@@ -1,0 +1,11 @@
+Status Output of tst_status.out
+init >> USER    :obachman
+init >> HOSTNAME:torreba.agt.cie.uva.es
+init >> uname -a:Linux torreba.agt.cie.uva.es 2.0.33 #4 Sun Jun 7 19:02:37 MET DST 1998 i586 unknown
+init >> date    :Sat Mar  6 16:41:52 MET 1999
+init >> version :1302
+init >> ticks   :100
+1 >> tst_memory_0 :: torreba.agt.cie.uva.es:158250
+1 >> tst_memory_1 :: torreba.agt.cie.uva.es:208786
+1 >> tst_memory_2 :: torreba.agt.cie.uva.es:221184
+1 >> tst_timer_1 :: torreba.agt.cie.uva.es:67

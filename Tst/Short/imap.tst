@@ -1,0 +1,546 @@
+LIB "tst.lib";
+tst_init();
+
+ring r0 = 0, (a,b,x,y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring r1 = (0, a), (b, x, y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring r2 = (0, a, b), (x, y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring s0 = 32003, (a,b,x,y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring s1 = (32003, a), (b, x, y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring s2 = (32003, a,b), (x, y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring t0 = 7, (a,b,x,y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring t1 = (7, a), (b, x, y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring t2 = (7, a,b), (x, y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring f0 = (0, a) , (b, x, y), lp; minpoly = a2 + 1;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring f1 = (7, a) , (b, x, y), lp; minpoly = a2 + 1;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+ring f2 = (49, a), (b, x, y), lp;
+poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;
+
+
+
+setring r0;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring r1;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring r2;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring s0;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring s1;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring s2;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring t0;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring t1;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring t2;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring f2;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p); 
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring f1;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring f0;
+imap(r0, p);
+imap (r1, p);
+imap(r2, p);
+imap(s0, p);
+imap (s1, p);
+imap(s2, p);
+imap(t0, p);
+imap (t1, p);
+imap(t2, p);
+imap(f2, p);
+imap(f1, p);
+imap(f0, p);
+
+setring r0;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring r1;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring r2;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring s0;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring s1;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring s2;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring t0;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring t1;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring t2;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring f2;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p); core dump nsetMap ok -- while doing permutation
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring f1;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring f0;
+fetch(r0, p);
+fetch (r1, p);
+fetch(r2, p);
+fetch(s0, p);
+fetch (s1, p);
+fetch(s2, p);
+fetch(t0, p);
+fetch (t1, p);
+fetch(t2, p);
+fetch(f2, p);
+fetch(f1, p);
+fetch(f0, p);
+
+setring r0;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring r1;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring r2;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring s0;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring s1;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring s2;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring t0;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring t1;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring t2;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring f2;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring f1;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+setring f0;
+map m_r0 = r0,maxideal(1); m_r0(p);
+map m_r1 = r1,maxideal(1); m_r1(p);
+map m_r2 = r2,maxideal(1); m_r2(p);
+map m_s0 = s0,maxideal(1); m_s0(p);
+map m_s1 = s1,maxideal(1); m_s1(p);
+map m_s2 = s2,maxideal(1); m_s2(p);
+map m_t0 = t0,maxideal(1); m_t0(p);
+map m_t1 = t1,maxideal(1); m_t1(p);
+map m_t2 = t2,maxideal(1); m_t2(p);
+map m_f2 = f2,maxideal(1); m_f2(p);
+map m_f1 = f1,maxideal(1); m_f1(p);
+map m_f0 = f0,maxideal(1); m_f0(p);
+
+tst_status(1);$
