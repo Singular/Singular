@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.5 2004-09-28 09:36:48 Singular Exp $ */
+/* $Id: longalg.cc,v 1.6 2005-02-24 17:45:46 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -25,15 +25,10 @@
 
 naIdeal naI=NULL;
 
-napoly naMinimalPoly;
 int naNumbOfPar;
-#ifndef LONGALGNEW
-int napMonomSize;
-char **naParNames;
-#else /* LONGALGNEW */
+napoly naMinimalPoly;
 #define naParNames (currRing->parameter)
 #define napNormalize(p) p_Normalize(p,nacRing)
-#endif /* LONGALGNEW */
 static int naIsChar0;
 static int naPrimeM;
 
@@ -63,9 +58,6 @@ static BOOLEAN  (*nacIsOne)(number a);
 static BOOLEAN  (*nacIsMOne)(number a);
 static BOOLEAN  (*nacGreaterZero)(number a);
 static char   * (*nacRead) (char *s, number *a);
-#ifndef LONGALGNEW
-extern void     napDelete(napoly *p);
-#endif /* not LONGALGNEW */
 static napoly napRedp(napoly q);
 static napoly napTailred(napoly q);
 static BOOLEAN napDivPoly(napoly p, napoly q);
@@ -88,16 +80,13 @@ void naSetChar(int i, ring r)
     naI=NULL;
   }
   naMap = naCopy;
-  /*------------ set naMinimalPoly -----------------------------------*/
+
   if (r->minpoly!=NULL)
     naMinimalPoly=((lnumber)r->minpoly)->z;
   else
     naMinimalPoly = NULL;
+
   naNumbOfPar=rPar(r);
-#ifndef LONGALGNEW
-  naParNames=r->parameter;
-  napMonomSize = RECA_SIZE + naNumbOfPar*SIZEOF_PARAMETER;
-#endif /* not LONGALGNEW */
   if (i == 1)
   {
     naIsChar0 = 1;
@@ -154,29 +143,6 @@ static void napTest(napoly p)
 #define napTest(p) ((void) 0)
 #endif
 
-#ifndef LONGALGNEW
-/*3
-* creates  an napoly poly
-*/
-static napoly napInit(int i)
-{
-  napoly a = (napoly)omAlloc0(napMonomSize);
-
-  a->ko = nacInit(i);
-  if (!nacIsZero(a->ko))
-  {
-    return a;
-  }
-  else
-  {
-    omFreeSize((ADDRESS)a, napMonomSize);
-    return NULL;
-  }
-}
-#define napMultCopy(p,q)  napMult(napCopy(p),napCopy(q))
-#define napIsConstant(p)  (napDeg(p)==0)
-#define napSetCoeff(p,n) {nacDelete(&((p)->ko),nacRing);(p)->ko=n;}
-#else /* LONGALGNEW */
 #define napInit(i)       (napoly)p_ISet(i,nacRing)
 #define napSetCoeff(p,n) {nacDelete(&napGetCoeff(p),nacRing);napGetCoeff(p)=n;}
 #define napDelete1(p)    p_LmDelete((poly *)p, nacRing)
@@ -188,244 +154,26 @@ static napoly napInit(int i)
 #define napMultCopy(A,B)   (napoly)pp_Mult_qq((poly)A,(poly)B,nacRing)
 #define napIsConstant(p) p_LmIsConstant(p,nacRing)
 #define napDeg(p)        (int)p_ExpVectorQuerSum(p, nacRing)
-#endif /* LONGALGNEW */
 
 /*3
 * creates  an napoly
 */
 napoly napInitz(number z)
 {
-#ifndef LONGALGNEW
-  napoly a = (napoly)omAlloc0(napMonomSize);
-#else /* LONGALGNEW */
   napoly a = (napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   napGetCoeff(a) = z;
   return a;
 }
-
-#ifndef LONGALGNEW
-/*3
-*  deletes head of  an napoly poly
-*/
-static void napDelete1(napoly *p)
-{
-  napoly h = *p;
-
-  if (h!=NULL)
-  {
-    *p = h->ne;
-    nacDelete(&(h->ko),nacRing);
-    omFreeSize((ADDRESS)h, napMonomSize);
-  }
-}
-
-/*3
-*  delete an napoly poly
-*/
-void napDelete(napoly *p)
-{
-  napoly w, h = *p;
-
-  while (h!=NULL)
-  {
-    w = h;
-    h = h->ne;
-    nacDelete(&(w->ko),nacRing);
-    omFreeSize((ADDRESS)w, napMonomSize);
-  }
-  *p = NULL;
-}
-
-void nap_Delete(napoly *p, const ring r)
-{
-  napoly w, h = *p;
-
-  while (h!=NULL)
-  {
-    w = h;
-    h = h->ne;
-    n_Delete(&(w->ko),r->algring);
-    omFree((ADDRESS)w);
-  }
-  *p = NULL;
-}
-
-
-/*3
-* copy a napoly. poly
-*/
-static napoly napCopy(napoly p)
-{
-  if (p==NULL) return NULL;
-
-  napoly w, a;
-
-  omCheckAddrSize(p,napMonomSize);
-  a = w = (napoly)omAlloc(napMonomSize);
-  memcpy4(w->e, p->e, naNumbOfPar * SIZEOF_PARAMETER);
-  w->ko = nacCopy(p->ko);
-  loop
-  {
-    p=p->ne;
-    if (p==NULL) break;
-    omCheckAddrSize(p,napMonomSize);
-    a->ne = (napoly)omAlloc(napMonomSize);
-    a = a->ne;
-    memcpy4(a->e, p->e, naNumbOfPar * SIZEOF_PARAMETER);
-    a->ko = nacCopy(p->ko);
-  }
-  a->ne = NULL;
-  return w;
-}
-#endif /* not LONGALGNEW */
 
 /*3
 * copy a napoly. poly
 */
 static napoly napCopyNeg(napoly p)
 {
-#ifndef LONGALGNEW
-  napoly w, a;
-
-  if (p==NULL) return NULL;
-  omCheckAddrSize(p,napMonomSize);
-  a = w = (napoly)omAlloc(napMonomSize);
-  memcpy4(w->e, p->e, naNumbOfPar * SIZEOF_PARAMETER);
-  w->ko = nacNeg(nacCopy(p->ko));
-  loop
-  {
-    p=p->ne;
-    if (p==NULL) break;
-    omCheckAddrSize(p,napMonomSize);
-    a->ne = (napoly)omAlloc(napMonomSize);
-    a = a->ne;
-    memcpy4(a->e, p->e, naNumbOfPar * SIZEOF_PARAMETER);
-    a->ko = nacNeg(nacCopy(p->ko));
-  }
-  a->ne = NULL;
-  return w;
-#else /* LONGALGNEW */
   napoly r=napCopy(p);
   r=(napoly)p_Neg((poly)r, nacRing);
   return r;
-#endif /* LONGALGNEW */
 }
-
-#ifndef LONGALGNEW
-/*3
-* Compare exponents of p and q
-*/
-static int  napComp(napoly p, napoly q)
-{
-  int  i = 0;
-
-  omCheckAddrSize(p,napMonomSize);
-  omCheckAddrSize(q,napMonomSize);
-  while (p->e[i] == q->e[i])
-  {
-    i++;
-    if (i >= naNumbOfPar)
-      return 0;
-  }
-  if (p->e[i]  >  q->e[i])
-    return 1;
-  else
-    return - 1;
-}
-
-/*3
-*  addition of napoly. polys
-*/
-napoly napAdd(napoly p1, napoly p2)
-{
-  napoly a1, p, a2, a;
-  int  c;  number t;
-
-  if (p1==NULL) return p2;
-  if (p2==NULL) return p1;
-  omCheckAddrSize(p1,napMonomSize);
-  omCheckAddrSize(p2,napMonomSize);
-  a1 = p1;
-  a2 = p2;
-  a = p  = (napoly)omAlloc(napMonomSize);
-  loop
-  {
-    c = napComp(a1, a2);
-    if (c == 1)
-    {
-      a = a->ne = a1;
-      a1 = a1->ne;
-      if (a1==NULL)
-      {
-        a->ne= a2;
-        break;
-      }
-      omCheckAddrSize(a1,napMonomSize);
-    }
-    else if (c == -1)
-    {
-      a = a->ne = a2;
-      a2 = a2->ne;
-      if (a2==NULL)
-      {
-        a->ne = a1;
-        break;
-      }
-      omCheckAddrSize(a2,napMonomSize);
-    }
-    else
-    {
-      t = nacAdd(a1->ko, a2->ko);
-      napDelete1(&a2);
-      if (nacIsZero(t))
-      {
-        nacDelete(&t,nacRing);
-        napDelete1(&a1);
-      }
-      else
-      {
-        nacDelete(&(a1->ko),nacRing);
-        a1->ko = t;
-        a = a->ne = a1;
-        a1 = a1->ne;
-      }
-      if (a1==NULL)
-      {
-        a->ne = a2;
-        break;
-      }
-      else if (a2==NULL)
-      {
-        a->ne = a1;
-        break;
-      }
-      omCheckAddrSize(a1,napMonomSize);
-      omCheckAddrSize(a2,napMonomSize);
-    }
-  }
-  a = p->ne;
-  omFreeSize((ADDRESS)p, napMonomSize);
-  return a;
-}
-
-
-/*3
-* multiply a napoly. poly by -1
-*/
-napoly napNeg(napoly a)
-{
-  napoly p = a;
-
-  while (p!=NULL)
-  {
-    omCheckAddrSize(p,napMonomSize);
-    p->ko = nacNeg(p->ko);
-    p = p->ne;
-  }
-  return a;
-}
-#endif /* not LONGALGNEW */
 
 /*3
 * returns ph * z
@@ -444,134 +192,6 @@ static void napMultN(napoly p, number z)
   }
 }
 
-#ifndef LONGALGNEW
-/*3
-* update the polynomial a by multipying it by
-* the (number) coefficient
-* and the exponent vector (of) exp (a well initialized polynomial)
-*/
-static void napMultT(napoly a, napoly exp)
-{
-  int  i;
-  number t, h;
-  if (a==NULL)
-    return;
-  h = exp->ko;
-  if (nacIsOne(h))
-  {
-    do
-    {
-      for (i = naNumbOfPar - 1; i >= 0; i--)
-        a->e[i] += exp->e[i];
-      a = a->ne;
-    }
-    while (a!=NULL);
-  }
-  else
-  {
-    h = nacNeg(h);
-    if (nacIsOne(h))
-    {
-      h = nacNeg(h);
-      do
-      {
-        a->ko = nacNeg(a->ko);
-        for (i = naNumbOfPar - 1; i >= 0; i--)
-          a->e[i] += exp->e[i];
-        a = a->ne;
-      }
-      while (a!=NULL);
-    }
-    else
-    {
-      h = nacNeg(h);
-      do
-      {
-        t = nacMult(a->ko, h);
-        nacDelete(&(a->ko),nacRing);
-        a->ko = t;
-        for (i = naNumbOfPar - 1; i >= 0; i--)
-          a->e[i] += exp->e[i];
-        a = a->ne;
-      }
-      while (a!=NULL);
-    }
-    // need to do this, since nacNeg might have changed h
-    exp->ko = h;
-  }
-}
-#endif /* LONGALGNEW */
-
-#ifndef LONGALGNEW
-/*3
-* multiplication of napoly. polys
-* multiply p1 with p2, p1 and p2 are destroyed
-*/
-static napoly napMult(napoly p1, napoly p2)
-{
-  napoly a1, a2, b, h;
-  if (p1==NULL)
-  {
-    napDelete(&p2);
-    return NULL;
-  }
-  if (p2==NULL)
-  {
-    napDelete(&p1);
-    return NULL;
-  }
-  b = NULL;
-  a1 = p1;
-  a2 = p2;
-  if (a2->ne!=NULL)
-  {
-    if (a1->ne!=NULL)
-    {
-      do
-      {
-        a1 = a1->ne;
-        a2 = a2->ne;
-      }
-      while ((a1!=NULL) && (a2!=NULL));
-      if (a1!=NULL)
-      {
-        a1 = p1;
-        a2 = p2;
-      }
-      else
-      {
-        a1 = p2;
-        a2 = p1;
-      }
-      do
-      {
-        if (a2->ne!=NULL)
-          h = napCopy(a1);
-        else
-          h = a1;
-        napMultT(h, a2);
-        b = napAdd(h, b);
-        napDelete1(&a2);
-      }
-      while (a2!=NULL);
-    }
-    else
-    {
-      napMultT(a2, a1);
-      b = napAdd(a2, b);
-      napDelete1(&a1);
-    }
-  }
-  else
-  {
-    napMultT(a1, a2);
-    b = napAdd(a1, b);
-    napDelete1(&a2);
-  }
-  return b;
-}
-#endif /* not LONGALGNEW */
-
 /*3
 *  division with rest; f = g*q + r, returns r and destroy f
 */
@@ -579,11 +199,7 @@ napoly napRemainder(napoly f, const napoly  g)
 {
   napoly a, h, qq;
 
-#ifndef LONGALGNEW
-  qq = (napoly)omAlloc(napMonomSize);
-#else /* LONGALGNEW */
   qq = (napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   napNext(qq) = NULL;
   napNormalize(g);
   napNormalize(f);
@@ -591,7 +207,7 @@ napoly napRemainder(napoly f, const napoly  g)
   do
   {
     napSetExp(qq,1, napGetExp(a,1) - napGetExp(g,1));
-    p_Setm(qq,nacRing);
+    napSetm(qq);
     napGetCoeff(qq) = nacDiv(napGetCoeff(a), napGetCoeff(g));
     napGetCoeff(qq) = nacNeg(napGetCoeff(qq));
     nacNormalize(napGetCoeff(qq));
@@ -602,11 +218,7 @@ napoly napRemainder(napoly f, const napoly  g)
     a = napAdd(a, h);
   }
   while ((a!=NULL) && (napGetExp(a,1) >= napGetExp(g,1)));
-#ifndef LONGALGNEW
-  omFreeSize((ADDRESS)qq, napMonomSize);
-#else /* LONGALGNEW */
   omFreeBinAddr(qq);
-#endif /* LONGALGNEW */
   return a;
 }
 
@@ -617,11 +229,7 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
 {
   napoly a, h, b, qq;
 
-#ifndef LONGALGNEW
-  qq = (napoly)omAlloc(napMonomSize);
-#else /* LONGALGNEW */
   qq = (napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   napNext(qq) = b = NULL;
   napNormalize(g);
   napNormalize(f);
@@ -641,11 +249,7 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
     a = napAdd(a, h);
   }
   while ((a!=NULL) && (napGetExp(a,1) >= napGetExp(g,1)));
-#ifndef LONGALGNEW
-  omFreeSize((ADDRESS)qq, napMonomSize);
-#else /* LONGALGNEW */
   omFreeBinAddr(qq);
-#endif /* LONGALGNEW */
   *q = b;
   *r = a;
 }
@@ -758,21 +362,6 @@ zero_divisor:
   return x;
 }
 
-#ifndef LONGALGNEW
-/*3
-* the degree of an napoly poly (used for test of "constant" et al.)
-*/
-static int  napDeg(napoly p)
-{
-  int  d = 0, i;
-
-  omCheckAddrSize(p,napMonomSize);
-  for (i = naNumbOfPar-1; i>=0; i--)
-    d += p->e[i];
-  return d;
-}
-#endif /* LONGALGNEW */
-
 /*3
 * the max degree of an napoly poly (used for test of "simple" et al.)
 */
@@ -872,11 +461,7 @@ void napWrite(napoly p,const BOOLEAN has_denom)
 }
 
 
-#ifndef LONGALGNEW
-static char *napHandleMons(char *s, int i, PARAMETER_TYPE *ex)
-#else /* LONGALGNEW */
 static char *napHandleMons(char *s, int i, napoly ex)
-#endif /* LONGALGNEW */
 {
   int  j;
   if (strncmp(s,naParNames[i],strlen(naParNames[i]))==0)
@@ -885,18 +470,10 @@ static char *napHandleMons(char *s, int i, napoly ex)
     if ((*s >= '0') && (*s <= '9'))
     {
       s = eati(s, &j);
-#ifndef LONGALGNEW
-      ex[i] += j;
-#else /* LONGALGNEW */
       napAddExp(ex,i+1,j);
-#endif /* LONGALGNEW */
     }
     else
-#ifndef LONGALGNEW
-      ex[i]++;
-#else /* LONGALGNEW */
       napAddExp(ex,i+1,1);
-#endif /* LONGALGNEW */
   }
   return s;
 }
@@ -906,11 +483,7 @@ static char  *napRead(char *s, napoly *b)
 {
   napoly a;
   int  i;
-#ifndef LONGALGNEW
-  a = (napoly)omAlloc0(napMonomSize);
-#else /* LONGALGNEW */
   a = (napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   if ((*s >= '0') && (*s <= '9'))
   {
     s = nacRead(s, &napGetCoeff(a));
@@ -928,11 +501,7 @@ static char  *napRead(char *s, napoly *b)
   loop
   {
     olds = s;
-#ifndef LONGALGNEW
-    s = napHandleMons(s, i, a->e);
-#else /* LONGALGNEW */
     s = napHandleMons(s, i, a);
-#endif /* LONGALGNEW */
     if (olds == s)
       i++;
     else
@@ -1153,11 +722,7 @@ static napoly napGcd(napoly a, napoly b)
     return g;
   }
   // Hmm ... this is a memory leak
-#ifndef LONGALGNEW
-  // x = (napoly)omAlloc0(napMonomSize);
-#else /* LONGALGNEW */
   // x = (napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   g=a;
   h=b;
   if (!naIsChar0) x = napInit(1);
@@ -1199,24 +764,12 @@ number napLcm(napoly a)
 */
 static BOOLEAN napDivPoly (napoly p, napoly q)
 {
-#ifndef LONGALGNEW
-  int j=0;   /* evtl. von naNumber.. -1 abwaerts zaehlen */
-#else /* LONGALGNEW */
   int j=1;   /* evtl. von naNumber.. -1 abwaerts zaehlen */
-#endif /* LONGALGNEW */
 
-#ifndef LONGALGNEW
-  while (p->e[j] <= q->e[j])
-#else /* LONGALGNEW */
   while (napGetExp(p,j) <= napGetExp(q,j))
-#endif /* LONGALGNEW */
   {
     j++;
-#ifndef LONGALGNEW
-    if (j >= naNumbOfPar)
-#else /* LONGALGNEW */
     if (j > naNumbOfPar)
-#endif /* LONGALGNEW */
       return 1;
   }
   return 0;
@@ -1230,11 +783,7 @@ static BOOLEAN napDivPoly (napoly p, napoly q)
 */
 napoly napRedp (napoly q)
 {
-#ifndef LONGALGNEW
-  napoly h = (napoly)omAlloc0(napMonomSize);
-#else /* LONGALGNEW */
   napoly h = (napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   int i=0,j;
 
   loop
@@ -1302,18 +851,6 @@ number naInit(int i)
 {
   if (i!=0)
   {
-#ifndef LONGALGNEW
-    lnumber l = (lnumber)omAllocBin(rnumber_bin);
-    l->z = napInit(i);
-    if (l->z==NULL)
-    {
-      omFreeBin((ADDRESS)l,  rnumber_bin);
-      return NULL;
-    }
-    l->s = 2;
-    l->n = NULL;
-    return (number)l;
-#else /* LONGALGNEW */
     napoly z=napInit(i);
     if (z!=NULL)
     {
@@ -1323,7 +860,6 @@ number naInit(int i)
       l->n = NULL;
       return (number)l;
     }
-#endif /* LONGALGNEW */
   }
   /*else*/
   return NULL;
@@ -1459,25 +995,18 @@ number naAdd(number la, number lb)
     if (b->n!=NULL) x = napCopy(b->n);
     else            x = NULL;
   }
-#ifndef LONGALGNEW
-  if ((x!=NULL) && (napDeg(x)==0) && nacIsOne(x->ko))
-    napDelete(&x);
-#else /* LONGALGNEW */
   if (x!=NULL)
   {
     assume(!napIsConstant(x));
   }
-#endif /* LONGALGNEW */
   lu->n = x;
   lu->s = 0;
-#ifdef LONGALGNEW
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
      naNormalize(luu);
      lu=(lnumber)luu;
   }
-#endif /* LONGALGNEW */
   naTest((number)lu);
   return (number)lu;
 }
@@ -1524,25 +1053,18 @@ number naSub(number la, number lb)
     if (b->n!=NULL) x = napCopy(b->n);
     else            x = NULL;
   }
-#ifndef LONGALGNEW
-  if ((x!=NULL)&& (napDeg(x)==0) && nacIsOne(x->ko))
-    napDelete(&x);
-#else /* LONGALGNEW */
   if (x!=NULL)
   {
     assume(!napIsConstant(x));
   }
-#endif /* LONGALGNEW */
   lu->n = x;
   lu->s = 0;
-#ifdef LONGALGNEW
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
      naNormalize(luu);
      lu=(lnumber)luu;
   }
-#endif /* LONGALGNEW */
   naTest((number)lu);
   return (number)lu;
 }
@@ -1631,24 +1153,14 @@ number naIntDiv(number la, number lb)
   lnumber res;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-#ifndef LONGALGNEW
-  if ((a==NULL) || (a->z==NULL))
-#else /* LONGALGNEW */
   if (a==NULL)
   {
     assume(a->z!=NULL);
-#endif /* LONGALGNEW */
     return NULL;
-#ifndef LONGALGNEW
-  if ((b==NULL) || (b->z==NULL))
-#else /* LONGALGNEW */
   }
   if (b==NULL)
-#endif /* LONGALGNEW */
   {
-#ifdef LONGALGNEW
     assume(b->z!=NULL);
-#endif /* LONGALGNEW */
     WerrorS("div. by 0");
     return NULL;
   }
@@ -1718,14 +1230,12 @@ number naDiv(number la, number lb)
     napDelete(&x);
   lo->s = 0;
   lo->n = x;
-#ifdef LONGALGNEW
   if (lo->n!=NULL)
   {
      number luu=(number)lo;
      naNormalize(luu);
      lo=(lnumber)luu;
   }
-#endif /* LONGALGNEW */
   naTest((number)lo);
   return (number)lo;
 }
@@ -1791,14 +1301,12 @@ number naInvers(number a)
   }
   else
     lo->n = x;
-#ifdef LONGALGNEW
   if (lo->n!=NULL)
   {
      number luu=(number)lo;
      naNormalize(luu);
      lo=(lnumber)luu;
   }
-#endif /* LONGALGNEW */
   naTest((number)lo);
   return (number)lo;
 }
@@ -2083,9 +1591,9 @@ number naGcd(number a, number b, const ring r)
   {
     if (naMinimalPoly!=NULL)
     {
-      if (napNext(x->z)!=NULL)
-        result->z = napCopy(x->z);
-      else
+      //if (napNext(x->z)!=NULL)
+      //  result->z = napCopy(x->z);
+      //else
         result->z = napGcd0(x->z, y->z);
     }
     else
@@ -2465,11 +1973,7 @@ number naMapP0(number c)
   if (npIsZero(c)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
-#ifndef LONGALGNEW
-  l->z=(napoly)omAlloc0(napMonomSize);
-#else /* LONGALGNEW */
   l->z=(napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   int i=(int)c;
   if (i>(naPrimeM>>2)) i-=naPrimeM;
   napGetCoeff(l->z)=nlInit(i);
@@ -2485,11 +1989,7 @@ number naMap00(number c)
   if (nlIsZero(c)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=0;
-#ifndef LONGALGNEW
-  l->z=(napoly)omAlloc0(napMonomSize);
-#else /* LONGALGNEW */
   l->z=(napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   napGetCoeff(l->z)=nlCopy(c);
   l->n=NULL;
   return (number)l;
@@ -2503,11 +2003,7 @@ number naMapPP(number c)
   if (npIsZero(c)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
-#ifndef LONGALGNEW
-  l->z=(napoly)omAlloc0(napMonomSize);
-#else /* LONGALGNEW */
   l->z=(napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   napGetCoeff(l->z)=c; /* omit npCopy, because npCopy is a no-op */
   l->n=NULL;
   return (number)l;
@@ -2525,11 +2021,7 @@ number naMapPP1(number c)
   if (npIsZero(n)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
-#ifndef LONGALGNEW
-  l->z=(napoly)omAlloc0(napMonomSize);
-#else /* LONGALGNEW */
   l->z=(napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   napGetCoeff(l->z)=n;
   l->n=NULL;
   return (number)l;
@@ -2545,11 +2037,7 @@ number naMap0P(number c)
   if (npIsZero(n)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
-#ifndef LONGALGNEW
-  l->z=(napoly)omAlloc0(napMonomSize);
-#else /* LONGALGNEW */
   l->z=(napoly)p_Init(nacRing);
-#endif /* LONGALGNEW */
   napGetCoeff(l->z)=n;
   l->n=NULL;
   return (number)l;
@@ -2557,41 +2045,27 @@ number naMap0P(number c)
 
 static number (*nacMap)(number);
 static int naParsToCopy;
-#ifdef LONGALGNEW
 static ring napMapRing;
-#endif /* LONGALGNEW */
 static napoly napMap(napoly p)
 {
   napoly w, a;
 
   if (p==NULL) return NULL;
-#ifndef LONGALGNEW
-  a = w = (napoly)omAlloc0(napMonomSize);
-  memcpy4(a->e, p->e, naParsToCopy * SIZEOF_PARAMETER);
-  w->ko = nacMap(p->ko);
-#else /* LONGALGNEW */
   a = w = (napoly)p_Init(nacRing);
   int i;
   for(i=1;i<=naParsToCopy;i++)
     napSetExp(a,i,napGetExpFrom(p,i,napMapRing));
   p_Setm(a,nacRing);
   napGetCoeff(w) = nacMap(napGetCoeff(p));
-#endif /* LONGALGNEW */
   loop
   {
     napIter(p);
     if (p==NULL) break;
-#ifndef LONGALGNEW
-    a->ne = (napoly)omAlloc0(napMonomSize);
-    a = a->ne;
-    memcpy4(a->e, p->e, naParsToCopy * SIZEOF_PARAMETER);
-#else /* LONGALGNEW */
     napNext(a) = (napoly)p_Init(nacRing);
     napIter(a);
     for(i=1;i<=naParsToCopy;i++)
       napSetExp(a,i,napGetExpFrom(p,i,napMapRing));
     p_Setm(a,nacRing);
-#endif /* LONGALGNEW */
     napGetCoeff(a) = nacMap(napGetCoeff(p));
   }
   napNext(a) = NULL;
@@ -2671,11 +2145,7 @@ number naMapQaQb(number c)
     {
       if (napGetExp(erg->n,1) >= napGetExp(naMinimalPoly,1))
         erg->n = napRemainder(erg->n, naMinimalPoly);
-#ifndef LONGALGNEW
-      if ((napDeg(erg->n)==0) && nacIsOne(erg->n->ko))
-#else /* LONGALGNEW */
       if ((napIsConstant(erg->n)) && nacIsOne(napGetCoeff(erg->n)))
-#endif /* LONGALGNEW */
         napDelete(&(erg->n));
     }
   }
@@ -2706,9 +2176,7 @@ nMapFunc naSetMap(ring src, ring dst)
            return NULL;
         naParsToCopy++;
       }
-#ifdef LONGALGNEW
       napMapRing=src;
-#endif /* LONGALGNEW */
       nacMap=nacCopy;
       if ((naParsToCopy==rPar(dst))&&(naParsToCopy==rPar(src)))
         return naCopy;    /* Q(a) -> Q(a) */
@@ -2755,9 +2223,7 @@ nMapFunc naSetMap(ring src, ring dst)
            return NULL;
         naParsToCopy++;
       }
-#ifdef LONGALGNEW
       napMapRing=src;
-#endif /* LONGALGNEW */
       if ((naParsToCopy==rPar(dst))&&(naParsToCopy==rPar(src))
       && (nacMap==nacCopy))
         return naCopy;    /* Z/p(a) -> Z/p(a) */

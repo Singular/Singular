@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.3 2004-09-28 09:36:49 Singular Exp $ */
+/* $Id: longalg.h,v 1.4 2005-02-24 17:45:46 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -14,19 +14,6 @@
 struct slnumber;
 typedef struct slnumber * lnumber;
 
-#ifndef LONGALGNEW
-//make parameter type same as exponent type
-#define PARAMETER_TYPE short
-#define SIZEOF_PARAMETER SIZEOF_SHORT
-
-struct reca
-{
-  napoly ne;
-  number ko;
-  PARAMETER_TYPE e[1];
-};
-#endif /* not LONGALGNEW */
-
 struct slnumber
 {
   napoly z;
@@ -35,18 +22,10 @@ struct slnumber
 };
 
 extern int naNumbOfPar;             /* maximal number of parameters */
+
 extern napoly naMinimalPoly;
-#ifndef LONGALGNEW
-extern char **naParNames;
-extern int napMonomSize;
-#endif /* LONGALGNEW */
 
 void naSetChar(int p, ring r);
-#ifndef LONGALGNEW
-#define napAddExp(P,I,E)  ((P)->e[I-1]+=(E))
-#define napLength(p)      pLength((poly)p)
-napoly napNeg(napoly a);
-#endif /* LONGALGNEW */
 void    naDelete (number *p, const ring r);
 number  naInit(int i);                              /* z := i */
 number  naPar(int i);                               /* z := par(i) */
@@ -87,26 +66,7 @@ BOOLEAN naDBTest(number a, char *f,int l);
 void    naSetIdeal(ideal I);
 
 // external access to the interna
-#ifndef LONGALGNEW
-#define RECA_SIZE (sizeof(napoly)+sizeof(number))
-napoly napAdd(napoly p1, napoly p2);
-void napDelete(napoly *p);
-void nap_Delete(napoly *p, ring r);
-#endif /* not LONGALGNEW */
 poly naPermNumber(number z, int * par_perm, int P, ring r);
-#ifndef LONGALGNEW
-#define napVariables naNumbOfPar
-#define napNext(p) (p->ne)
-#define napIter(p) ((p) = (p)->ne)
-#define napGetCoeff(p) (p->ko)
-#define napGetExp(p,i) ((p)->e[(i)-1])
-#define napGetExpFrom(p,i,r) ((p)->e[(i)-1])
-#define napSetExp(p,i,ee) ((p)->e[(i)-1]=ee)
-#define napNew() ((napoly)omAlloc0(napMonomSize))
-#define nanumber lnumber
-#define naGetNom0(na)  (((nanumber)(na))->z)
-#define naGetDenom0(na)  (((nanumber)(na))->n)
-#else /* LONGALGNEW */
 #define napAddExp(p,i,e)       (p_AddExp(p,i,e,currRing->algring))
 #define napLength(p)           pLength(p)
 #define napNeg(p)              (p_Neg(p,currRing->algring))
@@ -126,7 +86,6 @@ poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define naGetNom0(na)          (((nanumber)(na))->z)
 #define naGetDenom0(na)        (((nanumber)(na))->n)
 napoly napRemainder(napoly f, const napoly  g);
-#endif /* LONGALGNEW */
 extern number   (*nacCopy)(number a);
 extern BOOLEAN  (*nacIsZero)(number a);
 extern number   (*nacInit)(int i);
