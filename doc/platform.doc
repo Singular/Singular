@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: platform.doc,v 1.4 1999-12-06 16:06:57 obachman Exp $
+@comment $Id: platform.doc,v 1.5 1999-12-08 15:41:28 obachman Exp $
 @comment this file contains Release notes and various howto's
 
 @c The following directives are necessary for proper compilation
@@ -44,7 +44,17 @@
 @cindex howto, download
 
 
-TBC
+@sc{Singular} is available as binary program for most common hard-
+and software platforms. It can be downloaded with ftp from our FTP site
+@display
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/},
+@end display
+or, using your favourite WWW browser, from
+@display
+@uref{http://www.mathematik.uni-kl.de/pub/Math/Singular/}.
+@end display
+
+@include README_download.texi
 
 @c ----------------------------------------------------------
 @node Unix installation instructions, Windows installation instructions,Downloading instructions, Release Notes
