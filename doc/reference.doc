@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.54 1998-05-18 14:51:40 Singular Exp $
+@comment $Id: reference.doc,v 1.55 1998-05-18 15:22:20 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2299,7 +2299,7 @@ deletes objects.
 * names::
 @end menu
 @iftex
-See @ref{defined}, @ref{general.lib}, @ref{names}
+See @ref{defined}, @ref{general_lib}, @ref{names}
 @end iftex
 @c ---------------------------------------
 @node killattrib, koszul, kill, Functions
@@ -4519,7 +4519,7 @@ general_lib::
 @end menu
 @iftex
 @c See @ref{string expressions}; @ref{intvec expressions}; @ref{poly expressions};
-See @ref{general.lib}.
+See @ref{general_lib}.
 @end iftex
 @c ---------------------------------------
 @node sres, status, sortvec, Functions
