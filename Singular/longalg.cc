@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.6 1997-06-17 09:44:27 Singular Exp $ */
+/* $Id: longalg.cc,v 1.7 1997-06-25 07:58:08 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1758,31 +1758,9 @@ BOOLEAN naIsMOne(number za)
   if (a->n==NULL)
   {
     if (napDeg(a->z)==0) return nacIsMOne(a->z->ko);
-    else                 return FALSE;
+    /*else                 return FALSE;*/
   }
-  x = a->z;
-  y = a->n;
-  do
-  {
-    t = nacAdd(x->ko, y->ko);
-    if (!nacIsZero(t))
-    {
-      nacDelete(&t);
-      return FALSE;
-    }
-    else
-      nacDelete(&t);
-    x = x->ne;
-    y = y->ne;
-  }
-  while ((x!=NULL) && (y!=NULL));
-  if ((x!=NULL) || (y!=NULL)) return FALSE;
-  napDelete(&a->z);
-  napDelete(&a->n);
-  a->z = napInit(-1);
-  a->n = NULL;
-  a->s = 2;
-  return TRUE;
+  return FALSE;
 }
 
 /*2
