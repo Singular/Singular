@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.90 1999-11-20 10:17:24 siebert Exp $ */
+/* $Id: ring.cc,v 1.91 1999-11-21 12:26:48 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3105,7 +3105,7 @@ void rUnComplete(ring r)
   {
     if (r->mm_specHeap != NULL)
       mmUnGetSpecHeap(&(r->mm_specHeap));
-  
+
     Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
     if (r->order != NULL)
     {
@@ -3193,7 +3193,7 @@ void rDebugPrint(ring r)
       #endif
     }
     #ifdef HAVE_SHIFTED_EXPONENTS
-    if( r->pCompIndex==j ) Print("v0; ");
+    if( r->pCompIndex==j ) PrintS("v0; ");
     #endif
     for(i=0;i<r->OrdSize;i++)
     {
@@ -3203,8 +3203,10 @@ void rDebugPrint(ring r)
           r->typ[i].data.dp.start, r->typ[i].data.dp.end);
       }
     }
-    if (j<r->pCompLSize)
-      Print("ordsgn %d\n", r->ordsgn[j]);
+    if (j<r->pCompLSize) Print("ordsgn %d ", r->ordsgn[j]);
+
+    if (j==r->pOrdIndex)
+      PrintS("pOrdIndex\n");
     else
       PrintLn();
   }
@@ -3331,12 +3333,12 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete = TRUE)
 static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
 {
   int last_block = rBlocks(r) - 2;
-  if (r->order[last_block] != ringorder_c && 
+  if (r->order[last_block] != ringorder_c &&
       r->order[last_block] != ringorder_C)
   {
     int c_pos = 0;
     int i;
-    
+
     for (i=0; i< last_block; i++)
     {
       if (r->order[i] == ringorder_c || r->order[i] == ringorder_C)
@@ -3345,7 +3347,7 @@ static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
         break;
       }
     }
-    if (c_pos != -1) 
+    if (c_pos != -1)
     {
       ring new_r = rCopy0(r, FALSE, TRUE);
       for (i=c_pos+1; i<=last_block; i++)
@@ -3386,10 +3388,10 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
 {
   ring new_r_1 = rAssure_CompLastBlock(currRing, FALSE);
   ring new_r = rAssure_SyzComp(new_r_1, FALSE);
-  
+
   if (new_r != currRing)
   {
-    ring old_r = currRing;    
+    ring old_r = currRing;
     if (new_r_1 != new_r && new_r_1 != old_r) rDelete(new_r_1);
     rComplete(new_r, 1);
     rChangeCurrRing(new_r, TRUE);
@@ -3413,8 +3415,8 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
   assume(b1 == ringorder_c || b1 == ringorder_C ||
          b2 == ringorder_c || b2 == ringorder_C ||
          b2 == ringorder_S);
-  if ((r_blocks == 3) && 
-      (currRing->order[0] == b1) && 
+  if ((r_blocks == 3) &&
+      (currRing->order[0] == b1) &&
       (currRing->order[1] == b2) &&
       (currRing->order[2] == 0))
     return currRing;
