@@ -383,12 +383,19 @@ AC_CHECK_SIZEOF(short,2)
 AC_CHECK_SIZEOF(int,4)
 AC_CHECK_SIZEOF(long,4)
 AC_CHECK_SIZEOF(void*,4)
+AC_CHECK_SIZEOF(double, 8)
 AC_C_BIGENDIAN
 if test "$ac_cv_sizeof_int" != 4; then
   AC_MSG_ERROR(need int to be four bytes long)
 fi
 if test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
   AC_MSG_ERROR(need equal sizes for long and void*)
+fi
+if test "$ac_cv_sizeof_double" != 8; then
+  AC_MSG_ERROR(need double to b 8 bytes long)
+fi
+if test "$ac_cv_sizeof_voidp" != 4 && "$ac_cv_sizeof_voidp" != 8; then
+  AC_MSG_ERROR(need void* to be 4 or 8 bytes long)
 fi
 
 dnl

@@ -1343,13 +1343,17 @@ int sleftv::Eval()
       if (!nok)
       {
         char *n=d->arg1.name;
-        nok=d->arg2.Eval();
+        nok=(n == NULL) || d->arg2.Eval();
         if (!nok)
         {
           int save_typ=d->arg1.rtyp;
           mmTestLP(n);
           if (d->arg1.rtyp!=IDHDL)
-            syMake(&d->arg1,n); //assume  type of arg1==DEF_CMD
+#ifdef HAVE_NAMESPACES
+            syMake(&d->arg1,n, d->arg1.req_packhdl); //assume  type of arg1==DEF_CMD
+#else
+          syMake(&d->arg1,n);
+#endif          
           mmTestLP(d->arg1.name);
           if (d->arg1.rtyp==IDHDL)
           {

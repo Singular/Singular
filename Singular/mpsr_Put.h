@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.h,v 1.9 1998-12-16 18:43:43 Singular Exp $ */
+/* $Id: mpsr_Put.h,v 1.10 1998-12-18 11:11:42 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Put.h
@@ -16,6 +16,8 @@
 
 #ifndef __MPSR_PUT__
 #define __MPSR_PUT__
+
+#include"mod2.h"
 
 #include"mpsr.h"
 
@@ -78,7 +80,7 @@ inline mpsr_Status_t mpsr_PutString(MP_Link_pt link, char *str)
 }
 extern mpsr_Status_t mpsr_PutRing(MP_Link_pt link, ring r);
 extern mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char *pname,procinfov proc);
-extern mpsr_Status_t mpsr_PutPackage(MP_Link_pt link, char *pname,idhdl proc);
+extern mpsr_Status_t mpsr_PutPackage(MP_Link_pt link, package pack);
 inline mpsr_Status_t mpsr_PutDef(MP_Link_pt link, char *name)
 {
   mp_return(MP_PutIdentifierPacket(link, MP_SingularDict, name, 0));
@@ -218,7 +220,7 @@ inline mpsr_Status_t mpsr_PutMapLeftv(MP_Link_pt link, leftv v, ring cring)
 inline mpsr_Status_t mpsr_PutPackageLeftv(MP_Link_pt link, leftv v)
 {
   typecheck(v, PACKAGE_CMD);
-  return mpsr_PutPackage(link, v->name, (idhdl) v->Data());
+  return mpsr_PutPackage(link, (package) v->Data());
 }
 
 /***************************************************************

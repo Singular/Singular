@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.20 1998-11-09 15:43:05 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.21 1998-12-18 11:11:42 obachman Exp $ */
 
 /***************************************************************
  *
@@ -239,7 +239,8 @@ short sr_cmds[] =
   DUMP_CMD,
   GETDUMP_CMD,
   STATUS_CMD,
-  LIB_CMD
+  LIB_CMD,
+  PACKAGE_CMD
 };
 
 // struct used for specifying the cmd <-> cop relations
@@ -368,6 +369,7 @@ cmd_dictcop cmd_dictcops[] =
       {INTERSECT_CMD, MP_CopBasicInterSect},
       {SUBST_CMD, MP_CopBasicSubst},
       {NOT, MP_CopBasicNot},
+      {COLONCOLON, MP_CopBasicPackage},
       {MAX_TOK, 0}
     }
   }

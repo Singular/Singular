@@ -1,9 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.14 1998-11-13 12:20:59 obachman Exp $ */
-
-#define KAI
+/* $Id: mpsr_Put.cc,v 1.15 1998-12-18 11:11:41 obachman Exp $ */
 
 /***************************************************************
  *
@@ -516,30 +514,30 @@ mpsr_Status_t mpsr_PutMap(MP_Link_pt link, map m, ring cring)
   return mpsr_PutIdeal(link, (ideal) m, cring);
 }
 
-
-mpsr_Status_t mpsr_PutPackage(MP_Link_pt link, char* pname, idhdl pack)
+mpsr_Status_t mpsr_PutPackage(MP_Link_pt link, package pack)
 {
   MP_DictTag_t dict;
   MP_Common_t  cop;
 
-  printf("Huhu\n");
-  failr(mpsr_tok2mp('=', &dict, &cop));
-  printf("Huhu 1\n");
+  failr(mpsr_tok2mp(PACKAGE_CMD, &dict, &cop));
 
   // A Singular- procedure is sent as a cop with the string as arg
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                        dict,
-                                        cop,
-                                        0,
-                                        2));
-  printf("Huhu 2\n");
-  mp_failr(MP_PutIdentifierPacket(link, MP_SingularDict, pname,1));
-  printf("Huhu 3\n");
+                                      dict,
+                                      cop,
+                                      1,
+                                      (pack->language != LANG_NONE &&
+                                       pack->language != LANG_TOP ? 1 : 0)));
   mp_failr(MP_PutAnnotationPacket(link,
                                   MP_SingularDict,
-                                  0,
-                                  0));
-  printf("Huhu 4\n");
+                                  MP_AnnotSingularPackageType,
+                                  MP_AnnotValuated));
+  mp_failr(MP_PutUint8Packet(link, (unsigned char) pack->language, 0));
+  if (pack->language != LANG_NONE && pack->language != LANG_TOP)
+  {
+    assume(pack->libname != NULL);
+    mp_failr(MP_PutStringPacket(link, pack->libname, 0));
+  }
   mp_return(MP_Success);
 }
 
@@ -554,7 +552,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
   ring r;
   sip_command cmd;
   leftv lv;
-
+  
   mpsr_ClearError();
   memset(&(cmd), 0, sizeof(sip_command));
   cmd.argc = 2;
@@ -573,47 +571,83 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
       Print("Dumped Proc %s\n", IDID(h));
 #endif
     }
-    // do not dump LIB string and Links
+    // do not dump LIB string and Links and Top PACKAGE
     else if (!(IDTYP(h) == STRING_CMD && strcmp("LIB", IDID(h)) == 0) &&
-             IDTYP(h) != LINK_CMD)
+             IDTYP(h) != LINK_CMD && 
+             ! (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") == 0))
     {
+#ifdef HAVE_NAMESPACES
+      cmd.arg1.name = (char*) 
+        AllocL(strlen(IDID(h)) + strlen(namespaceroot->name) + 3);
+      sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h));
+#else
       cmd.arg1.name = IDID(h);
-      //cmd.arg2.next = h->next;
-      cmd.arg1.name = IDID(h);
+#endif      
       cmd.arg2.data=IDDATA(h);
       cmd.arg2.flag=h->flag;
       cmd.arg2.attribute=h->attribute;
       cmd.arg2.rtyp=h->typ;
-      //cmd.arg2.e = NULL;
-      //cmd.arg2.muell = 0;
-      //memcpy(&(cmd.arg2), h, sizeof(sleftv));
-      if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success) break;
+#ifdef HAVE_NAMESPACES
+      if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success) 
+      {
+        FreeL(cmd.arg1.name);
+        break;
+      }
+      FreeL(cmd.arg1.name);
+#else
+      if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
+#endif
+      
 #ifdef MPSR_DEBUG
       Print("Dumped %s\n", IDID(h));
 #endif
-      if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+      if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD || 
+          (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") != 0))
       {
         // we don't really need to do that, it's only for convenience
         // for putting numbers
-        rSetHdl(h, TRUE);
-        r = IDRING(h);
-        h2 = r->idroot;
+        if (IDTYP(h) == PACKAGE_CMD)
+        {
+          namespaceroot->push(IDPACKAGE(h), IDID(h));
+          h2 = IDPACKAGE(h)->idroot;
+        }
+        else
+        {
+          rSetHdl(h, TRUE);
+          r = IDRING(h);
+          h2 = r->idroot;
+        }
         while (h2 != NULL)
         {
-          //cmd.arg2.next = h->next;
+#ifdef HAVE_NAMESPACES
+          cmd.arg1.name = (char*) 
+            AllocL(strlen(IDID(h2)) + strlen(namespaceroot->name) + 3);
+          sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h2));
+#else
           cmd.arg1.name = IDID(h2);
+#endif      
           cmd.arg2.data=IDDATA(h2);
           cmd.arg2.flag = h2->flag;
           cmd.arg2.attribute = h2->attribute;
           cmd.arg2.rtyp = h2->typ;
-          //cmd.arg2.e = NULL;
-          //cmd.arg2.muell = 0;
-          //memcpy(&(cmd.arg2), h2, sizeof(sleftv));
+#ifdef HAVE_NAMESPACES
+          if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success) 
+          {
+            FreeL(cmd.arg1.name);
+            break;
+          }
+          FreeL(cmd.arg1.name);
+#else
           if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
+#endif
 #ifdef MPSR_DEBUG
           Print("Dumped %s\n", IDID(h2));
 #endif
           h2 = h2->next;
+        }
+        if (IDTYP(h) == PACKAGE_CMD)
+        {
+          namespaceroot->pop();
         }
       }
     }

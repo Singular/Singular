@@ -683,12 +683,18 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
           namespaceroot->pop();
         }
         else
+        {
           Werror("'%s' no such package", u->name);
+          return TRUE;
+        }
         break;
+
       case DEF_CMD:
         break;
+
       default:
         Werror("<package>::<id> expected");
+        return TRUE;
   }
 #else /* HAVE_NAMESPACES */
   Werror("package are not supported in this version");

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Tok.h,v 1.2 1997-04-09 12:20:05 Singular Exp $ */
+/* $Id: mpsr_Tok.h,v 1.3 1998-12-18 11:11:43 obachman Exp $ */
 
 /***************************************************************
  *
@@ -25,5 +25,7 @@ extern mpsr_Status_t mpsr_mp2tok(MP_DictTag_t dict, MP_Common_t cop,
 extern MP_Common_t mpsr_ord2mp(int sr_ord);
 extern short mpsr_mp2ord(MP_Common_t mp_ord);
 
-#define MP_AnnotSingularProcDef 1
+#define MP_AnnotSingularProcDef         1
+#define MP_AnnotSingularPackageType     2
+
 #endif  // __MPSR_TOK_H__

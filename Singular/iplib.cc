@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.49 1998-12-15 13:20:31 krueger Exp $ */
+/* $Id: iplib.cc,v 1.50 1998-12-18 11:11:37 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -675,7 +675,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 #ifdef HAVE_NAMESPACES
   int token = 0;
 
-  if(IsCmd(plib, &token))
+  if(IsCmd(plib, token))
   {
     Werror("'%s' is resered identifier\n", plib);
     fclose(fp);

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.21 1998-11-13 12:20:59 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.22 1998-12-18 11:11:40 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -515,7 +515,7 @@ static mpsr_Status_t GetIntMatLeftv(MP_Link_pt link, MPT_Node_pt node,
   intvec *iv;
   int row = node->numchild, col = 1, *v;
   MPT_Annot_pt annot = MPT_Annot(node, MP_MatrixDict,
-                                     MP_AnnotMatrixDimension);
+                                 MP_AnnotMatrixDimension);
   if (annot != NULL &&
       annot->value != NULL &&
       annot->value->node->numchild == 2 &&
@@ -665,6 +665,38 @@ static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
   return mpsr_Success;
 }
 
+static mpsr_Status_t GetPackageLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                     mpsr_leftv mlv)
+{
+  package pack = (package) Alloc0(sizeof(sip_package));
+  
+  pack->language = LANG_NONE;
+  
+  if (node->numchild > 0)
+  {
+    failr(mpsr_GetLeftv(link, mlv, 0));
+    if (mlv->lv->rtyp != STRING_CMD)
+      return mpsr_SetError(mpsr_WrongArgumentType);
+    pack->libname = (char*) mlv->lv->data;
+    mlv->lv->rtyp = PACKAGE_CMD;
+  }
+  else
+    mlv->lv = mpsr_InitLeftv(PACKAGE_CMD, NULL);
+
+  mlv->lv->data = (void*) pack;
+
+  MPT_Annot_pt annot = MPT_Annot(node, MP_SingularDict, 
+                                 MP_AnnotSingularPackageType);
+  if (annot != NULL && annot->value != NULL && annot->value->node)
+  {
+    MPT_Node_pt node = annot->value->node;
+    if (node->type == MP_Uint8Type && MP_UINT8_T(node->nvalue) < LANG_MAX)
+      pack->language =  (language_defs) MP_UINT8_T(node->nvalue);
+  }
+  return mpsr_Success;
+}
+  
+    
 static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
                                mpsr_leftv mlv)
 {
@@ -731,7 +763,9 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
     return mpsr_SetError(mpsr_CanNotHandlePrototype);
 
   if (tok == MAP_CMD) return GetMapLeftv(link, node, mlv);
-  
+  if (tok == PACKAGE_CMD) return GetPackageLeftv(link, node, mlv);
+  if (tok == COLONCOLON) quote++;
+
   if (nc > 0)
   {
     if (tok == '=') failr(mpsr_GetLeftv(link, mlv, quote + 1));

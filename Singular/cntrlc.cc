@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.21 1998-12-07 08:48:23 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.22 1998-12-18 11:11:24 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -131,6 +131,9 @@ void sigsegv_handler(int sig, sigcontext s)
 }
 
 #ifdef PAGE_TEST
+#ifndef PAGE_INTERRUPT_TIME
+#define PAGE_INTERRUPT_TIME 1
+#endif
 void sig11_handler(int sig, sigcontext s)
 {
   unsigned long base =(unsigned long)(s.cr2&(~4095));
@@ -154,9 +157,9 @@ void sigalarm_handler(int sig, sigcontext s)
   struct itimerval t,o;
   memset(&t,0,sizeof(t));
   t.it_value.tv_sec     =(unsigned)0;
-  t.it_value.tv_usec    =(unsigned)200;
+  t.it_value.tv_usec    =(unsigned) PAGE_INTERRUPT_TIME;
   o.it_value.tv_sec     =(unsigned)0;
-  o.it_value.tv_usec    =(unsigned)200;
+  o.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
   setitimer(ITIMER_VIRTUAL,&t,&o);
   signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 }
@@ -173,9 +176,9 @@ void init_signals()
   struct itimerval t,o;
   memset(&t,0,sizeof(t));
   t.it_value.tv_sec     =(unsigned)0;
-  t.it_value.tv_usec    =(unsigned)100;
+  t.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
   o.it_value.tv_sec     =(unsigned)0;
-  o.it_value.tv_usec    =(unsigned)200;
+  o.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
   setitimer(ITIMER_VIRTUAL,&t,&o);
   signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 #else

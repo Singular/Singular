@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.8 1998-12-02 13:58:30 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.9 1998-12-18 11:11:38 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -450,7 +450,138 @@ char * mmDBStrdup( const char * s, char *fname, int lineno)
 #endif /* MDEBUG */
 
 
+/**********************************************************************
+ *
+ * Routines for aligned memory allocation
+ *
+ **********************************************************************/
     
+#if SIZEOF_DOUBLE == SIZEOF_VOIDP + SIZEOF_VOIDP
+
+#if 0 
+#ifdef MDEBUG
+void * mmDBAllocAlignedBlock( size_t size, char* f, int l)    
+#else
+void * mmAllocAlignedBlock( size_t size)
+#endif
+{
+  int i = mmGetIndex(size);
+  
+  if (i < 0)
+  {
+#ifdef MDEBUG
+    unsigned long ret = (unsigned long) _mmDBAllocBlock(size + 9, f, l);
+#else
+    unsigned long ret = (unsigned long) _mmAllocBlock(size+SIZEOF_DOUBLE+1);
+#endif
+    unsigned char shift = (ret + 1) & (SIZEOF_DOUBLE - 1);
+    *((unsigned char*) ret) = (unsigned char) shift;
+
+    assume(ret != 0);
+
+    return (void*) ((ret + 1) & ~(SIZEOF_DOUBLE - 1));
+  }
+  else
+  {
+#if SIZEOF_DOUBLE != SIZEOF_VOIDP 
+    void *garbage = NULL, *good, *temp;
+
+    while (1)
+    {
+#endif /* SIZEOF_DOUBLE != SIZEOF_VOIDP */
+
+#ifdef MDEBUG
+      good = mmDBAllocHeapS(&(mm_theList[i]), size, f, l);
+#else
+      AllocHeap(good, &(mm_theList[i]));
+#endif
+      assume(good != NULL);
+
+#if SIZEOF_DOUBLE != SIZEOF_VOIDP 
     
+      if (((unsigned long) good) & (SIZEOF_DOUBLE - 1))
+      {
+        *((void**) good) = garbage;
+        garbage = good;
+      }
+      else
+      {
+        break;
+      }
+    }
+  
+    while (garbage != NULL)
+    {
+      temp = garbage;
+      garbage = *((void**) garbage);
+#ifdef MDEBUG
+      mmDBFreeHeapS(temp, &(mm_theList[i]), size, f, l);
+#else
+      FreeHeap(temp, &(mm_theList[i]));
+#endif
+    }
+#endif /* SIZEOF_DOUBLE != SIZEOF_VOIDP */
+
+    assume(((unsigned long) good) % SIZEOF_DOUBLE == 0);
+    
+    return good;
+  }
+}
+
+
+#ifdef MDEBUG
+void * mmDBAllocAlignedBlock0( size_t size, char* f, int l)    
+#else
+void * mmAllocAlignedBlock0( size_t size)
+#endif
+{
+  void* good;
+#ifdef MDEBUG
+  good = mmDBAllocBlock(size, f, l);
+#else
+  good = mmAllocBlock(size);
+#endif
+  
+  memset(good, 0, size);
+  
+  return good;
+}
+
+#ifdef MDEBUG
+void  mmDBFreeAlignedBlock( void* addr, size_t size, char* f, int l)    
+#else
+void  mmFreeAlignedBlock( void* addr, size_t size)
+#endif
+{
+  int i = mmGetIndex(size);
+  
+  if (i < 0)
+  {
+    unsigned char* adj_addr = ((unsigned char*) addr) - 1;
+    unsigned char shift = *adj_addr;
+
+#ifdef MDEBUG    
+    _mmDBFreeBlock(adj_addr - shift, size + SIZEOF_DOUBLE + 1, f, l);
+#else
+    _mmFreeBlock(adj_addr - shift, size + SIZEOF_DOUBLE + 1);
+#endif
+  }
+  else
+  {
+#ifdef MDEBUG
+    mmDBFreeHeapS(addr, &(mm_theList[i]), size, f, l);
+#else
+    FreeHeap(addr, &(mm_theList[i]));
+#endif
+  }
+}
+#endif
+
+#endif /* SIZEOF_DOUBLE == SIZEOF_VOIDP + SIZEOF_VOIDP */
+    
+
+
+  
+  
   
 
