@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.149 1999-09-02 14:24:46 Singular Exp $
+@comment $Id: general.doc,v 1.150 1999-09-20 17:45:52 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -115,20 +115,20 @@ page of the @sc{Singular} manual) which offers a
 short table of contents.  Typing @code{help} topic@code{;} shows the
 available documentation on topic.  Here, topic may be either a function
 name or, more generally, any index entry of the @sc{Singular}
-manual. Furthermore, topic may contain wildcard characters. 
+manual. Furthermore, topic may contain wildcard characters.
 @xref{help}, for more information.
 
 @cindex browsers
 @cindex help browsers
 Online help information can be displayed in various help browsers. The
-following table lists a summary of the supported browsers. See below for 
+following table lists a summary of the supported browsers. See below for
 more details about particular browsers.
 
 @multitable @columnfractions .2 .2 .6
-@item @strong{Browser} @tab @strong{Platform} 
-@tab @strong{Description} 
+@item @strong{Browser} @tab @strong{Platform}
+@tab @strong{Description}
 
-@item netscape 
+@item netscape
 @cindex netscape
 @cindex help browsers, netscape
 @tab Unix, Windows
@@ -143,14 +143,14 @@ more details about particular browsers.
 @item xinfo
 @cindex xinfo
 @cindex help browsers, xinfo
-@tab Unix 
-@tab uses the @code{info} program to display texinfo version of manual in an 
+@tab Unix
+@tab uses the @code{info} program to display texinfo version of manual in an
 extra @code{xterm}
 
 @item info
 @cindex info
 @cindex help browsers, info
-@tab Unix, Windows 
+@tab Unix, Windows
 @tab uses the @code{info} program to display texinfo version of manual
 
 @item builtin
@@ -172,7 +172,7 @@ extra @code{xterm}
 
 The browser which is used to display the help information, can be either
 set at startup time with the command line option  (@pxref{Command line
-options}) 
+options})
 @smallexample
 --browers=<browser>
 @end smallexample
@@ -197,7 +197,7 @@ your local set-up does not allow to run it.
 
 The @code{.singularrc} (@pxref{Startup sequence}) file is a good place
 to set your default browser. Recall that if a file
-@code{$HOME/.singularrc} exists on your system, then the content of this 
+@code{$HOME/.singularrc} exists on your system, then the content of this
 file is executed before the first user input. Hence, putting a line like
 @smallexample
 system("--browser", "info");
@@ -207,11 +207,11 @@ in your file @code{$HOME/.singularrc} sets your default browser to
 
 
 Obviously, certain external files and programs are required for the
-@sc{Singular} help system to work correctly. If something is not availabel 
+@sc{Singular} help system to work correctly. If something is not availabel
 or goes wrong, here are some tips for troubleshooting the help system:
 
-@itemize
-@item 
+@itemize @bullet
+@item
 @cindex DISPLAY environment variable
 @cindex environment variable, DISPLAY
 Under Unix, the environment variable @code{DISPLAY} has to be set for
@@ -221,20 +221,20 @@ the browsers @code{netscape}, @code{tkinfo}, and @code{xinfo} to work.
 The help browsers @code{netscape}, @code{tkinfo}, @code{xinfo}, and
 @code{info} are only available if the respective programs are installed
 on your system (for @code{xinfo}, the programs @code{xterm} and
-@code{info} are necessary). You can explicitely specify which program to 
-use, by setting appropriate environment variables (whose names 
-are the names of the respective programs in all up-case letters). 
+@code{info} are necessary). You can explicitely specify which program to
+use, by setting appropriate environment variables (whose names
+are the names of the respective programs in all up-case letters).
 @*For example,
 to use the program @code{navigator} with a private colormap as
 @code{netscape} help browser, set the environment variable
 @code{NETSCAPE} to the value @code{"navigator
--install"}. 
+-install"}.
 @c TBC (@xref{Setting environment variables}).
 
 @item
 If the help browser @code{netscape} can not find the local html pages of
 the @sc{Singular} manual (which should be at
-@code{$SINGULAR_ROOT_DIR/html}), then it dispatches the html pages from 
+@code{$SINGULAR_ROOT_DIR/html}), then it dispatches the html pages from
 @url{http://www.mathematik.uni-kl.de/~zca/Singular/Manual}. You can
 specify an alternative location of a local directory where the html
 pages reside by setting the environment variable
@@ -255,14 +255,14 @@ setting the environment variable @code{SINGULAR_INFO_FILE}.
 @cindex help browsers, info
 @cindex info help browsers
 
-The help browsers @code{tkinfo}, @code{xinfo} and @code{info} (so-called 
+The help browsers @code{tkinfo}, @code{xinfo} and @code{info} (so-called
 info help browsers) are based on the
 @code{info} program from the Gnu @code{texinfo} package.  @xref{Top, An
 Introduction to Info, Getting started, info, The Info Manual}, for more
-information.  
+information.
 
 For info help browsers, the online manual is decomposed into ``nodes''
-of information, closely 
+of information, closely
 related to the division of the printed manual into sections and
 subsections.  A node contains text describing a specific topic at a
 specific level of detail.  The top line of a node is its ``header''.
@@ -336,13 +336,12 @@ quits  @sc{Singular}
 @node Editing input,Command line options,Interrupting SINGULAR,Interactive use
 @subsection Editing input
 @cindex Editing input
-@cindex SINGULARHIST
+@c @cindex SINGULARHIST
 
-
-This section describes only a subset of the key bindings of
-@sc{Singular} binaries built with the GNU Readline library.
-@xref{Command Line Editing, GNU Readline Library, Command Line Editing,
-readline, The GNU Readline Library Manual}, for more information.
+@c This section describes only a subset of the key bindings of
+@c @sc{Singular} binaries built with the GNU Readline library.
+@c @xref{Command Line Editing, GNU Readline Library, Command Line Editing,
+@c readline, The GNU Readline Library Manual}, for more information.
 
 The following keys can be used for editing the input and retrieving
 previous input lines:
@@ -378,13 +377,13 @@ saves the current line to the history and
 sends it to the @sc{Singular} parser for interpretation
 @end table
 
-On Unix-like operating systems, @sc{Singular}
-maintains a history of the last lines of input.  If the environment
-variable @code{SINGULARHIST} is set and has a name of a file as value,
-then the input history is stored across sessions using this
-file. Otherwise, i.e., if the environment variable @code{SINGULARHIST}
-is not set, then the history of the last inputs is only available for
-the commands of the current session.
+@c On Unix-like operating systems, @sc{Singular}
+@c maintains a history of the last lines of input.  If the environment
+@c variable @code{SINGULARHIST} is set and has a name of a file as value,
+@c then the input history is stored across sessions using this
+@c file. Otherwise, i.e., if the environment variable @code{SINGULARHIST}
+@c is not set, then the history of the last inputs is only available for
+@c the commands of the current session.
 
 @c --------------------------------------------------------------------------
 @node Command line options, Startup sequence, Editing input, Interactive use
@@ -420,11 +419,11 @@ Print a one-line description of each command line option and exit.
 
 @item @code{--browser=VAL}
 @cindex --browser
-Use @code{VAL} as browser for the @sc{Singular} online manual. 
+Use @code{VAL} as browser for the @sc{Singular} online manual.
 @*@code{VAL} may be one of @code{netscape}, @code{xinfo},
 @code{tkinfo}, @code{info}, @code{builtin}, or @code{emacs}. Depending
-on your platform and local 
-installation, only some browsers might be available. The default browser 
+on your platform and local
+installation, only some browsers might be available. The default browser
 is @code{netscape}. @xref{The online help system}.
 
 @item @code{--no-rc}
@@ -473,7 +472,7 @@ to @sc{Singular}:
 
 @table @asis
 @item @code{-c}, @code{--execute=STRING}
-@cindex -c 
+@cindex -c
 @cindex --execute
 Execute @code{STRING} as (a sequence of) @sc{Singular} commands on
 start-up after the @code{.singularrc} file is executed, but prior to
@@ -553,8 +552,8 @@ if an option was not given), can be checked with the command
 @c example
 @end smallexample
 
-Furthermore, the value of some options (e.g., @code{--browser}) can be 
-re-set while @sc{Singular} is running with the command 
+Furthermore, the value of some options (e.g., @code{--browser}) can be
+re-set while @sc{Singular} is running with the command
 @code{system("}long_option_name_string @code{",} value
 @code{)}. @xref{system}.
 @smallexample
@@ -1001,7 +1000,7 @@ Any polynomial (resp.@: vector) in @sc{Singular} is ordered w.r.t. a
 term ordering (or, monomial ordering), which has to be specified
 together with the declaration of a ring. @sc{Singular} stores and
 displays a polynomial (resp.@: vector) w.r.t. this ordering, i.e., the
-greatest monomial (also called the leading monomial) is the first one 
+greatest monomial (also called the leading monomial) is the first one
 appearing in the output polynomial, and the smallest monomial is the last one.
 
 @strong{Remark:} The novice user should generally use the ordering
@@ -1236,7 +1235,7 @@ the quotient of a ring by an ideal resp.@: of a free module by a
 submodule.
 
 The ideal resp.@: module has to be finite dimensional as a vector space
-over the ground field and has to be represented by a standard basis w.r.t.@: 
+over the ground field and has to be represented by a standard basis w.r.t.@:
 the ring ordering.
 @item mult
 @ref{mult}@*
@@ -2214,7 +2213,7 @@ The help and example sections are ignored if the procedure is defined
 interactively, i.e., if it was not loaded from a file by a @ref{load} command.
 @end ifset
 @ifclear namespaces
-interactively, i.e., if it was not loaded from a file by a LIB command 
+interactively, i.e., if it was not loaded from a file by a LIB command
 (@ref{LIB}).
 @end ifclear
 @* Specifying @code{static} in front of the proc-definition (in a library file)
@@ -2264,16 +2263,16 @@ Now, we load the library and execute the procedures defined there:
 
 @subsubheading Guidelines for the help text of a procedure
 There are no enforced rules on the format of the help section of a
-procedure. 
+procedure.
 
 Nevertheless, we recommend that the help text of a procedure should
-contain information about the usage, 
+contain information about the usage,
 purpose, return values and generated objects. Particular assumptions or
 limitations should be listed. It should also be mentioned if global
 objects are generated or manipulated.
 
 The help text of procedures contained in libraries of the
-@sc{Singular} distribution 
+@sc{Singular} distribution
 should furthermore comply with the certain rules as explained in
 @ref{The help string of procedures}.
 
@@ -2388,7 +2387,7 @@ proc x7 (ring r)
 @subsection Procedure commands
 @cindex Procedure commands
 
-Some commands only make sense inside a procedure, since they make 
+Some commands only make sense inside a procedure, since they make
 objects known to the nesting level from which the procedure was called
 or to all nesting levels.
 
@@ -2409,10 +2408,10 @@ procedures in a file.
 @*@sc{Singular} reads a library with the command
 @code{LIB}. General information about the library is displayed by the command
 @code{help libname_lib}. After loading the library, its procedures can be used
-like the built-in @sc{Singular} functions. 
+like the built-in @sc{Singular} functions.
 
 To have the full functionality of a built-in function libraries have to
-comply with the few syntax rules described below. 
+comply with the few syntax rules described below.
 
 Furthermore, libraries which are to be included in the @sc{Singular}
 distribution, have to comply with certain rules as explained in
@@ -2533,10 +2532,10 @@ In the info-string the characters \ and " must be preceded by a \ (escaped).
 It is recommended that the info string is placed on the top of a
 library file and contains general information about the library as well
 as a listing of all procedures available to the users (with a one line
-description of each procedure). 
+description of each procedure).
 
-Although there is no enforced format of the info string of a library, we 
-recommend that you follow certain rules as explained in 
+Although there is no enforced format of the info string of a library, we
+recommend that you follow certain rules as explained in
 @ref{The help string of a library}.
 @end table
 
@@ -2568,7 +2567,7 @@ It is common practice to simply define the version string to be
 @node Guidelines for writing a library, Debugging tools, Libraries, General concepts
 @section Guidelines for writing a library
 @cindex Guidelines for writing a library
-@cindex library, Guidelines for writing 
+@cindex library, Guidelines for writing
 
 
 Although there are very few enforced rules on how libraries are written
@@ -2586,13 +2585,13 @@ distribution, the following guidelines are mandatory.
 * Typesetting of help strings::
 * The help string of a library::
 * The help string of procedures::
-* template_lib:: 
+* template_lib::
 @end menu
 
 @c ---------------------------------------
 @node Procedures in a library, Documentation of a library,,Guidelines for writing a library
 
-@subsection Procedures in a library 
+@subsection Procedures in a library
 @cindex Procedures in a library
 @cindex library, procedures
 
@@ -2625,7 +2624,7 @@ No procedures should be defined within the body of another procedure.
 If the value of
 the reserved variable @code{printlevel} (@pxref{printlevel}) is greater
 than 0 then interactive user-input, i.e., the usage of functions like
-@code{pause("..")} or @code{read("");} (@pxref{read}), may be requested. 
+@code{pause("..")} or @code{read("");} (@pxref{read}), may be requested.
 
 @item
 If the value of
@@ -2710,31 +2709,31 @@ documentation of all libraries of the @sc{Singular} distribution is
 generated automatically from their source code.
 
 More precisely, for each library,
-@itemize
+@itemize @minus
 @item
-the info string of the library is parsed and typeset 
+the info string of the library is parsed and typeset
 as explained in @ref{Typesetting of help strings}.
 
 @item
 the help string of each procedure listed in the @code{PROCEDURE:}
-section of the library info string is parsed 
+section of the library info string is parsed
 and typeset as explained in @ref{Typesetting of help strings}.
 
-@item 
+@item
 the example of each procedure listed in the @code{PROCEDURE:} section of
 the library info string is computed and its output is
 included into the documentation.
 @end itemize
 
 For a uniform look-and-feel of the library documentation, library
-developers should 
-@itemize
-@item 
-follow the recommendation of 
+developers should
+@itemize @minus
+@item
+follow the recommendation of
 @ref{The help string of a library} and @ref{The help string of
-procedures} 
+procedures}
 
-@item 
+@item
 consult the source code of libraries like
 @code{template.lib} (@pxref{template_lib}) or @code{standard.lib}
 (@pxref{standard_lib}) for examples on how library documentations are
@@ -2748,10 +2747,10 @@ section
 @item
 not use interactive functions like
 @code{pause("..")} or @code{read("");} (@pxref{read}) and should limit the
-length of input lines to 60 characters in the example section of 
+length of input lines to 60 characters in the example section of
 procedures
 
-@item 
+@item
 carefully check the generated
 documentation of their libraries in its various formats using the
 @code{lib2doc} (@pxref{lib2doc}) utility.
@@ -2774,7 +2773,7 @@ documentation of their libraries in its various formats using the
 @cindex library, typesetting of help strings
 
 The help strings of procedures and info strings of libraries which are
-included in the 
+included in the
 distribution of @sc{Singular} are parsed and automatically converted
 into the texinfo format (the typesetting language in which the
 documentation  of @sc{Singular} is written).
@@ -2795,9 +2794,9 @@ If a line starts with a character and contains a colon, then the text up
 to the colon is taken to be the description-string of an item and the
 text following the colon is taken to be the content of the item.
 @item
-If the description-string of an item matches 
+If the description-string of an item matches
 @table @asis
-@item @code{EXAMPLE} 
+@item @code{EXAMPLE}
 then this item and its content is ignored.
 @item @code{SEE ALSO}
 then the
@@ -2826,24 +2825,24 @@ are recognized (and, their content not further manipulated):
 to enforce a line-break.
 @table @asis
 @item Example:
-@code{old line @@* new line} 
-@* @expansion{} 
+@code{old line @@* new line}
+@* @expansion{}
 @* old line @* new line
 @end table
 
-@item @code{@@math@{..@}} 
+@item @code{@@math@{..@}}
 for typesetting of small (i.e., which do not go over
 multiple lines) mathematical expressions  in LaTeX math-mode
 syntax.
 @table @asis
 @item Example:
-@code{@@math@{\alpha@}} 
-@*@expansion{} 
+@code{@@math@{\alpha@}}
+@*@expansion{}
 @*@math{\alpha}
 @item Note:
 Mathematical expressions inside @code{@@math@{..@}} may
 not contain curly parenthesis and the "at" sign, i.e., may not contain
-@code{@{,@},@@}. 
+@code{@{,@},@@}.
 @end table
 
 @item @code{@@code@{..@}}
@@ -2851,27 +2850,27 @@ for typesetting of small (i.e., which do not go over
 multiple lines) strings in typewriter font.
 @table @asis
 @item Example:
-@code{@@code@{typewriter font@}} 
-@*@expansion{} 
+@code{@@code@{typewriter font@}}
+@*@expansion{}
 @*@code{typewriter font}
 @item Note:
 The string inside @code{@@code@{..@}} may
 not contain curly parenthesis and the "at" sign, i.e., may not contain
-@code{@{,@},@@}. 
+@code{@{,@},@@}.
 @end table
 
 @item @code{@@example}
  @code{...}
 @item @code{@@end example}
 for pre-formatted text which is indented and typeset in typewriter
-font. 
+font.
 @table @asis
 @item Example:
 @example
 before example
 @@example
 in              example
-notice extra identation and 
+notice extra identation and
 escape of special characters like @@@{,@@@},@@@@
 @@end example
 after example
@@ -2883,7 +2882,7 @@ in                example
 notice extra identation  and
 escape of special characters like @{,@},@@
 @end example
-after example 
+after example
 @item Note:
 The characters @{,@},@@ have to be escaped by an @@ sign inside an
 @@example environment.
@@ -2893,14 +2892,14 @@ The characters @{,@},@@ have to be escaped by an @@ sign inside an
  @code{...}
 @item @code{@@end format}
 for pre-formatted text which is not indented and typeset in normal
-font. 
+font.
 @table @asis
 @item Example:
 @example
 before format
 @@format
 in              format
-no extra identation but still 
+no extra identation but still
 escape of special characters like @@@{,@@@},@@@@
 @@end format
 after format
@@ -2909,10 +2908,10 @@ after format
 @*before format
 @format
 in              format
-no extra identation  but still 
+no extra identation  but still
 escape of special characters like @{,@},@@
 @end format
-after format 
+after format
 @item Note:
 The characters @{,@},@@ have to be escaped by an @@ sign inside an
 @@example environment.
@@ -2927,8 +2926,8 @@ for text which is written in pure texinfo.
 @item Example:
 @example
 @@texinfo
-Among others, within a texinfo environment 
-one can use the tex environment to typeset 
+Among others, within a texinfo environment
+one can use the tex environment to typeset
 more complex mathematical like
 @@tex
 $i_@{1,1@} $
@@ -2945,7 +2944,7 @@ $ i_{1,1} $
 
 @end table
 
-Furthermore, a line-break is inserted in front of each line 
+Furthermore, a line-break is inserted in front of each line
 whose previous line is shorter than 60
 characters and does not contain any of the above described recognized
 texinfo markup elements.
@@ -2985,7 +2984,7 @@ The purpose of the one line procedure descriptions is not to give a short help
 for the procedure, but to help the user decide what procedure might be
 the right one for the job. Details can then be found in the help section
 of each procedure. Therefore parameters may be omitted or abbreviated if
-necessary. 
+necessary.
 
 For more information, see @ref{Typesetting of help strings}. For an
 example, see @ref{template_lib}.

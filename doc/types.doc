@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.101 1999-09-03 15:06:58 Singular Exp $
+@comment $Id: types.doc,v 1.102 1999-09-20 17:45:55 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -161,7 +161,7 @@ whereas @code{ncols} counts all generators.
 
 @table @strong
 @item Syntax:
-@code{ideal} name @code{=} list_of_poly_expressions @code{;}
+@code{ideal} name @code{=} list_of_poly_and_ideal_expressions @code{;}
 @*@code{ideal} name @code{=} ideal_expression @code{;}
 
 @item Purpose:
@@ -192,8 +192,6 @@ defines an ideal.
 
 An ideal expression is:
 @enumerate
-@item
-an expression list of poly expressions and ideal expressions
 @item
 an identifier of type ideal
 @item
@@ -816,7 +814,7 @@ matrix.
 @item Syntax:
 @code{intmat} name @code{=} intmat_expression @code{;}
 @*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} intmat_expression @code{;}
-@*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} list_of_int_expressions @code{;}
+@*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} list_of_int_and_intvec_and_intmat_expressions @code{;}
 @*rows and cols must be positive int expressions.
 
 @item Purpose:
@@ -849,8 +847,6 @@ elements, only the first rows*cols elements are used.
 
 An intmat expression is:
 @enumerate
-@item
-a list of int expressions, intvec expressions, or intmat expressions
 @item
 an identifier of type intmat
 @item
@@ -1030,6 +1026,7 @@ intvec within int is done element-wise.
 @table @strong
 @item Syntax:
 @code{intvec} name @code{=} intvec_expression @code{;}
+@*@code{intvec} name @code{=} list_of_int_and_intvec_expressions @code{;}
 
 @item Purpose:
 defines an intvec variable.
@@ -1056,8 +1053,6 @@ defines an intvec variable.
 
 An intvec expression is:
 @enumerate
-@item
-a list of int expressions and of intvec expressions
 @item
 a range: int expression @code{..} int expression
 @item
@@ -1760,8 +1755,6 @@ A list expression is:
 @item
 the empty list @code{list()}
 @item
-a list of expressions of any type
-@item
 an identifier of type list
 @item
 a function returning list
@@ -1863,7 +1856,7 @@ Maps are ring maps from a preimage ring into the basering.
 @strong{Note:}
 @itemize @bullet
 @item
-the target of a map is ALWAYS the actual basering
+the target of a map is @strong{ALWAYS} the actual basering
 @item
 the preimage ring is stored "by name", that means, maps can only be
 used in such contexts, where the name of the preimage ring can be
@@ -1993,6 +1986,8 @@ See @ref{imap}; @ref{fetch}; @ref{subst}.
 @table @strong
 @item Syntax:
 @code{map} name @code{=} preimage_ring_name @code{,} ideal_expression @code{;}
+@*@code{map} name @code{=} preimage_ring_name @code{,} list_of_poly_and_ideal_expressions @code{;}
+@*@code{map} name @code{=} map_expression @code{;}
 
 @item Purpose:
 defines a ring map from preimage_ring to basering.
@@ -2172,8 +2167,6 @@ If the size is omitted a 1x1 matrix is created.
 
 A matrix expression is:
 @enumerate
-@item
-an expression list of poly expressions
 @item
 an identifier of type matrix
 @item
@@ -2437,8 +2430,6 @@ defines a module.
 
 A module expression is:
 @enumerate
-@item
-an expression list of vector expressions
 @item
 an identifier of type module
 @item
@@ -2968,6 +2959,8 @@ a function returning poly
 poly expressions combined by the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{/}, or @code{^}
 @item
+an int expression (see @ref{Type conversion and casting})
+@item
 a type cast to poly
 @end enumerate
 
@@ -3166,6 +3159,8 @@ using the command @code{LIB}. For more information on libraries see
 @end tex
    sequence_of_commands;
 @*@code{@}}]
+@*@code{proc} proc_name @code{=} proc_name @code{;}
+@*@code{proc} proc_name @code{=} string_expression @code{;}
 @item Purpose:
 defines a new function, the @code{proc} proc_name, with the additional
 information help_text, which is copied to the screen by
@@ -3175,9 +3170,10 @@ which is executed by @code{example proc_name;}.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined
 interactively, i.e., if it was not loaded from a file by a @ref{LIB} command.
-@* Specifying @code{static} in front of the proc-definition (in a library file)
-makes this procedure local to the library, i.e., accessible only for the other
-procedures in the same library, but not for the users.
+@* Specifying @code{static} in front of the proc-definition is only possible
+in a library file and makes this procedure local to the library,
+i.e., accessible only for the other procedures in the same library,
+but not for the users.
 
 @item Example:
 @smallexample
@@ -3520,6 +3516,7 @@ while a @code{+} concatenates strings.
 @table @strong
 @item Syntax:
 @code{string} name @code{=} string_expression @code{;}
+@*@code{string} name @code{=} list_of_string_expressions @code{;}
 
 @item Purpose:
 defines a string variable.
@@ -3548,8 +3545,6 @@ A string expression is:
 @enumerate
 @item
 a sequence of characters between two unescaped quotes (@code{"})
-@item
-a list of string expressions
 @item
 an identifier of type string
 @item

@@ -1,9 +1,9 @@
-// $Id: surf.lib,v 1.5 1999-07-06 15:33:00 Singular Exp $
+// $Id: surf.lib,v 1.6 1999-09-20 17:45:43 Singular Exp $
 //
 // author : Hans Schoenemann
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.5 1999-07-06 15:33:00 Singular Exp $";
+version="$Id: surf.lib,v 1.6 1999-09-20 17:45:43 Singular Exp $";
 info="
 LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF (by Stephan Endrass)
 
@@ -31,8 +31,8 @@ static proc num_of_vars(ideal I)
 
 proc  plot(ideal I)
 "USAGE:   plot(I);  I ideal
-RETURN:
-NOTE:
+RETURN: nothing
+NOTE: requires the external program 'surf'
 EXAMPLE: example plot; shows an example
 "
 {
@@ -69,7 +69,7 @@ EXAMPLE: example plot; shows an example
       write(l, "width=500; height=500; set_size; do_background=yes; background_red=255; background_green=255; background_blue=255;");
     write(l,
     "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
-    write(l, "curve_green=0; curve_blue=0; curve_width=4.5;");
+    write(l, "curve_green=0; curve_blue=0; curve_width=1.5;");
     write(l,"curve=",I[1],";");
     write(l,"draw_curve;");
   }

@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.44 1999-09-11 13:22:06 Singular Exp $
+// $Id: standard.lib,v 1.45 1999-09-20 17:45:42 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.44 1999-09-11 13:22:06 Singular Exp $";
+version="$Id: standard.lib,v 1.45 1999-09-20 17:45:42 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -22,7 +22,7 @@ proc stdfglm (ideal i, list #)
 "SYNTAX:  stdfglm(ideal_expression);
          stdfglm(ideal_expression, string_expression);
 TYPE:    ideal
-PURPOSE: computes the standardbasis of the ideal in the basering,
+PURPOSE: computes the standard basis of the ideal in the basering,
          calculated via fglm from ordering given as the second argumnent
          to the ordering of the basering.
          If no second argumnt is given, \"dp\" is used.
@@ -69,7 +69,7 @@ proc stdhilb(ideal i,list #)
 "SYNTAX:  stdhilb(ideal_expression);
          stdhilb(ideal_expression, intvec_expression);
 TYPE:    ideal
-PURPOSE: computes the standardbasis of the homogeneous ideal in the basering,
+PURPOSE: computes the standard basis of the homogeneous ideal in the basering,
          calculated via a Hilbert driven standard basis computation.
          An optional second argument will be used as the Hilbert function.
 SEE ALSO: stdfglm, std, groebner
@@ -137,9 +137,13 @@ example
 //////////////////////////////////////////////////////////////////////////
 
 proc groebner(def i, list #)
-"USAGE: groebner(i[, wait]) i -- ideal/module; wait -- int
-RETURNS: Standard basis of ideal or module which is computed using a
-         heuristically chosen method:
+"SYNTAX:  groebner(ideal_expression);
+         groebner(module_expression);
+         groebner(ideal_expression, int_expression);
+         groebner(module_expression, int_expression);
+TYPE:    type of the first argument
+PURPOSE: computes the standard basis of the first argument i
+         (ideal or module) by a heuristically chosen method:
          If the ordering of the current ring is a local ordering, or
          if it is a non-block ordering and the current ring has no
          parameters, then std(i) is returned.
@@ -418,9 +422,8 @@ example
   if (system("with", "MP")) {groebner(i, 0);}
   defined(groebner_error);
 }
-
-
 //////////////////////////////////////////////////////////////////////////
+
 proc res(list #)
 "@c we do texinfo here:
 @cindex resolution, computation of
@@ -586,12 +589,19 @@ example
   l;              // resolution is minimized
   res(i,0,0);     // local ring and minimized: uses mres
 }
-
+/////////////////////////////////////////////////////////////////////////
 
 proc quot (m1,m2,list #)
-"USAGE:   quot(m1, m2[, n]); m1, m2 two submodules of k^s,
-          n (optional) integer (1<= n <=5)
-RETURN:  the quotient of m1 and m2
+"SYNTAX:  quot(module_expression, module_expression);
+         quot(module_expression, module_expression, int_expression);
+         quot(ideal_expression, ideal_expression);
+         quot(ideal_expression, ideal_expression, int_expression);
+TYPE:    ideal
+SYNTAX:  quot(module_expression, ideal_expression);
+TYPE:    module
+PURPOSE: computes the quotient of the first and the 2nd argument
+         If a 3rd argumnt 'n' is given the n-th method is used
+         (1 <= n <= 5).
 SEE ALSO: quotient
 EXAMPLE: example quot; shows an example"
 {

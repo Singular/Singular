@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.149 1999-09-16 09:28:46 wichmann Exp $
+@comment $Id: reference.doc,v 1.150 1999-09-20 17:45:53 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5987,7 +5987,7 @@ while (1)
 @end smallexample
 @end table
 @c ref
-See 
+See
 @ref{Control structures};
 @ref{for};
 @ref{while}.
@@ -6024,9 +6024,9 @@ for (int i = 1 ; i<=10; i=i+1)
 @end smallexample
 @end table
 @c ref
-See 
-@ref{Control structures}; 
-@ref{for}; 
+See
+@ref{Control structures};
+@ref{for};
 @ref{while}.
 @c ref
 @c ---------------------------------------
@@ -6054,9 +6054,9 @@ else
 @end smallexample
 @end table
 @c ref
-See 
-@ref{if}; 
-@ref{boolean expressions}; 
+See
+@ref{if};
+@ref{boolean expressions};
 @ref{Control structures}.
 @c ref
 @c ---------------------------------------
@@ -6329,7 +6329,7 @@ s;
 @end smallexample
 @end table
 @c ref
-See 
+See
 @ref{Control structures};
 @ref{boolean expressions};
 @ref{while};
