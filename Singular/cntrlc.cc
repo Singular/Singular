@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.14 1997-12-01 18:12:02 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.15 1997-12-03 14:07:51 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -54,8 +54,6 @@ static void stack_trace_sigchld (int);
 #endif
 #endif
 
-/* types */
-typedef void (*si_sighandler_t)(int);
 /* data */
 jmp_buf si_start_jmpbuf;
 int siRandomStart;
@@ -67,12 +65,12 @@ BOOLEAN siCntrlc = FALSE;
 /* signals are not implemented in DJGCC */
 #ifndef macintosh
 /* signals are not right implemented in macintosh */
-typedef void (*s_hdl_typ)(int);
+typedef void (*si_hdl_typ)(int);
 void sigint_handler(int sig);
 #endif
 #endif
 
-#ifdef linux
+#if defined(linux) && defined(__i386__)
 struct sigcontext_struct {
         unsigned short gs, __gsh;
         unsigned short fs, __fsh;
@@ -100,7 +98,7 @@ struct sigcontext_struct {
 typedef struct sigcontext_struct sigcontext;
 
 /*2
-* signal handler for run time errors, linux version
+* signal handler for run time errors, linux/i386 version
 */
 void sigsegv_handler(int sig, sigcontext s)
 {
@@ -145,7 +143,7 @@ void sig11_handler(int sig, sigcontext s)
     if (page_tab[i]==base) { use_tab[i]='X'; break; }
   }
   Page_AllowAccess((void *)base, 4096);
-  signal(SIGSEGV,(si_sighandler_t)sig11_handler);
+  signal(SIGSEGV,(si_hdl_typ)sig11_handler);
 }
 
 void sigalarm_handler(int sig, sigcontext s)
@@ -172,19 +170,19 @@ void sigalarm_handler(int sig, sigcontext s)
   o.it_value.tv_sec     =(unsigned)0;
   o.it_value.tv_usec    =(unsigned)200;
   setitimer(ITIMER_VIRTUAL,&t,&o);
-  signal(SIGVTALRM,(si_sighandler_t)sigalarm_handler);
+  signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 }
 
 #endif
 
 /*2
-* init signal handlers, linux version
+* init signal handlers, linux/i386 version
 */
 void init_signals()
 {
 /*4 signal handler: linux*/
 #ifdef PAGE_TEST
-  signal(SIGSEGV,(si_sighandler_t)sig11_handler);
+  signal(SIGSEGV,(si_hdl_typ)sig11_handler);
   page_tab_ind=0;
   struct itimerval t,o;
   memset(&t,0,sizeof(t));
@@ -193,13 +191,13 @@ void init_signals()
   o.it_value.tv_sec     =(unsigned)0;
   o.it_value.tv_usec    =(unsigned)200;
   setitimer(ITIMER_VIRTUAL,&t,&o);
-  signal(SIGVTALRM,(si_sighandler_t)sigalarm_handler);
+  signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 #else
-  signal(SIGSEGV,(si_sighandler_t)sigsegv_handler);
+  signal(SIGSEGV,(si_hdl_typ)sigsegv_handler);
 #endif
-  signal(SIGFPE, (si_sighandler_t)sigsegv_handler);
-  signal(SIGILL, (si_sighandler_t)sigsegv_handler);
-  signal(SIGIOT, (si_sighandler_t)sigsegv_handler);
+  signal(SIGFPE, (si_hdl_typ)sigsegv_handler);
+  signal(SIGILL, (si_hdl_typ)sigsegv_handler);
+  signal(SIGIOT, (si_hdl_typ)sigsegv_handler);
   signal(SIGINT ,sigint_handler);
 }
 
@@ -218,6 +216,15 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
                    "please inform the authors\n",
                    (int)addr,siRandomStart);
   }
+#ifdef __OPTIMIZE__
+  if(si_restart<3)
+  {
+    si_restart++;
+    fprintf(stderr,"trying to restart...\n");
+    init_signals();
+    longjmp(si_start_jmpbuf,1);
+  }
+#endif
 #ifdef HAVE_FEREAD
   fe_reset_input_mode(0,NULL);
 #endif
@@ -256,6 +263,15 @@ void sigsegv_handler(int sig)
                    "please inform the authors\n",
                    siRandomStart);
   }
+#ifdef __OPTIMIZE__
+  if(si_restart<3)
+  {
+    si_restart++;
+    fprintf(stderr,"trying to restart...\n");
+    init_signals();
+    longjmp(si_start_jmpbuf,1);
+  }
+#endif
 #ifdef HAVE_FEREAD
 #ifdef HAVE_ATEXIT
   fe_reset_input_mode();
@@ -265,6 +281,7 @@ void sigsegv_handler(int sig)
 #endif
 #ifdef unix
 #ifndef hpux
+/* debug(..) does not work under HPUX (because ptrace does not work..) */
 #ifndef __OPTIMIZE__
 #ifndef MSDOS
   if (sig!=SIGINT) debug(STACK_TRACE);
@@ -320,6 +337,8 @@ void sigint_handler(int sig)
   loop
   {
     int cnt=0;
+    fprintf(stderr,"\n(last cmd:%d: `%s` in line\n>>%s<<)",
+      iiOp,Tok2Cmdname(iiOp),my_yylinebuf);
     fputs("\nabort command(a), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
     switch(fgetc(stdin))
     {
@@ -331,11 +350,11 @@ void sigint_handler(int sig)
                 siCntrlc++;
       case 'c':
                 fgetc(stdin);
-                signal(SIGINT ,(s_hdl_typ)sigint_handler);
+                signal(SIGINT ,(si_hdl_typ)sigint_handler);
                 return;
                 //siCntrlc ++;
-                //if (siCntrlc>2) signal(SIGINT,(s_hdl_typ) sigsegv_handler);
-                //else            signal(SIGINT,(s_hdl_typ) sigint_handler);
+                //if (siCntrlc>2) signal(SIGINT,(si_hdl_typ) sigsegv_handler);
+                //else            signal(SIGINT,(si_hdl_typ) sigint_handler);
     }
     cnt++;
     if(cnt>5) m2_end(2);
