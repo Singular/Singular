@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.15 1997-10-24 16:46:20 schmidt Exp $ */
+/* $Id: cf_gcd.cc,v 1.16 1998-01-27 10:18:33 pohl Exp $ */
 
 #include <config.h>
 
@@ -16,7 +16,7 @@
 #include "sm_sparsemod.h"
 #include "fac_util.h"
 #ifdef macintosh
-#include <::templates:ftmpl_functions.h>
+#include <:templates:ftmpl_functions.h>
 #else
 #include "templates/ftmpl_functions.h"
 #endif
