@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_linsys.cc,v 1.0 1996-05-17 10:59:44 stobbe Exp $
+// $Id: cf_linsys.cc,v 1.1 1996-07-08 08:22:51 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:44  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
@@ -16,9 +19,36 @@ $Log: not supported by cvs2svn $
 
 
 static bool solve ( int **extmat, int nrows, int ncols );
+int determinant ( int **extmat, int n );
 
 static CanonicalForm bound ( CanonicalForm ** M, int rows, int cols );
+CanonicalForm detbound ( const CFMatrix & M, int rows );
 
+bool matrix_in_Z( const CFMatrix & M, int rows )
+{
+    int i, j;
+    for ( i = 1; i <= rows; i++ )
+	for ( j = 1; j <= rows; j++ )
+	    if ( ! M(i,j).inZ() )
+		return false;
+    return true;
+}
+
+bool betterpivot ( const CanonicalForm & oldpivot, const CanonicalForm & newpivot )
+{
+    if ( newpivot.isZero() )
+	return false;
+    else  if ( oldpivot.isZero() )
+	return true;
+    else  if ( level( oldpivot ) > level( newpivot ) )
+	return true;
+    else  if ( level( oldpivot ) < level( newpivot ) )
+	return false;
+    else
+	return ( newpivot.lc() < oldpivot.lc() );
+}
+
+bool fuzzy_result;
 
 void
 linearSystemSolve( CanonicalForm ** M, int rows, int cols )
@@ -61,7 +91,7 @@ linearSystemSolve( CanonicalForm ** M, int rows, int cols )
 	    MM[i][j] = mm[i][j];
     // Q so far
     Q = p;
-    while ( Q < B ) {
+    while ( Q < B && pno < cf_getNumBigPrimes() ) {
 	do {
 	    cout << "trying prime(" << pno << ") = " << flush;
 	    p = cf_getBigPrime( pno );
@@ -84,6 +114,10 @@ linearSystemSolve( CanonicalForm ** M, int rows, int cols )
 	    }
 	Q = qnew;
     }
+    if ( pno == cf_getNumBigPrimes() )
+	fuzzy_result = true;
+    else
+	fuzzy_result = false;
     // store the result in M
     Qhalf = Q / 2;
     for ( i = 0; i < rows; i++ ) {
@@ -97,6 +131,128 @@ linearSystemSolve( CanonicalForm ** M, int rows, int cols )
     }
     delete [] MM;
     delete [] mm;
+}
+
+CanonicalForm
+determinant( const CFMatrix & M, int rows )
+{
+    ASSERT( rows <= M.rows() && rows <= M.columns() && rows > 0, "undefined determinant" );
+    if ( rows == 1 )
+	return M(1,1);
+    else  if ( rows == 2 )
+	return M(1,1)*M(2,2)-M(2,1)*M(1,2);
+    else  if ( matrix_in_Z( M, rows ) ) {
+	int ** mm = new (int*)[rows];
+	CanonicalForm Q, Qhalf, mnew, qnew, B;
+	CanonicalForm det, detnew;
+	int i, j, p, pno, intdet;
+	bool ok;
+
+	// initialize room to hold the result and the result mod p
+	for ( i = 0; i < rows; i++ ) {
+	    mm[i] = new int[rows];
+	}
+
+	// calculate the bound for the result
+	B = detbound( M, rows );
+
+	// find a first solution mod p
+	pno = 0;
+	do {
+	    p = cf_getBigPrime( pno );
+	    setCharacteristic( p );
+	    ok = true;
+	    // map matrix into char p
+	    for ( i = 0; i < rows && ok; i++ )
+		for ( j = 0; j < rows && ok; j++ ) {
+		    if ( M(i+1,j+1).isZero() )
+			mm[i][j] = 0;
+		    else {
+			mm[i][j] = mapinto( M(i+1,j+1) ).intval();
+			ok = mm[i][j] != 0;
+		    }
+		}
+	    pno++;
+	} while ( ! ok && pno < cf_getNumPrimes() );
+	// initialize the result matrix with first solution
+	// solve mod p
+	intdet = determinant( mm, rows );
+	setCharacteristic( 0 );
+	det = intdet;
+	// Q so far
+	Q = p;
+	while ( Q < B && cf_getNumPrimes() > pno ) {
+	    do {
+		p = cf_getBigPrime( pno );
+		setCharacteristic( p );
+		ok = true;
+		// map matrix into char p
+		for ( i = 0; i < rows && ok; i++ )
+		    for ( j = 0; j < rows && ok; j++ ) {
+			if ( M(i+1,j+1).isZero() )
+			    mm[i][j] = 0;
+			else {
+			    mm[i][j] = mapinto( M(i+1,j+1) ).intval();
+			    ok = mm[i][j] != 0;
+			}
+		    }
+		pno++;
+	    } while ( ! ok && cf_getNumPrimes() > pno );
+	    // solve mod p
+	    intdet = determinant( mm, rows );
+	    // found a solution mod p
+	    // now chinese remainder it to a solution mod Q*p
+	    setCharacteristic( 0 );
+	    chineseRemainder( det, Q, intdet, p, detnew, qnew );
+	    det = detnew;
+	    Q = qnew;
+	}
+	if ( ! ok )
+	    fuzzy_result = true;
+	else
+	    fuzzy_result = false;
+	// store the result in M
+	Qhalf = Q / 2;
+	if ( det > Qhalf )
+	    det = det - Q;
+	for ( i = 0; i < rows; i++ )
+	    delete [] mm[i];
+	delete [] mm;
+	return det;
+    }
+    else {
+	CFMatrix m( M );
+	CanonicalForm divisor = 1, pivot, mji;
+	int i, j, k, sign = 1;
+	for ( i = 1; i <= rows; i++ ) {
+	    pivot = m(i,i); k = i;
+	    for ( j = i+1; j <= rows; j++ ) {
+		if ( betterpivot( pivot, m(j,i) ) ) {
+		    pivot = m(j,i);
+		    k = j;
+		}
+	    }
+	    if ( pivot.isZero() )
+		return 0;
+	    if ( i != k ) {
+		m.swapRow( i, k );
+		sign = -sign;
+	    }
+	    for ( j = i+1; j <= rows; j++ ) {
+		if ( ! m(j,i).isZero() ) {
+		    divisor *= pivot;
+		    mji = m(j,i);
+		    m(j,i) = 0;
+		    for ( k = i+1; k <= rows; k++ )
+			m(j,k) = m(j,k) * pivot - m(i,k)*mji;
+		}
+	    }
+	}
+	pivot = sign;
+	for ( i = 1; i <= rows; i++ )
+	    pivot *= m(i,i);
+	return pivot / divisor;
+    }
 }
 
 static CanonicalForm
@@ -115,7 +271,22 @@ bound ( CanonicalForm ** M, int rows, int cols )
 	if ( vsum > vmax ) vmax = vsum;
     }
     sum += vmax;
-    return sum;
+    return sqrt( sum );
+}
+
+
+CanonicalForm
+detbound ( const CFMatrix & M, int rows )
+{
+    CanonicalForm sum = 0, prod = 1;
+    int i, j;
+    for ( i = 1; i <= rows; i++ ) {
+	sum = 0;
+	for ( j = 1; j <= rows; j++ )
+	    sum += M(i,j) * M(i,j);
+	prod *= sum;
+    }
+    return 2 * sqrt( prod );
 }
 
 
@@ -165,6 +336,44 @@ solve ( int **extmat, int nrows, int ncols )
 	}
     }
     return true;
+}
+
+int
+determinant ( int **extmat, int n )
+{
+    int i, j, k;
+    int divisor, multiplier, rowii, rowji; // all FF
+    int * rowi; // FF
+    int * rowj; // FF
+    int * swap; // FF
+    // triangularization
+    multiplier = 1;
+    divisor = 1;
+    
+    for ( i = 0; i < n; i++ ) {
+	//find "pivot"
+	for (j = i; j < n; j++ )
+	    if ( extmat[j][i] != 0 ) break;
+	if ( j == n ) return 0;
+	if ( j != i ) {
+	    multiplier = ff_neg( multiplier );
+	    swap = extmat[i]; extmat[i] = extmat[j]; extmat[j] = swap;
+	}
+	rowi = extmat[i];
+	rowii = rowi[i];
+	for ( j = i+1; j < n; j++ ) {
+	    rowj = extmat[j];
+	    rowji = rowj[i];
+	    if ( rowji == 0 ) continue;
+	    divisor = ff_mul( divisor, rowii );
+	    for ( k = i; k < n; k++ )
+		rowj[k] = ff_sub( ff_mul( rowj[k], rowii ), ff_mul( rowi[k], rowji ) );
+	}
+    }
+    multiplier = ff_mul( multiplier, ff_inv( divisor ) );
+    for ( i = 0; i < n; i++ )
+	multiplier = ff_mul( multiplier, extmat[i][i] );
+    return multiplier;
 }
 
 void
