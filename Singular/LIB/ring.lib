@@ -1,8 +1,8 @@
-// $Id: ring.lib,v 1.7 1998-10-14 10:15:38 krueger Exp $
+// $Id: ring.lib,v 1.8 1998-10-21 10:28:27 krueger Exp $
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: ring.lib,v 1.7 1998-10-14 10:15:38 krueger Exp $";
+version="$Id: ring.lib,v 1.8 1998-10-21 10:28:27 krueger Exp $";
 info="
 LIBRARY:  ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
 
@@ -68,7 +68,7 @@ example
    changechar("R1","32003",R); R1;
    kill R,R1;
    if(system("with","Namespaces")) {
-      kill Ring::R,Ring::R1;
+      kill Top::R,Top::R1;
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ example
    changeord("Q'","lp",Q); Q';
    kill R,Q,Q';
    if(system("with","Namespaces")) {
-      kill Ring::R,Ring::Q';
+      kill Top::R,Top::Q';
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -179,7 +179,7 @@ example
    changevar("Q'","a,b,c,d",Q); Q';
    kill R,Q,Q';
    if(system("with","Namespaces")) {
-      kill Ring::R,Ring::Q';
+      kill Top::R,Top::Q';
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ example
    defring("R","2,A",10,"x(","dp(3),ws(1,2,3),ds"); R;
    kill r,R;
    if(system("with","Namespaces")) {
-      kill Ring::r,Ring::R;
+      kill Top::r,Top::R;
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,7 +252,7 @@ example
    defrings(30); S30;
    kill S5, S30;
    if(system("with","Namespaces")) {
-      kill Ring::S5,Ring::S30;
+      kill Top::S5,Top::S30;
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -289,7 +289,7 @@ example
    defringp(30); P30;
    kill P5, P30;
    if(system("with","Namespaces")) {
-      kill Ring::P5,Ring::P30;
+      kill Top::P5,Top::P30;
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -446,7 +446,7 @@ example
    show(R4);
    kill r,R1,R2,R3,R4;
    if(system("with","Namespaces")) {
-      kill Ring::R1,Ring::R2,Ring::R3,Ring::R4;
+      kill Top::R1,Top::R2,Top::R3,Top::R4;
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -666,11 +666,7 @@ example
    ring s=0,(a,b,c),wp(1,2,3);
    ring t=0,x(1..5),(c,ls);
    ringtensor("R",r,s,t);
-   if(system("with","Namespaces")) {
-      type Ring::R;"";
-   } else {
-      type R;
-   }
+   type R;
    setring s;
    ideal i = a2+b3+c5;
    changevar("S","x,y,z");       //set S (change vars of s to x,y,z) the basering
@@ -678,14 +674,10 @@ example
    changevar("T","d,e,f,g,h",t); //set T (change vars of t to d..h) the basering
    qring qT=std(d2+e2-f3);       //create qring of T mod d2+e2-f3
    ringtensor("Q",s,qS,t,qT);
-   if(system("with","Namespaces")) {
-      type Ring::Q;"";
-   } else {
-      type Q;
-   }
+   type Q;
    kill R,Q,S,T;
    if(system("with","Namespaces")) {
-      kill Ring::R,Ring::Q,Ring::S,Ring::T;
+      kill Top::R,Top::Q,Top::S,Top::T;
    }
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,8 +1,8 @@
-// $Id: finvar.lib,v 1.13 1998-10-01 12:26:39 Singular Exp $
+// $Id: finvar.lib,v 1.14 1998-10-21 10:28:21 krueger Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 3.5.98
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.13 1998-10-01 12:26:39 Singular Exp $"
+version="$Id: finvar.lib,v 1.14 1998-10-21 10:28:21 krueger Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
                            (c) Agnes Eileen Heydtmann,
@@ -2321,6 +2321,7 @@ example
          string newring="alskdfj";
          molien(L[2..size(L)],newring);
          matrix P=primary_charp(L[1],newring);
+         if(system("with","Namespaces")) { kill Top::`newring`; }
          kill `newring`;
          print(P);
 }
@@ -3467,6 +3468,7 @@ example
          string newring="alskdfj";
          molien(L[2..size(L)],newring);
          matrix P=primary_charp_random(L[1],newring,1);
+         if(system("with","Namespaces")) { kill Top::`newring`; }
          kill `newring`;
          print(P);
 }

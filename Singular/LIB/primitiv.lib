@@ -1,8 +1,8 @@
-// $Id: primitiv.lib,v 1.6 1998-05-14 18:45:14 Singular Exp $
+// $Id: primitiv.lib,v 1.7 1998-10-21 10:28:26 krueger Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           11.3.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primitiv.lib,v 1.6 1998-05-14 18:45:14 Singular Exp $";
+version="$Id: primitiv.lib,v 1.7 1998-10-21 10:28:26 krueger Exp $";
 info="
 LIBRARY:    primitiv.lib    PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
 
@@ -251,10 +251,12 @@ EXAMPLE: example splitring;  shows an example
   }
  }
  if (defined(altrname)) {
+   if(system("with","Namespaces")) { kill Top::`altrname`; }
    execute("kill "+altrname+";");
    execute("def "+altrname+" = splt_temp;");
    @R=altrname;
    execute("export "+altrname+";");
+   if(system("with","Namespaces")) { kill Top::splt_temp; }
    kill splt_temp;
  }
 

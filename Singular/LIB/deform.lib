@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.13 1998-10-09 12:28:56 Singular Exp $
+// $Id: deform.lib,v 1.14 1998-10-21 10:28:19 krueger Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.13 1998-10-09 12:28:56 Singular Exp $";
+version="$Id: deform.lib,v 1.14 1998-10-21 10:28:19 krueger Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
                            by Bernd Martin (martin@math.tu-cottbus.de)
@@ -205,6 +205,7 @@ setring  Po;
       degBound = 0;
 //--------------- obtain new base-ring ----------------------------------------
         kill `myOx`;
+        if(system("with","Namespaces")==1) { kill Top::`myOx`; }
   qring `myOx` = J;
         matrix Fs,Rs,F_R,Cup,Cup',homFR,New,Rn,Fn;
         module hom';
@@ -289,12 +290,14 @@ example
    Js;"";
    // ___ Equations of miniversal total space ___:
    Fs;"";
+   if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
    kill Px,Qx,So;
    ring  r2       = 0,(x,y,z),ds;
    ideal Fo       = x2,xy,yz,zx;
    printlevel     = 3;
    versal(Fo);
    printlevel     = p;
+   if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
    kill Px,Qx,So;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -455,6 +458,9 @@ EXAMPLE:example mod_versal; shows an example
       I_J = Io,J;                attrib(I_J,"isSB",1);
 //-------- obtain new base ring -----------------------------------------------
       kill `myOx`;
+      if(system("with","Namespaces")==1) {
+         if(defined(Top::`myOx`)) { kill Top::`myOx`; }
+      }
  qring `myOx` = I_J;
       ideal null,tet;            attrib(null,"isSB",1);
       matrix Ms  = imap(`myQx`,Ms);
@@ -535,6 +541,7 @@ example
   matrix Mo[2][2] = x2,y,-y2,x2;
   mod_versal(Mo,Io);
   printlevel = p;
+  if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
   kill Px,Qx,So;
 }
 //=============================================================================
@@ -558,9 +565,20 @@ Sub-procedure: kills exported rings of 'versal' and
   if (defined(`br`)) { kill `br`;}
   br = my+"Sx";
   if (defined(`br`)) { kill `br`}
+  if(system("with","Namespaces")) { 
+    br = my+"Qx";
+    if (defined(Top::`br`)) { kill Top::`br`;}
+    br = my+"Ox";
+    if (defined(Top::`br`)) { kill Top::`br`;}
+    br = my+"Px";
+    if (defined(Ring::`br`)) { kill Ring::`br`;}
+    br = my+"So";
+    if (defined(Ring::`br`)) { kill Ring::`br`;}
+  }
   if (defined(basering)==0)
   { "// choose new basering?";
-    listvar(ring);
+    if(system("with","Namespaces")) { listvar(Top,ring); }
+    else { listvar(ring); }
   }
   return();
 }
@@ -867,6 +885,7 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
     }
   }
  setring br;
+  if(system("with","Namespaces")) { kill Ring::nr; }
   kill nr;
   return(degA);
 }
@@ -924,12 +943,18 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    module A = fetch(br,A);
    intvec dv;
    int l = homog(A) ;
-   if (l==0) {setring br; kill nr; return(l);}
+   if (l==0) {
+     setring br;
+     if(system("with","Namespaces")) { kill Ring::nr; }
+     kill nr;
+     return(l);
+   }
    dv = attrib(A,"isHomog");
    l  = dv[1];
    dv = dv[2..size(dv)];
    dv = dv-l;
  setring br;
+   if(system("with","Namespaces")) { kill Ring::nr; }
    kill nr;
    return(dv);
 }

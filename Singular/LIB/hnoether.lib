@@ -1,9 +1,9 @@
-// $Id: hnoether.lib,v 1.8 1998-05-27 10:54:24 Singular Exp $
+// $Id: hnoether.lib,v 1.9 1998-10-21 10:28:24 krueger Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           26.03.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: hnoether.lib,v 1.8 1998-05-27 10:54:24 Singular Exp $";
+version="$Id: hnoether.lib,v 1.9 1998-10-21 10:28:24 krueger Exp $";
 info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
 
@@ -514,6 +514,7 @@ EXAMPLES: example develop; shows an example
       else {
         if (str<>"c") {
           setring altring;kill guenstig;kill zweitring;
+          if(system("with","Namespaces")) { kill Top::guenstig; }
           return(return_error);}
         else { "if the algorithm doesn't terminate, you were wrong...";}
     }}
@@ -535,6 +536,7 @@ EXAMPLES: example develop; shows an example
     "reducible.";"Please try again.";
     setring altring;
     kill guenstig;
+    if(system("with","Namespaces")) { kill Top::guenstig; }
     return(return_error);}
    if (test_sqr != f) {
     "The given polynomial is not squarefree. I'll continue with the radical.";
@@ -552,6 +554,7 @@ EXAMPLES: example develop; shows an example
 
   if (N==0) {
     " Sorry. The remaining polynomial is a unit in the power series ring...";
+    if(system("with","Namespaces")) { kill Top::guenstig; }
     setring altring;kill guenstig;return(return_error);
   }
  //---------------------- gewaehrleiste, dass x transvers ist -----------------
@@ -576,6 +579,7 @@ EXAMPLES: example develop; shows an example
   if (testreducible(f,N,M)) {
     " The given polynomial is not irreducible";
     kill guenstig;
+    if(system("with","Namespaces")) { kill Top::guenstig; }
     setring altring;
     return(return_error);       // Abbruch der Prozedur!
   }
@@ -704,6 +708,7 @@ EXAMPLES: example develop; shows an example
    if (ringwechsel) { f=zurueck(f); }
  }
 
+ if(system("with","Namespaces")) { kill Top::guenstig; }
  kill guenstig;
  if (Ausgabe == 0) { return(list(amat,hqs,getauscht,f));}
  if (Ausgabe == 1) { return(return_error);}             // error has occurred
@@ -1622,7 +1627,10 @@ EXAMPLE: example extdevelop;  shows an example
     mneu[zeile,i]=var(2);           // fuelle nicht def. Stellen der Matrix auf
  }}}
  else { v[zeile]=Q; }               // HNE war exakt
- if (ringwechsel) { kill extdguenstig; }
+ if (ringwechsel) { 
+   if(system("with","Namespaces")) { kill Top::extdguenstig; }
+   kill extdguenstig;
+ }
 
  return(list(mneu,v,switch,f));
 }
@@ -1914,6 +1922,7 @@ EXAMPLE: example reddevelop;  shows an example
      }
      else {
        if (str<>"c") {
+         if(system("with","Namespaces")) { kill Top::HNEring; }
          setring altring;kill HNEring;kill zweitring;
          return(list());}
        else { "if the algorithm doesn't terminate, you were wrong...";}
@@ -1958,6 +1967,7 @@ EXAMPLE: example reddevelop;  shows an example
     else { "I'll continue with the radical."; str="c"; }
    }                                // endelse (test_sqr!=1)
    if (str=="q") {
+    if(system("with","Namespaces")) { kill Top::HNEring; }
     setring altring;kill HNEring;
     return(list());
    }
@@ -2062,12 +2072,15 @@ EXAMPLE: example reddevelop;  shows an example
  }
  //------------------- Loesche globale, nicht mehr benoetigte Objekte: --------
  if (EXTHNEnumber>0) {
+  if(system("with","Namespaces")) { kill Top::HNEring; }
   kill HNEring;
   def HNEring=EXTHNEring(EXTHNEnumber);
   setring HNEring;
   export HNEring;
+  if(system("with","Namespaces")) { kill Primitiv::EXTHNEring(1..EXTHNEnumber);}
   kill EXTHNEring(1..EXTHNEnumber);
  }
+ if(system("with","Namespaces")){kill Top::HNE_noparam;}
  kill HNE_noparam;
  kill EXTHNEnumber;
  keepring basering;

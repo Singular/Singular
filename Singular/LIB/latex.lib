@@ -1,4 +1,4 @@
-// $Id: latex.lib,v 1.4 1998-10-14 14:34:47 Singular Exp $   
+// $Id: latex.lib,v 1.5 1998-10-21 10:28:25 krueger Exp $   
 //                        1998/04/17
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 // 
@@ -1779,7 +1779,8 @@ static proc part0(string fname)
     return(t);
   }
 
- export splt;
+ if(system("with","Namespaces")) { exportto(Current,splt); }
+ else { export splt; }
 		
 // string fname = "texlibdemo.tex";
  string nl = newline;

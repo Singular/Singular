@@ -1,8 +1,8 @@
-// $Id: classify.lib,v 1.27 1998-10-09 12:28:54 Singular Exp $
+// $Id: classify.lib,v 1.28 1998-10-21 10:28:17 krueger Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.27 1998-10-09 12:28:54 Singular Exp $";
+version  = "$Id: classify.lib,v 1.28 1998-10-21 10:28:17 krueger Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -75,6 +75,9 @@ EXAMPLE:  example classify; shows an example"
   list   v;
   def ring_ext = basering;
 
+  if(system("with","Namespaces")) {
+    if(defined(A_Z)==0) { proc A_Z = general_lib::A_Z; export A_Z; }
+  }
   init_debug();                    // initialize trace/debug mode
   if(checkring()) { return(f_in); }
   n = nvars(basering);
