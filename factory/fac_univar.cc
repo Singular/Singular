@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.13 1997-08-29 08:38:32 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.14 1997-09-29 06:53:25 schmidt Exp $ */
 
 #include <config.h>
 
@@ -161,6 +161,8 @@ cf2double ( const CanonicalForm & f )
 // norm(f) = sqrt(sum( f[i]^2 )).  f should be an univariate
 // polynomial over Z.
 //
+// Used by kbound().
+//
 //}}}
 static CanonicalForm
 norm ( const CanonicalForm & f )
@@ -186,6 +188,8 @@ norm ( const CanonicalForm & f )
 // 'Some Usefull Bounds' in Buchberger, Collins, Loos (eds.) -
 // 'Computer Algebra: Symbolic and Algebraic Computation', 2nd
 // ed.
+//
+// Use by ZFactorizeUnivariate().
 //
 //}}}
 static int
