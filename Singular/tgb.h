@@ -27,13 +27,21 @@
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 
+/** 
+    reduction_accumulators are objects which are shared by several sums
+ **/
 
 class reduction_accumulator{
+  
  public:
+  /// (1/multiplied)*bucket=reduced original data
   number multiplied;
+  ///the polynomial data
   kBucket_pt bucket;
+  /// the reference counter
   int counter;
-  void decrease_counter(){
+  /// decrease the reference counter, at 0 it deletes the object
+  void decrease_counter(){ 
     if((--counter)==0)
       {
 	nDelete(&multiplied);
