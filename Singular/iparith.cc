@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.301 2003-04-11 17:08:53 levandov Exp $ */
+/* $Id: iparith.cc,v 1.302 2003-06-11 21:24:57 krueger Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2401,7 +2401,7 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
-#ifdef HAVE_FACTORY
+#if defined(HAVE_FACTORY) && defined(HAVE_LIBFAC_P)
 ,{jjGCD_P,     GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD NO_PLURAL}
 #else
 ,{jjWRONG2,    GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD NO_PLURAL}

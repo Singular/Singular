@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.82 2003-02-04 18:17:26 Singular Exp $
+// $Id: clapsing.cc,v 1.83 2003-06-11 21:24:56 krueger Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -196,7 +196,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 
 
 
-
+#ifdef HAVE_LIBFAC_P
 
 poly singclap_gcd ( poly f, poly g )
 {
@@ -256,7 +256,7 @@ poly singclap_gcd ( poly f, poly g )
     }
     Off(SW_RATIONAL);
   }
-  #if 0
+#if 0
   else if (( nGetChar()>1 )&&(currRing->parameter!=NULL)) /* GF(q) */
   {
     int p=rChar(currRing);
@@ -267,7 +267,7 @@ poly singclap_gcd ( poly f, poly g )
     CanonicalForm F( convSingGFClapGF( f ) ), G( convSingGFClapGF( g ) );
     res= convClapGFSingGF( gcd( F, G ) );
   }
-  #endif
+#endif
   else
     WerrorS( feNotImplemented );
 
@@ -276,6 +276,7 @@ poly singclap_gcd ( poly f, poly g )
   pTest(res);
   return res;
 }
+#endif /* HAVE_LIBFAC_P */
 
 poly singclap_resultant ( poly f, poly g , poly x)
 {
@@ -786,7 +787,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         }
 #else
         WarnS("complete factorization only for univariate polynomials");
-        if (rField_is_Q_a()||(!F.isUnivariate()) /* Q(a) */
+        if (rField_is_Q_a()||(!F.isUnivariate())) /* Q(a) */
         {
           L = factorize( G );
         }
@@ -1251,12 +1252,14 @@ int singclap_det_i( intvec * m )
 }
 /*==============================================================*/
 /* interpreter interface : */
+#ifdef HAVE_LIBFAC_P
 BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 {
   res->data=(void *)singclap_gcd((poly)(u->CopyD(POLY_CMD)),
                                  (poly)(v->CopyD(POLY_CMD)));
   return FALSE;
 }
+#endif /* HAVE_LIBFAC_P */
 
 BOOLEAN jjFAC_P(leftv res, leftv u)
 {
