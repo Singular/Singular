@@ -329,8 +329,8 @@ install: all installbin
 
 installbin: ${DL_LIBS} ${DL_LIBSG}
 	${MKINSTALLDIRS} ${bindir}
-	${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ${bindir}
-	${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ../Singular
+	-${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ${bindir}
+	-${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ../Singular
 
 ##
 ## clean targest
