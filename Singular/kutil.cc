@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.33 1999-04-29 16:57:16 Singular Exp $ */
+/* $Id: kutil.cc,v 1.34 1999-09-06 15:43:33 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2324,46 +2324,48 @@ int posInL17_c (const LSet set, const int length,
 */
 poly redtail (poly p, int pos, kStrategy strat)
 {
-  poly h, hn;
-  int j, e, l;
-  int op;
 
-  if (strat->noTailReduction)
+  if ((!strat->noTailReduction)
+  && (pNext(p)!=NULL))
   {
-    return p;
-  }
-  h = p;
-  hn = pNext(h);
-  while(hn != NULL)
-  {
-    op = pFDeg(hn);
-    e = pLDeg(hn,&l)-op;
-    j = 0;
-    while (j <= pos)
+    int j, e, l;
+    poly h = p;
+    poly hn = pNext(h); // !=NULL
+    int op = pFDeg(hn);
+    BOOLEAN save_HE=strat->kHEdgeFound;
+    strat->kHEdgeFound |= ((Kstd1_deg>0) && (op<=Kstd1_deg));
+    loop
     {
-      if (pDivisibleBy(strat->S[j], hn)
-      && ((e >= strat->ecartS[j])
-        || strat->kHEdgeFound
-        || ((Kstd1_deg>0)&&(op<=Kstd1_deg)))
-      )
+      e = pLDeg(hn,&l)-op;
+      j = 0;
+      while (j <= pos)
       {
-        spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
-        hn = pNext(h);
-        if (hn == NULL)
+        if (pDivisibleBy(strat->S[j], hn)
+        && ((e >= strat->ecartS[j])
+          || strat->kHEdgeFound)
+        )
         {
-          return p;
+          spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
+          hn = pNext(h);
+          if (hn == NULL) goto all_done;
+          op = pFDeg(hn);
+          if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
+          e = pLDeg(hn,&l)-op;
+          j = 0;
         }
-        op = pFDeg(hn);
-        e = pLDeg(hn,&l)-op;
-        j = 0;
-      }
-      else
-      {
-        j++;
-      }
+        else
+        {
+          j++;
+        }
+      } /* while (j <= pos) */
+      h = hn; /* better for: pIter(h); */
+      hn = pNext(h);
+      if (hn==NULL) break;
+      op = pFDeg(hn);
+      if ((Kstd1_deg>0)&&(op>Kstd1_deg)) break;
     }
-    h = hn;
-    hn = pNext(h);
+all_done:
+    strat->kHEdgeFound = save_HE;
   }
   return p;
 }
