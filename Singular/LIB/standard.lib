@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.43 1999-08-24 11:05:24 obachman Exp $
+// $Id: standard.lib,v 1.44 1999-09-11 13:22:06 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.43 1999-08-24 11:05:24 obachman Exp $";
+version="$Id: standard.lib,v 1.44 1999-09-11 13:22:06 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -19,11 +19,13 @@ PROCEDURES:
 //////////////////////////////////////////////////////////////////////////////
 
 proc stdfglm (ideal i, list #)
-"USAGE:   stdfglm(i[,s]); i ideal, s string (any allowed ordstr of a ring)
-RETURN:  stdfglm(i): standard basis of i in the basering, calculated via fglm
-                     from ordering \"dp\" to the ordering of the basering.
-         stdfglm(i,s): standard basis of i in the basering, calculated via
-                     fglm from ordering s to the ordering of the basering.
+"SYNTAX:  stdfglm(ideal_expression);
+         stdfglm(ideal_expression, string_expression);
+TYPE:    ideal
+PURPOSE: computes the standardbasis of the ideal in the basering,
+         calculated via fglm from ordering given as the second argumnent
+         to the ordering of the basering.
+         If no second argumnt is given, \"dp\" is used.
 SEE ALSO: stdhilb, std, groebner
 KEYWORDS: fglm
 EXAMPLE: example stdfglm; shows an example"
@@ -64,10 +66,12 @@ example
 /////////////////////////////////////////////////////////////////////////////
 
 proc stdhilb(ideal i,list #)
-"USAGE:  stdhilb(i);  i ideal
-         stdhilb(i,v); i homogeneous ideal, v intvec (the Hilbert function)
-RETURN:  stdhilb(i): a standard basis of i (computing v internally)
-         stdhilb(i,v): standard basis of i, using the given Hilbert function
+"SYNTAX:  stdhilb(ideal_expression);
+         stdhilb(ideal_expression, intvec_expression);
+TYPE:    ideal
+PURPOSE: computes the standardbasis of the homogeneous ideal in the basering,
+         calculated via a Hilbert driven standard basis computation.
+         An optional second argument will be used as the Hilbert function.
 SEE ALSO: stdfglm, std, groebner
 KEYWORDS: Hilbert function
 EXAMPLE: example stdhilb;  shows an example"
