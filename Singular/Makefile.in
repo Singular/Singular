@@ -110,7 +110,9 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	kstdfac.h mpsr_Get.h spolys.h \
 	kutil.h mpsr_Put.h spolys0.h
 
-TESTS=${testdir}/check ${testdir}/input ${testdir}/output 
+TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
+	${testdir}/general_test.in ${testdir}/general_test.out \
+	${testdir}/mpcheck ${testdir}/mpcheck.data 
 
 DOCS=${docdir}/Makefile.in ${docdir}/copyright.tex ${docdir}/doc2tex.c \
 	${docdir}/examples.doc ${docdir}/examples.tex ${docdir}/proc.tex \
@@ -169,7 +171,7 @@ claptmpl.o: claptmpl.cc mod2.h
 weight.o: weight.cc mod2.h
 	${CXX} ${CXXNOOPTFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 	
-iparith.inc mpsr_Tok.inc : iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h 
+iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h 
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -DGENTABLE -o gentable \
 	iparith.cc tesths.cc mpsr_Tok.cc ${OBJS} ${LDFLAGS} ${LIBS}
 	./gentable
@@ -282,14 +284,14 @@ factorycheck: Singular ${testdir}/comparecheck ${testdir}/fac_test.in \
 ##
 
 dist:
-	-rm -rf ${DIST_NAME}
-	-rm -f ${DIST_NAME}.tar.gz
-	${MKINSTALLDIRS} ${DIST_NAME}/LIB/gftables
-	-ln ${DISTFILES} ${DIST_NAME}
-	-ln LIB/*.lib ${DIST_NAME}/LIB
-	-ln LIB/gftables/* ${DIST_NAME}/LIB/gftables
-	tar cvf ${DIST_NAME}.tar  ${DIST_NAME}
-	gzip -9 ${DIST_NAME}.tar
+	rm -rf ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}*
+	mkdir ${TEMPDIR}/${DISTNAME}
+	- cp -pR . ${TEMPDIR}/${DISTNAME}
+	cd ${TEMPDIR}/${DISTNAME}; ${MAKE} distclean; 
+	cd ${TEMPDIR}; tar cf ${DISTNAME}.tar ${DISTNAME} 
+	rm -rf ${TEMPDIR}/${DISTNAME}
+	- gzip -9 ${TEMPDIR}/${DISTNAME}.tar
+	- mv ${TEMPDIR}/${DISTNAME}.tar.gz .
 
 TAGS:
 	etags ${SOURCES} ${HEADERS}

@@ -144,6 +144,11 @@ Singular's configure script pays attention to the following
                this library is not found, then Singular is built
                without DBM and DBM links are disabled. 
 
+  'info'     : Uses the 'info' program for displaying the Singular
+               documentation on a 'help' copmmand. This requires that
+               the 'info' programm is installed on your system. If
+               this program is not found, the a built-in display
+               routine is used.
   'MP'       : Uses the MP library for MP links. Requires that
                libgmp.a, libMP.a, libMPT.a and gmp.h, MP.h, MPT.h are
                installed on your system. If these files are not found,

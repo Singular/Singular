@@ -97,9 +97,11 @@ fi
 
 dnl programs to built the grammar/parser
 dnl check for info
-AC_CHECK_PROG(INFO, info, info)
-if test -n "$INFO"; then
-  AC_DEFINE(HAVE_INFO)
+if test "$with_info" != no; then
+  AC_CHECK_PROG(INFO, info, info)
+  if test -n "$INFO"; then
+    AC_DEFINE(HAVE_INFO)
+  fi
 fi
 
   
@@ -121,7 +123,9 @@ AC_ARG_WITH(
 AC_ARG_WITH(
   dbm,
   [  --without-dbm        do not use dbm (disables DBM links)])
-
+AC_ARG_WITH(
+  info,
+  [  --without-info       do not use info for help (use buildin help, instead)])
 AC_ARG_WITH(
   dld,
   [  --without-dld        do not use dld (disables dynamic linking)])
