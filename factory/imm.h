@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.11 1997-12-17 11:05:27 schmidt Exp $ */
+/* $Id: imm.h,v 1.12 1997-12-17 11:10:02 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -151,7 +151,7 @@ inline int imm_intval ( const InternalCF* const op )
 // If CO is in GF(q) or in FF(p) and SW_SYMMETRIC_FF is off, the
 // sign of CO is zero iff CO is zero, otherwise the sign is one.
 //
-// See alse: CanonicalForm::sign(), gf_sign()
+// See also: CanonicalForm::sign(), gf_sign()
 //
 //}}}
 inline int
@@ -189,6 +189,8 @@ imm_sign ( const InternalCF * const op )
 // total well order on polynomials we have to define a total well
 // order on all coefficients, too.  I decided to use simply the
 // order on the representation as `int's of such objects.
+//
+// See also: CanonicalForm::operator <(), CanonicalForm::operator ==()
 //
 //}}}
 inline int
