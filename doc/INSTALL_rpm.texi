@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.12 2002-07-01 13:07:06 Singular Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.13 2002-07-04 16:32:41 Singular Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -113,6 +113,7 @@ To install a @sc{Singular} menu @sc{rpm} package, @sc{gnome} or @sc{kde} have to
 Type
 @smallexample
 rpm -ivh Singular-desktop-@value{RPM_VERSION}-1.noarch.rpm
+@end smallexample
 in a command shell.
 @item
 To deinstall a @sc{Singular} @sc{rpm} package, type
