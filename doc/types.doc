@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.55 1998-05-19 07:32:14 Singular Exp $
+@comment $Id: types.doc,v 1.56 1998-05-19 09:26:09 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -28,8 +28,8 @@ alphabetical order. For every type, there is a description of the
 declaration syntax as well as information about how to build expressions
 of certain types.
 
-A list of expressions (in the following referred to as expression_list)
-in @sc{Singular} is any comma separated list of expressions.
+The term expression list in @sc{Singular} referes to any comma separated
+list of expressions.
 
 For the general syntax of a declaration see @ref{General command syntax}.
 
@@ -63,7 +63,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 @c ------------------------------
 Objects may be defined without a specific type: they get their
 type from the first assignment to them.
-E.g. @code{ideal i=x,y,z; def j=i^2;} defines the ideal @code{i^2}
+E.g., @code{ideal i=x,y,z; def j=i^2;} defines the ideal @code{i^2}
 with the name @code{j}.
 @*Note: Unlike other assignments a ring as an untyped object
 is not a copy but another reference to the same ring.
@@ -73,9 +73,9 @@ is not a copy but another reference to the same ring.
   setring s;
 @end example
 defines a ring @code{s} which is just another reference (or name)
-for the @code{basering}. This is useful if the basering
+for the basering. This is useful if the basering
 is not local to the procedure (so it cannot be accessed by its name)
-but one needs a name for it (e.g. for a use with @code{setring} or @code{map}).
+but one needs a name for it (e.g., for a use with @code{setring} or @code{map}).
 @code{setring r;} does not work in this case, because
 @code{r} may not be local to the procedure.
 
@@ -97,15 +97,13 @@ defines an object of the same type as the right-hand side.
 none
 @item Note:
 This is useful if the right-hand side may be of
-variable type as a consequence of a computation (e.g. ideal or module or
-matrix). It is also used in procedures to give the basering a name which
+variable type as a consequence of a computation (e.g., ideal or module or
+matrix). It may also be used in procedures to give the basering a name which
 is local to the procedure.
 @item Example:
 @example
 @c example
-  def i;
-  typeof(i);
-  i=2;
+  def i=2;
   typeof(i);
 @c example
 @end example
@@ -153,11 +151,6 @@ defines an ideal.
   poly s3 = z;
   ideal i =  s1, s2-s1, s2*s3, s3^4;
   i;
-  ideal j = i^2;
-  // generators i[k]*i[l], 1<=k<=l<=size(i);
-  ideal IJ = i*j;
-  // generators i[k]*j[l], 1<=k<=size(i), 1<=l<=size(j)
-  size(j), size(IJ);
 @c example
 @end example
 @end table
@@ -189,12 +182,18 @@ a typecast to ideal
 @strong{Example:}
 @example
 @c example
-
+  ring r=0,(x,y,z),dp;
+  poly s1 = x2;
+  poly s2 = y3;
+  poly s3 = z;
+  ideal i =  s1, s2-s1, s2*s3, s3^4;
+  ideal j = i^2;
+  // generators i[k]*i[l], 1<=k<=l<=size(i);
+  ideal IJ = i*j;
+  // generators i[k]*j[l], 1<=k<=size(i), 1<=l<=size(j)
+  size(j), size(IJ);
 @c example
 @end example
-@c ref
-See @ref{Type conversion and casting}.
-@c ref
 
 @c ------------------------------
 @node ideal operations, ideal related functions, ideal expressions, ideal
@@ -203,16 +202,16 @@ See @ref{Type conversion and casting}.
 
 @table @asis
 @item @code{+}
-addition (concatenation of the generator and simplification)
+addition (concatenation of the generators and simplification)
 
 @item @code{*}
 multiplication (with ideal, poly, vector, module)
 
 @item @code{^}
-power, exponentiation (by an integer)
+exponentiation (by a non-negative integer)
 
 @item ideal_expression @code{[} int_expression @code{]}
-is a generator of the ideal
+is a polynomial generator of the ideal, index 1 gives the first generator.
 @end table
 
 @strong{Example:}
@@ -247,19 +246,20 @@ factorizing Groebner basis algorithm (see @ref{facstd})
 @item factorize
 ideal of factors of a polynomial (see @ref{factorize})
 @item fglm
-compute the Groebner basis from a Groebner basis w.r.t. a different
+Groebner basis computation from a Groebner basis w.r.t. a different
 ordering (see @ref{fglm})
 @item finduni
-find univariate polynomials in a zero dimensional ideal (see @ref{finduni})
+computation of univariate polynomials lying in a zero dimensional ideal
+(see @ref{finduni})
 @item groebner
 Groebner basis computation (a wrapper around @code{std,stdhilb,stdfglm},...)
 (see @ref{groebner})
 @item homog
 homogenization with respect to a variable (see @ref{homog})
 @item hilb
-Hilbert function of a standard basis (see @ref{hilb})
+Hilbert series of a standard basis (see @ref{hilb})
 @item indepSet
-a maximal set of independent variables of an ideal (see @ref{indepSet})
+sets of independent variables of an ideal (see @ref{indepSet})
 @item interred
 interreduction of an ideal (see @ref{interred})
 @item intersect
@@ -321,7 +321,7 @@ simplify a set of polynomials (see @ref{simplify})
 @item size
 number of non-zero generators (see @ref{size})
 @item sortvec
-permutation for sorting ideals/modules (see @ref{sortvec})
+permutation for sorting ideals resp@:. modules (see @ref{sortvec})
 @item sres
 free resolution of a standard basis (see @ref{sres})
 @item std
@@ -346,10 +346,10 @@ optimal weights (see @ref{weight})
 @cindex int
 
 Variables of type int represent the machine integers and are, therefore,
-limited  in their range (i.e. the range is between
--2147483647 and 2147483647 for 32-bit machines). They are mainly used
-to count things (dimension, rank, etc., see @ref{dim}),
-in loops (see @ref{for}) and
+limited  in their range (e.g., the range is between
+-2147483647 and 2147483647 on 32-bit machines). They are mainly used
+to count things (dimension, rank, etc.),
+in loops (see @ref{for}), and
 to represent boolean values
 (FALSE is represented by 0, every other value means TRUE, see
 @ref{boolean expressions}).
@@ -406,12 +406,11 @@ converted to the type number, if a basering is defined)
 @item
 an identifier of type int
 @item
-an element of an intvec or an intmat
-@item
 a function returning int
 @item
 int expressions combined by the arithmetic operations
-@code{+}, @code{-}, @code{*}, @code{/}, @code{%}, or @code{^}
+@code{+}, @code{-}, @code{*}, @code{div}, @code{/},
+@code{%} (@code{mod}), or @code{^}
 @item
 a typecast to int
 @end enumerate
@@ -433,18 +432,15 @@ number(11)*13*17*100*200*2000*503*1111*222222;
 // Note: 11*13*17*100*200*2000*503*1111*222222
 // would return a machine integer:
 11*13*17*100*200*2000*503*1111*222222;
-ring rp;
+ring rp=320003,x,dp;
 12345678901;
 typeof(_);
-int i;
-i+2;
-intvec v=i..i+3;
-v;
 //----------------------------------------------------
 int j=1;
 ring r;
-i=dim(std(ideal(x,y)));// dimension of factor ring defined by (x,y)
-               // (i.e. R/(x,y)) if it is given by a standard basis
+// dimension of factor ring defined by (x,y)
+// (i.e. R/(x,y)) if it is given by a standard basis
+int i=dim(std(ideal(x,y)));
 int compare = i<j;
 compare;      // 0 (FALSE) if i >= j, 1 (TRUE) if i<j
 //----------------------------------------------------
@@ -481,11 +477,11 @@ negation or subtraction
 @item @code{*}
 multiplication
 @item @code{div}, @code{/}
-division in the integers (omitting the remainder)
+integer division (omitting the remainder)
 @item @code{%}, @code{mod}
-modulo (the remainder of the division)
+integer modulo (the remainder of the division)
 @item @code{^}, @code{**}
-power, exponentiation
+exponentiation
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
 comparison
 @end table
@@ -531,7 +527,7 @@ number of columns (see @ref{ncols})
 number of ring parameters (see @ref{npars})
 @item nrows
 number of rows of a matrix resp.
-the rank of the free module where the vector / module lives
+the rank of the free module where the vector or module lives
 (see @ref{nrows})
 @item nvars
 number of ring variables (see @ref{nvars})
@@ -578,12 +574,13 @@ module (see @ref{vdim})
 A boolean expression is really an int expression used in a logical context:
 @enumerate
 @item
-an int expression (<> 0 evaluates to @emph{TRUE}, 0 evaluates to @emph{FALSE})
+an int expression (<> 0 evalutates to @emph{TRUE} (represented by 1),
+0 represents @emph{FALSE})
 @item
 an integer comparison:
 @example
   i == j
-  i != j    //or     i <> j
+  i != j    // or     i <> j
   i <= j
   i >= j
   i > j
@@ -593,7 +590,7 @@ an integer comparison:
 a number comparison:
 @example
   m == n
-  m != n    //or     m <> n
+  m != n    // or     m <> n
   m < n
   m > n
   m <= n
@@ -609,21 +606,21 @@ the @code{<} and @code{>} are equivalent to @code{!=}.
 a polynomial comparison:
 @example
   f == g
-  f != g    //or     f <> g
-  f <= g    //comparing the leading term w.r.t. the monomial order
+  f != g    // or     f <> g
+  f <= g    // comparing the leading term w.r.t. the monomial order
   f >= g
 @end example
 @item
 an intvec or intmat comparison:
 @example
   v == w
-  v != w    //or     v <> w
+  v != w    // or     v <> w
 @end example
 @item
 a string comparison:
 @example
   f == g
-  f != g    //or     f <> g
+  f != g    // or     f <> g
   f <= g    // comparing lexicographically
             // w.r.t. the order specified by ASCII
   f >= g
@@ -634,15 +631,19 @@ a string comparison:
 boolean expressions combined by boolean operations (@code{and},
 @code{or}, @code{not})
 
-@strong{Note:} All arguments of a logical expressions are first
-evaluated and then the value of the logical expression is
-determined. For example, the value of the logical expressionss
-@code{(1 || a)} is
-determined by evaluating @code{a}, even though the value of
-@code{a} has no influence on the value of @code{(1 || a)}. Note that
-this is different from the left-to-right evaluation of logical
-expressions (as found in most programming languages) which
-determine the value of @code{(1 || a)} without evaluating @code{a}.
+@strong{Note:}
+@strong{All} arguments of a logical expressions are first evaluated and
+then the value of the logical expression is determined. For example, the
+logical expressions @code{(a || b)} is evaluated by first evaluating
+@code{a} @emph{and} @code{b}, even though the value of @code{b} has no
+influence on the value of @code{(a || b)}, if @code{a} evaluates to
+@i{true}.
+
+Note that this evaluation is different from the left-to-right, conditional
+evaluation of logical expressions (as found in most programming
+languages). For example, in these other languages, the value of @code{(1
+|| b)} is determined without ever evaluating @code{b}.
+
 See @ref{Major differences to the C programming language}.
 @end enumerate
 
@@ -691,6 +692,7 @@ matrix.
 @code{intmat} name @code{=} intmat_expression @code{;}
 @*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} intmat_expression @code{;}
 @*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} list_of_int_expressions @code{;}
+@*rows and cols must be int expressions.
 @item Purpose:
 defines an intmat variable.
 @* Given a list of integers, the matrix is filled up with the first row
@@ -705,7 +707,7 @@ elements, only the first rows*cols elements are used.
 @c example
   intmat im[3][5]=1,3,5,7,8,9,10,11,12,13;
   im;
-  im[2,2];
+  im[3,2];
   intmat m[2][3] = im[1..2, 3..5];  // defines a submatrix
   m;
 @c example
@@ -720,7 +722,7 @@ elements, only the first rows*cols elements are used.
 An intmat expression is:
 @enumerate
 @item
-a list of int expressions, intvec expressions and intmat expressions
+a list of int expressions, intvec expressions, or intmat expressions
 @item
 an identifier of type intmat
 @item
@@ -732,16 +734,13 @@ intmat operations (@code{+}, @code{-}, @code{*})
 @item
 a typecast to intmat
 @end enumerate
-@c ref
-See @ref{Type conversion and casting}.
-@c ref
 
 @strong{Example:}
 @example
 @c example
   intmat m[2][3]=1,0,2,4,5,1;
   m+1;             // adds unit intmat to m
-  m[2,1];          // entry at 2,1
+  m[2,1];          // entry at row 2, col 1
   intmat m1[3][2]=1,0,2,4,0,1;
   m1*10;           // multiply each entry with 10
   m*m1;
@@ -792,8 +791,6 @@ second the column
 @cindex intmat related functions
 
 @table @code
-@item bareiss
-Bareiss algorithm (see @ref{bareiss})
 @item betti
 Betti numbers of a free resolution (see @ref{betti})
 @item det
@@ -818,20 +815,19 @@ trace of an intmat (see @ref{trace})
 @cindex intvec
 
 Variables of type intvec are lists of integers.  For the range of
-integers see @ref{Limitations}. They can be used for simulating
-integers sets (and other sets if the intvec entry is used as an index
-for other objects). They are also used as return values of certain interpreter
-related functions (see @ref{Functions}). Addition and subtraction of an
+integers see @ref{Limitations}. They may be used for simulating
+integers sets (and other sets if the intvec is used as an index set
+for other objects). Addition and subtraction of an
 intvec with in int is done element wise.
-@example
-@c example
-  intvec iv=1,2,5,7;
-  iv;
-  iv[3];
-  iv[7]=1;
-  iv;
-@c example
-@end example
+@c @example
+@c @c example
+@c   intvec iv=1,2,5,7;
+@c   iv;
+@c   iv[3];
+@c   iv[7]=1;
+@c   iv;
+@c @c example
+@c @end example
 
 @menu
 * intvec declarations::
@@ -887,10 +883,6 @@ intvec operation with intmat (@code{*})
 a typecast to intvec
 @end enumerate
 
-@c ref
-See @ref{Type conversion and casting}.
-@c ref
-
 @strong{Example:}
 @example
 @c example
@@ -921,25 +913,25 @@ See @ref{Type conversion and casting}.
 
 @table @asis
 @item @code{+}
-addition with intvec or int (element wise)
+addition with intvec or int (component wise)
 
 @item @code{-}
-negation or subtraction with intvec or int (element wise)
+negation or subtraction with intvec or int (component wise)
 
 @item @code{*}
-multiplication with int (element wise)
+multiplication with int (component wise)
 
 @item @code{/}, @code{div}
-division with int (element wise)
+division with int (component wise)
 
 @item  @code{%, mod}
-modulo (element wise)
+modulo (component wise)
 
 @item  @code{<>}, @code{==}, @code{<=}, @code{>=}, @code{>}, @code{<}
 comparison (done lexicographically)
 
 @item intvec_expression @code{[} int_expression @code{]}
-is an element of the intvec; the index 1 gives the first element.
+is an element of the intvec; the first element has index one.
 @end table
 
 @strong{Example:}
@@ -958,7 +950,7 @@ is an element of the intvec; the index 1 gives the first element.
 @item hilb
 returns Hilbert series as intvec (see @ref{hilb})
 @item indepSet
-indices of a maximal set of independent variables of an ideal (see @ref{indepSet})
+sets of independent variables of an ideal (see @ref{indepSet})
 @item leadexp
 the exponent vector of the leading monomial (see @ref{leadexp})
 @item nrows
@@ -981,7 +973,7 @@ returns weights for the weighted ecart method (see @ref{weight})
 @cindex link
 
 @c {{{ section link }}}
-Links are the communication channels of @sc{Singular}, i.e.
+Links are the communication channels of @sc{Singular}, i.e.,
 something @sc{Singular} can write to and/or read from. Currently,
 @sc{Singular} supports four different link types:
 @itemize @bullet
@@ -1112,9 +1104,10 @@ closes and kills a link (see @ref{kill})
 Via ASCII links data that can be converted to a string can be written
 into files for storage or communcation with other programs. The data is
 written in plain ASCII format. The output format of polynomials is done
-w.r.t. the value of the global variable @code{short} (see @ref{short}). Reading
-from an ASCII link returns a string - conversion into other data is up to
-the user. This can be done, for example, using the command @code{execute}
+w.r.t@:. the value of the global variable @code{short} (see @ref{short}).
+Reading from an ASCII link returns a string --- conversion into other data
+is up to the user. This can be done, for example,
+using the command @code{execute}
 (see @ref{execute}).
 
 The ASCII link describing string has to be one of the following:
@@ -1136,7 +1129,7 @@ There are the following default values:
 @item the type @code{ASCII} may be ommitted since ASCII links are the
 default links.
 
-@item if non of @code{r}, @code{w} or @code{a} is specified, the mode of
+@item if non of @code{r}, @code{w}, or @code{a} is specified, the mode of
 the link is set by the first @code{read} or @code{write} command on the
 link. If the first command is @code{write}, the mode is set to @code{a}
 (append mode).
@@ -1174,9 +1167,9 @@ written.
   read("example.txt");         // data is returned as string
   execute read(l);             // read string is executed
   close(l);                    // link is closed
-  // dump vars overwriting previous file content:
-  dump(":w example.txt");
 @c example
+@c  // dump vars overwriting previous file content:
+@c  dump(":w example.txt");
 @end example
 
 @c ------------------------------
@@ -1185,7 +1178,7 @@ written.
 @cindex MP links
 
 MP (Multi Protocol) links give the possibility to store and communicate
-data in the binary MP format: read and write access is very fast
+data in the binary MP format: Read and write access is very fast
 compared to ASCII links. MP links can be established using files (link
 type is @code{MPfile}) or using TCP sockets (link type is
 @code{MPtcp}). All data (including such data that can not be converted
@@ -1199,13 +1192,14 @@ ring.
 Currently, MP links are only available on Unix platforms and data is
 written without attributes (which is likely to change in future
 versions). For a general description of MP, see
-@code{http://symbolicnet.mcs.kent.edu:/areas/mp.html}.
+@code{http://symbolicnet.mcs.kent.edu/areas/mp.html}.
 
 @menu
 * MPfile links::
 * MPtcp links::
 @end menu
 
+@c -------------------------------------------------------------
 @node MPfile links, MPtcp links, MP links, MP links
 @subsubsection MPfile links
 @cindex MPfile links
@@ -1235,7 +1229,7 @@ The MPfile link describing string has to be one of the following:
 
 There are the following default values:
 @itemize @bullet
-@item if none of @code{r}, @code{w} or @code{a} is specified, the mode of
+@item if none of @code{r}, @code{w}, or @code{a} is specified, the mode of
 the link is set by the first @code{read} or @code{write} command on the
 link. If the first command is @code{write}, the mode is set to @code{a}
 (append mode).
@@ -1269,6 +1263,7 @@ either for reading or for writing, but not for both at the same time. A
 @c example
 @end example
 
+@c -------------------------------------------------------------
 @node MPtcp links,  , MPfile links, MP links
 @subsubsection MPtcp links
 @cindex MPtcp links
@@ -1333,8 +1328,10 @@ There are the following default values:
 
 @item if no application is specified (in mode @code{launch}) the default
 application is the value of @code{system("Singular") + " -b"}.
+(This evalutates to the absolute path of the @sc{Singular} currently running
+with the option "-b" appended.
 
-@item if no hostname is specified the localhost is used as default host.
+@item if no hostname is specified the local host is used as default host.
 @end itemize
 
 To open an MPtcp link in launch mode, the application to launch must
@@ -1360,20 +1357,20 @@ actually opened the link acts as a client.
 
 To arrange the evaluation of an expression by a server, the expression
 must be quoted using the command @code{quote} (see @ref{quote}), so that
-a local evaluation is prevented (otherwise, the expression is evaluated
+a local evaluation is prevented. Otherwise, the expression is evaluated
 first, and the result of the evaluation is written, instead of the
-expression which is to be evaluated).
+expression which is to be evaluated.
 
 If @sc{Singular} is in server mode, the value of the variable
 @code{mp_ll} is the MPtcp link connecting to the client and
 @sc{Singular} is in an infinite read-eval-write loop until the
 connection is closed from the client side (by closing its connecting
-link). Reading and writing is done to the link @code{mp_ll} -- after an
+link). Reading and writing is done to the link @code{mp_ll}: After an
 expression is read, it is evaluated and the result of the evaluation is
 written back.  That is, for each expression which was written to the
-server, there is exactly one expression written back (which might be an
+server, there is exactly one expression written back. This might be an
 "empty" expression, if the evaluation on the server side does not return
-a value).
+a value.
 
 MPtcp links should explicitly be opened before being used. MPtcp links
 are bidirectional, i.e., can be be used for both, writing and
@@ -1421,8 +1418,8 @@ is data to read.
 @subsection DBM links
 @cindex DBM links
 
-DBM links provide access to data stored in a data base (using the dbm or
-gdbm library). Each entry in the data base consists of a (key_string,
+DBM links provide access to data stored in a data base.
+Each entry in the data base consists of a (key_string,
 value_string) pair. Such a pair can be inserted with the command
 @code{write(}link@code{,} key_string@code{,} value_string@code{)}.  By
 calling @code{write(}link@code{,} key_string@code{)}, the entry with key
@@ -1484,14 +1481,14 @@ Note, that @code{name} must be given without the suffix @code{.pag} ors
 
 Lists are arrays whose elements can be of any type (including ring and
 qring). If one element belongs to a ring the whole list belongs to that
-ring. (This applies also to the special list @code{#}.) The expression
-@code{list()} is the empty list, see @ref{Type conversion and casting}.
+ring. This applies also to the special list @code{#}. The expression
+@code{list()} is the empty list.
 
 Note that a list stores the objects itself and not the names.  Hence, if
 @code{L} is a list, @code{L[1]} for example has no name.  A name, say
 @code{R}, can be created for @code{L[1]} by @code{def R=L[1];}. To store
 also the name of an object, say @code{r}, it can be added to the list
-with @code{nameof(r);}. Objects of a list may also be rings.
+with @code{nameof(r);}. Rings and qrings may be objects of a list.
 
 @strong{Note}: Unlike other assignments a ring as an element of a list
 is not a copy but another reference to the same ring.
@@ -1623,7 +1620,7 @@ free resolution of an ideal resp. module given by a standard base (see @ref{sres
 Maps are ring maps from a preimage ring into the basering.
 Note that the target of a map is ALWAYS the actual basering.
 Maps between rings with different coefficient fields are
-possible, the map of the coefficients is defined in the following way:
+possible, coefficients are mapped in the following way:
 @itemize @bullet
 @item
 @tex
@@ -1791,7 +1788,8 @@ is a map entry
 @section matrix
 @cindex matrix
 
-Matrices are matrices with polynomial entries. Like polynomials they can
+Objects of type matrix are matrices with polynomial entries.
+Like polynomials they can
 only be defined or accessed with respect to a basering. In order to
 compute with matrices having integer or rational entries define a ring
 with characteristic 0 and at least one variable.
@@ -1874,9 +1872,6 @@ matrix expressions combined by the arithmetic operations
 @item
 a typecast to matrix
 @end enumerate
-@c ref
-See @ref{Type conversion and casting}.
-@c ref
 
 @strong{Example:}
 @example
@@ -1925,7 +1920,7 @@ second the column
 
 @table @code
 @item bareiss
-Bareiss algorithm (see @ref{bareiss})
+Gauss-Bareiss algorithm (see @ref{bareiss})
 @item coef
 matrix of coefficients and monomials (see @ref{coef})
 @item coeffs
@@ -2221,7 +2216,7 @@ vector space dimension of free module over the basering modulo module (see @ref{
 @section number
 @cindex number
 
-Numbers are the coefficients of a monomial (power products of ring variables).
+Numbers are elements from the coefficient field.
 They can only be defined or accessed with respect to a basering
 which determines the coefficient field.
 
@@ -2540,7 +2535,7 @@ variable in string form (see @ref{varstr})
 
 Procedures are sequences of @sc{Singular} commands in a special
 format. They are used to extend the set of @sc{Singular} commands with
-user definable commands. Once a procedure is defined it can be used as
+user defined commands. Once a procedure is defined it can be used as
 any other @sc{Singular} command. Procedures may be defined by either
 typing them on the command line or by loading them from a file. For a
 detailed description on the concept of procedures in @sc{Singular} see
@@ -2585,8 +2580,8 @@ using the command @code{LIB}. For more information on libraries see
 @item Purpose:
 defines a new function, the @code{proc} proc_name, with the additional
 information help_text, which is copied to the screen by
-@code{help proc_name;} and the @code{example} section
-which is executed by @code{example proc_name;}.
+@code{help} proc_name@code{;} and the @code{example} section
+which is executed by @code{example} proc_name@code{;}.
 @* The help_text, the parameter_list, and the example section are optional.
 @* Specifying @code{static} in front of the procedure definition (in a
 library file) makes this procedure local to the library.
@@ -2639,7 +2634,7 @@ of the basering to this new ring.
 @item Default:
 none
 @item Note:
-In a @code{qring}, polynomials are not immediately reduced with respect
+In a qring, polynomials are not immediately reduced with respect
 to the quotient ring.
 @item Example:
 @example
