@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.11 2003-05-20 17:46:51 levandov Exp $
+@comment $Id: plumath.doc,v 1.12 2003-05-23 11:26:19 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -154,7 +154,7 @@ A is an integral domain,
 
 @item  
 @tex  
-$A$ has a left and right quotient ring.
+$A$ has left and right quotient rings.
 @end tex
 
 @ifinfo  
@@ -333,7 +333,7 @@ basis}\} \to A^r, (f|G) \mapsto \hbox{NF}(f|G)$, is called a {\bf normal
 form} on $A^r$ if for any $f \in A^r$ and any  Groebner basis $G$ the following
 holds: 
 
-(i) $\hbox{NF}(f|G) \not= 0$ then lm$(g)$  does not divide
+(i) $\hbox{NF}(f|G) \not= 0$ then $\hbox{lm}(g)$  does not divide
 $\hbox{lm}(\hbox{NF}(f|G))$ for all $g \in G$.
 
 (ii) $f - \hbox{NF}(f|G)\in \langle G \rangle.$ 
@@ -640,11 +640,10 @@ Graduate Studies in Mathematics. 30. Providence, RI: American Mathematical Socie
 
 @item
 @c{AP} art
-@tex
+
 J. Apel.
   Gr@"obnerbasen in nichtkommutativen algebren und ihre anwendung.
     Dissertation, Universit@"at Leipzig, 1988.
-@end tex
 
 @item
 @c{AP2}  art
@@ -655,7 +654,7 @@ J. Apel.
 @item
 @c{BachS:98} InCollection
 O. Bachmann and H. Sch@"onemann.
-   Monomial operations for computations of Gr @"o bner bases.
+   Monomial operations for computations of Gr@"obner bases.
   In   Reports On Computer Algebra 18. Centre for Computer Algebra,
 Preprint 18,in Reports on Computer Algebra,  University of Kaiserslautern, January (1998)
  

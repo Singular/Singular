@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.13 2003-05-20 16:43:52 levandov Exp $
+@comment $Id: plureference.doc,v 1.14 2003-05-23 11:26:19 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1027,7 +1027,6 @@ see also @sc{Singular} manual sections dim, degree, mult, kbase.
 @node Control structures@value{PSUFFIX}, System variables@value{PSUFFIX}, Functions@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}
 @section Control structures@value{PSUFFIX}
 @cindex Control structures@value{PSUFFIX}
-@cindex block
 
 See SINGULAR Manual
 @ifset singularmanual
