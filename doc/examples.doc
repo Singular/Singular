@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.9 1998-05-12 08:05:00 wichmann Exp $
+@comment $Id: examples.doc,v 1.10 1998-05-12 13:41:45 obachman Exp $
 @comment this file contains the examples
 
 @ifinfo
@@ -31,6 +31,7 @@ The following topics are treated:
 * Puiseux pairs::
 * Primary decomposition::
 * Classification::
+* Parallelization with MPtcp links::
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -1758,12 +1759,11 @@ Gianni/Trager/Zacharias (written by Gerhard Pfister)
 and @code{primdecSY}, based on Shimoyama/Yokoyama
 (written by Wolfram Decker and Hans Schoenemann)
 
-The result of @code{primdecGTZ} will be presented as a list of ideals,
-where the even index blongs to the prime ideal
-corresponding to the primary ideal with odd index
-before.
+The result of primdecGTZ is returned as a list of ideals,
+where the even indexed ideals form the prime ideal and the odd indexed
+ideal form the corresponding primary ideal.
 
-The result of @code{primdecSY} is a list of list of 2 ideals,
+The result of primdecSY is a list of list-tupels of ideals,
 the primary ideal and the corresponding prime ideal.
 
 @example
@@ -1802,7 +1802,103 @@ the primary ideal and the corresponding prime ideal.
 @c example
 @end example
 @c ----------------------------------------------------------------------------
-@node Classification,,Primary decomposition,Examples
+@node Classification, Parallelization with MPtcp links, Primary decomposition, Examples
 @section Classification
 @cindex Classification
+
+
+@c ----------------------------------------------------------------------------
+@node  Parallelization with MPtcp links,, Classification,Examples
+@section Parallelization with MPtcp links
+@cindex Parallelization
+@cindex MPtcp
+@cindex link
+In this example, we demonstrate how MPtcp links can be used to
+paralellize computations. 
+
+To compute a standard base for a zero-dimensional ideal in the
+lexicographical ordering, one of the two powerful routines
+@code{stdhilbert} (see @ref{stdhilbert}) and @code{stdfglm} (see
+@ref{stdfglm}) should be used. However, one can not a priory predict
+which one the two commands is faster. This very much depends on the
+(input) example. Therefore, we use MPtcp links to let the two commands
+work on the problem simultanoulsy, and let the one which finishes first
+deliver the result. 
+
+The example we use is the so-called "omndi example". See @i{Tim
+Wichmann; Der FGLM-Algorithmus: verallgemeinert und implementiert in
+Singular; Diplomarbeit Fachbereich Mathematik, Universitaet
+Kaiserslautern; 1997} for more details.
+
+@example
+@c example
+ring r=0,(a,b,c,u,v,w,x,y,z),lp; 
+ideal i=a+c+v+2x-1, ab+cu+2vw+2xy+2xz-2/3,  ab2+cu2+2vw2+2xy2+2xz2-2/5, 
+ab3+cu3+2vw3+2xy3+2xz3-2/7, ab4+cu4+2vw4+2xy4+2xz4-2/9, vw2+2xyz-1/9, 
+vw4+2xy2z2-1/25, vw3+xyz2+xy2z-1/15, vw4+xyz3+xy3z-1/21;
+
+link l_hilb,l_fglm = "MPtcp:fork","MPtcp:fork";         // 1.
+
+open(l_fglm); open(l_hilb);
+
+write(l_hilb, quote(system("pid")));                    // 2.
+write(l_fglm, quote(system("pid")));        
+int pid_hilb,pid_fglm = read(l_hilb),read(l_fglm); 
+
+write(l_hilb, quote(stdhilbert(i)));                    // 3.
+write(l_fglm, quote(stdfglm(eval(i)))); 
+
+while (status(l_hilb, "read", "not ready") &&           // 4.
+       status(l_fglm, "read", "not ready")) {}
+
+if (status(l_hilb, "read", "ready"))
+{
+  "stdhilbert won !!!!"; size(read(l_hilb));
+  close(l_hilb); pid_fglm = system("sh","kill "+string(pid_fglm));
+}
+else                                                    // 5.
+{
+  "stdfglm won !!!!"; size(read(l_fglm));
+  close(l_fglm); pid_hilb = system("sh","kill "+string(pid_hilb));
+}
+@c example
+@end example
+Some explainatory remarks are in order:
+@enumerate
+@item 
+Instead of using links of the type @code{MPtcp:fork}, we alternatively
+could use @code{MPtcp:launch} links such that the two "competing"
+@sc{Singular} processes run on different machines. This has the
+advantage of "true" parallel computing since no resource sharing is
+invloved (as it usually is with forked processes).
+
+@item
+Unfortunately, MPtcp links do not offer means to (asynchronously)
+interrupt or kill an attached (i.e., lauched or forked)
+process. Therefore, we explicitely need to get the process id numbers of 
+the competing @sc{Singular} processes, so that we can "kill" the looser.
+
+@item 
+Notice how quoting is used in order to prevent local evaluation (i.e.,
+local computation of results). Since we "forked" the two competing
+processes,  the identifier @code{i} is defined and has identical values
+in the two child processes. Therefore, the innermost @code{eval} can be
+ommited, and only the identifier @code{i} needs to be communicated to
+the children. However, when @code{MPtcp:lauch} links are used, the inner
+evaluation must be applied so that actual values, and not the identifiers
+are communicated.
+
+@item 
+We go into a "bussy" loop and wait until one of the two children
+finished the computation. Unfortunately, there is no way, yet, to go
+into a "sleep" mode and only wake up when one of the children has
+finished.
+
+@item
+The child which won delivers the result and is terminated with the usual 
+@code{close} command. The other child which is still computing needs to
+be terminated by an explicit (i.e., system) kill command, since it can
+not be terminated whicle it is still computing.
+@end enumerate
+
 

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.32 1998-05-11 13:10:45 wichmann Exp $
+@comment $Id: types.doc,v 1.33 1998-05-12 13:41:50 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -898,7 +898,17 @@ returns weights for the weighted ecart method (see @ref{weight})
 @section link
 @cindex link
 
-Links describe the communication channels of @sc{Singular}, i.e.
+@c {{{ section link }}}
+@menu
+* link declarations::
+* link expressions::
+* link related functions::
+* ASCII links::
+* MP links::
+* DBM links::
+@end menu
+
+Links are the communication channels of @sc{Singular}, i.e.
 something @sc{Singular} can write to and/or read from. Currently,
 @sc{Singular} supports four different link types: 
 @itemize @bullet
@@ -1029,8 +1039,8 @@ Via ASCII links data that can be converted to a string can be written
 into files for storage or communcation with other programs. The data is
 written in plain ASCII format. The output format of polynomials is done
 w.r.t. the value of the global variable @code{short} (see @ref{short}). Reading
-from an ASCII links returns a string - conversion into other data is up to
-the user. This can be done for example using the command @code{execute} 
+from an ASCII link returns a string - conversion into other data is up to
+the user. This can be done, for example, using the command @code{execute} 
 (see @ref{execute}).
 
 The ASCII link describing string has to be one of the following:
@@ -1190,7 +1200,7 @@ either for reading or for writing, but not for both at the same time. A
 @cindex MPtcp links
 
 MPtcp links give the possibility to exchange data in the binary MP
-format between two processes which may run on the same or different
+format between two processes which may run on the same or on different
 computers. MPtcp links can be opened in four different modes: 
 
 @table @code
