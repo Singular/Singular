@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omalloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAlloc.c,v 1.2 1999-11-22 18:12:57 obachman Exp $
+ *  Version: $Id: omAlloc.c,v 1.3 1999-11-23 20:40:12 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
@@ -16,6 +16,12 @@
 #include "omList.h"
 
 
+/*******************************************************************
+ *  
+ *  global variables
+ *  
+ *******************************************************************/
+
 omBinPage_t om_ZeroPage[] = {{0, NULL, NULL, NULL, NULL}};
 omBinPage_t om_CheckPage[] = {{0, NULL, NULL, NULL, NULL}};
 omBinPage_t om_LargePage[] = {{0, NULL, NULL, NULL, NULL}};
@@ -23,8 +29,209 @@ omBin_t     om_LargeBin[] = {{om_LargePage, NULL, NULL, 0, 0, 0}};
 omBin_t     om_CheckBin[] = {{om_CheckPage, NULL, NULL, 0, 0, 0}};
 omSpecBin om_SpecBin = NULL;
 
+/*******************************************************************
+ *  
+ *  Alloc routines which we do not define as macros
+ *  
+ *******************************************************************/
+void* _omReallocBlock(void* old_addr, size_t old_size, size_t new_size)
+{
+  void* new_addr;
+  if (old_addr == NULL) __omTypeAllocBlock(void*, new_addr, new_size);
+  else
+  {
+    if (new_size <= OM_MAX_BLOCK_SIZE && old_size <= OM_MAX_BLOCK_SIZE)
+    {
+      omBin __om_new_bin = omSmallSize2Bin(new_size);
+      omBin __om_old_bin = omSmallSize2Bin(old_size);
+      if (__om_new_bin != __om_old_bin)
+      {
+        __omTypeAllocBlock(void*, new_addr, new_size);
+        omMemcpyW(new_addr, old_addr,
+                  (__om_old_bin->sizeW > __om_new_bin->sizeW ?
+                   __om_new_bin->sizeW : __om_old_bin->sizeW));
+        __omFreeBin(old_addr);
+      }
+    }
+    else if (new_size > OM_MAX_BLOCK_SIZE && old_size > OM_MAX_BLOCK_SIZE)
+    {
+      new_addr = (type) omLargeBlockRealloc(new_size, old_addr, old_size);
+    }
+    else
+    {
+      __omTypeAllocBlock(void*, new_addr, new_size);
+      memcpy(new_addr, old_addr, (old_size > new_size ? new_size : old_size));
+    }
+  }
+  return new_addr;
+}
 
-#include <stdlib.h>
+void* _omRealloc0Block(void* old_addr, size_t old_size, size_t new_size)
+{
+  void* new_addr;
+  int __om_fill = new_size - old_size;
+  new_addr = _omReallocBlock(void*, new_addr, new_size, old_addr, old_size);
+  if (_om_fill > 0) memset(((void*) new_addr) + __om_fill, 0, __om_fill);
+  return new_addr;
+}
+
+#ifdef OM_ALIGNMENT_NEEDS_WORK      
+void* _omReallocAlignedBlock(void* old_addr, size_t old_size, size_t new_size)
+{
+  void* new_addr;
+  if (old_addr == NULL) __omTypeAllocAlignedBlock(void*, new_addr, new_size);
+  else
+  {
+    if (new_size <= OM_MAX_BLOCK_SIZE && old_size <= OM_MAX_BLOCK_SIZE)
+    {
+      omBin __om_new_bin = omSmallSize2AlignedBin(new_size);
+      omBin __om_old_bin = omSmallSize2AlignedBin(old_size);
+      if (__om_new_bin != __om_old_bin)
+      {
+        __omTypeAllocAlignedBlock(void*, new_addr, new_size);
+        omMemcpyW(new_addr, old_addr,
+                  (__om_old_bin->sizeW > __om_new_bin->sizeW ?
+                   __om_new_bin->sizeW : __om_old_bin->sizeW));
+        __omFreeBin(old_addr);
+      }
+    }
+    else if (new_size > OM_MAX_BLOCK_SIZE && old_size > OM_MAX_BLOCK_SIZE)
+    {
+      new_addr = (type) omLargeBlockRealloc(new_size, old_addr, old_size);
+    }
+    else
+    {
+      __omTypeAllocAllignedBlock(void*, new_addr, new_size);
+      memcpy(new_addr, old_addr, (old_size > new_size ? new_size : old_size));
+    }
+  }
+}
+
+void* _omRealloc0AlignedBlock(void* old_addr, size_t old_size, size_t new_size)
+{
+  void* new_addr;
+  int __om_fill = new_size - old_size;
+  __omTypeReallocAlignedBlock(void*, new_addr, new_size, old_addr, old_size);
+  if (_om_fill > 0) memset(((void*) new_addr) + __om_fill, 0, __om_fill);
+  return new_addr;
+}
+#endif /* OM_ALIGNMENT_NEEDS_WORK */
+
+void* _omReallocChunk(void* old_addr, size_t new_size)
+{
+  void* new_addr;
+  if (old_addr == NULL) __omTypeAllocChunk(void*, new_addr, new_size);
+  else
+  {
+    void* __old_addr = ((void*) (old_addr)) - SIZEOF_OM_ALIGNMENT;
+    omBinPage __om_page = *((omBinPage*) __old_addr);
+    size_t __new_size = new_size + SIZEOF_OM_ALIGNMENT;
+    void* __new_addr;
+    if (__new_size <= MAX_BLOCK_SIZE && __om_page != om_LargePage)
+    {
+      omBin __om_old_bin = omGetTopBinOfPage(__om_page);
+      omBin __om_new_bin = omSmallSize2Bin(__new_size);
+      if (__om_old_bin != __om_new_bin)
+      {
+        __omTypeAllocBin(void*, __new_addr, __new_size);
+        omMemcpyW(__new_addr, __old_addr,                     
+                  (__om_old_bin->sizeW > __om_new_bin->sizeW ?
+                   __om_new_bin->sizeW : __om_old_bin->sizeW));
+        *((void**) __new_addr) = (void*) __om_new_bin->current_page;
+        __omFreeBin(__old_addr);
+        new_addr = (type) (__new_addr + SIZEOF_OM_ALIGNMENT);
+      }
+      else
+      {
+        new_addr = (type) old_addr;
+      }
+    }
+    else if (__new_size > MAX_BLOCK_SIZE && __om_page == om_LargePage)
+    {
+      __new_addr = omReallocLargeChunk(__old_addr, __new_size);
+      *((void**) __new_addr) = (void*) om_LargePage;
+      new_addr = (type) (__new_addr + SIZEOF_OM_ALIGNMENT);
+    }
+    else
+    {
+      __omTypeAllocChunk(void*, new_addr, new_size);
+      if (__om_page != om_LargePage)
+      {
+        omBin old_bin = omGetTopBinOfPage(__om_page);
+        omMemcpyW(new_addr, old_addr, old_bin->sizeW - 1);
+      }
+      else
+      {
+        memcpy(new_addr, old_addr, new_size);
+      }
+    }
+  }
+  return new_addr;
+}
+
+#ifdef OM_ALIGNMENT_NEEDS_WORK
+void* _omReallocAlignedChunk(void* old_addr, size_t new_size)
+{
+  void* new_addr;
+  if (old_addr == NULL) __omTypeAllocAlignedChunk(void*, new_addr, new_size);
+  else
+  {
+    void* __old_addr = ((void*) (old_addr)) - SIZEOF_OM_CHUNK_ALIGNMENT;
+    omBinPage __om_page = *((omBinPage*) __old_addr);
+    size_t __new_size = new_size + SIZEOF_OM_CHUNK_ALIGNMENT;
+    void* __new_addr;
+    if (__new_size <= MAX_BLOCK_SIZE && __om_page != om_LargePage)
+    {
+      omBin __om_old_bin = omGetTopBinOfPage(__om_page);
+      omBin __om_new_bin = omSmallSize2AlignedBin(__new_size);
+      if (__om_old_bin != __om_new_bin)
+      {
+        __omTypeAllocBin(void*, __new_addr, __new_size);
+        omMemcpyW(__new_addr, __old_addr,                     
+                  (__om_old_bin->sizeW > __om_new_bin->sizeW ?
+                   __om_new_bin->sizeW : __om_old_bin->sizeW));
+        *((void**) __new_addr) = (void*) __om_new_bin->current_page;
+        __omFreeBin(__old_addr);
+        new_addr = (type) (__new_addr + SIZEOF_OM_ALIGNMENT);
+      }
+      else
+      {
+        new_addr = (type) old_addr;
+      }
+    }
+    else if (__new_size > MAX_BLOCK_SIZE && __om_page == om_LargePage)
+    {
+      __new_addr = omReallocLargeChunk(__old_addr, __new_size);
+      *((void**) __new_addr) = (void*) om_LargePage;
+      new_addr = (type) (__new_addr + SIZEOF_OM_CHUNK_ALIGNMENT);
+    }
+    else
+    {
+      __omTypeAllocChunk(void*, new_addr, new_size);
+      if (__om_page != om_LargePage)
+      {
+        omBin old_bin = omGetTopBinOfPage(__om_page);
+        memcpy(new_addr, old_addr, 
+               old_bin->sizeW*SIZEOF_LONG - SIZEOF_OM_CHUNK_ALIGNMENT);
+      }
+      else
+      {
+        memcpy(new_addr, old_addr, new_size);
+      }
+      __omFreeAlignedChunk(old_addr);
+    }
+  }
+  return new_addr;
+}
+#endif /* OM_ALIGNMENT_NEEDS_WORK */
+
+
+/*******************************************************************
+ *  
+ *  Local stuff
+ *  
+ *******************************************************************/
+/* this should go away */
 #define AllocSizeOf(x) _omAllocBlock(sizeof(x))
 #define FreeSizeOf(addr, x) _omFreeBin(addr)
 
@@ -571,14 +778,11 @@ static void omMergeStickyPages(omBin to_bin, omBin from_bin)
 #endif
 }
 
-#include "omDebug.h"
-  
 void omDeleteStickyBinTag(omBin bin, unsigned long sticky)
 {
   omBin no_sticky_bin = NULL;
   omBin sticky_bin = NULL;
 
-  omdCheckBin(bin, 10);
   if (sticky == 0)
   {
     omAssume(0);
@@ -601,7 +805,6 @@ void omDeleteStickyBinTag(omBin bin, unsigned long sticky)
     bin->next = omRemoveFromGList(bin->next, next, sticky_bin);
     FreeSizeOf(sticky_bin, omBin_t);
   }
-  omdCheckBin(bin, 10);
 }
 
 

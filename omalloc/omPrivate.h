@@ -4,7 +4,7 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omPrivate.h,v 1.2 1999-11-22 18:12:59 obachman Exp $
+ *  Version: $Id: omPrivate.h,v 1.3 1999-11-23 20:40:13 obachman Exp $
  *******************************************************************/
 #ifndef OM_PRIVATE_H
 #define OM_PRIVATE_H
@@ -56,11 +56,12 @@ struct omBinPage_s
 {
   long          used_blocks;    /* number of used blocks of this page */
   void*         current;        /* pointer to current freelist */
-  omBinPage    next;           /* next/prev pointer of pages */
-  omBinPage    prev;
-  void*         bin_sticky;   /* bin this page belongs to with 
-                                  sticky tag of page hidden in ptr*/
+  omBinPage     next;           /* next/prev pointer of pages */
+  omBinPage     prev;
+  void*         bin_sticky;     /* bin this page belongs to with 
+                                   sticky tag of page hidden in ptr*/
 };
+
 /* Change this appropriately, if you change omBinPage           */
 /* However, make sure that omBinPage is a multiple of SIZEOF_MAX_TYPE */
 #define _SIZEOF_OM_BIN_PAGE_HEADER (4*SIZEOF_VOIDP + SIZEOF_LONG + SIZEOF_LONG) 
@@ -72,9 +73,9 @@ struct omBinPage_s
    otherwise list operations will fail */
 struct omBin_s
 {
-  omBinPage    current_page;   /* page of current freelist */
-  omBinPage    last_page;      /* pointer to last page of freelist */
-  omBin        next;           /* sticky bins of the same size */
+  omBinPage     current_page;   /* page of current freelist */
+  omBinPage     last_page;      /* pointer to last page of freelist */
+  omBin         next;           /* sticky bins of the same size */
   long          sizeW;          /* size in words */
   long          max_blocks;     /* if > 0   # blocks in one page, 
                                    if < 0   # pages for one block */
@@ -84,7 +85,7 @@ struct omBin_s
 struct omSpecBin_s
 {
   omSpecBin        next;       /* pointer to next bin */
-  omBin            bin;       /* pointer to bin itself */
+  omBin            bin;        /* pointer to bin itself */
   long             max_blocks; /* max_blocks of bin*/
   long             ref;        /* ref count */
 };
@@ -175,8 +176,9 @@ while (0)
 
 /*******************************************************************/
 /* Block                                                           */
-#define omSmallSize2Bin(size) om_Size2Bin[((size) -1) >> LOG_SIZEOF_OM_ALIGNMENT]
-#define omSize2Bin(size) ((size) <= OM_MAX_BLOCK_SIZE ? omSmallSize2Bin(size) : om_LargeBin)
+#define omSmallSize2Bin(size) om_Size2Bin[((size) -1)>>LOG_SIZEOF_OM_ALIGNMENT]
+#define omSize2Bin(size) ((size) <= OM_MAX_BLOCK_SIZE ? \
+                          omSmallSize2Bin(size) : om_LargeBin)
 
 #define omAllocLargeBlock(size)       OM_MALLOC(size)
 #define omFreeLargeBlock(addr, size)  OM_FREE(addr)
@@ -212,6 +214,43 @@ do                                              \
 }                                               \
 while (0)
 
+#ifdef OM_ALIGNMENT_NEEDS_WORK
+#define __omTypeAllocAlignedBlock(type, addr, size) \
+do                                                  \
+{                                                   \
+  if (size <= OM_MAX_BLOCK_SIZE)                    \
+  {                                                 \
+    omBin __om_bin = omSmallSize2AlignedBin(size);  \
+    __omTypeAllocBin(type, addr, __om_bin);         \
+  }                                                 \
+  else                                              \
+  {                                                 \
+    addr = (type) omAllocLargeBlock(size);          \
+  }                                                 \
+}                                                   \
+while(0)
+
+#define __omTypeAlloc0AlignedBlock(type, addr, size)    \
+do                                                      \
+{                                                       \
+  if (size <= OM_MAX_BLOCK_SIZE)                        \
+  {                                                     \
+    omBin __om_bin = omSmallSize2AlignedBin(size);      \
+    __omTypeAlloc0Bin(type, addr, __om_bin);            \
+  }                                                     \
+  else                                                  \
+  {                                                     \
+    addr = (type) omAllocLargeBlock(size);              \
+    memset(addr, 0, size);                              \
+  }                                                     \
+}                                                       \
+while (0)
+
+#else /* ! OM_ALIGNMENT_NEEDS_WORK */
+#define __omTypeAllocAlignedBlock  __omTypeAllocBlock
+#define __omTypeAlloc0AlignedBlock __omTypeAlloc0Block
+#endif /* OM_ALIGNMENT_NEEDS_WORK */
+      
 #define __omFreeBlock(addr, size)               \
 do                                              \
 {                                               \
@@ -238,14 +277,14 @@ do                                                          \
   size_t __om_size = (size) + SIZEOF_OM_ALIGNMENT;          \
   if (__om_size <= OM_MAX_BLOCK_SIZE)                       \
   {                                                         \
-    omBin __om_bin = omSmallSize2Bin(__om_size);                 \
+    omBin __om_bin = omSmallSize2Bin(__om_size);            \
     __omTypeAllocBin(void*, __om_addr, __om_bin);           \
     *((void**) __om_addr) = (void*) __om_bin->current_page; \
   }                                                         \
   else                                                      \
   {                                                         \
     __om_addr = omAllocLargeChunk(__om_size);               \
-    *((void**) __om_addr) = om_LargePage;                   \
+    *((void**) __om_addr) = (void*) om_LargePage;           \
   }                                                         \
   addr = (type) (__om_addr + SIZEOF_OM_ALIGNMENT);          \
 }                                                           \
@@ -266,11 +305,70 @@ do                                                          \
   {                                                         \
     __om_addr = omAllocLargeChunk(__om_size);               \
     memset(__om_addr, 0, __om_size);                        \
-    *((void**) __om_addr) = om_LargePage;                   \
+    *((void**) __om_addr) = (void*) om_LargePage;           \
   }                                                         \
   addr = (type) (__om_addr + SIZEOF_OM_ALIGNMENT);          \
 }                                                           \
 while (0)
+
+#ifdef OM_ALIGNMENT_NEEDS_WORK
+
+#define __omTypeAllocAlignedChunk(type, addr, size)         \
+do                                                          \
+{                                                           \
+  void* __om_addr;                                          \
+  size_t __om_size = (size) + SIZEOF_OM_CHUNK_ALIGNMENT;    \
+  if (__om_size <= OM_MAX_BLOCK_SIZE)                       \
+  {                                                         \
+    omBin __om_bin = omSmallSize2AlignedBin(__om_size);     \
+    __omTypeAllocBin(void*, __om_addr, __om_bin);           \
+    *((void**) __om_addr) = (void*) __om_bin->current_page; \
+  }                                                         \
+  else                                                      \
+  {                                                         \
+    __om_addr = omAllocLargeChunk(__om_size);               \
+    *((void**) __om_addr) = (void*) om_LargePage;           \
+  }                                                         \
+  addr = (type) (__om_addr + SIZEOF_OM_CHUNK_ALIGNMENT);    \
+}                                                           \
+while (0)
+
+#define __omTypeAlloc0AlignedChunk(type, addr, size)        \
+do                                                          \
+{                                                           \
+  void* __om_addr;                                          \
+  size_t __om_size = (size) + SIZEOF_OM_CHUNK_ALIGNMENT;    \
+  if (__om_size <= OM_MAX_BLOCK_SIZE)                       \
+  {                                                         \
+    omBin __om_bin = omSmallSize2Bin(__om_size);            \
+    __omTypeAlloc0Bin(void*, __om_addr, __om_bin);          \
+    *((void**) __om_addr) = (void*) __om_bin->current_page; \
+  }                                                         \
+  else                                                      \
+  {                                                         \
+    __om_addr = omAllocLargeChunk(__om_size);               \
+    memset(__om_addr, 0, __om_size);                        \
+    *((void**) __om_addr) = (void*) om_LargePage;           \
+  }                                                         \
+  addr = (type) (__om_addr + SIZEOF_OM_CHUNK_ALIGNMENT);    \
+}                                                           \
+while (0)
+
+#define __omFreeAlignedChunk(addr)                              \
+do                                                              \
+{                                                               \
+  void* __addr = ((void*) (addr)) - SIZEOF_OM_CHUNK_ALIGNMENT;  \
+  omBinPage __om_page = *((omBinPage*) __addr);                 \
+  __omFreeToPage(__addr, __om_page);                            \
+}                                                               \
+while (0)
+
+
+#else /* ! OM_ALIGNMENT_NEEDS_WORK */
+#define __omTypeAllocAlignedChunk  __omTypeAllocChunk
+#define __omTypeAlloc0AlignedChunk __omTypeAlloc0Chunk
+#define __omFreeAlignedChunk       __omFreeChunk
+#endif /* OM_ALIGNMENT_NEEDS_WORK */
 
 #define __omFreeChunk(addr)                                 \
 do                                                          \
@@ -289,11 +387,11 @@ while (0)
 
 #if defined(OM_INLINE)
 
-#define OM_ALLOCBIN_FUNC_WRAPPER(func)         \
-OM_INLINE void* _om##func (omBin bin)         \
+#define OM_ALLOCBIN_FUNC_WRAPPER(func)          \
+OM_INLINE void* _om##func (omBin bin)           \
 {                                               \
   void* addr;                                   \
-  __omType##func (void*, addr, bin);           \
+  __omType##func (void*, addr, bin);            \
   return addr;                                  \
 }
 
