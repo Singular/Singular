@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.86 1999-11-18 14:47:01 obachman Exp $ */
+/* $Id: ring.cc,v 1.87 1999-11-19 15:07:51 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2789,6 +2789,10 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_a:
         rO_WDegree(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
                    r->wvhdl[i]);
+        if (r->OrdIndex== -1)
+        {
+          r->OrdIndex= (j-1)*sizeof(Exponent_t)/sizeof(long);
+        }
         r->pVarLowIndex=j;
         typ_i++;
         break;
@@ -2811,16 +2815,28 @@ BOOLEAN rComplete(ring r, int force)
                        r->wvhdl[i]+(r->block1[i]-r->block0[i]+1)*l);
             typ_i++;
           }
+        if (r->OrdIndex== -1)
+        {
+          r->OrdIndex= (j-1)*sizeof(Exponent_t)/sizeof(long);
+        }
           r->pVarLowIndex=j;
           break;
         }
 
       case ringorder_lp:
         rO_LexVars(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v);
+        if (r->OrdIndex== -1)
+        {
+          r->OrdIndex= (j-1)*sizeof(Exponent_t)/sizeof(long);
+        }
         break;
 
       case ringorder_ls:
         rO_LexVars_neg(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v);
+        if (r->OrdIndex== -1)
+        {
+          r->OrdIndex= (j-1)*sizeof(Exponent_t)/sizeof(long);
+        }
         break;
 
       case ringorder_dp:
@@ -3069,10 +3085,18 @@ BOOLEAN rComplete(ring r, int force)
   r->pDivHigh=r->pVarHighIndex/(sizeof(long)/sizeof(Exponent_t));
 #endif
   r->pCompIndex=r->VarOffset[0];
-  // HANNES--think of s,c,dp; s, dp, C,
 #ifdef WORDS_BIGENDIAN
-  if(r->pCompIndex==0) r->pOrdIndex=1;
-  else                 r->pOrdIndex=0;
+  if (r->order[0] == ringorder_s)
+  {
+    if (r->pCompIndex == 1)
+      r->pOrdIndex = 2;
+    else
+      r->pOrdIndex = 1;
+  }
+  else if (r->pCompIndex == 0)
+    r->pOrdIndex=1;
+  else
+    r->pOrdIndex=0;
 #else
   if (r->order[0] == ringorder_s)
   {
@@ -3173,7 +3197,7 @@ void rDebugPrint(ring r)
     {
       #ifdef HAVE_SHIFTED_EXPONENTS
       if( (r->VarOffset[i] & 0xffffff)*sizeof(Exponent_t)/sizeof(long) == j )
-      {  Print("v%d at e[%d], bit %d; ", i,r->VarOffset[i] & 0xffffff, 
+      {  Print("v%d at e[%d], bit %d; ", i,r->VarOffset[i] & 0xffffff,
                                          r->VarOffset[i] >>24 ); }
       #else
       if( r->VarOffset[i]*sizeof(Exponent_t)/sizeof(long) == j )
@@ -3505,7 +3529,7 @@ BOOLEAN rRing_is_Homog(ring r)
       int* wvhdl = r->wvhdl[i];
       if (r->order[i] == ringorder_M) length *= length;
       assume(mmSizeL(wvhdl) >= length*sizeof(int));
-      
+
       for (j=0; j< length; j++)
       {
         if (wvhdl[j] != 0 && wvhdl[j] != 1) return FALSE;
@@ -3514,5 +3538,3 @@ BOOLEAN rRing_is_Homog(ring r)
   }
   return TRUE;
 }
-
-        
