@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.3 1997-10-09 14:39:02 schmidt Exp $ */
+/* $Id: cf_algorithm.cc,v 1.4 1997-10-09 14:40:12 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -188,3 +188,4 @@ divides ( const CanonicalForm & f, const CanonicalForm & g )
 	return ok && r == 0;
     }
 }
+//}}}
