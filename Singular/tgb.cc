@@ -4,9 +4,11 @@
 // #define OM_KEEP  1
 // TODO: 
 //       deg -> poly_crit
-//       "e"
 //       multiple rings
 //       shorten_tails und dessen Aufrufe pruefen wlength!!!
+//       calculating with formal sums
+//       try to create spolys as formal sums
+
 #include "tgb.h"
 #define OM_KEEP 0
 #define LEN_VAR1
@@ -641,96 +643,7 @@ static inline poly p_MoveHead(poly p, omBin b)
 #endif
 
 
-static void initial_data(calc_dat* c, ideal I){
-  void* h;
-  poly hp;
-  int i,j;
-  c->easy_product_crit=0;
-  c->extended_product_crit=0;
-  c->is_char0=(rChar()==0);
-  c->reduction_steps=0;
-  c->last_index=-1;
 
-
-
-  c->Rcounter=0;
-
-  c->soon_free=NULL;
-
-
-  c->normal_forms=0;
-  c->current_degree=1;
- 
-  c->max_pairs=5*I->idelems();
- 
-  c->apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*c->max_pairs);
-  c->pair_top=-1;
-  int n=I->idelems();
-  for (i=0;i<n;i++){
-    wrp(I->m[i]);
-    PrintS("\n");
-  }
-    i=0;
-  c->n=0;
-  c->T_deg=(int*) omalloc(n*sizeof(int));
- 
-#ifdef HEAD_BIN
-  c->HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
-#endif
-  /* omUnGetSpecBin(&(c->HeadBin)); */
-  h=omalloc(n*sizeof(char*));
-  c->states=(char**) h;
-  h=omalloc(n*sizeof(int));
-  c->lengths=(int*) h;
-  h=omalloc(n*sizeof(int));
-        c->gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
-  c->rep=(int*) h;
-  c->short_Exps=(long*) omalloc(n*sizeof(long));
-  c->S=idInit(n,1);
-  c->strat=new skStrategy;
-  c->strat->syzComp = 0;
-  initBuchMoraCrit(c->strat);
-  initBuchMoraPos(c->strat);
-  c->strat->initEcart = initEcartBBA;
-  c->strat->enterS = enterSBba;
-  c->strat->sl = -1;
-  i=n;
-  /* initS(c->S,NULL,c->strat); */
-/* intS start: */
-  i=((i+IDELEMS(c->S)+15)/16)*16;
-  c->strat->ecartS=(intset)omAlloc(i*sizeof(int)); /*initec(i);*/
-  c->strat->sevS=(unsigned long*)omAlloc0(i*sizeof(unsigned long));
-  /*initsevS(i);*/
-  c->strat->S_2_R=(int*)omAlloc0(i*sizeof(int));/*initS_2_R(i);*/
-  c->strat->fromQ=NULL;
-  c->strat->Shdl=idInit(1,1);
-  c->strat->S=c->strat->Shdl->m;
-  c->strat->lenS=(int*)omAlloc0(i*sizeof(int));
-  if(c->is_char0)
-    c->strat->lenSw=(int*)omAlloc0(i*sizeof(int));
-  else
-    c->strat->lenSw=NULL;
-  sorted_pair_node* si;
-  assume(n>0);
-  add_to_basis(I->m[0],-1,-1,c);
-
-  assume(c->strat->sl==c->strat->Shdl->idelems()-1);
-
-  for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
-   {
-//     add_to_basis(I->m[i],-1,-1,c);
-     si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
-      si->i=-1;
-      si->j=-1;
-      si->expected_length=pLength(I->m[i]);
-      si->deg=pTotaldegree(I->m[i]);
-      si->lcm_of_lm=I->m[i];
-
-//      c->apairs[n-1-i]=si;
-      c->apairs[n-i-1]=si;
-      ++(c->pair_top);
-   }
-}
 //very important: ILM
 
 //len should be weighted length in char 0
@@ -1548,8 +1461,95 @@ ideal t_rep_gb(ring r,ideal arg_I){
   Print("Idelems %i \n----------\n",IDELEMS(I));
   calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
   c->r=currRing;
+  void* h;
+  poly hp;
+  int i,j;
+  c->easy_product_crit=0;
+  c->extended_product_crit=0;
+  c->is_char0=(rChar()==0);
+  c->reduction_steps=0;
+  c->last_index=-1;
 
-  initial_data(c,I);
+
+
+  c->Rcounter=0;
+
+  c->soon_free=NULL;
+
+
+  c->normal_forms=0;
+  c->current_degree=1;
+ 
+  c->max_pairs=5*I->idelems();
+ 
+  c->apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*c->max_pairs);
+  c->pair_top=-1;
+  int n=I->idelems();
+  for (i=0;i<n;i++){
+    wrp(I->m[i]);
+    PrintS("\n");
+  }
+    i=0;
+  c->n=0;
+  c->T_deg=(int*) omalloc(n*sizeof(int));
+ 
+#ifdef HEAD_BIN
+  c->HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
+#endif
+  /* omUnGetSpecBin(&(c->HeadBin)); */
+  h=omalloc(n*sizeof(char*));
+  c->states=(char**) h;
+  h=omalloc(n*sizeof(int));
+  c->lengths=(int*) h;
+  h=omalloc(n*sizeof(int));
+        c->gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
+  c->rep=(int*) h;
+  c->short_Exps=(long*) omalloc(n*sizeof(long));
+  c->S=idInit(n,1);
+  c->strat=new skStrategy;
+  c->strat->syzComp = 0;
+  initBuchMoraCrit(c->strat);
+  initBuchMoraPos(c->strat);
+  c->strat->initEcart = initEcartBBA;
+  c->strat->enterS = enterSBba;
+  c->strat->sl = -1;
+  i=n;
+  /* initS(c->S,NULL,c->strat); */
+/* intS start: */
+  i=((i+IDELEMS(c->S)+15)/16)*16;
+  c->strat->ecartS=(intset)omAlloc(i*sizeof(int)); /*initec(i);*/
+  c->strat->sevS=(unsigned long*)omAlloc0(i*sizeof(unsigned long));
+  /*initsevS(i);*/
+  c->strat->S_2_R=(int*)omAlloc0(i*sizeof(int));/*initS_2_R(i);*/
+  c->strat->fromQ=NULL;
+  c->strat->Shdl=idInit(1,1);
+  c->strat->S=c->strat->Shdl->m;
+  c->strat->lenS=(int*)omAlloc0(i*sizeof(int));
+  if(c->is_char0)
+    c->strat->lenSw=(int*)omAlloc0(i*sizeof(int));
+  else
+    c->strat->lenSw=NULL;
+  sorted_pair_node* si;
+  assume(n>0);
+  add_to_basis(I->m[0],-1,-1,c);
+
+  assume(c->strat->sl==c->strat->Shdl->idelems()-1);
+
+  for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
+   {
+//     add_to_basis(I->m[i],-1,-1,c);
+     si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+      si->i=-1;
+      si->j=-1;
+      si->expected_length=pLength(I->m[i]);
+      si->deg=pTotaldegree(I->m[i]);
+      si->lcm_of_lm=I->m[i];
+
+//      c->apairs[n-1-i]=si;
+      c->apairs[n-i-1]=si;
+      ++(c->pair_top);
+   }
+ 
 
   while(c->pair_top>=0)
     go_on(c);
@@ -1563,7 +1563,20 @@ ideal t_rep_gb(ring r,ideal arg_I){
 
   omfree(c->short_Exps);
   omfree(c->T_deg);
-  int i;
+
+     omFree(c->strat->ecartS);
+     omFree(c->strat->sevS);
+//   /*initsevS(i);*/
+   omFree(c->strat->S_2_R);
+   
+
+  omFree(c->strat->lenS);
+
+   if(c->strat->lenSw)  omFree(c->strat->lenSw);
+
+
+
+
   for(i=0;i<c->n;i++){
     if(c->gcd_of_terms[i])
       pDelete(&(c->gcd_of_terms[i]));
@@ -1577,7 +1590,7 @@ ideal t_rep_gb(ring r,ideal arg_I){
 
   for(i=0;i<c->n;i++){
     if (c->rep[i]!=i){
-      for(int j=0;j<=c->strat->sl;j++){
+      for(j=0;j<=c->strat->sl;j++){
 	if(c->strat->S[j]==c->S->m[i]){
 	  c->strat->S[j]=NULL;
 	  break;
@@ -1590,7 +1603,7 @@ ideal t_rep_gb(ring r,ideal arg_I){
   for(i=0;i<=c->strat->sl;i++){
     if (!c->strat->S[i]) continue;
     BOOLEAN found=FALSE;
-    for(int j=0;j<c->n;j++){
+    for(j=0;j<c->n;j++){
       if (c->S->m[j]==c->strat->S[i]){
 	found=TRUE;
 	break;
@@ -1599,12 +1612,15 @@ ideal t_rep_gb(ring r,ideal arg_I){
     if(!found) pDelete(&c->strat->S[i]);
   }
   omfree(c->rep);
-    I=c->S;
+  I=c->S;
+  
   IDELEMS(I)=c->n;
 
   idSkipZeroes(c->S);
-  
-
+  for(i=0;i<=c->strat->sl;i++)
+    c->strat->S[i]=NULL;
+  id_Delete(&c->strat->Shdl,c->r);
+  delete c->strat;
   omfree(c);
 
   return(I);
@@ -1705,10 +1721,10 @@ static void shorten_tails(calc_dat* c, poly monom)
     if (did_something)
     {
       int new_pos;
-      if (c->is_char0) 
-        simple_posInS(c->strat,c->S->m[i],pSLength(c->S->m[i],c->lengths[i]),c->is_char0);
-      else      
-        simple_posInS(c->strat,c->S->m[i],c->lengths[i],c->is_char0);
+      int q;
+      q=quality(c->S->m[i],c->lengths[i],c);
+      new_pos=simple_posInS(c->strat,c->S->m[i],q,c->is_char0);
+
       int old_pos=-1;
       //assume new_pos<old_pos
       for (int z=0;z<=c->strat->sl;z++)
@@ -1733,7 +1749,7 @@ static void shorten_tails(calc_dat* c, poly monom)
       assume(pLength(c->strat->S[old_pos])==c->lengths[i]);
       c->strat->lenS[old_pos]=c->lengths[i];
       if (c->strat->lenSw)
-        c->strat->lenSw[old_pos]=pSLength(c->S->m[i],c->lengths[i]);
+        c->strat->lenSw[old_pos]=q;
 
       if (new_pos<old_pos)
         move_forward_in_S(old_pos,new_pos,c->strat, c->is_char0);

@@ -140,4 +140,5 @@ static poly kBucketGcd(kBucket* b, ring r);
 static void multi_reduction(red_object* los, int & losl, calc_dat* c);
 static sorted_pair_node* quick_pop_pair(calc_dat* c);
 static sorted_pair_node* top_pair(calc_dat* c);
+static int quality(poly p, int len, calc_dat* c);
 #endif
