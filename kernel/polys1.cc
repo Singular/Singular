@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.6 2004-08-27 12:22:34 Singular Exp $ */
+/* $Id: polys1.cc,v 1.7 2005-01-27 16:44:13 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -917,6 +917,101 @@ void pCleardenom(poly ph)
     }
     if (h!=NULL) nDelete(&h);
     pContent(ph);
+  }
+}
+
+void pCleardenom_n(poly ph,number &c)
+{
+  number d, h;
+  poly p;
+
+  p = ph;
+  if(pNext(p)==NULL)
+  {
+    c=nInvers(pGetCoeff(p));
+    pSetCoeff(p,nInit(1));
+  }
+  else
+  {
+    h = nInit(1);
+    while (p!=NULL)
+    {
+      nNormalize(pGetCoeff(p));
+      d=nLcm(h,pGetCoeff(p),currRing);
+      nDelete(&h);
+      h=d;
+      pIter(p);
+    }
+    c=h;
+    /* contains the 1/lcm of all denominators */
+    if(!nIsOne(h))
+    {
+      p = ph;
+      while (p!=NULL)
+      {
+        /* should be:
+        * number hh;
+        * nGetDenom(p->coef,&hh);
+        * nMult(&h,&hh,&d);
+        * nNormalize(d);
+        * nDelete(&hh);
+        * nMult(d,p->coef,&hh);
+        * nDelete(&d);
+        * nDelete(&(p->coef));
+        * p->coef =hh;
+        */
+        d=nMult(h,pGetCoeff(p));
+        nNormalize(d);
+        pSetCoeff(p,d);
+        pIter(p);
+      }
+      if (nGetChar()==1)
+      {
+        loop
+        {
+          h = nInit(1);
+          p=ph;
+          while (p!=NULL)
+          {
+            d=nLcm(h,pGetCoeff(p),currRing);
+            nDelete(&h);
+            h=d;
+            pIter(p);
+          }
+          /* contains the 1/lcm of all denominators */
+          if(!nIsOne(h))
+          {
+            p = ph;
+            while (p!=NULL)
+            {
+              /* should be:
+              * number hh;
+              * nGetDenom(p->coef,&hh);
+              * nMult(&h,&hh,&d);
+              * nNormalize(d);
+              * nDelete(&hh);
+              * nMult(d,p->coef,&hh);
+              * nDelete(&d);
+              * nDelete(&(p->coef));
+              * p->coef =hh;
+              */
+              d=nMult(h,pGetCoeff(p));
+              nNormalize(d);
+              pSetCoeff(p,d);
+              pIter(p);
+            }
+            number t=nMult(c,h);
+            nDelete(&c);
+            c=t;
+          }
+          else
+          {
+            break;
+          }
+          nDelete(&h);
+        }
+      }
+    }
   }
 }
 
