@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.201 2003-10-17 15:59:48 levandov Exp $ */
+/* $Id: extra.cc,v 1.202 2004-02-23 19:04:01 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -109,13 +109,13 @@
  * - without HAVE_DYNAMIC_LOADING: these functions comes as system("....");
  * - with    HAVE_DYNAMIC_LOADING: these functions are loaded as module.
  */
-#ifndef HAVE_DYNAMIC_LOADING
+//#ifndef HAVE_DYNAMIC_LOADING
 
 #ifdef HAVE_PCV
 #include "pcv.h"
 #endif
 
-#endif /* not HAVE_DYNAMIC_LOADING */
+//#endif /* not HAVE_DYNAMIC_LOADING */
 
 // see clapsing.cc for a description of the `FACTORY_*' options
 
@@ -521,7 +521,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
-#ifndef HAVE_DYNAMIC_LOADING
+//#ifndef HAVE_DYNAMIC_LOADING
 /*==================== pcv ==================================*/
 #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvLAddL")==0)
@@ -581,7 +581,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
-#endif /* HAVE_DYNAMIC_LOADING */
+//#endif /* HAVE_DYNAMIC_LOADING */
 /*==================== contributors =============================*/
    if(strcmp(sys_cmd,"contributors") == 0)
    {

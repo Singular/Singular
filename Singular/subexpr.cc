@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.85 2003-03-10 16:43:54 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.86 2004-02-23 19:04:05 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1403,9 +1403,10 @@ void syMake(leftv v,char * id, idhdl packhdl)
     /* 7. non-local ring: number/poly */
     {
       BOOLEAN ok=FALSE;
-      poly p = ((currRingHdl!=NULL)     /* ring required */
-               &&(!yyInRingConstruction) /* not in decl */
-               &&(IDLEV(currRingHdl)!=myynest)) /* already in case 4/6 */
+      poly p = ((currRing!=NULL)     /* ring required */
+               && (currRingHdl!=NULL)
+               && (!yyInRingConstruction) /* not in decl */
+               && (IDLEV(currRingHdl)!=myynest)) /* already in case 4/6 */
                      ? pmInit(id,ok) : (poly)NULL;
       if (ok)
       {

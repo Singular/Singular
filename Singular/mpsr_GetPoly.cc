@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.33 2002-05-16 17:49:22 Singular Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.34 2004-02-23 19:04:04 Singular Exp $ */
 
 /***************************************************************
  *
@@ -19,7 +19,7 @@
 
 #include "mpsr_Get.h"
 
-#include "gmp.h"
+#include "si_gmp.h"
 #include "omalloc.h"
 #include "tok.h"
 #include "ipid.h"

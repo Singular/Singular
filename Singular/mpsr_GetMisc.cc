@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.28 2002-11-26 14:25:38 Singular Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.29 2004-02-23 19:04:04 Singular Exp $ */
 
 /***************************************************************
  *
@@ -354,11 +354,7 @@ static char* GenerateRingName()
 // the first found is returned together witht the respective ring
 idhdl mpsr_FindIdhdl(char *name, ring &r)
 {
-#ifdef HAVE_NAMESPACES
-  idhdl h = (NSROOT(namespaceroot) != NULL ? namespaceroot->get(name, 0): (idhdl) NULL), h2;
-#else /* HAVE_NAMESPACES */
   idhdl h = (IDROOT != NULL ? IDROOT->get(name, 0): (idhdl) NULL), h2;
-#endif /* HAVE_NAMESPACES */
   r = NULL;
 
   if (h != NULL)

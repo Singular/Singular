@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.29 2002-11-26 14:25:38 Singular Exp $ */
+/* $Id: mpsr_Put.cc,v 1.30 2004-02-23 19:04:04 Singular Exp $ */
 
 /***************************************************************
  *
@@ -18,6 +18,7 @@
 
 #ifdef HAVE_MPSR
 
+#include "structs.h"
 #include "mpsr_Put.h"
 #include "mpsr_Tok.h"
 #include "intvec.h"
@@ -501,11 +502,7 @@ mpsr_Status_t mpsr_PutMap(MP_Link_pt link, map m, ring cring)
                                       0,
                                       3));
   // First, is the ring
-#ifdef HAVE_NAMESPACES
-  failr(mpsr_PutRingLeftv(link, (leftv) namespaceroot->get(m->preimage, 1)));
-#else /* HAVE_NAMESPACES */
   failr(mpsr_PutRingLeftv(link, (leftv) IDROOT->get(m->preimage, 1)));
-#endif /* HAVE_NAMESPACES */
 
   // Second, the name of the ring
   mp_failr(MP_PutStringPacket(link, m->preimage,0));
@@ -577,41 +574,32 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
              IDTYP(h) != LINK_CMD &&
              ! (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") == 0))
     {
-#ifdef HAVE_NAMESPACES
-      cmd.arg1.name = (char*)
-        omAlloc(strlen(IDID(h)) + strlen(namespaceroot->name) + 3);
-      sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h));
-#else
       cmd.arg1.name = IDID(h);
-#endif
       cmd.arg2.data=IDDATA(h);
       cmd.arg2.flag=h->flag;
       cmd.arg2.attribute=h->attribute;
       cmd.arg2.rtyp=h->typ;
-#ifdef HAVE_NAMESPACES
-      if (mpsr_PutLeftv(link, lv , r) != mpsr_Success)
-      {
-        omFree(cmd.arg1.name);
-        break;
-      }
-      omFree(cmd.arg1.name);
-#else
       if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
-#endif
 
 #ifdef MPSR_DEBUG_DUMP
       Print("Dumped %s\n", IDID(h));
 #endif
-      if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD ||
-          (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") != 0))
+      if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD 
+#if 0
+      || (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") != 0)
+#endif
+      )
       {
         // we don't really need to do that, it's only for convenience
         // for putting numbers
+#if 0
         if (IDTYP(h) == PACKAGE_CMD)
         {
+          namespaceroot->push(IDPACKAGE(h), IDID(h));
           h2 = IDPACKAGE(h)->idroot;
         }
         else
+#endif
         {
           rSetHdl(h);
           r = IDRING(h);
@@ -619,32 +607,23 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
         }
         while (h2 != NULL)
         {
-#ifdef HAVE_NAMESPACES
-          cmd.arg1.name = (char*)
-            omAlloc(strlen(IDID(h2)) + strlen(namespaceroot->name) + 3);
-          sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h2));
-#else
           cmd.arg1.name = IDID(h2);
-#endif
           cmd.arg2.data=IDDATA(h2);
           cmd.arg2.flag = h2->flag;
           cmd.arg2.attribute = h2->attribute;
           cmd.arg2.rtyp = h2->typ;
-#ifdef HAVE_NAMESPACES
-          if (mpsr_PutLeftv(link, lv , r) != mpsr_Success)
-          {
-            omFree(cmd.arg1.name);
-            break;
-          }
-          omFree(cmd.arg1.name);
-#else
           if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
-#endif
 #ifdef MPSR_DEBUG_DUMP
           Print("Dumped %s\n", IDID(h2));
 #endif
           h2 = h2->next;
         }
+#if 0
+        if (IDTYP(h) == PACKAGE_CMD)
+        {
+          namespaceroot->pop();
+        }
+#endif
       }
     }
 

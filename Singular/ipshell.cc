@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.85 2004-02-12 09:33:39 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.86 2004-02-23 19:04:02 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1045,20 +1045,30 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
       h=currRing->idroot->get(v->name,toLev);
       root=&currRing->idroot;
     }
+    BOOLEAN keepring=FALSE;
     if ((h!=NULL)&&(IDLEV(h)==toLev))
     {
       if (IDTYP(h)==v->Typ())
       {
+        if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+        && (v->Data()==IDDATA(h)))
+        {
+          IDRING(h)->ref++;
+          keepring=TRUE;
+          IDLEV(h)=toLev;
+          //WarnS("keepring");
+          return FALSE;
+        }
         if (BVERBOSE(V_REDEFINE))
         {
           Warn("redefining %s",IDID(h));
         }
 #ifdef USE_IILOCALRING
-        if (iiLocalRing[0]==IDRING(h)) iiLocalRing[0]=NULL;
+        if (iiLocalRing[0]==IDRING(h) && (!keepring)) iiLocalRing[0]=NULL;
 #else
         proclevel *p=procstack;
         while (p->next!=NULL) p=p->next;
-        if (p->cRing==IDRING(h))
+        if ((p->cRing==IDRING(h)) && (!keepring))
         {
           p->cRing=NULL;
           p->cRingHdl=NULL;
@@ -1073,6 +1083,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
     }
     h=(idhdl)v->data;
     IDLEV(h)=toLev;
+    if (keepring) IDRING(h)->ref--;
     iiNoKeepRing=FALSE;
     //Print("export %s\n",IDID(h));
   }
