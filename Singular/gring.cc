@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.29 2003-03-11 16:49:55 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.30 2003-03-11 19:59:17 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -61,7 +61,7 @@ poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r)
   }
   while (qq!=NULL)
   {
-    res=p_Add_q(res,nc_pp_Mult_mm(pp,p_Head(qq,r),r,ghost),r);
+    res=p_Add_q(res, nc_pp_Mult_mm(pp, p_Head(qq,r), r, ghost), r);
     qq=p_LmDeleteAndNext(qq,r);
   }
   p_Delete(&pp,r);
@@ -81,7 +81,6 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
   p_Test(m,r);
 #endif
   poly v=NULL;
-  poly out=NULL;
   int rN=r->N;
   int *P=(int *)omAlloc0((rN+1)*sizeof(int));
   int *M=(int *)omAlloc0((rN+1)*sizeof(int));
@@ -121,7 +120,6 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
         expOut=0;
       }
     }
-
     p_GetExpV(p,P,r);
     cP=p_GetCoeff(p,r);
     cOut=n_Mult(cP,cM,r);
@@ -137,6 +135,7 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
   }
   freeT(P,rN);
   freeT(M,rN);
+  poly out=NULL;
   int len=pLength(out);
   sBucketDestroyAdd(bu_out, &out, &len);
 #ifdef PDEBUG
@@ -159,7 +158,6 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
   p_Test(m,r);
 #endif
   poly v=NULL;
-  poly out=NULL;
   int rN=r->N;
   int *P=(int *)omAlloc0((rN+1)*sizeof(int));
   int *M=(int *)omAlloc0((rN+1)*sizeof(int));
@@ -213,6 +211,7 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
   }
   freeT(P,rN);
   freeT(M,rN);
+  poly out=NULL;
   int len=pLength(out);
   sBucketDestroyAdd(bu_out, &out, &len );
 #ifdef PDEBUG
@@ -252,9 +251,10 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
   if (iF<=jG)
     /* i.e. no mixed exp_num , MERGE case */
   {
-    p_MemAdd_LengthGeneral(F, G, ExpSize);
+    p_MemAdd_LengthGeneral(F, G, ExpSize/sizeof(long));
     p_SetExpV(out,F,r);
     p_Setm(out,r);
+    //    omFreeSize((ADDRESS)F,ExpSize);
     freeT(F,rN);
     freeT(G,rN);
     return(out);
@@ -312,7 +312,7 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
       }
       cff=totcff;
     }
-    p_MemAdd_LengthGeneral(F, G, ExpSize);
+    p_MemAdd_LengthGeneral(F, G, ExpSize/sizeof(long));
     p_SetExpV(out,F,r);
     p_Setm(out,r);
     p_SetCoeff(out,cff,r);
@@ -321,6 +321,10 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
     freeT(G,rN);
     return(out);
   } /* end nc_skew */
+    
+  /* now we have to destroy out! */
+  p_Delete(&out,r);  
+  out = NULL;  
 
   if (iG==jG)
     /* g is univariate monomial */
