@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.11 2001-03-05 18:28:45 mschulze Exp $";
+version="$Id: linalg.lib,v 1.12 2001-05-23 16:56:29 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib        Algorithmic Linear Algebra
@@ -24,6 +24,8 @@ PROCEDURES:
  mat_rk(A);         rank of constant matrix A
  U_D_O(A);          P*A=U*D*O, P,D,U,O=permutaion,diag,lower-,upper-triang
  pos_def(A,i);      test symmetric matrix for positive definiteness
+ hessenberg(M);     transforms M to Hessenberg form
+ eigenval(M);       eigenvalues of M with multiplicities
  jordan(M);         Jordan data of constant square matrix M
  jordanbasis(M);    Jordan basis of constant square matrix M
  jordanmatrix(e,b); Jordan matrix with eigenvalues e and Jordan block sizes b
@@ -1229,8 +1231,217 @@ example
 //////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-//    PROCEDURES for Jordan Normal form
+//    PROCEDURES for Jordan normal form
 //    AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
+///////////////////////////////////////////////////////////////////////////////
+
+static proc swap(matrix M,int i,int j)
+{
+  if(i==j)
+  {
+    return(M);
+  }
+  poly p;
+  for(int k=1;k<=nrows(M);k++)
+  {
+    p=M[i,k];
+    M[i,k]=M[j,k];
+    M[j,k]=p;
+  }
+  for(k=1;k<=ncols(M);k++)
+  {
+    p=M[k,i];
+    M[k,i]=M[k,j];
+    M[k,j]=p;
+  }
+  return(M);
+}
+//////////////////////////////////////////////////////////////////////////////
+
+static proc rowelim(matrix M,int i,int j,int k)
+{
+  if(jet(M[i,k],0)==0||jet(M[j,k],0)==0)
+  {
+    return(M);
+  }
+  number n=number(jet(M[i,k],0))/number(jet(M[j,k],0));
+  for(int l=1;l<=ncols(M);l++)
+  {
+    M[i,l]=M[i,l]-n*M[j,l];
+  }
+  for(l=1;l<=nrows(M);l++)
+  {
+    M[l,j]=M[l,j]+n*M[l,i];
+  }
+  return(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc colelim(matrix M,int i,int j,int k)
+{
+  if(jet(M[k,i],0)==0||jet(M[k,j],0)==0)
+  {
+    return(M);
+  }
+  number n=number(jet(M[k,i],0))/number(jet(M[k,j],0));
+  for(int l=1;l<=nrows(M);l++)
+  {
+    M[l,i]=M[l,i]-m*M[l,j];
+  }
+  for(l=1;l<=ncols(M);l++)
+  {
+    M[j,l]=M[j,l]-n*M[i,l];
+  }
+  return(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc hessenberg(matrix M)
+"USAGE:   hessenberg(M); matrix M
+ASSUME:  M constant square matrix
+RETURN:  matrix H in Hessenberg form with H=inverse(U)*M*U for some U
+EXAMPLE: example hessenberg; shows examples
+"
+{
+  int n=ncols(M);
+  int i,j;
+  for(int k=1;k<n-1;k++)
+  {
+    j=k+1;
+    while(j<n&&jet(M[j,k],0)==0)
+    {
+      j++;
+    }
+    if(jet(M[j,k],0)!=0)
+    {
+      M=swap(M,j,k+1);
+      for(i=j+1;i<=n;i++)
+      {
+        M=rowelim(M,i,k+1,k);
+      }
+    }
+  }
+  return(M);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,x,dp;
+  matrix M[3][3]=3,2,1,0,2,1,0,0,3;
+  print(M);
+  print(hessenberg(M));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc addval(list l,poly e,int m)
+{
+  if(size(l)==0)
+  {
+    return(list(ideal(e),intvec(m)));
+  }
+  int n=ncols(l[1]);
+  for(int i=n;i>=1;i--)
+  {
+    if(l[1][i]==e)
+    {
+      l[2][i]=l[2][i]+m;
+      return(l);
+    }
+  }
+  l[1][n+1]=e;
+  l[2][n+1]=m;
+  return(l);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc sortval(list l)
+{
+  def e,m=l[1..2];
+  int n=ncols(e);
+  poly ee;
+  int mm;
+  int i,j;
+  for(i=n;i>1;i--)
+  {
+    for(j=i-1;j>=1;j--)
+    {
+      if(number(e[j])>number(e[i]))
+      {
+        ee=e[i];
+        e[i]=e[j];
+        e[j]=ee;
+        mm=m[i];
+        m[i]=m[j];
+        m[j]=mm;
+      }
+    }
+  }
+  return(list(e,m));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc eigenval(matrix M)
+"USAGE:   eigenval(M); matrix M
+ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
+RETURN:
+@format
+list l:
+  ideal l[1]: eigenvalues of M
+  intvec l[2]:
+    int l[2][i]: multiplicity of eigenvalue l[1][i]
+@end format
+EXAMPLE: example eigenval; shows examples
+"
+{
+  M=jet(hessenberg(M),0);
+  int n=ncols(M);
+  number e;
+  intvec v;
+  list l,f;
+  int i;
+  int j=1;
+  while(j<=n)
+  {
+    v=j;
+    j++;
+    if(j<=n)
+    {
+      while(j<n&&M[j,j-1]!=0)
+      {
+        v=v,j;
+        j++;
+      }
+      if(M[j,j-1]!=0)
+      {
+        v=v,j;
+        j++;
+      }
+    }
+    if(size(v)==1)
+    {
+      l=addval(l,M[v,v],1);
+    }
+    else
+    {
+      f=factorize(det(submat(M,v,v)-var(1)));
+      for(i=size(f[1]);i>=1;i--)
+      {
+        e=number(f[1][i]/var(1));
+        if(e!=0)
+	{
+          l=addval(l,(e*var(1)-f[1][i])/e,f[2][i]);
+	}
+      }
+    }
+  }
+  return(sortval(l));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,x,dp;
+  matrix M[3][3]=3,2,1,0,2,1,0,0,3;
+  print(M);
+  eigenval(M);
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordan(matrix M,list #)
@@ -1238,13 +1449,13 @@ proc jordan(matrix M,list #)
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
 RETURN:
 @format
-<list> l:
-  <ideal> l[1]: eigenvalues of M
-  <list> l[2]:
-    <intvec> l[2][i]:
-       <int> l[2][i][j]: size of Jordan block j of M with eigenvalue l[1][i]
+list l:
+  ideal l[1]: eigenvalues of M
+  list l[2]:
+    intvec l[2][i]:
+      int l[2][i][j]: size of Jordan block j of M with eigenvalue l[1][i]
 @end format
-EXAMPLE: example jordan; shows an example
+EXAMPLE: example jordan; shows examples
 "
 {
   if(nrows(M)==0)
@@ -1258,7 +1469,7 @@ EXAMPLE: example jordan; shows an example
 
   M=jet(M,0);
 
-  list l=system("eigenval",M);
+  list l=eigenval(M);
   def e,m=l[1..2];
 
   int i;
@@ -1319,8 +1530,8 @@ example
 proc jordanbasis(matrix M)
 "USAGE:   jordan(M); matrix M
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
-RETURN:  <matrix> U: inverse(U)*M*U Jordan normal form of M
-EXAMPLE: example jordanbasis; shows an example
+RETURN:  matrix U with inverse(U)*M*U in Jordan normal form
+EXAMPLE: example jordanbasis; shows examples
 "
 {
   if(nrows(M)==0)
@@ -1334,7 +1545,7 @@ EXAMPLE: example jordanbasis; shows an example
 
   M=jet(M,0);
 
-  list l=system("eigenval",M);
+  list l=eigenval(M);
   def e,m=l[1..2];
   kill l;
 
@@ -1407,8 +1618,9 @@ example
 
 proc jordanmatrix(ideal e,list b)
 "USAGE:   jordanmatrix(e,b); ideal e, list b
-RETURN:  <matrix> J: Jordan matrix with eigenvalues e and block sizes b
-EXAMPLE: example jordanmatrix; shows an example
+RETURN:  matrix J in Jordan normal form 
+         with eigenvalues e and Jordan block sizes b
+EXAMPLE: example jordanmatrix; shows examples
 "
 {
   if(size(e)!=size(b))
@@ -1472,8 +1684,8 @@ example
 proc jordanform(matrix M)
 "USAGE:   jordanform(M); matrix M
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
-RETURN:  <matrix> J: Jordan normal form of M
-EXAMPLE: example jordanform; shows an example
+RETURN:  matrix J in Jordan normal form with J=inverse(U)*M*U for some U
+EXAMPLE: example jordanform; shows examples
 "
 {
   list l=jordan(M);
