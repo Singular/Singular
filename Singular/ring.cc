@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.196 2002-12-13 16:20:59 Singular Exp $ */
+/* $Id: ring.cc,v 1.197 2003-01-29 17:50:21 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -913,20 +913,8 @@ void rKill(ring r)
     // delete noncommutative extension
     if (r->nc!=NULL)
     {
-      int i,j;
-      for(i=1;i<r->N;i++)
-      {
-        for(j=i+1;j<=r->N;j++)
-        {
-          id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,r->N)]),r);
-        }
-      }
-      omFreeSize((ADDRESS)r->nc->MT,r->N*(r->N-1)/2*sizeof(matrix));
-      omFreeSize((ADDRESS)r->nc->MTsize,r->N*(r->N-1)/2*sizeof(int));
-      id_Delete((ideal *)&(r->nc->C),r);
-      id_Delete((ideal *)&(r->nc->D),r);
-      id_Delete((ideal *)&(r->nc->COM),r);    
-      omFreeSize((ADDRESS)r->nc,sizeof(nc_struct));
+      if (r->nc->ref>1) r->nc->ref--;
+      else ncKill(r);
     }
     #endif
     nKillChar(r);
@@ -991,9 +979,9 @@ static idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL)
   while (h!=NULL)
   {
     if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
-	&& (h!=n)
-        && (h->data.uring==r)
-	)
+    && (h!=n)
+    && (h->data.uring==r)
+    )
       return h;
     h=IDNEXT(h);
   }
@@ -1731,6 +1719,12 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
     if (copy_qideal) res->qideal= idrCopyR_NoSort(r->qideal, r);
     else res->qideal = NULL;
   }
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+    res->nc->ref++;
+  }
+#endif
   return res;
 }
 
@@ -2653,7 +2647,7 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     if (!ommit_comp)
     {
       order[1]=ringorder_C;
-    }  
+    }
     ring res=(ring)omAlloc0Bin(ip_sring_bin);
     *res = *r;
     // res->qideal, res->idroot ???
