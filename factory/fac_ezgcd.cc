@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.17 2005-02-03 14:05:55 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.18 2005-02-11 13:24:27 Singular Exp $ */
 
 #include <config.h>
 
@@ -122,7 +122,11 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
             /// ---> A6
             CanonicalForm xxx;
             //if ( gcd( (DD[1] = Fb / Db), Db ) == 1 ) {
-	    xxx= gcd( (DD[1] = Fb / Db), Db );
+            DD[1] = Fb / Db;
+	    xxx= gcd( DD[1], Db );
+            DEBOUTLN( cerr, "gcd((Fb/Db),Db) = " << xxx );
+            DEBOUTLN( cerr, "Fb/Db = " << DD[1] );
+            DEBOUTLN( cerr, "Db = " << Db );
 	    if (xxx.inCoeffDomain()) {
                 B = F;
                 DD[2] = Db;
@@ -131,16 +135,23 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
                 B *= lcF;
             }
             //else  if ( gcd( (DD[1] = Gb / Db), Db ) == 1 ) {
-	    else { 
-	    xxx=gcd( (DD[1] = Gb / Db), Db );
-	    if (xxx.inCoeffDomain()) {
+	    else
+            { 
+              DD[1] = Gb / Db;
+	      xxx=gcd( DD[1], Db );
+              DEBOUTLN( cerr, "gcd((Gb/Db),Db) = " << xxx );
+              DEBOUTLN( cerr, "Gb/Db = " << DD[1] );
+              DEBOUTLN( cerr, "Db = " << Db );
+	      if (xxx.inCoeffDomain())
+              {
                 B = G;
                 DD[2] = Db;
                 lcDD[1] = lcG;
                 lcDD[2] = lcG;
                 B *= lcG;
-            }
-            else {
+              }
+              else
+              {
 #ifdef DEBUGOUTPUT
                 CanonicalForm dummyres = d * ezgcd_specialcase( F, G, b, bound );
                 DEBDECLEVEL( cerr, "ezgcd" );
@@ -148,7 +159,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 #else
                 return d * ezgcd_specialcase( F, G, b, bound );
 #endif
-            }
+              }
 	    }
             /// ---> A7
             DD[2] = DD[2] * ( b( lcDD[2] ) / lc( DD[2] ) );
@@ -178,6 +189,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 	    }
             /// ---> A8 (gcdfound)
         }
+        delta++;
     }
     /// ---> A9
     DEBDECLEVEL( cerr, "ezgcd" );
@@ -208,10 +220,13 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
 	return ezgcd( F, G, b, true );
     }
 #if 1
-    extern CanonicalForm
-gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag );
-
-    return gcd_poly1( F, G, getCharacteristic()==0 );
+    Off(SW_USE_EZGCD);
+    //bool ntl=isOn(SW_USE_NTL_GCD);
+    //Off(SW_USE_NTL_GCD);
+    d=gcd( F, G );
+    //if (ntl) On(SW_USE_NTL_GCD);
+    On(SW_USE_EZGCD);
+    return d;
 #else
 
     DEBOUTLN( cerr, "ezgcdspec: (S1) done, Ft = " << Ft );

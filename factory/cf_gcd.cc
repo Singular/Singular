@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.28 2005-02-03 14:05:55 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.29 2005-02-11 13:22:44 Singular Exp $ */
 
 #include <config.h>
 
@@ -197,20 +197,46 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
   {
     if ( getCharacteristic() > 0 )
     {
+      //CanonicalForm cf=F.lc();
+      //CanonicalForm f=F / cf;
+      //CanonicalForm cg=G.lc();
+      //CanonicalForm g= G / cg;
       zz_pContext ccc(getCharacteristic());
       ccc.restore();
       zz_p::init(getCharacteristic());
       zz_pX F1=convertFacCF2NTLzzpX(F);
       zz_pX G1=convertFacCF2NTLzzpX(G);
       zz_pX R=GCD(F1,G1);
-      return convertNTLzzpX2CF(R,F.mvar());
+      return  convertNTLzzpX2CF(R,F.mvar());
     }
     else
     {
-      ZZX F1=convertFacCF2NTLZZX(F);
-      ZZX G1=convertFacCF2NTLZZX(G);
+      CanonicalForm f=F ;
+      CanonicalForm g=G ;
+      bool rat=isOn( SW_RATIONAL );
+      if ( isOn( SW_RATIONAL ) )
+      {
+         DEBOUTLN( cerr, "NTL_gcd: ..." );
+         CanonicalForm cdF = bCommonDen( F );
+         CanonicalForm cdG = bCommonDen( G );
+         Off( SW_RATIONAL );
+         CanonicalForm l = lcm( cdF, cdG );
+         On( SW_RATIONAL );
+         f *= l, g *= l;
+      }
+      DEBOUTLN( cerr, "NTL_gcd: f=" << f );
+      DEBOUTLN( cerr, "NTL_gcd: g=" << g );
+      ZZX F1=convertFacCF2NTLZZX(f);
+      ZZX G1=convertFacCF2NTLZZX(g);
       ZZX R=GCD(F1,G1);
-      return convertNTLZZX2CF(R,F.mvar());
+      CanonicalForm r=convertNTLZZX2CF(R,F.mvar());
+      DEBOUTLN( cerr, "NTL_gcd: -> " << r );
+      if (rat)
+      {
+        r /= r.lc();
+        DEBOUTLN( cerr, "NTL_gcd2: -> " << r );
+      }
+      return r;
     }
   }
 #endif
@@ -315,11 +341,11 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
     pi1 = pi1 / Ci1; pi = pi / Ci;
     if ( pi.isUnivariate() && pi1.isUnivariate() )
     {
-      if ( modularflag
 #ifdef HAVE_NTL
-      || (isOn(SW_USE_NTL_GCD) && isPurePoly(pi) && isPurePoly(pi1))
+      if (isOn(SW_USE_NTL_GCD) && isPurePoly(pi) && isPurePoly(pi1))
+         return gcd_poly_univar0(f, g, true);
 #endif
-      )
+      if ( modularflag)
         return gcd_poly_univar0( pi, pi1, true ) * C;
     }
     else if ( gcd_test_one( pi1, pi, true ) )
