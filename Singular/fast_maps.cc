@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.11 2002-01-19 14:13:35 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.12 2002-01-19 14:16:53 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -229,7 +229,6 @@ void maMap_CreateRings(ideal map_id, ring map_r,
   dest_r = image_r;
 }
 
-
 ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
 {
   ideal res = idInit(m_id->n, 1);
@@ -239,6 +238,7 @@ ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
   {
     sBucketDestroyMerge(m_id->buckets[i], &(res->m[i]), &l);
   }
+  omFree(m_id);
   return res;
 }
 
