@@ -38,4 +38,14 @@ Before these changes, we copied the exec to Singular.Jan.
 	DONE syz, nres, mres;
 	small problems with minres.
 
+until
+17.03.03
+	fixed: minres, ideal multiplication, maps, syz
+	balanced the use of buckets in mult and bracket
+	added quasicommutative stuff in multiplication
+	gained about 30% speedup
+
+18.03.03
+	fixed: extra "type print" in ring.cc
+        new strategy of bucket used in bracket 
 

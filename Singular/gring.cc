@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.35 2003-03-17 14:42:14 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.36 2003-03-18 23:52:02 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1253,7 +1253,7 @@ poly nc_p_Bracket_qq(poly p, poly q)
   poly res=NULL;
   poly pres=NULL;
   int UseBuckets=1;
-  if (pLength(p)+pLength(q)< MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS) UseBuckets=0;
+  if ((pLength(p)< MIN_LENGTH_BUCKET/2) && (pLength(q)< MIN_LENGTH_BUCKET/2) || TEST_OPT_NOT_BUCKETS) UseBuckets=0;
   sBucket_pt bu_out;
   if (UseBuckets) bu_out=sBucketCreate(currRing);
   while (p!=NULL)
