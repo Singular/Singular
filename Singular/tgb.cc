@@ -3723,6 +3723,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   for(i=0;i<=c->strat->sl;i++)
     c->strat->S[i]=NULL;
   id_Delete(&c->strat->Shdl,c->r);
+  pDelete(&c->tmp_lm);
   delete c->strat;
   omfree(c);
 
