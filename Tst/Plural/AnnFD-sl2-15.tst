@@ -1,3 +1,5 @@
+LIB "tst.lib";
+tst_init();
 ring r=0,(x,y,z),dp;
 matrix d[3][3];
 d[1,2]=-z;
@@ -18,4 +20,4 @@ ideal k=std(i);
 k;
 ideal J=system("twostd",i);
 J;
-$
+tst_status(1);$

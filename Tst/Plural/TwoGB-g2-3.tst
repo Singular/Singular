@@ -1,3 +1,5 @@
+LIB "tst.lib";
+tst_init();
 ring r=0,(x(1..6),y(1..6),Ha,Hb),dp;
 matrix D[14][14]=0;
 D[1,2]=-x(3);
@@ -62,4 +64,4 @@ option(redSB);
 option(redTail);
 ideal J=system("twostd",i);
 J;
-$
+tst_status(1);$
