@@ -1904,7 +1904,7 @@ fi
 
 WITH_LIBFAC=no
 if test "$with_libfac" != no; then
-  if test "$ac_factory_ok" != yes; then
+  if test "${WITH_FACTORY}" != yes; then
     echo "configure: warning: building without libfac: can not use libfac without factory" 1>&2 
   else
     if test "$ac_cv_lib_singcf_atof" = yes; then

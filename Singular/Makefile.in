@@ -189,7 +189,7 @@ config.status: configure
 	./config.status --recheck
 
 configure: configure.in
-	echo "You need to rerun autoconf. I am proceeding, for now."
+	@echo "WARNING: You need to rerun autoconf. I am proceeding, for now."
 	touch configure
 #	autoconf 
 
@@ -235,7 +235,7 @@ mostlyclean: clean
 
 clean:
 	-rm -rf Singular* *.o *.og core *.d *.dd *~ \#* /tmp/mp*
-	cd ${testdir}; rm -f out.got *dump* out.diff
+	cd ${testdir}; rm -f *.got *dump* *.diff
 	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
@@ -252,20 +252,24 @@ maintainer-clean: distclean
 info dvi ps html:
 	cd ${docdir}; ${MAKE} $@
 
-check:	Singular ${testdir}/check ${testdir}/out.should
-	cd ${testdir}; SINGULARPATH=./../LIB/ ./check ./../Singular
-	if test "$WITH_MP" = yes; then echo; ${MAKE} mpcheck; fi
-	if test "$WITH_FACTORY" = yes && test "$WITH_LIBFAC" = yes; then \
+check:	Singular ${testdir}/general_test.in ${testdir}/general_test.out
+	- SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
+	PATH=`pwd`:${PATH}; export PATH;\
+	cd ${testdir}; ./comparecheck general_test.in general_test.out
+	if test "${WITH_MP}" = yes; then ${MAKE} mpcheck; fi; 
+	if test "${WITH_FACTORY}" = yes && test "${WITH_LIBFAC}" = yes; then \
 	  ${MAKE} factorycheck;\
 	fi	
          	    
 
 mpcheck: Singular ${testdir}/mpcheck ${testdir}/mpcheck.data
-	cd ${testdir}; ./mpcheck `pwd`/.. mpcheck.data
+	- SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
+	PATH=`pwd`:${PATH}; export PATH;\
+	cd ${testdir}; ./mpcheck mpcheck.data
 
 factorycheck: Singular ${testdir}/comparecheck ${testdir}/fac_test.in \
 		${testdir}/fac_test.out
-	SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
+	- SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
 	cd ${testdir}; ./comparecheck fac_test.in fac_test.out
 	
