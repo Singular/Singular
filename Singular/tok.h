@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.16 1998-05-12 10:01:09 Singular Exp $ */
+/* $Id: tok.h,v 1.17 1998-05-19 18:08:41 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -42,6 +42,7 @@ inline int min(const int a, const int b)  { return (a<b) ? a : b; }
 
 enum {
   ATTRIB_CMD     = UMINUS + 15,
+  BAREISS_CMD,
   CHARACTERISTIC_CMD,
   CHARSTR_CMD,
   CHAR_SERIES_CMD,

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.36 1998-05-16 12:15:27 Singular Exp $ */
+/* $Id: grammar.y,v 1.37 1998-05-19 18:08:40 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -152,7 +152,6 @@ void yyerror(char * fmt)
 /* end types */
 
 /* ring dependent cmd:*/
-%token <i> BAREISS_CMD
 %token <i> BETTI_CMD
 %token <i> COEFFS_CMD
 %token <i> COEF_CMD
