@@ -27,7 +27,6 @@ bindir		= @bindir@
 includedir	= @includedir@
 slibdir		= ${prefix}/LIB
 install_bindir  = ${install_prefix}/${SINGUNAME}
-install_bindir_plural  = ${install_prefix}/Plural
 install_slibdir = ${install_prefix}/LIB
 
 ##
@@ -464,19 +463,6 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
 	-${INSTALL_PROGRAM} *.so ${install_bindir}
 	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${DL_LIBS} ${install_bindir}
-	echo "#undef MAKE_DISTRIBUTION " > distrib.h
-
-install-bindist-plural: $(HEADERS) $(SOURCES) Makefile depend
-	echo "#define MAKE_DISTRIBUTION	" > distrib.h
-	sleep 1
-	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
-	${MKINSTALLDIRS} ${install_bindir} 
-	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Plural
-	${INSTALL_PROGRAM} -s  ESingular ${install_bindir}/EPlural
-	${INSTALL_PROGRAM} -s  TSingular ${install_bindir}/TPlural
-	- ${INSTALL_PROGRAM} -s  runESingular ${install_bindir}/runEPlural
-	- ${INSTALL_PROGRAM} -s  runTSingular ${install_bindir}/runTPlural
-	${INSTALL_PROGRAM} -s  libparse ${DL_LIBS} ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
 install-sharedist: ${SLIBS_FILES} LIB/gftables
