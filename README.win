@@ -1,14 +1,14 @@
-			 Singular version <
+                                                        Singular version 1.2
 		     University of Kaiserslautern
-     Department of Mathematics        Centre for Computer Algebra
+                   Department of Mathematics   Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
-		  (C) 1986-1998 All Rights Reserved
+                                          (C) 1986-1998 All Rights Reserved
 
        README FILE FOR THE SINGULAR WINDOWS 95/NT DISTRIBUTION
-       ========================================================
+       =============================================================
 
 IMPORTANT: 
-==========
+============
 (1) See the COPYING file contained in this distribution
     for license information for the Singular.
 (2) See the README.general file contained in this distribution for general
@@ -18,22 +18,29 @@ IMPORTANT:
 
 
 ABOUT THIS DISTRIBUTION
-=======================
+==========================
+To install Singular on for Windows 95/NT, you need the file
+		    Singular-<x-y-z>-ix86-Win.zip
+which you can obtain by public ftp from
+      ftp://www.mathematik.uni-kl.de/pub/Math/Singular/.
 This distribution contains the following files and subdirectories
 
-  ./Singular/<x.y.z>/Singular.exe	Singular executable
-  ./Singular/<x.y.z>/libparse.exe       parser for Singular libraries
-  ./Singular/LIB/<x.y.z>/		Singular libraries
-  ./Singular/gftables/                  Singular gftables
-  ./Singular/doc/<x.y.z>/		documentation (ps, dvi, info)
-  ./Singular/html/<x.y.z>/		documentation (html)
+  ./Singular/<x-y-z>/Singular.exe	                     Singular executable
+  ./Singular/<x-y-z>/libparse.exe                           parser for Singular libraries
+  ./Singular/<x-y-z>/cygwinb19.dll		CYGWIN DLL Library
+  ./Singular/<x-y-z>/info.exe                                  info program
+  ./Singular/<x-y-z>/sh.exe                                     sh program
+  ./Singular/LIB/<x-y-z>/		Singular libraries
+  ./Singular/LIB/gftables/                                         Singular gftables
+  ./Singular/doc/<x-y-z>/		documentation (ps, dvi, info)
+  ./Singular/html/<x-y-z>/		documentation (html)
   ./Singular/INSTALL			installation instructions
   ./Singular/COPYING			licence information
   ./Singular/README.general		general Singular info 
   ./Singular/README			this file
 
 More information about Singular: Comments, Questions, Bug Reports
-=================================================================
+=====================================================
 
 More and up-to-date information about Singular is always available
 from 

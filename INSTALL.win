@@ -1,12 +1,11 @@
-			 Singular version 1.2
+                                                        Singular version 1.2
 		     University of Kaiserslautern
-       Department of Mathematics   Centre for Computer Algebra
+                   Department of Mathematics   Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
-		  (C) 1986-1998 All Rights Reserved
+                                          (C) 1986-1998 All Rights Reserved
 
-	 WINDOWS 95/NT INSTALLATION INSTRUCTIONS FOR SINGULAR
-	=====================================================
-
+       WINDOWS 95/NT INSTALLATION INSTRUCTIONS FOR SINGULAR
+       ===========================================================
 To install Singular on for Windows 95/NT, you need the file
 		    Singular-<x-y-z>-ix86-Win.zip
 which you can obtain by public ftp from
@@ -41,13 +40,15 @@ under the same root.
 
 After unpacking, you will have a directory structure like:
 
-  ./Singular/<x.y.z>/Singular.exe		Singular executable
-  ./Singular/<x.y.z>/cygwinb19.dll		CYGWIN DLL Library
-  ./Singular/<x.y.z>/info.exe                   info program
-  ./Singular/<x.y.z>/sh.exe                     sh program
-  ./Singular/LIB/<x.y.z>/			Singular libraries
-  ./Singular/doc/<x.y.z>/			documentation (ps, dvi, info)
-  ./Singular/html/<x.y.z>/			documentation (html)
+  ./Singular/<x-y-z>/Singular.exe	                     Singular executable
+  ./Singular/<x-y-z>/libparse.exe                           parser for Singular libraries
+  ./Singular/<x-y-z>/cygwinb19.dll		CYGWIN DLL Library
+  ./Singular/<x-y-z>/info.exe                                  info program
+  ./Singular/<x-y-z>/sh.exe                                     sh program
+  ./Singular/LIB/<x-y-z>/		Singular libraries
+  ./Singular/LIB/gftables/                                         Singular gftables
+  ./Singular/doc/<x-y-z>/		documentation (ps, dvi, info)
+  ./Singular/html/<x-y-z>/		documentation (html)
 
 
 For the executable to work, the directory layout must look pretty much
@@ -64,33 +65,26 @@ RUNNING SINGULAR
 The easiest way to start-up Singular is to double-click on the
 `Singular.exe' file from your desktop. 
 
-You can also start-up Singular from an MS-DOS or Bash/Sh
-shell. However, for the latter case, you need to add the directory 
+You can also start-up Singular from an MS-DOS or Bash/Sh (from Cygnus)
+terminal. However, for the latter case, you need to add the directory 
 where the file `Singular.exe' resides to your PATH variable (unless
 you cd to that directory each time before you start Singular). Use the 
-following commands: For the MS-DOS shell
-  set PATH=%PATH%;<place where you extracted Singular>\Singular\<x.y.z>
-or, for the Bash/Sh shell
-  export PATH=$PATH:<place where you extracted Singular>/Singular/<x.y.z>
+following commands: For the MS-DOS terminal
+  set PATH=%PATH%;<place where you extracted Singular>\Singular\<x-y-z>
+or, for the Bash/Sh terminal
+  export PATH=$PATH:<place where you extracted Singular>/Singular/<x-y-z>
 You also might want to adjust your personal start-up files accordingly, 
 so that the PATH variable is set automatically each time you login.
 
 Alternatively, you can copy the DLL library
-`./Singular/<x.y.z>/cygwinb19.dll' to a standard place on your system
-(like /WIN32), so that it is automatically when Singular is started
-up.
-
-Furthermore, you might want to check the settings of your I/O
-window(s), and adjust them, if necessary, so that cutting and pasting
-of is enabled.
-
+./Singular/<x-y-z>/cygwinb19.dll' to a  place on your system
+where the PATH is defined.
 
 TROUBLES
 =========
-
 * Singular complains that it can not find `cygwinb19.dll':
   Make sure that the DLL library `cygwinb19.dll' which is included in
-  the distribution at `./Singular/<x.y.z>/' was either copied to a
+  the distribution at `./Singular/<x-y-z>/' was either copied to a
   standard place on your system (like /WIN32), or that your PATH
   variable contains the directory where this library resides. See
   above for more details.
@@ -106,11 +100,11 @@ TROUBLES
       files as follows:
       1.) In all dirs specified by the environment variable SINGULARPATH
       2.) $bindir/LIB
-      3.) $bindir/LIB/<x.y.z>
+      3.) $bindir/LIB/<x-y-z>
       4.) $bindir/../../Singular/LIB
-      5.) $bindir/../../Singular/LIB/<x.y.z>
+      5.) $bindir/../../Singular/LIB/<x-y-z>
       6.) /Singular/LIB/
-      7.) /Singular/LIB/<x.y.z>
+      7.) /Singular/LIB/<x-y-z>
       If one of these directories exists, then it is appended to the
       Singular SearchPath (in that order) and libraries are looked for 
       in all directories contained in the Singular SearchPath. You can 
@@ -136,10 +130,10 @@ TROUBLES
       order): 
       1.) $bindir/../doc/
       2.) $bindir/../info/
-      3.) $bindir/../../Singular/doc/<x.y.z>/
+      3.) $bindir/../../Singular/doc/<x-y-z>/
       4.) $bindir/../../Singular/doc/
       5.) $bindir/../../info/
-      6.) /Singular/doc/<x.y.z>/
+      6.) /Singular/doc/<x-y-z>/
       7.) /Singular/doc/
       8.) /info/
       9.) In all directories contained in the Singular SearchPath.
