@@ -1,8 +1,12 @@
 // emacs editmode for this file is -*- C++ -*-
-// $Id: canonicalform.cc,v 1.2 1996-07-02 11:18:32 stobbe Exp $
+// $Id: canonicalform.cc,v 1.3 1997-03-26 16:27:09 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1996/07/02 11:18:32  stobbe
+"initCanonicalForm: now initializes the switch system.
+"
+
 Revision 1.1  1996/06/13 07:15:50  stobbe
 "CanonicalForm::deriv(x): bug fix, result is now swapped back if x is not
                          the main variable of *this
@@ -14,7 +18,9 @@ Initial revision
 */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "cf_globals.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
@@ -23,12 +29,13 @@ Initial revision
 #include "imm.h"
 #include "gfops.h"
 #include "cf_binom.h"
-#if defined USE_MEMUTIL && ! defined USE_OLD_MEMMAN
+#if defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)
 #include "memman.h"
 #endif
 
+#ifndef NOSTREAMIO
 CanonicalForm readCF( istream& );
-
+#endif /* NOSTREAMIO */
 
 CanonicalForm::CanonicalForm() : value( CFFactory::basic( (int)0 ) )
 {
@@ -412,6 +419,7 @@ CanonicalForm::isUnivariate() const
 	return value->isUnivariate();
 }
 
+#ifndef NOSTREAMIO
 void
 CanonicalForm::print( ostream & os, char * str ) const
 {
@@ -420,6 +428,7 @@ CanonicalForm::print( ostream & os, char * str ) const
     else
 	value->print( os, str );
 }
+#endif /* NOSTREAMIO */
 
 bool
 operator == ( const CanonicalForm & lhs, const CanonicalForm & rhs )
@@ -998,23 +1007,23 @@ divremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, C
     return result;
 }
 
+#ifndef NOSTREAMIO
 ostream&
 operator << ( ostream & os, const CanonicalForm & cf )
 {
     cf.print( os, "" );
     return os;
 }
+#endif /* NOSTREAMIO */
 
+#ifndef NOSTREAMIO
 istream&
 operator >> ( istream & is, CanonicalForm & cf )
 {
-#ifdef SINGULAR
-    cf = 0;
-#else
     cf = readCF( is );
-#endif
     return is;
 }
+#endif /* NOSTREAMIO */
 
 CanonicalForm
 CanonicalForm::operator () ( const CanonicalForm & f ) const
@@ -1124,7 +1133,7 @@ initCanonicalForm( void )
 {
     static bool initialized = false;
     if ( ! initialized ) {
-#if defined USE_MEMUTIL && ! defined USE_OLD_MEMMAN
+#if defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)
 	(void)mmInit();
 #endif
 
@@ -1199,7 +1208,7 @@ CanonicalForm::mapinto () const
 	return result;
     }
 }
-	
+
 void
 On( int sw )
 {
@@ -1260,7 +1269,7 @@ CanonicalForm::sqrt ( ) const
     else
 	return CanonicalForm( value->sqrt() );
 }
-	
+
 
 int
 getNumVars( const CanonicalForm & f )
@@ -1323,4 +1332,3 @@ divides ( const CanonicalForm & f, const CanonicalForm & g )
 	return ok && r == 0;
     }
 }
-

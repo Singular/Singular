@@ -1,15 +1,23 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_eval.cc,v 1.1 1996-05-24 09:21:54 stobbe Exp $
+// $Id: cf_eval.cc,v 1.2 1997-03-26 16:29:50 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/05/24 09:21:54  stobbe
+"operator(): Bug fix, operator( const CanonicalForm & ) now uses
+            values.min() as lower index instead of 2 and produces the
+            right result.
+"
+
 // Revision 1.0  1996/05/17  10:59:43  stobbe
 // Initial revision
 //
 */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "cf_eval.h"
 
 static CanonicalForm evalCF ( const CanonicalForm & f, const CFArray & a, int m, int n );
@@ -50,12 +58,14 @@ Evaluation::nextpoint()
 	values[i] += 1;
 }
 
+#ifndef NOSTREAMIO
 ostream&
 operator<< ( ostream& s, const Evaluation &e )
 {
     s << e.values;
     return s;
 }
+#endif /* NOSTREAMIO */
 
 CanonicalForm
 evalCF ( const CanonicalForm & f, const CFArray & a, int m, int n )

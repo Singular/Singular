@@ -1,11 +1,15 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: canonicalform.h,v 1.2 1996-07-15 08:32:46 stobbe Exp $
+// $Id: canonicalform.h,v 1.3 1997-03-26 16:28:31 schmidt Exp $
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1996/07/15 08:32:46  stobbe
+"new function linearSystemSolve
+"
+
 Revision 1.1  1996/06/24 11:26:36  stobbe
 "new function determinant.
 new template class Matrix<CanonicalForm>
@@ -16,9 +20,12 @@ Initial revision
 
 */
 
+#ifndef NOSTREAMIO
 #include <iostream.h>
+#endif /* NOSTREAMIO */
 
 #include "cf_defs.h"
+
 #include "variable.h"
 #include "templates/list.h"
 #include "templates/array.h"
@@ -115,7 +122,7 @@ public:
     CanonicalForm& div ( const CanonicalForm& );
     CanonicalForm& mod ( const CanonicalForm& );
 
-    friend CanonicalForm operator - ( const CanonicalForm& ); 
+    friend CanonicalForm operator - ( const CanonicalForm& );
 
     friend CanonicalForm operator + ( const CanonicalForm&, const CanonicalForm& );
     friend CanonicalForm operator - ( const CanonicalForm&, const CanonicalForm& );
@@ -129,9 +136,11 @@ public:
     friend void divrem ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
     friend bool divremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
 
+#ifndef NOSTREAMIO
     void print( ostream&, char * ) const;
     friend ostream& operator << ( ostream&, const CanonicalForm& );
     friend istream& operator >> ( istream&, CanonicalForm& );
+#endif /* NOSTREAMIO */
 
     friend bool operator == ( const CanonicalForm&, const CanonicalForm& );
     friend bool operator != ( const CanonicalForm&, const CanonicalForm& );
