@@ -1,9 +1,9 @@
-// $Id: hnoether.lib,v 1.22 2000-12-04 15:05:10 Singular Exp $
+// $Id: hnoether.lib,v 1.23 2000-12-04 18:16:24 Singular Exp $
 // last change:           27.04.00
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-7 or newer
 
-version="$Id: hnoether.lib,v 1.22 2000-12-04 15:05:10 Singular Exp $";
+version="$Id: hnoether.lib,v 1.23 2000-12-04 18:16:24 Singular Exp $";
 info="
 LIBRARY:  hnoether.lib   Procedures for the Hamburger-Noether (Puiseux) development
 
@@ -898,7 +898,6 @@ example
   //    is not complete. It can only occur in the last line of the
   //    HNE, and normally does.)
   hne[2];
-  pause("Hit RETURN to continue:");
   param(hne);
   // returns the parametrization
   // x(t)= -t^14+O(t^21),  y(t)= -3t^98+O(t^105)
@@ -1043,12 +1042,11 @@ example
  list hne=develop(f);
  list hne_extended1=develop(f,6);
  list hne_extended2=develop(f,10);
- pause("Hit RETURN to continue:");
-                                   //   compare the different matrices ...
+            //   compare the different matrices ...
  print(hne[1]);
  print(hne_extended1[1]);
  print(hne_extended2[1]);
-                                   // ... and the resulting parametrizations:
+            // ... and the resulting parametrizations:
  param(hne);
  param(hne_extended1);
  param(hne_extended2);
@@ -2413,7 +2411,8 @@ EXAMPLE: example reddevelop;  shows an example
 example
 {
   // -------- prepare for example ---------
-  if (nameof(basering)=="HNEring") {
+  if (nameof(basering)=="HNEring")
+  {
    def rettering=HNEring;
    kill HNEring;
   }
@@ -2427,7 +2426,6 @@ example
   param(hne[2]);
   displayInvariants(hne);
   kill HNEring,r;
-  pause("Hit RETURN to continue:");
   // ----------------- a more interesting example: --------------------
   ring r = 32003,(x,y),dp;
   poly f = x25+x24-4x23-1x22y+4x22+8x21y-2x21-12x20y-4x19y2+4x20+10x19y
