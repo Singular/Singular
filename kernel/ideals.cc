@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.7 2005-03-14 16:17:07 Singular Exp $ */
+/* $Id: ideals.cc,v 1.8 2005-03-17 14:13:02 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3029,7 +3029,7 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
         if (p==NULL) break;
         if (d!=pFDeg(p,currRing)) 
         {
-          // pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p)); 
+          //pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p,currRing)); 
           return FALSE; 
         }
       }
