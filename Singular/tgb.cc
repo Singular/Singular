@@ -709,7 +709,7 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
          }
     if ((c->lengths[i]==1) && (c->lengths[j]==1))
       c->states[i][j]=HASTREP;
-    if (pHasNotCF(c->S->m[i],c->S->m[j]))
+    else if (pHasNotCF(c->S->m[i],c->S->m[j]))
       c->states[i][j]=HASTREP;
 
   }
