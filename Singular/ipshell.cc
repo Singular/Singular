@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.84 2004-02-11 11:33:04 bricken Exp $ */
+/* $Id: ipshell.cc,v 1.85 2004-02-12 09:33:39 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1092,7 +1092,11 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
   if (frompack==NULL) frompack=currPack;
   package rootpack = IDPACKAGE(roothdl);
 //  Print("iiInternalExport('%s',%d,%s->%s) typ:%d\n", v->name, toLev, IDID(currPackHdl),IDID(roothdl),v->Typ());
-  if (RingDependend(IDTYP(h)))
+  if ((RingDependend(IDTYP(h)))
+  || ((IDTYP(h)==LIST_CMD)
+     && (lRingDependend(IDLIST(h)))
+     )
+  )
   {
     //Print("// ==> Ringdependent set nesting to 0\n");
     return (iiInternalExport(v, toLev));
@@ -1161,7 +1165,7 @@ BOOLEAN iiExport (leftv v, int toLev)
 BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 {
   checkall();
-//      Print("iiExport1: pack=%s\n",IDID(root));
+  //  Print("iiExport1: pack=%s\n",IDID(root));
   BOOLEAN nok=FALSE;
   leftv rv=v;
   while (v!=NULL)
