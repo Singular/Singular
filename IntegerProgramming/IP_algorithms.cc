@@ -2426,14 +2426,14 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
   if(!problem)
   {
     cerr<<"ERROR: int solve(INPUT_FILE, INPUT_FILE):\n"
-      "cannot read from first input file, possibly not found"<<endl;
+      "cannot read from first input file "<< PROBLEM <<", possibly not found"<<endl;
     return 0;
   }
 
   if(!groebner)
   {
     cerr<<"ERROR: int solve(INPUT_FILE, INPUT_FILE):\n"
-      "cannot read from second input file, possibly not found"<<endl;
+      "cannot read from second input file "<< GROEBNER <<", possibly not found"<<endl;
     return 0;
   }
 

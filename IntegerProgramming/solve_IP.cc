@@ -248,8 +248,9 @@ int main(int argc, char *argv[])
       // now solve problems
 
       char* GROEBNER=new char[128];
+      memset(GROEBNER,0,128);
       short i=0;
-      while(argv[argc-2][i]!='\0' && argv[argc-2][i]!='.')
+      while(argv[argc-2][i]!='\0' && argv[argc-2][i]!='.' && argv[argc-2][i]>' ')
       {
         GROEBNER[i]=argv[argc-2][i];
         i++;

@@ -551,6 +551,7 @@ short matrix::compute_flip_variables(short*& F)
   {
     r=columns-r;
     F=new short[r];
+    memset(F,0,r*sizeof(short));
     short counter=0;
     for(short j=0;j<columns;j++)
       if(H[0][j]>0)
@@ -564,6 +565,7 @@ short matrix::compute_flip_variables(short*& F)
     // all variables corresponding to negative components will be flipped
   {
     F=new short[r];
+    memset(F,0,r*sizeof(short));
     short counter=0;
     for(short j=0;j<columns;j++)
       if(H[0][j]<0)
@@ -607,6 +609,7 @@ short matrix::hosten_shapiro(short*& sat_var)
 
   short number_of_sat_var=0;
   sat_var=new short[columns/2];
+  memset(sat_var,0,sizeof(short)*(columns/2));
 
   BOOLEAN* ideal_saturated_by_var=new BOOLEAN[columns];
   // auxiliary array used to remember by which variables the ideal has still to

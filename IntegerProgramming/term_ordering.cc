@@ -256,7 +256,10 @@ term_ordering::term_ordering(const short& n, ifstream& input,
       }
 
       if(weight_vector[i]<0)
+      {
+        cout << "neg found at i="<<i<<":" <<weight_vector[i] <<"\n";
         negative_weight=TRUE;
+      }	
       if(weight_vector[i]==0)
         zero_weight=TRUE;
     }
