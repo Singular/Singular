@@ -1,4 +1,4 @@
-;; Tests which shoujld pass for shifted exponents
+;; Tests which should pass for shifted exponents
 allres_l
 bardet_probl_l
 ; bug_4 wrong order
@@ -34,7 +34,7 @@ pMult0L_l
 pMult0_l
 pMultL_l
 pMult_l
-primdec_l
+; primdec_l negative exponents
 primitiv_l
 res_l
 resultantp_l
