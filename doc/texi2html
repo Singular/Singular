@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 'di ';
 'ig 00 ';
-# $Id: texi2html,v 1.2 1998-06-08 13:22:47 krueger Exp $
+# $Id: texi2html,v 1.3 1998-06-09 13:16:27 krueger Exp $
 # Description: Program to transform most Texinfo documents to HTML.
 # The plan is for the next version of makeinfo to support HTML output
 # directly, but until then ...
@@ -34,6 +34,16 @@ $DEBUG_GLOSS =  8;
 $DEBUG_DEF   = 16;
 $DEBUG_HTML  = 32;
 $DEBUG_USER  = 64;
+
+$IMG_FIRST_ACTIVE  = "<IMG SRC=\"first-b.gif\">";
+$IMG_FIRST_PASSIVE = "<IMG SRC=\"first-t.gif\">";
+$IMG_LAST_ACTIVE   = "<IMG SRC=\"last-b.gif\">";
+$IMG_LAST_PASSIVE  = "<IMG SRC=\"last-t.gif\">";
+$IMG_NEXT_ACTIVE   = "<IMG SRC=\"next-b.gif\">";
+$IMG_NEXT_PASSIVE  = "<IMG SRC=\"next-t.gif\">";
+$IMG_PREV_ACTIVE   = "<IMG SRC=\"previous-b.gif\">";
+$IMG_PREV_PASSIVE  = "<IMG SRC=\"previous-t.gif\">";
+$IMG_TOC           = "<IMG SRC=\"toc-b.gif\">";
 
 $BIBRE = '\[[\w\/]+\]';			# RE for a bibliography reference
 $FILERE = '[\/\w.+-]+';			# RE for a file name
@@ -281,6 +291,11 @@ $html2_doctype = '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0 Strict Level 2//E
 #
 # things to skip
 #
+%to_ignore = (
+	    'manual', 1,
+	    'end manual', 1,
+	    );
+
 %to_skip = (
 	    # comments
 	    'c', 1,
@@ -322,6 +337,18 @@ $html2_doctype = '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0 Strict Level 2//E
 	    'end group', 1,
 	    );
 
+%append2num = (
+	       'A', 1,
+	       'B', 2,
+	       'C', 3,
+	       'D', 4,
+	       'E', 5,
+	       'F', 6,
+	       'G', 7,
+	       'H', 8,
+	       'I', 9,
+	       'J', 10,
+	       );
 #+++############################################################################
 #                                                                              #
 # Argument parsing, initialisation                                             #
@@ -347,6 +374,7 @@ $verbose = 0;
 $make_entry_page = 1;
 $make_menu_page = 1;
 $section_type = 0;
+$ignore_part = 0;
 $usage = <<EOT;
 This is $THISPROG
 To convert a Texinfo file to HMTL: $0 [options] file
@@ -524,6 +552,7 @@ $deferred_ref = '';			# deferred reference for indexes
 @html_stack = ();			# HTML elements stack
 $html_element = '';			# current HTML element
 &html_reset;
+@raw_html = ();
 
 # build code for simple substitutions
 # the maps used (%simple_map and %things_map) MUST be aware of this
@@ -582,7 +611,7 @@ while ($_ = &next_line) {
 	next;
     } elsif ($tag eq 'ifhtml') {
 	$in_html = $PROTECTTAG . ++$html_num;
-	push(@lines, $in_html);
+	push(@raw_html, $in_html);
 	next;
     }
     #
@@ -592,7 +621,7 @@ while ($_ = &next_line) {
 	if ($end_tag eq 'html') {
 	    $in_raw_html = 0;
 	} else {
-	    push (@lines, $_);
+	    push (@raw_html, $_);
 	}
 	next;
     } elsif ($tag eq 'html') {
@@ -607,6 +636,19 @@ while ($_ = &next_line) {
 	next if $to_skip{$tag};
 	last if $tag eq 'bye';
     }
+
+    if ($end_tag) {
+	if ($to_ignore{"end $end_tag"}) {
+	    $ignore_part = 0;
+	    next;
+	}
+    } elsif ($tag) {
+	if ($to_ignore{$tag}) {
+	    $ignore_part = 1;
+	}
+    }
+    next if $ignore_part;
+
     #
     # try to remove inlined comments
     # syntax from tex-mode.el comment-start-skip
@@ -648,7 +690,8 @@ while ($_ = &next_line) {
 	    # @ifinfo bits).
 	    $in_top = 1;
 	    $in_preamble = 0;
-	    @lines = (); # ignore all lines before top (title page garbage)
+	    #@lines = (); # ignore all lines before top (title page garbage)
+	    @lines = @raw_html;
 	    next;
 	} elsif ($tag eq 'node') {
 	    push (@lines, "$TOPTAG") if ($in_top); # Mark end of top node
@@ -1486,16 +1529,20 @@ while (@lines3) {
 print "# end of pass 4\n" if $verbose;
 
 push(@menu_lines, "<BODY BACKGROUND=\"/rock.gif\">\n");
+push(@menu_lines, "<IMG SRC=\"Singulars.gif\"><P>\n");
 #push(@menu_lines, "<BODY BACKGROUND=\"/rock.gif\" TEXT=\"yellow\"");
 #push(@menu_lines, " LINK=#FFFFFF ALINK=#FF00FF VLINK=\"#00FF00\">\n");
 #push(@menu_lines, "<NOBR>\n");
-push(@menu_lines, "<DL>\n");
+push(@menu_lines, "<OL>\n");
 foreach (@left_index) {
+    $entry = $_;
+    @part = split(/\ /);
+    $name = join(' ', @part[1..$#part]);
     if (!/^[A-Z0-9]\./) {
-	&left_menu_entry($_);
+	&left_menu_entry($part[0], $name);
     }
 }
-push(@menu_lines, "</DL>\n");
+push(@menu_lines, "</OL>\n");
 print "# end of pass 5\n" if $verbose;
 
 #+++############################################################################
@@ -1560,7 +1607,8 @@ if (!$monolithic && $make_entry_page) {
     if(open(FILE, "> $docu_main")) {
 	&print_header("$title - $docu_name", "", 1);
 	print "# creating $docu_main...\n" if $verbose;
-        &print_frame($docu_name);
+        #&print_frame($docu_name . "_1.html");
+	&print_frame($docu_toc);
 	&print_toplevel_footer;
 	close(FILE);
     } else {
@@ -1604,15 +1652,17 @@ if ($split_chapter || $split_node) { # split
 	    # fixme: try rel=Index too?
 	    &print_header("$title - $section", $links, 0);
 
-	    $navigation = "<p>Go to the ";
-	    $navigation .= ($prev_doc ? &anchor('', $first_doc, '', "first") : "first");
-	    $navigation .= ", ";
-	    $navigation .= ($prev_doc ? &anchor('', $prev_doc, '', "previous") : "previous");
-	    $navigation .= ", ";
-	    $navigation .= ($next_doc ? &anchor('', $next_doc, '', "next") : "next");
-	    $navigation .= ", ";
-	    $navigation .= ($next_doc ? &anchor('', $last_doc, '', "last") : "last");
-	    $navigation .= " section, " . &anchor('', $docu_toc, '', "table of contents") . ".\n";
+	    #$navigation = "<p>Go to the ";
+	    $navigation = "<p>";
+	    $navigation .= ($prev_doc ? &anchor('', $first_doc, '', $IMG_FIRST_ACTIVE) : $IMG_FIRST_PASSIVE);
+	    $navigation .= " ";
+	    $navigation .= ($prev_doc ? &anchor('', $prev_doc, '', $IMG_PREV_ACTIVE) : $IMG_PREV_PASSIVE);
+	    $navigation .= " ";
+	    $navigation .= ($next_doc ? &anchor('', $next_doc, '', $IMG_NEXT_ACTIVE) : $IMG_NEXT_PASSIVE);
+	    $navigation .= " ";
+	    $navigation .= ($next_doc ? &anchor('', $last_doc, '', $IMG_LAST_ACTIVE) : $IMG_LAST_PASSIVE);
+	    #$navigation .= " section, " . &anchor('', $docu_toc, '', "<IMG SRC=\"toc-b.gif\">") . ".\n";
+	    $navigation .= " " . &anchor('', $docu_toc, '', $IMG_TOC) . "\n";
 	    print FILE $navigation;
 	    &print_ruler;
 	    # find corresponding lines
@@ -1849,19 +1899,28 @@ sub normalise_node {
 }
 
 sub left_menu_entry {
-    local($entry) = @_;
+    local($secnum, $entry) = @_;
     local($_);
-    local($href, $descr);
+    local($href, $descr, $oltype,$value);
 
+    $_ = $secnum;
+    $value = $secnum;
+    if (/[A-Z]/) { 
+	$oltype = "<LI TYPE=A";
+	$value = $append2num{$secnum};
+    } else {
+	$oltype = "<LI";
+    }
     $_ = $entry;
-    print "===>$_\n";
-    s/^[0-9A-Z.]+ //;
+    print "===>($secnum): $entry\n";
+    #s/^[0-9A-Z.]+ //;
+    $_ = $entry;
     &normalise_node($_);
     $href = $node2href{$_};
     if ($href) {
 	$descr =~ s/^\s+//;
 	$descr = ": $descr" if $descr;
-	push(@menu_lines, "<DT>" . &anchor('', $href, "Main", $entry) . "$descr</DT>\n");
+	push(@menu_lines, "$oltype VALUE=$value>" . &anchor('', $href, "Main", $entry) . "$descr\n");
     } else {
 	warn "$ERROR Undefined node ($node): $_";
     }
@@ -2055,11 +2114,10 @@ sub print_ruler {
 }
 
 sub print_frame {
-    local($docu_right) = $_[0] . "_1";
     print FILE <<EOT;
 <FRAMESET COLS="20%,*" BORDER=0>
 <FRAME SRC="$docu_left" NAME="Links">
-<FRAME SRC="$docu_right.html" NAME="Main">
+<FRAME SRC="$_[0]" NAME="Main">
 </FRAMESET>
 
 EOT
