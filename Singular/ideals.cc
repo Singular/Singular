@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.131 2003-01-30 21:41:02 levandov Exp $ */
+/* $Id: ideals.cc,v 1.132 2003-03-19 23:08:57 levandov Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1171,7 +1171,7 @@ ideal idSect (ideal h1,ideal h2)
         k = pGetComp(p)-1-length;
         pSetComp(p,0);
         pSetmComp(p);
-        result->m[j] = pAdd(result->m[j],pMult(pCopy(first->m[k]),p));
+	result->m[j] = pAdd(result->m[j],pMult(pCopy(first->m[k]),p));
         p = q;
       }
       j++;
@@ -2367,6 +2367,19 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     return idCopy(h1);
   }
   if (idIs0(h1)) return idInit(1,h1->rank);
+  if (rIsPluralRing(currRing)) 
+    /* in the NC case, we have to check the admissibility of */
+    /* the subalgebra to be intersected with */
+  {
+    if (currRing->nc->type!=nc_skew)
+    {
+      if (!nc_CheckSubalgebra(delVar,currRing))
+      {
+	WerrorS("no elimination is possible: subalgebra is not admissible");
+	return idCopy(h1);
+      }
+    }
+  }
   hom=(tHomog)idHomModule(h1,NULL,&w); //sets w to weight vector or NULL
   h3=idInit(16,h1->rank);
   for (k=0;; k++)

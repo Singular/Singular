@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.36 2003-03-18 23:52:02 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.37 2003-03-19 23:08:56 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -191,6 +191,15 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
 
   iF=rN;
   while ((F[iF]==0)&&(iF>=1)) iF--; /* last exp_num of F */
+  if (iF==0) /* F0 is zero vector */
+  {
+    out=pOne();
+    p_SetExpV(out,G0,r);
+    p_Setm(out,r);
+    freeT(F,rN);
+    freeT(G,rN);
+    return(out);
+  }
   jG=1;
   while ((G[jG]==0)&&(jG<=rN)) jG++;  /* first exp_num of G */
   iG=rN;
@@ -1573,5 +1582,48 @@ poly nc_p_CopyPut(poly a, ring r)
   }
 }
 
+int nc_CheckSubalgebra(poly PolyVar, ring r)
+  /* returns TRUE if product of vars from PolyVar defines */
+  /* an admissible subalgebra of r */
+{
+  int rN=r->N;
+  int *ExpVar=(int*)omAlloc0((rN+1)*sizeof(int));
+  int *ExpTmp=(int*)omAlloc0((rN+1)*sizeof(int));
+  p_GetExpV(PolyVar, ExpVar, r);
+  int i; int j; int k;
+  poly test=NULL;
+  int OK=1;
+  for (i=1;i<rN;i++)
+  {
+    if (ExpVar[i]==0) /* i.e. not in PolyVar */
+    {  
+      for (j=i+1;j<=rN;j++)
+      {
+	if (ExpVar[j]==0)
+	{
+	  test=nc_p_CopyGet(MATELEM(r->nc->D,i,j),r);
+	  while (test!=NULL)
+	  {
+            p_GetExpV(test, ExpTmp, r);
+	    OK=1;
+	    for (k=1;k<=rN;k++)
+            {
+	      if (ExpTmp[k]!=0)
+	      {
+		if (ExpVar[k]!=0) OK=0;
+	      }
+            }
+	    if (!OK) return(FALSE);
+	    pIter(test);
+          }
+	}
+      }
+    }
+  }
+  p_Delete(&test,r);
+  freeT(ExpVar,rN);
+  freeT(ExpTmp,rN);
+  return(TRUE);
+}
 
 #endif

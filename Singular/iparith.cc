@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.291 2003-03-14 16:57:49 levandov Exp $ */
+/* $Id: iparith.cc,v 1.292 2003-03-19 23:08:59 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2405,8 +2405,8 @@ struct sValCmd2 dArith2[]=
 ,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE ALLOW_PLURAL}
 ,{jjINDEPSET2, INDEPSET_CMD,   LIST_CMD,       IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{lInsert,     INSERT_CMD,     LIST_CMD,       LIST_CMD,   DEF_CMD ALLOW_PLURAL}
-,{jjINTERSECT, INTERSECT_CMD,  IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD NO_PLURAL}
-,{jjINTERSECT, INTERSECT_CMD,  MODUL_CMD,      MODUL_CMD,  MODUL_CMD NO_PLURAL}
+,{jjINTERSECT, INTERSECT_CMD,  IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
+,{jjINTERSECT, INTERSECT_CMD,  MODUL_CMD,      MODUL_CMD,  MODUL_CMD ALLOW_PLURAL}
 ,{jjJET_P,     JET_CMD,        POLY_CMD,       POLY_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjJET_ID,    JET_CMD,        IDEAL_CMD,      IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjJET_P,     JET_CMD,        VECTOR_CMD,     VECTOR_CMD, INT_CMD ALLOW_PLURAL}
@@ -5359,8 +5359,8 @@ struct sValCmdM dArithM[]=
 ,{jjDBPRINT,   DBPRINT_CMD,     NONE,               -2       ALLOW_PLURAL}
 ,{jjCALL1ARG,  IDEAL_CMD,       IDEAL_CMD,          1        ALLOW_PLURAL}
 ,{jjIDEAL_PL,  IDEAL_CMD,       IDEAL_CMD,          -1       ALLOW_PLURAL}
-,{jjCALL2ARG,  INTERSECT_CMD,   IDEAL_CMD,          2        NO_PLURAL}
-,{jjINTERSECT_PL,INTERSECT_CMD, IDEAL_CMD,          -2       NO_PLURAL}
+,{jjCALL2ARG,  INTERSECT_CMD,   IDEAL_CMD,          2        ALLOW_PLURAL}
+,{jjINTERSECT_PL,INTERSECT_CMD, IDEAL_CMD,          -2       ALLOW_PLURAL}
 ,{jjCALL1ARG,  INTVEC_CMD,      INTVEC_CMD,         1        ALLOW_PLURAL}
 ,{jjINTVEC_PL, INTVEC_CMD,      INTVEC_CMD,         -2       ALLOW_PLURAL}
 ,{jjCALL2ARG,  JET_CMD,         POLY_CMD,/*or set by p*/ 2   ALLOW_PLURAL}

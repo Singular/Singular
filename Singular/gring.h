@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.20 2003-03-14 21:36:53 levandov Exp $ */
+/* $Id: gring.h,v 1.21 2003-03-19 23:09:01 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -61,6 +61,8 @@ void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c);
 void nc_PolyPolyRed(poly &b, poly p, number *c);
 
 matrix nc_PrintMat(int a, int b, ring r, int metric);
+
+int nc_CheckSubalgebra(poly PolyVar, ring r);
 
 #else
 // dummy definition to make gcc happy
