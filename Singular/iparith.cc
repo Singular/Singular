@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.310 2004-02-03 16:19:39 Singular Exp $ */
+/* $Id: iparith.cc,v 1.311 2004-02-04 20:19:46 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2771,7 +2771,7 @@ static BOOLEAN jjCOUNT_RG(leftv res, leftv v)
   if (rField_is_Zp(r)||rField_is_GF(r)) elems=rInternalChar(r);
   else if (rField_is_Zp_a(r) && (r->minpoly!=NULL))
   {
-    elems=(int)pow(ABS(rInternalChar(r),naParDeg(r->minpoly)));
+    elems=(int)pow(ABS(rInternalChar(r)),naParDeg(r->minpoly));
   }
   res->data = (char *)elems;
   return FALSE;
