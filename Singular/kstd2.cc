@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.75 2001-08-27 14:47:05 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.76 2002-01-30 14:33:02 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -32,7 +32,7 @@
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
 int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
-                        const int tl, const LObject* L, int start)
+                        const int tl, const LObject* L, const int start)
 {
   unsigned long not_sev = ~L->sev;
   int j = start;
@@ -600,7 +600,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
 
-      // reduce the tail and normailze poly
+      // reduce the tail and normalize poly
       if (TEST_OPT_INTSTRATEGY)
       {
         strat->P.pCleardenom();

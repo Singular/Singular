@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.27 2001-08-27 14:47:12 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.28 2002-01-30 14:33:04 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -2444,7 +2444,7 @@ void resMatrixDense::generateBaseData()
 
 }
 
-resVector *resMatrixDense::getMVector(int i)
+resVector *resMatrixDense::getMVector(const int i)
 {
   assume( i >= 0 && i < numVectors );
   return &resVectorList[i];
@@ -3159,15 +3159,15 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
   return roots;
 }
 
-int uResultant::nextPrime( int i )
+int uResultant::nextPrime( const int i )
 {
   int init=i;
-  i+=2;
-  int j= IsPrime( i );
+  int ii=i+2;
+  int j= IsPrime( ii );
   while ( j <= init )
   {
-    i+=2;
-    j= IsPrime( i );
+    ii+=2;
+    j= IsPrime( ii );
   }
   return j;
 }

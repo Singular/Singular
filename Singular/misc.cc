@@ -302,8 +302,8 @@ void singular_example(char *str)
 struct soptionStruct
 {
   char * name;
-  int   setval;
-  int   resetval;
+  unsigned   setval;
+  unsigned   resetval;
 };
 
 struct soptionStruct optionStruct[]=
@@ -700,7 +700,7 @@ void listall(int showproc)
             Print(" ref: %d\n",IDRING(hh)->ref);
           else
             PrintLn();
-        }  
+        }
         hh=IDNEXT(hh);
       }
       hh=basePack->idroot;
@@ -725,7 +725,7 @@ void listall(int showproc)
               else PrintS("   ");
               Print("%s::%s, typ %s level %d data %x\n",
               IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2),IDDATA(h2));
-	    }  
+            }
             h2=IDNEXT(h2);
           }
         }

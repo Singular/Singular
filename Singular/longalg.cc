@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.63 2002-01-10 12:33:21 Singular Exp $ */
+/* $Id: longalg.cc,v 1.64 2002-01-30 14:33:02 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -51,7 +51,7 @@ static numberfunc
                 nacMult, nacSub, nacAdd, nacDiv, nacIntDiv;
 static number   (*nacGcd)(number a, number b, const ring r);
 static number   (*nacLcm)(number a, number b, const ring r);
-static void     (*nacDelete)(number *a, ring r);
+static void     (*nacDelete)(number *a, const ring r);
        number   (*nacInit)(int i);
 static int      (*nacInt)(number &n);
        void     (*nacNormalize)(number &a);
@@ -252,7 +252,7 @@ void napDelete(napoly *p)
   *p = NULL;
 }
 
-void nap_Delete(napoly *p, ring r)
+void nap_Delete(napoly *p, const ring r)
 {
   napoly w, h = *p;
 
@@ -1369,7 +1369,7 @@ int naInt(number &n)
 /*2
 *  deletes p
 */
-void naDelete(number *p, ring r)
+void naDelete(number *p, const ring r)
 {
   lnumber l = (lnumber) * p;
   if (l==NULL) return;
@@ -2060,7 +2060,7 @@ void naPower(number p, int i, number *rc)
 /*2
 * result =gcd(a,b)
 */
-number naGcd(number a, number b, ring r)
+number naGcd(number a, number b, const ring r)
 {
   lnumber x, y;
   lnumber result = (lnumber)omAlloc0Bin(rnumber_bin);
@@ -2354,7 +2354,7 @@ void naNormalize(number &pp)
 * returns in result->n 1
 * and in     result->z the lcm(a->z,b->n)
 */
-number naLcm(number la, number lb, ring r)
+number naLcm(number la, number lb, const ring r)
 {
   lnumber result;
   lnumber a = (lnumber)la;

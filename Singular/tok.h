@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.51 2001-08-27 14:47:44 Singular Exp $ */
+/* $Id: tok.h,v 1.52 2002-01-30 14:33:07 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -118,7 +118,6 @@ enum {
   REPART_CMD,
   RESERVEDNAME_CMD,
   RESULTANT_CMD,
-  RINGLIST_CMD,
   ROWS_CMD,
   SIMPLEX_CMD,
   SQR_FREE_DEC_CMD,
@@ -156,7 +155,7 @@ enum {
 **  Set operations (small sets only)
 */
 
-#define Sy_bit(x)     (1<<(x))
+#define Sy_bit(x)     ((unsigned)1<<(x))
 #define Sy_inset(x,s) ((Sy_bit(x)&(s))?TRUE:FALSE)
 #define BTEST1(a)     Sy_inset((a), test)
 #define BVERBOSE(a)   Sy_inset((a), verbose)
@@ -204,7 +203,7 @@ enum {
 #define OPT_NOTREGULARITY 30
 #define OPT_WEIGHTM       31
 
-/* define ring dependent options */
+/* define ring dependent options */ 
 #define TEST_RINGDEP_OPTS \
  (Sy_bit(OPT_INTSTRATEGY) | Sy_bit(OPT_REDTHROUGH) | Sy_bit(OPT_REDTAIL))
 

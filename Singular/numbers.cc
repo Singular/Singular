@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.43 2001-08-24 14:10:09 Singular Exp $ */
+/* $Id: numbers.cc,v 1.44 2002-01-30 14:33:04 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -78,7 +78,7 @@ number ndReturn0(number n) { return nInit(0); }
 
 int    ndParDeg(number n) { return 0; }
 
-number ndGcd(number a, number b, ring r) { return r->cf->nInit(1); }
+number ndGcd(number a, number b, const ring r) { return r->cf->nInit(1); }
 
 number ndIntMod(number a, number b) { return nInit(0); }
 

@@ -7,7 +7,7 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs_Generate.cc,v 1.5 2001-08-27 14:47:28 Singular Exp $
+ *  Version: $Id: p_Procs_Generate.cc,v 1.6 2002-01-30 14:33:05 Singular Exp $
  *******************************************************************/
 
 
@@ -242,10 +242,10 @@ int main()
 // we only need lookup tables for p_Procs_Static
 #ifdef p_Procs_Static
   int j;
-  printf("
-/***************************************************************
-  Names of procs for RDEBUG */
-#ifdef RDEBUG\n");
+  printf("\n"
+  "/***************************************************************\n"
+  "Names of procs for RDEBUG */\n"
+  "#ifdef RDEBUG\n");
 
   for (i=0; i<p_Unknown_Proc; i++)
   {
@@ -263,12 +263,9 @@ int main()
     }
     printf("\n};\n");
   }
-  printf("
-#endif // RDEBUG
-
-
-/***************************************************************/
-/* Tables for lookup of procedures: */\n");
+  printf("\n #endif // RDEBUG\n\n"
+  "/***************************************************************/\n"
+  "/* Tables for lookup of procedures: */\n");
 
   for (i=0; i<p_Unknown_Proc; i++)
   {

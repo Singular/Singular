@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.8 2001-08-27 14:47:20 Singular Exp $
+ *  Version: $Id: pInline0.h,v 1.9 2002-01-30 14:33:05 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -111,13 +111,14 @@ PINLINE0 long p_MaxComp(poly p, ring lmRing, ring tailRing)
   return result;
 }
 
-BOOLEAN   p_IsConstantPoly(poly p, ring r)
+BOOLEAN   p_IsConstantPoly(const poly p, const ring r)
 {
-  while(p!=NULL)
+  poly pp=p;
+  while(pp!=NULL)
   {
-    if (! p_LmIsConstantComp(p, r))
+    if (! p_LmIsConstantComp(pp, r))
       return FALSE;
-    pIter(p);
+    pIter(pp);
   }
   return TRUE;
 }
@@ -181,3 +182,4 @@ PINLINE0 poly pLast(poly a, int &l)
 }
 
 #endif // PINLINE_CC
+
