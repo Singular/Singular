@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.23 2000-05-12 12:17:19 krueger Exp $
+// $Id: tst.lib,v 1.24 2000-08-14 11:26:30 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.23 2000-05-12 12:17:19 krueger Exp $";
+version="$Id: tst.lib,v 1.24 2000-08-14 11:26:30 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -217,7 +217,6 @@ EXAMPLE: example tst_status; shows example
       tst_status_out(tst_status_counter, "tst_timer", timer - Get_tst_timer());
       Set_tst_timer(timer);
     }
-    string(tst_status_counter) + " >> " + GetTstStatusFile();
   }
 }
 example
