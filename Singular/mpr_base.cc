@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.17 2000-01-10 18:59:34 wenk Exp $ */
+/* $Id: mpr_base.cc,v 1.18 2000-02-29 17:13:41 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -1430,7 +1430,6 @@ int resMatrixSparse::createMatrix( pointSet *E )
 
     //
     rowp= pMult( pCopy(epp), pCopy((gls->m)[(*E)[i]->rc.set]) );  // x^(p-a[ij]) * f(i)
-    pSetm( rowp );
 
     cp= 2;
     // get column for every monomial in rowp and store it
@@ -1448,6 +1447,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
       }
       pSetExpV(iterp,eexp);
       pSetComp(iterp, epos );
+      pSetm(iterp);
       if ( (*E)[i]->rc.set == linPolyS ) { // store coeff positions
         IMATELEM(*uRPos,rp,cp)= epos;
         cp++;
@@ -1458,7 +1458,6 @@ int resMatrixSparse::createMatrix( pointSet *E )
       IMATELEM(*uRPos,rp,1)= i-1;
       rp++;
     }
-    pSetm(rowp);
     (rmat->m)[i-1]= rowp;
   } // for
 
@@ -2112,7 +2111,7 @@ void resMatrixDense::createMatrix()
         if ( !nIsZero( vecp->getElemNum(i) ) )
         {
           MATELEM(m,numVectors - k,i + 1)= pInit();
-          pSetCoeff( MATELEM(m,numVectors - k,i + 1), nCopy(vecp->getElemNum(i)) );
+          pSetCoeff0( MATELEM(m,numVectors - k,i + 1), nCopy(vecp->getElemNum(i)) );
         }
     }
   } // for
@@ -2146,7 +2145,6 @@ void resMatrixDense::generateMonoms( poly m, int var, int deg )
 {
   if ( !deg ) { // deg == 0
     poly mon = pCopy( m );
-    pSetm( mon );
 
     if ( numVectors == veclistmax )
     {
@@ -2260,7 +2258,6 @@ void resMatrixDense::generateMonomData( int deg, intvec* polyDegs , intvec* iVO 
             //mprPROTInl("\t------------------> S ",(*iVO)[k]);
             resVectorList[j].elementOfS= (*iVO)[k];
             resVectorList[j].dividedBy= pCopy( (pDegDiv->m)[ (*iVO)[i] ] );
-            pSetm( resVectorList[j].dividedBy );
           }
         }
       }
@@ -2357,17 +2354,14 @@ void resMatrixDense::generateBaseData()
 
       // compute row poly
       poly pi= pMult( pCopy( (gls->m)[ resVectorList[k].elementOfS ] ) , pCopy( resVectorList[k].mon ) );
-      pSetm( pi );
       pi= pDivideM( pCopy( pi ), pCopy( resVectorList[k].dividedBy ) );
-      pSetm( pi );
 
       // fill in "matrix"
       while ( pi )
       {
         matEntry= nCopy(pGetCoeff(pi));
         pmatchPos= pHead0( pi );
-        pSetCoeff( pmatchPos, nInit(1) );
-        pSetm( pmatchPos );
+        pSetCoeff0( pmatchPos, nInit(1) );
 
         for ( i= 0; i < numVectors; i++)
           if ( pEqual( pmatchPos, resVectorList[i].mon ) )
@@ -2398,7 +2392,7 @@ void resMatrixDense::generateBaseData()
       j=0;
       while ( pi ) { // fill in "matrix"
         pmp= pMult( pHead( pi ), pCopy( factor ) );
-        pSetm( pmp );pTest( pi );
+        pTest( pi );
 
         for ( i= 0; i < numVectors; i++)
           if ( pEqual( pmp, resVectorList[i].mon ) )
@@ -2489,7 +2483,6 @@ const ideal resMatrixDense::getSubMatrix()
       if ( getMVector(i)->isReduced ) continue;
       if ( !nIsZero(vecp->getElemNum(numVectors - i - 1)) )
       {
-        MATELEM(resmat,j,l)= pInit();
         MATELEM(resmat,j,l)= pCopy( vecp->getElem(numVectors-i-1) );
       }
       l++;
@@ -2726,7 +2719,6 @@ poly uResultant::linearPoly( const resMatType rmt )
     actlp->next= newlp;
     newlp->next= NULL;
   }
-  pSetm( rootlp );
   return ( rootlp );
 }
 
@@ -2844,7 +2836,7 @@ poly uResultant::interpolateDense( const number subDetVal )
   {
     if ( sum == tdg )
     {
-      if ( ncpoly[c] )
+      if ( !nIsZero(ncpoly[c]) )
       {
         poly p= pOne();
         if ( rmt == denseResMat )
@@ -2857,9 +2849,8 @@ poly uResultant::interpolateDense( const number subDetVal )
         }
         pSetCoeff( p, ncpoly[c] );
         pSetm( p );
-        if (result) result= pAdd( pCopy(result), pCopy(p) );
-        else result= pCopy( p );
-        pDelete( &p );
+        if (result!=NULL) result= pAdd( result, p );
+        else result=  p;
       }
       c++;
     }
@@ -2877,7 +2868,6 @@ poly uResultant::interpolateDense( const number subDetVal )
     sum+=exp[n-1];
   }
 
-  pSetm( result );
   pTest( result );
 
   return result;
