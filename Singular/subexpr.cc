@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.63 2000-09-15 16:43:54 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.64 2000-09-15 16:44:31 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,8 +13,6 @@
 #include <unistd.h>
 
 #include "mod2.h"
-#define OM_TRACK 5
-#define OM_CHECK 3
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
