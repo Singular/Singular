@@ -391,7 +391,7 @@ BOOLEAN good_has_t_rep(int i, int j,calc_dat* c){
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
   assume(lm!=NULL);
-  int deciding_deg= pTotaldegree(lm);
+  //int deciding_deg= pTotaldegree(lm);
   int* i_con =make_connections(i,j,lm,c);
   p_Delete(&lm,c->r);
 
@@ -431,6 +431,8 @@ static void cleanS(kStrategy strat){
     if(kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P)!=i){
       deleteInS(i,strat);
       //remember destroying poly
+
+      //remember additional reductors
     }
     else i++;
   }
@@ -896,30 +898,35 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
       //check product criterion
 
       c->states[i][j]=UNCALCULATED;
-
-      //lies I[i] under I[j] ?
-      if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
-        c->rep[j]=i;
-	
-        PrintS("R"); R_found=TRUE;
-
-        c->Rcounter++;
-        if((i_pos>=0) && (j_pos>=0)){
-       
-        }
-        for(int z=0;z<j;z++){
-          if(c->rep[z]!=z) continue;
-          if (c->states[j][z]==UNCALCULATED){
-            c->states[j][z]=UNIMPORTANT;
-          }
-        }
-        for(int z=j+1;z<i;z++){
-          if(c->rep[z]!=z) continue;
-          if (c->states[z][j]==UNCALCULATED){
-            c->states[z][j]=UNIMPORTANT;
-          }
-        }
+      assume(p_LmDivisibleBy(c->S->m[i],c->S->m[j],c->r)==
+	     p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r));
+      if(!c->F4_mode)
+      {
+	assume(!(p_LmDivisibleBy(c->S->m[j],c->S->m[i],c->r)));
       }
+      //lies I[i] under I[j] ?
+  //     if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
+//         c->rep[j]=i;
+	
+//         PrintS("R"); R_found=TRUE;
+
+//         c->Rcounter++;
+//         if((i_pos>=0) && (j_pos>=0)){
+       
+//         }
+//         for(int z=0;z<j;z++){
+//           if(c->rep[z]!=z) continue;
+//           if (c->states[j][z]==UNCALCULATED){
+//             c->states[j][z]=UNIMPORTANT;
+//           }
+//         }
+//         for(int z=j+1;z<i;z++){
+//           if(c->rep[z]!=z) continue;
+//           if (c->states[z][j]==UNCALCULATED){
+//             c->states[z][j]=UNIMPORTANT;
+//           }
+//         }
+//       }
     }
     else {
       c->states[i][j]=UNIMPORTANT;
@@ -2084,6 +2091,99 @@ void simple_gauss(tgb_matrix* mat){
     row++;
   }
 }
+void simple_gauss2(tgb_matrix* mat){
+  int col, row;
+  col=0;
+  row=0;
+  int i;
+  int pn=mat->get_rows();
+  assume(pn>0);
+  //first clear zeroes
+//   for(i=0;i<pn;i++)
+//   {
+//     if(mat->zero_row(i))
+//     {
+//       mat->perm_rows(i,pn-1);
+//       pn--;
+//       if(i!=pn){i--;}
+//     }
+//   }
+  while((row<pn-1)&&(col<mat->get_columns())){
+    //row is the row where pivot should be
+    // row== pn-1 means we have only to act on one row so no red nec.
+    //we assume further all rows till the pn-1 row are non-zero
+    
+    //select column
+   
+    //    col=mat->min_col_not_zero_in_row(row);
+    assume(col!=mat->get_columns());
+    int found_in_row=-1;
+    
+    //    found_in_row=row;
+    assume(pn<=mat->get_rows());
+    for(i=row;i<pn;i++)
+    {
+      //    int first=mat->min_col_not_zero_in_row(i);
+      //  if(first<col)
+      if(!(mat->is_zero_entry(i,col))){
+	
+	found_in_row=i;
+	break;
+      }
+    }
+    if(found_in_row!=-1)
+    {
+    //select pivot
+      int act_l=mat->non_zero_entries(found_in_row);
+      for(i=i+1;i<pn;i++)
+      {
+	int vgl;
+	assume(mat->min_col_not_zero_in_row(i)>=col);
+	if((!(mat->is_zero_entry(i,col)))&&((vgl=mat->non_zero_entries(i))<act_l))
+	{
+	  found_in_row=i;
+	  act_l=vgl;
+	}
+	
+      }
+      mat->perm_rows(row,found_in_row);
+      
+      
+      //reduction
+      for(i=row+1;i<pn;i++){
+	assume(mat->min_col_not_zero_in_row(i)>=col);
+	if(!(mat->is_zero_entry(i,col)))
+	{
+	  
+	  number c1=nNeg(mat->get(i,col));
+	  number c2=mat->get(row,col);
+	  number n1=c1;
+	  number n2=c2;
+	  
+	  ksCheckCoeff(&n1,&n2);
+	  nDelete(&c1);
+	  mat->mult_row(i,n2);
+	  mat->add_lambda_times_row(i,row,n1);
+	  assume(mat->is_zero_entry(i,col));
+	  
+	} 
+	assume(mat->min_col_not_zero_in_row(i)>col);
+      }
+      row++;
+    }
+    col++;
+    // for(i=row+1;i<pn;i++)
+//     {
+//       if(mat->zero_row(i))
+//       {
+// 	mat->perm_rows(i,pn-1);
+// 	pn--;
+// 	if(i!=pn){i--;}
+//       }
+//     }
+
+  }
+}
 
 static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, calc_dat* c){
   tgb_matrix* t=new tgb_matrix(p_index,done_index);
@@ -2196,7 +2296,12 @@ static void go_on_F4 (calc_dat* c){
   while(chosen_index<PAR_N_F4)
   {
     
-    sorted_pair_node* s=top_pair(c);//here is actually chain criterium done
+    //    sorted_pair_node* s=c->apairs[c->pair_top];
+    sorted_pair_node* s;
+    if(c->pair_top>=0)
+      s=top_pair(c);//here is actually chain criterium done
+    else
+      s=NULL;
     if (!s) break;
     nfs++;
     if(curr_deg>=0)
@@ -2215,6 +2320,7 @@ static void go_on_F4 (calc_dat* c){
 	continue;
       }
     }
+    assume(s->i>=0);
     monom_poly h;
     BOOLEAN only_free=FALSE;
     if(s->i>=0)
@@ -2287,7 +2393,7 @@ static void go_on_F4 (calc_dat* c){
     //    PrintS("simplifying ");
     //Print("from %s",pString(chosen[i].m));
     //Print(", %s", pString(chosen[i].f));
-    simplify(chosen[i],c);
+     simplify(chosen[i],c);
     //Print(" to %s",pString(chosen[i].m));
     //Print(", %s \n", pString(chosen[i].f));
   }
@@ -2601,7 +2707,10 @@ static void go_on_F4 (calc_dat* c){
   tgb_matrix* mat=build_matrix(p,p_index,done, done_index,c);
   //mat->print();
   //next Step Gauss
-  simple_gauss(mat);
+  simple_gauss2(mat);
+  //  PrintS("Zeilenstufenform:\n");
+  //mat->print();
+  //PrintS("\n");
   //mat->print();
   //next Step retranslate
 
