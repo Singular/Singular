@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.14 1998-03-04 15:14:54 obachman Exp $ */
+/* $Id: syz0.cc,v 1.15 1998-04-29 07:05:31 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -736,17 +736,6 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   ring origR = currRing;
   sip_sring tmpR;
 
-#ifdef THROW_IT_AWAY_EVENTUALLY
-  if((hom==isHomog)
-  &&(maxlength==pVariables-1)
-  &&(currQuotient==NULL)
-  &&(idRankFreeModule(arg)==0)
-  &&(!idIs0(arg)))
-  {
-   return syLaScala1(arg,length);
-  }  
-#endif
-  
   if ((!isMonomial) && syTestOrder(arg))
   {
     WerrorS("sres only implemented for modules with ordering  ..,c or ..,C");
@@ -821,7 +810,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
 	tmpR.block1 = bl1;
 	tmpR.wvhdl = wv;
 	rComplete(&tmpR);
-        rChangeCurrRing(&tmpR, FALSE);
+        rChangeCurrRing(&tmpR, TRUE);
       }
     }
     if (sort) sort=FALSE;
@@ -855,3 +844,21 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   if (w!=NULL) delete w;
   return res;
 }
+
+syStrategy sySchreyer(ideal arg, int maxlength)
+{
+  int typ0;
+  syStrategy result=(syStrategy)Alloc0(sizeof(ssyStrategy));
+
+  resolvente fr = sySchreyerResolvente(arg,maxlength,&(result->length));
+  result->fullres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
+  for (int i=result->length-1;i>=0;i--)
+  {
+    if (fr[i]!=NULL)
+      result->fullres[i] = fr[i];
+      fr[i] = NULL;
+  }
+  Free((ADDRESS)fr,(result->length)*sizeof(ideal));
+  return result;
+}
+

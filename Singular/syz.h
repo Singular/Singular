@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.7 1998-04-03 17:38:44 Singular Exp $ */
+/* $Id: syz.h,v 1.8 1998-04-29 07:05:30 siebert Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -32,6 +32,7 @@ class ssyStrategy{
   int ** backcomponents;
   int ** Howmuch;
   int ** Firstelem;
+  intvec ** weights;
   resolvente res;
   resolvente orderedRes;
   SRes resPairs;
@@ -54,8 +55,12 @@ void sySchreyersSyzygiesB(polyset F,int Fmax,polyset* Shdl,int* Smax,
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
    BOOLEAN isMonomial=FALSE, BOOLEAN notReplace=FALSE);
 
+syStrategy sySchreyer(ideal arg, int maxlength);
+
 resolvente syResolvente(ideal arg, int maxlength, int * length,
                         intvec *** weights, BOOLEAN minim);
+
+syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim);
 
 resolvente syMinRes(ideal arg, int maxlength, int * length, BOOLEAN minim);
 
@@ -84,5 +89,4 @@ lists syConvRes(syStrategy syzstr);
 syStrategy syConvList(lists li);
 syStrategy syForceMin(lists li);
 syStrategy syMinimize(syStrategy syzstr);
-syStrategy syMakeResolution(resolvente r, int length);
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.8 1998-01-17 18:08:00 Singular Exp $ */
+/* $Id: syz.cc,v 1.9 1998-04-29 07:05:30 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -390,6 +390,39 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   return res;
 }
 
+syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
+{
+  int typ0;
+  syStrategy result=(syStrategy)Alloc0(sizeof(ssyStrategy));
+
+  if (w!=NULL)
+  {
+    result->weights = (intvec**)Alloc0(sizeof(intvec*));
+    (result->weights)[0] = ivCopy(w);
+    result->length = 1;
+  }
+  resolvente fr = syResolvente(arg,maxlength,&(result->length),&(result->weights),minim),fr1;
+  if (minim)
+  {
+    result->minres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
+    fr1 =  result->minres;
+  }
+  else
+  {
+    result->fullres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
+    fr1 =  result->fullres;
+  }
+  for (int i=result->length-1;i>=0;i--)
+  {
+    if (fr[i]!=NULL)
+      fr1[i] = fr[i];
+    fr[i] = NULL;
+  }
+  Free((ADDRESS)fr,(result->length)*sizeof(ideal));
+  return result;
+}
+
+
 resolvente syMinRes(ideal arg, int maxlength, int * length, BOOLEAN minim)
 {
   resolvente res;
@@ -675,6 +708,15 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   {
     cols--;
   }
+  intvec * result;
+  if (idIs0(res[0]))
+  {
+    if (res[0]==NULL)
+      result = new intvec(1,1,1);
+    else
+      result = new intvec(1,1,res[0]->rank);
+    return result;
+  }
   l = max(idRankFreeModule(res[0]),res[0]->rank);
   i = 0;
   while ((i<length) && (res[i]!=NULL))
@@ -712,7 +754,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     temp2 = temp3;
   }
   /*------ computation betti numbers --------------*/
-  intvec * result = new intvec(rows,cols,0);
+  result = new intvec(rows,cols,0);
   (*result)[0] = /*idRankFreeModule(res[0])*/ res[0]->rank;
   if ((!idIs0(res[0])) && ((*result)[0]==0)) (*result)[0] = 1;
   tocancel = (int*)Alloc0((rows+1)*sizeof(int));

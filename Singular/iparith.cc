@@ -1680,7 +1680,8 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     return TRUE;
   }
   int l=0;
-  resolvente r;
+  //resolvente r;
+  syStrategy r;
   intvec **weights=NULL;
   int wmaxl=maxl;
   maxl--;
@@ -1688,27 +1689,29 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     maxl = pVariables-1;
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
-    if (BTEST1(28))
-    {
-      r=syMinRes((ideal)u->Data(),maxl,&l, iiOp==MRES_CMD);
-    }
-    else
+    //if (BTEST1(28))
+    //{
+    //  r=syMinRes((ideal)u->Data(),maxl,&l, iiOp==MRES_CMD);
+    //}
+    //else
     {
       intvec * iv=(intvec*)atGet(u,"isHomog");
-      if (iv!=NULL)
-      {
-        weights = (intvec**)Alloc0(sizeof(intvec*));
-        weights[0] = ivCopy(iv);
-        l=1;
-      }
-      r=syResolvente((ideal)u->Data(),maxl,&l, &weights, iiOp==MRES_CMD);
+      //if (iv!=NULL)
+      //{
+      //  weights = (intvec**)Alloc0(sizeof(intvec*));
+      //  weights[0] = ivCopy(iv);
+      //  l=1;
+      //}
+      //r=syResolvente((ideal)u->Data(),maxl,&l, &weights, iiOp==MRES_CMD);
+      r=syResolution((ideal)u->Data(),maxl, iv, iiOp==MRES_CMD);
     }
   }
   else
-    r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
+  //  r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
+    r=sySchreyer((ideal)u->Data(),maxl+1);
   if (r==NULL) return TRUE;
-  res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
-  //res->data=(void *)syMakeResolution(r,l);
+  //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
+  res->data=(void *)r;
   return FALSE;
 }
 static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
@@ -2049,10 +2052,10 @@ struct sValCmd2 dArith2[]=
 ,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD PROFILER}
 ,{jjMONITOR2,  MONITOR_CMD,    NONE,           STRING_CMD, STRING_CMD PROFILER}
-,{jjRES,       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
-,{jjRES,       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
-//,{jjRES,       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
-//,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
+,{jjRES,       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
+,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD PROFILER}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD PROFILER}
 ,{jjPRINT_FORMAT, PRINT_CMD,   NONE,           DEF_CMD,    STRING_CMD PROFILER}
@@ -2067,19 +2070,19 @@ struct sValCmd2 dArith2[]=
 ,{jjREDUCE_ID, REDUCE_CMD,     IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjREDUCE_ID, REDUCE_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD PROFILER}
 ,{jjREDUCE_ID, REDUCE_CMD,     MODUL_CMD,      MODUL_CMD,  IDEAL_CMD PROFILER}
-,{jjRES,       RES_CMD,        LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
-,{jjRES,       RES_CMD,        LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
-//,{jjRES,       RES_CMD,        RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
-//,{jjRES,       RES_CMD,        RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       RES_CMD,        LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       RES_CMD,        LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
+,{jjRES,       RES_CMD,        RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
+,{jjRES,       RES_CMD,        RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
 ,{jjSTATUS2,   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD PROFILER}
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD PROFILER}
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD PROFILER}
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
-,{jjRES,       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
-,{jjRES,       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
-//,{jjRES,       SRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
-//,{jjRES,       SRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
+,{jjRES,       SRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
+,{jjRES,       SRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
 ,{jjCALL2MANY, SYSTEM_CMD,     ANY_TYPE/*set by p*/,STRING_CMD, DEF_CMD PROFILER}
 ,{jjSTD_1,     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
 ,{jjSTD_1,     STD_CMD,        MODUL_CMD,      MODUL_CMD,  VECTOR_CMD PROFILER}
@@ -3212,7 +3215,7 @@ struct sValCmd1 dArith1[]=
 ,{jjREAD,       READ_CMD,        STRING_CMD,     LINK_CMD }
 ,{jjREGULARITY, REGULARITY_CMD,  INT_CMD,        LIST_CMD }
 ,{jjRESERVEDNAME,RESERVEDNAME_CMD, INT_CMD,      STRING_CMD }
-//,{jjL2R,        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD }
+,{jjL2R,        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD }
 ,{jjDUMMY,      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD }
 ,{jjWRONG,      ROWS_CMD,        0,              POLY_CMD }
 ,{jjpMaxComp,   ROWS_CMD,        XS(INT_CMD),    VECTOR_CMD }

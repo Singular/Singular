@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.6 1998-04-01 18:59:29 Singular Exp $ */
+/* $Id: lists.cc,v 1.7 1998-04-29 07:05:29 siebert Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -13,6 +13,7 @@
 #include "ideals.h"
 #include "attrib.h"
 #include "ipshell.h"
+#include "intvec.h"
 #include "lists.h"
 
 lists lCopy(lists L)
@@ -207,7 +208,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
     reallen=max(reallen,length);
     L->Init(reallen);
     int i=0;
-  
+
     while (i<length)
     {
       if (r[i]!=NULL)
@@ -275,9 +276,10 @@ lists liMakeResolv(resolvente r, int length, int reallen,
   return L;
 }
 
-resolvente liFindRes(lists L, int * len, int *typ0)
+resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
 {
   resolvente r;
+  intvec ** w=NULL,*tw=NULL;
 
   *len=L->nr+1;
   if (*len<=0)
@@ -286,6 +288,7 @@ resolvente liFindRes(lists L, int * len, int *typ0)
     return NULL;
   }
   r=(ideal *)Alloc0((*len)*sizeof(ideal));
+  w=(intvec**)Alloc0((*len)*sizeof(intvec*));
   int i=0;
   *typ0=MODUL_CMD;
   while (i<(*len))
@@ -306,7 +309,30 @@ resolvente liFindRes(lists L, int * len, int *typ0)
       break;
     }
     r[i]=(ideal)L->m[i].data;
+    tw=(intvec*)atGet((idhdl)&L->m[i],mstrdup("isHomog"));
+    if (tw!=NULL)
+    {
+      w[i]=ivCopy(tw);
+    }
+    tw = NULL;
     i++;
+  }
+  BOOLEAN hom_complex=TRUE;
+  int j=0;
+  while ((j<i) && hom_complex)
+  {
+    hom_complex = hom_complex && (w[i]!=NULL);
+    j++;
+  }
+  if ((!hom_complex) || (weights==NULL))
+  {
+    for (j=0;j<i;j++)
+      if (w[j]!=NULL) delete w[j];
+    Free((ADDRESS)w,(*len)*sizeof(intvec*));
+  }
+  else
+  {
+    *weights = w;
   }
   //Print("find res of length %d (0..%d) L:%d\n",*len,(*len)-1,L->nr);
   return r;
