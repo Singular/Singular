@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.16 1998-07-23 09:07:02 Singular Exp $ */
+/* $Id: polys.h,v 1.17 1998-12-01 17:23:31 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -141,6 +141,7 @@ extern pFDegProc pFDeg;
 int pDeg(poly p);
 int pTotaldegree(poly p);
 int pWTotaldegree(poly p);
+int pWDegree(poly p);
 
 /*-------------pComp for syzygies:-------------------*/
 
