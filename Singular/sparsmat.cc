@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.38 2000-09-19 12:18:34 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.39 2000-09-21 11:15:31 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -37,10 +37,9 @@ struct smprec{
 /* declare internal 'C' stuff */
 static void smExactPolyDiv(poly, poly);
 static BOOLEAN smIsNegQuot(poly, const poly, const poly);
-static poly smEMult(poly, const poly);
 static BOOLEAN smCheckLead(const poly, const poly);
-static poly smDMult(poly, const poly);
-static void smComplete(poly, const poly, const poly);
+static poly smSelectCopy(poly, const poly);
+static void smExpMultDiv(poly, const poly, const poly);
 static void smPolyDivN(poly, const number);
 static BOOLEAN smSmaller(poly, poly);
 static void smCombineChain(poly *, poly);
@@ -1694,13 +1693,13 @@ poly smMult(poly a, poly b)
     if (pIsConstantComp(b))
       return ppMult_nn(a, pGetCoeff(b));
     else
-      return smEMult(a, b);
+      return ppMult_mm(a, b);
   }
-  pa = res = smEMult(a, b);
+  pa = res = ppMult_mm(a, b);
   pIter(b);
   do
   {
-    r = smEMult(a, b);
+    r = ppMult_mm(a, b);
     smCombineChain(&pa, r);
     pIter(b);
   } while (b != NULL);
@@ -1785,13 +1784,13 @@ poly smMultDiv(poly a, poly b, const poly c)
       if (pIsConstantComp(b))
         return ppMult_nn(a, pGetCoeff(b));
       else
-        return smEMult(a, b);
+        return ppMult_mm(a, b);
     }
-    pa = res = smEMult(a, b);
+    pa = res = ppMult_mm(a, b);
     pIter(b);
     do
     {
-      r = smEMult(a, b);
+      r = ppMult_mm(a, b);
       smCombineChain(&pa, r);
       pIter(b);
     } while (b != NULL);
@@ -1806,13 +1805,13 @@ poly smMultDiv(poly a, poly b, const poly c)
     if (smIsNegQuot(e, b, c))
     {
       lead = smCheckLead(a, e);
-      r = smDMult(a, e);
-      smComplete(r, b, c);
+      r = smSelectCopy(a, e);
+      smExpMultDiv(r, b, c);
     }
     else
     {
       lead = TRUE;
-      r = smEMult(a, e);
+      r = ppMult_mm(a, e);
     }
     if (lead)
     {
@@ -1841,8 +1840,8 @@ poly smMultDiv(poly a, poly b, const poly c)
     pSetCoeff0(e,pGetCoeff(b));
     if (smIsNegQuot(e, b, c))
     {
-      r = smDMult(a, e);
-      smComplete(r, b, c);
+      r = smSelectCopy(a, e);
+      smExpMultDiv(r, b, c);
       if (smCheckLead(a, e))
         smCombineChain(&pa, r);
       else
@@ -1850,7 +1849,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     }
     else
     {
-      r = smEMult(a, e);
+      r = ppMult_mm(a, e);
       smCombineChain(&pa, r);
     }
     pIter(b);
@@ -1891,11 +1890,11 @@ static void smExactPolyDiv(poly a, poly b)
     pSetCoeff0(e,yn);
     if (smIsNegQuot(e, a, b))
     {
-      h = smDMult(tail, e);
-      smComplete(h, a, b);
+      h = smSelectCopy(tail, e);
+      smExpMultDiv(h, a, b);
     }
     else
-      h = smEMult(tail, e);
+      h = ppMult_mm(tail, e);
     nDelete(&yn);
     a = pNext(a) = pAdd(pNext(a), h);
   } while (a!=NULL);
@@ -1924,31 +1923,8 @@ static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
     {
       pSetExp(a,i, pGetExp(b,i)-pGetExp(c,i));
     }
+    pSetm(a);
     return FALSE;
-  }
-}
-
-static poly smEMult(poly t, const poly e)
-{
-  const number y = pGetCoeff(e);
-  poly res, h;
-  int i;
-
-  h = res = pNew();
-  loop
-  {
-    pExpVectorCopy(h,t);
-    for (i=pVariables; i; i--)
-      pAddExp(h,i,pGetExp(e,i));
-    pSetm(h);
-    pSetCoeff0(h,nMult(y,pGetCoeff(t)));
-    pIter(t);
-    if (t == NULL)
-    {
-      pNext(h) = NULL;
-      return res;
-    }
-    h = pNext(h) = pNew();
   }
 }
 
@@ -1965,7 +1941,7 @@ static BOOLEAN smCheckLead(const poly t, const poly e)
   return TRUE;
 }
 
-static poly smDMult(poly t, const poly e)
+static poly smSelectCopy(poly t, const poly e)
 {
   const number y = pGetCoeff(e);
   poly res, h;
@@ -1995,17 +1971,13 @@ static poly smDMult(poly t, const poly e)
   }
 }
 
-static void smComplete(poly t, const poly b, const poly c)
+static void smExpMultDiv(poly t, const poly b, const poly c)
 {
   int i;
   while(t!=NULL)
   {
-    for (i=pVariables; i; i--)
-    {
-      pAddExp(t,i,pGetExp(b,i));
-      pSubExp(t,i,pGetExp(c,i));
-    }
-    pSetm(t);
+    pExpVectorAdd(t,b);
+    pExpVectorSub(t,c);
     pIter(t);
   }
 }
