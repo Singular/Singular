@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.34 2000-02-29 16:32:35 Singular Exp $ */
+/* $Id: polys1.cc,v 1.35 2000-03-31 15:32:24 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -427,11 +427,19 @@ poly pPower(poly p, int i)
 
   if(p!=NULL)
   {
+#ifdef HAVE_SHIFTED_EXPONENTS
+    if (i > currRing->bitmask)
+    {
+      Werror("exponent is too large, max. is %d",currRing->bitmask);
+      return NULL;
+    }
+#else
     if (i > EXPONENT_MAX)
     {
       Werror("exponent is too large, max. is %d",EXPONENT_MAX);
       return NULL;
     }
+#endif
     switch (i)
     {
       case 0:

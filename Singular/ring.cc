@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.101 2000-03-31 13:19:19 Singular Exp $ */
+/* $Id: ring.cc,v 1.102 2000-03-31 15:32:24 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2241,6 +2241,10 @@ unsigned long rGetExpSize(unsigned long bitmask, int & bits)
   if (bitmask == 0)
   {
     bits=16; bitmask=0xffff;
+  }
+  else if (bitmask <= 1)
+  {
+    bits=1; bitmask = 1;
   }
   else if (bitmask <= 3)
   {
