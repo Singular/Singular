@@ -3,13 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.29 2003-03-04 09:24:37 Singular Exp $ */
+/* $Id: ipshell.h,v 1.30 2003-12-09 18:15:26 Singular Exp $ */
 /*
 * ABSTRACT
 */
 #include <stdio.h>
 #include "structs.h"
-#include "subexpr.h"
 
 extern int  traceit ;
 #define TRACE_SHOW_PROC   1
@@ -25,6 +24,7 @@ extern int  myynest;
 extern char *  currid;
 extern int     iiRETURNEXPR_len;
 extern sleftv *iiRETURNEXPR;
+const char sNoName[]="_";
 #ifdef USE_IILOCALRING
 extern ring   *iiLocalRing;
 #endif
