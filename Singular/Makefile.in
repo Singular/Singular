@@ -78,7 +78,7 @@ CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c mmheap.c mmspec.c mmutil.c
 
 SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l
 
-HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h grammar.h\
+HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
@@ -91,7 +91,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h grammar.h\
 	kutil.h mpsr_Put.h spolys0.h
 
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
-	mod2.h.in testgh
+	mod2.h.in grammar.h testgh
 
 OBJS=grammar.o scanner.o matpol.o binom.o\
      febase.o feread.o timer.o intvec.o attrib.o lists.o\
@@ -140,7 +140,7 @@ iparith.inc : ${OBJS} iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h
 	./gentable
 	/bin/rm gentable
 
-version.h: ${DISTFILES}
+version.h: ${SOURCES} ${HEADERS} Makefile.in configure.in
 	echo "#define VERSION_ID " `date '+%y%m%d%H'` >version.h
 
 mod2.h: configure mod2.h.in 
