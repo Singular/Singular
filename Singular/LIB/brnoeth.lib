@@ -1,5 +1,5 @@
-version="$Id: brnoeth.lib,v 1.12 2001-08-27 14:47:46 Singular Exp $";
-category="Miscellaneous";
+version="$Id: brnoeth.lib,v 1.13 2004-02-17 16:03:20 Singular Exp $";
+category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
 AUTHORS:   Jose Ignacio Farran Martin, ignfar@eis.uva.es
@@ -10,12 +10,12 @@ OVERVIEW:
  Riemann-Roch problem and applications in Algebraic Geometry codes.
  The computation of Weierstrass semigroups is also implemented.@*
  The procedures are intended only for plane (singular) curves defined over
- a prime field of positive charateristic.@*
+ a prime field of positive characteristic.@*
  For more information about the library see the end of the file brnoeth.lib.
 
 MAIN PROCEDURES:
  Adj_div(f);            computes the conductor of a curve
- NSplaces(h,A);         computes non-singular places up to given degree
+ NSplaces(h,A);         computes non-singular places with given degrees
  BrillNoether(D,C);     computes a vector space basis of the linear system L(D)
  Weierstrass(P,m,C);    computes the Weierstrass semigroup of C at P up to m
  extcurve(d,C);         extends the curve C to an extension of degree d
@@ -513,7 +513,7 @@ static proc subset (ideal I,ideal J)
 {
   // checks wether I is contained in J and returns a boolean
   // remark : J is assumed to be given by a standard basis
-  int s=size(I);
+  int s=ncols(I);
   int i;
   for (i=1;i<=s;i=i+1)
   {
@@ -839,15 +839,8 @@ static proc subfield (sf)
           FF2=list();
         }
         kill(FF2);
-//        list Fp;
-//        ideal facs=factorize(x^(q-1)-1,1);
-//        for (i=1;i<=q-1;i=i+1)
-//        {
-//          Fq[i]=number(subst(facs[i],x,0));
-//        }
         for (i=1;i<=q-1;i=i+1)
         {
-//          b=Fq[i];
           b=FF1[i];
           if (subst(mpol,x,b)==0)
           {
@@ -1154,7 +1147,8 @@ static proc place (intvec Pp,int sing,list CURVE)
   export(CHI);
   int i,j,k;
   int m,n;
-  list L@HNE=essdevelop(CHI);
+//  list L@HNE=essdevelop(CHI);
+  list L@HNE=ratdevelop(CHI);
   export(L@HNE);
   int n_branches=size(L@HNE);
   list Li_aux=list();
@@ -1197,6 +1191,9 @@ static proc place (intvec Pp,int sing,list CURVE)
           }
         }
       }
+////////
+check=0;
+////////
       if (size(update_CURVE[5])>0)
       {
         if (typeof(update_CURVE[5][1])=="list")
@@ -1311,6 +1308,9 @@ static proc place (intvec Pp,int sing,list CURVE)
       for (i=1;i<=n_branches;i=i+1)
       {
         ext_0=dgs[i];
+////////
+check=0;
+////////
         if (size(update_CURVE[5])>=ext_0)
         {
           if (typeof(update_CURVE[5][ext_0])=="list")
@@ -1463,6 +1463,9 @@ static proc place (intvec Pp,int sing,list CURVE)
           }
         }
       }
+////////
+check=0;
+////////
       if (size(update_CURVE[5])>=ext2)
       {
         if (typeof(update_CURVE[5][ext2])=="list")
@@ -1603,6 +1606,9 @@ static proc place (intvec Pp,int sing,list CURVE)
         // first compute the actual degree of each branch and check if the
         // local ring exists
         ext_0=ext1*dgs[i];
+////////
+check=0;
+////////
         if (size(update_CURVE[5])>=ext_0)
         {
           if (typeof(update_CURVE[5][ext_0])=="list")
@@ -2151,14 +2157,13 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc NSplaces (int h,list CURVE)
-"USAGE:   NSplaces( h, CURVE ), where h is an integer and CURVE is a list
-RETURN:   list L with updated data of CURVE after computing all
-          points up to degree H+h (H the maximum degree of the previously
-          computed places): @*
+proc NSplaces (intvec h,list CURVE)
+"USAGE:   NSplaces( h, CURVE ), where h is an intvec and CURVE is a list
+RETURN:   list L with updated data of CURVE after computing all non-singular
+          affine closed places whose degrees are in the intvec h: @*
    @format
    in L[1][1]: (affine ring) lists Aff_Points(d) with affine non-singular
-               points of degree d (if non-empty)
+               (closed) points of degree d (if non-empty),
    in L[3]:    the newly computed closed places are added,
    in L[5]:    local rings created/updated to store (repres. of) new places.
    @end format
@@ -2170,42 +2175,44 @@ SEE ALSO: closed_points, Adj_div
 EXAMPLE:  example NSplaces; shows an example
 "
 {
-  // computes all the non-singular closed places with degree up to a certain
-  // bound; this bound is the maximum degree of an existing singular place or
-  // non-singular place at infinity plus an increment h>=0 which is given as
-  // input
+  // computes all the non-singular affine (closed) places with fixed degrees
   // creates lists of points and the corresponding places
   // list CURVE must be the output of the procedure "Adj_div"
-  // warning : if h<0 then it will be replaced by h=0
+  // notice : if h==0 then nothing is done
+  // warning : non-positive entries are forgotten
+  if (h==0)
+  {
+    return(CURVE);
+  }
   intvec opgt=option(get);
   option(redSB);
   def Base_R=basering;
   def aff_r=CURVE[1][1];
-  int M=size(CURVE[5]);
-  if (h>0)
-  {
-    M=M+h;
-  }
+  int M=size(h);
   list update_CURVE=CURVE;
-  int i,j,s;
+  int i,j,l,s;
   setring aff_r;
   intvec pP=1,0,0;
   for (i=1;i<=M;i=i+1)
   {
-    dbprint(printlevel+1,"Computing non-singular affine places of degree "
-                           +string(i)+" ... ");
-    if (defined(Aff_Points(i))==0)
+    l=h[i];
+    if (l>0)
     {
-      list Aff_Points(i)=closed_points_deg(CHI,i,Aff_SLocus);
-      s=size(Aff_Points(i));
-      if (s>0)
+      dbprint(printlevel+1,"Computing non-singular affine places of degree "
+                             +string(l)+" ... ");
+      if (defined(Aff_Points(l))==0)
       {
-        export(Aff_Points(i));
-        pP[2]=i;
-        for (j=1;j<=s;j=j+1)
+        list Aff_Points(l)=closed_points_deg(CHI,l,Aff_SLocus);
+        s=size(Aff_Points(l));
+        if (s>0)
         {
-          pP[3]=j;
-          update_CURVE=place(pP,0,update_CURVE);
+          export(Aff_Points(l));
+          pP[2]=l;
+          for (j=1;j<=s;j=j+1)
+          {
+            pP[3]=j;
+            update_CURVE=place(pP,0,update_CURVE);
+          }
         }
       }
     }
@@ -2223,8 +2230,8 @@ example
   list C=Adj_div(x3y+y3+x);
   // The list of computed places:
   C[3];
-  // create places up to degree 1+3
-  list L=NSplaces(3,C);
+  // create places up to degree 4
+  list L=NSplaces(1..4,C);
   // The list of computed places is now:
   L[3];
   // e.g., affine non-singular points of degree 4 :
@@ -3368,7 +3375,7 @@ example
   printlevel=-1;
   ring s=2,(x,y),lp;
   list C=Adj_div(x3y+y3+x);
-  C=NSplaces(3,C);
+  C=NSplaces(1..4,C);
   // the first 3 Places in C[3] are of degree 1.
   // we define the rational divisor G = 4*C[3][1]+4*C[3][3] (of degree 8):
   intvec G=4,0,4;
@@ -3623,7 +3630,7 @@ example
   printlevel=-1;
   ring s=2,(x,y),lp;
   list C=Adj_div(x3y+y3+x);
-  C=NSplaces(3,C);
+  C=NSplaces(1..4,C);
   def R=C[1][2];
   setring R;
   // Place C[3][1] has degree 1 (i.e it is rational);
@@ -3792,11 +3799,18 @@ static proc disj_divs (intvec H,intvec P,list EC)
   {
     if ( (s mod i) == 0 )
     {
-      def auxR=EC[5][i][1];
-      setring auxR;
-      auxIV[i]=size(POINTS);
-      setring BRing;
-      kill(auxR);
+      if (typeof(EC[5][i])=="list")
+      {
+        def auxR=EC[5][i][1];
+        setring auxR;
+        auxIV[i]=size(POINTS);
+        setring BRing;
+        kill(auxR);
+      }
+      else
+      {
+        auxIV[i]=0;
+      }
     }
     else
     {
@@ -3812,7 +3826,7 @@ static proc disj_divs (intvec H,intvec P,list EC)
       if ( (s mod d) == 0 )
       {
         l=iw[2];
-        // check that this place(s) are not in sup(D)
+        // check that this place(s) is/are not in sup(D)
         if (d==1)
         {
           for (j=1;j<=s2;j=j+1)
@@ -3911,7 +3925,7 @@ example
   printlevel=-1;
   ring s=2,(x,y),lp;
   list HC=Adj_div(x3+y2+y);
-  HC=NSplaces(1,HC);
+  HC=NSplaces(1..2,HC);
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
@@ -3958,7 +3972,7 @@ example
   printlevel=-1;
   ring s=2,(x,y),lp;
   list HC=Adj_div(x3+y2+y);
-  HC=NSplaces(1,HC);
+  HC=NSplaces(1..2,HC);
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
@@ -3990,16 +4004,18 @@ RETURN:   list L which is the update of the list CURVE with additional entries
           is the update of the list CURVE with additional entries
    @format
    L[1][5]: ring p,(x,y,t),ls,
-   L[2][3]: int  (the number of places over the base field).
+   L[2][3]: int  (the number of computed places over the base field).
    @end format
           In both cases, in the ring L[1][5] lists with the data for all the
-          rational places (after a field extension of degree d) are
+          computed rational places (after a field extension of degree d) are
           created (see @ref{Adj_div}):
    @format
    lists POINTS, LOC_EQS, BRANCHES, PARAMETRIZATIONS.
    @end format
-NOTE:     The list CURVE should be the output of @code{NSplaces} and has
-          to contain (at least) all places up to degree d. @*
+NOTE:     The list CURVE should be the output of @code{NSplaces},
+          and must contain (at least) one place of degree d. @*
+          You actually need all the places with degree dividing d.
+          Otherwise, not all the places are computed, but only part of them. @*
           This procedure must be executed before constructing AG codes,
           even if no extension is needed. The ring L[1][4] must be active
           when constructing codes over the field extension.@*
@@ -4046,80 +4062,83 @@ EXAMPLE:  example extcurve; shows an example
   }
   else
   {
-    if (size(CURVE[5])>=d)
+    // exclude the case when no place of degree d was previously computed/found
+    int dd=size(CURVE[5]);
+    if (dd<d)
     {
-      int i,j,k;
-      if (typeof(CURVE[5][d])=="list")
+      ERROR("you did not compute/find any place of degree "+string(d));
+    }
+    if (typeof(CURVE[5][d])<>"list")
+    {
+      ERROR("you did not compute/find any place of degree "+string(d));
+    }
+
+    // Define the ring "RatPl" :
+    def S(d)=CURVE[5][d][1];
+    setring S(d);
+    string smin=string(minpoly);
+    setring BR;
+    ring RatPl=(char(basering),a),(x,y,t),ls;
+    execute("minpoly="+smin+";");
+
+    // import data from local ring S(d)
+    list POINTS=imap(S(d),POINTS);
+    list LOC_EQS=imap(S(d),LOC_EQS);
+    list BRANCHES=imap(S(d),BRANCHES);
+    list PARAMETRIZATIONS=imap(S(d),PARAMETRIZATIONS);
+    kill(S(d));
+
+    // conjugate data from S(d)
+    int s=size(POINTS);
+    int counter=0;
+    int piv=0;
+    int i,j,k;
+    for (j=1;j<=s;j=j+1)
+    {
+      counter=counter+1;
+      piv=counter;
+      for (k=1;k<d;k=k+1)
       {
-        def S(d)=CURVE[5][d][1];
-        setring S(d);
-      }
-      else
-      {
-        ring S(d)=char(basering),t,ls;
-        list POINTS=list();
-      }
-      string smin=string(minpoly);
-      setring BR;
-      ring RatPl=(char(basering),a),(x,y,t),ls;
-      execute("minpoly="+smin+";");
-      list POINTS=imap(S(d),POINTS);
-      list LOC_EQS=imap(S(d),LOC_EQS);
-      list BRANCHES=imap(S(d),BRANCHES);
-      list PARAMETRIZATIONS=imap(S(d),PARAMETRIZATIONS);
-      kill(S(d));
-      int s=size(POINTS);
-      int counter=0;
-      int piv=0;
-      for (j=1;j<=s;j=j+1)
-      {
+        POINTS=insert(POINTS,Frobenius(POINTS[piv],1),counter);
+        LOC_EQS=insert(LOC_EQS,Frobenius(LOC_EQS[piv],1),counter);
+        BRANCHES=insert(BRANCHES,conj_b(BRANCHES[piv],1),counter);
+        PARAMETRIZATIONS=insert(PARAMETRIZATIONS,Frobenius(
+                                  PARAMETRIZATIONS[piv],1),counter);
         counter=counter+1;
         piv=counter;
-        for (k=1;k<d;k=k+1)
-        {
-          POINTS=insert(POINTS,Frobenius(POINTS[piv],1),counter);
-          LOC_EQS=insert(LOC_EQS,Frobenius(LOC_EQS[piv],1),counter);
-          BRANCHES=insert(BRANCHES,conj_b(BRANCHES[piv],1),counter);
-          PARAMETRIZATIONS=insert(PARAMETRIZATIONS,Frobenius(
-                                             PARAMETRIZATIONS[piv],1),counter);
-          counter=counter+1;
-          piv=counter;
-        }
       }
-      string olda;
-      poly paux;
-      intvec iv,iw;
-      int ii,jj,kk,m,n;
-      for (i=d-1;i>=2;i=i-1)
+    }
+
+    // now the same thing for smaller base fields
+    string olda;
+    poly paux;
+    intvec iv,iw;
+    int ii,jj,kk,m,n;
+    for (i=d-1;i>=2;i=i-1)
+    {
+      if ( (d mod i)==0 )
       {
-        if ( (d mod i)==0 )
+        if (typeof(CURVE[5][i])=="list")
         {
-          if (typeof(CURVE[5][i])=="list")
-          {
-            def S(i)=CURVE[5][i][1];
-          }
-          else
-          {
-            ring S(i)=char(basering),t,ls;
-            list POINTS=list();
-            setring BR;
-           }
+          def S(i)=CURVE[5][i][1];
+          // embedd S(i) inside basering == RatPl " ==S(d) "
           olda=subfield(S(i));
           setring S(i);
           s=size(POINTS);
           setring RatPl;
+          // import data from S(i)
           for (j=s;j>=1;j=j-1)
           {
             counter=0;
             POINTS=insert(POINTS,list(),0);
             POINTS[1][1]=number(importdatum(S(i),"POINTS["+string(j)
-                                                            +"][1]",olda));
+                                                          +"][1]",olda));
             POINTS[1][2]=number(importdatum(S(i),"POINTS["+string(j)
-                                                            +"][2]",olda));
+                                                          +"][2]",olda));
             POINTS[1][3]=number(importdatum(S(i),"POINTS["+string(j)
-                                                            +"][3]",olda));
+                                                          +"][3]",olda));
             LOC_EQS=insert(LOC_EQS,importdatum(S(i),"LOC_EQS["+string(j)
-                                                            +"]",olda),0);
+                                                          +"]",olda),0);
             BRANCHES=insert(BRANCHES,list(),0);
             setring S(i);
             m=nrows(BRANCHES[j][1]);
@@ -4139,7 +4158,7 @@ EXAMPLE:  example extcurve; shows an example
               for (jj=1;jj<=n;jj=jj+1)
               {
                 Maux[ii,jj]=importdatum(S(i),"BRANCHES["+string(j)
-                                 +"][1]["+string(ii)+","+string(jj)+"]",olda);
+                               +"][1]["+string(ii)+","+string(jj)+"]",olda);
               }
             }
             BRANCHES[1][1]=Maux;
@@ -4162,7 +4181,7 @@ EXAMPLE:  example extcurve; shows an example
               LOC_EQS=insert(LOC_EQS,Frobenius(LOC_EQS[piv],1),counter);
               BRANCHES=insert(BRANCHES,conj_b(BRANCHES[piv],1),counter);
               PARAMETRIZATIONS=insert(PARAMETRIZATIONS,Frobenius(
-                                             PARAMETRIZATIONS[piv],1),counter);
+                                        PARAMETRIZATIONS[piv],1),counter);
             }
             setring S(i);
             kill(par@1,par@2);
@@ -4171,52 +4190,45 @@ EXAMPLE:  example extcurve; shows an example
           kill(S(i));
         }
       }
-      kill(iw);
-      kill(paux);
-      if (typeof(CURVE[5][1])=="list")
-      {
-        def S(1)=CURVE[5][1][1];
-      }
-      else
-      {
-        ring S(1)=char(basering),t,ls;
-        list POINTS=list();
-        setring RatPl;
-      }
+    }
+    kill(iw);
+    kill(paux);
+
+    // finally add points from S(1)
+    if (typeof(CURVE[5][1])=="list")
+    {
+      def S(1)=CURVE[5][1][1];
       POINTS=imap(S(1),POINTS)+POINTS;
       LOC_EQS=imap(S(1),LOC_EQS)+LOC_EQS;
       BRANCHES=imap(S(1),BRANCHES)+BRANCHES;
       PARAMETRIZATIONS=imap(S(1),PARAMETRIZATIONS)+PARAMETRIZATIONS;
-      export(POINTS);
-      export(LOC_EQS);
-      export(BRANCHES);
-      export(PARAMETRIZATIONS);
-      int NrRatPl=size(POINTS);
-      ext_CURVE[2][3]=NrRatPl;
-      setring BR;
-      ext_CURVE[1][5]=RatPl;
-      ring r(d)=(char(basering),a),(x,y),lp;
-      execute("minpoly="+smin+";");
-      setring BR;
-      ext_CURVE[1][3]=r(d);
-      ring R(d)=(char(basering),a),(x,y,z),lp;
-      execute("minpoly="+smin+";");
-      setring BR;
-      ext_CURVE[1][4]=R(d);
-      dbprint(printlevel+1,"");
-      dbprint(printlevel+2,"Total number of rational places : NrRatPl = "
+    }
+
+    // prepare data for output
+    export(POINTS);
+    export(LOC_EQS);
+    export(BRANCHES);
+    export(PARAMETRIZATIONS);
+    int NrRatPl=size(POINTS);
+    ext_CURVE[2][3]=NrRatPl;
+    setring BR;
+    ext_CURVE[1][5]=RatPl;
+    ring r(d)=(char(basering),a),(x,y),lp;
+    execute("minpoly="+smin+";");
+    setring BR;
+    ext_CURVE[1][3]=r(d);
+    ring R(d)=(char(basering),a),(x,y,z),lp;
+    execute("minpoly="+smin+";");
+    setring BR;
+    ext_CURVE[1][4]=R(d);
+    dbprint(printlevel+1,"");
+    dbprint(printlevel+2,"Total number of rational places : NrRatPl = "
                                    +string(NrRatPl));
-      dbprint(printlevel+1,"");
-      kill(S(1));
-      kill(R(d));
-      kill(RatPl);
-      return(ext_CURVE);
-    }
-    else
-    {
-      ERROR("you must compute first all the places up to degree "+string(d));
-      return();
-    }
+    dbprint(printlevel+1,"");
+    kill(S(1));
+    kill(R(d));
+    kill(RatPl);
+    return(ext_CURVE);
   }
 }
 example
@@ -4226,7 +4238,7 @@ example
   printlevel=-1;
   ring s=2,(x,y),lp;
   list C=Adj_div(x5+y2+y);
-  C=NSplaces(3,C);
+  C=NSplaces(1..4,C);
   // since we have all points up to degree 4, we can extend the curve
   // to that extension, in order to get rational points over F_16;
   C=extcurve(4,C);
@@ -4362,7 +4374,7 @@ example
   printlevel=-1;
   ring s=2,(x,y),lp;
   list HC=Adj_div(x3+y2+y);
-  HC=NSplaces(1,HC);
+  HC=NSplaces(1..2,HC);
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
@@ -4512,7 +4524,7 @@ example
   printlevel=-1;
   ring s=2,(x,y),lp;
   list HC=Adj_div(x3+y2+y);
-  HC=NSplaces(1,HC);
+  HC=NSplaces(1..2,HC);
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
@@ -4648,20 +4660,22 @@ EXAMPLE:  example sys_code; shows an example
   // convert the diagonal into ones
   for (i=1;i<=m;i=i+1)
   {
-    for (j=i;j<=n;j=j+1)
+    for (j=i+1;j<=n;j=j+1)
     {
       A[i,j]=A[i,j]/A[i,i];
     }
+    A[i,i]=1;
   }
   // complete a block with the identity matrix
   for (k=1;k<m;k=k+1)
   {
     for (i=k+1;i<=m;i=i+1)
     {
-      for (j=i;j<=n;j=j+1)
+      for (j=i+1;j<=n;j=j+1)
       {
         A[k,j]=A[k,j]-A[i,j]*A[k,i];
       }
+      A[k,i]=0;
     }
   }
   // compute a parity-check matrix in standard form
@@ -4687,6 +4701,61 @@ example
   // we can check that both codes are dual to each other
   print(L[1]*transpose(L[2]));
 }
+
+////////////// this procedure should move in hnoether.lib /////////
+static proc ratdevelop (poly chi)
+{
+  def r=basering;
+  int k1=res_deg();
+  list HND=essdevelop(chi);
+  int k2=res_deg();
+  if (k1<k2)
+  {
+    int N=size(HND);
+    list CB=list();
+    int i,j,k,d;
+    intvec dgs;
+    list auxL=list();
+    intvec auxiv;
+    for (i=1;i<=N;i++)
+    {
+      CB[i]=conj_bs(HND[i],k1);
+      dgs[i]=size(CB[i]);
+    }
+    for (i=1;i<N;i++)
+    {
+      for (j=i+1;j<=N;j++)
+      {
+        if (dgs[i]==dgs[j])
+        {
+          d=dgs[i];
+          for (k=1;k<=d;k++)
+          {
+            if (intersection(CB[i][1],CB[j][k])==-1)
+            {
+              HND=delete(HND,j);
+              CB=delete(CB,j);
+//              dgs=delete(dgs,j);
+              execute("auxL="+string(dgs)+";");
+              auxL=delete(auxL,j);
+              execute("dgs="+string(auxL)+";");
+              N=N-1;
+              j=j-1;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  keepring(HNEring);
+  return(HND);
+}
+;
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -4746,12 +4815,9 @@ Plane curves :
             with their corresponding degrees; thus, you can now decide
             how many other points you want to compute with NSplaces.
 
-      (1.2) CURVE=NSplaces(range,CURVE);
+      (1.2) CURVE=NSplaces(degrees,CURVE);
 
-            See help NSplaces tp know the meaning of "range";
-            for instance, if you have that the singular places
-            have degree 2 at most and you want all the places
-            up to degree 5, you must write range=3.
+            "degrees" is an intvec with the degrees we want to compute
 
       (1.3) CURVE=extcurve(extension,CURVE);
 
@@ -4833,7 +4899,7 @@ Special Issues :
 proc Klein ()
 {
   list KLEIN=Adj_div(x3y+y3+x);
-  KLEIN=NSplaces(2,KLEIN);
+  KLEIN=NSplaces(1..3,KLEIN);
   KLEIN=extcurve(3,KLEIN);
   dbprint(printlevel+1,"Klein quartic over F_8 successfully constructed");
   return(KLEIN);
@@ -4844,7 +4910,7 @@ proc Hermite (int m)
   int p=char(basering);
   int r=p^m;
   list HERMITE=Adj_div(y^r+y-x^(r+1));
-  HERMITE=NSplaces(2*m-1,HERMITE);
+  HERMITE=NSplaces(1..2*m,HERMITE);
   HERMITE=extcurve(2*m,HERMITE);
   dbprint(printlevel+1,"Hermitian curve over F_("+string(r)+"^2)
                           successfully constructed");
@@ -4854,7 +4920,7 @@ proc Hermite (int m)
 proc Suzuki ()
 {
   list SUZUKI=Adj_div(x10+x3+y8+y);
-  SUZUKI=NSplaces(2,SUZUKI);
+  SUZUKI=NSplaces(1..3,SUZUKI);
   SUZUKI=extcurve(3,SUZUKI);
   dbprint(printlevel+1,"Suzuki curve over F_8 successfully constructed");
   return(SUZUKI);
@@ -4865,14 +4931,14 @@ proc Suzuki ()
 // A hyperelliptic curve with 33 rational points over F_16
 
 list CURVE=Adj_div(x5+y2+y);
-CURVE=NSplaces(3,CURVE);
+CURVE=NSplaces(1..4,CURVE);
 CURVE=extcurve(4,CURVE);
 
 // A nice curve with 113 rational points over F_64
 
 list CURVE=Adj_div(y9+y8+xy6+x2y3+y2+x3);
-CURVE=NSplaces(4,CURVE);
+intvec ww=1,2,3,6;
+CURVE=NSplaces(ww,CURVE);
 CURVE=extcurve(6,CURVE);
 
 */
-;
