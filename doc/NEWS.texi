@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.15 2000-06-15 11:26:51 obachman Exp $
+@comment $Id: NEWS.texi,v 1.16 2000-07-11 12:29:31 obachman Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -137,6 +137,14 @@ solve Vandermonde linear system
 
 @heading @sc{Singular} functions whose syntax/semantics has changed
 @table @asis
+@item @nref{coeffs}
+Extended possible syntax to 
+@code{coeffs(ideal,ideal)} and @code{coeffs(module,module)} which is
+equivalent to @code{coeffs(ideal,ideal,p)} and
+@code{coeffs(module,module,p)} wher @code{p} is a polynomial consisting
+of all ring variables.
+@item @nref{execute}
+parenthesis around argument of execute is now @strong{mandatory}.
 @item @nref{lift}
 new implementation (unified handling of isSB and not isSB case); new
 optional third argument (a matrix name), which, if given, stores the

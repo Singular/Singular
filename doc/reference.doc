@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.191 2000-06-05 14:58:27 obachman Exp $
+@comment $Id: reference.doc,v 1.192 2000-07-11 12:29:32 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -822,6 +822,8 @@ given expression.
 @c example
 @end smallexample
 @item @strong{Syntax:}
+@code{coeffs (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{coeffs (} module_expression@code{,} module_expression @code{)}
 @code{coeffs (} ideal_expression@code{,} ideal_expression@code{,} product_of_ringvars @code{)}
 @*@code{coeffs (} module_expression@code{,} module_expression@code{,} product_of_ringvars @code{)}
 @item @strong{Type:}
@@ -829,8 +831,10 @@ matrix
 @item @strong{Purpose:}
 let the first argument be M,
 the second argument  be K (a set of monomials in P),
-the third argument be the product P of variables to consider.
-M is supposed to consist of elements of (resp.@: have entries in)
+the third argument be the product P of variables to consider (if this
+argument is not given, then the product of all ring variables is taken
+as default argument).
+@*M is supposed to consist of elements of (resp.@: have entries in)
 a finitely generated module
 over a ring in the variables not appearing in P. K should contain the
 generators of the module over this smaller ring.
@@ -845,6 +849,7 @@ M, then K*A=M' where M' is the part of M that can be expressed.
   ring r=32003,(x,y,z),dp;
   ideal M=x2z+y3,xy;
   print(coeffs(M,ideal(x2,xy,y2),xy));
+  print(coeffs(M, ideal(x2,xy,y2)));
 @c example
 @end smallexample
 @end table
