@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.120 2003-05-26 13:09:34 Singular Exp $ */
+/* $Id: kutil.cc,v 1.121 2003-05-31 14:13:33 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -243,8 +243,11 @@ void cancelunit (LObject* L)
 {
   int  i;
   poly h;
-  ring r = L->tailRing;
 
+  if(currRing->OrdSgn != -1) return;
+  if(TEST_OPT_CANCELUNIT) return;
+
+  ring r = L->tailRing;
   poly p = L->GetLmTailRing();
 
   if(p_GetComp(p, r) != 0 && !p_OneComp(p, r)) return;
@@ -2928,7 +2931,7 @@ void message (int i,int* reduc,int* olddeg,kStrategy strat, int red_result)
       PrintS("-");
     else if (red_result < 0)
       PrintS(".");
-    else
+    if ((red_result > 0) || ((strat->Ll % 100)==99))
     {
       if (strat->Ll != *reduc && strat->Ll > 0)
       {
@@ -3194,8 +3197,8 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=IDELEMS(Q);
-  else i=0;
+  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  else i=setmaxT;
   i=((i+IDELEMS(F)+15)/16)*16;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
@@ -3355,7 +3358,7 @@ static poly redBba1 (poly h,int maxIndex,kStrategy strat)
 /*2
 *tests if p.p=monomial*unit and cancels the unit
 */
-void cancelunit1 (LObject* p,int index,kStrategy strat )
+void cancelunit1 (LObject* p,int *suc, int index,kStrategy strat )
 {
   int k;
   poly r,h,h1,q;
@@ -3373,6 +3376,7 @@ void cancelunit1 (LObject* p,int index,kStrategy strat )
         pDelete(&(pNext((*p).p)));
         (*p).ecart = 0;
         (*p).length = 1;
+        (*suc)=0;
         return;
       }
       if (!pDivisibleBy(r,h))
@@ -3568,9 +3572,14 @@ void updateS(BOOLEAN toT,kStrategy strat)
     {
       for (i=0; i<=strat->sl; i++)
       {
-        if (((strat->fromQ==NULL) || (strat->fromQ[i]==0))
-        )
+        if ((strat->fromQ==NULL) || (strat->fromQ[i]==0))
+        {
           h.p = redtailBba(strat->S[i],i-1,strat);
+          if (TEST_OPT_INTSTRATEGY)
+          {
+            pCleardenom(h.p);// also does a pContent
+          }
+        }
         else
         {
           h.p = strat->S[i];
@@ -3594,7 +3603,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
   {
     while (suc != -1)
     {
-      i=suc+1;
+      i=suc;
       while (i<=strat->sl)
       {
         if (((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
@@ -3665,13 +3674,14 @@ void updateS(BOOLEAN toT,kStrategy strat)
         h.sev = strat->sevS[i];
       }
       if ((strat->fromQ==NULL) || (strat->fromQ[i]==0))
-        cancelunit1(&h,strat->sl,strat);
+        cancelunit1(&h,&suc,strat->sl,strat);
       h.length = pLength(h.p);
       h.SetpFDeg();
       /*puts the elements of S also to T*/
       enterT(h,strat);
       strat->S_2_R[i] = strat->tl;
     }
+    if (suc!= -1) updateS(toT,strat);
   }
   if (redSi!=NULL) pDeleteLm(&redSi);
 #ifdef KDEBUG
