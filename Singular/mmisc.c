@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.23 1999-11-18 13:07:54 obachman Exp $ */
+/* $Id: mmisc.c,v 1.24 1999-12-21 15:51:45 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -263,7 +263,7 @@ void mmCheckPrint( void )
 {
   int mm_bytesAlloc = mm_bytesValloc + mm_bytesMalloc;
 
-#if 0
+#if 1
   if ( ABS(mm_bytesAlloc - mm_printMark)>(100*1024) )
   {
     int i=(mm_bytesAlloc+1023)/1024;
