@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.20 1999-11-15 17:20:18 obachman Exp $ */
+/* $Id: lists.cc,v 1.21 2000-05-18 14:04:01 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -168,8 +168,7 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
         ul->m[i].CleanUp();
       }
     }
-    Free((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
-    FreeSizeOf((ADDRESS)ul,slists);
+    ul->Clean();
     res->data = (char *)l;
     return FALSE;
   }
