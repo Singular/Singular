@@ -1,21 +1,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.8 2000-11-10 10:29:47 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.9 2000-12-04 13:48:43 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
-AUTHOR:   Mathias Schulze (mschulze@mathematik.uni-kl.de)
-
-OVERVIEW:
- A library to compute invariants related to the Gauss-Manin connection 
- of an isolated hypersurface singularity
+AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
 PROCEDURES:
- monomat  : monodromy matrix
- monospec : spectrum of monodromy
- vfilt    : V-filtration on H''/H'
- singspec : singularity spectrum
- vjacob   : V-filtration on Jacobian algebra
+ monomat   monodromy matrix
+ monospec  spectrum of monodromy
+ vfilt     V-filtration on H''/H'
+ singspec  singularity spectrum
+ vjacob    V-filtration on Jacobian algebra
+ gamma     Hertling's gamma invariant
+ gamma4    Hertling's gamma4 invariant
 ";
 
 LIB "jordan.lib";
@@ -138,8 +136,8 @@ static proc redNF(module M,module N,list #)
 
 proc monomat(poly f,list #)
 "USAGE:   <matrix> M=monomat(<poly> f);
-ASSUME:  f defines an isolated hypersurface singularity
 RETURN:  exp(-2*pi*i*M) is a monodromy matrix
+NOTE:    f isolated singularity
 EXAMPLE: example monomat; shows an example
 "
 {
@@ -190,7 +188,7 @@ EXAMPLE: example monomat; shows an example
     dbprint(printlevel-voice+2,"//gaussman::monomat: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::monomat: compute C");
-    C=coeffs(redNF(w,sJ,U),m);
+    C=coeffs(redNF(w,sJ,U),m,product(maxideal(1)));
     A0=A0+C*var(1)^k;
 
     if(sdH>0)
@@ -208,7 +206,8 @@ EXAMPLE: example monomat; shows an example
       }
       else
       {
-        dbprint(printlevel-voice+2,"//gaussman::monomat: basis of saturation");
+        dbprint(printlevel-voice+2,
+          "//gaussman::monomat: compute basis of saturation");
         H=minbase(H0);
         int modH=maxorddif(H);
         K=modH+1;
@@ -218,12 +217,14 @@ EXAMPLE: example monomat; shows an example
     if(k==K&&sdH==0)
     {
       N=k-modH;
-      dbprint(printlevel-voice+2,"//gaussman::monomat: A on saturation");
+      dbprint(printlevel-voice+2,
+        "//gaussman::monomat: compute A on saturation");
       l=division(H*var(1),A0*H+var(1)^2*diff(matrix(H),var(1)));
       A=expand(l[1],l[2],N-1);
       if(mide<0)
       {
-        dbprint(printlevel-voice+2,"//gaussman::monomat: eigenvalues e of A");
+        dbprint(printlevel-voice+2,
+          "//gaussman::monomat: compute eigenvalues e of A");
         ideal e=jordan(A,-1)[1];
         dbprint(printlevel-voice+2,"//gaussman::monomat: e="+string(e));
         mide=maxintdif(e);
@@ -233,7 +234,7 @@ EXAMPLE: example monomat; shows an example
 
     if(k<K||sdH>0)
     {
-      dbprint(printlevel-voice+2,"//gaussman::monomat: division by J");
+      dbprint(printlevel-voice+2,"//gaussman::monomat: divide by J");
       l=division(J,ideal(matrix(w)-matrix(m)*C*U));
       D=l[1];
 
@@ -345,8 +346,8 @@ example
 
 proc monospec(poly f)
 "USAGE:   <matrix> M=monospec(<poly> f);
-ASSUME:  f defines an isolated hypersurface singularity
 RETURN:  the spectrum of exp(-2*pi*i*M) is the spectrum of monodromy
+NOTE:    f isolated singularity
 EXAMPLE: example monospec; shows an example
 "
 {
@@ -363,7 +364,6 @@ example
 
 proc vfilt(poly f,list #)
 "USAGE:   <list> l=vfilt(<poly> f);
-ASSUME:  f defines an isolated hypersurface singularity
 RETURN:  <ideal> l[1] : spectral numbers in increasing order
          <intvec> l[2] :
            <int> l[2][i] : multiplicity of spectral number l[1][i]
@@ -372,6 +372,7 @@ RETURN:  <ideal> l[1] : spectral numbers in increasing order
                               of the V-filtration on H''/H' in terms of l[4]
          <ideal> l[4] : monomial vector space basis of H''/H'
          <ideal> l[5] : standard basis of Jacobian ideal
+NOTE:    f isolated singularity
 EXAMPLE: example vfilt; shows an example
 "
 {
@@ -416,7 +417,7 @@ EXAMPLE: example vfilt; shows an example
     dbprint(printlevel-voice+2,"//gaussman::vfilt: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::vfilt: compute C");
-    C=coeffs(redNF(w,sJ,U),m);
+    C=coeffs(redNF(w,sJ,U),m,product(maxideal(1)));
     A=A+C*var(1)^k;
 
     if(sdH>0)
@@ -434,7 +435,8 @@ EXAMPLE: example vfilt; shows an example
       }
       else
       {
-        dbprint(printlevel-voice+2,"//gaussman::vfilt: basis of saturation");
+        dbprint(printlevel-voice+2,
+          "//gaussman::vfilt: compute basis of saturation");
         H=minbase(H0);
         int modH=maxorddif(H);
         if(k<n)
@@ -451,7 +453,7 @@ EXAMPLE: example vfilt; shows an example
 
     if(k<K||sdH>0)
     {
-      dbprint(printlevel-voice+2,"//gaussman::vfilt: division by J");
+      dbprint(printlevel-voice+2,"//gaussman::vfilt: divide by J");
       l=division(J,ideal(matrix(w)-matrix(m)*C*U));
       D=l[1];
 
@@ -481,8 +483,10 @@ EXAMPLE: example vfilt; shows an example
   l=division(H,H0);
   H0=expand(l[1],l[2],N-1);
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: H0 as vector space V0");
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: H1 as vector space V1");
+  dbprint(printlevel-voice+2,
+    "//gaussman::vfilt: compute H0 as vector space V0");
+  dbprint(printlevel-voice+2,
+    "//gaussman::vfilt: compute H1 as vector space V1");
   poly p;
   int i0,j0,i1,j1;
   matrix V0[mu*N][mu*N];
@@ -509,11 +513,11 @@ EXAMPLE: example vfilt; shows an example
     }
   }
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: A on saturation");
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: compute A on saturation");
   l=division(H*var(1),A*H+var(1)^2*diff(matrix(H),var(1)));
   A=expand(l[1],l[2],N-1);
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: matrix M of A");
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: compute matrix M of A");
   matrix M[mu*N][mu*N];
   for(i0=mu;i0>=1;i0--)
   {
@@ -539,11 +543,11 @@ EXAMPLE: example vfilt; shows an example
     }
   }
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: eigenvalues eA of A");
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: compute eigenvalues eA of A");
   ideal eA=jordan(A,-1)[1];
   dbprint(printlevel-voice+2,"//gaussman::vfilt: eA="+string(eA));
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: eigenvalues eM of M");
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: compute eigenvalues eM of M");
   ideal eM;
   k=0;
   intvec u;
@@ -571,7 +575,8 @@ EXAMPLE: example vfilt; shows an example
   }
   dbprint(printlevel-voice+2,"//gaussman::vfilt: eM="+string(eM));
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: V-filtration on H0/H1");
+  dbprint(printlevel-voice+2,
+    "//gaussman::vfilt: compute V-filtration on H0/H1");
   ideal s;
   k=0;
   list V;
@@ -601,7 +606,7 @@ EXAMPLE: example vfilt; shows an example
       }
     }
 
-    dbprint(printlevel-voice+2,"//gaussman::vfilt: symmetry index reached");
+    dbprint(printlevel-voice+2,"//gaussman::vfilt: symmetry index found");
     j=k;
     if(number(eM[i])-1==number(n-1)/2)
     {
@@ -686,7 +691,7 @@ EXAMPLE: example vfilt; shows an example
       }
     }
 
-    dbprint(printlevel-voice+2,"//gaussman::vfilt: graded parts");
+    dbprint(printlevel-voice+2,"//gaussman::vfilt: compute graded parts");
     option(redSB);
     for(k=1;k<size(v);k++)
     {
@@ -710,10 +715,10 @@ example
 
 proc singspec(poly f)
 "USAGE:   <list> l=singspec(<poly> f);
-ASSUME:  f defines an isolated hypersurface singularity
 RETURN:  <ideal> l[1] : spectral numbers in increasing order
          <intvec> l[2] :
            <int> l[2][i] : multiplicity of spectral number l[1][i]
+NOTE:    f isolated singularity
 EXAMPLE: example singspec; shows an example
 "
 {
@@ -730,8 +735,8 @@ example
 
 proc gamma(list l)
 "USAGE:   <number> g=gamma(singspec(<poly> f));
-ASSUME:  f defines an isolated hypersurface singularity
 RETURN:  Hertling's gamma invariant
+NOTE:    f defines an isolated singularity
 EXAMPLE: example gamma; shows an example
 "
 {
@@ -760,8 +765,8 @@ example
 
 proc gamma4(list l)
 "USAGE:   <number> g4=gamma4(singspec(<poly> f));
-ASSUME:  f defines an isolated hypersurface singularity
-RETURN:  Hertling's gamma(4) invariant
+RETURN:  Hertling's gamma4 invariant
+NOTE:    f defines an isolated singularity
 EXAMPLE: example gamma4; shows an example
 "
 {
@@ -791,7 +796,6 @@ example
 
 proc vjacob(list l)
 "USAGE:   <list> l=vjacob(vfilt(<poly> f));
-ASSUME:  f defines an isolated hypersurface singularity
 RETURN:  <ideal> l[1] : spectral numbers of the V-filtration on the 
                         Jacobian algebra in increasing order
          <intvec> l[2] :
@@ -802,6 +806,7 @@ RETURN:  <ideal> l[1] : spectral numbers of the V-filtration on the
                               in terms of l[4]
          <ideal> l[4] : monomial vector space basis of the Jacobian algebra
          <ideal> l[5] : standard basis of Jacobian ideal
+NOTE:    f defines an isolated singularity
 EXAMPLE: example vjacob; shows an example
 "
 {
@@ -818,7 +823,7 @@ EXAMPLE: example vjacob; shows an example
   list M;
   for(i=ncols(m);i>=1;i--)
   {
-    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V);
+    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V,product(maxideal(1)));
   }
 
   int i0,j0,i1,j1;
