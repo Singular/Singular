@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 'di ';
 'ig 00 ';
-# $Id: texi2html,v 1.5 1998-06-18 13:26:19 krueger Exp $
+# $Id: texi2html,v 1.6 1998-06-19 13:35:42 krueger Exp $
 # Description: Program to transform most Texinfo documents to HTML.
 # The plan is for the next version of makeinfo to support HTML output
 # directly, but until then ...
@@ -1596,7 +1596,8 @@ $full_title = "<H1>" . join("</H1>\n<H1>", split(/\n/, $_)) . "</H1>\n";
 if (!$monolithic && @toc_lines) {
     if (open(FILE, "> $docu_toc")) {
 	print "# creating $docu_toc...\n" if $verbose;
-	&print_toplevel_header("$title - Table of Contents");
+	&print_header("$title - Table of Contents", "", 0);
+	# &print_toplevel_header("$title - Table of Contents");
 	&print_ruler;
 	&print (*top_lines, FILE); # Contents of the top node before the TOC.
 	&print(*toc_lines, FILE);
@@ -2052,7 +2053,7 @@ sub apply_l_style {
 	    $style = $';
 	    $text = &$style($text);
 	} elsif ($style) { # good style
-	    $text = "<$style>$text</$style>";
+	    $text = "<H1><$style>$text</$style></H1>";
 	} else { # no style
 	}
     } else { # unknown style
@@ -2216,6 +2217,7 @@ sub print_toplevel_footer {
 <H6>This document was generated on $TODAY using the
 <A HREF=\"$HOMEPAGE\" TARGET=\"_parent\">texi2html</A>
 translator version 1.51a.</H6>
+<H6>Modified by the Singular-Team 19.6.1998</H6>
 EOT
     &print_footer;
 }
