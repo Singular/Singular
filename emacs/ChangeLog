@@ -1,3 +1,16 @@
+1999-07-15  T. Wichmann  <wichmann@itwm.uni-kl.de>
+
+	* singular.el: Added function singular-dynamic-complete
+	Added new variable singular-completion-addsuffix
+	Added define key for singular-dynamic-complete
+	Remark: Loading of completion files not ready!
+	
+1999-07-14  T. Wichmann  <wichmann@itwm.uni-kl.de>
+
+	* singular.el: font-lock-levels extended to 3 levels
+	Removed font-lock error in prompt fontifying
+	Removed font-lock error in keywords fontifying
+
 1998-08-14  T. Wichmann  <wichmann@itwm.uni-kl.de>
 
 	* singular.el : commented code for singular-logo on startup in
