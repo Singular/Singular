@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.31 1998-06-13 12:44:40 krueger Exp $ */
+/* $Id: ipassign.cc,v 1.32 1998-07-07 16:10:17 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1258,7 +1258,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
         b=jiAssign_1(l,r);
         if (l->rtyp==IDHDL)
         {
-          if ((lt==DEF_CMD)||(lt=LIST_CMD)) ipMoveId((idhdl)l->data);
+          if ((lt==DEF_CMD)||(lt==LIST_CMD)) ipMoveId((idhdl)l->data);
           l->attribute=IDATTR((idhdl)l->data);
           l->flag=IDFLAG((idhdl)l->data);
           l->CleanUp();
