@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.208 2000-04-11 15:40:22 Singular Exp $ */
+/* $Id: iparith.cc,v 1.209 2000-04-13 13:01:49 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -116,6 +116,7 @@ static Subexpr jjMakeSub(leftv e);
 extern int cmdtok;
 extern BOOLEAN expected_parms;
 
+#define ii_div_by_0 "div. by 0"
 int iiOp; /* the current operation*/
 
 #ifdef GENTABLE
@@ -1017,7 +1018,7 @@ static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
   int b= (int) v->Data();
   if (b==0)
   {
-    WerrorS("div. by 0");
+    WerrorS(ii_div_by_0);
     return TRUE;
   }
   int bb=ABS(b);
@@ -1043,7 +1044,7 @@ static BOOLEAN jjDIV_N(leftv res, leftv u, leftv v)
   number q=(number)v->Data();
   if (nIsZero(q))
   {
-    WerrorS("div. by 0");
+    WerrorS(ii_div_by_0);
     return TRUE;
   }
   q = nDiv((number)u->Data(),q);
@@ -1056,14 +1057,50 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   poly q=(poly)v->Data();
   if (q==NULL)
   {
-    WerrorS("div. by 0");
+    WerrorS(ii_div_by_0);
     return TRUE;
   }
   if (pNext(q)!=NULL)
   {
 #ifdef HAVE_FACTORY
-    res->data=(void*)(singclap_pdivide((poly)(u->Data()),
-                                       (poly)(v->Data())));
+    poly p=(poly)(u->Data());
+    if(pGetComp(p)==0)
+    {
+      res->data=(void*)(singclap_pdivide(p /*(poly)(u->Data())*/ ,
+                                         q /*(poly)(v->Data())*/ ));
+    }
+    else
+    {
+      int comps=pMaxComp(p);
+      ideal I=idInit(comps,1);
+      p=(poly)(u->CopyD());
+      poly h;
+      int i;
+      // conversio to a list of polys:
+      while (p!=NULL)
+      {
+        i=pGetComp(p)-1;
+        h=pNext(p);
+        pNext(p)=NULL;
+        pSetComp(p,0);
+        I->m[i]=pAdd(I->m[i],p);
+        p=h;
+      }
+      // division and conversion to vector:
+      h=NULL;
+      p=NULL;
+      for(i=comps-1;i>=0;i--)
+      {
+        if (I->m[i]!=NULL)
+        {
+          h=singclap_pdivide(I->m[i],q);
+          pSetCompP(h,i+1);
+          p=pAdd(p,h);
+        }
+      }
+      idDelete(&I);
+      res->data=(void *)p;
+    }
 #else
     WerrorS("division only by a monomial");
     return TRUE;
