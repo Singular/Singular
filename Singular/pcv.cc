@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.12 1998-12-08 12:48:42 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.13 1998-12-14 12:22:56 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -14,9 +14,8 @@
 #include "lists.h"
 #include "matpol.h"
 #include "pcv.h"
-#include "febase.h"
 
-static int pcvMaxDeg;
+static int pcvMaxDegree;
 static int pcvTableSize;
 static int pcvIndexSize;
 static unsigned* pcvTable=NULL;
@@ -29,71 +28,80 @@ int pcvDeg(poly p)
   return dp;
 }
 
-int pcvOrd(poly p)
+int pcvMinDeg(poly p)
 {
-  if(!p) return -1;
-  int op=pcvDeg(p);
+  if(!p) return 0;
+  int md=pcvDeg(p);
   pIter(p);
   while(p)
   {
     int d=pcvDeg(p);
-    if(d<op) op=d;
+    if(d<md) md=d;
     pIter(p);
   }
-  return op;
+  return md;
 }
 
-int pcvOrd(matrix m)
+int pcvMaxDeg(poly p)
 {
-  int om=-1;
-  for(int i=MATROWS(m);i>=1;i--)
+  if(!p) return 0;
+  int md=pcvDeg(p);
+  pIter(p);
+  while(p)
   {
-    for(int j=MATCOLS(m);j>=1;j--)
-    {
-      int o=pcvOrd(MATELEM(m,i,j));
-      if(o<om&&o>=0||om==-1) om=o;
-    }
+    int d=pcvDeg(p);
+    if(d>md) md=d;
+    pIter(p);
   }
-  return om;
+  return md;
 }
 
-BOOLEAN pcvOrd(leftv res,leftv h)
+BOOLEAN pcvMinDeg(leftv res,leftv h)
 {
   if(h)
   {
     if(h->Typ()==POLY_CMD)
     {
       res->rtyp=INT_CMD;
-      res->data=(void*)pcvOrd((poly)h->Data());
-      return FALSE;
-    }
-    if(h->Typ()==MATRIX_CMD)
-    {
-      res->rtyp=INT_CMD;
-      res->data=(void*)pcvOrd((matrix)h->Data());
+      res->data=pcvMinDeg((poly)h->Data());
       return FALSE;
     }
   }
-  WerrorS("<matrix> expected");
+  WerrorS("<poly> expected");
+  return TRUE;
+}
+
+BOOLEAN pcvMaxDeg(leftv res,leftv h)
+{
+  if(h)
+  {
+    if(h->Typ()==POLY_CMD)
+    {
+      res->rtyp=INT_CMD;
+      res->data=pcvMaxDeg((poly)h->Data());
+      return FALSE;
+    }
+  }
+  WerrorS("<poly> expected");
   return TRUE;
 }
 
 void pcvInit(int d)
 {
   if(d<0) d=0;
-  pcvMaxDeg=d;
-  pcvTableSize=pVariables*pcvMaxDeg*sizeof(unsigned);
-  pcvTable=(unsigned*)Alloc0(pcvTableSize);
+  pcvMaxDegree=d;
+  pcvTableSize=pVariables*pcvMaxDegree*sizeof(unsigned);
+  pcvTable=Alloc0(pcvTableSize);
   pcvIndexSize=pVariables*sizeof(unsigned*);
-  pcvIndex=(unsigned**)Alloc(pcvIndexSize);
+  pcvIndex=Alloc(pcvIndexSize);
   for(int i=0;i<pVariables;i++)
-    pcvIndex[i]=pcvTable+i*pcvMaxDeg;
-  for(int i=0;i<pcvMaxDeg;i++)
+    pcvIndex[i]=pcvTable+i*pcvMaxDegree;
+  for(int i=0;i<pcvMaxDegree;i++)
     pcvIndex[0][i]=i;
   for(int i=1;i<pVariables;i++)
   {
     unsigned x=0;
-    for(int j=0;j<pcvMaxDeg;j++)
+    for(int j=0;j<pcvMaxDegree;j++)
     {
       x+=pcvIndex[i-1][j];
       pcvIndex[i][j]=x;
@@ -115,7 +123,7 @@ void pcvClean()
   }
 }
 
-unsigned pcvM2n(poly m)
+int pcvM2N(poly m)
 {
   unsigned n=0,d=0;
   for(int i=0;i<pVariables;i++)
@@ -126,7 +134,7 @@ unsigned pcvM2n(poly m)
   return n+1;
 }
 
-poly pcvN2m(unsigned n)
+poly pcvN2M(int n)
 {
   n--;
   poly m=pOne();
@@ -134,7 +142,7 @@ poly pcvN2m(unsigned n)
   for(i=pVariables-1;i>=0;i--)
   {
     k=j;
-    for(j=0;j<pcvMaxDeg&&pcvIndex[i][j]<=n;j++);
+    for(j=0;j<pcvMaxDegree&&pcvIndex[i][j]<=n;j++);
     j--;
     n-=pcvIndex[i][j];
     if(i<pVariables-1) pSetExp(m,i+2,k-j);
@@ -161,7 +169,7 @@ poly pcvP2cv(poly p,int d0,int d1)
     if(d0<=d&&d<d1)
     {
       poly c=pOne();
-      pSetComp(c,pcvM2n(p));
+      pSetComp(c,pcvM2N(p));
       pSetCoeff(c,nCopy(pGetCoeff(p)));
       cv=pAdd(cv,c);
     }
@@ -175,7 +183,7 @@ poly pcvCv2p(poly cv,int d0,int d1)
   poly p=NULL;
   while(cv)
   {
-    poly m=pcvN2m(pGetComp(cv));
+    poly m=pcvN2M(pGetComp(cv));
     if(m)
     {
       int d=pcvDeg(m);
@@ -302,7 +310,7 @@ BOOLEAN pcvDim(leftv res,leftv h)
       {
         int d1=(int)h->Data();
         res->rtyp=INT_CMD;
-        res->data=(void*)pcvDim(d0,d1);
+        res->data=pcvDim(d0,d1);
         return FALSE;
       }
     }
