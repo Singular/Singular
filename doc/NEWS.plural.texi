@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.plural.texi,v 1.3 2003-06-14 17:01:53 levandov Exp $
+@comment $Id: NEWS.plural.texi,v 1.4 2003-07-25 18:24:32 levandov Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -20,19 +20,18 @@
 @end macro
 @end ifset
 
-The current version @value{VERSION} is the first pre-release
-of the upcoming release series version 2-2. Therefore, some
-command names are subject to change. 
+The current version @value{VERSION} is the second pre-release
+of the upcoming release series version 2-1. Therefore, some
+command names are still subject to change. 
 
 Singular::Plural version 2-1 is generally much faster than any previous
 experimental version of Singular::Plural, due to a rewrite of major parts 
 of the Singular kernel (e.g., the kernel has a new memory manager 
-and a new polynomial arithmetic) 
-and due to new and better implemented algorithms 
-(e.g., for two-sided Groebner bases).
+and a new polynomial arithmetic) and due to new and better implemented algorithms (e.g., for two-sided Groebner bases and generally, for computations
+in factor algebras).
 
-Besides theses internal changes, Singular version 2 offers many new
-features and functionalities 
+Besides theses internal changes, Singular::Plural version 2-1 offers many new
+features and functionalities.
 
 @heading Efficiency Improvements
 The following table shows some timings which compare the efficincy of
@@ -69,15 +68,16 @@ choose in which browser the on-line help is displayed;
 @item @nref{Source code debugger}
 interactive debugging of procedures written in the @sc{Singular}
 language
-@item http://www.singular.uni-kl.de
-New WWW home-site of @sc{Singular}
+@item http://www.singular.uni-kl.de/plural
+New WWW home-site of @sc{Plural}
 @end table
 
 @heading @sc{Singular::Plural} libraries
 
 @table @asis
-@item @nref{lieA_lib} Plural definitions of several enveloping algebras of simple Lie algebras
+@item @nref{lieA_lib} Plural definitions of several series of enveloping algebras of simple Lie algebras
 @end table
+
 
 @heading Internal Changes
 @table @asis

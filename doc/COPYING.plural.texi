@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.plural.texi,v 1.1 2003-05-22 19:15:52 levandov Exp $
+@comment $Id: COPYING.plural.texi,v 1.2 2003-07-25 18:24:32 levandov Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -71,7 +71,7 @@ for information on how to cite Singular.
 @heading Availability
 
 The latest information about @sc{Singular::Plural} is always available from
-@uref{http://www.singular.uni-kl.de}.
+@uref{http://www.singular.uni-kl.de/plural}.
 @ifset singularmanual
 The program @sc{Singular} and the above mentioned parts are available via
 anonymous ftp through the following addresses:
@@ -110,7 +110,7 @@ Sch@"onemann.
 
 @cindex  Greuel, Gert-Martin
 @cindex  Levandovskyy, Viktor
-@cindex Sch@"onemann, Hans
+@cindex  Sch@"onemann, Hans
 
 Further contributions to @sc{Singular::Plural} were made by:
 Yuriy Drozd,
@@ -120,4 +120,3 @@ Lesya Bodnarchuk.
 We should like to acknowledge the financial support given by
 the Deutsche Forschungsgemeinschaft
 to the @sc{Singular::Plural} project.
-
