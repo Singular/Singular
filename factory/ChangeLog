@@ -1,3 +1,15 @@
+Wed Jul 16 11:35:06 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* canonicalform.cc (CanonicalForm::ilog2): new method
+	* canonicalform.h (class CanonicalForm): new declaration of ilog2
+	(ilog2): new function
+	* int_cf.cc (InternalCF::ilog2): new method
+	* int_cf.h (class InternalCF): new declaration of ilog2
+	* int_int.cc (InternalInteger::ilog2): new method
+	* int_int.h (class InternalInteger): new declaration of ilog2
+	* fac_univar.cc (norm, dnorm): function dnorm replaced by norm
+	(kBound): uses ilog2() and norm() now
+
 Tue Jul  1 14:26:29 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* GNUmakefile.in (dist): use ln instead of cp to build
