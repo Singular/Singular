@@ -1,11 +1,10 @@
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: factory.template,v 1.3 1997-04-17 14:48:51 schmidt Exp $ */
+/* $Id: factory.template,v 1.4 1997-04-30 13:58:31 schmidt Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
 
-/*MAKEHEADER*/
-#include <config.h>
+#include <factoryconf.h>
 
 #ifndef NOSTREAMIO
 #include <iostream.h>
@@ -15,6 +14,21 @@
 #include <templates/factor.h>
 #include <templates/list.h>
 #include <templates/matrix.h>
+
+// note that in this file the order of 'includes' matters!
+// in general, files at the end depend on file at the beginning.
+
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cf_globals.h"
+
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cf_primes.h"
+
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cf_defs.h"
+
+/*MAKEHEADER PUBLIC ONLY*/
+#include "variable.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "canonicalform.h"
@@ -26,39 +40,27 @@
 #include "cf_chinese.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cf_defs.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
 #include "cf_eval.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cf_generator.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cf_globals.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
-#include "cf_irred.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
 #include "cf_iter.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
-#include "cf_map.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
-#include "cf_primes.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cf_random.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cf_reval.h"
+#include "cf_irred.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "fac_util.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "variable.h"
+#include "cf_map.h"
+
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cf_reval.h"
 
 #endif /* INCL_FACTORY_H */
