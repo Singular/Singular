@@ -519,14 +519,15 @@ static int add_to_reductors(calc_dat* c, poly h, int len){
   P.tailRing=c->r;
   P.p=h; /*p_Copy(h,c->r);*/
   P.FDeg=pFDeg(P.p,c->r);
+ 
   if (!rField_is_Zp(c->r)){ 
     pCleardenom(P.p);
     pContent(P.p); //is a duplicate call, but belongs here
+    
   }
-  
   else                     
     pNorm(P.p);
- 
+  pNormalize(P.p);
 
   c->strat->enterS(P,i,c->strat);
  
@@ -2335,7 +2336,7 @@ void tgb_matrix::free_row(int row, BOOLEAN free_non_zeros){
 }
 
 
-tgb_sparse_matrix::tgb_sparse_matrix(int i, int j){
+tgb_sparse_matrix::tgb_sparse_matrix(int i, int j, ring rarg){
   mp=(mac_poly*) omalloc(i*sizeof (mac_poly));;
   int z;
   int z2;
@@ -2346,6 +2347,7 @@ tgb_sparse_matrix::tgb_sparse_matrix(int i, int j){
   this->columns=j;
   this->rows=i;
   free_numbers=FALSE;
+  r=rarg;
 }
 tgb_sparse_matrix::~tgb_sparse_matrix(){
   int z;
@@ -2503,6 +2505,18 @@ BOOLEAN tgb_sparse_matrix::zero_row(int row){
   else
     return FALSE;
 }
+void tgb_sparse_matrix::row_normalize(int row){
+  if (!rField_has_simple_inverse(r))  /* Z/p, GF(p,n), R, long R/C */
+  {
+    mac_poly m=mp[row];
+	while (m!=NULL)
+	{
+	  if (currRing==r) {nTest(m->coef);}
+	  n_Normalize(m->coef,r);
+	  m=m->next;
+	}
+  }
+}
 int tgb_sparse_matrix::non_zero_entries(int row){
 
   return mac_length(mp[row]);
@@ -2566,7 +2580,7 @@ poly free_row_to_poly(tgb_sparse_matrix* mat, int row, poly* monoms, int monom_i
 
 }
 
-void simple_gauss(tgb_sparse_matrix* mat){
+void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c){
   int col, row;
   int* row_cache=(int*) omalloc(mat->get_rows()*sizeof(int));
   col=0;
@@ -2638,6 +2652,7 @@ void simple_gauss(tgb_sparse_matrix* mat){
     int found_in_row;
     
     found_in_row=row;
+    BOOLEAN must_reduce=FALSE;
     assume(pn<=mat->get_rows());
     for(i=row+1;i<=max_in_area;i++){
       int first;//=mat->min_col_not_zero_in_row(i);
@@ -2648,6 +2663,11 @@ void simple_gauss(tgb_sparse_matrix* mat){
       {
 	col=first;
 	found_in_row=i;
+	must_reduce=FALSE;
+      }
+      else {
+	if(first==col)
+	  must_reduce=TRUE;
       }
     }
     //select pivot
@@ -2673,7 +2693,15 @@ void simple_gauss(tgb_sparse_matrix* mat){
     row_cache[row]=row_cache[found_in_row];
     row_cache[found_in_row]=h;
 
+
+
+    if(!must_reduce){
+      row++;
+      continue;
+    }
     //reduction
+    //must extract content and normalize here
+    mat->row_normalize(row);
 
     //for(i=row+1;i<pn;i++){
     for(i=max_in_area;i>row;i--)
@@ -2697,6 +2725,8 @@ void simple_gauss(tgb_sparse_matrix* mat){
 	nDelete(&c1);
 	mat->mult_row(i,n2);
 	mat->add_lambda_times_row(i,row,n1);
+	nDelete(&n1);
+	nDelete(&n2);
 	assume(mat->is_zero_entry(i,col));
 	row_cache[i]=mat->min_col_not_zero_in_row(i);
 	assume(mat->min_col_not_zero_in_row(i)>col);
@@ -2920,7 +2950,7 @@ static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, 
   return t;
 }
 static tgb_sparse_matrix* build_sparse_matrix(poly* p,int p_index,poly* done, int done_index, calc_dat* c){
-  tgb_sparse_matrix* t=new tgb_sparse_matrix(p_index,done_index);
+  tgb_sparse_matrix* t=new tgb_sparse_matrix(p_index,done_index,c->r);
   int i, pos;
   //  Print("\n 0:%s\n",pString(done[done_index-1]));
   //Print("\n 1:%s\n",pString(done[done_index-2]));
@@ -3462,7 +3492,7 @@ static void go_on_F4 (calc_dat* c){
  
 //   simple_gauss2(mat);
   tgb_sparse_matrix* mat=build_sparse_matrix(p,p_index,done, done_index,c);
-  simple_gauss(mat);
+  simple_gauss(mat,c);
   m_size=mat->get_rows();
   m=(poly*) omalloc(m_size*sizeof(poly));
   m_index=retranslate(m,mat,done,c);
@@ -4961,6 +4991,13 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   {
     r[rn].flatten();
     kBucketClear(r[rn].bucket,&red,&red_len);
+    if (!rField_is_Zp(c->r))
+    {
+      pContent(red);
+      pCleardenom(red);//should be unnecessary
+     
+    }
+    pNormalize(red);
   }
   if (erg.to_reduce_u-erg.to_reduce_l>5){
     woc=TRUE;

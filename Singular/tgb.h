@@ -135,6 +135,7 @@ public:
 typedef mac_poly_r* mac_poly;
 class tgb_sparse_matrix{
  private:
+  ring r;
   mac_poly* mp;
   int columns;
   int rows;
@@ -143,11 +144,12 @@ class tgb_sparse_matrix{
   void sort_rows();
   friend poly free_row_to_poly(tgb_sparse_matrix* mat, int row, poly* monoms, int monom_index);
   friend void init_with_mac_poly(tgb_sparse_matrix* mat, int row, mac_poly m);
-  tgb_sparse_matrix(int i, int j);
+  tgb_sparse_matrix(int i, int j, ring rarg);
   ~tgb_sparse_matrix();
   int get_rows();
   int get_columns();
   void print();
+  void row_normalize(int row);
   //  void perm_rows(int i, int j);
   void perm_rows(int i, int j){
   mac_poly h;
