@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.24 1999-09-29 10:59:37 obachman Exp $ */
+/* $Id: polys.h,v 1.25 1999-10-14 12:50:27 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -244,7 +244,7 @@ poly      pDiffOp(poly a, poly b,BOOLEAN multiply);
 
 int       pLength(poly a);
 int       pMaxComp(poly p);
-int       pMinComp(poly p);
+int       pMinComp(poly p, ring r=currRing);
 BOOLEAN   pOneComp(poly p);
 int       pWeight(int c);
 void      pSetCompP(poly a, int i);

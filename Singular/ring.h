@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.35 1999-09-29 17:19:05 Singular Exp $ */
+/* $Id: ring.h,v 1.36 1999-10-14 12:50:28 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -25,6 +25,7 @@ void   rWrite(ring r);
 void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
+ring   rAddSyzComp(ring r);
 
 #ifdef PDEBUG
 #define rChangeSComps(c,s,l) rDBChangeSComps(c,s,l)
@@ -125,6 +126,7 @@ enum
   ringorder_C,
   ringorder_M,
   ringorder_S,
+  ringorder_s,
   ringorder_lp,
   ringorder_dp,
   ringorder_Dp,

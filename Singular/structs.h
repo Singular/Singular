@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.26 1999-09-29 13:42:54 Singular Exp $ */
+/* $Id: structs.h,v 1.27 1999-10-14 12:50:29 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -123,6 +123,7 @@ typedef enum
   ro_wp, // ordering is a weighted degree ordering
   ro_cp, // ordering duplicates variables
   ro_syzcomp, // ordering indicates "subset" of component number
+  ro_syz, // ordering  with component number >syzcomp is lower
   ro_none
 }
 ro_typ;
@@ -167,6 +168,14 @@ struct sro_syzcomp
 };
 typedef struct sro_syzcomp sro_syzcomp;
 
+// ordering  with component number >syzcomp is lower
+struct sro_syz
+{
+  short place;  // where the index is stored (in L)
+  int limit;    // syzcomp
+};
+
+typedef struct sro_syz sro_syz;
 
 struct sro_ord
 {
@@ -177,6 +186,7 @@ struct sro_ord
      sro_wp wp;
      sro_cp cp;
      sro_syzcomp syzcomp;
+     sro_syz syz;
   } data;
 };
 

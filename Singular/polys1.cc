@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.29 1999-09-29 10:59:38 obachman Exp $ */
+/* $Id: polys1.cc,v 1.30 1999-10-14 12:50:27 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -645,16 +645,16 @@ int pMaxComp(poly p)
 /*2
 * returns minimal column number in the modul element a (or 0)
 */
-int pMinComp(poly p)
+int pMinComp(poly p, ring r)
 {
   int result,i;
 
   if(p==NULL) return 0;
-  result = pGetComp(p);
+  result = pRingGetComp(r,p);
   while (pNext(p)!=NULL)
   {
     pIter(p);
-    i = pGetComp(p);
+    i = pRingGetComp(r,p);
     if (i<result) result = i;
   }
   return result;

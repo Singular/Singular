@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.108 1999-09-29 10:59:28 obachman Exp $ */
+/* $Id: extra.cc,v 1.109 1999-10-14 12:50:25 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -487,7 +487,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ring r=(ring)h->Data();
       int j;
       PrintS("varoffset:\n");
+      #ifdef HAVE_SHIFTED_EXPONENTS
+      for(j=0;j<=r->N;j++) Print("  v%d at pos %d, bit %d\n",
+         j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
+      Print("bitmask=%x\n",r->bitmask);
+      #else
       for(j=0;j<=r->N;j++) Print("  v%d at pos %d\n",j,r->VarOffset[j]);
+      #endif
       PrintS("ordsgn:\n");
       for(j=0;j<r->pCompLSize;j++)
         Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j);

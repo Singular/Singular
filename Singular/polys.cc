@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.44 1999-10-01 16:24:39 obachman Exp $ */
+/* $Id: polys.cc,v 1.45 1999-10-14 12:50:26 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -135,6 +135,12 @@ void rSetm(poly p)
           }
           p->exp.l[o->data.syzcomp.place]=sc;
 #endif
+          break;
+        }
+        case ro_syz:
+        {
+          int c=pGetComp(p);
+          p->exp.l[o->data.syz.place]= (o->data.syz.limit > c);
           break;
         }
         default:
@@ -386,42 +392,16 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
   }
 }
 
-/*2
-*the pComp0 for normal syzygies
-*compares monomials in the usual ring order (pCompOld)
-*but groups module indecees according indexBounds befor
-*/
-static int mcompSyz(poly p1,poly p2)
-{
-  if (pGetComp(p1)<=pMaxBound)
-  {
-    if (pGetComp(p2)>pMaxBound) return 1;
-  }
-  else if (pGetComp(p2)<=pMaxBound)
-  {
-    return -1;
-  }
-  return pCompOld(p1,p2);
-}
-
 void pSetSyzComp(int k)
 {
-  if (k!=0)
+  pMaxBound=k;
+  if(currRing->typ[0].ord_typ==ro_syz)
   {
-    if (pMaxBound==0)
-    {
-      pCompOld = pComp0;
-      pComp0 = mcompSyz;
-    }
-    pMaxBound = k;
+    currRing->typ[0].data.syz.limit=k;
   }
-  else
+  else if (k!=0)
   {
-    if (pMaxBound!=0)
-    {
-      pComp0 = pCompOld;
-      pMaxBound = 0;
-    }
+    Warn("syzcomp in incompatible ring");
   }
 }
 
