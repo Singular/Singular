@@ -65,12 +65,15 @@ if (test "x${prefix} != xNONE && test "${prefix} != "/usr/local") || \
 fi
 LDFLAGS="-L. ${LDFLAGS}"
 
-if test "$with_debug" = yes; then
-  CXXFLAGS="-g"
-else
-  CXXFLAGS="-O"
-  AC_DEFINE(NDEBUG)  
+if test "${CXXFLAGS+set}" != set; then
+  if test "$with_debug" = yes; then
+    CXXFLAGS="-g"
+  else
+    CXXFLAGS="-O"
+    AC_DEFINE(NDEBUG)  
+  fi
 fi
+
 
 dnl
 dnl Checks for programs.
@@ -113,10 +116,12 @@ dnl
 dnl Last, but not least, customize CFLAGS
 dnl
 if test ${GXX} = yes; then
-  if test "$with_debug" = yes; then
-     CXXFLAGS="-O -g"
-  else
-     CXXFLAGS="-O3 "
+  if test "${CXXFLAGS+set}" != set; then
+    if test "$with_debug" = yes; then
+      CXXFLAGS="-O -g"
+    else
+      CXXFLAGS="-O3 "
+    fi
   fi
   CXXTEMPLFLAGS="-fno-implicit-templates"
 else
