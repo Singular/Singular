@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.38 2003-02-25 17:15:38 Singular Exp $
+// $Id: all.lib,v 1.39 2005-02-22 10:39:08 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.38 2003-02-25 17:15:38 Singular Exp $";
+version="$Id: all.lib,v 1.39 2005-02-22 10:39:08 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
@@ -35,7 +35,8 @@ Singularities
   classify_lib:    Arnold Classifier of Singularities
   deform_lib:      Miniversal Deformation of Singularities and Modules
   equising_lib:    Equisingularity Stratum of a Family of Plane Curves
-  gaussman_lib:    Gauss-Manin Connection of a Singularity
+  gmssing.lib:     Gauss-Manin System of Isolated Singularities
+  gmspoly.lib:     Gauss-Manin System of Tame Polynomials
   hnoether_lib:    Hamburger-Noether (Puiseux) Development
   mondromy_lib:    Monodromy of an Isolated Hypersurface Singularity
   qhmoduli.lib:    Moduli Spaces of Semi-Quasihomogeneous Singularities
@@ -99,7 +100,8 @@ LIB "alexpoly.lib";
 LIB "classify.lib";
 LIB "deform.lib";
 LIB "equising.lib";
-LIB "gaussman.lib";
+LIB "gmssing.lib";
+LIB "gmspoly.lib";
 LIB "hnoether.lib";
 LIB "mondromy.lib";
 LIB "qhmoduli.lib";
