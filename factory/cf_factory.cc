@@ -1,12 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_factory.cc,v 1.0 1996-05-17 10:59:43 stobbe Exp $
+// $Id: cf_factory.cc,v 1.1 1997-03-26 16:37:27 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:43  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "cf_factory.h"
 #include "canonicalform.h"
 #include "int_cf.h"
@@ -70,12 +75,11 @@ CFFactory::basic ( int type, int value )
     else  if ( type == PrimePowerDomain )
 	return new InternalPrimePower( value );
     else {
-	cerr << "type = " << type << endl;
-	ASSERT( 0, "illegal basic domain!" );
+	ASSERT1( 0, "illegal basic domain (type = %d)!", type );
 	return 0;
     }
 }
-	
+
 InternalCF *
 CFFactory::basic ( const char * str )
 {
@@ -241,4 +245,4 @@ MP_INT getmpi ( InternalCF * value, bool symmetric )
     else
 	mpz_init_set( &dummy, &InternalPrimePower::MPI( value ) );
     return dummy;
-}	
+}
