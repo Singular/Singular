@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_ftp.texi,v 1.10 2000-06-15 11:26:51 obachman Exp $
+@comment $Id: README_ftp.texi,v 1.11 2001-02-28 16:06:47 Singular Exp $
 @c FILE: README_download.texi
 @c PURPOSE: This should reside as README file in the main directory of the
 @c          Singular ftp site.
@@ -19,11 +19,6 @@ detailed overview of
 @display
 @uref{http://www.singular.uni-kl.de/Overview/}
 @end display
-
-The new @sc{Singular} version @value{VERSION} which can be downloaded from
-this directory is an alpha-release of the upcoming
-new release version 2-0 (should be there in the middle of
-2000). 
 
 So far, there are only version for Linux, HPUX, SunOS, and Windows 95/98/Nt/2K.
 
