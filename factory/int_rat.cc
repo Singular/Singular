@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.4 1997-09-09 09:03:37 schmidt Exp $ */
+/* $Id: int_rat.cc,v 1.5 1997-09-10 15:46:21 schmidt Exp $ */
 
 #include <config.h>
 
@@ -724,7 +724,11 @@ int InternalRational::intval() const
 //   return (int)mpz_mmod_ui( 0, &thempq, (unsigned long)p );
 // }
 
-int InternalRational::sign ( ) const
+//{{{ int InternalRational::sign () const
+// docu: see CanonicalForm::sign()
+int
+InternalRational::sign () const
 {
-    return mpz_cmp_si( &_num, 0 );
+    return mpz_sgn( &_num );
 }
+//}}}
