@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.38 1999-07-16 16:07:22 Singular Exp $ */
+/* $Id: syz1.cc,v 1.39 1999-08-19 15:51:30 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2056,7 +2056,7 @@ void syKillComputation(syStrategy syzstr)
 * read out the Betti numbers from resolution
 * (if not LaScala calls the traditional Betti procedure)
 */
-intvec * syBettiOfComputation(syStrategy syzstr)
+intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
 {
   int dummy;
   if (syzstr->resPairs!=NULL)
@@ -2102,9 +2102,29 @@ intvec * syBettiOfComputation(syStrategy syzstr)
     return result;
   }
   else if (syzstr->fullres!=NULL)
-    return syBetti(syzstr->fullres,syzstr->length,&dummy);
+    return syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim);
   else
-    return syBetti(syzstr->minres,syzstr->length,&dummy);
+    return syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim);
+}
+
+/*2
+* read out the Betti numbers from resolution
+* (interpreter interface)
+*/
+BOOLEAN syBetti2(leftv res, leftv u, leftv w)
+{
+  syStrategy syzstr=(syStrategy)u->Data();
+  BOOLEAN minim=(int)w->Data();
+  
+  res->data=(void *)syBettiOfComputation(syzstr,minim);
+  return FALSE;
+}
+BOOLEAN syBetti1(leftv res, leftv u)
+{
+  syStrategy syzstr=(syStrategy)u->Data();
+  
+  res->data=(void *)syBettiOfComputation(syzstr);
+  return FALSE;
 }
 
 /*3

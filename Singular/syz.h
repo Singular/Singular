@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.15 1999-08-19 11:56:46 siebert Exp $ */
+/* $Id: syz.h,v 1.16 1999-08-19 15:51:30 Singular Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -82,7 +82,9 @@ resolvente syLaScala1(ideal arg,int * length);
 syStrategy syLaScala3(ideal arg,int * length);
 
 void syKillComputation(syStrategy syzstr);
-intvec * syBettiOfComputation(syStrategy syzstr);
+intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim=TRUE);
+BOOLEAN syBetti1(leftv res, leftv u);
+BOOLEAN syBetti2(leftv res, leftv u, leftv w);
 int syLength(syStrategy syzstr);
 int sySize(syStrategy syzstr);
 int syDim(syStrategy syzstr);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.172 1999-08-19 11:28:08 obachman Exp $ */
+/* $Id: iparith.cc,v 1.173 1999-08-19 15:51:29 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -127,7 +127,7 @@ cmdnames cmds[] =
   { "and",         0, '&' ,               '&'},
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
   { "bareiss",     0, BAREISS_CMD ,       CMD_123},
-  { "betti",       0, BETTI_CMD ,         CMD_1},
+  { "betti",       0, BETTI_CMD ,         CMD_12},
   { "break",       0, BREAK_CMD ,         BREAK_CMD},
   { "char",        0, CHARACTERISTIC_CMD ,CMD_1},
   { "char_series", 0, CHAR_SERIES_CMD ,   CMD_1},
@@ -2176,6 +2176,7 @@ struct sValCmd2 dArith2[]=
 // and the procedures with 2 arguments:
 ,{atATTRIB2,   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD PROFILER}
 ,{jjWRONG2,    BAREISS_CMD,    0,              DEF_CMD,    DEF_CMD PROFILER}
+,{syBetti2,    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD PROFILER}
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD PROFILER}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD PROFILER}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD PROFILER}
@@ -3184,7 +3185,6 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 #define jjrVarStr      (proc1)18
 #define jjrParStr      (proc1)19
 #define jjidMinEmbedding (proc1)20
-#define jjBETTI_R        (proc1)21
 #define jjCOUNT_R        (proc1)22
 #define jjDIM_R          (proc1)23
 #define jjMINRES_R       (proc1)24
@@ -3223,7 +3223,6 @@ void jjInitTab1()
         case (int)jjrVarStr:      dArith1[i].p=(proc1)rVarStr; break;
         case (int)jjrParStr:      dArith1[i].p=(proc1)rParStr; break;
         case (int)jjidMinEmbedding: dArith1[i].p=(proc1)idMinEmbedding; break;
-        case (int)jjBETTI_R:      dArith1[i].p=(proc1)syBettiOfComputation; break;
         case (int)jjCOUNT_R:      dArith1[i].p=(proc1)syLength; break;
         case (int)jjDIM_R:        dArith1[i].p=(proc1)syDim; break;
         case (int)jjMINRES_R:     dArith1[i].p=(proc1)syMinimize; break;
@@ -3335,11 +3334,6 @@ static BOOLEAN jjidMinEmbedding(leftv res, leftv v)
   res->data = (char *)idMinEmbedding((ideal)v->Data());
   return FALSE;
 }
-static BOOLEAN jjBETTI_R(leftv res, leftv v)
-{
-  res->data=(char *)syBettiOfComputation((syStrategy)v->Data());
-  return FALSE;
-}
 static BOOLEAN jjCOUNT_R(leftv res, leftv v)
 {
   res->data=(char *)syLength((syStrategy)v->Data());
@@ -3383,7 +3377,6 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjrVarStr      (proc1)rVarStr
 #define jjrParStr      (proc1)rParStr
 #define jjidMinEmbedding (proc1)idMinEmbedding
-#define jjBETTI_R        (proc1)syBettiOfComputation
 #define jjCOUNT_R        (proc1)syLength
 #define jjDIM_R        (proc1)syDim
 #define jjMINRES_R     (proc1)syMinimize
@@ -3420,7 +3413,7 @@ struct sValCmd1 dArith1[]=
 ,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
 ,{jjBAREISS,    BAREISS_CMD,     LIST_CMD,       MODUL_CMD }
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD }
-,{jjBETTI_R,    BETTI_CMD,       XS(INTMAT_CMD), RESOLUTION_CMD }
+,{syBetti1,     BETTI_CMD,       INTMAT_CMD,     RESOLUTION_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD }
 #ifdef HAVE_FACTORY
@@ -4320,8 +4313,8 @@ struct sValCmd3 dArith3[]=
 #endif
 #ifdef HAVE_SPECTRUM
 ,{semicProc3,       SEMIC_CMD,  INT_CMD,    LIST_CMD,   LIST_CMD,   INT_CMD }
-,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, INT_CMD } 
-,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, LIST_CMD } 
+,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, INT_CMD }
+,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, LIST_CMD }
 #endif
 #ifdef OLD_RES
 ,{jjRES3,           SRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
@@ -4755,7 +4748,7 @@ static BOOLEAN jjSUBST_M(leftv res, leftv u)
     b = iiExprArithM(&tmp_res,res,iiOp);
     memcpy(res,&tmp_res,sizeof(tmp_res));
     res->next=tmp_next;
-  }  
+  }
   u->next = v;
   v->next = w;
   w->next = rest;
