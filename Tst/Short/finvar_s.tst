@@ -33,8 +33,6 @@ example secondary_and_irreducibles_no_molien;
 example secondary_not_cohen_macaulay;
 example invariant_ring;
 example invariant_ring_random;
-example algebra_containment;
-example module_containment;
 example orbit_variety;
 example relative_orbit_variety;
 example image_of_variety;
