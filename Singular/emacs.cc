@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.2 1999-08-25 15:55:32 obachman Exp $ */
+/* $Id: emacs.cc,v 1.3 1999-08-25 20:34:39 wichmann Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -202,7 +202,9 @@ int main(int argc, char** argv)
     prefix = "-";
   getcwd(cwd, MAXPATHLEN);
 
-  sprintf(syscall, "%s %seval '(setq singular-emacs-home-directory \"%s\")' %sq %sl %s %seval '(singular-other \"%s\" \"%s\" (quote ",
+  // Note: option -no-init-file should be equivalent to -q. Anyhow, 
+  // xemacs-20.4 sometimes crashed on startup when using -q. Don´t know why.
+  sprintf(syscall, "%s %seval '(setq singular-emacs-home-directory \"%s\")' %sno-init-file %sl %s %seval '(singular-other \"%s\" \"%s\" (list ",
           emacs, prefix, emacs_dir, prefix, prefix, emacs_load, prefix, 
           singular, cwd);
 
@@ -219,7 +221,7 @@ int main(int argc, char** argv)
       strcat(syscall, "\" ");
     }
   }
-  strcat(syscall, "\"-t\" \"-emacs\") \"Singular\")'");
+  strcat(syscall, ") \"singular\")'");
   
   if (no_emacs_call)
   {
