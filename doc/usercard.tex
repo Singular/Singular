@@ -1,4 +1,4 @@
-% $Id: usercard.tex,v 1.1 1998-05-12 07:24:29 schmidt Exp $
+% $Id: usercard.tex,v 1.2 1998-05-25 09:49:02 schmidt Exp $
 
 %
 % usercard.tex - Singular user quick reference card.
@@ -14,31 +14,32 @@
 
 Do not forget to terminate all commands with a {\tt ;} (semicolon)!
 
-Especially if \Singular\ prints the continuation prompt {\tt .}
+In particular if \Singular\ prints the continuation prompt {\tt .}
 (dot) instead of the regular command prompt {\tt >}, then it
 waits for a command to be terminated by a {\tt ;}.  If that does
 not help, try one or more {\tt "} or {\tt \char`}} to close an
-opened string or procedure.
+opened string or block.
 
-Comments start with {\tt //} and extend to the end of the line.
+Comments start with {\tt //} and extend to end of line.
+
+\smallskip
+Some of the topics concerning interactive use are system dependent.
 
 \sec Starting SINGULAR(2.5cm)
 Singular& 			start \Singular\cr
 Singular {\it files} $\ldots$&	read {\it files\/} and prompt for further commands\cr
-Singular --help&		print short help on command line options and
-				exit\cr
+Singular --help&		print help on command line options and exit\cr
 \endsec
 
 \sec Stopping SINGULAR()
 quit;&				exit \Singular; also {\tt exit;} or {\tt \$}\cr
-\ctl c&				interrupt \Singular\ (on $*$ix systems only)\cr
+\ctl c&				interrupt \Singular\cr
 \endsec
 
 \sec Getting help()
 help;&				enter online help system\cr
 help {\it topic\/};&		describe {\it topic\/}; also {\tt? {\it topic\/};}\cr
 \subsec{Inside the online help system:}
-&				(on $*$ix systems only)\cr
 \ctl h&				get help on help system\cr
 q&				exit from help system\cr
 n\rmslash p\rmslash u&		go to next/previous/upper node\cr
@@ -49,10 +50,8 @@ SPC\rmslash DEL&		scroll forward/backward one page\cr
 
 \sec Commandline editing()
 \sectext
-You may edit the commandline and retrieve previous commands in a
-way common to most modern shells (on $*$ix systems only):\cr
-BS\rmslash\ctl d&		remove character on the left/right of the
-				cursor\cr
+Commandline editing is similar to that of, e.g., {\tt bash} or {\tt tcsh}:\cr
+BS\rmslash\ctl d&		remove character on the left/right of cursor\cr
 \ctl p\rmslash\ctl n&		get previous/next line from history\cr
 \ctl b\rmslash\ctl f&		move cursor left/right\cr
 \ctl a\rmslash\ctl e&		go to beginning/end of line\cr
@@ -70,15 +69,20 @@ Names of type {\tt number}, {\tt poly}, {\tt ideal}, {\tt vector}, {\tt
 module}, {\tt matrix}, {\tt map}, and {\tt resolution} may be declared
 only inside a ring.  They are local to that ring.  The same holds for a {\tt
 list} if it contains an object of the above types.  All other types may be
-declared at any moment.  They are visible globally.
+declared at any time.  They are globally visible.
 
-Names may consist of alphanumeric characters including {\tt \_} (underscore) and
-have to start with a letter.  Names may be followed by an integer expression in
+Names may consist of alphanumeric characters including {\tt \_}
+(underscore) and have to start with a letter.  Capital and small letters
+are distinguished.  Names may be followed by an integer expression in
 parentheses, resulting in so-called {\it indexed names}.
 
 The expression {\tt {\it name\/}({\it n}..{\it m\/})} is a shortcut for {\tt
-{\it name\/}({\it n\/}), $\ldots$, {\it name\/}({\it m\/})} which is especially
-useful for declaring ring variables (\eg {\tt ring r = 0, x(1..3), dp;}).\cr
+{\it name\/}({\it n\/}), $\ldots$, {\it name\/}({\it m\/})} which in particular
+is useful for declaring ring variables (\eg {\tt ring r = 0, x(1..3), dp;}).
+
+The special name {\tt \_} (underscore) may be used to refer to the value of the
+last expression printed.
+\cr
 \endsec
 
 \vfill
@@ -88,48 +92,46 @@ useful for declaring ring variables (\eg {\tt ring r = 0, x(1..3), dp;}).\cr
 
 \sec Ring declaration()
 \longentry ring {\it name\/} = {\it basefield}, ({\it ringvars}), {\it ordering\/};&
-				\hyphenpenalty=50 \tolerance=200 declare the
-				ring {\it name\/} and make it the current
-				base\-ring.  {\it ringvars\/} has to be a list
-				of names or indexed names, the other items are
-				described below.  An example:\par {\tt ring r =
-				32003, (x, y, z), dp;}\cr
+				\hyphenpenalty=50 \tolerance=200 declare ring
+				{\it name\/} and make it the current base\-ring.
+				{\it ringvars\/} has to be a list of names, the
+				other items are described below.  Example:\par
+				{\tt ring r = 32003, (x, y, z), dp;}\cr
 \longentry qring {\it name\/} = {\it ideal\/};&
-				declare the quotient ring {\it name\/} of the
-				current basering with respect to ideal {\it
-				ideal\/}.  Make {\it name\/} the new
-				basering.\cr
+				declare quotient ring {\it name\/} of the
+				current base\-ring with respect to {\it
+				ideal\/}.  {\it ideal\/} has to be a standard
+				bases.  Make {\it name\/} the new basering.\cr
 \subsec{Available {\bit basefields\/}:}
-0&				the field of rational numbers\cr
+0&				the rational numbers\cr
 \it p&				the finite field $Z_p$ with {\it p\/}
 				elements,\par
 				$2 \le p \le 32003$ a prime\cr
 ({\it p\/}\^{}{\it n}, {\it gen\/})&
 				the finite field with $p^n$ elements, {\it p\/}
-				a prime and\par
-				$4 \le p^n \le 32671$. The name {\it gen\/}
-				refers to some generator of the group of
-				unities.\cr
+				a prime and\par $4 \le p^n \le 32671$. The name
+				{\it gen\/} refers to some generator of the
+				cyclic group of unities.\cr
 ({\it p}, {\it alpha\/})&	algebraic extension of $Q$ or $Z_p$ ($p =
-				0$ or as above) by {\it alpha}.  You have to
-				specify the minpoly $\mu_{\hbox{\tit alpha}}$
-				for {\it alpha\/} immediately after the ring
-				declaration with an assignment to {\tt minpoly}
-				(\eg {\tt minpoly=a\^{}2+1;}).  {\it alpha\/}
-				has to be a valid name.\cr
+				0$ or as above) by {\it alpha}.  The minpoly
+				$\mu_{\hbox{\tit alpha}}$ for {\it alpha\/} has
+				to be specified with an assignment to {\tt
+				minpoly} (\eg {\tt minpoly=a\^{}2+1;}, for
+				$\hbox{\it alpha}=\hbox{\tt a}$).  {\it
+				alpha\/} has to be a name.\cr
 ({\it p}, $t_1$, $\ldots$)&	transcendental extension of $Q$ or $Z_p$
-				($p = 0$ or as above) by~$t_i$.  As $t_i$ you
-				may use either names or indexed names.\cr
+				($p = 0$ or as above) by~$t_i$.  The $t_i$ have
+				to be names.\cr
 real&				the real numbers represented by floating point
 				numbers\cr
 \endsec
 
 \sec Term orderings()
 \sectext
-An {\it ordering\/} as referred to in the ring declaration may be either 
+An {\it ordering\/} as referred to in the ring declaration may either be
 a global, local, or matrix ordering or a list of these resulting in a
 pro\-duct ordering.  The list may include extra weight vectors and may be
-preceded or followed by a module order specification.\cr
+preceded or followed by a module ordering specification.\cr
 \subsec{Global orderings}
 lp&				lexicographical ordering\cr
 dp&				degree reverse lexicographical ordering\cr
@@ -146,17 +148,22 @@ Ws($w_1$, $\ldots$)&		general weighted lexicographical ordering\cr
 &				$w_1$ has to be a nonzero integer, every other
 				$w_i$ may be any integer\cr
 \subsec{Matrix orderings}
-\longentry M($M_{11}$, $M_{12}$, $\ldots$, $M_{nn}$)&
-				{\it M\/} has to be an invertible matrix with
+\longentry M($m_{11}$, $m_{12}$, $\ldots$, $m_{nn}$)&
+				{\it m\/} has to be an invertible matrix with
 				integer coeffi\-cients.  Coefficients have to be
 				specified row-wise.\cr
 \subsec{Product orderings}
 \longentry($o_1$\opt{($k_1$)}, $o_2$\opt{($k_2$)}, $\ldots$, $o_n$\opt{($k_n$)})&
-				the orderings {\tt lp}, {\tt dp}, {\tt Dp}, {\tt
-				ls}, {\tt ds}, {\tt Ds} may be followed by an
-				integer expression $k_i$ in parentheses which
-				specifies the number of variables $o_i$ refers
-				to (\eg {\tt (lp(3), dp(2))}).\cr
+				the $o_i$ have to be any of the above orderings.
+				{\tt lp}, {\tt dp}, {\tt Dp}, {\tt ls}, {\tt
+				ds}, {\tt Ds} may be followed by an integer
+				expression $k_i$ in parentheses specifying the
+				number of variables $o_i$ refers to (\eg {\tt
+				(lp(3), dp(2))}).\cr
+\subsec{Extra weight vector}
+a($w_1$, $\ldots$)&		any of the above degree orderings may be
+				preceded by an extra weight vector\cr
+\noalign{\eject}
 \subsec{Module orderings}
 ({\it c}, $o_1$, $\ldots$)&	sort by components first\cr
 ($o_1$, $\ldots$, {\it c\/})&	sort by variables first\cr
@@ -167,52 +174,47 @@ C&				sort generators in ascending order (\ie {\tt
 				gen({\it i\/})} $<$ {\tt gen({\it j\/})} iff $i <
 				j$)\cr
 c&				sort generators in descending order\cr
-\subsec{Extra weight vector}
-a($w_1$, $\ldots$)&		any of the above degree orderings may be
-				preceded by an extra weight vector\cr
 \endsec
 
-\begingroup
-\def\interentryskip{\noalign{\verysmallskip}}%
 \sec Data types(1.5cm)
 \sectext
-First, examples of ring-independent types:\cr
-\interentryskip
+Examples of ring-independent types:\cr
+\entryskip
 \longitem
 int i1 = 101; int i2 = 13 div 3;\cr
-\interentryskip
+\entryskip
 \longitem
 intvec iv = 13 div 3, -4, i1;\cr
-\interentryskip
+\entryskip
 \longentry
 intmat im[2][2] = 13 div 3, -4, i1;&
 				a $2\times 2$ matrix.  Entries are filled
 				row-wise, missing entries are set to zero, extra
 				entries are ignored.  vector/matrix elements are
 				accessed using the {\tt[$\ldots$]} operator,
-				where the first index is one (\eg {\tt iv[3];
-				im[1, 2];}).\cr
-\interentryskip
+				where the first element has index one (\eg {\tt
+				iv[3]; im[1, 2];}).\cr
+\entryskip
 \longitem
 string s1 = "a quote \char"5C " and a backslash \char"5C \char"5C";\par
 string s2 = "con" + "catenation";\cr
-\interentryskip
+\entryskip
 \sectext
-The basering in the following is {\tt ring r = 0, (x, y, z, mu, nu), dp;}\cr
-\interentryskip
+Basering in the following is {\tt ring r = 0, (x, y, z, mu, nu), dp;}\cr
+\entryskip
 \longitem
 number n = 5/3;\cr
-\interentryskip
+\entryskip
 \longentry
 poly p(1) = 2xy2+3/4x3yz4;\par
 poly p(2) = (5/3)*mu\^{}2*nu\^{}3+n*yz2;&
-				{\tt p(1)} equals $3/4x^3yz^4+2xy^2$.  The
-				short format of monomials is valid for
-				one-character ring variables only.\cr
-\interentryskip
+				{\tt p(1)} equals $3/4x^3yz^4+2xy^2$.  Short
+				format of mono\-mials is valid for one-character
+				ring variables only.\cr
+\entryskip
 \longentry
 ideal i = p(1..2), x+y;&	note the use of indexed names\cr
-\interentryskip
+\entryskip
 \longentry
 vector v = [p(1), p(2), x+y];\par
 vector w = 2*p(1)*gen(6)+n*nu*gen(1);&
@@ -220,35 +222,40 @@ vector w = 2*p(1)*gen(6)+n*nu*gen(1);&
 				[$\ldots$]}) or expressed as linear
 				combinations of the canonical generators {\tt
 				gen({\it i\/})}\cr
-\interentryskip
+\entryskip
 \longitem
 module mo = v, w, x+y*gen(1);\cr
-\interentryskip
+\entryskip
 \longitem
 resolution r = sres(std(mo), 0);\cr
-\interentryskip
+\entryskip
 \longentry
 matrix ma[2][2] = 5/3, p(1), 101;&
 				the rules for declaring, filling, and accessing
-				of integer matricies apply to the types {\tt
-				matrix} and {\tt vector}, too\cr
-\interentryskip
+				integer matrices apply to types {\tt matrix}
+				and {\tt vector}, too\cr
+\entryskip
 \longentry
 list l = iv, v, p(1..2), mo;&
 				lists may collect objects of any type.  They are
 				ring-dependent iff one of the entries is.\cr
+\entryskip
+\longentry
+def d = read("MPfile:r example.mp");&
+				a name of type {\tt def} inherits the type of
+				the object assigned first to it.  Useful if the
+				actual type of an object is unknown.\cr
 \endsec
-\endgroup
 
 \sec Monitoring and debugging tools()
 timer = 1;&			print time used for commands to execute\cr
 \longentry int t = timer; {\it commandsequence}; timer-t;&
-				print time in seconds used for {\it commandsequence}
-				to execute\cr
+				print time used for {\it commandsequence} to
+				execute\cr
 memory(1);&			print number of bytes allocated from system\cr
 option(prot);&			show algorithm protocol\cr
 option(mem);&			show algorithm memory usage\cr
-\noalign{\medskip}
+\entryskip
 TRACE = 1;&			print protocol on execution of procedures\cr
 listvar(all);&			list all (user-)defined names\cr
 \longentry listvar({\it ringname});&
@@ -263,7 +270,7 @@ option();&			show current option settings\cr
 				switch $option_1$ on and $option_2$ off, resp.\cr
 option(none);&			reset all options to default values\cr
 \sectext
-The most important options:\cr
+Type {\tt help option;} for a list of all options.\cr
 \subsec{Monitoring}
 debugLib&			show loading of procedures from libraries\cr
 mem&				show algorithm memory usage\cr
@@ -286,7 +293,7 @@ returnSB&			let some functions return standard bases\cr
 
 \sec System variables()
 \sectext
-The most important system variables:\cr
+Type {\tt help System variables;} for a list of all system variables.\cr
 \subsec{Standard bases}
 degBound&			stop if (weighted) total degree exceeds {\tt
 				degBound}\cr
@@ -295,77 +302,87 @@ multBound&			stop if multiplicity gets smaller than {\tt
 noether&			cut off all monomials above the monomial {\tt
 				noether}\cr
 \subsec{Miscellany}
-minPoly&			use {\tt minPoly} as minimal polynomial for
-				algebraic extensions\cr
-short&				print monomials in a long format if non-zero\cr
+basering&			the current basering\cr
+minpoly&			minimal polynomial for algebraic extensions\cr
+short&				do not print monomials in short format if zero\cr
 timer&				on assignment of a non-zero value show time
 				used for execution of executed commands.  On
 				evaluation, return system time in seconds used
 				by \Singular\ since start\cr
 TRACE&				print information on procedures being executed
-				if {\tt TRACE} is larger than one\cr
+				if larger than one\cr
+\endsec
+
+\sec Input and output()
+< "{\it filename}";&		load and execute {\it filename}\cr
+\longentry write("{\it filename}", {\it expression\_list})&
+				write {\it expression\_list} to ASCII file {\it
+				filename}\cr
+\longentry read("{\it filename}");&
+				read ASCII file {\it filename} and return
+				content as a string.  See also example below.\cr
+\longentry
+dump("MPfile: {\it filename}");\par
+getdump("MPfile: {\it filename}");&
+				dump current state of {\sc Singular} to {\it
+				filename} and retrieve it, resp.\cr
+\entryskip
+\sectext
+An example how to write one single expression (in this case the
+ideal {\tt i}) to a file and read it back from there:
+
+{\tt
+write("i.save", i);\par
+execute("ideal i=" + read("i.save") + ";");
+}\cr
+\endsec
+
+\eject
+				
+\sec Libraries()
+LIB "{\it library\/}";&		load {\it library}\cr
+help {\it library\/};&		show help on {\it library}\cr
+help all.lib;&			show list of all libraries\cr
 \endsec
 
 \sec Mapping(1.5cm)
-\longentry map {\it name\/} = {\it ringname}, {\it idealexpression};&
+\longentry map {\it name\/} = {\it ringname}, {\it ideal\/};&
 				declare a map {\it name\/} from {\it ringname}
 				to current basering.  The $i$'th ring variable
 				from {\it ringname} is mapped to the $i$'th
-				generator from {\it idealexpression}.\cr
+				generator of {\it ideal}.\cr
 \longentry {\it mapname\/}({\it expression\/})&
 				apply map {\it mapname\/} to {\it expression}\cr
-\noalign{\smallskip}
+\entryskip
 \sectext
 Coefficients between rings with different basefields are mapped in the following
-way (non-canonical maps only):\par
-$Z_p \rightarrow Q: [i]_p \mapsto i \in [-p/2,p/2] \subset Z$\par
-$Z_p \rightarrow Z_q: [i]_p \mapsto i \in [-p/2,p/2] \subset Z \mapsto [i]_q \in
-Z_q$\cr
-\noalign{\smallskip}
-\longentry subst({\it expression}, {\it ringvar}, {\it monomial\/})&
-				substitute {\it ringvar\/} by {\it monomial\/}
-				in {\it expression}\cr
+way (non-canonical maps only):\strut
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+$$
+\eqalign{Z_p \rightarrow Q&  :[i]_p \mapsto i \in [-p/2,p/2] \subset Z\cr
+	 Z_p \rightarrow Z_q&:[i]_p \mapsto i \in [-p/2,p/2] \subset Z, i \mapsto [i]_q}
+$$
+\cr
+\noalign{\vskip -9pt} % dirty trick, gobbles the trailing \strut from \sectext
+\entryskip
+\longentry fetch({\it ringname}, {\it name\/})&
+				map object {\it name\/} from ring {\it
+				ringname\/} to current base\-ring.  The rings
+				have to be ``almost'' identical.\cr
 \longentry imap({\it ringname}, {\it name\/})&
 				map object {\it name\/} from subring {\it
 				ringname\/} to current basering\cr
-\longentry fetch({\it ringname}, {\it name\/})&
-				map object {\it name\/} from ring {\it
-				ringname\/} to current basering.  The rings
-				have to be ``allmost'' identical.\cr
+\longentry subst({\it expression}, {\it ringvar}, {\it monomial\/})&
+				substitute {\it ringvar\/} by {\it monomial\/}
+				in {\it expression}\cr
 \endsec
 
-\sec Liebe SINGULAR-Entwickler und Benutzer!()
-\sectext
-\font\ninerm=cmr9
-\ninerm\baselineskip=11pt
-\parindent=1em
-Das ist der Entwurf einer Quick-Reference-Card f\"ur SINGULAR.  Nachdem der
-`kanonische' Teil gesetzt ist, gebe ich die Arbeit weiter an Euch.  Genauer:
-
-\medskip
-\item{$\bullet$} K\"onntet Ihr bitte den bereits vorhandenen Text korrektur\-lesen,
-  insbesondere auch auf typografische Fehler achtend.
-
-\item{$\bullet$} Eure \"Anderungsw\"unsche und Kritik dazu h\"atte ich gerne.
-  Allerdings ist die erste Seite bereits voll.  Wenn Ihr also irgendwo eine
-  Zeile mehr haben wollt, m\"u\ss t Ihr auch dazusagen, wo eine andere
-  rausgenommen werden soll.
-
-\hang Die Karte ist keine Kurzeinf\"uhrung in SINGULAR, sondern soll als
-  Ged\"achtnisst\"utze dienen.  Dies bitte bei Kritik der Art ``zu ungenau!''
-  oder ``besser!'' beachten.  Davon abgesehen bitte ich um konstruktive Kritik.
-
-\item{$\bullet$} Es fehlen noch Abschnitte zu Input/Output und zu den
-  meistgebrauchten mathematischen Funktionen.  F\"ur den Input/Output-Teil bitte
-  das aufschreiben, was ihr f\"ur erw\"ahnenswert haltet bzw. h\"aufig braucht.
-  Und f\"ur die mathematischen Funktionen bitte ich regelrecht um eine
-  ``Top-Twenty'' der von Euch am h\"aufigsten gebrauchten SINGULAR-Kernel
-  Funktionen.  Oder auch Library-Funktionen?
-
-\hang Irgendwann soll es noch eine ``Programmer's Quick Reference Card''
-  geben (hoffentlich nicht von mir).  Dementsprechend also eher Funktionen
-  ber\"ucksichtigen, die f\"ur den interaktiven Gebrauch wichtig sind.
-\cr
+\sec Miscellany(1.5cm)
+\longentry ord({\it poly\/}\alt{\it vector\/})&
+				return (weighted) degree of initial term\cr
+\longentry deg({\it poly\/}\alt{\it vector\/})&
+				return maximal (weighted) degree of terms\cr
 \endsec
 
 \bye
