@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.198 2000-01-11 17:51:15 Singular Exp $ */
+/* $Id: iparith.cc,v 1.199 2000-01-13 10:33:19 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -570,20 +570,27 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
   int e=(int)v->Data();
   int rc = 1;
   BOOLEAN overflow=FALSE;
-  if ((e >= 0)&&(b!=0))
+  if (e >= 0)
   {
-    int oldrc;
-    while ((e--)!=0)
+    if (b==0)
     {
-      oldrc=rc;
-      rc *= b;
-      if (!overflow)
-      {
-        if(rc/b!=oldrc) overflow=TRUE;
-      }
+      rc=0;
     }
-    if (overflow)
-      Warn("int overflow(^), result may be wrong");
+    else
+    {
+      int oldrc;
+      while ((e--)!=0)
+      {
+        oldrc=rc;
+        rc *= b;
+        if (!overflow)
+        {
+          if(rc/b!=oldrc) overflow=TRUE;
+        }
+      }
+      if (overflow)
+        WarnS("int overflow(^), result may be wrong");
+    }
     res->data = (char *)rc;
     if (u!=NULL) return jjOP_REST(res,u,v);
     return FALSE;
@@ -740,7 +747,7 @@ static BOOLEAN jjPLUS_I(leftv res, leftv u, leftv v)
   res->data = (char *)c;
   if (((Sy_bit(31)&a)==(Sy_bit(31)&b))&&((Sy_bit(31)&a)!=(Sy_bit(31)&c)))
   {
-    Warn("int overflow(+), result may be wrong");
+    WarnS("int overflow(+), result may be wrong");
   }
   return jjPLUSMINUS_Gen(res,u,v);
 }
@@ -811,7 +818,7 @@ static BOOLEAN jjMINUS_I(leftv res, leftv u, leftv v)
   unsigned int c=a-b;
   if (((Sy_bit(31)&a)!=(Sy_bit(31)&b))&&((Sy_bit(31)&a)!=(Sy_bit(31)&c)))
   {
-    Warn("int overflow(-), result may be wrong");
+    WarnS("int overflow(-), result may be wrong");
   }
   res->data = (char *)c;
   return jjPLUSMINUS_Gen(res,u,v);
@@ -852,7 +859,7 @@ static BOOLEAN jjTIMES_I(leftv res, leftv u, leftv v)
   int b=(int)v->Data();
   int c=a * b;
   if ((b!=0) && (c/b !=a))
-    Warn("int overflow(*), result may be wrong");
+    WarnS("int overflow(*), result may be wrong");
   res->data = (char *)c;
   if ((u->Next()!=NULL) || (v->Next()!=NULL))
     return jjOP_REST(res,u,v);
