@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.13 2002-07-04 14:18:37 anne Exp $
+ * $Id: utils.cc,v 1.14 2002-09-26 09:55:11 anne Exp $
  */
 
 #include <stdio.h>
@@ -17,6 +17,7 @@ int modlineno;    /* lineno within module */
 
 #include "modgen.h"
 
+extern int do_create_srcdir;
 void init_system_type();
 
 /*========================================================================*/
@@ -99,7 +100,9 @@ char *build_filename(
 {
   static char p[512];
 
-  switch(what) 
+  if(do_create_srcdir)
+  {
+    switch(what) 
     {
         case 1:
           snprintf(p, sizeof(p), "%s/%s.cc", module->name, text);
@@ -117,7 +120,26 @@ char *build_filename(
           snprintf(p, sizeof(p), "%s/%s", module->name, text); 
           break;
     }
-  
+  } else {
+    switch(what)
+    {
+      case 1:
+        snprintf(p, sizeof(p), "%s.cc",text);
+        break;
+      case 2:
+	snprintf(p, sizeof(p), "%s.h",text);
+	break;
+      case 3:
+        snprintf(p, sizeof(p), "%s.bin",text);
+	break;
+      case 4:
+        snprintf(p, sizeof(p), "%s.pl",text);
+	break;
+      default:
+        snprintf(p, sizeof(p), "%s",text);
+	break;
+    }
+  }
   return p;
 }
 

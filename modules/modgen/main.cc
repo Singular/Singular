@@ -69,15 +69,17 @@ extern void init_type_conv();
 int debug = 0;
 int trace = 0;
 int do_create_makefile = 1;
+int do_create_srcdir = 1;
 char* inst_dir = EXEC_PREFIX;
 
 static struct option long_options[] =
 {
   {"debug", 0, 0, 'd'},
-  {"verbose", 0, 0, 'v'},
-  {"nocreate-makefile", 0, 0, 'm'},
-  {"install-dir",1,0,'i'},
   {"help", 0, 0, '?'},
+  {"install-dir",1,0,'i'},
+  {"nocreate-makefile", 0, 0, 'm'},
+  {"nocreate-srcdir", 0, 0, 's'},
+  {"verbose", 0, 0, 'v'},
   {0, 0, 0, 0}
 };
 
@@ -113,7 +115,7 @@ main( int argc, char *argv[] )
   int option_index = 0;
   unsigned long cksm;
 
-  while( (c=getopt_long (argc, argv, "dmvi:",
+  while( (c=getopt_long (argc, argv, "dmvsi:",
                          long_options, &option_index))>=0) {
     switch (c)
     {
@@ -121,6 +123,7 @@ main( int argc, char *argv[] )
         case 'v' : trace=1; break;
         case 'm' : do_create_makefile = 0; break;
 	case 'i' : inst_dir=optarg; break;
+	case 's' : do_create_srcdir = 0; break;
           
         case '?' : usage(argv[0]);
           return 0;

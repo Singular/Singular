@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.14 2002-07-01 12:31:34 anne Exp $ */
+/* $Id: scanner.l,v 1.15 2002-09-26 09:55:10 anne Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -124,6 +124,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 /* %start START */
 
 %x preamble
+%x MODINITIAL
 %x PROCCMDBLOCK
 %x CODEBLOCK
 %x CODEBLOCK2
@@ -235,6 +236,12 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
 					  yylineno, module_def.filename);
 		}
+	^"%modinitial".*{NL} {
+	        yylineno++;
+		push_state(YYSTATE, MODINITIAL, "MODINITIAL");
+		fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
+	                               	  yylineno, module_def.filename);
+		}
 	{WS}            /* discard */
         {NL}    { yylineno++; }
 
@@ -275,7 +282,15 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
          {NL}    { yylineno++; yymore(); }
          .       { yymore(); }
        }
-
+<MODINITIAL>{
+           ^"%endinitial".*{NL} {
+	           yylineno++;
+		   pop_state();
+                 }
+           .*{NL}  { yylineno++; 
+	           lvalp->name = yytext;
+		   return CODEPART; }
+       }
 <STRING>{
           {NL}    { yylineno++; yymore(); }
           [^\"]   { yymore(); }

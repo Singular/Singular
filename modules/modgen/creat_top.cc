@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.19 2002-07-05 06:51:33 anne Exp $ */
+/* $Id: creat_top.cc,v 1.20 2002-09-26 09:55:09 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -16,6 +16,7 @@
 
 
 extern int yylineno;
+extern int do_create_srcdir;
 
 void enter_id(FILE *fp, char *name, char *value);
 /*========================================================================*/
@@ -148,7 +149,7 @@ int write_intro(
 {
   char filename[512];
 
-  mkdir(module->name, 0755);
+  if(do_create_srcdir) mkdir(module->name, 0755);
   strcpy(filename, build_filename(module, module->name, 1));
   
   fflush(module->fmtfp);

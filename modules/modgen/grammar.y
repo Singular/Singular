@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.19 2002-07-03 12:42:49 anne Exp $
+ * $Id: grammar.y,v 1.20 2002-09-26 09:55:10 anne Exp $
  */
 
 %{
@@ -19,6 +19,7 @@
 
 int sectnum = 1;
 int iseof = 0;
+int initdone = 0;
 extern moddef module_def;
 extern int yylineno;
 extern int do_create_makefile;
@@ -125,7 +126,6 @@ part1: initmod sect1 sect1end
         }
         | sect1 sect1end
         {
-          write_mod_init(&module_def, module_def.fmtfp);
           if(do_create_makefile)mod_create_makefile(&module_def);
           if(write_intro(&module_def)) {
             return(myyyerror("Error while creating files\n"));
@@ -133,7 +133,6 @@ part1: initmod sect1 sect1end
         }
         | sect1end
         {
-          write_mod_init(&module_def, module_def.fmtfp);
           if(do_create_makefile)mod_create_makefile(&module_def);
           if(write_intro(&module_def)) {
             return(myyyerror("Error while creating files\n"));
@@ -148,6 +147,7 @@ initmod:
 					  yylineno, module_def.filename);
           free($1);
           write_mod_init(&module_def, module_def.fmtfp);
+	  initdone = 1;
         }
 
 sect1: expr ';'
@@ -155,10 +155,32 @@ sect1: expr ';'
 ;
 
         
-sect1end: SECTEND
+sect1end:
+        codeline2 SECTEND
+	{
+	  memset(&procedure_decl, 0, sizeof(procdef));
+	  if(debug>2)printf("End of section 1 (new=%d)\n", sectnum);
+	}  
+	| SECTEND
         {
           memset(&procedure_decl, 0, sizeof(procdef));
           if(debug>2)printf("End of section 1 (new=%d)\n", sectnum);
+        }
+        ;
+
+codeline2: CODEPART
+        {
+	  if(initdone == 0) {
+	    write_mod_init(&module_def, module_def.fmtfp);
+	    initdone = 1;
+          }
+	  fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
+	                            yylineno, module_def.filename);
+          fprintf(module_def.fmtfp, "%s", $1);
+        }
+        | codeline2 CODEPART
+        {
+        fprintf(module_def.fmtfp, "%s", $2);
         }
         ;
 
@@ -699,6 +721,7 @@ codeline: CODEPART
         {
           fprintf(module_def.modfp, "#line %d \"%s\"\n",
 					  yylineno, module_def.filename);
+          fprintf(module_def.modfp, "%s", $1);
         }
         | codeline CODEPART
         {
