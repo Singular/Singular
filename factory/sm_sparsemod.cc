@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.cc,v 1.1 1997-07-19 08:40:49 schmidt Exp $ */
+/* $Id: sm_sparsemod.cc,v 1.2 1997-07-22 09:16:10 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -314,8 +314,8 @@ smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm &
 }
 
 // In sparsemod testen, ob G[levU] | u und G[levU] | v ///
-CanonicalForm
-sparsemod( const CanonicalForm & F, const CanonicalForm & G )
+static CanonicalForm
+internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
 {
   // On(SW_USE_EZGCD );
   On( SW_SYMMETRIC_FF );
@@ -669,4 +669,13 @@ sparsemod( const CanonicalForm & F, const CanonicalForm & G )
 
   return 0;
 
+}
+
+CanonicalForm
+sparsemod( const CanonicalForm & F, const CanonicalForm & G )
+{
+    Off( SW_USE_SPARSEMOD );
+    CanonicalForm result = internalSparsemod( F, G );
+    On( SW_USE_SPARSEMOD );
+    return result;
 }
