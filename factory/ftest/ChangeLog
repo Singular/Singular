@@ -1,4 +1,16 @@
+Tue Jul  7 18:19:42 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* gcd.m4 (normalizeGcd): new function
+	  (gcdCheck): uses `normalizeGcd()' to check result and real
+	  result
+
+	* gcd.m4 (ftestSetNameOfGame): doc fixes
+
+	* extgcd.m4: new file
+
 Fri Jul  3 11:26:56 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* feval.m4: doc fixes
 
 	* ChangeLog, divrem.m4, feval.m4:
 	  ***** merge from branch `factory-gcd' to main trunk

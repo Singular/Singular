@@ -1,4 +1,31 @@
+Tue Jul  7 18:34:39 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (ftestm4src): `extgcd.m4' added to distribution
+
+Wed Jul  1 10:57:53 1998      <pohl@FUECHSE>
+
+	* int_intdiv.cc (modulocoeff): extra call added for `mpz_mod_ui()'
+	  with void return value.  Wrapped by #define `__MWERKS__'.
+
+Tue Jun 30 16:38:41 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_algorithm.cc: doc fixes
+
+	* cf_algorithm.cc (divides): bug fix.  Works for zero f and g.
+	  More heuristic added.
+
+	* cf_algorithm.cc (psr, psq, psqr): bug fix.  Work for `x' with
+	  level lower than `level(f)' or `level(g)'.
+
+	* cf_algorithm.h: doc fixes
+
+	* ftmpl_inst.cc (tmax, tmin(Var, Var)): instantiations added
+
+	* GNUmakefile.in (ftestm4src): `divides.m4' added to distribution
+
 Mon Jun 29 12:41:40 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* templates/ftmpl_functions.h: doc fixes
 
 	* GNUmakefile.in (basefactorysrc): `cf_inline.cc' and
 	  `cf_iter_inline.cc' added to distribution
