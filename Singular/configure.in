@@ -148,6 +148,8 @@ fi
 test "x$bindir" = 'x${exec_prefix}/bin' && bindir="${exec_prefix}/bin" 
 SINGULAR=${SINGULAR:-$bindir/Singular-$SINGULAR_MAJOR_VERSION.$SINGULAR_MINOR_VERSION.$SINGULAR_SUB_VERSION}
 AC_SUBST(SINGULAR)
+SINGULAR_BIN_DIR=$bindir
+AC_SUBST(SINGULAR_BIN_DIR)
 
 # expand libdir
 test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${SINGULAR_VERSION}"
