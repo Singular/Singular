@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.5 1997-10-15 07:58:51 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.6 1997-10-15 08:05:23 pohl Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -1154,6 +1154,14 @@ static short scRestrict( int &Nstc, scfmon stc, int Nvar)
   }
   if (Istc < Nstc)
   {
+    for (i=Nstc-1; i>=0; i--)
+    {
+      if (stc[i] && (stc[i][Nvar] >= y))
+      {
+	Istc--;
+	stc[i] = NULL;
+      }
+    }
     j = 0;
     while (stc[j]) j++;
     i = j+1;
@@ -1228,19 +1236,20 @@ static void scDegKbase( scfmon stc, int Nstc, int Nvar, short deg)
   Ivar = Nvar-1;
   sn = hGetmem(Nstc, stc, stcmem[Ivar]);
   x = scRestrict(Nstc, sn, Nvar);
-  if (x < 0) ideg = deg;
+  if (x <= 0)
+  {
+    if (x == 0) return;
+    ideg = deg;
+  }
   else
   {
-    if (Nstc == 0)
-    {
-      if (deg >= x) return;
-      act[Nvar] = deg;
-      for (i=Ivar; i; i--) act[i] = 0;
-      scElKbase();
-      return;
-    }
     if (deg < x) ideg = deg;
     else ideg = x-1;
+    if (Nstc == 0)
+    {
+      scAllKbase(Nvar, ideg, deg);
+      return;
+    }
   }
   loop
   {
@@ -1301,18 +1310,7 @@ static void scInKbase( scfmon stc, int Nstc, int Nvar)
   Ivar = Nvar-1;
   sn = hGetmem(Nstc, stc, stcmem[Ivar]);
   x = scRestrict(Nstc, sn, Nvar);
-  if (Nstc == 0)
-  {
-    if (x == 0) return;
-    for (i=Ivar; i; i--) act[i] = 0;
-    do
-    {
-      x--;
-      act[Nvar] = x;
-      scElKbase();
-    } while(x > 0);
-    return;
-  }
+  if (x == 0) return;
   ideg = x-1;
   loop
   {
@@ -1428,6 +1426,5 @@ ende:
     return scIdKbase();
   }
 }
-
 
 
