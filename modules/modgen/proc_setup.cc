@@ -1,5 +1,5 @@
 /*
- * $Id: proc_setup.cc,v 1.3 2000-01-27 12:40:54 krueger Exp $
+ * $Id: proc_setup.cc,v 1.4 2000-02-14 21:44:40 krueger Exp $
  */
 
 #include <stdio.h>
@@ -27,7 +27,8 @@ int init_proc(
   procdefv p,
   char *procname,
   paramdefv ret,
-  int lineno
+  int lineno,
+  language_defs language
   )
 {
   int i;
@@ -39,6 +40,7 @@ int init_proc(
   if( p->c_code != NULL ) free(p->c_code);
   if( p->help_string != NULL) free(p->help_string);
   if( p->example_string != NULL) free(p->example_string);
+  
   if( p->paramcnt>0 ) { 
     //free(p->param);
   }
@@ -58,13 +60,12 @@ int init_proc(
     p->return_val.typ = NONE;
   }
   
+  p->language = language;
   p->lineno = lineno;
   p->flags.do_typecheck = default_do_typecheck;
   p->flags.do_return = default_do_return;
   p->flags.declaration_done = 0;
   p->flags.typecheck_done = 0;
-  printf("Default: %d %d\n",  p->flags.do_typecheck,
-         p->flags.do_return);
   
   return 0;
 }
@@ -72,7 +73,8 @@ int init_proc(
 /*========================================================================*/
 void AddParam(
   procdefv p,
-  paramdefv vnew
+  paramdefv vnew,
+  char *varname
   )
 {
   paramdef pnew;
@@ -98,6 +100,11 @@ void AddParam(
   pnew.typ = vnew->typ;
 
   paramcnt = p->paramcnt;
+  if(varname == NULL) {
+    snprintf(typname, sizeof(typname), "res%d", paramcnt);
+    pnew.varname = strdup(typname);
+  } else pnew.varname = strdup(varname);
+
  if(p->paramcnt==0) {
     p->param = (paramdefv)malloc(sizeof(paramdef));
  }
@@ -201,4 +208,26 @@ void proc_set_var(
   return;
 }
 
+/*========================================================================*/
+char *ReservedVarnames[] = {
+  "v",
+  "h"
+  "res",
+  "v_save"
+  "tok",
+  "index",
+  NULL 
+};
+
+int check_reseverd(
+  char *name
+  )
+{
+  int i;
+  
+  for(i=0; ReservedVarnames[i] != NULL; i++)
+    if(strcmp(ReservedVarnames[i], name)==0) return 1;
+  return 0;
+}
+  
 /*========================================================================*/

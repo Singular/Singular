@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.5 2000-01-27 12:40:03 krueger Exp $
+ * $Id: proc.cc,v 1.6 2000-02-14 21:44:40 krueger Exp $
  */
 
 #include <stdio.h>
@@ -38,32 +38,47 @@ void setup_proc(
   /* if proc is NULL, just return */
   if( proc == NULL ) return;
 
-//  if(proc->funcname == NULL) proc->funcname = strdup(proc->procname);
-  if(proc->return_val.typ == NONE) {
-    if(proc->return_val.typname == NULL) {
-      proc->return_val.typname = strdup("NONE");
-    }
-  }
   if(trace) printf("\tcreating '%s'...", proc->procname); fflush(stdout);
-  
-  /* write call to add procname to list */
   fprintf(module->modfp, "#line %d \"%s\"\n", proc->lineno, module->filename);
-  fprintf(module->modfp, "  iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
-          module->name, proc->procname, 
-          proc->is_static ? "TRUE" : "FALSE",
-          proc->procname);
-  if(proc->help_string!=NULL) {
-    fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(helphdl) ,");
-    fprintf(module->modfp, " IDID(helphdl));\n");
-    fprintf(module->modfp, "  enter_id(\"%s\",", proc->procname);
-    fprintf(module->modfp, " \"%s\", STRING_CMD);\n", proc->help_string);
-    fprintf(module->modfp, "  namespaceroot->push();\n");
-  }
-  fprintf(module->modfp, "\n");
 
-  write_procedure_header(module, proc, module->fmtfp);
-  fprintf(module->modfp_h,
-          "BOOLEAN mod_%s(leftv res, leftv h);\n", proc->procname);
+  switch(proc->language) {
+      case LANG_C:
+        //  if(proc->funcname == NULL) proc->funcname = strdup(proc->procname);
+        if(proc->return_val.typ == NONE) {
+          if(proc->return_val.typname == NULL) {
+            proc->return_val.typname = strdup("NONE");
+          }
+        }
+  
+        printf("iiAddCproc %s is C\n", proc->procname);
+        /* write call to add procname to list */
+        fprintf(module->modfp, "  iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
+                module->name, proc->procname, 
+                proc->is_static ? "TRUE" : "FALSE",
+                proc->procname);
+        if(proc->help_string!=NULL) {
+          fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(helphdl) ,");
+          fprintf(module->modfp, " IDID(helphdl));\n");
+          fprintf(module->modfp, "  enter_id(\"%s\",", proc->procname);
+          fprintf(module->modfp, " \"%s\", STRING_CMD);\n", proc->help_string);
+          fprintf(module->modfp, "  namespaceroot->push();\n");
+        }
+        fprintf(module->modfp, "\n");
+
+        write_procedure_header(module, proc, module->fmtfp);
+        fprintf(module->modfp_h,
+                "BOOLEAN mod_%s(leftv res, leftv h);\n", proc->procname);
+        break;
+        
+      case LANG_SINGULAR:
+        fprintf(module->modfp,
+                "  h = add_singular_proc(%s, %d, %ld, %ld, %s);\n",
+                proc->procname, proc->lineno,
+                proc->sing_start, proc->sing_end,
+                proc->is_static ? "TRUE" : "FALSE");
+        break;
+  }
+  
   //  printf(" done\n");
 }
 
@@ -126,8 +141,8 @@ void write_function_declaration(
     fprintf(module->fmtfp, "  int tok = NONE, index = 0;\n");
     for (i=0;i<pi->paramcnt; i++)
       fprintf(module->fmtfp, 
-              "  sleftv sres%d; leftv res%d = &sres%d;\n", i, i, i);
-
+              "  sleftv s%s; leftv %s = &s%s;\n", pi->param[i].varname,
+              pi->param[i].varname, pi->param[i].varname);
     fprintf(module->fmtfp, "\n");
     pi->flags.declaration_done = 1;
   }
@@ -168,7 +183,8 @@ void write_function_return(
                   pi->funcname);
     }
     for (i=0;i<pi->paramcnt; i++) {
-      fprintf(module->modfp_h, "%s res%d", type_conv[pi->param[i].typ], i);
+      fprintf(module->modfp_h, "%s %s", type_conv[pi->param[i].typ], 
+              pi->param[i].varname);
       if(i<pi->paramcnt-1) fprintf(module->modfp_h, ", ");
     }
     fprintf(module->modfp_h, ");\n\n");
@@ -270,8 +286,8 @@ static void gen_func_param_check(
   fprintf(fp, "     goto mod_%s_error;\n", pi->procname);
   fprintf(fp, "  v_save = v->next;\n");
   fprintf(fp, "  v->next = NULL;\n");
-  fprintf(fp, "  if(iiConvert(tok, %s, index, v, res%d))\n",
-          pi->param[i].typname, i);
+  fprintf(fp, "  if(iiConvert(tok, %s, index, v, %s))\n",
+          pi->param[i].typname, pi->param[i].varname);
   fprintf(fp, "     goto mod_%s_error;\n", pi->procname);
   fprintf(fp, "  v = v_save;\n");
 }
@@ -307,8 +323,8 @@ void write_procedure_return(
         case SELF_CMD:
           fprintf(fmtfp, "    return(%s(res", pi->funcname);
           for (i=0;i<pi->paramcnt; i++)
-            fprintf(fmtfp, ", (%s) res%d->Data()",
-                    type_conv[pi->param[i].typ], i);
+            fprintf(fmtfp, ", (%s) %s->Data()",
+                    type_conv[pi->param[i].typ], pi->param[i].varname);
           fprintf(fmtfp, "));\n\n");
           break;
 
@@ -317,8 +333,8 @@ void write_procedure_return(
           fprintf(fmtfp, "  res->data = NULL;\n");
           fprintf(fmtfp, "  return(%s(", pi->funcname);
           for (i=0;i<pi->paramcnt; i++) {
-            fprintf(fmtfp, "(%s) res%d->Data()",
-                    type_conv[pi->param[i].typ], i);
+            fprintf(fmtfp, "(%s) %s->Data()",
+                    type_conv[pi->param[i].typ], pi->param[i].varname);
             if(i<pi->paramcnt-1) fprintf(fmtfp, ", ");
           }
           fprintf(fmtfp, "));\n\n");
@@ -328,8 +344,8 @@ void write_procedure_return(
           fprintf(fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
           fprintf(fmtfp, "  res->data = (void *)%s(", pi->funcname);
           for (i=0;i<pi->paramcnt; i++) {
-            fprintf(fmtfp, "(%s) res%d->Data()",
-                    type_conv[pi->param[i].typ], i);
+            fprintf(fmtfp, "(%s) %s->Data()",
+                    type_conv[pi->param[i].typ], pi->param[i].varname);
             if(i<pi->paramcnt-1) fprintf(fmtfp, ", ");
           }
           fprintf(fmtfp, ");\n");
@@ -339,7 +355,7 @@ void write_procedure_return(
 }
 
 /*========================================================================*/
-#if 0
+/*
     if(pi->param[0].typ==SELF_CMD) {
       if(pi->c_code != NULL) fprintf(fp, "%s\n", pi->c_code);
   
@@ -347,25 +363,109 @@ void write_procedure_return(
       fprintf(fp, "}\n\n");
     }
     else {
-#endif
+*/
 
-void write_function_errorhandling(procdefv pi, FILE *fp)
+void write_function_errorhandling(
+  moddefv module,
+  procdefv pi
+  )
 {
   int cnt = 0, i;
-  if(pi->paramcnt>0) {
-    if(pi->flags.typecheck_done) {
-      printf("error handling..."); fflush(stdout);
-      fprintf(fp, "  mod_%s_error:\n", pi->procname);
-      fprintf(fp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(tok));\n",
-              pi->procname);
-      fprintf(fp, "    Werror(\"expected %s(", pi->procname);
-      for (i=0;i<pi->paramcnt; i++) {
-        fprintf(fp, "'%s'", pi->param[i].name);
-        if(i!=pi->paramcnt-1) fprintf(fp, ",");
-      }
-      fprintf(fp, ")\");\n");
-      fprintf(fp, "    return TRUE;\n");
-    } 
+  
+  switch(pi->language) {
+      case LANG_C:
+        if(pi->paramcnt>0) {
+          if(pi->flags.typecheck_done) {
+            printf("error handling..."); fflush(stdout);
+            fprintf(module->fmtfp, "  mod_%s_error:\n", pi->procname);
+            fprintf(module->fmtfp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(tok));\n",
+                    pi->procname);
+            fprintf(module->fmtfp, "    Werror(\"expected %s(", pi->procname);
+            for (i=0;i<pi->paramcnt; i++) {
+              fprintf(module->fmtfp, "'%s'", pi->param[i].name);
+              if(i!=pi->paramcnt-1) fprintf(module->fmtfp, ",");
+            }
+            fprintf(module->fmtfp, ")\");\n");
+            fprintf(module->fmtfp, "    return TRUE;\n");
+          } 
+        }
+        fprintf(module->fmtfp, "}\n\n");
+        break;
+      case LANG_SINGULAR:
+        fprintf(module->binfp, "}\n// end of procedure %s\n\n", pi->procname);
+        fprintf(module->modfp, "  if( h != NULL) {\n");
+        fprintf(module->modfp, "    IDPROC(h)->data.s.body_end = %ld;\n",
+                ftell(module->binfp));
+        fprintf(module->modfp, "    IDPROC(h)->data.s.proc_end = %ld;\n",
+                ftell(module->binfp));
+        fprintf(module->modfp, "  }\n");
+        break;
   }
-    fprintf(fp, "}\n\n");
+  
 }
+
+/*========================================================================*/
+int write_singular_procedures(
+  moddefv module,
+  procdefv proc
+  )
+{
+  if(module->binfp==NULL) {
+    char *filename;
+
+    filename = (char *)malloc(strlen(module->name)+5+4);
+    sprintf(filename, "tmp/%s.bin", module->name);
+
+    if( (module->binfp = fopen(filename, "w")) == NULL) {
+      free(filename);
+      return -1;
+    }
+    printf("Creating %s, ", filename);fflush(stdout);
+
+    free(filename);
+  }
+  
+  /* */
+  fprintf(module->binfp, "// line %d \"%s\"\n", proc->lineno,
+          module->filename);
+  fprintf(module->binfp, "// proc %s\n", proc->procname);
+  proc->sing_start = ftell(module->binfp);
+  
+  return 0;
+}
+
+/*========================================================================*/
+void write_singular_parameter(
+  moddefv module,
+  int lineno,
+  char *typname,
+  char *varname
+  )
+{
+  fprintf(module->binfp, "  parameter %s %s;\n", typname, varname);
+}
+
+/*========================================================================*/
+void write_codeline(
+  moddefv module,
+  procdefv proc,
+  char *line,
+  int lineno
+  )
+{
+  switch(proc->language) {
+      case LANG_SINGULAR:
+        if(lineno>=0)
+          fprintf(module->binfp, "// #line %d \"%s\"\n",
+					  lineno, module->filename);
+        fprintf(module->binfp, "%s", line); break;
+
+      case LANG_C: 
+        if(lineno>=0)
+          fprintf(module->fmtfp, "#line %d \"%s\"\n",
+					  lineno, module->filename);
+        fprintf(module->fmtfp, "%s", line); break;
+  }
+}
+
+/*========================================================================*/
