@@ -155,6 +155,18 @@ then
         echo ${prefix}-Unknown
         exit 1
     fi
+# other PowerPC ##############################################
+elif (echo $uname_a | $egrep "ppc" > $devnull)
+then
+    prefix="ppc"
+    if (echo $uname_a | $egrep "Linux" > $devnull)
+    then
+        echo ${prefix}-Linux
+        exit 0
+    else
+        echo ${prefix}-Unknown
+        exit 1
+    fi
 # itanium ########################################################
 elif (echo $uname_a | $egrep "itanium" > $devnull)
 then
