@@ -1,21 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_list.cc,v 1.3 1997-04-30 13:08:26 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1997/04/15 10:10:20  schmidt
-#include <config.h> added
-the headers config.h and assert.h will be included
-  be makeheader now
-
-Revision 1.1  1997/03/27 10:31:57  schmidt
-stream-io wrapped by NOSTREAMIO
-error check changed to ASSERT
-
-Revision 1.0  1996/05/17 11:06:32  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: ftmpl_list.cc,v 1.4 1997-06-19 13:11:19 schmidt Exp $ */
 
 #include <factoryconf.h>
 

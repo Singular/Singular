@@ -1,25 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_array.cc,v 1.4 1997-04-30 13:08:23 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.3  1997/04/15 09:56:36  schmidt
-#include <config.h> added
-the headers config.h and assert.h will be included
-  be makeheader now
-
-Revision 1.2  1997/03/27 10:28:51  schmidt
-error check changed to ASSERT
-
-Revision 1.1  1996/07/16 12:24:56  stobbe
-"operators += and *= deleted sincethey are not needed in an general
-array class als well as the functions sum, prod, crossprod.
-"
-
-Revision 1.0  1996/05/17 11:06:32  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: ftmpl_array.cc,v 1.5 1997-06-19 13:11:10 schmidt Exp $ */
 
 #include <factoryconf.h>
 

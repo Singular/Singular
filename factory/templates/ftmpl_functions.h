@@ -1,19 +1,8 @@
-// emacs mode for this file is -*- C++ -*-
-// $Id: ftmpl_functions.h,v 1.2 1997-04-30 13:08:26 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: ftmpl_functions.h,v 1.3 1997-06-19 13:11:16 schmidt Exp $ */
 
-#ifndef INCL_TMPLFUNCTIONS_H
-#define INCL_TMPLFUNCTIONS_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/04/15 10:09:07  schmidt
-#include <config.h> added
-the header config.h will be included be makeheader
-
-Revision 1.0  1996/05/17 11:06:32  stobbe
-Initial revision
-
-*/
+#ifndef INCL_FUNCTIONS_H
+#define INCL_FUNCTIONS_H
 
 #include <factoryconf.h>
 
@@ -29,4 +18,4 @@ inline T tmin( const T & a, const T & b )
   return (a < b) ? a : b;
 }
 
-#endif
+#endif /* ! INCL_FUNCTIONS_H */

@@ -1,25 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_matrix.cc,v 1.5 1997-04-30 13:08:28 schmidt Exp $
-
-/*
- * $Log: not supported by cvs2svn $
- * Revision 1.4  1997/04/18 16:44:13  schmidt
- * o Matrix::Matrix( int, int ), Matrix::Matrix( const Matrix& ),
- *   Matrix::operator=: new (T*)[..]; changed to new T_prt[..];
- *
- * Revision 1.3  1997/04/15 10:12:43  schmidt
- * #include <config.h> added
- * the headers config.h and assert.h will be included
- *   be makeheader now
- *
- * Revision 1.2  1997/03/27 10:33:48  schmidt
- * stream-io wrapped by NOSTREAMIO
- * definition of assertions replaced by #include <assert.h>
- *
- * Revision 1.1  1996/12/18 15:04:23  schmidt
- * Initial revision
- *
- */
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: ftmpl_matrix.cc,v 1.6 1997-06-19 13:11:26 schmidt Exp $ */
 
 #include <factoryconf.h>
 
