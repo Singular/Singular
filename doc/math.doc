@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.12 1998-05-14 16:46:31 Singular Exp $
+@comment $Id: math.doc,v 1.13 1998-05-14 17:40:21 Singular Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -346,9 +346,10 @@ $\deg(x^\alpha) = w_1 \alpha_1 + \cdots + w_n\alpha_n.$
 generators of Loc K[x]^r, the r-fold direct sum of Loc K[x].
 @end ifinfo
 @tex
-$\{ x^a gen(i) | a \in N^n, 1 \leq i \leq r \}$ on Loc K$[x]^r$ = Loc K[x]$gen(1)
-+ \ldots +$Loc K[x]$gen(r)$, where $gen(1), \ldots, gen(r)$ denote the canonical
+$\{ x^a e_i | a \in N^n, 1 \leq i \leq r \}$ on Loc K$[x]^r$ = Loc K[x]$e_1
++ \ldots +$Loc K[x]$e_r$, where $e_1, \ldots, e_r$ denote the canonical
 generators of Loc K[x]$^r$, the r-fold direct sum of Loc K[x].
+(The function {\tt gen(i)} yields $e_i$).
 @end tex
 
 We have two possibilities, either to give priority to the component of a
@@ -1078,6 +1079,7 @@ relations) of R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n
 @end ifinfo
 
 @subheading Regularity
+@cindex Regularity
 @ifinfo
 Let (+) K[X]e(a,n) -> @dots{} -> (+) K[X]e(a,0) -> I -> 0
 @* be a minimal resolution with homogeneous maps of degree 0.
