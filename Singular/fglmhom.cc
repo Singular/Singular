@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.7 1998-01-05 16:39:18 Singular Exp $
+// $Id: fglmhom.cc,v 1.8 1998-05-15 14:31:13 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -216,7 +216,7 @@ getVectorRep( homogData & dat )
 			    }
 			}
 		    }
-		    temp= pIter(temp);
+		    pIter(temp);
 		}
 		pDelete( & nf );
 	    }

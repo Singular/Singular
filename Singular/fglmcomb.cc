@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.9 1998-04-08 12:11:24 pohl Exp $
+// $Id: fglmcomb.cc,v 1.10 1998-05-15 14:31:20 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -39,7 +39,7 @@ pSize( poly p )
     int count = 0;
     while ( p != NULL ) {
         count+= nSize( pGetCoeff( p ) );
-        p= pIter( p );
+        pIter( p );
     }
     return count;
 }
@@ -59,12 +59,12 @@ fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numM
             poly todelete;
             if ( pretemp == NULL ) {
                 todelete = temp;
-                *pptr= pIter( *pptr );
+                pIter( *pptr );
                 temp= *pptr;
             }
             else {
                 todelete= temp;
-                temp= pIter( temp );
+                pIter( temp );
                 pretemp->next= temp;
             }
             pGetCoeff( todelete )= nNeg( pGetCoeff( todelete ) );
@@ -78,7 +78,7 @@ fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numM
             point++;
         else {
             pretemp= temp;
-            temp= pIter( temp );
+            pIter( temp );
         }
     }
 }
@@ -154,7 +154,7 @@ fglmReduce( poly * pptr, fglmVector & v, polyset m, int numMonoms, ideal source,
                 reduced= fglmReductionStep( & pNext( temp ), source, w );
             }
             if ( pNext( temp ) != NULL ) {
-                temp= pIter( temp );
+                pIter( temp );
             }
         }
     }
@@ -194,7 +194,7 @@ fglmNewLinearCombination( ideal source, poly monset )
 	m[k]= pNew();
 	pCopy2( m[k], temp );
 	pSetCoeff( m[k], nInit(1) );
-        temp= pIter( temp );
+        pIter( temp );
     }
 
     nf= (polyset)Alloc( numMonoms * sizeof( poly ) );
@@ -211,7 +211,7 @@ fglmNewLinearCombination( ideal source, poly monset )
         int w = 0;
         while ( temp != NULL ) {
             w+= nSize( pGetCoeff( temp ) );
-            temp= pIter( temp );
+            pIter( temp );
         }
         weights[k]= w;
         STICKYPROT2( "%i ", w );
@@ -256,7 +256,7 @@ fglmNewLinearCombination( ideal source, poly monset )
 		pSetCoeff( basis[basisSize], nInit(1) );
                 basisSize++;
             }
-            temp= pIter( temp );
+            pIter( temp );
         }
         nf[k]= current;
 #ifdef __MWERKS__
@@ -289,7 +289,7 @@ fglmNewLinearCombination( ideal source, poly monset )
             }
             number coeff = nCopy( pGetCoeff( mon ) );
             v[k].setelem( b+1, coeff );
-            mon= pIter( mon );
+            pIter( mon );
         }
         pDelete( nf + k );
     }
@@ -421,7 +421,7 @@ fglmLinearCombination( ideal source, poly monset )
     temp = monset;
     while ( temp != NULL ) {
         numMonoms++;
-        temp= pIter( temp );
+        pIter( temp );
     }
     // Allocate Memory
     m= (polyset)Alloc( numMonoms * sizeof( poly ) );
@@ -462,11 +462,11 @@ fglmLinearCombination( ideal source, poly monset )
                 pSetCoeff( basis[basisSize], nInit( 1 ) );
                 basisSize++;
             }
-            sm= pIter( sm );
+            pIter( sm );
         }
         STICKYPROT( "]" );
         m[k]= mon;
-        temp= pIter( temp );
+        pIter( temp );
     }
     // get the vector representation
     STICKYPROT2( "(%i)", basisSize );
@@ -489,7 +489,7 @@ fglmLinearCombination( ideal source, poly monset )
             }
             number coeff = nCopy( pGetCoeff( mon ) );
             v[k].setelem( b+1, coeff );
-            mon= pIter( mon );
+            pIter( mon );
         }
         STICKYPROT( ")" );
     }

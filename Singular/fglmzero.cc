@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.14 1998-04-14 15:28:31 Singular Exp $
+// $Id: fglmzero.cc,v 1.15 1998-05-15 14:31:04 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -523,7 +523,7 @@ fglmSdata::getVectorRep( const poly p )
 	    number newelem = nCopy( pGetCoeff( m ) );
 	    temp.setelem( num, newelem );
 	    num--;
-	    m= pIter( m );
+	    pIter( m );
 	}
         else { 
 	    if ( comp < 0 ) {
