@@ -150,6 +150,37 @@ char * find_executable_link (const char *name)
 
 #ifdef HAVE_READLINK
 
+/* similar to readlink, but dont' mess up absolute pathnames */
+int my_readlink(const char* name, char* buf, size_t bufsize)
+{
+  char buf2[MAXPATHLEN];
+  int ret;
+  
+  if ((ret = readlink(name, buf2, bufsize)) > 0)
+  {
+    buf2[ret] = 0;
+    if (*name == '/' && *buf2 != '/')
+    {
+      char* last = strrchr(name, '/');
+      int i = 0;
+      while (&(name[i]) != last)
+      {
+        buf[i] = name[i];
+        i++;
+      }
+      buf[i] = '/';
+      i++;
+      strcpy(&(buf[i]), buf2);
+      return i + ret;
+    }
+    else
+    {
+      strcpy(buf, buf2);
+    }
+  }
+  return ret;
+}
+
 #define MAX_LINK_LEVEL 10
 /* similar to readlink (cf. man readlink), except that symbolic links are 
    followed up to MAX_LINK_LEVEL
@@ -159,7 +190,7 @@ int full_readlink(const char* name, char* buf, size_t bufsize)
 {
   int ret;
   
-  if ((ret=readlink(name, buf, bufsize)) > 0)
+  if ((ret=my_readlink(name, buf, bufsize)) > 0)
   {
     char buf2[MAXPATHLEN];
     int ret2, i = 0;
@@ -167,7 +198,7 @@ int full_readlink(const char* name, char* buf, size_t bufsize)
     do
     {
       buf[ret] = '\0';
-      if ((ret2 = readlink(buf, buf2, MAXPATHLEN)) > 0)
+      if ((ret2 = my_readlink(buf, buf2, MAXPATHLEN)) > 0)
       {
         i++;
         buf2[ret2] = '\0';

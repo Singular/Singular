@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.18 1999-12-06 16:06:44 obachman Exp $ */
+/* $Id: feResource.cc,v 1.19 1999-12-08 19:52:59 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -577,7 +577,7 @@ static char* feCleanUpPath(char* path)
   for (i=0; i<n_comps; i++)
     path_comps[i] = feCleanUpFile(path_comps[i]);
 #ifdef RESOURCE_DEBUG
-  PrintS("feCleanUpPath: fter CleanUpName: ");
+  PrintS("feCleanUpPath: after CleanUpName: ");
   for (i=0; i<n_comps; i++)
     Print("%s:", path_comps[i]);
   Print("\n");
@@ -616,7 +616,8 @@ static char* feCleanUpPath(char* path)
         path_comps[j-1] = path_comps[j];
     n_comps--;
   }
-
+  
+  
   // assemble everything again
   for (path=opath, i=0;i<n_comps-1;i++)
   {
@@ -625,7 +626,14 @@ static char* feCleanUpPath(char* path)
     *path = fePathSep;
     path++;
   }
-  if (n_comps) strcpy(path, path_comps[i]);
+  if (n_comps) 
+  {
+    strcpy(path, path_comps[i]);
+  }
+  else
+  {
+    *opath = '\0';
+  }
   FreeL(path_comps);
 #ifdef RESOURCE_DEBUG
   Print("feCleanUpPath: leaving with path=%s=\n", opath);
