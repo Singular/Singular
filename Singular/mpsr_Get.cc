@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.12 1997-07-16 07:51:29 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.13 1997-08-08 12:59:26 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -174,6 +174,7 @@ inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
   mlv->r = mpsr_rDefault(0);
   n->s = 3;
   memcpy(&(n->z), apint, sizeof(MP_INT));
+  n = nlInit(n);
   Free(apint, sizeof(MP_INT));
   mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
 }
@@ -692,7 +693,7 @@ static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
 
   
 static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                      mpsr_leftv mlv, short quote)
+                                        mpsr_leftv mlv, short quote)
 {
   short tok;
   MP_NumChild_t nc = node->numchild, i;
@@ -702,7 +703,8 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
   
   failr(mpsr_mp2tok(node->dict, MP_COMMON_T(node->nvalue), &tok));
 
-  if ((typespec = MPT_GetProtoTypespec(node)) && MPT_IsTrueProtoTypeSpec(typespec))
+  if ((typespec = MPT_GetProtoTypespec(node)) &&
+      MPT_IsTrueProtoTypeSpec(typespec))
     return mpsr_SetError(mpsr_CanNotHandlePrototype);
 
   if (tok == MAP_CMD) return GetMapLeftv(link, node, mlv);
@@ -723,7 +725,36 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
   cmd->op = tok;
   cmd->argc = nc;
 
-  if (nc >= 1)
+  // check that associative operators are binary
+  if (nc > 2 && (tok == '+' || tok == '*'))
+  {
+    leftv lv = mlv->lv, lv2;
+    command c = cmd, c2;
+
+    for (i=2; i<nc; i++)
+    {
+      c->op = tok;
+      c->argc = 2;
+      memcpy(&(c->arg1), lv, sizeof(sleftv));
+      c->arg1.next = NULL;
+
+      c2 = (command) Alloc0(sizeof(sip_command));
+      c->arg2.data = (void *) c2;
+      c->arg2.rtyp = COMMAND;
+      c = c2;
+      lv2 = lv->next;
+      Free(lv, sizeof(sleftv));
+      lv = lv2;
+    }
+    c->op = tok;
+    c->argc = 2;
+    memcpy(&(c->arg1), lv, sizeof(sleftv));
+    c->arg1.next = NULL;
+    memcpy(&(c->arg2), lv->next, sizeof(sleftv));
+    Free(lv->next, sizeof(sleftv));
+    Free(lv, sizeof(sleftv));
+  }
+  else if (nc >= 1)
   {
     memcpy(&(cmd->arg1), mlv->lv, sizeof(sleftv));
     if (nc <= 3)
@@ -744,19 +775,17 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
     }
     Free(mlv->lv, sizeof(sleftv));
   }
-  else
-  {
+
+  // Now we perform some tree manipulations
+  if (nc == 0 && tok == LIST_CMD)
     // Here we work around a Singular bug: It can not handle lists of 0 args
     // so we construct them explicitely
-    if (tok == LIST_CMD)
-    {
-      lists l = (lists) Alloc(sizeof(slists));
-      l->Init(0);
-      mlv->lv = mpsr_InitLeftv(LIST_CMD, (void *) l);
-      return mpsr_Success;
-    }
+  {
+    lists l = (lists) Alloc(sizeof(slists));
+    l->Init(0);
+    mlv->lv = mpsr_InitLeftv(LIST_CMD, (void *) l);
+    return mpsr_Success;
   }
-
   mlv->lv = mpsr_InitLeftv(COMMAND, (void *) cmd);
   return mpsr_Success;
 }

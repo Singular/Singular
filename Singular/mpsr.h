@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.6 1997-07-11 11:10:08 obachman Exp $ */
+/* $Id: mpsr.h,v 1.7 1997-08-08 12:59:25 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -167,7 +167,7 @@ do                                                                  \
 {                                                                   \
   if (x != MPT_Success)                                              \
   {                                                                 \
-    Werror("mpr_failr violation in %s line %d:",__FILE__, __LINE__); \
+    Werror("mpt_failr violation in %s line %d:",__FILE__, __LINE__); \
     return mpsr_SetError(mpsr_MPT_Failure);                           \
   }                                                                 \
 }                                                                   \

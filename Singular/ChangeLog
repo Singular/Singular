@@ -1,7 +1,21 @@
+Fri Aug  8 14:54:28 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* Makefile.in ndbm.[cc,h]: Together with krueger: Added files
+	  ndbm.[cc,h]; no longer linking with libdbm, instead,
+	  user supplied files; added dbm_test; small changes to sing_dbm.cc
+
 Fri Aug  8 12:56:44 MET DST 1997
         * hannes: introduced "div" for integer division
           grammar.*, iparith.cc, singular.doc
         * changed version to 1.1.2/August
+
+Thu Aug  7 14:51:59 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* mpsr_Get.cc (GetCopCommandLeftv): made +/* to binary ops
+
+	* longrat.[h,cc]: added number   nlInit(number i) to initialize a
+		  number, i.e. get it into the right Singular state
+
 Wed Jul 16 12:57:22 MET DST 1997: hannes
         * introduced '.singularrc', modified loading of satndard.lib 
           (tesths.cc)

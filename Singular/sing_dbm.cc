@@ -2,95 +2,99 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-//**************************************************************************
+//**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.4 1997-04-09 12:20:09 Singular Exp $
+// $Id: sing_dbm.cc,v 1.5 1997-08-08 12:59:30 obachman Exp $
 //
-//**************************************************************************
+//**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
-// Singular. Don't forget to compile Singular with the option -ldbm
+// Singular. 
 //
-//**************************************************************************
+//**************************************************************************/
 
 #include "mod2.h"
 
 #ifdef HAVE_DBM
 
-#include <stdio.h>
-#include <fcntl.h>
-#include <errno.h>
-#include "tok.h"
-#include "febase.h"
-#include "mmemory.h"
-#include "ipid.h"
-#include "silink.h"
-#include "sing_dbm.h"
-
-
-static BOOLEAN dbOpened = FALSE;
-
-/* The data and key structure.  This structure is defined for compatibility. */
-typedef struct {
-        char *dptr;
-        int   dsize;
-} datum;
-
+#  include <stdio.h>
+#  include <fcntl.h>
+#  include <errno.h>
+#  include "tok.h"
+#  include "febase.h"
+#  include "mmemory.h"
+#  include "ipid.h"
+#  include "silink.h"
+#  include "sing_dbm.h"
 
 /* These are the routines in dbm. */
-
-
-extern "C" {
-extern int dbminit(const char *__file);
-extern int store(datum __key, datum __content);
-extern datum fetch(datum);
-extern datum firstkey(void);
-extern datum nextkey(datum);
-}
+#  include "ndbm.h"
+typedef struct {
+  DBM *db;        // pointer to open database
+  int first;      // firstkey to look for?
+} DBM_info;
 
 //extern char *getenv(char *var);
 extern char *index(char *str, char c);
 
-//**************************************************************************
+//**************************************************************************/
 BOOLEAN dbOpen(si_link l, short flag)
 {
-  if((flag==SI_LINK_OPEN)
-  || (flag==SI_LINK_READ)
-  || (flag==SI_LINK_WRITE))
-  {
-    if (!dbOpened)
-    {
-      if(dbminit(l->name) == 0)
-      {
-        dbOpened=TRUE;
-        SI_LINK_SET_RW_OPEN_P(l);
-        l->data=NULL;
-        FreeL(l->mode);
-        l->mode=mstrdup("rw");
-        return FALSE;
+  char *mode = "r";
+  DBM_info *db;
+  int dbm_flags = O_RDONLY | O_CREAT;  // open database readonly as default
+
+  if((flag & SI_LINK_OPEN)
+  || (flag & SI_LINK_READ)
+  || (flag & SI_LINK_WRITE)) {
+    if (l->mode[0] == '\0' || (strcmp(l->mode, "r") == 0))
+      flag = SI_LINK_READ;
+    else flag = SI_LINK_READ | SI_LINK_WRITE;
+  }
+
+  if((flag & SI_LINK_READ) || (flag & SI_LINK_WRITE)) {
+    if( l->data == NULL ) {
+      if ((db = (DBM_info *)malloc(sizeof *db)) == 0) {
+	errno = ENOMEM;
+	return TRUE;
       }
-      Werror("dbminit of `%s` failed",l->name);
+      if( flag & SI_LINK_WRITE ) {
+	dbm_flags = O_RDWR | O_CREAT;
+	mode = "rw";
+      }
+      if( (db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL ) {
+	db->first=1;
+	if(flag & SI_LINK_WRITE) SI_LINK_SET_RW_OPEN_P(l);
+	else SI_LINK_SET_R_OPEN_P(l);
+	l->data=(void *)(db);
+	FreeL(l->mode);
+	l->mode=mstrdup(mode);
+	return FALSE;
+      }
+      Werror("dbm_open of `%s` failed",l->name);
     }
-    else
-      Werror("only one DBM link allowed:`%s`",l->name);
   }
   return TRUE;
 }
 
-//**************************************************************************
+//**************************************************************************/
 BOOLEAN dbClose(si_link l)
 {
-  dbOpened=FALSE;
+  DBM_info *db = l->data;
+
+  dbm_close(db->db);
+  free(db);
+  l->data=NULL;  
   SI_LINK_SET_CLOSE_P(l);
   return FALSE;
 }
 
-//**************************************************************************
+//**************************************************************************/
 static datum d_value;
 leftv dbRead2(si_link l, leftv key)
 {
+  DBM_info *db = l->data;
   leftv v=NULL;
-  if(dbOpened)
-  {
+  if(l->data != NULL) {
     datum d_key;
 
     if(key!=NULL)
@@ -99,7 +103,7 @@ leftv dbRead2(si_link l, leftv key)
       {
         d_key.dptr = (char*)key->Data();
         d_key.dsize = strlen(d_key.dptr)+1;
-        d_value = fetch(d_key);
+        d_value = dbm_fetch(db->db, d_key);
         v=(leftv)Alloc0(sizeof(sleftv));
         if (d_value.dptr!=NULL) v->data=mstrdup(d_value.dptr);
         else                    v->data=mstrdup("");
@@ -110,21 +114,21 @@ leftv dbRead2(si_link l, leftv key)
         WerrorS("read(`link`,`string`) expected");
       }
     }
-    else
-    {
-      if (l->data==NULL)
-      {
-        d_value = firstkey();
-        l->data=(void *)&d_value;
-      }
-      else
-      {
-        d_value = nextkey(*(datum *)l->data);
-      }
+    else {
+      if(db->first) d_value = dbm_firstkey((DBM *)db->db);
+      else d_value = dbm_nextkey((DBM *)db->db);
+
       v=(leftv)Alloc0(sizeof(sleftv));
       v->rtyp=STRING_CMD;
-      if (d_value.dptr!=NULL) v->data=mstrdup(d_value.dptr);
-      else                    v->data=mstrdup("");
+      if (d_value.dptr!=NULL) {
+	v->data=mstrdup(d_value.dptr);
+	db->first = 0;
+      }
+      else {
+	v->data=mstrdup("");
+	db->first = 1;
+      }
+
     }
   }
   else
@@ -137,28 +141,41 @@ leftv dbRead1(si_link l)
 {
   return dbRead2(l,NULL);
 }
-//**************************************************************************
+//**************************************************************************/
 BOOLEAN dbWrite(si_link l, leftv key)
 {
+  DBM_info *db = l->data;
   BOOLEAN b=TRUE;
+  register int ret;
 
-  if(dbOpened)
-  {
-    if((key!=NULL)
-    && (key->Typ()==STRING_CMD)
-    && (key->next!=NULL)
-    && (key->next->Typ()==STRING_CMD))
-    {
-      datum d_key, d_value;
-      d_key.dptr = (char *)key->Data();
-      d_key.dsize = strlen(d_key.dptr)+1;
-      d_value.dptr = (char *)key->next->Data();
-      d_value.dsize = strlen(d_value.dptr)+1;
-      store(d_key, d_value);
-      b=FALSE;
-    }
-    else
-    {
+  if(l->data != NULL) {                      // is database opened ?
+    if((key!=NULL) && (key->Typ()==STRING_CMD) ) { 
+      if (key->next!=NULL) {                 // have a second parameter ?
+	if(key->next->Typ()==STRING_CMD) {   // replace (key,value)
+	  datum d_key, d_value;
+
+	  d_key.dptr = (char *)key->Data();
+	  d_key.dsize = strlen(d_key.dptr)+1;
+	  d_value.dptr = (char *)key->next->Data();
+	  d_value.dsize = strlen(d_value.dptr)+1;
+	  ret  = dbm_store(db->db, d_key, d_value, DBM_REPLACE);
+	  if(!ret ) b=FALSE;
+	  else {
+	    if(dbm_error(db->db)) {
+	      Werror("DBM link I/O error. is '%s' readonly?", l->name);
+	      dbm_clearerr(db->db);
+	    }
+	  }
+	}
+      } else {                               // delete (key)
+	datum d_key;
+
+	d_key.dptr = (char *)key->Data();
+	d_key.dsize = strlen(d_key.dptr)+1;
+	dbm_delete(db->db, d_key);
+	b=FALSE;
+      }
+    } else {
       WerrorS("write(`DBM link`,`key string`,`data string`) expected");
     }
   }
@@ -168,18 +185,22 @@ BOOLEAN dbWrite(si_link l, leftv key)
   }
   return b;
 }
-//**************************************************************************
+//**************************************************************************/
 char *dbStatus(si_link l, char *request)
 {
-  if ((strcmp(request, "read") == 0)
-  ||  (strcmp(request, "write") == 0))
+  if (strcmp(request, "read") == 0)
   {
-    if (SI_LINK_RW_OPEN_P(l)) return "ready";
-    else                      return "not ready";
+    if (SI_LINK_R_OPEN_P(l)) return "ready";
+    else return "not ready";
+  }
+  else if (strcmp(request, "write") == 0)
+  {
+    if (SI_LINK_W_OPEN_P(l)) return "ready";
+    else return "not ready";
   }
   else return "unknown status request";
 }
-//**************************************************************************
+//**************************************************************************/
 si_link_extension slInitDBMExtension(si_link_extension s)
 {
   s->Open=dbOpen;
@@ -193,4 +214,4 @@ si_link_extension slInitDBMExtension(si_link_extension s)
   s->type="DBM";
   return s;
 }
-#endif
+#endif /* HAVE_DBM */

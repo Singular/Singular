@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.8 1997-06-30 17:04:46 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.9 1997-08-08 12:59:27 obachman Exp $ */
 
 /***************************************************************
  *
@@ -240,12 +240,12 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
   else if (node == MP_ApIntType)
   {
     mpz_ptr gnum;
-    *x =  (number) Alloc0(sizeof(rnumber));
-    y = (number) *x;
+    y =  (number) Alloc0(sizeof(rnumber));
     y->s = 3;
     gnum = &(y->z);
     mpz_init(gnum);
     mp_failr(IMP_MyGetApInt(link, (MP_ApInt_t *) &gnum));
+    *x = nlInit(y);
   }
   // fraction of numbers
   else if (node == MP_CommonOperatorType &&

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.6 1997-06-11 08:00:10 obachman Exp $ */
+/* $Id: longrat.h,v 1.7 1997-08-08 12:59:24 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -64,6 +64,7 @@ BOOLEAN  nlIsOne(number a);
 BOOLEAN  nlIsMOne(number a);
 void     nlNew(number *r);
 number   nlInit(int i);
+number   nlInit(number i);
 int      nlInt(number &n);
 BOOLEAN  nlIsZero(number za);
 BOOLEAN  nlGreaterZero(number za);

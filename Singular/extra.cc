@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.17 1997-08-05 13:04:02 Singular Exp $ */
+/* $Id: extra.cc,v 1.18 1997-08-08 12:59:20 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -484,7 +484,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     if(strcmp((char*)(h->Data()),"ftest")==0)
     {
       MP_Link_pt rlink = (MP_Link_pt) ((si_link) h->next->Data())->data;
-//      MP_Link_pt wlink = (MP_Link_pt) ((si_link) h->next->next->Data())->data;
+      MP_Link_pt wlink;
+      
       MPT_Tree_pt tree1 = NULL, tree2;
 
       MPT_GetExternalData = MPT_DefaultGetExternalData;
@@ -508,10 +509,24 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       MP_Sint32_t ch;
       MPT_Tree_pt var_tree;
       MP_Common_t ordering;
-      MPT_IsDDPTree(tree1, &ch, &var_tree, &ordering);
-      MPT_CpyTree(&tree2, tree1);
+//      MPT_IsDDPTree(tree1, &ch, &var_tree, &ordering);
+//      MPT_CpyTree(&tree2, tree1);
       tree1 = MPT_DDP_2_ExpTree(tree1);
+      tree1 = MPT_UntypespecTree(tree1);
+
+      if (h->next->next != NULL)
+      {
+        wlink = (MP_Link_pt) ((si_link) h->next->next->Data())->data;
+        MP_ResetLink(wlink);
+        if (MPT_PutTree(wlink, tree1) != MPT_Success)
+        {
+          Werror("PutTree failed \n");
+          return TRUE;
+        }
+        MP_EndMsg(wlink);
+      }
       MPT_DeleteTree(tree1);
+        
       return FALSE;
     }
     else

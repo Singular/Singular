@@ -170,19 +170,6 @@ if test "$with_readline" != no; then
    AC_DEFINE(HAVE_FEREAD)
 fi
   
-dnl Check dbm
-if test "$with_dbm" != no; then
-  AC_CHECK_LIB(
-    dbm,
-    dbminit,
-    AC_DEFINE(HAVE_DBM) LIBS="-ldbm $LIBS",
-    AC_CHECK_LIB(
-      gdbm,
-      dbminit,
-      AC_DEFINE(HAVE_DBM) LIBS="-lgdbm $LIBS",
-      AC_MSG_WARN(building without dbm: disabling DBM links)))
-fi
-
 dnl Check dld
 if test "$with_dld" = yes; then
   AC_CHECK_LIB(dld, dld_init,\
@@ -363,6 +350,18 @@ AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
 AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h)
+
+dnl Check dbm
+WITH_DBM=no
+AC_MSG_CHECKING(whether to build with dbm links)
+if test "$with_dbm" != no; then
+  AC_DEFINE(HAVE_DBM) 
+  WITH_DBM=yes
+  AC_SUBST(WITH_DBM)
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.9 1997-06-11 08:00:09 obachman Exp $ */
+/* $Id: longrat.cc,v 1.10 1997-08-08 12:59:22 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -242,6 +242,23 @@ number nlInit (int i)
   nlTest(n);
 #endif
   return n;
+}
+
+
+number nlInit (number u)
+{
+  if (u->s == 3 && mpz_size1(&u->z)<=MP_SMALL)
+  {
+    int ui=(int)mpz_get_si(&u->z);
+    if ((((ui<<3)>>3)==ui)
+        && (mpz_cmp_si(&u->z,(long)ui)==0))
+    {
+      mpz_clear(&u->z);
+      Free((ADDRESS)u,sizeof(rnumber));
+      return INT_TO_SR(ui);
+    }
+  }
+  return u;
 }
 
 int nlSize(number a)

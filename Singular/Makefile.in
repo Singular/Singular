@@ -64,6 +64,7 @@ testdir		= tests
 WITH_MP		= @WITH_MP@
 WITH_FACTORY	= @WITH_FACTORY@
 WITH_LIBFAC	= @WITH_LIBFAC@
+WITH_DBM	= @WITH_DBM@
 
 ##
 ## End configuration dependend stuff
@@ -91,7 +92,8 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     subexpr.cc syz.cc syz0.cc syz1.cc \
     tesths.cc timer.cc weight.cc \
     mpsr_Put.cc mpsr_PutPoly.cc mpsr_Tok.cc mpsr_GetPoly.cc \
-    mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc
+    mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
+    ndbm.cc 
 
 CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c mmheap.c mmspec.c mmutil.c weight0.c
 
@@ -107,11 +109,13 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
-	kutil.h mpsr_Put.h spolys0.h
+	kutil.h mpsr_Put.h spolys0.h \
+	ndbm.h
 
 TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
 	${testdir}/general_test.in ${testdir}/general_test.out \
-	${testdir}/mpcheck ${testdir}/mpcheck.data 
+	${testdir}/mpcheck ${testdir}/mpcheck.data \
+	${testdir}/dbm_test.in ${testdir}/dbm_test.out
 
 DOCS=${docdir}/Makefile.in ${docdir}/copyright.tex ${docdir}/doc2tex.c \
 	${docdir}/examples.doc ${docdir}/examples.tex ${docdir}/proc.tex \
@@ -135,7 +139,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      sing_mp.o fglm.o fglmzero.o fglmvec.o cntrlc.o \
      algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
-     mpsr_Get.o mpsr_GetMisc.o 
+     mpsr_Get.o mpsr_GetMisc.o ndbm.o
 
 ##
 ## PRIMARY Targets
@@ -237,7 +241,7 @@ mostlyclean: clean
 
 clean:
 	-rm -rf Singular* *.o *.og core *.d *.dd *~ \#* /tmp/mp* \
-	        *.got *dump* *.diff
+	        *.got *dump* *.diff *.dir *.pag
 	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
@@ -261,8 +265,9 @@ check:	Singular ${testdir}/general_test.in ${testdir}/general_test.out
 	@ if test "${WITH_MP}" = yes; then ${MAKE} mpcheck; fi; 
 	@ if test "${WITH_FACTORY}" = yes && test "${WITH_LIBFAC}" = yes; then \
 	  ${MAKE} factorycheck;\
-	fi	
-         	    
+	fi
+	@ if test "${WITH_DBM}" = yes; then ${MAKE} dbmcheck; fi
+
 
 mpcheck: Singular ${testdir}/mpcheck ${testdir}/mpcheck.data
 	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
@@ -274,7 +279,14 @@ factorycheck: Singular ${testdir}/comparecheck ${testdir}/fac_test.in \
 	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
 	${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out
-	
+
+dbmcheck: Singular ${testdir}/comparecheck ${testdir}/dbm_test.in \
+		${testdir}/dbm_test.out 
+	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
+	PATH=`pwd`:${PATH}; export PATH;\
+	${testdir}/comparecheck ${testdir}/dbm_test.in ${testdir}/dbm_test.out
+
+
 ##
 ## miscellanous targets
 ##
@@ -327,7 +339,8 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      algmap.og clapconv.og  clapmem.og clapsing.og \
      cntrlc.og  \
      mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
-     mpsr_Get.og mpsr_GetMisc.og 
+     mpsr_Get.og mpsr_GetMisc.og \
+     ndbm.og
 
 OBJG2= mmalloc.og mmallocb.og mmallocs.og mmblock.og mmheap.og \
      mmspec.og mmutil.og weight0.og
@@ -364,7 +377,6 @@ installg: Singularg
 ##
 ## dependencies
 ##
-	
 %.dd: %.cc mod2.h
 	echo $@ $(@:.dd=.og) " " \\ > $@
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
