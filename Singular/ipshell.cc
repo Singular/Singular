@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.31 1998-11-02 09:05:38 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.32 1998-11-04 17:34:29 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -882,11 +882,14 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
     {
       if (IDTYP(h)==v->Typ())
       {
+        if (BVERBOSE(V_REDEFINE))
+        {
 #ifdef KAI
-        Warn("!!! redefining %s",IDID(h));
+          Warn("!!! redefining %s",IDID(h));
 #else
-        Warn(" redefining %s",IDID(h));
+          Warn(" redefining %s",IDID(h));
 #endif
+        }
 #ifdef HAVE_NAMESPACES
         //if (namespaceroot->currRing==IDRING(h)) namespaceroot->currRing=NULL;
 #endif /* HAVE_NAMESPACES */
@@ -1019,7 +1022,10 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
       {
         if (IDTYP(old)==v->Typ())
         {
-          Warn("redefining %s",IDID(old));
+	  if (BVERBOSE(V_REDEFINE))
+	  {
+            Warn("redefining %s",IDID(old));
+	  }  
           killhdl(old,&root);
         }
         else
