@@ -117,5 +117,8 @@ example factorfirst;
 example essdevelop;
 example factorlist;
 example extrafactor;
+example develop;
+example param;
+example reddevelop;
 
 tst_status(1);$
