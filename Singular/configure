@@ -4405,10 +4405,67 @@ fi
 EOF
 
   fi
+  echo $ac_n "checking for shl_load in -ldld""... $ac_c" 1>&6
+echo "configure:4410: checking for shl_load in -ldld" >&5
+ac_lib_var=`echo dld'_'shl_load | sed 'y%./+-%__p_%'`
+if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  ac_save_LIBS="$LIBS"
+LIBS="-ldld  $LIBS"
+cat > conftest.$ac_ext <<EOF
+#line 4418 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char shl_load();
+
+int main() {
+shl_load()
+; return 0; }
+EOF
+if { (eval echo configure:4429: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=yes"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=no"
+fi
+rm -f conftest*
+LIBS="$ac_save_LIBS"
+
+fi
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+    ac_tr_lib=HAVE_LIB`echo dld | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+    -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+  cat >> confdefs.h <<EOF
+#define $ac_tr_lib 1
+EOF
+
+  LIBS="-ldld $LIBS"
+
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+  if test "$ac_cv_lib_dld_shl_load" = yes; then
+    NEED_LIBS="-ldld ${NEED_LIBS}"
+    LD_DYN_FLAGS="-Xlinker -E"
+    LD_LIBC="-lc"
+    
+    cat >> confdefs.h <<\EOF
+#define HAVE_DL 1
+EOF
+
+  fi
 fi
 
 echo $ac_n "checking whether to have MP""... $ac_c" 1>&6
-echo "configure:4412: checking whether to have MP" >&5
+echo "configure:4469: checking whether to have MP" >&5
 if test "${with_MP}" != yes && test "${with_MP}" != no; then
   if (test "${will_have_gmp}" = yes) && \
      (test "$ac_MP_ok" =  yes || test "$enable_MP" = yes); then
@@ -4439,7 +4496,7 @@ else
 fi
 
 echo $ac_n "checking whether to have factory""... $ac_c" 1>&6
-echo "configure:4443: checking whether to have factory" >&5
+echo "configure:4500: checking whether to have factory" >&5
 if test "${with_factory}" != yes && test "${with_factory}" != no; then
   if test "$ac_factory_ok" =  yes || test "$enable_factory" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -4470,7 +4527,7 @@ else
 fi
      
 echo $ac_n "checking whether to have libfac""... $ac_c" 1>&6
-echo "configure:4474: checking whether to have libfac" >&5
+echo "configure:4531: checking whether to have libfac" >&5
 if test "${with_libfac}" != yes && test "${with_libfac}" != no; then
   if (test "${will_have_factory}" = yes) && \
      (test "$ac_libfac_ok" =  yes || test "$enable_libfac" = yes); then
@@ -4502,7 +4559,7 @@ fi
 
 
 echo $ac_n "checking whether to have dbm links""... $ac_c" 1>&6
-echo "configure:4506: checking whether to have dbm links" >&5
+echo "configure:4563: checking whether to have dbm links" >&5
 if test "$with_dbm" != no; then
   cat >> confdefs.h <<\EOF
 #define HAVE_DBM 1
@@ -4514,7 +4571,7 @@ else
 fi
 
 echo $ac_n "checking whether to have namespaces""... $ac_c" 1>&6
-echo "configure:4518: checking whether to have namespaces" >&5
+echo "configure:4575: checking whether to have namespaces" >&5
 if test "$with_namespaces" != yes; then
   echo "$ac_t""no" 1>&6
 else
@@ -4526,7 +4583,7 @@ EOF
 fi
 
 echo $ac_n "checking whether to have dynamic loading""... $ac_c" 1>&6
-echo "configure:4530: checking whether to have dynamic loading" >&5
+echo "configure:4587: checking whether to have dynamic loading" >&5
 if test "$with_dl" != yes; then
   echo "$ac_t""no" 1>&6
 else
@@ -4539,7 +4596,7 @@ EOF
 	unknown) ;;
 	HPUX-9)
 	  echo $ac_n "checking for shl_load in -ldld""... $ac_c" 1>&6
-echo "configure:4543: checking for shl_load in -ldld" >&5
+echo "configure:4600: checking for shl_load in -ldld" >&5
 ac_lib_var=`echo dld'_'shl_load | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4547,7 +4604,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-ldld  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 4551 "configure"
+#line 4608 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -4558,7 +4615,7 @@ int main() {
 shl_load()
 ; return 0; }
 EOF
-if { (eval echo configure:4562: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:4619: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -4590,7 +4647,7 @@ fi
 	;;
 	HPUX-10)
 	  echo $ac_n "checking for shl_load in -ldld""... $ac_c" 1>&6
-echo "configure:4594: checking for shl_load in -ldld" >&5
+echo "configure:4651: checking for shl_load in -ldld" >&5
 ac_lib_var=`echo dld'_'shl_load | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4598,7 +4655,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-ldld  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 4602 "configure"
+#line 4659 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -4609,7 +4666,7 @@ int main() {
 shl_load()
 ; return 0; }
 EOF
-if { (eval echo configure:4613: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:4670: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -4648,7 +4705,7 @@ fi
 fi
 
 echo $ac_n "checking whether to use mtrack""... $ac_c" 1>&6
-echo "configure:4652: checking whether to use mtrack" >&5
+echo "configure:4709: checking whether to use mtrack" >&5
 if test "$with_mtrack" = yes && test "$ac_cv_singuname" = ix86-Linux; then
   echo "$ac_t""yes" 1>&6
   cat >> confdefs.h <<\EOF
@@ -4662,7 +4719,7 @@ fi
  
 
 echo $ac_n "checking which exponent type to use""... $ac_c" 1>&6
-echo "configure:4666: checking which exponent type to use" >&5
+echo "configure:4723: checking which exponent type to use" >&5
 if test "$with_exp_type" = "char"; then
   echo "$ac_t""char" 1>&6
   cat >> confdefs.h <<\EOF

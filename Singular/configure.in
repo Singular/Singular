@@ -736,6 +736,14 @@ if test "$with_dl" != no; then
     AC_SUBST(LD_LIBC)
     AC_DEFINE(HAVE_DL)
   fi
+  AC_CHECK_LIB(dld, shl_load)
+  if test "$ac_cv_lib_dld_shl_load" = yes; then
+    NEED_LIBS="-ldld ${NEED_LIBS}"
+    LD_DYN_FLAGS="-Xlinker -E"
+    LD_LIBC="-lc"
+    AC_SUBST(LD_LIBC)
+    AC_DEFINE(HAVE_DL)
+  fi
 fi
 
 AC_MSG_CHECKING(whether to have MP)
