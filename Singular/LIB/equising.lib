@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.6 2001-01-31 15:36:02 lossen Exp $";
+version="$Id: equising.lib,v 1.7 2001-02-05 12:01:37 lossen Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -6,7 +6,7 @@ AUTHOR:   Andrea Mindnich, mindnich@mathematik.uni-kl.de
 
 PROCEDURES:
  esStratum(F[,m]);   computes the equisingularity stratum of a deformation
- isEquising(F[,m]);  tests, whether a given deformation is equisingular
+ isEquising(F[,m]);  tests if a given deformation is equisingular
 ";
 
 LIB "poly.lib";
@@ -751,21 +751,23 @@ static proc calcEsCond(poly p_F, intvec multSeq, int maxStep)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc esStratum (poly p_F, list #)
-"USAGE:   esStratum(F[,m]); F a polynomial, m an integer
+"USAGE:   esStratum(F[,m]); F poly, m int
 ASSUME:  F defines a deformation of an irreducible bivariate polynomial f
-         and that char(basering) does not divide mult(f).
+         and the characteristic of the basering does not divide mult(f). @*
          If nv is the number of variables of the basering, then the first nv-2
-         ringvariables are the deformation parameters.
+         variables are the deformation parameters. @*
          If the basering is a qring, ideal(basering) must only depend
          on the deformation parameters.
-RETURN:  A list l of an ideal and an integer, where
-         l[1] is the ideal in the deformation parameters, defining the
-         equisingularity stratum of F,
-         l[2] = 1 if some error has occured, l[2] = 0 otherwise.
-         If m is given, the computation stops after m steps of the iteration.
-NOTE:    printlevel > 0 displays comments and pauses after intermediate
-         computations (default: printlevel=0)
-         This proc uses 'execute' or calls a procedure using 'execute'.
+RETURN:  list l of an ideal and an integer, where
+@format
+  l[1] is the ideal in the deformation parameters, defining the ES-stratum of F,
+  l[2]=1 if some error has occured,  l[2]=0 otherwise.
+@end format
+NOTE:    If m is given, the computation stops after m steps of the iteration. @*
+         printlevel > 0 displays comments and pauses after intermediate
+         computations (default: printlevel=0) @*
+         This procedure uses @code{execute} or calls a procedure using 
+         @code{execute}.
 EXAMPLE: example esStratum; shows an example
 "
 {
@@ -846,11 +848,10 @@ example
 {
    "EXAMPLE:"; echo=2;
    ring r = 11,(a,b,c,d,e,f,g,x,y),ds;
-   poly F =
-   xa+yb+x2+2xy+y2c+y^2+y3d+y4e+y5f+y6g+x^7;
+   poly F = (x2+2xy+y2+x5)+ax+by+cx2+dxy+ey2+fx3+gx4;
    esStratum(F);
    esStratum(F,2);
-   ideal I  = f-fa,e+b;
+   ideal I = f-fa,e+b;
    qring q = std(I);
    poly F = imap(r,F);
    esStratum(F);
@@ -1158,18 +1159,21 @@ static proc equisingTest (poly p_F, intvec multSeq, int maxStep)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc isEquising (poly p_F, list #)
-"USAGE:   isEquising(F[,m]); F a polynomial, m an integer
-ASSUME:  F defines a deformation of an irreducible bivariate polynomial f
-         and that char(basering) does not divide mult(f).
+"USAGE:   isEquising(F[,m]); F poly, m int
+ASSUME:   F defines a deformation of an irreducible bivariate polynomial f
+         and the characteristic of the basering does not divide mult(f). @*
          If nv is the number of variables of the basering, then the first nv-2
-         ringvariables are the deformation parameters.
+         variables are the deformation parameters. @*
          If the basering is a qring, ideal(basering) must only depend
          on the deformation parameters.
-RETURN:  A list l of two integers, where
-         l[1] = 1 if F is an equisingular deformation,l[1] = 0 otherwise.
-         l[2] = 1 if some error has occured, l[2] = 0 otherwise.
-         If m is given, the computation stops after m steps of the iteration.
-NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
+RETURN:  list l of two integers, where
+@format        
+   l[1]=1 if F is an equisingular deformation,  l[1]=0 otherwise.
+   l[2]=1 if some error has occured,  l[2]=0 otherwise.
+@end format
+NOTE:    If m is given, the computation stops after m steps of the iteration. @*
+         This procedure uses @code{execute} or calls a procedure using 
+         @code{execute}.
 EXAMPLE: example isEquising; shows an example
 "
 {
@@ -1241,15 +1245,14 @@ EXAMPLE: example isEquising; shows an example
 example
 {
    "EXAMPLE:"; echo=2;
-   ring r = 11,(T,x,y),ds;
-   poly F = (x+y)^2+y^3*T+x^7;
+   ring r = 11,(a,b,x,y),ds;
+   poly F = (x2+2xy+y2+x5)+ay3+bx5;
    isEquising(F);
    isEquising(F,1);
-   isEquising(F,2);
-   ideal I  = ideal(T);
+   ideal I = ideal(a);
    qring q = std(I);
    poly F = imap(r,F);
-   isEquising(F,2);
+   isEquising(F);
 }
 ///////////////////////////////////////////////////////////////////////////////
 /*
