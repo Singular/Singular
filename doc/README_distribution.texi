@@ -1,0 +1,72 @@
+@comment -*-texinfo-*-
+@comment $Id: README_distribution.texi,v 1.1 1999-12-08 17:59:33 obachman Exp $
+@c FILE: README_distribution.texi
+@c PURPOSE: general README file to be included in the distribution 
+@c
+
+@ifclear VERSION
+@include version.texi
+@end ifclear
+
+@majorheading README file for the @sc{Singular} distribution
+
+@sc{Singular} is a Computeralgebra system for polynomial computations
+with special emphasize on the needs of commutative algebra, algebraic
+geometry, singularity theory and polynomial system solving. For a more
+detailed overview of 
+@sc{Singular}, see 
+@display
+@uref{http://www.mathematik.uni-kl.de/~zca/Singular/Overview/}
+@end display
+
+
+The current version @value{VERSION} is an alpha-release of the upcoming
+new release version 2-0 (should be there at the beginning of
+2000). 
+
+Although there are no known bugs, it is to be
+expected that the current version @value{VERSION} is not as stable as
+the 1.2 version(s), since major changes were done to the @sc{Singular}
+kernel. Therefore, it is important to us, that users try out this new
+version and report their bugs/comments and suggestions.
+
+Furthermore, the current version is generally not yet as fast as version 
+1.2. But this is going to change dramatically in the upcoming release
+version(s). 
+
+
+@macro nref{name,url}
+@ifhtml
+@item @uref{\url\,,\name\}
+@end ifhtml
+@ifnothtml
+@item @code{\name\}
+@end ifnothtml
+@end macro
+
+See the files
+@table @asis
+@nref{NEWS, NEWS.html}
+for news and changes of this version
+@nref{COPYING, COPYING.html}
+for license information for @sc{Singular}
+@nref{INSTALL, INSTALL.html}
+for installation instructions
+@end table
+
+More and up-to-date information about @sc{Singular} is always available
+from
+@display
+@uref{http://www.mathematik.uni-kl.de/~zca/Singular}.
+@end display
+We very much welcome any comments, questions, and bug reports,
+especially comments about our new version. Please
+contact us at
+@display
+@email{singular@@mathematik.uni-kl.de}.
+@end display
+
+GOOD LUCK and ENJOY!                         
+Your @sc{Singular} team.
+
+

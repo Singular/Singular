@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.49 1999-12-08 14:47:00 obachman Exp $
+### $Id: Makefile.in,v 1.50 1999-12-08 17:59:32 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -82,7 +82,8 @@ HTML_TUTOR_TOP     = tutor.htm
 # File sets
 #
 STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
-			  README_download.texi README_ftp.texi
+			  README_download.texi README_ftp.texi \
+			  README_distribution.texi
 
 DOC2TEX_FILES	= \
 		examples.tex general.tex math.tex reference.tex \
@@ -264,6 +265,9 @@ install-sharedist: singular.hlp html/index.htm singular.idx \
 	${INSTALL_DATA} COPYING.html ${install_prefix}
 	${INSTALL_DATA} NEWS.txt ${install_prefix}/NEWS
 	${INSTALL_DATA} NEWS.html ${install_prefix}
+	${INSTALL_DATA} README_distribution.txt ${install_prefix}/README
+	${INSTALL_DATA} README_distribution.html ${install_prefix}/README.html
+
 
 install-bindist: INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
 	${MKINSTALLDIRS} ${install_prefix}

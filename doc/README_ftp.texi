@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_ftp.texi,v 1.2 1999-12-08 17:00:40 obachman Exp $
+@comment $Id: README_ftp.texi,v 1.3 1999-12-08 17:59:33 obachman Exp $
 @c FILE: README_download.texi
 @c PURPOSE: This should reside as README file in the main directory of the
 @c          Singular ftp site.
@@ -10,6 +10,15 @@
 
 
 @majorheading Welcome to the Development FTP site of SINGULAR
+
+@sc{Singular} is a Computeralgebra system for polynomial computations
+with special emphasize on the needs of commutative algebra, algebraic
+geometry, singularity theory and polynomial system solving. For a more
+detailed overview of 
+@sc{Singular}, see 
+@display
+@uref{http://www.mathematik.uni-kl.de/~zca/Singular/Overview/}
+@end display
 
 The new @sc{Singular} version @value{VERSION} which can be downloaded from
 this directory is an alpha-release of the upcoming
@@ -52,4 +61,20 @@ advance for your support.
 
 
 
+@heading More information about @sc{Singular}: Comments, Questions, Bug Reports
+
+More and up-to-date information about @sc{Singular} is always available
+from
+@display
+@uref{http://www.mathematik.uni-kl.de/~zca/Singular}.
+@end display
+We very much welcome any comments, questions, and bug reports,
+especially comments about our new version. Please
+contact us at
+@display
+@email{singular@@mathematik.uni-kl.de}.
+@end display
+
+GOOD LUCK and ENJOY!                         
+Your @sc{Singular} team.
 
