@@ -587,7 +587,7 @@ char * versionString()
 #endif
               StringAppend("random=%d\n",siRandomStart);
 
-              feStringAppendResources(1);
-              feStringAppendBrowsers(-1);
+              feStringAppendResources(0);
+              feStringAppendBrowsers(0);
               return str;
 }

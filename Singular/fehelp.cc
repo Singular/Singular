@@ -633,7 +633,6 @@ static void heBrowserHelp(heEntry hentry)
   // check checksums of procs
   int kchksum = (hentry != NULL && hentry->chksum > 0 ?
                  heKeyChksum(hentry->key) : 0);
-  Print("chksum for %s:procinfo:%d, idx:%d\n",hentry->key, kchksum,hentry->chksum);
   if (kchksum  && kchksum != hentry->chksum && heOnlineHelp(hentry->key))
     return;
 
