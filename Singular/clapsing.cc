@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.50 1999-04-17 14:58:38 obachman Exp $
+// $Id: clapsing.cc,v 1.51 1999-06-14 16:25:42 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -203,7 +203,7 @@ poly singclap_gcd ( poly f, poly g )
   if (g!=NULL) pCleardenom(g);
   else         return pCopy(f); // g==0 => gcd=f (but do a pCleardenom)
   if (f==NULL) return pCopy(g); // f==0 => gcd=g (but do a pCleardenom)
- 
+
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if (( nGetChar() == 0 || nGetChar() > 1 )
@@ -617,6 +617,14 @@ void singclap_divide_content ( poly f )
   }
 }
 
+static int primepower(int c)
+{
+  int p=1;
+  int cc=c;
+  while(cc!= rInternalChar(currRing)) { cc*=c; p++; }
+  return p;
+}
+
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 {
   // with_exps: 1 return only true factors
@@ -640,8 +648,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   number N=NULL;
   number NN=NULL;
 
-  if (( (nGetChar() == 0) || (nGetChar() > 1) )
-  && (currRing->parameter==NULL))
+  if (rField_is_Q() || rField_is_Zp())
   {
     setCharacteristic( nGetChar() );
     if (nGetChar()==0) /* Q */
@@ -675,9 +682,22 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 #endif
     }
   }
+  else if (rField_is_GF())
+  {
+    int c=rChar(currRing);
+    setCharacteristic( c, primepower(c) );
+    CanonicalForm F( convSingGFClapGF( f ) );
+    if (F.isUnivariate())
+    {
+      L = factorize( F );
+    }
+    else
+    {
+      goto notImpl;
+    }
+  }
   // and over Q(a) / Fp(a)
-  else if (( nGetChar()==1 ) /* Q(a) */
-  || (nGetChar() <-1))       /* Fp(a) */
+  else if (rField_is_Extension())
   {
     if (nGetChar()==1) setCharacteristic( 0 );
     else               setCharacteristic( -nGetChar() );
@@ -687,14 +707,27 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPClapAP( f,a ) );
+      L.insert(F);
       if (F.isUnivariate())
       {
         L = factorize( F, a );
       }
       else
       {
+        WarnS("complete factorization only for univariate polynomials");
         CanonicalForm G( convSingTrPClapP( f ) );
-        L = factorize( G );
+        if (nGetChar()==1) /* Q(a) */
+        {
+          L = factorize( G );
+        }
+        else
+        {
+#ifdef HAVE_LIBFAC_P
+          L = Factorize( G );
+#else
+          goto notImpl;
+#endif
+        }
       }
     }
     else
@@ -739,9 +772,11 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     for ( ; J.hasItem(); J++, j++ )
     {
       if (with_exps!=1) (**v)[j] = J.getItem().exp();
-      if ((nGetChar()==0)||(nGetChar()>1))           /* Q, Fp */
+      if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
         res->m[j] = convClapPSingP( J.getItem().factor() );
-      else if ((nGetChar()==1)||(nGetChar()<-1))     /* Q(a), Fp(a) */
+      else if (rField_is_GF())
+        res->m[j] = convClapGFSingGF( J.getItem().factor() );
+      else if (rField_is_Extension())     /* Q(a), Fp(a) */
       {
         if (currRing->minpoly==NULL)
           res->m[j] = convClapPSingTrP( J.getItem().factor() );
@@ -762,7 +797,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       int j=0;
       for(;i>=0;i--)
       {
-        if (pIsConstant(res->m[i]))
+        if ((res->m[i]!=NULL) && (pNext(res->m[i])==NULL) && (pIsConstant(res->m[i])))
         {
           pDelete(&(res->m[i]));
           if ((v!=NULL) && ((*v)!=NULL))
