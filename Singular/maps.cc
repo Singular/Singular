@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.14 1999-03-09 12:28:49 obachman Exp $ */
+/* $Id: maps.cc,v 1.15 1999-07-13 15:06:52 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -21,7 +21,7 @@
 #include "longalg.h"
 #include "maps.h"
 
-#define MAX_MAP_DEG 32
+#define MAX_MAP_DEG 128
 
 /*2
 * copy a map
@@ -36,22 +36,56 @@ map maCopy(map theMap)
   return m;
 }
 
-poly maEval(map theMap, poly p,ring preimage_r,matrix s)
-{
-  poly result = NULL,q,pp;
-  int i,modulComp;
-  int varnum = preimage_r->N;
 
-//  for(i=1; i<=varnum; i++)
-//  {
-//    pTest(theMap->m[i-1]);
-//  }
-  while (p!=NULL)
+/*2
+* return the image of var(v)^pExp, where var(v) maps to p
+*/
+poly maEvalVariable(poly p, int v,int pExp,matrix s)
+{
+  if (pExp==1)
+    return pCopy(p);
+
+  poly res;
+
+  if((s!=NULL)&&(pExp<MAX_MAP_DEG))
   {
-    q=pOne();
+    int j=2;
+    poly p0=p;
+    // find starting point
+    if(MATELEM(s,v,1)==NULL)
+    {
+      MATELEM(s,v,1)=pCopy(p/*theMap->m[v-1]*/);
+    }
+    else
+    {
+      while((j<=pExp)&&(MATELEM(s,v,j)!=NULL))
+      {
+        j++;
+      }
+      p0=MATELEM(s,v,j-1);
+    }
+    // multiply
+    for(;j<=pExp;j++)
+    {
+      p0=MATELEM(s,v,j)=pMult(pCopy(p0/*MATELEM(s,v,j-1)*/),
+                              pCopy(p/*theMap->m[v-1]*/));
+    }
+    res=pCopy(p0/*MATELEM(s,v,pExp)*/);
+  }
+  else //if ((p->next!=NULL)&&(p->next->next==NULL))
+  {
+    res=pPower(pCopy(p),pExp);
+  }
+  return res;
+}
+
+poly maEvalMonom(map theMap, poly p,ring preimage_r,matrix s)
+{
+    poly q=pOne();
     pSetCoeff(q,nMap(pGetCoeff(p)));
 
-    for(i=1; i<=varnum; i++)
+    int i;
+    for(i=preimage_r->N; i>0; i--)
     {
       int pExp=pRingGetExp(preimage_r, p,i);
       if (pExp != 0)
@@ -59,47 +93,7 @@ poly maEval(map theMap, poly p,ring preimage_r,matrix s)
         if (theMap->m[i-1]!=NULL)
         {
           poly p1=theMap->m[i-1];
-          if((s!=NULL)&&(pExp<(MAX_MAP_DEG*2)))
-          {
-            int e=min(pExp,MAX_MAP_DEG);
-            if(MATELEM(s,i,e)!=NULL)
-              pp=pCopy(MATELEM(s,i,e));
-            else
-            {
-              int j=2;
-              poly p0=p1;
-              if(MATELEM(s,i,1)==NULL)
-              {
-                MATELEM(s,i,1)=pCopy(p1/*theMap->m[i-1]*/);
-              }
-              else
-              {
-                while((j<=e)&&(MATELEM(s,i,j)!=NULL))
-                {
-                  j++;
-                }
-                p0=MATELEM(s,i,j-1);
-              }
-              for(;j<=e;j++)
-              {
-                p0=MATELEM(s,i,j)=pMult(pCopy(p0/*MATELEM(s,i,j-1)*/),
-                                        pCopy(p1/*theMap->m[i-1]*/));
-              }
-              pp=pCopy(p0/*MATELEM(s,i,e)*/);
-            }
-            while(e!=pExp/*pRingGetExp(preimage_r, p,i)*/)
-            {
-              // e is the current exponent,
-              // MAX_MAP_DEG the max exponent in the table
-              // pExp the end exponent
-              pp=pMult(pp,pCopy(MATELEM(s,i,min(MAX_MAP_DEG,pExp-e))));
-              e+=min(MAX_MAP_DEG,pExp-e);
-            }
-          }
-          else
-          {
-            pp = pPower(pCopy(p1/*theMap->m[i-1]*/),pExp/*pRingGetExp(preimage_r, p,i)*/);
-          }
+          poly pp=maEvalVariable(p1,i,pExp,s);
           q = pMult(q,pp);
         }
         else
@@ -109,12 +103,51 @@ poly maEval(map theMap, poly p,ring preimage_r,matrix s)
         }
       }
     }
-    modulComp = pRingGetComp(preimage_r, p);
+    int modulComp = pRingGetComp(preimage_r, p);
     if (q!=NULL) pSetCompP(q,modulComp);
-    result = pAdd(result,q);
-    pIter(p);
+  return q;
+}
+
+poly maEval(map theMap, poly p,ring preimage_r,matrix s)
+{
+  poly result = NULL;
+  int i;
+
+//  for(i=1; i<=preimage_r->N; i++)
+//  {
+//    pTest(theMap->m[i-1]);
+//  }
+//  while (p!=NULL)
+//  {
+//    poly q=maEvalMonom(theMap,p,preimage_r,s);
+//    result = pAdd(result,q);
+//    pIter(p);
+//  }
+  if (p!=NULL)
+  {
+    int l = pLength(p)-1;
+    poly* monoms;
+    if (l>0)
+    {
+      monoms = (poly*) Alloc(l*sizeof(poly));
+
+      for (i=0; i<l; i++)
+      {
+        monoms[i]=maEvalMonom(theMap,p,preimage_r,s);
+        pIter(p);
+      }
+    }
+    result=maEvalMonom(theMap,p,preimage_r,s);
+    if (l>0)
+    {
+      for(i = l-1; i>=0; i--)
+      {
+        result=pAdd(result, monoms[i]);
+      }
+      Free((ADDRESS)monoms,l*sizeof(poly));
+    }
+    if (currRing->minpoly!=NULL) result=pMult(result,pOne());
   }
-  if (currRing->minpoly!=NULL) result=pMult(result,pOne());
   pTest(result);
   return result;
 }
@@ -279,7 +312,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 }
 
 void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
-                char **names,       int n,       char **par,       int nop, 
+                char **names,       int n,       char **par,       int nop,
                 int * perm, int *par_perm, int ch)
 {
   int i,j;
