@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.27 1998-09-24 12:09:26 Singular Exp $
+// $Id: primdec.lib,v 1.28 1998-10-26 16:21:36 obachman Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.27 1998-09-24 12:09:26 Singular Exp $";
+version="$Id: primdec.lib,v 1.28 1998-10-26 16:21:36 obachman Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -382,7 +382,7 @@ proc specialIdealsEqual( ideal k1, ideal k2)
 
    if(size(k1)==size(k2))
    {
-      for(j=ncols(k1);j>0;j--)
+      for(j=1;j<=size(k1);j++)
       {
          if(leadexp(k1[j])!=leadexp(k2[j]))
          {
@@ -400,7 +400,7 @@ proc stdIdealsEqual( ideal k1, ideal k2)
 
    if(size(k1)==size(k2))
    {
-      for(j=ncols(k1);j>0;j--)
+      for(j=1;j<=size(k1);j++)
       {
          if(leadexp(k1[j])!=leadexp(k2[j]))
          {
@@ -430,9 +430,9 @@ EXAMPLE: example randomLast; shows an example
 {
 
   ideal i=maxideal(1);
-  int k=ncols(i);
+  int k=size(i);
   i[k]=0;
-  i=randomid(i,ncols(i),b);
+  i=randomid(i,size(i),b);
   ideal ires=maxideal(1);
   ires[k]=i[1]+var(k);
   return(ires);
