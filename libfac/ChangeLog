@@ -1,3 +1,7 @@
+Tue Apr 10 15:34:04 CEST 2001 Hans Schoenemann <hannes@mathematik.uni-kl.de>
+
+       * changed copyright notice to GPL
+
 Wed Jun 03 14:42:51 1998    <pohl@FUECHSE>
 
 	* Makefile.in (CPPFLAGS): include paths fixed so that Windows
