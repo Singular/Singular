@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.113 1999-11-02 15:19:05 Singular Exp $ */
+/* $Id: extra.cc,v 1.114 1999-11-14 21:34:26 wenk Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -469,6 +469,50 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
+/*==================== complexNearZero ======================*/
+    if(strcmp(sys_cmd,"complexNearZero")==0)
+    {
+      if (h->Typ()==NUMBER_CMD )
+      {
+	if ( h->next!=NULL && h->next->Typ()==INT_CMD )
+	{
+	  if ( !rField_is_long_C() )
+	    {
+	      Werror( "unsupported ground field!");
+	      return TRUE;
+	    }
+	  else
+	    {
+	      res->rtyp=INT_CMD;
+	      res->data=(int)complexNearZero((gmp_complex*)h->Data(),(int)h->next->Data());
+	      return FALSE;
+	    }
+	}      
+	else
+	{
+	  Werror( "expected <int> as third parameter!");
+	  return TRUE;
+	}
+      }
+      else
+      {
+	Werror( "expected <number> as second parameter!");
+	return TRUE;
+      }
+    }
+/*==================== getPrecDigits ======================*/
+    if(strcmp(sys_cmd,"getPrecDigits")==0)
+    {
+      if ( !rField_is_long_C() && !rField_is_long_R() )
+      {
+	Werror( "unsupported ground field!");
+	return TRUE;
+      }
+      res->rtyp=INT_CMD;
+      res->data=(int)getGMPFloatDigits();
+      return FALSE;
+    }
+=======
 /*==================== poly debug ==================================*/
     if(strcmp(sys_cmd,"p")==0)
     {
