@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.75 2001-03-26 19:30:24 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.76 2001-05-30 14:37:57 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1557,7 +1557,7 @@ int sleftv::Eval()
           omCheckAddr(n);
           if (d->arg1.rtyp!=IDHDL)
 #ifdef HAVE_NAMESPACES
-            syMake(&d->arg1,n, d->arg1.req_packhdl); //assume  type of arg1==DEF_CMD
+          syMake(&d->arg1,n, d->arg1.req_packhdl); //assume  type of arg1==DEF_CMD
 #else
           syMake(&d->arg1,n);
 #endif
@@ -1566,10 +1566,11 @@ int sleftv::Eval()
           {
             n=omStrDup(IDID((idhdl)d->arg1.data));
             killhdl((idhdl)d->arg1.data);
-            d->arg1.data=NULL;
+	    d->arg1.Init();
+            //d->arg1.data=NULL;
             d->arg1.name=n;
           }
-          //d->arg1.rtyp=DEF_CMD;
+          d->arg1.rtyp=DEF_CMD;
           sleftv t;
           if(save_typ!=PROC_CMD) save_typ=d->arg2.rtyp;
           if (::RingDependend(d->arg2.rtyp))
