@@ -81,7 +81,8 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
     ndbm.cc spSpolyLoop.cc libparse.cc
 
-CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c  mmspec.c mmutil.c weight0.c find_exec.c getopt.c
+CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c  mmspec.c mmutil.c \
+    weight0.c find_exec.c getopt.c fereadl.c
 
 SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l spSpolyLoop.pl
 
@@ -123,7 +124,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
      mpsr_Get.o mpsr_GetMisc.o ndbm.o spSpolyLoop.o libparse.o \
-     find_exec.o getopt.o
+     find_exec.o getopt.o fereadl.o
 
 ##
 ## Build Targets
@@ -340,7 +341,7 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      ndbm.og spSpolyLoop.og libparse.og \
 
 OBJG2= mmalloc.og mmallocb.og mmallocs.og mmblock.og \
-     mmspec.og mmutil.og weight0.og find_exec.og getopt.og
+     mmspec.og mmutil.og weight0.og find_exec.og getopt.og fereadl.og
 
 
 OBJG=$(OBJG1) $(OBJG2) claptmpl.og
@@ -414,7 +415,7 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op\
      ndbm.op spSpolyLoop.op libparse.op
 
 OBJP2= mmalloc.op mmallocb.op mmallocs.op mmblock.op \
-     mmspec.op mmutil.op weight0.op find_exec.op getopt.op
+     mmspec.op mmutil.op weight0.op find_exec.op getopt.op fereadl.op
 
 OBJP=$(OBJP1) $(OBJP2) claptmpl.op
 
@@ -439,7 +440,7 @@ OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      ndbm.ob spSpolyLoop.ob libparse.ob 
 
 OBJB2= mmalloc.ob mmallocb.ob mmallocs.ob mmblock.ob \
-     mmspec.ob mmutil.ob weight0.ob find_exec.ob getopt.ob
+     mmspec.ob mmutil.ob weight0.ob find_exec.ob getopt.ob fereadl.ob
 
 OBJB=$(OBJB1) $(OBJB2) claptmpl.ob
 
