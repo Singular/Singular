@@ -81,23 +81,23 @@ Configuring and building Factory for different configurations
 additional options.  Here is a list of them which you can get entering
 './configure --help':
 
-  --with-memman(=<memman>) specify factory memory manager.
+  --with-memman(=<memman>) specify Factory memory manager.
                           <memman> is either 'old' (default), 'new', or 'no'.
   --with-gmp(=<gmp_inc_path>(,<gmp_lib_path>))
                           specify where to find gmp library.
   --with-Singular         build for use with computer algebra system Singular.
-  --disable-streamio      build factory without streamio
-  --enable-memdebug=<level> switch on memory managment debugging.  Meaningful
+  --disable-streamio      build Factory without stream IO
+  --enable-memdebug=<level> switch on memory management debugging.  Meaningful
                           with --with-memman=new only.  <level> may be either
                           'no' (default), 'normal', or 'full'.
-  --enable-assertions     build factory with assertions activated
-  --enable-timing         build factory so it will print timing information
-  --enable-debugoutput    build factory so it will print debugging information
+  --enable-assertions     build Factory with assertions activated
+  --enable-timing         build Factory so it will print timing information
+  --enable-debugoutput    build Factory so it will print debugging information
   --enable-gmp            together with --with-Singular means: installation
                           in process, be graceful when there is no gmp.h
 
   For more detailed information, see the README file.  Note that not all
-possible combinations of the with's and enable's are meaningful.  The
+possible combinations of the --with's and --enable's are meaningful.  The
 dependencies between them are described in the README file, too.
 
   You can compile the package for more than one configuration at the same
@@ -122,8 +122,8 @@ commands necessary to do that:
   cd OPTDIR
   ../configure --srcdir=.. --prefix=/usr/local/factory.opt
   make install
-  # Better set a symbolic link from one $(gftabledir) to the other.  There
-  # are not any configuration dependent differences.
+  # Better set a symbolic link from one $(gftabledir) to the other.  They
+  # GF(q) tables are the same for all configurations.
   make installgftables
   
 
@@ -167,7 +167,7 @@ source files change.  Intended to be used by developers.
 
 'make ftmpl_inst.o'
 -------------------
-  Creates the Factory template instantiation.  Necessary when you link
+  Creates the Factory template instantiation.  Necessary when linking
 Factory with your application.
 
 
@@ -187,12 +187,12 @@ b) Create them using Factory itself.  Since this process does not require
 
    'make gengftables'
    ------------------
-     Creates the executable necessary to build the tables.
+     Creates the executable gengftables necessary to build the tables.
 
    'make gftables'
    ---------------
-     Creates a directory gftables/ and execute gengftables.  This is a
-   rather time consuming process, so you maybe want to start it in the
+     Creates a directory gftables/ and executes gengftables.  This is a
+   rather time consuming process, so you may want to start it in the
    background or as 'nohup' ('nohup make gftables &').
 
 
@@ -202,8 +202,8 @@ b) Create them using Factory itself.  Since this process does not require
 
 'make install'
 --------------
-  Builds Factory and install it.  This target also creates the directories
-in which Factory will be installed, if they do not already exist.
+  Builds and installs Factory.  This target also creates the directories
+in which Factory will be installed if they do not already exist.
 The files are installed in the following directories:
 
 File		Symb.Name	(Default) phys. location
@@ -229,7 +229,7 @@ gftables/*	$(gftabledir)	= /usr/local/share/factory/gftables
 'make uninstall'
 ----------------
   Deletes all the installed files that the install target created.  Also
-attempt to delete the directories created by installation process.
+attempts to delete the directories created by the installation process.
 
 
 5. Installing GF(q) tables
@@ -240,4 +240,5 @@ attempt to delete the directories created by installation process.
 
 'make unistallgftables'
 -----------------------
-  Uninstalls the GF(q) tables.
+  Uninstalls the GF(q) tables and attempts to delete the directories created
+by the installation process.
