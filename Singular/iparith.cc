@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.327 2004-08-05 09:00:09 Singular Exp $ */
+/* $Id: iparith.cc,v 1.328 2004-10-05 13:00:29 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2546,6 +2546,8 @@ struct sValCmd2 dArith2[]=
 ,{jjWRONG2,    BAREISS_CMD,    0,              DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjBETTI2,    BETTI_CMD,      INTMAT_CMD,     LIST_CMD,   INT_CMD ALLOW_PLURAL}
 ,{syBetti2,    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD ALLOW_PLURAL}
+,{jjBETTI2_ID, BETTI_CMD,      INTMAT_CMD,     IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
+,{jjBETTI2_ID, BETTI_CMD,      INTMAT_CMD,     MODUL_CMD,  INT_CMD ALLOW_PLURAL}
 #ifdef HAVE_PLURAL
 ,{jjBRACKET,   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 #endif
@@ -3877,6 +3879,8 @@ struct sValCmd1 dArith1[]=
 ,{jjBAREISS,    BAREISS_CMD,     LIST_CMD,       MODUL_CMD      NO_PLURAL}
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD       ALLOW_PLURAL}
 ,{syBetti1,     BETTI_CMD,       INTMAT_CMD,     RESOLUTION_CMD ALLOW_PLURAL}
+,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     IDEAL_CMD      ALLOW_PLURAL}
+,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     MODUL_CMD      ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD       ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD      ALLOW_PLURAL}
 #ifdef HAVE_FACTORY

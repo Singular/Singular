@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.91 2004-07-20 15:41:00 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.92 2004-10-05 13:00:50 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -854,7 +854,30 @@ BOOLEAN jjBETTI(leftv res, leftv u)
   memset(&tmp,0,sizeof(tmp));
   tmp.rtyp=INT_CMD;
   tmp.data=(void *)1;  
-  return jjBETTI2(res,u,&tmp);
+  if ((u->Typ()==IDEAL_CMD)
+  || (u->Typ()==MODUL_CMD))
+    return jjBETTI2_ID(res,u,&tmp);
+  else
+    return jjBETTI2(res,u,&tmp);
+}
+
+BOOLEAN jjBETTI2_ID(leftv res, leftv u, leftv v)
+{
+  lists l=(lists) omAllocBin(slists_bin);
+  l->Init(1);
+  l->m[0].rtyp=u->Typ();
+  l->m[0].data=u->Data();
+  l->m[0].attribute=u->attribute;
+  sleftv tmp2;
+  memset(&tmp2,0,sizeof(tmp2));
+  tmp2.rtyp=LIST_CMD;
+  tmp2.data=(void *)l;
+  BOOLEAN r=jjBETTI2(res,&tmp2,v);
+  l->m[0].data=NULL;
+  l->m[0].attribute=NULL;
+  l->m[0].rtyp=DEF_CMD;
+  l->Clean();
+  return r;
 }
 
 BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
@@ -864,13 +887,24 @@ BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
   int reg,typ0;
   lists l=(lists)u->Data();
 
-  intvec *weights=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD); 
+  intvec *weights=NULL;
+  int add_row_shift=0;
+  intvec *ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD); 
+  if (ww!=NULL)
+  {
+     weights=ivCopy(ww);
+     add_row_shift = ww->min_in();
+     (*weights) -= add_row_shift;
+  }
   //Print("attr:%x\n",weights);
 
   r=liFindRes(l,&len,&typ0);
   if (r==NULL) return TRUE;
   res->data=(char *)syBetti(r,len,&reg,weights,(int)v->Data());
   omFreeSize((ADDRESS)r,(len)*sizeof(ideal));
+  if (add_row_shift!=0) 
+    atSet(res,omStrDup("rowShift"),(void*)add_row_shift,INT_CMD);
+  if (weights!=NULL) delete weights;
   return FALSE;
 }
 
