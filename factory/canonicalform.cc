@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.19 1997-09-24 10:52:23 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.20 1997-10-10 10:40:17 schmidt Exp $ */
 
 #include <config.h>
 
@@ -22,6 +22,32 @@
 CanonicalForm readCF( istream& );
 #endif /* NOSTREAMIO */
 
+//{{{ initialization
+int initializeGMP();
+int initializeCharacteristic();
+#ifdef SINGULAR
+int mmInit(void);
+#endif
+
+int
+initCanonicalForm( void )
+{
+    static bool initialized = false;
+    if ( ! initialized ) {
+#if (defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)) || defined (SINGULAR)
+	(void)mmInit();
+#endif
+
+	(void)initializeCharacteristic();
+	(void)initializeGMP();
+	initPT();
+	initialized = true;
+    }
+    return 1;
+}
+//}}}
+
+//{{{ constructors, destructors, selectors
 CanonicalForm::CanonicalForm() : value( CFFactory::basic( (int)0 ) )
 {
 }
@@ -65,6 +91,17 @@ CanonicalForm::getval() const
 	return value->copyObject();
 }
 
+CanonicalForm
+CanonicalForm::deepCopy() const
+{
+    if ( is_imm( value ) )
+	return *this;
+    else
+	return CanonicalForm( value->deepCopyObject() );
+}
+//}}}
+
+//{{{ predicates
 bool
 CanonicalForm::isOne() const
 {
@@ -183,6 +220,23 @@ CanonicalForm::inQuotDomain() const
 	return value->inQuotDomain();
 }
 
+bool
+CanonicalForm::isFFinGF() const
+{
+    return is_imm( value ) == GFMARK && gf_isff( imm2int( value ) );
+}
+
+bool
+CanonicalForm::isUnivariate() const
+{
+    if ( is_imm( value ) )
+	return false;
+    else
+	return value->isUnivariate();
+}
+//}}}
+
+//{{{ conversion functions
 int
 CanonicalForm::intval() const
 {
@@ -193,7 +247,110 @@ CanonicalForm::intval() const
 }
 
 CanonicalForm
-CanonicalForm::lc() const
+CanonicalForm::mapinto () const
+{
+    ASSERT( is_imm( value ) ||  ! value->inExtension(), "cannot map into different Extension" );
+    if ( is_imm( value ) )
+	if ( getCharacteristic() == 0 )
+	    if ( is_imm( value ) == FFMARK )
+		return CanonicalForm( int2imm( ff_symmetric( imm2int( value ) ) ) );
+	    else  if ( is_imm( value ) == GFMARK )
+		return CanonicalForm( int2imm( ff_symmetric( gf_gf2ff( imm2int( value ) ) ) ) );
+	    else
+		return *this;
+	else  if ( CFFactory::gettype() == PrimePowerDomain )
+	    return CanonicalForm( CFFactory::basic( imm2int( value ) ) );
+	else  if ( getGFDegree() == 1 )
+	    return CanonicalForm( int2imm_p( ff_norm( imm2int( value ) ) ) );
+	else
+	    return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
+    else  if ( value->inBaseDomain() )
+	if ( getCharacteristic() == 0 )
+	    if ( value->levelcoeff() == PrimePowerDomain )
+		return CFFactory::basic( getmpi( value, true ) );
+	    else
+		return *this;
+	else  if ( CFFactory::gettype() == PrimePowerDomain ) {
+	    ASSERT( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain, "no proper map defined" );
+	    if ( value->levelcoeff() == PrimePowerDomain )
+		return *this;
+	    else
+		return CFFactory::basic( getmpi( value ) );
+	}
+	else {
+	    int val;
+	    if ( value->levelcoeff() == IntegerDomain )
+		val = value->intmod( ff_prime );
+	    else  if ( value->levelcoeff() == RationalDomain )
+		return num().mapinto() / den().mapinto();
+	    else {
+		ASSERT( 0, "illegal domain" );
+		return 0;
+	    }
+	    if ( getGFDegree() > 1 )
+		return CanonicalForm( int2imm_gf( gf_int2gf( val ) ) );
+	    else
+		return CanonicalForm( int2imm_p( val ) );
+	}
+    else {
+	Variable x = value->variable();
+	CanonicalForm result;
+	for ( CFIterator i = *this; i.hasTerms(); i++ )
+	    result += power( x, i.exp() ) * i.coeff().mapinto();
+	return result;
+    }
+}
+//}}}
+
+//{{{ CanonicalForm CanonicalForm::lc (), Lc (), LC (), LC ( v ) const
+//{{{ docu
+//
+// lc(), Lc(), LC() - leading coefficient functions.
+//
+// All methods return CO if CO is in a base domain.
+//
+// lc() returns the leading coefficient of CO with respect to
+// lexicographic ordering.  Elements in an algebraic extension
+// are considered polynomials so lc() always returns a leading
+// coefficient in a base domain.  This method is useful to get
+// the base domain over which CO is defined.
+//
+// Lc() returns the leading coefficient of CO with respect to
+// lexicographic ordering.  In contrast to lc() elements in an
+// algebraic extension are considered coefficients so Lc() always
+// returns a leading coefficient in a coefficient domain.
+// 
+// LC() returns the leading coefficient of CO where CO is
+// considered a univariate polynomial in its main variable.  An
+// element of an algebraic extension is considered an univariate
+// polynomial, too.
+//
+// LC( v ) returns the leading coefficient of CO where CO is
+// considered an univariate polynomial in the polynomial variable
+// v.
+// Note: If v is less than the main variable of CO we have to
+// swap variables which may be quite expensive.
+//
+// Examples:
+// Let x < y be polynomial variables, a an algebraic variable.
+//
+// (3*a*x*y^2+y+x).lc() = 3
+// (3*a*x*y^2+y+x).Lc() = 3*a
+// (3*a*x*y^2+y+x).LC() = 3*a*x
+// (3*a*x*y^2+y+x).LC( x ) = 3*a*y^2+1
+//
+// (3*a^2+4*a).lc() = 3
+// (3*a^2+4*a).Lc() = 3*a^2+4*a
+// (3*a^2+4*a).LC() = 3
+// (3*a^2+4*a).LC( x ) = 3*a^2+4*a
+//
+// See also: InternalCF::lc(), InternalCF::Lc(), InternalCF::LC(),
+// InternalPoly::lc(), InternalPoly::Lc(), InternalPoly::LC(),
+// ::lc(), ::Lc(), ::LC(), ::LC( v )
+//
+//}}}
+CanonicalForm
+CanonicalForm::lc () const
 {
     if ( is_imm( value ) )
 	return *this;
@@ -202,36 +359,61 @@ CanonicalForm::lc() const
 }
 
 CanonicalForm
-CanonicalForm::LC() const
+CanonicalForm::Lc () const
 {
-    if ( inBaseDomain() )
+    if ( is_imm( value ) || value->inCoeffDomain() )
+	return *this;
+    else
+	return value->Lc();
+}
+
+CanonicalForm
+CanonicalForm::LC () const
+{
+    if ( is_imm( value ) )
 	return *this;
     else
 	return value->LC();
 }
 
 CanonicalForm
-CanonicalForm::LC( const Variable & v ) const
+CanonicalForm::LC ( const Variable & v ) const
 {
-    if ( inBaseDomain() )
+    if ( is_imm( value ) || value->inCoeffDomain() )
 	return *this;
-    else  if ( v == mvar() )
+
+    Variable x = value->variable();
+    if ( v > x )
+	return *this;
+    else if ( v == x )
 	return value->LC();
     else {
-	CanonicalForm f = swapvar( *this, v, mvar() );
- 	if ( f.mvar() == mvar() )
- 	    return swapvar( f.value->LC(), v, mvar() );
+	CanonicalForm f = swapvar( *this, v, x );
+ 	if ( f.mvar() == x )
+ 	    return swapvar( f.value->LC(), v, x );
  	else
+	    // v did not occur in f
 	    return *this;
     }
 }
+//}}}
 
-//{{{ int CanonicalForm::degree() const
+//{{{ int CanonicalForm::degree (), degree ( v ) const
 //{{{ docu
 //
-// degree() - return degree in main variable.
+// degree() - degree methods.
 //
-// Returns -1 for the zero polynomial.
+// Both methods returns -1 for the zero polynomial and 0 if
+// CO is in a base domain.
+//
+// degree() returns the degree of CO in its main variable.
+// Elements in an algebraic extension are considered polynomials.
+// degree( v ) returns the degree of CO with respect to v.
+// Elements in an algebraic extension are considered polynomials,
+// and v may be algebraic.
+//
+// See also: InternalCf::degree(), InternalPoly::degree(),
+// ::degree(), ::degree( v )
 //
 //}}}
 int
@@ -244,51 +426,67 @@ CanonicalForm::degree() const
     else
 	return value->degree();
 }
-//}}}
 
-//{{{ int CanonicalForm::degree( const Variable & v ) const
-//{{{ docu
-//
-// degree() - return degree in variable v.
-//
-// Returns -1 for the zero polynomial.
-//
-// Note: If v is less than the main variable of CO we have to swap
-// variables which may be quite expensive.  Calculating the degree in
-// respect to an algebraic variable may fail.
-//
-//}}}
 int
 CanonicalForm::degree( const Variable & v ) const
 {
     if ( isZero() )
 	return -1;
-    else  if ( is_imm( value ) )
-	return 0;
-    else  if ( inBaseDomain() )
+    else  if ( is_imm( value ) || value->inBaseDomain() )
 	return 0;
 
-    Variable x = mvar();
+    Variable x = value->variable();
     if ( v == x )
 	return value->degree();
     else  if ( v > x )
 	// relatively to v, f is in a coefficient ring
 	return 0;
     else {
-	// v < mvar(), make v main variable
-	CanonicalForm f = swapvar( *this, v, x );
-	if ( f.mvar() == x )
-	    return f.value->degree();
-	else
-	    // in this case, we lost our main variable because
-	    // v did not occur in CO
-	    return 0;
+	int coeffdeg, result = 0;
+	// search for maximum of coefficient degree
+	for ( CFIterator i = *this; i.hasTerms(); i++ ) {
+	    coeffdeg = i.coeff().degree( v );
+	    if ( coeffdeg > result )
+		result = coeffdeg;
+	}
+	return result;
     }
 }
 //}}}
 
+//{{{ CanonicalForm CanonicalForm::tailcoeff (), int CanonicalForm::taildegree () const
+//{{{ docu
+//
+// tailcoeff(), taildegree() - return last coefficient and
+//   degree, resp.
+//
+// tailcoeff() returns the coefficient of the term with the least
+// degree in CO.  Elements in an algebraic extension are
+// considered coefficients.
+//
+// taildegree() returns -1 for the zero polynomial, 0 if CO is in
+// a base domain, the least degree of all terms occuring in CO
+// otherwise.  In contrast to tailcoeff(), elements in an
+// algebraic extension are considered polynomials, not
+// coefficients, and such may have a taildegree larger than
+// zero.
+//
+// See also: InternalCF::tailcoeff(), InternalCF::tailcoeff(),
+// InternalPoly::tailcoeff(), InternalPoly::taildegree,
+// ::tailcoeff(), ::taildegree()
+//
+//}}}
+CanonicalForm
+CanonicalForm::tailcoeff () const
+{
+    if ( is_imm( value ) || value->inCoeffDomain() )
+	return *this;
+    else
+	return value->tailcoeff();
+}
+
 int
-CanonicalForm::taildegree() const
+CanonicalForm::taildegree () const
 {
     if ( isZero() )
 	return -1;
@@ -297,18 +495,26 @@ CanonicalForm::taildegree() const
     else
 	return value->taildegree();
 }
+//}}}
 
-CanonicalForm
-CanonicalForm::tailcoeff() const
-{
-    if ( inCoeffDomain() )
-	return *this;
-    else
-	return value->tailcoeff();
-}
-
+//{{{ int CanonicalForm::level (), Variable CanonicalForm::mvar () const
+//{{{ docu
+//
+// level(), mvar() - return level and main variable of CO.
+//
+// level() returns the level of CO.  For a list of the levels,
+// see cf_defs.h.
+//
+// mvar() returns the main variable of CO or Variable() if CO is
+// in a base domain.
+//
+// See also: InternalCF::level(), InternalCF::variable(),
+// InternalPoly::level(), InternalPoly::variable(), ::level(),
+// ::mvar()
+// 
+//}}}
 int
-CanonicalForm::level() const
+CanonicalForm::level () const
 {
     if ( is_imm( value ) )
 	return LEVELBASE;
@@ -317,16 +523,33 @@ CanonicalForm::level() const
 }
 
 Variable
-CanonicalForm::mvar() const
+CanonicalForm::mvar () const
 {
     if ( is_imm( value ) || value->inBaseDomain() )
 	return Variable();
     else
 	return value->variable();
 }
+//}}}
 
+//{{{ CanonicalForm CanonicalForm::num (), den () const
+//{{{ docu
+//
+// num(), den() - return numinator and denominator of CO.
+//
+// num() returns the numinator of CO if CO is a rational number,
+// CO itself otherwise.
+//
+// den() returns the denominator of CO if CO is a rational
+// number, 1 (from the current domain!) otherwise.
+//
+// See also: InternalCF::num(), InternalCF::den(),
+// InternalRational::num(), InternalRational::den(), ::num(),
+// ::den()
+//
+//}}}
 CanonicalForm
-CanonicalForm::num() const
+CanonicalForm::num () const
 {
     if ( is_imm( value ) )
 	return *this;
@@ -335,261 +558,16 @@ CanonicalForm::num() const
 }
 
 CanonicalForm
-CanonicalForm::den() const
+CanonicalForm::den () const
 {
     if ( is_imm( value ) )
 	return 1;
     else
 	return CanonicalForm( value->den() );
 }
-
-CanonicalForm
-CanonicalForm::deepCopy() const
-{
-    if ( is_imm( value ) )
-	return *this;
-    else
-	return CanonicalForm( value->deepCopyObject() );
-}
-
-CanonicalForm
-CanonicalForm::gcd( const CanonicalForm & ) const
-{
-//    return ::gcd( *this, f );
-    return 1;
-}
-
-//{{{ CanonicalForm CanonicalForm::deriv () const
-//{{{ docu
-//
-// deriv() - return the formal derivation of CO.
-//
-// Derives CO with respect to its main variable.  Returns zero if
-// f is in a coefficient domain.
-//
-//}}}
-CanonicalForm
-CanonicalForm::deriv () const
-{
-    if ( inCoeffDomain() )
-	return 0;
-    else {
-	CanonicalForm res = 0;
-	Variable x = mvar();
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    if ( i.exp() > 0 )
-		res += power( x, i.exp()-1 ) * i.coeff() * i.exp();
-	return res;
-    }
-}
 //}}}
 
-//{{{ CanonicalForm CanonicalForm::deriv ( const Variable & x ) const
-//{{{ docu
-//
-// deriv() - return the formal derivation of CO with respect to x.
-//
-// x should be a polynomial variable.  Returns zero if f is in a
-// coefficient domain.
-//
-// Timing Note (for the developer): I tried the same without
-// 'Variable y = mvar()', replacing each occurence of y directly
-// with 'mvar()'.  It turned out that this version is slower in all
-// cases.
-//
-//}}}
-CanonicalForm
-CanonicalForm::deriv ( const Variable & x ) const
-{
-    ASSERT( x.level() > 0, "cannot derive with respect to algebraic variables" );
-    if ( inCoeffDomain() )
-	return 0;
-
-    Variable y = mvar();
-    if ( x > y )
-	return 0;
-    else if ( x == y )
-	return deriv();
-    else {
-	CanonicalForm result;
-	CFIterator i;
-	for ( i = *this; i.hasTerms(); i++ )
-	    result += i.coeff().deriv( x ) * power( y, i.exp() );
-	return result;
-    }
-}
-//}}}
-
-CanonicalForm
-CanonicalForm::genCoeff( int type, int i )
-{
-    return CanonicalForm( CFFactory::basic( type, i ) );
-}
-
-CanonicalForm
-CanonicalForm::genZero() const
-{
-    int what = is_imm( value );
-    if ( what == FFMARK )
-	return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 0 ) );
-    else  if ( what == GFMARK )
-	return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 0 ) );
-    else  if ( what )
-	return CanonicalForm( CFFactory::basic( IntegerDomain, 0 ) );
-    else
-	return CanonicalForm( value->genZero() );
-}
-
-CanonicalForm
-CanonicalForm::genOne() const
-{
-    int what = is_imm( value );
-    if ( what == FFMARK )
-	return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 1 ) );
-    else  if ( what == GFMARK )
-	return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 1 ) );
-    else  if ( what )
-	return CanonicalForm( CFFactory::basic( IntegerDomain, 1 ) );
-    else
-	return CanonicalForm( value->genOne() );
-}
-
-bool
-CanonicalForm::isUnivariate() const
-{
-    if ( is_imm( value ) )
-	return false;
-    else
-	return value->isUnivariate();
-}
-
-#ifndef NOSTREAMIO
-void
-CanonicalForm::print( ostream & os, char * str ) const
-{
-    if ( is_imm( value ) )
-	imm_print( os, value, str );
-    else
-	value->print( os, str );
-}
-#endif /* NOSTREAMIO */
-
-bool
-operator == ( const CanonicalForm & lhs, const CanonicalForm & rhs )
-{
-    int what = is_imm( lhs.value );
-    if ( what )
-	if ( what == is_imm( rhs.value ) )
-	    return lhs.value == rhs.value;
-	else
-	    return false;
-    else  if ( is_imm( rhs.value ) )
-	return false;
-    else  if ( lhs.level() == rhs.level() )
-	if ( lhs.value->levelcoeff() >= rhs.value->levelcoeff() )
-	    return lhs.value->comparesame( rhs.value ) == 0;
-	else
-	    return rhs.value->comparesame( lhs.value ) == 0;
-    else
-	return false;
-}
-
-bool
-operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
-{
-    int what = is_imm( lhs.value );
-    if ( what )
-	if ( what == is_imm( rhs.value ) )
-	    return lhs.value != rhs.value;
-	else
-	    return true;
-    else  if ( is_imm( rhs.value ) )
-	return true;
-    else  if ( lhs.level() == rhs.level() )
-	if ( lhs.value->levelcoeff() >= rhs.value->levelcoeff() )
-	    return lhs.value->comparesame( rhs.value ) != 0;
-	else
-	    return rhs.value->comparesame( lhs.value ) != 0;
-    else
-	return true;
-}
-
-bool
-operator > ( const CanonicalForm & lhs, const CanonicalForm & rhs )
-{
-    int what = is_imm( lhs.value );
-    if ( what ) {
-	ASSERT ( ! is_imm( rhs.value ) || (what==is_imm( rhs.value )), "illegal base coefficients" );
-	if ( what == INTMARK ) {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp( lhs.value, rhs.value ) > 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) < 0;
-	}
-	else  if ( what == FFMARK ) {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp_p( lhs.value, rhs.value ) > 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) < 0;
-	}
-	else {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp_gf( lhs.value, rhs.value ) > 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) < 0;
-	}
-    }
-    else  if ( is_imm( rhs.value ) )
-	return lhs.value->comparecoeff( rhs.value ) > 0;
-    else  if ( lhs.level() == rhs.level() )
-	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
-	    return lhs.value->comparesame( rhs.value ) > 0;
-	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
-	    return lhs.value->comparecoeff( lhs.value ) > 0;
-	else
-	    return rhs.value->comparecoeff( lhs.value ) < 0;
-    else
-	return lhs.value->level() > rhs.value->level();
-}
-
-bool
-operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
-{
-    int what = is_imm( lhs.value );
-    if ( what ) {
-	ASSERT ( ! is_imm( rhs.value ) || (what==is_imm( rhs.value )), "illegal base coefficients" );
-	if ( what == INTMARK ) {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp( lhs.value, rhs.value ) < 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) > 0;
-	}
-	else  if ( what == FFMARK ) {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp( lhs.value, rhs.value ) < 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) > 0;
-	}
-	else {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp( lhs.value, rhs.value ) < 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) > 0;
-	}
-    }
-    else  if ( is_imm( rhs.value ) )
-	return lhs.value->comparecoeff( rhs.value ) < 0;
-    else  if ( lhs.level() == rhs.level() )
-	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
-	    return lhs.value->comparesame( rhs.value ) < 0;
-	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
-	    return lhs.value->comparecoeff( lhs.value ) < 0;
-	else
-	    return rhs.value->comparecoeff( lhs.value ) > 0;
-    else
-	return lhs.value->level() < rhs.value->level();
-}
-
+//{{{ assignment operators
 CanonicalForm&
 CanonicalForm::operator = ( const CanonicalForm & cf )
 {
@@ -903,7 +881,342 @@ CanonicalForm::mod( const CanonicalForm & cf )
     }
     return *this;
 }
+//}}}
 
+//{{{ evaluation operators
+CanonicalForm
+CanonicalForm::operator () ( const CanonicalForm & f ) const
+{
+    if ( inBaseDomain() )
+	return *this;
+    else {
+	CanonicalForm result = 0;
+	for ( CFIterator i = *this; i.hasTerms(); i++ )
+	    if ( i.exp() == 0 )
+		result += i.coeff();
+	    else
+		result += power( f, i.exp() ) * i.coeff();
+	return result;
+    }
+}
+
+CanonicalForm
+CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
+{
+    if ( inBaseDomain() || v > mvar() )
+	return *this;
+    else  if ( v == mvar() ) {
+	CanonicalForm result = 0;
+	for ( CFIterator i = *this; i.hasTerms(); i++ )
+	    if ( i.exp() == 0 )
+		result += i.coeff();
+	    else
+		result += power( f, i.exp() ) * i.coeff();
+	return result;
+    }
+    else {
+	CanonicalForm G = swapvar( *this, v, Variable::highest() );
+	if ( G.mvar() != Variable::highest() )
+	    return *this;
+	CanonicalForm result = 0;
+	for ( CFIterator i = G; i.hasTerms(); ++i )
+	    if ( i.exp() == 0 )
+		result += i.coeff();
+	    else
+		result += power( f, i.exp() ) * i.coeff();
+	return result;
+    }
+}
+//}}}
+
+//{{{ CanonicalForm CanonicalForm::operator[] ( int i ) const
+CanonicalForm
+CanonicalForm::operator[] ( int i ) const
+{
+    return value->coeff( i );
+}
+//}}}
+
+//{{{ CanonicalForm CanonicalForm::deriv (), deriv ( x )
+//{{{ docu
+//
+// deriv() - return the formal derivation of CO.
+//
+// deriv() derives CO with respect to its main variable.  Returns
+// zero if f is in a coefficient domain.
+//
+// deriv( x ) derives CO with respect to x.  x should be a
+// polynomial variable.  Returns zero if f is in a coefficient
+// domain.
+//
+// See also: ::deriv()
+//
+//}}}
+CanonicalForm
+CanonicalForm::deriv () const
+{
+    if ( is_imm( value ) || value->inCoeffDomain() )
+	return 0;
+    else {
+	CanonicalForm result = 0;
+	Variable x = value->variable();
+	for ( CFIterator i = *this; i.hasTerms(); i++ )
+	    if ( i.exp() > 0 )
+		result += power( x, i.exp()-1 ) * i.coeff() * i.exp();
+	return result;
+    }
+}
+
+CanonicalForm
+CanonicalForm::deriv ( const Variable & x ) const
+{
+    ASSERT( x.level() > 0, "cannot derive with respect to algebraic variables" );
+    if ( is_imm( value ) || value->inCoeffDomain() )
+	return 0;
+
+    Variable y = value->variable();
+    if ( x > y )
+	return 0;
+    else if ( x == y )
+	return deriv();
+    else {
+	CanonicalForm result = 0;
+	for ( CFIterator i = *this; i.hasTerms(); i++ )
+	    result += i.coeff().deriv( x ) * power( y, i.exp() );
+	return result;
+    }
+}
+//}}}
+
+//{{{ int CanonicalForm::sign () const
+//{{{ docu
+//
+// sign() - return sign of CO.
+//
+// If CO is an integer or a rational number, the sign is defined
+// as usual.  If CO is an element of a prime power domain or in a
+// finite field and SW_SYMMETRIC_FF is on the sign of CO is the
+// sign of the symmetric representation of CO.  If CO is in GF(q)
+// or in a finite field and SW_SYMMETRIC_FF is off, the sign of
+// CO is zero iff CO is zero, otherwise the sign is one.
+//
+// If CO is a polynomial or in an extension of one of the base
+// domains, the sign of CO is the sign of its leading
+// coefficient.
+//
+// See also: InternalCF::sign(), InternalInteger::sign(),
+// InternalPrimePower::sign(), InternalRational::sign(),
+// InternalPoly::sign(), imm_sign(), gf_sign()
+//
+//}}}
+int
+CanonicalForm::sign () const
+{
+    if ( is_imm( value ) )
+	return imm_sign( value );
+    else
+	return value->sign();
+}
+//}}}
+
+//{{{ CanonicalForm CanonicalForm::sqrt () const
+//{{{ docu
+//
+// sqrt() - calculate integer square root.
+//
+// CO has to be an integer greater or equal zero.  Returns the
+// largest integer less or equal sqrt(CO).
+//
+// In the immediate case, we use the newton method to find the
+// root.  The algorithm is from H. Cohen - 'A Course in
+// Computational Algebraic Number Theory', ch. 1.7.1.
+//
+// See also: InternalCF::sqrt(), InternalInteger::sqrt(), ::sqrt()
+//
+//}}}
+CanonicalForm
+CanonicalForm::sqrt () const
+{
+    if ( is_imm( value ) ) {
+	ASSERT( is_imm( value ) == INTMARK, "sqrt() not implemented" );
+	int n = imm2int( value );
+	ASSERT( n >= 0, "arg to sqrt() less than zero" );
+	if ( n == 0 || n == 1 )
+	    return CanonicalForm( CFFactory::basic( n ) );
+	else {
+	    int x, y = n;
+	    do {
+		x = y;
+		// the intermediate result may not fit into an
+		// integer, but the result does
+		y = (unsigned int)(x + n/x)/2;
+	    } while ( y < x );
+	    return CanonicalForm( CFFactory::basic( x ) );
+	}
+    }
+    else
+	return CanonicalForm( value->sqrt() );
+}
+//}}}
+
+//{{{ int CanonicalForm::ilog2 () const
+//{{{ docu
+//
+// ilog2() - integer logarithm to base 2.
+//
+// Returns the largest integer less or equal logarithm of CO to
+// base 2.  CO should be a positive integer.
+//
+// See also: InternalCF::ilog2(), InternalInteger::ilog2(), ::ilog2()
+//
+//}}}
+int
+CanonicalForm::ilog2 () const
+{
+    if ( is_imm( value ) ) {
+	ASSERT( is_imm( value ) == INTMARK, "ilog2() not implemented" );
+	int a = imm2int( value );
+	ASSERT( a > 0, "arg to ilog2() less or equal zero" );
+	int n = -1;
+	while ( a != 0 ) {
+	    n++;
+	    a /= 2;
+	}
+	return n;
+    }
+    else
+	return value->ilog2();
+}
+//}}}
+
+//{{{ CanonicalForm CanonicalForm::gcd( const CanonicalForm & ) const
+CanonicalForm
+CanonicalForm::gcd( const CanonicalForm & ) const
+{
+//    return ::gcd( *this, f );
+    return 1;
+}
+//}}}
+
+//{{{ comparison operators
+bool
+operator == ( const CanonicalForm & lhs, const CanonicalForm & rhs )
+{
+    int what = is_imm( lhs.value );
+    if ( what )
+	if ( what == is_imm( rhs.value ) )
+	    return lhs.value == rhs.value;
+	else
+	    return false;
+    else  if ( is_imm( rhs.value ) )
+	return false;
+    else  if ( lhs.level() == rhs.level() )
+	if ( lhs.value->levelcoeff() >= rhs.value->levelcoeff() )
+	    return lhs.value->comparesame( rhs.value ) == 0;
+	else
+	    return rhs.value->comparesame( lhs.value ) == 0;
+    else
+	return false;
+}
+
+bool
+operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
+{
+    int what = is_imm( lhs.value );
+    if ( what )
+	if ( what == is_imm( rhs.value ) )
+	    return lhs.value != rhs.value;
+	else
+	    return true;
+    else  if ( is_imm( rhs.value ) )
+	return true;
+    else  if ( lhs.level() == rhs.level() )
+	if ( lhs.value->levelcoeff() >= rhs.value->levelcoeff() )
+	    return lhs.value->comparesame( rhs.value ) != 0;
+	else
+	    return rhs.value->comparesame( lhs.value ) != 0;
+    else
+	return true;
+}
+
+bool
+operator > ( const CanonicalForm & lhs, const CanonicalForm & rhs )
+{
+    int what = is_imm( lhs.value );
+    if ( what ) {
+	ASSERT ( ! is_imm( rhs.value ) || (what==is_imm( rhs.value )), "illegal base coefficients" );
+	if ( what == INTMARK ) {
+	    if ( what == is_imm( rhs.value ) )
+		return imm_cmp( lhs.value, rhs.value ) > 0;
+	    else
+		return rhs.value->comparecoeff( lhs.value ) < 0;
+	}
+	else  if ( what == FFMARK ) {
+	    if ( what == is_imm( rhs.value ) )
+		return imm_cmp_p( lhs.value, rhs.value ) > 0;
+	    else
+		return rhs.value->comparecoeff( lhs.value ) < 0;
+	}
+	else {
+	    if ( what == is_imm( rhs.value ) )
+		return imm_cmp_gf( lhs.value, rhs.value ) > 0;
+	    else
+		return rhs.value->comparecoeff( lhs.value ) < 0;
+	}
+    }
+    else  if ( is_imm( rhs.value ) )
+	return lhs.value->comparecoeff( rhs.value ) > 0;
+    else  if ( lhs.level() == rhs.level() )
+	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
+	    return lhs.value->comparesame( rhs.value ) > 0;
+	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
+	    return lhs.value->comparecoeff( lhs.value ) > 0;
+	else
+	    return rhs.value->comparecoeff( lhs.value ) < 0;
+    else
+	return lhs.value->level() > rhs.value->level();
+}
+
+bool
+operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
+{
+    int what = is_imm( lhs.value );
+    if ( what ) {
+	ASSERT ( ! is_imm( rhs.value ) || (what==is_imm( rhs.value )), "illegal base coefficients" );
+	if ( what == INTMARK ) {
+	    if ( what == is_imm( rhs.value ) )
+		return imm_cmp( lhs.value, rhs.value ) < 0;
+	    else
+		return rhs.value->comparecoeff( lhs.value ) > 0;
+	}
+	else  if ( what == FFMARK ) {
+	    if ( what == is_imm( rhs.value ) )
+		return imm_cmp( lhs.value, rhs.value ) < 0;
+	    else
+		return rhs.value->comparecoeff( lhs.value ) > 0;
+	}
+	else {
+	    if ( what == is_imm( rhs.value ) )
+		return imm_cmp( lhs.value, rhs.value ) < 0;
+	    else
+		return rhs.value->comparecoeff( lhs.value ) > 0;
+	}
+    }
+    else  if ( is_imm( rhs.value ) )
+	return lhs.value->comparecoeff( rhs.value ) < 0;
+    else  if ( lhs.level() == rhs.level() )
+	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
+	    return lhs.value->comparesame( rhs.value ) < 0;
+	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
+	    return lhs.value->comparecoeff( lhs.value ) < 0;
+	else
+	    return rhs.value->comparecoeff( lhs.value ) > 0;
+    else
+	return lhs.value->level() < rhs.value->level();
+}
+//}}}
+
+//{{{ arithmetic operators
 CanonicalForm
 operator - ( const CanonicalForm & cf )
 {
@@ -1050,17 +1363,26 @@ divremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, C
     }
     return result;
 }
+//}}}
 
+//{{{ input/output
 #ifndef NOSTREAMIO
+void
+CanonicalForm::print( ostream & os, char * str ) const
+{
+    if ( is_imm( value ) )
+	imm_print( os, value, str );
+    else
+	value->print( os, str );
+}
+
 ostream&
 operator << ( ostream & os, const CanonicalForm & cf )
 {
     cf.print( os, "" );
     return os;
 }
-#endif /* NOSTREAMIO */
 
-#ifndef NOSTREAMIO
 istream&
 operator >> ( istream & is, CanonicalForm & cf )
 {
@@ -1072,88 +1394,45 @@ operator >> ( istream & is, CanonicalForm & cf )
 #endif /* SINGULAR */
 }
 #endif /* NOSTREAMIO */
-
-CanonicalForm
-CanonicalForm::operator () ( const CanonicalForm & f ) const
-{
-    if ( inBaseDomain() )
-	return *this;
-    else {
-	CanonicalForm result = 0;
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    if ( i.exp() == 0 )
-		result += i.coeff();
-	    else
-		result += power( f, i.exp() ) * i.coeff();
-	return result;
-    }
-}
-
-CanonicalForm
-CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
-{
-    if ( inBaseDomain() || v > mvar() )
-	return *this;
-    else  if ( v == mvar() ) {
-	CanonicalForm result = 0;
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    if ( i.exp() == 0 )
-		result += i.coeff();
-	    else
-		result += power( f, i.exp() ) * i.coeff();
-	return result;
-    }
-    else {
-	CanonicalForm G = swapvar( *this, v, Variable::highest() );
-	if ( G.mvar() != Variable::highest() )
-	    return *this;
-	CanonicalForm result = 0;
-	for ( CFIterator i = G; i.hasTerms(); ++i )
-	    if ( i.exp() == 0 )
-		result += i.coeff();
-	    else
-		result += power( f, i.exp() ) * i.coeff();
-	return result;
-    }
-}
-
-CanonicalForm
-CanonicalForm::operator[] ( int i ) const
-{
-    return value->coeff( i );
-}
-
-//{{{ int CanonicalForm::sign () const
-//{{{ docu
-//
-// sign() - return sign of CO.
-//
-// If CO is an integer or a rational number, the sign is defined
-// as usual.  If CO is an element of a prime power domain or in a
-// finite field and SW_SYMMETRIC_FF is on the sign of CO is the
-// sign of the symmetric representation of CO.  If CO is in GF(q)
-// or in a finite field and SW_SYMMETRIC_FF is off, the sign of
-// CO is zero iff CO is zero, otherwise the sign is one.
-//
-// If CO is a polynomial or in an extension of one of the base
-// domains, the sign of CO is the sign of its leading
-// coefficient.
-//
-// See also: InternalCF::sign(), InternalInteger::sign(),
-// InternalPrimePower::sign(), InternalRational::sign(),
-// InternalPoly::sign(), imm_sign(), gf_sign()
-//
 //}}}
-int
-CanonicalForm::sign () const
+
+//{{{ genCoeff(), genOne(), genZero()
+CanonicalForm
+CanonicalForm::genCoeff( int type, int i )
 {
-    if ( is_imm( value ) )
-	return imm_sign( value );
+    return CanonicalForm( CFFactory::basic( type, i ) );
+}
+
+CanonicalForm
+CanonicalForm::genZero() const
+{
+    int what = is_imm( value );
+    if ( what == FFMARK )
+	return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 0 ) );
+    else  if ( what == GFMARK )
+	return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 0 ) );
+    else  if ( what )
+	return CanonicalForm( CFFactory::basic( IntegerDomain, 0 ) );
     else
-	return value->sign();
+	return CanonicalForm( value->genZero() );
+}
+
+CanonicalForm
+CanonicalForm::genOne() const
+{
+    int what = is_imm( value );
+    if ( what == FFMARK )
+	return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 1 ) );
+    else  if ( what == GFMARK )
+	return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 1 ) );
+    else  if ( what )
+	return CanonicalForm( CFFactory::basic( IntegerDomain, 1 ) );
+    else
+	return CanonicalForm( value->genOne() );
 }
 //}}}
 
+//{{{ exponentiation
 CanonicalForm
 power ( const CanonicalForm & f, int n )
 {
@@ -1193,87 +1472,9 @@ power ( const Variable & v, int n )
     else
 	return CanonicalForm( v, n );
 }
+//}}}
 
-
-int initializeGMP();
-int initializeCharacteristic();
-#ifdef SINGULAR
-int mmInit(void);
-#endif
-
-int
-initCanonicalForm( void )
-{
-    static bool initialized = false;
-    if ( ! initialized ) {
-#if (defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)) || defined (SINGULAR)
-	(void)mmInit();
-#endif
-
-	(void)initializeCharacteristic();
-	(void)initializeGMP();
-	initPT();
-	initialized = true;
-    }
-    return 1;
-}
-
-
-CanonicalForm
-CanonicalForm::mapinto () const
-{
-    ASSERT( is_imm( value ) ||  ! value->inExtension(), "cannot map into different Extension" );
-    if ( is_imm( value ) )
-	if ( getCharacteristic() == 0 )
-	    if ( is_imm( value ) == FFMARK )
-		return CanonicalForm( int2imm( ff_symmetric( imm2int( value ) ) ) );
-	    else  if ( is_imm( value ) == GFMARK )
-		return CanonicalForm( int2imm( ff_symmetric( gf_gf2ff( imm2int( value ) ) ) ) );
-	    else
-		return *this;
-	else  if ( CFFactory::gettype() == PrimePowerDomain )
-	    return CanonicalForm( CFFactory::basic( imm2int( value ) ) );
-	else  if ( getGFDegree() == 1 )
-	    return CanonicalForm( int2imm_p( ff_norm( imm2int( value ) ) ) );
-	else
-	    return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
-    else  if ( value->inBaseDomain() )
-	if ( getCharacteristic() == 0 )
-	    if ( value->levelcoeff() == PrimePowerDomain )
-		return CFFactory::basic( getmpi( value, true ) );
-	    else
-		return *this;
-	else  if ( CFFactory::gettype() == PrimePowerDomain ) {
-	    ASSERT( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain, "no proper map defined" );
-	    if ( value->levelcoeff() == PrimePowerDomain )
-		return *this;
-	    else
-		return CFFactory::basic( getmpi( value ) );
-	}
-	else {
-	    int val;
-	    if ( value->levelcoeff() == IntegerDomain )
-		val = value->intmod( ff_prime );
-	    else  if ( value->levelcoeff() == RationalDomain )
-		return num().mapinto() / den().mapinto();
-	    else {
-		ASSERT( 0, "illegal domain" );
-		return 0;
-	    }
-	    if ( getGFDegree() > 1 )
-		return CanonicalForm( int2imm_gf( gf_int2gf( val ) ) );
-	    else
-		return CanonicalForm( int2imm_p( val ) );
-	}
-    else {
-	Variable x = value->variable();
-	CanonicalForm result;
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    result += power( x, i.exp() ) * i.coeff().mapinto();
-	return result;
-    }
-}
-
+//{{{ switches
 void
 On( int sw )
 {
@@ -1291,97 +1492,4 @@ isOn( int sw )
 {
     return cf_glob_switches.isOn( sw );
 }
-
-bool
-CanonicalForm::isFFinGF() const
-{
-    return is_imm( value ) == GFMARK && gf_isff( imm2int( value ) );
-}
-
-//{{{ CanonicalForm CanonicalForm::sqrt () const
-//{{{ docu
-//
-// sqrt() - calculate integer square root.
-//
-// CO has to be an integer greater or equal zero.  Returns the
-// largest integer less or equal sqrt(CO).
-//
-// In the immediate case, we use the newton method to find the
-// root.  The algorithm is from H. Cohen - 'A Course in
-// Computational Algebraic Number Theory', ch. 1.7.1.
-//
-// See also: InternalCF::sqrt(), InternalInteger::sqrt(), ::sqrt()
-//
 //}}}
-CanonicalForm
-CanonicalForm::sqrt () const
-{
-    if ( is_imm( value ) ) {
-	ASSERT( is_imm( value ) == INTMARK, "sqrt() not implemented" );
-	int n = imm2int( value );
-	ASSERT( n >= 0, "arg to sqrt() less than zero" );
-	if ( n == 0 || n == 1 )
-	    return CanonicalForm( CFFactory::basic( n ) );
-	else {
-	    int x, y = n;
-	    do {
-		x = y;
-		// the intermediate result may not fit into an
-		// integer, but the result does
-		y = (unsigned int)(x + n/x)/2;
-	    } while ( y < x );
-	    return CanonicalForm( CFFactory::basic( x ) );
-	}
-    }
-    else
-	return CanonicalForm( value->sqrt() );
-}
-//}}}
-
-//{{{ int CanonicalForm::ilog2 () const
-//{{{ docu
-//
-// ilog2() - integer logarithm to base 2.
-//
-// Returns the largest integer less or equal logarithm of CO to
-// base 2.  CO should be a positive integer.
-//
-// See also: InternalCF::ilog2(), InternalInteger::ilog2(), ::ilog2()
-//
-//}}}
-int
-CanonicalForm::ilog2 () const
-{
-    if ( is_imm( value ) ) {
-	ASSERT( is_imm( value ) == INTMARK, "ilog2() not implemented" );
-	int a = imm2int( value );
-	ASSERT( a > 0, "arg to ilog2() less or equal zero" );
-	int n = -1;
-	while ( a != 0 ) {
-	    n++;
-	    a /= 2;
-	}
-	return n;
-    }
-    else
-	return value->ilog2();
-}
-//}}}
-
-bool
-divides ( const CanonicalForm & f, const CanonicalForm & g )
-{
-    if ( g.level() > 0 && g.level() == f.level() )
-	if ( divides( f.tailcoeff(), g.tailcoeff() ) && divides( f.LC(), g.LC() ) ) {
-	    CanonicalForm q, r;
-	    bool ok = divremt( g, f, q, r );
-	    return ok && r == 0;
-	}
-	else
-	    return false;
-    else {
-	CanonicalForm q, r;
-	bool ok = divremt( g, f, q, r );
-	return ok && r == 0;
-    }
-}
