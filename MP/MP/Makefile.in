@@ -99,6 +99,7 @@ install: libMP.a
 	$(INSTALL_DATA) libMP.a $(libdir)
 	if $(RANLIB_TEST) ; then $(RANLIB) $(libdir)/libMP.a; else true; fi
 	$(INSTALL_DATA) MP.h $(includedir)
+	$(INSTALL_DATA) mp_gmp.h $(includedir)
 	$(INSTALL_DATA) MP_Config.h $(includedir)	
 	-chmod a-x $(libdir)/libMP.a $(includedir)/MP.h $(includedir)/MP_Config.h
 
