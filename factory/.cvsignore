@@ -6,3 +6,4 @@ config.status
 factoryconf.h
 factory.h
 stamp-h
+*.d
