@@ -1,10 +1,11 @@
 Status Output of tst_status.out
-init >> USER    :hannes
-1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:528630
-init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
-1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:524288
-init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
-1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:191
-init >> date    :Thu Aug 19 19:03:34 MET DST 1999
-init >> version :1304
+init >> USER    :siebert
+init >> HOSTNAME:pitti
+init >> uname -a:Linux pitti 2.0.35 #130 Mon Jul 27 11:06:31 MEST 1998 i586 unknown
+init >> date    :Mon Nov 22 16:45:57 MET 1999
+init >> version :1306
 init >> ticks   :100
+1 >> tst_memory_0 :: pitti:533037
+1 >> tst_memory_1 :: pitti:738473
+1 >> tst_memory_2 :: pitti:733184
+1 >> tst_timer_1 :: pitti:168

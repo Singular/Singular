@@ -6,10 +6,14 @@ tst_init();
 LIB "deform.lib";
 example versal;
 // rest of what used to be in that example
+   int p = printlevel;
    ring  r2       = 0,(x,y,z),ds;
    ideal Fo       = x2,xy,yz,zx;
    printlevel     = 2;
    versal(Fo);
+   setring(So);
+   ideal Js=imap(Px,Js);
+   hilb(std(Js)); 
    printlevel     = p;
    if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
    kill Px,Qx,So;
@@ -32,6 +36,9 @@ ring  r1  = 0,(x,y,z,u),dp;
  versal(i3);
  setring Px;
  listvar(Px);
+ setring(So);
+ ideal Js=imap(Px,Js);
+ hilb(std(Js)); 
  kill_rings();
 ring   Po = 0,(x,y),dp;
 ideal  Io = std(x^4+y^3);
@@ -48,6 +55,9 @@ for (i'=0;i'<3;i'=i'+1)
   mod_versal(Mo,Io);
   setring Px;
   listvar(Px);
+  setring(So);
+  ideal Js=imap(Qx,Js);
+  hilb(std(Js)); 
   setring(Po);
  kill_rings();
 }
