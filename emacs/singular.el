@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.45 1999-09-17 11:14:13 wichmann Exp $
+;; $Id: singular.el,v 1.46 1999-09-20 19:37:11 obachman Exp $
 
 ;;; Commentary:
 
@@ -3763,12 +3763,12 @@ This variable is buffer-local.")
 (defvar singular-switches-history nil
   "History list of Singular switches.")
 
-(defvar singular-switches-magic '("-t" "--emacs")
+(defvar singular-switches-magic '("-t" "--exec" "if (system(\"version\") > 1304){system(\"--emacs\", 1);};")
   "Additional magic switches for Singular process.
 List of switch-strings which are automagically added when new Singular
 processes are started, one string for each command line argument. 
 This list should at least contain the options \"--emacs\" and \"-t\". If
-you are running an older version of Singular, remove option \"--emacs\"
+you are running a Singular with version < 1.2 , remove option \"--exec\"
 from the list.")
 
 (defcustom singular-name-default "singular"
