@@ -105,7 +105,7 @@ Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
 # distribution targets
 LN_S		= @LN_S@
 MKINSTALLDIRS 	= ./mkinstalldirs
-TMPDIR		= /tmp/sing_dist
+TMPDIR		= /tmp/singdist
 SINGUNAME 	= @SINGUNAME@
 SINGULAR_VERSION= @SINGULAR_VERSION@
 DISTROOT_NAME	= Singular-${SINGULAR_VERSION}
@@ -178,32 +178,33 @@ infodist:
 	cp ${TMPDIR}/info-${SINGUNAME}.tar.gz .
 	rm -rf ${TMPDIR}
 
-ZIP		= zip
-INSTALL		= "Singular/install-sh -c"
+ZIP		= pkzip
+INSTALL		= ./Singular/install-sh -c
 SH_PROGRAM 	= /bin/sh
 INFO_PROGRAM 	= /bin/info
 CYGWIN_DLL	= /bin/cygwinb19.dll
+WIN_BINDIR      = ${TMPDIR}/Singular/${SINGULAR_VERSION}
 
 windist: ${SHAREDIST_NAME}.tar.gz ${SINGULAR}
 	cd Singular; ${MAKE} Singular-bindist libparse
 	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/Singular/bin/${SINGULAR_VERSION}
-	${INSTALL} Singular/Singular ${TMPDIR}/Singular/bin/${SINGULAR_VERSION}
-	${INSTALL} Singular/libparse ${TMPDIR}/Singular/bin/${SINGULAR_VERSION}
-	${INSTALL} ${SH_PROGRAM} ${TMPDIR}/Singular/bin/${SINGULAR_VERSION}
-	${INSTALL} ${INFO_PROGRAM} ${TMPDIR}/Singular/bin/${SINGULAR_VERSION}
-	${INSTALL} ${CYGWIN_DLL} ${TMPDIR}/Singular/bin/${SINGULAR_VERSION}
+	${MKINSTALLDIRS} ${WIN_BINDIR}
+	${INSTALL} Singular/Singular-bindist ${WIN_BINDIR}/Singular.exe
+	${INSTALL} Singular/libparse ${WIN_BINDIR}
+	${INSTALL} ${SH_PROGRAM} ${WIN_BINDIR}
+	${INSTALL} ${INFO_PROGRAM} ${WIN_BINDIR}
+	${INSTALL} ${CYGWIN_DLL} ${WIN_BINDIR}
 	cp  ${SHAREDIST_NAME}.tar.gz ${TMPDIR}
 	cd ${TMPDIR}; gunzip ${SHAREDIST_NAME}.tar.gz; \
                       tar xf ${SHAREDIST_NAME}.tar
-	rm -rf ${TMPDIR}/Singular/info
+	rm -rf ${TMPDIR}/info
 	cp COPYING README.general ${TMPDIR}/Singular
 	cp INSTALL.win	${TMPDIR}/Singular/INSTALL
 	cp README.win	${TMPDIR}/Singular/README
 	cd ${TMPDIR}; \
-           zip -r Singular-${SINGULAR_VERSION}-${SINGUNAME} Singular 
+           ${ZIP} -r Singular-${SINGULAR_VERSION}-${SINGUNAME} Singular 
 	cp ${TMPDIR}/Singular-${SINGULAR_VERSION}-${SINGUNAME}.zip .
-	rm -rf ${TMPDIR}
+#	rm -rf ${TMPDIR}
 
 
 ##############################################################

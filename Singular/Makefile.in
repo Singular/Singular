@@ -282,8 +282,7 @@ Singular-bindist: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
                   mpsr_Tok.o tesths.cc libparse.cc si_paths.h depend
 	touch si_paths.h
 	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" Singular
-	strip Singular
-	mv Singular Singular-bindist
+	${INSTALL} -s Singular Singular-bindist
 
 Singular-static-bindist: mod2.h Makefile version.h scanner.cc si_paths.h \
                          ${OBJS} iparith.o mpsr_Tok.o tesths.cc \
