@@ -1,11 +1,11 @@
 Status Output of tst_status.out
-init >> USER    :mschulze
-init >> HOSTNAME:wilde13
-init >> uname -a:HP-UX wilde13 B.10.20 A 9000/780 2000149616 two-user license
-init >> date    :Wed Jun 16 20:22:43 METDST 1999
+init >> USER    :hannes
+init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
+init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
+init >> date    :Thu Jun 24 11:30:48 MET DST 1999
 init >> version :1303
 init >> ticks   :100
-1 >> tst_memory_0 :: wilde13:181574
-1 >> tst_memory_1 :: wilde13:470450
-1 >> tst_memory_2 :: wilde13:565248
-1 >> tst_timer_1 :: wilde13:244
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:187269
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:474489
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:528384
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:182
