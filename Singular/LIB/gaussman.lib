@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.73 2002-03-05 13:49:50 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.74 2002-03-05 14:22:14 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -1035,7 +1035,7 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:   list A;  t-matrix A[1]+s*A[2] on H''
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
-          mixed Hodge structure; opposite Hodge filtration; V-filtration;
+          mixed Hodge structure; opposite Hodge filtration; V-filtration
 EXAMPLE:  example tmatrix; shows examples
 "
 {
