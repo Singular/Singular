@@ -71,7 +71,7 @@ void lll_redi (int k, int l, int C);
 void lll_test (int *k, int kma, int C);
 void lll_product (mpz_t * a, mpz_t * f, int n, mpz_t * prod);
 
-void main (void)
+int main (void)
 {
   int i, j, k, kmax;
   int F, C;
@@ -174,6 +174,7 @@ void main (void)
     delete[]lll_b[i];
   }
   delete[]lll_b;
+  return 0;
 }
 
 /*---------------------------------------------------------------------------
