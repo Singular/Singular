@@ -36,8 +36,8 @@ clean distclean mostlyclean maintainer-clean:
 		cd $${SUBDIR}; \
 		${MAKE} $@; \
 		cd .. ;\
-	done;\
-	rm -rf *~ a.out core *.o .log \
+	done; \
+	rm -rf *~ a.out core *.o .log; \
 	if test "$@" = distclean || test "$@" = maintainer-clean; then \
 	  rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar;\
 	fi; \
