@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.74 1999-07-23 13:58:35 obachman Exp $
+@comment $Id: singular.doc,v 1.75 1999-07-23 14:00:36 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -175,31 +175,31 @@ command @code{LIB "all.lib";} for loading all libraries.
 @menu
 * standard_lib:: extensions of singular kernel
 * all_lib:: load all other libraries
-* general_lib:: procedures of general type
-* matrix_lib:: procedures for matrix operations
-* sing_lib:: procedures for computing invariants of singularities
-* elim_lib:: procedures for elimination, saturation and blowing up
-* inout_lib:: procedures for manipulating in- and output
-* random_lib:: procedures of random/sparse  matrix and poly operations
-* deform_lib:: procedures for computing miniversal deformation
-* homolog_lib:: procedures for homological algebra
-* poly_lib:: procedures for manipulating polynomials and ideals
-* ring_lib:: procedures for manipulating rings and maps
-* finvar_lib:: procedures to calculate invariant rings & more
-* primdec_lib:: procedures for primary decomposition
-* invar_lib:: procedures to compute the ring of invariants
-* latex_lib:: procedures for typesetting in TeX
-* hnoether_lib:: procedures for the Hamburger-Noether-development
+* algebra_lib:: procedures for computing with algbras and maps
 * classify_lib:: procedures for classifying hypersurface singularities
+* deform_lib:: procedures for computing miniversal deformation
+* elim_lib:: procedures for elimination, saturation and blowing up
+* finvar_lib:: procedures to calculate invariant rings & more
+* general_lib:: procedures of general type
 * graphics_lib:: procedures to draw  with Mathematica
-* normal_lib:: procedure for normalization
-* mondromy_lib:: procedures to compute the monodromy of a singularity
+* hnoether_lib:: procedures for the Hamburger-Noether-development
+* homolog_lib:: procedures for homological algebra
+* inout_lib:: procedures for manipulating in- and output
+* invar_lib:: procedures to compute the ring of invariants
 * jordan_lib:: procedures to compute the jordan normal form
-* primitiv_lib:: procedures for finding a primitive element
+* latex_lib:: procedures for typesetting in TeX
+* matrix_lib:: procedures for matrix operations
+* mondromy_lib:: procedures to compute the monodromy of a singularity
+* normal_lib:: procedure for normalization
+* poly_lib:: procedures for manipulating polynomials and ideals
 * presolve_lib:: procedures for pre-solving polynomial equations
+* primdec_lib:: procedures for primary decomposition
+* primitiv_lib:: procedures for finding a primitive element
+* random_lib:: procedures of random/sparse  matrix and poly operations
+* ring_lib:: procedures for manipulating rings and maps
+* sing_lib:: procedures for computing invariants of singularities
 * solve_lib:: procedures to solve polynomial systems
 * spcurve_lib:: procedures for cm codimension 2 singularities
-* algebra_lib:: procedures for computing with algbras and maps
 @end menu
 
 
