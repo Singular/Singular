@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_univar.cc,v 1.0 1996-05-17 10:59:45 stobbe Exp $
+// $Id: fac_univar.cc,v 1.1 1996-06-13 10:34:04 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:45  stobbe
+Initial revision
+
 */
 
 //#define TIMING
@@ -401,12 +404,11 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 	    for ( i = 0; i < MAX_FP_FAC; i++ ) {
 		setCharacteristic( p[i] );
 		fp = mapinto( f );
-		if ( p[i] > 23 && fp.degree() < 10 )
-		    F[i] = FpFactorizeUnivariateCZ( fp, true );
-		else
-		    F[i] = FpFactorizeUnivariateB( fp, true );
-//		if ( F[i].getFirst().factor().inBaseDomain() )
-//		    F[i].removeFirst();
+		FpFactorizeUnivariateCZ( fp, true );
+//		if ( p[i] < 23 && fp.degree() < 10 )
+//		    F[i] = FpFactorizeUnivariateB( fp, true );
+//		else
+//		    F[i] = FpFactorizeUnivariateCZ( fp, true );
 		DEBOUT( cerr, "F[i] = ", F[i] );
 		DEBOUTLN( cerr, ", p = ", p[i] );
 	    }
