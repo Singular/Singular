@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.11 2000-04-27 10:07:10 obachman Exp $ */
+/* $Id: mpr_complex.h,v 1.12 2000-06-05 12:53:23 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -46,34 +46,28 @@ class gmp_float
 public:
   gmp_float( const int v = 0 )
   {
-    mpf_init2( t, gmp_default_prec_bits );
-    mpf_set_si( t, (signed long int) v );
+    mpf_init_set_si( t, (signed long int) v );
   }
   gmp_float( const long v )
   {
-    mpf_init2( t, gmp_default_prec_bits );
-    mpf_set_si( t, (signed long int) v );
+    mpf_init_set_si( t, (signed long int) v );
   }
   gmp_float( const mprfloat v ) // double
   {
-    mpf_init2( t, gmp_default_prec_bits );
-    mpf_set_d( t, (double) v );
+    mpf_init_set_d( t, (double) v );
   }
   gmp_float( const mpf_t v )
   {
-    mpf_init2( t, gmp_default_prec_bits );
-    mpf_set( t, v );
+    mpf_init_set( t, v );
   }
   gmp_float( const mpz_t v ) // gnu mp Z
   {
-    mpf_init2( t, gmp_default_prec_bits );
+    mpf_init( t );
     mpf_set_z( t, v );
   }
   gmp_float( const gmp_float & v ) // copy constructor
   {
-    //mpf_init2( t, mpf_get_prec( v.t ) );
-    mpf_init2( t, gmp_default_prec_bits );
-    mpf_set( t, v.t );
+    mpf_init_set( t, v.t );
   }
 
   ~gmp_float()
@@ -86,8 +80,8 @@ public:
   friend gmp_float operator * ( const gmp_float & a, const gmp_float & b );
   friend gmp_float operator / ( const gmp_float & a, const gmp_float & b );
 
-  inline gmp_float & operator += ( const gmp_float & a );
-  inline gmp_float & operator -= ( const gmp_float & a );
+  gmp_float & operator += ( const gmp_float & a );
+  gmp_float & operator -= ( const gmp_float & a );
   inline gmp_float & operator *= ( const gmp_float & a );
   inline gmp_float & operator /= ( const gmp_float & a );
 
@@ -105,9 +99,9 @@ public:
   gmp_float & operator = ( const long a );
 
   inline int sign();    // t>0:+1, t==0:0, t<0:-1
-  inline bool isZero();  // t == 0 ?
-  inline bool isOne();   // t == 1 ?
-  inline bool isMOne();  // t == -1 ?
+  bool isZero();  // t == 0 ?
+  bool isOne();   // t == 1 ?
+  bool isMOne();  // t == -1 ?
 
   bool setFromStr( char * in );
 
@@ -121,7 +115,6 @@ public:
   inline operator int();
   inline operator int() const;
 
-public:
   static void setPrecision( const unsigned long int prec ) {
     gmp_default_prec_bits= prec;
   }
@@ -143,21 +136,7 @@ private:
   mpf_t t;
 };
 
-extern const gmp_float  gmpOne;
-extern const gmp_float gmpMOne;
-extern const gmp_float gmpZero;
-
 // <gmp_float> operator <gmp_float>
-inline gmp_float & gmp_float::operator += ( const gmp_float & a )
-{
-  mpf_add( t, t, a.t );
-  return *this;
-}
-inline gmp_float & gmp_float::operator -= ( const gmp_float & a )
-{
-  mpf_sub( t, t, a.t );
-  return *this;
-}
 inline gmp_float & gmp_float::operator *= ( const gmp_float & a )
 {
   mpf_mul( t, t, a.t );
@@ -215,33 +194,6 @@ inline gmp_float::operator int() const
 inline int gmp_float::sign()
 {
   return mpf_sgn( t );
-}
-// t == 0 ?
-inline bool gmp_float::isZero()
-{
-#ifdef  VARIANTE_1
-  return (mpf_sgn( t ) == 0);
-#else
-  return  mpf_eq( t , gmpZero.t , gmp_float::gmp_needequal_bits );
-#endif
-}
-// t == 1 ?
-inline bool gmp_float::isOne()
-{
-#ifdef  VARIANTE_1
-  return (mpf_cmp_ui( t , 1 ) == 0);
-#else
-  return mpf_eq( t , gmpOne.t , gmp_float::gmp_needequal_bits );
-#endif
-}
-// t == -1 ?
-inline bool gmp_float::isMOne()
-{
-#ifdef VARIANTE_1
-  return (mpf_cmp_si( t , -1 ) == 0);
-#else
-  return mpf_eq( t , gmpMOne.t , gmp_float::gmp_needequal_bits );
-#endif
 }
 
 // access pointer

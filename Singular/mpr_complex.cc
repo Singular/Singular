@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.19 2000-04-27 10:07:09 obachman Exp $ */
+/* $Id: mpr_complex.cc,v 1.20 2000-06-05 12:53:24 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -39,9 +39,10 @@
 size_t gmp_output_digits= DEFPREC;
 
 int dummy=mmInit();
-const gmp_float  gmpOne= 1;
-const gmp_float gmpMOne= -1;
-const gmp_float gmpZero= 0;
+static const gmp_float  gmpOne= 1;
+static const gmp_float gmpMOne= -1;
+static gmp_float gmpRel=0;
+static gmp_float diff=0;
 
 
 //-> setGMPFloat*
@@ -75,10 +76,12 @@ void setGMPFloatDigits( size_t digits )
 {
   size_t bits= 1 + (size_t) (digits / (log(2)/log(10)));
   bits= bits>64?bits:64;
-  //gmp_float::setPrecision( bits+EXTRABYTES*8 );
-  gmp_float::setPrecision( bits+(bits/5) );
+  gmp_float::setPrecision( bits+bits );
   gmp_float::setEqualBits( bits );
   gmp_output_digits= digits;
+  mpf_set_default_prec( bits+bits );
+  mpf_set_ui(*gmpRel.mpfp(),1);
+  mpf_div_2exp(*gmpRel.mpfp(),*gmpRel.mpfp(),bits);
 }
 
 size_t getGMPFloatDigits()
@@ -141,11 +144,74 @@ gmp_float operator / ( const gmp_float & a, const gmp_float & b )
   return tmp;
 }
 
-// <gmp_float> == <gmp_float> ?? up to the first gmp_float::gmp_needequal_bits bits
+// <gmp_float> operator <gmp_float>
+gmp_float & gmp_float::operator += ( const gmp_float & a )
+{
+  gmp_float r = -a;
+  if (!(*this == r))
+    mpf_sub( t, t, r.t );
+  else
+    mpf_set_d( t, 0.0);
+  return *this;
+}
+gmp_float & gmp_float::operator -= ( const gmp_float & a )
+{
+  gmp_float r = a;
+  if (!(*this == r))
+    mpf_sub( t, t, r.t );
+  else
+    mpf_set_d( t, 0.0);
+  return *this;
+}
+
+// <gmp_float> == <gmp_float> ??
 bool operator == ( const gmp_float & a, const gmp_float & b )
 {
-  //return mpf_cmp( a.t, b.t ) == 0;
-  return mpf_eq( a.t , b.t , gmp_float::gmp_needequal_bits );
+  if(mpf_sgn(a.t) != mpf_sgn(b.t))
+    return false;
+  mpf_reldiff(diff.t, a.t, b.t);
+  mpf_abs(diff.t, diff.t);
+  if(diff < gmpRel)
+    return true;
+  else
+    return false;
+}
+// t == 0 ?
+bool gmp_float::isZero()
+{
+  return (mpf_sgn( t ) == 0);
+}
+// t == 1 ?
+bool gmp_float::isOne()
+{
+#ifdef  VARIANTE_1
+  return (mpf_cmp_ui( t , 1 ) == 0);
+#else
+  if (mpf_sgn(t) <= 0)
+    return false;
+  mpf_reldiff(diff.t, t, gmpOne.t);
+  mpf_abs(diff.t, diff.t);
+  if(diff < gmpRel)
+    return true;
+  else
+    return false;
+#endif
+}
+// t == -1 ?
+bool gmp_float::isMOne()
+{
+#ifdef VARIANTE_1
+  return (mpf_cmp_si( t , -1 ) == 0);
+#else
+  if (mpf_sgn(t) >= 0)
+    return false;
+  mpf_reldiff(diff.t, t, gmpMOne.t);
+  mpf_abs(diff.t, diff.t);
+  if(diff < gmpRel)
+    return true;
+  else
+    return false;
+#endif
 }
 bool operator > ( const gmp_float & a, const gmp_float & b )
 {
