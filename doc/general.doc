@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.123 1999-07-02 15:19:21 Singular Exp $
+@comment $Id: general.doc,v 1.124 1999-07-08 17:12:44 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -317,8 +317,8 @@ exits.
 @item @code{-u}, @code{--user-option=STRING}
 Returns @code{STRING} on @code{system("--user-option")}. This is useful
 for passing arbitrary arguments from the command line to the
-@sc{Singular} interpreter.  E.g., 
-@*@code{Singular -u "xxx.dump" -c 'getdump(system("--user-option"))'} 
+@sc{Singular} interpreter.  E.g.,
+@*@code{Singular -u "xxx.dump" -c 'getdump(system("--user-option"))'}
 reads the file @code{xxx.dump} at
 start-up and allows the user to start working with all the objects
 defined in a previous session.
@@ -328,17 +328,17 @@ Seed (i.e., set the initial value of) the pseudo random generator with
 integer @code{SEED}.  If this option is not given, then the random
 generator is seeded with a time-based @code{SEED} (the number of
 seconds since January, 1, 1970, on Unix-like operating systems, to be
-precise). 
+precise).
 
 @item @code{--min-time=SECS}
 If the @code{timer} (@pxref{timer}), resp.  @code{rtimer}
-(@pxref{rtimer}) , variable is 
-set, report only 
+(@pxref{rtimer}) , variable is
+set, report only
 times larger than @code{SECS} seconds (@code{SECS} needs to be a
 floating point number greater than 0).  By default, this value is set to
 0.5 (i.e., half a second).  E.g., the option @code{--min-time=0.01}
 forces @sc{Singular} to report all times larger than 1/100 of a
-second. 
+second.
 
 @item @code{--ticks-per-sec=TICKS}
 Set unit of timer to @code{TICKS} ticks per second (i.e., the value
@@ -558,11 +558,11 @@ ring r = 0,(x,y,z,a,b,c),(ds(3), dp(3));
 the ring @math{Q[x,y,z]} with weighted reverse lexicographical ordering.
 The variables @math{x}, @math{y}, and @math{z} have the weights 2, 1,
 and 3, respectively, and  vectors are first ordered by components (in
-descending order) and then by monomials:  
+descending order) and then by monomials:
 @example
 ring r = 0,(x,y,z),(c,wp(2,1,3));
 @end example
-For ascending component order, the component ordering @code{C} has to be 
+For ascending component order, the component ordering @code{C} has to be
 used.
 
 @item
@@ -599,6 +599,33 @@ numbers represented by simple precision floating point numbers:
 
 @example
 ring r = real,(x,y,z),dp;
+@end example
+
+@item
+the ring @math{R''[x,y,z]}, where @math{R''} denotes the field of real
+numbers represented by floating point numbers of 50 valid decimal digits
+(the maximal precision is 32767):
+
+@example
+ring r = (real,50),(x,y,z),dp;
+@end example
+
+@item
+the ring @math{R''(i)[x,y,z]}, where @math{R''} denotes the field of real
+numbers represented by floating point numbers of 50 valid decimal digits
+and @math{i} denotes the imaginary unit.
+
+@example
+ring r = (real,50,i),(x,y,z),dp;
+@end example
+
+@item
+the ring @math{R''(i)[x,y,z]}, where @math{R''} denotes the field of real
+numbers represented by floating point numbers of 6 valid decimal digits
+and @math{i} denotes the imaginary unit.
+
+@example
+ring r = (real,i),(x,y,z),dp;
 @end example
 
 @item
@@ -700,7 +727,7 @@ weight vector given as an intvec_expression in parentheses.
 @code{c} or @code{C}.
 @end enumerate
 
-For the definition of the orderings, see @ref{Monomial orderings} and @ref{Monomial orderings}. 
+For the definition of the orderings, see @ref{Monomial orderings} and @ref{Monomial orderings}.
 
 If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
@@ -768,14 +795,14 @@ greates monomial (als called the leading monomial) comes first, and the
 smalles monomial comes last.
 
 @strong{Remark:} The novice user should generally use the ordering
-@code{dp} for computations in the polynomial ring 
+@code{dp} for computations in the polynomial ring
 @tex
-$K[x_1,\ldots,x_n]$, 
+$K[x_1,\ldots,x_n]$,
 @end tex
 @ifinfo
-K[x1,...,xn], 
+K[x1,...,xn],
 @end ifinfo
-resp.  @code{ds} for computations in the localization 
+resp.  @code{ds} for computations in the localization
 @tex
 $\hbox{Loc}_{(x)}K[x_1,\ldots,x_n])$.
 @end tex
@@ -927,6 +954,7 @@ Algorithms for univariate and multivariate polynomial factorization,
 resultant and gcd computations.
 @end itemize
 
+@c ----------------------------------------------------------------------
 @unnumberedsubsec Commands to compute standard bases
 @table @code
 @item facstd
@@ -970,6 +998,7 @@ computes a Groebner basis in a ring with a ``difficult'' ordering
 and a @code{std} computation guided by the Hilbert series.
 @end table
 
+@c ----------------------------------------------------------------------
 @unnumberedsubsec Further processing of standard bases
 The next commands require the input to be a standard basis.
 
@@ -1011,6 +1040,7 @@ computes the vector space dimension of a ring (resp.@: free module)
 modulo an ideal (resp.@: module).
 @end table
 
+@c ----------------------------------------------------------------------
 @unnumberedsubsec Commands to compute resolutions
 @table @code
 @item res
@@ -1044,6 +1074,7 @@ computes the first Syzygy (i.e., the module of relations of the
 given generators).
 @end table
 
+@c ----------------------------------------------------------------------
 @unnumberedsubsec Further processing of resolutions
 @table @code
 @item betti
@@ -1054,6 +1085,7 @@ computes the graded Betti numbers of a module from a free resolution.
 minimizes a free resolution of an ideal or module.
 @end table
 
+@c ----------------------------------------------------------------------
 @unnumberedsubsec Processing of polynomials
 @table @code
 @item char_series
@@ -1100,6 +1132,7 @@ Multivariate polynomials are considered univariate polynomials in a
 main variable to be specified by the user.
 @end table
 
+@c ----------------------------------------------------------------------
 @unnumberedsubsec Matrix computations
 @table @code
 @item bareiss
@@ -1117,6 +1150,21 @@ other domains, elementary algorithms are used.
 computes all minors (=subdeterminants) of a given size for a matrix.
 @end table
 
+@c ----------------------------------------------------------------------
+@unnumberedsubsec Numeric computations
+@table @code
+@item laguerre
+@ref{laguerre}@*
+computes ... TBC
+@item uressolve
+@ref{uressolve}@*
+implements ... TBC
+@item vandermonde
+@ref{vandermonde}@*
+computes ... TBC
+@end table
+
+@c ----------------------------------------------------------------------
 @unnumberedsubsec Controlling computations
 @table @code
 @item option
@@ -1320,7 +1368,7 @@ The following characters and operators have special meaning:
 @cindex =
 assignment
 @item @code{(}, @code{)}
-@cindex ( 
+@cindex (
 @cindex )
 in expressions, for indexed names and for argument lists
 @item @code{[}, @code{]}
@@ -2232,7 +2280,7 @@ all loaded libraries, but a namespace can also be created by a user:@*
 @code{package} package_name@code{;} @ref{package}.
 
 @example
-@c example 
+@c example
   option(loadLib);   // show loading of libraries;
                      // standard.lib is loaded
   listvar(package);
@@ -2556,8 +2604,8 @@ However, if @code{printlevel} is set to  a value k with k>0, then
 @code{Test} is called from other procedures, with a nesting level up to
 k (resp. k-1).
 
-Note furthermore, that the example part of a procedure 
-behaves in this respect like a procedure (i.e., the value of @code{voice} 
+Note furthermore, that the example part of a procedure
+behaves in this respect like a procedure (i.e., the value of @code{voice}
 is 1). Therefore, the command @code{printlevel=1;} is necessary for
 @samp{comment1} to be displayed on @code{ example Test;}. However,
 since printlevel is a global variable, it should be reset to the old

@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.60 1999-07-07 16:38:39 obachman Exp $
+@comment $Id: singular.doc,v 1.61 1999-07-08 17:12:45 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -151,6 +151,9 @@ must be smaller than 32768
 a ring must have 505 variables or less
 @*(501 on a DEC Alpha)
 @c TBC -- number of parameters
+@item
+the precision of long floating point numbers (for ground field real)
+must be smaller than 32768
 @item
 integers (of type @code{int}) have the limited range
 from -2147483647 to 2147483647
