@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.21 1997-10-18 11:04:13 Singular Exp $ */
+/* $Id: extra.cc,v 1.22 1997-11-13 09:09:26 siebert Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -343,7 +343,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 #if 0
     if(strcmp((char*)(h->Data()),"red")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+     if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
       {
         res->rtyp=IDEAL_CMD;
         res->data=(void *)stdred((ideal)h->next->Data(),NULL,testHomog,NULL);
@@ -607,6 +607,31 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== barstep =============================*/
+    if(strcmp((char*)(h->Data()),"barstep")==0)
+    {
+     if ((h->next!=NULL) &&(h->next->Typ()==MATRIX_CMD))
+      {
+        if (h->next->next!=NULL)
+        {
+          if (h->next->next->Typ()!=POLY_CMD)
+          {
+	      Warn("Wrong types for barstep(matrix,poly)");
+          }
+        }
+	int r,c;
+	poly div=(poly)h->next->next->Data();
+        res->rtyp=MATRIX_CMD;
+        res->data=(void *)mpOneStepBareiss((matrix)h->next->Data(),
+	           &div,&r,&c);
+        Print("div: ");pWrite(div);
+	Print("rows: %d, cols: %d\n",r,c);
+	pDelete(&div);
+        return FALSE;
+      }
+      else
+        WerrorS("matrix expected");
+    }
 /*============================================================*/
       WerrorS("not implemented\n");
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.3 1997-04-02 15:07:25 Singular Exp $ */
+/* $Id: matpol.cc,v 1.4 1997-11-13 09:09:27 siebert Exp $ */
 
 /*
 * ABSTRACT:
@@ -318,6 +318,8 @@ class mp_permmatrix
   mp_permmatrix(matrix);
   mp_permmatrix(mp_permmatrix *);
   ~mp_permmatrix();
+  int mpGetRow();
+  int mpGetCol();
   int mpGetRdim();
   int mpGetCdim();
   int mpGetSign();
@@ -369,6 +371,42 @@ matrix mpBareiss (matrix a, BOOLEAN sw)
 */
   delete v;
   return c;
+}
+
+/*2
+*  one step of 'Bareiss' algorithm
+*  for application in minor
+*  assume to have a full matrix
+*  if *H!=0, then divide by *H (the pivot from the step before)
+*  returns the choosen pivot *H=m[*r,*c]
+*  the result has the pivot at the right lower corner
+*/
+matrix mpOneStepBareiss (matrix a, poly *H, int *r, int *c)
+{
+  poly div=*H;
+  matrix re = mpCopy(a);
+  mp_permmatrix *Bareiss = new mp_permmatrix(re);
+  row_col_weight w(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+
+  /* step of Bareiss */
+  if(Bareiss->mpPivotBareiss(&w))
+  {
+    Bareiss->mpElimBareiss(div);
+    div = Bareiss->mpGetElem(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+    *H = pCopy(div);
+    *c = Bareiss->mpGetCol()+1;
+    *r = Bareiss->mpGetRow()+1;
+    Bareiss->mpRowReorder();
+    Bareiss->mpColReorder();
+  }
+  else
+  {
+    *H = NULL;
+    *c = *r = 0;
+  }
+  Bareiss->mpSaveArray();
+  delete Bareiss;
+  return re;
 }
 
 /*2
@@ -1205,6 +1243,16 @@ void mp_permmatrix::mpColSwap(int j1, int j2)
      a1[i] = a2[i];
      a2[i] = p;
    }
+}
+
+int mp_permmatrix::mpGetRow()
+{
+  return qrow[s_m];
+}
+
+int mp_permmatrix::mpGetCol()
+{
+  return qcol[s_n];
 }
 
 /*2

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.h,v 1.4 1997-04-09 12:19:58 Singular Exp $ */
+/* $Id: matpol.h,v 1.5 1997-11-13 09:09:28 siebert Exp $ */
 /*
 * ABSTRACT
 */
@@ -46,6 +46,7 @@ poly mpTrace ( matrix a);
 poly TraceOfProd ( matrix a, matrix b, int n);
 
 matrix mpBareiss (matrix a, BOOLEAN diagonal);
+matrix mpOneStepBareiss (matrix a, poly *H, int *r, int *c);
 poly mpDet (matrix m);
 matrix mpWedge(matrix a, int ar);
 BOOLEAN mpJacobi(leftv res,leftv a);
