@@ -22,6 +22,7 @@ mp_srcdir	= ../MP
 @SET_MAKE@
 CLEAN		= @CLEAN@
 CC		= @CC@
+CXX		= @CXX@
 AR		= @AR@
 RANLIB		= @RANLIB@
 INSTALL		= ../install-sh -c
@@ -61,7 +62,7 @@ DISTFILES = ${SRCS} MPT.h Makefile.in GP.h MPT_GP.h
 .SUFFIXES: .cc .o 
 
 .cc.o: ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h MPT.h 
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $<
+	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $<
 
 
 all: libMPT.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h Makefile
