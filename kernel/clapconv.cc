@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.1.1.1 2003-10-06 12:15:50 Singular Exp $
+// $Id: clapconv.cc,v 1.2 2005-01-27 16:35:30 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -506,7 +506,7 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
       pSetComp(term, 0);
       for ( i = 1; i <= off; i++ )
         //z->e[i-1]+=exp[i];
-	napAddExp(z,i,exp[i]);
+        napAddExp(z,i,exp[i]);
       pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
       ((lnumber)pGetCoeff(term))->z=z;
       pSetm( term );
@@ -631,6 +631,13 @@ CanonicalForm convSingTrPClapP ( poly p )
   {
     nNormalize(pGetCoeff(p));
     CanonicalForm term=convSingTrClapP(((lnumber)pGetCoeff(p))->z);
+
+    if ((((lnumber)pGetCoeff(p))->n!=NULL)
+    && (!errorreported))
+    {
+      WerrorS("conversion error: denominator!= 1");
+    }
+
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = pGetExp( p, i )) != 0 )
