@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.49 2001-08-09 08:39:54 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.50 2001-08-13 11:40:58 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -376,42 +376,16 @@ static proc maxintdif(ideal e)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc maxorddif(matrix H)
-{
-  int i,j,d;
-  int d0,d1=-1,-1;
-  for(i=nrows(H);i>=1;i--)
-  {
-    for(j=ncols(H);j>=1;j--)
-    {
-      d=ord(H[i,j]);
-      if(d>=0)
-      {
-        if(d0<0||d<d0)
-        {
-          d0=d;
-        }
-        if(d1<0||d>d1)
-        {
-          d1=d;
-        }
-      }
-    }
-  }
-  return(d1-d0);
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc monodromy(poly t,list #)
-"USAGE:    monodromy(t[,opt]); poly t[, int opt]
+"USAGE:    monodromy(t[,opt]); poly t, int opt
 ASSUME:   basering with characteristic 0 and local degree ordering,
           t with isolated singularity at 0
 RETURN:
 @format
-if opt=0:
+if opt<=0:
 list l:
   ideal l[1]: exp(-2*pi*i*l[1]) are the eigenvalues of the monodromy
-if opt=1:
+if opt>=1:
 list l: Jordan data jordan(M) of a monodromy matrix exp(-2*pi*i*M)
 default: opt=1
 @end format
@@ -437,7 +411,6 @@ EXAMPLE:  example monodromy; shows examples
   int mu=ncols(gmsbasis);
   ideal r=gmspoly*gmsbasis;
   list l;
-  matrix U=freemodule(mu);
   matrix A0[mu][mu],C;
   module H,H1=freemodule(mu),freemodule(mu);
   module H0;
@@ -447,7 +420,7 @@ EXAMPLE:  example monodromy; shows examples
     k++;
     dbprint(printlevel-voice+2,"// k="+string(k));
     dbprint(printlevel-voice+2,"// compute matrix A of t");
-    if(opt==0)
+    if(opt<=0)
     {
       l=gmscoeffs(r,k,mu);
     }
@@ -467,16 +440,16 @@ EXAMPLE:  example monodromy; shows examples
 
   dbprint(printlevel-voice+2,"// compute basis of saturation of H''");
   H=std(H0);
-  int d0=maxorddif(H)/deg(s);
+  int d0=maxdeg1(H);
   dbprint(printlevel-voice+2,"// k="+string(d0+1));
   dbprint(printlevel-voice+2,"// compute matrix A of t");
-  if(opt==0)
+  if(opt<=0)
   {
     l=gmscoeffs(r,d0+1,d0+1);
   }
   else
   {
-    l=gmscoeffs(r,d0+1,d0+1+n);
+    l=gmscoeffs(r,d0+1,d0+n+1);
   }
   C,r=l[1..2];
   A0=A0+C;
@@ -491,7 +464,7 @@ EXAMPLE:  example monodromy; shows examples
   dbprint(printlevel-voice+2,"// e="+string(e));
   dbprint(printlevel-voice+2,"// m="+string(m));
 
-  if(opt==0)
+  if(opt<=0)
   {
     setring(R);
     ideal e=imap(G,e);
@@ -502,6 +475,7 @@ EXAMPLE:  example monodromy; shows examples
   int d1=maxintdif(e);
   dbprint(printlevel-voice+2,"// d1="+string(d1));
 
+  module U;
   if(d1>0)
   {
     dbprint(printlevel-voice+2,"// k="+string(d0+d1+1));
@@ -624,7 +598,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sppairs(poly t,list #)
-"USAGE:    sppairs(t[,opt]); poly t[, int opt]
+"USAGE:    sppairs(t[,opt]); poly t, int opt
 ASSUME:   basering with characteristic 0 and local degree ordering,
           t with isolated singularity at 0
 RETURN: list l:
@@ -662,7 +636,6 @@ EXAMPLE:  example sppairs; shows examples
   int mu=ncols(gmsbasis);
   ideal r=gmspoly*gmsbasis;
   list l;
-  matrix U=freemodule(mu);
   matrix A0[mu][mu],C;
   module H0;
   module H,H1=freemodule(mu),freemodule(mu);
@@ -672,7 +645,14 @@ EXAMPLE:  example sppairs; shows examples
     k++;
     dbprint(printlevel-voice+2,"// k="+string(k));
     dbprint(printlevel-voice+2,"// compute matrix A of t");
-    l=gmscoeffs(r,k,mu+n);
+    if(opt<=0)
+    {
+      l=gmscoeffs(r,k,mu);
+    }
+    else
+    {
+      l=gmscoeffs(r,k,mu+n);
+    }
     C,r=l[1..2];
     A0=A0+C;
 
@@ -685,14 +665,21 @@ EXAMPLE:  example sppairs; shows examples
 
   dbprint(printlevel-voice+2,"// compute basis of saturation of H''");
   H=std(H0);
-  int d0=maxorddif(H)/deg(s);
+  int d0=maxdeg1(H);
   dbprint(printlevel-voice+2,"// transform H'' to saturation of H''");
   l=division(H,freemodule(mu)*s^k);
   H0=l[1];
 
   dbprint(printlevel-voice+2,"// k="+string(d0+1));
   dbprint(printlevel-voice+2,"// compute matrix A of t");
-  l=gmscoeffs(r,d0+1,d0+1+n);
+  if(opt<=0)
+  {
+    l=gmscoeffs(r,d0+1,d0+1);
+  }
+  else
+  {
+    l=gmscoeffs(r,d0+1,d0+n+1);
+  }
   C,r=l[1..2];
   A0=A0+C;
   dbprint(printlevel-voice+2,"// transform A to saturation of H''");
@@ -700,7 +687,7 @@ EXAMPLE:  example sppairs; shows examples
   matrix A=jet(l[1],l[2],0);
 
   int i,j;
-  matrix V;
+  module U,V;
   if(opt<=0)
   {
     dbprint(printlevel-voice+2,"// transform to Jordan basis");
@@ -819,20 +806,18 @@ EXAMPLE:  example sppairs; shows examples
     A=jet(A,0);
   }
 
-  dbprint(printlevel-voice+2,"// transform to Jordan basis");
+  dbprint(printlevel-voice+2,"// compute weight filtration basis");
   intvec w0;
   l=jordanbasis(A);
   U,w0=l[1..2];
   V=lift(U,freemodule(mu));
-  A0=V*A*U;
-
-  dbprint(printlevel-voice+2,"// compute weight filtration basis");
+  A0=jet(V*A*U,0);
   vector u;
   i=1;
-  while(i<ncols(A))
+  while(i<ncols(A0))
   {
     j=i+1;
-    while(j<ncols(A)&&A[i,i]==A[j,j])
+    while(j<ncols(A0)&&A0[i,i]==A0[j,j])
     {
       if(w0[i]<w0[j])
       {
@@ -845,7 +830,7 @@ EXAMPLE:  example sppairs; shows examples
       }
       j++;
     }
-    if(j==ncols(A)&&A[i,i]==A[j,j]&&w0[i]<w0[j])
+    if(j==ncols(A0)&&A0[i,i]==A0[j,j]&&w0[i]<w0[j])
     {
       k=w0[i];
       w0[i]=w0[j];
@@ -925,7 +910,6 @@ EXAMPLE:  example vfilt; shows examples
   int mu=ncols(gmsbasis);
   ideal r=gmspoly*gmsbasis;
   list l;
-  matrix U=freemodule(mu);
   matrix A[mu][mu],C;
   module H,H1=freemodule(mu),freemodule(mu);
   module H0;
@@ -950,7 +934,7 @@ EXAMPLE:  example vfilt; shows examples
 
   dbprint(printlevel-voice+2,"// compute basis of saturation of H''");
   H=std(H0);
-  int d0=maxorddif(H)/deg(s);
+  int d0=maxdeg1(H);
   dbprint(printlevel-voice+2,"// k="+string(d0+N));
   dbprint(printlevel-voice+2,"// compute matrix A of t");
   l=gmscoeffs(r,d0+N,d0+N);
@@ -1201,7 +1185,7 @@ EXAMPLE: example endfilt; shows examples
 
   dbprint(printlevel-voice+2,"// compute multiplication in Jacobian algebra");
   list M;
-  matrix U=freemodule(ncols(m));
+  module U=freemodule(ncols(m));
   for(i=ncols(m);i>=1;i--)
   {
     M[i]=lift(V0,coeffs(reduce(m[i]*m,U,g),m)*V0);
