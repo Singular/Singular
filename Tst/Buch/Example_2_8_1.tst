@@ -11,4 +11,8 @@ v;
 
 reduce(v,std(M));
 
+syz(v+M);
+
+lift(M,v);
+
 tst_status(1);$
