@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.21 2000-12-18 14:22:56 obachman Exp $
+@comment $Id: pdata.doc,v 1.22 2000-12-22 16:02:52 mschulze Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -45,7 +45,7 @@ one has to give a list of polynomials in a specific format.
 
 For ideals, resp.@: matrices, this is straight forward:
 The user gives a list of polynomials
-which generate the ideal, resp.@:local/Singular/ which are the entries of the matrix.
+which generate the ideal, resp.@: which are the entries of the matrix.
 (The number of rows and columns has to be given when creating the matrix.)
 
 A vector  in @sc{Singular} is always an element of a free module over the
