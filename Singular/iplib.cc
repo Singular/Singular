@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.52 1999-03-16 15:33:14 Singular Exp $ */
+/* $Id: iplib.cc,v 1.53 1999-04-01 10:09:58 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -31,12 +31,7 @@
 #endif /* HAVE_LIBPARSER */
 #define NS_LRING namespaceroot->next->currRing
 
-#ifdef HAVE_DYNAMIC_LOADING
-void *dynl_open(char *filename);
-void *dynl_sym(void *handle, char *symbol);
-int dynl_close (void *handle);
-char *dynl_error();
-#endif /* HAVE_DYNAMIC_LOADING */
+#include "mod_raw.h"
 
 char *iiConvName(char *p);
 #ifdef HAVE_LIBPARSER
@@ -1171,7 +1166,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     newlib = mstrdup(libnamebuf);
     goto lib_type_end;
   }
-  if( (strncmp(buf, "\02\013\01\016\05\022@", 7)==0)) {
+  if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0)) {
     LT = LT_HPUX;
     FreeL(newlib);
     newlib = mstrdup(libnamebuf);
