@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.121 1999-11-24 18:50:36 obachman Exp $ */
+/* $Id: extra.cc,v 1.122 1999-11-29 14:46:53 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -325,7 +325,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         fePrintOptValues();
         return FALSE;
       }
-      
+
       feOptIndex opt = feGetOptIndex(&sys_cmd[2]);
       if (opt == FE_OPT_UNDEF)
       {
@@ -333,15 +333,15 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         Werror("Use 'system(\"--\");' for listing of available options");
         return TRUE;
       }
-      
-      // for Untyped Options (help version), 
+
+      // for Untyped Options (help version),
       // setting it just triggers action
       if (feOptSpec[opt].type == feOptUntyped)
       {
         feSetOptValue(opt,NULL);
         return FALSE;
       }
-      
+
       if (h == NULL)
       {
         if (feOptSpec[opt].type == feOptString)
@@ -359,8 +359,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         return FALSE;
       }
-      
-      if (h->Typ() != STRING_CMD && 
+
+      if (h->Typ() != STRING_CMD &&
           h->Typ() != INT_CMD)
       {
         Werror("Need string or int argument to set option value");
@@ -375,7 +375,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           return TRUE;
         }
         errormsg = feSetOptValue(opt, (int) h->Data());
-        if (errormsg != NULL) 
+        if (errormsg != NULL)
           Werror("Option '--%s=%d' %s", sys_cmd, (int) h->Data(), errormsg);
       }
       else
@@ -506,6 +506,22 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    }
    else
    {
+/*==================== semic =============================*/
+   if(strcmp(sys_cmd,"semic") == 0)
+   {
+     if ((h->next!=NULL)
+     && (h->Typ()==LIST_CMD)
+     && (h->next->Typ()==LIST_CMD))
+     {
+       if (h->next->next==NULL)
+         return semicProc(res,h,h->next);
+       else if (h->next->next->Typ()==INT_CMD)
+         return semicProc3(res,h,h->next,h->next->next);
+     }
+     return TRUE;
+   }
+   else
+   {
    #endif
 /*================= Extended system call ========================*/
 #ifdef HAVE_EXTENDED_SYSTEM
@@ -542,30 +558,30 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       if (h->Typ()==NUMBER_CMD )
       {
-	if ( h->next!=NULL && h->next->Typ()==INT_CMD )
-	{
-	  if ( !rField_is_long_C() )
-	    {
-	      Werror( "unsupported ground field!");
-	      return TRUE;
-	    }
-	  else
-	    {
-	      res->rtyp=INT_CMD;
-	      res->data=(void*)complexNearZero((gmp_complex*)h->Data(),(int)h->next->Data());
-	      return FALSE;
-	    }
-	}      
-	else
-	{
-	  Werror( "expected <int> as third parameter!");
-	  return TRUE;
-	}
+        if ( h->next!=NULL && h->next->Typ()==INT_CMD )
+        {
+          if ( !rField_is_long_C() )
+            {
+              Werror( "unsupported ground field!");
+              return TRUE;
+            }
+          else
+            {
+              res->rtyp=INT_CMD;
+              res->data=(void*)complexNearZero((gmp_complex*)h->Data(),(int)h->next->Data());
+              return FALSE;
+            }
+        }
+        else
+        {
+          Werror( "expected <int> as third parameter!");
+          return TRUE;
+        }
       }
       else
       {
-	Werror( "expected <number> as second parameter!");
-	return TRUE;
+        Werror( "expected <number> as second parameter!");
+        return TRUE;
       }
     }
 /*==================== getPrecDigits ======================*/
@@ -573,8 +589,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       if ( !rField_is_long_C() && !rField_is_long_R() )
       {
-	Werror( "unsupported ground field!");
-	return TRUE;
+        Werror( "unsupported ground field!");
+        return TRUE;
       }
       res->rtyp=INT_CMD;
       res->data=(void*)getGMPFloatDigits();
@@ -598,7 +614,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     if(strcmp(sys_cmd,"mtrack")==0)
     {
 #ifdef MLIST
-      FILE *fd = NULL; 
+      FILE *fd = NULL;
       if ((h!=NULL) &&(h->Typ()==STRING_CMD))
       {
         fd = fopen((char*) h->Data(), "w");
@@ -609,9 +625,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (fd != NULL) fclose(fd);
       return FALSE;
 #else
-     WerrorS("mtrack not supported without MLIST"); 
+     WerrorS("mtrack not supported without MLIST");
      return TRUE;
-#endif     
+#endif
     }
     else
 /*==================== naIdeal ==================================*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.191 1999-11-24 18:13:21 Singular Exp $ */
+/* $Id: iparith.cc,v 1.192 1999-11-29 14:46:54 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -283,9 +283,6 @@ cmdnames cmds[] =
   { "simplify",    0, SIMPLIFY_CMD ,      CMD_2},
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
-  #ifdef HAVE_SPECTRUM
-  { "semic",       0, SEMIC_CMD ,         CMD_23},
-  #endif
   #ifdef OLD_RES
   { "sres",        0, SRES_CMD ,          CMD_23},
   #else
@@ -2294,9 +2291,6 @@ struct sValCmd2 dArith2[]=
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD PROFILER}
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
-#ifdef HAVE_SPECTRUM
-,{semicProc,   SEMIC_CMD,      INT_CMD,        LIST_CMD,   LIST_CMD PROFILER}
-#endif
 //,{jjRES,       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
 //,{jjRES,       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
 ,{jjRES,       SRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
@@ -4337,7 +4331,6 @@ struct sValCmd3 dArith3[]=
 #endif
 ,{jjRING3,          RING_CMD,   RING_CMD,   DEF_CMD,    DEF_CMD,    DEF_CMD }
 #ifdef HAVE_SPECTRUM
-,{semicProc3,       SEMIC_CMD,  INT_CMD,    LIST_CMD,   LIST_CMD,   INT_CMD }
 ,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, INT_CMD }
 ,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, LIST_CMD }
 #endif
