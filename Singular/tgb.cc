@@ -2013,7 +2013,7 @@ void simple_gauss(tgb_matrix* mat){
     int found_in_row;
     
     found_in_row=row;
-    assume(pn<mat->get_rows());
+    assume(pn<=mat->get_rows());
     for(i=row+1;i<pn;i++){
       int first=mat->min_col_not_zero_in_row(i);
       if(first<col)
@@ -2086,6 +2086,7 @@ static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, 
       //v is ascending ordered, we need descending order
       v=done_index-1-v;
       t->set(i,v,nCopy(p_i->coef));
+      p_i=p_i->next;
     }
   }
   return t;
@@ -2274,7 +2275,9 @@ static void go_on_F4 (calc_dat* c){
   pos=0;
   //Print("Done_index:%i",done_index);
   if(done_index>0)
+  {
     pTest(done[0]);
+ }
   for(i=1;i<done_index;i++)
   {
     pTest(done[i]);
@@ -2286,7 +2289,9 @@ static void go_on_F4 (calc_dat* c){
     done_index=pos+1;
 #ifdef TGB_DEBUG
   for(i=0;i<done_index;i++)
+  {
     pTest(done[i]);
+  }
 #endif
   poly* m;
   int m_index=0;
@@ -2295,31 +2300,84 @@ static void go_on_F4 (calc_dat* c){
   {
     m_size+=pLength(p[i]);
   }
+  m=(poly*) omalloc(m_size*sizeof(poly));
   //q=(poly*) omalloc(m_size*sizeof(poly));
- 
+#ifdef TGB_DEBUG
+  
+  for(i=0;i<done_index;i++)
+  {
+    
+    pTest(done[i]);
+  }
+#endif
+  
+  assume(done_index==0);
   for(i=0;i<p_index;i++)
   {
+     assume(done_index==0);
     poly p_i=p[i];
+     assume(done_index==0);
+    pTest(p[i]);
+     assume(done_index==0);
     while(p_i)
     {
+       assume(done_index==0);
       m[m_index]=pLmInit(p_i);
+      assume(done_index==0);
       pSetCoeff(m[m_index],nInit(1));
-      p_i=p_i->next;
+       assume(done_index==0);
+       p_i=p_i->next;
+        assume(done_index==0);
       m_index++;
+       assume(done_index==0);
     }
   }
+#ifdef TGB_DEBUG
+      
+      for(i=0;i<done_index;i++)
+      {
+	
+	pTest(done[i]);
+      }
+#endif
   int q_size=m_index;
   poly* q=(poly*) omalloc(q_size*sizeof(poly));
   int q_index=0;
   //next Step additional reductors
+  #ifdef TGB_DEBUG
+      
+      for(i=0;i<done_index;i++)
+      {
+	
+	pTest(done[i]);
+      }
+#endif
   while(m_index>0)
   {
+#ifdef TGB_DEBUG
+      
+      for(i=0;i<done_index;i++)
+      {
+	
+	pTest(done[i]);
+      }
+#endif
     qsort(m, m_index,sizeof(poly),pLmCmp_func);
 
     
     pos=0;
+    #ifdef TGB_DEBUG
+      
+      for(i=0;i<done_index;i++)
+      {
+	
+	pTest(done[i]);
+      }
+#endif
     for(i=1;i<m_index;i++)
     {
+      pTest(m[i]);
+      pTest(m[pos]);
       if((!(pLmEqual(m[i],m[pos]))))
 	m[++pos]=m[i];
       else pDelete(&(m[i]));
@@ -2343,15 +2401,23 @@ static void go_on_F4 (calc_dat* c){
       omfree(q);
       q=(poly*) omalloc(q_size*sizeof(poly));
     }
+#ifdef TGB_DEBUG
+      int j;
+      for(j=0;j<done_index;j++)
+      {
+	
+	pTest(done[j]);
+      }
+#endif
     for(i=0;i<m_index;i++)
     {
       BOOLEAN in_done=FALSE;
       pTest(m[i]);
 #ifdef TGB_DEBUG
-      int j;
+     
       for(j=0;j<done_index;j++)
       {
-	Print("%i %i\n",j,i);
+	//Print("%i %i\n",j,i);
 	pTest(done[j]);
       }
 #endif
@@ -2681,7 +2747,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   }
   while(c->to_destroy)
   {
-    pDelete(&c->to_destroy->p);
+    pDelete(&(c->to_destroy->p));
     poly_list_node* old=c->to_destroy;
     c->to_destroy=c->to_destroy->next;
     omfree(old);
