@@ -531,9 +531,24 @@ BOOLEAN setOption(leftv res, leftv v)
   char *n;
   do
   {
-    n=v->name;
-    if (n==NULL) return TRUE;
-    v->name=NULL;
+    if (v->Typ()==STRING_CMD)
+    {
+      n=(char *)v->CopyD();
+    }
+    else
+    {
+      if (v->name==NULL)
+        return TRUE;
+      if (v->rtyp==0)
+      {
+        n=v->name;
+        v->name=NULL;
+      }
+      else
+      {
+        n=mstrdup(v->name);
+      }
+    }
 
     int i;
 
