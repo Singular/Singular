@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.17 1998-04-07 19:14:43 krueger Exp $ */
+/* $Id: iplib.cc,v 1.18 1998-04-22 09:14:07 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -105,7 +105,7 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
       // copy the result to argstr
       strcat(argstr,"parameter ");
       strcat(argstr,s);
-      strcat(argstr,";\n");
+      strcat(argstr,"; ");
       e++; // e was pointing to ','
     }
   } while (in_args);
