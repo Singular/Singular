@@ -128,11 +128,12 @@ MKINSTALLDIRS 	= ./mkinstalldirs
 TMPDIR		= ${TMP_DIR}/singdist
 SINGUNAME 	= @SINGUNAME@
 S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
-BINDIR_NAME	= Singular/${SINGUNAME}/${S_VERSION}
-LIBDIR_NAME 	= Singular/LIB/${S_VERSION}
-GFTABLESDIR_NAME= Singular/LIB/gftables
-DOCDIR_NAME 	= Singular/doc/${S_VERSION}
-HTMLDIR_NAME	= Singular/html/${S_VERSION}
+BINDIR_NAME	= Singular/${S_VERSION}/${SINGUNAME}
+LIBDIR_NAME 	= Singular/${S_VERSION}/LIB
+GFTABLESDIR_NAME= Singular/${S_VERSION}/LIB/gftables
+DOCDIR_NAME 	= Singular/${S_VERSION}/doc
+HTMLDIR_NAME	= Singular/${S_VERSION}/html
+INFODIR_NAME	= Singular/${S_VERSION}/info
 
 BINDIST_NAME	= Singular-${S_VERSION}-${SINGUNAME}
 SHAREDIST_NAME  = Singular-${S_VERSION}-share
@@ -149,18 +150,15 @@ sharedist: ${SINGULAR}
 	${MKINSTALLDIRS} ${TMPDIR}/${GFTABLESDIR_NAME}
 	${MKINSTALLDIRS} ${TMPDIR}/${DOCDIR_NAME}
 	${MKINSTALLDIRS} ${TMPDIR}/${HTMLDIR_NAME}
+	${MKINSTALLDIRS} ${TMPDIR}/${INFODIR_NAME}
 	cp Singular/LIB/*.lib ${TMPDIR}/${LIBDIR_NAME}
-	rm -f ${TMPDIR}/Singular/LIB/${S_VERSION}/fastsolv.lib
-	rm -f ${TMPDIR}/Singular/LIB/${S_VERSION}/tst.lib
+	rm -f ${TMPDIR}/${LIBDIR_NAME}/tst.lib 
 	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/${GFTABLESDIR_NAME}
-	cp doc/singular.hlp doc/singular.ps doc/usercard.ps \
-           doc/singular.dvi doc/usercard.dvi \
+	cp doc/singular.idx doc/manual.ps doc/usercard.ps \
+           doc/manual.dvi doc/usercard.dvi \
            ${TMPDIR}/${DOCDIR_NAME}
+	cp doc/singular.hlp ${TMPDIR}/${INFODIR_NAME}
 	cp -R doc/html/* ${TMPDIR}/${HTMLDIR_NAME}
-	cat README.general | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
-                             ${TMPDIR}/Singular/README
-	cat COPYING | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
-                             ${TMPDIR}/Singular/COPYING
 	chmod -R  a+rX  ${TMPDIR}/Singular
 	cd ${TMPDIR}; \
 	    ${ZIP} -r ${SHAREDIST_NAME} Singular; \
@@ -176,8 +174,6 @@ bindist: ${SINGULAR}
 	cp Singular/Singular-$@ ${TMPDIR}/${BINDIR_NAME}/Singular
 	cp Singular/libparse ${TMPDIR}/${BINDIR_NAME}
 	-strip ${TMPDIR}/${BINDIR_NAME}/*
-	cat INSTALL.unix | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
-                      ${TMPDIR}/Singular/INSTALL
 	cd ${TMPDIR}; chmod -R a+rX *;\
            tar cf ${BINDIST_NAME}.tar Singular; \
            gzip ${BINDIST_NAME}.tar
