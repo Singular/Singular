@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.8 1998-04-28 07:56:03 Singular Exp $
+@comment $Id: singular.doc,v 1.9 1998-04-28 12:19:42 schmidt Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -60,17 +60,17 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @center Centre for Computer Algebra
 @end ifinfo
 @menu
-* Preface::
-* Introduction::
-* General concepts::
-* Data types::
-* Commands::
-* Tricks and pitfalls::
-* Examples::
-* Mathematical background::
-* SINGULAR libraries::
-* Library function index::
-* Index::
+* Preface::                     
+* Introduction::                
+* General concepts::            
+* Data types::                  
+* Functions and variables::     
+* Tricks and pitfalls::         
+* Examples::                    
+* Mathematical background::     
+* SINGULAR libraries::          
+* Library function index::      
+* Index::                       
 @end menu
 @c ----------------------------------------------------------------------------
 @node Preface, Introduction, Top, Top
@@ -91,19 +91,19 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @include general.tex
 
 @c ----------------------------------------------------------------------------
-@node Data types, Commands, General concepts, Top
+@node Data types, Functions and variables, General concepts, Top
 @chapter Data types
 @cindex Data types
 @include types.tex
 
 @c ----------------------------------------------------------------------------
-@node Commands, Tricks and pitfalls, Data types, Top
-@chapter Commands
+@node Functions and variables, Tricks and pitfalls, Data types, Top
+@chapter Functions and variables
 @cindex Commands
 @include reference.tex
 
 @c ----------------------------------------------------------------------------
-@node Tricks and pitfalls, Examples, Commands, Top
+@node Tricks and pitfalls, Examples, Functions and variables, Top
 @chapter Tricks and pitfalls
 @cindex Tricks and pitfalls
 
