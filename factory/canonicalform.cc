@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.21 1997-10-16 15:32:55 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.22 1997-10-22 15:51:36 schmidt Exp $ */
 
 #include <config.h>
 
@@ -903,6 +903,81 @@ CanonicalForm::mod ( const CanonicalForm & cf )
     }
     return *this;
 }
+
+void
+divrem ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r )
+{
+    InternalCF * qq = 0, * rr = 0;
+    int what = is_imm( f.value );
+    if ( what )
+	if ( is_imm( g.value ) ) {
+	    if ( what == FFMARK )
+		imm_divrem_p( f.value, g.value, qq, rr );
+	    else  if ( what == GFMARK )
+		imm_divrem_gf( f.value, g.value, qq, rr );
+	    else
+		imm_divrem( f.value, g.value, qq, rr );
+	}
+	else
+	    g.value->divremcoeff( f.value, qq, rr, true );
+    else  if ( (what=is_imm( g.value )) )
+	f.value->divremcoeff( g.value, qq, rr, false );
+    else  if ( f.value->level() == g.value->level() )
+	if ( f.value->levelcoeff() == g.value->levelcoeff() )
+	    f.value->divremsame( g.value, qq, rr );
+	else  if ( f.value->levelcoeff() > g.value->levelcoeff() )
+	    f.value->divremcoeff( g.value, qq, rr, false );
+	else
+	    g.value->divremcoeff( f.value, qq, rr, true );
+    else  if ( f.value->level() > g.value->level() )
+	f.value->divremcoeff( g.value, qq, rr, false );
+    else
+	g.value->divremcoeff( f.value, qq, rr, true );
+    ASSERT( qq != 0 && rr != 0, "error in divrem" );
+    q = CanonicalForm( qq );
+    r = CanonicalForm( rr );
+}
+
+bool
+divremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r )
+{
+    InternalCF * qq = 0, * rr = 0;
+    int what = is_imm( f.value );
+    bool result = true;
+    if ( what )
+	if ( is_imm( g.value ) ) {
+	    if ( what == FFMARK )
+		imm_divrem_p( f.value, g.value, qq, rr );
+	    else  if ( what == GFMARK )
+		imm_divrem_gf( f.value, g.value, qq, rr );
+	    else
+		imm_divrem( f.value, g.value, qq, rr );
+	}
+	else
+	    result = g.value->divremcoefft( f.value, qq, rr, true );
+    else  if ( (what=is_imm( g.value )) )
+	result = f.value->divremcoefft( g.value, qq, rr, false );
+    else  if ( f.value->level() == g.value->level() )
+	if ( f.value->levelcoeff() == g.value->levelcoeff() )
+	    result = f.value->divremsamet( g.value, qq, rr );
+	else  if ( f.value->levelcoeff() > g.value->levelcoeff() )
+	    result = f.value->divremcoefft( g.value, qq, rr, false );
+	else
+	    result = g.value->divremcoefft( f.value, qq, rr, true );
+    else  if ( f.value->level() > g.value->level() )
+	result = f.value->divremcoefft( g.value, qq, rr, false );
+    else
+	result = g.value->divremcoefft( f.value, qq, rr, true );
+    if ( result ) {
+	ASSERT( qq != 0 && rr != 0, "error in divrem" );
+	q = CanonicalForm( qq );
+	r = CanonicalForm( rr );
+    }
+    else {
+	q = 0; r = 0;
+    }
+    return result;
+}
 //}}}
 
 //{{{ CanonicalForm CanonicalForm::operator () ( f ), operator () ( f, v ) const
@@ -921,23 +996,6 @@ CanonicalForm::mod ( const CanonicalForm & cf )
 // and v may be an algebraic variable.
 //
 //}}}
-#ifndef NEWINS
-CanonicalForm
-CanonicalForm::operator () ( const CanonicalForm & f ) const
-{
-    if ( is_imm( value ) || value->inBaseDomain() )
-	return *this;
-    else {
-	CanonicalForm result = 0;
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    if ( i.exp() == 0 )
-		result += i.coeff();
-	    else
-		result += power( f, i.exp() ) * i.coeff();
-	return result;
-    }
-}
-#else
 CanonicalForm
 CanonicalForm::operator () ( const CanonicalForm & f ) const
 {
@@ -949,46 +1007,20 @@ CanonicalForm::operator () ( const CanonicalForm & f ) const
 	CanonicalForm result = i.coeff();
 	i++;
 	while ( i.hasTerms() ) {
-	    result *= power( f, lastExp - i.exp() );
+	    if ( (lastExp - i.exp()) == 1 )
+		result *= f;
+	    else
+		result *= power( f, lastExp - i.exp() );
 	    result += i.coeff();
 	    lastExp = i.exp();
 	    i++;
 	}
-	result *= power( f, lastExp );
+	if ( lastExp != 0 )
+	    result *= power( f, lastExp );
 	return result;
     }
 }
-#endif
 
-#ifndef NEWINS
-CanonicalForm
-CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
-{
-    if ( inBaseDomain() || v > mvar() )
-	return *this;
-    else  if ( v == mvar() ) {
-	CanonicalForm result = 0;
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    if ( i.exp() == 0 )
-		result += i.coeff();
-	    else
-		result += power( f, i.exp() ) * i.coeff();
-	return result;
-    }
-    else {
-	CanonicalForm G = swapvar( *this, v, Variable::highest() );
-	if ( G.mvar() != Variable::highest() )
-	    return *this;
-	CanonicalForm result = 0;
-	for ( CFIterator i = G; i.hasTerms(); ++i )
-	    if ( i.exp() == 0 )
-		result += i.coeff();
-	    else
-		result += power( f, i.exp() ) * i.coeff();
-	return result;
-    }
-}
-#else
 CanonicalForm
 CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
 {
@@ -1008,7 +1040,6 @@ CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
 	return result;
     }
 }
-#endif
 //}}}
 
 //{{{ CanonicalForm CanonicalForm::operator [] ( int i ) const
@@ -1407,81 +1438,6 @@ operator % ( const CanonicalForm &c1, const CanonicalForm &c2 )
 {
     CanonicalForm result( c1 );
     result %= c2;
-    return result;
-}
-
-void
-divrem ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r )
-{
-    InternalCF * qq = 0, * rr = 0;
-    int what = is_imm( f.value );
-    if ( what )
-	if ( is_imm( g.value ) ) {
-	    if ( what == FFMARK )
-		imm_divrem_p( f.value, g.value, qq, rr );
-	    else  if ( what == GFMARK )
-		imm_divrem_gf( f.value, g.value, qq, rr );
-	    else
-		imm_divrem( f.value, g.value, qq, rr );
-	}
-	else
-	    g.value->divremcoeff( f.value, qq, rr, true );
-    else  if ( (what=is_imm( g.value )) )
-	f.value->divremcoeff( g.value, qq, rr, false );
-    else  if ( f.value->level() == g.value->level() )
-	if ( f.value->levelcoeff() == g.value->levelcoeff() )
-	    f.value->divremsame( g.value, qq, rr );
-	else  if ( f.value->levelcoeff() > g.value->levelcoeff() )
-	    f.value->divremcoeff( g.value, qq, rr, false );
-	else
-	    g.value->divremcoeff( f.value, qq, rr, true );
-    else  if ( f.value->level() > g.value->level() )
-	f.value->divremcoeff( g.value, qq, rr, false );
-    else
-	g.value->divremcoeff( f.value, qq, rr, true );
-    ASSERT( qq != 0 && rr != 0, "error in divrem" );
-    q = CanonicalForm( qq );
-    r = CanonicalForm( rr );
-}
-
-bool
-divremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r )
-{
-    InternalCF * qq = 0, * rr = 0;
-    int what = is_imm( f.value );
-    bool result = true;
-    if ( what )
-	if ( is_imm( g.value ) ) {
-	    if ( what == FFMARK )
-		imm_divrem_p( f.value, g.value, qq, rr );
-	    else  if ( what == GFMARK )
-		imm_divrem_gf( f.value, g.value, qq, rr );
-	    else
-		imm_divrem( f.value, g.value, qq, rr );
-	}
-	else
-	    result = g.value->divremcoefft( f.value, qq, rr, true );
-    else  if ( (what=is_imm( g.value )) )
-	result = f.value->divremcoefft( g.value, qq, rr, false );
-    else  if ( f.value->level() == g.value->level() )
-	if ( f.value->levelcoeff() == g.value->levelcoeff() )
-	    result = f.value->divremsamet( g.value, qq, rr );
-	else  if ( f.value->levelcoeff() > g.value->levelcoeff() )
-	    result = f.value->divremcoefft( g.value, qq, rr, false );
-	else
-	    result = g.value->divremcoefft( f.value, qq, rr, true );
-    else  if ( f.value->level() > g.value->level() )
-	result = f.value->divremcoefft( g.value, qq, rr, false );
-    else
-	result = g.value->divremcoefft( f.value, qq, rr, true );
-    if ( result ) {
-	ASSERT( qq != 0 && rr != 0, "error in divrem" );
-	q = CanonicalForm( qq );
-	r = CanonicalForm( rr );
-    }
-    else {
-	q = 0; r = 0;
-    }
     return result;
 }
 //}}}
