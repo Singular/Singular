@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.45 2000-09-12 16:00:59 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.46 2000-09-14 14:07:22 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -820,7 +820,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
+  kStrategy strat=new skStrategy;
 
   if (rField_has_simple_inverse())
     strat->LazyPass=20;

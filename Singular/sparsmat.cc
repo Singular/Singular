@@ -1,11 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.33 2000-09-12 16:01:15 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.34 2000-09-14 14:07:25 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
 */
+
+// Wilfried: make sure that you pass all tests (e.g., primdec3),
+// and then delete this line 
+#define PDEBUG 2
 
 #include "mod2.h"
 #include "structs.h"

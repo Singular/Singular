@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.59 2000-09-14 13:04:36 obachman Exp $ */
+/* $Id: kutil.cc,v 1.60 2000-09-14 14:07:23 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -251,7 +251,7 @@ BOOLEAN isInPairsetB(poly q,int*  k,kStrategy strat)
 }
 
 #ifdef KDEBUG
-BOOLEAN K_Test_L(char *f , int l, LObject *L,
+BOOLEAN K_Test_L(char *f , int l, LObject *L, ring tailRing,
                  BOOLEAN testp, int lpos, TSet T, int tlength)
 {
   BOOLEAN ret = TRUE;
@@ -259,7 +259,7 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
   #ifdef PDEBUG
   if (testp)
   {
-    if (! _pp_Test(L->p, L->lmRing, L->tailRing, PDEBUG))
+    if (! _pp_Test(L->p, currRing, tailRing, PDEBUG))
     {
       Warn("for L->p");
       ret = FALSE;
@@ -276,7 +276,7 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
   if (L->p1 == NULL)
   {
     // L->p2 either NULL or poly from global heap
-    ret &= _pp_Test(L->p2, L->lmRing, L->tailRing, PDEBUG);
+    ret &= _pp_Test(L->p2, currRing, tailRing, PDEBUG);
   }
   else if (tlength > 0 && T != NULL)
   {
@@ -305,7 +305,7 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
   int i;
   BOOLEAN ret = TRUE;
   // test P
-  ret = K_Test_L(f, l, &(strat->P),
+  ret = K_Test_L(f, l, &(strat->P), strat->tailRing,
                  (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
                  -1, strat->T, strat->tl+1);
 
@@ -319,7 +319,7 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
   {
     for (i=0; i<=strat->tl; i++)
     {
-      if (K_Test_T(f, l, &(strat->T[i]), i) == FALSE)
+      if (K_Test_T(f, l, &(strat->T[i]), strat->tailRing, i) == FALSE)
       {
         ret = FALSE;
       }
@@ -335,7 +335,7 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
         dReportError("L[%d].p is NULL", i);
         ret = FALSE;
       }
-      if (K_Test_L(f, l, &(strat->L[i]),
+      if (K_Test_L(f, l, &(strat->L[i]), strat->tailRing,
                    (pNext(strat->L[i].p) != strat->tail), i,
                    strat->T, strat->tl + 1) == FALSE)
       {
@@ -369,10 +369,10 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
 }
 
 
-BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
+BOOLEAN K_Test_T(char* f, int l, TObject * T, ring tailRing, int i)
 {
   #ifdef PDEBUG
-  BOOLEAN ret = _pp_Test(T->p, T->lmRing, T->tailRing, PDEBUG);
+  BOOLEAN ret = _pp_Test(T->p, currRing, tailRing, PDEBUG);
   #else
   BOOLEAN ret=FALSE;
   #endif
@@ -384,10 +384,10 @@ BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
           i , pLength(T->p), T->pLength,f, l);
     ret = FALSE;
   }
-  if (T->sev != 0 && p_GetShortExpVector(T->p, T->lmRing) != T->sev)
+  if (T->sev != 0 && p_GetShortExpVector(T->p, currRing) != T->sev)
   {
     dReportError("T[%d] wrong sev: has %o, specified to have %o in %s:%d",
-          i , p_GetShortExpVector(T->p, T->lmRing), T->sev,f, l);
+          i , p_GetShortExpVector(T->p, currRing), T->sev,f, l);
     ret = FALSE;
   }
   return ret;

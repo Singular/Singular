@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.38 2000-09-12 16:01:00 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.39 2000-09-14 14:07:23 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -147,7 +147,7 @@ static void copyL (kStrategy o,kStrategy n)
 kStrategy kStratCopy(kStrategy o)
 {
   kTest_TS(o);
-  kStrategy s=(kStrategy)omAlloc0(sizeof(skStrategy));
+  kStrategy s=new skStrategy;
   s->next=NULL;
   s->red=o->red;
   s->initEcart=o->initEcart;
@@ -159,6 +159,7 @@ kStrategy kStratCopy(kStrategy o)
   s->pOldFDeg=o->pOldFDeg;
   s->Shdl=idCopy(o->Shdl);
   s->S=s->Shdl->m;
+  s->tailRing = o->tailRing;
   if (o->D!=NULL) s->D=idCopy(o->D);
   else            s->D=NULL;
   s->ecartS=(int *)omAlloc(IDELEMS(o->Shdl)*sizeof(int));
@@ -765,7 +766,7 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
+  kStrategy strat=new skStrategy;
   kStrategy orgstrat=strat;
   lists L=(lists)omAllocBin(slists_bin); L->Init(0);
   sleftv v; memset(&v,0,sizeof(v));

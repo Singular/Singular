@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.28 2000-09-12 16:01:01 obachman Exp $ */
+/* $Id: kutil.h,v 1.29 2000-09-14 14:07:24 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -30,13 +30,9 @@ public:
   poly  p;
   int ecart,length, pLength;
   unsigned long sev;
-  ring lmRing;
-  ring tailRing;
   sTObject() 
     { 
       memset((void*) this, 0, sizeof(sTObject)); 
-      lmRing=currRing; 
-      tailRing=currRing;
     }
   KINLINE poly SetP(poly p_new);
 };
@@ -48,8 +44,6 @@ public:
   poly  tail;
   poly  p1,p2; /*- the pair p comes from -*/
   poly  lcm;   /*- the lcm of p1,p2 -*/
-  ring lmRing;
-  ring tailRing;
   int is_bucket;
   int ecart,length, pLength;
   unsigned long sev;
@@ -57,8 +51,6 @@ public:
   sLObject() 
     { 
       memset((void*) this, 0, sizeof(sLObject));
-      lmRing=currRing; 
-      tailRing=currRing;
     }
   // spoly related things
   KINLINE poly SetP(poly new_p);
@@ -131,10 +123,18 @@ public:
   BOOLEAN noetherSet;
   BOOLEAN update;
   BOOLEAN posInLOldFlag;
+  ring tailRing;
   /*FALSE, if posInL == posInL10*/
   char    redTailChange;
   char    news;
   char    newt;/*used for messageSets*/
+
+  skStrategy()
+    {
+      memset(this, 0, sizeof(skStrategy));
+      tailRing = currRing;
+    };
+  
 };
 
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
@@ -209,8 +209,8 @@ KINLINE TSet initT ();
 #define kTest_Pref(L) K_Test(__FILE__,__LINE__,L, 2)
 BOOLEAN K_Test(char *f, int l,kStrategy strat, int pref=0);
 BOOLEAN K_Test_TS(char *f, int l,kStrategy strat);
-BOOLEAN K_Test_T(char *f, int l, TObject* T, int tpos = -1);
-BOOLEAN K_Test_L(char* f, int l, LObject* L,
+BOOLEAN K_Test_T(char *f, int l, TObject* T, ring tailRing = currRing, int tpos = -1);
+BOOLEAN K_Test_L(char* f, int l, LObject* L, ring tailRing = currRing,
                  BOOLEAN testp = FALSE, int lpos = -1,
                  TSet T = NULL, int tlength = -1);
 BOOLEAN K_Test_S(char* f, int l, kStrategy strat);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.52 2000-09-12 16:00:59 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.53 2000-09-14 14:07:22 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1690,7 +1690,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
+  kStrategy strat=new skStrategy;
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
@@ -1790,7 +1790,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   BOOLEAN oldDegBound=TEST_OPT_DEGBOUND;
-  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
+  kStrategy strat=new skStrategy;
 
   if(!TEST_OPT_RETURN_SB)
      strat->syzComp = syzComp;
@@ -1910,7 +1910,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
 {
   if (p==NULL)
      return NULL;
-  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
+  kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
   if (pOrdSgn==-1)
     p=kNF1(F,Q,p,strat,lazyReduce);
@@ -1927,7 +1927,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   {
     Print("(S:%d)",IDELEMS(p));mflush();
   }
-  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
+  kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
   if (pOrdSgn==-1)
     res=kNF1(F,Q,p,strat,lazyReduce);
@@ -1943,7 +1943,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
 ideal kInterRed (ideal F, ideal Q)
 {
   int j;
-  kStrategy strat = (kStrategy)omAlloc0(sizeof(skStrategy));
+  kStrategy strat = new skStrategy;
 
 //  if (TEST_OPT_PROT)
 //  {

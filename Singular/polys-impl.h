@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.53 2000-09-14 13:04:40 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.54 2000-09-14 14:07:24 obachman Exp $ */
 
 /***************************************************************
  *
@@ -42,9 +42,13 @@ struct  spolyrec
 
 /***************************************************************
  *
- * What should be inlined?
+ * What should be inlined and debugged?
  *
  ***************************************************************/
+#ifdef NO_PDEBUG
+#undef PDEBUG
+#endif
+
 // determines inlining of poly procs which iter through polys
 #if defined(DO_PINLINE0) && !defined(PDEBUG)
 #define PINLINE0 static inline

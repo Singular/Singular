@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.1 2000-09-14 13:04:38 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.2 2000-09-14 14:07:24 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -186,6 +186,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, level+1)
                         == omError_NoError, "memory error");
 
+  pFalseReturn(p_CheckRing(r));
   int ismod = p_GetComp(p, r) > 0;
   
   while (p != NULL)
