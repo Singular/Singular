@@ -3,7 +3,7 @@
  *  Purpose: implementation of routines for primitve BinPage managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBinPage.c,v 1.8 2001-04-30 09:02:02 Singular Exp $
+ *  Version: $Id: omBinPage.c,v 1.9 2003-06-23 08:09:22 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include "om_Alloc.h"
@@ -109,11 +109,11 @@ omBinPage omAllocBinPage()
       om_CurrentBinPageRegion->current = NEXT_PAGE(bin_page);
       goto Found;
     }
-    if (om_CurrentBinPageRegion->init_pages)
+    if (om_CurrentBinPageRegion->init_pages > 0)
     {
       bin_page = (omBinPage)om_CurrentBinPageRegion->init_addr;
       om_CurrentBinPageRegion->init_pages--;
-      if (om_CurrentBinPageRegion->init_pages)
+      if (om_CurrentBinPageRegion->init_pages > 0)
         om_CurrentBinPageRegion->init_addr += SIZEOF_SYSTEM_PAGE;
       else
         om_CurrentBinPageRegion->init_addr = NULL;
@@ -131,7 +131,6 @@ omBinPage omAllocBinPage()
       om_CurrentBinPageRegion = new_region;
     }
   }
-  while (1);
 
   Found:
   bin_page->region = om_CurrentBinPageRegion;
@@ -183,7 +182,7 @@ omBinPage omAllocBinPages(int how_many)
       region = new_region;
     }
   }
-  while (1);
+  /*while (1) */
 
   Found:
   bin_page->region = region;
