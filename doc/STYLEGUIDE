@@ -67,6 +67,7 @@
   Nach einem Doppelpunkt schreiben wir klein weiter:
     Purpose: computes the dimension.
 
+* Hilfe-Texte in Libraries: keine TAB's verwenden
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.1 1998-05-12 14:23:51 wichmann Exp $
+$Id: STYLEGUIDE,v 1.2 1998-05-14 18:47:07 Singular Exp $
 ------------------------------------------------------------
