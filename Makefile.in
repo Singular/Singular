@@ -115,10 +115,10 @@ Tst-Old: ${SINGULAR} Tst/Old/universal.lst Tst/regress.cmd
 	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Old/universal.lst
 
 Tst-Short: ${SINGULAR} Tst/Short/ok_s.lst Tst/regress.cmd 
-	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Short/ok_s.lst
+	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Short/ok_e.lst
 
 Tst-Long:  ${SINGULAR} Tst/Long/ok_l.lst Tst/regress.cmd
-	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Long/ok_l.lst
+	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Long/ok_e.lst
 
 ##############################################################
 # distribution targets
