@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.8 1999-10-14 17:59:32 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.9 1999-10-18 16:47:41 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -436,6 +436,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                             poly spNoether)
 {
   assume (*l <= 0 || pLength(p) == *l);
+  kbTests(bucket);
   int i, l1;
   poly p1 = p;
 
@@ -451,6 +452,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 
 #ifndef HAVE_PSEUDO_BUCKETS
   kBucketMergeLm(bucket);
+  kbTests(bucket);
   i = pLogLength(l1);
 
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
@@ -468,6 +470,8 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
       p1 = p_Add_q(p1, bucket->buckets[i],
                    &l1, bucket->buckets_length[i],
                    bucket->heap);
+      bucket->buckets[i] = NULL;
+      bucket->buckets_length[i] = 0;
       i = pLogLength(l1);
     }
   }
