@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.5 1998-05-14 18:45:19 Singular Exp $
+// $Id: tst.lib,v 1.6 1998-05-15 16:18:19 obachman Exp $
 //(obachman, last modified 2/13/98)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.5 1998-05-14 18:45:19 Singular Exp $";
+version="$Id: tst.lib,v 1.6 1998-05-15 16:18:19 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -17,9 +17,8 @@ LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
 proc tst_system(string s)
 "USAGE:    tst_system(s); s string
-RETURN:   string which is stdout \x and stderr of system(\"sh\", s)
-EXAMPLE:  example tst_system; shows examples
-"
+RETURN:   string which is stdout and stderr of system(\"sh\", s)
+EXAMPLE:  example tst_system; shows examples"
 {
   string tmpfile = "/tmp/tst_" + string(system("pid"));
   int errno;
@@ -61,7 +60,7 @@ EXAMPLE:  example tst_ignore; shows examples
   {
     "Error tst_ignore: Wrong number of arguments";
     "Usage: tst_ignore (any,[keyword], [link]);";
-    return;
+    return();
   }
 
   // Get Args
@@ -88,7 +87,7 @@ EXAMPLE:  example tst_ignore; shows examples
   {
     "Error tst_ignore: Keyword must be a string";
     "Usage: tst_ignore (any,[keyword], [link]);";
-    return;
+    return();
   }
   if (keyword == "time" || keyword == "memory")
   {
@@ -111,7 +110,7 @@ EXAMPLE:  example tst_ignore; shows examples
     "Error tst_ignore: Can not write to link";
     outlink;
     "Usage: tst_ignore (any,[keyword], [link]);";
-    return;
+    return();
   }
 
   // ready -- do the actual work
