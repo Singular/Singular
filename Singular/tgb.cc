@@ -2637,7 +2637,7 @@ static void go_on_F4 (calc_dat* c){
     int sum=0;
     for(i=0;i<p_index;i++)
     {
-      sum+=pLength(p[i]);
+      sum+=pLength(p[i])-1;
     }
     if (m_size<sum)
     {
@@ -2647,7 +2647,7 @@ static void go_on_F4 (calc_dat* c){
     m_size=sum;
     for(i=0;i<q_index;i++)
     {
-      poly p_i=q[i];
+      poly p_i=q[i]->next;
       while(p_i)
       {
 	m[m_index]=pLmInit(p_i);
