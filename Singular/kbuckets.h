@@ -3,10 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.15 2001-10-09 16:36:07 Singular Exp $ */
+/* $Id: kbuckets.h,v 1.16 2003-03-03 15:19:01 Singular Exp $ */
 #include "structs.h"
 #include "p_Procs.h"
 #include "pShallowCopyDelete.h"
+
+#define HAVE_COEF_BUCKETS
 
 /////////////////////////////////////////////////////////////////////////
 // configuration
@@ -185,6 +187,9 @@ public:
   int l;
 #else
   poly buckets[MAX_BUCKET + 1];        // polys in bucket
+#ifdef HAVE_COEF_BUCKETS
+  poly coef[MAX_BUCKET + 1];        // coeff of polys in bucket or NULL : 2..max
+#endif
   int  buckets_length[MAX_BUCKET + 1]; // length if i-th poly
   int buckets_used;                    // max number of used bucket
 #endif
