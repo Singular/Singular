@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.10 2004-05-20 13:23:40 Singular Exp $ */
+/* $Id: ring.cc,v 1.11 2004-05-25 16:45:57 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -380,6 +380,7 @@ void rDelete(ring r)
     }
   }
 #endif
+  nKillChar(r);
   rUnComplete(r);
   // delete order stuff
   if (r->order != NULL)

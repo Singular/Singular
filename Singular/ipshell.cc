@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.89 2004-05-20 13:22:57 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.90 2004-05-25 16:46:28 levandov Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4167,7 +4167,6 @@ void rKill(ring r)
       id_Delete(&r->qideal, r);
       r->qideal = NULL;
     }
-    nKillChar(r);
     int i=1;
     int j;
     int *pi=r->order;
@@ -4198,6 +4197,7 @@ void rKill(ring r)
     }
 #endif /* USE_IILOCALRING */
 
+    /* nKillChar(r); will be called from inside of rDelete */
     rDelete(r);
     return;
   }
