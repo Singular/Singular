@@ -1,3 +1,9 @@
+Wed Apr 22 16:12:16 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* header.tpl, factor.h, factor/version.cc (libfac_name,
+	  libgac_version, libfac_date, libfac_athur): defined/declared
+ 	  const
+
 Thu Mar 12 14:32:06 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* charset/csutil.cc, charset/alg_factor.cc: all references to
