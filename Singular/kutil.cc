@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.113 2002-12-11 15:23:39 Singular Exp $ */
+/* $Id: kutil.cc,v 1.114 2003-01-07 09:07:07 bricken Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -828,6 +828,14 @@ void deleteInS (int i,kStrategy strat)
     memmove(&(strat->lenS[i]),&(strat->lenS[i+1]),(strat->sl - i)*sizeof(int));
 #else
     for (j=i; j<strat->sl; j++) strat->lenS[j] = strat->lenS[j+1];
+#endif
+  }
+  if (strat->lenSw!=NULL)
+  {
+#ifdef ENTER_USE_MEMMOVE
+    memmove(&(strat->lenSw[i]),&(strat->lenSw[i+1]),(strat->sl - i)*sizeof(int));
+#else
+    for (j=i; j<strat->sl; j++) strat->lenSw[j] = strat->lenSw[j+1];
 #endif
   }
   if (strat->fromQ!=NULL)
@@ -3696,6 +3704,11 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
                                        IDELEMS(strat->Shdl)*sizeof(int),
                                        (IDELEMS(strat->Shdl)+setmaxTinc)
                                                  *sizeof(int));
+    if (strat->lenSw!=NULL)
+      strat->lenSw=(int*)omRealloc0Size(strat->lenSw,
+                                       IDELEMS(strat->Shdl)*sizeof(int),
+                                       (IDELEMS(strat->Shdl)+setmaxTinc)
+                                                 *sizeof(int));
     if (strat->fromQ!=NULL)
     {
       strat->fromQ = (intset)omReallocSize(strat->fromQ,
@@ -3721,6 +3734,9 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
     if (strat->lenS!=NULL)
     memmove(&(strat->lenS[atS+1]), &(strat->lenS[atS]),
             (strat->sl - atS + 1)*sizeof(int));
+    if (strat->lenSw!=NULL)
+    memmove(&(strat->lenSw[atS+1]), &(strat->lenSw[atS]),
+            (strat->sl - atS + 1)*sizeof(int));
 #else
     for (i=strat->sl+1; i>=atS+1; i--)
     {
@@ -3732,6 +3748,9 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
     if (strat->lenS!=NULL)
     for (i=strat->sl+1; i>=atS+1; i--)
       strat->lenS[i] = strat->lenS[i-1];
+    if (strat->lenSw!=NULL)
+    for (i=strat->sl+1; i>=atS+1; i--)
+      strat->lenSw[i] = strat->lenSw[i-1];
 #endif
   }
   if (strat->fromQ!=NULL)
