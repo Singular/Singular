@@ -18,10 +18,8 @@
   // of rank 10 over a polynomial ring in 10 variables.
   // Compute a full resolution of D with sres.
   // This takes about 17 sec on a Mac PB 520c and 2 sec an a HP 735
-  int time = timer;
   module sD = std(D);
   list Dres = sres(sD,0);                // the full resolution
-  timer-time;                            // time used for std + sres
   intmat B = betti(Dres);
   print(B,"betti");
   N-ncols(B)+1;                          // the desired depth
