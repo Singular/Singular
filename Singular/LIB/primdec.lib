@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.78 2000-06-07 15:55:05 pfister Exp $
+// $Id: primdec.lib,v 1.79 2000-06-10 23:44:35 greuel Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.78 2000-06-07 15:55:05 pfister Exp $";
+version="$Id: primdec.lib,v 1.79 2000-06-10 23:44:35 greuel Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -28,9 +28,9 @@ PROCEDURES:
   prepareAss(I);    list of radicals of the equidimensional components of I
   equidim(I);       weak equidimensional decomposition of I
   equidimMax(I);    equidimensional locus of I
-  equidimMaxEHV(I); equidimensional locus of I (Algorithm of Eisenbud,
-                    Huneke and Vasconcelos)
-  zerodec(I);       zerodimensional decomposition for characteristic zero
+  equidimMaxEHV(I); equidimensional locus of I via Eisenbud,Huneke,Vasconcelos
+  zerodec(I);       zerodimensional decomposition via Monico
+
 REMARK:
 These procedures are implemented to be used in characteristic 0.
 @*They also work in positive characteristic >> 0.
@@ -4695,28 +4695,34 @@ example
    testPrimary(pr,i);
 }
 
+///////////////////////////////////////////////////////////////////////////////
 proc zerodec(ideal I)
 "USAGE:   zerodec(I); I ideal
- RETURN:  a list of primary ideals, the zero-dimensional decomposition of I
- NOTE:    the algorithm of C. Monico, works only good for small vdim(std(I))
-          (<=100) and without parameters 
-          in characteristic p>0 it may be wrong
- EXAMPLE: example zerodec; shows an example
+RETURN:  a list of primary ideals, the zero-dimensional decomposition of I
+ASSUME:  I is zero-dimensional, the characterisitic of the ground field is 0
+NOTE:    the algorithm,due to C. Monico, works well only good for small total
+         number of solutions (i.e. vdim(std(I)) should be < 100) 
+         and without parameters. In practise, it works also in big 
+         characteristic p>0 but may fail for small p.
+         If printlevel > 0 (default = 0) additional information is displayed
+EXAMPLE: example zerodec; shows an example
 "
 {
    def R=basering;
    poly q;
-   int j;
+   int j,time;
    matrix m;
    list re;
    poly va=var(1);
    ideal J=groebner(I);
    ideal ba=kbase(J);
    int d=vdim(J);
+   dbprint(printlevel-voice+2,"// multiplicity of ideal : "+ string(d));
+//------ compute matrix of multiplication on R/I with generic element p -----
    int e=nvars(basering);
-   poly p=randomLast(100)[e]+random(-50,50);
+   poly p=randomLast(100)[e]+random(-50,50);     //the generic element
    matrix n[d][d];
-
+   time = timer;
    for(j=2;j<=e;j++)
    {
       va=va*var(j);
@@ -4727,36 +4733,67 @@ proc zerodec(ideal I)
       m=coeffs(q,ba,va);
       n[j,1..d]=m[1..d,1];
    }
-   execute("ring P=("+charstr(R)+"),T,dp;");
-   map phi=R,T;
-   matrix n=phi(n);
-   matrix E=unitmat(d);
-   poly charpol=det(n-T*E);
+   dbprint(printlevel-voice+2,
+      "// time for computing multiplication matrix (with generic element) : "+ 
+      string(timer-time));
+//---------------- compute characteristic polynomial of matrix --------------
+   execute("ring P1=("+charstr(R)+"),T,dp;");
+   matrix n=imap(R,n);
+   time = timer;
+   poly charpol=det(n-T*freemodule(d));
+   dbprint(printlevel-voice+2,"// time for computing char poly: "+ 
+           string(timer-time));
+//------------------- factorize characteristic polynomial -------------------
+//check first if constant term of charpoly is != 0 (which is true for 
+//sufficiently generic element)
    if(charpol[size(charpol)]!=0)
    {
+     time = timer;
      list fac=factor(charpol);
      testFactor(fac,charpol);
+     dbprint(printlevel-voice+2,"// time for factorizing char poly: "+ 
+             string(timer-time));
      int f=size(fac[1]);
-     setring R;
+//--------------------------- the irreducible case --------------------------
      if(f==1)
      {
+       setring R;
        re=I;
        return(re);
      }
-     map psi=P,p;
-     list rfac=psi(fac);
+//---------------------------- the reducible case ---------------------------
+//if f_i are the irreducible factors of charpoly, mult=ri, then <I,g_i^ri> 
+//are the primary components where g_i = f_i(p). However, substituting p in 
+//f_i may result in a huge object although the final result may be small. 
+//Hence it is better to simultaneously reduce with I. For this we need a new 
+//ring.
+     execute("ring P=("+charstr(R)+"),(T,"+varstr(R)+"),(dp(1),dp);");
+     list rfac=imap(P1,fac);
+     intvec ov=option(get);;
      option(redSB);
+     list re1;
+     ideal new = T-imap(R,p),imap(R,J);
+     attrib(new, "isSB",1);    //we know that new is a standard basis
      for(j=1;j<=f;j++)
      {
-        re[j]=interred(I+ideal(rfac[1][j]^rfac[2][j])); 
+        re1[j]=reduce(rfac[1][j]^rfac[2][j],new); 
      }
-     option(noredSB);
+     setring R;
+     re = imap(P,re1);
+     for(j=1;j<=f;j++)
+     {
+        J=I,re[j];
+        re[j]=interred(J); 
+     }
+     option(set,ov);
      return(re);
   }
   else
+//------------------- choice of generic element failed -------------------
   {
-    setring R;
-    return(zerodec(I));
+     dbprint(printlevel-voice+2,"// try new generic element!");
+     setring R;
+     return(zerodec(I));
   }
 }
 example
@@ -4766,6 +4803,147 @@ example
    list pr=zerodec(i);
    pr;
 }
+////////////////////////////////////////////////////////////////////////////
+/*
+//Beispiele Wenk-Dipl (in ~/Texfiles/Diplom/Wenk/Examples/)
+//Zeiten: Singular/Singular/Singular -r123456789 -v :wilde13 (PentiumPro200)
+//Singular for HPUX-9 version 1-3-8  (2000060214)  Jun  2 2000 15:31:26
+//(wilde13)
+
+//1. vdim=20, 3  Komponenten
+//zerodec-time:2(1)  (matrix:1 charpoly:0 factor:1)
+//primdecGTZ-time: 1(0)
+ring rs= 0,(a,b,c),dp;
+poly f1= a^2*b*c + a*b^2*c + a*b*c^2 + a*b*c + a*b + a*c + b*c;
+poly f2= a^2*b^2*c + a*b^2*c^2 + a^2*b*c + a*b*c + b*c + a + c;
+poly f3= a^2*b^2*c^2 + a^2*b^2*c + a*b^2*c + a*b*c + a*c + c + 1;
+ideal gls=f1,f2,f3;
+int time=timer;
+printlevel =1;
+time=timer; list pr1=zerodec(gls); timer-time;size(pr1);
+time=timer; list pr =primdecGTZ(gls); timer-time;size(pr);
+
+//2.cyclic5  vdim=70, 20 Komponenten
+//zerodec-time:36(28)  (matrix:1(0) charpoly:18(19) factor:17(9)
+//primdecGTZ-time: 28(5)
+ring rs= 0,(a,b,c,d,e),dp;
+poly f0= a + b + c + d + e + 1;
+poly f1= a + b + c + d + e;
+poly f2= a*b + b*c + c*d + a*e + d*e;
+poly f3= a*b*c + b*c*d + a*b*e + a*d*e + c*d*e;
+poly f4= a*b*c*d + a*b*c*e + a*b*d*e + a*c*d*e + b*c*d*e;
+poly f5= a*b*c*d*e - 1;
+ideal gls= f1,f2,f3,f4,f5;
+
+//3. random vdim=40, 1 Komponente
+//zerodec-time:126(304)  (matrix:1 charpoly:115(298) factor:10(5))
+//primdecGTZ-time:17 (11) 
+ring rs=0,(x,y,z),dp;
+poly f1=2*x^2 + 4*x + 3*y^2 + 7*x*z + 9*y*z + 5*z^2;
+poly f2=7*x^3 + 8*x*y + 12*y^2 + 18*x*z + 3*y^4*z + 10*z^3 + 12;
+poly f3=3*x^4 + 1*x*y*z + 6*y^3 + 3*x*z^2 + 2*y*z^2 + 4*z^2 + 5;
+ideal gls=f1,f2,f3;
+
+//4. introduction into resultants, sturmfels, vdim=28, 1 Komponente
+//zerodec-time:4  (matrix:0 charpoly:0 factor:4)
+//primdecGTZ-time:1 
+ring rs=0,(x,y),dp;
+poly f1= x4+y4-1;
+poly f2= x5y2-4x3y3+x2y5-1;
+ideal gls=f1,f2;
+
+//5. 3 quadratic equations with random coeffs, vdim=8, 1 Komponente
+//zerodec-time:0(0)  (matrix:0 charpoly:0 factor:0)
+//primdecGTZ-time:1(0) 
+ring rs=0,(x,y,z),dp;
+poly f1=2*x^2 + 4*x*y + 3*y^2 + 7*x*z + 9*y*z + 5*z^2 + 2;
+poly f2=7*x^2 + 8*x*y + 12*y^2 + 18*x*z + 3*y*z + 10*z^2 + 12;
+poly f3=3*x^2 + 1*x*y + 6*y^2 + 3*x*z + 2*y*z + 4*z^2 + 5;
+ideal gls=f1,f2,f3;
+
+//6. 3 polys    vdim=24, 1 Komponente
+// run("ex14",2);
+//zerodec-time:5(4)  (matrix:0 charpoly:3(3) factor:2(1))
+//primdecGTZ-time:4 (2)
+ring rs=0,(x1,x2,x3,x4),dp;
+poly f1=16*x1^2 + 3*x2^2 + 5*x3^4 - 1 - 4*x4 + x4^3;
+poly f2=5*x1^3 + 3*x2^2 + 4*x3^2*x4 + 2*x1*x4 - 1 + x4 + 4*x1 + x2 + x3 + x4;
+poly f3=-4*x1^2 + x2^2 + x3^2 - 3 + x4^2 + 4*x1 + x2 + x3 + x4;
+poly f4=-4*x1 + x2 + x3 + x4;
+ideal gls=f1,f2,f3,f4;
+
+//7. ex43, PoSSo, caprasse   vdim=56, 16 Komponenten
+//zerodec-time:23(15)  (matrix:0 charpoly:16(13) factor:3(2)) 
+//primdecGTZ-time:3 (2)
+ring rs= 0,(y,z,x,t),dp;
+ideal gls=y^2*z+2*y*x*t-z-2*x,
+4*y^2*z*x-z*x^3+2*y^3*t+4*y*x^2*t-10*y^2+4*z*x+4*x^2-10*y*t+2,
+2*y*z*t+x*t^2-2*z-x,
+-z^3*x+4*y*z^2*t+4*z*x*t^2+2*y*t^3+4*z^2+4*z*x-10*y*t-10*t^2+2;
+
+//8. Arnborg-System, n=6 (II),    vdim=156, 90 Komponenten
+//zerodec-time (char32003):127(45)(matrix:2(0) charpoly:106(37) factor:16(7))
+//primdecGTZ-time(char32003) :81 (18)
+//ring rs= 0,(a,b,c,d,x,f),dp;
+ring rs= 32003,(a,b,c,d,x,f),dp;
+ideal gls=a+b+c+d+x+f, ab+bc+cd+dx+xf+af, abc+bcd+cdx+d*xf+axf+abf, 
+abcd+bcdx+cd*xf+ad*xf+abxf+abcf, abcdx+bcd*xf+acd*xf+abd*xf+abcxf+abcdf, 
+abcd*xf-1;
+
+//9. ex42, PoSSo, Methan6_1, vdim=27, 2 Komponenten
+//zerodec-time:610  (matrix:10 charpoly:557 factor:26)
+//primdecGTZ-time: 118
+//zerodec-time(char32003):2
+//primdecGTZ-time(char32003):4
+//ring rs= 0,(x1,x2,x3,x4,x5,x6,x7,x8,x9,x10),dp;
+ring rs= 32003,(x1,x2,x3,x4,x5,x6,x7,x8,x9,x10),dp;
+ideal gls=64*x2*x7-10*x1*x8+10*x7*x9+11*x7*x10-320000*x1,
+-32*x2*x7-5*x2*x8-5*x2*x10+160000*x1-5000*x2,
+-x3*x8+x6*x8+x9*x10+210*x6+1300000,
+-x4*x8+700000,
+x10^2-2*x5,
+-x6*x8+x7*x9-210*x6,
+-64*x2*x7-10*x7*x9-11*x7*x10+320000*x1-16*x7+7000000,
+-10*x1*x8-10*x2*x8-10*x3*x8-10*x4*x8-10*x6*x8+10*x2*x10+11*x7*x10
+    +20000*x2+14*x5,
+x4*x8-x7*x9-x9*x10-410*x9,
+10*x2*x8+10*x3*x8+10*x6*x8+10*x7*x9-10*x2*x10-11*x7*x10-10*x9*x10
+    -10*x10^2+1400*x6-4200*x10;
+
+//10. ex33, walk-s7, Diplomarbeit von Tim, vdim=114
+//zerfaellt in unterschiedlich viele Komponenten in versch. Charkteristiken:
+//char32003:30, char0:3(2xdeg1,1xdeg112!), char181:4(2xdeg1,1xdeg28,1xdeg84)
+//char 0: zerodec-time:10075 (ca 3h) (matrix:3 charpoly:9367, factor:680
+//        + 24 sec fuer Normalform (anstatt einsetzen), total [29623k])
+//        primdecGTZ-time: 214
+//char 32003:zerodec-time:197(68) (matrix:2(1) charpoly:173(60) factor:15(6))
+//        primdecGTZ-time:14 (5)
+//char 181:zerodec-time:(87) (matrix:(1) charpoly:(58) factor:(25))
+//        primdecGTZ-time:(2)
+//in char181 stimmen Ergebnisse von zerodec und primdecGTZ ueberein (gecheckt)
+
+//ring rs= 0,(a,b,c,d,e,f,g),dp;
+ring rs= 32003,(a,b,c,d,e,f,g),dp;
+poly f1= 2gb + 2fc + 2ed + a2 + a;
+poly f2= 2gc + 2fd + e2 + 2ba + b;
+poly f3= 2gd + 2fe + 2ca + c + b2;
+poly f4= 2ge + f2 + 2da + d + 2cb;
+poly f5= 2fg + 2ea + e + 2db + c2;
+poly f6= g2 + 2fa + f + 2eb + 2dc;
+poly f7= 2ga + g + 2fb + 2ec + d2;
+ideal gls= f1,f2,f3,f4,f5,f6,f7;
+
+~/Singular/Singular/Singular -r123456789 -v
+LIB"./primdec.lib";
+timer=1;
+int time=timer;
+printlevel =1;
+option(prot,mem);
+time=timer; list pr1=zerodec(gls); timer-time;
+
+time=timer; list pr =primdecGTZ(gls); timer-time;
+time=timer; list pr =primdecSY(gls); timer-time;
+*/
 
 
 
