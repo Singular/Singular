@@ -1,0 +1,271 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: lieA.lib,v 1.1 2003-05-21 13:26:43 levandov Exp $";
+category="Plural: Lie Theory";
+info="
+LIBRARY:  lieA.lib      some enveloping algebras
+AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
+@*        Oleksander Motsak
+
+PROCEDURES:
+ sl(n);                 returns U(sl_n)
+ A(n);                  returns U(sl_{n+1})
+ sl2();                 returns U(sl_2) in (e,f,h) presentation
+ g2();                  returns U(g_2) in (x(i),y(i),Ha,Hb) presentation
+ gl3();                 returns U(gl_3) as enveloping algebra of a Lie algebra over e_ij (1<i,j<3)
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc sl2()
+"USAGE:   sl2()
+RETURN:  ring, corresponding to the U(sl_2) in (e,f,h) presentation
+NOTE:    you have to activate this ring with the "setring" command
+SEE ALSO: sl;
+EXAMPLE: example sl2; shows examples
+"{
+   ring rrr=0,(e,f,h),dp;
+   setring rrr;
+   matrix D[3][3]=0;   
+   D[1,2]=-h;
+   D[1,3]=2*e;
+   D[2,3]=-2*f;
+   system("PLURAL",1,D);
+   return(rrr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def a=sl2();
+   setring a;
+   a;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc sl(int n)
+"USAGE:   sl(n); n an integer, n>1
+RETURN:  a ring, describing U(sl_n)
+NOTE:    You have to activate this ring with the "setring" command.
+         The presentation of U(sl_n) is derived from the 
+         standard representation of sl_n, positive
+         resp. negative roots are denoted by x(i) resp. y(i),
+         the Cartan elements are denoted by h(i).
+
+SEE ALSO: sl2;
+EXAMPLE: example sl; shows examples
+"{
+  if (n<2)
+  {
+    Print("Incorrect input");
+    return(0);
+  }
+  if (n==2)
+  {
+    def a=sl2();
+    return(a);
+  }
+  ring rr=0,(x(1..n*(n-1)/2),y(1..n*(n-1)/2),h(1..n-1)),dp;
+  intmat CNT[n][n]=0;
+  matrix TMP[n][n]=0;
+  int k,l=1,1;
+  int buf=0;  
+  list X,Y,H;
+
+  for(k=1;k<=n;k++)
+  {
+    for(l=k+1;l<=n;l++)
+    {
+      buf= (l-k-1)*(2*n-l+k)/2 + k; 
+      CNT[k,l]=buf;
+      TMP[k,l]=1;
+      X[buf]=TMP;
+      TMP=0;
+      CNT[l,k]=buf;
+      TMP[l,k]=1;
+      Y[buf]=TMP;
+      TMP=0;   
+    }
+  }
+
+  for(k=1;k<=n-1;k++)
+  {
+   TMP[k,k]=1;
+   TMP[k+1,k+1]=-1;
+   H[k]=TMP;
+   TMP=0;
+  }  
+  int i,j=1,1;
+  number p,q=0,0;
+  list V=X+Y+H;
+  int v=size(V);
+  matrix D[v][v]=0;  
+  for(k=1;k<=v;k++)
+  {
+    for(l=k+1;l<=v;l++)
+    {
+      TMP=V[l]*V[k]-V[k]*V[l];
+      for(i=1;i<=n;i++)
+      {
+        for(j=i+1;j<=n;j++)
+        {
+          buf=(j-i-1)*(2*n-j+i)/2+i;
+          if (TMP[i,j]!=0)
+          {
+             D[k,l]=D[k,l]+leadcoef(TMP[i,j])*x(buf);
+          }
+          
+          if (TMP[j,i]!=0)
+          {          
+             D[k,l]=D[k,l]+leadcoef(TMP[j,i])*y(buf);
+          }
+        }
+      } 
+      i=1;
+      while ((TMP[i,i]==0)&&(i<n)) {i++;}
+      for(j=i;j<=n-1;j++)
+      {
+        p=leadcoef(TMP[j,j]);
+        q=leadcoef(TMP[j+1,j+1]);
+        D[k,l]=D[k,l]+p*h(j);
+//        if ((j!=n-1)&&((p+q)!=0)) {D[k,l]=D[k,l]+(p+q)*h(j+1);}
+        TMP[j+1,j+1]=TMP[j+1,j+1]+p; 
+      }
+        
+    }
+  }
+  system("PLURAL",1,D);
+  return(rr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def a=sl(3);
+   setring a;
+   a;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc A(int n)
+{
+  if (n<1) 
+  {
+    "Incorrect input";
+    return(0);
+  }
+  def a=sl(n+1);
+  return(a);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc g2()
+"USAGE:   g2()
+RETURN:  ring, corresponding to the U(g_2) in (x(i),y(i),Ha,Hb) presentation
+NOTE:    you have to activate this ring with the "setring" command
+SEE ALSO: sl;
+EXAMPLE: example g2; shows examples
+"{
+ring rrr=0,(x(1..6),y(1..6),Ha,Hb),dp;
+setring rrr;
+matrix D[14][14];
+D[1,2]=-x(3);
+D[1,3]=-2*x(4);
+D[1,4]=3*x(5);
+D[1,7]=-Ha;
+D[1,9]=3*y(2);
+D[1,10]=2*y(3);
+D[1,11]=-y(4);
+D[1,13]=2*x(1);
+D[1,14]=-x(1);
+D[2,5]=x(6);
+D[2,8]=-Hb;
+D[2,9]=-y(1);
+D[2,12]=-y(5);
+D[2,13]=-3*x(2);
+D[2,14]=2*x(2);
+D[3,4]=3*x(6);
+D[3,7]=3*x(2);
+D[3,8]=-x(1);
+D[3,9]=-Ha-3*Hb;
+D[3,10]=-2*y(1);
+D[3,12]=-y(4);
+D[3,13]=-x(3);
+D[3,14]=x(3);
+D[4,7]=2*x(3);
+D[4,9]=-2*x(1);
+D[4,10]=-2*Ha-3*Hb;
+D[4,11]=y(1);
+D[4,12]=y(3);
+D[4,13]=x(4);
+D[5,7]=-x(4);
+D[5,10]=x(1);
+D[5,11]=-Ha-Hb;
+D[5,12]=y(2);
+D[5,13]=3*x(5);
+D[5,14]=-x(5);
+D[6,8]=-x(5);
+D[6,9]=-x(4);
+D[6,10]=x(3);
+D[6,11]=x(2);
+D[6,12]=-Ha-2*Hb;
+D[6,14]=x(6);
+D[7,8]=y(3);
+D[7,9]=2*y(4);
+D[7,10]=-3*y(5);
+D[7,13]=-2*y(1);
+D[7,14]=y(1);
+D[8,11]=-y(6);
+D[8,13]=3*y(2);
+D[8,14]=-2*y(2);
+D[9,10]=-3*y(6);
+D[9,13]=y(3);
+D[9,14]=-y(3);
+D[10,13]=-y(4);
+D[11,13]=-3*y(5);
+D[11,14]=y(5);
+D[12,14]=-y(6);
+system("PLURAL",1,D);
+return(rrr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def a=g2();
+   setring a;
+   a;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc gl3()
+"USAGE:   gl3()
+RETURN:  ring, corresponding to the U(gl_2) as enveloping algebra of a Lie algebra over e_ij (1<i,j<3)
+NOTE:    you have to activate this ring with the "setring" command
+SEE ALSO: sl;
+EXAMPLE: example gl3; shows examples
+"{
+ring rrr=0,(e11, e12, e13, e21, e22, e23, e31, e32, e33),dp;
+setring rrr;
+matrix D[9][9]=0;   
+D[1, 2]=-e12;
+D[1, 3]=-e13;
+D[1, 4]=e21;
+D[1, 7]=e31;
+D[2, 4]=e22-e11;
+D[2, 5]=-e12;
+D[2, 6]=-e13;
+D[2, 7]=e32;
+D[3, 4]=e23;
+D[3, 7]=e33-e11;
+D[3, 8]=-e12;
+D[3, 9]=-e13;
+D[4, 5]=e21;
+D[4, 8]=e31;
+D[5, 6]=-e23;
+D[5, 8]=e32;
+D[6, 7]=-e21;
+D[6, 8]=e33-e22;
+D[6, 9]=-e23;
+D[7, 9]=e31;
+D[8, 9]=e32;
+system("PLURAL",1,D);
+return(rrr);
+}
