@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.321 2004-06-28 14:58:16 Singular Exp $ */
+/* $Id: iparith.cc,v 1.322 2004-07-20 15:27:57 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -42,7 +42,6 @@
 #include "attrib.h"
 #include "silink.h"
 #include "sparsmat.h"
-#include "algmap.h"
 #include "units.h"
 #include "janet.h"
 #include "../kernel/GMPrat.h"
@@ -4665,39 +4664,6 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
   res->data = (char *)m;
   return FALSE;
 }
-static BOOLEAN jjSUBST_Par_N(leftv res, leftv u, leftv v,leftv w)
-{
-  // u: to change poly
-  // v: number (parameter)
-  // w: image of u (number)
-  int i;
-  lnumber a=(lnumber)v->Data();
-  if (naParDeg((number)a)!=1)
-  {
-    WerrorS("first argument is not a parameter");
-    return TRUE;
-  }
-  int r=rPar(currRing);
-  ideal G=idMaxIdeal(1);
-  ideal F=idInit(r,1);
-  int par=-1;
-  for(i=1;i<=r;i++)
-  {
-    if (napGetExp(a->z,i)!=0) { par=i; break;}
-  }
-  for(i=0;i<r;i++)
-  {
-    if (i==par) F->m[i]=(poly)w->CopyD();
-    else
-    {
-      F->m[i]=pOne();pSetCoeff( F->m[i],naPar(i+1));
-    }
-  }
-  res->data=(poly)maAlgpolyMap(currRing,(poly)u->Data(),F,G);
-  idDelete(&F);
-  idDelete(&G);
-  return FALSE;
-}
 static BOOLEAN jjMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
 {
   res->data = (char *)idModule2formatedMatrix((ideal)u->CopyD(MODUL_CMD),
@@ -4927,7 +4893,6 @@ struct sValCmd3 dArith3[]=
 ,{jjSTATUS3,        STATUS_CMD, INT_CMD,    LINK_CMD,   STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjSTD_HILB_W,     STD_CMD,    IDEAL_CMD,  IDEAL_CMD,  INTVEC_CMD, INTVEC_CMD NO_PLURAL}
 ,{jjSTD_HILB_W,     STD_CMD,    MODUL_CMD,  MODUL_CMD,  INTVEC_CMD, INTVEC_CMD NO_PLURAL}
-,{jjSUBST_Par_N,    SUBST_CMD,  POLY_CMD,   POLY_CMD,   NUMBER_CMD, POLY_CMD  ALLOW_PLURAL}
 ,{jjSUBST_P,        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD  ALLOW_PLURAL}
 ,{jjSUBST_P,        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD  ALLOW_PLURAL}
 ,{jjSUBST_P,        SUBST_CMD,  VECTOR_CMD, VECTOR_CMD, POLY_CMD,   POLY_CMD  ALLOW_PLURAL}
