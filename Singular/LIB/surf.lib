@@ -1,9 +1,9 @@
-// $Id: surf.lib,v 1.10 2000-07-11 13:13:57 obachman Exp $
+// $Id: surf.lib,v 1.11 2000-07-11 13:19:05 obachman Exp $
 //
 // author : Hans Schoenemann
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.10 2000-07-11 13:13:57 obachman Exp $";
+version="$Id: surf.lib,v 1.11 2000-07-11 13:19:05 obachman Exp $";
 info="
 LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF
 
@@ -101,8 +101,13 @@ EXAMPLE: example plot; shows an example
       return();
     }
   }
+  string surf_call = "surf ";
+  if (defined(extra_surf_opts))
+  {
+    surf_call = surf_call + extra_surf_opts + " ";
+  }
 //  "calling surf (by Stephan Endrass) for drawing";
-  i=system("sh","surf "+l+" >/dev/null 2>&1");
+  i=system("sh",surf_call + l +" >/dev/null 2>&1");
   if (i!=0)
   {
     "calling `surf` failed. (the shell return the error code",i,").";
