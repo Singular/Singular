@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.94 1999-11-23 15:25:37 Singular Exp $ */
+/* $Id: ring.cc,v 1.95 1999-11-25 11:55:15 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3563,3 +3563,11 @@ BOOLEAN rRing_is_Homog(ring r)
   }
   return TRUE;
 }
+
+BOOLEAN rRing_has_CompLastBlock(ring r)
+{
+  assume(r != NULL);
+  int lb = rBlocks(r) - 2;
+  return (r->order[lb] == ringorder_c || r->order[lb] == ringorder_C);
+}
+

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.44 1999-11-19 16:42:42 obachman Exp $ */
+/* $Id: ring.h,v 1.45 1999-11-25 11:55:16 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -69,6 +69,7 @@ void   rUnComplete(ring r);
 #endif
 
 BOOLEAN rRing_is_Homog(ring r=currRing);
+BOOLEAN rRing_has_CompLastBlock(ring r=currRing);
 
 inline BOOLEAN rField_is_Zp(ring r=currRing)
 { return (r->ch > 1) && (r->parameter==NULL); }
