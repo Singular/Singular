@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.9 2000-03-30 06:35:45 krueger Exp $ */
+/* $Id: misc.cc,v 1.10 2000-05-01 19:17:32 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -186,9 +186,11 @@ struct valid_cmds_def
   int args;
 } valid_cmds[] = {
   { "declaration",  write_function_declaration, CMD_DECL,   CMDT_SINGLE, 0 },
+  { "error",        write_function_error,       CMD_ERROR,  CMDT_ANY,    0 },
+  { "nodeclaration",write_function_nodecl,      CMD_NODECL, CMDT_SINGLE, 0 },
   { "typecheck",    write_function_typecheck,   CMD_CHECK,  CMDT_SINGLE, 0 },
-  { "return",       write_function_result,      CMD_RETURN, CMDT_EQ,     0 },
-  { "return",       write_function_return,      CMD_RETURN, CMDT_SINGLE, 1 },
+//{ "return",       write_function_result,      CMD_RETURN, CMDT_EQ,     0 },
+//{ "return",       write_function_return,      CMD_RETURN, CMDT_SINGLE, 1 },
   { "return",       write_function_return,      CMD_RETURN, CMDT_0,     1 },
   { "return",       write_function_return,      CMD_RETURN, CMDT_ANY,   1 },
   { "singularcmd",  write_function_singularcmd, CMD_SINGULAR, CMDT_ANY, 1 },
@@ -224,13 +226,10 @@ struct valid_vars_def {
   void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
                     idtyp t, void *arg1 = NULL, void *arg2 = NULL);
 } valid_vars[] = {
-  { "module",       VAR_STRING,  VAR_MODULE,  0 },
-  { "version",      VAR_STRING,  VAR_VERSION, write_main_variable },
-  { "info",         VAR_STRING,  VAR_INFO,    write_main_variable },
   { "help",         VAR_STRING,  VAR_HELP,    write_main_variable },
-#if 0
-  { "do_typecheck", VAR_BOOL,    VAR_TYPECHECK },
-#endif
+  { "info",         VAR_STRING,  VAR_INFO,    write_main_variable },
+  { "package",      VAR_STRING,  VAR_MODULE,  0 },
+  { "version",      VAR_STRING,  VAR_VERSION, write_main_variable },
   { NULL,           VAR_UNKNOWN, VAR_NONE, 0 }
 };
 
@@ -279,7 +278,8 @@ void PrintProc(
   }
   printf(")\n");
   if(pi->return_val.typ!=0)
-    printf("\treturn = %s (%s)\n", pi->return_val.name, pi->return_val.typname);
+    printf("\treturn = %s (%s)\n", pi->return_val.name,
+           pi->return_val.typname);
   printf("{%s}\n", pi->c_code);
 }
 
@@ -442,8 +442,10 @@ void  write_procedure_text(
           break;
             
         default:
-          fprintf(module->fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
-          fprintf(module->fmtfp, "  res->data = (void *)%s();\n", pi->funcname);
+          fprintf(module->fmtfp, "  res->rtyp = %s;\n", 
+                  pi->return_val.typname);
+          fprintf(module->fmtfp, "  res->data = (void *)%s();\n", 
+                  pi->funcname);
           fprintf(module->fmtfp, "  return FALSE;");
     }
   }
@@ -520,7 +522,7 @@ void enter_id(
 void init_type_conv() 
 {
   strcpy(type_conv[NONE], "none");
-  strcpy(type_conv[NONE], "void");
+//  strcpy(type_conv[NONE], "void");
   strcpy(type_conv[INT_CMD], "int");
   strcpy(type_conv[RING_CMD], "ring");
   strcpy(type_conv[QRING_CMD], "ring");

@@ -1,5 +1,5 @@
 /*
- * $Id: proc_setup.cc,v 1.5 2000-03-30 06:35:45 krueger Exp $
+ * $Id: proc_setup.cc,v 1.6 2000-05-01 19:14:49 krueger Exp $
  */
 
 #include <stdio.h>
@@ -62,10 +62,13 @@ int init_proc(
   
   p->language = language;
   p->lineno = lineno;
-  p->flags.do_typecheck = default_do_typecheck;
-  p->flags.do_return = default_do_return;
+  p->flags.auto_header = 1;
+  
+  p->flags.do_declaration = 1;
   p->flags.declaration_done = 0;
+  p->flags.do_typecheck = default_do_typecheck;
   p->flags.typecheck_done = 0;
+  p->flags.do_return = default_do_return;
   
   return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.12 2000-04-17 07:21:24 krueger Exp $
+ * $Id: grammar.y,v 1.13 2000-05-01 19:14:48 krueger Exp $
  */
 
 %{
@@ -22,6 +22,7 @@ int iseof = 0;
 extern moddef module_def;
 extern int yylineno;
 extern int do_create_makefile;
+extern char *sectname[];
  
 extern int init_modgen(moddef *module_def, char *filename);
 extern int write_intro(moddefv module);
@@ -56,8 +57,16 @@ void yyerror(char * fmt)
 %token <i> MPROC_CMD
 
 %token SECTEND
+/* SECT2: Singular procedure declaration */
+%token SECT2START
 %token SECT2END
+/* SECT3: procedure declaration */
+%token SECT3START
 %token SECT3END
+/* SECT4: C/C++ text */
+%token SECT4START
+%token SECT4END
+
 /*%token PROCEND*/
 %token PROCDECLTOK
 %token EXAMPLETOK
@@ -73,6 +82,7 @@ void yyerror(char * fmt)
 %token <name> MCCODETOK
 %token <name> MCODETOK
 %token <name> CODEPART
+%token <name> CMTPART
 %token <name> PROCCMD
 %token <name> ANYTOK
 %token  <tp> VARTYPETOK
@@ -84,11 +94,26 @@ void yyerror(char * fmt)
 
 %nonassoc '='
 %%
-goal: part1 sect2 sect2end code
-        {
-          if(trace)printf("Finish modules\n");
+goal: part1 sect3 sect3end sect4
+      {
+          if(trace)printf("Finish modules 1\n");
           return 0;
-        }
+      }
+      | part1 sect3full sect4
+      {
+          if(trace)printf("Finish modules 2\n");
+          return 0;
+      }
+      | part1 sect2full sect3full sect4
+      {
+          if(trace)printf("Finish modules 3\n");
+          return 0;
+      }
+      | part1 sect3full sect2full sect4
+      {
+          if(trace)printf("Finish modules 4\n");
+          return 0;
+      }
 ;
 
 part1: initmod sect1 sect1end
@@ -133,7 +158,7 @@ sect1: expr ';'
 sect1end: SECTEND
         {
           memset(&procedure_decl, 0, sizeof(procdef));
-          if(debug>2)printf("End of section %d\n", sectnum-1);
+          if(debug>2)printf("End of section 1 (new=%d)\n", sectnum);
         }
         ;
 
@@ -157,7 +182,7 @@ expr:   NAME '=' MSTRINGTOK
                             yylineno, $1, sectnum);
                 }
                 break;
-              case 2: /* pass 2: procedure declaration */
+              case 3: /* pass 3: procedure declaration */
                 if( (vt=checkvar($1, VAR_STRING, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_STRING, vt, $1, $3.string);
                 }
@@ -181,7 +206,7 @@ expr:   NAME '=' MSTRINGTOK
               case 1: /* pass 1: */
                 Add2files(&module_def, $3);
                 break;
-              case 2: /* pass 2: procedure declaration */
+              case 3: /* pass 3: procedure declaration */
                 if( (vt=checkvar($1, VAR_FILE, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_FILE, vt, $1, $3);
                 }
@@ -199,7 +224,7 @@ expr:   NAME '=' MSTRINGTOK
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
-              case 2: /* pass 2: procedure declaration */
+              case 3: /* pass 3: procedure declaration */
                 if( (vt=checkvar($1, VAR_FILES, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_FILES, vt, $1, &$3);
                 }
@@ -217,7 +242,7 @@ expr:   NAME '=' MSTRINGTOK
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
-              case 2: /* pass 2: procedure declaration */
+              case 3: /* pass 3: procedure declaration */
                 if( (vt=checkvar($1, VAR_NUM, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_NUM, vt, $1, &$3);
                 }
@@ -243,7 +268,7 @@ expr:   NAME '=' MSTRINGTOK
                             yylineno, $1, sectnum);
                 }
                 break;
-              case 2: /* pass 2: procedure declaration */
+              case 3: /* pass 3: procedure declaration */
                 if( (vt=checkvar($1, VAR_BOOL, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_BOOL, vt, $1, &$3);
                 }
@@ -270,19 +295,89 @@ files:  FILENAME ',' FILENAME
         }
 ;
 
-sect2:  procdef 
-        | sect2 procdef
-        ;
+sect2full: SECT2START sect2 sect2end;
+
+sect2: procdefsg
+       | sect2 procdefsg
+       ;
 
 sect2end: SECT2END
+{
+          if(debug>2)printf("End of section 'Singular' 2 (%d)\n",
+                            sectnum);
+};
+
+
+sect3full: SECT3START sect3 sect3end;
+
+sect3:  procdef 
+        | sect3 procdef
+        ;
+
+sect3end: SECT3END
         {
           write_finish_functions(&module_def, &procedure_decl);
-          if(debug>2)printf("End of section %d\n", sectnum-1);
+          if(debug>2)printf("End of section 'procedures' 3 (%d)\n",
+                            sectnum);
         }
         ;
 
 /*
  */
+procdefsg: procdeclsg proccode
+        {
+          if(debug>2)printf("SG-PROCDEF:\n");
+        }
+        | procdecl proccode procdeclexample
+        {
+          if(debug>2)printf("SG-PROCDEF mit example:\n");
+          fflush(module_def.fmtfp);
+        }
+;
+
+procdeclsg: procdeclsg2 '{'
+        {
+          setup_proc(&module_def, &procedure_decl);
+        }
+        | procdeclsg2 procdeclhelp '{'
+        {
+          setup_proc(&module_def, &procedure_decl);
+        }
+        ;
+
+procdeclsg2: procdecl1 '(' sgtypelist ')'
+         {
+           write_singular_parameter(&module_def, yylineno, "list", "#");
+           procedure_decl.lineno_other = yylineno;
+         }
+        | procdecl1
+         {
+           write_singular_parameter(&module_def, yylineno, "list", "#");
+           procedure_decl.lineno_other = yylineno;
+         }
+        | procdecl1 '(' ')'
+         {
+           write_singular_parameter(&module_def, yylineno, "list", "#");
+           procedure_decl.lineno_other = yylineno;
+         }
+        ;
+
+procdecl1: PROCDECLTOK NAME
+        {
+          init_proc(&procedure_decl, $2, NULL, yylineno, LANG_SINGULAR);
+          free($2); 
+          if(write_singular_procedures(&module_def, &procedure_decl))
+            return(myyyerror("Error while creating bin-file\n"));
+        }
+        | STATICTOK PROCDECLTOK NAME
+        {
+          init_proc(&procedure_decl, $3, NULL, yylineno, LANG_SINGULAR);
+          procedure_decl.is_static = TRUE;
+          free($3);
+          if(write_singular_procedures(&module_def, &procedure_decl))
+            return(myyyerror("Error while creating bin-file\n"));
+        };
+
 procdef: procdecl proccode
         {
           if(debug>2)printf("PROCDEF:\n");
@@ -304,56 +399,15 @@ procdecl: procdecl2 '{'
         }
         ;
 
-procdecl1: PROCDECLTOK NAME
-        {
-          init_proc(&procedure_decl, $2, NULL, yylineno, LANG_SINGULAR);
-          free($2); 
-          if(write_singular_procedures(&module_def, &procedure_decl))
-            return(myyyerror("Error while creating bin-file\n"));
-        }
-        | STATICTOK PROCDECLTOK NAME
-        {
-          init_proc(&procedure_decl, $3, NULL, yylineno, LANG_SINGULAR);
-          procedure_decl.is_static = TRUE;
-          free($3);
-          if(write_singular_procedures(&module_def, &procedure_decl))
-            return(myyyerror("Error while creating bin-file\n"));
-        };
-
-procdecl2: procdecl1 '(' sgtypelist ')'
-        | funcdecl1
+procdecl2: funcdecl1
         | funcdecl1 '(' ')'
-        | funcdecl1 '(' typelist ')'
-        | procdecl1
-         {
-           write_singular_parameter(&module_def, yylineno, "list", "#");
-           procedure_decl.lineno_other = yylineno;
-         }
-        | procdecl1 '(' ')'
-         {
-           write_singular_parameter(&module_def, yylineno, "list", "#");
-           procedure_decl.lineno_other = yylineno;
-         }
-        ;
+        | funcdecl1 '(' typelist ')';
 
-funcdecl1: NAME
-        {
-          if(debug>2)printf("funcdecl1-1\n");
-          init_proc(&procedure_decl, $1, NULL, yylineno);
-          free($1);
-        }
-        | VARTYPETOK NAME
+funcdecl1: VARTYPETOK NAME
         {
           if(debug>2)printf("funcdecl1-2\n");
           init_proc(&procedure_decl, $2, &$1, yylineno);
           free($2);
-        }
-        | STATICTOK NAME
-        {
-          if(debug>2)printf("funcdecl1-3\n");
-          init_proc(&procedure_decl, $2, NULL, yylineno);
-          free($2);
-          procedure_decl.is_static = TRUE;
         }
         | STATICTOK VARTYPETOK NAME
         {
@@ -381,10 +435,17 @@ proccode: proccodeline MCODETOK
 
 proccodeline: CODEPART
         {
+          printf(">>>>(%d) %s<<<<\n", procedure_decl.flags.start_of_code, $1);
           write_codeline(&module_def, &procedure_decl, $1, yylineno-1);
         }
         | proccodeline CODEPART
         {
+          printf(">>>>(%d) %s<<<<\n", procedure_decl.flags.start_of_code, $2);
+          write_codeline(&module_def, &procedure_decl, $2);
+        }
+        | proccodeline CMTPART
+        {
+          printf(">>>>(%d) %s<<<<\n", procedure_decl.flags.start_of_code, $2);
           write_codeline(&module_def, &procedure_decl, $2);
         }
         | proccodeline proccmd
@@ -444,7 +505,16 @@ proccmd: '%' NAME ';'
                 return(myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
                           yylineno, $2, sectnum));
                 break;
+
+              case CMD_DECL:
+              case CMD_CHECK:
+                procedure_decl.flags.auto_header = 0;
+              case CMD_NODECL:
+                write_cmd(&module_def, &procedure_decl);
+                break;
+
               default:
+                write_function_header(&module_def, &procedure_decl);
                 write_cmd(&module_def, &procedure_decl);
           }
           free($2);
@@ -464,8 +534,10 @@ proccmd: '%' NAME ';'
                           yylineno, $2, sectnum));
                 break;
               default:
-                write_cmd(&module_def, &procedure_decl,
-                          procedure_decl.procname);
+                write_function_header(&module_def, &procedure_decl);
+              case CMD_DECL:
+              case CMD_CHECK:
+                write_cmd(&module_def, &procedure_decl);
           }
           free($2);
         }
@@ -484,6 +556,9 @@ proccmd: '%' NAME ';'
                           yylineno, $2, sectnum));
                 break;
               default:
+                write_function_header(&module_def, &procedure_decl);
+              case CMD_DECL:
+              case CMD_CHECK:
                 write_cmd(&module_def, &procedure_decl, $4);
           }
           free($2); free($4);
@@ -503,6 +578,9 @@ proccmd: '%' NAME ';'
                           yylineno, $2, sectnum));
                 break;
               default:
+                write_function_header(&module_def, &procedure_decl);
+              case CMD_DECL:
+              case CMD_CHECK:
                 write_cmd(&module_def, &procedure_decl, $4);
           }
           free($2);
@@ -522,6 +600,9 @@ proccmd: '%' NAME ';'
                           yylineno, $2, sectnum));
                 break;
               default:
+                write_function_header(&module_def, &procedure_decl);
+              case CMD_DECL:
+              case CMD_CHECK:
                 write_cmd(&module_def, &procedure_decl, $4);
           }
           free($2);
@@ -606,11 +687,10 @@ typelist: VARTYPETOK
         }
         ;
 
-code:  codeline SECT3END
+sect4:  SECT4START codeline SECT4END
         {
-          fprintf(module_def.modfp, "%s", $1);
-        }
-;
+          fprintf(module_def.modfp, "'%s'", $2);
+        };
 
 codeline: CODEPART
         {

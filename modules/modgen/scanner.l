@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.11 2000-04-17 07:21:24 krueger Exp $ */
+/* $Id: scanner.l,v 1.12 2000-05-01 19:14:49 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #include "stype.h"
 #include "grammar.h"
 
-/* #define DEBUG 3 */
+#define DEBUG 3
  
 #  define YYLP_ERR_NONE    0
 #  define YYLP_DEF_BR2     1
@@ -39,8 +39,14 @@
   char *yylp_buffer_start;
 
   extern int sectnum;
+  static int oldsectnum = 1;
   extern moddef module_def;
+  extern procdef procedure_decl;
 
+  char *sectname[] = { "sect -0", "section 1",
+                       "Singular", "procedures", "C-part" 
+  };
+  
   struct _states {
     char name[32];
     int state;
@@ -55,6 +61,7 @@
   void push_state(int state, int new_state, char *name);
   void switch_state(int state, int new_state, char *name);
   void pop_state();
+  int return_sect_token(int passed, int old_sect, int new_sect);
   extern int init_modgen(moddef *module_def, char *filename);
  
 static char * dupyytext()
@@ -122,9 +129,11 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 %x CODEBLOCK2
 %x module
 %x COMMENT
+%x COMMENTB
 %x STRING
 %x SECT2
 %x SECT3
+%x SECT4
 %x PROCDECL
 %x EXAMPLE
 %x ANYLINE
@@ -141,10 +150,74 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
        static int brace3 = 0;  /* [ ] */
        static int quote  = 0;  /* " */
 
-<COMMENT,STRING,INITIAL><<EOF>>   {
+<COMMENT,COMMENTB,STRING,INITIAL><<EOF>>   {
           printf( "EOF encountered inside an action\n");
 	  printf("ERRRRROOOOORRR\n");
                  }
+
+<INITIAL,SECT2,SECT3,SECT4>{
+        ^"%Singular".* {
+                  int passed = (oldsectnum == sectnum) ? 0 : 1;
+                  int old_sect = sectnum;
+
+                  oldsectnum = sectnum;
+                  sectnum = 2;
+                  if(!passed) yyless(0);
+                  else push_state(YYSTATE, SECT2, "SECT2");
+                  return(return_sect_token(passed, old_sect, sectnum));
+                }
+        "%Singular".* {
+                  int passed = (oldsectnum == sectnum) ? 0 : 1;
+                  int old_sect = sectnum;
+
+                  oldsectnum = sectnum;
+                  sectnum = 2;
+                  if(!passed) yyless(0);
+                  else push_state(YYSTATE, SECT2, "SECT2");
+                  return(return_sect_token(passed, old_sect, sectnum));
+                }
+        ^"%procedures".* { 
+                  int passed = (oldsectnum == sectnum) ? 0 : 1;
+                  int old_sect = sectnum;
+
+                  oldsectnum = sectnum;
+                  sectnum = 3;
+                  if(!passed) yyless(0);
+                  else push_state(YYSTATE, SECT3, "SECT3");
+                  return(return_sect_token(passed, old_sect, sectnum));
+                }
+        "%procedures".* { 
+                  int passed = (oldsectnum == sectnum) ? 0 : 1;
+                  int old_sect = sectnum;
+
+                  oldsectnum = sectnum;
+                  sectnum = 3;
+                  if(!passed) yyless(0);
+                  else push_state(YYSTATE, SECT3, "SECT3");
+                  return(return_sect_token(passed, old_sect, sectnum));
+                }
+        ^"%C".* { 
+                  int passed = (oldsectnum == sectnum) ? 0 : 1;
+                  int old_sect = sectnum;
+
+                  oldsectnum = sectnum;
+                  sectnum = 4;
+                  if(!passed) yyless(0);
+                  else push_state(YYSTATE, SECT4, "SECT4");
+                  return(return_sect_token(passed, old_sect, sectnum));
+                }
+        "%C".* { 
+                  int passed = (oldsectnum == sectnum) ? 0 : 1;
+                  int old_sect = sectnum;
+
+                  oldsectnum = sectnum;
+                  sectnum = 4;
+                  if(!passed) yyless(0);
+                  else push_state(YYSTATE, SECT4, "SECT4-2");
+                  return(return_sect_token(passed, old_sect, sectnum));
+                }
+              }
+
 
 <INITIAL>{
         ^{WS}      push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
@@ -173,15 +246,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                   lvalp->sv.lineno = yylineno;
                   push_state(YYSTATE, STRING, "string");
                 }
-        ^"%%".* { 
-		  sectnum = 2;
-#if DEBUG
-                  printf("Goto section %d\n", sectnum);
-#endif
-                  push_state(YYSTATE, SECT2, "SECT2");
-                  /*line_directive_out( (FILE *) 0, 1 );*/
-                  return SECTEND;
-                }
+
 	^{NAME} {
 	          lvalp->name = strdup(yytext);
                   return NAME;
@@ -191,6 +256,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                   return FILENAME;
                 }
 	   }
+
 <CODEBLOCK>{
             ^"%}".*{NL} {
                    char * s, *t;
@@ -243,16 +309,6 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 	  }
 
 <SECT2>{
-        ^"%%".* {
-	          sectnum = 3;
-#if DEBUG
-                  printf("Goto section %d\n", sectnum);
-#endif
-                  switch_state(YYSTATE, SECT3, "SECT3");
-		  /*yyterminate();*/
-                  /*line_directive_out( (FILE *) 0, 1 );*/
-                  return SECT2END;
-                }
         {NL}    { yylineno++; }
         {WS}    /* ignore */
         ;       /* ignore */
@@ -265,6 +321,26 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 	          push_state(YYSTATE, PROCDECL, "PROCDECL");
 		  return PROCDECLTOK;
                 }
+        example {
+#if DEBUG > 1
+	          printf(">>>EXAMPLE\n");
+#endif
+                  brace1 = 0; /* { */
+                  brace2 = 0; /* ( */
+                  brace3 = 0; /* [ */
+	            push_state(YYSTATE, EXAMPLE, "EXAMPLE");
+		        return EXAMPLETOK;
+                }
+ 	    static  { return STATICTOK; }
+        .       { printf("SG(%d) <<<'%s' ", yylineno, yytext); }
+       }
+
+<SECT3>{
+        {NL}    { yylineno++; }
+        {WS}    /* ignore */
+        ;       /* ignore */
+        "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
+        "//".*{NL}  ++yylineno; ACTION_ECHO; 
         example {
 #if DEBUG > 1
 	          printf(">>>EXAMPLE\n");
@@ -299,7 +375,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		     return NAME;
 		   }
                  }
-        .       { printf("<<<'%s' ", yytext); }
+        .       { printf("PR(%d) <<<'%s' ", yylineno, yytext); }
        }
 
 <EXAMPLE>{
@@ -312,13 +388,13 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         .       { printf("ERROR <<<'%s' ", yytext); }
 }
 
-<SECT3>{
+<SECT4>{
         {NL}    { yylineno++; }
         .*(\n?) { lvalp->name = yytext; return CODEPART; }
 
         <<EOF>>  { sectnum = 0;
 	           iseof=1;
-	           return SECT3END;
+	           return SECT4END;
                    /*yyterminate();*/
                  }
        }
@@ -373,6 +449,18 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
        }
 
+<COMMENTB>{
+        "*/"          { ACTION_ECHO;
+                        pop_state();
+                        lvalp->name = yytext;
+                        return CMTPART;
+                	yymore();
+                      }
+        "*"           yymore();
+        {NL}          { yylineno++; yymore(); }
+        .             { yymore(); }
+	  }
+
 <CODEBLOCK2>{
          "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
          "//".*{NL} { yylineno++; lvalp->name = yytext; return CODEPART; }
@@ -405,8 +493,11 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		   }
                  }
          {NL}    { yylineno++; lvalp->name = yytext; return CODEPART; }
-	 "%" { push_state(YYSTATE, PROCCMDBLOCK, "PROCCMDBLOCK"); return '%'; }
-         .       { yymore(); }
+	 "%" { push_state(YYSTATE, PROCCMDBLOCK, "PROCCMDBLOCK");
+               procedure_decl.flags.start_of_code = 1;
+               return '%'; }
+         " " { yymore(); }
+         .   { yymore(); procedure_decl.flags.start_of_code = 1; }
 
        }
 
@@ -504,6 +595,35 @@ void pop_state()
   if(state_level<0) state_level = -1;
 }
 
+int return_sect_token(
+  int passed,
+  int old_sect,
+  int new_sect
+  )
+{
+  if(passed) {
+#if DEBUG
+    printf("Go to section '%s' (%d)\n", sectname[new_sect], new_sect);
+#endif
+    switch(new_sect) {
+        case 2: return SECT2START;
+        case 3: return SECT3START;
+        case 4: return SECT4START;
+        default: return SECTEND;
+    }
+  } else {
+#if DEBUG
+    printf("End of section '%s' (%d)\n", sectname[old_sect], old_sect);
+#endif
+    switch(old_sect) {
+        case 2: return SECT2END;
+        case 3: return SECT3END;
+        case 4: return SECT4END;
+        default: return SECTEND;
+    }
+  }
+}
+
 void add_action(char *new_text)
 {
   return;
@@ -516,6 +636,9 @@ void add_action(char *new_text)
       break;
     case 3:
       printf("3>%s<#\n", new_text);
+      break;
+    case 4:
+      printf("4>%s<#\n", new_text);
       break;
   }
 }
