@@ -1,0 +1,77 @@
+\input texinfo    @c -*-texinfo-*-
+@comment this file contains the main structure of the manual
+
+
+@c ------------------------
+@c %**start of header
+@c ------------------------
+@setfilename plural.hlp
+@settitle Plural Manual
+@c @setchapternewpage odd
+@paragraphindent 0
+@c ------------------------
+@c %**end of header
+@c ------------------------
+
+@c --------------------- general settings --------------------
+@iftex
+@afourpaper
+@finalout
+@pagesizes 23cm, 16.5cm
+@end iftex
+
+@clear singularmanual
+@set withplural 1
+@c @set namespaces 1
+@include version.texi
+@include uname.texi
+@c --------------------- end general setting --------------------
+
+
+@c --------------------- invisible Info header ------------------------
+@ifinfo
+This is the texinfo file describing Singular:Plural (version @value{VERSION})
+@end ifinfo
+@c --------------------- end Info invisible header --------------------
+
+@c --------------------- tex titlepage --------------------
+@titlepage
+@sp 2
+@center @titlefont{Singular:Plural}
+@sp 2
+@center A Computer Algebra System for Noncommutative Polynomial Algebras
+@sp 5
+@center @titlefont{Manual}
+@center Version @value{VERSION}
+@sp 2
+@center Singular:Plural is created and its development is directed and coordinated by
+@center G.-M. Greuel, Y. A. Drozd, V. Levandovskyy and H. Sch@"onemann
+@sp 2
+@center with contributions by
+@center L. Bodnarchuk and O. Khomenko
+@sp 2
+@author Fachbereich Mathematik
+@author Zentrum f@"ur Computeralgebra
+@author Universit@"at Kaiserslautern
+@author D-67653 Kaiserslautern
+@end titlepage
+
+@c print short table of contents in tex right after titlepage
+@c Detailed ToC is printed at the end of the manual
+@shortcontents
+
+
+@ifnothtml
+@ifinfo
+@center @strong{SINGULAR:PLURAL}
+@center A Computer Algebra System for Noncommutative Polynomial Algebras
+@center User Manual for @sc{Singular:Plural} Version @value{VERSION}
+@center @uref{http://www.singular.uni-kl.de}
+@end ifinfo
+@end ifnothtml
+
+@include plural.tex
+
+@c generate table of content and short table of content
+@contents
+@bye
