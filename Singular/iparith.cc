@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.138 1999-03-16 15:33:09 Singular Exp $ */
+/* $Id: iparith.cc,v 1.139 1999-03-17 14:26:28 pohl Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2547,16 +2547,16 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
     else
     {
       // now po!=NULL, p!=NULL
-      int d=(pFDeg(po)+(*w)[pGetComp(po)-1] - pFDeg(p)-(*w)[i-1]);
+      int d=(pFDeg(po)-(*w)[pGetComp(po)-1] - pFDeg(p)+(*w)[i-1]);
       if (d==0)
-        d=pComp0(p,po);
+        d=pComp0(po,p);
       if (d > 0)
       {
-        pDelete(&po); po=p;
+        pDelete(&p);
       }
       else // (d < 0)
       {
-        pDelete(&p);
+        pDelete(&po); po=p;
       }
     }
   }
