@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.122 2003-06-14 16:55:15 levandov Exp $ */
+/* $Id: kutil.cc,v 1.123 2003-07-23 12:09:21 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -265,9 +265,9 @@ void cancelunit (LObject* L)
       {
         p_Delete(&pNext(p), r);
         number eins=nInit(1);
-	if (L->p != NULL)  pSetCoeff(L->p,eins);
-	else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
-	if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
+        if (L->p != NULL)  pSetCoeff(L->p,eins);
+        else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
+        if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
         L->ecart = 0;
         L->length = 1;
         if (L->pLength > 0) L->pLength = 1;
@@ -4090,6 +4090,32 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
       if ((r->m[l]!=NULL) && (pGetComp(r->m[l])==0))
       {
         pDelete(&r->m[l]); // and set it to NULL
+      }
+    }
+    int q;
+    poly p;
+    for (l=IDELEMS(r)-1;l>=0;l--)
+    {
+      if (r->m[l]!=NULL)
+      {
+        for(q=IDELEMS(Q)-1; q>=0;q--)
+        {
+          if ((Q->m[q]!=NULL)
+          &&(pLmDivisibleBy(Q->m[q],r->m[l])))
+          {
+            if (TEST_OPT_REDSB)
+            {
+              p=r->m[l];
+              r->m[l]=kNF(Q,NULL,p);
+              pDelete(&p);
+            }
+            else
+            {
+              pDelete(&r->m[l]); // and set it to NULL
+            }
+            break;
+          }
+        }
       }
     }
   }
