@@ -1,8 +1,12 @@
+Fri Mar 13 16:16:27 MET 1998 hannes
+  * fixed: Singular crashed while changing the minpoly in GF(q)
+    (ipassign.cc)
+
 Fri Mar  6 13:27:45 MET 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
 	* new: libparse.l,libparse.cc,utils.cc,ytils.h
 	  scanner for a quick check of singular-libraries.
 	* Makefile.in,mod2.h.in,iplib.cc,structs.h,subexpr.h
-	  use a scanner when loading libraries. 
+	  use a scanner when loading libraries.
 	* grammar.y,ipassign.cc,subexpr.h
 	  procinfo: added position of end of proc-definition
 	            added flag for 'static'-proc (proc that can only be used
