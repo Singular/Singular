@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.64 1999-10-19 12:42:42 obachman Exp $ */
+/* $Id: ideals.cc,v 1.65 1999-10-20 07:31:58 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2859,9 +2859,12 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   {
     if (diff[i]<diffmin) diffmin=diff[i];
   }
-  for (i=1;i<cmax;i++)
+  if (w!=NULL)
   {
-    (**w)[i-1]=diff[i]-diffmin;
+    for (i=1;i<cmax;i++)
+    {
+      (**w)[i-1]=diff[i]-diffmin;
+    }
   }
   Free((ADDRESS) diff,cmax*sizeof(int));
   return TRUE;
