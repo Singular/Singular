@@ -1,4 +1,4 @@
-// $Id: standard.lib,v 1.4 1997-09-12 07:40:37 Singular Exp $
+// $Id: standard.lib,v 1.5 1997-10-17 07:39:27 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY: standard.lib	PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
@@ -17,14 +17,14 @@ EXAMPLE: example stdfglm; shows an example
 {
    string os;
    def dr= basering;
-   if( (size(#)==0) or (typeof(#[1]) != "string") ) 
+   if( (size(#)==0) or (typeof(#[1]) != "string") )
    {
      os = "dp(" + string( nvars(dr) ) + ")";
-     if ( (find( ordstr(dr), os ) != 0) and (find( ordstr(dr), "a") == 0) ) 
+     if ( (find( ordstr(dr), os ) != 0) and (find( ordstr(dr), "a") == 0) )
      {
        os= "Dp";
-     } 
-     else 
+     }
+     else
      {
        os= "dp";
      }
@@ -41,10 +41,10 @@ EXAMPLE: example stdfglm; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r  = 0,(x,y,z),lp; 
+   ring r  = 0,(x,y,z),lp;
    ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
    ideal i1= stdfglm(i);         //uses fglm from "dp" to "lp"
-   i1;      
+   i1;
    ideal i2= stdfglm(i,"Dp");    //uses fglm from "Dp" to "lp"
    i2;
 }
@@ -65,10 +65,9 @@ EXAMPLE: example stdhilbert; shows an example
       {
          return(std(i,#[1]));
       }
-
       return(std(i));
    }
- 
+
    execute "ring S = ("+charstr(R)+"),("+varstr(R)+",@t),dp;";
    ideal i=homog(imap(R,i),@t);
    intvec v=hilb(std(i),1);
@@ -88,6 +87,7 @@ EXAMPLE: example stdhilbert; shows an example
      if(deg(a[j])==0)
      {
        a=ideal(1);
+       attrib(a,"isSB",1);
        return(a);
      }
      if(deg(a[j])>0)
@@ -102,11 +102,13 @@ EXAMPLE: example stdhilbert; shows an example
        }
      }
    }
-   return(simplify(a,2));   
+   a=simplify(a,2);
+   attrib(a,"isSB",1);
+   return(a);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring  r = 0,(x,y,z),lp; 
+   ring  r = 0,(x,y,z),lp;
    ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
    ideal i1= stdhilbert(i); i1;
    // is in this case equivalent to:
