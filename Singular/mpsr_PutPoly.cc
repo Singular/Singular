@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.4 1997-04-02 15:07:41 Singular Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.5 1997-04-10 13:08:39 obachman Exp $ */
 
 /***************************************************************
  *
@@ -164,11 +164,11 @@ static mpsr_Status_t PutRationalNumber(MP_Link_pt link, number a)
     nlNormalize(a);
   // send number itself
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopBasicDiv,
-                                   MP_BasicDict,
-                                   0,
-                                   2));
-    // and now sent nominator and denominator
+                                      MP_BasicDict,
+                                      MP_CopBasicDiv,
+                                      0,
+                                      2));
+  // and now sent nominator and denominator
   mp_failr(MP_MyPutApIntPacket(link, (MP_ApInt_t) &(a->z), 0));
   mp_return(MP_MyPutApIntPacket(link, (MP_ApInt_t) &(a->n), 0));
 }
@@ -250,7 +250,7 @@ mpsr_Status_t mpsr_PutPolyData(MP_Link_pt link, poly p, ring cring)
   monomial exp;
 
   if (cring != CurrPutRing)
-     SetPutFuncs(cring);
+    SetPutFuncs(cring);
 
 #ifdef MPSR_DEBUG
   if (currRing == cring)
@@ -338,9 +338,9 @@ mpsr_Status_t mpsr_PutRingAnnots(MP_Link_pt link, ring r, BOOLEAN mv)
 
   if (mv)
     mp_failr(MP_PutAnnotationPacket(link,
-                                 MP_AnnotPolyModuleVector,
-                                 MP_PolyDict,
-                                 MP_AnnotRequired));
+                                    MP_PolyDict,
+                                    MP_AnnotPolyModuleVector,
+                                    MP_AnnotRequired));
   // Hmm .. this is not according to a "proper" Singular ring,
   // but to be used in a recursive call of mpsr_PutRingAnnots
   if (r->minpoly != NULL && r->parameter == NULL && r->ch > 0)
@@ -353,73 +353,73 @@ mpsr_Status_t mpsr_PutRingAnnots(MP_Link_pt link, ring r, BOOLEAN mv)
 }
 
 static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
-                                     BOOLEAN mv)
+                                       BOOLEAN mv)
 {
   // each element of the poly is a 
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotProtoPrototype,
-                               MP_ProtoDict,
-                               MP_AnnotReqValNode));
+                                  MP_ProtoDict,
+                                  MP_AnnotProtoPrototype,
+                                  MP_AnnotReqValNode));
   // Monom represented as a struct of 2 elements
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopProtoStruct,
-                                   MP_ProtoDict,
-                                   0,
-                                   2));
+                                      MP_ProtoDict,
+                                      MP_CopProtoStruct,
+                                      0,
+                                      2));
 
   // First element is the coefficient
   if ((r->ch) == 0)
   {
     // rational numbers
-    mp_failr(MP_PutCommonMetaPacket(link,
-                                 MP_CmtNumberRational,
-                                 MP_NumberDict,
-                                 1));
+    mp_failr(MP_PutCommonMetaTypePacket(link,
+                                        MP_NumberDict,
+                                        MP_CmtNumberMP_Rational,
+                                        1));
     // are always normalized (and made that way, if necessary)
     mp_failr(MP_PutAnnotationPacket(link,
-                                 MP_AnnotNumberIsNormalized,
-                                 MP_NumberDict,
-                                 0));
+                                    MP_NumberDict,
+                                    MP_AnnotNumberIsNormalized,
+                                    0));
   }
   else if ((r->ch) > 1)
   {
     // modulo p numbers
     // are communicated as IMP_Uint32's
-    mp_failr(MP_PutCommonMetaPacket(link,
-                                 MP_CmtProtoUint32,
-                                 MP_ProtoDict,
-                                 1));
+    mp_failr(MP_PutCommonMetaTypePacket(link,
+                                    MP_ProtoDict,
+                                    MP_CmtProtoIMP_Uint32,
+                                    1));
     // but are taken as modulo numbers 
     mp_failr(MP_PutAnnotationPacket(link,
-                                 MP_AnnotNumberModulos,
-                                 MP_NumberDict,
-                                 MP_AnnotValuated));
+                                    MP_NumberDict,
+                                    MP_AnnotNumberModulos,
+                                    MP_AnnotValuated));
     // with Modulo
     mp_failr(MP_PutUint32Packet(link, r->ch, 1));
     if (r->parameter == NULL)
     {
       // which is (in our case) always a prime number
       mp_failr(MP_PutAnnotationPacket(link,
-                                   MP_AnnotNumberIsPrime,
-                                   MP_NumberDict,
-                                   0));
+                                      MP_NumberDict,
+                                      MP_AnnotNumberIsPrime,
+                                      0));
     }
     else
     {
       mp_failr(MP_PutAnnotationPacket(link,
-                                   MP_AnnotSingularGalois,
-                                   129,
-                                   MP_AnnotValuated));
+                                      MP_SingularDict,
+                                      MP_AnnotSingularGalois,
+                                      MP_AnnotValuated));
       mp_failr(MP_PutStringPacket(link, r->parameter[0], 0));
     }
   }
   else if ((r->ch) == -1)
   {
     // floats 
-    mp_failr(MP_PutCommonMetaPacket(link,
-                                 MP_CmtProtoReal32,
-                                 MP_ProtoDict,
-                                 0));
+    mp_failr(MP_PutCommonMetaTypePacket(link,
+                                    MP_ProtoDict,
+                                    MP_CmtProtoIMP_Real32,
+                                    0));
   }
   else
   {
@@ -439,10 +439,10 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
     // Algebraic numbers are 
     // a fraction of two Dense Dist Polys
     mp_failr(MP_PutCommonMetaOperatorPacket(link,
-                                         MP_CopPolyDenseDistPolyFrac,
-                                         MP_PolyDict,
-                                         mpsr_GetNumOfRingAnnots(alg_r,0),
-                                         0));
+                                            MP_PolyDict,
+                                            MP_CopPolyDenseDistPolyFrac,
+                                            mpsr_GetNumOfRingAnnots(alg_r,0),
+                                            0));
     failr(mpsr_PutRingAnnots(link, alg_r, 0));
 
     // destroy temporary ring
@@ -452,18 +452,18 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
 
   // second element is the exponent vector
   mp_failr(MP_PutCommonMetaOperatorPacket(link,
-                                       MP_CopProtoArray,
-                                       MP_ProtoDict,
-                                       1,
-                                       (mv ? r->N + 1 : r->N)));
+                                          MP_ProtoDict,
+                                          MP_CopProtoArray,
+                                          1,
+                                          (mv ? r->N + 1 : r->N)));
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotProtoPrototype,
-                               MP_ProtoDict,
-                               MP_AnnotReqValNode));
-  mp_return(MP_PutCommonMetaPacket(link,
-                                MP_CmtProtoSint32,
-                                MP_ProtoDict,
-                                0));
+                                  MP_ProtoDict,
+                                  MP_AnnotProtoPrototype,
+                                  MP_AnnotReqValNode));
+  mp_return(MP_PutCommonMetaTypePacket(link,
+                                   MP_ProtoDict,
+                                   MP_CmtProtoIMP_Sint32,
+                                   0));
 }
 
     
@@ -471,14 +471,14 @@ static mpsr_Status_t PutVarNamesAnnot(MP_Link_pt link, ring r)
 {
   // first, we put the annot packet, with flags (1, 0, 1, 0)
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotPolyVarNames,
-                               MP_PolyDict,
-                               MP_AnnotValuated));
+                                  MP_PolyDict,
+                                  MP_AnnotPolyVarNames,
+                                  MP_AnnotValuated));
   // now, the varnames follow
   if ((r->N) == 1)
   {
     // only 1 varname
-    mp_return(MP_PutIdentifierPacket(link, *(r->names), 0, 0));
+    mp_return(MP_PutIdentifierPacket(link, MP_SingularDict, *(r->names), 0));
   }
   else
   {
@@ -487,19 +487,19 @@ static mpsr_Status_t PutVarNamesAnnot(MP_Link_pt link, ring r)
     int i, n = r->N;
 
     mp_failr(MP_PutCommonOperatorPacket(link,
-                                     MP_CopProtoArray,
-                                     MP_ProtoDict,
-                                     1,
-                                     r->N));
+                                        MP_ProtoDict,
+                                        MP_CopProtoArray,
+                                        1,
+                                        r->N));
     mp_failr(MP_PutAnnotationPacket(link,
-                                 MP_AnnotProtoPrototype,
-                                 MP_ProtoDict,
-                                 MP_AnnotReqValNode));
+                                    MP_ProtoDict,
+                                    MP_AnnotProtoPrototype,
+                                    MP_AnnotReqValNode));
                                  
-    mp_failr(MP_PutCommonMetaPacket(link,
-                                 MP_CmtProtoIdentifier,
-                                 MP_ProtoDict,
-                                 0));
+    mp_failr(MP_PutCommonMetaTypePacket(link,
+                                    MP_ProtoDict,
+                                    MP_CmtProtoIMP_Identifier,
+                                    0));
     for (i=0; i<n; i++)
       mp_failr(IMP_PutString(link, names[i]));
 
@@ -510,9 +510,9 @@ static mpsr_Status_t PutVarNamesAnnot(MP_Link_pt link, ring r)
 static mpsr_Status_t PutVarNumberAnnot(MP_Link_pt link, ring r, BOOLEAN mv)
 {
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotPolyVarNumber,
-                               MP_PolyDict,
-                               MP_AnnotValuated));
+                                  MP_PolyDict,
+                                  MP_AnnotPolyVarNumber,
+                                  MP_AnnotValuated));
   mp_return(MP_PutUint32Packet(link, (mv ? r->N + 1 : r->N), 0));
 }
 
@@ -523,9 +523,9 @@ static mpsr_Status_t PutOrderingAnnot(MP_Link_pt link, ring r, BOOLEAN mv)
   int *order = r->order;
 
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotPolyOrdering,
-                               MP_PolyDict,
-                               MP_AnnotValuated));
+                                  MP_PolyDict,
+                                  MP_AnnotPolyOrdering,
+                                  MP_AnnotValuated));
 
   // let's see whether we have a simple ordering to sent
   if ((mv == 0) && (order[2] == ringorder_no))
@@ -544,10 +544,10 @@ static mpsr_Status_t PutOrderingAnnot(MP_Link_pt link, ring r, BOOLEAN mv)
   // if we deal with a non-vector, we are not going to sent
   // the vector ordering
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopBasicList,
-                                   MP_BasicDict,
-                                   0,
-                                   (mv ? nblocks : nblocks - 1)));
+                                      MP_BasicDict,
+                                      MP_CopBasicList,
+                                      0,
+                                      (mv ? nblocks : nblocks - 1)));
 
   for (index = 0; index < nblocks; index ++)
     // Do not sent vector ordering, if we are sending pure polys
@@ -556,10 +556,10 @@ static mpsr_Status_t PutOrderingAnnot(MP_Link_pt link, ring r, BOOLEAN mv)
     {
       // a product ordering is sent as triple 
       mp_failr(MP_PutCommonOperatorPacket(link,
-                                       MP_CopBasicList,
-                                       MP_BasicDict,
-                                       0,
-                                       3));
+                                          MP_BasicDict,
+                                          MP_CopBasicList,
+                                          0,
+                                          3));
       // first element is the simple ordering
       failr(PutSimpleOrdering(link, r, index));
       // second and third for covered variables
@@ -580,38 +580,41 @@ static mpsr_Status_t PutSimpleOrdering(MP_Link_pt link, ring r, short index)
     vlength = r->block1[index] - r->block0[index] + 1;
 
   mp_failr(MP_PutCommonConstantPacket(link,
-                                   mpsr_ord2mp(r->order[index]),
-                                   MP_PolyDict,
-                                   (vlength == 0 ? 0 : 1)));
+                                      MP_PolyDict,
+                                      mpsr_ord2mp(r->order[index]),
+                                      (vlength == 0 ? 0 : 1)));
 
   if (vlength == 0) return mpsr_Success;
 
   // deal with the weights 
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotPolyWeights,
-                               MP_PolyDict,
-                               MP_AnnotValuated));
+                                  MP_PolyDict,
+                                  MP_AnnotPolyWeights,
+                                  MP_AnnotValuated));
   if (r->order[index] == ringorder_M)
   {
     // put the matrix header
     mp_failr(MP_PutCommonOperatorPacket(link,
-                                     MP_CopMatrixDenseMatrix,
-                                     MP_MatrixDict,
-                                     2,
-                                     vlength*vlength));
+                                        MP_MatrixDict,
+                                        MP_CopMatrixDenseMatrix,
+                                        2,
+                                        vlength*vlength));
     mp_failr(MP_PutAnnotationPacket(link,
-                                 MP_AnnotProtoPrototype,
-                                 MP_ProtoDict,
-                                 MP_AnnotReqValNode));
-    mp_failr(MP_PutCommonMetaPacket(link, MP_CmtProtoSint32, MP_ProtoDict, 0));
+                                    MP_ProtoDict,
+                                    MP_AnnotProtoPrototype,
+                                    MP_AnnotReqValNode));
+    mp_failr(MP_PutCommonMetaTypePacket(link,
+                                    MP_ProtoDict,
+                                    MP_CmtProtoIMP_Sint32,
+                                    0));
     mp_failr(MP_PutAnnotationPacket(link,
-                                 MP_AnnotMatrixDimension,
-                                 MP_MatrixDict,
-                                 MP_AnnotReqValNode));
+                                    MP_MatrixDict,
+                                    MP_AnnotMatrixDimension,
+                                    MP_AnnotReqValNode));
     mp_failr(MP_PutCommonOperatorPacket(link,
-                                     MP_CopBasicList,
-                                     MP_BasicDict,
-                                     0, 2));
+                                        MP_BasicDict,
+                                        MP_CopBasicList,
+                                        0, 2));
     mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) vlength, 0));
     mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) vlength, 0));
     vlength *= vlength;
@@ -620,15 +623,18 @@ static mpsr_Status_t PutSimpleOrdering(MP_Link_pt link, ring r, short index)
   {
     // vector header
     mp_failr(MP_PutCommonOperatorPacket(link,
-                                     MP_CopMatrixDenseVector,
-                                     MP_MatrixDict,
-                                     1,
-                                     vlength));
+                                        MP_MatrixDict,
+                                        MP_CopMatrixDenseVector,
+                                        1,
+                                        vlength));
     mp_failr(MP_PutAnnotationPacket(link,
-                                 MP_AnnotProtoPrototype,
-                                 MP_ProtoDict,
-                                 MP_AnnotReqValNode));
-    mp_failr(MP_PutCommonMetaPacket(link, MP_CmtProtoSint32, MP_ProtoDict, 0));
+                                    MP_ProtoDict,
+                                    MP_AnnotProtoPrototype,
+                                    MP_AnnotReqValNode));
+    mp_failr(MP_PutCommonMetaTypePacket(link,
+                                    MP_ProtoDict,
+                                    MP_CmtProtoIMP_Sint32,
+                                    0));
   }
 
   // weights are all what remains 
@@ -646,22 +652,22 @@ static mpsr_Status_t PutMinPolyAnnot(MP_Link_pt link, ring r)
   r->minpoly = 0;
 
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotPolyDefRel,
-                               MP_PolyDict,
-                               MP_AnnotValuated));
+                                  MP_PolyDict,
+                                  MP_AnnotPolyDefRel,
+                                  MP_AnnotValuated));
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopPolyDenseDistPoly,
-                                   MP_PolyDict,
-                                   5,
-                                   GetPlength( ((lnumber) minpoly)->z)));
+                                      MP_PolyDict,
+                                      MP_CopPolyDenseDistPoly,
+                                      5,
+                                      GetPlength( ((lnumber) minpoly)->z)));
   failr(PutProtoTypeAnnot(link, r, 0));
   failr(PutVarNamesAnnot(link, r));
   failr(PutVarNumberAnnot(link, r,0));
   failr(PutOrderingAnnot(link, r, 0));
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotPolyIrreducible,
-                               MP_PolyDict,
-                               0));
+                                  MP_PolyDict,
+                                  MP_AnnotPolyIrreducible,
+                                  0));
 
   // need to set PutAlgAlgnumber and gNalgVars
   CurrPutRing = r;
@@ -685,9 +691,9 @@ static mpsr_Status_t PutDefRelsAnnot(MP_Link_pt link, ring r)
   r->qideal = NULL;
 
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotPolyDefRel,
-                               MP_PolyDict,
-                               MP_AnnotValuated));
+                                  MP_PolyDict,
+                                  MP_AnnotPolyDefRel,
+                                  MP_AnnotValuated));
   failr(mpsr_PutIdeal(link, id, r));
   r->qideal = id;
   return mpsr_Success;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.5 1997-04-02 15:07:40 Singular Exp $ */
+/* $Id: mpsr_Put.cc,v 1.6 1997-04-10 13:08:37 obachman Exp $ */
 
 
 /***************************************************************
@@ -100,7 +100,7 @@ mpsr_Status_t mpsr_PutLeftv(MP_Link_pt link, leftv v, ring cring)
       case DEF_CMD:
         return mpsr_PutDefLeftv(link, v);
 
-    // now potentially ring-dependent types
+        // now potentially ring-dependent types
       case LIST_CMD:
         return mpsr_PutListLeftv(link,v, cring);
 
@@ -146,19 +146,21 @@ mpsr_Status_t mpsr_PutIntVec(MP_Link_pt link, intvec *iv)
   
   // Put the Vector Operator 
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopMatrixDenseVector,
-                                   MP_MatrixDict,
-                                   1,
-                                   length));
+                                      MP_MatrixDict,
+                                      MP_CopMatrixDenseVector,
+                                      1,
+                                      length));
   // Prototype Annot 
   mp_failr(MP_PutAnnotationPacket(link,
-                                  MP_AnnotProtoPrototype,
                                   MP_ProtoDict,
+                                  MP_AnnotProtoPrototype,
                                   MP_AnnotReqValNode));
-  // Together with the CommonMetaPacket specifying that each element of
+  // Together with the CommonMetaTypePacket specifying that each element of
   // the vector is an Sint32 
-  mp_failr(MP_PutCommonMetaPacket(link, MP_CmtProtoSint32,
-                                  MP_ProtoDict, 0));
+  mp_failr(MP_PutCommonMetaTypePacket(link,
+                                      MP_ProtoDict,
+                                      MP_CmtProtoIMP_Sint32,
+                                      0));
   
   // Now we finally put the data 
   mp_return(IMP_PutSint32Vector(link, (MP_Sint32_t *) iv->ivGetVec(),
@@ -171,27 +173,31 @@ mpsr_Status_t mpsr_PutIntMat(MP_Link_pt link, intvec *iv)
 
   // First, we put the Matrix operator 
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopMatrixDenseMatrix,
-                                   MP_MatrixDict,
-                                   2,
-                                   length));
+                                      MP_MatrixDict,
+                                      MP_CopMatrixDenseMatrix,
+                                      2,
+                                      length));
   // Put the two annotations 
   // First, the prototype annot 
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotProtoPrototype,
-                               MP_ProtoDict,
-                               MP_AnnotReqValNode));
-  mp_failr(MP_PutCommonMetaPacket(link, MP_CmtProtoSint32, MP_ProtoDict, 0));
+                                  MP_ProtoDict,
+                                  MP_AnnotProtoPrototype,
+                                  MP_AnnotReqValNode));
+  mp_failr(MP_PutCommonMetaTypePacket(link,
+                                  MP_ProtoDict,
+                                  MP_CmtProtoIMP_Sint32,
+                                  0));
   // And second, the dimension annot 
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotMatrixDimension,
-                               MP_MatrixDict,
-                               MP_AnnotReqValNode));
+                                  MP_MatrixDict,
+                                  MP_AnnotMatrixDimension,
+                                  MP_AnnotReqValNode));
   // which specifies the dimesnion of the matrix
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopBasicList,
-                                   MP_BasicDict,
-                                   0, 2));
+                                      MP_BasicDict,
+                                      MP_CopBasicList,
+                                      0,
+                                      2));
   mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) r, 0));
   mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) c, 0));
 
@@ -203,10 +209,10 @@ mpsr_Status_t mpsr_PutIntMat(MP_Link_pt link, intvec *iv)
 mpsr_Status_t mpsr_PutRing(MP_Link_pt link, ring cring)
 {
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopPolyRing,
-                                   MP_PolyDict,
-                                   mpsr_GetNumOfRingAnnots(cring, 1),
-                                   0));
+                                      MP_PolyDict,
+                                      MP_CopPolyRing,
+                                      mpsr_GetNumOfRingAnnots(cring, 1),
+                                      0));
   return mpsr_PutRingAnnots(link, cring, 1);
 }
 
@@ -219,13 +225,15 @@ mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char* pname, char *proc)
   
   // A Singular- procedure is sent as a cop with the string as arg
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   cop,
-                                   dict,
-                                   0,
-                                   2));
-  mp_failr(MP_PutIdentifierPacket(link, pname, MP_BasicDict, 1));
-  mp_failr(MP_PutAnnotationPacket(link, MP_AnnotSingularProcDef,
-                                  MP_SingularDict, 0));
+                                      dict,
+                                      cop,
+                                      0,
+                                      2));
+  mp_failr(MP_PutIdentifierPacket(link, MP_SingularDict, pname,1));
+  mp_failr(MP_PutAnnotationPacket(link,
+                                  MP_SingularDict,
+                                  MP_AnnotSingularProcDef,
+                                  0));
   mp_return(MP_PutStringPacket(link, proc, 0));
 }
 
@@ -250,10 +258,10 @@ mpsr_Status_t mpsr_PutList(MP_Link_pt link, lists l, ring cring)
   int i, nl = l->nr + 1;
 
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopBasicList,
-                                   MP_BasicDict,
-                                   0,
-                                   nl));
+                                      MP_BasicDict,
+                                      MP_CopBasicList,
+                                      0,
+                                      nl));
   for (i=0; i<nl; i++)
     failr(mpsr_PutLeftv(link, &(l->m[i]), cring));
 
@@ -272,7 +280,7 @@ mpsr_Status_t mpsr_PutCopCommand(MP_Link_pt link,  command cmd, ring cring)
   failr(mpsr_tok2mp(cmd->op, &dict, &cop));
 
   // and put the common operator
-  mp_failr(MP_PutCommonOperatorPacket(link, cop, dict, 0, nc));
+  mp_failr(MP_PutCommonOperatorPacket(link, dict, cop, 0, nc));
 
   // now we Put the arguments
   if (nc > 0)
@@ -297,10 +305,10 @@ mpsr_Status_t mpsr_PutCopCommand(MP_Link_pt link,  command cmd, ring cring)
 mpsr_Status_t mpsr_PutOpCommand(MP_Link_pt link,  command cmd, ring cring)
 {
   mp_failr(MP_PutOperatorPacket(link,
-                             (char *) (cmd->arg1.Data()),
-                             MP_SingularDict,
-                             0,
-                             (cmd->argc <= 1 ? 0 :(cmd->arg2).listLength())));
+                                MP_SingularDict,
+                                (char *) (cmd->arg1.Data()),
+                                0,
+                                (cmd->argc <= 1 ? 0 :(cmd->arg2).listLength())));
   if (cmd->argc > 1)
     return PutLeftvChain(link, &(cmd->arg2), cring);
   else
@@ -336,10 +344,10 @@ mpsr_Status_t mpsr_PutNumber(MP_Link_pt link,  number n, ring cring)
 mpsr_Status_t mpsr_PutPoly(MP_Link_pt link, poly p, ring cring)
 {
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopPolyDenseDistPoly,
-                                   MP_PolyDict,
-                                   mpsr_GetNumOfRingAnnots(cring, 0),
-                                   pLength(p)));
+                                      MP_PolyDict,
+                                      MP_CopPolyDenseDistPoly,
+                                      mpsr_GetNumOfRingAnnots(cring, 0),
+                                      pLength(p)));
   failr(mpsr_PutRingAnnots(link, cring, 0));
   return mpsr_PutPolyData(link, p, cring);
 }
@@ -348,10 +356,10 @@ mpsr_Status_t mpsr_PutPoly(MP_Link_pt link, poly p, ring cring)
 mpsr_Status_t mpsr_PutPolyVector(MP_Link_pt link, poly p, ring cring)
 {
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopPolyDenseDistPoly,
-                                   MP_PolyDict,
-                                   mpsr_GetNumOfRingAnnots(cring,1),
-                                   pLength(p)));
+                                      MP_PolyDict,
+                                      MP_CopPolyDenseDistPoly,
+                                      mpsr_GetNumOfRingAnnots(cring,1),
+                                      pLength(p)));
   failr(mpsr_PutRingAnnots(link, cring, 1));
   return mpsr_PutPolyVectorData(link, p, cring);
 }
@@ -362,19 +370,19 @@ mpsr_Status_t mpsr_PutIdeal(MP_Link_pt link, ideal id, ring cring)
   int i, idn = IDELEMS(id);
 
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopPolyIdeal,
-                                   MP_PolyDict,
-                                   1,
-                                   idn));
+                                      MP_PolyDict,
+                                      MP_CopPolyIdeal,
+                                      1,
+                                      idn));
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotProtoPrototype,
-                               MP_ProtoDict,
-                               MP_AnnotReqValNode));
+                                  MP_ProtoDict,
+                                  MP_AnnotProtoPrototype,
+                                  MP_AnnotReqValNode));
   mp_failr(MP_PutCommonMetaOperatorPacket(link,
-                                       MP_CopPolyDenseDistPoly,
-                                       MP_PolyDict,
-                                       mpsr_GetNumOfRingAnnots(cring, 0),
-                                       0));
+                                          MP_PolyDict,
+                                          MP_CopPolyDenseDistPoly,
+                                          mpsr_GetNumOfRingAnnots(cring, 0),
+                                          0));
   failr(mpsr_PutRingAnnots(link, cring, 0));
 
   for (i=0; i < idn; i++)
@@ -390,19 +398,19 @@ mpsr_Status_t mpsr_PutModule(MP_Link_pt link, ideal id, ring cring)
   int i, idn = IDELEMS(id);
 
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopPolyModule,
-                                   MP_PolyDict,
-                                   1,
-                                   idn));
+                                      MP_PolyDict,
+                                      MP_CopPolyModule,
+                                      1,
+                                      idn));
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotProtoPrototype,
-                               MP_ProtoDict,
-                               MP_AnnotReqValNode));
+                                  MP_ProtoDict,
+                                  MP_AnnotProtoPrototype,
+                                  MP_AnnotReqValNode));
   mp_failr(MP_PutCommonMetaOperatorPacket(link,
-                                       MP_CopPolyDenseDistPoly,
-                                       MP_PolyDict,
-                                       mpsr_GetNumOfRingAnnots(cring, 1),
-                                       0));
+                                          MP_PolyDict,
+                                          MP_CopPolyDenseDistPoly,
+                                          mpsr_GetNumOfRingAnnots(cring, 1),
+                                          0));
   failr(mpsr_PutRingAnnots(link, cring, 1));
 
   for (i=0; i < idn; i++)
@@ -420,33 +428,33 @@ mpsr_Status_t mpsr_PutMatrix(MP_Link_pt link, ideal id, ring cring)
 
   // First, we put the Matrix operator 
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopMatrixDenseMatrix,
-                                   MP_MatrixDict,
-                                   2,
-                                   n));
+                                      MP_MatrixDict,
+                                      MP_CopMatrixDenseMatrix,
+                                      2,
+                                      n));
   // Put the two annotations 
   // First, the prototype annot 
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotProtoPrototype,
-                               MP_ProtoDict,
-                               MP_AnnotReqValNode));
+                                  MP_ProtoDict,
+                                  MP_AnnotProtoPrototype,
+                                  MP_AnnotReqValNode));
   mp_failr(MP_PutCommonMetaOperatorPacket(link,
-                                       MP_CopPolyDenseDistPoly,
-                                       MP_PolyDict,
-                                       mpsr_GetNumOfRingAnnots(cring, 0),
-                                       0));
+                                          MP_PolyDict,
+                                          MP_CopPolyDenseDistPoly,
+                                          mpsr_GetNumOfRingAnnots(cring, 0),
+                                          0));
   failr(mpsr_PutRingAnnots(link, cring, 0));
 
   // second, the matrix dim annot
   mp_failr(MP_PutAnnotationPacket(link,
-                               MP_AnnotMatrixDimension,
-                               MP_MatrixDict,
-                               MP_AnnotReqValNode));
+                                  MP_MatrixDict,
+                                  MP_AnnotMatrixDimension,
+                                  MP_AnnotReqValNode));
   // which specifies the dimesnion of the matrix
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   MP_CopBasicList,
-                                   MP_BasicDict,
-                                   0, 2));
+                                      MP_BasicDict,
+                                      MP_CopBasicList,
+                                      0, 2));
   mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) nrows, 0));
   mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) ncols, 0));
 
@@ -471,10 +479,10 @@ mpsr_Status_t mpsr_PutMap(MP_Link_pt link, map m, ring cring)
   failr(mpsr_tok2mp(MAP_CMD, &dict, &cop));
 
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                   cop,
-                                   dict,
-                                   0,
-                                   3));
+                                      dict,
+                                      cop,
+                                      0,
+                                      3));
   // First, is the ring
   failr(mpsr_PutRingLeftv(link, (leftv) idroot->get(m->preimage, 1)));
 
@@ -538,7 +546,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
           memcpy(&(cmd.arg2), h2, sizeof(sleftv));
           if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
 #ifdef MPSR_DEBUG
-      Print("Dumped %s\n", IDID(h2));
+          Print("Dumped %s\n", IDID(h2));
 #endif
           h2 = h2->next;
         }

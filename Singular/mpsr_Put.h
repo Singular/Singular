@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.h,v 1.2 1997-04-09 12:20:03 Singular Exp $ */
+/* $Id: mpsr_Put.h,v 1.3 1997-04-10 13:08:38 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Put.h
@@ -31,7 +31,7 @@
 #include"MP_PolyDict.h"
 #include"MP_NumberDict.h"
 #include"MP_ProtoDict.h"
-
+#include"MP_MpDict.h"
 
 
 /***************************************************************
@@ -74,13 +74,19 @@ extern mpsr_Status_t mpsr_PutIntVec(MP_Link_pt link, intvec *iv);
 extern mpsr_Status_t mpsr_PutIntMat(MP_Link_pt link, intvec *iv);
 inline mpsr_Status_t mpsr_PutString(MP_Link_pt link, char *str)
 {
-  mp_return(MP_PutStringPacket(link, str, 0));
+  if (strcmp(str, MPSR_QUIT_STRING) == 0)
+    mp_return(MP_PutCommonOperatorPacket(link,
+                                         MP_MpDict,
+                                         MP_CopMpEndSession,
+                                         0, 0));
+  else
+    mp_return(MP_PutStringPacket(link, str, 0));
 }
 extern mpsr_Status_t mpsr_PutRing(MP_Link_pt link, ring r);
 extern mpsr_Status_t mpsr_PutProc(MP_Link_pt link,  char *pname, char* proc);
 inline mpsr_Status_t mpsr_PutDef(MP_Link_pt link, char *name)
 {
-  mp_return(MP_PutIdentifierPacket(link, name, 0, 0));
+  mp_return(MP_PutIdentifierPacket(link, MP_SingularDict, name, 0));
 }
 // next, ring-dependent data
 extern mpsr_Status_t mpsr_PutList(MP_Link_pt link, lists l, ring cring);

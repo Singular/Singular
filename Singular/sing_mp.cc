@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.8 1997-04-09 12:20:10 Singular Exp $ */
+/* $Id: sing_mp.cc,v 1.9 1997-04-10 13:08:40 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -269,14 +269,32 @@ BOOLEAN slOpenMPTcp(si_link l, short flag)
 
 BOOLEAN slWriteMP(si_link l, leftv v)
 {
+  leftv next = (v != NULL ? v->next : NULL);
   mpsr_ClearError();
+
+  // writing is done with one leftv at a time
+  if (v != NULL) v->next = NULL; // hence, we need to set next to NULL
   if (mpsr_PutMsg((MP_Link_pt) l->data, v) != mpsr_Success)
   {
     mpsr_PrintError((MP_Link_pt) l->data);
+    if (v != NULL) v->next = next;
     return TRUE;
   }
-  else
-    return FALSE;
+
+  // take care of the remaining leftv's 
+  while (next != NULL)
+  {
+    v->next = next;
+    v = next;
+    next = v->next;
+    if (mpsr_PutMsg((MP_Link_pt) l->data, v) != mpsr_Success)
+    {
+      mpsr_PrintError((MP_Link_pt) l->data);
+      v->next = next;
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
 
 leftv slReadMP(si_link l)
@@ -297,7 +315,7 @@ static void SentQuitMsg(si_link l)
   leftv v = (leftv) Alloc0(sizeof(sleftv));
 
   v->rtyp = STRING_CMD;
-  v->data = "MP:Quit";
+  v->data = MPSR_QUIT_STRING;
   slWriteMP(l, v);
   Free(v, sizeof(sleftv));
 }
@@ -424,7 +442,8 @@ int Batch_do(int argc, char **argv)
     }
 
     // no need to evaluate -- it is done in the read
-    if (v->Typ() == STRING_CMD && (strcmp((char *)v->Data(), "MP:Quit") == 0))
+    if (v->Typ() == STRING_CMD &&
+        (strcmp((char *)v->Data(), MPSR_QUIT_STRING)  == 0))
     {
       slKill(silink);
       return 0;

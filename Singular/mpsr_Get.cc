@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.7 1997-04-08 08:43:24 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.8 1997-04-10 13:08:36 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -34,6 +34,7 @@
 #include "MP_PolyDict.h"
 #include "MP_BasicDict.h"
 #include "MP_ProtoDict.h"
+#include "MP_MpDict.h"
 
 #include <limits.h>
 
@@ -81,7 +82,7 @@ inline BOOLEAN IsIntVecNode(MPT_Node_pt node)
 
   MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
   return tree != NULL && NodeCheck(tree->node, MP_CommonMetaType,
-                                   MP_ProtoDict, MP_CmtProtoSint32);
+                                   MP_ProtoDict, MP_CmtProtoIMP_Sint32);
 }
 
 inline BOOLEAN IsIntMatNode(MPT_Node_pt node)
@@ -90,7 +91,7 @@ inline BOOLEAN IsIntMatNode(MPT_Node_pt node)
 
   MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
   return tree != NULL && NodeCheck(tree->node, MP_CommonMetaType,
-                                   MP_ProtoDict, MP_CmtProtoSint32);
+                                   MP_ProtoDict, MP_CmtProtoIMP_Sint32);
 }
 
 inline BOOLEAN IsRingNode(MPT_Node_pt node, ring &r)
@@ -157,6 +158,11 @@ inline BOOLEAN IsMatrixNode(MPT_Node_pt node, ring &r)
     node->type == MP_CommonMetaOperatorType &&
     node->numchild == 0 &&
     IsPolyNode(node, r);
+}
+
+inline BOOLEAN IsQuitNode(MPT_Node_pt node)
+{
+  return NodeCheck(node, MP_MpDict, MP_CopMpEndSession);
 }
 
 //
@@ -278,6 +284,12 @@ inline mpsr_Status_t mpsr_GetStringLeftv(MPT_Node_pt node, mpsr_leftv mlv)
   return mpsr_Success;
 }
 
+inline mpsr_Status_t GetQuitLeftv(mpsr_leftv mlv)
+{
+  mlv->lv = mpsr_InitLeftv(STRING_CMD, (void *) mstrdup(MPSR_QUIT_STRING));
+  return mpsr_Success;
+}
+
 /***************************************************************
  *
  * The top-level routine for getting a message
@@ -292,16 +304,15 @@ mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
   mlv1.lv = NULL;
   mlv1.r = NULL;
 
-  MP_SkipMsg(link);
+  status = (MP_InitMsg(link) == MP_Success ? mpsr_Success : mpsr_MP_Failure);
   
-  if (! MP_TestEofMsg(link))
+  if (status == mpsr_Success && ! MP_TestEofMsg(link))
     status = mpsr_GetLeftv(link, &mlv, 0);
   else
   {
     lv = mpsr_InitLeftv(NONE, NULL);
-    return mpsr_Success;
+    return status;
   }
-  
 
   // handle more than one leftv (ie. chains of leftv's)
   while (status == mpsr_Success && ! MP_TestEofMsg(link))
@@ -328,7 +339,7 @@ mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
 
     lv = mlv.lv;
   }
-  else lv = NULL;
+  else lv = mpsr_InitLeftv(NONE, NULL); 
   
   return status;
 }
@@ -428,6 +439,8 @@ mpsr_Status_t mpsr_GetCommonOperatorLeftv(MP_Link_pt link,
   // Matrix
   else if (IsMatrixNode(node, mlv->r))
     return GetMatrixLeftv(link, node, mlv);
+  else if (IsQuitNode(node))
+    return GetQuitLeftv(mlv);
   // Map 
   else
     // now it should be a command (which handles Proc, Map and List
@@ -753,6 +766,7 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
   return mpsr_Success;
 }
 
+  
 /***************************************************************
  *
  * The routine for Getting External Data

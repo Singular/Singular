@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.4 1997-04-09 12:20:01 Singular Exp $ */
+/* $Id: mpsr.h,v 1.5 1997-04-10 13:08:35 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -120,8 +120,7 @@ inline void mpsr_SetCurrRing(ring rg, BOOLEAN complete)
 // remove this, once the Galois field stuff is done properly
 #define MP_AnnotSingularGalois  1
 // String used to indicate the end of a communication
-#define MPSR_QUIT_STRING    "MPSR::Quit"
-#define MPSR_DEFAULT_DUMP_FILE "mpsr_dump.mp"
+#define MPSR_QUIT_STRING    "MPtcp:quit"
 
 // some handy Macros for error handlings 
 #ifdef MPSR_DEBUG

@@ -1,61 +1,15 @@
-proc asciidump
-{
-  list l = names();
-  list lr;
-  int ll = size(l);
-  int llr;
-  int i;
-  int j;
-  def el;
-  def elr;
-  
-  for (i=1; i<= ll; i++)
-  {
-    el = l[i];
-    el;
-    " = ";
-    if (typeof(`el`) == "proc")
-    {
-      string(`el`);
-    }
-    else
-    {
-      `el`;
-    }
-    " ";
-    if (typeof(`el`) == "ring")
-    {
-      lr = names(`el`);
-      llr = size(lr);
-      j;
-      
-      setring(`el`);
-      for (j=1; j<llr; j++)
-      {
-        elr = lr[j];
-        elr;
-        " = ";
-        `elr`;
-        " ";
-      }
-    }
-  }
-  return();
-}
-  
-	
 proc mptest (lv)
 {
   print(lv);
-  write("t.mp MP:file", lv);
-  return(lv == read("t.mp MP:file"));
+  write("MPfile:w /tmp/t.mp", lv);
+  return(lv == read("MPfile: /tmp/t.mp"));
 };
 
 proc mpt(lv)
 {
   lv;
-  write("t.mp MP:file", lv);
-  def r = read("t.mp MP:file");
+  write("MPfile:w /tmp/t.mp", lv);
+  def r = read("MPfile: /tmp/t.mp");
   r;
 };
 
@@ -113,6 +67,15 @@ poly p11 = x + y;
 poly p12 = xyz - 2x3y4z5 + 3xy -4yz + 5z;
 poly p13 = p12^4;
 
+ring rtm = 32003, (x,y,z,t), dp;
+ideal ex = t3y7z4 + 9x8 + 5t2x4y2 + 2t2xy2z3,
+2t2x5y4+7txy6+9y8 + 2t2x2yz3,  3t4x2y3z2 + 9z8, 3x2y9 +
+y9 + 5x4;
+
+ring rt0 = 0, (x,y,z,t), dp;
+ideal ex = t3y7z4 + 9x8 + 5t2x4y2 + 2t2xy2z3,
+2t2x5y4+7txy6+9y8 + 2t2x2yz3,  3t4x2y3z2 + 9z8, 3x2y9 +
+y9 + 5x4;
 
 
 ring rr = 32003,(a,b),dp;

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.4 1997-04-02 15:07:39 Singular Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.5 1997-04-10 13:08:37 obachman Exp $ */
 
 /***************************************************************
  *
@@ -15,6 +15,7 @@
 #include "mod2.h"
 
 #ifdef HAVE_MPSR
+#include "limits.h"
 
 #include "mpsr_Get.h"
 
@@ -37,7 +38,6 @@
 #include "MP_NumberDict.h"
 #include "MP_ProtoDict.h"
 
-#include "limits.h"
 
 #ifdef PARI_BIGINT_TEST
 #include "MP_PariBigInt.h"
@@ -175,7 +175,7 @@ static mpsr_Status_t GetApInt(MP_Link_pt link, mpz_ptr ap)
   MP_Common_t       cvalue;
   MP_Boolean_t      req = 0;
   
-  mp_failr(IMP_GetNodeHeader(link,&node,&cvalue,&dict, &num_annots,
+  mp_failr(IMP_GetNodeHeader(link,&node,&dict, &cvalue, &num_annots,
                              &num_child));
 
   if (node == MP_ApIntType)
@@ -225,7 +225,8 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
   number            y;
   MP_Boolean_t      req;
 
-  mp_failr(IMP_GetNodeHeader(link,&node,&cvalue,&dict, &num_annots, &num_child));
+  mp_failr(IMP_GetNodeHeader(link,&node,&dict, &cvalue, &num_annots,
+                             &num_child));
 
   // start with the most frequent cases
   if (node == MP_Sint32Type) 
@@ -629,7 +630,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
     return mpsr_Failure;
   
   node = val->node;
-  falser(NodeCheck(node, MP_CommonMetaType, MP_ProtoDict, MP_CmtProtoSint32));
+  falser(NodeCheck(node, MP_CommonMetaType, MP_ProtoDict, MP_CmtProtoIMP_Sint32));
 
   // consider the first arg -- which specify the coeffs
   val = ta[0];
@@ -637,13 +638,13 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
   if (node->type == MP_CommonMetaType)
   {
     // char 0
-    if (MP_COMMON_T(node->nvalue) == MP_CmtNumberRational &&
+    if (MP_COMMON_T(node->nvalue) == MP_CmtNumberMP_Rational &&
         node->dict == MP_NumberDict)
     {
       r->ch = 0;
       // Hmm ... we should check for the normalized annot
     }
-    else if (MP_COMMON_T(node->nvalue) == MP_CmtProtoUint32 &&
+    else if (MP_COMMON_T(node->nvalue) == MP_CmtProtoIMP_Uint32 &&
              node->dict == MP_ProtoDict &&
              (annot = MPT_FindAnnot(node,MP_NumberDict,MP_AnnotNumberModulos))
               != NULL)
@@ -666,7 +667,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
         r->P = 1;
       }
     }
-    else if (MP_COMMON_T(node->nvalue) == MP_CmtProtoReal32 &&
+    else if (MP_COMMON_T(node->nvalue) == MP_CmtProtoIMP_Real32 &&
              node->dict == MP_ProtoDict)
     {
       // floats
@@ -726,7 +727,7 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
       MPT_Tree_pt val = MPT_GetProtoTypespec(node);
       if (val != NULL &&
           NodeCheck(val->node, MP_CommonMetaType, MP_ProtoDict,
-                    MP_CmtProtoIdentifier))
+                    MP_CmtProtoIMP_Identifier))
       {
         MPT_Arg_pt arg_pt = annot->value->args;        
         lb = min(nc, N);
@@ -885,7 +886,7 @@ static mpsr_Status_t GetSimpleOrdering(MPT_Node_pt node, ring r, short i)
 
   if (annot2 == NULL ||
       ! NodeCheck(annot2->value->node, MP_CommonMetaType, MP_ProtoDict,
-                 MP_CmtProtoSint32))
+                 MP_CmtProtoIMP_Sint32))
     return mpsr_Failure;
 
   MP_Uint32_t nc = node->numchild, j;
