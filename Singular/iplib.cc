@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.59 1999-08-03 16:33:42 obachman Exp $ */
+/* $Id: iplib.cc,v 1.60 1999-08-16 12:39:57 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -161,6 +161,8 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     int i, offset=0;
     long head = pi->data.s.def_end - pi->data.s.proc_start;
     procbuflen = pi->data.s.help_end - pi->data.s.help_start;
+    if (procbuflen<5)
+      return NULL; // help part does not exist
     //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
     //    pi->data.s.proc_start, procbuflen);
     s = (char *)AllocL(procbuflen+head+3);
@@ -183,8 +185,8 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     }
     return(s);
   }
-  if(part==1)
-  { // load proc part
+  else if(part==1)
+  { // load proc part - must exist
     procbuflen = pi->data.s.def_end - pi->data.s.proc_start;
     //fgets(buf, sizeof(buf), fp);
     myfread( buf, procbuflen, 1, fp);
@@ -217,10 +219,13 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     if (s!=NULL) *s=' ';
     return NULL;
   }
-  if(part==2)
-  { // load example
+  else if(part==2)
+  { // example
+    if ( pi->data.s.example_lineno == 0)
+      return NULL; // example part does not exist
+    // load example
     fseek(fp, pi->data.s.example_start, SEEK_SET);
-    fgets(buf, sizeof(buf), fp);
+    fgets(buf, sizeof(buf), fp); // skip line with "example"
     procbuflen = pi->data.s.proc_end - pi->data.s.example_start - strlen(buf);
     //Print("Example=%ld-%ld=%d\n", pi->data.s.proc_end,
     //  pi->data.s.example_start, procbuflen);

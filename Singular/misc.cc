@@ -243,7 +243,7 @@ void singular_example(char *str)
       }
     }
   }
-  Werror("%s not found",s);
+  Werror("%s not found",str);
 }
 
 
