@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multivar.cc,v 1.7 1997-08-29 08:38:28 schmidt Exp $ */
+/* $Id: fac_multivar.cc,v 1.8 1998-03-12 14:30:55 schmidt Exp $ */
 
 #include <config.h>
 
@@ -68,7 +68,7 @@ coeffBound ( const CanonicalForm & f, int p )
     int M = 0, i, k = f.level();
     for ( i = 1; i <= k; i++ )
 	M += degs[i];
-    CanonicalForm b = 2 * maxCoeff( f ) * power( CanonicalForm( 3 ), M );
+    CanonicalForm b = 2 * maxNorm( f ) * power( CanonicalForm( 3 ), M );
     CanonicalForm B = p;
     k = 1;
     while ( B < b ) {

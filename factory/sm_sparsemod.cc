@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.cc,v 1.6 1998-03-10 14:48:29 schmidt Exp $ */
+/* $Id: sm_sparsemod.cc,v 1.7 1998-03-12 14:31:13 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -473,7 +473,7 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   else
     deg = 1;
   CanonicalForm B, L, Bound, lcF = Leitkoeffizient( primif); //lc( primif ) ;
-  B =  2 * maxCoeff( primif ) * maxCoeff( g ) ;
+  B =  2 * maxNorm( primif ) * maxNorm( g ) ;
   L = lcF ;
   Bound = abs( 2 * B * L + 1 );
   int length = 1;

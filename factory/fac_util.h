@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_util.h,v 1.5 1997-06-19 12:23:08 schmidt Exp $ */
+/* $Id: fac_util.h,v 1.6 1998-03-12 14:31:07 schmidt Exp $ */
 
 #ifndef INCL_FAC_UTIL_H
 #define INCL_FAC_UTIL_H
@@ -37,8 +37,6 @@ CanonicalForm replaceLc( const CanonicalForm & f, const CanonicalForm & c );
 CanonicalForm remainder( const CanonicalForm & f, const CanonicalForm & g, const modpk & pk );
 
 void divremainder( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & quot, CanonicalForm & rem, const modpk & pk );
-
-CanonicalForm maxCoeff( const CanonicalForm & f );
 
 bool Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const modpk & bound, const Variable & x );
 

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_util.cc,v 1.7 1998-03-12 10:27:15 schmidt Exp $ */
+/* $Id: fac_util.cc,v 1.8 1998-03-12 14:31:02 schmidt Exp $ */
 
 #include <config.h>
 
@@ -7,7 +7,6 @@
 
 #include "cf_defs.h"
 #include "canonicalform.h"
-#include "cf_algorithm.h"
 #include "cf_iter.h"
 #include "fac_util.h"
 
@@ -140,21 +139,6 @@ divremainder( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & 
 	}
     }
 }
-
-CanonicalForm
-maxCoeff( const CanonicalForm & f )
-{
-    if ( f.inCoeffDomain() )
-	return abs( f );
-    else {
-	CanonicalForm M = 0, m;
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    if ( (m = maxCoeff( i.coeff() )) > M )
-		M = m;
-	return M;
-    }
-}
-
 
 CanonicalForm
 mappksymmetric ( const CanonicalForm & f )

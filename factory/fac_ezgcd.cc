@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.10 1998-03-10 14:48:24 schmidt Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.11 1998-03-12 14:30:50 schmidt Exp $ */
 
 #include <config.h>
 
@@ -246,7 +246,7 @@ enlargeBound ( const CanonicalForm & F, const CanonicalForm & Lb, const Canonica
     DEBOUTLN( cerr, "ezgcd: (enlarge bound) Db % p = " << mod( Db, pk.getp() ) );
 
     CanonicalForm limit = power( CanonicalForm(2), degree( Db ) ) *
-	tmax( maxCoeff( Lb ), tmax( maxCoeff( Db ), maxCoeff( F ) ) );
+	tmax( maxNorm( Lb ), tmax( maxNorm( Db ), maxNorm( F ) ) );
     int p = pk.getp();
     int k = pk.getk();
     CanonicalForm bound = pk.getpk();
@@ -263,7 +263,7 @@ static modpk
 findBound ( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & lcF, const CanonicalForm & lcG, int degF, int degG )
 {
     CanonicalForm limit = power( CanonicalForm(2), tmin( degF, degG ) ) *
-	gcd( icontent( lcF ), icontent( lcG ) ) * tmin( maxCoeff( F ), maxCoeff( G ) );
+	gcd( icontent( lcF ), icontent( lcG ) ) * tmin( maxNorm( F ), maxNorm( G ) );
     int p, i = 0;
     do {
 	p = cf_getBigPrime( i );
