@@ -44,6 +44,10 @@ TO INSTALL SINGULAR
     that multiple versions and multiple architecture dependent files
     of Singular can peaceably coexist under the same `/usr/local/'
     tree.
+    Messages from tar like "Could not create symlink to ..."
+    can safely be ignored - they appaer only in the case that you install
+    the same version of Singular twice.
+
 
 (2) Unpack the architecture dependent files: 
 
