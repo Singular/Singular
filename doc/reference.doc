@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.182 2000-02-21 11:33:24 Singular Exp $
+@comment $Id: reference.doc,v 1.183 2000-03-08 15:21:44 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1736,7 +1736,7 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-input comes from the file @file{filename}. This is shorthand
+input comes from the file @file{filename}. This is a shorthand for
 @code{execute read(filename)}.
 @item @strong{Example:}
 @smallexample
