@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.9 1997-04-28 17:47:16 Singular Exp $ */
+/* $Id: tesths.cc,v 1.10 1997-04-28 19:25:50 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -63,7 +63,7 @@ int main(          /* main entry to Singular */
           double mintime = strtod(argv[2], &ptr);
           if (errno != ERANGE && ptr != argv[2])
 #else
-          double mintime = 0.0;
+          double mintime = 0;
           sscanf(argv[2],"%f", &mintime);
           if (mintime != 0.0)
 #endif
@@ -73,11 +73,11 @@ int main(          /* main entry to Singular */
             SetMinDisplayTime(mintime);
           }
           else
-            printf("Can not convert %s to a float\n", argv[2]);
+            fprintf(stderr, "Can not convert %s to a float\n", argv[2]);
         }
         else
         {
-          printf("Need a float to set mintime");
+          fprintf(stderr, "Need a float to set mintime");
         }
       }
     }
@@ -88,11 +88,11 @@ int main(          /* main entry to Singular */
         char* ptr = NULL;
 #ifdef HAVE_STRTOL        
         long res = strtol(argv[2], &ptr, 10);
-        if (errno != ERANGE && ptr != argv[2])
+        if (errno != ERANGE && ptr != argv[2] && res > 0)
 #else
         long res = 0;
         sscanf(argv[2],"%d", &res);
-        if (res != 0)
+        if (res > 0)
 #endif          
         {
           argc--;
@@ -100,11 +100,11 @@ int main(          /* main entry to Singular */
           SetTimerResolution(res);
         }
         else
-          printf("Can not convert %s to an integer\n", argv[2]);
+          fprintf(stderr,"Can not convert %s to an integer > 0\n", argv[2]);
       }
       else
       {
-        printf("Need an integer to set timer resolution");
+        fprintf(stderr,"Need an integer to set timer resolution");
       }
     }
     else
@@ -118,7 +118,7 @@ int main(          /* main entry to Singular */
         {
             case 'V':
             case 'v':{
-              printf("Singular %s %s(%d) %s %s\n",
+              printf("Singular %s  %s  (%d)  %s %s\n",
                      S_VERSION1,S_VERSION2,
                      VERSION_ID,__DATE__,__TIME__);
               printf("with ");
@@ -217,17 +217,16 @@ int main(          /* main entry to Singular */
   if (BVERBOSE(0))
   {
     printf(
-"              Welcome to SINGULAR                /\n"
-"           A Computer Algebra System           o<\n"
-" for Algebraic Geometry and Singularity Theory   \\\n\n"
+"              Welcome to SINGULAR                  /\n"
+"           A Computer Algebra System             o<\n"
+" for Commutative Algebra and Algebraic Geometry    \\\n\n"
 "by: G.-M. Greuel, G. Pfister, H. Schoenemann\n"
 "Fachbereich Mathematik der Universitaet, D-67653 Kaiserslautern\n"
 "contributions: O.Bachmann,W.Decker,H.Grassmann,B.Martin,M.Messollen,W.Neumann,\n"
 "W.Pohl,T.Siebert,R.Stobbe                 e-mail: singular@mathematik.uni-kl.de\n");
-    printf("%s %s",S_VERSION1,S_VERSION2);
-    printf(" (%d)\n\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
-           "\"\n(e.g. help; help command; help General syntax; help ring; quit;)\n\n",
-           VERSION_ID);
+    printf("%s  %s  (%d)",S_VERSION1,S_VERSION2, VERSION_ID);
+    printf("\n\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
+           "\"\n(e.g. help; help command; help General syntax; help ring; quit;)\n\n");
   }
   else
   if (!feBatch)

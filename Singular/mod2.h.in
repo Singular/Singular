@@ -139,6 +139,9 @@ char *strstr(const char *haystack, const char *needle);
 /*******************************************************************
  * Miscellanous Defines 
  ******************************************************************/
+/* define MM_COUNT to enable "memory(0)" (resp. memory(1))*/
+#define MM_COUNT 1
+
 /* define YYDEBUG 1 for debugging bison texts, 0 otherwise */
 #define YYDEBUG 0
 
@@ -200,8 +203,6 @@ extern int pShortOut;
 #define RDEBUG 
 /* define TEST for non time critical tests, undefine otherwise */
 #define TEST
-/* define MM_COUNT 1 for use of "memory(0/1)", undefine otherwise */
-#define MM_COUNT 1
 /* define MM_STAT for printing block stats */
 /* #define MM_STAT 1 */
 /* #define PAGE_TEST */

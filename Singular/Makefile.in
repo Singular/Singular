@@ -146,7 +146,7 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 
 mod2.h: configure mod2.h.in Makefile.in
 	./configure ${CONFIGURE_INPUT}
-	touch -r mod2.h configure configure.in
+	touch -r mod2.h configure configure.in Makefile.in
 
 configure: configure.in
 	autoconf configure.in > configure
@@ -163,7 +163,7 @@ installbin: Singular
 installdata: 
 	${MKINSTALLDIRS} ${singulardatadir}
 	${MKINSTALLDIRS} ${singulardatadir}/gftables
-	for file in ${srcdir}/LIB/gftables/*; do \
+	for file in ${srcdir}/LIB/gftables/[0-9]*; do \
 		${INSTALL_DATA} $${file} ${singulardatadir}/gftables; \
 	done
 	for file in ${srcdir}/LIB/*.lib; do \
@@ -194,6 +194,8 @@ maintainer-clean: distlean
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm configure scanner.cc grammar.h grammar.cc
 
+check:	Makefile.in tests/check tests/output
+	cd tests; tests/check ${bindir}/Singular; cd ..
 
 dist:
 	-rm -rf ${DIST_NAME}

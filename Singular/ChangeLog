@@ -1,3 +1,10 @@
+Mon Apr 28 21:00:07 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Added README, INSTALL, COPYING file to distribution
+
+	* tesths.cc (main): slightly changed Singular banner; fixed
+	  display of version number
+
 Fri Apr 25 16:59:31 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* fixed configure.in s.t. sprintf test is correct
