@@ -76,7 +76,7 @@ endif
 ###
 
 # normal C++ source files
-CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
+CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     clapsing.cc cntrlc.cc mminit.cc\
     extra.cc febase.cc feread.cc fehelp.cc feResource.cc feOpt.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
@@ -119,7 +119,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} mmalloc.cc\
 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
-	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
+	longalg.h mpsr_Tok.h structs.h intvec.h longrat.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
 	cntrlc.h ipprint.h ring.h timer.h sdb.h dError.h \
