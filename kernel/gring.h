@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.7 2004-08-14 13:55:27 levandov Exp $ */
+/* $Id: gring.h,v 1.8 2004-08-27 12:20:02 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -46,8 +46,8 @@ poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r);
 poly nc_pSubst(poly p, int n, poly e);
 
 /* copy : */
-poly nc_p_CopyGet(poly a, ring r);
-poly nc_p_CopyPut(poly a, ring r);
+poly nc_p_CopyGet(poly a, const ring r);
+poly nc_p_CopyPut(poly a, const ring r);
 
 /* syzygies : */
 /* former nc_spGSpolyCreate */
