@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.25 1999-08-19 08:31:10 pohl Exp $ */
+/* $Id: matpol.cc,v 1.26 1999-08-19 15:26:13 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -355,46 +355,30 @@ void mpMinorToResult(ideal result, int &elems, matrix a, int r, int c)
   int e=IDELEMS(result);
   int i,j;
 
-  if(e<0X80000000)
-  {    
-    for (i=r-1;i>=0;i--)
-    {
-      q1 = &(a->m)[i*a->ncols];
-      for (j=c-1;j>=0;j--)
-      {
-        if (q1[j]!=NULL)
-        {
-          if (elems>=e)
-          {
-            pEnlargeSet(&(result->m),e,e+1);
-            e += e+1;
-            IDELEMS(result) =e;
-          }
-          result->m[elems] = q1[j];
-          q1[j] = NULL;
-          elems++;
-        }
-      }
-    }
-  }
-  else
+  for (i=r-1;i>=0;i--)
   {
-    for (i=r-1;i>=0;i--)
+    q1 = &(a->m)[i*a->ncols];
+    for (j=c-1;j>=0;j--)
     {
-      q1 = &(a->m)[i*a->ncols];
-      for (j=c-1;j>=0;j--)
+      if (q1[j]!=NULL)
       {
-        if (q1[j]!=NULL)
+        if (elems>=e)
         {
-          if (elems>=e)
+          if(e<100000)
           {
-            Werror("stop after %d minors",elems);
-            HALT();
+            pEnlargeSet(&(result->m),e,e);
+            e += e;
           }
-          result->m[elems] = q1[j];
-          q1[j] = NULL;
-          elems++;
+          else
+          {
+            pEnlargeSet(&(result->m),e,100000);
+            e += 100000;
+          }
+          IDELEMS(result) =e;
         }
+        result->m[elems] = q1[j];
+        q1[j] = NULL;
+        elems++;
       }
     }
   }

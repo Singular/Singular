@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.52 1999-08-19 08:31:09 pohl Exp $ */
+/* $Id: ideals.cc,v 1.53 1999-08-19 15:26:12 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2434,7 +2434,7 @@ ideal idMinors(matrix a, int ar)
     return NULL;
   }
   a = mpCopy(a);
-  result=idInit(31,1);
+  result=idInit(32,1);
   if(ar>1) mpRecMin(ar-1,result,elems,a,a->nrows,a->ncols,NULL);
   else mpMinorToResult(result,elems,a,a->nrows,a->ncols);
   idDelete((ideal *)&a);
