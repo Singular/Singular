@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.6 1998-01-05 16:39:20 Singular Exp $ */
+/* $Id: ipid.h,v 1.7 1998-01-12 18:59:49 obachman Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -29,13 +29,18 @@ struct sip_sring
 #endif
   short      ch;     /* characteristic */
   short      N;      /* number of vars */
+
   short      P;      /* number of pars */
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
+
   short      ref;
+
+  // what follows below here should be set by rComplete, _only_
 #ifdef COMP_FAST
   short     VarOffset; /* controls indexing of exponents */
   short     CompIndex; /* index of component in exponent vector */
 #endif    
+
 #ifdef RDEBUG
   short      no;
 #endif
@@ -153,3 +158,5 @@ void  ipMoveId(idhdl h);
 #define resetFlag(A,F) (A)->flag&=~Sy_bit(F)
 void ipListFlag(idhdl h);
 #endif
+
+

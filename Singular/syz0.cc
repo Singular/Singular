@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.11 1997-12-15 22:46:41 obachman Exp $ */
+/* $Id: syz0.cc,v 1.12 1998-01-12 19:00:02 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -733,6 +733,8 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   short ** wv=NULL;
   BOOLEAN sort = TRUE;
   tHomog hom=(tHomog)idHomModule(arg,NULL,&w);
+  ring origR = currRing;
+  sip_sring tmpR;
 
 #ifndef COMP_FAST  
   if((hom==isHomog)
@@ -777,7 +779,6 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       sySchreyersSyzygiesFM(res[syzIndex]->m,i,&(res[syzIndex+1]->m),
         &(IDELEMS(res[syzIndex+1])),sort);
 //idPrint(res[syzIndex+1]);
-#ifndef COMP_FAST    
     if ((syzIndex==0) && (currRing->OrdSgn==1))
     {
       j = 0;
@@ -814,10 +815,15 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         bl0[j] = currRing->block0[m_order];
         bl1[j] = currRing->block1[m_order];
         wv[j] = currRing->wvhdl[m_order];
-        pChangeRing(pVariables,currRing->OrdSgn,ord,bl0,bl1,wv);
+	tmpR = *currRing;
+	tmpR.order = ord;
+	tmpR.block0 = bl0;
+	tmpR.block1 = bl1;
+	tmpR.wvhdl = wv;
+	rComplete(&tmpR);
+        rChangeCurrRing(&tmpR, FALSE);
       }
     }
-#endif    
     if (sort) sort=FALSE;
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);
@@ -834,8 +840,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     Free((ADDRESS)bl0,(j+2)*sizeof(int));
     Free((ADDRESS)bl1,(j+2)*sizeof(int));
     Free((ADDRESS)wv,(j+2)*sizeof(short*));
-    pChangeRing(pVariables,currRing->OrdSgn,currRing->order,currRing->block0,
-                currRing->block1,currRing->wvhdl);
+    rChangeCurrRing(origR, TRUE);
   }
   while ((syzIndex < *length) && (res[syzIndex]))
   {

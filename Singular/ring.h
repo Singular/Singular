@@ -6,12 +6,13 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.7 1998-01-05 16:39:29 Singular Exp $ */
+/* $Id: ring.h,v 1.8 1998-01-12 18:59:58 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
 #include "polys-impl.h"
 
+void   rChangeCurrRing(ring r, BOOLEAN complete = TRUE);
 void   rSetHdl(idhdl h, BOOLEAN complete);
 idhdl  rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   BOOLEAN isDRing);

@@ -55,7 +55,7 @@ extern int maxBound;
  *
  ***************************************************************/
 #ifndef DO_DEEP_PROFILE
-#define FAST_SPOLY_LOOP
+// #define FAST_SPOLY_LOOP
 #endif
 
 spSpolyLoopProc spSetPSpolyLoop(ring r, int syzComp, int ak, BOOLEAN homog)
@@ -340,11 +340,14 @@ void spPSpolyLoop_General(poly a1, poly a2, poly m,poly spNoether)
 }                                               \
 
 #define NonZeroTestA(d, multiplier, actionE)    \
+do                                              \
+{                                               \
   if (d)                                        \
   {                                             \
     d ^= multiplier;                            \
     actionE;                                    \
   }                                             \
+}                                               \
 while(0)
 
 static void spPSpolyLoop_1(poly a1, poly a2, poly m,poly spNoether)
@@ -1419,7 +1422,7 @@ do                                              \
 {                                               \
   Exponent_t c1 = pGetComp(p1);                 \
   Exponent_t c2 = pGetComp(p2);                 \
-  d = c1 -c2;                                   \
+  d = c2 -c1;                                   \
   if (d)                                        \
   {                                             \
     if (c1 <= maxBound)                         \
@@ -1495,36 +1498,37 @@ static void spPSpolyLoop_1_Syz(poly a1, poly a2, poly m,poly spNoether)
   goto Top;
 
   NotEqual:
-  if (d > 0)
+  if (d < 0)
   {
-    Greater:
-    pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
-    a = pNext(a) = b;
-    pIter(a1);
-    if (a1!=NULL)
+    Smaller:
+    a = pNext(a) = a2;
+    pIter(a2);
+    if (a2==NULL)
     {
-      b = pNew();
-      pCopyAddFast(b, a1, m);
-    }
-    else
-    {
-      pNext(a) = a2;
+      pFree1(b);
+      spMultCopyX(a1, m, a, tneg,spNoether);
       return;
-    }
-    goto Top;
+     }
+     goto Top;
   }
   
   // now d >= 0
-  Smaller:
-  a = pNext(a) = a2;
-  pIter(a2);
-  if (a2==NULL)
+  Greater:
+  pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
+  a = pNext(a) = b;
+  pIter(a1);
+  if (a1!=NULL)
   {
-    pFree1(b);
-    spMultCopyX(a1, m, a, tneg,spNoether);
+    b = pNew();
+    pCopyAddFast(b, a1, m);
+  }
+  else
+  {
+    pNext(a) = a2;
     return;
   }
   goto Top;
+
 }
 
 static void spPSpolyLoop_1_c_Syz(poly a1, poly a2, poly m,poly spNoether)
@@ -1582,7 +1586,6 @@ static void spPSpolyLoop_1_c_Syz(poly a1, poly a2, poly m,poly spNoether)
   }
   pCopyAddFast(b, a1, m);
   goto Top;
-
   NotEqual:
   if (d < 0)
   {
@@ -1594,8 +1597,8 @@ static void spPSpolyLoop_1_c_Syz(poly a1, poly a2, poly m,poly spNoether)
       pFree1(b);
       spMultCopyX(a1, m, a, tneg,spNoether);
       return;
-    }
-    goto Top;
+     }
+     goto Top;
   }
   
   // now d >= 0
@@ -1614,6 +1617,7 @@ static void spPSpolyLoop_1_c_Syz(poly a1, poly a2, poly m,poly spNoether)
     return;
   }
   goto Top;
+
 }
 
 static void spPSpolyLoop_c_1_Syz(poly a1, poly a2, poly m,poly spNoether)
@@ -1674,33 +1678,33 @@ static void spPSpolyLoop_c_1_Syz(poly a1, poly a2, poly m,poly spNoether)
   goto Top;
 
   NotEqual:
-  if (d > 0)
+  if (d < 0)
   {
-    Greater:
-    pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
-    a = pNext(a) = b;
-    pIter(a1);
-    if (a1!=NULL)
+    Smaller:
+    a = pNext(a) = a2;
+    pIter(a2);
+    if (a2==NULL)
     {
-      b = pNew();
-      pCopyAddFast(b, a1, m);
-    }
-    else
-    {
-      pNext(a) = a2;
+      pFree1(b);
+      spMultCopyX(a1, m, a, tneg,spNoether);
       return;
-    }
-    goto Top;
+     }
+     goto Top;
   }
-
+  
   // now d >= 0
-  Smaller:
-  a = pNext(a) = a2;
-  pIter(a2);
-  if (a2==NULL)
+  Greater:
+  pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
+  a = pNext(a) = b;
+  pIter(a1);
+  if (a1!=NULL)
   {
-    pFree1(b);
-    spMultCopyX(a1, m, a, tneg,spNoether);
+    b = pNew();
+    pCopyAddFast(b, a1, m);
+  }
+  else
+  {
+    pNext(a) = a2;
     return;
   }
   goto Top;
@@ -1906,6 +1910,7 @@ static void spPSpolyLoop_c_2_Syz(poly a1, poly a2, poly m,poly spNoether)
   register long d;
 
   _SyzComp_d(b, a2, d, goto Greater, goto Smaller);
+
   d = pGetOrder(b) - pGetOrder(a2);
   NonZeroTestA(d, pOrdSgn, goto NotEqual);
   _pMonCmp_2(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);
@@ -1941,33 +1946,33 @@ static void spPSpolyLoop_c_2_Syz(poly a1, poly a2, poly m,poly spNoether)
   goto Top;
 
   NotEqual:
-  if (d > 0)
+  if (d < 0)
   {
-    Greater:
-    pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
-    a = pNext(a) = b;
-    pIter(a1);
-    if (a1!=NULL)
+    Smaller:
+    a = pNext(a) = a2;
+    pIter(a2);
+    if (a2==NULL)
     {
-      b = pNew();
-      pCopyAddFast(b, a1, m);
-    }
-    else
-    {
-      pNext(a) = a2;
+      pFree1(b);
+      spMultCopyX(a1, m, a, tneg,spNoether);
       return;
-    }
-    goto Top;
+     }
+     goto Top;
   }
-
+  
   // now d >= 0
-  Smaller:
-  a = pNext(a) = a2;
-  pIter(a2);
-  if (a2==NULL)
+  Greater:
+  pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
+  a = pNext(a) = b;
+  pIter(a1);
+  if (a1!=NULL)
   {
-    pFree1(b);
-    spMultCopyX(a1, m, a, tneg,spNoether);
+    b = pNew();
+    pCopyAddFast(b, a1, m);
+  }
+  else
+  {
+    pNext(a) = a2;
     return;
   }
   goto Top;
@@ -2211,33 +2216,33 @@ static void spPSpolyLoop_c_2i_Syz(poly a1, poly a2, poly m,poly spNoether)
   goto Top;
 
   NotEqual:
-  if (d > 0)
+  if (d < 0)
   {
-    Greater:
-    pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
-    a = pNext(a) = b;
-    pIter(a1);
-    if (a1!=NULL)
+    Smaller:
+    a = pNext(a) = a2;
+    pIter(a2);
+    if (a2==NULL)
     {
-      b = pNew();
-      pCopyAddFast(b, a1, m);
-    }
-    else
-    {
-      pNext(a) = a2;
+      pFree1(b);
+      spMultCopyX(a1, m, a, tneg,spNoether);
       return;
-    }
-    goto Top;
+     }
+     goto Top;
   }
-
+  
   // now d >= 0
-  Smaller:
-  a = pNext(a) = a2;
-  pIter(a2);
-  if (a2==NULL)
+  Greater:
+  pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
+  a = pNext(a) = b;
+  pIter(a1);
+  if (a1!=NULL)
   {
-    pFree1(b);
-    spMultCopyX(a1, m, a, tneg,spNoether);
+    b = pNew();
+    pCopyAddFast(b, a1, m);
+  }
+  else
+  {
+    pNext(a) = a2;
     return;
   }
   goto Top;

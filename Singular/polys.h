@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.7 1998-01-05 16:39:27 Singular Exp $ */
+/* $Id: polys.h,v 1.8 1998-01-12 18:59:56 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -129,6 +129,7 @@ void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 extern void   pChangeRing(int N, int OrdSgn,
                          int* ord, int* block0, int* block1,
                          short** wv);
+extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
 
 /*-----------the ordering of monomials:-------------*/
 extern pSetmProc pSetm;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.5 1998-01-05 16:39:25 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.6 1998-01-12 18:59:52 obachman Exp $ */
 
 /***************************************************************
  *
@@ -173,6 +173,9 @@ extern int pVarHighIndex;
 #define _pRingExpIndex(r, i)                                   \
   ((r)->VarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
    (r)->VarOffset - (i) : (r)->VarOffset + (i))
+#define _pExpIndex(i)                                   \
+  (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
+   pVarOffset - (i) : pVarOffset + (i))
 #endif
     
 // For (Lex, Comp) Comparisons
@@ -824,14 +827,23 @@ DECLARE(int, __pExpQuerSum2(poly p, int from, int to))
 }
 
 #ifdef COMP_FAST
-#define _pExpQuerSum(p)     __pExpQuerSum2(p, pVarLowIndex, pVarHighIndex)
-#define _pExpQuerSum1(p,to) __pExpQuerSum2(p, pVarLowIndex, pVarLowIndex+to-1) 
-#define _pExpQuerSum2(p,from, to)     \
-  __pQuerSum2(p, pVarLowIndex + from -1 ,pVarLowIndex + to -1)
+#define _pExpQuerSum(p)  __pExpQuerSum2(p, pVarLowIndex, pVarHighIndex)
+
+#define _pExpQuerSum1(p,to) \
+ (_pHasReverseExp ? \
+    __pExpQuerSum2(p, _pExpIndex(to), _pExpIndex(1)) : \
+    __pExpQuerSum2(p, _pExpIndex(1), _pExpIndex(to)))
+ 
+#define _pExpQuerSum2(p,from,to) \
+ (_pHasReverseExp ? \
+    __pExpQuerSum2(p, _pExpIndex(to), _pExpIndex(from)) : \
+    __pExpQuerSum2(p, _pExpIndex(from), _pExpIndex(to)))
 #else
+
 #define _pExpQuerSum(p)             __pExpQuerSum2(p, 1, pVariables)
 #define _pExpQuerSum1(p, to)        __pExpQuerSum2(p, 1, to)
 #define _pExpQuerSum2(p, from, to)  __pExpQuerSum2(p, from, to)
+
 #endif
            
 #endif // POLYS_IMPL_H

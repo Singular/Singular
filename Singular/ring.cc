@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.12 1997-12-15 22:46:39 obachman Exp $ */
+/* $Id: ring.cc,v 1.13 1998-01-12 18:59:57 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -40,23 +40,61 @@ int rBlocks(ring r)
   return i+1;
 }
 
-static void rSet(ring rg,BOOLEAN complete)
+// internally changes the gloabl ring and resets the relevant
+// global variables: 
+// complete == FALSE : only delete operations are enabled
+// complete == TRUE  : full reset of all variables
+void rChangeCurrRing(ring r, BOOLEAN complete)
 {
-  if (ppNoether!=NULL) pDelete(&ppNoether);
-  if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
-  || ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
+  if (r != NULL)
   {
-    sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
-  }
-  if(rg!=NULL)
-  {
-    test |= Sy_bit(OPT_REDTAIL); /* redTail, except reset by nSetChar or pChangeRing */
-    nSetChar(rg->ch,complete,rg->parameter,rg->P);
-    pChangeRing(rg->N, rg->OrdSgn, rg->order, rg->block0, rg->block1,  rg->wvhdl);
+    /*------------ set redTail, except reset by nSetChar or pChangeRing */
+    test |= Sy_bit(OPT_REDTAIL); 
+
+    /*------------ global variables related to coefficients ------------*/
+    nSetChar(r->ch, complete, r->parameter, r->P);
+
+    /*------------ global variables related to polys -------------------*/
+    pSetGlobals(r, complete);
+
+    /*------------ set naMinimalPoly -----------------------------------*/
+    if (r->minpoly!=NULL)
+    {
+      naMinimalPoly=((lnumber)r->minpoly)->z;
+    }
+    
+    /*------------ set global ring vars --------------------------------*/
+    currRing = r;
+    currQuotient=r->qideal;
+
+#ifdef DRING
+    pDRING=FALSE;
+    pSDRING=FALSE;
+    if (hasFlag(h,FLAG_DRING)) rDSet();
+#endif // DRING
+
+#ifdef SRING
+    if ((currRing->partN<=currRing->N)
+#ifdef DRING
+	&& (!hasFlag(h,FLAG_DRING))
+#endif
+	)
+    {
+      pAltVars=currRing->partN;
+      pSRING=TRUE;
+      pSDRING=TRUE;
+    }
+    else
+    {
+      pAltVars=currRing->N+1;
+    }
+#endif // SRING
+
+    /*------------ set spolys ------------------------------------------*/
+    if (complete) spSet(r);
   }
 }
-
+  
 void rSetHdl(idhdl h, BOOLEAN complete)
 {
   int i;
@@ -76,12 +114,22 @@ void rSetHdl(idhdl h, BOOLEAN complete)
     mmTestP(rg->wvhdl,i*sizeof(short *));
   }
   else complete=FALSE;
-  rSet(rg,complete);
+    
+  // clean up history
+    if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
+	|| ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
+    {
+      sLastPrinted.CleanUp();
+      memset(&sLastPrinted,0,sizeof(sleftv));
+    }
+  
+   /*------------ change the global ring -----------------------*/
+  rChangeCurrRing(rg,complete);
   currRingHdl = h;
-  currRing    = rg;
+
+    /*------------ set pShortOut -----------------------*/
   if (complete /*&&(h!=NULL)*/)
   {
-    /*------------ set pShortOut -----------------------*/
     if (tclmode)
     {
       PrintTCLS('R',IDID(h));
@@ -92,76 +140,47 @@ void rSetHdl(idhdl h, BOOLEAN complete)
       pShortOut=(int)TRUE;
       if ((rg->parameter!=NULL) && (rg->ch<2))
       {
-        for (i=0;i<rg->P;i++)
-        {
-          if(strlen(rg->parameter[i])>1)
-          {
-            pShortOut=(int)FALSE;
-            break;
-          }
-        }
+	for (i=0;i<rg->P;i++)
+	{
+	  if(strlen(rg->parameter[i])>1)
+	  {
+	    pShortOut=(int)FALSE;
+	    break;
+	  }
+	}
       }
       if (pShortOut)
       {
-        for (i=(rg->N-1);i>=0;i--)
-        {
-          if(strlen(rg->names[i])>1)
-          {
-            pShortOut=(int)FALSE;
-            break;
-          }
-        }
+	for (i=(rg->N-1);i>=0;i--)
+	{
+	  if(strlen(rg->names[i])>1)
+	  {
+	    pShortOut=(int)FALSE;
+	    break;
+	  }
+	}
       }
     }
-    /*------------ set naMinimalPoly -----------------------*/
-    if (rg->minpoly!=NULL)
-    {
-      naMinimalPoly=((lnumber)rg->minpoly)->z;
-    }
-    /*------------ set global ring vars -----------------------*/
-    currQuotient=rg->qideal;
-#ifdef DRING
-    pDRING=FALSE;
-    pSDRING=FALSE;
-    if (hasFlag(h,FLAG_DRING)) rDSet();
-#endif
-#ifdef SRING
-    if ((currRing->partN<=currRing->N)
-#ifdef DRING
-    && (!hasFlag(h,FLAG_DRING))
-#endif
-    )
-    {
-      pAltVars=currRing->partN;
-      pSRING=TRUE;
-      pSDRING=TRUE;
-    }
-    else
-    {
-      pAltVars=currRing->N+1;
-    }
-#endif
-    /*------------ set spolys -----------------------*/
-    spSet(rg);
   }
+  
 }
 
 idhdl rDefault(char *s)
 {
   idhdl tmp=NULL;
-
+  
   if (s!=NULL) tmp = enterid(s, myynest, RING_CMD, &idroot);
   if (tmp==NULL) return NULL;
-
+  
   if (ppNoether!=NULL) pDelete(&ppNoether);
   if ((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
   {
     sLastPrinted.CleanUp();
     memset(&sLastPrinted,0,sizeof(sleftv));
   }
-
+  
   currRing = IDRING(tmp);
-
+  
   currRing->ch    = 32003;
   currRing->N     = 3;
   /*currRing->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
@@ -172,42 +191,42 @@ idhdl rDefault(char *s)
   currRing->partN = 4;
 #endif
   /*names*/
-    currRing->names = (char **) Alloc(3 * sizeof(char *));
-    currRing->names[0]  = mstrdup("x");
-    currRing->names[1]  = mstrdup("y");
-    currRing->names[2]  = mstrdup("z");
+  currRing->names = (char **) Alloc(3 * sizeof(char *));
+  currRing->names[0]  = mstrdup("x");
+  currRing->names[1]  = mstrdup("y");
+  currRing->names[2]  = mstrdup("z");
   /*weights: entries for 3 blocks: NULL*/
-    currRing->wvhdl = (short **)Alloc0(3 * sizeof(short *));
+  currRing->wvhdl = (short **)Alloc0(3 * sizeof(short *));
   /*order: dp,C,0*/
-    currRing->order = (int *) Alloc(3 * sizeof(int *));
-    currRing->block0 = (int *)Alloc(3 * sizeof(int *));
-    currRing->block1 = (int *)Alloc(3 * sizeof(int *));
+  currRing->order = (int *) Alloc(3 * sizeof(int *));
+  currRing->block0 = (int *)Alloc(3 * sizeof(int *));
+  currRing->block1 = (int *)Alloc(3 * sizeof(int *));
   /* ringorder dp for the first block: var 1..3 */
-    currRing->order[0]  = ringorder_dp;
-    currRing->block0[0] = 1;
-    currRing->block1[0] = 3;
+  currRing->order[0]  = ringorder_dp;
+  currRing->block0[0] = 1;
+  currRing->block1[0] = 3;
   /* ringorder C for the second block: no vars */
-    currRing->order[1]  = ringorder_C;
-    currRing->block0[1] = 0;
-    currRing->block1[1] = 0;
+  currRing->order[1]  = ringorder_C;
+  currRing->block0[1] = 0;
+  currRing->block1[1] = 0;
   /* the last block: everything is 0 */
-    currRing->order[2]  = 0;
-    currRing->block0[2] = 0;
-    currRing->block1[2] = 0;
+  currRing->order[2]  = 0;
+  currRing->block0[2] = 0;
+  currRing->block1[2] = 0;
   /*polynomial ring*/
-    currRing->OrdSgn    = 1;
-
-    /* complete ring intializations */
+  currRing->OrdSgn    = 1;
+  
+  /* complete ring intializations */
 #ifdef COMP_FAST    
-    rComplete(currRing);
+  rComplete(currRing);
 #endif    
   rSetHdl(tmp,TRUE);
   return currRingHdl;
 }
 
 /*2
-*check intvec, describing the ordering
-*/
+ *check intvec, describing the ordering
+ */
 BOOLEAN rCheckIV(intvec *iv)
 {
   if ((iv->length()!=2)&&(iv->length()!=3))
@@ -222,7 +241,7 @@ static int rTypeOfMatrixOrder(intvec * order)
 {
   int i=0,j,typ=1;
   int sz = (int)sqrt(order->length()-2);
-
+  
   while ((i<sz) && (typ==1))
   {
     j=0;
@@ -241,12 +260,12 @@ static int rTypeOfMatrixOrder(intvec * order)
 }
 
 /*2
-* define a new ring from the data:
-*s: name, chr: ch, parameter names (or NULL): pn,
-*varnames: rv, ordering: ord, typ: typ
-*/
+ * define a new ring from the data:
+ *s: name, chr: ch, parameter names (or NULL): pn,
+ *varnames: rv, ordering: ord, typ: typ
+ */
 idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
-  BOOLEAN isDRing)
+	    BOOLEAN isDRing)
 {
   int ch;
   if (pn->Typ()==INT_CMD)
@@ -265,7 +284,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     return NULL;
   }
   pn=pn->next;
-
+  
   int l, last;
   int typ = 1;
   sleftv * sl;
@@ -273,15 +292,15 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   ip_sring tmpR;
   BOOLEAN ffChar=FALSE;
   /*every entry in the new ring is initialized to 0*/
-
-/* characteristic -----------------------------------------------*/
+  
+  /* characteristic -----------------------------------------------*/
   /* input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE
-  *         0    1 : Q(a,...)        *names         FALSE
-  *         0   -1 : R               NULL           FALSE
-  *         p    p : Fp              NULL           FALSE
-  *         p   -p : Fp(a)           *names         FALSE
-  *         q    q : GF(q=p^n)       *names         TRUE
-  */
+   *         0    1 : Q(a,...)        *names         FALSE
+   *         0   -1 : R               NULL           FALSE
+   *         p    p : Fp              NULL           FALSE
+   *         p   -p : Fp(a)           *names         FALSE
+   *         q    q : GF(q=p^n)       *names         TRUE
+   */
   if (ch!=-1)
   {
     if ((ch!=0) &&((ch<2) || (ch > 32003)))
@@ -294,21 +313,21 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       while ((ch!=fftable[l]) && (fftable[l])) l++;
       if (fftable[l]==0)
       {
-        ch = IsPrime(ch);
+	ch = IsPrime(ch);
       }  
       else
       {
-        char *m[1]={(char *)sNoName};
-        nfSetChar(ch,m);
-        if(errorreported)
-        {
-           errorreported=0;
-           ch=IsPrime(ch);
-        }
-        else
-        {
-          ffChar=TRUE;
-        }  
+	char *m[1]={(char *)sNoName};
+	nfSetChar(ch,m);
+	if(errorreported)
+	{
+	  errorreported=0;
+	  ch=IsPrime(ch);
+	}
+	else
+	{
+	  ffChar=TRUE;
+	}  
       }
     }
     else
@@ -317,17 +336,17 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     }
   }
   memset(&tmpR,0,sizeof(tmpR));
-
+  
   tmpR.ch = ch;
-
-/* parameter -------------------------------------------------------*/
+  
+  /* parameter -------------------------------------------------------*/
   sleftv* hs;
   const char* h;
-
+  
   if ((pn!=NULL)&& (ffChar||(ch==-1)))
   {
     if((ffChar && (pn->next!=NULL))
-    || (ch==-1))
+       || (ch==-1))
     {
       WarnS("too many parameters");
       if (ffChar) hs=pn->next; 
@@ -335,21 +354,21 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       hs->CleanUp();
       if (ffChar) 
       {
-        pn->next=NULL;
-        Free((ADDRESS)hs,sizeof(sleftv));
+	pn->next=NULL;
+	Free((ADDRESS)hs,sizeof(sleftv));
       }  
       else pn=NULL;
     }
   }
   /* a tempory pointer for typ conversion
-  * and for deallocating sleftv*-lists:
-  *  don't deallocate the first but all other entries*/
-
+   * and for deallocating sleftv*-lists:
+   *  don't deallocate the first but all other entries*/
+  
   if (pn!=NULL)
   {
     tmpR.P=pn->listLength();
     if((ffChar && (tmpR.P>1))
-    || ((ch==-1) && (tmpR.P>0)))
+       || ((ch==-1) && (tmpR.P>0)))
     {
       tmpR.P=ffChar; /* GF(q): 1, R: 0 */
       WarnS("too many parameters");
@@ -369,26 +388,26 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       h=sl->Name();
       if ((h==sNoName)&&(sl->Typ()==POLY_CMD))
       {
-        hs=(leftv)Alloc(sizeof(sleftv));
-        iiConvert(POLY_CMD,ANY_TYPE,-1,sl,hs);
-        sl->next=hs->next;
-        hs->next=NULL;
-        h=hs->Name();
+	hs=(leftv)Alloc(sizeof(sleftv));
+	iiConvert(POLY_CMD,ANY_TYPE,-1,sl,hs);
+	sl->next=hs->next;
+	hs->next=NULL;
+	h=hs->Name();
       }
       if (h==sNoName)
       {
-        WerrorS("parameter expected");
-        pn->CleanUp();
-        rv->CleanUp();
-        ord->CleanUp();
-        return NULL;
+	WerrorS("parameter expected");
+	pn->CleanUp();
+	rv->CleanUp();
+	ord->CleanUp();
+	return NULL;
       }
       *p=mstrdup(h);
       p++;
       if (hs!=NULL)
       {
-        hs->CleanUp();
-        Free((ADDRESS)hs,sizeof(sleftv));
+	hs->CleanUp();
+	Free((ADDRESS)hs,sizeof(sleftv));
       }
       hs=sl;
       sl=sl->next;
@@ -399,7 +418,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     if ((ch>1) && /*(pn!=NULL) &&*/ (!ffChar)) tmpR.ch=-tmpR.ch;
     if (ch==0) tmpR.ch=1;
   }
-
+  
   /* names and number of variables-------------------------------------*/
   {
     int i, n;
@@ -411,7 +430,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     tmpR.N = n;
 #ifdef SDRING
     tmpR.partN=n+1-isDRing; // set to N+1 for SRING, N for DRING
-    if (isDRing) n=2*n+1;
+      if (isDRing) n=2*n+1;
 #endif
     tmpR.N = n;
     tmpR.names   = (char **)Alloc(n * sizeof(char *));
@@ -421,60 +440,60 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
 #ifdef DRING
       if (sl==NULL)
       {
-        if (i==tmpR.N-1)
-          tmpname=mstrdup("");
-        else
-        {
-          tmpname=(char*)AllocL(strlen(tmpR.names[i-tmpR.partN])+2);
-          strcpy(tmpname,"d");
-          strcat(tmpname,tmpR.names[i-tmpR.partN]);
-        }
-        h=tmpname;
+	if (i==tmpR.N-1)
+	  tmpname=mstrdup("");
+	else
+	{
+	  tmpname=(char*)AllocL(strlen(tmpR.names[i-tmpR.partN])+2);
+	  strcpy(tmpname,"d");
+	  strcat(tmpname,tmpR.names[i-tmpR.partN]);
+	}
+	h=tmpname;
       }
       else
 #endif
-      h=sl->Name();
+	h=sl->Name();
       if ((h==sNoName)&&(sl->Typ()==POLY_CMD))
       {
-        hs=(leftv)Alloc(sizeof(sleftv));
-        iiConvert(POLY_CMD,ANY_TYPE,-1,sl,hs);
-        sl->next=hs->next;
-        hs->next=NULL;
-        h=hs->Name();
+	hs=(leftv)Alloc(sizeof(sleftv));
+	iiConvert(POLY_CMD,ANY_TYPE,-1,sl,hs);
+	sl->next=hs->next;
+	hs->next=NULL;
+	h=hs->Name();
       }
       if (h==sNoName)
       {
-        WerrorS("expected name of ring variable");
-        sl->CleanUp();
-        ord->CleanUp();
-        return NULL;
+	WerrorS("expected name of ring variable");
+	sl->CleanUp();
+	ord->CleanUp();
+	return NULL;
       }
       tmpR.names[i] = mstrdup(h);
       if (hs!=NULL)
       {
-        hs->CleanUp();
-        Free((ADDRESS)hs,sizeof(sleftv));
+	hs->CleanUp();
+	Free((ADDRESS)hs,sizeof(sleftv));
       }
       hs=sl;
 #ifdef DRING
       if (sl!=NULL)
       {
 #endif
-      sl=sl->next;
-      hs->next=NULL;
-      hs->CleanUp();
-      if (hs!=rv) Free((ADDRESS)hs,sizeof(sleftv));
+	sl=sl->next;
+	hs->next=NULL;
+	hs->CleanUp();
+	if (hs!=rv) Free((ADDRESS)hs,sizeof(sleftv));
 #ifdef DRING
       }
       if (tmpname!=NULL)
       {
-        FreeL((ADDRESS)tmpname);
-        tmpname=NULL;
+	FreeL((ADDRESS)tmpname);
+	tmpname=NULL;
       }
 #endif
     }
-
-  /* ordering -------------------------------------------------------------*/
+    
+    /* ordering -------------------------------------------------------------*/
     sl = ord;
     /* the number of orderings*/
     n = 1; i=0;
@@ -496,13 +515,13 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     if (i==0) n++;
     else if (i!=1)
       WarnS("more than one ordering c/C -- ignored");
-
+    
     /* allocating */
     tmpR.order=(int *)Alloc0(n*sizeof(int));
     tmpR.block0=(int *)Alloc0(n*sizeof(int));
     tmpR.block1=(int *)Alloc0(n*sizeof(int));
     tmpR.wvhdl=(short**)Alloc0(n*sizeof(short*));
-
+    
     /* init orders */
     sl=ord;
     n=0;
@@ -511,72 +530,72 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     {
       intvec *iv;
       iv = (intvec *)(sl->data);
-
+      
       /* the format of an ordering:
-      *  iv[0]: factor
-      *  iv[1]: ordering
-      *  iv[2..end]: weights
-      */
+       *  iv[0]: factor
+       *  iv[1]: ordering
+       *  iv[2..end]: weights
+       */
       tmpR.order[n] = (*iv)[1];
       switch ((*iv)[1])
       {
-        case ringorder_ws:
-        case ringorder_Ws:
-          typ=-1;
-        case ringorder_wp:
-        case ringorder_Wp:
-          tmpR.wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
-          for (l=2;l<iv->length();l++)
-            tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
-          tmpR.block0[n]=last+1;
-          last+=iv->length()-2;
-          tmpR.block1[n]=last;
-          break;
-        case ringorder_ls:
-        case ringorder_ds:
-        case ringorder_Ds:
-          typ=-1;
-        case ringorder_lp:
-        case ringorder_dp:
-        case ringorder_Dp:
-          tmpR.block0[n]=last+1;
-          //last+=(*iv)[0];
-          if (iv->length()==3) last+=(*iv)[2];
-          else last+=(*iv)[0];
-          tmpR.block1[n]=last;
-          if (rCheckIV(iv)) return NULL;
-          break;
-        case ringorder_c:
-        case ringorder_C:
-          if (rCheckIV(iv)) return NULL;
-          break;
-        case ringorder_a:
-          tmpR.block0[n]=last+1;
-          tmpR.block1[n]=last+iv->length()-2;
-          tmpR.wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
-          for (l=2;l<iv->length();l++)
-          {
-            tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
-            if ((*iv)[l]<0) typ=-1;
-          }
-          break;
-        case ringorder_M:
-          {
-            int Mtyp=rTypeOfMatrixOrder(iv);
-            if (Mtyp==0) return NULL;
-            if (Mtyp==-1) typ=-1;
-            tmpR.wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
-            for (l=2;l<iv->length();l++)
-              tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
-            tmpR.block0[n]=last+1;
-            last+=(int)sqrt(iv->length()-2);
-            tmpR.block1[n]=last;
-            break;
-          }
+      case ringorder_ws:
+      case ringorder_Ws:
+	typ=-1;
+      case ringorder_wp:
+      case ringorder_Wp:
+	tmpR.wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
+	for (l=2;l<iv->length();l++)
+	  tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
+	tmpR.block0[n]=last+1;
+	last+=iv->length()-2;
+	tmpR.block1[n]=last;
+	break;
+      case ringorder_ls:
+      case ringorder_ds:
+      case ringorder_Ds:
+	typ=-1;
+      case ringorder_lp:
+      case ringorder_dp:
+      case ringorder_Dp:
+	tmpR.block0[n]=last+1;
+	//last+=(*iv)[0];
+	if (iv->length()==3) last+=(*iv)[2];
+	else last+=(*iv)[0];
+	tmpR.block1[n]=last;
+	if (rCheckIV(iv)) return NULL;
+	break;
+      case ringorder_c:
+      case ringorder_C:
+	if (rCheckIV(iv)) return NULL;
+	break;
+      case ringorder_a:
+	tmpR.block0[n]=last+1;
+	tmpR.block1[n]=last+iv->length()-2;
+	tmpR.wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
+	for (l=2;l<iv->length();l++)
+	{
+	  tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
+	  if ((*iv)[l]<0) typ=-1;
+	}
+	break;
+      case ringorder_M:
+	{
+	  int Mtyp=rTypeOfMatrixOrder(iv);
+	  if (Mtyp==0) return NULL;
+	  if (Mtyp==-1) typ=-1;
+	  tmpR.wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
+	  for (l=2;l<iv->length();l++)
+	    tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
+	  tmpR.block0[n]=last+1;
+	  last+=(int)sqrt(iv->length()-2);
+	  tmpR.block1[n]=last;
+	  break;
+	}
 #ifdef TEST
-        default:
-          Print("order ??? %d\n",(*iv)[1]);
-          break;
+      default:
+	Print("order ??? %d\n",(*iv)[1]);
+	break;
 #endif
       }
       sl=sl->next;
@@ -590,62 +609,62 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     }
     else n--;
     while ((tmpR.order[n]==ringorder_c)
-    ||(tmpR.order[n]==ringorder_C))
+	   ||(tmpR.order[n]==ringorder_C))
       n--;
     if (tmpR.block1[n]!=tmpR.N)
     {
       if ((tmpR.order[n]==ringorder_dp) ||
-        (tmpR.order[n]==ringorder_ds) ||
-        (tmpR.order[n]==ringorder_Dp) ||
-        (tmpR.order[n]==ringorder_Ds) ||
-        (tmpR.order[n]==ringorder_lp) ||
-        (tmpR.order[n]==ringorder_ls))
+	  (tmpR.order[n]==ringorder_ds) ||
+	  (tmpR.order[n]==ringorder_Dp) ||
+	  (tmpR.order[n]==ringorder_Ds) ||
+	  (tmpR.order[n]==ringorder_lp) ||
+	  (tmpR.order[n]==ringorder_ls))
       {
-        tmpR.block1[n]=tmpR.N;
-        if (tmpR.block0[n]>tmpR.N/*tmpR.block1[n]*/)
-        {
-          tmpR.block1[n]=tmpR.block0[n];
-          goto ord_mismatch;
-          //Werror("mismatch of number of vars (%d) and ordering (>=%d vars)",
-          //  tmpR.N,tmpR.block0[n]);
-          //return NULL;
-        }
+	tmpR.block1[n]=tmpR.N;
+	if (tmpR.block0[n]>tmpR.N/*tmpR.block1[n]*/)
+	{
+	  tmpR.block1[n]=tmpR.block0[n];
+	  goto ord_mismatch;
+	  //Werror("mismatch of number of vars (%d) and ordering (>=%d vars)",
+	  //  tmpR.N,tmpR.block0[n]);
+	  //return NULL;
+	}
       }
       else
       {
-ord_mismatch:
-        Werror("mismatch of number of vars (%d) and ordering (%d vars)",
-          tmpR.N,tmpR.block1[n]);
-        return NULL;
+      ord_mismatch:
+	Werror("mismatch of number of vars (%d) and ordering (%d vars)",
+	       tmpR.N,tmpR.block1[n]);
+	return NULL;
       }
     }
   }
   tmpR.OrdSgn = typ;
 #ifdef COMP_FAST  
   // Complete the initialization
-  rComplete(&tmpR);
+    rComplete(&tmpR);
 #endif  
-/* try to enter the ring into the name list*/
+  /* try to enter the ring into the name list*/
   if ((tmp = enterid(s, myynest, RING_CMD, &idroot))==NULL)
   {
     return NULL;
   }
-
+  
   memcpy(IDRING(tmp),&tmpR,sizeof(tmpR));
   rSetHdl(tmp,TRUE);
-
+  
 #ifdef RDEBUG
   currRing->no    =rNumber; rNumber++;
 #endif
-
+  
   return currRingHdl;
 }
 
 #ifdef COMP_FAST
 // set those fields of the ring, which can be computed from other fields:
 // More particularly, set:
-// r->VarOffset
-// r->CompIndex
+// r->VarOffset, r->CompIndex
+
 void rComplete(ring r)
 {
   int dummy, VarOffset, CompIndex;
@@ -654,11 +673,11 @@ void rComplete(ring r)
   r->CompIndex = (short) CompIndex;
 }
 #endif
-
+  
 /*2
-* set a new ring from the data:
-s: name, chr: ch, varnames: rv, ordering: ord, typ: typ
-*/
+ * set a new ring from the data:
+ s: name, chr: ch, varnames: rv, ordering: ord, typ: typ
+ */
 #ifdef DRING
 void rDSet()
 {
@@ -668,7 +687,7 @@ void rDSet()
   pdK=pVariables-pdN*2-1;
 }
 #endif
-
+  
 int rIsRingVar(char *n)
 {
   if ((currRing!=NULL) && (currRing->names!=NULL))
@@ -691,23 +710,23 @@ void rWrite(ring r)
 {
   if ((r==NULL)||(r->order==NULL))
     return; /*to avoid printing after errors....*/
-
+  
   int nblocks=rBlocks(r);
-
+  
   mmTestP(r,sizeof(ip_sring));
   mmTestP(r->order,nblocks*sizeof(int));
   mmTestP(r->block0,nblocks*sizeof(int));
   mmTestP(r->block1,nblocks*sizeof(int));
   mmTestP(r->wvhdl,nblocks*sizeof(short *));
   mmTestP(r->names,r->N*sizeof(char *));
-
+  
   nblocks--;
-
-
+  
+  
   if ((r->parameter!=NULL)&&(r->ch>1))
-  PrintS("//   # ground field : ");
+    PrintS("//   # ground field : ");
   else
-  PrintS("//   characteristic : ");
+    PrintS("//   characteristic : ");
   if (r->ch==-1)     Print ("0 (real)\n");  /* R */
   else if (r->ch<0)  Print ("%d\n",-r->ch); /* Fp(a) */
   else if (r->ch==1) PrintS("0\n");         /* Q(a)  */
@@ -721,22 +740,22 @@ void rWrite(ring r)
       int nop=0;
       while (nop<r->P)
       {
-        PrintS(*sp);
-        PrintS(" ");
-        sp++; nop++;
+	PrintS(*sp);
+	PrintS(" ");
+	sp++; nop++;
       }
       PrintS("\n//   minpoly        : ");
       if (r==currRing)
       {
-        StringSetS(""); nWrite(r->minpoly); PrintS(StringAppendS("\n"));
+	StringSetS(""); nWrite(r->minpoly); PrintS(StringAppendS("\n"));
       }
       else if (r->minpoly==NULL)
       {
-        PrintS("0\n");
+	PrintS("0\n");
       }
       else
       {
-        PrintS("...\n");
+	PrintS("...\n");
       }
     }
     else
@@ -744,52 +763,52 @@ void rWrite(ring r)
       Print("//   primitive element : %s\n", r->parameter[0]);
       if (r==currRing) 
       {
-        StringSetS("//   minpoly        : ");
-        nfShowMipo();PrintS(StringAppend("\n"));
+	StringSetS("//   minpoly        : ");
+	nfShowMipo();PrintS(StringAppend("\n"));
       }  
     }  
   }
   Print("//   number of vars : %d",r->N);
-
+  
   //for (nblocks=0; r->order[nblocks]; nblocks++);
   nblocks=rBlocks(r)-1;
-
+  
   for (int l=0, nlen=0 ; l<nblocks; l++)
   {
     int i;
     Print("\n//        block %3d : ",l+1);
-
+    
     Print("ordering %c", (" acCMldDwWldDwWu")[r->order[l]]);
     if ((r->order[l]>=ringorder_lp)&&(r->order[l]!=ringorder_unspec))
     {
       if (r->order[l]>=ringorder_ls)
-        PrintS("s");
+	PrintS("s");
       else
-        PrintS("p");
+	PrintS("p");
     }
-
+    
     if ((r->order[l] != ringorder_c) && (r->order[l] != ringorder_C))
     {
       PrintS("\n//                  : names    ");
       for (i = r->block0[l]-1; i<r->block1[l]; i++)
       {
-        nlen = strlen(r->names[i]);
-        Print("%s ",r->names[i]);
+	nlen = strlen(r->names[i]);
+	Print("%s ",r->names[i]);
       }
     }
-
+    
     if (r->wvhdl[l]!=NULL)
     {
       for (int j= 0;
-        j<(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1);
-        j+=i)
+	   j<(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1);
+	   j+=i)
       {
-        PrintS("\n//                  : weights  ");
-        for (i = 0; i<=r->block1[l]-r->block0[l]; i++)
-        {
-          Print("%*d " ,nlen,r->wvhdl[l][i+j],i+j);
-        }
-        if (r->order[l]!=ringorder_M) break;
+	PrintS("\n//                  : weights  ");
+	for (i = 0; i<=r->block1[l]-r->block0[l]; i++)
+	{
+	  Print("%*d " ,nlen,r->wvhdl[l][i+j],i+j);
+	}
+	if (r->order[l]!=ringorder_M) break;
       }
     }
   }
@@ -798,8 +817,8 @@ void rWrite(ring r)
     PrintS("\n// quotient ring from ideal");
     if (r==currRing)
     {
-       PrintLn();
-       iiWriteMatrix((matrix)r->qideal,"_",1);
+      PrintLn();
+      iiWriteMatrix((matrix)r->qideal,"_",1);
     }
     else PrintS(" ...");
   }
@@ -816,15 +835,15 @@ void rKill(ring r)
     {
       if (r->qideal!=NULL)
       {
-        idDelete(&r->qideal);
-        r->qideal=NULL;
-        currQuotient=NULL;
+	idDelete(&r->qideal);
+	r->qideal=NULL;
+	currQuotient=NULL;
       }
       if (ppNoether!=NULL) pDelete(&ppNoether);
       if ((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
       {
-        sLastPrinted.CleanUp();
-        memset(&sLastPrinted,0,sizeof(sleftv));
+	sLastPrinted.CleanUp();
+	memset(&sLastPrinted,0,sizeof(sleftv));
       }
       currRing=NULL;
       currRingHdl=NULL;
@@ -832,10 +851,10 @@ void rKill(ring r)
     else if (r->qideal!=NULL)
     {
       ring savecurrRing = currRing;
-      rSet((ring)r,FALSE);
+      rChangeCurrRing((ring)r,FALSE);
       idDelete(&r->qideal);
       r->qideal=NULL;
-      if (savecurrRing!=NULL) rSet(savecurrRing,FALSE);
+      if (savecurrRing!=NULL) rChangeCurrRing(savecurrRing,FALSE);
     }
     int i=1;
     int j;
@@ -844,8 +863,8 @@ void rKill(ring r)
     {
       if (iiLocalRing[j]==r)
       {
-        if (j<myynest) Warn("killing the basering for level %d",j);
-        iiLocalRing[j]=NULL;
+	if (j<myynest) Warn("killing the basering for level %d",j);
+	iiLocalRing[j]=NULL;
       }
     }
     if (pi!=NULL)
@@ -857,29 +876,29 @@ void rKill(ring r)
       Free((ADDRESS)r->block1,i*sizeof(int));
       for (j=0; j<i; j++)
       {
-        if (r->wvhdl[j]!=NULL)
-          FreeL(r->wvhdl[j]);
+	if (r->wvhdl[j]!=NULL)
+	  FreeL(r->wvhdl[j]);
       }
       Free((ADDRESS)r->wvhdl,i*sizeof(short *));
       if(r->names!=NULL)
       {
-        for (i=0; i<r->N; i++)
-        {
-          FreeL((ADDRESS)r->names[i]);
-        }
-        Free((ADDRESS)r->names,r->N*sizeof(char *));
+	for (i=0; i<r->N; i++)
+	{
+	  FreeL((ADDRESS)r->names[i]);
+	}
+	Free((ADDRESS)r->names,r->N*sizeof(char *));
       }
       if (r->parameter!=NULL)
       {
-        int len=0;
-        char **s=r->parameter;
-        while (len<r->P)
-        {
-          FreeL((ADDRESS)*s);
-          s++;
-          len++;
-        }
-        Free((ADDRESS)r->parameter,r->P*sizeof(char *));
+	int len=0;
+	char **s=r->parameter;
+	while (len<r->P)
+	{
+	  FreeL((ADDRESS)*s);
+	  s++;
+	  len++;
+	}
+	Free((ADDRESS)r->parameter,r->P*sizeof(char *));
       }
     }
 #ifdef TEST
@@ -903,9 +922,9 @@ void rKill(idhdl h)
     while (currRingHdl!=NULL)
     {
       if ((currRingHdl!=h)
-      && (IDTYP(currRingHdl)==IDTYP(h))
-      && (h->data.uring==currRingHdl->data.uring))
-         break;
+	  && (IDTYP(currRingHdl)==IDTYP(h))
+	  && (h->data.uring==currRingHdl->data.uring))
+	break;
       currRingHdl=IDNEXT(currRingHdl);
     }
   }
@@ -917,8 +936,8 @@ idhdl rFindHdl(ring r, idhdl n)
   while (h!=NULL)
   {
     if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
-    && (h->data.uring==r)
-    && (h!=n))
+	&& (h->data.uring==r)
+	&& (h!=n))
       return h;
     h=IDNEXT(h);
   }
@@ -928,34 +947,34 @@ idhdl rFindHdl(ring r, idhdl n)
 int rOrderName(char * ordername)
 {
   int order=0;
-
+  
   switch (*ordername)
   {
-     case 'l':
-              if (*(ordername+1)=='p') order = ringorder_lp;
-              else if (*(ordername+1)=='s') order = ringorder_ls;
-              break;
-     case 'd':
-              if (*(ordername+1)=='p') order = ringorder_dp;
-              else if (*(ordername+1)=='s') order = ringorder_ds;
-              break;
-     case 'w':
-              if (*(ordername+1)=='p') order = ringorder_wp;
-              else if (*(ordername+1)=='s') order = ringorder_ws;
-              break;
-     case 'D':
-              if (*(ordername+1)=='p') order = ringorder_Dp;
-              else if (*(ordername+1)=='s') order = ringorder_Ds;
-              break;
-     case 'W':
-              if (*(ordername+1)=='p') order = ringorder_Wp;
-              else if (*(ordername+1)=='s') order = ringorder_Ws;
-              break;
-     case 'c': order = ringorder_c; break;
-     case 'C': order = ringorder_C; break;
-     case 'a': order = ringorder_a; break;
-     case 'M': order = ringorder_M; break;
-     default: break;
+  case 'l':
+    if (*(ordername+1)=='p') order = ringorder_lp;
+    else if (*(ordername+1)=='s') order = ringorder_ls;
+    break;
+  case 'd':
+    if (*(ordername+1)=='p') order = ringorder_dp;
+    else if (*(ordername+1)=='s') order = ringorder_ds;
+    break;
+  case 'w':
+    if (*(ordername+1)=='p') order = ringorder_wp;
+    else if (*(ordername+1)=='s') order = ringorder_ws;
+    break;
+  case 'D':
+    if (*(ordername+1)=='p') order = ringorder_Dp;
+    else if (*(ordername+1)=='s') order = ringorder_Ds;
+    break;
+  case 'W':
+    if (*(ordername+1)=='p') order = ringorder_Wp;
+    else if (*(ordername+1)=='s') order = ringorder_Ws;
+    break;
+  case 'c': order = ringorder_c; break;
+  case 'C': order = ringorder_C; break;
+  case 'a': order = ringorder_a; break;
+  case 'M': order = ringorder_M; break;
+  default: break;
   }
   if (order==0) Werror("wrong ring order `%s`",ordername);
   FreeL((ADDRESS)ordername);
@@ -965,10 +984,10 @@ int rOrderName(char * ordername)
 char * rOrdStr(ring r)
 {
   int nblocks,l,i;
-
+  
   for (nblocks=0; r->order[nblocks]; nblocks++);
   nblocks--;
-
+  
   StringSetS("");
   for (l=0; ; l++)
   {
@@ -976,36 +995,36 @@ char * rOrdStr(ring r)
     if (r->order[l]>=ringorder_lp)
     {
       if (r->order[l]>=ringorder_ls)
-        StringAppendS("s");
+	StringAppendS("s");
       else
-        StringAppendS("p");
+	StringAppendS("p");
     }
     if ((r->order[l] != ringorder_c) && (r->order[l] != ringorder_C))
     {
       if (r->wvhdl[l]!=NULL)
       {
-        StringAppendS("(");
-        for (int j= 0;
-          j<(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1);
-          j+=i+1)
-        {
-          char c=',';
-          for (i = 0; i<r->block1[l]-r->block0[l]; i++)
-          {
-            StringAppend("%d," ,r->wvhdl[l][i+j]);
-          }
-          if (r->order[l]!=ringorder_M)
-          {
-            StringAppend("%d)" ,r->wvhdl[l][i+j]);
-            break;
-          }
-          if (j+i+1==(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1))
-            c=')';
-          StringAppend("%d%c" ,r->wvhdl[l][i+j],c);
-        }
+	StringAppendS("(");
+	for (int j= 0;
+	     j<(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1);
+	     j+=i+1)
+	{
+	  char c=',';
+	  for (i = 0; i<r->block1[l]-r->block0[l]; i++)
+	  {
+	    StringAppend("%d," ,r->wvhdl[l][i+j]);
+	  }
+	  if (r->order[l]!=ringorder_M)
+	  {
+	    StringAppend("%d)" ,r->wvhdl[l][i+j]);
+	    break;
+	  }
+	  if (j+i+1==(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1))
+	    c=')';
+	  StringAppend("%d%c" ,r->wvhdl[l][i+j],c);
+	}
       }
       else
-        StringAppend("(%d)",r->block1[l]-r->block0[l]+1);
+	StringAppend("(%d)",r->block1[l]-r->block0[l]+1);
     }
     if (l==nblocks) return mstrdup(StringAppendS(""));
     StringAppendS(",");
@@ -1017,7 +1036,7 @@ char * rVarStr(ring r)
   int i;
   int l=2;
   char *s;
-
+  
   for (i=0; i<r->N; i++)
   {
     l+=strlen(r->names[i])+1;
@@ -1037,7 +1056,7 @@ char * rCharStr(ring r)
 {
   char *s;
   int i;
-
+  
   if (r->parameter==NULL)
   {
     i=r->ch;
@@ -1078,10 +1097,10 @@ char * rCharStr(ring r)
 char * rParStr(ring r)
 {
   if (r->parameter==NULL) return mstrdup("");
-
+  
   int i;
   int l=2;
-
+  
   for (i=0; i<r->P; i++)
   {
     l+=strlen(r->parameter[i])+1;
@@ -1143,10 +1162,10 @@ int    rIsExtension()
 }
 
 /*2
-*returns -1 for not compatible, (sum is undefined)
-*         0 for equal, (and sum)
-*         1 for compatible (and sum)
-*/
+ *returns -1 for not compatible, (sum is undefined)
+ *         0 for equal, (and sum)
+ *         1 for compatible (and sum)
+ */
 int rSum(ring r1, ring r2, ring &sum)
 {
   if (r1==r2)
@@ -1165,109 +1184,109 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       if (r1->parameter!=NULL)
       {
-        if (strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
-        {
-          tmpR.parameter=(char **)Alloc(sizeof(char *));
-          tmpR.parameter[0]=mstrdup(r1->parameter[0]);
-          tmpR.P=1;
-        }
-        else
-        {
-          WerrorS("GF(p,n)+GF(p,n)");
-          return -1;
-        }
+	if (strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
+	{
+	  tmpR.parameter=(char **)Alloc(sizeof(char *));
+	  tmpR.parameter[0]=mstrdup(r1->parameter[0]);
+	  tmpR.P=1;
+	}
+	else
+	{
+	  WerrorS("GF(p,n)+GF(p,n)");
+	  return -1;
+	}
       }
     }
     else if ((r1->ch==1)||(r1->ch<-1)) /* Q(a),Z/p(a) */
     {
       if (r1->minpoly!=NULL)
       {
-        if (r2->minpoly!=NULL)
-        {
-          nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
-          if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
-          && naEqual(r1->minpoly,r2->minpoly))
-          {
-            tmpR.parameter=(char **)Alloc(sizeof(char *));
-            tmpR.parameter[0]=mstrdup(r1->parameter[0]);
-            tmpR.minpoly=naCopy(r1->minpoly);
-            tmpR.P=1;
-            nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
-          }
-          else
-          {
-            nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
-            WerrorS("different minpolys");
-            return -1;
-          }
-        }
-        else
-        {
-          if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
-          && (r2->P==1))
-          {
-            tmpR.parameter=(char **)Alloc0(sizeof(char *));
-            tmpR.parameter[0]=mstrdup(r1->parameter[0]);
-            tmpR.P=1;
-            nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
-            tmpR.minpoly=naCopy(r1->minpoly);
-            nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
-          }
-          else
-          {
-            WerrorS("different parameters and minpoly!=0");
-            return -1;
-          }
-        }
+	if (r2->minpoly!=NULL)
+	{
+	  nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+	  if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
+	      && naEqual(r1->minpoly,r2->minpoly))
+	  {
+	    tmpR.parameter=(char **)Alloc(sizeof(char *));
+	    tmpR.parameter[0]=mstrdup(r1->parameter[0]);
+	    tmpR.minpoly=naCopy(r1->minpoly);
+	    tmpR.P=1;
+	    nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+	  }
+	  else
+	  {
+	    nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+	    WerrorS("different minpolys");
+	    return -1;
+	  }
+	}
+	else
+	{
+	  if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
+	      && (r2->P==1))
+	  {
+	    tmpR.parameter=(char **)Alloc0(sizeof(char *));
+	    tmpR.parameter[0]=mstrdup(r1->parameter[0]);
+	    tmpR.P=1;
+	    nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+	    tmpR.minpoly=naCopy(r1->minpoly);
+	    nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+	  }
+	  else
+	  {
+	    WerrorS("different parameters and minpoly!=0");
+	    return -1;
+	  }
+	}
       }
       else /* r1->minpoly==NULL */
       {
-        if (r2->minpoly!=NULL)
-        {
-          if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
-          && (r1->P==1))
-          {
-            tmpR.parameter=(char **)Alloc(sizeof(char *));
-            tmpR.parameter[0]=mstrdup(r1->parameter[0]);
-            tmpR.P=1;
-            nSetChar(r2->ch,TRUE,r2->parameter,r2->P);
-            tmpR.minpoly=naCopy(r2->minpoly);
-            nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
-          }
-          else
-          {
-            WerrorS("different parameters and minpoly!=0");
-            return -1;
-          }
-        }
-        else
-        {
-          int len=rPar(r1)+rPar(r2);
-          tmpR.parameter=(char **)Alloc(len*sizeof(char *));
-          int i;
-          for (i=0;i<r1->P;i++)
-          {
-            tmpR.parameter[i]=mstrdup(r1->parameter[i]);
-          }
-          int j,l;
-          for(j=0;j<r2->P;j++)
-          {
-            for(l=0;l<i;l++)
-            {
-              if(strcmp(tmpR.parameter[l],r2->parameter[j])==0)
-                break;
-            }
-            if (l==i)
-            {
-              tmpR.parameter[i]=mstrdup(r2->parameter[j]);
-              i++;
-            }
-          }
-          if (i!=len)
-          {
-            ReAlloc(tmpR.parameter,len*sizeof(char *),i*sizeof(char *));
-          }
-        }
+	if (r2->minpoly!=NULL)
+	{
+	  if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
+	      && (r1->P==1))
+	  {
+	    tmpR.parameter=(char **)Alloc(sizeof(char *));
+	    tmpR.parameter[0]=mstrdup(r1->parameter[0]);
+	    tmpR.P=1;
+	    nSetChar(r2->ch,TRUE,r2->parameter,r2->P);
+	    tmpR.minpoly=naCopy(r2->minpoly);
+	    nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+	  }
+	  else
+	  {
+	    WerrorS("different parameters and minpoly!=0");
+	    return -1;
+	  }
+	}
+	else
+	{
+	  int len=rPar(r1)+rPar(r2);
+	  tmpR.parameter=(char **)Alloc(len*sizeof(char *));
+	  int i;
+	  for (i=0;i<r1->P;i++)
+	  {
+	    tmpR.parameter[i]=mstrdup(r1->parameter[i]);
+	  }
+	  int j,l;
+	  for(j=0;j<r2->P;j++)
+	  {
+	    for(l=0;l<i;l++)
+	    {
+	      if(strcmp(tmpR.parameter[l],r2->parameter[j])==0)
+		break;
+	    }
+	    if (l==i)
+	    {
+	      tmpR.parameter[i]=mstrdup(r2->parameter[j]);
+	      i++;
+	    }
+	  }
+	  if (i!=len)
+	  {
+	    ReAlloc(tmpR.parameter,len*sizeof(char *),i*sizeof(char *));
+	  }
+	}
       }
     }
   }
@@ -1276,23 +1295,23 @@ int rSum(ring r1, ring r2, ring &sum)
     if (r1->ch<-1) /* Z/p(a) */
     {
       if ((r2->ch==0) /* Q */
-      || (r2->ch==-r1->ch)) /* Z/p */
+	  || (r2->ch==-r1->ch)) /* Z/p */
       {
-        tmpR.ch=r1->ch;
-        tmpR.parameter=(char **)Alloc(rPar(r1)*sizeof(char *));
-        tmpR.P=r1->P;
-        memcpy(tmpR.parameter,r1->parameter,rPar(r1)*sizeof(char *));
-        if (r1->minpoly!=NULL)
-        {
-          nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
-          tmpR.minpoly=naCopy(r1->minpoly);
-          nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
-        }
+	tmpR.ch=r1->ch;
+	tmpR.parameter=(char **)Alloc(rPar(r1)*sizeof(char *));
+	tmpR.P=r1->P;
+	memcpy(tmpR.parameter,r1->parameter,rPar(r1)*sizeof(char *));
+	if (r1->minpoly!=NULL)
+	{
+	  nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+	  tmpR.minpoly=naCopy(r1->minpoly);
+	  nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+	}
       }
       else  /* R, Q(a),Z/q,Z/p(a),GF(p,n) */
       {
-        WerrorS("Z/p(a)+(R,Q(a),Z/q(a),GF(q,n))");
-        return -1;
+	WerrorS("Z/p(a)+(R,Q(a),Z/q(a),GF(q,n))");
+	return -1;
       }
     }
     else if (r1->ch==-1) /* R */
@@ -1304,85 +1323,85 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       if ((r2->ch<-1)||(r2->ch==1)) /* Z/p(a),Q(a) */
       {
-        tmpR.ch=r2->ch;
-        tmpR.P=r2->P;
-        tmpR.parameter=(char **)Alloc(rPar(r2)*sizeof(char *));
-        memcpy(tmpR.parameter,r2->parameter,rPar(r2)*sizeof(char *));
-        if (r2->minpoly!=NULL)
-        {
-          nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
-          tmpR.minpoly=naCopy(r2->minpoly);
-          nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
-        }
+	tmpR.ch=r2->ch;
+	tmpR.P=r2->P;
+	tmpR.parameter=(char **)Alloc(rPar(r2)*sizeof(char *));
+	memcpy(tmpR.parameter,r2->parameter,rPar(r2)*sizeof(char *));
+	if (r2->minpoly!=NULL)
+	{
+	  nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+	  tmpR.minpoly=naCopy(r2->minpoly);
+	  nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+	}
       }
       else if (r2->ch>1) /* Z/p,GF(p,n) */
       {
-        tmpR.ch=r2->ch;
-        if (r2->parameter!=NULL)
-        {
-          tmpR.parameter=(char **)Alloc(sizeof(char *));
-          tmpR.P=1;
-          tmpR.parameter[0]=mstrdup(r2->parameter[0]);
-        }
+	tmpR.ch=r2->ch;
+	if (r2->parameter!=NULL)
+	{
+	  tmpR.parameter=(char **)Alloc(sizeof(char *));
+	  tmpR.P=1;
+	  tmpR.parameter[0]=mstrdup(r2->parameter[0]);
+	}
       }
       else
       {
-        WerrorS("Q+R");
-        return -1; /* R */
+	WerrorS("Q+R");
+	return -1; /* R */
       }
     }
     else if (r1->ch==1) /* Q(a) */
     {
       if (r2->ch==0) /* Q */
       {
-        tmpR.ch=r1->ch;
-        tmpR.P=rPar(r1);
-        tmpR.parameter=(char **)Alloc0(rPar(r1)*sizeof(char *));
-        int i;
-        for(i=0;i<r1->P;i++)
-        {
-          tmpR.parameter[i]=mstrdup(r1->parameter[i]);
-        }
-        if (r1->minpoly!=NULL)
-        {
-          nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
-          tmpR.minpoly=naCopy(r1->minpoly);
-          nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
-        }
+	tmpR.ch=r1->ch;
+	tmpR.P=rPar(r1);
+	tmpR.parameter=(char **)Alloc0(rPar(r1)*sizeof(char *));
+	int i;
+	for(i=0;i<r1->P;i++)
+	{
+	  tmpR.parameter[i]=mstrdup(r1->parameter[i]);
+	}
+	if (r1->minpoly!=NULL)
+	{
+	  nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+	  tmpR.minpoly=naCopy(r1->minpoly);
+	  nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+	}
       }
       else  /* R, Z/p,GF(p,n) */
       {
-        WerrorS("Q(a)+(R,Z/p,GF(p,n))");
-        return -1;
+	WerrorS("Q(a)+(R,Z/p,GF(p,n))");
+	return -1;
       }
     }
     else /* r1->ch >=2 , Z/p */
     {
       if (r2->ch==0) /* Q */
       {
-        tmpR.ch=r1->ch;
+	tmpR.ch=r1->ch;
       }
       else if (r2->ch==-r1->ch) /* Z/p(a) */
       {
-        tmpR.ch=r2->ch;
-        tmpR.P=rPar(r2);
-        tmpR.parameter=(char **)Alloc(rPar(r2)*sizeof(char *));
-        int i;
-        for(i=0;i<r2->P;i++)
-        {
-          tmpR.parameter[i]=mstrdup(r2->parameter[i]);
-        }
-        if (r2->minpoly!=NULL)
-        {
-          nSetChar(r2->ch,TRUE,r2->parameter,r2->P);
-          tmpR.minpoly=naCopy(r2->minpoly);
-          nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
-        }
+	tmpR.ch=r2->ch;
+	tmpR.P=rPar(r2);
+	tmpR.parameter=(char **)Alloc(rPar(r2)*sizeof(char *));
+	int i;
+	for(i=0;i<r2->P;i++)
+	{
+	  tmpR.parameter[i]=mstrdup(r2->parameter[i]);
+	}
+	if (r2->minpoly!=NULL)
+	{
+	  nSetChar(r2->ch,TRUE,r2->parameter,r2->P);
+	  tmpR.minpoly=naCopy(r2->minpoly);
+	  nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+	}
       }
       else
       {
-        WerrorS("Z/p+(GF(q,n),Z/q(a),R,Q(a))");
-        return -1; /* GF(p,n),Z/q(a),R,Q(a) */
+	WerrorS("Z/p+(GF(q,n),Z/q(a),R,Q(a))");
+	return -1; /* GF(p,n),Z/q(a),R,Q(a) */
       }
     }
   }
@@ -1391,27 +1410,27 @@ int rSum(ring r1, ring r2, ring &sum)
   int l=r1->N+r2->N;
   char **names=(char **)Alloc0(l*sizeof(char*));
   k=0;
-
+  
   // collect all varnames from r1, except those which are parameters
   // of r2, or those which are the empty string
   for (i=0;i<r1->N;i++)
   {
     BOOLEAN b=TRUE;
-
+    
     if (*(r1->names[i]) == '\0')
       b = FALSE;
     else if ((r2->parameter!=NULL) && (strlen(r1->names[i])==1))
     {
       for(j=0;j<r2->P;j++)
       {
-        if (strcmp(r1->names[i],r2->parameter[j])==0)
-        {
-          b=FALSE;
-          break;
-        }
+	if (strcmp(r1->names[i],r2->parameter[j])==0)
+	{
+	  b=FALSE;
+	  break;
+	}
       }
     }
-
+    
     if (b)
     {
       //Print("name : %d: %s\n",k,r1->names[i]);
@@ -1426,36 +1445,36 @@ int rSum(ring r1, ring r2, ring &sum)
   for(i=0;i<r2->N;i++)
   {
     BOOLEAN b=TRUE;
-
+    
     if (*(r2->names[i]) == '\0')
       b = FALSE;
     else if ((r1->parameter!=NULL) && (strlen(r2->names[i])==1))
     {
       for(j=0;j<r1->P;j++)
       {
-        if (strcmp(r2->names[i],r1->parameter[j])==0)
-        {
-          b=FALSE;
-          break;
-        }
+	if (strcmp(r2->names[i],r1->parameter[j])==0)
+	{
+	  b=FALSE;
+	  break;
+	}
       }
     }
-
+    
     if (b)
     {
       for(j=0;j<r1->N;j++)
       {
-        if (strcmp(r1->names[j],r2->names[i])==0)
-        {
-          b=FALSE;
-          break;
-        }
+	if (strcmp(r1->names[j],r2->names[i])==0)
+	{
+	  b=FALSE;
+	  break;
+	}
       }
       if (b)
       {
-        names[k]=mstrdup(r2->names[i]);
-        //Print("name : %d : %s\n",k,r2->names[i]);
-        k++;
+	names[k]=mstrdup(r2->names[i]);
+	//Print("name : %d : %s\n",k,r2->names[i]);
+	k++;
       }
       //else
       //  Print("no name (var): %s\n",r2->names[i]);
@@ -1474,7 +1493,7 @@ int rSum(ring r1, ring r2, ring &sum)
   /* ordering *======================================================== */
   tmpR.OrdSgn=1;
   if ((r1->order[0]==ringorder_unspec)
-  && (r2->order[0]==ringorder_unspec))
+      && (r2->order[0]==ringorder_unspec))
   {
     tmpR.order=(int*)Alloc(3*sizeof(int));
     tmpR.block0=(int*)Alloc(3*sizeof(int));
@@ -1518,9 +1537,9 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       for (i=0;i<b;i++)
       {
-        tmpR.order[i]=rb->order[i];
-        tmpR.block0[i]=rb->block0[i];
-        tmpR.block1[i]=rb->block1[i];
+	tmpR.order[i]=rb->order[i];
+	tmpR.block0[i]=rb->block0[i];
+	tmpR.block1[i]=rb->block1[i];
       }
       tmpR.block0[0]=1;
     }
@@ -1528,37 +1547,37 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       for (i=0;r1->order[i]!=0;i++)
       {
-        tmpR.order[i]=r1->order[i];
-        tmpR.block0[i]=r1->block0[i];
-        tmpR.block1[i]=r1->block1[i];
+	tmpR.order[i]=r1->order[i];
+	tmpR.block0[i]=r1->block0[i];
+	tmpR.block1[i]=r1->block1[i];
       }
       j=i;
       i--;
       if ((r1->order[i]==ringorder_c)
-      ||(r1->order[i]==ringorder_C))
+	  ||(r1->order[i]==ringorder_C))
       {
-        j--;
-        tmpR.order[b-2]=r1->order[i];
+	j--;
+	tmpR.order[b-2]=r1->order[i];
       }
       for (i=0;r2->order[i]!=0;i++,j++)
       {
-        if ((r2->order[i]!=ringorder_c)
-        &&(r2->order[i]!=ringorder_C))
-        {
-          tmpR.order[j]=r2->order[i];
-          tmpR.block0[j]=r2->block0[i]+r1->N;
-          tmpR.block1[j]=r2->block1[i]+r1->N;
-        }
+	if ((r2->order[i]!=ringorder_c)
+	    &&(r2->order[i]!=ringorder_C))
+	{
+	  tmpR.order[j]=r2->order[i];
+	  tmpR.block0[j]=r2->block0[i]+r1->N;
+	  tmpR.block1[j]=r2->block1[i]+r1->N;
+	}
       }
       if((r1->OrdSgn==-1)||(r2->OrdSgn==-1))
-        tmpR.OrdSgn=-1;
+	tmpR.OrdSgn=-1;
     }
   }
   else if ((k==r1->N) && (k==r2->N)) /* r1 and r2 are "quite" the same ring */
-                          /* copy r1, because we have the variables from r1 */
+    /* copy r1, because we have the variables from r1 */
   {
     int b=rBlocks(r1);
-
+    
     tmpR.order=(int*)Alloc0(b*sizeof(int));
     tmpR.block0=(int*)Alloc0(b*sizeof(int));
     tmpR.block1=(int*)Alloc0(b*sizeof(int));
@@ -1588,17 +1607,17 @@ int rSum(ring r1, ring r2, ring &sum)
 }
 
 /*2
-* create a copy of the ring r, which must be equivalent to currRing
-* used for qring definition,..
-* (i.e.: normal rings: same nCopy as currRing;
-*        qring:        same nCopy, same idCopy as currRing)
-*/
+ * create a copy of the ring r, which must be equivalent to currRing
+ * used for qring definition,..
+ * (i.e.: normal rings: same nCopy as currRing;
+ *        qring:        same nCopy, same idCopy as currRing)
+ */
 ring rCopy(ring r)
 {
   int i,j;
   int *pi;
   ring res=(ring)Alloc(sizeof(ip_sring));
-
+  
   memcpy4(res,r,sizeof(ip_sring));
   if (r->parameter!=NULL)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.6 1997-12-15 22:46:21 obachman Exp $ */
+/* $Id: algmap.cc,v 1.7 1998-01-12 18:59:44 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -19,12 +19,12 @@
 #include "algmap.h"
 
 
-static poly maLongalg1Fetch(poly res, poly p0, int m, int n,
+static poly maLongalg1Fetch(poly res, poly p0, ring r0, int n,
                             int t, BOOLEAN *nom)
 {
   napoly a0, b0;
   poly q0, q1 = NULL;
-  int i, j;
+  int i, j, m = r0->N;
 
   if (naGetDenom(pGetCoeff(p0)) != NULL)
   {
@@ -35,7 +35,7 @@ static poly maLongalg1Fetch(poly res, poly p0, int m, int n,
   do
   {
     q0 = pInit();
-    pSetComp(q0,pGetComp(p0));
+    pSetComp(q0,pRingGetComp(r0, p0));
     if (t!=0)
     {
       pGetCoeff(q0) = (number)Alloc0(sizeof(rnumber));
@@ -52,7 +52,7 @@ static poly maLongalg1Fetch(poly res, poly p0, int m, int n,
     }
     for (i=m; i>0; i--)
     {
-      pSetExp(q0,i, pGetExp(p0,i));
+      pSetExp(q0,i, pRingGetExp(r0, p0,i));
     }
     j = t;
     for (i=m+1; i<=n; i++)
@@ -68,7 +68,7 @@ static poly maLongalg1Fetch(poly res, poly p0, int m, int n,
   return pAdd(res, q1);
 }
 
-static poly maLongalg2Fetch(poly res, poly p0, int n, int s,
+static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
                             int t, BOOLEAN *nom)
 {
   poly q0;
@@ -86,10 +86,10 @@ static poly maLongalg2Fetch(poly res, poly p0, int n, int s,
     a0 = naGetNom(pGetCoeff(p0));
   }
   q0 = pInit();
-  pSetComp(q0,pGetComp(p0));
+  pSetComp(q0,pRingGetComp(r0, p0));
   for (i=n; i>0; i--)
   {
-    pSetExp(q0,i, pGetExp(p0,i));
+    pSetExp(q0,i, pRingGetExp(r0,p0,i));
   }
   pSetm(q0);
   do
@@ -111,7 +111,7 @@ static poly maLongalg2Fetch(poly res, poly p0, int n, int s,
     for (i=s+1; i<=t; i++)
     {
       j++;
-      napGetExp(b0,i) = pGetExp(p0,j);
+      napGetExp(b0,i) = pRingGetExp(r0,p0,j);
     }
     if (s==0)
     {
@@ -167,7 +167,7 @@ poly maAlgpolyFetch(ring R, poly preimage)
   {
     while (p0!=NULL)
     {
-      result = maLongalg1Fetch(result, p0, m, n, t, &nom);
+      result = maLongalg1Fetch(result, p0, R, n, t, &nom);
       if (nom)
       {
         goto err_algfetch;
@@ -179,7 +179,7 @@ poly maAlgpolyFetch(ring R, poly preimage)
   {
     while (p0!=NULL)
     {
-      result = maLongalg2Fetch(result, p0, n, s, t, &nom);
+      result = maLongalg2Fetch(result, p0, R, n, s, t, &nom);
       if (nom)
       {
         goto err_algfetch;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.6 1997-12-15 22:46:31 obachman Exp $ */
+/* $Id: maps.cc,v 1.7 1998-01-12 18:59:50 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -171,7 +171,6 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   int N = pVariables+imagepvariables;
   sip_sring tmpR;
 
-//  pChangeRing(theImageRing->N,theImageRing->OrdSgn,theImageRing->order,theImageRing->blocks,theImageRing->wvhdl);
   memset(block0, 0,sizeof(block0));
   memset(block1, 0,sizeof(block1));
   memset(orders, 0,sizeof(orders));
@@ -202,16 +201,16 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   wv = (short **) Alloc(ordersize * sizeof(short **));
   memset(wv,0,ordersize * sizeof(short **));
   for (i--;i!=0 ;i--) wv[i+1] = sourcering->wvhdl[i];
-  memset(&tmpR, 0, sizeof(sip_sring));
+  tmpR = *currRing;
   tmpR.N = N;
-  tmpR.OrdSgn = currRing->OrdSgn;
   tmpR.order = orders;
   tmpR.block0 = block0;
   tmpR.block1 = block1;
   tmpR.wvhdl = wv;
   rComplete(&tmpR);
-  
-  pChangeRing(N,currRing->OrdSgn,orders,block0,block1, wv);
+
+  // change to new ring
+  rChangeCurrRing(&tmpR, FALSE);
   sizeofpoly = pMonomSize; /*POLYSIZE+sizeof(monomial);*/
   if (id==NULL)
     j = 0;
@@ -247,8 +246,9 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   {
     if (pLowVar(temp2->m[i])<imagepvariables) pDelete(&(temp2->m[i]));
   }
-  pChangeRing(sourcering->N,sourcering->OrdSgn,sourcering->order,
-              sourcering->block0,sourcering->block1,sourcering->wvhdl);
+
+  // let's get back to the original ring
+  rChangeCurrRing(sourcering, FALSE);
   temp1 = idInit(5,1);
   j = 0;
   for (i=0;i<IDELEMS(temp2);i++)
@@ -410,7 +410,7 @@ static int maMaxDeg_P(poly p,ring preimage_r)
   int N = preimage_r->N;
   int *m=(int *)Alloc0(N*sizeof(int));
 
-  pTest(p);
+//  pTest(p);
   while(p!=NULL)
   {
     for(j=N-1;j>=0;j--)

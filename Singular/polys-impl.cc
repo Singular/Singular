@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.3 1997-12-16 18:23:59 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.4 1998-01-12 18:59:51 obachman Exp $ */
 
 /***************************************************************
  *
@@ -306,12 +306,10 @@ void _pDelete1(poly* p)
 
 void ppDelete(poly* p, ring rg)
 {
-  nSetChar(rg->ch,FALSE,rg->parameter,rg->P);
-  pChangeRing(rg->N,rg->OrdSgn,rg->order,rg->block0,rg->block1,rg->wvhdl);
+  ring origRing = currRing;
+  rChangeCurrRing(rg, FALSE);
   pDelete(p);
-  nSetChar(currRing->ch,FALSE,currRing->parameter,currRing->P);
-  pChangeRing(currRing->N,currRing->OrdSgn,currRing->order,
-    currRing->block0,currRing->block1,  currRing->wvhdl);
+  rChangeCurrRing(origRing, FALSE);
 }
 
 /*2

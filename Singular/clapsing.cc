@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.21 1998-01-12 17:32:46 Singular Exp $
+// $Id: clapsing.cc,v 1.22 1998-01-12 18:59:46 obachman Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -26,7 +26,10 @@
 poly singclap_gcd ( poly f, poly g )
 {
   poly res=NULL;
-
+  
+  pCleardenom(f);
+  pCleardenom(g);
+  
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if ( nGetChar() == 0 || nGetChar() > 1 )
@@ -58,6 +61,9 @@ poly singclap_gcd ( poly f, poly g )
   }
   else
     WerrorS( "not implemented" );
+
+  pDelete(&f);
+  pDelete(&g);
   return res;
 }
 
@@ -782,7 +788,7 @@ int singclap_det_i( intvec * m )
 /* interpreter interface : */
 BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 {
-  res->data=(void *)singclap_gcd((poly)(u->Data()),((poly)v->Data()));
+  res->data=(void *)singclap_gcd((poly)(u->CopyD()),((poly)v->CopyD()));
   return FALSE;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.15 1997-12-15 22:46:26 obachman Exp $ */
+/* $Id: ideals.cc,v 1.16 1998-01-12 18:59:47 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2102,6 +2102,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   tHomog hom;
   intvec * w;
   sip_sring tmpR;
+  ring origR = currRing;
 
   if (delVar==NULL)
   {
@@ -2144,27 +2145,26 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   ord[0] = ringorder_a;
 
   // fill in tmp ring to get back the data later on
-  memset(&tmpR, 0, sizeof(sip_sring));
-  tmpR.N = pVariables;
-  tmpR.OrdSgn = currRing->OrdSgn;
+  tmpR  = *origR;
   tmpR.order = ord;
   tmpR.block0 = block0;
   tmpR.block1 = block1;
   tmpR.wvhdl = wv;
   rComplete(&tmpR);
-
+  
   // change into the new ring
   pChangeRing(pVariables,currRing->OrdSgn,ord,block0,block1,wv);
+  //  rChangeCurrRing(&tmpR, FALSE);
+  currRing = &tmpR;
   h = idInit(IDELEMS(h1),1);
   // fetch data from the old ring
-  for (k=0;k<IDELEMS(h1);k++) h->m[k] = pFetchCopy(currRing, pCopy(h1->m[k]));
+  for (k=0;k<IDELEMS(h1);k++) h->m[k] = pFetchCopy(origR, h1->m[k]);
   // compute std
   hh = std(h,NULL,hom,&w,hilb);
   idDelete(&h);
 
   // go back to the original ring
-  pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
-    currRing->block0,currRing->block1,currRing->wvhdl);
+  rChangeCurrRing(origR,FALSE);
   i = IDELEMS(hh)-1;
   while ((i >= 0) && (hh->m[i] == NULL)) i--;
   j = -1;
@@ -2181,10 +2181,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
         pEnlargeSet(&(h3->m),IDELEMS(h3),16);
         IDELEMS(h3) += 16;
       }
-//pWrite(hh->m[k]);
       h3->m[j] = pFetchCopy(&tmpR, hh->m[k]);
-//pWrite(h3->m[j]);
-//PrintLn();
     }
   }
   idDelete(&hh);

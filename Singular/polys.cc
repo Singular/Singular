@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.12 1998-01-05 16:39:26 Singular Exp $ */
+/* $Id: polys.cc,v 1.13 1998-01-12 18:59:54 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -20,6 +20,7 @@
 #include "polys.h"
 #include "ring.h"
 #include "binom.h"
+#include "ipid.h"
 
 #ifdef COMP_FAST
 #include "polys-comp.h"
@@ -128,7 +129,7 @@ static void setdeg1(poly p)
 #ifdef COMP_DEBUG  
     int i, j = pGetExp(p,1);
 
-  for (i = firstBlockEnds; i>1; i--) j += pGetExp(p,i);
+  for (i = firstBlockEnds; i > 1; i--) j += pGetExp(p,i);
   if (j != p->Order)
   {
     Print("Error in setdeg1");
@@ -1922,8 +1923,22 @@ BOOLEAN pDivisibleBy(poly a, poly b)
 /*2
 * change all variables to fit the description of the new ring
 */
+
 void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
          short ** wv)
+{
+  sip_sring tmpR;
+  memset(&tmpR, 0, sizeof(sip_sring));
+  tmpR.N = n;
+  tmpR.OrdSgn = Sgn;
+  tmpR.order = orders;
+  tmpR.block0 = b0;
+  tmpR.block1 = b1;
+  tmpR.wvhdl = wv;
+  pSetGlobals(&tmpR);
+}
+
+void pSetGlobals(ring r, BOOLEAN complete)
 {
 #ifdef TEST_MAC_ORDER
   bNoAdd=FALSE;
@@ -1933,13 +1948,13 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
   if (ppNoether!=NULL) pDelete(&ppNoether);
 #ifdef SRING
   pSRING=FALSE;
-  pAltVars=n+1;
+  pAltVars=r->N+1;
 #endif
   t_pComp0 = NULL;
 #ifdef COMP_FAST
   f_pComp0 = NULL;
 #endif  
-  pVariables = n;
+  pVariables = r->N;
 
   // set the various size parameters and initialize memory
   pMonomSize = POLYSIZE + (pVariables + 1) * sizeof(Exponent_t);
@@ -1968,13 +1983,13 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
 #endif
   mmSpecializeBlock(pMonomSize);
   
-  pOrdSgn = Sgn;
-  pVectorOut=(orders[0]==ringorder_c);
-  order=orders;
-  block0=b0;
-  block1=b1;
+  pOrdSgn = r->OrdSgn;
+  pVectorOut=(r->order[0]==ringorder_c);
+  order=r->order;
+  block0=r->block0;
+  block1=r->block1;
   firstwv=NULL;
-  polys_wv=wv;
+  polys_wv=r->wvhdl;
   /*------- only one real block ----------------------*/
   pLexOrder=FALSE;
   pMixedOrder=FALSE;
@@ -1982,53 +1997,53 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
   if (pOrdSgn == 1) pLDeg = ldegb;
   else              pLDeg = ldeg0;
   /*======== ordering type is (_,c) =========================*/
-  if ((orders[0]==ringorder_unspec)
+  if ((order[0]==ringorder_unspec)
   ||(
-    ((orders[1]==ringorder_c)||(orders[1]==ringorder_C))
-    && (orders[0]!=ringorder_M)
-    && (orders[2]==0))
+    ((order[1]==ringorder_c)||(order[1]==ringorder_C))
+    && (order[0]!=ringorder_M)
+    && (order[2]==0))
   )
   {
-    if ((orders[0]!=ringorder_unspec)
-    && (orders[1]==ringorder_C))
+    if ((order[0]!=ringorder_unspec)
+    && (order[1]==ringorder_C))
       pComponentOrder=-1;
     if (pOrdSgn == -1) pLDeg = ldeg0c;
 #ifdef COMP_FAST    
-    SimpleChoose(orders[0],orders[1], &pComp0);
+    SimpleChoose(order[0],order[1], &pComp0);
 #else    
-    SimpleChoose(orders[0],&pComp0);
+    SimpleChoose(order[0],&pComp0);
 #endif    
-    SetpSetm(orders[0],0);
+    SetpSetm(order[0],0);
 #ifdef TEST_MAC_ORDER
-    if (orders[0]==ringorder_dp)
-       bBinomSet(orders);
+    if (order[0]==ringorder_dp)
+       bBinomSet(order);
 #endif
   }
   /*======== ordering type is (c,_) =========================*/
-  else if (((orders[0]==ringorder_c)||(orders[0]==ringorder_C))
-  && (orders[1]!=ringorder_M)
-  &&  (orders[2]==0))
+  else if (((order[0]==ringorder_c)||(order[0]==ringorder_C))
+  && (order[1]!=ringorder_M)
+  &&  (order[2]==0))
   {
     /* pLDeg = ldeg0; is standard*/
-    if (orders[0]==ringorder_C)
+    if (order[0]==ringorder_C)
       pComponentOrder=-1;
 #ifdef COMP_FAST
-    SimpleChooseC(orders[1],pComponentOrder, &pComp0);
+    SimpleChooseC(order[1],pComponentOrder, &pComp0);
 #else    
-    SimpleChooseC(orders[1],&pComp0);
+    SimpleChooseC(order[1],&pComp0);
 #endif    
-    SetpSetm(orders[1],1);
+    SetpSetm(order[1],1);
 #ifdef TEST_MAC_ORDER
-    if (orders[1]==ringorder_dp)
-       bBinomSet(orders);
+    if (order[1]==ringorder_dp)
+       bBinomSet(order);
 #endif
   }
   /*------- more than one block ----------------------*/
   else
   {
     //pLexOrder=TRUE;
-    pVectorOut=orders[0]==ringorder_c;
-    if ((pVectorOut)||(orders[0]==ringorder_C))
+    pVectorOut=order[0]==ringorder_c;
+    if ((pVectorOut)||(order[0]==ringorder_C))
     {
       if(block1[1]!=pVariables) pLexOrder=TRUE;
     }  
@@ -2038,17 +2053,17 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
     }
     /*the number of orderings:*/
     i = 0;
-    while (orders[++i] != 0);
+    while (order[++i] != 0);
     do
     {
       i--;
-      HighSet(i, orders[i]);/*sets also pMixedOrder to TRUE, if...*/
-      SetpSetm(orders[i],i);
+      HighSet(i, order[i]);/*sets also pMixedOrder to TRUE, if...*/
+      SetpSetm(order[i],i);
     }
     while (i != 0);
 
     pComp0 = BlockComp;
-    if ((orders[0]!=ringorder_c)&&(orders[0]!=ringorder_C))
+    if ((order[0]!=ringorder_c)&&(order[0]!=ringorder_C))
     {
       pLDeg = ldeg1c;
     }
