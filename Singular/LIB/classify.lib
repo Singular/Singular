@@ -1,4 +1,4 @@
-// $Id: classify.lib,v 1.8 1997-08-13 07:39:06 krueger Exp $
+// $Id: classify.lib,v 1.9 1997-08-13 17:21:03 krueger Exp $
 //=============================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
@@ -11,8 +11,6 @@ LIBRARY:  Classify.lib
 
 // required libraries
 
-LIB "lib_Setring";
-LIB "lib_RandomPoly";
 LIB "Morse.lib";
 LIB "tools.lib";
 LIB "Kclass.lib";
