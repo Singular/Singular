@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.15 1999-09-23 12:13:39 Singular Exp $
+// $Id: tst.lib,v 1.16 1999-10-19 15:45:44 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.15 1999-09-23 12:13:39 Singular Exp $";
+version="$Id: tst.lib,v 1.16 1999-10-19 15:45:44 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -16,6 +16,8 @@ PROCEDURES:
                         tests groebner command
  tst_stdEqual(ideal i1, ideal i2)
                         test whether two std's are \"equal\"
+
+ tst_test_res(ideal i)  test different res commands for homog ideal i 
 ";
 
 /////////////////////////////////////////////////////////////////////////////
@@ -432,5 +434,66 @@ static proc idPrintShort(ideal id, string name)
 }
 
 
+proc tst_test_res(ideal i)
 
+"USAGE:    tst_test_res(ideal i)
+RETURN:    1, if ok; 0 on error
+PURPOSE:   Tests sres, lres, hres, mres with betti commands and conversions
+EXAMPLE:  example tst_test_res shows an example"
+{
+  int ret = 1;
+  basering;
+  print(i);
+  
+  if (! homog(i))
+  {
+    ERROR("ERROR: input ideal needs to be homogenous ");
+  }
+  
+  resolution rs = sres(std(i), 0);rs;
+  resolution rl = lres(i, 0);rl;
+  resolution rh = hres(i,0);rh;
+  resolution rm = mres(i,0);rm;
+  
+  intmat is = betti(rs);is;
+  intmat il = betti(rl);il;
+  intmat ih = betti(rh);ih;
+  intmat im = betti(rm);im;
+
+  if (is != il){"ERROR: is != il";ret=0;}
+  if (is != ih){"ERROR: is != ih";ret=0;}
+  if (is != im){"ERROR: is != im";ret=0;}
+
+  list ls = list(rs);ls;
+  list ll = list(rl);ll;
+  list lh = list(rh);lh;
+  list lm = list(rm);lm;
+
+  intmat is_1 = betti(ls);is_1;
+  intmat il_1 = betti(ll);il_1;
+  intmat ih_1 = betti(lh);ih_1;
+  intmat im_1 = betti(lm);im_1;
+
+  if (is_1 != il_1){"ERROR: is_1 != il_1";ret=0;}
+  if (is_1 != ih_1){"ERROR: is_1 != ih_1";ret=0;}
+  if (is_1 != im_1){"ERROR: is_1 != im_1";ret=0;}
+
+  if (is != is_1) {"ERROR: is != is_1";ret=0;}
+  if (il != il_1) {"ERROR: il != il_1";ret=0;}
+  if (ih != ih_1) {"ERROR: ih != ih_1";ret=0;}
+  if (im != im_1) {"ERROR: im != im_1";ret=0;}
+
+  return (ret);
+}
+example
+{
+  "EXAMPLE: "; echo = 2;
+  ring an=0,(w,x,y,z),(dp,C);
+  ideal i=
+    1w2xy+1w2xz+1w2yz+1wxyz+1x2yz+1xy2z+1xyz2,
+    1w4x+1w4z+1w3yz+1w2xyz+1wx2yz+1x2y2z+1xy2z2,
+    1w6+1w5z+1w4xz+1w3xyz+1w2xy2z+1wx2y2z+1x2y2z2;
+  tst_test_res(i);
+  kill an;
+}
 
