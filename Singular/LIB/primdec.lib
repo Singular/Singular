@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.82 2000-12-31 02:02:05 greuel Exp $";
+version="$Id: primdec.lib,v 1.83 2001-01-08 13:27:30 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -13,9 +13,9 @@ OVERVIEW:
  Algorithms for primary decomposition based on the ideas of
  Shimoyama/Yokoyama was written by Wolfram Decker and Hans Schoenemann.   
  These procedures are implemented to be used in characteristic 0.
- @*They also work in positive characteristic >> 0.
- @*In small characteristic and for algebraic extensions, primdecGTZ,
- minAssGTZ, radical and equiRadical may not terminate and primdecSY and
+ They also work in positive characteristic >> 0.
+ In small characteristic and for algebraic extensions, primdecGTZ and
+ minAssGTZ may not terminate and primdecSY and
  minAssChar may not give a complete decomposition.
 
 PROCEDURES:
@@ -2797,9 +2797,133 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc radicalKL (list m,ideal ser,list #)
+proc powerCoeffs(poly f,int e)
+//computes a polynomial with the same monomials as f but coefficients
+//the p^e th power of the coefficients of f
 {
-   ideal i=m[2];
+   int i;
+   poly g;
+   int ex=char(basering)^e;
+   for(i=1;i<=size(f);i++)
+   {
+      g=g+leadcoef(f[i])^ex*leadmonom(f[i]);
+   }
+   return(g);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sep(poly f,int i, list #)
+"USAGE:  input: a polynomial f depending on the i-th variable and optional
+         an integer k considering the polynomial f defined over Fp(t1,...,tm)
+         as polynomial over Fp(t(1)^(p^-k),...,t(m)^(p^-k))
+ RETURN: the separabel part of f as polynomial in Fp(t1,...,tm)
+        and an integer k to indicate that f should be considerd 
+        as polynomial over Fp(t(1)^(p^-k),...,t(m)^(p^-k))
+ EXAMPLE: example sep; shows an example
+{
+   def R=basering;
+   int k;
+   if(size(#)>0){k=#[1];}
+
+   poly h=gcd(f,diff(f,var(i)));
+   poly g1=lift(h,f)[1][1];    //  f/h
+   poly h1;
+
+   while(h!=h1)
+   {
+      h1=h;
+      h=gcd(h,diff(h,var(i)));
+   }
+
+   if(deg(h1)==0){return(list(g1,k));} //in characteristic 0 we return here
+
+   k++;
+
+   ideal ma=maxideal(1);
+   ma[i]=var(i)^char(R);
+   map phi=R,ma;
+   ideal hh=h;    //this is technical because preimage works only for ideals
+
+   poly u=preimage(R,phi,hh)[1]; //h=u(x(i)^p)
+
+   list g2=sep(u,i,k);           //we consider u(t(1)^(p^-1),...,t(m)^(p^-1))
+   g1=powerCoeffs(g1,g2[2]-k+1); //to have g1 over the same field as g2[1]
+
+   list g3=sep(g1*g2[1],i,g2[2]);
+   return(g3);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=(5,t,s),(x,y,z),dp;
+   poly f=(x^25-t*x^5+t)*(x^3+s);
+   sep(f,1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc zeroRad(ideal I)
+"USAGE:  zeroRad(I) , I a zero-dimensional ideal
+ RETURN: the radical of I
+ NOTE:  Algorithm of Kemper
+ EXAMPLE: example zeroRad; shows an example
+{
+   
+   //I needs to be a reduced standard basis
+   def R=basering; 
+   int m=npars(R);
+   int n=nvars(R);
+   int p=char(R);  
+   int i,k;
+   list l;
+
+   option(redSB);  
+   ideal F=finduni(I);//F[i] generates I intersected with K[var(i)]
+   option(noredSB);
+
+   for(i=1;i<=n;i++)
+   {
+      l[i]=sep(F[i],i);
+      F[i]=l[i][1];
+      if(l[i][2]>k){k=l[i][2];}  //computation of the maximal k
+   }
+
+   if(k==0){return(I+F);}        //the separable case
+
+   for(i=1;i<=n;i++)             //consider all polynomials over 
+   {                             //Fp(t(1)^(p^-k),...,t(m)^(p^-k))
+      F[i]=powerCoeffs(F[i],k-l[i][2]);
+   }
+
+   string cR="ring @R="+string(p)+",("+parstr(R)+","+varstr(R)+"),dp;";
+   execute(cR);
+   ideal F=imap(R,F);
+   string nR="ring @S="+string(p)+",(y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
+   execute(nR);
+
+   ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
+   ideal I=imap(R,I);
+   ideal J=I+G;
+   k=p^k;
+   for(i=1;i<=m;i++)
+   {
+      J=J,var(i)^k-var(m+n+i);
+   }
+   J=eliminate(J,y(1..m));
+
+   setring R;
+   ideal J=imap(@S,J);
+   return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=(5,t),(x,y),dp;
+   ideal I=x^5-t,y^5-t;
+   zeroradp(I);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc radicalKL (ideal i,ideal ser,list #)
+{
+  // i needs to be a reduced standard basis
   //--------------------------------------------------------------------------
   //i is the zero-ideal
   //-------------------------------------------------------------------------
@@ -2811,75 +2935,43 @@ proc radicalKL (list m,ideal ser,list #)
 
    def  @P = basering;
    list indep,allindep,restindep,fett,@mu;
-   intvec @vh,isat;
+   intvec @vh,isat,@w,@hilb;
    int @wr,@k,@n,@m,@n1,@n2,@n3,lauf,di;
    ideal @j,@j1,fac,@h,collectrad,htrad,lsau;
    ideal rad=ideal(1);
    ideal te=ser;
 
    poly @p,@q;
-   string @va,quotring;
+   string @va,quotring,@ri;
    int  homo=homog(i);
-   if((find(ordstr(basering),"w")!=0)||(find(ordstr(basering),"W")!=0)||(find(ordstr(basering),"a")!=0))
-   {
-      homo=0;
-   }
+   attrib(i,"isSB",1);
    if(size(#)>0)
    {
       @wr=#[1];
    }
-   @j=m[1];
-   @j1=m[2];
-   int jdim=dim(@j);
-   if(size(reduce(ser,@j,1))==0)
-   {
-      return(ser);
-   }
+   int jdim=dim(i);
+
    if(homo==1)
    {
       if(jdim==0)
       {
-         option(noredSB);
          return(maxideal(1));
       }
-      intvec @hilb=hilb(@j,1);
+      for(@n=1;@n<=nvars(basering);@n++)
+      {
+         @w[@n]=ord(var(@n));
+      }
+      @hilb=hilb(i,1,@w);     
    }
-
-
   //---------------------------------------------------------------------------
   //j is the ring
   //---------------------------------------------------------------------------
 
    if (jdim==-1)
    {
-      option(noredSB);
-      return(ideal(0));
+
+      return(ideal(1));
    }
-
-  //---------------------------------------------------------------------------
-  //  the case of one variable
-  //---------------------------------------------------------------------------
-
-   if(nvars(basering)==1)
-   {
-      fac=factorize(@j[1],1);
-      @p=1;
-      for(@k=1;@k<=size(fac);@k++)
-      {
-         @p=@p*fac[@k];
-      }
-      option(noredSB);
-
-      return(ideal(@p));
-   }
-  //---------------------------------------------------------------------------
-  //the case of a complete intersection
-  //---------------------------------------------------------------------------
-    if(jdim+size(@j1)==nvars(basering))
-    {
-      // ideal jac=minor(jacob(@j1),size(@j1));
-      // return(quotient(@j1,jac));
-    }
 
   //---------------------------------------------------------------------------
   //the zero-dimensional case
@@ -2887,26 +2979,7 @@ proc radicalKL (list m,ideal ser,list #)
 
    if (jdim==0)
    {
-      if((npars(basering)>0)&&(char(basering)>0)&&(char(basering)<=181))
-      {
-         "        !  Warning  !  ";
-         "    The field is not perfect.";
-         "    The result may be wrong.";
-      }
-      @j1=finduni(@j);
-      for(@k=1;@k<=size(@j1);@k++)
-      {
-         fac=factorize(cleardenom(@j1[@k]),1);
-         @p=fac[1];
-         for(@n=2;@n<=size(fac);@n++)
-         {
-            @p=@p*fac[@n];
-         }
-         @j=@j,@p;
-      }
-      @j=std(@j);
-      option(noredSB);
-      return(@j);
+      return(zeroRad(i));
    }
 
    //-------------------------------------------------------------------------
@@ -2916,9 +2989,7 @@ proc radicalKL (list m,ideal ser,list #)
    //indep[1] is the new varstring, indep[2] the string for the block-ordering
    //-------------------------------------------------------------------------
 
-   indep=maxIndependSet(@j);
-
-   di=dim(@j);
+   indep=maxIndependSet(i);
 
    for(@m=1;@m<=size(indep);@m++)
    {
@@ -2928,7 +2999,7 @@ proc radicalKL (list m,ideal ser,list #)
       {
         execute("ring gnir1 = ("+charstr(basering)+"),("+varstr(basering)+"),("
                               +ordstr(basering)+");");
-         ideal @j=fetch(@P,@j);
+         ideal @j=fetch(@P,i);
          attrib(@j,"isSB",1);
       }
       else
@@ -2939,11 +3010,11 @@ proc radicalKL (list m,ideal ser,list #)
          execute("map phi=@P,"+@va+";");
          if(homo==1)
          {
-            ideal @j=std(phi(@j),@hilb);
+            ideal @j=std(phi(i),@hilb,@w);
          }
          else
          {
-           ideal @j=groebner(phi(@j));
+           ideal @j=groebner(phi(i));
          }
       }
       if((deg(@j[1])==0)||(dim(@j)<jdim))
@@ -2989,7 +3060,6 @@ proc radicalKL (list m,ideal ser,list #)
      //here it becomes minimal
 
       @j=clearSB(@j,fett);
-      attrib(@j,"isSB",1);
 
      //we need later ggt(h[1],...)=gh for saturation
       ideal @h;
@@ -2999,14 +3069,12 @@ proc radicalKL (list m,ideal ser,list #)
          {
             @h[@n]=leadcoef(@j[@n]);
          }
-        //the primary decomposition of j*K(var(nnp+1),..,var(nva))[..rest..]
+     
          option(redSB);
-
-         @j=interred(@j);
-
+         @j=interred(@j);  //to obtain a reduced standardbasis
          attrib(@j,"isSB",1);
-         list  @mo=@j,@j;
-         ideal zero_rad= radicalKL(@mo,ideal(1));
+         option(noredSB);
+         ideal zero_rad= zeroRad(@j);
       }
       else
       {
@@ -3020,6 +3088,9 @@ proc radicalKL (list m,ideal ser,list #)
      //h which is the lcm of the leading coefficients of the fi considered in
      //the quotientring: this is coded in saturn
 
+     
+       zero_rad=std(zero_rad);
+     
       ideal hpl;
 
       for(@n=1;@n<=size(zero_rad);@n++)
@@ -3044,7 +3115,6 @@ proc radicalKL (list m,ideal ser,list #)
      //mentioned above is really computed
 
       collectrad=sat2(collectrad,lsau)[1];
-
       if(deg(@h[1])>=0)
       {
          fac=ideal(0);
@@ -3061,11 +3131,12 @@ proc radicalKL (list m,ideal ser,list #)
          {
             @q=@q*fac[lauf];
          }
-
-
-         @mu=mstd(quotient(@j+ideal(@q),rad));
-         @j=@mu[1];
-         attrib(@j,"isSB",1);
+         option(returnSB);
+         option(redSB);
+         i=quotient(i+ideal(@q),rad);
+         attrib(i,"isSB",1);
+         option(noreturnSB);
+         option(noredSB);
 
       }
       if((deg(rad[1])>0)&&(deg(collectrad[1])>0))
@@ -3079,28 +3150,21 @@ proc radicalKL (list m,ideal ser,list #)
             rad=collectrad;
          }
       }
-
-      te=simplify(reduce(te*rad,@j),2);
-
-      if((dim(@j)<di)||(size(te)==0))
+      te=simplify(reduce(intersect(te,rad),i,1),2);
+      if((dim(i)<jdim)||(size(te)==0))
       {
          break;
       }
       if(homo==1)
       {
-         @hilb=hilb(@j,1);
+         @hilb=hilb(i,1,@w);
       }
    }
-
-   if(((@wr==1)&&(dim(@j)<di))||(deg(@j[1])==0)||(size(te)==0))
+   if(((@wr==1)&&(dim(i)<jdim))||(deg(i[1])==0)||(size(te)==0))
    {
       return(rad);
    }
-  // rad=intersect(rad,radicalKL(@mu,rad,@wr));
-   rad=intersect(rad,radicalKL(@mu,ideal(1),@wr));
-
-
-   option(noredSB);
+   rad=intersect(rad,radicalKL(i,ideal(1),@wr));
    return(rad);
 }
 
@@ -3163,7 +3227,7 @@ proc radicalEHV(ideal i,ideal re,list #)
          return(intersect(radI1,radicalEHV(I2,re,il)));
       }
    }
-   return(radicalKL(m,re,il));
+   return(radicalKL(m[1],re,il));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -4464,65 +4528,22 @@ EXAMPLE: example radical; shows an example
    map phi=@P,qr[2];
    i=qr[1];
 
-   list pr=facstd(i);
-   if(size(pr)==1)
+   i=std(i);
+   int di=dim(i);
+   if(di==0)
    {
-      attrib(pr[1],"isSB",1);
-      if((dim(pr[1])==0)&&(homog(pr[1])==1))
-      {
-         ideal @res=maxideal(1);
-         return(phi(@res));
-      }
-      if(dim(pr[1])>1)
-      {
-         execute("ring gnir = ("+charstr(basering)+"),
-                              ("+varstr(basering)+"),(C,lp);");
-         ideal i=fetch(@P,i);
-         list @pr=facstd(i);
-         setring @P;
-         pr=fetch(gnir,@pr);
-      }
-   }
-   option(noredSB);
-   int s=size(pr);
-   if(s==1)
-   {
-     i=radicalEHV(pr[1],ideal(1),il);
+     i=zeroRad(i);
      return(phi(i));
    }
-   intvec pos;
-   pos[s]=0;
-   if(il==1)
-   {
-     int ndim,k;
-     attrib(pr[1],"isSB",1);
-     int odim=dim(pr[1]);
-     int count=1;
-
-     for(j=2;j<=s;j++)
-     {
-        attrib(pr[j],"isSB",1);
-        ndim=dim(pr[j]);
-        if(ndim>odim)
-        {
-           for(k=count;k<=j-1;k++)
-           {
-              pos[k]=1;
-           }
-           count=j;
-           odim=ndim;
-        }
-        if(ndim<odim)
-        {
-           pos[j]=1;
-        }
-     }
-   }
+   list pr=facstd(i);
+   option(noredSB);
+   int s=size(pr);
    for(j=1;j<=s;j++)
    {
-      if(pos[s+1-j]==0)
+      attrib(pr[s+1-j],"isSB",1);
+      if((size(reduce(re,pr[s+1-j],1))!=0)&&((dim(pr[s+1-j])==di)||!il))
       {
-         re=intersect(re,radicalEHV(pr[s+1-j],re,il));
+         re=intersect(re,radicalKL(pr[s+1-j],re,il));
       }
    }
    re=interred(re);
