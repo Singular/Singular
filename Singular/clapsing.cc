@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.16 1997-10-20 15:27:25 Singular Exp $
+// $Id: clapsing.cc,v 1.17 1997-11-18 16:10:41 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -25,15 +25,18 @@
 
 poly singclap_gcd ( poly f, poly g )
 {
+  poly res=NULL;
+
+  pCleardenom(f);
+  pCleardenom(g);
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if ( nGetChar() == 0 || nGetChar() > 1 )
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
-    poly res=convClapPSingP( gcd( F, G ) );
+    res=convClapPSingP( gcd( F, G ) );
     Off(SW_RATIONAL);
-    return res;
   }
   // and over Q(a) / Fp(a)
   else if (( nGetChar()==1 ) /* Q(a) */
@@ -41,7 +44,6 @@ poly singclap_gcd ( poly f, poly g )
   {
     if (nGetChar()==1) setCharacteristic( 0 );
     else               setCharacteristic( -nGetChar() );
-    poly res;
     if (currRing->minpoly!=NULL)
     {
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
@@ -55,11 +57,12 @@ poly singclap_gcd ( poly f, poly g )
       res= convClapPSingTrP( gcd( F, G ) );
     }
     Off(SW_RATIONAL);
-    return res;
   }
   else
     WerrorS( "not implemented" );
-  return NULL;
+  pDelete(&f);
+  pDelete(&g);
+  return res;
 }
 
 //poly singclap_resultant ( poly f, poly g , poly x)
@@ -761,7 +764,7 @@ int singclap_det_i( intvec * m )
 /* interpreter interface : */
 BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 {
-  res->data=(void *)singclap_gcd((poly)(u->Data()),((poly)v->Data()));
+  res->data=(void *)singclap_gcd((poly)(u->CopyD()),((poly)v->CopyD()));
   return FALSE;
 }
 

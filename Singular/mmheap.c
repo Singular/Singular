@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.c,v 1.2 1997-04-02 15:07:32 Singular Exp $ */
+/* $Id: mmheap.c,v 1.3 1997-11-18 16:10:44 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -31,7 +31,8 @@ void* mmGetMemory( size_t size )
 {
   void * dummy;
 
-  if ( mm_theBytesLeft < size ) {
+  if ( mm_theBytesLeft < size )
+  {
     mmDistributeRestOfHeap();
     mm_theHeapPtr = (char*)mmGetBlock();
     mm_theBytesLeft = MAXDATA;
@@ -59,19 +60,20 @@ BOOLEAN mmPutMemory( void *adr, size_t size )
 
 static void mmDistributeRestOfHeap( void )
 {
-/*
-*  char* dummy;
-*  int j;
-*
-*  while ( mm_theBytesLeft > RealSizeFromSize( mmGetSize( 0 ) ) ) {
-*    j = mmGetIndex( SizeFromRealSize( mm_theBytesLeft ) );
-*    if ( RealSizeFromSize( mmGetSize( j ) ) > mm_theBytesLeft ) j--;
-*    dummy = mm_theHeapPtr;
-*    mm_theHeapPtr += RealSizeFromSize( mmGetSize( j ) );
-*    mm_theBytesLeft -= RealSizeFromSize( mmGetSize( j ) );
-*    mmFreeBlock( &(dummy[DebugOffsetFront]), mmGetSize( j ) );
-*  }
-*/
+
+  char* dummy;
+  int j;
+
+  while ( mm_theBytesLeft > RealSizeFromSize( mmGetSize( 0 ) ) )
+  {
+    j = mmGetIndex( SizeFromRealSize( mm_theBytesLeft ) );
+    if ( RealSizeFromSize( mmGetSize( j ) ) > mm_theBytesLeft ) j--;
+    dummy = mm_theHeapPtr;
+    mm_theHeapPtr += RealSizeFromSize( mmGetSize( j ) );
+    mm_theBytesLeft -= RealSizeFromSize( mmGetSize( j ) );
+    *(mcb)dummy = mm_theList[j];
+    mm_theList[j] = (mcb)dummy;
+  }
 }
 
 #else /* MDEBUG */

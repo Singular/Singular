@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.13 1997-09-18 14:08:19 Singular Exp $ */
+/* $Id: longalg.cc,v 1.14 1997-11-18 16:10:42 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1584,7 +1584,7 @@ BOOLEAN naGreaterZero(number za)
   if ((zb!=NULL) && (zb->z==NULL)) WerrorS("internal zero error(3)");
 #endif
   naTest(za);
-  return ((zb!=NULL) && (zb->z!=NULL));
+  return ((zb!=NULL) && (zb->z!=NULL)) && (!naIsMOne(za));
 }
 
 
