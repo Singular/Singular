@@ -168,6 +168,18 @@ then
         echo ${prefix}-Unknown
         exit 1
     fi
+# AMD-Opteron ########################################################
+elif (echo $uname_a | $egrep "x86_64" > $devnull)
+then
+    prefix=x86_64
+    if (echo $uname_a | $egrep "Linux" > $devnull)
+    then
+        echo ${prefix}-Linux
+        exit 0
+    else
+        echo ${prefix}-Unknown
+        exit 1
+    fi
 else # Unknown ########################################################
     echo Unknown
     exit 2
