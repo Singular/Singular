@@ -105,6 +105,7 @@ solve_s
 spcurve
 sres_s
 std_s
+stratify
 string
 test_c_dp
 triang_s
