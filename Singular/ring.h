@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.21 1999-03-08 17:30:50 Singular Exp $ */
+/* $Id: ring.h,v 1.22 1999-03-09 12:22:18 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -48,18 +48,25 @@ void   rUnComplete(ring r);
 int    rBlocks(ring r);
 
 #define  rInternalChar(r) ((r)->ch)
+#ifndef ABS
+#define ABS(x) ((x) < 0 ? (-(x)) : (x))
+#endif
 inline BOOLEAN rField_is_Zp(ring r=currRing)
-{ return (r->ch>1) && (r->parameter==NULL); }
+{ return (r->ch > 1) && (r->parameter==NULL); }
+inline BOOLEAN rField_is_Zp(ring r, int p)
+{ return (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
 inline BOOLEAN rField_is_Q(ring r=currRing)
-{ return (r->ch==0) && (r->parameter==NULL); }
+{ return (r->ch == 0) && (r->parameter==NULL); }
 inline BOOLEAN rField_is_R(ring r=currRing)
-{ return (r->ch==-1); }
+{ return (r->ch == -1); }
 inline BOOLEAN rField_is_GF(ring r=currRing)
-{ return (r->ch>1) && (r->parameter!=NULL); }
+{ return (r->ch > 1) && (r->parameter!=NULL); }
 inline BOOLEAN rField_is_Zp_a(ring r=currRing)
-{ return (r->ch<-1); }
+{ return (r->ch < -1); }
+inline BOOLEAN rField_is_Zp_a(ring r, int p)
+{ return (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
 inline BOOLEAN rField_is_Q_a(ring r=currRing)
-{ return (r->ch==1); }
+{ return (r->ch == 1); }
 inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 { return (r->ch>1); } /* Z/p and GF(p,n) */
 
