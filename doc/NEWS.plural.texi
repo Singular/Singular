@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.plural.texi,v 1.2 2003-05-22 19:21:24 levandov Exp $
+@comment $Id: NEWS.plural.texi,v 1.3 2003-06-14 17:01:53 levandov Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -29,7 +29,7 @@ experimental version of Singular::Plural, due to a rewrite of major parts
 of the Singular kernel (e.g., the kernel has a new memory manager 
 and a new polynomial arithmetic) 
 and due to new and better implemented algorithms 
-(e.g., for two-sided Gr"obner bases).
+(e.g., for two-sided Groebner bases).
 
 Besides theses internal changes, Singular version 2 offers many new
 features and functionalities 
