@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.2 1999-09-30 14:09:34 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.3 1999-09-30 16:27:44 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -40,7 +40,6 @@ void ksReducePoly(LObject* PR,
   poly a2 = pNext(p2), lm = p1;
 
   p1 = pNext(p1);
-  pNext(lm) = NULL;
 
   BOOLEAN reset_vec=FALSE;
   
@@ -180,7 +179,11 @@ void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 {
   poly Lp = PR->p;
   number coef;
+  poly Save = PW->p;
   
+  if (Lp == Save)
+    PW->p = pCopy(Save);
+    
   assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);
   assume(pIsMonomOf(Lp, Current));
   
@@ -195,6 +198,11 @@ void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
   nDelete(&coef);
   pNext(Current) = PR->p;
   PR->p = Lp;
+  if (PW->p != Save)
+  {
+    pDelete(&(PW->p));
+    PW->p = Save; // == Lp
+  }
 }
 
 
@@ -455,7 +463,7 @@ poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether)
   return L.p;
 }
 
-#if 0
+#if 1
 void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether)
 {
   LObject L;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.3 1999-09-30 14:09:39 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.4 1999-09-30 16:27:46 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -167,7 +167,6 @@ poly  p_Mult_m_General(poly p,
 {
   assume(heap != NULL && heap != MM_UNKNOWN_HEAP);
   assume(pHeapTest(p, MM_UNKNOWN_HEAP));
-  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
   
   if (p == NULL) return NULL;
   spolyrec rp;
@@ -239,8 +238,6 @@ poly p_Minus_m_Mult_q_General (poly p,
   assume(heap != NULL && heap != MM_UNKNOWN_HEAP);
   assume(pHeapTest(p, heap));
   assume(pHeapTest(q, MM_UNKNOWN_HEAP));
-  assume(pNext(m) == NULL || (! (pNext(m) = NULL)));
-  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
   assume(lp == NULL || (pLength(p) == *lp && pLength(q) == lq));
 
   // we are done if q == NULL || m == NULL
