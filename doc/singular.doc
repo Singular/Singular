@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.22 1998-05-13 08:16:36 schmidt Exp $
+@comment $Id: singular.doc,v 1.23 1998-05-14 14:51:35 obachman Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -111,6 +111,7 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 * Limitations::
 * Major differences to the C programming language::
 * Miscellaneous oddities::
+* Identifier resolution::
 @end menu
 @c -------------------------------------------------------------------------
 @node Limitations,Major differences to the C programming language,,Tricks and pitfalls
@@ -153,52 +154,44 @@ to those from the C programming language, there are some subtle
 differences. Most notably:
 
 @menu
-* No rvalue of increments::
-* No rvalue of assignments::
+* No rvalue of increments and assignments::
 * Evaluation of logical expressions::
 * No case/switch statement::
 * Usage of commas::
 * Usage of brackets::
 * Behaviour of continue::
+* Return type of procedures::
 @end menu
 @c ---------------------------------------
-@node No rvalue of increments, No rvalue of assignments,,Major differences to the C programming language 
-@subsection No rvalue of increments
-@cindex rvalue of increments
-The increment @code{++} (resp. decrement operator @code{--}) has no rvalue 
+@node No rvalue of increments and assignments, Evaluation of logical expressions,,Major differences to the C programming language 
+@heading No rvalue of increments and assignments
+@cindex rvalue
+
+The increment @code{++} (resp. decrement operator @code{--}) has no
 rvalue, i.e. can not be used on the right-hand sides of 
 assignments. So, instead of 
 @*@code{j = i++;  // WRONG!!!}
 @*(which results in an error), it must be written
 @*@code{i++; j = i;}
 
-@c ---------------------------------------
-@node No rvalue of assignments, Evaluation of logical expressions, No rvalue of increments, Major differences to the C programming language
-@subsection No rvalue of assignments
-@cindex rvalue of assignments 
-An assignment expression does not have a result, i.e., does not have an rvalue.
-Therefore, compound assignments like @code{i = j = k;} are not allowed.
-However, the following works:
-@*@code{string s; int i;}
-@*@code{s, i = "Hello", 2;}
+Likewise, an assignment expression does not have a result, i.e., does
+not have an rvalue.  Therefore, compound assignments like @code{i = j =
+k;} are not allowed and result in an error.
 
 @c ---------------------------------------
-@node Evaluation of logical expressions, No case/switch statement, No rvalue of assignments, Major differences to the C programming language
-@subsection Evaluation of logical expressions
+@node Evaluation of logical expressions, No case/switch statement, No rvalue of increments and assignments, Major differences to the C programming language
+@heading Evaluation of logical expressions
 @cindex and
 @cindex or
 
-@strong{All} arguments of a logical expressions are first
-evaluated and then the value of the logical expression is
-determined. For example, the logical expressions @code{(a || b)} is
-evaluated by first evaluating @code{a} and @code{b}, even though the value of
-@code{b} has no influence on the value of @code{(a || b)}. Note that
-this is different from the left-to-right evaluation of logical
-expressions (as found in most programming languages like C) which, for
-example, determine the @code{(1 || b)} without evaluating @code{b}.
-Hence, in @sc{Singular}, the following results in a syntax error
+@strong{All} arguments of a logical expressions are first evaluated and
+then the value of the logical expression is determined. For example, the
+logical expressions @code{(a || b)} is evaluated by first evaluating
+@code{a} @emph{and} @code{b}, even though the value of @code{b} has no
+influence on the value of @code{(a || b)}, if @code{a} evaluates to
+@i{true}. Therefore, the following results in a syntax error
 @example
-if (defined(i) && i > 0) @{@}
+if (defined(i) && i > 0) @{@} // WRONG!!!
 @end example
 if the variable @code{i} is undefined and must be written intead as
 @example
@@ -207,16 +200,23 @@ if (defined(i))
   if (i > 0) @{@}
 @}
 @end example
+
+Note that this evaluation is different from the left-to-right, conditional
+evaluation of logical expressions (as found in most programming
+languages). For example, in these other languages, the value of @code{(1
+|| b)} is determined without ever evaluating @code{b}.
+
 However, there are several short work-arounds for this problem:
 @enumerate
 @item 
-If a variable (say, @code{i}) can  only have two values (say, 1 and 0),
-then define (value equals 1) and undefine (value equals 0) @code{i}
-instead of assigning a value. Then it is sufficient to simply write
+If a variable (say, @code{i}) is only to be used as a boolean flag (say,
+1 and 0), then define (value is true) and undefine (value is false)
+@code{i} instead of assigning a value. Using this scheme, it is
+sufficient to simply write
 @example
 if (defined(i))
 @end example
-in order to check whether @code{i} has the value 1.
+in order to check whether @code{i} is true.
 @item 
 If a variable  can have more than two values, then
 define it, if necessary, before it is used for the first time.
@@ -228,18 +228,19 @@ if (DEBUG == 3)  @{@dots{}@}
 if (DEBUG == 2)  @{@dots{}@}
 @dots{}
 @end example
-then the existence of the variable @code{DEBUG} remains hidden from the
+then a user of this procedure does not need to care about the existence
+of the @code{DEBUG} variable -- this remains hidden from the
 user. However, if @code{DEBUG} exists globally, then its local default
-value is overwritten.
+value is overwritten by its global one.
 @end enumerate
 
 @c ---------------------------------------
 @node No case/switch statement,  Usage of commas, Evaluation of logical expressions, Major differences to the C programming language
-@subsection No case/switch statement
+@heading No case/switch statement
 @cindex case
 @cindex switch
 
-Singular does not offer a @code{case} (or, @code{switch})
+@sc{Singular} does not offer a @code{case} (or, @code{switch})
 statement. However, it can be imitated in the following way:
 @example
   while (1)
@@ -254,7 +255,7 @@ statement. However, it can be imitated in the following way:
 
 @c ---------------------------------------
 @node Usage of commas, Usage of brackets, No case/switch statement, Major differences to the C programming language
-@subsection Usage of commas
+@heading Usage of commas
 @cindex comma
 
 In @sc{Singular}, a comma separates list elements and the value of a comma
@@ -264,14 +265,14 @@ a single expression. For example, instead of writing
 @example
  for (i=1, j=5; i<j; i++, j++) @{@dots{}@} // WRONG!!!!!! 
 @end example
-you have to write
+one has to write
 @example
  for (i,j = 1,5; i<j; i++, j++) @{@dots{}@}
 @end example
 
 @c ---------------------------------------
 @node Usage of brackets, Behaviour of continue, Usage of commas, Major differences to the C programming language
-@subsection Usage of brackets
+@heading Usage of brackets
 @cindex bracket
 
 In @sc{Singular}, curly brackets (i.e. "@code{@{@}}") @strong{must always} be
@@ -289,18 +290,12 @@ results in a errors. Instead, it must be written as
   if (i == 1) @{ return (i); @} 
 @end example
 
-On the other hand, more than one value can be returned by a single
-@code{return} statement. For example,
-@example
-proc tworeturn () @{ return (1,2); @}
-int i,j = tworeturn();
-@end example
 
 @c ---------------------------------------
-@node  Behaviour of continue,, Usage of brackets, Major differences to the C programming language
-@subsection Behaviour of continue
+@node  Behaviour of continue, Return type of procedures, Usage of brackets, Major differences to the C programming language
+@heading Behaviour of continue
 @cindex continue 
-Singular's @code{continue} construct is only valid inside the body of
+@sc{Singular}'s @code{continue} construct is only valid inside the body of
 the @code{for} construct. It skips the rest of the loop-body and jumps
 to the beginning of the block. Unlike the C-construct @sc{Singular}'s
 @code{continue} @strong{does not execute the increment statement}. For
@@ -321,10 +316,59 @@ example,
   @expansion{} 10
 @end example
 
+@c ---------------------------------------
+@node Return type of procedures,,Behaviour of continue, Major differences to the C programming language
+
+Although the @sc{Singular} language is a strongly typed programming
+language, the type of the 
+return value of a procedure does not need to be specified. As a
+consequence, the return type of a procedure may vary, i.e., may, for
+example, depend on the input. However, the retun value
+of such a procedures may then only be assigned to a variable of type
+@code{def}. 
+@example
+@c example
+proc type_return (int i) 
+{ 
+  if (i > 0) {return (i);} 
+  else {return (list(i));} 
+}
+def t1 = type_return(1);
+def t2 = type_return(-1);
+typeof(t1); typeof(t2);
+@c example
+@end example
+
+Furthermore, it is mandatory to assign the return value of a procedure
+to a variable of type def, if a procedure changes the currint ring using 
+the @code{keepring} command (@ref{keepring}) and returns a
+ring-dependent value (like a polynom or module).
+
+@example
+@c example
+proc def_return
+{
+  ring r;
+  poly p = x;
+  keepring r;
+  return (x);
+}
+def p = def_return();
+// poly p = def_return(); would be WRONG!!!
+typeof(p);
+@c example
+@end example
+
+On the other hand, more than one value can be returned by a single
+@code{return} statement. For example,
+@example
+proc tworeturn () @{ return (1,2); @}
+int i,j = tworeturn();
+@end example
 
 
 @c -------------------------------------------------------------------------
-@node Miscellaneous oddities,,Major differences to the C programming language, Tricks and pitfalls
+@node Miscellaneous oddities, Identifier resolution, Major differences to the C programming language, Tricks and pitfalls
 @section Miscellaneous oddities
 
 @enumerate
@@ -333,7 +377,7 @@ example,
 @cindex mod
 
 A sequence of digits and @code{/} without spaces is of type number.
-With spaces it is an expression of type ints
+With spaces it is an expression of type int
 (and @code{/} is the integer division).
 To avoid confusion use the operand @code{div}.
 @example
@@ -358,11 +402,10 @@ The computation of a monomial has precedence over all operators:
 @example
 @c example
   ring r=0,(x,y),dp;
-  xy^2;
-  x*y^2;
+  xy^2 == (x*y)^2;
+  x*y^2 == (x) * (y^2)
 @c example
 @end example
-
 
 @item meaning of mult
 @cindex mult
@@ -388,15 +431,19 @@ ideal).
 
 @item computations in qrings
 
-Singular computes in a @code{qring} as long as possible with the given
-representative of a polynomial, i.e. it usually does not reduce a
-polynom w.r.t. the quotient ideal. This is only done during standard
-bases computations.
+@sc{Singular} computes in a @code{qring} as long as possible with the given
+representative of a polynomial @code{p}, i.e. it usually does not reduce a
+polynom @code{p}w.r.t. the quotient ideal. This is only done during standard
+bases computations or by an explicite reduction using the command
+@code{NF(p, 0)}. @ref{reduce}
+
 
 @item substring selection 
 
 Two comma -- separated @code{int}s in square brackets after a string select a
-substring. An @code{intvec} in square brackets after a string selects the respective single characters of the string and collects them as strings.
+substring. An @code{intvec} in square brackets after a string selects
+the respective single characters of the string and returns them as an
+expression list of two strings.
 In particular,
 @example
 @c example
@@ -408,26 +455,45 @@ In particular,
   size(s[v]);
 @c example
 @end example
-
-@item return type of procedures
-
-The type of the return value of a procedure does not need to be fixed,
-i.e., the return type may depend on the input. However, the retun value
-of such a procedures can only be assigned to a variable of type @code{def}.
-@example
-@c example
-proc type_return (int i) 
-{ 
-  if (i > 0) {return (i);} 
-  else {return (list(i));} 
-}
-def t1 = type_return(1);
-def t2 = type_return(-1);
-typeof(t1); typeof(t2);
-@c example
-@end example
 @end enumerate
 
+@c ----------------------------------------------
+@node Identifier resolution,, Miscellaneous oddities, Tricks and pitfalls
+@section Identifier resolution
+@cindex identifier
+
+In @sc{Singular}, an identifier (i.e., a "word") is resolved in the
+following way and order: It is checked for 
+@enumerate
+@item
+a reserved name,
+@item 
+a local  variable (w.r.t. a procedure),
+@item
+a local ring variable (w.r.t. a ring locally set in a procedure),
+@item
+a global variable,
+@item 
+a monom consisting of local ring variables written without operators,
+@item 
+a monom consisting of global ring variables written without operators.
+@end enumerate
+
+Consequently, it is allowed to have general variables with the same name
+as ring  variables. However, the above identifier resolution order must
+be kept in mind. Otherwise, surprising results may come up. 
+
+@example
+@c example
+ring r;
+int x;
+x*y; // resolved product int*poly, i.e. 0*y 
+xy; // "xy" is one identifier and resolved to monom xy
+@c example
+@end example
+
+For these reasons, we strongly disrecommend the usage of variables which 
+have the same name(s) as ring variables
 
 @c ----------------------------------------------------------------------------
 @node Examples, Mathematical background, Tricks and pitfalls, Top
@@ -474,7 +540,7 @@ typeof(t1); typeof(t2);
 @cindex standard_lib
 The library @code{standard.lib} provides extensions to the
 set of built-in commands and will be automatically loaded
-during the start of @code{Singular}.
+during the start of @sc{Singular}.
 It contains:
 @menu
 * stdfglm::

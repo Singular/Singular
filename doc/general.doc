@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.67 1998-05-14 11:58:13 anne Exp $
+@comment $Id: general.doc,v 1.68 1998-05-14 14:51:33 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -41,7 +41,7 @@
 
 @menu
 * How to enter and exit::       
-* SINGULAR prompt::             
+* The SINGULAR prompt::             
 * The online help system::      
 * Interrupting SINGULAR::       
 * Editing input::               
@@ -50,7 +50,7 @@
 @end menu
 
 @c --------------------------------------------------------------------------
-@node How to enter and exit,SINGULAR prompt  , Interactive use, Interactive use
+@node How to enter and exit, The SINGULAR prompt, Interactive use, Interactive use
 @subsection How to enter and exit
 @cindex How to enter and exit
 
@@ -75,7 +75,6 @@ Singular  [options] [file1 [file2 ...]]
 @c --------------------------------------------------------------------------
 @node The SINGULAR prompt,The online help system,How to enter and exit, Interactive use
 @subsection The SINGULAR prompt
-@cindex The SINGULAR prompt
 @cindex prompt
 @cindex error recovery
 The @sc{Singular} prompt @code{>} asks the user for input of a command, while
@@ -87,7 +86,7 @@ additional @code{;} will not harm @sc{Singular} since extra semicolons are
 interpreted as empty statements.
 
 @c --------------------------------------------------------------------------
-@node The online help system,Interrupting SINGULAR,SINGULAR prompt,Interactive use
+@node The online help system,Interrupting SINGULAR, The SINGULAR prompt,Interactive use
 @subsection The online help system
 @cindex The online help system
 
@@ -1020,9 +1019,9 @@ subtraction
 multiplication
 @item @code{/}
 division of numbers (coefficients of polynomials) and polynomials
-(but see also @ref{div})
+(but see also @ref{int operations})
 @item @code{%}
-integer modulo (see also @ref{mod})
+integer modulo (see also @ref{int operations})
 @item @code{^} or @code{**}
 exponentiation
 @item @code{==}
