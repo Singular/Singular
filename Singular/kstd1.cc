@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.71 2000-12-14 17:32:46 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.72 2000-12-15 11:33:58 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1648,7 +1648,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
               int reduced)
 {
   ideal r=NULL;
-  int Kstd1_OldDeg,i;
+  int Kstd1_OldDeg = Kstd1_deg,i;
   intvec* temp_w=NULL;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
