@@ -1,0 +1,207 @@
+
+
+       --- This README file corresponds to Factory version 1.2c ---
+
+
+			  README file for Factory
+			  =======================
+
+!! IMPORTANT: copyright notice still missing
+
+
+Overview
+--------
+  Factory is a C++ class library that implements a recursive representation
+of multivariate polynomial data.  It is being developed at the University
+of Kaiserslautern as an independent and self-contained part of the computer
+algebra system Singular (developed by G.-M. Greuel, G. Pfister and
+H. Schoenemann).
+
+  Factory handles sparse multivariate polynomials over different
+coefficient domains, such as Z, Q and GF(q), as well as algebraic
+extensions over Q and GF(q) in an efficient way.  The recursive
+representation gives a univariate view to multivariate polynomials.  This
+means that each polynomial is represented as a univariate polynomial in a
+so-called main variable with coefficients which are elements of a
+polynomial ring.
+
+  The interface to the polynomial system of Factory is provided by a single
+class CanonicalForm which can deal with elements of the coefficient domain
+as well as polynomials.  Using operator overloading, you can handle
+polynomial data similarly to built-in types such as the machine integers.
+For example, to add together two polynomials one simply uses the '+'
+operator.  Because of this, Factory is easy to use even if you are not
+familar with C++ programming.
+
+  There are a couple of utility classes provided by Factory such as lists,
+arrays, polynomial maps, etc.  These make the usage more comfortable.
+
+  Factory includes algorithms for computing univariate and multivariate
+gcds, resultants, chinese remainders and several algorithms to factorize
+univariate polynomials over the integers and over finite fields.
+Factorization of multivariate polynomials over the integers is in beta test
+stage.
+
+
+Prerequisites
+-------------
+  You need GNU make to build and install Factory.  Furthermore, I strongly
+recommend to build Factory with GNU CC (version 2.7 or newer).  To build
+Factory and to link your programs with Factory you need the GNU Multiple
+Precision Library (GMP, version 2.0 or newer).  The GMP library is
+available at ftp.gnu.ai.mit.edu or its mirrors.  Alternatively, Factory may
+be linked with the so called small GMP library which comes with the full
+version of Singular (not recommended).
+
+
+Installation
+------------
+  See the INSTALL file for instructions on how to install Factory.  The
+installation procedure conforms more or less to the GNU standard
+(configure; make; make install).  However, I recommend to read the
+instructions since there are a lot of non-standard options to configure.
+
+
+Distribution
+------------
+  The newest version of Factory is always available by anonymous ftp from
+
+		www.mathematik.uni-kl.de:/pub/Math/Factory
+
+The Factory distribution consists of three archives:
+
+o the Factory source code (factory-<version>.tgz);
+o some preliminary documentation on Factory (factory-doc-prelim.tgz);
+o Factory GF(q) addition tables (see below).
+
+
+Documentation
+-------------
+  So far there are only preliminary versions of a user/reference manual and
+a tutorial (``A quick start into Factory'').  Please do not expect them to
+be complete or even error-free.  For this reason, the documentation is not
+included in the source code archive (factory-<version>.tgz).  Instead, you
+sources and compiled dvi files reside in factory-doc-prelim.tgz. They will
+unpack into a directory factory-doc-prelim/.
+
+
+GF(q) tables
+------------
+  Factory uses addition tables to calculate in GF(p^n) in an efficient way.
+There are two possibilities to get these tables:
+o you get them from the net (factory-gftables.tgz) where you got Factory
+  from.  The files unpack into a directory gftables/.
+o you create them with gengftables which is a part of Factory.  Building
+  the tables takes quite a while!
+See the INSTALL file for more information.
+
+
+Examples and Tests
+------------------
+  So far neither examples nor tests, sorry.  You may have a look at
+gengftables.cc which is an application of the most basic Factory features.
+
+
+A note on Singular
+------------------
+  If you have received this Factory distribution together with Singular you
+do not have to worry about compilation or installation at all.  The
+installation procedure for Singular should do everything for you.  If you
+want to configure/build the package on your own instead of letting
+Singulars configure do the work you should:
+
+configure --with-Singular --enable-gmp
+	(or, equivalently: )
+configure --with-Singular --with-gmp='${includedir}'
+
+  Furthermore, you should specify --prefix so 'gmake install' will install
+the files in the places where Singular looks for them.  By default, this is
+the top directory of the Singular distribution.  In this case you have to
+specify '--prefix=..'.
+
+
+Comments, questions, bug reports
+--------------------------------
+  Factory is a project in evolution.  That means there is no guarantee that
+Factory is bug free.  I am sure that there are bugs or at least features.
+If you find bugs or if you find a strange behavior of the library, please
+let me know (e-mail: Jens Schmidt <schmidt@mathematik.uni-kl.de>).
+Comments and questions are welcome, too.
+
+
+Files in the distribution
+-------------------------
+ChangeLog	- history of changes
+INSTALL		- installation instructions
+README		- this file
+NEWS		- new Factory features
+
+bin/install-sh	- a script version of the BSD install program
+bin/makeheader	- creates headers from header templates (*.template)
+bin/mkinstalldirs - recursive mkdir
+
+GNUmakefile.in	- master makefile and
+config.h.in	- configuration include file.  Run configure to create
+		  GNUmakefile and config.h, resp.
+configure
+configure.in	- configure script generated with Autoconf 2.10
+		  from configure.in
+
+factory.template
+factoryconf.template - header templates for the user interface header
+		  files.  Run makeheader to create factory.h and
+		  factoryconf.h, resp.
+
+ffops.cc
+ffops.h
+gf_tabutil.cc
+gf_tabutil.h
+gfops.cc
+gfops.h
+imm.h
+int_*.cc
+int_*.h		- low level classes and functions
+
+canonicalform.cc
+canonicalform.h
+cf_*.cc
+cf_*.h
+variable.cc
+variable.h	- high level classes and functions.  User interface to
+		  the polynomial (and other) arithmetic.
+
+templates/	- factory templates
+ftmpl_inst.cc	- template instantiation for factory templates
+
+fac_*.cc
+fac_*.h		- high level algorithms (factorization, gcd, sqfr
+		  computation, etc.)
+sm_*.c
+sm_*.h		- sparse modular gcd.  Contributed by Marion Bruder
+		  <bruder@math.uni-sb.de>
+
+parseutil.cc
+parseutil.h
+readcf.cc
+readcf.y	- Factory parser to read canonical forms.  readcf.cc
+		  translated with Bison 1.18 from readcf.y.
+
+gmpext.h
+initgmp.cc	- Factories interface to GNU MP
+singext.cc
+singext.h	- Factories interface to Singular
+
+memutil.c
+memutil.h	- 'old' Factory memory manager
+memman.h
+mm*.c
+mm*.h		- 'new' Factory memory manager
+newdelete.cc	- C++ interface to the memory managers
+
+assert.h	- the ASSERT macros
+debug.h
+debug.cc	- the DEBOUT macros
+timing.h	- the TIMING macros
+
+gengftables.cc	- run gengftables to create the GF(q) addition tables
+		  necessary to work with Factory
