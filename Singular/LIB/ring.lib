@@ -1,8 +1,8 @@
-// $Id: ring.lib,v 1.11 2000-05-12 12:17:17 krueger Exp $
+// $Id: ring.lib,v 1.12 2000-05-23 23:02:18 greuel Exp $
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: ring.lib,v 1.11 2000-05-12 12:17:17 krueger Exp $";
+version="$Id: ring.lib,v 1.12 2000-05-23 23:02:18 greuel Exp $";
 info="
 LIBRARY:  ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
 
@@ -17,6 +17,7 @@ PROCEDURES:
  fetchall(R[,str]);     fetch all objects of ring R to basering
  imapall(R[,str]);      imap all objects of ring R to basering
  mapall(R,i[,str]);     map all objects of ring R via ideal i to basering
+ ord_test(R);           test wether ordering of R is global, local or mixed
  ringtensor(\"R\",s,t,..);create ring R, tensor product of rings s,t,...
            (parameters in square brackets [] are optional)
 ";
@@ -621,6 +622,44 @@ example
 //   names(T);
 //   j; print(M); phi;
 //   kill R,S,T;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc ord_test (r)
+"USAGE:   ord_test(r);  r ring
+RETURN:  int 1 (resp. -1, resp. 0) if ordering of r is global (resp. local,
+         resp. mixed)
+EXAMPLE: example ord_test; shows an example
+"
+{
+   if (typeof(r) != "ring")
+   {
+      "// ord_test requires a ring as input";
+      return();
+   }
+   def BAS = basering;
+   setring r;
+   poly f;
+   int n,o,u = nvars(r),1,1;
+   int ii;
+   for ( ii=1; ii<=n; ii++ )
+   {
+      f = 1+var(ii);
+      o = o*(lead(f) == var(ii));
+      u = u*(lead(f) == 1);
+   }
+   setring BAS;
+   if ( o==1 ) { return(1); }
+   if ( u==1 ) { return(-1); }
+   else { return(0); }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y),dp;
+   ring S = 0,(u,v),ls;
+   ord_test(R);
+   ord_test(S);
+   ord_test(R+S);   
 }
 ///////////////////////////////////////////////////////////////////////////////
 
