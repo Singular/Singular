@@ -212,6 +212,8 @@ mmutil.inc: mmutil.c mmprivat.h
 	./mmutil > mmutil.inc
 	rm -rf mmutil
 
+mmutil.o: mmutil.inc
+
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
