@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.22 1998-01-12 18:59:46 obachman Exp $
+// $Id: clapsing.cc,v 1.23 1998-02-09 11:29:02 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -32,7 +32,8 @@ poly singclap_gcd ( poly f, poly g )
   
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
-  if ( nGetChar() == 0 || nGetChar() > 1 )
+  if (( nGetChar() == 0 || nGetChar() > 1 )
+  && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
@@ -59,6 +60,18 @@ poly singclap_gcd ( poly f, poly g )
     }
     Off(SW_RATIONAL);
   }
+  #if 0
+  else if (( nGetChar()>1 )&&(currRing->parameter!=NULL)) /* GF(q) */
+  {
+    int p=rChar(currRing);
+    int n=2;
+    int t=p*p;
+    while (t!=nChar) { t*=p;n++; }
+    setCharacteristic(p,n,'a');
+    CanonicalForm F( convSingGFClapGF( f ) ), G( convSingGFClapGF( g ) );
+    res= convClapGFSingGF( gcd( F, G ) );
+  }
+  #endif
   else
     WerrorS( "not implemented" );
 
@@ -78,7 +91,8 @@ poly singclap_resultant ( poly f, poly g , poly x)
   Variable X(i);
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
-  if ( nGetChar() == 0 || nGetChar() > 1 )
+  if (( nGetChar() == 0 || nGetChar() > 1 )
+  && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
@@ -179,7 +193,8 @@ lists singclap_extgcd ( poly f, poly g )
   // Q and Fp ...
   poly res=NULL,pa=NULL,pb=NULL;
   On(SW_SYMMETRIC_FF);
-  if ( nGetChar() == 0 || nGetChar() > 1 )
+  if (( nGetChar() == 0 || nGetChar() > 1 )
+  && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
@@ -253,7 +268,8 @@ poly singclap_pdivide ( poly f, poly g )
   // Q and Fp ...
   poly res=NULL;
   On(SW_RATIONAL);
-  if ( nGetChar() == 0 || nGetChar() > 1 )
+  if (( nGetChar() == 0 || nGetChar() > 1 )
+  && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
@@ -292,8 +308,10 @@ void singclap_divide_content ( poly f )
     return; /* not implemented for R */
   else  if ( nGetChar() < 0 )
     setCharacteristic( -nGetChar() );
-  else
+  else if (currRing->parameter==NULL) /* not GF(q) */
     setCharacteristic( nGetChar() );
+  else
+    return; /* not implemented*/
   if ( f==NULL )
   {
     return;
@@ -380,7 +398,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   CFFList L;
   number N=NULL;
 
-  if ( (nGetChar() == 0) || (nGetChar() > 1) )
+  if (( (nGetChar() == 0) || (nGetChar() > 1) )
+  && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     if (nGetChar()==0) /* Q */
@@ -541,7 +560,8 @@ matrix singclap_irrCharSeries ( ideal I)
   On(SW_SYMMETRIC_FF);
   CFList L;
   ListCFList LL;
-  if ( (nGetChar() == 0) || (nGetChar() > 1) )
+  if (((nGetChar() == 0) || (nGetChar() > 1) )
+  && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     for(i=0;i<IDELEMS(I);i++)
@@ -605,7 +625,8 @@ char* singclap_neworder ( ideal I)
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
   CFList L;
-  if ( (nGetChar() == 0) || (nGetChar() > 1) )
+  if (((nGetChar() == 0) || (nGetChar() > 1) )
+  && (currRing->paramyer==NULL))
   {
     setCharacteristic( nGetChar() );
     for(i=0;i<IDELEMS(I);i++)
@@ -668,7 +689,8 @@ BOOLEAN singclap_isSqrFree(poly f)
   BOOLEAN b=FALSE;
   Off(SW_RATIONAL);
   //  Q / Fp
-  if ( (nGetChar() == 0) || (nGetChar() > 1) )
+  if (((nGetChar() == 0) || (nGetChar() > 1) )
+  &&(currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) );
@@ -713,7 +735,8 @@ poly singclap_det( const matrix m )
     return NULL;
   }
   poly res=NULL;
-  if ( nGetChar() == 0 || nGetChar() > 1 )
+  if (( nGetChar() == 0 || nGetChar() > 1 )
+  && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     CFMatrix M(r,r);

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.13 1998-01-12 17:32:44 Singular Exp $
+// $Id: clapconv.cc,v 1.14 1998-02-09 11:29:00 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -33,6 +33,8 @@ static void convRecPTr ( const CanonicalForm & f, int * exp, alg & result );
 static void convRecAP ( const CanonicalForm & f, int * exp, poly & result );
 
 static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int offs );
+
+static void convRecGFGF ( const CanonicalForm & f, int * exp, poly & result );
 
 static number convClapNSingAN( const CanonicalForm &f);
 
@@ -521,6 +523,70 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
     result = pAdd( result, term );
   }
 }
+
+#if 0
+CanonicalForm
+convSingGFClapGF( poly p )
+{
+  CanonicalForm result = 0;
+  int e, n = pVariables;
+
+  while ( p != NULL )
+  {
+    CanonicalForm term;
+    term = npInt( ???????pGetCoeff( p ) );
+    for ( int i = 1; i <= n; i++ )
+    {
+      if ( (e = pGetExp( p, i )) != 0 )
+         term *= power( Variable( i ), e );
+    }
+    result += term;
+    p = pNext( p );
+  }
+  return result;
+}
+
+poly
+convClapGFSingGF ( const CanonicalForm & f )
+{
+//    cerr << " f = " << f << endl;
+  int n = pVariables+1;
+  /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
+  int * exp = new int[n];
+  //for ( int i = 0; i < n; i++ ) exp[i] = 0;
+  memset(exp,0,n*sizeof(int));
+  poly result = NULL;
+  convRecGFGF( f, exp, result );
+  delete [] exp;
+  return result;
+}
+
+static void
+convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
+{
+  if ( ! f.inCoeffDomain() )
+  {
+    int l = f.level();
+    for ( CFIterator i = f; i.hasTerms(); i++ )
+    {
+      exp[l] = i.exp();
+      convRecGFGF( i.coeff(), exp, result );
+    }
+    exp[l] = 0;
+  }
+  else
+  {
+    poly term = pNew();
+    pNext( term ) = NULL;
+    for ( int i = 1; i <= pVariables; i++ )
+      pSetExp( term, i, exp[i]);
+    pSetComp(term, 0);
+    pGetCoeff( term ) = nInit( ?????f.intval() );
+    pSetm( term );
+    result = pAdd( result, term );
+  }
+}
+#endif
 
 int convClapISingI( const CanonicalForm & f)
 {
