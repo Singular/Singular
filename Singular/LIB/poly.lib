@@ -1,9 +1,9 @@
-// $Id: poly.lib,v 1.24 2000-01-12 10:35:01 obachman Exp $
+// $Id: poly.lib,v 1.25 2000-03-15 17:17:09 siebert Exp $
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.24 2000-01-12 10:35:01 obachman Exp $";
+version="$Id: poly.lib,v 1.25 2000-03-15 17:17:09 siebert Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -140,8 +140,6 @@ RETURN:  rank of coker(M) if coker(M) is free and -1 else;
                 L[1] = rank of coker(M) or -1
                 L[2] = minbase(M)
 NOTE:    freerank(syz(M)); computes the rank of M if M is free (and -1 else)
-         //* Zur Zeit noch ein Bug, da erste Bettizahl falsch berechnet wird:
-         //betti(0) ist -1 statt 0
 EXAMPLE: example freerank; shows examples
 "
 {
@@ -159,11 +157,11 @@ example
   ring r;
   ideal i=x;
   module M=[x,0,1],[-x,0,-1];
-  freerank(M);           // should be -1, coker(M) is not free
-                         // [1] should be 1, coker(syz(M))=M is free of rank 1
-  freerank(syz (M),"");  // [2] should be gen(2)+gen(1) (minimal relation of M)
+  freerank(M);           // should be 2, coker(M) is not free
+  freerank(syz (M),"");  // [1] should be 1, coker(syz(M))=M is free of rank 1
+                         // [2] should be gen(2)+gen(1) (minimal relation of M)
   freerank(i);
-  freerank(syz(i));      //* bug, should be 1, coker(syz(i))=i is free of rank 1
+  freerank(syz(i));      // should be 1, coker(syz(i))=i is free of rank 1
 }
 ///////////////////////////////////////////////////////////////////////////////
 
