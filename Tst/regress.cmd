@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.15 1998-06-16 19:18:52 obachman Exp $
+# $Id: regress.cmd,v 1.16 1998-06-18 08:46:11 pohl Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -82,7 +82,7 @@ if ( (! (-e $singular)) || (! (-x $singular)))
   $singular = $curr_dir."/../Singular$ext";
 }
 # sed scripts which are applied to res files before they are diff'ed
-$sed_scripts = "-e \"/^\\/\\/.*used time:/d\" -e \"/^\\/\\/.*ignore:/d\" -e \"/error occurred in/d\"";
+$sed_scripts = "-e '/^\\/\\/.*used time:/d' -e '/^\\/\\/.*ignore:/d' -e '/error occurred in/d'";
 
 
 
@@ -96,14 +96,17 @@ sub Set_withMP
   if (! $withMP)
   {
     $withMP = "no";
-    &mysystem("$singular -qt -c 'system(\"with\", \"MP\");\$' > withMPtest");
+    open(MP_TEST, ">MPTest");
+    print(MP_TEST "system(\"with\", \"MP\"); \$");
+    close(MP_TEST);
+    &mysystem("$singular -qt MPTest > withMPtest");
     if (open(MP_TEST, "<withMPtest"))
     {
       $_ = <MP_TEST>;
       $withMP = "yes" if (/^1/);
       close(MP_TEST);
     }
-    &mysystem("$rm -f withMPtest");
+    &mysystem("$rm -f withMPtest MPTest");
   }
 }
     
@@ -185,7 +188,7 @@ sub tst_check
   {
     if ((-r "$root.res.gz.uu") && ! ( -z "$root.res.gz.uu"))
     {
-      $exit_status = &mysystem("$uudecode $root.res.gz.uu; $gunzip -f $root.res.gz");
+      $exit_status = &mysystem("$uudecode $root.res.gz.uu > /dev/null 2&>1; $gunzip -f $root.res.gz");
       if ($exit_status)
       {
 	print (STDERR "Can not decode $root.res.gz.uu\n");
@@ -277,7 +280,6 @@ while ($ARGV[0] =~ /^-/)
   if (/^-s$/)
   {
     $singular = shift;
-    $singular = "$singular$ext" if ($WINNT && $singular !~ /.*$ext$/)
   }
   elsif (/^-h$/)
   {
@@ -312,9 +314,15 @@ $singular = "$curr_dir/$singular" unless ($singular =~ /^\/.*/);
 
 if ( ! (-e $singular))
 {
+  $singular = "$singular$ext"   if ($WINNT && $singular !~ /.*$ext$/);
+}
+
+if ( ! (-e $singular))
+{
   print (STDERR "Can not find $singular \n") && &Usage && die;
 }
-if (! (-x $singular))
+
+if (! (-x $singular) && (! WINNT))
 {
   print (STDERR "Can not execute $singular \n") && &Usage && die;
 }
