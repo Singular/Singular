@@ -1466,22 +1466,23 @@ static void go_on (calc_dat* c){
   //resort S
 #ifdef FIND_DETERMINISTIC
   for(z2=0;z2<=c->strat->sl;z2++)
+  {
+    if (c->modifiedS[z2])
     {
-      if (c->modifiedS[z2])
-	{
-	  int qal;
-	  if (c->strat->lenSw)
-	    qal=c->strat->lenSw[z2];
-	  else
-	    qal=c->strat->lenS[z2];
-	  int new_pos=simple_posInS(c->strat,c->strat->S[z2],qal,c->is_char0);
-	  if (new_pos<z2)
-	    { 
-	      move_forward_in_S(z2,new_pos,c->strat,c->is_char0);
-	    }
-	}
+      int qal;
+      if (c->strat->lenSw)
+	qal=c->strat->lenSw[z2];
+      else
+	qal=c->strat->lenS[z2];
+      int new_pos=simple_posInS(c->strat,c->strat->S[z2],qal,c->is_char0);
+      if (new_pos<z2)
+      { 
+	move_forward_in_S(z2,new_pos,c->strat,c->is_char0);
+      }
     }
-  for(z2=0;c->expandS[z2]!=NULL;z2++){
+  }
+  for(z2=0;c->expandS[z2]!=NULL;z2++)
+  {
     add_to_reductors(c,c->expandS[z2],pLength(c->expandS[z2]));
     // PrintS("E");
   }
@@ -1502,9 +1503,8 @@ static void go_on (calc_dat* c){
 //   }
   int* ibuf=(int*) omalloc(i*sizeof(int));
   sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
-  for(j=0;j<i;j++){
- 
- 
+  for(j=0;j<i;j++)
+  {
     int len;
     poly p;
     buf[j].flatten();
@@ -1522,7 +1522,8 @@ static void go_on (calc_dat* c){
   }
   sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
   int partsum=0;
-  for(j=0;j<i;j++){
+  for(j=0;j<i;j++)
+  {
     memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
     omfree(sbuf[j]);
     partsum+=ibuf[j];
@@ -2413,7 +2414,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     }
   
   }
-  if(swap_roles){
+  if(swap_roles)
+  {
     PrintS("b");
     poly clear_into;
     int dummy_len;
@@ -2456,8 +2458,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       pContent(clear_into);
       pCleardenom(clear_into);
     }
-  else                     
-    pNorm(clear_into);
+    else                     
+      pNorm(clear_into);
 #ifdef FIND_DETERMINISTIC
     erg.reduce_by=j;
     //resort later see diploma thesis, find_in_S must be deterministic
@@ -2465,10 +2467,11 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     //input polys
 #else
     
-      if (new_pos<j){ 
+    if (new_pos<j)
+    { 
       move_forward_in_S(j,new_pos,c->strat,c->is_char0);
-     erg.reduce_by=new_pos;
-      }
+      erg.reduce_by=new_pos;
+    }
 #endif
   }
 }
@@ -2688,17 +2691,17 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 //   sort_region_down(los, 0, losl-1, c);
     //  qsort(los,losl,sizeof(red_object),red_object_better_gen);
     if(erg.expand)
-      {
+    {
 #ifdef FIND_DETERMINISTIC
-	int i;
-	for(i=0;c->expandS[i];i++);
-	c->expandS=(poly*) omrealloc(c->expandS,(i+2)*sizeof(poly));
-	c->expandS[i]=erg.expand;
-	c->expandS[i+1]=NULL;
+      int i;
+      for(i=0;c->expandS[i];i++);
+      c->expandS=(poly*) omrealloc(c->expandS,(i+2)*sizeof(poly));
+      c->expandS[i]=erg.expand;
+      c->expandS[i+1]=NULL;
 #else
-	add_to_reductors(c,erg.expand,erg.expand_length);
+      add_to_reductors(c,erg.expand,erg.expand_length);
 #endif
-      }
+    }
       
   }
   return;
