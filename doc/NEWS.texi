@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.28 2001-02-02 17:52:08 Singular Exp $
+@comment $Id: NEWS.texi,v 1.29 2001-02-02 17:53:45 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -217,5 +217,5 @@ fragmentation, much better locality of reference.
 @code{libreadline} works only with ix86-libc5, 
 ix86-libc6,HPUX_9,HPUX_10
 @item Singular is available for ix86-libc5, ix86-libc6, HPUX_9, HPUX_10,
-SunOS-4, SunOS-5, ...
+SunOS-4, SunOS-5, ix86-Win (runs on Windows 95/98/ME, NT 4.0)
 @end itemize

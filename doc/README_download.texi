@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.6 2000-06-15 11:26:51 obachman Exp $
+@comment $Id: README_download.texi,v 1.7 2001-02-02 17:52:08 Singular Exp $
 @c FILE: README_download.texi
 @c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
 @c
@@ -109,4 +109,5 @@ for details on how to finish the installation.
 @end enumerate
 
 @heading To download @sc{Singular} for the Macintosh
-TBC
+The port of @sc{Singular} will be aviable soon.
+
