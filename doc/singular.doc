@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.104 2000-12-19 15:55:08 Singular Exp $
+@comment $Id: singular.doc,v 1.105 2000-12-20 16:46:20 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -396,6 +396,7 @@ LIB "all.lib";
 * finvar_lib:: procedures to compute invariant rings of finite groups
 * ainvar_lib:: procedures to compute invariants rings of the additive group
 * rinvar_lib:: procedures to compute invariants ring of reductive groups
+* stratify_lib:: algorithmic stratification by the Greuel-Pfister algorithm
 @end menu
 
 @c ----------------------------------------------------------
@@ -407,9 +408,13 @@ LIB "all.lib";
 @subsection ainvar_lib
 @c lib ainvar.lib
 @c ----------------------------------------------------------
-@node rinvar_lib, , ainvar_lib, Invariant theory
+@node rinvar_lib, stratify_lib, ainvar_lib, Invariant theory
 @subsection rinvar_lib
 @c lib rinvar.lib
+@c ----------------------------------------------------------
+@node stratify_lib, ,rinvar_lib, Invariant theory
+@subsection stratify_lib
+@c lib stratify.lib
 @c ----------------------------------------------------------------------------
 @node Symbolic-numerical solving, Visualization, Invariant theory, SINGULAR libraries
 @section Symbolic-numerical solving
