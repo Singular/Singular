@@ -90,7 +90,7 @@ static heBrowser heCurrentHelpBrowser = NULL;
 // order is improtant -- first possible help is choosen
 static heBrowser_s heHelpBrowsers[] =
 {
-#ifdef WINNT
+#ifdef ix86_Win
   { "html",     heDummyInit,    heHtmlHelp},
   { "winhlp",   heDummyInit,    heWinHelp},
 #endif
@@ -203,7 +203,7 @@ char* feHelpBrowser(char* which, int warn)
 
     // First, try emacs, if emacs-option is set
     // Under Win, always use html
-#ifndef WINNT
+#ifndef ix86_Win
     if (feOptValue(FE_OPT_EMACS) != NULL)
     {
       while (heHelpBrowsers[i].browser != NULL)
@@ -756,7 +756,7 @@ static BOOLEAN heNetscapeInit(int warn)
     if (warn) WarnS("'netscape' help browser not available: no 'netscape' program found");
     return FALSE;
   }
-#ifndef WINNT
+#ifndef ix86_Win
   if (getenv("DISPLAY") == NULL)
   {
     if (warn) WarnS("'netscape' help browser not available:");
@@ -804,7 +804,7 @@ static void heNetscapeHelp(heEntry hentry)
   {
     sprintf(url, "%s%s/index.htm", urltype, htmldir);
   }
-#ifndef WINNT
+#ifndef ix86_Win
   sprintf(sys, "%s --remote 'OpenUrl(%s)' > /dev/null 2>&1",
 #else
   sprintf(sys, "%s %s",
@@ -889,8 +889,8 @@ static void heXinfoHelp(heEntry hentry)
 {
   char sys[MAX_SYSCMD_LEN];
 
-#ifdef WINNT
-#define EXTRA_XTERM_ARGS "+vb -sb -fb Courier-bold-13 -tn linux -cr Red3"
+#ifdef ix86_Win
+#define EXTRA_XTERM_ARGS "+vb -sb -fb Courier-bold-12 -tn linux -cr Red3"
 #else
 #define EXTRA_XTERM_ARGS ""
 #endif
@@ -915,7 +915,7 @@ static void heXinfoHelp(heEntry hentry)
 
 static BOOLEAN heTkinfoInit(int warn)
 {
-#ifndef WINNT
+#ifndef ix86_Win
   if (getenv("DISPLAY") == NULL)
   {
     if (warn) WarnS("'tkinfo' help browser not available:");

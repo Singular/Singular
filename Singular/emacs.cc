@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.21 2001-10-09 16:35:57 Singular Exp $ */
+/* $Id: emacs.cc,v 1.22 2002-02-11 12:03:58 Singular Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -12,7 +12,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#ifdef WINNT
+#ifdef ix86_Win
 #include <windows.h>
 #endif
 #include "mod2.h"
@@ -43,7 +43,7 @@
 #  define  DIR_SEPP "/"
 #  define  UP_DIR ".."
 
-#ifndef WINNT
+#ifndef ix86_Win
 void error(const char *fmt, ...)
 {
   va_list ap;
@@ -195,8 +195,8 @@ int main(int argc, char** argv)
     exit(1);
   }
 
-#ifdef WINNT
-#define EXTRA_XTERM_ARGS "+vb -sl 2000 -fb Courier-bold-13 -tn linux -cr Red3"
+#ifdef ix86_Win
+#define EXTRA_XTERM_ARGS "+vb -sl 2000 -fb Courier-bold-12 -tn linux -cr Red3"
 #else
 #define EXTRA_XTERM_ARGS ""
 #endif
@@ -255,7 +255,7 @@ int main(int argc, char** argv)
 #ifdef ix86_Win
       if ((emacs_load==NULL)||(!access(emacs_load,X_OK)))
         emacs_load = getenv("SINGHOME");
-#endif	
+#endif
       sprintf(cwd, "%s/.emacs-singular", emacs_load);
       if (! access(cwd, R_OK))
       {

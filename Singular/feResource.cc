@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.33 2002-01-29 17:26:47 Singular Exp $ */
+/* $Id: feResource.cc,v 1.34 2002-02-11 12:03:58 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -30,7 +30,7 @@ char* feResource(const char* key, int warn = -1);
 // #define RESOURCE_DEBUG
 
 #if defined(MAKE_DISTRIBUTION)
-#if defined(WINNT) && ! defined(__CYGWIN__)
+#if defined(ix86_Win) && ! defined(__CYGWIN__)
 #define SINGULAR_DEFAULT_DIR "/Singular/"S_VERSION1
 #elif defined(macintosh)
 #define SINGULAR_DEFAULT_DIR "Macintosh HD:Singular:"S_VERSION1
@@ -89,7 +89,7 @@ static feResourceConfig_s feResourceConfigs[25] =
   {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
   {"info",      'I',    feResBinary,"INFO",                 "%b/info",              ""},
   {"tkinfo",    'T',    feResBinary,"TKINFO",               "%b/tkinfo",            ""},
-#ifdef WINNT
+#ifdef ix86_Win
   {"rxvt",     'X',    feResBinary,"RXVT",                "%b/rxvt",             ""},
 #else
   {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             ""},
@@ -121,7 +121,7 @@ char* feArgv0=NULL;
 #define MAXRESOURCELEN 5*MAXPATHLEN
 
 char fePathSep =
-#if defined(WINNT)
+#if defined(ix86_Win)
 ';'
 #elif defined(macintosh)
 ','
@@ -142,7 +142,7 @@ static char* feCleanUpFile(char* fname);
 static char* feCleanUpPath(char* path);
 static void mystrcpy(char* d, char* s);
 static char* feSprintf(char* s, const char* fmt, int warn = -1);
-#if defined(WINNT) && defined(__GNUC__)
+#if defined(ix86_Win) && defined(__GNUC__)
 // utility function of Cygwin32:
 extern "C" int cygwin32_posix_path_list_p (const char *path);
 #endif
@@ -179,7 +179,7 @@ char* feResourceDefault(const char* key)
 
 void feInitResources(char* argv0)
 {
-#if defined(WINNT) && defined(__GNUC__)
+#if defined(ix86_Win) && defined(__GNUC__)
   if (cygwin32_posix_path_list_p (getenv("PATH")))
     fePathSep = ':';
 #endif
@@ -409,7 +409,7 @@ static char* feGetExpandedExecutable()
     return NULL;
   }
 #ifndef macintosh
-#ifdef WINNT // stupid WINNT sometimes gives you argv[0] within ""
+#ifdef ix86_Win // stupid WINNT sometimes gives you argv[0] within ""
   if (*feArgv0 == '"')
   {
     int l = strlen(feArgv0);
@@ -478,7 +478,7 @@ static char* feCleanResourceValue(feResourceType type, char* value)
 #ifdef RESOURCE_DEBUG
       printf("Clean value:%s\n", value);
 #endif
-#ifdef WINNT
+#ifdef ix86_Win
 #ifdef RESOURCE_DEBUG
       printf("Clean WINNT value:%s\n", value);
 #endif
