@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.33 1998-04-16 16:10:24 obachman Exp $ */
+/* $Id: tesths.cc,v 1.34 1998-04-17 09:39:00 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -90,7 +90,7 @@ static struct option longopts[] =
   { 0, 0, 0, 0 }
 };
 // #define SHORT_OPTS_STRING "bc:e::hqr:tu:v"
-#define SHORT_OPTS_STRING "bhqtvxe::c:r:u:"
+#define SHORT_OPTS_STRING "bhqtvxec:r:u:"
 
 struct sing_option
 {
