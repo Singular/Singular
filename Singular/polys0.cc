@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.4 1997-04-12 16:04:43 Singular Exp $ */
+/* $Id: polys0.cc,v 1.5 1997-07-02 16:44:14 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -17,7 +17,7 @@
 #include "ipid.h"
 #include "polys.h"
 
-int pVectorOut=TRUE;
+BOOLEAN pVectorOut=TRUE;
 /*2
 * writes a monomial (p),
 * uses form x*gen(.) if ko != coloumn number of p

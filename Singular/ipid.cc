@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.5 1997-06-17 09:44:26 Singular Exp $ */
+/* $Id: ipid.cc,v 1.6 1997-07-02 16:44:11 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -97,15 +97,16 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
         IDSTRING(h) = mstrdup("parameter list #;\nreturn();\n\n");
         break;
       case STRING_CMD:
-      #ifdef HAVE_DLD
-      case BINARY_CMD:
-      #endif
         IDSTRING(h) = mstrdup("");
         break;
       case LIST_CMD:
         IDLIST(h)=(lists)Alloc(sizeof(slists));
         IDLIST(h)->Init();
         break;
+      case BINARY_CMD:
+        WerrorS("`binary` objects cannot be declared");
+        Free(ADDRESS(h),sizeof(idrec));
+        return NULL;
     //the types with the standard init: set the struct to zero
       case LINK_CMD:
         len=sizeof(ip_link);

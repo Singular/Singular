@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: sing_dld.cc,v 1.3 1997-04-02 15:07:51 Singular Exp $ */
+/* $Id: sing_dld.cc,v 1.4 1997-07-02 16:44:16 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to dynamic loading
@@ -41,18 +41,21 @@ void dlInit(const char *thisfile)
 #endif
 #endif
 
-BOOLEAN dlLoad(const char * fn, const char *pn, proc1 &p)
+BOOLEAN dlLoad(const char * fn, const char *pn)
 {
+  typedef void (*PROC)(void);
+  PROC p1;
   #ifdef linux
   #ifdef __ELF__
   /*======================linux elf dl============================*/
   void *h=dlopen(fn,RTD_GLOBAL|RTD_NOW);
   if (h!=NULL)
   {
-    p1=(proc1)dlsym(h,pn);
+    p1=(PROC)dlsym(h,pn);
     char *s;
     if((s=dlerror())==NULL)
     {
+      p1();
       return FALSE;
     }
     else
@@ -77,7 +80,8 @@ BOOLEAN dlLoad(const char * fn, const char *pn, proc1 &p)
     int i= dld_link (fn);
     if (dld_function_executable_p(pn))
     {
-      p = (proc1) dld_get_func (pn);
+      p1 = (PROC) dld_get_func (pn);
+      p1();
       return FALSE;
     }
     else
@@ -91,9 +95,12 @@ BOOLEAN dlLoad(const char * fn, const char *pn, proc1 &p)
   #elif defined(hpux)
   shl_t hdl=shl_load(fn,
           BIND_IMMEDIATE|BIND_NOSTART|BIND_NONFATAL|BIND_VERBOSE,0L);
-  int i=shl_findsym(&hdl,pn,TYPE_PROCEDURE,&p);
+  int i=shl_findsym(&hdl,pn,TYPE_PROCEDURE,&p1);
   if (i==0)
+  {
+    p1();
     return FALSE;
+  }  
   else
   {
     Werror("cannot find %s in %s",pn,fn);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.14 1997-07-01 15:41:49 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.15 1997-07-02 16:44:10 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -476,7 +476,6 @@ struct sValAssign dAssign[]=
 ,{jiA_LIST,     LIST_CMD,       LIST_CMD }
 ,{jiA_LINK,     LINK_CMD,       STRING_CMD }
 ,{jiA_LINK,     LINK_CMD,       LINK_CMD }
-,{jiA_STRING,   BINARY_CMD,     STRING_CMD }
 ,{NULL,         0,              0 }
 };
 struct sValAssign_sys dAssign_sys[]=

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.20 1997-07-01 15:41:55 Singular Exp $ */
+/* $Id: tesths.cc,v 1.21 1997-07-02 16:44:17 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -20,6 +20,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "ipshell.h"
+#include "sing_dld.h"
 #include "febase.h"
 #include "cntrlc.h"
 #include "mmemory.h"
@@ -269,9 +270,7 @@ int main(          /* main entry to Singular */
 #endif
   }
   slStandardInit();
-#ifdef HAVE_DLD
   dlInit(thisfile);
-#endif
   myynest=0;
   /* if script is given */
   if ((argc > 1)&&(argv[1][0]!='-'))

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.6 1997-05-20 08:52:07 Singular Exp $ */
+/* $Id: ipshell.h,v 1.7 1997-07-02 16:44:12 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -94,7 +94,7 @@ struct sValCmd2
 #ifdef PROFILING
   short cnt;
   int   t;
-#endif    
+#endif
 };
 
 typedef BOOLEAN (*proc3)(leftv,leftv,leftv,leftv);
@@ -148,19 +148,5 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl);
 void   showOption();
 BOOLEAN setOption(leftv res, leftv v);
 /* ================================================================== */
-// from sing_dld.cc:
-#ifdef HAVE_DLD
-  sleftv * iiMake_binary(idhdl pn, sleftv* sl);
-  BOOLEAN dlLoad(char * fn, char *pn, proc1 &p);
-  #ifdef linux
-    #ifdef __ELF__
-      #define dlInit(A)
-    #else
-      void    dlInit(const char *thisfile);
-    #endif
-  #else
-    #define dlInit(A)
-  #endif
-#endif
 #endif
 

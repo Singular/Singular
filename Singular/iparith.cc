@@ -38,6 +38,7 @@
 #include "weight.h"
 #include "ipconv.h"
 #include "ipprint.h"
+#include "sing_dld.h"
 #include "attrib.h"
 #include "silink.h"
 #ifdef HAVE_FACTORY
@@ -1963,7 +1964,7 @@ struct sValCmd2 dArith2[]=
 ,{jjINDEX_V_IV,'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD PROFILER}
 ,{jjPROC,      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD PROFILER}
 #ifdef HAVE_DLD
-,{jjBIN,       '(',            ANY_TYPE/*set by p*/,BIN_CMD, DEF_CMD PROFILER}
+,{jjBIN,       '(',            ANY_TYPE/*set by p*/,BINARY_CMD, DEF_CMD PROFILER}
 #endif
 ,{jjMAP,       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD PROFILER}
 ,{jjKLAMMER,   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD PROFILER}

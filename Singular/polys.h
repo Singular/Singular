@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.3 1997-04-09 12:20:06 Singular Exp $ */
+/* $Id: polys.h,v 1.4 1997-07-02 16:44:12 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -39,7 +39,7 @@ extern int      pOrdSgn;
 extern BOOLEAN  pLexOrder;
 extern BOOLEAN  pMixedOrder;
 extern poly     ppNoether;
-extern int      pVectorOut;
+extern BOOLEAN  pVectorOut;
 
 #ifdef DRING
 // D=k[x,d,y] is the Weyl-Algebra [y], y commuting with all others
