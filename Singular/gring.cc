@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.28 2003-03-10 16:30:38 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.29 2003-03-11 16:49:55 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -23,7 +23,7 @@
 #include "prCopy.h"
 
 /* global nc_macros : */
-#define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(Exponent_t))
+#define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(int))
 #define freeN(A,k) omFreeSize((ADDRESS)A,k*sizeof(number))
 
 /* poly functions defined in p_Procs : */
@@ -83,16 +83,16 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
   poly v=NULL;
   poly out=NULL;
   int rN=r->N;
-  Exponent_t *P=(Exponent_t *)omAlloc0((rN+1)*sizeof(Exponent_t));
-  Exponent_t *M=(Exponent_t *)omAlloc0((rN+1)*sizeof(Exponent_t));
+  int *P=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *M=(int *)omAlloc0((rN+1)*sizeof(int));
   /* coefficients: */
   number cP,cM,cOut;
-  p_GetExpV(m,M,r);
+  p_GetExpV(m, M, r);
   cM=p_GetCoeff(m,r);
   /* components:*/
-  const Exponent_t expM=p_GetComp(m,r);
-  Exponent_t expP=0;
-  Exponent_t expOut=0;
+  const int expM=p_GetComp(m,r);
+  int expP=0;
+  int expOut=0;
 
   sBucket_pt bu_out=sBucketCreate(r);
 
@@ -100,10 +100,9 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
   {
     //v=p_Head(p,r);
 #ifdef PDEBUG
-    p_Test(v,r);
-    //p_Test(p,r);
+    //    p_Test(v,r);
+    p_Test(p,r);
 #endif
-
     expP=p_GetComp(p,r);
     if (expP==0)
     {
@@ -133,7 +132,8 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
     /* hats off before buckets! */
     sBucket_Add_p(bu_out,v,pLength(v));
     /*    out = p_Add_q(out,v,r); */
-    p=p_LmDeleteAndNext(p,r);
+    p_DeleteLm(&p,r);
+    //p=p_LmDeleteAndNext(p,r);
   }
   freeT(P,rN);
   freeT(M,rN);
@@ -161,27 +161,27 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
   poly v=NULL;
   poly out=NULL;
   int rN=r->N;
-  Exponent_t *P=(Exponent_t *)omAlloc0((rN+1)*sizeof(Exponent_t));
-  Exponent_t *M=(Exponent_t *)omAlloc0((rN+1)*sizeof(Exponent_t));
+  int *P=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *M=(int *)omAlloc0((rN+1)*sizeof(int));
   /* coefficients: */
   number cP,cM,cOut;
   p_GetExpV(m,M,r);
   cM=p_GetCoeff(m,r);
   /* components:*/
-  const Exponent_t expM=p_GetComp(m,r);
-  Exponent_t expP=0;
-  Exponent_t expOut=0;
+  const int expM=p_GetComp(m,r);
+  int expP=0;
+  int expOut=0;
 
   sBucket_pt bu_out=sBucketCreate(r);
 
   while (p!=NULL)
   {
-    v=p_Head(p,r);
+    //    v=p_Head(p,r);
 #ifdef PDEBUG
-    p_Test(v,r);
+    //    p_Test(v,r);
     p_Test(p,r);
 #endif
-    expP=p_GetComp(v,r);
+    expP=p_GetComp(p,r);
     if (expP==0)
     {
       expOut=expM;
@@ -199,10 +199,10 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
         expOut=0;
       }
     }
-    p_GetExpV(v,P,r);
-    cP=p_GetCoeff(v,r);
+    p_GetExpV(p,P,r);
+    cP=p_GetCoeff(p,r);
     cOut=n_Mult(cP,cM,r);
-    p_Delete(&v,r);
+    //p_Delete(&v,r);
     v= nc_mm_Mult_nn(M,P,r);
     v = p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
@@ -221,21 +221,21 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
   return(out);
 }
 
-poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
+poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
 /* destroys nothing, no coeffs and exps */
 {
   poly out=NULL;
   int i,j;
   int iF,jG,iG;
   int rN=r->N;
-  int ExpSize=(rN+1)*sizeof(Exponent_t);
+  int ExpSize=(((rN+1)*sizeof(int)+sizeof(long)-1)/sizeof(long))*sizeof(long);
 
-  Exponent_t *F=(Exponent_t *)omAlloc0(ExpSize);
-  Exponent_t *G=(Exponent_t *)omAlloc0(ExpSize);
+  int *F=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *G=(int *)omAlloc0((rN+1)*sizeof(int));
 
-  memcpy(F, F0,(rN+1)*sizeof(Exponent_t));
+  memcpy(F, F0,(rN+1)*sizeof(int));
   // pExpVectorCopy(F,F0);
-  memcpy(G, G0,(rN+1)*sizeof(Exponent_t));
+  memcpy(G, G0,(rN+1)*sizeof(int));
   //  pExpVectorCopy(G,G0);
   // F[0]=0; done by omAlloc0
   // G[0]=0; done by omAlloc0
@@ -252,7 +252,7 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
   if (iF<=jG)
     /* i.e. no mixed exp_num , MERGE case */
   {
-    p_MemAdd_LengthGeneral(F, G, r->ExpL_Size);
+    p_MemAdd_LengthGeneral(F, G, ExpSize);
     p_SetExpV(out,F,r);
     p_Setm(out,r);
     freeT(F,rN);
@@ -312,7 +312,7 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
       }
       cff=totcff;
     }
-    p_MemAdd_LengthGeneral(F, G, r->ExpL_Size);
+    p_MemAdd_LengthGeneral(F, G, ExpSize);
     p_SetExpV(out,F,r);
     p_Setm(out,r);
     p_SetCoeff(out,cff,r);
@@ -333,8 +333,8 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
   }
 
   number n1=n_Init(1,r);
-  Exponent_t *Prv=(Exponent_t *)omAlloc0(ExpSize);
-  Exponent_t *Nxt=(Exponent_t *)omAlloc0(ExpSize);
+  int *Prv=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *Nxt=(int *)omAlloc0((rN+1)*sizeof(int));
 
   int *log=(int *)omAlloc0((rN+1)*sizeof(int));
   int cnt=0; int cnf=0;
@@ -375,9 +375,9 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
   number *c=(number *)omAlloc0((rN+1)*sizeof(number));
   c[0]=n_Init(1,r);
 
-  Exponent_t *Op=Nxt;
-  Exponent_t *On=G;
-  Exponent_t *U=(Exponent_t *)omAlloc0(ExpSize);
+  int *Op=Nxt;
+  int *On=G;
+  int *U=(int *)omAlloc0((rN+1)*sizeof(int));
 
   for (i=jG;i<=rN;i++) U[i]=Nxt[i]+G[i];  /* make leadterm */
   Nxt=NULL;
@@ -470,7 +470,7 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
 }
 
 
-poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
+poly nc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
 /* f=mono(F),g=(x_iG)^bG */
 {
   poly out=NULL;
@@ -541,8 +541,8 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
 //     /* + cleanup, post-processing */
 //   }
 
-  Exponent_t *Prv=(Exponent_t*)omAlloc0((rN+1)*sizeof(Exponent_t));
-  Exponent_t *Nxt=(Exponent_t*)omAlloc0((rN+1)*sizeof(Exponent_t));
+  int *Prv=(int*)omAlloc0((rN+1)*sizeof(int));
+  int *Nxt=(int*)omAlloc0((rN+1)*sizeof(int));
   int *lF=(int *)omAlloc0((rN+1)*sizeof(int));
   int cnt=0; int cnf=0;
   /* splitting F wrt jG */
@@ -593,13 +593,13 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
   number *c=(number *)omAlloc0((cnt+2)*sizeof(number));
   c[cnt+1]=n_Init(1,r);
   i=cnt+2;         /* later in freeN */
-  Exponent_t *Op=Nxt;
-  Exponent_t *On=(Exponent_t *)omAlloc0((rN+1)*sizeof(Exponent_t));
-  Exponent_t *U=(Exponent_t *)omAlloc0((rN+1)*sizeof(Exponent_t));
+  int *Op=Nxt;
+  int *On=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *U=(int *)omAlloc0((rN+1)*sizeof(int));
 
 
   //  pExpVectorCopy(U,Nxt);
-  memcpy(U, Nxt,(rN+1)*sizeof(Exponent_t));
+  memcpy(U, Nxt,(rN+1)*sizeof(int));
   U[jG] = U[jG] + bG;
 
   /* Op=Nxt and initial On=(0); */
@@ -1067,7 +1067,7 @@ poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r)
   number C=n_Copy(p_GetCoeff(N,r),r);
   number cF=n_Copy(p_GetCoeff(p2,r),r);
   p2=p_Mult_nn(p2,C,r);
-  poly out=nc_mm_Mult_p(m,p_LmDeleteAndNext(p_Copy(p1,r),r),r);
+  poly out = nc_mm_Mult_p(m, p_Copy(pNext(p1),r), r);
   N=p_Add_q(N,out,r);
   number MinusOne=n_Init(-1,r);
   if (!n_Equal(cF,MinusOne,r))
@@ -1325,10 +1325,11 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
 {
   if (pLmIsConstant(m1) || pLmIsConstant(m1)) return(NULL);
   if (pLmCmp(m1,m2)==0) return(NULL);
-  Exponent_t *M1=(Exponent_t *)omAlloc0((currRing->N+1)*sizeof(Exponent_t));
-  Exponent_t *M2=(Exponent_t *)omAlloc0((currRing->N+1)*sizeof(Exponent_t));
-  Exponent_t *PREFIX=(Exponent_t *)omAlloc0((currRing->N+1)*sizeof(Exponent_t));
-  Exponent_t *SUFFIX=(Exponent_t *)omAlloc0((currRing->N+1)*sizeof(Exponent_t));
+  int rN=currRing->N;
+  int *M1=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *M2=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *PREFIX=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *SUFFIX=(int *)omAlloc0((rN+1)*sizeof(int));
   pGetExpV(m1,M1);
   pGetExpV(m2,M2);
   poly res=NULL;
@@ -1340,12 +1341,12 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
   number nTmp=NULL;
   number MinusOne=nInit(-1);
   int i,j,k;
-  for (i=1;i<=currRing->N;i++)
+  for (i=1;i<=rN;i++)
   {
     if (M2[i]!=0)
     {
       ares=NULL;
-      for (j=1;j<=currRing->N;j++)
+      for (j=1;j<=rN;j++)
       {
         if (M1[j]!=0)
         {
@@ -1376,10 +1377,10 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
           if (bres!=NULL)
           {
             /* now mult (prefix, bres, suffix) */
-            memcpy(SUFFIX, M1,(currRing->N+1)*sizeof(Exponent_t));
-            memcpy(PREFIX, M1,(currRing->N+1)*sizeof(Exponent_t));
+            memcpy(SUFFIX, M1,(rN+1)*sizeof(int));
+            memcpy(PREFIX, M1,(rN+1)*sizeof(int));
             for (k=1;k<=j;k++) SUFFIX[k]=0;
-            for (k=j;k<=currRing->N;k++) PREFIX[k]=0;
+            for (k=j;k<=rN;k++) PREFIX[k]=0;
             SUFFIX[0]=0;
             PREFIX[0]=0;
             prefix=pOne();
@@ -1400,10 +1401,10 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
       if (ares!=NULL)
       {
         /* now mult (prefix, bres, suffix) */
-        memcpy(SUFFIX, M2,(currRing->N+1)*sizeof(Exponent_t));
-        memcpy(PREFIX, M2,(currRing->N+1)*sizeof(Exponent_t));
+        memcpy(SUFFIX, M2,(rN+1)*sizeof(int));
+        memcpy(PREFIX, M2,(rN+1)*sizeof(int));
         for (k=1;k<=i;k++) SUFFIX[k]=0;
-        for (k=i;k<=currRing->N;k++) PREFIX[k]=0;
+        for (k=i;k<=rN;k++) PREFIX[k]=0;
         SUFFIX[0]=0;
         PREFIX[0]=0;
         prefix=pOne();
@@ -1421,10 +1422,10 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
       }
     }
   }
-  freeT(M1,currRing->N);
-  freeT(M2,currRing->N);
-  freeT(PREFIX, currRing->N);
-  freeT(SUFFIX, currRing->N);
+  freeT(M1, rN);
+  freeT(M2, rN);
+  freeT(PREFIX, rN);
+  freeT(SUFFIX, rN);
   return(res);
 }
 
@@ -1443,6 +1444,7 @@ ideal twostd(ideal I)
   poly varj=NULL;
   ideal Q=NULL;
   ideal id_tmp=NULL;
+  int rN=currRing->N;
 
   loop
   {
@@ -1452,7 +1454,7 @@ ideal twostd(ideal I)
     for (i=0;i<=s-1;i++)
     {
       p=J->m[i];
-      for (j=1;j<=currRing->N;j++)
+      for (j=1;j<=rN;j++)
       {
         varj=pOne();
         pSetExp(varj,j,1);
