@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.94 2004-04-23 15:10:19 Singular Exp $
+### $Id: Makefile.in,v 1.95 2004-12-17 17:53:53 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -46,6 +46,7 @@ PERL            = @PERL@
 TEX             = tex
 MAKEINFO        = @MAKEINFO@ --force
 TEXI2DVI        = @TEXI2DVI@
+TEXI2PDF        = @TEXI2PDF@
 TEXINDEX        = @TEXINDEX@
 # use our local texi2html
 TEXI2HTML       = ./texi2html
@@ -163,6 +164,10 @@ p-pluralmain.tex: plural.tex pluralmain.tex ${PLU_MANUAL_FILES}
 singular.dvi: ${MANUAL_FILES} singular.tex s-plural.tex
 	${TEXI2DVI} singular.tex
 
+singular.pdf: ${MANUAL_FILES} singular.tex s-plural.tex
+	${TEXI2PDF} singular.tex
+
+plural.dvi: ${PLU_MANUAL_FILES} p-pluralmain.tex
 plural.dvi: ${PLU_MANUAL_FILES} p-pluralmain.tex
 	${TEXI2DVI} p-pluralmain.tex; mv p-pluralmain.dvi plural.dvi
 
