@@ -241,6 +241,22 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,calc_dat* c){
 
 ///returns position sets w as weight
 int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
+  int best=l;
+  int i;
+  w=r[l].guess_quality(c);
+  for(i=l+1;i<=u;i++){
+    int w2=r[i].guess_quality(c);
+    if(w2<w){
+      w=w2;
+      best=i;
+    }
+   
+  }
+ return best;
+}
+
+#if 0 
+int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
 
   int sz=u-l+1;
   int n=sz/10+1;
@@ -295,6 +311,8 @@ int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
   return pos;
   
 }
+
+#endif
 void red_object::canonicalize(){
   kBucketCanonicalize(bucket);
   if(sum)
@@ -1402,6 +1420,10 @@ static void go_on (calc_dat* c){
   }
   p[i]=NULL;
   pre_comp(p,i,c);
+  if(i==0){
+    omfree(p);
+    return;
+  }
   red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
   c->normal_forms+=i;
   int j;
@@ -2531,13 +2553,54 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 //     Print("reduce_by:%i\n",erg.reduce_by);
 //     Print("fromS:%i\n",erg.fromS);
     if(erg.reduce_by<0) break;
+
+
+
+    erg.expand=NULL;
+    int d=erg.to_reduce_u-erg.to_reduce_l+1;
+    if ((!erg.fromS)&&(d>100)){
+      PrintS("L");
+      if(!erg.fromS){
+	erg.to_reduce_u=MAX(erg.to_reduce_u,erg.reduce_by);
+	if (pLmEqual(los[erg.reduce_by].p,los[erg.to_reduce_l].p))
+	  erg.to_reduce_l=MIN(erg.to_reduce_l,erg.reduce_by);
+      }
+      int pn=erg.to_reduce_u+1-erg.to_reduce_l;
+      poly* p=(poly*) omalloc((pn)*sizeof(poly));
+      int i;
+      for(i=0;i<pn;i++){
+	int len;
+	los[erg.to_reduce_l+i].flatten();
+	kBucketClear(los[erg.to_reduce_l+i].bucket,&p[i],&len);
+	
+	redTailShort(p[i],c->strat);
+      }
+      pre_comp(p,pn,c);
+      int j;
+      for(j=0;j<pn;j++){
+	los[erg.to_reduce_l+j].p=p[j];
+	los[erg.to_reduce_l+j].sev=pGetShortExpVector(p[j]);
+	los[erg.to_reduce_l+j].sum=NULL;
+	int len=pLength(p[j]);
+	kBucketInit(los[erg.to_reduce_l+j].bucket,los[erg.to_reduce_l+j].p,len);
+      }
+      for(j=erg.to_reduce_l+pn;j<=erg.to_reduce_u;j++){
+	los[j].p=NULL;
+	
+      }
+
+      omfree(p);
+    }
+    else {
     multi_reduction_lls_trick(los,losl,c,erg);
     int sum=0;
 
     
     int i;
     int len;
+    
     multi_reduce_step(erg,los,c);
+    }
 //     reduction_step *rs=create_reduction_step(erg, los, c);
 //     rs->reduce(los,erg.to_reduce_l,erg.to_reduce_u);
 //     finalize_reduction_step(rs);
