@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.91 2003-10-02 18:07:23 levandov Exp $
+### $Id: Makefile.in,v 1.92 2004-04-22 16:17:23 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -137,7 +137,7 @@ all: info dvi html singular.idx
 # info stuff
 info: singular.hlp
 
-singular.hlp: ${MANUAL_FILES} singular.tex ${PLU_MANUAL_FILES}
+singular.hlp: ${MANUAL_FILES} singular.tex s-plural.tex
 	- ${MAKEINFO} --no-split singular.tex
 
 plural.hlp:  ${PLU_MANUAL_FILES} pluralmain.tex
@@ -146,19 +146,25 @@ plural.hlp:  ${PLU_MANUAL_FILES} pluralmain.tex
 # dvi stuff
 dvi: manual.dvi usercard.dvi
 
-singular.dvi: ${MANUAL_FILES} singular.tex
+s-plural.tex: plural.tex ${PLU_MANUAL_FILES}
+	for PFILE in ${PLU_MANUAL_FILES};\
+	do \
+		sed 's/@value{PSUFFIX}//g' < $${PFILE}  >s-$${PFILE};\
+	done
+	sed -e 's/@include plu/@include s-plu/' -e 's/@value{PSUFFIX}/(plural)/g' < plural.tex >s-plural.tex
+
+singular.dvi: ${MANUAL_FILES} singular.tex s-plural.tex
 	${TEXI2DVI} singular.tex
 
 plural.dvi: ${PLU_MANUAL_FILES} pluralmain.tex
-	touch ./xx
+	-mkdir plural
+	cp *.tex *.texi plural
 	for PFILE in ${PLU_MANUAL_FILES};\
 	do \
-		sed 's/@value{PSUFFIX}//g' < $${PFILE}  >./xx ;\
-		cp ./xx $${PFILE};\
-	done; \
-	rm ./xx
-	${TEXI2DVI} pluralmain.tex
-	mv pluralmain.dvi plural.dvi
+		sed 's/@value{PSUFFIX}//g' < $${PFILE}  >plural/$${PFILE};\
+	done
+	cp pluralmain.tex plural/pluralmain.tex
+	cd plural;ln -s ../d2t_singular .; ${TEXI2DVI} pluralmain.tex; mv pluralmain.dvi ../plural.dvi; cd ..
 
 manual.dvi: ${MANUAL_FILES} manual.tex
 	${TEXI2DVI} manual.tex
