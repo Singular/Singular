@@ -195,7 +195,7 @@ BOOLEAN good_has_t_rep(int i, int j,calc_dat* c){
 
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
-  int deciding_deg= pFDeg(lm);
+  int deciding_deg= pTotaldegree(lm);
   int* i_con =make_connections(i,j,lm,c);
   p_Delete(&lm,c->r);
 
@@ -453,7 +453,7 @@ static void replace_pair(int & i, int & j, calc_dat* c)
 
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
-  int deciding_deg= pFDeg(lm);
+  int deciding_deg= pTotaldegree(lm);
   int* i_con =make_connections(i,j,lm,c);
   int z=0;
 
@@ -480,14 +480,14 @@ static void replace_pair(int & i, int & j, calc_dat* c)
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
   poly short_s;
-  curr_deg=pFDeg(lm);
+  curr_deg=pTotaldegree(lm);
   int_pair_node* last=NULL;
 
   for (int n=0;((n<c->n) && (j_con[n]>=0));n++){
     for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
       pLcm(c->S->m[i_con[m]], c->S->m[j_con[n]], lm);
       pSetm(lm);
-      if (pFDeg(lm)>=deciding_deg)
+      if (pTotaldegree(lm)>=deciding_deg)
       {
         soon_t_rep(i_con[m],j_con[n],c);
         int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
@@ -530,7 +530,7 @@ static void replace_pair(int & i, int & j, calc_dat* c)
         if (p_LmDivisibleBy(c->S->m[dz],short_s,c->r)) break;
       }
 #endif
-      int comp_deg(pFDeg(short_s));
+      int comp_deg(pTotaldegree(short_s));
       p_Delete(&short_s,c->r);
       if ((comp_deg<curr_deg)
           ||
@@ -582,19 +582,19 @@ static void replace_pair(redNF_inf* inf, calc_dat* c)
 
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
-  int deciding_deg= pFDeg(lm);
+  int deciding_deg= pTotaldegree(lm);
   int* i_con =make_connections(i,j,lm,c);
   int z=0;
 
   for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
     if (i_con[n]==j){
-      //       curr_deg=pFDeg(lm);
+      //       curr_deg=pTotaldegree(lm);
       //       for(int z1=0;((z1<c->n) && (i_con[z1]>=0));z1++)
       //         for (int z2=z1+1;((z2<c->n)&&(i_con[z2]>=0));z2++)
       //         {
       //           pLcm(c->S->m[i_con[z1]], c->S->m[i_con[z2]], lm);
       //           pSetm(lm);
-      //           if (pFDeg(lm)==curr_deg)
+      //           if (pTotaldegree(lm)==curr_deg)
       //             now_t_rep(i_con[z1],i_con[z2],c);
       //         }
       now_t_rep(i,j,c);
@@ -620,13 +620,13 @@ static void replace_pair(redNF_inf* inf, calc_dat* c)
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
   poly short_s;
-  curr_deg=pFDeg(lm);
+  curr_deg=pTotaldegree(lm);
 
   for (int n=0;((n<c->n) && (j_con[n]>=0));n++){
     for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
       pLcm(c->S->m[i_con[m]], c->S->m[j_con[n]], lm);
       pSetm(lm);
-      if (pFDeg(lm)>=deciding_deg)
+      if (pTotaldegree(lm)>=deciding_deg)
       {
         //soon_t_rep(i_con[m],j_con[n],c);
         int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
@@ -669,7 +669,7 @@ static void replace_pair(redNF_inf* inf, calc_dat* c)
         if (p_LmDivisibleBy(c->S->m[dz],short_s,c->r)) break;
       }
 #endif
-      int comp_deg(pFDeg(short_s));
+      int comp_deg(pTotaldegree(short_s));
       p_Delete(&short_s,c->r);
       if ((comp_deg<curr_deg)
           ||
@@ -698,7 +698,7 @@ static void replace_pair(redNF_inf* inf, calc_dat* c)
 static int* make_connections(int from, poly bound, calc_dat* c)
 {
   ideal I=c->S;
-  int s=pFDeg(bound);
+  int s=pTotaldegree(bound);
   int* cans=(int*) omalloc(c->n*sizeof(int));
   int* connected=(int*) omalloc(c->n*sizeof(int));
   int cans_length=0;
@@ -740,7 +740,7 @@ static int* make_connections(int from, poly bound, calc_dat* c)
 static int* make_connections(int from, int to, poly bound, calc_dat* c)
 {
   ideal I=c->S;
-  int s=pFDeg(bound);
+  int s=pTotaldegree(bound);
   int* cans=(int*) omalloc(c->n*sizeof(int));
   int* connected=(int*) omalloc(c->n*sizeof(int));
   cans[0]=to;
@@ -992,7 +992,7 @@ static void initial_data(calc_dat* c, ideal I){
       si->i=-1;
       si->j=-1;
       si->expected_length=pLength(I->m[i]);
-      si->deg=pFDeg(I->m[i]);
+      si->deg=pTotaldegree(I->m[i]);
       si->lcm_of_lm=I->m[i];
       si->next=NULL;
       PrintS("ho");
@@ -1065,7 +1065,7 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
   sorted_pair_node** nodes=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
   int spc=0;
   c->T_deg=(int*) omrealloc(c->T_deg,c->n*sizeof(int));
-  c->T_deg[i]=pFDeg(h);
+  c->T_deg[i]=pTotaldegree(h);
   hp=omrealloc(c->rep, c->n *sizeof(int));
   if (hp!=NULL){
     c->rep=(int*) hp;
@@ -1152,7 +1152,7 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
         s->i=max(i,j);
         s->j=min(i,j);
         s->expected_length=c->lengths[i]+c->lengths[j]-2;
-        s->deg=pFDeg(short_s);
+        s->deg=pTotaldegree(short_s);
         poly lm=pOne();
 
         pLcm(c->S->m[i], c->S->m[j], lm);
@@ -2182,14 +2182,14 @@ static int pMinDeg3(poly f){
   }
 
   poly h=f->next;
-  int n=pFDeg(h);
+  int n=pTotaldegree(h);
   int i=0;
   while((i<2)){
     if (h==NULL)
       return(n);
     h=h->next;
     if (h!=NULL){
-      n=min(n,pFDeg(h));
+      n=min(n,pTotaldegree(h));
     }
     i++;
   }
