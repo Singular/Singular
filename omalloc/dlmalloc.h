@@ -3,7 +3,7 @@
  *  Purpose: declarations for dlmalloc 
  *  This was obtained by taking cutting out the beginning of malloc.c 
  *
- *  Version: $Id: dlmalloc.h,v 1.5 2000-08-16 12:55:46 obachman Exp $
+ *  Version: $Id: dlmalloc.h,v 1.6 2000-11-20 15:52:55 hannes Exp $
  *******************************************************************/
 #ifndef DL_MALLOC_H
 #define DL_MALLOC_H
@@ -610,7 +610,7 @@ do {                                                                          \
 /* #define HAVE_USR_INCLUDE_MALLOC_H */
 
 #if HAVE_USR_INCLUDE_MALLOC_H
-#include "/usr/include/malloc.h"
+#include <malloc.h>
 #else
 
 /* SVID2/XPG mallinfo structure */
