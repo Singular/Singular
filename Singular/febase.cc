@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.83 1999-09-21 14:44:58 obachman Exp $ */
+/* $Id: febase.cc,v 1.84 1999-11-15 12:53:28 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -17,6 +17,10 @@
 #endif
 #ifdef NeXT
 #include <sys/file.h>
+#endif
+
+#ifdef HAVE_PWD_H
+#include "pwd.h"
 #endif
 
 #include "tok.h"
@@ -101,13 +105,34 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror,
   char longpath[MAXPATHLEN];
   if (path[0]=='~')
   {
-    char* home = getenv("HOME");
-    if (home != NULL)
+    if (path[1] == DIR_SEP)
     {
-      strcpy(longpath, home);
-      strcat(longpath, &(path[1]));
-      path = longpath;
+      char* home = getenv("HOME");
+      if (home != NULL)
+      {
+        strcpy(longpath, home);
+        strcat(longpath, &(path[1]));
+        path = longpath;
+      }
     }
+#if defined(HAVE_PWD_H) && defined(HAVE_GETPWNAM)
+    else
+    {
+      char* dir_sep;
+      struct passwd *pw_entry;
+      strcpy (longpath, path);
+      dir_sep = strchr(longpath, DIR_SEP);
+      *dir_sep = '\0';
+      pw_entry = getpwnam(&longpath[1]);
+      if (pw_entry != NULL)
+      {
+        strcpy(longpath, pw_entry->pw_dir);
+        dir_sep = strchr(path, DIR_SEP);
+        strcat(longpath, dir_sep);
+        path = longpath;
+      }
+    }
+#endif
   }
   FILE * f=NULL;
   if (! path_only)

@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.73 1999-10-22 16:31:22 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.74 1999-11-15 12:53:27 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -60,8 +60,10 @@
 #undef HAVE_PWD_H
 /* Define if you have unistd.h */
 #undef HAVE_UNISTD_H
-/* define if you have malloc.h n */
+/* define if you have malloc.h */
 #undef HAVE_MALLOC_H
+/* define if you have pwd.h*/
+#undef HAVE_PWD_H
 /* Define if you have alloca */
 #undef HAVE_ALLOCA
 /* Define if you have getpagesize */
@@ -95,6 +97,8 @@
 #undef HAVE_SLEEP
 /* Define if you have setenv */
 #undef HAVE_SETENV
+/* Define if you have petpwnam */
+#undef HAVE_GETPWNAM
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */
