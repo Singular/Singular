@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.31 2001-02-26 11:29:46 Singular Exp $
+@comment $Id: NEWS.texi,v 1.32 2001-02-26 13:11:28 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -20,20 +20,20 @@
 @end macro
 @end ifset
 
-The current version @value{VERSION} is the first release of the new 
-release series version 2-0. Its is a major upgrade from both, the 1-2 and 
+The current version @value{VERSION} is the first release of the new
+release series version 2-0. Its is a major upgrade from both, the 1-2 and
 1-3 release serieses.
 
-Singular version 2 is generally much faster than any previous 
+Singular version 2 is generally much faster than any previous
 version of Singular, due to a rewrite of major parts of the Singular
 kernel (e.g., the kernel has a new memory manager and a new polynomial
 arithmetic) and due to new and better implemented algorithms (e.g., for
-computing resolutions and determinants). 
+computing resolutions and determinants).
 
 Besides theses internal changes, Singular version 2 offers many new
 features and functionlities (which were partly already incorporated in
 the 1-3 series). E.g., a native Windows distribution, an Emacs user
-interface, a new help system, 16  new libraries, etc. 
+interface, a new help system, 16  new libraries, etc.
 
 All these changes are explained in more detail below.
 
@@ -95,7 +95,7 @@ Reorganisation of libraries into "Categories".
 @table @asis
 @item @nref{intprog_lib} procedures for computing toric ideals
 @item @nref{toric_lib} procedures for Integer Programming using Groebner bases
-@item @code{spectrum.lib} procedures for computing spectra
+@item @nref{spectrum_lib} procedures for computing spectra
 @item @nref{mregular_lib}  procedures for computing the Castelnuovo-Mumford regularity
 @item @nref{mondromy_lib}
 procedures for computing the monodromy of a singularity
@@ -125,7 +125,7 @@ Moduli spaces of sqh-singularities
 
 @heading Changes in @sc{Singular} libraries
 Many procedures were moved into different libraries,
-the documentation of libraries was generally improved and 
+the documentation of libraries was generally improved and
 some libraries renamed:
 @table @asis
 @item @nref{ainvar_lib}
@@ -175,7 +175,7 @@ solve Vandermonde linear system
 @heading @sc{Singular} functions whose syntax/semantics has changed
 @table @asis
 @item @nref{coeffs}
-Extended possible syntax to 
+Extended possible syntax to
 @code{coeffs(ideal,ideal)} and @code{coeffs(module,module)} which is
 equivalent to @code{coeffs(ideal,ideal,p)} and
 @code{coeffs(module,module,p)} where @code{p} is a polynomial (i.e.,
@@ -193,7 +193,7 @@ run example for all kernel commands.
 @c @item @nref{fetch}
 @item @nref{print}
 Finer-grained control for formatted output.
-@item @code{pause}
+@item @nref{pause}
 can be called with argument, must be called with parenthesis.
 @item @nref{option}
 new options: @code{oldStd}, @code{redThrough}, @code{notBuckets}
@@ -202,13 +202,13 @@ new options: @code{oldStd}, @code{redThrough}, @code{notBuckets}
 @heading Changes of command-line options and system resources
 @table @asis
 @item @code{--browser}, @code{--allow-net}, @code{--emacs}, @code{--sdb}
-new command-line options
+new command-line options (@pxref{Command line options}).
 @item @nref{system}
 values of command-line options can be inspected/set at run-time with
 @code{system(<option>[,<new_value])}.
 @item @code{.singularrc}
 system administrators can put a "global" @code{.singularrc} file into
-the directories where @sc{Singular} libraries reside.
+the directories where @sc{Singular} libraries reside (@pxref{Startup sequence}).
 @item @code{libreadline}
 if found, a shared version of the @code{readline} library is linked-in
 dynamically at run-time. If not found, @code{readline} is emulated.
@@ -230,8 +230,8 @@ fragmentation, much better locality of reference.
 @heading Porting
 
 @itemize @bullet
-@item 
-@code{libreadline} works only with ix86-libc5, 
+@item
+@code{libreadline} works only with ix86-libc5,
 ix86-libc6,HPUX_9,HPUX_10
 @item Singular is available for ix86-libc5, ix86-libc6, HPUX_9, HPUX_10,
 SunOS-4, SunOS-5, ix86-Win (runs on Windows 95/98/ME, NT 4.0)
