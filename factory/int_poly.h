@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.h,v 1.5 1998-03-17 15:56:46 schmidt Exp $ */
+/* $Id: int_poly.h,v 1.6 1998-06-26 16:15:08 schmidt Exp $ */
 
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H
@@ -68,8 +68,6 @@ public:
 #ifndef NOSTREAMIO
     void print( ostream&, char* );
 #endif /* NOSTREAMIO */
-    bool isZero() const { return false; }
-    bool isOne() const { return false; }
     bool inBaseDomain() const { return false; }
     bool inExtension() const { return var.level() < 0; }
     bool inCoeffDomain() const { return var.level() < 0; }
