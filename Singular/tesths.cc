@@ -1,15 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.35 1998-04-24 16:39:26 Singular Exp $ */
+/* $Id: tesths.cc,v 1.36 1998-04-28 09:53:19 pohl Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
 
-#ifndef macintosh
 #include <unistd.h>
-#endif
 #include <string.h>
 #include <stdio.h>
 #include <stddef.h>
@@ -32,7 +30,7 @@
 #include <factory.h>
 #endif
 
-#include <getopt.h>
+#include "getopt.h"
 
 // define the long option names here
 #define LON_BATCH           "batch"
@@ -266,9 +264,9 @@ int main(          /* main entry to Singular */
   jjInitTab1();
 #endif
 #ifdef GENTABLE
-  extern ttGen1();
-  extern ttGen2();
-  #ifndef macintosh
+  extern void ttGen1();
+  extern void ttGen2();
+  #ifndef __MWERKS__
     extern mpsr_ttGen(); // For initialization of (CMD, MP_COP) tables
     mpsr_ttGen();
   #endif
@@ -487,7 +485,7 @@ int main(          /* main entry to Singular */
   else
   if (!feBatch)
   {
-#ifdef macintosh
+#ifdef __MWERKS__
     memcpy(stderr,stdout,sizeof(FILE));
 #else
     dup2(1,2);
