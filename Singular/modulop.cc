@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.8 1997-10-09 09:36:23 Singular Exp $ */
+/* $Id: modulop.cc,v 1.9 1999-02-26 15:30:49 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -124,7 +124,7 @@ number  npInvers (number c)
 
 number npNeg (number c)
 {
-//  *(int *)c = npPrimeM-*(int *)c;
+  if ((int)c==0) return c;
   return npNegM(c);
 }
 
