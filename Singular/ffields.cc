@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.10 1997-04-25 15:54:02 Singular Exp $ */
+/* $Id: ffields.cc,v 1.11 1997-05-02 15:10:12 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -15,10 +15,10 @@
 #include "numbers.h"
 #include "ffields.h"
 
-static int nfCharQ=0;  /* the number of elemts: q*/
+int nfCharQ=0;  /* the number of elemts: q*/
+int nfM1;       /*representation of -1*/
 static int nfCharP=0;  /* the characteristic: p*/
 static int nfCharQ1=0; /* q-1 */
-static int nfM1;       /*representation of -1*/
 CARDINAL *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
 char * nfParameter;          /*  the name of the primitive element */
 /* the q's from the table 'fftable' */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.4 1997-04-02 15:07:10 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.5 1997-05-02 15:10:15 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -278,7 +278,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
 #ifdef TEST
         else
         {
-          Werror("wrong name, should not happen");
+          WerrorS("wrong name, should not happen");
           output->name=mstrdup("?");
         }
 #endif

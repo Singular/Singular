@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.3 1997-04-02 15:07:21 Singular Exp $ */
+/* $Id: longalg.cc,v 1.4 1997-05-02 15:10:19 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -155,7 +155,7 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
 #ifdef TEST
   else
   {
-    Print("hier ging was schief:c=%d compl=%d param=%d\n",i,complete,param);
+    Print("naSetChar:c=%d compl=%d param=%d\n",i,complete,param);
   }
 #endif
 }
@@ -1713,7 +1713,7 @@ BOOLEAN naIsMOne(number za)
   if (a==NULL) return FALSE;
   mmTestP(a,sizeof(rnumber));
 #ifdef TEST
-  if (a->z==NULL) WerrorS("internal zero error(4)");
+  if (a->z==NULL) WerrorS("internal zero error(5)");
 #endif
   if (a->n==NULL)
   {

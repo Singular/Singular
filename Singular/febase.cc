@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.14 1997-04-30 17:44:35 Singular Exp $ */
+/* $Id: febase.cc,v 1.15 1997-05-02 15:10:11 Singular Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -146,81 +146,82 @@ BOOLEAN tclmode=FALSE;
 
 FILE * feFopen(char *path, char *mode, char *where,int useWerror)
 {
-  if (where!=NULL) strcpy(where,path);
   FILE * f=fopen(path,mode);
-  if ((*mode=='a') ||(*mode=='w') || (path[0]==DIR_SEP)||(path[0]=='.')
-  ||(f!=NULL))
-    return f;
-  char found = 0;
-#ifdef MSDOS
-  char *env=getenv("SPATH");
-#else
-  char *env=getenv("SINGULARPATH");
-#endif
-  char *s;
-  if (where==NULL) s=(char *)AllocL(250);
-  else             s=where;
-  if (env!=NULL)
+  if (where!=NULL) strcpy(where,path);
+  if ((*mode=='r') && (path[0]!=DIR_SEP)&&(path[0]!='.')
+  &&(f==NULL))
   {
-    char *p,*q;
-    p = env;
-    while( (q=strchr(p, FS_SEP)) != NULL)
+    char found = 0;
+    #ifdef MSDOS
+      char *env=getenv("SPATH");
+    #else
+      char *env=getenv("SINGULARPATH");
+    #endif
+    char *s;
+    if (where==NULL) s=(char *)AllocL(250);
+    else             s=where;
+    if (env!=NULL)
     {
-      *q = '\0';
-      strcpy(s,p);
-      *q = FS_SEP;
-      strcat(s, DIR_SEPP);
-      strcat(s, path);
-#ifndef macintosh
-      if(!access(s, R_OK)) { found++; break; }
-#else
+      char *p,*q;
+      p = env;
+      while( (q=strchr(p, FS_SEP)) != NULL)
+      {
+        *q = '\0';
+        strcpy(s,p);
+        *q = FS_SEP;
+        strcat(s, DIR_SEPP);
+        strcat(s, path);
+        #ifndef macintosh
+          if(!access(s, R_OK)) { found++; break; }
+        #else
+          f=fopen(s,mode);
+          if (f!=NULL)  { found++; fclose(f); break; }
+        #endif
+        p = q+1;
+      }
+      if(!found)
+      {
+        strcpy(s,p);
+        strcat(s, DIR_SEPP);
+        strcat(s, path);
+      }
       f=fopen(s,mode);
-      if (f!=NULL)  { found++; fclose(f); break; }
-#endif
-      p = q+1;
-    }
-    if(!found)
-    {
-      strcpy(s,p);
-      strcat(s, DIR_SEPP);
-      strcat(s, path);
-    }
-    f=fopen(s,mode);
-    if (f!=NULL)
-    {
-      if (where==NULL) FreeL((ADDRESS)s);
-      return f;
-    }
-  }
-  else
-  {
-    if (where!=NULL) strcpy(s/*where*/,path);
-    f=fopen(path,mode);
-  }  
-#ifndef macintosh
-  if (f==NULL)
-  {
-    char* ss = s;
-    int need_len = strlen(path) + strlen(SINGULAR_DATADIR) + 2;
-    
-    if (where == NULL)
-    {
-      if (need_len > 250) ss = (char *) AllocL(need_len);
-      strcpy(ss,s);
+      if (f!=NULL)
+      {
+        if (where==NULL) FreeL((ADDRESS)s);
+        return f;
+      }
     }
     else
     {
-      if (need_len > strlen(where)) ss = (char *) AllocL(need_len);
-      strcpy(ss, s);
+      if (where!=NULL) strcpy(s/*where*/,path);
+      f=fopen(path,mode);
     }
-    strcpy(ss,SINGULAR_DATADIR);
-    strcat(s, DIR_SEPP);
-    strcat(ss,path);
-    f=fopen(ss,mode);
-    if (ss != s) FreeL((ADDRESS)ss);
+    #ifndef macintosh
+      if (f==NULL)
+      {
+        char* ss = s;
+        int need_len = strlen(path) + strlen(SINGULAR_DATADIR) + 2;
+
+        if (where == NULL)
+        {
+          if (need_len > 250) ss = (char *) AllocL(need_len);
+          strcpy(ss,s);
+        }
+        else
+        {
+          if (need_len > strlen(where)) ss = (char *) AllocL(need_len);
+          strcpy(ss, s);
+        }
+        strcpy(ss,SINGULAR_DATADIR);
+        strcat(s, DIR_SEPP);
+        strcat(ss,path);
+        f=fopen(ss,mode);
+        if (ss != s) FreeL((ADDRESS)ss);
+      }
+    #endif
+    if (where==NULL) FreeL((ADDRESS)s);
   }
-#endif
-  if (where==NULL) FreeL((ADDRESS)s);
   if ((f==NULL)&&(useWerror))
     Werror("cannot open `%s`",path);
   return f;

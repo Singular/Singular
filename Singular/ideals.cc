@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.5 1997-04-12 16:04:35 Singular Exp $ */
+/* $Id: ideals.cc,v 1.6 1997-05-02 15:10:13 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -220,7 +220,7 @@ ideal idCopy (ideal h1)
   int i;
   ideal h2;
 
-#ifdef TEST
+//#ifdef TEST
   if (h1 == NULL)
   {
 #ifdef MDEBUG
@@ -230,7 +230,7 @@ ideal idCopy (ideal h1)
 #endif
   }
   else
-#endif
+//#endif
   {
 #ifdef MDEBUG
     h2=idDBInit(IDELEMS(h1),h1->rank,f,l);

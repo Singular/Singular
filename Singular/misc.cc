@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.8 1997-04-28 09:57:56 Singular Exp $ */
+/* $Id: misc.cc,v 1.9 1997-05-02 15:10:20 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -392,7 +392,6 @@ struct soptionStruct
 
 struct soptionStruct optionStruct[]=
 {
-/*Aenderung: Namen fuer test 24,23,27 einfuehren*/
   {"prot",         Sy_bit(OPT_PROT),           ~Sy_bit(OPT_PROT)   },
   {"redSB",        Sy_bit(OPT_REDSB),          ~Sy_bit(OPT_REDSB)   },
   /* 2 Gebauer/Moeller */
@@ -479,6 +478,12 @@ BOOLEAN setOption(leftv res, leftv v)
         goto okay;
       }  
     }
+    if(strcmp(n,"none")==0)
+    {
+      test=0;
+      verbose=0;
+      goto okay;
+    }  
     for (i=0; (i==0) || (optionStruct[i-1].setval!=0); i++)
     {
       if (strcmp(n,optionStruct[i].name)==0)
@@ -496,8 +501,7 @@ BOOLEAN setOption(leftv res, leftv v)
       else if ((strncmp(n,"no",2)==0)
       && (strcmp(n+2,optionStruct[i].name)==0))
       {
-        if ((optionStruct[i].setval & validOpts)
-        || (strcmp(n+2,"ne")==0))
+        if (optionStruct[i].setval & validOpts)
         {
           test &= optionStruct[i].resetval;
         }

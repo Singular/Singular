@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.8 1997-04-30 15:25:32 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.9 1997-05-02 15:10:17 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -206,14 +206,6 @@ void killlocals0(int v, idhdl * localhdl)
       else if (vv >= v)
       {
         idhdl nexth = IDNEXT(h);
-#ifdef TEST
-//        if ((('0'<r) && (r<='9'))
-//        && ((IDTYP(h)==RING_CMD) || (IDTYP(h)==QRING_CMD)))
-//        {
-//          PrintS("## parameter type was (q)ring\n");
-//          IDTYP(h)=0;
-//        }
-#endif
         //Print("kill %s, lev: %d\n",IDID(h),IDLEV(h));
         killhdl(h,localhdl);
         h = nexth;

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.3 1997-04-02 15:07:43 Singular Exp $ */
+/* $Id: numbers.cc,v 1.4 1997-05-02 15:10:23 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -288,7 +288,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
     }
   }
   else
-  if (c==(-1))
+  //if (c==(-1)) // the rest...
   {
 #ifdef LDEBUG
     nDBDelete= nDBDummy1;
@@ -329,12 +329,6 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
 #endif
     }
   }
-#ifdef TEST
-  else
-  {
-    Werror("invalid char %d\n",c);
-  }
-#endif
   if (complete&&(!errorreported)) nNULL=nInit(0);
 }
 

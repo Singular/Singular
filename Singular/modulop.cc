@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.5 1997-04-12 16:04:42 Singular Exp $ */
+/* $Id: modulop.cc,v 1.6 1997-05-02 15:10:22 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -220,14 +220,6 @@ void npSetChar(int c)
   int i, w;
 
   if (c==npPrimeM) return;
-#ifdef TEST
-  if ((c==-npPrimeM) || ((c^1)==0))
-  {
-    Print("internal error: %d as np\n",c);
-    return;
-  }
-  // should never happen:if ((c^1)==0) return;
-#endif
   if (npPrimeM > 1)
   {
     Free( (ADDRESS)npExpTable,npPrimeM*sizeof(CARDINAL) );

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.5 1997-04-25 15:04:00 obachman Exp $ */
+/* $Id: iplib.cc,v 1.6 1997-05-02 15:10:15 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -633,7 +633,7 @@ BOOLEAN iiLibCmd( char *newlib )
         {
           v=0;
           sscanf( buf+7, "%d", &v);
-          if(v!=(VERSION/100))
+          if(v!=(SINGULAR_VERSION/100))
             Warn("version mismatch - library `%s` requires:%d.%d",
                   newlib,v/1000,(v%1000)/100);
         }

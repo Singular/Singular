@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.9 1997-04-12 16:04:39 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.10 1997-05-02 15:10:14 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1357,12 +1357,10 @@ BOOLEAN iiAssign(leftv l, leftv r)
       Werror("cannot assign to %s",l->Name());
       nok=TRUE;
       break;
-#ifdef TEST
     default:
       WerrorS("assign not impl.");
       nok=TRUE;
       break;
-#endif
   } /* end switch: typ */
   if (nok && (!errorreported)) WerrorS("incompatible type in list assignment");
   r->CleanUp();
