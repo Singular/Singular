@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.22 1998-05-19 21:12:41 wichmann Exp $
+@comment $Id: examples.doc,v 1.23 1998-05-20 07:13:46 pohl Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -450,6 +450,7 @@ examples, to do the calculation first in positive char (e.g. 32003).
 It was shown, that in complicated examples, more than 95 percent of
 the time needed for a standard basis computation is used in the
 computation of the coefficients (in char 0).
+The representation of long integers with real is demonstrated.
 
 @example
 timer = 1;                              // activate the timer
@@ -511,6 +512,39 @@ size(string(j[2]))/size(j[2]);
 @expansion{} 51
 vdim(j);
 @expansion{} 63
+
+// For a better representation normalize the long coefficients
+// of the polynomial j[2] and map it  to real:
+poly p=-(1/12103947791971846719838321886393392913750065060875)*j[2];
+ring R1=real,(x,y),lp;
+poly p=imap(R0,p);
+p;
+@expansion{} -xy8
+@expansion{} +2.366e-02y38
+@expansion{} +2.640e-01y37
+@expansion{} -4.745e-06y36
+@expansion{} -1.370e-04y35
+@expansion{} -1.760e-03y34
+@expansion{} -1.505e-01y33
+@expansion{} +3.884e-07y32
+@expansion{} +1.117e-05y31
+@expansion{} +3.200e-04y30
+@expansion{} -1.095e-01y29
+@expansion{} -1.320e+00y28
+@expansion{} +2.170e-05y27
+@expansion{} +6.267e-04y26
+@expansion{} +7.170e-03y25
+@expansion{} +4.582e-01y24
+@expansion{} +1.576e-06y23
+@expansion{} -4.532e-05y22
+@expansion{} -1.301e-03y21
+@expansion{} +1.168e-01y20
+@expansion{} +1.711e+00y19
+@expansion{} +2.255e-05y18
+@expansion{} -6.519e-04y17
+@expansion{} -5.251e-03y16
+@expansion{} +1.826e+00y14
+@expansion{} -1.222e+00y10
 
 // Compute a standard basis for the deformed ideal:
 j = std(i2);
