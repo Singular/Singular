@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $
+// $Id: fglmzero.cc,v 1.2 2004-06-23 15:12:24 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -76,7 +76,7 @@ public:
     idealFunctionals( int blockSize, int numFuncs );
     ~idealFunctionals();
 
-    int dimen() const { fglmASSERT( _size>0, "called to early"); return _size; }
+    int dimen() const { fglmASSERT( _size>0, "called too early"); return _size; }
     void endofConstruction();
     void map( ring source );
     void insertCols( int * divisors, int to );
@@ -94,9 +94,9 @@ idealFunctionals::idealFunctionals( int blockSize, int numFuncs )
     _size= 0;
     _nfunc= numFuncs;
 
-    currentSize= (int *)omAlloc( _nfunc*sizeof( int ) );
-    for ( k= _nfunc-1; k >= 0; k-- )
-        currentSize[k]= 0;
+    currentSize= (int *)omAlloc0( _nfunc*sizeof( int ) );
+    //for ( k= _nfunc-1; k >= 0; k-- )
+    //    currentSize[k]= 0;
 
     func= (matHeader **)omAlloc( _nfunc*sizeof( matHeader * ) );
     for ( k= _nfunc-1; k >= 0; k-- )
@@ -487,15 +487,15 @@ fglmSdata::updateCandidates()
             else done= TRUE;
         }
         if ( done == FALSE ) {
-            nlist.append( fglmSelem( newmonom, k ) );
+            nlist.append( fglmSelem( newmonom, varpermutation[k] ) );
             break;
         }
         if ( state == 0 ) {
-            list.getItem().newDivisor( k );
+            list.getItem().newDivisor( varpermutation[k] );
             pDeleteLm(&newmonom);
         }
         else {
-            list.insert( fglmSelem( newmonom, k ) );
+            list.insert( fglmSelem( newmonom, varpermutation[k] ) );
         }
         k--;
     }
@@ -503,7 +503,7 @@ fglmSdata::updateCandidates()
         newmonom= pCopy( m ); // HIER
         pIncrExp( newmonom, varpermutation[k] );
         pSetm( newmonom );
-        nlist.append( fglmSelem( newmonom, k ) );
+        nlist.append( fglmSelem( newmonom, varpermutation[k] ) );
     }
 }
 
@@ -1097,9 +1097,16 @@ FindUnivariatePolys( const idealFunctionals & l )
 
     int i;
     BOOLEAN isZero;
+    int *varpermutation = (int*)omAlloc( (pVariables+1)*sizeof(int) );
+    ideal perm = idMaxIdeal(1);
+    intvec *iv = idSort(perm,TRUE);
+    idDelete(&perm);
+    for(int i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
+    delete iv;
+     
     for ( i= 1; i <= pVariables; i++ ) {
         // main loop
-        STICKYPROT2( "(%i)", i );
+        STICKYPROT2( "(%i)", i /*varpermutation[i]*/);
         gaussReducer gauss( l.dimen() );
         isZero= FALSE;
         v= fglmVector( l.dimen(), 1 );
@@ -1127,7 +1134,7 @@ FindUnivariatePolys( const idealFunctionals & l )
                             pIter( temp );
                         }
                         pSetCoeff( temp, n );
-                        pSetExp( temp, i, k-1 );
+                        pSetExp( temp, i /*varpermutation[i]*/, k-1 );
                         pSetm( temp );
                     }
                 }
@@ -1137,11 +1144,12 @@ FindUnivariatePolys( const idealFunctionals & l )
             else {
                 STICKYPROT( "." );
                 gauss.store();
-                v= l.multiply( v, i );
+                v= l.multiply( v, i /*varpermutation[i]*/ );
             }
         }
     }
     STICKYPROT( "\n" );
+    omFreeSize( (ADDRESS)varpermutation, (pVariables+1)*sizeof(int) );
     return destIdeal;
 }
 
