@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.98 2000-09-14 12:38:55 Singular Exp $
+@comment $Id: singular.doc,v 1.99 2000-10-24 09:39:39 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -283,6 +283,7 @@ LIB "all.lib";
 * normal_lib:: procedure for normalization
 * primdec_lib:: procedures for primary decomposition
 * primitiv_lib:: procedures for finding a primitive element
+* reesclos_lib:: Rees Algebra and integral closure of an ideal
 * intprog_lib:: Integer Programming
 * toric_lib:: toric ideals
 @end menu
@@ -312,11 +313,15 @@ LIB "all.lib";
 @subsection primdec_lib
 @c lib primdec.lib
 @c ---------------------------------------------------------
-@node primitiv_lib, intprog_lib, primdec_lib, Commutative algebra
+@node primitiv_lib, reesclos_lib, primdec_lib, Commutative algebra
 @subsection primitiv_lib
 @c lib primitiv.lib
 @c ---------------------------------------------------------
-@node intprog_lib, toric_lib, primitiv_lib, Commutative algebra
+@node reesclos_lib, intprog_lib, primitiv_lib, Commutative algebra
+@subsection reesclos_lib
+@c lib reesclos.lib
+@c ---------------------------------------------------------
+@node intprog_lib, toric_lib, reesclos_lib, Commutative algebra
 @subsection intprog_lib
 @c lib intprog.lib no_ex
 @c ---------------------------------------------------------
