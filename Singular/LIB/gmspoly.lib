@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.4 2003-06-05 09:33:15 mschulze Exp $";
+version="$Id: gmspoly.lib,v 1.5 2003-06-27 10:43:44 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -492,6 +492,7 @@ EXAMPLE:  example gbasis; shows examples
   {
     setring(@XS);
 
+    B=0;
     while(size(B)<mu||size(B0)<mu||maxdegree(b)+deg(f)>k)
     {
       k++;
