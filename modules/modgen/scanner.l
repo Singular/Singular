@@ -1,0 +1,378 @@
+%{
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: scanner.l,v 1.1 1999-11-23 21:30:22 krueger Exp $ */
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#include "modgen.h"
+#include "stype.h"
+#include "grammar.h"
+
+/*#define DEBUG 1*/
+ 
+#  define YYLP_ERR_NONE    0
+#  define YYLP_DEF_BR2     1
+#  define YYLP_BODY_BR2    2
+#  define YYLP_BODY_BR3    3
+#  define YYLP_BODY_TMBR2  4
+#  define YYLP_BODY_TMBR3  5
+#  define YYLP_EX_BR2      6
+#  define YYLP_EX_BR3      7
+#  define YYLP_BAD_CHAR    8
+#  define YYLP_MISSQUOT    9
+#  define YYLP_MISS_BR1   10
+#  define YYLP_MISS_BR2   11
+#  define YYLP_MISS_BR3   12
+
+  int offset = 0;
+  int yylineno = 1;
+  int do_return = 0;
+
+  int state_level = -1;
+  int state_max = 0;
+  char *yylp_buffer_start;
+
+  extern int sectnum;
+  extern moddef module_def;
+
+  struct _states {
+    char name[32];
+    int state;
+  } * old_states = NULL;
+/*  int *old_states = NULL;*/
+
+  int current_pos(int i);
+  int read_string(char **buffer, long *start, long end);
+  int libread(FILE* f, char* buf, int max_size);
+  add_action(char *new_text);
+ 
+  void push_state(int state, int new_state, char *name);
+  void switch_state(int state, int new_state, char *name);
+  void pop_state();
+  extern int init_modgen(moddef *module_def, char *filename);
+ 
+static char * dupyytext()
+{
+  if (yyleng>0) yytext[yyleng-1] = '\0';
+  return strdup((char *)yytext);
+}
+
+#   undef YY_DECL
+#   define YY_DECL int yylex(YYSTYPE* lvalp)
+
+#   undef YY_INPUT
+#   define YY_INPUT(buf,result,max_size) \
+          if ( ((result = libread( (yyin), (char *) buf, max_size )) < 0 ) \
+                  && ferror( yyin ) ) \
+                YY_FATAL_ERROR( "read in flex scanner failed" );
+
+#   undef yywrap
+  extern "C"
+  {
+  int yywrap();
+  }
+
+#define ACTION_ECHO add_action( yytext )
+
+%}
+
+digit          [0-9]
+letter         [@a-zA-Z\']
+name           ({letter}({letter}*{digit}*_*)*|_)
+fname          ({letter}({letter}*{digit}*_*.)*|_)
+letters        ({letter}|{digit}|[_./#%^*:,])
+string         ({letters}*)
+comment        [\/][\/]
+dolar          [$]
+symbols        [~!@#$%^&*()_+-={}\\\|\[\];:,<.>/\?\' \n\~\`\r]
+aletters       ({letter}|{digit}|{symbols}|{dolar}|{escquote})
+strings        ({aletters}*)
+quote          [\"]
+escquote       (\\\")
+taborspace     [ \t]
+tos            ({taborspace}*)
+eq             (=|{tos}+=|=+{tos}|{tos}+=+{tos})
+tnl            ([ \t\n]*)
+col            (;|{tos}+;)
+eqnl           ([ \t\n]*+=[ \t\n]*)
+begincode      (%+\{)
+endcode        (\n+%+[}]+\n)
+
+WS             [[:blank:]]+
+NL             \r?\n
+EQ             (([{WS}]+=[{WS}]+)|=)
+
+NAME           ([[:alpha:]_][[:alnum:]_-]*)
+FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
+
+/* %start START */
+
+%x preamble
+%x CODEBLOCK
+%x CODEBLOCK2
+%x module
+%x COMMENT
+%x STRING
+%x SECT2
+%x SECT3
+%x PROCDECL
+
+%x pdef
+%x procopt
+%x procdef
+%x ctext
+%x cstring
+
+%%
+       static int brace1 = 0;  /* { } */
+       static int brace2 = 0;  /* ( ) */
+       static int brace3 = 0;  /* [ ] */
+       static int quote  = 0;  /* " */
+
+<COMMENT,STRING,INITIAL><<EOF>>   {
+          printf( "EOF encountered inside an action\n");
+	  printf("ERRRRROOOOORRR\n");
+                 }
+
+<INITIAL>{
+        ^{WS}        push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
+        ^"/*"       ACTION_ECHO; push_state(YYSTATE, COMMENT, "COMMENT");
+        ^"//".*{NL}  ++yylineno; ACTION_ECHO; 
+	^"%{".*{NL} { 
+	        yylineno++;
+		push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
+		fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
+					  yylineno, module_def.filename);
+		}
+	{WS}            /* discard */
+        {NL}    { yylineno++; }
+
+        {eq}    { return '='; }
+        ";"     { return ';'; }
+        ","     { return ','; }
+
+        "\""    { do_return++; push_state(YYSTATE, STRING, "string"); }
+        ^"%%".* {
+		  sectnum = 2;
+                  printf("Goto section %d\n", sectnum);
+                  push_state(YYSTATE, SECT2, "SECT2");
+                  /*line_directive_out( (FILE *) 0, 1 );*/
+                  return SECTEND;
+                }
+	^{NAME} {
+	          lvalp->name = strdup(yytext);
+                  return NAME;
+                }
+	{FILENAME} {
+	          lvalp->name = strdup(yytext);
+                  return FILENAME;
+                }
+	   }
+<CODEBLOCK>{
+            ^"%}".*{NL} {
+                   char * s, *t;
+
+                   yylineno++;
+		   pop_state();
+		   s = t = lvalp->name = dupyytext();
+		   while (*yytext)
+		   {
+		     if (*yytext == '\\') yytext++;
+		     *s++ = *yytext++;
+		   }
+		   if(s-t>2 && *(s-1)=='}' && *(s-2)=='%') *(s-2)='\0';
+		   return MCCODETOK;
+                 }
+         {NL}    { yylineno++; yymore(); }
+         .       { yymore(); }
+       }
+
+<STRING>{
+          {NL}    { yylineno++; yymore(); }
+          [^\"]   { yymore(); }
+          "\\\\"  { yymore(); }
+          "\\\""  { yymore(); }
+          ("\"")  {
+                    char * s, *t;
+                    pop_state();
+	            if(do_return) {
+                      s = t = lvalp->name = dupyytext();
+                      while (*yytext)
+                      {
+                        if (*yytext == '\\') yytext++;
+                        *s++ = *yytext++;
+                       }
+		       *s++ = *yytext++;
+		       do_return = 0;
+		       return MSTRINGTOK;
+                     } else {
+		       do_return = 0;
+                       yymore();
+                     }
+		   }
+	}
+
+<COMMENT>{
+        "*/"            /*ACTION_ECHO;*/ pop_state(); yymore();
+        "*"             /*ACTION_ECHO;*/ yymore();
+        [^*\n]+         ++yylineno; yymore(); /*ACTION_ECHO;*/
+        [^*\n]*{NL}     ++yylineno; yymore(); /*ACTION_ECHO;*/
+	  }
+
+<SECT2>{
+        ^"%%".* {
+	          sectnum = 3;
+                  printf("Goto section %d\n", sectnum);
+                  switch_state(YYSTATE, SECT3, "SECT3");
+		  /*yyterminate();*/
+                  /*line_directive_out( (FILE *) 0, 1 );*/
+                  return SECT2END;
+                }
+        {NL}    { yylineno++; }
+        {WS}    /* ignore */
+        ;       /* ignore */
+        "/*"       ACTION_ECHO; push_state(YYSTATE, COMMENT, "COMMENT");
+        "//".*{NL}  ++yylineno; ACTION_ECHO; 
+        proc+{WS} {
+                  brace1 = 0; /* { */
+                  brace2 = 0; /* ( */
+                  brace3 = 0; /* [ */
+	          push_state(YYSTATE, PROCDECL, "PROCDECL");
+		  return PROCDECLTOK;
+                }
+        .       { printf("'%s' ", yytext); }
+
+       }
+
+<SECT3>{
+        {NL}    { yylineno++; }
+        .*(\n?)         ECHO;
+        <<EOF>>  { sectnum = 0; printf("XXXX\n"); 
+	           return SECT3END;
+                   /*yyterminate();*/ }
+       }
+
+<PROCDECL>{
+         "{"     { brace1++;
+		   switch_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
+		   return '{';
+		 }
+	 {NAME}  { 
+	           int i,tok;
+	           printf("VAR: %s\n", yytext);
+	           lvalp->name = strdup(yytext);
+		   i = IsCmd(lvalp->name, tok);
+		   printf("Res=%d, %d\n", i, tok);
+		   if(i) return VARTYPETOK;
+		   else return NAME;
+                 }
+         {NL}    { yylineno++; }
+         .       { }
+
+       }
+
+<CODEBLOCK2>{
+         "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
+         "//".*{NL}  ++yylineno; yymore();
+         "\""    { push_state(YYSTATE, STRING, "string"); yymore();}
+         "{"     { brace1++; yymore();}
+         "}"     { brace1--;
+                   if(brace1<=0) {
+                     char * s, *t;
+
+                     yylineno++;
+		     pop_state();
+		     s = t = lvalp->name = dupyytext();
+		     while (*yytext)
+		     {
+		       if (*yytext == '\\') yytext++;
+		       *s++ = *yytext++;
+		     }
+		     if(s-t>2 && *(s-1)=='}' && *(s-2)=='%') *(s-2)='\0';
+                   printf("BRACE DOWN=%d\n", brace1);
+		     return MCODETOK;
+                     return PROCEND;
+                   } else yymore();
+                 }
+         {NL}    { yylineno++; yymore(); }
+         .       { yymore(); }
+       }
+
+%%
+
+extern "C" {
+  int yywrap() {
+    /*printf("yywrap()\n");*/
+    return 1;
+  }
+}
+
+int libread(FILE* f, char* buf, int max_size)
+{ int rc;
+
+  offset = ftell(f);
+  rc  = fread( buf, 1, max_size, f );
+#if YYLPDEBUG >2
+  printf("fread: %d of %d\n", rc, max_size);
+#endif
+  yylp_buffer_start = buf;
+  return rc;
+}
+
+void switch_state(int state, int new_state, char *name)
+{
+#if DEBUG
+  printf("====>SWITCH to new state %d/%d l=%d, [%s] at %d\n",
+         state, new_state, state_level, name, yylineno);
+#endif
+  strncpy(old_states[state_level].name, name,
+          sizeof(old_states[state_level].name));
+  BEGIN(new_state);
+}
+
+void push_state(int state, int new_state, char *name)
+{
+  state_level++;
+#if DEBUG
+  printf("====>PUSH to new state %d/%d l=%d, [%s] at %d\n",
+         state, new_state, state_level, name, yylineno);
+#endif
+  if(state_level>=state_max) {
+    state_max++;
+    if(old_states == NULL)
+      old_states = (struct _states *)malloc(sizeof(struct _states));
+    else {
+      old_states = (struct _states *)realloc(old_states,
+                                             state_max*sizeof(struct _states));
+    }
+  }
+  old_states[state_level].state = state;
+  strncpy(old_states[state_level].name, name,
+          sizeof(old_states[state_level].name));
+  BEGIN(new_state);
+}
+
+void pop_state()
+{
+#if DEBUG
+  printf("====>Back to old state %d, l=%d [%s] at %d\n",
+         old_states[state_level].state,
+         state_level,
+         (state_level>0) ? old_states[state_level-1].name : "INITIAL",
+         yylineno);
+#endif
+  if(state_level<0) return;
+  BEGIN(old_states[state_level].state);
+  state_level--;
+  if(state_level<0) state_level = -1;
+}
+
+add_action(char *new_text)
+{
+
+   printf("%s", new_text);
+}
