@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_linsys.cc,v 1.4 1997-03-26 16:46:46 schmidt Exp $
+// $Id: cf_linsys.cc,v 1.5 1997-04-07 16:01:47 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/03/26 16:46:46  schmidt
+debug output rewritten
+debug output changed to DEBOUT
+
 Revision 1.3  1996/12/05 18:24:54  schmidt
 ``Unconditional'' check-in.
 Now it is my turn to develop factory.
@@ -20,12 +24,13 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
 #include "debug.h"
 #include "timing.h"
 
 #include "cf_defs.h"
-
 #include "cf_primes.h"
 #include "canonicalform.h"
 #include "cf_iter.h"

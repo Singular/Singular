@@ -1,11 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_ops.cc,v 1.0 1996-05-17 11:56:37 stobbe Exp $
+// $Id: cf_ops.cc,v 1.1 1997-04-07 16:04:13 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 11:56:37  stobbe
+Initial revision
+
 */
 
+#include <config.h>
+
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
@@ -121,7 +127,7 @@ degreesRec ( const CanonicalForm & f, int * degs )
 	for ( CFIterator i = f; i.hasTerms(); i++ )
 	    degreesRec( i.coeff(), degs );
     }
-}	
+}
 
 int *
 degrees ( const CanonicalForm & f, int * degs )

@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_iterfor.cc,v 1.2 1997-03-27 09:43:07 schmidt Exp $
+// $Id: fac_iterfor.cc,v 1.3 1997-04-07 16:23:36 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/03/27 09:43:07  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.1  1996/07/08 08:18:49  stobbe
 "IteratedFor now handles the cases in which the mainvariable is not of
 level 1.
@@ -13,10 +16,11 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #include "fac_iterfor.h"
 
 void

@@ -1,13 +1,19 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_cantzass.cc,v 1.0 1996-05-17 10:59:45 stobbe Exp $
+// $Id: fac_cantzass.cc,v 1.1 1997-04-07 16:20:23 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:45  stobbe
+Initial revision
+
 */
+
+#include <config.h>
 
 #include "cf_gmp.h"
 
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "cf_globals.h"
 #include "cf_random.h"
@@ -151,7 +157,7 @@ CFFList CantorZassenhausFactorFFGF( const CanonicalForm & g, int s, int q, const
     CanonicalForm b, f1;
     int d, d1;
     Variable x = f.mvar();
-  
+
     if ( (d=f.degree(x)) == s )
 	return CFFactor( f, 1 );
     else while ( 1 ) {
@@ -173,7 +179,7 @@ CFFList CantorZassenhausFactorExt( const CanonicalForm & g, int s, MP_INT * q, c
     CanonicalForm b, f1;
     int d, d1;
     Variable x = f.mvar();
-  
+
     if ( (d=f.degree(x)) == s )
 	return CFFactor( f, 1 );
     else while ( 1 ) {
@@ -220,7 +226,7 @@ CanonicalForm powerMod( const CanonicalForm & f, int p, int s, const CanonicalFo
     int odd;
 
     MP_INT m;
-  
+
     mpz_init( &m );
     mpz_mypow_ui( &m, p, s );
     while ( mpz_cmp_si( &m, 0 ) != 0 ) {
@@ -241,7 +247,7 @@ CanonicalForm powerMod2( const CanonicalForm & f, int p, int s, const CanonicalF
     int odd;
 
     MP_INT m;
-  
+
     mpz_init( &m );
     mpz_mypow_ui( &m, p, s );
     mpz_sub_ui( &m, &m, 1 );
@@ -264,7 +270,7 @@ CanonicalForm powerMod2( const CanonicalForm & f, MP_INT * q, int s, const Canon
     int odd;
 
     MP_INT m;
-  
+
     mpz_init( &m );
     mpz_mypow( &m, q, s );
     mpz_sub_ui( &m, &m, 1 );
@@ -279,5 +285,3 @@ CanonicalForm powerMod2( const CanonicalForm & f, MP_INT * q, int s, const Canon
     mpz_clear( &m );
     return prod;
 }
-
-

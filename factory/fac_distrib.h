@@ -1,12 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_distrib.h,v 1.1 1996-12-06 14:45:57 schmidt Exp $
+// $Id: fac_distrib.h,v 1.2 1997-04-07 16:21:56 schmidt Exp $
 
 #ifndef INCL_FAC_DISTRIB_H
 #define INCL_FAC_DISTRIB_H
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  1996/12/06 14:45:57  schmidt
+ * Initial revision
+ *
  */
+
+#include <config.h>
 
 #include "canonicalform.h"
 

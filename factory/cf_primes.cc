@@ -1,8 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_primes.cc,v 1.3 1996-06-18 12:14:37 stobbe Exp $
+// $Id: cf_primes.cc,v 1.4 1997-04-07 16:08:15 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1996/06/18 12:14:37  stobbe
+"smallprimes and bigprimes are now stored in cf_primetab.h.
+minor changes in all functions.
+"
+
 Revision 1.2  1996/06/18 06:53:42  stobbe
 "Now stores more prime numbers.
 "
@@ -17,7 +22,10 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "cf_globals.h"
 #include "cf_primes.h"

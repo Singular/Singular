@@ -1,13 +1,18 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_primetab.h,v 1.0 1996-06-18 12:12:15 stobbe Exp $
+// $Id: cf_primetab.h,v 1.1 1997-04-07 16:09:22 schmidt Exp $
 
 #ifndef INCL_CF_PRIMETAB_H
 #define INCL_CF_PRIMETAB_H
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.0  1996/06/18 12:12:15  stobbe
+ * Initial revision
+ *
  */
 
+
+#include <config.h>
 
 #define NUMSMALLPRIMES 3511
 #define NUMBIGPRIMES 28427
@@ -599,7 +604,7 @@ static const int smallprimes [] = {
     32563, 32569, 32573, 32579, 32587, 32603,
     32609, 32611, 32621, 32633, 32647, 32653,
     32687, 32693, 32707, 32713, 32717, 32719,
-    32749, 0 
+    32749, 0
 };
 
 static const int bigprimes [] = {

@@ -1,18 +1,22 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_distrib.cc,v 1.2 1997-03-27 09:39:51 schmidt Exp $
+// $Id: fac_distrib.cc,v 1.3 1997-04-07 16:21:32 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  1997/03/27 09:39:51  schmidt
+ * debug output rewritten
+ *
  * Revision 1.1  1996/12/06 14:44:08  schmidt
  * Initial revision
  *
  */
 
+#include <config.h>
+
 #include "assert.h"
 #include "debug.h"
 
 #include "cf_defs.h"
-
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "fac_util.h"

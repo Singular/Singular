@@ -1,17 +1,22 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_berlekamp.cc,v 1.1 1997-03-27 09:34:59 schmidt Exp $
+// $Id: fac_berlekamp.cc,v 1.2 1997-04-07 16:17:28 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/03/27 09:34:59  schmidt
+debug output changed to DEBOUT
+
 Revision 1.0  1996/05/17 10:59:45  stobbe
 Initial revision
 
 */
+
+#include <config.h>
+
 #include "assert.h"
 #include "debug.h"
 
 #include "cf_defs.h"
-
 #include "fac_berlekamp.h"
 #include "ffops.h"
 #include "gfops.h"

@@ -1,14 +1,20 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_random.cc,v 1.0 1996-05-17 10:59:44 stobbe Exp $
+// $Id: cf_random.cc,v 1.1 1997-04-07 16:10:17 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:44  stobbe
+Initial revision
+
 */
+
+#include <config.h>
 
 #include <stdlib.h>
 #include <math.h>
 
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "cf_random.h"
 #include "ffops.h"
@@ -53,7 +59,7 @@ CanonicalForm IntRandom::generate() const
 {
     return factoryrandom( max );
 }
- 
+
 CFRandom * IntRandom::clone() const
 {
     return new IntRandom( max );
