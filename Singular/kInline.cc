@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.25 2001-08-27 14:47:04 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.26 2002-01-22 09:13:16 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -606,10 +606,16 @@ KINLINE poly sLObject::GetP(omBin lmBin)
 {
   kTest_L(this);
   if (p == NULL)
+  {
     p = k_LmInit_tailRing_2_currRing(t_p, tailRing,
                                      (lmBin!=NULL?lmBin:currRing->PolyBin));
+    FDeg = pFDeg();
+  }
   else if (lmBin != NULL && lmBin != currRing->PolyBin)
+  {
     p = p_LmShallowCopyDelete(p, currRing, lmBin);
+    FDeg = pFDeg();
+  }
 
   if (bucket != NULL)
   {
