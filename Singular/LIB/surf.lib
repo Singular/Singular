@@ -1,9 +1,9 @@
-// $Id: surf.lib,v 1.1 1999-05-01 15:27:13 obachman Exp $
+// $Id: surf.lib,v 1.2 1999-05-25 14:59:03 obachman Exp $
 //
 // author : Hans Schoenemann
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.1 1999-05-01 15:27:13 obachman Exp $";
+version="$Id: surf.lib,v 1.2 1999-05-25 14:59:03 obachman Exp $";
 info="
 LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF
 
@@ -65,8 +65,10 @@ EXAMPLE: example plot; shows an example
   if (ncols(I)==1 and n<=2) // curve
   {
     write(":w "+l,"clip=none;");
+      write(l, "width=500; height=500; set_size; do_background=yes; background_red=255; background_green=255; background_blue=255;");
     write(l,
     "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
+    write(l, "curve_green=0; curve_blue=0; curve_width=4.5;");
     write(l,"curve=",I[1],";");
     write(l,"draw_curve;");
   }
@@ -76,6 +78,7 @@ EXAMPLE: example plot; shows an example
     {
       write(":w "+l,
       "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
+     write(l, "width=500; height=500; set_size; do_background=yes; background_red=255; background_green=255; background_blue=255;");
       write(l,"rot_x=0.14; rot_y=-0.3;");
       write(l,"surface=",I[1],";");
       write(l,"draw_surface;");
