@@ -525,8 +525,11 @@ static BOOLEAN heOnlineHelp(char* s)
     {
       Print("// proc %s from lib %s\n",s,lib);
       s=iiGetLibProcBuffer(IDPROC(h), 0);
-      PrintS(s);
-      FreeL((ADDRESS)s);
+      if (s!=NULL)
+      {
+        PrintS(s);
+        FreeL((ADDRESS)s);
+      }
       return TRUE;
     }
     return FALSE;
@@ -660,7 +663,7 @@ static void heBrowserHelp(heEntry hentry)
     }
     WarnS(browsers);
   }
-    
+
   heCurrentHelpBrowser->help_proc(hentry);
   feHelpCalled = TRUE;
 }
