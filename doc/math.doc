@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.64 2001-01-23 13:19:38 mschulze Exp $
+@comment $Id: math.doc,v 1.65 2001-01-24 13:55:08 mschulze Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -427,64 +427,66 @@ characteristic series} of the ideal (G).
 @c to the first example.
 
 @tex
-Let $f\colon(C^{n+1},0)\rightarrow(C,0)$ be an isolated hypersurface singularity given by a polynomial with algebraic coefficients which we also denote by $f$.
+Let $f\colon(C^{n+1},0)\rightarrow(C,0)$ be a complex isolated hypersurface singularity given by a polynomial with algebraic coefficients which we also denote by $f$.
 Let $O=C[x_0,\ldots,x_n]_{(x_0,\ldots,x_n)}$ be the local ring at the origin and $J_f$ the Jacobian ideal of $f$.
 
 A {\bf Milnor representative} of $f$ defines a real analytic fibre bundle over the punctured disc with fibres of homotopy type of $\mu$ $n$-spheres.
 The $n$-th cohomology bundle is a flat vector bundle of dimension $n$ and carries a natural flat connection with covariant derivative $\partial_t$.
 The {\bf monodromy operator} is the action of a positively oriented generator of the fundamental group of the puctured disc on the Milnor fibre.
-The germ $G$ at $0$ is a regular $D=C\{t\}[\partial_t]$-module, the {\bf Gauss-Manin connection}.
+Sections in the cohomology bundle of {\bf moderate growth} at $0$ form a regular $D=C\{t\}[\partial_t]$-module $G$, the {\bf Gauss-Manin connection}.
 
-By integrating along flat multivalued families of cycles, one can consider fibre wise global holomorphic differential forms as elements of $G$.
-This factors through an inclusion of the {\bf Brieskorn lattice} $H''$ in $G$.
+By integrating along flat multivalued families of cycles, one can consider fibrewise global holomorphic differential forms as elements of $G$.
+This factors through an inclusion of the {\bf Brieskorn lattice} $H'':=\Omega^{n+1}_{C^{n+1},0}/df\wedge d\Omega^{n-1}_{C^{n+1},0}$ in $G$.
 
-The $D$-module structure defines the {\bf V-filtration} $V$ on $G$ and $H''$ defines the {\bf Hodge filtration} $F$ on $G$ by $F_k=\partial_t^kH''$ which comes from the {\bf mixed Hodge structure} on the Milnor fibre.
+The $D$-module structure defines the {\bf V-filtration} $V$ on $G$ by $V^\alpha:=\sum_{\beta\ge\alpha}C\{t\}ker(t\partial_t-\beta)^{n+1}$.
+The Brieskorn lattice defines the {\bf Hodge filtration} $F$ on $G$ by $F_k=\partial_t^kH''$ which comes from the {\bf mixed Hodge structure} on the Milnor fibre.
 Note that $F_{-1}=H'$.
 
 The induced V-filtration on the Brieskorn lattice determines the {\bf singularity spectrum} $Sp$ by $Sp(\alpha):=\dim_CGr_V^\alpha Gr^F_0G$.
-The spectrum consists of $\mu$ rational numbers $\alpha_1,\dots,\alpha_\mu$ such that $e^{2\pi i\alpha_1},\dots,e^{2\pi i\alpha_\mu}$ are the eigenvalues of monodromy.
+The spectrum consists of $\mu$ rational numbers $\alpha_1,\dots,\alpha_\mu$ such that $e^{2\pi i\alpha_1},\dots,e^{2\pi i\alpha_\mu}$ are the eigenvalues of the monodromy.
 These {\bf spectral numbers} lie in the open interval $(-1,n)$, symmetric about the midpoint $(n-1)/2$.
 
 The spectrum is constant under $\mu$-constant deformations and has the following semicontinuity property:
-The number of spectral numbers in an interval $(a,a+1]$ of a small deformation of $f$ is greater or equal to that of f in this interval.
+The number of spectral numbers in an interval $(a,a+1]$ of all singularities of a small deformation of $f$ is greater or equal to that of f in this interval.
 For semiquasihomogeneous singularities, this also holds for intervals of the form $(a,a+1)$.
 
 Two given isolated singularities $f$ and $g$ determine two spectra and from these spectra we get an integer.
 This integer is the maximal positive integer $k$ such that the semicontinuity holds for the spectrum of $f$ and $k$ times the spectrum of $g$.
 These numbers give bounds for the maximal number of isolated singularties of a specific type on a hypersurface $X\subset{P}^n$ of degree $d$: 
-such a surface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
+such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
 The cone itself being a $\mu$-constant deformation of $x_0^d+\dots+x_n^d=0$, the singularities are bounded by the spectrum of $x_0^d+\dots+x_n^d$.
 
 Using the library {\tt gaussman.lib} one can compute the {\bf monodromy}, the V-fitration on $H''/H'$, and the spectrum.
 @end tex
 
 @ifinfo
-Let f:(C^(n+1),0)--->(C,0) be an isolated hypersurface singularity given by a polynomial with algebraic coefficients which we also denote by f.
+Let f:(C^(n+1),0)--->(C,0) be a complex isolated hypersurface singularity given by a polynomial with algebraic coefficients which we also denote by f.
 Let O=C[x_0,...,x_n]_(x_0,...,x_n) be the local ring at the origin and J_f the Jacobian ideal of f.
 
 A @strong{Milnor representative} of f defines a real analytic fibre bundle over the punctured disc with fibres of homotopy type of mu n-spheres.
 The n-th cohomology bundle is a flat vector bundle of dimension n and carries a natural flat connection with covariant derivative d_t.
 The @strong{monodromy operator} is the action of a positively oriented generator of the fundamental group of the puctured disc on the Milnor fibre.
-The germ G at 0 is a regular D=C@{t@}[d_t]-module, the \@strong{Gauss-Manin connection}.
+Sections in the cohomology bundle of @strong{moderate growth} at 0 form a regular D=C@{t@}[d_t]-module G, the @strong{Gauss-Manin connection}.
 
-By integrating along flat multivalued families of cycles, one can consider fibre wise global holomorphic differential forms as elements of G.
-This factors through an inclusion of the @strong{Brieskorn lattice} H'' in G.
+By integrating along flat multivalued families of cycles, one can consider fibrewise global holomorphic differential forms as elements of G.
+This factors through an inclusion of the @strong{Brieskorn lattice} H'':=Omega^(n+1)_(C^(n+1),0)/df*dOmega^(n-1)_(C^(n+1),0) in G.
 
-The D-module structure defines the @strong{V-filtration} V on G and H'' defines the @strong{Hodge filtration} F on G by F_k=d_t^kH'' which comes from the @strong{mixed Hodge structure} on the Milnor fibre.
+The D-module structure defines the @strong{V-filtration} V on G by V^a:=sum_(b>=a)C@{t@}ker(t*d_t-b)^(n+1).
+The Brieskorn lattice defines the @strong{Hodge filtration} F on G by F_k=d_t^kH'' which comes from the @strong{mixed Hodge structure} on the Milnor fibre.
 Note that F_(-1)=H'.
 
 The induced V-filtration on the Brieskorn lattice determines the @strong{singularity spectrum} Sp by Sp(a):=dim_CGr_V^a Gr^F_0G.
-The spectrum consists of mu rational numbers a_1,...,a_mu such that exp(2*pi*i*a_1),...,exp(2*pi*i*a_mu) are the eigenvalues of monodromy.
+The spectrum consists of mu rational numbers a_1,...,a_mu such that exp(2*pi*i*a_1),...,exp(2*pi*i*a_mu) are the eigenvalues of the monodromy.
 These @strong{spectral numbers} lie in the open interval (-1,n), symmetric about the midpoint (n-1)/2.
 
 The spectrum is constant under mu-constant deformations and has the following semicontinuity property:
-The number of spectral numbers in an interval (a,a+1] of a small deformation of f is greater or equal to that of f in this interval.
+The number of spectral numbers in an interval (a,a+1] of all singularities of a small deformation of f is greater or equal to that of f in this interval.
 For semiquasihomogeneous singularities, this also holds for intervals of the form (a,a+1).
 
 Two given isolated singularities f and g determine two spectra and from these spectra we get an integer.
 This integer is the maximal positive integer k such that the semicontinuity holds for the spectrum of f and k times the spectrum of g.
 These numbers give bounds for the maximal number of isolated singularties of a specific type on a hypersurface X in P^n of degree d: 
-such a surface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
+such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
 The cone itself being a mu-constant deformation of x_0^d+...+x_n^d=0, the singularities are bounded by the spectrum of x_0^d+...+x_n^d.
 
 Using the library @code{gaussman.lib} one can compute the @strong{monodromy}, the V-fitration on H''/H', and the spectrum.
