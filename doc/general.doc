@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.159 1999-11-29 14:45:57 Singular Exp $
+@comment $Id: general.doc,v 1.160 1999-11-29 19:33:13 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -903,8 +903,6 @@ libraries, loading files
 @cindex Singular, running within Emacs
 @cindex Running SINGULAR under Emacs
 
-Singular Emacs lisp directory.
-
 There are two ways to start the @sc{Singular} Emacs interface: Typing
 @code{ESingular} instead of @code{Singular} on the command shell
 launches a new Emacs process, initializes the interface and runs
@@ -913,44 +911,69 @@ an already running Emacs, by typing @code{M-x singular} inside
 Emacs. This initializes the interface and runs @sc{Singular} within
 Emacs. Both ways are described in more detail below.
 
-Loading of the usual @code{.emacs} initialization file is suppressed and
-the special initialization file @code{.emacs-singular} is loaded
-instead. 
+Note: To properly run the Emacs interface, several files are needed
+which usually reside in the @code{emacs} subdirectory of your
+@sc{Singular} distribution. This directory is called
+singular-emacs-home-directory in the following.
 
-The @sc{Singular} prompt comes up in a Emacs buffer and you are ready to
-start your @sc{Singular} session. The command line arguments of
-@code{ESingular} are discussed below.
+@subheading{Starting the interface using ESingular}
+
+As mentioned above, @code{ESingular} is an "out-of-the-box" solution:
+You don't have to add special things to your @code{.emacs} startup file
+to initialize the interface; everything is done for you in a special
+file called @code{.emacs-singular} (which comes along with the
+@sc{Singular} distribution and resides in the
+singular-emacs-home-directory) which is automatically loaded on Emacs
+startup (and the loading of the @code{.emacs} file is automatically
+suppressed).
+
+The customizable variables of the @sc{Singular} Emacs interface are set
+to useful default settings giving the novice user a very shell like
+feeling of the interface. Nevertheless, this default settings can be
+changed, see @ref{Customization of the Emacs interface}. Besides other
+Emacs initializations, such as fontification or blinking parantheses, a
+new menu item called @code{Singular} is added to the main menu,
+providing menu items for starting @sc{Singular}. On XEmacs, a button
+starting @sc{Singular} is added to the main toolbar.
+
+The @sc{Singular} interface is started automatically; once you see a
+buffer called @code{*singular*} and the @sc{Singular} prompt you are
+ready to start your @sc{Singular} session.
 
 @code{ESingular} inherits all @code{Singular} options. For a description
 off all these options, see @ref{Command line options}. Additionally
 there are the following options which are special to @code{ESingular}:
 
-@table @asis
+@table @code
 
-@item @code{--emacs=EMACS}
+@item --emacs=EMACS
 @cindex --emacs
 Use @code{EMACS} as Emacs program to run the @sc{Singular} Emacs
 interface.
 
-@item @code{--emacs-dir=DIR}
+@item --emacs-dir=DIR
 @cindex --emacs-dir
-Set the @sc{Singular} Emacs directory to @code{DIR}.
+Set the singular-emacs-home-directory to @code{DIR}.
 
-@item @code{--emacs-load=FILE}
+@item --emacs-load=FILE
 @cindex --emacs-load
 Load @code{FILE} on Emacs start-up, instead of the default load file.
 
-@item @code{--singular=PROG}
+@item --singular=PROG
 @cindex --singular
 Start @code{PROG} as @sc{Singular} program within Emacs
 
 @end table
 
-If you are already using Emacs, you can add the following code to your
-local @code{.emacs} file:
+@subheading{Starting the interface using running Emacs}
+
+If you are a more experienced Emacs user and you already have your own
+local @code{.emacs} startup file, you might want to start the interface
+out of your own Emacs without using @code{ESingular}. For this, you
+should add the following lisp code to your @code{.emacs} file:
 
 @smallexample
-(setq load-path (cons "<your-singular-emacs-home-directory>" load-path))
+(setq load-path (cons "<singular-emacs-home-directory>" load-path))
 (autoload 'singular "singular"
   "Start Singular using default values." t)
 (autoload 'singular-other "singular"
@@ -962,30 +985,24 @@ the interface in a new buffer and launches a @sc{Singular} process. The
 @sc{Singular} prompt comes up and you are ready to start your
 @sc{Singular} session.
 
-@itemize
-ESingular vs running within existing emacs
-@item 
-ESingular (start-up sequence, command-line options, files)
-@item 
-Singular within running emacs (.emacs, start-up)
-@item 
-@end itemize
+It is a good idea to take a look at the (well documented) file
+@code{.emacs-singular} in the singular-emacs-home-directory, which comes
+along with the distribution. In it you find some useful initializations
+of the @sc{Singular} interface as well as some lisp code, which, for
+example, adds a button to the XEmacs toolbar. Some of this code might be
+useful for your @code{.emacs} file, too. And if you are a Emacs wizard,
+it is of course a good idea to take a look at @code{singular.el} in the
+singular-emacs-home-directory.
 
-The command @code{singular-exit-singular} (bound to @code{C-c $} or item
-@code{Exit} of the @code{Singular} menu) interrupts and kills the
-running @sc{Singular} process of the current buffer (but does not kill
-the buffer). Once you have killed a @sc{Singular} process you can start
-a new one in the same buffer with the command @code{singular} (or select
-the item @code{Start default} of the @code{Singular} menu).
+@subheading{Starting and stopping SINGULAR}
 
-The command @code{singular-restart} (bound to @code{C-c C-r} or item
-@code{Restart} of the @code{Singular} menu) kills the running
-@sc{Singular} process of the current buffer and starts a new process in
-the same buffer with exactly the same command line arguments as before.
+There are the following commands to start and stop @sc{Singular}:
 
-To start a @sc{Singular} process different from the default one, you have
-to use the command @code{singular-other} (or select the item
-@code{Start...} of the @code{Singular} menu). This command asks for four
+@itemize @bullet
+@item @code{singular-other} (or menu @code{Singular}, item
+@code{Start...})
+
+Starts a @sc{Singular} process and asks for the following four
 parameters in the minibuffer area:
 
 @enumerate
@@ -1003,14 +1020,47 @@ directory, e.g., @code{~/work}. The current directory is set to this
 directory before @sc{Singular} is started.
 
 @item 
-Command line switches. You can set any @sc{Singular} command line
-switch.
+Command line options. You can set any @sc{Singular} command line
+option (see @ref{Command line options}).
 
 @item
 The buffer name. You can specify the name of the buffer the interface is
 running in.
 
 @end enumerate
+
+@item @code{singular} (or menu @code{Singular}, item @code{Start
+default})
+
+Starts @sc{Singular} with default settings for the executable, the
+working directory, command line switches, and the buffer name. You can
+customize this default settings, see @ref{Customization of the Emacs
+interface}.
+
+@item @code{singular-exit-singular} (bound to @code{C-c $} or menu
+@code{Singular}, item @code{Exit})
+
+interrupts and kills the running @sc{Singular} process of the current
+buffer (but does not kill the buffer). Once you have killed a
+@sc{Singular} process you can start a new one in the same buffer with
+the command @code{singular} (or select the item @code{Start default} of
+the @code{Singular} menu).
+
+@item @code{singular-restart} (bound to @code{C-c C-r} or menu
+@code{Singular}, item @code{Restart})
+
+kills the running @sc{Singular} process of the current buffer and starts
+a new process in the same buffer with exactly the same command line
+arguments as before.
+
+@end itemize
+
+Whenever a @sc{Singular} process is started within the Emacs interface,
+the contents of a special startup file (by default
+@code{~/.emacs-singularrc}) is pasted as input to @sc{Singular} at the
+very end of the usual startup sequence (see @ref{Startup sequence}). The
+name of the startup file can be changed, see @ref{Customization of the
+Emacs interface}.
 
 @c --------------------------------------------------------------------------
 @node Demo mode, Customization of the Emacs interface, Running SINGULAR under Emacs, Emacs user interface
@@ -1046,7 +1096,18 @@ Olaf
 @cindex Singular, important commands of Emacs interface
 @cindex Top 20 Emacs commands
 
-Tim
+@itemize @bullet
+@item @code{singular-toggle-truncate-lines} (key @code{C-c t} or menu
+@code{Commands} item @code{Truncate lines})
+
+Toggles wether long lines should be truncated or not.
+
+@item @code{singular-demo-load} (key @code{C-c d l} or menu
+@code{Commands} item @code{Load library})
+
+Loads a @sc{Singular} library.
+@end itemize
+
 
 @c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
