@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.6 1998-04-23 13:40:45 obachman Exp $
+# $Id: regress.cmd,v 1.7 1998-04-30 07:40:10 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -81,37 +81,23 @@ sub tst_check
     print (STDERR "Can not read $root.tst\n");
     return (1);
   }
-  if ((! (-r "$root.res")) || (-z "$root.res"))
+  if ($generate ne "yes")
   {
-    if ((! (-r "$root.res.gz")) || (-z "$root.res.gz"))
+    if ((-r "$root.res.gz.uu") && ! ( -z "$root.res.gz.uu"))
     {
-      if ((! (-r "$root.res.gz.uu")) || (-z "$root.res.gz.uu"))
-      {
-	if ($generate ne "yes")
-	{
-	  print (STDERR "Can not read $root.res[.gz]\n");
-	  return (1);
-	}
-      }
-      else 
-      {
-	$exit_status 
-	  = $exit_status || &mysystem("$uudecode -o $root.res.gz $root.res.gz.uu; $gunzip $root.res.gz");
-	if ($exit_status)
-	{
-	  print (STDERR "Can not decode $root.res.gz.uu\n");
-	  return ($exit_status);
-	}
-      }
-    }
-    else
-    {
-      $exit_status = $exit_status || & mysystem("$gunzip -f -c $root.res.gz > $root.res");
+      $exit_status 
+	= $exit_status || &mysystem("$uudecode -o $root.res.gz $root.res.gz.uu; $gunzip -f $root.res.gz");
       if ($exit_status)
       {
-	print (STDERR "Can not `$gunzip -f -c $root.res.gz > $root.res'\n" );
+	print (STDERR "Can not decode $root.res.gz.uu\n");
 	return ($exit_status);
       }
+    }
+    elsif (! (-r "$root.res") || ( -z "$root.res"))
+    {
+      print (STDERR "Can not read $root.res[.gz.uu]\n");
+      return (1);
+      
     }
   }
   
@@ -171,14 +157,10 @@ sub tst_check
   } 
   elsif ($generate eq "yes")
   {
-    & mysystem("$gzip -f $root.res; $uuencode $root.res.gz $root.res.gz > $root.res.gz.uu");
+    & mysystem("$gzip -f $root.res; $uuencode $root.res.gz $root.res.gz > $root.res.gz.uu; $rm -rf $root.res.gz");
     if ($keep eq "yes")
     {
       & mysystem("mv $root.new.res $root.res");
-    }
-    else
-    {
-      & mysystem("$rm -rf $root.new.res $root.res.gz");
     }
   }
   
