@@ -1,28 +1,16 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_matrix.cc,v 1.1 1996-12-18 15:04:23 schmidt Exp $
+// $Id: ftmpl_matrix.cc,v 1.2 1997-03-27 10:33:48 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  1996/12/18 15:04:23  schmidt
+ * Initial revision
+ *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "matrix.h"
+#include <templates/assert.h>
 
-#undef ASSERT
-#undef __ASSERT
-#undef STICKYASSERT
-
-#ifdef NDEBUG
-#define ASSERT(ignore1,ignore2)((void)0)
-#else
-#define ASSERT(expression,message) \
-((void)((expression) ? 0 : __ASSERT(#expression, message, __FILE__, __LINE__)))
-#define __ASSERT(expression, message, file, line)  \
-(fprintf( stderr, "error: %s\n%s:%u: failed assertion `%s'\n", \
- message, file, line, expression ), abort(), 0 )
-#endif
-
+#include <templates/matrix.h>
 
 template <class T>
 Matrix<T>::Matrix( int nr, int nc ) : NR(nr), NC(nc)
@@ -155,6 +143,7 @@ void Matrix<T>::swapColumn ( int i, int j )
     }
 }
 
+#ifndef NOSTREAMIO
 template <class T>
 void Matrix<T>::printrow ( ostream & s, int i ) const
 {
@@ -185,6 +174,7 @@ void Matrix<T>::print( ostream& s ) const
 	s << "\n)";
     }
 }
+#endif /* NOSTREAMIO */
 
 template <class T>
 Matrix<T> operator+ ( const Matrix<T>& lhs, const Matrix<T>& rhs )
