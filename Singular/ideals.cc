@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.96 2000-07-06 13:30:01 pohl Exp $ */
+/* $Id: ideals.cc,v 1.97 2000-08-02 19:06:29 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1627,7 +1627,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
   int comps_to_add=0;
   poly p;
 
-  if (idIs0(mod))
+  if (idIs0(submod))
   {
     if (unit!=NULL)
     {
@@ -1637,6 +1637,23 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
     if (rest!=NULL)
     {
       *rest=idInit(1,mod->rank);
+    }
+    return idInit(1,mod->rank);
+  }
+  if (idIs0(mod))
+  {
+    if (unit!=NULL)
+    {
+      i=IDELEMS(submod);
+      *unit=mpNew(i,i);
+      for (j=i;j>0;j--)
+      {
+        MATELEM(*unit,j,j)=pOne();
+      }
+    }
+    if (rest!=NULL)
+    {
+      *rest=idCopy(submod);
     }
     return idInit(1,mod->rank);
   }
