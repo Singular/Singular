@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.21 1998-08-07 06:25:55 wichmann Exp $
+;; $Id: singular.el,v 1.22 1998-08-07 07:55:52 wichmann Exp $
 
 ;;; Commentary:
 
@@ -2086,6 +2086,51 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 
 ;; for convenience only
 (defalias 'Singular 'singular)
+
+(defun singular-generate-new-buffer-name (name)
+  "NOT READY [docu]
+name: should be without stars.
+Try to create a buffer named *name*.
+If fails, try to create buffer named *name<number>*
+Return buffer name with stars at start/end"
+  (let ((new-name (singular-process-name-to-buffer-name name))
+	(count 2))
+    (while (get-buffer new-name)
+      (setq new-name (singular-process-name-to-buffer-name
+		      (concat name "<" (format "%d" count) ">")))
+      (setq count (1+ count)))
+    new-name))
+  
+(defun singular-other (file) 
+  "NOT READY [docu]"
+  (interactive "fSingular executable: ")
+  ;; NOT READY [code]
+  (let ((name (singular-generate-new-buffer-name 
+	       (downcase (file-name-nondirectory file))))
+	(switches "")
+	temp)
+
+    ;; Read buffer name from minibuffer at strip surrounding stars
+    (setq name (read-from-minibuffer "Singular buffer name: " name))
+    (if (string-match "^\\*\\(.*\\)\\*$" name)
+	(setq name (substring name (match-beginning 1) (match-end 1))))
+
+    ;; make one string of options from list of default options
+    (setq temp singular-default-switches)
+    (while temp
+      (setq switches (concat switches (car temp) " "))
+      (setq temp (cdr temp)))
+    (setq switches (read-from-minibuffer "Singular arguments: " switches))
+
+    ;; make list of strings of switch-string
+    (setq temp nil)
+    (while (string-match "-[^ ]*" switches)
+      (setq temp (append temp (list (substring switches (match-beginning 0) 
+					       (match-end 0)))))
+      (setq switches (substring switches (match-end 0) nil)))
+    (setq switches temp)
+
+    (singular file name switches)))
 ;;}}}
 ;;}}}
 
