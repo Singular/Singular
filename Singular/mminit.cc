@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.7 1997-06-17 11:53:57 Singular Exp $ */
+/* $Id: mminit.cc,v 1.8 1998-04-27 10:03:07 pohl Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -13,10 +13,9 @@
 #include "mod2.h"
 #include "mmemory.h"
 #include "mmprivat.h"
+extern "C" { /* begin of "C" */
 #ifdef HAVE_GMP
-extern "C" {
 #include <gmp.h>
-}
 #endif
 
 #ifdef ALIGN_8
@@ -114,6 +113,7 @@ int mm_specIndex=0;
 size_t mm_specSize = mm_mcbSizes[0];
 
 int mm_printMark=102400;
+} /* end of "C" */
 
 void* operator new ( size_t size )
 {
