@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.9 1997-09-08 11:08:40 schmidt Exp $ */
+/* $Id: cf_map.cc,v 1.10 1998-01-27 10:30:05 pohl Exp $ */
 
 //{{{ docu
 //
@@ -15,7 +15,7 @@
 #include "cf_map.h"
 #include "cf_iter.h"
 #ifdef macintosh
-#include <::templates:ftmpl_functions.h>
+#include <:templates:ftmpl_functions.h>
 #else
 #include "templates/ftmpl_functions.h"
 #endif
