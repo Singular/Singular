@@ -1,3 +1,6 @@
+Tue Jun  2 17:28:48 MET DST 1998 hannes
+	* introduced /* */ comments
+	* some code cleanups
 Fri May 29 17:00:27 MET DST 1998 hannes
 	* change res to nres (cmd), resu to res(standard.lib)
 	  including changes to libs, docs (partially)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.14 1998-05-28 16:50:51 Singular Exp $ */
+/* $Id: polys.h,v 1.15 1998-06-02 15:30:02 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -75,7 +75,7 @@ extern BOOLEAN pSDRING;
 #define pGetOrder(p)        _pGetOrder(p)
 
 // Gets/Sets Component field w.r.t. of polys of global ring
-#define pSetComp(p,k)       _pSetComp(p,k)    
+#define pSetComp(p,k)       _pSetComp(p,k)
 #define pGetComp(p)         _pGetComp(p)
 #define pIncrComp(p)        _pIncrComp(p)
 #define pDecrComp(p)        _pDecrComp(p)
@@ -83,7 +83,7 @@ extern BOOLEAN pSDRING;
 #define pSubComp(p,v)       _pSubComp(p,v)
 
 // Gets/Sets Component field w.r.t. of polys of ring r
-#define pRingSetComp(r,p,k)       _pRingSetComp(r,p,k)    
+#define pRingSetComp(r,p,k)       _pRingSetComp(r,p,k)
 #define pRingGetComp(r,p)         _pRingGetComp(r,p)
 
 // Gets/Sets ith exponent poly of global ring
@@ -95,16 +95,16 @@ extern BOOLEAN pSDRING;
 #define pRingSetExp(r,p,i,v)      _pRingSetExp(r,p,i,v)
 
 // Increments/decrements ith exponent by one
-#define pIncrExp(p,i)       _pIncrExp(p,i)   
-#define pDecrExp(p,i)       _pDecrExp(p,i)   
+#define pIncrExp(p,i)       _pIncrExp(p,i)
+#define pDecrExp(p,i)       _pDecrExp(p,i)
 
 // Gets Difference and sum of ith Exponent of m1, m2
 #define pGetExpSum(m1, m2, i)  _pGetExpSum(p1, p2, i)
 #define pGetExpDiff(p1, p2, i) _pGetExpDiff(p1, p2, i)
 
 // Adds/Substracts v to/from the ith Exponent
-#define pAddExp(p,i,v)      _pAddExp(p,i,v)  
-#define pSubExp(p,i,v)      _pSubExp(p,i,v)  
+#define pAddExp(p,i,v)      _pAddExp(p,i,v)
+#define pSubExp(p,i,v)      _pSubExp(p,i,v)
 #define pMultExp(p,i,v)     _pMultExp(p,i,v)
 
 // Gets a copy of (resp. sets) the exponent vector, where e is assumed
@@ -208,7 +208,7 @@ poly      pMultCopyN(poly a, number c);
 poly      pPower(poly p, int i);
 
 // return TRUE, if exponent and component of Lm(p1) and Lm(p2) are equal,
-// FALSE otherwise; 
+// FALSE otherwise;
 #define pEqual(p1, p2) _pEqual(p1, p2) // Assumes p1 != NULL & p2 != NULL
 inline BOOLEAN pLmEqual(poly p1, poly p2) // no assumptions
 {
@@ -264,9 +264,9 @@ poly      pISet(int i);
 void      pContent(poly p);
 void      pCleardenom(poly p);
 
-// homogenizes p by multiplying certain powers of the varnum-th variable 
+// homogenizes p by multiplying certain powers of the varnum-th variable
 poly      pHomogen (poly p, int varnum);
-  
+
 // replaces the maximal powers of the leading monomial of p2 in p1 by
 // the same powers of n, utility for dehomogenization
 poly      pDehomogen (poly p1,poly p2,number n);

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.12 1998-04-07 08:30:32 Singular Exp $ */
+/* $Id: scanner.l,v 1.13 1998-06-02 15:30:04 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -27,8 +27,6 @@ extern int inerror;
 
 static char * dupyytext()
 {
-  //int i = strlen((char *)yytext);
-  //if (i>0) yytext[i-1] = '\0';
   if (yyleng>0) yytext[yyleng-1] = '\0';
   return mstrdup((char *)yytext);
 }
@@ -39,11 +37,12 @@ static char * dupyytextNL()
   char * rc = (char*)AllocL( 3 + i );
   if (i>0)
   {
-    yytext[i-1] = '\0';
-    strcpy( rc, (char *)yytext );
+    strncpy( rc, (char *)yytext, i-1 );
   }
   else
+  {
     i++;
+  }
   rc[i-1] = '\n';
   rc[i] = '\n';
   rc[i+1] = '\0';
@@ -92,6 +91,24 @@ parname        #
 %%
 \/\/[^\n]*               { }
 ^#![^\n]*                { }
+"/*"                     {
+                           yy_noeof=noeof_comment;
+                           loop
+                           {
+                             register int c;
+                             while ( (c = yyinput()) != '*' && c != EOF );
+                             if ( c == '*' )
+                             {
+                               while ( (c = yyinput()) == '*' );
+                               if ( c == '/' ) break; /* found the end */
+                             }
+                             else
+                             {
+                               break;
+                             }
+                           }
+                           yy_noeof=0;
+                         }
 pause[ \t\n]*[\.;]       { fePause(); }
 while                    { blocknest = 0; yy_noeof = noeof_brace; BEGIN(brace);
                            return WHILE_CMD;}
@@ -253,68 +270,18 @@ newline                  {
                            return RINGVAR;
                          }
 \$                       {
-                           #ifdef HAVE_TCL
-                           if (tclmode)
-                             PrintTCL('Q',0,NULL);
-                           else
-                           #endif
-                           { if (BVERBOSE(0)) printf("\n$Bye.\n"); }
-                           #ifndef macintosh
-                             #ifdef HAVE_FEREAD
-                               #ifdef HAVE_ATEXIT
-                                 fe_reset_input_mode();
-                               #else
-                                 fe_reset_input_mode(0,NULL);
-                               #endif
-			     #else
-			       #ifdef HAVE_READLINE
-                                 fe_reset_input_mode();
-			       #endif
-                             #endif
-                           #endif
-                           #ifdef sun
-                           #ifndef __svr4__
-                           _cleanup();
-                           _exit(0);
-                           #endif
-                           #endif
-                           exit(0);
+                           m2_end(-1);
                          }
 (quit|exit)[ \t\n]*[\.;]?  {
-                           #ifdef HAVE_TCL
-                             if (tclmode)
-                               PrintTCL('Q',0,NULL);
-                             else
-                           #endif
                            #ifdef MM_STAT
                            mmStat(-500);
-                           #endif
-                           { if (BVERBOSE(0)) printf("\nAuf Wiedersehen.\n"); }
-                           #ifndef macintosh
-                             #ifdef HAVE_FEREAD
-                               #ifdef HAVE_ATEXIT
-                                 fe_reset_input_mode();
-                               #else
-                                 fe_reset_input_mode(0,NULL);
-                               #endif
-			     #else
-			       #ifdef HAVE_READLINE
-                                 fe_reset_input_mode();
-			       #endif
-                             #endif
                            #endif
                            #ifdef MDEBUG
                              #ifdef MLIST
                              mmTestList();
                              #endif
                            #endif
-                           #ifdef sun
-                           #ifndef __svr4__
-                           _cleanup();
-                           _exit(0);
-                           #endif
-                           #endif
-                           exit(0);
+                           m2_end(0);
                          }
 
 {rgvars}|{realnum}       {

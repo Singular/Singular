@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.2 1997-04-09 12:20:02 Singular Exp $ */
+/* $Id: mpsr_Get.h,v 1.3 1998-06-02 15:29:59 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -32,7 +32,7 @@
  *
  ***************************************************************/
 
-// the data structure which functions as external data 
+// the data structure which functions as external data
 typedef struct mpsr_sleftv
 {
   leftv lv;
@@ -70,11 +70,11 @@ extern mpsr_Status_t mpsr_GetLeftv(MP_Link_pt link, mpsr_leftv mlv, short quote)
 extern mpsr_Status_t mpsr_GetCommonOperatorLeftv(MP_Link_pt link,
                                                MPT_Node_pt node,
                                                mpsr_leftv mlv,
-                                               short quote); 
+                                               short quote);
 extern mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
                                          MPT_Node_pt node,
                                          mpsr_leftv mlv,
-                                         short quote); 
+                                         short quote);
 extern MPT_Status_t mpsr_GetExternalData(MP_Link_pt link,
                                          MPT_Arg_t  *odata,
                                          MPT_Node_pt node);
@@ -85,7 +85,7 @@ extern MPT_Status_t mpsr_GetExternalData(MP_Link_pt link,
  * inlines
  *
  ***************************************************************/
-inline BOOLEAN NodeCheck(MPT_Node_pt node, MP_NodeType_t type, 
+inline BOOLEAN NodeCheck(MPT_Node_pt node, MP_NodeType_t type,
                         MP_DictTag_t dtag, MP_Common_t cv)
 {
   mpsr_assume(node != NULL);

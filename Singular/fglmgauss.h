@@ -1,10 +1,10 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmgauss.h,v 1.2 1997-10-06 12:19:10 obachman Exp $
+// $Id: fglmgauss.h,v 1.3 1998-06-02 15:29:54 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* 
+/*
 * ABSTRACT - header file for the gauss - reducer
 *            (used by fglm)
 */
@@ -17,12 +17,12 @@
 
 class gaussElem;
 
-class gaussReducer 
+class gaussReducer
 {
 private:
     int size;
-    int max;  
-    gaussElem * elems;  
+    int max;
+    gaussElem * elems;
     BOOLEAN * isPivot;
     int * perm;
     fglmVector v;
@@ -31,17 +31,17 @@ private:
 public:
     gaussReducer( int dimen );
     ~gaussReducer();
-    
+
     // reduce returns TRUE, if v reduces to 0, FALSE otherwise;
     BOOLEAN reduce( fglmVector v );
 
     // if a vector does not reduce to zero, then it can be stored as a new gauss
-    // vector. 
+    // vector.
     // Has to be called after reduce!
     void store();
 
     // if a vector reduces to zero, then one can get the corresponding fglmVector
-    // of the linear dependence 
+    // of the linear dependence
     // Has to be called after reduce!
     fglmVector getDependence();
 };

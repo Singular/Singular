@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.9 1998-05-25 21:28:32 obachman Exp $ */
+/* $Id: mpsr.h,v 1.10 1998-06-02 15:29:58 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -101,7 +101,7 @@ inline void mpsr_SetCurrRing(ring rg, BOOLEAN complete)
     nSetChar(rg->ch, TRUE, rg->parameter,rg->P);
 #else
     nSetChar(rg->ch, complete, rg->parameter,rg->P);
-#endif    
+#endif
     pChangeRing(rg->N, rg->OrdSgn, rg->order, rg->block0, rg->block1,
                 rg->wvhdl);
     currRing = rg;
@@ -137,7 +137,7 @@ inline void mpsr_InitTempArray(int length)
 // String used to indicate the end of a communication
 #define MPSR_QUIT_STRING    "MPtcp:quit"
 
-// some handy Macros for error handlings 
+// some handy Macros for error handlings
 #ifdef MPSR_DEBUG
 
 #undef failr
@@ -249,7 +249,7 @@ do                                                  \
   else return mpsr_Success;                         \
 }                                                   \
 while (0)
-#undef mpsr_assume   
+#undef mpsr_assume
 #define mpsr_assume(cond) ((void) 0)
 
 #endif // MPSR_DEBUG

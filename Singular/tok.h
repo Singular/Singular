@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.17 1998-05-19 18:08:41 Singular Exp $ */
+/* $Id: tok.h,v 1.18 1998-06-02 15:30:06 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -28,7 +28,7 @@ extern int  yyparse(void);
 #define ABS(x) ((x)<0?(-(x)):(x))
 #endif
 
-#if defined(__cplusplus)  
+#if defined(__cplusplus)
 inline int max(const int a, const int b)  { return (a>b) ? a : b; }
 inline int min(const int a, const int b)  { return (a<b) ? a : b; }
 #else

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.9 1998-05-27 17:14:07 Singular Exp $ */
+/* $Id: longrat.h,v 1.10 1998-06-02 15:29:56 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -19,7 +19,7 @@ extern "C" {
 #  define HAVE_LIBGMP2
 #else
 #  define HAVE_LIBGMP1
-#endif 
+#endif
 #endif
 
 typedef MP_INT lint;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.8 1998-04-28 08:39:40 obachman Exp $ */
+/* $Id: mmemory.h,v 1.9 1998-06-02 15:29:58 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -16,11 +16,11 @@ extern "C" {
 #endif
 
 #include "mod2.h"
-  
+
 #ifdef DO_DEEP_PROFILE
 extern void _memcpyW(void* p1, void* p2, long l);
-#define  memcpyW(p1, p2, l) _memcpyW((void*) p1, (void*) p2, (long) l)  
-#else                                                                   
+#define  memcpyW(p1, p2, l) _memcpyW((void*) p1, (void*) p2, (long) l)
+#else
 #define memcpyW(p1, p2, l)                      \
 do                                              \
 {                                               \
@@ -39,7 +39,7 @@ do                                              \
 }                                               \
 while(0)
 #endif
-  
+
 
 void mmSpecializeBlock( size_t );
 
@@ -47,7 +47,7 @@ int mmMemReal( void );
 int mmMemUsed( void );
 #ifdef HAVE_SBRK
 int mmMemPhysical( void );
-#endif  
+#endif
 
 #define mstrdup mmStrdup
 /* char * mstrdup(char *s); */

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.17 1998-05-25 21:28:31 obachman Exp $ */
+/* $Id: febase.h,v 1.18 1998-06-02 15:29:52 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -21,7 +21,7 @@
 // do never use fopen and fread
 */
 #ifndef unix
-extern FILE *myfopen(char *path, char *mode); 
+extern FILE *myfopen(char *path, char *mode);
 #else
 #define myfopen fopen
 #endif
@@ -63,7 +63,7 @@ void   WerrorS(const char *s);
 }
 /* the C++-part: */
 
-enum   feBufferTypes 
+enum   feBufferTypes
 {
   BT_none  = 0,  // entry level
   BT_break = 1,  // while, for
@@ -75,7 +75,7 @@ enum   feBufferTypes
   BT_else        // else
 };
 
-enum   feBufferInputs 
+enum   feBufferInputs
 {
   BI_stdin = 1,
   BI_buffer,

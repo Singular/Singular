@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.12 1998-05-04 14:11:38 Singular Exp $ */
+/* $Id: ipid.h,v 1.13 1998-06-02 15:29:55 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -41,7 +41,7 @@ struct sip_sring
 
 #ifdef RDEBUG
   short      no; /* unique id for rings */
-#endif  
+#endif
 };
 
 struct sip_sideal

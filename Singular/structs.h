@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.11 1998-04-28 09:39:27 pohl Exp $ */
+/* $Id: structs.h,v 1.12 1998-06-02 15:30:05 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -28,9 +28,10 @@ enum noeof_t
   noeof_brace = 1,
   noeof_asstring,
   noeof_block,
-  noeof_string,
   noeof_bracket,
-  noeof_procname
+  noeof_comment,
+  noeof_procname,
+  noeof_string
 };
 
 /* C++-part */

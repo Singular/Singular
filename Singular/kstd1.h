@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.5 1998-05-14 13:04:17 Singular Exp $ */
+/* $Id: kstd1.h,v 1.6 1998-06-02 15:29:55 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -27,7 +27,7 @@ ideal kStd(ideal F, ideal Q, tHomog h, intvec ** w,intvec *hilb=NULL,
 #ifdef STDTRACE
 lists TraceStd(leftv,int , ideal F, ideal Q, tHomog h, intvec ** w,intvec *hilb=NULL,
           int syzComp=0,int newIdeal=0);
-#endif          
+#endif
 
 /* the following global data are defined in kutil.cc */
 //extern int syzComp;

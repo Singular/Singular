@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.h,v 1.8 1997-08-12 17:14:43 Singular Exp $ */
+/* $Id: silink.h,v 1.9 1998-06-02 15:30:04 Singular Exp $ */
 /*
 * ABSTRACT: general interface to links
 */
@@ -37,8 +37,8 @@ struct s_si_link_extension
 struct sip_link
 {
   si_link_extension m; // methods
-  char *mode;    
-  char *name;          // used for filename and/or further specs 
+  char *mode;
+  char *name;          // used for filename and/or further specs
   void *data;          // the link itself
   BITSET flags;        // 0=close open = 1: read = 2: write = 3
   short ref;           // reference counter

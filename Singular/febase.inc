@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.10 1998-05-07 17:53:25 Singular Exp $ */
+/* $Id: febase.inc,v 1.11 1998-06-02 15:29:53 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -301,48 +301,51 @@ BOOLEAN exitVoice()
   //while (p!=NULL);
   //Print("----------------\n");
   //}
-  if (currentVoice->oldb!=NULL)
+  if (currentVoice!=NULL)
   {
-    myyoldbuffer(currentVoice->oldb);
-    currentVoice->oldb=NULL;
+    if (currentVoice->oldb!=NULL)
+    {
+      myyoldbuffer(currentVoice->oldb);
+      currentVoice->oldb=NULL;
+    }
+    if ((currentVoice->prev==NULL)&&(currentVoice->sw==BI_file))
+    {
+      currentVoice->prev=feInitStdin();
+    }
+    if (currentVoice->prev!=NULL)
+    {
+      //printf("exitVoice typ %d(%s)\n",
+      //  currentVoice->typ,BT_name[currentVoice->typ]);
+      if (currentVoice->typ==BT_if)
+      {
+        currentVoice->prev->ifsw=2;
+      }
+      else
+      {
+        currentVoice->prev->ifsw=0;
+      }
+      if ((currentVoice->sw == BI_file)
+      && (currentVoice->files!=NULL))
+      {
+        fclose(currentVoice->files);
+      }
+      if (currentVoice->filename!=NULL)
+      {
+        FreeL((ADDRESS)currentVoice->filename);
+        currentVoice->filename=NULL;
+      }
+      if (currentVoice->buffer!=NULL)
+      {
+        FreeL((ADDRESS)currentVoice->buffer);
+        currentVoice->buffer=NULL;
+      }
+      yylineno=currentVoice->prev->curr_lineno;
+    }
+    Voice *p=currentVoice->prev;
+    delete currentVoice;
+    currentVoice=p;
   }
-  if ((currentVoice->prev==NULL)&&(currentVoice->sw==BI_file))
-  {
-    currentVoice->prev=feInitStdin();
-  }
-  if (currentVoice->prev!=NULL)
-  {
-    //printf("exitVoice typ %d(%s)\n",
-    //  currentVoice->typ,BT_name[currentVoice->typ]);
-    if (currentVoice->typ==BT_if)
-    {
-      currentVoice->prev->ifsw=2;
-    }
-    else
-    {
-      currentVoice->prev->ifsw=0;
-    }
-    if ((currentVoice->sw == BI_file)
-    && (currentVoice->files!=NULL))
-    {
-      fclose(currentVoice->files);
-    }
-    if (currentVoice->filename!=NULL)
-    {
-      FreeL((ADDRESS)currentVoice->filename);
-      currentVoice->filename=NULL;
-    }
-    if (currentVoice->buffer!=NULL)
-    {
-      FreeL((ADDRESS)currentVoice->buffer);
-      currentVoice->buffer=NULL;
-    }
-    yylineno=currentVoice->prev->curr_lineno;
-  }
-  Voice *p=currentVoice->prev;
-  delete currentVoice;
-  currentVoice=p;
-  return currentVoice==0;
+  return currentVoice==NULL;
 }
 
 /*2
@@ -431,95 +434,99 @@ static int fePrintEcho(char *anf)
 
 int feReadLine(char* b, int l)
 {
+  char *s=NULL;
+  int offset; /* will not be used if s==NULL*/
   // try to read from the buffer into b, max l chars
-  if ((currentVoice->buffer!=NULL)
-  && (currentVoice->buffer[currentVoice->fptr]!='\0'))
+  if (currentVoice!=NULL)
   {
-NewBuff:
-    int i=0;
-    int startfptr=currentVoice->fptr;
-    l--;
-    loop
+    if((currentVoice->buffer!=NULL)
+    && (currentVoice->buffer[currentVoice->fptr]!='\0'))
     {
-      char c=
-      b[i]=currentVoice->buffer[currentVoice->fptr];
-      i++;
-      if (yy_noeof==noeof_block)
+  NewBuff:
+      int i=0;
+      int startfptr=currentVoice->fptr;
+      l--;
+      loop
       {
-        if (c<' ')  yylineno++;
-        else if (c=='}') break;
+        char c=
+        b[i]=currentVoice->buffer[currentVoice->fptr];
+        i++;
+        if (yy_noeof==noeof_block)
+        {
+          if (c<' ')  yylineno++;
+          else if (c=='}') break;
+        }
+        else
+        {
+          if ((c<' ') ||
+          (c==';') ||
+          (c==')')
+          )
+            break;
+        }          
+        if (i>=l) break;
+        currentVoice->fptr++;
+        if(currentVoice->buffer[currentVoice->fptr]=='\0') break;
       }
-      else
+      b[i]='\0';
+      if (currentVoice->sw==BI_buffer)
       {
-        if ((c<' ') ||
-        (c==';') ||
-        (c==')')
-        )
-          break;
-      }          
-      if (i>=l) break;
+        if (startfptr==0)
+        {
+          char *anf=currentVoice->buffer;
+          char *ss=strchr(anf,'\n');
+          int len;
+          if (ss==NULL) len=strlen(anf);
+          else          len=ss-anf;
+          char *s=(char *)AllocL(len+2);
+          strncpy(s,anf,len+2);
+          s[len+1]='\0';
+          fePrintEcho(s);
+          FreeL((ADDRESS)s);
+        }
+        else if (/*(startfptr>0) &&*/
+        (currentVoice->buffer[startfptr-1]=='\n'))
+        {
+          char *anf=currentVoice->buffer+startfptr;
+          char *ss=strchr(anf,'\n');
+          int len;
+          if (ss==NULL) len=strlen(anf);
+          else          len=ss-anf;
+          char *s=(char *)AllocL(len+2);
+          strncpy(s,anf,len+2);
+          s[len+1]='\0';
+          yylineno++;
+          fePrintEcho(s);
+          FreeL((ADDRESS)s);
+        }
+      }
       currentVoice->fptr++;
-      if(currentVoice->buffer[currentVoice->fptr]=='\0') break;
+      return i;
     }
-    b[i]='\0';
-    if (currentVoice->sw==BI_buffer)
+    // no buffer there or e-o-buffer or eoln:
+    if (currentVoice->sw!=BI_buffer)
     {
-      if (startfptr==0)
-      {
-        char *anf=currentVoice->buffer;
-        char *ss=strchr(anf,'\n');
-        int len;
-        if (ss==NULL) len=strlen(anf);
-        else          len=ss-anf;
-        char *s=(char *)AllocL(len+2);
-        strncpy(s,anf,len+2);
-        s[len+1]='\0';
-        fePrintEcho(s);
-        FreeL((ADDRESS)s);
-      }
-      else if (/*(startfptr>0) &&*/
-      (currentVoice->buffer[startfptr-1]=='\n'))
-      {
-        char *anf=currentVoice->buffer+startfptr;
-        char *ss=strchr(anf,'\n');
-        int len;
-        if (ss==NULL) len=strlen(anf);
-        else          len=ss-anf;
-        char *s=(char *)AllocL(len+2);
-        strncpy(s,anf,len+2);
-        s[len+1]='\0';
-        yylineno++;
-        fePrintEcho(s);
-        FreeL((ADDRESS)s);
-      }
+      currentVoice->fptr=0;
+      if (currentVoice->buffer==NULL)
+        currentVoice->buffer=(char *)AllocL(4096-sizeof(ADDRESS));
     }
-    currentVoice->fptr++;
-    return i;
-  }
-  // no buffer there or e-o-buffer or eoln:
-  if (currentVoice->sw!=BI_buffer)
-  {
-    currentVoice->fptr=0;
-    if (currentVoice->buffer==NULL)
-      currentVoice->buffer=(char *)AllocL(4096-sizeof(ADDRESS));
-  }
-  char *s;
-  int offset=0;
-NewRead:
-  yylineno++;
-  if (currentVoice->sw==BI_stdin)
-  {
-    feShowPrompt();
-    s=fe_fgets_stdin(currentVoice->buffer+offset,(4096-1-sizeof(ADDRESS))-offset);
-  }
-  else if (currentVoice->sw==BI_file)
-  {
-    s=fgets(currentVoice->buffer+offset,(4096-1-sizeof(ADDRESS))-offset,
-            currentVoice->files);
-  }
-  else /* BI_buffer */
-  {
-    return 0;
+    offset=0;
+  NewRead:
+    yylineno++;
+    if (currentVoice->sw==BI_stdin)
+    {
+      feShowPrompt();
+      s=fe_fgets_stdin(currentVoice->buffer+offset,(4096-1-sizeof(ADDRESS))-offset);
+    }
+    else if (currentVoice->sw==BI_file)
+    {
+      s=fgets(currentVoice->buffer+offset,(4096-1-sizeof(ADDRESS))-offset,
+              currentVoice->files);
+    }
+    //else /* BI_buffer */ s==NULL  => return 0
+    //{
+    //  return 0;
+    //}
   }
   if (s!=NULL)
   {
@@ -543,27 +550,33 @@ NewRead:
   }
   /* else if (s==NULL) */
   {
+    char *err=NULL;
     switch(yy_noeof)
     {
-      case 0:
-        return 0;
       case noeof_brace:
       case noeof_block:
-        WerrorS("premature end of file while reading {...}");
+        err="{...}";
         break;
       case noeof_asstring:
-        WerrorS("premature end of file while reading till `.`");
+        err="till `.`";
         break;
       case noeof_string:
-        WerrorS("premature end of file while reading string");
+        err="string";
         break;
       case noeof_bracket:
-        WerrorS("premature end of file while reading (...)");
+        err="(...)";
         break;
       case noeof_procname:
-        WerrorS("premature end of file while reading proc");
+        err="proc";
+        break;
+      case noeof_comment:
+        err="/*...*/";
+        break;
+      default:
         break;
     }
+    if (err!=NULL)
+      Werror("premature end of file while reading %s",err);
     return 0;
   }
 }

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.14 1998-05-28 16:50:54 Singular Exp $ */
+/* $Id: ring.h,v 1.15 1998-06-02 15:30:03 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -70,7 +70,7 @@ enum
 typedef enum rOrderType_t
 {
   rOrderType_General = 0, // non-simple ordering as specified by currRing
-  rOrderType_CompExp,     // simple ordering, component has priority 
+  rOrderType_CompExp,     // simple ordering, component has priority
   rOrderType_ExpComp,     // simple ordering, exponent vector has priority
                           // component not compatible with exp-vector order
   rOrderType_Exp,         // simple ordering, exponent vector has priority

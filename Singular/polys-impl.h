@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.21 1998-03-23 22:51:03 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.22 1998-06-02 15:30:02 Singular Exp $ */
 
 /***************************************************************
  *
@@ -141,7 +141,7 @@ inline void pGetVarIndicies_Lex(int nvars, int &VarOffset, int &VarCompIndex,
   VarLowIndex  = 0;
   VarHighIndex = nvars - 1;
 #else //  ! WORDS_BIGENDIAN
-  temp *= sizeof(long)/sizeof(Exponent_t); 
+  temp *= sizeof(long)/sizeof(Exponent_t);
   VarHighIndex = temp -1;
   VarLowIndex = temp - nvars;
   VarOffset = temp;
@@ -152,7 +152,7 @@ inline void pGetVarIndicies_Lex(int nvars, int &VarOffset, int &VarCompIndex,
 #define pSetVarIndicies_Lex(nvars)                      \
   pGetVarIndicies_Lex(nvars,pVarOffset,pVarCompIndex,   \
                       pVarLowIndex,pVarHighIndex)
-  
+
 
 
 inline void pGetVarIndicies_RevLex(int nvars,int &VarOffset,int &VarCompIndex,
@@ -169,7 +169,7 @@ inline void pGetVarIndicies_RevLex(int nvars,int &VarOffset,int &VarCompIndex,
   VarLowIndex  = 0;
   VarHighIndex = nvars-1;
 #else //  ! WORDS_BIGENDIAN
-  temp *= sizeof(long)/sizeof(Exponent_t); 
+  temp *= sizeof(long)/sizeof(Exponent_t);
   VarHighIndex = temp -1;
   VarLowIndex = temp - nvars;
   VarOffset = temp - nvars -1;
@@ -510,7 +510,7 @@ inline void __pCopyAddFastHomog(poly p1, poly p2, poly p3, Order_t Order)
 
   p1->coef = p2->coef;
   p1->Order = Order;
-  
+
   for (;;)
   {
     *s1 = *s2 + *s3;
@@ -553,7 +553,7 @@ DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
   const unsigned long* s1 = (unsigned long*) &(a->exp[0]);
   const unsigned long* s2 = (unsigned long*) &(b->exp[0]);
 #endif
-  
+
   for (;;)
   {
     // Yes, the following is correct, provided that the exponents do
@@ -624,7 +624,7 @@ DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
 
 /***************************************************************
  *
- * Routines which implement low-level manipulations/operations 
+ * Routines which implement low-level manipulations/operations
  * on exponents and "are allowed" to access single exponetns
  *
  ***************************************************************/

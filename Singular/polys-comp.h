@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.7 1998-04-30 15:29:34 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.8 1998-06-02 15:30:01 Singular Exp $ */
 
 /***************************************************************
  *
@@ -24,7 +24,7 @@ do                                                          \
   actionE;                                                  \
 }                                                           \
 while(0)
-  
+
 #define _pMonComp_otEXPCOMP_nwONE(p1, p2, d, actionD, actionE)  \
 do                                                              \
 {                                                               \
@@ -51,7 +51,7 @@ do                                                          \
   actionE;                                                  \
 }                                                           \
 while(0)
-  
+
 #define _pMonComp_otEXPCOMP_nwTWO(p1, p2, d, actionD, actionE)  \
 do                                                              \
 {                                                               \
@@ -69,7 +69,7 @@ do                                                              \
   actionE;                                                      \
 }                                                               \
 while(0)
-  
+
 #define _pMonComp_otEXP_nwEVEN(p1, p2, length, d, actionD, actionE) \
 do                                                                  \
 {                                                                   \
@@ -113,7 +113,7 @@ do                                                                  \
   }                                                                 \
 }                                                                   \
 while(0)
-  
+
 #define _pMonComp_otEXPCOMP_nwEVEN(p1, p2, length, d, actionD, actionE) \
 do                                                                      \
 {                                                                       \
@@ -144,7 +144,7 @@ do                                                                      \
   actionE;                                                              \
 }                                                                       \
 while(0)
-  
+
 #define _pMonComp_otEXPCOMP_nwODD(p1, p2, length, d, actionD, actionE)  \
 do                                                                      \
 {                                                                       \
@@ -221,7 +221,7 @@ do                                                                      \
 }                                                                       \
 while(0)
 
-  
+
 #else //  ! WORDS_BIGENDIAN
 
 #define _pMonComp_otEXP_nwONE(p1, p2, d, actionD, actionE)                  \
@@ -232,7 +232,7 @@ do                                                                          \
   actionE;                                                                  \
 }                                                                           \
 while(0)
-  
+
 #define _pMonComp_otEXPCOMP_nwONE(p1, p2, d, actionD, actionE)              \
 do                                                                          \
 {                                                                           \
@@ -259,7 +259,7 @@ do                                                          \
   actionE;                                                  \
 }                                                           \
 while(0)
-  
+
 #define _pMonComp_otEXPCOMP_nwTWO(p1, p2, d, actionD, actionE)  \
 do                                                              \
 {                                                               \
@@ -279,7 +279,7 @@ do                                                              \
   actionE;                                                      \
 }                                                               \
 while(0)
-  
+
 #define _pMonComp_otEXP_nwEVEN(p1, p2, length, d, actionD, actionE) \
 do                                                                  \
 {                                                                   \
@@ -322,7 +322,7 @@ do                                                                  \
   }                                                                 \
 }                                                                   \
 while(0)
-  
+
 #define _pMonComp_otEXPCOMP_nwEVEN(p1, p2, length, d, actionD, actionE) \
 do                                                                      \
 {                                                                       \
@@ -353,7 +353,7 @@ do                                                                      \
   actionE;                                                              \
 }                                                                       \
 while(0)
-  
+
 #define _pMonComp_otEXPCOMP_nwODD(p1, p2, length, d, actionD, actionE)  \
 do                                                                      \
 {                                                                       \
@@ -402,7 +402,7 @@ do                                                                  \
   }                                                                 \
 }                                                                   \
 while(0)
-  
+
 #define _pMonComp_otEXPCOMP_nwGEN(p1, p2, length, d, actionD, actionE) \
 do                                                                      \
 {                                                                       \

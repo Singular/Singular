@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.h,v 1.6 1998-05-31 15:42:24 krueger Exp $ */
+/* $Id: libparse.h,v 1.7 1998-06-02 15:29:56 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -16,7 +16,7 @@ typedef enum { OLD_LIBSTYLE, NEW_LIBSTYLE } lib_style_types;
 procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
                                  char *procname, int line, long pos,
 				 BOOLEAN pstatic = FALSE);
-int yylplex(char *libname, char *libfile, lib_style_types *lib_style, 
+int yylplex(char *libname, char *libfile, lib_style_types *lib_style,
 	    lp_modes=LOAD_LIB);
 void reinit_yylp();
 
@@ -41,6 +41,6 @@ extern char * text_buffer;
 #    define myfopen fopen
 #  endif
 
-#endif /* LIBPARSE_H */ 
+#endif /* LIBPARSE_H */
 
 

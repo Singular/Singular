@@ -1,12 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.8 1998-04-14 15:28:00 Singular Exp $
+// $Id: fglm.h,v 1.9 1998-06-02 15:29:54 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* 
+/*
 * ABSTRACT - The FGLM-Algorithm
-*   The main header file for the fglm algorithm          
+*   The main header file for the fglm algorithm
 *   (See fglm.cc for details)
 */
 
@@ -40,9 +40,9 @@ public:
 class fglmDelem
 {
 public:
-    int insertions;  
+    int insertions;
     poly monom;
-    fglmVector v;   
+    fglmVector v;
     int var;
     fglmDelem( poly & m, fglmVector mv, int v );
 
@@ -57,7 +57,7 @@ public:
 // The sourceIdeal has to be a reduced, 0-dimensional groebner basis in sourceRing.
 // Warning: There is no check, if the ideal is really 0-dimensional and minimal.
 // If it is minimal but not reduced, then it returns FALSE, otherwise TRUE.
-// Warning: There is no check, if the rings are compatible for fglm (see 
+// Warning: There is no check, if the rings are compatible for fglm (see
 // fglm.cc for functions to check this)
 // if switchBack==TRUE, then the procedure sets the ring as currentRing which was
 // current when it was called ( When called there may be currRing != sourceRing ).
@@ -72,7 +72,7 @@ fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & d
 // The procedure which has to be called from the interpreter.
 // first is the sourceRing, second is the given ideal in sourceRing.
 // Returns the groebnerbasis of the sourceIdeal in the currentRing.
-// Checks, if the ideal is really a reduced groebner basis of a 
+// Checks, if the ideal is really a reduced groebner basis of a
 // 0-dimensional Ideal. Returns TRUE if an error occoured.
 BOOLEAN
 fglmProc( leftv result, leftv first, leftv second );

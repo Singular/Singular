@@ -89,21 +89,47 @@ int inits(void)
 extern "C" {
 void m2_end(short i)
 {
-  if (i==0)
+  #ifdef HAVE_TCL
+  if (tclmode)
+    PrintTCL('Q',0,NULL);
+  #endif
+  if (i<=0)
   {
     #ifdef HAVE_TCL
-    if (tclmode)
-      PrintTCL('Q',0,NULL);
-    else
+    if (!tclmode)
     #endif
-      printf("Auf Wiedersehen.\n");
+      if (BVERBOSE(0))
+      {
+        if (i==0)
+          printf("Auf Wiedersehen.\n");
+	else
+	  printf("\n$Bye.\n");
+      }
+    #ifndef macintosh
+      #ifdef HAVE_FEREAD
+        #ifdef HAVE_ATEXIT
+          fe_reset_input_mode();
+        #else
+          fe_reset_input_mode(0,NULL);
+        #endif
+      #else
+        #ifdef HAVE_READLINE
+          fe_reset_input_mode();
+        #endif
+      #endif
+    #endif
+    #ifdef sun
+      #ifndef __svr4__
+        _cleanup();
+        _exit(0);
+      #endif
+    #endif
+    exit(0);
   }
   else
   {
     #ifdef HAVE_TCL
-    if (tclmode)
-      PrintTCL('Q',0,NULL);
-    else
+    if (!tclmode)
     #endif
       printf("\nhalt %d\n",i);
   }

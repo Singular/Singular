@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.36 1998-05-25 13:04:54 Singular Exp $ */
+/* $Id: febase.cc,v 1.37 1998-06-02 15:29:51 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -118,17 +118,17 @@ extern "C" char* find_executable(const char* argv0);
 // look for libs in $ROOT/share/Singular/xx.lib:
 #define SINGULAR_RELATIVE_DATA_DIR "../share/Singular"
 
-static char* SearchPath = NULL;
-static char* ExpandedExecutable = NULL;
+static char* feSearchPath = NULL;
+static char* feExpandedExecutable = NULL;
 
 char* feGetExpandedExecutable(const char* argv0)
 {
-  if (ExpandedExecutable == NULL)
+  if (feExpandedExecutable == NULL)
   {
     if (argv0 != NULL)
-      ExpandedExecutable = find_executable(argv0);
+      feExpandedExecutable = find_executable(argv0);
   }
-  return ExpandedExecutable;
+  return feExpandedExecutable;
 }
 
 static char* feRemovePathnameHead(const char* ef)
@@ -151,7 +151,7 @@ static char* feRemovePathnameHead(const char* ef)
     }
     return temp2;
   }
-  else 
+  else
     return NULL;
 }
 
@@ -159,32 +159,32 @@ static char* feRemovePathnameHead(const char* ef)
 // Return the file search path for singular w.r.t. the following priorities:
 // Env-variables + Relative Data Dir + Burned-in data dir
 char* feGetSearchPath(const char* argv0)
-{   
-  if (SearchPath == NULL) 
+{
+  if (feSearchPath == NULL)
   {
     char *env = NULL, *sibbling = NULL, *path;
     int plength = 0, tmp;
-  
+
 #ifdef MSDOS
     env=getenv("SPATH");
 #else
     env=getenv("SINGULARPATH");
 #endif
-  
+
     if (env != NULL)
       plength = strlen(env) + 1;
 
     if (argv0 != NULL)
       sibbling = feRemovePathnameHead(feGetExpandedExecutable(argv0));
-  
+
     if (sibbling != NULL)
       plength += strlen(sibbling) + strlen(SINGULAR_RELATIVE_DATA_DIR) + 2;
-  
+
     plength += strlen(SINGULAR_DATADIR) + 2;
-  
+
     path = (char*) AllocL(plength*sizeof(char));
-    SearchPath = path;
-  
+    feSearchPath = path;
+
     if (env != NULL)
     {
       tmp = strlen(env);
@@ -193,7 +193,7 @@ char* feGetSearchPath(const char* argv0)
       *path = FS_SEP;
       path++;
     }
-  
+
     if (sibbling != NULL)
     {
       tmp = strlen(sibbling);
@@ -208,13 +208,13 @@ char* feGetSearchPath(const char* argv0)
       path++;
       FreeL(sibbling);
     }
-  
+
     tmp = strlen(SINGULAR_DATADIR);
     memcpy(path,SINGULAR_DATADIR, tmp);
     path = &(path[tmp]);
     *path = '\0';
   }
-  return SearchPath;
+  return feSearchPath;
 }
 
 
@@ -267,9 +267,12 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
     strcpy(where,res);
   FreeL(res);
 #else
-  if (where!=NULL) strcpy(where,path);
-  if ((*mode=='r') && (path[0]!=DIR_SEP)&&(path[0]!='.')
-  &&(f==NULL))
+  if (where!=NULL)
+    strcpy(where,path);
+  if ((*mode=='r')
+  && (path[0]!=DIR_SEP)
+  && (path[0]!='.')
+  && (f==NULL))
   {
     char found = 0;
     char* spath = feGetSearchPath();
@@ -292,7 +295,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
         #ifndef macintosh
           if(!access(s, R_OK)) { found++; break; }
         #else
-          f=myfopen(s,mode);
+          f=fopen(s,mode); /* do not need myfopen: we test only the access */
           if (f!=NULL)  { found++; fclose(f); break; }
         #endif
         p = q+1;
@@ -681,14 +684,14 @@ FILE *myfopen(char *path, char *mode)
   char mmode[4];
   int i;
   BOOLEAN done = FALSE;
-  
+
   for (i=0;;i++)
   {
     mmode[i] = mode[i];
     if (mode[i] == '\0') break;
     if (mode[i] == 'b') done = TRUE;
   }
-  
+
   if (! done)
   {
     mmode[i] = 'b';
@@ -719,4 +722,4 @@ size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 }
 
 
-      
+

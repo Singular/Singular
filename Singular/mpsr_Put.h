@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.h,v 1.6 1998-01-16 14:29:56 krueger Exp $ */
+/* $Id: mpsr_Put.h,v 1.7 1998-06-02 15:29:59 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Put.h
@@ -10,7 +10,7 @@
  *
  * Change History (most recent first):
  *  o 1/97 obachman
- *    Updated putting routines to MP and MPP v1.1 
+ *    Updated putting routines to MP and MPP v1.1
  *
  ***************************************************************/
 
@@ -30,7 +30,7 @@
  * 1.) Some handy macros
  *
  ***************************************************************/
-// some often used flags settings for annotations 
+// some often used flags settings for annotations
 #define MP_AnnotReqValTree                                  \
 (MP_AnnotRequired | MP_AnnotValuated | MP_AnnotTreeScope)
 
@@ -169,7 +169,7 @@ inline mpsr_Status_t mpsr_PutListLeftv(MP_Link_pt link, leftv v, ring cring)
 inline mpsr_Status_t mpsr_PutCommandLeftv(MP_Link_pt link, leftv v, ring cring)
 {
   command cmd = (command) v->Data();
-  
+
   typecheck(v, COMMAND);
   if (cmd->op == PROC_CMD)
     return mpsr_PutOpCommand(link, cmd, cring);

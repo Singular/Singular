@@ -102,7 +102,7 @@ public:
 class skstdLink;
 typedef class skstdLink * stdLink;
 
-class skstdLink 
+class skstdLink
 {
 public:
   stdModus Modus;
@@ -145,7 +145,7 @@ private:
 
   LSet Warteliste;
   int Wartelistemax, Wartelistel;
-  int aktuell;         // Index des Polynoms in l, das als nächstes verarbeitet wird. 
+  int aktuell;         // Index des Polynoms in l, das als nächstes verarbeitet wird.
 
   int      procnum;
   intarray res;

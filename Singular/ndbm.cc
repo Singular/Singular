@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.9 1998-04-09 11:47:13 pohl Exp $
+// $Id: ndbm.cc,v 1.10 1998-06-02 15:30:00 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -143,7 +143,7 @@ long
 dbm_forder(register DBM *db, datum key)
 {
   long hash;
-  
+
   hash = dcalchash(key);
   for (db->dbm_hmask=0;; db->dbm_hmask=(db->dbm_hmask<<1)+1) {
     db->dbm_blkno = hash & db->dbm_hmask;
@@ -232,7 +232,7 @@ loop:
     return (-1);
   }
   return (0);
-  
+
 split:
   if (key.dsize+dat.dsize+3*sizeof(short) >= PBLKSIZ) {
     db->dbm_flags |= _DBM_IOERR;
@@ -278,7 +278,7 @@ split:
 datum
 dbm_firstkey(DBM *db)
 {
-  
+
   db->dbm_blkptr = 0L;
   db->dbm_keyptr = 0;
   return (dbm_nextkey(db));
@@ -289,7 +289,7 @@ dbm_nextkey(register DBM *db)
 {
   struct stat statb;
   datum item;
-  
+
   if (dbm_error(db) || fstat(db->dbm_pagf, &statb) < 0)
                 goto err;
   statb.st_size /= PBLKSIZ;
@@ -347,7 +347,7 @@ int getbit(register DBM *db)
 {
   long bn;
   register b, i, n;
-        
+
 
   if (db->dbm_bitno > db->dbm_maxbno)
     return (0);
@@ -397,7 +397,8 @@ makdatum(char buf[PBLKSIZ], int n)
   datum item;
 
   sp = (short *)buf;
-  if ((unsigned)n >= sp[0]) {
+  if ((unsigned)n >= (unsigned)sp[0])
+  {
     item.dptr = NULL;
     item.dsize = 0;
     return (item);
@@ -482,7 +483,7 @@ dcalchash(datum item)
   register char *cp;
   register long hashl;
   register int hashi;
-  
+
   hashl = 0;
   hashi = 0;
   for (cp = item.dptr, s=item.dsize; --s >= 0; ) {
@@ -503,13 +504,14 @@ static
 int delitem(char buf[PBLKSIZ], int n)
 {
   register short *sp, *sp1;
-  register i1, i2;
+  register int i1, i2;
 
   sp = (short *)buf;
   i2 = sp[0];
-  if ((unsigned)n >= i2 || (n & 1))
+  if ((unsigned)n >= (unsigned)i2 || (n & 1))
     return (0);
-  if (n == i2-2) {
+  if (n == i2-2)
+  {
     sp[0] -= 2;
     return (1);
   }
