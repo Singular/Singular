@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_ops.cc,v 1.2 1997-06-19 12:24:13 schmidt Exp $ */
+/* $Id: cf_ops.cc,v 1.3 1997-07-19 08:09:28 schmidt Exp $ */
 
 #include <config.h>
 
@@ -202,16 +202,39 @@ totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 
     }
 }
 
+//{{{ CanonicalForm resultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+//{{{ docu
+//
+// resultant() - return resultant of f and g with respect to x.
+//
+// We calculate the resultant using a subresultant PSR.
+//
+// flipFactor: Res(f, g) = flipFactor * Res(g, f)
+// F, G: f and g with x as main variable
+// pi, pi1, pi2: used to compute PSR
+// delta:
+// bi, Hi:
+//
+//}}}
 CanonicalForm
-resultant( const CanonicalForm & f, const CanonicalForm& g, const Variable & x )
+resultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
     CanonicalForm Hi, bi, pi, pi1, pi2, F, G;
-    int delta;
-    Variable v = f.mvar();
+    int delta, flipFactor;
+    Variable v;
 
-    if ( f.mvar() < x || g.mvar() < x )
-	return 1;
+    ASSERT( x.level() > 0, "cannot calculate resultant in respect to algebraic variables" );
 
+    // some checks on triviality.  We will not use degree( v )
+    // here because this may involve variable swapping.
+    if ( f.isZero() || g.isZero() )
+	return 0;
+    if ( f.mvar() < x )
+	return power( f, g.degree( x ) );
+    if ( g.mvar() < x )
+	return power( g, f.degree( x ) );
+
+    // make x main variale
     if ( f.mvar() > x || g.mvar() > x ) {
 	if ( f.mvar() > g.mvar() )
 	    v = f.mvar();
@@ -225,40 +248,71 @@ resultant( const CanonicalForm & f, const CanonicalForm& g, const Variable & x )
 	F = f;
 	G = g;
     }
-    if ( F.degree( v ) < 1 || G.degree( v ) < 1 )
-	return 1;
+    // at this point, we have to calculate resultant( F, G, v )
+    // where v is equal to or greater than the main variables
+    // of F and G
 
-    if ( f.degree( v ) >= g.degree( v ) ) {
+    // trivial case: F or G in R.  Swapping will not occur
+    // when calling degree( v ).
+    if ( F.degree( v ) < 1 )
+	return power( f, G.degree( v ) );
+    if ( G.degree( v ) < 1 )
+	return power( g, F.degree( v ) );
+
+    // start the pseudo remainder sequence
+    if ( F.degree( v ) >= G.degree( v ) ) {
 	pi = F; pi1 = G;
+	flipFactor = 1;
     }
     else {
+	if ( (F.degree( v ) * G.degree( v )) % 2 )
+	    flipFactor = -1;
+	else
+	    flipFactor = 1;
 	pi = G; pi1 = F;
     }
+
     delta = degree( pi, v ) - degree( pi1, v );
     Hi = power( LC( pi1, v ), delta );
+
+    // Ist hier nicht if und else zweig vertauscht ???
     if ( (delta+1) % 2 )
 	bi = 1;
     else
 	bi = -1;
+
+    // Ist pi1.isZero vielleich schneller ???
     while ( degree( pi1, v ) >= 0 ) {
 	pi2 = psr( pi, pi1, v );
 	pi2 = pi2 / bi;
 	pi = pi1; pi1 = pi2;
 	if ( degree( pi1, v ) >= 0 ) {
 	    delta = degree( pi, v ) - degree( pi1, v );
+
+	    // Ist hier nicht if und else zweig vertauscht ???
 	    if ( (delta+1) % 2 )
 		bi = LC( pi, v ) * power( Hi, delta );
 	    else
 		bi = -LC( pi, v ) * power( Hi, delta );
+
+	    // Was ist f"ur delta == 0 ???
 	    Hi = power( LC( pi1, v ), delta ) / power( Hi, delta-1 );
 	}
     }
-    if ( v == x )
-	return Hi;
-    else
-	return swapvar( Hi, v, x );
-}
 
+    // f and g have non-trivial common divisor
+    // if ( degree( pi, v ) > 0 )
+    // return 0;
+
+    // undo variable swap
+    if ( v == x )
+	// Gibt man hier nicht den letzten Rest der PSR zur"uck
+	// und nicht den Korrekturterm Hi ???
+	return Hi * flipFactor;
+    else
+	return swapvar( Hi, v, x ) * flipFactor;
+}
+//}}}
 
 static CanonicalForm
 cden ( const CanonicalForm & f )
