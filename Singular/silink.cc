@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.29 1999-07-06 14:18:45 Singular Exp $ */
+/* $Id: silink.cc,v 1.30 1999-07-22 17:47:17 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -305,6 +305,7 @@ BOOLEAN slGetDump(si_link l)
     if (res)
       Werror("getdump: Error for link of type %s, mode: %s, name: %s",
              l->m->type, l->mode, l->name);
+    res|=slClose(l);
     return res;
   }
   else
