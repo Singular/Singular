@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.cc,v 1.2 1997-07-22 09:16:10 schmidt Exp $ */
+/* $Id: sm_sparsemod.cc,v 1.3 1997-10-09 14:47:19 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -24,6 +24,7 @@
 #include "cf_primes.h"
 #include "cf_random.h"
 #include "fac_util.h"
+#include "cf_algorithm.h"
 #include "sm_util.h"
 #include "sm_sparsemod.h"
 #ifdef macintosh

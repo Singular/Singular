@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.7 1997-06-30 15:26:31 schmidt Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.8 1997-10-09 14:44:49 schmidt Exp $ */
 
 #include <config.h>
 
@@ -14,6 +14,7 @@
 #endif
 #include "canonicalform.h"
 #include "fac_util.h"
+#include "cf_algorithm.h"
 #include "cf_reval.h"
 #include "cf_random.h"
 #include "cf_primes.h"

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_distrib.cc,v 1.5 1997-06-19 12:23:38 schmidt Exp $ */
+/* $Id: fac_distrib.cc,v 1.6 1997-10-09 14:47:17 schmidt Exp $ */
 
 #include <config.h>
 
@@ -8,6 +8,7 @@
 
 #include "cf_defs.h"
 #include "canonicalform.h"
+#include "cf_algorithm.h"
 #include "cf_iter.h"
 #include "fac_util.h"
 
