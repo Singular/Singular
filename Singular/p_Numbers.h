@@ -6,14 +6,14 @@
  *  Purpose: macros/inline functions for number oerations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Numbers.h,v 1.5 2000-12-01 12:57:04 Singular Exp $
+ *  Version: $Id: p_Numbers.h,v 1.6 2001-01-09 15:40:12 Singular Exp $
  *******************************************************************/
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H
 
 #include "numbers.h"
 #define n_Copy_FieldGeneral(n, r)           (r)->cf->nCopy(n)
-#define n_Delete_FieldGeneral(n, r)         (r)->cf->nDelete(n)
+#define n_Delete_FieldGeneral(n, r)         (r)->cf->cfDelete(n,r)
 #define n_Mult_FieldGeneral(n1, n2, r)      (r)->cf->nMult(n1, n2)
 #define n_Add_FieldGeneral(n1, n2, r)       (r)->cf->nAdd(n1, n2)
 #define n_IsZero_FieldGeneral(n, r)         (r)->cf->nIsZero(n)
@@ -34,7 +34,7 @@
 #define DO_LINLINE
 #include "longrat.cc"
 #define n_Copy_FieldQ(n, r)        nlCopy(n)
-#define n_Delete_FieldQ(n, r)      nlDelete(n)
+#define n_Delete_FieldQ(n, r)      nlDelete(n,r)
 #define n_Mult_FieldQ(n1, n2, r)   nlMult(n1,n2)
 #define n_Add_FieldQ(n1, n2, r)    nlAdd(n1, n2)
 #define n_IsZero_FieldQ(n, r)      nlIsZero(n)

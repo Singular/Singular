@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.23 2000-12-14 16:38:50 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.24 2001-01-09 15:40:09 Singular Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -274,7 +274,7 @@ int ksCheckCoeff(number *a, number *b)
   nTest(an);
   nTest(bn);
 
-  number cn = nGcd(an, bn);
+  number cn = nGcd(an, bn, currRing);
 
   if(nIsOne(cn))
   {

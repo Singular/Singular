@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.16 2000-12-15 18:49:28 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.17 2001-01-09 15:40:06 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -82,11 +82,7 @@ int ngcInt(number &i)
 /*2
 * delete a
 */
-#ifdef LDEBUG
-void ngcDBDelete (number * a,char *f, int l)
-#else
-void ngcDelete (number * a)
-#endif
+void ngcDelete (number * a, ring r)
 {
   if ( *a != NULL ) {
     delete *(gmp_complex**)a;

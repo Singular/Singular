@@ -3,17 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.14 2000-12-18 15:44:41 obachman Exp $ */
+/* $Id: modulop.h,v 1.15 2001-01-09 15:40:11 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
 #include "structs.h"
 
 // define if a*b is with mod instead of tables
-#if defined(i386)
-// seems to be better on i386 processors
 #define HAVE_MULT_MOD
-#endif
 
 extern int npPrimeM;
 extern int npGen;

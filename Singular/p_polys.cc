@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.14 2000-12-20 11:15:46 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.15 2001-01-09 15:40:12 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -825,7 +825,7 @@ poly p_NSet(number n, ring r)
 {
   if (r->cf->nIsZero(n))
   {
-    r->cf->nDelete(&n);
+    r->cf->cfDelete(&n, r);
     return NULL;
   }
   else

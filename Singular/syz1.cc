@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.69 2000-12-06 11:03:31 Singular Exp $ */
+/* $Id: syz1.cc,v 1.70 2001-01-09 15:40:14 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -899,7 +899,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
     if ((tso.p1!=NULL) && (tso.p2!=NULL))
     {
       coefgcd =
-        nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2));
+        nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing);
       tso.syz = pHead(tso.lcm);
       p = tso.syz;
       pSetCoeff(p,nDiv(pGetCoeff(tso.p1),coefgcd));

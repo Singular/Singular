@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.53 2000-12-31 15:14:35 obachman Exp $ */
+/* $Id: longalg.cc,v 1.54 2001-01-09 15:40:09 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -49,13 +49,10 @@ BOOLEAN naDBTest(number a, char *f,int l);
 number (*naMap)(number from);
 /* procedure variables */
 static numberfunc
-                nacMult, nacSub, nacAdd, nacDiv, nacIntDiv, nacGcd, nacLcm;
-#ifdef LDEBUG
-static void     (*nacDBDelete)(number *a,char *f,int l);
-#define         nacDelete(A) nacDBDelete(A,__FILE__,__LINE__)
-#else
-static void     (*nacDelete)(number *a);
-#endif
+                nacMult, nacSub, nacAdd, nacDiv, nacIntDiv;
+static number   (*nacGcd)(number a, number b, ring r);
+static number   (*nacLcm)(number a, number b, ring r);
+static void     (*nacDelete)(number *a, ring r);
        number   (*nacInit)(int i);
 static int      (*nacInt)(number &n);
        void     (*nacNormalize)(number &a);
@@ -74,7 +71,7 @@ static alg napTailred(alg q);
 static BOOLEAN napDivPoly(alg p, alg q);
 static int napExpi(int i, alg a, alg b);
 
-static number nadGcd( number a, number b) { return nacInit(1); }
+static number nadGcd( number a, number b, ring r) { return nacInit(1); }
 /*2
 *  sets the appropriate operators
 */
@@ -97,11 +94,7 @@ void naSetChar(int i, ring r)
   if (i == 1)
   {
     naIsChar0 = 1;
-#ifdef LDEBUG
-    nacDBDelete      = nlDBDelete;
-#else
     nacDelete      = nlDelete;
-#endif
     nacInit        = nlInit;
     nacInt         = nlInt;
     nacCopy        = nlCopy;
@@ -125,11 +118,7 @@ void naSetChar(int i, ring r)
   else if (i < 0)
   {
     naIsChar0 = 0;
-#ifdef LDEBUG
-    nacDBDelete    = nDBDummy1;
-#else
-    nacDelete      = nDummy1;
-#endif
+    nacDelete      = ndDelete;
     npSetChar(-i, r->algring); // to be changes HS
     nacInit        = npInit;
     nacInt         = npInt;
@@ -161,8 +150,7 @@ void naSetChar(int i, ring r)
 
 /*============= procedure for polynomials: napXXXX =======================*/
 
-#define napSetCoeff(p,n) {nacDelete(&((p)->ko));(p)->ko=n;}
-#define napIter(A) A=(A)->ne
+#define napSetCoeff(p,n) {nacDelete(&((p)->ko),currRing);(p)->ko=n;}
 
 
 #ifdef LDEBUG
@@ -220,7 +208,7 @@ static void napDelete1(alg *p)
   if (h!=NULL)
   {
     *p = h->ne;
-    nacDelete(&(h->ko));
+    nacDelete(&(h->ko),currRing);
     omFreeSize((ADDRESS)h, napMonomSize);
   }
 }
@@ -236,7 +224,7 @@ void napDelete(alg *p)
   {
     w = h;
     h = h->ne;
-    nacDelete(&(w->ko));
+    nacDelete(&(w->ko),currRing);
     omFreeSize((ADDRESS)w, napMonomSize);
   }
   *p = NULL;
@@ -363,12 +351,12 @@ alg napAdd(alg p1, alg p2)
       napDelete1(&a2);
       if (nacIsZero(t))
       {
-        nacDelete(&t);
+        nacDelete(&t,currRing);
         napDelete1(&a1);
       }
       else
       {
-        nacDelete(&(a1->ko));
+        nacDelete(&(a1->ko),currRing);
         a1->ko = t;
         a = a->ne = a1;
         a1 = a1->ne;
@@ -396,9 +384,9 @@ alg napAdd(alg p1, alg p2)
 /*3
 * multiply a alg. poly by -1
 */
-static alg napNeg(alg a)
+napoly napNeg(napoly a)
 {
-  alg p = a;
+  napoly p = a;
 
   while (p!=NULL)
   {
@@ -421,7 +409,7 @@ static void napMultN(alg p, number z)
     omCheckAddrSize(p,napMonomSize);
     t = nacMult(p->ko, z);
     nacNormalize(t);
-    nacDelete(&p->ko);
+    nacDelete(&p->ko,currRing);
     p->ko = t;
     p = p->ne;
   }
@@ -470,7 +458,7 @@ static void napMultT(alg a, alg exp)
       do
       {
         t = nacMult(a->ko, h);
-        nacDelete(&(a->ko));
+        nacDelete(&(a->ko),currRing);
         a->ko = t;
         for (i = naNumbOfPar - 1; i >= 0; i--)
           a->e[i] += exp->e[i];
@@ -570,7 +558,7 @@ static alg napRemainder(alg f, const alg  g)
     qq->ko = nacNeg(qq->ko);
     h = napCopy(g);
     napMultT(h, qq);
-    nacDelete(&(qq->ko));
+    nacDelete(&(qq->ko),currRing);
     a = napAdd(a, h);
   }
   while ((a!=NULL) && (a->e[0] >= g->e[0]));
@@ -598,7 +586,7 @@ static void napDivMod(alg f, alg  g, alg *q, alg *r)
     qq->ko = nacNeg(qq->ko);
     h = napCopy(g);
     napMultT(h, qq);
-    nacDelete(&(qq->ko));
+    nacDelete(&(qq->ko),currRing);
     a = napAdd(a, h);
   }
   while ((a!=NULL) && (a->e[0] >= g->e[0]));
@@ -627,8 +615,8 @@ static alg napInvers(alg x, const alg c)
     {
       h = nacInit(1);
       t = nacDiv(h, x->ko);
-      nacDelete(&(x->ko));
-      nacDelete(&h);
+      nacDelete(&(x->ko),currRing);
+      nacDelete(&h,currRing);
       x->ko = t;
     }
     return x;
@@ -645,8 +633,8 @@ static alg napInvers(alg x, const alg c)
     t = nacDiv(h, r->ko);
     nacNormalize(t);
     napMultN(qa, t);
-    nacDelete(&h);
-    nacDelete(&t);
+    nacDelete(&h,currRing);
+    nacDelete(&t,currRing);
     napDelete(&x);
     napDelete(&r);
     return qa;
@@ -665,8 +653,8 @@ static alg napInvers(alg x, const alg c)
     h = nacInit(1);
     t = nacDiv(h, r->ko);
     napMultN(q, t);
-    nacDelete(&h);
-    nacDelete(&t);
+    nacDelete(&h,currRing);
+    nacDelete(&t,currRing);
     napDelete(&x);
     napDelete(&r);
     if (q->e[0] >= c->e[0])
@@ -693,8 +681,8 @@ static alg napInvers(alg x, const alg c)
       h = nacInit(1);
       t = nacDiv(h, r->ko);
       napMultN(q, t);
-      nacDelete(&h);
-      nacDelete(&t);
+      nacDelete(&h,currRing);
+      nacDelete(&t,currRing);
       napDelete(&x);
       napDelete(&r);
       if (q->e[0] >= c->e[0])
@@ -926,29 +914,29 @@ static void napContent(alg ph)
   p = p->ne;
   do
   {
-    d=nacGcd(p->ko, h);
+    d=nacGcd(p->ko, h, currRing);
     if(nacIsOne(d))
     {
-      nacDelete(&h);
-      nacDelete(&d);
+      nacDelete(&h,currRing);
+      nacDelete(&d,currRing);
       return;
     }
-    nacDelete(&h);
+    nacDelete(&h,currRing);
     h = d;
     p = p->ne;
   }
   while (p!=NULL);
   h = nacInvers(d);
-  nacDelete(&d);
+  nacDelete(&d,currRing);
   p = ph;
   while (p!=NULL)
   {
     d = nacMult(p->ko, h);
-    nacDelete(&(p->ko));
+    nacDelete(&(p->ko),currRing);
     p->ko = d;
     p = p->ne;
   }
-  nacDelete(&h);
+  nacDelete(&h,currRing);
 }
 
 static void napCleardenom(alg ph)
@@ -962,8 +950,8 @@ static void napCleardenom(alg ph)
   h = nacInit(1);
   while (p!=NULL)
   {
-    d = nacLcm(h, p->ko);
-    nacDelete(&h);
+    d = nacLcm(h, p->ko, currRing);
+    nacDelete(&h,currRing);
     h = d;
     p = p->ne;
   }
@@ -973,11 +961,11 @@ static void napCleardenom(alg ph)
     while (p!=NULL)
     {
       d=nacMult(h, p->ko);
-      nacDelete(&(p->ko));
+      nacDelete(&(p->ko),currRing);
       p->ko = d;
       p = p->ne;
     }
-    nacDelete(&h);
+    nacDelete(&h,currRing);
   }
   napContent(ph);
 }
@@ -993,16 +981,16 @@ static alg napGcd0(alg a, alg b)
   while (a->ne!=NULL)
   {
     a = a->ne;
-    y = nacGcd(x, a->ko);
-    nacDelete(&x);
+    y = nacGcd(x, a->ko, currRing);
+    nacDelete(&x,currRing);
     x = y;
     if (nacIsOne(x))
       return napInitz(x);
   }
   do
   {
-    y = nacGcd(x, b->ko);
-    nacDelete(&x);
+    y = nacGcd(x, b->ko, currRing);
+    nacDelete(&x,currRing);
     x = y;
     if (nacIsOne(x))
       return napInitz(x);
@@ -1101,8 +1089,8 @@ number napLcm(alg a)
 
     while (b!=NULL)
     {
-      d = nacLcm(h, b->ko);
-      nacDelete(&h);
+      d = nacLcm(h, b->ko, currRing);
+      nacDelete(&h,currRing);
       h = d;
       b = b->ne;
     }
@@ -1274,11 +1262,7 @@ int naInt(number &n)
 /*2
 *  deletes p
 */
-#ifdef LDEBUG
-void naDBDelete(number *p,char *f, int lno)
-#else
-void naDelete(number *p)
-#endif
+void naDelete(number *p, ring r)
 {
   lnumber l = (lnumber) * p;
   if (l==NULL) return;
@@ -1689,7 +1673,7 @@ BOOLEAN naEqual (number a, number b)
 #endif
   number h = naSub(a, b);
   BOOLEAN bo = naIsZero(h);
-  naDelete(&h);
+  naDelete(&h,currRing);
   return bo;
 }
 
@@ -1830,11 +1814,11 @@ BOOLEAN naIsOne(number za)
       t = nacSub(x->ko, y->ko);
       if (!nacIsZero(t))
       {
-        nacDelete(&t);
+        nacDelete(&t,currRing);
         return FALSE;
       }
       else
-        nacDelete(&t);
+        nacDelete(&t,currRing);
     }
     x = x->ne;
     y = y->ne;
@@ -1884,7 +1868,7 @@ void naPower(number p, int i, number *rc)
   for (; i > 0; i--)
   {
     x = naMult(*rc, p);
-    naDelete(rc);
+    naDelete(rc,currRing);
     *rc = x;
   }
 }
@@ -1892,7 +1876,7 @@ void naPower(number p, int i, number *rc)
 /*2
 * result =gcd(a,b)
 */
-number naGcd(number a, number b)
+number naGcd(number a, number b, ring r)
 {
   lnumber x, y;
   lnumber result = (lnumber)omAlloc0Bin(rnumber_bin);
@@ -1984,7 +1968,7 @@ void naNormalize(number &pp)
     number n=napLcm(y);
     napMultN(x,n);
     napMultN(y,n);
-    nacDelete(&n);
+    nacDelete(&n,currRing);
     while(x!=NULL)
     {
       nacNormalize(x->ko);
@@ -2035,7 +2019,7 @@ void naNormalize(number &pp)
     number h1 = nacInvers(y->ko);
     nacNormalize(h1);
     napMultN(x, h1);
-    nacDelete(&h1);
+    nacDelete(&h1,currRing);
     napDelete1(&y);
     p->n = NULL;
     naTest(pp);
@@ -2082,7 +2066,7 @@ void naNormalize(number &pp)
       number n=napLcm(y);
       napMultN(x,n);
       napMultN(y,n);
-      nacDelete(&n);
+      nacDelete(&n,currRing);
       while(x!=NULL)
       {
         nacNormalize(x->ko);
@@ -2139,29 +2123,29 @@ void naNormalize(number &pp)
   napIter(x);
   while (x!=NULL)
   {
-    number d=nacGcd(g,napGetCoeff(x));
+    number d=nacGcd(g,napGetCoeff(x), currRing);
     if(nacIsOne(d))
     {
-      nacDelete(&g);
-      nacDelete(&d);
+      nacDelete(&g,currRing);
+      nacDelete(&d,currRing);
       naTest(pp);
       return;
     }
-    nacDelete(&g);
+    nacDelete(&g,currRing);
     g = d;
     napIter(x);
   }
   while (y!=NULL)
   {
-    number d=nacGcd(g,napGetCoeff(y));
+    number d=nacGcd(g,napGetCoeff(y), currRing);
     if(nacIsOne(d))
     {
-      nacDelete(&g);
-      nacDelete(&d);
+      nacDelete(&g,currRing);
+      nacDelete(&d,currRing);
       naTest(pp);
       return;
     }
-    nacDelete(&g);
+    nacDelete(&g,currRing);
     g = d;
     napIter(y);
   }
@@ -2179,7 +2163,7 @@ void naNormalize(number &pp)
     napSetCoeff(y,d);
     napIter(y);
   }
-  nacDelete(&g);
+  nacDelete(&g,currRing);
   naTest(pp);
 }
 
@@ -2187,7 +2171,7 @@ void naNormalize(number &pp)
 * returns in result->n 1
 * and in     result->z the lcm(a->z,b->n)
 */
-number naLcm(number la, number lb)
+number naLcm(number la, number lb, ring r)
 {
   lnumber result;
   lnumber a = (lnumber)la;
@@ -2209,17 +2193,17 @@ number naLcm(number la, number lb)
     alg xx=x;
     while (xx!=NULL)
     {
-      bt = nacGcd(t, xx->ko);
+      bt = nacGcd(t, xx->ko, currRing);
       r = nacMult(t, xx->ko);
-      nacDelete(&(xx->ko));
+      nacDelete(&(xx->ko),currRing);
       xx->ko = nacDiv(r, bt);
       nacNormalize(xx->ko);
-      nacDelete(&bt);
-      nacDelete(&r);
+      nacDelete(&bt,currRing);
+      nacDelete(&r,currRing);
       xx=xx->ne;
     }
   }
-  nacDelete(&t);
+  nacDelete(&t,currRing);
   result->z = x;
 #ifdef HAVE_FACTORY
   if (b->n!=NULL)
@@ -2270,7 +2254,7 @@ void naSetIdeal(ideal I)
         a=nacCopy(x->ko);
         a=nacDiv(nacInit(1),a);
         napMultN(x,a);
-        nacDelete(&a);
+        nacDelete(&a,currRing);
       }
     }
   }
@@ -2396,7 +2380,7 @@ number naMapQaQb(number c)
       if (erg->z==NULL)
       {
         number t_erg=(number)erg;
-        naDelete(&t_erg);
+        naDelete(&t_erg,currRing);
         return (number)NULL;
       }
     }
@@ -2569,7 +2553,6 @@ number   naGetDenom(number &n)
 #ifdef LDEBUG
 BOOLEAN naDBTest(number a, char *f,int l)
 {
-#if 0
   lnumber x=(lnumber)a;
   if (x == NULL)
     return TRUE;
@@ -2612,7 +2595,6 @@ BOOLEAN naDBTest(number a, char *f,int l)
     if (omCheckAddrSize(p, napMonomSize)) return FALSE;
     p = p->ne;
   }
-#endif
   return TRUE;
 }
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.83 2000-12-12 08:44:55 obachman Exp $ */
+/* $Id: tesths.cc,v 1.84 2001-01-09 15:40:16 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -225,9 +225,8 @@ int main(          /* main entry to Singular */
   }
   setjmp(si_start_jmpbuf);
   yyparse();
-#endif
-  //Print("at very end\n");
   m2_end(0);
+#endif
   return 0;
 }
 

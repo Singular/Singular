@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.52 2000-12-31 15:14:45 obachman Exp $ */
+/* $Id: structs.h,v 1.53 2001-01-09 15:40:13 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -21,6 +21,15 @@ typedef void * Sy_reference;
 /* the following defines should really go into mod2.h,
    but configure dislikes it */
 
+
+// define if a*b is with mod instead of tables
+#if defined(i386)
+// seems to be better on i386 processors
+#define HAVE_MULT_MOD
+#ifdef HAVE_MULT_MOD
+/* #define HAVE_DIV_MOD*/
+#endif
+#endif
 
 typedef long Exponent_t;
 typedef long Order_t;
@@ -92,7 +101,9 @@ struct snumber;
 struct sip_command;
 struct sip_package;
 struct s_si_link_extension;
+#ifndef LONGALGNEW
 struct reca;
+#endif /* not LONGALGNEW */
 
 typedef struct  n_Procs_s  n_Procs_s;
 
@@ -128,8 +139,12 @@ typedef ideal *            resolvente;
 typedef union uutypes      utypes;
 typedef ip_command *       command;
 typedef struct s_si_link_extension *si_link_extension;
+#ifndef LONGALGNEW
 typedef struct reca *      alg;
 #define napoly             alg
+#else /* LONGALGNEW */
+#define napoly             poly
+#endif /* LONGALGNEW */
 
 #ifdef __cplusplus
 typedef idrec *            idhdl;
@@ -161,7 +176,11 @@ struct sindlist
 struct snaIdeal
 {
   int anz;
+#ifndef LONGALGNEW
   alg *liste;
+#else /* LONGALGNEW */
+  poly *liste;
+#endif /* LONGALGNEW */
 };
 typedef struct snaIdeal * naIdeal;
 
@@ -200,8 +219,12 @@ struct n_Procs_s
    // Zp:
    int npPrimeM;
    int npPminus1M;
+   #ifdef HAVE_DIV_MOD
+   CARDINAL *npInvTable;
+   #else
    CARDINAL *npExpTable;
    CARDINAL *npLogTable;
+   #endif
    // Zp_a, Q_a
 
    // general stuff
@@ -228,14 +251,10 @@ struct n_Procs_s
            (*nGreaterZero)(number a);
    void    (*nPower)(number a, int i, number * result);
    number  (*nGetDenom)(number &n);
-   numberfunc nGcd, nLcm;
+   number  (*nGcd)(number a, number b, ring r);
+   number  (*nLcm)(number a, number b, ring r);
+   void    (*cfDelete)(number * a, ring r);
    nMapFunc (*nSetMap)(ring src, ring dst);
-#ifdef LDEBUG
-   BOOLEAN (*nDBTest)(number a, char *f, int l);
-   void    (*nDBDelete)(number * a,char *f, int l);
-#else
-   void    (*nDelete)(number * a);
-#endif
    char *  (*nName)(number n);
 //extern number  (*nMap)(number from);
 

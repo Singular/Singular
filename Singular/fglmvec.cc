@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.cc,v 1.14 2000-09-18 09:18:58 obachman Exp $
+// $Id: fglmvec.cc,v 1.15 2001-01-09 15:40:05 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -450,7 +450,7 @@ fglmVector::gcd() const
         while ( i > 0 && ! gcdIsOne ) {
             current= rep->getconstelem( i );
             if ( ! nIsZero( current ) ) {
-                number temp= nGcd( theGcd, current );
+                number temp= nGcd( theGcd, current, currRing );
                 nDelete( &theGcd );
                 theGcd= temp;
                 if ( nIsOne( theGcd ) ) gcdIsOne= TRUE;
@@ -473,7 +473,7 @@ fglmVector::clearDenom()
     for ( i= size(); i > 0; i-- ) {
         if ( ! nIsZero( rep->getconstelem(i) ) ) {
             isZero= FALSE;
-            number temp= nLcm( theLcm, rep->getconstelem( i ) );
+            number temp= nLcm( theLcm, rep->getconstelem( i ), currRing );
             nDelete( &theLcm );
             theLcm= temp;
         }

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.32 2000-12-15 18:49:28 Singular Exp $
+// $Id: fglmzero.cc,v 1.33 2001-01-09 15:40:06 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -982,7 +982,7 @@ fglmDdata::gaussreduce( fglmVector & v, fglmVector & p, number & pdenom )
             }
             nDelete( & gcd );
             gcd= p.gcd();
-            temp= nGcd( pdenom, gcd );
+            temp= nGcd( pdenom, gcd, currRing );
             nDelete( &gcd );
             gcd= temp;
             if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) ) {

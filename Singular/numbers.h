@@ -3,14 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.23 2000-12-15 18:49:35 Singular Exp $ */
+/* $Id: numbers.h,v 1.24 2001-01-09 15:40:12 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
 #include "structs.h"
 
 #define n_Copy(n, r)          (r)->cf->nCopy(n)
-#define n_Delete(n, r)        (r)->cf->nDelete(n)
+#define n_Delete(n, r)        (r)->cf->cfDelete(n,r)
 #define n_Mult(n1, n2, r)     (r)->cf->nMult(n1, n2)
 #define n_Add(n1, n2, r)      (r)->cf->nAdd(n1, n2)
 #define n_IsZero(n, r)        (r)->cf->nIsZero(n)
@@ -24,6 +24,8 @@
 #define n_GreaterZero(n, r)   (r)->cf->nGreaterZero(n)
 #define n_Write(n, r)         (r)->cf->nWrite(n)
 #define n_Normalize(n, r)     (r)->cf->nNormalize(n)
+#define n_Gcd(a, b, r)        (r)->cf->nGcd(a,b,r)
+#define n_IntDiv(a, b, r)     (r)->cf->nIntDiv(a,b)
 
 /* variables */
 extern short fftable[];
@@ -52,24 +54,20 @@ extern BOOLEAN (*nGreater)(number a,number b),
                (*nGreaterZero)(number a);
 extern void    (*nPower)(number a, int i, number * result);
 extern number  (*nGetDenom)(number &n);
-extern numberfunc nGcd, nLcm;
+extern number (*nGcd)(number a, number b, ring r);
+extern number (*nLcm)(number a, number b, ring r);
 
 extern number nNULL; /* the 0 as constant */
 
-#ifdef LDEBUG
-extern BOOLEAN (*nDBTest)(number a, char *f, int l);
-#define nTest(a) nDBTest(a,__FILE__,__LINE__)
-extern void    (*nDBDelete)(number * a,char *f, int l);
-#define nDelete(A) nDBDelete(A,__FILE__,__LINE__)
-#else
+extern void    (*n__Delete)(number * a, ring r);
 #define nTest(a) (1)
-extern void    (*nDelete)(number * a);
-#endif
+#define nDelete(A) (currRing)->cf->cfDelete(A,currRing)
 
 #define nSetMap(R) (currRing->cf->nSetMap(R,currRing))
 extern char *  (*nName)(number n);
 
 void nDummy1(number* d);
+void ndDelete(number* d, ring r);
 void nDummy2(number &d);
 number ndGcd(number a, number b);
 number ndCopy(number a);

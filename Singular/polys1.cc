@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.61 2000-12-31 15:14:42 obachman Exp $ */
+/* $Id: polys1.cc,v 1.62 2001-01-09 15:40:13 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -14,6 +14,7 @@
 #include "structs.h"
 #include "tok.h"
 #include "numbers.h"
+#include "ffields.h"
 #include "omalloc.h"
 #include "febase.h"
 #include "weight.h"
@@ -27,8 +28,7 @@
 #include "clapsing.h"
 #endif
 
-
-/*-----------------------------------------------------------*/
+/*-------- several access procedures to monomials -------------------- */
 /*
 * the module weights for std
 */
@@ -484,7 +484,7 @@ void pContent(poly ph)
     while (p!=NULL)
     {
       nNormalize(pGetCoeff(p));
-      d=nGcd(h,pGetCoeff(p));
+      d=nGcd(h,pGetCoeff(p),currRing);
       nDelete(&h);
       h = d;
       if(nIsOne(h))
@@ -588,6 +588,63 @@ void pContent(poly ph)
 //#endif
 //  }
 //}
+void p_Content(poly ph, ring r)
+{
+  number h,d;
+  poly p;
+
+  if(pNext(ph)==NULL)
+  {
+    pSetCoeff(ph,n_Init(1,r));
+  }
+  else
+  {
+    n_Normalize(pGetCoeff(ph),r);
+    if(!n_GreaterZero(pGetCoeff(ph),r)) ph = p_Neg(ph,r);
+    h=n_Copy(pGetCoeff(ph),r);
+    p = pNext(ph);
+    while (p!=NULL)
+    {
+      n_Normalize(pGetCoeff(p),r);
+      d=n_Gcd(h,pGetCoeff(p),r);
+      n_Delete(&h,r);
+      h = d;
+      if(n_IsOne(h,r))
+      {
+        break;
+      }
+      pIter(p);
+    }
+    p = ph;
+    //number tmp;
+    if(!n_IsOne(h,r))
+    {
+      while (p!=NULL)
+      {
+        //d = nDiv(pGetCoeff(p),h);
+        //tmp = nIntDiv(pGetCoeff(p),h);
+        //if (!nEqual(d,tmp))
+        //{
+        //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
+        //  nWrite(h);StringAppendS("=");nWrite(d);StringAppendS(" int:");
+        //  nWrite(tmp);Print(StringAppendS("\n"));
+        //}
+        //nDelete(&tmp);
+        d = n_IntDiv(pGetCoeff(p),h,r);
+        p_SetCoeff(p,d,r);
+        pIter(p);
+      }
+    }
+    n_Delete(&h,r);
+#ifdef HAVE_FACTORY
+    //if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+    //{
+    //  singclap_divide_content(ph);
+    //  if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
+    //}
+#endif
+  }
+}
 
 void pCleardenom(poly ph)
 {
@@ -605,7 +662,7 @@ void pCleardenom(poly ph)
     while (p!=NULL)
     {
       nNormalize(pGetCoeff(p));
-      d=nLcm(h,pGetCoeff(p));
+      d=nLcm(h,pGetCoeff(p),currRing);
       nDelete(&h);
       h=d;
       pIter(p);
@@ -641,7 +698,7 @@ void pCleardenom(poly ph)
           p=ph;
           while (p!=NULL)
           {
-            d=nLcm(h,pGetCoeff(p));
+            d=nLcm(h,pGetCoeff(p),currRing);
             nDelete(&h);
             h=d;
             pIter(p);
@@ -703,6 +760,75 @@ BOOLEAN pIsHomogeneous (poly p)
   return TRUE;
 }
 
+// orders monoms of poly using merge sort (ususally faster than
+// insertion sort). ASSUMES that pSetm was performed on monoms
+poly pOrdPolyMerge(poly p)
+{
+  poly qq,pp,result=NULL;
+
+  if (p == NULL) return NULL;
+
+  loop
+  {
+    qq = p;
+    loop
+    {
+      if (pNext(p) == NULL)
+      {
+        result=pAdd(result, qq);
+        pTest(result);
+        return result;
+      }
+      if (pLmCmp(p,pNext(p)) != 1)
+      {
+        pp = p;
+        pIter(p);
+        pNext(pp) = NULL;
+        result = pAdd(result, qq);
+        break;
+      }
+      pIter(p);
+    }
+  }
+}
+
+// orders monoms of poly using insertion sort, performs pSetm on each monom
+poly pOrdPolyInsertSetm(poly p)
+{
+  poly qq,result = NULL;
+
+#if 0
+  while (p != NULL)
+  {
+    qq = p;
+    pIter(p);
+    qq->next = NULL;
+    pSetm(qq);
+    result = pAdd(result,qq);
+    pTest(result);
+  }
+#else
+  while (p != NULL)
+  {
+    qq = p;
+    pIter(p);
+    qq->next = result;
+    result = qq;
+    pSetm(qq);
+  }
+  p = result;
+  result = NULL;
+  while (p != NULL)
+  {
+    qq = p;
+    pIter(p);
+    qq->next = NULL;
+    result = pAdd(result, qq);
+  }
+  pTest(result);
+#endif
+  return result;
+}
 
 /*2
 *returns a re-ordered copy of a polynomial, with permutation of the variables
@@ -718,7 +844,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing, nMapFunc nMap,
 
   while (p != NULL)
   {
-    if (OldPar==0)
+    if ((OldPar==0)||(rField_is_GF(oldRing)))
     {
       qq = pInit();
       number n=nMap(pGetCoeff(p));
@@ -770,9 +896,21 @@ poly pPermPoly (poly p, int * perm, ring oldRing, nMapFunc nMap,
             pAddExp(qq,perm[i], e/*p_GetExp( p,i,oldRing)*/);
           else if (perm[i]<0)
           {
-            lnumber c=(lnumber)pGetCoeff(qq);
-            napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
-            mapped_to_par=1;
+            if (rField_is_GF())
+            {
+              number c=pGetCoeff(qq);
+              number ee=nfPar(1);
+              number eee;nfPower(ee,e,&eee); //nfDelete(ee,currRing);
+              ee=nfMult(c,eee);
+              //nfDelete(c,currRing);nfDelete(eee,currRing);
+              pSetCoeff0(qq,ee);
+            }
+            else
+            {
+              lnumber c=(lnumber)pGetCoeff(qq);
+              napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
+              mapped_to_par=1;
+            }
           }
           else
           {

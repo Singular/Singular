@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.35 2000-12-21 13:22:00 pohl Exp $ */
+/* $Id: longrat.cc,v 1.36 2001-01-09 15:40:10 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1112,7 +1112,7 @@ BOOLEAN nlGreater (number a, number b)
   BOOLEAN rr;
   r=nlSub(a,b);
   rr=(!nlIsZero(r)) && (nlGreaterZero(r));
-  nlDelete(&r);
+  nlDelete(&r,currRing);
   return rr;
 }
 
@@ -1132,7 +1132,7 @@ BOOLEAN nlIsMOne (number a)
 /*2
 * result =gcd(a,b)
 */
-number nlGcd(number a, number b)
+number nlGcd(number a, number b, ring r)
 {
   number result;
 #ifdef LDEBUG
@@ -1218,7 +1218,7 @@ void nlNormalize (number &x)
   {
     if (mpz_cmp_ui(&x->z,(long)0)==0)
     {
-      nlDelete(&x);
+      nlDelete(&x,currRing);
       x=nlInit(0);
       return;
     }
@@ -1291,7 +1291,7 @@ void nlNormalize (number &x)
 /*2
 * returns in result->z the lcm(a->z,b->n)
 */
-number nlLcm(number a, number b)
+number nlLcm(number a, number b, ring r)
 {
   number result;
 #ifdef LDEBUG
@@ -1503,7 +1503,7 @@ number _nlCopy_NoImm(number a)
   return b;
 }
 
-void _nlDelete_NoImm(number *a)
+void _nlDelete_NoImm(number *a, ring r)
 {
   switch ((*a)->s)
   {
@@ -2189,7 +2189,7 @@ number nlRInit (int i)
 number nlRInit (int i);
 BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b);
 number  _nlCopy_NoImm(number a);
-void    _nlDelete_NoImm(number *a);
+void    _nlDelete_NoImm(number *a, ring r);
 number  _nlNeg_NoImm(number a);
 number  _nlAdd_aNoImm_OR_bNoImm(number a, number b);
 number  _nlSub_aNoImm_OR_bNoImm(number a, number b);
@@ -2274,11 +2274,7 @@ LINLINE void nlNew (number * r)
 /*2
 * delete a
 */
-#ifdef LDEBUG
-void nlDBDelete (number * a,char *f, int l)
-#else
-LINLINE void nlDelete (number * a)
-#endif
+LINLINE void nlDelete (number * a, ring r)
 {
   if (*a!=NULL)
   {
@@ -2286,7 +2282,7 @@ LINLINE void nlDelete (number * a)
     nlTest(*a);
 #endif
     if ((SR_HDL(*a) & SR_INT)==0)
-      _nlDelete_NoImm(a);
+      _nlDelete_NoImm(a,r);
     *a=NULL;
   }
 }

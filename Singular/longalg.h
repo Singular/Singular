@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.24 2000-12-15 18:49:32 Singular Exp $ */
+/* $Id: longalg.h,v 1.25 2001-01-09 15:40:10 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -40,12 +40,8 @@ extern int napMonomSize;
 void naSetChar(int p, ring r);
 #define napAddExp(P,I,E)  ((P)->e[I-1]+=(E))
 #define napLength(p)      (pLength((poly)p))
-#ifdef LDEBUG
-void    naDBDelete (number *p,char *f, int l);
-#define naDelete(A) naDBDelete(A,__FILE__,__LINE__)
-#else
-void    naDelete (number *p);
-#endif
+napoly napNeg(napoly a);
+void    naDelete (number *p, ring r);
 number  naInit(int i);                              /* z := i */
 number  naPar(int i);                               /* z := par(i) */
 int     naParDeg(number n);                         /* i := deg(n) */
@@ -71,8 +67,8 @@ number  naIntDiv(number la, number li);            /* lo := la/li */
 //number  naIntMod(number la, number li);            /* lo := la/li */
 number  naSub(number la, number li);               /* lu := la-li */
 void    naNormalize(number &p);
-number  naGcd(number a, number b);
-number  naLcm(number a, number b);
+number  naGcd(number a, number b, ring r);
+number  naLcm(number a, number b, ring r);
 char *  naRead(char * s, number * p);
 void    naWrite(number &p);
 char *  naName(number n);

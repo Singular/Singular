@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.36 2000-12-20 11:15:46 obachman Exp $ */
+/* $Id: numbers.cc,v 1.37 2001-01-09 15:40:12 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -49,14 +49,10 @@ void    (*nWrite)(number &a);
 char *  (*nRead)(char *s,number *a);
 void    (*nPower)(number a, int i, number * result);
 number  (*nGetDenom)(number &n);
-numberfunc nGcd,nLcm;
+number  (*nGcd)(number a, number b, ring r);
+number  (*nLcm)(number a, number b, ring r);
 char * (*nName)(number n);
-#ifdef LDEBUG
-BOOLEAN (*nDBTest)(number a, char *f, int l);
-void (*nDBDelete)(number *a, char *f, int l);
-#else
-void   (*nDelete)(number *a);
-#endif
+void   (*n__Delete)(number *a, ring r);
 
 /*0 implementation*/
 number nNULL; /* the 0 as constant */
@@ -66,6 +62,7 @@ int    nChar;
 n_Procs_s *cf_root=NULL;
 
 void   nDummy1(number* d) { *d=NULL; }
+void   ndDelete(number* d, ring r) { *d=NULL; }
 
 #ifdef LDEBUG
 void   nDBDummy1(number* d,char *f, int l) { *d=NULL; }
@@ -81,7 +78,7 @@ number ndReturn0(number n) { return nInit(0); }
 
 int    ndParDeg(number n) { return 0; }
 
-number ndGcd(number a, number b) { return nInit(1); }
+number ndGcd(number a, number b, ring r) { return r->cf->nInit(1); }
 
 number ndIntMod(number a, number b) { return nInit(0); }
 
@@ -102,24 +99,39 @@ void nSetChar(ring r)
   int c=rInternalChar(r);
 
   nChar=c;
-#ifdef LDEBUG
-  nDBDelete= r->cf->nDBDelete;
-#else
-  nDelete= r->cf->nDelete;
-#endif
+  n__Delete= r->cf->cfDelete;
   if (rField_is_Extension(r))
   {
     naSetChar(c,r);
+#ifdef LONGALGNEW
+    test |= Sy_bit(OPT_INTSTRATEGY); /*intStrategy*/
+    test &= ~Sy_bit(OPT_REDTAIL); /*noredTail*/
+  }
+  else if (rField_is_Q(r))
+  {
+    test |= Sy_bit(OPT_INTSTRATEGY); /*26*/
+#endif /* LONGALGNEW */
   }
   else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
     npSetChar(c, r);
+#ifdef LONGALGNEW
+    test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
+#endif /* LONGALGNEW */
   }
   /* -------------- GF(p^m) -----------------------*/
   else if (rField_is_GF(r))
   {
+#ifdef LONGALGNEW
+    test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
+#endif /* LONGALGNEW */
     nfSetChar(c,r->parameter);
+  }
+  /* -------------- R -----------------------*/
+  //if (c==(-1))
+  else if (rField_is_R(r))
+  {
   }
   /* -------------- long R -----------------------*/
   else if (rField_is_long_R(r))
@@ -171,9 +183,6 @@ void nSetChar(ring r)
   nGetDenom = r->cf->nGetDenom;
   nRePart = r->cf->nRePart;
   nImPart = r->cf->nImPart;
-#ifdef LDEBUG
-  nDBTest=r->cf->nDBTest;
-#endif
   if (!errorreported) nNULL=r->cf->nNULL;
 }
 
@@ -192,6 +201,7 @@ void nInitChar(ring r)
       int ch=-c;
       if (c==1) ch=0;
       r->algring=(ring) rDefault(ch,r->P,r->parameter);
+      //r->algring->ShortOut=r->ShortOut;
       // includes: nInitChar(r->algring);
     }
   }
@@ -227,14 +237,12 @@ void nInitChar(ring r)
   r->cf->nGetDenom= ndGetDenom;
   r->cf->nName =  ndName;
   r->cf->nImPart=ndReturn0;
+  r->cf->cfDelete= ndDelete;
+  r->cf->nNew=nDummy1;
   if (rField_is_Extension(r))
   {
     //naInitChar(c,TRUE,r);
-#ifdef LDEBUG
-    r->cf->nDBDelete = naDBDelete;
-#else
-    r->cf->nDelete = naDelete;
-#endif
+    r->cf->cfDelete = naDelete;
     r->cf-> nNew       = naNew;
     r->cf-> nNormalize = naNormalize;
     r->cf->nInit       = naInit;
@@ -267,16 +275,12 @@ void nInitChar(ring r)
     r->cf->nSize       = naSize;
     r->cf->nGetDenom   = naGetDenom;
 #ifdef LDEBUG
-    r->cf->nDBTest     = naDBTest;
+    //r->cf->nDBTest     = naDBTest;
 #endif
   }
   else if (rField_is_Q(r))
   {
-#ifdef LDEBUG
-    r->cf->nDBDelete= nlDBDelete;
-#else
-    r->cf->nDelete= nlDelete;
-#endif
+    r->cf->cfDelete= nlDelete;
     r->cf->nNew   = nlNew;
     r->cf->nNormalize=nlNormalize;
     r->cf->nInit  = nlInit;
@@ -306,19 +310,13 @@ void nInitChar(ring r)
     r->cf->nSize  = nlSize;
     r->cf->nGetDenom = nlGetDenom;
 #ifdef LDEBUG
-    r->cf->nDBTest=nlDBTest;
+    //r->cf->nDBTest=nlDBTest;
 #endif
   }
   else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
-#ifdef LDEBUG
-    r->cf->nDBDelete= nDBDummy1;
-#else
-    r->cf->nDelete= nDummy1;
-#endif
     npInitChar(c,r);
-    r->cf->nNew   = nDummy1;
     r->cf->nNormalize=nDummy2;
     r->cf->nInit  = npInit;
     r->cf->nInt   = npInt;
@@ -347,19 +345,13 @@ void nInitChar(ring r)
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    r->cf->nDBTest=npDBTest;
+    //r->cf->nDBTest=npDBTest;
 #endif
   }
   /* -------------- GF(p^m) -----------------------*/
   else if (rField_is_GF(r))
   {
-#ifdef LDEBUG
-    r->cf->nDBDelete= nDBDummy1;
-#else
-    r->cf->nDelete= nDummy1;
-#endif
     //nfSetChar(c,r->parameter);
-    r->cf->nNew   = nDummy1;
     r->cf->nNormalize=nDummy2;
     r->cf->nInit  = nfInit;
     r->cf->nPar   = nfPar;
@@ -390,19 +382,13 @@ void nInitChar(ring r)
     r->cf->nName= nfName;
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    r->cf->nDBTest=nfDBTest;
+    //r->cf->nDBTest=nfDBTest;
 #endif
   }
   /* -------------- R -----------------------*/
   //if (c==(-1))
   else if (rField_is_R(r))
   {
-#ifdef LDEBUG
-    r->cf->nDBDelete= nDBDummy1;
-#else
-    r->cf->nDelete= nDummy1;
-#endif
-    r->cf->nNew=nDummy1;
     r->cf->nNormalize=nDummy2;
     r->cf->nInit  = nrInit;
     r->cf->nInt   = nrInt;
@@ -431,18 +417,14 @@ void nInitChar(ring r)
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    r->cf->nDBTest=nrDBTest;
+    //r->cf->nDBTest=nrDBTest;
 #endif
   }
   /* -------------- long R -----------------------*/
   else if (rField_is_long_R(r))
   {
     //setGMPFloatDigits(r->ch_flags);
-#ifdef LDEBUG
-    r->cf->nDBDelete= ngfDBDelete;
-#else
-    r->cf->nDelete= ngfDelete;
-#endif
+    r->cf->cfDelete= ngfDelete;
     r->cf->nNew=ngfNew;
     r->cf->nNormalize=nDummy2;
     r->cf->nInit  = ngfInit;
@@ -472,18 +454,14 @@ void nInitChar(ring r)
     r->cf->nName= ndName;
     r->cf->nSize  = ndSize;
 #ifdef LDEBUG
-    r->cf->nDBTest=ngfDBTest;
+    //r->cf->nDBTest=ngfDBTest;
 #endif
   }
   /* -------------- long C -----------------------*/
   else if (rField_is_long_C(r))
   {
     //setGMPFloatDigits(r->ch_flags);
-#ifdef LDEBUG
-    r->cf->nDBDelete= ngcDBDelete;
-#else
-    r->cf->nDelete= ngcDelete;
-#endif
+    r->cf->cfDelete= ngcDelete;
     r->cf->nNew=ngcNew;
     r->cf->nNormalize=nDummy2;
     r->cf->nInit  = ngcInit;
@@ -515,7 +493,7 @@ void nInitChar(ring r)
     r->cf->nImPart=ngcImPart;
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    r->cf->nDBTest=ngcDBTest;
+    //r->cf->nDBTest=ngcDBTest;
 #endif
   }
 #ifdef TEST
@@ -547,14 +525,19 @@ void nKillChar(ring r)
       {
         n->next=n->next->next;
         cf_root=tmp.next;
-        r->cf->nDelete(&(r->cf->nNULL));
+        r->cf->cfDelete(&(r->cf->nNULL),r);
         switch(r->cf->type)
         {
           case n_Zp:
+               #ifdef HAVE_DIV_MOD
+               omFreeSize( (ADDRESS)r->cf->npInvTable,
+                           r->cf->npPrimeM*sizeof(CARDINAL) );
+               #else
                omFreeSize( (ADDRESS)r->cf->npExpTable,
                            r->cf->npPrimeM*sizeof(CARDINAL) );
                omFreeSize( (ADDRESS)r->cf->npLogTable,
                            r->cf->npPrimeM*sizeof(CARDINAL) );
+               #endif
                break;
 
           default:

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.h,v 1.8 2000-12-20 10:54:24 pohl Exp $ */
+/* $Id: gnumpfl.h,v 1.9 2001-01-09 15:40:07 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -31,19 +31,10 @@ void     ngfWrite(number &a);
 
 #ifdef LDEBUG
 BOOLEAN  ngfDBTest(number a, char *f, int l);
-void     ngfDBDelete(number *a, char *f, int l);
-#define  ngfDelete(A) nlDBDelete(A,__FILE__,__LINE__)
-#else
-void     ngfDelete(number *a);
 #endif
+void     ngfDelete(number *a, ring r);
 
 nMapFunc  ngfSetMap(ring src, ring dst);
 
 void setGMPFloatDigits( size_t digits, size_t rest );
 #endif
-
-
-// local Variables: ***
-// folded-file: t ***
-// compile-command: "make installg" ***
-// End: *** 
