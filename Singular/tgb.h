@@ -75,6 +75,7 @@ struct calc_dat
   int** deg;
   int* T_deg;
   int* misses;
+	poly* gcd_of_terms;
   int_pair_node* soon_free;
   sorted_pair_node* pairs;
   sorted_pair_node** apairs;
@@ -99,6 +100,8 @@ struct calc_dat
   int last_index;
   int max_pairs;
   int pair_top;
+  int easy_product_crit;
+  int extended_product_crit;
   BOOLEAN is_char0;
 };
 static int bucket_guess(kBucket* bucket);
@@ -127,4 +130,7 @@ static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, calc_dat* c)
 static void sort_pair_in(int i, int j,calc_dat* c);
 static int pair_better_gen(const void* ap,const void* bp);
 static poly redTailShort(poly h, kStrategy strat);
+poly gcd_of_terms(poly p, ring r);
+BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, calc_dat* c);
+static poly kBucketGcd(kBucket* b, ring r);
 #endif

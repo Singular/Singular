@@ -4,9 +4,8 @@
 // #define OM_KEEP  1
 
 #include "tgb.h"
-
-
-#define LEN_VAR3
+#define OM_KEEP 0
+#define LEN_VAR1
 
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
@@ -910,6 +909,8 @@ static void initial_data(calc_dat* c, ideal I){
   void* h;
   poly hp;
   int i,j;
+  c->easy_product_crit=0;
+  c->extended_product_crit=0;
   c->is_char0=(rChar()==0);
   c->reduction_steps=0;
   c->last_index=-1;
@@ -953,6 +954,7 @@ static void initial_data(calc_dat* c, ideal I){
   h=omalloc(n*sizeof(int));
   c->lengths=(int*) h;
   h=omalloc(n*sizeof(int));
+        c->gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
   c->rep=(int*) h;
   c->short_Exps=(long*) omalloc(n*sizeof(long));
   c->S=idInit(n,1);
@@ -1000,6 +1002,7 @@ static void initial_data(calc_dat* c, ideal I){
       ++(c->pair_top);
    }
 }
+//very important: ILM
 
 //len should be weighted length in char 0
 static int simple_posInS (kStrategy strat, poly p,int len, BOOLEAN is_char0)
@@ -1084,11 +1087,10 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
   c->misses[i]=0;
   c->lengths[i]=pLength(h);
   hp=omrealloc(c->states, c->n * sizeof(char*));
-  if (hp!=NULL){
+ 
     c->states=(char**) hp;
-  } else {
-    exit(1);
-  }
+  c->gcd_of_terms=(poly*) omrealloc(c->gcd_of_terms, c->n *sizeof(poly));
+  c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
   c->deg=(int**) omrealloc(c->deg, c->n * sizeof(int*));
   c->rep[i]=i;
   hp=omalloc(i*sizeof(char));
@@ -1141,10 +1143,18 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
     }
     if ((c->lengths[i]==1) && (c->lengths[j]==1))
       c->states[i][j]=HASTREP;
-    else if (pHasNotCF(c->S->m[i],c->S->m[j]))
+    else if (pHasNotCF(c->S->m[i],c->S->m[j])){
+      c->easy_product_crit++;
       c->states[i][j]=HASTREP;
+    }
+                        else if(extended_product_criterion(c->S->m[i],c->gcd_of_terms[i],c->S->m[j],c->gcd_of_terms[j],c)){
+                                        c->states[i][j]=HASTREP;
+					c->extended_product_crit++;
+                                        //PrintS("E");
+                        }
     if (c->states[i][j]==UNCALCULATED){
 //      sort_pair_in(i,j,c);
+      
       poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
       if (short_s)
       {
@@ -1347,10 +1357,10 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
                 ||(len_upper_bound<strat->lenS[j]/2))
             {
               PrintS("e");
-	      int dummy_len;
+              int dummy_len;
               kBucketClear(P.bucket,&sec_copy,&dummy_len);
               kBucketInit(P.bucket,pCopy(sec_copy),dummy_len
-	                                          /*pLength(sec_copy)*/);
+                                                  /*pLength(sec_copy)*/);
               must_expand=TRUE;
             }
           }
@@ -1383,13 +1393,13 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
           Print("%i",strat->lenS[j]-new_length);
           len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
           int new_pos;
-	  if(c->is_char0)
-	    new_pos=simple_posInS(c->strat,sec_copy,
-	                          pSLength(sec_copy,new_length),
-				  c->is_char0);//hac
-	  else
-	    new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
-	  assume(new_pos<=j);
+          if(c->is_char0)
+            new_pos=simple_posInS(c->strat,sec_copy,
+                                  pSLength(sec_copy,new_length),
+                                  c->is_char0);//hac
+          else
+            new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
+          assume(new_pos<=j);
 //          p=NULL;
           for (z=c->n;z;z--)
           {
@@ -1429,8 +1439,8 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 
 
               c->strat->lenS[old_pos]=new_length;
-	      if(c->strat->lenSw)
-		c->strat->lenS[old_pos]=pSLength(sec_copy,new_length);
+              if(c->strat->lenSw)
+                c->strat->lenS[old_pos]=pSLength(sec_copy,new_length);
               int i=0;
               for(i=new_pos;i<old_pos;i++){
                 if (strat->lenS[i]<=new_length)
@@ -1501,7 +1511,31 @@ static poly redTailShort(poly h, kStrategy strat){
   return(redNFTail(h,i-1,strat, len));
 }
 
-
+static void line_of_extended_prod(int fixpos,calc_dat* c){
+    if (c->gcd_of_terms[fixpos]==NULL)
+  {
+    c->gcd_of_terms[fixpos]=gcd_of_terms(c->S->m[fixpos],c->r);
+    if (c->gcd_of_terms[fixpos])
+    {
+      int i;
+      for(i=0;i<fixpos;i++)
+        if((c->states[fixpos][i]!=HASTREP)&& (extended_product_criterion(c->S->m[fixpos],c->gcd_of_terms[fixpos], c->S->m[i],c->gcd_of_terms[i],c)))
+{
+          c->states[fixpos][i]=HASTREP;
+	  c->extended_product_crit++;
+}     
+      for(i=fixpos+1;i<c->n;i++)
+        if((c->states[i][fixpos]!=HASTREP)&& (extended_product_criterion(c->S->m[fixpos],c->gcd_of_terms[fixpos], c->S->m[i],c->gcd_of_terms[i],c)))
+	{        c->states[i][fixpos]=HASTREP;
+	c->extended_product_crit++;
+	}
+    }
+  }
+}
+static void c_S_element_changed_hook(int pos, calc_dat* c){
+  length_one_crit(c,pos, c->lengths[pos]);
+  line_of_extended_prod(pos,c);
+}
 
 static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
 {
@@ -1514,7 +1548,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
   int wlen_upper;
   int j;
   kStrategy strat=c->strat;
-  assume(strat->sl<50000);
+
   if (0 > strat->sl)
   {
 
@@ -1544,23 +1578,23 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
       if (j>=0)
       {
         poly sec_copy=NULL;
-	if (c->is_char0) wlen_upper=kSBucketLength(obj->P->bucket);
+        if (c->is_char0) wlen_upper=kSBucketLength(obj->P->bucket);
         BOOLEAN must_expand=FALSE;
         BOOLEAN must_replace_in_basis;
-	if(c->is_char0)
-	  must_replace_in_basis=(wlen_upper<strat->lenSw[j]);//first test
-	else
-	  must_replace_in_basis=(obj->len_upper_bound<strat->lenS[j]);//first test
+        if(c->is_char0)
+          must_replace_in_basis=(wlen_upper<strat->lenSw[j]);//first test
+        else
+          must_replace_in_basis=(obj->len_upper_bound<strat->lenS[j]);//first test
         if (must_replace_in_basis)
         {
           //second test
           if (pLmEqual(obj->P->p,strat->S[j]))
           {
-	    int dummy_len;
+            int dummy_len;
             PrintS("b");
             kBucketClear(obj->P->bucket,&sec_copy,&dummy_len);
             kBucketInit(obj->P->bucket,pCopy(sec_copy),dummy_len
-	                                                 /*pLength(sec_copy)*/);
+                                                         /*pLength(sec_copy)*/);
           }
           else
           {
@@ -1568,15 +1602,15 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
             if ((obj->len_upper_bound==1)
                 ||(obj->len_upper_bound==2)
                 ||(obj->len_upper_bound<strat->lenS[j]/2)
-		||
-		(c->is_char0 && (wlen_upper<strat->lenSw[j]/100))
+                ||
+                (c->is_char0 && (wlen_upper<strat->lenSw[j]/100))
 )
             {
-	      int dummy_len;
+              int dummy_len;
               PrintS("e");
               kBucketClear(obj->P->bucket,&sec_copy,&dummy_len);
               kBucketInit(obj->P->bucket,pCopy(sec_copy),dummy_len 
-	                                                 /*pLength(sec_copy)*/);
+                                                         /*pLength(sec_copy)*/);
               must_expand=TRUE;
             }
           }
@@ -1592,13 +1626,36 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
           wrp(strat->S[j]);
         }
 #endif
+	if ((!must_replace_in_basis) && (pLmEqual(obj->P->p,c->strat->S[j]))){
+	  obj->need_std_rep=TRUE;
+	  int is;
+	  for(is=0;is<c->n;is++)
+	    if(c->S->m[is]==c->strat->S[j])
+	      break;
+	  if (is!=c->n){
+	    if (c->gcd_of_terms[is]==NULL) {
+	      poly m=kBucketGcd(obj->P->bucket,c->r);
+	      if (m!=NULL){
+	      pDelete(&m);
+	      kBucketCanonicalize(obj->P->bucket);
+	      m=kBucketGcd(obj->P->bucket,c->r);
+	      c->gcd_of_terms[is]=m;
+	      line_of_extended_prod(is,c);
+	      PrintS("C");
+	      }
+	      
+	    }
+	  }
+	}
+
         obj->len_upper_bound=obj->len_upper_bound+strat->lenS[j]-2;
         number coef=kBucketPolyRed(obj->P->bucket,strat->S[j],
                                    strat->lenS[j]/*pLength(strat->S[j])*/,
                                    strat->kNoether);
         nDelete(&coef);
         h = kBucketGetLm(obj->P->bucket);
-
+		    
+      
         if (must_replace_in_basis){
           obj->need_std_rep=TRUE;
           int pos_in_c=-1;
@@ -1609,15 +1666,15 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
           Print("%i",strat->lenS[j]-new_length);
           obj->len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
 
-	            int new_pos;
-	  if(c->is_char0)
-	    new_pos=simple_posInS(c->strat,sec_copy,
-	                          pSLength(sec_copy,new_length),
-				  c->is_char0);//hac
-	  else
-	    new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
+                    int new_pos;
+          if(c->is_char0)
+            new_pos=simple_posInS(c->strat,sec_copy,
+                                  pSLength(sec_copy,new_length),
+                                  c->is_char0);//hac
+          else
+            new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
 //          p=NULL;
-	  assume(new_pos<=j);
+          assume(new_pos<=j);
           for (z=c->n;z;z--)
           {
             if(p==c->S->m[z-1])
@@ -1631,7 +1688,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
             //LEAVE
             deleteInS(j,c->strat);
             add_to_reductors(c,sec_copy,pLength(sec_copy));
-	    pDelete(&p);
+            pDelete(&p);
           }
           else {
 //shorten_tails may alter position (not the length, even not by recursion in GLOBAL case)
@@ -1646,8 +1703,8 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
               new_pos=min(old_pos, new_pos);
               assume(new_pos<=old_pos);
               c->strat->lenS[old_pos]=new_length;
-	      if(c->strat->lenSw)
-		c->strat->lenS[old_pos]=pSLength(sec_copy,new_length);
+              if(c->strat->lenSw)
+                c->strat->lenS[old_pos]=pSLength(sec_copy,new_length);
               int i=0;
               for(i=new_pos;i<old_pos;i++){
                 if (strat->lenS[i]<=new_length)
@@ -1655,15 +1712,16 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
                 else
                   break;
               }
-	      assume(new_pos<=old_pos);
+              assume(new_pos<=old_pos);
               if (new_pos<old_pos)
                 move_forward_in_S(old_pos,new_pos,c->strat,c->is_char0);
-	      assume(0<=pos_in_c);
-	      assume(c->n>pos_in_c);
+              assume(0<=pos_in_c);
+              assume(c->n>pos_in_c);
               c->S->m[pos_in_c]=sec_copy;
 
               c->lengths[pos_in_c]=new_length;
-              length_one_crit(c,pos_in_c, new_length);
+              c_S_element_changed_hook(pos_in_c,c);
+              
 
             }
           }
@@ -2006,12 +2064,12 @@ static BOOLEAN compute(calc_dat* c){
           else
           {
             c->misses_series=0;
-	    if(c->is_char0)
-	      pContent(hr);
+            if(c->is_char0)
+              pContent(hr);
 #ifdef HEAD_BIN
             hr=p_MoveHead(hr,c->HeadBin);
 #endif
-	    
+            
             add_to_basis(hr, c->work_on[i].i,c->work_on[i].j,c);
 
           }
@@ -2116,6 +2174,7 @@ ideal t_rep_gb(ring r,ideal arg_I){
   omfree(c->states);
   omfree(c->lengths);
   printf("calculated %d NFs\n",c->normal_forms);
+  printf("applied %i product crit, %i extended_product crit \n", c->easy_product_crit, c->extended_product_crit);
   I=c->S;
   IDELEMS(I)=c->n;
   omfree(c);
@@ -2219,9 +2278,9 @@ static void shorten_tails(calc_dat* c, poly monom)
     {
       int new_pos;
       if (c->is_char0) 
-	simple_posInS(c->strat,c->S->m[i],pSLength(c->S->m[i],c->lengths[i]),c->is_char0);
-      else	
-	simple_posInS(c->strat,c->S->m[i],c->lengths[i],c->is_char0);
+        simple_posInS(c->strat,c->S->m[i],pSLength(c->S->m[i],c->lengths[i]),c->is_char0);
+      else      
+        simple_posInS(c->strat,c->S->m[i],c->lengths[i],c->is_char0);
       int old_pos=-1;
       //assume new_pos<old_pos
       for (int z=0;z<=c->strat->sl;z++)
@@ -2246,7 +2305,7 @@ static void shorten_tails(calc_dat* c, poly monom)
       assume(pLength(c->strat->S[old_pos])==c->lengths[i]);
       c->strat->lenS[old_pos]=c->lengths[i];
       if (c->strat->lenSw)
-	c->strat->lenSw[old_pos]=pSLength(c->S->m[i],c->lengths[i]);
+        c->strat->lenSw[old_pos]=pSLength(c->S->m[i],c->lengths[i]);
 
       if (new_pos<old_pos)
         move_forward_in_S(old_pos,new_pos,c->strat, c->is_char0);
@@ -2361,4 +2420,104 @@ static void sort_pair_in(int i, int j,calc_dat* c){
     last->next=s;
     s->next=h;
   }
+}
+poly gcd_of_terms(poly p, ring r){
+  int max_g_0=0;
+  assume(p!=NULL);
+  int i;
+  poly m=pOne();
+  poly t;
+  for (i=pVariables; i; i--)
+  {
+      pSetExp(m,i, pGetExp(p,i));
+      if (max_g_0==0)
+	if (pGetExp(m,i)>0)
+	  max_g_0=i;
+  }
+  
+  t=p->next;
+  while (t!=NULL){
+    
+    if (max_g_0==0) break;
+    for (i=pVariables; i; i--)
+    {
+      pSetExp(m,i, min(pGetExp(t,i),pGetExp(m,i)));
+      if (max_g_0==i)
+	if (pGetExp(m,i)==0)
+	  max_g_0=0;
+      if ((max_g_0==0) && (pGetExp(m,i)>0)){
+	max_g_0=i;
+      }
+    }
+                t=t->next;
+  }
+        for (i=pVariables;i;i--)
+        {
+                if(pGetExp(m,i)>0)
+                        return m;
+  }
+        pDelete(&m);
+  return NULL;
+}
+BOOLEAN pHasNotCFExtended(poly p1, poly p2, poly m)
+{
+
+  if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
+    return FALSE;
+  int i = 1;
+  loop
+  {
+    if ((pGetExp(p1, i)-pGetExp(m,i) >0) && (pGetExp(p2, i) -pGetExp(m,i)> 0))   return FALSE;
+    if (i == pVariables)                                return TRUE;
+    i++;
+  }
+}
+
+
+//for impl reasons may return false if the the normal product criterion matches
+BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, calc_dat* c){
+  if(gcd1==NULL) return FALSE;
+        if(gcd2==NULL) return FALSE;
+        gcd1->next=gcd2; //may ordered incorrect
+        poly m=gcd_of_terms(gcd1,c->r);
+        gcd1->next=NULL;
+        if (m==NULL) return FALSE;
+
+        BOOLEAN erg=pHasNotCFExtended(p1,p2,m);
+        pDelete(&m);
+        return erg;
+}
+static poly kBucketGcd(kBucket* b, ring r)
+{
+  int s=0;
+  int i;
+  poly m, n;
+  BOOLEAN initialized=FALSE;
+  for (i=MAX_BUCKET-1;i>=0;i--)
+  { 
+    if (b->buckets[i]!=NULL){
+      if (!initialized){
+	m=gcd_of_terms(b->buckets[i],r);
+	initialized=TRUE;
+	if (m==NULL) return NULL;
+      }
+      else
+	{
+	  n=gcd_of_terms(b->buckets[i],r);
+	  if (n==NULL) {
+	    pDelete(&m);
+	    return NULL;    
+	  }
+	  n->next=m;
+	  poly t=gcd_of_terms(n,r);
+	  n->next=NULL;
+	  pDelete(&m);
+	  pDelete(&n);
+	  m=t;
+	  if (m==NULL) return NULL;
+	  
+	}
+    }
+  }
+  return m;
 }
