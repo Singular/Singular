@@ -1,4 +1,4 @@
-// $Id: classify.lib,v 1.18 1997-12-02 18:40:25 krueger Exp $
+// $Id: classify.lib,v 1.19 1997-12-15 10:35:03 krueger Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES  
@@ -582,7 +582,7 @@ proc Funktion40 (poly f, list cstn, int k)
 //------------------------------ classify f2 ----------------------------------
     v1=Klassifiziere(map_top2tmp(b));
     init_debug(oldDebug);
-    Typ = v[2];
+    Typ = v1[2];
     v2 = DecodeNormalFormString(Typ);
     Typ, kr, rr, sr = v2[1..4];
     r   = kr-k;

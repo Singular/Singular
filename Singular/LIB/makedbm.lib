@@ -1,4 +1,4 @@
-// $Id: makedbm.lib,v 1.4 1997-11-10 19:18:46 krueger Exp $
+// $Id: makedbm.lib,v 1.5 1997-12-15 10:35:07 krueger Exp $
 //=========================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
@@ -9,6 +9,12 @@ LIBRARY:  makedbm.lib     some usefull tools needed by the Arnold-Classifier.
 
    dbm_read(l);          read all entries from a DBM-databaes pointed by l
    dbm_getnext(l);       read next entry from a DBM-databaes pointed by l
+
+//=============================================================================
+proc _init()
+{
+  "_init() makedbm started";
+}
 
 //=============================================================================
 
@@ -34,10 +40,22 @@ proc dbm_getnext (link l)
 //=============================================================================
 proc create_sing_dbm
 {
+// DatenFormat: crk=#; Mu=#; MlrCd=#;
+  string s;
   link l="DBM:rw NFlist";
+
   write(l, "A[k]", "x^(k+1)");
+  s ="crk=1; Mu=k; MlnCd=k;";
+  write(l, "I_A[k]", s);
+
   write(l, "D[k]", "x2y+y^(k-1)");
+  s = "crk=2; Mu=k; MlnCd=1,1,k-3";
+  write(l, "I_D[k]", s);
+
   write(l, "E[6k]", "x3+y^(3*k+1)+a*x*(y^(2*k+1))");
+  s = "crk=2; Mu=6*k; MlnCd=1,2*k,2*k-1";
+  write(l, "I_E[6k]", s);
+
   write(l, "E[6k+1]", "x3+x*(y^(2*k+1))+a*(y^(3*k+2))");
   write(l, "E[6k+2]", "x3+y^(3*k+2)+a*x*(y^(2*k+2))");
   write(l, "J[k,0]", "x3+b*x^2*y^k+y^(3*k)+c*x*y^(2*k+1)");
@@ -91,15 +109,6 @@ proc create_sing_dbm
   write(l, "V#[1,2r]", "x2y+z3y+a*z2y2+y4+b*(z^(r+4))");
   write(l, "T[k,r,s]", "x^k+y^r+z^s+xyz");
 
-//////////////////////////////////////////////////////////////////
-// DatenFormat: crk=#; Mu=#; MlrCd=#;
-string s;
-  s ="crk=1; Mu=k; MlnCd=k;";
-  write(l, "I_A[k]", s);
-  s = "crk=2; Mu=k; MlnCd=1,1,k-3";
-  write(l, "I_D[k]", s);
-  s = "crk=2; Mu=6*k; MlnCd=1,2*k,2*k-1";
-  write(l, "I_E[6k]", s);
   s = "crk=2; Mu=6*k+1; MlnCd=1,2*k,2*k";
   write(l, "I_E[6k+1]", s);
 //"I_E[6k+1]=", read(l, "I_E[6k+1]");
@@ -207,6 +216,7 @@ string s;
   write(l, "I_V#[1,2r]", s);
   s = "crk=3; Mu=0;";
   write(l, "I_T[k,r,s]", s);
+  write(l,"VERSION", "1.0");
   close(l);
 }
 
