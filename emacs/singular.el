@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.4 1998-07-23 08:38:08 schmidt Exp $
+;; $Id: singular.el,v 1.5 1998-07-23 15:57:22 schmidt Exp $
 
 ;;; Commentary:
 
@@ -233,6 +233,88 @@ Singular interactive mode starts up.")
 ;;}}}
 
 ;;{{{ Input and output filters
+
+;;{{{ Some lengthy notes on filters
+
+;; Note:
+;;
+;; The filters and other functions have access to four important markers,
+;; `comint-last-input-start', `comint-last-input-end',
+;; `comint-last-output-start', and the buffers process mark.  They are
+;; initialized to nil (except process mark, which is initialized to
+;; `(point-max)') when Singular is called in `singular'.  These markers are
+;; modified by `comint-send-input' and `comint-output-filter' but not in a
+;; quite reliable way.  Here are some valid invariants and pre-/post-
+;; conditions.
+;;
+;; Output filters:
+;; ---------------
+;; The output filters may be sure that they are run in the process buffer
+;; and that the process buffer is still alive.  `comint-output-filter'
+;; ensures this.  But `comint-output-filter' does neither catch changes in
+;; match data done by the filters nor does it protect against non-local
+;; exits of itself or of one of the filters.  As a result, the current
+;; buffer may be changed in `comint-output-filter'!
+;;
+;; `comint-output-filter' is called also from `comint-send-input' (dunno
+;; why).  The following holds only for executions of `comint-output-filter'
+;; as a result of Singular output being processed.
+;;
+;; We have the following preconditions for any output filters (up to
+;; changes through other filter functions):
+;; - The argument STRING is what has been inserted in the buffer.  Not
+;;   really reliable.
+;; - `comint-last-input-end' <= `comint-last-output-start' <= process mark
+;;   if all of them are defined
+;; - The text between `comint-last-output-start' and process mark is the
+;;   one which has been inserted immediately before.
+;; - The text between `comint-last-input-end' (if it is defined) and
+;;   process mark is the one which has been inserted into buffer since last
+;;   user input.
+;; - It seems to be a reasonable assumption that the text between process
+;;   mark and `(point-max)' is user input.
+;;
+;; The standard filters which come with comint.el do not change the markers
+;; in the preconditions described above.  But they may change the text
+;; (e.g., `comint-strip-ctrl-m').
+;;
+;; Post-conditions for `comint-output-filter':
+;; - `comint-last-output-start' <= process mark.  The region between them
+;;   is the text which has been inserted immediately before.
+;; - `comint-last-input-start' and `comint-last-input-end' are unchanged.
+;;
+;; Input filters:
+;; --------------
+;; `comint-send-input' ensures that the process is still alive.  Further
+;; preconditions for any input filter (up to changes through filter
+;; functions):
+;; - The (CR-terminated) argument STRING is what will be sent to the
+;;   process (up to slight differences between XEmacs and Emacs).  Not
+;;   really reliable.
+;; - process mark <= `(point)'
+;; - The (CR-terminated) text between process mark and `(point)' is what
+;;   has been inserted by the user.
+;;
+;; Post-conditions for `comint-send-input':
+;; - `comint-last-input-start' <= `comint-last-input-end'
+;;                              = `comint-last-output-start' (!)
+;;                              = process marker = `(point)'.
+;;   The region between the first of them is what has been inserted by the
+;;   user.
+;;
+;; Invariants which always hold outside `comint-send-input' and
+;; `comint-output-filter':
+;; ------------------------------------------------------------
+;; - `comint-last-input-start' <= `comint-last-input-end' <= process mark
+;;   if all of them are defined.  The region between the first of them is
+;;   the last input entered by the user, the region between the latter of
+;;   them is the text from Singular printed since the last input.
+;; - `comint-last-output-start' <= process mark if both are defined.
+;; - It is a reasonable assumption that the text from process mark up to
+;;   `(point-max)' is user input.
+
+;;}}}
+
 (defconst singular-bogus-output-filter-calls
   (cond
    ;; XEmacs
@@ -256,7 +338,7 @@ This variable is set to `singular-bogus-output-filter-calls' in
 
 (defun singular-debug-output-filter (string)
   "Echo STRING and `singular-debug-bogus-output-filter-cnt'.
-Decrement "
+Decrement `singular-debug-bogus-output-filter-cnt' until it becomes zero."
   (if (zerop singular-debug-bogus-output-filter-cnt)
       (message "Output filter (real): %s"
 	       (singular-debug-format string))
@@ -274,26 +356,8 @@ Decrement "
 ;; In contrast to shell.el, `singular' does not run
 ;; `singular-interactive-mode' every time a new Singular process is
 ;; started, but only when a new buffer is created.  This behaviour seems
-;; more intuitive w.r.t. local variables and hooks.  So far so good.
-;;
-;; But there is a slight problem: `make-comint' runs `comint-mode'
-;; every time it creates a new process and overwrites a few but
-;; important major-mode related variables.  Another consequence of
-;; `comint-mode' being run more than once is that buffer-local
-;; variables that are not declared to be permanent local are killed by
-;; `comint-mode'.  Last not least, there is allmost no difference
-;; between the `comint-mode-hook' and the `comint-exec-hook' since
-;; both are run every time Singular starts up.
-;;
-;; The best solution seemed to define an advice to `comint-mode' which
-;; inhibits its execution if `singular-interactive-mode' is already
-;; up.
+;; more intuitive w.r.t. local variables and hooks.
 
-(defadvice comint-mode (around singular-interactive-mode activate)
-  "Do not run `comint-mode' if `singular-interactive-mode' is already up."
-  (if (not (eq major-mode 'singular-interactive-mode))
-      ad-do-it))
-  
 (defun singular-interactive-mode ()
   "Major mode for interacting with Singular.
 
@@ -317,10 +381,8 @@ are run.
 NOT READY [much more to come.  See shell.el.]!"
   (interactive)
 
-  ;; run comint mode and do basic mode setup.  The `let' around
-  ;; `comint-mode' ensures that `comint-mode' really will be run.  See
-  ;; the above advice.
-  (let (major-mode) (comint-mode))
+  ;; run comint mode and do basic mode setup
+  (comint-mode)
   (setq major-mode 'singular-interactive-mode)
   (setq mode-name "Singular Interaction")
   (use-local-map singular-interactive-mode-map)
@@ -333,8 +395,13 @@ NOT READY [much more to come.  See shell.el.]!"
   (setq comint-buffer-maximum-size singular-buffer-maximum-size)
   (setq comint-input-ring-size singular-input-ring-size)
   (setq comint-input-filter singular-history-filter)
-  (add-hook 'comint-output-filter-functions
-	    'comint-truncate-buffer nil t)
+  ;; do not add `comint-truncate-buffer' if it already has been added
+  ;; globally.  This is sort of a bug in `add-hook'.
+  (and (default-boundp 'comint-output-filter-functions)
+       (not (memq 'comint-truncate-buffer
+		  (default-value 'comint-output-filter-functions)))
+       (add-hook 'comint-output-filter-functions
+		 'comint-truncate-buffer nil t))
 
   ;; get name of history file (if any)
   (setq comint-input-ring-file-name (getenv "SINGULARHIST"))
@@ -421,8 +488,8 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 	 (singular-switches (or singular-switches
 				singular-default-switches))
 
-	 ;; buffer associated with Singular, nil if there is none
 	 (buffer-name (singular-process-name-to-buffer-name singular-name))
+	 ;; buffer associated with Singular, nil if there is none
 	 (buffer (get-buffer buffer-name)))
 
     ;; create new buffer if there has been none and call
@@ -438,14 +505,26 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
     ;; create new process if there has been none
     (if (not (comint-check-proc buffer))
 	(progn
+	  ;; initialize markers.  process-marker is initialized by
+	  ;; `comint-exec'.
+	  (set-marker comint-last-input-start nil)
+	  (set-marker comint-last-input-end nil)
+	  (set-marker comint-last-output-start nil)
+
+	  ;; note that `comint-exec' may result in some process output already!
+	  ;; Note furthermore that we use `comint-exec' instead of
+	  ;; `make-comint' to avoid double calls of `comint-mode'.
 	  (singular-debug 'interactive (message "Starting new Singular"))
-	  (setq buffer (apply 'make-comint singular-name singular-executable
-			      (if (file-exists-p singular-start-file) singular-start-file)
-			      singular-switches))
+	  (setq buffer (funcall 'comint-exec buffer singular-name singular-executable
+				(if (file-exists-p singular-start-file) singular-start-file)
+				singular-switches))
 	  (set-process-sentinel (get-buffer-process buffer) 'singular-exit-sentinel)
 	  (set-buffer buffer)
 	  (singular-debug 'interactive (message "Reading input ring"))
 	  (comint-read-input-ring t)
+
+	  ;; go to end of buffer and run hooks
+	  (goto-char (point-max))
 	  (run-hooks 'singular-exec-hook)))
 
     ;; pop to buffer
