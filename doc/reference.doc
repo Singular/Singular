@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.46 1998-05-14 13:28:16 anne Exp $
+@comment $Id: reference.doc,v 1.47 1998-05-14 16:12:17 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5493,10 +5493,22 @@ returns the result(s) of a procedure.
   return("NIL");
   return(m);
   return(i(1..5));
+  // can also return an expression list, i.e., more than value
+  proc tworeturn () @{ return (1,2); @}
+  int i,j = tworeturn();
+  // return type may even depend on the input
+  proc type_return (int i) 
+  @{ 
+    if (i > 0) @{return (i);@} 
+    else @{return (list(i));@} 
+  @}
+  // then we need def type to collect value
+  def t1 = type_return(1);
+  def t2 = type_return(-1);
 @end example
 @end table
 @c ref
-See @ref{Data types}; @ref{proc}.
+See @ref{Data types}; @ref{proc}; @ref{Return type of procedures}.
 @c ref
 @c ---------------------------------------
 @node while, ~ , return, Control structures

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.68 1998-05-14 14:51:33 obachman Exp $
+@comment $Id: general.doc,v 1.69 1998-05-14 16:12:16 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -973,6 +973,10 @@ an @strong{assignment}:
   I = jacob(f);
   f,g = I[1],x^2+y^2 ; //overwrites the old values of f and g
 @end example
+@*@strong{Note:}
+An assignment itself does not yield a value. Hence, compound assignments
+like @code{i = j = k;} are not allowed and result in an error.
+
 @item
 a @strong{command}:
 @*   command_name [ @code{(} argument_list @code{)} ] @code{.}
@@ -1082,7 +1086,7 @@ terminates @sc{Singular}
 @itemize @bullet
 
 @item
-@sc{Singular} is a typed language.  This means that all names (=
+@sc{Singular} is a strongly typed language.  This means that all names (=
 identifiers) have to be declared prior to their use.
 The general syntax of a declaration is
 

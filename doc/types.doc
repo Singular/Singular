@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.43 1998-05-14 07:28:27 wichmann Exp $
+@comment $Id: types.doc,v 1.44 1998-05-14 16:12:20 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -23,8 +23,8 @@
 @c @end ifset
 
 @cindex expression list
-This chapter explains all data types known by @sc{Singular} in
-alphabetical order. For every type there is a description of the
+This chapter explains all data types of @sc{Singular} in
+alphabetical order. For every type, there is a description of the
 declaration syntax as well as information about how to build expressions
 of certain types. A list of expressions (in the following referred to as
 expression_list) in @sc{Singular} is any comma separated list of
@@ -604,8 +604,8 @@ determined. For example, the logical expressions @code{(1 || a)} is
 evaluated by first evaluating @code{a}, even though the value of
 @code{a} has no influence on the value of @code{(1 || a)}. Note that
 this is different from the left-to-right evaluation of logical
-expressions (as found in most programming languages like C) which, for
-example, determine the @code{(1 || a)} without evaluating @code{a}.
+expressions (as found in most programming languages) which, for
+example, determine the value of @code{(1 || a)} without evaluating @code{a}.
 See @ref{Evaluation of logical expressions}.
 @end enumerate
 
