@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.14 1997-09-29 06:53:25 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.15 1997-12-08 18:24:35 schmidt Exp $ */
 
 #include <config.h>
 
@@ -450,11 +450,11 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 	for ( i = 0; i < max_fp_fac; i++ ) {
 	    setCharacteristic( p[i] );
 	    fp = mapinto( f );
-	    F[i] = FpFactorizeUnivariateCZ( fp, true );
+	    F[i] = FpFactorizeUnivariateCZ( fp, true, 0, Variable(), Variable() );
 //		if ( p[i] < 23 && fp.degree() < 10 )
 //		    F[i] = FpFactorizeUnivariateB( fp, true );
 //		else
-//		    F[i] = FpFactorizeUnivariateCZ( fp, true );
+//		    F[i] = FpFactorizeUnivariateCZ( fp, true, 0, Variable, Variable() );
 	    DEBOUTLN( cerr, "F[i] = " << F[i] << ", p = " << p[i] );
 	}
 	TIMING_END_AND_PRINT(fac_facModPrimes, "time to factorize mod primes: ");

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.cc,v 1.5 1997-10-22 13:42:23 schmidt Exp $ */
+/* $Id: ffops.cc,v 1.6 1997-12-08 18:24:37 schmidt Exp $ */
 
 #include <config.h>
 
@@ -44,7 +44,7 @@ int ff_newinv ( const int a )
 
 int ff_biginv ( const int a )
 {
-    long long int u, r0 = a, r1 = ff_prime, q0 = 1, q1 = 0;
+    INT64 u, r0 = a, r1 = ff_prime, q0 = 1, q1 = 0;
     while ( ( r0 > 0 ) && ( r1 > 0 ) ) {
 	u = r0 / r1;
 	r0 = r0 % r1;

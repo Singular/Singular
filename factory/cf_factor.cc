@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.7 1997-09-09 09:25:52 schmidt Exp $ */
+/* $Id: cf_factor.cc,v 1.8 1997-12-08 18:24:23 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -44,7 +44,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 	if ( isOn( SW_BERLEKAMP ) )
 	    return FpFactorizeUnivariateB( f, issqrfree );
 	else
-	    return FpFactorizeUnivariateCZ( f, issqrfree );
+	    return FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
     }
     else {
 	if ( f.isUnivariate() )
@@ -59,7 +59,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     ASSERT( alpha.level() < 0, "not an algebraic extension" );
     ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
     ASSERT( getCharacteristic() > 0, "char 0 factorization not implemented" );
-    return FpFactorizeUnivariateCZ( f, false, 1, alpha );
+    return FpFactorizeUnivariateCZ( f, false, 1, alpha, Variable() );
 }
 
 CFFList sqrFree ( const CanonicalForm & f, bool sort )

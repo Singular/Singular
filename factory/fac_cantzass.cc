@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_cantzass.cc,v 1.3 1997-09-09 09:03:31 schmidt Exp $ */
+/* $Id: fac_cantzass.cc,v 1.4 1997-12-08 18:24:28 schmidt Exp $ */
 
 #include <config.h>
 
@@ -42,7 +42,7 @@ static CanonicalForm powerMod2( const CanonicalForm & f, int p, int s, const Can
 
 static CanonicalForm powerMod2( const CanonicalForm & f, MP_INT * q, int s, const CanonicalForm & d );
 
-CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int numext, const Variable & alpha, const Variable & beta )
+CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int numext, const Variable alpha, const Variable beta )
 {
     CFFList F, G, H, HH;
     CanonicalForm fac;

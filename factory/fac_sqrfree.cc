@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_sqrfree.cc,v 1.6 1997-06-19 12:23:21 schmidt Exp $ */
+/* $Id: fac_sqrfree.cc,v 1.7 1997-12-08 18:24:32 schmidt Exp $ */
 
 #include <config.h>
 
@@ -95,7 +95,7 @@ bool isSqrFreeFp( const CanonicalForm & f )
   return ( F.length() == 1 && F.getFirst().exp() == 1 );
 }
 
-int isSqrFreeZ ( const CanonicalForm & f )
+bool isSqrFreeZ ( const CanonicalForm & f )
 {
     return gcd( f, f.deriv() ).degree() == 0;
 }

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_iterfor.cc,v 1.4 1997-06-19 12:23:33 schmidt Exp $ */
+/* $Id: fac_iterfor.cc,v 1.5 1997-12-08 18:24:31 schmidt Exp $ */
 
 #include <config.h>
 
@@ -21,7 +21,7 @@ IteratedFor::fill ( int from, int max )
 
 IteratedFor::IteratedFor( int from, int to, int max ) : MAX( max ), FROM( from ), TO( to ), N( TO-FROM ), last( false )
 {
-    ASSERT( n >= 0 && max >= 0, "illegal iterated for" );
+    ASSERT( N >= 0 && max >= 0, "illegal iterated for" );
     index = new int[N+1];
     imax = new int[N+1];
     fill( 0, max );

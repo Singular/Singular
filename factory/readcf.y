@@ -1,7 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.4 1997-06-19 12:42:58 schmidt Exp $ */
+/* $Id: readcf.y,v 1.5 1997-12-08 18:24:42 schmidt Exp $ */
 
 %{
+
+#ifdef WINNT
+#include <malloc.h>
+#include <memory.h>
+#define alloca _alloca
+#endif
 
 #include <config.h>
 

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: timing.h,v 1.3 1997-06-19 12:21:54 schmidt Exp $ */
+/* $Id: timing.h,v 1.4 1997-12-08 18:24:47 schmidt Exp $ */
 
 /* It should be possible to include this file multiple times for different */
 /* settings of TIMING */
@@ -13,8 +13,10 @@
 
 #ifdef TIMING
 #include <time.h>
+#ifndef WINNT
 #include <sys/times.h>
 #include <sys/param.h>
+#endif
 #include <stdio.h>
 
 // need to be adjusted on your machine:
@@ -33,6 +35,18 @@
 #endif
 #endif
 
+#ifdef WINNT
+#define TIMING_START(t) { clock_t timing_ ## t ## _start, timing_ ## t ## _end; \
+  timing_ ## t ## _start = clock();
+#define TIMING_END(t) timing_ ## t ## _end = clock(); \
+timing_ ## t ## _time += timing_ ## t ## _end - timing_ ## t ## _start; }
+#define TIMING_DEFINE_PRINT(t) clock_t timing_ ## t ## _time; \
+void timing_print_ ## t ( char * msg ) { \
+  fprintf( stderr, "%s%.2f sec\n", msg, float(timing_ ## t ## _time) / HZ ); \
+}
+#define TIMING_DEFINE_PRINTPROTO(t) void timing_print_ ## t ( char * );
+#define TIMING_PRINT(t, msg) timing_print_ ## t ( msg );
+#else
 #define TIMING_START(t) { struct tms timing_ ## t ## _start, timing_ ## t ## _end; \
   times( &timing_ ## t ## _start );
 #define TIMING_END(t) times( &timing_ ## t ## _end ); \
@@ -47,6 +61,7 @@ void timing_print_ ## t ( char * msg ) { \
 }
 #define TIMING_DEFINE_PRINTPROTO(t) void timing_print_ ## t ( char * );
 #define TIMING_PRINT(t, msg) timing_print_ ## t ( msg );
+#endif
 #else /* TIMING */
 #define TIMING_START(t)
 #define TIMING_END(t)

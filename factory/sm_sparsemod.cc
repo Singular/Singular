@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.cc,v 1.3 1997-10-09 14:47:19 schmidt Exp $ */
+/* $Id: sm_sparsemod.cc,v 1.4 1997-12-08 18:24:45 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -379,7 +379,9 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   if ( levis < 0 )
     return N( gcd( primif, primig ) );
 
-  int varf[ levis ], varg[ levis ], schnitt[ levis ];
+  int * varf = new int[levis];
+  int * varg = new int[levis];
+  int * schnitt = new int[levis];
 
   while ( ABFRAGE == 1 )
     {
@@ -432,8 +434,8 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
 
     }
 
-
-
+  
+  delete [] varf; delete [] varg; delete [] schnitt;
 
 
   //  Nochmal compress fuer den Fall, dass eine Variable rausfliegt //
