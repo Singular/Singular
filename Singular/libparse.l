@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.29 1998-11-04 18:28:03 Singular Exp $ */
+/* $Id: libparse.l,v 1.30 1998-11-10 17:03:29 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -50,7 +50,7 @@ int old_state = 0;
 lib_cmds last_cmd = LP_NONE;
 
 char libnamebuf[128];
-char *text_buffer;
+char *text_buffer=NULL;
 long string_start;
 
 char *yylp_buffer_start;
@@ -261,6 +261,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                    IDSTRING(h0) = mstrdup(libnamebuf);
                 }
 #  else /* HAVE_NAMESPACES */
+               if (text_buffer!=NULL) FreeL((ADDRESS)text_buffer);
                text_buffer = mstrdup(libnamebuf);
 #  endif /* HAVE_NAMESPACES */
 #endif
@@ -735,6 +736,7 @@ LIB[ \t]+"\"" { quote++;
 #  ifdef STANDALONE_PARSER
                            printf("[%d]", *yytext);
 #  else
+                           if (text_buffer!=NULL) FreeL((ADDRESS)text_buffer);
                            text_buffer = mstrdup(yytext);
 #  endif
 #if YYLPDEBUG > 1
@@ -818,6 +820,7 @@ void copy_string(lp_modes mode)
     long current_location = ftell(yylpin);
     int len = (int)(current_pos(0) - string_start);
     fseek(yylpin, string_start, SEEK_SET);
+    if (text_buffer!=NULL) FreeL((ADDRESS)text_buffer);
     text_buffer = (char *)AllocL(len+2);
     myfread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
