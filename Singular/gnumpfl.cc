@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.11 1999-09-16 12:33:56 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.12 1999-11-15 16:22:50 pohl Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -258,13 +258,12 @@ void ngfPower ( number x, int exp, number * u )
     }
     return;
   }
-
   ngfPower(x,exp-1,u);
 
   gmp_float *n=new gmp_float();
   *n=*(gmp_float*)x;
   *(gmp_float*)(*u) *= *(gmp_float*)n;
-
+  delete (gmp_float*)n;
 }
 
 BOOLEAN ngfIsZero (number a)
@@ -293,7 +292,7 @@ BOOLEAN ngfGreater (number a, number b)
   }
   if ( b==NULL )
   {
-    return (((gmp_float*)a)->sign() < 0);
+    return (((gmp_float*)a)->sign() > 0);
   }
   return ( (*(gmp_float*)a) > (*(gmp_float*)b) );
 }
