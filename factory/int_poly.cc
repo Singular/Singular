@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.4 1997-06-19 12:22:42 schmidt Exp $ */
+/* $Id: int_poly.cc,v 1.5 1997-09-10 15:45:49 schmidt Exp $ */
 
 #include <config.h>
 
@@ -86,11 +86,14 @@ InternalPoly::degree()
     return firstTerm->exp;
 }
 
+//{{{ int InternalPoly::sign () const
+// docu: see CanonicalForm::sign()
 int
-InternalPoly::sign() const
+InternalPoly::sign () const
 {
     return firstTerm->coeff.sign();
 }
+//}}}
 
 CanonicalForm
 InternalPoly::lc()
