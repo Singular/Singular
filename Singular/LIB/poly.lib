@@ -1,4 +1,4 @@
-// $Id: poly.lib,v 1.2 1997-04-28 19:27:22 obachman Exp $
+// $Id: poly.lib,v 1.3 1997-07-10 14:18:23 Singular Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,6 +16,7 @@ LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
  mindeg1(poly/...);     int = [weighted] minimal degree of input
  normalize(poly/...);   normalize poly/... such that leading coefficient is 1
            (parameters in square brackets [] are optional)
+ stdfglm(ideal[,ord])   standard basis of the ideal via fglm [and ordering ord]
 
 LIB "general.lib";
 ///////////////////////////////////////////////////////////////////////////////
@@ -473,3 +474,42 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+proc stdfglm (ideal i, list #)
+USAGE:   stdfglm(i[,s]); i ideal, s string (any allowed ordstr of a ring)
+RETURN:  stdfglm(i);    standard basis of i in the given ring, calculated via 
+			fglm from ordering "dp" to the current ordering.
+	 stdfglm(i,s);  standard basis of i in the given ring, calculated via
+		        fglm from ordering s (as a string) to the given 
+			ordering.
+EXAMPLE: example stdfglm; shows an example
+{
+   string os;
+   def dr= basering;
+   if( (size(#)==0) or (typeof(#[1]) != "string") ) 
+   {
+     os = "dp(" + string( nvars(dr) ) + ")";
+     if ( (find( ordstr(dr), os ) != 0) and (find( ordstr(dr), "a") == 0) ) 
+     {
+       os= "Dp";
+     } 
+     else 
+     {
+       os= "dp";
+     }
+   }
+   else { os = #[1]; }
+   execute "ring sr="+charstr(dr)+",("+varstr(dr)+"),"+os+";";
+   ideal i= fetch(dr,i);
+   intvec opt= option(get);
+   option(redSB);
+   i=std(i);
+   option(set,opt);
+   setring dr;
+   return (fglm(sr,i));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z), lp; ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
+   ideal is=stdfglm(i,"Dp"); is;
+}
+///////////////////////////////////////////////////////////////////////////////
