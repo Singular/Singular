@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_binom.cc,v 1.0 1996-05-17 10:59:43 stobbe Exp $
+// $Id: cf_binom.cc,v 1.1 1996-07-08 08:13:08 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:43  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
@@ -23,13 +26,17 @@ int ptZmax = INITPT;
 int ptFmax = 0;
 
 void
+resetFPT()
+{
+    ptFmax = 0;
+}
+
+void
 initPT ( )
 {
     static bool initialized = false;
 
     if ( ! initialized ) {
-	CFFList lll = CFFList();
-	lll.insert( CFFactor( 1, 2 ) );
 	initialized = true;
 	ptZ = new CFArray[MAXPT+1];
 	ptF = new CFArray[MAXPT+1];
