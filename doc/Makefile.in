@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.72 2000-07-05 12:04:20 obachman Exp $
+### $Id: Makefile.in,v 1.73 2000-07-07 12:53:55 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -196,10 +196,10 @@ endif
 	${MAKEINFO} --no-header --paragraph-indent none -o $@ $<
 
 %.${SINGUNAME}.html : %.texi
-	${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -verbose -split none -o $@ $<
+	${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -verbose -split none -out_file $@ $<
 
 %.html : %.texi
-	${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -verbose -split none -o $@ $<
+	${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -verbose -split none -out_file $@ $<
 
 % : %.txt
 	cp $< $@
