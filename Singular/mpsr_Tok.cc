@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.13 1998-05-12 14:59:21 Singular Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.14 1998-06-14 11:40:05 Singular Exp $ */
 
 /***************************************************************
  *
@@ -554,11 +554,13 @@ mpsr_cmd mpsr_cmds[] =
   {
     fprintf(outfile, "\n{\n");
     for (j=0; j<MAX_COP; j++)
-      fprintf(outfile, " %d,",mp2tok[i][j]);
-    fseek(outfile, 1, -1);
-    fprintf(outfile, "},");
+    {
+      fprintf(outfile, " %d",mp2tok[i][j]);
+      if  (j!=MAX_COP-1) fprintf(outfile, ",");
+    }  
+    if (i!=MAX_SR_DICT-1) fprintf(outfile, "},");
+    else                  fprintf(outfile, "}");
   }
-  fseek(outfile, 1, -1);
   fprintf(outfile,"\n};");
   fclose(outfile);
 } // That's all
