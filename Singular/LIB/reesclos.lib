@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 version="$id reesclos.lib,v 1.30 2000/12/5 hirsch Exp $";
-
+category="Commutative Algebra";
 info="
 LIBRARY:     reesclos.lib
 AUTHOR:      Tobias Hirsch, email: hirsch@math.tu-cottbus.de

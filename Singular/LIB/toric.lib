@@ -1,7 +1,7 @@
-// version="$Id: toric.lib,v 1.7 2000-09-14 12:37:10 Singular Exp $";
+// version="$Id: toric.lib,v 1.8 2000-12-19 14:41:45 anne Exp $";
 
 ///////////////////////////////////////////////////////////////////////////////
-
+category="Commutative Algebra";
 info="
 LIBRARY: toric.lib                COMPUTING TORIC IDEALS
 

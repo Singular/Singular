@@ -1,8 +1,8 @@
-// $Id: mregular.lib,v 1.2 2000-12-04 12:13:05 mschulze Exp $
+// $Id: mregular.lib,v 1.3 2000-12-19 14:41:43 anne Exp $
 // IB/PG/GMG, last modified:  21.7.2000
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: mregular.lib,v 1.2 2000-12-04 12:13:05 mschulze Exp $";
-
+version = "$Id: mregular.lib,v 1.3 2000-12-19 14:41:43 anne Exp $";
+category="Commutative Algebra";
 info="
 LIBRARY: mregular.lib       PROCEDURES FOR THE CASTELNUOVO-MUMFORD REGULARITY
 AUTHORS: I.Bermejo, email: ibermejo@ull.es

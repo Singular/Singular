@@ -1,8 +1,9 @@
-// $Id: elim.lib,v 1.9 2000-03-01 16:28:56 Singular Exp $
+// $Id: elim.lib,v 1.10 2000-12-19 14:41:42 anne Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: elim.lib,v 1.9 2000-03-01 16:28:56 Singular Exp $";
+version="$Id: elim.lib,v 1.10 2000-12-19 14:41:42 anne Exp $";
+category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
 

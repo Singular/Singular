@@ -1,9 +1,10 @@
-// $Id: primitiv.lib,v 1.11 1999-08-12 16:12:43 lamm Exp $
+// $Id: primitiv.lib,v 1.12 2000-12-19 14:41:45 anne Exp $
 // last change:            12.08.99
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: primitiv.lib,v 1.11 1999-08-12 16:12:43 lamm Exp $";
+version="$Id: primitiv.lib,v 1.12 2000-12-19 14:41:45 anne Exp $";
+category="Commutative Algebra";
 info="
 LIBRARY:    primitiv.lib    PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
 AUTHOR:     Martin Lamm,    email: lamm@mathematik.uni-kl.de

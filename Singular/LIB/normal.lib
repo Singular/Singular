@@ -4,7 +4,8 @@
 // the criterion of Grauert/Remmert and ideas of De Jong & Vasconcelos
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.26 2000-05-23 22:57:52 greuel Exp $";
+version="$Id: normal.lib,v 1.27 2000-12-19 14:41:43 anne Exp $";
+category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     PROCEDURES FOR NORMALIZATION
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,

@@ -1,8 +1,9 @@
-// $Id: homolog.lib,v 1.10 1999-12-13 15:33:47 obachman Exp $
+// $Id: homolog.lib,v 1.11 2000-12-19 14:41:42 anne Exp $
 //(BM/GMG)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: homolog.lib,v 1.10 1999-12-13 15:33:47 obachman Exp $";
+version="$Id: homolog.lib,v 1.11 2000-12-19 14:41:42 anne Exp $";
+category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
 

@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.79 2000-06-10 23:44:35 greuel Exp $
+// $Id: primdec.lib,v 1.80 2000-12-19 14:41:44 anne Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,8 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.79 2000-06-10 23:44:35 greuel Exp $";
+version="$Id: primdec.lib,v 1.80 2000-12-19 14:41:44 anne Exp $";
+category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)

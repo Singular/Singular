@@ -1,5 +1,5 @@
-version="$Id: intprog.lib,v 1.1 2000-09-14 12:37:09 Singular Exp $";
-
+version="$Id: intprog.lib,v 1.2 2000-12-19 14:41:42 anne Exp $";
+category="Commutative Algebra";
 ///////////////////////////////////////////////////////////////////////////////
 
 info="
