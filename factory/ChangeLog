@@ -1,4 +1,46 @@
+Sat Jul 19 08:57:34 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_gcd.cc (gcd_poly): call to sparsemod() added
+
+	* cf_chinese.cc (chineseRemainder): doc fix
+
+	* cf_ops.cc (resultant): assertion added
+	(resultant): new variable flipFactor
+	(resultant): handling of trivial cases fixed
+	(resultant): some other minor bug fixes
+
+	* cf_ops.cc (resultant): doc fix
+
+	* README: doc fix
+
+	* NEWS: doc fix
+
+	* GNUmakefile.in (uninstallgftables): brute force ('rm -rf')
+	  replaced by a safer variant
+
+Thu Jul 17 11:05:04 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* sm_util.h (REArray): bug fix
+
+	* sm_sparsemod.cc: new file
+
+	* GNUmakefile.in (basefactoryincl): files sm_util.h and
+	  sm_sparsemod.h added
+	  (basefactorysrc): files sm_util.cc and sm_sparsemod.cc added
+
+	* NEWS: new file
+
 Wed Jul 16 11:35:06 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_chinese.cc: doc fix
+
+	* cf_chinese.cc: doc checked
+
+	* cf_chinese.h: doc fix
+
+	* cf_chinese.h: doc checked
+
+	* .cvsignore (config.cache): new entry
 
 	* canonicalform.cc (CanonicalForm::ilog2): new method
 	* canonicalform.h (class CanonicalForm): new declaration of ilog2
@@ -10,6 +52,90 @@ Wed Jul 16 11:35:06 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* fac_univar.cc (norm, dnorm): function dnorm replaced by norm
 	(kBound): uses ilog2() and norm() now
 
+Tue Jul 15 14:47:53 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* sm_util.h (REArray): new typedef.  All references to
+	  Array<REvaluation> changed to REArray.
+
+	* sm_util.h: doc checked
+
+	* sm_sparsemod.h: new file
+
+	* sm_sparsemod.h: doc checked
+
+Mon Jul 14 10:00:59 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* sm_util.h: doc fix
+
+	* sm_util.h (dinterpol): bug fix of declaration
+
+	* sm_util.cc: doc fix
+
+	* sm_util.cc: new file
+
+	* sm_util.h: new file
+
+	* int_cf.h (OBJDEL): spurious macro OBJDEL removed
+
+	* README: new file
+	* GNUmakefile.in (distfiles): README added to distribution
+
+	* canonicalform.cc (initCanonicalForm): initialization of
+	  SW_USE_SPARSEMOD added
+
+	* canonicalform.cc (CanonicalForm::degree( Variable )): doc fix
+
+	* configure.in: doc fix
+
+	* configure.in (libmem, headerfactory, factoryconf): output
+	  variables removed
+
+	* configure.in (templatedir): initialization fixed
+
+Fri Jul 11 09:48:26 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* canonicalform.cc (CanonicalForm::degree): doc fix
+
+	* GNUmakefile.in: dependencies checked
+
+	* GNUmakefile.in: doc fix
+
+	* GNUmakefile.in (.PHONY): phony targets updated
+
+	* GNUmakefile.in (clean): core and *~ will not be removed any
+	  longer
+
+	* GNUmakefile.in (depend): dependencies config.h and factoryconf.h
+	  removed
+
+	* GNUmakefile.in (dist): 'chmod 777' removed
+
+	* GNUmakefile.in (gengftables): dependency on 'all' replaced by
+	  dependency on $(libfactory) and libcfmem.a
+
+	* GNUmakefile.in (gengftables.o): dependency cf_util.h removed
+	(gengftables.o): dependencies factoryconf.h and config.h added
+
+	* GNUmakefile.in (installcf, installgftables): bug fix
+	(uninstallcf): bug fix
+
+	* GNUmakefile.in (libmem, headerfactory, factoryconf): variables
+	  removed.  All references changed (to 'libcfmem.a', 'factory.h',
+ 	  and 'factoryconf.h', resp.).
+
+	* GNUmakefile.in (realmaintainer-clean): target removed
+
+	* GNUmakefile.in (templatesrc, templateincl): file
+	  ftmpl_functions.h moved from $(templateincl) to $(templatesrc)
+
+	* GNUmakefile.in (TESTLDFLAGS): flag '-L.' moved to target
+	  gengftables
+	(gengftables): '-L.' moved from $(TESTLDFLAGS) to command
+
+	* GNUmakefile.in (TESTCXXFLAGS): new variable
+	(gengftables.o): references to $(LIBCXXFLAGS) replaced by
+	  references to $(TESTCXXFLAGS)
+
 Tue Jul  1 14:26:29 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* GNUmakefile.in (dist): use ln instead of cp to build
@@ -19,9 +145,9 @@ Tue Jul  1 14:26:29 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	  managment if compiled with Singular.  New declaration of
 	  mmInit().
 
-	* cf_random.cc (RandomGenerator): removed definitions of
-	  'const long int' in class for mac.  Instead, they are
-	  initialized in the constructor.
+	* cf_random.cc (RandomGenerator): definitions of 'const long int'
+	  in class for mac removed.  Instead, they are initialized in the
+ 	  constructor.
 
 	* cf_random.h (factoryrandom, factoryseed): declarations marked as
 	  public
