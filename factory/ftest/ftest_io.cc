@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.6 1997-10-08 09:17:34 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.7 1997-10-15 13:53:21 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -142,6 +142,28 @@ ftestPrintResult ( const char * resultName, const CanonicalForm & result )
 	ftestPrint( (char *)0, "@@\n" );
     } else if ( ! ftestPrintFlag )
 	cout << result << endl;
+}
+//}}}
+
+//{{{ void ftestPrintResult ( const char * resultName, const CFFList & result )
+//{{{ docu
+//
+// ftestPrintResult() - print a list of canonical form factors
+//
+//}}}
+void
+ftestPrintResult ( const char * resultName, const CFFList & result )
+{
+    CFFListIterator I;
+
+    if ( ftestPrintResultFlag ) {
+	ftestPrint( "result: %s\n", "@@%s\n", resultName );
+	for ( I = result; I.hasItem(); I++ )
+	    cout << I.getItem() << endl;
+	ftestPrint( (char *)0, "@@\n" );
+    } else if ( ! ftestPrintFlag )
+	for ( I = result; I.hasItem(); I++ )
+	    cout << I.getItem() << endl;
 }
 //}}}
 
