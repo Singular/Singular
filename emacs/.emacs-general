@@ -1,0 +1,166 @@
+;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
+;;; $Id: .emacs-general,v 1.1 2000-05-24 15:10:35 obachman Exp $
+
+;;;
+;;; .emacs-general - Emacs initialization file for general emacs
+;;;                  settings which have nothing to do with the 
+;;;                  singular-emacs mode, but which we recommend
+;;;                  nevertheless, so that your emacs is more useful.
+;;; 
+;;; This file is loaded by .emacs-singular, if it exists in your home directory
+;;; or in the singular-emacs directory.
+;;;
+;;; If you have your own .emacs file, you might consider copying
+;;; this file to your home directory and then load it from your .emacs
+;;; file with: (load-file "~/.emacs-general")
+;;; 
+;;; 
+
+;; a handy function for customizing the face of point
+(defun customize-face-at-point ()
+  "Customize face which point is at."
+  (interactive)
+  (let ((face (get-text-property (point) 'face)))
+    (if face
+	(customize-face face)
+      (message "No face defined at point"))))
+
+;; I love font-lock mode 
+(add-hook 'emacs-lisp-mode-hook	'turn-on-font-lock)
+(add-hook 'lisp-mode-hook	'turn-on-font-lock)
+(add-hook 'c-mode-hook		'turn-on-font-lock)
+(add-hook 'c++-mode-hook		'turn-on-font-lock)
+(add-hook 'perl-mode-hook	'turn-on-font-lock)
+(add-hook 'tex-mode-hook		'turn-on-font-lock)
+(add-hook 'texinfo-mode-hook	'turn-on-font-lock)
+(add-hook 'postscript-mode-hook	'turn-on-font-lock)
+(add-hook 'dired-mode-hook	'turn-on-font-lock)
+(add-hook 'ada-mode-hook		'turn-on-font-lock)
+(add-hook 'TeX-mode-hook  'turn-on-font-lock)
+(add-hook 'shell-mode-hook 'turn-on-font-lock)
+
+(cond ((string-match "XEmacs\\|Lucid" emacs-version)
+       ;; XEmacs specific stuff
+
+       ;; I like some more  keybindings for better moving
+       (define-key global-map '(control ,)
+	 '(lambda () (interactive) (scroll-up -1)))
+       ;; control-, scrolls up
+       (define-key global-map '(control 46)
+	 '(lambda () (interactive) (scroll-up 1)))
+       ;; control-;  and control-'
+       (define-key global-map '(control 59)  'backward-word) 
+       (define-key global-map '(control 39) 'forward-word) 
+
+       ;; a function which on C-= reload a file automatically without
+       ;; asking for confirmation got it from From: Richard Mlynarik
+       ;; <mly@adoc.xerox.com> on 1/18/95
+       (global-set-key [(control =)] '(lambda ()
+					(interactive)
+					(or (verify-visited-file-modtime
+					     (current-buffer))
+					    (revert-buffer t t))))
+       ;; turn on auto-compression of gz files
+       (toggle-auto-compression 1)
+
+       ;; I like unique buffer names based on dirs
+       (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+       (require 'uniquify)
+
+       ;; Use the "Describe Variable..." option on the "Help" menu
+       ;; or C-x v to find out what these variables mean.
+       (setq find-file-use-truenames nil
+	     find-file-compare-truenames t
+	     minibuffer-confirm-incomplete t
+	     complex-buffers-menu-p t
+	     next-line-add-newlines nil
+	     mail-yank-prefix "> "
+	     kill-whole-line t
+	     )
+
+       ;; func-menu is a package that scans your source file for function
+       ;; definitions and makes a menubar entry that lets you jump to any
+       ;; particular function definition by selecting it from the menu.  The
+       ;; following code turns this on for all of the recognized languages.  
+       (require 'func-menu)
+       (define-key global-map 'f8 'function-menu)
+       (add-hook 'find-file-hooks 'fume-add-menubar-entry)
+       (define-key global-map "\C-cl" 'fume-list-functions)
+       (define-key global-map "\C-cg" 'fume-prompt-function-goto)
+
+       ;; The Hyperbole information manager package uses (shift button2) and
+       ;; (shift button3) to provide context-sensitive mouse keys.  If you
+       ;; use this next binding, it will conflict with Hyperbole's setup.
+       ;; Choose another mouse key if you use Hyperbole.
+       (define-key global-map '(shift button3) 'mouse-function-menu)
+
+       ;; For descriptions of the following user-customizable variables,
+       ;; type C-h v <variable>
+       (setq fume-max-items 25
+             fume-fn-window-position 3
+             fume-auto-position-popup t
+             fume-display-in-modeline-p t
+             fume-menubar-menu-location "File"
+             fume-buffer-name "*Function List*"
+             fume-no-prompt-on-valid-default nil)
+
+       ;; end Xemacs stuff
+       )
+      (t
+       ;; Emcas stuff
+       ;; End Emcas stuff
+       )
+      )
+
+;; use auctex as default mode for editing latex stuff
+(setq auctex-filename (locate-library "tex-site"))
+(if auctex-filename 
+    (require 'tex-site auctex-filename))
+
+;; put stuff here which should not be/only be executed under
+;; mswindows/unix
+(cond ((or (eq system-type 'cygwin32)
+	   (eq system-type 'windows-nt))
+;;; mswindows stuff
+
+       ;; Let shell be /bin/bash, if it exists
+       (cond ((file-exists-p "/bin/bash")
+	      (setq explicit-shell-filename "/bin/bash")
+	      (setq explicit-bash-args (list "--login"  "-i"))))
+
+; patch these function so that they do not use ~ for backup under
+; mswindows
+(defun make-backup-file-name (file)
+  "Create the non-numeric backup file name for FILE.
+This is a separate function so you can redefine it for customization."
+  (if (eq system-type 'ms-dos) 
+      (let ((fn (file-name-nondirectory file)))
+	(concat (file-name-directory file)
+		(if (string-match "\\([^.]*\\)\\(\\..*\\)?" fn)
+		    (substring fn 0 (match-end 1)))
+		".bak"))
+    (if (or (eq system-type 'cygwin32)
+	    (eq system-type 'windows-nt))
+	(concat file ".bak")
+      (concat file "~"))))
+
+(defun backup-file-name-p (file)
+  "Return non-nil if FILE is a backup file name (numeric or not).
+This is a separate function so you can redefine it for customization.
+You may need to redefine `file-name-sans-versions' as well."
+  (if (or (eq system-type 'ms-dos) 
+	  (eq system-type 'cygwin32)
+	  (eq system-type 'windows-nt))
+      (string-match "\\.bak\\'" file)
+      (string-match "~\\'" file)))
+
+;;; end mswindows stuff
+) 
+(t
+;;; stuff for unix only
+
+;;; end stuff for unix only
+))
+ 
+
+
