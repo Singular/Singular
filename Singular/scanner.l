@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.11 1998-04-01 19:00:49 Singular Exp $ */
+/* $Id: scanner.l,v 1.12 1998-04-07 08:30:32 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -187,6 +187,7 @@ proc[ \t]+{name}[ \t]*\( {
                            yymore();
                          }
 <block>[^\{\}\"]*        { yymore(); }
+<block>\/\/[^\n]*        { yymore(); }
 <block>"{"               { blocknest++; yymore(); }
 <block>"}"               {
                            if (--blocknest <= 0)

@@ -1,3 +1,6 @@
+Tue Apr  7 10:27:50 MET DST 1998 hannes
+        * fixed scanner bug: ignoring { and } in <block> (scanner.l)
+
 1998-04-06  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* spSpolyLoop.h: neww calling interface for spGetSpolyLoop
