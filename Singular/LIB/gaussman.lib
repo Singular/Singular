@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.62 2002-01-22 17:26:44 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.63 2002-01-22 17:29:12 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -1151,6 +1151,7 @@ EXAMPLE:  example endvfilt; shows examples
 "
 {
   def a,d,V,m,g=v[1..5];
+  attrib(g,"isSB",1);
   int mu=ncols(m);
 
   module V0=V[1];
