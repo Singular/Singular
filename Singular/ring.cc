@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.78 1999-10-25 18:21:53 Singular Exp $ */
+/* $Id: ring.cc,v 1.79 1999-11-02 15:19:10 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -26,6 +26,8 @@
 #include "ideals.h"
 #include "lists.h"
 #include "ring.h"
+
+#define BITS_PER_LONG 8*SIZEOF_LONG
 
 static const char * const ringorder_name[] =
 {
@@ -1733,7 +1735,7 @@ int rSum(ring r1, ring r2, ring &sum)
  * used for qring definition,..
  * (i.e.: normal rings: same nCopy as currRing;
  *        qring:        same nCopy, same idCopy as currRing)
- * DO NOT CALL rComplete
+ * DOES NOT CALL rComplete
  */
 ring rCopy0(ring r)
 {
@@ -2078,160 +2080,154 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 #endif
 
 #ifdef HAVE_SHIFTED_EXPONENTS
-static void rO_Align(int &place)
+static void rO_Align(int &place, int &bitplace)
 {
   // increment place to the next aligned one
   // (count as Exponent_t,align as longs)
-  if (place & ((sizeof(long)*8)-1))
+  if (bitplace!=BITS_PER_LONG)
   {
-    place += ((sizeof(long)*8)-1);
-    place &= (~((sizeof(long)*8)-1));
+    place++;
+    bitplace=BITS_PER_LONG;
+  }
+  if (place & ((sizeof(long)/sizeof(Exponent_t))-1))
+  {
+    place += ((sizeof(long)/sizeof(Exponent_t))-1);
+    place &= (~((sizeof(long)/sizeof(Exponent_t))-1));
   }
 }
 
-static void rO_TDegree(int &place, int start, int end,
-    long *o, sro_ord &ord_struct, int bits)
+static void rO_TDegree(int &place, int &bitplace, int start, int end,
+    long *o, sro_ord &ord_struct)
 {
   // degree (aligned) of variables v_start..v_end, ordsgn 1
-  rO_Align(place);
+  rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_dp;
   ord_struct.data.dp.start=start;
   ord_struct.data.dp.end=end;
-  ord_struct.data.dp.place=place/(sizeof(long)*8));
+  ord_struct.data.dp.place=place/(sizeof(long)/sizeof(Exponent_t));
   o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
   place++;
-  rO_Align(place);
+  rO_Align(place,bitplace);
 }
 
-static void rO_TDegree_neg(int &place, int start, int end,
+static void rO_TDegree_neg(int &place, int &bitplace, int start, int end,
     long *o, sro_ord &ord_struct)
 {
   // degree (aligned) of variables v_start..v_end, ordsgn -1
-  rO_Align(place);
+  rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_dp;
   ord_struct.data.dp.start=start;
   ord_struct.data.dp.end=end;
-  ord_struct.data.dp.place=place/(sizeof(long)*8);
+  ord_struct.data.dp.place=place/(sizeof(long)/sizeof(Exponent_t));
   o[place/(sizeof(long)/sizeof(Exponent_t))]=-1;
   place++;
-  rO_Align(place);
+  rO_Align(place,bitplace);
 }
 
-static void rO_WDegree(int &place, int start, int end,
+static void rO_WDegree(int &place, int &bitplace, int start, int end,
     long *o, sro_ord &ord_struct, int *weights)
 {
   // weighted degree (aligned) of variables v_start..v_end, ordsgn 1
-  rO_Align(place);
+  rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_wp;
   ord_struct.data.wp.start=start;
   ord_struct.data.wp.end=end;
-  ord_struct.data.wp.place=place/(sizeof(long)*8);
+  ord_struct.data.wp.place=place/(sizeof(long)/sizeof(Exponent_t));
   ord_struct.data.wp.weights=weights;
   o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
   place++;
-  rO_Align(place);
+  rO_Align(place,bitplace);
 }
 
-static void rO_WDegree_neg(int &place, int start, int end,
+static void rO_WDegree_neg(int &place, int &bitplace, int start, int end,
     long *o, sro_ord &ord_struct, int *weights)
 {
   // weighted degree (aligned) of variables v_start..v_end, ordsgn -1
-  rO_Align(place);
+  rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_wp;
   ord_struct.data.wp.start=start;
   ord_struct.data.wp.end=end;
-  ord_struct.data.wp.place=place/(sizeof(long)*8);
+  ord_struct.data.wp.place=place/(sizeof(long)/sizeof(Exponent_t));
   ord_struct.data.wp.weights=weights;
   o[place/(sizeof(long)/sizeof(Exponent_t))]=-1;
   place++;
-  rO_Align(place);
+  rO_Align(place,bitplace);
 }
 
-static void rO_LexVars(int &place, int start, int end,
+static void rO_LexVars(int &place, int &bitplace, int start, int end,
   int &prev_ord, long *o,int *v, int bits)
 {
   // a block of variables v_start..v_end with lex order, ordsgn 1
   int k;
   int incr=1;
-  if(prev_ord!=1) rO_Align(place);
-  int e_place=place/ sizeof(Exponent_t);
-  int bit_place=place - (e_place*sizeof(Exponent_t));
+  if(prev_ord!=1) rO_Align(place,bitplace);
+
   if (start>end)
   {
     incr=-1;
   }
   for(k=start;;k+=incr)
   {
-    o[place/(sizeof(Exponent_t)*8)]=1;
-    v[k]=e_place | (bit_place << 24);
-    bit_place+=bits;
-#if SIZEOF_LONG == 4
-    if (bit_place > 32-bits) { bit_place=0; e_place++; }
-#else /* SIZEOF_LONG == 8 */
-    if (bit_place > 64-bits) { bit_place=0; e_place++; }
-#endif
+    bitplace-=bits;
+    if (bitplace < 0) { bitplace=BITS_PER_LONG-bits; place++; }
+    o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
+    v[k]= place | (bitplace << 24);
     if (k==end) break;
   }
   prev_ord=1;
-  place = e_place*sizeof(Exponent_t)+bit_place;
 }
 
-static void rO_LexVars_neg(int &place, int start, int end,
+static void rO_LexVars_neg(int &place, int &bitplace, int start, int end,
   int &prev_ord, long *o,int *v, int bits)
 {
   // a block of variables v_start..v_end with lex order, ordsgn -1
   int k;
   int incr=1;
-  if(prev_ord!=-1) rO_Align(place);
-  int e_place=place/ sizeof(Exponent_t);
-  int bit_place=place - (e_place*sizeof(Exponent_t));
+  if(prev_ord!=-1) rO_Align(place,bitplace);
+
   if (start>end)
   {
     incr=-1;
   }
   for(k=start;;k+=incr)
   {
-    o[place/(sizeof(Exponent_t)*8)]=-1;
-    v[k]=e_place | (bit_place << 24);
-    bit_place+=bits;
-#if SIZEOF_LONG == 4
-    if (bit_place > 32-bits) { bit_place=0; e_place++; }
-#else /* SIZEOF_LONG == 8 */
-    if (bit_place > 64-bits) { bit_place=0; e_place++; }
-#endif
+    bitplace-=bits;
+    if (bitplace < 0) { bitplace=BITS_PER_LONG-bits; place++; }
+    o[place/(sizeof(long)/sizeof(Exponent_t))]=-1;
+    v[k]=place | (bitplace << 24);
     if (k==end) break;
   }
   prev_ord=-1;
-  place = e_place*sizeof(Exponent_t)+bit_place;
 }
 
-static void rO_Syzcomp(int &place, int &prev_ord,
+static void rO_Syzcomp(int &place, int &bitplace, int &prev_ord,
     long *o, sro_ord &ord_struct)
 {
   // ordering is derived from component number
-  rO_Align(place);
+  rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_syzcomp;
-  ord_struct.data.syzcomp.place=place/(sizeof(long)*8));
+  ord_struct.data.syzcomp.place=place/(sizeof(long)/sizeof(Exponent_t));
   ord_struct.data.syzcomp.Components=NULL;
   ord_struct.data.syzcomp.ShiftedComponents=NULL;
-  o[place/(sizeof(long)*8)]=1;
+  o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
   prev_ord=1;
   place++;
-  rO_Align(place,bit_place);
+  rO_Align(place,bitplace);
 }
 
-static void rO_Syz(int &place, int &prev_ord,
+static void rO_Syz(int &place, int &bitplace, int &prev_ord,
     long *o, sro_ord &ord_struct)
 {
   // ordering is derived from component number
-  if (prev_ord!= -1) rO_Align(place);
-  if ((place & 7) ERROR;
+  // let's reserve one Exponent_t for it
+  if ((prev_ord!= -1) || (bitplace!=BITS_PER_LONG))
+    rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_syz;
-  ord_struct.data.syz.place=place/(sizeof(Exponent_t)*8));
+  ord_struct.data.syz.place=place/(sizeof(long)/sizeof(Exponent_t));
   ord_struct.data.syz.limit=0;
-  o[place/(sizeof(Exponent_t)*8)]= -1;
+  o[place/(sizeof(long)/sizeof(Exponent_t))]= -1;
   prev_ord=-1;
-  place+=Exponent_t*8;
+  place++;
 }
 
 BOOLEAN rComplete(ring r, int force)
@@ -2274,15 +2270,17 @@ BOOLEAN rComplete(ring r, int force)
        Werror("unknown bitmask %xl",r->bitmask);
        return TRUE;
   }
-  long *tmp_ordsgn=(long *)Alloc0(2*(n+r->N)*sizeof(long)); // wil be used for ordsgn
-  int *v=(int *)Alloc((r->N+1)*sizeof(int)); // will be used for VarOffset
+  // will be used for ordsgn:
+  long *tmp_ordsgn=(long *)Alloc0(2*(n+r->N)*sizeof(long));
+  // will be used for VarOffset:
+  int *v=(int *)Alloc((r->N+1)*sizeof(int));
   for(i=r->N; i>=0 ; i--)
   {
     v[i]=-1;
   }
   sro_ord *tmp_typ=(sro_ord *)Alloc0(2*(n+r->N)*sizeof(sro_ord));
   int typ_i=0;
-  int bit_place=0;
+  int bitplace=0;
   int prev_ordsgn=0;
   r->pVarLowIndex=0;
 
@@ -2301,11 +2299,13 @@ BOOLEAN rComplete(ring r, int force)
         break;
 
       case ringorder_c:
-        rO_LexVars_neg(j, j_bits, 0,0, prev_ordsgn,tmp_ordsgn,v,bits);
+        rO_Align(j, j_bits);
+        rO_LexVars_neg(j, j_bits, 0,0, prev_ordsgn,tmp_ordsgn,v,BITS_PER_LONG);
         break;
 
       case ringorder_C:
-        rO_LexVars(j, j_bits, 0,0, prev_ordsgn,tmp_ordsgn,v,bits);
+        rO_Align(j, j_bits);
+        rO_LexVars(j, j_bits, 0,0, prev_ordsgn,tmp_ordsgn,v,BITS_PER_LONG);
         break;
 
       case ringorder_M:
@@ -2461,13 +2461,17 @@ BOOLEAN rComplete(ring r, int force)
     }
   }
 
-  int j0=j-1;
+  int j0=j; // save j
+  int j_bits0=j_bits; // save jbits
   rO_Align(j,j_bits);
+  j_bits=j_bits0; j=j0;
+
   r->pCompHighIndex=(j-1)/(sizeof(long)/sizeof(Exponent_t));
-  j=j0+1;
 
   // fill in some empty slots with variables not already covered
-  for(i=0 ; i<r->N+1 ; i++)
+  // v0 is special, is therefore already covered
+  assume(v[0]!=-1);
+  for(i=1 ; i<r->N+1 ; i++)
   {
     if(v[i]==(-1))
     {
@@ -2482,7 +2486,7 @@ BOOLEAN rComplete(ring r, int force)
     }
   }
 
-  r->pVarHighIndex=j-1;
+  r->pVarHighIndex=j - (j_bits==0);
   rO_Align(j,j_bits);
   // ----------------------------
   // finished with constructing the monomial, computing sizes:
@@ -2490,7 +2494,7 @@ BOOLEAN rComplete(ring r, int force)
   r->ExpESize=j;
   r->ExpLSize=j/(sizeof(long)/sizeof(Exponent_t));
   r->mm_specHeap = mmGetSpecHeap(POLYSIZE + (r->ExpLSize)*sizeof(long));
-  assume(r->m_specHeap != NULL);
+  assume(r->mm_specHeap != NULL);
 
   // ----------------------------
   // indices and ordsgn vector for comparison
@@ -2911,7 +2915,9 @@ BOOLEAN rComplete(ring r, int force)
   j=j0+1;
 
   // fill in some empty slots with variables not already covered
-  for(i=0 ; i<r->N+1 ; i++)
+  // v0 is special, is therefore already covered
+  assume(v[0]!=-1);
+  for(i=1 ; i<r->N+1 ; i++)
   {
     if(v[i]==(-1))
     {
@@ -3056,6 +3062,69 @@ void rUnComplete(ring r)
   Free((ADDRESS)r->ordsgn,r->pCompLSize*sizeof(long));
 }
 
+void rDebugPrint(ring r)
+{
+  int j;
+  PrintS("varoffset:\n");
+  #ifdef HAVE_SHIFTED_EXPONENTS
+  for(j=0;j<=r->N;j++) Print("  v%d at pos %d, bit %d\n",
+     j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
+  Print("bitmask=0x%x\n",r->bitmask);
+  #else
+  for(j=0;j<=r->N;j++)
+    Print("  v%d at pos %d\n",j,r->VarOffset[j]);
+  #endif
+  PrintS("ordsgn:\n");
+  for(j=0;j<r->pCompLSize;j++)
+    Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j);
+  Print("OrdSgn:%d\n",r->OrdSgn);
+  PrintS("ordrec:\n");
+  for(j=0;j<r->OrdSize;j++)
+  {
+    char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp","ro_none"};
+    Print("  typ %s",TYP[r->typ[j].ord_typ]);
+    Print("  place %d",r->typ[j].data.dp.place);
+    if (r->typ[j].ord_typ!=ro_syzcomp)
+    {
+      Print("  start %d",r->typ[j].data.dp.start);
+      Print("  end %d",r->typ[j].data.dp.end);
+      if (r->typ[j].ord_typ==ro_wp)
+      {
+        Print(" w:");
+        int l;
+        for(l=r->typ[j].data.wp.start;l<=r->typ[j].data.wp.end;l++)
+          Print(" %d",r->typ[j].data.wp.weights[l-r->typ[j].data.wp.start]);
+      }
+    }
+    PrintLn();
+  }
+  Print("pVarLowIndex:%d ",r->pVarLowIndex);
+  Print("pVarHighIndex:%d\n",r->pVarHighIndex);
+  Print("pDivLow:%d ",r->pDivLow);
+  Print("pDivHigh:%d\n",r->pDivHigh);
+  Print("pCompLowIndex:%d ",r->pCompLowIndex);
+  Print("pCompHighIndex:%d\n",r->pCompHighIndex);
+  Print("pOrdIndex:%d pCompIndex:%d\n", r->pOrdIndex, r->pCompIndex);
+  Print("ExpESize:%d ",r->ExpESize);
+  Print("ExpLSize:%d ",r->ExpLSize);
+  Print("OrdSize:%d\n",r->OrdSize);
+}
+
+void pDebugPrint(poly p)
+{
+  int i;
+  pWrite(p);
+  while(p!=NULL)
+  {
+    Print("exp.e[0..%d]\n",currRing->ExpESize-1);
+    for(i=0;i<currRing->ExpESize;i++)
+      Print("%d ",p->exp.e[i]);
+    Print("\nexp.l[0..%d]\n",currRing->ExpLSize-1);
+    for(i=0;i<currRing->ExpLSize;i++)
+      Print("%d ",p->exp.l[i]);
+    PrintLn();pIter(p);
+  }
+}
 
 #if 0
 /*2
@@ -3163,14 +3232,15 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 
 ring rAddSyzComp(ring r)
 {
-  // HANNES: WHAT's THIS ????
-  nMap=nCopy;
   if (r->order[0]==ringorder_c)
     return currRing;
-  
-  assume(currRing->order[0] != ringorder_s && 
+
+  assume(currRing->order[0] != ringorder_s &&
          currRing->order[0] != ringorder_S);
-  
+
+  nMap=nCopy; // need to set nMap for mapping of polys
+              // (at least with current implementation via pPermPoly)
+
   ring res=rCopy0(r);
   if (res->qideal!=NULL)
   {

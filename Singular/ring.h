@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.37 1999-10-26 16:40:46 Singular Exp $ */
+/* $Id: ring.h,v 1.38 1999-11-02 15:19:11 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -190,6 +190,9 @@ extern BOOLEAN rDBTest(ring r, char* fn, int l);
 #else
 #define rTest(r)
 #endif
+
+void rDebugPrint(ring r);
+void pDebugPrint(poly p);
 
 #endif
 

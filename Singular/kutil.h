@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.20 1999-10-27 15:07:30 obachman Exp $ */
+/* $Id: kutil.h,v 1.21 1999-11-02 15:19:08 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -162,6 +162,7 @@ void cancelunit (LObject* p);
 void HEckeTest (poly pp,kStrategy strat);
 void redtailS (poly* h,int maxIndex);
 void redtailMora (poly* h,int maxIndex);
+void kinitBbaHeaps(kStrategy heap);
 void initBuchMoraCrit(kStrategy strat);
 void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat);
 void initBuchMoraPos(kStrategy strat);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.10 1999-09-16 12:33:58 Singular Exp $ */
+/* $Id: longalg.h,v 1.11 1999-11-02 15:19:08 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -20,7 +20,7 @@ typedef struct slnumber * lnumber;
 #define SIZEOF_PARAMETER SIZEOF_EXPONENT
 #else
 #define PARAMETER_TYPE int
-#define SIZEOF_PARAMETER SIZOF_EXPONENT
+#define SIZEOF_PARAMETER SIZEOF_EXPONENT
 #endif
 
 struct reca

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.16 1999-10-26 12:38:57 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.17 1999-11-02 15:19:11 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -92,7 +92,7 @@ private:
   int inred;           // unreducable part
   int rpiv, cpiv;      // position of the pivot
   int normalize;       // Normalization flag
-  EXPONENT_TYPE *perm; // permutation of rows
+  Exponent_t *perm;    // permutation of rows
   float wpoints;       // weight of all points
   float *wrw, *wcl;    // weights of rows and columns
   smpoly * m_act;      // unreduced columns
@@ -348,7 +348,7 @@ sparse_mat::sparse_mat(ideal smat)
   crd = 0;
   tored = nrows; // without border
   i = tored+1;
-  perm = (EXPONENT_TYPE *)Alloc(sizeof(EXPONENT_TYPE)*(i+1));
+  perm = (Exponent_t *)Alloc(sizeof(Exponent_t)*(i+1));
   perm[i] = 0;
   m_row = (smpoly *)Alloc0(sizeof(smpoly)*i);
   wrw = (float *)Alloc(sizeof(float)*i);
@@ -385,7 +385,7 @@ sparse_mat::~sparse_mat()
   i = nrows+1;
   Free((ADDRESS)wrw, sizeof(float)*i);
   Free((ADDRESS)m_row, sizeof(smpoly)*i);
-  Free((ADDRESS)perm, sizeof(EXPONENT_TYPE)*(i+1));
+  Free((ADDRESS)perm, sizeof(Exponent_t)*(i+1));
 }
 
 /*
@@ -479,7 +479,7 @@ poly sparse_mat::smDet()
       this->smFinalMult();
       this->smPivDel();
       if (act != 0) res = m_act[1]->m;
-      FreeSizeOf((void *)m_act[1], smprec);    
+      FreeSizeOf((void *)m_act[1], smprec);
       return res;
     }
   }
@@ -488,7 +488,7 @@ poly sparse_mat::smDet()
 /*
 * the Bareiss elimination:
 *   - with x unreduced last rows, pivots from here are not allowed
-*   - the method will finish for number of unreduced columns < y 
+*   - the method will finish for number of unreduced columns < y
 */
 void sparse_mat::smBareiss(int x, int y)
 {
@@ -545,7 +545,7 @@ void sparse_mat::smBareiss(int x, int y)
 /*
 * the new Bareiss elimination:
 *   - with x unreduced last rows, pivots from here are not allowed
-*   - the method will finish for number of unreduced columns < y 
+*   - the method will finish for number of unreduced columns < y
 */
 void sparse_mat::smNewBareiss(int x, int y)
 {
@@ -675,7 +675,7 @@ void sparse_mat::smPivot()
           wopt = wp;
           copt = i;
           ropt = a->pos;
-        } 
+        }
       }
       a = a->n;
       if (a == NULL)
@@ -776,7 +776,7 @@ void sparse_mat::smNewPivot()
           wopt = wp;
           copt = i;
           ropt = a->pos;
-        } 
+        }
       }
       a = a->n;
       if (a == NULL)
@@ -807,7 +807,7 @@ void sparse_mat::smElim()
   int i;
 
   if (oldpiv != NULL) q = oldpiv->m; // previous pivot
-  else q = NULL; 
+  else q = NULL;
   if ((c == NULL) || (r == NULL))
   {
     while (r) smElemDelete(&r);
@@ -893,7 +893,7 @@ void sparse_mat::smElim()
           b = b->n;
           if (q) SM_DIV(hb, q);
           res->m = hb;
-        }      
+        }
         else
         {
           ha = SM_MULT(a->m, p, q);
@@ -955,7 +955,7 @@ void sparse_mat::sm1Elim()
         res->e = 1;
         res->f = smPolyWeight(res);
         b = b->n;
-      }      
+      }
       else
       {
         ha = smMult(a->m, p);
@@ -1042,7 +1042,7 @@ void sparse_mat::smHElim()
         res->m = x;
         res->e = e;
         res->f = smPolyWeight(res);
-      }      
+      }
       else
       {
         ha = a->m;
@@ -1546,7 +1546,7 @@ int sparse_mat::smCheckNormalize()
 }
 
 /*
-* normalize 
+* normalize
 */
 void sparse_mat::smNormalize()
 {
@@ -1840,7 +1840,7 @@ poly smMultDiv(poly a, poly b, const poly c)
       if (smCheckLead(a, e))
         smCombineChain(&pa, r);
       else
-        pa = pAdd(pa,r); 
+        pa = pAdd(pa,r);
     }
     else
     {
@@ -1883,7 +1883,7 @@ static void smExactPolyDiv(poly a, poly b)
     pSetCoeff(a,y);
     yn = nNeg(nCopy(y));
     pSetCoeff0(e,yn);
-    if (smIsNegQuot(e, a, b)) 
+    if (smIsNegQuot(e, a, b))
       h = smDMult(tail, e);
     else
       h = smEMult(tail, e);
@@ -1961,7 +1961,7 @@ static poly smDMult(poly t, const poly e)
   poly r = NULL;
   poly res, h;
   int i;
-  EXPONENT_TYPE w;
+  Exponent_t w;
 
   h = res = pInit();
   loop
@@ -2152,7 +2152,7 @@ static smpoly smPoly2Smpoly(poly q)
 {
   poly pp;
   smpoly res, a;
-  EXPONENT_TYPE x;
+  Exponent_t x;
 
   if (q == NULL)
     return NULL;
@@ -2189,7 +2189,7 @@ static poly smSmpoly2Poly(smpoly a)
 {
   smpoly b;
   poly res, pp, q;
-  EXPONENT_TYPE x;
+  Exponent_t x;
 
   if (a == NULL)
     return NULL;

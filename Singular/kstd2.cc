@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.37 1999-10-19 12:42:44 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.38 1999-11-02 15:19:07 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -564,7 +564,6 @@ void kinitBbaHeaps(kStrategy heap)
 #endif
 }
 
-
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
   int   srmax,lrmax, red_result;
@@ -572,9 +571,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
+  initBuchMoraPos(strat);
   initHilbCrit(F,Q,&hilb,strat);
   initBba(F,strat);
-  initBuchMoraPos(strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);

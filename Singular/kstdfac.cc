@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.27 1999-10-19 12:42:45 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.28 1999-11-02 15:19:08 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -47,20 +47,18 @@ static void copyT (kStrategy o,kStrategy n)
       if (i>o->sl)
       {
         t[j].p=pCopy(p);
-        t[j].ecart=o->T[j].ecart;
-        t[j].length=o->T[j].length;
-        t[j].sev=o->T[j].sev;
         break;
       }
       if (p == o->S[i])
       {
         t[j].p=n->S[i];
-        t[j].ecart=o->T[j].ecart;
-        t[j].length=o->T[j].length;
-        t[j].sev=o->T[j].sev;
         break;
       }
     }
+    t[j].ecart=o->T[j].ecart;
+    t[j].length=o->T[j].length;
+    t[j].sev=o->T[j].sev;
+    // t[j].heap=NULL; // done by Alloc0
   }
   n->T=t;
 }
@@ -76,6 +74,7 @@ static void copyL (kStrategy o,kStrategy n)
 
   for (j=0; j<=o->Ll; j++)
   {
+    // copy .p ----------------------------------------------
     if (o->L[j].p->next!=o->tail)
       l[j].p=pCopy(o->L[j].p);
     else
@@ -83,6 +82,7 @@ static void copyL (kStrategy o,kStrategy n)
       l[j].p=pHead(o->L[j].p);
       l[j].p->next=n->tail;
     }
+    // copy .lcm ----------------------------------------------
     if (o->L[j].lcm!=NULL)
       l[j].lcm=pCopy1(o->L[j].lcm);
     else
@@ -92,6 +92,7 @@ static void copyL (kStrategy o,kStrategy n)
     l[j].p1=NULL;
     l[j].p2=NULL;
 
+    // copy .p1 ----------------------------------------------
     p = o->L[j].p1;
     i = -1;
     loop
@@ -111,6 +112,7 @@ static void copyL (kStrategy o,kStrategy n)
       }
     }
 
+    // copy .p2 ----------------------------------------------
     p = o->L[j].p2;
     i = -1;
     loop
@@ -129,6 +131,17 @@ static void copyL (kStrategy o,kStrategy n)
         break;
       }
     }
+
+    // copy .heap ----------------------------------------------
+    l[j].heap=NULL;
+    // copy .ecart ---------------------------------------------
+    l[j].ecart=o->L[j].ecart;
+    // copy .length --------------------------------------------
+    l[j].length=o->L[j].length;
+    // copy .pLength -------------------------------------------
+    l[j].pLength=o->L[j].pLength;
+    // copy .sev -----------------------------------------------
+    l[j].sev=o->L[j].sev;
   }
   n->L=l;
 }
@@ -237,6 +250,7 @@ static void completeReduceFac (kStrategy strat, lists FL)
     }
     int facdeg=pFDeg(strat->S[si]);
 
+    kTest_S(strat);
     ideal fac=singclap_factorize(strat->S[si],NULL,1);
 #ifndef HAVE_LIBFAC_P
     if (fac==NULL)
@@ -425,8 +439,9 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     //test_int_std(strat->kIdeal);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
-    && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
-       || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))))
+    && ((strat->honey 
+        && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
+      || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))))
     {
       /*
       *stops computation if
@@ -451,11 +466,13 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     }
     if (strat->honey)
     {
-      if (TEST_OPT_PROT) message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
+      if (TEST_OPT_PROT)
+        message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
     }
     else
     {
-      if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
+      if (TEST_OPT_PROT)
+        message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
     }
     /* reduction of the element choosen from L */
     strat->red(&strat->P,strat);
@@ -744,6 +761,7 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   initBuchMoraPos(strat);
   initBba(F,strat);
   initBuchMora(F, Q,strat);
+  kinitBbaHeaps(strat);
   if (D!=NULL)
   {
     strat->D=idCopy(D);

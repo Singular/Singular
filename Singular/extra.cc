@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.112 1999-10-22 11:14:07 obachman Exp $ */
+/* $Id: extra.cc,v 1.113 1999-11-02 15:19:05 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -469,72 +469,17 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
-/*==================== poly ==================================*/
+/*==================== poly debug ==================================*/
     if(strcmp(sys_cmd,"p")==0)
     {
-      poly p=(poly)h->Data();
-      int i;
-      pWrite(p);
-      while(p!=NULL)
-      {
-        Print("exp.e[0..%d]\n",currRing->ExpESize-1);
-        for(i=0;i<currRing->ExpESize;i++)
-          Print("%d ",p->exp.e[i]);
-        Print("\nexp.l[0..%d]\n",currRing->ExpLSize-1);
-        for(i=0;i<currRing->ExpLSize;i++)
-          Print("%d ",p->exp.l[i]);
-        PrintLn();pIter(p);
-      }
+      pDebugPrint((poly)h->Data());
       return FALSE;
     }
     else
-/*==================== ring ==================================*/
+/*==================== ring debug ==================================*/
     if(strcmp(sys_cmd,"r")==0)
     {
-      ring r=(ring)h->Data();
-      int j;
-      PrintS("varoffset:\n");
-      #ifdef HAVE_SHIFTED_EXPONENTS
-      for(j=0;j<=r->N;j++) Print("  v%d at pos %d, bit %d\n",
-         j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
-      Print("bitmask=%x\n",r->bitmask);
-      #else
-      for(j=0;j<=r->N;j++) Print("  v%d at pos %d\n",j,r->VarOffset[j]);
-      #endif
-      PrintS("ordsgn:\n");
-      for(j=0;j<r->pCompLSize;j++)
-        Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j);
-      Print("OrdSgn:%d\n",r->OrdSgn);
-      PrintS("ordrec:\n");
-      for(j=0;j<r->OrdSize;j++)
-      {
-        char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp","ro_none"};
-        Print("  typ %s",TYP[r->typ[j].ord_typ]);
-        Print("  place %d",r->typ[j].data.dp.place);
-        if (r->typ[j].ord_typ!=ro_syzcomp)
-        {
-          Print("  start %d",r->typ[j].data.dp.start);
-          Print("  end %d",r->typ[j].data.dp.end);
-          if (r->typ[j].ord_typ==ro_wp)
-          {
-            Print(" w:");
-            int l;
-            for(l=r->typ[j].data.wp.start;l<=r->typ[j].data.wp.end;l++)
-              Print(" %d",r->typ[j].data.wp.weights[l-r->typ[j].data.wp.start]);
-          }
-	}
-        PrintLn();
-      }
-      Print("pVarLowIndex:%d ",r->pVarLowIndex);
-      Print("pVarHighIndex:%d\n",r->pVarHighIndex);
-      Print("pDivLow:%d ",r->pDivLow);
-      Print("pDivHigh:%d\n",r->pDivHigh);
-      Print("pCompLowIndex:%d ",r->pCompLowIndex);
-      Print("pCompHighIndex:%d\n",r->pCompHighIndex);
-      Print("pOrdIndex:%d pCompIndex:%d\n", r->pOrdIndex, r->pCompIndex);
-      Print("ExpESize:%d ",r->ExpESize);
-      Print("ExpLSize:%d ",r->ExpLSize);
-      Print("OrdSize:%d\n",r->OrdSize);
+      rDebugPrint((ring)h->Data());
       return FALSE;
     }
     else

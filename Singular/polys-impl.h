@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.39 1999-10-26 15:06:13 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.40 1999-11-02 15:19:09 Singular Exp $ */
 
 /***************************************************************
  *
@@ -32,10 +32,9 @@
 union s_exp
 {
    Exponent_t     e[VARS +1];
-   unsigned long  l[(VARS +1)/2];
+   unsigned long  l[(VARS +1)/(sizeof(long)/sizeof(Exponent_t))];
 };
 
-//typedef Exponent_t  monomial[VARS + 1];
 typedef s_exp  monomial;
 typedef Exponent_t* Exponent_pt;
 

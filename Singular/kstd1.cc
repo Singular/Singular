@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.44 1999-10-22 11:14:13 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.45 1999-11-02 15:19:06 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1657,6 +1657,7 @@ int kHomModDeg(poly p)
   if (i==0) return j;
   return j+(*kModW)[i-1];
 }
+
 ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
           int newIdeal, intvec *vw)
 {

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.24 1999-10-14 14:27:25 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.25 1999-11-02 15:19:09 Singular Exp $ */
 
 /***************************************************************
  *
@@ -303,8 +303,13 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
 static inline mpsr_Status_t GetAlgPoly(MP_Link_pt link, alg *p)
 {
   MP_Uint32_t j, nm;
-  int *exp, i;
+  int i;
   alg a;
+#if SIZEOF_INT == SIZEOF_PARAMETER
+  Exponent_t *exp;
+#else
+  int *exp;
+#endif
 
   IMP_GetUint32(link, &nm);
 
