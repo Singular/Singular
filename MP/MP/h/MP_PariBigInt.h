@@ -12,8 +12,17 @@
 #include "MP.h"
 #ifdef MP_HAVE_PARI
 
+/* Dirty hack with honors to andi: pari defines "overflow" identifier
+   which conflicts with the definition in some libraries (e.g. in
+   iostream -- hence, we overshadow this defitnition before includeing
+   genpari */
+#ifndef overflow
+#define overflow muff
 #include "genpari.h"
-  
+#undef overflow
+#endif
+
+
 EXTERN MP_BigIntOps_t imp_pari_bigint_ops;
 
 EXTERN MP_Status_t IMP_GetPariBigInt _ANSI_ARGS_((MP_Link_pt link,

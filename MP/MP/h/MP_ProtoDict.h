@@ -19,6 +19,9 @@
  * Meta type definitions
  *
  ***************************************************************************/
+/* We use the same numerical values as we use for the MP types */
+#define MP_CmtProto_2_MPType(cmt)   cmt
+
 #define MP_CmtProtoIMP_Sint8                        65
 #define MP_CmtProtoIMP_Uint8                        67
 #define MP_CmtProtoIMP_Boolean                      68

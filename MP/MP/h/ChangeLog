@@ -1,3 +1,26 @@
+Sat Jun 28 15:24:44 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MP_ProtoDict.h: Added MP_CmtProto_2_MPType(cmt)
+
+	* MP_PolyDict.h:  Added MP_CmtPolyExpTreePoly
+
+	* MP_PariBigInt.h: Shadow definition of overflow
+
+	* MP_NumberDict.h: Added MP_CmtNumberInteger
+
+	* MP_Config.h.in: Added dewfines for pari compilation
+
+	* MP_BasicDict.h: Added MP_CopBasicComplex
+
+Wed Jun 25 09:14:42 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MP_Env.h: typedef MP_TranspOps_t: used VARARGS in function
+	  declarartion to enable g++ compilation
+
+Tue Jun 24 12:29:13 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MP_PariBigInt.h (overflow): added dirty andi hack
+
 Wed Jun 11 14:18:51 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* MP_PolyDict.h (MP_CopPolyLeadExp): changed some names

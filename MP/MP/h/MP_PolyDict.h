@@ -103,5 +103,12 @@
 #define MP_CopPolyFacStd                43
 #define MP_CopPolyResultant             44
 
+/***************************************************************************
+ *
+ * Common Metat Types
+ *
+ ***************************************************************************/
+
+#define MP_CmtPolyExpTreePoly       1
 
 #endif /* _MP_PolyDict_h */

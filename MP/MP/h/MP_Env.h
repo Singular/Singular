@@ -46,12 +46,12 @@
 #define MP_INIT_FREE_BUFFERS_OPT 3
 
 typedef struct  {
-    long         (*write_buf)();          /* write buffer to transport   */
-    long         (*read_buf)();           /* read transport to buffer    */
-    MP_Status_t  (*flush_buf)();          /* flush buffer to transport   */
-    MP_Boolean_t (*get_status)();         /* check status of the link    */
-    MP_Status_t  (*open_transp)();        /* open the transport device   */
-    MP_Status_t  (*close_transp)();       /* close the transport device  */
+    long         (*write_buf)VARARGS;       /* write buffer to transport   */
+    long         (*read_buf)VARARGS;        /* read transport to buffer    */
+    MP_Status_t  (*flush_buf)VARARGS;       /* flush buffer to transport   */
+    MP_Boolean_t (*get_status)VARARGS;      /* check status of the link    */
+    MP_Status_t  (*open_transp)VARARGS;     /* open the transport device   */
+    MP_Status_t  (*close_transp)VARARGS;    /* close the transport device  */
 } MP_TranspOps_t;
 
 
