@@ -29,13 +29,12 @@ clean distclean mostlyclean maintainer-clean:
 		${MAKE} $@; \
 		cd .. ;\
 	done;\
-	rm -rf *~ a.out core *.o .log lib bin share include; \
+	rm -rf *~ a.out core *.o .log lib bin info share include; \
 	if test "$@" = distclean || test "$@" = maintainer-clean; then \
 	  rm -f config.cache config.log config.status TAGS* *.gz *.tar; \
 	fi; \
 	if test "$@" = maintainer-clean; then \
 	  echo "This command is inteneded for maintainer use, only" ; \
-	  echo "Rebuilding the deleteed file(s) requires at least autoconf"; \ 
 	  rm -f configure ;\
 	fi
 

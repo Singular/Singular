@@ -1,5 +1,7 @@
 Tue May  6 09:30:51 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
+	* Added ranlib after installing libs -- Suns seem to need it
+
 	* configure.in: Manuallu put INSTALL into Makefile.in
 
 Mon May  5 15:43:58 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>

@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.3 1997-05-06 17:17:54 obachman Exp $
+# $Id: Makefile.in,v 1.4 1997-05-06 19:37:57 obachman Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= rm -f
@@ -142,6 +142,7 @@ install:	all
 	${MKINSTALLDIRS} ${templatedir}
 	${INSTALL_DATA} ${LIBFACINCLUDE} ${includedir}
 	${INSTALL_PROGRAM} ${TARGETNAME}.a ${libdir}
+	${RANLIB} ${libdir}/${TARGETNAME}.a
 	for TEMPL in ${FACTORTEMPL}; do \
 		${INSTALL_DATA} $${TEMPL} ${templatedir}; \
 	done
