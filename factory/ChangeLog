@@ -1,3 +1,9 @@
+Fri Feb 14 16:53:42 CET 2003 * hannes: bugfix
+       could not factorize x2+xy+y2 in Fp(a)[x,y], a2+a+1=0
+       added tests in factorize(f,a) (isPurePoly(f,a))
+       added sort option to FpFactorizeUnivariateCZ and to NTL factor routines
+       (NTLconvert.cc cf_factor.cc fac_cantzass.cc)
+
 Thu Nov  7 11:29:33 MET 2002 Hans Schoenemann <hannes@mathematik.uni-kl.de>
         * interface to NTL
 	* many fixes 

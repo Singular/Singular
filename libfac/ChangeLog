@@ -1,3 +1,11 @@
+Fri Feb 14 16:53:42 CET 2003 * hannes: bugfix
+       could not factorize x2+xy+y2 in Fp(a)[x,y], a2+a+1=0
+       added wrapper factorize2 with sanity checks/typ conversions
+
+Thu Nov  7 11:29:33 MET 2002 Hans Schoenemann <hannes@mathematik.uni-kl.de>
+       * interface to NTL
+       * many fixes
+
 Wed Aug 22 16:35:00 CEST 2001 Hans Schoenemann <hannes@mathematik.uni-kl.de>
        * HAVE_SINGULAR_ERROR/NOSTREAMIO handling in configure
        * search for main var in Factorize
