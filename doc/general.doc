@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.75 1998-05-15 11:49:45 schmidt Exp $
+@comment $Id: general.doc,v 1.76 1998-05-15 12:09:15 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -425,7 +425,7 @@ Throughout this manual, the current active ring in @sc{Singular} is
 called basering. The reserved name @code{basering} in @sc{Singular} is
 an alias for the current active ring.
 
-The basering can by set by declaring a new ring as described in the
+The basering can be set by declaring a new ring as described in the
 following subsections or with the commands @code{setring} and
 @code{keepring}. Objects of ring dependent types are local to a ring. To
 access them after a change of the basering they have to be mapped using

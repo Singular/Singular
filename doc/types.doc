@@ -1,6 +1,7 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.47 1998-05-15 11:59:55 schmidt Exp $
+@comment $Id: types.doc,v 1.48 1998-05-15 12:10:07 wichmann Exp $
 @comment this file contains the type definitions
+@c * wichmann: + typographical changes.
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
@@ -2668,7 +2669,9 @@ library file) makes this procedure local to the library.
 @section qring
 @cindex qring
 
-HIER MUSS NOCH TEXT HIN (HANNES?)
+@sc{Singular} offers the opportunity to calculate in quotient rings
+(factor rings), i.e., rings modulo an ideal. The ideal has to be given
+in form of a standard basis. 
 
 @menu
 * qring declaration::           
@@ -2802,9 +2805,11 @@ For a detailed description of the concept of rings see
 
 @menu
 * ring declarations::           
+* ring related functions::      
 @end menu
 
-@node ring declarations,  , ring, ring
+@c ---------------------------------------
+@node ring declarations, ring related functions, ring, ring
 @subsection ring declarations
 @cindex ring declarations
 
@@ -2869,6 +2874,33 @@ be omitted.
 @end example
 @end table
 
+@c ---------------------------------------
+@node ring related functions,  , ring declarations, ring
+@subsection ring related functions
+@cindex ring related functions
+
+@table @code
+@item charstr
+description of the coeffinet field of a ring (see @ref{charstr})
+@item keepring
+move ring to next upper level (see @ref{keepring})
+@item npars
+number of ring parameters (see @ref{npars})
+@item nvars
+number of ring variables (see @ref{nvars})
+@item ordstr
+monomial ordering of a ring (see @ref{ordstr})
+@item parstr
+names of all ring parameters or the
+name of the n-th ring parameter (see @ref{parstr})
+@item qring
+quotient ring (see @ref{qring})
+@item setring
+set a new basering (see @ref{setring})
+@item varstr
+names of all ring variables or the
+name of the n-th ring variable (see @ref{varstr})
+@end table
 
 @c ---------------------------------------
 @node string, vector, ring, Data types
