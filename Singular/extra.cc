@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.39 1998-04-23 09:50:23 schmidt Exp $ */
+/* $Id: extra.cc,v 1.40 1998-04-24 17:19:04 schmidt Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -68,7 +68,7 @@
 // see clapsing.cc for a description of the `FACTORY_*' options
 
 #ifdef FACTORY_GCD_STAT
-#define FACTORY_GCD_TEST
+#include "gcd_stat.h"
 #endif
 
 #ifdef FACTORY_GCD_TIMING
@@ -733,6 +733,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 	TIMING_RESET( contentTimer );
 	TIMING_RESET( algContentTimer );
 	TIMING_RESET( algLcmTimer );
+	return FALSE;
+    }
+    else
+#endif
+      
+#ifdef FACTORY_GCD_STAT
+    if ( ! strcmp( (char*)(h->Data()), "gcdstat" ) ) {
+	printGcdTotal();
+	printContTotal();
+	resetGcdTotal();
+	resetContTotal();
 	return FALSE;
     }
     else
