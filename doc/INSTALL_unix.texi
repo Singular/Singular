@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.19 2002-04-23 14:23:01 westenb Exp $
+@comment $Id: INSTALL_unix.texi,v 1.20 2005-03-14 13:22:10 Singular Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -287,8 +287,6 @@ chgrp tty $(which emacs)
 chmod g+s $(which xemacs)
 chgrp tty $(which xemacs)
 @end example
-See also @uref{http://sdb.suse.de/sdb/de/html/ke_devpts-63.html} for
-details.
 
 @item For @code{HPUX} systems:
 @*The /etc/termcap files which are pre-installed on these systems are
