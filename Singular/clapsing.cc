@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.34 1998-04-24 17:19:29 schmidt Exp $
+// $Id: clapsing.cc,v 1.35 1998-04-27 14:47:02 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -96,10 +96,10 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 poly singclap_gcd ( poly f, poly g )
 {
   poly res=NULL;
-  
+
   if (f) pCleardenom(f);
   if (g) pCleardenom(g);
-  
+
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if (( nGetChar() == 0 || nGetChar() > 1 )
@@ -128,7 +128,7 @@ poly singclap_gcd ( poly f, poly g )
         Variable a=rootOf(mipo);
         CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
         res= convClapAPSingAP( gcd( F, G ) );
-      }	
+      }
     }
     else
     {
@@ -633,9 +633,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
             {
               (**v)[j]=(*w)[i]; j++;
             }
-          }  
+          }
           delete w;
-        }  
+        }
       }
       if (res->m[0]==NULL)
       {

@@ -1,3 +1,6 @@
+Mon Apr 27 16:45:41 MET DST 1998 hannes
+        * fixed conversion of factory 0 to poly NULL (clapconv.cc)
+
 1998-04-27  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* febase.cc (myfread): introduced myfread and myfopen which assure 

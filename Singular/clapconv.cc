@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.16 1998-04-23 09:52:07 Singular Exp $
+// $Id: clapconv.cc,v 1.17 1998-04-27 14:47:01 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -156,7 +156,14 @@ convRecPP ( const CanonicalForm & f, int * exp, poly & result )
       }
     }
     pSetm( term );
-    result = pAdd( result, term );
+    if ( nIsZero(pGetCoeff(term)) )
+    {
+      pDelete(&term);
+    }
+    else
+    {
+      result = pAdd( result, term );
+    }  
   }
 }
 

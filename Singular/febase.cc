@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.32 1998-04-27 12:34:12 obachman Exp $ */
+/* $Id: febase.cc,v 1.33 1998-04-27 14:47:03 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -710,6 +710,3 @@ size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream)
   }
   return got;
 }
-
-
-      
