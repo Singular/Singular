@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.5 1999-07-02 16:14:38 wenk Exp $ */
+/* $Id: gnumpc.cc,v 1.6 1999-07-02 16:43:18 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -284,12 +284,15 @@ BOOLEAN ngcIsZero (number a)
 }
 
 /*2
-* za >= 0 ? ( real() > 0 || imag() > 0 )
+* za >= 0 ? 
 */
 BOOLEAN ngcGreaterZero (number a)
 {
   if ( a == NULL ) return TRUE;
-  return ( ((gmp_complex*)a)->real().sign() > 0 || ((gmp_complex*)a)->imag().sign() > 0 );
+  if ( ! ((gmp_complex*)a)->imag().isZero() ) 
+    return ( abs( *(gmp_complex*)a).sign() >= 0 );
+  else 
+    return ( ((gmp_complex*)a)->real().sign() >= 0 );
 }
 
 /*2
