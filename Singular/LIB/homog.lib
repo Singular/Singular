@@ -1,7 +1,7 @@
-// $Id: homog.lib,v 1.1.1.1 1997-04-25 15:13:26 obachman Exp $
+// $Id: homog.lib,v 1.2 1997-04-28 19:27:18 obachman Exp $
 //(BM 11/95)
 ///////////////////////////////////////////////////////////////////////////////
-LIBRARY:  homog.lib           homological algebra porcedures  
+LIBRARY:  homog.lib           homological algebra porcedures
 ext(<int>,<ideal>);             Ext^k(R/I,R),    I - ideal in basering R
 Ext(<int>,<mod>,<mod>);         Ext^k(M,N),      M,N modules
 Hom(<mod>,<mod>);               Hom(M,N),        M,N modules
@@ -327,7 +327,7 @@ RETURNS:  <matrix> of the associated linear map
 }
 example
 {
-  "EXAMPLE";   echo=2;  int printlevel=2;
+  "EXAMPLE";   echo=2;  printlevel=2;
   ring  r = 0,(x,y),(dp,C);
   ideal i = x2-y3;
   qring q = std(i);

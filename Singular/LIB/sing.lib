@@ -1,9 +1,9 @@
-// $Id: sing.lib,v 1.1.1.1 1997-04-25 15:13:27 obachman Exp $
+// $Id: sing.lib,v 1.2 1997-04-28 19:27:25 obachman Exp $
 //system("random",787422842);
-//(GMG+BM)
+//(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES         
+LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 
  deform(i);             infinitesimal deformations of ideal i
  dim_slocus(i);         dimension of singular locus of ideal i
@@ -21,24 +21,26 @@ LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
  T2((i);                T2-module of ideal i
  T12(i);                T1- and T2-module of ideal i
 
-LIB "inout.lib"; 
+LIB "inout.lib";
 LIB "random.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc deform (ideal id)
-USAGE:   deform(id);  id = ideal or poly
+USAGE:   deform(id); id=ideal or poly
 RETURN:  matrix, columns are kbase of infinitesimal deformations
-EXAMPLE: example deform; shows an example 
-{ 
+EXAMPLE: example deform; shows an example
+{
    list L=T1(id,"");
-   return(L[2]*kbase(std(L[1])));
+   def K=L[1]; attrib(K,"isSB",1);
+   return(L[2]*kbase(K));
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=32003,(x,y,z),ds; 
-   ideal i=xy,xz,yz; 
-   matrix T=deform(i);print(T);
-   print(deform(x3+y5+z2)); 
+   ring r   = 32003,(x,y,z),ds;
+   ideal i  = xy,xz,yz;
+   matrix T = deform(i);
+   print(T);
+   print(deform(x3+y5+z2));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -51,35 +53,35 @@ EXAMPLE: example dim_slocus; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=32003,(x,y,z),ds;
-   ideal i= x5+y6+z6,x2+2y2+3z2;
+   ring r  = 32003,(x,y,z),ds;
+   ideal i = x5+y6+z6,x2+2y2+3z2;
    dim_slocus(i);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc is_active (poly f, id)
-USAGE:   is_active(f,id); f poly, id ideal or module 
+USAGE:   is_active(f,id); f poly, id ideal or module
 RETURN:  1 if f is an active element modulo id (i.e. dim(id)=dim(id+f*R^n)+1,
          if id is a submodule of R^n) resp. 0 if f is not active.
-         The basering may be a quotient ring 
+         The basering may be a quotient ring
 NOTE:    regular parameters are active but not vice versa (id may have embedded
          components). proc is_reg tests whether f is a regular parameter
 EXAMPLE: example is_active; shows an example
 {
-   if( size(id)==0 ) { return(1); } 
+   if( size(id)==0 ) { return(1); }
    if( typeof(id)=="ideal" ) { ideal m=f; }
-   if( typeof(id)=="module" ) { module m=f*freemodule(rank(id)); }
+   if( typeof(id)=="module" ) { module m=f*freemodule(nrows(id)); }
    return(dim(std(id))-dim(std(id+m)));
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=32003,(x,y,z),ds;
-   ideal i=yx3+y,yz3+y3z;
-   poly f=x;
+   ring r   =32003,(x,y,z),ds;
+   ideal i  = yx3+y,yz3+y3z;
+   poly f   = x;
    is_active(f,i);
-   qring q = std(x4y5);
-   poly f=x;
-   module m=[yx3+x,yx3+y3x];
+   qring q  = std(x4y5);
+   poly f   = x;
+   module m = [yx3+x,yx3+y3x];
    is_active(f,m);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,49 +89,42 @@ example
 proc is_ci (ideal i)
 USAGE:   is_ci(i); i ideal
 RETURN:  intvec = sequence of dimensions of ideals (j[1],...,j[k]), for
-         k=1,...,size(j), where j is minimal base of i. i is a complete 
-         intersection if last number equals nvars-size(i)  
-NOTE:    dim(0-ideal) = -1. You may first apply simplify(i,10); in order to 
-         delete zeroes and multiples from set of generators 
+         k=1,...,size(j), where j is minimal base of i. i is a complete
+         intersection if last number equals nvars-size(i)
+NOTE:    dim(0-ideal) = -1. You may first apply simplify(i,10); in order to
+         delete zeroes and multiples from set of generators
+         printlevel >=0: display comments (default)
 EXAMPLE: example is_ci; shows an example
 {
    int n; intvec dimvec; ideal id;
    i=minbase(i);
    int s = ncols(i);
+   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
 //--------------------------- compute dimensions ------------------------------
-   for( n=1; n<=s; n++ ) 
-   { 
+   for( n=1; n<=s; n=n+1 )
+   {
       id = i[1..n];
       dimvec[n] = dim(std(id));
    }
    n = dimvec[s];
-//--------------------------- output ------------------------------------------      
-   if( defined(printlevel) )
-   {
-      if( n+s !=nvars(basering) ) 
-      { dbprint(printlevel,"// no complete intersection"); }
-      if( n+s ==nvars(basering) ) 
-      { dbprint(printlevel,"// complete intersection of dim "+string(n)); }
-      dbprint(printlevel,"// dim-sequence:");
-   }
-   if( voice==2 )
-   {
-      if( n+s !=nvars(basering)) {"// no complete intersection"; }
-      if( n+s ==nvars(basering)) {"// complete intersection of dim",n;}
-      "// dim-sequence:"; 
-   }
+//--------------------------- output ------------------------------------------
+   if( n+s != nvars(basering) )
+   { dbprint(p,"// no complete intersection"); }
+   if( n+s == nvars(basering) )
+   { dbprint(p,"// complete intersection of dim "+string(n)); }
+   dbprint(p,"// dim-sequence:");
    return(dimvec);
 }
 example
-{ "EXAMPLE:";   echo = 2;  
-   int printlevel=2;                // this forces the proc to display comments
-   export printlevel;             
-   ring r=32003,(x,y,z),ds; 
-   ideal i=x4+y5+z6,xyz,yx2+xz2+zy7; 
+{ "EXAMPLE:"; echo = 2;
+   int p      = printlevel;
+   printlevel = 1;                // display comments
+   ring r     = 32003,(x,y,z),ds;
+   ideal i    = x4+y5+z6,xyz,yx2+xz2+zy7;
    is_ci(i);
-   i=xy,yz; 
-   is_ci(i); 
-   kill printlevel;
+   i          = xy,yz;
+   is_ci(i);
+   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -138,28 +133,31 @@ USAGE:   is_is(id);  id ideal or poly
 RETURN:  intvec = sequence of dimensions of singular loci of ideals
          generated by id[1]..id[i], k = 1..size(id); dim(0-ideal) = -1;
          id defines an isolated singularity if last number is 0
+NOTE:    printlevel >=0: display comments (default)
 EXAMPLE: example is_is; shows an example
 {
   int l; intvec dims; ideal j;
+  int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
 //--------------------------- compute dimensions ------------------------------
-   for( l=1; l<=ncols(i); l++ )
+   for( l=1; l<=ncols(i); l=l+1 )
    {
-     j = i[1..l]; 
+     j = i[1..l];
      dims[l] = dim(std(slocus(j)));
    }
-   if( voice==2 ) {"// dim of singular locus =",dims[size(dims)],"dim-sequence:";
-                   "// isolated singularity if last number is 0"; }
+   dbprint(p,"// dim of singular locus = "+string(dims[size(dims)]),
+             "// isolated singularity if last number is 0 in dim-sequence:");
    return(dims);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=32003,(x,y,z),ds;
-   ideal i=x2y,x4+y5+z6,yx2+xz2+zy7;
+   int p      = printlevel;
+   printlevel = 1;
+   ring r     = 32003,(x,y,z),ds;
+   ideal i    = x2y,x4+y5+z6,yx2+xz2+zy7;
    is_is(i);
-// isolated singularity if last number is 0 
-   poly f=xy+yz;
+   poly f     = xy+yz;
    is_is(f);
-// isolated singularity if last number is 0 
+   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -176,18 +174,20 @@ EXAMPLE: example is_reg; shows an example
    def q = quotient(id,ideal(f));
    id=std(id);
    d=size(q);
-   for( ii=1; ii<=d; ii++ )
+   for( ii=1; ii<=d; ii=ii+1 )
    {
       if( reduce(q[ii],id)!=0 )
       { return(0); }
    }
    return(1);
 }
-example 
+example
 { "EXAMPLE:"; echo = 2;
-   ring r=32003,(x,y),ds;
-   ideal i=x8,y8;ideal j=(x+y)^4;
-   i=intersect(i,j); poly f=xy;
+   ring r  = 32003,(x,y),ds;
+   ideal i = x8,y8;
+   ideal j = (x+y)^4;
+   i       = intersect(i,j);
+   poly f  = xy;
    is_reg(f,i);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,91 +197,97 @@ USAGE:   is_regs(i[,id]); i poly, id ideal or module (default: id=0)
 RETURN:  1 if generators of i are a regular sequence modulo id, 0 otherwise
 NOTE:    let R be the basering and id a submodule of R^n. The procedure checks
          injectivity of multiplication with i[k] on R^n/id+i[1..k-1].
-         The basering may be a quotient ring 
+         The basering may be a quotient ring
+         printlevel >=0: display comments (default)
+         printlevel >=1: display comments during computation
 EXAMPLE: example is_regs; shows an example
 {
+   int d,ii,r;
+   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
    if( size(#)==0 ) { ideal id; }
    else { def id=#[1]; }
    if( size(i)==0 ) { return(0); }
-   int d,ii,r;
-   d=size(i); 
+   d=size(i);
    if( typeof(id)=="ideal" ) { ideal m=1; }
-   if( typeof(id)=="module" ) { module m=freemodule(rank(id)); }
-   for( ii=1; ii<=d; ii++ )
-   {  
-      if( voice==2 ) 
+   if( typeof(id)=="module" ) { module m=freemodule(nrows(id)); }
+   for( ii=1; ii<=d; ii=ii+1 )
+   {
+      if( p>=2 )
       { "// checking whether element",ii,"is regular mod 1 ..",ii-1; }
-      if( is_reg(i[ii],id)==0 ) 
-      { 
-         if( voice==2 ) 
-         { 
-            "// elements 1 ..",ii-1,"are regular,",
-            ii,"is not regular mod 1 ..",ii-1; 
-         }
-         return(0); 
+      if( is_reg(i[ii],id)==0 )
+      {
+        dbprint(p,"// elements 1.."+string(ii-1)+" are regular, " +
+                string(ii)+" is not regular mod 1.."+string(ii-1));
+         return(0);
       }
-      id=id+i[ii]*m; 
+      id=id+i[ii]*m;
    }
-   if( voice==2 ) { "// elements are a regular sequence of length",d; }
+   if( p>=1 ) { "// elements are a regular sequence of length",d; }
    return(1);
 }
-example 
+example
 { "EXAMPLE:"; echo = 2;
-   ring r1=32003,(x,y,z),ds;
-   ideal i=x8,y8,(x+y)^4;
+   int p      = printlevel;
+   printlevel = 1;
+   ring r1    = 32003,(x,y,z),ds;
+   ideal i    = x8,y8,(x+y)^4;
    is_regs(i);
-   module m=[x,0,y];
-   i=x8,(x+z)^4;;
+   module m   = [x,0,y];
+   i          = x8,(x+z)^4;;
    is_regs(i,m);
+   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc milnor (ideal i)
 USAGE:   milnor(i); i ideal or poly
 RETURN:  Milnor number of i, if i is ICIS (isolated complete intersection
-         singularity) in generic form, resp. -1 if not 
+         singularity) in generic form, resp. -1 if not
 NOTE:    use proc nf_icis to put generators in generic form
+         printlevel >=0: display comments (default)
 EXAMPLE: example milnor; shows an example
-{ 
-  i = simplify(i,10);     //delete zeroes and multiples from set of generators      
+{
+  i = simplify(i,10);     //delete zeroes and multiples from set of generators
   int n = size(i);
   int l,q,m_nr;  ideal t;  intvec disc;
-//---------------------------- hypersurface case ------------------------------    
-  if( n==1 )      
+  int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
+//---------------------------- hypersurface case ------------------------------
+  if( n==1 )
   {
      i = std(jacob(i[1]));
-     m_nr = vdim(i);       
-     if( m_nr<0 and voice==2 ) { "// no isolated singularity"; }
-     return(m_nr);  
+     m_nr = vdim(i);
+     if( m_nr<0 and p>=1 ) { "// no isolated singularity"; }
+     return(m_nr);
   }
 //------------ isolated complete intersection singularity (ICIS) --------------
   for( l=n; l>0; l=l-1)
-  {
-      t      = minor(jacob(i),l);
-      i[l]   = 0; 
+  {   t      = minor(jacob(i),l);
+      i[l]   = 0;
       q      = vdim(std(i+t));
       disc[l]= q;
       if( q ==-1 )
-      { 
-         if( voice==2 ) 
+      {  if( p>=1 )
             {  "// not in generic form or no ICIS; use proc nf_icis to put";
-            "// generators in generic form and then try milnor again!";  } 
+            "// generators in generic form and then try milnor again!";  }
          return(q);
       }
-      m_nr = q-m_nr; 
+      m_nr = q-m_nr;
   }
-//---------------------------- change sign ------------------------------------     
-  if (m_nr < 0) { m_nr=-m_nr; } 
-  if( voice==2 ) { "//sequence of discriminant numbers:",disc; }
+//---------------------------- change sign ------------------------------------
+  if (m_nr < 0) { m_nr=-m_nr; }
+  if( p>=1 ) { "//sequence of discriminant numbers:",disc; }
   return(m_nr);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=32003,(x,y,z),ds; 
-   ideal j=x5+y6+z6,x2+2y2+3z2,xyz+yx; 
+   int p      = printlevel;
+   printlevel = 1;
+   ring r     = 32003,(x,y,z),ds;
+   ideal j    = x5+y6+z6,x2+2y2+3z2,xyz+yx;
    milnor(j);
-   poly f=x7+y7+(x-y)^2*x2y2+z2; 
-   milnor(f); 
+   poly f     = x7+y7+(x-y)^2*x2y2+z2;
+   milnor(f);
+   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -290,44 +296,49 @@ USAGE:   nf_icis(i); i ideal
 RETURN:  ideal = generic linear combination of generators of i if i is an ICIS
          (isolated complete intersection singularity), return i if not
 NOTE:    this proc is useful in connection with proc milnor
+         printlevel >=0: display comments (default)
 EXAMPLE: example nf_icis; shows an example
 {
    i = simplify(i,10);  //delete zeroes and multiples from set of generators
-   int p,b = 100,0; 
+   int p,b = 100,0;
    int n = size(i);
    matrix mat=freemodule(n);
-//---------------------------- test: complete intersection? -------------------      
+   int P = printlevel-voice+3;  // P=printlevel+1 (default: P=1)
+//---------------------------- test: complete intersection? -------------------
    intvec sl = is_ci(i);
-   if( n+sl[n] != nvars(basering) )  
-   { 
-    if( voice==2 ) { "// no complete intersection"; }
-    return(i);
+   if( n+sl[n] != nvars(basering) )
+   {
+      dbprint(P,"// no complete intersection");
+      return(i);
    }
-//--------------- test: isolated singularity in generic form? -----------------     
+//--------------- test: isolated singularity in generic form? -----------------
    sl = is_is(i);
    if ( sl[n] != 0 )
    {
-      if( voice==2 ) { "// no isolated singularity"; }
+      dbprint(P,"// no isolated singularity");
       return(i);
    }
-//------------ produce generic linear combinations of generators --------------    
+//------------ produce generic linear combinations of generators --------------
    int prob;
-   while ( sum(sl) != 0 )  
+   while ( sum(sl) != 0 )
    {  prob=prob+1;
-      p=p-25; b=b+10; 
+      p=p-25; b=b+10;
       i = genericid(i,p,b);          // proc genericid from random.lib
       sl = is_is(i);
    }
-   if( voice==2 ) { "// ICIS in generic form after",prob,"genericity loop(s)";}
-   return(i);    
+   dbprint(P,"// ICIS in generic form after "+string(prob)+" genericity loop(s)");
+   return(i);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=32003,(x,y,z),ds;
-   ideal i=x3+y4,z4+yx;	   
-   nf_icis(i);     
-   ideal j=x3+y4,xy,yz;
+   int p      = printlevel;
+   printlevel = 1;
+   ring r     = 32003,(x,y,z),ds;
+   ideal i    = x3+y4,z4+yx;
+   nf_icis(i);
+   ideal j    = x3+y4,xy,yz;
    nf_icis(j);
+   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -339,29 +350,32 @@ EXAMPLE: example slocus; shows an example
 {
   int cod  = nvars(basering)-dim(std(i));
   i        = i+minor(jacob(i),cod);
-  return(i);   
+  return(i);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=32003,(x,y,z),ds;
-   ideal i= x5+y6+z6,x2+2y2+3z2;
+   ring r  = 32003,(x,y,z),ds;
+   ideal i = x5+y6+z6,x2+2y2+3z2;
    dim(std(slocus(i)));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Tjurina (id, list #)
-USAGE:   Tjurina(id[,<any>]);  id ideal or poly (assume: id=ICIS)
-RETURN:  Tjurina(id): standard basis of Tjurina-module of id, displays Tjurina 
-         number
-         Tjurina(id,...): If a second argument is present (of any type) return
-         a list of 4 objects: [1]=Tjurina number (int), [2]=basis of miniversal 
-         deformation (module), [3]=SB of Tjurina module (module), [4]=Tjurina 
-         module (module)
-NOTE:    if id is a poly the output will be of type ideal rather than module
-EXAMPLE: example Tjurina; shows an example
+USAGE:   Tjurina(id[,<any>]);  id=ideal or poly
+ASSUME:  id=ICIS (isolated complete intersection singularity)
+RETURN:  standard basis of Tjurina-module of id,
+         of type module if id=ideal, resp. of type ideal if id=poly.
+         If a second argument is present (of any type) return a list:
+           [1] = Tjurina number,
+           [2] = k-basis of miniversal deformation,
+           [3] = SB of Tjurina module,
+           [4] = Tjurina module
+DISPLAY: Tjurina number if printlevel >= 0 (default)
+NOTE:    Tjurina number = -1 implies that id is not an ICIS
+EXAMPLE: example Tjurina; shows examples
 {
 //---------------------------- initialisation ---------------------------------
-  def i = simplify(id,10);         
+  def i = simplify(id,10);
   int tau,n = 0,size(i);
   if( size(ideal(i))==1 ) { def m=i; }  // hypersurface case
   else { def m=i*freemodule(n); }       // complete intersection case
@@ -369,200 +383,214 @@ EXAMPLE: example Tjurina; shows an example
   def t1 = jacob(i)+m;                  // Tjurina module/ideal
   def st1 = std(t1);                    // SB of Tjurina module/ideal
   tau = vdim(st1);                      // Tjurina number
-  def kB = kbase(st1);                  // basis of miniversal deformation
-  if( voice==2 )  { "// Tjurina number =",tau; }
-  if( size(#)>0 ) { return(tau,kB,st1,t1); }
+  dbprint(printlevel-voice+3,"// Tjurina number = "+string(tau));
+  if( size(#)>0 )
+  {
+     def kB = kbase(st1);               // basis of miniversal deformation
+     return(tau,kB,st1,t1);
+  }
   return(st1);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y,z),ds;
-   poly f = x5+y6+z7+xyz;        // singularity T[5,6,7]
-   list T = Tjurina(f,"");
-   show(T[1]);                   // Tjurina number, should be 16
-   show(T[2]);                   // basis of miniversal deformation
-   show(T[3]);                   // SB of Tjurina ideal
-   show(T[4]); "";               // Tjurina ideal
-   ideal j=x2+y2+z2,x2+2y2+3z2;
-   show(kbase(Tjurina(j)));      // basis of miniversal deformation
-   hilb(Tjurina(j));             // Hilbert series of Tjurina module
+   int p      = printlevel;
+   printlevel = 1;
+   ring r     = 0,(x,y,z),ds;
+   poly f     = x5+y6+z7+xyz;        // singularity T[5,6,7]
+   list T     = Tjurina(f,"");
+   show(T[1]);                       // Tjurina number, should be 16
+   show(T[2]);                       // basis of miniversal deformation
+   show(T[3]);                       // SB of Tjurina ideal
+   show(T[4]); "";                   // Tjurina ideal
+   ideal j    = x2+y2+z2,x2+2y2+3z2;
+   show(kbase(Tjurina(j)));          // basis of miniversal deformation
+   hilb(Tjurina(j));                 // Hilbert series of Tjurina module
+   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc tjurina (ideal i)
-USAGE:   tjurina(id);  id ideal or poly (assume: id=ICIS)
+USAGE:   tjurina(id);  id=ideal or poly
+ASSUME:  id=ICIS (isolated complete intersection singularity)
 RETURN:  int = Tjurina number of id
+NOTE:    Tjurina number = -1 implies that id is not an ICIS
 EXAMPLE: example tjurina; shows an example
 {
-   return(vdim(Tjurina(i))); 
+   return(vdim(Tjurina(i)));
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring r=32003,(x,y,z),(c,ds);
    ideal j=x2+y2+z2,x2+2y2+3z2;
-   tjurina(j); 
+   tjurina(j);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc T1 (ideal id, list #)
 USAGE:   T1(id[,<any>]);  id = ideal or poly
-RETURN:  T1(id): T1-module of id or T1-ideal if id is a poly. This is a
+RETURN:  T1(id): of type module/ideal if id is of type ideal/poly.
+         We call T1(id) the T1-module of id. It is a std basis of the
          presentation of 1st order deformations of P/id, if P is the basering.
-         T1(id,...): If a second argument is present (of any type) return a 
-         list of 3 modules:
-            [1]= presentation of infinitesimal deformations of id (=T1(id)) 
+         If a second argument is present (of any type) return a list of
+         3 modules:
+            [1]= T1(id)
             [2]= generators of normal bundle of id, lifted to P
-            [3]= module of relations of [2], lifted to P ([2]*[3]=0 mod id) 
-         The list contains all non-easy objects which must be computed anyway 
+            [3]= module of relations of [2], lifted to P
+                 (note: transpose[3]*[2]=0 mod id)
+         The list contains all non-easy objects which must be computed
          to get T1(id).
-         The situation is described in detail in the procedure T1_expl 
-         from library explain.lib 
-NOTE:    T1(id) itself is usually of minor importance, nevertheless, from it
-         all relevant information can be obtained. Since no standard basis is 
-         computed, the user has first to compute a standard basis before 
-         applying vdim or hilb etc.. For example, matrix([2])*(kbase(std([1]))) 
-         represents a basis of 1st order semiuniversal deformation of id 
-         (use proc 'deform', to get this in a direct and convenient way). 
-         If the input is weighted homogeneous with weights w1,...,wn, use 
-         ordering wp(w1..wn), even in the local case, which is equivalent but 
-         faster than ws(w1..wn). 
+DISPLAY: k-dimension of T1(id) if printlevel >= 0 (default)
+NOTE:    T1(id) itself is usually of minor importance. Nevertheless, from it
+         all relevant information can be obtained. The most important are
+         probably vdim(T1(id)); (which computes the Tjurina number),
+         hilb(T1(id)); and kbase(T1(id));
+         If T1 is called with two argument, then matrix([2])*(kbase([1]))
+         represents a basis of 1st order semiuniversal deformation of id
+         (use proc 'deform', to get this in a direct way).
          For a complete intersection the proc Tjurina is faster
 EXAMPLE: example T1; shows an example
 {
    ideal J=simplify(id,10);
 //--------------------------- hypersurface case -------------------------------
-  if( size(J)<2 ) 
-  { 
-     ideal t1=J[1],jacob(J[1]); module nb=[1]; module pnb;
+  if( size(J)<2 )
+  {
+     ideal t1  = std(J+jacob(J[1]));
+     module nb = [1]; module pnb;
+     dbprint(printlevel-voice+3,"// dim T1 = "+string(vdim(t1)));
      if( size(#)>0 ) { return(t1*gen(1),nb,pnb); }
      return(t1);
   }
 //--------------------------- presentation of J -------------------------------
    int rk;
-  def P=basering;
+  def P = basering;
    module jac, t1;
-   jac=jacob(J);                 // jacobian matrix of J converted to module
-   res(J,2,A);                   // compute presentation of J
-   t1=transpose(A(2));           // transposed 1st syzygy module of J
+   jac  = jacob(J);                 // jacobian matrix of J converted to module
+   res(J,2,A);                      // compute presentation of J
+                                    // A(2) = 1st syzygy module of J
 //---------- go to quotient ring mod J and compute normal bundle --------------
-  qring  R=std(J);
-   module jac=fetch(P,jac); 
-   module t1=fetch(P,t1);	
-   res(t1,3,B);                  // resolve t1, B(2)=(J/J^2)*=normal_bdl
-   t1=lift(B(2),jac)+B(3);       // pres. of normal_bdl/trivial_deformations
-   rk=rank(t1);
+  qring  R    = std(J);
+   module jac = fetch(P,jac);
+   module t1  = transpose(fetch(P,A(2)));
+   res(t1,2,B);                     // resolve t1, B(2)=(J/J^2)*=normal_bdl
+   t1         = modulo(B(2),jac);   // pres. of normal_bdl/trivial_deformations
+   rk=nrows(t1);
 //-------------------------- pull back to basering ----------------------------
   setring P;
    t1 = fetch(R,t1)+J*freemodule(rk);  // T1-module, presentation of T1
-   if( size(#)>0 ) 
-   { 
-      module B2 = fetch(R,B(2));        // (generators of) normal bundle
-      module B3 = fetch(R,B(3));        // presentation of normal bundle
-      return(t1,B2,B3); 
+   t1 = std(t1);
+   dbprint(printlevel-voice+3,"// dim T1 = "+string(vdim(t1)));
+   if( size(#)>0 )
+   {
+      module B2 = fetch(R,B(2));        // presentation of normal bundle
+      list L = t1,B2,A(2);
+      attrib(L[1],"isSB",1);
+      return(L);
    }
-   return(t1);	
+   return(t1);
 }
-example 
+example
 { "EXAMPLE:"; echo = 2;
-   ring r=32003,(x,y,z),(c,ds);
-   ideal i=xy,xz,yz;
-   module T=T1(i);
-   vdim(std(T));                 // Tjurina number = dim_K(T1), should be 3
+   int p      = printlevel;
+   printlevel = 1;
+   ring r     = 32003,(x,y,z),(c,ds);
+   ideal i    = xy,xz,yz;
+   module T   = T1(i);
+   vdim(T);                      // Tjurina number = dim_K(T1), should be 3
    list L=T1(i,"");
-   module kB = kbase(std(L[1]));
+   module kB  = kbase(L[1]);
    print(L[2]*kB);               // basis of 1st order miniversal deformation
-   size(L[1]);                   // number of generators of T1-module
-   show(L[2]);                   // (generators of) normal bundle
-   print(L[3]);                  // relation matrix of normal bundle (mod i)
-   print(L[2]*L[3]);             // should be 0 (mod i)
+   show(L[2]);                   // presentation of normal bundle
+   print(L[3]);                  // relations of i
+   print(transpose(L[3])*L[2]);  // should be 0 (mod i)
+   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc T2 (ideal id, list #)
 USAGE:   T2(id[,<any>]);  id = ideal
-RETURN:  T2(id): T2-module of id . This is a presentation of the module of 
-            obstructions of R=P/id, if P is the basering.
-         T2(id,...): If a second argument is present (of any type) return a 
-         list of 6 modules and 1 ideal:
-            [1]= presentation of module of obstructions (=T2(id))
+RETURN:  T2(id): T2-module of id . This is a std basis of a presentation of
+         the module of obstructions of R=P/id, if P is the basering.
+         If a second argument is present (of any type) return a list of
+         4 modules and 1 ideal:
+            [1]= T2(id)
             [2]= standard basis of id (ideal)
             [3]= module of relations of id (=1st syzygy module of id)
-            [4]= presentation of [3] (=2nd syzygy module of id) 
-            [5]= lifting of Koszul relations kos, kos=module([3]*matrix([5]))
-            [6]= generators of Hom_P([3]/kos,R), lifted to P
-            [7]= relations of Hom_P([3]/kos,R), lifted to P
-         The list contains all non-easy objects which must be computed anyway 
-         to get T2(id). The situation is described in detail in the procedure 
-         T2_expl from library explain.lib 
-NOTE:    Since no standard basis is computed, the user has first to compute a 
-         standard basis before applying vdim or hilb etc..  
-         If the input is weighted homogeneous with weights w1,...,wn, use 
-         ordering wp(w1..wn), even in the local case, which is equivalent but 
-         faster than ws(w1..wn).
-         Use proc miniversal to get equations of miniversal deformation; 
+            [4]= presentation of syz/kos
+            [5]= relations of Hom_P([3]/kos,R), lifted to P
+         The list contains all non-easy objects which must be computed
+         to get T2(id).
+DISPLAY: k-dimension of T2(id) if printlevel >= 0 (default)
+NOTE:    The most important information is probably vdim(T2(id)).
+         Use proc miniversal to get equations of miniversal deformation.
 EXAMPLE: example T2; shows an example
 {
 //--------------------------- initialisation ----------------------------------
   def P = basering;
-   ideal J = simplify(id,10);
-   module kos,L0,t2;
+   ideal J = id;
+   module kos,SK,B2,t2;
+   list L;
    int n,rk;
-//------------------- presentation of non-trivial syzygies --------------------  
-   res(J,3,A);                            // resolve J, A(2)=syz
+//------------------- presentation of non-trivial syzygies --------------------
+   res(J,2,A);                            // resolve J, A(2)=syz
    kos  = koszul(2,J);                    // module of Koszul relations
-   L0 = lift(A(2),kos);                   // lift Koszul relations to syz
-   t2   = L0+A(3);                        // presentation of syz/kos
+   SK   = modulo(A(2),kos);               // presentation of syz/kos
    ideal J0 = std(J);                     // standard basis of J
-//*** sollte bei der Berechnung von res mit anfallen, zu aendern!!
+//?*** sollte bei der Berechnung von res mit anfallen, zu aendern!!
 //---------------------- fetch to quotient ring mod J -------------------------
   qring R = J0;                           // make P/J the basering
-   module A2' = transpose(fetch(P,A(2))); // dual of syz  
-   module t2  = transpose(fetch(P,t2));   // dual of syz/kos 
-   res(t2,3,B);                           // resolve t2   
-   t2 = lift(B(2),A2')+B(3);              // presentation of T2
-   rk = rank(t2);
+   module A2' = transpose(fetch(P,A(2))); // dual of syz
+   module t2  = transpose(fetch(P,SK));   // dual of syz/kos
+   res(t2,2,B);                           // resolve (syz/kos)*
+   t2 = modulo(B(2),A2');                 // presentation of T2
+   rk = nrows(t2);
 //---------------------  fetch back to basering -------------------------------
   setring P;
    t2 = fetch(R,t2)+J*freemodule(rk);
-   if( size(#)>0 ) 
-   { 
-      module B2 = fetch(R,B(2));        // generators of Hom_P(syz/kos,R)
-      module B3 = fetch(R,B(3));        // relations of Hom_P(syz/kos,R)
-      return(t2,J0,A(2),A(3),L0,B2,B3); 
+   t2 = std(t2);
+   dbprint(printlevel-voice+3,"// dim T2 = "+string(vdim(t2)));
+   if( size(#)>0 )
+   {
+      B2 = fetch(R,B(2));        // generators of Hom_P(syz/kos,R)
+      L  = t2,J0,A(2),SK,B2;
+      return(L);
    }
-   return(t2);	
+   return(t2);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring  r = 32003,(x,y),(c,dp);
-   ideal j = x6-y4,x6y6,x2y4-x5y2;
-   module T= std(T2(j));
-   vdim(T);hilb(T);
-   ring r1=0,(x,y,z),dp;
-   ideal id=xy,xz,yz;
-   list L=T2(id,"");
-   vdim(std(L[1]));                      // vdim of T2
-   L[4];                                 // 2nd syzygy module of ideal
+   int p      = printlevel;
+   printlevel = 1;
+   ring  r    = 32003,(x,y),(c,dp);
+   ideal j    = x6-y4,x6y6,x2y4-x5y2;
+   module T   = T2(j);
+   vdim(T);
+   hilb(T);"";
+   ring r1    = 0,(x,y,z),dp;
+   ideal id   = xy,xz,yz;
+   list L     = T2(id,"");
+   vdim(L[1]);                           // vdim of T2
+   print(L[3]);                          // syzygy module of id
+   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc T12 (ideal i, list #)
 USAGE:   T12(i[,any]);  i = ideal
-DISPLAY: dim T1 and dim T2  of i
-RETURN:  T12(i): list of 2 modules: 
-             presentation of T1-module =T1(i) , 1st order deformations  
-             presentation of T2-module =T2(i) , obstructions of R=P/i
-         T12(i,...): If a second argument is present (of any type) return
-         a list of 9 modules, matrices, integers:
-             [1]= presentation of T1 (module)
-             [2]= presentation of T2 (module)
-             [3]= matrix, whose cols present infinitesimal deformations 
-             [4]= matrix, whose cols are generators of relations of i     
-             [5]= matrix, presenting Hom_P([4]/kos,R), lifted to P
-             [6]= standard basis of T1-module
-             [7]= standard basis of T2-module
-             [8]= vdim of T1
-             [9]= vdim of T2
+RETURN:  T12(i): list of 2 modules:
+             std basis of T1-module =T1(i), 1st order deformations
+             std basid of T2-module =T2(i), obstructions of R=P/i
+         If a second argument is present (of any type) return a list of
+         9 modules, matrices, integers:
+             [1]= standard basis of T1-module
+             [2]= standard basis of T2-module
+             [3]= vdim of T1
+             [4]= vdim of T2
+             [5]= matrix, whose cols present infinitesimal deformations
+             [6]= matrix, whose cols are generators of relations of i (=syz(i))
+             [7]= matrix, presenting Hom_P(syz/kos,R), lifted to P
+             [8]= presentation of T1-module, no std basis
+             [9]= presentation of T2-module, no std basis
+DISPLAY: k-dimension of T1 and T2 if printlevel >= 0 (default)
 NOTE:    Use proc miniversal from deform.lib to get miniversal deformation of i,
          the list contains all objects used by proc miniversal
 EXAMPLE: example T12; shows an example
@@ -571,58 +599,57 @@ EXAMPLE: example T12; shows an example
    int  n,r1,r2,d1,d2;
   def P = basering;
    i = simplify(i,10);
-   if (size(i)<2)
-   {
-     "// hypersurface, use proc 'Tjurina'";
-     //return([1]);
-   }
-   module jac,t1,t2,kos,sbt1,sbt2;
-   matrix L3,L4,L5;
+   module jac,t1,t2,sbt1,sbt2;
+   matrix Kos,Syz,SK,kbT1,Sx;
+   list L;
    ideal  i0 = std(i);
 //-------------------- presentation of non-trivial syzygies -------------------
-   list I= res(i,3);                            // resolve i
-   L4  = matrix(I[2]);                          // syz(i)
+   list I= res(i,2);                            // resolve i
+   Syz  = matrix(I[2]);                         // syz(i)
    jac = jacob(i);                              // jacobi ideal
-   t1  = transpose(I[2]);                       // dual of syzygies
-   kos = koszul(2,i);                           // koszul-relations
-   t2  = lift(I[2],kos)+I[3];                   // presentation of syz/kos
+   Kos = koszul(2,i);                           // koszul-relations
+   SK  = modulo(Syz,Kos);                       // presentation of syz/kos
 //--------------------- fetch to quotient ring  mod i -------------------------
   qring   Ox  = i0;                             // make P/i the basering
-   module jac = fetch(P,jac);
-   module t1  = fetch(P,t1);                    // Hom(syz,R)
-   module t2  = transpose(fetch(P,t2));         // Hom(syz/kos,R)
-   list resS  = res(t1,3);
-   list resR  = res(t2,3);
-   t2 = lift(resR[2],t1)+resR[3];               // presentation of T2
-   r2 = rank(t2);
-   t1 = lift(resS[2],jac)+resS[3];              // presentation of T1
-   r1 = rank(t1);
-   matrix L3  = resS[2];
-   matrix L5  = resR[2];
+   module Jac = fetch(P,jac);
+   matrix No  = transpose(fetch(P,Syz));        // ker(No) = Hom(syz,Ox)
+   module So  = transpose(fetch(P,SK));         // Hom(syz/kos,R)
+   list resS  = res(So,2);
+   matrix Sx  = resS[2];
+   list resN  = res(No,2);
+   matrix Nx  = resN[2];
+   module T2  = modulo(Sx,No);                  // presentation of T2
+   r2         = nrows(T2);
+   module T1  = modulo(Nx,Jac);                 // presentation of T1
+   r1         = nrows(T1);
 //------------------------ pull back to basering ------------------------------
   setring P;
-   t1   = fetch(Ox,t1)+i*freemodule(r1);
-   t2   = fetch(Ox,t2)+i*freemodule(r2);
+   t1   = fetch(Ox,T1)+i*freemodule(r1);
+   t2   = fetch(Ox,T2)+i*freemodule(r2);
    sbt1 = std(t1);
    d1   = vdim(sbt1);
-   sbt2=std(t2);
+   sbt2 = std(t2);
    d2   = vdim(sbt2);
-   "// dim T1  = ",d1;
-   "// dim T2  = ",d2;
+   dbprint(printlevel-voice+3,"// dim T1 = "+string(d1),"// dim T2 = "+string(d2));
    if  ( size(#)>0)
    {
-     L3 = fetch(Ox,L3)*kbase(sbt1);
-     L5 = fetch(Ox,L5);
-     return(t1,t2,L3,L4,L5,sbt1,sbt2,d1,d2);
+      kbT1 = fetch(Ox,Nx)*kbase(sbt1);
+      Sx   = fetch(Ox,Sx);
+      L = sbt1,sbt2,d1,d2,kbT1,Syz,Sx,t1,t2;
+      return(L);
    }
-   return(t1,t2);
+   L = sbt1,sbt2;
+   return(L);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=200,(x,y,z,u,v),(c,ws(4,3,2,3,4));
-   ideal i=xz-y2,yz2-xu,xv-yzu,yu-z3,z2u-yv,zv-u2;
-   //a cyclic quotient singularity
-   list L = T12(i,1);
-   print(L[3]);
+   int p      = printlevel;
+   printlevel = 1;
+   ring r     = 200,(x,y,z,u,v),(c,ws(4,3,2,3,4));
+   ideal i    = xz-y2,yz2-xu,xv-yzu,yu-z3,z2u-yv,zv-u2;
+                            //a cyclic quotient singularity
+   list L     = T12(i,1);
+   print(L[5]);             //matrix of infin. deformations
+   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////

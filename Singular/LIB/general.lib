@@ -1,4 +1,4 @@
-// $Id: general.lib,v 1.1.1.1 1997-04-25 15:13:26 obachman Exp $
+// $Id: general.lib,v 1.2 1997-04-28 19:27:17 obachman Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,7 +19,8 @@ LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
  sort(ideal/module);    sort generators according to monomial ordering
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
            (parameters in square brackets [] are optional)
-
+ wich(command);		searches for command and returns absolute
+                        path, if found
 LIB "inout.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -186,9 +187,12 @@ example
 
 proc killall
 USAGE:   killall(); (no parameter)
-         killall("proc");
+         killall("type_name");
+         killall("not", "type_name");
 COMPUTE: killall(); kills all user-defined variables but not loaded procedures
-         killall("proc"); kills all loaded procedures
+         killall("type_name"); kills all user-defined variables, of type "type_name" 
+         killall("not", "type_name"); kills all user-defined
+         variables, except those of type "type_name" and except loaded procedures
 RETURN:  no return value
 NOTE:    killall should never be used inside a procedure
 EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
@@ -200,22 +204,47 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
       {
          if( L[joni]!="LIB" and typeof(`L[joni]`)!="proc" ) { kill `L[joni]`; }
       }
-      return();
    }
-   if( #[1] == "proc" )
+   else 
    {
-      for ( joni=size(L); joni>0; joni-- )
-      {
-         if( L[joni]=="LIB" or typeof(`L[joni]`)=="proc" ) { kill `L[joni]`; }
-      }
-   }
+     if( size(#)==1 )
+     {
+       if( #[1] == "proc" )
+       {
+          for ( joni=size(L); joni>0; joni-- )
+          {
+             if( L[joni]=="LIB" or typeof(`L[joni]`)=="proc" ) 
+               { kill `L[joni]`; }
+          }
+       }
+       else 
+       {
+          for ( ; joni>2; joni-- )
+          {
+            if(typeof(`L[joni]`)==#[1] and L[joni]!="LIB" and typeof(`L[joni]`)!="proc") { kill `L[joni]`; }
+          }
+        }
+     }
+     else
+     {
+        for ( ; joni>2; joni-- )
+        {
+          if(typeof(`L[joni]`)!=#[2] and L[joni]!="LIB" and typeof(`L[joni]`)!="proc") { kill `L[joni]`; }
+        }
+     }
+  }
+  return();
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring rtest; ideal i=x,y,z; number n=37; string str="hi";
-   export rtest,i,n,str;     //this makes the local variables global
+   ring rtest; ideal i=x,y,z; number n=37; string str="hi"; int j = 3;
+   export rtest,i,n,str,j;     //this makes the local variables global
    listvar(all);
-   killall();
+   killall("string"); // kills all string variables
+   listvar(all);
+   killall("not", "int"); // kills all variables except int's (and procs)
+   listvar(all);
+   killall(); // kills all vars except loaded procs
    listvar(all);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -587,5 +616,44 @@ example
    //sum(iv,w);
    //intmat m[2][3] = 1,1,1,2,2,2;
    //sum(m,3..4);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc which (command)
+USAGE:    which(command); command = string expression
+RETURN:   Absolute pathname of command, if found in search path.
+          Empty string, otherwise.
+NOTE:     Based on the Unix command 'which'.
+EXAMPLE:  example which; shows an example
+{
+   int rs;
+   int i;
+   string fn = "/tmp/which_" + string(system("pid"));
+   string pn;
+   if( typeof(command) != "string") 
+   {
+	return pn;
+   }
+   i = system("sh", "which " + command + " > " + fn);
+   pn = read(fn);
+   pn[size(pn)] = "";
+   i = 1;
+   while ((pn[i] != " ") and (pn[i] != ""))
+   {
+     i = i+1;
+   }
+   if (pn[i] == " ") {pn[i] = "";}
+   rs = system("sh", "ls " + pn + " > " + fn + " 2>&1 ");
+   i = system("sh", "rm " + fn);
+   if (rs == 0) {return (pn);}
+   else 
+   {
+     print (command + " not found ");
+     return ("");
+   }
+}
+example
+{  "EXAMPLE:"; echo = 2;
+    which("Singular");
 }
 ///////////////////////////////////////////////////////////////////////////////
