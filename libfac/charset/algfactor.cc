@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: algfactor.cc,v 1.2 1997-09-12 07:19:38 Singular Exp $";
+static char * rcsid = "$Id: algfactor.cc,v 1.3 2001-06-18 08:44:40 pfister Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -161,7 +161,7 @@ algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const
   CanonicalForm result;
   if (cs.length()==nas) result= cs.getLast();
   else result= CanonicalForm(1);
-
+  DEBOUTLN(cout, "Result= ", result);
   return result;
 }
 
@@ -429,4 +429,7 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/09/12 07:19:38  Singular
+* hannes/michael: libfac-0.3.0
+
 */

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.31 2000-09-04 13:31:25 obachman Exp $ */
+/* $Id: canonicalform.cc,v 1.32 2001-06-18 08:44:35 pfister Exp $ */
 
 #include <config.h>
 
@@ -1582,7 +1582,7 @@ operator >> ( istream & is, CanonicalForm & cf )
     cf = readCF( is );
     return is;
 #else /* SINGULAR */
-    return 0;
+    return is;
 #endif /* SINGULAR */
 }
 #endif /* NOSTREAMIO */

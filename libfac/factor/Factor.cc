@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.5 1999-06-15 12:54:55 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.6 2001-06-18 08:44:41 pfister Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -702,6 +702,7 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
 
   DEBINCLEVEL(cout, "Factorize");
   DEBOUTMSG(cout, rcsid);
+  DEBOUTLN(cout, "Called with F= ", F);
   if ( getCharacteristic() == 0 ) { // char == 0
     TIMING_START(factorize_time);
     //cout << "Factoring in char=0 of " << F << " = " << Outputlist << endl;
@@ -803,6 +804,9 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  1999/06/15 12:54:55  Singular
+* hannes: debug fixes for Singular-interface
+
 Revision 1.4  1997/11/18 16:39:04  Singular
 * hannes: moved WerrorS from C++ to C
      (Factor.cc MVMultiHensel.cc SqrFree.cc Truefactor.cc)

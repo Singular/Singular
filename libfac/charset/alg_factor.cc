@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.4 1998-05-25 18:32:38 obachman Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.5 2001-06-18 08:44:39 pfister Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -80,6 +80,8 @@ mypsr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x ){
 // replacement for factory's broken resultant
 static CanonicalForm
 resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v ){
+return resultant(f,g,v);
+
   CanonicalForm h, beta, help, F, G;
   int delta;
 
@@ -164,7 +166,9 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
       // for now we use this workaround with Factorize... 
       // ...but it should go away soon!!!!
-      testlist= Factorize(R);  testlist.removeFirst();
+      testlist= Factorize(R);  
+      DEBOUTLN(cout, "testlist= ", testlist);
+      testlist.removeFirst();
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
 	if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
@@ -298,6 +302,7 @@ simpleextension(const CFList & Astar, const Variable & Extension,
 
   DEBOUTLN(cout, "simpleextension: Astar= ", Astar);
   DEBOUTLN(cout, "simpleextension:     R= ", R);
+  DEBOUTLN(cout, "simpleextension: Extension= ", Extension);
   if ( Astar.length() == 1 ){ R= Astar.getFirst();}
   else{
     R=Bstar.getFirst(); Bstar.removeFirst();
@@ -328,7 +333,8 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
   DEBINCLEVEL(cout,"alg_factor");
   substlist= simpleextension(Astar, vminpoly, Rstar);
   DEBOUTLN(cout, "alg_factor: substlist= ", substlist);
-  DEBOUTLN(cout, "alg_factor: minpoly Rstar= ", Rstar);  
+  DEBOUTLN(cout, "alg_factor: minpoly Rstar= ", Rstar);
+  DEBOUTLN(cout, "alg_factor: vminpoly= ", vminpoly);
   
   sqrf_norm(f, Rstar, vminpoly, s, g, R );
   DEBOUTLN(cout, "alg_factor: g= ", g);
@@ -612,6 +618,14 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1998/05/25 18:32:38  obachman
+1998-05-25  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* charset/alg_factor.cc: replaced identifiers 'random' by
+	'myrandom' to avoid name conflicts with the built-in (stdlib)
+	library function 'random' which might be a macro -- and, actually
+	is  under gcc v 2.6.3
+
 Revision 1.3  1998/03/12 12:34:24  schmidt
 	* charset/csutil.cc, charset/alg_factor.cc: all references to
 	  `common_den()' replaced by `bCommonDen()'
