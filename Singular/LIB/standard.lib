@@ -1,12 +1,12 @@
-// $Id: standard.lib,v 1.10 1998-05-14 18:45:16 Singular Exp $
+// $Id: standard.lib,v 1.11 1998-05-18 13:24:50 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.10 1998-05-14 18:45:16 Singular Exp $";
+version="$Id: standard.lib,v 1.11 1998-05-18 13:24:50 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
  stdfglm(ideal[,ord])   standard basis of the ideal via fglm [and ordering ord]
- stdhilbert(ideal)      standard basis of the ideal using the Hilbert function
+ stdhilb(ideal)         standard basis of the ideal using the Hilbert function
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,12 +54,12 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc stdhilbert(ideal i,list #)
-"USAGE:   stdhilbert(i);  i ideal
-         stdhilbert(i,v); i homogeneous ideal, v intvec (the Hilbert function)
-RETURN:  stdhilbert(i): a standard basis of i (computing v internally)
-         stdhilbert(i,v): standard basis of i, using the given Hilbert function
-EXAMPLE: example stdhilbert; shows an example"
+proc stdhilb(ideal i,list #)
+"USAGE:   stdhilb(i);  i ideal
+         stdhilb(i,v); i homogeneous ideal, v intvec (the Hilbert function)
+RETURN:  stdhilb(i): a standard basis of i (computing v internally)
+         stdhilb(i,v): standard basis of i, using the given Hilbert function
+EXAMPLE: example stdhilb; shows an example"
 {
    def R=basering;
 
@@ -114,10 +114,10 @@ example
 { "EXAMPLE:"; echo = 2;
    ring  r = 0,(x,y,z),lp;
    ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
-   ideal i1= stdhilbert(i); i1;
+   ideal i1= stdhilb(i); i1;
    // is in this case equivalent to:
    intvec v=1,0,0,-3,0,1,0,3,-1,-1;
-   ideal i2=stdhilbert(i,v);
+   ideal i2=stdhilb(i,v);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
