@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.77 2000-11-21 15:33:10 Singular Exp $ */
+/* $Id: iplib.cc,v 1.78 2000-11-22 17:54:23 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -21,6 +21,8 @@
 #include "subexpr.h"
 #include "ipshell.h"
 #include "lists.h"
+
+BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror);
 
 #ifdef HAVE_LIBPARSER
 #  include "libparse.h"
