@@ -3,7 +3,7 @@
  *  Purpose: alloc function to be included in omMain.c
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omtTestAlloc.c,v 1.6 2000-09-18 09:12:17 obachman Exp $
+ *  Version: $Id: omtTestAlloc.c,v 1.7 2000-09-18 09:18:26 obachman Exp $
  *******************************************************************/
 #include "omtTest.h"
 
@@ -17,7 +17,7 @@
 
 #ifdef TEST_KEEP
 #define OM_CHECK CHECK_LEVEL
-#define OM_KEEP
+#define OM_KEEP  1
 #define omtTestAlloc   omtTestAllocKeep
 #define omtTestRealloc omtTestReallocKeep
 #define omtTestFree    omtTestFreeKeep

@@ -363,7 +363,7 @@ int main(int argc, char* argv[])
         omPrintBinStats(stdout);
         used_regions += om_Info.CurrentRegionsAlloc;
       }
-      omPrintUsedAddrs(stdout);
+      omPrintUsedAddrs(stdout, 5);
       i=0;
       n--;
       if (n <= 0 || n_cells <= 100)
