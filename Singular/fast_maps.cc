@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.1 2002-01-18 14:46:00 obachman Exp $
+ *  Version: $Id: fast_maps.cc,v 1.2 2002-01-18 17:13:13 bricken Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -50,12 +50,12 @@ static poly maGetMaxExpP(poly* max_map_monomials,
   return map_j;
 }
 
-// returns maximal monomial if map_id is applied to pi_id
-static poly maGetMaxExpP(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
+// returns maximal exponent if map_id is applied to pi_id
+static Exponent_t maGetMaxExp(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
 {
+  Exponent_t max=0;
   poly* max_map_monomials = (poly*) omAlloc(IDELEMS(map_id)*sizeof(poly));
   poly max_pi_i, max_map_i;
-  poly max_map = p_Init(map_r);
   
   int i, j;
   for (i=0; i<IDELEMS(map_id); i++)
@@ -68,26 +68,17 @@ static poly maGetMaxExpP(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
     max_pi_i = p_GetMaxExpP(pi_id->m[i], pi_r);
     max_map_i = maGetMaxExpP(max_map_monomials, IDELEMS(map_id), map_r, 
                               max_pi_i, pi_r);
-    // get maximum 
-    for (j = 1; j<= map_r->N; j++)
-    {
-      if (p_GetExp(max_map, j, map_r) < p_GetExp(max_map_i, j, map_r))
-        p_SetExp(max_map, j, p_GetExp(max_map_i, j, map_r), map_r);
+    Exponent_t temp = p_GetMaxExp(max_map_i, map_r);
+    if (temp> max){
+      max=temp;
     }
+
     p_LmFree(max_pi_i, pi_r);
     p_LmFree(max_map_i, map_r);
   }
-  return max_map;
-}
-
-// returns maximal exponent if map_id is applied to pi_id
-static Exponent_t maGetMaxExp(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
-{
-  poly p = maGetMaxExpP(map_id, map_r, pi_id, pi_r);
-  Exponent_t max = p_GetMaxExp(p, map_r);
-  p_LmFree(p, map_r);
   return max;
 }
+
 
 // construct ring/map ideal  in/with which we perform computations
 // return TRUE if ordering changed (not yet implemented), false, otherwise
