@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.29 1998-05-18 15:19:44 Singular Exp $
+@comment $Id: singular.doc,v 1.30 1998-05-18 19:12:14 wichmann Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -436,7 +436,7 @@ ideal).
 representative of a polynomial @code{p}, i.e. it usually does not reduce a
 polynom @code{p}w.r.t. the quotient ideal. This is only done during standard
 bases computations or by an explicite reduction using the command
-@code{NF(p, 0)}. @ref{reduce}
+@code{reduce(p, 0)}. @ref{reduce}
 
 
 @item substring selection 
@@ -513,7 +513,8 @@ have the same name(s) as ring variables
 @cindex SINGULAR libraries
 @cindex LIBs
 
-@sc{Singular} comes with a set of standard libraries:
+@sc{Singular} comes with a set of standard libraries. Their content is
+described in the following subsections.
 @menu
 * standard_lib:: extensions of singular kernel
 * all_lib:: load all other libraries
@@ -539,7 +540,7 @@ have the same name(s) as ring variables
 @section standard_lib
 @cindex standard_lib
 The library @code{standard.lib} provides extensions to the
-set of built-in commands and will be automatically loaded
+set of built-in commands and is automatically loaded
 during the start of @sc{Singular}.
 It contains:
 @table @code
