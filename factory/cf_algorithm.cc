@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.5 1997-10-09 14:48:19 schmidt Exp $ */
+/* $Id: cf_algorithm.cc,v 1.6 1998-03-12 10:26:14 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -13,7 +13,7 @@
 // structural algorithms.
 //
 // Used by: cf_gcd.cc, cf_resultant.cc, fac_distrib.cc,
-//   fac_ezgcd.cc, sm_sparsemod.cc
+//   fac_ezgcd.cc, fac_util.cc, sm_sparsemod.cc
 //
 //}}}
 
@@ -23,15 +23,17 @@
 
 #include "cf_defs.h"
 #include "canonicalform.h"
+#include "cf_algorithm.h"
 #include "variable.h"
 #include "cf_iter.h"
 
 //{{{ CanonicalForm psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
 //
-// psr() - calculate pseudo remainder of f and g with respect to x.
+// psr() - calculate pseudo remainder of `f' and `g' with respect
+//   to `x'.
 //
-// x should be a polynomial variable.
+// `x' should be a polynomial variable, `g' must not equal zero.
 //
 // For f and g in R[x], R an integral domain, g != 0, there is a
 // unique representation
@@ -50,7 +52,7 @@
 CanonicalForm
 psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
-    ASSERT( x.level() > 0, "cannot calculate pseudo remainder/quotient with respect to algebraic variables" );
+    ASSERT( x.level() > 0, "illegal variable" );
     ASSERT( g != 0, "division by zero" );
 
     int m = degree( f, x );
@@ -65,16 +67,17 @@ psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ CanonicalForm psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
 //
-// psq() - calculate pseudo quotient of f and g with respect to x.
+// psq() - calculate pseudo quotient of `f' and `g' with respect
+//   to `x'.
 //
-// x should be a polynomial variable.  See psr() for more
-// detailed information.
+// `x' should be a polynomial variable, `g' must not equal zero.
+// See `psr()' for more detailed information.
 //
 //}}}
 CanonicalForm
 psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
-    ASSERT( x.level() > 0, "cannot calculate pseudo remainder/quotient with respect to algebraic variables" );
+    ASSERT( x.level() > 0, "illegal variable" );
     ASSERT( g != 0, "division by zero" );
 
     int m = degree( f, x );
@@ -89,16 +92,17 @@ psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ void psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const Variable & x )
 //{{{ docu
 //
-// psqr() - calculate pseudo quotient and remainder of f and g with respect to x.
+// psqr() - calculate pseudo quotient and remainder of `f' and
+//   `g' with respect to `x'.
 //
-// x should be a polynomial variable.  See psr() for more
-// detailed information.
+// `x' should be a polynomial variable, `g' must not equal zero.
+// See `psr()' for more detailed information.
 //
 //}}}
 void
 psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const Variable& x )
 {
-    ASSERT( x.level() > 0, "cannot calculate pseudo remainder/quotient with respect to algebraic variables" );
+    ASSERT( x.level() > 0, "illegal variable" );
     ASSERT( g != 0, "division by zero" );
 
     int m = degree( f, x );
@@ -111,63 +115,62 @@ psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, Cano
 }
 //}}}
 
-//{{{ static CanonicalForm cden ( const CanonicalForm & f )
+//{{{ static CanonicalForm internalBCommonDen ( const CanonicalForm & f )
 //{{{ docu
 //
-// cden() - recursively calculate multivariate common denominator
-//   of coefficients of f.
+// internalBCommonDen() - recursively calculate multivariate
+//   common denominator of coefficients of `f'.
 //
-// Used by: common_den()
+// Used by: bCommonDen()
 //
 //}}}
 static CanonicalForm
-cden ( const CanonicalForm & f )
+internalBCommonDen ( const CanonicalForm & f )
 {
     if ( f.inBaseDomain() )
 	return f.den();
     else {
-	CFIterator i;
-	CanonicalForm cd = 1;
-	for ( i = f; i.hasTerms(); i++ )
-	    cd = lcm( cd, cden( i.coeff() ) );
-	return cd;
+	CanonicalForm result = 1;
+	for ( CFIterator i = f; i.hasTerms(); i++ )
+	    result = blcm( result, internalBCommonDen( i.coeff() ) );
+	return result;
     }
 }
 //}}}
 
-//{{{ CanonicalForm common_den ( const CanonicalForm & f )
+//{{{ CanonicalForm bCommonDen ( const CanonicalForm & f )
 //{{{ docu
 //
-// common_den() - calculate multivariate common denominator of
-//   coefficients of f.
+// bCommonDen() - calculate multivariate common denominator of
+//   coefficients of `f'.
 //
 // The common denominator is calculated with respect to all
-// coefficients of f which are in a base domain.  In other words,
-// common_den( f ) * f is guaranteed to have integer
-// coefficients only.
+// coefficients of `f' which are in a base domain.  In other
+// words, common_den( `f' ) * `f' is guaranteed to have integer
+// coefficients only.  The common denominator of zero equals is
+// one.
 //
-// Returns one for domains other than Q.
+// Returns something non-trivial iff the current domain is Q.
 //
 //}}}
 CanonicalForm
-common_den ( const CanonicalForm & f )
+bCommonDen ( const CanonicalForm & f )
 {
     if ( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) {
-	// switch to Z so lcm() will work correctly
+	// otherwise `bgcd()' returns one
 	Off( SW_RATIONAL );
-	CanonicalForm cd = cden( f );
+	CanonicalForm result = internalBCommonDen( f );
 	On( SW_RATIONAL );
-	return cd;
-    }
-    else
-	return 1;
+	return result;
+    } else
+	return CanonicalForm( 1 );
 }
 //}}}
 
 //{{{ bool divides ( const CanonicalForm & f, const CanonicalForm & g )
 //{{{ docu
 //
-// divides() - check whether f divides g.
+// divides() - check whether `f' divides `g'.
 //
 // Uses some extra checks to avoid polynomial division.
 //
@@ -179,14 +182,68 @@ divides ( const CanonicalForm & f, const CanonicalForm & g )
 	if ( divides( f.tailcoeff(), g.tailcoeff() ) && divides( f.LC(), g.LC() ) ) {
 	    CanonicalForm q, r;
 	    bool ok = divremt( g, f, q, r );
-	    return ok && r == 0;
+	    return ok && r.isZero();
 	}
 	else
 	    return false;
     else {
 	CanonicalForm q, r;
 	bool ok = divremt( g, f, q, r );
-	return ok && r == 0;
+	return ok && r.isZero();
     }
+}
+//}}}
+
+//{{{ CanonicalForm maxNorm ( const CanonicalForm & f )
+//{{{ docu
+//
+// maxNorm() - get maximum norm of `f'.
+//
+// That is, the base coefficient of `f' with the largest absolute
+// value.
+//
+// Valid for arbitrary polynomials over arbitrary domains, but
+// most useful for multivariate polynomials over Z.
+//
+//}}}
+CanonicalForm
+maxNorm ( const CanonicalForm & f )
+{
+    if ( f.inBaseDomain() )
+	return abs( f );
+    else {
+	CanonicalForm result = 0;
+	for ( CFIterator i = f; i.hasTerms(); i++ ) {
+	    CanonicalForm coeffMaxNorm = maxNorm( i.coeff() );
+	    if ( coeffMaxNorm > result )
+		result = coeffMaxNorm;
+	}
+	return result;
+    }
+}
+//}}}
+
+//{{{ CanonicalForm euclideanNorm ( const CanonicalForm & f )
+//{{{ docu
+//
+// euclideanNorm() - get euclidean norm of `f'.
+//
+// That is, returns the largest integer smaller or equal
+// norm(`f') = sqrt(sum( `f'[i]^2 )).  `f' should be an
+// univariate polynomial over Z.
+//
+//}}}
+CanonicalForm
+euclideanNorm ( const CanonicalForm & f )
+{
+    ASSERT( (f.inBaseDomain() || f.isUnivariate()) && f.LC().inZ(),
+	    "illegal polynomial" );
+
+    CanonicalForm result = 0;
+    for ( CFIterator i = f; i.hasTerms(); i++ ) {
+	CanonicalForm coeff = i.coeff();
+	result += coeff*coeff;
+    }
+    return sqrt( result );
 }
 //}}}
