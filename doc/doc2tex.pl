@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.15 1999-07-23 12:32:35 obachman Exp $
+# $Id: doc2tex.pl,v 1.16 1999-07-28 11:36:31 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -381,14 +381,24 @@ sub HandleRef
 	$header = " " unless ($header);
       }
     }
+    $header = $_ unless ($header)
   }
+  chomp $header;
   die "$ERRROR no matching \@c ref found for $doc_file:$lline\n" 
     unless (/^\@c\s*ref\s*$/);
   # sort refs
   @refs = sort(keys(%refs));
   # put them out
-  print TEX $header ? "$header\n" : "See also:\n";
-  print TEX "\@ifinfo\n\@menu\n";
+  print TEX "\@ifinfo\n";
+  print TEX "\@menu\n";
+  if ($header && $header ne " ")
+  {
+    print TEX "$header\n";
+  }
+  else
+  {
+    print TEX "See also:\n";
+  }
   foreach $ref (@refs) {print TEX "* ".$ref."::\n";}
   print TEX "\@end menu\n\@end ifinfo\n\@iftex\n";
 

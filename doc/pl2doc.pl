@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.5 1999-07-23 16:07:36 obachman Exp $
+# $Id: pl2doc.pl,v 1.6 1999-07-28 11:36:32 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -35,7 +35,9 @@ $pl_file = pop(@ARGV);
 die "Error: No perl file specified: $Usage\n" unless $pl_file;
 die "Error: Can't find perl file $pl_file: $Usage\n" unless -r $pl_file;
 require $pl_file;
-($lib = $library) =~ s|.*/(.*)\.lib$|$1|;
+$lib = $library;
+$lib =~ s|.*/(.*)$|$1|;
+$lib =~ s|(.*)\.lib$|$1|;
 
 ###################################################################
 # print  summary
@@ -115,9 +117,7 @@ unless ($no_fun)
 if ($doc)
 {
  print LDOC <<EOT;
-\@example 
---------------END OF PART WHICH WILL BE INCLUDED IN MANUAL-------------------
-\@end example
+
 \@bye
 EOT
 }
@@ -346,8 +346,7 @@ sub OutRef
   $refs =~ s/\n/,/g;
   my @refs = split (/[,;\.]+/, $refs);
   my $ref;
-
-  print $FH "\@c ref\nSee also:\n";
+  print $FH "\@c ref\n";
   $ref = shift @refs;
   print $FH "\@ref{$ref}";
   for $ref (@refs)
@@ -356,7 +355,8 @@ sub OutRef
     $ref =~ s/\s*$//;
     print $FH ", \@ref{$ref}"  if ($ref =~ /\w/);
   }
-  print $FH "\n\@c ref\n";
+  print $FH "\n\@c ref\n\n";
+
 }
 
 sub CleanUpExample
@@ -406,7 +406,7 @@ sub print_doc_header
 \\input texinfo   \@c -*-texinfo-*-
 \@c %**start of header
 \@setfilename $hlp_file
-\@settitle Formatted manual of $library
+\@settitle Formatted manual of $lib.lib
 \@c %**end of header
 
 \@ifinfo
@@ -439,7 +439,9 @@ This file contains the formatted documentation of $library
 \@section ${lib}_lib
 
 \@example 
---------------BEGIN OF PART WHICH IS INCLUDED IN MANUAL-------------------
+-------BEGIN OF PART WHICH IS INCLUDED IN MANUAL-----
 \@end example
+
+
 EOT
 }

@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-###
+### $Id: Makefile.in,v 1.30 1999-07-28 11:36:31 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -160,7 +160,7 @@ singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_
 
 # targets which produce stand-alone documents
 COPYING: copyright.tex
-	${MAKEINFO} --no-header -o COPYING copyright.tex 
+	${MAKEINFO} --no-header --paragraph-indent none -o COPYING copyright.tex 
 
 ###########################################################
 # html targets
@@ -207,6 +207,15 @@ install: singular.hlp html/index.htm singular.idx
 uninstall: 
 	rm -f ${infodir}/singular.hlp
 	- rmdir ${infodir}
+
+lib2doc.tar.gz:
+	rm -rf lib2doc lib2doc.tar.gz
+	mkdir lib2doc
+	cp Makefile.lib2doc lib2doc/Makefile
+	${MAKEINFO} --no-header --paragraph-indent none -o lib2doc/README lib2doc.texi
+	cp pl2doc.pl doc2tex.pl ${TEXI2HTML} lib2doc
+	tar cf lib2doc.tar lib2doc
+	gzip lib2doc.tar
 
 clean: mostlyclean
 	/bin/rm -rf singular.tex manual.tex  ${HTML_DIR} ${D2T_SUBDIR}

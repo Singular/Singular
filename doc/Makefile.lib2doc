@@ -1,0 +1,102 @@
+##########################################################################
+##
+## Makefiel for generation of docu for libraries
+## $Id: Makefile.lib2doc,v 1.1 1999-07-28 11:36:31 obachman Exp $
+#####################################################################
+
+####################################################################
+##
+## Configuration: 
+##
+## 1.) You MUST set SINGULAR and LIBPARSE to the newset versions of
+##     the Singular and libparse program (they are located at 
+##     ${SingularRoot}/<uname> within a distribution).
+## 
+SINGULAR = Singular
+LIBPARSE = libparse
+
+##
+## 2.) Set this to the name of your latex2html program, if you have latex2html
+##
+LATEX2HTML = 
+
+
+##
+## 3.) Set this to the name of your perl5 program
+##
+PERL		= perl
+
+##
+## End Configuration
+####################################################################
+#
+# There should be no need to set anything below here
+#
+
+#
+# programs we use
+#
+PL2DOC		= ./pl2doc.pl
+DOC2TEX 	= ./doc2tex.pl
+TEX		= tex
+MAKEINFO	= makeinfo --force --no-split
+TEXI2DVI	= texi2dvi
+TEXI2HTML	= ./texi2html
+DVIPS           = dvips
+
+# 
+# setting of program parameters
+#
+# set this to 0 if you want no chattering, to 2 (3,4) if you want more
+VERBOSE		= 1
+# doc2tex parameters
+D2T_SUBDIR 	= d2t
+DOC2TEX_OPTS	= -subdir ${D2T_SUBDIR} -verbose ${VERBOSE} \
+		  -Singular ${SINGULAR} 
+# texi2html parameters
+TMP_DIR		= /tmp
+TEXI2HTML_OPTS  = -expand tex -short_ref
+ifneq ($(strip $(LATEX2HTML)),)
+TEXI2HTML_OPTS 	:= $(TEXI2HTML_OPTS) -l2h -l2h_l2h $(LATEX2HTML) -l2h_tmp $(TMP_DIR)
+endif
+ifneq ($(VERBOSE),0)
+TEXI2HTML_OPTS := $(TEXI2HTML_OPTS) -verbose
+endif
+
+
+####################################################################
+#
+# Targets are specified as patterns
+#
+
+%.html: %.tex
+	${TEXI2HTML} ${TEXI2HTML_OPTS} -o $@ $<
+
+%.hlp: %.tex
+	${MAKEINFO} -o $@ $<
+
+%.ps: %.dvi
+	${DVIPS} $< -o $@
+
+%.dvi: %.tex
+	${TEXI2DVI} $<
+
+
+%.tex: %.doc
+	${PERL} ${DOC2TEX} ${DOC2TEX_OPTS} -o $@ $<
+
+%.doc: %.perl 
+	${PERL} ${PL2DOC} -doc -o $@ $<
+
+%.perl: %.lib 
+	${LIBPARSE} -i $< > $@
+
+
+.PRECIOUS: %.doc %.perl %.tex %.dvi
+
+mostlyclean:
+	rm -f *.perl *.doc *.tex *.dvi *.ps *.hlp *.gif *.html *_l2h*
+	rm -f *.ky *.cp *.cps *.fn *.pg *.toc *.tp *.vr *.aux *.log *.toc 
+
+clean: mostlyclean
+	rm -rf ${D2T_SUBDIR}
