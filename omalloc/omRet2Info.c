@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.6 2000-09-14 12:59:53 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.7 2000-09-18 09:12:16 obachman Exp $
  *******************************************************************/
 #include <stdio.h>
 #include <strings.h>
@@ -110,6 +110,18 @@ int omPrintRetInfo(omRetInfo info, int max, FILE* fd, const char* fmt)
         else if (fmt[l] == 'f') fprintf(fd, "%-20s", (*info[i].file != '\0' ? info[i].file : "??"));
         else if (fmt[l] == 'F') fprintf(fd, "%-20s", (*info[i].func != '\0' ? info[i].func : "??"));
         else if (fmt[l] == 'l') fprintf(fd, "%d", info[i].line);
+        else if (fmt[l] == 'N') 
+        {
+          if (*info[i].func != '\0')
+          {
+            char* found = strchr(info[i].func, '(');
+            if (found) *found = '\0';
+            fprintf(fd, "%-20s", info[i].func);
+            if (found) *found = '(';
+          }
+          else
+            fprintf(fd, "%-20s", "??");
+        }
         else if (fmt[l] == 'L') 
         {
           int n = fprintf(fd, "%s:%d", (*info[i].func != '\0' ? info[i].file : "??"), info[i].line);
@@ -142,9 +154,9 @@ int omPrintBackTrace(void** bt, int max, FILE* fd)
   
   i = omBackTrace_2_RetInfo(bt, info, max);
 #ifdef OM_PRINT_RETURN_ADDRESS
-  return omPrintRetInfo(info, i, fd, "  #%i at %L in %F ra=%p\n");
+  return omPrintRetInfo(info, i, fd, "  #%i at %L in %N ra=%p\n");
 #else
-  return omPrintRetInfo(info, i, fd, "  #%i at %L in %F\n");
+  return omPrintRetInfo(info, i, fd, "  #%i at %L in %N\n");
 #endif  
 }
 
@@ -240,9 +252,9 @@ int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
   else
 #endif /* ! OM_INTERNAL_DEBUG */
 #ifdef OM_PRINT_RETURN_ADDRESS
-    return omPrintRetInfo(info, i, fd, "\n  #%i at %L in %F ra=%p");
+    return omPrintRetInfo(info, i, fd, "\n  #%i at %L in %N ra=%p");
 #else
-    return omPrintRetInfo(info, i, fd, "\n  #%i at %L in %F");
+    return omPrintRetInfo(info, i, fd, "\n  #%i at %L in %N");
 #endif
 }
 

@@ -3,7 +3,7 @@
  *  Purpose: declaration of options for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omOpts.h,v 1.3 2000-08-14 12:26:48 obachman Exp $
+ *  Version: $Id: omOpts.h,v 1.4 2000-09-18 09:12:16 obachman Exp $
  *******************************************************************/
 #ifndef OM_OPTS_H
 #define OM_OPTS_H
@@ -19,6 +19,7 @@ struct omOpts_s
   unsigned int PagesPerRegion;
   void (*OutOfMemoryFunc)();
   void (*MemoryLowFunc)();
+  void (*ErrorHook)();
 };
 extern omOpts_t om_Opts;
 

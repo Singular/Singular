@@ -4,7 +4,7 @@
 #define OM_CHECK CHECK_LEVEL
 #endif
 
-#include "omalloc.h"
+#include "omAlloc.h"
 
 omMemCell_t cells[MAX_CELLS];
 int errors = 0;
@@ -150,6 +150,11 @@ void omCheckCells(int n, int level, omMemCell_t* cells)
       errors++;
       om_ErrorStatus = omError_NoError;
     }
+    if ((i % 10000) == 0) 
+    {
+      printf(".");
+      fflush(stdout);
+    }
   }
   om_Opts.MinCheck = l;
 #endif
@@ -183,8 +188,11 @@ void TestAlloc(omMemCell cell, unsigned long spec)
       om_Opts.MinTrack = GET_TRACK(spec);
     else
       om_Opts.MinTrack = 0;
-    
-    omtTestAllocDebug(cell, spec);
+   
+    if (DO_KEEP(spec))
+      omtTestAllocKeep(cell, spec);
+    else
+      omtTestAllocDebug(cell, spec);
   }
   else
     omtTestAlloc(cell, spec);
@@ -204,7 +212,10 @@ void TestRealloc(omMemCell cell, unsigned long spec)
     else
       om_Opts.MinTrack = 0;
     
-    omtTestReallocDebug(cell, spec);
+    if (DO_KEEP(spec))
+      omtTestReallocKeep(cell, spec);
+    else
+      omtTestReallocDebug(cell, spec);
   }
   else
     omtTestRealloc(cell, spec);
@@ -224,7 +235,10 @@ void TestDup(omMemCell cell, unsigned long spec)
     else
       om_Opts.MinTrack = 0;
     
-    omtTestDupDebug(cell, spec);
+    if (DO_KEEP(spec))
+      omtTestDupKeep(cell, spec);
+    else
+      omtTestDupDebug(cell, spec);
   }
   else
     omtTestDup(cell, spec);
@@ -242,7 +256,10 @@ void TestFree(omMemCell cell)
   {
     if (DO_FREE_CHECK(cell->spec))
     {
-      omtTestFreeDebug(cell);
+      if (DO_KEEP(cell->spec))
+        omtTestFreeKeep(cell);
+      else
+        omtTestFreeDebug(cell);
     }
     else
     {
@@ -281,8 +298,10 @@ int main(int argc, char* argv[])
   int n = 1;
   int n_cells = MAX_CELLS;
   int decr = 2;
+  int last_kept_freed = 0;
   om_Opts.MinCheck = CHECK_LEVEL;
   om_Opts.Keep = KEEP_ADDR;
+  
   seed = time(NULL);
   
   omInitRet_2_Info(argv[0]);
@@ -305,9 +324,18 @@ int main(int argc, char* argv[])
     if (i == n_cells)
     {
       i = 0;
-      printf("\nCells: %d\n", n_cells);
+      printf("\nCells: %d KeptAddr:%d AlwaysKeptAddr:%d\n", n_cells,
+#ifndef OM_NDEBUG
+             omListLength(om_KeptAddr), omListLength(om_AlwaysKeptAddrs)
+#else
+             0, 0
+#endif
+             );
+
+      printf("Checking Memory and all cells ");
       fflush(stdout);
       omCheckCells(n_cells, END_CHECK_LEVEL, cells);
+      printf("\n");
       omPrintStats(stdout);
       omPrintInfo(stdout);
       if (om_Info.CurrentRegionsAlloc > 0) omPrintBinStats(stdout);
@@ -398,6 +426,13 @@ int main(int argc, char* argv[])
     }
     myprintf("\n");
     myfflush(stdout);
+    // free kept addresses from time to time
+    if ((i % 10000) == 0 && i != n_cells && i!=last_kept_freed)
+    {
+      printf("F:");
+      omFreeKeptAddr();
+      last_kept_freed = i;
+    }
 #if 0
     if (CHECK_LEVEL > 2)
     {

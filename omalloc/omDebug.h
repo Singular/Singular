@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.9 2000-09-14 12:59:52 obachman Exp $
+ *  Version: $Id: omDebug.h,v 1.10 2000-09-18 09:12:14 obachman Exp $
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H
@@ -27,8 +27,8 @@
 #define omUnMarkAsStaticAddr()      ((void)0)
 #define omUnMarkMemoryAsStatic()    ((void)0)
 #define omFreeKeptAddr()            ((void)0)
-#define omPrintUsedAddrs(fd)        ((void)0)
-#define omPrintUsedTrackAddrs(fd)   ((void)0)
+#define omPrintUsedAddrs(fd,m)      ((void)0)
+#define omPrintUsedTrackAddrs(fd,m) ((void)0)
 #else
 #define OM_FBIN     1           /* size_bin is bin */
 #define OM_FSIZE    2           /* size_bin is size */
@@ -38,10 +38,11 @@
 #define OM_FZERO    32          /* for Alloc0 */
 #define OM_FALIGN   64          /* for AllocAligned */
 #define OM_FSLOPPY  128         /* be sloppy about arguments */
-#define OM_FBINADDR 256
+#define OM_FBINADDR 256         /* addr is bin addr */
+#define OM_FKEEP    512         /* addr is never really freed */
 /* maximal flag: OM_FBIN and OM_FSIZE can not be at the same time, 
-   and so can't OM_USED and OM_KEPT. Hence 255 - BIN - USED*/
-#define OM_FMAX     512 - OM_FBIN - OM_FUSED
+   and so can't OM_USED and OM_KEPT. Hence 1024 - BIN - USED*/
+#define OM_FMAX     1024 - OM_FBIN - OM_FUSED
 typedef unsigned short omTrackFlags_t;
 
 void* _omDebugAlloc(void* size_bin, omTrackFlags_t flags, OM_CTFL_DECL);
@@ -56,8 +57,8 @@ omError_t _omDebugMemory(OM_CFL_DECL);
 omError_t _omDebugAddr(void* addr, void* bin_size, omTrackFlags_t flags, OM_CFL_DECL);
 
 void omFreeKeptAddr();
-void omPrintUsedAddrs(FILE* fd);
-void omPrintUsedTrackAddrs(FILE* fd);
+void omPrintUsedAddrs(FILE* fd, int max_frames);
+void omPrintUsedTrackAddrs(FILE* fd, int max_frames);
 
 void omMarkAsStaticAddr(void* addr);
 void omMarkMemoryAsStatic();
@@ -94,8 +95,10 @@ void* omGetCustomOfTrackAddr(void* addr);
 
 
 void* om_KeptAddr;
+void* om_LastKeptAddr;
 unsigned long om_MaxAddr;
 unsigned long om_MinAddr;
+void* om_AlwaysKeptAddrs;
 
 /***********************************************************************
  *
@@ -118,7 +121,7 @@ void omIterateTroughAddrs(int normal, int track, void (*CallBackUsed)(void*), vo
 void omIterateTroughBinAddrs(omBin bin, void (*CallBackUsed)(void*), void (*CallBackFree)(void*));
 omError_t omDoCheckAddr(void* addr, void* bin_size, omTrackFlags_t flags, char level, 
                         omError_t report, OM_FLR_DECL);
-
+int omIsInKeptAddrList(void* addr);
 
 /***********************************************************************
  *
@@ -135,10 +138,10 @@ extern size_t omOutSizeOfTrackAddr(void* addr);
 extern omSpecBin om_SpecTrackBin;
 
 void* omAllocTrackAddr(void* bin_size, omTrackFlags_t flags, char track, OM_FLR_DECL);
-void* omMarkAsFreeTrackAddr(void* addr, int keep, OM_FLR_DECL);
+void* omMarkAsFreeTrackAddr(void* addr, int keep, omTrackFlags_t *flags, OM_FLR_DECL);
 omError_t omCheckTrackAddr(void* addr, void* bin_size, omTrackFlags_t flags, char level, 
                            omError_t report_error, OM_FLR_DECL);
-void omPrintTrackAddrInfo(FILE* fd, void* addr);
+void omPrintTrackAddrInfo(FILE* fd, void* addr, int max_frames);
 omBin omGetOrigSpecBinOfTrackAddr(void* addr);
 size_t omOutSizeOfTrackAddr(void* addr);
 extern int omIsStaticTrackAddr(void* addr);
@@ -148,7 +151,7 @@ extern int omIsStaticTrackAddr(void* addr);
 #else
 #define omIsStaticTrackAddr(addr)   0
 #endif
-
+void* omAddr_2_OutAddr(void* addr);
 
 /***********************************************************************
  *
@@ -178,7 +181,7 @@ do                                                                            \
   omError_t _status = cond;                                                   \
   if (_status && _status != omError_MaxError)                                 \
   {                                                                           \
-    _omPrintAddrInfo(stderr, _status, addr, bin_size, flags, "  occured for"); \
+    _omPrintAddrInfo(stderr, _status, addr, bin_size, flags, 10, "  occured for"); \
     return _status;                                                           \
   }                                                                           \
 } while (0)

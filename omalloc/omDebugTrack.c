@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.8 2000-09-14 13:58:12 obachman Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.9 2000-09-18 09:12:14 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -240,6 +240,18 @@ size_t omOutSizeOfTrackAddr(void* addr)
   return omTrackAddr_2_OutSize(d_addr);
 }
 
+void* omAddr_2_OutAddr(void* addr)
+{
+  if (omIsTrackAddr(addr)) 
+  {
+    return omTrackAddr_2_OutAddr(omOutAddr_2_TrackAddr(addr));
+  }
+  else
+  {
+    return addr;
+  }
+}
+
 /*******************************************************************
  *  
  * Low level allocation/free routines: do the actual work, 
@@ -345,7 +357,7 @@ void* omAllocTrackAddr(void* bin_size,
 }
 
 
-void* omMarkAsFreeTrackAddr(void* addr, int keep, OM_FLR_DECL)
+void* omMarkAsFreeTrackAddr(void* addr, int keep, omTrackFlags_t *flags, OM_FLR_DECL)
 {
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
   omAssume(omIsTrackAddr(addr));
@@ -377,6 +389,7 @@ void* omMarkAsFreeTrackAddr(void* addr, int keep, OM_FLR_DECL)
       omAssume(d_addr->flags & OM_FKEPT);
     }
   }
+  if (d_addr->flags & OM_FKEEP) *flags |= OM_FKEEP;
   d_addr->flags &= ~OM_FUSED;
   if (keep) d_addr->flags |= OM_FKEPT;
   else d_addr->flags &= ~OM_FKEPT;
@@ -453,6 +466,8 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
     omAddrCheckReturnError(d_addr->next != NULL && omCheckPtr(d_addr->next, omError_MaxError, OM_FLR_VAL), 
                            omError_FreedAddrOrMemoryCorrupted);
   omAddrCheckReturnCorrupted(omCheckFlags(d_addr->flags));
+
+  omAddrCheckReturnError(level > 1 && (flags & OM_FUSED) && omIsInKeptAddrList(d_addr), omError_FreedAddr);
   omAddrCheckReturnError((d_addr->flags & OM_FUSED) ^ (flags & OM_FUSED), omError_FreedAddrOrMemoryCorrupted);
 
   if (flags & OM_FBINADDR && flags & OM_FSIZE)
@@ -561,14 +576,17 @@ static int omCheckPattern(char* s, char p, size_t size)
 #define OM_FREE_FRAMES(d)  NULL
 #endif
 
-void omPrintTrackAddrInfo(FILE* fd, void* addr)
+void omPrintTrackAddrInfo(FILE* fd, void* addr, int max_frames)
 {
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
   omAssume(d_addr->track > 0);
+  if (max_frames <= 0) return;
+  
+  if (max_frames > OM_MAX_KEPT_FRAMES) max_frames = OM_MAX_KEPT_FRAMES;
   
   fprintf(fd, " allocated at ");
   if (! _omPrintBackTrace(OM_ALLOC_FRAMES(d_addr), 
-                          (d_addr->track > 1 ? OM_MAX_KEPT_FRAMES : 0), 
+                          (d_addr->track > 1 ? max_frames : 0), 
                           fd, 
                           OM_FLR_ARG(d_addr->alloc_file, d_addr->alloc_line, d_addr->alloc_r)))
     fprintf(fd," ??");
@@ -578,7 +596,7 @@ void omPrintTrackAddrInfo(FILE* fd, void* addr)
     {
       fprintf(fd, "\n freed at ");
       if (! _omPrintBackTrace(OM_FREE_FRAMES(d_addr), 
-                          (d_addr->track > 4 ? OM_MAX_KEPT_FRAMES : 0), 
+                          (d_addr->track > 4 ? max_frames : 0), 
                           fd, 
                           OM_FLR_ARG(d_addr->free_file, d_addr->free_line, d_addr->free_r)))
         fprintf(fd," ??");

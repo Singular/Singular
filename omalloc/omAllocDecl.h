@@ -3,7 +3,7 @@
  *  Purpose: declaration of Alloc routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocDecl.h,v 1.6 2000-09-14 12:59:51 obachman Exp $
+ *  Version: $Id: omAllocDecl.h,v 1.7 2000-09-18 09:12:13 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_DECL_H
 #define OM_ALLOC_DECL_H
@@ -32,51 +32,57 @@
 #define OM_TRACK    0
 #endif
 
-#define omTypeAllocBin(type,addr,bin)           addr=(type)_omDebugAlloc(bin,OM_FBIN,OM_CTFL)
-#define omTypeAlloc0Bin(type,addr,bin)          addr=(type)_omDebugAlloc(bin,OM_FBIN|OM_FZERO,OM_CTFL)
-#define omAllocBin(bin)                         _omDebugAlloc(bin,OM_FBIN,OM_CTFL)
-#define omAlloc0Bin(bin)                        _omDebugAlloc(bin,OM_FBIN|OM_FZERO,OM_CTFL)
+#if OM_KEEP > 0
+#define _OM_FKEEP OM_FKEEP
+#else
+#define _OM_FKEEP 0
+#endif
 
-#define omTypeAlloc(type,addr,size)             addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE,OM_CTFL)
-#define omTypeAlloc0(type,addr,size)            addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO,OM_CTFL)
-#define omAlloc(size)                           _omDebugAlloc((void*)(size),OM_FSIZE,OM_CTFL)
-#define omAlloc0(size)                          _omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO,OM_CTFL)
+#define omTypeAllocBin(type,addr,bin)           addr=(type)_omDebugAlloc(bin,OM_FBIN|_OM_FKEEP,OM_CTFL)
+#define omTypeAlloc0Bin(type,addr,bin)          addr=(type)_omDebugAlloc(bin,OM_FBIN|OM_FZERO|_OM_FKEEP,OM_CTFL)
+#define omAllocBin(bin)                         _omDebugAlloc(bin,OM_FBIN|_OM_FKEEP,OM_CTFL)
+#define omAlloc0Bin(bin)                        _omDebugAlloc(bin,OM_FBIN|OM_FZERO|_OM_FKEEP,OM_CTFL)
 
-#define omTypeReallocBin(o_addr,o_bin,type,addr,bin)            addr=(type)_omDebugRealloc(o_addr,o_bin,bin,OM_FBIN,OM_FBIN,OM_CTFL)
-#define omTypeRealloc0Bin(o_addr,o_bin,type,addr,bin)           addr=(type)_omDebugRealloc(o_addr,o_bin,bin,OM_FBIN,OM_FBIN|OM_FZERO,OM_CTFL)
-#define omReallocBin(o_addr,o_bin,bin)                          _omDebugRealloc(o_addr,o_bin,bin,OM_FBIN,OM_FBIN,OM_CTFL)
-#define omRealloc0Bin(o_addr,o_bin,bin)                         _omDebugRealloc(o_addr,o_bin,bin,OM_FBIN,OM_FBIN|OM_FZERO,OM_CTFL)
+#define omTypeAlloc(type,addr,size)             addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE|_OM_FKEEP,OM_CTFL)
+#define omTypeAlloc0(type,addr,size)            addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|_OM_FKEEP,OM_CTFL)
+#define omAlloc(size)                           _omDebugAlloc((void*)(size),OM_FSIZE|_OM_FKEEP,OM_CTFL)
+#define omAlloc0(size)                          _omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|_OM_FKEEP,OM_CTFL)
 
-#define omTypeReallocSize(o_addr,o_size,type,addr,size)         addr=(type)_omDebugRealloc(o_addr,(void*)(o_size),(void*)(size),OM_FSIZE,OM_FSIZE,OM_CTFL)
-#define omTypeRealloc0Size(o_addr,o_size,type,addr,size)        addr=(type)_omDebugRealloc(o_addr,(void*)(o_size),(void*)(size),OM_FSIZE,OM_FSIZE|OM_FZERO,OM_CTFL)
-#define omReallocSize(addr,o_size,size)                         _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE,OM_FSIZE,OM_CTFL)
-#define omRealloc0Size(addr,o_size,size)                        _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE,OM_FSIZE|OM_FZERO,OM_CTFL)
+#define omTypeReallocBin(o_addr,o_bin,type,addr,bin)            addr=(type)_omDebugRealloc(o_addr,o_bin,bin,OM_FBIN|_OM_FKEEP,OM_FBIN|_OM_FKEEP,OM_CTFL)
+#define omTypeRealloc0Bin(o_addr,o_bin,type,addr,bin)           addr=(type)_omDebugRealloc(o_addr,o_bin,bin,OM_FBIN|_OM_FKEEP,OM_FBIN|OM_FZERO|_OM_FKEEP,OM_CTFL)
+#define omReallocBin(o_addr,o_bin,bin)                          _omDebugRealloc(o_addr,o_bin,bin,OM_FBIN|_OM_FKEEP,OM_FBIN|_OM_FKEEP,OM_CTFL)
+#define omRealloc0Bin(o_addr,o_bin,bin)                         _omDebugRealloc(o_addr,o_bin,bin,OM_FBIN|_OM_FKEEP,OM_FBIN|OM_FZERO|_OM_FKEEP,OM_CTFL)
 
-#define omTypeRealloc(o_addr,type,addr,size)                    addr=(type)_omDebugRealloc(o_addr,NULL,(void*)(size),0,OM_FSIZE,OM_CTFL)
-#define omTypeRealloc0(o_addr,type,addr,size)                   addr=(type)_omDebugRealloc(o_addr,NULL,(void*)(size),0,OM_FSIZE|OM_FZERO,OM_CTFL)
-#define omRealloc(addr,size)                                    _omDebugRealloc(addr,NULL,(void*)(size),0,OM_FSIZE,OM_CTFL)
-#define omRealloc0(addr,size)                                   _omDebugRealloc(addr,NULL,(void*)(size),0,OM_FSIZE|OM_FZERO,OM_CTFL)
+#define omTypeReallocSize(o_addr,o_size,type,addr,size)         addr=(type)_omDebugRealloc(o_addr,(void*)(o_size),(void*)(size),OM_FSIZE|_OM_FKEEP,OM_FSIZE|_OM_FKEEP,OM_CTFL)
+#define omTypeRealloc0Size(o_addr,o_size,type,addr,size)        addr=(type)_omDebugRealloc(o_addr,(void*)(o_size),(void*)(size),OM_FSIZE|_OM_FKEEP,OM_FSIZE|OM_FZERO|_OM_FKEEP,OM_CTFL)
+#define omReallocSize(addr,o_size,size)                         _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE|_OM_FKEEP,OM_FSIZE|_OM_FKEEP,OM_CTFL)
+#define omRealloc0Size(addr,o_size,size)                        _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE|_OM_FKEEP,OM_FSIZE|OM_FZERO|_OM_FKEEP,OM_CTFL)
 
-#define omFreeBinAddr(addr)     _omDebugFree(addr,NULL,OM_FBINADDR,OM_CFL)
-#define omFreeBin(addr,bin)     _omDebugFree(addr,bin,OM_FBIN,OM_CFL)
-#define omFreeSize(addr,size)   _omDebugFree(addr,(void*)(size),OM_FSIZE,OM_CFL)
+#define omTypeRealloc(o_addr,type,addr,size)                    addr=(type)_omDebugRealloc(o_addr,NULL,(void*)(size),_OM_FKEEP,OM_FSIZE|_OM_FKEEP,OM_CTFL)
+#define omTypeRealloc0(o_addr,type,addr,size)                   addr=(type)_omDebugRealloc(o_addr,NULL,(void*)(size),_OM_FKEEP,OM_FSIZE|OM_FZERO|_OM_FKEEP,OM_CTFL)
+#define omRealloc(addr,size)                                    _omDebugRealloc(addr,NULL,(void*)(size),_OM_FKEEP,OM_FSIZE,OM_CTFL)
+#define omRealloc0(addr,size)                                   _omDebugRealloc(addr,NULL,(void*)(size),_OM_FKEEP,OM_FSIZE|OM_FZERO,OM_CTFL)
+
+#define omFreeBinAddr(addr)     _omDebugFree(addr,NULL,OM_FBINADDR|_OM_FKEEP,OM_CFL)
+#define omFreeBin(addr,bin)     _omDebugFree(addr,bin,OM_FBIN|_OM_FKEEP,OM_CFL)
+#define omFreeSize(addr,size)   _omDebugFree(addr,(void*)(size),OM_FSIZE|_OM_FKEEP,OM_CFL)
 #define omFree(addr)            _omDebugFree(addr,0,0,OM_CFL)
 
 
-#define omalloc(size)   _omDebugAlloc((void*)(size),OM_FSIZE|OM_FSLOPPY|OM_FALIGN,OM_CTFL)
-#define omalloc0(size)  _omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN,OM_CTFL)
-#define omcalloc(n,size)_omDebugAlloc((void*) ((size)*n),OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN,OM_CTFL)
+#define omalloc(size)   _omDebugAlloc((void*)(size),OM_FSIZE|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omalloc0(size)  _omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omcalloc(n,size)_omDebugAlloc((void*) ((size)*n),OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
 
-#define omreallocSize(addr,o_size,size) _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE|OM_FSLOPPY,OM_FSIZE|OM_FSLOPPY|OM_FALIGN,OM_CTFL)
-#define omrealloc0Size(addr,o_size,size)_omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE|OM_FSLOPPY,OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN,OM_CTFL)
-#define omrealloc(addr,size)            _omDebugRealloc(addr,NULL,(void*)(size),OM_FSLOPPY,OM_FSIZE|OM_FSLOPPY|OM_FALIGN,OM_CTFL)
-#define omrealloc0(addr,size)           _omDebugRealloc(addr,NULL,(void*)(size),OM_FSLOPPY,OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN,OM_CTFL)
+#define omreallocSize(addr,o_size,size) _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE|OM_FSLOPPY|_OM_FKEEP,OM_FSIZE|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omrealloc0Size(addr,o_size,size)_omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE|OM_FSLOPPY|_OM_FKEEP,OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omrealloc(addr,size)            _omDebugRealloc(addr,NULL,(void*)(size),OM_FSLOPPY|_OM_FKEEP,OM_FSIZE|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omrealloc0(addr,size)           _omDebugRealloc(addr,NULL,(void*)(size),OM_FSLOPPY|_OM_FKEEP,OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
 
-#define omfreeSize(addr,size)   _omDebugFree(addr,(void*)(size),OM_FSIZE|OM_FSLOPPY,OM_CFL)
-#define omfree(addr)            _omDebugFree(addr,NULL,OM_FSLOPPY,OM_CFL)
+#define omfreeSize(addr,size)   _omDebugFree(addr,(void*)(size),OM_FSIZE|OM_FSLOPPY|_OM_FKEEP,OM_CFL)
+#define omfree(addr)            _omDebugFree(addr,NULL,OM_FSLOPPY|_OM_FKEEP,OM_CFL)
 
 #define omStrDup(s)                             _omDebugStrDup(s,OM_TFL)
-#define omMemDup(addr)                          _omDebugMemDup(addr,0,OM_CTFL)
+#define omMemDup(addr)                          _omDebugMemDup(addr,_OM_FKEEP,OM_CTFL)
 
 #define omDebugBinAddr(addr)                 _omDebugAddr(addr,NULL,OM_FBINADDR,OM_CFL) 
 #define omDebugAddrBin(addr, bin)            _omDebugAddr(addr,bin,OM_FBIN,OM_CFL)
@@ -105,22 +111,22 @@
 
 #ifdef OM_ALIGNMENT_NEEDS_WORK
 
-#define omTypeAllocAligned(type,addr,size)             addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE|OM_FALIGN,OM_CTFL)
-#define omTypeAlloc0Aligned(type,addr,size)            addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|OM_FALIGN,OM_CTFL)
-#define omAllocAligned(size)                           _omDebugAlloc((void*)(size),OM_FSIZE|OM_FALIGN,OM_CTFL)
-#define omAlloc0Aligned(size)                          _omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|OM_FALIGN,OM_CTFL)
+#define omTypeAllocAligned(type,addr,size)             addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omTypeAlloc0Aligned(type,addr,size)            addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omAllocAligned(size)                           _omDebugAlloc((void*)(size),OM_FSIZE|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omAlloc0Aligned(size)                          _omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|OM_FALIGN|_OM_FKEEP,OM_CTFL)
 
-#define omTypeReallocAlignedSize(o_addr,o_size,type,addr,size)         addr=(type)_omDebugRealloc(o_addr,(void*)(o_size),(void*)(size),OM_FSIZE,OM_FSIZE|OM_FALIGN,OM_CTFL)
-#define omTypeRealloc0AlignedSize(o_addr,o_size,type,addr,size)        addr=(type)_omDebugRealloc(o_addr,(void*)(o_size),(void*)(size),OM_FSIZE,OM_FSIZE|OM_FZERO|OM_FALIGN,OM_CTFL)
-#define omReallocAlignedSize(addr,o_size,size)                         _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE,OM_FSIZE|OM_FALIGN,OM_CTFL)
-#define omRealloc0AlignedSize(addr,o_size,size)                        _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE,OM_FSIZE|OM_FZERO|OM_FALIGN,OM_CTFL)
+#define omTypeReallocAlignedSize(o_addr,o_size,type,addr,size)         addr=(type)_omDebugRealloc(o_addr,(void*)(o_size),(void*)(size),OM_FSIZE|_OM_FKEEP,OM_FSIZE|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omTypeRealloc0AlignedSize(o_addr,o_size,type,addr,size)        addr=(type)_omDebugRealloc(o_addr,(void*)(o_size),(void*)(size),OM_FSIZE|_OM_FKEEP,OM_FSIZE|OM_FZERO|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omReallocAlignedSize(addr,o_size,size)                         _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE|_OM_FKEEP,OM_FSIZE|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omRealloc0AlignedSize(addr,o_size,size)                        _omDebugRealloc(addr,(void*)(o_size),(void*)(size),OM_FSIZE|_OM_FKEEP,OM_FSIZE|OM_FZERO|OM_FALIGN|_OM_FKEEP,OM_CTFL)
 
-#define omTypeReallocAligned(o_addr,type,addr,size)                    addr=(type)_omDebugRealloc(o_addr,NULL,(void*)(size),0,OM_FSIZE|OM_FALIGN,OM_CTFL)
-#define omTypeRealloc0Aligned(o_addr,type,addr,size)                   addr=(type)_omDebugRealloc(o_addr,NULL,(void*)(size),0,OM_FSIZE|OM_FZERO|OM_FALIGN,OM_CTFL)
-#define omReallocAligned(addr,size)                                    _omDebugRealloc(addr,NULL,(void*)(size),0,OM_FSIZE|OM_FALIGN,OM_CTFL)
-#define omRealloc0Aligned(addr,size)                                   _omDebugRealloc(addr,NULL,(void*)(size),0,OM_FSIZE|OM_FZERO|OM_FALIGN,OM_CTFL)
+#define omTypeReallocAligned(o_addr,type,addr,size)                    addr=(type)_omDebugRealloc(o_addr,NULL,(void*)(size),_OM_FKEEP,OM_FSIZE|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omTypeRealloc0Aligned(o_addr,type,addr,size)                   addr=(type)_omDebugRealloc(o_addr,NULL,(void*)(size),_OM_FKEEP,OM_FSIZE|OM_FZERO|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omReallocAligned(addr,size)                                    _omDebugRealloc(addr,NULL,(void*)(size),0,OM_FSIZE|OM_FALIGN|_OM_FKEEP,OM_CTFL)
+#define omRealloc0Aligned(addr,size)                                   _omDebugRealloc(addr,NULL,(void*)(size),0,OM_FSIZE|OM_FZERO|OM_FALIGN|_OM_FKEEP,OM_CTFL)
 
-#define omMemDupAligned(addr)                       _omDebugMemDup(addr,OM_FALIGN,OM_CTFL)
+#define omMemDupAligned(addr)                       _omDebugMemDup(addr,OM_FALIGN|_OM_FKEEP,OM_CTFL)
 
 #define omDebugBinAddrAligned(addr)                 _omDebugAddr(addr,NULL,OM_FBINADDR|OM_FALIGN,OM_CFL)
 #define omDebugAddrAlignedBin(addr, bin)            _omDebugAddr(addr,bin,OM_FBIN|OM_FALIGN,OM_CFL)

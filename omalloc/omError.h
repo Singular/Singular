@@ -3,7 +3,7 @@
  *  Purpose: Error handling of omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.h,v 1.5 2000-09-14 12:59:53 obachman Exp $
+ *  Version: $Id: omError.h,v 1.6 2000-09-18 09:12:15 obachman Exp $
  *******************************************************************/
 #ifndef OM_ERROR_H
 #define OM_ERROR_H
@@ -54,6 +54,9 @@ const char* omError2Serror(omError_t error);
 extern omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,  
                                const char* fmt, ...);
 
+/* this is a dummy function and used as default for om_Opts.ErrorHook */
+extern void omErrorBreak();
+
 #ifndef OM_NDEBUG
 extern void omPrintAddrInfo(FILE* fd, void* addr, char* s);
 #else
@@ -61,6 +64,13 @@ extern void omPrintAddrInfo(FILE* fd, void* addr, char* s);
 #endif
 
 /*BEGINPRIVATE*/
+
+#ifndef OM_NDEBUG
+extern int om_CallErrorHook;
+#else
+#define om_CallErrorHook 1
+#endif
+
 /*******************************************************************
  *
  * om_assume(x) -- a handy macro for assumptions

@@ -3,7 +3,7 @@
  *  Purpose: default declaration of of configurable stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDefaultConfig.h,v 1.3 2000-08-14 12:26:43 obachman Exp $
+ *  Version: $Id: omDefaultConfig.h,v 1.4 2000-09-18 09:12:15 obachman Exp $
  *******************************************************************/
 
 /********************************************************************
@@ -115,6 +115,12 @@ do                                              \
 while(0)
 #endif
 
+/* This is called after an omError was reported.
+   It is especially useful to set a debugger breakpoint
+   to this func */
+#ifndef OM_DEFAULT_ERROR_HOOK
+#define OM_DEFAULT_ERROR_HOOK omErrorBreak
+#endif
 
 /********************************************************************
  * 

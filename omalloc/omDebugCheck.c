@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.5 2000-09-14 12:59:52 obachman Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.6 2000-09-18 09:12:14 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <stdarg.h>
@@ -25,7 +25,7 @@ omError_t omDoCheckBin(omBin bin, int normal_bin, char level,
                        omError_t report, OM_FLR_DECL);
 static omError_t omDoCheckBinPage(omBinPage page, int normal_page, int level, 
                                   omError_t report, OM_FLR_DECL);
-static void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, char* s);
+static void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, int max_frames, char* s);
 
 
 /*******************************************************************
@@ -92,16 +92,30 @@ omError_t _omCheckMemory(char check, omError_t report, OM_FLR_DECL)
   }
 #endif
   
-  if (check > 1 && om_KeptAddr != NULL)
+  if (check > 1)
   {
-    void* addr = om_KeptAddr;
-    omCheckReturn(omCheckList(om_KeptAddr, check, (report ? report :  omError_KeptAddrListCorrupted), OM_FLR_VAL));
-    while (addr != NULL)
+    if (om_KeptAddr != NULL)
     {
-      omCheckReturn(omDoCheckAddr(addr, NULL, OM_FKEPT, check, report, OM_FLR_VAL));
-      addr = *((void**) addr);
+      void* addr = om_KeptAddr;
+      omCheckReturn(omCheckList(om_KeptAddr, check - 1, (report ? report :  omError_KeptAddrListCorrupted), OM_FLR_VAL));
+      while (addr != NULL)
+      {
+        omCheckReturn(omDoCheckAddr(addr, NULL, OM_FKEPT, check, report, OM_FLR_VAL));
+        addr = *((void**) addr);
+      }
+    }
+    if (om_AlwaysKeptAddrs != NULL)
+    {
+      void* addr = om_AlwaysKeptAddrs;
+      omCheckReturn(omCheckList(om_AlwaysKeptAddrs, check - 1, (report ? report :  omError_KeptAddrListCorrupted), OM_FLR_VAL));
+      while (addr != NULL)
+      {
+        omCheckReturn(omDoCheckAddr(addr, NULL, OM_FKEPT, check, report, OM_FLR_VAL));
+        addr = *((void**) addr);
+      }
     }
   }
+
   return omError_NoError;
 }
 
@@ -151,19 +165,28 @@ omError_t omDoCheckAddr(void* addr, void* bin_size, omTrackFlags_t flags, char l
   }
 }
 
-static int omIsInKeptAddrList(void* addr)
+int omIsInKeptAddrList(void* addr)
 {
   void* ptr = om_KeptAddr;
+  int ret = 0;
+  
+  if (om_LastKeptAddr != NULL)
+    *((void**) om_LastKeptAddr) = om_AlwaysKeptAddrs;
   
   while (ptr != NULL)
   {
-    if (ptr == addr) return 1;
+    if (ptr == addr) {ret = 1; break;}
     if ((unsigned long) addr > (unsigned long)ptr && 
-        (unsigned long) addr < (unsigned long) ptr + omSizeOfAddr(ptr))
-      return 1;
+        (unsigned long) addr < (unsigned long)ptr + 
+        (omIsBinPageAddr(ptr) ? omSizeOfBinAddr(addr) : omSizeOfLargeAddr(ptr)))
+    {ret = 1; break;}
     ptr = *((void**) ptr);
   }
-  return 0;
+  
+  if (om_LastKeptAddr != NULL)
+    *((void**) om_LastKeptAddr) = NULL;
+  
+  return ret;
 }
 
 
@@ -423,13 +446,16 @@ omError_t omReportAddrError(omError_t error, omError_t report_error, void* addr,
 {
   va_list ap;
   va_start(ap, fmt);
+  om_CallErrorHook = 0;
   omReportError(error, report_error, OM_FLR_VAL, fmt, ap);
+  om_CallErrorHook = 1;
   
-  _omPrintAddrInfo(stderr, error, addr, bin_size, flags, " occured for");
+  _omPrintAddrInfo(stderr, error, addr, bin_size, flags, 10, " occured for");
+  om_Opts.ErrorHook();
   return om_ErrorStatus;
 }
 
-void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, char* s)
+void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, int frames, char* s)
 {
   if (! omCheckPtr(addr, omError_MaxError, OM_FLR))
   {
@@ -442,7 +468,7 @@ void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omT
     fprintf(fd, " specified bin is of size:%d", ((omBin) bin_size)->sizeW << LOG_SIZEOF_LONG);
   
   if (omIsTrackAddr(addr)) 
-    omPrintTrackAddrInfo(fd, addr);
+    omPrintTrackAddrInfo(fd, addr, frames);
   else
     fprintf(fd, "\n");
   }
@@ -454,7 +480,7 @@ void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omT
 
 void omPrintAddrInfo(FILE* fd, void *addr, char* s)
 {
-  _omPrintAddrInfo(fd, omError_NoError, addr, NULL, 0, s);
+  _omPrintAddrInfo(fd, omError_NoError, addr, NULL, 0, 10, s);
 }
 
 /*******************************************************************
@@ -467,7 +493,7 @@ void omIterateTroughBinAddrs(omBin bin, void (*CallBackUsed)(void*), void (*Call
 {
   omBinPage page;
   void* addr;
-  void* is_free;
+  int is_free;
   int i;
   
   do
@@ -479,7 +505,7 @@ void omIterateTroughBinAddrs(omBin bin, void (*CallBackUsed)(void*), void (*Call
       i = 0;
       do
       {
-        is_free = omIsOnList(page->current, addr);
+        is_free = omIsOnList(page->current, addr) != NULL || omIsInKeptAddrList(addr);
         if (is_free)
         {
           if (CallBackFree != NULL) CallBackFree(addr);
@@ -537,6 +563,7 @@ void omIterateTroughAddrs(int normal, int track, void (*CallBackUsed)(void*), vo
 static FILE* om_print_used_addr_fd;
 static size_t om_total_used_size;
 static unsigned int om_total_used_blocks;
+static int om_print_frames;
 
 static void _omPrintUsedAddr(void* addr)
 {
@@ -544,26 +571,31 @@ static void _omPrintUsedAddr(void* addr)
   {
     om_total_used_blocks++;
     om_total_used_size += omSizeOfAddr(addr);
-    _omPrintAddrInfo(om_print_used_addr_fd, omError_NoError, addr, NULL, 0, "");
-    fprintf(om_print_used_addr_fd, "\n");
+    if (om_print_frames > 0)
+    {
+      _omPrintAddrInfo(om_print_used_addr_fd, omError_NoError, addr, NULL, 0, om_print_frames, "");
+      fprintf(om_print_used_addr_fd, "\n");
+    }
   }
 }
 
-void omPrintUsedAddrs(FILE* fd)
+void omPrintUsedAddrs(FILE* fd, int max)
 {
   om_total_used_size = 0;
   om_total_used_blocks = 0;
   om_print_used_addr_fd = (fd == NULL ? stdout : fd);
+  om_print_frames = max;
   omIterateTroughAddrs(1, 1, _omPrintUsedAddr, NULL);
   fprintf(fd, "UsedAddrs Summary: UsedBlocks:%d  TotalSize:%d\n", 
           om_total_used_blocks, om_total_used_size);
 }
 
-void omPrintUsedTrackAddrs(FILE* fd)
+void omPrintUsedTrackAddrs(FILE* fd, int max)
 {
   om_total_used_size = 0;
   om_total_used_blocks = 0;
   om_print_used_addr_fd = (fd == NULL ? stdout : fd);
+  om_print_frames = max;
   omIterateTroughAddrs(0, 1 ,  _omPrintUsedAddr, NULL);
   fprintf(fd, "UsedTrackAddrs Summary: UsedBlocks:%d  TotalSize:%d\n", 
           om_total_used_blocks, om_total_used_size);

@@ -43,7 +43,7 @@ int omtTestErrors()
   omMemCell cell = NULL;
   
   printf("omtTestErrors: Start\n");
-  om_Opts.MinCheck = 5;
+  om_Opts.MinCheck = 2;
   for (error = omError_MemoryCorrupted; error < omError_MaxError; error++)
   {
     om_InternalErrorStatus = omError_NoError;
@@ -148,6 +148,38 @@ int omtTestErrors()
 
         case omError_FreedAddr: 
         {
+#if KEEP_LEVEL > 0
+          void* addr = om_AlwaysKeptAddrs;
+          while (addr != NULL && omIsTrackAddr(addr))
+          {
+            addr = *((void**) addr);
+          }
+          if (addr != NULL)
+          {
+            omFree(addr);
+            if (om_ErrorStatus == omError_FreedAddr)
+            {
+              om_ErrorStatus = omError_NoError;
+              addr = om_AlwaysKeptAddrs;
+               while (addr != NULL && ! omIsTrackAddr(addr))
+               {
+                 addr = *((void**) addr);
+               }
+               if (addr != NULL)
+               {
+                 addr = omAddr_2_OutAddr(addr);
+                 omFree(addr);
+               }
+            }
+          }
+          if (addr == NULL) 
+          {
+            printf("addr not found\n");
+            break;
+          }
+          if (om_ErrorStatus != omError_FreedAddr)
+            break;
+#endif
           spec.MinTrack = 5;
           spec.NotIsBin = 1;
           cell = omFindCell(spec);
@@ -174,7 +206,7 @@ int omtTestErrors()
             page->region = NULL;
             om_Opts.MinCheck = 1;
             omDebugAddr(cell->addr);
-            om_Opts.MinCheck = 5;
+            om_Opts.MinCheck = 2;
             page->region = region;
           }
           else printf("cell not found\n");
@@ -268,7 +300,9 @@ int omtTestErrors()
           {
             void* last = omListLast(om_KeptAddr);
             *((void**)last) = om_KeptAddr;
+            om_Opts.MinCheck = 5;
             omDebugMemory();
+            om_Opts.MinCheck = 2;
             *((void**)last) = NULL;
           }
           else printf("om_KeptAddr == NULL\n");
@@ -379,7 +413,7 @@ int omtTestErrors()
     }
     if (om_ErrorStatus != omError_NoError)
     {
-      printf("???panik: memory corrupted\n\n");
+      printf("omtTest panik: memory corrupted\n\n");
       return -1;
     }
     printf("\n");

@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.h,v 1.5 2000-09-14 12:59:53 obachman Exp $
+ *  Version: $Id: omRet2Info.h,v 1.6 2000-09-18 09:12:16 obachman Exp $
  *******************************************************************/
 #ifndef OM_RET_2_INFO_H
 #define OM_RET_2_INFO_H
@@ -21,7 +21,8 @@ struct omRetInfo_s
    The following conversions are recognized:
     %i -- number of return addr
     %p -- address (in hex)
-    %F -- functions
+    %F -- function name with arguments (for C++, only)
+    %N -- funtion name without arguments 
     %f -- file
     %l -- line
     %L -- file:line

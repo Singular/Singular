@@ -4,6 +4,9 @@
 
 #define TRACK_LEVEL   1
 #define CHECK_LEVEL   1
+// keep every ith address: define to 0 if no keeping
+#define KEEP_LEVEL    20
+
 // #define MAX_CELLS  500000   
 #define MAX_CELLS     100000
 // #define MAX_CELLS     1000
@@ -68,6 +71,14 @@ void TestFree(omMemCell cell);
 #define DO_TRACK(spec)      0
 #define GET_TRACK(spec)     0
 #endif
+#if KEEP_LEVEL > 0
+#define DO_KEEP(spec)           (DO_CHECK(spec) && (spec % KEEP_LEVEL == 0))
+#define DO_FREE_KEEP(spec)      (DO_FREE_CHECK(spec) && (spec % KEEP_LEVEL == 0))
+#else
+#define DO_KEEP(spec)       0
+#define DO_FREE_KEEP(spec)  0
+#endif
+
 #define IS_FREE_SIZE(spec)      (spec & (1 << 28))
 #define IS_FREE_BIN(spec)       (spec & (1 << 29))
 #define IS_SLOPPY(spec)         (spec & (1 << 30))
@@ -90,6 +101,12 @@ void omtTestAllocDebug(omMemCell cell, unsigned long spec);
 void omtTestReallocDebug(omMemCell cell, unsigned long spec);
 void omtTestDupDebug(omMemCell cell, unsigned long spec);
 void omtTestFreeDebug(omMemCell cell);
+
+void omtTestAllocKeep(omMemCell cell, unsigned long spec);
+void omtTestReallocKeep(omMemCell cell, unsigned long spec);
+void omtTestDupKeep(omMemCell cell, unsigned long spec);
+void omtTestFreeKeep(omMemCell cell);
+
 void InitCellAddrContent(omMemCell cell);
 int omtTestErrors();
 

@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.9 2000-09-14 12:59:52 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.10 2000-09-18 09:12:13 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -27,7 +27,9 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t  flags, OM_
 
 void* om_KeptAddr = NULL;
 static unsigned long om_NumberOfKeptAddrs = 0;
-static void* om_LastKeptAddr = NULL;
+void* om_LastKeptAddr = NULL;
+void* om_AlwaysKeptAddrs = NULL;
+
 
 /*******************************************************************
  *  
@@ -343,7 +345,8 @@ static void* __omDebugRealloc(void* old_addr, void* old_size_bin, void* new_size
   {
     new_addr = __omDebugAlloc(new_size_bin, new_flags, track, OM_FLR_VAL);
   }
-  else if (om_Opts.Keep > 0 || track > 0 || omIsTrackAddr(old_addr) || old_status != omError_NoError)
+  else if (om_Opts.Keep > 0 || track > 0 || omIsTrackAddr(old_addr) || old_status != omError_NoError ||
+           old_flags & OM_FKEEP || new_flags & OM_FKEEP)
   {
     new_addr = __omDebugAlloc(new_size_bin, new_flags, track, OM_FLR_VAL);
     new_size =  omSizeOfAddr(new_addr);
@@ -448,7 +451,7 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_F
   {
 #ifdef OM_HAVE_TRACK
     if (omIsTrackAddr(addr))
-      addr = omMarkAsFreeTrackAddr(addr, 1, OM_FLR_VAL);
+      addr = omMarkAsFreeTrackAddr(addr, 1, &flags, OM_FLR_VAL);
 #endif
     bin = omGetOrigSpecBinOfAddr(addr);
     if (bin != NULL) 
@@ -456,6 +459,13 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_F
       omSpecBin s_bin = omFindInGList(om_SpecBin, next, bin, (unsigned long) bin);
       omAssume(s_bin != NULL);
       (s_bin->ref)++;
+    }
+
+    if (flags & OM_FKEEP)
+    {
+      *((void**) addr) = om_AlwaysKeptAddrs;
+      om_AlwaysKeptAddrs = addr;
+      return;
     }
 
     if (om_NumberOfKeptAddrs)
@@ -494,7 +504,7 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_F
 #ifdef OM_HAVE_TRACK
   if (omIsTrackAddr(addr))
   {
-    omMarkAsFreeTrackAddr(addr, 0, OM_FLR_VAL);
+    omMarkAsFreeTrackAddr(addr, 0, &flags, OM_FLR_VAL);
     omFreeTrackAddr(addr);
   }
   else
@@ -513,6 +523,10 @@ void omFreeKeptAddr()
 {
   void* next;
   omBin bin;
+  omTrackFlags_t flags;
+
+  if (om_LastKeptAddr != NULL)
+    *((void**) om_LastKeptAddr) = om_AlwaysKeptAddrs;
   
   while (om_KeptAddr != NULL)
   {
@@ -522,7 +536,7 @@ void omFreeKeptAddr()
 #ifdef OM_HAVE_TRACK
     if (omIsTrackAddr(om_KeptAddr)) 
     {
-      omMarkAsFreeTrackAddr(om_KeptAddr, 0, OM_FLR);
+      omMarkAsFreeTrackAddr(om_KeptAddr, 0, &flags, OM_FLR);
       omFreeTrackAddr(om_KeptAddr);
     }
     else
@@ -534,6 +548,7 @@ void omFreeKeptAddr()
   }
   om_NumberOfKeptAddrs = 0;
   om_LastKeptAddr = NULL;
+  om_AlwaysKeptAddrs = NULL;
 }
 
 #endif /* ! OM_NDEBUG */

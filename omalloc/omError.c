@@ -3,7 +3,7 @@
  *  Purpose: implementation of Error handling routines 
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.c,v 1.4 2000-08-18 09:05:52 obachman Exp $
+ *  Version: $Id: omError.c,v 1.5 2000-09-18 09:12:15 obachman Exp $
  *******************************************************************/
 
 #include <stdarg.h>
@@ -71,6 +71,10 @@ const char* omError2Serror(omError_t error)
   return "omError_UnKnown";
 }
 
+#ifndef OM_NDEBUG
+int om_CallErrorHook = 1;
+#endif
+
 omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,  
                         const char* fmt, ...)
 {
@@ -107,8 +111,15 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
     fprintf(stderr, "\n");
     fflush(stderr);
   }
+  if (om_CallErrorHook)
+    om_Opts.ErrorHook();
   return error;
 }
+
+
+/* this is a dummy function and used as default for om_Opts.ErrorHook */
+extern void omErrorBreak()
+{}
 
 
 
