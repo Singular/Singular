@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.11 1998-07-14 06:50:11 obachman Exp $
+// $Id: tst.lib,v 1.12 1998-09-01 12:03:13 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.11 1998-07-14 06:50:11 obachman Exp $";
+version="$Id: tst.lib,v 1.12 1998-09-01 12:03:13 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -59,66 +59,69 @@ RETURN:   none; writes string(any) to link (or stdout, if no link given),
 EXAMPLE:  example tst_ignore; shows examples
 "
 {
-  string s;
-  string keyword = "";
-  link outlink = "";
+  if (! defined(tst_no_status))
+  {
+    string s;
+    string keyword = "";
+    link outlink = "";
 
-  // Check # of args
-  if (size(#) < 1 || size(#) > 3)
-  {
-    "Error tst_ignore: Wrong number of arguments";
-    "Usage: tst_ignore (any,[keyword], [link]);";
-    return();
-  }
+    // Check # of args
+    if (size(#) < 1 || size(#) > 3)
+    {
+      "Error tst_ignore: Wrong number of arguments";
+      "Usage: tst_ignore (any,[keyword], [link]);";
+      return();
+    }
 
-  // Get Args
-  s = string(#[1]);
-  if (size(#) == 3)
-  {
-    keyword = #[2];
-    outlink = #[3];
-  }
-  if (size(#) == 2)
-  {
-    if (typeof(#[2]) == "string")
+    // Get Args
+    s = string(#[1]);
+    if (size(#) == 3)
     {
       keyword = #[2];
+      outlink = #[3];
+    }
+    if (size(#) == 2)
+    {
+      if (typeof(#[2]) == "string")
+      {
+        keyword = #[2];
+      }
+      else
+      {
+        outlink = #[2];
+      }
+    }
+
+    // check args
+    if (typeof(keyword) != "string")
+    {
+      "Error tst_ignore: Keyword must be a string";
+      "Usage: tst_ignore (any,[keyword], [link]);";
+      return();
+    }
+
+    if (status(outlink, "open", "no"))
+    {
+      open(outlink);
+    }
+
+    if (status(outlink, "write", "not ready"))
+    {
+      "Error tst_ignore: Can not write to link";
+      outlink;
+      "Usage: tst_ignore (any,[keyword], [link]);";
+      return();
+    }
+
+    // ready -- do the actual work
+    if (keyword != "")
+    {
+      write(outlink,"// tst_ignore:" + keyword + " :: " + tst_system("hostname", 1) + ":" + s);
     }
     else
     {
-      outlink = #[2];
+      write(outlink, "// tst_ignore: " + s);
     }
-  }
-
-  // check args
-  if (typeof(keyword) != "string")
-  {
-    "Error tst_ignore: Keyword must be a string";
-    "Usage: tst_ignore (any,[keyword], [link]);";
-    return();
-  }
-
-  if (status(outlink, "open", "no"))
-  {
-    open(outlink);
-  }
-
-  if (status(outlink, "write", "not ready"))
-  {
-    "Error tst_ignore: Can not write to link";
-    outlink;
-    "Usage: tst_ignore (any,[keyword], [link]);";
-    return();
-  }
-
-  // ready -- do the actual work
-  if (keyword != "")
-  {
-    write(outlink,"// tst_ignore:" + keyword + " :: " + tst_system("hostname", 1) + ":" + s);
-  }
-  else
-  {
-    write(outlink, "// tst_ignore: " + s);
   }
 }
 example
@@ -189,29 +192,32 @@ NOTE:     Should be used regularly within tst files to enable automatic
 EXAMPLE: example tst_status; shows example
 "
 {
-  if (! defined(tst_status_counter))
+  if (! defined(tst_no_status))
   {
-    int tst_status_counter = 1;
-    export tst_status_counter;
-  }
-  else
-  {
-    tst_status_counter++;
-  }
+    if (! defined(tst_status_counter))
+    {
+      int tst_status_counter = 1;
+      export tst_status_counter;
+    }
+    else
+    {
+      tst_status_counter++;
+    }
   
-  tst_status_out(tst_status_counter, "tst_memory_0", memory(0));
-  tst_status_out(tst_status_counter, "tst_memory_1", memory(1));
-  tst_status_out(tst_status_counter, "tst_memory_2", memory(2));
-  if (size(#) > 0)
-  {
-    tst_status_out(tst_status_counter, "tst_timer_1", timer);
+    tst_status_out(tst_status_counter, "tst_memory_0", memory(0));
+    tst_status_out(tst_status_counter, "tst_memory_1", memory(1));
+    tst_status_out(tst_status_counter, "tst_memory_2", memory(2));
+    if (size(#) > 0)
+    {
+      tst_status_out(tst_status_counter, "tst_timer_1", timer);
+    }
+    else
+    {
+      tst_status_out(tst_status_counter, "tst_timer", timer - Get_tst_timer());
+      Set_tst_timer(timer);
+    }
+    string(tst_status_counter) + " >> " + GetTstStatusFile();
   }
-  else
-  {
-    tst_status_out(tst_status_counter, "tst_timer", timer - Get_tst_timer());
-    Set_tst_timer(timer);
-  }
-  string(tst_status_counter) + " >> " + GetTstStatusFile();
 }
 example
 {
@@ -231,14 +237,17 @@ RETURN:  none; writes some identification data to stdout;
 EXAMPLE: example tst_init; shows example
 "
 {
-  write(":w " + GetTstStatusFile(), "Status Output of " + GetTstStatusFile());
-  tst_status_out("init", "USER    :" + system("getenv", "USER"));
-  tst_status_out("init", "HOSTNAME:" + tst_system("hostname", 1));
-  tst_status_out("init", "uname -a:" + tst_system("uname -a", 1));
-  tst_status_out("init", "date    :" + tst_system("date", 1));
-  tst_status_out("init", "version :" + string(system("version")));
-  tst_status_out("init", "ticks   :" + system("--ticks-per-sec"));
-  "init >> " + GetTstStatusFile();
+  if (! defined(tst_no_status))
+  {
+    write(":w " + GetTstStatusFile(), "Status Output of " + GetTstStatusFile());
+    tst_status_out("init", "USER    :" + system("getenv", "USER"));
+    tst_status_out("init", "HOSTNAME:" + tst_system("hostname", 1));
+    tst_status_out("init", "uname -a:" + tst_system("uname -a", 1));
+    tst_status_out("init", "date    :" + tst_system("date", 1));
+    tst_status_out("init", "version :" + string(system("version")));
+    tst_status_out("init", "ticks   :" + system("--ticks-per-sec"));
+    "init >> " + GetTstStatusFile();
+  }
 }
 example
 {
