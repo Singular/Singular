@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.59 2000-05-17 13:07:26 obachman Exp $
+;; $Id: singular.el,v 1.60 2000-05-19 11:13:32 wichmann Exp $
 
 ;;; Commentary:
 
@@ -3934,6 +3934,7 @@ switches.  START-FILE should be the name of a file which contents is
 sent to the process.
 
 Deletes any old processes running in that buffer.
+Removes any empty string in SWITCHES befor passing to Singular.
 Moves point to the end of BUFFER.
 Initializes all important markers and the simple sections.
 Runs the hooks on `singular-exec-hook'.
@@ -3948,9 +3949,14 @@ Returns BUFFER."
 	    (if process (delete-process process)))
 
 	  ;; create new process
-	  (singular-debug 'interactive (message "Starting new Singular: %s %s" executable switches))
-	  (let ((process (comint-exec-1 name buffer executable switches)))
-
+	  (singular-debug 'interactive
+			  (message "Starting new Singular: %s %s"
+				   executable switches))
+	  ;; before passing SWITCHES to Singuar we remove any empty strings
+	  ;; because otherwise Singular tries to open a file with an empty
+	  ;; file name.
+	  (let ((process (comint-exec-1 name buffer
+					executable (delete "" switches))))
 	    ;; set process filter and sentinel
 	    (set-process-filter process 'singular-output-filter)
 	    (set-process-sentinel process 'singular-exit-sentinel)
