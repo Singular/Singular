@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.48 1998-06-19 15:55:27 obachman Exp $
+@comment $Id: singular.doc,v 1.49 1998-07-20 16:50:18 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -589,6 +589,7 @@ described in the following subsections.
 * hnoether_lib:: procedures for the Hamburger-Noether-development
 * classify_lib:: procedures for classifying hypersurface singularities
 * graphics_lib:: procedures to draw  with Mathematica
+* normal_lib:: procedure for normalization
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, all_lib, SINGULAR libraries, SINGULAR libraries
@@ -697,10 +698,15 @@ see @ref{stdhilb}.
 @cindex classify_lib
 @c lib classify.lib
 @c ---------------------------------------------------------
-@node graphics_lib,,classify_lib, SINGULAR libraries
+@node graphics_lib,normal_lib,classify_lib, SINGULAR libraries
 @section graphics_lib
 @cindex graphics_lib
 @c lib graphics.lib
+@c ---------------------------------------------------------
+@node normal_lib,,graphics_lib, SINGULAR libraries
+@section normal_lib
+@cindex normal_lib
+@c lib normal.lib
 @c ----------------------------------------------------------
 @node Library function index, Index, SINGULAR libraries, Top
 @appendix Library function index
