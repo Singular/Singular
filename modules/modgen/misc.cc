@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.10 2000-05-01 19:17:32 krueger Exp $ */
+/* $Id: misc.cc,v 1.11 2000-11-09 21:45:16 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -189,7 +189,7 @@ struct valid_cmds_def
   { "error",        write_function_error,       CMD_ERROR,  CMDT_ANY,    0 },
   { "nodeclaration",write_function_nodecl,      CMD_NODECL, CMDT_SINGLE, 0 },
   { "typecheck",    write_function_typecheck,   CMD_CHECK,  CMDT_SINGLE, 0 },
-//{ "return",       write_function_result,      CMD_RETURN, CMDT_EQ,     0 },
+  { "return",       write_function_result,      CMD_RETURN, CMDT_EQ,     0 },
 //{ "return",       write_function_return,      CMD_RETURN, CMDT_SINGLE, 1 },
   { "return",       write_function_return,      CMD_RETURN, CMDT_0,     1 },
   { "return",       write_function_return,      CMD_RETURN, CMDT_ANY,   1 },
