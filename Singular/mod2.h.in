@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.70 1999-10-14 14:27:21 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.71 1999-10-19 13:39:42 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -355,7 +355,7 @@ extern int pShortOut;
  * You can control HEAP_DEBUG at run-time by setting the value of the
  * variable mm_HEAP_DEBUG (defined in mmheap.c) to the appropriate value.
  */
-#define HEAP_DEBUG 0
+/* #define HEAP_DEBUG 0 */
 
 /* define PAGE_DEBUG for page accesses -- never re-uses freed pages */
 #ifndef PAGE_DEBUG
