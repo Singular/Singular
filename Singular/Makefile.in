@@ -97,7 +97,7 @@ endif
 # normal C++ source files
 CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     eigenval_ip.cc\
-    extra.cc fehelp.cc feResource.cc feOpt.cc \
+    extra.cc fehelp.cc feOpt.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc \
     lists.cc \
@@ -304,12 +304,12 @@ libparse.cc: libparse.l
 
 # Hmm compiling with -fomit-frame-pointer resulted in access violation
 # under cygwin
-ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
+ESingular: fegetopt.o mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc mmalloc.o
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -o ESingular emacs.cc fegetopt.o \
 	${LDFLAGS} -lomalloc_ndebug mmalloc.o
 
-TSingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
+TSingular: fegetopt.o mod2.h feOpt.cc version.h emacs.cc \
            feOptTS.inc mmalloc.o
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DTSINGULAR -o TSingular emacs.cc fegetopt.o \
 	${LDFLAGS} -lomalloc_ndebug mmalloc.o
@@ -623,7 +623,7 @@ installg: Singularg
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} Singularg ${bindir}	
 
-ESingularg: fegetopt.og feResource.cc mod2.h feOpt.cc version.h emacs.cc \
+ESingularg: fegetopt.og mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc mmalloc.og
 	${CXXG} ${CXXFLAGSG} ${CPPFLAGS} -DESINGULAR -g ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS} -lomalloc mmalloc.og
 
