@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.65 2002-02-14 15:08:52 Singular Exp $ */
+/* $Id: longalg.cc,v 1.66 2002-02-26 11:36:41 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -88,7 +88,11 @@ void naSetChar(int i, ring r)
     naI=NULL;
   }
   naMap = naCopy;
-  naMinimalPoly = NULL;
+  /*------------ set naMinimalPoly -----------------------------------*/
+  if (r->minpoly!=NULL)
+    naMinimalPoly=((lnumber)r->minpoly)->z;
+  else
+    naMinimalPoly = NULL;
   naNumbOfPar=rPar(r);
 #ifndef LONGALGNEW
   naParNames=r->parameter;
