@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.175 2000-01-27 16:53:50 Singular Exp $
+@comment $Id: reference.doc,v 1.176 2000-01-28 17:53:18 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4145,7 +4145,8 @@ computation in some cases
 disables the regularity bound for @code{res} and @code{mres} (see
 @ref{regularity})
 @item @code{notSugar}
-disables the sugar strategy during standard basis computation
+disables the sugar strategy during standard basis computation 
+@anchor{option(prot)}
 @item @code{prot}
 shows protocol information indicating the
 progress during the following computations:
@@ -5473,6 +5474,9 @@ implementation of the classical
 Buchberger (resp.@: Mora) algorithm. For global orderings, use the
 @code{groebner} command instead (@pxref{groebner}), which heuristically
 chooses the "best" algorithm to compute a Groebner basis.
+@*To view the progress of long running computations, use
+@code{option(prot)}, @ref{option(prot)}.
+
 @item @strong{Example:}
 @smallexample
 @c example

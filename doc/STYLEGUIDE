@@ -147,21 +147,7 @@
 * Singular Beispiele und libraries *
 ====================================
 
-* generally use @samllexample for (code) examples
-
-* Die Kommandozeilen in einem Beispiel, das nicht von doc2tex
-  gerechnet wird, beginnen NICHT MEHR mit zwei Leerzeichen:
-@smallexample
-ring r;
-ideal i=x,y;
-@end smallexample
-
-* Beispiele, die von doc2tex gerechnet werden, muessen weiterhin mit
-  zwei Leerzeichen beginnen. Diese beiden Leerzeichen werden auto-
-  matisch von doc2tex gestrichen. 
-  Dieses Verhalten wird sich nach Mittwoch aendern. Ab dann darf kein
-  Beispiel mit Leerzeichen beginnen. Aus Zeitgruenden verwenden wir
-  im Moment den "hack" mit doc2tex.
+* generally, use @samllexample for (code) examples
 
 + Ist der Kommentar zu einem Kommando in einem Beispiel, das von Singular
   gerechnet werden soll, laenger als eine Zeile, muss das Kommando in der 
@@ -244,6 +230,26 @@ i;  // mit Leerzeichen beginnen.
   Die Referenzen bitte alphabetisch sortieren und mit einem Semikolon
   trennen.
 
+* Index, Anchors*
+==================
++ Do not hesitate to insert many index entires. Each index entiresneeds
+  to be written on one line. For one topic, insert different
+  formulation of the index entries. For example:
+@cindex The online help system
+@cindex online help
+@cindex help, online help system
+  Generally, if an index topic needs to be specified further, mention
+  the general topic first, separated by komma, and followed by
+  specialization (like "help, online help system").
+
++ Use the @anchor{label} construct, to set arbitraty labels, to which
+  you can refer to with @ref{label}. For example:
+@anchor{option(prot);}
+  Put the @anchor before the explained topic, otherwise the html
+  display might cut the first line(s) of the explained topic.
+
+
+
 * Umlaute *
 ===========
 @"o                 "o      umlaut accent          
@@ -270,4 +276,4 @@ i;  // mit Leerzeichen beginnen.
   domkumentiert. Siehe doc2tex.pl - Vorspann.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.14 1999-08-23 17:09:45 Singular Exp $
+$Id: STYLEGUIDE,v 1.15 2000-01-28 17:53:17 obachman Exp $
