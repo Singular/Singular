@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.82 1998-12-14 12:22:10 mschulze Exp $ */
+/* $Id: extra.cc,v 1.83 1998-12-15 11:23:16 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -410,6 +410,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
      return FALSE;
    }
 /*==================== pcv ==================================*/
+#ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvMinDeg")==0)
     {
@@ -442,6 +443,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+#endif /* HAVE_DYNAMIC_LOADING */
 /*==================== naIdeal ==================================*/
     if(strcmp(sys_cmd,"naIdeal")==0)
     {
