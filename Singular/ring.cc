@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.164 2001-05-22 13:30:55 Singular Exp $ */
+/* $Id: ring.cc,v 1.165 2001-05-22 14:23:31 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3910,7 +3910,7 @@ lists rDecompose(ring r)
   LL=(lists)omAlloc0Bin(slists_bin);
   L->m[2].rtyp=LIST_CMD;
   L->m[2].data=(void *)LL;
-  LL->Init((i=rBlocks(r)));
+  LL->Init((i=rBlocks(r)-1));
   lists LLL;
   for(; i>=0; i--)
   {
@@ -3919,19 +3919,30 @@ lists rDecompose(ring r)
     LL->m[i].rtyp=LIST_CMD;
     LLL=(lists)omAlloc0Bin(slists_bin);
     LLL->Init(2);
-    LLL->m[0].rtyp=INT_CMD;
-    LLL->m[0].data=(void *)r->order[i];
+    LLL->m[0].rtyp=STRING_CMD;
+    LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
     LLL->m[1].rtyp=INTVEC_CMD;
     j=r->block1[i]-r->block0[i];
-    if (j==0) j=1;
-    iv=new intvec(j);
+    iv=new intvec(j+1);
     LLL->m[1].data=(void *)iv;
-    if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL)
-    && (r->block1[i]-r->block0[i] >0 ))
+    if (r->block1[i]-r->block0[i] >=0 )
     {
-      for(;j>=0; j--)
-       (*iv)[j]=r->wvhdl[i][j];
-    }
+      if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
+      {
+        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j];
+      }
+      else switch (r->order[i])
+      {
+        case ringorder_dp:
+        case ringorder_Dp:
+        case ringorder_ds:
+        case ringorder_Ds:
+        case ringorder_lp:
+          for(;j>=0; j--) (*iv)[j]=1;
+          break;
+        default: /* do nothing */;
+      }
+    }  
     LL->m[i].data=(void *)LLL;
   }
   // ----------------------------------------
