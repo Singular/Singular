@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.41 1999-10-22 11:14:07 obachman Exp $ */
+/* $Id: febase.h,v 1.42 1999-10-25 18:21:51 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -52,6 +52,7 @@ size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
 
 extern char*  feErrors;
+extern char*  feArgv0;
 extern int    feErrorsLen;
 extern FILE*  feProtFile;
 extern FILE*  feFilePending; /*temp. storage for grammar.y */
@@ -60,6 +61,9 @@ extern int    si_echo, printlevel;
 extern int    pagelength, colmax;
 extern int    yy_blocklineno;
 extern int    yy_noeof;
+#ifdef MTRACK
+extern BOOLEAN feRes_works;
+#endif
 extern char   prompt_char;
 extern const char feNotImplemented[];
 #ifdef HAVE_TCL
@@ -127,7 +131,7 @@ enum   feBufferInputs
  *****************************************************************/
 // returns value of Resource as read-only string, or NULL
 // if Resource not found
-// issues warning, if explicitely requested (warn > 0), or 
+// issues warning, if explicitely requested (warn > 0), or
 // if warn < 0 and Resource is gotten for the first time
 // Always quiet if warn == 0
 char* feResource(const char id, int warn = -1);
@@ -148,9 +152,9 @@ void feStringAppendResources(int warn = -1);
 // if str != NULL display help for str
 // display general help, otherwise
 void feHelp(char* str = NULL);
-// if browser != NULL or feOpt("browser") != NULL 
-//    set HelpBrowser to browser 
-// otherwise, if browser was already set, leave as is, 
+// if browser != NULL or feOpt("browser") != NULL
+//    set HelpBrowser to browser
+// otherwise, if browser was already set, leave as is,
 //            if not, choose first available browser
 // return string identifying current browser
 // keeps feOpt("browser") up-to-date
@@ -266,7 +270,7 @@ void fe_reset_fe (void);
 
   /* fgets: */
   char * fe_fgets(char *pr,char *s, int size);
- 
+
   #ifdef HAVE_TCL
   /* tcl: */
   char * fe_fgets_tcl(char *pr,char *s, int size);

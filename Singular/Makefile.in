@@ -425,20 +425,20 @@ CXXP		= gcc
 CFLAGSP		= -pg -O3 ${PIPE}
 CXXFLAGSP	= -pg -O3 ${PIPE}
 CXXTEMPLFLAGSP	= -fno-implicit-templates
-DEFSP		= -DNDEBUG -DDO_PROFILE -D@SING_UNAME@
+DEFSP		= -DNDEBUG -DDO_PROFILE -D@SING_UNAME@ @DEFS@
 LDFLAGSP	= -static @LDFLAGS@
 
 CFLAGSB		= -g -O3 ${PIPE}
 CXXFLAGSB	= -g -O3 ${PIPE}
 CXXTEMPLFLAGSB	= -fno-implicit-templates
-DEFSB		= -D@SING_UNAME@ -DNDEBUG
+DEFSB		= -D@SING_UNAME@ -DNDEBUG @DEFS@
 LDFLAGSB	= -static @LDFLAGS@
 
 # bprof object  file to link with
 BPROFOBJ	= /usr/local/lib/bmon.o
 
-DEFST           = -DNDEBUG -D@SING_UNAME@ -DMTRACK
-LDFLAGST        = -static @LDFLAGS@
+DEFST           = -DNDEBUG -D@SING_UNAME@ -DMTRACK @DEFS@
+LDFLAGST        = @LDFLAGS@
 CFLAGST		= -g  -w ${PIPE}
 CXXFLAGST	= -g  -w ${PIPE}
 

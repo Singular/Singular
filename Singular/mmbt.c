@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.19 1999-10-25 16:13:19 Singular Exp $ */
+/* $Id: mmbt.c,v 1.20 1999-10-25 18:21:52 Singular Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -27,7 +27,6 @@
 #include "mmprivate.h"
 #include "febase.h"
 #include "mmbt.h"
-#include "febase.h"
 
 
 #ifdef MTRACK
@@ -64,7 +63,7 @@ int mmTrackInit ()
     mm_highpc = atoi (1 + strchr (entry, ':'));
     return 0;
   }
-  else
+  else if (feRes_works)
   {
     char buf[255];
     sprintf(buf,"nm -n %s",feGetResource('S'));
@@ -73,7 +72,7 @@ int mmTrackInit ()
       if (nm==NULL)
       {
         fprintf(stderr,
-	  "environment variable MPRPC not found\nand pipe to `%s`failed\n",buf);
+          "environment variable MPRPC not found\nand pipe to `%s`failed\n",buf);
         m2_end(1);
       }
       else
@@ -95,6 +94,7 @@ int mmTrackInit ()
         }
         pclose(nm);
       }
+      return 0;
     }
   }
   return 1;
@@ -120,7 +120,6 @@ void mmTrack (unsigned long *bt_stack)
 #endif
 
   if (mm_lowpc==0) mmTrackInit();
-
 
   while ((fp!=NULL) && ((unsigned long)fp>4095)
   && ((unsigned long)fp < ((unsigned long)0xff000000))
@@ -175,6 +174,7 @@ void mmP2cNameInit()
   p2n[i].p=~1;
   mm_p2n_max=i;
 }
+
 char * mmP2cName(unsigned long p)
 {
   int i, e;

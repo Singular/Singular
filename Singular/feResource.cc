@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.14 1999-10-22 12:15:07 obachman Exp $ */
+/* $Id: feResource.cc,v 1.15 1999-10-25 18:21:50 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -20,16 +20,16 @@ extern "C" char* find_executable(const char* argv0);
 // #define RESOURCE_DEBUG
 
 #if defined(MAKE_DISTRIBUTION)
-#if defined(WINNT) 
+#if defined(WINNT)
 #define SINGULAR_DEFAULT_DIR "/Singular/"S_VERSION1
 #elif defined(macintosh)
 #define SINGULAR_DEFAULT_DIR "Macintosh HD:Singular:"S_VERSION1
 #else // unix
 #define SINGULAR_DEFAULT_DIR "/usr/local/Singular/"S_VERSION1
-#endif 
+#endif
 #else // ! defined(MAKE_DISTRIBUTION)
 #define SINGULAR_DEFAULT_DIR S_ROOT_DIR
-#endif // defined(MAKE_DISTRIBUTION) 
+#endif // defined(MAKE_DISTRIBUTION)
 
 /*****************************************************************
  *
@@ -45,20 +45,20 @@ typedef struct feResourceConfig_s
   feResourceType  type;  // type of Resource
   char*           env;   // env variable to look for
   char*           fmt;   // format string -- see below for epxlaination
-  char*                        value; // what it was set to 
+  char*                        value; // what it was set to
 } feResourceConfig_s;
 typedef feResourceConfig_s * feResourceConfig;
 
-// feSprintf transforms format strings as follows format string: 
+// feSprintf transforms format strings as follows format string:
 // 1.) substrings of the form %c (c being a letter) are replaced by respective resource value
 // 2.) substrings of the form $string are replaced by value of resp. env variable
 
 // feCleanResource makes furthermore  the following transformations (except for URL resources)
 // 1.) '/' characters are replaced by respective directory - separators
 // 2.) ';' characters are replaced by respective path separators
-static feResourceConfig_s feResourceConfigs[20] = 
+static feResourceConfig_s feResourceConfigs[20] =
 {
-  {"SearchPath",    's',     feResPath,  NULL,         
+  {"SearchPath",    's',     feResPath,  NULL,
    "$SINGULARPATH;"
    "%b/LIB;"
    "%r/LIB;"
@@ -82,7 +82,7 @@ static feResourceConfig_s feResourceConfigs[20] =
   {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             ""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",         ""},
 #endif // ! defined(macintosh)
- 
+
 #ifdef ESINGULAR
   {"emacs",    'E',    feResBinary, "EMACS",               "%b/emacs",              ""},
   {"SingularEmacs",'M',feResBinary, "SINGULAR",             "%b/Singular",           ""},
@@ -97,9 +97,14 @@ static feResourceConfig_s feResourceConfigs[20] =
  * Declarations: Local variables / functions
  *
  *****************************************************************/
-char* feArgv0;
+char* feArgv0=NULL;
 #define MAXRESOURCELEN 5*MAXPATHLEN
-char fePathSep = 
+
+#ifdef MTRACK
+BOOLEAN feRes_works=FALSE;
+#endif
+
+char fePathSep =
 #if defined(WINNT)
 ';'
 #elif defined(macintosh)
@@ -171,15 +176,16 @@ void feInitResources(char* argv0)
   feResource('r');
   // don't complain about stuff when initializing SingularPath
   feResource('s',0);
-  
-  
-  
+
 #ifdef HAVE_SETENV
   char* path = feResource('p');
 #ifdef RESOURCE_DEBUG
   printf("feInitResources: setting path with argv0=%s=\n", path);
 #endif
   if (path != NULL) setenv("PATH", path, 1);
+#endif
+#ifdef MTRACK
+  feRes_works=TRUE;
 #endif
 }
 
@@ -260,16 +266,16 @@ static char* feInitResource(feResourceConfig config, int warn)
   // First, check Environment variable
   if (config->env != NULL)
   {
-    char* evalue = getenv(config->env); 
+    char* evalue = getenv(config->env);
     if (evalue != NULL)
-    { 
+    {
 #ifdef RESOURCE_DEBUG
       printf("feInitResource: Found value from env:%s\n", evalue);
 #endif
       strcpy(value, evalue);
       if (config->type == feResBinary  // do not verify binaries
           ||
-          feVerifyResourceValue(config->type, 
+          feVerifyResourceValue(config->type,
                                 feCleanResourceValue(config->type, value)))
       {
 #ifdef RESOURCE_DEBUG
@@ -280,13 +286,13 @@ static char* feInitResource(feResourceConfig config, int warn)
       }
     }
   }
-  
+
   *value = '\0';
   // Special treatment of executable
   if (config->id == 'S')
   {
     char* executable = feGetExpandedExecutable();
-    if (executable != NULL) 
+    if (executable != NULL)
     {
       strcpy(value, executable);
       FreeL(executable);
@@ -306,7 +312,7 @@ static char* feInitResource(feResourceConfig config, int warn)
       if (executable != NULL) *executable = '\0';
     }
   }
-  
+
   if (*value == '\0' && config->fmt != NULL )
   {
     feSprintf(value, config->fmt, warn);
@@ -319,7 +325,7 @@ static char* feInitResource(feResourceConfig config, int warn)
   }
 
   // Clean and verify
-  if (feVerifyResourceValue(config->type, 
+  if (feVerifyResourceValue(config->type,
                             feCleanResourceValue(config->type, value)))
   {
 #ifdef RESOURCE_DEBUG
@@ -336,7 +342,7 @@ static char* feInitResource(feResourceConfig config, int warn)
     {
       strcpy(value, executable);
       FreeL(executable);
-      if (feVerifyResourceValue(config->type, 
+      if (feVerifyResourceValue(config->type,
                                 feCleanResourceValue(config->type, value)))
       {
         config->value = mstrdup(value);
@@ -348,12 +354,12 @@ static char* feInitResource(feResourceConfig config, int warn)
     }
   }
 
-  // issue warning if explicitely requested, or if 
+  // issue warning if explicitely requested, or if
   // this value is gotten for the first time
   if (warn > 0 || (warn < 0 && config->value != NULL))
   {
     Warn("Could not get %s. ", config->key);
-    Warn("Either set environment variable %s to %s,", 
+    Warn("Either set environment variable %s to %s,",
          config->env, config->key);
     feSprintf(value, config->fmt, warn);
     Warn("or make sure that %s is at %s", config->key, value);
@@ -404,8 +410,8 @@ static char* feGetExpandedExecutable()
   return feArgv0;
 #endif
 }
- 
-      
+
+
 static BOOLEAN feVerifyResourceValue(feResourceType type, char* value)
 {
 #ifdef RESOURCE_DEBUG
@@ -416,14 +422,14 @@ static BOOLEAN feVerifyResourceValue(feResourceType type, char* value)
       case feResUrl:
       case feResPath:
         return TRUE;
-        
+
       case feResFile:
         return ! access(value, R_OK);
 
       case feResBinary:
       case feResDir:
         return ! access(value, X_OK);
-        
+
       default:
         return FALSE;
   }
@@ -445,7 +451,7 @@ static char* feCleanResourceValue(feResourceType type, char* value)
     if (l < 4 || strcmp(&value[l-4], ".exe") != 0)
       strcat(value, ".exe");
   }
-#endif  
+#endif
   if (type == feResFile || type == feResBinary || type == feResDir)
     return feCleanUpFile(value);
   if (type == feResPath)
@@ -499,7 +505,7 @@ static char* feCleanUpFile(char* fname)
       }
     }
   }
-  
+
 #ifdef macintosh
   // replace / and .. by DIR_SEP and UP_DIR
   fn = fname;
@@ -516,7 +522,7 @@ static char* feCleanUpFile(char* fname)
     }
   }
 #endif
-    
+
 #ifdef RESOURCE_DEBUG
   printf("feCleanUpFile: leaving with =%s=\n", fname);
 #endif
@@ -636,7 +642,7 @@ static void mystrcpy(char* d, char* s)
   }
   *d = '\0';
 }
-  
+
 /*****************************************************************
  *
  * feSprintf
@@ -646,11 +652,11 @@ static char* feSprintf(char* s, const char* fmt, int warn)
 {
   char* s_in = s;
   if (fmt == NULL) return NULL;
-  
+
   while (*fmt != '\0')
   {
     *s = *fmt;
-    
+
     if (*fmt == '%' && *(fmt + 1) != '\0')
     {
       fmt++;
@@ -690,7 +696,7 @@ static char* feSprintf(char* s, const char* fmt, int warn)
   *s = '\0';
   return s_in;
 }
-    
+
 void feStringAppendResources(int warn = -1)
 {
   int i = 0;
@@ -698,12 +704,8 @@ void feStringAppendResources(int warn = -1)
   while (feResourceConfigs[i].key != NULL)
   {
     r = feResource(feResourceConfigs[i].key, warn);
-    StringAppend("%-10s:\t%s\n", feResourceConfigs[i].key, 
+    StringAppend("%-10s:\t%s\n", feResourceConfigs[i].key,
                  (r != NULL ? r : ""));
     i++;
   }
 }
-
-
-  
-  

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.77 1999-10-25 08:32:18 obachman Exp $ */
+/* $Id: ring.cc,v 1.78 1999-10-25 18:21:53 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1983,7 +1983,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 
   if (r == NULL)
   {
-    Werror("Null ring in %s:%l\n", fn, l);
+    Werror("Null ring in %s:%d\n", fn, l);
     return FALSE;
   }
 
