@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.16 1998-01-27 18:51:21 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.17 1998-01-28 22:11:22 Singular Exp $ */
 
 /***************************************************************
  *
@@ -903,6 +903,7 @@ DECLARE(void, _bSetm0(poly p))
   int ord = -INT_MAX;
   Exponent_t *ep;
 
+#ifdef COMP_FAST
   if(_pHasReverseExp)
   {
     ep=&(p->exp[pVarHighIndex]);
@@ -916,16 +917,6 @@ DECLARE(void, _bSetm0(poly p))
       ep--;
       ip+=bHighdeg_1+(*ep);
     }
-#if 0
-    int *ip=bBinomials+_pGetExp(p,1);
-    loop
-    {
-      ord += (*ip);
-      if (i==pVariables) break;
-      i++;
-      ip+=bHighdeg_1+_pGetExp(p,i);
-    }
-#endif
   }
   else
   {
@@ -940,7 +931,14 @@ DECLARE(void, _bSetm0(poly p))
       ep++;
       ip+=bHighdeg_1+(*ep);
     }
-#if 0
+  }
+  #ifdef TEST_MAC_DEBUG
+  p->Order=_pExpQuerSum(p);
+  p->MOrder=ord;
+  #else
+  p->Order=ord;
+  #endif
+#else
     int *ip=bBinomials+_pGetExp(p,1);
     loop
     {
@@ -949,9 +947,13 @@ DECLARE(void, _bSetm0(poly p))
       i++;
       ip+=bHighdeg_1+_pGetExp(p,i);
     }
-#endif
-  }
+  #ifdef TEST_MAC_DEBUG
+  p->Order=pTotaldegree(p);
+  p->MOrder=ord;
+  #else
   p->Order=ord;
+  #endif
+#endif
 }
 
 DECLARE(void, _bSetm(poly p))
@@ -961,9 +963,15 @@ DECLARE(void, _bSetm(poly p))
   if (ord<bHighdeg)
     _bSetm0(p);
   else
+  {
+  #ifdef TEST_MAC_DEBUG
+    p->MOrder=ord;
+  #endif
     p->Order=ord;
+  }
 }
 
+#ifdef COMP_FAST
 // ordering dp,c or c,dp, general case
 #if defined(PDEBUG) && PDEBUG == 1
 #define pbMonAddFast(p1, p2)  pDBMonAddFast(p1, p2, __FILE__, __LINE__)
@@ -1135,6 +1143,7 @@ inline void __pbCopyAddFast10(poly p1, poly p2, poly p3)
   _bSetm0(p1);
 }
 
+#endif
 #endif
 
 #endif // POLYS_IMPL_H

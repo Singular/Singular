@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.11 1998-01-27 18:51:17 Singular Exp $ */
+/* $Id: binom.cc,v 1.12 1998-01-28 22:11:19 Singular Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -140,6 +140,7 @@ int bComp1dpc(poly p1, poly p2)
   /* now o1==o2: */
   if (o1>0)
   {
+  #ifdef COMP_FAST
     register long d;
     if (pVariablesW >2 )
     {
@@ -158,6 +159,31 @@ int bComp1dpc(poly p1, poly p2)
     NotEqual:
     if (d>0) return -1; /*pLexSgn*/
     return 1; /*-pLexSgn*/
+  #else  
+    {
+      int i = pVariables;
+      if ((p1->exp[i] == p2->exp[i]))
+      {
+        do
+        {
+          i--;
+          if (i <= 1)
+          {
+             /*4 handle module case:*/
+             if (p1->exp[0]==p2->exp[0])
+               return 0;
+             else if (p1->exp[0] > p2->exp[0])
+               return -pComponentOrder;
+             else
+               return pComponentOrder;
+          }
+        } while ((p1->exp[i] == p2->exp[i]));
+      }
+      if (p1->exp[i] < p2->exp[i])
+        return 1;
+      return -1;
+    }
+  #endif
   }
   //o1=pGetComp(p1)-pGetComp(p2);
   //if (o1 == 0) return 0;
@@ -167,11 +193,42 @@ int bComp1dpc(poly p1, poly p2)
 }
 
 #ifdef TEST_MAC_DEBUG
-static pCompProc pComp0_c;
+static int comp1dpc(poly p1, poly p2)
+{
+  /*4 compare monomials by order then revlex*/
+  int d=p1->Order - p2->Order;
+  if (d == 0 /*p1->Order == p2->Order*/)
+  {
+    int i = pVariables;
+    if ((p1->exp[i] == p2->exp[i]))
+    {
+      do
+      {
+        i--;
+        if (i <= 1)
+        {
+           /*4 handle module case:*/
+           if (p1->exp[0]==p2->exp[0])
+             return 0;
+           else if (p1->exp[0] > p2->exp[0])
+             return -pComponentOrder;
+           else
+             return pComponentOrder;
+        }
+      } while ((p1->exp[i] == p2->exp[i]));
+    }
+    if (p1->exp[i] < p2->exp[i])
+      return 1;
+    return -1;
+  }
+  else if (d > 0 /*p1->Order > p2->Order*/)
+    return 1;
+  return -1;
+}
 int bComp1dpc(poly p1, poly p2)
 {
   int m=bComp1dpc_org(p1,p2);
-  int c=pComp0_c(p1,p2);
+  int c=comp1dpc(p1,p2);
   if (c!=m)
   {
     Print("comp mismatch\n");
@@ -254,9 +311,6 @@ static int bLDeg0(poly p,int *l)
 */
 void bBinomSet(int * orders)
 {
-#ifdef TEST_MAC_DEBUG
-  pComp0_c=pComp0;
-#endif
   bNoAdd=TRUE;
 #if 0
   int bbHighdeg=1;
@@ -317,7 +371,7 @@ void bBinomSet(int * orders)
   bHighdeg--;
 
   if(bBinomials!=NULL) Free((ADDRESS)bBinomials,bSize);
-  bSize = pVariables*bHighdeg_1*sizeof(int);
+  bSize = (pVariables+1)*bHighdeg_1*sizeof(int);
   bBinomials = (int*)Alloc(bSize);
 
   // Print("max deg=%d, table size=%d bytes\n",bHighdeg,bSize);

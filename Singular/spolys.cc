@@ -367,19 +367,17 @@ static poly spPSpolyRed(poly p1, poly p2,poly spNoether, spSpolyLoopProc SpolyLo
     reset_vec=TRUE;
   }
   spMonSub(p2,p1);
-  if (1!=(int)pGetCoeff(p2))
 #ifdef COMP_FAST  
-  {
-    if (SpolyLoop != NULL)
-      SpolyLoop(a1, a2, p2, spNoether);
-    else
-      spPSpolyLoop_General(a1, a2, p2, spNoether);
-  }
+  if (SpolyLoop != NULL)
+    SpolyLoop(a1, a2, p2, spNoether);
+  else
+    spPSpolyLoop_General(a1, a2, p2, spNoether);
 #else
+  if (1!=(int)pGetCoeff(p2))
     spSpolyLoop(a1, a2, p2,spNoether);
-#endif  
   else
     spSpolyLoop1(a1, a2, p2,spNoether);
+#endif  
   a2 = pNext(p2);
   if (reset_vec)
     spModuleToPoly(a1);
@@ -429,19 +427,17 @@ static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether,
   m = pNew();
   spMemcpy(m,p2);
   spMonSub(m,p1);
-  if (1!=(int)pGetCoeff(m))
 #ifdef COMP_FAST
-  {
-    if (SpolyLoop != NULL)
-      SpolyLoop(a1, a2, m, spNoether);
-    else
-      spPSpolyLoop_General(a1, a2, m, spNoether);
-  }
+  if (SpolyLoop != NULL)
+    SpolyLoop(a1, a2, m, spNoether);
+  else
+    spPSpolyLoop_General(a1, a2, m, spNoether);
 #else  
+  if (1!=(int)pGetCoeff(m))
     spSpolyLoop(a1, a2, m,spNoether);
-#endif    
   else
     spSpolyLoop1(a1, a2, m,spNoether);
+#endif    
   a2 = pNext(m);
   if (reset_vec)
     spModuleToPoly(a1);
