@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.28 1998-05-19 17:24:15 Singular Exp $ */
+/* $Id: ideals.cc,v 1.29 1998-05-25 12:56:40 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2383,13 +2383,12 @@ ideal idMinors(matrix a, int ar)
 {
   if((ar<=0) || (ar>min(a->ncols,a->nrows)))
   {
-    Werror("%d-th minor ",ar);
+    Werror("%d-th minor, matrix is %dx%d",ar,a->ncols,a->nrows);
     return NULL;
   }
   int i=0;
   poly barDiv=NULL;
   ideal result=idInit(16,1);
-  idTest(result);
 
   idRecMin(mpCopy(a),ar-1,&barDiv,result,&i);
   idSkipZeroes(result);

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.79 1998-05-25 08:01:31 schmidt Exp $
+@comment $Id: reference.doc,v 1.80 1998-05-25 12:56:41 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1744,18 +1744,27 @@ See @ref{link}; @ref{dump}; @ref{read}.
 @cindex groebner
 @table @code
 @item @strong{Syntax:}
-@code{groebner (}  @code{) ;}
+@code{groebner (} ideal_expression @code{)}
+@*@code{groebner (} module_expression @code{)}
 @item @strong{Type:}
+ideal or module
 @item @strong{Purpose:}
+returns a standard basis of an ideal or module with respect to the
+monomial ordering of the basering using a heuristically choosen method.
 @item @strong{Example:}
 @example
 @c example
+  ring r = 0, (a,b,c,d), lp;
+  ideal i = a+b+c+d, ab+ad+bc+cd, abc+abd+acd+bcd, abcd-1;
+  groebner(i);
 @c example
 @end example
 @end table
 @c ref
 See
-@ref{std}.
+@ref{std};
+@ref{stdfglm};
+@ref{stdhilb}.
 @c ref
 @c ---------------------------------------
 @node help, hilb, groebner, Functions
