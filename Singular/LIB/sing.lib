@@ -1,9 +1,9 @@
-// $Id: sing.lib,v 1.12 1998-05-29 15:02:01 Singular Exp $
+// $Id: sing.lib,v 1.13 1998-06-02 10:21:19 Singular Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.12 1998-05-29 15:02:01 Singular Exp $";
+version="$Id: sing.lib,v 1.13 1998-06-02 10:21:19 Singular Exp $";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 
@@ -547,7 +547,7 @@ EXAMPLE: example T1; shows an example
    qring  R    = std(J);
    module jac = fetch(P,jac);
    module t1  = transpose(fetch(P,A(2)));
-   list B=nres(t1,2,B);             // resolve t1, B(2)=(J/J^2)*=normal_bdl
+   list B=nres(t1,2);               // resolve t1, B(2)=(J/J^2)*=normal_bdl
    def B(1..2)=B[1..2]; kill B;
    t1         = modulo(B(2),jac);   // pres. of normal_bdl/trivial_deformations
    rk=nrows(t1);
