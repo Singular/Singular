@@ -11,7 +11,7 @@ of changes at 'organization level' (aka 'preprocessor level') and at
 Source code level:
 ------------------
 o Serious bug in univariate factorization in characterstic 0 fixed (by
-  R"udiger).
+  Ruediger).
 
 o New gcd algorithm (sparse modular), not fully testes by now (contributed
   by Marion Bruder).  Switch on with SW_USE_SPARSEMOD.
@@ -19,12 +19,13 @@ o New gcd algorithm (sparse modular), not fully testes by now (contributed
 o Various minor bug fixes.
 
 
+
 Organization level:
 -------------------
-o Factory translates now on Macintosh with metroworks
+o Factory translates now on Macintosh with Metroworks
   CodeWarrior Academic Pro 11 (changes by Wilfred Pohl)
 
-o So called 'new' memory manager (written by R"udiger) added to
+o So called 'new' memory manager (written by Ruediger) added to
   distribution.  So far no timigs available which memory manager is
   faster.
 
@@ -46,7 +47,7 @@ o Factory's IO completely re-organized (that was a mess!).  It is now
 Distribution level:
 -------------------
 o The organization of the distribution as well as the compile/install
-  procedure totally changed.  It is now more GNU like.  See the INSTALL
+  procedure totally changed.  It is now more GNU-like.  See the INSTALL
   file and the README file for more information.
 
 o The file names of the template sources changed.  To make them less
@@ -56,12 +57,12 @@ o The installation target directories and their structure changed a little
   bit.  See the INSTALL file for more information.
 
 
-
+
 Before May 3 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 New features in Factory, version 1.2c:
 ======================================
   Version 1.2c is a more or less inofficial version distributed with
-Singular 1.0.  I hope it does not distribute to far...  The description of
+Singular 1.0.  I hope it does not distribute too far...  The description of
 new features to version 1.3a cope the description of new features to this
 version.
