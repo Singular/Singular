@@ -1887,7 +1887,23 @@ tgb_matrix::~tgb_matrix(){
   }
   omfree(n);
 }
-
+void tgb_matrix::print(){
+  int i;
+  int j;
+  Print("\n");
+  for(i=0;i<rows;i++)
+  {
+    Print("(");
+    for(j=0;j<columns;j++)
+    {
+      StringSetS("");
+      n_Write(n[i][j],currRing);
+      Print(StringAppendS(""));
+      Print("\t");
+    }
+    Print(")\n");
+  }
+}
 //transfers ownership of n to the matrix
 void tgb_matrix::set(int i, int j, number n){
   assume(i<rows);
@@ -2072,11 +2088,26 @@ void simple_gauss(tgb_matrix* mat){
 static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, calc_dat* c){
   tgb_matrix* t=new tgb_matrix(p_index,done_index);
   int i, pos;
+  Print("\n 0:%s\n",pString(done[done_index-1]));
+  Print("\n 1:%s\n",pString(done[done_index-2]));
+  assume((!(pLmEqual(done[done_index-1],done[done_index-2]))));
+#ifdef TGB_DEGUG
+  for(i=0;i<done_index;i++)
+  {
+    int j;
+    for(j=0;j<i;j++)
+    {
+      assume((!(pLmEqual(done[i],done[j]))));
+    }
+  }
+#endif
   for(i=0;i<p_index;i++)
   { 
+    // Print("%i ter Eintrag:%s\n",i,pString(p[i]));
     poly p_i=p[i];
     while(p_i)
     {
+
       int v=-1;
       pos=posInPolys (done, done_index, p_i,c);
       if((done_index>pos)&&(pLmEqual(p_i,done[pos])))
@@ -2270,7 +2301,8 @@ static void go_on_F4 (calc_dat* c){
       chosen[++pos]=chosen[i];
     else pDelete(&(chosen[i].m));
   }
-  chosen_index=pos;
+  if(chosen_index>0)
+    chosen_index=pos+1;
   //next step process polys
   int p_size=2*chosen_index;
   int p_index=0;
@@ -2296,6 +2328,16 @@ static void go_on_F4 (calc_dat* c){
   }
   if(done_index>0)
     done_index=pos+1;
+#ifdef TGB_DEBUG
+  for(i=0;i<done_index;i++)
+  {
+    int j;
+    for(j=0;j<i;j++)
+    {
+      assume((!pLmEqual(done[j],done[i])));
+    }
+  }
+#endif
 #ifdef TGB_DEBUG
   for(i=0;i<done_index;i++)
   {
@@ -2350,6 +2392,7 @@ static void go_on_F4 (calc_dat* c){
 	pTest(done[i]);
       }
 #endif
+
     qsort(m, m_index,sizeof(poly),pLmCmp_func);
 
     
@@ -2399,6 +2442,20 @@ static void go_on_F4 (calc_dat* c){
 #endif
     for(i=0;i<m_index;i++)
     {
+
+#ifdef TGB_DEBUG
+      {
+	int my_i;
+	for(my_i=0;my_i<done_index;my_i++)
+	{
+	  int my_j;
+	  for(my_j=0;my_j<my_i;my_j++)
+	  {
+	    assume((!pLmEqual(done[my_j],done[my_i])));
+	  }
+	}
+      }
+#endif
       BOOLEAN in_done=FALSE;
       pTest(m[i]);
 #ifdef TGB_DEBUG
@@ -2410,10 +2467,18 @@ static void go_on_F4 (calc_dat* c){
       }
 #endif
       pos=posInPolys (done, done_index, m[i],c);
+#ifdef TGB_DEBUG
+      {
+	int my_i;
+	for (my_i=0;my_i<done_index;my_i++)
+	  pTest(done[my_i]);
+      }
+#endif      
       if(((done_index>pos)&&(pLmEqual(m[i],done[pos]))) ||(pos>0) &&(pLmEqual(m[i],done[pos-1])))
 	in_done=TRUE;
       if (!(in_done))
       {
+       
 	pos=kFindDivisibleByInS_easy(c->strat,m[i], pGetShortExpVector(m[i]));
 	if(pos>=0)
 	{
@@ -2430,10 +2495,34 @@ static void go_on_F4 (calc_dat* c){
 	  chosen[chosen_index++]=h;
 	  q_index++;
 	}
-	done[done_index++]=m[i];
+	pTest(m[i]);
+	memmove(&(done[pos+1]),&(done[pos]), (done_index-pos)*sizeof(poly));
+	done[pos]=m[i];
+	done_index++;
+#ifdef TGB_DEBUG
+	{
+	  int my_i;
+	  for (my_i=0;my_i<done_index;my_i++)
+	    pTest(done[my_i]);
+	}
+#endif      
       }
       else
 	pDelete(&m[i]);
+#ifdef TGB_DEBUG
+      {
+	int my_i;
+	for(my_i=0;my_i<done_index;my_i++)
+	{
+	  pTest(done[my_i]);
+	  int my_j;
+	  for(my_j=0;my_j<my_i;my_j++)
+	  {
+	    assume((!pLmEqual(done[my_j],done[my_i])));
+	  }
+	}
+      }
+#endif
     }
     if(p_size<p_index+q_index)
     {
@@ -2465,7 +2554,7 @@ static void go_on_F4 (calc_dat* c){
 	m_index++;
       }
     }
-    qsort(done, done_index,sizeof(poly),pLmCmp_func);
+    //qsort(done, done_index,sizeof(poly),pLmCmp_func);
 #ifdef TGB_DEBUG
     for(i=0;i<done_index;i++)
     {
@@ -2473,16 +2562,37 @@ static void go_on_F4 (calc_dat* c){
     }
 #endif
   }
+#ifdef TGB_DEBUG
+  for(i=0;i<done_index;i++)
+  {
+    int j;
+    for(j=0;j<i;j++)
+    {
+      assume((!pLmEqual(done[j],done[i])));
+    }
+  }
+#endif
   omfree(m);
   omfree(q);
   Print("%i, ",chosen_index);
   //next Step build matrix
+  #ifdef TGB_DEBUG
+  for(i=0;i<done_index;i++)
+  {
+    int j;
+    for(j=0;j<i;j++)
+    {
+      assume((!pLmEqual(done[j],done[i])));
+    }
+  }
+#endif
   assume(p_index==chosen_index);
   
   tgb_matrix* mat=build_matrix(p,p_index,done, done_index,c);
- 
+  //mat->print();
   //next Step Gauss
   simple_gauss(mat);
+  //mat->print();
   //next Step retranslate
 
  

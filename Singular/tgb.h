@@ -109,6 +109,7 @@ class tgb_matrix{
   ~tgb_matrix();
   int get_rows();
   int get_columns();
+  void print();
   void perm_rows(int i, int j);
   void set(int i, int j, number n);
   number get(int i, int j);
