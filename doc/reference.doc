@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.140 1999-08-19 17:22:10 Singular Exp $
+@comment $Id: reference.doc,v 1.141 1999-08-23 14:52:12 anne Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -294,7 +294,7 @@ value of type int is the multiplicity (see @ref{mult})
 @*@code{bareiss (} module_expression@code{,} int_expression@code{,} int_expression @code{)}
 @*@code{bareiss (} matrix_expression@code{,} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
-list of matrix and intvec
+list of module and intvec
 @item @strong{Purpose:}
 applies sparse Gauss-Bareiss algorithm (see @ref{References}, Lee and Saunders)
 to a module (or with type conversion to a matrix) with an 'optimal' pivotstrategy.
@@ -303,7 +303,8 @@ With only one parameter a complete elimination is done.
 Result is a list: the first entry is a module with a minimal independent set of vectors
 (as a matrix lower triangular),
 the second entry an intvec with the permutations of the rows
-w.r.t. the original matrix.
+w.r.t. the original matrix, that is a k at position l indicates that
+row l became row k.
 The further parameters control the algorithm:
 the second is the number of last rows out of the elimination and the third is
 as follows, if the vectors to reduce in the algorithm
