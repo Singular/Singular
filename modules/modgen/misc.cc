@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.19 2002-07-04 14:18:36 anne Exp $ */
+/* $Id: misc.cc,v 1.20 2003-06-09 09:52:10 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -69,7 +69,7 @@ struct sValCmdTab
   short start;
 };
 
-#include "iparith.inc"
+#include "../../Singular/iparith.inc"
 
 /*=================== general utilities ============================*/
 int IsCmd(char *n, int & tok)
@@ -156,8 +156,8 @@ int IsCmd(char *n, int & tok)
   
   if( (cmds[i].toktype==ROOT_DECL) ||
       (cmds[i].toktype==ROOT_DECL_LIST) ||
-      (cmds[i].toktype==RING_DECL) ||
-      ((cmds[i].toktype>=DRING_CMD) && (cmds[i].toktype<=VECTOR_CMD))) 
+      (cmds[i].toktype==RING_DECL))// ||
+//      ((cmds[i].toktype>=DRING_CMD) && (cmds[i].toktype<=VECTOR_CMD))) 
     return cmds[i].toktype;
   return 0;
 }
@@ -194,7 +194,7 @@ struct valid_cmds_def
   { "return",       write_function_return,      CMD_RETURN, CMDT_0,     1 },
   { "return",       write_function_return,      CMD_RETURN, CMDT_ANY,   1 },
   { "singularcmd",  write_function_singularcmd, CMD_SINGULAR, CMDT_ANY, 1 },
-  { NULL,           0, CMD_NONE, 0 }
+  { NULL,           0, CMD_NONE, CMDT_ANY, 0 }
 };
 
 cmd_token checkcmd(
