@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.76 2001-01-20 11:40:13 Singular Exp $
+// $Id: clapsing.cc,v 1.77 2001-02-21 10:17:57 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -591,13 +591,6 @@ void singclap_divide_content ( poly f )
       {
         lnumber c=(lnumber)pGetCoeff(p);
         napDelete(&c->z);
-        #ifdef LDEBUG
-        number nt=(number)omAlloc0Bin(rnumber_bin);
-        lnumber nnt=(lnumber)nt;
-        nnt->z=convClapPSingTr( i.getItem());
-        nTest(nt);
-        omFreeBin(nt, rnumber_bin);
-        #endif
         c->z=convClapPSingTr( i.getItem() / g );
         //nTest((number)c);
         //#ifdef LDEBUG
