@@ -96,7 +96,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     clapsing.cc cntrlc.cc mminit.cc\
     extra.cc febase.cc feread.cc fehelp.cc feResource.cc feOpt.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
-    gring.cc \
+    gring.cc gr_kstd2.cc\
     ideals.cc intvec.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
