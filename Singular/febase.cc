@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.58 1998-07-03 10:47:42 pohl Exp $ */
+/* $Id: febase.cc,v 1.59 1998-07-07 14:00:38 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -82,7 +82,7 @@ BOOLEAN feProt = FALSE;
 FILE*   feProtFile;
 BOOLEAN tclmode=FALSE;
 /* TCL-Protocoll (Singular -x): <char type>:<int length>:<string> \n
-*  E:l:s  error - not implemented yet (use N)
+*  E:l:s  error
 *  W:l:s  warning
 *  N:l:s  stdout
 *  Q:0:   quit
@@ -91,7 +91,6 @@ BOOLEAN tclmode=FALSE;
 *  R:l:<ring-name> ring change
 * plan:
 *  O:l:<option/no-option> option change (option)
-*  V:l:<option/no-option> option change (verbose)
 */
 
 #include "febase.inc"
@@ -873,10 +872,8 @@ void WerrorS(const char *s)
 #ifdef HAVE_TCL
     if (tclmode)
     {
-      //PrintTCLS('E',(char *)s);
-      //PrintTCLS('E',"\n");
-      PrintTCLS('N',(char *)s);
-      PrintTCLS('N',"\n");
+      PrintTCLS('E',(char *)s);
+      PrintTCLS('E',"\n");
     }
     else
 #endif

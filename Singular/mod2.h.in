@@ -122,7 +122,7 @@
 /* Undefine to disable the quote/eval of expressions */
 #define SIQ 1
 /* Define to enable TCL interface */
-#undef HAVE_TCL
+#define HAVE_TCL 1
 /* Define to enable working in Weyl algebras */
 #undef DRING
 /* Define to enable working in exterior algebras */
