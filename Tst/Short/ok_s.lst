@@ -68,7 +68,7 @@ gaussm_ex
 gaussm_s
 gcd0_s
 gcdp_s
-general_s
+;MP general_s
 graphics
 groebner_s
 highcorner_s
@@ -120,7 +120,7 @@ solve_s
 spcurve
 sres_s
 std_s
-stratify
+;MP stratify
 string
 test_c_dp
 triang_s
