@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.18 1998-03-10 14:48:05 schmidt Exp $ */
+/* $Id: cf_gcd.cc,v 1.19 1998-03-12 10:27:48 schmidt Exp $ */
 
 #include <config.h>
 
@@ -498,8 +498,8 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
 		else
 		    return g;
 	    if ( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) {
-		CanonicalForm cdF = common_den( f );
-		CanonicalForm cdG = common_den( g );
+		CanonicalForm cdF = bCommonDen( f );
+		CanonicalForm cdG = bCommonDen( g );
 		Off( SW_RATIONAL );
 		CanonicalForm l = lcm( cdF, cdG );
 		On( SW_RATIONAL );

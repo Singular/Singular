@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.9 1998-02-09 15:58:20 stobbe Exp $ */
+/* $Id: cf_factor.cc,v 1.10 1998-03-12 10:27:41 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -48,7 +48,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 	    return FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
     }
     else {
-        CanonicalForm cd = common_den( f );
+        CanonicalForm cd = bCommonDen( f );
         CanonicalForm fz = f * cd;
         CFFList F;
         bool on_rational = isOn(SW_RATIONAL);
