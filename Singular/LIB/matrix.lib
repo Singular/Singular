@@ -1,6 +1,6 @@
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.23 2001-01-17 08:50:59 greuel Exp $";
+version="$Id: matrix.lib,v 1.24 2001-01-17 14:03:26 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -512,7 +512,7 @@ RETURN:  - a matrix B, if called with one argument; B is the complete column-
            and L[2] the transformation matrix.
 NOTE:    * The procedure just applies interred to A with ordering (C,dp).
            The transformation matrix is obtained by applying 'lift'.
-           In most cases this should be faster than the procedure colred.
+           This should be faster than the procedure colred.
 @*       * It should only be used with exact coefficient field (there is no
            pivoting and rounding error treatment).
 @*       * Parameters are allowed. Hence, if the entries of A are parameters,
@@ -528,7 +528,7 @@ EXAMPLE: example gauss_col; shows an example
    module M = A;
    intvec v = option(get);
 //------------------------ change ordering if necessary ----------------------
-   if( ordstr(R) != "C,dp("+string(nvars(R))+")"ideal linI = imap(R,linI); )
+   if( ordstr(R) != "C,dp(nvars(R))" )
    {
      changeord("@R","C,dp",R); u=1;
      execute("minpoly="+mp+";");
@@ -596,12 +596,12 @@ RETURN: - a matrix B, if called with one argument; B is the complete row-
           reduced lower-triangular normal form of A if A is constant,
           (resp. as far as this is possible if A is a polynomial matrix;
           no division by polynomials).
-@*      - a list L of two matrices, if called with two arguments; 
-          L satisfies L[1] = L[2] * A with L[1] the row-reduced form of A 
+@*      - a list L of two matrices, if called with two arguments;
+          L satidfies L[1] = L[2] * A with L[1] the row-reduced form of A
           and L[2] the transformation matrix.
 NOTE:   * This procedure just applies gauss_col to the transposed matrix.
           The transformation matrix is obtained by applying lift.
-          In most cases this should be faster than the procedure rowred.
+          This should be faster than the procedure rowred.
 @*      * It should only be used with exact coefficient field (there is no
           pivoting and rounding error treatment).
 @*      * Parameters are allowed. Hence, if the entries of A are parameters,
@@ -613,8 +613,6 @@ EXAMPLE: example gauss_row; shows an example
    if(size(#) > 0)
    {
      list L = gauss_col(transpose(A),1);
-     L[1] = transpose(L[1]);
-     L[2] = transpose(L[2]); 
      return(L);
    }
    A = gauss_col(transpose(A));
@@ -766,10 +764,8 @@ RETURN:  - a matrix B, being the row reduced form of A, if rowred is called
 NOTE:    * This procedure is designed for teaching purposes mainly.
 @*       * The straight forward Gaussian algorithm is implemented in the
            library (no standard basis computation).
-           The transformation matrix is obtained by concatenating a unit 
-           matrix to A. In most cases the procedure gauss_row should be faster.
-           (However, the result may differ, since the transformation matrix
-           is not unique if A has not maximal row-rank).
+           The transformation matrix is obtained by concatenating a unit
+           matrix to A. proc gauss_row should be faster.
 @*       * It should only be used with exact coefficient field (there is no
            pivoting) over the polynomial ring (ordering lp or dp).
 @*       * Parameters are allowed. Hence, if the entries of A are parameters
@@ -851,10 +847,8 @@ RETURN:  - a matrix B, being the column reduced form of A, if colred is
            the column-reduced form of A and L[2] the transformation matrix
            (if colred is called with two arguments).
 NOTE:    * This procedure is designed for teaching purposes mainly.
-@*       * It applies rowred to the transposed matrix. in most cases the
-           procedure gauss_col should be faster. (However, the result may 
-           differ, since the transformation matrix is not unique if A has 
-           not maximal col-rank).
+@*       * It applies rowred to the transposed matrix.
+           proc gauss_col should be faster.
 @*       * It should only be used with exact coefficient field (there is no
            pivoting) over the polynomial ring (ordering lp or dp).
 @*       * Parameters are allowed. Hence, if the entries of A are parameters
