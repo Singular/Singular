@@ -1,4 +1,4 @@
-
+version="0.0.0";
 info="LIBRARY: sample.lib
 
       sample library for static and global procedures
@@ -17,11 +17,9 @@ example
   for(int n=0; n<=5; n=n+1)
   { tab(5-n)+"*"+tab(n)+"+"+tab(n)+"*"; }
 }
+
 //
 // Example of a static procedure
 //
 static proc internal_tab(int n)
 { return(" "[1,n]); }
-  
-
-
