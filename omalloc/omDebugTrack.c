@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.14 2001-04-30 09:02:04 Singular Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.15 2001-08-09 13:10:32 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>
@@ -321,7 +321,7 @@ void* omAllocTrackAddr(void* bin_size,
 #endif
 
 #ifdef OM_TRACK_BACKTRACE
-    omGetBackTrace(d_addr->alloc_frames,  FROM_FRAMES, OM_MAX_KEPT_FRAMES);
+    omGetBackTrace((void **)d_addr->alloc_frames,  FROM_FRAMES, OM_MAX_KEPT_FRAMES);
 #endif
 
     if (track > 2)
@@ -541,7 +541,8 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
       }
 #endif
 #ifdef OM_TRACK_RETURN
-      omAddrCheckReturnCorrupted(d_addr->flags & OM_FUSED && d_addr->free_r != (void*) -1);
+      omAddrCheckReturnCorrupted((d_addr->flags & OM_FUSED)
+                                 && (d_addr->free_r != (void*) -1));
 #endif
     }
   }
@@ -605,7 +606,7 @@ void omPrintTrackAddrInfo(FILE* fd, void* addr, int max_frames)
   if (max_frames > OM_MAX_KEPT_FRAMES) max_frames = OM_MAX_KEPT_FRAMES;
 
   fprintf(fd, " allocated at ");
-  if (! _omPrintBackTrace(OM_ALLOC_FRAMES(d_addr),
+  if (! _omPrintBackTrace((void **)OM_ALLOC_FRAMES(d_addr),
                           (d_addr->track > 1 ? max_frames : 0),
                           fd,
                           OM_FLR_ARG(d_addr->alloc_file, d_addr->alloc_line, d_addr->alloc_r)))

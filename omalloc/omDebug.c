@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.15 2001-04-30 09:02:03 Singular Exp $
+ *  Version: $Id: omDebug.c,v 1.16 2001-08-09 13:10:32 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>
@@ -231,7 +231,10 @@ void* _omDebugMemDup(void* addr, omTrackFlags_t flags, OM_CTFL_DECL)
 
 char* _omDebugStrDup(const char* addr, OM_TFL_DECL)
 {
-  unsigned long size, i=0;
+#if 0
+  unsigned long size;
+#endif
+  unsigned long i=0;
   char* ret;
   OM_R_DEF;
 
@@ -250,11 +253,11 @@ char* _omDebugStrDup(const char* addr, OM_TFL_DECL)
     size = omSizeOfAddr(addr);
   }
   else
-#endif
   {
     size = ULONG_MAX;
   }
-  while (addr[i] != '\0' && i < size) i++;
+#endif
+  while ((addr[i] != '\0') /* && (i < size)*/) i++;
 // there seems to be no way to check if it is really a string
 #if 0
   if (i == size)
