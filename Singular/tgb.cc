@@ -10,9 +10,9 @@
 //       try to create spolys as formal sums
 
 #include "tgb.h"
-#define OM_KEEP 0
+#define OM_KEEP 1
 #define LEN_VAR1
-
+#define degbound(p) assume(pTotaldegree(p)<10)
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
 int pSLength(poly p, int l) {
@@ -2302,11 +2302,7 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     if(erg.reduce_by<0) break;
     multi_reduction_lls_trick(los,losl,c,erg);
     int sum=0;
-    BOOLEAN join=FALSE;
-    for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
-      if(!los[i].sum) sum++;
-      if (sum>=AC_NEW_MIN) {join=TRUE;break;}
-    }
+
     
     int i;
     int len;
@@ -2344,7 +2340,7 @@ void red_object::flatten(){
       kBucketClear(sum->ac->bucket,&clear_into,&len);
       if(sum->ac->counter>1){
 	add_this=pCopy(clear_into);
-	kBucketInit(bucket,clear_into,len);
+	kBucketInit(sum->ac->bucket,clear_into,len);
       }
       else
 	add_this=clear_into;
@@ -2352,10 +2348,11 @@ void red_object::flatten(){
       nDelete(&sum->c_ac);
       nDelete(&sum->c_my);
       nDelete(&mult_my);
+      sum->ac->decrease_counter();
       delete sum;
       kBucket_Add_q(bucket,add_this, &len);
-      sum->ac->decrease_counter();
-      
+      p=kBucketGetLm(bucket);
+      sum=NULL;
     }
   }
 }
@@ -2367,7 +2364,8 @@ void red_object::validate(){
     if ((lm_ac==NULL)||((lm!=NULL) && (pLmCmp(lm,lm_ac)!=-1))){
       flatten();
       p=kBucketGetLm(bucket);
-      sev=pGetShortExpVector(p);
+      if (p!=NULL)
+	sev=pGetShortExpVector(p);
     } 
     else
     {
@@ -2380,6 +2378,7 @@ void red_object::validate(){
   }
   else{
     p=kBucketGetLm(bucket);
+    if(p)
     sev=pGetShortExpVector(p);
   }
 }
@@ -2438,7 +2437,11 @@ void simple_reducer::target_is_a_sum_reduce(red_object & ro){
     nDelete(&ro.sum->ac->multiplied);
     nDelete(&n1);
     ro.sum->ac->multiplied=n2;
+    poly lm=kBucketGetLm(ro.sum->ac->bucket);
+    if (lm)
+      ro.sum->ac->sev=pGetShortExpVector(lm);
   }
+  ro.sev=ro.sum->ac->sev;
 }
 void simple_reducer::reduce(red_object* r, int l, int u){
   int i;
@@ -2457,8 +2460,9 @@ void simple_reducer::reduce(red_object* r, int l, int u){
     //red_object for sum
  
   }
-  for(i=l;i<=u;i++)
+  for(i=l;i<=u;i++){
     r[i].validate();
+      }
 }
 reduction_step::~reduction_step(){}
 simple_reducer::~simple_reducer(){
@@ -2472,23 +2476,60 @@ simple_reducer::~simple_reducer(){
 reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c){
   static int id=0;
   id++;
-  
-  simple_reducer* pointer= new simple_reducer();
- 
+  if(id==0)
+    PrintS("warning: integer overflow");
+  BOOLEAN join=FALSE;
+  int i;
+  int sum;
+  for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
+    if(!r[i].sum) sum++;
+    if (sum>=AC_NEW_MIN) {join=TRUE;break;}
+  }
+  simple_reducer* pointer;
+  poly p;
+
   if (erg.fromS){
-    pointer->p=c->strat->S[erg.reduce_by];
-    pointer->p_len=c->strat->lenS[erg.reduce_by];
+    
+    p=c->strat->S[erg.reduce_by];
+    if ((!join)||(p->next==NULL)){
+      
+      pointer=new simple_reducer(p,c->strat->lenS[erg.reduce_by]);
+    
+    }
+    else{
+      join_simple_reducer* jp;
+      pointer= jp=new join_simple_reducer(p,c->strat->lenS[erg.reduce_by],r[erg.to_reduce_l].p);
+
+
+     
+    }
+   
     pointer->fill_back=NULL;
   }
   else
   {
-    
+    r[erg.reduce_by].flatten();
+    int len;
     kBucket_pt bucket=r[erg.reduce_by].bucket;
-    kBucketClear(bucket,&pointer->p,&pointer->p_len);
-
-    pointer->fill_back=bucket;
+    kBucketClear(bucket,&p,&len);
     if(c->is_char0)
-      pContent(pointer->p);
+	 pContent(p);
+
+    if ((!join)||(p->next==NULL))
+      pointer=new simple_reducer(p,len);
+    else
+    {
+      join_simple_reducer* jp;
+      pointer=jp=new join_simple_reducer(p,len,r[erg.to_reduce_l].p);
+
+
+
+    }
+    
+    pointer->p=p;
+    pointer->p_len=len;
+    pointer->fill_back=bucket;
+ 
   }
 
   pointer->reduction_id=id;
@@ -2496,3 +2537,60 @@ reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c
  
   return pointer;
 };
+
+void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
+
+  ro.sum=new formal_sum_descriptor();
+  ro.sum->ac=ac;
+  ac->counter++;
+  kBucket_pt bucket=ro.bucket;
+  poly a1 = pNext(p), lm = kBucketExtractLm(bucket);
+  BOOLEAN reset_vec=FALSE;
+  number rn;
+  assume(a1!=NULL);
+  number an = pGetCoeff(p), bn = pGetCoeff(lm);
+  lm->next=NULL;
+  int ct = ksCheckCoeff(&an, &bn);
+  ro.sum->c_ac=nNeg(bn);
+  ro.sum->c_my=an;
+
+  if (p_GetComp(p, bucket->bucket_ring) != p_GetComp(lm, bucket->bucket_ring))
+  {
+    p_SetCompP(a1, p_GetComp(lm, bucket->bucket_ring), bucket->bucket_ring);
+    reset_vec = TRUE;
+    p_SetComp(lm, p_GetComp(p, bucket->bucket_ring), bucket->bucket_ring);
+    p_Setm(lm, bucket->bucket_ring);
+  }
+
+
+  
+
+  p_DeleteLm(&lm, bucket->bucket_ring);
+  if (reset_vec) p_SetCompP(a1, 0, bucket->bucket_ring);
+  kbTest(bucket);
+
+}
+
+  reduction_accumulator::reduction_accumulator(poly p, int p_len, poly high_to){
+    //sev needs to be removed from interfaces,makes no sense
+    degbound(p);
+    degbound(p->next);
+    degbound(high_to);
+    poly my=pOne();
+    counter=0;
+   
+    for(int i=1;i<=pVariables;i++)
+      pSetExp(my,i,(pGetExp(high_to, i)-pGetExp(p,i)));
+    degbound(my);
+   
+   
+    pSetm(my);
+    last_reduction_id=-1;
+    multiplied=nInit(1);
+    bucket=kBucketCreate(currRing);
+    poly a=pMult_mm(pCopy(p->next),my);
+    degbound(a);
+    this->sev=pGetShortExpVector(a);
+    kBucketInit(bucket, a,p_len-1);
+    pDelete(&my);
+  }

@@ -60,10 +60,7 @@ class reduction_accumulator{
       }
   }
   int last_reduction_id;
-  reduction_accumulator(){
-    last_reduction_id=-1;
-    bucket=kBucketCreate(currRing);
-  }
+  reduction_accumulator(poly p, int p_len, poly high_to);
   ~reduction_accumulator(){
     nDelete(&multiplied);
     kBucketDeleteAndDestroy(&bucket);
@@ -183,12 +180,26 @@ class simple_reducer:public reduction_step{
   poly p;
   kBucket_pt fill_back;
   int p_len;
-  
+  simple_reducer(poly p, int p_len){
+    this->p=p;
+    this->p_len=p_len;
+  }
   virtual void reduce(red_object* r, int l, int u);
   ~simple_reducer();
- protected:
+
   virtual void target_is_a_sum_reduce(red_object & ro);
   virtual void target_is_no_sum_reduce(red_object & ro);
+};
+class join_simple_reducer:public simple_reducer{
+ public:
+  join_simple_reducer(poly p, int p_len, poly high_to):simple_reducer(p,p_len){
+    ac=new reduction_accumulator( p, p_len, high_to);
+    
+    
+  }
+
+  void target_is_no_sum_reduce(red_object & ro);
+  reduction_accumulator* ac;
 };
 //class sum_canceling_reducer:public reduction_step {
 //  void reduce(red_object* r, int l, int u);
