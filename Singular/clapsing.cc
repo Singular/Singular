@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.63 2000-04-11 14:48:25 Singular Exp $
+// $Id: clapsing.cc,v 1.64 2000-04-11 15:03:52 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -1308,7 +1308,7 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
    FACTORY_CFAOUT( "d", GCD );
    FACTORY_GCDSTAT( "acnt:", F, G, GCD );
 
-   if ((GCD!=1) && (GCD=!0))
+   if ((GCD!=1) && (GCD!=0))
    {
      ff= convClapASingA( F/ GCD );
      gg= convClapASingA( G/ GCD );
