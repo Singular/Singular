@@ -1,8 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_matrix.cc,v 1.3 1997-04-15 10:12:43 schmidt Exp $
+// $Id: ftmpl_matrix.cc,v 1.4 1997-04-18 16:44:13 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  1997/04/15 10:12:43  schmidt
+ * #include <config.h> added
+ * the headers config.h and assert.h will be included
+ *   be makeheader now
+ *
  * Revision 1.2  1997/03/27 10:33:48  schmidt
  * stream-io wrapped by NOSTREAMIO
  * definition of assertions replaced by #include <assert.h>
@@ -28,7 +33,7 @@ Matrix<T>::Matrix( int nr, int nc ) : NR(nr), NC(nc)
 	elems = 0;
     else {
 	int i;
-	elems = new (T*)[nr];
+	elems = new T_ptr[nr];
 	for ( i = 0; i < nr; i++ )
 	    elems[i] = new T[nc];
     }
@@ -41,7 +46,7 @@ Matrix<T>::Matrix( const Matrix<T>& M ) : NR(M.NR), NC(M.NC)
 	elems = 0;
     else {
 	int i, j;
-	elems = new (T*)[NR];
+	elems = new T_ptr[NR];
 	for ( i = 0; i < NR; i++ ) {
 	    elems[i] = new T[NC];
 	    for ( j = 0; j < NC; j++ )
@@ -71,7 +76,7 @@ Matrix<T>& Matrix<T>::operator= ( const Matrix<T>& M )
 		delete [] elems[i];
 	    delete elems;
 	    NR = M.NR; NC = M.NC;
-	    elems = new (T*)[NR];
+	    elems = new T_ptr[NR];
 	    for ( i = 0; i < NR; i++ )
 		elems[i] = new T[NC];
 	}
