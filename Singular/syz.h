@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.10 1998-09-29 21:14:46 siebert Exp $ */
+/* $Id: syz.h,v 1.11 1998-10-15 13:51:19 siebert Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -92,4 +92,5 @@ lists syConvRes(syStrategy syzstr);
 syStrategy syConvList(lists li);
 syStrategy syForceMin(lists li);
 syStrategy syMinimize(syStrategy syzstr);
+void syKillEmptyEntres(resolvente res,int length);
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.11 1998-10-06 14:37:54 siebert Exp $ */
+/* $Id: syz.cc,v 1.12 1998-10-15 13:51:18 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -216,27 +216,154 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
     idDelete(&deg0);
 }
 
+/*2
+* make Gauss for one element
+*/
+static void syGaussForOne(ideal syz, int elnum, int ModComp)
+{
+  int k,j,i;
+  poly unit1,unit2;
+  poly actWith=syz->m[elnum];
+
+  syz->m[elnum] = NULL;
+  if (currRing->ch<2) pCleardenom(actWith);
+/*--makes Gauss alg. for the column ModComp--*/
+  unit1 = pTakeOutComp1(&(actWith), ModComp);
+  k=0;
+  while (k<IDELEMS(syz))
+  {
+    if (syz->m[k]!=NULL)
+    {
+      unit2 = pTakeOutComp1(&(syz->m[k]), ModComp);
+      syz->m[k] = pMult(syz->m[k],pCopy(unit1));
+      syz->m[k] = pSub(syz->m[k],
+        pMult(pCopy(actWith),unit2));
+      if (syz->m[k]==NULL)
+      {
+        Print("Hier muss noch was gemacht werden\n");
+      }
+    }
+    k++;
+  }
+  pDelete(&actWith);
+  pDelete(&unit1);
+}
+static void syDeleteAbove1(ideal up, int k)
+{
+  poly p,pp;
+  if (up!=NULL)
+  {
+    for (int i=0;i<IDELEMS(up);i++)
+    {
+      p = up->m[i];
+      while ((p!=NULL) && (pGetComp(p)==k)) 
+      {
+        pp = pNext(p);
+        pNext(p) = NULL;
+        pDelete(&p);
+        p = pp;
+      }
+      up->m[i] = p;
+      if (p!=NULL)
+      {
+        while (pNext(p)!=NULL)
+        {
+          if (pGetComp(pNext(p))==k)
+          {
+            pp = pNext(pNext(p));
+            pNext(pNext(p)) = NULL;
+            pDelete(&pNext(p));
+            pNext(p) = pp;
+          }
+          else
+            pIter(p);
+        }
+      } 
+    }
+  }
+}
+/*2
+*minimizes the resolution res
+*assumes homogeneous or local case
+*/
+static void syMinStep1(resolvente res, int length)
+{
+  int i,j,k,l,index=0;
+  poly p;
+  ideal deg0=NULL,reddeg0=NULL;
+  intvec *have_del=NULL,*to_del=NULL;
+
+  while ((index<length) && (res[index]!=NULL))
+  {
+/*---we take out dependend elements from syz---------------------*/
+    if (res[index+1]!=NULL)
+    {
+      deg0 = idJet(res[index+1],0);
+      reddeg0 = kInterRed(deg0);
+      idDelete(&deg0);
+      have_del = new intvec(IDELEMS(res[index]));
+      for (i=0;i<IDELEMS(reddeg0);i++)
+      {
+        if (reddeg0->m[i]!=NULL)
+        {
+          j = pGetComp(reddeg0->m[i]);
+          pDelete(&(res[index]->m[j-1]));
+          res[index]->m[j-1] = NULL;
+          (*have_del)[j-1] = 1;
+        }
+      }
+      idDelete(&reddeg0);
+    }
+    if (index>0)
+    {
+/*--- we search for units and perform Gaussian elimination------*/
+      j = to_del->length();
+      while (j>0)
+      {
+        if ((*to_del)[j-1]==1)
+        {
+          k = 0;
+          while (k<IDELEMS(res[index]))
+          {
+            p = res[index]->m[k];
+            while ((p!=NULL) && ((!pIsConstantComp(p)) || (pGetComp(p)!=j)))
+              pIter(p);
+            if ((p!=NULL) && (pIsConstantComp(p)) && (pGetComp(p)==j)) break;
+            k++;
+          }
+          if (k>=IDELEMS(res[index])) 
+          {
+            Print("out of range\n");
+          }
+          syGaussForOne(res[index],k,j);
+          if (res[index+1]!=NULL)
+            syDeleteAbove1(res[index+1],k+1);
+          (*to_del)[j-1] = 0;
+        }
+        j--;
+      }
+    }
+    if (to_del!=NULL) delete to_del;
+    to_del = have_del;
+    have_del = NULL;
+    index++;
+  }
+  PrintLn();
+  syKillEmptyEntres(res,length);
+}
+
 void syMinimizeResolvente(resolvente res, int length, int first)
 {
   int syzIndex=first;
-  intvec * dummy;
+  intvec *dummy;
 
   if (syzIndex<1) syzIndex=1;
-/*                            Noch zu testen!!
-*  if ((syzIndex==1) && (idHomModule(res[0],currQuotient,&dummy)))
-*  {
-*    delete dummy;
-*    resolvente res1=syFastMin(res,length);
-*    int i;
-*    for (i=0;i<length;i++)
-*    {
-*      idDelete(&res[i]);
-*      res[i] = res1[i];
-*    }
-*    Free((ADDRESS)res1,length*sizeof(ideal));
-*    return;
-*  }
-*/
+  if ((syzIndex==1) && (idHomModule(res[0],currQuotient,&dummy)))
+  {
+    syMinStep1(res,length);
+    delete dummy;
+    return;
+  }
   while ((syzIndex<length-1) && (res[syzIndex]!=NULL) && (res[syzIndex+1]!=NULL))
   {
     syMinStep(res[syzIndex-1],res[syzIndex],FALSE,res[syzIndex+1]);
@@ -1028,144 +1155,4 @@ int syIsMinimizedFrom(resolvente res,int length)
     j--;
   }
   return j;
-}
-
-/*2
-* determines the generators of a minimal resolution
-* contained in res
-*/
-static int ** syScanRes(resolvente res, int length)
-{
-  int i=0,j,k;
-  int **result=(int**)Alloc0(length*sizeof(int*));
-  poly p;
-  ideal tid;
-
-  while ((i<length) && (!idIs0(res[i])))
-  {
-    result[i] = (int*)Alloc0(IDELEMS(res[i])*sizeof(int));
-    for (j=IDELEMS(res[i])-1;j>=0;j--)
-    {
-      if (res[i]->m[j]==NULL) (result[i])[j] = -1;
-    }
-    if (i>0)
-    {
-      tid = idJet(res[i],0);
-      Print("Der %d-te 0-jet ist:\n",i);
-      for (j=0;j<IDELEMS(tid);j++)
-      {
-        if (tid->m[j]!=0)
-        {
-          Print("poly %d :",j);pWrite(tid->m[j]);
-        }
-      }
-      for (j=0;j<IDELEMS(tid);j++)
-      {
-        p = tid->m[j];
-        while (p!=NULL)
-        {
-          pNorm(p);
-          k = (result[i-1])[pGetComp(p)-1];
-          if ((k==0) || (k==-2))
-          {
-            (result[i-1])[pGetComp(p)-1] = j+1;
-            (result[i])[j] = -2;
-            break;
-          }
-          else if (k>0)
-          {
-            p = pSub(p,pCopy(tid->m[k-1]));
-          }
-          else if (k==-1)
-          {
-            Print("Something is rotten in the state of Denmark\n");
-          }
-        }
-        tid->m[j] = p;
-      }
-      Print("Der %d-te 0-jet ist:\n",i);
-      for (j=0;j<IDELEMS(tid);j++)
-      {
-        if (tid->m[j]!=0)
-        {
-          Print("poly %d :",j);pWrite(tid->m[j]);
-        }
-      }
-      idDelete(&tid);
-    }
-    i++;
-  }
-  Print("Die gescannte Struktur ist:\n");
-  for (i=0;i<length;i++)
-  {
-    Print("Fuer den %d-ten Module:\n",i);
-    if (!idIs0(res[i]))
-      for (j=0;j<IDELEMS(res[i]);j++) Print(" %d",(result[i])[j]);
-    Print("\n");
-  }
-  return result;
-}
-
-static void syReduce(ideal toRed,poly redWith,int redComp)
-{
-  int i;
-  poly p=redWith,pp,ppp;
-  number n;
-
-  while ((p!=NULL) && (pGetComp(p)!=redComp)) pIter(p);
-  if (p==NULL)
-  {
-    Print("Hier ist was faul!\n");
-  }
-  else
-  {
-    n = nCopy(pGetCoeff(p));
-  }
-  p = redWith;
-  for (i=0;i<IDELEMS(toRed);i++)
-  {
-    pp = toRed->m[i];
-    while ((pp!=NULL) && (pGetComp(pp)!=redComp)) pIter(pp);
-    if (pp!=NULL)
-    {
-      ppp = pMultCopyN(p,pGetCoeff(pp));
-      pMultN(toRed->m[i],n);
-      toRed->m[i] = pSub(toRed->m[i],ppp);
-    }
-  }
-  nDelete(&n);
-}
-
-resolvente syFastMin(resolvente res,int length)
-{
-  int **res_shape=syScanRes(res,length);
-  int i,j,k;
-  poly p;
-  resolvente result=(ideal*)Alloc0(length*sizeof(ideal));
-  
-  for (i=0;(i<length) && !idIs0(res[i]);i++)
-  {
-    k = 0;
-    result[i] = idInit(IDELEMS(res[i]),res[i]->rank);
-    for (j=IDELEMS(res[i])-1; j>=0;j--)
-    {
-      if ((res_shape[i])[j]==0)
-      {
-        result[i]->m[k] = pCopy(res[i]->m[j]);
-        k++;
-      }
-    }
-    if (i>0)
-    {
-      for (j=IDELEMS(res[i-1])-1;j>=0;j--)
-      {
-        if ((res_shape[i-1])[j]>0)
-        {
-          k = (res_shape[i-1])[j]-1;
-          syReduce(result[i],res[i]->m[k],j+1);
-        }
-      }
-    }
-  }
-  return result;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.38 1998-09-30 14:12:47 Singular Exp $ */
+/* $Id: ideals.cc,v 1.39 1998-10-15 13:51:17 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -654,7 +654,7 @@ ideal idMinBase (ideal h1)
   }
   if ((currRing->OrdSgn == 1) && (homog))
   {
-    lists re=min_std(h1,currQuotient,(tHomog)homog,&wth,NULL,0,2);
+    lists re=min_std(h1,currQuotient,(tHomog)homog,&wth,NULL,0,3);
     h2 = (ideal)re->m[1].data;
     re->m[1].data = NULL;
     re->m[1].rtyp = NONE;
