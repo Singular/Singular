@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.11 1997-05-02 07:44:46 Singular Exp $ */
+/* $Id: tesths.cc,v 1.12 1997-05-06 17:53:37 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -26,6 +26,22 @@
 #include "silink.h"
 #include "timer.h"
 
+/* version strings */
+#ifdef HAVE_FACTORY
+  extern const char factoryVersion[];
+#endif
+#ifdef HAVE_LIBFAC_P
+  extern const char * libfac_version;
+  extern const char * libfac_date;
+#endif
+#ifdef HAVE_GMP
+extern "C" {
+#include <gmp.h>
+}
+#endif
+#ifdef HAVE_MPSR
+#include <MP_Config.h>
+#endif
 
 /*0 implementation*/
 char * thisfile;
@@ -121,47 +137,47 @@ int main(          /* main entry to Singular */
               printf("Singular %s  %s  (%d)  %s %s\n",
                      S_VERSION1,S_VERSION2,
                      SINGULAR_VERSION_ID,__DATE__,__TIME__);
-              printf("with ");
+              printf("with\n");
 #ifdef HAVE_FACTORY
-              printf("factory,");
+              printf("\tfactory (%s),\n", factoryVersion);
 #endif
-#ifdef HAVE_FACTORY
-              printf("fac(p),");
+#ifdef HAVE_LIBFAC_P
+              printf("\tlibfac(%s,%s),\n",libfac_version,libfac_date);
 #endif
 #ifdef SRING
-              printf("super algebra,");
+              printf("\tsuper algebra,\n");
 #endif
 #ifdef DRING
-              printf("Weyl algebra,");
+              printf("\tWeyl algebra,\n");
 #endif
 #ifdef HAVE_GMP
-              printf("GMP,");
+              printf("\tGMP(%d.%d),\n",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
 #endif
 #ifdef HAVE_DBM
-              printf("DBM,");
+              printf("\tDBM,\n");
 #endif
 #ifdef HAVE_MPSR
-              printf("MP,");
+              printf("\tMP(%s),\n",MP_VERSION);
 #endif
 #if defined(HAVE_READLINE) && !defined(FEREAD)
-              printf("RL,");
+              printf("\tlibreadline,\n");
 #endif
 #ifdef HAVE_FEREAD
-              printf("SRL,");
+              printf("\temulated libreadline,\n");
 #endif
 #ifdef TEST
-              printf("TESTs,");
+              printf("\tTESTs,\n");
 #endif
 #if YYDEBUG
-              printf("YYDEBUG,");
+              printf("\tYYDEBUG=1,\n");
 #endif
 #ifdef MDEBUG
-              printf("MDEBUG=%d,",MDEBUG);
+              printf("\tMDEBUG=%d,\n",MDEBUG);
 #endif
 #ifndef __OPTIMIZE__
-              printf("-g,");
+              printf("\t-g,\n");
 #endif
-              printf("random=%d\n",siRandomStart);
+              printf("\trandom=%d\n",siRandomStart);
 #ifdef MSDOS
               char *p=getenv("SPATH");
 #else
