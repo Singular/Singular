@@ -169,7 +169,7 @@ bindist ${BINDIST_NAME}.tar.gz:
 	${MAKE} install-bindist localdir=${TMPDIR}
 	chmod -R a+rX ${TMPDIR}
 	cd ${TMPDIR}; tar cf ${BINDIST_NAME}.tar Singular; ${MYGZIP} ${BINDIST_NAME}.tar
-	mv ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
+	mv ${TMPDIR}/${BINDIST_NAME}.tar.gz .
 	rm -rf ${TMPDIR}
 
 static-bindist ${BINDIST_NAME}-static.tar.gz: 
