@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.14 1998-03-27 15:43:29 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.15 1998-04-07 18:37:41 Singular Exp $ */
 
 /***************************************************************
  *
@@ -21,6 +21,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "structs.h"
+#include "mmprivat.h"
 #include "mmemory.h"
 #include "febase.h"
 #include "numbers.h"
@@ -185,9 +186,9 @@ poly _pFetchCopy(ring r, poly p)
 poly pDBNew(char *f, int l)
 {
 #ifdef MDEBUG
-  poly p = (poly) mmDBAllocBlock(pMonomSize,f,l);
+  poly p = (poly) mmDBAllocSpecialized(f,l);
 #else
-  poly p = (poly) mmAllocBlock(pMonomSize);
+  poly p = (poly) mmAllocSpecialized();
 #endif
   memset(p,0,pMonomSize);
   return p;
@@ -225,9 +226,9 @@ void pDBDelete(poly * p, char * f, int l)
 #endif
     pIter(h);
 #ifdef MDEBUG
-    mmDBFreeBlock((ADDRESS)*p,pMonomSize,f,l);
+    mmDBFreeSpecialized((ADDRESS)*p,f,l);
 #else
-    mmFreeBlock((ADDRESS)*p,pMonomSize);
+    mmFreeSpecialized((ADDRESS)*p);
 #endif
     *p=h;
     if (l>0) l= -l;
@@ -263,9 +264,9 @@ void pDBDelete1(poly * p, char * f, int l)
   nDelete(&(h->coef));
   *p = pNext(h);
 #ifdef MDEBUG
-  mmDBFreeBlock((ADDRESS)h,pMonomSize,f,l);
+  mmDBFreeSpecialized((ADDRESS)h,f,l);
 #else
-  mmFreeBlock((ADDRESS)h,pMonomSize);
+  mmFreeSpecialized((ADDRESS)h);
 #endif
 }
 #else
@@ -298,9 +299,9 @@ void pDBFree1(poly p, char * f, int l)
   {
     p->coef=NULL;//nDelete(&(p->coef));
 #ifdef MDEBUG
-    mmDBFreeBlock((ADDRESS)p,pMonomSize,f,l);
+    mmDBFreeSpecialized((ADDRESS)p,f,l);
 #else
-    mmFreeBlock((ADDRESS)p,pMonomSize);
+    mmFreeSpecialized((ADDRESS)p);
 #endif
   }
 }
@@ -661,7 +662,7 @@ BOOLEAN pDBTest(poly p, char *f, int l)
   while (p!=NULL)
   {
 #ifdef MDEBUG
-    if (!mmDBTestBlock(p,pMonomSize,f,l))
+    if (!mmDBTestBlock(p,mm_specSize,f,l))
       return FALSE;
 #endif
 #ifdef LDEBUG
