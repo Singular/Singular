@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.2 2004-08-27 12:20:40 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -381,7 +381,13 @@ p_GetTotalDegree(const unsigned long l, const ring r)
 // returns a copy of p
 PINLINE2 poly p_Copy(poly p, const ring r)
 {
+#ifdef PDEBUG
+  poly pp= r->p_Procs->p_Copy(p, r);
+  p_Test(pp,r);
+  return pp;
+#else
   return r->p_Procs->p_Copy(p, r);
+#endif
 }
 
 PINLINE2 poly p_Copy(poly p, const ring lmRing, const ring tailRing)
