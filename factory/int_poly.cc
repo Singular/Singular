@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_poly.cc,v 1.2 1997-03-27 10:07:37 schmidt Exp $
+// $Id: int_poly.cc,v 1.3 1997-04-15 09:13:49 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/03/27 10:07:37  schmidt
+stream-io wrapped by NOSTREAMIO
+debug output changed to DEBOUT
+
 Revision 1.1  1996/05/23 09:33:05  stobbe
 "modulocoeff: Bug fix, invert is now handled as it should be.
 "
@@ -12,6 +16,8 @@ Revision 1.1  1996/05/23 09:33:05  stobbe
 //
 */
 
+#include <config.h>
+
 #ifndef NOSTREAMIO
 #include <string.h>
 #include <strstream.h>
@@ -20,7 +26,6 @@ Revision 1.1  1996/05/23 09:33:05  stobbe
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #include "cf_factory.h"
 #include "int_cf.h"
 #include "int_poly.h"

@@ -1,14 +1,20 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: parseutil.cc,v 1.0 1996-05-17 10:59:47 stobbe Exp $
+// $Id: parseutil.cc,v 1.1 1997-04-15 09:34:26 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:47  stobbe
+Initial revision
+
 */
+
+#include <config.h>
 
 #include <string.h>
 #include <stdlib.h>
 
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "parseutil.h"
 
@@ -158,4 +164,3 @@ int ParseUtil::getintval()
 {
     return value->getintval();
 }
-

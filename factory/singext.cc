@@ -1,11 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: singext.cc,v 1.0 1996-05-17 10:59:47 stobbe Exp $
+// $Id: singext.cc,v 1.1 1997-04-15 09:37:55 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:47  stobbe
+Initial revision
+
 */
 
+#include <config.h>
+
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "singext.h"
 #include "int_cf.h"
@@ -14,7 +20,7 @@ $Log: not supported by cvs2svn $
 #include "imm.h"
 #include "cf_factory.h"
 
-MP_INT 
+MP_INT
 gmp_numerator ( const CanonicalForm & f )
 {
     InternalCF * ff = f.getval();

@@ -1,12 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: gmpext.h,v 1.0 1996-05-17 10:59:40 stobbe Exp $
+// $Id: gmpext.h,v 1.1 1997-04-15 09:07:42 schmidt Exp $
 
-#ifndef INCL_GCDEXT_H
-#define INCL_GCDEXT_H
+#ifndef INCL_GMPEXT_H
+#define INCL_GMPEXT_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:40  stobbe
+Initial revision
+
 */
+
+#include <config.h>
 
 #include "cf_gmp.h"
 
@@ -51,4 +56,4 @@ mpz_mypow( MP_INT * result, MP_INT * p, int n )
     }
 }
 
-#endif
+#endif /* INCL_GMPEXT_H */

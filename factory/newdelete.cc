@@ -1,12 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: newdelete.cc,v 1.0 1996-05-17 12:21:32 stobbe Exp $
+// $Id: newdelete.cc,v 1.1 1997-04-15 09:33:49 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 12:21:32  stobbe
+Initial revision
+
 */
 
+#include <config.h>
+
 #include "assert.h"
-#include "conf.h"
+
 #ifdef USE_OLD_MEMMAN
 #include "memutil.h"
 #else

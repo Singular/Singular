@@ -1,13 +1,16 @@
+/* emacs edit mode for this file is -*- C -*- */
+/* $Id: mmprivate.h,v 1.1 1997-04-15 09:30:00 schmidt Exp $ */
+
 #ifndef MEMPRIVAT_H
 #define MEMPRIVAT_H
-/****************************************
-*  Computer Algebra System SINGULAR     *
-****************************************/
-/*
-* ABSTRACT
-*/
+
 /* $Log: not supported by cvs2svn $
+ * Revision 1.0  1996/05/17 10:59:42  stobbe
+ * Initial revision
+ *
 */
+
+#include <config.h>
 
 #define MAXDATA 4000
 #ifdef __alpha__
@@ -151,4 +154,3 @@ void mmPrintFL( const char* fname, const int lineno );
 #endif /* MDEBUG */
 
 #endif /* MEMPRIVATE_H */
-

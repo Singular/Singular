@@ -1,15 +1,20 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_pp.h,v 1.1 1997-03-27 10:10:17 schmidt Exp $
+// $Id: int_pp.h,v 1.2 1997-04-15 09:16:46 schmidt Exp $
 
 #ifndef INCL_INTERNALPRIMEPOWER_H
 #define INCL_INTERNALPRIMEPOWER_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/03/27 10:10:17  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.0  1996/05/17 10:59:41  stobbe
 Initial revision
 
 */
+
+#include <config.h>
 
 #include "cf_gmp.h"
 

@@ -1,19 +1,23 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: initgmp.cc,v 1.1 1997-03-27 10:01:44 schmidt Exp $
+// $Id: initgmp.cc,v 1.2 1997-04-15 09:09:30 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/03/27 10:01:44  schmidt
+dependency on SINGULAR removed
+
 Revision 1.0  1996/05/17 10:59:46  stobbe
 Initial revision
 
 */
+
+#include <config.h>
 
 #include "cf_gmp.h"
 
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #ifdef USE_MEMUTIL
 #ifdef USE_OLD_MEMMAN
 #include "memutil.h"

@@ -1,22 +1,26 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_poly.h,v 1.1 1997-03-27 10:08:06 schmidt Exp $
+// $Id: int_poly.h,v 1.2 1997-04-15 09:14:20 schmidt Exp $
 
 #ifndef INCL_INTERNALPOLY_H
 #define INCL_INTERNALPOLY_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/03/27 10:08:06  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.0  1996/05/17 10:59:41  stobbe
 Initial revision
 
 */
+
+#include <config.h>
 
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif /* NOSTREAMIO */
 
 #include "cf_defs.h"
-
 #include "int_cf.h"
 #include "variable.h"
 #include "canonicalform.h"

@@ -1,14 +1,19 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: mmallocb.c,v 1.1 1997-03-27 10:16:24 schmidt Exp $ */
+/* $Id: mmallocb.c,v 1.2 1997-04-15 09:23:45 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/03/27 10:16:24  schmidt
+option TEST renamed to MM_TEST
+
 Revision 1.0  1996/05/17 10:59:47  stobbe
 Initial revision
 
 */
 
 #define _POSIX_SOURCE 1
+
+#include <config.h>
 
 #include <string.h>
 #include <stdio.h>

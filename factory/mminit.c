@@ -1,14 +1,20 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: mminit.c,v 1.0 1996-05-17 10:59:48 stobbe Exp $ */
+/* $Id: mminit.c,v 1.1 1997-04-15 09:25:10 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:48  stobbe
+Initial revision
+
 */
 
 #define _POSIX_SOURCE 1
 
+#include <config.h>
+
 #include <stdlib.h>
 #include <string.h>
+
 #include "memman.h"
 #include "mmprivate.h"
 

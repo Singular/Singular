@@ -1,17 +1,21 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_rat.cc,v 1.1 1997-03-27 10:10:56 schmidt Exp $
+// $Id: int_rat.cc,v 1.2 1997-04-15 09:18:07 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/03/27 10:10:56  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.0  1996/05/17 10:59:47  stobbe
 Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #include "cf_globals.h"
 #include "int_rat.h"
 #include "int_int.h"
