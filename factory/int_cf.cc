@@ -1,12 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_cf.cc,v 1.0 1996-05-17 10:59:46 stobbe Exp $
+// $Id: int_cf.cc,v 1.1 1997-03-27 10:03:08 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:46  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "int_cf.h"
 #include "canonicalform.h"
 
@@ -56,8 +61,7 @@ InternalCF::coeff( int i )
 int
 InternalCF::intval() const
 {
-    cerr << "not implemented for class " << this->classname() << endl;
-    ASSERT( 0, "illegal conversion" );
+    ASSERT1( 0, "illegal conversion: not implemented for class %s", this->classname() );
     return 0;
 }
 
@@ -70,8 +74,7 @@ InternalCF::sign() const
 InternalCF*
 InternalCF::invert()
 {
-    cerr << "not implemented for class " << this->classname() << endl;
-    ASSERT( 0, "internal factory error" );
+    ASSERT1( 0, "internal factory error: not implemented for class %s", this->classname() );
     return 0;
 }
 
@@ -90,15 +93,13 @@ InternalCF::den()
 int
 InternalCF::comparecoeff ( InternalCF* )
 {
-    cerr << "not implemented for class " << this->classname() << endl;
-    ASSERT( 0, "fatal error" );
+    ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
     return 0;
 }
 
 InternalCF*
 InternalCF::sqrt()
 {
-    cerr << "not implemented for class " << this->classname() << endl;
-    ASSERT( 0, "fatal error" );
+    ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
     return 0;
 }
