@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.187 1999-11-17 18:22:54 Singular Exp $ */
+/* $Id: iparith.cc,v 1.188 1999-11-24 14:02:17 wichmann Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -167,6 +167,7 @@ cmdnames cmds[] =
   { "factorize",   0, FAC_CMD ,           CMD_12},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
   { "fglm",        0, FGLM_CMD ,          CMD_2},
+  { "fglmquot",    0, FGLMQUOT_CMD,       CMD_2},
   { "find",        0, FIND_CMD ,          CMD_23},
   { "finduni",     0, FINDUNI_CMD,        CMD_1},
   { "forif",       0, IF_CMD ,            IF_CMD},
@@ -2217,9 +2218,11 @@ struct sValCmd2 dArith2[]=
 #ifdef HAVE_FGLM
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD PROFILER}
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD PROFILER}
+,{fglmQuotProc,FGLMQUOT_CMD,   IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
 #else
 ,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD PROFILER}
 ,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD PROFILER}
+,{jjWRONG2,    FGLMQUOT_CMD,   IDEAL_CMD,      POLY_CMD,   IDEAL_CMD PROFILER}
 #endif
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD PROFILER}
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD PROFILER}
