@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.13 1999-12-13 15:32:46 obachman Exp $
+# $Id: pl2doc.pl,v 1.14 1999-12-13 16:28:34 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -391,7 +391,7 @@ sub OutInfoItem
     if ($text =~ /\w/)
     {
       print $FH '@item @strong{Purpose:'."}\n";
-      if ($text !~ /[a-z]*/)
+      if ($text !~ /[a-z]/)
       {
 	print $FH lc $text;
       }
