@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_int.cc,v 1.0 1996-05-17 10:59:46 stobbe Exp $
+// $Id: int_int.cc,v 1.1 1996-12-20 15:35:26 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:46  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
@@ -88,7 +91,7 @@ InternalCF* InternalInteger::genOne()
     if ( isOne() )
 	return copyObject();
     else
-	return new InternalInteger();
+	return new InternalInteger( 1 );
 }
 
 InternalCF* InternalInteger::neg()
