@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.147 1999-09-03 11:56:02 pohl Exp $
+@comment $Id: reference.doc,v 1.148 1999-09-13 18:46:54 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5987,7 +5987,8 @@ while (1)
 @end smallexample
 @end table
 @c ref
-See @ref{Control structures};
+See 
+@ref{Control structures};
 @ref{for};
 @ref{while}.
 @c ref
@@ -5999,9 +6000,9 @@ See @ref{Control structures};
 @item @strong{Syntax:}
 @code{continue;}
 @item @strong{Purpose:}
-skips the rest of this loop und jumps to the beginning of the
-block. This command is only valid inside a @code{for} or a @code{while}
-construct.
+skips the rest of the innermost @code{for} or @code{while} loop und jumps
+to the beginning of the block. This command is only valid inside a
+@code{for} or a @code{while} construct.
 @item @strong{Note:}
 Unlike the C-construct it @strong{does not execute the increment statement}.
 The command @code{continue} is mainly for internal use.
@@ -6023,7 +6024,10 @@ for (int i = 1 ; i<=10; i=i+1)
 @end smallexample
 @end table
 @c ref
-See @ref{Control structures}; @ref{for}; @ref{while}.
+See 
+@ref{Control structures}; 
+@ref{for}; 
+@ref{while}.
 @c ref
 @c ---------------------------------------
 @node else, export, continue, Control structures
@@ -6050,7 +6054,10 @@ else
 @end smallexample
 @end table
 @c ref
-See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
+See 
+@ref{if}; 
+@ref{boolean expressions}; 
+@ref{Control structures}.
 @c ref
 @c ---------------------------------------
 @ifset namespaces
@@ -6298,15 +6305,16 @@ See
 @cindex for
 @table @code
 @item @strong{Syntax:}
-@code{for (} init_commands@code{;}
+@code{for (} init_command@code{;}
 boolean_expression@code{;}
 iterate_commands@code{)} block
 @item @strong{Purpose:}
 repetitive, conditional execution of a command block.
 @*The command init_command is executed first. Then boolean_expression is
-evaluated. If its value is TRUE the block is executed, otherwise the @code{for}
-statement is complete. After each execution of the block, the command
-iterate_command is executed and boolean_expression is evaluated.
+evaluated. If its value is TRUE the block is executed, otherwise the
+@code{for} statement is complete. After each execution of the block, the
+command iterate_command is executed and boolean_expression is
+evaluated. This is repeated until boolean_expression evaluates to FALSE.
 @*The command @code{break;} leaves the innermost @code{for} construct.
 @item @strong{Example:}
 @smallexample
@@ -6321,8 +6329,13 @@ s;
 @end smallexample
 @end table
 @c ref
-See @ref{Control structures}; @ref{boolean expressions}; @ref{while}; @ref{if};
-@ref{break}; @ref{continue}.
+See 
+@ref{Control structures};
+@ref{boolean expressions};
+@ref{while};
+@ref{if};
+@ref{break};
+@ref{continue}.
 @c ref
 @c ---------------------------------------
 @node if, keepring, for, Control structures
@@ -6348,7 +6361,10 @@ if (i > 5 and typeof(m) == "matrix")
 @end smallexample
 @end table
 @c ref
-See @ref{else}; @ref{break}; @ref{Control structures};
+See
+@ref{else};
+@ref{break};
+@ref{Control structures};
 @ref{boolean expressions}.
 @c ref
 @c ---------------------------------------
@@ -6385,6 +6401,10 @@ P2();
 @expansion{} at top level: r1
 @end smallexample
 @end table
+@c ref
+See
+@ref{ring}.
+@c ref
 @c ---------------------------------------
 @node quit, return, keepring, Control structures
 @subsection quit
@@ -6394,7 +6414,7 @@ P2();
 @item @strong{Syntax:}
 @code{quit;}
 @item @strong{Purpose:}
-quits @sc{Singular},
+quits @sc{Singular};
 works also from inside a procedure. The commands @code{quit} and
 @code{exit} are synonymous.
 @item @strong{Example:}
@@ -6413,8 +6433,9 @@ works also from inside a procedure. The commands @code{quit} and
 @item @strong{Type:}
 any
 @item @strong{Purpose:}
-returns the result(s) of a procedure.
-@*Can only be used inside a procedure.
+returns the result(s) of a procedure and can only be used inside a
+procedure. Note, that the brackets are required even if no return value
+is given.
 @item @strong{Example:}
 @smallexample
 proc p2
@@ -6426,7 +6447,7 @@ proc p2
   @}
   return(j);
 @}
-// can also return an expression list, i.e., more than value
+// can also return an expression list, i.e., more than one value
 proc tworeturn ()
 @{ return (1,2); @}
 int i,j = tworeturn();
@@ -6455,7 +6476,9 @@ See
 @code{while (}boolean_expression@code{)} block
 @item @strong{Purpose:}
 repetitive, conditional execution of block.
-@*The command @code{break} leaves the innermost @code{while}
+@*The boolean_expression is evaluated and if its value is TRUE, the
+block gets executed. This is repeated until boolean_expression evaluates
+to FALSE.  The command @code{break} leaves the innermost @code{while}
 construct.
 @item @strong{Example:}
 @smallexample
@@ -6476,7 +6499,10 @@ while (1)
 @end smallexample
 @end table
 @c ref
-See @ref{Control structures}; @ref{boolean expressions}; @ref{break}.
+See
+@ref{Control structures};
+@ref{boolean expressions};
+@ref{break}.
 @c ref
 
 @c ---------------------------------------
@@ -6514,7 +6540,8 @@ i;
 @end smallexample
 @end table
 @c ref
-See @ref{Break points}.
+See
+@ref{Break points}.
 @c ref
 
 @c ---------------------------------------
@@ -6598,7 +6625,8 @@ degBound = 0; //resets degree bound to infinity
 See also
 @ref{deg};
 @ref{int};
-@ref{option}.
+@ref{option};
+@ref{std}.
 @c ref
 @c -----------------------------------------------------
 @node echo, minpoly, degBound, System variables
@@ -6609,8 +6637,8 @@ See also
 int
 @item @strong{Purpose:}
 input is echoed if @code{echo} >= @code{voice}.
-@*echo is a local setting for a procedure and defaulted to 0.
-@*echo does not affect the output of commands.
+@*@code{echo} is a local setting for a procedure and defaulted to 0.
+@*@code{echo} does not affect the output of commands.
 @item @strong{Example:}
 @c this example cannot be a computed one - echo interferes with -e
 @smallexample
@@ -6652,7 +6680,7 @@ function @code{factorize} (@pxref{factorize}).
   //(Q[i]/(i^2+1))[x,y,z]:
   ring Cxyz=(0,i),(x,y,z),dp;
   minpoly=i^2+1;
-  i2;
+  i2;  //this is a number, not a poly
 @c example
 @end smallexample
 @end table
@@ -6672,7 +6700,7 @@ int
 The standard basis computation is stopped if the ideal is
 zero-dimensional in a ring with local ordering
 and its multiplicity (@code{mult}) is lower than @code{multBound}.
-@*Reset this bound by setting @code{multBound} to 0
+@*Reset this bound by setting @code{multBound} to 0.
 @item @strong{Example:}
 @smallexample
 multBound = 20;
@@ -6688,7 +6716,8 @@ multBound = 0;  //disables multBound
 See
 @ref{int};
 @ref{mult};
-@ref{option}.
+@ref{option};
+@ref{std}.
 @c ref
 @c -----------------------------------------------------
 @node noether, printlevel, multBound, System variables
@@ -6702,7 +6731,7 @@ The standard basis computation in local rings
 cuts off  all monomials above
 (in the sense of the monomial ordering)
 the monomial @code{noether} during the computation.
-@*Reset @code{noether} by setting @code{noether} to 0
+@*Reset @code{noether} by setting @code{noether} to 0.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -6728,12 +6757,12 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-sets the debug level for dbprint.
+sets the debug level for @code{dbprint}.
 If @code{printlevel} >= @code{voice} then @code{dbprint} is equivalent to
 @code{print}, otherwise nothing is printed.
 @item @strong{Note:}
-@xref{Guidelines for writing a library}, for an smallexample how this is used
-for the display of comments while procedures are executed.
+@xref{Guidelines for writing a library}, for an small example how this
+is used for the display of comments while procedures are executed.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -6775,10 +6804,14 @@ that ring and overwrites the previous setting.
   2x2,x2;
   short = 0;
   2x2,x2;
-  short=save;//resets short to the previous value
+  short=save;  //resets short to the previous value
 @c example
 @end smallexample
 @end table
+@c ref
+See
+@ref{int}.
+@c ref
 @c -----------------------------------------------------
 @node timer, TRACE var, short, System variables
 @subsection timer
@@ -6850,6 +6883,8 @@ int
 @item @strong{Purpose:}
 sets level of debugging.
 @table @asis
+@item @code{TRACE=0}
+no debugging messages are printed.
 @item @code{TRACE=1}
 messages about entering and leaving of procedures are displayed.
 @item @code{TRACE=3}
@@ -6898,7 +6933,7 @@ int
 @item @strong{Purpose:}
 shows the nesting level of procedures.
 @item @strong{Note:}
-@xref{Guidelines for writing a library}, for an smallexample how this is used
+@xref{Guidelines for writing a library}, for an small example how this is used
 for the display of comments while procedures are executed.
 @item @strong{Example:}
 @smallexample
@@ -6908,7 +6943,8 @@ for the display of comments while procedures are executed.
 proc p
 @{
   voice;
-@}
+@};
+p();
 @expansion{} 2
 @end smallexample
 @end table
