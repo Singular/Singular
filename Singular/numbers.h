@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.19 2000-12-01 15:21:35 Singular Exp $ */
+/* $Id: numbers.h,v 1.20 2000-12-06 11:03:26 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -75,6 +75,6 @@ void nDBDummy1(number* d,char *f, int l);
 int  nGetChar();
 void nInitChar(ring r);
 void nKillChar(ring r);
-void nSetChar(ring r, BOOLEAN complete);
+void nSetChar(ring r);
 
 #endif

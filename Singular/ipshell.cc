@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.57 2000-10-19 15:00:13 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.58 2000-12-06 11:03:18 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -278,7 +278,7 @@ void killlocals(int v)
     if (((IDTYP(h)==QRING_CMD) || (IDTYP(h) == RING_CMD))
     && (IDRING(h)->idroot!=NULL))
     {
-      if (h!=currRingHdl) {changed=TRUE;rSetHdl(h,FALSE);}
+      if (h!=currRingHdl) {changed=TRUE;rSetHdl(h);}
       killlocals0(v,&(IDRING(h)->idroot));
     }
     h = IDNEXT(h);
@@ -292,7 +292,7 @@ void killlocals(int v)
     && (IDRING(h)->idroot!=NULL))
     {
       //Print("=====> Toplevel: ring %s, lev: %d:\n",IDID(h),IDLEV(h));
-      if (h!=currRingHdl) {changed=TRUE;rSetHdl(h,FALSE);}
+      if (h!=currRingHdl) {changed=TRUE;rSetHdl(h);}
       killlocals0(v,&(IDRING(h)->idroot));
     }
     if (IDTYP(h)==PACKAGE_CMD && (IDPACKAGE(h)->idroot!=NULL))
@@ -306,7 +306,7 @@ void killlocals(int v)
             && (IDRING(h0)->idroot!=NULL))
         {
           //Print("=====> '%s': ring %s, lev: %d:\n",IDID(h),IDID(h0),IDLEV(h0));
-          if (h0!=currRingHdl) {changed=TRUE;rSetHdl(h0,FALSE);}
+          if (h0!=currRingHdl) {changed=TRUE;rSetHdl(h0);}
           killlocals0(v,&(IDRING(h0)->idroot));
         }
         h0 = IDNEXT(h0);
@@ -320,7 +320,7 @@ void killlocals(int v)
   {
     currRing=NULL;
     currRingHdl=NULL;
-    if (sh!=NULL) rSetHdl(sh,TRUE);
+    if (sh!=NULL) rSetHdl(sh);
   }
 
   if (myynest<=1) iiNoKeepRing=TRUE;

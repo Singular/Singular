@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.79 2000-12-04 14:33:49 Singular Exp $ */
+/* $Id: iplib.cc,v 1.80 2000-12-06 11:03:16 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -482,7 +482,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     }
     if (iiLocalRing[myynest]!=NULL)
     {
-      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL),TRUE);
+      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL));
       iiLocalRing[myynest]=NULL;
       namespaceroot->next->currRing = NULL;
     }
@@ -509,7 +509,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     }
     if (NS_LRING!=NULL)
     {
-      rSetHdl(rFindHdl(NS_LRING,NULL, NULL),TRUE);
+      rSetHdl(rFindHdl(NS_LRING,NULL, NULL));
       NS_LRING=NULL;
     }
     else
@@ -581,7 +581,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   {
     if (iiLocalRing[myynest]!=NULL)
     {
-      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL),TRUE);
+      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL));
       iiLocalRing[myynest]=NULL;
     }
     else
@@ -595,7 +595,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   {
     if (NS_LRING!=NULL)
     {
-      rSetHdl(rFindHdl(NS_LRING,NULL, NULL),TRUE);
+      rSetHdl(rFindHdl(NS_LRING,NULL, NULL));
       NS_LRING=NULL;
     }
     else

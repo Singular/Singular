@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.59 2000-12-05 12:14:33 obachman Exp $ */
+/* $Id: ring.h,v 1.60 2000-12-06 11:03:29 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -15,8 +15,8 @@
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
 
 
-void   rChangeCurrRing(ring r, BOOLEAN complete = TRUE);
-void   rSetHdl(idhdl h, BOOLEAN complete = TRUE);
+void   rChangeCurrRing(ring r);
+void   rSetHdl(idhdl h);
 ring   rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl  rDefault(char *s);
 ring   rDefault(int ch, int N, char **n);

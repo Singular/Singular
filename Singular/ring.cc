@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.146 2000-11-25 13:02:09 Singular Exp $ */
+/* $Id: ring.cc,v 1.147 2000-12-06 11:03:27 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -83,7 +83,7 @@ static void rRightAdjustVarOffset(ring r);
 // global variables:
 // complete == FALSE : only delete operations are enabled
 // complete == TRUE  : full reset of all variables
-void rChangeCurrRing(ring r, BOOLEAN complete)
+void rChangeCurrRing(ring r)
 {
   /*------------ set global ring vars --------------------------------*/
   currRing = r;
@@ -91,32 +91,26 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
   if (r != NULL)
   {
     rTest(r);
-    if (complete)
-    {
-      /*------------ set global ring vars --------------------------------*/
-      currQuotient=r->qideal;
-      /*------------ set redTail, except reset by nSetChar or pSetGlobals */
-      test |= Sy_bit(OPT_REDTAIL);
-    }
+    /*------------ set global ring vars --------------------------------*/
+    currQuotient=r->qideal;
+    /*------------ set redTail, except reset by nSetChar or pSetGlobals */
+    test |= Sy_bit(OPT_REDTAIL);
 
     /*------------ global variables related to coefficients ------------*/
-    nSetChar(r, complete);
+    nSetChar(r);
 
     /*------------ global variables related to polys -------------------*/
-    pSetGlobals(r, complete);
+    pSetGlobals(r);
 
-    if (complete)
-    {
     /*------------ set naMinimalPoly -----------------------------------*/
-      if (r->minpoly!=NULL)
-      {
-        naMinimalPoly=((lnumber)r->minpoly)->z;
-      }
+    if (r->minpoly!=NULL)
+    {
+      naMinimalPoly=((lnumber)r->minpoly)->z;
     }
   }
 }
 
-void rSetHdl(idhdl h, BOOLEAN complete)
+void rSetHdl(idhdl h)
 {
   int i;
   ring rg = NULL;
@@ -128,7 +122,6 @@ void rSetHdl(idhdl h, BOOLEAN complete)
       omCheckAddr((ADDRESS)IDID(h));
     rTest(rg);
   }
-  else complete=FALSE;
 
   // clean up history
     if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
@@ -139,7 +132,7 @@ void rSetHdl(idhdl h, BOOLEAN complete)
     }
 
    /*------------ change the global ring -----------------------*/
-  rChangeCurrRing(rg,complete);
+  rChangeCurrRing(rg);
   currRingHdl = h;
 }
 
@@ -188,7 +181,7 @@ idhdl rDefault(char *s)
 
   /* complete ring intializations */
   rComplete(r);
-  rSetHdl(tmp,TRUE);
+  rSetHdl(tmp);
   return currRingHdl;
 }
 
@@ -1289,7 +1282,7 @@ int rSum(ring r1, ring r2, ring &sum)
       {
         if (r2->minpoly!=NULL)
         {
-          nSetChar(r1,TRUE);
+          nSetChar(r1);
           if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
               && naEqual(r1->minpoly,r2->minpoly))
           {
@@ -1297,11 +1290,11 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.minpoly=naCopy(r1->minpoly);
             tmpR.P=1;
-            nSetChar(currRing,TRUE);
+            nSetChar(currRing);
           }
           else
           {
-            nSetChar(currRing,TRUE);
+            nSetChar(currRing);
             WerrorS("different minpolys");
             return -1;
           }
@@ -1314,9 +1307,9 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.parameter=(char **)omAlloc0Bin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
-            nSetChar(r1,TRUE);
+            nSetChar(r1);
             tmpR.minpoly=naCopy(r1->minpoly);
-            nSetChar(currRing,TRUE);
+            nSetChar(currRing);
           }
           else
           {
@@ -1335,9 +1328,9 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
-            nSetChar(r2,TRUE);
+            nSetChar(r2);
             tmpR.minpoly=naCopy(r2->minpoly);
-            nSetChar(currRing,TRUE);
+            nSetChar(currRing);
           }
           else
           {
@@ -1389,9 +1382,9 @@ int rSum(ring r1, ring r2, ring &sum)
         memcpy(tmpR.parameter,r1->parameter,rPar(r1)*sizeof(char_ptr));
         if (r1->minpoly!=NULL)
         {
-          nSetChar(r1,TRUE);
+          nSetChar(r1);
           tmpR.minpoly=naCopy(r1->minpoly);
-          nSetChar(currRing,TRUE);
+          nSetChar(currRing);
         }
       }
       else  /* R, Q(a),Z/q,Z/p(a),GF(p,n) */
@@ -1415,9 +1408,9 @@ int rSum(ring r1, ring r2, ring &sum)
         memcpy(tmpR.parameter,r2->parameter,rPar(r2)*sizeof(char_ptr));
         if (r2->minpoly!=NULL)
         {
-          nSetChar(r1,TRUE);
+          nSetChar(r1);
           tmpR.minpoly=naCopy(r2->minpoly);
-          nSetChar(currRing,TRUE);
+          nSetChar(currRing);
         }
       }
       else if (r2->ch>1) /* Z/p,GF(p,n) */
@@ -1450,9 +1443,9 @@ int rSum(ring r1, ring r2, ring &sum)
         }
         if (r1->minpoly!=NULL)
         {
-          nSetChar(r1,TRUE);
+          nSetChar(r1);
           tmpR.minpoly=naCopy(r1->minpoly);
-          nSetChar(currRing,TRUE);
+          nSetChar(currRing);
         }
       }
       else  /* R, Z/p,GF(p,n) */
@@ -1479,9 +1472,9 @@ int rSum(ring r1, ring r2, ring &sum)
         }
         if (r2->minpoly!=NULL)
         {
-          nSetChar(r2,TRUE);
+          nSetChar(r2);
           tmpR.minpoly=naCopy(r2->minpoly);
-          nSetChar(currRing,TRUE);
+          nSetChar(currRing);
         }
       }
       else
@@ -3456,7 +3449,7 @@ ring rCurrRingAssure_SyzComp()
   if (r != currRing)
   {
     ring old_ring = currRing;
-    rChangeCurrRing(r, TRUE);
+    rChangeCurrRing(r);
     if (old_ring->qideal != NULL)
     {
       r->qideal = idrCopyR_NoSort(old_ring->qideal, old_ring);
@@ -3542,7 +3535,7 @@ ring rCurrRingAssure_CompLastBlock()
   if (currRing != new_r)
   {
     ring old_r = currRing;
-    rChangeCurrRing(new_r, TRUE);
+    rChangeCurrRing(new_r);
     if (old_r->qideal != NULL)
     {
       new_r->qideal = idrCopyR(old_r->qideal, old_r);
@@ -3562,7 +3555,7 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
     ring old_r = currRing;
     if (new_r_1 != new_r && new_r_1 != old_r) rDelete(new_r_1);
     rComplete(new_r, 1);
-    rChangeCurrRing(new_r, TRUE);
+    rChangeCurrRing(new_r);
     if (old_r->qideal != NULL)
     {
       new_r->qideal = idrCopyR(old_r->qideal, old_r);
@@ -3608,7 +3601,7 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
   // HANNES: This sould be set in rComplete
   res->OrdSgn = 1;
   rComplete(res, 1);
-  rChangeCurrRing(res, TRUE);
+  rChangeCurrRing(res);
   return res;
 }
 

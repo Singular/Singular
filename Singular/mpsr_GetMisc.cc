@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.22 2000-12-05 11:15:09 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.23 2000-12-06 11:03:22 Singular Exp $ */
 
 /***************************************************************
  *
@@ -320,7 +320,7 @@ void mpsr_SetCurrRingHdl(mpsr_leftv mlv)
     // this does nothing on !PDEBUG
     p_SetRingOfLeftv(mlv->lv, IDRING(rh));
 
-    rSetHdl(rh, TRUE);
+    rSetHdl(rh);
 
     if (currRing != r)
     {
@@ -335,7 +335,7 @@ void mpsr_SetCurrRingHdl(mpsr_leftv mlv)
                         (void *) r, GenerateRingName());
     // reset currRing for reasons explained above
     if (currRingHdl != NULL) mpsr_SetCurrRing(IDRING(currRingHdl), TRUE);
-    rSetHdl(rh, TRUE);
+    rSetHdl(rh);
     rh->next = IDROOT;
     IDROOT = rh;
     r->ref = 0;

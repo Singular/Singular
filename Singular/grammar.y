@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.86 2000-11-14 16:08:23 Singular Exp $ */
+/* $Id: grammar.y,v 1.87 2000-12-06 11:03:10 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1441,7 +1441,7 @@ setringcmd:
                   YYERROR;
                 }
               }
-              if (h!=NULL) rSetHdl(h,TRUE);
+              if (h!=NULL) rSetHdl(h);
               else
               {
                 Werror("cannot find the name of the basering %s",n);

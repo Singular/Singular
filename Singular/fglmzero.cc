@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.30 2000-09-18 09:18:59 obachman Exp $
+// $Id: fglmzero.cc,v 1.31 2000-12-06 11:03:09 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -1136,18 +1136,18 @@ fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & d
     BOOLEAN fglmok;
 
     if ( currRingHdl != sourceRingHdl )
-        rSetHdl( sourceRingHdl, TRUE );
+        rSetHdl( sourceRingHdl );
     idealFunctionals L( 100, pVariables );
     fglmok = CalculateFunctionals( sourceIdeal, L );
     if ( deleteIdeal == TRUE )
         idDelete( & sourceIdeal );
-    rSetHdl( destRingHdl, TRUE );
+    rSetHdl( destRingHdl );
     if ( fglmok == TRUE ) {
         L.map( IDRING( sourceRingHdl ) );
         destIdeal= GroebnerViaFunctionals( L );
     }
     if ( (switchBack == TRUE) && (currRingHdl != initialRingHdl) )
-        rSetHdl( initialRingHdl, TRUE );
+        rSetHdl( initialRingHdl );
     return fglmok;
 }
 

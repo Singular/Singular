@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.16 2000-12-05 11:15:09 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.17 2000-12-06 11:03:26 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -444,4 +444,3 @@ void p_SetRingOfLeftv(leftv l, ring r)
 #endif // PDEBUG
 
 #endif // PDEBUG_CC
-

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.115 2000-12-05 09:05:58 Singular Exp $ */
+/* $Id: ideals.cc,v 1.116 2000-12-06 11:03:10 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1113,7 +1113,7 @@ ideal idSect (ideal h1,ideal h2)
   idDelete(&temp);
 
   if(syz_ring!=orig_ring)
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
 
   result = idInit(IDELEMS(temp1),rank);
   j = 0;
@@ -1141,9 +1141,9 @@ ideal idSect (ideal h1,ideal h2)
   }
   if(syz_ring!=orig_ring)
   {
-    rChangeCurrRing(syz_ring,FALSE);
+    rChangeCurrRing(syz_ring);
     idDelete(&temp1);
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
     rKill(syz_ring);
   }
   else
@@ -1238,7 +1238,7 @@ ideal idMultSect(resolvente arg, int length)
   idDelete(&bigmat);
 
   if(syz_ring!=orig_ring)
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
 
   /* interprete result ----------------------------------------*/
   result = idInit(8,maxrk);
@@ -1263,11 +1263,11 @@ ideal idMultSect(resolvente arg, int length)
   }
   /* clean up ----------------------------------------------------*/
   if(syz_ring!=orig_ring)
-    rChangeCurrRing(syz_ring,FALSE);
+    rChangeCurrRing(syz_ring);
   idDelete(&tempstd);
   if(syz_ring!=orig_ring)
   {
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
     rKill(syz_ring);
   }
   idSkipZeroes(result);
@@ -1395,7 +1395,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     }
     idSkipZeroes(s_h3);
     s_h3->rank -= k;
-    rChangeCurrRing(orig_ring, TRUE);
+    rChangeCurrRing(orig_ring);
     s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
     rKill(syz_ring);
     idTest(s_h3);
@@ -1442,7 +1442,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     idDelete(&e);
     if (dp_C_ring != syz_ring)
     {
-      rChangeCurrRing(syz_ring, TRUE);
+      rChangeCurrRing(syz_ring);
       rKill(dp_C_ring);
     }
   }
@@ -1494,7 +1494,7 @@ ideal idXXX (ideal  h1, int k)
   {
     idDelete(&s_h1);
     idSkipZeroes(s_h3);
-    rChangeCurrRing(orig_ring, TRUE);
+    rChangeCurrRing(orig_ring);
     s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
     rKill(syz_ring);
     idTest(s_h3);
@@ -1570,7 +1570,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   if (syz_ring!=orig_ring)
   {
     idDelete(&s_h1);
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
   }
 
   idDelete((ideal*)ma);
@@ -1798,7 +1798,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
   if(syz_ring!=orig_ring)
   {
     idDelete(&s_mod);
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
     s_result = idrMoveR_NoSort(s_result, syz_ring);
     s_rest = idrMoveR_NoSort(s_rest, syz_ring);
     rKill(syz_ring);
@@ -2023,7 +2023,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   if(syz_ring!=orig_ring)
   {
 //    pDelete(&q);
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
     s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
     rKill(syz_ring);
   }
@@ -2296,7 +2296,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
 
   // change into the new ring
   //pChangeRing(pVariables,currRing->OrdSgn,ord,block0,block1,wv);
-  rChangeCurrRing(&tmpR, TRUE);
+  rChangeCurrRing(&tmpR);
   currRing = &tmpR;
   h = idInit(IDELEMS(h1),h1->rank);
   // fetch data from the old ring
@@ -2306,7 +2306,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   idDelete(&h);
 
   // go back to the original ring
-  rChangeCurrRing(origR,TRUE);
+  rChangeCurrRing(origR);
   i = IDELEMS(hh)-1;
   while ((i >= 0) && (hh->m[i] == NULL)) i--;
   j = -1;
@@ -2326,9 +2326,9 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       h3->m[j] = prCopyR( hh->m[k], &tmpR);
     }
   }
-  rChangeCurrRing(&tmpR, FALSE);
+  rChangeCurrRing(&tmpR);
   idDelete(&hh);
-  rChangeCurrRing(origR, TRUE);
+  rChangeCurrRing(origR);
   idSkipZeroes(h3);
   omFree((ADDRESS)wv[0]);
   omFreeSize((ADDRESS)wv,ordersize*sizeof(int**));
@@ -2915,7 +2915,7 @@ static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
   if (syz_ring!=orig_ring)
   {
     idDelete(&s_temp);
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
   }
 
   idDelete(&temp);
@@ -2923,9 +2923,9 @@ static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
 
   if (syz_ring!=orig_ring)
   {
-    rChangeCurrRing(syz_ring,FALSE);
+    rChangeCurrRing(syz_ring);
     idDelete(&s_temp1);
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
     rKill(syz_ring);
   }
 
@@ -3034,7 +3034,7 @@ ideal idModulo (ideal h2,ideal h1)
 
   if (syz_ring!=orig_ring)
   {
-    rChangeCurrRing(orig_ring,TRUE);
+    rChangeCurrRing(orig_ring);
     s_temp1 = idrMoveR_NoSort(s_temp1, syz_ring);
     rKill(syz_ring);
     // Hmm ... here seems to be a memory leak

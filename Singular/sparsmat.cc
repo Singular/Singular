@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.45 2000-11-28 11:50:56 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.46 2000-12-06 11:03:30 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -154,7 +154,7 @@ ideal smRingCopy(ideal I, ring *ri, sip_sring &tmpR)
     block1[1]=tmpR.N;
     tmpR.block1=block1;
     rComplete(&tmpR,1);
-    rChangeCurrRing(&tmpR,TRUE);
+    rChangeCurrRing(&tmpR);
     // fetch data from the old ring
     II=idInit(IDELEMS(I),I->rank);
     int k;
@@ -170,7 +170,7 @@ ideal smRingCopy(ideal I, ring *ri, sip_sring &tmpR)
 
 void smRingClean(ring origR, ip_sring &tmpR)
 {
-  rChangeCurrRing(origR,TRUE);
+  rChangeCurrRing(origR);
   rUnComplete(&tmpR);
   omFreeSize((ADDRESS)tmpR.order,3*sizeof(int));
   omFreeSize((ADDRESS)tmpR.block0,3*sizeof(int));
@@ -215,10 +215,10 @@ poly smCallDet(ideal I)
   delete det;
   if (origR!=NULL)
   {
-    rChangeCurrRing(origR,TRUE);
+    rChangeCurrRing(origR);
     save = res;
     res = prCopyR( save, &tmpR);
-    rChangeCurrRing(&tmpR,FALSE);
+    rChangeCurrRing(&tmpR);
     pDelete(&save);
     smRingClean(origR,tmpR);
   }
@@ -259,11 +259,11 @@ lists smCallBareiss(ideal I, int x, int y)
     delete bareiss;
     if (origR!=NULL)
     {
-      rChangeCurrRing(origR,TRUE);
+      rChangeCurrRing(origR);
       mm=idInit(IDELEMS(m),m->rank);
       int k;
       for (k=0;k<IDELEMS(m);k++) mm->m[k] = prCopyR( m->m[k], &tmpR);
-      rChangeCurrRing(&tmpR,FALSE);
+      rChangeCurrRing(&tmpR);
       idDelete(&m);
       smRingClean(origR,tmpR);
     }
@@ -307,11 +307,11 @@ lists smCallNewBareiss(ideal I, int x, int y)
     delete bareiss;
     if (origR!=NULL)
     {
-      rChangeCurrRing(origR,TRUE);
+      rChangeCurrRing(origR);
       mm=idInit(IDELEMS(m),m->rank);
       int k;
       for (k=0;k<IDELEMS(m);k++) mm->m[k] = prCopyR( m->m[k], &tmpR);
-      rChangeCurrRing(&tmpR,FALSE);
+      rChangeCurrRing(&tmpR);
       idDelete(&m);
       smRingClean(origR,tmpR);
     }
@@ -2342,11 +2342,11 @@ lists smCallSolv(ideal I)
   delete linsolv;
   if ((origR!=NULL) && (ss!=NULL))
   {
-    rChangeCurrRing(origR,TRUE);
+    rChangeCurrRing(origR);
     rr = idInit(IDELEMS(ss), 1);
     for (k=0;k<IDELEMS(ss);k++)
       rr->m[k] = prCopyR(ss->m[k], &tmpR);
-    rChangeCurrRing(&tmpR,FALSE);
+    rChangeCurrRing(&tmpR);
     idDelete(&ss);
     ss = rr;
   }

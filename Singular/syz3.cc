@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz3.cc,v 1.5 2000-09-18 09:19:37 obachman Exp $ */
+/* $Id: syz3.cc,v 1.6 2000-12-06 11:03:33 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1896,7 +1896,7 @@ syStrategy syKosz(ideal arg,int * length)
           }
           omFreeSize((ADDRESS)res,len*sizeof(ideal));
           idDelete(&initial);
-          rChangeCurrRing(syzstr->syRing, TRUE);
+          rChangeCurrRing(syzstr->syRing);
           rKill(dp_C_ring);
         }
 #endif
@@ -2016,7 +2016,7 @@ syStrategy syKosz(ideal arg,int * length)
   }
   if (origR!=syzstr->syRing)
   {
-    rChangeCurrRing(origR,TRUE);
+    rChangeCurrRing(origR);
     index = 0;
     while ((index<=*length) && (syzstr->fullres[index]!=NULL))
     {

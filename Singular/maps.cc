@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.29 2000-11-09 16:32:52 obachman Exp $ */
+/* $Id: maps.cc,v 1.30 2000-12-06 11:03:19 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -247,7 +247,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   rTest(&tmpR);
 
   // change to new ring
-  rChangeCurrRing(&tmpR, FALSE);
+  rChangeCurrRing(&tmpR);
   if (id==NULL)
     j = 0;
   else
@@ -292,7 +292,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   }
 
   // let's get back to the original ring
-  rChangeCurrRing(sourcering, FALSE);
+  rChangeCurrRing(sourcering);
   temp1 = idInit(5,1);
   j = 0;
   for (i=0;i<IDELEMS(temp2);i++)

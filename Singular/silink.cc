@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.36 2000-09-18 09:19:33 obachman Exp $ */
+/* $Id: silink.cc,v 1.37 2000-12-06 11:03:29 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -496,7 +496,7 @@ BOOLEAN slDumpAscii(si_link l)
 
   if (! status ) status = DumpAsciiMaps(fd, h, NULL);
 
-  if (currRingHdl != rh) rSetHdl(rh, TRUE);
+  if (currRingHdl != rh) rSetHdl(rh);
   fprintf(fd, "RETURN();\n");
   fflush(fd);
 
@@ -514,7 +514,7 @@ static BOOLEAN DumpAscii(FILE *fd, idhdl h)
   // need to set the ring before writing it, otherwise we get in
   // trouble with minpoly
   if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
-    rSetHdl(h, TRUE);
+    rSetHdl(h);
 
   if (DumpAsciiIdhdl(fd, h)) return TRUE;
 
@@ -544,7 +544,7 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
   else if (IDTYP(h) == MAP_CMD)
   {
     char *rhs;
-    rSetHdl(rhdl, TRUE);
+    rSetHdl(rhdl);
     rhs = h->String();
 
 #ifdef HAVE_NAMESPACES

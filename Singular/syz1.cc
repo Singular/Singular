@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.68 2000-11-14 16:05:02 obachman Exp $ */
+/* $Id: syz1.cc,v 1.69 2000-12-06 11:03:31 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1652,7 +1652,7 @@ void syKillComputation(syStrategy syzstr)
     ring origR = currRing;
 
     if ((syzstr->syRing != NULL) && (syzstr->syRing != origR))
-      rChangeCurrRing(syzstr->syRing, FALSE);
+      rChangeCurrRing(syzstr->syRing);
 
     if (syzstr->resPairs!=NULL)
     {
@@ -1741,7 +1741,7 @@ void syKillComputation(syStrategy syzstr)
       delete syzstr->Tl;
     if ((syzstr->syRing != NULL) && (syzstr->syRing != origR))
     {
-      rChangeCurrRing(origR, FALSE);
+      rChangeCurrRing(origR);
       rKill(syzstr->syRing);
     }
     omFreeSize((ADDRESS)syzstr, sizeof(ssyStrategy));
@@ -2558,7 +2558,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
   int * ord,*b0,*b1;
 
   assume(syzstr->syRing != NULL);
-  rChangeCurrRing(syzstr->syRing, TRUE);
+  rChangeCurrRing(syzstr->syRing);
 //Print("laeufts ");
   syzstr->bucket = kBucketCreate();
   for (index=syzstr->length-1;index>0;index--)
@@ -2607,7 +2607,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
   kBucketDestroy(&syzstr->bucket);
   if (syzstr->syRing != NULL)
   {
-    rChangeCurrRing(origR,TRUE);
+    rChangeCurrRing(origR);
     // Thomas: now make sure that all data which you need is pFetchCopied
     // maybe incoporate it into syReorder ??
   }
@@ -2756,7 +2756,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   if (temp!=NULL) idDelete(&temp);
   kBucketDestroy(&(syzstr->bucket));
   if (origR != syzstr->syRing)
-    rChangeCurrRing(origR,TRUE);
+    rChangeCurrRing(origR);
   pDeleteLm(&redpol);
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.13 2000-09-18 09:18:59 obachman Exp $ */
+/* $Id: gnumpc.cc,v 1.14 2000-12-06 11:03:09 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -13,7 +13,6 @@
 #include "febase.h"
 #include "omalloc.h"
 #include "numbers.h"
-#include "modulop.h"
 #include "longrat.h"
 
 #include "gnumpc.h"

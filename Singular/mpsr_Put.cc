@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.23 2000-12-05 11:15:09 obachman Exp $ */
+/* $Id: mpsr_Put.cc,v 1.24 2000-12-06 11:03:22 Singular Exp $ */
 
 /***************************************************************
  *
@@ -615,7 +615,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
         }
         else
         {
-          rSetHdl(h, TRUE);
+          rSetHdl(h);
           r = IDRING(h);
           h2 = r->idroot;
         }
@@ -658,7 +658,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
   }
   MP_EndMsg(link);
   omFreeBin(lv, sleftv_bin);
-  if (rh != NULL && rh != currRingHdl) rSetHdl(rh, TRUE);
+  if (rh != NULL && rh != currRingHdl) rSetHdl(rh);
 
   if (h == NULL && h2 == NULL)
     return mpsr_Success;

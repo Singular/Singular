@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.29 2000-12-01 15:41:31 Singular Exp $ */
+/* $Id: numbers.cc,v 1.30 2000-12-06 11:03:24 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -95,14 +95,11 @@ number ndCopy(number a) { return a; }
 * init operations for characteristic c (complete==TRUE)
 * init nDelete    for characteristic c (complete==FALSE)
 */
-void nSetChar(ring r, BOOLEAN complete)
+void nSetChar(ring r)
 {
   int c=rInternalChar(r);
 
-  if (complete)
-  {
-    nChar=c;
-  }
+  nChar=c;
 #ifdef LDEBUG
   nDBDelete= r->cf->nDBDelete;
 #else
@@ -110,37 +107,25 @@ void nSetChar(ring r, BOOLEAN complete)
 #endif
   if (rField_is_Extension(r))
   {
-    naSetChar(c,complete,r);
-    if (complete)
-    {
-      test |= Sy_bit(OPT_INTSTRATEGY); /*intStrategy*/
-      test &= ~Sy_bit(OPT_REDTAIL); /*noredTail*/
-    }
+    naSetChar(c,TRUE,r);
+    test |= Sy_bit(OPT_INTSTRATEGY); /*intStrategy*/
+    test &= ~Sy_bit(OPT_REDTAIL); /*noredTail*/
   }
   else if (rField_is_Q(r))
   {
-    if (complete)
-    {
-      test |= Sy_bit(OPT_INTSTRATEGY); /*26*/
-    }
+    test |= Sy_bit(OPT_INTSTRATEGY); /*26*/
   }
   else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
-    if (complete)
-    {
-      npSetChar(c, r);
-      test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
-    }
+    npSetChar(c, r);
+    test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
   }
   /* -------------- GF(p^m) -----------------------*/
   else if (rField_is_GF(r))
   {
-    if (complete)
-    {
-      test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
-      nfSetChar(c,r->parameter);
-    }
+    test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
+    nfSetChar(c,r->parameter);
   }
   /* -------------- R -----------------------*/
   //if (c==(-1))
@@ -163,44 +148,41 @@ void nSetChar(ring r, BOOLEAN complete)
     WerrorS("unknown field");
   }
 #endif
-  if(complete)
-  {
-    nNew   = r->cf->nNew;
-    nNormalize=r->cf->nNormalize;
-    nInit  = r->cf->nInit;
-    nPar   = r->cf->nPar;
-    nParDeg= r->cf->nParDeg;
-    nInt   = r->cf->nInt;
-    nAdd   = r->cf->nAdd;
-    nSub   = r->cf->nSub;
-    nMult  = r->cf->nMult;
-    nDiv   = r->cf->nDiv;
-    nExactDiv= r->cf->nExactDiv;
-    nIntDiv= r->cf->nIntDiv;
-    nIntMod= r->cf->nIntMod;
-    nNeg   = r->cf->nNeg;
-    nInvers= r->cf->nInvers;
-    nCopy  = r->cf->nCopy;
-    nGreater = r->cf->nGreater;
-    nEqual = r->cf->nEqual;
-    nIsZero = r->cf->nIsZero;
-    nIsOne = r->cf->nIsOne;
-    nIsMOne = r->cf->nIsMOne;
-    nGreaterZero = r->cf->nGreaterZero;
-    nWrite = r->cf->nWrite;
-    nRead = r->cf->nRead;
-    nPower = r->cf->nPower;
-    nGcd  = r->cf->nGcd;
-    nLcm  = r->cf->nLcm;
-    nSetMap = r->cf->nSetMap;
-    nName= r->cf->nName;
-    nSize  = r->cf->nSize;
-    nGetDenom = r->cf->nGetDenom;
+  nNew   = r->cf->nNew;
+  nNormalize=r->cf->nNormalize;
+  nInit  = r->cf->nInit;
+  nPar   = r->cf->nPar;
+  nParDeg= r->cf->nParDeg;
+  nInt   = r->cf->nInt;
+  nAdd   = r->cf->nAdd;
+  nSub   = r->cf->nSub;
+  nMult  = r->cf->nMult;
+  nDiv   = r->cf->nDiv;
+  nExactDiv= r->cf->nExactDiv;
+  nIntDiv= r->cf->nIntDiv;
+  nIntMod= r->cf->nIntMod;
+  nNeg   = r->cf->nNeg;
+  nInvers= r->cf->nInvers;
+  nCopy  = r->cf->nCopy;
+  nGreater = r->cf->nGreater;
+  nEqual = r->cf->nEqual;
+  nIsZero = r->cf->nIsZero;
+  nIsOne = r->cf->nIsOne;
+  nIsMOne = r->cf->nIsMOne;
+  nGreaterZero = r->cf->nGreaterZero;
+  nWrite = r->cf->nWrite;
+  nRead = r->cf->nRead;
+  nPower = r->cf->nPower;
+  nGcd  = r->cf->nGcd;
+  nLcm  = r->cf->nLcm;
+  nSetMap = r->cf->nSetMap;
+  nName= r->cf->nName;
+  nSize  = r->cf->nSize;
+  nGetDenom = r->cf->nGetDenom;
 #ifdef LDEBUG
-    nDBTest=r->cf->nDBTest;
+  nDBTest=r->cf->nDBTest;
 #endif
-    if (!errorreported) nNULL=r->cf->nNULL;
-  }
+  if (!errorreported) nNULL=r->cf->nNULL;
 }
 
 /*2

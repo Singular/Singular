@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.52 2000-10-30 13:40:24 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.53 2000-12-06 11:03:27 Singular Exp $ */
 
 /***************************************************************
  *
@@ -50,9 +50,9 @@ int pDBsyzComp=0;
 void ppDelete(poly* p, ring rg)
 {
   ring origRing = currRing;
-  rChangeCurrRing(rg, FALSE);
+  rChangeCurrRing(rg);
   pDelete(p);
-  rChangeCurrRing(origRing, FALSE);
+  rChangeCurrRing(origRing);
 }
 
 

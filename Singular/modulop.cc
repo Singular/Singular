@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.21 2000-11-25 20:30:19 obachman Exp $ */
+/* $Id: modulop.cc,v 1.22 2000-12-06 11:03:20 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -211,52 +211,28 @@ char * npRead (char *s, number *a)
 
 void npSetChar(int c, ring r)
 {
-  int i, w;
+//  int i, w;
 
-  if (c==npPrimeM) return;
-  if (npPrimeM > 1)
-  {
-    omFreeSize( (ADDRESS)npExpTable,npPrimeM*sizeof(CARDINAL) );
-    omFreeSize( (ADDRESS)npLogTable,npPrimeM*sizeof(CARDINAL) );
-  }
+//  if (c==npPrimeM) return;
+//  if (npPrimeM > 1)
+//  {
+//    omFreeSize( (ADDRESS)npExpTable,npPrimeM*sizeof(CARDINAL) );
+//    omFreeSize( (ADDRESS)npLogTable,npPrimeM*sizeof(CARDINAL) );
+//  }
   if ((c>1) || (c<(-1)))
   {
     if (c>1) npPrimeM = c;
     else     npPrimeM = -c;
     npPminus1M = npPrimeM - 1;
-    npExpTable= (CARDINAL *)omAlloc( npPrimeM*sizeof(CARDINAL) );
-    npLogTable= (CARDINAL *)omAlloc( npPrimeM*sizeof(CARDINAL) );
-    omMarkAsStaticAddr(npExpTable);
-    omMarkAsStaticAddr(npLogTable);
-    npExpTable[0] = 1;
-    npLogTable[1] = 0;
-    if (npPrimeM > 2)
-    {
-      w = 1;
-      loop
-      {
-        npLogTable[1] = 0;
-        w++;
-        i = 0;
-        loop
-        {
-          i++;
-          npExpTable[i] = (int)(((long)w * (long)npExpTable[i-1]) % npPrimeM);
-          npLogTable[npExpTable[i]] = i;
-          if (/*(i == npPrimeM - 1 ) ||*/ (npExpTable[i] == 1))
-            break;
-        }
-        if (i == npPrimeM - 1)
-          break;
-      }
-      npGen=w;
-    }
-    else
-    {
-      npExpTable[1] = 1;
-      npGen=1;
-    }
-    // if (npGen != npExpTable[1]) Print("npGen wrong:%d, %d\n",npGen, npExpTable[1]);
+//    npExpTable= (CARDINAL *)omAlloc( npPrimeM*sizeof(CARDINAL) );
+//     npLogTable= (CARDINAL *)omAlloc( npPrimeM*sizeof(CARDINAL) );
+//     omMarkAsStaticAddr(npExpTable);
+//     omMarkAsStaticAddr(npLogTable);
+//     memcpy(npExpTable,r->cf->npExpTable,npPrimeM*sizeof(CARDINAL));
+//     memcpy(npLogTable,r->cf->npLogTable,npPrimeM*sizeof(CARDINAL));
+    npExpTable=r->cf->npExpTable;
+    npLogTable=r->cf->npLogTable;
+    npGen = npExpTable[1];
   }
   else
   {
@@ -272,17 +248,13 @@ void npInitChar(int c, ring r)
 
   if ((c>1) || (c<(-1)))
   {
-    // if (r->cf->npExpTable!=NULL)
-    //   Print("npExpTable!=NULL\n");
-    // if (r->cf->npLogTable!=NULL)
-    //   Print("npLogTable!=NULL\n");
     if (c>1) r->cf->npPrimeM = c;
     else     r->cf->npPrimeM = -c;
     r->cf->npPminus1M = r->cf->npPrimeM - 1;
     r->cf->npExpTable= (CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
     r->cf->npLogTable= (CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
     r->cf->npExpTable[0] = 1;
-    r->cf->npLogTable[1] = 0;
+    r->cf->npLogTable[0] = 0;
     if (r->cf->npPrimeM > 2)
     {
       w = 1;
@@ -307,6 +279,7 @@ void npInitChar(int c, ring r)
     else
     {
       r->cf->npExpTable[1] = 1;
+      r->cf->npLogTable[1] = 0;
     }
   }
   else

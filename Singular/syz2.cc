@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.19 2000-10-19 15:25:42 obachman Exp $ */
+/* $Id: syz2.cc,v 1.20 2000-12-06 11:03:32 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1083,7 +1083,7 @@ crit_fails = 0;
   kBucketDestroy(&(syzstr->bucket));
   kBucketDestroy(&(syzstr->syz_bucket));
   if (origR != syzstr->syRing)  
-    rChangeCurrRing(origR,TRUE);
+    rChangeCurrRing(origR);
   else
     currRing =  origR;
   if (TEST_OPT_PROT) PrintLn();

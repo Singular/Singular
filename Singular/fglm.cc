@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.22 2000-09-18 09:18:57 obachman Exp $
+// $Id: fglm.cc,v 1.23 2000-12-06 11:03:09 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -170,7 +170,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         }
         // both rings are qrings, now check if both quotients define the same ideal.
         // check if sring->qideal is contained in dring->qideal:
-        rSetHdl( dringHdl, TRUE );
+        rSetHdl( dringHdl );
         //nSetMap( rInternalChar(sring), sring->parameter, npar, sring->minpoly );
         nSetMap( sring );
         ideal sqind = idInit( IDELEMS( sring->qideal ), 1 );
@@ -183,7 +183,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         }
         idDelete( & sqind );
         idDelete( & sqindred );
-        rSetHdl( sringHdl, TRUE );
+        rSetHdl( sringHdl );
         if ( state != FglmOk ) return state;
         // check if dring->qideal is contained in sring->qideal:
         int * dsvperm = (int *)omAlloc0( (nvar+1)*sizeof( int ) );
@@ -263,7 +263,7 @@ fglmProc( leftv result, leftv first, leftv second )
     ring destRing = currRing;
     ideal destIdeal = NULL;
     idhdl sourceRingHdl = (idhdl)first->data;
-    rSetHdl( sourceRingHdl, TRUE );
+    rSetHdl( sourceRingHdl );
     ring sourceRing = currRing;
 
     int * vperm = (int *)omAlloc0( (pVariables+1)*sizeof( int ) );
@@ -288,7 +288,7 @@ fglmProc( leftv result, leftv first, leftv second )
         } else state= FglmNoIdeal;
     }
     if ( currRingHdl != destRingHdl )
-        rSetHdl( destRingHdl, TRUE );
+        rSetHdl( destRingHdl );
     switch (state) {
         case FglmOk:
             if ( currQuotient != NULL ) fglmUpdateresult( destIdeal );

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.28 2000-11-03 13:02:58 Singular Exp $
+// $Id: clapconv.cc,v 1.29 2000-12-06 11:03:08 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -15,9 +15,9 @@
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include "clapconv.h"
 #include "numbers.h"
+#include "modulop.h"
 #include "longalg.h"
 #include "polys.h"
-#include "modulop.h"
 #include "febase.h"
 #include "ipid.h"
 #include "ring.h"

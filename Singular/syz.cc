@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.39 2000-10-19 15:00:23 obachman Exp $ */
+/* $Id: syz.cc,v 1.40 2000-12-06 11:03:30 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -585,7 +585,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 /*--- going back to the original ring -------------------------*/
   if (origR != syz_ring)
   {
-    rChangeCurrRing(origR, TRUE);
+    rChangeCurrRing(origR);
     for (i=0; i<=syzIndex; i++)
     {
       res[i] = idrMoveR_NoSort(res[i], syz_ring);
