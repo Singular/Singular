@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.54 1999-12-08 21:49:16 obachman Exp $
+### $Id: Makefile.in,v 1.55 1999-12-14 15:58:50 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -207,18 +207,21 @@ standalone-txt:  ${STANDALONE_TXT_FILES}
 ###########################################################
 # html targets
 #
-html: ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${IMAGES_HTML} $(STANDALONE_TEXI_FILES)
+html: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${IMAGES_HTML} $(STANDALONE_TEXI_FILES)
 ${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex
 	${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
 # html stuff
-html_tutor: ${HTML_SUBDIR}/${HTML_TUTOR_TOP} ${IMAGES_HTML}
+html_tutor: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_TUTOR_TOP} ${IMAGES_HTML}
 ${HTML_SUBDIR}/${HTML_TUTOR_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} tutor.tex
 	${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_TUTOR_PREFIX} \
         -top_file ${HTML_TUTOR_TOP} tutor.tex
 
 ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx: ${HTML_SUBDIR}/${HTML_MANUAL_TOP}
+
+${TMP_DIR}:
+	${MKINSTALLDIRS} ${TMP_DIR}
 
 # pattern rules for images
 images/%.gif : images/%.gif.uu
