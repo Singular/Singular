@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.117 2003-05-30 09:59:59 mschulze Exp $
+@comment $Id: singular.doc,v 1.118 2004-04-30 10:26:29 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -162,7 +162,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @node PLURAL, Examples, Tricks and pitfalls, Top
 @chapter PLURAL
 @cindex PLURAL
-@include plural.tex
+@include s-plural.tex
 @end ifset
 
 @c ----------------------------------------------------------------------------
