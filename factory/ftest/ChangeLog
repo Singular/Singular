@@ -1,3 +1,7 @@
+Wed Mar 11 20:33:40 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* commonden.m4, norm.m4: new files
+
 Wed Feb 25 17:26:18 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* runfex (printData): arguments `$name' and `$note' re-added

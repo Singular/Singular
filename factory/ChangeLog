@@ -1,3 +1,63 @@
+Thu Mar 12 12:21:33 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_gcd.cc (maxnorm): function removed.  All references replaced
+	  by `maxNorm()'.
+
+	* fac_univar.cc (norm): function removed.  All references replaced
+	  by `euclideanNorm()'.
+
+	* fac_util.cc (maxCoeff): function removed.  Declarations
+	  adapted.  All references replaced by `maxNorm()'.
+
+	* cf_algorithm.cc (divides): slightly speeded up.
+
+	* canonicalform.h (sign): new function
+
+	* canonicalform.cc (blcm): new function.  Declaration added.
+
+Wed Mar 11 10:39:33 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_algorithm.cc (cden, common_den): renamed to
+	  `internalBCommonDen()' and `bCommonDen()', resp.  Declarations
+	  adapted. All references changed.
+
+	* cf_algorithm.h (abs): function `abs()' moved from
+	  `canonicalform.h' to `cf_algorithm.h'.  All referring files
+	  include `cf_algorithm.h'.
+
+	* cf_algorithm.cc (maxNorm, euclideanNorm): new functions.
+	  Declarations added.
+
+	* cf_algorithm.cc (internalBCommonDen): uses `blcm()' instead of
+	  `lcm()'
+
+	* GNUmakefile.in (ftestm4src): `norm.m4' and `commonden.m4' added
+	  to distribution
+
+	* templates/ftmpl_functions.h: doc checked
+
+	* templates/ftmpl_functions.h (tabs): new function
+
+	* ffops.cc (ff_setprime): uses `memset()' to clear inversion
+	  table
+
+Tue Mar 10 15:44:06 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* factory.template, ftmpl_inst.cc, templates/ftmpl_array.cc,
+	  templates/ftmpl_factor.cc, templates/ftmpl_list.cc,
+	  templates/ftmp_matrix.cc: #include directives for mac fixed
+
+	* ftmpl_array.h, ftmpl_factor.h, ftmpl_functions.h, ftmpl_list.h,
+	  ftmpl_matrix.h: new files.  #include of `templates/ftmpl_xxx.h'
+	  changed to include of `ftmpl_xxx.h'.
+	* GNUmakefile.in (basefactoryincl): new header files added to
+	  distribution
+
+Fri Feb 20 17:41:23 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (installcf, installmem): `ranlib' libraries after
+	  installing them for SUN machines
+
 Mon Feb  9 15:57:07 1998  Ruediger Stobbe  <rstobbe@de.oracle.com>
 
 	* cf_factor.cc (factorize): factorize now handles characteristic
