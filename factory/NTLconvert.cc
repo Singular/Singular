@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.8 2003-04-01 15:26:08 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.9 2003-04-01 17:04:37 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -16,7 +16,7 @@
 #include "cf_algorithm.h"
 
 #ifdef HAVE_NTL
-
+#include <string.h>
 #include <NTL/ZZXFactoring.h>
 #include <NTL/ZZ_pXFactoring.h>
 #include <NTL/GF2XFactoring.h>
