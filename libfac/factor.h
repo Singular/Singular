@@ -17,6 +17,7 @@ extern const char * libfac_author;
 
 //// Note: second argument for Factorize is for internal use only.
 CFFList Factorize( const CanonicalForm & F, int is_SqrFree=0 ) ;
+CFFList Factorize( const CanonicalForm & F, Variable mipo, int is_SqrFree=0 ) ;
 CFFList newfactoras( const CanonicalForm & f, const CFList & as, int success);
 
 //// Note: InternalSqrFree does only the work needed for factorization.

@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.11 2001-08-22 14:21:16 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.12 2002-07-30 15:10:22 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -462,7 +462,9 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
       if ( degree(Extension) == 0   )
         unilist = factorize(g,1); // poly is sqr-free!
       else
+      {
         unilist = factorize(g,Extension);
+      }	
       if (unilist.length() <= minfactors ) {
         minfactors=unilist.length();
         minEvaluation=Substitutionlist;
@@ -724,6 +726,7 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
 // Option of * choosing a  main variable (n.y.i.)            //
 //           * choosing an algebraic extension (n.y.u.)      //
 //           * ensuring poly is sqrfree (n.y.i.)             //
+// use Factorize(F,alpha,is_SqrFree) if not over Zp[x]/Q[x]  //
 ///////////////////////////////////////////////////////////////
 int find_mvar(const CanonicalForm &f);
 CFFList
@@ -731,7 +734,7 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
   CanonicalForm g=1,unit=1,r=1;
-  Variable minpoly; // reserved (-> Factorisation over algebraic Extensions)
+  Variable minpoly; // dummy
   int exp;
   CFMap m;
 
@@ -758,7 +761,7 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   TIMING_START(factorize_time);
   // search an "optimal" main variavble
   int mv=F.level();
-  if (! F.isUnivariate() )
+  if (mv != LEVELBASE && ! F.isUnivariate() )
   {
      mv=find_mvar(F);
      if (mv!=F.level())
@@ -862,8 +865,154 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   return Outputlist2;
 }
 
+///////////////////////////////////////////////////////////////
+// The user front-end for a uni/multivariate factorization   //
+// routine. F needs not to be SqrFree.                       //
+// Option of * choosing a  main variable (n.y.i.)            //
+//           * choosing an algebraic extension (n.y.u.)      //
+//           * ensuring poly is sqrfree (n.y.i.)             //
+///////////////////////////////////////////////////////////////
+CFFList
+Factorize(const CanonicalForm & F, Variable minpoly, int is_SqrFree ){
+  CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
+  ListIterator<CFFactor> i,j;
+  CanonicalForm g=1,unit=1,r=1;
+  //Variable minpoly; // reserved (-> Factorisation over algebraic Extensions)
+  int exp;
+  CFMap m;
+
+  // INTERRUPTHANDLER
+  if ( interrupt_handle() ) return CFFList() ;
+  // INTERRUPTHANDLER
+
+  DEBINCLEVEL(cout, "Factorize");
+  DEBOUTMSG(cout, rcsid);
+  DEBOUTLN(cout, "Called with F= ", F);
+  if ( getCharacteristic() == 0 ) { // char == 0
+    TIMING_START(factorize_time);
+    //cout << "Factoring in char=0 of " << F << " = " << Outputlist << endl;
+    Outputlist= factorize(F,minpoly);
+    // Factorization in char=0 doesn't sometimes return at least two elements!!!
+    if ( getNumVars(Outputlist.getFirst().factor()) != 0 )
+      Outputlist.insert(CFFactor(1,1));
+    //cout << "  Factorize in char=0: returning with: " << Outputlist << endl;
+    TIMING_END(factorize_time);
+    DEBDECLEVEL(cout, "Factorize");
+    TIMING_PRINT(factorize_time, "\ntime used for factorization   : ");
+    return Outputlist;
+  }
+  TIMING_START(factorize_time);
+  // search an "optimal" main variavble
+  int mv=F.level();
+  if (mv != LEVELBASE && ! F.isUnivariate() )
+  {
+     mv=find_mvar(F);
+     if (mv!=F.level())
+     {
+       swapvar(F,Variable(mv),F.mvar());
+     }
+  }
+
+  ///////
+  // Maybe it`s better to add a sqrfree-test before?
+  // (If gcd is fast...)
+  ///////
+  //  if ( ! SqrFreeTest(F) ){
+  if ( ! is_SqrFree ){
+    TIMING_START(sqrfree_time);
+    SqrFreeList = InternalSqrFree(F) ; // first sqrfree the polynomial
+    // don't use sqrFree(F), factory's internal sqrFree for multiv.
+    // Polynomials; it's wrong!! Ex.: char=p   f= x^p*(y+1);
+    // InternalSqrFree(f)= ( y+1, (x)^p ), sqrFree(f)= ( y+1 ) .
+    TIMING_END(sqrfree_time);
+
+    // INTERRUPTHANDLER
+    if ( interrupt_handle() ) return CFFList() ;
+    // INTERRUPTHANDLER
+
+  }
+  else
+    SqrFreeList.append(CFFactor(F,1));
+  DEBOUTLN(cout, "InternalSqrFreeList= ", SqrFreeList);
+  for ( i=SqrFreeList; i.hasItem(); i++ ){
+    DEBOUTLN(cout, "Factor under consideration: ", i.getItem().factor());
+    // We need a compress on each list item ! Maybe we have less variables!
+    g =compress(i.getItem().factor(),m);
+    exp = i.getItem().exp();
+    if ( getNumVars(g) ==0 ) // a constant; Exp==1
+      Outputlist.append( CFFactor(g,1) ) ;
+    else// a real polynomial
+      if ( g.isUnivariate() ){
+        Intermediatelist=factorize(g,minpoly); // poly is sqr-free!
+        for ( j=Intermediatelist; j.hasItem(); j++ )
+          //Normally j.getItem().exp() should be 1
+          Outputlist.append( CFFactor( m(j.getItem().factor()),exp*j.getItem().exp()));
+      }
+      else{ // multivariate polynomial
+        if ( is_homogeneous(g) ){
+          DEBOUTLN(cout, "Poly is homogeneous! : ", g);
+          // Now we can substitute one variable to 1, factorize and then
+          // look on the resulting factors and their monomials for
+          // backsubstitution of the substituted variable.
+          Intermediatelist = HomogFactor(g, minpoly, 0);
+        }
+        else // not homogeneous
+          Intermediatelist = Factorized(g, minpoly, 0);
+
+        // INTERRUPTHANDLER
+        if ( interrupt_handle() ) return CFFList() ;
+        // INTERRUPTHANDLER
+
+        for ( j=Intermediatelist; j.hasItem(); j++ )
+          //Normally j.getItem().exp() should be 1
+          Outputlist= myappend( Outputlist, CFFactor(m(j.getItem().factor()),exp*j.getItem().exp()));
+      }
+  }
+  g=1; unit=1;
+  DEBOUTLN(cout, "Outputlist is ", Outputlist);
+  for ( i=Outputlist; i.hasItem(); i++ )
+    if ( level(i.getItem().factor()) > 0 ){
+      unit = lc(i.getItem().factor());
+      if ( getNumVars(unit) == 0 ){ // a constant; possibly 1
+        Outputlist2.append(CFFactor(i.getItem().factor()/unit , i.getItem().exp()));
+        g *=power(i.getItem().factor()/unit,i.getItem().exp());
+      }
+      else{
+        Outputlist2.append(i.getItem());
+        g *=power(i.getItem().factor(),i.getItem().exp());
+      }
+    }
+
+  r=F/g;
+  Outputlist2.insert(CFFactor(r,1));
+
+  if ((mv!=F.level()) && (! F.isUnivariate() ))
+  {
+    CFFListIterator J=Outputlist2;
+    for ( ; J.hasItem(); J++)
+    {
+      swapvar(J.getItem().factor(),Variable(mv),F.mvar());
+    }
+    swapvar(F,Variable(mv),F.mvar());
+  }
+											 
+  DEBDECLEVEL(cout, "Factorize");
+  TIMING_END(factorize_time);
+
+  TIMING_PRINT(sqrfree_time, "\ntime used for sqrfree   : ");
+  TIMING_PRINT(discr_time, "time used for discriminante   : ");
+  TIMING_PRINT(evaluate_time, "time used for evaluation and univ. factorization  : ");
+  TIMING_PRINT(hensel_time, "time used for hensel-lift   : ");
+  TIMING_PRINT(truefactor_time, "time used for truefactors   : ");
+  TIMING_PRINT(factorize_time, "\ntime used for factorization   : ");
+  return Outputlist2;
+}
+
 /*
 $Log: not supported by cvs2svn $
+Revision 1.11  2001/08/22 14:21:16  Singular
+*hannes: added search for main var to Factorize
+
 Revision 1.10  2001/08/08 14:26:55  Singular
 *hannes: Dan's HAVE_SINGULAR_ERROR
 
