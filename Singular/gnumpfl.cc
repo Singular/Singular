@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.5 1999-07-02 14:28:52 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.6 1999-07-02 15:01:42 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -241,8 +241,8 @@ void ngfPower ( number x, int exp, number * u )
 {
   if ( exp == 0 )
   { 
-    nNew(u);
-    *(gmp_float*)u= (gmp_float)1.0;
+    gmp_float* n = new gmp_float(1);
+    *u=(number)n; 
     return;
   }
   if ( exp == 1 )
@@ -250,18 +250,23 @@ void ngfPower ( number x, int exp, number * u )
     nNew(u);
     if ( x == NULL )
     {
-      *(gmp_float*)(*u) = (gmp_float)0.0;
+      gmp_float* n = new gmp_float();
+      *u=(number)n;
     }
     else
     {
-      *(gmp_float*)(*u) = *(gmp_float*)x;
+      gmp_float* n = new gmp_float();
+      *n= *(gmp_float*)x;
+      *u=(number)n; 
     }
     return;
   }
 
   ngfPower(x,exp-1,u);
 
-  *(gmp_float*)(*u) *= *(gmp_float*)x;
+  gmp_float *n=new gmp_float();
+  *n=*(gmp_float*)x;
+  *(gmp_float*)(*u) *= *(gmp_float*)n;
 
 }
 
@@ -346,21 +351,15 @@ char * ngfEatFloatNExp( char * s )
 
   // eat floats (mantissa) like:
   //   0.394394993, 102.203003008,  .300303032
-  while ((*s >= '0' && *s <= '9')||(*s == '.'))
-  {
-    s++;
-  }
+  while ((*s >= '0' && *s <= '9')||(*s == '.')) s++;
+
   // eat the exponent, starts with 'e' followed by '+', '-'
-  // or no sign and digits, like:
-  //  e1322, e-202, e+393
-  if ( (s != start) && (*s == 'e') )
+  // and digits, like:
+  //   e-202, e+393
+  if ( (s != start) && (*s == 'e') && ((*(s+1) == '+') || (*(s+1) == '-')) )
   {
-    s++;
-    if ( (*s=='-') || (*s=='+') ) s++;
-    while ((*s >= '0' && *s <= '9'))
-    {
-      s++;
-    }
+    s=s+2; // eat e and sign
+    while ((*s >= '0' && *s <= '9')) s++;
   }
 
   return s;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.9 1999-07-02 14:28:53 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.10 1999-07-02 15:01:43 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -277,7 +277,7 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
 
   if ( strlen(in) == 0 )
   {
-    *size= 2*sizeof(char)+10;
+    *size= 2*sizeof(char);
     out= (char*)AllocL( *size );
     strcpy(out,"0");
     return out;
@@ -290,9 +290,9 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
     {
       int eexponent= (exponent >= 0) ? 0 : -exponent;
       int eeexponent= (exponent >= 0) ? exponent : 0;
-      *size= (strlen(in)+5+eexponent) * sizeof(char) + 10;
+      *size= (strlen(in)+15+eexponent) * sizeof(char);
       out= (char*)AllocL(*size);
-      memset(out,'\0',*size);
+      memset(out,0,*size);
 
       strcpy(out,csign);
       strncat(out,in+sign,eeexponent);
@@ -310,8 +310,9 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
     }
     else if ( exponent+sign > (int)strlen(in) )
     {
-      *size= (strlen(in)+exponent+2)*sizeof(char)+10;
+      *size= (strlen(in)+exponent+12)*sizeof(char);
       out= (char*)AllocL(*size);
+      memset(out,0,*size);
       sprintf(out,"%s%s",csign,in+sign);
       memset(out+strlen(out),'0',exponent-strlen(in)+sign);
     }
@@ -319,6 +320,7 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
     {
       *size= (strlen(in)+2) * sizeof(char) + 10;
       out= (char*)AllocL(*size);
+      memset(out,0,*size);
       sprintf(out,"%s%s",csign,in+sign);
     }
   }
@@ -334,6 +336,7 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
       }
       *size= (strlen(in)+12+c) * sizeof(char) + 10;
       out= (char*)AllocL(*size);
+      memset(out,0,*size);
       sprintf(out,"%s0.%se%d",csign,in+sign,(unsigned int)exponent);
 //      }
 //      else
@@ -503,7 +506,8 @@ char *complexToStr( const gmp_complex & c, const unsigned int oprec )
 
   if ( !c.imag().isZero() )
   {
-    in_real=floatToStr( c.real(), oprec );         // get real part
+
+      in_real=floatToStr( c.real(), oprec );         // get real part
     in_imag=floatToStr( abs(c.imag()), oprec );    // get imaginary part
 
     if (rField_is_long_C())
@@ -511,22 +515,29 @@ char *complexToStr( const gmp_complex & c, const unsigned int oprec )
       int len=(strlen(in_real)+strlen(in_imag)+5+strlen(currRing->parameter[0]))*sizeof(char);
       out=(char*)AllocL(len);
       memset(out,0,len);
-      sprintf(out,"%s%s%s*%s",in_real,c.imag().sign()>=0?"+":"-",currRing->parameter[0],in_imag);
+      if (  !c.real().isZero() ) 
+	sprintf(out,"(%s%s%s*%s)",in_real,c.imag().sign()>=0?"+":"-",currRing->parameter[0],in_imag);
+      else
+	sprintf(out,"(%s%s*%s)",c.imag().sign()>=0?"":"-",currRing->parameter[0],in_imag);
     }
     else
     {
       int len=(strlen(in_real)+strlen(in_imag)+8) * sizeof(char);
       out=(char*)AllocL( len );
       memset(out,0,len);
-      sprintf(out,"%s%s%s",in_real,c.imag().sign()>=0?" + I ":" - I ",in_imag);
+      if (  !c.real().isZero() ) 
+	sprintf(out,"(%s%s%s)",in_real,c.imag().sign()>=0?"+I*":"-I*",in_imag);
+      else
+	sprintf(out,"(%s%s)",c.imag().sign()>=0?"I*":"-I*",in_imag);
     }
     FreeL( (ADDRESS) in_real );
     FreeL( (ADDRESS) in_imag );
   }
-  else
+  else 
   {
     out= floatToStr( c.real(), oprec );
   }
+
   return out;
 }
 //<-
