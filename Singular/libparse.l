@@ -2,17 +2,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.50 2002-06-03 12:15:08 Singular Exp $ */
+/* $Id: libparse.l,v 1.51 2003-08-26 13:28:46 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "mod2.h"
 #ifdef STANDALONE_PARSER
   #include "utils.h"
   #define HAVE_LIBPARSER
   #define YYLPDEBUG 1
 #else
-  #include "mod2.h"
   #include "subexpr.h"
   #include "grammar.h"
   #include "ipshell.h"

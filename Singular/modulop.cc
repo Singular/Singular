@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.32 2003-06-20 14:40:38 Singular Exp $ */
+/* $Id: modulop.cc,v 1.33 2003-08-26 13:28:46 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -102,7 +102,11 @@ BOOLEAN npIsMOne (number a)
 
 #ifdef HAVE_DIV_MOD
 #if 1 //ifdef HAVE_NTL // in ntl.a
-extern void XGCD(long& d, long& s, long& t, long a, long b);
+//extern void XGCD(long& d, long& s, long& t, long a, long b);
+#include <NTL/ZZ.h>
+#ifdef NTL_CLIENT
+NTL_CLIENT
+#endif
 #else
 void XGCD(long& d, long& s, long& t, long a, long b)
 {

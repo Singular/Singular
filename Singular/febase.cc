@@ -1,14 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.98 2003-04-24 16:55:53 Singular Exp $ */
+/* $Id: febase.cc,v 1.99 2003-08-26 13:28:44 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
 
+#include "mod2.h"
+
 /* I need myfread in standalone_parser */
 #ifndef STANDALONE_PARSER
-#include "mod2.h"
 
 #include <stdlib.h>
 #include <stdio.h>
