@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.41 1999-10-18 11:19:26 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.42 1999-10-20 07:33:40 siebert Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1755,6 +1755,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 {
   ideal r=NULL;
   int Kstd1_OldDeg,i;
+  intvec* temp_w=NULL;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   BOOLEAN oldDegBound=TEST_OPT_DEGBOUND;
@@ -1769,6 +1770,11 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->LazyDegree = 1;
   strat->minim=(reduced % 2)+1;
   strat->ak = idRankFreeModule(F);
+  if (delete_w)
+  {
+    temp_w=new intvec((strat->ak)+1);
+    w = &temp_w;
+  }
   if ((h==testHomog)
   )
   {
@@ -1834,13 +1840,21 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   pLexOrder = b;
   HCord=strat->HCord;
-  if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+  if ((delete_w)&&(temp_w!=NULL)) delete temp_w;
   lists l=(lists)AllocSizeOf(slists);
   l->Init(2);
-  l->m[0].rtyp=IDEAL_CMD;
+  if (strat->ak==0)
+  {
+    l->m[0].rtyp=IDEAL_CMD;
+    l->m[1].rtyp=IDEAL_CMD;
+  }
+  else
+  {
+    l->m[0].rtyp=MODUL_CMD;
+    l->m[1].rtyp=MODUL_CMD;
+  }
   l->m[0].data=(void *)r;
   setFlag(&(l->m[0]),FLAG_STD);
-  l->m[1].rtyp=IDEAL_CMD;
   if (strat->M==NULL)
   {
     l->m[1].data=(void *)idInit(1,F->rank);
