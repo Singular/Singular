@@ -5,6 +5,7 @@ deform_l
 det_minor
 fetch_l
 fglm1_l
+fglmquot1_l
 finvar_l
 gcd0_l
 gcdp_l
@@ -22,6 +23,7 @@ mre
 mre_nonhom
 primdec_l
 primitiv_l
+res_bug
 res_l
 resultantp_l
 sing_l
