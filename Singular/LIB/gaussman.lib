@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.30 2001-02-02 16:38:28 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.31 2001-02-06 17:27:02 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -419,14 +419,7 @@ EXAMPLE:  example vfiltration; shows an example
           "//gaussman::vfiltration: compute basis of saturation");
         H=minbase(H0);
         int modH=maxorddif(H);
-        if(k<n)
-        {
-          K=modH+n+1;
-        }
-        else
-        {
-          K=modH+k+1;
-        }
+        K=modH+n+1;
         H0=freemodule(mu)*var(1)^k;
       }
     }
