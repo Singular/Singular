@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.h,v 1.5 2001-10-09 16:36:27 Singular Exp $ */
+/* $Id: walk.h,v 1.6 2002-04-26 15:55:54 Singular Exp $ */
 /*
 * ABSTRACT: Declaration of the Groebner walk
 */
@@ -9,7 +9,6 @@
 #ifndef WALK_H
 #define WALK_H
 
-#include "mod2.h"
 #include "structs.h"
 
 //////////////////////////////////////////////////////////////////////

@@ -6,12 +6,11 @@
  *  Purpose: declarations of link initialization functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: slInit.h,v 1.1 2000-12-12 08:44:54 obachman Exp $
+ *  Version: $Id: slInit.h,v 1.2 2002-04-26 15:56:18 Singular Exp $
  *******************************************************************/
 #ifndef SL_INIT_H
 #define SL_INIT_H
 
-#include "mod2.h"
 #include "silink.h"
 
 #ifdef HAVE_MPSR

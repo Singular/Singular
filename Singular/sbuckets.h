@@ -9,12 +9,11 @@
  *           use kbuckets, instead.
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.h,v 1.2 2001-10-09 16:36:21 Singular Exp $
+ *  Version: $Id: sbuckets.h,v 1.3 2002-04-26 15:54:46 Singular Exp $
  *******************************************************************/
 #ifndef S_BUCKETS_H
 #define S_BUCKETS_H
 
-#include "mod2.h"
 #include "structs.h"
 
 //////////////////////////////////////////////////////////////////////////

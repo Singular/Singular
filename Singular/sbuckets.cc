@@ -7,8 +7,10 @@
  *           a bucket sort
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.cc,v 1.2 2001-10-09 16:36:21 Singular Exp $
+ *  Version: $Id: sbuckets.cc,v 1.3 2002-04-26 15:54:46 Singular Exp $
  *******************************************************************/
+#include "mod2.h"
+
 #include "sbuckets.h"
 #include "omalloc.h"
 #include "ring.h"

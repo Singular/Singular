@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.9 2002-01-30 14:33:05 Singular Exp $
+ *  Version: $Id: pInline0.h,v 1.10 2002-04-26 15:55:11 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -17,7 +17,6 @@
 #define PINLINE0
 #endif
 
-#include "mod2.h"
 #include "p_polys.h"
 #include "ring.h"
 

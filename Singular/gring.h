@@ -3,12 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.8 2001-10-09 16:36:02 Singular Exp $ */
+/* $Id: gring.h,v 1.9 2002-04-26 15:49:59 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
 
-#include "mod2.h"
 #ifdef HAVE_PLURAL
 #include "structs.h"
 
