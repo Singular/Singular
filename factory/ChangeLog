@@ -1,3 +1,142 @@
+Mon Dec  8 18:56:39 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* INSTALL, README: doc fixes for the Windows NT port
+
+Thu Nov 27 21:00:00 1997  Ruediger Stobbe  <rstobbe@de.oracle.com>
+
+	* winnt: new directory containing configuration files for
+	  Microsoft Windows NT port using MS Visual C++ 5.0
+
+	* winnt/INSTALL.nt: new file that describes the make process on
+	  Windows NT
+
+	* winnt/nt.mak: Makefile for Windoes NT
+
+	* winnt/config.h: preconfigured file for Windows NT
+
+	* winnt/factoryconf.h: for the first time this file is a hand-made
+	  version of factoryconf.h for Windows NT
+
+	* winnt/factory.h: for the first time this file is a hand-made
+	  version of factory.h for Windows NT
+
+	* config.h.in: new typedef INT64 for 64 bit integer type of various
+	  platforms (currently 'long long int' for gcc and '__int64' for
+	  MS VC++)
+
+	* readcf.y: malloc.h and memory.h are included in the case of WINNT
+	  to have prototypes for alloca and memcpy
+
+	* ffops.h: now uses INT64 instead of long long int
+
+	* ffops.cc: now uses INT64 instead of long long int
+
+	* imm.h: now uses INT64 instead of long long int
+
+	* int_poly.cc: includes strstrea.h instead of strstream.h in the
+	  case of WINNT (a typical Microsoft 8.3 problem - its a pity)
+
+	* cf_random.cc: the way const data members were used was not
+          conforming to the C++ standard. Now there is a version of
+	  RandomGenerator that should run the same way on gcc as well as on
+	  CodeWarrior (mac) and MS VC++ (nt) and every other compiler
+	  conforming to the C++ standard
+
+	* fac_iterfor.cc: fixed assertion that refers to a variable that
+	  was not in the scope. Wondering why gcc compiled it
+
+	* fac_sqrfree.cc: isSqrFreeZ now returns a bool, as declared in
+	  the prototype. Again wondering about gcc's behaviour
+
+	* sm_sparsemod.cc: array declaration of varf, varg and schnitt on
+	  on the heap instead on the stack because the array size is not
+	  a constant. delete [] is called at a suitable place
+
+	* fac_cantzass.h: MS VC++ does not like a default value for a
+	  parameter that is a reference (in some sense this is good behaviour)
+	  Therefore there are now no default values for the parameter list
+	  of FpFactorizeUnivariateCZ
+
+	* fac_cantzass.cc: No reference parameters for FpFactorizeUnivariateCZ
+
+	* cf_factor.cc: FpFactorizeUnivariateCZ is called with full parameter
+	  list
+
+	* fac_univar.cc: FpFactorizeUnivariateCZ is called with full parameter
+	  list
+
+	* ftmpl_inst.cc: MS VC++ does not like to explicitly instantiate
+	  template functions - tmax and tmin are therefore not instatiated in
+	  the case of WINNT
+	  Anyway it is not clear if this file is needed when using MS VC++
+	  since the handling of templates in MS VC++ done in the spirit of
+	  AT&T's Cfront compilers which do a more automatic job
+
+	* templates/ftmpl_list.h: MS VC++ wants a forward declaration of
+	  template class List<T> and template class ListIterator<T>. This
+	  should be no problem for gcc
+
+	* timing.h: changes in the case of WINNT
+
+Fri Nov 21 15:25:27 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* canonicalform.h (class CanonicalForm): inline function hasGcd()
+	  removed.
+
+	* int_poly.cc (coeff): explicit cast to CanonicalForm added
+	  (coeff): cosmetic change
+
+	* int_rat.cc (comparecoeff): bug fix.  Did not calculate dummy
+	  correctly.
+	  (comparecoeff): assertion moved into if branch
+
+	* int_pp.cc (comparesame): assertion added
+
+	* int_int.cc (comparesame): assertion added
+
+	* int_cf.cc (coeff): explicit cast to CanonicalForm added
+
+	* int_cf.cc (comparecoeff): function made pure virtual.
+	  Declarations adapted.
+	* int_cf.h (class InternalCF): new pure virtual function
+	  comparecoeff()
+
+	* imm.h: doc fix
+
+	* GNUmakefile.in (ftestm4src): fbinops.m4 added to distribution
+
+Thu Nov 20 16:21:51 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* imm.h: functions rereordered
+
+Wed Nov 19 12:21:27 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* gfops.h: functions reordered
+
+	* imm.h (imm_sign): doc fix
+
+	* imm.h: functions reordered
+
+Thu Nov 13 09:10:53 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_chinese.cc (chineseRemainder): `const CF' in arguments
+	  changed to `const CF &'.  Declaration adapted.
+
+	* configure.in: doc fix
+
+	* GNUmakefile.in (ftestall): new target
+	  (.PHONY): dependencies `ftestall' `ftestclean' `ftestdistclean'
+	  added
+
+	* GNUmakefile.in (%.d): dependency generation uses temporary files
+	  (clean): removes these temporary files
+
+	* GNUmakefile.in ($(ftestexec)): dependecy `factoryconf.h' added
+
+Wed Nov 12 18:08:51 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in: check for `GetOpt.h' removed
+
 Thu Nov  6 16:43:17 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* configure.in: check for `libg++.a' commented out
