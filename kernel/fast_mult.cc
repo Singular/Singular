@@ -535,7 +535,9 @@ poly pFastPowerMC(poly f, int n, ring r){
   if(rChar(r)!=0)
     Werror("Char not 0, pFastPowerMC not implemented for this case");
   if (n<=1)
-    Werror("not implemented for so small n, recursion fails");
+    Werror("not implemented for so small n, recursion fails");//should be length(f)
+   if (pLength(f)<=1)
+    Werror("not implemented for so small lenght of f, recursion fails");
   //  number null_number=n_Init(0,r);
   number* facult=(number*) omalloc((n+1)*sizeof(number));
   facult[0]=n_Init(1,r);
