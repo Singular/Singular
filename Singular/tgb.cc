@@ -2088,8 +2088,8 @@ void simple_gauss(tgb_matrix* mat){
 static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, calc_dat* c){
   tgb_matrix* t=new tgb_matrix(p_index,done_index);
   int i, pos;
-  Print("\n 0:%s\n",pString(done[done_index-1]));
-  Print("\n 1:%s\n",pString(done[done_index-2]));
+  //  Print("\n 0:%s\n",pString(done[done_index-1]));
+  //Print("\n 1:%s\n",pString(done[done_index-2]));
   assume((!(pLmEqual(done[done_index-1],done[done_index-2]))));
 #ifdef TGB_DEGUG
   for(i=0;i<done_index;i++)
@@ -2479,23 +2479,30 @@ static void go_on_F4 (calc_dat* c){
       if (!(in_done))
       {
        
-	pos=kFindDivisibleByInS_easy(c->strat,m[i], pGetShortExpVector(m[i]));
-	if(pos>=0)
+	int S_pos=kFindDivisibleByInS_easy(c->strat,m[i], pGetShortExpVector(m[i]));
+	if(S_pos>=0)
 	{
 	  monom_poly h;
-	  h.f=c->strat->S[pos];
+	  h.f=c->strat->S[S_pos];
 	  h.m=pOne();
 	  int* ev=(int*) omalloc((c->r->N+1)*sizeof(int));
 	  pGetExpV(m[i],ev);
 	  pSetExpV(h.m,ev);
 	  omfree(ev);
-	  pExpVectorSub(h.m,c->strat->S[pos]);
+	  pExpVectorSub(h.m,c->strat->S[S_pos]);
 	  simplify(h,c);
 	  q[q_index]=ppMult_mm(h.f,h.m);
 	  chosen[chosen_index++]=h;
 	  q_index++;
 	}
 	pTest(m[i]);
+#ifdef TGB_DEBUG
+	{
+	  int my_i;
+	  for (my_i=0;my_i<done_index;my_i++)
+	    pTest(done[my_i]);
+	}
+#endif      
 	memmove(&(done[pos+1]),&(done[pos]), (done_index-pos)*sizeof(poly));
 	done[pos]=m[i];
 	done_index++;
@@ -2503,7 +2510,10 @@ static void go_on_F4 (calc_dat* c){
 	{
 	  int my_i;
 	  for (my_i=0;my_i<done_index;my_i++)
+	  {
+	    //	    Print("Position %i pos %i size %i\n",my_i,pos,done_index);
 	    pTest(done[my_i]);
+	  }
 	}
 #endif      
       }
