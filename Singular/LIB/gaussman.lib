@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.44 2001-05-31 12:10:45 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.45 2001-06-21 14:59:10 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -532,7 +532,7 @@ EXAMPLE:  example monodromy; shows examples
   {
     dbprint(printlevel-voice+2,"//gaussman::monodromy: mide="+string(mide));
 
-    matrix U=0;
+    U=0;
     A0=jet(A,0);
     for(i=ncols(e);i>=1;i--)
     {
@@ -546,13 +546,13 @@ EXAMPLE:  example monodromy; shows examples
       {
         if(ide[i]==0&&ide[j]>0)
         {
-          A[i,j]=A[i,j]*d;
+          A[i,j]=A[i,j]*s;
         }
         else
         {
           if(ide[i]>0&&ide[j]==0)
           {
-            A[i,j]=A[i,j]/d;
+            A[i,j]=A[i,j]/s;
           }
         }
       }
