@@ -1,4 +1,4 @@
-// $Id: sing.lib,v 1.7 1997-12-15 11:31:32 Singular Exp $
+// $Id: sing.lib,v 1.8 1998-01-28 18:47:59 Singular Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -254,7 +254,7 @@ EXAMPLE: example milnor; shows an example
   int l,q,m_nr;  ideal t;  intvec disc;
   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
 //---------------------------- hypersurface case ------------------------------
-  if( n==1 )
+  if( n==1 or i==0 )
   {
      i = std(jacob(i[1]));
      m_nr = vdim(i);
