@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.15 1998-11-12 14:44:37 siebert Exp $ */
+/* $Id: ipconv.cc,v 1.16 1999-01-22 18:23:21 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -152,7 +152,7 @@ static void * iiN2P(void *data)
   //else
   //{
   //  nDelete((number *)&data);
-  //}  
+  //}
   return (void *)p;
 }
 
@@ -168,7 +168,7 @@ static void * iiN2Ma(void *data)
   //else
   //{
   //  nDelete((number *)&data);
-  //}  
+  //}
   return (void *)I;
 }
 
@@ -289,31 +289,34 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       }
       else if ((input->rtyp==POLY_CMD) && (input->name==NULL))
       {
-        int nr=pIsPurePower((poly)input->data);
-        if (nr!=0)
+        if (input->data!=NULL)
         {
-          if (pGetExp((poly)input->data,nr)==1)
+          int nr=pIsPurePower((poly)input->data);
+          if (nr!=0)
           {
-            output->name=mstrdup(currRing->names[nr-1]);
+            if (pGetExp((poly)input->data,nr)==1)
+            {
+              output->name=mstrdup(currRing->names[nr-1]);
+            }
+            else
+            {
+              output->name=(char *)AllocL(4);
+              sprintf(output->name,"%c%d",*(currRing->names[nr-1]),
+              pGetExp((poly)input->data,nr));
+            }
           }
+          else if(pIsConstant((poly)input->data))
+          {
+            output->name=nName(pGetCoeff((poly)input->data));
+          }
+#ifdef TEST
           else
           {
-            output->name=(char *)AllocL(4);
-            sprintf(output->name,"%c%d",*(currRing->names[nr-1]),
-              pGetExp((poly)input->data,nr));
+            WerrorS("wrong name, should not happen");
+            output->name=mstrdup("?");
           }
-        }
-        else if(pIsConstant((poly)input->data))
-        {
-          output->name=nName(pGetCoeff((poly)input->data));
-        }
-#ifdef TEST
-        else
-        {
-          WerrorS("wrong name, should not happen");
-          output->name=mstrdup("?");
-        }
 #endif
+        }
       }
       else if ((input->rtyp==NUMBER_CMD) && (input->name==NULL))
       {
