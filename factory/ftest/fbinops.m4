@@ -1,12 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fbinops.m4,v 1.3 1997-12-17 12:16:40 schmidt Exp $ */
+/* $Id: fbinops.m4,v 1.4 1998-03-31 10:23:59 schmidt Exp $ */
 
 ftestSetNameOfGame( fbinops, `"
 Usage: fbinops [<options>] [<envSpec>] <f> <operator> <g>
   executes operator an canonical forms f, g.
 
   The following operators (with aliases) are recognized:
-  `+', `-', `*' (= `mul'), `/', `%': return a canonicalform;
+  `+', `-', `*' (= `mul'), `/', `div', `%', `mod': return a canonicalform;
   `==', `!=', `<' (= `lt'), `>' (= `gt'): return an integer (i.e. boolean)
 "'`' )
 
@@ -156,6 +156,39 @@ ftestArithTest( const CanonicalForm &, const CanonicalForm &, const CanonicalFor
 {
     return UndefinedResult;
 }
+
+static ftestStatusT
+ftestDivideTest( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & quot )
+{
+    if ( ! ((quot*g)+(f%g)-f).isZero() ) {
+	ftestError( CheckError, "f != (f/g)*g+(f%%g)\n" );
+	return Failed;
+    } else
+	return Passed;
+}
+
+static ftestStatusT
+ftestDivTest( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & quot )
+{
+    if ( ! (f%g).isZero() ) {
+	ftestError( CheckError, "g does not divide f\n" );
+	return Failed;
+    } else if ( f != (quot*g) ) {
+	ftestError( CheckError, "f != (div(f, g)*g)\n" );
+	return Failed;
+    } else
+	return Passed;
+}
+
+static ftestStatusT
+ftestModuloTest( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & rem )
+{
+    if ( ! (((f/g)*g)+(rem)-f).isZero() ) {
+	ftestError( CheckError, "f != (f/g)*g+(f%%g)\n" );
+	return Failed;
+    } else
+	return Passed;
+}
 //}}}
 
 //{{{ binOpCFSpecArray, binOpBoolSpecArray
@@ -170,8 +203,10 @@ binOpCFSpecT binOpCFSpecArray[] =
     { &operator-, ftestArithTest, "-", "f-g" },
     { &operator*, ftestArithTest, "*", "f*g" },
     { &operator*, ftestArithTest, "mul", "f*g" },
-    { &operator/, ftestArithTest, "/", "f/g" },
-    { &operator%, ftestArithTest, "%", "f%g" },
+    { &operator/, ftestDivideTest, "/", "f/g" },
+    { &div, ftestDivTest, "div", "div(f,g)" },
+    { &operator%, ftestModuloTest, "%", "f%g" },
+    { &mod, ftestModuloTest, "mod", "mod(f,g)" },
     { 0, 0, 0, 0 }
 };
 
