@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.97 1998-05-20 12:53:55 schmidt Exp $
+@comment $Id: general.doc,v 1.98 1998-05-21 11:41:52 krueger Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2131,7 +2131,7 @@ specifying the type of error and the line where it was detected.
 @example
 @c include bad_lib0.lib
 @c example
-  LIB"bad_lib0";
+  LIB"bad_lib0.lib";
 @c example
 @end example
 @end table
