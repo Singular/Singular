@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.109 2000-05-15 12:59:55 Singular Exp $
+@comment $Id: types.doc,v 1.110 2000-12-19 16:16:32 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2815,6 +2815,9 @@ expressions}.
 @item cleardenom
 cancel denominators of numbers in poly and divide it by its content
 (see @ref{cleardenom})
+@item impart
+imaginary part of a complex number, 0 otherwise
+(see @ref{impart}, @ref{repart})
 @item numerator, denominator
 return the numerator/denominator of a rational number 
 (see @ref{numerator}, @ref{denominator})
@@ -2826,6 +2829,9 @@ n-th parameter of the basering (see @ref{par})
 degree of a number in ring parameters (see @ref{pardeg})
 @item parstr
 string form of ring parameters (see @ref{parstr})
+@item repart
+real part of a complex number
+(see @ref{impart}, @ref{repart})
 @end table
 
 @c ---------------------------------------
