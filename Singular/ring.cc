@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.82 1999-11-15 17:20:44 obachman Exp $ */
+/* $Id: ring.cc,v 1.83 1999-11-17 10:51:02 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -79,12 +79,12 @@ static void rDelete(ring r);
 // complete == TRUE  : full reset of all variables
 void rChangeCurrRing(ring r, BOOLEAN complete)
 {
-  rTest(r);
   /*------------ set global ring vars --------------------------------*/
   currRing = r;
   currQuotient=NULL;
   if (r != NULL)
   {
+    rTest(r);
     if (complete)
     {
       /*------------ set global ring vars --------------------------------*/
@@ -893,7 +893,7 @@ void rKill(ring r)
       rChangeCurrRing((ring)r,FALSE);
       idDelete(&r->qideal);
       r->qideal=NULL;
-      rChangeCurrRing(savecurrRing,FALSE);
+      rChangeCurrRing(savecurrRing,TRUE);
     }
     int i=1;
     int j;
@@ -3336,11 +3336,15 @@ static ring rAssureSyzComp(ring r)
 }
   
 
-// use this fro global ordering consisting of two blocks
+// use this for global orderings consisting of two blocks
 static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
 {
   int r_blocks = rBlocks(currRing);
   int i;
+  
+  assume(b1 == ringorder_c || b1 == ringorder_C || 
+         b2 == ringorder_c || b1 == ringorder_C || 
+         b2 == ringorder_S);
   
   if (r_blocks == 2 && currRing->order[0] == b1 && currRing->order[2] == 0)
     return currRing;
@@ -3352,8 +3356,17 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
   res->wvhdl = (int**)Alloc0(3*sizeof(int*));
   res->order[0] = b1;
   res->order[1] = b2;
-  res->block0[0] = 1;
-  res->block1[0] = currRing->N;
+  if (b1 == ringorder_c || b1 == ringorder_C)
+  {
+    res->block0[1] = 1;
+    res->block1[1] = currRing->N;
+  }
+  else
+  {
+    res->block0[0] = 1;
+    res->block1[0] = currRing->N;
+  }
+  // HANNES: This sould be set in rComplete
   res->OrdSgn = 1;
   rComplete(res, 1);
   rChangeCurrRing(res, TRUE);
@@ -3370,6 +3383,12 @@ ring rCurrRingAssure_dp_C()
 {
   return rCurrRingAssure_Global(ringorder_dp, ringorder_C);
 }
+
+ring rCurrRingAssure_C_dp()
+{
+  return rCurrRingAssure_Global(ringorder_C, ringorder_dp);
+}
+
 
 void rSetSyzComp(int k)
 {

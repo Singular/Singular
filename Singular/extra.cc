@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.116 1999-11-16 12:39:26 obachman Exp $ */
+/* $Id: extra.cc,v 1.117 1999-11-17 10:51:04 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -50,6 +50,7 @@
 #include "sdb.h"
 #include "feOpt.h"
 #include "distrib.h"
+#include "prCopy.h"
 
 // Define to enable many more system commands
 #ifndef MAKE_DISTRIBUTION
@@ -1115,6 +1116,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== thomas =================*/
+    if (strcmp(sys_cmd, "thomas") == 0)
+    {
+      poly p = (poly) h->Data();
+      ring cr = currRing;
+      ring r = rCurrRingAssure_C_dp();
+      poly p_r = prCopyR(p, cr);
+      pTest(p_r);
+      pWrite(p_r);
+      rChangeCurrRing(cr, TRUE);
+      return FALSE;
+    }
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.40 1999-11-15 17:20:45 obachman Exp $ */
+/* $Id: ring.h,v 1.41 1999-11-17 10:51:04 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -194,6 +194,7 @@ ring   rCurrRingAssureSyzComp();
 void   rSetSyzComp(int k);
 ring   rCurrRingAssure_dp_S();
 ring   rCurrRingAssure_dp_C();
+ring   rCurrRingAssure_C_dp();
 // return the max-comonent wchich has syzIndex i
 // Assume: i<= syzIndex_limit
 int rGetMaxSyzComp(int i);
