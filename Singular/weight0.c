@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight0.c,v 1.3 1998-01-27 15:40:48 pohl Exp $ */
+/* $Id: weight0.c,v 1.4 1998-06-12 18:11:03 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -17,26 +17,29 @@ double wFunctionalMora(int *degw, int *lpol, int npol,
        double *rel, double wx);
 double wFunctionalBuch(int *degw, int *lpol, int npol,
        double *rel, double wx);
-double * wDouble(void *adr);       
 void wAdd(int *A, int mons, int kn, int xx);
 void wNorm(int *degw, int *lpol, int npol, double *rel);
 void wFirstSearch(int *A, int *x, int mons,
         int *lpol, int npol, double *rel, double *fopt);
 void wSecondSearch(int *A, int *x, int *lpol,
         int npol, int mons, double *rel, double *fk);
-void wGcd(int *x, int n);        
+void wGcd(int *x, int n);
 /*0 implementation*/
 
 short * ecartWeights=NULL;
 extern int pVariables;
 
+#ifdef ALIGN_8
+#define wDouble(A) ((double *)A)
+#else
 double * wDouble(void *adr)
 {
   long i = (long)adr;
   return (double *)((i+7)&(~7));
 }
+#endif
 
-double nsqr;
+double wNsqr;
 double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx);
 
@@ -57,7 +60,7 @@ double wFunctionalMora(int *degw, int *lpol, int npol,
   for (i = 0; i < npol; i++)
   {
     ecl = ecu = e1 = *ex++;
-    for (j = lpol[i] - 1; j; j--)
+    for (j = lpol[i] - 1; j!=0; j--)
     {
       ec = *ex++;
       if (ec > ecu)
@@ -81,7 +84,7 @@ double wFunctionalMora(int *degw, int *lpol, int npol,
     ghom *= (double)5.0;
     gecart *= ((double)5.0 - ghom);
   }
-  return (gfmax * gecart) / pow(wx, nsqr);
+  return (gfmax * gecart) / pow(wx, wNsqr);
 }
 
 
@@ -100,7 +103,7 @@ double wFunctionalBuch(int *degw, int *lpol, int npol,
   for (i = 0; i < npol; i++)
   {
     ecu = ecl = *ex++;
-    for (j = lpol[i] - 1; j; j--)
+    for (j = lpol[i] - 1; j!=0 ; j--)
     {
       ec = *ex++;
       if (ec < ecl)
@@ -115,7 +118,7 @@ double wFunctionalBuch(int *degw, int *lpol, int npol,
   }
   if (ghom > (double)0.5)
     gfmax *= ((double)1.0 - (ghom * ghom)) / (double)0.75;
-  return gfmax / pow(wx, nsqr);
+  return gfmax / pow(wx, wNsqr);
 }
 
 
@@ -125,14 +128,15 @@ static void wSub(int *A, int mons, int kn, int xx)
 
   B = A + ((kn - 1) * mons);
   ex = A + (pVariables * mons);
+  i = mons;
   if (xx == 1)
   {
-    for (i = mons; i; i--)
+    for (/* i=mons */; i!=0 ; i--)
       *ex++ -= *B++;
   }
   else
   {
-    for (i = mons; i; i--)
+    for (/* i=mons */; i!=0 ; i--)
       *ex++ -= (*B++) * xx;
   }
 }
@@ -144,14 +148,15 @@ void wAdd(int *A, int mons, int kn, int xx)
 
   B = A + ((kn - 1) * mons);
   ex = A + (pVariables * mons);
+  i = mons;
   if (xx == 1)
   {
-    for (i = mons; i; i--)
+    for (/* i=mons */; i!=0 ; i--)
       *ex++ += *B++;
   }
   else
   {
-    for (i = mons; i; i--)
+    for (/* i=mons */; i!=0 ; i--)
       *ex++ += (*B++) * xx;
   }
 }
@@ -236,7 +241,7 @@ static double wPrWeight(int *x, int n)
   double y;
 
   y = (double)x[n];
-  for (i = n - 1; i; i--)
+  for (i = n - 1; i!=0 ; i--)
     y *= (double)x[i];
   return y;
 }
@@ -252,7 +257,7 @@ double wx, double *rel, double *fopt, int *s0, int *s1, int *s2)
   n = pVariables;
   degw = A + (n * mons);
   fo2 = fo1 = (double)1.0e10;
-  for (i1 = n; i1; i1--)
+  for (i1 = n; i1!=0 ; i1--)
   {
     if (x[i1] > 1)
     {
@@ -265,7 +270,7 @@ double wx, double *rel, double *fopt, int *s0, int *s1, int *s2)
         fo1 = fmax;
         k0 = i1;
       }
-      for (i2 = i1; i2; i2--)
+      for (i2 = i1; i2!=0 ; i2--)
       {
         if (x[i2] > 1)
         {
@@ -387,7 +392,7 @@ void wGcd(int *x, int n)
     if (b == 1)
       return;
   }
-  for (i = n; i; i--)
+  for (i = n; i!=0 ; i--)
     x[i] /= b;
 }
 
@@ -401,7 +406,7 @@ static void wSimple(int *x, int n)
   xopt = x + (n + 1);
   kopt = k = g = 0;
   min = 1000000;
-  for (i = n; i; i--)
+  for (i = n; i!=0 ; i--)
   {
     c = xopt[i];
     if (c > 1)
@@ -423,7 +428,7 @@ static void wSimple(int *x, int n)
   for (k = min; k > 1; k--)
   {
     s2 = s1 = (double)0.0;
-    for(i = n; i; i--)
+    for(i = n; i!=0 ; i--)
     {
       c = xopt[i];
       if (c > 1)
@@ -449,7 +454,7 @@ static void wSimple(int *x, int n)
       kopt = k;
     }
   }
-  for(i = n; i; i--)
+  for(i = n; i!=0 ; i--)
   {
     x[i] = 1;
     c = xopt[i];
@@ -479,7 +484,7 @@ void wNorm(int *degw, int *lpol, int npol, double *rel)
   for (i = 0; i < npol; i++)
   {
     ecu = *ex++;
-    for (j = lpol[i] - 1; j; j--)
+    for (j = lpol[i] - 1; j!=0 ; j--)
     {
       ec = *ex++;
       if (ec > ecu)
