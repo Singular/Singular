@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.7 2002-01-19 12:29:32 obachman Exp $
+ *  Version: $Id: fast_maps.h,v 1.8 2002-01-19 12:43:40 obachman Exp $
  *******************************************************************/
 
 /*******************************************************************************
@@ -79,7 +79,7 @@ mapoly maPoly_InsertMonomial(mapoly into, poly p, ring src_r, sBucket_pt bucket 
 mapoly maPoly_Optimize(mapoly mpoly, ring src_r);
 
 // evaluates mpoly and destroys it, on the fly
-mapoly maPoly_Eval(mapoly mpoly, ring src_r, poly* dest_id, ring dest_r);
+void maPoly_Eval(mapoly mpoly, ring src_r, poly* dest_id, ring dest_r);
 
 // creates mpoly and  mideal
 void maMap_CreatePolyIdeal(ideal map_id, ring map_r, 
@@ -89,6 +89,8 @@ void maMap_CreatePolyIdeal(ideal map_id, ring map_r,
 void maMap_CreateRings(ideal map_id, ring map_r, 
                        ideal image_id, ring image_r, 
                        ring &src_r, ring &dest_r);
+
+ideal maIdeal_2_Ideal(maideal ideal);
 
 
 
