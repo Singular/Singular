@@ -2,7 +2,7 @@
 // author : Christine Theis
 //
 Procedures for Toric ideals/Integer Programming using Groebner basis methods
-Interface to Singular: ip.lib, toric.lib
+Interface to Singular: intprog.lib, toric.lib
 Mathematical background: see math.doc
 
 install several stand alone programs into the $bindir
