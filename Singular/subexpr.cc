@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.14 1997-04-18 15:49:41 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.15 1997-04-22 14:50:28 Singular Exp $ */
 
 /*
 * ABSTRACT: handling of leftv
@@ -632,7 +632,7 @@ char *  sleftv::String(void *d)
           nWrite(n);
           data=(char *)n;
         }
-        else if((rtyp==VMINPOLY)&&(currRing->ch>2))
+        else if((rtyp==VMINPOLY)&&(currRing->ch>2)&&(currRing->P==1))
         {
           nfShowMipo();
         }
