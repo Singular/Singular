@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_linsys.cc,v 1.3 1996-12-05 18:24:54 schmidt Exp $
+// $Id: cf_linsys.cc,v 1.4 1997-03-26 16:46:46 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1996/12/05 18:24:54  schmidt
+``Unconditional'' check-in.
+Now it is my turn to develop factory.
+
 Revision 1.2  1996/07/15 08:33:18  stobbe
 "changed interface to linearSystemSolve to use the class CFMatrix
 "
@@ -16,12 +20,12 @@ Initial revision
 
 */
 
-#define TIMING
-
+#include "assert.h"
+#include "debug.h"
 #include "timing.h"
 
-#include "assert.h"
 #include "cf_defs.h"
+
 #include "cf_primes.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
@@ -137,9 +141,11 @@ linearSystemSolve( CFMatrix & M )
 	// find a first solution mod p
 	pno = 0;
 	do {
-	    DEBOUT( cerr, "trying prime(", pno ); DEBOUTLN( cerr, ") = ", ' ' );
+	    DEBOUTSL( cerr );
+	    DEBOUT( cerr, "trying prime(" << pno << ") = " );
 	    p = cf_getBigPrime( pno );
-	    cout << p << endl;
+	    DEBOUT( cerr, p );
+	    DEBOUTENDL( cerr );
 	    setCharacteristic( p );
 	    // map matrix into char p
 	    for ( i = 0; i < rows; i++ )
@@ -158,9 +164,11 @@ linearSystemSolve( CFMatrix & M )
 	Q = p;
 	while ( Q < B && pno < cf_getNumBigPrimes() ) {
 	    do {
-		cout << "trying prime(" << pno << ") = " << flush;
+		DEBOUTSL( cerr );
+		DEBOUT( cerr, "trying prime(" << pno << ") = " );
 		p = cf_getBigPrime( pno );
-		cout << p << endl;
+		DEBOUT( cerr, p );
+		DEBOUTENDL( cerr );
 		setCharacteristic( p );
 		for ( i = 0; i < rows; i++ )
 		    for ( j = 0; j < cols; j++ )
@@ -214,7 +222,7 @@ fill_int_mat( const CFMatrix & M, int ** m, int rows )
 	}
     return ok;
 }
-	
+
 CanonicalForm
 determinant( const CFMatrix & M, int rows )
 {
@@ -243,7 +251,7 @@ determinant( const CFMatrix & M, int rows )
 	TIMING_END(det_numprimes);
 
 	CFArray X(1,n), Q(1,n);
-	
+
 	while ( pno < n ) {
 	    p = cf_getBigPrime( pno );
 	    setCharacteristic( p );
@@ -252,7 +260,7 @@ determinant( const CFMatrix & M, int rows )
 	    fill_int_mat( M, mm, rows );
 	    TIMING_END(det_mapping);
 	    pno++;
-	    cerr << "."; cerr.flush();
+	    DEBOUT( cerr, "." );
 	    TIMING_START(det_determinant);
 	    intdet = determinant( mm, rows );
 	    TIMING_END(det_determinant);
@@ -340,7 +348,7 @@ determinant2( const CFMatrix & M, int rows )
 	} while ( ! ok && pno < cf_getNumPrimes() );
 	// initialize the result matrix with first solution
 	// solve mod p
-	cerr << "."; cerr.flush();
+	DEBOUT( cerr, "." );
 	intdet = determinant( mm, rows );
 	setCharacteristic( 0 );
 	det = intdet;
@@ -358,7 +366,7 @@ determinant2( const CFMatrix & M, int rows )
 	    } while ( ! ok && pno < cf_getNumPrimes() );
 	    // initialize the result matrix with first solution
 	    // solve mod p
-	    cerr << "."; cerr.flush();
+	    DEBOUT( cerr, "." );
 	    intdet = determinant( mm, rows );
 	    setCharacteristic( 0 );
 	    qdet = intdet;
@@ -376,7 +384,7 @@ determinant2( const CFMatrix & M, int rows )
 		    pno++;
 		} while ( ! ok && cf_getNumPrimes() > pno );
 		// solve mod p
-		cerr << "."; cerr.flush();
+		DEBOUT( cerr, "." );
 		intdet = determinant( mm, rows );
 		// found a solution mod p
 		// now chinese remainder it to a solution mod Q*p
@@ -387,7 +395,7 @@ determinant2( const CFMatrix & M, int rows )
 		QQ *= p;
 		pcount++;
 	    }
-	    cerr << "*"; cerr.flush();
+	    DEBOUT( cerr, "*" );
 	    chineseRemainder( det, Q, qdet, q, detnew, qnew );
 	    Q = qnew;
 	    QQ = Q;
@@ -536,7 +544,7 @@ determinant ( int **extmat, int n )
     // triangularization
     multiplier = 1;
     divisor = 1;
-    
+
     for ( i = 0; i < n; i++ ) {
 	//find "pivot"
 	for (j = i; j < n; j++ )
