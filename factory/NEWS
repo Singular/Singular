@@ -11,9 +11,9 @@ of changes at 'organization level' (aka 'preprocessor level') and at
 Source code level:
 ------------------
 o Serious bug in univariate factorization in characterstic 0 fixed (by
-  Ruediger).
+  Ruediger Stobbe).
 
-o New gcd algorithm (sparse modular), not fully testes by now (contributed
+o New gcd algorithm (sparse modular), not fully tested by now (contributed
   by Marion Bruder).  Switch on with SW_USE_SPARSEMOD.
 
 o Various minor bug fixes.
@@ -25,9 +25,8 @@ Organization level:
 o Factory translates now on Macintosh with Metroworks
   CodeWarrior Academic Pro 11 (changes by Wilfred Pohl)
 
-o So called 'new' memory manager (written by Ruediger) added to
-  distribution.  So far no timigs available which memory manager is
-  faster.
+o So called 'new' memory manager (written by Ruediger Stobbe) added to
+  distribution.  So far no timigs available which memory manager is faster.
 
 o ASSERT, DEBOUT, TIMING macros streamlined
 
@@ -37,7 +36,7 @@ o Factory's IO completely re-organized (that was a mess!).  It is now
   Factory without libg++.  Changes include:
 
   - everything related to stream IO wrapped by '#ifndef NOSTREAMIO'
-  - all error messages/debug output messages rewritten so they use the
+  - all error messages/debug output messages rewritten so that they use the
     ASSERT and DEBOUT macros
   - furthermore, it was necessary to change the way the GF(q) tables are
     read.  As a consequence, the format of the GF(q) tables slightly
