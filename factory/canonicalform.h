@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.14 1997-09-01 09:08:35 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.15 1997-09-04 15:31:22 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -211,8 +211,6 @@ CanonicalForm iextgcd ( const CanonicalForm&, const CanonicalForm&, CanonicalFor
 
 CanonicalForm lcm ( const CanonicalForm&, const CanonicalForm& );
 
-CanonicalForm common_den ( const CanonicalForm& );
-
 CanonicalForm pp ( const CanonicalForm& );
 
 CanonicalForm content ( const CanonicalForm& );
@@ -274,12 +272,6 @@ ilog2 ( const CanonicalForm & a )
     return a.ilog2();
 }
 //}}}
-
-CanonicalForm psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x  );
-
-CanonicalForm psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
-
-void psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const Variable & x );
 
 int getNumVars( const CanonicalForm & f );
 CanonicalForm getVars( const CanonicalForm & f );
