@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.60 1999-05-06 16:53:23 Singular Exp $ */
+/* $Id: grammar.y,v 1.61 1999-05-29 12:00:01 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -324,7 +324,7 @@ lines:
             }
             #endif
             prompt_char = '>';
-	    if (sdb_flags & 2) { sdb_flags=0; YYERROR; }
+	    if (sdb_flags & 2) { sdb_flags=1; YYERROR; }
             if(siCntrlc)
             {
               siCntrlc=FALSE;
