@@ -128,7 +128,7 @@ SINGUNAME	= @SINGUNAME@
 localdir        = /usr/local
 install_prefix  = ${localdir}/Singular/${S_VERSION}
 
-BINDIST_DIRS    = Singular doc IntegerProgramming
+BINDIST_DIRS    = kernel Singular doc IntegerProgramming
 PLU_BINDIST_DIRS = Singular doc
 SHAREDIST_DIRS  = Singular doc emacs
 PLU_SHAREDIST_DIRS  = Singular doc emacs

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.102 2004-08-27 12:18:46 Singular Exp $ */
+/* $Id: grammar.y,v 1.103 2004-09-23 10:03:30 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -602,7 +602,7 @@ elemexpr:
         ;
 
 exprlist:
-        expr ',' exprlist
+        exprlist ',' expr
           {
             leftv v = &$1;
             while (v->next!=NULL)
