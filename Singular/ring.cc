@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.53 1999-05-10 15:10:53 Singular Exp $ */
+/* $Id: ring.cc,v 1.54 1999-05-19 15:17:01 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -561,7 +561,8 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   if (pn!=NULL)
   {
     R->P=pn->listLength();
-    if ((ffChar|| (ch == 1)) && (R->P > 1))
+    //if ((ffChar|| (ch == 1)) && (R->P > 1))
+    if ((R->P > 1) && (ffChar || (ch == -1)))
     {
       WerrorS("too many parameters");
       goto rInitError;
