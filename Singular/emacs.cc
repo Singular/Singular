@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.6 1999-09-07 08:23:04 Singular Exp $ */
+/* $Id: emacs.cc,v 1.7 1999-09-07 08:36:09 Singular Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -63,9 +63,6 @@ extern "C" {
 }
 #include "feResource.cc"
 #include "feCmdLineOptions.cc"
-extern "C" {
-#include "getopt.c"
-}
 
 int main(int argc, char** argv)
 {
