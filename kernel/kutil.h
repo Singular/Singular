@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.2 2004-08-03 17:33:56 Singular Exp $ */
+/* $Id: kutil.h,v 1.3 2005-02-17 09:42:21 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -232,7 +232,7 @@ public:
   int (*posInT)(const TSet T,const int tl,LObject &h);
   int (*posInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
-  void (*enterS)(LObject h, int pos,kStrategy strat, int atR = -1);
+  void (*enterS)(LObject h, int pos,kStrategy strat, int atR/* =-1*/ );
   void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
   int (*posInLOld)(const LSet Ls,const int Ll,
                    LObject* Lo,const kStrategy strat);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.1.1.1 2003-10-06 12:15:54 Singular Exp $ */
+/* $Id: khstd.cc,v 1.2 2005-02-17 09:42:19 Singular Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven kStd
 */
@@ -56,7 +56,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
     mw = (*hilb)[l];
     newhilb = hHstdSeries(strat->Shdl,w,strat->kHomW,Q,strat->tailRing);
     ln = newhilb->length()-1;
-    deg = degp(strat->P.p)-mw;
+    deg = degp(strat->P.p,currRing)-mw;
     loop // compare the series in degree deg, try to increase deg -----------
     {
       if (deg < ln) // deg may be out of range
@@ -91,7 +91,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
       deg++;
     } /* loop */
     delete newhilb;
-    while ((strat->Ll>=0) && (degp(strat->L[strat->Ll].p)-mw < deg)) // the essential step
+    while ((strat->Ll>=0) && (degp(strat->L[strat->Ll].p,currRing)-mw < deg)) // the essential step
     {
       count++;
       if(TEST_OPT_PROT)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.2 2004-06-02 14:54:54 Singular Exp $ */
+/* $Id: syz2.cc,v 1.3 2005-02-17 09:42:23 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -919,7 +919,7 @@ static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
       togo = IDELEMS(syzstr->res[i]);
       for (j=0;j<k;j++)
       {
-        if (toreor->m[j]!=NULL) (IMATELEM(*syzstr->betti,pFDeg(toreor->m[j])-i+1,i+1))++;
+        if (toreor->m[j]!=NULL) (IMATELEM(*syzstr->betti,pFDeg(toreor->m[j],currRing)-i+1,i+1))++;
         reor->m[j] = toreor->m[j];
         toreor->m[j] = NULL;
       }

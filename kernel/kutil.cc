@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.5 2004-11-09 14:55:00 Singular Exp $ */
+/* $Id: kutil.cc,v 1.6 2005-02-17 09:42:20 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -972,7 +972,7 @@ void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
 {
   Lp->FDeg = Lp->pFDeg();
   (*Lp).ecart = si_max(ecartF,ecartG);
-  (*Lp).ecart = (*Lp).ecart- (Lp->FDeg -pFDeg((*Lp).lcm));
+  (*Lp).ecart = (*Lp).ecart- (Lp->FDeg -pFDeg((*Lp).lcm,currRing));
   (*Lp).length = 0;
 }
 
@@ -3060,7 +3060,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
             pos = posInS(strat,strat->sl,h.p,h.ecart);
           }
           h.sev = pGetShortExpVector(h.p);
-          strat->enterS(h,pos,strat);
+          strat->enterS(h,pos,strat,-1);
           strat->fromQ[pos]=1;
         }
       }
@@ -3094,7 +3094,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
         else
           pos = posInS(strat,strat->sl,h.p,h.ecart);
         h.sev = pGetShortExpVector(h.p);
-        strat->enterS(h,pos,strat);
+        strat->enterS(h,pos,strat,-1);
       }
     }
   }
@@ -3151,7 +3151,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
             pos = posInS(strat,strat->sl,h.p,h.ecart);
           }
           h.sev = pGetShortExpVector(h.p);
-          strat->enterS(h,pos,strat);
+          strat->enterS(h,pos,strat,-1);
           strat->fromQ[pos]=1;
         }
       }
@@ -3475,7 +3475,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
 
   if (maxIndex >= 0)
   {
-    e = pLDeg(h,&l)-pFDeg(h);
+    e = pLDeg(h,&l,currRing)-pFDeg(h,currRing);
     do
     {
       if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)
@@ -3494,7 +3494,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
 #endif
         // pDelete(&h);
         if (h == NULL) return NULL;
-        e = pLDeg(h,&l)-pFDeg(h);
+        e = pLDeg(h,&l,currRing)-pFDeg(h,currRing);
         j = 0;
         not_sev = ~ pGetShortExpVector(h);
       }
@@ -4237,7 +4237,7 @@ BOOLEAN newHEdge(polyset S, kStrategy strat)
     strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
   /* compare old and new noether*/
   newNoether = pLmInit(strat->kHEdge);
-  j = pFDeg(newNoether);
+  j = pFDeg(newNoether,currRing);
   for (i=1; i<=pVariables; i++)
   {
     if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);

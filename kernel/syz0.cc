@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.3 2004-06-03 12:27:07 Singular Exp $ */
+/* $Id: syz0.cc,v 1.4 2005-02-17 09:42:22 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -219,8 +219,8 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
   for(j=0;j<Fl;j++)
   {
     S[j] = pCopy(F[j]);
-    totalS[j] = pLDeg(S[j],&k);
-    ecartS[j] = totalS[j]-pFDeg(S[j]);
+    totalS[j] = pLDeg(S[j],&k,currRing);
+    ecartS[j] = totalS[j]-pFDeg(S[j],currRing);
 //Print("%d", pGetComp(S[j]));PrintS("  ");
     p = S[j];
     if (rkF==0) pSetCompP(p,1);
@@ -329,8 +329,8 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
 *         if ((bestEcart) || (ecartToRed!=0))
 *         {
 */
-            totalToRed = pLDeg(toRed,&kk);
-            ecartToRed = totalToRed-pFDeg(toRed);
+            totalToRed = pLDeg(toRed,&kk,currRing);
+            ecartToRed = totalToRed-pFDeg(toRed,currRing);
 /*
 *         }
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.4 2004-11-09 14:54:59 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.5 2005-02-17 09:42:18 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -49,7 +49,7 @@ int redGrFirst (LObject* h,kStrategy strat)
   int pass = 0;
   int j = 0;
 
-  d = pFDeg((*h).p)+(*h).ecart;
+  d = pFDeg((*h).p,currRing)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
   loop
   {
@@ -92,8 +92,8 @@ int redGrFirst (LObject* h,kStrategy strat)
         pCleardenom((*h).p);
       }
       /*computes the ecart*/
-      d = pLDeg((*h).p,&((*h).length));
-      (*h).FDeg=pFDeg((*h).p);
+      d = pLDeg((*h).p,&((*h).length),currRing);
+      (*h).FDeg=pFDeg((*h).p,currRing);
       (*h).ecart = d-(*h).FDeg; /*pFDeg((*h).p);*/
       if ((strat->syzComp!=0) && !strat->honey)
       {
@@ -297,7 +297,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
   int at,d,i;
   int j = 0;
   int pass = 0;
-  int reddeg = pFDeg((*h).p);
+  int reddeg = pFDeg((*h).p,currRing);
 
   if (TEST_OPT_DEBUG)
   {
@@ -342,7 +342,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
       }
       /*- try to reduce the s-polynomial -*/
       pass++;
-      d = pFDeg((*h).p);
+      d = pFDeg((*h).p,currRing);
       if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
       {
         at = posInL11(strat->L,strat->Ll,h,strat);
@@ -408,7 +408,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
   int i,j,at,reddeg,d,pass,ei;
 
   pass = j = 0;
-  d = reddeg = pFDeg((*h).p)+(*h).ecart;
+  d = reddeg = pFDeg((*h).p,currRing)+(*h).ecart;
   if (TEST_OPT_DEBUG)
   {
     PrintS("red:");
@@ -497,9 +497,9 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       }
       /* compute the ecart */
       if (ei <= (*h).ecart)
-        (*h).ecart = d-pFDeg((*h).p);
+        (*h).ecart = d-pFDeg((*h).p,currRing);
       else
-        (*h).ecart = d-pFDeg((*h).p)+ei-(*h).ecart;
+        (*h).ecart = d-pFDeg((*h).p,currRing)+ei-(*h).ecart;
 //      if (strat->syzComp)
 //      {
 //        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
@@ -519,7 +519,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       *-if the number of pre-defined reductions jumps
       */
       pass++;
-      d = pFDeg((*h).p)+(*h).ecart;
+      d = pFDeg((*h).p,currRing)+(*h).ecart;
       if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
       {
         at = strat->posInL(strat->L,strat->Ll,h,strat);
@@ -586,9 +586,9 @@ static int nc_redBest (LObject*  h,kStrategy strat)
   pass = j = 0;
 
   if (strat->honey)
-    reddeg = pFDeg((*h).p)+(*h).ecart;
+    reddeg = pFDeg((*h).p,currRing)+(*h).ecart;
   else
-    reddeg = pFDeg((*h).p);
+    reddeg = pFDeg((*h).p,currRing);
   loop
   {
     if (pDivisibleBy(strat->T[j].p,(*h).p))
@@ -685,7 +685,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
       if (strat->honey || pLexOrder)
       {
         pass++;
-        d = pFDeg((*h).p);
+        d = pFDeg((*h).p,currRing);
         if (strat->honey)
           d += (*h).ecart;
         if ((strat->Ll >= 0) && ((pass > strat->LazyPass) || (d > reddeg)))
@@ -807,8 +807,9 @@ ideal gr_bba (ideal F, ideal Q, kStrategy strat)
     if (TEST_OPT_DEBUG) messageSets(strat);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
-    && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
-       || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))))
+    && ((strat->honey
+    && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+       || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
       /*
       *stops computation if
@@ -886,7 +887,7 @@ ideal gr_bba (ideal F, ideal Q, kStrategy strat)
               enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
               if (strat->sl==-1) pos=0;
               else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
-              strat->enterS(strat->P,pos,strat);
+              strat->enterS(strat->P,pos,strat,-1);
             }
             if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
           }

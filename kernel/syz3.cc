@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz3.cc,v 1.2 2004-06-02 15:59:12 Singular Exp $ */
+/* $Id: syz3.cc,v 1.3 2005-02-17 09:42:23 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -272,7 +272,7 @@ void syReorder_Kosz(syStrategy syzstr)
 #ifdef USE_REGULARITY
       if ((syzstr->regularity>0) && (res[syzIndex]->m[i]!=NULL))
       {
-        if (pFDeg(res[syzIndex]->m[i])>=syzstr->regularity+syzIndex)
+        if (pFDeg(res[syzIndex]->m[i],currRing)>=syzstr->regularity+syzIndex)
           pDelete(&res[syzIndex]->m[i]);
       }
 #endif
@@ -334,13 +334,13 @@ static void updatePairs(SSet *resPairs,int *l_pairs,syStrategy syzstr,
       pEnlargeSet(&old_repr->m,IDELEMS(old_repr),16);
       IDELEMS(old_repr) += 16;
     }
-    k = pFDeg(new_generators->m[i]);
+    k = pFDeg(new_generators->m[i],currRing);
     kk = pGetComp(new_generators->m[i]);
     j = og_ini;
     while ((j<og_elem) && (old_generators->m[j]!=NULL) &&
            (pGetComp(old_generators->m[j])<kk)) j++;
     while ((j<og_elem) && (old_generators->m[j]!=NULL) &&
-           (pFDeg(old_generators->m[j])<=k)) j++;
+           (pFDeg(old_generators->m[j],currRing)<=k)) j++;
     for (jj=og_elem;jj>j;jj--)
     {
       old_generators->m[jj] = old_generators->m[jj-1];
@@ -439,7 +439,7 @@ static void updatePairs(SSet *resPairs,int *l_pairs,syStrategy syzstr,
         }
         tso.lcm = prs[jj];
         prs[jj] = NULL;
-        tso.order = pFDeg(tso.lcm);
+        tso.order = pFDeg(tso.lcm,currRing);
         tso.p1 = old_generators->m[jj];
         tso.p2 = old_generators->m[j];
         tso.ind1 = jj;
@@ -678,15 +678,15 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
     if (index==0)
     {
 /*--- tests wether a generator must be replaced (lt(f1)|lt(f2)!)--*/
-      if (pFDeg(tso.p1)==pFDeg(tso.lcm))
+      if (pFDeg(tso.p1,currRing)==pFDeg(tso.lcm,currRing))
         toReplace = tso.ind1+1;
-      else if (pFDeg(tso.p2)==pFDeg(tso.lcm))
+      else if (pFDeg(tso.p2,currRing)==pFDeg(tso.lcm,currRing))
         toReplace = tso.ind2+1;
     }
 #ifdef EXPERIMENT3
 /*--- tests wether the product criterion applies --------------*/
     if ((index==0) && (old_generators->rank==1) && 
-        (pFDeg(tso.p1)+pFDeg(tso.p2)==tso.order))
+        (pFDeg(tso.p1,currRing)+pFDeg(tso.p2,currRing)==tso.order))
     {
       tso.p = NULL;
       p = pCopy(tso.p1);
@@ -1138,7 +1138,7 @@ static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy syzstr,
         }
         tso.lcm = prs[j];
         prs[j] = NULL;
-        tso.order = pFDeg(tso.lcm);
+        tso.order = pFDeg(tso.lcm,currRing);
         tso.p1 = add_generators->m[j];
         tso.p2 = add_generators->m[i];
         tso.ind1 = j;
@@ -1197,7 +1197,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
     if (TEST_OPT_PROT)
       PrintS(".");
 #ifdef USE_PROD_CRIT
-    if (pFDeg(tso.p1)+pFDeg(tso.p2)==tso.order+pFDeg(deg_soc))
+    if (pFDeg(tso.p1,currRing)+pFDeg(tso.p2,currRing)==tso.order+pFDeg(deg_soc,currRing))
     {
       if (TEST_OPT_PROT) PrintS("pc");
       int ac=pGetComp(tso.p1);
@@ -1422,7 +1422,7 @@ static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
   next_place_add = IDELEMS(add_generators);
   while ((next_place_add>0) && (add_generators->m[next_place_add-1]==NULL))
     next_place_add--;
-  int next_deg = pFDeg(temp_generators->m[i]);
+  int next_deg = pFDeg(temp_generators->m[i],currRing);
   next_new_el = next_place_add;
 /*--- loop about all all elements-----------------------------------*/
   while ((i<idel_temp) && (temp_generators->m[i]!=NULL))
@@ -1442,7 +1442,7 @@ static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
       }
     }
 #endif
-    while ((i<idel_temp) && (pFDeg(temp_generators->m[i])==next_deg))
+    while ((i<idel_temp) && (pFDeg(temp_generators->m[i],currRing)==next_deg))
     {
       next_p = temp_generators->m[i];
       temp_generators->m[i] = NULL;
@@ -1503,7 +1503,7 @@ static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
     }                        //end inner loop
     red_deg = next_deg;
     if (i<idel_temp)
-      next_deg = pFDeg(temp_generators->m[i]);
+      next_deg = pFDeg(temp_generators->m[i],currRing);
     else
       next_deg = -1;
     if ((next_place_add>next_new_el) || (next_deg<0))  //there are new generators or pairs
@@ -1607,7 +1607,7 @@ static ideal kosz_ext(ideal new_generators,ideal new_repr,syStrategy syzstr,
     {
       p = new_generators->m[j];
       new_generators->m[j] = NULL;
-      deg_p = pFDeg(p);
+      deg_p = pFDeg(p,currRing);
       if (min_deg<0)
       {
         min_deg = deg_p;
@@ -1618,7 +1618,7 @@ static ideal kosz_ext(ideal new_generators,ideal new_repr,syStrategy syzstr,
       }
       k = 0;
       while ((k<idel_temp) && (temp_generators->m[k]!=NULL) &&
-             (pFDeg(temp_generators->m[k])<=deg_p)) k++;
+             (pFDeg(temp_generators->m[k],currRing)<=deg_p)) k++;
       for (jj=idel_temp-1;jj>k;jj--)
       {
         temp_generators->m[jj] = temp_generators->m[jj-1];
@@ -1786,11 +1786,12 @@ syStrategy syKosz(ideal arg,int * length)
 #ifdef WITH_SORT
   if (temp->m[0]!=NULL)
   {
-    int maxdeg=pFDeg(temp->m[IDELEMS(temp)-1]),md;
+    int md;
+    int maxdeg=pFDeg(temp->m[IDELEMS(temp)-1],currRing);
     ideal temp1=idInit(IDELEMS(temp),temp->rank);
     for (j=IDELEMS(temp)-2;j>=0;j--)
     {
-      jj = pFDeg(temp->m[j]);
+      jj = pFDeg(temp->m[j],currRing);
       if (jj>maxdeg) maxdeg = jj;
     }
     while (!idIs0(temp))
@@ -1800,13 +1801,13 @@ syStrategy syKosz(ideal arg,int * length)
       {
         if (temp->m[j]!=NULL)
         {
-          jj = pFDeg(temp->m[j]);
+          jj = pFDeg(temp->m[j],currRing);
           if (jj<md) md = jj;
         }
       }
       for (j=0;j<IDELEMS(temp);j++)
       {
-        if ((temp->m[j]!=NULL) && (pFDeg(temp->m[j])==md))
+        if ((temp->m[j]!=NULL) && (pFDeg(temp->m[j],currRing)==md))
         {
           temp1->m[k] = temp->m[j];
           temp->m[j] = NULL;
@@ -1844,7 +1845,7 @@ syStrategy syKosz(ideal arg,int * length)
       new_generators->m[0] = kNF(syzstr->res[0],currQuotient,temp->m[i]);
       if (!nIsOne(pGetCoeff(new_generators->m[0])))
         pNorm(new_generators->m[0]);
-      next_deg = pFDeg(new_generators->m[0]);
+      next_deg = pFDeg(new_generators->m[0],currRing);
       next_gen = pCopy(new_generators->m[0]);
     }
     if (!idIs0(new_generators))
@@ -1989,7 +1990,8 @@ syStrategy syKosz(ideal arg,int * length)
           else
           {
             PrintS("Da ist was faul!!!\n");
-            Print("Aber: Regularitaet %d, Grad %d\n",syzstr->regularity,pFDeg(totake[index]->m[i]));
+            Print("Aber: Regularitaet %d, Grad %d\n",
+		   syzstr->regularity,pFDeg(totake[index]->m[i],currRing));
           }
         }
       }

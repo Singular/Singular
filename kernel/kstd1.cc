@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.4 2004-09-28 13:23:49 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.5 2005-02-17 09:42:19 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -446,7 +446,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
   int j = 0;
   int z = 10;
   int o = H.SetpFDeg();
-  H.ecart = pLDeg(H.p,&H.length)-o;
+  H.ecart = pLDeg(H.p,&H.length,currRing)-o;
   if ((flag & 2) == 0) cancelunit(&H);
   H.sev = pGetShortExpVector(H.p);
   unsigned long not_sev = ~ H.sev;
@@ -525,7 +525,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       /*- try to reduce the s-polynomial -*/
       o = H.SetpFDeg();
       if ((flag &2 ) == 0) cancelunit(&H);
-      H.ecart = pLDeg(H.p,&(H.length))-o;
+      H.ecart = pLDeg(H.p,&(H.length),currRing)-o;
       j = 0;
       H.sev = pGetShortExpVector(H.p);
       not_sev = ~ H.sev;
@@ -1058,7 +1058,7 @@ void initMora(ideal F,kStrategy strat)
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
   if (strat->kHEdgeFound)
   {
-    strat->HCord = pFDeg(ppNoether)+1;
+    strat->HCord = pFDeg(ppNoether,currRing)+1;
     strat->posInT = posInT2;
   }
   else
@@ -1293,7 +1293,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (BTEST1(27))
   {
     if (strat->kHEdge!=NULL)
-      Kstd1_mu=pFDeg(strat->kHEdge);
+      Kstd1_mu=pFDeg(strat->kHEdge,currRing);
     else
       Kstd1_mu=-1;
   }
@@ -1752,8 +1752,8 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
         Kstd1_deg = -1;
         for (i=IDELEMS(F)-1;i>=0;i--)
         {
-          if ((F->m[i]!=NULL) && (pFDeg(F->m[i])>=Kstd1_deg))
-            Kstd1_deg = pFDeg(F->m[i])+1;
+          if ((F->m[i]!=NULL) && (pFDeg(F->m[i],currRing)>=Kstd1_deg))
+            Kstd1_deg = pFDeg(F->m[i],currRing)+1;
         }
       }
     }

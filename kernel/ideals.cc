@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.5 2004-07-16 08:42:59 Singular Exp $ */
+/* $Id: ideals.cc,v 1.6 2005-02-17 09:42:19 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2921,7 +2921,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
         order=pTotaldegree(p);
       else
       //  order = p->order;
-        order = pFDeg(p);
+        order = pFDeg(p,currRing);
       order += diff[pGetComp(p)];
       p = F[i];
 //Print("Actual p=F[%d]: ",i);pWrite(p);
@@ -2934,7 +2934,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
       //  ord=pTotaldegree(p);
       //else
       //  ord = p->order;
-      ord = pFDeg(p);
+      ord = pFDeg(p,currRing);
       if (!iscom[pGetComp(p)])
       {
         diff[pGetComp(p)] = order-ord;
@@ -3014,12 +3014,12 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
     poly q=p;
     if (p!=NULL)
     {
-      int d=pFDeg(p);
+      int d=pFDeg(p,currRing);
       loop
       {
         pIter(p);
         if (p==NULL) break;
-        if (d!=pFDeg(p)) 
+        if (d!=pFDeg(p,currRing)) 
         {
           // pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p)); 
           return FALSE; 
@@ -3299,7 +3299,7 @@ intvec * idMWLift(ideal mod,intvec * weights)
   intvec *result = new intvec(i+1);
   while (i>0)
   {
-    (*result)[i]=pFDeg(mod->m[i])+(*weights)[pGetComp(mod->m[i])];
+    (*result)[i]=pFDeg(mod->m[i],currRing)+(*weights)[pGetComp(mod->m[i])];
   }
   return result;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.1.1.1 2003-10-06 12:15:56 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.2 2005-02-17 09:42:20 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -238,7 +238,7 @@ kStrategy kStratCopy(kStrategy o)
 
 BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
 {
-  int facdeg=pFDeg(p);
+  int facdeg=pFDeg(p,currRing);
   ideal fac=singclap_factorize(p,NULL,1);
   int fac_elems;
 #ifndef HAVE_LIBFAC_P
@@ -254,7 +254,7 @@ BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
   rfac=fac;
   fac_copy=idInit(fac_elems,1);
 
-  if ((fac_elems!=1)||(facdeg!=pFDeg(fac->m[0])))
+  if ((fac_elems!=1)||(facdeg!=pFDeg(fac->m[0],currRing)))
   {
     if (TEST_OPT_DEBUG)
     {
@@ -503,8 +503,8 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
     && ((strat->honey
-        && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
-      || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))))
+        && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+      || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
       /*
       *stops computation if
@@ -529,12 +529,12 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
     if (strat->honey)
     {
       if (TEST_OPT_PROT)
-        message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat, red_result);
+        message(strat->P.ecart+pFDeg(strat->P.p,currRing),&olddeg,&reduc,strat, red_result);
     }
     else
     {
       if (TEST_OPT_PROT)
-        message(pFDeg(strat->P.p),&olddeg,&reduc,strat, red_result);
+        message(pFDeg(strat->P.p,currRing),&olddeg,&reduc,strat, red_result);
     }
     /* reduction of the element choosen from L */
     kTest_TS(strat);

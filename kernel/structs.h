@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.3 2003-12-16 18:30:31 levandov Exp $ */
+/* $Id: structs.h,v 1.4 2005-02-17 09:42:22 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -284,9 +284,9 @@ extern package basePack;
 
 /* the function pointer types */
 
-typedef long     (*pLDegProc)(poly p, int *length, ring r= currRing);
-typedef long     (*pFDegProc)(poly p, ring r = currRing);
-typedef void     (*p_SetmProc)(poly p, ring r = currRing);
+typedef long     (*pLDegProc)(poly p, int *length, ring r);
+typedef long     (*pFDegProc)(poly p, ring r);
+typedef void     (*p_SetmProc)(poly p, ring r);
 
 typedef enum
 {

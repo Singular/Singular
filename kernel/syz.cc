@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.6 2004-10-26 15:40:28 levandov Exp $ */
+/* $Id: syz.cc,v 1.7 2005-02-17 09:42:22 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -61,7 +61,7 @@ static intvec * syPrepareModComp(ideal arg,intvec ** w)
   {
     if (arg->m[i-maxxx]!=NULL)
     {
-      (*w1)[i] = pFDeg(arg->m[i-maxxx]);
+      (*w1)[i] = pFDeg(arg->m[i-maxxx],currRing);
       if (pGetComp(arg->m[i-maxxx])!=0)
       {
         (*w1)[i]+=(**w)[pGetComp(arg->m[i-maxxx])-1];
@@ -477,7 +477,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     while ((j<IDELEMS(res[0])) && (res[0]->m[j]==NULL)) j++;
     if (j<IDELEMS(res[0]))
     {
-      if (pFDeg(res[0]->m[j])!=pTotaldegree(res[0]->m[j]))
+      if (pFDeg(res[0]->m[j],currRing)!=pTotaldegree(res[0]->m[j]))
         setRegularity = FALSE;
     }
   }
@@ -561,7 +561,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       {
         if (res[syzIndex-1]->m[i]!=NULL) // hs
         {
-          (*w)[i + rGetCurrSyzLimit()] = pFDeg(res[syzIndex-1]->m[i]);
+          (*w)[i + rGetCurrSyzLimit()] = pFDeg(res[syzIndex-1]->m[i],currRing);
           if (pGetComp(res[syzIndex-1]->m[i])>0)
             (*w)[i + rGetCurrSyzLimit()]
               += (*w)[pGetComp(res[syzIndex-1]->m[i])-1];
@@ -571,7 +571,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       for (i=k;i<k+IDELEMS(res[syzIndex]);i++)
       {
         if (res[syzIndex]->m[i-k]!=NULL)
-          (*w)[i+rGetCurrSyzLimit()] = pFDeg(res[syzIndex]->m[i-k])
+          (*w)[i+rGetCurrSyzLimit()] = pFDeg(res[syzIndex]->m[i-k],currRing)
                     +(*w)[pGetComp(res[syzIndex]->m[i-k])-1];
       }
     }
@@ -696,8 +696,8 @@ int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
   {
     if (homog)
     {
-      if (index==0)      k = pFDeg(temp->m[j])+degrees[pGetComp(temp->m[j])];
-      else               k = degrees[pGetComp(temp->m[j])];
+      if (index==0) k = pFDeg(temp->m[j],currRing)+degrees[pGetComp(temp->m[j])];
+      else          k = degrees[pGetComp(temp->m[j])];
       if (k>=index) tocancel[k-index]++;
       if ((k>=0) && (index==0)) subFromRank++;
     }
@@ -821,7 +821,7 @@ rintLn();
           omFreeSize((ADDRESS)temp2,(l+1)*sizeof(int));
           return NULL;
         }
-        temp2[j+1] = pFDeg(res[i]->m[j])+temp1[pGetComp(res[i]->m[j])];
+        temp2[j+1] = pFDeg(res[i]->m[j],currRing)+temp1[pGetComp(res[i]->m[j])];
         if (temp2[j+1]-i>rows) rows = temp2[j+1]-i;
         if (temp2[j+1]-i<mr) mr = temp2[j+1]-i;
       }
@@ -884,7 +884,7 @@ rintLn();
     {
       if (res[i]->m[j]!=NULL)
       {
-        temp2[j+1] = pFDeg(res[i]->m[j])+temp1[pGetComp(res[i]->m[j])];
+        temp2[j+1] = pFDeg(res[i]->m[j],currRing)+temp1[pGetComp(res[i]->m[j])];
         //(*result)[i+1+(temp2[j+1]-i-1)*cols]++;
         //if (temp2[j+1]>i) IMATELEM((*result),temp2[j+1]-i-mr,i+2)++;
         IMATELEM((*result),temp2[j+1]-i-mr,i+2)++;
@@ -1030,7 +1030,7 @@ intvec * syNewBetti(resolvente res, intvec ** weights, int length)
     {
       if (res[i]->m[j]!=NULL)
       {
-        k = pFDeg(res[i]->m[j])+(*(weights[i]))[pGetComp(res[i]->m[j])]-i-1;
+        k = pFDeg(res[i]->m[j],currRing)+(*(weights[i]))[pGetComp(res[i]->m[j])]-i-1;
         if (k>rsmax) rsmax = k;
         if (k<rsmin) rsmin = k;
       }
@@ -1069,7 +1069,7 @@ intvec * syNewBetti(resolvente res, intvec ** weights, int length)
     {
       if (res[i]->m[j]!=NULL)
       {
-        k = pFDeg(res[i]->m[j])+(*(weights[i]))[pGetComp(res[i]->m[j])]-i;
+        k = pFDeg(res[i]->m[j],currRing)+(*(weights[i]))[pGetComp(res[i]->m[j])]-i;
         IMATELEM(*result,k-rsmin,i+2)++;
       }
     }
