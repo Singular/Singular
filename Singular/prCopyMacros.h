@@ -1,14 +1,13 @@
 #undef PR_DELETE_MONOM
-#if PR_DELETE_SRC > 1
+#if PR_DELETE_SRC > 0
 #define PR_DELETE_MONOM(src, r_src)             \
 do                                              \
 {                                               \
-  PR_NDELETE(src, r_src);                       \
-  FreeHeap(src, r_src->mm_specHeap);             \
+  PR_NDELETE(&pGetCoeff(src), r_src);           \
+  FreeHeap(src, r_src->mm_specHeap);            \
 }                                               \
 while (0)
 #else
-#define PR_DELETE_SRC_NAME Copy
 #define PR_DELETE_MONOM(src, r_src) ((void)0)
 #endif
 
@@ -32,22 +31,20 @@ while (0)
 #undef PR_NCOPY
 #undef PR_NDELETE
 #undef PR_NUMBER_SIMPLE_NAME
-#if PR_NUMBER_SIMPLE > 1 
+#if PR_NUMBER_SIMPLE > 0 
 #define PR_NCOPY(n) n
-#define PR_NDELETE(n) ((void)0)
+#define PR_NDELETE(n, r) ((void)0)
 #define PR_NUMBER_SIMPLE_NAME NSimple
 #else
 #define PR_NCOPY(n) nCopy(n)
-#define PR_NDLETE(n) nDelete(n)
+#define PR_NDELETE(n, r) nDelete(n)
 #define PR_NUMBER_SIMPLE_NAME NoNSimple
 #endif
 
 #undef PR_SORT_POLY
-#if PR_NO_SORT > 1
+#if PR_NO_SORT > 0
 #define PR_SORT_POLY(p, r) ((void)0)
-#define PR_SORT_NAME NoSort
 #else
 #define PR_SORT_POLY(p, r) p = prSortR(p, r, TRUE)
-#define PR_SORT_NAME Sort
 #endif
 

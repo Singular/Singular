@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.14 1999-11-16 12:39:30 obachman Exp $ */
+/* $Id: ideals.h,v 1.15 1999-12-03 13:26:23 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -36,7 +36,8 @@ void idDelDiv(ideal id);
 void idDBTest(ideal h1,char *f,int l);
 #define idTest(A) idDBTest(A,__FILE__,__LINE__)
 #else
-#define idTest(A)
+#define idTest(A)  (TRUE)
+#define idPrint(A) ((void)0)
 #endif
 
 #ifdef PDEBUG

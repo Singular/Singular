@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.126 1999-12-03 11:50:24 obachman Exp $ */
+/* $Id: extra.cc,v 1.127 1999-12-03 13:26:21 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1170,10 +1170,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ideal id_r = idrMoveR(id, cr);
       idTest(id_r);
       idPrint(id_r);
-      idDelete(&id_r);
       if (r != cr)
       {
         rChangeCurrRing(cr, TRUE);
+        id_r = idrMoveR(id_r, r);
+        idTest(id_r);
+        idPrint(id_r);
+        idDelete(&id_r);
         rKill(r);
       }
       return FALSE;
