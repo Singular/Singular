@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.329 2004-10-18 18:57:44 levandov Exp $ */
+/* $Id: iparith.cc,v 1.330 2004-10-21 18:21:49 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2036,13 +2036,12 @@ static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
 
 static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 {
-  /* int, number, poly, vector, intvec  */
-  /* if (rIsPluralRing(currRing)) -- skipped! */
+  /* number, poly, vector, ideal, module, matrix */
   ring  r = (ring)a->Data();
   if (r == currRing)
   {
     res->data = b->Data();
-    res->rtyp  = b->rtyp;
+    res->rtyp = b->rtyp;
     return FALSE;
   }
   if (!rIsLikeOpposite(currRing, r))
@@ -2079,6 +2078,19 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 	res->rtyp = argtype;
 	break;
       }
+    case MATRIX_CMD:  
+      {
+	ring save = currRing;
+	rChangeCurrRing(r);
+	matrix  m = (matrix)IDDATA(w);
+	ideal   Q = idMatrix2Module(mpCopy(m));
+	rChangeCurrRing(save);
+        ideal   S = idOppose(r,Q);
+	id_Delete(&Q, r);
+	res->data = idModule2Matrix(S); 
+	res->rtyp = argtype;
+	break;
+      }
     default:  
       {       
 	Werror("unsupported type in oppose");
@@ -2094,52 +2106,6 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
   return FALSE;
 }
 
-// static BOOLEAN jjOPPOSE_ideal(leftv res, leftv a, leftv b)
-// {
-//   /* int, number, poly, vector, intvec  */
-//   ring    A = (ring)a->Data();
-//   ideal   Q = (ideal)b->Data();
-//   // if (rIsPluralRing(currRing)) 
-//   {
-//     res->data = idOppose(A,Q);
-//   }
-//   return FALSE;
-// }
-
-// static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
-// {
-//   if (rIsPluralRing(currRing)) 
-//   {
-//     int btype = (int)b->rtyp;
-//     ring    A = (ring)a->Data();
-//     switch (btype)
-//     {
-//     case INT_CMD:
-//     case POLY_CMD:
-//     case VECTOR_CMD:
-//     case INTVEC_CMD:
-//     case NUMBER_CMD:
-//       {
-// 	poly    q = (poly)b->Data();
-// 	res->data = pOppose(A,q);
-// 	res->rtyp = b->rtyp;
-//       }
-//     case IDEAL_CMD:   
-//     case MATRIX_CMD: 
-//     case MODUL_CMD:  
-//     case INTMAT_CMD: 
-//       {
-// 	ideal   Q = (ideal)b->Data();
-// 	res->data = idOppose(A,Q);
-// 	res->rtyp = b->rtyp;
-//       }
-//       // TODO   case RESOLUTION_CMD: 
-//     default:       return FALSE;
-//     }
-//   }
-//   else res->data=NULL;
-//   return FALSE;
-// }
 #endif /* HAVE_PLURAL */
 
 static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
@@ -2654,14 +2620,7 @@ struct sValCmd2 dArith2[]=
 ,{jjBETTI2_ID, BETTI_CMD,      INTMAT_CMD,     MODUL_CMD,  INT_CMD ALLOW_PLURAL}
 #ifdef HAVE_PLURAL
 ,{jjBRACKET,   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
-,{jjOPPOSE,    OPPOSE_CMD,     ANY_TYPE/*set by p*/, RING_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjOPPOSE,    OPPOSE_CMD,     ANY_TYPE/*set by p*/, RING_CMD,   DEF_CMD ALLOW_PLURAL}
-// ,{jjOPPOSE_poly,    OPPOSE_CMD,     NUMBER_CMD,     RING_CMD,   NUMBER_CMD ALLOW_PLURAL}
-// ,{jjOPPOSE_poly,    OPPOSE_CMD,     POLY_CMD,       RING_CMD,   POLY_CMD ALLOW_PLURAL}
-// ,{jjOPPOSE_poly,    OPPOSE_CMD,     VECTOR_CMD,     RING_CMD,   VECTOR_CMD ALLOW_PLURAL}
-// ,{jjOPPOSE_ideal,   OPPOSE_CMD,     IDEAL_CMD,      RING_CMD,   IDEAL_CMD ALLOW_PLURAL}
-// ,{jjOPPOSE_ideal,   OPPOSE_CMD,     MODUL_CMD,      RING_CMD,   MODUL_CMD  ALLOW_PLURAL}
-// ,{jjOPPOSE_ideal,   OPPOSE_CMD,     MATRIX_CMD,     RING_CMD,   MATRIX_CMD ALLOW_PLURAL}
 #endif
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
