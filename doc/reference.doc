@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.122 1999-07-09 16:28:17 Singular Exp $
+@comment $Id: reference.doc,v 1.123 1999-07-15 17:31:23 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3781,8 +3781,8 @@ automatically computes suitable weights for the weighted ecart and the
 weighted sugar method
 @end table
 @*
-There are further options that control the behavior of the computations,
-but these options are not manipulated using the @code{option} command:
+There next options that control the behavior of the computations
+are not manipulated by the @code{option} command:
 @table @asis
 @item @code{multBound}
 a multiplicity bound is set (see @ref{multBound})
