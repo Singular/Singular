@@ -1,0 +1,159 @@
+// $Id: surf.lib,v 1.1 1999-05-01 15:27:13 obachman Exp $
+//
+// author : Hans Schoenemann
+//
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: surf.lib,v 1.1 1999-05-01 15:27:13 obachman Exp $";
+info="
+LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF
+
+ plot(I);  plots curves and surfaces
+";
+
+///////////////////////////////////////////////////////////////////////////////
+static proc num_of_vars(ideal I)
+{
+  intvec v;
+  int i;
+  poly p;
+  for(i=size(I);i>0;i--)
+  {
+    p=I[i];
+    while(p!=0)
+    {
+      v=v+leadexp(p);
+      p=p-lead(p);
+    }
+  }
+  return(v);
+}
+
+proc  plot(ideal I)
+"USAGE:   plot(I);  I ideal
+RETURN:
+NOTE: 
+EXAMPLE: example plot; shows an example
+"
+{
+  string l="/tmp/surf"+string(system("pid"));
+  def base=basering;
+  intvec v=num_of_vars(I);
+  int i,j,n;
+  for(i=size(v);i>0;i--)
+  {
+    if (v[i]!=0) { n++; }
+  }
+  if (n==0 or n>3)
+  {
+    "Cannot plot equations with", n, "variables";
+    return();
+  }
+  ring r=0,(x,y,z),dp;
+  short=0;
+  map phi=base,0;
+  j=1;
+  for(i=1;i<=size(v);i++)
+  {
+    if (v[i]!=0)
+    {
+      phi[i]=var(j);
+      j++;
+      if(j==4) break;
+    }
+  }
+  ideal I=simplify(phi(I),2);
+  if (ncols(I)==1 and n<=2) // curve
+  {
+    write(":w "+l,"clip=none;");
+    write(l,
+    "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
+    write(l,"curve=",I[1],";");
+    write(l,"draw_curve;");
+  }
+  else
+  {
+    if (ncols(I)==1 and n==3) // surface
+    {
+      write(":w "+l,
+      "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
+      write(l,"rot_x=0.14; rot_y=-0.3;");
+      write(l,"surface=",I[1],";");
+      write(l,"draw_surface;");
+    }
+    else
+    {
+      "cannot plot",ncols(I),"equations in",n,"variables";
+      return();
+    }
+  }
+//  "calling surf (by Stephan Endrass) for drawing";
+  i=system("sh","surf "+l+" >/dev/null 2&>1");
+  i=system("sh","/bin/rm "+l);
+}
+example
+{ "EXAMPLE:"; echo =2;
+   // ---------  plane curves ------------
+   ring rr0 = 0,(x1,x2),dp;
+
+   ideal I = x1^3 - x2^2;
+   plot(I);
+   ideal J = x1^2-x1-x2^3;
+   plot(J); 
+
+   ring rr1 = 0,(x,y,z),dp;
+   ideal I(1) = 2x2-1/2x3 +1-y+1;
+   plot(I(1));
+   ideal I(2) = x3-x-y; 
+   plot(I(2));
+
+  //  ---- Singular Logo --------------
+  poly logo = ((x+3)^3 + 2*(x+3)^2 - y^2)*(x^3 - y^2)*((x-3)^3-2*(x-3)^2-y^2);
+  plot(logo);
+
+ 
+   // --------- implicit curves ------------
+   // implicit curves
+   ideal I(1) = y,-x2;
+   plot(I(1));
+   ideal I(2) = x2,-y2 +4;
+   plot(I(2));
+
+   //the lemniscate
+
+   ideal I(3) = x4+2x2y2 + y4, x2-y2;
+   plot(I(3));
+
+   // a critical part
+   // adjust the plotregion properly to get a good picture
+
+   poly f = (x-y)*(x2+y);
+   plot(f,1); 
+   ideal J = jacob(f);
+   J;
+   plot(J);     // bad resolution
+
+   // ----------- surfaces -------------------
+   ideal J(1) = 3xy4 + 2xy2, x5y3 + x + y6,10x2;
+   plot(J(1));
+
+   // Steiner surface
+
+   ideal J(2) = x^2*y^2+x^2*z^2+y^2*z^2-17*x*y*z;
+   plot(J(2));
+  
+  plot(x*(x2-y2)+z2);
+
+  // E7
+  plot(x^3-x*y^3+z^2);
+
+  // Whitney umbrella
+  plot(z^2-x^2*y);
+
+  // A1
+  plot(y2-xz);
+
+
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
