@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.20 2003-03-10 16:43:45 Singular Exp $ */
+/* $Id: attrib.cc,v 1.21 2003-05-31 14:12:45 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -350,7 +350,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
       return TRUE;
     }
     ideal I=(ideal)v->Data();
-    I->rank=max(I->rank,(int)c->Data());
+    I->rank=max((int)I->rank,(int)c->Data());
   }
   else
   {
