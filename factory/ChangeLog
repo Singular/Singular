@@ -1,3 +1,188 @@
+Tue Oct 28 14:46:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+
+    **************** Factory Version 1.3b released ****************
+
+	
+	* NEWS: updated to 1.3b
+
+	* README: doc fix.  Updated to 1.3b.
+
+	* INSTALL: doc fix.  Updated to 1.3b.
+
+	* configure.in (factory_version): updated to 1.3b
+
+	* examples/GNUmakefile: doc fix
+
+	* configure.in (factory_configuration): new variable
+	* config.h.in (FACTORYCONFIGURATION): new #define
+
+	* configure.in (ac_cv_shift): set to `yes' in case of cross
+	  compiling
+
+	* examples/application.cc (main): check on existence of GF(q)
+	  tables removed
+
+Mon Oct 27 15:14:19 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* examples, examples/GNUmakefile, examples/application.cc,
+ 	  examples/gcd.cc, examples/factorize.cc: new files
+	* GNUmakefile.in (distfiles, dist): `examples/' and `examples/*'
+	  added to distribution
+
+	* canonicalform.cc (operator >, operator <): bug fix.  Calls
+	  `comparecoeff()' in the right way.
+
+Fri Oct 24 18:44:37 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (TMPLCXXFLAGS): set to `$(LIBCXXFLAGS)'
+
+	* cf_gcd.cc (gcd): bug fix.  Handles polynomials with rational
+	  coefficients correctly
+
+Thu Oct 23 14:13:42 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftmpl_inst.cc: implicit instantiations of `ListItem<T>' changed
+	  to explicit instantiations
+
+	* factory.template, factoryconf.template, gengftables.cc,
+	  ftmpl_inst.cc: doc fix
+
+	* cf_globals.cc (factoryConfiguration): new external variable.
+	  Declaration added.
+	* test_install.cc (main): prints factoryConfiguration
+
+Wed Oct 22 15:41:30 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in: doc fixes
+
+	* canonicalform.cc (operator ()): speeded up
+
+	* cf_random.cc (factoryrandom): returns a random number without
+	  calculating any remainder if n equals zero
+
+	* ffops.cc (ff_setprime): does not clear table of primes if the
+	  prime number used last time equals new one
+
+Tue Oct 21 13:24:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* test_install.cc: new file
+	* GNUmakefile.in (distsrc): distribution file test_install.cc
+	  added
+	  (installtest, test_install, iftmpl_inst.o, test_install.o): new
+	  targets
+	  (clean): removes test_install
+	  (.PHONY): phony target installtest added
+
+Wed Oct 15 16:31:53 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* canonicalform.cc (taildegree): slightly speeded up
+
+	* canonicalform.cc (operator []): assertion added.  Bug fix (did
+	  not work for immediates).
+
+	* canonicalform.cc (den, deriv, operator []): explicit casts to
+	  CanonicalForm added
+	  (sqrt): explicit calls to CFFactory::basic removed
+
+Tue Oct 14 16:47:28 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* canonicalform.cc (mvar, degree): slightly speeded up
+
+Fri Oct 10 10:19:07 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* gfops.cc (gf_get_table): casts to 'char *' added to avoid
+	  warnings
+
+	* int_pp.cc: superfluous arguments removed
+
+	* int_int.cc: doc fix
+
+	* int_cf.cc: doc fix
+
+	* int_rat.cc: doc fix
+
+	* int_cf.cc (den): returns 'CFFactory::basic( 1 )' instead of
+	  'genOne()'
+
+	* canonicalform.cc (LC, degree( v ), tailcoeff, deriv): slightly
+	  speeded up
+
+	* canonicalform.cc (Lc): new method.  Declaration added.
+	* int_cf.cc (Lc): new method.  Declaration added.
+	* int_poly.cc (Lc): new method.  Declaration added.
+
+Thu Oct  9 10:20:56 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_algorithm.cc (divides): moved from canonicalform.cc to
+	  cf_algorithm.cc.  Declaration moved, too.  In all files which
+ 	  refer to this function #include of cf_algorithm.h added.
+	  (divides): doc fix
+	* canonicalform.cc (divides): moved to cf_algorithm.cc.
+	  Declaration moved, too.
+
+	* canonicalform.h (Lc): new function
+
+Wed Oct  1 14:21:53 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_random.h: (factoryrandom): n defaults to zero
+
+	* cf_random.cc (factoryrandom): checks for n = zero added
+
+Tue Sep 30 10:22:43 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (%.d): order of dependencies changed
+
+Mon Sep 29 08:11:42 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (%.d): `factoryconf.h' added as dependency
+
+	* canonicalform.h: doc fix
+
+	* cf_ops.cc (size( CF ), size( CF, Var )): new functions.
+	  Declarations added.
+
+	* fac_univar.cc: doc fix
+
+	* cf_chinese.cc: doc fix
+
+	* cf_resultant.cc: doc fix
+
+	* cf_gcd.cc (maxnorm): spurious variable `h' removed
+
+	* cf_gcd.cc (balance): slightly speeded up
+
+Fri Sep 26 12:54:41 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* assert.h: prints the function now where the assrtion occured if
+	  we are translating with gcc
+
+Thu Sep 25 13:51:01 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_gcd.cc (chinesePoly): function removed
+	(gcd_poly_univar0): slightly speeded up
+
+	* cf_gcd.cc (lcm): bug fix.  Returns zero now if f or g equals
+	  zero.
+
+	* cf_gcd.cc (gcd_poly): does not call sparsemod on univariate
+	  polynomials an longer
+
+	* cf_gcd.cc (vcontent): assertion added.
+
+	* cf_gcd.cc (content( CF, Variable )): slightly speeded up.
+	  Assertion added.
+
+Wed Sep 24 12:35:40 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* canonicalform.cc (deriv): speeded up
+
+Tue Sep 23 17:24:24 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* int_int.cc: doc fix
+
+	* canonicalform.cc: doc fix
+
 Fri Sep 12 17:25:14 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* cf_gcd.cc (isqrt): function removed
@@ -145,12 +330,12 @@ Mon Sep  1 10:47:41 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 Fri Aug 29 09:10:28 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* canonicalform.cc (degree( Variable )): slightly speeded up
-	(deriv( Variable )): slightly speeded up
+	  (deriv( Variable )): slightly speeded up
 
 	* canonicalform.h (deriv): doc fix
 
 	* canonicalform.cc (deriv( Variable )): assertion added
-	(deriv( Variable )): bug fix
+	  (deriv( Variable )): bug fix
 
 	* cf_algorithm.h: declarations of functions from cf_linsys.cc
 	  moved from canonicalform.h to cf_algorithm.h
