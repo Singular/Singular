@@ -1,0 +1,23 @@
+LIB "tst.lib";
+tst_init();
+ring r=32003,(x(1..80)),ls;
+matrix A[9][7]=maxideal(1);
+timer=1;
+ideal i=minor(A,4);
+size(i);
+kill r;
+ring r1=32003,(x,y,z,v,w),dp;
+ideal j=vx+xyzw,vxy+yzw,vyz+zwx,vzw+wxy;
+matrix A=jacob(j);
+ideal i=minor(A,3);
+i;
+kill r1;
+ring r=32003,(x,y,z,v,w),dp;
+ideal j=v2x2+xyz2w,vx2y+y2z2w,v2yz+z2w2x,v2zw+wx2y2;
+matrix A=jacob(j);
+ideal i=minor(A,3);
+i;
+ideal B[1][1];
+minor(B,1);
+minor(B,2);
+$
