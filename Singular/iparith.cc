@@ -4534,6 +4534,7 @@ static BOOLEAN jjIMPORTFROM(leftv res, leftv v)
     {
       //nok = iiInternalImport(v->next, 0, v->data);
       if(nok) return nok;
+      v = v->next;
     }
     return FALSE;
   }
@@ -5427,6 +5428,21 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
   return TRUE;
 }
 /*==================== operations with many arg. ===============================*/
+
+BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
+{
+  // cnt = 0: all
+  // cnt = 1: only first one
+  leftv next;
+  BOOLEAN failed = TRUE;
+  if(v==NULL) return failed;
+  res->rtyp = LIST_CMD;
+  if(cnt) v->next = NULL;
+  next = v->next;             // saving next-pointer
+  failed = jjLIST_PL(res, v);
+  v->next = next;             // writeback next-pointer
+  return failed;
+}
 
 BOOLEAN iiExprArithM(leftv res, leftv a, int op)
 {
