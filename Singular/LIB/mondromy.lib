@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.9 1999-11-10 17:50:30 mschulze Exp $";
+version="$Id: mondromy.lib,v 1.10 1999-11-12 11:21:02 mschulze Exp $";
 info="
 LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -73,7 +73,6 @@ static proc pcvinit()
     pcvbasis=Pcv::Basis;
   }
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc min(intvec v)
