@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.17 1998-05-19 18:53:49 schmidt Exp $
+@comment $Id: start.doc,v 1.18 1998-05-19 20:06:55 schmidt Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -170,7 +170,7 @@ lexicographical ordering'' one should refer to this chapter.
 libraries which come with @sc{Singular} and the functions contained in
 them, resp.
 
-@subsubheading Typograhpical conventions
+@subsubheading Typographical conventions
 Throughout this manual, the following typographical conventions are
 adopted:
 
