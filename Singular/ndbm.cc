@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.3 1997-08-12 17:14:41 Singular Exp $
+// $Id: ndbm.cc,v 1.4 1997-08-15 09:49:13 krueger Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -83,7 +83,10 @@ dbm_open(char *file, int flags, int mode)
   // setting flags to O_RDWR | O_CREAT solved our problem. :-(
   flags = O_RDWR | O_CREAT;
 #endif /* macintosh */
-
+#ifdef MSDOS
+  // default mode of open is ascii, we need binary mode.
+  flags |= O_BINARY;
+#endif
   db->dbm_flags = (flags & 03) == O_RDONLY ? _DBM_RDONLY : 0;
   if ((flags & 03) == O_WRONLY)
     flags = (flags & ~03) | O_RDWR;
