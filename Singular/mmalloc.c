@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.18 1999-10-19 14:55:38 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.19 1999-10-22 16:31:21 obachman Exp $ */
 
 /*
 * ABSTRACT: implementation of alloc/free routines
@@ -184,11 +184,13 @@ static void mmDBFreeHeapS(void* addr, memHeap heap, size_t size,
 {
   DBMCB *what = (DBMCB*) ((char*) addr - DebugOffsetFront);
 
+#if MDEBUG >= 0
   if ( ! mmCheckDBMCB(what, size, MM_USEDFLAG))
   {
     mmPrintFL( fname, lineno );
     return;
   }
+#endif
 
 #ifdef HEAP_DEBUG
   mmDebugFreeHeap(what, heap, fname, lineno);
@@ -285,11 +287,14 @@ void mmDBFreeBlock(void* adr, size_t size, char * fname, int lineno)
     DBMCB * what = (DBMCB*) ((char*) adr - DebugOffsetFront);
     int tmpsize=RealSizeFromSize(size);
 
+#if MDEBUG >= 0
     if ( ! mmCheckDBMCB(what, size, MM_USEDFLAG))
     {
       mmPrintFL( fname, lineno );
       return;
     }
+#endif
+
     mmTakeOutDBMCB(what);
     mmFreeToSystem(what, tmpsize);
   }

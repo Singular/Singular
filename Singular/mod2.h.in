@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.72 1999-10-22 11:14:15 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.73 1999-10-22 16:31:22 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -335,6 +335,7 @@ extern int pShortOut;
 /* undef MDEBUG to disable memory checks
  *
  * define MDEBUG to
+ * -1 to enable MTRACK, but to skip memory checks 
  * 0 to enable basic memory checks (at least on each alloc/free)
  * 1 for addtl. containment checks in free/alloc list for each memory check
  * 2 for addtl. checks of entire free/alloc list at each memory check
@@ -478,7 +479,7 @@ extern int pShortOut;
 /* MTRACK requires MDEBUG and MLIST*/
 #ifdef MTRACK
 #ifndef MDEBUG
-#define MDEBUG 0
+#define MDEBUG -1
 #endif
 #ifndef MLIST
 #define MLIST
