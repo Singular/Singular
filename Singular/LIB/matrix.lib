@@ -1,6 +1,6 @@
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.20 2001-01-07 15:21:46 greuel Exp $";
+version="$Id: matrix.lib,v 1.21 2001-01-12 12:46:19 greuel Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -502,7 +502,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc gauss_col (matrix A, list #)
-"USAGE:   gauss_col(A[,any]); A a matrix, any any type
+"USAGE:   gauss_col(A[,e]); A a matrix, e any type
 RETURN:  - a matrix B, if called with one argument; B is the complete column-
            reduced upper-triangular normal form of A if A is constant, 
            (resp. as far as this is possible if A is a polynomial matrix;
@@ -522,6 +522,7 @@ EXAMPLE: example gauss_col; shows an example
 "
 {
    def R=basering; int u;
+   string mp = string(minpoly);
    int n = nrows(A);
    int m = ncols(A);
    module M = A;
@@ -530,6 +531,7 @@ EXAMPLE: example gauss_col; shows an example
    if( ordstr(R) != "C,dp(nvars(R))" )
    {
      changeord("@R","C,dp",R); u=1;
+     execute("minpoly="+mp+";");
      matrix A = imap(R,A);
      module M = A;
    }
