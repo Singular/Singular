@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: */
+/* $Id: spolys.cc,v 1.15 1998-09-07 15:25:56 Singular Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction for char p
