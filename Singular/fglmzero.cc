@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.34 2001-10-09 16:36:00 Singular Exp $
+// $Id: fglmzero.cc,v 1.35 2003-04-01 12:48:31 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -31,6 +31,7 @@
 #include "maps.h"
 #include "omalloc.h"
 #include "kstd1.h" // for kNF (see fglmquot)
+#include "intvec.h" 
 #include "fglm.h"
 #include "fglmvec.h"
 #include "fglmgauss.h"
@@ -330,6 +331,7 @@ class fglmSdata
 private:
     ideal theIdeal;
     int idelems;
+    int* varpermutation;
 
     int basisBS;
     int basisMax;
@@ -366,6 +368,13 @@ fglmSdata::fglmSdata( const ideal thisIdeal )
     // werden, jenachdem wie das Ideal aussieht.
     theIdeal= thisIdeal;
     idelems= IDELEMS( theIdeal );
+    varpermutation = (int*)omAlloc( (pVariables+1)*sizeof(int) );
+    // Sort ring variables by increasing values (because of weighted orderings)
+    ideal perm = idMaxIdeal(1);
+    intvec *iv = idSort(perm,TRUE);
+    idDelete(&perm);
+    for(int i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
+    delete iv;
 
     basisBS= 100;
     basisMax= basisBS;
@@ -386,6 +395,7 @@ fglmSdata::fglmSdata( const ideal thisIdeal )
 
 fglmSdata::~fglmSdata()
 {
+    omFreeSize( (ADDRESS)varpermutation, (pVariables+1)*sizeof(int) );
     for ( int k = basisSize; k > 0; k-- )
         pDeleteLm( basis + k );  //. rem: basis runs from basis[1]..basis[basisSize]
     omFreeSize( (ADDRESS)basis, basisMax*sizeof( poly ) );
@@ -457,7 +467,7 @@ fglmSdata::nextCandidate()
 //     Multiplies basis[basisSize] with all ringvariables and inserts the new monomials
 //      into the list of candidates, according to the given order. If a monomial already
 //      exists, then "insertions" and "divisors" are updated.
-//     Assumes that ringvar(k) < ringvar(l) for k > l
+//     Assumes that ringvar(varperm[k]) < ringvar(varperm[l]) for k > l
 void
 fglmSdata::updateCandidates()
 {
@@ -470,7 +480,7 @@ fglmSdata::updateCandidates()
     int state = 0;
     while ( k >= 1 ) {
         newmonom = pCopy( m );
-        pIncrExp( newmonom, k );
+        pIncrExp( newmonom, varpermutation[k] );
         pSetm( newmonom );
         done= FALSE;
         while ( list.hasItem() && (done == FALSE) ) {
@@ -493,7 +503,7 @@ fglmSdata::updateCandidates()
     }
     while ( --k >= 1 ) {
         newmonom= pCopy( m ); // HIER
-        pIncrExp( newmonom, k );
+        pIncrExp( newmonom, varpermutation[k] );
         pSetm( newmonom );
         nlist.append( fglmSelem( newmonom, k ) );
     }
@@ -660,7 +670,7 @@ CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
     internalCalculateFunctionals( theIdeal, l, data );
     //    STICKYPROT("Calculating vector rep\n");
     v = data.getVectorRep( p );
-    // if ( v.isZero() )
+    // if ( v.isZero() ) 
     //   STICKYPROT("vectorrep is 0\n");
     return ( data.state() );
 }
@@ -739,6 +749,8 @@ private:
     int basisSize;  //. the CURRENT basisSize, i.e. basisSize <= dimen
     polyset basis;  // [1]..[dimen]. The monoms of the new Vectorspace-basis
 
+    int* varpermutation;
+
     int groebnerBS;
     int groebnerSize;
     ideal destId;
@@ -777,6 +789,14 @@ fglmDdata::fglmDdata( int dimension )
     for ( k= dimen; k > 0; k-- ) isPivot[k]= FALSE;
     perm= (int *)omAlloc( (dimen+1)*sizeof( int ) );
     basis= (polyset)omAlloc( (dimen+1)*sizeof( poly ) );
+    varpermutation = (int*)omAlloc( (pVariables+1)*sizeof(int) );
+    // Sort ring variables by increasing values (because of weighted orderings)
+    ideal perm = idMaxIdeal(1);
+    intvec *iv = idSort(perm,TRUE);
+    idDelete(&perm);
+    for(int i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
+    delete iv;
+
     groebnerBS= 16;
     groebnerSize= 0;
     destId= idInit( groebnerBS, 1 );
@@ -803,6 +823,7 @@ fglmDdata::~fglmDdata()
     for ( k= basisSize; k > 0; k-- )
         pLmDelete( basis[k]);
     omFreeSize( (ADDRESS)basis, (dimen+1)*sizeof( poly ) );
+    omFreeSize( (ADDRESS)varpermutation, (pVariables+1)*sizeof(int) );
 }
 
 fglmDelem
@@ -860,7 +881,7 @@ fglmDdata::updateCandidates( poly m, const fglmVector v )
     int state = 0;
     while ( k >= 1 ) {
         newmonom = pCopy( m );
-        pIncrExp( newmonom, k );
+        pIncrExp( newmonom, varpermutation[k] );
         pSetm( newmonom );
         done= FALSE;
         while ( list.hasItem() && (done == FALSE) ) {
@@ -883,7 +904,7 @@ fglmDdata::updateCandidates( poly m, const fglmVector v )
     }
     while ( --k >= 1 ) {
         newmonom= pCopy( m );
-        pIncrExp( newmonom, k );
+        pIncrExp( newmonom, varpermutation[k] );
         pSetm( newmonom );
         nlist.append( fglmDelem( newmonom, v, k ) );
     }
@@ -1019,7 +1040,7 @@ GroebnerViaFunctionals( const idealFunctionals & l,
       // STICKYPROT("initv is not zero\n");
       initv = iv;
     }
-
+      
     poly one = pOne();
     data.updateCandidates( one, initv );
     number nOne = nInit( 1 );
