@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $ */
+/* $Id: ideals.cc,v 1.2 2004-03-25 16:50:04 levandov Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1121,7 +1121,7 @@ ideal idSect (ideal h1,ideal h2)
       if (syz_ring==orig_ring)
         temp->m[k] = pCopy(first->m[i]);
       else
-        temp->m[k] = prCopyR(first->m[i], orig_ring);
+	temp->m[k] = prCopyR(first->m[i], orig_ring);
       q = pOne();
       pSetComp(q,i+1+length);
       pSetmComp(q);
@@ -1141,7 +1141,7 @@ ideal idSect (ideal h1,ideal h2)
       if (syz_ring==orig_ring)
         temp->m[k] = pCopy(second->m[i]);
       else
-        temp->m[k] = prCopyR(second->m[i], orig_ring);
+	temp->m[k] = prCopyR(second->m[i], orig_ring);
       if (slength==0) pShift(&(temp->m[k]),1);
       k++;
     }
@@ -1161,9 +1161,9 @@ ideal idSect (ideal h1,ideal h2)
     && (p_GetComp(temp1->m[i],syz_ring)>length))
     {
       if(syz_ring==orig_ring)
-        p = pCopy(temp1->m[i]);
+	p = pCopy(temp1->m[i]);
       else
-        p = prCopyR(temp1->m[i], syz_ring);
+	p = prCopyR(temp1->m[i], syz_ring);
       while (p!=NULL)
       {
         q = pNext(p);
@@ -1171,7 +1171,8 @@ ideal idSect (ideal h1,ideal h2)
         k = pGetComp(p)-1-length;
         pSetComp(p,0);
         pSetmComp(p);
-        result->m[j] = pAdd(result->m[j],pMult(pCopy(first->m[k]),p));
+	/* Warning! multiply only from the left! it's very important for Plural */
+        result->m[j] = pAdd(result->m[j],pMult(p,pCopy(first->m[k])));
         p = q;
       }
       j++;
