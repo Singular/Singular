@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.131 1999-03-09 12:26:20 obachman Exp $ */
+/* $Id: iparith.cc,v 1.132 1999-03-09 14:13:41 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1334,15 +1334,15 @@ static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
 {
   //Print("try to map %s with %s\n",$3.Name(),$1.Name());
   leftv sl=NULL;
-  if (v->e==NULL)
+  if ((v->e==NULL)&&(v->name!=NULL))
   {
     map m=(map)u->Data();
     sl=iiMap(m,v->name);
   }
-  //else
-  //{
-  //  WerrorS("map_id(<name>) expected");
-  //}
+  else
+  {
+    Werror("%s(<name>) expected",u->Nmae());
+  }
   if (sl==NULL) return TRUE;
   memcpy(res,sl,sizeof(sleftv));
   Free((ADDRESS)sl,sizeof(*sl));
