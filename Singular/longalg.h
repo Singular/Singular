@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.16 2000-11-17 14:07:11 Singular Exp $ */
+/* $Id: longalg.h,v 1.17 2000-12-07 12:07:01 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -82,7 +82,6 @@ BOOLEAN naDBTest(number a, char *f,int l);
 void    naSetIdeal(ideal I);
 
 // external access to the interna
-#define napoly alg
 #define RECA_SIZE (sizeof(alg)+sizeof(number))
 alg napAdd(alg p1, alg p2);
 void napDelete(alg *p);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.45 2000-11-16 16:50:16 Singular Exp $ */
+/* $Id: structs.h,v 1.46 2000-12-07 12:07:00 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -128,6 +128,7 @@ typedef union uutypes      utypes;
 typedef ip_command *       command;
 typedef struct s_si_link_extension *si_link_extension;
 typedef struct reca *      alg;
+#define napoly             alg
 
 #ifdef __cplusplus
 typedef idrec *            idhdl;
