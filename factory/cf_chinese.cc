@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_chinese.cc,v 1.6 1997-09-09 07:31:18 schmidt Exp $ */
+/* $Id: cf_chinese.cc,v 1.7 1997-09-29 06:51:46 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -57,6 +57,10 @@ chineseRemainder ( const CanonicalForm x1, const CanonicalForm q1, const Canonic
 // coefficients.  If all coefficients of all x[i] are positive
 // integers, the result is guaranteed to have positive
 // coefficients, too.
+//
+// This is a standard algorithm, too, except for the fact that we
+// use a divide-and-conquer method instead of a linear approach
+// to calculate the remainder.
 //
 // Note: be sure you are calculating in Z, and not in Q!
 //
