@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.29 2000-12-06 11:03:08 Singular Exp $
+// $Id: clapconv.cc,v 1.30 2000-12-08 12:47:37 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -24,11 +24,11 @@
 
 static void convRec( const CanonicalForm & f, int * exp, poly & result );
 
-static void convRecAlg( const CanonicalForm & f, int * exp, alg & result );
+static void convRecAlg( const CanonicalForm & f, int * exp, napoly & result );
 
 static void convRecPP ( const CanonicalForm & f, int * exp, poly & result );
 
-static void convRecPTr ( const CanonicalForm & f, int * exp, alg & result );
+static void convRecPTr ( const CanonicalForm & f, int * exp, napoly & result );
 
 static void convRecAP ( const CanonicalForm & f, int * exp, poly & result );
 
@@ -239,7 +239,7 @@ convRecPP ( const CanonicalForm & f, int * exp, poly & result )
 
 
 CanonicalForm
-convSingTrClapP( alg p )
+convSingTrClapP( napoly p )
 {
   CanonicalForm result = 0;
   int e, n = napVariables;
@@ -298,7 +298,7 @@ convSingTrClapP( alg p )
   return result;
 }
 
-alg
+napoly
 convClapPSingTr ( const CanonicalForm & f )
 {
 //    cerr << " f = " << f << endl;
@@ -307,14 +307,14 @@ convClapPSingTr ( const CanonicalForm & f )
   int * exp = new int[n];
   // for ( int i = 0; i < n; i++ ) exp[i] = 0;
   memset(exp,0,n*sizeof(int));
-  alg result = NULL;
+  napoly result = NULL;
   convRecPTr( f, exp, result );
   delete [] exp;
   return result;
 }
 
 static void
-convRecPTr ( const CanonicalForm & f, int * exp, alg & result )
+convRecPTr ( const CanonicalForm & f, int * exp, napoly & result )
 {
   if (f == 0)
     return;
@@ -330,10 +330,10 @@ convRecPTr ( const CanonicalForm & f, int * exp, alg & result )
   }
   else
   {
-    alg term = napNew();
+    napoly term = napNew();
     // napNext( term ) = NULL; //already done by napNew
     for ( int i = 1; i <= napVariables; i++ )
-      napGetExp( term, i ) = exp[i];
+      napSetExp( term, i , exp[i]);
     if ( getCharacteristic() != 0 )
     {
       napGetCoeff( term ) = npInit( f.intval() );
@@ -425,7 +425,7 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
   }
   else
   {
-    alg z=(alg)convClapASingA( f );
+    napoly z=(napoly)convClapASingA( f );
     if (z!=NULL)
     {
       poly term = pInit();
@@ -434,8 +434,9 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
       for ( i = 1; i <= pVariables; i++ )
         pSetExp( term, i , exp[i+off]);
       pSetComp(term, 0);
-      for ( i = 0; i < off; i++ )
-        z->e[i]+=exp[i+1];
+      for ( i = 1; i <= off; i++ )
+        //z->e[i-1]+=exp[i];
+	napAddExp(z,i,exp[i]);
       pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
       ((lnumber)pGetCoeff(term))->z=z;
       pSetm( term );
@@ -444,7 +445,7 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
   }
 }
 
-CanonicalForm convSingAClapA ( alg p , const Variable & a )
+CanonicalForm convSingAClapA ( napoly p , const Variable & a )
 {
   CanonicalForm result = 0;
   int e;
@@ -528,10 +529,10 @@ static number convClapNSingAN( const CanonicalForm &f)
   }
 }
 
-alg convClapASingA ( const CanonicalForm & f )
+napoly convClapASingA ( const CanonicalForm & f )
 {
-  alg a=NULL;
-  alg t;
+  napoly a=NULL;
+  napoly t;
   for( CFIterator i=f; i.hasTerms(); i++)
   {
     t=napNew();
@@ -539,11 +540,11 @@ alg convClapASingA ( const CanonicalForm & f )
     napGetCoeff(t)=convClapNSingAN( i.coeff() );
     if (nacIsZero(napGetCoeff(t)))
     {
-      napDelete(&t);
+      p_Delete(&t, currRing->algring);
     }
     else
     {
-      napGetExp(t,1)=i.exp();
+      napSetExp(t,1,i.exp());
       a=napAdd(a,t);
     }
   }
