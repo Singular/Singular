@@ -5,7 +5,7 @@
 
 #include "tgb.h"
 #define OM_KEEP 0
-#define LEN_VAR4
+#define LEN_VAR1
 
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
@@ -276,13 +276,6 @@ static int bucket_guess(kBucket* bucket){
 }
 
 
-#ifdef RANDOM_WALK
-int my_rand(int n){
-  //RANDOM integer beetween 0,..,n-1
-  int erg=(double(rand())/RAND_MAX) *n;
-  return ((erg>=n)?erg-1:erg);
-}
-#endif
 
 static BOOLEAN is_empty(calc_dat* c){
   int i;
@@ -355,63 +348,7 @@ static sorted_pair_node* find_next_pair2(calc_dat* c, BOOLEAN go_higher){
   //free_sorted_pair_node(s, c->r);
   return s;
 }
-static BOOLEAN find_next_pair(calc_dat* c, BOOLEAN go_higher)
-{
-  int start_i,start_j,i,j;
-  start_i=0;
-  start_j=-1;
-#ifndef HOMOGENEOUS_EXAMPLE
-  if (c->misses_series>80){
-    c->current_degree++;
-    c->misses_series=0;
-  }
-#endif
-  start_i=c->continue_i;
-  start_j=c->continue_j;
 
-  for (int i=start_i;i<c->n;i++){
-    if (c->T_deg[i]>c->current_degree)
-    {
-      c->skipped_pairs++;
-      continue;
-    }
-    for(int j=(i==start_i)?start_j+1:0;j<i;j++){
-      // printf("searching at %d,%d",i,j);
-      if (c->misses_counter>=2) {
-        c->skipped_pairs++;
-        break;
-      }
-      if (c->states[i][j]==UNCALCULATED){
-        if(c->deg[i][j]<=c->current_degree)
-        {
-          c->continue_i=c->found_i=i;
-          c->continue_j=c->found_j=j;
-          return TRUE;
-        }
-        else
-        {
-          ++(c->skipped_pairs);
-        }
-      }
-    }
-    c->misses_counter=0;
-  }
-
-  if (!((start_i==1) &&(start_j==0))){
-    c->continue_i=1;
-    c->continue_j=0;
-    return find_next_pair(c);
-  }
-
-  if ((c->skipped_pairs>0) && go_higher){
-    ++(c->current_degree);
-    c->skipped_pairs=0;
-    c->continue_i=0;
-    c->continue_j=0;
-    return find_next_pair(c);
-  }
-  return FALSE;
-}
 static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat, BOOLEAN is_char0)
 {
   assume(old_pos>=new_pos);
@@ -1540,6 +1477,23 @@ static void c_S_element_changed_hook(int pos, calc_dat* c){
   line_of_extended_prod(pos,c);
 }
 
+static BOOLEAN redNF2_pseudo (redNF_inf* obj,calc_dat* c, int n){
+  if(obj->P->p==NULL) {obj->h=NULL; return TRUE;}
+  LObject** P= (LObject**) omalloc(sizeof(LObject*));
+  P[0]=obj->P;
+  int nonzero=1;
+  multi_reduction(P, nonzero, c);
+  if(nonzero) {
+    int len;
+    kBucketClear(P[0]->bucket,&(obj->h), & len);
+} else 
+ {
+   obj->h=NULL;
+   obj->P=NULL;
+}
+  omfree(P);
+  return TRUE;
+}
 static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
 {
 
@@ -2036,7 +1990,7 @@ static BOOLEAN compute(calc_dat* c){
         init_red_spoly_phase2(c,i);
       if (!c->work_on[i].is_free){
 //        Print("Computing i=%i,j=%i",c->work_on[i].i,c->work_on[i].j);
-        if(redNF2_n_steps(&(c->work_on[i]),c,((c->reduction_steps+50)/(c->normal_forms+1))/4+5)){
+        if(redNF2_pseudo(&(c->work_on[i]),c,((c->reduction_steps+50)/(c->normal_forms+1))/4+5)){
 
 
           trep_them(&c->work_on[i],c);
@@ -2578,7 +2532,7 @@ static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_e
 	
 	erg.swap_roles=FALSE;
       }
-      return;
+  
     }
       else
     {
@@ -2653,6 +2607,7 @@ static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_e
   
   }
   if(erg.swap_roles){
+    PrintS("b");
     poly clear_into;
     int dummy_len;
     int new_length;
@@ -2694,9 +2649,10 @@ static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_e
     }
   else                     
     pNorm(clear_into);
-    if (new_pos<j)
+    if (new_pos<j){
       move_forward_in_S(j,new_pos,c->strat,c->is_char0);
-
+      erg.reduce_by=new_pos;
+    }
   }
 }
 static find_erg multi_reduction_find(LObject** los, int losl,calc_dat* c,int startf){
@@ -2723,7 +2679,7 @@ static find_erg multi_reduction_find(LObject** los, int losl,calc_dat* c,int sta
     if (j<0){
       //not reduceable, try to use this for reducing higher terms
       int i2;
-      for (i2=i+1;i2<=losl;i2++){
+      for (i2=i+1;i2<losl;i2++){
 	if (p_LmShortDivisibleBy(los[i]->p,los[i]->sev,los[i2]->p,los[i2]->sev,
 				c->r)){
 	  int i3=i2;
@@ -2810,7 +2766,7 @@ static void multi_reduction(LObject** los, int & losl, calc_dat* c)
     los[i]->SetShortExpVector();
     los[i]->p=kBucketGetLm(los[i]->bucket);
   }
-  poly h=kBucketGetLm(los[i]->bucket);
+
   kStrategy strat=c->strat;
   int curr_pos=losl-1;
 
@@ -2840,7 +2796,9 @@ static void multi_reduction(LObject** los, int & losl, calc_dat* c)
     }
     for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++)
     {
-      assume((!erg.fromS)||(i!=erg.reduce_by));
+    
+      assume((erg.fromS)||(i!=erg.reduce_by));
+      assume(reductor!=NULL);
        number coef=kBucketPolyRed(los[i]->bucket,reductor,
                                   len,
 				  strat->kNoether);

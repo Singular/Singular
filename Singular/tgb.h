@@ -134,4 +134,5 @@ static poly redTailShort(poly h, kStrategy strat);
 poly gcd_of_terms(poly p, ring r);
 BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, calc_dat* c);
 static poly kBucketGcd(kBucket* b, ring r);
+static void multi_reduction(LObject** los, int & losl, calc_dat* c);
 #endif
