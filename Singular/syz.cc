@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.15 1999-03-08 17:30:53 Singular Exp $ */
+/* $Id: syz.cc,v 1.16 1999-08-17 13:06:02 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -762,6 +762,7 @@ void syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
     {
       k = pFDeg(id->m[j])+degrees[pGetComp(id->m[j])];
       if (k>=index) tocancel[k-index]++;
+      if ((k>0) && (index==0)) tocancel[0]++;
     }
     else
     {
@@ -866,7 +867,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     Warn("betti-command: Input is not homogeneous!");
   }
   delete w;
-  l = max(idRankFreeModule(res[0]),res[0]->rank);
+  int rkl=l = max(idRankFreeModule(res[0]),res[0]->rank);
   i = 0;
   while ((i<length) && (res[i]!=NULL))
   {
@@ -904,7 +905,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   }
   /*------ computation betti numbers --------------*/
   result = new intvec(rows,cols,0);
-  (*result)[0] = /*idRankFreeModule(res[0])*/ res[0]->rank;
+  (*result)[0] = /*idRankFreeModule(res[0])*/ rkl;
   if ((!idIs0(res[0])) && ((*result)[0]==0)) (*result)[0] = 1;
   tocancel = (int*)Alloc0((rows+1)*sizeof(int));
   memset(temp2,0,l*sizeof(int));
