@@ -13,7 +13,7 @@ ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
 ac_help="$ac_help
-  --with-memman(=<memman>) specify factory memory manager.
+  --with-memman(=<memman>) specify Factory memory manager.
                           <memman> is either 'old' (default), 'new', or 'no'."
 ac_help="$ac_help
   --with-gmp(=<gmp_inc_path>(,<gmp_lib_path>))
@@ -21,20 +21,20 @@ ac_help="$ac_help
 ac_help="$ac_help
   --with-Singular         build for use with computer algebra system Singular."
 ac_help="$ac_help
-  --disable-streamio      build factory without streamio"
+  --disable-streamio      build Factory without stream IO"
 ac_help="$ac_help
-  --enable-memdebug=<level> switch on memory managment debugging.  Meaningful
+  --enable-memdebug=<level> switch on memory management debugging.  Meaningful
                           with --with-memman=new only.  <level> may be either
                           'no' (default), 'normal', or 'full'."
 ac_help="$ac_help
-  --enable-assertions     build factory with assertions activated"
+  --enable-assertions     build Factory with assertions activated"
 ac_help="$ac_help
-  --enable-timing         build factory so it will print timing information"
+  --enable-timing         build Factory so it will print timing information"
 ac_help="$ac_help
-  --enable-debugoutput    build factory so it will print debugging information"
+  --enable-debugoutput    build Factory so it will print debugging information"
 ac_help="$ac_help
   --enable-gmp            together with --with-Singular means: installation
-                          in process, be gracefull when there is no gmp.h"
+                          in process, be graceful when there is no gmp.h"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -560,7 +560,7 @@ ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
 #
 # Do not change version here!!!
 #
-factory_version="1.2c"
+factory_version="1.3a"
 
 #
 # - check withs and enables.
@@ -883,7 +883,7 @@ else
 fi
 
 if test "x$GCC" != xyes && test "x$GXX" != xyes; then
-  echo "configure: warning: you better use gcc to compile factory" 1>&2
+  echo "configure: warning: you better use gcc to compile Factory" 1>&2
 else
   if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
     echo "configure: warning: we will use '-O2 -fomit-frame-pointer' as default for CXXFLAGS
