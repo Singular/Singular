@@ -48,9 +48,10 @@ if [ -z $goodversion ];
     #echo $file2
     if [ -r $file2 ];
 	then
-	file3=`echo $file2|sed -e "s/\$/.tmp/"`
-	cp $file2 $file3
-	cat $file3
+#	file3=`echo $file2|sed -e "s/\$/.tmp/"`
+#	cp $file2 $file3
+#	cat $file3
+	cat $file2
     else
 	#echo "file does not exist"
 	exit 1;
