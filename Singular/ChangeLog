@@ -1,3 +1,12 @@
+Fri Dec 19 17:22:26 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* claptmpl.cc: template instantiation for `Array<REvaluation>'
+	  added
+
+	* fglmcomb.cc, fglmhom.cc, fglmzero.cc, claptmpl.cc: #include
+	  directives fixed (templates/list.h renamed to
+ 	  templates/ftmpl_list.h)
+
 Thu Dec 18 15:23:29 MET 1997
 	* hannes:
 	- removed type "binary" and handling routines
