@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.4 1997-10-01 14:30:36 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.5 1997-10-01 16:33:41 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -40,7 +40,7 @@ ftestGetCanonicalForm ( const char * canFormSpec )
 	stringF = getenv( tokenCursor );
 	if ( ! stringF )
 	    ftestError( CanFormSpecError,
-			"no environment variable `$%s'\n",
+			"no environment variable `$%s' set\n",
 			tokenCursor );
     }
 
@@ -88,12 +88,12 @@ ftestGetVariable ( const char * stringVariable )
 	v = Variable();
     else
 	ftestError( CommandlineError,
-		    "not a variable: `%s'\n", stringVariable );
+		    "variable expected at `%s'\n", stringVariable );
 
     stringVariable = ftestSkipBlancs( stringVariable+1 );
     if ( *stringVariable )
 	ftestError( CommandlineError,
-		    "extra characters after var spec: `%s'\n", stringVariable );
+		    "extra characters after var spec `%s'\n", stringVariable );
 
     return v;
 }
