@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.17 1999-10-25 16:00:09 Singular Exp $ */
+/* $Id: mmbt.c,v 1.18 1999-10-25 16:09:35 Singular Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
 *                  - mprdem: must be in the current directory
 *                  - mprnm: must be in thje current directory
 *                  - nm: to find entry pints if MPRPC is not set
-* files: - Singularg: the name of the executable
+* files: - feGetResource('S'): the name of the executable
 *        - nm.log: temp. file for the map address -> name
 */
 
@@ -32,7 +32,7 @@
 
 #ifdef MTRACK
 // #ifndef __OPTIMIZE__
-/* does only work in debug mode: 
+/* does only work in debug mode:
 * requires that -fomit-frame-pointer is not given
 */
 #if defined(linux) && defined(__i386__)
@@ -67,12 +67,12 @@ int mmTrackInit ()
   else
   {
     char buf[255];
-    sprintf(buf,"nm -n %s","Singularg");
+    sprintf(buf,"nm -n %s",feGetResource('S'));
     {
       FILE *nm=popen(buf,"r");
       if (nm==NULL)
       {
-        fprintf(stderr, 
+        fprintf(stderr,
 	  "environment variable MPRPC not found\nand pipe to `%s`failed\n",buf);
         m2_end(1);
       }
@@ -118,19 +118,18 @@ void mmTrack (unsigned long *bt_stack)
   si_hdl_typ sig11_handler = signal(SIGSEGV, (si_hdl_typ) mmTrack_sig11_handler);
   mmTrack_sig11_caught = 0;
 #endif
-  
+
   if (mm_lowpc==0) mmTrackInit();
-  
-  
-  while ((fp!=NULL) && ((unsigned long)fp>4095)  
-  && ((unsigned long)fp < ((unsigned long)0xff000000)) 
-  && *fp && (pc = getpc (fp)) 
+
+
+  while ((fp!=NULL) && ((unsigned long)fp>4095)
+  && ((unsigned long)fp < ((unsigned long)0xff000000))
+  && *fp && (pc = getpc (fp))
   && !entrypc (pc) && (i<BT_MAXSTACK))
   {
     if ( mmTrack_sig11_caught) break;
     bt_stack[i]=pc; i++;
     fp = (unsigned long *) *fp;
-    
   }
 /*  signal(SIGSEGV, (si_hdl_typ) sig11_handler); */
   while(i<BT_MAXSTACK)
@@ -152,7 +151,7 @@ void mmP2cNameInit()
   int i,j;
   char n[128];
   char s[2000];
-  sprintf(s, "%s/mprnm -mprdem %s/mprdem -p %s >nm.log", 
+  sprintf(s, "%s/mprnm -mprdem %s/mprdem -p %s >nm.log",
           feGetResource('b'), feGetResource('b'), feGetResource('S'));
   system(s);
   f=fopen("nm.log","r");
@@ -160,7 +159,7 @@ void mmP2cNameInit()
   loop
   {
     j=fscanf(f,"%d %s\n",(int *)&p2n[i].p,n);
-    if (j!=2) 
+    if (j!=2)
     {
       break;
     }
@@ -185,7 +184,7 @@ char * mmP2cName(unsigned long p)
   e=mm_p2n_max;
   loop
   {
-    if (a>=e-1) 
+    if (a>=e-1)
     {
       if (p2n[a].p<=p) return p2n[a].name;
       else if (a==0) return("??");
@@ -200,7 +199,7 @@ char * mmP2cName(unsigned long p)
     {
       e=i;
     }
-  }  
+  }
 #if 0
   for(i=0;i<=mm_p2n_max;i++)
   {
@@ -228,7 +227,7 @@ void mmDBPrintThisStack(FILE *fd, void* memblock, int all, int free)
 #endif
     mmPrintStackFrames(fd, ((DBMCB*) memblock)->bt_allocated_stack, 0, BT_MAXSTACK, all);
 }
-    
+
 void mmDBPrintStack(FILE *fd, void* memblock, int all)
 {
   mmPrintStackFrames(fd, ((DBMCB*) memblock)->bt_allocated_stack, 0, BT_MAXSTACK, all);
@@ -236,19 +235,19 @@ void mmDBPrintStack(FILE *fd, void* memblock, int all)
 
 void mmDBPrintStackFrames(FILE *fd, void* memblock, int start, int end)
 {
-  mmPrintStackFrames(fd, ((DBMCB*) memblock)->bt_allocated_stack, start, end, 
+  mmPrintStackFrames(fd, ((DBMCB*) memblock)->bt_allocated_stack, start, end,
                      MM_PRINT_ALL_STACK);
 }
 
 /* print stack */
-void mmPrintStackFrames(FILE *fd, unsigned long *bt_stack, int start, int end, int mm) 
+void mmPrintStackFrames(FILE *fd, unsigned long *bt_stack, int start, int end, int mm)
 {
   int i=start;
   fprintf( fd," ");
   do
   {
     char *s;
-    s=mmP2cName(bt_stack[i]); 
+    s=mmP2cName(bt_stack[i]);
     if (s!=NULL && strcmp(s, "??"))
     {
       if ((mm & MM_PRINT_ALL_STACK) || strncmp(s, "mm", 2) !=0)
