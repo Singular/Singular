@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.3 1997-10-01 12:27:47 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.4 1997-10-01 14:30:36 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -40,7 +40,7 @@ ftestGetCanonicalForm ( const char * canFormSpec )
 	stringF = getenv( tokenCursor );
 	if ( ! stringF )
 	    ftestError( CanFormSpecError,
-			"no such environment variable: `$%s'\n",
+			"no environment variable `$%s'\n",
 			tokenCursor );
     }
 
@@ -121,7 +121,7 @@ ftestGetint ( const char * stringInt )
     stringInt = ftestSkipBlancs( tokenCursor );
     if ( *stringInt )
 	ftestError( CommandlineError,
-		    "extra characters after int spec: `%s'\n", stringInt );
+		    "extra characters after int spec `%s'\n", stringInt );
 
     return i;
 }
