@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.47 1998-09-01 14:58:25 Singular Exp $ */
+/* $Id: grammar.y,v 1.48 1998-09-14 13:59:28 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -473,17 +473,21 @@ elemexpr:
               int k = (int)(v->Data());
               if (k!=0)
               {
-                if (v->Typ() == INT_CMD)
-                {
-                  $$.data = (void *)pAdd((poly)$$.data,pMult(p,pISet(k)));
-                }
-                else if (v->Typ() == POLY_CMD)
-                {
-                  $$.data = (void *)pAdd((poly)$$.data,
-                                         pMult(p,(poly)(v->CopyD())) );
-                }
-                else
+	        int i,t;
+		sleftv tmp;
+		memset(&tmp,0,sizeof(tmp));
+		i=iiTestConvert((t=v->Typ()),POLY_CMD);
+		if((i==0) || (iiConvert(t /*v->Typ()*/,POLY_CMD,i,v,&tmp))) 
+		{
+		  pDelete(&p);
+		  pDelete((poly *)&$$.data);
+                  $2.CleanUp();
                   MYYERROR("expected '[poly,...'");
+		}
+                $$.data = (void *)pAdd((poly)$$.data,
+		                               pMult(p,(poly)tmp.CopyD()));
+                v->next=tmp.next;tmp.next=NULL;
+		tmp.CleanUp();
               }
               else
                 pDelete1(&p);
