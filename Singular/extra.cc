@@ -1,12 +1,19 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.152 2000-12-12 08:44:43 obachman Exp $ */
+/* $Id: extra.cc,v 1.153 2000-12-18 15:44:39 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
 
 #include <stdlib.h>
+#if defined(__alpha)
+extern "C"
+{
+  int setenv(const char *name, const char *value, int overwrite);
+}
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -345,7 +352,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       // setting it just triggers action
       if (feOptSpec[opt].type == feOptUntyped)
       {
-        feSetOptValue(opt,NULL);
+        feSetOptValue(opt,0);
         return FALSE;
       }
 

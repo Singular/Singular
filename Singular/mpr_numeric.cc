@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.11 2000-10-05 15:16:58 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.12 2000-12-18 15:44:42 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -596,6 +596,9 @@ void rootContainer::laguer(gmp_complex ** a, int m, gmp_complex *x, int *its)
     f= gmp_complex();
     abx_g= abs(*x);
 
+// gcc 2.95.2 on the dec alpha chokes on this
+#if defined(__GNUC__)
+#if ! (defined(__alpha) && __GNUC__ == 2 && __GNUC_MINOR__ == 95)
     for ( j= m-1; j >= 0; j-- )
     {
       f= ( *x * f ) + d;
@@ -630,10 +633,11 @@ void rootContainer::laguer(gmp_complex ** a, int m, gmp_complex *x, int *its)
 
     if ( iter % MT ) *x= x1;
     else *x -= ( dx * frac_g[ iter / MT ] );
+#endif
+#endif
   }
 
   *its= MAXIT+1;
-
   return;
 }
 //<-

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.35 2000-09-18 12:03:56 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.36 2000-12-18 15:44:39 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -25,7 +25,10 @@
 
 
 /* undef, if you don't want GDB to come up on error */
-#define CALL_GDB 
+
+#if !defined(__alpha)
+#define CALL_GDB
+#endif
 
 #if defined(__OPTIMIZE__) && defined(CALL_GDB)
 #undef CALL_GDB

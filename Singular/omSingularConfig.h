@@ -7,7 +7,7 @@
  *           rebuilt the library).
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: omSingularConfig.h,v 1.2 2000-08-24 14:42:42 obachman Exp $
+ *  Version: $Id: omSingularConfig.h,v 1.3 2000-12-18 15:44:42 obachman Exp $
  *******************************************************************/
 #ifndef OM_SINGULAR_CONFIG_H
 #define OM_SINGULAR_CONFIG_H
@@ -33,8 +33,8 @@ extern int om_sing_opt_show_mem;
 extern size_t om_sing_last_reported_size;
 #endif
 
-/* number of bytes for difference to report */
-#define SING_REPORT_THRESHOLD 100*1024 
+/* number of bytes for difference to report: every 1 MByte */
+#define SING_REPORT_THRESHOLD 1000*1024 
 #define OM_SINGULAR_HOOK                                                        \
 do                                                                              \
 {                                                                               \
@@ -47,7 +47,7 @@ do                                                                              
                    om_sing_last_reported_size - _current_bytes);                \
     if (_diff >= SING_REPORT_THRESHOLD)                                         \
     {                                                                           \
-      fprintf(stdout, "[%dk]", (_current_bytes + 1023)/1024);                   \
+      fprintf(stdout, "[%ldk]", (_current_bytes + 1023)/1024);                   \
       fflush(stdout);                                                           \
       om_sing_last_reported_size = _current_bytes;                              \
     }                                                                           \

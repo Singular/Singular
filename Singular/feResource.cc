@@ -1,10 +1,18 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.30 2000-09-18 09:18:55 obachman Exp $ */
+/* $Id: feResource.cc,v 1.31 2000-12-18 15:44:40 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
+
+#include <stdlib.h>
+#if defined(__alpha)
+extern "C"
+{
+  int setenv(const char *name, const char *value, int overwrite);
+};
+#endif
 
 #include <unistd.h>
 #include <string.h>

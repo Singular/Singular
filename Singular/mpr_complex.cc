@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.28 2000-11-21 15:35:44 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.29 2000-12-18 15:44:41 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -62,10 +62,10 @@ void setGMPFloatDigits( size_t digits )
   bits= bits>64?bits:64;
   gmp_output_digits= digits;
   mpf_set_default_prec( db );
-  mpf_set_prec((mpf_ptr)*(diff.mpfp()),32);
-  mpf_set_prec((mpf_ptr)*gmpRel.mpfp(),32);
-  mpf_set_d((mpf_ptr)*gmpRel.mpfp(),0.1);
-  mpf_pow_ui((mpf_ptr)*gmpRel.mpfp(),(mpf_ptr)*gmpRel.mpfp(),digits);
+  mpf_set_prec(*diff._mpfp(),32);
+  mpf_set_prec(*gmpRel._mpfp(),32);
+  mpf_set_d(*gmpRel._mpfp(),0.1);
+  mpf_pow_ui(*gmpRel._mpfp(),*gmpRel._mpfp(),digits);
 }
 
 size_t getGMPFloatDigits()
@@ -705,18 +705,18 @@ void gmp_complex::SmallToZero()
   gmp_float ar=this->real();
   gmp_float ai=this->imag();
   if (ar.isZero() || ai.isZero()) return;
-  mpf_abs((mpf_ptr)*ar.mpfp(), (mpf_ptr)*ar.mpfp());
-  mpf_abs((mpf_ptr)*ai.mpfp(), (mpf_ptr)*ai.mpfp());
-  mpf_set_prec((mpf_ptr)*ar.mpfp(), 32);
-  mpf_set_prec((mpf_ptr)*ai.mpfp(), 32);
+  mpf_abs(*ar._mpfp(), *ar._mpfp());
+  mpf_abs(*ai._mpfp(), *ai._mpfp());
+  mpf_set_prec(*ar._mpfp(), 32);
+  mpf_set_prec(*ai._mpfp(), 32);
   if (ar > ai)
   {
-    mpf_div((mpf_ptr)*ai.mpfp(), (mpf_ptr)*ai.mpfp(), (mpf_ptr)*ar.mpfp());
+    mpf_div(*ai._mpfp(), *ai._mpfp(), *ar._mpfp());
     if (ai < gmpRel) this->imag(0.0);
   }
   else
   {
-    mpf_div((mpf_ptr)*ar.mpfp(), (mpf_ptr)*ar.mpfp(), (mpf_ptr)*ai.mpfp());
+    mpf_div(*ar._mpfp(), *ar._mpfp(), *ai._mpfp());
     if (ar < gmpRel) this->real(0.0);
   }
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.241 2000-12-15 18:49:29 Singular Exp $ */
+/* $Id: iparith.cc,v 1.242 2000-12-18 15:44:40 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2874,7 +2874,7 @@ static BOOLEAN jjIS_RINGVAR_P(leftv res, leftv v)
 }
 static BOOLEAN jjIS_RINGVAR_S(leftv res, leftv v)
 {
-  res->data = (char *)(rIsRingVar((char *)v->Data())+1);
+  res->data = (char *)(r_IsRingVar((char *)v->Data(), currRing)+1);
   return FALSE;
 }
 static BOOLEAN jjIS_RINGVAR0(leftv res, leftv v)
@@ -4982,6 +4982,13 @@ static BOOLEAN jjTEST(leftv res, leftv v)
 }
 
 #ifndef __MWERKS__
+#if defined(__alpha)
+extern "C"
+{
+  void usleep(unsigned long usec);
+};
+#endif
+
 static BOOLEAN jjSTATUS_M(leftv res, leftv v)
 {
   if ((v->Typ() != LINK_CMD) ||
