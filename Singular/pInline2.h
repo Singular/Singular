@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.33 2003-03-11 16:14:43 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.34 2003-03-11 16:26:31 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -166,51 +166,51 @@ PINLINE2 int p_SetExp(poly p, int v, int e, ring r)
 }
 
 // the following should be implemented more efficiently
-PINLINE2  Exponent_t p_IncrExp(poly p, int v, ring r)
+PINLINE2  int p_IncrExp(poly p, int v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  Exponent_t e = p_GetExp(p,v,r);
+  int e = p_GetExp(p,v,r);
   e++;
   return p_SetExp(p,v,e,r);
 }
-PINLINE2  Exponent_t p_DecrExp(poly p, int v, ring r)
+PINLINE2  int p_DecrExp(poly p, int v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  Exponent_t e = p_GetExp(p,v,r);
+  int e = p_GetExp(p,v,r);
   pAssume2(e > 0);
   e--;
   return p_SetExp(p,v,e,r);
 }
-PINLINE2  Exponent_t p_AddExp(poly p, int v, Exponent_t ee, ring r)
+PINLINE2  int p_AddExp(poly p, int v, int ee, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  Exponent_t e = p_GetExp(p,v,r);
+  int e = p_GetExp(p,v,r);
   e += ee;
   return p_SetExp(p,v,e,r);
 }
-PINLINE2  Exponent_t p_SubExp(poly p, int v, Exponent_t ee, ring r)
+PINLINE2  int p_SubExp(poly p, int v, int ee, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  Exponent_t e = p_GetExp(p,v,r);
+  int e = p_GetExp(p,v,r);
   pAssume2(e >= ee);
   e -= ee;
   return p_SetExp(p,v,e,r);
 }
-PINLINE2  Exponent_t p_MultExp(poly p, int v, Exponent_t ee, ring r)
+PINLINE2  int p_MultExp(poly p, int v, int ee, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  Exponent_t e = p_GetExp(p,v,r);
+  int e = p_GetExp(p,v,r);
   e *= ee;
   return p_SetExp(p,v,e,r);
 }
 
-PINLINE2 Exponent_t p_GetExpSum(poly p1, poly p2, int i, ring r)
+PINLINE2 int p_GetExpSum(poly p1, poly p2, int i, ring r)
 {
   p_LmCheckPolyRing2(p1, r);
   p_LmCheckPolyRing2(p2, r);
   return p_GetExp(p1,i,r) + p_GetExp(p2,i,r);
 }
-PINLINE2 Exponent_t p_GetExpDiff(poly p1, poly p2, int i, ring r)
+PINLINE2 int p_GetExpDiff(poly p1, poly p2, int i, ring r)
 {
   return p_GetExp(p1,i,r) - p_GetExp(p2,i,r);
 }

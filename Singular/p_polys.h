@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.22 2003-03-11 16:07:37 Singular Exp $
+ *  Version: $Id: p_polys.h,v 1.23 2003-03-11 16:26:32 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -79,15 +79,15 @@ PINLINE2 unsigned long p_AddComp(poly p, unsigned long v, ring r);
 PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r);
 
 // Exponent
-PINLINE2 Exponent_t p_GetExp(poly p, int v, ring r);
-PINLINE2 Exponent_t p_SetExp(poly p, int v, int e, ring r);
-PINLINE2 Exponent_t p_IncrExp(poly p, int v, ring r);
-PINLINE2 Exponent_t p_DecrExp(poly p, int v, ring r);
-PINLINE2 Exponent_t p_AddExp(poly p, int v, Exponent_t ee, ring r);
-PINLINE2 Exponent_t p_SubExp(poly p, int v, Exponent_t ee, ring r);
-PINLINE2 Exponent_t p_MultExp(poly p, int v, Exponent_t ee, ring r);
-PINLINE2 Exponent_t p_GetExpSum(poly p1, poly p2, int i, ring r);
-PINLINE2 Exponent_t p_GetExpDiff(poly p1, poly p2, int i, ring r);
+PINLINE2 int p_GetExp(poly p, int v, ring r);
+PINLINE2 int p_SetExp(poly p, int v, int e, ring r);
+PINLINE2 int p_IncrExp(poly p, int v, ring r);
+PINLINE2 int p_DecrExp(poly p, int v, ring r);
+PINLINE2 int p_AddExp(poly p, int v, int ee, ring r);
+PINLINE2 int p_SubExp(poly p, int v, int ee, ring r);
+PINLINE2 int p_MultExp(poly p, int v, int ee, ring r);
+PINLINE2 int p_GetExpSum(poly p1, poly p2, int i, ring r);
+PINLINE2 int p_GetExpDiff(poly p1, poly p2, int i, ring r);
 
 /***************************************************************
  *
