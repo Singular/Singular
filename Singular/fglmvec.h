@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.h,v 1.7 1998-06-03 15:25:19 obachman Exp $
+// $Id: fglmvec.h,v 1.8 1998-06-04 13:39:07 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -32,6 +32,7 @@ public:
 #ifndef HAVE_EXPLICIT_CONSTR
     void mac_constr( const fglmVector & v);
     void mac_constr_i( int size);
+    void clearelems();
 #endif
     int size() const;
     int numNonZeroElems() const;

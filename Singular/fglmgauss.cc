@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmgauss.cc,v 1.8 1998-06-03 15:25:18 obachman Exp $
+// $Id: fglmgauss.cc,v 1.9 1998-06-04 13:39:21 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -31,8 +31,11 @@ public:
 	newpdenom= NULL;
 	newfac= NULL;
     }
+
 #ifndef HAVE_EXPLICIT_CONSTR
-    void mac_gaussElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac )
+  gaussElem() : v(), p(), pdenom(NULL), fac(NULL) {}
+
+  void mac_gaussElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac )
     {
     v= newv;
     p= newp;
@@ -42,6 +45,7 @@ public:
 	newfac= NULL;
     }
 #endif
+
     ~gaussElem() 
     {
 	nDelete( & pdenom );
@@ -54,7 +58,11 @@ gaussReducer::gaussReducer( int dimen )
     int k;
     size= 0;
     max= dimen;
+#ifndef HAVE_EXPLICIT_CONSTR
+    elems= new gaussElem[ max+1 ];
+#else
     elems= (gaussElem *)Alloc( (max+1)*sizeof( gaussElem ) );
+#endif
     isPivot= (BOOLEAN *)Alloc( (max+1)*sizeof( BOOLEAN ) );
     for ( k= max; k > 0; k-- ) 
 	    isPivot[k]= FALSE;
@@ -64,9 +72,15 @@ gaussReducer::gaussReducer( int dimen )
 gaussReducer::~gaussReducer() 
 {
     int k;
+
+#ifndef HAVE_EXPLICIT_CONSTR
+    delete [] elems;
+#else
     for ( k= size; k > 0; k-- ) 
 	elems[k].~gaussElem();
     Free( (ADDRESS)elems, (max+1)*sizeof( gaussElem ) );
+#endif
+
     Free( (ADDRESS)isPivot, (max+1)*sizeof( BOOLEAN ) );
     Free( (ADDRESS)perm, (max+1)*sizeof( int ) );
 }

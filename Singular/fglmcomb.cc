@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.11 1998-05-19 09:46:46 pohl Exp $
+// $Id: fglmcomb.cc,v 1.12 1998-06-04 13:38:48 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -198,9 +198,19 @@ fglmNewLinearCombination( ideal source, poly monset )
     }
 
     nf= (polyset)Alloc( numMonoms * sizeof( poly ) );
-    mv= (fglmVector *)Alloc( numMonoms * sizeof( fglmVector ) );
 
+#ifndef HAVE_EXPLICIT_CONSTR
+    mv= new fglmVector[ numMonoms ];
+#else
+    mv= (fglmVector *)Alloc( numMonoms * sizeof( fglmVector ) );
+#endif
+
+#ifndef HAVE_EXPLICIT_CONSTR
+    v= new fglmVector[ numMonoms ];
+#else
     v= (fglmVector *)Alloc( numMonoms * sizeof( fglmVector ) );
+#endif
+
     basisMax= basisBS;
     basis= (polyset)Alloc( basisMax * sizeof( poly ) );
 
@@ -259,7 +269,7 @@ fglmNewLinearCombination( ideal source, poly monset )
             pIter( temp );
         }
         nf[k]= current;
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
         mv[k].mac_constr( currV );
 #else
         mv[k].fglmVector( currV );
@@ -270,7 +280,7 @@ fglmNewLinearCombination( ideal source, poly monset )
     for ( k= 0; k < numMonoms; k++ ) {
         STICKYPROT( "." );
  
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
         v[k].mac_constr_i( basisSize );
 #else
         v[k].fglmVector( basisSize );
@@ -340,7 +350,11 @@ fglmNewLinearCombination( ideal source, poly monset )
             gauss.store();
             act++;
         }
+#ifndef HAVE_EXPLICIT_CONSTR
+	v[best-1].clearelems();
+#else
         v[best-1].~fglmVector();
+#endif
     }
     poly result = NULL;
     if ( isZero == TRUE ) {
@@ -385,13 +399,23 @@ fglmNewLinearCombination( ideal source, poly monset )
     Free( (ADDRESS)order, numMonoms * sizeof( int ) );
 //     for ( k= 0; k < numMonoms; k++ )
 //         v[k].~fglmVector();
+#ifndef HAVE_EXPLICIT_CONSTR
+    delete [] v;
+#else
     Free( (ADDRESS)v, numMonoms * sizeof( fglmVector ) );
+#endif
+
     for ( k= 0; k < basisSize; k++ )
         pDelete( basis + k );
     Free( (ADDRESS)basis, basisMax * sizeof( poly ) );
+
+#ifndef HAVE_EXPLICIT_CONSTR
+    delete [] mv;
+#else
     for ( k= 0; k < numMonoms; k++ )
         mv[k].~fglmVector();
     Free( (ADDRESS)mv, numMonoms * sizeof( fglmVector ) );
+#endif
 
     for ( k= 0; k < numMonoms; k++ )
         pDelete( m + k );
