@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.12 1999-11-15 17:20:46 obachman Exp $ */
+/* $Id: sdb.cc,v 1.13 2000-05-02 14:21:15 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -231,7 +231,7 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
           "B <proc> [<line>] - define breakpoint\n"
           "c - continue\n"
           "d - delete current breakpoint\n"
-          "D - show all preakpoints\n"
+          "D - show all breakpoints\n"
           "e - edit the current procedure (current call will be aborted)\n"
           "h,? - display this help screen\n"
           "n - execute current line, break at next line\n"
