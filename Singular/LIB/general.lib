@@ -1,7 +1,7 @@
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.34 2000-12-31 15:14:46 obachman Exp $";
+version="$Id: general.lib,v 1.35 2001-01-07 01:50:32 greuel Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -19,7 +19,6 @@ PROCEDURES:
  number_pi(n);          compute pi (area of unit circle) up to n digits
  primes(n,m);           intvec of primes p, n<=p<=m
  product(../..[,v]);    multiply components of vector/ideal/...[indices v]
- ringweights(r);        intvec of weights of ring variables of ring r
  sort(ideal/module);    sort generators according to monomial ordering
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
  watchdog(i,cmd);       only wait for result of command cmd for i seconds
@@ -270,10 +269,10 @@ RETURN:   factorial(n):   n! (computed in characteristic 0), of type string.
 SEE ALSO: prime
 EXAMPLE:  example factorial; shows an example
 "
-{   int l,p;
+{   int str,l,p;
 //---------------------------- initialization -------------------------------
    if ( size(#) == 0 )
-   {  
+   {  str = 1;
       ring bin = 0,x,dp;
       number r=1;
    }
@@ -283,40 +282,16 @@ EXAMPLE:  example factorial; shows an example
       if ( defined(basering) )
       {
          if ( p == char(basering) )
-         {
-           // do it clever !
-           if (n < 1) {return (0);}
-           if (! defined(sv_factorials))
-           {
-             ideal sv_factorials;
-             sv_factorials[1] = 1;
-             export(sv_factorials);
-           }
-           if (n > size(sv_factorials))
-           {
-             int i = size(sv_factorials);
-             sv_factorials[n] = 0;
-             number fi = number(sv_factorials[i]);
-             for (i++;i<=n;i++)
-             {
-               fi = fi * i;
-               sv_factorials[i] = fi;
-             }
-             return (fi);
-           }
-           else
-           {
-             return (number(sv_factorials[n]));
-           }
+         {  number r=1;
          }
          else
-         {  
+         {  str = 1;
             ring bin = p,x,dp;
             number r=1;
          }
       }
       else
-      {  
+      {  str = 1;
          ring bin = p,x,dp;
          number r=1;
       }
@@ -326,7 +301,8 @@ EXAMPLE:  example factorial; shows an example
    {
       r=r*l;
    }
-   return(string(r));
+   if ( str==1 ) { return(string(r)); }
+   else { return(r); }
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -335,8 +311,6 @@ example
    number p = factorial(37,0);       //37! of type number, computed in r
    p;
 }
-    
-        
 ///////////////////////////////////////////////////////////////////////////////
 
 proc fibonacci (int n, list #)
@@ -786,88 +760,9 @@ example
    product(A,3..5);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc ringweights (list # )
-"USAGE:   ringweights(P); P=name of an existing ring (true name, not a string)
-RETURN:  intvec consisting of the weights of the variables of P, as they 
-         appear when typing P;.
-NOTE:    This is useful when enlarging P but keeping the weights of the old
-         variables.
-EXAMPLE: example ringweights; shows an example
-"
-{
-   int ii,q,fi,fo,fia;
-   intvec rw,nw;
-   string os;
-   def P = #[1];
-   string osP = ordstr(P);
-   fo  = 1;
-//------------------------- find weights in ordstr(P) -------------------------
-   fi  = find(osP,"(",fo);
-   fia = find(osP,"a",fo)+find(osP,"w",fo)+find(osP,"W",fo);
-   while ( fia )
-   {
-      os = osP[fi+1,find(osP,")",fi)-fi-1];
-      if( find(os,",") )
-      {
-         execute("nw = "+os+";");
-         if( size(nw) > ii )
-         {
-             rw = rw,nw[ii+1..size(nw)];
-         }
-         else  {  ii = ii - size(nw); }
-
-         if( find(osP[1,fi],"a",fo) ) { ii = size(nw); }
-      }
-      else
-      {
-         execute("q = "+os+";");
-         if( q > ii )
-         {
-            nw = 0; nw[q-ii] = 0;
-            nw = nw + 1;          //creates an intvec 1,...,1 of length q-ii
-            rw = rw,nw;
-         }
-         else { ii = ii - q; }
-      }
-      fo  = fi+1;
-      fi  = find(osP,"(",fo);
-      fia = find(osP,"a",fo)+find(osP,"w",fo)+find(osP,"W",fo);
-   }
-//-------------- adjust weight vector to length = nvars(P)  -------------------
-   if( fo > 1 )
-   {                                            // case when weights were found
-      rw = rw[2..size(rw)];
-      if( size(rw) > nvars(P) )
-      {
-         rw = rw[1..nvars(P)];
-      }
-      if( size(rw) < nvars(P) )
-      {
-         nw=0; nw[nvars(P)-size(rw)]=0; nw=nw+1; rw=rw,nw;
-      }
-   }
-   else
-   {                                         // case when no weights were found
-      rw[nvars(P)]= 0; rw=rw+1;
-   }
-   return(rw);
-}
-example
-{"EXAMPLE:";  echo = 2;
-  ring r0 = 0,(x,y,z),dp;
-  ringweights(r0);
-  ring r1 = 0,x(1..5),(ds(3),wp(2,3));
-  ringweights(r1);"";
-  // an example for enlarging the ring, keeping the first weights:
-  intvec v = ringweights(r1),6,2,3,4,5;
-  ring R = 0,x(1..10),(a(v),dp);
-  ordstr(R);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 
 proc sort (id, list #)
-"USAGE:   sort(id[v,o,n]); id=ideal/module/intvec/list(of intvec's or int's)
+"USAGE:   sort(id[v,o,n]); id = ideal/module/intvec/list(of intvec's or int's)
 @*       sort may be called with 1, 2 or 3 arguments in the following way:
 @*       sort(id[v,n]); v=intvec of positive integers, n=integer,
 @*       sort(id[o,n]); o=string (any allowed ordstr of a ring), n=integer
@@ -906,7 +801,8 @@ EXAMPLE: example sort; shows an example
 {  int ii,jj,s,n = 0,0,1,0;
    intvec v;
    if ( defined(basering) ) { def P = basering; }
-   if ( size(#)==0 and (typeof(id)=="ideal" or typeof(id)=="module") )
+   if ( size(#)==0 and (typeof(id)=="ideal" or typeof(id)=="module"
+                        or typeof(id)=="matrix"))
    {
       id = simplify(id,2);
       for ( ii=1; ii<size(id); ii++ )
@@ -916,7 +812,8 @@ EXAMPLE: example sort; shows an example
       if ( ii != size(id) ) { v = sortvec(id); }
       else  { v = size(id)..1; }
    }
-   if ( size(#)>=1 and (typeof(id)=="ideal" or typeof(id)=="module") )
+   if ( size(#)>=1 and (typeof(id)=="ideal" or typeof(id)=="module"
+                        or typeof(id)=="matrix") )
    {
       if ( typeof(#[1])=="string" )
       {
