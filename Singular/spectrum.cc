@@ -624,7 +624,7 @@ static spectrumState   spectrumCompute( poly h,lists *L,int fast )
 
   poly hc = (poly)NULL;
 
-  scComputeHC( stdJ,0,hc );
+  scComputeHC( stdJ,currQuotient, 0,hc );
 
   if( hc!=(poly)NULL )
   {
