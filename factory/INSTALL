@@ -20,7 +20,7 @@ Overview				Installation for the impatient
 
 1. Configuring Factory
 ======================
-   The configure shell script attempts to guess correct values for various
+  The configure shell script attempts to guess correct values for various
 system-dependent variables used during compilation.  It uses those values
 to create a GNUmakefile and a config.h file containing system-dependent
 definitions.  Finally, it creates a shell script config.status that you can
@@ -29,19 +29,25 @@ config.cache that saves the results of its tests to speed up reconfiguring,
 and a file config.log containing compiler output (useful mainly for
 debugging configure).
 
-   If you need to do unusual things to compile the package, please try to
+  If you need to do unusual things to compile the package, please try to
 figure out how configure could check whether to do them, and mail diffs or
 instructions to the address given in the README file so they can be
 considered for the next release.  If at some point config.cache contains
 results you don't want to keep, you may remove or edit it.
 
-   The file configure.in is used to create configure by a program called
+  The file configure.in is used to create configure by a program called
 autoconf.  You only need configure.in if you want to change it or
 regenerate configure using a newer version of autoconf.
 
+  Normally, the configure script's guesses are correct.  However, you may
+want to check the values it came up with.  Especially the way configure
+tries to figure out the path to the GF(q) tables ('GFTABLEDIR') may be
+fooled in some circumstances.  See the marked sections in the files
+config.h and GNUmakefile which configure created.
+
 Compiler options
 ----------------
-   Some systems require unusual options for compilation or linking that the
+  Some systems require unusual options for compilation or linking that the
 configure script does not know about.  You can give configure initial
 values for variables by setting them in the environment.  Using a
 Bourne-compatible shell, you can do that on the command line like this:
@@ -57,7 +63,7 @@ Or on systems that have the env program, you can do it like this:
 you do not like this, configure with
 
   CFLAGS='-g -O' CXXFLAGS='-g -O' ./configure
-
+
 Specifying source and installation directories
 ----------------------------------------------
   configure recognizes the '--srcdir=<srcdir>' option and looks in <srcdir>
@@ -69,7 +75,7 @@ section).
 /usr/local/lib, /usr/local/include, etc.  You can specify an installation
 prefix other than /usr/local by giving configure the option
 --prefix=<path>.
-  You can specify seperate installation prefixes for architecture-specific
+  You can specify separate installation prefixes for architecture-specific
 files and architecture-independent files.  If you give configure the option
 '--exec-prefix=<path>' the package will use <path> as the prefix for
 installing the libraries.  The other data files will still use the regular
@@ -129,7 +135,7 @@ commands necessary to do that:
 
 Configuring for Macintosh or other non-Unix platforms
 -----------------------------------------------------
-  Factory translates on Macintosh with the Metroworks CodeWarrior compile
+  Factory translates on Macintosh with the Metroworks CodeWarrior compiler
 now.  If you want to build Factory on this or other non-Unix platforms you
 either have to configure config.h and GNUmakefile by hand or you have to
 create a suitable config.cache file and run configure on a machine that
@@ -151,7 +157,7 @@ make mem').
   Deletes all files from the current directory that have been created by
 building Factory.  In addition, 'make mostlyclean' deletes the GF(q) tables
 if they have been created by 'make gftables'.  'make distclean' is like
-'make mostlyclean', but also deletes all files from the current directoy
+'make mostlyclean', but also deletes all files from the current directory
 that have been created by configuring.  If you have unpacked the source and
 built the program without creating any other files, 'make distclean' leaves
 only the files that were in the distribution.
