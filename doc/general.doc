@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.55 1998-05-12 16:19:56 schmidt Exp $
+@comment $Id: general.doc,v 1.56 1998-05-13 06:42:54 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -519,7 +519,8 @@ and matrices and set it as the actual basering.
 All advanced algorithms in @sc{Singular} require a ring.
 The last defined ring is the basering until a new ring is defined
 or until it is changed with @code{setring} or @code{keepring} or
-it gets killed.
+it gets killed. The actual basering always carries the additional name
+@code{basering}. 
 
 The coefficient field is given by either
 @enumerate
@@ -1395,27 +1396,31 @@ Procedures are defined by either typing them in on the command line or by
 loading them from a file. If a procedure is defined in a file which complies
 with the syntax rules for libraries, this file may be loaded with the
 @code{LIB} command and the procedure may have additional sections (cf.
-@ref{Proc in a library}).
+@ref{Procedure definition}).
 Procedures are invoked like a normal built-in command, i.e. by typing their
 name followed by the list of arguments
 in parentheses. The invocation then executes
 the sequence of commands stored in the specified procedure.
 
 @menu
-* Proc definition::
-* Names in proc::
-* Parameter list::
-* Proc commands::
-* Proc in a library::
-* Loading of procedure files::
+* Procedure definition::             
+* Names in procedures::         
+* Parameter list::              
+* Procedure commands::          
+* Loading of procedure files::  
 @end menu
 @c -------------------------------------------------
-@node Proc definition, Names in procedures, Procedures, Procedures
+@node Procedure definition, Names in procedures, Procedures, Procedures
 @subsection Proc in a library
 @cindex Proc in a library
+@c ------------------------------------------------------------
+@c   This piece of text exists also in the file types.doc, 
+@c   chapter "proc declaration".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
 @table @strong
 @item Syntax:
-@code{[static] proc} proc_name [parameter_list]
+[@code{static}] @code{proc} proc_name [parameter_list]
 @*["help_text"]
 @*@code{@{}
 @*
@@ -1437,12 +1442,10 @@ defines a new function, the @code{proc} proc_name, with the additional
 information help_text, which is copied to the screen by 
 @code{help proc_name;} and the @code{example} section
 which is executed by @code{example proc_name;}. 
-
 @* The help_text, the parameter_list, and the example section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined 
 interactively, i.e. if it was not loaded from a file by a @code{LIB} command.
-
 @* Specifying static in front of the proc-definition (in a library file)
 makes this procedure local to the library, i.e. accessible only for the other
 procedures in the same library, but not for the users. So there is no
@@ -1561,7 +1564,7 @@ EXAMPLE:  example <proc_name>; shows an example
 @end menu
 
 @c ---------------------------------------
-@node Names in procedures, Parameter list, Proc definition, Procedures
+@node Names in procedures, Parameter list, Procedure definition, Procedures
 @subsection Names in procedures
 @cindex Names in procedures
 @cindex local names
@@ -1769,14 +1772,14 @@ library files is @code{/usr/local/share/Singular};
 or can be given by the environment variable
 @code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS}. Users, who do not
 intend to write their own libraries, may skip paragraphs @ref{Format of a
-library} to @ref{A good example} without loosing any relevant information.
+library} to @ref{A syntax example} without loosing any relevant information.
 
 @menu
-* Format of a library::
-* LIB in a library::
-* info::
-* version::
-* A good example::
+* Format of a library::         
+* LIB in a library::            
+* info::                        
+* version::                     
+* A syntax example::            
 @end menu
 
 @c ---------------------------------------
