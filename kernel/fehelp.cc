@@ -889,7 +889,7 @@ static void heDummyHelp(heEntry hentry, int br)
 
 static BOOLEAN heEmacsInit(int warn, int br)
 {
-  return TRUE;
+  return (BOOLEAN)feOptValue(FE_OPT_EMACS);
 }
 static void heEmacsHelp(heEntry hentry, int br)
 {
