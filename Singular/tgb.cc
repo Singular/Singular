@@ -2784,13 +2784,14 @@ void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c){
       if(row_cache[i]==col)
       {
 	
-	number c1=nNeg(nCopy(mat->get(i,col)));
+	number c1=mat->get(i,col);
 	number c2=mat->get(row,col);
 	number n1=c1;
 	number n2=c2;
 
 	ksCheckCoeff(&n1,&n2);
-	nDelete(&c1);
+	//nDelete(&c1);
+	n1=nNeg(n1);
 	mat->mult_row(i,n2);
 	mat->add_lambda_times_row(i,row,n1);
 	nDelete(&n1);
