@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.70 1999-10-14 14:27:28 obachman Exp $ */
+/* $Id: ring.cc,v 1.71 1999-10-14 15:33:40 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -211,21 +211,17 @@ idhdl rDefault(char *s)
   /*weights: entries for 3 blocks: NULL*/
   r->wvhdl = (int **)Alloc0(3 * sizeof(int_ptr));
   /*order: dp,C,0*/
-  r->order = (int *) Alloc(3 * sizeof(int_ptr));
-  r->block0 = (int *)Alloc(3 * sizeof(int_ptr));
-  r->block1 = (int *)Alloc(3 * sizeof(int_ptr));
+  r->order = (int *) Alloc(3 * sizeof(int *));
+  r->block0 = (int *)Alloc0(3 * sizeof(int *));
+  r->block1 = (int *)Alloc0(3 * sizeof(int *));
   /* ringorder dp for the first block: var 1..3 */
   r->order[0]  = ringorder_dp;
   r->block0[0] = 1;
   r->block1[0] = 3;
   /* ringorder C for the second block: no vars */
   r->order[1]  = ringorder_C;
-  r->block0[1] = 0;
-  r->block1[1] = 0;
   /* the last block: everything is 0 */
   r->order[2]  = 0;
-  r->block0[2] = 0;
-  r->block1[2] = 0;
   /*polynomial ring*/
   r->OrdSgn    = 1;
 
@@ -1731,8 +1727,9 @@ int rSum(ring r1, ring r2, ring &sum)
  * used for qring definition,..
  * (i.e.: normal rings: same nCopy as currRing;
  *        qring:        same nCopy, same idCopy as currRing)
+ * DO NOT CALL rComplete
  */
-ring rCopy(ring r)
+ring rCopy0(ring r)
 {
   if (r == NULL) return NULL;
   int i,j;
@@ -1779,6 +1776,19 @@ ring rCopy(ring r)
   }
   res->idroot = NULL;
   if (r->qideal!=NULL) res->qideal= idCopy(r->qideal);
+  return res;
+}
+
+/*2
+ * create a copy of the ring r, which must be equivalent to currRing
+ * used for qring definition,..
+ * (i.e.: normal rings: same nCopy as currRing;
+ *        qring:        same nCopy, same idCopy as currRing)
+ */
+ring rCopy(ring r)
+{
+  if (r == NULL) return NULL;
+  ring res=rCopy0(r);
   rComplete(res, 1);
   return res;
 }
@@ -1975,10 +1985,10 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 //  mmTestP(r,sizeof(ip_sring));
 #ifdef MDEBUG
   i=rBlocks(r);
-  mmTestP(r->order,i*sizeof(int));
-  mmTestP(r->block0,i*sizeof(int));
-  mmTestP(r->block1,i*sizeof(int));
-  mmTestP(r->wvhdl,i*sizeof(int_ptr));
+  mmDBTestBlock(r->order,i*sizeof(int),fn,l);
+  mmDBTestBlock(r->block0,i*sizeof(int),fn,l);
+  mmDBTestBlock(r->block1,i*sizeof(int),fn,l);
+  mmDBTestBlock(r->wvhdl,i*sizeof(int *),fn,l);
 #endif
   if (r->VarOffset == NULL)
   {
@@ -3144,27 +3154,36 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 
 ring rAddSyzComp(ring r)
 {
+  nMap=nCopy;
   if (r->order[0]==ringorder_c)
     return currRing;
 
-  ring res=rCopy(r);
+  ring res=rCopy0(r);
   if (res->qideal!=NULL)
   {
     idDelete(&(res->qideal));
   }
-  rUnComplete(res);
   int i=rBlocks(r);
+  int j;
+
   Free((ADDRESS)res->order,i*sizeof(int));
-  res->order=(int *)Alloc((i+1)*sizeof(int));
-  memcpy(&(res->order[1]),&(r->order[0]),i*sizeof(int));
-  Free((ADDRESS)res->block0,i*sizeof(int));
-  res->block0=(int *)Alloc((i+1)*sizeof(int));
-  memcpy(&(res->block0[1]),&(r->block0[0]),i*sizeof(int));
-  Free((ADDRESS)res->block1,i*sizeof(int));
-  res->block1=(int *)Alloc((i+1)*sizeof(int));
-  memcpy(&(res->block1[1]),&(r->block1[0]),i*sizeof(int));
+  res->order=(int *)Alloc0((i+1)*sizeof(int));
+  for(j=i;j>0;j--) res->order[j]=r->order[j-1];
   res->order[0]=ringorder_s;
-  rComplete(res);
+
+  Free((ADDRESS)res->block0,i*sizeof(int));
+  res->block0=(int *)Alloc0((i+1)*sizeof(int));
+  for(j=i;j>0;j--) res->block0[j]=r->block0[j-1];
+
+  Free((ADDRESS)res->block1,i*sizeof(int));
+  res->block1=(int *)Alloc0((i+1)*sizeof(int));
+  for(j=i;j>0;j--) res->block1[j]=r->block1[j-1];
+
+  Free((ADDRESS)res->wvhdl,i*sizeof(int*));
+  res->wvhdl=(int **)Alloc0((i+1)*sizeof(int**));
+  for(j=i;j>0;j--) res->wvhdl[j]=r->wvhdl[j-1];
+
+  rComplete(res,1);
   rChangeCurrRing(res,TRUE);
   if(r->qideal!=NULL)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.45 1999-10-14 12:50:26 Singular Exp $ */
+/* $Id: polys.cc,v 1.46 1999-10-14 15:33:39 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -643,6 +643,7 @@ static void HighSet(int ip, int o_r)
     case ringorder_Ds:
     case ringorder_ws:
     case ringorder_Ws:
+    case ringorder_s:
       break;
     case ringorder_c:
       pComponentOrder=1;

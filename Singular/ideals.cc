@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.58 1999-10-14 14:27:05 obachman Exp $ */
+/* $Id: ideals.cc,v 1.59 1999-10-14 15:33:39 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1385,22 +1385,26 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
       s_h1->m[i]=pPermPoly(h1->m[i],NULL,orig_ring,NULL,0);
     }
   }
-  ideal s_quot=idInit(IDELEMS(quot),1);
-  for(i=IDELEMS(quot)-1;i>=0;i--)
+  ideal s_quot=NULL;
+  if (quot!=NULL)
   {
-    if(syz_ring==orig_ring)
+    s_quot=idInit(IDELEMS(quot),1);
+    for(i=IDELEMS(quot)-1;i>=0;i--)
     {
-      s_quot->m[i]=pCopy(quot->m[i]);
-    }
-    else
-    {
-      s_quot->m[i]=pPermPoly(quot->m[i],NULL,orig_ring,NULL,0);
+      if(syz_ring==orig_ring)
+      {
+        s_quot->m[i]=pCopy(quot->m[i]);
+      }
+      else
+      {
+        s_quot->m[i]=pPermPoly(quot->m[i],NULL,orig_ring,NULL,0);
+      }
     }
   }
 
   ideal s_h3=idPrepare(s_h1,s_quot,h,k,&quotgen,&quotdim,w);
   idDelete(&s_h1);
-  idDelete(&s_quot);
+  if(s_quot!=NULL) idDelete(&s_quot);
 
   if (syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring,TRUE);
@@ -1524,19 +1528,22 @@ ideal idSyzMin (ideal h1,ideal  quot, tHomog h,intvec **w,
       s_h1->m[i]=pPermPoly(h1->m[i],NULL,orig_ring,NULL,0);
     }
   }
-  ideal s_quot=idInit(IDELEMS(quot),1);
-  for(i=IDELEMS(quot)-1;i>=0;i--)
+  ideal s_quot=NULL;
+  if (quot!=NULL)
   {
-    if(syz_ring==orig_ring)
+    s_quot=idInit(IDELEMS(quot),1);
+    for(i=IDELEMS(quot)-1;i>=0;i--)
     {
-      s_quot->m[i]=pCopy(quot->m[i]);
-    }
-    else
-    {
-      s_quot->m[i]=pPermPoly(quot->m[i],NULL,orig_ring,NULL,0);
+      if(syz_ring==orig_ring)
+      {
+        s_quot->m[i]=pCopy(quot->m[i]);
+      }
+      else
+      {
+        s_quot->m[i]=pPermPoly(quot->m[i],NULL,orig_ring,NULL,0);
+      }
     }
   }
-
   ideal s_h3=idPrepare(s_h1,s_quot,h,k,&quotgen,&quotdim,w);
   for (i=IDELEMS(s_h1);i!=0;i--)
     pDelete(&(s_h1->m[i-1]));
@@ -1544,7 +1551,7 @@ ideal idSyzMin (ideal h1,ideal  quot, tHomog h,intvec **w,
   if (s_h3==NULL)
   {
     idDelete(&s_h1);
-    idDelete(&s_quot);
+    if (s_quot!=NULL) idDelete(&s_quot);
     if (syz_ring!=orig_ring)
       rChangeCurrRing(orig_ring,TRUE);
     pSetSyzComp(0);
