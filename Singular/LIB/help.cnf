@@ -1,4 +1,4 @@
-# Singular help browser file $Id: help.cnf,v 1.5 2005-02-24 14:24:40 Singular Exp $
+# Singular help browser file $Id: help.cnf,v 1.6 2005-03-21 09:41:16 Singular Exp $
 # each line which start with an # is a comment
 # each other line defines a (possible) help browser
 # the format of the entries is: <name>!<requirements>!<shell command>
@@ -23,11 +23,11 @@
 # ix86_Win: has 2 additional default browsers: html and winhlp
 #----------------------------------------------------
 htmlview!xDhE:htmlview:!htmlview %h &
+mac!xhE:open:!open %f &
+mac-net!xE:open:!open %H &
 mozilla!xDhE:mozilla:!(mozilla -remote "openURL(%h)")||(mozilla %h) &
 galeon!xDhE:galeon:!galeon -n %h &
 netscape!xDhE:netscape:!(netscape -remote "openURL(%h)")||(netscape %h) &
 tkinfo!xDiE:tkinfo:!tkinfo '(%i)%n' &
 xinfo!xDiE:xterm:E:info:!xterm -e info -f %i --node='%n' &
-mac!xhE:open:!open %f &
-mac-net!xE:open:!open %H &
 info!xiE:info:!info -f %i --node='%n'
