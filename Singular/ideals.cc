@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.39 1998-10-15 13:51:17 siebert Exp $ */
+/* $Id: ideals.cc,v 1.40 1998-11-10 17:12:03 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2352,7 +2352,7 @@ static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
         p = MATELEM(a,i,j);
         if (p!=NULL)
         {
-	  //idEnterSet(p,result,nextPlace);
+          //idEnterSet(p,result,nextPlace);
           if (*nextPlace>=IDELEMS(result))
           {
             pEnlargeSet(&(result->m),IDELEMS(result),IDELEMS(result));
@@ -2577,25 +2577,24 @@ BOOLEAN pIsUnit(poly p)
 */
 ideal idCompactify(ideal id)
 {
-  ideal result = NULL;
   int i,j;
   BOOLEAN b=FALSE;
 
-  result=idCopy(id);
-  i = IDELEMS(result)-1;
+  i = IDELEMS(id)-1;
   while ((! b) && (i>=0))
   {
-    b=pIsUnit(result->m[i]);
+    b=pIsUnit(id->m[i]);
     i--;
   }
   if (b)
   {
-    for (i=IDELEMS(result)-1;i>=0;i--)
-      pDelete(&result->m[i]);
+    ideal result=idInit(1,id->rank);
     result->m[0]=pOne();
+    return result;
   }
   else
   {
+    ideal result=idCopy(id);
     for (i=1;i<IDELEMS(result);i++)
     {
       if (result->m[i]!=NULL)
@@ -2610,9 +2609,9 @@ ideal idCompactify(ideal id)
         }
       }
     }
+    idSkipZeroes(result);
+    return result;
   }
-  idSkipZeroes(result);
-  return result;
 }
 
 /*2
