@@ -679,7 +679,7 @@ check_aso:
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
 depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h claptmpl.dd
-	-cat *.d *.dd >depend
+	-cat *.d >depend
 	-cat *.dd >>depend
 
 ifeq (depend,$(wildcard depend))
