@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.12 1998-10-21 10:25:39 krueger Exp $ */
+/* $Id: lists.cc,v 1.13 1999-04-16 07:53:39 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -353,3 +353,34 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
   return r;
 }
 
+char* lString(lists l)
+{
+  if (l->nr == -1) return mstrdup("");
+  char** slist = (char**) Alloc((l->nr+1) * sizeof(char*));
+  int i, j, k;
+  char *s;
+  for (i=0, j = 0, k = 0; i<=l->nr; i++)
+  {
+    slist[i] = l->m[i].String();
+    assume(slist[i] != NULL);
+    if (*(slist[i]) != '\0')
+    {
+      j += strlen(slist[i]);
+      k++;
+    }
+  }
+  s = (char*) AllocL(j+k+1);
+  *s = '\0';
+  for (i=0; i<=l->nr; i++)
+  {
+    if (*(slist[i]) != '\0')
+    {
+      strcat(s, slist[i]);
+      strcat(s, ",");
+    }
+    FreeL(slist[i]);
+  }
+  if (k > 0) s[strlen(s) - 1] = '\0';
+  Free(slist, (l->nr+1) * sizeof(char*));
+  return s;
+}

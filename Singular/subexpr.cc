@@ -637,7 +637,7 @@ attr sleftv::CopyA()
   return NULL;
 }
 
-char *  sleftv::String(void *d)
+char *  sleftv::String(void *d, BOOLEAN func)
 {
 #ifdef SIQ
   if (rtyp==COMMAND)
@@ -657,81 +657,115 @@ char *  sleftv::String(void *d)
   if (!errorreported)
   {
     /* create a string, which may be freed by FreeL
-    * leave the switch with return
-    * or with break, which copies the string s*/
+     * leave the switch with return
+     * or with break, which copies the string s*/
     char *s;
     const char *n;
     if (name!=NULL) n=name;
     else n=sNoName;
     switch (Typ())
     {
-      case INT_CMD:
-        s=(char *)AllocL(MAX_INT_LEN+2);
-        sprintf(s,"%d",(int)d);
-        return s;
-      case STRING_CMD:
-        return (char *)CopyD(STRING_CMD);
-      case POLY_CMD:
-      case VECTOR_CMD:
-        s = pString((poly)d);
-        break;
-      case NUMBER_CMD:
-        StringSetS("");
-        if ((rtyp==IDHDL)&&(IDTYP((idhdl)data)==NUMBER_CMD))
+        case INT_CMD:
+          s=(char *)AllocL(MAX_INT_LEN+2);
+          sprintf(s,"%d",(int)d);
+          return s;
+        case STRING_CMD:
+          if (d != NULL) return mstrdup((char*)d);
+          return mstrdup("");
+        case POLY_CMD:
+        case VECTOR_CMD:
+          s = pString((poly)d);
+          break;
+        case NUMBER_CMD:
+          StringSetS("");
+          if ((rtyp==IDHDL)&&(IDTYP((idhdl)data)==NUMBER_CMD))
+          {
+            nWrite(IDNUMBER((idhdl)data));
+          }
+          else if (rtyp==NUMBER_CMD)
+          {
+            number n=(number)data;
+            nWrite(n);
+            data=(char *)n;
+          }
+          else if((rtyp==VMINPOLY)&&(rField_is_GF()))
+          {
+            nfShowMipo();
+          }
+          else
+          {
+            number n=nCopy((number)d);
+            nWrite(n);
+            nDelete(&n);
+          }
+          s = StringAppend("");
+          break;
+        case MATRIX_CMD:
+          s= iiStringMatrix((matrix)d,1);
+          break;
+        case MODUL_CMD:
+        case IDEAL_CMD:
+        case MAP_CMD:
+          s= iiStringMatrix((matrix)d,1);
+          break;
+        case INTVEC_CMD:
+        case INTMAT_CMD:
         {
-          nWrite(IDNUMBER((idhdl)data));
+          intvec *v=(intvec *)d;
+          return v->String(1);
         }
-        else if (rtyp==NUMBER_CMD)
+        case RING_CMD:
         {
-          number n=(number)data;
-          nWrite(n);
-          data=(char *)n;
+          return rString((ring)d);
         }
-        else if((rtyp==VMINPOLY)&&(rField_is_GF()))
+        case QRING_CMD:
         {
-          nfShowMipo();
+          char* r = rString((ring)d);
+          char* i = iiStringMatrix((matrix) ((ring) d)->qideal, 1);
+          s = (char*) AllocL(strlen(r) + strlen(i) + 4);
+          sprintf(s, "%s,(%s)", r, i);
+          FreeL(r);
+          return s;
         }
-        else
+        
+        case RESOLUTION_CMD:
         {
-          number n=nCopy((number)d);
-          nWrite(n);
-          nDelete(&n);
+          lists l = syConvRes((syStrategy)d);
+          s = lString(l);
+          l->Clean();
+          return (s);
         }
-        s = StringAppend("");
-        break;
-      case MATRIX_CMD:
-        s= iiStringMatrix((matrix)d,2);
-        break;
-      case MODUL_CMD:
-      case IDEAL_CMD:
-      case MAP_CMD:
-        s= iiStringMatrix((matrix)d,1);
-        break;
-      case INTVEC_CMD:
-      case INTMAT_CMD:
-      {
-        intvec *v=(intvec *)d;
-        return v->String();
-      }
-      case RING_CMD:
-      case QRING_CMD:
-      {
-        return rString((ring)d);
-      }
+        case PROC_CMD:
+        {
+          procinfo* pi = (procinfo*) d;
+          if((pi->language == LANG_SINGULAR) && (pi->data.s.body!=NULL))
+            return mstrdup(pi->data.s.body);
+          else
+            return mstrdup("");
+        }
+          
         case LINK_CMD:
         {
           return slString((si_link) d);
         }
+        case DEF_CMD:
+        {
+          return mstrdup("");
+        }
         
-      default:
-        #ifdef TEST
-        ::Print("String:unknown type %s(%d)", Tok2Cmdname(Typ()),Typ());
-        #endif
-        return NULL;
+        case LIST_CMD:
+        {
+          return lString((lists) d);
+        }
+        default:
+#ifdef TEST
+          ::Print("String:unknown type %s(%d)", Tok2Cmdname(Typ()),Typ());
+#endif
+          return mstrdup("");
     } /* end switch: (Typ()) */
     return mstrdup(s);
   }
-  return NULL;
+  return mstrdup("");
 }
 
 int  sleftv::Typ()

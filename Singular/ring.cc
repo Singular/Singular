@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.49 1999-03-25 20:18:32 Singular Exp $ */
+/* $Id: ring.cc,v 1.50 1999-04-16 07:53:41 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1735,6 +1735,7 @@ int rSum(ring r1, ring r2, ring &sum)
  */
 ring rCopy(ring r)
 {
+  if (r == NULL) return NULL;
   int i,j;
   int *pi;
   ring res=(ring)Alloc(sizeof(ip_sring));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.58 1999-04-15 17:28:03 Singular Exp $ */
+/* $Id: grammar.y,v 1.59 1999-04-16 07:53:32 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -636,6 +636,10 @@ expr:   expr_arithmetic
         | MATRIX_CMD '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,MATRIX_CMD)) YYERROR;
+          }
+        | INTMAT_CMD '(' expr ',' expr ',' expr ')'
+          {
+            if(iiExprArith3(&$$,INTMAT_CMD,&$3,&$5,&$7)) YYERROR;
           }
         | INTMAT_CMD '(' expr ')'
           {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.141 1999-04-15 09:57:03 obachman Exp $ */
+/* $Id: iparith.cc,v 1.142 1999-04-16 07:53:37 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2951,33 +2951,9 @@ static BOOLEAN jjSTD(leftv res, leftv v)
   if (w!=NULL) atSet(res,mstrdup("isHomog"),w,INTVEC_CMD);
   return FALSE;
 }
-static BOOLEAN jjSTRING(leftv res, leftv v)
-{
-  res->data = (char *)v->String();
-  if (res->data==NULL)
-  {
-    Werror("cannot convert %s to string",Tok2Cmdname(v->Typ()));
-    return TRUE;
-  }
-  return FALSE;
-}
 static BOOLEAN jjSort_Id(leftv res, leftv v)
 {
   res->data = (char *)idSort((ideal)v->Data());
-  return FALSE;
-}
-static BOOLEAN jjSTRING_PROC(leftv res, leftv v)
-{
-  procinfov pi = IDPROC((idhdl)v->data);
-  if((pi->language == LANG_SINGULAR) && (pi->data.s.body!=NULL))
-  //if(pi->language == LANG_SINGULAR)
-  {
-    //if(pi->data.s.body==NULL)
-    //  iiGetLibProcBuffer(IDPROC((idhdl)v->data));
-    res->data=mstrdup(pi->data.s.body);
-  }
-  else
-    res->data=mstrdup("");
   return FALSE;
 }
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
@@ -3558,20 +3534,6 @@ struct sValCmd1 dArith1[]=
 ,{jjSTD,        STD_CMD,         IDEAL_CMD,      IDEAL_CMD }
 ,{jjSTD,        STD_CMD,         MODUL_CMD,      MODUL_CMD }
 ,{jjDUMMY,      STRING_CMD,      STRING_CMD,     STRING_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     INT_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     POLY_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     VECTOR_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     NUMBER_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     MATRIX_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     MODUL_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     IDEAL_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     MAP_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     INTVEC_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     INTMAT_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     LINK_CMD }
-,{jjSTRING_PROC,STRING_CMD,      STRING_CMD,     PROC_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     RING_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     QRING_CMD }
 ,{jjSYSTEM,     SYSTEM_CMD,      NONE,           STRING_CMD }
 ,{jjSYZYGY,     SYZYGY_CMD,      MODUL_CMD,      IDEAL_CMD }
 ,{jjSYZYGY,     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD }
@@ -3925,6 +3887,20 @@ static BOOLEAN jjFIND3(leftv res, leftv u, leftv v, leftv w)
   }
   return FALSE;
 }
+static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
+{
+  intvec* im= new intvec((int)v->Data(),(int)w->Data(), 0);
+  intvec* arg = (intvec*) u->Data();
+  int i, n = min(im->cols()*im->rows(), arg->cols()*arg->rows());
+  
+  for (i=0; i<n; i++)
+  {
+    (*im)[i] = (*arg)[i];
+  }
+  
+  res->data = (char *)im;
+  return FALSE;
+}
 static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)
 {
   short *iw=iv2array((intvec *)w->Data());
@@ -4226,6 +4202,7 @@ struct sValCmd3 dArith3[]=
 ,{jjCALL3MANY,      IDEAL_CMD,  IDEAL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD }
 //,{jjCALL3MANY,      INTERSECT_CMD,  NONE,   DEF_CMD,    DEF_CMD,    DEF_CMD }
 ,{lInsert3,         INSERT_CMD, LIST_CMD,   LIST_CMD,   DEF_CMD,    INT_CMD }
+,{jjINTMAT3,        INTMAT_CMD, INTMAT_CMD, INTMAT_CMD, INT_CMD,    INT_CMD}
 ,{jjCALL3MANY,      INTVEC_CMD, INTVEC_CMD, DEF_CMD,    DEF_CMD,    DEF_CMD }
 ,{jjJET_P_IV,       JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    INTVEC_CMD }
 ,{jjJET_ID_IV,      JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD,    INTVEC_CMD }
@@ -4586,48 +4563,36 @@ static BOOLEAN jjRESERVED0(leftv res, leftv v)
 }
 static BOOLEAN jjSTRING_PL(leftv res, leftv v)
 {
-  if ((v!=NULL)&&(v->next==NULL))
-    return iiExprArith1(res,v,iiOp);
-  int sl=0;
-  leftv h=v,nachher;
-  sleftv tmpR;
-  BOOLEAN bo;
-  char *sum=NULL;
-  while(h!=NULL)
+  if (v == NULL)
   {
-    /* convert to string =================================*/
-    nachher=h->next;
-    h->next=NULL;
-    bo=iiExprArith1(&tmpR,h,iiOp);
-    if(bo)
-    {
-      h->next=nachher;
-      FreeL(sum);
-      return TRUE;
-    }
-    /* append to 'sum' =================================*/
-    if(sum==NULL)
-    {
-      sum=(char *)tmpR.data;
-      sl=strlen(sum);
-    }
-    else
-    {
-      int nl=strlen((char *)tmpR.data);
-      char *s=(char *)AllocL(sl+nl+1);
-      memcpy(s,sum,sl);
-      memcpy(s+sl,(char *)tmpR.data,nl);
-      s[sl+nl]='\0';
-      sl+=nl;
-      FreeL(sum);
-      sum=s;
-    }
-    /* next sleftv =================================*/
-    h->next=nachher;
-    h=nachher;
+    res->data = mstrdup("");
+    return FALSE;
   }
-  if (sum==NULL) sum=mstrdup("");
-  res->data=(char *)sum;
+  int n = v->listLength();
+  if (n == 1)
+  {
+    res->data = v->String();
+    return FALSE;
+  }
+  
+  char** slist = (char**) Alloc(n*sizeof(char*));
+  int i, j;
+  
+  for (i=0, j=0; i<n; i++, v = v ->next)
+  {
+    slist[i] = v->String();
+    assume(slist[i] != NULL);
+    j+=strlen(slist[i]);
+  }
+  char* s = (char*) AllocL((j+1)*sizeof(char));
+  *s='\0';
+  for (i=0;i<n;i++)
+  {
+    strcat(s, slist[i]);
+    FreeL(slist[i]);
+  }
+  Free(slist, n*sizeof(char*));
+  res->data = s;
   return FALSE;
 }
 static BOOLEAN jjTEST(leftv res, leftv v)
