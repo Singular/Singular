@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.235 2000-11-27 11:48:57 Singular Exp $ */
+/* $Id: iparith.cc,v 1.236 2000-11-27 12:50:12 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1116,7 +1116,7 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   }
   else
   {
-    res->data = (char *)pDivideM((pCopy(p),pHead(q));
+    res->data = (char *)pDivideM(pCopy(p),pHead(q)));
   }
   return FALSE;
 }
