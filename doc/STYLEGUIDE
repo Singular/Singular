@@ -48,8 +48,8 @@
 
 + Email Adressen in @email{...} notieren, URL's in @url{...}
 
-+ Muticolumn tables: Rows of multicolumn tables need to go in one
-  line, otherwise exi2html chockes. Space beween rows with "empty"
++ Multicolumn tables: Rows of multicolumn tables need to go in one
+  line, otherwise texi2html chockes. Space beween rows with "empty"
   rows (c.f. texi2html), i.e., with @item @tab @tab ....
 
 
@@ -234,14 +234,14 @@ i;  // mit Leerzeichen beginnen.
 
 * Index, Anchors*
 ==================
-+ Do not hesitate to insert many index entires. Each index entiresneeds
-  to be written on one line. For one topic, insert different
++ Do not hesitate to insert many index entries. Each index entries
+  needs to be written on one line. For one topic, insert different
   formulation of the index entries. For example:
 @cindex The online help system
 @cindex online help
 @cindex help, online help system
   Generally, if an index topic needs to be specified further, mention
-  the general topic first, separated by komma, and followed by
+  the general topic first, separated by comma, and followed by
   specialization (like "help, online help system").
 
 + Use the @anchor{label} construct, to set arbitraty labels, to which
@@ -278,4 +278,4 @@ i;  // mit Leerzeichen beginnen.
   domkumentiert. Siehe doc2tex.pl - Vorspann.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.17 2001-08-27 14:40:04 Singular Exp $
+$Id: STYLEGUIDE,v 1.18 2003-02-05 18:29:52 levandov Exp $
