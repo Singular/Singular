@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_sqrfree.cc,v 1.4 1997-04-08 10:32:03 schmidt Exp $
+// $Id: fac_sqrfree.cc,v 1.5 1997-04-18 16:02:55 schmidt Exp $
 
 #include <config.h>
 
@@ -10,6 +10,9 @@
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/04/08 10:32:03  schmidt
+#include <config.h> added
+
 Revision 1.3  1996/12/05 18:24:55  schmidt
 ``Unconditional'' check-in.
 Now it is my turn to develop factory.
@@ -34,6 +37,37 @@ static int divexp = 1;
 static void divexpfunc ( CanonicalForm &, int & e )
 {
     e /= divexp;
+}
+
+static int
+compareFactors( const CFFactor & f, const CFFactor & g )
+{
+    return f.exp() > g.exp();
+}
+
+CFFList
+sortCFFList( CFFList & F )
+{
+    F.sort( compareFactors );
+
+    int exp;
+    CanonicalForm f;
+    CFFListIterator I = F;
+    CFFList result;
+
+    // join elements with the same degree
+    while ( I.hasItem() ) {
+	f = I.getItem().factor();
+	exp = I.getItem().exp();
+	I++;
+	while ( I.hasItem() && I.getItem().exp() == exp ) {
+	    f *= I.getItem().factor();
+	    I++;
+	}
+	result.append( CFFactor( f, exp ) );
+    }
+
+    return result;
 }
 
 CFFList sqrFreeFp ( const CanonicalForm & f )
