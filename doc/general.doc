@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.18 1998-05-04 10:51:08 schmidt Exp $
+@comment $Id: general.doc,v 1.19 1998-05-04 12:30:05 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -9,8 +9,9 @@
 @c @menu
 @c * General concepts::     
 @c @end menu
-@node General concepts, Data types, Introduction, Top
-@chapter General concepts
+@c @node General concepts, Data types, Introduction, Top
+@c @chapter General concepts
+
 
 @menu
 * Interactive use::             
@@ -22,6 +23,8 @@
 * Debugging tools::
 @end menu
 
+
+@c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
 @node Interactive use, Rings and orderings, General concepts, General concepts
 @section Interactive use
@@ -324,6 +327,7 @@ the @code{timer} variable multiplied by @code{TICKS} gives the time in
 seconds.By default, this value is 1.
 
 @end table
+
 
 @c --------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
@@ -863,7 +867,7 @@ minimizes a free resolution of an ideal or module
 
 @c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
-@node The SINGULAR language, Procedures, Rings and orderings, General concepts
+@node The SINGULAR language, Procedures, Implemented algorithms, General concepts
 @section The SINGULAR language
 @cindex The SINGULAR language
 
@@ -1459,7 +1463,10 @@ The user may add other procedures/libraries.
 
 
 @c ---------------------------------------------------------------------------
+@c ---------------------------------------------------------------------------
 @include libraries.tex
+
 @c @node Procedures, Libraries, The SINGULAR language, General concepts
+@c @section Procedures
 @c @node Libraries, Debugging tools, Procedures, General concepts
 @c @node Debugging tools, Implemented algorithms, Libraries, General concepts
