@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.144 1999-04-19 11:02:37 obachman Exp $ */
+/* $Id: iparith.cc,v 1.145 1999-04-26 12:58:45 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5162,6 +5162,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
     int at=a->Typ();
     int bt=b->Typ();
     int i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
+    int index=i;
 
     iiOp=op;
     while (dArith2[i].cmd==op)
@@ -5188,7 +5189,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       leftv an = (leftv)Alloc0(sizeof(sleftv));
       leftv bn = (leftv)Alloc0(sizeof(sleftv));
       BOOLEAN failed=FALSE;
-      i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
+      i=index; /*iiTabIndex(dArithTab2,JJTAB2LEN,op);*/
       //Print("op: %c, type: %s %s\n",op,Tok2Cmdname(at),Tok2Cmdname(bt));
       while (dArith2[i].cmd==op)
       {
@@ -5243,7 +5244,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
         Werror("`%s` is not defined",s);
       else
       {
-        i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
+        i=index; /*iiTabIndex(dArithTab2,JJTAB2LEN,op);*/
         s = iiTwoOps(op);
         if (proccall)
         {
