@@ -1,0 +1,72 @@
++ Schreibweise von Singular:
+    im Text: @sc{Singular}
+    in Singular-Kommentaren von Singular-Beispielen: SINGULAR
+    in Ueberschriften: SINGULAR
+
++ Alle Singular-Befehle und -Variablen werden im Style @code
+  geschrieben:
+    @code{std}, @code{TRACE} 
+
++ Singular-Typen werden NICHT im Style @code geschrieben:
+    int, intmat
+
++ Das Argument von @cindex, @chapter, @section und @subsection darf
+  nicht in geschweiften Klammern stehen, auch wenn es Leerzeichen
+  enthaelt. (Das Argument geht bis zum Ende der Zeile.)
+    @cindex Procedures
+    @section Getting started
+
++ Gross/Kleinschreibung von Ueberschriften: Das erste Wort wird gross
+  geschrieben, alle anderen klein. Ausnahme: Wenn das erste Wort ein
+  reserviertes Wort von Singular ist, wird es so geschrieben, wie man
+  es in Singular schreibt:
+    Functions and system variables
+    int related functions
+    TRACE
+
++ Die Zeichen @ und { und } muessen in texinfo mit @ "gequoted"
+  werden (nicht mit Backslash!). 
+  Der Backslash muss nicht gequoted werden:
+    @  muss als  @@  geschrieben werden
+    {  muss als  @{  geschrieben werden
+    }  muss als  @}  geschrieben werden
+    \  wird als  \   geschrieben
+
++ Tasten, die man druecken muss, werden im Style @code geschrieben.
+  Die Control-Taste wird als CTRL abgekuerzt:
+    @code{CTRL-A}
+
++ der basering heisst "basering" und nicht "base ring".
+
++ mit der neuen Version von doc2tex kann (soll) man Cross-Referenzen
+  wie folgt schreiben:
+    @c ref
+    See
+    @ref{std};
+    @ref{stdfac};
+    @ref{stdhilbert}.
+    @c ref
+  Daraus wird dann automatisch ein Menue fuer die info-Files erzeugt.
+  (Man kann sich also das "@menu * std:: ...  @end menu" sparen.)
+  Bitte pro Zeile nur *eine* Referenz notieren und das `See'
+  in eine eigene Zeile packen.  Das macht die Sache
+  uebersichtlicher.  Ausserdem kann man die Referenzen dann
+  leichter im Editor handhaben (loeschen, alphabetisch
+  sortieren).
+  Die Referenzen bitte alphabetisch sortieren.
+
++ Beim Schreiben von Singular-Beispielen (insbesondere von
+  Kommentaren) bitte darauf achten, dass die Zeilen nicht zu breit
+  werden. (Sonst bekommt man "overfull hbox"-Meldungen um die Ohren
+  geschmissen.)
+
++ Zum Englischen (Dank an Olaf):
+  "i.e.", "e.g.", "for example", "that is" usw. werden immer in Kommas
+  eingebettet:
+    @sc{Singular}, for example, has the ...
+  Nach einem Doppelpunkt schreiben wir klein weiter:
+    Purpose: computes the dimension.
+
+------------------------------------------------------------
+$Id: STYLEGUIDE,v 1.1 1998-05-12 14:23:51 wichmann Exp $
+------------------------------------------------------------
