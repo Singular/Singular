@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.13 2002-06-04 11:49:27 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.14 2002-06-06 16:02:10 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -754,6 +754,10 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
   {
     Print("nc_spGSpolyCreate : different components!");    
     return(NULL);
+  }
+  if ((r->nc->type==nc_lie) && pHasNotCF(p1,p2)) /* prod crit */
+  {
+    return(nc_p_Bracket_qq(pCopy(p2),p1));
   }
   poly pL=pOne();
   poly m1=pOne();

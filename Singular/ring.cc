@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.192 2002-05-31 17:24:46 levandov Exp $ */
+/* $Id: ring.cc,v 1.193 2002-06-06 16:02:12 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -796,14 +796,17 @@ void rWrite(ring r)
     {
       for (int j = i+1; j<=r->N; j++)
       {
-	if (MATELEM(r->nc->COM,i,j)==NULL)
-	{
-	  Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
-	  pl=MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1);
-	  pWrite0(pl);
-	}
+        if (MATELEM(r->nc->COM,i,j)==NULL)
+        {
+          Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
+          pl=MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1);
+          pWrite0(pl);
+        }
       }
     }
+#ifdef PDEBUG
+    Print("\n//   noncommutative type:%d",r->nc->type);
+#endif
   }
 #endif
   if (r->qideal!=NULL)
@@ -905,6 +908,24 @@ void rKill(ring r)
     {
       id_Delete(&r->qideal, r);
       r->qideal = NULL;
+    }
+    // delete noncommutative extension
+    if (r->nc!=NULL)
+    {
+      int i,j;
+      for(i=1;i<r->N;i++)
+      {
+        for(j=i+1;j<=r->N;j++)
+        {
+          id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,r->N)]),r);
+        }
+      }
+      omFreeSize((ADDRESS)r->nc->MT,r->N*(r->N-1)/2*sizeof(matrix));
+      omFreeSize((ADDRESS)r->nc->MTsize,r->N*(r->N-1)/2*sizeof(int));
+      id_Delete((ideal *)&(r->nc->C),r);
+      id_Delete((ideal *)&(r->nc->D),r);
+      id_Delete((ideal *)&(r->nc->COM),r);    
+      omFreeSize((ADDRESS)r->nc,sizeof(nc_struct));
     }
     nKillChar(r);
     int i=1;

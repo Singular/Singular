@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.186 2002-06-05 11:12:53 levandov Exp $ */
+/* $Id: extra.cc,v 1.187 2002-06-06 16:02:09 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1400,6 +1400,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	  }
 	}
       }
+      pN=NULL;
       h=hh;
       /* D is either a poly or a matrix */
       if (h==NULL) { pN=NULL;}  /* D is zero matrix */ 
@@ -1447,6 +1448,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else currRing->nc->type=nc_undef;
       tmp_v.CleanUp();
+      pN=NULL;
       /* Now we proceed with C and D */
       matrix COM;      
       currRing->nc->MT=(matrix *)omAlloc0(currRing->N*(currRing->N-1)/2*sizeof(matrix));
@@ -1484,6 +1486,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	  pSetm(p);
 	  p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
 	  MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=p;
+	  p=NULL;
 	}
 	/* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
       }
@@ -1491,6 +1494,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
 	if (IsNonComm==1) 
 	{
+          assume(pN!=NULL);
 	  if ((IsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) currRing->nc->type=nc_lie;
 	  else currRing->nc->type=nc_general;
 	}

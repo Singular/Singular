@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.109 2002-06-04 11:49:28 levandov Exp $ */
+/* $Id: kutil.cc,v 1.110 2002-06-06 16:02:11 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -16,6 +16,7 @@
 #include "mod2.h"
 #include <mylimits.h>
 #ifdef HAVE_PLURAL
+#include "structs.h"
 #include "gring.h"
 #endif
 #ifdef KDEBUG
@@ -968,21 +969,20 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     *the product criterion has applied for (s,p),
     *i.e. lcm(s,p)=product of the leading terms of s and p.
     *Suppose (s,r) is in L and the leading term
-    *of p devides lcm(s,r)
-    *(==> the leading term of p devides the leading term of r)
-    *but the leading term of s does not devide the leading term of r
+    *of p divides lcm(s,r)
+    *(==> the leading term of p divides the leading term of r)
+    *but the leading term of s does not divide the leading term of r
     *(notice that tis condition is automatically satisfied if r is still
-    *in S), then (s,r) can be canceled.
+    *in S), then (s,r) can be cancelled.
     *This should be done here because the
     *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
+    *
+    *Moreover, skipping (s,r) holds also for the noncommutative case.
     */
-      if (!rIsPluralRing(currRing))
-      {
-        strat->cp++;
-        pLmFree(Lp.lcm);
-        Lp.lcm=NULL;
-        return;
-      }
+      strat->cp++;
+      pLmFree(Lp.lcm);
+      Lp.lcm=NULL;
+      return;
     }
     else
       Lp.ecart = max(ecart,strat->ecartS[i]);
@@ -1110,15 +1110,13 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 #ifdef HAVE_PLURAL
     if (currRing->nc!=NULL) 
     {
-      if (pHasNotCF(p,strat->S[i])) /* generalized prod-crit for lie-type */
+      if ((currRing->nc->type==nc_lie) && (pHasNotCF(p,strat->S[i]))) 
+	/* generalized prod-crit for lie-type */
       {
-	strat->cp++;
-	Lp.p=nc_p_Bracket_qq(pCopy(p),strat->S[i]);
+	  strat->cp++;
+	  //	  Lp.p=nc_p_Bracket_qq(pCopy(p),strat->S[i]);
       }
-      else
-      {
-	Lp.p = nc_spGSpolyCreate(strat->S[i],p,NULL,currRing);
-      }
+      Lp.p = nc_spGSpolyCreate(strat->S[i],p,NULL,currRing);
     }
     else
     {

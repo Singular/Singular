@@ -1,30 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.6 2002-06-04 11:49:28 levandov Exp $ */
-/* $Log: not supported by cvs2svn $
-/* Revision 1.5  2002/05/31 17:24:44  levandov
-/* Plural: buckets added to NF and other fixes
-/*
-/* Revision 1.4  2002/04/30 13:35:10  levandov
-/* Big Plural Update
-/*
-/* Revision 1.1.2.3  2001/09/25 15:39:01  Singular
-/* *hannes: PLURAL syntax fixes
-/*
-/* Revision 1.1.2.2  2001/08/16 13:17:29  Singular
-/* * hannes: removed rcsid
-/*
-/* Revision 1.1.2.1  2001/04/17 15:33:35  levandov
-/* PosInS syntax change fixed
-/*
-/* Revision 1.1  2001/02/28 11:39:17  levandov
-/* * levandov: add gr_kstd2.cc
-/*
-/* Revision 1.1  2000/07/20 16:11:45  obachman
-/* * added stuff
-/*
-*/
+/* $Id: gr_kstd2.cc,v 1.7 2002-06-06 16:02:10 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -846,6 +823,11 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
       /* deletes the short spoly and computes */
       pLmFree(strat->P.p);
       /* the real one */
+      if ((currRing->nc->type==nc_lie) && pHasNotCF(strat->P.p1,strat->P.p2)) /* prod crit */
+      {
+	strat->cp++;
+	/* prod.crit itself in nc_spGSpolyCreate */
+      }
       strat->P.p = nc_spGSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether,currRing);
     }
     if (strat->P.p != NULL)
@@ -853,7 +835,7 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
       if (TEST_OPT_PROT)
       message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
               &olddeg,&reduc,strat, red_result);
-      /* reduction of the element choosen from L */
+      /* reduction of the element chosen from L */
       strat->red(&strat->P,strat);
     }
     if (strat->P.p != NULL)
@@ -862,7 +844,6 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
           if (TEST_OPT_PROT) 
 	  {
 	    PrintS("s\n");
-	    pWrite(strat->P.p);
 	  }
           /* enter P.p into s and L */
           {
@@ -873,9 +854,8 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
               {
                 if ((strat->syzComp==0)||(!strat->homog))
                 {
-                  //strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-                  pCleardenom(strat->P.p);
-                }
+                  /* strat->P.p = redtailBba(strat->P.p,pos-1,strat);   */                     }
+		pCleardenom(strat->P.p);
               }
               else
               {
@@ -885,6 +865,10 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
                   //strat->P.p = redtailBba(strat->P.p,pos-1,strat);
                 }
               }
+	      // PLURAL debug
+	      /* should be used only internally!!! */
+              pWrite(strat->P.p);
+
               if (TEST_OPT_DEBUG)
               {
                 PrintS("new s:");
