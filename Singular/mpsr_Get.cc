@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.35 2000-12-31 15:14:36 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.36 2001-08-27 14:47:15 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -28,7 +28,7 @@
 #include "matpol.h"
 #include "lists.h"
 
-#include <limits.h>
+#include <mylimits.h>
 
 omBin mpsr_sleftv_bin = omGetSpecBin(sizeof(mpsr_sleftv));
 

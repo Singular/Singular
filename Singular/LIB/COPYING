@@ -1,0 +1,120 @@
+                        SINGULAR version 2-0-0
+			    Singular-libraries
+
+                     University of Kaiserslautern
+
+      Department of Mathematics and  Centre for Computer Algebra
+
+           Authors: see the header of the libraries or the list below
+
+                        Copyright (C) 1986-2001
+
+
+
+                               *NOTICE*
+
+The copyrights of the libaries are given in the header of the libraries.
+If no copyright is given, the following applies:
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version with the following additional restrictions
+(which override any conflicting restrictions in the GPL):
+
+This package is part of the software SINGULAR.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307  USA (see GPL)
+
+Please send any comments or bug reports to
+<singular@mathematik.uni-kl.de> or the author(s) of the libary.
+
+Please register yourself as a SINGULAR user by sending email to
+<singular@mathematik.uni-kl.de> with the subject line `register'
+if you not already done so.
+
+If you use Singular or parts thereof in a project and/or publish
+results that were partly obtained using SINGULAR, we ask you to cite
+SINGULAR and inform us thereof - see
+`http://www.singular.uni-kl.de/how_to_cite.html', for information on
+how to cite Singular.
+
+
+Contributors:
+=============
+
+ainvar.lib	Gerhard Pfister,		pfister@mathematik.uni-kl.de,
+		Gert-Martin Greuel,		greuel@mathematik.uni-kl.de,
+algebra.lib	Gert-Martin Greuel,     	greuel@mathematik.uni-kl.de,
+		Agnes Eileen Heydtmann, 	agnes@math.uni-sb.de,
+		Gerhard Pfister,        	pfister@mathematik.uni-kl.de
+brnoeth.lib	Jose Ignacio Farran Martin, 	ignfar@eis.uva.es
+		Christoph Lossen,           	lossen@mathematik.uni-kl.de
+classify.lib	Kai Krueger, 			krueger@mathematik.uni-kl.de
+deform.lib	Bernd Martin, 			martin@math.tu-cottbus.de
+elim.lib	Gert-Martin Greuel,     	greuel@mathematik.uni-kl.de,
+		Gerhard Pfister,        	pfister@mathematik.uni-kl.de
+		Hans Schoenemann,		hannes@mathematik.uni-kl.de
+equising.lib	Andrea Mindnich, 		mindnich@mathematik.uni-kl.de
+finvar.lib	Agnes E. Heydtmann,		agnes@math.uni-sb.de
+gaussman.lib	Mathias Schulze,		mschulze@mathematik.uni-kl.de
+general.lib	Gert-Martin Greuel,		greuel@mathematik.uni-kl.de,
+		Anne Fruehbis-Krueger,		anne@mathematik.uni-kl.de
+graphics.lib	Christian Gorzel,		gorzelc@math.uni-muenster.de
+hnoether.lib	Martin Lamm,   			lamm@mathematik.uni-kl.de
+homolog.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
+		Bernd Martin,  			martin@math.tu-cottbus.de
+inout.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
+		Bernd Martin,  			martin@math.tu-cottbus.de
+intprog.lib	Christine Theis, 		ctheis@math.uni-sb.de
+latex.lib	Christian Gorzel, 		gorzelc@math.uni-muenster.de
+linalg.lib	Ivor Saynisch,			ivs@math.tu-cottbus.de,
+		Mathias Schulze,		mschulze@mathematik.uni-kl.de
+makedbm.lib	Kai Krueger, 			krueger@mathematik.uni-kl.de
+matrix.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
+                Bernd Martin,  			martin@math.tu-cottbus.de
+mprimdec.lib	Alexander Dreyer, 		dreyer@mathematik.uni-kl.de
+mondromy.lib	Mathias Schulze,		mschulze@mathematik.uni-kl.de
+mregular.lib	I.Bermejo,			ibermejo@ull.es,
+		Ph.Gimenez,			pgimenez@agt.uva.es,
+		G.-M.Greuel,			greuel@mathematik.uni-kl.de
+normal.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
+		G. Pfister,			pfister@mathematik.uni-kl.de
+ntsolve.lib	Wilfred Pohl,			pohl@mathematik.uni-kl.de
+		Dietmar Hillebrand
+paramet.lib	Thomas Keilen,			keilen@mathematik.uni-kl.de
+poly.lib	Olaf Bachmann,			obachman@mathematik.uni-kl.de,
+		Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
+		Anne Fruehbis-Krueger,		anne@mathematik.uni-kl.de
+presolve.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
+primdec.lib	Gerhard Pfister, 		pfister@mathematik.uni-kl.de
+		Wolfram Decker, 		decker@math.uni-sb.de
+		Hans Schoenemann, 		hannes@mathematik.uni-kl.de
+primitiv.lib	Martin Lamm,			lamm@mathematik.uni-kl.de
+qhmoduli.lib	Thomas Bayer,			bayert@in.tum.de
+random.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
+                Bernd Martin,  			martin@math.tu-cottbus.de
+reesclos.lib	Tobias Hirsch,			hirsch@math.tu-cottbus.de
+ring.lib	G.-M.Greuel,			greuel@mathematik.uni-kl.de
+rinvar.lib	Thomas Bayer,			bayert@in.tum.de
+sing.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
+                Bernd Martin,  			martin@math.tu-cottbus.de
+solve.lib	Moritz Wenk,			wenk@mathematik.uni-kl.de
+spcurve.lib	Anne Fruehbis-Krueger,		anne@mathematik.uni-kl.de
+spectrum.lib	S. Endrass
+standard.lib	Olaf Bachmann,			obachman@mathematik.uni-kl.de,
+		Hans Schoenemann, 		hannes@mathematik.uni-kl.de
+stratify.lib	Anne Fruehbis-Krueger,		anne@mathematik.uni-kl.de
+surf.lib	Hans Schoenemann,		hannes@mathematik.uni-kl.de
+		S. Endrass
+toric.lib	Christine Theis,		ctheis@math.uni-sb.de
+triang.lib	D. Hillebrand
+zeroset.lib	Thomas Bayer,			bayert@in.tum.de
+

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.51 2001-01-31 18:48:42 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.52 2001-08-27 14:47:40 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -384,9 +384,7 @@ lists smCallBareiss(ideal I, int x, int y)
   Exponent_t bound;
   ring origR;
   sip_sring tmpR;
-  ideal II;
   sparse_mat *bareiss;
-  ideal mm=II;
   intvec *v;
 
   res->Init(2);
@@ -399,7 +397,7 @@ lists smCallBareiss(ideal I, int x, int y)
   if (t>s) t=s;
   bound=2*smExpBound(I,c,r,t);
   smRingChange(&origR,tmpR,bound);
-  II = idrCopyR(I, origR);
+  ideal II = idrCopyR(I, origR);
   bareiss = new sparse_mat(II);
   if (bareiss->smGetAct() == NULL)
   {
@@ -432,9 +430,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
   Exponent_t bound;
   ring origR;
   sip_sring tmpR;
-  ideal II;
   sparse_mat *bareiss;
-  ideal mm=II;
   intvec *v;
 
   res->Init(2);
@@ -447,7 +443,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
   if (t>s) t=s;
   bound=smExpBound(I,c,r,t);
   smRingChange(&origR,tmpR,bound);
-  II = idrCopyR(I, origR);
+  ideal II = idrCopyR(I, origR);
   bareiss = new sparse_mat(II);
   if (bareiss->smGetAct() == NULL)
   {

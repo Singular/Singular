@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.30 2000-12-20 10:54:24 pohl Exp $ */
+/* $Id: mpr_complex.cc,v 1.31 2001-08-27 14:47:13 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -253,52 +253,50 @@ gmp_float operator - ( const gmp_float & a )
 
 gmp_float abs( const gmp_float & a )
 {
-  gmp_float *tmp= new gmp_float();
-  mpf_abs( *tmp->_mpfp(), *a.mpfp() );
-  return *tmp;
+  gmp_float tmp;
+  mpf_abs( *(tmp._mpfp()), *a.mpfp() );
+  return tmp;
 }
 gmp_float sqrt( const gmp_float & a )
 {
-  gmp_float *tmp= new gmp_float();
-  mpf_sqrt( *tmp->_mpfp(), *a.mpfp() );
-  return *tmp;
+  gmp_float tmp;
+  mpf_sqrt( *(tmp._mpfp()), *a.mpfp() );
+  return tmp;
 }
 gmp_float sin( const gmp_float & a )
 {
-  gmp_float *tmp= new gmp_float( sin((double)a) );
-  return *tmp;
+  gmp_float tmp( sin((double)a) );
+  return tmp;
 }
 gmp_float cos( const gmp_float & a )
 {
-  gmp_float *tmp= new gmp_float( cos((double)a) );
-  return *tmp;
+  gmp_float tmp( cos((double)a) );
+  return tmp;
 }
 gmp_float log( const gmp_float & a )
 {
-  gmp_float *tmp= new gmp_float( log((double)a) );
-  return *tmp;
+  gmp_float tmp( log((double)a) );
+  return tmp;
 }
 gmp_float hypot( const gmp_float & a, const gmp_float & b )
 {
 #if 1
-  gmp_float *tmp= new gmp_float();
-  *tmp= sqrt( (a*a) + (b*b) );
-  return *tmp;
+  return ( sqrt( (a*a) + (b*b) ) );
 #else
-  gmp_float *tmp= new gmp_float( hypot( (double)a, (double)b ) );
-  return *tmp;
+  gmp_float tmp( hypot( (double)a, (double)b ) );
+  return tmp;
 #endif
 }
 gmp_float exp( const gmp_float & a )
 {
-  gmp_float *tmp= new gmp_float( exp((double)a) );
-  return *tmp;
+  gmp_float tmp( exp((double)a) );
+  return tmp;
 }
 gmp_float max( const gmp_float & a, const gmp_float & b )
 {
-  gmp_float *tmp= new gmp_float();
-  a > b ? *tmp= a : *tmp= b;
-  return *tmp;
+  gmp_float tmp;
+  a > b ? tmp= a : tmp= b;
+  return tmp;
 }
 //
 // number to float, number = Q, R, C

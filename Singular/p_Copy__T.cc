@@ -6,7 +6,7 @@
  *  Purpose: template for p_Copy
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Copy__Template.cc,v 1.5 2000-12-07 15:03:57 obachman Exp $
+ *  Version: $Id: p_Copy__T.cc,v 1.2 2001-08-27 14:47:22 Singular Exp $
  *******************************************************************/
 
 LINKAGE poly p_Copy(poly s_p, const ring r)

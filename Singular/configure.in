@@ -47,9 +47,9 @@ dnl here are some defaults
 
 SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-2}
 SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-1}
-SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-0}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-2}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"March 2001"}
+VERSION_DATE=${VERSION_DATE:-"August 2001"}
 
 dnl pass them on into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
@@ -300,7 +300,7 @@ case "$ac_cv_singuname" in
 	  AC_CHECK_LIB(dld, shl_load)
 	  if test "$ac_cv_lib_dld_shl_load" = yes; then
          	LD_DYN_FLAGS="-ldld -Xlinker -E"
-	  	SFLAGS="-fPIC -DPIC"
+	  	SFLAGS="-fpic -fPIC -DPIC"
 	  	SLDFLAGS=-shared
 		LD=gcc
 		ac_lib_dl=yes
@@ -316,22 +316,23 @@ case "$ac_cv_singuname" in
 	        ac_lib_dl=yes
 	  fi
 	;;
+        IRIX-6)
+          LD_DYN_FLAGS="-lc"
+	  SFLAGS="-fPIC -DPIC"
+	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
+          LD=ld
+	  ac_lib_dl=yes
+        ;;
 	SunOS-5)
 	  AC_CHECK_LIB(dl, dlopen)
           if test "$ac_cv_lib_dl_dlopen" = yes; then
 	  	LD_DYN_FLAGS="-ldl -Xlinker -E"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
+                LD=ld
 	        ac_lib_dl=yes
 	  fi
 	;;
-        IRIX-6)
-          LD_DYN_FLAGS="-lc"
-	  SFLAGS="-fPIC -DPIC"
-	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
-	  LD=ld
-	  ac_lib_dl=yes
-        ;;
 esac
 AC_SUBST(LD_DYN_FLAGS)
 AC_SUBST(SFLAGS)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.37 2001-03-05 11:48:54 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.38 2001-08-27 14:46:50 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -122,7 +122,7 @@ typedef struct sigcontext_struct sigcontext;
 */
 void sigsegv_handler(int sig, sigcontext s)
 {
-  fprintf(stderr,"Singular : signal %d (v: %d/%lu):\n",sig,SINGULAR_VERSION,feVersionId);
+  fprintf(stderr,"Singular : signal %d (v: %d/%u):\n",sig,SINGULAR_VERSION,feVersionId);
   if (sig!=SIGINT)
   {
     fprintf(stderr,"Segment fault/Bus error occurred at %x because of %x (r:%d)\n"
@@ -229,7 +229,7 @@ void init_signals()
 */
 void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
 {
-  fprintf(stderr,"Singular : signal %d, code %d (v: %d/%lu):\n",
+  fprintf(stderr,"Singular : signal %d, code %d (v: %d/%u):\n",
     sig,code,SINGULAR_VERSION,feVersionId);
   if ((sig!=SIGINT)&&(sig!=SIGABRT))
   {
@@ -274,7 +274,7 @@ void init_signals()
 #ifndef macintosh
 void sigsegv_handler(int sig)
 {
-  fprintf(stderr,"Singular : signal %d (v: %d/%lu):\n",
+  fprintf(stderr,"Singular : signal %d (v: %d/%u):\n",
     sig,SINGULAR_VERSION,feVersionId);
   if (sig!=SIGINT)
   {

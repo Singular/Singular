@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.19 2000-11-14 16:04:51 obachman Exp $ */
+/* $Id: emacs.cc,v 1.20 2001-08-27 14:46:56 Singular Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -252,6 +252,10 @@ int main(int argc, char** argv)
     {
       // look in home-dir
       emacs_load = getenv("HOME");
+#ifdef ix86_Win
+      if ((emacs_load==NULL)||(!access(emacs_load,X_OK)))
+        emacs_load = getenv("SINGHOME");
+#endif	
       sprintf(cwd, "%s/.emacs-singular", emacs_load);
       if (! access(cwd, R_OK))
       {

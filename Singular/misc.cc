@@ -351,6 +351,7 @@ struct soptionStruct verboseStruct[]=
   {"Imap",     Sy_bit(V_IMAP),      ~Sy_bit(V_IMAP)       },
   {"prompt",   Sy_bit(V_PROMPT),    ~Sy_bit(V_PROMPT)     },
   {"notWarnSB",Sy_bit(V_NSB),       ~Sy_bit(V_NSB)        },
+  {"contentSB",Sy_bit(V_CONTENTSB), ~Sy_bit(V_CONTENTSB)        },
 /*special for "none" and also end marker for showOption:*/
   {"ne",         0,          0 }
 };

@@ -6,7 +6,7 @@
  *  Purpose: macros for memory addition
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_MemAdd.h,v 1.3 2000-10-16 12:06:37 obachman Exp $
+ *  Version: $Id: p_MemAdd.h,v 1.4 2001-08-27 14:47:23 Singular Exp $
  *******************************************************************/
 #ifndef P_MEM_ADD_H
 #define P_MEM_ADD_H
@@ -282,7 +282,7 @@ while (0)
  * MemSub
  *
  ***************************************************************/
-  
+
 #define _p_MemSub(i, r, s) r[i] -= s[i]
 
 #define _p_MemSub_LengthOne(r, s) _p_MemSub(0, r, s)
@@ -386,5 +386,4 @@ do                                                  \
 }                                                   \
 while (0)
 
-#endif P_MEM_ADD_H
-
+#endif /* P_MEM_ADD_H */

@@ -1,0 +1,80 @@
+                        SINGULAR version 2-0-0
+			    Singular-kernel
+
+                     University of Kaiserslautern
+
+      Department of Mathematics and  Centre for Computer Algebra
+
+           Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
+
+                        Copyright (C) 1986-2001
+
+
+
+                               *NOTICE*
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version with the following additional restrictions
+(which override any conflicting restrictions in the GPL):
+
+This package is part of the software SINGULAR. The GPL is valid for
+this package, other packages may have other copyrights.
+
+Their copyrights and licences can be found in the accompanying files
+which are distributed along with these packages.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307  USA (see GPL)
+
+Please send any comments or bug reports to
+<singular@mathematik.uni-kl.de>.
+
+Please register yourself as a SINGULAR user by sending email to
+<singular@mathematik.uni-kl.de> with the subject line `register'
+if you not already done so.
+
+If you use Singular or parts thereof in a project and/or publish
+results that were partly obtained using SINGULAR, we ask you to cite
+SINGULAR and inform us thereof - see
+`http://www.singular.uni-kl.de/how_to_cite.html', for information on
+how to cite Singular.
+
+Availability
+============
+
+The latest information about SINGULAR is always available from
+`http://www.singular.uni-kl.de'.
+
+Acknowledgements
+================
+
+The development of SINGULAR is directed and coordinated by Gert-Martin
+Greuel, Gerhard Pfister, and Hans Scho"nemann.
+
+Currently, the SINGULAR team has the following members: Olaf Bachmann,
+Anne Fru"bis-Kru"ger, Thomas Keilen, Kai Kru"ger, Christoph Lossen,
+Victor Levandovskyy, Wilfred Pohl, Mathias Schulze, Eric Westenberger,
+and Tim Wichmann.
+
+Past members of the SINGULAR team are: Hubert Grassmann, Wolfgang
+Neumann, Jens Schmidt, Ru"diger Stobbe.
+
+Further contributions to SINGULAR were made by: Thomas Bayer, Isabelle
+Bermejo, Stephan Endrass, Jose Ignacio Farran Martin, Wolfram Decker,
+Philippe Gimenez, Christian Gorzel, Agnes Heydtmann, Dietmar Hillebrand,
+Tobias Hirsch, Martin Lamm, Bernd Martin, Michael Messollen, Thomas
+Nu"ssler, Moritz Wenk.
+
+We should like to acknowledge the financial support given by the
+Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft and the
+Stiftung fu"r Innovation des Landes Rheinland-Pfalz to the SINGULAR
+project.
+

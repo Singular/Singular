@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.31 2000-12-07 16:25:19 Singular Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.32 2001-08-27 14:47:16 Singular Exp $ */
 
 /***************************************************************
  *
@@ -15,7 +15,7 @@
 #include "mod2.h"
 
 #ifdef HAVE_MPSR
-#include "limits.h"
+#include "mylimits.h"
 
 #include "mpsr_Get.h"
 

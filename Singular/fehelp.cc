@@ -198,7 +198,7 @@ char* feHelpBrowser(char* which, int warn)
   if (which == NULL || *which == '\0')
   {
     // return, if already set
-    if (heCurrentHelpBrowser != NULL) 
+    if (heCurrentHelpBrowser != NULL)
       return heCurrentHelpBrowser->browser;
 
     // First, try emacs, if emacs-option is set
@@ -271,11 +271,11 @@ char* feHelpBrowser(char* which, int warn)
   Finish:
   // update value of Browser Option
   if (feOptSpec[FE_OPT_BROWSER].value == NULL ||
-      strcmp((char*) feOptSpec[FE_OPT_BROWSER].value,  
+      strcmp((char*) feOptSpec[FE_OPT_BROWSER].value,
              heCurrentHelpBrowser->browser) != 0)
   {
       omfree(feOptSpec[FE_OPT_BROWSER].value);
-   feOptSpec[FE_OPT_BROWSER].value 
+   feOptSpec[FE_OPT_BROWSER].value
      = (void*) omStrDup(heCurrentHelpBrowser->browser);
   }
   return heCurrentHelpBrowser->browser;
@@ -588,7 +588,7 @@ static BOOLEAN heOnlineHelp(char* s)
   char libnamebuf[128];
   FILE *fp=NULL;
   // first, search for library of that name in LIB string
-  if ((str[1]!='\0') && 
+  if ((str[1]!='\0') &&
       ((iiLocateLib(str, libnamebuf) && (fp=feFopen(libnamebuf, "rb")) !=NULL)
        ||
        ((fp=feFopen(str,"rb", libnamebuf))!=NULL)))
@@ -760,8 +760,8 @@ static BOOLEAN heNetscapeInit(int warn)
     return FALSE;
   }
 #endif
-  
-  if (feResource('h' /*"HtmlDir"*/, (feOptValue(FE_OPT_ALLOW_NET)? 0 : warn)) 
+
+  if (feResource('h' /*"HtmlDir"*/, (feOptValue(FE_OPT_ALLOW_NET)? 0 : warn))
       == NULL)
   {
     if (warn) WarnS("No local HtmlDir found.");
@@ -803,7 +803,7 @@ static void heNetscapeHelp(heEntry hentry)
 #ifndef WINNT
   sprintf(sys, "%s --remote 'OpenUrl(%s)' > /dev/null 2>&1",
 #else
-  sprintf(sys, "%s %s", 
+  sprintf(sys, "%s %s",
 #endif
           feResource('N' /*"netscape"*/), url);
 
@@ -837,19 +837,26 @@ static void heHtmlHelp(heEntry hentry)
 static void heWinHelp(heEntry hentry)
 {
   char keyw[MAX_HE_ENTRY_LENGTH];
-  strcat(keyw,hentry->key);
+  if ((hentry!=NULL)&&(hentry->key!=NULL))
+    strcpy(keyw,hentry->key);
+  else
+    strcpy(keyw," ");
   char* helppath = feResource('h' /*"HtmlDir"*/);
   const char *filename="/Manual.hlp";
-  helppath = strcat(helppath,filename);
-
-  heOpenWinntHlp(keyw,helppath);
+  int helppath_len=0;
+  if (helppath!=NULL) helppath_len=strlen(helppath);
+  char *callpath=(char *)omAlloc0(helppath_len+strlen(filename)+1);
+  if ((helppath!=NULL) && (*helppath>' '))
+    strcpy(callpath,helppath);
+  strcat(callpath,filename);
+  heOpenWinntHlp(keyw,callpath);
+  omfree(callpath);
 }
-
 #endif
 
 static BOOLEAN heXinfoInit(int warn)
 {
-#ifndef WINNT
+#ifndef ix86_Win
   if (getenv("DISPLAY") == NULL)
   {
     if (warn) WarnS("'xinfo' help browser not available:");
@@ -878,7 +885,7 @@ static void heXinfoHelp(heEntry hentry)
 {
   char sys[MAX_SYSCMD_LEN];
 
-#ifdef WINNT 
+#ifdef WINNT
 #define EXTRA_XTERM_ARGS "+vb -sb -fb Courier-bold-13 -tn linux -cr Red3"
 #else
 #define EXTRA_XTERM_ARGS ""
@@ -888,7 +895,7 @@ static void heXinfoHelp(heEntry hentry)
   {
     if (*(hentry->node) != '\0')
       sprintf(sys, "%s %s -e %s -f %s --node='%s' &",
-              feResource('X'), EXTRA_XTERM_ARGS, 
+              feResource('X'), EXTRA_XTERM_ARGS,
               feResource('I'), feResource('i'), hentry->node);
     else
       sprintf(sys, "%s %s -e %s -f %s Index '%s' &",
@@ -987,7 +994,6 @@ static void heBuiltinHelp(heEntry hentry)
 //
 #define HELP_OK        0
 #define FIN_INDEX    '\037'
-#define not  !
 #define HELP_NOT_OPEN  1
 #define HELP_NOT_FOUND 2
 #define BUF_LEN        256
@@ -1096,7 +1102,7 @@ static int singular_manual(char *str)
   }
   if (index != NULL) (void)fclose(index);
   if (help != NULL) (void)fclose(help);
-  if(not done)
+  if(! done)
   {
     Warn("`%s` not found",String);
     return HELP_NOT_FOUND;

@@ -1,6 +1,6 @@
 //(GMG, last modified 16.12.00)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.12 2001-02-19 14:17:47 lossen Exp $";
+version="$Id: ntsolve.lib,v 1.13 2001-08-27 14:47:56 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  ntsolve.lib     Real Newton Solving of Polynomial Systems
@@ -22,7 +22,7 @@ proc nt_solve (ideal gls, ideal ini, list #)
   @format
  ipar[1]: max. number of iterations
  ipar[2]: accuracy (we have the l_2-norm ||.||): accept solution @code{sol}
-          if ||gls(sol)|| < eps0*(0.1^ipar[2]) 
+          if ||gls(sol)|| < eps0*(0.1^ipar[2])
           where eps0 = ||gls(ini)|| is the initial error
   @end format
 ASSUME:  gls is a zerodimensional ideal with nvars(basering) = size(gls) (>1)

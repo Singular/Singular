@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.25 2001-04-05 15:41:10 Singular Exp $ */
+/* $Id: modulop.cc,v 1.26 2001-08-27 14:47:12 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */

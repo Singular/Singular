@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.16 2001-02-27 15:50:04 levandov Exp $
+// $Id: sing_dbm.cc,v 1.17 2001-08-27 14:47:39 Singular Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -22,14 +22,17 @@
 
 #  include "tok.h"
 #  include "febase.h"
-#  include "omalloc.h"
+#  include <omalloc.h>
 #  include "ipid.h"
 #  include "silink.h"
 #  include "sing_dbm.h"
-#ifdef USE_GDBM
-#  include "gdbm.h"
-#endif
 
+#ifdef ix86_Win
+#  define USE_GDBM
+#  define BLOCKSIZE 1
+#  define GDBM_STATIC
+#  include <gdbm.h>
+#endif
 
 #ifdef USE_GDBM
 typedef struct {
@@ -49,14 +52,14 @@ LINKAGE BOOLEAN dbOpen(si_link l, short flag)
 
   if(flag & SI_LINK_WRITE)
   {
-    if((l->mode==NULL)
-    || ((l->mode[0]!='w')&&(l->mode[1]!='w')))
-    {
-      // request w- open, but mode is not "w" nor "rw" => fail
-      return TRUE;
-    }
+ //    if((l->mode==NULL)
+//     || ((l->mode[0]!='w')&&(l->mode[1]!='w')))
+//     {
+//       // request w- open, but mode is not "w" nor "rw" => fail
+//       return TRUE;
+//    }
     //    dbm_flags = O_RDWR | O_CREAT;
-    read_write =  GDBM_WRCREAT;
+    read_write =  GDBM_WRCREAT | GDBM_NOLOCK;
     mode = "rw";
   }
   if(flag & SI_LINK_READ)
@@ -91,6 +94,7 @@ LINKAGE BOOLEAN dbOpen(si_link l, short flag)
     l->mode=omStrDup(mode);
     return FALSE;
   }
+  Print("%d/%s",gdbm_errno,gdbm_strerror(gdbm_errno));
   return TRUE;
 }
 
@@ -98,6 +102,7 @@ LINKAGE BOOLEAN dbOpen(si_link l, short flag)
 LINKAGE BOOLEAN dbClose(si_link l)
 {
   GDBM_info *db = (GDBM_info *)l->data;
+  gdbm_sync(db->db);
   gdbm_close(db->db);
   omFreeSize((ADDRESS)db,(sizeof *db));
   l->data=NULL;  
@@ -125,7 +130,7 @@ LINKAGE leftv dbRead2(si_link l, leftv key)
 	  if (!dbClose(l)) {Print("cannot close link!\n");}
 	}
       //(SI_LINK_CLOSE_P(l)) automatically      
-      dbOpen(l, SI_LINK_READ);
+      if (dbOpen(l, SI_LINK_READ)) return NULL;
     }
   if (SI_LINK_RW_OPEN_P(l)) {Print("I/O Error!\n");}
 
@@ -243,10 +248,10 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
         else
         {
           //          if(gdbm_error(db->db))
-          if (gdbm_errno!=0)
+          if (gdbm_errno != 0)
           {
-            //              Werror("GDBM link I/O error. Is '%s' readonly?", l->name);
-            Print(gdbm_strerror(gdbm_errno));
+            Werror("GDBM link I/O error: '%s' ", gdbm_errno);
+	    //            Print(gdbm_strerror(gdbm_errno));
             //dbm_clearerr(db->db);
 	    //            gdbm_errno=0;
           }
@@ -268,6 +273,7 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
   {
     WerrorS("write(`GDBM link`,`key string` [,`data string`]) expected");
   }
+  gdbm_sync(db->db);
   return b;
 }
 #endif /* USE_GDBM */

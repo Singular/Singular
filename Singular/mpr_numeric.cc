@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.15 2001-01-17 18:16:32 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.16 2001-08-27 14:47:15 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -449,7 +449,7 @@ bool rootContainer::solver( const int polishmode )
   int i;
 
   // there are maximal tdg roots, so *roots ranges form 0 to tdg-1.
-  theroots= (gmp_complex**)omAlloc( (tdg)*sizeof(gmp_complex*) );
+  theroots= (gmp_complex**)omAlloc( tdg*sizeof(gmp_complex*) );
   for ( i=0; i < tdg; i++ ) theroots[i]= new gmp_complex();
 
   // copy the coefficients of type number to type gmp_complex

@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.100 2001-03-05 18:28:49 mschulze Exp $
+ *  Version: $Id: mod2.h.in,v 1.101 2001-08-27 14:47:11 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -160,7 +160,7 @@
 /* includes for Metrowerks */
 #include "mod2.mwerks.h"
 #else
-/* works around a quirk in the generation of parser tables */
+/* works around a quirk in gcc in the generation of parser tables */
 #define INIT_BUG
 #endif
 

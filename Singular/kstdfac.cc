@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.51 2001-03-08 13:05:12 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.52 2001-08-27 14:47:06 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -58,7 +58,8 @@ static void copyT (kStrategy o,kStrategy n)
         break;
       }
     }
-    t[j].t_p = NULL;
+    t[j].t_p = NULL; // ?? or t[j].p ??
+    t[j].max = NULL; // ?? or p_GetMaxExpP(t[j].t_p,o->tailRing); ??
   }
   n->T=t;
   n->R=r;
@@ -92,8 +93,8 @@ static void copyL (kStrategy o,kStrategy n)
     l[j].p1=NULL;
     l[j].p2=NULL;
     l[j].t_p = NULL;
-    
-    // copy .p1 ----------------------------------------------
+
+    // copy .p1 , i_r1----------------------------------------------
     p = o->L[j].p1;
     i = -1;
     loop
@@ -104,16 +105,18 @@ static void copyL (kStrategy o,kStrategy n)
       {
         Warn("poly p1 not found in T:");wrp(p);PrintLn();
         l[j].p1=pCopy(p);
+        l[j].i_r1=-1;
         break;
       }
       if (p == o->T[i].p)
       {
         l[j].p1=n->T[i].p;
+        l[j].i_r1=n->T[j].i_r;
         break;
       }
     }
 
-    // copy .p2 ----------------------------------------------
+    // copy .p2 , i_r2----------------------------------------------
     p = o->L[j].p2;
     i = -1;
     loop
@@ -124,11 +127,13 @@ static void copyL (kStrategy o,kStrategy n)
       {
         Warn("poly p2 not found in T:");wrp(p);PrintLn();
         l[j].p2=pCopy(p);
+        l[j].i_r2=-1;
         break;
       }
       if (p == o->T[i].p)
       {
         l[j].p2=n->T[i].p;
+        l[j].i_r2=n->T[j].i_r;
         break;
       }
     }
@@ -142,14 +147,15 @@ static void copyL (kStrategy o,kStrategy n)
     // copy .sev -----------------------------------------------
     l[j].sev=o->L[j].sev;
     l[j].i_r = o->L[j].i_r;
-    l[j].i_r1 = o->L[j].i_r1;
-    l[j].i_r2 = o->L[j].i_r2;
+    //l[j].i_r1 = o->L[j].i_r1;
+    //l[j].i_r2 = o->L[j].i_r2;
   }
   n->L=l;
 }
 
 kStrategy kStratCopy(kStrategy o)
 {
+  int i;
   kTest_TS(o);
   kStrategy s=new skStrategy;
   s->next=NULL;
@@ -171,8 +177,6 @@ kStrategy kStratCopy(kStrategy o)
   memcpy(s->sevS,o->sevS,IDELEMS(o->Shdl)*sizeof(unsigned long));
   s->S_2_R=(int*)omAlloc(IDELEMS(o->Shdl)*sizeof(int));
   memcpy(s->S_2_R,o->S_2_R,IDELEMS(o->Shdl)*sizeof(int));
-  s->R=(TObject**)omAlloc(o->tmax*sizeof(TObject*));
-  memcpy(s->R, o->R, o->tmax*sizeof(TObject*));
   s->sevT=(unsigned long *)omAlloc(o->tmax*sizeof(unsigned long));
   memcpy(s->sevT,o->sevT,o->tmax*sizeof(unsigned long));
   if(o->fromQ!=NULL)
@@ -233,6 +237,48 @@ kStrategy kStratCopy(kStrategy o)
   return s;
 }
 
+BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
+{
+  int facdeg=pFDeg(p);
+  ideal fac=singclap_factorize(p,NULL,1);
+  int fac_elems;
+#ifndef HAVE_LIBFAC_P
+  if (fac==NULL)
+  {
+    fac=idInit(1,1);
+    fac->m[0]=pCopy(strat->P.p);
+    fac_elems=1;
+  }
+  else
+#endif
+    fac_elems=IDELEMS(fac);
+  rfac=fac;
+  fac_copy=idInit(fac_elems,1);
+
+  if ((fac_elems!=1)||(facdeg!=pFDeg(fac->m[0])))
+  {
+    if (TEST_OPT_DEBUG)
+    {
+      Print("-> %d factors\n",fac_elems);
+    }
+    else if (TEST_OPT_PROT)
+    {
+      int ii=fac_elems;
+      if (ii>1)
+      {
+        while(ii>0) { PrintS("F"); ii--; }
+      }
+    }
+    return TRUE;
+  }
+  else
+  {
+    pDelete(&(fac->m[0]));
+    fac->m[0]=pCopy(p);
+  }
+  return FALSE;
+}
+
 static void completeReduceFac (kStrategy strat, lists FL)
 {
   int si;
@@ -259,37 +305,18 @@ static void completeReduceFac (kStrategy strat, lists FL)
     {
       PrintS("-");mflush();
     }
-    int facdeg=pFDeg(strat->S[si]);
+    ideal fac;
+    ideal fac_copy;
 
-    ideal fac=singclap_factorize(strat->S[si],NULL,1);
-#ifndef HAVE_LIBFAC_P
-    if (fac==NULL)
-    {
-      fac=idInit(1,1);
-      fac->m[0]=pCopy(strat->S[si]);
-    }
-#endif
-
-    if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
+    if (!k_factorize(strat->S[si],fac,fac_copy))
     {
       idDelete(&fac);
+      idDelete(&fac_copy);
       continue;
     }
-    if (TEST_OPT_DEBUG)
-    {
-      wrp(strat->S[si]);
-      Print(" (=S[%d]) -> %d factors\n",si,IDELEMS(fac));
-    }
-    else if (TEST_OPT_PROT)
-    {
-      int ii=IDELEMS(fac);
-      if (ii>1)
-      {
-        while(ii>0) { PrintS("F"); ii--; }
-      }
-    }
-    ideal fac_copy=idInit(IDELEMS(fac),1);
+
     deleteInS(si,strat);
+
     int i;
     for(i=IDELEMS(fac)-1;i>=0;i--)
     {
@@ -306,6 +333,7 @@ static void completeReduceFac (kStrategy strat, lists FL)
       }
 
       n->P.p=fac->m[i];
+      n->P.pLength=0;
       n->initEcart(&n->P);
 
       /* enter P.p into s and L */
@@ -514,33 +542,12 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     red_result = strat->red(&strat->P,strat);
     if (strat->P.p != NULL)
     {
-      int facdeg=pFDeg(strat->P.p);
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
+      ideal fac;
+      ideal fac_copy;
 
-      ideal fac=singclap_factorize(strat->P.p,NULL,1);
-#ifndef HAVE_LIBFAC_P
-      if (fac==NULL)
-      {
-        fac=idInit(1,1);
-        fac->m[0]=pCopy(strat->P.p);
-      }
-#endif
-      ideal fac_copy=idInit(IDELEMS(fac),1);
-
-      if (TEST_OPT_DEBUG)
-      {
-        Print("-> %d factors\n",IDELEMS(fac));
-      }
-      else if (TEST_OPT_PROT)
-      {
-        int ii=IDELEMS(fac);
-        if (ii>1)
-        {
-          while(ii>0) { PrintS("F"); ii--; }
-        }
-      }
-      if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
+      if (!k_factorize(strat->P.p,fac,fac_copy))
       {
         if (TEST_OPT_INTSTRATEGY)
         {
@@ -555,21 +562,17 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         if (strat->redTailChange)
         {
           idDelete(&fac);
-          fac=singclap_factorize(strat->P.p,NULL,1);
-#ifndef HAVE_LIBFAC_P
-          if (fac==NULL)
-          {
-            fac=idInit(1,1);
-            fac->m[0]=pCopy(strat->P.p);
-          }
-#endif
           idDelete(&fac_copy);
-          fac_copy=idInit(IDELEMS(fac),1);
-        }
-        if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
-        {
-          pDelete(&(fac->m[0]));
-          fac->m[0]=strat->P.p;
+          if (!k_factorize(strat->P.p,fac,fac_copy))
+          {
+            pDelete(&(fac->m[0]));
+            fac->m[0]=strat->P.p;
+            strat->P.p=NULL;
+          }
+          else
+          {
+            pDelete(&strat->P.p);
+          }
         }
       }
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
@@ -577,10 +580,12 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
 
       for(i=IDELEMS(fac)-1;i>=0;i--)
       {
+        int ii;
         kStrategy n=strat;
         if (i>=1)
         {
           n=kStratCopy(strat); // includes memset(&n->P,0,sizeof(n->P));
+          kTest_TS(n);
           n->next=strat->next;
           strat->next=n;
         }
@@ -591,6 +596,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
 
         n->P.p=fac->m[i];
         n->initEcart(&n->P);
+        kTest_TS(n);
 
         /* enter P.p into s and L */
         int pos;
@@ -608,6 +614,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
           pNorm(n->P.p);
           n->P.p = redtailBba(n->P.p,pos-1,n);
         }
+        kTest_TS(n);
 
         if (TEST_OPT_DEBUG)
         {
@@ -618,6 +625,23 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
         enterT(n->P,n);
         n->enterS(n->P,pos,n, n->tl);
+        {
+          int i=n->Ll;
+          for(;i>=0;i--)
+          {
+            n->L[i].i_r1= -1;
+            for(ii=0; ii<=n->tl; ii++)
+            {
+              if (n->R[ii]->p==n->L[i].p1)  { n->L[i].i_r1=ii;break; }
+            }
+            n->L[i].i_r2= -1;
+            for(ii=0; ii<=n->tl; ii++)
+            {
+              if (n->R[ii]->p==n->L[i].p2)  { n->L[i].i_r2=ii;break; }
+            }
+          }
+        }
+        kTest_TS(n);
         if (n->sl>srmax) srmax = n->sl;
 
         /* construct D */

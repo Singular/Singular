@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.45 2001-03-22 19:11:05 Singular Exp $ */
+/* $Id: libparse.l,v 1.46 2001-08-27 14:47:08 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -306,7 +306,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                //#else /* HAVE_NAMESPACES */
                if (text_buffer!=NULL) omFree((ADDRESS)text_buffer);
                text_buffer = omStrDup(libnamebuf);
-	       omMarkAsStaticAddr(text_buffer);
+               omMarkAsStaticAddr(text_buffer);
                //#endif /* HAVE_NAMESPACES */
                #endif
              }
@@ -330,7 +330,11 @@ static     { p_static=TRUE; }
                printpi(pi);
                pi_clear(pi);
              }
+             #ifdef STANDALONE_PARSER
              pi = (procinfo *)malloc(sizeof(procinfo));
+             #else
+             pi = (procinfo *)omAlloc(sizeof(procinfo));
+             #endif
              iiInitSingularProcinfo(pi, newlib, proc, yylplineno,
                                     current_pos(0), p_static);
              #else STANDALONE_PARSER
@@ -350,6 +354,7 @@ static     { p_static=TRUE; }
                h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
                                    &idroot, TRUE );
                #endif /* HAVE_NAMESPACES */
+               /* omCheckAddr(IDID(h0)); */
                if (h0!=NULL)
                {
                  iiInitSingularProcinfo(IDPROC(h0), newlib, proc,

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.40 2001-03-26 18:11:54 Singular Exp $ */
+/* $Id: silink.cc,v 1.41 2001-08-27 14:47:39 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -11,7 +11,7 @@
 #include <string.h>
 #include "mod2.h"
 #include "tok.h"
-#include "omalloc.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "subexpr.h"
 #include "ipid.h"
@@ -22,6 +22,12 @@
 #include "ideals.h"
 #include "numbers.h"
 #include "intvec.h"
+
+#ifdef HAVE_DBM
+#ifdef ix86_Win
+#define USE_GDBM
+#endif
+#endif
 
 omBin s_si_link_extension_bin = omGetSpecBin(sizeof(s_si_link_extension));
 omBin sip_link_bin = omGetSpecBin(sizeof(sip_link));
@@ -87,7 +93,7 @@ BOOLEAN slInit(si_link l, char *istr)
 
     while (strcmp(s->type, type) != 0)
     {
-      if (s->next == NULL) 
+      if (s->next == NULL)
       {
         prev = s;
         s = NULL;
@@ -111,7 +117,7 @@ BOOLEAN slInit(si_link l, char *istr)
     l->m = si_link_root;
 
   if (l->m == NULL) return TRUE;
-  
+
   l->name = (name != NULL ? name : omStrDup(""));
   l->mode = (mode != NULL ? mode : omStrDup(""));
   l->ref = 1;
@@ -218,7 +224,7 @@ leftv slRead(si_link l, leftv a)
 #ifdef USE_GDBM
     if (! SI_LINK_CLOSE_P(l))
       {
-	if (slClose(l)) return NULL;
+        if (slClose(l)) return NULL;
       }
 #endif
 #endif
@@ -265,7 +271,7 @@ BOOLEAN slWrite(si_link l, leftv v)
 #ifdef USE_GDBM
     if (! SI_LINK_CLOSE_P(l))
       {
-	if (slClose(l)) return TRUE;
+        if (slClose(l)) return TRUE;
       }
 #endif
 #endif
@@ -848,7 +854,7 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
   assume(s != NULL);
   s->next = NULL;
   si_link_extension ns = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
-  
+
 #ifdef HAVE_MPSR
   if (strcmp(type, "MPfile") == 0)
     s->next = slInitMPFileExtension(ns);
@@ -871,7 +877,7 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
     omFreeBin(ns, s_si_link_extension_bin);
     return si_link_root;
   }
-  
+
   if (s->next == NULL)
   {
     Werror("Can not initialize link type %s", type);

@@ -33,6 +33,7 @@ install_slibdir = ${install_prefix}/LIB
 ##
 @SET_MAKE@
 CC		= @CC@
+LD              = @LD@
 CXX		= @CXX@
 LEX		= @LEX@
 PERL		= @PERL@
@@ -148,14 +149,14 @@ ESOURCES=mmalloc.cc iparith.cc $(COMMON_SOURCES) \
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
 	grammar.y scanner.l libparse.l syz2.cc prCopyTemplate.cc \
-        p_Delete__Template.cc p_ShallowCopyDelete__Template.cc \
-        p_Copy__Template.cc p_Mult_nn__Template.cc  pp_Mult_nn__Template.cc \
-        pp_Mult_mm__Template.cc p_Mult_mm__Template.cc \
-        p_Minus_mm_Mult_qq__Template.cc p_Add_q__Template.cc \
-	p_Neg__Template.cc pp_Mult_Coeff_mm_DivSelect__Template.cc \
-	pp_Mult_Coeff_mm_DivSelectMult__Template.cc \
-	p_Merge_q__Template.cc pp_Mult_mm_Noether__Template.cc\
-	p_kBucketSetLm__Template.cc \
+        p_Delete__T.cc p_ShallowCopyDelete__T.cc \
+        p_Copy__T.cc p_Mult_nn__T.cc  pp_Mult_nn__T.cc \
+        pp_Mult_mm__T.cc p_Mult_mm__T.cc \
+        p_Minus_mm_Mult_qq__T.cc p_Add_q__T.cc \
+	p_Neg__T.cc pp_Mult_Coeff_mm_DivSelect__T.cc \
+	pp_Mult_Coeff_mm_DivSelectMult__T.cc \
+	p_Merge_q__T.cc pp_Mult_mm_Noether__T.cc\
+	p_kBucketSetLm__T.cc \
 	kInline.cc utils.cc utils.h febase.inc \
 	tesths.cc mpsr_Tok.cc claptmpl.cc 
 
@@ -216,15 +217,17 @@ endif
 # Singular libraries which go into distribution
 # MAKE SURE THAT THIS IS UP_TO_DATE
 #
-SLIBS = ainvar.lib   algebra.lib   all.lib       brnoeth.lib    classify.lib \
+SLIBS = COPYING \
+	ainvar.lib   algebra.lib   all.lib       brnoeth.lib    classify.lib \
         deform.lib   elim.lib      equising.lib  finvar.lib     gaussman.lib \
         general.lib  graphics.lib  hnoether.lib  homolog.lib    inout.lib \
         intprog.lib  latex.lib     linalg.lib    makedbm.lib    matrix.lib \
-        mondromy.lib mprimdec.lib  mregular.lib  normal.lib     ntsolve.lib \
-	paramet.lib  poly.lib      presolve.lib  primdec.lib    primitiv.lib \
-	qhmoduli.lib random.lib    reesclos.lib  ring.lib       rinvar.lib \
-	sing.lib     solve.lib     spcurve.lib   spectrum.lib   standard.lib \
-	stratify.lib surf.lib     toric.lib     triang.lib    zeroset.lib
+	mprimdec.lib \
+        mondromy.lib mregular.lib  normal.lib    ntsolve.lib    paramet.lib \
+        poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
+        random.lib   reesclos.lib  ring.lib      rinvar.lib     sing.lib \
+        solve.lib    spcurve.lib   spectrum.lib  standard.lib   stratify.lib \
+        surf.lib     toric.lib     triang.lib    zeroset.lib
 
 SLIBS_FILES = $(addprefix LIB/,${SLIBS})
 
@@ -361,13 +364,13 @@ p_Procs_%.inc: p_Procs_Generate.cc p_Procs_Impl.h mod2.h
 	-rm -f p_Procs_$* p_Procs_$*.exe
 
 p_Procs_%.so: p_Procs_Lib_%.dl_o
-	ld ${SLDFLAGS} -o $@ $^
+	$(LD) ${SLDFLAGS} -o $@ $^
 
 mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
-	ld ${SLDFLAGS} -o $@ $^ -L${libdir} ${MP_LIBS}
+	$(LD) ${SLDFLAGS} -o $@ $^ -L${libdir} ${MP_LIBS}
 
 dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
-	ld ${SLDFLAGS} -o $@ $^
+	$(LD) ${SLDFLAGS} -o $@ $^
 
 src: scanner.cc grammar.h grammar.cc libparse.cc 
 
@@ -428,9 +431,7 @@ installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
-	${INSTALL_PROGRAM} ESingular ${bindir}
-	${INSTALL_PROGRAM} TSingular ${bindir}
-	${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
+	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
 	chmod a+x ${SINGULAR}
 	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
 	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};
@@ -485,9 +486,8 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${install_bindir} 
 	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
-	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${install_bindir}
+	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${DL_LIBS} ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
-	${INSTALL_PROGRAM} ${DL_LIBS} ${install_bindir}
 
 install-sharedist: ${SLIBS_FILES} LIB/gftables
 	${MKINSTALLDIRS} ${install_slibdir}

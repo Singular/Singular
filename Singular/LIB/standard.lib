@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.58 2001-02-22 16:02:55 westenb Exp $";
+version="$Id: standard.lib,v 1.59 2001-08-27 14:48:01 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -70,7 +70,7 @@ proc stdhilb(ideal i,list #)
 TYPE:    ideal
 PURPOSE: computes the standard basis of the homogeneous ideal in the basering,
          via a Hilbert driven standard basis computation.@*
-         An optional second argument will be used as 1-st Hilbert function.
+         An optional second argument will be used as 1st Hilbert function.
 ASSUME:  The optional second argument is the first Hilbert series as computed
          by @code{hilb}.
 SEE ALSO: stdfglm, std, groebner
@@ -239,7 +239,7 @@ EXAMPLE: example groebner;  shows an example"
 
   // we are still here -- do the actual computation
   string ordstr_P = ordstr(P);
-  if (find(ordstr_P,"s") > 0)
+  if ((find(ordstr_P,"s") > 0)||(find(ordstr_P,"M") > 0))
   {
     //spaeter den lokalen fall ueber lp oder aehnlich behandeln
     return(std(i));
@@ -434,7 +434,7 @@ proc res(list #)
 resolution
 @item @strong{Purpose:}
 computes a (possibly minimal) free resolution of an ideal or module using
-a heuristically choosen method.
+a heuristically chosen method.
 @* The second (int) argument (say, @code{k}) specifies the length of
 the resolution. If it is not positive then @code{k} is assumed to be the
 number of variables of the basering.
@@ -602,7 +602,7 @@ proc quot (m1,m2,list #)
 TYPE:    ideal
 SYNTAX:  @code{quot (} module_expression@code{,} ideal_expression @code{)}
 TYPE:    module
-PURPOSE: computes the quotient of the first and the 2nd argument.
+PURPOSE: computes the quotient of the 1st and the 2nd argument.
          If a 3rd argument 'n' is given the n-th method is used
          (n=1...5).
 SEE ALSO: quotient

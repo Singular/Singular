@@ -1,6 +1,6 @@
 //last change: 02.03.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.19 2001-03-02 13:41:19 westenb Exp $";
+version="$Id: surf.lib,v 1.20 2001-08-27 14:48:01 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -39,8 +39,8 @@ static proc num_of_vars(ideal I)
 }
 
 proc  plot(ideal I,list #)
-"USAGE:   plot(I);  I ideal
-ASSUME: I defines a plane curve or a surface
+"USAGE:   plot(I);  I ideal or poly
+ASSUME: I defines a plane curve or a surface given by one equation
 RETURN: nothing
 NOTE: requires the external program 'surf' to be installed
 EXAMPLE: example plot; shows an example
@@ -74,6 +74,7 @@ EXAMPLE: example plot; shows an example
     }
   }
   ideal I=simplify(phi(I),2);
+  if (leadcoef(I[1]) <0) { I[1]=-I[1]; }
   if (ncols(I)==1 and n<=2) // curve
   {
     write(":w "+l,"clip=none;");
@@ -130,41 +131,25 @@ background_red=255; background_green=255; background_blue=255;");
 }
 example
 { "EXAMPLE:"; echo =2;
-   // ---------  plane curves ------------
-   ring rr0 = 0,(x1,x2),dp;
+  // ---------  plane curves ------------
+  ring rr0 = 0,(x1,x2),dp;
 
-   ideal I = x1^3 - x2^2;
-   plot(I);
+  ideal I = x1^3 - x2^2;
+  plot(I);
 
-   ring rr1 = 0,(x,y,z),dp;
-   ideal I(1) = 2x2-1/2x3 +1-y+1;
-   plot(I(1));
+  ring rr1 = 0,(x,y,z),dp;
+  ideal I(1) = 2x2-1/2x3 +1-y+1;
+  plot(I(1));
 
   //  ---- Singular Logo --------------
   poly logo = ((x+3)^3 + 2*(x+3)^2 - y^2)*(x^3 - y^2)*((x-3)^3-2*(x-3)^2-y^2);
   plot(logo);
 
-   // --------- implicit curves ------------
-   // implicit curves
-   ideal I(1) = y,-x2;
-   plot(I(1));
-   ideal I(2) = x2,-y2 +4;
-   plot(I(2));
+  // Steiner surface
+  ideal J(2) = x^2*y^2+x^2*z^2+y^2*z^2-17*x*y*z;
+  plot(J(2));
 
-   //the lemniscate
-
-   ideal I(3) = x4+2x2y2 + y4, x2-y2;
-   plot(I(3));
-
-   // ----------- surfaces -------------------
-   ideal J(1) = 3xy4 + 2xy2, x5y3 + x + y6,10x2;
-   plot(J(1));
-
-   // Steiner surface
-
-   ideal J(2) = x^2*y^2+x^2*z^2+y^2*z^2-17*x*y*z;
-   plot(J(2));
-
+  // --------------------
   plot(x*(x2-y2)+z2);
 
   // E7

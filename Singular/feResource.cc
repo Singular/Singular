@@ -1,19 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.31 2000-12-18 15:44:40 obachman Exp $ */
+/* $Id: feResource.cc,v 1.32 2001-08-27 14:46:57 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
 
 #include <stdlib.h>
-#if defined(__alpha)
-extern "C"
-{
-  int setenv(const char *name, const char *value, int overwrite);
-};
-#endif
-
 #include <unistd.h>
 #include <string.h>
 
@@ -21,9 +14,11 @@ extern "C"
 #include "distrib.h"
 #include "dError.h"
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include "omalloc.h"
 #include "febase.h"
+#include "omalloc.h"
 #else
+char* feResource(const char id, int warn = -1);
+char* feResource(const char* key, int warn = -1);
 #include "dError.c"
 #endif
 
@@ -153,7 +148,7 @@ extern "C" int cygwin32_posix_path_list_p (const char *path);
  * Public functions
  *
  *****************************************************************/
-char* feResource(const char* key, int warn = -1)
+char* feResource(const char* key, int warn)
 {
   return feResource(feGetResourceConfig(key), warn);
 }
@@ -163,7 +158,7 @@ char* feGetResource(const char id)
   return feResource(feGetResourceConfig(id), -1);
 }
 
-char* feResource(const char id, int warn = -1)
+char* feResource(const char id, int warn)
 {
   return feResource(feGetResourceConfig(id), warn);
 }
@@ -479,7 +474,7 @@ static char* feCleanResourceValue(feResourceType type, char* value)
   if (type == feResBinary)
   {
     int l = strlen(value);
-    if (l < 4 || (strcmp(&value[l-4], ".exe") != 0 && 
+    if (l < 4 || (strcmp(&value[l-4], ".exe") != 0 &&
                   strcmp(&value[l-4], ".EXE") != 0))
       strcat(value, ".exe");
   }
@@ -645,8 +640,8 @@ static char* feCleanUpPath(char* path)
         path_comps[j-1] = path_comps[j];
     n_comps--;
   }
-  
-  
+
+
   // assemble everything again
   for (path=opath, i=0;i<n_comps-1;i++)
   {
@@ -655,7 +650,7 @@ static char* feCleanUpPath(char* path)
     *path = fePathSep;
     path++;
   }
-  if (n_comps) 
+  if (n_comps)
   {
     strcpy(path, path_comps[i]);
   }
@@ -737,7 +732,7 @@ static char* feSprintf(char* s, const char* fmt, int warn)
   return s_in;
 }
 
-void feStringAppendResources(int warn = -1)
+void feStringAppendResources(int warn)
 {
   int i = 0;
   char* r;

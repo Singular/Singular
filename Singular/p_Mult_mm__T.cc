@@ -2,53 +2,44 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    pp_Mult_mm__Template.cc
+ *  File:    p_Mult_mm__Template.cc
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__Template.cc,v 1.9 2000-12-07 15:04:02 obachman Exp $
+ *  Version: $Id: p_Mult_mm__T.cc,v 1.2 2001-08-27 14:47:25 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
  *
  *   Returns:  p*m
- *   Const:    p, m
+ *   Const:    m
+ *   Destroys: p  
  *
  ***************************************************************/
-LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
+LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
-  if (p == NULL) 
-  {
-    last = NULL;
-    return NULL;
-  }
-  spolyrec rp;
-  poly q = &rp, r;
+  if (p == NULL) return NULL;
+  pAssume(m != NULL);
+  poly q = p;
   number ln = pGetCoeff(m);
-  omBin bin = ri->PolyBin;
+  number pn;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
   const unsigned long* m_e = m->exp;
   pAssume(!n_IsZero(ln,ri));
-  pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
 
-
-  do
+  while (p != NULL)
   {
-    p_AllocBin( pNext(q), bin, ri);
-    q = pNext(q);
-    pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
-    p_MemSum(q->exp, p->exp, m_e, length);
-    p_MemAddAdjust(q, ri);
+    pn = pGetCoeff(p);
+    pSetCoeff0(p, n_Mult(ln, pn, ri));
+    n_Delete(&pn, ri);
+    p_MemAdd(p->exp, m_e, length);
+    p_MemAddAdjust(p, ri);
     p = pNext(p);
   }
-  while (p != NULL);
-  last = q;
-  pNext(q) = NULL;
-
-  p_Test(pNext(&rp), ri);
-  return pNext(&rp);
+  p_Test(q, ri);
+  return q;
 }
 
 

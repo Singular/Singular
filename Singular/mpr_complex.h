@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.16 2000-12-20 10:54:24 pohl Exp $ */
+/* $Id: mpr_complex.h,v 1.17 2001-08-27 14:47:14 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -327,7 +327,7 @@ char *complexToStr( gmp_complex & c, const  unsigned int oprec );
 
 bool complexNearZero( gmp_complex * c, int digits );
 
-#endif MPR_COMPLEX_H
+#endif /* MPR_COMPLEX_H */
 
 // local Variables: ***
 // folded-file: t ***

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.85 2001-05-17 15:23:18 Singular Exp $ */
+/* $Id: iplib.cc,v 1.86 2001-08-27 14:47:03 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -49,6 +49,33 @@ libstackv library_stack;
 //int IsCmd(char *n, int tok);
 char mytolower(char c);
 
+/*2
+* return TRUE if the libray libname is already loaded
+*/
+BOOLEAN iiGetLibStatus(char *lib)
+{
+  idhdl hl;
+
+#ifndef HAVE_NAMESPACES
+  char *p;
+
+  hl = IDROOT->get("LIB", 0);
+  if (hl == NULL || (p=strstr(IDSTRING(hl), lib)) == NULL) return FALSE;
+  if ((p!=IDSTRING(hl)) && (*(p-1)!=',')) return FALSE;
+
+  return TRUE;
+#else
+  char *plib = iiConvName(lib);
+  hl = namespaceroot->get(plib,0, TRUE);
+  if((hl==NULL) ||(IDTYP(hl)!=PACKAGE_CMD))
+  {
+    omFree(plib);
+    return FALSE;
+  }  
+  omFree(plib);
+  return TRUE;
+#endif
+}
 
 /*2
 * find the library of an proc:
@@ -667,7 +694,7 @@ BOOLEAN iiReLoadLib(idhdl packhdl)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-/* sees wheter library lib has already been loaded
+/* check, if library lib has already been loaded
    if yes, writes filename of lib into where and returns TRUE,
       no, returns FALSE
 */
@@ -677,6 +704,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
 
 #ifndef HAVE_NAMESPACES
   char *p;
+
   hl = IDROOT->get("LIB", 0);
   if (hl == NULL || (p=strstr(IDSTRING(hl), lib)) == NULL) return FALSE;
   if ((p!=IDSTRING(hl)) && (*(p-1)!=',')) return FALSE;
@@ -703,7 +731,10 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
   char *plib = iiConvName(lib);
   hl = namespaceroot->get(plib,0, TRUE);
   if((hl==NULL) ||(IDTYP(hl)!=PACKAGE_CMD))
+  {
+    omFree(plib);
     return FALSE;
+  }  
   strcpy(where,IDPACKAGE(hl)->libname);
   omFree(plib);
 #endif
@@ -1208,15 +1239,7 @@ void piShowProcList()
 void libstack::push(char *p, char *libname)
 {
   libstackv lp;
-#ifndef HAVE_NAMESPACES
-  idhdl hl = idroot->get("LIB",0);
-  char *f = NULL;
-  if(hl!=NULL) f = strstr(IDSTRING(hl),libname);
-  if( (hl==NULL) || (f == NULL))
-#else
-  char dummy[128];
-  if (!iiLocateLib(libname, dummy))
-#endif
+  if( !iiGetLibStatus(libname))
   {
     for(lp = this;lp!=NULL;lp=lp->next)
     {

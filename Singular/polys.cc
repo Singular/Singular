@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.75 2000-12-31 15:14:41 obachman Exp $ */
+/* $Id: polys.cc,v 1.76 2001-08-27 14:47:32 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -65,7 +65,7 @@ void pSetGlobals(ring r, BOOLEAN complete)
 // resets the pFDeg and pLDeg: if pLDeg is not given, it is
 // set to currRing->pLDegOrig, i.e. to the respective LDegProc which
 // only uses pFDeg (and not pDeg, or pTotalDegree, etc)
-void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg = NULL)
+void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg)
 {
   assume(new_FDeg != NULL);
   pFDeg = new_FDeg;

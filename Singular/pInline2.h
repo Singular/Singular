@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.28 2001-05-22 13:25:13 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.29 2001-08-27 14:47:21 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -84,7 +84,6 @@ PINLINE2 Order_t p_SetOrder(poly p, long o, ring r)
         return (p)->exp[r->pOrdIndex] = o;
     }
   }
-  return (p)->exp[r->pOrdIndex] = o;
 }
 
 // Setm
@@ -141,10 +140,10 @@ PINLINE2 Exponent_t p_GetExp(poly p, int v, ring r)
   int bitpos=(r->VarOffset[v] >> 24);
   long exp=(p->exp[pos] >> bitmask) & r->bitmask;
   return exp;
-#else  
+#else
   return (p->exp[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
           & r->bitmask;
-#endif  
+#endif
 }
 PINLINE2 Exponent_t p_SetExp(poly p, int v, int e, ring r)
 {
@@ -317,13 +316,13 @@ PINLINE2 Exponent_t p_GetMaxExp(poly p, ring r)
   return p_GetMaxExp(p_GetMaxExpL(p, r), r);
 }
 
-PINLINE2 Exponent_t 
+PINLINE2 Exponent_t
 p_GetMaxExp(const unsigned long l, const ring r, const int number_of_exps)
 {
   unsigned long bitmask = r->bitmask;
   unsigned long max = (l & bitmask);
   unsigned long j = number_of_exps - 1;
-  
+
   if (j > 0)
   {
     unsigned long i = r->BitsPerExp;
@@ -331,7 +330,7 @@ p_GetMaxExp(const unsigned long l, const ring r, const int number_of_exps)
     while(1)
     {
       e = ((l >> i) & bitmask);
-      if ((unsigned long) e > max) 
+      if ((unsigned long) e > max)
         max = e;
       j--;
       if (j==0) break;
@@ -346,13 +345,13 @@ PINLINE2 Exponent_t p_GetMaxExp(const unsigned long l, const ring r)
   return p_GetMaxExp(l, r, r->ExpPerLong);
 }
 
-PINLINE2 unsigned long 
+PINLINE2 unsigned long
 p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps)
 {
   const unsigned long bitmask = r->bitmask;
   unsigned long sum = (l & bitmask);
   unsigned long j = number_of_exps - 1;
-  
+
   if (j > 0)
   {
     unsigned long i = r->BitsPerExp;
@@ -367,7 +366,7 @@ p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps)
   return sum;
 }
 
-PINLINE2 unsigned long 
+PINLINE2 unsigned long
 p_GetTotalDegree(const unsigned long l, const ring r)
 {
   return p_GetTotalDegree(l, r, r->ExpPerLong);
@@ -641,7 +640,7 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
   else
 #endif
     res = _p_Mult_q(p, qq, 1, r);
-  
+
   if (qq != q)
     p_Delete(&qq, r);
   return res;
@@ -649,7 +648,7 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
 
 // returns p + m*q destroys p, const: q, m
 // this should be implemented more efficiently
-PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq, 
+PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
                                 const ring r)
 {
   poly res, last;
@@ -664,7 +663,7 @@ PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
   else
 #endif
     res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
- 
+
   lp = (lp + lq) - shorter;
   pSetCoeff0(m, n_old);
   n_Delete(&n_neg, r);
@@ -721,4 +720,3 @@ PINLINE2 void      p_wrp(poly p, ring p_ring)
 }
 #endif // !defined(NO_PINLINE2) || defined(POLYS_IMPL_CC)
 #endif // PINLINE2_H
-

@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_nn__Template.cc,v 1.3 2000-12-07 15:03:58 obachman Exp $
+ *  Version: $Id: p_Mult_nn__T.cc,v 1.2 2001-08-27 14:47:26 Singular Exp $
  *******************************************************************/
 
 /***************************************************************

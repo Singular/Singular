@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.24 2001-02-09 17:26:00 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.25 2001-08-27 14:47:04 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -45,7 +45,7 @@ KINLINE TObject* skStrategy::s_2_t(int i)
     }
     // last but not least, try kFindInT
     sri = kFindInT(S[i], T, tl);
-    if (sri >= 0) 
+    if (sri >= 0)
       return &(T[sri]);
   }
   return NULL;
@@ -69,9 +69,9 @@ KINLINE poly skStrategy::kNoetherTail()
  *
  ***************************************************************/
 
-KINLINE TSet initT () 
-{ 
-  TSet T = (TSet)omAlloc0(setmax*sizeof(TObject)); 
+KINLINE TSet initT ()
+{
+  TSet T = (TSet)omAlloc0(setmax*sizeof(TObject));
   for (int i=0; i<setmax; i++)
   {
     T[i].tailRing = currRing;
@@ -120,7 +120,7 @@ KINLINE void sTObject::Set(poly p_in, ring r)
   }
 }
 
-KINLINE sTObject::sTObject(poly p_in, ring r) 
+KINLINE sTObject::sTObject(poly p_in, ring r)
 {
   Init(r);
   Set(p_in, r);
@@ -134,7 +134,7 @@ KINLINE void sTObject::Set(poly p_in, ring c_r, ring t_r)
     pp_Test(p_in, currRing, t_r);
     p = p_in;
   }
-  else 
+  else
   {
     Set(p_in, c_r);
   }
@@ -228,9 +228,9 @@ KINLINE poly sTObject::GetLmTailRing()
 KINLINE poly sTObject::GetLm(ring r)
 {
   assume(r == tailRing || r == currRing);
-  if (r == currRing) 
+  if (r == currRing)
     return GetLmCurrRing();
-  
+
   if (t_p == NULL && p != NULL)
     t_p = k_LmInit_currRing_2_tailRing(p, tailRing);
 
@@ -274,7 +274,7 @@ KINLINE poly sTObject::Next()
   if (t_p != NULL) return pNext(t_p);
   return pNext(p);
 }
-    
+
 // Iterations
 KINLINE void sTObject::LmDeleteAndIter()
 {
@@ -309,16 +309,16 @@ KINLINE void sTObject::Mult_nn(number n)
   }
 }
 
-KINLINE void 
+KINLINE void
 sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
-                            pShallowCopyDeleteProc p_shallow_copy_delete, 
+                            pShallowCopyDeleteProc p_shallow_copy_delete,
                             BOOLEAN set_max)
 {
   if (new_tailBin == NULL) new_tailBin = new_tailRing->PolyBin;
   if (t_p != NULL)
   {
     t_p = p_shallow_copy_delete(t_p, tailRing, new_tailRing, new_tailBin);
-    if (p != NULL) 
+    if (p != NULL)
       pNext(p) = pNext(t_p);
     if (new_tailRing == currRing)
     {
@@ -331,7 +331,7 @@ sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
   {
     if (pNext(p) != NULL)
     {
-      pNext(p) = p_shallow_copy_delete(pNext(p), 
+      pNext(p) = p_shallow_copy_delete(pNext(p),
                                        tailRing, new_tailRing, new_tailBin);
     }
     if (new_tailRing != currRing)
@@ -356,7 +356,7 @@ sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
   }
   tailRing = new_tailRing;
 }
-  
+
 KINLINE long sTObject::pFDeg() const
 {
   if (p != NULL) return ::pFDeg(p, currRing);
@@ -406,9 +406,9 @@ KINLINE void  sTObject::pNorm()
     is_normalized = TRUE;
   }
 }
-  
 
-    
+
+
 /***************************************************************
  *
  * Operation on LObjects
@@ -473,7 +473,7 @@ KINLINE void sLObject::PrepareRed(BOOLEAN use_bucket)
 
 KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_bucket, ring tailRing, poly _last)
 {
-  
+
   Set(lm, tailRing);
   if (use_bucket)
   {
@@ -489,7 +489,7 @@ KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_buc
     pLength = p_Length + 1;
     last = _last;
   }
-  
+
 }
 
 KINLINE void sLObject::Tail_Mult_nn(number n)
@@ -506,7 +506,7 @@ KINLINE void sLObject::Tail_Mult_nn(number n)
   }
 }
 
-KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq, 
+KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
                                              poly spNoether)
 {
   if (bucket != NULL)
@@ -518,7 +518,7 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
     poly _p = (t_p != NULL ? t_p : p);
     assume(_p != NULL);
     int shorter;
-    pNext(_p) = tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(_p), m, q, 
+    pNext(_p) = tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(_p), m, q,
                                                       shorter,spNoether,
                                                       tailRing, last);
     pLength += lq - shorter;
@@ -549,9 +549,9 @@ KINLINE poly sLObject::LmExtractAndIter()
 {
   poly ret = GetLmTailRing();
   poly pn;
-  
+
   assume(p != NULL || t_p != NULL);
-  
+
   if (bucket != NULL)
   {
     pn = kBucketExtractLm(bucket);
@@ -566,7 +566,7 @@ KINLINE poly sLObject::LmExtractAndIter()
   pNext(ret) = NULL;
   if (p != NULL && t_p != NULL)
     p_LmFree(p, currRing);
-    
+
   Set(pn, tailRing);
   return ret;
 }
@@ -601,16 +601,16 @@ KINLINE poly sLObject::GetTP()
   return tp;
 }
 
-    
-KINLINE poly sLObject::GetP(omBin lmBin = NULL)
+
+KINLINE poly sLObject::GetP(omBin lmBin)
 {
   kTest_L(this);
   if (p == NULL)
-    p = k_LmInit_tailRing_2_currRing(t_p, tailRing, 
+    p = k_LmInit_tailRing_2_currRing(t_p, tailRing,
                                      (lmBin!=NULL?lmBin:currRing->PolyBin));
   else if (lmBin != NULL && lmBin != currRing->PolyBin)
     p = p_LmShallowCopyDelete(p, currRing, lmBin);
-  
+
   if (bucket != NULL)
   {
     kBucketClear(bucket, &pNext(p), &pLength);
@@ -622,15 +622,15 @@ KINLINE poly sLObject::GetP(omBin lmBin = NULL)
   return p;
 }
 
-KINLINE void 
-sLObject::ShallowCopyDelete(ring new_tailRing, 
+KINLINE void
+sLObject::ShallowCopyDelete(ring new_tailRing,
                             pShallowCopyDeleteProc p_shallow_copy_delete)
 {
   if (bucket != NULL)
     kBucketShallowCopyDelete(bucket, new_tailRing, new_tailRing->PolyBin,
                              p_shallow_copy_delete);
-  sTObject::ShallowCopyDelete(new_tailRing, 
-                              new_tailRing->PolyBin,p_shallow_copy_delete, 
+  sTObject::ShallowCopyDelete(new_tailRing,
+                              new_tailRing->PolyBin,p_shallow_copy_delete,
                               FALSE);
   last = NULL;
 }
@@ -641,7 +641,7 @@ KINLINE void sLObject::SetShortExpVector()
   {
     sev = p_GetShortExpVector(t_p, tailRing);
   }
-  else 
+  else
   {
     sev = p_GetShortExpVector(p, currRing);
   }
@@ -653,8 +653,8 @@ KINLINE void sLObject::Copy()
   {
     int i = kBucketCanonicalize(bucket);
     kBucket_pt new_bucket = kBucketCreate(tailRing);
-    kBucketInit(new_bucket, 
-                p_Copy(bucket->buckets[i], tailRing), 
+    kBucketInit(new_bucket,
+                p_Copy(bucket->buckets[i], tailRing),
                 bucket->buckets_length[i]);
     bucket = new_bucket;
     if (t_p != NULL) pNext(t_p) = NULL;
@@ -702,8 +702,8 @@ KINLINE long sLObject::pLDeg()
 KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
 {
   if (! deg_last || bucket != NULL) return sLObject::pLDeg();
-  
-  if (last == NULL || pLength == 0) 
+
+  if (last == NULL || pLength == 0)
     last = pLast(GetLmTailRing(), pLength);
 #ifdef HAVE_ASSUME
   long fdeg;
@@ -732,14 +732,14 @@ KINLINE long sLObject::SetDegStuffReturnLDeg(BOOLEAN use_last)
 }
 KINLINE int sLObject::GetpLength()
 {
-  if (bucket == NULL) 
+  if (bucket == NULL)
     return sTObject::GetpLength();
   int i = kBucketCanonicalize(bucket);
   return bucket->buckets_length[i] + 1;
 }
 KINLINE int sLObject::SetLength(BOOLEAN length_pLength)
 {
-  if (length_pLength) 
+  if (length_pLength)
   {
     length = this->GetpLength();
   }
@@ -770,7 +770,7 @@ KINLINE long sLObject::Comp()
   assume(p != NULL);
   return p_GetComp(p, r);
 }
-  
+
 KINLINE sLObject& sLObject::operator=(const sTObject& t)
 {
   memset(this, 0, sizeof(*this));
@@ -778,12 +778,12 @@ KINLINE sLObject& sLObject::operator=(const sTObject& t)
   return *this;
 }
 
-KINLINE TObject* sLObject::T_1(const skStrategy* strat)
+KINLINE TObject* sLObject::T_1(const skStrategy* s)
 {
   if (p1 == NULL) return NULL;
-  if (i_r1 == -1) i_r1 = kFindInT(p1, strat->T, strat->tl);
-  assume(i_r1 >= 0 && i_r1 <= strat->tl);
-  TObject* T = strat->R[i_r1];
+  if (i_r1 == -1) i_r1 = kFindInT(p1, s->T, s->tl);
+  assume(i_r1 >= 0 && i_r1 <= s->tl);
+  TObject* T = s->R[i_r1];
   assume(T->p == p1);
   return T;
 }
@@ -799,12 +799,12 @@ KINLINE TObject* sLObject::T_2(const skStrategy* strat)
   return T;
 }
 
-KINLINE void    sLObject::T_1_2(const skStrategy* strat, 
+KINLINE void    sLObject::T_1_2(const skStrategy* strat,
                                 TObject* &T_1, TObject* &T_2)
 {
   if (p1 == NULL)
   {
-    T_1 = NULL; 
+    T_1 = NULL;
     T_2 = NULL;
     return;
   }
@@ -825,10 +825,10 @@ KINLINE void    sLObject::T_1_2(const skStrategy* strat,
  * Conversion of polys
  *
  ***************************************************************/
-  
+
 KINLINE poly k_LmInit_currRing_2_tailRing(poly p, ring tailRing, omBin tailBin)
 {
-  
+
   poly np = p_LmInit(p, currRing, tailRing, tailBin);
   pNext(np) = pNext(p);
   pSetCoeff0(np, pGetCoeff(p));
@@ -885,17 +885,17 @@ KINLINE poly k_LmShallowCopyDelete_tailRing_2_currRing(poly p, ring tailRing)
  ***************************************************************/
 // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
 //     m2 = LCM(LM(p1), LM(p2))/LM(p2)
-KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r, 
+KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
                                poly &m1, poly &m2, const ring m_r)
 {
   p_LmCheckPolyRing(p1, p_r);
   p_LmCheckPolyRing(p2, p_r);
-  
+
   int i;
   Exponent_t x;
   m1 = p_Init(m_r);
   m2 = p_Init(m_r);
-  
+
   for (i = p_r->N; i; i--)
   {
     x = p_GetExpDiff(p1, p2, i, p_r);
@@ -916,7 +916,7 @@ KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
   p_Setm(m1, m_r);
   p_Setm(m2, m_r);
   return TRUE;
-  
+
   false_return:
   p_LmFree(m1, m_r);
   p_LmFree(m2, m_r);
@@ -927,7 +927,7 @@ KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
 /***************************************************************
  *
  * Misc things
- * 
+ *
  ***************************************************************/
 KINLINE int ksReducePolyTail(LObject* PR, TObject* PW, LObject* Red)
 {
@@ -936,12 +936,11 @@ KINLINE int ksReducePolyTail(LObject* PR, TObject* PW, LObject* Red)
 
   assume(PR->GetLmCurrRing() != PW->GetLmCurrRing());
   ret = ksReducePoly(Red, PW, NULL, &coef);
-  
+
   if (!ret)
   {
     if (! n_IsOne(coef, currRing))
       PR->Mult_nn(coef);
-      
     n_Delete(&coef, currRing);
   }
   return ret;
@@ -950,8 +949,8 @@ KINLINE int ksReducePolyTail(LObject* PR, TObject* PW, LObject* Red)
 /***************************************************************
  *
  * Routines for backwards-Compatibility
- * 
- * 
+ *
+ *
  ***************************************************************/
 KINLINE poly ksOldSpolyRed(poly p1, poly p2, poly spNoether)
 {
@@ -959,7 +958,7 @@ KINLINE poly ksOldSpolyRed(poly p1, poly p2, poly spNoether)
   TObject T(p1);
 
   ksReducePoly(&L, &T, spNoether);
-  
+
   return L.GetLmCurrRing();
 }
 
@@ -969,7 +968,7 @@ KINLINE poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether)
   TObject T(p1);
 
   ksReducePoly(&L, &T, spNoether);
-  
+
   return L.GetLmCurrRing();
 }
 
@@ -978,7 +977,7 @@ KINLINE poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether, ring r)
   LObject L(r);
   L.p1 = p1;
   L.p2 = p2;
-  
+
   ksCreateSpoly(&L, spNoether);
   return L.GetLmCurrRing();
 }
@@ -1007,7 +1006,6 @@ KINLINE poly redtailBba(TObject *T, int pos,kStrategy strat, BOOLEAN withT)
   assume( p == T->p);
   return p;
 }
-  
+
 #endif // defined(KINLINE) || defined(KUTIL_CC)
 #endif // KINLINE_CC
-

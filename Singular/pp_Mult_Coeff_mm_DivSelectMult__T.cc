@@ -6,7 +6,7 @@
  *  Purpose: template for pp_Mult_Coeff_mm__DivSelectMult
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_Coeff_mm_DivSelectMult__Template.cc,v 1.2 2000-12-31 15:54:47 obachman Exp $
+ *  Version: $Id: pp_Mult_Coeff_mm_DivSelectMult__T.cc,v 1.2 2001-08-27 14:47:33 Singular Exp $
  *******************************************************************/
 
 /***************************************************************

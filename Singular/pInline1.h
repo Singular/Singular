@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.19 2001-05-22 13:24:32 Singular Exp $
+ *  Version: $Id: pInline1.h,v 1.20 2001-08-27 14:47:20 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -479,7 +479,7 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
 // i.e., test if all exponents are zero
 PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r)
 {
-  p_LmCheckPolyRing(p, r);
+  //p_LmCheckPolyRing(p, r);
   int i = r->VarL_Size - 1;
 
   do
@@ -541,4 +541,3 @@ PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2,
 
 #endif // !defined(NO_PINLINE1) || defined(PINLINE1_CC)
 #endif // PINLINE1_CC
-

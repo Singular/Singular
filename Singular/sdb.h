@@ -3,11 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.h,v 1.6 1999-11-15 17:20:46 obachman Exp $ */
+/* $Id: sdb.h,v 1.7 2001-08-27 14:47:38 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
 
+#define HAVE_SDB
+
+#ifdef HAVE_SDB
 #include "febase.h"
 #include "structs.h"
 
@@ -19,5 +22,6 @@ void sdb_edit(procinfo *pi);
 void sdb_show_bp();
 BOOLEAN sdb_set_breakpoint(const char *p, int lineno=0);
 void sdb(Voice * currentVoice, const char * currLine, int len);
+#endif
 #endif
 

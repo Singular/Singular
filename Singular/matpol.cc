@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.42 2001-07-16 08:51:48 Singular Exp $ */
+/* $Id: matpol.cc,v 1.43 2001-08-27 14:47:10 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -151,9 +151,9 @@ matrix mpMultP(matrix a, poly p)
 
   pNormalize(p);
   for (k=m*n-1; k>0; k--)
-  {  
+  {
     a->m[k] = pMult(a->m[k], pCopy(p));
-  }  
+  }
   a->m[0] = pMult(a->m[0], p);
   return a;
 }
@@ -341,7 +341,7 @@ class mp_permmatrix
 #define SIZE_OF_SYSTEM_PAGE 4096
 #endif
 /*2
-* entries of a are minors and go to result (only if not in R) 
+* entries of a are minors and go to result (only if not in R)
 */
 void mpMinorToResult(ideal result, int &elems, matrix a, int r, int c,
                      ideal R)
@@ -1887,7 +1887,7 @@ BOOLEAN mpIsDiagUnit(matrix U)
         if (!pIsUnit(MATELEM(U,i,i))) return FALSE;
       }
       else if (MATELEM(U,i,j)!=NULL) return FALSE;
-    }  
+    }
   }
   return TRUE;
 }

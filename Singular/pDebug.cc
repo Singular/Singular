@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.18 2001-03-08 13:05:14 Singular Exp $
+ *  Version: $Id: pDebug.cc,v 1.19 2001-08-27 14:47:18 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -41,7 +41,7 @@ BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
   d_poly_error_reporting = TRUE;
   va_list ap;
   va_start(ap, fmt);
-  
+
   fprintf(stderr, "\n// ***dPolyError: ");
   vfprintf(stderr, fmt, ap);
   fprintf(stderr, "\n occured at\n");
@@ -78,8 +78,8 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
     {
       pPolyAssumeReturnMsg(custom == r ||
                            // be more sloppy for qrings
-                           (r->qideal != NULL && 
-                            omIsBinPageAddr(p) && 
+                           (r->qideal != NULL &&
+                            omIsBinPageAddr(p) &&
                             omSizeWOfAddr(p)==r->PolyBin->sizeW) ||
                            rEqual((ring) custom, r, FALSE),
                            "monomial not from specified ring");
@@ -183,14 +183,14 @@ static poly p_DebugInit(poly p, ring src_ring, ring dest_ring)
   poly d_p = p_Init(dest_ring);
   int i;
   assume(dest_ring->N == src_ring->N);
-  
+
   for (i=1; i<= src_ring->N; i++)
   {
     p_SetExp(d_p, i, p_GetExp(p, i, src_ring), dest_ring);
   }
   if (rRing_has_Comp(dest_ring))
     p_SetComp(d_p, p_GetComp(p, src_ring), dest_ring);
-  
+
   p_Setm_General(d_p, dest_ring);
   return d_p;
 }
@@ -201,9 +201,9 @@ BOOLEAN _p_Test(poly p, ring r, int level)
 
   if (PDEBUG > level) level = PDEBUG;
   if (level < 0 || p == NULL) return TRUE;
-  
+
   poly p_prev = NULL;
-  
+
   // check addr with level+1 so as to check bin/page of addr
   pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, level+1)
                         == omError_NoError, "memory error");
@@ -213,15 +213,15 @@ BOOLEAN _p_Test(poly p, ring r, int level)
   // this checks that p does not contain a loop: rather expensive O(length^2)
   if (level > 1)
     pFalseReturn(omTestList(p, level) == omError_NoError);
-  
+
   int ismod = p_GetComp(p, r) > 0;
-  
+
   while (p != NULL)
   {
     // ring check
     pFalseReturn(p_LmCheckIsFromRing(p, r));
     // omAddr check
-    pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, 1) 
+    pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, 1)
                      == omError_NoError, "memory error");
     // number/coef check
     pPolyAssumeReturnMsg(p->coef != NULL || (n_GetChar(r) >= 2), "NULL coef");
@@ -229,7 +229,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
 
     // check for valid comp
     pPolyAssumeReturnMsg(p_GetComp(p, r) >= 0 && (p_GetComp(p, r)<65000), "component out of range ?");
-    // check for mix poly/vec representation 
+    // check for mix poly/vec representation
     pPolyAssumeReturnMsg(ismod == (p_GetComp(p, r) > 0), "mixed poly/vector");
 
     // special check for ringorder_s/S
@@ -246,7 +246,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
       ec1 = p->exp[r->typ[1].data.syzcomp.place];
       pPolyAssumeReturnMsg(ec1 == ccc1, "Shifted comp out of sync. should %d, is %d");
     }
-    
+
     // check that p_Setm works ok
     if (level > 0)
     {
@@ -254,7 +254,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
       pPolyAssumeReturnMsg(p_ExpVectorEqual(p, p_should_equal, r), "p_Setm field(s) out of sync");
       p_LmFree(p_should_equal, r);
     }
-    
+
     // check order
     if (p_prev != NULL)
     {
@@ -263,7 +263,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
       {
         _pPolyAssumeReturnMsg(0, "monoms p and p->next are equal", p_prev, r);
       }
-      else 
+      else
         _pPolyAssumeReturnMsg(p_LmCmp(p_prev, p, r) == 1, "wrong order", p_prev, r);
 
       // check that compare worked sensibly
@@ -318,7 +318,7 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
   }
   return TRUE;
 }
-  
+
 #endif // PDEBUG
 
 #include "pInline1.h"
@@ -377,9 +377,9 @@ void p_SetRingOfPoly(poly p, ring r)
 void p_SetRingOfIdeal(ideal id, ring r)
 {
   if (id == NULL) return;
-  
+
   int i, n = id->ncols*id->nrows;
-  
+
   for (i=0; i<n; i++)
   {
     p_SetRingOfPoly(id->m[i], r);
@@ -419,7 +419,7 @@ void p_SetRingOfLeftv(leftv l, ring r)
     {
         case POLY_CMD:
         case VECTOR_CMD:
-          p_SetRingOfPoly((poly) l->data, r);  
+          p_SetRingOfPoly((poly) l->data, r);
       break;
 
       case IDEAL_CMD:

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.19 2001-03-14 15:51:52 Singular Exp $ */
+/* $Id: hutil.cc,v 1.20 2001-08-27 14:47:02 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */

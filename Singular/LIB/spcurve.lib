@@ -1,6 +1,6 @@
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: spcurve.lib,v 1.15 2001-02-06 11:38:07 anne Exp $";
+version="$Id: spcurve.lib,v 1.16 2001-08-27 14:48:00 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY: spcurve.lib    Deformations and Invariants of CM-codim 2 Singularities
@@ -719,7 +719,7 @@ proc KSpencerKernel(matrix M,list #)
            *  s = first of the names of the new rings
               e.g. \"R\" leads to ring names R and R1
            *  v of size n(n+1) leads to the following module ordering @*
-              gen(v[1]) > gen(v[2]) > ... > gen(v[n(n+1)]) where the matrix 
+              gen(v[1]) > gen(v[2]) > ... > gen(v[n(n+1)]) where the matrix
               entry ij corresponds to gen((i-1)*n+j)
 ASSUME:    M is a quasihomogeneous n x (n+1) matrix where the n minors define
            an isolated space curve singularity

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_global.h,v 1.10 2000-01-10 18:59:34 wenk Exp $ */
+/* $Id: mpr_global.h,v 1.11 2001-08-27 14:47:14 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants -
@@ -33,14 +33,14 @@ typedef double mprfloat;
 #define mprDEBUG_STICKY
 
 #ifdef mprDEBUG_PROT
-#define mprPROT(msg) Print("%s",msg)
+#define mprPROT(msg) PrintS(msg)
 #define mprPROTnl(msg) Print("%s\n",msg)
-#define mprPROTP(msg,poly) Print("%s",msg);pWrite0(poly)
-#define mprPROTPnl(msg,poly) Print("%s",msg);pWrite(poly)
+#define mprPROTP(msg,poly) PrintS(msg);pWrite0(poly)
+#define mprPROTPnl(msg,poly) PrintS(msg);pWrite(poly)
 #define mprPROTI(msg,intval) Print("%s%d",msg,intval)
 #define mprPROTInl(msg,intval) Print("%s%d\n",msg,intval)
-#define mprPROTN(msg,nval) Print("%s",msg);nPrint(nval);
-#define mprPROTNnl(msg,nval) Print("%s",msg);nPrint(nval);PrintLn();
+#define mprPROTN(msg,nval) PrintS(msg);nPrint(nval);
+#define mprPROTNnl(msg,nval) PrintS(msg);nPrint(nval);PrintLn();
 #else
 #define mprPROT(msg)
 #define mprPROTnl(msg)

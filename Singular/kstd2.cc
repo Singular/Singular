@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.74 2001-03-08 13:05:12 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.75 2001-08-27 14:47:05 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -9,7 +9,7 @@
 // #define PDEBUG 2
 // define to enable tailRings
 #define HAVE_TAIL_RING
-// define if no buckets should be used 
+// define if no buckets should be used
 // #define NO_BUCKETS
 
 #include "mod2.h"
@@ -41,7 +41,7 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
   L->GetLm(p, r);
 
   pAssume(~not_sev == p_GetShortExpVector(p, r));
-  
+
   if (r == currRing)
   {
     while (1)
@@ -101,7 +101,7 @@ int kFindDivisibleByInS(const polyset &S, const unsigned long* sev, const int sl
     j++;
   }
 }
-  
+
 /*2
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
@@ -123,12 +123,12 @@ static int redHomog (LObject* h,kStrategy strat)
     // find a poly with which we can reduce
     h->SetShortExpVector();
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
-    if (j < 0) 
+    if (j < 0)
     {
       h->SetpFDeg();
       return 1;
     }
-    
+
     // now we found one which is divisible -- reduce it
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
 
@@ -191,7 +191,7 @@ static int redLazy (LObject* h,kStrategy strat)
       PrintLn();
     }
 #endif
-    
+
     if (h->GetLmTailRing() == NULL)
     {
       if (h->lcm!=NULL) pLmFree(h->lcm);
@@ -243,7 +243,7 @@ static int redHoney (LObject* h, kStrategy strat)
   int i,j,at,pass,ei, ii, h_d;
   unsigned long not_sev;
   long reddeg,d;
-  
+
   pass = j = 0;
   d = reddeg = h->GetpFDeg() + h->ecart;
   h->SetShortExpVector();
@@ -269,8 +269,8 @@ static int redHoney (LObject* h, kStrategy strat)
         break;
       if (ei <= h->ecart)
         break;
-      if ((strat->T[i].ecart < ei) && 
-          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], 
+      if ((strat->T[i].ecart < ei) &&
+          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
                                h_p, not_sev, strat->tailRing))
       {
         /*
@@ -502,7 +502,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   BOOLEAN withT = FALSE;
-  
+
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
   initHilbCrit(F,Q,&hilb,strat);
@@ -521,14 +521,14 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   // redtailBBa against T for inhomogenous input
   if (!K_TEST_OPT_OLDSTD)
     withT = ! strat->homog;
-  
+
   // strat->posInT = posInT_pLength;
   kTest_TS(strat);
-  
+
 #ifdef HAVE_TAIL_RING
   kStratInitChangeTailRing(strat);
-#endif  
-  
+#endif
+
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
@@ -556,13 +556,13 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
     if (pNext(strat->P.p) == strat->tail)
     {
-      // deletes the short spoly 
+      // deletes the short spoly
       pLmFree(strat->P.p);
       strat->P.p = NULL;
       poly m1 = NULL, m2 = NULL;
 
       // check that spoly creation is ok
-      while (strat->tailRing != currRing && 
+      while (strat->tailRing != currRing &&
              !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
       {
         assume(m1 == NULL && m2 == NULL);
@@ -571,7 +571,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         kStratChangeTailRing(strat);
       }
       // create the real one
-      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets, 
+      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
     }
     else if (strat->P.p1 == NULL)
@@ -581,7 +581,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // for input polys, prepare reduction
       strat->P.PrepareRed(strat->use_buckets);
     }
-    
+
     if (TEST_OPT_PROT)
       message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
               &olddeg,&reduc,strat, red_result);
@@ -635,7 +635,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           strat->P.p2=NULL;
         }
         if (strat->tailRing!=currRing && pNext(strat->M->m[minimcnt])!=NULL)
-          pNext(strat->M->m[minimcnt]) 
+          pNext(strat->M->m[minimcnt])
             = strat->p_shallow_copy_delete(pNext(strat->M->m[minimcnt]),
                                            strat->tailRing, currRing,
                                            currRing->PolyBin);

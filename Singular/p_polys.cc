@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.16 2001-03-08 13:05:15 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.17 2001-08-27 14:47:32 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -72,9 +72,9 @@ void p_Setm_General(poly p, ring r)
         {
           int c=p_GetComp(p,r);
           long sc = c;
-          int* Components = (_ExternalComponents ? _Components : 
+          int* Components = (_ExternalComponents ? _Components :
                              o->data.syzcomp.Components);
-          long* ShiftedComponents = (_ExternalComponents ? _ShiftedComponents: 
+          long* ShiftedComponents = (_ExternalComponents ? _ShiftedComponents:
                                      o->data.syzcomp.ShiftedComponents);
           if (ShiftedComponents != NULL)
           {
@@ -141,17 +141,17 @@ void p_Setm_WFirstTotalDegree(poly p, ring r)
 
 p_SetmProc p_GetSetmProc(ring r)
 {
-  // covers lp, rp, ls, 
+  // covers lp, rp, ls,
   if (r->typ == NULL) return p_Setm_Dummy;
 
   if (r->OrdSize == 1)
   {
-    if (r->typ[0].ord_typ == ro_dp && 
+    if (r->typ[0].ord_typ == ro_dp &&
         r->typ[0].data.dp.start == 1 &&
         r->typ[0].data.dp.end == r->N &&
         r->typ[0].data.dp.place == r->pOrdIndex)
       return p_Setm_TotalDegree;
-    if (r->typ[0].ord_typ == ro_wp && 
+    if (r->typ[0].ord_typ == ro_wp &&
         r->typ[0].data.wp.start == 1 &&
         r->typ[0].data.wp.end == r->N &&
         r->typ[0].data.wp.place == r->pOrdIndex &&
@@ -196,13 +196,13 @@ long pTotaldegree(poly p, ring r)
   return (long) _pTotaldegree(p, r);
 }
 
-// pWTotalDegree for weighted orderings 
+// pWTotalDegree for weighted orderings
 // whose first block covers all variables
 inline long _pWFirstTotalDegree(poly p, ring r)
 {
   int i;
   long sum = 0;
-  
+
   for (i=1; i<= r->firstBlockEnds; i++)
   {
     sum += p_GetExp(p, i, r)*r->firstwv[i-1];
@@ -346,7 +346,7 @@ long pLDeg0c(poly p,int *l, ring r)
 
   if (! rIsSyzIndexRing(r))
   {
-    while (pNext(p) != NULL) 
+    while (pNext(p) != NULL)
     {
       pIter(p);
       ll++;
@@ -674,8 +674,8 @@ long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r)
  *
  ***************************************************************/
 
-static inline unsigned long 
-p_GetMaxExpL2(unsigned long l1, unsigned long l2, ring r, 
+static inline unsigned long
+p_GetMaxExpL2(unsigned long l1, unsigned long l2, ring r,
               unsigned long number_of_exp)
 {
   const unsigned long bitmask = r->bitmask;
@@ -716,14 +716,14 @@ poly p_GetMaxExpP(poly p, ring r)
   int i, offset;
   unsigned long l_p, l_max;
   unsigned long divmask = r->divmask;
-  
+
   do
   {
     offset = r->VarL_Offset[0];
     l_p = p->exp[offset];
     l_max = max->exp[offset];
     // do the divisibility trick to find out whether l has an exponent
-    if (l_p > l_max || 
+    if (l_p > l_max ||
         (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
       max->exp[offset] = p_GetMaxExpL2(l_max, l_p, r);
 
@@ -733,7 +733,7 @@ poly p_GetMaxExpP(poly p, ring r)
       l_p = p->exp[offset];
       l_max = max->exp[offset];
       // do the divisibility trick to find out whether l has an exponent
-      if (l_p > l_max || 
+      if (l_p > l_max ||
           (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
         max->exp[offset] = p_GetMaxExpL2(l_max, l_p, r);
     }
@@ -747,7 +747,7 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
 {
   unsigned long l_p, divmask = r->divmask;
   int i;
-  
+
   while (p != NULL)
   {
     l_p = p->exp[r->VarL_Offset[0]];
@@ -758,7 +758,7 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
     {
       l_p = p->exp[r->VarL_Offset[i]];
       // do the divisibility trick to find out whether l has an exponent
-      if (l_p > l_max || 
+      if (l_p > l_max ||
           (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
         l_max = p_GetMaxExpL2(l_max, l_p, r);
     }
@@ -767,9 +767,6 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
   return l_max;
 }
 
-
-
-    
 /***************************************************************
  *
  * Misc things
@@ -842,4 +839,3 @@ poly p_NSet(number n, ring r)
     return rc;
   }
 }
-

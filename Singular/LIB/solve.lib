@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.21 2001-02-19 14:17:49 lossen Exp $";
+version="$Id: solve.lib,v 1.22 2001-08-27 14:48:00 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -777,7 +777,7 @@ initial ideal.@*
 p>0: gives precision of complex numbers in digits,@*
 d>0: gives precision (1<d<p) for near-zero-determination,@*
 (default: d=1/2*p)
-         
+
 ASSUME:  the ground field has char 0;@*
          l was computed using Algorithm of Lazard or Algorithm of Moeller
          (see triang.lib).

@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.17 2001-02-19 14:17:48 lossen Exp $";
+version="$Id: presolve.lib,v 1.18 2001-08-27 14:47:57 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -747,10 +747,10 @@ proc tolessvars (id ,list #)
           s1,s2=strings@*
           s1: name of new ring,@*
           s2: new ordering@*
-          (default: s1=\"R(n)\" where n is the # of vars in the new ring, 
+          (default: s1=\"R(n)\" where n is the # of vars in the new ring,
           s2=\"dp\" or \"ds\" depending whether the first block of the old
           ordering is a p- resp. an s-ordering)
-          
+
 CREATE:  nothing, if id contains all vars of the basering.@*
          Else, create a ring with same char as the basering, but possibly less
          variables (only those variables which actually occur in id) and map
@@ -883,7 +883,7 @@ proc sortandmap (@id,string @s1,string @s2, list #)
 CREATE:  a new ring and map id into it, the new ring has same char as basering
          but with new ordering and vars sorted in the following manner:
   @format
-  - each block of vars occuring in pi is sorted w.r.t. its complexity in id, 
+  - each block of vars occuring in pi is sorted w.r.t. its complexity in id,
   - ni controls the sorting in i-th block (= vars occuring in pi):
     ni=0 (resp.!=0) means that less (resp. more) complex vars come first
   - oi and mi define the monomial ordering of the i-th block:
@@ -892,12 +892,12 @@ CREATE:  a new ring and map id into it, the new ring has same char as basering
       each subblock having ordstr=oi, such that vars of same complexity are
       in one block
   @end format
-  Note that only simple ordstrings oi are allowed: 
+  Note that only simple ordstrings oi are allowed:
   \"lp\",\"dp\",\"Dp\",\"ls\",\"ds\",\"Ds\".
 RETURN:  nothing
 NOTE:    We define a variable x to be more complex than y (with respect to id)
          if val(x) > val(y) lexicographically, where val(x) denotes the
-         valuation vector of x:@* 
+         valuation vector of x:@*
          consider id as list of polynomials in x with coefficients in the
          remaining variables. Then:@*
          val(x) = (maximal occuring power of x,  # of all monomials in leading
@@ -952,7 +952,7 @@ EXAMPLE: example sortandmap; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring s = 32003,(x,y,z),dp;
-   ideal i=x3+y2,xz+z2; 
+   ideal i=x3+y2,xz+z2;
    sortandmap(i,"R_r","i");
    // i is now an ideal in the new basering R_r
    show(R_r);
@@ -986,7 +986,7 @@ RETURN:  list of two elements, an ideal and a list:
   @end format
 NOTE:    We define a variable x to be more complex than y (with respect to id)
          if val(x) > val(y) lexicographically, where val(x) denotes the
-         valuation vector of x:@* 
+         valuation vector of x:@*
          consider id as list of polynomials in x with coefficients in the
          remaining variables. Then:@*
          val(x) = (maximal occuring power of x,  # of all monomials in leading
@@ -1020,7 +1020,7 @@ EXAMPLE: example sortvars; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring s=0,(x,y,z,w),dp;
-   ideal i = x3+y2+yw2,xz+z2,xyz-w2; 
+   ideal i = x3+y2+yw2,xz+z2,xyz-w2;
    sortvars(i,0,xy,1,zw);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -1052,7 +1052,7 @@ RETURN:  list with 3 entries:
 NOTE:    Use @code{sortvars} in order to actually sort the variables!
          We define a variable x to be more complex than y (with respect to id)
          if val(x) > val(y) lexicographically, where val(x) denotes the
-         valuation vector of x:@* 
+         valuation vector of x:@*
          consider id as list of polynomials in x with coefficients in the
          remaining variables. Then:@*
          val(x) = (maximal occuring power of x,  # of all monomials in leading

@@ -1,14 +1,14 @@
 // last change:           17.01.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: paramet.lib,v 1.11 2001-02-19 14:17:47 lossen Exp $";
+version="$Id: paramet.lib,v 1.12 2001-08-27 14:47:57 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: paramet.lib   Parametrization of Varieties
 AUTHOR:  Thomas Keilen, keilen@mathematik.uni-kl.de
 SEE ALSO: normal_lib, primdec_lib, hnoether_lib
 
-PROCEDURES:           
- parametrize(I);       parametrizes a prime ideal via the normalization         
+PROCEDURES:
+ parametrize(I);       parametrizes a prime ideal via the normalization
  parametrizepd(I);     calculates the prim.dec. and parametrizes the components
  parametrizesing(f);   parametrizes an isolated plane curve singularity
 
@@ -25,10 +25,10 @@ LIB "hnoether.lib";
 
 proc parametrize(ideal I)
 "USAGE:   parametrize(I); I ideal in an arbitrary number of variables,
-          whose radical is prime, in a ring with global ordering  
+          whose radical is prime, in a ring with global ordering
 CREATE:   If the parametrization is successful, the basering will be changed to
-          the parametrization ring, that is to the ring PR=0,(s,t),dp; 
-          respectively PR=0,t(1..d),dp;, depending on the dimension of the 
+          the parametrization ring, that is to the ring PR=0,(s,t),dp;
+          respectively PR=0,t(1..d),dp;, depending on the dimension of the
           parametrized variety.
 RETURN:   a list containing the parametrization ideal resp. the original ideal,
           the number of variables needed for the parametrization resp. 0, and
@@ -103,8 +103,8 @@ example
 proc parametrizepd(ideal I)
 "USAGE:   parametrizepd(I); I ideal in a polynomial ring with global ordering
 CREATE:   If the parametrization is successful, the basering will be changed to
-          the parametrization ring, that is to the ring PR=0,(s,t),dp; 
-          respectively PR=0,t(1..d),dp;, depending on the dimension of the 
+          the parametrization ring, that is to the ring PR=0,(s,t),dp;
+          respectively PR=0,t(1..d),dp;, depending on the dimension of the
           parametrized variety.
 RETURN:   a list of lists, where each entry contains the parametrization
           of a primary component of I resp. 0, the number of variables
@@ -185,7 +185,7 @@ proc parametrizesing(poly f)
 CREATE:   If the parametrization is successful, the basering will be changed to
           the parametrization ring, that is to the ring  0,(x,y),ls;
 RETURN:   a list containing the parametrizations of the different branches of the
-          singularity at the origin resp. 0, if f was not of the desired kind  
+          singularity at the origin resp. 0, if f was not of the desired kind
 SEE ALSO: hnoether_lib, reddevelop
 KEYWORDS: parametrization; curve singularities
 EXAMPLE:  example parametrizesing; shows an example"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.67 2001-05-28 12:35:50 Singular Exp $ */
+/* $Id: polys1.cc,v 1.68 2001-08-27 14:47:33 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -471,6 +471,7 @@ void pContent(poly ph)
   number h,d;
   poly p;
 
+  if(TEST_OPT_CONTENTSB) return;
   if(pNext(ph)==NULL)
   {
     pSetCoeff(ph,nInit(1));
@@ -654,7 +655,19 @@ void pCleardenom(poly ph)
   p = ph;
   if(pNext(p)==NULL)
   {
-    pSetCoeff(p,nInit(1));
+    if (TEST_OPT_CONTENTSB)
+    {
+      number n=nGetDenom(pGetCoeff(p));
+      if (!nIsOne(n))
+      {
+        number nn=nMult(pGetCoeff(p),n);
+	nNormalize(nn);
+        pSetCoeff(p,nn);
+      }
+      nDelete(&n);
+    }
+    else
+      pSetCoeff(p,nInit(1));
   }
   else
   {
@@ -1217,7 +1230,7 @@ int pMinDeg(poly p,intvec *w=NULL)
   return d;
 }
 
-poly pSeries(int n,poly p,poly u=NULL,intvec *w=NULL)
+poly pSeries(int n,poly p,poly u, intvec *w)
 {
   short *ww=iv2array(w);
   if(p!=NULL)

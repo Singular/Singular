@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.101 2001-07-17 09:42:25 Singular Exp $ */
+/* $Id: kutil.cc,v 1.102 2001-08-27 14:47:06 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -237,6 +237,7 @@ void cancelunit (LObject* L)
   int  i;
   poly h;
   ring r = L->tailRing;
+
   poly p = L->GetLmTailRing();
 
   if(p_GetComp(p, r) != 0 && !p_OneComp(p, r)) return;
@@ -268,8 +269,8 @@ void cancelunit (LObject* L)
       loop
       {
         i++;
-        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ;
-        if (i == r->N) break;
+        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
+        if (i == r->N) break; // does divide, try next monom
       }
       pIter(h);
     }
@@ -2820,7 +2821,7 @@ void message (int i,int* reduc,int* olddeg,kStrategy strat, int red_result)
       PrintS("-");
     else if (red_result < 0)
       PrintS(".");
-    else
+    if ((red_result > 0) || ((strat->Ll % 100)==99))
     {
       if (strat->Ll != *reduc && strat->Ll > 0)
       {

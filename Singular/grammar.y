@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.91 2001-04-05 15:41:08 Singular Exp $ */
+/* $Id: grammar.y,v 1.92 2001-08-27 14:47:01 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -142,7 +142,10 @@ void yyerror(char * fmt)
   if ((currentVoice!=NULL)
   && (currentVoice->prev!=NULL)
   && (myynest>0)
-  && ((sdb_flags &1)==0))
+#ifdef HAVE_SDB
+  && ((sdb_flags &1)==0)
+#endif
+  )
   {
     Werror("leaving %s",VoiceName());
   }
@@ -344,7 +347,9 @@ lines:
             }
             #endif
             prompt_char = '>';
+#ifdef HAVE_SDB
             if (sdb_flags & 2) { sdb_flags=1; YYERROR; }
+#endif
             if(siCntrlc)
             {
               siCntrlc=FALSE;
@@ -399,11 +404,13 @@ pprompt:
             if (!errorreported) WerrorS("...parse error");
             yyerror("");
             yyerrok;
+#ifdef HAVE_SDB
             if ((sdb_flags & 1) && currentVoice->pi!=NULL)
             {
               currentVoice->pi->trace_flag |=1;
             }
             else
+#endif
             if (myynest>0)
             {
               feBufferTypes t=currentVoice->Typ();
@@ -418,7 +425,9 @@ pprompt:
             {
               exitVoice();
             }
+#ifdef HAVE_SDB
             if (sdb_flags &2) sdb_flags=1;
+#endif
           }
         ;
 
@@ -1090,7 +1099,7 @@ exportcmd:
             if (($4.Typ()==PACKAGE_CMD)
             && (iiExport(&$2,0,(idhdl)$4.data)))
               YYERROR;
-#else            
+#else
             printf("String: %s;\n", (char *)$4.data);
 #endif /* HAVE_NAMESPACES */
           }

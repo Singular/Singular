@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.84 2001-01-09 15:40:16 Singular Exp $ */
+/* $Id: tesths.cc,v 1.85 2001-08-27 14:47:43 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -108,9 +108,9 @@ int main(          /* main entry to Singular */
 
   /* say hello */
   {
-    idhdl h;
     namespaceroot->push(NULL, "Top", 0, TRUE);
 #ifdef HAVE_NAMESPACES
+    idhdl h;
     h=enterid(omStrDup("Top"), 0, PACKAGE_CMD, &IDROOT, TRUE);
     IDPACKAGE(h) = NSPACK(namespaceroot);
     IDPACKAGE(h)->language = LANG_TOP;
@@ -118,7 +118,7 @@ int main(          /* main entry to Singular */
   }
   if (BVERBOSE(0))
   {
-    printf(
+    (printf)(
 "                     SINGULAR                             /"
 #ifndef MAKE_DISTRIBUTION
 "  Development"
@@ -132,7 +132,9 @@ int main(          /* main entry to Singular */
   }
   else
   {
+#ifdef HAVE_SDB
     sdb_flags = 0;
+#endif    
 #ifdef __MWERKS__
     memcpy(stderr,stdout,sizeof(FILE));
 #else
@@ -158,7 +160,7 @@ int main(          /* main entry to Singular */
   // and again, ifdef OM_NDEBUG this call is undef'ed
   // otherwise, it marks all memory allocated so far as static
   // i.e. as memory which is not mention on omPrintUsedAddr:
-  omMarkMemoryAsStatic();
+  //omMarkMemoryAsStatic();
 
   setjmp(si_start_jmpbuf);
 

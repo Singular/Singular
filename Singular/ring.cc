@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.168 2001-07-30 08:48:36 Singular Exp $ */
+/* $Id: ring.cc,v 1.169 2001-08-27 14:47:37 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3167,9 +3167,9 @@ BOOLEAN rComplete(ring r, int force)
 
       case ringorder_unspec:
       case ringorder_no:
-        default:
-          dReportError("undef. ringorder used\n");
-          break;
+      default:
+        dReportError("undef. ringorder used\n");
+        break;
     }
   }
 

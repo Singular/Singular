@@ -1,19 +1,12 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.165 2001-03-26 18:11:53 Singular Exp $ */
+/* $Id: extra.cc,v 1.166 2001-08-27 14:46:56 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
 
 #include <stdlib.h>
-#if defined(__alpha)
-extern "C"
-{
-  int setenv(const char *name, const char *value, int overwrite);
-}
-#endif
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -73,7 +66,7 @@ extern "C"
 #endif
 
 #ifdef ix86_Win /* only for the DLLTest */
-#include "WinDllTest.h"
+/* #include "WinDllTest.h" */
 #ifdef HAVE_DL
 #include "mod_raw.h"
 #endif
@@ -654,7 +647,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #include "mpsr.h"
 
 #include "mod_raw.h"
-   
+
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
@@ -1124,6 +1117,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== sdb_flags =================*/
+#ifdef HAVE_SDB
     if (strcmp(sys_cmd, "sdb_flags") == 0)
     {
       if ((h!=NULL) && (h->Typ()==INT_CMD))
@@ -1154,6 +1148,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif
 /*==================== GF =================*/
 #if 0
     if (strcmp(sys_cmd, "GF") == 0)
@@ -1215,7 +1210,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
       {
         WarnS("redefining algebra structure");
-      }     
+      }
       currRing->nc->type=nc_general;
       currRing->nc->C=C;
       currRing->nc->D=D;
@@ -1245,11 +1240,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
             MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=p;
           }
-          
+
           /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
         }
       }
-      
+
       currRing->nc->COM=COM;
       return FALSE;
     }
@@ -1306,31 +1301,31 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== DLL =================*/
 /* testing the DLL functionality under Win32 */
       if (strcmp(sys_cmd, "DLL") == 0)
-	{
-	  typedef void  (*Void_Func)();
-	  typedef int  (*Int_Func)(int);
-	  void *hh=dynl_open("WinDllTest.dll");
-	  if ((h!=NULL) && (h->Typ()==INT_CMD))
-	    {
-	      int (*f)(int);
-	      if (hh!=NULL)
-		{
-		  int (*f)(int);
-		  f=(Int_Func)dynl_sym(hh,"PlusDll");
-		  int i=10;
-		  if (f!=NULL) printf("%d\n",f(i));
-		  else PrintS("cannot find PlusDll\n");
-		}
-	    }
-	  else
-	    {	
-	      void (*f)();
-	      f= (Void_Func)dynl_sym(hh,"TestDll");
-	      if (f!=NULL) f();
-	      else PrintS("cannot find TestDll\n");
-	    }
-	  return FALSE;
-	}
+        {
+          typedef void  (*Void_Func)();
+          typedef int  (*Int_Func)(int);
+          void *hh=dynl_open("WinDllTest.dll");
+          if ((h!=NULL) && (h->Typ()==INT_CMD))
+            {
+              int (*f)(int);
+              if (hh!=NULL)
+                {
+                  int (*f)(int);
+                  f=(Int_Func)dynl_sym(hh,"PlusDll");
+                  int i=10;
+                  if (f!=NULL) printf("%d\n",f(i));
+                  else PrintS("cannot find PlusDll\n");
+                }
+            }
+          else
+            {
+              void (*f)();
+              f= (Void_Func)dynl_sym(hh,"TestDll");
+              if (f!=NULL) f();
+              else PrintS("cannot find TestDll\n");
+            }
+          return FALSE;
+        }
       else
 #endif
 #endif

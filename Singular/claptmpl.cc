@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.24 2000-07-06 13:26:22 pohl Exp $
+// $Id: claptmpl.cc,v 1.25 2001-08-27 14:46:49 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -40,6 +40,7 @@
     template class ListItem<CanonicalForm>;
     template class ListIterator<CFFactor>;
     template class List<CanonicalForm>;
+    template class List<List<CanonicalForm> >;
     template class ListIterator<CanonicalForm>;
     template class Array<CanonicalForm>;
     template class List<MapPair>;
@@ -51,6 +52,7 @@
 
     #ifndef NOSTREAMIO
     template ostream & operator<<(ostream &, const List<Factor<CanonicalForm> > &);
+    template ostream & operator<<(ostream &, const List<List<CanonicalForm> > &);
     template ostream & operator<<(ostream &, const List<Variable> &);
     #endif
 
@@ -91,7 +93,11 @@ public:
     T factor() const { return _factor; }
     T exp() const { return _exp; }
 #ifndef NOSTREAMIO
-    friend ostream & operator <<(ostream &, const Substitution<T> &);
+    friend ostream & operator <<<>(ostream &, Substitution<T> &);
+    void Substitution<T>::print ( ostream& s ) const
+    {
+      s << "("  << factor() << ")^" << exp();
+    }
 #endif
 };
 template <class T>
@@ -118,7 +124,15 @@ Substitution<T>& Substitution<T>::operator= ( const T & f )
 
 #ifndef NOSTREAMIO
 template <class T>
-ostream& operator<< ( ostream & os, const Substitution<T> & a ) { return os; }
+ostream & operator <<(ostream & os, Substitution<T> &a)
+{
+  a.print(os);
+  return os;
+}
+template ostream & operator <<(ostream &, Substitution<CanonicalForm> &);
+template ostream & operator <<(ostream &, const List<CanonicalForm> &);
+template ostream & operator <<(ostream &, const Array<CanonicalForm> &);
+template ostream & operator<<(ostream &, const List<Substitution<CanonicalForm> > &);
 #endif
 
 template <class T>
@@ -151,7 +165,6 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
     #endif
 
 // for charsets:
-    template class List<CFList>;
     template class ListIterator<CFList>;
 
   #endif

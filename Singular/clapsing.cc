@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.77 2001-02-21 10:17:57 Singular Exp $
+// $Id: clapsing.cc,v 1.78 2001-08-27 14:46:49 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -614,11 +614,13 @@ static int primepower(int c)
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 {
-  // with_exps: 1 return only true factors
+  // with_exps: 3,1 return only true factors, no exponents
   //            2 return true factors and exponents
-  //            0 return factors and exponents
+  //            0 return coeff, factors and exponents
 
   ideal res=NULL;
+
+  // handle factorize(0) =========================================
   if (f==NULL)
   {
     res=idInit(1,1);
@@ -629,11 +631,58 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     }
     return res;
   }
+  // handle factorize(mon) =========================================
+  if (pNext(f)==NULL)
+  {
+    int i=0;
+    int n=0;
+    int e;
+    for(i=pVariables;i>0;i--) if(pGetExp(f,i)!=0) n++;
+    if (with_exps==0) n++; // with coeff
+    res=idInit(max(n,1),1);
+    switch(with_exps)
+    {
+      case 0: // with coef & exp.
+        res->m[0]=pOne();
+        pSetCoeff(res->m[0],nCopy(pGetCoeff(f)));
+        // no break
+      case 2: // with exp.
+        (*v)=new intvec(n);
+        (**v)[0]=1;
+        // no break
+      case 1: ;
+      #ifdef TEST
+      default: ;
+      #endif
+    }
+    if (n==0)
+    {
+      res->m[0]=pOne();
+      // (**v)[0]=1; is already done
+      return res;
+    }
+    for(i=pVariables;i>0;i--)
+    {
+      e=pGetExp(f,i);
+      if(e!=0)
+      {
+        n--;
+        poly p=pOne();
+        pSetExp(p,i,1);
+        pSetm(p);
+        res->m[n]=p;
+        if (with_exps!=1) (**v)[n]=e;
+      }
+    }
+    return res;
+  }
+  // use factory/libfac in general ==============================
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
   CFFList L;
   number N=NULL;
   number NN=NULL;
+  number old_lead_coeff=nCopy(pGetCoeff(f));
 
   if (rField_is_Q() || rField_is_Zp())
   {
@@ -688,35 +737,36 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   // and over Q(a) / Fp(a)
   else if (rField_is_Extension())
   {
-    if (nGetChar()==1) setCharacteristic( 0 );
-    else               setCharacteristic( -nGetChar() );
+    if (rField_is_Q_a()) setCharacteristic( 0 );
+    else                 setCharacteristic( -nGetChar() );
     if ((currRing->minpoly!=NULL)
-    && (nGetChar()<(-1)))
+    )
     {
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPClapAP( f,a ) );
       L.insert(F);
-      if (F.isUnivariate())
+      if ((nGetChar()<(-1)) && F.isUnivariate())
       {
         L = factorize( F, a );
       }
       else
       {
-        WarnS("complete factorization only for univariate polynomials");
         CanonicalForm G( convSingTrPClapP( f ) );
+#ifdef HAVE_LIBFAC_P
+        CFList as(mipo);
+        L = newfactoras( G, as, 1);
+#else
+        WarnS("complete factorization only for univariate polynomials");
         if (nGetChar()==1) /* Q(a) */
         {
           L = factorize( G );
         }
         else
         {
-#ifdef HAVE_LIBFAC_P
-          L = Factorize( G );
-#else
           goto notImpl;
-#endif
         }
+#endif
       }
     }
     else
@@ -783,19 +833,32 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       N=NULL;
     }
     // delete constants
-    if ((with_exps!=0) && (res!=NULL))
+    if (res!=NULL)
     {
       int i=IDELEMS(res)-1;
       int j=0;
       for(;i>=0;i--)
       {
-        if ((res->m[i]!=NULL) && (pNext(res->m[i])==NULL) && (pIsConstant(res->m[i])))
+        if ((res->m[i]!=NULL)
+        && (pNext(res->m[i])==NULL)
+        && (pIsConstant(res->m[i])))
         {
-          pDelete(&(res->m[i]));
-          if ((v!=NULL) && ((*v)!=NULL))
-            (**v)[i]=0;
-          j++;
-        }
+          if (with_exps!=0)
+          {
+            pDelete(&(res->m[i]));
+            if ((v!=NULL) && ((*v)!=NULL))
+              (**v)[i]=0;
+            j++;
+          }
+          else if (i!=0)
+          {
+            res->m[0]=pMult(res->m[0],res->m[i]);
+            res->m[i]=NULL;
+            if ((v!=NULL) && ((*v)!=NULL))
+              (**v)[i]=0;
+            j++;
+          }
+	}
       }
       if (j>0)
       {
@@ -820,6 +883,17 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       }
     }
   }
+  if (rField_is_Q_a() && (currRing->minpoly!=NULL))
+  {
+    int i=IDELEMS(res)-1;
+    for(;i>=1;i--)
+    {
+      pNorm(res->m[i]);
+    }
+    pSetCoeff(res->m[0],old_lead_coeff);
+  }
+  else
+    nDelete(&old_lead_coeff);
 notImpl:
   if (res==NULL)
     WerrorS( feNotImplemented );
@@ -884,14 +958,23 @@ matrix singclap_irrCharSeries ( ideal I)
     return res;
   }
 
-  LL=IrrCharSeries(L);
-  int m= LL.length(); // Anzahl Zeilen
-  int n=0;
+  // a very bad work-around --- FIX IT in libfac
+  // should be fixed as of 2001/6/27
+  int tries=0;
+  int m,n;
   ListIterator<CFList> LLi;
-  CFListIterator Li;
-  for ( LLi = LL; LLi.hasItem(); LLi++ )
+  loop
   {
-    n = max(LLi.getItem().length(),n);
+    LL=IrrCharSeries(L);
+    m= LL.length(); // Anzahl Zeilen
+    n=0;
+    for ( LLi = LL; LLi.hasItem(); LLi++ )
+    {
+      n = max(LLi.getItem().length(),n);
+    }
+    if ((m!=0) && (n!=0)) break;
+    tries++;
+    if (tries>=5) break;
   }
   if ((m==0) || (n==0))
   {
@@ -902,6 +985,7 @@ matrix singclap_irrCharSeries ( ideal I)
     n=max(n,1);
   }
   res=mpNew(m,n);
+  CFListIterator Li;
   for ( m=1, LLi = LL; LLi.hasItem(); LLi++, m++ )
   {
     for (n=1, Li = LLi.getItem(); Li.hasItem(); Li++, n++)
@@ -1152,7 +1236,9 @@ BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
 {
   intvec *v=NULL;
   int sw=(int)dummy->Data();
-  ideal f=singclap_factorize((poly)(u->Data()), &v, sw);
+  int fac_sw=sw;
+  if ((sw<0)||(sw>2)) fac_sw=1;
+  ideal f=singclap_factorize((poly)(u->Data()), &v, fac_sw);
   if (f==NULL)
     return TRUE;
   switch(sw)

@@ -1,4 +1,5 @@
-version="$Id: brnoeth.lib,v 1.11 2001-02-09 13:11:35 lossen Exp $";
+version="$Id: brnoeth.lib,v 1.12 2001-08-27 14:47:46 Singular Exp $";
+category="Miscellaneous";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
 AUTHORS:   Jose Ignacio Farran Martin, ignfar@eis.uva.es
@@ -1980,7 +1981,7 @@ NOTE:     @code{Adj_div(f);} computes and stores the fundamental data of the
           inside this local ring.@*
           In the intvec L[4] (conductor) the i-th entry corresponds to the
           i-th entry in the list of places L[3].
-          
+
           With no optional arguments, the conductor is computed by
           local invariants of the singularities; otherwise it is computed
           by the Dedekind formula. @*
@@ -1988,10 +1989,10 @@ NOTE:     @code{Adj_div(f);} computes and stores the fundamental data of the
           of a prime ideal and P[2] is an intvec containing the position
           of the places above P in the list of closed places L[3]. @*
           If the point is at infinity, P[1] is a homogeneous irreducible
-          polynomial in two variables. 
+          polynomial in two variables.
 
-          If @code{printlevel>=0} additional comments are displayed (default: 
-          @code{printlevel=0}). 
+          If @code{printlevel>=0} additional comments are displayed (default:
+          @code{printlevel=0}).
 KEYWORDS: Hamburger-Noether expansions; adjunction divisor
 SEE ALSO: closed_points, NSplaces
 EXAMPLE:  example Adj_div; shows an example
@@ -2125,7 +2126,7 @@ example
   CHI;                    // affine equation of the curve
   Aff_SLocus;             // ideal of the affine singular locus
   Aff_SPoints[1];         // 1st affine singular point: (1:1:1), no.1
-  Inf_Points[1];          // singular point(s) at infinity: (1:0:0), no.4 
+  Inf_Points[1];          // singular point(s) at infinity: (1:0:0), no.4
   Inf_Points[2];          // list of non-singular points at infinity
   //
   pause("press RETURN");
@@ -2138,9 +2139,9 @@ example
   C[4];                   // adjunction divisor (all points are singular!)
   //
   pause("press RETURN");
-  // we look at the place(s) of degree 2 by changing to the ring 
+  // we look at the place(s) of degree 2 by changing to the ring
   C[5][2][1];
-  def S(2)=C[5][2][1];          
+  def S(2)=C[5][2][1];
   setring S(2);
   POINTS;                // base point(s) of place(s) of degree 2: (1:a:1)
   LOC_EQS;               // local equation(s)
@@ -2163,8 +2164,8 @@ RETURN:   list L with updated data of CURVE after computing all
    @end format
           See @ref{Adj_div} for a description of the entries in L.
 NOTE:     The list_expression should be the output of the procedure Adj_div.@*
-          If @code{printlevel>=0} additional comments are displayed (default: 
-          @code{printlevel=0}). 
+          If @code{printlevel>=0} additional comments are displayed (default:
+          @code{printlevel=0}).
 SEE ALSO: closed_points, Adj_div
 EXAMPLE:  example NSplaces; shows an example
 "
@@ -3368,7 +3369,7 @@ example
   ring s=2,(x,y),lp;
   list C=Adj_div(x3y+y3+x);
   C=NSplaces(3,C);
-  // the first 3 Places in C[3] are of degree 1. 
+  // the first 3 Places in C[3] are of degree 1.
   // we define the rational divisor G = 4*C[3][1]+4*C[3][3] (of degree 8):
   intvec G=4,0,4;
   def R=C[1][2];
@@ -3400,7 +3401,7 @@ static proc simplifyRF (ideal F)
   // maybe add a "restriction" to the curve "CHI" but it is not easy to
   // programm
   poly auxp=gcd(F[1],F[2]);
-  return(ideal(division(auxp,F)[1]));
+  return(ideal(division(F,auxp)[1]));
 }
 ///////////////////////////////////////////////////////////////////////////////
 static proc sumRF (F,G)
@@ -3521,7 +3522,7 @@ RETURN:   list WS of two lists:
   @end format
 NOTE:     The procedure must be called from the ring CURVE[1][2],
           where CURVE is the output of the procedure @code{NSplaces}.
-@*        i represents the place CURVE[3][i]. 
+@*        i represents the place CURVE[3][i].
 @*        Rational functions are represented by numerator/denominator
           in form of ideals with two homogeneous generators.
 WARNING:  The place must be rational, i.e., necessarily CURVE[3][i][1]=1. @*
@@ -3914,7 +3915,7 @@ example
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
-  intvec G=5;      // the rational divisor G = 5*HC[3][1] 
+  intvec G=5;      // the rational divisor G = 5*HC[3][1]
   intvec D=2..9;   // D = sum of the rational places no. 2..9 over F_4
   // let us construct the corresponding evaluation AG code :
   matrix C=AGcode_L(G,D,HC);
@@ -3961,7 +3962,7 @@ example
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
-  intvec G=5;      // the rational divisor G = 5*HC[3][1] 
+  intvec G=5;      // the rational divisor G = 5*HC[3][1]
   intvec D=2..9;   // D = sum of the rational places no. 2..9 over F_4
   // let us construct the corresponding residual AG code :
   matrix C=AGcode_Omega(G,D,HC);
@@ -4365,11 +4366,11 @@ example
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
-  intvec G=5;      // the rational divisor G = 5*HC[3][1] 
+  intvec G=5;      // the rational divisor G = 5*HC[3][1]
   intvec D=2..9;   // D = sum of the rational places no. 2..9 over F_4
   // construct the corresp. residual AG code of type [8,3,>=5] over F_4:
   matrix C=AGcode_Omega(G,D,HC);
-  // we can correct 1 error and the genus is 1, thus F must have degree 2 
+  // we can correct 1 error and the genus is 1, thus F must have degree 2
   // and support disjoint from that of D;
   intvec F=2;
   list SV=prepSV(G,D,F,HC);
@@ -4515,7 +4516,7 @@ example
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
-  intvec G=5;      // the rational divisor G = 5*HC[3][1] 
+  intvec G=5;      // the rational divisor G = 5*HC[3][1]
   intvec D=2..9;   // D = sum of the rational places no. 2..9 over F_4
   // construct the corresp. residual AG code of type [8,3,>=5] over F_4:
   matrix C=AGcode_Omega(G,D,HC);

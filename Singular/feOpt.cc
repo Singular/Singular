@@ -1,11 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.16 2001-01-30 12:15:36 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.17 2001-08-27 14:46:57 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
 
+#include <string.h>
 #include "mod2.h"
 #include "feOpt.h"
 
@@ -171,7 +172,6 @@ const char SHORT_OPTS_STRING[] = "bdhqtvxec:r:u:";
 
 #include <stdio.h>
 #include <unistd.h>
-#include <string.h>
 #include <stdlib.h>
 main()
 {
@@ -366,10 +366,12 @@ static char* feOptAction(feOptIndex opt)
         return NULL;
 
       case FE_OPT_SDB:
+      #ifdef HAVE_SDB
         if (feOptSpec[FE_OPT_SDB].value)
           sdb_flags = 1;
         else
           sdb_flags = 0;
+      #endif	  
         return NULL;
 
       case FE_OPT_VERSION:

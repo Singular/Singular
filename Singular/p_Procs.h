@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.12 2000-12-31 15:14:39 obachman Exp $
+ *  Version: $Id: p_Procs.h,v 1.13 2001-08-27 14:47:28 Singular Exp $
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
@@ -17,13 +17,13 @@
 typedef poly (*p_Copy_Proc_Ptr)(poly p, const ring r);
 typedef void (*p_Delete_Proc_Ptr)(poly *p, const ring r);
 typedef poly (*p_ShallowCopyDelete_Proc_Ptr)(poly p, const ring r, omBin_s* dest_bin);
-typedef poly (*p_Mult_nn_Proc_Ptr)(poly p, number n, const ring r);
-typedef poly (*pp_Mult_nn_Proc_Ptr)(poly p, number n, const ring r);
-typedef poly (*p_Mult_mm_Proc_Ptr)(poly p, poly m, const ring r);
-typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, poly m, 
+typedef poly (*p_Mult_nn_Proc_Ptr)(poly p, const number n, const ring r);
+typedef poly (*pp_Mult_nn_Proc_Ptr)(poly p, const number n, const ring r);
+typedef poly (*p_Mult_mm_Proc_Ptr)(poly p, const poly m, const ring r);
+typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, const poly m, 
                                     const ring r, 
                                     poly &last);
-typedef poly (*pp_Mult_mm_Noether_Proc_Ptr)(poly p, poly m, 
+typedef poly (*pp_Mult_mm_Noether_Proc_Ptr)(poly p, const poly m, 
                                             const poly spNoether, int &ll,
                                             const ring r, poly &last);
 typedef poly (*p_Add_q_Proc_Ptr)(poly p, poly q, int & shorter, const ring r);

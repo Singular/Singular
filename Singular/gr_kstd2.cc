@@ -1,8 +1,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/gr_kstd2.cc,v 1.1 2001-02-28 11:39:17 levandov Exp $";
+/* $Id: gr_kstd2.cc,v 1.2 2001-08-27 14:47:00 Singular Exp $ */
 /* $Log: not supported by cvs2svn $
+/* Revision 1.1.2.2  2001/08/16 13:17:29  Singular
+/* * hannes: removed rcsid
+/*
+/* Revision 1.1.2.1  2001/04/17 15:33:35  levandov
+/* PosInS syntax change fixed
+/*
+/* Revision 1.1  2001/02/28 11:39:17  levandov
+/* * levandov: add gr_kstd2.cc
+/*
 /* Revision 1.1  2000/07/20 16:11:45  obachman
 /* * added stuff
 /*
@@ -750,7 +759,7 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
           if (TEST_OPT_PROT) PrintS("s");
           /* enter P.p into s and L */
           {
-            int pos=posInS(strat,strat->sl,strat->P.p);
+            int pos=posInS(strat,strat->sl,strat->P.p, strat->P.ecart);
             {
               if (TEST_OPT_INTSTRATEGY)
               {
@@ -776,7 +785,7 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
               }
               enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
               if (strat->sl==-1) pos=0;
-              else pos=posInS(strat,strat->sl,strat->P.p);
+              else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
               strat->enterS(strat->P,pos,strat);
             }
             if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);

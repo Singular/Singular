@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.51 2001-04-05 15:41:12 Singular Exp $ */
+/* $Id: febase.h,v 1.52 2001-08-27 14:46:58 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -29,7 +29,22 @@ extern char fePathSep;
 #include <sys/param.h>
 #endif
 
+/* the are versions of limits.h with incorrect values (IRIX_6)
+* let's include our own */
+
 #include <mylimits.h>
+
+/* OSF/1 and AIX_4 are missing the header for setenv, but the proc exists */
+#if defined(__alpha) || defined(AIX_4)
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+  int setenv(const char *name, const char *value, int overwrite);
+#ifdef __cplusplus
+}
+#endif
+#endif
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
@@ -39,7 +54,9 @@ extern char fePathSep;
   #undef HAVE_READLINE
   #define HAVE_FEREAD 1
 #elif ! defined(HAVE_READLINE)
+#ifndef ix86_Win
   #define HAVE_FEREAD 1
+#endif
 #endif
 
 /*
@@ -93,6 +110,7 @@ extern "C" {
 
 void    Werror(char *fmt, ...);
 void    WerrorS(const char *s);
+void    WarnS(const char *s);
 void    Print(char* fmt, ...);
 void    PrintLn();
 #ifdef HAVE_TCL
@@ -204,7 +222,6 @@ char *  StringAppendS(char *s);
 char *  StringSetS(char* s);
 const  char * VoiceName();
 void    VoiceBackTrack();
-void    WarnS(const char *s);
 void    Warn(const char *fmt, ...);
 BOOLEAN contBuffer(feBufferTypes typ);
 char *  eati(char *s, int *i);

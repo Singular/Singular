@@ -6,7 +6,7 @@
  *  Purpose: link initialization for static linking
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: slInit_Static.cc,v 1.1 2000-12-12 08:44:55 obachman Exp $
+ *  Version: $Id: slInit_Static.cc,v 1.2 2001-08-27 14:47:40 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -63,7 +63,11 @@ BatchDoProc slInitMPBatchDo()
 #endif
 
 #ifdef HAVE_DBM
+#ifndef USE_GDBM
 #include "dbm_sl.h"
+#else
+#include "sing_dbm.h"
+#endif
 si_link_extension slInitDBMExtension(si_link_extension s)
 {
   s->Open=dbOpen;

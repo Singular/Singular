@@ -20,7 +20,6 @@
 #endif
 
 #include <stdlib.h>
-#include <float.h>
 #include <math.h>
 #include <ctype.h>
 #include <string.h>
@@ -61,32 +60,11 @@ Rational::Rational( )
     mpq_init( p->rat );
 }
 
-Rational::Rational( long int a )
-{
-    p = new rep;
-    mpq_init( p->rat );
-    mpq_set_si( p->rat,a,1 );
-}
-
-Rational::Rational( unsigned long int a )
-{
-    p = new rep;
-    mpq_init( p->rat );
-    mpq_set_ui( p->rat,a,1 );
-}
-
 Rational::Rational( int a )
 {
     p = new rep;
     mpq_init( p->rat );
     mpq_set_si( p->rat,(long int)a,1 );
-}
-
-Rational::Rational( unsigned int a )
-{
-    p = new rep;
-    mpq_init( p->rat );
-    mpq_set_ui( p->rat,(unsigned long)a,1 );
 }
 
 Rational::Rational( const Rational& a )
@@ -95,165 +73,15 @@ Rational::Rational( const Rational& a )
     p=a.p;
 }
 
-Rational::Rational( double a )
-{
-    mpz_t   h1,h2;
-    int     i=0;
-    double  aa=a;
-
-    p = new rep;
-    mpq_init( p->rat );
-    mpz_init_set_ui( h1,1 );
-
-    while( fabs( 10.0*aa ) < DBL_MAX && i<DBL_DIG )
-    {
-        aa *= 10.;
-        mpz_mul_ui( h1,h1,10 );
-        i++;
-    }
-    mpz_init_set_d( h2,aa );
-    mpq_set_num( p->rat,h2 );
-    mpq_set_den( p->rat,h1 );
-    mpq_canonicalize( p->rat );
-    mpz_clear( h1 );
-    mpz_clear( h2 );
-}
-
-Rational::Rational(float a)
-{
-    mpz_t h1,h2;
-    int i=0;
-    double aa=a;
-
-    p=new rep;
-    mpq_init(p->rat);
-    mpz_init_set_ui(h1,1);
-    while(fabs(10.*aa) < FLT_MAX && i<FLT_DIG){
-        aa*=10.;
-        mpz_mul_ui(h1,h1,10);
-        i++;
-    }
-    mpz_init_set_d(h2,aa);
-    mpq_set_num(p->rat,h2);
-    mpq_set_den(p->rat,h1);
-    mpq_canonicalize(p->rat);
-    mpz_clear(h1);
-    mpz_clear(h2);
-}
-
-// ----------------------------------------------------------------------------
-//  Create a Rational from a string like "+1234.5678e-1234"
-// ----------------------------------------------------------------------------
-
-Rational::Rational( char *s )
-{
-    mpz_t   h1;
-    int     exp=0,i=0;
-    char    *s1,*s2,*ss;
-
-    ss = new char[strlen(s)+1];
-    strcpy( ss,s );
-    s1 = ss;
-    p = new rep;
-    mpq_init( p->rat );
-    if( isdigit(s1[0]) || s1[0]=='-' || s1[0]=='+' )
-    {
-        if (s1[0]=='+') ++s1;
-        if (s1[0]=='-') ++i;
-
-        while( isdigit( s1[i] ) )
-        {
-            ++i;
-        }
-        if (s1[i]=='.')
-        {
-            ++i;
-            while( isdigit( s1[i] ) )
-            {
-                s1[i-1]=s1[i];
-                ++i;
-                --exp;
-            }
-            s1[i-1]='\0';
-        }
-        if (s1[i]=='e' || s1[i]=='E')
-        {
-            s2=s1+i+1;
-        }
-        else
-            s2="";
-
-        s1[i]='\0';
-        i=exp+atoi(s2);
-        mpz_init_set_str(h1,s1,10);
-        delete[] ss;
-        mpq_set_z(p->rat,h1);
-        mpq_set_ui(save.p->rat,10,1);
-        if (i>0)
-        {
-            for(int j=0;j<i;j++)
-                mpq_mul(p->rat,p->rat,save.p->rat);
-        }
-        else if (i<0)
-        {
-            for(int j=0;j>i;j--)
-                mpq_div(p->rat,p->rat,save.p->rat);
-        }
-        mpq_canonicalize(p->rat);
-        mpz_clear(h1);
-    }
-}
-
 // ----------------------------------------------------------------------------
 //  Constructors with two arguments: numerator and denominator
 // ----------------------------------------------------------------------------
-
-Rational::Rational(long int a, unsigned long int b)
-{
-    p = new rep;
-    mpq_init( p->rat );
-    mpq_set_si( p->rat,a,b );
-    mpq_canonicalize( p->rat );
-}
-
-Rational::Rational(unsigned long int a, unsigned long int b)
-{
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_ui(p->rat,a,b);
-    mpq_canonicalize(p->rat);
-}
-
-Rational::Rational(int a, unsigned int b)
-{
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_si(p->rat,(long int) a,(unsigned long int) b);
-    mpq_canonicalize(p->rat);
-}
-
-Rational::Rational(unsigned int a, unsigned int b)
-{
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_ui(p->rat,(unsigned long) a,(unsigned long int) b);
-    mpq_canonicalize(p->rat);
-}
 
 Rational::Rational(const Rational& a, const Rational& b)
 {
     p=new rep;
     mpq_init(p->rat);
     mpq_div(p->rat, a.p->rat, b.p->rat);
-}
-
-Rational::Rational(long int a, long int b)
-{
-    if (b<0) a=-a;
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_si(p->rat,a,abs(b));
-    mpq_canonicalize(p->rat);
 }
 
 Rational::Rational(int a, int b)
@@ -263,17 +91,6 @@ Rational::Rational(int a, int b)
     mpq_init(p->rat);
     mpq_set_si(p->rat,(long int) a,(unsigned long int) abs(b));
     mpq_canonicalize(p->rat);
-}
-
-Rational::Rational(char *sn, char *sd)
-{
-  Rational
-    h=sd;
-
-  p=new rep;
-  mpq_init(p->rat);
-  *this=sn;
-  mpq_div(p->rat,p->rat,h.p->rat);
 }
 
 // ----------------------------------------------------------------------------
@@ -291,119 +108,11 @@ Rational::~Rational()
 // ----------------------------------------------------------------------------
 //  Assignment operators
 // ----------------------------------------------------------------------------
+
 Rational& Rational::operator=(int a)
 {
   disconnect();
   mpq_set_si(p->rat,(long int) a,1);
-  return *this;
-}
-
-Rational& Rational::operator=(double a)
-{
-  mpz_t
-    h1,
-    h2;
-  int
-    i=0;
-  double
-    aa=a;
-
-  disconnect();
-  mpz_init_set_ui(h1,1);
-  while(fabs(10.*aa) < DBL_MAX && i<DBL_DIG){
-    aa*=10.;
-    mpz_mul_ui(h1,h1,10);
-    i++;
-  }
-  mpz_init_set_d(h2,aa);
-  mpq_set_num(p->rat,h2);
-  mpq_set_den(p->rat,h1);
-  mpq_canonicalize(p->rat);
-  mpz_clear(h1);
-  mpz_clear(h2);
-  return *this;
-}
-
-Rational& Rational::operator=(float a)
-{
-  mpz_t
-    h1,
-    h2;
-  int
-    i=0;
-  double
-    aa=a;
-
-  disconnect();
-  mpz_init_set_ui(h1,1);
-  while(fabs(10.*aa) < FLT_MAX && i<FLT_DIG){
-    aa*=10.;
-    mpz_mul_ui(h1,h1,10);
-    i++;
-  }
-  mpz_init_set_d(h2,aa);
-  mpq_set_num(p->rat,h2);
-  mpq_set_den(p->rat,h1);
-  mpq_canonicalize(p->rat);
-  mpz_clear(h1);
-  mpz_clear(h2);
-  return *this;
-}
-
-Rational& Rational::operator=(char *s)
-{
-  mpz_t
-    h1;
-  int
-    exp=0,
-    i=0;
-  char
-    *s1=s,
-    *s2,
-    *ss;
-
-  ss=new char[strlen(s)+1];
-  strcpy(ss,s);
-  s1=ss;
-  disconnect();
-  if (isdigit(s1[0]) || s1[0]=='-' || s1[0]=='+'){
-    if (s1[0]=='+') ++s1;
-    if (s1[0]=='-') ++i;
-    while(isdigit(s1[i]))
-      ++i;
-    if (s1[i]=='.'){
-      ++i;
-      while(isdigit(s1[i])){
-        s1[i-1]=s1[i];
-        ++i;
-        --exp;
-      }
-      s1[i-1]='\0';
-    }
-    if (s1[i]=='e' || s1[i]=='E'){
-      s2=s1+i+1;
-    }
-    else
-      s2="";
-    s1[i]='\0';
-    i=exp+atoi(s2);
-    mpz_init_set_str(h1,s1,10);
-    delete[] ss;
-    mpq_set_z(p->rat,h1);
-    mpq_set_ui(save.p->rat,10,1);
-    if (i>0){
-      for(int j=0;j<i;j++)
-        mpq_mul(p->rat,p->rat,save.p->rat);
-    }
-    else if (i<0){
-      for(int j=0;j>i;j--)
-        mpq_div(p->rat,p->rat,save.p->rat);
-    }
-    mpq_canonicalize(p->rat);
-    mpz_clear(h1);
-  }
-  else
-    mpq_set_ui(p->rat,0,1);
   return *this;
 }
 
@@ -454,41 +163,6 @@ int Rational::get_den_si( )
 //  Casting
 // ----------------------------------------------------------------------------
 
-Rational::operator bool()
-{
-    if (mpq_sgn(p->rat)) return true;
-    return false;
-}
-
-Rational::operator long int()
-{
-  mpz_t
-    h;
-  long int
-    ret_val;
-
-  mpz_init(h);
-  mpz_tdiv_q(h,mpq_numref(p->rat),mpq_denref(p->rat));
-  ret_val=mpz_get_si(h);
-  mpz_clear(h);
-
-  return ret_val;
-}
-
-Rational::operator unsigned long int()
-{
-  mpz_t
-    h;
-  unsigned long int
-    ret_val;
-
-  mpz_init(h);
-  mpz_tdiv_q(h,mpq_numref(p->rat),mpq_denref(p->rat));
-  ret_val=mpz_get_ui(h);
-  mpz_clear(h);
-  return ret_val;
-}
-
 Rational::operator int()
 {
   mpz_t
@@ -502,86 +176,6 @@ Rational::operator int()
   mpz_clear(h);
 
   return ret_val;
-}
-
-Rational::operator unsigned int()
-{
-  mpz_t
-    h;
-  unsigned long int
-    ret_val;
-
-  mpz_init(h);
-  mpz_tdiv_q(h,mpq_numref(p->rat),mpq_denref(p->rat));
-  ret_val=mpz_get_ui(h);
-  mpz_clear(h);
-  return ret_val;
-}
-
-Rational::operator short int()
-{
-  mpz_t
-    h;
-  short int
-    ret_val;
-
-  mpz_init(h);
-  mpz_tdiv_q(h,mpq_numref(p->rat),mpq_denref(p->rat));
-  ret_val=mpz_get_si(h);
-  mpz_clear(h);
-  return ret_val;
-}
-
-Rational::operator unsigned short int()
-{
-  mpz_t
-    h;
-  unsigned short int
-    ret_val;
-
-  mpz_init(h);
-  mpz_tdiv_q(h,mpq_numref(p->rat),mpq_denref(p->rat));
-  ret_val=mpz_get_ui(h);
-  mpz_clear(h);
-  return ret_val;
-}
-
-Rational::operator char()
-{
-  mpz_t
-    h;
-  char
-    ret_val;
-
-  mpz_init(h);
-  mpz_tdiv_q(h,mpq_numref(p->rat),mpq_denref(p->rat));
-  ret_val=mpz_get_si(h);
-  mpz_clear(h);
-  return ret_val;
-}
-
-Rational::operator unsigned char()
-{
-  mpz_t
-    h;
-  unsigned char
-    ret_val;
-
-  mpz_init(h);
-  mpz_tdiv_q(h,mpq_numref(p->rat),mpq_denref(p->rat));
-  ret_val=mpz_get_ui(h);
-  mpz_clear(h);
-  return ret_val;
-}
-
-Rational::operator double()
-{
-  return mpq_get_d(p->rat);
-}
-
-Rational::operator float()
-{
-  return mpq_get_d(p->rat);
 }
 
 // ----------------------------------------------------------------------------

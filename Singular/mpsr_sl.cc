@@ -6,7 +6,7 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.cc,v 1.1 2000-12-12 08:44:49 obachman Exp $
+ *  Version: $Id: mpsr_sl.cc,v 1.2 2001-08-27 14:47:17 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -16,6 +16,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#ifdef HPUX_9
+#include <signal.h>
+#endif
 #include "mpsr.h"
 #include "tok.h"
 #include "omalloc.h"
@@ -394,10 +397,16 @@ static void SentQuitMsg(si_link l)
 
 LINKAGE BOOLEAN slCloseMP(si_link l)
 {
+#ifdef HPUX_9
+  signal(SIGCHLD, (void (*)(int))SIG_DFL);
+#endif  
   if ((strcmp(l->mode, "launch") == 0 || strcmp(l->mode, "fork") == 0) &&
       (MP_GetLinkStatus((MP_Link_pt)l->data,MP_LinkReadyWriting) == MP_TRUE))
     SentQuitMsg(l);
   MP_CloseLink((MP_Link_pt) l->data);
+#ifdef HPUX_9
+  signal(SIGCHLD, (void (*)(int))SIG_IGN);
+#endif  
   SI_LINK_SET_CLOSE_P(l);
   return FALSE;
 }

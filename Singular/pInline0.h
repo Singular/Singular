@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.7 2001-05-22 13:24:32 Singular Exp $
+ *  Version: $Id: pInline0.h,v 1.8 2001-08-27 14:47:20 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -14,23 +14,23 @@
 #if defined(DO_PINLINE0)
 #define PINLINE0 static inline
 #else
-#define PINLINE0 
+#define PINLINE0
 #endif
 
 #include "mod2.h"
 #include "p_polys.h"
 #include "ring.h"
-  
+
 PINLINE0 int p_SetCompP(poly p, int i, ring r)
 {
   if (p == NULL) return 0;
-  
+
 #ifdef PDEBUG
   poly q = p;
 #endif
-  
+
   int l = 0;
-  
+
   if (rOrd_SetCompRequiresSetm(r))
   {
     do
@@ -98,7 +98,7 @@ PINLINE0 long p_MaxComp(poly p, ring lmRing, ring tailRing)
 
   if(p==NULL) return 0;
   result = p_GetComp(p, lmRing);
-  if (result != 0) 
+  if (result != 0)
   {
     loop
     {
@@ -166,7 +166,7 @@ PINLINE0 int pLength(poly a)
 */
 PINLINE0 poly pLast(poly a, int &l)
 {
-  if (a == NULL) 
+  if (a == NULL)
   {
     l = 0;
     return NULL;
@@ -181,4 +181,3 @@ PINLINE0 poly pLast(poly a, int &l)
 }
 
 #endif // PINLINE_CC
-

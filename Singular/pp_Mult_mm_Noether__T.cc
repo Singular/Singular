@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm_Noether__Template.cc,v 1.3 2000-12-07 15:04:02 obachman Exp $
+ *  Version: $Id: pp_Mult_mm_Noether__T.cc,v 1.2 2001-08-27 14:47:35 Singular Exp $
  *******************************************************************/
 
 /***************************************************************

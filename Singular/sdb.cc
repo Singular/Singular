@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.15 2000-09-18 09:19:33 obachman Exp $ */
+/* $Id: sdb.cc,v 1.16 2001-08-27 14:47:38 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -16,6 +16,7 @@
 #include "ipid.h"
 #include "sdb.h"
 
+#ifdef HAVE_SDB
 // We use 8 breakpoints - corresponding to a bit in a char variable in procinfo
 // bit 1..7 force a breakpoint, if lineno==sdb_lines[i-1],
 //                         (for displaying only: file sdb_files[i-1])
@@ -316,4 +317,4 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
     }
   }
 }
-
+#endif

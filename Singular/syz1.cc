@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.72 2001-05-28 15:57:29 Singular Exp $ */
+/* $Id: syz1.cc,v 1.73 2001-08-27 14:47:41 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -31,7 +31,7 @@
 #include "kbuckets.h"
 #include "prCopy.h"
 
-extern void p_Setm_Syz(poly p, ring r, 
+extern void p_Setm_Syz(poly p, ring r,
                        int* Components, long* ShiftedComponents);
 
 /*--------------static variables------------------------*/
@@ -1254,13 +1254,13 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
         }
         tso.lcm = p = nPm[ii];
         nPm[ii] = NULL;
-	//#ifdef HAVE_SHIFTED_EXPONENTS
+        //#ifdef HAVE_SHIFTED_EXPONENTS
         //tso.order = pTotaldegree(p);
-	//p->exp[currRing->pOrdIndex]=tso.order+0x40000000;
-	//#else
+        //p->exp[currRing->pOrdIndex]=tso.order+0x40000000;
+        //#else
         tso.order = pTotaldegree(p);
         pSetOrder(p, tso.order);
-	//#endif
+        //#endif
         if ((syzstr->cw!=NULL) && (index>0) && (pGetComp(q)>0))
         {
           int ii=index-1,jj=pGetComp(q);
@@ -1790,7 +1790,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
     j = j+sh;
     jj = jj+2;
     result=new intvec(j,jj-sh,0);
-    IMATELEM(*result,1,1) 
+    IMATELEM(*result,1,1)
       = max(1,idRankFreeModule(syzstr->res[1],
                                (syzstr->syRing!=NULL?syzstr->syRing:currRing)));
     for (i=sh;i<jj;i++)
@@ -1809,7 +1809,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
     result = syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim,row_shift);
   else
     result = syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim,row_shift);
-  if ((minim) || (syzstr->resPairs!=NULL)) 
+  if ((minim) || (syzstr->resPairs!=NULL))
     syzstr->betti = ivCopy(result);
   return result;
 }
@@ -1968,7 +1968,7 @@ void syPrint(syStrategy syzstr)
     {
       syzstr->resolution = new intvec(syzstr->length+1);
       SRes rP=syzstr->resPairs;
-      (*syzstr->resolution)[0] 
+      (*syzstr->resolution)[0]
         = max(1,idRankFreeModule(syzstr->res[1],
                                  (syzstr->syRing != NULL ? syzstr->syRing : currRing)));
       while ((l<syzstr->length) && (rP[l]!=NULL))
@@ -1992,8 +1992,8 @@ void syPrint(syStrategy syzstr)
         rr = syzstr->minres;
       else
         rr = syzstr->fullres;
-      (*syzstr->resolution)[0] 
-        = max(1,idRankFreeModule(rr[0], 
+      (*syzstr->resolution)[0]
+        = max(1,idRankFreeModule(rr[0],
                                  (syzstr->syRing != NULL ? syzstr->syRing : currRing)));
       while ((l<syzstr->length) && (rr[l]!=NULL))
       {

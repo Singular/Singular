@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.7 2001-02-19 14:17:50 lossen Exp $";
+version="$Id: zeroset.lib,v 1.8 2001-08-27 14:48:02 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
@@ -85,7 +85,7 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
   @format
   - 'roots' is the list of roots of the polynomial f (no multiplicities)
   - if the groundfield is Q(a') and the extension field is Q(a), then
-    'newA' is the representation of a' in Q(a). 
+    'newA' is the representation of a' in Q(a).
     If the basering contains a parameter 'a' and the minpoly remains unchanged
     then 'newA' = 'a'.
     If the basering does not contain a parameter then 'newA' = 'a' (default).
@@ -311,7 +311,7 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
     'newA' is the representation of a' in Q(a).
     If the basering contains a parameter 'a' and the minpoly remains unchanged
     then 'newA' = 'a'.
-    If the basering does not contain a parameter then 'newA' = 'a' (default).    
+    If the basering does not contain a parameter then 'newA' = 'a' (default).
   - 'id' is the ideal I in Q(a)[x_1,...] (a' substituted by 'newA')
   @end format
 ASSUME:  dim(I) = 0, and ground field to be Q or a simple extension of Q given

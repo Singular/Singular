@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.50 2001-05-22 13:20:01 Singular Exp $ */
+/* $Id: tok.h,v 1.51 2001-08-27 14:47:44 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -178,6 +178,7 @@ enum {
 #define V_IMAP      12
 #define V_PROMPT    13
 #define V_NSB       14
+#define V_CONTENTSB 15
 #define V_DEG_STOP  31
 
 
@@ -203,7 +204,7 @@ enum {
 #define OPT_NOTREGULARITY 30
 #define OPT_WEIGHTM       31
 
-/* define ring dependent options */ 
+/* define ring dependent options */
 #define TEST_RINGDEP_OPTS \
  (Sy_bit(OPT_INTSTRATEGY) | Sy_bit(OPT_REDTHROUGH) | Sy_bit(OPT_REDTAIL))
 
@@ -227,6 +228,7 @@ enum {
 #define TEST_OPT_WEIGHTM           BTEST1(OPT_WEIGHTM)
 #define TEST_OPT_REDTHROUGH        BTEST1(OPT_REDTHROUGH)
 #define TEST_OPT_OLDSTD            BTEST1(OPT_OLDSTD)
+#define TEST_OPT_CONTENTSB         BVERBOSE(V_CONTENTSB)
 
 #define TEST_VERB_NSB              BVERBOSE(V_NSB)
 #define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)

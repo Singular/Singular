@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.7 2001-02-05 12:01:37 lossen Exp $";
+version="$Id: equising.lib,v 1.8 2001-08-27 14:47:49 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -766,7 +766,7 @@ RETURN:  list l of an ideal and an integer, where
 NOTE:    If m is given, the computation stops after m steps of the iteration. @*
          printlevel > 0 displays comments and pauses after intermediate
          computations (default: printlevel=0) @*
-         This procedure uses @code{execute} or calls a procedure using 
+         This procedure uses @code{execute} or calls a procedure using
          @code{execute}.
 EXAMPLE: example esStratum; shows an example
 "
@@ -1167,12 +1167,12 @@ ASSUME:   F defines a deformation of an irreducible bivariate polynomial f
          If the basering is a qring, ideal(basering) must only depend
          on the deformation parameters.
 RETURN:  list l of two integers, where
-@format        
+@format
    l[1]=1 if F is an equisingular deformation,  l[1]=0 otherwise.
    l[2]=1 if some error has occured,  l[2]=0 otherwise.
 @end format
 NOTE:    If m is given, the computation stops after m steps of the iteration. @*
-         This procedure uses @code{execute} or calls a procedure using 
+         This procedure uses @code{execute} or calls a procedure using
          @code{execute}.
 EXAMPLE: example isEquising; shows an example
 "

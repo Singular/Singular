@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.94 2001-04-05 15:41:11 Singular Exp $ */
+/* $Id: febase.cc,v 1.95 2001-08-27 14:46:58 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -102,7 +102,7 @@ BOOLEAN tclmode=FALSE;
  *
  *****************************************************************/
 
-FILE * feFopen(char *path, char *mode, char *where,int useWerror, 
+FILE * feFopen(char *path, char *mode, char *where,int useWerror,
                int path_only)
 {
   char longpath[MAXPATHLEN];
@@ -111,6 +111,10 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror,
     if (path[1] == DIR_SEP)
     {
       char* home = getenv("HOME");
+#ifdef ix86_Win
+      if ((home==NULL)||(!access(home,X_OK)))
+        home = getenv("SINGHOME");
+#endif
       if (home != NULL)
       {
         strcpy(longpath, home);
@@ -353,7 +357,6 @@ void Werror(char *fmt, ...)
   omFreeSize(s,256);
   va_end(ap);
 }
-}
 
 void WarnS(const char *s)
 {
@@ -381,6 +384,7 @@ void WarnS(const char *s)
     }
   }
 }
+} /* end extern "C" */
 
 void Warn(const char *fmt, ...)
 {

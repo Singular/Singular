@@ -28,27 +28,13 @@ class Rational
     public:
 
     Rational( );
-    Rational( long int );
-    Rational( unsigned long int );
     Rational( int );
-    Rational( unsigned int );
-    Rational( double );
-    Rational( float );
-    Rational( char* );
     Rational( const Rational& );
-    Rational( long int,unsigned long int );
-    Rational( unsigned long int,unsigned long int );
-    Rational( int, unsigned int );
-    Rational( unsigned int,unsigned int );
     Rational( const Rational&,const Rational& );
-    Rational( long int,long int );
     Rational( int,int );
-    Rational( char*,char* );
     ~Rational( );
 
     Rational& operator = ( int );
-    Rational& operator = ( double );
-    Rational& operator = ( float );
     Rational& operator = ( char *s );
     Rational& operator = ( const Rational& );
 
@@ -57,17 +43,7 @@ class Rational
     Rational get_den( );
     int      get_num_si( );
     int      get_den_si( );
-    operator bool( );
-    operator long int( );
-    operator unsigned long int( );
     operator int( );
-    operator unsigned int( );
-    operator short int( );
-    operator unsigned short int( );
-    operator char( );
-    operator unsigned char( );
-    operator double( );
-    operator float( );
 
     Rational  operator - ( );
     Rational  operator ~ ( );

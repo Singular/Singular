@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.23 2001-05-31 09:11:38 Singular Exp $ */
+/* $Id: mminit.cc,v 1.24 2001-08-27 14:47:11 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -40,7 +40,7 @@ int mmInit( void )
 {
   if(mmIsInitialized==0)
   {
-#ifdef OMALLOC_USES_MALLOC
+#if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
     mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
 #else
     mp_set_memory_functions(malloc,reallocSize,freeSize);
@@ -48,7 +48,7 @@ int mmInit( void )
     om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
 #ifndef OM_NDEBUG
     om_Opts.ErrorHook = dErrorBreak;
-#endif    
+#endif
     omInitInfo();
 #ifdef OM_SING_KEEP
     om_Opts.Keep = OM_SING_KEEP;

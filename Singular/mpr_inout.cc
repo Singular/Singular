@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.12 2000-12-20 10:54:25 pohl Exp $ */
+/* $Id: mpr_inout.cc,v 1.13 2001-08-27 14:47:14 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -374,7 +374,8 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
     return TRUE;
   }
 
-  int deg= pTotaldegree( gls );
+  int ldummy;
+  int deg= pLDeg( gls, &ldummy );
   //  int deg= pDeg( gls );
   int len= pLength( gls );
   int i,vpos;

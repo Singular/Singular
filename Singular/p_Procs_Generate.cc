@@ -7,12 +7,13 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs_Generate.cc,v 1.4 2000-12-31 15:14:39 obachman Exp $
+ *  Version: $Id: p_Procs_Generate.cc,v 1.5 2001-08-27 14:47:28 Singular Exp $
  *******************************************************************/
 
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "mod2.h"
 #include "dError.c"
@@ -39,18 +40,16 @@ int IsKernelProc(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
   // general procs go into kernel
   if (field == FieldGeneral && length == LengthGeneral && ord == OrdGeneral)
     return 1;
-  
+
   // plus procs with FieldZp
-  if ((field == FieldZp || field == FieldQ) && 
+  if ((field == FieldZp || field == FieldQ) &&
       // which are not general in length or ord
       !((length == LengthGeneral && p_ProcDependsOn_Length(proc)) ||
         (ord == OrdGeneral && p_ProcDependsOn_Ord(proc))) &&
-      // and whose length is smaller than five 
+      // and whose length is smaller than five
       (!p_ProcDependsOn_Length(proc) || (length >= LengthFour)))
     return 1;
 
-  
-  
   return 0;
 }
 
@@ -84,11 +83,11 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   const char* s_ord = p_OrdEnum_2_String(ord);
   const char* s_field = p_FieldEnum_2_String(field);
   char* s_full_proc_name = (char*) malloc(200);
-  
+
   sprintf(s_full_proc_name, "%s__%s_%s_%s", s_what, s_field, s_length, s_ord);
-             
+
   (generated_p_procs[proc])[index(proc, field, length, ord)] = s_full_proc_name;
-  // define all macros 
+  // define all macros
   printf("\n// definition of %s\n", s_full_proc_name);
 #ifndef p_Procs_Static
   if (IsKernelProc(proc, field, length, ord))
@@ -112,25 +111,25 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
 
     printf("#ifdef p_Procs_%s\n", module);
   }
-#endif  
+#endif
   i = 0;
   while (macros_field[i] != NULL)
   {
-    printf("#undef %s\n#define %s\t%s_%s\n", 
+    printf("#undef %s\n#define %s\t%s_%s\n",
            macros_field[i], macros_field[i],  macros_field[i], s_field);
     i++;
   }
   i = 0;
   while (macros_length[i] != NULL)
   {
-    printf("#undef %s\n#define %s\t%s_%s\n", 
+    printf("#undef %s\n#define %s\t%s_%s\n",
            macros_length[i], macros_length[i], macros_length[i], s_length);
     i++;
   }
   i = 0;
   while (macros_length_ord[i] != NULL)
   {
-    printf("#undef %s\n#define %s\t%s_%s_%s\n", 
+    printf("#undef %s\n#define %s\t%s_%s_%s\n",
            macros_length_ord[i], macros_length_ord[i], macros_length_ord[i], s_length, s_ord);
     i++;
   }
@@ -151,7 +150,7 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
     else
       printf("#define p_MemAddAdjust(p, r) ((void)0)\n");
   }
-  
+
   // define DECLARE_ORDSGN
   printf("#undef DECLARE_ORDSGN\n");
   if (ord != OrdGeneral)
@@ -176,14 +175,14 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
       printf("#define DECLARE_LENGTH_2(what) what \n");
       printf("#define p_MemCmp_Bitmask_2 p_MemCmp_Bitmask_LengthGeneral\n");
     }
-    
-      
+
+
     printf("#undef p_MemAddAdjust\n");
     printf("#define p_MemAddAdjust(p, r) ((void)0)\n");
   }
 
   printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
-  printf("#include \"%s__Template.cc\"\n", s_what);
+  printf("#include \"%s__T.cc\"\n", s_what);
   printf("#undef %s\n", s_what);
 #ifndef p_Procs_Static
   printf("#endif // p_Procs_[Kernel|Field*]\n");
@@ -202,28 +201,28 @@ int main()
   int length  = LengthGeneral;
   int ord = OrdGeneral;
   int i;
-  
-  
-  printf("/* -*-c++-*- */
-/***************************************************************
- * This file was generated automatically by p_ProcsGenerate.cc: DO NOT EDIT
- *
- * This file provides the needed implementation of p_Procs for 
- *               %s
- * See the end for a summary. 
- *******************************************************************/\n",
 
+
+  printf("/* -*-c++-*- */\n");
+  printf("/***************************************************************\n");
+  printf(" * This file was generated automatically by p_ProcsGenerate.cc: DO NOT EDIT\n");
+  printf(" *\n");
+  printf(" * This file provides the needed implementation of p_Procs for\n");
+  printf(" *               %s\n",
 #if defined(p_Procs_Static)
          "p_Procs_Static"
 #else
          "p_Procs_Dynamic"
 #endif
-         );
+  );
+  printf(" * See the end for a summary.\n");
+  printf(" *******************************************************************/\n");
+
 
   generated_p_procs = (char***) malloc(p_Unknown_Proc*sizeof(char**));
   for (i=0; i<p_Unknown_Proc; i++)
   {
-    generated_p_procs[i] = 
+    generated_p_procs[i] =
       (char**) calloc(index((p_Proc)i, FieldUnknown, LengthUnknown, OrdUnknown), sizeof(char*));
   }
 
@@ -260,7 +259,7 @@ int main()
       }
       else
         printf("0,");
-          
+
     }
     printf("\n};\n");
   }
@@ -283,39 +282,34 @@ int main()
       }
       else
         printf("0,");
-          
+
     }
     printf("\n};\n");
   }
 #endif
 
-  printf("
-/***************************************************************
- * Summary: 
- *   HAVE_FAST_P_PROCS  = %d, 
- *   HAVE_FAST_FIELD    = %d, 
- *   HAVE_FAST_LENGTH   = %d, 
- *   HAVE_FAST_ORD      = %d, 
- *   HAVE_FAST_ZERO_ORD = %d
- *   
- *   Generated PolyProcs= %d\n",
-         HAVE_FAST_P_PROCS, HAVE_FAST_FIELD, HAVE_FAST_LENGTH, HAVE_FAST_ORD, 
-         HAVE_FAST_ZERO_ORD, NumberOfHaveProcs);
+  printf("\n/***************************************************************");
+  printf("* Summary:\n");
+  printf("*   HAVE_FAST_P_PROCS  = %d,\n",HAVE_FAST_P_PROCS);
+  printf("*   HAVE_FAST_FIELD    = %d,\n",HAVE_FAST_FIELD);
+  printf("*   HAVE_FAST_LENGTH   = %d,\n",HAVE_FAST_LENGTH);
+  printf("*   HAVE_FAST_ORD      = %d,\n",HAVE_FAST_ORD);
+  printf("*   HAVE_FAST_ZERO_ORD = %d\n",HAVE_FAST_ZERO_ORD);
+  printf("*\n");
+  printf("*   Generated PolyProcs= %d\n",NumberOfHaveProcs);
 
 #ifndef p_Procs_Static
-  printf(" * 
- * KernelProcs          = %d
- * FieldIndepProcs      = %d
- * FieldZpProcs         = %d
- * FieldQProcs          = %d
- * FieldGeneralProcs    = %d
- * FieldUnknownProcs    = %d\n",
-         KernelProcs, FieldIndepProcs, FieldZpProcs,FieldQProcs,
-         FieldGeneralProcs, UnknownProcs);
-#endif  
+  printf(" *\n");
+  printf("* KernelProcs          = %d\n",KernelProcs);
+  printf("* FieldIndepProcs      = %d\n",FieldIndepProcs);
+  printf("* FieldZpProcs         = %d\n",FieldZpProcs);
+  printf("* FieldQProcs          = %d\n",FieldQProcs);
+  printf("* FieldGeneralProcs    = %d\n",FieldGeneralProcs);
+  printf("* FieldUnknownProcs    = %d\n",UnknownProcs);
+#endif
 
-  printf(" *
- *******************************************************************/\n");
+  printf("*\n");
+  printf("*******************************************************************/\n");
 }
 
 

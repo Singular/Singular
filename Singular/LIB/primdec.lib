@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.99 2001-03-29 11:34:59 Singular Exp $";
+version="$Id: primdec.lib,v 1.100 2001-08-27 14:47:58 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -378,7 +378,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc idealsEqual( ideal k, ideal j)
+proc idealsEqual( ideal k, ideal j)
 {
    return(stdIdealsEqual(std(k),std(j)));
 }
@@ -425,7 +425,7 @@ static proc stdIdealsEqual( ideal k1, ideal k2)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-static proc primaryTest (ideal i, poly p)
+proc primaryTest (ideal i, poly p)
 {
    int m=1;
    int n=nvars(basering);
@@ -796,8 +796,11 @@ static proc splitCharp(list l)
   {
     for(i=1;i<=size(keep);i++)
     {
-       l[size(l)+1]=keep[i];
-       l[size(l)+1]=primaryTest(keep[i],keep[i][1]);
+       if(deg(keep[i][1])>0)
+       {
+          l[size(l)+1]=keep[i];
+          l[size(l)+1]=primaryTest(keep[i],keep[i][1]);
+       }
     }
   }
   return(l);
@@ -951,6 +954,7 @@ EXAMPLE: example zero_decomp; shows an example
         primary[2]=primaryTest(primary[1],act[1][1]);
      }
   }
+
   if(size(#)==0)
   {
      primary=splitPrimary(primary,ser,@wr,act);
@@ -3155,7 +3159,7 @@ proc radicalEHV(ideal i)
 "USAGE:   radicalEHV(i); i ideal.
 RETURN:  ideal, the radical of i.
 NOTE:    Uses the algorithm of Eisenbud/Huneke/Vasconcelos, which
-         reduces the computation to the complete intersection case, 
+         reduces the computation to the complete intersection case,
          by taking, in the general case, a generic linear combination
          of the input.
          Works only in characteristic 0 or p large.
@@ -3176,7 +3180,7 @@ EXAMPLE: example radicalEHV; shows an example
    int l,n;
    intvec op=option(get);
    matrix M;
-   
+
    option(redSB);
    list m=mstd(i);
         I=m[2];

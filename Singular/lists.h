@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.14 2000-09-18 09:19:12 obachman Exp $ */
+/* $Id: lists.h,v 1.15 2001-08-27 14:47:08 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -62,7 +62,7 @@ lists liMakeResolv(resolvente r, int length, int reallen, int typ0, intvec ** we
 resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights=NULL);
 
 #if ! defined(MDEBUG) || defined(LISTS_CC)
-INLINE_THIS void slists::Init(int l=0)
+INLINE_THIS void slists::Init(int l)
       { nr=l-1; m=(sleftv *)((l>0) ? omAlloc0(l*sizeof(sleftv)): NULL);
 #ifdef HAVE_NAMESPACES_N
         src_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.9 2001-03-05 16:44:15 mschulze Exp $ */
+/* $Id: units.cc,v 1.10 2001-08-27 14:47:44 Singular Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
@@ -18,7 +18,7 @@
 #include "kstd1.h"
 #include "units.h"
 
-ideal redNF(ideal N,ideal M,matrix U=NULL,int d=-1,intvec *w=NULL)
+ideal redNF(ideal N,ideal M,matrix U,int d,intvec *w)
 {
   matrix U0=NULL;
   if(U!=NULL)
@@ -56,7 +56,7 @@ ideal redNF(ideal N,ideal M,matrix U=NULL,int d=-1,intvec *w=NULL)
   return M0;
 }
 
-poly redNF(ideal N,poly p,poly u=NULL,int d=-1,intvec *w=NULL)
+poly redNF(ideal N,poly p,poly u,int d,intvec *w)
 {
   ideal M=idInit(1,pGetComp(p));
   M->m[0]=p;

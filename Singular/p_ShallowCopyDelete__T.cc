@@ -6,7 +6,7 @@
  *  Purpose: template for p_ShallowCopyDelete
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_ShallowCopyDelete__Template.cc,v 1.6 2000-12-07 15:04:01 obachman Exp $
+ *  Version: $Id: p_ShallowCopyDelete__T.cc,v 1.2 2001-08-27 14:47:29 Singular Exp $
  *******************************************************************/
 
 /***************************************************************

@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.48 2001-02-06 11:26:15 anne Exp $";
+version  = "$Id: classify.lib,v 1.49 2001-08-27 14:47:48 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -56,12 +56,12 @@ proc classify_init
 proc classify (poly f_in)
 "USAGE:    classify(f);  f=poly
 COMPUTE:  normal form and singularity type of f with respect to right
-          equivalence, as given in the book \"Singularities of differentiable 
+          equivalence, as given in the book \"Singularities of differentiable
           maps, Volume I\" by V.I. Arnold, S.M. Gusein-Zade, A.N. Varchenko
 RETURN:   normal form of f, of type poly
 REMARK:   This version of classify is only beta. Please send bugs and
           comments to: \"Kai Krueger\" <krueger@mathematik.uni-kl.de> @*
-          Be sure to have at least Singular version 1.0.1. Updates can be 
+          Be sure to have at least Singular version 1.0.1. Updates can be
           found at: @*
           URL=http://www.mathematik.uni-kl.de/~krueger/Singular/
 NOTE:     type init_debug(n); (0 <= n <= 10) in order to get intermediate

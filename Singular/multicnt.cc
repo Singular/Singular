@@ -11,6 +11,8 @@
 
 #ifdef HAVE_SPECTRUM
 
+#include <stdlib.h>
+
 #ifdef  MULTICNT_PRINT
 #include <iostream.h>
 #ifndef  MULTICNT_IOSTREAM

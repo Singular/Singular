@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.32 2000-09-04 13:38:57 obachman Exp $ */
+/* $Id: febase.inc,v 1.33 2001-08-27 14:46:58 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -432,12 +432,14 @@ static int fePrintEcho(char *anf, char *b)
     Print("{%d}",yylineno);
     mflush();
   }
+#ifdef HAVE_SDB  
   if ((blocknest==0)
   && (currentVoice->pi!=NULL)
   && (currentVoice->pi->trace_flag!=0))
   {
     sdb(currentVoice, anf, len_s);
   }
+#endif  
   prompt_char = '.';
   return len_s;
 }
@@ -534,6 +536,9 @@ int feReadLine(char* b, int l)
       s=fe_fgets_stdin(fe_promptstr,
                        &(currentVoice->buffer[offset]),
                        (4096-1-sizeof(ADDRESS))-offset);
+      int i=0;
+      if (s!=NULL)
+        while((s[i]!='\0') && (i<4096)) {s[i] &= (char)127;i++;}
     }
     else if (currentVoice->sw==BI_file)
     {

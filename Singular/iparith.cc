@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.264 2001-05-22 13:20:02 Singular Exp $ */
+/* $Id: iparith.cc,v 1.265 2001-08-27 14:47:02 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1548,22 +1548,22 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
 }
 static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
 {
-  ideal ui=(ideal)u->Data();
-  int ul= IDELEMS(ui);
   ideal vi=(ideal)v->Data();
   int vl= IDELEMS(vi);
+  ideal ui=(ideal)u->Data();
+  int ul= IDELEMS(ui);
   ideal R; matrix U;
-  ideal m = idLift(ui,vi,&R, FALSE,hasFlag(u,FLAG_STD),TRUE,&U);
+  ideal m = idLift(vi,ui,&R, FALSE,hasFlag(v,FLAG_STD),TRUE,&U);
   // now make sure that all matices have the corect size:
-  matrix T = idModule2formatedMatrix(m,ul,vl);
-  if (MATCOLS(U) != vl)
+  matrix T = idModule2formatedMatrix(m,vl,ul);
+  if (MATCOLS(U) != ul)
   {
-    int mvl=min(vl,MATCOLS(U));
-    matrix UU=mpNew(vl,vl);
+    int mul=min(ul,MATCOLS(U));
+    matrix UU=mpNew(ul,ul);
     int i,j;
-    for(i=mvl;i>0;i--)
+    for(i=mul;i>0;i--)
     {
-      for(j=mvl;j>0;j--)
+      for(j=mul;j>0;j--)
       {
         MATELEM(UU,i,j)=MATELEM(U,i,j);
         MATELEM(U,i,j)=NULL;
@@ -1969,7 +1969,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
       "full resolution in a qring may be infinite, setting max length to %d",
       maxl+1);
     }
-  }  
+  }
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
     intvec * iv=(intvec*)atGet(u,"isHomog");
@@ -3525,13 +3525,13 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjidVec2Ideal  (proc1)idVec2Ideal
 #define jjrCharStr     (proc1)rCharStr
 #ifndef MDEBUG
-#define jjpHead        (proc1)pHead
+#define jjpHead        (proc1)pHeadProc
 #endif
 #define jjidHead       (proc1)idHead
 #define jjidMaxIdeal   (proc1)idMaxIdeal
 #define jjidMinBase    (proc1)idMinBase
 #define jjsyMinBase    (proc1)syMinBase
-#define jjpMaxComp     (proc1)pMaxComp
+#define jjpMaxComp     (proc1)pMaxCompProc
 #define jjmpTrace      (proc1)mpTrace
 #define jjmpTransp     (proc1)mpTransp
 #define jjrOrdStr      (proc1)rOrdStr
@@ -4648,11 +4648,14 @@ struct sValCmd3 dArith3[]=
 /*=================== operations with many arg.: static proc =================*/
 static BOOLEAN jjBREAK0(leftv res, leftv v)
 {
+#ifdef HAVE_SDB
   sdb_show_bp();
+#endif
   return FALSE;
 }
 static BOOLEAN jjBREAK1(leftv res, leftv v)
 {
+#ifdef HAVE_SDB
   if(v->Typ()==PROC_CMD)
   {
     int lineno=0;
@@ -4663,6 +4666,9 @@ static BOOLEAN jjBREAK1(leftv res, leftv v)
     return sdb_set_breakpoint(v->Name(),lineno);
   }
   return TRUE;
+#else
+ return FALSE;
+#endif
 }
 static BOOLEAN jjCALL1ARG(leftv res, leftv v)
 {
@@ -6271,7 +6277,6 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
     iiOp=op;
     int i=0;
     while ((dArithM[i].cmd!=op)&&(dArithM[i].cmd!=0)) i++;
-    int ii=i;
     while (dArithM[i].cmd==op)
     {
       if ((args==dArithM[i].number_of_args)
@@ -6404,8 +6409,10 @@ int IsCmd(char *n, int & tok)
         break;
     }
   }
-#endif
   return cmds[i].toktype;
+#else
+  return 0;
+#endif
 }
 static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 {

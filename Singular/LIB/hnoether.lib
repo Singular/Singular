@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-7 or newer
 
-version="$Id: hnoether.lib,v 1.29 2001-02-05 13:27:00 Singular Exp $";
+version="$Id: hnoether.lib,v 1.30 2001-08-27 14:47:51 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Development
@@ -49,12 +49,12 @@ LIB "inout.lib";
 
 proc further_hn_proc()
 "USAGE: further_hn_proc();
-NOTE:  The library @code{hnoether.lib} contains some more procedures which 
-       are not shown when typing @code{help hnoether.lib;}. They may be useful 
+NOTE:  The library @code{hnoether.lib} contains some more procedures which
+       are not shown when typing @code{help hnoether.lib;}. They may be useful
        for interactive use (e.g. if you want to do the calculation of an HN
-       development \"by hand\" to see the intermediate results), and they 
+       development \"by hand\" to see the intermediate results), and they
        can be enumerated by calling @code{further_hn_proc()}. @*
-       Use @code{help <procedure>;} for detailed information about each of 
+       Use @code{help <procedure>;} for detailed information about each of
        them.
 "
 {
@@ -77,9 +77,6 @@ NOTE:  The library @code{hnoether.lib} contains some more procedures which
  factorlist(L);      factorize a list L of polynomials
  referencepoly(D);   a polynomial f s.t. D is the Newton diagram of f";
 
-// extrafactor(f,M,N); try to factor charPoly(f,M,N) where 'factorize' cannot
-// (will hopefully become obsolete soon)
-//
 //       static procedures not useful for interactive use:
 // polytest(f);        tests coefficients and exponents of poly f
 // extractHNEs(H,t);   extracts output H of HN to output of reddevelop
@@ -260,8 +257,8 @@ proc squarefree (poly f)
 "USAGE:  squarefree(f);  f poly
 ASSUME:  f is a bivariate polynomial (in the first 2 ring variables).
 RETURN:  poly, a squarefree divisor of f.
-NOTE:    Usually, the return value is the greatest squarefree divisor, but 
-         there is one exception: factors with a p-th root, p the 
+NOTE:    Usually, the return value is the greatest squarefree divisor, but
+         there is one exception: factors with a p-th root, p the
          characteristic of the basering, are lost.
 SEE ALSO: allsquarefree
 EXAMPLE: example squarefree; shows some examples.
@@ -411,14 +408,14 @@ example
 
 proc is_irred (poly f)
 "USAGE:   is_irred(f); f poly
-ASSUME:  f is a squarefree bivariate polynomial (in the first 2 ring 
+ASSUME:  f is a squarefree bivariate polynomial (in the first 2 ring
          variables).
-RETURN:  int (0 or 1): @* 
-         - @code{is_irred(f)=1} if f is irreducible as a formal power 
-         series over the algebraic closure of its coefficient field (f 
+RETURN:  int (0 or 1): @*
+         - @code{is_irred(f)=1} if f is irreducible as a formal power
+         series over the algebraic closure of its coefficient field (f
          defines an analytically irreducible curve at zero), @*
          - @code{is_irred(f)=0} otherwise.
-NOTE:    0 and units in the ring of formal power series are considered to be 
+NOTE:    0 and units in the ring of formal power series are considered to be
          not irreducible.
 KEYWORDS: irreducible power series
 EXAMPLE: example is_irred;  shows an example
@@ -466,7 +463,7 @@ NOTE:   this procedure is only useful in characteristic zero, because otherwise
 
 proc develop
 "USAGE:   develop(f [,n]); f poly, n int
-ASSUME:  f is a bivariate polynomial (in the first 2 ring variables) and 
+ASSUME:  f is a bivariate polynomial (in the first 2 ring variables) and
          irreducible as power series (for reducible f use @code{reddevelop}).
 RETURN:  list @code{L} with:
 @texinfo
@@ -475,38 +472,38 @@ RETURN:  list @code{L} with:
          Each row contains the coefficients of the corresponding line of the
          Hamburger-Noether expansion (HNE). The end of the line is marked in
          the matrix by the first ring variable (usually x).
-@item @code{L[2]}; intvec: 
+@item @code{L[2]}; intvec:
          indicating the length of lines of the HNE
 @item @code{L[3]}; int:
          0  if the 1st ring variable was transversal (with respect to f), @*
-         1  if the variables were changed at the beginning of the 
+         1  if the variables were changed at the beginning of the
             computation, @*
-        -1  if an error has occurred. 
-@item @code{L[4]}; poly: 
-         the transformed polynomial of f to make it possible to extend the 
+        -1  if an error has occurred.
+@item @code{L[4]}; poly:
+         the transformed polynomial of f to make it possible to extend the
          Hamburger-Noether development a posteriori without having to do
          all the previous calculation once again (0 if not needed)
 @item @code{L[5]}; int:
          1  if the curve has exactly one branch (i.e., is irreducible), @*
-         0  else (i.e., the curve has more than one HNE, or f is not valid). 
+         0  else (i.e., the curve has more than one HNE, or f is not valid).
 @end table
 @end texinfo
 DISPLAY: The (non zero) elements of the HNE (if not called by another proc).
 NOTE:    The optional parameter @code{n} affects only the computation of
          the LAST line of the HNE. If it is given, the HN-matrix @code{L[1]}
          will have at least @code{n} columns. @*
-         Otherwise, the number of columns will be chosen minimal such that the 
-         matrix contains all necessary information (i.e., all lines of the HNE 
+         Otherwise, the number of columns will be chosen minimal such that the
+         matrix contains all necessary information (i.e., all lines of the HNE
          but the last (which is in general infinite) have place). @*
-         If @code{n} is negative, the algorithm is stopped as soon as the 
-         computed information is sufficient for @code{invariants(L)}, but the 
-         HN-matrix @code{L[1]} may still contain undetermined elements, which 
+         If @code{n} is negative, the algorithm is stopped as soon as the
+         computed information is sufficient for @code{invariants(L)}, but the
+         HN-matrix @code{L[1]} may still contain undetermined elements, which
          are marked with the 2nd variable (of the basering). @*
          For time critical computations it is recommended to use
          @code{ring ...,(x,y),ls} as basering - it increases the algorithm's
          speed. @*
-         If @code{printlevel>=0} comments are displayed (default is 
-         @code{printlevel=0}). 
+         If @code{printlevel>=0} comments are displayed (default is
+         @code{printlevel=0}).
 SEE ALSO: reddevelop, extdevelop, displayHNE
 EXAMPLES: example develop; shows an example
           example param;   shows an example for using the 2nd parameter
@@ -907,21 +904,21 @@ example
 
 proc param
 "USAGE:  param(L [,x]); L list, x any type (optional)
-ASSUME:  L is the output of @code{develop(f)}, or of 
-        @code{extdevelop(develop(f),n)}, or one entry of the output of 
+ASSUME:  L is the output of @code{develop(f)}, or of
+        @code{extdevelop(develop(f),n)}, or one entry of the output of
         @code{reddevelop(f)}.
 RETURN: a parametrization for f in the following format: @*
-        - if only the list L is given, the result is an ideal of two 
+        - if only the list L is given, the result is an ideal of two
         polynomials p[1],p[2]: if the HNE was finite then f(p[1],p[2])=0};
-        if not, the \"real\" parametrization will be two power series and 
-        p[1],p[2] are truncations of these series.@* 
+        if not, the \"real\" parametrization will be two power series and
+        p[1],p[2] are truncations of these series.@*
         - if the optional parameter x is given, the result is a list l:
-        l[1]=param(L) (ideal) and l[2]=intvec with two entries indicating 
-        the highest degree up to which the coefficients of the monomials in 
+        l[1]=param(L) (ideal) and l[2]=intvec with two entries indicating
+        the highest degree up to which the coefficients of the monomials in
         l[1] are exact (entry -1 means that the corresponding parametrization
         is exact).
-NOTE:   If the basering has only 2 variables, the first variable is chosen 
-        as indefinite. Otherwise, the 3rd variable is chosen. 
+NOTE:   If the basering has only 2 variables, the first variable is chosen
+        as indefinite. Otherwise, the 3rd variable is chosen.
 SEE ALSO: develop, extdevelop
 KEYWORDS: parametrization
 EXAMPLE: example param;     shows an example
@@ -1048,8 +1045,8 @@ example
 
 proc invariants
 "USAGE:   invariants(L); L list
-ASSUME:  L is the output of @code{develop(f)}, or of 
-         @code{extdevelop(develop(f),n)}, or one entry of the output of 
+ASSUME:  L is the output of @code{develop(f)}, or of
+         @code{extdevelop(develop(f),n)}, or one entry of the output of
          @code{reddevelop(f)}.
 RETURN:  list, if L contains a valid HNE:
 @format
@@ -1152,8 +1149,8 @@ example
 
 proc displayInvariants
 "USAGE:  displayInvariants(L); L list
-ASSUME:  L is the output of @code{develop(f)}, or of 
-         @code{extdevelop(develop(f),n)}, or (one entry of) the output of 
+ASSUME:  L is the output of @code{develop(f)}, or of
+         @code{extdevelop(develop(f),n)}, or (one entry of) the output of
          @code{reddevelop(f)}.
 RETURN:  none
 DISPLAY: invariants of the corresponding branch, resp. of all branches,
@@ -1239,9 +1236,9 @@ example
 
 proc multiplicities
 "USAGE:   multiplicities(L); L list
-ASSUME:  L is the output of @code{develop(f)}, or of 
-         @code{extdevelop(develop(f),n)}, or one entry of the output of 
-         @code{reddevelop(f)}. 
+ASSUME:  L is the output of @code{develop(f)}, or of
+         @code{extdevelop(develop(f),n)}, or one entry of the output of
+         @code{reddevelop(f)}.
 RETURN:  intvec of the different multiplicities that occur when successively
          blowing-up the curve singularity corresponding to f.
 SEE ALSO: develop
@@ -1283,9 +1280,9 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc puiseux2generators (intvec m, intvec n)
-"USAGE:   puiseux2generators(m,n); m,n intvec 
+"USAGE:   puiseux2generators(m,n); m,n intvec
 ASSUME:  m, resp. n, represent the 1st, resp. 2nd, components of Puiseux pairs
-         (e.g., @code{m=invariants(L)[3]}, @code{n=invariants(L)[4]}). 
+         (e.g., @code{m=invariants(L)[3]}, @code{n=invariants(L)[4]}).
 RETURN:  intvec of the generators of the semigroup of values.
 SEE ALSO: invariants
 EXAMPLE: example puiseux2generators;  shows an example
@@ -1314,8 +1311,8 @@ example
 
 proc intersection (list hn1, list hn2)
 "USAGE:   intersection(hne1,hne2); hne1, hne2 lists
-ASSUME:  hne1, hne2 represent a HNE (i.e., are the output of 
-        @code{develop(f)}, or of @code{extdevelop(develop(f),n)}, or 
+ASSUME:  hne1, hne2 represent a HNE (i.e., are the output of
+        @code{develop(f)}, or of @code{extdevelop(develop(f),n)}, or
         one entry of the output of @code{reddevelop(f)}).
 RETURN:  int, the intersection multiplicity of the branches corresponding to
          hne1 and hne2.
@@ -1423,7 +1420,7 @@ example
   ring r=0,(x,y),dp;
   list hne=reddevelop((x2-y3)*(x2+y3));
   intersection(hne[1],hne[2]);
-  kill HNEring,r; 
+  kill HNEring,r;
   printlevel=plevel; echo = 0;
   // --- restore HNEring if previously defined ---
   if (defined(rettering)) {
@@ -1436,27 +1433,27 @@ example
 
 proc multsequence
 "USAGE:   multsequence(L); L list
-ASSUME:  L is the output of @code{develop(f)}, or of 
-         @code{extdevelop(develop(f),n)}, or one entry of the output of 
+ASSUME:  L is the output of @code{develop(f)}, or of
+         @code{extdevelop(develop(f),n)}, or one entry of the output of
          @code{reddevelop(f)}.
-RETURN:  intvec corresponding to the multiplicity sequence of (a branch) 
+RETURN:  intvec corresponding to the multiplicity sequence of (a branch)
          of the curve (the same as @code{invariants(L)[6]}).
 ASSUME:  L is the output of @code{reddevelop(f)}.
 RETURN:  list of two integer matrices:
 @texinfo
 @table @asis
 @item  @code{multsequence(L)[1][i,*]}
-   contains the multiplicities of the branches at their infinitely near point 
-   of 0 in its (i-1) order neighbourhood (i.e., i=1: multiplicity of the 
-   branches themselves, i=2: multiplicity of their 1st quadratic transformed, 
+   contains the multiplicities of the branches at their infinitely near point
+   of 0 in its (i-1) order neighbourhood (i.e., i=1: multiplicity of the
+   branches themselves, i=2: multiplicity of their 1st quadratic transformed,
    etc., @*
-   Hence, @code{multsequence(L)[1][*,j]} is the multiplicity sequence 
+   Hence, @code{multsequence(L)[1][*,j]} is the multiplicity sequence
    of branch j.
-@item  @code{multsequence(L)[2][i,*]}: 
+@item  @code{multsequence(L)[2][i,*]}:
    contains the information which of these infinitely near points coincide.
 @end table
 @end texinfo
-NOTE:  The order of elements of the list obtained from @code{reddevelop(f)} 
+NOTE:  The order of elements of the list obtained from @code{reddevelop(f)}
        must not be changed (because then the coincident infinitely near points
        couldn't be grouped together, cf. meaning of 2nd intmat in example).
        Hence, it is not wise to compute the HNE of several polynomials
@@ -1541,7 +1538,7 @@ example
    kill HNEring;
   }
   // ------ the example starts here -------
-  "EXAMPLE:"; echo = 2;   
+  "EXAMPLE:"; echo = 2;
   int plevel=printlevel; printlevel=-1;
   ring r=0,(x,y),dp;
   list hne=reddevelop((x6-y10)*(x+y2-y3)*(x+y2+y3));   // 4 branches
@@ -1564,20 +1561,20 @@ example
 
 proc displayMultsequence
 "USAGE:   displayMultsequence(L);
-ASSUME:  L is the output of @code{develop(f)}, or of 
-         @code{extdevelop(develop(f),n)}, or (one entry of) the output of 
+ASSUME:  L is the output of @code{develop(f)}, or of
+         @code{extdevelop(develop(f),n)}, or (one entry of) the output of
          @code{reddevelop(f)}.
 RETURN:  nothing
 DISPLAY: the sequence of multiplicities:
 @format
- -  if @code{L=develop(f)} or @code{L=reddevelop(f)[i]}: 
-                      @code{a , b , c , ....... , 1}  
- - if @code{L=reddevelop(f)}: 
+ -  if @code{L=develop(f)} or @code{L=reddevelop(f)[i]}:
+                      @code{a , b , c , ....... , 1}
+ - if @code{L=reddevelop(f)}:
                       @code{[(a_1, .... , b_1 , .... , c_1)],}
                       @code{[(a_2, ... ), ... , (... , c_2)],}
                       @code{ ........................................ ,}
                       @code{[(a_n),(b_n), ....., (c_n)]}
-     with: 
+     with:
        @code{a_1 , ... , a_n} the sequence of multiplicities of the 1st branch,
        @code{[...]} the multiplicities of the j-th transformed of all branches,
        @code{(...)} indicating branches meeting in an infinitely near point.
@@ -1636,7 +1633,7 @@ example
   displayMultsequence(hne[1]);
   displayMultsequence(hne);
   kill HNEring,r;
-  printlevel=plevel; 
+  printlevel=plevel;
   echo = 0;
   // --- restore HNEring if previously defined ---
   if (defined(rettering)) {
@@ -1649,10 +1646,10 @@ example
 
 proc separateHNE (list hn1,list hn2)
 "USAGE:    separateHNE(hne1,hne2);  hne1, hne2 lists
-ASSUME:   hne1, hne2 are HNEs (=output of 
-          @code{develop(f)}, @code{extdevelop(develop(f),n)}, or 
+ASSUME:   hne1, hne2 are HNEs (=output of
+          @code{develop(f)}, @code{extdevelop(develop(f),n)}, or
           one entry of the output of @code{reddevelop(f)}).
-RETURN:   number of quadratic transformations needed to separate both curves 
+RETURN:   number of quadratic transformations needed to separate both curves
           (branches).
 SEE ALSO: develop, reddevelop, multsequence, displayMultsequence
 EXAMPLE:  example separateHNE;  shows an example
@@ -1750,7 +1747,7 @@ example
 
 proc displayHNE(list ldev,list #)
 "USAGE:   displayHNE(L[,n]); L list, n int
-ASSUME:  L has the format of the output of @code{develop(f)}, resp. of 
+ASSUME:  L has the format of the output of @code{develop(f)}, resp. of
          @code{reddevelop(f)}.
 RETURN:  - if only one argument is given, no return value, but
          display an ideal HNE of the following form:
@@ -1761,22 +1758,22 @@ RETURN:  - if only one argument is given, no return value, but
      .......             ..........................
      HNE[r+1]=           []*z(r)^2+[]*z(r)^3+......
      @end example
-     where @code{x},@code{y} are the first 2 variables of the basering. 
-     The values of @code{[]} are the coefficients of the Hamburger-Noether 
-     matrix, the values of @code{<>} are represented by @code{x} in the 
-     HN-matrix.@*  
+     where @code{x},@code{y} are the first 2 variables of the basering.
+     The values of @code{[]} are the coefficients of the Hamburger-Noether
+     matrix, the values of @code{<>} are represented by @code{x} in the
+     HN-matrix.@*
      - if a second argument is given, create and export a new ring with
-     name @code{displayring} containing an ideal @code{HNE} as described 
+     name @code{displayring} containing an ideal @code{HNE} as described
      above.@*
-     - if L corresponds to the output of @code{reddevelop(f)}, 
-     @code{displayHNE(L[,n])} shows the HNE's of all branches of f in the form 
+     - if L corresponds to the output of @code{reddevelop(f)},
+     @code{displayHNE(L[,n])} shows the HNE's of all branches of f in the form
      described above. The optional parameter is then ignored.
 NOTE:  The 1st line of the above ideal (i.e., @code{HNE[1]}) means that
      @code{y=[]*z(0)^1+...}, the 2nd line (@code{HNE[2]}) means that
-     @code{x=[]*z(1)^2+...}, so you can see which indeterminate 
-     corresponds to which line (it's also possible that @code{x} corresponds 
+     @code{x=[]*z(1)^2+...}, so you can see which indeterminate
+     corresponds to which line (it's also possible that @code{x} corresponds
      to the 1st line and @code{y} to the 2nd).
- 
+
 SEE ALSO: develop, reddevelop
 EXAMPLE: example displayHNE; shows an example
 "
@@ -2013,19 +2010,19 @@ example
 
 
 proc extdevelop (list l, int Exaktheit)
-"USAGE:   extdevelop(L,N); list L, int N 
+"USAGE:   extdevelop(L,N); list L, int N
 ASSUME:  L is the output of @code{develop(f)}, or of @code{extdevelop(l,n)},
          or one entry of the output of @code{reddevelop(f)}.
-RETURN:  an extension of the Hamburger-Noether development of f as a list 
+RETURN:  an extension of the Hamburger-Noether development of f as a list
          in the same format as L has (up to the last entry in the output
          of @code{develop(f)}).@*
-         Type @code{help develop;}, resp. @code{help reddevelop;} for more 
+         Type @code{help develop;}, resp. @code{help reddevelop;} for more
          details.
 NOTE:    The new HN-matrix will have at least N columns (if the HNE is not
          finite). In particular, if f is irreducible then (in most cases)
-         @code{extdevelop(develop(f),N)} will produce the same result as 
+         @code{extdevelop(develop(f),N)} will produce the same result as
          @code{develop(f,N)}.@*
-         If the matrix M of L has n columns then, compared with 
+         If the matrix M of L has n columns then, compared with
          @code{param(L)}, @code{param(extdevelop(L,N))} will increase the
          exactness by at least (N-n) more significant monomials.
 SEE ALSO: develop, reddevelop, param
@@ -2160,11 +2157,11 @@ example
    kill HNEring;
   }
   // ------ the example starts here -------
-  "EXAMPLE:"; echo = 2; 
+  "EXAMPLE:"; echo = 2;
   ring exring=0,(x,y),dp;
   list hne=reddevelop(x14-3y2x11-y3x10-y2x9+3y4x8+y5x7+3y4x6+x5*(-y6+y5)
                       -3y6x3-y7x2+y8);
-  print(hne[1][1]);    // HNE of 1st branch is finite  
+  print(hne[1][1]);    // HNE of 1st branch is finite
   print(extdevelop(hne[1],5)[1]);
   print(hne[2][1]);    // HNE of 2nd branch can be extended
   list ehne=extdevelop(hne[2],5);
@@ -2184,8 +2181,8 @@ example
 
 proc stripHNE (list l)
 "USAGE:   stripHNE(L);  L list
-ASSUME:  L is the output of @code{develop(f)}, or of 
-         @code{extdevelop(develop(f),n)}, or (one entry of) the output of 
+ASSUME:  L is the output of @code{develop(f)}, or of
+         @code{extdevelop(develop(f),n)}, or (one entry of) the output of
          @code{reddevelop(f)}.
 RETURN:  list in the same format as L, but all polynomials L[4], resp.
          L[i][4], are set to zero.
@@ -2210,7 +2207,7 @@ EXAMPLE: example stripHNE;  shows an example
  return(l);
 }
 example
-{  
+{
   "EXAMPLE:"; echo = 2;
   int plevel=printlevel; printlevel=-1;
   ring r=0,(x,y),dp;
@@ -2308,31 +2305,31 @@ example
 proc HNdevelop (poly f)
 "USAGE:   HNdevelop(f); f poly
 ASSUME:  f is a bivariate polynomial (in the first 2 ring variables)
-CREATE:  ring with name @code{HNEring}, variables @code{x,y} and ordering 
-         @code{ls} over a field extension of the current basering's ground 
+CREATE:  ring with name @code{HNEring}, variables @code{x,y} and ordering
+         @code{ls} over a field extension of the current basering's ground
          field. @*
          Since the Hamburger-Noether development usually does not exist
          in the originally given basering, @code{HNdevelop} always defines
-         @code{HNEring} and CHANGES to it. The field extension is chosen 
+         @code{HNEring} and CHANGES to it. The field extension is chosen
          minimally.
 RETURN:  list @code{L} of lists @code{L[i]} (corresponding to the output of
-         @code{develop(f[i])}, f[i] a branch of f, but the last entry being 
+         @code{develop(f[i])}, f[i] a branch of f, but the last entry being
          omitted).
 @texinfo
 @table @asis
 @item @code{L[i][1]}; matrix:
          Each row contains the coefficients of the corresponding line of the
-         Hamburger-Noether expansion (HNE) for f[i]. The end of the line is 
+         Hamburger-Noether expansion (HNE) for f[i]. The end of the line is
          marked in the matrix by the first ring variable (usually x).
-@item @code{L[i][2]}; intvec: 
+@item @code{L[i][2]}; intvec:
          indicating the length of lines of the HNE
 @item @code{L[i][3]}; int:
          0  if the 1st ring variable was transversal (with respect to f[i]), @*
-         1  if the variables were changed at the beginning of the 
+         1  if the variables were changed at the beginning of the
             computation, @*
-        -1  if an error has occurred. 
-@item @code{L[i][4]}; poly: 
-         the transformed polynomial of f[i] to make it possible to extend the 
+        -1  if an error has occurred.
+@item @code{L[i][4]}; poly:
+         the transformed polynomial of f[i] to make it possible to extend the
          Hamburger-Noether development a posteriori without having to do
          all the previous calculation once again (0 if not needed)
 @end table
@@ -2341,8 +2338,8 @@ NOTE:    @code{HNdevelop} decides which procedure (@code{develop} or
          @code{reddevelop}) applies best to the given problem and calls it. @*
          If f is known to be irreducible as a power series, @code{develop(f)}
          should be chosen instead to avoid the change of basering. @*
-         If @code{printlevel>=0} comments are displayed (default is 
-         @code{printlevel=0}).  
+         If @code{printlevel>=0} comments are displayed (default is
+         @code{printlevel=0}).
 SEE ALSO: develop, reddevelop, extdevelop, essdevelop, param, displayHNE
 EXAMPLE: example HNdevelop;  shows an example
 "
@@ -2428,37 +2425,37 @@ example
 proc reddevelop (poly f)
 "USAGE:   reddevelop(f); f poly
 ASSUME:  f is a bivariate polynomial (in the first 2 ring variables)
-CREATE:  ring with name @code{HNEring}, variables @code{x,y} and ordering 
-         @code{ls} over a field extension of the current basering's ground 
+CREATE:  ring with name @code{HNEring}, variables @code{x,y} and ordering
+         @code{ls} over a field extension of the current basering's ground
          field. @*
          Since the Hamburger-Noether development of a reducible curve
          singularity usually does not exist in the originally given basering,
-         @code{reddevelop} always defines @code{HNEring} and CHANGES to it. 
+         @code{reddevelop} always defines @code{HNEring} and CHANGES to it.
          The field extension is chosen minimally.
 RETURN:  list @code{L} of lists @code{L[i]} (corresponding to the output of
-         @code{develop(f[i])}, f[i] a branch of f, but the last entry being 
+         @code{develop(f[i])}, f[i] a branch of f, but the last entry being
          omitted).
 @texinfo
 @table @asis
 @item @code{L[i][1]}; matrix:
          Each row contains the coefficients of the corresponding line of the
-         Hamburger-Noether expansion (HNE) for f[i]. The end of the line is 
+         Hamburger-Noether expansion (HNE) for f[i]. The end of the line is
          marked in the matrix by the first ring variable (usually x).
-@item @code{L[i][2]}; intvec: 
+@item @code{L[i][2]}; intvec:
          indicating the length of lines of the HNE
 @item @code{L[i][3]}; int:
          0  if the 1st ring variable was transversal (with respect to f[i]), @*
-         1  if the variables were changed at the beginning of the 
+         1  if the variables were changed at the beginning of the
             computation, @*
-        -1  if an error has occurred. 
-@item @code{L[i][4]}; poly: 
-         the transformed polynomial of f[i] to make it possible to extend the 
+        -1  if an error has occurred.
+@item @code{L[i][4]}; poly:
+         the transformed polynomial of f[i] to make it possible to extend the
          Hamburger-Noether development a posteriori without having to do
          all the previous calculation once again (0 if not needed)
 @end table
 @end texinfo
-NOTE:    If @code{printlevel>=0} comments are displayed (default is 
-         @code{printlevel=0}). 
+NOTE:    If @code{printlevel>=0} comments are displayed (default is
+         @code{printlevel=0}).
 SEE ALSO: develop, extdevelop, essdevelop, param, displayHNE
 EXAMPLE: example reddevelop;  shows an example
 "
@@ -2488,7 +2485,7 @@ example
           -80x14y3-10x13y4+36x14y2+60x12y4+2x11y5-84x12y3-24x10y5
           +126x10y4+4x8y6-126x8y5+84x6y6-36x4y7+9x2y8-1y9;
   list hne=reddevelop(f);
-  size(hne);            // number of branches 
+  size(hne);            // number of branches
   print(hne[1][1]);     // HN-matrix of 1st branch
   print(hne[4][1]);     // HN-matrix of 4th branch
   // a ring change was necessary, a is a parameter
@@ -2825,15 +2822,15 @@ static proc pre_HN (poly f, int essential)
 proc essdevelop (poly f)
 "USAGE:   essdevelop(f); f poly
 ASSUME:  f is a bivariate polynomial (in the first 2 ring variables)
-CREATE:  ring with name @code{HNEring}, variables @code{x,y} and ordering 
-         @code{ls} over a field extension of the current basering's ground 
+CREATE:  ring with name @code{HNEring}, variables @code{x,y} and ordering
+         @code{ls} over a field extension of the current basering's ground
          field. @*
          Since the Hamburger-Noether development of a reducible curve
          singularity usually does not exist in the originally given basering,
-         @code{essdevelop} always defines @code{HNEring} and CHANGES to it. 
+         @code{essdevelop} always defines @code{HNEring} and CHANGES to it.
          The field extension is chosen minimally.
 RETURN:  list @code{L} of lists @code{L[i]} (corresponding to the output of
-         @code{develop(f[i])}, f[i] an \"essential\" branch of f, but the last 
+         @code{develop(f[i])}, f[i] an \"essential\" branch of f, but the last
          entry being omitted).@*
          For more details type @code{help reddevelop;}.
 NOTE:    If the HNE needs a field extension, some of the branches will be
@@ -2843,8 +2840,8 @@ NOTE:    If the HNE needs a field extension, some of the branches will be
          of the field extension in which all HNEs can be put.@*
          Use @code{reddevelop} or @code{HNdevelop} to compute a complete HNE,
          i.e., a HNE for all branches.@*
-         If @code{printlevel>=0} comments are displayed (default is 
-         @code{printlevel=0}). 
+         If @code{printlevel>=0} comments are displayed (default is
+         @code{printlevel=0}).
 SEE ALSO: develop, reddevelop, HNdevelop, extdevelop
 EXAMPLE: example essdevelop;  shows an example
 "
@@ -3049,9 +3046,7 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
 
  //---------- Sonderbehandlung: faktorisere einige Polynome ueber Q(a): -------
      if (charstr(basering)=="0,a") {
-       faktoren,flag=extrafactor(leitf,M,N);  // damit funktion. Bsp. Baladi 5
-       if (flag==0)
-         { ERROR("Could not factorize in field of type (0,a)!"); }
+       faktoren=factorize(charPoly(leitf,M,N),2);  // damit funktion. Bsp. Baladi 5
      }
      else {
  //------------------ faktorisiere das charakt. Polynom: ----------------------
@@ -3494,67 +3489,3 @@ example
  factorlist(L);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-proc extrafactor (poly leitf, int M, int N)
-"USAGE:   factors,flag=extrafactor(f,M,N);
-         list factors, int flag,M,N, poly f in x,y
-RETURN:  for some special f, factors is a list of the factors of
-         charPoly(f,M,N), same format as factorize
-         (see help charPoly; help factorize)
-         In this case, flag!=0 (TRUE). If extrafactor cannot factorize f,
-         flag will be 0 (FALSE), factors will be the empty list.
-ASSUME:  basering is (0,a),(x,y),ds or ls
-         Newton polygon of f is one side with height N, length M
-NOTE:    This procedure is designed to make reddevelop able to compute some
-         special cases that need a ring extension in char 0.
-         It becomes obsolete as soon as `factorize' works also in such rings.
-EXAMPLE: example extrafactor;  shows an example
-"
-{
- list faktoren;
-
-      if (a2==-1) {
-       poly testpol=charPoly(leitf,M,N);
-       if (testpol==1+2y2+y4) {
-         faktoren=list(ideal(y+a,y-a),intvec(2,2));
-         testpol=0;
-       }
- //------------ ist Poly von der Form q*i+r*y^n, n in N, q,r in Q ?: ----------
-       if ((size(testpol)==2) && (find(string(lead(testpol)),"a")>0)
-           && (find(string(testpol-lead(testpol)),"a")==0)) {
-        faktoren=list(ideal(testpol),intvec(1));
-        testpol=0;
-       }
-      }
-      if (a4==-625) {
-        poly testpol=charPoly(leitf,M,N);
-        if (testpol==4a2-4y2)
-         { faktoren=list(ideal(-4,y+a,y-a),intvec(1,1,1)); testpol=0;}
-        if (testpol==-4a2-4y2)
-         { faktoren=list(ideal(-4,y+1/25*a3,y-1/25*a3),intvec(1,1,1));
-           testpol=0;}
-      }
-      if (a2+a==-1) {
-        poly testpol=charPoly(leitf,M,N);
-        if (testpol==1+2y+3y2+2y3+y4)
-         { faktoren=list(ideal(1,y-a,y+a+1),intvec(1,2,2)); testpol=0;}
-      }
-      if (defined(testpol)==0) { poly testpol=1; }
-      if (testpol!=0) {
-        "factorize not implemented in char (0,a)!";
-        "could not factorize:",charPoly(leitf,M,N);
-        if (printlevel>0) { pause("Hit RETURN to continue:"); }
-      }
- return(faktoren,(testpol==0)); // Test: faktoren==list() geht leider nicht
-}
-example
-{ "EXAMPLE:"; echo=2;
-  ring r=(0,a),(x,y),ds;
-  minpoly=a2+1;
-  poly f=x4+2x2y2+y4;
-  charPoly(f,4,4);
-  list factors;
-  int flag;
-  factors,flag=extrafactor(f,4,4);
-  if (flag!=0) {factors;}
-}

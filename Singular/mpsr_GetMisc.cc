@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.26 2001-02-01 21:19:54 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.27 2001-08-27 14:47:16 Singular Exp $ */
 
 /***************************************************************
  *
@@ -354,11 +354,11 @@ static char* GenerateRingName()
 // the first found is returned together witht the respective ring
 idhdl mpsr_FindIdhdl(char *name, ring &r)
 {
-#ifdef HAVE_NAMESPACES
-  idhdl h = (NSROOT(namespaceroot) != NULL ? namespaceroot->get(name, 0): (idhdl) NULL), h2;
-#else /* HAVE_NAMESPACES */
-  idhdl h = (idroot != NULL ? idroot->get(name, 0): (idhdl) NULL), h2;
-#endif /* HAVE_NAMESPACES */
+//#ifdef HAVE_NAMESPACES
+//  idhdl h = (NSROOT(namespaceroot) != NULL ? namespaceroot->get(name, 0): (idhdl) NULL), h2;
+//#else /* HAVE_NAMESPACES */
+  idhdl h = (IDROOT != NULL ? IDROOT->get(name, 0): (idhdl) NULL), h2;
+//#endif /* HAVE_NAMESPACES */
   r = NULL;
 
   if (h != NULL)
@@ -448,8 +448,8 @@ LINKAGE void mpsr_Init()
   if (mpsr_is_initialized) return;
   // memory management functions of MP (and MPT)
 #ifdef OMALLOC_USES_MALLOC
-  IMP_RawMemAllocFnc = omMallocFunc,
-  IMP_RawMemFreeFnc = omFreeFunc,
+  IMP_RawMemAllocFnc = omMallocFunc;
+  IMP_RawMemFreeFnc = omFreeFunc;
   IMP_MemAllocFnc = omMallocFunc;
   IMP_MemFreeFnc = omFreeSizeFunc;
 #else

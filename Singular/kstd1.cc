@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.83 2001-03-08 13:05:11 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.84 2001-08-27 14:47:04 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -606,19 +606,22 @@ void missingAxis (int* last,kStrategy strat)
   int   k = 0;
 
   *last = 0;
-  loop
+  if (!currRing->MixedOrder)
   {
-    i++;
-    if (i > pVariables) break;
-    if (strat->NotUsedAxis[i])
+    loop
     {
-      *last = i;
-      k++;
-    }
-    if (k>1)
-    {
-      *last = 0;
-      break;
+      i++;
+      if (i > pVariables) break;
+      if (strat->NotUsedAxis[i])
+      {
+        *last = i;
+        k++;
+      }
+      if (k>1)
+      {
+        *last = 0;
+        break;
+      }
     }
   }
 }
@@ -1609,7 +1612,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     r=gr_bba(F,Q,strat);
   }
   else
-#endif  
+#endif
   if (pOrdSgn==-1)
   {
     if (w!=NULL)
@@ -1836,7 +1839,7 @@ ideal kInterRed(ideal F, ideal Q)
   pLexOrder=b;
   if (h==isHomog)
   {
-    if (strat->ak > 0 && (w!=NULL)) 
+    if (strat->ak > 0 && (w!=NULL))
     {
       strat->kModW = kModW = w;
       pFDegOld = pFDeg;

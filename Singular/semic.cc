@@ -21,7 +21,7 @@
 
 #include<string.h>
 #ifndef ix86_Win
-#include<values.h>
+//#include<values.h>
 #endif
 
 #include"intvec.h"
