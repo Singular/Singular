@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.18 1998-05-05 12:07:01 schmidt Exp $ */
+/* $Id: libparse.l,v 1.19 1998-05-05 13:46:38 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -247,8 +247,7 @@ info=+"\"" { old_state = YYSTATE; quote++; BEGIN(string);
 #ifdef STANDALONE_PARSER
                printf("Version:%s;\n", libnamebuf);
 #else
-               //text_buffer = mstrdup(libnamebuf);
-               print_version(mode, libnamebuf);
+               text_buffer = mstrdup(libnamebuf);
 #endif
              }
            }
@@ -259,6 +258,9 @@ static     { p_static=TRUE; }
              char proc[256];
              BEGIN(pdef);
              found_proc_in_proc = 0;
+             proc[0]='\0';
+             sscanf( yytext, "%*[^p]proc %s", proc);
+             if(strlen(proc)<1) sscanf( yytext, "proc %s", proc);
 #if YYLPDEBUG > 1
              printf("Newlib:%s\n", newlib);
 #endif
@@ -268,13 +270,10 @@ static     { p_static=TRUE; }
                  pi_clear(pi);
                }
                pi = (procinfo *)malloc(sizeof(procinfo));
-               iiInitSingularProcinfo(pi, newlib, yytext+5, yylplineno,
+               iiInitSingularProcinfo(pi, newlib, proc, yylplineno,
                                         current_pos(0), p_static);
 #else STANDALONE_PARSER
              if( mode == LOAD_LIB) {
-               proc[0]='\0';
-               sscanf( yytext, "%*[^p]proc %s", proc);
-               if(strlen(proc)<1) sscanf( yytext, "proc %s", proc);
                h0 = enterid( mstrdup(proc), myynest, PROC_CMD,
                                    &idroot, FALSE );
                if (h0!=NULL) {
@@ -286,8 +285,10 @@ static     { p_static=TRUE; }
 #endif STANDALONE_PARSER
                SET_DEF_END(mode, pi, current_pos(yyleng+1));
 #if YYLPDEBUG
-               if(lpverbose>1) printf("PROC %d at %d/%d: (%d) %s\n", p_static,
-                      yylplineno, current_pos(0), brace1, yytext);
+               if(lpverbose)
+                  printf("// %s PROC '%s' at line %d,%d: (%d).\n", 
+                      p_static ? "local" : "global", proc,
+                      yylplineno, current_pos(0), brace1);
 #endif
                p_static=FALSE;
 #ifndef STANDALONE_PARSER
@@ -298,7 +299,8 @@ example    {
              BEGIN(pexample);
              SET_EXAMPLE_START(mode, pi, yylplineno, current_pos(0));
 #if YYLPDEBUG
-             if(lpverbose>1) printf("EXAMPLE at %d/%d (%d)\n", yylplineno,
+             if(lpverbose)
+                printf("//     EXAMPLE at line %d,%d (%d)\n", yylplineno,
                     current_pos(0), brace1);
 #endif
            }
@@ -309,7 +311,6 @@ LIB[ \t]+"\"" { quote++;
 
 <header>({comment}+{tos}+{dolar}+Id:+{string}+[^\n]*)|({comment}+{tos}+{dolar}+Header:+{string}+[^\n]*) {
              make_version(yytext, 0);
-             //print_version(mode, "");
 #if YYLPDEBUG > 1
              printf("+(id)HEAD:%s\n", yytext);
 #endif
@@ -325,7 +326,6 @@ LIB[ \t]+"\"" { quote++;
 #endif
            }
 <header>^proc\  { yyless(0);
-             //print_version(mode, libfile);
              BEGIN(INITIAL);
              yymore();
            }
@@ -337,7 +337,6 @@ LIB[ \t]+"\"" { quote++;
            }
 
 <header>^LIB[ \t]+"\""   { quote++;
-             //print_version(mode, libfile);
              BEGIN(libcmd);
            }
 <header>\n { yylplineno++; }
@@ -345,7 +344,6 @@ LIB[ \t]+"\"" { quote++;
 #if YYLPDEBUG > 1
              printf(" HEAD:%s\n", yytext);
 #endif
-             //print_version(mode, libfile);
              yyless(0);
              BEGIN(help);
            }
@@ -433,6 +431,9 @@ LIB[ \t]+"\"" { quote++;
                return(1);
              } else {
                brace1++; BEGIN(pbody);
+               if(lpverbose)
+                  printf("//     BODY at line %d,%d (%d)\n", yylplineno,
+                      current_pos(0), brace1);
                SET_BODY_START(mode, pi, yylplineno, current_pos(0));
              }
            }
@@ -488,6 +489,9 @@ LIB[ \t]+"\"" { quote++;
 <poldhelp>{escbrack} { }
 <poldhelp>"{" {
                 brace1++; BEGIN(pbody);
+                if(lpverbose)
+                   printf("//     BODY at line %d,%d (%d)\n", yylplineno,
+                       current_pos(0), brace1);
 #if YYLPDEBUG > 1
                 printf("BEGIN(pbody){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
@@ -507,6 +511,9 @@ LIB[ \t]+"\"" { quote++;
 <phelp>{tos} {}
 <phelp>"{" {
              brace1++; BEGIN(pbody);
+             if(lpverbose)
+                printf("//     BODY at line %d,%d (%d)\n", yylplineno,
+                    current_pos(0), brace1);
 #if YYLPDEBUG > 1
              printf("BEGIN(pbody){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif

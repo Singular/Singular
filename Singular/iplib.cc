@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.22 1998-05-05 13:20:46 obachman Exp $ */
+/* $Id: iplib.cc,v 1.23 1998-05-05 13:46:37 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -506,6 +506,8 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   print_init();
 #  endif
 //  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loading %s...", libnamebuf);
+  extern int lpverbose;
+  if (BVERBOSE(V_DEBUG_LIB)) lpverbose=1; else lpverbose=0;
   yylplex(newlib, libnamebuf, &lib_style);
   if(yylp_errno) {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
@@ -517,7 +519,8 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     FreeL((ADDRESS)newlib);
     return TRUE;
   }
-  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s", libnamebuf);
+  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s %s", libnamebuf,
+				   text_buffer);
   if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
     Warn( "library %s has an old format. Please fix it for the next time",
 	  newlib);

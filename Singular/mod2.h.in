@@ -131,6 +131,7 @@
 
 /* Define to use new namespaces techniks */
 #undef HAVE_NAMESPACES
+#undef HAVE_DYNAMIC_LOADING
 
 /* Define to use scanner when loading libraries */
 #define HAVE_LIBPARSER
@@ -205,7 +206,7 @@
 #ifndef HAVE_LIBPARSER
 #  undef YYLPDEBUG
 #else
-#  define YYLPDEBUG 0
+#  define YYLPDEBUG 1
 #endif
 
 #ifndef FALSE
