@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.205 2001-02-13 18:02:58 mschulze Exp $
+@comment $Id: reference.doc,v 1.206 2001-02-21 15:40:28 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5837,6 +5837,7 @@ type of the returned value is either string or int.
 @cindex system, --long_option_name=value
 @cindex random number generator, seed
 @cindex browsers, setting the
+@cindex browser, setting the
 @cindex help browsers, setting the
 @cindex timer resolution, setting the
 @cindex minimal display time, setting the
