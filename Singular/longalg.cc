@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.48 2000-11-17 14:07:11 Singular Exp $ */
+/* $Id: longalg.cc,v 1.49 2000-11-20 17:29:45 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -170,6 +170,21 @@ void naSetChar(int i, BOOLEAN complete, ring r)
 #define napSetCoeff(p,n) {nacDelete(&((p)->ko));(p)->ko=n;}
 #define napIter(A) A=(A)->ne
 
+
+#ifdef LDEBUG
+static void napTest(alg p)
+{
+  while (p != NULL)
+  {
+    if (naIsChar0)
+      nlDBTest(p->ko, "", 0);
+    omCheckAddrSize(p, napMonomSize);
+    p = p->ne;
+  }
+}
+#else
+#define napTest(p) ((void) 0)
+#endif
 
 /*3
 * creates  an alg poly
@@ -469,6 +484,8 @@ static void napMultT(alg a, alg exp)
       }
       while (a!=NULL);
     }
+    // need to do this, since nacNeg might have changed h
+    exp->ko = h;
   }
 }
 
