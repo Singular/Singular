@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_gcd.cc,v 1.7 1997-04-07 15:05:38 schmidt Exp $
+// $Id: cf_gcd.cc,v 1.8 1997-04-30 12:58:35 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  1997/04/07 15:05:38  schmidt
+#include <config.h> added
+
 Revision 1.6  1997/03/26 16:39:06  schmidt
 debug output changed to DEBOUT
 
@@ -335,7 +338,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 	else {
 	    return gcd_poly( F, G, false );
 	}
-	DEBOUTLN( cerr, "another try ...", ' ' );
+	DEBOUTLN( cerr, "another try ..." );
     }
 }
 
