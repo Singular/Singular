@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.21 2003-01-29 17:49:29 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.22 2003-01-29 19:13:36 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -20,6 +20,7 @@
 #include "kbuckets.h"
 #include "kstd1.h"
 #include "sbuckets.h"
+#include "prCopy.h"
 
 /* global nc_macros : */
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(Exponent_t))
@@ -94,14 +95,7 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
     expP=p_GetComp(v,r);
     if (expP==0)
     {
-      if (expM==0)
-      {
-        expOut=0;
-      }
-      else
-      {
-        expOut=expM;
-      }
+      expOut=expM;
     }
     else
     {
@@ -174,14 +168,7 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
     expP=p_GetComp(v,r);
     if (expP==0)
     {
-      if (expM==0)
-      {
-        expOut=0;
-      }
-      else
-      {
-        expOut=expM;
-      }
+      expOut=expM;
     }
     else
     {
@@ -636,36 +623,35 @@ poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 
   if (((a<cMTsize)&&(b<cMTsize))&&(MATELEM(cMT,a,b)!=NULL))
   {
-    out=p_Copy(MATELEM(cMT,a,b),r);
+    out = prCopyR_NoSort(MATELEM(cMT,a,b),r->nc->basering, r);
+    //   out=p_Copy(MATELEM(cMT,a,b),r);
     return (out);
   }
 
-  /*  poly C=MATELEM(r->nc->C,j,i);               */
-  /*  number c=p_GetCoeff(C,r); //coeff           */
-  /*  p_Delete(&C,r); */
-
   int newcMTsize=0;
-  int k,m;
+  int k,l,m;
 
   if (a>=b) {newcMTsize=a;} else {newcMTsize=b;}
   if (newcMTsize>cMTsize)
   {
      newcMTsize = newcMTsize+cMTsize;
      matrix tmp = mpNew(newcMTsize,newcMTsize);
-
+     l=UPMATELEM(j,i,r->N);
      for (k=1;k<=cMTsize;k++)
      {
         for (m=1;m<=cMTsize;m++)
         {
-           MATELEM(tmp,k,m) = MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m);
-           //           omCheckAddr(tmp->m);
-           MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m)=NULL;
-           //           omCheckAddr(r->nc->MT[UPMATELEM(j,i,r->N)]->m);
+	  MATELEM(tmp,k,m) = nc_p_CopyPut(MATELEM(r->nc->MT[l],k,m),r);
+	  //	  MATELEM(tmp,k,m) = MATELEM(r->nc->MT[l],k,m);
+	  //           omCheckAddr(tmp->m);
+	  //	  MATELEM(r->nc->MT[l],k,m)=NULL;
+	  p_Delete(&MATELEM(r->nc->MT[l],k,m),r);
+	  //           omCheckAddr(r->nc->MT[UPMATELEM(j,i,r->N)]->m);
         }
      }
-     id_Delete((ideal *)&(r->nc->MT[UPMATELEM(j,i,r->N)]),r);
-     r->nc->MT[UPMATELEM(j,i,r->N)] = tmp;
-     r->nc->MTsize[UPMATELEM(j,i,r->N)] = newcMTsize;
+     id_Delete((ideal *)&(r->nc->MT[l]),r->nc->basering);
+     r->nc->MT[l] = tmp;
+     r->nc->MTsize[l] = newcMTsize;
   }  /* The update of multiplication matrix is finished */
 
   cMT=r->nc->MT[UPMATELEM(j,i,r->N)];         /* cMT=current MT */
@@ -678,34 +664,43 @@ poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 
   for (k=2;k<=a;k++)
   {
-     t=MATELEM(cMT,k,1);
+     t = nc_p_CopyGet(MATELEM(cMT,k,1),r);
 
      if (t==NULL)   /* not computed yet */
      {
-        t=p_Copy(MATELEM(cMT,k-1,1),r);
-        t = nc_mm_Mult_p(y,t,r);
-        MATELEM(cMT,k,1) = t;
-        //        omCheckAddr(cMT->m);
+       t = nc_p_CopyGet(MATELEM(cMT,k-1,1),r);
+       //        t=p_Copy(MATELEM(cMT,k-1,1),r);
+       t = nc_mm_Mult_p(y,t,r);
+       MATELEM(cMT,k,1) = nc_p_CopyPut(t,r);
+       //        omCheckAddr(cMT->m);
+       p_Delete(&t,r);
      }
      t=NULL;
   }
 
   for (m=2;m<=b;m++)
   {
-     t=MATELEM(cMT,a,m);
-     if (t==NULL)   //not computed yet
-     {
-        t=p_Copy(MATELEM(cMT,a,m-1),r);
-        t = nc_p_Mult_mm(t,x,r);
-        MATELEM(cMT,a,m) = t;
-        //        omCheckAddr(cMT->m);
-     }
-     t=NULL;
+    t = nc_p_CopyGet(MATELEM(cMT,a,m),r);
+    //     t=MATELEM(cMT,a,m);
+    if (t==NULL)   //not computed yet
+    {
+      t = nc_p_CopyGet(MATELEM(cMT,a,m-1),r);
+      //      t=p_Copy(MATELEM(cMT,a,m-1),r);
+      t = nc_p_Mult_mm(t,x,r);
+      MATELEM(cMT,a,m) = nc_p_CopyPut(t,r);
+      //      MATELEM(cMT,a,m) = t;
+      //        omCheckAddr(cMT->m);
+      p_Delete(&t,r);
+    }
+    t=NULL;
   }
   p_Delete(&x,r);
   p_Delete(&y,r);
-  t=MATELEM(cMT,a,b);
-  return(p_Copy(t,r));  /* as the last computed element was cMT[a,b] */
+  //  t=MATELEM(cMT,a,b);
+  t= nc_p_CopyGet(MATELEM(cMT,a,b),r);
+  //  return(p_Copy(t,r));  
+  /* since the last computed element was cMT[a,b] */
+  return(t);     
 }
 
 poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
@@ -1059,9 +1054,11 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
   p_Setm(pL,r);
   p_Test(pL,r);
   p_ExpVectorDiff(m1,pL,p1,r);
+  p_SetComp(m1,0,r);
   p_Setm(m1,r);
   p_Test(m1,r);
   p_ExpVectorDiff(m2,pL,p2,r);
+  p_SetComp(m2,0,r);
   p_Setm(m2,r);
   p_Test(m2,r);
   p_Delete(&pL,r);
@@ -1098,6 +1095,7 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
   //  n_Delete(&C1,r);
   //  n_Delete(&C2,r);
   n_Delete(&MinusOne,r);
+  p_Test(M2,r);
   return(M2);
 }
 
@@ -1113,6 +1111,7 @@ void nc_spGSpolyRedTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
   number cQ=p_GetCoeff(Q,r);
   poly m=pOne();
   p_ExpVectorDiff(m,Q,p1,r);
+  p_SetComp(m,0,r);
   p_Setm(m,r);
   p_Test(m,r);
   /* pSetComp(m,r)=0? */
@@ -1150,6 +1149,7 @@ poly nc_spShort(poly p1, poly p2, const ring r)
   poly m=pOne();
   pLcm(p1,p2,m);
   p_Setm(m,r);
+  p_Test(m,r);
   return(m);
 }
 
@@ -1500,5 +1500,28 @@ void ncKill(ring r)
   omFreeSize((ADDRESS)r->nc,sizeof(nc_struct));
   r->nc=NULL;
 }
+
+poly nc_p_CopyGet(poly a, ring r)
+/* for use in getting the mult. martix elements*/
+{
+  if (!rIsPluralRing(r)) return(p_Copy(a,r));
+  if (r==r->nc->basering) return(p_Copy(a,r));
+  else
+  {
+    return(prCopyR_NoSort(a,r->nc->basering,r));
+  }
+}
+
+poly nc_p_CopyPut(poly a, ring r)
+/* for use in defining the mult. martix elements*/
+{
+  if (!rIsPluralRing(r)) return(p_Copy(a,r));
+  if (r==r->nc->basering) return(p_Copy(a,r));
+  else
+  {
+    return(prCopyR_NoSort(a,r,r->nc->basering));
+  }
+}
+
 
 #endif

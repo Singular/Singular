@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.194 2003-01-29 17:51:27 Singular Exp $ */
+/* $Id: extra.cc,v 1.195 2003-01-29 19:13:35 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1454,7 +1454,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	{
 	  for(j=i+1;j<=currRing->N;j++)
 	  {
-	    MATELEM(C,i,j)=pCopy(pN);
+	    MATELEM(C,i,j) = nc_p_CopyPut(pN,currRing);
+	    //  MATELEM(C,i,j)=pCopy(pN);
 	  }
 	}
       }
@@ -1500,7 +1501,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	{
 	  for(j=i+1;j<=currRing->N;j++)
 	  {
-	    MATELEM(D,i,j)=pCopy(pN);
+	    MATELEM(D,i,j) = nc_p_CopyPut(pN,currRing);
+	    //	    MATELEM(D,i,j)=pCopy(pN);
 	  }
 	}
       }
@@ -1518,7 +1520,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       short DefMTsize=7;
       int IsSkewConstant=1;
       int IsNonComm=0;
-      pN=MATELEM(currRing->nc->C,1,2);
+      pN=nc_p_CopyGet(MATELEM(currRing->nc->C,1,2),currRing);
+      //      pN=MATELEM(currRing->nc->C,1,2);
+		   
       for(i=1;i<currRing->N;i++)
       {
         for(j=i+1;j<=currRing->N;j++)
@@ -1547,8 +1551,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	  pSetExp(p,i,1);
 	  pSetExp(p,j,1);
 	  pSetm(p);
-	  p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
-	  MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=p;
+	  //	  p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
+	  p=pAdd(p,nc_p_CopyGet(MATELEM(currRing->nc->D,i,j),currRing));
+	  //	  MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=p;
+	  MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=nc_p_CopyPut(p,currRing);
+	  pDelete(&p);
 	  p=NULL;
 	}
 	/* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
