@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.h,v 1.7 1997-12-17 11:31:11 schmidt Exp $ */
+/* $Id: int_cf.h,v 1.8 1997-12-17 14:10:13 schmidt Exp $ */
 
 #ifndef INCL_INT_CF_H
 #define INCL_INT_CF_H
@@ -54,7 +54,7 @@ public:
     virtual bool isUnivariate() const { return false; }
     virtual int intval() const;
     virtual int intmod( int ) const { return 0; }
-    virtual int sign() PVIRT_INT("sign");
+    virtual int sign() const PVIRT_INT("sign");
 
     virtual InternalCF* num();
     virtual InternalCF* den();
