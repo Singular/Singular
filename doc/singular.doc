@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.81 1999-09-08 13:08:10 Singular Exp $
+@comment $Id: singular.doc,v 1.82 1999-10-25 09:08:07 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -253,6 +253,7 @@ LIB "all.lib";
 @menu
 * matrix_lib:: procedures for matrix operations
 * jordan_lib:: procedures to compute the jordan normal form
+* linalg_lib:: procedures for algorithmic linear algebra
 @end menu
 
 @c ----------------------------------------------------------
@@ -260,9 +261,13 @@ LIB "all.lib";
 @subsection matrix_lib
 @c lib matrix.lib
 @c ---------------------------------------------------------
-@node jordan_lib, , matrix_lib, Linear algebra
+@node jordan_lib, linalg_lib, matrix_lib, Linear algebra
 @subsection jordan_lib
 @c lib jordan.lib
+@c ---------------------------------------------------------
+@node linalg__lib, , jordan_lib, Linear algebra
+@subsection linalg_lib
+@c lib linalg.lib
 @c ----------------------------------------------------------------------------
 @node Commutative algebra, Singularities, Linear algebra, SINGULAR libraries
 @section Commutative algebra
