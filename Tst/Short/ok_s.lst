@@ -34,6 +34,7 @@ cyc5_lp
 bug_sres
 bug_sres_betti
 bug_sres_cyc5
+classify_s
 dbm_s
 deform_s
 elimlib_s
