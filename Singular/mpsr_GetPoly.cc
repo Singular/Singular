@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.30 2000-10-19 15:00:18 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.31 2000-12-07 16:25:19 Singular Exp $ */
 
 /***************************************************************
  *
@@ -251,7 +251,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     }
     *x =  (number) omAlloc0Bin(rnumber_bin);
     y = (number) *x;
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
     y->debug = 123456;
 #endif
     y->s = 1;
@@ -276,7 +276,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
       // otherwise, make an apint out of it
       *x =  (number) omAlloc0Bin(rnumber_bin);
       y = (number) *x;
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
       y->debug = 123456;
 #endif
       mpz_init_set_ui(&(y->z), ui);
@@ -300,16 +300,12 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
  * Algebraic Numbers (a la Singular)
  *
  ***************************************************************/
-static inline mpsr_Status_t GetAlgPoly(MP_Link_pt link, alg *p)
+static inline mpsr_Status_t GetAlgPoly(MP_Link_pt link, napoly *p)
 {
   MP_Uint32_t j, nm;
   int i;
-  alg a;
-#if SIZEOF_INT == SIZEOF_PARAMETER
-  Exponent_t *exp;
-#else
+  napoly a;
   int *exp;
-#endif
 
   IMP_GetUint32(link, &nm);
 
@@ -321,31 +317,21 @@ static inline mpsr_Status_t GetAlgPoly(MP_Link_pt link, alg *p)
   a = napNew();
   *p = a;
 
-  failr(GetAlgNumberNumber(link, &(a->ko)));
-#if SIZEOF_INT == SIZEOF_PARAMETER
-  exp = &(a->e[0]);
-  mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &exp, naNumbOfPar));
-#else
+  failr(GetAlgNumberNumber(link, &(napGetCoeff(a))));
   mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, naNumbOfPar));
   for (i=0; i<naNumbOfPar; i++)
-    a->e[i] = (PARAMETER_TYPE) gTa[i];
-#endif
+    napSetExp(a,i+1,gTa[i]);
 
   for (j=1; j<nm; j++)
   {
-    a->ne = napNew();
-    a = a->ne;
-    failr(GetAlgNumberNumber(link, &(a->ko)));
-#if SIZEOF_INT == SIZEOF_PARAMETER
-    exp = &(a->e[0]);
-    mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &exp, naNumbOfPar));
-#else
-  mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, naNumbOfPar));
-  for (i=0; i<naNumbOfPar; i++)
-    a->e[i] = (PARAMETER_TYPE) gTa[i];
-#endif
+    napNext(a) = napNew();
+    napIter(a);
+    failr(GetAlgNumberNumber(link, &(napGetCoeff(a))));
+    mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, naNumbOfPar));
+    for (i=0; i<naNumbOfPar; i++)
+      napSetExp(a,i+1,gTa[i]);
   }
-  a->ne = NULL;
+  napNext(a) = NULL;
 
   return mpsr_Success;
 }
@@ -1023,5 +1009,4 @@ extern mpsr_Status_t mpsr_rSetOrdSgn(ring r)
   }
   return mpsr_Success;
 }
-
 #endif

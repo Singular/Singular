@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.18 2000-12-07 15:21:07 Singular Exp $ */
+/* $Id: longalg.h,v 1.19 2000-12-07 16:25:18 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -39,6 +39,7 @@ extern int napMonomSize;
 
 void naSetChar(int p, BOOLEAN complete, ring r);
 #define napAddExp(p,i,e)  ((p)->e[i-1]+=(e))
+#define napLength(p)      (pLength((poly)p))
 #ifdef LDEBUG
 void    naDBDelete (number *p,char *f, int l);
 #define naDelete(A) naDBDelete(A,__FILE__,__LINE__)
@@ -89,8 +90,10 @@ void napDelete(alg *p);
 poly naPermNumber(number z, int * par_perm, int P);
 #define napVariables naNumbOfPar
 #define napNext(p) (p->ne)
+#define napIter(p) ((p) = (p)->ne)
 #define napGetCoeff(p) (p->ko)
-#define napGetExp(p,i) (p->e[(i)-1])
+#define napGetExp(p,i) ((p)->e[(i)-1])
+#define napSetExp(p,i,ee) ((p)->e[(i)-1]=ee)
 #define napNew() ((alg)omAlloc0(napMonomSize))
 #define nanumber lnumber
 #define naGetNom0(na)  (((nanumber)(na))->z)

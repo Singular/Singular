@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.20 2000-09-18 09:19:22 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.21 2000-12-07 16:25:19 Singular Exp $ */
 
 /***************************************************************
  *
@@ -66,7 +66,7 @@ static void        SetPutFuncs(ring r);
 static mpsr_Status_t PutModuloNumber(MP_Link_pt link, number a);
 static mpsr_Status_t PutFloatNumber(MP_Link_pt link, number a);
 static mpsr_Status_t PutRationalNumber(MP_Link_pt link, number a);
-static mpsr_Status_t PutAlgPoly(MP_Link_pt link, alg a);
+static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a);
 static mpsr_Status_t PutAlgNumber(MP_Link_pt link, number a);
 
 static mpsr_Status_t PutVarNamesAnnot(MP_Link_pt link, ring r);
@@ -176,14 +176,9 @@ static mpsr_Status_t PutRationalNumber(MP_Link_pt link, number a)
  * Algebraic Numbers (a la Singular)
  *
  ***************************************************************/
-inline MP_Uint32_t GetPlength(alg a)
+inline MP_Uint32_t GetPlength(napoly a)
 {
-  MP_Uint32_t i = 0;
-  while (a != NULL)
-  {
-    i++;
-    a = a->ne;
-  }
+  MP_Uint32_t i = napLength(a);
   return i;
 }
 
@@ -200,21 +195,21 @@ static mpsr_Status_t PutAlgNumber(MP_Link_pt link, number a)
     // hence, we use the first case of the union
     mp_failr(IMP_PutUint32(link, 1));
     mp_failr(IMP_PutUint32(link, GetPlength(b->z)));
-    return PutAlgPoly(link, (alg) (b->z));
+    return PutAlgPoly(link, b->z);
   }
   else
   {
     // we use the 2nd case of the union
     mp_failr(IMP_PutUint32(link, 2));
     mp_failr(IMP_PutUint32(link, GetPlength(b->z)));
-    failr(PutAlgPoly(link, (alg) (b->z)));
+    failr(PutAlgPoly(link, b->z));
     mp_failr(IMP_PutUint32(link, GetPlength(b->n)));
-    return PutAlgPoly(link, (alg) (b->n));
+    return PutAlgPoly(link, b->n);
   }
 }
 
 // this is very similar to putting a Poly
-static mpsr_Status_t PutAlgPoly(MP_Link_pt link, alg a)
+static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a)
 {
   unsigned int i;
   int *exp;
@@ -222,23 +217,19 @@ static mpsr_Status_t PutAlgPoly(MP_Link_pt link, alg a)
   if (gNalgvars > 1)
     while (a != NULL)
     {
-      failr(PutAlgAlgNumber(link, a->ko));
-#if (SIZEOF_INT == SIZEOF_PARAMETER)
-      mp_failr(IMP_PutSint32Vector(link, (MP_Sint32_t *) a->e, gNalgvars));
-#else
+      failr(PutAlgAlgNumber(link, napGetCoeff(a)));
       for (i=0; i<gNalgvars; i++)
-        gTa[i] = a->e[i];
+        gTa[i] = napGetExp(a,i+1);
       mp_failr(IMP_PutSint32Vector(link, gTa, gNalgvars));
-#endif
-      a = a->ne;
+      napIter(a);
     }
   else
   {
     while (a != NULL)
     {
-      failr(PutAlgAlgNumber(link, a->ko));
-      IMP_PutSint32(link, (MP_Sint32_t) a->e[0]);
-      a = a->ne;
+      failr(PutAlgAlgNumber(link, napGetCoeff(a)));
+      IMP_PutSint32(link, (MP_Sint32_t) napGetExp(a,1));
+      napIter(a);
     }
   }
   return mpsr_Success;
