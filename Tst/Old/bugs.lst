@@ -1,12 +1,6 @@
 ;;; here are those from universal.lst which are still buggy
-regul
-res
-m114si 
-m8ex
-m10ex
-m11ex
-m19ex
-err5
-syzygies
-m85si
-m114si
+regul    ; result of mres
+m8ex     ; order of polys in ideal which is result of intersection
+m10ex    ; qring and ext
+err5     ; qring stuff
+syzygies ; should be ok, minor differences
