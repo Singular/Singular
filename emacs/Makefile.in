@@ -33,5 +33,3 @@ clean:
 ${SINGULAR_HLP}:
 	cd ${docdir}; make singular.hlp
 
-${SINGULAR}:
-	cd ..; make install
