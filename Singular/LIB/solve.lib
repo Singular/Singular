@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.3 1999-06-29 09:05:16 wenk Exp $";
+version="$Id: solve.lib,v 1.4 1999-07-02 11:58:07 greuel Exp $";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
@@ -93,7 +93,9 @@ proc laguerre_solve( poly f, list # )
          l>0: defines precision of fractional part if ground field is Q
          m=0,1,2: number of iterations for approximation of roots (default=2)
 ASSUME:  p is an univariate polynom
-RETURN:  list of all (complex) roots of the polynomial p
+RETURN:  list of all (complex) roots of the polynomial p;
+         of type number if the ground field is the complex numbers,
+         of type string if the ground field is the rational or real numbers
 EXAMPLE: example laguerre_solve; shows an example
 "
 {
