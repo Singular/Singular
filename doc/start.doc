@@ -1,6 +1,7 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.25 1998-06-02 12:52:13 wichmann Exp $
+@comment $Id: start.doc,v 1.26 1998-06-04 13:36:23 wichmann Exp $
 @comment this file contains the "Introduction" chapter.
+@c * wichmann: + added chages by GMG.
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
@@ -222,7 +223,7 @@ are available without a ring.
 * Procedures and libraries::    
 * Change of rings::             
 * Modules and their annihilator::  
-* Resolution and Ext groups::   
+* Resolution::                  
 @end menu
 
 @c ------------------------------------------------------------------
@@ -271,8 +272,8 @@ int j;
 j = k+1;
 @end example
 
-@noindent The last displayed result is always available with the special
-symbol @code{_} .
+@noindent The last displayed (!) result is always available
+with the special symbol @code{_} .
 
 @example
 2*_;   // the value from k displayed above
@@ -283,7 +284,7 @@ Text starting with @code{//} denotes a comment and is ignored in
 calculations, as seen in the previous example. Furthermore @sc{Singular}
 maintains a history of the last inputs, which may be accessed by
 @code{CTRL-P} (previous) and @code{CTRL-N} (next) or the arrows on the
-keyboard.
+keyboard. Note, that the history is not available on Macintosh systems.
 
 The whole manual is online available with the command @code{help;} .
 Explanation on single topics, e.g., on @code{intmat}, which defines a
@@ -374,35 +375,72 @@ ring r = 0,(x,y,z),dp;
 @end example   
 
 The definition of a ring consists of three parts: the first part
-determines the characteristic of the ground field, the second part
-determines the names of the ring variables, and the third part
-determines the monomial ordering to be used. So the example above
-declares a polynomial ring called @code{r} with a ground field of
-characteristic @math{0} (i.e., the rational numbers) and ring variables
-called @code{x}, @code{y}, and @code{z}. The @code{dp} at the end means,
-that the degree reverse lexicographical ordering should be used.
+determines the ground field, the second part determines the names of the
+ring variables, and the third part determines the monomial ordering to
+be used. So the example above declares a polynomial ring called @code{r}
+with a ground field of characteristic @math{0} (i.e., the rational
+numbers) and ring variables called @code{x}, @code{y}, and @code{z}. The
+@code{dp} at the end means, that the degree reverse lexicographical
+ordering should be used.
 
-Another valid characteristic would be, for example, a prime number less
-or equal to @math{32003}. The name of the ring variables may be any
-valid @sc{Singular} name. Even indexed names are allowed, so
-@code{x(1..10)} specifies the ring variables @code{x(1)}, @dots{},
-@code{x(10)}. @sc{Singular} offers the possibility to calculate with any 
-monomial ordering, some orderings are predefined with special names like 
-@code{dp} in the example above. Another important example is the
-lexicographical ordering called @code{lp}. 
+Other ring declarations:
 
-The concept of rings in @sc{Singular} is discussed in detail in
-@ref{Rings and orderings}.
+@table @code 
+@item ring r1=32003,(x,y,z),dp;
+characteristic 32003, variables @code{x}, @code{y}, and @code{z} and
+ordering @code{dp}.
 
-Defining a ring makes this ring the current basering and once a basering
-is active, we can define polynomials. A monomial, say
+@item ring r2=32003,(a,b,c,d),lp;
+characteristic 32003, variable names @code{a}, @code{b}, @code{c},
+@code{d} and lexicographical ordering.
+
+@item ring r3=7,(x(1..10)),ls;
+characteristic 7, variable names @code{x(1)},@dots{},@code{x(10)}, negative
+lexicographical ordering.
+
+@item ring r4=(0,a),(mu,nu),lp;
+transcendental extension of @math{Q} by @math{a}, variable names
+@code{mu} and @code{nu}.
+@end table
+
+@c Another valid characteristic would be, for example, a prime number less
+@c or equal to @math{32003}. The name of the ring variables may be any
+@c valid @sc{Singular} name. Even indexed names are allowed, so
+@c @code{x(1..10)} specifies the ring variables @code{x(1)}, @dots{},
+@c @code{x(10)}. @sc{Singular} offers the possibility to calculate with any 
+@c monomial ordering, some orderings are predefined with special names like 
+@c @code{dp} in the example above. Another important example is the
+@c lexicographical ordering called @code{lp}. 
+@c
+Typing the name of a ring prints its definition. The example below
+shows, that the default ring in @sc{Singular} is @math{Z/32003[x,y,z]}
+with degree reverse lexicographical ordering:
+@example
+@c example
+ring r5;
+r5;
+@c example
+@end example
+
+Defining a ring makes this ring the current active basering, so each
+ring definition above switches to a new basering. The concept of rings
+in @sc{Singular} is discussed in detail in @ref{Rings and orderings}.
+
+The basering now is @code{r5}. Since we want to calcualate in the ring
+@code{r}, which we defined first, we have to switch back to it. This can
+be done using the function @code{setring}:
+
+@example
+setring r;
+@end example
+Once a ring is active, we can define polynomials. A monomial, say
 @tex
 $x^3$
 @end tex
-@iftex
+@ifinfo
 x^3
-@end iftex
-may be entered in two ways: Either using the power operator @code{^},
+@end ifinfo
+may be entered in two ways: either using the power operator @code{^},
 saying @code{x^3}, or in short-hand notation without operator, saying
 @code{x3}. Note, that the short-hand notation is forbidden if the name
 of the ring variable consists of more than one character.
@@ -414,8 +452,10 @@ f;
 @expansion{} x3y2-x2y3+x3+y3+z2
 @end example
 
-@noindent The command @code{size} determines in general the number of
-''single entries`` in an object. In particular, for polynomials,
+@noindent Note, that @sc{Singular} always expands brackets etc.@: and
+automatically sorts the terms with respect to the monomial ordering of
+the basering. The command @code{size} determines in general the number
+of ''single entries`` in an object. In particular, for polynomials,
 @code{size} determines the number of monomials.
 
 @example
@@ -458,10 +498,12 @@ reduce(g,sI);
 ideal defined by @code{g}.
 
 The command @code{kbase} calculates a basis of the polynomial ring
-modulo an ideal. As an example we calculate the Milnor number of a hyper
-surface singularity in the global and local case. This is the vector
-space dimension of the polynomial ring modulo the Jacobian ideal in the
-global case resp.@: of the power series ring modulo the Jacobian ideal.
+modulo an ideal. As an example we calculate the Milnor number of a
+hypersurface singularity in the global and local case. This is the
+vector space dimension of the polynomial ring modulo the Jacobian ideal
+in the global case resp.@: of the power series ring modulo the Jacobian
+ideal in the local case. @xref{Critical points}, for a detailed
+explanation. 
 
 The Jacobian ideal is obtained with the command @code{jacob}.
 
@@ -503,11 +545,17 @@ K;
 @noindent Then
 
 @example
-size(I);
+size(K);
 @expansion{} 12
 @end example
 
-@noindent gives the desired vector space dimension.
+@noindent gives the desired vector space dimension
+@tex
+$K[x,y,z]/\hbox{\rm jacob}(f)$.
+@end tex
+@ifinfo
+K[x,y,z]/jacob(f).
+@end ifinfo
 As in @sc{Singular} the functions may take directly the input from 
 earlier calculations, all may be written together in one single statement.
 
@@ -537,14 +585,21 @@ commands to a new one. Procedures are defined with the keyword
 specified types.  Finally, a procedure may return values with the
 command @code{return}.
 
-Define the following procedure called @code{Milnor}
+Define the following procedure called @code{Milnor}:
 
 @example
 proc Milnor(poly h)
 @{
- return(vdim(groebner(jacob(h))));
+  return(vdim(groebner(jacob(h))));
 @}
 @end example
+
+Note: if you have entered the first line of the procedure and pressed
+@code{RETURN}, @sc{Singular} prints the prompt @code{.} (dot) instead of
+the usual prompt @code{>} . This shows, that the input is incomplete and
+@sc{Singular} expects more lines. After typing the closing bracket,
+@sc{Singular} prints the usual prompt indicating that the input is now
+complete.
 
 @noindent Then call the procedure:
 
@@ -552,6 +607,9 @@ proc Milnor(poly h)
 Milnor(f);
 @expansion{} 12
 @end example
+
+@noindent Note, that the result may depend on the basering as we will
+see in the next chapter.
 
 With @sc{Singular} come several libraries, a collection of useful
 procedures based on the kernel commands, which extend the functionality
@@ -565,7 +623,7 @@ together with a one-line explanation.
 
 One of these libraries is @code{sing.lib} which contains already a
 procedure called @code{milnor} to calculate the Milnor number not only
-for hyper surfaces but more generally for complete intersection
+for hypersurfaces but more generally for complete intersection
 singularities.
 
 Libraries are loaded with the command @code{LIB}. Some additional
@@ -589,45 +647,45 @@ which is shown with
 
 @example
 help milnor;
-@expansion{} // proc milnor from lib sing.lib
-@expansion{} proc milnor (ideal i)
-@expansion{} USAGE:   milnor(i); i ideal or poly
-@expansion{} RETURN:  Milnor number of i, if i is ICIS (isolated complete intersection
-@expansion{}          singularity) in generic form, resp. -1 if not
-@expansion{} NOTE:    use proc nf_icis to put generators in generic form
-@expansion{}          printlevel >=0: display comments (default)
-@expansion{} EXAMPLE: example milnor; shows an example
-@expansion{}
+@c @expansion{} // proc milnor from lib sing.lib
+@c @expansion{} proc milnor (ideal i)
+@c @expansion{} USAGE:   milnor(i); i ideal or poly
+@c @expansion{} RETURN:  Milnor number of i, if i is ICIS (isolated complete intersection
+@c @expansion{}          singularity) in generic form, resp. -1 if not
+@c @expansion{} NOTE:    use proc nf_icis to put generators in generic form
+@c @expansion{}          printlevel >=0: display comments (default)
+@c @expansion{} EXAMPLE: example milnor; shows an example
+@c @expansion{}
 @end example
 
 @noindent as well as some examples, which are executed with
 
 @example
 example milnor;
-@expansion{} // proc milnor from lib sing.lib
-@expansion{} EXAMPLE:
-@expansion{}    int p      = printlevel;
-@expansion{}    printlevel = 1;
-@expansion{}    ring r     = 32003,(x,y,z),ds;
-@expansion{}    ideal j    = x5+y6+z6,x2+2y2+3z2,xyz+yx;
-@expansion{}    milnor(j);
-@expansion{} //sequence of discriminant numbers: 100,149,70 
-@expansion{} 21
-@expansion{}    poly f     = x7+y7+(x-y)^2*x2y2+z2;
-@expansion{}    milnor(f);
-@expansion{} 28
-@expansion{}    printlevel = p;
-@expansion{} 
+@c @expansion{} // proc milnor from lib sing.lib
+@c @expansion{} EXAMPLE:
+@c @expansion{}    int p      = printlevel;
+@c @expansion{}    printlevel = 1;
+@c @expansion{}    ring r     = 32003,(x,y,z),ds;
+@c @expansion{}    ideal j    = x5+y6+z6,x2+2y2+3z2,xyz+yx;
+@c @expansion{}    milnor(j);
+@c @expansion{} //sequence of discriminant numbers: 100,149,70 
+@c @expansion{} 21
+@c @expansion{}    poly f     = x7+y7+(x-y)^2*x2y2+z2;
+@c @expansion{}    milnor(f);
+@c @expansion{} 28
+@c @expansion{}    printlevel = p;
+@c @expansion{} 
 @end example
 
-Likewise the library itself has a help part, to show all the functions
+@noindent Likewise the library itself has a help part, to show all the functions
 available for the user defined in the library.
 
 @example
 help sing.lib;
 @end example
 
-The output of the command is omitted here.
+@noindent The output of the help commands is omitted here.
 
 @c ------------------------------------------------------------------
 @node Change of rings, Modules and their annihilator, Procedures and libraries, Getting started
@@ -653,8 +711,13 @@ f;
 @expansion{} z2+x3+y3+x3y2-x2y3
 @end example
 
-Here the terms are ordered by increasing exponents. The local Milnor number is
-now 
+@noindent Instead of @code{fetch} we can use the function @code{imap}
+which is more general but less efficient. The most general way to fetch
+data from one ring to another is to use maps, this will be explained in
+@ref{Data types}.
+
+Here the terms are ordered by increasing exponents. The local Milnor
+number is now
 
 @example
 Milnor(f);
@@ -711,10 +774,16 @@ minor(H,1);  // the 1x1 - minors
 @expansion{} _[5]=6x+6xy2-2y3
 @end example
 
-The variety defined by the one-dimensional minors is empty.
-With the command @code{option} the algorithm of the standard basis 
-may be affected. For instance a reduced standard basis is obtained 
-in the following way  
+The variety defined by the
+@tex
+$1\times1$-minors
+@end tex
+@ifinfo
+1 x 1 - minors
+@end ifinfo
+is empty. With the command @code{option} the algorithm of the standard
+basis may be affected. For instance a reduced standard basis is obtained
+in the following way
 
 @example
 option(redSB);
@@ -740,7 +809,7 @@ hence the variety is empty.
 @c @cindex Maps and elimination
 
 @c ------------------------------------------------------------------
-@node Modules and their annihilator, Resolution and Ext groups, Change of rings, Getting started
+@node Modules and their annihilator, Resolution, Change of rings, Getting started
 @subsection Modules and their annihilator
 @cindex Modules and and their annihilator
 
@@ -754,10 +823,10 @@ is defined as follows:
 ring rr;
 int n = 4;
 freemodule(4);
-@expansion{} _[1]=1*gen(1)
-@expansion{} _[2]=1*gen(2)
-@expansion{} _[3]=1*gen(3)
-@expansion{} _[4]=1*gen(4)
+@expansion{} _[1]=gen(1)
+@expansion{} _[2]=gen(2)
+@expansion{} _[3]=gen(3)
+@expansion{} _[4]=gen(4)
 typeof(_);
 @expansion{} module
 print(freemodule(4));
@@ -777,7 +846,7 @@ ring r =0,(x,y,z),dp;
 module MD = [x,0,x],[y,z,-y];
 matrix MM = MD;
 print(MM);
-@expansion{} x,-y,
+@expansion{} x,y,
 @expansion{} 0,z, 
 @expansion{} x,-y 
 @end example
@@ -791,7 +860,9 @@ $r^3/MD$.
 r^3/MD.
 @end ifinfo
 In this way @sc{Singular} can treat arbitrary finitely generated modules 
-over the basering. In order to get the module of relations of @math{MD}, 
+over the basering (@pxref{Representation of mathematical objects}).
+
+In order to get the module of relations of @math{MD}, 
 we use the command @code{syz}.
 
 @example
@@ -836,58 +907,18 @@ $\{ a \mid a \in U \colon r^3 \}$.
 @end ifinfo
 The rank of the free module is determined by the choice of U and is the
 number of rows of the corresponding matrix. This may be determined by
-the @code{nrows}. All we have to do now is the following.
+the function @code{nrows}. All we have to do now is the following:
 
 @example
 quotient(U,freemodule(nrows(U)));
-typeof(_);
-@expansion{} ideal
 @end example
 
-As this calculation may take a while, let us measure the time. Reset
-the timer and redo the example.
-
-@example
-timer =0;
-ideal I = quotient(U,freemodule(nrows(U)));
-timer;
-@expansion{} 16
-@end example
-
-Therefore it is useful to simplify the input. In the case of a module the
-command @code{prune} may be used first, which tries to find an isomorphic
-module with smaller rank, i.e., the matrix has less rows.
-
-@example
-prune(U);
-@expansion{} _[1]=x3*gen(3)+xy2*gen(2)+z3*gen(1)
-@expansion{} _[2]=xy5z*gen(3)+yz2*gen(1)+z3*gen(3)+gen(2)
-@expansion{} _[3]=x3*gen(3)+y2z*gen(1)
-@expansion{} _[4]=xyz*gen(1)+x2*gen(1)+y2*gen(2)
-@expansion{} _[5]=x2y*gen(2)+xyz*gen(1)+gen(3)
-timer=0;
-I =  quotient(prune(U),freemodule(nrows(prune(U))));
-timer;
-@expansion{}  
-@end example
+@noindent The result is too big to be shown here.
 
 @c ------------------------------------------------------------------
-@node Resolution and Ext groups,  , Modules and their annihilator, Getting started
-@subsection Resolution and Ext groups
-@cindex Resolution and Ext groups
-
-Another example in the introduction shows how to calculate the
-@math{n}-th Ext group of an ideal. The ingredients to do this, are by
-the definition of Ext the following: calculate a (minimal) resolution at
-least up to length @math{n}, apply the Hom-functor, and calculate the
-@math{n}-th Homology group, so form the quotient 
-@tex
-$\hbox{\rm ker} / \hbox{\rm Im}$
-@end tex
-@ifinfo
-ker/Im
-@end ifinfo
-in the sequence.
+@node Resolution,  , Modules and their annihilator, Getting started
+@subsection Resolution
+@cindex Resolution
 
 The corresponding commands in @sc{Singular} are first the command
 @code{mres( ,n)} which calculates a minimal free resolution with the
@@ -931,6 +962,17 @@ rs;
 @expansion{} rr  <-- rr  <-- rr  <-- rr  <-- rr
 @expansion{}  
 @expansion{} 0       1       2       3       4
+print(betti(rs),"betti");
+@expansion{}            0     1     2     3
+@expansion{} ------------------------------
+@expansion{}     0:     1     0     0     0
+@expansion{}     1:     0     0     0     0
+@expansion{}     2:     0     0     0     0
+@expansion{}     3:     0     4     1     0
+@expansion{}     4:     0     0     1     0
+@expansion{}     5:     0     0     3     2
+@expansion{} ------------------------------
+@expansion{} total:     1     4     5     2
 @end example
 
 A single module in this resolution is obtained as usual with the
@@ -944,52 +986,3 @@ print(rs[3]);
 @expansion{} -2z,  x-y+4z,
 @expansion{} -z,   -y+3z  
 @end example
-
-We continue with the translation into @sc{Singular} commands.  The Hom
-functor is given simply by transposing (hence dualizing) the module or
-the corresponding matrix with the command @code{transpose}.  The image
-of the @math{n-1}-st map is generated by the columns of the
-corresponding matrix. To calculate the kernel apply the command
-@code{syz} at the @math{n-1}-st transposed entry of the resolution.
-Finally, the quotient is obtained by the command @code{modulo}, which
-gives for two modules A = ker, B = Im the module of relations of
-@tex
-$A/(A \cap B)$
-@end tex
-@ifinfo
-A/(A intersect B)
-@end ifinfo
-in the usual way. As we have a chain complex this is obviously the same
-as ker/im.  
-
-We collect these statements in this short procedure.
-
-@example
-proc Ext(int n, ideal I)
-@{
-  resolution rs = mres(I,n+1);
-  module tAn    = transpose(rs[n+1]);
-  module tAn_1  = transpose(rs[n]);
-  module ext_n  = modulo(syz(tAn),tAn_1); 
-  return(ext_n);
-@}
-@end example  
-
-Now consider the following example:
-
-@example
-ring r5 = 32003,(a,b,c,d,e),dp;
-ideal I = a2b2+ab2c+b2cd, a2c2+ac2d+c2de,a2d2+ad2e+bd2e,a2e2+abe2+bce2;
-print(Ext(2,I));
-@expansion{} 1,0,0,0,0,0,0,
-@expansion{} 0,1,0,0,0,0,0,
-@expansion{} 0,0,1,0,0,0,0,
-@expansion{} 0,0,0,1,0,0,0,
-@expansion{} 0,0,0,0,1,0,0,
-@expansion{} 0,0,0,0,0,1,0,
-@expansion{} 0,0,0,0,0,0,1 
-Ext(3,I);   // too big to be displayed here
-@end example
-
-Finally we mention, that  more general procs to calculate 
-Ext groups are implemented in the library @code{homolog.lib}.
