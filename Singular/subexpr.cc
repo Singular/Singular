@@ -93,7 +93,7 @@ void sleftv::Print(leftv store, int spaces)
       return;
     if ((store!=NULL)&&(store!=this))
       store->CleanUp();
-    
+
     switch (t /*=Typ()*/)
       {
         case UNKNOWN:
@@ -127,7 +127,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case RESOLUTION_CMD:
           syPrint((syStrategy)d);
-          break;  
+          break;
         case STRING_CMD:
           ::Print("%-*.*s%s",spaces,spaces," ",(char *)d);
           break;
@@ -137,15 +137,15 @@ void sleftv::Print(leftv store, int spaces)
        case PROC_CMD:
          {
            procinfov pi=(procinfov)d;
-	   ::Print("%-*.*s// libname  : %s\n",spaces,spaces," ",
-		   piProcinfo(pi, "libname"));
-	   ::Print("%-*.*s// procname : %s\n",spaces,spaces," ",
-		   piProcinfo(pi, "procname"));
-	   ::Print("%-*.*s// type     : %s",spaces,spaces," ",
-		   piProcinfo(pi, "type"));
-	   //	   ::Print("%-*.*s// ref      : %s",spaces,spaces," ",
-	   //   piProcinfo(pi, "ref"));
-	   break;
+           ::Print("%-*.*s// libname  : %s\n",spaces,spaces," ",
+                   piProcinfo(pi, "libname"));
+           ::Print("%-*.*s// procname : %s\n",spaces,spaces," ",
+                   piProcinfo(pi, "procname"));
+           ::Print("%-*.*s// type     : %s",spaces,spaces," ",
+                   piProcinfo(pi, "type"));
+           //           ::Print("%-*.*s// ref      : %s",spaces,spaces," ",
+           //   piProcinfo(pi, "ref"));
+           break;
          }
        case POINTER_CMD:
          { package pack = (package)d;
@@ -212,7 +212,7 @@ void sleftv::Print(leftv store, int spaces)
   else if (t!=LIST_CMD)
   {
     PrintLn();
-  }  
+  }
 #ifdef SIQ
   if (rtyp!=COMMAND)
 #endif
@@ -277,8 +277,8 @@ void sleftv::CleanUp()
         rKill((ring)data);
         break;
       case PROC_CMD:
-	piKill((procinfov)data);
-	break;
+        piKill((procinfov)data);
+        break;
       case LINK_CMD:
         slKill((si_link)data);
         break;
@@ -312,7 +312,7 @@ void sleftv::CleanUp()
       case VTIMER:
 #ifdef HAVE_RTIMER
         case VRTIMER:
-#endif          
+#endif
       case VOICE:
       case VMAXDEG:
       case VMAXMULT:
@@ -326,7 +326,7 @@ void sleftv::CleanUp()
         break;
       default:
         ::Print("CleanUp: unknown type %d\n",rtyp);  /* DEBUG */
-#endif          
+#endif
     } /* end switch: (rtyp) */
     data=NULL;
   }
@@ -348,7 +348,7 @@ void sleftv::CleanUp()
       case VTIMER:
 #ifdef HAVE_RTIMER
       case VRTIMER:
-#endif          
+#endif
       case VOICE:
       case VMAXDEG:
       case VMAXMULT:
@@ -514,11 +514,11 @@ void sleftv::Copy(leftv source)
           ring r=(ring)d;
           r->ref++;
           data=d;
-        }  
+        }
         else
         {
           WerrorS("invalid ring description");
-        }  
+        }
         break;
       }
     case RESOLUTION_CMD:
@@ -545,10 +545,9 @@ void sleftv::Copy(leftv source)
 
 void * sleftv::CopyD(int t)
 {
-  if (iiCheckRing(t))
-     return NULL;
   if ((rtyp!=IDHDL)&&(e==NULL))
   {
+    if (iiCheckRing(t)) return NULL;
     void *x=data;
     if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
     else if (rtyp==LIB_CMD)
@@ -558,8 +557,8 @@ void * sleftv::CopyD(int t)
     data=NULL;
     return x;
   }
-  void *d=Data();
-  if (!errorreported) return slInternalCopy(this,t,d,e);
+  void *d=Data(); // will also do a iiCheckRing
+  if ((!errorreported) && (d!=NULL)) return slInternalCopy(this,t,d,e);
   return NULL;
 }
 
@@ -580,7 +579,7 @@ attr sleftv::CopyA()
   attr *a=Attribute();
   if ((a!=NULL) && (*a!=NULL))
     return (*a)->Copy();
-  return NULL;  
+  return NULL;
 }
 
 char *  sleftv::String(void *d)
@@ -663,7 +662,7 @@ char *  sleftv::String(void *d)
       case QRING_CMD:
       {
         return rString((ring)d);
-      }  
+      }
       default:
         #ifdef TEST
         ::Print("String:unknown type %s(%d)", Tok2Cmdname(Typ()),Typ());
@@ -693,7 +692,7 @@ int  sleftv::Typ()
       case VTIMER:
 #ifdef HAVE_RTIMER
       case VRTIMER:
-#endif          
+#endif
       case VOICE:
       case VMAXDEG:
       case VMAXMULT:
@@ -701,7 +700,7 @@ int  sleftv::Typ()
       case VSHORTOUT:
         return INT_CMD;
       case LIB_CMD:
-        return STRING_CMD;  
+        return STRING_CMD;
       case VMINPOLY:
         return NUMBER_CMD;
       case VNOETHER:
@@ -790,7 +789,7 @@ int  sleftv::LTyp()
 
 void * sleftv::Data()
 {
-  if (iiCheckRing(rtyp))
+  if (rtyp!=IDHDL && iiCheckRing(rtyp))
      return NULL;
   if (e==NULL)
   {
@@ -822,7 +821,7 @@ void * sleftv::Data()
                          idhdl h = ggetid( "LIB" );
                          if(h==NULL) return (void *)sNoName;
                          return IDSTRING(h);
-                       }  
+                       }
       case IDHDL:
         return IDDATA((idhdl)data);
       case POINTER_CMD:

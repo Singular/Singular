@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.26 1998-09-24 09:59:51 Singular Exp $
+// $Id: primdec.lib,v 1.27 1998-09-24 12:09:26 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.26 1998-09-24 09:59:51 Singular Exp $";
+version="$Id: primdec.lib,v 1.27 1998-09-24 12:09:26 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -382,7 +382,7 @@ proc specialIdealsEqual( ideal k1, ideal k2)
 
    if(size(k1)==size(k2))
    {
-      for(j=size(k1);j>0;j--)
+      for(j=ncols(k1);j>0;j--)
       {
          if(leadexp(k1[j])!=leadexp(k2[j]))
          {
@@ -400,7 +400,7 @@ proc stdIdealsEqual( ideal k1, ideal k2)
 
    if(size(k1)==size(k2))
    {
-      for(j=size(k1);j>0;j--)
+      for(j=ncols(k1);j>0;j--)
       {
          if(leadexp(k1[j])!=leadexp(k2[j]))
          {
@@ -430,9 +430,9 @@ EXAMPLE: example randomLast; shows an example
 {
 
   ideal i=maxideal(1);
-  int k=size(i);
+  int k=ncols(i);
   i[k]=0;
-  i=randomid(i,size(i),b);
+  i=randomid(i,ncols(i),b);
   ideal ires=maxideal(1);
   ires[k]=i[1]+var(k);
   return(ires);
@@ -471,27 +471,27 @@ proc primaryTest (ideal i, poly p)
       }
       else
       {
-         while (lead(i[m])/var(n-1)==0)
+        while (lead(i[m])/var(n-1)==0)
         {
-            m=m+1;
-         }
-         m=m-1;
+          m=m+1;
+        }
+        m=m-1;
       }
       //check whether i[m] =(c*var(n)+h)^e modulo prm for some
       //h in K[var(n+1),...,var(nvars(basering))], c in K
       //if not (0) is returned, else var(n)+h is added to prm
 
-         e=deg(lead(i[m]));
-         t=leadcoef(i[m])*e*var(n)+(i[m]-lead(i[m]))/var(n)^(e-1);
+      e=deg(lead(i[m]));
+      t=leadcoef(i[m])*e*var(n)+(i[m]-lead(i[m]))/var(n)^(e-1);
 
-         i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
+      i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
 
-         if (reduce(i[m]-t^e,prm,1) !=0)
-         {
-           return(ideal(0));
-         }
-         h=interred(t);
-         t=h[1];
+      if (reduce(i[m]-t^e,prm,1) !=0)
+      {
+        return(ideal(0));
+      }
+      h=interred(t);
+      t=h[1];
 
       prm = prm,t;
       attrib(prm,"isSB",1);
@@ -529,7 +529,6 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
          l[2*i]=ideal(1);
          continue;
       }
-
 
       if(size(l[2*i])==0)
       {
