@@ -1,15 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qmatrix.lib,v 1.3 2004-03-19 16:28:50 levandov Exp $";
+version="$Id: qmatrix.lib,v 1.4 2004-06-01 13:53:36 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups.
 AUTHORS: Lobillo, F.J., email: jlobillo@ugr.es
-	 Rabelo, C., email: crabelo@ugr.es
+@*	 Rabelo, C., email: crabelo@ugr.es
 
 SUPPORT: Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
 MAIN PROCEDURES:
-quant(n, [p]);		generates the quantum matrix ring of order n, the quantum parameter q will be specified at the p-th root of unity 
+quant(n, [p]);		generates the quantum matrix ring of order n; if optional integer p is specified, the quantum parameter q will be specified at the p-th root of unity 
 qminor(u, v, nr);  	calculate a quantum minor of a quantum matrix
 
 AUXILIARY PROCEDURES:

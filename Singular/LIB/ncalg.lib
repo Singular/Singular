@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.5 2004-05-28 20:58:14 levandov Exp $";
+version="$Id: ncalg.lib,v 1.6 2004-06-01 13:53:35 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      definitions of important G-algebras
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
-          Oleksandr Motsak,        motsak@mathematik.uni-kl.de,
-          Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de.
+@*	  Oleksandr Motsak,        motsak@mathematik.uni-kl.de,
+@*	  Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de.
 
 PROCEDURES:
 sl(n[,p]);   returns U(sl_n) in char p, if an integer p is given,

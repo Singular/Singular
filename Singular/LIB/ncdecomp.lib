@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncdecomp.lib,v 1.1 2004-05-31 21:45:47 levandov Exp $";
+version="$Id: ncdecomp.lib,v 1.2 2004-06-01 13:53:35 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncdecomp.lib      Central character decomposition of a module 
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
-          Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de.
+@*        Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de.
 
 PROCEDURES:
 CentralQuot(I,G);       for a module I and an ideal G, returns I:G,
