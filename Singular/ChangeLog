@@ -1,3 +1,10 @@
+Thu Aug 12 12:57:49 MET DST 1999 hannes
+* integrated "spectrum" by Stefan Endrass, inactive by default
+  (Makefile.in claptmpl.cc feResource.cc iparith.cc mod2.h.in
+  tok.h GMPrat.h GMPrat.cc kmatrix.h multicnt.h multicnt.cc 
+  npolygon.h npolygon.cc semic.h semic.cc spectrum.h spectrum.cc
+  splist.h splist.cc)
+
 Thu Apr 15 19:26:07 MET DST 1999 hannes
   * start to implement debugger (sdb.h,sdb.cc, febase*, iplib,cc, scanner)
 
