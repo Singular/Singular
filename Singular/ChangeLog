@@ -1,3 +1,7 @@
+Tue Apr 15 12:07:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	*  (extra.cc): system("sh",command) returns exit status of command
+
 Thu Apr 10 11:59:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* remote quit is now arranged using MP_CopMpQuit
