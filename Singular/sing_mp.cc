@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.21 1998-10-15 11:46:06 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.22 1998-10-27 13:25:44 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -207,14 +207,15 @@ static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
 static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
 {
   char *argv[] = {"--MPtransp", "TCP", "--MPmode", "launch",
-                  "--MPhost", "localhost",  "--MPrsh", "rsh",
-                  "--MPapplication", "Singular -bq  --no-stdlib --no-rc"};
+                  "--MPhost", "localhost",  
+                  "--MPapplication", "Singular -bq  --no-warn --no-out --no-rc",
+                  "--MPrsh", "rsh"};
   char *appl = IMP_GetCmdlineArg(n_argc, n_argv, "--MPapplication");
   char *host = IMP_GetCmdlineArg(n_argc, n_argv, "--MPhost");
   char *rsh = IMP_GetCmdlineArg(n_argc, n_argv, "--MPrsh");
   char* nappl = NULL;
   MP_Link_pt link;
-
+  int argc = 8;
 
   if (appl == NULL && (host == NULL || 
                        strcmp(host, "localhost") == 0))
@@ -223,16 +224,13 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
     
     if (appl != NULL)
     {
-      nappl = (char*) Alloc(MAXPATHLEN + 24);
+      nappl = (char*) Alloc(MAXPATHLEN + 50);
       strcpy(nappl, appl);
-      strcat(nappl, " -bq");
+      strcat(nappl, " -bq --no-warn --no-out --no-rc");
       appl = nappl;
     }
   }
   
-  if (appl != NULL)  
-    argv[9] = appl;
-
   if (host == NULL)
   {
     argv[5] = mp_Env->thishost;
@@ -240,13 +238,18 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   else
     argv[5] = host;
 
+  if (appl != NULL)  
+    argv[7] = appl;
+
+
   if (rsh != NULL)
   {
-    argv[7] = rsh;
+    argv[9] = rsh;
+    argc = 10;
   }
 
-  link = MP_OpenLink(mp_Env, 10, argv);
-  if (nappl != NULL) Free(nappl, MAXPATHLEN + 24);
+  link = MP_OpenLink(mp_Env, argc, argv);
+  if (nappl != NULL) Free(nappl, MAXPATHLEN + 50);
   return link;
 }
 
