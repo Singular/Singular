@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.7 1997-06-20 08:17:14 Singular Exp $ */
+/* $Id: kutil.cc,v 1.8 1997-06-20 09:56:55 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -16,6 +16,7 @@
 #include "numbers.h"
 #include "polys.h"
 #include "ipid.h"
+#include "ring.h"
 #include "ideals.h"
 #include "timer.h"
 #include "cntrlc.h"
@@ -334,7 +335,7 @@ void K_Test (char *f, int l,kStrategy strat)
 //            Print("wrong comp. S (%d) in %s:%d\n",pGetComp(strat->S[i]),f,l);
 //        }
 //      }
-    }  
+    }
   }
   /*- test set L -*/
   if ((strat->L!=NULL) && (strat->Ll>=0))
@@ -1701,6 +1702,72 @@ int posInT17 (TSet set,int length,LObject p)
       an=i;
   }
 }
+/*2
+* looks up the position of p in set
+* set[0] is the smallest with respect to the ordering-procedure
+* pGetComp, pFDeg+ecart, ecart, pComp
+*/
+int posInT17_c (TSet set,int length,LObject p)
+{
+  if (length==-1) return 0;
+
+  int i;
+  int an = 0;
+  int en= length;
+  int cc = (-1+2*currRing->order[0]==ringorder_c);
+  /* cc==1 for (c,..), cc==-1 for (C,..) */
+  int o = pFDeg(p.p) + p.ecart;
+  int c = pGetComp(p.p)*cc;
+
+  if (pGetComp(set[length].p)*cc < c)
+    return length+1;
+  if (pGetComp(set[length].p)*cc == c)
+  {
+    if ((pFDeg(set[length].p)+set[length].ecart < o)
+    || ((pFDeg(set[length].p)+set[length].ecart == o)
+       && (set[length].ecart > p.ecart))
+    || ((pFDeg(set[length].p)+set[length].ecart == o)
+       && (set[length].ecart==p.ecart)
+       && (pComp0(set[length].p,p.p) != pOrdSgn)))
+      return length+1;
+  }
+
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (pGetComp(set[an].p)*cc < c)
+        return en;
+      if (pGetComp(set[an].p)*cc == c)
+      {
+        if ((pFDeg(set[an].p)+set[an].ecart > o)
+        || ((pFDeg(set[an].p)+set[an].ecart == o) && (set[an].ecart < p.ecart))
+        || ((pFDeg(set[an].p)+set[an].ecart  == o)
+           && (set[an].ecart==p.ecart)
+           && (pComp0(set[an].p,p.p) == pOrdSgn)))
+          return an;
+      }
+      return en;
+    }
+    i=(an+en) / 2;
+    if (pGetComp(set[i].p)*cc > c)
+      en=i;
+    else if (pGetComp(set[i].p)*cc == c)
+    {
+      if ((pFDeg(set[i].p) +set[i].ecart > o)
+      || ((pFDeg(set[i].p)+set[i].ecart == o)
+         && (set[i].ecart < p.ecart))
+      || ((pFDeg(set[i].p) +set[i].ecart == o)
+         && (set[i].ecart == p.ecart)
+         && (pComp0(set[i].p,p.p) == pOrdSgn)))
+        en=i;
+      else
+        an=i;
+    }
+    else
+      an=i;
+  }
+}
 
 /*2
 * looks up the position of p in set
@@ -2058,6 +2125,72 @@ int posInL17 (LSet set, int length, LObject p,kStrategy strat)
        && (set[i].ecart == p.ecart)
        && (pComp0(set[i].p,p.p) != -pOrdSgn)))
       an=i;
+    else
+      en=i;
+  }
+}
+/*2
+* looks up the position of polynomial p in set
+* e is the ecart of p
+* set[length] is the smallest element in set with respect
+* to the ordering-procedure pComp
+*/
+int posInL17_c (LSet set, int length, LObject p,kStrategy strat)
+{
+  int i;
+  int an = 0;
+  int en= length;
+  int cc = (-1+2*currRing->order[0]==ringorder_c);
+  /* cc==1 for (c,..), cc==-1 for (C,..) */
+  int c = pGetComp(p.p)*cc;
+  int o = pFDeg(p.p) + p.ecart;
+
+  if (length<0) return 0;
+  if (pGetComp(set[length].p)*cc > c)
+    return length+1;
+  if (pGetComp(set[length].p)*cc == c)
+  {
+    if ((pFDeg(set[length].p) + set[length].ecart > o)
+    || ((pFDeg(set[length].p) + set[length].ecart == o)
+       && (set[length].ecart > p.ecart))
+    || ((pFDeg(set[length].p) + set[length].ecart == o)
+       && (set[length].ecart == p.ecart)
+       && (pComp0(set[length].p,p.p) != -pOrdSgn)))
+      return length+1;
+  }
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (pGetComp(set[an].p)*cc > c)
+        return en;
+      if (pGetComp(set[an].p)*cc == c)
+      {
+        if ((pFDeg(set[an].p) + set[an].ecart > o)
+        || ((pFDeg(set[an].p) + set[an].ecart == o)
+           && (set[an].ecart > p.ecart))
+        || ((pFDeg(set[an].p) + set[an].ecart == o)
+           && (set[an].ecart == p.ecart)
+           && (pComp0(set[an].p,p.p) != -pOrdSgn)))
+          return en;
+      }
+      return an;
+    }
+    i=(an+en) / 2;
+    if (pGetComp(set[i].p)*cc > c)
+      an=i;
+    else if (pGetComp(set[i].p)*cc == c)
+    {
+      if ((pFDeg(set[i].p) + set[i].ecart > o)
+      || ((pFDeg(set[i].p) + set[i].ecart == o)
+         && (set[i].ecart > p.ecart))
+      || ((pFDeg(set[i].p) +set[i].ecart == o)
+         && (set[i].ecart == p.ecart)
+         && (pComp0(set[i].p,p.p) != -pOrdSgn)))
+        an=i;
+      else
+        en=i;
+    }
     else
       en=i;
   }
@@ -3361,8 +3494,17 @@ void initBuchMoraPos (kStrategy strat)
     }
     else
     {
-      strat->posInL = posInL17;
-      strat->posInT = posInT17;
+      if ((currRing->order[0]==ringorder_c)
+      ||(currRing->order[0]==ringorder_C))
+      {
+        strat->posInL = posInL17_c;
+        strat->posInT = posInT17_c;
+      }
+      else
+      {
+        strat->posInL = posInL17;
+        strat->posInT = posInT17;
+      }
     }
   }
   if (strat->minim>0) strat->posInL =posInLSpecial;
