@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.3 1999-05-10 15:10:49 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.4 1999-06-23 08:26:43 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -241,23 +241,26 @@ void ngfPower ( number x, int exp, number * u )
 {
   if ( exp == 0 )
   {
-    *(gmp_float*)u= 1.0;
+    *(gmp_float*)u= (gmp_float)1.0;
     return;
   }
   if ( exp == 1 )
   {
     if ( x == NULL )
     {
-      *(gmp_float*)u= 0.0;
+      *(gmp_float*)(*u) = (gmp_float)0.0;
     }
     else
     {
-      *(gmp_float*)u= *(gmp_float*)x;
+      *(gmp_float*)(*u) = *(gmp_float*)x;
     }
     return;
   }
+
   ngfPower(x,exp-1,u);
-  *(gmp_float*)u*= *(gmp_float*)x;
+
+  *(gmp_float*)(*u) *= *(gmp_float*)x;
+
 }
 
 BOOLEAN ngfIsZero (number a)
@@ -397,11 +400,14 @@ char * ngfRead (char * s, number * a)
 void ngfWrite (number &a)
 {
   char *out;
-//Print("ngfWrite %d\n",gmp_output_digits);
-  out= floatToStr(*(gmp_float*)a,gmp_output_digits);
-  StringAppend(out);
-
-  Free((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
+  if ( a ) {
+    out= floatToStr(*(gmp_float*)a,gmp_output_digits);
+    StringAppend(out);
+    //Free((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
+    FreeL( (ADDRESS)out );
+  } else {
+    StringAppend("0");
+  }
 }
 
 #ifdef LDEBUG
