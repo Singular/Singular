@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.169 2001-10-09 16:35:57 Singular Exp $ */
+/* $Id: extra.cc,v 1.170 2001-11-12 13:34:33 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -55,6 +55,7 @@
 #include "mpr_complex.h"
 
 #include "walk.h"
+#include "weight.h"
 
 #ifdef HAVE_SPECTRUM
 #include "spectrum.h"
@@ -93,11 +94,11 @@
  * - without HAVE_DYNAMIC_LOADING: these functions comes as system("....");
  * - with    HAVE_DYNAMIC_LOADING: these functions are loaded as module.
  */
-#ifndef HAVE_DYNAMIC_LOADING
+//#ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV
 #include "pcv.h"
 #endif
-#endif /* not HAVE_DYNAMIC_LOADING */
+//#endif /* not HAVE_DYNAMIC_LOADING */
 
 // eigenvalues of constant square matrices
 #ifdef HAVE_EIGENVAL
@@ -504,7 +505,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
 #endif
 /*==================== pcv ==================================*/
-#ifndef HAVE_DYNAMIC_LOADING
+//#ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvLAddL")==0)
     {
@@ -542,7 +543,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
-#endif /* HAVE_DYNAMIC_LOADING */
+//#endif /* HAVE_DYNAMIC_LOADING */
 /*==================== eigenval =============================*/
     if(strcmp(sys_cmd,"tridiag")==0)
     {
@@ -657,6 +658,101 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
+/*==================== locNF ======================================*/
+    if(strcmp(sys_cmd,"locNF")==0)
+    {
+      if (h != NULL && h->Typ() == VECTOR_CMD)
+      {
+        poly f=(poly)h->Data();
+        h=h->next;
+        if (h != NULL && h->Typ() == MODUL_CMD)
+        {
+          ideal m=(ideal)h->Data();
+          assumeStdFlag(h);
+          h=h->next;
+          if (h != NULL && h->Typ() == INT_CMD)
+          {
+            int n=(int)h->Data();
+            h=h->next;
+            if (h != NULL && h->Typ() == INTVEC_CMD)
+            {
+              intvec *v=(intvec *)h->Data();
+
+              /* == now the work starts == */
+
+              short * iv=iv2array(v);
+              poly r=0;
+              poly h=ppJetW(f,n,iv);
+              int s=MATCOLS(m);
+              int j=0;
+              matrix T=mpInitI(s,1,0);
+
+              while (h != NULL)
+              {
+                if (pDivisibleBy(m->m[j],h))
+                  {
+                    if (MATELEM(T,j+1,1)==0)
+                    {
+                      MATELEM(T,j+1,1)=pDivideM(pHead(h),pHead(m->m[j]));
+                    }
+                    else
+                    {
+                      pAdd(MATELEM(T,j+1,1),pDivideM(pHead(h),pHead(m->m[j])));
+                    }
+                    h=ppJetW(ksOldSpolyRed(m->m[j],h,0),n,iv);
+                    j=0;
+                  }
+                else
+                {
+                  if (j==s-1)
+                  {
+                    r=pAdd(r,pHead(h));
+                    pLmDeleteAndNext(h); /* h=pSub(h,pHead(h));*/
+                    j=0;
+                  }
+                  else
+                  {
+                    j++;
+                  }
+                }
+              }
+
+              matrix Temp=mpTransp((matrix) idVec2Ideal(r));
+              matrix R=mpNew(MATCOLS((matrix) idVec2Ideal(f)),1);
+              for (int k=1;k<=MATROWS(Temp);k++)
+              {
+                MATELEM(R,k,1)=MATELEM(Temp,k,1);
+              }
+
+              lists L=(lists)omAllocBin(slists_bin);
+              L->Init(2);
+              L->m[0].rtyp=MATRIX_CMD;   L->m[0].data=(void *)R;
+              L->m[1].rtyp=MATRIX_CMD;   L->m[1].data=(void *)T;
+              res->data=L;
+              res->rtyp=LIST_CMD;
+            }
+            else
+            {
+              Warn ("4th argument: must be an intvec!");
+            }
+          }
+          else
+          {
+            Warn("3rd argument must be an int!!");
+          }
+        }
+        else
+        {
+          Warn("2nd argument must be a module!");
+        }
+      }
+      else
+      {
+        Warn("1st argument must be a vector!");
+      }
+      return FALSE;
+    }
+    else
 /*==================== interred ==================================*/
     #if 0
     if(strcmp(sys_cmd,"interred")==0)
@@ -1024,8 +1120,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== listall ===================================*/
     if(strcmp(sys_cmd,"listall")==0)
     {
+      int showproc=1;
+      if ((h!=NULL) && (h->Typ()==INT_CMD)) showproc=(int)h->Data();
 #ifdef HAVE_NS
-      listall();
+      listall(showproc);
 #else
       idhdl hh=IDROOT;
       while (hh!=NULL)
