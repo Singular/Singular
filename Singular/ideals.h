@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.37 2002-02-28 17:56:33 mschulze Exp $ */
+/* $Id: ideals.h,v 1.38 2002-03-07 18:32:10 mschulze Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -96,7 +96,7 @@ ideal   idLift (ideal mod, ideal sumod,ideal * rest=NULL,
              BOOLEAN goodShape=FALSE, BOOLEAN isSB=TRUE,BOOLEAN divide=FALSE,
              matrix *unit=NULL);
 
-lists   idLiftW (ideal P, ideal Q, int n, short *w);
+lists idLiftW(ideal P,ideal Q,int n,short *w=NULL);
 
 intvec * idMWLift(ideal mod,intvec * weights);
 

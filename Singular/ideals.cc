@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.128 2002-03-07 16:00:58 mschulze Exp $ */
+/* $Id: ideals.cc,v 1.129 2002-03-07 18:32:09 mschulze Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1885,15 +1885,18 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
 }
 
 /*2
-*computes division of P by Q with remainder up to weighted degree n
+*computes division of P by Q with remainder up to (w-weighted) degree n
 *P, Q, and w are not changed
 */
-lists idLiftW(ideal P, ideal Q, int n, short *w)
+lists idLiftW(ideal P,ideal Q,int n,short *w=NULL)
 {
   int N=0;
   int i;
   for(i=IDELEMS(Q)-1;i>=0;i--)
-    N=max(N,pDegW(Q->m[i],w));
+    if(w==NULL)
+      N=max(N,pDeg(Q->m[i]));
+    else
+      N=max(N,pDegW(Q->m[i],w));
   N+=n;
 
   matrix T=mpNew(IDELEMS(Q),IDELEMS(P));
@@ -1901,7 +1904,11 @@ lists idLiftW(ideal P, ideal Q, int n, short *w)
 
   for(i=IDELEMS(P)-1;i>=0;i--)
   {
-    poly p=ppJetW(P->m[i],N,w);
+    poly p;
+    if(w==NULL)
+      p=ppJet(P->m[i],N);
+    else
+      p=ppJetW(P->m[i],N,w);
 
     int j=IDELEMS(Q)-1;
     while(p!=NULL)
@@ -1909,9 +1916,12 @@ lists idLiftW(ideal P, ideal Q, int n, short *w)
       if(pDivisibleBy(Q->m[j],p))
       {
         poly p0=pDivideM(pHead(p),pHead(Q->m[j]));
-        p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
+        if(w==NULL)
+          p=pJet(pSub(p,ppMult_mm(Q->m[j],p0)),N);
+        else
+          p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
         pNormalize(p);
-        if(pDegW(p0,w)>n)
+        if(w==NULL&&pDeg(p0)>n||w!=NULL&&pDegW(p0,w)>n)
           pDelete(&p0);
 	else
           MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
@@ -1924,7 +1934,7 @@ lists idLiftW(ideal P, ideal Q, int n, short *w)
 	  poly p0=p;
 	  pIter(p);
           pNext(p0)=NULL;
-	  if(pDegW(p0,w)>n)
+	  if(w==NULL&&pDeg(p0)>n||w!=NULL&&pDegW(p0,w)>n)
             pDelete(&p0);
 	  else
             R->m[i]=pAdd(R->m[i],p0);

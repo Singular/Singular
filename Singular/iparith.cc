@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.279 2002-03-07 16:00:57 mschulze Exp $ */
+/* $Id: iparith.cc,v 1.280 2002-03-07 18:32:08 mschulze Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4815,7 +4815,7 @@ static BOOLEAN jjCOEF_M(leftv res, leftv v)
 }
 
 static BOOLEAN jjDIVISION4(leftv res, leftv v)
-{
+{ // may have 3 or 4 arguments
   leftv v1=v;
   leftv v2=v1->next;
   leftv v3=v2->next;
@@ -4824,9 +4824,9 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   int i1=iiTestConvert(v1->Typ(),MODUL_CMD);
   int i2=iiTestConvert(v2->Typ(),MODUL_CMD);
 
-  if(i1==0||i2==0||v3->Typ()!=INT_CMD||v4->Typ()!=INTVEC_CMD)
+  if(i1==0||i2==0||v3->Typ()!=INT_CMD||(v4!=NULL&&v4->Typ()!=INTVEC_CMD))
   {
-    WarnS("<module>,<module>,<int>,<intvec> expected!");
+    WarnS("<module>,<module>,<int>[,<intvec>] expected!");
     return TRUE;
   }
 
@@ -4837,21 +4837,25 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   ideal Q=(ideal)w2.Data();
 
   int n=(int)v3->Data();
-  short *w=iv2array((intvec *)v4->Data());
-
-  short *w0=w+1;
-  int i=pVariables;
-  while(i>0&&*w0>0)
+  short *w=NULL;
+  if(v4!=NULL)
   {
-    w0++;
-    i--;
+    w=iv2array((intvec *)v4->Data());
+    short *w0=w+1;
+    int i=pVariables;
+    while(i>0&&*w0>0)
+    {
+      w0++;
+      i--;
+    }
+    if(i>0)
+      WarnS("not all weights are positive!");
   }
-  if(i>0)
-    WarnS("not all weights are positive!");
 
   lists L=idLiftW(P,Q,n,w);
 
-  omFree(w);
+  if(w!=NULL)
+    omFree(w);
 
   L->m[1].rtyp=v1->Typ();
   ideal R=(ideal)L->m[1].data;
@@ -5503,6 +5507,7 @@ struct sValCmdM dArithM[]=
 ,{jjCALL2ARG,  COEF_CMD,        MATRIX_CMD,         2  }
 ,{jjCOEF_M,    COEF_CMD,        NONE,               4  }
 ,{jjCALL2ARG,  DIVISION_CMD,    ANY_TYPE/*or set by p*/,2  }
+,{jjDIVISION4, DIVISION_CMD,    ANY_TYPE/*or set by p*/,3  }
 ,{jjDIVISION4, DIVISION_CMD,    ANY_TYPE/*or set by p*/,4  }
 ,{jjDBPRINT,   DBPRINT_CMD,     NONE,               -2 }
 ,{jjCALL1ARG,  IDEAL_CMD,       IDEAL_CMD,          1  }
