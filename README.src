@@ -17,7 +17,7 @@ This directory contains the following subdirectories:
               (C) Gray/Kajler/Wang; Kent State University
   factory --  The factory library (v: 1.2) for polynomial factorization
 	      (C) Greuel/Stobbe U of Kaiserslautern
-  libfac  --  The libfac library for characteristic set computations
+  libfac  --  The libfac library (v: 0.2.1) for characteristic set computations
               (C) Mesollen U of Saarbruecken
   Singular--  The source code for the Singular kernel
               (C) Greuel/Pfister/Schoenemann U of Kaiserslautern
@@ -72,9 +72,9 @@ Singular 1.0 is distributed with the following libraries
               (C) Free Software Foundation
   MP      --  The Multi Protocol library (v: 1.1.2) distribution
               (C) Gray/Kajler/Wang; Kent State University
-  factory --  The factory library (v: 1.2) for polynomial factorization
+  factory --  The factory library (v: 1.2c) for polynomial factorization
 	      (C) Greuel/Stobbe U of Kaiserslautern
-  libfac  --  The libfac library for characteristic set computations
+  libfac  --  The libfac library (v: 0.2.1) for characteristic set computations
               (C) Mesollen U of Saarbruecken
 We would like to thank all authors of who contributed these
 libraries. 

@@ -46,13 +46,13 @@ In order to use Singular, you
 		'setenv SINGULARPATH $HOME/Singular/share/Singular'.
 	If you use the bash, ksh, or sh shell, this can be
 	accomplished by the command 
-		'export SINGULARPATH=$HOME/Singular/share/Singular'
-	Furthermroe, these commands should be put into your shell
-	initialization file (e.g., $HOME/.tcshr)
+		'SINGULARPATH=$HOME/Singular/share/Singular;export SINGULARPATH'
+	Furthermore, these commands should be put into your shell
+	initialization file (e.g., $HOME/.tcshrc)
 
 Optional:
 (4) You may move the file singular.hlp contained in share/Singular to
-    your info diretory (usualy /usr/local/info) and add the line 
+    your info diretory (usually /usr/local/info) and add the line 
 * Singular: (singular.hlp). The Singular manual
     to the 'dir' file contained in your info directory.   
 
@@ -98,14 +98,14 @@ Acknowledgments
 ================
 Singular 1.0 is linked with the following libraries: 
   readline--  The Gnu readline library (v. 2.0) 
-	      C) Free Software Foundation
+	      (C) Free Software Foundation
   gmp	  --  The Gnu Multiple precision library (v: 2.0.2) distribution
               (C) Free Software Foundation
   MP      --  The Multi Protocol library (v: 1.1.2) distribution
               (C) Gray/Kajler/Wang; Kent State University
-  factory --  The factory library (v: 1.2) for polynomial factorization
+  factory --  The factory library (v: 1.2c) for polynomial factorization
 	      (C) Greuel/Stobbe U of Kaiserslautern
-  libfac  --  The libfac library for characteristic set computations
+  libfac  --  The libfac library (v: 0.2.1) for characteristic set computations
               (C) Mesollen U of Saarbruecken
 We would like to thank all authors of these who contributed these
 libraries. 
