@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.19 1997-09-16 13:45:31 Singular Exp $ */
+/* $Id: extra.cc,v 1.20 1997-10-06 12:19:06 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -55,6 +55,8 @@
 #include "clapsing.h"
 #include "clapconv.h"
 #include "kstdfac.h"
+#include "fglmcomb.cc"
+#include "fglm.h"
 #endif
 
 #include "silink.h"
@@ -479,58 +481,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         WerrorS("ideal expected");
     }
     else
-#ifdef HAVE_MPSR
-/*==================== ftest =============================*/
-    if(strcmp((char*)(h->Data()),"ftest")==0)
-    {
-      MP_Link_pt rlink = (MP_Link_pt) ((si_link) h->next->Data())->data;
-      MP_Link_pt wlink;
-      
-      MPT_Tree_pt tree1 = NULL, tree2;
-
-      MPT_GetExternalData = MPT_DefaultGetExternalData;
-      if (MP_InitMsg(rlink) != MP_Success)
-      {
-        WerrorS("Init failed\n");
-        return TRUE;
-      }
-      
-      if (MPT_GetTree(rlink, &tree1) != MPT_Success)
-      {
-        WerrorS("GetTree failed\n");
-        return TRUE;
-      }
-        
-//      MPT_CpyTree(&tree2, tree1);
-//      MPT_DeleteTree(tree1);
-//      tree2 = tree1;
-//      tree2 = MPT_UntypespecTree(tree2);
-//      MPT_PutTree(link, tree2);
-      MP_Sint32_t ch;
-      MPT_Tree_pt var_tree;
-      MP_Common_t ordering;
-//      MPT_IsDDPTree(tree1, &ch, &var_tree, &ordering);
-//      MPT_CpyTree(&tree2, tree1);
-      tree1 = MPT_DDP_2_ExpTree(tree1);
-      tree1 = MPT_UntypespecTree(tree1);
-
-      if (h->next->next != NULL)
-      {
-        wlink = (MP_Link_pt) ((si_link) h->next->next->Data())->data;
-        MP_ResetLink(wlink);
-        if (MPT_PutTree(wlink, tree1) != MPT_Success)
-        {
-          Werror("PutTree failed \n");
-          return TRUE;
-        }
-        MP_EndMsg(wlink);
-      }
-      MPT_DeleteTree(tree1);
-        
-      return FALSE;
-    }
-    else
-#endif    
 #ifdef STDTRACE
     /*==================== trace =============================*/
     /* Parameter : Ideal, Liste mit Links. */
@@ -581,6 +531,61 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else  
 #endif    
+/*==================== fastcomb =============================*/
+    if(strcmp((char*)(h->Data()),"fastcomb")==0)
+    {
+      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      {
+        int i=0;
+        if (h->next->next!=NULL)
+        {
+          if (h->next->next->Typ()!=POLY_CMD)
+          {
+	      Warn("Wrong types for poly= comb(ideal,poly)");
+          }
+        }
+        res->rtyp=POLY_CMD;
+        res->data=(void *)fglmLinearCombination((ideal)h->next->Data(),(poly)h->next->next->Data());
+        return FALSE;
+      }
+      else
+        WerrorS("ideal expected");
+    }
+    else
+/*==================== comb =============================*/
+    if(strcmp((char*)(h->Data()),"comb")==0)
+    {
+      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      {
+        int i=0;
+        if (h->next->next!=NULL)
+        {
+          if (h->next->next->Typ()!=POLY_CMD)
+          {
+	      Warn("Wrong types for poly= comb(ideal,poly)");
+          }
+        }
+        res->rtyp=POLY_CMD;
+        res->data=(void *)fglmNewLinearCombination((ideal)h->next->Data(),(poly)h->next->next->Data());
+        return FALSE;
+      }
+      else
+        WerrorS("ideal expected");
+    }
+    else
+/*==================== finduni =============================*/
+    if(strcmp((char*)(h->Data()),"finduni")==0)
+    {
+      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      {
+        res->rtyp=IDEAL_CMD;
+        res->data=(void *)FindUnivariateWrapper((ideal)h->next->Data());
+        return FALSE;
+      }
+      else
+        WerrorS("ideal expected");
+    }
+    else
 /*============================================================*/
       WerrorS("not implemented\n");
   }

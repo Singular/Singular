@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.6 1997-08-15 08:11:15 Singular Exp $
+// $Id: fglmzero.cc,v 1.7 1997-10-06 12:19:13 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -13,6 +13,10 @@
 *   input for GroebnerViaFunctionals, which defines the reduced
 *   groebner basis for the ideal in the destination ring.
 */
+
+/* Changes:
+ * o FindUnivariatePolys added
+ */
 
 #include "mod2.h"
 
@@ -28,6 +32,7 @@
 #include "mmemory.h"
 #include "fglm.h"
 #include "fglmvec.h"
+#include "fglmgauss.h"
 // assumes, that NOSTREAMIO is set in factoryconf.h, which is included
 // by templates/list.h. 
 #ifdef macintosh
@@ -35,6 +40,12 @@
 #else
 #include <templates/list.h>
 #endif
+#define PROT(msg)
+#define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
+#define PROT2(msg,arg)
+#define STICKYPROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
+#define fglmASSERT(ignore1,ignore2)
+
 
 // internal Version: 1.3.1.12
 // ============================================================
@@ -658,7 +669,7 @@ fglmDelem::cleanup()
     }
 }
 
-class gaussElem
+class oldGaussElem
 {
 public:
     fglmVector v;
@@ -667,14 +678,14 @@ public:
     number fac;
 
 #ifdef macintosh
-    gaussElem() : v(), p(), pdenom( NULL ), fac( NULL ) {}
+    oldGaussElem() : v(), p(), pdenom( NULL ), fac( NULL ) {}
 #endif
-    gaussElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac ) : v( newv ), p( newp ), pdenom( newpdenom ), fac( newfac )
+    oldGaussElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac ) : v( newv ), p( newp ), pdenom( newpdenom ), fac( newfac )
     {
 	newpdenom= NULL;
 	newfac= NULL;
     }
-    ~gaussElem();
+    ~oldGaussElem();
 #ifdef macintosh
     void insertElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac ) 
     {
@@ -688,7 +699,7 @@ public:
 #endif
 };
 
-gaussElem::~gaussElem()
+oldGaussElem::~oldGaussElem()
 {
     nDelete( & fac );
     nDelete( & pdenom );
@@ -699,7 +710,7 @@ class fglmDdata
 {
 private:
     int dimen;
-    gaussElem * gauss;
+    oldGaussElem * gauss;
     BOOLEAN * isPivot;  // [1]..[dimen]
     int * perm;  // [1]..[dimen]
     int basisSize;  //. the CURRENT basisSize, i.e. basisSize <= dimen
@@ -735,9 +746,9 @@ fglmDdata::fglmDdata( int dimension )
     basisSize= 0;
     //. All arrays run from [1]..[dimen], thus Alloc( dimen + 1 )!
 #ifdef macintosh
-    gauss= new gaussElem[ dimen+1 ];
+    gauss= new oldGaussElem[ dimen+1 ];
 #else
-    gauss= (gaussElem *)Alloc( (dimen+1)*sizeof( gaussElem ) );
+    gauss= (oldGaussElem *)Alloc( (dimen+1)*sizeof( oldGaussElem ) );
 #endif
     isPivot= (BOOLEAN *)Alloc( (dimen+1)*sizeof( BOOLEAN ) );
     for ( k= dimen; k > 0; k-- ) isPivot[k]= FALSE;
@@ -756,8 +767,8 @@ fglmDdata::~fglmDdata()
     delete [] gauss;
 #else
     for ( k= dimen; k > 0; k-- ) 
-	gauss[k].~gaussElem();
-    Free( (ADDRESS)gauss, (dimen+1)*sizeof( gaussElem ) );
+	gauss[k].~oldGaussElem();
+    Free( (ADDRESS)gauss, (dimen+1)*sizeof( oldGaussElem ) );
 #endif
     Free( (ADDRESS)isPivot, (dimen+1)*sizeof( BOOLEAN ) );
     Free( (ADDRESS)perm, (dimen+1)*sizeof( int ) );
@@ -808,7 +819,7 @@ fglmDdata::newBasisElem( poly & m, fglmVector v, fglmVector p, number & denom )
 #ifdef macintosh
     gauss[basisSize].insertElem( v, p, denom, pivot );
 #else
-    gauss[basisSize].gaussElem( v, p, denom, pivot );
+    gauss[basisSize].oldGaussElem( v, p, denom, pivot );
 #endif
 }
 
@@ -1017,6 +1028,63 @@ GroebnerViaFunctionals( const idealFunctionals & l )
 }
 //<-
 
+ideal
+FindUnivariatePolys( const idealFunctionals & l )
+{
+    fglmVector v;
+    fglmVector p;
+    ideal destIdeal = idInit( pVariables, 1 );
+    
+    int i;
+    BOOLEAN isZero;
+    for ( i= 1; i <= pVariables; i++ ) {
+	// main loop
+	STICKYPROT2( "(%i)", i );
+	gaussReducer gauss( l.dimen() );
+	isZero= FALSE;
+	v= fglmVector( l.dimen(), 1 );
+	while ( isZero == FALSE ) {
+	    if ( (isZero= gauss.reduce( v )) == TRUE ) {
+		STICKYPROT( "+" );
+		p= gauss.getDependence();
+		number gcd= p.gcd();
+		if ( ! nIsOne( gcd ) ) {
+		    p /= gcd;
+		}
+		nDelete( & gcd );
+		int k;
+		poly temp = NULL;
+		poly result;
+		for ( k= p.size(); k > 0; k-- ) {
+		    number n = nCopy( p.getconstelem( k ) );
+		    if ( ! nIsZero( n ) ) {
+			if ( temp == NULL ) {
+			    result= pOne();
+			    temp= result;
+			}
+			else {
+			    temp->next= pOne();
+			    pIter( temp );
+			}
+			pSetCoeff( temp, n );
+			pSetExp( temp, i, k-1 );
+			pSetm( temp );
+		    }
+		}
+		if ( ! nGreaterZero( pGetCoeff( result ) ) ) result= pNeg( result );
+		(destIdeal->m)[i-1]= result;
+	    }
+	    else {
+		STICKYPROT( "." );
+		gauss.store();
+		v= l.multiply( v, i );
+	    }
+	}
+    }
+    STICKYPROT( "\n" );
+    return destIdeal;
+}
+
 // for a descritption of the parameters see fglm.h
 BOOLEAN
 fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & destIdeal, BOOLEAN switchBack, BOOLEAN deleteIdeal )
@@ -1039,6 +1107,21 @@ fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & d
 	rSetHdl( initialRingHdl, TRUE );
     return fglmok;
 }
+
+ideal 
+FindUnivariateWrapper( ideal source ) 
+{
+    ideal destIdeal;
+    BOOLEAN fglmok;
+    
+    idealFunctionals L( 100, pVariables );
+    fglmok = CalculateFunctionals( source, L );
+    if ( fglmok == TRUE ) {
+	destIdeal= FindUnivariatePolys( L );
+    }
+    return destIdeal;
+}
+
 
 #endif
 

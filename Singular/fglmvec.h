@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.h,v 1.2 1997-03-26 17:07:22 Singular Exp $
+// $Id: fglmvec.h,v 1.3 1997-10-06 12:19:13 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -14,7 +14,6 @@
 
 #include "mod2.h"
 #include "numbers.h"
-#include "fglm.h"
 
 class fglmVectorRep;
 

@@ -86,7 +86,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     longalg.cc longrat.cc \
     longrat0.cc maps.cc matpol.cc misc.cc \
     mminit.cc modulop.cc \
-    fglm.cc fglmzero.cc fglmvec.cc \
+    fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc \
     numbers.cc polys.cc polys0.cc polys1.cc polys2.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
     sing_dld.cc sing_dbm.cc spolys.cc spolys0.cc \
@@ -108,7 +108,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	febase.h ipshell.h mmprivat.h shortfl.h tok.h \
 	ffields.h khstd.h silink.h \
 	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
-	fglmvec.h kstd2.h mpsr.h sing_mp.h \
+	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
 	kutil.h mpsr_Put.h spolys0.h \
 	ndbm.h
@@ -137,7 +137,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      polys.o polys0.o polys1.o polys2.o extra.o\
      mminit.o mmutil.o mmalloc.o mmallocb.o mmallocs.o \
      mmspec.o mmblock.o mmheap.o sing_dld.o sing_dbm.o silink.o \
-     sing_mp.o fglm.o fglmzero.o fglmvec.o cntrlc.o \
+     sing_mp.o fglm.o fglmzero.o fglmvec.o fglmhom.o fglmgauss.o cntrlc.o \
      algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
      mpsr_Get.o mpsr_GetMisc.o ndbm.o
@@ -348,7 +348,7 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      ipid.og ipshell.og iplib.og ipassign.og ipconv.og ipprint.og\
      polys.og polys0.og polys1.og polys2.og extra.og\
      mminit.og sing_dld.og sing_dbm.og silink.og \
-     sing_mp.og fglm.og fglmzero.og fglmvec.og \
+     sing_mp.og fglm.og fglmzero.og fglmvec.og fglmgauss.og fglmhom.og\
      algmap.og clapconv.og  clapmem.og clapsing.og \
      cntrlc.og  \
      mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \

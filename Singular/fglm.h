@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.4 1997-08-15 08:08:55 Singular Exp $
+// $Id: fglm.h,v 1.5 1997-10-06 12:19:07 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -13,14 +13,14 @@
 #ifndef FGLM_H
 #define FGLM_H
 
+#include "polys.h"
+#include "fglmvec.h"
+
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define PROT2(msg,arg)
 #define STICKYPROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
 #define fglmASSERT(ignore1,ignore2)
-
-#include "polys.h"
-#include "fglmvec.h"
 
 // internal Version: 1.10.1.4
 // Some data types needed by the fglm algorithm. claptmpl.cc has to know them.
@@ -76,4 +76,8 @@ fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & d
 // 0-dimensional Ideal. Returns TRUE if an error occoured.
 BOOLEAN
 fglmProc( leftv result, leftv first, leftv second );
+
+// FindUnivariatePolys (test)
+ideal
+FindUnivariateWrapper( ideal source );
 #endif

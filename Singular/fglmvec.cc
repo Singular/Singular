@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.cc,v 1.3 1997-03-27 20:23:37 obachman Exp $
+// $Id: fglmvec.cc,v 1.4 1997-10-06 12:19:12 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -20,6 +20,12 @@
 #include "numbers.h"
 #include "fglm.h"
 #include "fglmvec.h"
+
+#define PROT(msg)
+#define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
+#define PROT2(msg,arg)
+#define STICKYPROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
+#define fglmASSERT(ignore1,ignore2)
 
 class fglmVectorRep
 {
