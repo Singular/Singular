@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.54 2000-09-14 14:07:24 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.55 2000-09-14 15:06:34 obachman Exp $ */
 
 /***************************************************************
  *
@@ -234,8 +234,8 @@ while (0)
 // coeff
 #define _pGetCoeff(p)       ((p)->coef)
 #define _pSetCoeff0(p,n)    (p)->coef=n
-#define __p_GetComp(p, r)   ((long) (p)->exp[r->pCompIndex])
-#define _p_GetComp(p, r)    (r->pCompIndex >= 0 ? __p_GetComp(p, r) : 0)
+#define __p_GetComp(p, r)   (p)->exp[r->pCompIndex]
+#define _p_GetComp(p, r)    ((long) (r->pCompIndex >= 0 ? __p_GetComp(p, r) : 0))
 
 
 

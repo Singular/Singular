@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.17 2000-08-14 12:56:03 obachman Exp $ */
+/* $Id: emacs.cc,v 1.18 2000-09-14 15:06:33 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -10,6 +10,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+
 #ifdef WINNT
 #include <windows.h>
 #endif

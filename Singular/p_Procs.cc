@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.6 2000-09-12 16:01:07 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.7 2000-09-14 15:06:33 obachman Exp $
  *******************************************************************/
 #include <string.h>
 #include "mod2.h"
@@ -18,8 +18,8 @@
  * 
  *******************************************************************/
 // define to enable/disable ptest in p_Procs
-// #undef TEST_P_PROCS
-#define TEST_P_PROCS
+#undef TEST_P_PROCS
+// #define TEST_P_PROCS
 
 /***************************************************************
  Here is how it works:
