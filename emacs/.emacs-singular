@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.13 2000-05-17 12:02:55 obachman Exp $
+;;; $Id: .emacs-singular,v 1.14 2000-05-17 13:05:40 obachman Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -81,13 +81,28 @@
 
 ;; other, "non-customizable" settings
 
-;; lazy-lock seems to be broken under mswindows:
-;; causes delay of input (only reacts after mouse click), or even total 
-;; hang
+;; put stuff here which should not be/only be executed under
+;; mswindows/unix
 (cond ((not (or (eq system-type 'cygwin32)
-	     (eq system-type 'windows-nt)))
-	    (add-hook 'font-lock-mode-hook 'lazy-lock-mode)
-	    (setq font-lock-support-mode 'lazy-lock-mode)))
+		(eq system-type 'windows-nt)))
+
+       ;; lazy-lock seems to be broken under mswindows:
+       ;; causes delay of input (only reacts after mouse click), or even total 
+       ;; hang
+       (add-hook 'font-lock-mode-hook 'lazy-lock-mode)
+       (setq font-lock-support-mode 'lazy-lock-mode)
+       
+       ;; somewhat nicer scrolling This causes a core dump with 21.1.9
+       ;; under cygwin, when a file is opened with a button 
+       ;; Fixed it with a simmple patch, by working around the
+       ;; assertion in file indent.c line 517 (or so). This was
+       ;; officially fixed in 21.1.10 -- still sometimes
+       ;; interactive windows disappeared. Hence, do not set it under
+       ;; Windows
+       (setq scroll-step 10)
+       )
+)
+       
 
 (add-hook 'singular-interactive-mode-hook
 	  (function (lambda () (font-lock-mode 1))))
@@ -98,12 +113,6 @@
 (add-hook 'c++-mode-hook
 	  (function (lambda () (font-lock-mode 1))))
 
-;; somewhat nicer scrolling 
-;; This causes a core dump with 21.1.9 under cygwin, when a file is opened
-;; with a button
-;; obachman: Fixed it with a simmple patch, by working around the assertion
-;; in file indent.c line 517 (or so)
-; (setq scroll-step 10)
 
 
 ;; this is a work-around for early version of Font Lock mode
@@ -120,6 +129,36 @@
     (if face
 	(customize-face face)
       (message "No face defined at point"))))
+
+
+;; for Xemacs, use func-menu
+;;; func-menu is a package that scans your source file for function
+;;; definitions and makes a menubar entry that lets you jump to any
+;;; particular function definition by selecting it from the menu.  The
+;;; following code turns this on for all of the recognized languages.       
+(cond ((string-match "XEmacs\\|Lucid" emacs-version)
+       (require 'func-menu)
+       (define-key global-map 'f8 'function-menu)
+       (add-hook 'find-file-hooks 'fume-add-menubar-entry)
+       (define-key global-map "\C-cl" 'fume-list-functions)
+       (define-key global-map "\C-cg" 'fume-prompt-function-goto)
+
+       ;; The Hyperbole information manager package uses (shift button2) and
+       ;; (shift button3) to provide context-sensitive mouse keys.  If you
+       ;; use this next binding, it will conflict with Hyperbole's setup.
+       ;; Choose another mouse key if you use Hyperbole.
+       (define-key global-map '(shift button3) 'mouse-function-menu)
+
+       ;; For descriptions of the following user-customizable variables,
+       ;; type C-h v <variable>
+       (setq fume-max-items 25
+             fume-fn-window-position 3
+             fume-auto-position-popup t
+             fume-display-in-modeline-p t
+             fume-menubar-menu-location "File"
+             fume-buffer-name "*Function List*"
+             fume-no-prompt-on-valid-default nil)
+       ))
 
 ;; tricky stuff: these customization settings are not used any
 ;; longer as soon as user saved her own to ~/.emacs-singular-cust
@@ -141,11 +180,14 @@
  '(singular-section-face-alist (quote ((input . singular-section-input-face) (output)))))
 
 (custom-set-faces
+ '(info-xref ((t (:foreground "blue" :bold t))))
+ '(info-node ((t (:foreground "blue" :bold t :italic t))))
  '(show-paren-match-face ((((class color)) (:foreground "Red"))))
- '(font-lock-string-face ((((class color) (background light)) (:foreground "Blue")) (((class color) (background dark)) (:foreground "LightSkyBlue"))) t)
  '(font-lock-variable-name-face ((t (:foreground "black"))) t)
  '(paren-match ((t (:foreground "Red"))) t)
  '(singular-section-input-face ((t (:bold t))))
+ '(font-lock-string-face ((((class color) (background light)) (:foreground "green4"))))
+ '(font-lock-doc-string-face ((((class color) (background light)) (:foreground "green4"))))
  '(font-lock-keyword-face ((t (:bold t :foreground "violet"))) t)
  '(singular-section-output-face ((t (:bold nil))))
  '(font-lock-type-face ((t (:bold t :foreground "violet"))) t)
@@ -160,7 +202,6 @@
 ;;  '(font-lock-string-face ((((class color) (background light)) (:foreground "Blue")) (((class color) (background dark)) (:foreground "LightSkyBlue"))) t)
 ;;  '(paren-match ((t (:foreground "Red"))) t)
 ;;  '(show-paren-match-face ((((class color)) (:foreground "Red")))))
-
 )
 
 ;; update singular-emacs-home-directory
