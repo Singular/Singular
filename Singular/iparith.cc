@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.336 2005-02-04 14:43:07 Singular Exp $ */
+/* $Id: iparith.cc,v 1.337 2005-02-04 16:28:06 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4458,10 +4458,8 @@ static BOOLEAN jjPROC3(leftv res, leftv u, leftv v, leftv w)
 {
   v->next=(leftv)omAllocBin(sleftv_bin);
   memcpy(v->next,w,sizeof(sleftv));
-  BOOLEAN r=iiExprArith2(res,u,'(',v);
-  v->rtyp=0; v->data=NULL;
-  w->rtyp=0; w->data=NULL;
-  return r;
+  memset(w,0,sizeof(sleftv));
+  return jjPROC(res,u,v);
 }
 static BOOLEAN jjCALL3MANY(leftv res, leftv u, leftv v, leftv w)
 {
