@@ -173,10 +173,10 @@ iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 
-iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
+iparith.inc mpsr_Tok.inc: gmalloc.o iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
 	     -o gentable iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS} 
+	     ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o
 	./gentable
 	/bin/rm -f gentable gentable.exe
 
