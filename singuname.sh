@@ -13,7 +13,7 @@ uname_a=`uname -a`
 devnull='/dev/null'
 file=file
 binary='/bin/ls'
-
+ldd='ldd'
 
 # HPUX ########################################################
 if (echo $uname_a | $egrep "HP-UX" > $devnull) 
@@ -55,8 +55,14 @@ then
 		exit 0
 	    fi
 	fi
-	# everything else is assumed to be Linux ELF    
-	echo ${prefix}
+	# everything else is assumed to be Linux ELF
+        # check for libc5
+        if (echo `$ldd $binary` | $egrep "libc.so.5" > $devnull)
+	then
+	    echo "${prefix}-libc5"
+	else
+	    echo ${prefix}
+	fi    
 	exit 0
     else
 	echo ${prefix}-Unknown

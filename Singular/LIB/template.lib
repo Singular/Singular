@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////
 // version string automatically expanded by CVS
-version="$Id: template.lib,v 1.4 1999-08-06 14:06:42 obachman Exp $";
-// summary descriptionof the library
+version="$Id: template.lib,v 1.5 2000-03-08 15:02:43 obachman Exp $";
+// summary description of the library
 info="
 LIBRARY:   template.lib  A TEMPLATE FOR A SINGULAR LIBRARY
 
