@@ -1,9 +1,9 @@
-// $Id: hnoether.lib,v 1.21 2000-05-19 11:41:05 obachman Exp $
+// $Id: hnoether.lib,v 1.22 2000-12-04 15:05:10 Singular Exp $
 // last change:           27.04.00
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-7 or newer
 
-version="$Id: hnoether.lib,v 1.21 2000-05-19 11:41:05 obachman Exp $";
+version="$Id: hnoether.lib,v 1.22 2000-12-04 15:05:10 Singular Exp $";
 info="
 LIBRARY:  hnoether.lib   Procedures for the Hamburger-Noether (Puiseux) development
 
@@ -475,7 +475,7 @@ RETURN:  Hamburger-Noether development of f, in form of a list:
   @*     [2]: intvec indicating the length of lines of the HNE
   @*     [3]: int:
            0  if the 1st ring variable was transversal (with respect to f),
-  @*       1  if the variables were changed at the beginning of the 
+  @*       1  if the variables were changed at the beginning of the
               computation,
            -1 if an error has occurred.
   @*     [4]: the transformed polynomial of f to make it possible to extend the
@@ -827,7 +827,7 @@ EXAMPLES: example develop; shows an example
      a(zeile)[Q+1]=x;   // Markiere das Ende der Zeile
      hqs[zeile+1]=Q;
      maxspalte=maxspalte*((Q+1) < maxspalte) + (Q+1)*((Q+1) >= maxspalte);
-     if (N <> 1) { einzweig=0; }   
+     if (N <> 1) { einzweig=0; }
      f=0;               // transformiertes Polynom wird nicht mehr gebraucht
      Abbruch=1;
   }
@@ -2203,8 +2203,7 @@ example
   stripHNE(hne);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc extractHNEs(list HNEs, int transvers)
+static proc extractHNEs(list HNEs, int transvers)
 "USAGE:  extractHNEs(HNEs,transvers);  list HNEs (output from HN),
         int transvers: 1 if x,y were exchanged, 0 else
 RETURN: list of Hamburger-Noether-Extensions in the form of reddevelop
@@ -2347,7 +2346,7 @@ EXAMPLE: example HNdevelop;  shows an example
      list hne;
      if (hn[3] <> -1) {
        hne[1]=list(hn[1],hn[2],hn[3],hn[4]);
-       if (hn[5] <> 1) { 
+       if (hn[5] <> 1) {
    " ** WARNING : The curve is reducible, but only one branch could be found!";
        }
      }
@@ -2837,8 +2836,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
+static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
 "NOTE: This procedure is only for internal use, it is called via pre_HN"
 {
  //---------- Variablendefinitionen fuer den unverzweigten Teil: --------------
@@ -3022,11 +3020,11 @@ proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
           zaehler++;
         }
         else {
-	  dbprint(printlevel+1,
+          dbprint(printlevel+1,
              " Change of basering (field extension) necessary!");
-	  if (defined(HNDebugOn)) { teiler,"is not properly factored!"; }
-	  if (needext==0) { poly zerlege=teiler; }
-	  needext=1;
+          if (defined(HNDebugOn)) { teiler,"is not properly factored!"; }
+          if (needext==0) { poly zerlege=teiler; }
+          needext=1;
         }
       }
      }                             // end(for j)
@@ -3309,8 +3307,7 @@ proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static
-proc constructHNEs (list HNEs,int hnezaehler,list aneu,list azeilen,
+static proc constructHNEs (list HNEs,int hnezaehler,list aneu,list azeilen,
                     int zeile,ideal deltais,int Q,int j)
 "NOTE: This procedure is only for internal use, it is called via HN"
 {
