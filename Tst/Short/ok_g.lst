@@ -24,6 +24,7 @@ bug_barei
 bug_c_dp
 bug_factorize
 bug_mres
+bug_napMultT
 bug_primdec
 cyc5_lp
 bug_sres
@@ -31,6 +32,7 @@ bug_sres_betti
 bug_sres_cyc5
 dbm_s
 deform_s
+facstd
 fetch_s
 fglm1_s
 fglmquot1_s
@@ -69,7 +71,7 @@ paramet
 polylib_s
 primdec_s
 primdec2
-primdec3 negative exponents
+primdec3
 primitiv_s
 quotient_s
 rInit

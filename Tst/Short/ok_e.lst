@@ -19,7 +19,7 @@ bug_5
 bug_6
 bug_7
 bug_8
-; bug_9 component/poly
+bug_9
 bug_barei
 bug_c_dp
 bug_factorize
@@ -79,7 +79,7 @@ resultantp_s
 ringsum
 sing_s 
 solve_s
-; spcurve weights?
+spcurve 
 sres_s
 std_s
 string
