@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.320 2004-06-28 13:50:15 Singular Exp $ */
+/* $Id: iparith.cc,v 1.321 2004-06-28 14:58:16 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4738,26 +4738,26 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
 {
-  assumeStdFlag(w);
-  if (!idIsZeroDim((ideal)w->Data()))
+  assumeStdFlag(v);
+  if (!idIsZeroDim((ideal)v->Data()))
   {
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
   }
-  res->data = (char *)redNF((ideal)w->CopyD(),(poly)u->CopyD(),
-    (poly)v->CopyD());
+  res->data = (char *)redNF((ideal)v->CopyD(),(poly)u->CopyD(),
+    (poly)w->CopyD());
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_CID(leftv res, leftv u, leftv v, leftv w)
 {
-  assumeStdFlag(w);
-  if (!idIsZeroDim((ideal)w->Data()))
+  assumeStdFlag(v);
+  if (!idIsZeroDim((ideal)v->Data()))
   {
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
   }
-  res->data = (char *)redNF((ideal)w->CopyD(),(ideal)u->CopyD(),
-    (matrix)v->CopyD());
+  res->data = (char *)redNF((ideal)v->CopyD(),(ideal)u->CopyD(),
+    (matrix)w->CopyD());
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
@@ -4908,8 +4908,8 @@ struct sValCmd3 dArith3[]=
 ,{jjREDUCE3_ID,     REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjREDUCE3_CP,     REDUCE_CMD, POLY_CMD,   POLY_CMD,   POLY_CMD,   IDEAL_CMD ALLOW_PLURAL}
 ,{jjREDUCE3_CP,     REDUCE_CMD, VECTOR_CMD, VECTOR_CMD, POLY_CMD,   MODUL_CMD ALLOW_PLURAL}
-,{jjREDUCE3_CID,    REDUCE_CMD, IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, IDEAL_CMD ALLOW_PLURAL}
-,{jjREDUCE3_CID,    REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, MODUL_CMD ALLOW_PLURAL}
+,{jjREDUCE3_CID,    REDUCE_CMD, IDEAL_CMD,  IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD ALLOW_PLURAL}
+,{jjREDUCE3_CID,    REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  MODUL_CMD,  MATRIX_CMD ALLOW_PLURAL}
 #ifdef OLD_RES
 ,{jjRES3,           RES_CMD,    NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE ALLOW_PLURAL}
 ,{jjRES3,           RES_CMD,    NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE ALLOW_PLURAL}
