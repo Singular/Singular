@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.1 1997-09-11 08:26:38 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.2 1997-09-12 10:03:41 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -138,7 +138,7 @@ ftestGetVariable ( const char * stringVariable )
     terminatedStringF[i+1] = '\0';
 
     // read f
-    istrstream( terminatedStringF ) >> f;
+    istrstream( terminatedStringF ) >> vf;
 
     delete [] terminatedStringF;
     return vf.mvar();
@@ -158,22 +158,22 @@ ftestPrintTimer ( const char * algorithm )
 	// print time in seconds
 	if ( strchr( outputType, '@' ) ) {
 	    // print in reduced format
-	    cout << "time: " << timing_ftest_timer_time / HZ << "; ";
+	    cout << "time: " << timing_ftestTimer_time / HZ << "; ";
 	    writtenToStream = true;
 	}
 	else
 	    // print in full format
-	    cout << "Time used by " << algorithm << ": " << timing_ftest_timer_time / HZ << endl;
+	    cout << "Time used by " << algorithm << ": " << timing_ftestTimer_time / HZ << endl;
     } else if ( strchr( outputType, 'T' ) ) {
 	// print time in tics
 	if ( strchr( outputType, '@' ) ) {
 	    // print in reduced format
-	    cout << "time: " << timing_ftest_timer_time << "; ";
+	    cout << "time: " << timing_ftestTimer_time << "; ";
 	    writtenToStream = true;
 	}
 	else
 	    // print in full format
-	    cout << "Time used by " << algorithm << ": " << timing_ftest_timer_time << endl;
+	    cout << "Time used by " << algorithm << ": " << timing_ftestTimer_time << endl;
     }
 }
 //}}}
