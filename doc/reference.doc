@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.225 2004-08-05 14:50:44 levandov Exp $
+@comment $Id: reference.doc,v 1.226 2004-08-05 15:08:28 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -108,6 +108,7 @@ brackets are allowed.
 * interred::
 * intersect::
 * jacob::
+* janet::
 * jet::
 * kbase::
 * kill::
