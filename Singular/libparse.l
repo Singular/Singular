@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.2 1998-03-06 12:12:03 krueger Exp $ */
+/* $Id: libparse.l,v 1.3 1998-03-11 12:03:46 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -20,6 +20,7 @@
 #  include "tok.h"
 #  include "febase.h"
 #  include "mmemory.h"
+#  include "libparse.h"
 #endif
 
 #ifdef HAVE_LIBPARSER
@@ -86,11 +87,12 @@ extern "C" {
   int yylpwrap();
 }
 #else /* STANDALONE_PARSER */
-procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
-                                 char *procname, int line, long pos,
-				 BOOLEAN pstatic = 0);
 idhdl h;
 #  define pi IDPROC(h)
+extern "C"
+{
+  int yylpwrap();
+}
 extern libstackv library_stack;
 #endif /* STANDALONE_PARSER */
 
