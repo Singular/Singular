@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.25 2000-05-25 13:37:30 obachman Exp $
+// $Id: all.lib,v 1.26 2000-08-18 11:58:31 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.25 2000-05-25 13:37:30 obachman Exp $";
+version="$Id: all.lib,v 1.26 2000-08-18 11:58:31 Singular Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -70,5 +70,5 @@ LIB "spcurve.lib";
 LIB "algebra.lib";
 LIB "ip.lib";
 LIB "toric.lib";
-LIB "Mregular.lib"
+LIB "mregular.lib"
 
