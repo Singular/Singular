@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.9 1998-06-02 15:29:58 Singular Exp $ */
+/* $Id: mmemory.h,v 1.10 1998-11-12 13:07:59 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -116,20 +116,6 @@ char * mmDBStrdup( const char * s, char *fname, int lineno);
 BOOLEAN mmDBTestBlock( const void* adr, const size_t size, const char * fname, const int lineno );
 
 BOOLEAN mmDBTest( const void* adr, const char * fname, const int lineno );
-
-#define mmAllocBlock(size) mmDBAllocBlock(size,__FILE__,__LINE__)
-
-#define mmFreeBlock(adr,size) mmDBFreeBlock(adr,size,__FILE__,__LINE__)
-
-#define mmAllocSpecialized() mmDBAllocSpecialized(__FILE__,__LINE__)
-
-#define mmFreeSpecialized(adr) mmDBFreeSpecialized(adr,__FILE__,__LINE__)
-
-#define mmAlloc(size) mmDBAlloc(size,__FILE__,__LINE__)
-
-#define mmFree(adr) mmDBFree(adr,__FILE__,__LINE__)
-
-#define mmReallocBlock(adr,oldsize,newsize) mmDBReallocBlock(adr,oldsize,newsize,__FILE__,__LINE__)
 
 #define mmStrdup(A) mmDBStrdup(A,__FILE__,__LINE__)
 

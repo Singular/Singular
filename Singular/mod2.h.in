@@ -271,6 +271,8 @@ extern int pShortOut;
 /* define MDEBUG 1 for allowing to keep track of Alloc/Free */
 /* undefine MMDEBUG otherwise */
 /*#define MDEBUG 0 */
+/* define MTRACK for allowing to keep track of Alloc/Free with a backtrace */
+/* #define MTRACK */
 /* define MLIST for listing used blocks at programm end */
 /* undefine otherwise */
 /*#define MLIST */
@@ -307,6 +309,16 @@ extern int pShortOut;
 #endif
 #endif
 
+/* MTRACK requires MDEBUG and MLIST*/
+#ifdef MTRACK
+#ifndef MDEBUG
+#define MDEBUG 1
+#endif
+#ifndef MLIST
+#define MLIST
+#endif
+#endif
+
 /* PDEBUG requires MDEBUG */
 #ifdef PDEBUG
 #ifndef MDEBUG
@@ -323,6 +335,10 @@ extern int pShortOut;
 #ifdef PAGE_COUNT
 #define PAGE_TEST
 #endif
+
+#ifdef MTRACK
+#define BT_MAXSTACK 10
+#endif /* MTRACK */
 
 #else /* not NDEBUG */
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.13 1998-10-15 11:46:00 obachman Exp $ */
+/* $Id: mminit.cc,v 1.14 1998-11-12 13:08:00 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -96,12 +96,21 @@ void *mm_spec_part=NULL;
 
 #ifdef MDEBUG
 
+#ifdef MTRACK
+DBMCB mm_theDBused={NULL,NULL,0,0,NULL,{0},0,0,NULL};
+DBMCB mm_theDBfree={NULL,NULL,0,0,NULL,{0},0,0,NULL};
+DBMCB mm_tmpDBused={NULL,NULL,0,0,NULL,{0},0,0,NULL};
+DBMCB mm_tmpDBfree={NULL,NULL,0,0,NULL,{0},0,0,NULL};
+DBMCB mm_normDBused={NULL,NULL,0,0,NULL,{0},0,0,NULL};
+DBMCB mm_normDBfree={NULL,NULL,0,0,NULL,{0},0,0,NULL};
+#else
 DBMCB mm_theDBused={NULL,NULL,0,0,NULL,0,0,NULL};
 DBMCB mm_theDBfree={NULL,NULL,0,0,NULL,0,0,NULL};
 DBMCB mm_tmpDBused={NULL,NULL,0,0,NULL,0,0,NULL};
 DBMCB mm_tmpDBfree={NULL,NULL,0,0,NULL,0,0,NULL};
 DBMCB mm_normDBused={NULL,NULL,0,0,NULL,0,0,NULL};
 DBMCB mm_normDBfree={NULL,NULL,0,0,NULL,0,0,NULL};
+#endif
 void * mm_maxAddr=NULL;
 void * mm_minAddr=NULL;
 
