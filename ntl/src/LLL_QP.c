@@ -5,8 +5,6 @@
 
 #include <NTL/new.h>
 
-#include <stdio.h>
-
 NTL_START_IMPL
 
 static inline
@@ -428,6 +426,49 @@ static double StartTime = 0;
 static double LastTime = 0;
 
 
+static void LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
+{
+   cerr << "---- LLL_QP status ----\n";
+   cerr << "elapsed time: ";
+   PrintTime(cerr, t-StartTime);
+   cerr << ", stage: " << max_k;
+   cerr << ", rank: " << m;
+   cerr << ", swaps: " << NumSwaps << "\n";
+
+   ZZ t1;
+   long i;
+   double prodlen = 0;
+
+   for (i = 1; i <= m; i++) {
+      InnerProduct(t1, B(i), B(i));
+      if (!IsZero(t1))
+         prodlen += log(t1);
+   }
+
+   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
+
+   if (LLLDumpFile) {
+      cerr << "dumping to " << LLLDumpFile << "...";
+
+      ofstream f;
+      OpenWrite(f, LLLDumpFile);
+      
+      f << "[";
+      for (i = 1; i <= m; i++) {
+         f << B(i) << "\n";
+      }
+      f << "]\n";
+
+      f.close();
+
+      cerr << "\n";
+   }
+
+   LastTime = t;
+   
+}
+
+
 static void init_red_fudge()
 {
    long i;
@@ -448,6 +489,8 @@ static void inc_red_fudge()
 
    red_fudge = red_fudge * 2;
    log_red--;
+
+   cerr << "LLL_QP: warning--relaxing reduction (" << log_red << ")\n";
 
    if (log_red < 4)
       Error("LLL_QP: too much loss of precision...stop!");
@@ -537,6 +580,14 @@ long ll_LLL_QP(mat_ZZ& B, mat_ZZ* U, quad_float delta, long deep,
          max_k = k;
       }
 
+      if (verbose) {
+         tt = GetTime();
+
+         if (tt > LastTime + LLLStatusInterval)
+            LLLStatus(max_k, tt, m, B);
+      }
+
+
       if (st[k] == k)
          rst = 1;
       else
@@ -557,7 +608,7 @@ long ll_LLL_QP(mat_ZZ& B, mat_ZZ* U, quad_float delta, long deep,
 
          counter++;
          if (counter > 10000) {
-            printf( "LLL_QP: warning--possible infinite loop\n");
+            cerr << "LLL_QP: warning--possible infinite loop\n";
             counter = 0;
          }
 
@@ -710,6 +761,10 @@ long ll_LLL_QP(mat_ZZ& B, mat_ZZ* U, quad_float delta, long deep,
          k++;
          // cout << "+ " << k << "\n";
       }
+   }
+
+   if (verbose) {
+      LLLStatus(m+1, GetTime(), m, B);
    }
 
 
@@ -933,6 +988,61 @@ void ComputeBKZThresh(quad_float *c, long beta)
 }
 
 
+static 
+void BKZStatus(double tt, double enum_time, unsigned long NumIterations, 
+               unsigned long NumTrivial, unsigned long NumNonTrivial, 
+               unsigned long NumNoOps, long m, 
+               const mat_ZZ& B)
+{
+   cerr << "---- BKZ_QP status ----\n";
+   cerr << "elapsed time: ";
+   PrintTime(cerr, tt-StartTime);
+   cerr << ", enum time: ";
+   PrintTime(cerr, enum_time);
+   cerr << ", iter: " << NumIterations << "\n";
+   cerr << "triv: " << NumTrivial;
+   cerr << ", nontriv: " << NumNonTrivial;
+   cerr << ", no ops: " << NumNoOps;
+   cerr << ", rank: " << m;
+   cerr << ", swaps: " << NumSwaps << "\n";
+
+
+
+   ZZ t1;
+   long i;
+   double prodlen = 0;
+
+   for (i = 1; i <= m; i++) {
+      InnerProduct(t1, B(i), B(i));
+      if (!IsZero(t1))
+         prodlen += log(t1);
+   }
+
+   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
+
+
+   if (LLLDumpFile) {
+      cerr << "dumping to " << LLLDumpFile << "...";
+
+      ofstream f;
+      OpenWrite(f, LLLDumpFile);
+      
+      f << "[";
+      for (i = 1; i <= m; i++) {
+         f << B(i) << "\n";
+      }
+      f << "]\n";
+
+      f.close();
+
+      cerr << "\n";
+   }
+
+   LastTime = tt;
+   
+}
+
+
 static
 long BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta, 
          long beta, long prune, LLLCheckFct check)
@@ -1100,6 +1210,15 @@ long BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
             clean = 1;
          }
 
+         if (verb) {
+            tt = GetTime();
+            if (tt > LastTime + LLLStatusInterval)
+               BKZStatus(tt, enum_time, NumIterations, NumTrivial,
+                         NumNonTrivial, NumNoOps, m, B);
+         }
+
+
+
    
          // ENUM
 
@@ -1134,6 +1253,19 @@ long BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
+            if (verb) {
+               enum_cnt++;
+               if (enum_cnt > 100000) {
+                  enum_cnt = 0;
+                  tt = GetTime();
+                  if (tt > LastTime + LLLStatusInterval) {
+                     enum_time += tt - tt1;
+                     tt1 = tt;
+                     BKZStatus(tt, enum_time, NumIterations, NumTrivial,
+                               NumNonTrivial, NumNoOps, m, B);
+                  }
+               }
+            }
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
@@ -1326,6 +1458,12 @@ long BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
             z++;
          }
       }
+   }
+
+
+   if (verb) {
+      BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial,
+                NumNoOps, m, B);
    }
 
 
@@ -1582,6 +1720,16 @@ long BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
             clean = 1;
          }
 
+         if (verb) {
+            tt = GetTime();
+            if (tt > LastTime + LLLStatusInterval)
+               BKZStatus(tt, enum_time, NumIterations, NumTrivial,
+                         NumNonTrivial, NumNoOps, m, B);
+         }
+
+
+
+   
          // ENUM
 
          double tt1;
@@ -1615,6 +1763,19 @@ long BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
+            if (verb) {
+               enum_cnt++;
+               if (enum_cnt > 100000) {
+                  enum_cnt = 0;
+                  tt = GetTime();
+                  if (tt > LastTime + LLLStatusInterval) {
+                     enum_time += tt - tt1;
+                     tt1 = tt;
+                     BKZStatus(tt, enum_time, NumIterations, NumTrivial,
+                               NumNonTrivial, NumNoOps, m, B);
+                  }
+               }
+            }
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*to_double(c[t]);
@@ -1812,6 +1973,13 @@ long BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
          }
       }
    }
+
+
+   if (verb) {
+      BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial,
+                NumNoOps, m, B);
+   }
+
 
    // clean up
 

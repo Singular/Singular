@@ -892,6 +892,159 @@ void power(RR& z, const RR& a, long e)
 }
 
 
+istream& operator>>(istream& s, RR& x)
+{
+   long c;
+   long cval;
+   long sign;
+   ZZ a, b;
+
+   if (!s) Error("bad RR input");
+
+
+   c = s.peek();
+   while (IsWhiteSpace(c)) {
+      s.get();
+      c = s.peek();
+   }
+
+   if (c == '-') {
+      sign = -1;
+      s.get();
+      c = s.peek();
+   }
+   else
+      sign = 1;
+
+   long got1 = 0;
+   long got_dot = 0;
+   long got2 = 0;
+
+   a = 0;
+   b = 1;
+
+   cval = CharToIntVal(c);
+
+   if (cval >= 0 && cval <= 9) {
+      got1 = 1;
+
+      while (cval >= 0 && cval <= 9) {
+         mul(a, a, 10);
+         add(a, a, cval);
+         s.get();
+         c = s.peek();
+         cval = CharToIntVal(c);
+      }
+   }
+
+   if (c == '.') {
+      got_dot = 1;
+
+      s.get();
+      c = s.peek();
+      cval = CharToIntVal(c);
+
+      if (cval >= 0 && cval <= 9) {
+         got2 = 1;
+   
+         while (cval >= 0 && cval <= 9) {
+            mul(a, a, 10);
+            add(a, a, cval);
+            mul(b, b, 10);
+            s.get();
+            c = s.peek();
+            cval = CharToIntVal(c);
+         }
+      }
+   }
+
+   if (got_dot && !got1 && !got2)  Error("bad RR input");
+
+   ZZ e;
+
+   long got_e = 0;
+   long e_sign;
+
+   if (c == 'e' || c == 'E') {
+      got_e = 1;
+
+      s.get();
+      c = s.peek();
+
+      if (c == '-') {
+         e_sign = -1;
+         s.get();
+         c = s.peek();
+      }
+      else if (c == '+') {
+         e_sign = 1;
+         s.get();
+         c = s.peek();
+      }
+      else
+         e_sign = 1;
+
+      cval = CharToIntVal(c);
+
+      if (cval < 0 || cval > 9) Error("bad RR input");
+
+      e = 0;
+      while (cval >= 0 && cval <= 9) {
+         mul(e, e, 10);
+         add(e, e, cval);
+         s.get();
+         c = s.peek();
+         cval = CharToIntVal(c);
+      }
+   }
+
+   if (!got1 && !got2 && !got_e) Error("bad RR input");
+
+   RR t1, t2, v;
+
+   long old_p = RR::precision();
+
+   if (got1 || got2) {
+      ConvPrec(t1, a, max(NumBits(a), 1));
+      ConvPrec(t2, b, NumBits(b));
+      if (got_e)
+         RR::SetPrecision(old_p + 10);
+
+      div(v, t1, t2);
+   }
+   else
+      set(v);
+
+   if (sign < 0)
+      negate(v, v);
+
+   if (got_e) {
+      if (e >= NTL_OVFBND) Error("RR input overflow");
+      long E;
+      conv(E, e);
+      if (e_sign < 0) E = -E;
+      RR::SetPrecision(old_p + 10);
+      power(t1, to_RR(10), E);
+      mul(v, v, t1);
+      RR::prec = old_p;
+   }
+
+   xcopy(x, v);
+   return s;
+}
+
+void InputPrec(RR& x, istream& s, long p)
+{
+   if (p < 1 || NTL_OVERFLOW(p, 1, 0))
+      Error("ConvPrec: bad precsion");
+
+   long old_p = RR::prec;
+   RR::prec = p;
+   s >> x;
+   RR::prec = old_p;
+}
+
+
 void conv(RR& z, const xdouble& a)
 {
    conv(z, a.mantissa());
@@ -1756,6 +1909,137 @@ void cos(RR& res, const RR& x)
    
    xcopy(res, s);
 
+}
+
+
+ostream& operator<<(ostream& s, const RR& a)
+{
+   if (IsZero(a)) {
+      s << "0";
+      return s;
+   }
+
+   long old_p = RR::precision();
+
+   // we compute new_p and log_10_a precisely using sufficient
+   // precision---this is necessary to achieve accuracy and
+   // platform independent behaviour
+
+   long temp_p = max(NumBits(RR::OutputPrecision()), 
+                     NumBits(Lg2(a))) + 10; 
+
+   RR::SetPrecision(temp_p);
+
+   RR ln2, ln10, log_2_10;
+   ComputeLn2(ln2);
+   ComputeLn10(ln10);
+   log_2_10 = ln10/ln2;
+   long new_p = to_long(RR::OutputPrecision()*log_2_10) + 20;
+   long log_10_a = to_long(Lg2(a)/log_2_10);
+
+   RR::SetPrecision(new_p);
+
+   RR b;
+   long neg;
+
+   if (a < 0) {
+      negate(b, a);
+      neg = 1;
+   }
+   else {
+      xcopy(b, a);
+      neg = 0;
+   }
+
+   long k = RR::OutputPrecision() - log_10_a;
+
+   RR c, d;
+
+   power(c, to_RR(10), RR::OutputPrecision());
+   power(d, to_RR(10), log_10_a);
+
+   div(b, b, d);
+   mul(b, b, c);
+
+   while (b < c) {
+      mul(b, b, 10);
+      k++;
+   }
+
+   while (b >= c) {
+      div(b, b, 10);
+      k--;
+   }
+
+   add(b, b, 0.5);
+   k = -k;
+
+   ZZ B;
+   conv(B, b);
+
+   long bp_len = RR::OutputPrecision()+10;
+
+   char *bp = NTL_NEW_OP char[bp_len];
+
+   if (!bp) Error("RR output: out of memory");
+
+   long len, i;
+
+   len = 0;
+   do {
+      if (len >= bp_len) Error("RR output: buffer overflow");
+      bp[len] = IntValToChar(DivRem(B, B, 10));
+      len++;
+   } while (B > 0);
+
+   for (i = 0; i < len/2; i++) {
+      char tmp;
+      tmp = bp[i];
+      bp[i] = bp[len-1-i];
+      bp[len-1-i] = tmp;
+   }
+
+   i = len-1;
+   while (bp[i] == '0') i--;
+
+   k += (len-1-i);
+   len = i+1;
+
+   bp[len] = '\0';
+
+   if (k > 3 || k < -len - 3) {
+      // use scientific notation
+
+      if (neg) s << "-";
+      s << "0." << bp << "e" << (k + len);
+   }
+   else if (k >= 0) {
+      if (neg) s << "-";
+      s << bp;
+      for (i = 0; i < k; i++) 
+         s << "0";
+   }
+   else if (k <= -len) {
+      if (neg) s << "-";
+      s << "0.";
+      for (i = 0; i < -len-k; i++)
+         s << "0";
+      s << bp;
+   }
+   else {
+      if (neg) s << "-";
+      for (i = 0; i < len+k; i++)
+         s << bp[i];
+
+      s << ".";
+
+      for (i = len+k; i < len; i++)
+         s << bp[i];
+   }
+
+   RR::SetPrecision(old_p);
+   delete [] bp;
+   return s;
 }
 
 

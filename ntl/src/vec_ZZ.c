@@ -10,6 +10,8 @@ NTL_vector_impl(ZZ,vec_ZZ)
 
 NTL_eq_vector_impl(ZZ,vec_ZZ)
 
+NTL_io_vector_impl(ZZ,vec_ZZ)
+
 void InnerProduct(ZZ& xx, const vec_ZZ& a, const vec_ZZ& b)
 {
    ZZ t1, x;

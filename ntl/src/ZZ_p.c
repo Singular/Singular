@@ -295,6 +295,16 @@ void conv(ZZ_p& x, long a)
    }
 }
 
+istream& operator>>(istream& s, ZZ_p& x)
+{
+   static ZZ y;
+
+   s >> y;
+   conv(x, y);
+
+   return s;
+}
+
 void div(ZZ_p& x, const ZZ_p& a, const ZZ_p& b)
 {
    ZZ_pTemp TT; ZZ_p& T = TT.val(); 

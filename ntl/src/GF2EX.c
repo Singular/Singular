@@ -17,6 +17,19 @@ const GF2EX& GF2EX::zero()
 
 
 
+istream& operator>>(istream& s, GF2EX& x)
+{
+   s >> x.rep;
+   x.normalize();
+   return s;
+}
+
+ostream& operator<<(ostream& s, const GF2EX& a)
+{
+   return s << a.rep;
+}
+
+
 void GF2EX::normalize()
 {
    long n;
@@ -372,7 +385,7 @@ void sqr(GF2EX& x, const GF2EX& a)
       return;
    }
 
-   x.rep.SetLength(2*(da+1));
+   x.rep.SetLength(2*da+1);
    long i;
 
    for (i = da; i > 0; i--) {
@@ -2195,6 +2208,8 @@ void ShiftAdd(GF2EX& U, const GF2EX& V, long n)
 NTL_vector_impl(GF2EX,vec_GF2EX)
 
 NTL_eq_vector_impl(GF2EX,vec_GF2EX)
+
+NTL_io_vector_impl(GF2EX,vec_GF2EX)
 
 
 

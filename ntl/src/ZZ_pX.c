@@ -43,6 +43,19 @@ ZZ_pX& ZZ_pX::operator=(const ZZ_p& a)
 }
 
 
+istream& operator>>(istream& s, ZZ_pX& x)
+{
+   s >> x.rep;
+   x.normalize();
+   return s;
+}
+
+ostream& operator<<(ostream& s, const ZZ_pX& a)
+{
+   return s << a.rep;
+}
+
+
 void ZZ_pX::normalize()
 {
    long n;

@@ -107,6 +107,28 @@ long operator!=(const mat_GF2& a, const mat_GF2& b)
    return !(a == b);  
 }  
 
+istream& operator>>(istream& s, mat_GF2& x)  
+{  
+   vec_vec_GF2 buf;  
+   s >> buf;  
+   conv(x, buf);  
+   return s;  
+}  
+  
+ostream& operator<<(ostream& s, const mat_GF2& a)  
+{  
+   long n = a.NumRows();  
+   long i;  
+   s << "[";  
+   for (i = 0; i < n; i++) {
+      s << a[i];  
+      s << "\n";
+   }
+   s << "]";  
+   return s;  
+}  
+
+
 void add(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)  
 {  
    long n = A.NumRows();  

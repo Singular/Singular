@@ -6,6 +6,7 @@
 NTL_START_IMPL
 
 NTL_matrix_impl(zz_p,vec_zz_p,vec_vec_zz_p,mat_zz_p)
+NTL_io_matrix_impl(zz_p,vec_zz_p,vec_vec_zz_p,mat_zz_p)
 NTL_eq_matrix_impl(zz_p,vec_zz_p,vec_vec_zz_p,mat_zz_p)
 
 

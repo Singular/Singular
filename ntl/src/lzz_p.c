@@ -251,4 +251,22 @@ void conv(zz_p& x, const ZZ& a)
 }
 
 
+istream& operator>>(istream& s, zz_p& x)
+{
+   static ZZ y;
+   s >> y;
+   conv(x, y);
+
+   return s;
+}
+
+ostream& operator<<(ostream& s, zz_p a)
+{
+   static ZZ y;
+   y = rep(a);
+   s << y;
+
+   return s;
+}
+
 NTL_END_IMPL

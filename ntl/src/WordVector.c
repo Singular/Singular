@@ -3,8 +3,6 @@
 
 #include <NTL/new.h>
 
-#include <stdio.h>
-
 NTL_START_IMPL
 
 
@@ -124,11 +122,12 @@ void WordVector::kill()
   
 void WordVector::RangeError(long i) const  
 {  
-   printf( "index out of range in vector: %d", i);  
+   cerr << "index out of range in vector: ";  
+   cerr << i;  
    if (!rep)  
-      printf( "(0)\n");  
+      cerr << "(0)\n";  
    else  
-      printf( "(%d)\n" ,rep[-1] );  
+      cerr << "(" << rep[-1] << ")\n";  
    abort();  
 }  
 
@@ -171,6 +170,68 @@ void WordVector::append_impl(WordVector& v, const WordVector& w)
       v[l+i] = w[i];  
 }
 
+
+istream & operator>>(istream& s, WordVector& a)   
+{   
+   WordVector ibuf;  
+   long c;   
+   long n;   
+   if (!s) Error("bad vector input"); 
+   
+   c = s.peek();  
+   while (IsWhiteSpace(c)) {  
+      s.get();  
+      c = s.peek();  
+   }  
+   if (c != '[') {  
+      Error("bad vector input");  
+   }  
+ 
+   n = 0;   
+   ibuf.SetLength(0);  
+      
+   s.get();  
+   c = s.peek();  
+   while (IsWhiteSpace(c)) {  
+      s.get();  
+      c = s.peek();  
+   }  
+   while (c != ']' && c != EOF) {   
+      if (n % NTL_WordVectorInputBlock == 0) ibuf.SetMaxLength(n + NTL_WordVectorInputBlock); 
+      n++;   
+      ibuf.SetLength(n);   
+      if (!(s >> ibuf[n-1])) Error("bad vector input");   
+      c = s.peek();  
+      while (IsWhiteSpace(c)) {  
+         s.get();  
+         c = s.peek();  
+      }  
+   }   
+   if (c == EOF) Error("bad vector input");  
+   s.get(); 
+   
+   a = ibuf; 
+   return s;   
+}    
+   
+   
+ostream& operator<<(ostream& s, const WordVector& a)   
+{   
+   long i, n;   
+  
+   n = a.length();  
+   
+   s << '[';   
+   
+   for (i = 0; i < n; i++) {   
+      s << a[i];   
+      if (i < n-1) s << " ";   
+   }   
+   
+   s << ']';   
+      
+   return s;   
+}   
 
 long operator==(const WordVector& a, const WordVector& b) 
 {  

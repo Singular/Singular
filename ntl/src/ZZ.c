@@ -79,6 +79,74 @@ static void InitZZIO()
    if (iodigits <= 0) Error("problem with I/O");
 }
 
+istream& operator>>(istream& s, ZZ& x)
+{
+   long c;
+   long cval;
+   long sign;
+   long ndigits;
+   long acc;
+   static ZZ a;
+
+   if (!s) Error("bad ZZ input");
+
+   if (!iodigits) InitZZIO();
+
+   a = 0;
+
+   SkipWhiteSpace(s);
+   c = s.peek();
+
+   if (c == '-') {
+      sign = -1;
+      s.get();
+      c = s.peek();
+   }
+   else
+      sign = 1;
+
+   cval = CharToIntVal(c);
+
+   if (cval < 0 || cval > 9) Error("bad ZZ input");
+
+   ndigits = 0;
+   acc = 0;
+   while (cval >= 0 && cval <= 9) {
+      acc = acc*10 + cval;
+      ndigits++;
+
+      if (ndigits == iodigits) {
+         mul(a, a, ioradix);
+         add(a, a, acc);
+         ndigits = 0;
+         acc = 0;
+      }
+
+      s.get();
+      c = s.peek();
+      cval = CharToIntVal(c);
+   }
+
+   if (ndigits != 0) {
+      long mpy = 1;
+      while (ndigits > 0) {
+         mpy = mpy * 10;
+         ndigits--;
+      }
+
+      mul(a, a, mpy);
+      add(a, a, acc);
+   }
+
+   if (sign == -1)
+      negate(a, a);
+
+   x = a;
+
+   return s;
+}
+
+
 // The class _ZZ_local_stack should be defined in an empty namespace,
 // but since I don't want to rely on namespaces, we just give it a funny 
 // name to avoid accidental name clashes.
@@ -116,6 +184,82 @@ void _ZZ_local_stack::push(long x)
 
    elts[top] = x;
 }
+
+
+static
+void PrintDigits(ostream& s, long d, long justify)
+{
+   static char *buf = 0;
+
+   if (!buf) {
+      buf = (char *) NTL_MALLOC(iodigits, 1, 0);
+      if (!buf) Error("out of memory");
+   }
+
+   long i = 0;
+
+   while (d) {
+      buf[i] = IntValToChar(d % 10);
+      d = d / 10;
+      i++;
+   }
+
+   if (justify) {
+      long j = iodigits - i;
+      while (j > 0) {
+         s << "0";
+         j--;
+      }
+   }
+
+   while (i > 0) {
+      i--;
+      s << buf[i];
+   }
+}
+      
+
+   
+
+ostream& operator<<(ostream& s, const ZZ& a)
+{
+   static ZZ b;
+   static _ZZ_local_stack S;
+   long r;
+   long k;
+
+   if (!iodigits) InitZZIO();
+
+   b = a;
+
+   k = sign(b);
+
+   if (k == 0) {
+      s << "0";
+      return s;
+   }
+
+   if (k < 0) {
+      s << "-";
+      negate(b, b);
+   }
+
+   do {
+      r = DivRem(b, b, ioradix);
+      S.push(r);
+   } while (!IsZero(b));
+
+   r = S.pop();
+   PrintDigits(s, r, 0);
+
+   while (!S.empty()) {
+      r = S.pop();
+      PrintDigits(s, r, 1);
+   }
+      
+   return s;
+}
+
 
 
 long GCD(long a, long b)
@@ -787,11 +931,76 @@ void SqrRootMod(ZZ& x, const ZZ& aa, const ZZ& nn)
       return;
    }
 
-   // at this point, we msut have nn >= 5
+   // at this point, we must have nn >= 5
+
+   if (trunc_long(nn, 2) == 3) {  // special case, n = 3 (mod 4)
+      ZZ n, a, e, z;
+
+      n = nn;
+      a  = aa;
+
+      add(e, n, 1);
+      RightShift(e, e, 2);
+
+      PowerMod(z, a, e, n);
+      x = z;
+
+      return;
+   }
+
+   ZZ n, m;
+   int h, nlen;
+
+   n = nn;
+   nlen = NumBits(n);
+
+   sub(m, n, 1);
+   h = MakeOdd(m);  // h >= 2
+
+
+   if (nlen > 50 && h < SqrRoot(nlen)) {
+      long i, j;
+      ZZ a, b, a_inv, c, r, m1, d;
+
+      a = aa;
+      InvMod(a_inv, a, n);
+
+      if (h == 2) 
+         b = 2;
+      else {
+         do {
+            RandomBnd(b, n);
+         } while (Jacobi(b, n) != -1);
+      }
+
+
+      PowerMod(c, b, m, n);
+      
+      add(m1, m, 1);
+      RightShift(m1, m1, 1);
+      PowerMod(r, a, m1, n);
+
+      for (i = h-2; i >= 0; i--) {
+         SqrMod(d, r, n);
+         MulMod(d, d, a_inv, n);
+         for (j = 0; j < i; j++)
+            SqrMod(d, d, n);
+         if (!IsOne(d))
+            MulMod(r, r, c, n);
+         SqrMod(c, c, n);
+      } 
+
+      x = r;
+      return;
+   } 
+
+
+
+
 
    long i, k;
-   ZZ ma, n, t, u, v, e;
-   ZZ t1, t2, t3;
+   ZZ ma, t, u, v, e;
+   ZZ t1, t2, t3, t4;
 
    n = nn;
    NegateMod(ma, aa, n);
@@ -816,15 +1025,21 @@ void SqrRootMod(ZZ& x, const ZZ& aa, const ZZ& nn)
    k = NumBits(e);
 
    for (i = k - 1; i >= 0; i--) {
-      SqrMod(t1, u, n);
-      SqrMod(t2, v, n);
-      MulMod(t3, u, v, n);
-      MulMod(t3, t3, 2, n);
-      MulMod(u, t1, t, n);
-      AddMod(u, u, t3, n);
-      MulMod(v, t1, ma, n);
-      AddMod(v, v, t2, n);
+      add(t2, u, v);
+      sqr(t3, t2);  // t3 = (u+v)^2
+      sqr(t1, u);
+      sqr(t2, v);
+      sub(t3, t3, t1);
+      sub(t3, t3, t2); // t1 = u^2, t2 = v^2, t3 = 2*u*v
+      rem(t1, t1, n);
+      mul(t4, t1, t);
+      add(t4, t4, t3);
+      rem(u, t4, n);
 
+      mul(t4, t1, ma);
+      add(t4, t4, t2);
+      rem(v, t4, n);
+      
       if (bit(e, i)) {
          MulMod(t1, u, t, n);
          AddMod(t1, t1, v, n);

@@ -893,6 +893,8 @@ NTL_vector_impl(zz_pX,vec_zz_pX)
 
 NTL_eq_vector_impl(zz_pX,vec_zz_pX)
 
+NTL_io_vector_impl(zz_pX,vec_zz_pX)
+
 
 
    

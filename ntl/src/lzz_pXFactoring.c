@@ -90,6 +90,8 @@ void NullSpace(long& r, vec_long& D, vec_vec_zz_p& M, long verbose)
    l = 0;
    for (k = 0; k < n; k++) {
 
+      if (verbose && k % 10 == 0) cerr << "+";
+
       pos = -1;
       for (i = l; i < n; i++) {
          if (!IsZero(M[i][k])) {
@@ -157,6 +159,7 @@ void BuildMatrix(vec_vec_zz_p& M,
 
    set(h);
    for (j = 0; j < n; j++) {
+      if (verbose && j % 10 == 0) cerr << "+";
 
       m = deg(h);
       for (i = 0; i < n; i++) {
@@ -254,6 +257,8 @@ void RandomBasisElt(zz_pX& g, const vec_long& D,
          v[j] = t1;
       }
    }
+
+   g.normalize();
 }
 
 
@@ -378,23 +383,33 @@ void SFBerlekamp(vec_zz_pX& factors, const zz_pX& ff, long verbose)
 
    zz_pX g, h;
 
+   if (verbose) { cerr << "computing X^p..."; t = GetTime(); }
    PowerXMod(g, p, F);
+   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
    vec_long D;
    long r;
 
    vec_vec_zz_p M;
 
+   if (verbose) { cerr << "building matrix..."; t = GetTime(); }
    BuildMatrix(M, n, g, F, verbose);
+   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
+   if (verbose) { cerr << "diagonalizing..."; t = GetTime(); }
    NullSpace(r, D, M, verbose);
+   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
+
+   if (verbose) cerr << "number of factors = " << r << "\n";
 
    if (r == 1) {
       factors.SetLength(1);
       factors[0] = f;
       return;
    }
+
+   if (verbose) { cerr << "factor extraction..."; t = GetTime(); }
 
    vec_zz_p roots;
 
@@ -409,6 +424,7 @@ void SFBerlekamp(vec_zz_pX& factors, const zz_pX& ff, long verbose)
    long i;
 
    while (factors.length() < r) {
+      if (verbose) cerr << "+";
       RandomBasisElt(g, D, M);
       S.kill();
       for (i = 0; i < factors.length(); i++) {
@@ -432,6 +448,15 @@ void SFBerlekamp(vec_zz_pX& factors, const zz_pX& ff, long verbose)
       swap(factors, S);
    }
 
+   if (verbose) { cerr << (GetTime()-t) << "\n"; }
+
+   if (verbose) {
+      cerr << "degrees:";
+      long i;
+      for (i = 0; i < factors.length(); i++)
+         cerr << " " << deg(factors[i]);
+      cerr << "\n";
+   }
 }
 
 
@@ -444,13 +469,19 @@ void berlekamp(vec_pair_zz_pX_long& factors, const zz_pX& f, long verbose)
    if (!IsOne(LeadCoeff(f)))
       Error("berlekamp: bad args");
 
+   if (verbose) { cerr << "square-free decomposition..."; t = GetTime(); }
    SquareFreeDecomp(sfd, f);
+   if (verbose) cerr << (GetTime()-t) << "\n";
 
    factors.SetLength(0);
 
    long i, j;
 
    for (i = 0; i < sfd.length(); i++) {
+      if (verbose) {
+         cerr << "factoring multiplicity " << sfd[i].b 
+              << ", deg = " << deg(sfd[i].a) << "\n";
+      }
 
       SFBerlekamp(x, sfd[i].a, verbose);
 
@@ -464,6 +495,8 @@ void berlekamp(vec_pair_zz_pX_long& factors, const zz_pX& f, long verbose)
 static
 void AddFactor(vec_pair_zz_pX_long& factors, const zz_pX& g, long d, long verbose)
 {
+   if (verbose)
+      cerr << "degree=" << d << ", number=" << deg(g)/d << "\n";
    append(factors, cons(g, d));
 }
 
@@ -474,6 +507,8 @@ void ProcessTable(zz_pX& f, vec_pair_zz_pX_long& factors,
 
 {
    if (limit == 0) return;
+
+   if (verbose) cerr << "+";
 
    zz_pX t1;
 
@@ -724,7 +759,9 @@ void RootEDF(vec_zz_pX& factors, const zz_pX& f, long verbose)
    vec_zz_p roots;
    double t;
 
+   if (verbose) { cerr << "finding roots..."; t = GetTime(); }
    FindRoots(roots, f);
+   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
    long r = roots.length();
    factors.SetLength(r);
@@ -758,6 +795,8 @@ void RecEDF(vec_zz_pX& factors, const zz_pX& f, const zz_pX& b, long d,
    vec_zz_pX v;
    long i;
    zz_pX bb;
+
+   if (verbose) cerr << "+";
 
    EDFSplit(v, f, b, d);
    for (i = 0; i < v.length(); i++) {
@@ -803,10 +842,17 @@ void EDF(vec_zz_pX& factors, const zz_pX& ff, const zz_pX& bb,
    }
 
    
+   double t;
+   if (verbose) { 
+      cerr << "computing EDF(" << d << "," << r << ")..."; 
+      t = GetTime(); 
+   }
+
    factors.SetLength(0);
 
    RecEDF(factors, f, b, d, verbose);
 
+   if (verbose) cerr << (GetTime()-t) << "\n";
 }
 
 
@@ -815,6 +861,8 @@ void SFCanZass1(vec_pair_zz_pX_long& u, zz_pX& h, const zz_pX& f, long verbose)
    if (!IsOne(LeadCoeff(f)) || deg(f) == 0)
       Error("SFCanZass1: bad args");
 
+   double t;
+
    long p = zz_p::modulus();
 
    
@@ -822,9 +870,16 @@ void SFCanZass1(vec_pair_zz_pX_long& u, zz_pX& h, const zz_pX& f, long verbose)
    build(F, f);
 
 
+   if (verbose) { cerr << "computing X^p..."; t = GetTime(); }
    PowerXMod(h, p, F);
+   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
+   if (verbose) { cerr << "computing DDF..."; t = GetTime(); }
    NewDDF(u, f, h, verbose);
+   if (verbose) { 
+      t = GetTime()-t; 
+      cerr << "DDF time: " << t << "\n";
+   }
 }
 
 void SFCanZass2(vec_zz_pX& factors, const vec_pair_zz_pX_long& u,
@@ -895,10 +950,17 @@ void SFCanZass(vec_zz_pX& factors, const zz_pX& ff, long verbose)
 
    zz_pX h;
 
+   if (verbose) { cerr << "computing X^p..."; t = GetTime(); }
    PowerXMod(h, p, F);
+   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
    vec_pair_zz_pX_long u;
+   if (verbose) { cerr << "computing DDF..."; t = GetTime(); }
    NewDDF(u, f, h, verbose);
+   if (verbose) { 
+      t = GetTime()-t; 
+      cerr << "DDF time: " << t << "\n";
+   }
 
    zz_pX hh;
    vec_zz_pX v;
@@ -941,13 +1003,19 @@ void CanZass(vec_pair_zz_pX_long& factors, const zz_pX& f, long verbose)
    vec_pair_zz_pX_long sfd;
    vec_zz_pX x;
 
+   if (verbose) { cerr << "square-free decomposition..."; t = GetTime(); }
    SquareFreeDecomp(sfd, f);
+   if (verbose) cerr << (GetTime()-t) << "\n";
 
    factors.SetLength(0);
 
    long i, j;
 
    for (i = 0; i < sfd.length(); i++) {
+      if (verbose) {
+         cerr << "factoring multiplicity " << sfd[i].b 
+              << ", deg = " << deg(sfd[i].a) << "\n";
+      }
 
       SFCanZass(x, sfd[i].a, verbose);
 
@@ -1475,6 +1543,10 @@ static
 void GenerateBabySteps(zz_pX& h1, const zz_pX& f, const zz_pX& h, long k,
                        long verbose)
 {
+   double t;
+
+   if (verbose) { cerr << "generating baby steps..."; t = GetTime(); }
+
    zz_pXModulus F;
    build(F, f);
 
@@ -1493,6 +1565,7 @@ void GenerateBabySteps(zz_pX& h1, const zz_pX& f, const zz_pX& h, long k,
          (*BabyStepFile)(i) = h1;
 
          PowerMod(h1, h1, zz_p::modulus(), F);
+         if (verbose) cerr << "+";
       }
    }
    else {
@@ -1504,9 +1577,12 @@ void GenerateBabySteps(zz_pX& h1, const zz_pX& f, const zz_pX& h, long k,
          (*BabyStepFile)(i) = h1; 
    
          CompMod(h1, h1, H, F);
+         if (verbose) cerr << "+";
       }
    }
    
+   if (verbose)
+      cerr << (GetTime()-t) << "\n";
 }
 
 
@@ -1547,6 +1623,9 @@ void NewAddFactor(vec_pair_zz_pX_long& u, const zz_pX& g, long m, long verbose)
    u[len].a = g;
    u[len].b = m;
 
+   if (verbose) {
+      cerr << "split " << m << " " << deg(g) << "\n";
+   }
 }
 
    
@@ -1647,6 +1726,13 @@ void GiantRefine(vec_pair_zz_pX_long& u, const zz_pX& ff, long k, long l,
                  long verbose)
 
 {
+   double t;
+
+   if (verbose) {
+      cerr << "giant refine...";
+      t = GetTime();
+   }
+
    u.SetLength(0);
 
    vec_zz_pX BabyStep;
@@ -1688,8 +1774,11 @@ void GiantRefine(vec_pair_zz_pX_long& u, const zz_pX& ff, long k, long l,
          MulMod(buf[size-1], buf[size-1], h, F);
       }
 
+      if (verbose && bs == 0) cerr << "+";
+
       if (size == zz_pX_GCDTableSize && bs == 0) {
          NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
+         if (verbose) cerr << "*";
          size = 0;
       }
 
@@ -1706,11 +1795,16 @@ void GiantRefine(vec_pair_zz_pX_long& u, const zz_pX& ff, long k, long l,
 
    if (size > 0) {
       NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
+      if (verbose) cerr << "*";
    }
 
    if (deg(f) > 0) 
       NewAddFactor(u, f, 0, verbose);
 
+   if (verbose) {
+      t = GetTime()-t;
+      cerr << "giant refine time: " << t << "\n";
+   }
 }
 
 
@@ -1775,6 +1869,13 @@ void BabyRefine(vec_pair_zz_pX_long& factors, const vec_pair_zz_pX_long& u,
                 long k, long l, long verbose)
 
 {
+   double t;
+
+   if (verbose) {
+      cerr << "baby refine...";
+      t = GetTime();
+   }
+
    factors.SetLength(0);
 
    vec_zz_pX BabyStep;
@@ -1791,6 +1892,11 @@ void BabyRefine(vec_pair_zz_pX_long& factors, const vec_pair_zz_pX_long& u,
             FetchBabySteps(BabyStep, k);
          IntervalRefine(factors, g, k, gs, BabyStep, verbose);
       }
+   }
+
+   if (verbose) {
+      t = GetTime()-t;
+      cerr << "baby refine time: " << t << "\n";
    }
 }
 

@@ -2,8 +2,6 @@
 #include <NTL/LLL.h>
 #include <NTL/fileio.h>
 
-#include <stdio.h>
-
 #include <NTL/new.h>
 
 NTL_START_IMPL
@@ -407,6 +405,8 @@ static void inc_red_fudge()
    mul(red_fudge, red_fudge, 2);
    log_red--;
 
+   cerr << "G_LLL_RR: warning--relaxing reduction (" << log_red << ")\n";
+
    if (log_red < 4)
       Error("G_LLL_RR: can not continue...sorry");
 }
@@ -419,6 +419,50 @@ static long verbose = 0;
 static unsigned long NumSwaps = 0;
 static double StartTime = 0;
 static double LastTime = 0;
+
+
+
+static void G_LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
+{
+   cerr << "---- G_LLL_RR status ----\n";
+   cerr << "elapsed time: ";
+   PrintTime(cerr, t-StartTime);
+   cerr << ", stage: " << max_k;
+   cerr << ", rank: " << m;
+   cerr << ", swaps: " << NumSwaps << "\n";
+
+   ZZ t1;
+   long i;
+   double prodlen = 0;
+
+   for (i = 1; i <= m; i++) {
+      InnerProduct(t1, B(i), B(i));
+      if (!IsZero(t1))
+         prodlen += log(t1);
+   }
+
+   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
+
+   if (LLLDumpFile) {
+      cerr << "dumping to " << LLLDumpFile << "...";
+
+      ofstream f;
+      OpenWrite(f, LLLDumpFile);
+      
+      f << "[";
+      for (i = 1; i <= m; i++) {
+         f << B(i) << "\n";
+      }
+      f << "]\n";
+
+      f.close();
+
+      cerr << "\n";
+   }
+
+   LastTime = t;
+   
+}
 
 
 
@@ -461,6 +505,13 @@ long ll_G_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
          max_k = k;
       }
 
+      if (verbose) {
+         tt = GetTime();
+
+         if (tt > LastTime + LLLStatusInterval)
+            G_LLLStatus(max_k, tt, m, B);
+      }
+
       GivensComputeGS(B1, mu, aux, k, n, cache);
 
       counter = 0;
@@ -473,7 +524,7 @@ long ll_G_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
 
          counter++;
          if (counter > 10000) {
-            printf( "G_LLL_XD: warning--possible infinite loop\n");
+            cerr << "G_LLL_XD: warning--possible infinite loop\n";
             counter = 0;
          }
 
@@ -602,6 +653,11 @@ long ll_G_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
          }
       }
    }
+
+   if (verbose) {
+      G_LLLStatus(m+1, GetTime(), m, B);
+   }
+
 
    return m;
 }
@@ -778,6 +834,63 @@ void ComputeG_BKZThresh(RR *c, long beta)
 
 
 
+static 
+void G_BKZStatus(double tt, double enum_time, unsigned long NumIterations, 
+               unsigned long NumTrivial, unsigned long NumNonTrivial, 
+               unsigned long NumNoOps, long m, 
+               const mat_ZZ& B)
+{
+   cerr << "---- G_BKZ_RR status ----\n";
+   cerr << "elapsed time: ";
+   PrintTime(cerr, tt-StartTime);
+   cerr << ", enum time: ";
+   PrintTime(cerr, enum_time);
+   cerr << ", iter: " << NumIterations << "\n";
+   cerr << "triv: " << NumTrivial;
+   cerr << ", nontriv: " << NumNonTrivial;
+   cerr << ", no ops: " << NumNoOps;
+   cerr << ", rank: " << m;
+   cerr << ", swaps: " << NumSwaps << "\n";
+
+
+
+   ZZ t1;
+   long i;
+   double prodlen = 0;
+
+   for (i = 1; i <= m; i++) {
+      InnerProduct(t1, B(i), B(i));
+      if (!IsZero(t1))
+         prodlen += log(t1);
+   }
+
+   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
+
+
+   if (LLLDumpFile) {
+      cerr << "dumping to " << LLLDumpFile << "...";
+
+      ofstream f;
+      OpenWrite(f, LLLDumpFile);
+      
+      f << "[";
+      for (i = 1; i <= m; i++) {
+         f << B(i) << "\n";
+      }
+      f << "]\n";
+
+      f.close();
+
+      cerr << "\n";
+   }
+
+   LastTime = tt;
+   
+}
+
+
+
+
 static
 long G_BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta, 
          long beta, long prune, LLLCheckFct check)
@@ -911,6 +1024,13 @@ long G_BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
             clean = 1;
          }
 
+         if (verb) {
+            tt = GetTime();
+            if (tt > LastTime + LLLStatusInterval)
+               G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
+                         NumNonTrivial, NumNoOps, m, B);
+         }
+
          // ENUM
 
          double tt1;
@@ -951,6 +1071,20 @@ long G_BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
+            if (verb) {
+               enum_cnt++;
+               if (enum_cnt > 100000) {
+                  enum_cnt = 0;
+                  tt = GetTime();
+                  if (tt > LastTime + LLLStatusInterval) {
+                     enum_time += tt - tt1;
+                     tt1 = tt;
+                     G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
+                               NumNonTrivial, NumNoOps, m, B);
+                  }
+               }
+            }
+
 
             add(t1, yvec(t), utildavec(t));
             sqr(t1, t1);
@@ -1150,6 +1284,12 @@ long G_BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
          }
       }
    }
+
+   if (verb) {
+      G_BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial,
+                NumNoOps, m, B);
+   }
+
 
    // clean up
 

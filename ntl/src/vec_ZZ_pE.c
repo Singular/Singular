@@ -7,6 +7,8 @@ NTL_START_IMPL
 
 NTL_vector_impl(ZZ_pE,vec_ZZ_pE)
 
+NTL_io_vector_impl(ZZ_pE,vec_ZZ_pE)
+
 NTL_eq_vector_impl(ZZ_pE,vec_ZZ_pE)
 
 

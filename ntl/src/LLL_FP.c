@@ -3,7 +3,6 @@
 #include <NTL/fileio.h>
 #include <NTL/vec_double.h>
 
-#include <stdio.h>
 
 #include <NTL/new.h>
 
@@ -429,6 +428,48 @@ static double LastTime = 0;
 
 
 
+static void LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
+{
+   cerr << "---- LLL_FP status ----\n";
+   cerr << "elapsed time: ";
+   PrintTime(cerr, t-StartTime);
+   cerr << ", stage: " << max_k;
+   cerr << ", rank: " << m;
+   cerr << ", swaps: " << NumSwaps << "\n";
+
+   ZZ t1;
+   long i;
+   double prodlen = 0;
+
+   for (i = 1; i <= m; i++) {
+      InnerProduct(t1, B(i), B(i));
+      if (!IsZero(t1))
+         prodlen += log(t1);
+   }
+
+   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
+
+   if (LLLDumpFile) {
+      cerr << "dumping to " << LLLDumpFile << "...";
+
+      ofstream f;
+      OpenWrite(f, LLLDumpFile);
+      
+      f << "[";
+      for (i = 1; i <= m; i++) {
+         f << B(i) << "\n";
+      }
+      f << "]\n";
+
+      f.close();
+
+      cerr << "\n";
+   }
+
+   LastTime = t;
+   
+}
+
 static void init_red_fudge()
 {
    long i;
@@ -447,6 +488,8 @@ static void inc_red_fudge()
    log_red--;
 
    
+   cerr << "LLL_FP: warning--relaxing reduction (" << log_red << ")\n";
+
    if (log_red < 4)
       Error("LLL_FP: too much loss of precision...stop!");
 }
@@ -480,6 +523,7 @@ static void RR_GS(mat_ZZ& B, double **B1, double **mu,
 {
    double tt;
 
+   cerr << "LLL_FP: RR refresh " << rr_st << "..." << k << "...";
    tt = GetTime();
 
    if (rr_st > k) Error("LLL_FP: can not continue!!!");
@@ -548,6 +592,7 @@ static void RR_GS(mat_ZZ& B, double **B1, double **mu,
 
    tt = GetTime()-tt;
    RR_GS_time += tt;
+   cerr << tt << " (" << RR_GS_time << ")\n";
 }
 
 void ComputeGS(const mat_ZZ& B, mat_RR& mu, vec_RR& c)
@@ -687,6 +732,13 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
          swap_cnt = 0;
       }
 
+      if (verbose) {
+         tt = GetTime();
+
+         if (tt > LastTime + LLLStatusInterval)
+            LLLStatus(max_k, tt, m, B);
+      }
+
       if (k < rr_st) rr_st = k;
 
       if (st[k] == k)
@@ -700,6 +752,7 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
       st[k] = k;
 
       if (swap_cnt > 200000) {
+         cerr << "LLL_FP: swap loop?\n";
          RR_GS(B, B1, mu, b, c, buf, prec,
                rr_st, k, m_orig, rr_B1, rr_mu, rr_b, rr_c);
          if (rr_st < st[k+1]) st[k+1] = rr_st;
@@ -733,7 +786,7 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
                sz = new_sz;
             }
             else {
-               printf("LLL_FP: warning--infinite loop?\n");
+               cerr << "LLL_FP: warning--infinite loop?\n";
             }
          }
 
@@ -919,6 +972,11 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
       }
 
    }
+
+   if (verbose) {
+      LLLStatus(m+1, GetTime(), m, B);
+   }
+
 
    delete [] buf;
    delete [] max_b;
@@ -1136,6 +1194,62 @@ void ComputeBKZThresh(double *c, long beta)
    }
 }
 
+static 
+void BKZStatus(double tt, double enum_time, unsigned long NumIterations, 
+               unsigned long NumTrivial, unsigned long NumNonTrivial, 
+               unsigned long NumNoOps, long m, 
+               const mat_ZZ& B)
+{
+   cerr << "---- BKZ_FP status ----\n";
+   cerr << "elapsed time: ";
+   PrintTime(cerr, tt-StartTime);
+   cerr << ", enum time: ";
+   PrintTime(cerr, enum_time);
+   cerr << ", iter: " << NumIterations << "\n";
+   cerr << "triv: " << NumTrivial;
+   cerr << ", nontriv: " << NumNonTrivial;
+   cerr << ", no ops: " << NumNoOps;
+   cerr << ", rank: " << m;
+   cerr << ", swaps: " << NumSwaps << "\n";
+
+
+
+   ZZ t1;
+   long i;
+   double prodlen = 0;
+
+   for (i = 1; i <= m; i++) {
+      InnerProduct(t1, B(i), B(i));
+      if (!IsZero(t1))
+         prodlen += log(t1);
+   }
+
+   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
+
+
+   if (LLLDumpFile) {
+      cerr << "dumping to " << LLLDumpFile << "...";
+
+      ofstream f;
+      OpenWrite(f, LLLDumpFile);
+      
+      f << "[";
+      for (i = 1; i <= m; i++) {
+         f << B(i) << "\n";
+      }
+      f << "]\n";
+
+      f.close();
+
+      cerr << "\n";
+   }
+
+   LastTime = tt;
+   
+}
+
+
+
 static
 long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta, 
          long beta, long prune, LLLCheckFct check)
@@ -1303,6 +1417,13 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
             clean = 1;
          }
 
+         if (verb) {
+            tt = GetTime();
+            if (tt > LastTime + LLLStatusInterval)
+               BKZStatus(tt, enum_time, NumIterations, NumTrivial,
+                         NumNonTrivial, NumNoOps, m, B);
+         }
+
    
          // ENUM
 
@@ -1337,6 +1458,19 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
+            if (verb) {
+               enum_cnt++;
+               if (enum_cnt > 100000) {
+                  enum_cnt = 0;
+                  tt = GetTime();
+                  if (tt > LastTime + LLLStatusInterval) {
+                     enum_time += tt - tt1;
+                     tt1 = tt;
+                     BKZStatus(tt, enum_time, NumIterations, NumTrivial,
+                               NumNonTrivial, NumNoOps, m, B);
+                  }
+               }
+            }
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
@@ -1525,6 +1659,11 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
       }
    }
 
+
+   if (verb) {
+      BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial, 
+                NumNoOps, m, B);
+   }
 
    // clean up
 

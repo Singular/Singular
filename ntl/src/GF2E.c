@@ -188,6 +188,16 @@ const GF2E& GF2E::zero()
 
 
 
+istream& operator>>(istream& s, GF2E& x)
+{
+   GF2X y;
+
+   s >> y;
+   conv(x, y);
+
+   return s;
+}
+
 void div(GF2E& x, const GF2E& a, const GF2E& b)
 {
    GF2E t;

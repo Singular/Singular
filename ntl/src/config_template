@@ -114,7 +114,7 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 #endif
 
 
-#if 1
+#if <NTL_GMP_LIP>
 #define NTL_GMP_LIP
 
 /* 

@@ -44,6 +44,8 @@ void BlockDestroy(ZZ_p* x, long n)
 
 NTL_vector_impl_plain(ZZ_p,vec_ZZ_p)
 
+NTL_io_vector_impl(ZZ_p,vec_ZZ_p)
+
 NTL_eq_vector_impl(ZZ_p,vec_ZZ_p)
 
 
