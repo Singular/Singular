@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.43 1999-08-23 14:53:07 anne Exp $
+@comment $Id: start.doc,v 1.44 1999-08-23 17:08:12 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -472,7 +472,7 @@ variable names @code{a} and @code{b}.
 floating point numbers with extended precision of 50 digits,
 variable names @code{a} and @code{b}.
 
-@item ring r7=(real,50,i),(a,b),lp;
+@item ring r7=(complex,50,i),(a,b),lp;
 complex floating point numbers with extended precision of 50 digits
 and imaginary unit @code{i},
 variable names @code{a} and @code{b}.
