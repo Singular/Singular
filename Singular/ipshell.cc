@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.83 2003-12-16 18:37:05 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.84 2004-02-11 11:33:04 bricken Exp $ */
 /*
 * ABSTRACT:
 */
@@ -3313,10 +3313,10 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
     Werror("Size of first input ideal must be equal to %d!",pVariables);
     return TRUE;
   }
-  if ( m != (int)pow((double)tdg+1,(int)n) )
+  if ( m != (int)pow((double)tdg+1,(double)n) )
   {
     Werror("Size of second input ideal must be equal to %d!",
-      (int)pow((double)tdg+1,(int)n));
+      (int)pow((double)tdg+1,(double)n));
     return TRUE;
   }
   if ( !(rField_is_Q() /* ||
