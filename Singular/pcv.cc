@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.21 1999-06-09 11:53:12 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.22 1999-06-11 12:29:49 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -163,8 +163,8 @@ BOOLEAN pcvMinDeg(leftv res,leftv h)
 
 void pcvInit(int d)
 {
-  if(d<0) d=0;
-  pcvMaxDegree=d;
+  if(d<0) d=1;
+  pcvMaxDegree=d+1;
   pcvTableSize=pVariables*pcvMaxDegree*sizeof(unsigned);
   pcvTable=(unsigned*)Alloc0(pcvTableSize);
   pcvIndexSize=pVariables*sizeof(unsigned*);
@@ -178,8 +178,14 @@ void pcvInit(int d)
     unsigned x=0;
     for(int j=0;j<pcvMaxDegree;j++)
     {
-      x+=pcvIndex[i-1][j];
-      pcvIndex[i][j]=x;
+      unsigned y=pcvIndex[i-1][j];
+      if(y>MAX_COMPONENT-x)
+      {
+        j=pcvMaxDegree;
+        i=pVariables;
+        WerrorS("component overflow");
+      }
+      pcvIndex[i][j]=x+=y;
     }
   }
 }
@@ -367,7 +373,7 @@ int pcvDim(int d0,int d1)
 {
   if(d0<0) d0=0;
   if(d1<0) d1=0;
-  pcvInit(d1+1);
+  pcvInit(d1);
   int d=pcvIndex[pVariables-1][d1]-pcvIndex[pVariables-1][d0];
   pcvClean();
   return d;
