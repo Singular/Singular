@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.120 2003-05-20 11:58:11 Singular Exp $
+@comment $Id: types.doc,v 1.121 2004-04-28 14:48:48 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3436,7 +3436,7 @@ a non-negative int_expression less or equal 2147483629.
 @item
 an expression_list of an int_expression and one or more names.
 @item
-the name @code{real}
+the name @code{real}.
 @item
 an expression_list of the name @code{real} and an  int_expression.
 @item
@@ -3510,11 +3510,11 @@ construct a new ring @math{k[X,Y]} from @math{k_1[X]}  and @math{k_2[Y]}.
 @end table
 
 Concerning the ground fields @math{k_1} and @math{k_2} take the
-following guide lines into consideration:
+following guidelines into consideration:
 @itemize @bullet
 @item Neither @math{k_1} nor @math{k_2} may be @math{R} or @math{C}.
 @item If the characteristic of @math{k_1} and @math{k_2} differs, then one of them must be @math{Q}.
-@item At most one of @math{k_1} and @math{k_2} may be have parameters.
+@item At most one of @math{k_1} and @math{k_2} may have parameters.
 @item If one of @math{k_1} and @math{k_2} is an algebraic extension of @math{Z/p} it may not be defined by a @code{charstr} of type @code{(p^n,a)}. 
 @end itemize
 
