@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.6 1997-04-17 17:52:23 Singular Exp $ */
+/* $Id: syz1.cc,v 1.7 1997-05-18 11:13:14 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2157,6 +2157,7 @@ resolvente syLaScala1(ideal arg,int * length)
         {
           res[i]->m[j] = pOrdPoly(res[i]->m[j]);
         }
+        idSkipZeroes(res[i]);
       }
     }
   }
@@ -2374,6 +2375,7 @@ resolvente syLaScala2(ideal arg,int * length)
             pIter(p);
           }
         }
+        idSkipZeroes(res[i]);
       }
     }
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.16 1997-04-30 15:25:34 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.17 1997-05-18 11:13:15 Singular Exp $ */
 
 /*
 * ABSTRACT: handling of leftv
@@ -397,12 +397,17 @@ void * slInternalCopy(leftv source)
       return  (void *)lCopy((lists)d);
     case LINK_CMD:
       return (void *)slCopy((si_link) d);
+    case RING_CMD:
+    case QRING_CMD:
+      {
+        ring r=(ring)d;
+        r->ref++;
+        return d;
+      }
 #ifdef TEST
     case DEF_CMD:
     case NONE:
       break; /* error recovery: do nothing */
-    //case RING_CMD:
-    //case QRING_CMD:
     //case COMMAND:
     default:
       Warn("InternalCopy: cannot copy type %s(%d)",
@@ -464,12 +469,18 @@ void sleftv::Copy(leftv source)
     case LINK_CMD:
       data = (void *)slCopy((si_link) d);
       break;
+    case RING_CMD:
+    case QRING_CMD:
+      {
+        ring r=(ring)d;
+        r->ref++;
+        data=d;
+        break;
+      }
 #ifdef TEST
     case DEF_CMD:
     case NONE:
       break; /* error recovery: do nothing */
-    //case RING_CMD:
-    //case QRING_CMD:
     //case COMMAND:
     default:
       Warn("Copy: cannot copy type %s(%d)",Tok2Cmdname(rtyp),rtyp);
