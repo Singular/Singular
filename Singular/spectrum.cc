@@ -38,43 +38,38 @@
 #include "semic.h"
 
 // ----------------------------------------------------------------------------
+//  test if the polynomial  h  has a term of total degree d
+// ----------------------------------------------------------------------------
+
+BOOLEAN hasTermOfDegree( poly h, int d )
+{
+  do
+  {
+    if( pTotaldegree( h )== d )
+      return  TRUE;
+    pIter(h);
+  }
+  while( h!=(poly)NULL );
+
+  return  FALSE;
+}
+
+// ----------------------------------------------------------------------------
 //  test if the polynomial  h  has a constant term
 // ----------------------------------------------------------------------------
 
-BOOLEAN hasConstTerm( poly h )
+static BOOLEAN inline hasConstTerm( poly h )
 {
-    do
-    {
-        if( pTotaldegree( h )==0 )
-        {
-            return  TRUE;
-        }
-
-        h = pNext( h );
-    }
-    while( h!=(poly)NULL );
-
-    return  FALSE;
+  return  hasTermOfDegree(h,0);
 }
 
 // ----------------------------------------------------------------------------
 //  test if the polynomial  h  has a linear term
 // ----------------------------------------------------------------------------
 
-BOOLEAN hasLinearTerm( poly h )
+static BOOLEAN inline hasLinearTerm( poly h )
 {
-    do
-    {
-        if( pTotaldegree( h )==1 )
-        {
-            return  TRUE;
-        }
-
-        h = pNext( h );
-    }
-    while( h!=(poly)NULL );
-
-    return  FALSE;
+  return  hasTermOfDegree(h,1);
 }
 
 // ----------------------------------------------------------------------------
@@ -83,39 +78,13 @@ BOOLEAN hasLinearTerm( poly h )
 
 BOOLEAN hasAxis( ideal J,int k )
 {
-    int i,j,found;
+  int i;
 
-    for( i=0; i<IDELEMS(J); i++ )
-    {
-        found = TRUE;
-
-        for( j=1; j<k && found==TRUE; j++ )
-        {
-            if( pGetExp( J->m[i],j ) > 0 )
-            {
-                found = FALSE;
-            }
-        }
-
-        if( pGetExp( J->m[i],k )==0 )
-        {
-            found = FALSE;
-        }
-
-        for( j=k+1; j<=pVariables && found==TRUE; j++ )
-        {
-            if( pGetExp( J->m[i],j ) > 0 )
-            {
-                found = FALSE;
-            }
-        }
-
-        if( found==TRUE )
-        {
-            return  TRUE;
-        }
-    }
-    return  FALSE;
+  for( i=0; i<IDELEMS(J); i++ )
+  {
+    if (pIsPurePower( J->m[i] ) == k) return TRUE;
+  }
+  return  FALSE;
 }
 
 // ----------------------------------------------------------------------------
@@ -124,26 +93,13 @@ BOOLEAN hasAxis( ideal J,int k )
 
 int     hasOne( ideal J )
 {
-    int i,j,found;
+  int i;
 
-    for( i=0; i<IDELEMS(J); i++ )
-    {
-        found = TRUE;
-
-        for( j=1; j<=pVariables && found==TRUE; j++ )
-        {
-            if( pGetExp( J->m[i],j ) > 0 )
-            {
-                found = FALSE;
-            }
-        }
-
-        if( found==TRUE )
-        {
-            return  TRUE;
-        }
-    }
-    return  FALSE;
+  for( i=0; i<IDELEMS(J); i++ )
+  {
+    if (pIsConstant(J->m[i])) return TRUE;
+  }
+  return  FALSE;
 }
 // ----------------------------------------------------------------------------
 //  test if  m  is a multiple of one of the monomials of  f
@@ -151,30 +107,30 @@ int     hasOne( ideal J )
 
 int     isMultiple( poly f,poly m )
 {
-    while( f!=(poly)NULL )
+  while( f!=(poly)NULL )
+  {
+    // ---------------------------------------------------
+    //  for a local order  f|m  is only possible if  f>=m
+    // ---------------------------------------------------
+
+    if( pComp0( f,m )>=0 )
     {
-        // ---------------------------------------------------
-        //  for a local order  f|m  is only possible if  f>=m
-        // ---------------------------------------------------
-
-        if( pComp( f,m )>=0 )
-        {
-            if( pDivisibleBy2( f,m ) )
-            {
-                return  TRUE;
-            }
-            else
-            {
-                f = pNext( f );
-            }
-        }
-        else
-        {
-            return FALSE;
-        }
+      if( pDivisibleBy2( f,m ) )
+      {
+        return  TRUE;
+      }
+      else
+      {
+        pIter( f );
+      }
     }
+    else
+    {
+      return FALSE;
+    }
+  }
 
-    return  FALSE;
+  return  FALSE;
 }
 
 // ----------------------------------------------------------------------------
@@ -183,123 +139,129 @@ int     isMultiple( poly f,poly m )
 
 poly    computeWC( const newtonPolygon &np,Rational max_weight )
 {
-    poly m  = pISet( 1 );
-    poly wc = (poly)NULL;
+  poly m  = pOne();
+  poly wc = (poly)NULL;
+  int  mdegree;
 
-    int  mdegree;
+  for( int i=1; i<=pVariables; i++ )
+  {
+    mdegree = 1;
+    pSetExp( m,i,mdegree );
+    // pSetm( m );
+    // np.weight_shift does not need pSetm( m ), postpone it
 
-    for( int i=1; i<=pVariables; i++ )
+    while(  np.weight_shift( m )<max_weight )
     {
-        mdegree = 1;
-        pSetExp( m,i,mdegree );
-        pSetm( m );
+      mdegree++;
+      pSetExp( m,i,mdegree );
+      // pSetm( m );
+      // np.weight_shift does not need pSetm( m ), postpone it
+    }
+    pSetm( m );
 
-        while(  np.weight_shift( m )<max_weight )
-        {
-            mdegree++;
-            pSetExp( m,i,mdegree );
-            pSetm( m );
-        }
-
-        if( i==1 || pComp( m,wc )<0 )
-        {
-            pDelete( &wc );
-            wc = pCopy( m );
-        }
-
-        pSetExp( m,i,0 );
+    if( i==1 || pComp( m,wc )<0 )
+    {
+      pDelete( &wc );
+      wc = pHead( m );
     }
 
-    pDelete( &m );
+    pSetExp( m,i,0 );
+  }
 
-    return  wc;
+  pDelete( &m );
+
+  return  wc;
 }
 
 // ----------------------------------------------------------------------------
 //  deletes all monomials of  f  which are less than  hc
 // ----------------------------------------------------------------------------
 
-inline  poly    normalFormHC( poly f,poly hc )
+static inline  poly    normalFormHC( poly f,poly hc )
 {
-    poly    *ptr = &f;
+  poly    *ptr = &f;
 
-    while( (*ptr)!=(poly)NULL )
+  while( (*ptr)!=(poly)NULL )
+  {
+    if( pComp0( *ptr,hc )>=0 )
     {
-        if( pComp( *ptr,hc )>=0 )
-        {
-            ptr = &(pNext( *ptr ));
-        }
-        else
-        {
-            pDelete( ptr );
-            return  f;
-        }
+      ptr = &(pNext( *ptr ));
     }
+    else
+    {
+      pDelete( ptr );
+      return  f;
+    }
+  }
 
-    return f;
+  return f;
 }
 
 // ----------------------------------------------------------------------------
 //  deletes all monomials of  f  which are multiples of monomials of  Z
 // ----------------------------------------------------------------------------
 
-inline  poly    normalFormZ( poly f,poly Z )
+static inline  poly    normalFormZ( poly f,poly Z )
 {
-    poly    *ptr = &f;
+  poly    *ptr = &f;
 
-    while( (*ptr)!=(poly)NULL )
+  while( (*ptr)!=(poly)NULL )
+  {
+    if( !isMultiple( Z,*ptr ) )
     {
-        if( !isMultiple( Z,*ptr ) )
-        {
-            ptr = &(pNext( *ptr ));
-        }
-        else
-        {
-            pDelete1( ptr );
-        }
+      ptr = &(pNext( *ptr ));
     }
+    else
+    {
+      pDelete1( ptr );
+    }
+  }
 
-    return f;
+  return f;
 }
 
+// ?? HS:
+// Looks for the shortest polynomial f in stdJ which is divisible
+// by the monimial m, return its index in stdJ
 // ----------------------------------------------------------------------------
 //  Looks for the first polynomial f in stdJ which satisfies m=LT(f)*eta
 //  for a monomial eta. The return eta*f-m and cancel all monomials
 //  which are smaller than the highest corner hc
 // ----------------------------------------------------------------------------
 
-inline  int     isLeadMonomial( poly m,ideal stdJ )
+static inline  int     isLeadMonomial( poly m,ideal stdJ )
 {
-    int     length = INT_MAX;
-    int     result = -1;
+  int     length = INT_MAX;
+  int     result = -1;
 
-    for( int i=0; i<IDELEMS(stdJ); i++ )
+  for( int i=0; i<IDELEMS(stdJ); i++ )
+  {
+    if( pComp( stdJ->m[i],m )>=0 && pDivisibleBy( stdJ->m[i],m ) )
     {
-        if( pComp( stdJ->m[i],m )>=0 && pDivisibleBy( stdJ->m[i],m ) )
-        {
-            int     tmp = pLength( stdJ->m[i] );
+      int     tmp = pLength( stdJ->m[i] );
 
-            if( tmp < length )
-            {
-                length = tmp;
-                result = i;
-            }
-        }
+      if( tmp < length )
+      {
+        length = tmp;
+        result = i;
+      }
     }
+  }
 
-    return  result;
+  return  result;
 }
 
 // ----------------------------------------------------------------------------
 //  set the exponent of a monomial t an integer array
 // ----------------------------------------------------------------------------
 
-void    setExp( poly m,int *r )
+static void    setExp( poly m,int *r )
 {
-    for( int i=0; i<pVariables; i++ )
-    {
-        pSetExp( m,i+1,r[i] );
-    }
+  for( int i=pVariables; i>0; i-- )
+  {
+    pSetExp( m,i,r[i-1] );
+  }
+  pSetm( m );
 }
 
 // ----------------------------------------------------------------------------
@@ -307,527 +269,536 @@ void    setExp( poly m,int *r )
 //  is smaller than only finitely monomials
 // ----------------------------------------------------------------------------
 
-BOOLEAN isWell( void )
+static BOOLEAN isWell( void )
 {
-    int b = rBlocks( currRing );
+  int b = rBlocks( currRing );
 
-    if( b==3 &&
-        ( currRing->order[0] == ringorder_ds ||
-          currRing->order[0] == ringorder_Ds ||
-          currRing->order[0] == ringorder_ws ||
-          currRing->order[0] == ringorder_Ws ) )
+  if( b==3 &&
+      ( currRing->order[0] == ringorder_ds ||
+        currRing->order[0] == ringorder_Ds ||
+        currRing->order[0] == ringorder_ws ||
+        currRing->order[0] == ringorder_Ws ) )
+  {
+    return  TRUE;
+  }
+  else if( b>=3 
+  && (( currRing->order[0] ==ringorder_a 
+        && currRing->block1[0]==pVariables  )
+    || (currRing->order[0]==ringorder_M 
+        && currRing->block1[0]==pVariables*pVariables )))
+  {
+    for( int i=pVariables-1; i>=0; i-- )
     {
-        return  TRUE;
+      if( currRing->wvhdl[0][i]>=0 )
+      {
+        return  FALSE;
+      }
     }
-    else if( b>=3 && currRing->order[0] ==ringorder_a
-                  && currRing->block1[0]==pVariables  )
-    {
-        for( int i=0; i<pVariables; i++ )
-        {
-            if( currRing->wvhdl[0][i]>=0 )
-            {
-                return  FALSE;
-                }
-        }
-        return  TRUE;
-    }
-    else if( b>=3 && currRing->order[0]==ringorder_M
-                  && currRing->block1[0]==pVariables*pVariables )
-    {
-        for( int i=0; i<pVariables; i++ )
-        {
-            if( currRing->wvhdl[0][i]>=0 )
-            {
-                return  FALSE;
-                }
-        }
-        return  TRUE;
-    }
+    return  TRUE;
+  }
 
-    return  FALSE;
+  return  FALSE;
 }
 
 // ----------------------------------------------------------------------------
 //  compute all monomials not in  stdJ  and their normal forms
 // ----------------------------------------------------------------------------
 
-void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
+static void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
 {
-    int         carry,k;
-    multiCnt    C( pVariables,0 );
-    poly        Z = (poly)NULL;
+  int         carry,k;
+  multiCnt    C( pVariables,0 );
+  poly        Z = (poly)NULL;
 
-    int         well = isWell( );
+  int         well = isWell( );
 
-    do
+  do
+  {
+    poly    m = pOne();
+    setExp( m,C.cnt );
+
+    carry = FALSE;
+
+    k = isLeadMonomial( m,stdJ );
+
+    if( k < 0 )
     {
-        poly    m = pISet( 1 );
-        setExp( m,C.cnt );
-        pSetm( m );
+      // ---------------------------
+      //  m  is not a lead monomial
+      // ---------------------------
 
-        carry = FALSE;
+      NF->insert_node( m,(poly)NULL );
+    }
+    else if( isMultiple( Z,m ) )
+    {
+      // ------------------------------------
+      //  m  is trivially in the ideal  stdJ
+      // ------------------------------------
 
-        k = isLeadMonomial( m,stdJ );
+      pDelete( &m );
+      carry = TRUE;
+    }
+    else if( pComp( m,hc ) < 0 || pComp( m,wc ) < 0 )
+    {
+      // -------------------
+      //  we do not need  m
+      // -------------------
 
-        if( k < 0 )
+      pDelete( &m );
+      carry = TRUE;
+    }
+    else
+    {
+      // --------------------------
+      //  compute lazy normal form
+      // --------------------------
+
+      poly    multiplicant = pDivide( m,stdJ->m[k] );
+      pGetCoeff( multiplicant ) = nInit(1);
+
+      poly    nf = pMultT( pCopy( stdJ->m[k] ), multiplicant );
+
+      pDelete( &multiplicant );
+
+      nf = normalFormHC( nf,hc );
+
+      if( pNext( nf )==(poly)NULL )
+      {
+        // ----------------------------------
+        //  normal form of  m  is  m  itself
+        // ----------------------------------
+
+        pDelete( &nf );
+        NF->delete_monomial( m );
+        Z = pAdd( Z,m );
+        carry = TRUE;
+      }
+      else
+      {
+        nf = normalFormZ( nf,Z );
+
+        if( pNext( nf )==(poly)NULL )
         {
-            // ---------------------------
-            //  m  is not a lead monomial
-            // ---------------------------
+          // ----------------------------------
+          //  normal form of  m  is  m  itself
+          // ----------------------------------
 
-            NF->insert_node( m,(poly)NULL );
-        }
-        else if( isMultiple( Z,m ) )
-        {
-            // ------------------------------------
-            //  m  is trivially in the ideal  stdJ
-            // ------------------------------------
-
-            pDelete( &m );
-            carry = TRUE;
-        }
-        else if( pComp( m,hc ) < 0 || pComp( m,wc ) < 0 )
-        {
-            // -------------------
-            //  we do not need  m
-            // -------------------
-
-            pDelete( &m );
-            carry = TRUE;
+          pDelete( &nf );
+          NF->delete_monomial( m );
+          Z = pAdd( Z,m );
+          carry = TRUE;
         }
         else
         {
-            // --------------------------
-            //  compute lazy normal form
-            // --------------------------
+          // ------------------------------------
+          //  normal form of  m  is a polynomial
+          // ------------------------------------
 
-            poly    multiplicant = pDivide( m,stdJ->m[k] );
-            pGetCoeff( multiplicant ) = nInit(1);
+          pNorm( nf );
+          if( well==TRUE )
+          {
+            NF->insert_node( m,nf );
+          }
+          else
+          {
+            poly    nfhard = kNF( stdJ,(ideal)NULL,pNext( nf ),0,0 );
+            nfhard = normalFormHC( nfhard,hc );
+            nfhard = normalFormZ ( nfhard,Z );
 
-            poly    nf = pMultT( pCopy( stdJ->m[k] ), multiplicant );
-
-            pDelete( &multiplicant );
-
-            nf = normalFormHC( nf,hc );
-
-            if( pNext( nf )==(poly)NULL )
+            if( nfhard==(poly)NULL )
             {
-                // ----------------------------------
-                //  normal form of  m  is  m  itself
-                // ----------------------------------
-
-                pDelete( &nf );
-                NF->delete_monomial( m );
-                Z = pAdd( Z,m );
-                carry = TRUE;
+              NF->delete_monomial( m );
+              Z = pAdd( Z,m );
+              carry = TRUE;
             }
             else
             {
-                nf = normalFormZ( nf,Z );
-
-                if( pNext( nf )==(poly)NULL )
-                {
-                    // ----------------------------------
-                    //  normal form of  m  is  m  itself
-                    // ----------------------------------
-
-                    pDelete( &nf );
-                    NF->delete_monomial( m );
-                    Z = pAdd( Z,m );
-                    carry = TRUE;
-                }
-                else
-                {
-                      // ------------------------------------
-                    //  normal form of  m  is a polynomial
-                    // ------------------------------------
-
-                    if( well==TRUE )
-                    {
-                        pNorm( nf );
-                         NF->insert_node( m,nf );
-                    }
-                    else
-                    {
-                        pNorm( nf );
-                        poly    nfhard = kNF( stdJ,(ideal)NULL,
-                                              pNext( nf ),0,0 );
-                        nfhard = normalFormHC( nfhard,hc );
-                        nfhard = normalFormZ ( nfhard,Z );
-
-                        if( nfhard==(poly)NULL )
-                        {
-                            NF->delete_monomial( m );
-                            Z = pAdd( Z,m );
-                            carry = TRUE;
-                        }
-                        else
-                        {
-                            pDelete( &pNext( nf ) );
-                            pNext( nf ) = nfhard;
-                            NF->insert_node( m,nf );
-                        }
-                    }
-                }
+              pDelete( &pNext( nf ) );
+              pNext( nf ) = nfhard;
+              NF->insert_node( m,nf );
             }
+          }
         }
+      }
     }
-    while( C.inc( carry ) );
+  }
+  while( C.inc( carry ) );
 
-    // delete single monomials
+  // delete single monomials
 
-    int  finished = FALSE;
+  BOOLEAN  not_finished;
 
-    while( finished==FALSE )
+  do
+  {
+    not_finished = FALSE;
+
+    spectrumPolyNode  *node = NF->root;
+
+    while( node!=(spectrumPolyNode*)NULL )
     {
-        finished = TRUE;
-
-        spectrumPolyNode  *node = NF->root;
-
-        while( node!=(spectrumPolyNode*)NULL )
-        {
-            if( node->nf!=(poly)NULL && pNext( node->nf )==(poly)NULL )
-            {
-                NF->delete_monomial( node->nf );
-                finished = FALSE;
-                node = (spectrumPolyNode*)NULL;
-            }
-            else
-            {
-                node = node->next;
-            }
-        }
+      if( node->nf!=(poly)NULL && pNext( node->nf )==(poly)NULL )
+      {
+        NF->delete_monomial( node->nf );
+        not_finished = TRUE;
+        node = (spectrumPolyNode*)NULL;
+      }
+      else
+      {
+        node = node->next;
+      }
     }
+  } while( not_finished );
 
-    pDelete( &Z );
+  pDelete( &Z );
 }
 
 // ----------------------------------------------------------------------------
 //  this is the main spectrum computation function
 // ----------------------------------------------------------------------------
 
-spectrumState   spectrumCompute( poly h,lists *L,int fast )
+static spectrumState   spectrumCompute( poly h,lists *L,int fast )
 {
-    int i,j;
+  int i,j;
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "spectrumCompute\n";
+    if( fast==0 ) cout << "    no optimization" << endl;
+    if( fast==1 ) cout << "    weight optimization" << endl;
+    if( fast==2 ) cout << "    symmetry optimization" << endl;
+  #else
+    fprintf( stdout,"spectrumCompute\n" );
+    if( fast==0 ) fprintf( stdout,"    no optimization\n" );
+    if( fast==1 ) fprintf( stdout,"    weight optimization\n" );
+    if( fast==2 ) fprintf( stdout,"    symmetry optimization\n" );
+  #endif
+  #endif
+  #endif
+
+  // ----------------------
+  //  check if  h  is zero
+  // ----------------------
+
+  if( h==(poly)NULL )
+  {
+    return  spectrumZero;
+  }
+
+  // ----------------------------------
+  //  check if  h  has a constant term
+  // ----------------------------------
+
+  if( hasConstTerm( h ) )
+  {
+    return  spectrumBadPoly;
+  }
+
+  // --------------------------------
+  //  check if  h  has a linear term
+  // --------------------------------
+
+  if( hasLinearTerm( h ) )
+  {
+    *L = (lists)Alloc( sizeof( slists ) );
+    (*L)->Init( 1 );
+    (*L)->m[0].rtyp = INT_CMD;    //  milnor number
+    /* (*L)->m[0].data = (void*)0;a  -- done by Init */
+
+    return  spectrumNoSingularity;
+  }
+
+  // ----------------------------------
+  //  compute the jacobi ideal of  (h)
+  // ----------------------------------
+
+  ideal J = NULL;
+  J = idInit( pVariables,1 );
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n   computing the Jacobi ideal...\n";
+  #else
+    fprintf( stdout,"\n   computing the Jacobi ideal...\n" );
+  #endif
+  #endif
+  #endif
+
+  for( i=0; i<pVariables; i++ )
+  {
+    J->m[i] = pDiff( h,i+1); //j );
 
     #ifdef SPECTRUM_DEBUG
     #ifdef SPECTRUM_PRINT
     #ifdef SPECTRUM_IOSTREAM
-        cout << "spectrumCompute" << endl;
-        if( fast==0 ) cout << "    no optimization" << endl;
-        if( fast==1 ) cout << "    weight optimization" << endl;
-        if( fast==2 ) cout << "    symmetry optimization" << endl;
+      cout << "        ";
     #else
-        fprintf( stdout,"spectrumCompute\n" );
-        if( fast==0 ) fprintf( stdout,"    no optimization\n" );
-        if( fast==1 ) fprintf( stdout,"    weight optimization\n" );
-        if( fast==2 ) fprintf( stdout,"    symmetry optimization\n" );
+      fprintf( stdout,"        " );
+    #endif
+      pWrite( J->m[i] );
     #endif
     #endif
-    #endif
+  }
 
-    // ----------------------
-    //  check if  h  is zero
-    // ----------------------
+  // --------------------------------------------
+  //  compute a standard basis  stdJ  of  jac(h)
+  // --------------------------------------------
 
-    if( h==(poly)NULL )
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << endl;
+    cout << "    computing a standard basis..." << endl;
+  #else
+    fprintf( stdout,"\n" );
+    fprintf( stdout,"    computing a standard basis...\n" );
+  #endif
+  #endif
+  #endif
+
+  ideal stdJ = kStd(J,currQuotient,isNotHomog,NULL);
+  idSkipZeroes( stdJ );
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+    for( i=0; i<IDELEMS(stdJ); i++ )
     {
-        return  spectrumZero;
+      #ifdef SPECTRUM_IOSTREAM
+        cout << "        ";
+      #else
+        fprintf( stdout,"        " );
+      #endif
+
+      pWrite( stdJ->m[i] );
     }
+  #endif
+  #endif
 
-    // ----------------------------------
-    //  check if  h  has a constant term
-    // ----------------------------------
+  idDelete( &J );
 
-    if( hasConstTerm( h )==TRUE )
+  // ------------------------------------------
+  //  check if the  h  has a singularity
+  // ------------------------------------------
+
+  if( hasOne( stdJ ) )
+  {
+    // -------------------------------
+    //  h is smooth in the origin
+    //  return only the Milnor number
+    // -------------------------------
+
+    *L = (lists)Alloc( sizeof( slists ) );
+    (*L)->Init( 1 );
+    (*L)->m[0].rtyp = INT_CMD;    //  milnor number
+    /* (*L)->m[0].data = (void*)0;a  -- done by Init */
+
+    return  spectrumNoSingularity;
+  }
+
+  // ------------------------------------------
+  //  check if the singularity  h  is isolated
+  // ------------------------------------------
+
+  for( i=pVariables; i>0; i-- )
+  {
+    if( hasAxis( stdJ,i )==FALSE )
     {
-        return  spectrumBadPoly;
+      return  spectrumNotIsolated;
     }
+  }
 
-    // --------------------------------
-    //  check if  h  has a linear term
-    // --------------------------------
+  // ------------------------------------------
+  //  compute the highest corner  hc  of  stdJ
+  // ------------------------------------------
 
-    if( hasLinearTerm( h )==TRUE )
-    {
-        *L = (lists)Alloc( sizeof( slists ) );
-        (*L)->Init( 1 );
-        (*L)->m[0].rtyp = INT_CMD;    //  milnor number
-        (*L)->m[0].data = (void*)0;
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n    computing the highest corner...\n";
+  #else
+    fprintf( stdout,"\n    computing the highest corner...\n" );
+  #endif
+  #endif
+  #endif
 
-        return  spectrumNoSingularity;
-    }
+  poly hc = (poly)NULL;
 
-    // ----------------------------------
-    //  compute the jacobi ideal of  (h)
-    // ----------------------------------
+  scComputeHC( stdJ,0,hc );
 
-    ideal J = NULL;
-    J = idInit( pVariables,1 );
-
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-    #ifdef SPECTRUM_IOSTREAM
-        cout << endl;
-        cout << "   computing the Jacobi ideal..." << endl;
-    #else
-        fprintf( stdout,"\n" );
-        fprintf( stdout,"   computing the Jacobi ideal...\n" );
-    #endif
-    #endif
-    #endif
-
-    for( i=0,j=1; i<pVariables; i++,j++ )
-    {
-        J->m[i] = pDiff( h,j );
-
-        #ifdef SPECTRUM_DEBUG
-        #ifdef SPECTRUM_PRINT
-        #ifdef SPECTRUM_IOSTREAM
-            cout << "        ";
-        #else
-            fprintf( stdout,"        " );
-        #endif
-
-            pWrite( J->m[i] );
-        #endif
-        #endif
-    }
-
-    // --------------------------------------------
-    //  compute a standard basis  stdJ  of  jac(h)
-    // --------------------------------------------
-
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-    #ifdef SPECTRUM_IOSTREAM
-        cout << endl;
-        cout << "    computing a standard basis..." << endl;
-    #else
-        fprintf( stdout,"\n" );
-        fprintf( stdout,"    computing a standard basis...\n" );
-    #endif
-    #endif
-    #endif
-
-    ideal stdJ = NULL;
-    stdJ = kStd(J,currQuotient,isNotHomog,NULL);
-    idSkipZeroes( stdJ );
-
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-        for( i=0; i<IDELEMS(stdJ); i++ )
-        {
-            #ifdef SPECTRUM_IOSTREAM
-                cout << "        ";
-            #else
-                fprintf( stdout,"        " );
-            #endif
-
-            pWrite( stdJ->m[i] );
-        }
-    #endif
-    #endif
-
-    idDelete( &J );
-
-    // ------------------------------------------
-    //  check if the  h  has a singularity
-    // ------------------------------------------
-
-    if( hasOne( stdJ )==TRUE )
-    {
-        // -------------------------------
-        //  h is smooth in the origin
-        //  return only the Milnor number
-        // -------------------------------
-
-        *L = (lists)Alloc( sizeof( slists ) );
-        (*L)->Init( 1 );
-        (*L)->m[0].rtyp = INT_CMD;    //  milnor number
-        (*L)->m[0].data = (void*)0;
-
-        return  spectrumNoSingularity;
-    }
-
-    // ------------------------------------------
-    //  check if the singularity  h  is isolated
-    // ------------------------------------------
+  if( hc!=(poly)NULL )
+  {
+    pGetCoeff(hc) = nInit(1);
 
     for( i=pVariables; i>0; i-- )
     {
-        if( hasAxis( stdJ,i )==FALSE )
-        {
-            return  spectrumNotIsolated;
-        }
+      if( pGetExp( hc,i )>0 ) pDecrExp( hc,i );
     }
+    pSetm( hc );
+  }
+  else
+  {
+    return  spectrumNoHC;
+  }
 
-    // ------------------------------------------
-    //  compute the highest corner  hc  of  stdJ
-    // ------------------------------------------
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "       ";
+  #else
+    fprintf( stdout,"       " );
+  #endif
+    pWrite( hc );
+  #endif
+  #endif
 
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-    #ifdef SPECTRUM_IOSTREAM
-        cout << endl;
-        cout << "    computing the highest corner..."  << endl;
-    #else
-        fprintf( stdout,"\n" );
-        fprintf( stdout,"    computing the highest corner...\n" );
-    #endif
-    #endif
-    #endif
+  // ----------------------------------------
+  //  compute the Newton polygon  nph  of  h
+  // ----------------------------------------
 
-    poly hc = (poly)NULL;
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n    computing the newton polygon...\n";
+  #else
+    fprintf( stdout,"\n    computing the newton polygon...\n" );
+  #endif
+  #endif
+  #endif
 
-    scComputeHC( stdJ,0,hc );
+  newtonPolygon nph( h );
 
-    if( hc!=(poly)NULL )
-    {
-        pGetCoeff(hc) = nInit(1);
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+    cout << nph;
+  #endif
+  #endif
 
-        for( i=pVariables; i>0; i-- )
-        {
-            if( pGetExp( hc,i )>0 ) pDecrExp( hc,i );
-        }
-        pSetm( hc );
-    }
-    else
-    {
-        return  spectrumNoHC;
-    }
+  // -----------------------------------------------
+  //  compute the weight corner  wc  of  (stdj,nph)
+  // -----------------------------------------------
 
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-    #ifdef SPECTRUM_IOSTREAM
-        cout << "       ";
-    #else
-        fprintf( stdout,"       " );
-    #endif
-        pWrite( hc );
-    #endif
-    #endif
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n    computing the weight corner...\n";
+  #else
+    fprintf( stdout,"\n    computing the weight corner...\n" );
+  #endif
+  #endif
+  #endif
 
-    // ----------------------------------------
-    //  compute the Newton polygon  nph  of  h
-    // ----------------------------------------
+  poly    wc = ( fast==0 ? pCopy( hc ) :
+               ( fast==1 ? computeWC( nph,(Rational)pVariables ) :
+              /* fast==2 */computeWC( nph,((Rational)pVariables)/(Rational)2 ) ) );
 
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-    #ifdef SPECTRUM_IOSTREAM
-        cout << endl;
-        cout << "    computing the newton polygon..." << endl;
-    #else
-        fprintf( stdout,"\n" );
-        fprintf( stdout,"    computing the newton polygon...\n" );
-    #endif
-    #endif
-    #endif
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "        ";
+  #else
+    fprintf( stdout,"        " );
+  #endif
+    pWrite( wc );
+  #endif
+  #endif
 
-    newtonPolygon nph( h );
+  // -------------
+  //  compute  NF
+  // -------------
 
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-        cout << nph;
-    #endif
-    #endif
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n    computing NF...\n" << endl;
+  #else
+    fprintf( stdout,"\n    computing NF...\n" );
+  #endif
+  #endif
+  #endif
 
-    // -----------------------------------------------
-    //  compute the weight corner  wc  of  (stdj,nph)
-    // -----------------------------------------------
+  spectrumPolyList NF( &nph );
 
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-    #ifdef SPECTRUM_IOSTREAM
-        cout << endl;
-        cout << "    computing the weight corner..." << endl;
-    #else
-        fprintf( stdout,"\n" );
-        fprintf( stdout,"    computing the weight corner...\n" );
-    #endif
-    #endif
-    #endif
+  computeNF( stdJ,hc,wc,&NF );
 
-    poly    wc = ( fast==0 ? pCopy( hc ) :
-                 ( fast==1 ? computeWC( nph,(Rational)pVariables ) :
-                /* fast==2 */computeWC( nph,((Rational)pVariables)/(Rational)2 ) ) );
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+    cout << NF;
+  #ifdef SPECTRUM_IOSTREAM
+    cout << endl;
+  #else
+    fprintf( stdout,"\n" );
+  #endif
+  #endif
+  #endif
 
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-    #ifdef SPECTRUM_IOSTREAM
-        cout << "        ";
-    #else
-        fprintf( stdout,"        " );
-    #endif
-        pWrite( wc );
-    #endif
-    #endif
+  // ----------------------------
+  //  compute the spectrum of  h
+  // ----------------------------
 
-    // -------------
-    //  compute  NF
-    // -------------
-
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-    #ifdef SPECTRUM_IOSTREAM
-        cout << endl;
-        cout << "    computing NF..." << endl;
-    #else
-        fprintf( stdout,"\n" );
-        fprintf( stdout,"    computing NF...\n" );
-    #endif
-    #endif
-    #endif
-
-    spectrumPolyList NF( &nph );
-
-    computeNF( stdJ,hc,wc,&NF );
-
-    #ifdef SPECTRUM_DEBUG
-    #ifdef SPECTRUM_PRINT
-        cout << NF;
-    #ifdef SPECTRUM_IOSTREAM
-        cout << endl;
-    #else
-        fprintf( stdout,"n" );
-    #endif
-    #endif
-    #endif
-
-    // ----------------------------
-    //  compute the spectrum of  h
-    // ----------------------------
-
-    return  NF.spectrum( L,fast );
+  return  NF.spectrum( L,fast );
 }
 
 // ----------------------------------------------------------------------------
 //  check if  currRing is local
 // ----------------------------------------------------------------------------
 
-BOOLEAN ringIsLocal( void )
+static BOOLEAN ringIsLocal( void )
 {
-    poly    m   = pISet( 1 );
-    poly    one = pISet( 1 );
+  poly    m   = pOne();
+  poly    one = pOne();
 
-    for( int i=1; i<=pVariables; i++ )
+  for( int i=pVariables; i>0; i-- )
+  {
+    pSetExp( m,i,1 );
+    pSetm( m );
+
+    if( pComp( m,one )>0 )
     {
-        pSetExp( m,i,1 );
-        pSetm( m );
-
-        if( pComp( m,one )>0 )
-        {
-            return  FALSE;
-        }
-        pSetExp( m,i,0 );
+      return  FALSE;
     }
+    pSetExp( m,i,0 );
+  }
 
-    pDelete( &m );
-    pDelete( &one );
+  pDelete( &m );
+  pDelete( &one );
 
-    return  TRUE;
+  return  TRUE;
 }
 
+// ----------------------------------------------------------------------------
+// print error message corresponding to spectrumState state:
+// ----------------------------------------------------------------------------
+static void spectrumPrintError(spectrumState state)
+{
+  switch( state )
+  {
+    case spectrumZero:
+      WerrorS( "polynomial is zero" );
+      break;
+    case spectrumBadPoly:
+      WerrorS( "polynomial has constant term" );
+      break;
+    case spectrumNoSingularity:
+      WerrorS( "not a singularity" );
+      break;
+    case spectrumNotIsolated:
+      WerrorS( "the singularity is not isolated" );
+      break;
+    case spectrumNoHC:
+      WerrorS( "highest corner cannot be computed" );
+      break;
+    case spectrumDegenerate:
+      WerrorS( "principal part is degenerate" );
+      break;
+    case spectrumOK:
+      break;
+
+    default:
+      WerrorS( "unknown error occurred" );
+      break;
+  }
+}
 // ----------------------------------------------------------------------------
 //  this procedure is called from the interpreter
 // ----------------------------------------------------------------------------
@@ -837,70 +808,46 @@ BOOLEAN ringIsLocal( void )
 
 BOOLEAN spectrumProc( leftv result,leftv first )
 {
-    spectrumState state = spectrumOK;
+  spectrumState state = spectrumOK;
 
-    // -------------------
-    //  check consistency
-    // -------------------
+  // -------------------
+  //  check consistency
+  // -------------------
 
-    //  check for a local ring
+  //  check for a local ring
 
-    if( !ringIsLocal( ) )
+  if( !ringIsLocal( ) )
+  {
+    WerrorS( "only works for local orderings" );
+    state = spectrumWrongRing;
+  }
+
+  //  no quotient rings are allowed
+
+  else if( currRing->qideal != NULL )
+  {
+    WerrorS( "does not work in quotient rings" );
+    state = spectrumWrongRing;
+  }
+  else
+  {
+    lists   L    = (lists)NULL;
+    int     flag = 1; // weight corner optimization is safe
+
+    state = spectrumCompute( (poly)first->Data( ),&L,flag );
+
+    if( state==spectrumOK )
     {
-        WerrorS( "only works for local orderings" );
-        state = spectrumWrongRing;
-    }
-
-    //  no quotient rings are allowed
-
-    else if( currRing->qideal != NULL )
-    {
-        WerrorS( "does not work in quotient rings" );
-        state = spectrumWrongRing;
+      result->rtyp = LIST_CMD;
+      result->data = (char*)L;
     }
     else
     {
-        lists   L    = (lists)NULL;
-        int     flag = 1; // weight corner optimization is safe
-
-        state = spectrumCompute( (poly)first->Data( ),&L,flag );
-
-        if( state==spectrumOK )
-        {
-            result->rtyp = LIST_CMD;
-            result->data = (char*)L;
-        }
-        else
-        {
-            switch( state )
-            {
-                   case spectrumZero:
-                    WerrorS( "polynomial is zero" );
-                    break;
-                   case spectrumBadPoly:
-                    WerrorS( "polynomial has constant term" );
-                    break;
-                   case spectrumNoSingularity:
-                    WerrorS( "not a singularity" );
-                    break;
-                   case spectrumNotIsolated:
-                    WerrorS( "the singularity is not isolated" );
-                    break;
-                   case spectrumNoHC:
-                    WerrorS( "highest corner cannot be computed" );
-                    break;
-                case spectrumDegenerate:
-                    WerrorS( "principal part is degenerate" );
-                    break;
-
-                default:
-                    WerrorS( "unknown error occurred" );
-                    break;
-            }
-        }
+      spectrumPrintError(state);
     }
+  }
 
-    return  (state!=spectrumOK);
+  return  (state!=spectrumOK);
 }
 
 // ----------------------------------------------------------------------------
@@ -912,67 +859,45 @@ BOOLEAN spectrumProc( leftv result,leftv first )
 
 BOOLEAN spectrumfProc( leftv result,leftv first )
 {
-    spectrumState state = spectrumOK;
+  spectrumState state = spectrumOK;
 
-    // -------------------
-    //  check consistency
-    // -------------------
+  // -------------------
+  //  check consistency
+  // -------------------
 
-    //  check for a local polynomial ring
+  //  check for a local polynomial ring
 
-    if( currRing->OrdSgn != -1 )
+  if( currRing->OrdSgn != -1 ) 
+  // ?? HS: the test above is also true for k[x][[y]], k[[x]][y]
+  //if( !ringIsLocal( ) )
+  {
+    WerrorS( "only works for local orderings" );
+    state = spectrumWrongRing;
+  }
+  else if( currRing->qideal != NULL )
+  {
+    WerrorS( "does not work in quotient rings" );
+    state = spectrumWrongRing;
+  }
+  else
+  {
+    lists   L    = (lists)NULL;
+    int     flag = 2; // symmetric optimization
+
+    state = spectrumCompute( (poly)first->Data( ),&L,flag );
+
+    if( state==spectrumOK )
     {
-        WerrorS( "only works for local orderings" );
-        state = spectrumWrongRing;
-    }
-    else if( currRing->qideal != NULL )
-    {
-        WerrorS( "does not work in quotient rings" );
-        state = spectrumWrongRing;
+      result->rtyp = LIST_CMD;
+      result->data = (char*)L;
     }
     else
     {
-        lists   L    = (lists)NULL;
-        int     flag = 2; // symmetric optimization
-
-        state = spectrumCompute( (poly)first->Data( ),&L,flag );
-
-        if( state==spectrumOK )
-        {
-            result->rtyp = LIST_CMD;
-            result->data = (char*)L;
-        }
-        else
-        {
-            switch( state )
-            {
-                   case spectrumZero:
-                    WerrorS( "polynomial is zero" );
-                    break;
-                   case spectrumBadPoly:
-                    WerrorS( "polynomial has constant term" );
-                    break;
-                   case spectrumNoSingularity:
-                    WerrorS( "not a singularity" );
-                    break;
-                   case spectrumNotIsolated:
-                    WerrorS( "the singularity is not isolated" );
-                    break;
-                   case spectrumNoHC:
-                    WerrorS( "highest corner cannot be computed" );
-                    break;
-                case spectrumDegenerate:
-                    WerrorS( "principal part is degenerate" );
-                    break;
-
-                default:
-                    WerrorS( "unknown error occurred" );
-                    break;
-            }
-        }
+      spectrumPrintError(state);
     }
+  }
 
-    return  (state!=spectrumOK);
+  return  (state!=spectrumOK);
 }
 
 // ----------------------------------------------------------------------------
@@ -1423,6 +1348,23 @@ BOOLEAN semichProc( leftv result,leftv first,leftv second )
     return  (state!=semicOK);
 }
 
+BOOLEAN    spectrumProc2 ( leftv res,leftv u, leftv v)
+{
+  if (((int)v->Data())==1)
+    return spectrumfProc(res,u);
+  return spectrumProc(res,u);
+}
+
+BOOLEAN    spectrumOp3  ( leftv res, leftv u, leftv v, leftv w )
+{
+  char v_str=(char *)v->Data();
+  if (strcmp(v_str, "+")==0)
+    return spaddProc(res,u,w);
+  else if (strcmp(v_str, "*")==0)
+    return spmulProc(res,u,w);
+  Werror("unknown operation '%s' for spectrum",v_str);
+  return TRUE;
+}
 #endif /* HAVE_SPECTRUM */
 // ----------------------------------------------------------------------------
 //  spectrum.cc

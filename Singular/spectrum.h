@@ -8,6 +8,8 @@
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
 
+BOOLEAN    spectrumProc2 ( leftv,leftv, leftv );
+BOOLEAN    spectrumOp3  ( leftv,leftv, leftv, leftv );
 BOOLEAN    spectrumProc ( leftv,leftv );
 BOOLEAN    spectrumfProc( leftv,leftv );
 BOOLEAN    spaddProc    ( leftv,leftv,leftv );

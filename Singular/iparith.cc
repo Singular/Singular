@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.168 1999-08-13 16:31:12 Singular Exp $ */
+/* $Id: iparith.cc,v 1.169 1999-08-13 17:12:20 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -280,10 +280,7 @@ cmdnames cmds[] =
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
   #ifdef HAVE_SPECTRUM
-  { "spectrum",    0, SPECTRUM_CMD ,      CMD_1},
-  { "spectrumnd",  0, SPECTRUMF_CMD ,     CMD_1},
-  { "spadd",       0, SPADD_CMD ,         CMD_2},
-  { "spmul",       0, SPMUL_CMD ,         CMD_2},
+  { "spectrum",    0, SPECTRUM_CMD ,      CMD_123},
   { "semic",       0, SEMIC_CMD ,         CMD_2},
   { "semicsqh",    0, SEMICH_CMD ,        CMD_2},
   #endif
@@ -2285,8 +2282,7 @@ struct sValCmd2 dArith2[]=
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
 #ifdef HAVE_SPECTRUM
-,{spaddProc,   SPADD_CMD,      LIST_CMD,       LIST_CMD,   LIST_CMD PROFILER}
-,{spmulProc,   SPMUL_CMD,      LIST_CMD,       LIST_CMD,   INT_CMD  PROFILER}
+,{spectrumProc2,SPECTRUM_CMD,  LIST_CMD,       POLY_CMD,   INT_CMD PROFILER}
 ,{semicProc,   SEMIC_CMD,      INT_CMD,        LIST_CMD,   LIST_CMD PROFILER}
 ,{semichProc,  SEMICH_CMD,     INT_CMD,        LIST_CMD,   LIST_CMD PROFILER}
 #endif
@@ -3604,7 +3600,6 @@ struct sValCmd1 dArith1[]=
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD }
 #ifdef HAVE_SPECTRUM
 ,{spectrumProc, SPECTRUM_CMD,    LIST_CMD,       POLY_CMD }
-,{spectrumfProc,SPECTRUMF_CMD,   LIST_CMD,       POLY_CMD }
 #endif
 ,{jjSTD,        STD_CMD,         IDEAL_CMD,      IDEAL_CMD }
 ,{jjSTD,        STD_CMD,         MODUL_CMD,      MODUL_CMD }
@@ -4325,6 +4320,9 @@ struct sValCmd3 dArith3[]=
 ,{jjRESULTANT,      RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
 #else
 ,{jjWRONG3,         RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
+#endif
+#ifdef HAVE_SPECTRUM
+,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, LIST_CMD } 
 #endif
 #ifdef OLD_RES
 ,{jjRES3,           SRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }

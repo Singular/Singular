@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.23 1999-07-23 13:45:17 Singular Exp $ */
+/* $Id: polys1.cc,v 1.24 1999-08-13 17:12:21 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -60,7 +60,7 @@ BOOLEAN   pIsConstantComp(poly p)
 }
 
 /*2
-*test if a monomial is a pure power
+*test if a monomial /head term is a pure power
 */
 int pIsPurePower(poly p)
 {
@@ -1115,7 +1115,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
     }
   }
   result=pOrdPolyMerge(result);
-#else  
+#else
   //  if (qq!=NULL)
   //  {
   //    pSetm(qq);

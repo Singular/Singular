@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.25 1999-08-12 10:57:37 Singular Exp $ */
+/* $Id: tok.h,v 1.26 1999-08-13 17:12:22 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -104,9 +104,6 @@ enum {
   ROWS_CMD,
 #ifdef HAVE_SPECTRUM
   SPECTRUM_CMD,
-  SPECTRUMF_CMD,
-  SPADD_CMD,
-  SPMUL_CMD,
   SEMIC_CMD,
   SEMICH_CMD,
 #endif
