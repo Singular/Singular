@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.19 1998-05-04 12:30:05 schmidt Exp $
+@comment $Id: general.doc,v 1.20 1998-05-04 13:02:03 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -775,10 +775,13 @@ See the file 'singular_algorithms.tex' for details and further algorithms.
 @table @code
 @item @strong{Commands to compute standard bases}
 @table @asis
+@item @code{facstd}
+@ref{facstd}
+@*computes the a list of Groebner bases via the Factorizing Groebenr Basis Algorithm: the intersection of the zero sets is the zero set of the given ideal
 @item @code{fglm}
 @ref{fglm}
 @*computes the Groebner basis provided that a reduced Groebner basis w.r.t.
-another ordering is known (@ref{fglm})
+another ordering is known
 @*The given ideal must be zero-dimensional.
 @item @code{std}
 @ref{std}
@@ -861,6 +864,15 @@ compute the graded Betti numbers of a module from a free resolution
 @item @code{minres}
 @ref{minres}@*
 minimizes a free resolution of an ideal or module
+@end table
+@item @strong{Processing of polynomials}
+@table @asis
+@item @code{extgcd}
+@ref{extgcd}@*
+@item @code{factorize}
+@ref{factorize}@*
+@item @code{gcd}
+@ref{gcd}@*
 @end table
 @end table
 
