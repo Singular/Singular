@@ -1,4 +1,4 @@
-% $Id: singcard.tex,v 1.2 1998-05-25 09:43:04 schmidt Exp $
+% $Id: singcard.tex,v 1.3 1998-05-27 13:24:42 schmidt Exp $
 
 %
 % singcard.tex - common macros for Singular reference cards.
@@ -161,6 +161,7 @@
 % \ctl: print control keys
 % \opt: print optional arguments
 % \alt: separate alternative arguments
+% \rep: denote repitition of arguments
 % \rmslash: print a slash in roman type face
 % \eg, \ie: obvious
 % \verysmallskip: skip a very small amount (used between \sec entries).
@@ -171,7 +172,8 @@
 \def\Singular{{\sc Singular}}
 \def\ctl#1{{\tt C-#1}}
 \def\opt#1{{\rm[{\tt #1}]}}
-\def\alt{\hbox{\hskip 1.15pt\vrule height5.5pt depth1pt width0.25pt\hskip 1pt}}
+\def\alt{\hbox{\hskip 1pt$\mid$\hskip 1pt}}
+\def\rep{$\ldots$}
 \def\rmslash{{\rm /}}
 \def\eg{e.g.~}
 \def\ie{i.e.~}
