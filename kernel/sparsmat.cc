@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.1.1.1 2003-10-06 12:15:55 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.2 2004-02-05 14:29:48 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -247,7 +247,7 @@ void smRingChange(ring *origR, sip_sring &tmpR, Exponent_t bound)
   tmpR.block0=block0;
   block1[1]=tmpR.N;
   tmpR.block1=block1;
-  tmpR.bitmask = bound;
+  tmpR.bitmask = 2*bound;
 
 // ???
 //  if (tmpR.bitmask > currRing->bitmask) tmpR.bitmask = currRing->bitmask;
