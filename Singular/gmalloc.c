@@ -8,9 +8,12 @@
    if HAVE_GMALLOC is defined
 */   
 
+#ifdef HAVE_CONFIG_H
 #include "mod2.h"
+#endif
 
-#ifdef HAVE_GMALLOC 
+/* #ifdef HAVE_GMALLOC */
+#if 1
 
 
 #define _MALLOC_INTERNAL
@@ -331,7 +334,8 @@ Cambridge, MA 02139, USA.
 #if defined (__GNU_LIBRARY__) || defined (_LIBC)
 #include <stddef.h>
 #include <sys/cdefs.h>
-extern size_t __getpagesize __P ((void));
+/* obachman: no declaration: conflicts with gnulibc6 unistd.h */
+/* extern size_t __getpagesize __P ((void)); */
 #else
 #if 0 /* obachman: pasted in getpagesize.h manually */
 #include "getpagesize.h"
@@ -371,6 +375,7 @@ extern size_t __getpagesize __P ((void));
 #endif /* no EXEC_PAGESIZE */
 #endif /* no _SC_PAGESIZE */
 
+/* obachman: undef , gnulibc6 conflict with unistd.h */
 #define	 __getpagesize()	getpagesize()
 #endif /* if 0 */
 #endif
@@ -387,7 +392,10 @@ valloc (size)
      __malloc_size_t size;
 {
   if (pagesize == 0)
+/* obachman: use getpagesize, instead
     pagesize = __getpagesize ();
+*/
+    pagesize = getpagesize ();
 
   return memalign (pagesize, size);
 }
