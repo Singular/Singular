@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.9 1998-06-02 15:29:54 Singular Exp $
+// $Id: fglm.h,v 1.10 1999-02-26 15:32:02 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -27,9 +27,9 @@
 class fglmSelem
 {
 public:
-    int numVars;
-    poly monom;
     int * divisors;
+    poly monom;
+    int numVars;
     fglmSelem( poly p, int var );
 
     void cleanup();
@@ -40,9 +40,9 @@ public:
 class fglmDelem
 {
 public:
-    int insertions;
     poly monom;
     fglmVector v;
+    int insertions;
     int var;
     fglmDelem( poly & m, fglmVector mv, int v );
 

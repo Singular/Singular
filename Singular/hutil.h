@@ -13,7 +13,9 @@ struct monrec;
 typedef struct monrec monh;
 typedef monh * monp;
 typedef monp * monf;
-struct monrec{  scfmon mo;
+struct monrec
+{
+  scfmon mo;
   int a;
 };
 

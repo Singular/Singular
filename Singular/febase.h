@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.25 1998-12-02 13:57:26 obachman Exp $ */
+/* $Id: febase.h,v 1.26 1999-02-26 15:32:01 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -147,6 +147,12 @@ class Voice
     char   * filename;    // file name or proc name
     procinfo * pi;        // proc info
     void   * oldb;        // internal scanner buffer
+    // for files only:
+    FILE * files;         // file handle
+    // for buffers only:
+    char * buffer;        // buffer pointer
+    long   fptr;          // current position in buffer
+
     int    start_lineno;  // lineno, to restore in recursion
     int    curr_lineno;   // current lineno
     feBufferInputs   sw;  // BI_stdin: read from STDIN
@@ -158,11 +164,6 @@ class Voice
             *       ==2: if (1) processed, else allowed but not executed
             */
     feBufferTypes   typ;  // buffer type: see BT_..
-    // for files only:
-    FILE * files;         // file handle
-    // for buffers only:
-    char * buffer;        // buffer pointer
-    long   fptr;          // current position in buffer
 
   Voice() { memset(this,0,sizeof(*this));}
   feBufferTypes Typ();

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.17 1998-12-14 15:32:29 Singular Exp $ */
+/* $Id: structs.h,v 1.18 1999-02-26 15:32:06 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -105,7 +105,6 @@ typedef ip_package *       package;
 typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
 typedef namerec *          namehdl;
-#endif
 
 struct _scmdnames
 {
@@ -115,6 +114,59 @@ struct _scmdnames
   short toktype;
 };
 typedef struct _scmdnames cmdnames;
+
+struct sip_sring
+{
+  idhdl      idroot; /* local objects */
+  int*       order;  /* array of orderings */
+  int*       block0; /* starting pos.*/
+  int*       block1; /* ending pos.*/
+  char**     parameter; /* names of parameters */
+  number     minpoly;
+  short**    wvhdl;  /* array of weight vectors */
+  char **    names;  /* array of variable names */
+  /* extension to the ring structure: qring */
+  ideal      qideal;
+#ifdef SDRING
+  short      partN;
+#endif
+  short      ch;     /* characteristic */
+  short      N;      /* number of vars */
+
+  short      P;      /* number of pars */
+  short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
+
+  short      ref;
+
+  // what follows below here should be set by rComplete, _only_
+  int       *VarOffset;   /* controls indexing of exponents */
+  short     VarCompIndex; /* location of component in exp vector */
+  short     VarLowIndex;  /* lowest index of an exponent */
+  short     VarHighIndex; /* Highest index of an expoentn */
+
+#ifdef RDEBUG
+  short      no; /* unique id for rings */
+#endif
+};
+
+struct sip_sideal
+{
+  poly*  m;
+  long rank;
+  int nrows;
+  int ncols;
+  #define IDELEMS(i) ((i)->ncols)
+  inline int& idelems(void) { return ncols; }
+};
+
+struct sip_smap
+{
+  poly *m;
+  char *preimage;
+  int nrows;
+  int ncols;
+};
+#endif
 
 /* the function pointer types */
 typedef number (*numberfunc)(number a,number b);

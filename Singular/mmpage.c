@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmpage.c,v 1.1 1998-12-02 13:57:35 obachman Exp $ */
+/* $Id: mmpage.c,v 1.2 1999-02-26 15:32:06 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mod2.h"
+#include "mmprivate.h"
 #ifdef HAVE_MALLOC_H
 #include "malloc.h"
 #endif

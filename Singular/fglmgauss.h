@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmgauss.h,v 1.4 1998-12-16 18:43:37 Singular Exp $
+// $Id: fglmgauss.h,v 1.5 1999-02-26 15:32:03 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -19,14 +19,14 @@ class gaussElem;
 class gaussReducer
 {
 private:
-    int size;
-    int max;
     gaussElem * elems;
     BOOLEAN * isPivot;
     int * perm;
     fglmVector v;
     fglmVector p;
     number pdenom;
+    int size;
+    int max;
 public:
     gaussReducer( int dimen );
     ~gaussReducer();

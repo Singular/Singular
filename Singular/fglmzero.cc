@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.18 1998-09-24 09:59:40 Singular Exp $
+// $Id: fglmzero.cc,v 1.19 1999-02-26 15:32:04 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -302,7 +302,7 @@ public:
 //     This class contains the relevant data for the 'candidates'
 //     The declaration of class fglmSelem is found in fglm.h
 
-fglmSelem::fglmSelem( poly p, int var ) : numVars( 0 ), monom( p )
+fglmSelem::fglmSelem( poly p, int var ) : monom( p ), numVars( 0 )
 {
     for ( int k = pVariables; k > 0; k-- )
         if ( pGetExp( monom, k ) > 0 )
@@ -644,7 +644,7 @@ CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l )
 
 //     The declaration of class fglmDelem is found in fglm.h
 
-fglmDelem::fglmDelem( poly & m, fglmVector mv, int v ) : insertions( 0 ), v( mv ), var( v )
+fglmDelem::fglmDelem( poly & m, fglmVector mv, int v ) : v( mv ), insertions( 0 ), var( v )
 {
     monom= m;
     m= NULL;
