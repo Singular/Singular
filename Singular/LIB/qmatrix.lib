@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qmatrix.lib,v 1.4 2004-06-01 13:53:36 levandov Exp $";
+version="$Id: qmatrix.lib,v 1.5 2004-08-05 12:25:23 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups.
@@ -147,7 +147,14 @@ EXAMPLE: example quant; shows examples
     {
       m[i,nv+1-i]=1;
     }
-    int chr = myInt(#);
+    int chr = 0;
+    if ( size(#) > 0 )
+    {
+      if ( typeof( #[1] ) == "int" )
+      {
+        chr = #[1];
+      }
+    }
     ring @rrr=(0,q),(y(1..nv)),Dp;
     minpoly = RootOfUnity(chr);
     matrix C[nv][nv]=0;
