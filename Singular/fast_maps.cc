@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.17 2002-01-19 17:20:59 obachman Exp $
+ *  Version: $Id: fast_maps.cc,v 1.18 2002-01-19 17:55:39 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -22,7 +22,7 @@
 // define if you want to use special src_ring
 #define HAVE_SRC_R 0
 // define if you want to use optimization step
-#define HAVE_MAP_OPTIMIZATION 0
+#define HAVE_MAP_OPTIMIZATION 1
 
 /*******************************************************************************
 **
@@ -303,7 +303,7 @@ void maMap_CreateRings(ideal map_id, ring map_r,
 #endif
 
 #if HAVE_DEST_R > 0
-  Exponent_t maxExp = maGetMaxExp(map_id, map_r, image_id, map_r);
+  Exponent_t maxExp = maGetMaxExp(map_id, map_r, image_id, image_r);
   dest_r = rModifyRing_Simple(image_r, TRUE, TRUE, maxExp);
 #else
   dest_r = image_r;
