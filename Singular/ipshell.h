@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.28 2002-05-02 15:15:57 Singular Exp $ */
+/* $Id: ipshell.h,v 1.29 2003-03-04 09:24:37 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -97,6 +97,9 @@ struct sValCmd1
   short cmd;
   short res;
   short arg;
+#ifdef HAVE_PLURAL  
+  short valid_for_plural;
+#endif  
 };
 
 typedef BOOLEAN (*proc2)(leftv,leftv,leftv);
@@ -107,10 +110,9 @@ struct sValCmd2
   short res;
   short arg1;
   short arg2;
-#ifdef PROFILING
-  short cnt;
-  int   t;
-#endif
+#ifdef HAVE_PLURAL  
+  short valid_for_plural;
+#endif  
 };
 
 typedef BOOLEAN (*proc3)(leftv,leftv,leftv,leftv);
@@ -122,6 +124,9 @@ struct sValCmd3
   short arg1;
   short arg2;
   short arg3;
+#ifdef HAVE_PLURAL  
+  short valid_for_plural;
+#endif  
 };
 struct sValCmdM
 {
@@ -129,6 +134,9 @@ struct sValCmdM
   short cmd;
   short res;
   short number_of_args; /* -1: any, -2: any >0, .. */
+#ifdef HAVE_PLURAL  
+  short valid_for_plural;
+#endif  
 };
 extern struct sValCmd2 dArith2[];
 extern struct sValCmd1 dArith1[];
