@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2idx.pl,v 1.1 1999-07-22 13:54:21 obachman Exp $
+# $Id: doc2idx.pl,v 1.2 2000-04-27 10:07:19 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -31,9 +31,12 @@ die "Need 3 arguments:\n $Usage" unless (scalar(@ARGV) == 3);
 open (HLP, "<$ARGV[0]") || die "Can't open $ARGV[0]: $!\n";
 open (URL, "<$ARGV[1]") || die "Can't open $ARGV[1]: $!\n";
 $db_file = $ARGV[2];
-$db_file = $1 if ($db_file =~ /(.*)\..*$/);
-dbmopen (%CHK, $db_file, 0666) ||
-      die "Error: can't open chksum data base $db_file";
+unless ($return = do $db_file)
+{
+  die "couldn't parse $db_file: $@" if $@;
+  die "couldn't do $db_file: $!"    unless defined $return;
+  die "couldn't run $db_file"       unless $return;
+} 
 
 # fill hashes
 # first: HLP
@@ -74,8 +77,7 @@ close(URL);
 
 for $entry (sort keys %$index)
 {
-  print "$entry\t$index->{$entry}->{Node}\t$index->{$entry}->{Url}\t$CHK{$entry}\n";
+  print "$entry\t$index->{$entry}->{Node}\t$index->{$entry}->{Url}\t$CHECKSUMS{$entry}\n";
 }
 
-close(%CHK);
 

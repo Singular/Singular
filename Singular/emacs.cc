@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.11 1999-12-16 13:41:30 obachman Exp $ */
+/* $Id: emacs.cc,v 1.12 2000-04-27 10:07:05 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -144,6 +144,7 @@ int main(int argc, char** argv)
   
   // make sure  emacs, singular, emacs_dir, emacs_load are set
   if (emacs == NULL) emacs = feResource("emacs", 0);
+  if (emacs == NULL) emacs = feResource("xemacs", 0);
   if (emacs == NULL)
   {
     fprintf(stderr, "Error: Can't find emacs executable. \n Expected it at %s\n Specify alternative with --emacs option,\n or set ESINGULAR_EMACS environment variable.\n", 
@@ -214,7 +215,9 @@ int main(int argc, char** argv)
   if (strstr(emacs, "xemacs") || strstr(emacs, "Xemacs") || strstr(emacs, "XEMACS"))
     prefix = "-";
   getcwd(cwd, MAXPATHLEN);
-
+  // append / at the end of cwd
+  if (cwd[strlen(cwd)-1] != '/') strcat(cwd, "/");
+    
   // Note: option -no-init-file should be equivalent to -q. Anyhow, 
   // xemacs-20.4 sometimes crashed on startup when using -q. Don´t know why.
   sprintf(syscall, "%s %seval '(setq singular-emacs-home-directory \"%s\")' %sno-init-file %sl %s %seval '(singular-other \"%s\" \"%s\" (list ",

@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.24 1998-06-29 14:18:40 schmidt Exp $
+dnl # $Id: configure.in,v 1.25 2000-04-27 10:07:30 obachman Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.24 1998-06-29 14:18:40 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.25 2000-04-27 10:07:30 obachman Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -219,15 +219,15 @@ AC_MSG_RESULT(done)
 AC_CHECK_LIB(m, atof, , [ AC_MSG_ERROR(libm.a not found) ])
 
 if test "x$gmp_in_installation" != xyes; then
-  AC_CHECK_LIB(gmp, mpz_init, ,
+  AC_CHECK_LIB(gmp, main, ,
     [
       # check a second time in `$(libdir)'.  This is a bit tricky,
       # but I think its worth avoiding long option values.
-      unset ac_cv_lib_gmp_mpz_init
+      unset ac_cv_lib_gmp_main
       LDFLAGS="-L$explicit_libdir $LDFLAGS"
-      AC_CHECK_LIB(gmp, mpz_init, ,
+      AC_CHECK_LIB(gmp, main, ,
         [ AC_MSG_ERROR(libgmp.a not found.  Use option --with-gmp to specify path) ])
-      unset ac_cv_lib_gmp_mpz_init
+      unset ac_cv_lib_gmp_main
     ])
 fi
 

@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.55 1999-11-15 17:20:51 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.56 2000-04-27 10:07:11 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -712,7 +712,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             return mstrdup(pString((poly)d));
 
         case NUMBER_CMD:
-          StringSetS((typed ? "number(" : ""));
+          StringSetS((char*) (typed ? "number(" : ""));
           if ((rtyp==IDHDL)&&(IDTYP((idhdl)data)==NUMBER_CMD))
           {
             nWrite(IDNUMBER((idhdl)data));
@@ -733,7 +733,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             nWrite(n);
             nDelete(&n);
           }
-          s = StringAppendS((typed ? ")" : ""));
+          s = StringAppendS((char*) (typed ? ")" : ""));
           return mstrdup(s);
           
         case MATRIX_CMD:

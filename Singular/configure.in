@@ -29,6 +29,11 @@ AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname")
 SINGUNAME=$ac_cv_singuname
 AC_SUBST(SINGUNAME)
 
+if test "$ac_cv_singuname" = ix86-Win; then
+  EXEC_EXT=".exe"
+fi
+AC_SUBST(EXEC_EXT)
+
 SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 AC_SUBST(SING_UNAME)
 
@@ -166,20 +171,20 @@ if test "x$exec_prefix" = xNONE; then
 fi
 
 # expand bindir
-test "x$bindir" = 'x${exec_prefix}/bin' && bindir="${exec_prefix}/bin"
-SINGULAR=${SINGULAR:-$bindir/Singular-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}
+test "x$bindir" = 'x${exec_prefix}/bin' && bindir="${exec_prefix}"
+SINGULAR=${SINGULAR:-$bindir/Singular-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}${EXEC_EXT}
 AC_SUBST(SINGULAR)
 AC_DEFINE_UNQUOTED(S_BIN_DIR, "${bindir}")
 
 # expand libdir
-test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${SINGULAR_VERSION}"
+test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib"
 
 # expand includedir
-test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include/${SINGULAR_VERSION}"
+test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include"
 
 # add to -I to CPPFLAGS and and -L to LDFLAGS, just to be sure
-LDFLAGS="-L${libdir} ${LDFLAGS}"
-CPPFLAGS="-I${includedir} ${CPPFLAGS}"
+LDFLAGS="-L${libdir} ${LDFLAGS} -L/usr/local/lib"
+CPPFLAGS="-I${includedir} ${CPPFLAGS} -I/usr/local/include"
 
 # this is a work-around to include the right term.h
 if test "$ac_cv_singuname" = SunOS-5; then
@@ -233,6 +238,8 @@ fi
 # ln -s
 AC_PROG_LN_S
 
+AC_CHECK_PROGS(PERL, perl5 perl)
+
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for general libraries, header files, typedefs, etc
 dnl
@@ -248,7 +255,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
-AC_CHECK_HEADERS(malloc.h sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h asm/sigcontext.h pwd.h termcap.h termios.h term.h)
+AC_CHECK_HEADERS(malloc.h sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h asm/sigcontext.h pwd.h termcap.h termios.h term.h readline/readline.h)
 
 # typedefs, structures
 AC_C_CONST
@@ -480,9 +487,6 @@ AC_ARG_WITH(
   lex,
   [  --with-lex=[LEX,no]     uses LEX as lex program, default is flex])
 AC_ARG_WITH(
-  perl5,
-  [  --with-perl5=[PERL5,no] uses PERL5 as perl5 program, default is perl5])
-AC_ARG_WITH(
   readline,
   [  --with-readline          do use static readline for fancy display])
 AC_ARG_WITH(
@@ -518,47 +522,6 @@ AC_ARG_WITH(
   mtrack,
   [  --with-mtrack           use mpr routines for extended memory tracking
                              -- works only under ix86-Linux])
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl Check for perl 5
-dnl
-# perl version 5
-if test "${with_perl5+set}" != set; then
-  AC_MSG_CHECKING(for perl5)
-  changequote(<<,>>)dnl
-  AC_CACHE_VAL(ac_cv_prog_perl5,
-  if (perl5 -v >/dev/null 2>&1)
-  then
-   if (perl5 -v | egrep "version 5\.[0-9]" >/dev/null 2>&1 )
-    then
-    ac_cv_prog_perl5=perl5
-   fi
-  elif (perl -v >/dev/null 2>&1)
-  then
-    if (perl -v | egrep "version 5\.[0-9]" >/dev/null 2>&1 )
-    then
-      ac_cv_prog_perl5=perl
-    fi
-  fi
-  )
-  changequote([,])dnl
-  if test "${ac_cv_prog_perl5+set}" = set; then
-    AC_MSG_RESULT(${ac_cv_prog_perl5})
-    PERL5=${ac_cv_prog_perl5}
-    AC_SUBST(PERL5)
-  else
-    AC_MSG_ERROR(can not find perl version 5)
-  fi
-elif test "${with_perl5}" = no; then
-  AC_MSG_WARN(building without perl5 --  make might fail)
-else
-  unset PERL5
-  unset ac_cv_prog_PERL5
-  AC_CHECK_PROGS(PERL5, ${with_perl5})
-  if test "x${PERL5}" = x; then
-    AC_MSG_WARN(building without perl5 -- make might fail)
-  fi
-fi
-
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for packages we need
 dnl for gmp, MP, factory and libfac, we built them in, even if the libs
@@ -572,6 +535,8 @@ AC_CHECK_LIB(ncurses,tgetent,,\
 
 # readline
 if test "$with_readline" = yes; then
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
    AC_CHECK_LIB(readline, rl_abort)
    AC_CHECK_HEADERS(readline/readline.h readline/history.h)
    if test "$ac_cv_lib_readline_rl_abort" = yes && \
@@ -648,16 +613,17 @@ ac_cv_have_readline="no"
   else
     AC_MSG_WARN(building without readline: disabling fancy display)
   fi
+AC_LANG_RESTORE
 fi
 
 NEED_LIBS=$LIBS
 
 # gmp, smallgmp, MP, MPT, factory, libfac
-AC_CHECK_LIB(gmp, mpq_init)
-if test "ac_cv_lib_gmp_mpq_init" = yes && test "$with-apint" = smallgmp; then
+AC_CHECK_LIB(gmp, main)
+if test "ac_cv_lib_gmp_main" = yes && test "$with-apint" = smallgmp; then
   LIBS=NEED_LIBS
 fi
-AC_CHECK_LIB(smallgmp, mpz_init)
+AC_CHECK_LIB(smallgmp, main)
 AC_CHECK_LIB(MP, IMP_PutGmpInt)
 AC_CHECK_LIB(MPT, MPT_GetTree)
 AC_CHECK_LIB(singcf, atof)
@@ -665,12 +631,12 @@ AC_CHECK_LIB(singfac, atof)
 
 AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h)
 
-if test "$ac_cv_lib_gmp_mpq_init" = yes && \
+if test "$ac_cv_lib_gmp_main" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
     ac_gmp_ok=yes
 fi
 
-if test "$ac_cv_lib_smallgmp_mpz_init" = yes && \
+if test "$ac_cv_lib_smallgmp_main" = yes && \
  test "$ac_cv_header_smallgmp_h" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
     ac_smallgmp_ok=yes

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.h,v 1.6 1998-04-14 15:16:24 pohl Exp $ */
+/* $Id: ffops.h,v 1.7 2000-04-27 10:07:30 obachman Exp $ */
 
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H
@@ -86,7 +86,7 @@ inline int ff_inv ( const int a )
     if ( ff_big )
 	return ff_biginv( a );
     else {
-	register b;
+	register int b;
 	if ( (b = (int)(ff_invtab[a])) )
 	    return b;
 	else

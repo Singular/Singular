@@ -120,9 +120,6 @@ Tst-Short: ${SINGULAR} Tst/Short/ok_s.lst Tst/regress.cmd
 Tst-Long:  ${SINGULAR} Tst/Long/ok_l.lst Tst/regress.cmd
 	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Long/ok_l.lst
 
-
-
-
 ##############################################################
 # distribution targets
 #

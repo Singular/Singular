@@ -12,7 +12,7 @@ SHELL		= /bin/sh
 SINGULAR_VERSION	= @SINGULAR_VERSION@
 SINGULAR		= @SINGULAR@
 SINGUNAME		= @SINGUNAME@
-
+EXEC_EXT		= @EXEC_EXT@
 ##
 ## various paths
 ##
@@ -35,7 +35,7 @@ install_slibdir = ${install_prefix}/LIB
 CC		= @CC@
 CXX		= @CXX@
 LEX		= @LEX@
-PERL5		= @PERL5@
+PERL		= @PERL@
 BISON		= bison
 INSTALL		= ./install-sh -c
 INSTALL_PROGRAM	= ${INSTALL} 
@@ -106,7 +106,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} \
 # ASO_SOURCES
 ASO_SOURCES = structs.aso.cc ipid.aso.cc mmprivate.aso.cc silink.aso.cc \
               matpol.aso.cc longrat.aso.cc kbuckets.aso.cc mpsr_Get.aso.cc \
-	      attrib.aso.cc lists.aso.cc kutil.aso.cc \
+	      attrib.aso.cc lists.aso.cc\
               syz.aso.cc subexpr.aso.cc 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
@@ -233,8 +233,8 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
 	echo unsigned long feVersionId =  `date '+%Y%m%d%H'`\; >version.h
 
-libparse: libparse_main.o utils.o fegetopt.o
-	${CXX}  -DHAVE_ASO=0  -o libparse libparse_main.o utils.o fegetopt.o
+libparse: libparse_main.o utils.o fegetopt.o febase.cc
+	${CXX}  -DHAVE_ASO=0 -DSTANDALONE_PARSER -o libparse febase.cc libparse_main.o utils.o fegetopt.o
 
 libparse_main.o: libparse.cc
 	${CXX} -c -o libparse_main.o libparse.cc  -DHAVE_ASO=0 -DSTANDALONE_PARSER
@@ -269,7 +269,7 @@ feOptES.inc: feOpt.cc
 prCopy.cc : prCopy.inc
 
 prCopy.inc : prCopyMacros.h prCopyTemplate.cc prCopy.pl
-	$(PERL5) prCopy.pl > prCopy.inc
+	$(PERL) prCopy.pl > prCopy.inc
 
 src: scanner.cc grammar.h grammar.cc libparse.cc 
 
@@ -296,15 +296,12 @@ install: all installbin installslib
 
 installbin: Singular libparse ESingular
 	${MKINSTALLDIRS} ${bindir}
-	${INSTALL_PROGRAM} Singular ${bindir}/Singular-${SINGULAR_VERSION}
-	${INSTALL_PROGRAM} libparse ${bindir}/libparse
-	${INSTALL_PROGRAM} ESingular ${bindir}/ESingular
-	chmod a+x ${bindir}/Singular-${SINGULAR_VERSION}
-	rm -f ${bindir}/Singular
-	cd ${bindir}; ${LN_S} Singular-${SINGULAR_VERSION} Singular;\
-	if test ! -x ${SINGULAR}; then \
-		${LN_S} Singular-${SINGULAR_VERSION} ${SINGULAR};\
-	fi
+	${INSTALL_PROGRAM} Singular ${SINGULAR}
+	${INSTALL_PROGRAM} libparse ${bindir}
+	${INSTALL_PROGRAM} ESingular ${bindir}
+	chmod a+x ${SINGULAR}
+	rm -f ${bindir}/Singular${EXEC_EXT}
+	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};\
 
 installslib: LIB
 	test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
@@ -313,7 +310,8 @@ installslib: LIB
 uninstall: uninstallbin
 
 uninstallbin:
-	rm -f ${bindir}/Singular rm -f ${bindir}/Singular-${SINGULAR_VERSION}
+	rm -f ${bindir}/Singular${EXEC_EXT} 
+	rm -f ${SINGULAR}
 	-rmdir ${bindir}
 
 ##
@@ -385,7 +383,7 @@ tar:
 	gzip -f Singular-${SINGULAR_VERSION}-src.tar
 
 
-TAGS:   ${SOURCES} ${HEADERS} ${INCS}
+TAGS:   ${SOURCES} ${HEADERS} 
 	etags ${SOURCES} ${HEADERS}
 
 tags:   
@@ -576,7 +574,7 @@ mpsr_Tok.ot: iparith.inc mpsr_Tok.cc
 ## check_aso
 ##
 check_aso:
-	${PERL5} check_aso.pl $(SOURCES)
+	${PERL} check_aso.pl $(SOURCES)
 ##
 ## dependencies
 ##

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.34 1999-12-16 16:12:45 Singular Exp $ */
+/* $Id: feread.cc,v 1.35 2000-04-27 10:07:08 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -76,6 +76,8 @@ char *command_generator (char *text, int state)
 #include <sys/stat.h>
 #include <sys/errno.h>
 
+// #undef READLINE_READLINE_H_OK
+
 extern "C" {
  #ifdef READLINE_READLINE_H_OK
   #include <readline/readline.h>
@@ -90,9 +92,12 @@ extern "C" {
   extern char ** completion_matches ();
   extern CPPFunction * rl_attempted_completion_function;
   extern FILE * rl_outstream;
-  char * readline ();
-  void add_history ();
-  int write_history ();
+  extern char * readline ();
+  extern void add_history ();
+  extern int write_history ();
+  extern void using_history();
+  extern int read_history();
+  extern int history_total_bytes();
  #endif /* READLINE_READLINE_H_OK */
 }
 

@@ -11,7 +11,7 @@ examplesdir	= ${prefix}/examples
 SINGULAR	= @SINGULAR@
 emacsdir	= ${install_prefix}/emacs
 
-PERL5		= @PERL5@
+PERL		= @PERL@
 INSTALL		= ../install-sh -c
 INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ../mkinstalldirs
@@ -21,19 +21,19 @@ SINGULAR_HLP	= ${docdir}/singular.hlp
 all install: cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
 
 cmd-cmpl.el: ${SINGULAR} cmpl.pl
-	${PERL5} cmpl.pl -Singular ${SINGULAR} -cmpl cmd > cmd-cmpl.el
+	${PERL} cmpl.pl -Singular ${SINGULAR} -cmpl cmd > cmd-cmpl.el
 
 hlp-cmpl.el: ${SINGULAR_HLP} cmpl.pl
-	${PERL5} cmpl.pl -hlp ${SINGULAR_HLP} -cmpl hlp > hlp-cmpl.el
+	${PERL} cmpl.pl -hlp ${SINGULAR_HLP} -cmpl hlp > hlp-cmpl.el
 
 ex-cmpl.el: cmpl.pl ${examplesdir}
-		${PERL5} cmpl.pl -cmpl ex -ex_dir ${examplesdir} > ex-cmpl.el
+		${PERL} cmpl.pl -cmpl ex -ex_dir ${examplesdir} > ex-cmpl.el
 
 # this is weird, if I work directly with _one_ pipe, 
 # then things break from time to time
 lib-cmpl.el: ${prefix}/Singular/Makefile cmpl.pl
 	${MAKE} --no-print-directory -s -f ${prefix}/Singular/Makefile echoLIBS > lib-temp
-	cat lib-temp | ${PERL5} cmpl.pl -cmpl lib > lib-cmpl.el
+	cat lib-temp | ${PERL} cmpl.pl -cmpl lib > lib-cmpl.el
 	rm lib-temp
 
 clean mostlyclean distclean:

@@ -1,8 +1,8 @@
-// $Id: general.lib,v 1.25 2000-01-13 12:15:54 obachman Exp $
+// $Id: general.lib,v 1.26 2000-04-27 10:07:13 obachman Exp $
 //GMG, last modified 18.6.99
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.25 2000-01-13 12:15:54 obachman Exp $";
+version="$Id: general.lib,v 1.26 2000-04-27 10:07:13 obachman Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -979,22 +979,40 @@ EXAMPLE:  example which; shows an example
 {
    int rs;
    int i;
-   string fn = "/tmp/which_" + string(system("pid"));
+   string fn = "which_" + string(system("pid"));
    string pn;
+   string cmd;
    if( typeof(command) != "string")
    {
      return (pn);
    }
-   i = system("sh", "which " + command + " > " + fn);
-   pn = read(fn);
-   pn[size(pn)] = "";
-   i = 1;
-   while ((pn[i] != " ") and (pn[i] != ""))
+   if (system("uname") != "ix86-Win")
    {
-     i = i+1;
+     cmd = "which ";
    }
-   if (pn[i] == " ") {pn[i] = "";}
-   rs = system("sh", "ls " + pn + " > " + fn + " 2>&1 ");
+   else
+   {
+     // unfortunately, it does not take -path
+     cmd = "type ";
+   }
+   i = system("sh", cmd + command + " > " + fn);
+   pn = read(fn);
+   if (system("uname") != "ix86-Win")
+   {
+     // TBC: Hmm... should parse output to get rid of 'command is '
+     pn[size(pn)] = "";
+     i = 1;
+     while ((pn[i] != " ") and (pn[i] != ""))
+     {
+       i = i+1;
+     }
+     if (pn[i] == " ") {pn[i] = "";}
+     rs = system("sh", "ls " + pn + " > " + fn + " 2>&1 ");
+   }
+   else
+   {
+     rs = 0;
+   }
    i = system("sh", "rm " + fn);
    if (rs == 0) {return (pn);}
    else
@@ -1005,6 +1023,6 @@ EXAMPLE:  example which; shows an example
 }
 example
 {  "EXAMPLE:"; echo = 2;
-    which("Singular");
+    which("sh");
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.14 1999-12-13 16:28:34 obachman Exp $
+# $Id: pl2doc.pl,v 1.15 2000-04-27 10:07:23 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -67,12 +67,17 @@ print LDOC "\@c ---end content LibInfo---\n";
 # print subsubsections for help of procs
 unless ($no_fun)
 {
-  if ($db_file)
+  if ($db_file && -e $db_file && ! -z $db_file)
   {
-    $db_file = $1 if ($db_file =~ /(.*)\..*$/);
-    dbmopen(%CHECKSUMS, $db_file, oct(755)) ||
-      die "Error: can't open chksum data base $db_file";
+    my $return;
+    unless ($return = do $db_file)
+    {
+      die "couldn't parse $db_file: $@" if $@;
+      die "couldn't do $db_file: $!"    unless defined $return;
+      die "couldn't run $db_file"       unless $return;
+    } 
   }
+
   # print help and example of each function
   for ($i = 0; $i <= $#procs; $i++)
   {
@@ -85,7 +90,13 @@ unless ($no_fun)
     print LDOC ", " . $lib ."_lib\n";
     print LDOC "\@subsubsection " . $procs[$i] . "\n";
     print LDOC "\@cindex ". $procs[$i] . "\n";
-    $CHECKSUMS{$procs[$i]} = $chksum{$procs[$i]} if ($db_file);
+    if ($db_file && 
+	(!defined($CHECKSUMS{$procs[$i]}) ||
+	 $CHECKSUMS{$procs[$i]} != $chksum{$procs[$i]}))
+    {
+      $CHECKSUMS{$procs[$i]} = $chksum{$procs[$i]};
+      $CHECKSUMS_CHANGED = 1;
+    }
     print LDOC "\@c ---content $procs[$i]---\n";
     print LDOC "Procedure from library \@code{$lib.lib} (\@pxref{${lib}_lib}).\n\n";
     if ($help{$procs[$i]} =~ /^\@/)
@@ -114,7 +125,18 @@ unless ($no_fun)
     OutRef(\*LDOC, $ref) if $ref;
     print LDOC "\@c ---end content $procs[$i]---\n";
   }
-  dbmclose(%CHECKSUMS);
+  # save checksums
+  if ($CHECKSUMS_CHANGED)
+  {
+    open(CD, ">$db_file") || die "Can't open '$db_file' for writing: $!";
+    print CD "%CHECKSUMS = (\n";
+    for $key (keys %CHECKSUMS)
+    {
+      print CD "q{$key}, $CHECKSUMS{$key},\n";
+    }
+    print CD ");\n";
+    close(CD);
+  }
 }
 
 # 

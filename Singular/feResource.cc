@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.22 2000-02-04 13:15:26 obachman Exp $ */
+/* $Id: feResource.cc,v 1.23 2000-04-27 10:07:06 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -56,7 +56,7 @@ typedef feResourceConfig_s * feResourceConfig;
 // feCleanResource makes furthermore  the following transformations (except for URL resources)
 // 1.) '/' characters are replaced by respective directory - separators
 // 2.) ';' characters are replaced by respective path separators
-static feResourceConfig_s feResourceConfigs[20] =
+static feResourceConfig_s feResourceConfigs[25] =
 {
   {"SearchPath",    's',     feResPath,  NULL,
    "$SINGULARPATH;"
@@ -85,6 +85,7 @@ static feResourceConfig_s feResourceConfigs[20] =
 
 #ifdef ESINGULAR
   {"emacs",    'E',    feResBinary, "ESINGULAR_EMACS",      "%b/emacs",              ""},
+  {"xemacs",    'A',    feResBinary, "ESINGULAR_EMACS",      "%b/xemacs",              ""},
   {"SingularEmacs",'M',feResBinary, "ESINGULAR_SINGULAR",    "%b/Singular",           ""},
   {"EmacsLoad",'l',    feResFile,   "ESINGULAR_EMACS_LOAD",  "%e/.emacs-singular",             ""},
   {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",   "%r/emacs",             ""},

@@ -1,7 +1,8 @@
+/* -*-c++-*- */
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.29 2000-02-14 17:00:10 Singular Exp $ */
+/* $Id: febase.inc,v 1.30 2000-04-27 10:07:07 obachman Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -439,7 +440,7 @@ static int fePrintEcho(char *anf, char *b)
 int feReadLine(char* b, int l)
 {
   char *s=NULL;
-  int offset; /* will not be used if s==NULL*/
+  int offset = 0; /* will not be used if s==NULL*/
   // try to read from the buffer into b, max l chars
   if (currentVoice!=NULL)
   {

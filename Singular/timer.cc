@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.13 1999-11-15 17:20:55 obachman Exp $ */
+/* $Id: timer.cc,v 1.14 2000-04-27 10:07:12 obachman Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -121,7 +121,7 @@ int getTimer()
 * stops timer, writes string s and the time since last call of startTimer
 * if this time is > mintime sec
 */
-void writeTime(void* v)
+void writeTime(char* v)
 {
   clock_t curr;
 
@@ -176,7 +176,7 @@ int getRTimer()
 * stops timer, writes string s and the time since last call of startTimer
 * if this time is > mintime
 */
-void writeRTime(void* v)
+void writeRTime(char* v)
 {
   struct timeval now;
 

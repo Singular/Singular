@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.24 2000-02-01 15:30:24 Singular Exp $ */
+/* $Id: kutil.h,v 1.25 2000-04-27 10:07:08 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -11,9 +11,6 @@
 #include "structs.h"
 #include "mmemory.h"
 #include "ring.h"
-#if HAVE_ASO == 1
-#include "kutil.aso"
-#endif
 
 #define setmax 16
 

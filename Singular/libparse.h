@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.h,v 1.11 1999-11-15 17:20:17 obachman Exp $ */
+/* $Id: libparse.h,v 1.12 2000-04-27 10:07:08 obachman Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -43,8 +43,13 @@ extern char * text_buffer;
 #  define YYLP_MISS_BR3   12
 
 #  ifdef STANDALONE_PARSER
-#    define myfread fread
-#    define myfopen fopen
+#ifndef unix
+extern FILE* myfopen(char *path, char *mode);
+extern size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+#else
+#define myfopen fopen
+#define myfread fread
+#endif
 #  endif
 
 #endif /* LIBPARSE_H */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.9 2000-02-04 13:15:25 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.10 2000-04-27 10:07:06 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -130,7 +130,7 @@ struct fe_option feOptSpec[] =
    0,          "Suppress all output",                                  feOptBool,    0,      0},
 
   {"min-time",          required_argument,  LONG_OPTION_RETURN,
-  "SECS",     "Do not display times smaller than SECS (in seconds)",   feOptString, "0.5",  0},
+  "SECS",     "Do not display times smaller than SECS (in seconds)",   feOptString, (void*) "0.5",  0},
 
 #ifdef HAVE_MPSR
   {"MPport",           required_argument,   LONG_OPTION_RETURN,

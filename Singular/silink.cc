@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.33 1999-11-15 17:20:47 obachman Exp $ */
+/* $Id: silink.cc,v 1.34 2000-04-27 10:07:11 obachman Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -438,7 +438,7 @@ leftv slReadAscii(si_link l)
   sleftv tmp;
   memset(&tmp,0,sizeof(sleftv));
   tmp.rtyp=STRING_CMD;
-  tmp.data="? ";
+  tmp.data=(void*) "? ";
   return slReadAscii2(l,&tmp);
 }
 

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.132 2000-01-22 12:04:06 Singular Exp $ */
+/* $Id: extra.cc,v 1.133 2000-04-27 10:07:05 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -166,14 +166,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-/*==================== gc ==================================*/
-    if(strcmp(sys_cmd,"gc")==0)
-    {
-      mmGarbageCollectHeaps(3);
-      PrintLn();
-      return FALSE;
-    }
-    else
 /*==================== sh ==================================*/
     if(strcmp(sys_cmd,"sh")==0)
     {
@@ -187,6 +179,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       #else
       res->data=(void *)0;
       #endif
+      return FALSE;
+    }
+    else
+/*==================== uname ==================================*/
+    if(strcmp(sys_cmd,"uname")==0)
+    {
+      res->rtyp=STRING_CMD;
+      res->data = mstrdup(S_UNAME);
       return FALSE;
     }
     else

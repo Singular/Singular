@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.38 1999-12-08 20:36:20 obachman Exp $ */
+/* $Id: libparse.l,v 1.39 2000-04-27 10:07:08 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -103,8 +103,8 @@ int    _isatty(int filedes);
 
 #ifdef STANDALONE_PARSER
 procinfov pi;
-printpi(procinfov pi);
-pi_clear(procinfov pi);
+void printpi(procinfov pi);
+void pi_clear(procinfov pi);
 extern "C" {
   int yylpwrap();
 }

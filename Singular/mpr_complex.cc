@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.18 1999-11-14 21:35:09 wenk Exp $ */
+/* $Id: mpr_complex.cc,v 1.19 2000-04-27 10:07:09 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -168,20 +168,20 @@ bool operator <= ( const gmp_float & a, const gmp_float & b )
 gmp_float operator - ( const gmp_float & a )
 {
   gmp_float tmp;
-  mpf_neg( *(tmp.mpfp()), *(a.mpfp()) );
+  mpf_neg( *(tmp._mpfp()), *(a.mpfp()) );
   return tmp;
 }
 
 gmp_float abs( const gmp_float & a )
 {
   gmp_float *tmp= new gmp_float();
-  mpf_abs( *tmp->mpfp(), *a.mpfp() );
+  mpf_abs( *tmp->_mpfp(), *a.mpfp() );
   return *tmp;
 }
 gmp_float sqrt( const gmp_float & a )
 {
   gmp_float *tmp= new gmp_float();
-  mpf_sqrt( *tmp->mpfp(), *a.mpfp() );
+  mpf_sqrt( *tmp->_mpfp(), *a.mpfp() );
   return *tmp;
 }
 gmp_float sin( const gmp_float & a )

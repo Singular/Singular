@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prProcs.cc,v 1.1 1999-11-15 17:20:44 obachman Exp $ */
+/* $Id: prProcs.cc,v 1.2 2000-04-27 10:07:10 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -179,7 +179,7 @@ poly  pr_Mult_m_General(poly p,
   {
     while (p != NULL)
     {
-      pNext(q) = AllocHeap(ri->mm_specHeap);
+      pNext(q) = AllocHeapType(ri->mm_specHeap, poly);
       q = pNext(q);
       pSetCoeff0(q, nMult(ln, pGetCoeff(p)));
       prMonAdd(q, p, m, ri);
@@ -191,7 +191,7 @@ poly  pr_Mult_m_General(poly p,
     poly r;
     while (p != NULL)
     {
-      r = AllocHeap(ri->mm_specHeap);
+      r = AllocHeapType(ri->mm_specHeap, poly);
       prMonAdd(r, p, m, ri);
 
       if (prComp0(r, spNoether, ri) == -1)
@@ -261,7 +261,7 @@ poly pr_Minus_m_Mult_q_General (poly p,
 
   if (p == NULL) goto Finish;       // we are done if p is 0
   
-  qm = AllocHeap(r->mm_specHeap);
+  qm = AllocHeapType(r->mm_specHeap,poly);
   assume(pGetComp(q) == 0 || pGetComp(m) == 0);
   prMonAdd(qm, q, m, r);
   
@@ -308,7 +308,7 @@ poly pr_Minus_m_Mult_q_General (poly p,
         goto Finish; 
       }
       // construct new qm 
-      qm = AllocHeap(r->mm_specHeap);
+      qm = AllocHeapType(r->mm_specHeap,poly);
       assume(pGetComp(q) == 0 || pGetComp(m) == 0);
       prMonAdd(qm, q, m, r);
       goto Top;

@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.92 2000-03-14 18:03:55 Singular Exp $
+@comment $Id: singular.doc,v 1.93 2000-04-27 10:07:25 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -24,6 +24,7 @@
 @set singularmanual 1
 @c @set namespaces 1
 @include version.texi
+@include uname.texi
 @c --------------------- end general setting --------------------
 
 
@@ -329,7 +330,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node classify_lib, deform_lib, Singularities, Singularities
 @subsection classify_lib
-@c lib classify.lib
+@c lib classify.lib unix_only
 @c ----------------------------------------------------------
 @node deform_lib, hnoether_lib, classify_lib, Singularities
 @subsection deform_lib

@@ -17,7 +17,7 @@ extern int texinfo_out;
 extern int found_version, found_info, found_oldhelp, found_proc_in_proc;
 int warning_info = 0, warning_version = 0;
 
-static usage(char *progname)
+static void usage(char *progname)
 {
   printf("libparse: a syntax-checker for Singular Libraries.\n");
   printf("USAGE: %s [options] singular-library\n", progname);
@@ -31,6 +31,7 @@ static usage(char *progname)
 }
  
 static char* lib_file = NULL;
+extern "C" { int fe_getopt (); }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 void main_init(int argc, char *argv[])
@@ -132,7 +133,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-pi_clear(procinfov pi)
+void pi_clear(procinfov pi)
 {
   free(pi->libname);
   free(pi->procname);
@@ -167,7 +168,7 @@ static void PrintOut(FILE *fd, int pos_start, int pos_end)
 }
 
 
-printpi(procinfov pi)
+void printpi(procinfov pi)
 {
   char *buf, name[256];
   int len1, len2;
@@ -177,7 +178,7 @@ printpi(procinfov pi)
   if (fp == NULL) 
   {
     printf("Can not open %s\n", lib_file);
-    return 0;
+    return;
   }
 
   if(!found_info && !warning_info) warning_info++;

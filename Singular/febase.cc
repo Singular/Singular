@@ -1,11 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.85 2000-04-11 15:18:06 Singular Exp $ */
+/* $Id: febase.cc,v 1.86 2000-04-27 10:07:06 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
 
+/* I need myfread in standalone_parser */
+#ifndef STANDALONE_PARSER
 #include "mod2.h"
 
 #include <stdlib.h>
@@ -630,6 +632,10 @@ char* eati(char *s, int *i)
   else *i = 1;
   return s;
 }
+#else /* ! STANDALONE_PARSER */
+#include <stdio.h>
+
+#endif
 
 #ifndef unix
 // Make sure that mode contains binary option
@@ -637,13 +643,13 @@ FILE* myfopen(char *path, char *mode)
 {
   char mmode[4];
   int i;
-  BOOLEAN done = FALSE;
+  int done = 0;
 
   for (i=0;;i++)
   {
     mmode[i] = mode[i];
     if (mode[i] == '\0') break;
-    if (mode[i] == 'b') done = TRUE;
+    if (mode[i] == 'b') done = 1;
   }
 
   if (! done)
@@ -654,7 +660,6 @@ FILE* myfopen(char *path, char *mode)
   return fopen(path, mmode);
 }
 #endif
-
 // replace "\r\n" by " \n" and "\r" by "\n"
 
 size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.45 2000-03-08 15:08:09 Singular Exp $ */
+/* $Id: febase.h,v 1.46 2000-04-27 10:07:07 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -38,6 +38,8 @@ extern char fePathSep;
 #ifdef HAVE_DYN_RL
   #undef HAVE_READLINE
   #define HAVE_FEREAD 1
+#elif ! defined(HAVE_READLINE)
+  #define HAVE_FEREAD
 #endif
 
 /*

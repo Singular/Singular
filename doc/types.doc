@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.107 2000-01-13 12:16:47 obachman Exp $
+@comment $Id: types.doc,v 1.108 2000-04-27 10:07:26 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1598,7 +1598,7 @@ is data to read.
 
 @*@strong{Example:}
 @smallexample
-@c example
+@c example unix_only
   LIB "general.lib"; // needed for "killall" command
   link l="MPtcp:launch";
   open(l); l;        // l is ready for writing but not for reading
@@ -1669,7 +1669,7 @@ Note, that @code{name} must be given without the suffix @code{.pag} or
 
 @*@strong{Example:}
 @smallexample
-@c example
+@c example unix_only
   link l="DBM:rw example";
   write(l,"1","abc");
   write(l,"3","XYZ");

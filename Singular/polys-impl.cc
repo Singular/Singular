@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.41 2000-03-31 13:21:25 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.42 2000-04-27 10:07:10 obachman Exp $ */
 
 /***************************************************************
  *
@@ -136,7 +136,7 @@ poly _pCopy(memHeap d_h, poly s_p)
 #ifdef MDEBUG
     d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
 #else
-    mmAllocHeap(d_p->next, d_h);
+    mmAllocHeapType(d_p->next, d_h, poly);
 #endif
     d_p = d_p->next;
     pSetCoeff0(d_p, nCopy(pGetCoeff(s_p)));
@@ -187,7 +187,7 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
 #ifdef MDEBUG
         d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
 #else
-        mmAllocHeap(d_p->next, d_h);
+        mmAllocHeapType(d_p->next, d_h, poly);
 #endif
         d_p = d_p->next;
 
@@ -210,7 +210,7 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
 #ifdef MDEBUG
         d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
 #else
-        mmAllocHeap(d_p->next, d_h);
+        mmAllocHeapType(d_p->next, d_h, poly);
 #endif
         d_p = d_p->next;
 
@@ -238,7 +238,7 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
 #ifdef MDEBUG
         d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
 #else
-        mmAllocHeap(d_p->next, d_h);
+        mmAllocHeapType(d_p->next, d_h, poly);
 #endif
         d_p = d_p->next;
 
@@ -262,7 +262,7 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
 #ifdef MDEBUG
         d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
 #else
-        mmAllocHeap(d_p->next, d_h);
+        mmAllocHeapType(d_p->next, d_h,poly);
 #endif
         d_p = d_p->next;
 
@@ -327,7 +327,7 @@ poly _pHead(memHeap heap, poly p)
 #ifdef MDEBUG
     w = (poly) mmDBAllocHeap(heap, f, l);
 #else
-    mmAllocHeap(w, heap);
+    mmAllocHeapType(w, heap, poly);
 #endif
     memcpyW(&(w->exp.l[0]), &(p->exp.l[0]), currRing->ExpLSize);
     pSetCoeff0(w,nCopy(pGetCoeff(p)));
@@ -353,7 +353,7 @@ poly _pShallowCopyDeleteHead(memHeap d_h, poly *s_p, memHeap s_h)
 #ifdef MDEBUG
     w = (poly) mmDBAllocHeap(d_h, f, l);
 #else
-    mmAllocHeap(w, d_h);
+    mmAllocHeapType(w, d_h, poly);
 #endif
     memcpyW(&(w->exp.l[0]), &(p->exp.l[0]), currRing->ExpLSize);
     pSetCoeff0(w,pGetCoeff(p));

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.176 2000-03-08 16:06:56 obachman Exp $
+@comment $Id: general.doc,v 1.177 2000-04-27 10:07:21 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -586,6 +586,7 @@ reported by the @code{timer} and @code{rtimer} variable divided by
 
 @end table
 
+@ifclear ix86-Win
 The next three options are of interest for the use with MP links:
 @table @asis
 @item @code{-b}, @code{--batch}
@@ -607,7 +608,9 @@ option is given.  @xref{MPtcp links}.
 Use @code{HOST} as default host for MP connections (whenever not
 further specified).  This option is mandatory when the @code{--batch}
 option is given.  @xref{MPtcp links}.
+@end table
 
+@end ifclear
 Finally, the following options are only available when running
 @code{ESingular} (see @ref{Running SINGULAR under Emacs} for details).
 
@@ -629,10 +632,8 @@ Load @code{FILE} on Emacs start-up, instead of the default load file.
 @item --singular=PROG
 @cindex --singular
 Start @code{PROG} as @sc{Singular} program within Emacs
-
 @end table
 
-@end table
 The value of options given to @sc{Singular} (resp.@: their default values,
 if an option was not given), can be checked with the command
 @code{system("}--long_option_name@code{")}.  @xref{system}.
@@ -2786,7 +2787,7 @@ For more information, see @ref{write}, @ref{read}, @ref{dump},
 
 @strong{Example:}
 @smallexample
-@c example
+@c example unix_only
   ring r; poly p = x+y;
   dump("MPfile:w test.mp");   // dump the session to the file test.mp
   kill r;                     // kill the basering
@@ -2807,7 +2808,7 @@ Links have various properties which can be queried using the
 
 @strong{Example:}
 @smallexample
-@c example
+@c example unix_only
   link l = "MPtcp:fork";
   l;
   open(l);
@@ -2843,6 +2844,7 @@ manipulate the data.
 @c example
 @end smallexample
 
+@ifclear ix86-Win
 @subheading MPfile links
 Data is stored in the binary MP format.  Read and write access is very
 fast compared to ASCII links.  All data (including such data that cannot
@@ -2861,7 +2863,7 @@ MPfile links are implemented on Unix-like operating systems only.
 
 @strong{Example:}
 @smallexample
-@c example
+@c example unix_only
   ring r;
   // (over)write MPfile test.mp, link is specified as string
   write("MPfile:w test.mp", x+y);
@@ -2888,7 +2890,7 @@ MPtcp links are implemented on Unix-like operating systems only.
 
 @strong{Example:}
 @smallexample
-@c example
+@c example unix_only
   ring r;
   link l = "MPtcp:launch"; // declare a link explicitly
   open(l);  // needs an open, launches another SINGULAR as a server
@@ -2899,6 +2901,7 @@ MPtcp links are implemented on Unix-like operating systems only.
   close(l); // shuts down SINGULAR server
 @c example
 @end smallexample
+@end ifclear
 
 @subheading DBM links
 Data is stored in and accessed from a data base.  Writing is
@@ -2916,7 +2919,7 @@ data bases).
 
 @strong{Example:}
 @smallexample
-@c example
+@c example unix_only
   ring r;
   // associate "x+y" with "mykey"
   write("DBM:w test.dbm", "mykey", string(x+y));

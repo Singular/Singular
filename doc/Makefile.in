@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.62 2000-03-13 15:51:27 obachman Exp $
+### $Id: Makefile.in,v 1.63 2000-04-27 10:07:18 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -35,10 +35,11 @@ INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ../mkinstalldirs
 GZIP		= @GZIP@
+UUDECODE	= @UUDECODE@
 
-PERL5		= @PERL5@
+PERL		= @PERL@
 TEX		= tex
-MAKEINFO	= @MAKEINFO@
+MAKEINFO	= @MAKEINFO@ --force
 TEXI2DVI	= @TEXI2DVI@
 TEXINDEX	= @TEXINDEX@
 TEXI2HTML	= @TEXI2HTML@
@@ -53,10 +54,10 @@ LIBPARSE	= ${bindir}/libparse
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
-DOC2TEX		= ${PERL5} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+DOC2TEX		= ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
 		  -exdir ${EX_SUBDIR}
-PL2DOC		= ${PERL5} ./pl2doc.pl -db  ${CHKSUM_DB}
+PL2DOC		= ${PERL} ./pl2doc.pl -db  ${CHKSUM_DB}
 
 # t2h stuff
 TMP_DIR		= @TMP_DIR@
@@ -172,7 +173,7 @@ ${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 
 # index file for help
 singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
-	${PERL5} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
+	${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
 
 ###########################################################
 # stand-alone targest
@@ -194,10 +195,10 @@ endif
 	${MAKEINFO} --no-header --paragraph-indent none -o $@ $<
 
 %.${SINGUNAME}.html : %.texi
-	${PERL5} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -verbose -split none -o $@ $<
+	${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -verbose -split none -o $@ $<
 
 %.html : %.texi
-	${PERL5} ${TEXI2HTML} -init_file t2h_standalone.init -verbose -split none -o $@ $<
+	${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -verbose -split none -o $@ $<
 
 % : %.txt
 	cp $< $@
@@ -227,13 +228,13 @@ install-standalone: standalone
 #
 html: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${IMAGES_HTML} $(STANDALONE_TEXI_FILES)
 ${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex
-	${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
+	${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
 # html stuff
 html_tutor: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_TUTOR_TOP} ${IMAGES_HTML}
 ${HTML_SUBDIR}/${HTML_TUTOR_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} tutor.tex
-	${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_TUTOR_PREFIX} \
+	${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_TUTOR_PREFIX} \
         -top_file ${HTML_TUTOR_TOP} tutor.tex
 
 ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx: ${HTML_SUBDIR}/${HTML_MANUAL_TOP}
@@ -243,13 +244,13 @@ ${TMP_DIR}:
 
 # pattern rules for images - but not everybody has gnu-uudecode
 images/%.gif : images/%.gif.uu
-	cd images; uudecode ../$< ;cd ..
+	cd images; ${UUDECODE} ../$< ;cd ..
 
 images/%.jpg : images/%.jpg.uu
-	cd images; uudecode ../$< ;cd ..
+	cd images; ${UUDECODE} ../$< ;cd ..
 
 images/%.xbm : images/%.xbm.uu
-	cd images; uudecode ../$< ;cd ..
+	cd images; ${UUDECODE} ../$< ;cd ..
 
 ${IMAGES_HTML} : ${IMAGES_SRC} 
 	test -d ${HTML_SUBDIR} || mkdir ${HTML_SUBDIR}

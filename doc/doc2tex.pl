@@ -1,12 +1,12 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.24 2000-03-09 16:37:23 hannes Exp $
+# $Id: doc2tex.pl,v 1.25 2000-04-27 10:07:20 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
 #  doc2tex: utility to generate the Singular manual
 #
 ####
-# @c example [error] [no_comp]
+# @c example [error] [no_comp] [unix_only]
 #    -> the text till the next @c example is feed into Singular,
 #       the text is then substituted by
 #       @c computed example $ex_prefix $doc_file:$line
@@ -21,6 +21,8 @@
 #       Processing is aborted if error occures in Singular run, 
 #       unless 'error' is specified
 #       if no_comp is given, then computation is not run
+#       if unix_only is given, then computation is only run
+#                              under unix
 #       
 #
 ####
@@ -50,6 +52,9 @@
 #
 ###################################################################
 
+use Config;
+$Win32 = 1 if ($Config{osname} =~ /win/i);
+
 #
 # default settings of command-line arguments
 #
@@ -65,6 +70,7 @@ $ex_subdir = "./examples";
 @include_dirs = (".", "../Singular/LIB");
 $make = 0;
 $make_opts = " --no-print-directory";
+
 
 #
 # misc. defaults
@@ -216,7 +222,7 @@ print "==>$tex_file)\n" if ($verbose);
 
 
 ######################################################################
-# @c example [error] [no_comp]
+# @c example [error] [no_comp] [unix_only]
 #    -> the text till the next @c example is fed into Singular,
 #       the text is then substituted by
 #       @c computed example $ex_prefix $doc_file:$line
@@ -231,9 +237,13 @@ print "==>$tex_file)\n" if ($verbose);
 #       Processing is aborted if error occures in Singular run, 
 #       unless 'error' is specified
 #       If [no_comp] is given, actual computation is not run
+#       if [unix_only] is given, then computation is only run
+#                                under unix
+
 sub HandleExample
 {
-  my($inc_file, $ex_file, $lline, $thisexample, $error_ok, $cache, $no_comp);
+  my($inc_file, $ex_file, $lline, $thisexample, $error_ok, $cache, $no_comp,
+     $unix_only);
   
   $lline = $line;
   $section = 'unknown' unless $section;
@@ -261,14 +271,18 @@ sub HandleExample
   $thisexample = '';
   $error_ok = 1 if /error/;
   $no_comp = 1 if /no_comp/;
-
-  # print content in example file till next @c example 
+  $unix_only = 1 if /unix_only/ && $Win32;
+  
+  # print content in example file till next @c example
+  print TEX "// only supported on Unix platforms\n"
+    if $unix_only;
+  
   while (<DOC>)
   {
     $line++;
     last if (/^\@c\s*example\s*$/);
 #    s/^\s*//; # remove preceeding white spaces
-    if ($no_ex || $no_comp)
+    if ($no_ex || $no_comp || $unix_only)
     {
       &protect_texi;
       print TEX $_;
@@ -288,7 +302,7 @@ sub HandleExample
     unless (/^\@c\s*example\s*$/);
 
   # done, if no examples
-  return if ($no_ex || $no_comp);
+  return if ($no_ex || $no_comp || $unix_only);
 
   # check whether it can be reused
   if ($reuse && $cache)
@@ -320,6 +334,17 @@ sub HandleExample
     open(EX, ">$ex_file") || Error("can't open $ex_file for writing: $!\n");
     print EX "$thisexample";
     close(EX);
+
+    unless ($Singular_OK)
+    {
+      if (system("echo '\$' | $Singular $Singular_opts > $res_file"))
+      {
+	$Singular .= '.exe' if ($Win32 && $Singular !~ /\.exe$/);
+	Error("Can´t run '$Singular $Singular_opts': $@")
+	  if (system("echo '\$' | $Singular $Singular_opts > $res_file"));
+      }
+      $Singular_OK = 1
+    }
 
     &System("echo '\$' | $Singular $Singular_opts $ex_file > $res_file");
     print ")" if ($verbose == 1);
@@ -491,7 +516,7 @@ sub HandleLib
 
   $proc = $1 if (/^:(.*?) /);
   $n_fun = 1 if ($no_fun || /no_fun/);
-  $n_ex = 1 if ($no_ex || /no_ex/);
+  $n_ex = 1 if ($no_ex || /no_ex/ || (/unix_only/ && $Win32));
   $section = $1 if /(\w*)section/;
   
   # contruct tex file name
