@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.37 2001-02-15 14:15:57 levandov Exp $
+# $Id: regress.cmd,v 1.38 2002-01-23 16:13:51 levandov Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -97,6 +97,11 @@ $| = 1;
 # the default settings
 #
 $singularOptions = "--ticks-per-sec=100 -teqr12345678 --no-rc";
+# for testing under Windows, remove "e" option above and compile
+# res files on Linux, then copy to Windows and compare. Otherwise
+# you have problems with diff on Win. Just uncomment the next line:
+# $singularOptions = "--ticks-per-sec=100 -tqr12345678 --no-rc";
+
 $keep = "no";
 $verbosity = 2;
 $generate = "no";
