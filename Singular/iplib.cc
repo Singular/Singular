@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.61 1999-09-22 14:42:33 Singular Exp $ */
+/* $Id: iplib.cc,v 1.62 1999-09-22 14:49:37 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -196,16 +196,15 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     char *argstr=NULL;
     *e=ct;
     argstr=iiProcArgs(e,TRUE);
+
+    assume(pi->data.s.body_end > pi->data.s.body_start);
+
     procbuflen = pi->data.s.body_end - pi->data.s.body_start;
     pi->data.s.body = (char *)AllocL( strlen(argstr)+procbuflen+15+
                                       strlen(pi->libname) );
     //Print("Body=%ld-%ld=%d\n", pi->data.s.body_end,
     //    pi->data.s.body_start, procbuflen);
-    if (pi->data.s.body==NULL)
-    {
-      Werror( "unable to allocate proc buffer `%s`", pi->procname );
-      return NULL;
-    }
+    assume(pi->data.s.body != NULL);
     fseek(fp, pi->data.s.body_start, SEEK_SET);
     strcpy(pi->data.s.body,argstr);
     myfread( pi->data.s.body+strlen(argstr), procbuflen, 1, fp);
