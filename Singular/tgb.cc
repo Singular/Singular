@@ -6,6 +6,79 @@
 #include "tgb.h"
 
 
+#define LEN_VAR1
+
+#ifdef LEN_VAR1
+// erste Variante: Laenge: Anzahl der Monome
+int pSLength(poly p) { 
+  PrintS("have char0");
+  return pLength(p); }
+int kSBucketLength(kBucket* bucket) {return bucket_guess(bucket);}
+#endif
+
+#ifdef LEN_VAR2
+// 2. Variante: Laenge: Platz fuer die Koeff.
+int pSLength(poly p)
+{
+  int s=0;
+  while (p!=NULL) { s+=nSize(pGetCoeff(p));pIter(p); }
+  return s;
+}
+int kSBucketLength(kBucket* b)
+{
+  int s=0;
+  int i;
+  for (i=MAX_BUCKET;i>=0;i--)
+  {
+    s+=pSLength(b->buckets[i]);
+  }
+  return s;
+}
+#endif
+
+#ifdef LEN_VAR3
+// 3.Variante: Laenge: Platz fuer Leitk * Monomanzahl
+int pSLength(poly p)
+{
+  int c=nSize(pGetCoeff(p));
+  return c*pLength(p);
+}
+int kSBucketLength(kBucket* b)
+{
+  int s=1;
+  int c=nSize(pGetCoeff(b->buckets[0]));
+  int i;
+  for (i=MAX_BUCKET;i>0;i--)
+  {
+    s+=pLength(b->buckets[i]);
+  }
+  return s*c;
+}
+#endif
+
+#ifdef LEN_VAR4
+// 4.Variante: Laenge: Platz fuer Leitk * (1+Platz fuer andere Koeff.)
+int pSLength(poly p)
+{
+  int s=1;
+  int c=nSize(pGetCoeff(p));
+  pIter(p);
+  while (p!=NULL) { s+=nSize(pGetCoeff(p));pIter(p); }
+  return s*c;
+}
+int kSBucketLength(kBucket* b)
+{
+  int s=1;
+  int c=nSize(pGetCoeff(b->buckets[0]));
+  int i;
+  for (i=MAX_BUCKET;i>0;i--)
+  {
+    s+=pSLength(b->buckets[i]);
+  }
+  return s*c;
+}
+#endif
+
 static int posInPairs (sorted_pair_node**  p, int pn, sorted_pair_node* qe,calc_dat* c,int an=0)
 {
   if(pn==0) return 0;
@@ -32,6 +105,12 @@ static int posInPairs (sorted_pair_node**  p, int pn, sorted_pair_node* qe,calc_
       else an=i;
     }
 }
+static BOOLEAN  ascending(int* i,int top){
+  if(top<1) return TRUE;
+  if(i[top]<i[top-1]) return FALSE;
+  return ascending(i,top-1);
+}
+
 sorted_pair_node**  merge(sorted_pair_node** p, int pn,sorted_pair_node **q, int qn,calc_dat* c){
   int i;
   int* a= (int*) omalloc(qn*sizeof(int));
@@ -216,20 +295,34 @@ static BOOLEAN is_empty(calc_dat* c){
 
 
 static void add_to_reductors(calc_dat* c, poly h, int len){
-  int i=simple_posInS(c->strat,h,len);
-
+  assume(lenS_correct(c->strat));
+ 
+  int i;
+  if (c->is_char0)
+       i=simple_posInS(c->strat,h,pSLength(h),c->is_char0);
+  else
+    i=simple_posInS(c->strat,h,len,c->is_char0);
+  
   LObject P; memset(&P,0,sizeof(P));
   P.tailRing=c->r;
   P.p=h; /*p_Copy(h,c->r);*/
   P.FDeg=pFDeg(P.p,c->r);
-  if (!rField_is_Zp(c->r)) pCleardenom(P.p);
-  else                     pNorm(P.p);
-
+  if (!rField_is_Zp(c->r)) 
+    pCleardenom(P.p);
+  else                     
+    pNorm(P.p);
+ 
+ 
   c->strat->enterS(P,i,c->strat);
+ 
+ 
+
   c->strat->lenS[i]=len;
-#if 0
-  c->strat->lenSw[i]=pSLength(P.p);
-#endif
+ 
+  if(c->strat->lenSw)
+    c->strat->lenSw[i]=pSLength(P.p);
+ 
+ 
   //pNorm(c->strat->S[i]);
 }
 static void length_one_crit(calc_dat* c, int pos, int len)
@@ -318,7 +411,7 @@ static BOOLEAN find_next_pair(calc_dat* c, BOOLEAN go_higher)
   }
   return FALSE;
 }
-static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
+static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat, BOOLEAN is_char0)
 {
   assume(old_pos>=new_pos);
   poly p=strat->S[old_pos];
@@ -326,7 +419,9 @@ static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
   long sev=strat->sevS[old_pos];
   int s_2_r=strat->S_2_R[old_pos];
   int length=strat->lenS[old_pos];
-  int length_w=strat->lenSw[old_pos];
+  int length_w;
+  if(is_char0)
+    length_w=strat->lenSw[old_pos];
   int i;
   for (i=old_pos; i>new_pos; i--)
   {
@@ -347,7 +442,8 @@ static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
   strat->sevS[new_pos]=sev;
   strat->S_2_R[new_pos]=s_2_r;
   strat->lenS[new_pos]=length;
-  strat->lenSw[new_pos]=length_w;
+  if(is_char0)
+    strat->lenSw[new_pos]=length_w;
   //assume(lenS_correct(strat));
 }
 static void replace_pair(int & i, int & j, calc_dat* c)
@@ -912,7 +1008,11 @@ static void initial_data(calc_dat* c){
     c->strat->initEcart(&h);
     assume(c->lengths[i]==pLength(h.p));
     if (c->strat->sl==-1) pos=0;
-    else pos = simple_posInS(c->strat,h.p,c->lengths[i]);
+    else 
+      if(c->is_char0)
+	pos=simple_posInS(c->strat,h.p,pSLength(h.p),c->is_char0);
+      else
+	pos = simple_posInS(c->strat,h.p,c->lengths[i],c->is_char0);
     h.sev = pGetShortExpVector(h.p);
     c->strat->enterS(h,pos,c->strat);
     c->strat->lenS[pos]=c->lengths[i];
@@ -926,6 +1026,7 @@ static void initial_data2(calc_dat* c, ideal I){
   void* h;
   poly hp;
   int i,j;
+  c->is_char0=(rChar()==0);
   c->reduction_steps=0;
   c->last_index=-1;
   c->work_on=(redNF_inf*) omalloc(PAR_N*sizeof(redNF_inf));
@@ -990,7 +1091,10 @@ static void initial_data2(calc_dat* c, ideal I){
   c->strat->Shdl=idInit(1,1);
   c->strat->S=c->strat->Shdl->m;
   c->strat->lenS=(int*)omAlloc0(i*sizeof(int));
-  c->strat->lenSw=(int*)omAlloc0(i*sizeof(int));
+  if(c->is_char0)
+    c->strat->lenSw=(int*)omAlloc0(i*sizeof(int));
+  else
+    c->strat->lenSw=NULL;
   sorted_pair_node* si;
   assume(n>0);
   add_to_basis(I->m[0],-1,-1,c);
@@ -1012,11 +1116,16 @@ static void initial_data2(calc_dat* c, ideal I){
       ++(c->pair_top);
    }
 }
-static int simple_posInS (kStrategy strat, poly p,int len)
+
+//len should be weighted length in char 0
+static int simple_posInS (kStrategy strat, poly p,int len, BOOLEAN is_char0)
 {
+
+
   if(strat->sl==-1) return 0;
   polyset set=strat->S;
   intset setL=strat->lenS;
+//  if (is_char0) setL=strat->lenSw;
   int length=strat->sl;
   int i;
   int an = 0;
@@ -1031,7 +1140,7 @@ static int simple_posInS (kStrategy strat, poly p,int len)
     if (an >= en-1)
     {
       if ((len<setL[an])
-          || ((len==setL[length]) && (pLmCmp(set[an],p) == 1))) return an;
+          || ((len==setL[an]) && (pLmCmp(set[an],p) == 1))) return an;
       return en;
     }
     i=(an+en) / 2;
@@ -1387,8 +1496,12 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
           int new_length=pLength(sec_copy);
           Print("%i",strat->lenS[j]-new_length);
           len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
-          int new_pos=simple_posInS(c->strat,strat->S[j],new_length);//hack
-
+          int new_pos;
+	  if(c->is_char0)
+	    new_pos=simple_posInS(c->strat,sec_copy,pSLength(sec_copy),c->is_char0);//hac
+	  else
+	    new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
+	  assume(new_pos<=j);
 //          p=NULL;
           for (z=c->n;z;z--)
           {
@@ -1436,7 +1549,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
                   break;
               }
               if (new_pos<old_pos)
-                move_forward_in_S(old_pos,new_pos,c->strat);
+                move_forward_in_S(old_pos,new_pos,c->strat, c->is_char0);
 
               c->S->m[pos_in_c]=sec_copy;
 
@@ -1525,6 +1638,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
   loop
     {
 
+
       if (n<=0){
 
         return FALSE;
@@ -1590,9 +1704,14 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
           int new_length=pLength(sec_copy);
           Print("%i",strat->lenS[j]-new_length);
           obj->len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
-          int new_pos=simple_posInS(c->strat,strat->S[j],new_length);//hack
 
+	            int new_pos;
+	  if(c->is_char0)
+	    new_pos=simple_posInS(c->strat,sec_copy,pSLength(sec_copy),c->is_char0);//hac
+	  else
+	    new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
 //          p=NULL;
+	  assume(new_pos<=j);
           for (z=c->n;z;z--)
           {
             if(p==c->S->m[z-1])
@@ -1628,8 +1747,9 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
                   break;
               }
               if (new_pos<old_pos)
-                move_forward_in_S(old_pos,new_pos,c->strat);
-
+                move_forward_in_S(old_pos,new_pos,c->strat,c->is_char0);
+	      assume(0<=pos_in_c);
+	      assume(c->n>pos_in_c);
               c->S->m[pos_in_c]=sec_copy;
 
               c->lengths[pos_in_c]=new_length;
@@ -1915,6 +2035,7 @@ static BOOLEAN fillup(calc_dat* c){
 }
 
 static BOOLEAN compute(calc_dat* c){
+  assume(lenS_correct(c->strat));
   int i=(c->last_index+ 1)%PAR_N;
   int len;
   BOOLEAN suc=FALSE;
@@ -1952,6 +2073,7 @@ static BOOLEAN compute(calc_dat* c){
             if(c->strat->lenS[c2]>2)
               break;
           }
+
           int sec_sl=c->strat->sl;
           c->strat->sl=c2-1;
 
@@ -1977,6 +2099,7 @@ static BOOLEAN compute(calc_dat* c){
 #ifdef HEAD_BIN
             hr=p_MoveHead(hr,c->HeadBin);
 #endif
+
             add_to_basis(hr, c->work_on[i].i,c->work_on[i].j,c);
 
           }
@@ -2175,6 +2298,7 @@ static int pMinDeg3(poly f){
 
 static void shorten_tails(calc_dat* c, poly monom)
 {
+  return;
 // BOOLEAN corr=lenS_correct(c->strat);
   for(int i=0;i<c->n;i++)
   {
@@ -2201,7 +2325,11 @@ static void shorten_tails(calc_dat* c, poly monom)
     }
     if (did_something)
     {
-      int new_pos=simple_posInS(c->strat,c->S->m[i],c->lengths[i]);
+      int new_pos;
+      if (c->is_char0) 
+	simple_posInS(c->strat,c->S->m[i],pSLength(c->S->m[i]),c->is_char0);
+      else	
+	simple_posInS(c->strat,c->S->m[i],c->lengths[i],c->is_char0);
       int old_pos=-1;
       //assume new_pos<old_pos
       for (int z=0;z<=c->strat->sl;z++)
@@ -2222,13 +2350,14 @@ static void shorten_tails(calc_dat* c, poly monom)
           }
         }
       assume(old_pos>=0);
+      assume(new_pos<=old_pos);
       assume(pLength(c->strat->S[old_pos])==c->lengths[i]);
       c->strat->lenS[old_pos]=c->lengths[i];
-#if 0
-      c->strat->lenSw[old_pos]=...
-#endif
+      if (c->strat->lenSw)
+	c->strat->lenSw[old_pos]=pSLength(c->S->m[i]);
+
       if (new_pos<old_pos)
-        move_forward_in_S(old_pos,new_pos,c->strat);
+        move_forward_in_S(old_pos,new_pos,c->strat, c->is_char0);
 
       length_one_crit(c,i,c->lengths[i]);
     }
