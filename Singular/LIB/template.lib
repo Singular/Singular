@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 // version string automatically expanded by CVS
-version="$Id: template.lib,v 1.5 2000-03-08 15:02:43 obachman Exp $";
+version="$Id: template.lib,v 1.6 2000-12-08 15:56:08 obachman Exp $";
 // summary description of the library
 info="
 LIBRARY:   template.lib  A TEMPLATE FOR A SINGULAR LIBRARY
@@ -72,6 +72,7 @@ proc msum(list #)
 "USAGE:  msum([i_1,..,i_n]); @code{i_1,..,i_n} def
 RETURN:  Sum of int arguments
 NOTE:    This help string is written in a mixture of ASCII and texinfo
+         @* Use a @ref constructs for references (like @pxref{mtripple})
          @* Use @code  for typewriter font (like @code{i_1})
          @* Use @math  for simple math mode typesetting (like @math{i_1}).
          @* Note: No parenthesis like } are allowed inside @math and @code
