@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.92 1999-11-22 14:22:09 Singular Exp $ */
+/* $Id: ring.cc,v 1.93 1999-11-22 16:30:01 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3080,12 +3080,14 @@ BOOLEAN rComplete(ring r, int force)
 #ifdef WORDS_BIGENDIAN
   if (r->order[0] == ringorder_s)
   {
-    if (r->pCompIndex == 1)
+    /* l[0] is occupied by ringorder_s,
+    *  does l[1] contain the component-number ? */
+    if (r->pCompIndex < 2*sizeof(long)/sizeof(Exponent_t)) /* e-index of l[2] */
       r->pOrdIndex = 2;
     else
       r->pOrdIndex = 1;
   }
-  else if (r->pCompIndex == 0)
+  else if (r->pCompIndex  < sizeof(long)/sizeof(Exponent_t))
     r->pOrdIndex=1;
   else
     r->pOrdIndex=0;
@@ -3134,6 +3136,11 @@ void rUnComplete(ring r)
 
 void rDebugPrint(ring r)
 {
+  if (r==NULL)
+  {
+    PrintS("NULL ?\n");
+    return;
+  }
   char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp", "ro_syz", "ro_none"};
   int i,j;
   PrintS("varoffset:\n");
