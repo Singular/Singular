@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.20 1999-07-19 14:07:27 obachman Exp $
+// $Id: all.lib,v 1.21 1999-08-16 10:55:45 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.20 1999-07-19 14:07:27 obachman Exp $";
+version="$Id: all.lib,v 1.21 1999-08-16 10:55:45 obachman Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -32,7 +32,7 @@ LIBRARY:  all.lib   Load all libraries
   mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
   jordan.lib    PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
   spcurve.lib   PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
-  algebra.lib    PROCEDURES FOR COMPUTING WITH ALGBRAS AND MAPS
+  algebra.lib   PROCEDURES FOR COMPUTING WITH ALGBRAS AND MAPS
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
