@@ -1,3 +1,6 @@
+LIB "tst.lib";
+tst_init();
+
 proc generate_ring_str(int n, string r_name, string ostring)
 {
   return ("ring "+r_name+" = 32003,x(1.." + string(n) + ")," + ostring + ";");

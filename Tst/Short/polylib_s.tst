@@ -6,7 +6,7 @@ LIB "poly.lib";
 example cyclic;
 killall();
 
-exampe katsura();
+example katsura;
 killall();
 
 example freerank;

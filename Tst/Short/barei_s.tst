@@ -1,6 +1,9 @@
 //
 // test script for bareiss command
 //
+LIB "tst.lib";
+tst_init();
+
 pagelength = 10000;
 ring r = 32003,(x,y,z),dp;
 r;

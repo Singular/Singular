@@ -174,7 +174,7 @@ tst_ignore(system("sh", "rm -rf _dump.*"));
 
 killall("proc");
 dump("");
-tst_status(1);$
+LIB "tst.lib"; tst_status(1);$
 
 
   
