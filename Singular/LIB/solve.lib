@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.22 2001-08-27 14:48:00 Singular Exp $";
+version="$Id: solve.lib,v 1.23 2001-11-12 11:16:33 pohl Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -9,7 +9,7 @@ AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
 PROCEDURES:
 ures_solve(i,[..]);     find all roots of 0-dimensional ideal i with resultants
 mp_res_mat(i,[..]);     multipolynomial resultant matrix of ideal i
-laguerre_solve(p,[..]); find all roots of univariate polynom p
+laguerre_solve(p,[..]); find all (or all different) roots of univariate polynom p
 interpolate(p,v,d);     interpolate poly from evaluation points i and results j
 fglm_solve(i,[..]);     find roots of 0-dim. ideal using FGLM and lex_solve
 triangL_solve(l,[..]);  find roots using triangular system (Lazard)
@@ -104,49 +104,203 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc laguerre_solve( poly f, list # )
-"USAGE:   laguerre_solve(p [, l, m] ); f=polynomial, l,m=integers,@*
-l>0: defines precision of fractional part if ground field is Q,@*
-m=0,1,2: number of iterations for approximation of roots,@*
-(default: l,m=30,2)
-ASSUME:  the ground field has char 0;@*
-         p is an univariate polynom
-RETURN:  list of all (complex) roots of the polynomial p;@*
+"USAGE:   laguerre_solve(p [, l, m, n, s] ); f=polynomial,@*
+   l,m,n,s=integers(control of the method),@*
+   l>=8: defines precision in the complex solution field@*
+   m>=4,m<=l: defines precision of the solution (|f(root)|<0.1^m)@*
+   n: control of multiplicity or of spliting
+      <0, no split of p (be shure that all roots are simple)
+      =0, return only different roots
+      >0, default, try to split and all roots
+   s!=0: returns an error for |f(root)|>0.1^m
+   (default: l,m,n,s=30,10,1,0)
+ASSUME:  f is an univariate polynom
+RETURN:  list of (complex) roots of the polynomial f (see #[3]);@*
          result is
   @format
-  of type number: if the ground field are the complex numbers,
-  of type string: if the ground field are the rational or real numbers
+  of type string: if the basering is not complex,
+  of type number: otherwise,
   @end format
+NOTE:    if printlevel >0: displays comments (default =0)
 EXAMPLE: example laguerre_solve; shows an example
 "
 {
-    int polish=2;
-    int prec=30;
+  int iv=checkv(f);
+  if(iv==0){ERROR("Wrong polynomial!");}
+  poly v=var(iv);
+  
+  int numberprec=30;// set the control
+  int solutionprec=10;
+  int splitcontrol=1;
+  int rootcheck=0;
+  if(size(#)>0){numberprec=#[1];
+    if(numberprec<8){numberprec=8;}}
+  if(size(#)>1){solutionprec=#[2];
+    if(solutionprec<4){solutionprec=4;}
+    if(solutionprec>numberprec){solutionprec=numberprec;}}
+  if(size(#)>2){splitcontrol=#[3];}
+  if(size(#)>3){rootcheck=#[4];}
+  int prot=printlevel-voice+2;
+  
+  poly p=divzero(f,iv);// divide out zeros as solution
+  int iz=deg(f)-deg(p);
+  if(prot!=0)
+  {
+    string pout;
+    string nl=newline;
+    pout="//BEGIN laguerre_solve";
+    if(iz!=0){pout=pout+nl+"//zeros: divide out "+string(iz);}
+    dbprint(prot,pout);
+  }
+  string ss,tt,oo;
+  ss="";oo="";
+  if(npars(basering)==1)
+  {
+    tt="1,"+string(par(1));
+    if(tt==charstr(basering)){ss=tt;}
+  }
+  list roots,simple;
+  if(deg(p)==0)// only zeros
+  {
+    roots=addzero(roots,ss,iz,splitcontrol);
+    if(prot!=0){dbprint(prot,"//END laguerre_solve");}
+    return(roots);
+  }
+  
+  if(prot!=0)// more informations
+  {
+    pout="//control: complex ring with precision "+string(numberprec);
+    if(size(ss)==0){pout=pout+nl+
+        "//         basering not complex, hence solutiontype string";
+    if(solutionprec<numberprec){pout=pout+nl+
+        "//         with precision "+string(solutionprec);}}
+    if(splitcontrol<0){pout=pout+nl+"//         no spliting";}
+    if(splitcontrol==0){pout=pout+nl+"//         output without multiple roots";}
+    if(rootcheck){pout=pout+nl+
+        "//         check roots with precision "+string(solutionprec);}
+    dbprint(prot,pout);
+  }
 
-    if ( size(#) >= 1 )
+  def rn = basering;// set the complex groundfield
+  tt="ring lagc=(complex,"+string(numberprec)+","+string(numberprec)+
+     "),"+string(var(iv))+",lp;";
+  execute(tt);
+  poly p=imap(rn,p);
+  poly v=var(1);
+  int ima=0;
+  if(size(ss)!=0){ima=checkim(p);}
+  number prc=0.1;// set precision of the solution
+  prc=prc^solutionprec;
+  if(prot!=0)
+  {
+    pout="//working in:  "+tt;
+    if((size(ss)!=0)&&(ima!=0)){pout=pout+nl+
+        "//         polynomial has complex coefficients";}
+    dbprint(prot,pout);
+  }
+  
+  int i1=1;
+  int i2=1;
+  ideal SPLIT=p;
+  if(splitcontrol>=0)// spliting
+  {
+    if(prot!=0){dbprint(prot,"//split in working ring:");}
+    SPLIT=splitsqrfree(p,v);
+    i1=size(SPLIT);
+    if((i1==1)&&(charstr(rn)=="0"))
     {
-        prec= #[1];
-        if ( prec == 0 ) { prec = 30; }
-        if ( prec < 0 )
+      if(prot!=0){dbprint(prot,"//split exact in basering:");}
+      setring rn;
+      if(v>1)
+      {
+        ideal SQQQQ=splitsqrfree(p,v);
+        setring lagc;
+        SPLIT=imap(rn,SQQQQ);
+      }
+      else
+      {
+        oo="ring exa=0,"+string(var(1))+",lp;";
+        execute(oo);
+        ideal SQQQQ=splitsqrfree(imap(rn,p),var(1));
+        setring lagc;
+        SPLIT=imap(exa,SQQQQ);
+        kill exa;
+      }
+      i1=size(SPLIT);
+    }
+    if(prot!=0)
+    {
+      if(i1>1)
+      {
+        int i3=deg(SPLIT[1]);
+        pout="//results of split(the squarefree factors):";
+        if(i3>0){pout=pout+nl+
+           "//  multiplicity "+string(i2)+", degree "+string(i3);}
+        while(i2<i1)
         {
-            ERROR("Fisrt parameter must be positive!");
+          i2++;
+          i3=deg(SPLIT[i2]);
+          if(i3>0){pout=pout+nl+
+             "//  multiplicity "+string(i2)+", degree "+string(i3);}
         }
+        dbprint(prot,pout);
+        i2=1;
+      }
+      else
+      {
+        if(charstr(rn)=="0"){dbprint(prot,"// polynomial is squarefree");}
+        else{dbprint(prot,"// split without result");}
+      }
     }
-    if ( size(#) >= 2 )
-    {
-        polish= #[2];
-        if ( polish < 0 || polish > 2 )
-        {
-            ERROR("Valid values for third parameter are:
-                   0,1,2: number of iterations for approximation of roots");
-        }
-    }
-    if ( size(#) > 2 )
-    {
-        ERROR("only two parameters allowed!");
-    }
+  }
 
-    return(laguerre(f,prec,polish));
+  p=SPLIT[1];// the first part
+  if(deg(p)>0)
+  {
+    roots=laguerre(p,numberprec,1);// the ring is already complex, hence numberprec is dummy
+    if((size(roots)==0)||(string(roots[1])=="0")){ERROR("laguerre: no roots found");}
+    if(rootcheck){checkroots(p,v,roots,ima,prc);}
+  }
+  while(i2<i1)
+  {
+    i2++;
+    p=SPLIT[i2];// the part with multiplicity i2
+    if(deg(p)>0)
+    {
+      simple=laguerre(p,numberprec,1);
+      if((size(simple)==0)||(string(simple[1])=="0")){ERROR("laguerre: no roots found");}
+      if(rootcheck){checkroots(p,v,simple,ima,prc);}
+      if(splitcontrol==0)// no multiple roots
+      {
+        roots=roots+simple;
+      }
+      else// multiple roots
+      {
+        roots=roots+makemult(simple,i2);
+      }
+    }
+  }
 
+  if((solutionprec<numberprec)&&(size(ss)==0))// shorter output
+  {
+    oo="ring lout=(complex,"+string(solutionprec)+",1),"
+    +string(var(1))+",lp;";
+    execute(oo);
+    list roots=imap(lagc,roots);
+    roots=transroots(roots);
+    if(iz>0){roots=addzero(roots,ss,iz,splitcontrol);}
+    if(prot!=0){dbprint(prot,"//END laguerre_solve");}
+    return(roots);
+  }
+  if(size(ss)==0){roots=transroots(roots);}// transform to string
+  else         // or map in basering
+  {
+    setring rn;
+    list roots=imap(lagc,roots);
+  }
+  if(iz>0){roots=addzero(roots,ss,iz,splitcontrol);}
+  if(prot!=0){dbprint(prot,"//END laguerre_solve");}
+  return(roots);
 }
 example
 {
@@ -157,7 +311,9 @@ example
     // 10 digits precision
     laguerre_solve(f,10);
 
-    // Now with complex coefficients, precision is 10 digits:
+    // Now with complex coefficients,
+    // internal precision is 30 digits (default)
+    printlevel=2;
     ring rsc= (real,10,I),x,lp;
     poly f = (15.4+I*5)*x^5 + (25.0e-2+I*2)*x^3 + x2 - 10*I;
     list l = laguerre_solve(f);
@@ -165,6 +321,238 @@ example
     // check result, value of substituted poly should be near to zero
     subst(f,x,l[1]);
     subst(f,x,l[2]);
+}
+/*
+*  if p depends only on var(i)
+*       returns i
+*  otherwise    0
+*/
+static proc checkv(poly p)
+{
+  int n=nvars(basering);
+  int i=0;
+  int v;
+  
+  while (n>0)
+  {
+    if ((p-subst(p,var(n),0))!=0)
+    {
+      i++;
+      if (i>1){return(0);}
+      v=n;
+    }
+    n--;
+  }
+  return(v);
+}
+/*
+*  if p hase only real coefficients
+*       returns 0
+*  otherwise    1
+*/
+static proc checkim(poly p)
+{
+  poly q=p;
+  
+  while(q!=0)
+  {
+    if(impart(leadcoef(q))!=0){return(1);}
+    q=q-lead(q);
+  }
+  return(0);
+}
+/*
+*  make multiplicity m
+*/
+static proc makemult(list si,int m)
+{
+  int k0=0;
+  int k1=size(si);
+  int k2,k3;
+  number ro;
+  list msi;
+  
+  for(k2=1;k2<=k1;k2++)
+  {
+    ro=si[k2];
+    for(k3=m;k3>0;k3--){k0++;msi[k0]=ro;}
+  }
+  return(msi);
+}
+/*
+*  returns 1 for n<1
+*/
+static proc cmp1(number n)
+{
+  number r=repart(n);
+  number i=impart(n);
+  number c=r*r+i*i;
+  if(c>1){return(1);}
+  else{return(0);}
+}
+/*
+*  exact division of polys f/g
+*  (should be internal)
+*/
+static proc exdiv(poly f,poly g,poly v)
+{
+  int d1=deg(f);
+  int d2=deg(g);
+  poly r0=f;
+  poly rf=0;
+  poly h;
+  number n,m;
+
+  m=leadcoef(g);
+  while ((r0!=0)&&(d1>=d2))
+  {
+    n=leadcoef(r0)/m;
+    h=n*v^(d1-d2);
+    rf=rf+h;
+    r0=r0-h*g;
+    d1=deg(r0);
+  }
+  return(cleardenom(rf));
+}
+/*
+*  p is uniform in x
+*  perform a split of p into squarefree factors
+*  such that the returned ideal split is
+*    p = n * product ( split[i]^i ) , n a number
+*/
+proc splitsqrfree(poly p, poly x)
+{
+  int i=1;
+  int dd=deg(p);
+  int j;
+  ideal h,split;
+  poly high;
+
+  if(x<1){ERROR("wrog ringorder!");}
+  h=p,diff(p,x);
+  h=interred(h);
+  if(deg(h[1])==0){return(p);}
+  high=h[1];
+  split[1]=exdiv(p,high,x);
+  while(1)
+  {
+    h=split[i],high;
+    h=interred(h);
+    j=deg(h[1]);
+    if(j==0){return(p);}
+    if(deg(h[1])==deg(split[i]))
+    {
+      split=split,split[i];
+      split[i]=1;
+    }
+    else
+    {
+      split[i]=exdiv(split[i],h[1],x);
+      split=split,h[1];
+      dd=dd-deg(split[i])*i;
+    }
+    j=j*(i+1);
+    if(j==dd){break;}
+    if(j>dd){return(p);}
+    high=exdiv(high,h[1],x);
+    if(deg(high)==0){return(p);};
+    i++;
+  }
+  return(split);
+}
+/*
+*  see checkroots
+*/
+static proc nerr(number n,number m)
+{
+  int r;
+  number z=0;
+  number nr=repart(n);
+  number ni=impart(n);
+  if(nr<z){nr=z-nr;}
+  if(ni<z){ni=nr-ni;}
+  else{ni=nr+ni;}
+  if(ni<m){r=0;}
+  else{r=1;}
+  return(r);
+}
+/*
+*  returns ERROR for nerr(p(r[i]))>=pr
+*/
+static proc checkroots(poly p,poly v,list r,int ima,number pr)
+{
+  int i=0;
+  int j;
+  number n,m;
+  ideal li;
+  
+  while(i<size(r))
+  {
+    i++;
+    n=r[i];
+    j=cmp1(n);
+    if(j!=0){li[1]=v/n-1;m=1;}
+    else{li[1]=v-n;m=n;}
+    if((ima==0)&&(impart(n)!=0))
+    {
+      i++;
+      n=r[i];
+      if(j!=0){li[1]=li[1]*(v/n-1);}
+      else{li[1]=li[1]*(v-n);m=m*n;}
+    }
+    attrib(li,"isSB",1);
+    n=leadcoef(reduce(p,li));n=n/m;
+    if(n!=0)
+    {if(nerr(n,pr)!=0){ERROR("Unsufficient accuracy!");}}
+  }
+}
+/*
+*  transforms thr result to string
+*/
+static proc transroots(list r)
+{
+  int i=size(r);
+  while (i>0)
+  {
+    r[i]=string(r[i]);
+    i--;
+  }
+  return(r);
+}
+/*
+* returns a poly without zeroroots
+*/
+static proc divzero(poly f,int iv);
+{
+  poly p=f;
+  poly q=p;
+  poly r;
+  while(p==q)
+  {
+    q=p/var(iv);
+    r=q*var(iv);
+    if(r==p){p=q;}
+  }
+  return(p);
+}
+/*
+*  add zeros to solution
+*/
+static proc addzero(list zz,string ss,int iz,int a)
+{
+    int i=1;
+    int j=size(zz);
+    
+    if(size(ss)==0){zz[j+1]="0";}
+    else{zz[j+1]=number(0);}
+    if(a==0){return(zz);}
+    while(i<iz)
+    {
+      i++;
+      if(size(ss)==0){zz[j+i]="0";}
+      else{zz[j+i]=number(0);}
+    }
+    return(zz);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
