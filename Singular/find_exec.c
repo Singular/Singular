@@ -95,12 +95,13 @@ find_executable (const char *name)
     search = getenv("PATH");
 /* for winnt under msdos, cwd is implicetyly in the path */
 #ifdef WINNT
-    if (strlen(getenv("SHELL")) < 1)
+    p = getenv("SHELL");
+    if (p == NULL || strlen(p < 2))
     {
-      /* we are under msdos */
-      extra = (char*) AllocL(strlen(search) + 3);
+      /* we are under msdos display */
+      extra = (char*) AllocL((search != NULL ? strlen(search) : 0) + 3);
       sprintf(extra, ".:");
-      strcat(extra, search);
+      if (search != NULL) strcat(extra, search);
       search = extra;
     }
 #endif
