@@ -476,17 +476,17 @@ fi
 
 
 dnl Check for external memory managements
-AC_ARG_WITH(malloc, \
- [ --with-malloc=HEADER     use external malloc routines declared in HEADER])
+AC_ARG_WITH(malloc_h, \
+ [ --with-malloc_h=HEADER     use external malloc routines declared in HEADER])
 
-if test "${with_malloc+set}" = set; then
-  AC_CHECK_HEADER(${with_malloc},,with_malloc=)
+if test "${with_malloc_h+set}" = set; then
+  AC_CHECK_HEADER(${with_malloc_h},,with_malloc=)
 fi
 AC_MSG_CHECKING(where malloc rotuines come from)
-if test "${with_malloc+set}" = set; then
-  AC_MSG_RESULT(${with_malloc})
+if test "${with_malloc_h+set}" = set; then
+  AC_MSG_RESULT(${with_malloc_h})
   AC_DEFINE(WITH_EXTERNAL_MALLOC)
-  AC_DEFINE_UNQUOTED(EXTERNAL_MALLOC_H, "${with_malloc}")
+  AC_DEFINE_UNQUOTED(EXTERNAL_MALLOC_H, "${with_malloc_h}")
 else
   AC_MSG_RESULT(stdlib.h)
 fi
