@@ -39,6 +39,21 @@ BOOLEAN lenS_correct(kStrategy strat){
   return TRUE;
     
 }
+
+void cleanS(kStrategy strat){
+  int i=0;
+  LObject P;
+  while(i<=strat->sl){
+    P.p=strat->S[i];
+    P.sev=strat->sevS[i];
+    if(kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P)!=i){
+      deleteInS(i,strat);
+
+		//remember destroying poly
+    }
+    else i++;
+  }
+}
 int bucket_guess(kBucket* bucket){
   int sum=0;
   int i;
@@ -103,6 +118,7 @@ struct calc_dat
   int current_degree;
   int misses_counter;
   int misses_series;
+  int Rcounter;
 };
 BOOLEAN find_next_pair(calc_dat* c);
 void shorten_tails(calc_dat* c, poly monom);
@@ -761,6 +777,7 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
       if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
 	c->rep[j]=i;
 	PrintS("R"); R_found=TRUE;
+	c->Rcounter++;
 	if((i_pos>=0) && (j_pos>=0)){
 	c->misses[i_pos]--;
 	c->misses[j_pos]--;
@@ -828,6 +845,10 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
 
     //for(i=c->strat->sl; i>0;i--)
     //  if(c->strat->lenS[i]<c->strat->lenS[i-1]) printf("fehler bei %d\n",i);
+    if (c->Rcounter>50) {
+      c->Rcounter=0;
+      cleanS(c->strat);
+    }
 }
 #if 0
 static poly redNF (poly h,kStrategy strat)
@@ -991,6 +1012,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 	      //not in c->S
 	      //LEAVE
 	      deleteInS(j,c->strat);
+	      //remember destroying poly
 	      //ENTER
 	       int mlength=pLength(sec_copy);
 	    int mi=simple_posInS(c->strat,sec_copy,mlength);
