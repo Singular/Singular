@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.26 1998-05-18 09:32:07 krueger Exp $ */
+/* $Id: iplib.cc,v 1.27 1998-05-21 08:56:33 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -534,14 +534,15 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     FreeL((ADDRESS)newlib);
     return TRUE;
   }
-  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s %s", libnamebuf,
+  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s %s\n", libnamebuf,
                                    text_buffer);
-  if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
-    Warn( "library %s has an old format. Please fix it for the next time",
-          newlib);
-  else {
-    if (BVERBOSE(V_LOAD_LIB)) Print("\n");
-  }
+  if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB))) {
+    Warn( "library %s has old format. This format is still accepted,", newlib);
+    Warn( "but for functionality you may wish to change to the new");
+    Warn( "format. Please refer to the manual for further information.");
+  } // else {
+//     if (BVERBOSE(V_LOAD_LIB)) Print("\n");
+//   }
   reinit_yylp();
   fclose( yylpin );
   {
