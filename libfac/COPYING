@@ -1,4 +1,5 @@
                         SINGULAR version 2-0-0
+			   Singular-libfac
 
                      University of Kaiserslautern
 
@@ -18,12 +19,8 @@ Free Software Foundation; either version 2 of the License, or (at your
 option) any later version with the following additional restrictions
 (which override any conflicting restrictions in the GPL):
 
-The following software used with SINGULAR have their own copyright: the
-omalloc library, the readline library, the Gnu Multiple Precision
-Library (GMP), the Multi Protocol library (MP), the Singular-Factory
-library, the Singular-libfac library, and, for the Windows 9X/NT
-distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
-XEmacs editor (XEmacs).
+This package is part of the software SINGULAR. The GPL is valid for
+this package, other packages may have other copyrights.
 
 Their copyrights and licences can be found in the accompanying files
 which are distributed along with these packages.
@@ -39,9 +36,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 Please send any comments or bug reports to
 <singular@mathematik.uni-kl.de>.
-
-Please register yourself as a SINGULAR user by sending email to
-<singular@mathematik.uni-kl.de> with the subject line `register'.
 
 If you use Singular or parts thereof in a project and/or publish
 results that were partly obtained using SINGULAR, we ask you to cite

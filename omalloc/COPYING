@@ -1,0 +1,23 @@
+                       SINGULAR version 2-0-0
+                       Package name:   omalloc
+
+                      University of Kaiserslautern
+
+      Department of Mathematics and  Centre for Computer Algebra
+
+                  Author of this package: O. Bachmann
+
+                        Copyright (C) 1999-2001
+
+
+                               *NOTICE*
+
+For this package the GPL does not apply. Permission of use within the
+software SINGULAR is granted by the author. In addition to this
+permission to modify the sources is granted to the copyright holders
+of SINGULAR.
+
+If you wish to use this package outside of SINGULAR or to modify it in
+any way, please contact the author
+"Olaf Bachmann" <obachman@mathematik.uni-kl.de>.
+
