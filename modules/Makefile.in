@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.2 1999-03-17 10:58:47 krueger Exp $
+### $Id: Makefile.in,v 1.3 2000-03-29 14:13:33 krueger Exp $
 ###
 #################################################################
 
@@ -11,6 +11,7 @@ SHELL		= /bin/sh
 ## 
 ## various paths
 ##
+topsrcdir	= @top_srcdir@
 srcdir		= @srcdir@
 prefix 		= @prefix@
 exec_prefix 	= @exec_prefix@
@@ -20,7 +21,8 @@ bindir		= @bindir@
 # Singular libs go here
 includedir	= @includedir@
 MOD_DEST	= ./include
-INC_SRC		= ../Singular
+INC_SRC		= $(topsrcdir)/Singular
+MODDIRS		= pcv kernel
 
 ## 
 ## various programs
@@ -35,6 +37,7 @@ INSTALL		= ./install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ./mkinstalldirs
+MODGEN		= ${bindir}/modgen
 
 ##
 ## compiler and linker options
@@ -65,7 +68,7 @@ MOD_INCLUDES	= mod2.h utils.h structs.h mmemory.h tok.h ipid.h \
 ##
 ##
 
-all: mod_install
+all: mod_install modgen modules
 
 mod_install:
 	for file in ${MOD_INCLUDES}; do \
@@ -77,12 +80,41 @@ mod_install:
 	done
 
 modgen:
+	cd tools; make install
+
+modules:
+	for SUBDIR in ${MODDIRS}; \
+	do \
+		echo ${MAKE} $@ in $${SUBDIR}; \
+		( cd $${SUBDIR} && ${MODGEN} $${SUBDIR}.mod ;); \
+		( cd $${SUBDIR} && ${MAKE} ;) \
+	done
 
 clean:
 	rm -f *.o *.lo *.so* *.la *~ core
 	for file in ${MOD_INCLUDES}; do \
 		rm -f ${MOD_DEST}/$${file}; \
 	done
+	( cd tools && make $@; )
+	for SUBDIR in ${MODDIRS}; \
+	do \
+		echo ${MAKE} $@ in $${SUBDIR}; \
+		( cd $${SUBDIR} && ${MAKE} $@; ) \
+	done
 
 distclean: clean
+	( cd tools && make clean )
+	for SUBDIR in ${MODDIRS}; \
+	do \
+		echo ${MAKE} $@ in $${SUBDIR}; \
+		( cd $${SUBDIR} && ${MAKE} $@ ;) \
+	done
 	rm -f Makefile
+
+install: all
+	cd tools; make install
+	for SUBDIR in ${MODDIRS}; \
+	do \
+		echo ${MAKE} $@ in $${SUBDIR}; \
+		( cd $${SUBDIR} && ${MAKE} $@;) \
+	done
