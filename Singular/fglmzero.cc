@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.7 1997-10-06 12:19:13 obachman Exp $
+// $Id: fglmzero.cc,v 1.8 1997-12-03 16:58:37 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -468,7 +468,7 @@ fglmSdata::updateCandidates()
     int state = 0;
     while ( k >= 1 ) {
 	newmonom = pCopy( m );  
-	pGetExp( newmonom, k )++;
+	pIncrExp( newmonom, k );
 	pSetm( newmonom );
 	done= FALSE;
 	while ( list.hasItem() && (done == FALSE) ) {
@@ -491,7 +491,7 @@ fglmSdata::updateCandidates()
     }
     while ( --k >= 1 ) {
 	newmonom= pCopy( m ); // HIER
-	pGetExp( newmonom, k )++;
+	pIncrExp( newmonom, k );
 	pSetm( newmonom );
 	nlist.append( fglmSelem( newmonom, k ) );
     }
@@ -833,7 +833,7 @@ fglmDdata::updateCandidates( poly m, const fglmVector v )
     int state = 0;
     while ( k >= 1 ) {
 	newmonom = pCopy( m );
-	pGetExp( newmonom, k )++;
+	pIncrExp( newmonom, k );
 	pSetm( newmonom );
 	done= FALSE;
 	while ( list.hasItem() && (done == FALSE) ) {
@@ -856,7 +856,7 @@ fglmDdata::updateCandidates( poly m, const fglmVector v )
     }
     while ( --k >= 1 ) {
 	newmonom= pCopy( m );
-	pGetExp( newmonom, k )++;
+	pIncrExp( newmonom, k );
 	pSetm( newmonom );
 	nlist.append( fglmDelem( newmonom, v, k ) );
     }

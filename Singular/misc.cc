@@ -437,7 +437,7 @@ struct soptionStruct optionStruct[]=
   {"notSugar",     Sy_bit(OPT_NOT_SUGAR),      ~Sy_bit(OPT_NOT_SUGAR)   },
   {"interrupt",    Sy_bit(OPT_INTERRUPT),      ~Sy_bit(OPT_INTERRUPT)   },
   {"sugarCrit",    Sy_bit(OPT_SUGARCRIT),      ~Sy_bit(OPT_SUGARCRIT)   },
-  /* {"teach",     Sy_bit(OPT_DEBUG),          ~Sy_bit(OPT_DEBUG)  }, */
+  {"teach",     Sy_bit(OPT_DEBUG),          ~Sy_bit(OPT_DEBUG)  }, 
   /* 7 cancel unit */
   {"morePairs",    Sy_bit(OPT_MOREPAIRS),      ~Sy_bit(OPT_MOREPAIRS)   },
   /* 9 return SB in syz, quotient, intersect */

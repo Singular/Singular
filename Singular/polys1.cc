@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.7 1997-10-20 10:52:03 Singular Exp $ */
+/* $Id: polys1.cc,v 1.8 1997-12-03 16:59:00 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -34,10 +34,11 @@ BOOLEAN   pIsConstant(poly p)
 {
   int i;
 
-  for (i=pVariables;i>=0;i--)
+  for (i=pVariables;i;i--)
   {
     if (pGetExp(p,i)!=0) return FALSE;
   }
+  if (pGetComp(p)) return FALSE;
   return TRUE;
 }
 
@@ -82,46 +83,6 @@ poly pOne(void)
   poly p=pInit();
   p->coef = nInit(1);
   return p;
-}
-
-/*2
-* creates a copy of p
-*/
-#ifdef MDEBUG
-poly pDBCopy(poly p,char *f,int l)
-#else
-poly pCopy(poly p)
-#endif
-{
-  poly w, a;
-
-  if (p==NULL) return NULL;
-  pDBTest(p,f,l);
-#ifdef MDEBUG
-  w = a = pDBNew(f,l);
-#else
-  w = a = pNew();
-#endif
-  memcpy(w,p,pMonomSize);
-  w->coef=nCopy(p->coef);
-  if (pNext(p)!=NULL)
-  {
-    pIter(p);
-    do
-    {
-#ifdef MDEBUG
-      a = pNext(a) = pDBNew(f,l);
-#else
-      a = pNext(a) = pNew();
-#endif
-      memcpy(a,p,pMonomSize);
-      a->coef=nCopy(p->coef);
-      pIter(p);
-    }
-    while (p!=NULL);
-  }
-  pNext(a) = NULL;
-  return w;
 }
 
 /*-----------------------------------------------------------*/
@@ -318,7 +279,7 @@ static poly pMonPower(poly p, int exp)
   pSetCoeff0(p,x);
   for (i=pVariables; i!=0; i--)
   {
-    pGetExp(p,i) *= exp;
+    pMultExp(p,i, exp);
   }
   p->Order *= exp;
   return p;
@@ -339,7 +300,7 @@ static void pMonMult(poly p, poly q)
   pSetCoeff0(p,x);
   for (i=pVariables; i!=0; i--)
   {
-    pGetExp(p,i) += pGetExp(q,i);
+    pAddExp(p,i, pGetExp(q,i));
   }
   p->Order += q->Order;
 }
@@ -356,10 +317,10 @@ static poly pMonMultC(poly p, poly q)
 
   x = nMult(pGetCoeff(p),pGetCoeff(q));
   pSetCoeff0(r,x);
-  pGetComp(r) = pGetComp(p);
+  pSetComp(r, pGetComp(p));
   for (i=pVariables; i!=0; i--)
   {
-    pGetExp(r,i) = pGetExp(p,i) + pGetExp(q,i);
+    pSetExp(r,i, pGetExp(p,i) + pGetExp(q,i));
   }
   r->Order = p->Order + q->Order;
   return r;
@@ -493,7 +454,7 @@ poly pPower(poly p, int i)
             {
               for(j=1;j<=pdK;j++)
               {
-                if(p->exp[pdY(j)]!=0)
+                if(pGetExp(p,pdY(j))!=0)
                 {
                   pDelete(&rc);
                   return NULL;
@@ -501,9 +462,9 @@ poly pPower(poly p, int i)
               }
               for(j=1;j<=pdN;j++)
               {
-                t=p->exp[pdX(j)];
-                p->exp[pdX(j)]=p->exp[pdIX(j)];
-                p->exp[pdIX(j)]=t;
+                t=pGetExp(p,pdX(j));
+                pGetExp(p,pdX(j)]=pGetExp(p,pdIX(j));
+                pGetExp(p,pdIX(j))=t;
               }
               pIter(p);
             }
@@ -558,6 +519,7 @@ poly pDiff(poly a, int k)
     if (pGetExp(a,k)!=0)
     {
       f = pNew();
+      pCopy2(f,a);
       pNext(f)=NULL;
       t = nInit(pGetExp(a,k));
       pSetCoeff0(f,nMult(t,pGetCoeff(a)));
@@ -566,8 +528,7 @@ poly pDiff(poly a, int k)
         pDelete1(&f);
       else
       {
-        memcpy4(f->exp,a->exp,(pVariables + 1) * sizeof(short));
-        f->exp[k]--;
+        pDecrExp(f,k);
         pSetm(f);
         if (res==NULL)
         {
@@ -661,56 +622,6 @@ void pSplit(poly p, poly *h)
 }
 
 /*2
-* returns (a copy of) the head term of a
-*/
-#ifdef MDEBUG
-poly pDBHead(poly p,char *f, int l)
-#else
-poly pHead(poly p)
-#endif
-{
-  poly w=NULL;
-
-  if (p!=NULL)
-  {
-#ifdef MDEBUG
-    w = pDBNew(f,l);
-#else
-    w = pNew();
-#endif
-    memcpy4(w,p,pMonomSize);
-    pSetCoeff0(w,nCopy(pGetCoeff(p)));
-    pNext(w) = NULL;
-  }
-  return w;
-}
-
-/*2
-* returns (a copy of) the head term of a without the coef
-*/
-#ifdef MDEBUG
-poly pDBHead0(poly p,char *f, int l)
-#else
-poly pHead0(poly p)
-#endif
-{
-  poly w=NULL;
-
-  if (p!=NULL)
-  {
-#ifdef MDEBUG
-    w = pDBNew(f,l);
-#else
-    w = pNew();
-#endif
-    memcpy4(w,p,pMonomSize);
-    pSetCoeff0(w,NULL);
-    pNext(w) = NULL;
-  }
-  return w;
-}
-
-/*2
 * returns maximal column number in the modul element a (or 0)
 */
 int pMaxComp(poly p)
@@ -756,7 +667,7 @@ void pSetCompP(poly p, int i)
   {
     do
     {
-      pSetComp(p, (short)i);
+      pSetComp(p, (Exponent_t)i);
       pIter(p);
     } while (p!=NULL);
   }
@@ -1006,7 +917,7 @@ poly pPermPoly (poly p, int * perm, int OldpVariables,
       aq=naPermNumber(pGetCoeff(p),par_perm,OldPar);
       pTest(aq);
     }
-    qq->exp[0]=p->exp[0];
+    pSetComp(qq, pGetComp(p));
     if (nIsZero(pGetCoeff(qq)))
     {
       pDelete1(&qq);
@@ -1015,18 +926,18 @@ poly pPermPoly (poly p, int * perm, int OldpVariables,
     {
       for(i=1; i<=OldpVariables; i++)
       {
-        if (p->exp[i]!=0)
+        if (pGetExp(p,i)!=0)
         {
           if (perm==NULL)
           {
-            qq->exp[i]=p->exp[i];
+            pSetExp(qq,i, pGetExp(p,i));
           }
           else if (perm[i]>0)
-            qq->exp[perm[i]]+=p->exp[i];
+            pAddExp(qq,perm[i], pGetExp(p,i));
           else if (perm[i]<0)
           {
             lnumber c=(lnumber)pGetCoeff(qq);
-            c->z->e[-perm[i]-1]+=p->exp[i];
+            c->z->e[-perm[i]-1]+=pGetExp(p,i);
           }
           else
           {
@@ -1306,13 +1217,18 @@ BOOLEAN pComparePolys(poly p1,poly p2)
   n=nDiv(pGetCoeff(p1),pGetCoeff(p2));
   while ((p1 != NULL) /*&& (p2 != NULL)*/)
   {
-    for (i=0; i<=pVariables; i++)
+    for (i=1; i<=pVariables; i++)
     {
       if (pGetExp(p1,i)!=pGetExp(p2,i))
       {
         nDelete(&n);
         return FALSE;
       }
+    }
+    if (pGetComp(p1) != pGetComp(p2))
+    {
+      nDelete(&n);
+      return FALSE;
     }
     if (!nEqual(pGetCoeff(p1),nn=nMult(pGetCoeff(p2),n)))
     {

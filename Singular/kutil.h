@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.3 1997-04-09 12:19:54 Singular Exp $ */
+/* $Id: kutil.h,v 1.4 1997-12-03 16:58:50 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -72,6 +72,7 @@ class skStrategy
     void (*enterS)(LObject h, int pos,kStrategy strat);
     void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
     int (*posInLOld)(LSet L,int Ll, LObject l,kStrategy strat);
+    void (*spSpolyLoop)(poly p1, poly p2, poly m, poly spNoether);
     pFDegProc pOldFDeg;
     ideal Shdl;
     ideal D; /*V(S) is in D(D)*/
@@ -171,7 +172,7 @@ void completeReduce (kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
 
-inline TSet initT () { return (TSet)Alloc(setmax*sizeof(TObject)); }
+inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
 #ifdef KDEBUG
 #define kTest(A) K_Test(__FILE__,__LINE__,A)
 void K_Test(char *f, int i,kStrategy strat);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.4 1997-07-01 15:41:41 Singular Exp $ */
+/* $Id: binom.cc,v 1.5 1997-12-03 16:58:30 obachman Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -70,17 +70,17 @@ static int bComp1dpc(poly p1, poly p2)
   if (o1>0)
   {
     int i = pVariables;
-    while ((i>1) && (p1->exp[i]==p2->exp[i]))
+    while ((i>1) && (pGetExp(p1,i)==pGetExp(p2,i)))
       i--;
     if (i>1)
     {
-      if (p1->exp[i] < p2->exp[i]) return 1;
+      if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
       return -1;
     }
   }
-  o1=p1->exp[0];
-  o2=p2->exp[0];
-  if (o1==o2/*p1->exp[0]==p2->exp[0]*/) return 0;
+  o1=pGetComp(p1);
+  o2=pGetComp(p2);
+  if (o1==o2) return 0;
   if (o1>o2) return -pComponentOrder;
   return pComponentOrder;
 }
@@ -93,7 +93,7 @@ static int bComp1dpc(poly p1, poly p2)
 */
 static int bLDegb(poly p,int *l)
 {
-  short k=p->exp[0];
+  Exponent_t k=pGetComp(p);
   int o = pFDeg(p);
   int ll=1;
 
@@ -111,7 +111,7 @@ static int bLDegb(poly p,int *l)
 */
 static int bLDeg0(poly p,int *l)
 {
-  short k=p->exp[0];
+  Exponent_t k=pGetComp(p);
   int ll=1;
 
   while ((pNext(p)!=NULL) && (pGetComp(pNext(p))==k))

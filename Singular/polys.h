@@ -3,43 +3,25 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.4 1997-07-02 16:44:12 Singular Exp $ */
+/* $Id: polys.h,v 1.5 1997-12-03 16:58:59 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
-#include "structs.h"
+#include "polys-impl.h"
 
-#define VARS (100)   /*max. number of variables as constant*/
-
-typedef short bmonomial;
-typedef bmonomial monomial[VARS+1];
-typedef bmonomial * pmonomial;
-
-struct  spolyrec
-{
-  poly     next;
-#define pNext(p) ((p)->next)
-#define pIter(p) ((p) = (p)->next)
-  number   coef;
-//number  pGetCoeff(poly p);
-#define   pGetCoeff(p)     ((p)->coef)
-//void    pSetCoeff(poly p, number n);
-#define   pSetCoeff(p,n)   {nDelete(&((p)->coef));(p)->coef=n;}
-//void    pSetCoeff0(poly p, number n);
-#define   pSetCoeff0(p,n)  (p)->coef=n
-  int      Order;
-#define   pGetOrder(p)     ((p)->Order)
-#define POLYSIZE (sizeof(poly) + sizeof(number) + sizeof(int))
-  monomial exp;
-};
 typedef poly*   polyset;
-
 extern int      pVariables;
 extern int      pOrdSgn;
 extern BOOLEAN  pLexOrder;
 extern BOOLEAN  pMixedOrder;
 extern poly     ppNoether;
 extern BOOLEAN  pVectorOut;
+// 1 for lex ordering (except ls), -1 otherwise
+extern int pLexSgn;
+
+#ifdef COMP_FAST
+extern int pComponentOrder;
+#endif
 
 #ifdef DRING
 // D=k[x,d,y] is the Weyl-Algebra [y], y commuting with all others
@@ -79,28 +61,61 @@ extern BOOLEAN pSDRING;
 #endif
 
 /* function prototypes */
-/*-------- several acces procedures to monomials ---- */
-//void    pGetExpV(poly p, short * exp);
-#define   pGetExpV(p,e)    memcpy((e),(p)->exp,(pVariables+1)*sizeof(short));
-//void    pSetExpV(poly p, short * exp);
-#define pSetExpV(p,e) {memcpy((p)->exp,(e),(pVariables+1)*sizeof(short));pSetm(p);}
-//void    pSetExp(poly p, int varnum, int exp);
-#define   pSetExp(p,v,e)   (p)->exp[(v)]=(e)
-//int     pGetExp(poly p, int varnum);
-#define   pGetExp(p,v)     ((p)->exp[(v)])
-//void    pSetComp(poly p, int k);
-#define   pSetComp(p,k)    pSetExp(p,0,k)
-//int     pGetComp(poly p);
-#define   pGetComp(p)      pGetExp(p,0)
+
+/* ---------------- General poly access and iteration macros -----------*/
+// IMPORTANT: Do _NOT_ make _ANY_ assumptions about their actual implementation
+
+#define pNext(p)            _pNext(p)
+#define pIter(p)            _pIter(p)
+
+#define pGetCoeff(p)        _pGetCoeff(p)
+// deletes old coeff before setting the new
+#define pSetCoeff(p,n)      _pSetCoeff(p,n)
+// sets new coeff without deleting the old one
+#define pSetCoeff0(p,n)     _pSetCoeff0(p,n)
+
+#define pGetOrder(p)        _pGetOrder(p)
+
+// Gets/Sets Component field
+#define pSetComp(p,k)       _pSetComp(p,k)    
+#define pGetComp(p)         _pGetComp(p)
+#define pIncrComp(p)        _pIncrComp(p)
+#define pDecrComp(p)        _pDecrComp(p)
+#define pAddComp(p,v)       _pAddComp(p,v)
+#define pSubComp(p,v)       _pSubComp(p,v)
+
+// Gets/Sets ith exponent
+#define pGetExp(p,i)        _pGetExp(p,i)
+#define pSetExp(p,i,v)      _pSetExp(p,i,v)
+
+// Increments/decrements ith exponent by one
+#define pIncrExp(p,i)       _pIncrExp(p,i)   
+#define pDecrExp(p,i)       _pDecrExp(p,i)   
+
+// Gets Difference and sum of ith Exponent of m1, m2
+#define pGetExpSum(m1, m2, i)  _pGetExpSum(p1, p2, i)
+#define pGetExpDiff(p1, p2, i) _pGetExpDiff(p1, p2, i)
+
+// Adds/Substracts v to/from the ith Exponent
+#define pAddExp(p,i,v)      _pAddExp(p,i,v)  
+#define pSubExp(p,i,v)      _pSubExp(p,i,v)  
+#define pMultExp(p,i,v)     _pMultExp(p,i,v)
+
+// Gets a copy of (resp. sets) the exponent vector, where e is assumed
+// to point to (pVariables+1)*sizeof(Exponent_t) memory. Exponents are
+// filled in as follows: comp, e_1, .., e_n
+#define pGetExpV(p, e)      _pGetExpV(p, e)
+#define pSetExpV(p, e)      _pSetExpV(p, e)
+
+
+/*-------------predicate on polys ----------------------*/
 BOOLEAN   pIsConstant(poly p);
 BOOLEAN   pIsConstantComp(poly p);
 int       pIsPurePower(poly p);
-//BOOLEAN pIsVector(poly p);
 #define   pIsVector(p)     (pGetComp(p)!=0)
 BOOLEAN   pHasNotCF(poly p1, poly p2);   /*has no common factor ?*/
 void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
-//void    pCat(poly p, poly r);
-#define   pCat(p,r)        ((p)->next=(r))
+
 
 /*-------------ring management:----------------------*/
 extern void   pChangeRing(int N, int OrdSgn,
@@ -110,6 +125,9 @@ extern void   pChangeRing(int N, int OrdSgn,
 /*-----------the ordering of monomials:-------------*/
 extern pSetmProc pSetm;
 extern pCompProc pComp0;
+// this is needed here as long as monomials with negative exponents might be
+// compared (see in spolys.cc)
+extern pCompProc t_pComp0;
 int    pComp(poly p1,poly p2);
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
@@ -125,39 +143,41 @@ void pSetSchreyerOrdM(polyset nextorder, int length, int comps);
 int  pModuleOrder();
 
 /*-------------storage management:-------------------*/
-#ifdef MDEBUG
-poly pDBNew(char *f, int l);
-#define pNew() pDBNew(__FILE__,__LINE__)
-poly pDBInit(char * f,int l);
-#define pInit() pDBInit(__FILE__,__LINE__)
-#else
-//poly    pNew(void);
-#define   pNew() (poly)mmAllocSpecialized()
-poly      pInit(void);
-#endif
+// allocates the space for a new monomial
+#define pNew()      _pNew()
+// allocates a new monomial and initializes everything to 0
+#define pInit()     _pInit()
+
+// frees the space of the monomial m
+#define pFree1(m)       _pFree1(m)
+// frees the space of monoial and frees coefficient
+#define pDelete1(m)     _pDelete1(m)
+// deletes the whole polynomial p
+#define pDelete(p)      _pDelete(p)
+
+// makes a simple memcopy of m2 into m1 -- does _not_ allocate memory for m1
+#define pCopy2(m1, m2)  _pCopy2(m1, m2)
+// Returns a newly allocated copy of the monomial m, initializes coefficient
+// and sets the next-fieled to NULL
+#define pCopy1(m)       _pCopy1(m)
+// Returns a newly allocated copy of the monomial m, sets the coefficient to 0,
+// and sets the next-fieled to NULL
+#define pHead0(p)       _pHead0(p)
+// Returns a newly allocated copy of the monomial m, copy includes copy of ceoff
+// and sets the next-fieled to NULL
+#define pHead(p)        _pHead(p)
+extern  poly pHeadProc(poly p);
+// Returns copy of the whole polynomial
+#define pCopy(p)        _pCopy(p)
+
+// Is equivalent to pCopy2(p1, p2);pMonAddFast(p1, p3);
+#define pCopyAddFast(p1, p2, p3)    _pCopyAddFast(p1, p2, p3)
+// Similar to pCopyAddFast, except that components of p2, and p3 must be 0
+#define pCopyAddFast1(p1, p2, p3)    _pCopyAddFast1(p1, p2, p3)
 
 poly      pmInit(char *s, BOOLEAN &ok);   /* monom -> poly */
 poly      pOne(void);
-#ifdef MDEBUG
-poly      pDBCopy(poly a, char *f, int l);
-#define   pCopy(A) pDBCopy(A,__FILE__,__LINE__)
-#else
-poly      pCopy(poly a);
-#endif
-
 void      ppDelete(poly * a, ring r);
-#ifdef MDEBUG
-#define   pDelete(a)             pDBDelete((a),__FILE__,__LINE__)
-void      pDBDelete(poly * a, char * f, int l);
-#define   pDelete1(a)            pDBDelete1((a),__FILE__,__LINE__)
-void      pDBDelete1(poly * a, char * f, int l);
-#define   pFree1(a)              {pDBFree1((a),__FILE__,__LINE__);(a)=NULL;}
-void      pDBFree1(poly a, char * f, int l);
-#else
-void      pDelete(poly * a);
-void      pDelete1(poly * a);
-#define   pFree1(a)               mmFreeSpecialized((ADDRESS)a)
-#endif
 
 /*-------------operations on polynomials:------------*/
 poly      pAdd(poly p1, poly p2);
@@ -168,30 +188,22 @@ void      pMultN(poly a, number c);
 poly      pMultCopyN(poly a, number c);
 poly      pPower(poly p, int i);
 
-BOOLEAN   pEqual(poly a, poly b);
+// return TRUE, if exponent and component of p1 and p2 are equal,
+// FALSE otherwise
+#define pEqual(p1, p2) _pEqual(p1, p2)
 
-#ifdef macintosh
+// returns TRUE, if leading monom of a is dividble be leading monom of b
+#if defined(macintosh) || defined(DIV_COUNT)
 BOOLEAN   pDivisibleBy(poly a, poly b);
 #else
-inline BOOLEAN pDivisibleBy(poly a, poly b)
-{
-  if ((a!=NULL)&&((a->exp[0]==0) || (a->exp[0] == b->exp[0])))
-  {
-    int i=pVariables;
-    short *e1=&(a->exp[1]);
-    short *e2=&(b->exp[1]);
-    if ((*e1) > (*e2)) return FALSE;
-    do
-    {
-      i--;
-      if (i == 0) return TRUE;
-      e1++;
-      e2++;
-    } while ((*e1) <= (*e2));
-  }
-  return FALSE;
-}
+#define pDivisibleBy(a, b)  _pDivisibleBy(a,b)
 #endif
+// like pDivisibleBy, except that it is assumed that a!=NULL
+#define pDivisibleBy1(a,b)   _pDivisibleBy1(a,b)
+// returns TRUE, if leading monom of a is dividble be leading monom of b
+// assumes a != NULL, b != NULL, and does not check components
+#define pDivisibleBy2(a, b) _pDivisibleBy2(a,b)
+
 
 poly      pDivide(poly a, poly b);
 poly      pDivideM(poly a, poly b);
@@ -200,19 +212,17 @@ poly      pDiff(poly a, int k);
 poly      pDiffOp(poly a, poly b,BOOLEAN multiply);
 
 int       pLength(poly a);
-#ifdef MDEBUG
-poly pDBHead(poly p,char *f, int l);
-#define pHead(A) pDBHead(A,__FILE__,__LINE__)
-poly pDBHead0(poly p,char *f, int l);
-#define pHead0(A) pDBHead0(A,__FILE__,__LINE__)
-#else
-poly pHead(poly p);
-poly pHead0(poly p);
-#endif
 int       pMaxComp(poly p);
 int       pMinComp(poly p);
 int       pWeight(int c);
 void      pSetCompP(poly a, int i);
+
+// Quer sum (total degree) of all exponents of leading monomial
+#define pExpQuerSum(p1)             _pExpQuerSum(p1)
+// sum from 1st to "to"th exponent (including the "to" one)
+#define pExpQuerSum1(p1, to)        _pExpQuerSum1(p1, to)
+// sum from "from"th to "to"th exponent (including borders)
+#define pExpQuerSum2(p1, from, to)  _pExpQuerSum2(p1, from, to)
 
 char*     pString(poly p);
 char*     pString0(poly p);
@@ -262,12 +272,9 @@ int       pDegW(poly p, short *w);
 poly  pPolys2Vec(polyset p, int len);
 void  pVec2Polys(poly v, polyset *p, int *len);
 int   pVar(poly m);
+
 /*-----------specials for spoly-computations--------------*/
-extern int pMonomSize;
-
 poly    pMultT(poly a, poly e);
-poly    pCopy1(poly p); // copy of the head monomial: coeff is 0
-
 int     pDivComp(poly p, poly q);
 BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm);
 BOOLEAN pEqualPolys(poly p1,poly p2);
@@ -282,4 +289,5 @@ BOOLEAN pDBTest(poly p, char *f, int l);
 #define pDBTest(A,B,C)
 #endif
 #endif
+
 

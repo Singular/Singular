@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.5 1997-11-24 12:48:27 pohl Exp $ */
+/* $Id: matpol.cc,v 1.6 1997-12-03 16:58:51 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -1278,8 +1278,8 @@ static poly mpDivide(poly a, poly b)
     {
       if (deg != 0)
       {
-        for (i=pVariables; i!=0; i--)
-          pGetExp(r,i) -= pGetExp(b,i);
+        for (i=pVariables; i; i--)
+          pSubExp(r,i,  pGetExp(b,i));
         pSetm(r);
       }
       y = nIntDiv(pGetCoeff(r),x);
@@ -1294,7 +1294,7 @@ static poly mpDivide(poly a, poly b)
     if (deg != 0)
     {
       for (i=pVariables; i>0; i--)
-        pGetExp(r,i) -= pGetExp(b,i);
+        pSubExp(r,i,pGetExp(b,i));
       pSetm(r);
     }
     y = nDiv(pGetCoeff(r), x);
@@ -1534,7 +1534,7 @@ static poly select (poly fro, monomial what)
     h = pOne();
     for (i=1; i<=pVariables; i++)
       pSetExp(h,i, pGetExp(fro,i) * what[i]);
-    pGetComp(h)=pGetComp(fro);
+    pSetComp(h, pGetComp(fro));
     pSetm(h);
     res = pInsert(h, res);
     fro = fro->next;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.11 1997-10-19 11:34:25 Singular Exp $ */
+/* $Id: ideals.cc,v 1.12 1997-12-03 16:58:42 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2267,11 +2267,12 @@ BOOLEAN pIsUnit(poly p)
   if (p == NULL) return FALSE;
   if (currRing->OrdSgn == 1)
   {
-    for (i=0;i<=pVariables;i++)
+    for (i=1;i<=pVariables;i++)
     {
       j = pGetExp(p,i);
       if (j != 0) return FALSE;
     }
+    if (pGetComp(p) != 0) return FALSE;
     if (pNext(p) !=NULL) return FALSE;
   }
   else
@@ -2279,14 +2280,17 @@ BOOLEAN pIsUnit(poly p)
     b = FALSE;
     while ((! b) && (q != NULL))
     {
-      i = 0;
-      j = pGetExp(p,i);
-      while ((i<=pVariables) && (j == 0))
+      if (pGetComp(p) == 0)
       {
-        i++;
+        i = 0;
         j = pGetExp(p,i);
+        while ((i<=pVariables) && (j == 0))
+        {
+          i++;
+          j = pGetExp(p,i);
+        }
+        if (i>pVariables) b = TRUE;
       }
-      if (i>pVariables) b = TRUE;
       q = pNext(q);
     }
     return b;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.15 1997-12-03 14:07:51 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.16 1997-12-03 16:58:31 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -18,6 +18,7 @@
 #include "febase.h"
 #include "cntrlc.h"
 #include "version.h"
+#include "polys.h"
 #ifdef PAGE_TEST
 #include "page.h"
 #endif
@@ -342,6 +343,28 @@ void sigint_handler(int sig)
     fputs("\nabort command(a), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
     switch(fgetc(stdin))
     {
+#if defined(MONOM_COUNT) || defined(DIV_COUNT)
+	      case 'e':
+#ifdef MONOM_COUNT
+		extern void ResetMonomCount();
+		ResetMonomCount();
+#endif
+#ifdef DIV_COUNT
+		extern void ResetDivCount();
+		ResetDivCount();
+#endif
+		break;
+	      case 'o':
+#ifdef MONOM_COUNT
+		extern void OutputMonomCount();
+		OutputMonomCount();
+#endif 
+#ifdef DIV_COUNT
+		extern void OutputDivCount();
+		OutputDivCount();
+#endif
+		break;
+#endif // defined(MONOM_COUNT) || defined(DIV_COUNT)
       case 'q':
                 m2_end(2);
       case 'r':

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.23 1997-11-13 13:06:37 pohl Exp $ */
+/* $Id: extra.cc,v 1.24 1997-12-03 16:58:34 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -47,6 +47,8 @@
 #include "ideals.h"
 #include "kstd1.h"
 #include "syz.h"
+#include "polys.h"
+
 #ifdef STDTRACE
 //#include "comm.h"
 #endif
@@ -531,27 +533,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
          WerrorS("ideal expected");
     }
     else  
-#endif    
-#ifdef HAVE_FGLM
-/*==================== fglmhomog =============================*/
-    if (strcmp((char*)(h->Data()),"fglmhomog")==0)
-    {
-	if (h->next!=NULL)
-	{
-	    if (h->next->Typ()==RING_CMD)
-	    {
-		if (h->next->next != NULL) {
-		    res->rtyp = IDEAL_CMD;
-		    res->data= (void *)fglmhomProc(h->next, h->next->next);
-		}
-		else PrintS("Needs two arguments (ring,ideal)\n");
-	    }
-	    else PrintS("First argument has to be a ring\n");
-	}
-	else PrintS("Needs two arguments (ring,ideal)\n");
-	return FALSE;
-    }
-    else
+#endif
+#ifdef HAVE_FACTORY      
 /*==================== fastcomb =============================*/
     if(strcmp((char*)(h->Data()),"fastcomb")==0)
     {
@@ -608,33 +591,65 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== divcount & mcount =============================*/      
+#ifdef MONOM_COUNT
+    if (strcmp((char*)(h->Data()),"mcount")==0)
+    {
+      extern void OutputMonomCount();
+      OutputMonomCount();
+      return FALSE;
+    }
+    else if (strcmp((char*)(h->Data()),"mreset")==0)
+    {
+      extern void ResetMonomCount();
+      ResetMonomCount();
+      return FALSE;
+    }
+    else
+#endif      
+#ifdef DIV_COUNT
+    if (strcmp((char*)(h->Data()),"dcount")==0)
+    {
+      extern void OutputDivCount();
+      OutputDivCount();
+      return FALSE;
+    }
+    else if (strcmp((char*)(h->Data()),"dreset")==0)
+    {
+      extern void ResetDivCount();
+      ResetDivCount();
+      return FALSE;
+    }
+    else
+#endif      
 /*==================== barstep =============================*/
     if(strcmp((char*)(h->Data()),"barstep")==0)
     {
-     if ((h->next!=NULL) &&(h->next->Typ()==MATRIX_CMD))
+      if ((h->next!=NULL) &&(h->next->Typ()==MATRIX_CMD))
       {
         if (h->next->next!=NULL)
         {
           if (h->next->next->Typ()!=POLY_CMD)
           {
-	      Warn("Wrong types for barstep(matrix,poly)");
+            Warn("Wrong types for barstep(matrix,poly)");
           }
         }
-	int r,c;
-	poly div=(poly)h->next->next->Data();
+        int r,c;
+        poly div=(poly)h->next->next->Data();
         res->rtyp=MATRIX_CMD;
         res->data=(void *)mpOneStepBareiss((matrix)h->next->Data(),
-	           &div,&r,&c);
+                                           &div,&r,&c);
         Print("div: ");pWrite(div);
-	Print("rows: %d, cols: %d\n",r,c);
-	pDelete(&div);
+        Print("rows: %d, cols: %d\n",r,c);
+        pDelete(&div);
         return FALSE;
       }
       else
         WerrorS("matrix expected");
     }
-/*============================================================*/
-      WerrorS("not implemented\n");
   }
+  
+/*============================================================*/
+  WerrorS("not implemented\n");
   return TRUE;
 }

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.11 1997-10-20 15:27:22 Singular Exp $
+// $Id: clapconv.cc,v 1.12 1997-12-03 16:58:30 obachman Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -125,8 +125,9 @@ convRecPP ( const CanonicalForm & f, int * exp, poly & result )
   {
     poly term = pNew();
     pNext( term ) = NULL;
-    for ( int i = 0; i <= pVariables; i++ )
-      pGetExp( term, i ) = exp[i];
+    for ( int i = 1; i <= pVariables; i++ )
+      pSetExp( term, i, exp[i]);
+    pSetComp(term, 0);
     if ( getCharacteristic() != 0 )
     {
       pGetCoeff( term ) = nInit( f.intval() );
@@ -355,8 +356,9 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
     {
       poly term = pNew();
       pNext( term ) = NULL;
-      for ( int i = 0; i <= pVariables; i++ )
-        pGetExp( term, i ) = exp[i];
+      for ( int i = 1; i <= pVariables; i++ )
+        pSetExp( term, i , exp[i]);
+      pSetComp(term, 0);
       pGetCoeff(term)=(number)Alloc0(sizeof(rnumber));
       ((lnumber)pGetCoeff(term))->z=z;
       pSetm( term );
@@ -521,8 +523,9 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
   {
     poly term = pNew();
     pNext( term ) = NULL;
-    for ( int i = 0; i <= pVariables; i++ )
-      pGetExp( term, i ) = exp[i];
+    for ( int i = 1; i <= pVariables; i++ )
+      pSetExp( term, i ,exp[i]);
+    pSetComp(term, 0);
     pGetCoeff(term)=(number)Alloc0(sizeof(rnumber));
     ((lnumber)pGetCoeff(term))->z=convClapPSingTr( f );
     pSetm( term );

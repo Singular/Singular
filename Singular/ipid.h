@@ -3,13 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.3 1997-04-09 12:19:50 Singular Exp $ */
+/* $Id: ipid.h,v 1.4 1997-12-03 16:58:45 obachman Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
 #include <string.h>
 #include "structs.h"
 #include "subexpr.h"
+#include "polys-impl.h"
 
 struct sip_sring
 {
@@ -31,6 +32,9 @@ struct sip_sring
   short      P;      /* number of pars */
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
   short      ref;
+#ifdef COMP_FAST
+  short     Offset; // if != 0, then exponents are stored in reverse order
+#endif    
 #ifdef RDEBUG
   short      no;
 #endif

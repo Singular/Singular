@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.3 1997-04-09 12:19:59 Singular Exp $ */
+/* $Id: mmemory.h,v 1.4 1997-12-03 16:58:53 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -14,6 +14,30 @@
 extern "C" {
 #endif
 
+#include "mod2.h"
+  
+#ifdef DO_DEEP_PROFILE                                                  
+#define  memcpyW(p1, p2, l) _memcpyW((void*) p1, (void*) p2, (long) l)  
+#else                                                                   
+#define memcpyW(p1, p2, l)                      \
+do                                              \
+{                                               \
+  long _i = l;                                  \
+  long* _s1 = (long*) p1;                       \
+  const long* _s2 = (long*) p2;                 \
+                                                \
+  for (;;)                                      \
+  {                                             \
+    *_s1 = *_s2;                                \
+    _i--;                                       \
+    if (_i == 0) break;                         \
+    _s1++;                                      \
+    _s2++;                                      \
+  }                                             \
+}                                               \
+while(0)
+#endif
+  
 
 void mmSpecializeBlock( size_t );
 

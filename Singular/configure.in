@@ -7,8 +7,8 @@ dnl set the version here
 dnl
 SINGULAR_MAJOR_VERSION=1
 SINGULAR_MINOR_VERSION=1
-SINGULAR_SUB_VERSION=4
-VERSION_DATE="November 1997"
+SINGULAR_SUB_VERSION=5
+VERSION_DATE="December 1997"
 AC_SUBST(SINGULAR_MAJOR_VERSION)
 AC_SUBST(SINGULAR_MINOR_VERSION)
 AC_SUBST(SINGULAR_SUB_VERSION)
@@ -163,6 +163,11 @@ AC_ARG_WITH(
 AC_ARG_WITH(apint, \
  [ --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
                           where PACKAGE can be gmp, smallgmp, or buildin])
+AC_ARG_WITH(
+  exp_type,
+  [  --with-exp_type=TYPE uses TYPE as type of exponents in polynomials 
+                          -- default type is short 
+			  -- possible other types are char and int])
 
 dnl
 dnl CHECK VARIOUS LIBRARIES
@@ -435,46 +440,6 @@ else
   AC_MSG_ERROR(need  -2 >> 1 == -1)
 fi
 
-
-dnl sizeof(int) == 4
-AC_MSG_CHECKING(whether sizeof int is four bytes)
-AC_CACHE_VAL(ac_cv_sizeof_int_equals_four, AC_TRY_RUN(
-[ int main() {if (sizeof(int) == 4)  exit(0); else exit(1); } ],
-  ac_cv_sizeof_int_equals_four=yes,
-  ac_cv_sizeof_int_equals_four=no,
-  if test "$ac_c_cross_dos" = yes; then 
-     ac_cv_sizeof_int_equals_four=yes; 
-   else 
-     AC_MSG_RESULT(no)
-     AC_MSG_ERROR(cross compilation without default value)
-   fi))
-
-if test "$ac_cv_sizeof_int_equals_four" = yes; then
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-  AC_MSG_ERROR(need int to be four bytes long)
-fi
-
-dnl sizeof(long) == sizeof (void *)
-AC_MSG_CHECKING(whether sizeof long equals sizeof void*)
-AC_CACHE_VAL(ac_cv_sizeof_long_equals_voidp, AC_TRY_RUN(
-  [ int main() {if (sizeof(long) == sizeof(void*))  exit(0); else exit(1); }],
-    ac_cv_sizeof_long_equals_voidp=yes,
-    ac_cv_sizeof_long_equals_voidp=no,
-    if test "$ac_c_cross_dos" = yes; then 
-      ac_cv_sizeof_long_equals_voidp=yes; 
-    else 
-      AC_MSG_RESULT(no)
-	AC_MSG_ERROR(cross compilation without default value)
-    fi))
-if test "$ac_cv_sizeof_long_equals_voidp" = yes; then
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-  AC_MSG_ERROR(need equal sizes for long and void*)
-fi
-
 dnl sprintf returns number of printed chars
 AC_MSG_CHECKING(whether vsprintf returns number of printed chars)
 AC_CACHE_VAL(ac_cv_returns_n_of_chars, AC_TRY_RUN( 
@@ -491,8 +456,40 @@ else
 fi
 
 dnl determine ALIGN_8
-AC_CHECK_SIZEOF(void*,4)
 
+AC_CHECK_SIZEOF(char,1)
+AC_CHECK_SIZEOF(short,2)
+AC_CHECK_SIZEOF(int,4)
+AC_CHECK_SIZEOF(long,4)
+AC_CHECK_SIZEOF(void*,4)
+AC_C_BIGENDIAN
+
+if test "$ac_cv_sizeof_int" != 4; then
+  AC_MSG_ERROR(need int to be four bytes long)
+fi
+
+if test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
+  AC_MSG_ERROR(need equal sizes for long and void*)
+fi
+
+dnl
+dnl figure out Exponent_t and Order_t
+dnl make sure that 2*sizeof(Exponent_t) + sizeof(Order_t) is aligned
+dnl
+AC_MSG_CHECKING(which exponent types to use)
+if test "$with_exp_type" = "char"; then
+  AC_MSG_RESULT(char)
+  AC_DEFINE(EXPONENT_TYPE, char)
+  AC_DEFINE(SIZEOF_EXPONENT, SIZEOF_CHAR)
+elif test "with_exp_type" = "int"; then
+  AC_MSG_RESULT(int)
+  AC_DEFINE(EXPONENT_TYPE, int)
+  AC_DEFINE(SIZEOF_EXPONENT, SIZEOF_INT)
+else
+  AC_MSG_RESULT(short)
+  AC_DEFINE(EXPONENT_TYPE, short)
+  AC_DEFINE(SIZEOF_TYPE, SIZEOF_SHORT)
+fi
 
 dnl
 dnl Last, but not least, customize CFLAGS

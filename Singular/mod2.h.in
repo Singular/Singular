@@ -63,8 +63,22 @@
 #undef HAVE_ATEXIT
 /* Define if sprintf does not return number of printed chars */
 #undef BSD_SPRINTF
+/* Define sizeof(char) */
+#define SIZEOF_CHAR 1
+/* Define sizeof(short) */
+#define SIZEOF_SHORT 2
+/* Define sizeof(int) */
+#define SIZEOF_INT 4
+/* Define sizeof(long) */
+#define SIZEOF_LONG 4
 /* Define sizeof(void*) */
 #define SIZEOF_VOIDP 4
+/* Define if your integer format is big endian */
+#undef WORDS_BIGENDIAN
+/* Define the type of the exponents to be used in monomials */
+#define EXPONENT_TYPE short
+/* Define the size of exponent */
+#define SIZEOF_EXPONENT SIZEOF_SHORT
 /* Define major version of Singular -- should be set in configure.in!!!*/
 #define SINGULAR_MAJOR_VERSION 0
 /* Define minor version of Singular -- should be set in configure.in!!! */
@@ -194,6 +208,10 @@ char *strstr(const char *haystack, const char *needle);
 #define MAX_INT_LEN 11
 extern int pShortOut;
 
+#ifdef DO_PROFILE
+/* define to enable explicit profiling of some crucial inline routines and defines */
+#define DO_DEEP_PROFILE
+#endif
 /*******************************************************************
  * DEBUG OPTIONS
  * -- only significant for for compiling without -DNDEBUG
@@ -213,7 +231,8 @@ extern int pShortOut;
 /* define MM_BEFORE for also printing the previous block while debugging */
 /*#define MM_BEFORE 1 */
 /* define PDEBUG checking polys, undefine otherwise */
-#define PDEBUG 
+/* define PDEBUG 1 for additionally checking access to polys  -- vewry slow !*/
+#define PDEBUG 1
 /* define KDEBUG checking during standard base computation */
 #define KDEBUG 
 /* define LDEBUG checking numbers, undefine otherwise */

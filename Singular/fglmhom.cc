@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.3 1997-10-18 11:03:26 Singular Exp $
+// $Id: fglmhom.cc,v 1.4 1997-12-03 16:58:36 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -34,11 +34,15 @@
 #include "stairc.h"  // -> hHStdSeries, hFirstSeries usw.
 #include <templates/list.h>
 
+// obachman: Got rid off those "redefiende messages by includeing fglm.h
+#include "fglm.h"
+#if 0
 #define PROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define PROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
 #define STICKYPROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
 #define fglmASSERT(ignore1,ignore2)
+#endif
 
 struct doublepoly
 {
@@ -163,7 +167,7 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
 	poly newm = pCopy( m );
 	while ( deg >= 0 ) {
 	    generateMonoms( newm, var+1, deg, dat );
-	    pGetExp( newm, var )++;
+	    pIncrExp( newm, var );
 	    pSetm( newm );
 	    deg--;
 	}

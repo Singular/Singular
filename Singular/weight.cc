@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.4 1997-07-07 15:22:27 Singular Exp $ */
+/* $Id: weight.cc,v 1.5 1997-12-03 16:59:09 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -72,7 +72,7 @@ static void wDimensions(polyset s, int sl, int *lpol, int *npol, int *mons)
 }
 
 
-static void wInit(polyset s, int sl, int mons, int *A)
+static void wInit(polyset s, int sl, int mons, int *A) 
 {
   int  n, a, i, j, *B, *C;
   poly p, q;

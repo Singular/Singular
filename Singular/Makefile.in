@@ -42,8 +42,8 @@ MKINSTALLDIRS   = ./mkinstalldirs
 ##
 ## compiler and linker options
 ##
-CFLAGS		= @CFLAGS@
-CXXFLAGS	= @CXXFLAGS@
+CFLAGS		= @CFLAGS@ -pipe 
+CXXFLAGS	= @CXXFLAGS@ -pipe 
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir} @CPPFLAGS@ 
 DEFS		= @DEFS@ -DNDEBUG
@@ -88,14 +88,14 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     longrat0.cc maps.cc matpol.cc misc.cc \
     mminit.cc modulop.cc \
     fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc \
-    numbers.cc polys.cc polys0.cc polys1.cc polys2.cc \
+    numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
     sing_dld.cc sing_dbm.cc spolys.cc spolys0.cc \
     subexpr.cc syz.cc syz0.cc syz1.cc \
     tesths.cc timer.cc weight.cc \
     mpsr_Put.cc mpsr_PutPoly.cc mpsr_Tok.cc mpsr_GetPoly.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
-    ndbm.cc 
+    ndbm.cc spSpolyLoop.cc
 
 CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c mmheap.c mmspec.c mmutil.c weight0.c
 
@@ -112,7 +112,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
 	kutil.h mpsr_Put.h spolys0.h \
-	ndbm.h
+	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h
 
 TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
 	${testdir}/general_test.in ${testdir}/general_test.out \
@@ -135,13 +135,13 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      ideals.o subexpr.o hdegree.o hutil.o ffields.o shortfl.o \
      longalg.o spolys0.o syz.o syz0.o syz1.o weight.o weight0.o \
      ipid.o ipshell.o iplib.o ipassign.o ipconv.o ipprint.o\
-     polys.o polys0.o polys1.o polys2.o extra.o\
+     polys.o polys0.o polys1.o polys-impl.o extra.o\
      mminit.o mmutil.o mmalloc.o mmallocb.o mmallocs.o \
      mmspec.o mmblock.o mmheap.o sing_dld.o sing_dbm.o silink.o \
      sing_mp.o fglm.o fglmzero.o fglmvec.o fglmhom.o fglmgauss.o cntrlc.o \
      algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
-     mpsr_Get.o mpsr_GetMisc.o ndbm.o
+     mpsr_Get.o mpsr_GetMisc.o ndbm.o spSpolyLoop.o
 
 ##
 ## PRIMARY Targets
@@ -337,8 +337,8 @@ CXXG		= gcc
 CXXM		= gcc -MM
 CCM		= gcc -MM
 
-CFLAGSG		= -g -Wall -Wno-unused
-CXXFLAGSG	= -g -Wall -Wno-unused
+CFLAGSG		= -g -Wall -Wno-unused -pipe 
+CXXFLAGSG	= -g -Wall -Wno-unused -pipe 
 CXXTEMPLFLAGSG	= -fno-implicit-templates
 DEFSG		= @DEFS@ 
 
@@ -353,14 +353,14 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      spolys.og ideals.og subexpr.og hdegree.og hutil.og ffields.og shortfl.og \
      longalg.og spolys0.og syz.og syz0.og syz1.og weight.og \
      ipid.og ipshell.og iplib.og ipassign.og ipconv.og ipprint.og\
-     polys.og polys0.og polys1.og polys2.og extra.og\
+     polys.og polys0.og polys1.og polys-impl.og extra.og\
      mminit.og sing_dld.og sing_dbm.og silink.og \
      sing_mp.og fglm.og fglmzero.og fglmvec.og fglmgauss.og fglmhom.og\
      algmap.og clapconv.og  clapmem.og clapsing.og \
      cntrlc.og  \
      mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
      mpsr_Get.og mpsr_GetMisc.og \
-     ndbm.og
+     ndbm.og spSpolyLoop.og
 
 OBJG2= mmalloc.og mmallocb.og mmallocs.og mmblock.og mmheap.og \
      mmspec.og mmutil.og weight0.og
@@ -393,16 +393,79 @@ installg: Singularg
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} Singularg ${bindir}	
 
+##
+## compiler and linker options for profile version
+##
+
+CCP		= gcc
+CXXP		= gcc
+
+CFLAGSP		= -pg -O3 -pipe  
+CXXFLAGSP	= -pg -O3 -pipe 
+CXXTEMPLFLAGSP	= -fno-implicit-templates
+DEFSP		= @DEFS@ -DNDEBUG -DDO_PROFIL
+
+##
+## .op files for 
+## 
+
+OBJP1=	grammar.op scanner.op matpol.op binom.op\
+     febase.op feread.op timer.op intvec.op attrib.op lists.op\
+     longrat.op longrat0.op misc.op ring.op numbers.op maps.op\
+     hilb.op comm.op kstd1.op kstd2.op kutil.op khstd.op kstdfac.op modulop.op \
+     spolys.op ideals.op subexpr.op hdegree.op hutil.op ffields.op shortfl.op \
+     longalg.op spolys0.op syz.op syz0.op syz1.op weight.op \
+     ipid.op ipshell.op iplib.op ipassign.op ipconv.op ipprint.op\
+     polys.op polys0.op polys1.op polys-impl.op extra.op\
+     mminit.op sing_dld.op sing_dbm.op silink.op \
+     sing_mp.op fglm.op fglmzero.op fglmvec.op fglmgauss.op fglmhom.op\
+     algmap.op clapconv.op  clapmem.op clapsing.op \
+     cntrlc.op  \
+     mpsr_Error.op mpsr_Put.op mpsr_PutPoly.op mpsr_GetPoly.op \
+     mpsr_Get.op mpsr_GetMisc.op \
+     ndbm.op spSpolyLoop.op
+
+OBJP2= mmalloc.op mmallocb.op mmallocs.op mmblock.op mmheap.op \
+     mmspec.op mmutil.op weight0.op
+
+OBJP=$(OBJP1) $(OBJP2) claptmpl.op
+
+##
+## Debug Targets
+##
+
+claptmpl.op: claptmpl.cc mod2.h
+	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
+$(OBJP1): %.op: %.cc
+	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
+
+$(OBJP2): %.op: %.c
+	$(CCP)  ${CFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
+
+Singularp: scanner.cc $(OBJP) iparith.op mpsr_Tok.op tesths.cc version.h 
+	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp \
+	tesths.cc iparith.op mpsr_Tok.op $(OBJP) ${LDFLAGS} ${LIBS}
+
+iparith.op: iparith.inc iparith.cc
+	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c iparith.cc -o iparith.op
+
+mpsr_Tok.op: iparith.inc mpsr_Tok.cc
+	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c mpsr_Tok.cc -o mpsr_Tok.op
+
+installp: Singularp
+	${MKINSTALLDIRS} ${bindir}
+	${INSTALL_PROGRAM} Singularp ${bindir}	
+
 
 ##
 ## dependencies
 ##
 %.dd: %.cc mod2.h
-	echo $@ $(@:.dd=.og) " " \\ > $@
+	echo $(@:.dd=.og) $(@:.dd=.op) " " \\ > $@
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
 
 %.d: %.c mod2.h
-	echo $@ $(@:.d=.og) " " \\ > $@
+	echo $(@:.d=.og) $(@:.d=.op) " " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
 depend: $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h

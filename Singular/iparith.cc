@@ -1131,7 +1131,7 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
     }
     else
     {
-      pGetComp(p)=0;
+      pSetComp(p, 0);
       o=p;
       p=pNext(o);
     }
@@ -2861,7 +2861,7 @@ void jjInitTab1()
         case (int)jjidFreeModule: dArith1[i].p=(proc1)idFreeModule; break;
         case (int)jjrCharStr:     dArith1[i].p=(proc1)rCharStr; break;
 #ifndef MDEBUG
-        case (int)jjpHead:        dArith1[i].p=(proc1)pHead; break;
+        case (int)jjpHead:        dArith1[i].p=(proc1)pHeadProc; break;
 #endif
         case (int)jjidHead:       dArith1[i].p=(proc1)idHead; break;
         case (int)jjidMaxIdeal:   dArith1[i].p=(proc1)idMaxIdeal; break;

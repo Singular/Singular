@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.2 1997-10-06 12:19:08 obachman Exp $
+// $Id: fglmcomb.cc,v 1.3 1997-12-03 16:58:35 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -29,9 +29,8 @@
 #include "fglmvec.h"
 #include "fglmgauss.h"
 #include "kstd1.h"
+#include "fglm.h"
 #include <templates/list.h>
-#define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
-#define STICKYPROT2(msg, arg) if (BTEST1(OPT_PROT)) Print(msg, arg)
 
 // nur fuer debug-Ausgaben:
 int

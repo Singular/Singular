@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.15 1997-11-18 16:10:46 Singular Exp $ */
+/* $Id: syz1.cc,v 1.16 1997-12-03 16:59:08 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -154,7 +154,7 @@ static int syzcomp1dpc(poly p1, poly p2)
 {
   /*4 compare monomials by order then revlex*/
     int i = pVariables;
-    if ((p1->exp[i] == p2->exp[i]))
+    if ((pGetExp(p1,i) == pGetExp(p2,i)))
     {
       do
       {
@@ -163,16 +163,16 @@ static int syzcomp1dpc(poly p1, poly p2)
         {
           //(*orderingdepth)[pVariables-i]++;
            /*4 handle module case:*/
-           if (p1->exp[0]==p2->exp[0]) return 0;
+           if (pGetComp(p1)==pGetComp(p2)) return 0;
            else if 
-              (currcomponents[p1->exp[0]]>currcomponents[p2->exp[0]]) 
+              (currcomponents[pGetComp(p1)]>currcomponents[pGetComp(p2)]) 
                 return 1;
            else return -1;
         }
-      } while ((p1->exp[i] == p2->exp[i]));
+      } while ((pGetExp(p1,i) == pGetExp(p2,i)));
     }
     //(*orderingdepth)[pVariables-i]++;
-    if (p1->exp[i] < p2->exp[i]) return 1;
+    if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
     return -1;
 }
 
@@ -190,18 +190,18 @@ static int syzcomp2dpc(poly p1, poly p2)
   if (o1>0)
   {
     int i = pVariables;
-    while ((i>1) && (p1->exp[i]==p2->exp[i]))
+    while ((i>1) && (pGetExp(p1,i)==pGetExp(p2,i)))
       i--;
     //(*orderingdepth)[pVariables-i]++;
     if (i>1)
     {
-      if (p1->exp[i] < p2->exp[i]) return 1;
+      if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
       return -1;
     }
   }
-  o1=p1->exp[0];
-  o2=p2->exp[0];
-  if (o1==o2/*p1->exp[0]==p2->exp[0]*/) return 0;
+  o1=pGetComp(p1);
+  o2=pGetComp(p2);
+  if (o1==o2/*pGetComp(p1)==pGetComp(p2)*/) return 0;
   if (currcomponents[o1]>currcomponents[o2]) return 1;
   return -1;
 }
@@ -217,16 +217,16 @@ static int syzcompmonomdp(poly p1, poly p2)
   if (pGetOrder(p1) == pGetOrder(p2))
   {
     i = pVariables;
-    if ((p1->exp[i] == p2->exp[i]))
+    if ((pGetExp(p1,i) == pGetExp(p2,i)))
     {
       do
       {
         i--;
         if (i <= 1)
           return 0;
-      } while ((p1->exp[i] == p2->exp[i]));
+      } while ((pGetExp(p1,i) == pGetExp(p2,i)));
     }
-    if (p1->exp[i] < p2->exp[i]) return 1;
+    if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
     return -1;
   }
   else if (pGetOrder(p1) > pGetOrder(p2)) return 1;
@@ -265,7 +265,7 @@ static void syzSetm(poly p)
 {
   int i = 0,j;
   for (j=pVariables;j>0;j--)
-    i += p->exp[j];
+    i += pGetExp(p,j);
 
   if (i<=highdeg)
   {
@@ -296,7 +296,7 @@ static inline poly syMultT(poly p,poly m)
     {
       spMemcpy(q,p);
       for (j=pVariables;j>0;j--)
-        pGetExp(q,j) += pGetExp(m,j);
+        pAddExp(q,j, pGetExp(m,j));
       pSetCoeff0(q,nCopy(pGetCoeff(p)));
       syzSetm(q);
       pIter(p);
@@ -318,7 +318,7 @@ static inline poly syMultT(poly p,poly m)
       {
         spMemcpy(q,p);
         for (j=pVariables;j>0;j--)
-          pGetExp(q,j) += pGetExp(m,j);
+          pAddExp(q,j,  pGetExp(m,j));
         syzSetm(q);
         lastmon = q;
         i = pGetOrder(p);
@@ -353,7 +353,7 @@ static inline poly syMultTNeg(poly p,poly m)
     {
       spMemcpy(q,p);
       for (j=pVariables;j>0;j--)
-        pGetExp(q,j) += pGetExp(m,j);
+        pAddExp(q,j, pGetExp(m,j));
       pSetCoeff0(q,nCopy(pGetCoeff(p)));
       pGetCoeff(q) = nNeg(pGetCoeff(q));
       syzSetm(q);
@@ -376,7 +376,7 @@ static inline poly syMultTNeg(poly p,poly m)
       {
         spMemcpy(q,p);
         for (j=pVariables;j>0;j--)
-          pGetExp(q,j) += pGetExp(m,j);
+          pAddExp(q,j, pGetExp(m,j));
         syzSetm(q);
         lastmon = q;
         i = pGetOrder(p);
@@ -412,7 +412,7 @@ static poly syMultT1(poly p,poly m)
     {
       spMemcpy(q,p);
       for (j=pVariables;j>0;j--)
-        pGetExp(q,j) += pGetExp(m,j);
+        pAddExp(q,j, pGetExp(m,j));
       pSetCoeff0(q,nMult(pGetCoeff(p),pGetCoeff(m)));
       syzSetm(q);
       pIter(p);
@@ -434,7 +434,7 @@ static poly syMultT1(poly p,poly m)
       {
         spMemcpy(q,p);
         for (j=pVariables;j>0;j--)
-          pGetExp(q,j) += pGetExp(m,j);
+          pAddExp(q,j, pGetExp(m,j));
         syzSetm(q);
         lastmon = q;
         i = pGetOrder(p);
@@ -486,13 +486,13 @@ static inline poly syAdd(poly m1,poly m2)
         pIter(p);
         pIter(m2);
       }
-      else if (currcomponents[m1->exp[0]]>currcomponents[m2->exp[0]])
+      else if (currcomponents[pGetComp(m1)]>currcomponents[pGetComp(m2)])
       {
         pNext(p) = m1;
         pIter(p);
         pIter(m1);
       }
-      else if (currcomponents[m1->exp[0]]<currcomponents[m2->exp[0]])
+      else if (currcomponents[pGetComp(m1)]<currcomponents[pGetComp(m2)])
       {
         pNext(p) = m2;
         pIter(p);
@@ -550,14 +550,14 @@ static poly sySPAdd(poly m1,poly m2,poly m)
   pIter(m2);
   spMemcpy(tm2,m2);
   j = 1;
-  pGetExp(tm2,1)+=pGetExp(m,1);
+  pAddExp(tm2,1, pGetExp(m,1));
   int *ip=binomials+pGetExp(tm2,1);
   loop
   {
     i2 += (*ip);
     if (j==pVariables) break;
     j++;
-    pGetExp(tm2,j)+=pGetExp(m,j);
+    pAddExp(tm2,j,pGetExp(m,j));
     ip+=highdeg_1+pGetExp(tm2,j);
   }
   pGetOrder(tm2) = i2;
@@ -587,7 +587,7 @@ static poly sySPAdd(poly m1,poly m2,poly m)
         {
           spMemcpy(tm2,m2);
           j = 1;
-          pGetExp(tm2,1)+=pGetExp(m,1);
+          pAddExp(tm2,1, pGetExp(m,1));
           int *ip=binomials+pGetExp(tm2,1);
           i2=-INT_MAX;
           loop
@@ -595,7 +595,7 @@ static poly sySPAdd(poly m1,poly m2,poly m)
             i2 += (*ip);
             if (j==pVariables) break;
             j++;
-            pGetExp(tm2,j)+=pGetExp(m,j);
+            pAddExp(tm2,j, pGetExp(m,j));
             ip+=highdeg_1+pGetExp(tm2,j);
           }
           pGetOrder(tm2) = i2;
@@ -615,8 +615,8 @@ static poly sySPAdd(poly m1,poly m2,poly m)
     }
     else 
     {
-      j = currcomponents[m1->exp[0]]-currcomponents[m2->exp[0]];
-      if (j>0/*currcomponents[m1->exp[0]]>currcomponents[m2->exp[0]]*/)
+      j = currcomponents[pGetComp(m1)]-currcomponents[pGetComp(m2)];
+      if (j>0/*currcomponents[pGetComp(m1)]>currcomponents[pGetComp(m2)]*/)
       {
         p = pNext(p) = m1;
         pIter(m1);
@@ -627,7 +627,7 @@ static poly sySPAdd(poly m1,poly m2,poly m)
       }
       else 
       {
-        if (j<0/*currcomponents[m1->exp[0]]<currcomponents[m2->exp[0]]*/)
+        if (j<0/*currcomponents[pGetComp(m1)]<currcomponents[pGetComp(m2)]*/)
         {
           p = pNext(p) = tm2;
           j = pGetOrder(m2);
@@ -665,7 +665,7 @@ static poly sySPAdd(poly m1,poly m2,poly m)
           {
             spMemcpy(tm2,m2);
             j = 1;
-            pGetExp(tm2,1)+=pGetExp(m,1);
+            pAddExp(tm2,1, pGetExp(m,1));
             int *ip=binomials+pGetExp(tm2,1);
             i2=-INT_MAX;
             loop
@@ -673,7 +673,7 @@ static poly sySPAdd(poly m1,poly m2,poly m)
               i2 += (*ip);
               if (j==pVariables) break;
               j++;
-              pGetExp(tm2,j)+=pGetExp(m,j);
+              pAddExp(tm2,j, pGetExp(m,j));
               ip+=highdeg_1+pGetExp(tm2,j);
             }
             pGetOrder(tm2) = i2;
@@ -739,7 +739,8 @@ static poly sySPolyRed(poly m1,poly m2)
   poly res;
   if (pGetOrder(m1)>0)
   {
-    res = spSpolyRed(m2,m1,NULL);
+    // TBC: initialize spSpolyLoop where ordering is set!!!
+    res = spSpolyRed(m2,m1,NULL, NULL);
   }
   else
   {
@@ -748,59 +749,6 @@ static poly sySPolyRed(poly m1,poly m2)
   pDelete(&a);
   return res;
 }
-
-BOOLEAN syDivisibleBy(poly a, poly b)
-{
-  if (a->exp[0]==b->exp[0])
-  {
-    int i=pVariables-1;
-    short *e1=&(a->exp[1]);
-    short *e2=&(b->exp[1]);
-    if ((*e1) > (*e2)) return FALSE;
-    do
-    {
-      i--;
-      e1++;
-      e2++;
-      if ((*e1) > (*e2)) return FALSE;
-    } while (i>0);
-    return TRUE;
-  }
-  else 
-    return FALSE;
-}
-
-BOOLEAN syDivisibleBy1(poly a, poly b)
-{
-  int i=pVariables-1;
-  short *e1=&(a->exp[1]);
-  short *e2=&(b->exp[1]);
-  if ((*e1) > (*e2)) return FALSE;
-  do
-  {
-    i--;
-    e1++;
-    e2++;
-    if ((*e1) > (*e2)) return FALSE;
-  } while (i>0);
-  return TRUE;
-}
-/*
-*int syDivisibleBy2(poly a, poly b)
-*{
-*  int i=pVariables-1;
-*  short *e1=&(a->exp[1]);
-*  short *e2=&(b->exp[1]);
-*  int result=(*e2)-(*e1);
-*  do
-*  {
-*    i--;
-*    e1++;
-*    e2++;
-*  } while (i>0);
-*  return 0;
-*}
-*/
 
 static int syLength(poly p)
 {
@@ -830,7 +778,7 @@ poly syRedtail (poly p, syStrategy syzstr, int index)
       pos = j+syzstr->Howmuch[index-1][pGetComp(hn)];
       while (j < pos)
       {
-        if (syDivisibleBy1(redWith->m[j], hn))
+        if (pDivisibleBy2(redWith->m[j], hn))
         {
            //int syL=syLength(redWith->m[j]);
             //Print("r");
@@ -1052,7 +1000,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
           if (or->m[l]!=NULL)
           {
             isDivisible = isDivisible || 
-              syDivisibleBy1(or->m[l],tso.lcm);
+              pDivisibleBy2(or->m[l],tso.lcm);
           }
           l++;
         }
@@ -1084,7 +1032,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
         loop
         {
           if (j<0) break;
-          if (syDivisibleBy1(redset[j],q))
+          if (pDivisibleBy2(redset[j],q))
           {
             //int syL=syLength(redset[j]);
             //Print("r");
@@ -1246,7 +1194,7 @@ static void syRedGenerOfCurrDeg(syStrategy syzstr, int deg, int index)
       while ((j>=0) && (res->m[j]!=NULL) && 
              ((sPairs)[i].syz!=NULL))
       {
-        if (syDivisibleBy(res->m[j],(sPairs)[i].syz))
+        if (pDivisibleBy1(res->m[j],(sPairs)[i].syz))
         {
           //Print("r");
           (sPairs)[i].syz = 
@@ -1407,12 +1355,12 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
         j1 = bci[ii];
         if (nPm[j1]!=NULL)
         {
-          if (syDivisibleBy1(nPm[j1],p))
+          if (pDivisibleBy2(nPm[j1],p))
           {
             pDelete(&p);
             break;
           }
-          else if (syDivisibleBy1(p,nPm[j1]))
+          else if (pDivisibleBy2(p,nPm[j1]))
           {
             pDelete(&(nPm[j1]));
             break;
@@ -2177,7 +2125,7 @@ static resolvente syReorder(resolvente res,int length,
               pNext(tq) = NULL;
             }
             for (l=pVariables;l>0;l--)
-              pGetExp(tq,l) -= pGetExp(ri1[pGetComp(tq)-1],l);
+              pSubExp(tq,l, pGetExp(ri1[pGetComp(tq)-1],l));
             pSetm(tq);
             q = pAdd(q,tq);
           }
@@ -2308,8 +2256,8 @@ static poly syMinimizeP(poly toMin,syStrategy syzstr,int pNum,int index,
           {
             tq = pNew();
             for(j=pVariables; j>0; j--)
-              tq->exp[j] = p->exp[j]-pisN->exp[j];
-            tq->exp[0] = 0;
+              pSetExp(tq,j, pGetExp(p,j)-pGetExp(pisN,j));
+            pSetComp(tq, 0);
             pSetCoeff0(tq,nDiv(pGetCoeff(p),pGetCoeff(pisN)));
             pGetCoeff(tq) = nNeg(pGetCoeff(tq));
             q = syAdd(q,syStripOut(syMultT1(syzstr->res[index+1]->m[sPairs[i].syzind],tq),toStrip));

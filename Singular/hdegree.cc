@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.8 1997-10-20 10:51:59 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.9 1997-12-03 16:58:41 obachman Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -986,7 +986,7 @@ static void hHedge(poly hEdge)
   if (pComp0(pWork, hEdge) == pOrdSgn)
   {
     for (int i = hNvar; i>0; i--)
-      hEdge->exp[i] = pWork->exp[i];
+      pSetExp(hEdge,i, pGetExp(pWork,i));
     pGetOrder(hEdge) = pGetOrder(pWork);
   }
 }
@@ -1099,7 +1099,11 @@ static void scElKbase()
 {
   poly q = pNew();
   pSetCoeff0(q,nInit(1));
+#if SIZEOF_EXPONENT != 2
+  Werror("Internal Error in scElKbase -- update the code !!\n");
+#else  
   pSetExpV(q,act);
+#endif  
   pSetm(q);
   pNext(q) = NULL;
   last = pNext(last) = q;

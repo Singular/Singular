@@ -1,3 +1,22 @@
+Wed Dec  3 16:14:51 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* Many changes to prepare for implementation of fast comparison
+		  schemes: Here are only a few:
+	- added file polys-impl.h which implements low-level poly stuff 
+	- removed file polys2.cc, added polys-impl.cc 
+	- added Singularp target to Make
+	- prepared configure for setting of exponent type
+	- got rid of as many direct p->exp[..] accesses as possible
+	- added file spSpolyLoop.cc spSpolyLoop.h polys-comp.h
+	* polys-impl.h: if you defined COMP_FAST, then fast polynomial
+		  comparsions are eanbled (still needs a lot of debugging)
+	
+
+Fri Oct 31 05:45:25 1997  Olaf Bachman  <bachman@bombelli.dm.unipi.it>
+
+	* polys1.cc et al: got rid of p[Get/Set]ExpV routines, provided
+		  pCopy2 instead
+
 Wed Oct  8 12:22:47 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* increased version number to 1.1.3

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.9 1997-08-08 12:59:27 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.10 1997-12-03 16:58:55 obachman Exp $ */
 
 /***************************************************************
  *
@@ -390,8 +390,8 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
   if (gNvars > 1)
   {
     mp_failr(IMP_GetSint32Vector(link, &gTa, gNvars));
-    pp->exp[0] = 0;
-    for (i=0, exp=&(pp->exp[1]); i<gNvars; i++)
+    pGetComp(pp) = 0;
+    for (i=0, exp = &(pp->exp[1]); i<gNvars; i++)
       exp[i] = (short) gTa[i];
     pSetm(pp);
 
@@ -401,7 +401,7 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32Vector(link, &gTa, gNvars));
-      pp->exp[0] = 0;
+      pGetComp(pp) = 0;
       for (i=0, exp=&(pp->exp[1]); i<gNvars; i++)
         exp[i] = (short) gTa[i];
       pSetm(pp);
@@ -410,8 +410,8 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
   else
   {
     mp_failr(IMP_GetSint32(link, &i));
-    pp->exp[0] = 0;
-    pp->exp[1] = (short) i;
+    pGetComp(pp) = 0;
+    pSetExp(pp,1, (short) i);
     pSetm(pp);
     
     for (j=1; j<nmon; j++)
@@ -420,8 +420,8 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32(link, &i));
-      pp->exp[0] = 0;
-      pp->exp[1] = (short) i;
+      pGetComp(pp) = 0;
+      pSetExp(pp,1, (short) i);
       pSetm(pp);
     }
   }
@@ -456,8 +456,8 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
   if (gNvars > 1)
   {
     mp_failr(IMP_GetSint32Vector(link, &gTa, n1));
-    pp->exp[0] = 0;
-    for (i=0, exp=&(pp->exp[0]); i<n1; i++)
+    pGetComp(pp) = 0;
+    for (i=0, exp=&(pGetComp(pp)); i<n1; i++)
       exp[i] = (short) gTa[i];
     pSetm(pp);
 
@@ -467,8 +467,8 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32Vector(link, &gTa, n1));
-      pp->exp[0] = 0;
-      for (i=0, exp=&(pp->exp[0]); i<n1; i++)
+      pGetComp(pp) = 0;
+      for (i=0, exp=&(pGetComp(pp)); i<n1; i++)
         exp[i] = (short) gTa[i];
       pSetm(pp);
     }
@@ -476,9 +476,9 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
   else
   {
     mp_failr(IMP_GetSint32(link, &i));
-    pp->exp[0] = (short) i;
+    pGetComp(pp) = (short) i;
     mp_failr(IMP_GetSint32(link, &i));
-    pp->exp[1] = (short) i;
+    pSetExp(pp,1, (short) i);
     pSetm(pp);
     
     for (j=1; j<nmon; j++)
@@ -487,9 +487,9 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32(link, &i));
-      pp->exp[0] = (short) i;
+      pGetComp(pp) = (short) i;
       mp_failr(IMP_GetSint32(link, &i));
-      pp->exp[1] = (short) i;
+      pSetExp(pp,1, (short) i);
       pSetm(pp);
     }
   }

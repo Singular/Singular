@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.9 1997-10-24 08:57:18 Singular Exp $ */
+/* $Id: kutil.cc,v 1.10 1997-12-03 16:58:49 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -25,6 +25,10 @@
 #include "kstd1.h"
 #include "kutil.h"
 //#include "longrat.h"
+
+#ifdef COMP_FAST
+#include "spSpolyLoop.h"
+#endif
 
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
@@ -551,8 +555,8 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
 //  {
 //    for(j=1;j<=pdN;j++)
 //    {
-//      if((Lp.lcm->exp[pdX(j)]>0)
-//      &&(Lp.lcm->exp[pdIX(j)]>0))
+//      if((Lp.pGetExp(lcm,pdX(j))>0)
+//      &&(Lp.pGetExp(lcm,pdIX(j))>0))
 //      {
 //        pFree1(Lp.lcm);
 //        Lp.lcm=NULL;
@@ -1639,65 +1643,6 @@ int posInT15 (TSet set,int length,LObject p)
 /*2
 * looks up the position of p in set
 * set[0] is the smallest with respect to the ordering-procedure
-* maximaldegree, pComp
-*/
-int posInT15_c (TSet set,int length,LObject p)
-{
-  if (length==-1) return 0;
-
-  int i;
-  int an = 0;
-  int en= length;
-  int cc = (-1+2*currRing->order[0]==ringorder_c);
-  /* cc==1 for (c,..), cc==-1 for (C,..) */
-  int c = pGetComp(p.p)*cc;
-  int o = pFDeg(p.p) + p.ecart;
-
-  if (pGetComp(set[length].p)*cc < c)
-    return length+1;
-  if (pGetComp(set[length].p)*cc == c)
-  {
-    if ((pFDeg(set[length].p)+set[length].ecart < o)
-    || ((pFDeg(set[length].p)+set[length].ecart == o)
-       && (pComp0(set[length].p,p.p) != pOrdSgn)))
-      return length+1;
-  }
-
-  loop
-  {
-    if (an >= en-1)
-    {
-      if (pGetComp(set[an].p)*cc < c)
-        return en;
-      if (pGetComp(set[an].p)*cc == c)
-      {
-        if ((pFDeg(set[an].p)+set[an].ecart > o)
-        || ((pFDeg(set[an].p)+set[an].ecart  == o)
-           && (pComp0(set[an].p,p.p) == pOrdSgn)))
-          return an;
-      }
-      return en;
-    }
-    i=(an+en) / 2;
-    if (pGetComp(set[i].p)*cc > c)
-      en=i;
-    else if (pGetComp(set[i].p)*cc == c)
-    {
-      if ((pFDeg(set[i].p) +set[i].ecart > o)
-      || ((pFDeg(set[i].p) +set[i].ecart == o)
-         && (pComp0(set[i].p,p.p) == pOrdSgn)))
-        en=i;
-      else
-        an=i;
-    }
-    else
-      an=i;
-  }
-}
-
-/*2
-* looks up the position of p in set
-* set[0] is the smallest with respect to the ordering-procedure
 * pFDeg+ecart, ecart, pComp
 */
 int posInT17 (TSet set,int length,LObject p)
@@ -2123,64 +2068,6 @@ int posInL15 (LSet set, int length, LObject p,kStrategy strat)
 * looks up the position of polynomial p in set
 * e is the ecart of p
 * set[length] is the smallest element in set with respect
-* to the ordering-procedure maximaldegree,pComp
-*/
-int posInL15_c (LSet set, int length, LObject p,kStrategy strat)
-{
-  int i;
-  int an = 0;
-  int en= length;
-  int cc = (-1+2*currRing->order[0]==ringorder_c);
-  /* cc==1 for (c,..), cc==-1 for (C,..) */
-  int c = pGetComp(p.p)*cc;
-  int o = pFDeg(p.p) + p.ecart;
-
-  if (length<0) return 0;
-  if (pGetComp(set[length].p)*cc < c)
-    return length+1;
-  if (pGetComp(set[length].p)*cc == c)
-  {
-    if ((pFDeg(set[length].p) + set[length].ecart > o)
-    || ((pFDeg(set[length].p) + set[length].ecart == o)
-       && (pComp0(set[length].p,p.p) != -pOrdSgn)))
-      return length+1;
-  }
-  loop
-  {
-    if (an >= en-1)
-    {
-      if (pGetComp(set[an].p)*cc < c)
-        return en;
-      if (pGetComp(set[an].p)*cc == c)
-      {
-        if ((pFDeg(set[an].p) + set[an].ecart > o)
-        || ((pFDeg(set[an].p) + set[an].ecart == o)
-           && (pComp0(set[an].p,p.p) != -pOrdSgn)))
-          return en;
-      }
-      return an;
-    }
-    i=(an+en) / 2;
-    if (pGetComp(set[i].p)*cc > c)
-      en=i;
-    else if (pGetComp(set[i].p)*cc == c)
-    {
-      if ((pFDeg(set[i].p) + set[i].ecart > o)
-      || ((pFDeg(set[i].p) +set[i].ecart == o)
-         && (pComp0(set[i].p,p.p) != -pOrdSgn)))
-        an=i;
-      else
-        en=i;
-    }
-    else
-      an=i;
-  }
-}
-
-/*2
-* looks up the position of polynomial p in set
-* e is the ecart of p
-* set[length] is the smallest element in set with respect
 * to the ordering-procedure totaldegree
 */
 int posInL17 (LSet set, int length, LObject p,kStrategy strat)
@@ -2316,24 +2203,6 @@ int posInL17_c (LSet set, int length, LObject p,kStrategy strat)
 * reduces h using the set S
 * procedure used in redtail
 */
-/*
-*void redtailS (poly* h,int maxIndex,kStrategy strat)
-*{
-*  int j = 0;
-*
-*  while (j <= maxIndex)
-*  {
-*    if (pDivisibleBy((strat->S)[j],*h))
-*    {
-*      *h = spSpolyRed(strat->S[j],*h,strat->kNoether);
-*      if (*h == NULL) return;
-*      j = 0;
-*    }
-*    else j++;
-*  }
-*}
-*/
-
 /*2
 *compute the normalform of the tail p->next of p
 *with respect to S
@@ -2361,7 +2230,7 @@ poly redtail (poly p, int pos, kStrategy strat)
         || ((Kstd1_deg>0)&&(pFDeg(hn)<=Kstd1_deg)))
       )
       {
-        spSpolyTail(strat->S[j], p, h, strat->kNoether);
+        spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
         hn = pNext(h);
         if (hn == NULL)
         {
@@ -2403,7 +2272,7 @@ poly redtailBba (poly p, int pos, kStrategy strat)
     {
       if (pDivisibleBy(strat->S[j], hn))
       {
-        spSpolyTail(strat->S[j], p, h, strat->kNoether);
+        spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
         hn = pNext(h);
         if (hn == NULL)
         {
@@ -2444,7 +2313,7 @@ poly redtailSyz (poly p, int pos, kStrategy strat)
     {
       if (pDivisibleBy(strat->S[j], hn) && (!pEqual(strat->S[j],h)))
       {
-        spSpolyTail(strat->S[j], p, h, strat->kNoether);
+        spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
         hn = pNext(h);
         if (hn == NULL)
         {
@@ -2624,12 +2493,14 @@ void initS (ideal F, ideal Q,kStrategy strat)
 #ifdef KDEBUG
         pTest(h.p);
 #endif
+#ifdef KDEBUG
         if (TEST_OPT_DEBUG && pSDRING)
         {
           PrintS("new (aug) s:");
           wrp(h.p);
           PrintLn();
         }
+#endif
 #endif
         if (TEST_OPT_INTSTRATEGY)
         {
@@ -2758,12 +2629,14 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 #ifdef KDEBUG
         pTest(h.p);
 #endif
+#ifdef KDEBUG
         if (TEST_OPT_DEBUG && pSDRING)
         {
           PrintS("new (aug) s:");
           wrp(h.p);
           PrintLn();
         }
+#endif
 #endif
         if (TEST_OPT_INTSTRATEGY)
         {
@@ -2971,7 +2844,7 @@ static poly redBba1 (poly h,int maxIndex,kStrategy strat)
   while (j <= maxIndex)
   {
     if (pDivisibleBy(strat->S[j],h))
-       return spSpolyRedNew(strat->S[j],h,strat->kNoether);
+       return spSpolyRedNew(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
     else j++;
   }
   return h;
@@ -3044,7 +2917,7 @@ static poly redQ (poly h, int j, kStrategy strat)
   {
     if (pDivisibleBy(strat->S[j],h))
     {
-      h = spSpolyRed(strat->S[j],h,strat->kNoether);
+      h = spSpolyRed(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
       if (h==NULL) return NULL;
       j = start;
     }
@@ -3067,7 +2940,7 @@ static poly redBba (poly h,int maxIndex,kStrategy strat)
     {
       pTest(strat->S[j]);
       pTest(h);
-      h = spSpolyRed(strat->S[j],h,strat->kNoether);
+      h = spSpolyRed(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
       if (h==NULL) return NULL;
       j = 0;
     }
@@ -3098,7 +2971,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
       if (pDivisibleBy(strat->S[j],h)
       && ((e >= strat->ecartS[j]) || strat->kHEdgeFound))
       {
-        h1 = spSpolyRedNew(strat->S[j],h,strat->kNoether);
+        h1 = spSpolyRedNew(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
         pDelete(&h);
         if (h1 == NULL) return NULL;
         h = h1;
@@ -3152,11 +3025,13 @@ void updateS(BOOLEAN toT,kStrategy strat)
         if (((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
         && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
         {
+#ifdef KDEBUG
           if (TEST_OPT_DEBUG)
           {
             PrintS("reduce:");
             wrp(strat->S[i]);
           }
+#endif
           pDelete(&redSi);
           redSi = pHead(strat->S[i]);
           strat->S[i] = redBba(strat->S[i],i-1,strat);
@@ -3172,7 +3047,9 @@ void updateS(BOOLEAN toT,kStrategy strat)
           if (strat->S[i]==NULL)
           {
             pDelete(&redSi);
+#ifdef KDEBUG
             if (TEST_OPT_DEBUG) PrintS(" to 0");
+#endif
             deleteInS(i,strat);
             i--;
           }
@@ -3202,12 +3079,14 @@ void updateS(BOOLEAN toT,kStrategy strat)
               pTest(h.p);
               if (h.p!=NULL)
               {
+#ifdef KDEBUG
                 if (TEST_OPT_DEBUG)
                 {
                   Print("new (aug %d) s:",augl);
                   wrp(h.p);
                   PrintLn();
                 }
+#endif
                 if (TEST_OPT_INTSTRATEGY)
                 {
                   //pContent(h.p);
@@ -3237,13 +3116,17 @@ void updateS(BOOLEAN toT,kStrategy strat)
             {
               pNorm(strat->S[i]);
             }
+#ifdef KDEBUG
             if (TEST_OPT_DEBUG)
             {
               PrintS(" to ");
               wrp(strat->S[i]);
             }
+#endif
           }
+#ifdef KDEBUG
           if (TEST_OPT_DEBUG) PrintLn();
+#endif
         }
         i++;
       }
@@ -3313,12 +3196,14 @@ void updateS(BOOLEAN toT,kStrategy strat)
             for (augl++;augl != 0;)
             {
               h.p=aug[--augl];
+#ifdef KDEBUG
               if (TEST_OPT_DEBUG)
               {
                 PrintS("new (aug) s:");
                 wrp(h.p);
                 PrintLn();
               }
+#endif
               if (!TEST_OPT_INTSTRATEGY)
                 pNorm(h.p);
               else
@@ -3569,11 +3454,13 @@ void initBuchMoraCrit(kStrategy strat)
   /* alway use tailreduction, except:
   * - in local rings, - in lex order case, -in ring over extensions */
   strat->noTailReduction = !TEST_OPT_REDTAIL;
+#ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
     if (strat->homog) PrintS("ideal/module is homogeneous\n");
     else              PrintS("ideal/module is not homogeneous\n");
   }
+#endif
 }
 
 void initBuchMoraPos (kStrategy strat)
@@ -3582,17 +3469,8 @@ void initBuchMoraPos (kStrategy strat)
   {
     if (strat->honey)
     {
-      if ((currRing->order[0]==ringorder_c)
-      ||(currRing->order[0]==ringorder_C))
-      {
-        strat->posInL = posInL15_c;
-        strat->posInT = posInT15_c;
-      }
-      else
-      {
-        strat->posInL = posInL15;
-        strat->posInT = posInT15;
-      }
+      strat->posInL = posInL15;
+      strat->posInT = posInT15;
     }
     else if (pLexOrder && !TEST_OPT_INTSTRATEGY)
     {
@@ -3686,8 +3564,8 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->P.length=0;
   if (pOrdSgn==-1)
   {
-    if (strat->kHEdge!=NULL) pGetComp(strat->kHEdge)=strat->ak;
-    if (strat->kNoether!=NULL) pGetComp(strat->kNoether)=strat->ak;
+    if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
+    if (strat->kNoether!=NULL) pSetComp(strat->kNoether, strat->ak);
   }
   if(TEST_OPT_SB_1)
   {
@@ -3714,6 +3592,9 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->kIdeal = NULL;
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
+#ifdef COMP_FAST
+  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+#endif
   if(!TEST_OPT_SB_1)
   {
     updateS(TRUE,strat);
@@ -3855,16 +3736,11 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
   /* compare old and new noether*/
   newNoether = pHead0(strat->kHEdge);
   j = pFDeg(newNoether);
+  for (i=1; i<=pVariables; i++)
   {
-    short * e = (short *)Alloc((pVariables+1)*sizeof(short));
-    pGetExpV(newNoether,e);
-    for (i=1; i<=pVariables; i++)
-    {
-      if (e[i] > 0) (e[i])--;
-    }
-    pSetExpV(newNoether,e);
-    Free((ADDRESS)e,(pVariables+1)*sizeof(short));
+    if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);
   }
+  pSetm(newNoether);
   if (j < strat->HCord) /*- statistics -*/
   {
     if (TEST_OPT_PROT)
@@ -3873,12 +3749,14 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
       mflush();
     }
     strat->HCord=j;
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       Print("H(%d):",pFDeg(strat->kHEdge));
       wrp(strat->kHEdge);
       PrintLn();
     }
+#endif
   }
   if (pComp(strat->kNoether,newNoether)!=1)
   {

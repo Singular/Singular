@@ -6,10 +6,11 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.4 1997-04-09 12:20:07 Singular Exp $ */
+/* $Id: ring.h,v 1.5 1997-12-03 16:59:01 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
+#include "polys-impl.h"
 
 void   rSetHdl(idhdl h, BOOLEAN complete);
 idhdl  rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,

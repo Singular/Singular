@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys.cc,v 1.3 1997-04-02 15:07:53 Singular Exp $ */
+/* $Id: spolys.cc,v 1.4 1997-12-03 16:59:03 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction for char p
@@ -20,6 +20,10 @@
 #include "spolys0.h"
 #include "spolys.h"
 
+#ifdef COMP_FAST
+#include "spSpolyLoop.h"
+#endif
+
 /*0 implementation*/
 
 #ifdef SDRING
@@ -27,9 +31,12 @@ poly spDSpolyRed(poly p1,poly p2,poly spNoether);
 poly spDSpolyCreate(poly p1,poly p2,poly spNoether);
 #endif
 
-poly (*spSpolyRed)(poly p1, poly p2,poly spNoether);
-void (*spSpolyTail)(poly p1, poly q, poly q2, poly spNoether);
-poly (*spSpolyRedNew)(poly p1, poly p2,poly spNoether);
+poly (*spSpolyRed)(poly p1, poly p2,poly spNoether,
+                   spSpolyLoopProc spSpolyLoop);
+void (*spSpolyTail)(poly p1, poly q, poly q2, poly spNoether,
+                    spSpolyLoopProc spSpolyLoop);
+poly (*spSpolyRedNew)(poly p1, poly p2,poly spNoether,
+                      spSpolyLoopProc spSpolyLoop);
 poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether);
 poly (*spSpolyShortBba)(poly p1, poly p2);
 
@@ -211,7 +218,7 @@ static void spSpolyLoop1(poly a1, poly a2, poly m, poly spNoether)
 * pNext(n) = result = p*m
 * do not destroy p
 */
-static void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
+void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
 {
   poly a, b;
 
@@ -222,7 +229,7 @@ static void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
     {
       a = pNext(a) = pNew();
       spMemcpy(a,p);
-      spMonAdd(a,m);
+     pMonAddFast(a,m);
       pSetCoeff0(a,npMultM(pGetCoeff(p),exp));
       pIter(p);
     }
@@ -236,7 +243,7 @@ static void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
     {
       b = pNext(a) = pNew();
       spMemcpy(b,p);
-      spMonAdd(b,m);
+     pMonAddFast(b,m);
       if (pComp0(b, spNoether) == -1)
       {
         pFree1(b);
@@ -257,6 +264,7 @@ static void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
 * pNext(m) = result = a2-a1*m
 * do not destroy a1, but a2
 */
+#ifndef COMP_FAST
 static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
 {
   poly a, b, s;
@@ -286,7 +294,7 @@ static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
       {
         b = pNew();
         spMemcpy(b,a1);
-        spMonAdd(b,m);
+       pMonAddFast(b,m);
       }
       else
       {
@@ -334,16 +342,17 @@ static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
         return;
       }
       spMemcpy(b,a1);
-      spMonAdd(b,m);
+     pMonAddFast(b,m);
     }
   }
 }
+#endif
 
 /*2
 * reduction of p2 with p1
 * do not destroy p1, but p2
 */
-static poly spPSpolyRed(poly p1, poly p2,poly spNoether)
+static poly spPSpolyRed(poly p1, poly p2,poly spNoether, spSpolyLoopProc SpolyLoop)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
   if(a1==NULL)
@@ -359,7 +368,16 @@ static poly spPSpolyRed(poly p1, poly p2,poly spNoether)
   }
   spMonSub(p2,p1);
   if (1!=(int)pGetCoeff(p2))
+#ifdef COMP_FAST  
+  {
+    if (SpolyLoop != NULL)
+      SpolyLoop(a1, a2, p2, spNoether);
+    else
+      spPSpolyLoop_General(a1, a2, p2, spNoether);
+  }
+#else
     spSpolyLoop(a1, a2, p2,spNoether);
+#endif  
   else
     spSpolyLoop1(a1, a2, p2,spNoether);
   a2 = pNext(p2);
@@ -374,16 +392,17 @@ static poly spPSpolyRed(poly p1, poly p2,poly spNoether)
 * lead(p1) divides lead(pNext(q2)) and pNext(q2) is reduced
 * do not destroy p1, but tail(q)
 */
-static void spPSpolyTail(poly p1, poly q, poly q2, poly spNoether)
+static void spPSpolyTail(poly p1, poly q, poly q2, poly spNoether,
+                         spSpolyLoopProc spSpolyLoop)
 {
   poly h = pNext(q2);
   if (p1 != q)
   {
-    pNext(q2) = spSpolyRed(p1, h, spNoether);
+    pNext(q2) = spSpolyRed(p1, h, spNoether, spSpolyLoop);
   }
   else
   {
-    pNext(q2) = spSpolyRedNew(p1, h, spNoether);
+    pNext(q2) = spSpolyRedNew(p1, h, spNoether, spSpolyLoop);
     pDelete(&h);
   }
 }
@@ -392,7 +411,8 @@ static void spPSpolyTail(poly p1, poly q, poly q2, poly spNoether)
 * reduction of p2 with p1
 * do not destroy p1 and p2
 */
-static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether)
+static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether,
+                           spSpolyLoopProc SpolyLoop)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
   poly m;
@@ -410,7 +430,16 @@ static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether)
   spMemcpy(m,p2);
   spMonSub(m,p1);
   if (1!=(int)pGetCoeff(m))
+#ifdef COMP_FAST
+  {
+    if (SpolyLoop != NULL)
+      SpolyLoop(a1, a2, m, spNoether);
+    else
+      spPSpolyLoop_General(a1, a2, m, spNoether);
+  }
+#else  
     spSpolyLoop(a1, a2, m,spNoether);
+#endif    
   else
     spSpolyLoop1(a1, a2, m,spNoether);
   a2 = pNext(m);
@@ -429,7 +458,7 @@ static poly spPSpolyCreate(poly p1, poly p2,poly spNoether)
   poly a1 = pNext(p1), a2 = pNext(p2);
   poly m, b;
   int co=0;
-  short c;
+  Exponent_t c;
   if (pGetComp(p1)!=pGetComp(p2))
   {
     if (pGetComp(p1)==0)
@@ -447,7 +476,7 @@ static poly spPSpolyCreate(poly p1, poly p2,poly spNoether)
   m = pNew();
   for (int i = pVariables; i; i--)
   {
-    c = pGetExp(p1,i) - pGetExp(p2,i);
+    c = pGetExpDiff(p1, p2,i);
     if (c > 0)
     {
       pSetExp(b,i,c);
@@ -524,7 +553,12 @@ static poly spPSpolyShortBba(poly p1, poly p2)
     else
     loop
     {
-      c = pComp0(b,a2);
+// here is one of the few places where monom comparisons can be called with
+// negative exponents -- the new monom comparison routines suppose
+// that the exponents are positive. Therefore, we need to use the
+// original routines. Will not result in a big performance loss, since
+// the monom comparison is called very seldoom from here.
+      c = t_pComp0(b, a2);
       if (c == 1)
       {
         spShort1(b,a1,m);
@@ -629,7 +663,7 @@ static poly spPSpolyShortBba(poly p1, poly p2)
       else
       {
         spMemcpy(b,a2);
-        spMonAdd0(b,lcm);
+        MyspMonAdd0(b,lcm);
         spMonSub(b,p2);
         break;
       }
@@ -639,7 +673,7 @@ static poly spPSpolyShortBba(poly p1, poly p2)
       if(a2==NULL)
       {
         spMemcpy(b,a1);
-        spMonAdd0(b,lcm);
+        MyspMonAdd0(b,lcm);
         spMonSub(b,p1);
         break;
       }
@@ -658,14 +692,14 @@ static poly spPSpolyShortBba(poly p1, poly p2)
       if(c==1)
       {
         spMemcpy(b,a1);
-        spMonAdd0(b,lcm);
+        MyspMonAdd0(b,lcm);
         spMonSub(b,p1);
         break;
       }
       else if(c==-1)
       {
         spMemcpy(b,a2);
-        spMonAdd0(b,lcm);
+        MyspMonAdd0(b,lcm);
         spMonSub(b,p2);
         break;
       }
@@ -674,7 +708,7 @@ static poly spPSpolyShortBba(poly p1, poly p2)
         if (!npEqualM(pGetCoeff(a2),pGetCoeff(a1)))
         {
           spMemcpy(b,a1);
-          spMonAdd0(b,lcm);
+          MyspMonAdd0(b,lcm);
           spMonSub(b,p1);
           break;
         }

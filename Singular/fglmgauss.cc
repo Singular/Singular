@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmgauss.cc,v 1.3 1997-10-18 11:02:53 Singular Exp $
+// $Id: fglmgauss.cc,v 1.4 1997-12-03 16:58:36 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -10,10 +10,12 @@
 */
 
 #include "mod2.h"
-#ifdef HAVE_FGLM
+
+#ifdef  HAVE_FACTORY
 #include "structs.h"
 #include "numbers.h"
 #include "mmemory.h"
+
 #include "fglmvec.h"
 #include "fglmgauss.h"
 
@@ -168,7 +170,6 @@ gaussReducer::getDependence()
     p= fglmVector();
     return ( result );
 }
-#endif
 // ================================================================================
 
 // ----------------------------------------------------------------------------
@@ -177,3 +178,4 @@ gaussReducer::getDependence()
 // page-delimiter: "^\\(\\|//!\\)" ***
 // fold-internal-margins: nil ***
 // End: ***
+#endif // HAVE_FACTORY

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.9 1997-11-05 14:44:06 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.10 1997-12-03 16:58:47 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -29,6 +29,10 @@
 #include "ideals.h"
 #include "timer.h"
 #include "kstdfac.h"
+#ifdef COMP_FAST
+#include "spSpolyLoop.h"
+#endif
+
 
 #ifdef HAVE_FACTORY
 /*3
@@ -204,6 +208,9 @@ kStrategy kStratCopy(kStrategy o)
   s->noTailReduction=o->noTailReduction;
   s->fromT=o->fromT;
   s->noetherSet=o->noetherSet;
+#ifdef COMP_FAST
+  s->spSpolyLoop = o->spSpolyLoop;
+#endif  
   return s;
 }
 
@@ -701,6 +708,9 @@ lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   }
   strat->homog=h;
   spSet(currRing);
+#ifdef COMP_FAST
+  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+#endif  
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
   initBba(F,strat);

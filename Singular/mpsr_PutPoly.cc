@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.8 1997-06-30 17:04:48 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.9 1997-12-03 16:58:56 obachman Exp $ */
 
 /***************************************************************
  *
@@ -279,7 +279,7 @@ mpsr_Status_t mpsr_PutPolyData(MP_Link_pt link, poly p, ring cring)
     while (p != NULL)
     {
       failr(PutCoeff(link, pGetCoeff(p)));
-      IMP_PutSint32(link, (MP_Sint32_t) p->exp[1]);
+      IMP_PutSint32(link, (MP_Sint32_t) pGetExp(p,1));
       pIter(p);
     }
   return mpsr_Success;
@@ -309,8 +309,8 @@ mpsr_Status_t mpsr_PutPolyVectorData(MP_Link_pt link, poly p, ring cring)
     while (p != NULL)
     {
       failr(PutCoeff(link, pGetCoeff(p)));
-      IMP_PutSint32(link, (MP_Sint32_t) p->exp[0]);
-      IMP_PutSint32(link, (MP_Sint32_t) p->exp[1]);
+      IMP_PutSint32(link, (MP_Sint32_t) pGetComp(p));
+      IMP_PutSint32(link, (MP_Sint32_t) pGetExp(p,1));
       pIter(p);
     }
   return mpsr_Success;

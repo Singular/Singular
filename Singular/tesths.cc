@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.27 1997-07-16 10:58:58 Singular Exp $ */
+/* $Id: tesths.cc,v 1.28 1997-12-03 16:59:09 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -88,6 +88,41 @@ int main(          /* main entry to Singular */
         }
       }
     }
+    else if (strcmp(argv[1], "-d") == 0)
+    {
+      
+      if (argc > 2)
+      {
+        char* ptr = NULL;
+        // OLAF: try to avoid using long:
+#ifdef HAVE_STRTOL
+        long res = strtol(argv[2], &ptr, 10);
+        if (errno != ERANGE && ptr != argv[2] && res > 0)
+#else
+          long res = 0;
+        sscanf(argv[2],"%d", &res);
+        if (res > 0)
+#endif
+        {
+          argc--;
+          argv++;
+          i=0;
+          SetTimerResolution(res);
+        }
+        else
+          fprintf(stderr,"Can not convert %s to an integer > 0\n", argv[2]);
+      }
+      else
+      {
+        long res=0;
+        while ((argv[1][i+1]>='0') && (argv[1][i+1]<='9'))
+        {
+          i++;
+          res = res*10+(int)(argv[1][i] - '0');
+          SetTimerResolution(res);
+        }
+      }
+    }
     else
     {
 
@@ -105,40 +140,6 @@ int main(          /* main entry to Singular */
               printf("with\n");
               printf(versionString());
               printf("\n\n");
-              break;
-            }
-            case 'd':
-            {
-              if (argc > 2)
-              {
-                char* ptr = NULL;
-                // OLAF: try to avoid using long:
-#ifdef HAVE_STRTOL
-                long res = strtol(argv[2], &ptr, 10);
-                if (errno != ERANGE && ptr != argv[2] && res > 0)
-#else
-                long res = 0;
-                sscanf(argv[2],"%d", &res);
-                if (res > 0)
-#endif
-                {
-                  argc--;
-                  argv++;
-                  i=0;
-                  SetTimerResolution(res);
-                }
-                else
-                  fprintf(stderr,"Can not convert %s to an integer > 0\n", argv[2]);
-              }
-              else
-              {
-                long res=0;
-                while ((argv[1][i+1]>='0') && (argv[1][i+1]<='9'))
-                {
-                  i++;
-                  res = res*10+(int)(argv[1][i] - '0');
-                }
-              }
               break;
             }
             case 'e': if ((argv[1][i+1]>'0') && (argv[1][i+1]<='9'))

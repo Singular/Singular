@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.5 1997-08-14 13:10:46 Singular Exp $ */
+/* $Id: spolys0.cc,v 1.6 1997-12-03 16:59:04 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -410,7 +410,7 @@ static void spGSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
 * reduction of p2 with p1
 * do not destroy p1, but p2
 */
-poly spGSpolyRed(poly p1, poly p2,poly spNoether)
+poly spGSpolyRed(poly p1, poly p2,poly spNoether, spSpolyLoopProc spSpolyLoop)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
   number an = pGetCoeff(p1), bn = pGetCoeff(p2);
@@ -459,7 +459,8 @@ poly spGSpolyRed(poly p1, poly p2,poly spNoether)
 * lead(p1) divides lead(pNext(q2)) and pNext(q2) is reduced
 * do not destroy p1, but tail(q)
 */
-void spGSpolyTail(poly p1, poly q, poly q2, poly spNoether)
+void spGSpolyTail(poly p1, poly q, poly q2, poly spNoether,
+                  spSpolyLoopProc spSpolyLoop)
 {
   number t;
   poly m, h;
@@ -536,7 +537,8 @@ void spGSpolyTail(poly p1, poly q, poly q2, poly spNoether)
 * reduction of p2 with p1
 * do not destroy p1 and p2
 */
-poly spGSpolyRedNew(poly p1, poly p2,poly spNoether)
+poly spGSpolyRedNew(poly p1, poly p2,poly spNoether,
+                    spSpolyLoopProc spSpolyLoop)
 {
   poly m;
   poly a1 = pNext(p1), a2 = pNext(p2);
@@ -598,7 +600,7 @@ poly spGSpolyRedNew(poly p1, poly p2,poly spNoether)
 */
 poly spGSpolyCreate(poly p1, poly p2,poly spNoether)
 {
-  short x;
+  Exponent_t x;
   poly m, b;
   poly a1 = pNext(p1), a2 = pNext(p2);
   number an = pGetCoeff(p1), bn = pGetCoeff(p2);
@@ -693,7 +695,7 @@ void spShort1(poly b, poly a, poly m)
 
 void spShort2(poly b, poly a, poly m)
 {
-  short x;
+  Exponent_t x;
   pSetComp(b,pGetComp(a));
   for(int i=pVariables; i; i--)
   {
@@ -776,7 +778,12 @@ poly spGSpolyShortBba(poly p1, poly p2)
   }
   loop
   {
-    c = pComp0(b,a2);
+// here is one of the few places where monom comparisons can be called with
+// negative exponents -- the new monom comparison routines suppose
+// that the exponents are positive. Therefore, we need to use the
+// original routines. Will not result in a big performance loss, since
+// the monom comparison is called very seldoom from here.
+    c = t_pComp0(b,a2);
     if (c == 1)
     {
       spShort1(b,a1,m);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.15 1997-11-19 13:08:10 Singular Exp $ */
+/* $Id: longalg.cc,v 1.16 1997-12-03 16:58:50 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2395,8 +2395,9 @@ poly naPermNumber(number z, int * par_perm, int P)
     pNext(p)=NULL;
     nNew(&pGetCoeff(p));
     int i;
-    for(i=pVariables;i>=0;i--)
-       pGetExp(p,i)=0;
+    for(i=pVariables;i;i--)
+       pSetExp(p,i, 0);
+    pSetComp(p, 0);
     napoly pa=NULL;
     if (currRing->parameter!=NULL)
     {
@@ -2414,7 +2415,7 @@ poly naPermNumber(number z, int * par_perm, int P)
       if(za->e[i]!=0)
       {
         if(par_perm[i]>0)
-          pGetExp(p,par_perm[i])=za->e[i];
+          pSetExp(p,par_perm[i],za->e[i]);
         else if((par_perm[i]<0)&&(pa!=NULL))
           pa->e[-par_perm[i]-1]=za->e[i];
         else

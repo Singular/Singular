@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.9 1997-04-17 17:52:22 Singular Exp $ */
+/* $Id: syz0.cc,v 1.10 1997-12-03 16:59:07 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -26,6 +26,7 @@
 #include "intvec.h"
 #include "ring.h"
 #include "syz.h"
+
 
 static polyset syInitSort(polyset oldF,int rkF,int Fmax,
          int syComponentOrder,intvec **modcomp)
@@ -119,31 +120,7 @@ static void syCreatePairs(polyset F,int lini,int wend,int k,int j,int i,
   }
 }
 
-inline BOOLEAN syDivisibleBy2(poly a, poly b)
-{
-  //if (a->exp[0]==b->exp[0])
-  {
-    int i=pVariables-1;
-    short *e1=&(a->exp[1]);
-    short *e2=&(b->exp[1]);
-    if ((*e1) > (*e2)) return FALSE;
-    do
-    {
-      i--;
-      e1++;
-      e2++;
-      if ((*e1) > (*e2)) return FALSE;
-    } while (i>0);
-    return TRUE;
-  }
-  //else 
-  //{
-    //Print("Fehler");
-    //return FALSE;
-  //}
-}
-
-static poly syRedtail2(poly p, polyset redWith, intvec *modcomp)
+static poly syRedtail2(poly p, polyset redWith, intvec *modcomp, spSpolyLoopProc SpolyLoop)
 {
   poly h, hn;
   int hncomp,nxt;
@@ -158,10 +135,10 @@ static poly syRedtail2(poly p, polyset redWith, intvec *modcomp)
     nxt = (*modcomp)[hncomp+1];
     while (j < nxt)
     {
-      if (syDivisibleBy2(redWith[j], hn))
+      if (pDivisibleBy2(redWith[j], hn))
       {
         //if (TEST_OPT_PROT) Print("r");
-        hn = spSpolyRed(redWith[j],hn,NULL);
+        hn = spSpolyRed(redWith[j],hn,NULL, SpolyLoop);
         if (hn == NULL)
         {
           pNext(h) = NULL;
@@ -401,7 +378,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
               tl++;
             }
 
-            toRed = spSpolyRed(p,toRed,NULL);
+            toRed = spSpolyRed(p,toRed,NULL, NULL);
           }
         }
 //PrintS("s");
@@ -451,7 +428,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
 /*3
 *special Normalform for Schreyer in factor rings
 */
-poly sySpecNormalize(poly toNorm,ideal mW=NULL)
+poly sySpecNormalize(poly toNorm,ideal mW=NULL, spSpolyLoopProc SpolyLoop=NULL)
 {
   int j,i=0;
   poly p;
@@ -468,7 +445,7 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL)
     if (pDivisibleBy(currQuotient->m[i],p))
     {
       //pNorm(toNorm);
-      toNorm = spSpolyRed(currQuotient->m[i],toNorm,NULL);
+      toNorm = spSpolyRed(currQuotient->m[i],toNorm,NULL, SpolyLoop);
       pDelete(&p); 
       if (toNorm==NULL) return NULL;
       p = pHead(toNorm);
@@ -597,7 +574,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
         else
         {
           q = pMultT(pCopy(F[j]),multWith);
-          toRed = sySpecNormalize(q,mW);
+          toRed = sySpecNormalize(q,mW, NULL);
           pDelete(&multWith);
         }
         isNotReduced = TRUE;
@@ -617,7 +594,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           {
             if ((currQuotient!=NULL) && (isNotReduced))
             {
-              toRed = sySpecNormalize(toRed,mW);
+              toRed = sySpecNormalize(toRed,mW, NULL);
               isNotReduced = FALSE;
             }
             else
@@ -676,7 +653,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           if (BTEST1(OPT_REDTAIL))
           {
             (*newmodcomp)[j+2] = Sl;
-            (*Shdl)[Sl] = syRedtail2(syz,*Shdl,newmodcomp);
+            (*Shdl)[Sl] = syRedtail2(syz,*Shdl,newmodcomp, NULL);
             (*newmodcomp)[j+2] = 0;
           }
           else
@@ -757,6 +734,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   BOOLEAN sort = TRUE;
   tHomog hom=(tHomog)idHomModule(arg,NULL,&w);
 
+#ifndef COMP_FAST  
   if((hom==isHomog)
   &&(maxlength==pVariables-1)
   &&(currQuotient==NULL)
@@ -765,7 +743,8 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   {
    return syLaScala1(arg,length);
   }  
-
+#endif
+  
   if ((!isMonomial) && syTestOrder(arg))
   {
     WerrorS("sres only implemented for modules with ordering  ..,c or ..,C");
@@ -798,6 +777,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       sySchreyersSyzygiesFM(res[syzIndex]->m,i,&(res[syzIndex+1]->m),
         &(IDELEMS(res[syzIndex+1])),sort);
 //idPrint(res[syzIndex+1]);
+#ifndef COMP_FAST    
     if ((syzIndex==0) && (currRing->OrdSgn==1))
     {
       j = 0;
@@ -837,6 +817,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         pChangeRing(pVariables,currRing->OrdSgn,ord,bl0,bl1,wv);
       }
     }
+#endif    
     if (sort) sort=FALSE;
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);

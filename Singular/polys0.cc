@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.6 1997-11-19 13:08:11 Singular Exp $ */
+/* $Id: polys0.cc,v 1.7 1997-12-03 16:59:00 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -54,7 +54,7 @@ static void writemon(poly p, int ko)
     if ((!pDRING)||(i!=2*pdN))
 #endif
     {
-      short ee = pGetExp(p,i+1);
+      Exponent_t ee = pGetExp(p,i+1);
       if (ee!=0)
       {
         if (wroteCoef)
@@ -81,7 +81,7 @@ static void writemon(poly p, int ko)
       }
     }
   }
-  if (pGetComp(p) != (short)ko)
+  if (pGetComp(p) != (Exponent_t)ko)
   {
     if (writeGen) StringAppendS("*");
     StringAppend("gen(%d)", pGetComp(p));
@@ -94,7 +94,7 @@ char* pString0(poly p)
   {
     return StringAppendS("0");
   }
-  if ((p->exp[0] == 0) || (!pVectorOut))
+  if ((pGetComp(p) == 0) || (!pVectorOut))
   {
     writemon(p,0);
     p = pNext(p);
@@ -108,18 +108,18 @@ char* pString0(poly p)
     return StringAppendS("");
   }
 
-  short k = 1;
+  Exponent_t k = 1;
   StringAppendS("[");
   loop
   {
-    while (k < p->exp[0])
+    while (k < pGetComp(p))
     {
       StringAppendS("0,");
       k++;
     }
     writemon(p,k);
     pIter(p);
-    while ((p!=NULL) && (k == p->exp[0]))
+    while ((p!=NULL) && (k == pGetComp(p)))
     {
       if (nGreaterZero(p->coef)) StringAppendS("+");
       writemon(p,k);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.2 1997-04-02 15:07:28 Singular Exp $ */
+/* $Id: mmalloc.c,v 1.3 1997-12-03 16:58:53 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -17,6 +17,24 @@
 #include "structs.h"
 #include "mmemory.h"
 #include "mmprivat.h"
+
+#ifdef DO_DEEP_PROFILE
+void _memcpyW(void* p1, void* p2, long l)
+{
+  long _i = l;                                          \
+  long* _s1 = (long*) p1;                               \
+  long* _s2 = (long*) p2;                               \
+                                                        \
+  for (;;)                                              \
+  {                                                     \
+    *_s1 = *_s2;                                        \
+    _i--;                                               \
+    if (_i == 0) break;                                 \
+    _s1++;                                              \
+    _s2++;                                              \
+  }                                                     \
+}
+#endif
 
 size_t mmSizeL( void* adr )
 {

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.13 1997-08-08 12:59:26 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.14 1997-12-03 16:58:54 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -207,7 +207,7 @@ inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
       pos = mpsr_rDefault(0, name, mlv->r);
       mpsr_SetCurrRing(mlv->r, TRUE);
       p = pOne();
-      p->exp[pos+1] = 1;
+      pSetExp(p,pos+1, 1);
       pSetm(p);
       mlv->lv = mpsr_InitLeftv(POLY_CMD, (void *) p);
     }
