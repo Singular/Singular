@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.15 1999-04-19 11:02:40 obachman Exp $ */
+/* $Id: lists.cc,v 1.16 1999-04-19 13:04:58 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -87,7 +87,7 @@ lists lInsert0(lists ul, leftv v, int pos)
   }
   for(j=ul->nr+1;j<pos;j++)
     l->m[j].rtyp=DEF_CMD;
-  memset(&(l->m[pos]),0,sizeof(sleftv));
+  // memset(&(l->m[pos]),0,sizeof(sleftv)); - done by Init
   l->m[pos].rtyp=v->Typ();
   l->m[pos].data=v->CopyD();
   l->m[pos].flag=v->flag;
@@ -355,12 +355,12 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
 
 char* lString(lists l, BOOLEAN typed, int dim)
 {
-  if (l->nr == -1) 
+  if (l->nr == -1)
   {
     if (typed) return mstrdup("list()");
     return mstrdup("");
   }
-  
+
   char** slist = (char**) Alloc((l->nr+1) * sizeof(char*));
   int i, j, k;
   char *s;

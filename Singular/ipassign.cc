@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.47 1999-03-16 10:34:21 hannes Exp $ */
+/* $Id: ipassign.cc,v 1.48 1999-04-19 13:04:56 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -835,6 +835,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
 {
   int sl = r->listLength();
   lists L=(lists)Alloc(sizeof(slists));
+  lists oldL;
   leftv h=NULL,o_r=r;
   int i;
   int rt;
@@ -872,19 +873,26 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
         goto err;
       }
   }
-  IDLIST((idhdl)l->data)->Clean();
-  IDLIST((idhdl)l->data)=L;
-#ifdef HAVE_NAMESPACES
-  if (l->req_packhdl != NULL)
+  oldL=(lists)l->Data(); oldL->Clean();
+  if (l->rtyp==IDHDL)
   {
-    //Print("jjA_L_LIST: -1 \n");
-    namespaceroot->push( IDPACKAGE(l->req_packhdl), IDID((idhdl)l));
-    ipMoveId((idhdl)l->data);
-    namespaceroot->pop();
+    IDLIST((idhdl)l->data)=L;
+#ifdef HAVE_NAMESPACES
+    if (l->req_packhdl != NULL)
+    {
+      //Print("jjA_L_LIST: -1 \n");
+      namespaceroot->push( IDPACKAGE(l->req_packhdl), IDID((idhdl)l));
+      ipMoveId((idhdl)l->data);
+      namespaceroot->pop();
+    }
+    else
+#endif /* HAVE_NAMESPACES */
+      ipMoveId((idhdl)l->data);
   }
   else
-#endif /* HAVE_NAMESPACES */
-    ipMoveId((idhdl)l->data);
+  {
+    l->LData()->data=L;
+  }
 err:
   o_r->CleanUp();
   return errorreported;
@@ -1417,7 +1425,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
           break;
         else
         {
-	  matrix rm;
+          matrix rm;
           ht=hh->Typ();
           if ((j=iiTestConvert(ht,etyp))!=0)
           {
