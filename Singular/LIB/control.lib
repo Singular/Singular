@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.5 2004-08-04 13:31:49 levandov Exp $";
+version="$Id: control.lib,v 1.6 2004-08-04 19:11:01 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -31,79 +31,82 @@ static autonom_output();      Generating the output for the procedure 'autonom' 
 LIB "homolog.lib"; 
 LIB "poly.lib";
 LIB "primdec.lib";
+LIB "ncalg.lib";
+
 //---------------------------------------------------------------
-
-
-proc ncdetection( r )
-//in dieser proc. wird eine matrix erzeugt, die in der i-ten zeile die indices
-//der differential-,shift- oder advance-operatoren enthaelt mit denen die i-te
-//variable nicht kommutiert.
-
+proc ncdetection( r)
+//in dieser proc. wird eine matrix erzeugt, die in der i-ten zeile die 
+indices 
+//der differential-,shift- oder advance-operatoren enthaelt mit denen die 
+i-te
+//variable nicht kommutiert. 
 {
   int i,j,k,LExp;
   int NVars=nvars(r);
   matrix rel = NCRelations(r)[2];
   intmat M[NVars][3];
   int NRows = nrows(rel);
-  intvec v,w;
-  poly d;
-  poly d2;
+  intvec v,w; 
+  poly d,d_lead;
   ideal I;
-  map theta; 
+  map theta;
+ 
   for( j=NRows;j>=2;j-- )
   {
-   if( rel[1..NRows,j] == w )       //the whole column is zero
-   {
+   if( rel[j] == w )       //the whole column is zero
+    {
       j--;
       continue;
-   }
-   for( i=1;i<j;i++ )
-   {
-     if( rel[i,j]==1 )        //relation of type var(j)*var(i) = var(i)*var(j) +1
-     {
-       M[i,1]=j;
-     }
-     if( rel[i,j] == -1 )    //relation of type var(i)*var(j) = var(j)*var(i) -1
-     {
-       M[j,1]=i;
-     }
-     d  = rel[i,j];
-     d2 = lead(d);
-     v=leadexp(d2);  //in the next lines we check wether we have a relation of differential or shift type
-     LExp=0;
-     for( k=1;k<=NVars;k++)
-     {
-       LExp = LExp + v[k];
-     }
-     if( d-d2!=0 || LExp > 1 )
-     {
-       return( "wrong input" );
-     }
-     v = leadexp(d);
-     if( v[j] == 1)  //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(j)
-     {
-       if (leadcoef(v) < 0)
-       {
-         M[i,2] = j;
-       } 
-       else
-       {
-         M[i,3] = j;
-       }
+    }
+    
+    for( i=1;i<j;i++ )         
+    {
+      if( rel[i,j]==1 )   //relation of type var(j)*var(i) = var(i)*var(j) +1
+      {
+         M[i,1]=j;
       }
-     if(v[i]==1 ) //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(i)
-     {
-       if (leadcoef(v) > 0)
-       {
-         M[j,2] = i;
-       }
-       else
-       {
+      if( rel[i,j] == -1 ) //relation of type var(i)*var(j) = var(j)*var(i) -1
+      {
+        M[j,1]=i;
+      }
+      d = rel[i,j];
+      d_lead = lead(d);
+      v=leadexp(d_lead); 
+//in the next lines we check whether we have 
+//a relation of differential or shift type
+      LExp=0;
+      for( k=1;k<=NVars;k++)
+      {
+        LExp = LExp + v[k];
+      }
+      if( (d-d_lead != 0) || (LExp > 1) )
+      {
+        return( "wrong input" );
+      }
+      if( v[j] == 1)    //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(j)
+      {
+        if (leadcoef(d) < 0)
+        {
+          M[i,2] = j;
+        }
+        else
+        {
+          M[i,3] = j;
+        }
+      }
+      if( v[i]==1 ) //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(i)
+      {
+        if (leadcoef(d) > 0)
+        {
+          M[j,2] = i;
+        }
+        else
+        {
           M[j,3] = i;
-       }
+        }
       }
-     }
-   }
+    }
+  }
   //ab hier wird die map ausgerechnet
   for(i=1;i<=NVars;i++)
   {
@@ -116,24 +119,64 @@ proc ncdetection( r )
       i++;
       continue;
     }
-    if( M[i,1]!=0 )    
+    if( M[i,1]!=0 )
     {
-      if( ( (M[i,2]!=0) && (M[i,3]==0) ) || ( (M[i,2]==0) && (M[i,3]!=0) ) )
+      if( (M[i,2]!=0) && (M[i,3]!=0) )
       {
-        I[i]=-var(i);
+        I[M[i,1]] = -var(M[i,1]);
+        I[M[i,2]] = var(M[i,3]);
+        I[M[i,3]] = var(M[i,2]);
       }
-      else
+      if( (M[i,2]==0) && (M[i,3]==0) )
       {
-        I[M[i,1]]=-var(M[i,1]);
+        I[M[i,1]] = -var(M[i,1]);
+      }                  
+      if( ( (M[i,2]!=0) && (M[i,3]==0) )|| ( (M[i,2]!=0) && (M[i,3]==0) ) 
+)
+      {
+        I[i] = -var(i);
       }
     }
     else
     {
-      I[1] = -var(i);
+      if( (M[i,2]!=0) && (M[i,3]!=0) )
+      {
+        I[i] = -var(i);
+        I[M[i,2]] = var(M[i,3]);
+        I[M[i,3]] = var(M[i,2]);
+      }
+      else
+      {
+        I[i] = -var(i);
+      } 
     }
   }
-//  map theta = basering, I;
-  return(I);
+  theta = I;
+  return(theta);
+}
+example
+{ 
+  "EXAMPLE:";echo = 2;
+  ring r=0,(x,y,z,D(1..3)),dp;
+  matrix D[6][6];
+  D[1,4]=1;
+  D[2,5]=1;
+  D[3,6]=1;
+  ncalgebra(1,D);
+  ncdetection(r);
+  kill r;
+//------------------
+  ring r=0,(x,S),dp;
+  ncalgebra(1,-S);
+  ncdetection(r);
+  kill r;
+//------------------
+  ring r=0,(x,D(1),S),dp;
+  matrix D[3][3];
+  D[1,2]=1;
+  D[1,3]=-S;
+  ncalgebra(1,D);
+  ncdetection(r);
 }
 
 proc invo_poly(poly m, map theta)
@@ -183,8 +226,16 @@ proc involution(m, map theta)
     } 
     return(n);
   }
-  
-  
+  if (typeof(m)=="vector")
+  {
+    vector n=m;
+    for(i=1; i<=size(m); i++)
+    {
+      n[i] = invo_poly(m[i],theta);
+    }
+    return (n);  
+  }
+
   if ( (typeof(m)=="matrix") || (typeof(m)=="module"))
   {  
 //    m=transpose(m);
