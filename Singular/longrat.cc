@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.42 2002-04-24 15:38:29 Singular Exp $ */
+/* $Id: longrat.cc,v 1.43 2002-04-30 14:50:08 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -237,22 +237,6 @@ BOOLEAN nlDBTest(number a, char *f,int l)
 
 
 number nlRInit (int i);
-
-number nlInit (number u)
-{
-  if (u->s == 3 && mpz_size1(&u->z)<=MP_SMALL)
-  {
-    int ui=(int)mpz_get_si(&u->z);
-    if ((((ui<<3)>>3)==ui)
-        && (mpz_cmp_si(&u->z,(long)ui)==0))
-    {
-      mpz_clear(&u->z);
-      omFreeBin((ADDRESS)u, rnumber_bin);
-      return INT_TO_SR(ui);
-    }
-  }
-  return u;
-}
 
 static number nlMapR(number from)
 {
