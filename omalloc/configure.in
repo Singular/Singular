@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.10 2000-12-15 08:44:28 obachman Exp $
+dnl Version: $Id: configure.in,v 1.11 2000-12-21 14:26:06 obachman Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(om_Alloc.c)
@@ -160,6 +160,11 @@ main()
   fprintf(f, "%d\n", omalloc_getpagesize);
   exit(0);
 }], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
+# can not really handle pagesizes which are greater -- there must be a 
+# bug somewhere
+if test $ac_cv_pagesize -gt 8192; then
+  ac_cv_pagesize=8192
+fi
 AC_MSG_RESULT($ac_cv_pagesize)
 if test "$ac_cv_pagesize" = 4096 || test "$ac_cv_pagesize" = 8192; then
   AC_DEFINE_UNQUOTED(SIZEOF_SYSTEM_PAGE, $ac_cv_pagesize)
