@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.22 2000-03-08 09:03:40 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.23 2000-03-10 13:40:43 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -296,7 +296,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
             {
               output->name=(char *)AllocL(4);
               sprintf(output->name,"%c%d",*(currRing->names[nr-1]),
-              pGetExp((poly)input->data,nr));
+              (int)pGetExp((poly)input->data,nr));
             }
           }
           else if(pIsConstant((poly)input->data))
