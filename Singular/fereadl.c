@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.24 2003-05-12 17:37:21 Singular Exp $ */
+/* $Id: fereadl.c,v 1.25 2003-05-22 17:29:59 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -92,9 +92,13 @@ int     fe_cursor_line; /* 0..pagelength-1*/
 #ifndef MSDOS
   #ifndef HAVE_ATEXIT
     int on_exit(void (*f)(int, void *), void *arg);
-    void fe_reset_fe (int i, void *v)
+    #ifdef HAVE_FEREAD
+      void fe_reset_fe (int i, void *v)
+    #endif
   #else
-    void fe_reset_fe (void)
+    #ifdef HAVE_FEREAD
+      void fe_reset_fe (void)
+    #endif
   #endif
   {
     if (fe_stdin_is_tty)
@@ -237,10 +241,12 @@ void fe_init (void)
           struct termios tattr;
           tcgetattr (STDIN_FILENO, &fe_saved_attributes);
         #endif
-        #ifdef HAVE_ATEXIT
-          atexit(fe_reset_fe);
-        #else
-          on_exit(fe_reset_fe,NULL);
+        #ifdef HAVE_FEREAD
+          #ifdef HAVE_ATEXIT
+            atexit(fe_reset_fe);
+          #else
+            on_exit(fe_reset_fe,NULL);
+          #endif
         #endif
 
       /* Set the funny terminal modes. */
@@ -841,9 +847,10 @@ char ** singular_completion (char *text, int start, int end)
   /* If this word is not in a string, then it may be a command
      to complete.  Otherwise it may be the name of a file in the current
      directory. */
+  char **m;
   if ((*fe_rl_line_buffer)[start-1]=='"')
     return (*fe_completion_matches) (text, *fe_filename_completion_function);
-  char **m=(*fe_completion_matches) (text, command_generator);
+  m=(*fe_completion_matches) (text, command_generator);
   if (m==NULL)
   {
     m=(char **)malloc(2*sizeof(char*));
@@ -944,7 +951,7 @@ void fe_reset_input_mode ()
       write_history (p);
   }
 #endif
-#if !defined(MSDOS) && (defined(HAVE_FEREAD) || defined(HAVE_DYN_RL))
+#if !defined(MSDOS) && defined(HAVE_FEREAD)
   #ifndef HAVE_ATEXIT
   fe_reset_fe(NULL,NULL);
   #else

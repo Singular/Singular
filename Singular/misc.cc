@@ -606,8 +606,10 @@ char * versionString()
                 StringAppendS("fgets,");
               if (fe_fgets_stdin==fe_fgets_stdin_drl)
                 StringAppendS("dynamic readline,");
+              #ifdef HAVE_FEREAD
               else if (fe_fgets_stdin==fe_fgets_stdin_emu)
                 StringAppendS("emulated readline,");
+              #endif
               else
                 StringAppendS("unknown fgets method,");
 #else

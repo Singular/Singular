@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.54 2003-04-24 16:55:53 Singular Exp $ */
+/* $Id: febase.h,v 1.55 2003-05-22 17:31:02 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -57,6 +57,9 @@ extern "C"
 #ifndef ix86_Win
   #define HAVE_FEREAD 1
 #endif
+#endif
+#ifdef ix86_Linux
+  #undef HAVE_FEREAD
 #endif
 
 /*
@@ -273,7 +276,7 @@ Voice * feInitStdin(Voice *pp);
 /* the interface for reading: */
 extern  char * (*fe_fgets_stdin)(char *pr,char *s, int size);
 
-#ifdef HAVE_FEREAD
+#ifdef HAVE_DYN_RL
 char * fe_fgets_stdin_drl(char *pr,char *s, int size);
 #endif
 

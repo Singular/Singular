@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.50 2003-04-24 16:55:54 Singular Exp $ */
+/* $Id: feread.cc,v 1.51 2003-05-22 17:30:27 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -35,7 +35,7 @@
 #endif
 
 #ifdef ix86_Linux
-#undef FEREAD
+#undef HAVE_FEREAD
 // not compatible with glibc2
 #endif
 
@@ -342,12 +342,12 @@ static char * fe_fgets_stdin_init(char *pr,char *s, int size)
     //  Warn("dynamic loading failed: %d\n",res);
     if (res!=1)
       Warn("dynamic loading failed: %d\n",res);
-    #ifdef FEREAD
+    #ifdef HAVE_FEREAD
     fe_fgets_stdin=fe_fgets_stdin_emu;
     #else
     fe_fgets_stdin=fe_fgets;
     #endif
-    return fe_fgets_stdin_emu(pr,s,size);
+    return fe_fgets_stdin(pr,s,size);
   }
 
   /* set the output stream */
