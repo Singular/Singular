@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.185 2000-12-14 12:05:00 Singular Exp $
+@comment $Id: general.doc,v 1.186 2000-12-19 16:03:48 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2488,7 +2488,7 @@ redefining and overwriting a variable is shown in the following example:
 
 User defined names should start with a letter and consist of letters and
 digits only.  As an exception to this rule, the characters @code{@@},
-@code{_}, and @code{$} may
+and @code{_} may
 be used as part of a name, too.  Capital and small letters are
 distinguished.  Indexed names are built as a name followed by an
 int_expression in parentheses.  A list of indexed names can be built as
