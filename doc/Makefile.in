@@ -36,11 +36,11 @@ SINGULARDIR	= ..
 ## End configuration dependend stuff
 #################################################################
 #
-# examples, general, libraries, math, reference,
+# examples, general, math, reference,
 # singular, start, types
 #SINGULAR_OBJS= copyright.tex proc.tex
 TEX_FILES = copyright.tex # proc.tex
-SINGULAR_OBJS= examples.tex general.tex libraries.tex math.tex reference.tex \
+SINGULAR_OBJS= examples.tex general.tex math.tex reference.tex \
 	singular.tex start.tex types.tex
 
 all: info dvi
@@ -117,7 +117,6 @@ Makefile: Makefile.in
 
 #examples.tex: examples.doc
 #general.tex: general.doc
-#libraries.tex: libraries.doc
 #math.tex: math.doc
 #reference.tex: reference.doc
 #singular.tex: singular.doc
