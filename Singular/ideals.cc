@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.50 1999-07-14 13:16:02 Singular Exp $ */
+/* $Id: ideals.cc,v 1.51 1999-08-17 17:02:30 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -321,6 +321,9 @@ ideal idCopy (ideal h1)
   int i;
   ideal h2;
 
+#ifdef PDEBUG
+  idDBTest(h1,f,l);
+#endif
 //#ifdef TEST
   if (h1 == NULL)
   {
@@ -361,6 +364,13 @@ void idDBTest(ideal h1,char *f,int l)
     /* to be able to test matrices: */
     for (i=(IDELEMS(h1)*h1->nrows)-1; i>=0; i--)
       pDBTest(h1->m[i],f,l);
+    int new_rk=idRankFreeModule(h1);
+    if(new_rk > h1->rank)
+    {
+      Print("wrong rank %d (should be %d) in %s:%d\n",
+      h1->rank, new_rk, f,l);
+      h1->rank=new_rk;
+    }
   }
 }
 #endif
@@ -1707,10 +1717,10 @@ ideal  idLift (ideal  mod,ideal submod)
           if (!reported)
           {
             WarnS("first module not a standardbasis\n"
-	    "// ** or second not a proper submodule");
+            "// ** or second not a proper submodule");
             //Warn("first module not a standardbasis(comp=%d,k=%d), q=",
-	    //  pMinComp(q),k);
-	    //  pWrite(q);
+            //  pMinComp(q),k);
+            //  pWrite(q);
             //WarnS("or second not a proper submodule");
             reported=TRUE;
           }
