@@ -1,4 +1,4 @@
-// $Id: classify.lib,v 1.7 1997-08-10 08:49:30 krueger Exp $
+// $Id: classify.lib,v 1.8 1997-08-13 07:39:06 krueger Exp $
 //=============================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
@@ -7,11 +7,11 @@
 
 LIBRARY:  Classify.lib
 
- Classify(f);
+ classify(f);            compute the Class of f.
+
 // required libraries
 
 LIB "lib_Setring";
-LIB "lib_ReOrder";
 LIB "lib_RandomPoly";
 LIB "Morse.lib";
 LIB "tools.lib";
@@ -21,28 +21,20 @@ LIB "HKclass.lib";
 LIB "NFlist.lib";
 LIB "Hilbert.lib";
 
-//=========================================================================
-//=========================================================================
-proc Classify_lib
-{
-"
-  Classify(poly f);    determine the typ of the singularity f
-";
-}
-
+//=============================================================================
 //=============================================================================
 // TopLevel Funktion of the Arnold-Classifier.
 //
-proc Classify (poly @f_in)
-USAGE:   Classify(f);  f=poly
-COMPUTE: Normalform and singularity type of f
-RETURN:  Normalform of f
-EXAMPLE: example Classify; shows an example
-REMARK:  This version of Classify is only alpha.
-         Please send bugs and comments to:
-         "Kai Krueger" <krueger@mathematik.uni-kl.de>
-NOTE:    The procedure init_debug(n); is usefull as trace-mode.
-	 n may range from 0 to 10, higher values of n give more informations.
+proc classify (poly @f_in)
+USAGE:    classify(f);  f=poly
+COMPUTE:  Normalform and singularity type of f
+RETURN:   Normalform of f
+EXAMPLE:  example classify; shows an example
+REMARK:   This version of classify is only alpha.
+          Please send bugs and comments to:
+          "Kai Krueger" <krueger@mathematik.uni-kl.de>
+NOTE:     The procedure init_debug(n); is usefull as trace-mode.
+	  n may range from 0 to 10, higher values of n give more informations.
 {
 //         or set the shell-variable SG_DEBUG to the debugging level.
   if(system("version")<922) {
@@ -86,13 +78,11 @@ NOTE:    The procedure init_debug(n); is usefull as trace-mode.
 
   string @s1;
   string @s2;
-  string @s3;
   string @s4;
   @s1,@s2=Klassifiziere(@Conv(@f_in));
   // @s1: f nach saemtlichen Koordinatentransformationen
   // @s2: Typ des Polynoms f z.b: E[18]
   @s4 = "poly @f_out="+@s1+";";
-//"Corang:"+ string(CoRang);
   debug_log(10, "S1=", @s1);
   debug_log(10, "S2=", @s2);
 
@@ -113,26 +103,18 @@ NOTE:    The procedure init_debug(n); is usefull as trace-mode.
     map @ConvUp=RingB,maxideal(1);
   }
   if(@show_nf==1) {
-    poly @f_nf = NormalForm(@s2);
+    poly @f_nf = normalform(@s2);
     for(@i=4;@i<=@n;@i=@i+1) {
       @f_nf = @f_nf + x(@i)^2;
     }
     if(DeBug>1) { "Normal form NF(f)=", @f_nf; }
   }
   poly @f_out = @ConvUp(@f_out);
-//listvar();
-//"------------------------------";
-//"Corang:"+ string(CoRang);
-//"Classify() Controlpoint Test----";
-//listvar();
-//"------------------------------";
   for(@i=CoRang+1;@i<=@n;@i=@i+1) {
     @f_out = @f_out + x(@i)^2;
   }
-//"Classify() Controlpoint Test----";
   setring ring_top;
   map @ConvBack=Rtop,maxideal(1);
-//"Classify() Controlpoint Test----";
 
   if(@show_nf == 1) {
     return(@ConvBack(@f_nf));
@@ -144,6 +126,6 @@ example
    ring r=0,(x,y,z),ds;
    init_debug(2);
    poly f=(x2+3y-2z)^2+xyz-(x-y3+x2*z3)^3;
-   poly g=Classify(f);
+   poly g=classify(f);
 }
 // E n d   O f   F i l e
