@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.10 2000-11-28 11:50:55 obachman Exp $
+ *  Version: $Id: p_Procs.h,v 1.11 2000-12-07 15:03:59 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
@@ -55,11 +55,13 @@ typedef struct p_Procs_s
 } pProcs_s;
 
   
-void p_SetProcs(ring r, p_Procs_s* p_Procs);
+void p_ProcsSet(ring r, p_Procs_s* p_Procs);
 #ifdef RDEBUG
 void p_Debug_GetSpecNames(const ring r, char* &field, char* &length, 
                           char* &ord);
 void p_Debug_GetProcNames(const ring r, p_Procs_s* p_Procs);
 #endif
+// if set, then dynamic p_procs are used, otherwise static
+extern BOOLEAN p_procs_dynamic;
 
 #endif /* ! P_PROCS_H */

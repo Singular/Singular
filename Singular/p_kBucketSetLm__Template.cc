@@ -6,10 +6,10 @@
  *  Purpose: template for setting the Lm of a bucket
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_kBucketSetLm__Template.cc,v 1.2 2000-12-05 13:01:11 obachman Exp $
+ *  Version: $Id: p_kBucketSetLm__Template.cc,v 1.3 2000-12-07 15:04:01 obachman Exp $
  *******************************************************************/
 
-void p_kBucketSetLm(kBucket_pt bucket)
+LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
 {
   int j = 0;
   poly lt;

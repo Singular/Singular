@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm_Noether__Template.cc,v 1.2 2000-11-28 11:50:56 obachman Exp $
+ *  Version: $Id: pp_Mult_mm_Noether__Template.cc,v 1.3 2000-12-07 15:04:02 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -17,8 +17,7 @@
  *   Const:    p, m
  *
  ***************************************************************/
-poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int &ll, 
-                        const ring ri, poly &last)
+LINKAGE poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int &ll, const ring ri, poly &last)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);

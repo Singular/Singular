@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.8 2000-05-23 13:10:10 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.9 2000-12-07 15:03:57 obachman Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -14,12 +14,66 @@
 #include "mod2.h"
 #include "static.h"
 #ifdef HAVE_STATIC
-#undef HAVE_DYNAMIC_LOADING
-#undef HAVE_DYN_RL
+#undef HAVE_DL
 #endif
 
-#if defined(HAVE_DYNAMIC_LOADING) || defined(HAVE_DYN_RL)
+#if defined(HAVE_DL)
 #include "mod_raw.h"
+#include "febase.h"
+
+/*****************************************************************************
+ *
+ * General section
+ * These are just wrappers around the repsective dynl_* calls 
+ * which look for the binary in the bin_dir of Singular and ommit warnings if
+ * somethings goes wrong
+ *
+ *****************************************************************************/
+static BOOLEAN warn_handle = FALSE;
+static BOOLEAN warn_proc = FALSE;
+#ifndef DL_TAIL
+#define DL_TAIL "so"
+#endif
+
+void* dynl_open_binary_warn(char* binary_name)
+{
+  void* handle = NULL;
+  const char* bin_dir = feGetResource('b');
+  if (bin_dir != NULL)
+  {
+    char path_name[MAXPATHLEN];
+    sprintf(path_name, "%s%s%s.%s", bin_dir, DIR_SEPP, binary_name, 
+            DL_TAIL);
+    handle = dynl_open(path_name);
+    if (handle == NULL && ! warn_handle)
+    {
+      Warn("Could not open dynamic library: %s", path_name);
+      Warn("Error message from system: %s", dynl_error());
+      Warn("Singular will work properly, but much slower.");
+      Warn("See the INSTALL section in the Singular manual for details.");
+      warn_handle = TRUE;
+    }
+  }
+  return  handle;
+}
+
+void* dynl_sym_warn(void* handle, char* proc)
+{
+  void *proc_ptr = NULL;
+  if (handle != NULL)
+  {
+    proc_ptr = dynl_sym(handle, proc);
+    if (proc_ptr == NULL && ! warn_proc)
+    {
+      Warn("Could load a procedure from a dynamic library");
+      Warn("Error message from system: %s", dynl_error());
+      Warn("Singular will work properly, but much slower.");
+      Warn("See the INSTALL section in the Singular manual for details.");
+      warn_proc = TRUE;
+    }
+  }
+  return proc_ptr;
+}
 
 
 /*****************************************************************************
@@ -298,4 +352,4 @@ const char *dynl_error()
 #  endif /* ppc_MPW */
 
 
-#endif /* HAVE_DYNAMIC_LOADING */
+#endif /* HAVE_DL */

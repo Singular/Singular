@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.93 2000-10-30 13:50:25 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.94 2000-12-07 15:03:56 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -15,10 +15,10 @@
  ******************************************************************/
 /* Define to use dynamic linking */
 #undef HAVE_DL
-/* Define to use readline lib for fancy display */
+/* Define to use static readline lib for fancy display */
 #undef HAVE_READLINE
-/* Define if you want to use dld's */
-#undef HAVE_DLD
+/* define to use dynamic version of readline lib */
+#undef HAVE_DYN_RL
 /* Define to have dbm links */
 #undef HAVE_DBM
 /* Define to have smallgmp */
@@ -143,8 +143,6 @@
 /*******************************************************************
  * Defines which are not set by configure
  ******************************************************************/
-/* define to use the dynamic linking of readline in non-distributions builds */
-/* #undef USE_STATIC_RL */
 
 /* Default value for timer resolution in ticks per second */
 /* set to 10 for resolution of tenth of a second, etc */
@@ -191,13 +189,6 @@
 /*******************************************************************
  * Evaluate the set defines
  ******************************************************************/
-/* dynamic readline or readline ? */
-#ifdef HAVE_DL
-  #if !defined(USE_STATIC_RL)
-    #define HAVE_DYN_RL
-  #endif
-#endif
-
 /* FGLM needs factory */
 #ifdef HAVE_FACTORY
 #define HAVE_FGLM

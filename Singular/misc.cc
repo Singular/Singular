@@ -28,6 +28,7 @@
 #include "intvec.h"
 #include "ring.h"
 #include "omSingularConfig.h"
+#include "p_Procs.h"
 
 #include "static.h"
 #ifdef HAVE_STATIC
@@ -603,7 +604,7 @@ char * versionString()
                 StringAppendS("unknown fgets method,");
 #else
   #if defined(HAVE_READLINE) && !defined(FEREAD)
-              StringAppendS("readline,");
+              StringAppendS("static readline,");
   #else
     #ifdef HAVE_FEREAD
               StringAppendS("emulated readline,");
@@ -624,11 +625,12 @@ char * versionString()
               StringAppendS("\n\t");
 #endif
 #ifdef HAVE_NAMESPACES
-              StringAppendS("Namespaces,");
+              StringAppendS("namespaces,");
 #endif
 #ifdef HAVE_DYNAMIC_LOADING
-              StringAppendS("DynamicLoading,");
+              StringAppendS("dynamic modules,");
 #endif
+              if (p_procs_dynamic) StringAppendS("dynamic p_Procs,");
 #ifdef TEST
               StringAppendS("TESTs,");
 #endif

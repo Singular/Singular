@@ -254,6 +254,31 @@ AC_CHECK_LIB(socket, listen)
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(ucb, index)
 
+# check for dl lib
+case "$ac_cv_singuname" in
+	HPUX*)
+	  AC_CHECK_LIB(dld, shl_load)
+	  if test "$ac_cv_lib_dld_shl_load" = yes; then
+         	LD_DYN_FLAGS="-ldld -Xlinker -E"
+	  	SFLAGS="-fPIC -DPIC"
+	  	SLDFLAGS=-shared
+		ac_lib_dl=yes
+	  fi
+	;;
+	*Linux*)
+	  AC_CHECK_LIB(dl, dlopen)
+          if test "$ac_cv_lib_dl_dlopen" = yes; then
+	  	LD_DYN_FLAGS="-ldl -rdynamic"
+	  	SFLAGS="-fPIC -DPIC"
+	  	SLDFLAGS=-shared
+	        ac_lib_dl=yes
+	  fi
+	;;
+esac
+AC_SUBST(LD_DYN_FLAGS)
+AC_SUBST(SFLAGS)
+AC_SUBST(SLDFLAGS)
+
 # heder file checks
 AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
@@ -372,7 +397,8 @@ AC_ARG_WITH(
   [  --with-lex=[LEX,no]     uses LEX as lex program, default is flex])
 AC_ARG_WITH(
   readline,
-  [  --with-readline          do use static readline for fancy display])
+  [  --with-readline=[dynamic,static,no]          
+                          do use dynamic/static/no readline for fancy display])
 AC_ARG_WITH(
   MP,
   [  --without-MP            do not use MP (no MP links)])
@@ -390,7 +416,14 @@ AC_ARG_WITH(
   [  --with-namespaces       do compile namespace support])
 AC_ARG_WITH(
   dl,
-  [  --with-dl               do use dl (dynamic linking)])
+  [  --without-dl            do not use dynamic linking, modules, and kernel])
+AC_ARG_WITH(
+  dynamic-modules,
+  [  --with-dynamic-modules  do compile with dynamic modules support]) 
+AC_ARG_WITH(
+  dynamic-kernel,
+  [  --without-dynamic-kernel               
+                          do not compile with dynamic kernel parts])
 AC_ARG_WITH(apint,
   [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic])
 AC_ARG_WITH(
@@ -404,12 +437,28 @@ dnl and headers were not found under the condition that the respective
 dnl  --enable argument was given
 dnl
 
+
+AC_MSG_CHECKING(whether to use dynamic linking)
+if test "$with_dl" != no && test "$ac_lib_dl" = yes; then
+  AC_DEFINE(HAVE_DL)
+  ac_have_dl=yes
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
 AC_CHECK_LIB(ncurses,tgetent,,\
  AC_CHECK_LIB(curses,tgetent,,\
   AC_CHECK_LIB(termcap,tgetent)))
 
 # readline
-if test "$with_readline" = yes; then
+if test "$with_readline" = dynamic && test "$ac_cv_have_dl" != yes; then
+  AC_MSG_WARN(can not build dynamic readline without dynamic linking)
+  with_readline=static
+fi
+
+
+if test "$with_readline" != dynamic && test "$with_readline" != no; then
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
    AC_CHECK_LIB(readline, rl_abort)
@@ -489,12 +538,21 @@ ac_cv_have_readline="no"
   fi
   if test "$ac_cv_have_readline" = yes; then
     AC_DEFINE(HAVE_READLINE)
-  else
-    AC_MSG_WARN(building without readline: disabling fancy display)
   fi
 AC_LANG_RESTORE
 fi
 
+AC_MSG_CHECKING(which readline to use)
+if test "$ac_cv_with_readline" = dynamic; then
+  AC_MSG_RESULT(dynamic)
+  AC_DEFINE(HAVE_DYN_RL)
+elif test "$ac_cv_have_readline" = yes; then
+  AC_MSG_RESULT(static)
+else
+  AC_MSG_RESULT(none)
+  AC_MSG_WARN(building without readline: disabling fancy display)
+fi
+  
 NEED_LIBS=$LIBS
 
 # gmp, smallgmp, MP, MPT, factory, libfac
@@ -504,7 +562,7 @@ if test "ac_cv_lib_gmp_main" = yes && test "$with-apint" = smallgmp; then
 fi
 AC_CHECK_LIB(smallgmp, main)
 AC_CHECK_LIB(MP, IMP_PutGmpInt)
-AC_CHECK_LIB(MPT, MPT_GetTree)
+AC_CHECK_LIB(MPT, MPT_GetTre)
 AC_CHECK_LIB(singcf, atof)
 AC_CHECK_LIB(singfac, atof)
 AC_CHECK_LIB(omalloc, omTestAddr)
@@ -682,37 +740,18 @@ else
   AC_MSG_RESULT(yes)
 fi
 
-AC_MSG_CHECKING(whether to have dl lib)
-
-case "$ac_cv_singuname" in
-	HPUX-9)
-          AC_MSG_RESULT(dld)
-	  AC_CHECK_LIB(dld, shl_load)
-	  LD_DYN_FLAGS="-ldld -Xlinker -E"
-          AC_DEFINE(HAVE_DL)
-	;;
-	HPUX-10)
-          AC_MSG_RESULT(dld)
-	  AC_CHECK_LIB(dld, shl_load)
-	  LD_DYN_FLAGS="-ldld -Xlinker -E"
-          AC_DEFINE(HAVE_DL)
-	;;
-	*Linux*)
-          AC_MSG_RESULT(dl)
-	  AC_CHECK_LIB(dl, dlopen)
-	  LD_DYN_FLAGS="-ldl -rdynamic"
-          AC_DEFINE(HAVE_DL)
-	;;
-	*) 
-          AC_MSG_RESULT(no)
-	  ;;
-esac
-
-AC_MSG_CHECKING(whether to have dynamic loading)
-if test "$with_dl" != yes; then
+AC_MSG_CHECKING(whether to have dynamic modules)
+if test "$with_dynamic_modules" != yes || test "$ac_have_dl" != yes; then
   AC_MSG_RESULT(no)
 else
   AC_DEFINE(HAVE_DYNAMIC_LOADING)
+  AC_MSG_RESULT(yes)
+fi
+
+AC_MSG_CHECKING(whether to have dynamic kernel)
+if test "$with_dynamic_kernel" != no && test "$ac_lib_dl" = yes; then
+  DL_KERNEL=1
+  AC_SUBST(DL_KERNEL)
   AC_MSG_RESULT(yes)
 fi
 
@@ -724,7 +763,6 @@ else
   AC_MSG_RESULT(yes)
 fi
 
-AC_SUBST(LD_DYN_FLAGS)
 
 OUTPUT_MAKEFILES=Makefile
 

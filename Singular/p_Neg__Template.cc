@@ -6,7 +6,7 @@
  *  Purpose: template for p_Neg
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Neg__Template.cc,v 1.2 2000-09-18 09:19:27 obachman Exp $
+ *  Version: $Id: p_Neg__Template.cc,v 1.3 2000-12-07 15:03:59 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -15,7 +15,7 @@
  *   Destroys: p
  *
  ***************************************************************/
-poly p_Neg(poly p, const ring r)
+LINKAGE poly p_Neg(poly p, const ring r)
 {
   poly q = p;
   while (p != NULL)

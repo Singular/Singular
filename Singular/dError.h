@@ -6,7 +6,7 @@
  *  Purpose: declaration for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.h,v 1.3 2000-09-25 12:26:30 obachman Exp $
+ *  Version: $Id: dError.h,v 1.4 2000-12-07 15:03:55 obachman Exp $
  *******************************************************************/
 #ifndef DERROR_H
 #define DERROR_H
@@ -17,7 +17,7 @@ extern "C"
 #endif
 extern int dReportError(const char* fmt, ...);
 #define dReportBug(s) \
-  dReportError("Bug reported %s\n occurde at %s,%l\n", s, __FILE__, __LINE__)
+  dReportError("Bug reported %s\n occured at %s,%l\n", s, __FILE__, __LINE__)
 #endif
 
 // this is just a dummy procedure which is called after the error

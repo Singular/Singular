@@ -6,7 +6,7 @@
  *  Purpose: template for p_ShallowCopyDelete
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_ShallowCopyDelete__Template.cc,v 1.5 2000-10-30 13:40:23 obachman Exp $
+ *  Version: $Id: p_ShallowCopyDelete__Template.cc,v 1.6 2000-12-07 15:04:01 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -15,7 +15,7 @@
  * Assumes:  Monoms of p are from 
  * Returns: 
  ***************************************************************/
-poly p_ShallowCopyDelete(poly s_p, const ring r, omBin d_bin)
+LINKAGE poly p_ShallowCopyDelete(poly s_p, const ring r, omBin d_bin)
 {
   spolyrec dp;
   poly d_p = &dp;

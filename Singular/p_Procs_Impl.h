@@ -2,16 +2,14 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    p_Procs.cc
+ *  File:    p_Procs_Impl.h
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.23 2000-11-28 11:50:55 obachman Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.1 2000-12-07 15:04:00 obachman Exp $
  *******************************************************************/
-#include <string.h>
-
-#include "mod2.h"
-
+#ifndef P_PROCS_IMPL_H
+#define P_PROCS_IMPL_H
 
 /***************************************************************
  *  
@@ -37,55 +35,57 @@
  a general proc is set/choosen.
  *******************************************************************/
 
-// Set HAVE_FAST_P_PROCS to:
+// Define HAVE_FAST_P_PROCS to:
 //   0 -- only FieldGeneral_LengthGeneral_OrdGeneral
 //   1 -- plus FieldZp_Length*_OrdGeneral procs
 //   2 -- plus FieldZp_Length*_Ord* procs
 //   3 -- plus FieldQ_Length*_Ord*
 //   4 -- plus FieldGeneral_Length*_OrdGeneral procs
 //   5 -- all Field*_Length*_Ord* procs
-#ifdef NDEBUG
-#ifdef __hpux
-const int HAVE_FAST_P_PROCS = 2;
-#else
-const int HAVE_FAST_P_PROCS = 3;
-#endif
-#else
-const int HAVE_FAST_P_PROCS = 0;
+#ifndef HAVE_FAST_P_PROCS
+#define HAVE_FAST_P_PROCS 0
 #endif
 
-#define inline
-
-// Set HAVE_FAST_FIELD to:
+// Define HAVE_FAST_FIELD to:
 //   0 -- only FieldGeneral
 //   1 -- special cases for FieldZp
 //   2 -- plus special cases for FieldQ
 //   nothing else is implemented, yet
-const int HAVE_FAST_FIELD = 2;
+#ifndef HAVE_FAST_FIELD 
+#define HAVE_FAST_FIELD 0
+#endif
 
-// Set HAVE_FAST_LENGTH to:
+// Define HAVE_FAST_LENGTH to:
 //   0 -- only LengthGeneral
 //   1 -- special cases for length <= 1
 //   2 -- special cases for length <= 2
 //   3 -- special cases for length <= 4
 //   4 -- special cases for length <= 8
-const int HAVE_FAST_LENGTH = 3;
+#ifndef HAVE_FAST_LENGTH 
+#define HAVE_FAST_LENGTH 0
+#endif
 
-// Set HAVE_FAST_ORD to:
+// Define HAVE_FAST_ORD to:
 //  0  -- only OrdGeneral
 //  1  -- special for ords with n_min <= 1
 //  2  -- special for ords with n_min <= 2
 //  3  -- special ords for with n_min <= 3
 //  4  -- special for all ords
-const int HAVE_FAST_ORD = 4;
+#ifndef HAVE_FAST_ORD 
+#define HAVE_FAST_ORD 0
+#endif
 
-// undefine this, if ExpL_Size always equals CompLSize
-#define HAVE_LENGTH_DIFF
-// Set HAVE_FAST_ZERO_ORD to:
+// Define HAVE_FAST_ZERO_ORD to:
 //  0 -- no zero ords are considered 
 //  1 -- only ZeroOrds for OrdPosNomogPosZero, OrdNomogPosZero, OrdPomogNegZero
 //  2 -- ZeroOrds for all
-const int HAVE_FAST_ZERO_ORD = 2;
+#ifndef HAVE_FAST_ZERO_ORD 
+#define HAVE_FAST_ZERO_ORD 0
+#endif
+
+// undefine this, if ExpL_Size always equals CompLSize
+#define HAVE_LENGTH_DIFF
+
 
 // Predicate which returns true if alloc/copy/free of numbers is
 // like that of Zp
@@ -192,10 +192,7 @@ typedef enum p_Proc
   p_Unknown_Proc
 };
 
-// *_2_String conversions of these enums
-// they are only needed at for GENERATE_P_PROCS or RDEBUG
-#if defined(GENERATE_P_PROCS) || defined(RDEBUG)
-char* p_FieldEnum_2_String(p_Field field)
+static inline char* p_FieldEnum_2_String(p_Field field)
 {
   switch(field)
   {
@@ -215,7 +212,7 @@ char* p_FieldEnum_2_String(p_Field field)
   return "NoField_2_String";
 }
 
-char* p_LengthEnum_2_String(p_Length length)
+static inline char* p_LengthEnum_2_String(p_Length length)
 {
   switch(length)
   {
@@ -233,7 +230,7 @@ char* p_LengthEnum_2_String(p_Length length)
   return "NoLength_2_String";
 }
 
-char* p_OrdEnum_2_String(p_Ord ord)
+static inline char* p_OrdEnum_2_String(p_Ord ord)
 {
   switch(ord)
   {
@@ -263,7 +260,7 @@ char* p_OrdEnum_2_String(p_Ord ord)
   return "NoOrd_2_String";
 }
 
-char* p_ProcEnum_2_String(p_Proc proc)
+static inline char* p_ProcEnum_2_String(p_Proc proc)
 {
   switch(proc)
   {
@@ -285,12 +282,6 @@ char* p_ProcEnum_2_String(p_Proc proc)
   }
   return "NoProc_2_String";
 }
-#endif // defined(GENERATE_P_PROCS) || defined(RDEBUG)
-
-
-#ifdef GENERATE_P_PROCS
-#include "dError.c"
-#endif
 
 /***************************************************************
  *  
@@ -557,427 +548,45 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
   }
 }
 
-// The procedure which does the work of choosing/generating a
-// set of poly procs
-static void SetProcs(p_Field field, p_Length length, p_Ord ord);
 
-
-#ifndef GENERATE_P_PROCS 
 
 /***************************************************************
  * 
- * Runtime stuff
- *
- ***************************************************************/
-#include "structs.h"
-#include "p_polys.h"
-#include "ring.h"
-#include "p_Procs.h"
-#include "p_Numbers.h"
-#include "p_MemCmp.h"
-#include "p_MemAdd.h"
-#include "p_MemCopy.h"
-#include "kbuckets.h"
-
-#ifdef NDEBUG
-#include "p_Procs.inc"
-#else
-#include "p_Procs_debug.inc"
-#endif
-
-
-// the rest is related to getting the procs
-static inline p_Field p_FieldIs(ring r)
-{
-  if (rField_is_Zp(r)) return FieldZp;          
-  if (rField_is_R(r)) return FieldR;
-  if (rField_is_GF(r)) return FieldGF;
-  if (rField_is_Q(r)) return FieldQ;
-#ifdef HAVE_MORE_FIELDS_IMPLEMENTED
-  if (rField_is_long_R(r)) return FieldLong_R;
-  if (rField_is_long_C(r)) return FieldLong_C;
-  if (rField_is_Zp_a(r)) return FieldZp_a;
-  if (rField_is_Q_a(r)) return FieldQ_a;
-#endif
-  return FieldGeneral;
-}
-
-static inline p_Length p_LengthIs(ring r)
-{
-  assume(r->ExpL_Size > 0);
-  // here is a quick hack to take care of p_MemAddAdjust
-  if (r->NegWeightL_Offset != NULL) return LengthGeneral;
-  if (r->ExpL_Size == 1) return LengthOne;
-  if (r->ExpL_Size == 2) return LengthTwo;
-  if (r->ExpL_Size == 3) return LengthThree;
-  if (r->ExpL_Size == 4) return LengthFour;
-  if (r->ExpL_Size == 5) return LengthFive;
-  if (r->ExpL_Size == 6) return LengthSix;
-  if (r->ExpL_Size == 7) return LengthSeven;
-  if (r->ExpL_Size == 8) return LengthEight;
-  return LengthGeneral;
-}
-
-static inline int p_IsNomog(long* sgn, int l)
-{
-  int i;
-  for (i=0;i<l;i++)
-    if (sgn[i] > 0) return 0;
-  
-  return 1;
-}
-
-static inline int p_IsPomog(long* sgn, int l)
-{
-  int i;
-  for (i=0;i<l;i++)
-    if (sgn[i] < 0) return 0;
-  return 1;
-}
-
-static inline p_Ord p_OrdIs(ring r)
-{
-  long* sgn = r->ordsgn;
-  long l = r->ExpL_Size;
-  int zero = 0;
-  
-  if (sgn[l-1] == 0) 
-  {
-    l--;
-    zero = 1;
-  }
-  
-  // we always favour the pomog cases
-  if (p_IsPomog(sgn,l)) return (zero ? OrdPomogZero : OrdPomog);
-  if (p_IsNomog(sgn,l)) return (zero ? OrdNomogZero : OrdNomog);
-  
-  assume(l > 1);
-  
-  if (sgn[0] == -1 && p_IsPomog(&sgn[1], l-1))
-    return (zero ? OrdNegPomogZero : OrdNegPomog);
-  if (sgn[l-1] == -1 && p_IsPomog(sgn, l-1))
-    return (zero ? OrdPomogNegZero : OrdPomogNeg);
-
-  if (sgn[0] == 1 && p_IsNomog(&sgn[1], l-1)) 
-    return (zero ? OrdPosNomogZero : OrdPosNomog);
-  if (sgn[l-1] == 1 && p_IsNomog(sgn, l-1))
-    return (zero ? OrdNomogPosZero : OrdNomogPos);
-
-  assume(l > 2);
-  
-  if (sgn[0] == 1 && sgn[1] == 1 && p_IsNomog(&sgn[2], l-2))
-    return (zero ? OrdPosPosNomogZero : OrdPosPosNomog);
-
-  if (sgn[0] == 1 && sgn[l-1] == 1 && p_IsNomog(&sgn[1], l-2))
-    return (zero ? OrdPosNomogPosZero : OrdPosNomogPos);
-
-  if (sgn[0] == -1 && sgn[1] == 1 && p_IsNomog(&sgn[2], l-2))
-    return (zero ? OrdNegPosNomogZero : OrdNegPosNomog);
-
-  return OrdGeneral;
-}
-  
-static p_Procs_s *_p_procs;
-// Choose a set of p_Procs
-void p_SetProcs(ring r, p_Procs_s* p_Procs)
-{
-  p_Field     field = p_FieldIs(r);
-  p_Length    length = p_LengthIs(r);
-  p_Ord       ord = p_OrdIs(r);
-  
-  assume(p_Procs != NULL);
-#ifdef RDEBUG
-  memset(p_Procs, 0, sizeof(p_Procs_s));
-#endif
-  _p_procs = p_Procs;
-  assume(IsValidSpec(field, length, ord));
-
-  SetProcs(field, length, ord);
-  assume(
-    (p_Procs->p_Delete != NULL) &&
-    (p_Procs->p_ShallowCopyDelete != NULL) &&
-    (p_Procs->p_Mult_nn != NULL) &&
-    (p_Procs->pp_Mult_nn != NULL) &&
-    (p_Procs->p_Copy != NULL) &&
-    (p_Procs->pp_Mult_mm != NULL) &&
-    (p_Procs->pp_Mult_mm_Noether != NULL) &&
-    (p_Procs->p_Mult_mm != NULL) &&
-    (p_Procs->p_Add_q != NULL) &&
-    (p_Procs->p_Neg != NULL) &&
-    (p_Procs->pp_Mult_Coeff_mm_DivSelect != NULL) &&
-    (p_Procs->p_Merge_q != NULL) &&
-    (p_Procs->p_kBucketSetLm != NULL) &&
-    (p_Procs->p_Minus_mm_Mult_qq != NULL));
-  assume(p_Procs->pp_Mult_mm_Noether != pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral || 
-         p_Procs->p_Minus_mm_Mult_qq == p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral || 
-         r->OrdSgn == 1 || r->LexOrder);
-}
-
-#ifdef RDEBUG 
-void p_Debug_GetSpecNames(const ring r, char* &field, char* &length, char* &ord)
-{
-  p_Field     e_field = p_FieldIs(r);
-  p_Length    e_length = p_LengthIs(r);
-  p_Ord       e_ord = p_OrdIs(r);
-  
-  field  = p_FieldEnum_2_String(p_FieldIs(r));
-  length = p_LengthEnum_2_String(p_LengthIs(r));
-  ord    = p_OrdEnum_2_String(p_OrdIs(r));
-}
-// like SetProcs, only that names are set
-static int set_names = 0;
-void p_Debug_GetProcNames(const ring r, p_Procs_s* p_Procs)
-{
-  set_names = 1;
-  p_SetProcs(r, p_Procs);
-  set_names = 0;
-}
-#endif // RDEBUG
-
-#define __SetProc(what, type, field, length, ord) \
-  _p_procs->what = (what##_Proc_Ptr) what##_Proc_##type [index(what##_Proc, field, length, ord)]
-
-#define ___SetProc(what, field, length, ord) __SetProc(what, funcs, field, length, ord)
-
-#ifdef RDEBUG
-#define _SetProc(what, field, length, ord)      \
-do                                              \
-{                                               \
-  if (set_names)                                \
-    __SetProc(what, names, field, length, ord); \
-  else                                          \
-    ___SetProc(what, field, length, ord);       \
-}                                               \
-while(0)
-#else
-#define _SetProc ___SetProc
-#endif
-
-#else /* GENERATE_P_PROCS */
-/***************************************************************
- * 
- * generate time stuff
- *
- ***************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-char*** generated_p_procs;
-
-inline int AlreadyHaveProc(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
-{
-  return (generated_p_procs[proc])[index(proc, field, length, ord)] != 0;
-}
-
-const char* macros_field[] = {"n_Copy","n_Delete", "n_Mult", "n_Add", "n_Sub", "n_IsZero", "n_Equal" , "n_Neg", NULL};
-
-const char* macros_length[] =
-{"p_MemCopy", "p_MemAdd", "p_MemSum", NULL};
-
-const char* macros_length_ord[] = {"p_MemCmp", NULL};
-int DummyProcs = 0;
-
-void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_Ord ord)
-{
-  int i;
-  const char* s_length = p_LengthEnum_2_String(length);
-  const char* s_ord = p_OrdEnum_2_String(ord);
-  const char* s_field = p_FieldEnum_2_String(field);
-  char* s_full_proc_name = (char*) malloc(200);
-  
-  sprintf(s_full_proc_name, "%s__%s_%s_%s", s_what, s_field, s_length, s_ord);
-             
-  (generated_p_procs[proc])[index(proc, field, length, ord)] = s_full_proc_name;
-  
-  // define all macros 
-  printf("\n// definition of %s\n", s_full_proc_name);
-  i = 0;
-  while (macros_field[i] != NULL)
-  {
-    printf("#undef %s\n#define %s\t%s_%s\n", 
-           macros_field[i], macros_field[i],  macros_field[i], s_field);
-    i++;
-  }
-  i = 0;
-  while (macros_length[i] != NULL)
-  {
-    printf("#undef %s\n#define %s\t%s_%s\n", 
-           macros_length[i], macros_length[i], macros_length[i], s_length);
-    i++;
-  }
-  i = 0;
-  while (macros_length_ord[i] != NULL)
-  {
-    printf("#undef %s\n#define %s\t%s_%s_%s\n", 
-           macros_length_ord[i], macros_length_ord[i], macros_length_ord[i], s_length, s_ord);
-    i++;
-  }
-
-  // define DECLARE_LENGTH
-  printf("#undef DECLARE_LENGTH\n");
-  printf("#undef p_MemAddAdjust\n");
-  if (length != LengthGeneral)
-  {
-    printf("#define DECLARE_LENGTH(what) ((void)0)\n");
-    printf("#define p_MemAddAdjust(p, r) ((void)0)\n");
-  }
-  else
-  {
-    printf("#define DECLARE_LENGTH(what) what\n");
-    printf("#define p_MemAddAdjust(p, r) p_MemAdd_NegWeightAdjust(p, r)\n");
-  }
-  
-  // define DECLARE_ORDSGN
-  printf("#undef DECLARE_ORDSGN\n");
-  if (ord != OrdGeneral)
-    printf("#define DECLARE_ORDSGN(what) ((void)0)\n");
-  else
-    printf("#define DECLARE_ORDSGN(what) what\n");
-
-  printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
-  printf("#include \"%s__Template.cc\"\n", s_what);
-  printf("#undef %s\n", s_what);
-}
-
-void GenerateProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_Ord ord)
-{
-  if (! AlreadyHaveProc(proc, field, length, ord))
-    AddProc(s_what, proc, field, length, ord);
-}
-
-int main()
-{
-  int field;
-  int length; 
-  int ord;
-  int i, j;
-  int NumberOfHaveProcs = 0;
-  
-  
-  printf("/* -*-c++-*- */\n");
-  printf("/***************************************************************\n");
-  printf(" This file was generated automatically by p_Procs.cc: DO NOT EDIT\n\n");
-  printf(" This file provides the needed implementation of p_Procs\n");
-  printf(" See the end for a summary. \n");
-  printf("*******************************************************************/\n");
-
-  generated_p_procs = (char***) malloc(p_Unknown_Proc*sizeof(char**));
-  for (i=0; i<p_Unknown_Proc; i++)
-  {
-    generated_p_procs[i] = 
-      (char**) calloc(index((p_Proc)i, FieldUnknown, LengthUnknown, OrdUnknown), sizeof(char*));
-  }
-  
-  // set default procs
-  for (field = 0; field < (int) FieldUnknown; field++)
-  {
-    for (length=0; length < (int) LengthUnknown; length++)
-    {
-      for (ord=0; ord < (int)OrdUnknown; ord++)
-      {
-        if (IsValidSpec((p_Field) field, (p_Length) length, (p_Ord) ord))
-            SetProcs((p_Field) field, (p_Length) length, (p_Ord) ord);
-      }
-    }
-  }
-
-  printf("
-/***************************************************************
-  Names of procs for RDEBUG */
-#ifdef RDEBUG\n");
-
-  for (i=0; i<p_Unknown_Proc; i++)
-  {
-    printf("static const char* %s_names[] = {", p_ProcEnum_2_String((p_Proc)i));
-    for (j=0;j<index((p_Proc)i, FieldUnknown, LengthUnknown, OrdUnknown); j++)
-    {
-      char* s = (generated_p_procs[i])[j];
-      if (s != 0)
-      {
-        printf("\n\"%s\",", s);
-      }
-      else
-        printf("0,");
-          
-    }
-    printf("\n};\n");
-  }
-  printf("
-#endif // RDEBUG
-
-
-/***************************************************************/
-/* Tables for lookup of procedures: */\n");
-
-  for (i=0; i<p_Unknown_Proc; i++)
-  {
-    printf("static const %s_Ptr %s_funcs[] = {", p_ProcEnum_2_String((p_Proc)i), p_ProcEnum_2_String((p_Proc)i));
-    for (j=0;j<index((p_Proc)i, FieldUnknown, LengthUnknown, OrdUnknown); j++)
-    {
-      char* s = (generated_p_procs[i])[j];
-      if (s != 0)
-      {
-        NumberOfHaveProcs++;
-        printf("\n%s,", s);
-      }
-      else
-        printf("0,");
-          
-    }
-    printf("\n};\n");
-  }
-  printf("
-/***************************************************************
- * Summary: 
- *   HAVE_FAST_P_PROCS  = %d, 
- *   HAVE_FAST_FIELD    = %d, 
- *   HAVE_FAST_LENGTH   = %d, 
- *   HAVE_FAST_ORD      = %d, 
- *   HAVE_FAST_ZERO_ORD = %d
- *   
- *   Generated PolyProcs= %d
- *
- *******************************************************************/\n",
-         HAVE_FAST_P_PROCS, HAVE_FAST_FIELD, HAVE_FAST_LENGTH, HAVE_FAST_ORD, HAVE_FAST_ZERO_ORD,
-         NumberOfHaveProcs);
-}
-
-#define _SetProc(what, field, length, ord) \
-      GenerateProc(#what, what##_Proc, field, length, ord)
-#endif // GENERATE_P_PROCS
-
-/***************************************************************
- * 
- * Setting the procedures
+ * Macros for setting procs -- these are used for 
+ * generation and setting
  *
  ***************************************************************/
 
-#define SetProc(what, field, length, ord)              \
+#define SetProc(what, field, length, ord)                   \
 do                                                          \
 {                                                           \
   p_Field t_field = field;                                  \
   p_Ord t_ord = ord;                                        \
   p_Length t_length = length;                               \
-  FastProcFilter(what##_Proc, t_field, t_length, t_ord);\
-  _SetProc(what, t_field, t_length, t_ord);                 \
+  FastProcFilter(what##_Proc, t_field, t_length, t_ord);    \
+  DoSetProc(what, t_field, t_length, t_ord);                \
 }                                                           \
-while (0)
+while (0)                                                   \
   
-static void SetProcs(p_Field field, p_Length length, p_Ord ord)
-{
-  SetProc(p_Delete, field, LengthGeneral, OrdGeneral);
-  SetProc(p_Mult_nn, field, LengthGeneral, OrdGeneral);
-  SetProc(pp_Mult_nn, field, length, OrdGeneral);
-  SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);
-  SetProc(p_Copy, field, length, OrdGeneral);
-  SetProc(pp_Mult_mm, field, length, OrdGeneral);
-  SetProc(pp_Mult_mm_Noether, field, length, ord);
-  SetProc(p_Mult_mm, field, length, OrdGeneral);
-  SetProc(p_Add_q, field, length, ord);
-  SetProc(p_Minus_mm_Mult_qq, field, length, ord);
-  SetProc(p_kBucketSetLm, field, length, ord);
-  SetProc(p_Neg, field, LengthGeneral, OrdGeneral);
-  SetProc(pp_Mult_Coeff_mm_DivSelect, field, length, OrdGeneral);
-  SetProc(p_Merge_q, FieldGeneral, length, ord);
-}
+#define SetProcs(field, length, ord)                                \
+do                                                                  \
+{                                                                   \
+  SetProc(p_Delete, field, LengthGeneral, OrdGeneral);              \
+  SetProc(p_Mult_nn, field, LengthGeneral, OrdGeneral);             \
+  SetProc(pp_Mult_nn, field, length, OrdGeneral);                   \
+  SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);   \
+  SetProc(p_Copy, field, length, OrdGeneral);                       \
+  SetProc(pp_Mult_mm, field, length, OrdGeneral);                   \
+  SetProc(pp_Mult_mm_Noether, field, length, ord);                  \
+  SetProc(p_Mult_mm, field, length, OrdGeneral);                    \
+  SetProc(p_Add_q, field, length, ord);                             \
+  SetProc(p_Minus_mm_Mult_qq, field, length, ord);                  \
+  SetProc(p_kBucketSetLm, field, length, ord);                      \
+  SetProc(p_Neg, field, LengthGeneral, OrdGeneral);                 \
+  SetProc(pp_Mult_Coeff_mm_DivSelect, field, length, OrdGeneral);   \
+  SetProc(p_Merge_q, FieldGeneral, length, ord);                    \
+}                                                                   \
+while (0)
+
+#endif // P_PROCS_IMPL_H
+

@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__Template.cc,v 1.8 2000-11-24 19:30:50 obachman Exp $
+ *  Version: $Id: pp_Mult_mm__Template.cc,v 1.9 2000-12-07 15:04:02 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -15,7 +15,7 @@
  *   Const:    p, m
  *
  ***************************************************************/
-poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
+LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);

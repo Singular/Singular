@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.147 2000-12-06 11:03:27 Singular Exp $ */
+/* $Id: ring.cc,v 1.148 2000-12-07 15:04:02 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3137,7 +3137,7 @@ BOOLEAN rComplete(ring r, int force)
   // ----------------------------
   // p_Procs: call AFTER NegWeightL
   r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
-  p_SetProcs(r, r->p_Procs);
+  p_ProcsSet(r, r->p_Procs);
 
   return FALSE;
 }

@@ -6,7 +6,7 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Add_q__Template.cc,v 1.4 2000-10-30 13:40:22 obachman Exp $
+ *  Version: $Id: p_Add_q__Template.cc,v 1.5 2000-12-07 15:03:57 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -16,7 +16,7 @@
  * Destroys: p, q
  * 
  ***************************************************************/
-poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
+LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
 {
   p_Test(p, r);
   p_Test(q, r);

@@ -6,7 +6,7 @@
  *  Purpose: template for pp_Mult_Coeff_mm__DivSelect
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_Coeff_mm_DivSelect__Template.cc,v 1.3 2000-10-30 13:40:26 obachman Exp $
+ *  Version: $Id: pp_Mult_Coeff_mm_DivSelect__Template.cc,v 1.4 2000-12-07 15:04:01 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -16,7 +16,7 @@
  *   Const:    p, m
  *
  ***************************************************************/
-poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
+LINKAGE poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
 {
   number n = pGetCoeff(m);
   pAssume(!n_IsZero(n,r));

@@ -6,10 +6,10 @@
  *  Purpose: template for p_Copy
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Copy__Template.cc,v 1.4 2000-10-30 13:40:22 obachman Exp $
+ *  Version: $Id: p_Copy__Template.cc,v 1.5 2000-12-07 15:03:57 obachman Exp $
  *******************************************************************/
 
-poly p_Copy(poly s_p, const ring r)
+LINKAGE poly p_Copy(poly s_p, const ring r)
 {
   // let's not do tests here -- but instead allow
   // to be sloppy

@@ -1,1 +1,1 @@
-#undef HABE_STATIC
+#undef HAVE_STATIC

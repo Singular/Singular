@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.9 2000-11-28 11:50:55 obachman Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.10 2000-12-07 15:03:58 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -17,7 +17,7 @@
  * Const:    m, q
  * 
  ***************************************************************/
-poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring r, poly &last)
+LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring r, poly &last)
 {
   p_Test(p, r);
   p_Test(q, r);

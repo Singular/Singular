@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.64 2000-11-28 11:50:53 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.65 2000-12-07 15:03:55 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -497,6 +497,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int   srmax,lrmax, red_result;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
+#ifdef PROT_LENGTH
+  int length;
+#endif
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
@@ -631,6 +634,13 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
 
       // enter into S, L, and T
+#ifdef PROT_LENGTH
+      if (TEST_OPT_PROT)
+      {
+        length += strat->P.GetpLength();
+        Print("[%d:%d]", strat->P.GetpLength(), length);
+      }
+#endif
       enterT(strat->P, strat);
       enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       // posInS only depends on the leading term

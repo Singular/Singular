@@ -6,7 +6,7 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Merge_q__Template.cc,v 1.2 2000-11-08 17:12:33 obachman Exp $
+ *  Version: $Id: p_Merge_q__Template.cc,v 1.3 2000-12-07 15:03:58 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -15,7 +15,7 @@
  * Destroys: p, q
  * 
  ***************************************************************/
-poly p_Merge_q(poly p, poly q, const ring r)
+LINKAGE poly p_Merge_q(poly p, poly q, const ring r)
 {
   assume(p != NULL && q != NULL);
   p_Test(p, r);
