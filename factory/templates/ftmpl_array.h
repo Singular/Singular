@@ -1,11 +1,14 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_array.h,v 1.2 1997-03-27 10:29:30 schmidt Exp $
+// $Id: ftmpl_array.h,v 1.3 1997-04-15 10:04:24 schmidt Exp $
 
 #ifndef INCL_ARRAY_H
 #define INCL_ARRAY_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/03/27 10:29:30  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.1  1996/07/16 12:24:57  stobbe
 "operators += and *= deleted sincethey are not needed in an general
 array class als well as the functions sum, prod, crossprod.
@@ -15,6 +18,9 @@ Revision 1.0  1996/05/17 11:06:32  stobbe
 Initial revision
 
 */
+
+/*MAKEHEADER*/
+#include "templates/config.h"
 
 #ifndef NOSTREAMIO
 #include <iostream.h>

@@ -1,15 +1,21 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_factor.h,v 1.1 1997-03-27 10:30:35 schmidt Exp $
+// $Id: ftmpl_factor.h,v 1.2 1997-04-15 10:08:06 schmidt Exp $
 
 #ifndef INCL_FACTOR_H
 #define INCL_FACTOR_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/03/27 10:30:35  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.0  1996/05/17 11:06:32  stobbe
 Initial revision
 
 */
+
+/*MAKEHEADER*/
+#include "templates/config.h"
 
 #ifndef NOSTREAMIO
 #include <iostream.h>
