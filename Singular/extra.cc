@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.100 1999-08-13 08:10:01 Singular Exp $ */
+/* $Id: extra.cc,v 1.101 1999-08-16 17:53:00 hannes Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -281,7 +281,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
 #ifdef HAVE_SETENV
       if (h!=NULL && h->Typ()==STRING_CMD && h->Data() != NULL &&
-          h->next != NULL && h->next->Typ() == STRING_CMD 
+          h->next != NULL && h->next->Typ() == STRING_CMD
           && h->next->Data() != NULL)
       {
         res->rtyp=STRING_CMD;
@@ -296,9 +296,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
 #else
-      WerroS("setenv not supported on this platform");
+      WerrorS("setenv not supported on this platform");
       return TRUE;
-#endif      
+#endif
     }
     else
 /*==================== Singular ==================================*/
@@ -325,7 +325,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         {
           if (h->Typ() == STRING_CMD)
           {
-            if (strcmp(feHelpBrowser((char*) h->Data(), 1), 
+            if (strcmp(feHelpBrowser((char*) h->Data(), 1),
                        (char*) h->Data()) != 0)
             {
               Werror("Can not set HelpBrowser to '%s'", (char*) h->Data());
@@ -350,7 +350,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if ((unsigned int) val > 1)
         {
           res->rtyp=STRING_CMD;
-          if (strcmp(sys_cmd, "--browser") == 0 && 
+          if (strcmp(sys_cmd, "--browser") == 0 &&
               (val == NULL || *val == '\0'))
             res->data = (void*) mstrdup(feHelpBrowser());
           else
