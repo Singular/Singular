@@ -10,12 +10,12 @@ done
 
 echo "#!/bin/sh" >config.status
 echo "cd src" >>config.status
-echo ./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix >>config.status
+echo ./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix NTL_GMP_LIP=on GMP_PREFIX=$prefix/`../singuname.sh` >>config.status
 echo "cd .." >>config.status
 
 cd src
 
-./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix
+./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix NTL_GMP_LIP=on GMP_PREFIX=$prefix/`../singuname.sh`
 
 cd ..
 

@@ -87,15 +87,15 @@ DOCDIR=$(PREFIX)/doc
 ###############################################################
 
 
-GMP_INCDIR=
+GMP_INCDIR=-I/home/hannes/singular/2-0-4/ix86-Linux/include
 # Set to -I<directory containing gmp.h> if using GMP and GMP
 # is not installed in a standard system directory, empty otherwise
 
-GMP_LIBDIR=
+GMP_LIBDIR=-L/home/hannes/singular/2-0-4/ix86-Linux/lib
 # Set to -L<directory containing libgmp.a> if using GMP and GMP
 # is not installed in a standard system directory, empty otherwise
 
-GMP_LIB=
+GMP_LIB=-lgmp
 # Set to -lgmp if using GMP, empty otherwise
 
 ###############################################################
