@@ -213,7 +213,7 @@ iparith.inc mpsr_Tok.inc: gmalloc.o claptmpl.o iparith.cc \
 
 
 mmtables.inc: mmtables.c mmprivate.h mmemory.h mod2.h
-	${CXX} ${CXXFLAGS}  ${CPPFLAGS}\
+	${CC} ${CFLAGS}  ${CPPFLAGS}\
 	       -DGENERATE_INDEX_TABLE  -DHAVE_ASO=0 -DHAVE_INDEX_TABLE mmtables.c -o mmtables
 	./mmtables > mmtables.inc
 	rm -f mmtables mmtables.exe
