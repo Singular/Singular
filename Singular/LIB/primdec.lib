@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.39 1999-07-07 14:39:12 obachman Exp $
+// $Id: primdec.lib,v 1.40 1999-07-26 13:37:49 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,27 +10,22 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.39 1999-07-07 14:39:12 obachman Exp $";
+version="$Id: primdec.lib,v 1.40 1999-07-26 13:37:49 Singular Exp $";
 info="
-LIBRARY: primdec.lib PROCEDURE FOR PRIMARY DECOMPOSITION
-
-AUTHORS: Gerhard Pfister, Wolfram Decker, Hans Schoenemann
+LIBRARY: primdec.lib      PROCEDURES FOR PRIMARY DECOMPOSITION
+AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
+          Wolfram Decker, email: decker@math.uni-sb.de         (SY)
+          Hans Schoenemann, email: hannes@mathematik.uni-kl.de (SY)
 
 PROCEDURES:
-  minAssGTZ(I);     computes the minimal associated primes
-                      via Gianni,Trager,Zacharias
-  minAssChar(I);    computes the minimal associated primes
-                      using characteristic sets
-  primdecGTZ(I);    computes a complete primary decomposition
-                      via Gianni,Trager,Zacharias
-  primdecSY(I);     computes a complete primary decomposition
-                      via Shimoyama-Yokoyama
-  testPrimary(L,k); tests whether the result of the primary
-                      decomposition is correct
+  primdecGTZ(I);    complete primary decomposition via Gianni,Trager,Zacharias
+  primdecSY(I);     complete primary decomposition via Shimoyama-Yokoyama
+  minAssGTZ(I);     the minimal associated primes via Gianni,Trager,Zacharias
+  minAssChar(I);    the minimal associated primes using characteristic sets
+  testPrimary(L,k); tests the result of the primary decomposition
   radical(I);       computes the radical of the ideal I
-  equiRadical(I);   computes the radical of the equidimensional part
-                      of the ideal I
-  prepareAss(I);    computes the radicals of the equidimensional parts of I
+  equiRadical(I);   the radical of the equidimensional part of the ideal I
+  prepareAss(I);    list of radicals of the equidimensional components of I
 
 REMARK:
 These procedures are implemented to be used in characteristic 0.
@@ -467,11 +462,12 @@ proc primaryTest (ideal i, poly p)
 
       i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
 
-      if(i[m]==0)
+      if((i[m]==0)&&(voice>=15))
       {
          "Warning: The characteristic ist too small to use";
          "the Algorithm of Gianni/Trager/Zacharias.";
          "This may result in an infinte loop";
+         " current nesting level in primaryTest",voice;
       }
       if (reduce(i[m]-t^e,prm,1) !=0)
       {
@@ -776,7 +772,7 @@ EXAMPLE: example zero_decomp; shows an example
      return(primary);
   }
 
-//withe the factors new ideals (hopefully the primary decomposition)
+//with the factors new ideals (hopefully the primary decomposition)
 //are created
 
   if(size(act[1])>1)
@@ -1527,7 +1523,6 @@ proc minAssPrimes(ideal i, list #)
 "USAGE:   minAssPrimes(i); i ideal
          minAssPrimes(i,1); i ideal  (to use also the factorizing Groebner)
 RETURN:  list = the minimal associated prime ideals of i
-NOTE:
 EXAMPLE: example minAssPrimes; shows an example
 "
 {
@@ -1649,7 +1644,7 @@ example
    ideal i = p^2*q^3,(y-z3)^3,(x-yz+z4)^4;
    list pr= minAssPrimes(i);
    pr;
-   pr= minAssPrimes(i,1);
+   minAssPrimes(i,1);
 }
 
 proc union(list li)
@@ -1946,7 +1941,7 @@ EXAMPLE: example decomp; shows an example
   //search for a maximal independent set indep,i.e.
   //look for subring such that the intersection with the ideal is zero
   //j intersected with K[var(indep[3]+1),...,var(nvar] is zero,
-  //indep[1] is the new varstring and indep[2] the string for the block-ordering
+  //indep[1] is the new varstring and indep[2] the string for block-ordering
   //------------------------------------------------------------------
 
   if(@wr!=1)
@@ -2056,15 +2051,15 @@ EXAMPLE: example decomp; shows an example
      //to this quotientring, j is their still a standardbasis, the
      //leading coefficients of the polynomials  there (polynomials in
      //K[var(nnp+1),..,var(nva)]) are collected in the list h,
-     //we need their ggt, gh, because of the following:
-     //let (j:gh^n)=(j:gh^infinity) then j*K(var(nnp+1),..,var(nva))[..the rest..]
+     //we need their ggt, gh, because of the following: let
+     //(j:gh^n)=(j:gh^infinity) then j*K(var(nnp+1),..,var(nva))[..the rest..]
      //intersected with K[var(1),...,var(nva)] is (j:gh^n)
      //on the other hand j=(j,gh^n) intersected with (j:gh^n)
 
      //------------------------------------------------------------------------------------
 
-     //the arrangement for the quotientring K(var(nnp+1),..,var(nva))[..the rest..]
-     //and the map phi:K[var(1),...,var(nva)] ----->K(var(nnpr+1),..,var(nva))[..the rest..]
+     //arrangement for quotientring K(var(nnp+1),..,var(nva))[..the rest..] and
+     //map phi:K[var(1),...,var(nva)] -->K(var(nnpr+1),..,var(nva))[..rest..]
      //-------------------------------------------------------------------------------------
 
      quotring=prepareQuotientring(nvars(basering)-indep[@m][3]);
@@ -2111,8 +2106,8 @@ EXAMPLE: example decomp; shows an example
      //polynomialring, i.e. let q=(f1,...,fr) in the quotientring such an ideal
      //but fi polynomials, then the intersection of q with the polynomialring
      //is the saturation of the ideal generated by f1,...,fr with respect to
-     //h which is the lcm of the leading coefficients of the fi considered in the
-     //quotientring: this is coded in saturn
+     //h which is the lcm of the leading coefficients of the fi considered
+     //in the quotientring: this is coded in saturn
 
      list saturn;
      ideal hpl;
@@ -4007,10 +4002,10 @@ proc reconvList(list l)
 
 proc primdecGTZ(ideal i)
 "USAGE:  primdecGTZ(i); i ideal
-RETURN:  list = list of primary ideals
-                and their associated primes
+RETURN:  a list, say pr, of primary ideals and their associated primes
+         pr[i][1], resp. pr[i][2] is the i-th primary resp. prime component
 NOTE:    Algorithm of Gianni, Traeger, Zacharias
-         designed for characteristic 0, works also in char k >> 0,
+         designed for characteristic 0, works also in char k > 0,
          may result in an infinite loop in small characteristic
 EXAMPLE: example primdecGTZ; shows an example
 "
@@ -4030,11 +4025,11 @@ example
 
 proc primdecSY(ideal i)
 "USAGE:  primdecSY(i); i ideal
-RETURN:  list = list of primary ideals
-                and their associated primes
+RETURN:  a list, say pr, of primary ideals and their associated primes
+         pr[i][1], resp. pr[i][2] is the i-th primary resp. prime component
 NOTE:    Algorithm of Shimoyama-Yokoyama
-         implemented for characteristic 0, works also in char k >> 0,
-         the result may be not compltely decomposed in small characteristic
+         implemented for characteristic 0, works also in char k > 0,
+         the result may be not completely decomposed in small characteristic
 EXAMPLE: example primdecSY; shows an example
 "
 {
@@ -4053,7 +4048,8 @@ example
 proc minAssGTZ(ideal i)
 "USAGE:  minAssGTZ(i); i ideal
 RETURN:  list = the minimal associated prime ideals of i
-NOTE:    designed for characteristic 0, works also in char k >> 0,
+NOTE:    designed for characteristic 0, works also in char k > 0
+         if it terminates,
          may result in an infinite loop in small characteristic
 EXAMPLE: example minAssGTZ; shows an example
 "
@@ -4074,9 +4070,9 @@ example
 proc minAssChar(ideal i)
 "USAGE:  minAssChar(i); i ideal
 RETURN:  list = the minimal associated prime ideals of i
-NOTE:    implemented for characteristic 0, works also in char k >> 0,
-         the result may be not compltely decomposed in small characteristic
-EXAMPLE: example primdecSY; shows an example
+NOTE:    implemented for characteristic 0, works also in char k > 0,
+         the result may be not completely decomposed in small characteristic
+EXAMPLE: example minAssChar; shows an example
 "
 {
    return(min_ass_prim_charsets(i,1));
@@ -4093,9 +4089,9 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc equiRadical(ideal i)
 "USAGE:  equiRadical(i); i ideal
-RETURN:  ideal = the intersection of associated primes
-         of i of dimension of i
-NOTE:    designed for characteristic 0, works also in char k >> 0,
+RETURN:  ideal, intersection of associated primes of i of maximal  dimension
+NOTE:    designed for characteristic 0, works also in char k > 0
+         if it terminates,
          may result in an infinite loop in small characteristic
 EXAMPLE: example equiRadical; shows an example
 "
@@ -4117,7 +4113,8 @@ proc radical(ideal i,list #)
 RETURN:  ideal = the radical of i
 NOTE:    a combination of the algorithms of Krick/Logar
          and Eisenbud/Huneke/Vasconcelos
-         designed for characteristic 0, works also in char k >> 0,
+         designed for characteristic 0, works also in char k > 0
+         if it termintes,
          may result in an infinite loop in small characteristic
 EXAMPLE: example radical; shows an example
 "
@@ -4212,8 +4209,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc prepareAss(ideal i)
 "USAGE:  prepareAss(i); i ideal
-RETURN:  list = the radicals of the equidimensional parts of i
-NOTE:    algorithm of Eisenbud,Huneke and Vasconcelos
+RETURN:  list = the radicals of the maximal dimensional components of i
+NOTE:    uses algorithm of Eisenbud,Huneke and Vasconcelos
 EXAMPLE: example prepareAss; shows an example
 "
 {
@@ -4253,10 +4250,8 @@ example
 }
 
 proc testPrimary(list pr, ideal k)
-"USAGE:   testPrimary(pr,k) pr=primdecGTZ(k) or primdecSY(k)
-RETURN:   int = 1, if the intersection of the primary ideals
-                in pr is k, 0 if not
-NOTE:
+"USAGE:   testPrimary(pr,k); pr a list, result of primdecGTZ(k) or primdecSY(k)
+RETURN:  int = 1, if intersection of the primary ideals in pr is k, 0 if not
 EXAMPLE: example testPrimary ; shows an example
 "
 {
