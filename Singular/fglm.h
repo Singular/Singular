@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.2 1997-03-26 17:07:20 Singular Exp $
+// $Id: fglm.h,v 1.3 1997-03-27 16:11:40 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -65,6 +65,8 @@ ostream & operator << ( ostream &, const fglmDelem & );
 // The sourceIdeal has to be a reduced, 0-dimensional groebner basis in sourceRing.
 // Warning: There is no check, if the ideal is really 0-dimensional and minimal.
 // If it is minimal but not reduced, then it returns FALSE, otherwise TRUE.
+// Warning: There is no check, if the rings are compatible for fglm (see 
+// fglm.cc for functions to check this)
 // if switchBack==TRUE, then the procedure sets the ring as currentRing which was
 // current when it was called ( When called there may be currRing != sourceRing ).
 // if switchBack==FALSE, then currRing==destRing at the end.
