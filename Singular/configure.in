@@ -91,10 +91,31 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_AIX
 
+# test for gcc-version: gcc2: prefer CC=gcc, CXX=gcc
+#                       gcc3:        CC=gcc  CXX=g++
+#                       other:       CC=cc   CXX=c++
+AC_MSG_CHECKING(can CC compile C++ files)
+AC_CACHE_VAL(ac_cv_c_cpp,
+AC_TRY_RUN([int main() {
+FILE *f=fopen("conftestval", "w");
+#ifdef __GNUC__
+char *p=__VERSION__;
+if (!f) exit(1);
+if (p[0]=='2') fprintf(f, "gcc2\n");
+else if (p[0]=='3') fprintf(f, "gcc3\n");
+else fprintf(f, "gcc_unknown\n");
+#else
+if (!f) exit(1);
+fprintf(f, "unknown\n");
+#endif
+fclose(f);exit(0); }],ac_cv_c_cpp=`cat conftestval`,ac_cv_c_cpp=unknown,ac_cv_c_cpp=unknown))
+
 # we prefer using gcc for compiling C++ files, provided the user did
 # not overwrite it explicitely
 if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
+if test "${ac_cv_c_cpp}" = gcc2; then
   CXX=gcc
+fi
 temp_cflags=${CXXFLAGS}
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
@@ -544,18 +565,6 @@ AC_LANG_CPLUSPLUS
 #include<readline/history.h>
 #endif
 ,
-#ifndef NULL
-#define NULL 0
-#endif
-rl_readline_name=NULL;
-*rl_line_buffer=1;
-completion_matches(NULL, filename_completion_function);
-rl_attempted_completion_function = (CPPFunction *) NULL;
-rl_outstream=NULL;
-readline(NULL);
-add_history(NULL);
-read_history(NULL);
-write_history(NULL);
 ,
 ac_cv_header_readline_readline_h_ok="yes",
 ac_cv_header_readline_readline_h_ok="no",
