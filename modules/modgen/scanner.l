@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.4 2000-01-21 09:23:22 krueger Exp $ */
+/* $Id: scanner.l,v 1.5 2000-01-27 12:40:55 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #include "stype.h"
 #include "grammar.h"
 
-/*#define DEBUG 3*/
+#define DEBUG 3
  
 #  define YYLP_ERR_NONE    0
 #  define YYLP_DEF_BR2     1
@@ -104,6 +104,7 @@ endcode        (\n+%+[}]+\n)
 
 WS             [[:blank:]]+
 NL             \r?\n
+WSNL           ([ \t\n\r]+)
 EQ             (([{WS}]+=[{WS}]+)|=)
 
 NAME           ([[:alpha:]_][[:alnum:]_-]*)
@@ -257,6 +258,14 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 	          push_state(YYSTATE, PROCDECL, "PROCDECL");
 		  return PROCDECLTOK;
                 }
+        example+{WSNL}+"{" {
+	          printf(">>>EXAMPLE\n");
+                  brace1 = 1; /* { */
+                  brace2 = 0; /* ( */
+                  brace3 = 0; /* [ */
+	          push_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
+		  return EXAMPLETOK;
+                }
         .       { printf("<<<'%s' ", yytext); }
 
        }
@@ -327,6 +336,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                      char * s, *t;
 
 		     pop_state();
+#if 0
 		     s = t = lvalp->name = dupyytext();
 		     while (*yytext)
 		     {
@@ -334,6 +344,9 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		       *s++ = *yytext++;
 		     }
 		     if(s-t>2 && *(s-1)=='}' && *(s-2)=='%') *(s-2)='\0';
+#else
+                     lvalp->name = yytext;
+#endif
 #if DEBUG > 1
                      printf("2 BRACE DOWN=%d\n", brace1);
 #endif
@@ -351,8 +364,10 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
 <PROCCMDBLOCK>{
        {col}  { pop_state(); return ';'; }
+	"("     { return '('; }
+	")"     { return ')'; }
        {WS}    /* ignore */
-       {NAME} { lvalp->name = strdup(yytext); return PROCCMD; }
+       {NAME} { lvalp->name = strdup(yytext); return NAME; }
        .      { printf("PCB: '%s'\n", yytext); }
        }
 

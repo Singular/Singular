@@ -1,5 +1,5 @@
 /*
- * $Id: proc_setup.cc,v 1.2 2000-01-21 09:23:22 krueger Exp $
+ * $Id: proc_setup.cc,v 1.3 2000-01-27 12:40:54 krueger Exp $
  */
 
 #include <stdio.h>
@@ -37,21 +37,28 @@ int init_proc(
   
   if( p->funcname != NULL ) free(p->funcname);
   if( p->c_code != NULL ) free(p->c_code);
+  if( p->help_string != NULL) free(p->help_string);
+  if( p->example_string != NULL) free(p->example_string);
   if( p->paramcnt>0 ) { 
     //free(p->param);
   }
 
   memset((void *)p, 0, sizeof(procdef));
   p->procname = strdup(procname);
+
   if( ret != NULL ) {
     char typname[32];
 
     decl2str(ret->typ, typname);
     ret->typname = strdup(typname);
     memcpy((void *)(&p->return_val), (void *)ret, sizeof(paramdef));
+  } else {
+    p->return_val.name = strdup("NONE");
+    p->return_val.typname = strdup("NONE");
+    p->return_val.typ = NONE;
   }
+  
   p->lineno = lineno;
-  p->return_val.typ = NONE;
   p->flags.do_typecheck = default_do_typecheck;
   p->flags.do_return = default_do_return;
   p->flags.declaration_done = 0;
@@ -176,10 +183,6 @@ void proc_set_var(
       case VAR_STRING:
         q = (char *)varvalue;
         switch(varid) {
-            case VAR_FUNCTION:
-              if(p->funcname != NULL) free(p->funcname);
-              p->funcname = strdup(q);
-              break;
             case VAR_HELP:
               break;
         }

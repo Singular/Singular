@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.4 2000-01-21 13:38:52 krueger Exp $
+ * $Id: proc.cc,v 1.5 2000-01-27 12:40:03 krueger Exp $
  */
 
 #include <stdio.h>
@@ -11,6 +11,7 @@
 #include <tok.h>
 #include "typmap.h"
 
+extern int trace;
 
 #if 1
 #  define logx printf
@@ -20,7 +21,8 @@
 /*#define DEBUG 1*/
 
 extern void PrintProc(procdefv pi);
-void write_function(moddefv module, procdefv proc);
+//void write_function(moddefv module, procdefv proc);
+static void write_function_declaration(procdefv pi, FILE *fp);
 static void  write_procedure_header(moddefv module, procdefv pi, FILE *fmtfp);
 static void gen_func_param_check(FILE *fp, procdefv pi, int i);
 
@@ -30,17 +32,58 @@ static void gen_func_param_check(FILE *fp, procdefv pi, int i);
 /*========================================================================*/
 void setup_proc(
   moddefv module,
-  procdefv p
+  procdefv proc
 )
 {
+  /* if proc is NULL, just return */
+  if( proc == NULL ) return;
 
-  if( p == NULL ) return;
-  write_function(module, p);
+//  if(proc->funcname == NULL) proc->funcname = strdup(proc->procname);
+  if(proc->return_val.typ == NONE) {
+    if(proc->return_val.typname == NULL) {
+      proc->return_val.typname = strdup("NONE");
+    }
+  }
+  if(trace) printf("\tcreating '%s'...", proc->procname); fflush(stdout);
   
-//  PrintProc(p);
-  return;
+  /* write call to add procname to list */
+  fprintf(module->modfp, "#line %d \"%s\"\n", proc->lineno, module->filename);
+  fprintf(module->modfp, "  iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
+          module->name, proc->procname, 
+          proc->is_static ? "TRUE" : "FALSE",
+          proc->procname);
+  if(proc->help_string!=NULL) {
+    fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(helphdl) ,");
+    fprintf(module->modfp, " IDID(helphdl));\n");
+    fprintf(module->modfp, "  enter_id(\"%s\",", proc->procname);
+    fprintf(module->modfp, " \"%s\", STRING_CMD);\n", proc->help_string);
+    fprintf(module->modfp, "  namespaceroot->push();\n");
+  }
+  fprintf(module->modfp, "\n");
+
+  write_procedure_header(module, proc, module->fmtfp);
+  fprintf(module->modfp_h,
+          "BOOLEAN mod_%s(leftv res, leftv h);\n", proc->procname);
+  //  printf(" done\n");
 }
 
+/*========================================================================*/
+void write_example(
+  moddefv module,
+  procdefv proc
+  )
+{
+  /* if proc is NULL, just return */
+  if( proc == NULL ) return;
+
+  if(proc->example_string!=NULL) {
+    fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(examplehdl) ,");
+    fprintf(module->modfp, " IDID(examplehdl));\n");
+    fprintf(module->modfp, "  enter_id(\"%s\",", proc->procname);
+    fprintf(module->modfp, " \"%s\", STRING_CMD);\n", proc->example_string);
+    fprintf(module->modfp, "  namespaceroot->push();\n");
+  }
+}
 /*========================================================================*/
 /*
  * write declaration of function to file pointed by 'fp', usualy the
@@ -52,7 +95,7 @@ static void write_function_declaration(procdefv pi, FILE *fp)
 {
   int i;
   
-  fprintf(fp, "BOOLEAN mod_%s(leftv res, leftv h);\n", pi->funcname);
+#if 0
   switch( pi->return_val.typ) {
       case SELF_CMD:
         fprintf(fp, "BOOLEAN %s(res, ", pi->funcname);
@@ -67,40 +110,14 @@ static void write_function_declaration(procdefv pi, FILE *fp)
     if(i<pi->paramcnt-1) fprintf(fp, ", ");
   }
   fprintf(fp, ");\n\n");
+#endif
 }
 
 /*========================================================================*/
-void write_function(
-  moddefv module,
-  procdefv proc
-)
-{
-  if(proc->funcname == NULL) proc->funcname = strdup(proc->procname);
-  if(proc->return_val.typ == NONE) {
-    //if(proc->return_val.name == NULL) proc->return_val.name = strdup("none");
-    if(proc->return_val.typname == NULL) {
-    proc->return_val.typname = strdup("NONE");
-    }
-  }
-  printf("\tcreating '%s'...", proc->procname); fflush(stdout);
-  
-  fprintf(module->modfp, "#line %d \"%s\"\n", proc->lineno, module->filename);
-  fprintf(module->modfp, "  iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
-          module->name, proc->procname, 
-          proc->is_static ? "TRUE" : "FALSE",
-          proc->funcname);
-
-  write_procedure_header(module, proc, module->fmtfp);
-//  generate_function(proc, module->fmtfp);
-  write_function_declaration(proc, module->modfp_h);
-  printf(" done\n");
-  
-  return;
-}
-
 void write_function_declaration(
   moddefv module,
-  procdefv pi
+  procdefv pi,
+  void *arg
   )
 {
   int i;
@@ -119,7 +136,8 @@ void write_function_declaration(
 
 void write_function_typecheck(
   moddefv module,
-  procdefv pi
+  procdefv pi,
+  void *arg
   )
 {
   write_procedure_typecheck(module, pi, module->fmtfp);
@@ -128,9 +146,35 @@ void write_function_typecheck(
 
 void write_function_return(
   moddefv module,
-  procdefv pi
+  procdefv pi,
+  void *arg
   )
 {
+  int i;
+
+  if(arg!=NULL) {
+    if( pi->funcname != NULL ) free(pi->funcname);
+    pi->funcname = strdup((char *)arg);
+    printf("CMD: return(%s)\n", arg);
+
+    /* write function declaration to header file */
+    switch( pi->return_val.typ) {
+        case SELF_CMD:
+          fprintf(module->modfp_h, "BOOLEAN %s(res, ", pi->funcname);
+          break;
+
+        default:
+          fprintf(module->modfp_h, "%s %s(", type_conv[pi->return_val.typ],
+                  pi->funcname);
+    }
+    for (i=0;i<pi->paramcnt; i++) {
+      fprintf(module->modfp_h, "%s res%d", type_conv[pi->param[i].typ], i);
+      if(i<pi->paramcnt-1) fprintf(module->modfp_h, ", ");
+    }
+    fprintf(module->modfp_h, ");\n\n");
+  }
+  else  printf("CMD: return()\n");
+
   write_procedure_return(module, pi, module->fmtfp);
 }
 
@@ -158,7 +202,7 @@ static void  write_procedure_header(
   printf("header..."); fflush(stdout);
   
   fprintf(fmtfp, "#line %d \"%s\"\n", pi->lineno, module->filename);
-  fprintf(fmtfp, "BOOLEAN mod_%s(leftv res, leftv h)\n{\n", pi->funcname);
+  fprintf(fmtfp, "BOOLEAN mod_%s(leftv res, leftv h)\n{\n", pi->procname);
 }
 
 /*========================================================================*/
@@ -190,7 +234,7 @@ void  write_procedure_typecheck(
     for (i=0;i<pi->paramcnt; i++) gen_func_param_check(fmtfp, pi, i);
 
     fprintf(fmtfp, "  if(v!=NULL) { tok = v->Typ(); goto mod_%s_error; }\n",
-            pi->funcname);
+            pi->procname);
 
     fprintf(fmtfp, "\n");
   }
@@ -219,16 +263,16 @@ static void gen_func_param_check(
   int i
   )
 {
-  fprintf(fp, "  if(v==NULL) goto mod_%s_error;\n", pi->funcname);
+  fprintf(fp, "  if(v==NULL) goto mod_%s_error;\n", pi->procname);
   fprintf(fp, "  tok = v->Typ();\n");
   fprintf(fp, "  if((index=iiTestConvert(tok, %s))==0)\n",
           pi->param[i].typname);
-  fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
+  fprintf(fp, "     goto mod_%s_error;\n", pi->procname);
   fprintf(fp, "  v_save = v->next;\n");
   fprintf(fp, "  v->next = NULL;\n");
   fprintf(fp, "  if(iiConvert(tok, %s, index, v, res%d))\n",
           pi->param[i].typname, i);
-  fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
+  fprintf(fp, "     goto mod_%s_error;\n", pi->procname);
   fprintf(fp, "  v = v_save;\n");
 }
 
@@ -249,9 +293,16 @@ void write_procedure_return(
 {
   int i;
   
-/*  if(pi->flags.do_return) {*/
-    printf("\nWriting return-block\n");
+  printf("\nWriting return-block\n");
     
+  printf("### RETURN: '%s' '%s' '%d'\n", pi->return_val.name,
+         pi->return_val.typname, pi->return_val.typ);
+  if(pi->funcname == NULL) {
+    fprintf(fmtfp, "  res->rtyp = NONE;\n");
+    fprintf(fmtfp, "  res->data = NULL;\n");
+    fprintf(fmtfp, "  return TRUE;\n");
+  }
+  else
     switch( pi->return_val.typ) {
         case SELF_CMD:
           fprintf(fmtfp, "    return(%s(res", pi->funcname);
@@ -263,6 +314,7 @@ void write_procedure_return(
 
         case NONE:
           fprintf(fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
+          fprintf(fmtfp, "  res->data = NULL;\n");
           fprintf(fmtfp, "  return(%s(", pi->funcname);
           for (i=0;i<pi->paramcnt; i++) {
             fprintf(fmtfp, "(%s) res%d->Data()",
@@ -280,9 +332,10 @@ void write_procedure_return(
                     type_conv[pi->param[i].typ], i);
             if(i<pi->paramcnt-1) fprintf(fmtfp, ", ");
           }
-          fprintf(fmtfp, ");\n  return FALSE;\n\n");
+          fprintf(fmtfp, ");\n");
+          fprintf(fmtfp, "  if(res->data != NULL) return FALSE;\n");
+          fprintf(fmtfp, "  else return TRUE;\n\n");
     }
-    /*}*/
 }
 
 /*========================================================================*/
@@ -296,13 +349,13 @@ void write_procedure_return(
     else {
 #endif
 
-void generate_function(procdefv pi, FILE *fp)
+void write_function_errorhandling(procdefv pi, FILE *fp)
 {
   int cnt = 0, i;
   if(pi->paramcnt>0) {
     if(pi->flags.typecheck_done) {
       printf("error handling..."); fflush(stdout);
-      fprintf(fp, "  mod_%s_error:\n", pi->funcname);
+      fprintf(fp, "  mod_%s_error:\n", pi->procname);
       fprintf(fp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(tok));\n",
               pi->procname);
       fprintf(fp, "    Werror(\"expected %s(", pi->procname);

@@ -12,6 +12,7 @@
 #include "modgen.h"
 #include "stype.h"
 
+int trace=1;
 /*
  *    Syntax of a module file:
  *    %{
@@ -88,7 +89,6 @@ main( int argc, char *argv[] )
   
   //fflush(module_def.fmtfp);
   //PrintProclist(&module_def);
-  //generate_mod(&module_def, 2);
   //mod_create_makefile(&module_def);
   if(module_def.fmtfp != NULL) fclose(module_def.fmtfp);
   if(module_def.modfp != NULL) fclose(module_def.modfp);

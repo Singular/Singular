@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.3 2000-01-21 09:23:22 krueger Exp $
+ * $Id: utils.cc,v 1.4 2000-01-27 12:40:53 krueger Exp $
  */
 
 #include <stdio.h>
@@ -8,6 +8,8 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "modgen.h"
+
+void init_system_type();
 
 /*========================================================================*/
 int init_modgen(
@@ -35,6 +37,8 @@ int init_modgen(
   module_def->name = (char *)malloc(strlen(tmpfile)+1);
   memset(module_def->name, '\0', strlen(tmpfile)+1);
   memcpy(module_def->name, tmpfile, strlen(tmpfile));
+  
+  init_system_type();
   
   return (create_tmpfile(module_def));
 }

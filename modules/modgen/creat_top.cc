@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.3 2000-01-17 08:32:25 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.4 2000-01-27 12:39:59 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -31,12 +31,19 @@ void  mod_copy_tmp(
 /*========================================================================*/
 void write_enter_id(FILE *fp)
 {
-  fprintf(fp, "void enter_id(char *name, char *value)\n");
-  fprintf(fp, "{\n  idhdl h;\n\n");
-  fprintf(fp, "  h = enterid(mstrdup(name),0, STRING_CMD, &IDROOT, FALSE);\n");
+  fprintf(fp, "idhdl enter_id(char *name, char *value, idtyp t)\n");
+  fprintf(fp, "{\n");
+  fprintf(fp, "  idhdl h;\n");
+  fprintf(fp, "\n");
+  fprintf(fp, "  h=enterid(mstrdup(name),0, t, &IDROOT, FALSE);\n");
   fprintf(fp, "  if(h!=NULL) {\n");
-  fprintf(fp, "     IDSTRING(h) = mstrdup(value);\n");
-  fprintf(fp, "  }\n}\n\n");
+  fprintf(fp, "     switch(t) {\n");
+  fprintf(fp, "       case STRING_CMD: IDSTRING(h) = mstrdup(value);break\n");
+  fprintf(fp, "       case PACKAGE_CMD: break;\n");
+  fprintf(fp, "     }\n");
+  fprintf(fp, "  }\n");
+  fprintf(fp, "  return(h);\n");
+  fprintf(fp, "}\n");
 }
 
 /*========================================================================*/
@@ -47,7 +54,9 @@ void write_mod_init(
   fprintf(fp, "\n\n");
   fprintf(fp, "extern \"C\"\n");
   fprintf(fp, "int mod_init(int(*iiAddCproc)())\n{\n");
-  fprintf(fp, "  idhdl h;\n\n");
+  fprintf(fp, "  idhdl h;\n");
+  fprintf(fp, "  idhdl helphdl = enter_id(\"help\", NULL, PACKAGE_CMD);\n");
+  fprintf(fp, "  idhdl examplehdl = enter_id(\"example\", NULL, PACKAGE_CMD);\n\n");
 }
 
 /*========================================================================*/

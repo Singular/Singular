@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.4 2000-01-21 09:23:20 krueger Exp $
+ * $Id: grammar.y,v 1.5 2000-01-27 12:40:54 krueger Exp $
  */
 
 %{
@@ -10,6 +10,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include <limits.h>
+
+#include <mod2.h>
+#include <tok.h>
 
 #include "modgen.h"
 #include "stype.h"
@@ -51,6 +54,7 @@ void yyerror(char * fmt)
 %token SECT3END
 /*%token PROCEND*/
 %token PROCDECLTOK
+%token EXAMPLETOK
 
 /* BISON Declarations */
 
@@ -94,14 +98,6 @@ initmod:
           write_mod_init(module_def.fmtfp);
         }
 
-line:
-        expr ';'
-        {
-          printf("EXPRESSION\n");
-        }
-        | procdecl
-;
-
 sect1: expr ';'
        | sect1 expr ';'
 ;
@@ -109,17 +105,21 @@ sect1: expr ';'
         
 sect1end: SECTEND
         {
+          memset(&procedure_decl, 0, sizeof(procdef));
           printf("End of section %d\n", sectnum-1);
         }
         ;
 
 expr:   NAME '=' MSTRINGTOK
         { var_token vt;
+          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
+                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
+          
           switch(sectnum) {
               case 1: /* pass 1: */
-                if( (vt=checkvar($1, VAR_STRING)) ) {
-                  enter_id(module_def.fmtfp, $1, $3, yylineno,
-                           module_def.filename);
+                if( (vt=checkvar($1, VAR_STRING, &write_cmd)) ) {
+                  if(write_cmd!=0)
+                    write_cmd(&module_def, vt, STRING_CMD, $1, $3);
                 }
                 else {
                   myyyerror("Line %d: Unknown variable '%s' in section %d\n",
@@ -127,7 +127,7 @@ expr:   NAME '=' MSTRINGTOK
                 }
                 break;
               case 2: /* pass 2: procedure declaration */
-                if( (vt=checkvar($1, VAR_STRING)) ) {
+                if( (vt=checkvar($1, VAR_STRING, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_STRING, vt, $1, $3);
                 }
                 else {
@@ -141,11 +141,13 @@ expr:   NAME '=' MSTRINGTOK
         }
         | NAME '=' FILENAME
         { var_token vt;
+          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
+                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
               case 2: /* pass 2: procedure declaration */
-                if( (vt=checkvar($1, VAR_FILE)) ) {
+                if( (vt=checkvar($1, VAR_FILE, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_FILE, vt, $1, $3);
                 }
                 break;
@@ -155,11 +157,13 @@ expr:   NAME '=' MSTRINGTOK
         }
         | NAME '=' files
         { var_token vt;
+          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
+                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
               case 2: /* pass 2: procedure declaration */
-                if( (vt=checkvar($1, VAR_FILES)) ) {
+                if( (vt=checkvar($1, VAR_FILES, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_FILES, vt, $1, &$3);
                 }
                 break;
@@ -169,11 +173,13 @@ expr:   NAME '=' MSTRINGTOK
         }
         | NAME '=' NUMTOK
         { var_token vt;
+          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
+                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
               case 2: /* pass 2: procedure declaration */
-                if( (vt=checkvar($1, VAR_NUM)) ) {
+                if( (vt=checkvar($1, VAR_NUM, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_NUM, vt, $1, &$3);
                 }
                 break;
@@ -183,9 +189,11 @@ expr:   NAME '=' MSTRINGTOK
         }
         | NAME '=' BOOLTOK
         { var_token vt;
+          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
+                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
           switch(sectnum) {
               case 1: /* pass 1: */
-                if( (vt=checkvar($1, VAR_BOOL)) ) {
+                if( (vt=checkvar($1, VAR_BOOL, &write_cmd)) ) {
                   proc_set_default_var(VAR_BOOL, vt, $1, &$3);
                 }
                 else {
@@ -194,7 +202,7 @@ expr:   NAME '=' MSTRINGTOK
                 }
                 break;
               case 2: /* pass 2: procedure declaration */
-                if( (vt=checkvar($1, VAR_BOOL)) ) {
+                if( (vt=checkvar($1, VAR_BOOL, &write_cmd)) ) {
                   proc_set_var(&procedure_decl, VAR_BOOL, vt, $1, &$3);
                 }
                 else {
@@ -226,17 +234,20 @@ sect2end: SECT2END
         ;
 
 procdef: procdecl proccode
-{
-  printf("PROCDEF:\n");
-}
-
+        {
+          printf("PROCDEF:\n");
+        }
+        | procdecl proccode procdeclexample
+        {
+          printf("PROCDEF mit example:\n");
+        }
         ;
 
-procdecl: procdecl3 '{'
+procdecl: procdecl2 '{'
         {
           setup_proc(&module_def, &procedure_decl);
         }
-        | procdecl3 procdeclhelp '{'
+        | procdecl2 procdeclhelp '{'
         {
           setup_proc(&module_def, &procedure_decl);
         }
@@ -256,29 +267,15 @@ procdecl2: procdecl1
         | procdecl1 '(' typelist ')'
         ;
 
-procdecl3: procdecl2
-        | procdecl2 procdeclflags
-        ;
-
 procdeclhelp: MSTRINGTOK
         {
           procedure_decl.help_string = strdup($1);
         }
         ;
 
-procdeclflags: expr ';'
-        {
-          //printf("expr-1\n");
-        }
-        | procdeclflags expr ';'
-        {
-          //printf("expr-2\n");
-        }
-        ;
-
 proccode: proccodeline MCODETOK
           {
-            generate_function(&procedure_decl, module_def.fmtfp);
+            write_function_errorhandling(&procedure_decl, module_def.fmtfp);
           };
 
 
@@ -296,18 +293,75 @@ proccodeline: CODEPART
         {
         };
 
-proccmd: '%' PROCCMD ';'
+procdeclexample: EXAMPLETOK examplecodeline MCODETOK
+        {
+          printf("Example\n");
+          if(procedure_decl.procname != NULL) {
+            //write_example(&module_def, &procedure_decl);
+          } else {
+            myyyerror("example without proc-declaration at line %d\n",
+                     yylineno);
+          }
+        }
+        ;
+
+examplecodeline: CODEPART
+        {
+          printf(">>1\n");
+          procedure_decl.example_len = strlen($1);
+          procedure_decl.example_string = malloc(strlen($1));
+          strncpy(procedure_decl.example_string, $1, strlen($1));
+        }
+        | examplecodeline CODEPART
+        {
+          printf(">>2\n");
+          procedure_decl.example_len += strlen($2);
+          procedure_decl.example_string =
+            realloc(procedure_decl.example_string, procedure_decl.example_len);
+          strcat(procedure_decl.example_string, $2);
+          printf(">>2b\n");
+        };
+
+proccmd: '%' NAME ';'
         { cmd_token vt;
-          void (*write_cmd)(moddefv module, procdefv pi);
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
           
-          if( (vt=checkcmd($2, &write_cmd)) ) {
+          if( (vt=checkcmd($2, &write_cmd, 0)) ) {
             write_cmd(&module_def, &procedure_decl);
           }
           else {
             myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                      yylineno, $1, sectnum);
+                      yylineno, $2, sectnum);
           }
           free($2);
+        }
+        | '%' NAME '(' ')' ';'
+        {
+          cmd_token vt;
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+          
+          if( (vt=checkcmd($2, &write_cmd, 1)) ) {
+            write_cmd(&module_def, &procedure_decl, procedure_decl.procname);
+          }
+          else {
+            myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                      yylineno, $2, sectnum);
+          }
+          free($2);
+        }
+        | '%' NAME '(' NAME ')' ';'
+        {
+          cmd_token vt;
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+          
+          if( (vt=checkcmd($2, &write_cmd, 1)) ) {
+            write_cmd(&module_def, &procedure_decl, $4);
+          }
+          else {
+            myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                      yylineno, $2, sectnum);
+          }
+          free($2); free($4);
         };
 
 typelist: VARTYPETOK

@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.4 2000-01-21 09:23:21 krueger Exp $
+ *  $Id: modgen.h,v 1.5 2000-01-27 12:40:00 krueger Exp $
  *
  */
 
@@ -12,6 +12,9 @@
 #define TMPL_FOOT ""
 
 #include <stdio.h>
+#include <string.h>
+#include <mod2.h>
+#include <subexpr.h>
 
 class paramdef;
 class procdef;
@@ -53,6 +56,8 @@ class procdef {
   procflags flags;
   char *c_code;
   char *help_string;
+  long example_len;
+  char *example_string;
 };
 
 class cfiles {
@@ -94,9 +99,6 @@ typedef enum { VAR_NONE, VAR_MODULE, VAR_HELP, VAR_INFO, VAR_VERSION,
 /*
  *
  */
-extern cmd_token checkcmd(char *cmdname,
-                          void(**write_cmd)(moddefv module, procdefv pi));
-extern var_token checkvar(char *varname, var_type type);
 
 
 extern int IsCmd(char *n, int & tok);
@@ -106,13 +108,10 @@ extern void myyyerror(char *fmt, ...);
 
 
 extern void PrintProclist(moddefv module);
-extern void Add2proclist(moddefv module, char *name, char *ret_val,
-                           char *ret_typname, int ret_typ);
 extern void generate_mod(moddefv module, int section);
 extern void mod_create_makefile(moddefv module);
 extern void Add2files(moddefv module, char *buff);
 
-extern void generate_function(procdefv pi, FILE *fp);
 extern void  mod_copy_tmp(FILE *fp_out, FILE *fp_in);
 extern void mod_write_header(FILE *fp, char *module, char what);
 extern void generate_header(procdefv pi, FILE *fp);
@@ -132,10 +131,26 @@ void AddParam(procdefv p, paramdefv vnew);
 
 extern int create_tmpfile(moddefv module_def);
 
+/* from proc.cc */
+extern void write_example(moddefv module, procdefv proc);
+
 extern void write_procedure_typecheck(moddefv module, procdefv pi, FILE *fmtfp);
 extern void write_procedure_return(moddefv module, procdefv pi, FILE *fmtfp);
-extern void write_function_declaration(moddefv module, procdefv pi);
-extern void write_function_typecheck(moddefv module, procdefv pi);
-extern void write_function_return(moddefv module, procdefv pi);
+extern void write_function_declaration(moddefv module, procdefv pi, void *arg = NULL);
+extern void write_function_typecheck(moddefv module, procdefv pi, void *arg = NULL);
+extern void write_function_return(moddefv module, procdefv pi, void *arg = NULL);
+extern void write_function_errorhandling(procdefv pi, FILE *fp);
+
+/* from misc.cc */
+extern cmd_token checkcmd(
+  char *cmdname,
+  void(**write_cmd)(moddefv module, procdefv pi, void *arg),
+  int args);
+extern var_token checkvar(
+  char *varname, var_type type,
+  void (**write_cmd)(moddefv module, var_token type, idtyp t,
+                     void *arg1, void *arg2));
+void write_main_variable(moddefv module, var_token type,
+                         idtyp t, void *arg1, void *arg2);
 
 #endif /* _MODGEN_H */

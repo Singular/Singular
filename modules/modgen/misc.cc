@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.4 2000-01-21 09:23:21 krueger Exp $ */
+/* $Id: misc.cc,v 1.5 2000-01-27 12:39:59 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -52,7 +52,10 @@ BOOLEAN siq=FALSE;
 char *lastreserved=NULL;
 #define SELF_CMD MAX_TOK+1
 
-void enter_id(FILE *fp, char *name, char *value);
+extern void enter_id(FILE *fp, idtyp t, char *name, char *value,
+                     int lineno, char *file);
+extern void write_enter_id(FILE *fp);
+
 static void  mod_write_ctext(FILE *fp, FILE *fp_in);
 char type_conv[MAX_TOK][32];
 
@@ -198,18 +201,20 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 struct valid_cmds_def 
 {
   char *name;
-  void (*write_cmd)(moddefv module, procdefv pi);
+  void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
   cmd_token id;
+  int args;
 } valid_cmds[] = {
-  { "declaration",  write_function_declaration,  CMD_DECL   },
-  { "typecheck",    write_function_typecheck,  CMD_CHECK  },
-  { "return",       write_function_return,  CMD_RETURN },
-  { NULL,           0, CMD_NONE }
+  { "declaration",  write_function_declaration, CMD_DECL,   0 },
+  { "typecheck",    write_function_typecheck,   CMD_CHECK,  0 },
+  { "return",       write_function_return,      CMD_RETURN, 1 },
+  { NULL,           0, CMD_NONE, 0 }
 };
 
 cmd_token checkcmd(
   char *cmdname,
-  void (**write_cmd)(moddefv module, procdefv pi)
+  void (**write_cmd)(moddefv module, procdefv pi, void *arg),
+  int args
   )
 {
   int i;
@@ -225,27 +230,46 @@ struct valid_vars_def {
   char *name;
   var_type type;
   var_token id;
+  void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
+                    idtyp t, void *arg1 = NULL, void *arg2 = NULL);
 } valid_vars[] = {
-  { "module",       VAR_STRING,  VAR_MODULE },
-  { "version",      VAR_STRING,  VAR_VERSION },
-  { "info",         VAR_STRING,  VAR_INFO },
-  { "help",         VAR_STRING,  VAR_HELP },
+  { "module",       VAR_STRING,  VAR_MODULE,  0 },
+  { "version",      VAR_STRING,  VAR_VERSION, write_main_variable },
+  { "info",         VAR_STRING,  VAR_INFO,    write_main_variable },
+  { "help",         VAR_STRING,  VAR_HELP,    write_main_variable },
+#if 0
   { "do_typecheck", VAR_BOOL,    VAR_TYPECHECK },
-  { "do_return",    VAR_BOOL,    VAR_RETURN },
-  { "function",     VAR_STRING,  VAR_FUNCTION },
-  { NULL,           VAR_UNKNOWN, VAR_NONE }
+#endif
+  { NULL,           VAR_UNKNOWN, VAR_NONE, 0 }
 };
 
 var_token checkvar(
   char *varname,
-  var_type type
+  var_type type,
+  void (**write_cmd)(moddefv module, var_token type,
+                    idtyp t, void *arg1, void *arg2)
   )
 {
   int i;
   for(i=0; valid_vars[i].name!=NULL; i++)
     if((strcmp(valid_vars[i].name, varname)==0) &&
-       (valid_vars[i].type == type) ) return valid_vars[i].id;
+       (valid_vars[i].type == type) ) {
+      *write_cmd = valid_vars[i].write_cmd;
+      return valid_vars[i].id;
+    }
   return VAR_NONE;
+}
+
+void write_main_variable(
+  moddefv module,
+  var_token type,
+  idtyp t, 
+  void *arg1,
+  void *arg2
+  )
+{
+  enter_id(module->fmtfp, t, (char *)arg1, (char *)arg2, yylineno,
+           module->filename);
 }
 
   
@@ -324,56 +348,15 @@ void Add2files(
 }
 
 /*========================================================================*/
-void Add2proclist(
-  moddefv module,
-  char *name,
-  char *ret_val,
-  char *ret_typname,
-  int ret_typ
-  )
+void init_system_type()
 {
-  procdef pnew;
-  logx("Add2proclist(%s, %s)\n", name, ret_val);
-  
-  memset((void *)&pnew, '\0', sizeof(procdef));
-
-  pnew.procname = (char *)malloc(strlen(name)+1);
-  if(pnew.procname==NULL) printf("Error 1\n");
-  memset(pnew.procname, '\0', strlen(name)+1);
-  memcpy(pnew.procname, name, strlen(name));
-
-  pnew.funcname = (char *)malloc(strlen(name)+1);
-  if(pnew.funcname==NULL) printf("Error 1\n");
-  memset(pnew.funcname, '\0', strlen(name)+1);
-  memcpy(pnew.funcname, name, strlen(name));
-
-  pnew.param = NULL;
-  (pnew).is_static = 0;
-  (pnew).paramcnt = 0;
-  pnew.c_code = NULL;
-  
-  pnew.return_val.name = (char *)malloc(strlen(ret_val)+1);
-  memset(pnew.return_val.name, '\0', strlen(ret_val)+1);
-  memcpy(pnew.return_val.name, ret_val, strlen(ret_val));
-  
-  pnew.return_val.typname = (char *)malloc(strlen(ret_typname)+1);
-  memset(pnew.return_val.typname, '\0', strlen(ret_typname)+1);
-  memcpy(pnew.return_val.typname, ret_typname, strlen(ret_typname));
-  pnew.return_val.typ = ret_typ;
-  
-  if(module->proccnt==0) {
-    module->procs = (procdefv)malloc(sizeof(procdef)+1);
+  if(strcmp(S_UNAME, "ix86-Linux") == 0) {
+    systyp = SYSTYP_LINUX;
+  } else if (strcmp(S_UNAME, "HPUX-9")==0) {
+    systyp = SYSTYP_HPUX9;
+  } else if (strcmp(S_UNAME, "HPUX-10")==0) {
+    systyp = SYSTYP_HPUX10;
   }
-  else {
-    module->procs = (procdefv)realloc(module->procs,
-                                   (module->proccnt+1)*sizeof(procdef));
-  }
-  if(module->procs == NULL) { printf("ERROR\n"); return; }
-  
-  memset((void *) &module->procs[module->proccnt], '\0', sizeof(procdef));
-  memcpy((void *)(&(module->procs[module->proccnt])),
-         (void *)&pnew, sizeof(procdef));
-  (module->proccnt)++;
 }
 
 /*========================================================================*/
@@ -399,16 +382,6 @@ void generate_mod(
   int proccnt;
   FILE *fp_h;
   char *filename;
-  
-  if(strcmp(S_UNAME, "ix86-Linux") == 0) {
-    systyp = SYSTYP_LINUX;
-  } else if (strcmp(S_UNAME, "HPUX-9")==0) {
-    systyp = SYSTYP_HPUX9;
-  } else if (strcmp(S_UNAME, "HPUX-10")==0) {
-    systyp = SYSTYP_HPUX10;
-  }
-  init_type_conv();
-  printf("SYSTYP:%d\n", systyp);
   
   switch(section) {
       case 1:
@@ -439,7 +412,7 @@ void generate_mod(
 
   /* building entry-functions */
   for(proccnt=0; proccnt<module->proccnt; proccnt++) {
-    generate_function(&module->procs[proccnt], module->modfp);
+    //generate_function(&module->procs[proccnt], module->modfp);
     //generate_header(&module->procs[proccnt], fp_h);
   }
   printf("  done.\n");fflush(stdout);
@@ -466,38 +439,6 @@ void  write_procedure_text(
 
 #if 0
   if(pi->paramcnt>0) {
-    if(pi->param[0].typ!=SELF_CMD) {
-      switch( pi->return_val.typ) {
-          case SELF_CMD:
-            fprintf(module->fmtfp, "    return(%s(res", pi->funcname);
-            for (i=0;i<pi->paramcnt; i++)
-              fprintf(module->fmtfp, ", (%s) res%d->Data()",
-                      type_conv[pi->param[i].typ], i);
-            fprintf(module->fmtfp, "));\n\n");
-           break;
-
-          default:
-            fprintf(module->fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
-            fprintf(module->fmtfp, "  res->data = (void *)%s(", pi->funcname);
-            for (i=0;i<pi->paramcnt; i++) {
-              fprintf(module->fmtfp, "(%s) res%d->Data()",
-                      type_conv[pi->param[i].typ], i);
-              if(i<pi->paramcnt-1) fprintf(module->fmtfp, ", ");
-            }
-            fprintf(module->fmtfp, ");\n  return FALSE;\n\n");
-      }
-      
-      fprintf(module->fmtfp, "  mod_%s_error:\n", pi->funcname);
-      fprintf(module->fmtfp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(tok));\n",
-              pi->procname);
-      fprintf(module->fmtfp, "    Werror(\"expected %s(", pi->procname);
-      for (i=0;i<pi->paramcnt; i++) {
-        fprintf(module->fmtfp, "'%s'", pi->param[i].name);
-        if(i!=pi->paramcnt-1) fprintf(module->fmtfp, ",");
-      }
-      fprintf(module->fmtfp, ")\");\n");
-      fprintf(module->fmtfp, "    return TRUE;");
-    }
   }
   else {
     switch( pi->return_val.typ) {
@@ -524,23 +465,7 @@ void  write_procedure_text(
 /*========================================================================*/
 void  mod_write_header(FILE *fp, char *module, char what)
 {
-#if 0
-  FILE *fp;
-  char buf[BUFLEN];
-  
-  regex_t preg;
-  regmatch_t   pmatch[1];
-  size_t  nmatch = 0;
-  char *regex = "@MODULE_NAME@";
 
-  rc = regcomp(&preg, regex, REG_NOSUB);
-  if(rc) return -1;
-
-  if(!regexec(&preg, d_entry->d_name, nmatch, pmatch, REG_NOTBOL))
-    cert_count++;
-  regfree(&preg);
-  
-#else
   write_header(fp, module);
   fprintf(fp, "#include <stdlib.h>\n");
   fprintf(fp, "#include <stdio.h>\n");
@@ -549,12 +474,12 @@ void  mod_write_header(FILE *fp, char *module, char what)
   fprintf(fp, "%s\n", DYNAinclude[systyp]);
   fprintf(fp, "\n");
   fprintf(fp, "#include <locals.h>\n");
-  if(what != 'h')  fprintf(fp, "#include \"%s.h\"\n", module);
+  if(what != 'h') {
+    fprintf(fp, "#include \"%s.h\"\n", module);
+    write_enter_id(fp);
+    fprintf(fp, "\n");
+  }
   fprintf(fp, "\n");
-
-  fprintf(fp, "void enter_id(char *name, char *value);\n");
-  fprintf(fp, "\n");
-#endif
 }
 
 /*========================================================================*/
@@ -571,11 +496,21 @@ void write_header(FILE *fp, char *module, char *comment)
 }
 
 /*========================================================================*/
-void enter_id(FILE *fp, char *name, char *value, int lineno, char *file)
+void enter_id(
+  FILE *fp, 
+  idtyp t,
+  char *name,
+  char *value,
+  int lineno,
+  char *file
+  )
 {
+  char tname[32];
+  
   if(lineno)
     fprintf(fp, "#line %d \"%s\"\n", lineno, file);
-  fprintf(fp, "  enter_id(\"%s\",\"%s\");\n",name, value);
+  fprintf(fp, "  enter_id(\"%s\",\"%s\", %s);\n",name, value,
+          decl2str(t, tname));
 }
 
 /*========================================================================*/
