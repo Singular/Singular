@@ -1,82 +1,3 @@
-\input texinfo    @c -*-texinfo-*-
-@comment %**start of header
-@c ------------------------
-@setfilename singular.hlp
-@settitle Singular Reference Manual
-@iftex
-@afourpaper
-@finalout
-@end iftex
-@comment %**end of header
-@c redirect funtion index:
-@c @syncodeindex fn cp
-@c ------------------------
-@set singularmanual 1
-@set VERSION 1.2
-@c ------------------------
-@ifinfo
-this is the texinfo file describing Singular (version @value{VERSION})
-@end ifinfo
-@c
-@titlepage
-@sp 2
-@center @titlefont{Singular}
-@sp 2
-@center A Computer Algebra System for Commutative Algebra, Algebraic Geometry
-@center and Singularity Theory
-@sp 5
-@center @titlefont{Reference Manual}
-@center Version @value{VERSION}
-@sp 2
-@center Singular is created and its development is directed and coordinated by
-@center G.-M. Greuel, G. Pfister and H. Schoenemann
-@sp 2
-@center with contributions by
-@center O. Bachmann, W. Decker, H. Grassmann, B. Martin, M. Messollen,
-@center W. Neumann, T. Nuessler, W. Pohl, T. Siebert, R. Stobbe, T. Wichmann
-@sp 2
-@author Fachbereich Mathematik
-@author und
-@author Zentrum fuer Computeralgebra
-@author Universitaet Kaiserslautern
-@author D-67653 Kaiserslautern
-@end titlepage
-@c ----------------------------------------------------------------------------
-@node Top, Preface, (dir), (dir)
-@ifinfo
-q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
-@sp 1
-@center Singular - Reference Manual
-@center Version @value{VERSION}
-@center A Computer Algebra System for Singularity Theory, Algebraic Geometry
-@center  and Commutative Algebra
-@sp 2
-@center University of Kaiserslautern
-@center Department of Mathematics
-@center and
-@center Centre for Computer Algebra
-@end ifinfo
-@menu
-* Preface::
-* Introduction::
-* Getting started::
-* Command Syntax::
-* Expressions::
-* Commands::
-* procedures and Libraries::
-* Tricks and Pitfalls::
-* Examples::
-* Library Index::
-* Library Function Index::
-* Index::
-@end menu
-@c ----------------------------------------------------------------------------
-@node Preface, Introduction, Top, Top
-@chapter Preface
-@cindex Preface
-
-@include copyright.tex
-@c ---------------------------------------
 @node Introduction, Getting started, Preface, Top
 @chapter Introduction
 @cindex Introduction
@@ -4792,9 +4713,6 @@ this is different from the left-to-right evaluation of logical
 expressions (as found in most programming languages like C) which, for
 example, determine the @code{(1 || b)} without evaluating @code{b}.
 
-@c ------------------------------------------------------------------------
-@node Examples, Library Index, Tricks and Pitfalls, Top
-@include examples.tex
 @c ----------------------------------------------------------
 @node Library Index, Library Function Index, Examples, Top
 @chapter Library Index

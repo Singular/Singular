@@ -1,4 +1,261 @@
-@comment -*-texinfo-*-
-@comment $Id: singular.doc,v 1.1.1.1 1998-04-24 11:25:11 Singular Exp $
+\input texinfo    @c -*-texinfo-*-
+@comment $Id: singular.doc,v 1.2 1998-04-24 13:17:20 Singular Exp $
 @comment this file contains the main structure of the manual
+@c ------------------------
+@comment %**start of header
+@c ------------------------
+@setfilename singular.hlp
+@settitle Singular Reference Manual
+@iftex
+@afourpaper
+@finalout
+@end iftex
+@comment %**end of header
+@c redirect funtion index:
+@c @syncodeindex fn cp
+@c ------------------------
+@set singularmanual 1
+@set VERSION 1.2
+@c ------------------------
+@ifinfo
+this is the texinfo file describing Singular (version @value{VERSION})
+@end ifinfo
+@c
+@titlepage
+@sp 2
+@center @titlefont{Singular}
+@sp 2
+@center A Computer Algebra System for Commutative Algebra, Algebraic Geometry
+@center and Singularity Theory
+@sp 5
+@center @titlefont{Reference Manual}
+@center Version @value{VERSION}
+@sp 2
+@center Singular is created and its development is directed and coordinated by
+@center G.-M. Greuel, G. Pfister and H. Schoenemann
+@sp 2
+@center with contributions by
+@center O. Bachmann, W. Decker, H. Grassmann, B. Martin, M. Messollen,
+@center W. Neumann, T. Nuessler, W. Pohl, T. Siebert, R. Stobbe, T. Wichmann
+@sp 2
+@author Fachbereich Mathematik
+@author und
+@author Zentrum fuer Computeralgebra
+@author Universitaet Kaiserslautern
+@author D-67653 Kaiserslautern
+@end titlepage
+@c ----------------------------------------------------------------------------
+@node Top, Preface, (dir), (dir)
+@ifinfo
+q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
+@sp 1
+@center Singular - Reference Manual
+@center Version @value{VERSION}
+@center A Computer Algebra System for Singularity Theory, Algebraic Geometry
+@center  and Commutative Algebra
+@sp 2
+@center University of Kaiserslautern
+@center Department of Mathematics
+@center and
+@center Centre for Computer Algebra
+@end ifinfo
+@menu
+* Preface::
+* Introduction::
+* General concepts::
+* Data types::
+* Commands::
+* Tricks and Pitfalls::
+* Examples::
+* Mathematical background::
+* SINGULAR libraries::
+* Library function index::
+* Index::
+@end menu
+@c ----------------------------------------------------------------------------
+@node Preface, Introduction, Top, Top
+@chapter Preface
+@cindex Preface
 
+@include copyright.tex
+@c ----------------------------------------------------------------------------
+@node Introduction, General concepts, Preface, Top
+@chapter Introduction
+@cindex Introduction
+
+@c ----------------------------------------------------------------------------
+@node General concepts, Data types, Introduction, Top
+@chapter General concepts
+@cindex General concepts
+
+@c ----------------------------------------------------------------------------
+@node Data types, Commands, General concepts, Top
+@chapter Data types
+@cindex Data types
+
+@c ----------------------------------------------------------------------------
+@node Commands, Tricks and pitfalls, Data types, Top
+@chapter Commands
+@cindex Commands
+
+@c ----------------------------------------------------------------------------
+@node Tricks and pitfalls, Examples, Commands, Top
+@chapter Tricks and pitfalls
+@cindex Tricks and pitfalls
+
+@c ----------------------------------------------------------------------------
+@node Examples, Mathematical background, Tricks and pitfalls, Top
+@chapter Examples
+@cindex Examples
+@include examples.tex
+
+@c ----------------------------------------------------------------------------
+@node Mathematical background, SINGULAR libraries, Examples, Top
+@chapter Mathematical background
+@cindex Mathematical background
+@include math.tex
+@c ----------------------------------------------------------------------------
+@node SINGULAR libraries, Library function index, Examples, Top
+@chapter SINGULAR libraries
+@cindex SINGULAR libraries
+@cindex LIBs
+
+@sc{Singular} comes with a set of standard libraries:
+@menu
+* standard_lib:: extensions of singular kernel
+* all_lib:: load all other libraries
+* general_lib:: procedures of general type
+* matrix_lib:: procedures for matrix operations
+* sing_lib:: procedures for computing invariants of singularities
+* elim_lib:: procedures for elimination, saturation and blowing up
+* inout_lib:: procedures for manipulating in- and output
+* random_lib:: procedures of random/sparse  matrix and poly operations
+* deform_lib:: procedures for computing miniversal deformation
+* homolog_lib:: procedures for homological algebra
+* poly_lib:: procedures for manipulating polynomials and ideals
+* factor_lib:: procedures for calling external factorizer (UNIX)
+* ring_lib:: procedures for manipulating rings and maps
+* finvar_lib:: procedures to calculate invariant rings & more
+* primdec_lib:: procedures for primary decomposition
+* invar_lib:: procedures to compute the ring of invariants
+* tex_lib:: procedures for typeseting in TeX
+* hnoether_lib:: procedures for the Hamburger-Noether-development
+* classify_lib:: procedures for classifying hypersurface singularities
+@end menu
+@c ----------------------------------------------------------
+@node standard_lib, all_lib, SINGULAR libraries, SINGULAR libraries
+@section standard_lib
+@cindex standard_lib
+The library @code{standard.lib} provides extensions to the 
+set of built-in commands and will be automatically loaded
+during the start of @code{Singular}.
+It contains:
+@menu
+* stdfglm::
+* stdhilbert::
+@end menu
+@iftex
+@*@code{stdfglm}:@ref{stdfglm};
+@*@code{stdhilbert}:@ref{stdhilbert}.
+@end iftex
+@c ----------------------------------------------------------
+@node all_lib, general_lib, standard_lib, SINGULAR libraries
+@section all_lib
+@cindex all_lib
+@c lib  all.lib
+@c ----------------------------------------------------------
+@node general_lib, matrix_lib, all_lib, SINGULAR libraries
+@section general_lib
+@cindex general_lib
+@c lib  general.lib
+@c ----------------------------------------------------------
+@node matrix_lib, sing_lib, general_lib, SINGULAR libraries
+@section matrix_lib
+@cindex matrix_lib
+@c lib matrix.lib
+@c ----------------------------------------------------------
+@node sing_lib, elim_lib, matrix_lib, SINGULAR libraries
+@section sing_lib
+@cindex sing_lib
+@c lib sing.lib
+@c ----------------------------------------------------------
+@node elim_lib, inout_lib, sing_lib, SINGULAR libraries
+@section elim_lib
+@cindex elim_lib
+@c lib elim.lib
+@c ----------------------------------------------------------
+@node inout_lib, random_lib,elim_lib, SINGULAR libraries
+@section inout_lib
+@cindex inout_lib
+@c lib inout.lib
+@c ----------------------------------------------------------
+@node random_lib, deform_lib, inout_lib, SINGULAR libraries
+@section random_lib
+@cindex random_lib
+@c lib random.lib
+@c ----------------------------------------------------------
+@node deform_lib,homolog_lib,random_lib, SINGULAR libraries
+@section deform_lib
+@cindex deform_lib
+@c lib deform.lib
+@c ----------------------------------------------------------
+@node homolog_lib,poly_lib,deform_lib, SINGULAR libraries
+@section homolog_lib
+@cindex homolog_lib
+@c lib homolog.lib
+@c ----------------------------------------------------------
+@node poly_lib,factor_lib,homolog_lib, SINGULAR libraries
+@section poly_lib
+@cindex poly_lib
+@c lib poly.lib
+@c ----------------------------------------------------------
+@node factor_lib,ring_lib,poly_lib, SINGULAR libraries
+@section factor_lib
+@cindex factor_lib
+@c lib factor.lib
+@c ----------------------------------------------------------
+@node ring_lib,finvar_lib,factor_lib, SINGULAR libraries
+@section ring_lib
+@cindex ring_lib
+@c lib ring.lib
+@c ----------------------------------------------------------
+@node finvar_lib,primdec_lib,ring_lib, SINGULAR libraries
+@section finvar_lib
+@cindex finvar_lib
+@c lib finvar.lib
+@c ----------------------------------------------------------
+@node primdec_lib,invar_lib,finvar_lib, SINGULAR libraries
+@section primdec_lib
+@cindex primdec_lib
+@c lib primdec.lib
+@c ----------------------------------------------------------
+@node invar_lib,tex_lib,primdec_lib, SINGULAR libraries
+@section invar_lib
+@cindex invar_lib
+@c lib invar.lib
+@c ---------------------------------------------------------
+@node tex_lib,hnoether_lib,invar_lib, SINGULAR libraries
+@section tex_lib
+@cindex tex_lib
+@c lib tex.lib
+@c ---------------------------------------------------------
+@node hnoether_lib,classify_lib,tex_lib, SINGULAR libraries
+@section hnoether_lib
+@cindex hnoether_lib
+@c lib hnoether.lib
+@c ---------------------------------------------------------
+@node classify_lib,,hnoether_lib, SINGULAR libraries
+@section classify_lib
+@cindex classify_lib
+@c lib classify.lib
+@c ----------------------------------------------------------
+@node Library function index, Index, SINGULAR libraries, Top
+@chapter Library function index
+@printindex fn
+@c ----------------------------------------------------------
+@node Index, ,Library function index, Top
+@chapter Index
+@printindex cp
+@c ---------------------------------------------------------
+@contents
+@bye
