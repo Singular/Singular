@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.46 1998-08-25 13:33:16 krueger Exp $ */
+/* $Id: grammar.y,v 1.47 1998-09-01 14:58:25 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1449,19 +1449,18 @@ proccmd:
               YYERROR;
             }
             char *args=iiProcArgs($2,FALSE);
-            procinfov pi;
             FreeL((ADDRESS)$2);
+            procinfov pi;
             iiInitSingularProcinfo(IDPROC(h),"", $1, 0, 0);
             IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+strlen(args)+14);;
             sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,$3);
             FreeL((ADDRESS)args);
             FreeL((ADDRESS)$3);
-            //Print(">>%s<<\n",IDPROC(h)->data.s.body);
           }
         | PROC_DEF STRINGTOK STRINGTOK BLOCKTOK
           {
             FreeL((ADDRESS)$3);
-            idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,FALSE);
+            idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL)
             {
               FreeL((ADDRESS)$2);
@@ -1469,14 +1468,13 @@ proccmd:
               YYERROR;
             }
             char *args=iiProcArgs($2,FALSE);
-            procinfov pi;
             FreeL((ADDRESS)$2);
+            procinfov pi;
             iiInitSingularProcinfo(IDPROC(h),"", $1, 0, 0);
             IDPROC(h)->data.s.body = (char *)AllocL(strlen($4)+strlen(args)+14);;
             sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,$4);
             FreeL((ADDRESS)args);
             FreeL((ADDRESS)$4);
-            //Print(">>%s<<\n",IDPROC(h)->data.s.body);
           }
         ;
 
