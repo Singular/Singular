@@ -21,13 +21,13 @@ ABOUT THIS DISTRIBUTION
 =======================
 This distribution contains the following files and subdirectories
 
-  ./<uname description>/bin/Singular-<x.y.z>	Singular executable
+  ./<uname description>/bin/Singular-<x.y.z>    Singular executable
   ./<uname description>/bin/Singular            soft link to executable
   ./<uname description>/bin/libparse            parser for Singular libraries
-  ./Singular/INSTALL				installation instructions
-  ./Singular/COPYING				licence information
-  ./Singular/README.general			general Singular info 
-  ./Singular/README.bin				this file
+  ./Singular/INSTALL                            installation instructions
+  ./Singular/COPYING                            licence information
+  ./Singular/README.general                     general Singular info 
+  ./Singular/README.bin                         this file
 
 where <uname description> is a description of the processor and
 operating system for which the Singular executable is compiled (e.g,
