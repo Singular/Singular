@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.29 1998-05-18 17:23:00 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.30 1998-05-28 16:50:48 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1453,7 +1453,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
           int i=IDELEMS(lm)-1;
           while (i>=0)
           {
-            pdSetDFlag(lm->m[i],1);
+            pdSetDFlagP(lm->m[i],1);
             i--;
           }
         }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.37 1998-05-19 18:08:40 Singular Exp $ */
+/* $Id: grammar.y,v 1.38 1998-05-28 16:50:46 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1200,10 +1200,10 @@ ringcmd:
             idhdl h;
             //noringvars = FALSE;
             h=rInit($3.name,    /* ringname */
-                   &$5,            /* characteristik and list of parameters*/
-                   &$7,            /* names of ringvariables */
-                   &$9,            /* ordering */
-                   TRUE));         /* is a dring */
+                   &$5,         /* characteristik and list of parameters*/
+                   &$7,         /* names of ringvariables */
+                   &$9,         /* ordering */
+                   TRUE);       /* is a dring */
             $5.CleanUp();
             $7.CleanUp();
             $9.CleanUp();

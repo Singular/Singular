@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.13 1998-05-19 09:02:38 obachman Exp $ */
+/* $Id: polys.h,v 1.14 1998-05-28 16:50:51 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -35,6 +35,7 @@ extern int pComponentOrder;
 // a monomial m belongs to a D-module M iff pdDFlag(m)==0
 // a monomial m belongs to an ideal in the Weyl-Algebra D iff pdDFlag(m)==1
 #define pdDFlag(m) pGetExp(m,pdN*2+1)
+#define pdSetDFlag(m,i) pSetExp(m,pdN*2+1,i)
 
 extern int      pdN;
 extern int      pdK;
@@ -43,7 +44,7 @@ poly   pdSpolyCreate(poly a, poly b);
 void   pdLcm(poly a, poly b, poly m);
 BOOLEAN pdIsConstantComp(poly p);
 void   spModuleToPoly(poly a1);
-void   pdSetDFlag(poly p,int i);
+void   pdSetDFlagP(poly p,int i);
 #endif
 #ifdef SRING
 extern int      pAltVars;

@@ -18,11 +18,11 @@ int pdN; /* the number of x(i) / d(i) / x(i)^(-1) */
 int pdK; /* the number of y(i) */
 /* pVariables=pdN*2+1+pdK */
 
-void pdSetDFlag(poly p, int i)
+void pdSetDFlagP(poly p, int i)
 {
   while (p!=NULL)
   {
-    pdDFlag(p)=1;
+    pdSetDFlag(p,1);
     pSetm(p);
     pIter(p);
   }
@@ -38,28 +38,28 @@ poly comm(int n, short d, short x)
   poly e1=pOne();
   poly e2=pOne();
 
-  pdDFlag(e1)=1;
-  pdDFlag(e2)=1;
+  pdSetDFlag(e1,1);
+  pdSetDFlag(e2,1);
   number t;
 
   if (x==1)
   {
-    e1->exp[pdX(n)]=1;
-    e1->exp[pdDX(n)]=d;
+    pSetExp(e1,pdX(n),1);
+    pSetExp(e1,pdDX(n),d);
     pSetm(e1);
     pNext(e1)=e2;
-    e2->exp[pdDX(n)]=d-1;
+    pSetExp(e2,pdDX(n),d-1);
     t = nInit(d);
     pSetCoeff(e2,t);
     pSetm(e2);
   }
   else if (d==1)
   {
-    e1->exp[pdX(n)]=x;
-    e1->exp[pdDX(n)]=1;
+    pSetExp(e1,pdX(n),x);
+    pSetExp(e1,pdDX(n),1);
     pSetm(e1);
     pNext(e1)=e2;
-    e2->exp[n]=x-1;
+    pSetExp(e2,n,x-1);
     t = nInit(x);
     pSetCoeff(e2,t);
     pSetm(e2);
@@ -71,8 +71,8 @@ poly comm(int n, short d, short x)
     int tp;
     poly h=NULL;
 
-    e1->exp[pdX(n)]=x;
-    e1->exp[pdDX(n)]=d;
+    pSetExp(e1,pdX(n),x);
+    pSetExp(e1,pdDX(n),d);
     pSetm(e1);
     for (j=1;j<=min(x,d);j++)
     {
@@ -81,8 +81,8 @@ poly comm(int n, short d, short x)
       {
         p *= (d-k);
       }
-      e2->exp[pdX(n)]=x-j;
-      e2->exp[pdDX(n)]=d-j;
+      pSetExp(e2,pdX(n),x-j);
+      pSetExp(e2,pdDX(n),d-j);
       pSetm(e2);
       tp=0;
       for(i=0;i<=x-j;i++)
@@ -113,10 +113,10 @@ poly pMultDD(poly a, poly b)
   poly multiply=NULL;
   short c; /* the component number of the result*/
 
-  if(c=pGetComp(a))
+  if((c=pGetComp(a))!=0)
   {
 #ifdef TEST
-    if (pGetComp(b))
+    if (pGetComp(b)!=0)
     {
       Werror("mult vector * vector");
       return NULL;
@@ -126,40 +126,41 @@ poly pMultDD(poly a, poly b)
   else
     c=pGetComp(b);
 
-  pdDFlag(resl)=1;
-  pdDFlag(resr)=1;
+  pdSetDFlag(resl,1);
+  pdSetDFlag(resr,1);
   pSetCoeff(resl,nCopy(pGetCoeff(a)));
   // put all x from a to the left result resl,
   // put all d from b to the right result resr
   for (i=1;i<=pdN;i++)
   {
-    resl->exp[pdX(i)]=a->exp[pdX(i)];
-    resr->exp[pdDX(i)]=b->exp[pdDX(i)];
+    pSetExp(resl,pdX(i),pGetExp(a,pdX(i)));
+    pSetExp(resr,pdDX(i),pGetExp(b,pdDX(i)));
   }
   // put all commutative vars y to the right result resr
   for (i=1;i<=pdK;i++)
   {
-    resr->exp[pdY(i)]=a->exp[pdY(i)]+b->exp[pdY(i)];
+    pSetExp(resr,pdY(i),pGetExp(a,pdY(i))+pGetExp(b,pdY(i)));
   }
   // set the component number
   pSetComp(resl,c);
   for (i=1;i<=pdN;i++)
   {
     if ((a->exp[pdDX(i)] !=0) && (b->exp[pdX(i)] !=0))
+    if ((pGetExp(a,pdDX(i)) !=0) && (pGetExp(b,pdX(i)) !=0))
     {
       if (multiply!=NULL)
       {
-        multiply=pMult(multiply,comm(i,a->exp[pdDX(i)],b->exp[pdX(i)]));
+        multiply=pMult(multiply,comm(i,pGetExp(a,pdDX(i)),pGetExp(b,pdX(i))));
       }
       else
       {
-        multiply=comm(i,a->exp[pdDX(i)],b->exp[pdX(i)]);
+        multiply=comm(i,pGetExp(a,pdDX(i)),pGetExp(b,pdX(i)));
       }
     }
     else
     {
-      resl->exp[pdX(i)] += b->exp[pdX(i)];
-      resr->exp[pdDX(i)] += a->exp[pdDX(i)];
+      pSetExp(resl,pdX(i),pGetExp(resl,pdX(i))+pGetExp(b,pdX(i)));
+      pSetExp(resr,pdDX(i),pGetExp(resr,pdDX(i))+pGetExp(a,pdDX(i)));
     }
   }
   pSetm(resl); /*poly or vector*/
@@ -173,7 +174,9 @@ poly pMultDD(poly a, poly b)
   {
     // now resl has only powers of x(i) and y(i), resr has only powers of d(i):
     for (i=1;i<=pdN;i++)
-      resl->exp[pdDX(i)]=resr->exp[pdDX(i)];
+    {
+      pSetExp(resl,pdDX(i),pGetExp(resr,pdDX(i)));
+    }
     pSetm(resl);
     pFree1(resr);
   }
@@ -189,10 +192,10 @@ poly pMultDT(poly a, poly b)
   int i;
   short c; /* the component number of the result*/
 
-  if(c=pGetComp(a))
+  if((c=pGetComp(a))!=0)
   {
 #ifdef TEST
-    if (pGetComp(b))
+    if (pGetComp(b)!=0)
     {
       Werror("mult vector * vector");
       return NULL;
@@ -205,22 +208,22 @@ poly pMultDT(poly a, poly b)
   // is the product 0 ?
   for (i=1;i<=pdN;i++)
   {
-    if ((a->exp[pdDX(i)] > b->exp[pdX(i)])
-    && (b->exp[pdIX(i)]==0))
+    if ((pGetExp(a,pdDX(i)) > pGetExp(b,pdX(i)))
+    && (pGetExp(b,pdIX(i))==0))
       return NULL;
   }
   poly resl=pOne();
-  pdDFlag(resl)=0;
+  pdSetDFlag(resl,0);
   pSetCoeff(resl,nCopy(pGetCoeff(a)));
   // put all x from a to the left result resl
   for (i=1;i<=pdN;i++)
   {
-    resl->exp[pdX(i)]=a->exp[pdX(i)];
+    pSetExp(resl,pdX(i),pGetExp(a,pdX(i)));
   }
   // put all commutative vars y to the left result resl
   for (i=1;i<=pdK;i++)
   {
-    resl->exp[pdY(i)]=a->exp[pdY(i)]+b->exp[pdY(i)];
+    pSetExp(resl,pdY(i),pGetExp(a,pdY(i))+pGetExp(b,pdY(i)));
   }
   // set the component number
   pSetComp(resl,c);
@@ -228,10 +231,10 @@ poly pMultDT(poly a, poly b)
   number n,h1,h2;
   for (i=1;i<=pdN;i++)
   {
-    if (((p=a->exp[pdDX(i)]) !=0) && ((q=b->exp[pdX(i)]) !=0))
+    if (((p=pGetExp(a,pdDX(i))) !=0) && ((q=pGetExp(b,pdX(i))) !=0))
     {
       // d^p(x^q): q*(q-1)*...*(q-p+1)* x^(q-p)
-      resl->exp[pdX(i)]+=q-p;
+      pSetExp(resl,pdX(i),pGetExp(resl,pdX(i))+q-p);
       n=nInit(q);
       q--;p--;
       while (p>0)
@@ -249,10 +252,10 @@ poly pMultDT(poly a, poly b)
       nDelete(&n);
     }
     else
-    if (((p=a->exp[pdDX(i)]) !=0) && ((q=b->exp[pdIX(i)]) !=0))
+    if (((p=pGetExp(a,pdDX(i))) !=0) && ((q=pGetExp(b,pdIX(i))) !=0))
     {
       // d^p(x^(-q)): (-1)^p*q*(q+1)*...*(q+p-1)* x^(-(q+p))
-      resl->exp[pdIX(i)]+=q+p;
+      pSetExp(resl,pdIX(i),pGetExp(resl,pdIX(i))+q+p);
       if (p & 1) n=nInit(-q);
       else       n=nInit(q);
       // last index: p=q+p-1
@@ -272,21 +275,21 @@ poly pMultDT(poly a, poly b)
     }
     else
     {
-      resl->exp[pdX(i)]+=b->exp[pdX(i)];
-      resl->exp[pdIX(i)]+=b->exp[pdIX(i)];
+      pSetExp(resl,pdX(i),pGetExp(resl,pdX(i))+pGetExp(b,pdX(i)));
+      pSetExp(resl,pdIX(i),pGetExp(resl,pdIX(i))+pGetExp(b,pdIX(i)));
     }
   }
   for(i=1;i<=pdN;i++)
   {
-    if (resl->exp[pdX(i)]>=resl->exp[pdIX(i)])
+    if (pGetExp(resl,pdX(i))>=pGetExp(resl,pdIX(i)))
     {
-      resl->exp[pdX(i)]-=resl->exp[pdIX(i)];
-      resl->exp[pdIX(i)]=0;
+      pSetExp(resl,pdX(i),pGetExp(resl,pdX(i))-pGetExp(resl,pdIX(i)));
+      pSetExp(resl,pdIX(i),0);
     }
     else
     {
-      resl->exp[pdIX(i)]-=resl->exp[pdX(i)];
-      resl->exp[pdX(i)]=0;
+      pSetExp(resl,pdIX(i),pGetExp(resl,pdIX(i))-pGetExp(resl,pdX(i)));
+      pSetExp(resl,pdX(i),0);
     }
   }
   pSetm(resl); /*poly or vector*/
@@ -302,10 +305,10 @@ poly pMultTT(poly a, poly b)
   int i;
   short c; /* the component number of the result*/
 
-  if(c=pGetComp(a))
+  if((c=pGetComp(a))!=0)
   {
 #ifdef TEST
-    if (pGetComp(b))
+    if (pGetComp(b)!=0)
     {
       Werror("mult vector * vector");
       return NULL;
@@ -317,18 +320,18 @@ poly pMultTT(poly a, poly b)
 
   poly resl=pOne();
   int t;
-  pdDFlag(resl)=0;
+  pdSetDFlag(resl,0);
   pSetCoeff(resl,nCopy(pGetCoeff(a)));
   for (i=1;i<=pdN;i++)
   {
-    t=a->exp[pdX(i)]+b->exp[pdX(i)]-a->exp[pdIX(i)]-b->exp[pdIX(i)];
-    if (t>=0)  resl->exp[pdX(i)]=t;
-    else       resl->exp[pdIX(i)]=-t;
+    t=pGetExp(a,pdX(i))+pGetExp(b,pdX(i))-pGetExp(a,pdIX(i))-pGetExp(b,pdIX(i));
+    if (t>=0)  pSetExp(resl,pdX(i),t);
+    else       pSetExp(resl,pdIX(i),-t);
   }
   // put all commutative vars y to the result resl
   for (i=1;i<=pdK;i++)
   {
-    resl->exp[pdY(i)]=a->exp[pdY(i)]+b->exp[pdY(i)];
+    pSetExp(resl,pdY(i),pGetExp(a,pdY(i))+pGetExp(b,pdY(i)));
   }
   // set the component number
   pSetComp(resl,c);
@@ -543,7 +546,7 @@ void pdAug(poly p, polyset *s, int *l, int *m)
     {
       q=pOne();
       pSetExp(q,pdDX(an),pGetExp(p,pdX(an))+1);
-      pdDFlag(q)=1;
+      pdSetDFlag(q,1);
       pSetm(q);
       //Print("1:  q ");wrp(q); Print("\n");
       q=pMult(q,pCopy(p));
@@ -569,8 +572,8 @@ void pdAug(poly p, polyset *s, int *l, int *m)
       dif=pOne();
       pSetExp(q,pdX(an),pGetExp(p,pdIX(an)));
       pSetExp(dif,pdDX(an),1);
-      pdDFlag(q)=1;
-      pdDFlag(dif)=1;
+      pdSetDFlag(q,1);
+      pdSetDFlag(dif,1);
       pSetm(q);
       //Print("2: q ");wrp(q); Print("\n");
       pSetm(dif);
@@ -603,11 +606,11 @@ void pdLcm(poly a, poly b, poly m)
   int i;
   for (i=2*pdN; i>=0; i--)
   {
-     m->exp[i] = min(a->exp[i],b->exp[i]);
+     pSetExp(m,i, min(pGetExp(a,i),pGetExp(b,i)));
   }
   for (i=pdY(1); i<=pdK; i++)
   {
-     m->exp[i] = max(a->exp[i],b->exp[i]);
+     pSetExp(m,i, max(pGetExp(a,i),pGetExp(b,i)));
   }
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.27 1998-05-19 23:48:00 obachman Exp $ */
+/* $Id: polys.cc,v 1.28 1998-05-28 16:50:50 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1403,7 +1403,7 @@ void pSetGlobals(ring r, BOOLEAN complete)
 
   // Set default Var Indicies
   pSetVarIndicies(pVariables);
-  
+
   // Initialize memory management
   mmSpecializeBlock(pMonomSize);
 
@@ -1845,7 +1845,7 @@ done:
       {
         if(pGetExp(rc,pdDX(i))>0)
         {
-          pdDFlag(rc)=1;
+          pdSetDFlag(rc,1);
           break;
         }
       }
@@ -2285,7 +2285,7 @@ poly pSubst(poly p, int n, poly e)
       pGetExpV(m,me);
       exponent=me[n];
       me[n]=0;
-      for(i=1;i<=pVariables;i++)
+      for(i=pVariables;i>0;i--)
         me[i]+=exponent*ee[i];
       pSetExpV(m,me);
       if (e!=NULL)
@@ -2319,7 +2319,8 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
     {
       if (pGetExp(p,j)!=pGetExp(lcm,j))
       {
-        for (k=pVariables; k>j; k--)        {
+        for (k=pVariables; k>j; k--)
+	{
           if ((pGetExp(p,k)!=pGetExp(lcm,k))
           && (pGetExp(p2,k)!=pGetExp(lcm,k)))
             return TRUE;
@@ -2343,7 +2344,7 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
           && (pGetExp(p1,k)!=pGetExp(lcm,k)))
             return TRUE;
         }
-        for (k=j-1; k; k--)
+        for (k=j-1; k!=0 ; k--)
         {
           if ((pGetExp(p,k)!=pGetExp(lcm,k))
           && (pGetExp(p1,k)!=pGetExp(lcm,k)))
@@ -2364,5 +2365,3 @@ int pWeight(int i)
   }
   return firstwv[i-1];
 }
-
-

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.31 1998-05-26 11:02:33 siebert Exp $ */
+/* $Id: ideals.cc,v 1.32 1998-05-28 16:50:47 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1260,7 +1260,7 @@ ideal  idPrepare (ideal  h1,ideal  quot, tHomog h,
     p = h2->m[j];
     q = pOne();
 #ifdef DRING
-    if (pDRING) { pdDFlag(q)=1; pSetm(q); }
+    if (pDRING) { pdSetDFlag(q,1); pSetm(q); }
 #endif
     pSetComp(q,*syzcomp+1+j);
     if (p!=NULL)
@@ -2536,7 +2536,7 @@ ideal idMatrix2Module(matrix mat)
         MATELEM(mat,i,j+1)=NULL;
         pSetCompP(h,i);
 #ifdef DRING
-        pdSetDFlag(h,0);
+        pdSetDFlagP(h,0);
 #endif
         result->m[j] = pAdd(result->m[j],h);
       }

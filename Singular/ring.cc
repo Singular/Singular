@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.24 1998-05-14 10:02:39 Singular Exp $ */
+/* $Id: ring.cc,v 1.25 1998-05-28 16:50:53 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -44,7 +44,11 @@ int rBlocks(ring r)
 // global variables:
 // complete == FALSE : only delete operations are enabled
 // complete == TRUE  : full reset of all variables
+#ifdef DRING
+void rChangeCurrRing(ring r, BOOLEAN complete, idhdl h)
+#else
 void rChangeCurrRing(ring r, BOOLEAN complete)
+#endif
 {
   /*------------ set global ring vars --------------------------------*/
   currRing = r;
@@ -78,13 +82,13 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
 #ifdef DRING
       pDRING=FALSE;
       pSDRING=FALSE;
-      if (hasFlag(h,FLAG_DRING)) rDSet();
+      if ((h!=NULL) && (hasFlag(h,FLAG_DRING))) rDSet();
 #endif // DRING
 
 #ifdef SRING
       if ((currRing->partN<=currRing->N)
 #ifdef DRING
-          && (!hasFlag(h,FLAG_DRING))
+          && ((h==NULL) || (!hasFlag(h,FLAG_DRING)))
 #endif
           )
       {
@@ -133,7 +137,11 @@ void rSetHdl(idhdl h, BOOLEAN complete)
     }
 
    /*------------ change the global ring -----------------------*/
+  #ifdef DRING
+  rChangeCurrRing(rg,complete,h);
+  #else
   rChangeCurrRing(rg,complete);
+  #endif
   currRingHdl = h;
 
     /*------------ set pShortOut -----------------------*/

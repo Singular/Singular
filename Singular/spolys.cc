@@ -25,8 +25,8 @@
 /*0 implementation*/
 
 #ifdef SDRING
-poly spDSpolyRed(poly p1,poly p2,poly spNoether);
-poly spDSpolyCreate(poly p1,poly p2,poly spNoether);
+poly spDSpolyRed(poly p1,poly p2,poly spNoether, spSpolyLoopProc dummy);
+poly spDSpolyCreate(poly p1,poly p2,poly spNoether, spSpolyLoopProc dummy);
 #endif
 
 poly (*spSpolyRed)(poly p1, poly p2,poly spNoether,
@@ -744,7 +744,7 @@ static poly spPSpolyShortBba(poly p1, poly p2)
 #endif
 
 #ifdef SDRING
-poly spDSpolyRed(poly p1,poly p2,poly spNoether)
+poly spDSpolyRed(poly p1,poly p2,poly spNoether, spSpolyLoopProc dummy)
 {
   poly m=pOne();
   poly tp1;
@@ -771,7 +771,7 @@ poly spDSpolyRed(poly p1,poly p2,poly spNoether)
         }
       }
     }
-    pdDFlag(m)=1;
+    pdSetDFlag(m,1);
   }
 #endif
   pSetm(m);
@@ -792,9 +792,9 @@ poly spDSpolyRed(poly p1,poly p2,poly spNoether)
   return p2;
 }
 
-poly spDSpolyRedNew(poly p1,poly p2,poly spNoether)
+poly spDSpolyRedNew(poly p1,poly p2,poly spNoether, spSpolyLoopProc dummy)
 {
-  return spDSpolyRed(p1,pCopy(p2),spNoether);
+  return spDSpolyRed(p1,pCopy(p2),spNoether, dummy);
 }
 
 poly spDSpolyCreate(poly p1,poly p2,poly spNoether)
@@ -846,8 +846,8 @@ poly spDSpolyCreate(poly p1,poly p2,poly spNoether)
         }
       }
     }
-    pdDFlag(m1)=1;
-    pdDFlag(m2)=1;
+    pdSetDFlag(m1,1);
+    pdSetDFlag(m2,1);
   }
 #endif
   pSetm(m1);

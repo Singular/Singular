@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.14 1998-05-19 09:02:38 obachman Exp $ */
+/* $Id: polys1.cc,v 1.15 1998-05-28 16:50:52 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -431,7 +431,7 @@ poly pPower(poly p, int i)
 #ifdef DRING
         if ((pDRING) && (pdDFlag(p)==1))
         {
-          pdDFlag(rc)=1;
+          pdSetDFlag(rc,1);
         }
 #endif
         pDelete(&p);
@@ -464,8 +464,8 @@ poly pPower(poly p, int i)
               for(j=1;j<=pdN;j++)
               {
                 t=pGetExp(p,pdX(j));
-                pGetExp(p,pdX(j)]=pGetExp(p,pdIX(j));
-                pGetExp(p,pdIX(j))=t;
+                pSetExp(p,pdX(j),pGetExp(p,pdIX(j)));
+                pSetExp(p,pdIX(j),t);
               }
               pIter(p);
             }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.9 1998-05-15 16:03:52 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.10 1998-05-28 16:50:49 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -70,7 +70,7 @@ static void * iiP2Id(void *data)
     {
       while (p!=NULL)
       {
-        pdDFlag(p)=1;
+        pdSetDFlag(p,1);
         pSetm(p);
         pIter(p);
       }

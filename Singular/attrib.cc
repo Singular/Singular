@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.9 1998-04-08 13:07:49 pohl Exp $ */
+/* $Id: attrib.cc,v 1.10 1998-05-28 16:50:45 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -361,7 +361,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
     {
       case POLY_CMD:
       case VECTOR_CMD:
-        pdSetDFlag((poly)v->Data(),(int)c->Data());
+        pdSetDFlagP((poly)v->Data(),(int)c->Data());
         break;
       case IDEAL_CMD:
       case MODUL_CMD:
@@ -369,7 +369,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
           ideal I=(ideal)v->Data();
           int i=IDELEMS(I)-1;
           int cc=(int)c->Data();
-          while (i>=0) { pdSetDFlag(I->m[i],cc); i--; }
+          while (i>=0) { pdSetDFlagP(I->m[i],cc); i--; }
           break;
         }
       default:
