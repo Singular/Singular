@@ -1,151 +1,45 @@
-			 Singular version 1.0
+			 Singular version 1.2
 		     University of Kaiserslautern
      Department of Mathematics        Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
-		  (C) 1986-1997 All Rights Reserved
+		  (C) 1986-1998 All Rights Reserved
 
-      README FILE FOR THE EXECUTABLE SINGULAR PROGRAM DISTRIBUTION
-      ============================================================
+      README FILE FOR THE SINGULAR EXECUTABLE DISTRIBUTION
+      ====================================================
 
-IMPORTANT: Please see the COPYING.bin file contained in this directory
-for license information for the Singular program.
-
-This directory contains 
-
-(1) binary versions of Singular for common hard- and software
-    platforms in the files Singular-1.0.<platform>.gz where
-    <platform> is, for example, 'linux', 'SunOS', etc.
-
-(2) The file Singular-1.0-share.tar.gz which contains the architecture
-    - independent files (such as libraries written in the Singular
-    programming language, and the Singular documentation). See the
-    file README.share contained in this tar file for more information.
-
-(3) the file COPYING.bin containing the copying and license
-    information.
+IMPORTANT: 
+==========
+(1) See the COPYING file contained in this distribution
+    for license information for the Singular.
+(2) See the README file contained in this distribution for general
+    information on Singular.
+(3) See the INSTALL file contained in this distribution for
+    instruction on how to install Singular.
 
 
-Installing the Singular binaries
-================================
-In order to use Singular, you 
+ABOUT THIS DISTRIBUTION
+=======================
+This distribution contains the following files and subdirectories
 
-(1) need to obtain _all_ the three files mentioned above (i.e. obtaining the
-    binary, only, is not enough!)
+  ./<uname description>/bin/Singular-<x.y.z>	Singular executable
+  ./<uname description>/bin/libparse            parser for Singular libraries
+  ./INSTALL					installation instructions
+  ./COPYING					licence information
+  ./README.general				general Singular info 
+  ./README.bin					this file
 
-(2) Uncompress the binary and install it at an appropriate place in
-    your executable path (e.g., /usr/local/bin)
+where <x.y.z> stands for the Singular version number (e.g., 1.2.0) and 
+<uname description> is a description of the processor and operating
+system for which Singular is compiled (e.g, ix86-Linux).
 
-(3) Unpack Singular-1.0-share.tar.gz 
-    (a) in the directory /usr/local/, or
-    (b) in another directory, say, $HOME/Singular, and set the environment
-        variable SINGULARPATH to the subdirectory
-        $HOME/Singular/share/Singular 
-	If you use the tcsh or csh shell, this can be accomplished by
-	the command 
-		'setenv SINGULARPATH $HOME/Singular/share/Singular'.
-	If you use the bash, ksh, or sh shell, this can be
-	accomplished by the command 
-		'SINGULARPATH=$HOME/Singular/share/Singular;export SINGULARPATH'
-	Furthermore, these commands should be put into your shell
-	initialization file (e.g., $HOME/.tcshrc)
+Note that this distribution does not contain architecture-independent
+data files (like the Singular libraries, or documentation files). 
 
-Optional:
-(4) You may move the file singular.hlp contained in share/Singular to
-    your info diretory (usualy /usr/local/info) and add the line 
-* Singular: (singular.hlp). The Singular manual
-    to the 'dir' file contained in your info directory.   
-
-(5) You may print the Singular manual (contained in docs/singular.dvi)
-    and tutorial (contained in docs/tutorial.dvi).
-
-Overview of Singular
-====================
-Singular is a special-purpose computer algebra system for commutative
-algebra, algebraic geometry and singularity theory. The main features
-of Singular are: 
-
- * Computations in very general rings (polynomial rings, localizations
-   of rings at a prime ideal, tensor products of rings) over many
-   ground fields (rational numbers, mod p numbers, Galois fields,
-   transcendental/algebraic extensions) and monomial orderings (all
-   standard monomial orderings, including matrix orderings)
-
- * Very fast standard (resp. Groebner) bases computations
-
- * Polynomial factorization, resultant, and gcd computations
-
- * Large variety of implemented related algorithm: FGLM,
-   Hilbert-driven, Factorizing Buchberger; Minimal resolutions,
-   Primary decomposition; Usual ideal theoretic operations; standard
-   combinatorial algorithms.
-
- * Efficient and flexible communication links based on the MP
-   protocol and library
-
- * Easy-to-use, command-driven user-interface
-
- * Intuitive, C-like programming language
-
- * Extensive libraries of procedures, written in Singular's
-   programming language
-
- * Written in C/C++. Available as binary program for common hard- and
-   software platforms (including most Un*x variants, MS-DOG, MacOS)
-
-Acknowledgments
-================
-Singular 1.0 is linked with the following libraries: 
-  readline--  The Gnu readline library (v. 2.0) 
-	      C) Free Software Foundation
-  gmp	  --  The Gnu Multiple precision library (v: 2.0.2) distribution
-              (C) Free Software Foundation
-  MP      --  The Multi Protocol library (v: 1.1.2) distribution
-              (C) Gray/Kajler/Wang; Kent State University
-  factory --  The factory library (v: 1.2c) for polynomial factorization
-	      (C) Greuel/Stobbe U of Kaiserslautern
-  libfac  --  The libfac library (v: 0.2.1) for characteristic set computations
-              (C) Mesollen U of Saarbruecken
-We would like to thank all authors of these who contributed these
-libraries. 
-
-
-Distribution of Singular
-========================
-The newest version of Singular is always available by anonymous ftp
-from 
-	     www.mathematik.uni-kl.de:/pub/Math/Singular
-
-Binary versions of Singular for common hard- and software
-platforms are contained in the files bin/Singular-1.0.<platform>.gz where
-<platform> is, for example, 'linux', 'SunOS', etc.  
-
-In general, Singular is only available as binary program. For
-exceptions, you may contact us at
-        singular@mathematik.uni-kl.de
-
-Architecture - independent files (such as libraries written in the
-Singular programming language, and the Singular documentation) are
-distributed as Singular-1.0-share.tar.gz. See the file README.share
-for more information. 
-
-Documentation to Singular is distributed as:
-Singular-1.0.dvi.gz	 - Reference manual in dvi format
-Tutorial.dvi.gz		 - Singular tutorial in dvi format
-Singular-1.0.ps.gz	 - Reference manual in postscript format
-Tutorial.dvi.gz		 - Singular tutorial in postscript format
-singular.hlp.gz		 - Reference manual in Info format
-Singular-1.0.html.tar.gz - Reference manual in html format
-
-The GMP library and the readline library is available at
-ftp.gnu.ai.mit.edu or its mirrors.
-
-The MP library library is avialbale from mcs.kent.edu:/pub/MP/
-For further information on MP, see also
-http://symbolicnet.mcs.kent.edu/areas/protocols/mp.html
-
-The factory and libfac library are available from
-www.mathematik.uni-kl.de:/pub/Math/
-
+You can get the Singular architecture-independent distribution from
+    ftp://www.mathematik.uni-kl.de/pub/Math/Singular
+by downloading the file
+    Singular-<x.y.z>-share.tar.gz
+See also the INSTALL file contained in this directory.
 
 More information about Singular: Comments, Questions, Bug Reports
 =================================================================

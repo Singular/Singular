@@ -112,7 +112,7 @@ DISTROOT_NAME	= Singular-${SINGULAR_VERSION}
 BINDIST_NAME	= ${DISTROOT_NAME}-${SINGUNAME}
 SHAREDIST_NAME  = ${DISTROOT_NAME}-share
 
-.PHONY: sharedist bindist static-bindist
+.PHONY: sharedist bindist static-bindist infodist
 sharedist: ${SINGULAR}
 	cd doc; ${MAKE} all; ${MAKE} ps
 	rm -rf ${TMPDIR}
@@ -156,6 +156,14 @@ static-bindist: ${SINGULAR}
 	cp ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
 	rm -rf ${TMPDIR}
 
+infodist: 
+	rm -rf ${TMPDIR}
+	${MKINSTALLDIRS} ${TMPDIR}/${SINGUNAME}/bin/
+	cp `which info` ${TMPDIR}/${SINGUNAME}/bin/
+	cd ${TMPDIR}; tar cf info-${SINGUNAME}.tar ${SINGUNAME}; \
+                      gzip info-${SINGUNAME}.tar
+	cp ${TMPDIR}/info-${SINGUNAME}.tar.gz .
+	rm -rf ${TMPDIR}
 
 ##############################################################
 # stuff for configure

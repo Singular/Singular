@@ -1,0 +1,69 @@
+WELCOME TO THE HOME FTP SITE OF SINGULAR -- A COMPUTER ALGEBRA SYSTEM FOR
+		       POLYNOMIAL COMPUTATIONS
+		
+Announcing Singular version 1.2.0:
+==================================
+Singular 1.2.0 is now available. It is a major upgrade from all previous 
+versions of Singular, and you should definitely consider upgrading
+your current Singular version.
+
+This directory cointains:
+=========================
+Singular-1.2.0-share.tar.gz	             
+        -- shared data of newest Singular distribution for Unix platforms
+Singular-1.2.0-<uname description>.tar.gz  
+        -- newest Singular executables for Unix platforms
+Singular-1.2.0-ix86-Win.zip
+        -- complete Singular distribution for Windows 95/NT 
+Singular-1.2.0.ppc.sea.hqx.gz
+        -- complete Singular distribution for Macintosh PowerPC
+Singular-1.2.0.68k.sea.hqx.gz
+        -- complete Singular distribution for Macintosh 68K computers
+COPYING			Licence information on Singular
+README.general          General information on Singular
+utils/			Directory containing various utilities
+doc/			Directory containing Singular documentation
+Attic/			Directory containing old versions of Singular
+
+
+To download Singular for Unix platforms:
+========================================
+You need at least the following two files: 
+      Singular-1.2.0-share.tar.gz 
+      Singular-1.2.0-<uname description>.tar.gz
+where <uname description> is a description of the processor and operating
+system for which Singular is compiled (e.g, ix86-Linux) -- you should
+pick the description which is closest to your local machine. 
+
+Simply cd to the directory in which you wish to install SINGULAR,
+and then unpack the architecture independent tar file, followed by
+the architecture-dependent files for those architectures you use:
+
+  cd /usr/local/	# or wherever you install 3rd-party software
+  gzip -dc Singular-<x.y.z>-share.tar.gz .tar.gz | tar -pxf -
+  gzip -dc Singular-<x.y.z>-<uname description> | tar -pxf -
+
+You may replace `/usr/local/' with what you like, but refer to the
+INSTALL file contained in the executable distribution for more
+detailed info on how to install Singular.
+
+To download Singular for Windows 95 or Windows NT platform:
+==========================================================
+TBC
+
+To download Singular for the Macintosh:
+=======================================
+TBC
+
+More information about Singular: Comments, Questions, Bug Reports
+=================================================================
+
+More and up-to-date information about Singular is always available
+from 
+	   http://www.mathematik.uni-kl.de/~zca/Singular
+We very much welcome any comments, questions, and bug reports. Please
+contact us at  
+		    singular@mathematik.uni-kl.de
+
+
+GOOD LUCK and ENJOY!                         Your Singular team.
