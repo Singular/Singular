@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.3 1999-03-03 16:58:09 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.4 1999-03-03 16:58:52 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -192,6 +192,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
 
   if (bareiss->smGetAct() == NULL)
   {
+    delete bareiss;
     if (origR!=NULL)
     {
       rChangeCurrRing(origR,TRUE);
@@ -200,6 +201,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
       Free((ADDRESS)tmpR.block0,3*sizeof(int));
       Free((ADDRESS)tmpR.block1,3*sizeof(int));
     }
+    v=new intvec(1,pVariables);
   }
   else
   {
