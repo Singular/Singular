@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.17 2000-12-08 15:51:24 obachman Exp $
+# $Id: pl2doc.pl,v 1.18 2000-12-11 15:09:08 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -132,7 +132,14 @@ unless ($no_fun)
     print CD "%CHECKSUMS = (\n";
     for $key (keys %CHECKSUMS)
     {
-      print CD "q{$key}, $CHECKSUMS{$key},\n";
+      if ($CHECKSUMS{$key} == "sprintf")
+      {
+        print CD "q{$key}, \"sprintf\",\n";
+      }
+      else
+      {
+        print CD "q{$key}, $CHECKSUMS{$key},\n";
+      }
     }
     print CD ");\n";
     close(CD);
