@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.19 1998-02-17 15:06:40 obachman Exp $ */
+/* $Id: longalg.cc,v 1.20 1998-03-27 15:43:28 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2472,7 +2472,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
     //  Print("normalized with non-normal coeffs in %s:%d\n",f,l);
     //  return FALSE;
     //}
-    if (naIsChar0 && nlDBTest(p->ko,f,l))
+    if (naIsChar0 && !(nlDBTest(p->ko,f,l)))
       return FALSE;
 #ifdef MDEBUG
     mmDBTestBlock(p,RECA_SIZE+naNumbOfPar*sizeof(int),f,l);
@@ -2482,7 +2482,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
   p = x->n;
   while(p!=NULL)
   {
-    if (naIsChar0 && nlDBTest(p->ko,f,l))
+    if (naIsChar0 && !(nlDBTest(p->ko,f,l)))
       return FALSE;
 #ifdef MDEBUG
     if (!mmDBTestBlock(p,RECA_SIZE+naNumbOfPar*sizeof(int),f,l))

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.13 1998-03-27 14:44:26 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.14 1998-03-27 15:43:29 obachman Exp $ */
 
 /***************************************************************
  *
@@ -664,13 +664,9 @@ BOOLEAN pDBTest(poly p, char *f, int l)
     if (!mmDBTestBlock(p,pMonomSize,f,l))
       return FALSE;
 #endif
-    if (pGetComp(p) > 10)
-    {
-      Print("Component > 10 in poly in %s: %d\n", f,l);
-    }
 #ifdef LDEBUG
     if (!nDBTest(p->coef,f,l))
-       return FALSE;
+      return FALSE;
 #endif
     if ((p->coef==NULL)&&(nGetChar()<2))
     {

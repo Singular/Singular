@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.9 1998-03-27 14:44:23 obachman Exp $ */
+/* $Id: algmap.cc,v 1.10 1998-03-27 15:43:17 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -196,7 +196,7 @@ err_algfetch:
   return NULL;
 }
 
-static poly maLongalgMap(poly res, poly p0, int s, int t,
+static poly maLongalgMap(poly res, ring r, poly p0, int s, int t,
                          BOOLEAN *nom, poly monpart, ideal F)
 {
   number cc;
@@ -204,7 +204,6 @@ static poly maLongalgMap(poly res, poly p0, int s, int t,
   poly q, q0, q1 = NULL;
   int i;
   
-  pTest(monpart);
   if (s == 0)
   {
     if (t!=0)
@@ -221,7 +220,7 @@ static poly maLongalgMap(poly res, poly p0, int s, int t,
     {
       pMultN(monpart,pGetCoeff(p0));
     }
-    pSetCompP(monpart, pGetComp(p0));
+    pSetCompP(monpart, pRingGetComp(r, p0));
     return pAdd(res, monpart);
   }
   if (naGetDenom(pGetCoeff(p0)) != NULL)
@@ -261,17 +260,13 @@ static poly maLongalgMap(poly res, poly p0, int s, int t,
           break;
         }
       }
-      pTest(q);
     }
     q1 = pAdd(q1, q);
-    pTest(q1);
     a0 = napNext(a0);
   }
   while (a0 != NULL);
   q1 = pMult(q1,monpart);
-  pTest(q1);
-  pSetCompP(q1,pGetComp(p0));
-  pTest(q1);
+  pSetCompP(q1,pRingGetComp(r, p0));
   return pAdd(res, q1);
 }
 
@@ -318,7 +313,7 @@ poly maAlgpolyMap(ring R, poly preimage, ideal F, ideal G)
     poly pr=pNext(p0);
     p0->next=NULL;
     monpart = maEval((map)G, p0, R);
-    result = maLongalgMap(result, p0, s, t, &nom, monpart, F);
+    result = maLongalgMap(result, R, p0, s, t, &nom, monpart, F);
     pTest(result);
     if (nom)
     {
@@ -327,6 +322,5 @@ poly maAlgpolyMap(ring R, poly preimage, ideal F, ideal G)
     p0->next = pr;
     p0=pr;
   }
-  pTest(result);
   return result;
 }

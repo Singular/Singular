@@ -1,3 +1,11 @@
+1998-03-27  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* longalg.cc (naDBTest): fixed lines for number tests
+
+	* added spSpolyLoop.inc to repository
+
+	* algmap.cc (maAlgpolyMap): fixed bug which changed preimage
+
 1998-03-23  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* taged version 1.1.7 -- unconditional fast version
