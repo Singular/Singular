@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: cmpl.pl,v 1.3 1999-08-16 11:10:09 obachman Exp $
+# $Id: cmpl.pl,v 1.4 1999-08-17 12:06:10 obachman Exp $
 ###################################################################
 #
 # FILE:    cmpl.pl
@@ -25,7 +25,7 @@ while (@ARGV && $ARGV[0] =~ /^-/)
 {
   $_ = shift(@ARGV);
   if (/^-S(ingular)?$/)  { $Singular = shift(@ARGV); next;}
-  if (/^-h(lp)?$/)       { $hlp = shift(@ARGV); next;}
+  if (/^-hlp$/)          { $hlp = shift(@ARGV); next;}
   if (/^-c(mpl)?$/)      { $cmpl = shift(@ARGV); next;}
   if (/^-h(elp)?$/)      { print $Usage; exit;}
   die "Unrecognized option: $_\n$Usage";
