@@ -3509,6 +3509,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
+  c->is_homog=TRUE;
   c->r=currRing;
   void* h;
   poly hp;
@@ -4272,6 +4273,61 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 #endif
   }
 }
+static int fwbw(red_object* los, int i){
+   int i2=i;
+   int step=1;
+   
+   BOOLEAN bw=FALSE;
+   BOOLEAN incr=TRUE;
+   
+   while(1)
+   {
+     if(!bw)
+     {
+       step=min(i2,step);
+       if (step==0) break;
+       i2-=step;
+	  
+       if(!pLmEqual(los[i].p,los[i2].p))
+       {
+	 bw=TRUE;
+	 incr=FALSE;
+       }
+       else
+       {
+	 if ((!incr) &&(step==1)) break;
+       }
+       
+       
+     }
+     else
+     {
+       
+       step=min(i-i2,step);
+       if (step==0) break;
+       i2+=step;
+       if(pLmEqual(los[i].p,los[i2].p)){
+	 if(step==1) break;
+	 else
+	 {
+	   bw=FALSE;
+	 }
+       }
+       
+     }
+     if (incr)
+       step*=2;
+     else
+     {
+       if (step%2==1)
+	 step=(step+1)/2;
+       else
+	 step/=2;
+       
+     }
+   }
+   return i2;
+}
 static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int startf,find_erg & erg){
   kStrategy strat=c->strat;
 
@@ -4289,23 +4345,29 @@ static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int start
       erg.to_reduce_u=i;
       erg.reduce_by=j;
       erg.fromS=TRUE;
-      int i2;
-      for(i2=i-1;i2>=0;i2--){
-	if(!pLmEqual(los[i].p,los[i2].p))
-	  break;
-      }
+      int i2=fwbw(los,i);
+      assume(pLmEqual(los[i].p,los[i2].p));
+      assume((i2==0)||(!pLmEqual(los[i2].p,los[i2-1].p)));
+      assume(i>=i2);
+
+//       int i2;
+//       for(i2=i-1;i2>=0;i2--){
+// 	if(!pLmEqual(los[i].p,los[i2].p))
+// 	  break;
+//      }
       
-      erg.to_reduce_l=i2+1;
+//      erg.to_reduce_l=i2+1;
+      erg.to_reduce_l=i2;
       assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
       return;
     }
     if (j<0){
       
       //not reduceable, try to use this for reducing higher terms
-      int i2;
-      i2=i;
-      while((i2>0)&&(pLmEqual(los[i].p,los[i2-1].p)))
-	i2--;
+      int i2=fwbw(los,i);
+      assume(pLmEqual(los[i].p,los[i2].p));
+      assume((i2==0)||(!pLmEqual(los[i2].p,los[i2-1].p)));
+      assume(i>=i2);
       if(i2!=i){
 	
 	erg.to_reduce_u=i-1;
@@ -4315,23 +4377,25 @@ static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int start
 	assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
 	return;
       }
- 
-      for (i2=i+1;i2<losl;i2++){
-	if (p_LmShortDivisibleBy(los[i].p,los[i].sev,los[i2].p,~los[i2].sev,
-				c->r)){
-	  int i3=i2;
-	  while((i3+1<losl) && (pLmEqual(los[i2].p, los[i3+1].p)))
-	    i3++;
-	  erg.to_reduce_u=i3;
-	  erg.to_reduce_l=i2;
-	  erg.reduce_by=i;
-	  erg.fromS=FALSE;
-	  assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
-	  return;
-	}
-//	else {assume(!p_LmDivisibleBy(los[i].p, los[i2].p,c->r));}
-      }
+      if(!(c->is_homog))
+      {
 
+	for (i2=i+1;i2<losl;i2++){
+	  if (p_LmShortDivisibleBy(los[i].p,los[i].sev,los[i2].p,~los[i2].sev,
+				   c->r)){
+	    int i3=i2;
+	    while((i3+1<losl) && (pLmEqual(los[i2].p, los[i3+1].p)))
+	      i3++;
+	    erg.to_reduce_u=i3;
+	    erg.to_reduce_l=i2;
+	    erg.reduce_by=i;
+	    erg.fromS=FALSE;
+	    assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
+	    return;
+	  }
+	  //	else {assume(!p_LmDivisibleBy(los[i].p, los[i2].p,c->r));}
+	}
+      }
       i--;
     }
   }
