@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.21 2000-12-06 12:34:20 Singular Exp $ */
+/* $Id: numbers.h,v 1.22 2000-12-13 17:49:39 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -39,6 +39,8 @@ extern int     (*nInt)(number &n);
 extern number  (*nNeg)(number a);
 extern number  (*nInvers)(number a);
 extern number  (*nCopy)(number a);
+extern number  (*nRePart)(number a);
+extern number  (*nImPart)(number a);
 extern void    (*nWrite)(number &a);
 extern char *  (*nRead)(char * s, number * a);
 extern void    (*nNormalize)(number &a);

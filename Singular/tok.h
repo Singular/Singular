@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.45 2000-11-14 16:05:03 obachman Exp $ */
+/* $Id: tok.h,v 1.46 2000-12-13 17:49:40 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -80,6 +80,7 @@ enum {
   GETDUMP_CMD,
   HIGHCORNER_CMD,
   HRES_CMD,
+  IMPART_CMD,
   INSERT_CMD,
   INT_CMD,
   INTDIV_CMD,
@@ -114,6 +115,7 @@ enum {
   QRING_CMD,
   RANDOM_CMD,
   READ_CMD,
+  REPART_CMD,
   RESERVEDNAME_CMD,
   RESULTANT_CMD,
   ROWS_CMD,

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.31 2000-12-08 14:57:21 Singular Exp $ */
+/* $Id: numbers.cc,v 1.32 2000-12-13 17:49:39 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -37,6 +37,8 @@ number (*nNeg)(number a);
 number (*nInvers)(number a);
 void   (*nNormalize)(number &a);
 number (*nCopy)(number a);
+number (*nRePart)(number a);
+number (*nImPart)(number a);
 BOOLEAN (*nGreater)(number a,number b);
 BOOLEAN (*nEqual)(number a,number b);
 BOOLEAN (*nIsZero)(number a);
@@ -76,6 +78,8 @@ void   nDummy2(number& d) { }
 char * ndName(number n) { return NULL; }
 
 number ndPar(int i) { return nInit(0); }
+
+number ndReturn0(number n) { return nInit(0); }
 
 int    ndParDeg(number n) { return 0; }
 
@@ -179,6 +183,8 @@ void nSetChar(ring r)
   nName= r->cf->nName;
   nSize  = r->cf->nSize;
   nGetDenom = r->cf->nGetDenom;
+  nRePart = r->cf->nRePart;
+  nImPart = r->cf->nImPart;
 #ifdef LDEBUG
   nDBTest=r->cf->nDBTest;
 #endif
@@ -234,6 +240,7 @@ void nInitChar(ring r)
   r->cf->nSize = ndSize;
   r->cf->nGetDenom= ndGetDenom;
   r->cf->nName =  ndName;
+  r->cf->nImPart=ndReturn0;
   if (rField_is_Extension(r))
   {
     //naInitChar(c,TRUE,r);
@@ -518,6 +525,8 @@ void nInitChar(ring r)
     r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
     r->cf->nSetMap=ngcSetMap;
     r->cf->nPar=ngcPar;
+    r->cf->nRePart=ngcRePart;
+    r->cf->nImPart=ngcImPart;
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
     r->cf->nDBTest=ngcDBTest;
@@ -529,7 +538,12 @@ void nInitChar(ring r)
     WerrorS("unknown field");
   }
 #endif
-  if (!errorreported) r->cf->nNULL=r->cf->nInit(0);
+  if (!errorreported) 
+  {
+    r->cf->nNULL=r->cf->nInit(0);
+    if (r->cf->nRePart==NULL)
+      r->cf->nRePart=r->cf->nCopy;
+  }    
 }
 
 void nKillChar(ring r)

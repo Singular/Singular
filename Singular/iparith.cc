@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.239 2000-12-08 14:57:19 Singular Exp $ */
+/* $Id: iparith.cc,v 1.240 2000-12-13 17:49:37 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -188,6 +188,7 @@ cmdnames cmds[] =
   { "ideal",       0, IDEAL_CMD ,         IDEAL_CMD},
   { "if",          0, IF_CMD ,            IF_CMD},
   { "imap",        0, IMAP_CMD ,          CMD_2},
+  { "impart",      0, IMPART_CMD ,        CMD_1},
 #ifdef HAVE_NAMESPACES
   { "importfrom",  0, IMPORTFROM_CMD ,    CMD_M},
 #endif
@@ -275,6 +276,7 @@ cmdnames cmds[] =
   { "read",        0, READ_CMD ,          CMD_12},
   { "reduce",      0, REDUCE_CMD ,        CMD_M},
   { "regularity",  0, REGULARITY_CMD ,    CMD_1},
+  { "repart",      0, REPART_CMD ,        CMD_1},
   { "reservedName",0, RESERVEDNAME_CMD ,  CMD_M},
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
@@ -2845,6 +2847,11 @@ static BOOLEAN jjIm2Iv(leftv res, leftv v)
   res->data = iv;
   return FALSE;
 }
+static BOOLEAN jjIMPART(leftv res, leftv v)
+{
+  res->data = (char *)nImPart((number)v->Data());
+  return FALSE;
+}
 static BOOLEAN jjINDEPSET(leftv res, leftv v)
 {
   assumeStdFlag(v);
@@ -3131,6 +3138,11 @@ static BOOLEAN jjREAD(leftv res, leftv v)
 static BOOLEAN jjREGULARITY(leftv res, leftv v)
 {
   res->data = (char *)iiRegularity((lists)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjREPART(leftv res, leftv v)
+{
+  res->data = (char *)nRePart((number)v->Data());
   return FALSE;
 }
 static BOOLEAN jjROWS(leftv res, leftv v)
@@ -3631,6 +3643,7 @@ struct sValCmd1 dArith1[]=
 ,{jjIDEAL_R,    IDEAL_CMD,       IDEAL_CMD,      RING_CMD }
 ,{jjIDEAL_Map,  IDEAL_CMD,       IDEAL_CMD,      MAP_CMD }
 ,{jjDUMMY,      IDEAL_CMD,       IDEAL_CMD,      IDEAL_CMD }
+,{jjIMPART,     IMPART_CMD,      NUMBER_CMD,     NUMBER_CMD }
 ,{jjINDEPSET,   INDEPSET_CMD,    INTVEC_CMD,     IDEAL_CMD }
 ,{jjDUMMY,      INT_CMD,         INT_CMD,        INT_CMD }
 ,{jjnInt,       INT_CMD,         INT_CMD,        NUMBER_CMD }
@@ -3714,6 +3727,7 @@ struct sValCmd1 dArith1[]=
 ,{jjWRONG,      QRING_CMD,       0,              ANY_TYPE}
 ,{jjREAD,       READ_CMD,        STRING_CMD,     LINK_CMD }
 ,{jjREGULARITY, REGULARITY_CMD,  INT_CMD,        LIST_CMD }
+,{jjREPART,     REPART_CMD,      NUMBER_CMD,     NUMBER_CMD }
 ,{jjRESERVEDNAME,RESERVEDNAME_CMD, INT_CMD,      STRING_CMD }
 ,{jjL2R,        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD }
 ,{jjDUMMY,      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD }
