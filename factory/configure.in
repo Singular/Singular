@@ -1,17 +1,18 @@
-dnl $Id: configure.in,v 1.9 1997-10-22 16:19:12 schmidt Exp $
+dnl emacs edit mode for this file is -*- sh -*-
+dnl $Id: configure.in,v 1.10 1997-10-28 14:37:07 schmidt Exp $
 
-dnl
-dnl configure.in - process this file with autoconf to generate
-dnl   a configure script.
-dnl
-dnl See the INSTALL file for information on how the configure script
-dnl works.
-dnl
+dnl #
+dnl # configure.in - process this file with `autoconf' to generate
+dnl #	a `configure' script.
+dnl #
+dnl # See the `INSTALL' file for information on how the `configure'
+dnl # script works.
+dnl #
 
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.9 1997-10-22 16:19:12 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.10 1997-10-28 14:37:07 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -19,11 +20,12 @@ AC_CONFIG_AUX_DIR(bin)
 #
 # Do not change version here!!!
 #
-dnl
-dnl Change version here, do not believe the comment in the
-dnl preceding lines.
-dnl
+dnl #
+dnl # Change version here, do not believe the comment in the
+dnl # preceding lines.
+dnl #
 factory_version="1.3a"
+factory_configuration="'$ac_configure_args' in `pwd`"
 
 #
 # - check withs and enables.
@@ -38,6 +40,8 @@ AC_ARG_WITH(
     else
       with_memman=old
     fi ])
+
+# font-lock-trick: '
 
 AC_ARG_WITH(
   gmp,
@@ -127,12 +131,12 @@ if test "x$GCC" != xyes && test "x$GXX" != xyes; then
   AC_MSG_WARN(you better use gcc to compile Factory)
 else
   if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-    AC_MSG_WARN([we will use '-O2 -fomit-frame-pointer' as default for CXXFLAGS
-		      (instead of the configure default '-g -O')])
+    AC_MSG_WARN([we will use \`-O2 -fomit-frame-pointer' as default for \`CXXFLAGS'
+                    (instead of the configure default \`-g -O')])
   fi
   if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-    AC_MSG_WARN([we will use '-O2 -fomit-frame-pointer' as default for CFLAGS
-		      (instead of the configure default '-g -O')])
+    AC_MSG_WARN([we will use \`-O2 -fomit-frame-pointer' as default for \`CFLAGS'
+                    (instead of the configure default \`-g -O')])
   fi
 fi
 
@@ -186,9 +190,11 @@ fi
 
 if test "x$enable_timing" != xno; then
   AC_CHECK_HEADERS(sys/param.h sys/times.h, ,
-    [ AC_MSG_ERROR(sys/times.h or sys/param.h not found.  Try
-                  configure --disable-timing) ])
+    [ AC_MSG_ERROR(\`sys/times.h' or \`sys/param.h' not found.  Try
+                  \`configure --disable-timing') ])
 fi
+
+# font-lock-trick: '
 
 #
 # - check for compiler characteristics.
@@ -202,8 +208,13 @@ AC_LANG_C
 AC_C_CROSS
 if test "x$cross_compiling" = xyes; then
   AC_MSG_WARN([you better specify a cache file to get the values for
-                    cross-compiling right (call configure --cache-file=target.cache)])
+                    cross-compiling right (e.g., call \`configure
+                    --cache-file=yourTarget.cache').  In particular, you
+                    should make sure that your target machine supports
+                    arithmetic shift.])
 fi
+
+# font-lock-trick: '
 
 AC_C_CONST
 AC_C_INLINE
@@ -213,7 +224,7 @@ AC_MSG_CHECKING(whether your compiler does arithmetic shifts)
 AC_CACHE_VAL(ac_cv_shift,
   [ AC_TRY_RUN(
       [ int main() { if (-2 >> 1 == -1) exit(0); else exit(1); } ],
-      ac_cv_shift=yes, ac_cv_shift=no, ac_cv_shift=no) ])
+      ac_cv_shift=yes, ac_cv_shift=no, ac_cv_shift=yes) ])
 if test "x$ac_cv_shift" = xyes; then   
   AC_MSG_RESULT(yes)
 else
@@ -433,6 +444,7 @@ AC_SUBST_FILE(debouttargets)
 AC_SUBST_FILE(debtimingtargets)
 
 AC_DEFINE_UNQUOTED(FACTORYVERSION, "$factory_version")
+AC_DEFINE_UNQUOTED(FACTORYCONFIGURATION, "$factory_configuration")
 AC_DEFINE_UNQUOTED(GFTABLEDIR, "$expl_gftabledir")
 
 AC_OUTPUT(GNUmakefile)
