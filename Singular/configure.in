@@ -273,7 +273,7 @@ AC_SUBST(WITH_FACTORY)
 dnl Check libfac
 WITH_LIBFAC=no
 if test "$with_libfac" != no; then
-  if test "${HAVE_FACTORY}" != yes; then
+  if test "${WITH_FACTORY}" != yes; then
     AC_MSG_WARN(building without libfac: can not use libfac without factory) 
   else
     if test "$ac_cv_lib_singcf_atof" = yes; then
