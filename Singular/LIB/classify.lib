@@ -1,8 +1,8 @@
-e// $Id: classify.lib,v 1.38 1999-11-05 15:12:24 obachman Exp $
+e// $Id: classify.lib,v 1.39 1999-12-09 12:41:44 obachman Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.38 1999-11-05 15:12:24 obachman Exp $";
+version  = "$Id: classify.lib,v 1.39 1999-12-09 12:41:44 obachman Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -42,7 +42,10 @@ proc classify_init
   link l="DBM:r NFlist";
   s = read(l,"VERSION");
   if (s == "" ) {
-    "(classify.lib): Need to create database...";
+    if (printlevel)
+    {
+      "(classify.lib): Need to create database...";
+    }
     LIB"makedbm.lib";
     create_sing_dbm();
   }
