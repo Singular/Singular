@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.31 1999-10-25 08:32:17 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.32 1999-11-05 19:11:08 obachman Exp $ */
 
 /***************************************************************
  *
@@ -338,7 +338,7 @@ poly _pCopy(memHeap d_h, poly s_p)
 
   assume(d_h != NULL && (d_h == mm_specHeap) ||
          d_h->size == mm_specHeap->size);
-
+  pTest(s_p);
   while (s_p != NULL)
   {
 #ifdef MDEBUG
@@ -1119,6 +1119,15 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
       {
         Warn("Shifted comp out of sync. should %d, is %d", ccc1, ec1);
         return FALSE;
+      }
+    }
+    if (currRing->order[0] == ringorder_s)
+    {
+      if (p->exp.l[currRing->typ[0].data.syz.place] != 0 &&
+          p->exp.l[currRing->typ[0].data.syz.place] != 1)
+      {
+        Warn("Syzcomp wrong %d in %s:%d", 
+             p->exp.l[currRing->typ[0].data.syz.place], f, l);
       }
     }
     old=p;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.71 1999-10-27 15:04:44 Singular Exp $ */
+/* $Id: ideals.cc,v 1.72 1999-11-05 19:11:06 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -354,26 +354,18 @@ ideal idCopy (ideal h1)
 /*2
 * copy an ideal from ring r1 to currRing
 */
-ideal idRingCopy(ideal h, ring r)
+ideal idRingCopy(ideal id, ring r)
 {
-  if (h==NULL) return NULL;
-  ideal s_h=idInit(IDELEMS(h),h->rank);
+  if (id == NULL) return NULL;
+  ideal res;
+  
   int i;
-  for(i=IDELEMS(h)-1;i>=0;i--)
+  res = idInit(IDELEMS(id), id->rank);
+  for (i=IDELEMS(id)-1; i>=0; i--)
   {
-    if (h->m[i]!=NULL)
-    {
-      if(r==currRing)
-      {
-        s_h->m[i]=pCopy(h->m[i]);
-      }
-      else
-      {
-        s_h->m[i]=pPermPoly(h->m[i],NULL,r,NULL,0);
-      }
-    }
+    res->m[i] = pFetchCopy(r, id->m[i]);
   }
-  return s_h;
+  return res;
 }
 
 #ifdef PDEBUG
@@ -1105,7 +1097,7 @@ ideal idSect (ideal h1,ideal h2)
   temp = idInit(j /*IDELEMS(first)*/,length+j);
 
   ring orig_ring=currRing;
-  ring syz_ring=rAddSyzComp(currRing);
+  ring syz_ring=rCurrRingAssureSyzComp();
   pSetSyzComp(length);
 
   while ((j>0) && (first->m[j-1]==NULL)) j--;
@@ -1117,7 +1109,7 @@ ideal idSect (ideal h1,ideal h2)
       if (syz_ring==orig_ring)
         temp->m[k] = pCopy(first->m[i]);
       else
-        temp->m[k] = pPermPoly(first->m[i],NULL,orig_ring,NULL,0);
+        temp->m[k] = pFetchCopy(orig_ring,first->m[i]);
       q = pOne();
       pSetComp(q,i+1+length);
       pSetmComp(q);
@@ -1137,7 +1129,7 @@ ideal idSect (ideal h1,ideal h2)
       if (syz_ring==orig_ring)
         temp->m[k] = pCopy(second->m[i]);
       else
-        temp->m[k] = pPermPoly(second->m[i],NULL,orig_ring,NULL,0);
+        temp->m[k] = pFetchCopy(orig_ring,second->m[i]);
       if (slength==0) pShift(&(temp->m[k]),1);
       k++;
     }
@@ -1160,7 +1152,7 @@ ideal idSect (ideal h1,ideal h2)
       if(syz_ring==orig_ring)
         p = pCopy(temp1->m[i]);
       else
-        p = pPermPoly(temp1->m[i],NULL,syz_ring,NULL,0);
+        p = pFetchCopy(syz_ring,temp1->m[i]);
       while (p!=NULL)
       {
         q = pNext(p);
@@ -1230,7 +1222,7 @@ ideal idMultSect(resolvente arg, int length)
   syzComp = k*maxrk;
 
   ring orig_ring=currRing;
-  ring syz_ring=rAddSyzComp(currRing);
+  ring syz_ring=rCurrRingAssureSyzComp();
   pSetSyzComp(syzComp);
 
   bigmat = idInit(j,(k+1)*maxrk);
@@ -1259,7 +1251,7 @@ ideal idMultSect(resolvente arg, int length)
           if (syz_ring==orig_ring)
             bigmat->m[i] = pCopy(arg[j]->m[l]);
           else
-            bigmat->m[i] = pPermPoly(arg[j]->m[l],NULL,orig_ring,NULL,0);
+            bigmat->m[i] = pFetchCopy(orig_ring,arg[j]->m[l]);
           pShift(&(bigmat->m[i]),k*maxrk+isIdeal);
           i++;
         }
@@ -1291,7 +1283,7 @@ ideal idMultSect(resolvente arg, int length)
       if (syz_ring==orig_ring)
         p = pCopy(tempstd->m[j]);
       else
-        p = pPermPoly(tempstd->m[j],NULL,syz_ring,NULL,0);
+        p = pFetchCopy(syz_ring,tempstd->m[j]);
       pShift(&p,-syzComp-isIdeal);
       result->m[k] = p;
       k++;
@@ -1396,7 +1388,7 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
 
   assume(currRing != NULL);
   ring orig_ring=currRing;
-  ring syz_ring=rAddSyzComp(currRing);
+  ring syz_ring=rCurrRingAssureSyzComp();
 
   pSetSyzComp(k);
 
@@ -1429,7 +1421,7 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
         }
         else
         {
-          p = pPermPoly(s_h3->m[j],NULL,syz_ring,NULL,0);
+          p = pFetchCopy(syz_ring,s_h3->m[j]);
           rChangeCurrRing(syz_ring,FALSE);
           pDelete(&(s_h3->m[j]));
           rChangeCurrRing(orig_ring,TRUE);
@@ -1516,7 +1508,7 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
   k=max(1,idRankFreeModule(h1));
 
   ring orig_ring=currRing;
-  ring syz_ring=rAddSyzComp(currRing);
+  ring syz_ring=rCurrRingAssureSyzComp();
   pSetSyzComp(k);
 
   ideal s_h1=idRingCopy(h1,orig_ring);
@@ -1612,7 +1604,7 @@ ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
   k=max(k,1);
 
   ring orig_ring=currRing;
-  ring syz_ring=rAddSyzComp(currRing);
+  ring syz_ring=rCurrRingAssureSyzComp();
   pSetSyzComp(k);
 
   ideal s_mod=idRingCopy(mod,orig_ring);
@@ -1695,7 +1687,7 @@ ideal  idLift (ideal  mod,ideal submod)
 
 
   ring orig_ring=currRing;
-  ring syz_ring=rAddSyzComp(currRing);
+  ring syz_ring=rCurrRingAssureSyzComp();
   pSetSyzComp(max(k,1));
 
   ideal s_result=idInit(IDELEMS(submod),submod->rank);
@@ -1729,7 +1721,7 @@ ideal  idLift (ideal  mod,ideal submod)
       if (syz_ring==orig_ring)
         p = pCopy(submod->m[j]);
       else
-        p=pPermPoly(submod->m[j],NULL,orig_ring,NULL,0);
+        p=pFetchCopy(orig_ring,submod->m[j]);
       if (pGetComp(p)==0) pSetCompP(p,1);
       q = kNF(s_temp,currQuotient,p,k);
       pDelete(&p);
@@ -1929,7 +1921,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   kmax = j*k+1;
 
   ring orig_ring=currRing;
-  ring syz_ring=rAddSyzComp(currRing);
+  ring syz_ring=rCurrRingAssureSyzComp();
   pSetSyzComp(kmax-1);
 
   poly s_p = pOne();
@@ -1940,7 +1932,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   if (syz_ring==orig_ring)
     s_q=pCopy(q);
   else
-    s_q=pPermPoly(q,NULL,orig_ring,NULL,0);
+    s_q=pFetchCopy(orig_ring,q);
 
   ideal s_h4 = idInit(16,kmax);
   s_q = pAdd(s_q,s_p);
@@ -1972,7 +1964,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
         if (syz_ring==orig_ring)
           s_p = pCopy(temph1->m[l]);
         else
-          s_p=pPermPoly(temph1->m[l],NULL,orig_ring,NULL,0);
+          s_p=pFetchCopy(orig_ring,temph1->m[l]);
         if (k1 == 0)
           pShift(&s_p,ll*k+1);
         else
@@ -2987,7 +2979,7 @@ ideal idModulo (ideal h2,ideal h1)
   }
 
   ring orig_ring=currRing;
-  ring syz_ring=rAddSyzComp(currRing);
+  ring syz_ring=rCurrRingAssureSyzComp();
   pSetSyzComp(length);
 
   ideal s_temp=idRingCopy(temp,orig_ring);

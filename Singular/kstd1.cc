@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.45 1999-11-02 15:19:06 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.46 1999-11-05 19:11:07 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -92,7 +92,8 @@ void doRed (LObject* h,poly* with,BOOLEAN intoT,kStrategy strat)
   pTest((*h).p);
   //pTest(*with);
 #endif
-
+  assume(strat->syzComp == 0 || 
+         pGetComp(h->p) <= strat->syzComp);
   if (!TEST_OPT_INTSTRATEGY)
     pNorm(*with);
   if (TEST_OPT_DEBUG)
@@ -253,6 +254,9 @@ int redEcart (LObject* h,kStrategy strat)
   int pass = 0;
   unsigned long not_sev;
 
+  assume(strat->syzComp == 0 || 
+         pGetComp(h->p) <= strat->syzComp);
+
   if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
@@ -357,6 +361,8 @@ int redEcart (LObject* h,kStrategy strat)
           if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
           return -2;
         }
+        assume(pGetComp(h->p) <= strat->syzComp);
+
       }
       /*- try to reduce the s-polynomial -*/
       pass++;

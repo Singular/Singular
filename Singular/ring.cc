@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.80 1999-11-05 15:54:29 Singular Exp $ */
+/* $Id: ring.cc,v 1.81 1999-11-05 19:11:09 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -115,7 +115,7 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
       }
 
     /*------------ Garbage Collection -----------------------------------*/
-      mmGarbageCollectHeaps(2);
+//      mmGarbageCollectHeaps(2);
     }
   }
 }
@@ -3095,7 +3095,7 @@ void rDebugPrint(ring r)
   PrintS("ordrec:\n");
   for(j=0;j<r->OrdSize;j++)
   {
-    char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp","ro_none"};
+    char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp", "ro_syz", "ro_none"};
     Print("  typ %s",TYP[r->typ[j].ord_typ]);
     Print("  place %d",r->typ[j].data.dp.place);
     if (r->typ[j].ord_typ!=ro_syzcomp)
@@ -3244,22 +3244,41 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
   *currComponents =   r->typ[1].data.syzcomp.Components;
 }
 
-ring rAddSyzComp(ring r)
+/////////////////////////////////////////////////////////////////////////////
+//
+// The following routines all take as input a ring r, and return R
+// where R has a certain property. P might be equal r in which case r
+// had already this property
+// 
+// Without argument, these functions work on currRing and change it,
+// if necessary
+
+// for the time being, this is still here
+extern ideal idRingCopy(ideal id, ring r);
+static ring rAssureSyzComp(ring r);
+ring rCurrRingAssureSyzComp()
 {
-  if (r->order[0]==ringorder_c)
-    return currRing;
-
-  assume(currRing->order[0] != ringorder_s &&
-         currRing->order[0] != ringorder_S);
-
-  nMap=nCopy; // need to set nMap for mapping of polys
-              // (at least with current implementation via pPermPoly)
+  ring r = rAssureSyzComp(currRing);
+  if (r != currRing) 
+  {
+    ring old_ring = currRing;
+    rChangeCurrRing(r, TRUE);
+    if (old_ring->qideal != NULL) 
+    {
+      r->qideal = idRingCopy(old_ring->qideal, old_ring);
+      assume(idRankFreeModule(r->qideal) == 0);
+      currQuotient = r->qideal;
+    }
+  }
+  return r;
+}
+    
+static ring rAssureSyzComp(ring r)
+{
+  if (r->order[0]==ringorder_c || r->order[0] == ringorder_s)
+    return r;
 
   ring res=rCopy0(r);
-  if (res->qideal!=NULL)
-  {
-    idDelete(&(res->qideal));
-  }
   int i=rBlocks(r);
   int j;
 
@@ -3282,15 +3301,8 @@ ring rAddSyzComp(ring r)
   res->wvhdl = wvhdl;
 
   rComplete(res,1);
-  rChangeCurrRing(res,TRUE);
-  if(r->qideal!=NULL)
-  {
-    res->qideal=idInit(IDELEMS(r->qideal),1);
-    for(i=IDELEMS(r->qideal)-1;i>=0;i--)
-    {
-      res->qideal->m[i]=pPermPoly(r->qideal->m[i],NULL,r,NULL,0);
-    }
-  }
-  currQuotient=res->qideal;
   return res;
 }
+  
+
+  

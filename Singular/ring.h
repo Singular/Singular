@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.38 1999-11-02 15:19:11 Singular Exp $ */
+/* $Id: ring.h,v 1.39 1999-11-05 19:11:10 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -25,7 +25,10 @@ void   rWrite(ring r);
 void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
-ring   rAddSyzComp(ring r);
+
+
+// Ring Manipulations
+ring   rCurrRingAssureSyzComp();
 
 #ifdef PDEBUG
 #define rChangeSComps(c,s,l) rDBChangeSComps(c,s,l)

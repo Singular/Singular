@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.4 1999-10-25 08:32:15 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.5 1999-11-05 19:11:07 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -36,13 +36,15 @@ void ksReducePoly(LObject* PR,
 
   poly p1 = PR->p;
   poly p2 = PW->p;
+
   assume(p2 != NULL && p1 != NULL && pDivisibleBy(p2,  p1));
+  assume(pGetComp(p1) == pGetComp(p2) || 
+         (pMaxComp(p2) == 0));
+  
   poly a2 = pNext(p2), lm = p1;
 
   p1 = pNext(p1);
 
-  BOOLEAN reset_vec=FALSE;
-  
   if (a2==NULL)
   {
     pDelete1(&lm);
@@ -64,28 +66,15 @@ void ksReducePoly(LObject* PR,
   }
   else
   {
-    if (coef != NULL)
-      *coef = nInit(1);
+    if (coef != NULL) *coef = nInit(1);
   }
   
   
-  if (pGetComp(p2) != pGetComp(lm))
-  {
-    pSetCompP(a2, pGetComp(lm));
-    reset_vec = TRUE;
-    // need to make sure that Comp of lm is same as comp of p2
-    pSetComp(lm, pGetComp(p2));
-    pSetmComp(lm);
-  }
-
   pMonSubFrom(lm, p2);
-  assume(pGetComp(lm) == 0);
 
-  int l1, l2;
   PR->p = p_Minus_m_Mult_q(p1, lm, a2, spNoether);
-  
+
   pDelete1(&lm);
-  if (reset_vec) pSetCompP(a2, 0);
 }
 
 /***************************************************************
@@ -464,7 +453,6 @@ poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether)
   return L.p;
 }
 
-#if 1
 void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether)
 {
   LObject L;
@@ -478,78 +466,6 @@ void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether)
 }
 
 
-#else
-  
-/*2
-* reduction of tail(q) with p1
-* lead(p1) divides lead(pNext(q2)) and pNext(q2) is reduced
-* do not destroy p1, but tail(q)
-*/
-void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether)
-{
-  number t;
-  poly m, h;
-  poly a1 = pNext(p1), p2 = pNext(q2), a2 = pNext(p2);
-  number an = pGetCoeff(p1), bn = pGetCoeff(p2);
-  int ct = ksCheckCoeff(&an, &bn);
-  BOOLEAN reset_vec=FALSE;
-
-  if(a1==NULL)
-  {
-    nDelete(&an);
-    nDelete(&bn);
-    nDelete(&pGetCoeff(p2));
-    pFree1(p2);
-    pNext(q2) = a2;
-    return;
-  }
-  if (p1 != q)
-  {
-    m = p2;
-    pSetCoeff(m,bn);
-  }
-  else
-  {
-    m = pHead0(p2);
-    pSetCoeff0(m,bn);
-  }
-  if ((ct == 0) || (ct == 2))
-  {
-    pMultN(a2, an);
-  }
-  if ((pGetComp(p1) != pGetComp(p2))
-  && (pGetComp(p1)==0))
-  {
-    pSetCompP(a1,pGetComp(p2));
-    reset_vec=TRUE;
-  }
-  pMonSubFrom(m,p1);
-  poly res = p_Minus_m_Mult_q(a2, m, a1);
-  if ((ct == 0) || (ct == 2))
-  {
-    h = q;
-    do
-    {
-      t = nMult(pGetCoeff(h),an);
-      pSetCoeff(h,t);
-      pIter(h);
-    }
-    while (h != p2);
-  }
-  h = res;
-  nDelete(&an);
-  nDelete(&bn);
-  pFree1(m);
-  pNext(q2) = h;
-  if (reset_vec)
-    pSetCompP(a1,0);
-  if (p1 == q)
-  {
-    pDelete(&p2);
-  }
-}
-
-#endif          
 
   
   

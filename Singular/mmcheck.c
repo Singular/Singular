@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.15 1999-10-26 15:06:10 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.16 1999-11-05 19:11:08 obachman Exp $ */
 
 /*
 * ABSTRACT: several checking routines to help debugging the memory subsystem
@@ -216,6 +216,7 @@ void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
     memset(addr, MM_FREE_PATTERN, size);
 
   memset(what->front_pattern, MM_FRONT_PATTERN, MM_NUMBER_OF_FRONT_PATTERNS);
+  memset(addr, 255, size);
   memset((char*) addr + size, MM_BACK_PATTERN, DebugOffsetBack);
 }
 

@@ -367,8 +367,8 @@ echoLIBS:
 
 CCG		= gcc
 CXXG		= gcc
-CXXM		= gcc -MM -DGENERATE_DEPEND
-CCM		= gcc -MM -DGENERATE_DEPEND
+CXXM		= gcc -MM -MG -DGENERATE_DEPEND
+CCM		= gcc -MM -MG -DGENERATE_DEPEND
 
 CFLAGSG		= -g -Wall -Wno-unused ${PIPE}
 CXXFLAGSG	= -g -Wall -Wno-unused ${PIPE}

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.20 1999-10-26 15:06:11 obachman Exp $ */
+/* $Id: mmisc.c,v 1.21 1999-11-05 19:11:08 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -69,7 +69,7 @@ void mmUnGetSpecHeap(memHeap *heap_p)
   memHeap heap = *heap_p;
   int mm_this_specIndex = mmGetIndex(SizeFromRealSize(heap->size));
 
-  mmGarbageCollectHeap(heap, 0);
+/*  mmGarbageCollectHeap(heap, 0); */
 
   if (mm_this_specIndex < 0 || 
       ((mm_theList[mm_this_specIndex].size != heap->size) && 
