@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.27 2003-11-04 16:43:50 Singular Exp $
+// $Id: deform.lib,v 1.28 2004-02-23 10:19:09 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.27 2003-11-04 16:43:50 Singular Exp $";
+version="$Id: deform.lib,v 1.28 2004-02-23 10:19:09 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -25,7 +25,7 @@ LIB "sing.lib";
 
 proc versal (ideal Fo,list #)
 "USAGE:   versal(Fo[,d,any]); Fo=ideal, d=int, any=list
-COMUPTE: miniversal deformation of Fo up to degree d (default d=100),
+COMPUTE: miniversal deformation of Fo up to degree d (default d=100),
 CREATE:  Rings (exported):
          'my'Px = extending the basering Po by new variables given by
            \"A,B,..\" (deformation parameters), returns as basering; the
@@ -103,7 +103,7 @@ setring  Po;
   @t2 = Ls[4];                                 // vdim of T_2
   kill Ls;
   t1' = @t1;
-  if( @t1==0) { dbprint(p,"// rigit!"); return();}
+  if( @t1==0) { dbprint(p,"// rigid!"); return();}
   if( @t2==0) { @smooth=1; dbprint(p,"// smooth base space");}
   dbprint(p,"// ready: T_1 and T_2");
   @colR = ncols(Ro);
@@ -116,7 +116,7 @@ setring  Po;
   }
   if (defined(@active))
   { "// matrix of infinitesimal deformations:";print(InfD);
-    "// weights of infinitesimal deformations (  emty ='not qhomog'):";
+    "// weights of infinitesimal deformations (  empty ='not qhomog'):";
      @degrees;
      matrix dummy;
      InfD,dummy,t1' = interact2(InfD,@jv);kill dummy;
@@ -296,7 +296,7 @@ example
 
 proc mod_versal(matrix Mo, ideal I, list #)
 "USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list
-COMUPTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
+COMPUTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
 CREATE:  Ringsr (exported):
          'my'Px  = extending the basering by new variables (deformation
                    parameters), the new variables precede the old ones,
@@ -316,7 +316,7 @@ CREATE:  Ringsr (exported):
       @*Otherwise 'any' gives predefined strings:\"my\",\"param\",\"order\",\"out\"
       (\"my\" prefix-string, \"param\" is a letter (e.g. \"A\")  for the name of
       first parameter or (e.g. \"A(\") for index parameter variables, \"ord\"
-      ordering string for ringextension), \"out\" name of output-file).
+      ordering string for ring extension), \"out\" name of output-file).
 NOTE:   printlevel < 0        no output at all,
         printlevel >=0,1,2,.. informs you, what is going on,
         this proc uses 'execute'.
@@ -324,6 +324,8 @@ EXAMPLE:example mod_versal; shows an example
 "
 {
 //------- prepare -------------------------------------------------------------
+  intvec save_opt=option(get);
+  option(cancelunit);
   string str,@param,@order,@my,@out,@degrees;
   int @d,d_max,f0,f1,f2,e1,e1',e2,ok_ann,@smooth,@noObstr,@size,@j;
   int p    = printlevel-voice+3;
@@ -524,6 +526,7 @@ EXAMPLE:example mod_versal; shows an example
   "listvar(matrix);",
   "// NOTE: rings "+myQx+", "+myOx+", "+mySo+" are still alive!",
   "// (use: 'kill_rings("+@my+");' to remove them)");
+  option(set,save_opt);
   return();
 }
 example
@@ -817,17 +820,33 @@ Sub-procedure: asking for and reading your input
   int t1 = ncols(A);
   ">>Do you want all deformations? (ENTER=yes)";
   string str = read("");
-  if (size(str)>1)
-  { ">> Choose columnes of the matrix";
-    ">> (Enter = all columnes)";
-    "INPUT (number of columnes to use as integer-list 'i_1,i_2,.. ,i_t' ):";
+  if ((size(str)>1) and (str<>"yes"))
+  { ">> Choose columns of the matrix";
+    ">> (Enter = all columns)";
+    "INPUT (number of columns to use as integer-list 'i_1,i_2,.. ,i_t' ):";
     string columnes = read("");
-    if (size(columnes)<2) {columnes=string(col_vec);}
-    t1 = size(columnes)/2;
+
+// improved: CL
+// ==========================================================
+// old:   if (size(columnes)<2) {columnes=string(col_vec);}
+//        t1 = size(columnes)/2;
+// new:
+    if (columnes=="")
+    {
+      intvec vvvv=1..ncols(A);
+    }
+    else
+    {
+      execute("intvec vvvv="+columnes);
+    }
+    t1=size(vvvv);
+// ==========================================================
+    
     int l,l1;
     for (l=1;l<=t1;l=l+1)
     {
-      execute("l1= "+columnes[2*l-1]+";");
+// old:   execute("l1= "+columnes[2*l-1]+";");
+      l1=vvvv[l];
       B[l] = A[l1];
       if(flag) { C[l]=D[l1];}
     }
@@ -875,14 +894,14 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
     }
   }
  setring br;
-  //if(system("with","Namespaces")) { kill Ring::nr; }
-  //else { kill nr;}
+  if(system("with","Namespaces")) { kill Ring::nr; }
+  kill nr;
   return(degA);
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc homog_test(intvec w_vec, matrix Mo, matrix A)
 "
-Sub proc: return relative weight string of columnes of A with respect
+Sub proc: return relative weight string of columns of A with respect
           to the given w_vec and to Mo, or \"\" if not qh
     NOTE: * means weight is not determined
 "
@@ -908,7 +927,8 @@ Sub proc: return relative weight string of columnes of A with respect
     }
     if (size(tv)>1)
     { k = tv[2];
-      tv = tv[2..size(tv)]; tv = tv -k;
+      tv = tv[2..size(tv)]; 
+      tv = tv -k;
       if (tv==0) { @nv = @nv+string(-k)+",";}
       else {return("");}
     }
@@ -921,7 +941,7 @@ Sub proc: return relative weight string of columnes of A with respect
 proc homog_t(intvec d_vec, matrix Fo, matrix A)
 "
 Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
-               of columnes of A (return zero if Fo or A not qh)
+               of columns of A (return zero if Fo or A not qh)
 "
 {
    Fo = matrix(Fo,nrows(A),1);
@@ -936,7 +956,7 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    if (l==0) {
      setring br;
      if(system("with","Namespaces")) { kill Ring::nr; }
-     else { kill nr;}
+     kill nr;
      return(l);
    }
    dv = attrib(A,"isHomog");
@@ -945,7 +965,7 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    dv = dv-l;
  setring br;
    if(system("with","Namespaces")) { kill Ring::nr; }
-   else { kill nr;}
+   kill nr;
    return(dv);
 }
 ///////////////////////////////////////////////////////////////////////////////

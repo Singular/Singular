@@ -1,21 +1,24 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.37 2001-10-23 10:26:24 pfister Exp $";
+version="$Id: normal.lib,v 1.38 2004-02-23 10:19:11 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
 AUTHORS:  G.-M. Greuel,  greuel@mathematik.uni-kl.de,
 @*        G. Pfister,    pfister@mathematik.uni-kl.de
 
-PROCEDURES:
- normal(I[,wd]);        computes the normalization of basering/I
-                        resp. computes the normalization of basering/I and
-                        the delta-invariante
- HomJJ(L);              presentation of End_R(J) as affine ring, L a list
- genus(I);              computes the genus of the projective curve defined 
-                        by I
+MAIN PROCEDURES:
+ normal(I[,wd]);     computes the normalization of basering/I,
+                     resp. computes the normalization of basering/I and
+                     the delta invariant
+ HomJJ(L);           presentation of End_R(J) as affine ring, L a list
+ genus(I);           computes genus of the projective curve defined by I
+
+AUXILIARY PROCEDURE: 
+ deltaLoc(f,S);      (sum of) delta invariant(s) at conjugated singular points
 ";
 
 LIB "general.lib";
+LIB "poly.lib";
 LIB "sing.lib";
 LIB "primdec.lib";
 LIB "elim.lib";
@@ -183,8 +186,8 @@ EXAMPLE: example HomJJ;  shows an example
 
    f=mstd(f)[2];
    ideal ann=quotient(f2,f);
-   int delta;
-   if(isIso&&isEq){delta=vdim(std(modulo(f,ideal(p))));}
+   int delt;
+   if(isIso&&isEq){delt=vdim(std(modulo(f,ideal(p))));}
 
    f = p,rf;          // generates pJ:J mod(p), i.e. p*Hom(J,J)/p*R as R-module
    q = size(f);
@@ -324,7 +327,7 @@ EXAMPLE: example HomJJ;  shows an example
    }
    L = lastRing;
    L = insert(L,0,1);
-   L[3]=delta;
+   L[3]=delt;
    return(L);
 }
 example
@@ -346,29 +349,28 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc normal(ideal id, list #)
-"USAGE:   normal(i [,choose]);  i a radical ideal, choose empty, 1 or "wd"
+"USAGE:   normal(i [,choose]);  i a radical ideal, choose empty, 1 or \"wd\"
          if choose=1 the normalization of the associated primes is computed
-         (which is sometimes more efficient)
-         if choose="wd" the delta-invariant is computed simultaneously
-         this may take much more time in the reducible case because the
-         factorizing standardbasis algorithm cannot be used.
-ASSUME:  The ideal must be radical, for non radical ideals the output may
+         (which is sometimes more efficient);
+         if @code{choose=\"wd\"} the delta invariant is computed
+         simultaneously; this may take much more time in the reducible case,
+         since the factorizing standard basis algorithm cannot be used.
+ASSUME:  The ideal must be radical, for non-radical ideals the output may
          be wrong (i=radical(i); makes i radical)
-RETURN:   a list of rings, say nor and in case of choose="wd" an integer
-@format
-         at the end of the list.
-         each ring nor[i] contains two ideals
-         with given names norid and normap such that
-           - the direct sum of the rings nor[i]/norid is
-             the normalization of basering/id;
-           - normap gives the normalization map from basering/id
-             to nor[i]/norid (for each i)
-@end format
-NOTE:    to use the i-th ring type: def R=nor[i]; setring R;.
-@*       Increasing printlevel displays more comments (default: printlevel=0)
+RETURN:  a list of rings, say nor and in case of @code{choose=\"wd\"} an 
+         integer at the end of the list. 
+         Each ring @code{nor[i]} contains two ideals with given names 
+         @code{norid} and @code{normap} such that@*
+         - the direct sum of the rings @code{nor[i]/norid} is the 
+         normalization of basering/id;@*
+         - @code{normap} gives the normalization map from basering/id to 
+         @code{nor[i]/norid} (for each i).
+NOTE:    to use the i-th ring type: @code{def R=nor[i]; setring R;}.
+@*       Increasing printlevel displays more comments (default: printlevel=0).
 @*       Not implemented for local or mixed orderings.
 @*       If the input ideal i is weighted homogeneous a weighted ordering may
          be used (qhweight(i); computes weights).
+KEYWORDS: normalization; delta invariant.
 EXAMPLE: example normal; shows an example
 "
 {
@@ -526,9 +528,12 @@ EXAMPLE: example normal; shows an example
       result=keepresult;
    }
       dbprint(y+1,"
-// 'normal' created a list of "+sr+" ring(s).
-// nor["+sr+"+1] is the delta-invariant in case of choose=wd.
-// To see the rings, type (if the name of your list is nor):
+// 'normal' created a list of "+sr+" ring(s).");
+      if(withdelta) 
+      {
+        dbprint(y+1,"// nor["+sr+"+1] is the delta-invariant.");
+      }
+      dbprint(y+1,"// To see the rings, type (if the name of your list is nor):
      show( nor);
 // To access the 1-st ring and map (similar for the others), type:
      def R = nor[1]; setring R;  norid; normap;
@@ -557,7 +562,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc normalizationPrimes(ideal i,ideal ihp,int delta, list #)
+static proc normalizationPrimes(ideal i,ideal ihp,int delt, list #)
 "USAGE:   normalizationPrimes(i,ihp[,si]);  i equidimensional ideal, ihp map
          (partial normalization),delta partial delta-invariant,
           # ideal of singular locus
@@ -604,7 +609,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          export norid;
          export normap;
          result=newR7;
-         result[size(result)+1]=delta;
+         result[size(result)+1]=delt;
          setring BAS;
          return(result);
    }
@@ -632,7 +637,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          export norid;
          export normap;
          result=newR6;
-         result[size(result)+1]=delta;
+         result[size(result)+1]=delt;
          setring BAS;
          return(result);
    }
@@ -743,7 +748,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          export norid;
          export normap;
          result=newR6;
-         result[size(result)+1]=delta;
+         result[size(result)+1]=delt;
          setring BAS;
          return(result);
      }
@@ -767,7 +772,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       export norid;
       export normap;
       result=newR5;
-      result[size(result)+1]=delta;
+      result[size(result)+1]=delt;
       setring BAS;
       return(result);
    }
@@ -793,7 +798,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       export norid;
       export normap;
       result=newR4;
-      result[size(result)+1]=delta;
+      result[size(result)+1]=delt;
       setring BAS;
       return(result);
    }
@@ -863,7 +868,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          export norid;
          export normap;
          result=newR3;
-         result[size(result)+1]=delta;
+         result[size(result)+1]=delt;
          setring BAS;
          return(result);
       }
@@ -904,7 +909,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       export norid;
       export normap;
       result=newR6;
-      result[size(result)+1]=delta;
+      result[size(result)+1]=delt;
       setring BAS;
       return(result);
    }
@@ -940,7 +945,7 @@ EXAMPLE: example normalizationPrimes; shows an example
             def newR=RR[1];
             setring newR;
             map psi=BAS,endphi;
-            list tluser=normalizationPrimes(endid,psi(ihp),delta+RR[3],an);
+            list tluser=normalizationPrimes(endid,psi(ihp),delt+RR[3],an);
             setring BAS;
             return(tluser);
          }
@@ -949,11 +954,11 @@ EXAMPLE: example normalizationPrimes; shows an example
                       +ordstr(basering)+");");
          ideal norid=fetch(BAS,MB);
          ideal normap=fetch(BAS,ihp);
-         delta=delta+RR[3];
+         delt=delt+RR[3];
          export norid;
          export normap;
          result=newR7;
-         result[size(result)+1]=delta;
+         result[size(result)+1]=delt;
          setring BAS;
          return(result);
 
@@ -991,14 +996,14 @@ EXAMPLE: example normalizationPrimes; shows an example
 
           keepresult2=normalizationPrimes(id1,ihp,0);
             
-          delta=delta+mul+keepresult1[size(keepresult1)]
+          delt=delt+mul+keepresult1[size(keepresult1)]
                          +keepresult1[size(keepresult1)];
 
           for(lauf=1;lauf<=size(keepresult2)-1;lauf++)
           {
              keepresult1=insert(keepresult1,keepresult2[lauf]);
           }
-          keepresult1[size(keepresult1)]=delta;
+          keepresult1[size(keepresult1)]=delt;
           return(keepresult1);
        }
    }
@@ -1063,7 +1068,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          export norid;
          export normap;
          result=lastR;
-         result[size(result)+1]=delta+RS[3];
+         result[size(result)+1]=delt+RS[3];
          setring BAS;
          return(result);
       }
@@ -1075,7 +1080,7 @@ EXAMPLE: example normalizationPrimes; shows an example
 
       map psi=BAS,endphi;
       list tluser=
-             normalizationPrimes(endid,psi(ihp),delta+RS[3],psi(MJ));
+             normalizationPrimes(endid,psi(ihp),delt+RS[3],psi(MJ));
       setring BAS;
       return(tluser);
    }
@@ -1098,7 +1103,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          export norid;
          export normap;
          result=newR6;
-         result[size(result)+1]=delta;
+         result[size(result)+1]=delt;
          setring BAS;
          return(result);
    }
@@ -1160,7 +1165,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       {
          keepresult1=insert(keepresult1,keepresult2[lauf]);
       }
-      keepresult1[size(keepresult1)]=delta+mul+delta1+delta2;
+      keepresult1[size(keepresult1)]=delt+mul+delta1+delta2;
       return(keepresult1);
    }
 }
@@ -1272,7 +1277,7 @@ static proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
 }
 /////////////////////////////////////////////////////////////////////////////
 
-proc genus(ideal K,list #)
+proc genus(ideal I,list #)
 "USAGE:   genus(I) or genus(i,1); I a 1-dimensional ideal
 RETURN:  an integer, the geometric genus p_g = p_a - delta of the projective 
          curve defined by I, where p_a is the arithmetic genus.
@@ -1287,35 +1292,83 @@ EXAMPLE: example genus; shows an example
    int w = printlevel-voice+2;  // w=printlevel (default: w=0)
 
    def R=basering;
-   K=std(K);
- 
-   if(nvars(R)==3)
+
+   if(homog(I))
    {
-      if((dim(K)!=2)||(!homog(K))||(size(K)>1)){ERROR("Input is not a curve");}
-      execute("ring newR=("+charstr(R)+"),(x,y),dp;");  
-      map kappa=R,x,y,1;
-      ideal K=kappa(K);  
+      execute("ring newR=("+charstr(R)+"),("+varstr(R)+"),dp;"); 
+      ideal I=imap(R,I);  
    }
-   if((nvars(R)>3)||(size(K)>1))
-   {  // hier geeignet projezieren
-      ERROR("This case is not implemented yet");
-   }
-   if(nvars(R)==2)
+   else
    {
-      execute("ring newR=("+charstr(R)+"),(x,y),dp;");  
-      map kappa=R,x,y;
-      ideal K=kappa(K);  
+      execute("ring newR=("+charstr(R)+"),("+varstr(R)+",@t),dp;"); 
+      ideal I=imap(R,I);  
+      I=homog(std(I),@t);
+   }
+   ideal J=std(I);
+   if((dim(J)!=2)||((nvars(basering)==2)&&(dim(J)!=1)))
+   {
+      ERROR("This is not a curve");
+   }
+   if((nvars(basering)<=3)&&(size(J)>1))
+   {
+       ERROR("This is not equidimensional");
    } 
    
-   // assume now that R is a ring with two variables  
-   poly p=K[1];   
-   ideal I;
-   if(homog(p))
+   intvec hp=hilbPoly(J);
+   int p_a=1-hp[1];
+   int d=hp[2];
+
+   if(w>=1)
+   {
+      "";"The ideal of the projective curve:";"";J;"";
+      "The coefficients of the Hilbert polynomial";hp;
+      "arithmetic genus:";p_a;
+      "degree:";d;"";
+   }
+   
+   intvec v = hilb(J,1);
+   int o,i;
+   
+   if(nvars(basering)>3)
+   {
+      map phi=newR,maxideal(1);
+      int de;
+      ideal K,L;
+      poly m=var(4);
+      for(i=5;i<=nvars(basering);i++){m=m*var(i);}
+      K=eliminate(J,m,v);
+      if(size(K)==1){de=deg(K[1]);}
+      m=var(1);
+      for(i=2;i<=nvars(basering)-3;i++){m=m*var(i);}
+      i=0;
+      while(d!=de)
+      {
+         o=1;
+         i++;
+         K=phi(J);
+         K=eliminate(K,m,v);
+         if(size(K)==1){de=deg(K[1]);}
+         if(i==5)
+         {
+            K=reduce(equidimMax(J),J);
+            if(size(K)!=0){ERROR("This is not equidimensional");}
+          }
+          if(i==10){ERROR("did not find a good projection");}
+          L=sparsetriag(nvars(newR),nvars(newR),80-5*i,i)*transpose(maxideal(1));
+          phi=newR,L;
+      }
+      J=K;
+   }
+   poly p=J[1];
+   
+   if(nvars(basering)==2)
    {
       if(deg(squarefree(p))<deg(p)){ERROR("Curve is not reduced");}
       return(-deg(p)+1);
    }
+   
    execute("ring S=("+charstr(R)+"),(x,y,t),dp;");
+   ideal L=maxideal(1);
    execute("ring C=("+charstr(R)+"),(x,y),ds;");
    ideal I;
    execute("ring A=("+charstr(R)+"),(x,t),dp;");
@@ -1326,23 +1379,26 @@ EXAMPLE: example genus; shows an example
    execute("ring B=("+charstr(R)+"),(x,t),ds;");
    
    setring S;
-   poly F=imap(newR,p);
-   F=homog(F,t);
-   int d=deg(F);
-   int genus=(d-1)*(d-2)/2;
+   if(o)
+   {
+     for(i=1;i<=nvars(newR)-3;i++){L[i]=0;}
+     L=L,maxideal(1);
+   }   
+   map sigma=newR,L;
+   poly F=sigma(p);
+   if(w>=1){"the projected curve:";"";F;"";}
    
-//   if(w>=1){"test for smoothness";}
-//   if(dim(std(jacob(F)))==0)  //the smooth case
-//   {
-//      setring R;
-//      return(genus);
-//   }
+   kill newR;
+   
+   int genus=(d-1)*(d-2)/2;
+   if(w>=1){"the arithmetic genus of the plane curve:";genus;pause();}
  
-   int delta,deltaloc,deltainf,tau,tauinf,cusps,iloc,iglob,
-       tauloc,tausing,k,rat,nbranchinf,nbranch,nodes;
+   int delt,deltaloc,deltainf,tau,tauinf,cusps,iloc,iglob,l,nsing,
+       tauloc,tausing,k,rat,nbranchinf,nbranch,nodes,cuspsinf,nodesinf;
    list inv;
 
-   if(w>=1){"singularities at oo";}
+   if(w>=1)
+     {"";"analyse the singularities at oo";"";"singular locus at (1,x,0):";"";}
    setring A;        
    g=phi(F);
    h=psi(F);
@@ -1351,51 +1407,86 @@ EXAMPLE: example genus; shows an example
    if(deg(I[1])>0)
    {
       list qr=minAssGTZ(I);
+      if(w>=1){qr;"";}
+      
       for(k=1;k<=size(qr);k++)
       {
+         if(w>=1){ nsing=nsing+vdim(std(qr[k]));}
          inv=deltaLoc(g,qr[k]);
          deltainf=deltainf+inv[1];
          tauinf=tauinf+inv[2];
+         l=vdim(std(qr[k]));
+         if(inv[2]==l){nodesinf=nodesinf+l;}
+         if(inv[2]==2*l){cuspsinf=cuspsinf+l;}         
          nbranchinf=nbranchinf+inv[3];
       }
    }
+   else
+   {
+     if(w>=1){"            the curve is smooth at (1,x,0)";"";}
+   }
+   if(w>=1){"singular locus at (0,1,0):";"";}
    inv=deltaLoc(h,maxideal(1)); 
+   if((w>=1)&&(inv[2]!=0)){ nsing++;}
    deltainf=deltainf+inv[1];
    tauinf=tauinf+inv[2];
+   if(inv[2]==1){nodesinf=nodeainf++;}
+   if(inv[2]==2){cuspsinf=cuspsinf++;}         
+   
+   if((w>=1)&&(inv[2]==0)){"            the curve is smooth at (0,1,0)";"";}
    if(inv[2]>0){nbranchinf=nbranchinf+inv[3];}
   
    if(w>=1)
    {
-      "branches at oo:";nbranchinf;
-      "tau at oo:";tauinf;
-      "delta at oo:";deltainf;
-      "singularities not at oo";
+      if(tauinf==0)
+      {
+        "            the curve is smooth at oo";"";
+      }
+      else
+      {
+         "number of singularities at oo:";nsing;
+         "nodes at oo:";nodesinf;
+         "cusps at oo:";cuspsinf;
+         "branches at oo:";nbranchinf;
+         "Tjurina number at oo:";tauinf;
+         "delta at oo:";deltainf;
+         "Milnor number at oo:";2*deltainf-nbranchinf+nsing;
+         pause();
+      }
+      "singularities at (x,y,1):";"";
    }
-                          
-   setring newR;         //the singularities at the affine part
+   execute("ring newR=("+charstr(R)+"),(x,y),dp;");
+   //the singularities at the affine part
    map sigma=S,var(1),var(2),1;
-   I=sigma(F);
+   ideal I=sigma(F);
 
-   if((size(#)!=0)||((char(basering)<181)&&(char(basering)!=0)))     
+   if(size(#)!=0)     
    {                              //uses the normalization to compute delta
       list nor=normal(I,"wd");
-      delta=nor[size(nor)];
-      genus=genus-delta-deltainf;
+      delt=nor[size(nor)];
+      genus=genus-delt-deltainf;
       setring R;
       return(genus);
    }
 
    ideal I1=jacob(I);
    matrix Hess[2][2]=jacob(I1);
-   ideal ID=I+I1+ideal(det(Hess));
-
-   if(w>=1){"the cusps and nodes";}
+   ideal ID=I+I1+ideal(det(Hess));//singular locus of I+I1
    
-   ideal radID=std(radical(ID));
-   ideal IDsing=minor(jacob(ID),2)+radID;
+   ideal radID=std(radical(ID));//the non-nodal locus
+   if(w>=1){"the non-nodal locus:";"";radID;pause();"";}
+   if(deg(radID[1])==0)
+   {
+     ideal IDsing=1;
+   }
+   else
+   {
+     ideal IDsing=minor(jacob(ID),2)+radID;//singular locus of ID 
+   }
+   
    iglob=vdim(std(IDsing));
 
-   if(iglob!=0)
+   if(iglob!=0)//computation of the radical of IDsing
    {
       ideal radIDsing=reduce(IDsing,radID);
       if(size(radIDsing)==0)
@@ -1408,62 +1499,81 @@ EXAMPLE: example genus; shows an example
          radIDsing=std(radical(IDsing));
       }
       iglob=vdim(radIDsing);
+      if((w>=1)&&(iglob))
+          {"the non-nodal-cuspidal locus:";radIDsing;pause();"";}
    }
-   cusps=vdim(radID)-iglob; 
-        
-   if(w>=1){"the other singularities";}
-  
-   if(iglob==0)   //only cusps and double points
+   cusps=vdim(radID)-iglob;
+   nsing=nsing+cusps;
+   
+   if(iglob==0)
    {
+      if(w>=1){"             there are only cusps and nodes";"";}
       tau=vdim(std(I+jacob(I)));
+      tauinf=tauinf+tau;
       nodes=tau-2*cusps; 
-      delta=nodes+cusps;
-      nbranch=2*tau-3*cusps;    
+      delt=nodes+cusps;
+      nbranch=2*tau-3*cusps; 
+      nsing=nsing+nodes;
    }
    else
    {
+       if(w>=1){"the non-nodal-cuspidal singularities";"";}
        setring C;                     
        ideal I1=imap(newR,IDsing);
        iloc=vdim(std(I1));
-       if(iglob==iloc)  // only cusps and nodes outside 0
+       if(iglob==iloc)
        { 
+          if(w>=1){"only cusps and nodes outside (0,0,1)";}
           setring newR;
           tau=vdim(std(I+jacob(I)));
+          tauinf=tauinf+tau;
           inv=deltaLoc(I[1],maxideal(1));
-          delta=inv[1];
+          delt=inv[1];
           tauloc=inv[2];
           nodes=tau-tauloc-2*cusps; 
-          nbranch=inv[3]+ 2*nodes+cusps;          
-          delta=delta+nodes+cusps;
+          nsing=nsing+nodes;
+          nbranch=inv[3]+ 2*nodes+cusps;         
+          delt=delt+nodes+cusps;
+          if((w>=1)&&(inv[2]==0)){"smooth at (0,0,1)";}
         }
         else
         {
            setring newR;
-           list pr=minAssGTZ(IDsing);                   
+           list pr=minAssGTZ(IDsing);
+           if(w>=1){pr;}
+           
            for(k=1;k<=size(pr);k++)
            {
+              if(w>=1){nsing=nsing+vdim(std(pr[k]));}
               inv=deltaLoc(I[1],pr[k]);
-              delta=delta+inv[1];
+              delt=delt+inv[1];
               tausing=tausing+inv[2];
               nbranch=nbranch+inv[3];
            }
            tau=vdim(std(I+jacob(I)));
-
+           tauinf=tauinf+tau;
            nodes=tau-tausing-2*cusps;
-           delta=delta+nodes+cusps;  
+           nsing=nsing+nodes;
+           delt=delt+nodes+cusps;  
            nbranch=nbranch+2*nodes+cusps;            
         }
    }
-
+   genus=genus-delt-deltainf;
    if(w>=1)
    {
-      "branches :";nbranch;
-      "nodes:"; nodes;
-      "cusps:";cusps;
-      "tau :";tau;
-      "delta:";delta;
+      "The projected plane curve has locally:";"";
+      "singularities:";nsing;
+      "branches:";nbranch+nbranchinf;
+      "nodes:"; nodes+nodesinf;
+      "cusps:";cusps+cuspsinf;
+      "Tjurina number:";tauinf;
+      "Milnor number:";2*(delt+deltainf)-nbranch-nbranchinf+nsing;
+      "delta of the projected curve:";delt+deltainf;
+      "delta of the curve:";p_a-genus;
+      "genus:";genus;
+      "====================================================";
+      "";
    }
-   genus=genus-delta-deltainf;
    setring R;
    return(genus);
 }
@@ -1473,9 +1583,35 @@ example
    ideal i=y^9 - x^2*(x - 1)^9;
    genus(i);
 }
-///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
 proc deltaLoc(poly f,ideal singL)
+"USAGE:  deltaLoc(f,J);  f poly, J ideal 
+ASSUME: f is reduced bivariate polynomial; basering has exactly two variables;
+        J is irreducible prime component of the singular locus of f (e.g., one
+        entry of the output of @code{minAssGTZ(I);}, I = <f,jacob(f)>). 
+RETURN:  list L: 
+@texinfo
+@table @asis
+@item @code{L[1]}; int:
+         the sum of (local) delta invariants of f at the (conjugated) singular
+         points given by J.
+@item @code{L[2]}; int:
+         the sum of (local) Tjurina numbers of f at the (conjugated) singular
+         points given by J.
+@item @code{L[3]}; int:
+         the sum of (local) number of branches of f at the (conjugated) 
+         singular points given by J.
+@end table
+@end texinfo
+NOTE:    procedure makes use of @code{execute}; increasing printlevel displays 
+         more comments (default: printlevel=0).
+SEE ALSO: delta, tjurina
+KEYWORDS: delta invariant; Tjurina number
+EXAMPLE: example deltaLoc;  shows an example
+"
 {
+   option(redSB);
    def R=basering;
    execute("ring S=("+charstr(R)+"),(x,y),lp;");
    map phi=R,x,y;
@@ -1484,52 +1620,88 @@ proc deltaLoc(poly f,ideal singL)
    int d=vdim(singL);
    poly f=phi(f);
    int i;
-
+   int w = printlevel-voice+2;  // w=printlevel (default: w=0)
    if(d==1)
    {
       map alpha=S,var(1)-singL[2][2],var(2)-singL[1][2];
       f=alpha(f);
+
       execute("ring C=("+charstr(S)+"),("+varstr(S)+"),ds;");
       poly f=imap(S,f);
+      ideal singL=imap(S,singL);
+      if((w>=1)&&(ord(f)>=2))
+      {
+        "local analysis of the singularities";"";
+        basering;
+        singL;
+        f;
+        pause();
+      }
    }
    else
    {
       poly p;
       poly c;
       map psi;
-      while((deg(singL[1])>1)&&(deg(singL[2])>1))
+      number co;
+      
+      while((deg(lead(singL[1]))>1)&&(deg(lead(singL[2]))>1))
       {
          psi=S,x,y+random(-100,100)*x;
          singL=psi(singL);
          singL=std(singL);
+          f=psi(f);
       }
-      if(deg(singL[2])==1){p=singL[1];c=singL[2][2];}
-      if(deg(singL[1])==1)
+      
+      if(deg(lead(singL[2]))==1)
+      {
+         p=singL[1];
+         c=singL[2]-lead(singL[2]);
+         co=leadcoef(singL[2]);
+      }
+      if(deg(lead(singL[1]))==1)
       {
          psi=S,y,x;
          f=psi(f);
          singL=psi(singL);
          p=singL[2];
-         c=singL[1][2];
+         c=singL[1]-lead(singL[1]);;
+         co=leadcoef(singL[1]);
       }
+      
       execute("ring B=("+charstr(S)+"),a,dp;");
       map beta=S,a,a;
       poly p=beta(p);
+      
       execute("ring C=("+charstr(S)+",a),("+varstr(S)+"),ds;");
       number p=number(imap(B,p));
+      
       minpoly=p;
-      number c=number(imap(S,c));
-      map alpha=S,x-c,y+a;
-     
+      //number c=number(imap(S,c));
+      map iota=S,a,a;
+      number c=number(iota(c));
+      number co=iota(co);
+      
+      map alpha=S,x-c/co,y+a;
       poly f=alpha(f);
       f=cleardenom(f);
+      if((w>=1)&&(ord(f)>=2))
+      {
+        "local analysis of the singularities";"";
+        basering;
+        alpha;
+        f;
+        pause();
+        "";
+      } 
    }
+   option(noredSB);
    ideal fstd=std(ideal(f)+jacob(f));
    poly hc=highcorner(fstd);
    int tau=vdim(fstd);      
    int o=ord(f);
-   int delta,nb;
-
+   int delt,nb;
+   
    if(tau==0)                 //smooth case
    {
       setring R;
@@ -1539,47 +1711,46 @@ proc deltaLoc(poly f,ideal singL)
    {
       if(o==2)                //A_k-singularity 
       {
+        if(w>=1){"A_k-singularity";"";}        
          setring R;
-         delta=(tau+1)/2;
-         return(list(d*delta,d*tau,d*(2*delta-tau+1)));   
+         delt=(tau+1)/2;
+         return(list(d*delt,d*tau,d*(2*delt-tau+1)));   
       }
       if((lead(f)==var(1)*var(2)^2)||(lead(f)==var(1)^2*var(2)))
-      {//D_k- singularity
+      { 
+        if(w>=1){"D_k- singularity";"";}
+        
          setring R;
-         delta=(tau+2)/2;
-         return(list(d*delta,d*tau,d*(2*delta-tau+1)));
+         delt=(tau+2)/2;
+         return(list(d*delt,d*tau,d*(2*delt-tau+1)));
       }
 
       int mu=vdim(std(jacob(f)));
-      poly g=f+var(1)^mu+var(2)^mu;  //to obtain a convinient Newton-polygon
+      poly g=f+var(1)^mu+var(2)^mu;  //to obtain a convenient Newton-polygon
  
-      list NP=newton(g);
-
+      list NP=newtonpoly(g);
+      if(w>=1){"Newton-Polygon:";NP;"";}
       int s=size(NP);
-      int nN=-NP[1][2]-NP[s][1]+1;  // computation of the Newton-number
-      intmat m[2][2];
-      for(i=1;i<=s-1;i++)
-      {
-         m=NP[i+1],NP[i];
-         nN=nN+det(m);
-      }
-
-      if(mu==nN)                   // the Newton-polygon is non-degenerate
-      {                            // compute nb, the number of branches
+       
+      if(is_NND(f,mu,NP))     
+      { // the Newton-polygon is non-degenerate                            
+        // compute nb, the number of branches
         for(i=1;i<=s-1;i++)
         {
           nb=nb+gcd(NP[i][2]-NP[i+1][2],NP[i][1]-NP[i+1][1]);
         }
+        if(w>=1){"Newton-Polygon is non-degenerated";"";}
         return(list(d*(mu+nb-1)/2,d*tau,d*nb));
       }
 
-   //da reddevelop nur benutzt wird, um die Anzahl der Zweige zu bestimmen
-   //kann man das sicher schneller machen:
-   //die Aufblasung durchfuehren und stets testen, ob das Newton-polyeder
-   //nicht ausgeartet ist.
+      if(w>=1){"Newton-Polygon is degenerated";"";}
 
+      // the following can certainly be made more efficient when replacing
+      // 'reddevelop' (used only for computing number of branches) by 
+      // successive blowing-up + test if Newton polygon degenerate:
       if(s>2)    //  splitting of f
       {
+         if(w>=1){"Newton polygon can be used for splitting";"";}
          intvec v=NP[1][2]-NP[2][2],NP[2][1];
          int de=w_deg(g,v);
          int st=w_deg(hc,v)+v[1]+v[2];
@@ -1604,6 +1775,7 @@ proc deltaLoc(poly f,ideal singL)
       }
 
       f=jet(f,deg(hc)+2);
+      if(w>=1){"now we have to use Hamburger-Noether (Puiseux) expansion";}
       list hne=reddevelop(f);
       nb=size(hne);
       setring R;
@@ -1613,23 +1785,31 @@ proc deltaLoc(poly f,ideal singL)
    else             //the case of small characteristic
    {
       f=jet(f,deg(hc)+2);
-      list hne=reddevelop(f);
-      nb=size(hne);
-      if(nb==1)
-      {
-         delta=invariants(hne[1])[5]/2;
-         setring R;
-         kill HNEring;
-         return(list(d*delta,d*tau,d));
-      }
-      setring R;
-      kill HNEring;
-      //delta direkt aus reddevelop zurueckgeben
-      ERROR("the case of small characteristic is not fully implemented yet");
+      if(w>=1){"now we have to use Hamburger-Noether (Puiseux) expansion";}
+      delt=delta(f);
+      return(list(d*delt,d*tau,d));
    }
 }
-
-proc w_deg(poly p, intvec v)
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y),dp;
+  poly f=(x2+y^2-1)^3 +27x2y2;
+  ideal I=f,jacob(f);
+  I=std(I);
+  list qr=minAssGTZ(I);
+  size(qr);
+  // each component of the singular locus either describes a cusp or a pair
+  // of conjugated nodes:
+  deltaLoc(f,qr[1]); 
+  deltaLoc(f,qr[2]); 
+  deltaLoc(f,qr[3]); 
+  deltaLoc(f,qr[4]); 
+  deltaLoc(f,qr[5]); 
+  deltaLoc(f,qr[6]);
+}
+///////////////////////////////////////////////////////////////////////////////
+// compute the weighted degree of p 
+static proc w_deg(poly p, intvec v)
 {
    if(p==0){return(-1);}
    int d=0;
@@ -1638,44 +1818,15 @@ proc w_deg(poly p, intvec v)
    return(d);  
 }
 
-proc newton (poly f)
-{
-   def R1=basering;
-   execute("ring R2=("+charstr(R1)+"),("+varstr(R1)+"),ls;");
-   poly f=imap(R1,f);
-   intvec A=(0,ord(subst(f,var(1),0)));
-   intvec B=(ord(subst(f,var(2),0)),0);
-   intvec C,H; list L;
-   int abbruch,i;
-   poly hilf;
-   L[1]=A;
-   f=jet(f,A[2]*B[1]-1,intvec(A[2],B[1]));
-   map xytausch=R2,var(2),var(1);
-   for (i=2; f!=0; i++) 
-   {
-      abbruch=0;
-      while (abbruch==0) 
-      {
-         C=leadexp(f);          
-         if(jet(f,A[2]*C[1]-A[1]*C[2]-1,intvec(A[2]-C[2],C[1]-A[1]))==0)
-         { 
-            abbruch=1; 
-         }       
-         else 
-         { 
-            f=jet(f,-C[1]-1,intvec(-1,0)); 
-         }
-     }
-     hilf=jet(f,A[2]*C[1]-A[1]*C[2],intvec(A[2]-C[2],C[1]-A[1]));
-     H=leadexp(xytausch(hilf));
-     A=H[2],H[1]; 
-     L[i]=A;
-     f=jet(f,A[2]*B[1]-1,intvec(A[2],B[1]-A[1]));
-   }
-   L[i]=B;
-   setring R1;
-   return(L);
-}
+//proc hilbPoly(ideal J)
+//{  
+//   poly hp;
+//   int i;
+//   if(!attrib(J,"isSB")){J=std(J);}
+//   intvec v = hilb(J,2);
+//   for(i=1; i<=size(v); i++){ hp=hp+v[i]*(var(1)-i+2);}
+//   return(hp);
+//}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1900,8 +2051,8 @@ ideal i=9127158539954x10+3212722859346x8y2+228715574724x6y4-34263110700x4y6
 -2042158x4+660492x2y2-84366y4+2494x2-474y2-1;
 
 
-ring r=0,(x,y),dp;   // genuss 1  with 5 cusps
-ideal i=57y5+516x4y-320x4+66y4-340x2y3+73y3+128x2-84x2y2-96x2y;;
+ring r=0,(x,y),dp;   // genus 1  with 5 cusps
+ideal i=57y5+516x4y-320x4+66y4-340x2y3+73y3+128x2-84x2y2-96x2y;
 
 //Mark van Hoeij
 ring r=0,(x,y),dp;  //genus 19
@@ -1915,6 +2066,26 @@ ideal i=y40+y13x+x4y5+x3*(x+1)^2;
 
 ring r=0,(x,y),dp;  //genus 4
 ideal i=((x2+y3)^2+xy6)*((x3+y2)^2+x10y);
+
+ring r=0,(y,z,w,u),dp; //genus -5
+ideal i=y2+z2+w2+u2,w4-u4;
+
+ring r=0,(x,y,t),dp; //genus -5
+ideal i=x8+8x7y+32x6y2+80x5y3+136x4y4+160x3y5+128x2y6+64xy7+16y8+4x6t2+24x5yt2+72x4y2t2+128x3y3t2+144x2y4t2+96xy5t2+32y6t2+14x4t4+56x3yt4+112x2y2t4+112xy3t4+40y4t4+20x2t6+40xyt6+8y2t6+9t8;
+
+ring r=0,(y,z,w,u),dp; //genus 9
+ideal i=y2+z2+w2+u2,z4+w4+u4;
+
+ring r=0,(x,y,t),dp;
+ideal i=
+25x8+200x7y+720x6y2+1520x5y3+2064x4y4+1856x3y5+1088x2y6+384xy7+64y8-12x6t2-72x5yt2-184x4y2t2-256x3y3t2-192x2y4t2-64xy5t2-2x4t4-8x3yt4+16xy3t4+16y4t4+4x2t6+8xyt6+8y2t6+t8;
+
+ring r=0,(x,y,t),dp;
+ideal i=
+32761x8+786264x7y+8314416x6y2+50590224x5y3+193727376x4y4+478146240x3y5+742996800x2y6+664848000xy7+262440000y8+524176x7t+11007696x6yt+99772992x5y2t+505902240x4y3t+1549819008x3y4t+2868877440x2y5t+2971987200xy6t+1329696000y7t+3674308x6t2+66137544x5yt2+499561128x4y2t2+2026480896x3y3t2+4656222144x2y4t2+5746386240xy5t2+2976652800y6t2+14737840x5t3+221067600x4yt3+1335875904x3y2t3+4064449536x2y3t3+6226336512xy4t3+3842432640y5t3+36997422x4t4+443969064x3yt4+2012198112x2y2t4+4081745520xy3t4+3126751632y4t4+59524208x3t5+535717872x2yt5+1618766208xy2t5+1641991392y3t5+59938996x2t6+359633976xyt6+543382632y2t6+34539344xt7+103618032yt7+8720497t8;
+
+ring r=32003,(x,y,z,w,u),dp;
+ideal i=x2+y2+z2+w2+u2,x3+y3+z3,z4+w4+u4;
 
 */
 

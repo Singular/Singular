@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.20 2001-08-27 14:47:53 Singular Exp $";
+version="$Id: latex.lib,v 1.21 2004-02-23 10:19:10 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -29,7 +29,7 @@ GLOBAL VARIABLES:
 @format
   @code{TeXwidth} (int) -1, 0, 1..9, >9:  controls breaking of long polynomials
   @code{TeXnofrac} (int) flag:  write 1/2 instead of \\frac@{1@}@{2@}
-  @code{TeXbrack} (string) \"@{\", \"(\", \"<\", \"|\", empty string:
+  @code{TeXbrack} (string) \"@{\", \"(\", \"<\", \"|\", empty string: 
                                    controls brackets around ideals and matrices
   @code{TeXproj} (int) flag:  write \":\" instead of \",\" in vectors
   @code{TeXaligned} (int) flag:  write maps (and ideals) aligned
@@ -45,7 +45,7 @@ LIB "inout.lib";
 proc closetex(string fname, list #)
 "USAGE:   closetex(fname); fname string
 RETURN:  nothing; writes a LaTeX2e closing line into file @code{<fname>}.
-NOTE:    preceeding \">>\" are deleted and suffix \".tex\" (if not given)
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
          is added to @code{fname}.
 EXAMPLE: example closetex; shows an example
 "
@@ -89,7 +89,7 @@ example
 proc tex(string fname, list #)
 "USAGE:   tex(fname); fname string
 RETURN:  nothing; calls latex (LaTeX2e) for compiling the file fname
-NOTE:    preceeding \">>\" are deleted and suffix \".tex\" (if not given)
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
          is added to @code{fname}.
 EXAMPLE: example tex; shows an example
 "
@@ -130,7 +130,7 @@ example
   opentex("exp001");              // open latex2e document
   texobj("exp001","An ideal ",I);
   closetex("exp001");
-  tex("exp001");
+  tex("exp001"); 
   echo=0;
   pause("the created files will be deleted after pressing <RETURN>");
   system("sh","rm exp001.*");
@@ -140,7 +140,7 @@ example
 proc opentex(string fname, list #)
 "USAGE:   opentex(fname); fname string
 RETURN:  nothing; writes a LaTeX2e header into a new file @code{<fname>}.
-NOTE:    preceeding \">>\" are deleted and suffix \".tex\" (if not given)
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
          is added to @code{fname}.
 EXAMPLE: example opentex; shows an example
 "
@@ -283,11 +283,11 @@ NOTE:    this proc may take some time.
 
 proc texfactorize(string fname, poly f, list #)
 "USAGE:   texfactorize(fname,f); fname string, f poly
-RETURN:  if @code{fname=\"\"}: string, f as a product of its irreducible
+RETURN:  if @code{fname=\"\"}: string, f as a product of its irreducible 
          factors@*
-         otherwise: append this string to the file @code{<fname>}, and
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted and suffix \".tex\" (if not given)
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
          is added to @code{fname}.
 EXAMPLE: example texfactorize; shows an example
 "
@@ -368,11 +368,11 @@ static proc rp(string s)
 
 proc texmap(string fname, def m, def @r1, def @r2, list #)
 "USAGE:   texmap(fname,m,@r1,@r2); fname string, m string/map, @r1,@r2 rings
-RETURN:  if @code{fname=\"\"}: string, the map m from @r1 to @r2 (preceeded
+RETURN:  if @code{fname=\"\"}: string, the map m from @r1 to @r2 (preceded 
          by its name if m = string) in TeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>}, and
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.
          If m is a string then it has to be the name of an existing map
          from @r1 to @r2.
@@ -560,8 +560,8 @@ static proc manipul(string s)
   else { st = st + "_{" + s[anf,i-anf] + "}";}
   n = n+5*(i-anf);
   anf =i;            // the next text in ( , ) as exponent
-  if (op)
-  {
+  if (op) 
+  { 
     if (s[i]== ","){anf = anf+1;}
     while(s[i] !=")"){ i++;}
     if (i<>anf)
@@ -579,22 +579,22 @@ static proc manipul(string s)
 proc texname(string fname, string s)
 "USAGE:   texname(fname,s);  fname,s  strings
 RETURN:  if @code{fname=\"\"}: string, the transformed string s, where the
-         following rules apply:
-@example
+         following rules apply: 
+@example 
       s' + \"~\"             -->  \"\\tilde@{\"+ s' +\"@}\"
-     \"_\" + int             -->       \"_@{\" + int +\"@}\"
+     \"_\" + int             -->       \"_@{\" + int +\"@}\" 
   \"[\" + s' + \"]\"           -->      \"_@{\" + s' + \"@}\"
-   \"A..Z\" + int            --> \"A..Z\" + \"^@{\" + int + \"@}\"
+   \"A..Z\" + int            --> \"A..Z\" + \"^@{\" + int + \"@}\"    
    \"a..z\" + int            --> \"a..z\" + \"_@{\" + int + \"@}\"
 \"(\" + int + \",\" + s' + \")\" --> \"_@{\"+ int +\"@}\" + \"^@{\" + s'+\"@}\"
 @end example
          Anyhow, strings which begin with a @code{\"@{\"} are only changed
-         by deleting the first and last character (intended to remove the
+         by deleting the first and last character (intended to remove the 
          surrounding curly brackets).
 
-         if @code{fname!=\"\"}: append the transformed string s to the file
+         if @code{fname!=\"\"}: append the transformed string s to the file 
          @code{<fname>}, and return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.
 EXAMPLE: example texname; shows an example
 "
@@ -602,12 +602,12 @@ EXAMPLE: example texname; shows an example
   string st, extr;
   st=manipul(s);
   if (size(fname))
-  {
+  { 
     int i=1;
     while (fname[i]==">"){i++;}
     fname = fname[i,size(fname)-i+1];
     if (size(fname)>=4)            // check if filename is ending with ".tex"
-    {
+    { 
       if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
     }
     else {fname = fname + ".tex";}
@@ -633,7 +633,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc absterm(poly f)
-{
+{ 
   int k;
   for (k=1; k<=nvars(basering); k++)
   { f = subst(f,var(k),0); }
@@ -644,9 +644,9 @@ static proc absterm(poly f)
 proc texobj(string fname, list #)
 "USAGE:   texobj(fname,l); fname string, l list
 RETURN:  if @code{fname=\"\"}: string, the entries of l in LaTeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>}, and
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.
 EXAMPLE: example texobj; shows an example
 "
@@ -686,7 +686,7 @@ EXAMPLE: example texobj; shows an example
    if (typeof(obj) == "string")
    { if (defined(`obj`))
      { if (typeof(`obj`)=="ideal")
-       {
+       { 
          Iname = obj; def e = `obj`;     //convert to correct type ideal
          kill obj; def obj = e; kill e;
        }
@@ -899,7 +899,7 @@ EXAMPLE: example texobj; shows an example
  else {return(s);}
 }
 example
-{
+{ 
    echo=0;
    // -------- prepare for example ---------
    if (defined(TeXaligned)) {int Teali=TeXaligned; kill TeXaligned;}
@@ -941,11 +941,11 @@ example
 proc texproc(string fname,string pname)
 "USAGE:   texproc(fname,pname); fname,pname strings
 ASSUME:  @code{`pname`} is a procedure.
-RETURN:  if @code{fname=\"\"}: string, the proc @code{`pname`} in a verbatim
+RETURN:  if @code{fname=\"\"}: string, the proc @code{`pname`} in a verbatim 
          environment in LaTeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>}, and
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.@*
          @code{texproc} cannot be applied to itself correctly.
 EXAMPLE: example texproc; shows an example
@@ -1043,9 +1043,9 @@ static proc tvar(intvec v)
 proc texring(string fname, def r, list #)
 "USAGE:   texring(fname, r[,L]); fname string, r ring, L list
 RETURN:  if @code{fname=\"\"}: string, the ring in TeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>} and
+         otherwise: append this string to the file @code{<fname>} and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted and suffix \".tex\" (if not given)
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
          is added to @code{fname}.@*
          The optional list L is assumed to be a list of strings which control,
          e.g., the symbol for the field of coefficients.@*
@@ -1176,7 +1176,7 @@ example
   texring("",ralg);
   texring("",ralg,"mipo");
   //
-  ring r49=(49,a),x,dp;                // Galois field
+  ring r49=(49,a),x,dp;                // Galois field  
   texring("",r49);
   //
   setring r0;                          // quotient ring
@@ -1199,9 +1199,9 @@ example
 
 proc rmx(string fname)
 "USAGE:   rmx(fname); fname string
-RETURN:  nothing; removes the @code{.log} and @code{.aux} files associated to
+RETURN:  nothing; removes the @code{.log} and @code{.aux} files associated to 
          the LaTeX file <fname>.@*
-NOTE:    If @code{fname} ends by @code{\".dvi\"} or @code{\".tex\"}, the
+NOTE:    If @code{fname} ends by @code{\".dvi\"} or @code{\".tex\"}, the 
          @code{.dvi} or @code{.tex} file will be deleted, too.
 EXAMPLE: example rmx; shows an example
 "
@@ -1285,7 +1285,7 @@ EXAMPLE: example xdvi; shows an example
 example
 { "EXAMPLE:"; echo = 2;
   intmat m[3][4] = 9,2,4,5,2,5,-2,4,-6,10,-1,2,7;
-  opentex("exp001");
+  opentex("exp001"); 
   texobj("exp001","An intmat:  ",m);
   closetex("exp001");
   tex("exp001");
@@ -1299,7 +1299,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc parsr(string s)                     // parse real
-{
+{ 
   string t;
   if (s=="      Inf") { return("\\infty",3);}
   if (s=="     -Inf") { return("\\-infty",6);}
@@ -1311,24 +1311,24 @@ static proc parsr(string s)                     // parse real
     if (size(t)>1) {return(s[1,5]+"*10^{"+t+"}",21+2*size(t));}
     else {return(s[1,5]+"*10^"+t,23);}
   }
-  else
+  else 
   {
     return(s[1,5],12);
   }
 }
 
 static proc parsg(string s)                  // parse Galois field
-{
+{ 
   int i,j = 1,1;
   string t;
   if (short)
-  {
+  { 
     t =s[1];
     if(size(s)>1) {return(t+"^{" + s[2,size(s)-1] + "}",3+2*(size(s)-1));}
     else{return(t,5);}
   }
   else
-  {
+  { 
     return(parselong(s+"!"));
   }
 }
@@ -1337,9 +1337,9 @@ static proc parsg(string s)                  // parse Galois field
 proc texpoly(string fname,def p,list #)
 "USAGE:   texpoly(fname,p); fname string, p poly
 RETURN:  if @code{fname=\"\"}: string, the poly p in LaTeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>}, and
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.
 EXAMPLE: example texpoly; shows an example
 "
@@ -1846,7 +1846,7 @@ write(fname,"\\newcommand{\\Line}{\\rule{\\textwidth}{0.25mm}\\\\[5mm]}");
  {\\sc Singular} into \\LaTeX \\ text.
  This document illustrates the functionality of the library."+"\\\\" +  nl);
  write(fname,"\\begin{tabular}{ll}" + nl +
-"LIBRARY: {\\tt latex.lib} &   PROCEDURES FOR TYPESETTING SINGULAR" +
+"LIBRARY: {\\tt latex.lib} &   PROCEDURES FOR TYPESETTING SINGULAR" + 
 "\\\\" +  nl +
 " & OBJECTS IN LATEX2E"+
 "\\\\" +  nl +
@@ -1858,11 +1858,11 @@ write(fname,"\\newcommand{\\Line}{\\rule{\\textwidth}{0.25mm}\\\\[5mm]}");
 "\\\\" +  nl +
 "{\\tt  texdemo([n]);} & produces a file explaining the features of this lib"+
 "\\\\" +  nl +
-"{\\tt  texfactorize(fnm,f);} & creates string in \\LaTeX-format for
+"{\\tt  texfactorize(fnm,f);} & creates string in \\LaTeX-format for 
 factors of poly f"+ "\\\\" +  nl +
 "{\\tt  texmap(fnm,m,r1,r2);} & creates string in \\LaTeX-format for
 map m:r1$\\rightarrow$r2"+ "\\\\" +  nl +
-"{\\tt  texname(fnm,s);} &      creates string in \\LaTeX-format for
+"{\\tt  texname(fnm,s);} &      creates string in \\LaTeX-format for 
 identifier"+ "\\\\" +  nl +
 "{\\tt  texobj(l);} &           creates string in \\LaTeX-format for
 any (basic) type"+ "\\\\" +  nl +
@@ -1870,7 +1870,7 @@ any (basic) type"+ "\\\\" +  nl +
 "\\\\" +  nl +
 "{\\tt  texproc(fnm,p);} &      creates string in \\LaTeX-format of
 text from proc p"+ "\\\\" +  nl +
-"{\\tt  texring(fnm,r[,l]);} &  creates string in \\LaTeX-lformat for
+"{\\tt  texring(fnm,r[,l]);} &  creates string in \\LaTeX-lformat for 
 ring/qring"+ "\\\\" +  nl +
 "{\\tt  rmx(s);} &              removes .aux and .log files of \\LaTeX-files"+
 "\\\\" +  nl +
@@ -1880,7 +1880,7 @@ ring/qring"+ "\\\\" +  nl +
 "(parameters in square brackets {\\tt [ ]} are optional)"+
 "\\\\" +  nl2 + "\\vspace{0.2cm}" + nl2 +
 "The global variables {\\tt TeXwidth}, {\\tt TeXnofrac}, {\\tt
- TeXbrack}, {\\tt TeXproj}, {\\tt TeXaligned}, {\\tt TeXreplace}, {\\tt
+ TeXbrack}, {\\tt TeXproj}, {\\tt TeXaligned}, {\\tt TeXreplace}, {\\tt 
  NoDollars} are used to control the typesetting: "
 );
 
@@ -1900,7 +1900,7 @@ bv +
 ev);
 write(fname,"Notice that none of these global variables are defined when
 loading \\verb|latex.lib|. A flag variable is set as soon as it is defined.");
-
+ 
 
 //% The procs and
 //% the global variables
@@ -1908,10 +1908,10 @@ loading \\verb|latex.lib|. A flag variable is set as soon as it is defined.");
 //----------------------- opentex -----------------------------
    write(fname,"\\section{Opening a \\LaTeX\\ file}");
    write(fname,"In order to create a \\LaTeX\\ document and write a standard
-header into it, use the following command."+
+header into it, use the following command."+ 
 bv+
 "> string fname = \"" + fname + "\";" + nl +
-"> texopen(fname);" +
+"> texopen(fname);" + 
 ev + nl);
 
 write(fname,"The variable \\verb|fname| is always the first argument when
@@ -1933,7 +1933,7 @@ int TeXwidth = 100; export TeXwidth;
 
 
 static proc part1(string fname)
-{
+{ 
 
   int st = defined(texdemopart);
   string nl = newline;
@@ -1955,7 +1955,7 @@ write(fname,
 
 // -1a------ a ring in char 0, short varnames and poly. ordering ----------
 write(fname,
-" A ring in characteristic 0 with short names of variables and polynomial
+" A ring in characteristic 0 with short names of variables and polynomial 
 ordering." +nl);
  ring r0=0,(x,y,z),dp;
  poly g=-x2y+2y13z+1;
@@ -1964,14 +1964,14 @@ bv +
 "> ring r0=0,(x,y,z),dp;" +nl+
 "> texring(fname,r0);" +
 ev);
-  texring(fname,r0);
+  texring(fname,r0);              
   write(fname,nl2);
 write(fname,
 bv +
 "> poly g=-x2y+2y13z+1;  g;" + nl +
 "> texpoly(fname,g);" +nl +
 ev);
-  texpoly(fname,g);
+  texpoly(fname,g); 
   write(fname,"\\\\"+nl2);
 
 // write(fname,"\\Line");
@@ -1985,38 +1985,38 @@ bv +
 "> texpoly(fname,g/280);" +nl +
 ev
 );
-  texpoly(fname,g/280);
+  texpoly(fname,g/280);              
   kill r0;
-
+  
 write(fname,"\\\\"+nl2);
 write(fname,"\\Line");
 // -2-------- a ring in char 7, indexed varnames and series ordering ----------
 write(fname,
-" A ring in characteristic 7 with indexed names of variables and local
+" A ring in characteristic 7 with indexed names of variables and local 
 ordering." +nl);
  ring r1=7,(x1,x2,x3,x4),Ds;
- poly g=-2*x1+x4-1;
+ poly g=-2*x1+x4-1; 
 write(fname,
 bv +
-"> ring r1=7,(x1,x2,x3,x4),Ds;" +nl +
+"> ring r1=7,(x1,x2,x3,x4),Ds;" +nl +                
 "> texring(fname,r1);" +nl +
 ev);
-texring(fname,r1);
+texring(fname,r1);             
 write(fname,lb);
 
 write(fname, bv +
-"> poly g=-2*x1+x4-1;  g;" +nl +
+"> poly g=-2*x1+x4-1;  g;" +nl +                
 "> texpoly(fname,g);" +nl +
 ev);
 
   texpoly(fname,g);
-
+  
 write(fname,lb);
 write(fname,"\\Line");
 
 // -3-------- a ring in char 0, indexed varnames and local ordering ----------
 write(fname,
-" A ring in characteristic 0 with indexed names of variables and local
+" A ring in characteristic 0 with indexed names of variables and local 
 ordering.
 " +nl);
  ring r2=0,(x(1..5),y(1..2)),(ds(5),ls(2));
@@ -2026,18 +2026,18 @@ bv +
 "> ring r2=0,(x(1..5),y(1..2)),(ds(5),ls(2));" + nl +
 "> texring(fname,r2);" +nl +
 ev);
-  texring(fname,r2);
+  texring(fname,r2);             
 
 write(fname,
 bv +
 "> poly g=-y(1)^3*x(5)+y(1)*x(2);  g;" +nl+
- string(g) + nl +
+ string(g) + nl +          
 "> texpoly(fname,g);"  +nl +
 ev
 );
-  texpoly(fname,g);
+  texpoly(fname,g);              
   write(fname,lb);
-
+  
 write(fname,"\\Line");
 
 // -4-------- a ring in char 0, indexed varnames and weighted ordering ------
@@ -2060,7 +2060,7 @@ bv +
 ev
 );
   texpoly(fname,g); write(fname,lb);
-
+  
 write(fname,"\\Line");
 
 // -5-------- a ring with real coeff and matrix ordering -------------------
@@ -2098,7 +2098,7 @@ bv +
 "> texring(fname,r0t);" +nl +
 ev);
  texring(fname,r0t);
-write(fname,
+write(fname, 
 bv +
 "> poly g=8*(-s+2t)/(st+t3)*x+t2*x-1;  g;"+nl+
   string(g) +nl +
@@ -2172,7 +2172,7 @@ ev);
  texring(fname,r49);
 
 write(fname,
-bv +
+bv + 
 "> poly g=-(2a13+a)*x2+a2*x-a+1;  g;" +nl+
  string(g) +nl +
 "> texpoly(fname,g);" +nl +
@@ -2197,7 +2197,7 @@ ev);
  texring(fname,ri);
 
 write(fname,
-bv +
+bv + 
 "> poly g=-(i+1)*x+2i2y2+i+x;  g;" +nl+
  string(g) +nl +
 "> texpoly(fname,g);" +nl +
@@ -2294,7 +2294,7 @@ write(fname,nl2,"\\Line");
 write(fname,
 "It is possible to display a ground field different from the
 actual one by passing any letter in \\LaTeX \\ notation as additional
-argument.  Predefined values are \\verb|\"\\\\C\"|, \\verb|\"\\\\R\"|,
+argument.  Predefined values are \\verb|\"\\\\C\"|, \\verb|\"\\\\R\"|, 
 \\verb|\"k\"|, \\verb|\"K\"| and \\verb|\"R\"|."+nl+
 "If for example a ground field of characteristic 0 should be written as
 $\\C$ instead of $\\Q$ use this as additonal argument.",nl);
@@ -2310,7 +2310,7 @@ write(fname,nl+ "\\vspace{0.2cm}" + nl2);
 write(fname,"The values \\verb|\"k\"|, \\verb|\"K\"|, \\verb|\"R\"| play a
  special role when the ground field is an algebraic extension. In this case
 the parameters will be omitted.");
-
+ 
 write(fname,
 bv +
 "> texring(fname,ralg,\"k\");" + nl +
@@ -2357,7 +2357,7 @@ ev
 );
 
 write(fname,nl+ "\\vspace{0.2cm}" + nl2);
-
+ 
 write(fname,"The first and the last variable will always be printed.
 In order to print only these it is sufficient to give a 1 as third argument.");
 
@@ -2388,7 +2388,7 @@ write(fname,nl2,"\\Line");
 
 write(fname,"It is also possible to pass several of the arguments described
 above at once (in any order).");
-
+ 
 
 write(fname,
 bv +
@@ -2406,7 +2406,7 @@ write(fname,nl2);
 
 
 static proc part2(string fname)
-{
+{ 
 
   int st = defined(texdemopart);
   string nl = newline;
@@ -2426,9 +2426,9 @@ static proc part2(string fname)
 //-------------------- texfactorize ------------------------------
 write(fname,"\\subsection{Factorized polynomials}");
 
-write(fname,"The command \\verb|texfactorize| calls internally the
-{\\sc Singular} command \\verb|factorize| and returns the product of the
-irreducible factors. Note that, at the moment, it is not possible to pass
+write(fname,"The command \\verb|texfactorize| calls internally the 
+{\\sc Singular} command \\verb|factorize| and returns the product of the 
+irreducible factors. Note that, at the moment, it is not possible to pass 
 any optional arguments for \\verb|factorize| through \\verb|texfactorize|.");
 
   ring r0=0,(x,y,z),dp;
@@ -2465,10 +2465,10 @@ write(fname,"\\subsection{Features for polynomials}");
 // TeXreplace
 // ---------------------------------------------
 write(fname,"By setting the global variable \\verb|TeXreplace| it is possible
-to define rules for replacing strings or variable names.
+to define rules for replacing strings or variable names. 
 \\verb|TeXreplace| has to be a list of twoelemented lists where the first
 entry is the text which should be replaced by the second entry.
-This may be applied to replace names of variables, but is also used
+This may be applied to replace names of variables, but is also used 
 when calling \\verb|texname| or \\verb|texmap|. Note that it
 is necessary to write a double backslash \\verb|\\\\\| at the beginning of
 a \\TeX \\ symbol." + lb+nl);
@@ -2533,7 +2533,7 @@ term} \\\\ ",
 "\\end{cases}",
 "\\]",nl);
 
-write(fname,"Note that the size of terms is calculated with certain
+write(fname,"Note that the size of terms is calculated with certain 
 multiplicities.",nl);
 
 //----------------------------------------------------------
@@ -2549,7 +2549,7 @@ bv +
 "> texpoly(fname,f);" + nl +
 ev);
 
-  setring r0;
+  setring r0; 
   poly g=-x2y+2y13z+1;
   poly f=g^2;
   texpoly(fname,f);
@@ -2589,7 +2589,7 @@ write(fname,"\\end{itemize}",nl);
 
 write(fname,nl2,"\\Line");
 
-write(fname,"There are two possibilities to convert a polynomial into
+write(fname,"There are two possibilities to convert a polynomial into 
 \\LaTeX \\ code: either by using \\verb|texpoly| or by calling \\verb|texobj|.
 The difference is that \\verb|texpoly| puts the polynomial in textmode
 while \\verb|texobj| uses the display mode."+nl+
@@ -2602,7 +2602,7 @@ bv +
 ev);
 
 // setring r3;
-
+  
   ring r3=0,(x_1,x_2,x_3),wp(3,2,1);
   poly g=-x_1*x_2+2*x_2*x_3+x_1*x_3;
   texpoly(fname,g/180);
@@ -2640,7 +2640,7 @@ write(fname,"\\Line");
 //----------------------------------------------------------------------
 write(fname,"If the global variable \\verb|Texaligned| is set then the ideal
 is displayed as a row vector.");
-
+ 
 write(fname,
 bv +
 "> int TeXaligned;
@@ -2724,7 +2724,7 @@ ev);
 /////////////////////////////  PART3 //////////////////////////////////////////
 
 static proc part3(string fname)
-{
+{ 
   int st=defined(texdemopart);
   string nl=newline;
   string nl2=newline + newline;
@@ -2733,7 +2733,7 @@ static proc part3(string fname)
   string ev="\\end{verbatim}" ;
 
   if (not(st) or st>=3)
-  {
+  { 
     print(" Call part2 first");
     return();
   }
@@ -2745,7 +2745,7 @@ static proc part3(string fname)
 //---------------------- texmap ------------------------------
 write(fname,"\\section{Typeseting maps between rings}");
 write(fname,"By default, maps are displayed in the following way:");
-
+ 
 write(fname,
 bv +
 "> ring r4=0,(x,y,z),dp;"+nl+
@@ -2753,7 +2753,7 @@ bv +
 "> map phi=r1,u2,uv -v,v2;"+nl+
 "> texmap(fname,phi,r4,r5);" + nl +
 ev);
-
+ 
   ring @r4_h=0,(x,y,z),dp;
   if(system("with","Namespaces")) { exportto(Current, @r4_h); }
   else { export @r4_h; }
@@ -2766,7 +2766,7 @@ write(fname,"\\Line");
 
 write(fname,"If the global variable \\verb|TeXaligned| is set, then the
 map is displayed in one line.");
-
+ 
 write(fname,
 bv +
 "> int TeXaligned;"+nl+
@@ -2785,7 +2785,7 @@ be done by calling \\verb|texmap| with two lists as additional parameters,
 where the first list contains the optional parameters for the source and
 the second one contains the parameters for the domain. Note that if only one
 list is present then it is applied to both of the rings.");
-
+ 
 write(fname,
 bv +
 "> texmap(fname,phi,r4,r5,\"\\\\C\",\"{\");" + nl +
@@ -2801,7 +2801,7 @@ bv +
 "> texmap(fname,phi,r4,r5,list(),list(\"{\"));"+nl+
 ev );
 
- texmap(fname,@phi_h,@r4_h,r5,list(),list("{"));
+ texmap(fname,@phi_h,@r4_h,r5,list(),list("{")); 
 
 write(fname,nl+"\\Line");
 //--------------------------------------------------------------------
@@ -2835,7 +2835,7 @@ write(fname,"\\section{Typesetting composed data structures}");
 
 write(fname, "Complex data structures such as matrices, vectors or modules
 can be displayed by using the procedure \\verb|texobj|.");
-
+ 
 write(fname,"\\subsection{Matrices and vectors}");
 //=======================================================================
 
@@ -2936,10 +2936,10 @@ write(fname,bv +
 "> texobj(fname,V);",
 ev );
 
-  setring r;
+  setring r;  
   ideal I=3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
   int TeXproj; export TeXproj;
-
+  
   texobj(fname,V);
   kill TeXproj;
 
@@ -2947,7 +2947,7 @@ write(fname,
 bv +
 "> kill TeXproj;"+nl+
 ev);
-
+ 
 write(fname,"\\subsection{Modules}",nl2);
 
 write(fname,"By default, modules are displayed in the following way:"+
@@ -2983,7 +2983,7 @@ ev );
 write(fname,"\\subsection{Integer matrices and vectors}");
 
 write(fname,"Integer matrices are displayed in the following way.");
-
+ 
 intmat m[3][4]=-1,3,5,2,-2,8,6,0,2,5,8,7;
 
 write(fname,
@@ -3064,22 +3064,22 @@ kill TeXbrack;
     {
       "// not an isolated singularity";
     }
-    return(m_nr);
+    return(m_nr); 
   }
   export(milnor_number);
 
 write(fname,"\\section{Typesetting procedures}");
 write(fname,"The following procedure allows to include the source code
 of procedures into a \\LaTeX document.");
-write(fname,
+write(fname, 
 bv +
 "> texproc(fname,\"milnor\_number\");" +nl+
 ev);
-
+ 
  texproc(fname,"milnor_number");
 
   kill(milnor_number);
-
+ 
 // ------------------------------ closing the tex file -------------------
 write(fname,"\\section{Closing the \\LaTeX\\ file}");
 write(fname,"To close the file use \\verb|closetex(fname);|. It should now

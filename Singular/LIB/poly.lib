@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.33 2001-01-16 13:48:36 Singular Exp $";
+version="$Id: poly.lib,v 1.34 2004-02-23 10:19:13 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -12,7 +12,7 @@ PROCEDURES:
  is_homog(poly/...);    int, =1 resp. =0 if input is homogeneous resp. not
  is_zero(poly/...);     int, =1 resp. =0 if coker(input) is 0 resp. not
  lcm(ideal);            lcm of given generators of ideal
- maxcoef(poly/...);     maximal length of coefficient occuring in poly/...
+ maxcoef(poly/...);     maximal length of coefficient occurring in poly/...
  maxdeg(poly/...);      int/intmat = degree/s of terms of maximal order
  maxdeg1(poly/...);     int = [weighted] maximal degree of input
  mindeg(poly/...);      int/intmat = degree/s of terms of minimal order
@@ -24,14 +24,141 @@ PROCEDURES:
  denominator(n)         denominator of number n
  mod2id(M,iv);          conversion of a module M to an ideal
  id2mod(i,iv);          conversion inverse to mod2id
+ substitute(I,...)      substitute in I variables by polynomials
  subrInterred(i1,i2,iv);interred w.r.t. a subset of variables
+ hilbPoly( I)           Hilbert polynomial of basering/I
           (parameters in square brackets [] are optional)
 ";
 
 LIB "general.lib";
 LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
+static proc bino(int a, int b)
+{
+//computes binomial var(1)+a over b
+   int i;
+   if(b==0){return(1);}
+   poly p=(var(1)+a)/b;
+   for(i=1;i<=b-1;i++)
+   {
+      p=p*(var(1)+a-i)/i;
+   }
+   return(p);
+}
 
+proc hilbPoly(ideal I)
+"USAGE: hilbPoly(I) I a homogeneous ideal
+RETURN: the Hilbert polynomial of basering/I as an intvec v=v_0,...,v_r
+        such that the Hilbert polynomial is (v_0+v_1*t+...v_r*t^r)/r!
+EXAMPLE: example hilbPoly; shows an example
+"
+{
+   def R=basering;
+   if(!attrib(I,"isSB")){I=std(I);}
+   intvec v=hilb(I,2);
+   int s=dim(I);
+   intvec hp;
+   if(s==0){return(hp);}
+   int d=size(v)-2;
+   ring S=0,t,dp;
+   poly p=v[1+d]*bino(s-1-d,s-1);
+   int i;
+   for(i=1;i<=d;i++)
+   {
+      p=p+v[d-i+1]*bino(s-1-d+i,s-1);
+   }
+   int n=1;
+   for(i=2;i<=s-1;i++){n=n*i;}
+   p=n*p;
+   for(i=1;i<=s;i++)
+   {
+      hp[i]=int(leadcoef(p[s-i+1]));
+   }
+   setring R;
+   return(hp);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(b,c,t,h),dp;
+   ideal I=
+   bct-t2h+2th2+h3,
+   bt3-ct3-t4+b2th+c2th-2bt2h+2ct2h+2t3h-bch2-2bth2+2cth2+2th3,
+   b2c2+bt2h-ct2h-t3h+b2h2+2bch2+c2h2-2bth2+2cth2+t2h2-2bh3+2ch3+2th3+3h4,
+   c2t3+ct4-c3th-2c2t2h-2ct3h-t4h+bc2h2-2c2th2-bt2h2+4t3h2+2bth3-2cth3-t2h3
+   +bh4-6th4-2h5;
+   hilbPoly(I);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc substitute (I,list #)
+"USAGE:  - case 1: typeof(#[1])==poly:
+           substitute (I,v,f[,v1,f1,v2,f2,...]); I object of basering which 
+           can be mapped, v,v1,v2,.. ring variables, f,f1,f2,... poly
+@*       - case 2: typeof(#[1])==ideal:
+           substitute1 (I,v,f); I object of basering which can be mapped,
+           v ideal of ring variables, f ideal
+RETURN:  object of same type as I, 
+@*       - case 1: ring variable v,v1,v2,... substituted by polynomials
+           f,f1,f2,..., in this order
+@*       - case 2: ring variables in v substituted by polynomials in f:
+           v[i] is substituted by f[i], i=1,...,i=min(size(v),ncols(f))
+NOTE:    this procedure extends the built-in command subst which substitutes
+         ring variables only by monomials
+EXAMPLE: example substitute; shows an example
+"
+
+{
+   def bas = basering;
+   ideal m = maxideal(1);
+   int i,ii;
+   if(typeof(#[1])=="poly")
+   {
+     poly v = #[1];
+     poly f = #[2];
+     map phi = bas,m;
+     def J = I;
+     for (ii=1; ii<=size(#) - 1; ii=ii+2)
+     {
+        m = maxideal(1);
+        i=rvar(#[ii]);
+        m[i] = #[ii+1];
+        phi = bas,m;
+        J = phi(J);
+     }
+     return(J);
+   }
+   if(typeof(#[1])=="ideal")
+   {
+     ideal v = #[1];
+     ideal f = #[2];
+     int mi = size(v); 
+     if(ncols(f)<mi)
+     {
+        mi = ncols(f);
+     }
+     m[rvar(v[1])]=f[1];
+     map phi = bas,m;
+     def J = phi(I);
+     for (ii=2; ii<=mi; ii++)
+     {
+        m = maxideal(1);
+        m[rvar(v[ii])]=f[ii];
+        phi = bas,m;
+        J = phi(J);
+     }
+     return(J); 
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(b,c,t),dp;
+   ideal I = -bc+4b2c2t,bc2t-5b2c;
+   substitute(I,c,b+c,t,0,b,b-1);
+   ideal v = c,t,b;
+   ideal f = b+c,0,b-1;
+   substitute(I,v,f);
+} 
+///////////////////////////////////////////////////////////////////////////////
 proc cyclic (int n)
 "USAGE:   cyclic(n);  n integer
 RETURN:  ideal of cyclic n-roots from 1-st n variables of basering
@@ -277,7 +404,7 @@ RETURN:  int/intmat, each component equals maximal degree of monomials in the
          corresponding component of id, independent of ring ordering
          (maxdeg of each var is 1).
          Of type int if id is of type poly, of type intmat else
-NOTE:    proc maxdeg1 returns 1 integer, the absolut maximum; moreover, it has
+NOTE:    proc maxdeg1 returns 1 integer, the absolute maximum; moreover, it has
          an option for computing weighted degrees
 EXAMPLE: example maxdeg; shows examples
 "
@@ -316,7 +443,7 @@ EXAMPLE: example maxdeg; shows examples
 //-------------------------------- examples -----------------------------------
 example
 { "EXAMPLE:"; echo = 2;
-   ring r = 0,(x,y,z),wp(-1,-2,-3);
+   ring r = 0,(x,y,z),wp(1,2,3);
    poly f = x+y2+z3;
    deg(f);             //deg; returns weighted degree (in case of 1 block)!
    maxdeg(f);
@@ -396,14 +523,14 @@ EXAMPLE: example maxdeg1; shows examples
 //-------------------------------- examples -----------------------------------
 example
 { "EXAMPLE:"; echo = 2;
-   ring r = 0,(x,y,z),wp(-1,-2,-3);
+   ring r = 0,(x,y,z),wp(1,2,3);
    poly f = x+y2+z3;
    deg(f);            //deg returns weighted degree (in case of 1 block)!
    maxdeg1(f);
    intvec v = ringweights(r);
    maxdeg1(f,v);                        //weighted maximal degree
    matrix m[2][2]=f+x10,1,0,f^2;
-   maxdeg1(m,v);                        //absolut weighted maximal degree
+   maxdeg1(m,v);                        //absolute weighted maximal degree
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -412,7 +539,7 @@ proc mindeg (id)
 RETURN:  minimal degree/s of monomials of id, independent of ring ordering
          (mindeg of each variable is 1) of type int if id of type poly, else
          of type intmat.
-NOTE:    proc mindeg1 returns one integer, the absolut minimum; moreover it
+NOTE:    proc mindeg1 returns one integer, the absolute minimum; moreover it
          has an option for computing weighted degrees.
 EXAMPLE: example mindeg; shows examples
 "
@@ -538,7 +665,7 @@ example
    intvec v = 1,-3,2;
    mindeg1(f,v);            // computes minimal weighted degree
    matrix m[2][2]=x10,1,0,f^2;
-   mindeg1(m,1..3);         // computes absolut minimum of weighted degrees
+   mindeg1(m,1..3);         // computes absolute minimum of weighted degrees
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -610,7 +737,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc lcm (id, list #)
-"USAGE:   lcm(p[,q]); p int/intve q a list of integers or
+"USAGE:   lcm(p[,q]); p int/intvec q a list of integers or
           p poly/ideal q a list of polynomials
 RETURN:  the least common multiple of the common entries of p and q:
 @*         - of type int if p is an int/intvec
@@ -896,7 +1023,7 @@ RETURN:  list l:
           l[1]=the monomials from mon in the order used
           l[2]=their coefficients after interreduction
           l[3]=l[1]*l[2]
-PUPOSE:  Do interred only w.r.t. a subset of variables.
+PURPOSE:  Do interred only w.r.t. a subset of variables.
          The procedure returns an interreduced system of generators of
          sm considered as a k[t_1,..,t_s]-submodule of the free module
          k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)]).
