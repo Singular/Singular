@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.11 1999-01-26 14:41:38 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.12 1999-02-03 13:18:59 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -486,7 +486,7 @@ void * mmAllocAlignedBlock0( size_t size)
 {
   void* good;
 #ifdef MDEBUG
-  good = mmDBAllocAllignedBlock(size, f, l);
+  good = mmDBAllocAlignedBlock(size, f, l);
 #else
   good = mmAllocAlignedBlock(size);
 #endif
