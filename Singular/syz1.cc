@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.60 2000-08-14 12:56:54 obachman Exp $ */
+/* $Id: syz1.cc,v 1.61 2000-08-24 11:21:47 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1256,7 +1256,12 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
         }
         tso.lcm = p = nPm[ii];
         nPm[ii] = NULL;
+	//#ifdef HAVE_SHIFTED_EXPONENTS
+        //tso.order = pTotaldegree(p);
+	//p->exp.l[currRing->pOrdIndex]=tso.order+0x40000000;
+	//#else
         tso.order = pGetOrder(p) = pTotaldegree(p);
+	//#endif
         if ((syzstr->cw!=NULL) && (index>0) && (pGetComp(q)>0))
         {
           int ii=index-1,jj=pGetComp(q);

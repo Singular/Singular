@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.41 2000-08-22 13:35:40 Singular Exp $ */
+/* $Id: polys1.cc,v 1.42 2000-08-24 11:21:45 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -436,10 +436,13 @@ static poly pPow(poly p, int i)
 */
 poly pPower(poly p, int i)
 {
-  if (i==0)
-    return pOne();
-
   poly rc=NULL;
+
+  if (i==0)
+  {
+    pDelete(&p);
+    return pOne();
+  }
 
   if(p!=NULL)
   {
@@ -458,18 +461,19 @@ poly pPower(poly p, int i)
 #endif
     switch (i)
     {
-      case 0:
-      {
-        rc=pOne();
-#ifdef DRING
-        if ((pDRING) && (pdDFlag(p)==1))
-        {
-          pdSetDFlag(rc,1);
-        }
-#endif
-        pDelete(&p);
-        break;
-      }
+// cannot happen, see above
+//      case 0:
+//      {
+//        rc=pOne();
+//#ifdef DRING
+//        if ((pDRING) && (pdDFlag(p)==1))
+//        {
+//          pdSetDFlag(rc,1);
+//        }
+//#endif
+//        pDelete(&p);
+//        break;
+//      }
       case 1:
         rc=p;
         break;
@@ -565,7 +569,6 @@ poly pDiff(poly a, int k)
           pNext(last)=f;
           last=f;
         }
-        //res = pAdd(res, f);
       }
     }
     pIter(a);

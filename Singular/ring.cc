@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.105 2000-08-22 09:03:21 Singular Exp $ */
+/* $Id: ring.cc,v 1.106 2000-08-24 11:21:46 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3232,9 +3232,11 @@ void pDebugPrint(poly p)
   j=10;
   while(p!=NULL)
   {
+    #ifndef HAVE_SHIFTED_EXPONENTS
     Print("exp.e[0..%d]\n",currRing->ExpESize-1);
     for(i=0;i<currRing->ExpESize;i++)
       Print("%d ",p->exp.e[i]);
+    #endif
     Print("\nexp.l[0..%d]\n",currRing->ExpLSize-1);
     for(i=0;i<currRing->ExpLSize;i++)
       Print("%d ",p->exp.l[i]);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.55 2000-08-14 12:56:45 obachman Exp $ */
+/* $Id: polys.cc,v 1.56 2000-08-24 11:21:45 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -92,7 +92,7 @@ void rSetm(poly p)
           int a,e;
           a=o->data.dp.start;
           e=o->data.dp.end;
-          long ord=0;
+          long ord=0; //0x40000000;
           for(int i=a;i<=e;i++) ord+=pGetExp(p,i);
           p->exp.l[o->data.dp.place]=ord;
           break;
@@ -103,7 +103,7 @@ void rSetm(poly p)
           a=o->data.wp.start;
           e=o->data.wp.end;
           int *w=o->data.wp.weights;
-          long ord=0;
+          long ord=0; //0x40000000;
           for(int i=a;i<=e;i++) ord+=pGetExp(p,i)*w[i-a];
           p->exp.l[o->data.wp.place]=ord;
           break;
@@ -114,7 +114,11 @@ void rSetm(poly p)
           a=o->data.cp.start;
           e=o->data.cp.end;
           int pl=o->data.cp.place;
+	  #ifdef HAVE_SHIFTED_EXPONENTS
+          for(int i=a;i<=e;i++) { p->exp.l[pl]=pGetExp(p,i); pl++; }
+	  #else
           for(int i=a;i<=e;i++) { p->exp.e[pl]=pGetExp(p,i); pl++; }
+	  #endif
           break;
         }
         case ro_syzcomp:
@@ -194,7 +198,11 @@ void rSetmS(poly p, int* Components, long* ShiftedComponents)
           a=o->data.cp.start;
           e=o->data.cp.end;
           int pl=o->data.cp.place;
+	  #ifdef HAVE_SHIFTED_EXPONENTS
+          for(int i=a;i<=e;i++) { p->exp.l[pl]=pGetExp(p,i); pl++; }
+	  #else
           for(int i=a;i<=e;i++) { p->exp.e[pl]=pGetExp(p,i); pl++; }
+	  #endif
           break;
         }
         case ro_syzcomp:

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.46 2000-08-14 12:56:44 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.47 2000-08-24 11:21:44 Singular Exp $ */
 
 /***************************************************************
  *
@@ -33,7 +33,6 @@
 union s_exp
 {
 #ifdef HAVE_SHIFTED_EXPONENTS
-   long           e[VARS +1];
    unsigned long  l[VARS +1];
 #else
    Exponent_t     e[VARS +1];
@@ -101,7 +100,11 @@ extern omBin currPolyBin;
 #define _pSetCoeff(p,n)     {nDelete(&((p)->coef));(p)->coef=n;}
 #define _pSetCoeff0(p,n)    (p)->coef=n
 
+//#ifdef HAVE_SHIFTED_EXPONENTS
+//#define _pGetOrder(p)       ((p)->exp.l[currRing->pOrdIndex]-0x40000000)
+//#else
 #define _pGetOrder(p)       ((p)->exp.l[currRing->pOrdIndex])
+//#endif
 
 #if defined(PDEBUG) && PDEBUG > 1
 extern Exponent_t pPDSetExp(poly p, int v, Exponent_t e, char* f, int l);
@@ -253,11 +256,12 @@ inline Exponent_t pSMultExp(poly p, int v, Exponent_t e, ring r)
 
 #endif // defined(PDEBUG) && PDEBUG > 1
 
+#ifndef HAVE_SHIFTED_EXPONENTS
+
 #define _pGetComp(p)        ((p)->exp.e[_pCompIndex])
 #define _pIncrComp(p)       _pGetComp(p)++
 #define _pRingGetComp(r,p)        ((p)->exp.e[_pRingCompIndex(r)])
 
-#ifndef HAVE_SHIFTED_EXPONENTS
 inline Exponent_t _pGetExpSum(poly p1, poly p2, int i)
 {
   int index = _pExpIndex(i);
@@ -268,7 +272,13 @@ inline Exponent_t _pGetExpDiff(poly p1, poly p2, int i)
   int index = _pExpIndex(i);
   return p1->exp.e[index] - p2->exp.e[index];
 }
-#else
+
+#else //---------------------------------------------
+
+#define _pGetComp(p)        ((p)->exp.l[_pCompIndex])
+#define _pIncrComp(p)       _pGetComp(p)++
+#define _pRingGetComp(r,p)        ((p)->exp.l[_pRingCompIndex(r)])
+
 inline Exponent_t _pGetExpSum(poly p1, poly p2, int i)
 {
   return _pGetExp(p1,i) + _pGetExp(p2,i);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.33 2000-08-18 15:42:10 Singular Exp $ */
+/* $Id: structs.h,v 1.34 2000-08-24 11:21:47 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -141,7 +141,8 @@ typedef struct snaIdeal * naIdeal;
 // for sparsemat.cc 
 typedef struct smprec sm_prec;
 typedef sm_prec * smpoly;
-struct smprec{
+struct smprec
+{
   smpoly n;            // the next element
   int pos;             // position
   int e;               // level
