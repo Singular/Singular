@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.30 1998-05-26 09:19:32 Singular Exp $ */
+/* $Id: ideals.cc,v 1.31 1998-05-26 11:02:33 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2299,7 +2299,7 @@ static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
   matrix nextStep = mpOneStepBareiss(a,barDiv,&r,&c);
 //Print("next row is: %d, next col: %d\n",r,c);
 /*--- there is no pivot - the matrix is zero -------------*/
-  if (r*c==0)
+  if ((r*c==0) || (MATELEM(nextStep,nextStep->nrows,nextStep->ncols)==NULL))
   {
     idDelete((ideal*)&a);
     return;
