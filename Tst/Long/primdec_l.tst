@@ -13,11 +13,11 @@ fg2j-b,
 a+b+c+f+g-1,
 3ad+3bd+2cd+df+dg-a-2b-c-g;
 
-list pr1=minAssPrimes(i);
+list pr1=minAssGTZ(i);
 ideal i1=radical(i);
 ideal i2=equiRadical(i);
 list pr2= primdecGTZ(i);
-list pr3=min_ass_prim_charsets(i,1);
+list pr3=minAssChar(i,1);
 list pr4=primdecSY(i,1);
 matrix m=char_series(i);
 pr1;
@@ -42,11 +42,11 @@ uy+vx,
 uz+wx,
 vz+wy;
 
-list pr1=minAssPrimes(i);
+list pr1=minAssGTZ(i);
 ideal i1=radical(i);
 ideal i2=equiRadical(i);
 list pr2= primdecGTZ(i);
-list pr3=min_ass_prim_charsets(i,1);
+list pr3=minAssChar(i,1);
 list pr4=primdecSY(i,1);
 matrix m=char_series(i);
 pr1;
@@ -70,11 +70,11 @@ uy+vx,
 uz+wx,
 vz+wy;
 
-list pr1=minAssPrimes(i);
+list pr1=minAssGTZ(i);
 ideal i1=radical(i);
 ideal i2=equiRadical(i);
 list pr2= primdecGTZ(i);
-list pr3=min_ass_prim_charsets(i,1);
+list pr3=minAssChar(i,1);
 list pr4=primdecSY(i,1);
 matrix m=char_series(i);
 pr1;
@@ -93,11 +93,11 @@ ideal i=
 42y5+33y4+21x2y+17x2z+63y3+11xy+77y2+91y+1,
 26y2+44xz+12y+9;
 
-list pr1=minAssPrimes(i);
+list pr1=minAssGTZ(i);
 ideal i1=radical(i);
 ideal i2=equiRadical(i);
 list pr2= primdecGTZ(i);
-list pr3=min_ass_prim_charsets(i,1);
+list pr3=minAssChar(i,1);
 list pr4=primdecSY(i,1);
 matrix m=char_series(i);
 pr1;
@@ -118,11 +118,11 @@ cde+1bcd+1ade+1abe+1abc,
 bcde+1acde+1abde+1abce+1abcd,
 abcde-h5;
 
-list pr1=minAssPrimes(i);
+list pr1=minAssGTZ(i);
 ideal i1=radical(i);
 ideal i2=equiRadical(i);
 list pr2= primdecGTZ(i);
-list pr3=min_ass_prim_charsets(i,1);
+list pr3=minAssChar(i,1);
 list pr4=primdecSY(i,1);
 matrix m=char_series(i);
 pr1;
