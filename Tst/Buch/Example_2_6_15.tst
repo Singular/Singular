@@ -62,11 +62,11 @@ proc polyOfEndo(matrix B,poly p)
   return(C);
 }
 
-matrix S=polyOfEndo(M,F[1][3]^2);
+matrix S=polyOfEndo(M,F[1][2]^2);
 matrix V11=std(S*V1);
 print(V11);
 
-S=polyOfEndo(M,F[1][2]); 
+S=polyOfEndo(M,F[1][3]); 
 matrix V12=std(S*V1);
 print(V12);
 
