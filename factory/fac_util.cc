@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_util.cc,v 1.8 1998-03-12 14:31:02 schmidt Exp $ */
+/* $Id: fac_util.cc,v 1.9 2002-07-30 15:25:26 Singular Exp $ */
 
 #include <config.h>
 
@@ -45,10 +45,10 @@ modpk&
 modpk::operator= ( const modpk & m )
 {
     if ( this != &m ) {
-	p = m.p;
-	k = m.k;
-	pk = m.pk;
-	pkhalf = m.pkhalf;
+        p = m.p;
+        k = m.k;
+        pk = m.pk;
+        pkhalf = m.pkhalf;
     }
     return *this;
 }
@@ -58,19 +58,19 @@ modpk::inverse( const CanonicalForm & f, bool symmetric ) const
 {
     CanonicalForm u, r0 = this->operator()( f, false ), r1 = pk, q0 = 1, q1 = 0;
     while ( ( r0 > 0 ) && ( r1 > 0 ) ) {
-	u = r0 / r1;
-	r0 = r0 % r1;
-	q0 = u*q1 + q0;
-	if ( r0 > 0 ) {
-	    u = r1 / r0;
-	    r1 = r1 % r0;
-	    q1 = u*q0 + q1;
-	}
+        u = r0 / r1;
+        r0 = r0 % r1;
+        q0 = u*q1 + q0;
+        if ( r0 > 0 ) {
+            u = r1 / r0;
+            r1 = r1 % r0;
+            q1 = u*q0 + q1;
+        }
     }
     if ( r0 == 0 )
-	return this->operator()( pk-q1, symmetric );
+        return this->operator()( pk-q1, symmetric );
     else
-	return this->operator()( q0, symmetric );
+        return this->operator()( q0, symmetric );
 }
 
 CanonicalForm
@@ -79,18 +79,18 @@ modpk::operator() ( const CanonicalForm & f, bool symmetric ) const
     PKHALF = pkhalf;
     PK = pk;
     if ( symmetric )
-	return mapdomain( f, mappksymmetric );
+        return mapdomain( f, mappksymmetric );
     else
-	return mapdomain( f, mappk );
+        return mapdomain( f, mappk );
 };
 
 CanonicalForm
 replaceLc( const CanonicalForm & f, const CanonicalForm & c )
 {
     if ( f.inCoeffDomain() )
-	return c;
+        return c;
     else
-	return f + ( c - LC( f ) ) * power( f.mvar(), degree( f ) );
+        return f + ( c - LC( f ) ) * power( f.mvar(), degree( f ) );
 }
 
 CanonicalForm
@@ -98,19 +98,49 @@ remainder( const CanonicalForm & f, const CanonicalForm & g, const modpk & pk )
 {
     ASSERT( (f.inCoeffDomain() || f.isUnivariate()) && (g.inCoeffDomain() || g.isUnivariate()) && (f.inCoeffDomain() || g.inCoeffDomain() || f.mvar() == g.mvar()), "can not build remainder" );
     if ( f.inCoeffDomain() )
-	if ( g.inCoeffDomain() )
-	    return pk( f % g );
-	else
-	    return pk( f );
+        if ( g.inCoeffDomain() )
+            return pk( f % g );
+        else
+            return pk( f );
     else {
-	Variable x = f.mvar();
-	CanonicalForm invlcg = pk.inverse( g.lc() );
-	CanonicalForm result = f;
-	int degg = g.degree();
-	while ( result.degree() >= degg ) {
-	    result = pk( result - lc( result ) * invlcg * g * power( x, result.degree() - degg ) );
-	}
-	return result;
+        Variable x = f.mvar();
+        CanonicalForm result = f;
+        int degg = g.degree();
+        CanonicalForm invlcg = pk.inverse( g.lc() );
+        CanonicalForm gg = pk( g*invlcg );
+        if((gg.lc().isOne()))
+        {
+          while ( result.degree() >= degg )
+          {
+            result -= pk(lc( result ) * gg) * power( x, result.degree() - degg );
+            result=pk(result);
+          }
+        }
+        else 
+	// no inverse found
+        {
+          CanonicalForm ic=icontent(g);
+          if (!ic.isOne())
+          {
+            gg=g/ic;
+            return remainder(f,gg,pk);
+          }
+          while ( result.degree() >= degg )
+          {
+	    if (gg.lc().isZero()) return result;
+            CanonicalForm lcgf = result.lc() / gg.lc();
+            if (lcgf.inZ())
+              gg = pk( g*lcgf );
+            else
+            {
+              //printf("!\n\n");
+              return result;
+            }
+            result -=  gg * power( x, result.degree() - degg );
+            result=pk(result);
+          }
+        }
+        return result;
     }
 }
 
@@ -119,24 +149,24 @@ divremainder( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & 
 {
     ASSERT( (f.inCoeffDomain() || f.isUnivariate()) && (g.inCoeffDomain() || g.isUnivariate()) && (f.inCoeffDomain() || g.inCoeffDomain() || f.mvar() == g.mvar()), "can not build remainder" );
     if ( f.inCoeffDomain() )
-	if ( g.inCoeffDomain() ) {
-	    divrem( f, g, quot, rem );
-	    quot = pk( quot );
-	    rem = pk( rem );
-	}
-	else {
-	    quot = 0;
-	    rem = pk( f );
-	}
+        if ( g.inCoeffDomain() ) {
+            divrem( f, g, quot, rem );
+            quot = pk( quot );
+            rem = pk( rem );
+        }
+        else {
+            quot = 0;
+            rem = pk( f );
+        }
     else {
-	Variable x = f.mvar();
-	CanonicalForm invlcg = pk.inverse( g.lc() );
-	rem = f;
-	int degg = g.degree();
-	while ( rem.degree() >= degg ) {
-	    quot += pk( lc( rem ) * invlcg ) * power( x, rem.degree() - degg );
-	    rem = pk( rem - lc( rem ) * invlcg * g * power( x, rem.degree() - degg ) );
-	}
+        Variable x = f.mvar();
+        CanonicalForm invlcg = pk.inverse( g.lc() );
+        rem = f;
+        int degg = g.degree();
+        while ( rem.degree() >= degg ) {
+            quot += pk( lc( rem ) * invlcg ) * power( x, rem.degree() - degg );
+            rem = pk( rem - lc( rem ) * invlcg * g * power( x, rem.degree() - degg ) );
+        }
     }
 }
 
@@ -145,9 +175,9 @@ mappksymmetric ( const CanonicalForm & f )
 {
     CanonicalForm result = mod( f, PK );
     if ( result > PKHALF )
-	return result - PK;
+        return result - PK;
     else
-	return result;
+        return result;
 }
 
 CanonicalForm
@@ -165,26 +195,26 @@ extgcd ( const CanonicalForm & a, const CanonicalForm & b, CanonicalForm & S, Ca
 
     setCharacteristic( p );
     {
-	amodp = mapinto( a ); bmodp = mapinto( b );
-	(void)extgcd( amodp, bmodp, smodp, tmodp );
+        amodp = mapinto( a ); bmodp = mapinto( b );
+        (void)extgcd( amodp, bmodp, smodp, tmodp );
     }
     setCharacteristic( 0 );
     s = mapinto( smodp ); t = mapinto( tmodp );
 
     for ( j = 1; j < k; j++ ) {
-	e = ( 1 - s * a - t * b ) / modulus;
-	setCharacteristic( p );
-	{
-	    e = mapinto( e );
-	    sigmat = smodp * e;
-	    taut = tmodp * e;
-	    divrem( sigmat, bmodp, q, sigma );
-	    tau = taut + q * amodp;
-	}
-	setCharacteristic( 0 );
-	s += mapinto( sigma ) * modulus;
-	t += mapinto( tau ) * modulus;
-	modulus *= p;
+        e = ( 1 - s * a - t * b ) / modulus;
+        setCharacteristic( p );
+        {
+            e = mapinto( e );
+            sigmat = smodp * e;
+            taut = tmodp * e;
+            divrem( sigmat, bmodp, q, sigma );
+            tau = taut + q * amodp;
+        }
+        setCharacteristic( 0 );
+        s += mapinto( sigma ) * modulus;
+        t += mapinto( tau ) * modulus;
+        modulus *= p;
     }
     S = s; T = t;
 }
@@ -196,7 +226,7 @@ sum ( const CFArray & a, int f, int l )
     if ( l > a.max() ) l = a.max();
     CanonicalForm s = 0;
     for ( int i = f; i <= l; i++ )
-	s += a[i];
+        s += a[i];
     return s;
 }
 
@@ -207,7 +237,7 @@ prod ( const CFArray & a, int f, int l )
     if ( l > a.max() ) l = a.max();
     CanonicalForm p = 1;
     for ( int i = f; i <= l; i++ )
-	p *= a[i];
+        p *= a[i];
     return p;
 }
 
@@ -232,6 +262,6 @@ crossprod ( const CFArray & a, const CFArray & b )
     int fb = b.min();
     int n = a.max();
     for ( ; fa <= n; fa++, fb++ )
-	s += a[fa] * b[fb];
+        s += a[fa] * b[fb];
     return s;
 }
