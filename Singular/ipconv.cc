@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.8 1998-04-01 18:58:28 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.9 1998-05-15 16:03:52 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -183,7 +183,7 @@ static void * iiL2R(void * data)
 #endif
 
 //
-// conversions:
+// automatic conversions:
 //
 struct sConvertTypes dConvertTypes[] =
 {

@@ -2389,6 +2389,16 @@ static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
   res->data=(char *)mat;
   return FALSE;
 }
+static BOOLEAN jjIDEAL_Map(leftv res, leftv v)
+{
+  map m=(map)v->CopyD();
+  FreeL((ADDRESS)m->preimage);
+  m->preimage=NULL;
+  ideal I=(ideal)m;
+  I->rank=1;
+  res->data=(char *)I;
+  return FALSE;
+}
 static BOOLEAN jjIDEAL_R(leftv res, leftv v)
 {
   if (currRing!=NULL)
@@ -3147,6 +3157,7 @@ struct sValCmd1 dArith1[]=
 ,{jjIDEAL_Ma,   IDEAL_CMD,       IDEAL_CMD,      MATRIX_CMD }
 ,{jjIDEAL_R,    IDEAL_CMD,       IDEAL_CMD,      QRING_CMD }
 ,{jjIDEAL_R,    IDEAL_CMD,       IDEAL_CMD,      RING_CMD }
+,{jjIDEAL_Map,  IDEAL_CMD,       IDEAL_CMD,      MAP_CMD }
 ,{jjDUMMY,      IDEAL_CMD,       IDEAL_CMD,      IDEAL_CMD }
 ,{jjINDEPSET,   INDEPSET_CMD,    INTVEC_CMD,     IDEAL_CMD }
 ,{jjDUMMY,      INT_CMD,         INT_CMD,        INT_CMD }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.10 1998-04-27 12:34:14 obachman Exp $ */
+/* $Id: feread.cc,v 1.11 1998-05-15 16:03:49 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -393,6 +393,8 @@ char * fe_fgets_stdin(char *s, int size)
         {
           if (i==0) break;
           i--;
+          fputc('\b',fe_echo);
+          fputc(' ',fe_echo);
           fputc('\b',fe_echo);
           fflush(fe_echo);
           change=1;
