@@ -1,0 +1,533 @@
+// $Id: deform.lib,v 1.1.1.1 1997-04-25 15:13:25 obachman Exp $
+//(BM+GMG)
+///////////////////////////////////////////////////////////////////////////////
+LIBRARY:  deform.lib    PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
+
+ miniversal(id[,deg]);  miniversal deformation of an isolated singularity id
+  
+  SUB-PROCEDURES        used by main procedure:
+  apply_col(A,B);       put A into col-nf and apply same col-operations to B
+  defining_system(A,B); defining system for next degree of massey products
+  reduce_s(i,j,n);      add var(1)^(n+ord) to all polys of i and reduce mod j
+  lift_kbase(N,M);      coef-matrix expressing N as lin. comb. of k-basis of M
+  coef_ideal(M,s);      coef_matrices with respect to first s variables
+
+LIB "inout.lib";
+LIB "general.lib";
+LIB "sing.lib"; 
+LIB "matrix.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+proc miniversal (ideal id,list #)
+USAGE:   miniversal(id[,d,na,va,o,iv]); id=ideal, d=integer, 
+         na,va,o=strings, iv=intvec of positive integers
+COMUPTE: miniversal deformation of id up to degree d (default d=100)
+CREATE:  A ring with name `na` (e.g. R if na="R", default na="Ont") extending
+         the basering by new variables given by va (deformation parameters).
+         -- The new vars come before the old vars
+         -- The characteristic of `na`is the characteristic of the basering.
+         -- The new vars are derived from va. If va is a single letter, say 
+            va="T", and if n<=26 then T and the following n-1 letters from  
+            T..Z..T (resp. T(1..n) if n>26) are taken as additional variables. 
+            If va is a single letter followed by (, say va="x(", the new 
+            variables are x(1),...,x(n) (default va="A").
+         -- The ordering is the product ordering between the ordering of r and
+            an ordering derived from `o`, which has to be local!! (default: 
+            o="ds") [and iv (a weight vector)]. 
+            Type 'help extendring' for a more detailed explanation of the
+            ordering 
+         -- Even if na,va,o are given, d and/or iv may be ommited. Then the 
+            default values d=100, iv=0 (i.e. all weights = 1) are used.
+         The procedure creates also two ideals:
+            ideal jetJ - defining the miniversal base space (in `na`)
+            ideal jetF - defining miniversal total space (in `na`)
+NOTE:    int printlevel=2;  shows what is going on
+         int printlevel=3;  shows also memory usage
+         This proc uses 'execute' or calls a procedure using 'execute'. 
+         If you use it in your own proc, let the local names of your proc 
+         start with @ (see the file HelpForProc)
+EXAMPLE: example miniversal; shows an example  
+{
+//------- initialisation ------------------------------------------------------
+   int @d,@deg,@t1,@t2,@colR,@noObstr;
+   intvec @iv,@jv;
+   string @na,@va,@o;
+   if( size(#)==0 ) { @deg=100; @na="Ont"; @va="A"; @o="ds"; }
+   if( size(#)>=1 ) { if( typeof(#[1])!="int" ) { # = 100,#[1..size(#)]; }}
+   if( size(#)==1 ) { @deg=#[1]; @na="Ont"; @va="A"; @o="ds"; }
+   if( size(#)==2 ) { @deg=#[1]; @na=#[2];  @va="A"; @o="ds"; }
+   if( size(#)==3 ) { @deg=#[1]; @na=#[2];  @va=#[3]; @o="ds";}
+   if( size(#)==4 ) { @deg=#[1]; @na=#[2];  @va=#[3]; @o=#[4];}
+   if( size(#)==5 ) { @deg=#[1]; @na=#[2];  @va=#[3]; @o=#[4]; @iv=#[5]; }
+   if( find(@o,"s")==0 ) 
+   { "// ordering must be an s-ordering, please change!"; return();}
+ 
+  def @Pn = basering; 
+   string @ords = ordstr(@Pn);   
+   id = simplify(id,10);
+   int @rowR = size(id);
+   if( @rowR<=1 )
+   { 
+      "// hypersurface, use proc deform from sing.lib";
+      return();
+   }   
+//------- change ordering if not correct --------------------------------------
+   @t1=1;
+   for( @d=1;@d<=nvars(@Pn);@d++ ) { @t1=@t1*(lead(1+var(@d))==var(@d)); }
+   if( @t1==0 )
+   {
+      if( @ords[size(@ords)]!="c" and @ords[size(@ords)]!="C" ) 
+      { 
+         if( @ords[1]=="c" ) { @ords=@ords[3,size(@ords)-2]+",c"; @t1=1;}
+         if( @ords[1]=="C" ) { @ords=@ords[3,size(@ords)-2]+",C"; @t1=1;}
+      }
+      if( @t1==1 ) 
+      { 
+         changeord("@On",@ords,@Pn);
+         ideal id  = imap(@Pn,id);
+      }
+   }
+   if( defined(@On)==0 ) { def @On=@Pn; setring @On; }
+//-------  reproduce T12 -------------------------------------------------------
+   list   Ls   = T12(id,1); 
+   matrix Ro   = Ls[4];                         //syz(i)
+   matrix InfD = Ls[3];                         //matrix of inf. deformations
+   matrix PreO = Ls[5];                         //present. mat of Syz/Kos^*
+   module PreT = Ls[2];                         //present. module of modT2 
+   @t1 = Ls[8];                                 //vdim of T1
+   @t2 = Ls[9];                                 //vdim of T2
+   kill Ls;
+   dbpri(2,"","// ___ matrix of infinitesimal deformations:",InfD);
+   @colR = ncols(Ro);                 
+   ideal i0 = std(id);
+  qring @Ox = i0;                               //ring of singularity to deform
+   matrix Cup,lCup; module PreT;
+   ideal testid;
+   matrix Ro   = fetch(@On,Ro);
+   matrix PreO = fetch(@On,PreO);
+//---- create new ring with @t1=dim T1 additional variables and initialize ----
+
+  extendring(@na,@t1,@va,@o,@iv,0,@On);         //ring  containing miniversal
+                                                //deformation
+   @jv[@t1]=0; @jv=@jv+1; @jv[nvars(basering)]=0;       //@jv=
+                                                //weight-vector for calculating
+                                                //rel-jet with resp to def-para
+   ideal  jetF  = imap(@On,id);                 //(jet)ideal of minversal defor
+   export jetF;
+   matrix Fo = matrix(jetF);                    //initial equations
+   matrix Rs = imap(@On,Ro);                    //deformed syzygies 
+   ideal  jetJ;                                 //(jet)ideal of minversal defor
+   export jetJ;
+   ideal  testid,Jo;
+   Jo  =  std(Jo);
+   matrix Fs[1][@rowR];                          //deformed equations
+   matrix F_R[1][@colR];                         //product Fs*Rs
+   matrix F_r[1][@colR];                         //reduced product mod jetJ
+   matrix Fn[1][@rowR];                          //last homog part of Fs
+   matrix Rn[@rowR][@colR];                      //last homog part of Rs
+   matrix Cup,lCup,Test;                         //presenting obstructions
+   matrix Mon[@t1][1]=maxideal(1);               //occuring monomials in deg d
+   Fn  = transpose(imap(@On,InfD)*Mon);          //infinitesimal deformations
+   Fs  = Fo + Fn;
+   jetF= Fs;
+   F_R = Fs*Rs;
+   if (@t2<=0) { @d=0; }                         //finished, if "T2=0" 
+//------- start the loop ------------------------------------------------------
+   for (@d=1;@d<=@deg;@d++)
+   {
+      dbpri(2,"","// ___ start computation in degree "+string(@d)+":");
+      dbpri(3,"memory="+string(kmemory())+"k");
+//------- lift relation to next degree ----------------------------------------
+      F_r = reduce_s(F_R,Jo,@d+1); 
+      Cup = matrix(jet(F_r,@d,@jv),1,@colR);
+      Rn  = (-1)*lift(Fo,Cup);
+      Rs  = Rs + Rn;
+      F_R = F_R + Fs*Rn; 
+//------- test: already finished? ---------------------------------------------
+      testid = simplify(reduce(ideal(F_R),Jo),10);
+      if (testid[1]==0)
+      { 
+         "// computation finished in degree "+string(@d); 
+         if( @d==@deg ) 
+         {"// degree bound reached, result may not yet be complete!";}
+         break;
+      }
+//------- compute obstruction-matrix  -----------------------------------------
+      F_r = reduce_s(F_R,Jo,@d+1); 
+      Cup = matrix(jet(F_r,@d+1,@jv),1,@colR); 
+      Test= Cup;
+      dbpri(2,"","// ___ obstruction vector:",ideal(Cup));
+      Cup,Mon = coef_ideal(Cup,@t1);
+//------- express obstructions in kbase of T2  --------------------------------
+   setring @Ox;
+      Cup  = imap(`@na`,Cup);
+      lCup = lift(PreO,Cup);
+      PreT = fetch(@On,PreT);
+      lCup = lift_kbase(lCup,PreT);
+      @t2   = nrows(lCup);
+      dbpri(2,"","// ___ obstructions in kbase of T2:",lCup);
+      testid = simplify(ideal(lCup),10);           // test no obstructions
+      if (testid[1]==0)
+      { @noObstr=1; } else { @noObstr=0; }
+//------- compute ideal of minversal(its k-jet) -------------------------------
+   setring `@na`;
+      if (@noObstr==0)                              //case of non-zero obstr.      
+      {
+         lCup = imap(@Ox,lCup);
+         Jo   = lCup*transpose(Mon);
+         jetJ = matrix(jetJ,1,@t2)+matrix(Jo,1,@t2); 
+         dbpri(2,"","// ___ degree-"+string(@d+1)+"-part of ideal of miniversal base"+":",Jo);
+         Jo = std(jetJ);
+//------- choose a defining system --------------------------------------------
+         @iv,Cup = defining_system(lCup,Cup);
+         dbpri(2,"","// ___ number of cols of defining system:",@iv);
+//------- lift the equations --------------------------------------------------
+         if (sum(@iv)==0)
+         {
+            "// nothing to lift!";
+            "// miniversal base, defined by jetJ, is a fat point!";break;
+         } 
+   setring @Ox;
+         Cup = imap(`@na`,Cup);
+         Cup = submat(Cup,1..nrows(Cup),@iv);
+         dbpri(2,"","// ___ matrix of defining system:",Cup);
+      }
+      else                                         // case of zero obstructions
+      {       
+   setring @Ox;
+         Cup = imap(`@na`,Cup);
+      }   
+      Cup = lift(transpose(Ro),module(Cup));
+   setring `@na`;
+      Cup = imap(@Ox,Cup);
+      if (@noObstr==0)
+      {  Mon = submat(Mon,1..nrows(Mon),@iv); }
+      Fn  = (-1)*transpose(Cup*transpose(Mon));
+      Fs  = Fs+Fn;
+      F_R = F_R+Fn*Rs; 
+      jetF = matrix(Fs);
+      dbpri(2,"","// ___ degree-"+string(@d+1)+"-part of deformed equations:",Fn);
+   }  
+//---------  end loop and final output ---------------------------------------
+  "";
+  "// ___ Equations of miniversal base space ___";jetJ; "";
+  "// ___ Equations of miniversal total space ___";jetF; "";
+  "// Result belongs to ring",@na,"(total space of miniversal deformation).";
+  "// Make",@na,"the basering and list objects defined in",@na,"by typing:";
+  "   setring",@na,"; show("+@na+");";
+  "   listvar(ideal);"; 
+  kill @On;  
+  return();
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring r1=0,(x,y,z,u,v),ds;
+   matrix m[2][4]=x,y,z,u,y,z,u,v;
+   ideal i=minor(m,2);          //cone over rational normal curve of degree 4
+   miniversal(i,"R","T(");
+   // hit return-key to continue; 
+   // pause;
+   ring  r = 0,(x,y,z),ds;
+   ideal i = x2,xy,yz,zx;
+   printlevel = 2; 
+   miniversal(i);""; 
+   kill printlevel;
+// NOTE: rings R and Ont are still alive!
+}  
+///////////////////////////////////////////////////////////////////////////////
+
+proc apply_col (matrix A, matrix B) 
+USAGE:   apply_col(A,B);  A,B=matrices
+ASSUME:  A = constant matrix in row-reduced (upper triangular) normal form, 
+         B = matrix of same size
+COMUPTE: apply to B those col-operations which reduce A into col-reduced nf
+RETURN:  two transformed matrices: col-reduced A, transformed B
+EXAMPLE: example apply_col; shows an example  
+{
+   int i,j,k;
+   poly m;
+   int r=nrows(A);
+   int c=ncols(A);
+   matrix C  = concat(transpose(A),transpose(B));
+   module mC = transpose(C);
+   for( k=1;k<=r;k++ )
+   {
+      j=1;
+      while( C[j,k]==0 && j<c ) { j++; }
+      for( i=j+1;i<=c;i++ )
+      {
+         m = C[i,k];
+         mC[i] = mC[i]-m*mC[j];  
+      }
+   }
+   C = transpose(matrix(mC));
+   matrix a[c][r] = C[1..c,1..r];
+   matrix b[c][nrows(B)] = C[1..c,1+r..ncols(C)];
+   return(transpose(a),transpose(b));
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring R=0,(x,y,z),dp;
+   matrix A[3][3]=1,2,3;
+   print(A);
+   matrix B[3][3]=x,y,z,x2,y2,z2,xy,xz,yz;
+   print(B);
+   print(apply_col(A,B));
+   list L=apply_col(A,B);
+   print(L[2]);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc defining_system (matrix A,matrix B) 
+USAGE:   defining_system(A,B);  A,B=matrices
+ASSUME:  A a constant matrix
+COMPUTE: a defining system for next degree of massey products
+         (transform A into row reduced normal form, apply proc 'apply_col' to
+         A,B and store indices of 0-columns of A in intvec iv)
+RETURN:  two objects: intvec iv, matrix M (the transformed matrix B)
+         The columns of M with index from iv are a defining sytem
+EXAMPLE: example defining_system; shows an example  
+{
+   int    k,l;
+   ideal  id;
+   intvec iv;
+   A      = gauss_row(A);                  // row-reduced nf of A
+   int rg = ncols(A);
+   A,B    = apply_col(A,B);                // special columne-reduction
+   for( k=1;k<=rg;k++ )                  // collect zero-cols of B
+   {
+      if( A[k]==0) {l++;iv[l]=k;}        // test if kth column is 0
+   }                                       // collect indices of 0-columns in iv
+   return(iv,B);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring R=0,(x,y,z),dp;
+   matrix A[3][3]=1,2,3,2,4,6,4,8,12;
+   print(A);
+   matrix B[3][3]=x,y,z,x2,y2,z2,xy,xz,yz;
+   print(B);
+   print(defining_system(A,B));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc reduce_s (ideal i,ideal j,int n)
+USAGE:   reduce_s(i,j,n); i,j=ideals, n=integer
+RETURN:  add to all polys of i var(1)^(n+ord) and reduce mod std(j)
+         (to get correct reduction in s-order)
+NOTE:    apply jet(i,n-1) to get correct reduction (n > maxord(i)
+EXAMPLE: example reduce_s; shows an example
+
+{
+  int m = ncols(i);
+  int d,k;
+  ideal j0 = std(j);
+  for (k=1;k<=m;k++)
+  {
+    if (deg(i[k])>=0)
+    {
+      d = n+deg(i[k])+1;
+      i[k]= reduce(i[k]+var(1)^d,j0);
+    }
+  }
+  return(i);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y),ds;
+   poly f = x7+y7+(x-y)^2*x^2*y^2;
+   ideal j = jacob(f);
+   reduce_s(f,j,10);  
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc lift_kbase (N, M)
+USAGE:   lift_kbase(N,M); N,M=poly/ideal/vector/module
+RETURN:  matrix A, coefficient matrix expressing N as linear combination of 
+         k-basis of M. Let the k-basis have k elements and A c columns. 
+         Then A satisfies:
+             matrix(reduce(N,std(M)),k,c) = matrix(kbase(std(M)))*A
+ASSUME:  dim(M)=0 and the monomial ordering is a well ordering or the last 
+         block of the ordering is c or C
+EXAMPLE: example lift_kbase; shows an example
+{
+//----------  initialisation  -------------------------------------------------
+   string ords = ordstr(basering);
+   int    d,col,k,l;
+   module kb;
+   matrix testm;
+   vector v,p,q;
+//------- check wether ordering is correct ------------------------------------
+   k=1;
+   for( l=1;l<=nvars(basering);l++ ) { k=k*(lead(1+var(l))==var(l)); }
+   if( k==0 )
+   {
+      if( ords[size(ords)]!="c" and ords[size(ords)]!="C" ) 
+      { 
+         "// change ordering!";
+         "// ordering "+ordstr(basering)+" not implemented for this proc"; 
+         return(); 
+      }
+   }
+//----------  check assumtions  -----------------------------------------------
+   if( typeof(N)=="poly" ) { ideal J=ideal(N); kill N; module N=J; kill J; }
+   if( typeof(M)=="poly" ) { ideal J=ideal(M); kill M; module M=J; }
+   M = std(M);
+   d = vdim(M);
+   if( d<1 )
+   { "// second argument in `lift_kbase` has vdim",d; return(); }
+//----------  compute kbase and reduce(N,M) ----------------------------------- 
+   kb = kbase(M);
+   col = ncols(N);
+   N = reduce(N,M);
+//----------  collecting coefficients of reduce(N,M) --------------------------
+   matrix result[d][col];
+   for( l=1;l<=col;l=l+1 )
+   {
+      v = N[l];
+      if( size(v)>0 )
+      {
+         for( k=1;k<=d;k=k+1 )
+         { 
+            p = kb[k];
+            q = lead(v); 
+            if( size(p-q)<2 )
+            {
+               result[k,l] = leadcoef(q);
+               v = v-q;
+               if( size(v)<1 ) { k=d+1; }
+               else { k=0; }
+            }
+         }   
+      }
+   }
+//---------  final test -------------------------------------------------------
+   testm = matrix(N,nrows(kb),ncols(result))- matrix(kb)*result;
+   if( size(module(testm))!=0 ) 
+   { 
+      "// proc `lift_kbase` did'nt work correctly!";
+      "// Please inform tthe authors";
+      return();
+   }
+   return(result);
+}
+example
+{
+  "EXAMPLE:";     echo=2;
+  ring R=0,(x,y),ds;
+  module M=[x2,xy],[y2,xy],[0,xx],[0,yy];
+  module N=[x3+xy,x],[x,x+y2];
+  print(M);
+  module kb=kbase(std(M));
+  print(kb);
+  print(N);
+  matrix A=lift_kbase(N,M);
+  print(A);
+  matrix(reduce(N,std(M)),nrows(kb),ncols(A)) - matrix(kbase(std(M)))*A;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc coef_ideal (matrix M,int s)
+USAGE:   coef_ideal(M,s); M=matrix, s=integer
+ASSUME:  M=matrix with only one row and without any constant term
+COMPUTE: coef_matrices with respect to first s variables
+RETURN:  2 matrices: 
+         matrix of coefficients (each column is formed by the coefficients
+           of M with respect to some monomial)  
+         row-matrix of corresponding monomials 
+EXAMPLE: example coef_ideal; shows an example
+{
+  int   k,l,n,z;
+  int   cM = ncols(M);
+  ideal flatM = M; 
+  ideal monId,flat;
+  poly  mon = product(maxideal(1),1..s);
+//--------- collect all monomials (!=1) ---------------------------------------
+  for (k=1;k<=cM;k++)
+  {
+    matrix mci(k) = coef(flatM[k],mon);
+    flat = mci(k)[1,1..ncols(mci(k))];
+    if (flat[1]!=1)
+    { monId = monId,flat;}
+  } 
+  monId = monId+ideal(0);
+  k=size(monId);
+  matrix BIG[cM][k];
+//---------  create coef_matrices  --------------------------------------------
+  for (n=1;n<=k;n++)
+  {
+    for (l=1;l<=cM;l++)
+    {
+      for (z=1;z<=ncols(mci(l));z++)
+      {
+        if(mci(l)[1,z]==monId[n])
+        { BIG[l,n] = mci(l)[2,z];}
+      }   
+    }
+  }  
+  return(BIG,matrix(monId));
+}  
+example 
+{ "EXAMPLE:"; echo = 2;
+  ring Z = 0,(A,B,C,x,y,z),ds;
+  int  s = 3; 
+  matrix M[1][4]=A+yB,2C,3AA,4BB+5CC;
+  print(M);
+  matrix Coe,Mon;
+  Coe,Mon = coef_ideal(M,s);
+  print(Coe);
+  print(Mon);
+}
+///////////////////////////////////////////////////////////////////////////////
+----------
+
+"example in r1: i=cone rational normal curve d=4";
+int d=4;
+ring r1=0,(x,y,z,u,v),ds;
+matrix m[2][4]=x,y,z,u,y,z,u,v;
+ideal i=minor(m,2);
+i=minbase(i);
+i;pause;
+int t=timer;miniversal(i);timer-t;
+----------
+
+"example: in r4 i=cone rational normal curve d=5";
+int d=5;
+ring s=0,(x,y,z,u,v,w),ds;
+matrix m[2][5]=x,y,z,u,v,y,z,u,v,w;
+ideal i=minor(m,2);
+i=minbase(i);
+i;pause;
+
+----------
+
+"Example: in r5 i=L_n^n,   n=4;";
+ring r5=0,(x,y,z,u),ds;
+ideal i;
+i=xy,xz,xu,yz,yu,zu;
+i;pause;
+
+----------
+
+"Example 1 : cyclic quotient  in ws    
+      (type setring r1;sud(i);)";
+ring r1=0,(x,y,z,u,v),ws(4,3,2,3,4);
+ideal i=xz-y2,yz2-xu,xv-yzu,yu-z3,z2u-yv,zv-u2;
+i;
+
+"Example 2: same in wp
+      (ringr r2)";
+ring r2=0,(x,y,z,u,v),wp(4,3,2,3,4);
+ideal i=xz-y2,yz2-xu,xv-yzu,yu-z3,z2u-yv,zv-u2;
+i;
+
+"Example 3: same in ls";
+ring r3=0,(x,y,z,u,v),ls;
+ideal i=xz-y2,yz2-xu,xv-yzu,yu-z3,z2u-yv,zv-u2;
+i;
+
+"Example 4: by chance for testing";
+ring r4=0,(x,y,z),ds;
+ideal i=xy,yz,xz+y3,x2+y2+z3;
+i;
+

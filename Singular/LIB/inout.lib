@@ -1,0 +1,533 @@
+// $Id: inout.lib,v 1.1.1.1 1997-04-25 15:13:26 obachman Exp $
+//system("random",787422842);
+//(GMG,BM)
+///////////////////////////////////////////////////////////////////////////////
+
+LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT        
+
+ allprint(list);        print list if ALLprint is defined, with pause if >0
+ dbpri(n,list);         print objects of list if int n<=printlevel
+ lprint(poly/...[,n]);  display poly/... fitting to pagewidth [size n]
+ pmat(matrix[,n]);      print form-matrix [first n chars of each colum]
+ rMacaulay(string);     read Macaulay_1 output and return its Singular format
+ show(any);             display any object in a compact format
+ split(string,n);       split given string into lines of length n
+ tab(n);                string of n space tabs
+ writelist(fil,nam,L);  write the list L into a file `fil` and call it `nam`
+           (parameters in square brackets [] are optional)
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc allprint (list #) 
+USAGE:   allprint(L);  L list
+CREATE:  display L[1], L[2], ... if an integer with name ALLprint is defined,
+         makes "pause",   if ALLprint > 0 
+         listvar(matrix), if ALLprint = 2
+RETURN:  no return value
+EXAMPLE: example allprint; shows an example
+{
+   if( defined(ALLprint) )
+   {
+      int i;
+      for( i=1; i<=size(#); i++ ) { print(#[i]); }
+      if( ALLprint==2 ) { pause; listvar(matrix); }
+      if( ALLprint >0 ) { pause; }
+   }  
+   return();
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring S;
+   matrix M=matrix(freemodule(2),3,3);
+   int ALLprint; export ALLprint;
+   allprint("M =",M);
+   kill ALLprint;
+}  
+///////////////////////////////////////////////////////////////////////////////
+
+proc dbpri (int n ,list #)
+USAGE:   dbpri(n,L);  n integer, L list
+CREATE:  display L[1], L[2], ... if an integer with name printlevel is defined
+         and if n<=printlevel, set printlevel to 0 if it is not defined
+RETURN:  no return value
+NOTE:    this is uesful to control the printing of comments or partial results
+         in a procedure, e.g. for debugging a procedure. 
+         It is similair but not the same as the internal function dbprint
+EXAMPLE: example dbpri; shows an example
+{
+   int i; 
+   if( defined(printlevel)==0 ) { int printlevel; export printlevel; }
+   if( n<=printlevel )
+   {
+      for( i=1; i<=size(#); i++ ) {  print(#[i]); }
+   }
+   return();
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s;
+   module M=freemodule(3); 
+   dbpri(0,"M =",M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc lprint 
+USAGE:   lprint(id[,n]);  id poly/ideal/vector/module/matrix, n integer
+RETURN:  string of id in a format fitting into lines of size n; if only one 
+         argument is present, n = pagewidth 
+NOTE:    id is printed columnwise, each column separated by a blank line;
+         hence lprint(transpose(id)); displays a matrix id in a format which
+         can be used as input to reproduce id
+EXAMPLE: example lprint; shows an example
+{
+   if (size(#)==1) { int n = pagewidth-3; }
+   else {int n = #[2]-3; }
+   matrix M = matrix(#[1]);
+   poly p,h,L; string s1,s,S; int jj,ii,a;
+   for (jj=1; jj<=ncols(M); jj++)
+   {   
+      for (ii=1; ii<=nrows(M); ii++)
+      {
+         a=2;
+         if (a+size(string(M[ii,jj])) <= n) {s = "  "+string(M[ii,jj]);}
+         else
+         {
+            h = lead(M[ii,jj]); p = M[ii,jj] - h; L = lead(p);
+            while (p != 0)
+            {
+               if (a+size(string(h+L)) > n) 
+               { 
+                  s = string(h);
+                  if (a != 0) { s = "  "+s; }
+                  if (a == 0 and s[1] != "-") { s = "+" + s; }
+                  a=0; h=0; S=S+newline+s;
+               }
+               h = h + L; p = p - L; L = lead(p);
+            }
+            s = string(h);
+            if (a == 0 and s[1] != "-") { s = "+" + s; }
+         }
+         if (ii != nrows(M)) { s = s+","; S=S+newline+s; }
+         else 
+         {
+            if (jj != ncols(M)) { s = s+","; S=S+newline+s+newline;}
+            else { S=S+newline+s; }
+         }
+      }
+   }
+   return(S[2,size(S)-1]);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r= 0,(x,y,z),ds;
+   poly f=((x+y)*(x-y)*(x+z)*(y+z)^2);
+   short = 0;    // no short output, use * and ^
+   lprint(f,40); newline;
+   ideal i = f^2,x-y,(x+y)^2*f;
+   short = 1;    // short output, omit * and ^
+   lprint(i); newline;
+   module m = [f^2,x-y,(x+y)^2*f],[0,x-y,f^2];
+   string s=lprint(m); s;"";
+   // the following commands show how to use the string s=lprint(m) (defined
+   // above) as input in order to reproduce m (by defining m1):
+   execute("matrix M[2][3]="+s+";");
+   module m1 = transpose(M); 
+   m-m1;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc pmat (matrix m, list #)
+USAGE:   pmat(M,[n]);  M matrix, n integer
+CREATE:  display M in array format if it fits into pagewidth, no return value;
+         if n is given, only the first n characters of each colum are shown
+RETURN:  no return value
+EXAMPLE: example pmat; shows an example 
+{
+//------------- main case: input is a matrix, no second argument---------------
+   if ( size(#)==0)
+   { 
+      int elems,mlen,slen,c,r;
+   //-------------- count maximal size of each column, and sum up -------------
+      for ( c=1; c<=ncols(m); c++)
+      {  int len(c);
+         for (r=1; r<=nrows(m); r++)
+         {
+            elems = elems+1;
+            string s(elems) = string(m[r,c])+",";
+            slen = size(s(elems));
+            if ( slen>len(c) ) { len(c) = slen; }
+         }
+         mlen = mlen+len(c);
+      }
+   //---------------------- print all - except last - rows --------------------
+      string aus; string sep = " ";
+      if (mlen >= pagewidth) { sep = newline; }
+      for (r=1; r<nrows(m); r++)
+      {  elems = r; aus = "";
+         for (c=1; c<=ncols(m); c++)
+         {
+            aus = aus + s(elems)[1,len(c)] + sep;
+            elems = elems + nrows(m);
+         }
+         aus;
+      }
+   //--------------- print last row (no comma after last entry) ---------------
+      aus = ""; elems = nrows(m);
+      for (c=1; c<ncols(m); c++)
+      {
+         aus = aus + s(elems)[1,len(c)] + sep;
+         elems = elems + nrows(m);
+      }
+      aus = aus + string(m[nrows(m),ncols(m)]);
+      aus;  return();
+   }
+//---------- second case: second argument is given and of type int ------------
+   if ( typeof(#[1])=="int" )
+   {  string aus,tmp; int ll,c,r;
+      for ( r=1; r<=nrows(m); r++)
+      {  aus = "";
+         for (c=1; c<=ncols(m); c++) 
+         { 
+            tmp=string(m[r,c]); 
+            aus=aus+tmp[1,#[1]]+" "; 
+         }
+         aus;
+      }
+      return();
+   }
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),ls;
+   ideal i= x,z+3y,x+y,z;
+   matrix m[3][3]=i^2;
+   pmat(m);
+   pmat(m,3);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc rMacaulay  
+USAGE:   rMacaulay(s[,n]);  s string, n integer
+RETURN:  a string which should be readable by Singular if s is a string read
+         by Singular from a file which was produced by Macaulay_1 (='Macaulay
+         classic'). If a second argument is present the first n lines of the 
+         file are deleted (which is useful if the file was prodeuced e.g. by 
+         the putstd command of Macaulay) 
+NOTE:    This does not always work with 'cut and paste' since, coming
+         from the screen, the character \ is treated differently 
+EXAMPLE: example rMacaulay; shows an example 
+{
+   int n;
+   if( size(#)==2 ) { n=#[2]; }
+   string s0 = #[1];
+//------------------------ delete first n=#[2] lines --------------------------
+   int ii=find(s0,newline); int jj;
+   for ( jj=1; jj<=n; jj++)
+   {
+      s0 = s0[ii+1,size(s0)-ii];
+      ii = find(s0,newline);
+   }
+//--------------- delete blanks and 'newline' at start and end ----------------
+   ii = 1;
+   while( s0[ii]==" " or s0[ii]==newline ) { ii=ii+1; }
+   s0 = s0[ii,size(s0)-ii+1]; ii = size(s0);
+   while ( s0[ii]==" " or s0[ii]==newline) { ii=ii-1; }
+   s0 = s0[1,ii];
+//------------------------- make each line a string ---------------------------
+   ii = find(s0,newline); jj=0; int kk;
+   while( ii!=0 )
+   {  jj = jj+1;  kk = ii+1;
+      while( s0[kk]==" " or s0[kk]==newline ) {  kk=kk+1; }
+      string s(jj) = s0[1,ii-1];
+      s0 = s0[kk,size(s0)-kk+1];
+      ii = find(s0,newline);
+   }
+   jj=jj+1; 
+   string s(jj) = s0;
+//------------ delete blanks and \ at end of each string and add , ------------
+   for( ii=1; ii<=jj; ii=ii+1 )
+   {  kk = 1;
+      while( s(ii)[kk]==" " ) { kk=kk+1; }
+      s(ii) = s(ii)[kk,size(s(ii))-kk+1];
+      kk = size(s(ii));
+      while( s(ii)[kk]==" " or s(ii)[kk]=="\\" or s(ii)[kk]==newline )
+         {  kk = kk-1; }
+      s(ii) = s(ii)[1,kk]+","+newline;
+   }
+//------------------------ replace blanks by , and add up ---------------------
+   int ll; s0 = ""; string s1,s2;
+   for( ii=1; ii<=jj; ii=ii+1 )
+   {
+      s1 = ""; s2 = s(ii);
+      kk = find(s(ii)," "); ll=kk+1;
+      while( kk!=0 ) 
+      {
+         while( s2[ll]==" ") { ll=ll+1; }
+         if( kk!=1 ) { s1=s1+s2[1,kk-1]+","+s2[kk+1,ll-kk]; }
+         if( kk==1 ) { s1 = s1+","+s2[kk+1,ll-kk]; }
+         s2 = s2[ll+1,size(s2)-ll];
+         kk = find(s2," "); ll=kk+1;
+      }
+      s(ii) = s1+s2; s0 = s0+s(ii);
+   }
+//---------------------------- replace [] by () -------------------------------
+   s1 = ""; s2 = s0;
+   ii = find(s2,"[");
+   while( ii!=0 )
+   {
+      s0 = s0[1,ii-1]+"("+s0[ii+1,size(s0)-ii];
+      if( ii>2 )
+      {
+         if(s0[ii-2]!="+" and s0[ii-2]!="-" and s0[ii-2]!="," and s0[ii-2]!=newline)
+         {
+            s0 = s0[1,ii-2]+"*"+s0[ii-1,size(s0)-ii+2];
+         }
+      }
+      ii = find(s0,"[");
+   }
+   jj = find(s0,"]");
+   while ( jj!=0 )
+   {
+      s0 = s0[1,jj-1]+")"+s0[jj+1,size(s0)-jj];
+      if(s0[jj+1]!="+"and s0[jj+1]!="-" and s0[jj+1]!="," and s0[jj+1]!="*")
+         { s0 = s0[1,jj] + "^" + s0[jj+1,size(s0)-jj]; }
+      jj = find(s0,"]");
+   }
+   s0 = s0[1,size(s0)-2];
+   return(s0);
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   // Assume there exists a file 'Macid' with the following ideal in Macaulay 
+   // format:"
+   // x[0]3-101/74x[0]2x[1]+7371x[0]x[1]2-13/83x[1]3-x[0]2x[2] \ 
+   //     -4/71x[0]x[1]x[2]-65/64x[1]2x[2]-49/111x[0]x[2]2-x[1]x[2]2 \
+   //     -747x[2]3+6072x[0]2x[3] 
+   // You can read this file into Singular and assign it to the string s1 by: 
+   // string s1 = read("Macid");
+   // This is equivalent to";
+   string s1 =
+   "x[0]3-101/74x[0]2x[1]+7371x[0]x[1]2-13/83x[1]3-x[0]2x[2] \
+        -4/71x[0]x[1]x[2]-65/64x[1]2x[2]-49/111x[0]x[2]2-x[1]x[2]2 \
+        -747x[2]3+6072x[0]2x[3]";
+   rMacaulay(s1);
+   // You may wish to assign s1 to a Singular ideal id:
+   string sid = "ideal id =",rMacaulay(s1),";";
+   ring r = 0,x(0..3),dp; 
+   execute sid;
+   id; "";
+   // The next example treats a matrix in Macaulay format. Using the execute
+   // command, this could be assinged to a Singular matrix as above.
+   string s2 = "
+   0  0  0  0  0
+   a3 0  0  0  0
+   0  b3 0  0  0
+   0  0  c3 0  0
+   0  0  0  d3 0
+   0  0  0  0  e3 ";
+   rMacaulay(s2);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc show  
+USAGE:   show(id);   id any object of basering or of type ring/qring
+         show(R,s);  R=ring, s=string (`s` = name of an object belonging to R)
+CREATE:  display id resp.`s` in a compact format together with some information
+RETURN:  no return value
+NOTE:    objects of type string, int, intvec, intmat belong to any ring.
+         id may be a ring or a qring. In this case the minimal polynomial is 
+         displayed, and, for a qring, also the defining ideal.
+         id must not be of type list
+CAUTION: show(R,s) does not work inside a procedure  
+EXAMPLE: example show; shows an example
+{ 
+//------------- use funny names in order to avoid name conflicts --------------
+   int @short@=short; short=1;
+   string @s@; 
+//----------------------------- check syntax ----------------------------------
+   if( size(#)==1 )
+   { 
+       def @id@ = #[1];  
+   }
+   if( size(#)==2 )
+   {
+      if( typeof(#[1])=="ring" or typeof(#[1])=="qring") 
+      { 
+         def @R@ = #[1];
+         setring @R@; 
+         def @id@=`#[2]`;   
+      }
+   }
+   if( defined(@id@)!=voice ) { "// wrong syntax, type help show;";  return(); }    
+//-------------------- case: @id@ belongs to any ring -------------------------
+   if( typeof(@id@)=="string" or typeof(@id@)=="int" or typeof(@id@)=="intvec"
+       or typeof(@id@)=="intmat" or typeof(@id@)=="list" )  
+   { 
+      "//", typeof(@id@);
+      @id@;
+      short=@short@; return(); 
+   }
+//-------------------- case: @id@ belongs to basering -------------------------
+   if( typeof(@id@)=="poly" or typeof(@id@)=="ideal" or typeof(@id@)=="matrix" )
+   {
+      if( typeof(@id@)=="ideal" ) { @s@=", "+string(ncols(@id@))+" generators";}
+      if( typeof(@id@)=="matrix") { @s@=", "+string(nrows(@id@))+"x"+string(ncols(@id@));}
+      "// "+ typeof(@id@)+ @s@;
+      print(matrix(@id@)); short=@short@; return();
+   }
+   if( typeof(@id@)=="vector" )
+   {
+      "//", typeof(@id@);
+      print(@id@);  short=@short@; return();
+   }
+   if( typeof(@id@)=="module" )
+   {
+      @s@=", "+string(ncols(@id@))+" generators";
+      "// "+ typeof(@id@)+ @s@;
+      int @n@;
+      for( @n@=1; @n@<=ncols(@id@); @n@++ ) { print(@id@[@n@]); }
+      short=@short@; return();
+   }
+   if( typeof(@id@)=="number" ) { "//", typeof(@id@); @id@; short=@short@; return(); }
+   if( typeof(@id@)=="map" ) 
+   { 
+      def @map = @id@;
+      "// nth variable of preimage ring is mapped to nth component of map";
+      if( size(#)==1 ) { type @map; }
+      if( size(#)==2 ) { type `#[2]`; }
+      short=@short@; return();
+   }
+//---------------------- case: @id@ is a ring/qring ---------------------------
+   if( typeof(@id@)=="ring" or typeof(@id@)=="qring" ) 
+   { 
+      setring @id@;
+      string s="("+charstr(@id@)+"),("+varstr(@id@)+"),("+ordstr(@id@)+");";
+      if( typeof(@id@)=="ring" ) 
+      { 
+         "// ring:",s;
+         "// minpoly =", minpoly;
+      }
+      if( typeof(@id@)=="qring" )
+      { 
+         "// qring:",s;
+         "// minpoly =", minpoly;
+         "// quotient ring from ideal:"; ideal(@id@); 
+      }
+      short=@short@; return();
+   }
+}
+example
+{  "EXAMPLE:"; echo = 2;
+    ring r;
+    show(r);
+    ideal i=x^3+y^5-6*z^3,xy,x3-y2;
+    show(i);
+    vector v=x*gen(1)+y*gen(3);
+    show(v); 
+    module m=v,2*v+gen(4); 
+    show(m);   
+    ring S=(0,T),(a,b,c,d),ws(1,2,3,4); 
+    minpoly = T2+1; 
+    ideal i=a2+b,c2+T2*d2; i=std(i); 
+    qring Q=i; 
+    show(Q); 
+    map F=r,a2,b^2,3*c3;
+    show(F);
+// Apply show to i (which does not belong to the basering) by typing
+// ring r; ideal i=xy,x3-y2; ring Q; show(r,"i");
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc split (string s, list #)
+USAGE:    split(s[,n]); s string, n integer
+RETURN:   same string, split into lines of length n separated by \
+          (default: n=pagewidth)
+NOTE:     may be used in connection with lprint
+EXAMPLE:  example split; shows an example 
+{
+   string line,re; int p,l;
+   if( size(#)==0 ) { int n=pagewidth; } 
+   else { int n=#[1]; }
+   if( s[size(s),1] != newline ) { s=s+newline; }
+   l=size(s);
+   while( 1 )
+   {
+      p=1;
+      l=find(s,newline); line=s[1,l];
+      while( l>=n )
+      {
+         re=re+line[p,n-2]+"\\"+newline;
+         p=p+n-2; l=l-n+2;
+      }
+      re=re+line[p,l-1]+"\\"+newline;
+      l=size(line); 
+      if( l>=size(s) ) break;
+      s=s[l+1,size(s)-l];
+   }
+   return (re[1,size(re)-2]);
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r= 0,(x,y,z),ds;
+   poly f = (x+y+z)^9;
+   split(string(f),40);
+   string s=split(lprint(f,40),40); s;
+   split(lprint(f));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc tab (int n)
+USAGE:   tab(n);  n integer
+RETURN:  string of n space tabs
+EXAMPLE: example tab; shows an example
+{
+   if( n==0 ) { return(""); }
+   string s=" ";
+   return(s[1,n]);
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   for(int n=0; n<=5; n=n+1)
+   { tab(5-n)+"*"+tab(n)+"+"+tab(n)+"*"; }
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc writelist (string fil, string nam, list L)
+USAGE:   writelist(fil,nam,L);  fil,nam=strings (file name, list name), L=list
+CREATE:  a file with name `fil`, write the content of the list L into it and
+         call the list `nam`.
+RETURN:  no return value
+NOTE:    The syntax of writelist uses and is similar to the the syntax of the
+         write command of Singular which does not manage lists properly.
+         If, say, (fil,nam) = ("listfile","L1"),  writelist creates (resp. 
+         appends if listfile exists) a file with name listfile and stores 
+         there the list L under the name L1. The Singular command  
+         execute(read("listfile")); assignes the content of L (stored in 
+         listfile) to a list L1.
+         On a UNIX system, overwrite an existing file if fil=">...", resp. 
+         append if fil=">>...".
+EXAMPLE: example writelist; shows an example
+{
+   int i;
+   write fil,"list "+nam+";";
+   if( fil[1]==">" ) { fil=fil[2..size(fil)]; }
+   if( fil[1]==">" ) { fil=fil[2..size(fil)]; }
+   for( i=1;i<=size(L);i++ )
+   {
+     write fil,"   "+nam+"["+string(i)+"]=",string(L[i])+";";
+   }
+   return();
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r;
+   ideal i=x,y,z;
+   list k="Hi",nameof(basering),i,37;
+   writelist("zumSpass","lustig",k);
+   read("zumSpass");
+   list L=res(i,0);       //resolution of the maximal ideal
+   writelist("L","L",L);
+   read("L");
+   // You might wish to remove the just created files `zumSpass` and `L`!
+}
+///////////////////////////////////////////////////////////////////////////////

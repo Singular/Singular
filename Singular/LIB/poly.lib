@@ -1,0 +1,206 @@
+// $Id: poly.lib,v 1.1.1.1 1997-04-25 15:13:26 obachman Exp $
+//system("random",787422842);
+//(GMG)
+///////////////////////////////////////////////////////////////////////////////
+
+LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS AND IDEALS        
+
+ ishomog(poly/...);     int, =1 resp. =0 if input is homogeneous resp. not
+ maxcoef(poly/...);     maximal length of coefficient occuring in poly/... 
+ maxdeg(poly/...);      int/intmat = degree/s of terms of maximal order
+ mindeg(poly/...);      int/intmat = degree/s of terms of minimal order
+ normalize(poly/...);   normalize poly/... such that leading coefficient is 1
+           (parameters in square brackets [] are optional)
+
+LIB "general.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+proc ishomog (id) 
+USAGE:   ishomog(id);  id  poly/ideal/vector/module/matrix
+RETURN:  integer which is 1 if input is homogeneous (resp. weighted homogeneous
+         if the monomial ordering consists of one block of type ws,Ws,wp or Wp,
+         assuming that all weights are positive) and 0 otherwise
+NOTE:    A vector is homogeneous, if the components are homogeneous of same
+         degree, a module/matrix is homogeneous if all column vectors are
+         homogeneous
+         //*** ergaenzen, wenn Matrizen Spalten Gewichte haben
+EXAMPLE: example ishomog; shows an example
+{
+   module M = module(matrix(id));
+   M = simplify(M,2);                        // remove 0-columns
+   intvec v = ringweights(basering);
+   int i,j=1,1;
+   for (i=1; i<=ncols(M); i++)
+   {
+      if( M[i]!=jet(M[i],deg(lead(M[i])),v)-jet(M[i],deg(lead(M[i]))-1,v))
+      { return(0); }
+   }
+   return(1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),wp(1,2,3);
+   ishomog(x5-yz+y3);
+   ideal i = x6+y3+z2, x9-z3;
+   ishomog(i);
+   ring s = 0,(a,b,c),ds;
+   vector v = [a2,0,ac+bc];
+   vector w = [a3,b3,c4];
+   ishomog(v);
+   ishomog(w);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc maxcoef (f)
+USAGE:   maxcoef(f);  f  poly/ideal/vector/module/matrix
+RETURN:  maximal length of coefficient of f of type int (by counting the  
+         length of the string of each coefficient)
+EXAMPLE: example maxcoef; shows an example
+{
+   int max,s,ii,jj; string t;
+   ideal i = ideal(matrix(f));
+   i = simplify(i,6);         //* delete 0's and keep first of equal elements
+   poly m = var(1); matrix C;
+   for (ii=2;ii<=nvars(basering);ii++) { m = m*var(ii); }
+   for (ii=1; ii<=size(i); ii++)
+   {
+      C = coef(i[ii],m);
+      for (jj=1; jj<=ncols(C); jj++)
+      {
+         t = string(C[2,jj]);  s = size(t);
+         if ( t[1] == "-" ) { s = s - 1; }
+         if ( s > max ) { max = s; }
+      }
+   }
+   return(max);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r= 0,(x,y,z),ds;
+   poly g = 345x2-1234567890y+7/4z;
+   maxcoef(g);
+   ideal i = g,10/1234567890;   
+   maxcoef(i); 
+   // since i[2]=1/123456789 
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc maxdeg (id) 
+USAGE:   maxdeg(id);  id  poly/ideal/vector/module/matrix
+RETURN:  maximal degree/s of monomials of id independent of ring ordering 
+         (maxdeg of each variable is 1)
+         of type int if id is of type poly, of type intmat else
+EXAMPLE: example maxdeg; shows an example
+{
+//------------------- find maximal degree of given component ------------------
+   proc findmaxdeg
+   {
+      poly c = #[1];
+      if (c==0) { return(-1); }
+   //--- guess upper 'o' and lower 'u' bound, in case of negative weights -----
+      int d = (deg(c)>=0)*deg(c)-(deg(c)<0)*deg(c);
+      int i = d;
+      while ( c-jet(c,i) != 0 ) { i = 2*(i+1); }
+      int o = i-1;
+      int u = (d != i)*((i/ 2)-1);
+   //----------------------- "quick search" for maxdeg ------------------------
+      while ( (c-jet(c,i)==0)*(c-jet(c,i-1)!=0) == 0)
+      {
+         i = (o+1+u)/ 2;
+         if (c-jet(c,i)!=0) { u = i+1; }
+         else { o = i-1; }
+      }
+      return(i);
+   }
+//------------------------------ main program ---------------------------------
+   matrix M = matrix(id);
+   int r,c = nrows(M), ncols(M); int i,j;
+   intmat m[r][c];
+   for (i=r; i>0; i--)
+   {
+      for (j=c; j>0; j--) { m[i,j] = findmaxdeg(M[i,j]); }
+   }
+   if( typeof(id)=="poly" ) { return(m[1,1]); }
+   return(m);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),wp(-1,-2,-3);
+   poly f = x+y2+z3;
+   deg(f);               //deg returns weighted degree (in case of 1 block)!
+   maxdeg(f);
+   matrix m[2][2]=f+x10,1,0,f^2;
+   maxdeg(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc mindeg (id)
+USAGE:   mindeg(id);  id  poly/ideal/vector/module/matrix
+RETURN:  minimal degree/s of monomials of id independent of ring ordering
+         (mindeg of each variable is 1)
+         of type int if id is of type poly, of type intmat else
+EXAMPLE: example mindeg; shows an example
+{
+//------------------- find minimal degree of given component ------------------
+   proc findmindeg
+   {
+      poly c = #[1];
+      if (c==0) { return(-1); }
+   //--- guess upper 'o' and lower 'u' bound, in case of negative weights -----
+      int d = (ord(c)>=0)*ord(c)-(ord(c)<0)*ord(c);
+      int i = d;
+      while ( jet(c,i) == 0 ) { i = 2*(i+1); }
+      int o = i-1;
+      int u = (d != i)*((i/ 2)-1);
+//----------------------- "quick search" for mindeg --------------------------
+      while ( (jet(c,u)==0)*(jet(c,o)!=0) )
+      {
+         i = (o+u)/ 2;
+         if (jet(c,i)==0) { u = i+1; }
+         else { o = i-1; }
+      }
+      if (jet(c,u)!=0) { return(u); }
+      else { return(o+1); }
+   }
+//------------------------------ main program ---------------------------------
+   matrix M = matrix(id);
+   int r,c = nrows(M), ncols(M); int i,j;
+   intmat m[r][c];
+   for (i=r; i>0; i--)
+   {
+      for (j=c; j>0; j--) { m[i,j] = findmindeg(M[i,j]); }
+   }
+   if (typeof(id)=="poly") { return(m[1,1]); }
+   return(m);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),ls;
+   poly f = x5+y2+z3;
+   ord(f);                // ord returns weighted order of leading term!         
+   mindeg(f);
+   matrix m[2][2]=x10,1,0,f^2;
+   mindeg(m); 
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc normalize (id)
+USAGE:   normalize(id);  id=poly/vector/ideal/module
+RETURN:  object of same type with leading coefficient equal to 1
+EXAMPLE: example normalize; shows an example
+{  
+   return(simplify(id,1));
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),ls;
+   poly f = 2x5+3y2+4z3;
+   normalize(f);
+   module m=[9xy,0,3z3],[4z,6y,2x];
+   normalize(m);
+   ring s = 0,(x,y,z),(c,ls);
+   module m=[9xy,0,3z3],[4z,6y,2x];
+   normalize(m);
+   normalize(matrix(m));  // by automatic type conversion to module!
+}
+///////////////////////////////////////////////////////////////////////////////

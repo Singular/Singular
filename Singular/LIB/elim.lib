@@ -1,0 +1,265 @@
+// $Id: elim.lib,v 1.1.1.1 1997-04-25 15:13:25 obachman Exp $
+//system("random",787422842);
+//(GMG)
+///////////////////////////////////////////////////////////////////////////////
+
+LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
+
+ blowup0(j[,s1,s2]);    create presentation of blownup ring of ideal j  
+ elim(id,n,m);          variable n..m eliminated from id (ideal/module)
+ elim1(id,p);           p=product of vars to be eliminated from id  
+ nselect(id,n[,m]);     select generators not containing nth [..mth] variable
+ sat(id,j);             saturated quotient of ideal/module id by ideal j 
+ select(id,n[,m]);      select generators containing nth [..mth] variable
+           (parameters in square brackets [] are optional)
+
+LIB "inout.lib";
+LIB "general.lib";
+LIB "poly.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+proc blowup0 (ideal j,list #)
+USAGE:   blowup0(j[,s1,s2]); j ideal, s1,s2 nonempty strings 
+CREATE:  Create a presentation of the blowup ring of j 
+RETURN:  no return value
+NOTE:    s1 and s2 are used to give names to the blownup ring and the blownup
+         ideal (default: s1="j", s2="A")
+         Assume R = char,x(1..n),ord is the basering of j, and s1="j", s2="A"
+         then the procedure creates a new basering with name Bl_jR
+         (equal to R[A,B,...])
+               Bl_jR = char,(A,B,...,x(1..n)),(dp(k),ord) 
+         with k=ncols(j) new variables A,B,... and ordering wp(d1..dk) if j is 
+         homogeneous with deg(j[i])=di resp. dp otherwise for these vars.
+         If k>26 or size(s2)>1, say s2="A()", the new vars are A(1),...,A(k). 
+         Let j_ be the kernel of the ring map Bl_jR -> R defined by A(i)->j[i],
+         x(i)->x(i), then the quotient ring Bl_jR/j_ is the blowup ring of j
+         in R (being isomorphic to R+j+j^2+...). Moreover the procedure creates
+         a std basis of j_ with name j_ and Bl_jR as basering.
+EXAMPLE: example blowup0; shows an example
+{
+   string bsr = nameof(basering);
+   def br = basering;
+   string cr, vr, o = charstr(br), varstr(br), ordstr(br);
+   int n, k = nvars(br), ncols(j);
+   int i; 
+//---------------- create coordinate ring of blown up space -------------------
+   if( size(#)==0 ) { #[1] = "j"; #[2] = "A"; }
+   if( size(#)==1 ) { #[2] = "A"; }
+   if( k<=26 and size(#[2])==1 ) { string nv = A_Z(#[2],k)+","; }
+   else { string nv = (#[2])[1]+"(1.."+string(k)+"),"; }
+   if( ishomog(j) ) 
+   { 
+      intvec v=1;
+      for( i=1; i<=k; i++) { v[i+1]=deg(j[i]); }
+      string nor = "),(wp(v),";
+   }
+   else { string nor = "),(dp(1+k),";}
+   execute("ring Bl=("+cr+"),(t,"+nv+vr+nor+o+");");
+//---------- map to new ring, eliminate and create blown up ideal -------------
+   ideal j=imap(br,j);
+   for( i=1; i<=k; i++) { j[i]=var(1+i)-t*j[i]; } 
+   j=eliminate(j,t);
+   v=v[2..size(v)];
+   execute("ring Bl_"+#[1]+bsr+"=("+cr+"),("+nv+vr+nor+o+");");
+   ideal `#[1]+"_"`=imap(Bl,j);
+   export basering;
+   export `#[1]+"_"`;
+   keepring basering;
+//------------------- some comments about usage and names  --------------------
+   if( voice ==2 )
+   {
+"// NOTE:";
+"// basering is now Bl_"+#[1]+bsr+" (equal to "+bsr+"["+nv[1,size(nv)-1]+"])";
+"// it contains the ideal "+#[1]+"_ , such that";
+"//             Bl_"+#[1]+bsr+"/"+#[1]+"_ is the blowup ring"; 
+"// For blowing-up another ideal in "+bsr+" type first:";
+"//             setring "+bsr+";";
+   }
+   return();
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring R=0,(x,y),dp;
+   poly f=y2+x3; ideal j=jacob(f); 
+   blowup0(j);
+   type basering; "";
+// NOTE:
+// basering is now Bl_jR (equal to R[A,B])
+// it contains the ideal j_ , such that
+//             Bl_jR/j_ is the blowup ring
+// For blowing-up another ideal in R type first:
+//             setring R;
+   type j_; "";
+   ring r=32003,(x,y,z),ds;
+   blowup0(maxideal(1),"m","T()");
+   type basering; "";
+// NOTE:
+// basering is now Bl_mr (equal to r[T(1..3)])
+// it contains the ideal m_ , such that
+//             Bl_mr/m_ is the blowup ring
+// For blowing-up another ideal in r type first:
+//             setring r;
+   m_;
+   kill Bl_jR, Bl_mr; 
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc elim (id, int n, int m)
+USAGE:   elim(id,n,m);  id ideal/module, n,m integers 
+RETURNS: ideal/module obtained from id by eliminating variables n..m 
+NOTE:    no special monomial ordering is required, result is a SB with 
+         respect to ordering dp (resp. ls) if the first var not to be 
+         eliminated belongs to a -p (resp. -s) blockordering 
+EXAMPLE: example elim; shows an example
+{
+//---- get variables to be eliminated and create string for new ordering ------
+   int ii; poly vars=1;
+   for( ii=n; ii<=m; ii=ii+1 ) { vars=vars*var(ii); }   
+   if( n>1 ) { poly p = 1+var(1); }
+   else { poly p = 1+var(m+1); }
+   if( ord(p)==0 ) { string ordering = "),ls;"; }
+   if( ord(p)>0 ) { string ordering = "),dp;"; }
+//-------------- create new ring and map objects to new ring ------------------
+   def br = basering;
+   string str = "ring newr = ("+charstr(br)+"),("+varstr(br)+ordering;
+   execute(str);
+   def i = imap(br,id);
+   poly vars = imap(br,vars);
+//---------- now eliminate in new ring and map back to old ring ---------------
+   i = eliminate(i,vars);
+   setring br;
+   return(imap(newr,i));
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,u,v,w),dp;
+   ideal i=x-u,y-u2,w-u3,v-x+y3;
+   elim(i,3,4); 
+   module m=i*gen(1)+i*gen(2);
+   m=elim(m,3,4);show(m); 
+}
+/////////////////////////////////////////////////////////////////////////////// 
+
+proc elim1 (id, poly vars)
+USAGE:   elim1(id,poly); id ideal/module, poly=product of vars to be eliminated
+RETURN:  ideal/module obtained from id by eliminating vars occuring in poly
+NOTE:    no special monomial ordering is required, result is a SB with
+         respect to ordering dp (resp. ls) if the first var not to be
+         eliminated belongs to a -p (resp. -s) blockordering
+EXAMPLE: example elim1; shows an example
+{
+//---- get variables to be eliminated and create string for new ordering ------
+   int ii;                       
+   for( ii=1; ii<=nvars(basering); ii++ )
+   {   
+      if( vars/var(ii)==0 ) { poly p = 1+var(ii); }
+      break;
+   }
+   if( ord(p)==0 ) { string ordering = "),ls;"; }
+   if( ord(p)>0 ) { string ordering = "),dp;"; }
+//-------------- create new ring and map objects to new ring ------------------
+   def br = basering;
+   string str = "ring newr = "+charstr(br)+",("+varstr(br)+ordering;
+   execute(str);
+   def id = fetch(br,id);
+   poly vars = fetch(br,vars);
+//---------- now eliminate in new ring and map back to old ring ---------------
+   id = eliminate(id,vars);
+   setring br;
+   return(imap(newr,id));
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,t,s,z),dp;
+   ideal i=x-t,y-t2,z-t3,s-x+y3;
+   elim1(i,ts); 
+   module m=i*gen(1)+i*gen(2);
+   m=elim1(m,st); show(m); 
+}
+/////////////////////////////////////////////////////////////////////////////// 
+
+proc nselect (id, int n, list#)
+USAGE:   nselect(id,n[,m]); id a module or ideal, n, m integers
+RETURN:  generators of id not containing the variable n [up to m]
+EXAMPLE: example nselect; shows an example
+{
+   if( size(#)==0 ) { #[1]=n; }
+   int j,k;
+   for( k=1; k<=ncols(id); k++ )
+   {  
+      for( j=n; j<=#[1]; j++ )
+      {
+         if( size(id[k]/var(j))!=0) { id[k]=0; break; }
+      }
+   }
+   return(simplify(id,2));
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,t,s,z),(c,dp);
+   ideal i=x-y,y-z2,z-t3,s-x+y3;
+   nselect(i,3);
+   module m=i*(gen(1)+gen(2)); 
+   show(m);
+   show(nselect(m,3,4));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sat (id, ideal j)
+USAGE:   sat(id,j);  id ideal or module, j ideal
+RETURN:  saturation of id with respect to j (= union_(k=1...) of id:j^k)
+NOTE:    result is a std basis in the basering
+EXAMPLE: example sat; shows an example
+{
+   int ii,kk;
+   def i=id; id=std(id); 
+   while( ii<=size(i) )
+   {   
+      if( voice==2 )
+      {"// start quotient:",kk+1;}
+      i=quotient(id,j);
+      for( ii=1; ii<=size(i); ii++ )
+      {
+         if( reduce(i[ii],id)!=0 ) break;
+      }
+      id=std(i); kk=kk+1;
+   }
+   if( voice==2 )
+   {"//  saturation becomes stable after",kk-1,"iteration(s)";"";}
+   return (id);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring r=2,(x,y,z),dp;
+   poly F=x5+y5+(x-y)^2*xyz;
+   ideal j= jacob(F);
+   sat(j,maxideal(1)); 
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc select (id, int n, list#)
+USAGE:   select(id,n[,m]); id ideal/module, n, m integers
+RETURN:  generators of id containing the variable n [up to m]
+EXAMPLE: example select; shows an example
+{
+   if( size(#)==0 ) { #[1]=n; }
+   int j,k;
+   for( k=1; k<=ncols(id); k++ )
+   {  
+      for( j=n; j<=#[1]; j++ )
+      {
+         if( size(id[k]/var(j))==0) { id[k]=0; break; }
+      }
+   }
+   return(id+id);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,t,s,z),(c,dp);
+   ideal i=x-y,y-z2,z-t3,s-x+y3;
+   ideal j=select(i,1);
+   module m=i*(gen(1)+gen(2)); show(m);
+   show(select(m,1,2));
+}
+///////////////////////////////////////////////////////////////////////////////
+

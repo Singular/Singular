@@ -1,0 +1,212 @@
+// $Id: homolog.lib,v 1.1.1.1 1997-04-25 15:13:26 obachman Exp $
+//(BM 11/95)
+///////////////////////////////////////////////////////////////////////////////
+
+LIBRARY:  homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA                             
+
+Ext_R(k,id);            Ext^k(R/id,R), id  = ideal
+Ext(k,M,N);             Ext^k(M,N),    M,N = modules
+Hom(M,N);               Hom(M,N),      M,N = modules
+kohom(A,k);             Hom(R^k,A), A = matrix
+kontrahom(A,k);         Hom(A,R^k), A = matrix
+   
+LIB "matrix.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+proc Ext_R (int k, ideal I, list #)
+USAGE:   Ext_R(k,id[,any]);  k=integer, id=ideal
+DISPLAY: degree of Ext^k(P/id,P)
+RETURN:  Ext^k(P/id,P), presentation as a quotient of a free module.
+         If a third argument is given (of any type) return a list of two 
+         modules:
+           [1] = module Ext^k(P/id,P)
+           [2] = SB of  Ext^k(P/id,P)
+EXAMPLE: example Ext_R; shows an example
+{
+   module m1,m2,ret,ret0;   
+//------------------ compute resolution of P/I --------------------------------
+   mres(I,k+1,resI);
+//-----------------  apply Hom(_,P) at k-th place -----------------------------
+   m2 = transpose(resI(k+1));   
+   m1 = transpose(resI(k));
+//-----------------  ker(m2)/im(m1) -------------------------------------------
+   m2 = simplify(m2,10);         
+   if (m2[1]==0) { ret = m1; }
+   else          { ret = modulo(syz(m2),m1); }
+   ret0 = std(ret);
+   "// degree of Ext^"+string(k)+"(P/I,P):";degree(ret0);
+   if (size(#)>0) { return(ret,ret0); } 
+   return(ret);
+}
+example
+{ "EXAMPLE:";     echo=2;
+   ring r=0,(x,y,z),dp;
+   ideal  i = x2y,y2z,z3x; 
+   module E = Ext_R(1,i);"";
+   E = Ext_R(2,i);
+   show(E);"";
+   list LE = Ext_R(3,i,"");
+   kbase(LE[2]);"";
+   E = Ext_R(4,i);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc Ext (int k, module M, module N, list #)
+USAGE:   Ext(k,M,N[,any]);  k=integer, M,N=modules
+DISPLAY: degree of Ext^k(M,N)
+RETURN:  Ext^k(M,N), presentation as a quotient of a free module.
+         If a third argument is given (of any type) return a list of two 
+         modules:
+           [1] = module Ext^k(M,N)
+           [2] = SB of  Ext^k(M,N)
+EXAMPLE: example Ext; shows an example
+{
+   module A,B,C,M1,M2,ker,imag,extMN,extMN0;
+   ideal  test1,test2;
+//----------  resolution of M  and N ------------------------------------------
+  if (k>0)
+  { 
+     mres(M,k+1,resM);
+     M1 = resM(k);
+     M2 = resM(k+1);
+     test1 = simplify(ideal(M1),10); 
+     test2 = simplify(ideal(N),10); 
+     if ((test1[1]==0) or (test2[1]==0))
+        { "//Ext(M,N)=0";return(extMN); }
+     else
+     {  
+       test1 = simplify(ideal(M2),10);
+       if (test1[1]==0)                             //Ker(Hom(m2,N)) 
+          { ker = freemodule(ncols(M1)*nrows(N));}
+       else
+       { 
+          A   = kontrahom(M2,nrows(N));
+          B   = kohom(N,ncols(M2));
+          C   = intersect(A,B);
+          C   = reduce(C,std(ideal(0)));C=simplify(C,10);
+          ker = lift(A,C)+syz(A);    
+       }
+       imag  = kohom(N,ncols(M1));
+       A     = kontrahom(M1,nrows(N));
+       imag  = imag+A;                              //im(Hom(m1,M))
+       extMN = modulo(ker,imag);
+       extMN0= std(extMN);
+       "// degree of Ext^"+string(k)+"(M,N):";degree(extMN0);
+     }
+  } 
+  else { extMN,extMN0 = Hom(M,N,1); }
+  if (size(#)>0) { return(extMN,extMN0); } 
+  return(extMN );
+}
+example
+{ "EXAMPLE:"; echo=2;
+   ring r=0,(x,y),(c,dp);
+   ideal i=x2-y3;
+   qring qr=std(i);
+   module M=[-x,y],[-y2,x];
+   list EXT1=Ext(1,M,M,"");
+   kbase(EXT1[2]);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+proc Hom (module M, module N, list #)
+USAGE:   Hom(M,N);  M,N=modules
+DISPLAY: degree of Hom(M,N);
+RETURN:  Hom(M,N), presentation as a quotient of a free module.
+         If a third argument is given (of any type) return a list of two 
+         modules:
+           [1] = module Hom(M,N)
+           [2] = SB of  Hom(M,N)
+EXAMPLE: example Hom; shows an example
+{
+//---------- initialisation ---------------------------------------------------
+   module A,B,C,ker,imag,homMN,homMN0;
+   ideal  tes;
+   tes = simplify(ideal(M),10);
+   if (tes[1]==0)
+   {
+      "// Hom(ring,N)=N";
+      if (size(#)>0) { return(N,std(N)); }
+      return(N);
+   }
+   tes = simplify(ideal(N),10);  
+   if (tes[1]==0)
+   {
+      "// Hom(M,ring)=M^*";
+      homMN = transpose(M);
+      if (size(#)>0) { return(homMN,std(homMN));}
+      return(homMN);
+   }
+   B = kohom(N,ncols(M));
+   A = kontrahom(M,nrows(N));
+   C = intersect(A,B);
+   C = reduce(C,std(ideal(0)));C=simplify(C,10);
+   ker   = lift(A,C)+syz(A);                              //ker(Hom(m,N))
+   imag  = kohom(N,ncols(M));                             //im(Hom(M,n))
+   homMN = modulo(ker,imag);
+   homMN0= std(homMN);
+   "// degree of Hom(M,N):";degree(homMN0);
+   if (size(#)>0) { return(homMN,homMN0); }
+   return(homMN);
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring r=0,(x,y),(c,dp);
+   ideal i=x2-y3;
+   qring q=std(i);
+   module M=[-x,y],[-y2,x];
+   module hom=Hom(M,M);
+   print(hom); newline;
+   ring s=3,(x,y,z),(c,dp);
+   ideal i=x2+y5+z4;i=jacob(i);
+   qring rq=std(i);
+   matrix M[2][2]=xy,x3,5y,z2,x2;
+   matrix N[4][4]=x,y,z,x2,xyx2y,y3,xz2,x2z,z3;
+   print(M);
+   print(N);
+   print(Hom(M,N));
+}
+////////////////////////////////////////////////////////////////////////////////
+
+proc qmod (module M, module N)
+USAGE:   qmod(M,N); M,N=modules, N a submodule of M
+COMPUTE: presentation S of M/N, i.e. M/N<<--F<--[S], F free of rank = size(M) 
+RETURN:  module  S
+{     
+  return(lift(M,N)+syz(M));
+}
+//////////////////////////////////////////////////////////////////////////////
+
+proc kontrahom (matrix M, int j)
+USAGE:   qmod(M,N); M,N=modules, N a submodule of M
+USAGE:   kontrahom(A,k); A=matrix, k=integer
+RETURN:  Hom(A,P^k), i.e. let A be a matrix defining a map: F1 --> F2 of free 
+         P-modules, the matrix of Hom(F2,P^k)-->Hom(F1,P^k) is computed
+EXAMPLE: example kontrahom; shows an example
+{
+  return(transpose(outer(diag(1,j),M))); 
+}
+example
+{ "EXAMPLE:";  echo=2;
+   ring r;
+   matrix n[2][3]=x,y,5,z,77,33;
+   print(kontrahom(n,3));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc kohom (matrix M, int j)
+USAGE:   kohom(A,k); A=matrix, k=integer
+RETURN:  Hom(P^k,A) i.e. let A be a matrix defining a map: F1 --> F2 of free 
+         P-modules, the matrix of Hom(P^k,F1)-->Hom(P^k,F2) is computed
+EXAMPLE: example kohom; shows an example
+{
+    return(outer(M,diag(1,j)));  
+}
+example
+{ "EXAMPLE:";   echo=2;
+   ring r;
+   matrix n[2][3]=x,y,5,z,77,33;
+   print(kohom(n,3));          
+}
+///////////////////////////////////////////////////////////////////////////////
+
