@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.25 2001-02-23 16:25:10 levandov Exp $
+ *  Version: $Id: pInline2.h,v 1.26 2001-02-23 16:28:24 levandov Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -519,7 +519,7 @@ PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
      res = nc_p_Minus_mm_Mult_qq(p, m, q, r);
-#elseif
+#else
   res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
 #endif
   lp = (lp + lq) - shorter;
