@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.50 1999-12-08 17:59:32 obachman Exp $
+### $Id: Makefile.in,v 1.51 1999-12-08 18:44:09 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -252,13 +252,16 @@ uninstall:
 	- rmdir ${infodir}
 
 install-sharedist: singular.hlp html/index.htm singular.idx \
-                   COPYING.txt COPYING.html NEWS.txt NEWS.html 
+                   ${STANDALONE_HTML_FILES} ${STANDALONE_TXT_FILES}
 	${MKINSTALLDIRS} ${install_prefix}
 	${MKINSTALLDIRS} ${install_infodir}
 	${INSTALL_DATA} singular.hlp ${install_infodir}
 	${MKINSTALLDIRS} ${install_htmldir} 
 	cp ${HTML_SUBDIR}/* ${install_htmldir}
-	chmod 644 ${htmldir}/*
+	chmod 644 ${install_htmldir}/*
+	${MKINSTALLDIRS} ${install_exdir}
+	cp ${exdir}/*.sing ${install_exdir}
+	chmod 644 ${install_exdir}/*.sing
 	${MKINSTALLDIRS} ${install_docdir}
 	${INSTALL_DATA} singular.idx ${install_docdir}
 	${INSTALL_DATA} COPYING.txt ${install_prefix}/COPYING

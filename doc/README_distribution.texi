@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_distribution.texi,v 1.1 1999-12-08 17:59:33 obachman Exp $
+@comment $Id: README_distribution.texi,v 1.2 1999-12-08 18:44:09 obachman Exp $
 @c FILE: README_distribution.texi
 @c PURPOSE: general README file to be included in the distribution 
 @c
@@ -39,10 +39,11 @@ version(s).
 @ifhtml
 @item @uref{\url\,,\name\}
 @end ifhtml
-@ifnothtml
+@ifinfo
 @item @code{\name\}
-@end ifnothtml
+@end ifinfo
 @end macro
+
 
 See the files
 @table @asis
@@ -53,6 +54,7 @@ for license information for @sc{Singular}
 @nref{INSTALL, INSTALL.html}
 for installation instructions
 @end table
+
 
 More and up-to-date information about @sc{Singular} is always available
 from
