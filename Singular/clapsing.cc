@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.39 1998-07-29 13:55:43 Singular Exp $
+// $Id: clapsing.cc,v 1.40 1998-09-22 14:09:01 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -406,14 +406,14 @@ void singclap_divide_content ( poly f )
     CFList L;
     CanonicalForm g, h;
     poly p = pNext(f);
-    nTest(pGetCoeff(f));
+    //nTest(pGetCoeff(f));
     FACTORY_ALGOUT( "G = ", (((lnumber)pGetCoeff(f))->z) );
     g = convSingTrClapP( ((lnumber)pGetCoeff(f))->z );
     L.append( g );
     TIMING_START( contentTimer );
     while ( (p != NULL) && (g != 1) )
     {
-      nTest(pGetCoeff(p));
+      //nTest(pGetCoeff(p));
       FACTORY_ALGOUT( "h = ", (((lnumber)pGetCoeff(p))->z) );
       h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
       p = pNext( p );
@@ -463,7 +463,7 @@ void singclap_divide_content ( poly f )
         nTest(nt);
         #endif
         c->z=convClapPSingTr( i.getItem() / g );
-        nTest((number)c);
+        //nTest((number)c);
         //#ifdef LDEBUG
         //number cn=(number)c;
         //StringSet(""); nWrite(nt); StringAppend(" ==> ");
@@ -939,6 +939,8 @@ BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
   intvec *v=NULL;
   int sw=(int)dummy->Data();
   ideal f=singclap_factorize((poly)(u->Data()), &v, sw);
+  if (f==NULL)
+    return TRUE;
   switch(sw)
   {
     case 0:
@@ -956,7 +958,22 @@ BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
     }
     case 1:
       res->data=(void *)f;
-      return f==NULL;
+      return FALSE;
+    case 3:
+      {
+        poly p=f->m[0];
+        int i=IDELEMS(f);
+        f->m[0]=NULL;
+        while(i>1)
+        {
+          i--;
+          p=pMult(p,f->m[i]);
+          f->m[i]=NULL;
+        }
+        res->data=(void *)p;
+        res->rtyp=POLY_CMD;
+      }
+      return FALSE;
   }
   WerrorS("invalid switch");
   return TRUE;

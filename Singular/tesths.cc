@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.51 1998-08-03 16:39:34 Singular Exp $ */
+/* $Id: tesths.cc,v 1.52 1998-09-22 14:09:05 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -277,7 +277,6 @@ int main(          /* main entry to Singular */
   ttGen1();
   ttGen2();
 #else
-  int i;
   thisfile = argv[0];
   BOOLEAN load_std_lib=TRUE;
   BOOLEAN load_rc = TRUE;
@@ -296,9 +295,9 @@ int main(          /* main entry to Singular */
   {
     switch(optc)
     {
-   
+
         case 'b':
-#ifdef HAVE_MPSR   
+#ifdef HAVE_MPSR
           feBatch=TRUE;
           mainSetSingOptionValue(LON_BATCH, (char*) 1);
           break;
@@ -338,7 +337,7 @@ int main(          /* main entry to Singular */
 #ifdef HAVE_TCL
           tclmode = TRUE;
           mainSetSingOptionValue(LON_TCLMODE, (char*) 1);
-	  verbose|=Sy_bit(V_SHOW_MEM);
+          verbose|=Sy_bit(V_SHOW_MEM);
           break;
 #else
           printf("%s: Option `-x' not supported in this configuration\n", argv[0]);
@@ -377,7 +376,7 @@ int main(          /* main entry to Singular */
           execute_string = optarg;
           mainSetSingOptionValue(LON_EXECUTE, optarg);
           break;
-   
+
         case 'r':
           errno = 0;
           siRandomStart = strtol(optarg, NULL, 10);
@@ -397,7 +396,7 @@ int main(          /* main entry to Singular */
           #endif
           mainSetSingOptionValue(LON_RANDOM, optarg);
           break;
-   
+
         case 'u':
           mainSetSingOptionValue(LON_USER_OPTION, optarg);
           break;
@@ -435,7 +434,7 @@ int main(          /* main entry to Singular */
           {
             mainSetSingOptionValue(LON_MP_HOST, optarg);
           }
-#endif   
+#endif
           else if (strcmp(longopts[option_index].name, LON_TICKS_PER_SEC) == 0)
           {
             int ticks = atoi(optarg);
@@ -506,7 +505,7 @@ int main(          /* main entry to Singular */
   }
   errorreported = 0;
 #ifndef macintosh
-#if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
+#if defined(HAVE_READLINE)
   fe_set_input_mode();
 #endif
 #endif

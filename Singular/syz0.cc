@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.16 1998-06-12 17:41:41 obachman Exp $ */
+/* $Id: syz0.cc,v 1.17 1998-09-22 14:09:02 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -432,7 +432,7 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL, spSpolyLoopProc SpolyLoop=NULL)
 {
   int j,i=0;
   poly p;
-  
+
   if (toNorm==NULL) return NULL;
   p = pHead(toNorm);
   if (mW!=NULL)
@@ -446,7 +446,7 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL, spSpolyLoopProc SpolyLoop=NULL)
     {
       //pNorm(toNorm);
       toNorm = spSpolyRed(currQuotient->m[i],toNorm,NULL, SpolyLoop);
-      pDelete(&p); 
+      pDelete(&p);
       if (toNorm==NULL) return NULL;
       p = pHead(toNorm);
       if (mW!=NULL)
@@ -804,12 +804,12 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         bl0[j] = currRing->block0[m_order];
         bl1[j] = currRing->block1[m_order];
         wv[j] = currRing->wvhdl[m_order];
-	tmpR = *currRing;
-	tmpR.order = ord;
-	tmpR.block0 = bl0;
-	tmpR.block1 = bl1;
-	tmpR.wvhdl = wv;
-	rComplete(&tmpR);
+        tmpR = *currRing;
+        tmpR.order = ord;
+        tmpR.block0 = bl0;
+        tmpR.block1 = bl1;
+        tmpR.wvhdl = wv;
+        rComplete(&tmpR);
         rChangeCurrRing(&tmpR, TRUE);
       }
     }

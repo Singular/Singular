@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.10 1998-03-27 15:43:17 obachman Exp $ */
+/* $Id: algmap.cc,v 1.11 1998-09-22 14:09:00 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -203,7 +203,7 @@ static poly maLongalgMap(poly res, ring r, poly p0, int s, int t,
   napoly a0, b0;
   poly q, q0, q1 = NULL;
   int i;
-  
+
   if (s == 0)
   {
     if (t!=0)
