@@ -1,8 +1,8 @@
-// $Id: factor.lib,v 1.2 1997-04-28 19:27:17 obachman Exp $
+// $Id: factor.lib,v 1.3 1997-05-05 12:02:44 Singular Exp $
 //(RS)
 ///////////////////////////////////////////////////////////////////////////////
 
-LIBRARY:  redfac.lib    PROCEDURES FOR CALLING THE REDUCE FACTORIZER
+LIBRARY:  factor.lib    PROCEDURES FOR CALLING THE REDUCE FACTORIZER
 
  delete_dollar(s)       return the string s with '$' deleted
  reduce_factor(f)       list of factors of f, calling REDUCE (UNIX only)
@@ -47,7 +47,7 @@ EXAMPLE: example reduce_factor; shows an example
   int n = char( basering );
   int shortOutput = short;
   short = 0;
-  write scriptname,"#!/bin/sh
+  write (scriptname,"#!/bin/sh
                     $reduce/reduce >/dev/null <<EOF
                     off nat$ off echo$ setmod " + string( n ) + "$
                     erg:=factorize(",f,")$
@@ -60,7 +60,7 @@ EXAMPLE: example reduce_factor; shows an example
                     end;
                     shut \"" + outname + "\";
                     quit$
-               EOF";
+               EOF");
   system( "sh", "chmod 700 " + scriptname );
   system( "sh", scriptname );
   string resultstring = read( outname ); 
