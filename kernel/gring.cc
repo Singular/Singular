@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.13 2004-08-14 13:55:27 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.14 2004-08-27 12:19:35 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1605,8 +1605,8 @@ void ncCleanUp(ring r)
   r->nc = NULL;
 }
 
-poly nc_p_CopyGet(poly a, ring r)
-/* for use in getting the mult. martix elements*/
+poly nc_p_CopyGet(poly a, const ring r)
+/* for use in getting the mult. matrix elements*/
 {
   if (!rIsPluralRing(r)) return(p_Copy(a,r));
   if (r==r->nc->basering) return(p_Copy(a,r));
@@ -1616,8 +1616,8 @@ poly nc_p_CopyGet(poly a, ring r)
   }
 }
 
-poly nc_p_CopyPut(poly a, ring r)
-/* for use in defining the mult. martix elements*/
+poly nc_p_CopyPut(poly a, const ring r)
+/* for use in defining the mult. matrix elements*/
 {
   if (!rIsPluralRing(r)) return(p_Copy(a,r));
   if (r==r->nc->basering) return(p_Copy(a,r));
@@ -1899,7 +1899,7 @@ BOOLEAN nc_InitMultiplication(ring r)
   /* initialize the multiplication: */
   /*  r->nc->MTsize, r->nc->MT, r->nc->COM, */
   /* and r->nc->IsSkewConstant for the skew case */
-  if (r->N==1)
+  if (rVar(r)==1)
   {
     r->nc->type=nc_comm;
     r->nc->IsSkewConstant=1;
