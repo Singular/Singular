@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.134 2000-05-22 09:38:23 Singular Exp $ */
+/* $Id: extra.cc,v 1.135 2000-05-22 09:39:51 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <signal.h>
 #include "mod2.h"
 
 #ifndef __MWERKS__
