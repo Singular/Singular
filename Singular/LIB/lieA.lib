@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: lieA.lib,v 1.4 2003-07-31 19:52:53 levandov Exp $";
+version="$Id: lieA.lib,v 1.5 2003-10-17 16:02:52 levandov Exp $";
 category="Plural: Lie Theory";
 info="
 LIBRARY:  lieA.lib      definitions of several enveloping algebras
@@ -8,11 +8,12 @@ AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
 @*        Oleksander Motsak
 
 PROCEDURES:
- sl(n);                 returns U(sl_n)
  A(n);                  returns U(A(n))=U(sl_{n+1})
+ sl(n);                 returns U(sl_n)
  sl2();                 returns U(sl_2) in the {e,f,h} presentation
  g2();                  returns U(g_2) in the {x(i),y(i),Ha,Hb} presentation
  gl3();                 returns U(gl_3) in the {e_ij (1<i,j<3)} presentation
+ Weyl(n);		returns n-th Weyl algebra in {x(i),D(i)} presentation
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -291,3 +292,36 @@ example
    setring g;
    g;
 }
+///////////////////////////////////////////////////////////////////////////////
+
+proc Weyl(int n)
+"USAGE:   Weyl(n); n an integer, n>0
+RETURN:  a ring, describing n-th Weyl algebra over Q
+NOTE:    You have to activate this ring with the "setring" command.
+         The presentation of n-th Weyl algebra is classical:
+	 D(i)x(i)=x(i)D(i)+1
+SEE ALSO: sl2
+EXAMPLE: example Weyl; shows examples
+"{
+  if (n<1)
+  {
+    Print("Incorrect input");
+    return(0);
+  }
+  ring @rr=0,(x(1..n),D(1..n)),dp;
+  matrix @D[2*n][2*n];
+  int i=1; 
+  for (i=1;i<=n;i++)
+  {
+    @D[i,n+i]=1;
+  }
+  system("PLURAL",1,@D);
+  return(@rr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def a=Weyl(3);
+   setring a;
+   a;
+}
+///////////////////////////////////////////////////////////////////////////////
