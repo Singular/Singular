@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.14 2001-01-24 18:09:41 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.15 2005-01-05 11:27:17 Singular Exp $ */
 
 #include <config.h>
 
@@ -39,7 +39,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 {
     CanonicalForm F, G, f, g, d, Fb, Gb, Db, Fbt, Gbt, Dbt, B0, B, D0, lcF, lcG, lcD;
     CFArray DD( 1, 2 ), lcDD( 1, 2 );
-    int degF, degG, delta, deltaold, t;
+    int degF, degG, delta, t;
     REvaluation bt;
     bool gcdfound = false;
     Variable x = Variable(1);
@@ -53,9 +53,15 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
     DEBOUTLN( cerr, "g = " << g );
     F = FF / f; G = GG / g;
     if ( F.isUnivariate() && G.isUnivariate() )
+    {
+        DEBDECLEVEL( cerr, "ezgcd" );
         return d * gcd( F, G );
+    }
     else  if ( gcd_test_one( F, G, false ) )
+    {
+        DEBDECLEVEL( cerr, "ezgcd" );
         return d;
+    }
     lcF = LC( F, x ); lcG = LC( G, x );
     lcD = gcd( lcF, lcG );
     delta = 0;
@@ -63,7 +69,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
     t = tmax( F.level(), G.level() );
     bound = findBound( F, G, lcF, lcG, degF, degG );
     if ( ! internal )
-        b = REvaluation( 2, t, IntRandom( 100 ) );
+        b = REvaluation( 2, t, IntRandom( 50 ) );
     while ( ! gcdfound ) {
         /// ---> A2
         DEBOUTLN( cerr, "search for evaluation, delta = " << delta );
@@ -77,19 +83,25 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
         delta = degree( Db );
         /// ---> A3
         if ( delta == 0 )
-            return d;
+	{
+          DEBDECLEVEL( cerr, "ezgcd" );
+          return d;
+	}
         /// ---> A4
-        deltaold = delta + 1;
-        while ( deltaold != delta ) {
+        //deltaold = delta;
+        while ( 1 ) {
             bt = b;
             findeval( F, G, Fbt, Gbt, Dbt, bt, delta + 1, degF, degG );
-            if ( degree( Dbt ) == 0 )
+	    int dd=degree( Dbt );
+            if ( dd /*degree( Dbt )*/ == 0 )
+	    {
+                DEBDECLEVEL( cerr, "ezgcd" );
                 return d;
-            if ( degree( Dbt ) == delta )
-                deltaold = delta;
-            else  if ( degree( Dbt ) < delta ) {
-                deltaold = delta;
-                delta = degree( Dbt );
+	    }
+            if ( dd /*degree( Dbt )*/ == delta )
+                break;
+            else  if ( dd /*degree( Dbt )*/ < delta ) {
+                delta = dd /*degree( Dbt )*/;
                 b = bt;
                 Db = Dbt; Fb = Fbt; Gb = Gbt;
             }
@@ -97,9 +109,15 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
         DEBOUTLN( cerr, "now after A4, delta = " << delta );
         /// ---> A5
         if ( degF <= degG && delta == degF && divides( F, G ) )
+        {
+            DEBDECLEVEL( cerr, "ezgcd" );
             return d*F;
+	}
         if ( degG < degF && delta == degG && divides( G, F ) )
+        {
+            DEBDECLEVEL( cerr, "ezgcd" );
             return d*G;
+	}
         if ( delta != degF && delta != degG ) {
             /// ---> A6
             CanonicalForm xxx;
@@ -143,6 +161,25 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
             DEBOUTLN( cerr, "(hensel) lcDD = " << lcDD );
             gcdfound = Hensel( B, DD, lcDD, b, bound, x );
             DEBOUTLN( cerr, "(hensel finished) DD   = " << DD );
+            
+	    if (gcdfound)
+	    {
+              CanonicalForm cand=DD[2] / content(DD[2],Variable(1));
+	      if (B==F)
+	      {
+                DEBOUTLN( cerr, "(test) G: "<<G<<" % gcd:"<<cand<<" -> " << G%cand );
+                gcdfound= divides(cand,G);
+                //gcdfound= ((G-((G/cand)*cand))==0);
+                //gcdfound= ((G % cand)==0);
+              }
+	      else
+	      { 
+                DEBOUTLN( cerr, "(test) F: "<<F<<" % gcd:"<<cand<<" -> " << F%cand);
+                gcdfound= divides(cand,F);
+                //gcdfound= ((F-((F/cand)*cand))==0);
+                //gcdfound= ((F % cand)==0);
+	      }
+	    }
             /// ---> A8 (gcdfound)
         }
     }
@@ -233,9 +270,19 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
 static void
 findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, REvaluation & b, int delta, int degF, int degG )
 {
+//    int t=tmax(F.level(),G.level());
+    int i;
     bool ok;
     if ( delta != 0 )
         b.nextpoint();
+//    i=2;
+//    while(i<=t)
+//    {
+//      if (b[i]==0) { b.nextpoint(); i=2; }
+//      else i++;
+//    }
+    DEBOUTLN( cerr, "ezgcd: (findeval) F = " << F  <<", G="<< G);
+    DEBOUTLN( cerr, "ezgcd: (findeval) degF = " << degF << ", degG="<<degG );
     do {
         DEBOUTLN( cerr, "ezgcd: (findeval) b = " << b );
         Fb = b( F );
@@ -244,10 +291,16 @@ findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, 
             Gb = b( G );
             ok = degree( Gb ) == degG;
         }
+       
         if ( ok ) {
-            Db = gcd( Fb, Gb );
-            if ( delta > 0 )
+//	    if ((Fb.isZero())||(Gb.isZero()))
+//	      ok=false;
+//	    else
+	    {    
+              Db = gcd( Fb, Gb );
+              if ( delta > 0 )
                 ok = degree( Db ) < delta;
+	    }
         }
         if ( ! ok )
             b.nextpoint();
