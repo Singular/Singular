@@ -12,9 +12,6 @@ killall();
 example freerank;
 killall();
 
-example is_homog;
-killall();
-
 example maxcoef;
 killall();
 
