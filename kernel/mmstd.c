@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmstd.c,v 1.1.1.1 2003-10-06 12:15:57 Singular Exp $ */
+/* $Id: mmstd.c,v 1.2 2004-07-16 08:43:00 Singular Exp $ */
 /*
 * ABSTRACT: standard version of C-memory management alloc func 
 * i.e. (malloc/realloc/free)
@@ -21,11 +21,13 @@
 // we provide these functions, so that the settings of OM_CHECK
 // and OM_TRACK are used, but only provide them if omalloc is not based
 // on them
-#ifndef OMALLOC_USES_MALLOC
+// already provided in libomalloc
+#if !defined(OMALLOC_USES_MALLOC) && !defined(X_OMALLOC)
 
 // define this so that all addr allocated there are marked 
 // as static, i.e. not metioned by omPrintUsedAddr
 #define OM_MALLOC_MARK_AS_STATIC
+#define strdup_ strdup__
 #include <omalloc.c>
 #else
 #include <stdlib.h>

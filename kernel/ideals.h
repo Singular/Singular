@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $ */
+/* $Id: ideals.h,v 1.2 2004-07-16 08:43:00 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -66,6 +66,7 @@ inline long idRankFreeModule(ideal m, ring r = currRing)
 BOOLEAN idIsModule(ideal m, ring r = currRing);
 BOOLEAN idHomIdeal (ideal id, ideal Q=NULL);
 BOOLEAN idHomModule(ideal m, ideal Q,intvec **w);
+BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w);
 
 ideal idMinBase (ideal h1);
   /*returns a minimized set of generators of h1*/

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.1.1.1 2003-10-06 12:15:55 Singular Exp $ */
+/* $Id: intvec.h,v 1.2 2004-07-16 08:43:00 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -19,7 +19,7 @@ private:
   int col;
 public:
 
-  intvec(int l = 1)
+  inline intvec(int l = 1)
     {
       v = (int *)omAlloc0(sizeof(int)*l);
       row = l;
@@ -30,11 +30,11 @@ public:
   intvec(intvec* iv);
 
   void resize(int new_length);
-  int range(int i)
+  inline int range(int i)
     { return ((i<row) && (i>=0) && (col==1)); }
-  int range(int i, int j)
+  inline int range(int i, int j)
     { return ((i<row) && (i>=0) && (j<col) && (j>=0)); }
-  int& operator[](int i)
+  inline int& operator[](int i)
     {
 #ifndef NDEBUG
       if((i<0)||(i>=row*col))
@@ -53,17 +53,15 @@ public:
   // -2: not compatible, -1: <, 0:=, 1: >
   int compare(intvec* o);
   int compare(int o);
-  int  length() const { return col*row; }
-  int  cols() const { return col; }
-  int  rows() const { return row; }
-  void length(int l) { row = l; col = 1; }
-  void show(int notmat=1,int spaces=0);
-  void makeVector() { row*=col;col=1; }
-  // keiner (ausser obachman) darf das folgenden benutzen !!!
-  int * ivGetVec() { return v; }
+  inline int  length() const { return col*row; }
+  inline int  cols() const { return col; }
+  inline int  rows() const { return row; }
+  inline void length(int l) { row = l; col = 1; }
+  void show(int mat=0,int spaces=0);
+  inline void makeVector() { row*=col;col=1; }
   char * String(int dim = 2);
   char * ivString(int mat=0,int spaces=0, int dim=2);
-  ~intvec()
+  inline ~intvec()
     {
       if (v!=NULL)
       {
@@ -71,10 +69,18 @@ public:
         v=NULL;
       }
     }
-  void ivTEST()
+  inline void ivTEST()
     {
       omCheckAddrSize((ADDRESS)v,sizeof(int)*row*col);
     }
+  inline int min_in()
+  {
+    int m=v[0];
+    for (int i=row*col; i>0; i--) if (v[i]<m) m=v[i];
+    return m;
+  }
+  // keiner (ausser obachman) darf das folgenden benutzen !!!
+  inline int * ivGetVec() { return v; }
 };
 intvec * ivCopy(intvec * o);
 intvec * ivAdd(intvec * a, intvec * b);

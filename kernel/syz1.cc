@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.8 2004-06-02 17:05:07 Singular Exp $ */
+/* $Id: syz1.cc,v 1.9 2004-07-16 08:43:01 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1727,70 +1727,173 @@ void syKillComputation(syStrategy syzstr, ring r)
   }
 }
 
+/*2
+* divides out the weight monomials (given by the Schreyer-ordering)
+* from the LaScala-resolution
+*/
+resolvente syReorder(resolvente res,int length,
+        syStrategy syzstr,BOOLEAN toCopy,resolvente totake)
+{
+  int i,j,l;
+  poly p,q,tq;
+  polyset ri1;
+  resolvente fullres;
+  ring origR=syzstr->syRing;
+  fullres = (resolvente)omAlloc0((length+1)*sizeof(ideal));
+  if (totake==NULL)
+    totake = res;
+  for (i=length-1;i>0;i--)
+  {
+    if (res[i]!=NULL)
+    {
+      if (i>1)
+      {
+        j = IDELEMS(res[i-1]);
+        while ((j>0) && (res[i-1]->m[j-1]==NULL)) j--;
+        fullres[i-1] = idInit(IDELEMS(res[i]),j);
+        ri1 = totake[i-1]->m;
+        for (j=IDELEMS(res[i])-1;j>=0;j--)
+        {
+          p = res[i]->m[j];
+          q = NULL;
+          while (p!=NULL)
+          {
+            if (toCopy)
+            {
+              if (origR!=NULL)
+                tq = prHeadR(p,origR);
+              else
+                tq = pHead(p);
+              pIter(p);
+            }
+            else
+            {
+              res[i]->m[j] = NULL;
+              if (origR!=NULL)
+              {
+                poly pp=p;
+                pIter(p);
+                pNext(pp)=NULL;
+                tq = prMoveR(pp, origR);
+              }
+              else
+              {
+                tq = p;
+                pIter(p);
+                pNext(tq) = NULL;
+              }
+            }
+//            pWrite(tq);
+            pTest(tq);
+            for (l=pVariables;l>0;l--)
+            {
+              if (origR!=NULL)
+                pSubExp(tq,l, p_GetExp(ri1[pGetComp(tq)-1],l,origR));
+              else
+                pSubExp(tq,l, pGetExp(ri1[pGetComp(tq)-1],l));
+            }
+            pSetm(tq);
+            pTest(tq);
+            q = pAdd(q,tq);
+            pTest(q);
+          }
+          fullres[i-1]->m[j] = q;
+        }
+      }
+      else
+      {
+        if (origR!=NULL)
+        {
+          fullres[i-1] = idInit(IDELEMS(res[i]),res[i]->rank);
+          for (j=IDELEMS(res[i])-1;j>=0;j--)
+          {
+            if (toCopy)
+              fullres[i-1]->m[j] = prCopyR(res[i]->m[j], origR);
+            else
+            {
+              fullres[i-1]->m[j] = prMoveR(res[i]->m[j], origR);
+              res[i]->m[j] = NULL;
+            }
+          }
+        }
+        else
+        {
+          if (toCopy)
+            fullres[i-1] = idCopy(res[i]);
+          else
+          {
+            fullres[i-1] = res[i];
+            res[i] = NULL;
+          }
+        }
+        for (j=IDELEMS(fullres[i-1])-1;j>=0;j--)
+          fullres[i-1]->m[j] = pSortCompCorrect(fullres[i-1]->m[j]);
+      }
+      if (!toCopy)
+      {
+        if (res[i]!=NULL) idDelete(&res[i]);
+      }
+    }
+  }
+  if (!toCopy)
+    omFreeSize((ADDRESS)res,(length+1)*sizeof(ideal));
+  //syzstr->length = length;
+  return fullres;
+}
+
 /*3
 * read out the Betti numbers from resolution
 * (if not LaScala calls the traditional Betti procedure)
 */
-intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
+intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift,
+                              intvec* weights)
 {
   int dummy;
-  if (syzstr->betti!=NULL)
+  BOOLEAN std_weights=TRUE;
+  if ((weights!=NULL)
+  && (syzstr->betti!=NULL)
+  && (syzstr->weights!=NULL) && (syzstr->weights[0]!=NULL))
+  {
+    int i;
+    for(i=weights->length()-1; i>=0; i--)
+    {
+      //Print("test %d: %d - %d\n",i,(*weights)[i], (*(syzstr->weights[0]))[i]);
+      if ((*weights)[i]!=(*(syzstr->weights[0]))[i])
+      {
+        std_weights=FALSE;
+        break;
+      }
+    }
+  }
+  if ((syzstr->betti!=NULL)
+  && (std_weights))
   {
     if (minim || (syzstr->resPairs!=NULL))
       return ivCopy(syzstr->betti);
   }
-  intvec *result;
-  if (syzstr->resPairs!=NULL)
+  if ((syzstr->fullres==NULL) && (syzstr->minres==NULL))
   {
-    int i,j=-1,jj=-1,l,sh=0;
-    SRes rP=syzstr->resPairs;
-
-    if (syzstr->hilb_coeffs!=NULL) sh = 1;
-    l = syzstr->length;
-    while ((l>0) && (rP[l-1]==NULL)) l--;
-    if (l==0) return NULL;
-    l--;
-    while (l>=sh)
-    {
-      i = 0;
-      while ((i<(*syzstr->Tl)[l]) &&
-        ((rP[l][i].lcm!=NULL) || (rP[l][i].syz!=NULL)))
-      {
-        if (rP[l][i].isNotMinimal==NULL)
-        {
-          if (j<rP[l][i].order-l)
-            j = rP[l][i].order-l;
-          if (jj<l)
-            jj = l;
-        }
-        i++;
-      }
-      l--;
-    }
-    j = j+sh;
-    jj = jj+2;
-    result=new intvec(j,jj-sh,0);
-    IMATELEM(*result,1,1)
-      = si_max(1,(int)idRankFreeModule(syzstr->res[1],
-                               (syzstr->syRing!=NULL?syzstr->syRing:currRing)));
-    for (i=sh;i<jj;i++)
-    {
-      j = 0;
-      while (j<(*syzstr->Tl)[i])
-      {
-        if ((rP[i][j].isNotMinimal==NULL)&&
-           ((rP[i][j].lcm!=NULL) || (rP[i][j].syz!=NULL)))
-          IMATELEM(*result,rP[i][j].order-i+sh,i+2-sh)++;
-        j++;
-      }
-    }
-  }
-  else if (syzstr->fullres!=NULL)
-    result = syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim,row_shift);
+     if (syzstr->hilb_coeffs==NULL)
+     {
+        syzstr->fullres = syReorder(syzstr->res,syzstr->length,syzstr);
+     }
+     else
+     {
+        syzstr->minres = syReorder(syzstr->orderedRes,syzstr->length,syzstr);
+        syKillEmptyEntres(syzstr->minres,syzstr->length);
+     }
+   }
+  intvec *result=NULL;
+  if (syzstr->fullres!=NULL)
+    result = syBetti(syzstr->fullres,syzstr->length,&dummy,weights,minim,row_shift);
   else
-    result = syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim,row_shift);
-  if ((result!=NULL) && ((minim) || (syzstr->resPairs!=NULL)))
+    result = syBetti(syzstr->minres,syzstr->length,&dummy,weights,minim,row_shift);
+  if ((result!=NULL)
+  && ((minim) || (syzstr->resPairs!=NULL))
+  && std_weights)
+  {
     syzstr->betti = ivCopy(result);
+  }
   return result;
 }
 
@@ -2005,120 +2108,6 @@ void syPrint(syStrategy syzstr)
     PrintS("resolution not minimized yet");
     PrintLn();
   }
-}
-
-/*2
-* divides out the weight monomials (given by the Schreyer-ordering)
-* from the LaScala-resolution
-*/
-resolvente syReorder(resolvente res,int length,
-        syStrategy syzstr,BOOLEAN toCopy,resolvente totake)
-{
-  int i,j,l;
-  poly p,q,tq;
-  polyset ri1;
-  resolvente fullres;
-  ring origR=syzstr->syRing;
-  fullres = (resolvente)omAlloc0((length+1)*sizeof(ideal));
-  if (totake==NULL)
-    totake = res;
-  for (i=length-1;i>0;i--)
-  {
-    if (res[i]!=NULL)
-    {
-      if (i>1)
-      {
-        j = IDELEMS(res[i-1]);
-        while ((j>0) && (res[i-1]->m[j-1]==NULL)) j--;
-        fullres[i-1] = idInit(IDELEMS(res[i]),j);
-        ri1 = totake[i-1]->m;
-        for (j=IDELEMS(res[i])-1;j>=0;j--)
-        {
-          p = res[i]->m[j];
-          q = NULL;
-          while (p!=NULL)
-          {
-            if (toCopy)
-            {
-              if (origR!=NULL)
-                tq = prHeadR(p,origR);
-              else
-                tq = pHead(p);
-              pIter(p);
-            }
-            else
-            {
-              res[i]->m[j] = NULL;
-              if (origR!=NULL)
-              {
-                poly pp=p;
-                pIter(p);
-                pNext(pp)=NULL;
-                tq = prMoveR(pp, origR);
-              }
-              else
-              {
-                tq = p;
-                pIter(p);
-                pNext(tq) = NULL;
-              }
-            }
-//            pWrite(tq);
-            pTest(tq);
-            for (l=pVariables;l>0;l--)
-            {
-              if (origR!=NULL)
-                pSubExp(tq,l, p_GetExp(ri1[pGetComp(tq)-1],l,origR));
-              else
-                pSubExp(tq,l, pGetExp(ri1[pGetComp(tq)-1],l));
-            }
-            pSetm(tq);
-            pTest(tq);
-            q = pAdd(q,tq);
-            pTest(q);
-          }
-          fullres[i-1]->m[j] = q;
-        }
-      }
-      else
-      {
-        if (origR!=NULL)
-        {
-          fullres[i-1] = idInit(IDELEMS(res[i]),res[i]->rank);
-          for (j=IDELEMS(res[i])-1;j>=0;j--)
-          {
-            if (toCopy)
-              fullres[i-1]->m[j] = prCopyR(res[i]->m[j], origR);
-            else
-            {
-              fullres[i-1]->m[j] = prMoveR(res[i]->m[j], origR);
-              res[i]->m[j] = NULL;
-            }
-          }
-        }
-        else
-        {
-          if (toCopy)
-            fullres[i-1] = idCopy(res[i]);
-          else
-          {
-            fullres[i-1] = res[i];
-            res[i] = NULL;
-          }
-        }
-        for (j=IDELEMS(fullres[i-1])-1;j>=0;j--)
-          fullres[i-1]->m[j] = pSortCompCorrect(fullres[i-1]->m[j]);
-      }
-      if (!toCopy)
-      {
-        if (res[i]!=NULL) idDelete(&res[i]);
-      }
-    }
-  }
-  if (!toCopy)
-    omFreeSize((ADDRESS)res,(length+1)*sizeof(ideal));
-  //syzstr->length = length;
-  return fullres;
 }
 
 /*2

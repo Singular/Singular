@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.4 2004-05-12 11:24:37 levandov Exp $ */
+/* $Id: ideals.cc,v 1.5 2004-07-16 08:42:59 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2984,6 +2984,50 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
     }
   }
   omFreeSize((ADDRESS) diff,cmax*sizeof(int));
+  return TRUE;
+}
+
+BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
+{
+  if ((Q!=NULL) && (!idHomIdeal(Q,NULL)))  { PrintS(" Q not hom\n"); return FALSE;}
+  if (idIs0(m)) return TRUE;
+
+  int cmax=-1;
+  int i;
+  poly p=NULL;
+  int length=IDELEMS(m);
+  polyset P=m->m;
+  for (i=length-1;i>=0;i--)
+  {
+    p=P[i];
+    if (p!=NULL) cmax=si_max(cmax,(int)pMaxComp(p)+1);
+  }
+  if (w->length()+1 < cmax)
+  { 
+    // Print("length: %d - %d \n", w->length(),cmax);
+    return FALSE;
+  }
+  pSetModDeg(w);
+  for (i=length-1;i>=0;i--)
+  {
+    p=P[i];
+    poly q=p;
+    if (p!=NULL)
+    {
+      int d=pFDeg(p);
+      loop
+      {
+        pIter(p);
+        if (p==NULL) break;
+        if (d!=pFDeg(p)) 
+        {
+          // pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p)); 
+          return FALSE; 
+        }
+      }
+    }
+  }
+  pSetModDeg(NULL);
   return TRUE;
 }
 
