@@ -6,6 +6,9 @@ brnoeth_l
 classify_l
 deform_l
 det_minor
+eliminate_2
+eliminate_6
+eliminate_8
 fetch_l
 fglm1_l
 fglmquot1_l
@@ -24,6 +27,7 @@ modulo_l
 monodromy_l
 mora_1
 mora_2
+mora_3
 mora_4
 mora_8
 mpsr_l
