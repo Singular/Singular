@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.41 1999-11-15 17:20:40 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.42 1999-11-23 17:58:47 Singular Exp $ */
 
 /***************************************************************
  *
@@ -271,6 +271,8 @@ extern poly    _pShallowCopyDelete(memHeap d_h, poly *s_p, memHeap s_h);
 #endif // DO_DEEP_PROFILE
 
 
+#ifndef ASO_GENERATE
+
 #if defined(PDEBUG) && PDEBUG > 1
 #define _pMonAddOn(p1, p2)  pDBMonAddOn(p1, p2, __FILE__, __LINE__)
 extern  void pDBMonAddOn(poly p1, poly p2, char* f, int l);
@@ -532,4 +534,5 @@ DECLARE(int, _pExpQuerSum(poly p))
 }
 #endif
 
+#endif // ifndef ASO_GENERATE
 #endif // POLYS_IMPL_H

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.14 1999-11-15 17:20:29 obachman Exp $ */
+/* $Id: mpr_base.cc,v 1.15 1999-11-23 17:58:47 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -36,8 +36,11 @@
 #include "mpr_global.h"
 #include "mpr_base.h"
 #include "mpr_numeric.h"
-#if HAVE_ASO == 1
+#if HAVE_ASO == 10
 #include "mpr_base.aso"
+#else
+#define AllocSizeOf(X) Alloc(sizeof(X))
+#define FreeSizeOf(X,Y) Free(X,sizeof(Y))
 #endif
 
 //<-

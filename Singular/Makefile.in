@@ -105,7 +105,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} \
 # ASO_SOURCES
 ASO_SOURCES = structs.aso.cc ipid.aso.cc mmprivate.aso.cc silink.aso.cc \
               matpol.aso.cc longrat.aso.cc kbuckets.aso.cc mpsr_Get.aso.cc \
-	      mpr_base.aso.cc attrib.aso.cc lists.aso.cc kutil.aso.cc \
+	      attrib.aso.cc lists.aso.cc kutil.aso.cc \
               syz.aso.cc subexpr.aso.cc 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
