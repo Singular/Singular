@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.59 2000-05-09 13:26:10 pfister Exp $
+// $Id: primdec.lib,v 1.60 2000-05-10 12:56:13 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.59 2000-05-09 13:26:10 pfister Exp $";
+version="$Id: primdec.lib,v 1.60 2000-05-10 12:56:13 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -1773,10 +1773,17 @@ proc equidim(ideal i,list #)
   def  P = basering;
   list eq;
   intvec w;
-  int n;
+  int n,ra;
   ideal te=1;
   int a=attrib(i,"isSB");
   int homo=homog(i);
+  if( typeof(attrib(i,"isRadical"))=="int" )
+  {
+     if(attrib(i,"isRadical")==1)
+     { 
+        ra=1;
+     }
+  }
   if(size(#)!=0)
   {
     te=#[1];
@@ -1807,6 +1814,11 @@ proc equidim(ideal i,list #)
   ideal te=imap(P,te);
   list equ,equi,indep;
   int b;
+  if((size(reduce(te,j))==0)&&(deg(te[1])>0))
+  {
+    setring P;
+    return(eq);
+  }
   if(homo==1)
   {
      for(n=1;n<=nvars(basering);n++)
@@ -1817,11 +1829,6 @@ proc equidim(ideal i,list #)
   }
   if ((dim(j)==-1)||(size(j)==0)||(nvars(basering)==1)||(dim(j)==0))
   {
-    if((size(reduce(te,j))==0)&&(deg(te[1])>0))
-    {
-      setring P;
-      return(eq);
-    }
     setring P;
     i=imap(gnir,j);
     eq=i;
@@ -1860,14 +1867,25 @@ proc equidim(ideal i,list #)
   ideal h=imap(quring,h);
   kill quring;
   list l=minSat(j,h);
-
-  j=std(j,l[2]);
   attrib(l[1],"isSB",1);
+  
+  if(ra==1)
+  {
+     option(returnSB);  
+     j=quotient(j,l[1]);
+     option(noreturnSB);
+     attrib(j,"isSB",1);
+     attrib(j,"isRadical",1);
+  }
+  else
+  {
+     j=std(sat(j,l[1])[1]);  
+  }
   if(size(reduce(te,l[1]))!=0)
   {
     te=intersect(te,l[1]);
     equi=equidim(j,te);  
-    if(dim(l[1])==dim(j))
+    if((dim(l[1])==dim(j))&&(size(equi)>0))
     {
       equi[size(equi)]=intersect(l[1],equi[size(equi)]);
     }
@@ -1945,22 +1963,20 @@ proc equidimMax(ideal i)
   if ((dim(j)==-1)||(size(j)==0)||(nvars(basering)==1)||(dim(j)==0))
   {
     setring P;
-    eq=i;
-    return(eq);
+    return(i);
   }
 
   indep=maxIndependSet(j);
-  string va=string(maxideal(1));
+
   execute "ring gnir1 = ("+charstr(basering)+"),("+indep[1][1]+"),("
                               +indep[1][2]+");";
-  execute "map phi=gnir,"+va+";";
   if(homo==1)
   {
-     ideal j=std(phi(i),hil,w);
+     ideal j=std(imap(gnir,i),hil,w);
   }
   else
   {
-     ideal j=groebner(phi(i));
+     ideal j=groebner(imap(gnir,i));
   }
   string quotring=prepareQuotientring(nvars(basering)-indep[1][3]);
   execute quotring;
@@ -1972,22 +1988,17 @@ proc equidimMax(ideal i)
   {
      h[n]=leadcoef(j[n]);
   }
-
   setring gnir;
   ideal h=imap(quring,h);
   kill quring;
-
   list l=minSat(j,h);
   equ=l[1];
   attrib(equ,"isSB",1);
-  
+ 
   j=std(j,l[2]);
-
-  equi=equidimMax(j);
-  attrib(equi,"isSB",1);
-
-  if(dim(equ)==dim(equi))
+  if(dim(equ)==dim(j))
   {
+    equi=equidimMax(j);
     equ=intersect(equ,equi);
   }
   setring P;
