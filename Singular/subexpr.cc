@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.61 2000-09-12 16:01:18 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.62 2000-09-14 12:32:41 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -705,7 +705,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           {
             return omStrDup((char*)d);
           }
-    
+
         case POLY_CMD:
         case VECTOR_CMD:
           if (typed)
@@ -742,13 +742,13 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           s = StringAppendS((char*) (typed ? ")" : ""));
           return omStrDup(s);
-          
+
         case MATRIX_CMD:
           s= iiStringMatrix((matrix)d,dim);
           if (typed)
           {
             char* ns = (char*) omAlloc(strlen(s) + 40);
-            sprintf(ns, "matrix(ideal(%s),%d,%d)", s, 
+            sprintf(ns, "matrix(ideal(%s),%d,%d)", s,
                     ((ideal) d)->nrows, ((ideal) d)->ncols);
             omCheckAddr(ns);
             return ns;
@@ -800,7 +800,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         case RING_CMD:
         case QRING_CMD:
           s  = rString((ring)d);
-          
+
           if (typed)
           {
             char* ns;
@@ -820,7 +820,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             return ns;
           }
           return s;
-          
+
         case RESOLUTION_CMD:
         {
           lists l = syConvRes((syStrategy)d);
@@ -845,7 +845,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           return omStrDup(s);
         }
-          
+
         case LINK_CMD:
           s = slString((si_link) d);
           if (typed)
@@ -857,8 +857,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             return ns;
           }
           return s;
-          
-        
+
         case LIST_CMD:
           return lString((lists) d, typed, dim);
     } /* end switch: (Typ()) */
@@ -866,7 +865,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
   return omStrDup("");
 }
 
-    
+
 int  sleftv::Typ()
 {
   if (e==NULL)
@@ -1094,11 +1093,14 @@ void * sleftv::Data()
     }
     case STRING_CMD:
     {
-      // this is a memory leak
-      // OB: ???
-      // Hannes, any chance to get around this ???
+      // this was a memory leak
+      // we evalute it, cleanup and replace this leftv by it's evalutated form
+      // the evalutated form will be build in tmp
+      sleftv tmp;
+      memset(&tmp,0,sizeof(tmp));
+      tmp.next=next; next=NULL;
+      tmp.rtyp=STRING_CMD;
       r=(char *)omAllocBin(size_two_bin);
-      omMarkAsStaticAddr(r);
       if ((e->start>0)&& (e->start<=(int)strlen((char *)d)))
       {
         r[0]=*(((char *)d)+e->start-1);
@@ -1108,6 +1110,10 @@ void * sleftv::Data()
       {
         r[0]='\0';
       }
+      tmp.data=r;
+      CleanUp();
+      memcpy(this,&tmp,sizeof(tmp));
+      // and, remember, r is also the result...
       break;
     }
     case MATRIX_CMD:
@@ -1118,8 +1124,9 @@ void * sleftv::Data()
          ||(e->next->start>MATCOLS((matrix)d)))
       {
         if (!errorreported)
-          Werror("wrong range[%d,%d] in intmat(%dx%d)",e->start,e->next->start,
-                                                     MATROWS((matrix)d),MATCOLS((matrix)d));
+          Werror("wrong range[%d,%d] in intmat(%dx%d)",
+                  e->start,e->next->start,
+                  MATROWS((matrix)d),MATCOLS((matrix)d));
       }
       else
         r=(char *)MATELEM((matrix)d,e->start,e->next->start);
@@ -1386,7 +1393,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
       BOOLEAN ok=FALSE;
       poly p = ((currRingHdl!=NULL)     /* ring required */
                &&(!yyInRingConstruction) /* not in decl */
-	       &&(IDLEV(currRingHdl)!=myynest)) /* already in case 4/6 */
+               &&(IDLEV(currRingHdl)!=myynest)) /* already in case 4/6 */
                      ? pmInit(id,ok) : (poly)NULL;
       if (ok)
       {
@@ -1507,7 +1514,7 @@ int sleftv::Eval()
             syMake(&d->arg1,n, d->arg1.req_packhdl); //assume  type of arg1==DEF_CMD
 #else
           syMake(&d->arg1,n);
-#endif          
+#endif
           omCheckAddr(d->arg1.name);
           if (d->arg1.rtyp==IDHDL)
           {
