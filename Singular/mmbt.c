@@ -1,12 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.16 1999-10-25 08:32:16 obachman Exp $ */
+/* $Id: mmbt.c,v 1.17 1999-10-25 16:00:09 Singular Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
 *                  - mprdem: must be in the current directory
 *                  - mprnm: must be in thje current directory
+*                  - nm: to find entry pints if MPRPC is not set
 * files: - Singularg: the name of the executable
 *        - nm.log: temp. file for the map address -> name
 */
@@ -62,6 +63,39 @@ int mmTrackInit ()
     mm_lowpc = atoi (entry);
     mm_highpc = atoi (1 + strchr (entry, ':'));
     return 0;
+  }
+  else
+  {
+    char buf[255];
+    sprintf(buf,"nm -n %s","Singularg");
+    {
+      FILE *nm=popen(buf,"r");
+      if (nm==NULL)
+      {
+        fprintf(stderr, 
+	  "environment variable MPRPC not found\nand pipe to `%s`failed\n",buf);
+        m2_end(1);
+      }
+      else
+      {
+        while(fgets(buf,sizeof(buf),nm))
+        {
+          if((strstr(buf," t ")!=NULL)
+          ||(strstr(buf," T ")!=NULL))
+          {
+            if(strstr(buf," _start\n")!=NULL)
+            {
+              sscanf(buf,"%x",&mm_lowpc);
+              fgets(buf,sizeof(buf),nm);
+              sscanf(buf,"%x",&mm_highpc);
+              mm_highpc--;
+              break;
+            }
+          }
+        }
+        pclose(nm);
+      }
+    }
   }
   return 1;
 }
