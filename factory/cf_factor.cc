@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.14 2002-08-19 11:10:41 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.15 2002-09-24 11:28:29 Singular Exp $ */
 
 //{{{ docu
 //
@@ -316,11 +316,13 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   }
   return F;
 }
+#ifdef HAVE_NTL
 CanonicalForm fntl ( const CanonicalForm & f, int j )
 {
   ZZX f1=convertFacCF2NTLZZX(f);
   return convertZZ2CF(coeff(f1,j));
 }  
+#endif
 
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 {
