@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.138 1999-08-19 09:23:07 Singular Exp $
+@comment $Id: reference.doc,v 1.139 1999-08-19 15:28:26 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3620,7 +3620,9 @@ See
 @item @strong{Type:}
 resolution
 @item @strong{Purpose:}
-computes a minimal free resolution of an ideal or module M with the standard basis method.
+computes a free resolution of an ideal or module M with the standard
+basis which is minimized from the second module on. 
+
 More precisely, let
 @tex
 $A_1$=matrix(M),
@@ -4695,88 +4697,8 @@ See
 @node  res, reservedName, regularity, Functions
 @subsection res
 @cindex res
-@table @code
-@item @strong{Syntax:}
-@code{res (} ideal_expression@code{,} int_expression @code{)}
-@*@code{res (} module_expression@code{,} int_expression @code{)}
-@item @strong{Type:}
-resolution
-@item @strong{Purpose:}
-computes a minimal free resolution of an ideal or module M
-using a heuristically chosen method.
-More precisely, let
-@tex
-$A_1$=matrix(M),
-@end tex
-@ifinfo
-A1=matrix(M),
-@end ifinfo
-then @code{res}
-computes a free resolution of
-@ifinfo
-M1=coker(A1)
-@*...--> F2 --A2-> F1 --A1-> F0-->M1-->0,
-@end ifinfo
-@tex
-$M_1=coker(A_1)$
-$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M_1\longrightarrow 0,$$
-@end tex
-@*where the columns of the matrix
-@tex
-$A_1$
-@end tex
-@ifinfo
-A1
-@end ifinfo
-are the given set of generators of M.
-The computation stops after k steps, if the int expression k
-is not zero, and returns a list of modules
-@tex
-$M_i={\tt module}(A_i)$, i=1..k.
-@end tex
-@ifinfo
-Mi=module(Ai), i=1..k.
-@end ifinfo
-@*If k=0, @code{res(M,0)}
-returns a list of n modules where n is the number of variables of the basering.
-Let @code{list l=res(M,0);}
-then L[1]=M is identical to the input, L[2] is a minimal set of generators
-of the first syzygy
-module of L[1], etc.
-( L[i]
-@ifinfo
-=M_i
-@end ifinfo
-@tex
-$=M_i$
-@end tex
- in the notations from above).
-@item @strong{Note:}
-To access the elements of a resolution, it has to be assigned to a
-list. This my take some time since some further computations are
-necessary to do the assignment.
-@item @strong{Example:}
-@smallexample
-@c example
-  ring r  = 31991,(t,x,y,z,w),ls;
-  ideal M = t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
-            t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
-  resolution L = res(M,0);
-  L;
-  betti(L);
-@c example
-@end smallexample
-@end table
-@c ref
-See
-@ref{ideal};
-@ref{lres};
-@ref{module};
-@ref{mres};
-@ref{nres};
-@ref{sres};
-@ref{syz}.
-@c ref
+@c lib standard.lib:res lib_fun lib_ex
+
 @c ---------------------------------------
 @node reservedName, resultant, res, Functions
 @subsection reservedName
