@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.22 2001-01-09 16:16:14 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.23 2001-01-10 13:14:46 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -144,9 +144,8 @@ static proc redNF(module M,module N,list #)
 proc monodromy(poly f,list #)
 "USAGE:    monodromy(f[,mode]); poly f, int mode[=1]
 ASSUME:   basering has local ordering, f has isolated singularity at 0
-RETURN:
 @format
-          if mode=0:
+RETURN:   if mode=0:
             matrix M: exp(-2*pi*i*M) is a monodromy matrix of f
           if mode=1:
             ideal e: exp(-2*pi*i*e) is the spectrum of the monodromy of f
@@ -240,14 +239,25 @@ EXAMPLE:  example monodromy; shows an example
         "//gaussman::monodromy: compute A on saturation");
       l=division(H*var(1),A0*H+var(1)^2*diff(matrix(H),var(1)));
       A=expand(l[1],l[2],N-1);
-      dbprint(printlevel-voice+2,
-        "//gaussman::monodromy: compute eigenvalues e of A");
-      ideal e=jordan(A,-1)[1];
-      dbprint(printlevel-voice+2,"//gaussman::monodromy: e="+string(e));
-      if(mode==1)
+      if(mide==0)
       {
-        mide=maxintdif(e);
-        K=K+mide;
+        dbprint(printlevel-voice+2,
+          "//gaussman::monodromy: compute eigenvalues e and"+
+          "multiplicities b of A");
+        l=jordan(A);
+        ideal e=l[1];
+        intvec b;
+        for(i=ncols(e);i>=1;i--)
+	{
+          b[i]=sum(l[2][i]);
+        }
+        dbprint(printlevel-voice+2,"//gaussman::monodromy: e="+string(e));
+        dbprint(printlevel-voice+2,"//gaussman::monodromy: b="+string(b));
+        if(mode==1)
+        {
+          mide=maxintdif(e);
+          K=K+mide;
+        }
       }
     }
 
@@ -278,30 +288,12 @@ EXAMPLE:  example monodromy; shows an example
     }
   }
 
-  while(mide>0)
+  if(mide>0)
   {
-    dbprint(printlevel-voice+2,"//gaussman::monodromy: mide="+string(mide));
-
-    intvec b;
-    U=0;
-    module dU;
-    A0=jet(A,0);
-    matrix A0e;
-    for(i=ncols(e);i>=1;i--)
-    {
-      A0e=freemodule(mu);
-      for(j=n;j>=0;j--) // Potenzen von Matrizen?
-      {
-        A0e=A0e*(A0-e[i]);
-      }
-      dU=syz(A0e);
-      U=dU+U;
-      b[i]=size(dU);
-    }
-    A=division(U,A*U)[1];
-
     intvec ide;
     ide[mu]=0;
+    module dU;
+    matrix A0e;
     for(i=ncols(e);i>=1;i--)
     {
       for(j=i-1;j>=1;j--)
@@ -325,14 +317,27 @@ EXAMPLE:  example monodromy; shows an example
         k--;
       }
     }
+  }
+  while(mide>0)
+  {
+    dbprint(printlevel-voice+2,"//gaussman::monodromy: mide="+string(mide));
+
+    U=0;
+    A0=jet(A,0);
+    for(i=ncols(e);i>=1;i--)
+    {
+      A0e=freemodule(mu);
+      for(j=n;j>=0;j--) // Potenzen von Matrizen?
+      {
+        A0e=A0e*(A0-e[i]);
+      }
+      dU=syz(A0e);
+      U=dU+U;
+    }
+    A=division(U,A*U)[1];
 
     for(i=mu;i>=1;i--)
     {
-      if(ide[i]>0)
-      {
-        A[i,i]=A[i,i]+1;
-        e[i]=e[i]+1;
-      }
       for(j=mu;j>=1;j--)
       {
         if(ide[i]==0&&ide[j]>0)
@@ -346,6 +351,15 @@ EXAMPLE:  example monodromy; shows an example
             A[i,j]=A[i,j]/var(1);
           }
         }
+      }
+    }
+    for(i=mu;i>=1;i--)
+    {
+      if(ide[i]>0)
+      {
+        A[i,i]=A[i,i]+1;
+        e[i]=e[i]+1;
+        ide[i]=ide[i]-1;
       }
     }
     mide--;
@@ -372,9 +386,8 @@ example
 proc vfiltration(poly f,list #)
 "USAGE:    vfiltration(f[,mode]); poly f, int mode[=1]
 ASSUME:   basering has local ordering, f has isolated singularity at 0
-RETURN:
 @format
-          list l:
+RETURN:   list l:
           if mode=0 or mode=1:
             ideal l[1]: spectral numbers in increasing order
             intvec l[2]:
@@ -750,9 +763,8 @@ example
 proc vfiltjacalg(list l)
 "USAGE:   vfiltjacalg(vfiltration(f)); poly f
 ASSUME:  basering has local ordering, f has isolated singularity at 0
-RETURN:
 @format
-         list l:
+RETURN:  list l:
            ideal l[1]: spectral numbers of the V-filtration
                        on the Jacobian algebra in increasing order
            intvec l[2]:
