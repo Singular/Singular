@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.86 2000-04-27 10:07:06 obachman Exp $ */
+/* $Id: febase.cc,v 1.87 2000-06-05 12:23:10 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <stdarg.h>
+#include <sys/stat.h>
 #ifndef __MWERKS__
 #include <unistd.h>
 #endif
@@ -138,7 +139,12 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror,
   }
   FILE * f=NULL;
   if (! path_only)
-    f = myfopen(path,mode);
+  {
+    struct stat statbuf;
+    if ((stat(path,&statbuf)==0)
+    && (S_ISREG(statbuf.st_mode)))
+      f = myfopen(path,mode);
+  }
   if (where!=NULL) strcpy(where,path);
   if ((*mode=='r') &&
       (path[0]!=DIR_SEP) &&
