@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.1 1999-12-02 13:52:50 obachman Exp $
+@comment $Id: NEWS.texi,v 1.2 1999-12-02 14:14:40 obachman Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -19,6 +19,23 @@
 @ref{\what\}
 @end macro
 @end ifset
+
+The current version @value{VERSION} is an alpha-release of the upcoming
+new release version 2-0 (should be there at the beginning of
+2000). Items labeled with "TBC" in this news file are features which
+still have to be implemented and/or documented.
+
+It is to be expected that the current version @value{VERSION} is not as
+stable as the 1.2 version(s), since major changes were done to the
+@sc{Singular} kernel (although, there are no known bugs in the current
+version). Therefore, it is important to us, that users try out this
+new version. 
+
+Furthermore, the current version is generally not yet as fast as version 
+1.2. But this is going to change dramatically in the upcoming version(s).
+
+Thank you very much for your support!
+
 
 @heading General Changes
 @table @asis
@@ -51,17 +68,17 @@ The current syntax is going to change slightly in the final version 2.0.
 @heading New @sc{Singular} libraries
 
 @table @asis
-@item @nref{mondromy.lib}
+@item @nref{mondromy_lib}
 procedures for computing the monodromy of a singularity
-@item @nref{spectrum.lib}
+@item @nref{spectrum_lib}
 TBC: doCu, examples, tests
-@item @nref{spcurve.lib}
+@item @nref{spcurve_lib}
 procedures for cm codimension 2 singularities 
-@item @nref{triang.lib}
+@item @nref{triang_lib}
 procedures for solving triangular systems
-@item @nref{solve.lib}
+@item @nref{solve_lib}
 procedures for solving polynomial systems
-@item @nref{surf.lib}
+@item @nref{surf_lib}
 visualization of curves and surfaces with @code{surf}
 
 @end table
@@ -72,7 +89,7 @@ visualization of curves and surfaces with @code{surf}
 @item @nref{breakpoint}
 sets a debugger breakpoint
 @item @nref{int operations}
-@code{div} added: integer division ommitting remainder
+@code{div} added: integer division omitting remainder
 @item @nref{ERROR}
 interrupts computation in current procedure and returns with error
 message to top-level
@@ -106,6 +123,20 @@ Finer-grained control for formatted output.
 can be called with argument, must be called with parenthesis.
 @item TBC
 @end table
+
+
+@heading Internal Changes
+@table @asis
+@item new data structures for monomials and polynomials
+Makes polynomial arithmetic significantly faster. Especially for block - 
+or weighted orderings. TBC: Faster polynomial arithmetic for orderings
+(like dp, or lp). TBC: Bucket representation of polynomials in std; TBC: 
+DegBound during std computations.
+@item new memory management
+Results is less memory usage, faster memory allocation/free, less
+fragmentation, much better locality of reference.
+@end table
+
 
 
 
