@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.h,v 1.8 1999-11-15 17:19:50 obachman Exp $
+// $Id: clapconv.h,v 1.9 2000-11-03 13:02:59 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -32,6 +32,10 @@ alg convClapASingA ( const CanonicalForm & f );
 
 CanonicalForm convSingTrPClapP ( poly p );
 poly convClapPSingTrP ( const CanonicalForm & f );
+
+CanonicalForm convSingNClapN( number n );
+number convClapNSingN( const CanonicalForm & n);
+
 
 // CanonicalForm convSingIClapI( int i);a <- by constructor of CanonicalForm
 int convClapISingI( const CanonicalForm & f);

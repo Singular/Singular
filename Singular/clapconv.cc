@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.27 2000-09-18 09:18:53 obachman Exp $
+// $Id: clapconv.cc,v 1.28 2000-11-03 13:02:58 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -37,6 +37,73 @@ static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int 
 static void convRecGFGF ( const CanonicalForm & f, int * exp, poly & result );
 
 static number convClapNSingAN( const CanonicalForm &f);
+
+CanonicalForm
+convSingNClapN( number n )
+{
+  CanonicalForm term;
+  /* does only work for Zp, Q */
+  if ( getCharacteristic() != 0 )
+  {
+    Off(SW_USE_EZGCD);
+    term = npInt( n );
+  }
+  else
+  {
+    if ( ((int)n) & 1 )
+    {
+      term = ((int)n) >>2;
+    }
+    else
+    {
+      if ( n->s == 3 )
+      {
+        MP_INT dummy;
+        mpz_init_set( &dummy, &(n->z) );
+        term = make_cf( dummy );
+      }
+      else  if ( n->s == 1 )
+      {
+        MP_INT num, den;
+        On(SW_RATIONAL);
+        mpz_init_set( &num, &(n->z) );
+        mpz_init_set( &den, &(n->n) );
+        term = make_cf( num, den, false );
+      }
+      else
+      { // assume s == 0
+        MP_INT num, den;
+        mpz_init_set( &num, &(n->z) );
+        mpz_init_set( &den, &(n->n) );
+        term = make_cf( num, den, true );
+      }
+    }
+  }
+  return term;
+}
+
+number
+convClapNSingN( const CanonicalForm & n)
+{
+  if (n.isImm())
+    return nInit(n.intval());
+  else
+  {
+    number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+    z->debug=123456;
+#endif
+    z->z = gmp_numerator( n );
+    if ( n.den() == 1 )
+      z->s = 3;
+    else
+    {
+      z->n = gmp_denominator( n );
+      z->s = 0;
+    }
+    return z;
+  }
+}
 
 CanonicalForm
 convSingPClapP( poly p )

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.71 2000-09-18 09:18:53 obachman Exp $
+// $Id: clapsing.cc,v 1.72 2000-11-03 13:02:59 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -1337,5 +1337,61 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
  }
 
  Off(SW_RATIONAL);
+}
+
+lists singclap_chineseRemainder(lists x, lists q)
+{
+  //assume(x->nr == q->nr);
+  //assume(x->nr >= 0);
+  int n=x->nr+1;
+  if ((x->nr<0) || (x->nr!=q->nr))
+  {
+    WerrorS("list are empty or not of equal length");
+    return NULL;
+  }
+  lists res=(lists)omAlloc0Bin(slists_bin);
+  CFArray X(1,n), Q(1,n);
+  int i;
+  for(i=0; i<n; i++)
+  {
+    if (x->m[i-1].Typ()==INT_CMD)
+    {
+      X[i]=(int)x->m[i-1].Data();
+    }
+    else if (x->m[i-1].Typ()==NUMBER_CMD)
+    {
+      number N=(number)x->m[i-1].Data();
+      X[i]=convSingNClapN(N);
+    }
+    else
+    {
+      WerrorS("illegal type in chineseRemainder");
+      omFreeBin(res,slists_bin);
+      return NULL;
+    }
+    if (q->m[i-1].Typ()==INT_CMD)
+    {
+      Q[i]=(int)q->m[i-1].Data();
+    }
+    else if (q->m[i-1].Typ()==NUMBER_CMD)
+    {
+      number N=(number)x->m[i-1].Data();
+      Q[i]=convSingNClapN(N);
+    }
+    else
+    {
+      WerrorS("illegal type in chineseRemainder");
+      omFreeBin(res,slists_bin);
+      return NULL;
+    }
+  }
+  CanonicalForm r, prod;
+  chineseRemainder( X, Q, r, prod );
+  res->Init(2);
+  res->m[0].rtyp=NUMBER_CMD;
+  res->m[1].rtyp=NUMBER_CMD;
+  res->m[0].data=(char *)convClapNSingN( r );
+  res->m[1].data=(char *)convClapNSingN( prod );
+  return res;
 }
 #endif

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.h,v 1.6 1999-11-15 17:19:51 obachman Exp $
+// $Id: clapsing.h,v 1.7 2000-11-03 13:02:59 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -47,6 +47,7 @@ BOOLEAN jjEXTGCD_P(leftv res, leftv u, leftv v);
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
 BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u, leftv dummy);
 BOOLEAN jjCHARSERIES(leftv res, leftv u);
+lists singclap_chineseRemainder(lists x, lists q);
 #if 0
 BOOLEAN jjIS_SQR_FREE(leftv res, leftv u);
 #endif
