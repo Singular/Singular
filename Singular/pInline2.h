@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.32 2003-03-11 16:08:10 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.33 2003-03-11 16:14:43 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -131,21 +131,22 @@ PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r)
 // exponent
 // r->VarOffset encodes the position in p->exp (lower 24 bits)
 // and number of bits to shift to the right in the upper 8 bits
-PINLINE2 Exponent_t p_GetExp(poly p, int v, ring r)
+PINLINE2 int p_GetExp(poly p, int v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(v > 0 && v <= r->N);
 #if 0
   int pos=(r->VarOffset[v] & 0xffffff);
   int bitpos=(r->VarOffset[v] >> 24);
-  long exp=(p->exp[pos] >> bitmask) & r->bitmask;
+  int exp=(p->exp[pos] >> bitmask) & r->bitmask;
   return exp;
 #else
-  return (p->exp[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
-          & r->bitmask;
+  return (int)
+         ((p->exp[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
+          & r->bitmask);
 #endif
 }
-PINLINE2 Exponent_t p_SetExp(poly p, int v, int e, ring r)
+PINLINE2 int p_SetExp(poly p, int v, int e, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(v>0 && v <= r->N);
