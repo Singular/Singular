@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.4 1997-05-02 15:10:19 Singular Exp $ */
+/* $Id: longalg.cc,v 1.5 1997-05-06 18:21:22 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -691,7 +691,6 @@ static int  napDeg(alg p)
 */
 static void napWrite(alg p)
 {
-  int  i;
   if (p==NULL)
     StringAppendS("0");
   else
@@ -702,11 +701,17 @@ static void napWrite(alg p)
       BOOLEAN wroteCoeff=FALSE;
       mmTestP(p,RECA_SIZE+naNumbOfPar*sizeof(int));
       if ((napDeg(p)==0)
-      || (!nacIsOne(p->ko)))
+      || ((!nacIsOne(p->ko))
+        && (!nacIsMOne(p->ko))))
       {
         nacWrite(p->ko);
         wroteCoeff=(pShortOut==0);
       }
+      else if (nacIsMOne(p->ko))
+      {
+        StringAppend("-");
+      }
+      int  i;
       for (i = 0; i <= naNumbOfPar - 1; i++)
       {
         if (p->e[i] > 0)
