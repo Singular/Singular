@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.54 1998-11-02 08:45:05 Singular Exp $ */
+/* $Id: grammar.y,v 1.55 1998-12-09 11:21:51 krueger Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -283,13 +283,13 @@ void yyerror(char * fmt)
 %type <i>    setrings
 %type <i>    ringcmd1
 
-%type <i>    '=' '<' '>' '+' '-'
+%type <i>    '=' '<' '>' '+' '-' COLONCOLON
 %type <i>    '*' '/' '[' ']' '^' ',' ';'
 
 
 /*%nonassoc '=' PLUSEQUAL DOTDOT*/
 /*%nonassoc '=' DOTDOT COLONCOLON*/
-%nonassoc '=' DOTDOT COLONCOLON
+%nonassoc '=' DOTDOT
 %left ','
 %left '|' '&'
 %left EQUAL_EQUAL NOTEQUAL
@@ -301,6 +301,7 @@ void yyerror(char * fmt)
 %left '[' ']'
 %left '(' ')'
 %left PLUSPLUS MINUSMINUS
+%left COLONCOLON
 
 %%
 lines:
@@ -430,6 +431,10 @@ elemexpr:
           {
             syMake(&$$,$1);
           }
+        | elemexpr COLONCOLON elemexpr
+          {
+            if(iiExprArith2(&$$, &$1, COLONCOLON, &$3)) YYERROR;
+          }
         | elemexpr '('  ')'
           {
             if(iiExprArith1(&$$,&$1,'(')) YYERROR;
@@ -446,19 +451,6 @@ elemexpr:
               memcpy($1.next,&$3,sizeof(sleftv));
               if(iiExprArithM(&$$,&$1,'(')) YYERROR;
             }
-          }
-        | elemexpr COLONCOLON extendedid
-          {
-            idhdl r=IDROOT;
-            if ($1.Typ()!=PACKAGE_CMD) MYYERROR("<package>::<id> expected");
-#ifdef HAVE_NAMESPACES
-            namespaceroot->push( IDPACKAGE((idhdl)$1.data),
-                                 ((sleftv)$1).name);
-            syMake(&$$,$3, ((sleftv)$1).data);
-            namespaceroot->pop();
-#else /* HAVE_NAMESPACES */
-            syMake(&$$,$3);
-#endif /* HAVE_NAMESPACES */
           }
         | '[' exprlist ']'
           {

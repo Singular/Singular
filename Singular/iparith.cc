@@ -277,7 +277,7 @@ cmdnames cmds[] =
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
   { "typeof",      0, TYPEOF_CMD ,        CMD_1},
-//  { "unload",      0, UNLOAD_CMD ,        CMD_M},
+  { "unload",      0, UNLOAD_CMD ,        CMD_M},
   { "var",         0, VAR_CMD ,           CMD_1},
   { "varstr",      0, VARSTR_CMD ,        CMD_12},
   { "vdim",        0, VDIM_CMD ,          CMD_1},
@@ -633,6 +633,45 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
     u=u->next;
     if (u==NULL) return FALSE;
   }
+}
+static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
+{
+#ifdef HAVE_NAMESPACES
+  BOOLEAN iiReLoadLib(idhdl packhdl);
+  BOOLEAN iiTryLoadLib(leftv v, char *id);
+  idhdl packhdl;
+  
+  switch(u->Typ())
+  {
+      case PACKAGE_CMD:
+        packhdl = u->data;
+        //if(!IDPACKAGE(packhdl)->loaded) iiReLoadLib(packhdl);
+        namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
+        syMake(v, v->name, packhdl);
+        memcpy(res, v, sizeof(sleftv));
+        memset(v, 0, sizeof(sleftv));
+        namespaceroot->pop();
+        break;
+      case 0:
+        Print("%s of type 'ANY'. Trying load.\n", v->name);
+        if(!iiTryLoadLib(u, u->name)) {
+          syMake(u, u->name);
+          packhdl = u->data;
+          namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
+          syMake(v, v->name, packhdl);
+          memcpy(res, v, sizeof(sleftv));
+          memset(v, 0, sizeof(sleftv));
+          namespaceroot->pop();
+        } else
+          Werror("'%s' no such package", u->name);
+        break;
+      case DEF_CMD:
+        break;
+      default:
+        Werror("<package>::<id> expected");
+  }
+#endif /* HAVE_NAMESPACES */
+  return FALSE;
 }
 static BOOLEAN jjPLUS_I(leftv res, leftv u, leftv v)
 {
@@ -1917,7 +1956,8 @@ struct sValCmd2 dArith2[]=
 {
 // operations:
 // proc        cmd              res             arg1        arg2
- {jjPLUS_I,    '+',            INT_CMD,        INT_CMD,    INT_CMD        PROFILER}
+ {jjCOLCOL,    COLONCOLON,     ANY_TYPE,       DEF_CMD,    DEF_CMD      PROFILER}
+,{jjPLUS_I,    '+',            INT_CMD,        INT_CMD,    INT_CMD        PROFILER}
 ,{jjPLUS_N,    '+',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD     PROFILER}
 ,{jjPLUS_P,    '+',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 ,{jjPLUS_P,    '+',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD PROFILER}

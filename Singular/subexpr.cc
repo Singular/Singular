@@ -69,7 +69,7 @@ void sleftv::Print(leftv store, int spaces)
     char ch[2];
     ch[0]=c->op;ch[1]='\0';
     char *s=ch;
-    if (c->op>127) s=Tok2Cmdname(c->op);
+    if (c->op>127) s=iiTwoOps(c->op);
     ::Print("##command %d(%s), %d args\n",
       c->op, s, c->argc);
     if (c->argc>0)
@@ -98,6 +98,8 @@ void sleftv::Print(leftv store, int spaces)
       {
         case UNKNOWN:
         case DEF_CMD:
+          ::Print("%-*.*s`%s`",spaces,spaces," ",n);
+          break;
         case PACKAGE_CMD:
 #ifdef HAVE_NAMESPACES
           {
@@ -116,6 +118,9 @@ void sleftv::Print(leftv store, int spaces)
               ::Print("// libname : %s\n", ((package)d)->libname);
 
             ::Print("// language: %-*.*s%s",spaces,spaces," ",typ);
+            if(lang != LANG_NONE)
+              ::Print("\n// loaded  : %-*.*s%s",spaces,spaces," ",
+                      ((package)d)->loaded ? "yes" : "no");
           }
 #else /* HAVE_NAMESPACES */
           ::Print("%-*.*s`%s`",spaces,spaces," ",n);

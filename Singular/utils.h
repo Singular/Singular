@@ -47,7 +47,7 @@ public:
 
 typedef union uprocinfodata procinfodata;
 
-typedef enum { LANG_NONE, LANG_SINGULAR, LANG_C } language_defs;
+typedef enum { LANG_NONE, LANG_SINGULAR, LANG_C, LANG_MAX } language_defs;
 
 class procinfo
 {
