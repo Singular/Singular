@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.8 1997-08-14 13:10:44 Singular Exp $ */
+/* $Id: longalg.cc,v 1.9 1997-08-20 18:48:59 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2378,7 +2378,8 @@ BOOLEAN naDBTest(number a, char *f,int l)
   }
   while(p!=NULL)
   {
-    if (nIsZero(p->ko))
+    if ((naIsChar0 && nlIsZero(p->ko))
+    || ((!naIsChar0) && npIsZero(p->ko)))
     {
       Print("coeff 0 in %s:%d\n",f,l);
       return FALSE;

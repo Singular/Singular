@@ -124,9 +124,9 @@ cmdnames cmds[] =
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
   { "bareiss",     0, BAREISS_CMD ,       CMD_1},
   { "betti",       0, BETTI_CMD ,         CMD_1},
-  #ifdef HAVE_DLD
+//  #ifdef HAVE_DLD
   { "binary",      0, BINARY_CMD ,        ROOT_DECL},
-  #endif
+//  #endif
   { "break",       0, BREAK_CMD ,         BREAK_CMD},
   { "char",        0, CHARACTERISTIC_CMD ,CMD_1},
   { "char_series", 0, CHAR_SERIES_CMD ,   CMD_1},
@@ -147,9 +147,9 @@ cmdnames cmds[] =
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_1},
   { "div",         0, INTDIV ,            INTDIV},
-#ifdef DRING
+//#ifdef DRING
   { "dring",       0, DRING_CMD ,         DRING_CMD},
-#endif
+//#endif
   { "dump",        0, DUMP_CMD,           CMD_1},
   { "extgcd",      0, EXTGCD_CMD ,        CMD_2},
   { "EXTGCD",      2, EXTGCD_CMD ,        CMD_2},
@@ -287,9 +287,9 @@ cmdnames cmds[] =
 //  { "rank",        1, ROWS_CMD ,          CMD_1},
 
 /* set sys vars*/
-#ifdef SRING
+//#ifdef SRING
   { "alternating", 0, VALTVARS ,          SYSVAR},
-#endif
+//#endif
   { "degBound",    0, VMAXDEG ,           SYSVAR},
   { "echo",        0, VECHO ,             SYSVAR},
   { "minpoly",     0, VMINPOLY ,          SYSVAR},
@@ -1972,6 +1972,8 @@ struct sValCmd2 dArith2[]=
 ,{jjPROC,      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD PROFILER}
 #ifdef HAVE_DLD
 ,{jjBIN,       '(',            ANY_TYPE/*set by p*/,BINARY_CMD, DEF_CMD PROFILER}
+#else
+,{jjWRONG2,    '(',            ANY_TYPE/*set by p*/,BINARY_CMD, DEF_CMD PROFILER}
 #endif
 ,{jjMAP,       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD PROFILER}
 ,{jjKLAMMER,   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD PROFILER}
@@ -3045,6 +3047,8 @@ struct sValCmd1 dArith1[]=
 ,{jjPROC1,      '(',             ANY_TYPE/*set by p*/,PROC_CMD }
 #ifdef HAVE_DLD
 ,{jjBIN1,       '(',             ANY_TYPE/*set by p*/,BINARY_CMD }
+#else
+,{jjWRONG,      '(',             ANY_TYPE/*set by p*/,BINARY_CMD }
 #endif
 ,{jjKLAMMER_LIB,'(',             NONE,           STRING_CMD }
 // and the procedures with 1 argument:
@@ -3093,7 +3097,7 @@ struct sValCmd1 dArith1[]=
 ,{jjDET_I,      DET_CMD,         INT_CMD,        INTMAT_CMD }
 ,{jjDET,        DET_CMD,         POLY_CMD,       MATRIX_CMD }
 #else
-//,{jjWRONG,      DET_CMD,         INT_CMD,        INTMAT_CMD }
+,{jjWRONG,      DET_CMD,         INT_CMD,        INTMAT_CMD }
 ,{jjmpDet,      DET_CMD,        -((s)POLY_CMD),  MATRIX_CMD }
 #endif
 ,{jjDIM,        DIM_CMD,         INT_CMD,        IDEAL_CMD }
@@ -5245,9 +5249,9 @@ int IsCmd(char *n, int & tok)
   {
     switch (tok)
     {
-      #ifdef HAVE_DLD
+      //#ifdef HAVE_DLD
       case BINARY_CMD:
-      #endif
+      //#endif
       case IDEAL_CMD:
       case INT_CMD:
       case INTVEC_CMD:
