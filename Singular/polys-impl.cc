@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.39 2000-03-22 17:14:56 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.40 2000-03-27 16:06:21 Singular Exp $ */
 
 /***************************************************************
  *
@@ -1009,20 +1009,17 @@ int rComp0(poly p1, poly p2)
   {
     i=pGetComp(p1);
     j=pGetComp(p2);
-    if (i>0)
-    {
-      if (i > currRing->typ[0].data.syz.limit)
-        i=currRing->typ[0].data.syz.curr_index;
-      else
-        i=currRing->typ[0].data.syz.syz_index[i];
-    }
-    if (j>0)
-    {
-      if (j > currRing->typ[0].data.syz.limit)
-        j=currRing->typ[0].data.syz.curr_index;
-      else
-        j=currRing->typ[0].data.syz.syz_index[j];
-    }
+
+    if (i > currRing->typ[0].data.syz.limit)
+      i=currRing->typ[0].data.syz.curr_index;
+    else
+      i=currRing->typ[0].data.syz.syz_index[i];
+
+    if (j > currRing->typ[0].data.syz.limit)
+      j=currRing->typ[0].data.syz.curr_index;
+    else
+      j=currRing->typ[0].data.syz.syz_index[j];
+
     if (i >j ) { assume(rr== -1); return -1;}
     if (i <j ) { assume(rr== 1); return 1;}
   }
@@ -1063,7 +1060,7 @@ int rComp0(poly p1, poly p2)
 
       case ringorder_M:
         {
-          assume(0); // not yet implemented
+          //assume(0); // not yet implemented
           return rr;
         }
 
@@ -1140,14 +1137,11 @@ int rComp0(poly p1, poly p2)
       case ringorder_s:
         /*  ro_syz */
         // shall not appear:
-        assume(0);
-        #if 0
         if ((pGetComp(p1) > pDBsyzComp) && (pGetComp(p2) > pDBsyzComp)) break;
         if ((pGetComp(p1) <= pDBsyzComp) && (pGetComp(p2) <= pDBsyzComp)) break;
         if (pGetComp(p1) <= pDBsyzComp) { assume(rr==1); return rr;}
-        /* if (pGetComp(p2) <= pDBsyzComp) */ { assume (rr== -1); return rr; }
-        #endif
-        return rr;
+        /* if (pGetComp(p2) <= pDBsyzComp) */
+        { assume (rr== -1); return rr; }
 
       case ringorder_unspec:
       case ringorder_no:
