@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.37 2001-01-09 15:40:12 Singular Exp $ */
+/* $Id: numbers.cc,v 1.38 2001-01-20 11:40:14 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -103,29 +103,15 @@ void nSetChar(ring r)
   if (rField_is_Extension(r))
   {
     naSetChar(c,r);
-#ifdef LONGALGNEW
-    test |= Sy_bit(OPT_INTSTRATEGY); /*intStrategy*/
-    test &= ~Sy_bit(OPT_REDTAIL); /*noredTail*/
-  }
-  else if (rField_is_Q(r))
-  {
-    test |= Sy_bit(OPT_INTSTRATEGY); /*26*/
-#endif /* LONGALGNEW */
   }
   else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
     npSetChar(c, r);
-#ifdef LONGALGNEW
-    test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
-#endif /* LONGALGNEW */
   }
   /* -------------- GF(p^m) -----------------------*/
   else if (rField_is_GF(r))
   {
-#ifdef LONGALGNEW
-    test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
-#endif /* LONGALGNEW */
     nfSetChar(c,r->parameter);
   }
   /* -------------- R -----------------------*/
@@ -228,7 +214,7 @@ void nInitChar(ring r)
   else
   {
     WerrorS("nInitChar failed");
-  } 
+  }
   r->cf=n;
   r->cf->nChar = c;
   r->cf->nPar  = ndPar;
@@ -502,54 +488,62 @@ void nInitChar(ring r)
     WerrorS("unknown field");
   }
 #endif
-  if (!errorreported) 
+  if (!errorreported)
   {
     r->cf->nNULL=r->cf->nInit(0);
     if (r->cf->nRePart==NULL)
       r->cf->nRePart=r->cf->nCopy;
-  }    
+  }
 }
 
 void nKillChar(ring r)
 {
-  if ((r!=NULL) && (r->cf!=NULL))
+  if (r!=NULL)
   {
-    r->cf->ref--;
-    if (r->cf->ref<=0)
+    if (r->cf!=NULL)
     {
-      n_Procs_s tmp;
-      n_Procs_s* n=&tmp;
-      tmp.next=cf_root;
-      while((n->next!=NULL) && (n->next!=r->cf)) n=n->next;
-      if (n->next==r->cf)
+      r->cf->ref--;
+      if (r->cf->ref<=0)
       {
-        n->next=n->next->next;
-        cf_root=tmp.next;
-        r->cf->cfDelete(&(r->cf->nNULL),r);
-        switch(r->cf->type)
+        n_Procs_s tmp;
+        n_Procs_s* n=&tmp;
+        tmp.next=cf_root;
+        while((n->next!=NULL) && (n->next!=r->cf)) n=n->next;
+        if (n->next==r->cf)
         {
-          case n_Zp:
-               #ifdef HAVE_DIV_MOD
-               omFreeSize( (ADDRESS)r->cf->npInvTable,
-                           r->cf->npPrimeM*sizeof(CARDINAL) );
-               #else
-               omFreeSize( (ADDRESS)r->cf->npExpTable,
-                           r->cf->npPrimeM*sizeof(CARDINAL) );
-               omFreeSize( (ADDRESS)r->cf->npLogTable,
-                           r->cf->npPrimeM*sizeof(CARDINAL) );
-               #endif
-               break;
+          n->next=n->next->next;
+          cf_root=tmp.next;
+          r->cf->cfDelete(&(r->cf->nNULL),r);
+          switch(r->cf->type)
+          {
+            case n_Zp:
+                 #ifdef HAVE_DIV_MOD
+                 omFreeSize( (ADDRESS)r->cf->npInvTable,
+                             r->cf->npPrimeM*sizeof(CARDINAL) );
+                 #else
+                 omFreeSize( (ADDRESS)r->cf->npExpTable,
+                             r->cf->npPrimeM*sizeof(CARDINAL) );
+                 omFreeSize( (ADDRESS)r->cf->npLogTable,
+                             r->cf->npPrimeM*sizeof(CARDINAL) );
+                 #endif
+                 break;
 
-          default:
-               break;
+            default:
+                 break;
+          }
+          omFreeSize((ADDRESS)r->cf, sizeof(n_Procs_s));
+          r->cf=NULL;
         }
-        omFreeSize((ADDRESS)r->cf, sizeof(n_Procs_s));
-        r->cf=NULL;
+        else
+        {
+          WarnS("cf_root list destroyed");
+        }
       }
-      else
-      {
-        WarnS("cf_root list destroyed");
-      }
+    }
+    if (r->algring!=NULL)
+    {
+      rKill(r->algring);
+      r->algring=NULL;
     }
   }
 }

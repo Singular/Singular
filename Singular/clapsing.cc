@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.75 2000-12-08 12:50:30 Singular Exp $
+// $Id: clapsing.cc,v 1.76 2001-01-20 11:40:13 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -1289,6 +1289,7 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
  if (nGetChar()==1) setCharacteristic( 0 );
  else               setCharacteristic( -nGetChar() );
  ff=gg=NULL;
+ On(SW_RATIONAL);
 
  if (currRing->minpoly!=NULL)
  {

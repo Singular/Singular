@@ -1,3 +1,7 @@
+Fri Jan 19 17:56:20 CET 2001 hannes:
+* mod, div for intvec fixed
+* highcorner for global case fixed
+* highcorner for qring fixed
 Tue Feb  1 09:33:35 MET 2000 hannes: summary of changes
 * lift changed: - uses interanlly a different algorithm 
                   (for SB and NON-SB unified)

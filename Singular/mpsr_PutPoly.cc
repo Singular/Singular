@@ -2,12 +2,12 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.21 2000-12-07 16:25:19 Singular Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.22 2001-01-20 11:40:13 Singular Exp $ */
 
 /***************************************************************
  *
  * File:       mpsr_PutPoly.cc
- * Purpose:    rotines which put polys and polynomails (i.e. ring) annotations
+ * Purpose:    rotines which put polys and polynomials (i.e. ring) annotations
  * Author:     Olaf Bachmann (10/95)
  *
  * Change History (most recent first):
@@ -66,7 +66,7 @@ static void        SetPutFuncs(ring r);
 static mpsr_Status_t PutModuloNumber(MP_Link_pt link, number a);
 static mpsr_Status_t PutFloatNumber(MP_Link_pt link, number a);
 static mpsr_Status_t PutRationalNumber(MP_Link_pt link, number a);
-static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a);
+static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a, ring ar);
 static mpsr_Status_t PutAlgNumber(MP_Link_pt link, number a);
 
 static mpsr_Status_t PutVarNamesAnnot(MP_Link_pt link, ring r);
@@ -195,21 +195,21 @@ static mpsr_Status_t PutAlgNumber(MP_Link_pt link, number a)
     // hence, we use the first case of the union
     mp_failr(IMP_PutUint32(link, 1));
     mp_failr(IMP_PutUint32(link, GetPlength(b->z)));
-    return PutAlgPoly(link, b->z);
+    return PutAlgPoly(link, b->z, CurrPutRing->algring);
   }
   else
   {
     // we use the 2nd case of the union
     mp_failr(IMP_PutUint32(link, 2));
     mp_failr(IMP_PutUint32(link, GetPlength(b->z)));
-    failr(PutAlgPoly(link, b->z));
+    failr(PutAlgPoly(link, b->z, CurrPutRing->algring));
     mp_failr(IMP_PutUint32(link, GetPlength(b->n)));
-    return PutAlgPoly(link, b->n);
+    return PutAlgPoly(link, b->n, CurrPutRing->algring);
   }
 }
 
 // this is very similar to putting a Poly
-static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a)
+static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a, ring ar)
 {
   unsigned int i;
   int *exp;
@@ -219,7 +219,7 @@ static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a)
     {
       failr(PutAlgAlgNumber(link, napGetCoeff(a)));
       for (i=0; i<gNalgvars; i++)
-        gTa[i] = napGetExp(a,i+1);
+        gTa[i] = p_GetExp((poly)a,i+1,ar);
       mp_failr(IMP_PutSint32Vector(link, gTa, gNalgvars));
       napIter(a);
     }
@@ -228,7 +228,7 @@ static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a)
     while (a != NULL)
     {
       failr(PutAlgAlgNumber(link, napGetCoeff(a)));
-      IMP_PutSint32(link, (MP_Sint32_t) napGetExp(a,1));
+      IMP_PutSint32(link, (MP_Sint32_t) p_GetExp((poly)a,1,ar));
       napIter(a);
     }
   }
@@ -418,15 +418,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
   {
     // alg numbers
     // create temporary ring for describing the coeeficient domain
-    ring alg_r = (ring) omAlloc0Bin(sip_sring_bin);
-
-    alg_r->N = rPar(r);
-    alg_r->ch = rChar(r);
-    alg_r->order = (int *) omAlloc(3*sizeof(int));
-    alg_r->order[2] = ringorder_no;
-    alg_r->order[1] = ringorder_C;
-    alg_r->order[0] = ringorder_lp;
-    alg_r->names = r->parameter;
+    ring alg_r = r->algring;
     alg_r->minpoly = r->minpoly;
 
     // Algebraic numbers are
@@ -448,8 +440,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
     failr(mpsr_PutRingAnnots(link, alg_r, 0));
 
     // destroy temporary ring
-    omFreeSize(alg_r->order, 3*sizeof(int));
-    omFreeBin(alg_r, sip_sring_bin);
+    alg_r->minpoly = NULL;
   }
 
   // second element is the exponent vector
@@ -530,6 +521,11 @@ static mpsr_Status_t PutOrderingAnnot(MP_Link_pt link, ring r, BOOLEAN mv)
                                   MP_AnnotValuated));
 
   // let's see whether we have a simple ordering to sent
+  if ((mv == 0) && (order[1] == ringorder_no))
+  {
+    // ring does not contain a component entry:
+    return PutSimpleOrdering(link, r, 0);
+  }
   if ((mv == 0) && (order[2] == ringorder_no))
   {
     if (order[1] == ringorder_C || order[1] == ringorder_c)
@@ -680,7 +676,7 @@ static mpsr_Status_t PutMinPolyAnnot(MP_Link_pt link, ring r)
   gNalgvars = r->N;
 
   r->minpoly = minpoly;
-  return PutAlgPoly(link, ((lnumber) minpoly)->z);
+  return PutAlgPoly(link, ((lnumber) minpoly)->z, r);
 }
 
 
