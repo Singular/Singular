@@ -2444,6 +2444,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   {
     kBucketClear(r[rn].bucket,&red,&red_len);
   }
+  #ifdef HANS_IDEA
   if(erg.to_reduce_u-erg.to_reduce_l>100){
     poly my=pOne();
     int ol=red_len;
@@ -2464,6 +2465,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
     red=a;
     red_len=pLength(a);
   }
+  #endif
   pointer=new simple_reducer(red,red_len,c);
 
   if ((!woc) && (!erg.fromS))

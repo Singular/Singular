@@ -19,6 +19,7 @@
 #include "kbuckets.h"
 
 #define FULLREDUCTIONS
+//#define HANS_IDEA
 //#define HALFREDUCTIONS
 //#define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
