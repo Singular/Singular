@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.29 2001-08-27 14:47:21 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.30 2003-03-04 12:23:59 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -525,13 +525,18 @@ PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
   poly last,res;
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
+  {
      res = nc_p_Minus_mm_Mult_qq(p, m, q, r);
+     lp = pLength(res);
+  }
+  else
 #else
-  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
+  {
+    res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
+    lp = (lp + lq) - shorter;
+  }
 #endif
-  lp = (lp + lq) - shorter;
   return res;
-
 }
 
 PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
@@ -608,26 +613,22 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
   if (p == NULL || q == NULL) return NULL;
 
   if (pNext(p) == NULL)
+  {
 #ifdef HAVE_PLURAL
-    {
-      if (rIsPluralRing(r))
-	return nc_mm_Mult_p(p, p_Copy(q,r), r);
+    if (rIsPluralRing(r))
+      return nc_mm_Mult_p(p, p_Copy(q,r), r);
 #endif
-      return r->p_Procs->pp_Mult_mm(q, p, r, last);
-#ifdef HAVE_PLURAL
-    }
-#endif
+    return r->p_Procs->pp_Mult_mm(q, p, r, last);
+  }
 
   if (pNext(q) == NULL)
+  {
 #ifdef HAVE_PLURAL
-    {
-      if (rIsPluralRing(r))
-	return nc_p_Mult_mm(p_Copy(p,r), q, r);
+    if (rIsPluralRing(r))
+      return nc_p_Mult_mm(p_Copy(p,r), q, r);
 #endif
-      return r->p_Procs->pp_Mult_mm(p, q, r, last);
-#ifdef HAVE_PLURAL
-    }
-#endif
+    return r->p_Procs->pp_Mult_mm(p, q, r, last);
+  }
 
   poly qq = q;
   if (p == q)
