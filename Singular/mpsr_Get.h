@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.13 2002-03-07 18:59:03 Singular Exp $ */
+/* $Id: mpsr_Get.h,v 1.14 2003-12-10 17:35:18 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -16,6 +16,7 @@
 #ifndef __MPSR_GET__
 #define __MPSR_GET__
 
+#include "tok.h"
 #include "numbers.h"
 #include "polys.h"
 #include "febase.h"
