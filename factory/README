@@ -1,6 +1,6 @@
 
 
-  --- This `README' file corresponds to Singular-Factory version 1.3b ---
+  --- This `README' file corresponds to Singular-Factory version 2.0 ---
 
 
 		  README file for Singular-Factory
@@ -63,7 +63,7 @@ arrays, polynomial maps, etc.  These make the usage more comfortable.
   Factory is a project in evolution.  That means there is no guarantee that
 Factory is bug free.  I am sure that there are bugs or at least features.
 If you find bugs or if you find a strange behavior of the library, please
-let me know (e-mail: Jens Schmidt <schmidt@mathematik.uni-kl.de>).
+let me know (e-mail: singular@mathematik.uni-kl.de>).
 Comments and questions are welcome, too.
 
   Factory version 1.2c and newer define an external variable
@@ -506,6 +506,8 @@ gmpext.h
 initgmp.cc	- Factories interface to GNU MP
 singext.cc
 singext.h	- Factories interface to Singular
+
+NTLconvert.*    - some conversion routines for using NTL
 
 memutil.c
 memutil.h	- "old" Factory memory manager
