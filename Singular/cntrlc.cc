@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.25 1999-09-20 18:03:43 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.26 1999-10-26 15:06:10 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -20,6 +20,13 @@
 #include "polys.h"
 #ifdef PAGE_TEST
 #include "page.h"
+#endif
+
+/* undef, if you don't want GDB to come up on error */
+/* #define CALL_GDB */
+
+#if defined(__OPTIMIZE__) && defined(CALL_GDB)
+#undef CALL_GDB
 #endif
 
 #ifdef unix
@@ -45,9 +52,11 @@
 
 #define INTERACTIVE 0
 #define STACK_TRACE 1
-#ifndef __OPTIMIZE__
+#ifdef __CALL_GDB__
 static void debug (int);
 static void debug_stop (char **);
+#endif
+#ifndef __OPTIMIZE__
 static void stack_trace (char **);
 static void stack_trace_sigchld (int);
 #endif
@@ -123,7 +132,7 @@ void sigsegv_handler(int sig, sigcontext s)
     longjmp(si_start_jmpbuf,1);
   }
 #endif
-#ifndef __OPTIMIZE__
+#ifdef CALL_GDB
   if (sig!=SIGINT) debug(INTERACTIVE);
 #endif
   exit(0);
@@ -230,7 +239,7 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
     longjmp(si_start_jmpbuf,1);
   }
 #endif
-#ifndef __OPTIMIZE__
+#ifdef CALL_GDB
   if (sig!=SIGINT) debug(STACK_TRACE);
 #endif
   exit(0);
@@ -277,7 +286,7 @@ void sigsegv_handler(int sig)
 #ifdef unix
 #ifndef hpux
 /* debug(..) does not work under HPUX (because ptrace does not work..) */
-#ifndef __OPTIMIZE__
+#ifdef CALL_GDB
 #ifndef MSDOS
   if (sig!=SIGINT) debug(STACK_TRACE);
 #endif
@@ -438,7 +447,7 @@ void sigint_handler(int sig)
 #ifndef __OPTIMIZE__
 #ifndef MSDOS
 int si_stop_stack_trace_x;
-
+#ifdef CALL_GDB
 static void debug (int method)
 {
   int pid;
@@ -480,6 +489,7 @@ static void debug_stop ( char **args)
   perror ("exec failed");
   _exit (0);
 }
+#endif
 
 static int stack_trace_done;
 

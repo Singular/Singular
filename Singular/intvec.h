@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.10 1999-10-22 11:14:10 obachman Exp $ */
+/* $Id: intvec.h,v 1.11 1999-10-26 15:06:10 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -86,9 +86,7 @@ public:
   char * ivString(int mat=0,int spaces=0, int dim=2);
   ~intvec()
     {
-#ifdef MDEBUG
       mmTestL(this);
-#endif
       if (v!=NULL)
       {
         Free((ADDRESS)v,sizeof(int)*row*col);
@@ -97,10 +95,8 @@ public:
     }
   void ivTEST()
     {
-#ifdef MDEBUG
       mmTestL(this);
       mmTest((ADDRESS)v,sizeof(int)*row*col);
-#endif
     }
 };
 intvec * ivCopy(intvec * o);

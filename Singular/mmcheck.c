@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.14 1999-10-22 09:07:04 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.15 1999-10-26 15:06:10 obachman Exp $ */
 
 /*
 * ABSTRACT: several checking routines to help debugging the memory subsystem
@@ -440,19 +440,6 @@ int mmTestMemory()
   return 0;
 }
 
-int mmTestHeaps()
-{
-  int i = -1;
-
-  do
-  {
-    i++;
-    if (! mmCheckHeap(&mm_theList[i])) return 0;
-  }
-  while (mmGetSize(i) < MAX_BLOCK_SIZE);
-
-  return 1;
-}
 
 static int   mmIsAddrOnDList(DBMCB *what, DBMCB* list, int s)
 {

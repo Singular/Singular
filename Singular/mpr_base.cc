@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.12 1999-10-22 11:14:15 obachman Exp $ */
+/* $Id: mpr_base.cc,v 1.13 1999-10-26 15:06:12 obachman Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -343,7 +343,7 @@ private:
 
 poly monomAt( poly p, int i );
 
-#if HAVE_ASO == 1
+#ifndef ASO_GENERATE
 //<-
 
 //-> debug output stuff
@@ -3149,7 +3149,7 @@ int uResultant::nextPrime( int i )
 
 //-----------------------------------------------------------------------------
 
-#endif // ! HAVE_ASO
+#endif // ! ASO_GENERATE
 
 // local Variables: ***
 // folded-file: t ***

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.38 1999-10-25 08:32:18 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.39 1999-10-26 15:06:13 obachman Exp $ */
 
 /***************************************************************
  *
@@ -488,7 +488,7 @@ DECLARE(BOOLEAN, __pEqual(poly p1, poly p2))
  ***************************************************************/
 // Divisiblity tests based on Short Exponent Vectors
 // define to enable debugging of this
-#define PDIV_DEBUG
+// #define PDIV_DEBUG
 #if defined(PDEBUG) && ! defined(PDIV_DEBUG)
 #define PDIV_DEBUG
 #endif

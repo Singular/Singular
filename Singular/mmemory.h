@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.29 1999-10-25 16:07:35 obachman Exp $ */
+/* $Id: mmemory.h,v 1.30 1999-10-26 15:06:11 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -39,6 +39,10 @@ void * mmAllocAlignedBlock( size_t );
 void * mmAllocAlignedBlock0( size_t );
 void   mmFreeAlignedBlock( void*, size_t );
 #endif
+#define AllocHeap(h)            _AllocHeap(h)           
+#define Alloc0Heap(h)           _Alloc0Heap(h)
+#define AllocHeapType(h, t)     (t) AllocHeap(h)
+#define Alloc0HeapType(h, t)    (t) Alloc0Heap(h)
 #define FreeHeap                mmFreeHeap
 #define Alloc                   mmAllocBlock
 #define Alloc0                  mmAllocBlock0
@@ -80,6 +84,8 @@ void   mmDBFreeAlignedBlock( void*, size_t, char*, int );
 
 #define AllocHeap(heap)         mmDBAllocHeap(heap, __FILE__, __LINE__)
 #define Alloc0Heap(heap)        mmDBAlloc0Heap(heap, __FILE__, __LINE__)
+#define AllocHeapType(heap,t)   (t) mmDBAllocHeap(heap, __FILE__, __LINE__)
+#define Alloc0HeapType(heap,t)  (t) mmDBAlloc0Heap(heap, __FILE__, __LINE__)
 #define FreeHeap(addr, heap)    mmDBFreeHeap(addr, heap,  __FILE__, __LINE__)
 #define Alloc(s)                mmDBAllocBlock(s, __FILE__, __LINE__)
 #define Alloc0(s)               mmDBAllocBlock0(s, __FILE__, __LINE__)
@@ -119,12 +125,12 @@ void* mmDBAllocHeapSizeOf(memHeap heap, size_t size, char* file, int line);
 void* mmDBAlloc0HeapSizeOf(memHeap heap, size_t size, char* file, int line);
 void  mmDBFreeHeapSizeOf(void* addr, memHeap heap, size_t size, 
                          char* file, int line);
-#define AllocHeapSizeOf(h, s) mmDBAllocHeapSizeOf(h, s, __FILE__, __LINE__)
-#define Alloc0HeapSizeOf(h, s) mmDBAlloc0HeapSizeOf(h, s, __FILE__, __LINE__)
+#define AllocHeapSizeOf(h, s, t) (t) mmDBAllocHeapSizeOf(h, s, __FILE__, __LINE__)
+#define Alloc0HeapSizeOf(h, s, t) (t) mmDBAlloc0HeapSizeOf(h, s, __FILE__, __LINE__)
 #define FreeHeapSizeOf(x, h, s) mmDBFreeHeapSizeOf(x, h, s, __FILE__, __LINE__)
 #else /* ! (ASO_DEBUG || MDEBUG) */
-#define AllocHeapSizeOf(h, s)   AllocHeap(h)
-#define Alloc0HeapSizeOf(h, s)  Alloc0Heap(h)
+#define AllocHeapSizeOf(h, s, t)   AllocHeapType(h, t)
+#define Alloc0HeapSizeOf(h, s, t)  Alloc0HeapType(h, t)
 #define FreeHeapSizeOf(x, h, s) FreeHeap(x, h)
 #endif /* ASO_DEBUG || MDEBUG */
 
@@ -132,7 +138,7 @@ void  mmDBFreeHeapSizeOf(void* addr, memHeap heap, size_t size,
 /* defaults for AllocSizeOf stuff -- should be redefined by *.aso files */
 #define AllocSizeOf(x)    Alloc(sizeof(x))
 #define Alloc0SizeOf(x)   Alloc0(sizeof(x))
-#define FreeSizeOf(x, y)  FreeSizeOf(x, sizeof(y))
+#define FreeSizeOf(x, y)  Free(x, sizeof(y))
 #endif /* HAVE_ASO */
 
 
@@ -170,7 +176,6 @@ BOOLEAN mmDBTest(const void* adr, const char * fname, const int lineno);
 #endif /* MDEBUG >= 0 */
 
 int mmTestMemory();
-int mmTestHeaps();
 
 void mmPrintUsedList();
 void mmMarkInitDBMCB();
@@ -191,7 +196,6 @@ void mmTestList(FILE *fd, int all);
 #define mmTestP(A,B) TRUE
 #define mmTestLP(A)  TRUE
 #define mmTestMemory() TRUE
-#define mmTestHeaps()  TRUE
 #define mmMarkInitDBMCB()
 #define mmTestList(a) 
 
@@ -245,11 +249,12 @@ extern void mmMergeHeap(memHeap into, memHeap what);
  *
  **********************************/
 #ifndef HEAP_DEBUG
-#define mmAllocHeap(res, heap)  _mmAllocHeap(res, heap)
-#define mmFreeHeap(addr, heap) _mmFreeHeap(addr, heap)
+#define mmAllocHeap(res, heap)  _mmAllocHeap(res, heap, void*)
+#define mmFreeHeap(addr, heap)  _mmFreeHeap(addr, heap)
+#define mmAllocHeapType(res, heap, type)  _mmAllocHeap(res, heap, type)
 #define mmCheckHeap(heap)           1
 #define mmCheckHeapAddr(addr, heap) 1
-
+#define mmTestHeaps()               1
 #else
 /* 
  * define HEAP_DEBUG  and/or set mm_HEAP_DEBUG to 
@@ -260,7 +265,9 @@ extern void mmMergeHeap(memHeap into, memHeap what);
  */
 extern int mm_HEAP_DEBUG;
 
-#define mmAllocHeap(res, heap)\
+#define mmAllocHeapType(res, heap, type) \
+  (res) = (type)  mmDebugAllocHeap(heap, __FILE__, __LINE__)
+#define mmAllocHeap(res, heap) \
   (res) = mmDebugAllocHeap(heap, __FILE__, __LINE__)
 void * mmDebugAllocHeap(memHeap heap, const char*, int );
 
@@ -276,6 +283,7 @@ int mmDebugCheckHeap(memHeap heap, const char* fn, int line);
   mmDebugCheckHeapAdr(addr, heap, MM_HEAP_ADDR_USED_FLAG, __FILE__, __LINE__)  
 int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
                          const char* fn, int l);
+int mmTestHeaps();
 #endif /* HEAP_DEBUG */
 
 /**********************************
@@ -310,12 +318,12 @@ struct sip_memHeap
 };
 
 /* Allocates memory block from a heap */
-#define _mmAllocHeap(what, heap)                            \
+#define _mmAllocHeap(what, heap, type)                      \
 do                                                          \
 {                                                           \
   register memHeap _heap = heap;                            \
   if ((_heap)->current == NULL) mmAllocNewHeapPage(_heap);  \
-  what = (void *)((_heap)->current);              \
+  what = (type)((_heap)->current);              \
   (_heap)->current =  *((void**)(_heap)->current);          \
 }                                                           \
 while (0)
@@ -354,20 +362,20 @@ struct sip_memHeap
 };
 
 extern memHeapPage  mmGetNewCurrentPage(memHeap heap);
-extern void mmRearrangeHeapPages(memHeapPage page, memHeap heap, void* addr);
+extern void mmRearrangeHeapPages(memHeapPage page, void* addr, memHeap heap);
 extern struct sip_memHeapPage mmZeroPage[];
 #ifndef mmGetPageOfAddr
 #define mmGetPageOfAddr(addr) \
   ((void*) ((long) (addr) & ~(SIZE_OF_SYSTEM_PAGE -1)))
 #endif
 
-#define _mmAllocHeap(what, heap)                                    \
+#define _mmAllocHeap(what, heap, type)                              \
 do                                                                  \
 {                                                                   \
   register memHeapPage _page = (heap)->current_page;                \
   if (_page->current == NULL) _page = mmGetNewCurrentPage(heap);    \
   (_page->used_blocks)++;                                           \
-  what = (void *)((_page)->current);                                \
+  what = (type)((_page)->current);                                  \
   (_page)->current =  *((void**)(_page)->current);                  \
 }                                                                   \
 while (0)
@@ -376,13 +384,13 @@ while (0)
 do                                                      \
 {                                                       \
   register memHeapPage _page = mmGetPageOfAddr(addr);   \
-  _page->used_blocks--;                                 \
+  (_page->used_blocks)--;                               \
   if (_page->used_blocks == 0)                          \
-    mmRearrangeHeapPages(_page, heap, addr);            \
+    mmRearrangeHeapPages(_page, addr, heap);            \
   else                                                  \
   {                                                     \
-    *((void**) addr) = _page->current;                  \
-    _page->current = addr;                              \
+    *((void**) (addr)) = _page->current;                  \
+    _page->current = (addr);                              \
   }                                                     \
 }                                                       \
 while (0)
@@ -635,13 +643,13 @@ int mmInit();
 #endif
 
 #if ! defined(MDEBUG)
-inline void* AllocHeap(memHeap heap)
+inline void* _AllocHeap(memHeap heap)
 {
   void* ptr;
   mmAllocHeap(ptr, heap);
   return ptr;
 }
-inline void* Alloc0Heap(memHeap heap)
+inline void* _Alloc0Heap(memHeap heap)
 {
   void* ptr;
   mmAllocHeap(ptr, heap);

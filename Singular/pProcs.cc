@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.10 1999-10-25 08:32:17 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.11 1999-10-26 15:06:13 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -13,10 +13,24 @@
 #include "numbers.h"
 
 // Define to us COMP_MACROS
-// #define HAVE_COMP_MACROS
+#define HAVE_COMP_MACROS
+
+// #define HAVE_CHAR_P
+
+#ifdef HAVE_CHAR_P
+#include "modulop.h"
+
+#undef nDelete
+#define nDelete(n) 
+#define nMult(n1, n2)   npMultM(n1, n2)
+#define nAdd(n1, n2)    npAddM(n1, n2)
+#define nSub(n1, n2)    npSubM(n1, n2)
+#define nEqual(n1, n2)  npEqualM(n1, n2)
+#define nIsZero(n)      npIsZeroM(n)
+#endif
 
 // Define to enable tests in this file 
-#define DEBUG_THIS
+// #define DEBUG_THIS
 
 #if ! (defined(DEBUG_THIS) || (defined(PDEBUG) && PDEBUG > 0))
 #undef assume

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.c,v 1.14 1999-10-25 08:32:16 obachman Exp $ */
+/* $Id: mmheap.c,v 1.15 1999-10-26 15:06:11 obachman Exp $ */
 #include <stdio.h>
 #include "mod2.h"
 #include "structs.h"
@@ -274,160 +274,164 @@ void mmGarbageCollectHeap(memHeap heap, int strict)
     heap->last_gc = heap->current;
   }
 }
+int mmNumberOfAllocatedHeapPages(memHeap heap)
+{
+  return mmListLength(heap->pages);
+}
+
+int mmNumberOfFreeHeapBlocks(memHeap heap)
+{
+  mmListLength(heap->current);
+}
 
 #else /* HAVE_AUTOMATIC_GC */
 
+int mmNumberOfAllocatedHeapPages(memHeap heap)
+{
+  return mmGListLength(heap->last_page, 
+                       (void*) &(heap->last_page->prev) - (void*)heap->last_page);
+}
+
+int mmNumberOfFreeHeapBlocks(memHeap heap)
+{
+  int n = 0;
+  memHeapPage page;
+  
+  if (heap->current_page == mmZeroPage) return 0;
+  
+  page = heap->last_page;
+  do
+  {
+    n += mmListLength(page->current);
+    if (page == heap->current_page) break;
+    page = page->prev;
+  }
+  while (page != NULL);
+  
+  return n;
+}
+                       
+
 memHeapPage mmGetNewCurrentPage(memHeap heap)
 {
+  assume(heap->current_page->current == NULL);
   if (heap->current_page == mmZeroPage)
   {
     memHeapPage new_page = mmAllocNewHeapPage(heap);
     new_page->next = mmZeroPage;
-    new_page->prev = NULL;
+    new_page->prev = heap->last_page;
+    if (heap->last_page != NULL)
+      heap->last_page->next = new_page;
     heap->current_page = new_page;
-    return new_page;
+    heap->last_page = new_page;
   }
   else 
   {
     heap->current_page->used_blocks = 1;
-    heap->current_page->current = (void*) heap;
-    if (heap->current_page->next->current != NULL)
+    if (heap->current_page != heap->last_page)
     {
+      assume(heap->current_page->next->current != NULL);
       heap->current_page = heap->current_page->next;
-      return heap->current_page;
     }
     else
     {
       memHeapPage new_page = mmAllocNewHeapPage(heap);
       new_page->next = mmZeroPage;
-      heap->current_page->next = new_page;
-      new_page->previous = heap->current_page;
+      new_page->prev = heap->last_page;
+      new_page->prev->next = new_page;
       heap->current_page = new_page;
-      return new_page;
+      heap->last_page = new_page;
     }
   }
+#ifdef HEAP_DEBUG
+  if (mm_HEAP_DEBUG > 1) mmDebugCheckHeap(heap, __FILE__, __LINE__);
+#endif
+  return heap->current_page;
 }
 
 
 static void mmTakeOutHeapPage(memHeapPage page, memHeap heap)
 {
   if (heap->current_page == page) heap->current_page = page->next;
+  if (heap->last_page == page) heap->last_page = page->prev;
   if (page->prev != NULL) page->prev->next = page->next;
   if (page->next != mmZeroPage) page->next->prev = page->prev;
 }
 
 static void mmInsertHeapPage(memHeapPage after, memHeapPage page, memHeap heap)
 {
-  if (after == mmZeroPage)
+  if (after == NULL)
   {
+    assume(heap->current_page == mmZeroPage);
     page->next = mmZeroPage;
     page->prev = NULL;
     heap->current_page = page;
+    heap->last_page = page;
   }
   else
   {
-    page->next = after->next;
+    if (after == heap->last_page) heap->last_page = page;
     page->prev = after;
+    page->next = after->next;
     if (after->next != mmZeroPage) after->next->prev = page;
-    after->next page;
+    after->next = page;
+    if (heap->current_page == mmZeroPage && page->current != NULL)
+      heap->current_page = page;
   }
 }
 
-void mmRearrangeHeapPages(memHeapPage page, void* addr)
+void mmRearrangeHeapPages(memHeapPage page, void* addr, memHeap heap)
 {
-  memHeap heap;
-  if (mmGetPageOfAddr(page->current) == page)
+  assume(page->used_blocks == 0);
+  if (page->current != NULL)
   {
+    // all blocks of page are now collected
     // get heap
-    heap = (memHeap) *(page->current + 1);
-     mmTakeOutHeapPage(page, heap);
+    mmTakeOutHeapPage(page, heap);
     // page can be freed
     mmFreePage(page);
   }
   else
   {
     // page was full
-    heap = (memHeap) page->current;
-    page->current = addr;
-    page->used_blocks = (SIZE_OF_HEAP_PAGE / heap->block) - 1;
-    if (page->used_blocks <= 0) page->used_blocks = 1;
-    *(page->current + 1) = heap;
-    mmTakeOutHeapPage(page, heap);
-#if defined(PAGE_BEFORE_CURRENT)
-    if (heap->current_page->prev != NULL)
+    if (heap->max_blocks == 1) 
     {
-      mmInsertHeapPage(heap->current_page->prev, page);
-    }
-    else
-    {
-      mmInsertHeapPage(heap->current, page, heap);
-    }
-    heap->current = page;
-#elsif defined(PAGE_AFTER_CURRENT)
-    mmInsertHeapPage(heap->current, page, heap);
-#else
-    {
-      memPage lastpage = heap->current_page;
-      if (lastpage != mmZeroPage) 
-      {
-        memPage lastpage = heap->current_page;
-        while (lastpage->next != mmZeroPage)
-        {
-          lastpage = lastpage->next;
-        }
-      }
-      mmInsertHeapPage(lastpage, page, heap);
-    }
-#endif    
-  }
-}
-
-  
-    
-    
-    
-
-  if (page->used_blocks == 0)
-  {
-    if (heap->current_page == page) 
-      heap->current_page = heap->current_page->next;
-    page->prev->next = page->next;
-    page->next->prev = page->prev;
-    if (SIZE_OF_HEAP_PAGE / heap->size > 0)
+      mmTakeOutHeapPage(page, heap);
       mmFreePage(page);
+    }
     else
-      mmVfreeToSystem(page, heap->size + SIZE_OF_HEAP_PAGE_HEADER);
-  }
-  else
-  {
-    memHeapPage next_page = page->next;
-
-    if (heap->current_page->current == NULL)
-      heap->current_page = page;
-    else if (heap->current_page == page && next_page->current != NULL)
-      heap->current_page = next_page;
-
-    while (page->used_blocks < next_page->used_blocks) 
-      next_page = next_page->next;
-
-    if (next_page != page->next)
     {
-      page->prev->next = page->next;
-      page->next->prev = page->prev;
-      page->prev = next_page;
-      page->next = next_page->next;
-      next_page->next->prev = page;
-      next_page->next = page;
+      page->current = addr;
+      page->used_blocks = heap->max_blocks - 1;
+      *((void**)addr) = NULL;
+      mmTakeOutHeapPage(page, heap);
+#if defined(PAGE_BEFORE_CURRENT)
+      if (heap->current_page->prev != NULL)
+        mmInsertHeapPage(heap->current_page->prev, page);
+      else
+        mmInsertHeapPage(heap->current_page, page, heap);
+      heap->current_page = page;
+#elsif defined(PAGE_AFTER_CURRENT)
+      mmInsertHeapPage(heap->current_page, page, heap);
+#else
+      mmInsertHeapPage(heap->last_page, page, heap);
+#endif    
     }
   }
-  mmCheckHeap(heap);
+#ifdef HEAP_DEBUG
+  if (mm_HEAP_DEBUG > 1) mmDebugCheckHeap(heap, __FILE__, __LINE__);
+#endif
 }
+
 
 memHeap mmCreateHeap(size_t size)
 {
   memHeap heap = (memHeap) AllocSizeOf(ip_memHeap);
   heap->current_page = mmZeroPage;
+  heap->last_page = NULL;
   heap->size = size;
+  heap->max_blocks = SIZE_OF_HEAP_PAGE / size;
+  if (heap->max_blocks == 0) heap->max_blocks = 1;
   return heap;
 }
 
@@ -439,21 +443,11 @@ void mmDebugClearHeap(memHeap heap, const char* file, int line)
 {
 #ifdef HEAP_DEBUG  
   mmCheckHeap(heap);
-  if (heap->current_page != mmZeroPage &&  
-      (heap->current_page->used_blocks != 0 || 
-       heap->current_page->next != heap->current_page ||
-       heap->current_page->prev != heap->current_page))
-    mmPrintHeapError("ClearHeap: Heap not empty", NULL, heap, file, line);
-#endif
   if (heap->current_page != mmZeroPage)
   {
-    if (SIZE_OF_HEAP_PAGE / heap->size > 0)
-      mmFreePage(heap->current_page);
-    else
-      mmVfreeToSystem(heap->current_page, 
-                      heap->size + SIZE_OF_HEAP_PAGE_HEADER);
+    mmPrintHeapError("ClearHeap: Heap not empty", NULL, heap, file, line);
   }
-  heap->current_page = mmZeroPage;
+#endif
 }
 
 void  mmMergeHeap(memHeap into, memHeap what)
@@ -550,12 +544,14 @@ int mmDebugCheckHeap(memHeap heap, const char* fn, int l)
   return 1;
 }
 
+
 #else /* HAVE_AUTOMATIC_GC */
+
+
 static int mmDebugCheckSingleHeapAddr(void* addr, memHeap heap,
                                       const char* fn, int l)
 {
-  void* page;
-  memHeapPage hpage;
+  memHeapPage page;
   
   if (heap == NULL)
   {
@@ -570,17 +566,15 @@ static int mmDebugCheckSingleHeapAddr(void* addr, memHeap heap,
   if (! mmIsNotAddrOnFreePage(addr))
     return mmPrintHeapError("Addr on freed page", addr, heap, fn, l);
 
-#if 0  
   page = mmGetPageOfAddr(addr);
   
-  if (! mmIsAddrOnList(page, heap->pages))
-    return mmPrintHeapError("addr not on heap page", addr, heap, fn, l);
+  if (! mmIsAddrOnGList(page, heap->last_page, (void*) &page->prev - (void*) page))
+    return mmPrintHeapError("addr not on page of this heap", 
+                            addr, heap, fn, l);
 
   if ( (((long) (((char*) addr) - ((char*) page + SIZE_OF_HEAP_PAGE_HEADER)))
         % heap->size) != 0)
     return mmPrintHeapError("addr unaligned within heap", addr, heap, fn, l);
-  hpage = (memHeapPage) page;
-#endif
   return 1;
 }
 
@@ -588,16 +582,30 @@ static int mmDebugCheckSingleHeapAddr(void* addr, memHeap heap,
 static int mmDebugCheckHeapAddrContainment(void* addr, memHeap heap, int flag,
                                            const char* fn, int l)
 {
+  memHeapPage page = heap->last_page;
+  int where;
+  if (heap->current_page != mmZeroPage) where = 1;
+  else where = -1;
+  
+  
+  while (page != NULL && mmGetPageOfAddr(addr) != page) 
+  {
+    if (page == heap->current_page) where = -1;
+    page = page->prev;
+  }
+
+  if (page == NULL) mmPrintHeapError("addr not from heap", addr, heap, fn, l);
+  
   if (flag == MM_HEAP_ADDR_FREE_FLAG)
   {
-    if (! mmIsAddrOnList(addr, heap->current_page->current))
-      return mmPrintHeapError("addr not on heap free list",
+    if (where == -1 || ! mmIsAddrOnList(addr, heap->current_page->current))
+      return mmPrintHeapError("free addr not on a page free list",
                               addr, heap, fn, l);
   }
   else if (flag == MM_HEAP_ADDR_USED_FLAG)
   {
-    if (mmIsAddrOnList(addr, heap->current_page->current))
-      return mmPrintHeapError("used addr on heap free list",
+    if (where == 1 &&  mmIsAddrOnList(addr, heap->current_page->current))
+      return mmPrintHeapError("used addr on a page free list",
                               addr, heap, fn, l);
   }
   return 1;
@@ -606,69 +614,101 @@ static int mmDebugCheckHeapAddrContainment(void* addr, memHeap heap, int flag,
 int mmDebugCheckHeap(memHeap heap, const char* fn, int l)
 {
   void* p;
+  int where;
   memHeapPage page;
-  long prev_used_blocks;
   
-  long has_changed = FALSE;
-  long max_blocks = SIZE_OF_HEAP_PAGE / heap->size;
-  if (max_blocks == 0) max_blocks = 1;
+  if (heap->last_page == NULL)
+  {
+    if (heap->current_page != mmZeroPage)
+      return mmPrintHeapError("last_page out of sunc", NULL, heap, fn, l);
+    return 1;
+  }
   
-  if (heap->current_page == mmZeroPage) return 1;
+  if (heap->last_page != mmGetPageOfAddr(heap->last_page))
+    return mmPrintHeapError("last_page not page aligned", heap->last_page,
+                            heap, fn, l);
 
-  // check used_blocks
-  page = heap->current_page;
-  prev_used_blocks = heap->current_page->prev->used_blocks;
+  if (heap->current_page != mmZeroPage && 
+      mmGetPageOfAddr(heap->current_page) != heap->current_page)
+    return mmPrintHeapError("current_page not page aligned", 
+                            heap->current_page,
+                            heap, fn, l);
+    
+
+  if (heap->last_page->next != mmZeroPage) 
+    return mmPrintHeapError("last_page out of sunc", NULL, heap, fn, l);
+
+  /* check page list for cycles */
+  if (mmGListHasCycle(heap->last_page, (void*) &page->prev - (void*) page))
+    return mmPrintHeapError("prev chain of heap has cycles", NULL, heap, fn,l);
+  page = heap->last_page;
+  while (page->prev != NULL) page = page->prev;
+  if (mmGListHasCycle(heap->last_page, (void*) &page->next - (void*) page))
+    return mmPrintHeapError("next chain of heap has cycles", NULL, heap, fn,l);
+
+  /* check prev/next relations of pages */
+  page = heap->last_page;
   do
   {
-    if (page->prev->next != page || page->next->prev != page)
-      return mmPrintHeapError("page list damaged",  NULL, heap, fn, l);
-    if (page->used_blocks == 0) 
-      return mmPrintHeapError("No used blocks",  NULL, heap, fn, l);
-    if (page->used_blocks < 0 || page->used_blocks > max_blocks)
-      return mmPrintHeapError("used_blocks out of bounds", NULL, heap, fn, l);
-    if (max_blocks - mmListLength(page->current) != page->used_blocks)
-    {
-      fprintf(stderr, "used_blocks wrong: should be %ld, is %ld\n", 
-              max_blocks - mmListLength(page->current), page->used_blocks);
-      return mmPrintHeapError("", NULL, heap, fn, l);
-    }
-    if (page->used_blocks > heap->current_page->used_blocks)
-    {
-      fprintf(stderr, "used_blocks %ld larger than %ld", page->used_blocks,
-              heap->current_page->used_blocks);
-      return mmPrintHeapError("", NULL, heap, fn, l);
-    }
-    if (prev_used_blocks < page->used_blocks)
-    {
-      if (has_changed)
-      {
-        fprintf(stderr, "pages not decr order with change at %ld and %ld\n",
-                has_changed, page->used_blocks);
-        return mmPrintHeapError("", NULL, heap, fn, l);
-      }
-      else
-      {
-        has_changed = page->used_blocks;
-      }
+    if (page != mmGetPageOfAddr(page))
+      return mmPrintHeapError("page not aligned", page, heap, fn, l);
+    if (page->prev != NULL && page->prev->next != page)
+      return mmPrintHeapError("page list damaged (prev)", page, heap, fn, l);
+    if (page->next != mmZeroPage && page->next->prev != page)
+      return mmPrintHeapError("page list damaged (next)", page, heap, fn, l);
+    page = page->prev;
+  }
+  while (page != NULL);
 
+  /* check that current_page is on list of pages */
+  if (heap->current_page != mmZeroPage && 
+      ! mmIsAddrOnGList(heap->current_page, heap->last_page, 
+                        (void*) &page->prev - (void*) page))
+    return mmPrintHeapError("current_page not in page list", 
+                            heap->current_page, heap, fn, l);
+
+  /* now check single pages */
+  page = heap->last_page;
+  if (heap->current_page != mmZeroPage) where = 1;
+  else where = -1;
+  while (page != NULL)
+  {
+    if (page == heap->current_page) where = 0;
+    if (where > 0 && page->used_blocks <= 0) 
+      return mmPrintHeapError("used_blocks of page <= 0", page, heap, fn, l);
+
+    if (where >= 0)
+    {
+      if (mmListHasCycle(page->current))
+        return mmPrintHeapError("current of page has cycle", page, heap, fn, l);
+
+      if (heap->max_blocks - page->used_blocks != mmListLength(page->current))
+      return mmPrintHeapError("used_blocks of fpage out of sync", 
+                              page, heap, fn, l);
+    }
+    else
+    {
+      if (page->used_blocks != 1)
+        return mmPrintHeapError("used_blocks of upage not 1", 
+                                page, heap, fn, l);  
+    }
+    
+    if (mm_HEAP_DEBUG > 2 && where >= 0)
+    {
       p = page->current;
+      if (mmListHasCycle(p))
+        return mmPrintHeapError("current list of fpage has cycle", page,
+                                heap, fn, l);
       while (p != NULL)
       {
         if (mmGetPageOfAddr(p) != page)
-          return mmPrintHeapError("addr in freelist not on page",
-                                  p, heap, fn, l);
-        if (!mmDebugCheckSingleHeapAddr(p, heap, fn, l)  ||
-            !mmDebugCheckHeapAddrContainment(p, heap, MM_HEAP_ADDR_FREE_FLAG,
-                                             fn, l))
-          return 0;
+          return mmPrintHeapError("addr not on heap page", p, heap, fn, l);
         p = *((void**) p);
       }
     }
-    prev_used_blocks = page->used_blocks;
-    page = page->next;
+    if (where == 0) where = -1;
+    page = page->prev;
   }
-  while(page != heap->current_page);
-
   return 1;
 }
 #endif /* ! HAVE_AUTOMATIC_GC */
@@ -677,40 +717,37 @@ int mmDebugCheckHeap(memHeap heap, const char* fn, int l)
 int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
                          const char* fn, int l)
 {
+  if (mm_HEAP_DEBUG > 2 && ! mmDebugCheckHeap(heap, fn, l)) return 0;
+
   if (! mmDebugCheckSingleHeapAddr(addr, heap, fn, l)) return 0;
 
-  if (mm_HEAP_DEBUG > 1)
-  {
-    if (! mmDebugCheckHeap(heap, fn, l)) return 0;
-  }
-
-  if (mm_HEAP_DEBUG > 0)
-    return mmDebugCheckHeapAddrContainment(addr, heap, flag, fn, l);
-  else
-    return 1;
+  return mmDebugCheckHeapAddrContainment(addr, heap, flag, fn, l);
 }
   
 void * mmDebugAllocHeap(memHeap heap, const char* fn, int l)
 {
   void* res;
-
+  
   if (mm_HEAP_DEBUG > 1 && ! mmDebugCheckHeap(heap, fn, l))
     return NULL;
-  _mmAllocHeap(res, heap);
 
-  mmDebugCheckSingleHeapAddr(res, heap, fn, l);
-  
-  if (mm_HEAP_DEBUG > 0)
-    mmDebugCheckHeapAddrContainment(res, heap, MM_HEAP_ADDR_USED_FLAG,
-                                    fn, l);
+  _mmAllocHeap(res, heap, void*);
+
+  if (mm_HEAP_DEBUG > 2)
+    mmDebugCheckHeapAddr(res, heap, MM_HEAP_ADDR_USED_FLAG, fn, l);
+
   return res;
 }
   
 void  mmDebugFreeHeap(void* addr, memHeap heap, const char* fn, int l)
 {
-  mmDebugCheckHeapAddr(addr, heap, MM_HEAP_ADDR_USED_FLAG, fn, l);
-
+  if (mm_HEAP_DEBUG > 0)
+    mmDebugCheckHeapAddr(addr, heap, MM_HEAP_ADDR_USED_FLAG, fn, l);
+  
   _mmFreeHeap(addr, heap);
+
+  if (mm_HEAP_DEBUG > 2)
+    mmDebugCheckHeapAddr(addr, heap, MM_HEAP_ADDR_FREE_FLAG, fn, l);
 }
 
-#endif
+#endif /* HEAP_DEBUG */
