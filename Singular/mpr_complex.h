@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.12 2000-06-05 12:53:23 pohl Exp $ */
+/* $Id: mpr_complex.h,v 1.13 2000-06-26 08:02:23 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -46,11 +46,11 @@ class gmp_float
 public:
   gmp_float( const int v = 0 )
   {
-    mpf_init_set_si( t, (signed long int) v );
+    mpf_init_set_d( t, (double) v );
   }
   gmp_float( const long v )
   {
-    mpf_init_set_si( t, (signed long int) v );
+    mpf_init_set_d( t, (double) v );
   }
   gmp_float( const mprfloat v ) // double
   {
@@ -103,7 +103,7 @@ public:
   bool isOne();   // t == 1 ?
   bool isMOne();  // t == -1 ?
 
-  bool setFromStr( char * in );
+  void setFromStr( char * in );
 
   // access
   inline const mpf_t *mpfp() const;
@@ -166,7 +166,7 @@ inline gmp_float & gmp_float::operator = ( const mprfloat a )
 }
 inline gmp_float & gmp_float::operator = ( const long a )
 {
-  mpf_set_si( t, (signed long int) a );
+  mpf_set_d( t, (double) a );
   return *this;
 }
 
