@@ -120,7 +120,7 @@ test_t:
 
 .PHONY: sharedist bindist static-bindist infodist win-sharedist
 sharedist: ${SINGULAR}
-	cd doc; ${MAKE} all 
+	cd doc; ${MAKE} all ps
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/${S_VERSION}
 	${MKINSTALLDIRS} ${TMPDIR}/Singular/doc/${S_VERSION}
