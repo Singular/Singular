@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.131 2000-10-26 09:49:43 Singular Exp $ */
+/* $Id: ring.cc,v 1.132 2000-10-26 10:55:12 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2374,7 +2374,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   BOOLEAN need_other_ring;
   int bits;
 
-  exp_limit=rGetExpSize(exp_limit, bits);
+  exp_limit=rGetExpSize(exp_limit, bits, r->N);
   need_other_ring = (exp_limit != r->bitmask);
 
   int nblocks=rBlocks(r);
@@ -2717,7 +2717,7 @@ BOOLEAN rComplete(ring r, int force)
   int n=rBlocks(r)-1;
   int i;
   int bits;
-  r->bitmask=rGetExpSize(r->bitmask,bits);
+  r->bitmask=rGetExpSize(r->bitmask,bits,r->N);
   r->BitsPerExp = bits;
   r->divmask=rGetDivMask(bits);
 
