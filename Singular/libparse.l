@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.9 1998-04-22 10:37:46 krueger Exp $ */
+/* $Id: libparse.l,v 1.10 1998-04-22 14:29:26 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -544,6 +544,7 @@ LIB[ \t]+"\"" { quote++;
 <comment>.               { }
 
 \n                       { yylplineno++; }
+\r                       { }
 ;                        { p_static = FALSE;
 #if YYLPDEBUG
                             printf("%s", yytext);
@@ -551,6 +552,7 @@ LIB[ \t]+"\"" { quote++;
                          }
 .                        { p_static = FALSE; 
                            yylp_errno = YYLP_BAD_CHAR;
+                           printf("[%s\d]", *yytext);
 #if YYLPDEBUG
                            printf("[%s]", yytext);
 #endif
