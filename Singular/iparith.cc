@@ -1964,6 +1964,7 @@ struct sValCmd2 dArith2[]=
 ,{jjOP_I_IV,   '*',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD PROFILER}
 ,{jjTIMES_IV,  '*',            INTVEC_CMD,     INTMAT_CMD, INTVEC_CMD PROFILER}
 ,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD PROFILER}
+,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTVEC_CMD, INTMAT_CMD PROFILER}
 ,{jjDIV_N,     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD PROFILER}
 ,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 ,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
