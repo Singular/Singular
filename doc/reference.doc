@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.192 2000-07-11 12:29:32 obachman Exp $
+@comment $Id: reference.doc,v 1.193 2000-08-10 17:10:22 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3340,16 +3340,12 @@ returns statistics concerning the memory management:
 @*@code{memory(0)} is the number of active (used) bytes
 @*@code{memory(1)} is the number of bytes allocated from the
 operating system
+@*@code{memory(2)} is the maximal number of bytes ever allocated from the operating
+system during the current @sc{Singular} session
 @item @strong{Note:}
 To monitor the memory usage during ongoing computations the option
 @code{mem} should be set (using the command @code{option(mem);}, see
 also @ref{option}).
-@item @strong{Note on memory management:}
-While running, @sc{Singular} periodically performs garbage collection,
-i.e., it frees unused memory as much as possible. In particular, a
-garbage collection is performed whenever the basering is changed. An
-immediate garbage collection can be enforced with the command
-@code{system("gc");} (@pxref{system}).
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3359,12 +3355,14 @@ immediate garbage collection can be enforced with the command
      memory(0)/1023, "KByte)" +newline+
      "Memory currently allocated from system:",memory(1), "Byte (",
      memory(1)/1023, "KByte)";
+     "Maximal memory allocated from system:",memory(2), "Byte (",
+     memory(2)/1023, "KByte)";
   }
   ReportMemoryUsage();
   kill p;
   ReportMemoryUsage(); // less memory used: p killed
   kill r;
-  ReportMemoryUsage(); // even less memory: r killed and implicit gc
+  ReportMemoryUsage(); // even less memory: r killed 
 @c example
 @end smallexample
 @end table
@@ -5591,6 +5589,8 @@ See
 poly, vector, ideal or module (corresponding to the first argument)
 @item @strong{Purpose:}
 substitutes a ring variable by a term (a polynomial of length <=1).
+@item @strong{Note:}
+use @ref{map} for substitutions by polynomials.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5605,6 +5605,7 @@ substitutes a ring variable by a term (a polynomial of length <=1).
 @end table
 @c ref
 See
+@ref{map};
 @ref{poly};
 @ref{vector};
 @ref{ideal};
