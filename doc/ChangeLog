@@ -1,5 +1,7 @@
 Thu Jun 18 12:42:39 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
+	* singular.doc: short table of contents added
+
 	* usercard.tex (Computation of Invariants, Resolutions): new
 	  sections
 	  minor fixes throughout the whole card
