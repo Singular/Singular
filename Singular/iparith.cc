@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.282 2002-05-02 15:15:58 Singular Exp $ */
+/* $Id: iparith.cc,v 1.283 2002-06-26 11:24:17 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -722,6 +722,8 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         {
           v->name = omStrDup(v->name);
         }
+	v->req_packhdl=IDPACKAGE(packhdl);
+	v->packhdl=IDPACKAGE(packhdl);
         syMake(v, v->name, packhdl);
         memcpy(res, v, sizeof(sleftv));
         memset(v, 0, sizeof(sleftv));
