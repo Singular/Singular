@@ -1,4 +1,4 @@
-// $Id: classify.lib,v 1.19 1997-12-15 10:35:03 krueger Exp $
+// $Id: classify.lib,v 1.20 1998-04-03 23:18:15 krueger Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES  
@@ -28,6 +28,23 @@ debug_log (lev,[])   print trace and debugging information w.r.t level>@DeBug
 LIB "inout.lib";
 LIB "elim.lib";
 LIB "sing.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+proc classify_init
+{
+  string s;
+  link l="DBM:r NFlist";
+  s = read(l,"VERSION");
+  if (s == "" ) {
+    "(classify.lib): Need to create database...";
+    LIB"makedbm.lib";
+    create_sing_dbm();
+  }
+  close(l);
+  l="DBM:r NFlist";
+  s = read(l,"VERSION");
+  //"(classify.lib): Creation done. Current version:", s;
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc classify (poly f_in)
@@ -65,6 +82,7 @@ EXAMPLE:  example classify; shows an example
 
   map conv_ext2top=ring_ext,maxideal(1);
 
+  if(defined(@ringdisplay)!=0) { kill @ringdisplay; }
   string @ringdisplay = "ring_ext";
   export @ringdisplay;
 
@@ -118,6 +136,7 @@ proc Klassifiziere (poly f)
       export @ringdisplay;               // able to run 'Show(f)'
     }
     @ringdisplay = "setring RingB;";
+    if(defined(RingB)!=0) { kill RingB; }
     execute ("ring RingB="+charstr(basering)+",("+A_Z("x", n)+"),(c,ds);");
     export RingB;
     setring ring_top;
@@ -150,7 +169,7 @@ proc Klassifiziere (poly f)
 
     f = jet(f, K);
     v = HKclass(milnorcode(f));
-    if(v[2]>0) { debug_log(0, "Guessing type via Hilbert polynomial: ", v[1]);}
+    if(v[2]>0) { debug_log(0, "Guessing type via Milnorcode: ", v[1]);}
     else { 
       debug_log(0, "Hilbert polynomial not recognised. Milnor code = ",
                 milnorcode(f));
@@ -438,7 +457,7 @@ proc Funktion17 (poly f, list cstn)
       Mult = mult(Jf);
       if(Dim==0) { return(printresult(23,f,"Z["+string(p-1)+",0]", cstn, p)); }
       if( Mult == 1 ) { 
-         return(printresult(24, f, "Z["+string(p-1)+","+string(Mu-15)+"]", 
+         return(printresult(24, f, "Z["+string(p-1)+","+string(Mu-3-6*p)+"]", 
                 cstn, p));
       }
     }
@@ -1721,7 +1740,7 @@ proc quickclass(poly f);
 USAGE:    quickclass(f);         f=poly
 RETURN:   Normal form of f in Arnold's list
 REMARK:   try to determine the normal form of f by invariants, mainly by
-          computing the Hilbert funktion of the Milnor albegra,
+          computing the Hilbert function of the Milnor albegra,
           no coordinate change is needed (see also proc 'milnorcode').
 EXAMPLE:  example quickclass; shows an example
 {
@@ -2219,6 +2238,7 @@ EXAMPLE:  example singularity; shows an example
   int len = size(#);
   list v, ret;
 
+  classify_init();
   ret = 0, 0;
   k = #[1];
   if(len>=2) { r = #[2]; }
@@ -2438,8 +2458,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc basicinvariants(poly f)
 USAGE:    basicinvariants(f);   f = poly
-COMPUTE:  Compute basic invariants of f: an upper bound d for the determinacy,
-          the milnor number mu and the corank c of f
+COMPUTE:  Compute basic invariants of f: an upper bound d for the
+          determinacy, the milnor number mu and the corank c of f
 RETURN:   intvec: d, mu, c
 EXAMPLE:  example basicinvariants; shows an example
 { 

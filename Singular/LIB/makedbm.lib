@@ -1,4 +1,4 @@
-// $Id: makedbm.lib,v 1.5 1997-12-15 10:35:07 krueger Exp $
+// $Id: makedbm.lib,v 1.6 1998-04-03 23:18:16 krueger Exp $
 //=========================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
@@ -9,13 +9,25 @@ LIBRARY:  makedbm.lib     some usefull tools needed by the Arnold-Classifier.
 
    dbm_read(l);          read all entries from a DBM-databaes pointed by l
    dbm_getnext(l);       read next entry from a DBM-databaes pointed by l
+   create_sing_dbm();
+   read_sing_dbm();
 
 //=============================================================================
-proc _init()
-{
-  "_init() makedbm started";
-}
 
+proc makedbm_init()
+{
+  string s;
+  link l="DBM:r NFlist";
+  s = read(l,"VERSION");
+  if (s == "" ) {
+    "Need to create database...";
+    create_sing_dbm();
+  }
+  close(l);
+  l="DBM:r NFlist";
+  s = read(l,"VERSION");
+  "Creation done. Current version:", s;
+}
 //=============================================================================
 
 proc dbm_read (link l)
@@ -62,10 +74,10 @@ proc create_sing_dbm
   write(l, "J[k,r]", "x3+x2*y^k+a*y^(3*k+r)");
   write(l, "X[1,0]", "x4+a*x2y2+y4");
   write(l, "X[1,r]", "x4+x2y2+a*y^(4+r)");
-  write(l, "X[k,0]", "x4+b*x3y^k+a*x2y^(2*k) + xy^(3*k)");
-  write(l, "X[k,r]", "x4+a*x3*y^k+x2y^(2*k)+b*(y^(4*k+r))");
-  write(l, "W[12k]", "x4+y^(4*k+1)+a*x*(y^(3*k+1))+c*x2*(y^(2*k+1))");
-  write(l, "W[12k+1]", "x4+x*(y^(3*k+1))+a*x2*(y^(2*k+1))+c*y^(4*k+2)");
+  write(l, "X[k,0]", "x4+b*x^3*y^k+a*x^2*y^(2*k) + x*y^(3*k)");
+  write(l, "X[k,r]", "x4+a*x^3*y^k+x^2*y^(2*k)+b*(y^(4*k+r))");
+  write(l, "W[12k]", "x4+y^(4*k+1)+a*x*(y^(3*k+1))+c*x^2*(y^(2*k+1))");
+  write(l, "W[12k+1]", "x4+x*(y^(3*k+1))+a*x^2*(y^(2*k+1))+c*y^(4*k+2)");
   write(l, "W[12k+5]", "x4+x*(y^(3*k+2))+a*x2*(y^(2*k+2))+b*y^(4*k+3)");
   write(l, "W[12k+6]", "x4+y^(4*k+3)+a*x*(y^(3*k+3))+b*x2*(y^(2*k+2))");
   write(l, "W[k,0]", "x4+b*x2*(y^(2*k+1))+a*x*(y^(3*k+2))+y^(4*k+2)");
@@ -81,8 +93,8 @@ proc create_sing_dbm
   write(l, "Z[k,12k+6r-1]", "(x+a*(y^k))*(x3+b*x*(y^(2*k+2*r+1))+y^(3*k+3*r+1))");
   write(l, "Z[k,12k+6r]", "(x+a*(y^k))*(x3+x*(y^(2*k+2*r+1))+b*y^(3*k+3*r+2))");
   write(l, "Z[k,12k+6r+1]", "(x+a*(y^k))*(x3+b*x*(y^(2*k+2*r+2))+y^(3*k+3*r+2))");
-  write(l, "Z[k,0]", "y*(x3+d*x2*(y^k)+c*x*(y^(2*k+1))+y^(3*k))");
-  write(l, "Z[k,r]", "y*(x3+x2y^(k+1)+b*(y^(3*k+r+3)))");
+  write(l, "Z[k,0]", "y*(x3+d*x2*(y^(k+1))+c*x*(y^(2*k+3))+y^(3*k+3))");
+  write(l, "Z[k,r]", "y*(x3+x^2*y^(k+1)+b*(y^(3*k+r+3)))");
   write(l, "Z[6k+5]", "y*(x3+b*x*(y^(2*k+1))+y^(3*k+1))");
   write(l, "Z[6k+6]", "y*(x3+x*(y^(2*k+1))+b*y^(3*k+2))");
   write(l, "Z[6k+7]", "y*(x3+b*x*(y^(2*k+2))+y^(3*k+2))");
