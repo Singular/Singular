@@ -248,6 +248,7 @@ short sr_cmds[] =
   MSTD_CMD,
   RESERVEDNAME_CMD,
   WRITE_CMD,
+  QRING_CMD,
 };
 
 // struct used for specifying the cmd <-> cop relations
