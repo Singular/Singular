@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.7 2003-11-21 09:47:43 mschulze Exp $";
+version="$Id: gmspoly.lib,v 1.8 2004-08-10 17:03:44 mschulze Exp $";
 category="Singularities";
 
 info="
-LIBRARY:  gmspoly.lib  Gauss-Manin System of Cohomologically Tame Polynomials
+LIBRARY:  gmspoly.lib  Gauss-Manin System of Tame Polynomials
 
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
