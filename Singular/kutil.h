@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.66 2003-01-06 11:21:42 Singular Exp $ */
+/* $Id: kutil.h,v 1.67 2003-03-05 17:56:19 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -329,6 +329,7 @@ int posInT0 (const TSet set,const int length,LObject &p);
 int posInT1 (const TSet set,const int length,LObject &p);
 int posInT2 (const TSet set,const int length,LObject &p);
 int posInT11 (const TSet set,const int length,LObject &p);
+int posInT110 (const TSet set,const int length,LObject &p);
 int posInT13 (const TSet set,const int length,LObject &p);
 int posInT15 (const TSet set,const int length,LObject &p);
 int posInT17 (const TSet set,const int length,LObject &p);
