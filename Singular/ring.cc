@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.107 2000-08-24 14:42:46 obachman Exp $ */
+/* $Id: ring.cc,v 1.108 2000-08-24 15:20:39 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3123,7 +3123,7 @@ void rUnComplete(ring r)
       omFreeSize((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord));
     }
     if (r->ordsgn != NULL && r->pCompLSize != 0)
-      omFreeSize((ADDRESS)r->ordsgn,r->pExpLSize*sizeof(long));
+      omFreeSize((ADDRESS)r->ordsgn,r->ExpLSize*sizeof(long));
     if (r->p_Procs != NULL)
       omFreeSize(r->p_Procs, sizeof(p_Procs_s));
   }
