@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.69 2000-05-19 11:44:11 pfister Exp $
+// $Id: primdec.lib,v 1.70 2000-05-24 11:19:24 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.69 2000-05-19 11:44:11 pfister Exp $";
+version="$Id: primdec.lib,v 1.70 2000-05-24 11:19:24 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -741,7 +741,6 @@ EXAMPLE: example zero_decomp; shows an example
   intvec @vh,@hilb;
   string @ri;
   poly @f;
-
   if (dim(j)>0)
   {
      primary[1]=ideal(1);
@@ -750,7 +749,6 @@ EXAMPLE: example zero_decomp; shows an example
   }
 
   j=interred(j);
-
   attrib(j,"isSB",1);
   if(vdim(j)==deg(j[1]))
   {
@@ -2026,10 +2024,10 @@ EXAMPLE: example decomp; shows an example
   }
 
   homo=homog(i);
-   if((find(ordstr(basering),"w")!=0)||(find(ordstr(basering),"W")!=0))
-   {
-      homo=0;
-   }
+  if((find(ordstr(basering),"w")!=0)||(find(ordstr(basering),"W")!=0))
+  {
+     homo=0;
+  }
 
   if(homo==1)
   {
@@ -2117,11 +2115,42 @@ EXAMPLE: example decomp; shows an example
         @j[@k]=0;
       }
     }
+    
     if(size(fried)>0)
     {
+       string newva;
+       string newma; 
+       for(@k=1;@k<=nvars(basering);@k++)
+       {
+          @n1=0;
+          for(@n=1;@n<=size(fried);@n++)
+          {
+             if(lead(fried[@n])==var(@k))
+             {
+                @n1=1;
+                break;
+             }
+          } 
+          if(@n1==0)
+          {
+            newva=newva+string(var(@k))+",";
+            newma=newma+string(var(@k))+",";
+          }
+          else
+          {
+            newma=newma+string(0)+",";   
+          }      
+       }
+       newva[size(newva)]=")";
+       newma[size(newma)]=";";
+       execute("ring @deirf=("+charstr(gnir)+"),("+newva+",lp;");
+       execute("map @kappa=gnir,"+newma);
+       ideal @j= @kappa(@j);
        @j=simplify(@j,2);
        attrib(@j,"isSB",1);
        list pr=decomp(@j);
+       setring gnir;
+       list pr=fetch(@deirf,pr);
        for(@k=1;@k<=size(pr);@k++)
        {
          @j=pr[@k]+fried;
