@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.205 2000-02-17 10:32:41 Singular Exp $ */
+/* $Id: iparith.cc,v 1.206 2000-03-31 12:16:11 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1756,10 +1756,12 @@ static BOOLEAN jjKoszul_Id(leftv res, leftv u, leftv v)
 static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
 {
   ideal m;
+  BITSET save_test=test;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
   m = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD));
   res->data = (char *)idModule2formatedMatrix(m,ul,vl);
+  test=save_test;
   return FALSE;
 }
 static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
@@ -4238,12 +4240,14 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
 static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
 {
   if (w->rtyp!=IDHDL) return TRUE;
+  BITSET save_test=test;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
   ideal m
     = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD),
              FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
   res->data = (char *)idModule2formatedMatrix(m,ul,vl);
+  test=save_test;
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
