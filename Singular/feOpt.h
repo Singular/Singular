@@ -1,0 +1,76 @@
+#ifndef FEOPTS_H
+#define FEOPTS_H
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: feOpt.h,v 1.1 1999-09-20 18:03:45 obachman Exp $ */
+/*
+* ABSTRACT: Declarations for working with Options
+*/
+
+#include "mod2.h"
+#include "fegetopt.h"
+
+extern const char SHORT_OPTS_STRING[];
+#define LONG_OPTION_RETURN 13 
+
+// specifies format of options
+extern struct fe_option feOptSpec[];
+
+#ifndef GENERATE_OPTION_INDEX
+
+// provides feOptIndex enum type for fast accesses to feOptSpec
+#ifndef GENTABLE
+#ifdef ESINGULAR
+#include "feOptES.inc"
+#else
+#include "feOpt.inc"
+#endif
+#else
+typedef enum {FE_OPT_UNDEF}  feOptIndex;
+#endif
+
+inline void* feOptValue(feOptIndex opt)
+{
+  return feOptSpec[(int)opt].value;
+}
+inline int feOptValue(feOptIndex opt, char** val)
+{
+  if (opt != FE_OPT_UNDEF && feOptSpec[(int)opt].type == feOptString) 
+  {
+    *val = (char*) feOptSpec[(int)opt].value;
+    return TRUE;
+  }
+  *val = NULL;
+  return FALSE;
+}
+inline int feOptValue(feOptIndex opt, int* val)
+{
+  if (opt != FE_OPT_UNDEF && feOptSpec[(int)opt].type != feOptString) 
+  {
+    *val = (int) feOptSpec[(int)opt].value;
+    return TRUE;
+  }
+  *val = 0;
+  return FALSE;
+}
+ 
+// maps name to otions
+feOptIndex feGetOptIndex(const char* name);
+feOptIndex feGetOptIndex(int optc);
+
+// Setting option values:
+// Return: NULL -- everything ok
+//         "error-string" on error
+
+// opt->type must be feOptInt or feOptBool
+char* feSetOptValue(feOptIndex opt, int optarg);
+// for opt->type != feOptString, optarg is converted
+// to an int
+char* feSetOptValue(feOptIndex opt, char* optarg);
+
+void fePrintOptValues();
+
+#endif // ! GENERATE_OPTION_INDEX
+
+#endif //  FEOPTS_H

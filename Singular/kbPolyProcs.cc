@@ -372,7 +372,7 @@ void kbSetPolyProcs(kbPolyProcs_pt pprocs,
   int Variables1W;
 
   // set characterisic
-  if (r->ch > 1) ch = chMODP;
+  if (rField_is_Zp(r)) ch = chMODP;
   
   // set Ordering Type
   switch (rot)

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.103 1999-08-20 16:06:49 Singular Exp $ */
+/* $Id: extra.cc,v 1.104 1999-09-20 18:03:43 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -48,6 +48,8 @@
 #include "kstd1.h"
 #include "syz.h"
 #include "sdb.h"
+#include "feOpt.h"
+#include "distrib.h"
 
 // Define to enable many more system commands
 #ifndef MAKE_DISTRIBUTION
@@ -236,7 +238,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       res->rtyp = STRING_CMD;
       char* b = StringSetS("");
-      feStringAppendBrowsers(1);
+      feStringAppendBrowsers(0);
       res->data = mstrdup(b);
       return FALSE;
     }
@@ -315,58 +317,64 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /*==================== options ==================================*/
     if (strstr(sys_cmd, "--") == sys_cmd)
     {
-      BOOLEAN mainGetSingOptionValue(const char* name, char** result);
-      char* val;
-
-      if (h != NULL)
+      if (strcmp(sys_cmd, "--") == 0)
       {
-        if (strcmp(sys_cmd, "--browser") == 0)
-        {
-          if (h->Typ() == STRING_CMD)
-          {
-            if (strcmp(feHelpBrowser((char*) h->Data(), 1),
-                       (char*) h->Data()) != 0)
-            {
-              Werror("Can not set HelpBrowser to '%s'", (char*) h->Data());
-              return TRUE;
-            }
-          }
-          else
-          {
-            Werror("Need string to set HelpBrowser");
-            return TRUE;
-          }
-        }
-        else
-        {
-          Werror("Can not set value of option %s", sys_cmd);
-          return TRUE;
-        }
+        fePrintOptValues();
+        return FALSE;
       }
-
-      if (mainGetSingOptionValue(&(sys_cmd)[2], &val))
+      
+      feOptIndex opt = feGetOptIndex(&sys_cmd[2]);
+      if (opt == FE_OPT_UNDEF)
       {
-        if ((unsigned int) val > 1)
+        Werror("Unknown option %s", sys_cmd);
+        Werror("Use 'system(\"--\");' for listing of available options");
+        return TRUE;
+      }
+      
+      if (h == NULL)
+      {
+        if (feOptSpec[opt].type == feOptString)
         {
-          res->rtyp=STRING_CMD;
-          if (strcmp(sys_cmd, "--browser") == 0 &&
-              (val == NULL || *val == '\0'))
-            res->data = (void*) mstrdup(feHelpBrowser());
+          res->rtyp = STRING_CMD;
+          if (feOptSpec[opt].value != NULL)
+            res->data = mstrdup((char*) feOptSpec[opt].value);
           else
-            res->data = (void*) mstrdup( val );
+            res->data = mstrdup("");
         }
         else
         {
-          res->rtyp=INT_CMD;
-          res->data=(void *)val;
+          res->rtyp = INT_CMD;
+          res->data = feOptSpec[opt].value;
         }
         return FALSE;
       }
-      else
+      
+      if (h->Typ() != STRING_CMD && 
+          h->Typ() != INT_CMD)
       {
-        Werror("Unknown option %s\n", sys_cmd);
+        Werror("Need string or int argument to set option value");
         return TRUE;
       }
+      char* errormsg;
+      if (h->Typ() == INT_CMD)
+      {
+        if (feOptSpec[opt].type == feOptString)
+        {
+          Werror("Need string argument to set value of option %s", sys_cmd);
+          return TRUE;
+        }
+        errormsg = feSetOptValue(opt, (int) h->Data());
+        if (errormsg != NULL) 
+          Werror("Option '--%s=%d' %s", sys_cmd, (int) h->Data(), errormsg);
+      }
+      else
+      {
+        errormsg = feSetOptValue(opt, (char*) h->Data());
+        if (errormsg != NULL)
+          Werror("Option '--%s=%s' %s", sys_cmd, (char*) h->Data(), errormsg);
+      }
+      if (errormsg != NULL) return TRUE;
+      return FALSE;
     }
     else
 /*==================== HC ==================================*/
@@ -1004,16 +1012,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-/*==================== print all option values =================*/
-#ifndef NDEBUG
-    if (strcmp(sys_cmd, "options") == 0)
-    {
-      void mainOptionValues();
-      mainOptionValues();
-      return FALSE;
-    }
-    else
-#endif
 /*==================== GF =================*/
 #if 0
     if (strcmp(sys_cmd, "GF") == 0)

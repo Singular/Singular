@@ -1,16 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.10 1999-08-25 16:02:46 Singular Exp $ */
+/* $Id: feResource.cc,v 1.11 1999-09-20 18:03:45 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
 
 #include <unistd.h>
 
-#include "version.h"
 #include "mod2.h"
-#include "version.h"
+#include "distrib.h"
 #ifndef ESINGULAR
 #include "mmemory.h"
 #include "febase.h"
@@ -98,7 +97,7 @@ static feResourceConfig_s feResourceConfigs[20] =
  * Declarations: Local variables / functions
  *
  *****************************************************************/
-static char* feArgv0;
+char* feArgv0;
 #define MAXRESOURCELEN 5*MAXPATHLEN
 char fePathSep = 
 #if defined(WINNT)
@@ -193,7 +192,7 @@ void feReInitResources()
     i++;
   }
 #ifdef RESOURCE_DEBUG
-  printf("feInitResources: entering with argv0=%s=\n", argv0);
+  printf("feInitResources: entering with argv0=%s=\n", feArgv0);
 #endif
   // init some Resources
   feResource('b');

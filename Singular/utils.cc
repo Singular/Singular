@@ -2,11 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "getopt.h"
+#include "fegetopt.h"
 #include "utils.h"
 #ifdef __MWERKS__
 #define __GNU_LIBRARY__
-#include "getopt.h"
+#include "fegetopt.h"
 #endif
 
 extern FILE *yylpin;
@@ -37,14 +37,14 @@ void main_init(int argc, char *argv[])
 {
   char c;
 
-  while((c=getopt(argc, argv, "ihd:sf:"))>=0) {
+  while((c=fe_getopt(argc, argv, "ihd:sf:"))>=0) {
     switch(c) {
         case 'd':
           lpverbose = 1;
-          if(isdigit(argv[optind-1][0])) sscanf(optarg, "%d", &lpverbose);
-          else optind--;
+          if(isdigit(argv[fe_optind-1][0])) sscanf(optarg, "%d", &lpverbose);
+          else fe_optind--;
           break;
-        case 'f': lib_file = argv[optind-1];
+        case 'f': lib_file = argv[fe_optind-1];
           break;
         case 's':
           check++;
@@ -56,10 +56,10 @@ void main_init(int argc, char *argv[])
           usage(argv[0]);
           break;
           
-        case -1 : printf("no such option:%s\n", argv[optind]);
+        case -1 : printf("no such option:%s\n", argv[fe_optind]);
           usage(argv[0]);
           break;
-        default: printf("no such option.%x, %c %s\n", c&0xff, c, argv[optind]);
+        default: printf("no such option.%x, %c %s\n", c&0xff, c, argv[fe_optind]);
           usage(argv[0]);
     }
   }
@@ -72,17 +72,17 @@ void main_init(int argc, char *argv[])
     else
       printf("$library = \"%s\";\n", lib_file);
   } else {
-    while(argc>optind && yylpin==NULL) {
-      yylpin = fopen( argv[optind], "rb" );
+    while(argc>fe_optind && yylpin==NULL) {
+      yylpin = fopen( argv[fe_optind], "rb" );
       if(yylpin!=NULL) 
       {
-        lib_file = argv[optind];
+        lib_file = argv[fe_optind];
         if (! texinfo_out) 
-          printf("Checking library '%s'\n", argv[optind]);
+          printf("Checking library '%s'\n", argv[fe_optind]);
         else
           printf("$library = \"%s\";\n", lib_file);
       }
-      else optind++;
+      else fe_optind++;
     }
   }
   if(yylpin == NULL) {

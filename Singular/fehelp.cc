@@ -20,6 +20,7 @@
 #include "ipid.h"
 #include "ipshell.h"
 #include "libparse.h"
+#include "feOpt.h"
 
 /*****************************************************************
  *
@@ -148,7 +149,7 @@ void feHelp(char *str)
       {
         Warn("No help for topic '%s' (not even for '*%s*')", str, str);
         WarnS("Try '?;'       for general help");
-        WarnS("or  '?Index;'  for all available help topics");
+        WarnS("or  '?Index;'  for all available help topics.");
         return;
       }
     }
@@ -181,25 +182,35 @@ void feHelp(char *str)
 char* feHelpBrowser(char* which, int warn)
 {
   int i = 0;
-  extern void mainSetSingOptionValue(const char* name, char* value);
-  char* mainGetSingOptionValue(const char* name);
-
-  // if no argument, see what we have as value to the option
-  if (which == NULL || *which == '\0')
-    which = mainGetSingOptionValue("browser");
 
   // if no argument, choose first available help browser
   if (which == NULL || *which == '\0')
   {
-    // unles one is already set
-    if (heCurrentHelpBrowser != NULL) goto Finish;
+    // return, if already set
+    if (heCurrentHelpBrowser != NULL) 
+      return heCurrentHelpBrowser->browser;
 
+    // First, try emacs, if emacs-option is set
+    if (feOptValue(FE_OPT_EMACS) != NULL)
+    {
+      while (heHelpBrowsers[i].browser != NULL)
+      {
+        if (strcmp(heHelpBrowsers[i].browser, "emacs") == 0 &&
+            (heHelpBrowsers[i].init_proc(0)))
+        {
+          heCurrentHelpBrowser = &(heHelpBrowsers[i]);
+          goto Finish;
+        }
+        i++;
+      }
+      i=0;
+    }
     while (heHelpBrowsers[i].browser != NULL)
     {
       if (heHelpBrowsers[i].init_proc(0))
       {
         heCurrentHelpBrowser = &(heHelpBrowsers[i]);
-        return heCurrentHelpBrowser->browser;
+        goto Finish;
       }
       i++;
     }
@@ -214,7 +225,7 @@ char* feHelpBrowser(char* which, int warn)
 
   if (heHelpBrowsers[i].browser == NULL)
   {
-    if (warn) Warn("No help browser '%s' available", which);
+    if (warn) Warn("No help browser '%s' available.", which);
   }
   else
   {
@@ -229,23 +240,31 @@ char* feHelpBrowser(char* which, int warn)
   // something went wrong
   if (heCurrentHelpBrowser == NULL)
   {
-    // choose first available help browser
-    mainSetSingOptionValue("browser", "");
     feHelpBrowser();
     assume(heCurrentHelpBrowser != NULL);
     if (warn)
-      Warn("Setting help browser to '%s'", heCurrentHelpBrowser->browser);
+      Warn("Setting help browser to '%s'.", heCurrentHelpBrowser->browser);
     return heCurrentHelpBrowser->browser;
   }
   else
   {
     // or, leave as is
     if (warn)
-      Warn("Help browser stays at '%s'",  heCurrentHelpBrowser->browser);
+      Warn("Help browser stays at '%s'.",  heCurrentHelpBrowser->browser);
+    return heCurrentHelpBrowser->browser;
   }
 
   Finish:
-  mainSetSingOptionValue("browser", heCurrentHelpBrowser->browser);
+  // update value of Browser Option
+  if (feOptSpec[FE_OPT_BROWSER].value == NULL ||
+      strcmp((char*) feOptSpec[FE_OPT_BROWSER].value,  
+             heCurrentHelpBrowser->browser) != 0)
+  {
+    if (feOptSpec[FE_OPT_BROWSER].value == NULL) 
+      FreeL(feOptSpec[FE_OPT_BROWSER].value);
+   feOptSpec[FE_OPT_BROWSER].value 
+     = (void*) mstrdup(heCurrentHelpBrowser->browser);
+  }
   return heCurrentHelpBrowser->browser;
 }
 
@@ -641,7 +660,7 @@ static void heBrowserHelp(heEntry hentry)
   if (kchksum  && kchksum != hentry->chksum && heOnlineHelp(hentry->key))
     return;
 
-  if (heCurrentHelpBrowser == NULL) feHelpBrowser();
+  if (heCurrentHelpBrowser == NULL) feHelpBrowser(NULL, 0);
   assume(heCurrentHelpBrowser != NULL);
   if (! feHelpCalled)
   {
@@ -721,7 +740,8 @@ static BOOLEAN heNetscapeInit(int warn)
   if (feResource('h' /*"HtmlDir"*/, warn) == NULL)
   {
     if (warn) WarnS("no local HtmlDir found");
-    if (warn) Warn("using %s instead", feResource('u' /*"ManualUrl"*/, warn));
+    return FALSE;
+//    if (warn) Warn("using %s instead", feResource('u' /*"ManualUrl"*/, warn));
   }
   return TRUE;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.9 1999-08-18 09:18:28 obachman Exp $ */
+/* $Id: mmisc.c,v 1.10 1999-09-20 18:03:50 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -12,6 +12,8 @@
 #include "mmprivate.h"
 #include "mmpage.h"
 #include "febase.h"
+#include "distrib.h"
+
 #ifdef MTRACK
 #include "mmbt.h"
 #endif

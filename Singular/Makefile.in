@@ -65,11 +65,12 @@ LIBS		= -lm @NEED_LIBS@
 ### file sets
 ###
 
+# normal C++ source files
 CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
-    clapmem.cc clapsing.cc claptmpl.cc cntrlc.cc \
-    extra.cc febase.cc feread.cc fehelp.cc feResource.cc feCmdLineOptions.cc\
+    clapmem.cc clapsing.cc cntrlc.cc\
+    extra.cc febase.cc feread.cc fehelp.cc feResource.cc feOpt.cc\
     ffields.cc hdegree.cc hilb.cc hutil.cc \
-    ideals.cc intvec.cc iparith.cc \
+    ideals.cc intvec.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
     comm.cc kstd1.cc kstd2.cc kutil.cc lists.cc \
@@ -81,18 +82,23 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
     sing_dld.cc sing_dbm.cc spolys.cc spolys0.cc \
     subexpr.cc syz.cc syz0.cc syz1.cc \
-    tesths.cc timer.cc weight.cc \
-    mpsr_Put.cc mpsr_PutPoly.cc mpsr_Tok.cc mpsr_GetPoly.cc \
+    timer.cc weight.cc \
+    mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
     ndbm.cc spSpolyLoop.cc libparse.cc mod_raw.cc\
     pcv.cc kbuckets.cc kbPolyProcs.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc
 
-CSOURCES=gmalloc.c mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
-    mmbt.c weight0.c find_exec.c getopt.c fereadl.c page.c
+# normal C source files
+CSOURCES=mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
+    mmbt.c weight0.c find_exec.c fegetopt.c fereadl.c page.c
 
-SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l spSpolyLoop.pl generate.pl
+# special source files (need extra compiling and/or linking)
+ESOURCES=iparith.cc gmalloc.c tesths.cc mpsr_Tok.cc claptmpl.cc
+
+SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} \
+	grammar.y scanner.l libparse.l spSpolyLoop.pl generate.pl
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
@@ -106,12 +112,13 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
 	kutil.h mpsr_Put.h spolys0.h sing_dld.h\
-	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h getopt.h libparse.h \
+	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h libparse.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
 	pcv.h mod_raw.h kbuckets.h kbPolyProcs.h \
-	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h 
+	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
+	feOpt.h fegetopt.h
 
-INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc spSpolyLoop.inc
+INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc spSpolyLoop.inc feOpt.inc
 
 TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
 	${testdir}/general_test.in ${testdir}/general_test.out \
@@ -122,24 +129,7 @@ DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
 	${INCS}
 
-OBJS=grammar.o scanner.o matpol.o binom.o mpr_complex.o gnumpfl.o gnumpc.o \
-     febase.o feread.o fehelp.o feResource.o timer.o intvec.o attrib.o lists.o\
-     longrat.o longrat0.o misc.o ring.o numbers.o maps.o\
-     hilb.o comm.o kstd1.o kstd2.o kutil.o khstd.o kstdfac.o modulop.o spolys.o\
-     ideals.o subexpr.o hdegree.o hutil.o ffields.o shortfl.o \
-     longalg.o spolys0.o syz.o syz0.o syz1.o weight.o weight0.o \
-     ipid.o ipshell.o iplib.o ipassign.o ipconv.o ipprint.o\
-     polys.o polys0.o polys1.o polys-impl.o extra.o sparsmat.o\
-     mminit.o mmtables.o mmalloc.o mmheap.o mmpage.o page.o \
-     mmisc.o mmcheck.o mmbt.o sing_dld.o sing_dbm.o silink.o \
-     sing_mp.o fglm.o fglmzero.o fglmvec.o fglmhom.o fglmgauss.o cntrlc.o \
-     algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
-     mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
-     mpsr_Get.o mpsr_GetMisc.o ndbm.o spSpolyLoop.o libparse.o \
-     find_exec.o getopt.o fereadl.o  mod_raw.o sdb.o \
-     GMPrat.o multicnt.o npolygon.o semic.o spectrum.o splist.o \
-     pcv.o kbuckets.o kbPolyProcs.o \
-     mpr_inout.o mpr_base.o mpr_numeric.o
+OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 
 # Singular libraries which go into distribution
 SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
@@ -178,27 +168,30 @@ SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
 all:	Singular
 
 Singular: mod2.h Makefile version.h scanner.cc gmalloc.o \
-          ${OBJS} iparith.o mpsr_Tok.o tesths.cc libparse.cc 
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -o Singular \
-	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS} \
-	${LD_DYN_FLAGS} gmalloc.o ${LD_LIBC}
+          ${OBJS} iparith.o tesths.cc libparse.cc claptmpl.o
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
+	  -o Singular \
+	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
+	  ${OBJS} ${LDFLAGS} ${LIBS} ${LD_DYN_FLAGS} \
+	  gmalloc.o ${LD_LIBC}
 
 Singular-static: mod2.h Makefile version.h scanner.cc  gmalloc.o \
-	        ${OBJS} iparith.o mpsr_Tok.o tesths.cc
+	        ${OBJS} iparith.o mpsr_Tok.o tesths.cc claptmpl.o
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
-	-o Singular-static \
-	tesths.cc iparith.o mpsr_Tok.o \
-	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS} ${LD_DYN_FLAGS} \
-	gmalloc.o ${LD_LIBC}
+	  -o Singular-static \
+	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
+	  ${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS} ${LD_DYN_FLAGS} \
+	  gmalloc.o ${LD_LIBC}
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
 claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 
-iparith.inc mpsr_Tok.inc: gmalloc.o iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
+iparith.inc mpsr_Tok.inc: gmalloc.o claptmpl.o iparith.cc \
+                          ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
-	     -o gentable iparith.cc tesths.cc mpsr_Tok.cc \
+	     -o gentable claptmpl.o iparith.cc tesths.cc mpsr_Tok.cc \
 	     ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o ${LD_LIBC}
 	./gentable
 	/bin/rm -f gentable gentable.exe
@@ -214,7 +207,7 @@ mmtables.o mmtables.d: mmtables.inc
 
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
-	echo "#define SINGULAR_VERSION_ID " `date '+%Y%m%d%H'` >version.h
+	echo unsigned long feVersionId =  `date '+%Y%m%d%H'`\; >version.h
 
 kbPolyProcs.cc kbPolyProcs.dd : kbPolyProcs.pin 
 
@@ -234,8 +227,9 @@ spSpolyLoop.inc: spSpolyLoop.pl
 	fi
 	${PERL5} spSpolyLoop.pl > spSpolyLoop.inc
 
-libparse: libparse_main.o utils.o getopt.o
-	${CXX} -o libparse libparse_main.o utils.o getopt.o
+
+libparse: libparse_main.o utils.o fegetopt.o
+	${CXX} -o libparse libparse_main.o utils.o fegetopt.o
 
 libparse_main.o: libparse.cc
 	${CXX} -c -o libparse_main.o libparse.cc -DSTANDALONE_PARSER
@@ -247,8 +241,21 @@ libparse.cc: libparse.l
 	fi
 	${LEX} -I -Pyylp -olibparse.cc libparse.l
 
-ESingular: getopt.o feResource.cc mod2.h feCmdLineOptions.cc version.h emacs.cc
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o ESingular emacs.cc getopt.o ${LDFLAGS} ${LIBS}
+ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
+           feOptES.inc
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o ESingular emacs.cc fegetopt.o ${LDFLAGS} ${LIBS}
+
+feOpt.h: feOpt.inc feOptES.inc
+
+feOpt.inc: feOpt.cc
+	$(CXX) -DGENERATE_OPTION_INDEX feOpt.cc
+	./a.out
+	rm a.out
+
+feOptES.inc: feOpt.cc
+	$(CXX) -DGENERATE_OPTION_INDEX -DESINGULAR feOpt.cc
+	./a.out
+	rm a.out
 
 src: scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
 
@@ -301,7 +308,7 @@ uninstallbin:
 mostlyclean: clean
 
 clean:
-	-rm -f Singular Singularg Singularp Singularb libparse \
+	-rm -f Singular Singularg Singularp Singularb libparse feOpt*.inc\
             *.o *.og core *.op *.ob 
 
 distclean: clean
@@ -326,22 +333,20 @@ maintainer-clean: distclean srcclean
 ##
 
 Singular-bindist: ${OBJS} Makefile
-	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
-	echo "#define MAKE_DISTRIBUTION	" >> version.h
+	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	${MAKE} Singular ESingular
 	strip Singular ESingular
 	${INSTALL} -s Singular Singular-bindist
 	${INSTALL} -s ESingular ESingular-bindist
-	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
+	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
 Singular-static-bindist: ${OBJS} Makefile
-	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
-	echo "#define MAKE_DISTRIBUTION	" >> version.h
+	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	${MAKE} Singular-static ESingular
 	strip Singular-static ESingular
 	mv Singular-static Singular-static-bindist
 	${INSTALL} -s ESingular ESingular-bindist
-	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
+	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
 tar:
 	tar cf Singular-${SINGULAR_VERSION}-src.tar ${DISTFILES}
@@ -379,29 +384,11 @@ DEFSG		= -D@SING_UNAME@ @DEFS@
 ## .og files for having -O and -g object versions available at the same time
 ## 
 
-OBJG1=	grammar.og scanner.og matpol.og binom.og gnumpfl.og mpr_complex.og \
-     febase.og feread.og fehelp.og feResource.og timer.og intvec.og attrib.og lists.og \
-     gnumpc.og longrat.og longrat0.og misc.og ring.og numbers.og maps.og\
-     hilb.og comm.og kstd1.og kstd2.og kutil.og khstd.og kstdfac.og modulop.og \
-     spolys.og ideals.og subexpr.og hdegree.og hutil.og ffields.og shortfl.og \
-     longalg.og spolys0.og syz.og syz0.og syz1.og weight.og \
-     ipid.og ipshell.og iplib.og ipassign.og ipconv.og ipprint.og\
-     polys.og polys0.og polys1.og polys-impl.og extra.og\
-     mminit.og sing_dld.og sing_dbm.og silink.og sparsmat.og\
-     sing_mp.og fglm.og fglmzero.og fglmvec.og fglmgauss.og fglmhom.og\
-     algmap.og clapconv.og  clapmem.og clapsing.og cntrlc.og  sdb.og\
-     mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
-     mpsr_Get.og mpsr_GetMisc.og \
-     ndbm.og spSpolyLoop.og libparse.og  mod_raw.og \
-     GMPrat.og multicnt.og npolygon.og semic.og spectrum.og splist.og \
-     mpr_inout.og mpr_base.og mpr_numeric.og \
-     pcv.og kbuckets.og kbPolyProcs.og
-
-OBJG2= mmalloc.og mmheap.og mmpage.og mmcheck.og mmbt.og page.og \
-     mmisc.og mmtables.og weight0.og find_exec.og getopt.og fereadl.og
+OBJG1 := $(CXXSOURCES:.cc=.og) 
+OBJG2 := $(CSOURCES:.c=.og) 
 
 
-OBJG=$(OBJG1) $(OBJG2) claptmpl.og 
+OBJG=$(OBJG1) $(OBJG2) 
 
 ##
 ## Debug Targets
@@ -409,15 +396,16 @@ OBJG=$(OBJG1) $(OBJG2) claptmpl.og
 
 claptmpl.og: claptmpl.cc mod2.h
 	$(CXXG)  ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
-$(OBJG1): %.og: %.cc
+
+$(OBJG1) : %.og: %.cc
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
 $(OBJG2) gmalloc.og: %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-Singularg: scanner.cc gmalloc.og $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h 
+Singularg: scanner.cc gmalloc.og $(OBJG) iparith.og mpsr_Tok.og claptmpl.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
-	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS} \
+	tesths.cc iparith.og mpsr_Tok.og claptmpl.og $(OBJG) ${LDFLAGS} ${LIBS} \
 	${LD_DYN_FLAGS} gmalloc.og
 
 iparith.og: iparith.inc iparith.cc

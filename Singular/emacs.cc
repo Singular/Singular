@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.7 1999-09-07 08:36:09 Singular Exp $ */
+/* $Id: emacs.cc,v 1.8 1999-09-20 18:03:43 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -49,8 +49,8 @@ void fePrintReportBug(char* msg, char* file, int line)
   WarnS("Please, email the following output to singular@mathematik.uni-kl.de ");
   Warn("Bug occured at %s:%d ", file, line);
   Warn("Message: %s ", msg);
-  Warn("Version: " S_UNAME S_VERSION1 " (%d) " __DATE__ __TIME__,
-       SINGULAR_VERSION_ID);
+  Warn("Version: " S_UNAME S_VERSION1 " (%lu) " __DATE__ __TIME__,
+       feVersionId);
 }
 
 void assume_violation(char* file, int line)
@@ -62,7 +62,12 @@ extern "C" {
 #include "find_exec.c"
 }
 #include "feResource.cc"
-#include "feCmdLineOptions.cc"
+#include "feOpt.cc"
+
+void mainUsage()
+{
+  fprintf(stderr, "Use `%s --help' for a complete list of options\n", feArgv0);
+}
 
 int main(int argc, char** argv)
 {
@@ -82,55 +87,60 @@ int main(int argc, char** argv)
   
   int optc, option_index;
   
-  while ((optc = getopt_long(argc, argv, SHORT_OPTS_STRING, 
-                             longopts, &option_index))
+  while ((optc = fe_getopt_long_only(argc, argv, SHORT_OPTS_STRING, 
+                                     feOptSpec, &option_index))
         != EOF)
   {
     switch(optc)
     {
         case 'h':
-          mainHelp(argv[0]);
+          feOptHelp(feArgv0);
           exit(0);
           
         case '?':
         case ':':
-          mainUsage(argv[0]);
+        case '\0':
+          mainUsage();
           exit(1);
 
         case  LONG_OPTION_RETURN:
-          if (strcmp(longopts[option_index].name, LON_EMACS) == 0)
+        {
+          switch(option_index)
           {
-            emacs = optarg;
-          }
-          else if (strcmp(longopts[option_index].name, LON_EMACS_DIR) == 0)
-          {
-            emacs_dir = optarg;
-          }
-          else if (strcmp(longopts[option_index].name, LON_EMACS_LOAD) == 0)
-          {
-            emacs_load = optarg;
-          }
-          else if (strcmp(longopts[option_index].name, LON_SINGULAR) == 0)
-          {
-            singular = optarg;
-          }
-          else if (strcmp(longopts[option_index].name, LON_NO_EMACS_CALL) == 0)
-          {
-            no_emacs_call = 1;
-          }
-          else
-          {
-            break;
+              case FE_OPT_EMACS:
+                emacs = fe_optarg;
+                break;
+                
+              case FE_OPT_EMACS_DIR:
+                emacs_dir = fe_optarg;
+                break;
+                
+              case FE_OPT_EMACS_LOAD:
+                emacs_load = fe_optarg;
+                break;
+                
+              case FE_OPT_SINGULAR:
+                singular = fe_optarg;
+                break;
+
+              case FE_OPT_NO_EMACS_CALL:
+                no_emacs_call = 1;
+                break;
+                
+              default:
+                goto NEXT;
           }
           // delete options from option-list
-          if (optind > 2 && *argv[optind-1] != '-' && 
-              optarg != NULL && longopts[option_index].has_arg)
+          if (fe_optind > 2 && *argv[fe_optind-1] != '-' && 
+              fe_optarg != NULL && feOptSpec[option_index].has_arg)
           {
-            argv[optind-2] = NULL;
+            argv[fe_optind-2] = NULL;
           }
-          argv[optind-1] = NULL;
+          argv[fe_optind-1] = NULL;
+        }
     }
-  } 
+    NEXT:{}
+  }
   
   // make sure  emacs, singular, emacs_dir, emacs_load are set
   if (emacs == NULL) emacs = feResource("emacs", 0);
@@ -138,7 +148,7 @@ int main(int argc, char** argv)
   {
     fprintf(stderr, "Error: Can't find emacs executable. \nExpected it at %s\n. Specify alternative with --emacs option,\n or set EMACS environment variable.\n", 
             feResourceDefault("emacs"));
-    mainUsage(argv[0]);
+    mainUsage();
     exit(1);
   }
             
@@ -147,7 +157,7 @@ int main(int argc, char** argv)
   {
     fprintf(stderr, "Error: Can't find singular executable.\nExpected it at %s\nSpecify with --singular option,\n  or set SINGULAR_EMACS environment variable.\n", 
             feResourceDefault("SingularEmacs"));
-    mainUsage(argv[0]);
+    mainUsage();
     exit(1);
   }
     
@@ -156,7 +166,7 @@ int main(int argc, char** argv)
   {
     fprintf(stderr, "Error: Can't find emacs directory for Singular lisp files. \nExpected it at %s\nSpecify with --emacs_dir option,\n  or set SINGULAR_EMACS_DIR environment variable.\n", 
             feResourceDefault("EmacsDir"));
-    mainUsage(argv[0]);
+    mainUsage();
     exit(1);
   }
 
@@ -181,7 +191,7 @@ int main(int argc, char** argv)
         {
           fprintf(stderr, "Error: Can't find emacs load file for Singular mode. \nExpected it at %s\nSpecify with --emacs_load option,\n or set SINGULAR_EMACS_LOAD environment variable,\n or put file '.emacs-singular' in your home directory.\n", 
                   feResourceDefault("EmacsLoad"));  
-          mainUsage(argv[0]);
+          mainUsage();
           exit(1);
         }
       }
@@ -231,7 +241,7 @@ int main(int argc, char** argv)
     if (system(syscall) != 0)
     {
       fprintf(stderr, "Error: Executation of\n%s\n");
-      mainUsage(argv[0]);
+      mainUsage();
       exit(1);
     }
   }

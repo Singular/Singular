@@ -1,13 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.22 1999-08-25 16:02:47 Singular Exp $ */
+/* $Id: feread.cc,v 1.23 1999-09-20 18:03:48 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
 
 
-#include "version.h"
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"

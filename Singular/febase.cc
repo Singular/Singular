@@ -1,12 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.81 1999-08-25 16:02:46 Singular Exp $ */
+/* $Id: febase.cc,v 1.82 1999-09-20 18:03:46 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
 
-#include "version.h"
 #include "mod2.h"
 
 #include <stdlib.h>
@@ -361,8 +360,8 @@ void fePrintReportBug(char* msg, char* file, int line)
   WarnS("Please, email the following output to singular@mathematik.uni-kl.de");
   Warn("Bug occured at %s:%d", file, line);
   Warn("Message: %s", msg);
-  Warn("Version: " S_UNAME S_VERSION1 " (%d) " __DATE__ __TIME__,
-       SINGULAR_VERSION_ID);
+  Warn("Version: " S_UNAME S_VERSION1 " (%lu) " __DATE__ __TIME__,
+       feVersionId);
 }
 
 extern "C" {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.26 1999-08-13 11:21:44 Singular Exp $ */
+/* $Id: sing_mp.cc,v 1.27 1999-09-20 18:03:50 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -21,6 +21,7 @@
 #include "subexpr.h"
 #include "ipid.h"
 #include "silink.h"
+#include "feOpt.h"
 
 static int Batch_ReadEval(si_link silink);
 
@@ -163,8 +164,6 @@ static BOOLEAN slOpenMPFile(si_link l, short flag)
  * MPtcp  specific stuff
  *
  ***************************************************************/
-extern BOOLEAN mainGetSingOptionValue(const char* name, char** val);
-
 
 static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
 {
@@ -174,8 +173,8 @@ static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
   char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
   char *host = IMP_GetCmdlineArg(n_argc, n_argv, "--MPhost");
 
-  if (port == NULL) mainGetSingOptionValue("--MPport", &port);
-  if (host == NULL) mainGetSingOptionValue("--MPhost", &host);
+  if (port == NULL) port = (char*) feOptValue(FE_OPT_MP_PORT);
+  if (host == NULL) host = (char*) feOptValue(FE_OPT_MP_HOST);
 
   if (port != NULL)
     argv[5] = port;
@@ -193,7 +192,7 @@ static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
                   "--MPport", "1025"};
   char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
 
-  if (port == NULL) mainGetSingOptionValue("--MPport", &port);
+  if (port == NULL) port = (char*) feOptValue(FE_OPT_MP_HOST);
 
   if (port != NULL) argv[5] = port;
 

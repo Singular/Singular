@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.36 1999-08-25 16:02:46 Singular Exp $ */
+/* $Id: febase.h,v 1.37 1999-09-20 18:03:47 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -147,16 +147,28 @@ void feStringAppendResources(int warn = -1);
 // if str != NULL display help for str
 // display general help, otherwise
 void feHelp(char* str = NULL);
-// if browser != NULL or OptionValue("browser") != NULL 
+// if browser != NULL or feOpt("browser") != NULL 
 //    set HelpBrowser to browser 
 // otherwise, if browser was already set, leave as is, 
 //            if not, choose first available browser
 // return string identifying current browser
-// keeps OptionValue("browser") up-to-date
+// keeps feOpt("browser") up-to-date
 // Optional warn argument is as in feResource
 char* feHelpBrowser(char* browser = NULL, int warn = -1);
 void feStringAppendBrowsers(int warn = -1);
 
+/*****************************************************************
+ *
+ * version Id
+ *
+ *****************************************************************/
+extern unsigned long feVersionId;
+
+/*****************************************************************
+ *
+ * File Stuff
+ *
+ *****************************************************************/
 FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
 #ifndef __MWERKS__
 #ifdef HAVE_TCL

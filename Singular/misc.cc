@@ -13,7 +13,6 @@
 #include <time.h>
 #include <limits.h>
 
-#include "version.h"
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"

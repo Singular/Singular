@@ -63,9 +63,9 @@ char * find_executable_link (const char *name)
   else
   {
     if (((name[0] == '.') && (name[1] == '/')) ||
-        ((name[0] == '.') && (name[1] == '.') && (name[2] == '/')))
+        ((name[0] == '.') && (name[1] == '.') && (name[2] == '/')) ||
+        strchr(name, '/') != NULL)
     {
-      strcpy (tbuf, (name[1] == '.' ? ".." : "."));
 
 #ifdef HAVE_GETCWD
       getcwd (tbuf, MAXPATHLEN);
@@ -76,9 +76,9 @@ char * find_executable_link (const char *name)
 #endif
       strcat (tbuf, "/");
       strcat (tbuf, name);
-      return copy_of (tbuf);
+      if (! access(name, X_OK))
+        return copy_of (tbuf);
     }
-
 
     search = getenv("PATH");
 /* for winnt under msdos, cwd is implictly in the path */
