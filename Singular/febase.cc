@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.35 1998-04-28 13:12:09 Singular Exp $ */
+/* $Id: febase.cc,v 1.36 1998-05-25 13:04:54 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -113,7 +113,10 @@ BOOLEAN tclmode=FALSE;
 
 extern "C" char* find_executable(const char* argv0);
 
-#define SINGULAR_RELATIVE_DATA_DIR "LIB"
+//#define SINGULAR_RELATIVE_DATA_DIR "LIB"
+// Singular is      $ROOT/bin/Singular,
+// look for libs in $ROOT/share/Singular/xx.lib:
+#define SINGULAR_RELATIVE_DATA_DIR "../share/Singular"
 
 static char* SearchPath = NULL;
 static char* ExpandedExecutable = NULL;
@@ -168,12 +171,12 @@ char* feGetSearchPath(const char* argv0)
     env=getenv("SINGULARPATH");
 #endif
   
-    if (argv0 != NULL)
-      sibbling = feRemovePathnameHead(feGetExpandedExecutable(argv0));
-  
     if (env != NULL)
       plength = strlen(env) + 1;
 
+    if (argv0 != NULL)
+      sibbling = feRemovePathnameHead(feGetExpandedExecutable(argv0));
+  
     if (sibbling != NULL)
       plength += strlen(sibbling) + strlen(SINGULAR_RELATIVE_DATA_DIR) + 2;
   
