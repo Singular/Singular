@@ -48,6 +48,7 @@
 
 + Email Adressen in @email{...} notieren, URL's in @url{...}
 
+
 * Notationen *
 ==============
 
@@ -75,11 +76,17 @@
     int related functions
     TRACE
 
-+ Die Funktionsweise von Funktionen (vor allem im Kapitel "Functions")
-  wird in der dritten Person beschrieben. Statt "will be" wird "is"
-  verwendet:
-    vdim: returns the vector space dimension ....
++ Die Funktionsweise von Funktionen (vor allem im Kapitel "Functions", aber
+  auch z.B. Kommandozeilen-Optionen, etc.)  wird in der dritten Person
+  beschrieben. Sie fangen mit einem Kleinbuchstaben an und schliessen mit
+  einem Punkt.  Bitte vollstaendige Saetze formulieren.
+  
+    npars: returns the number of ring parameters.
+
+  Statt "will be" wird "is" verwendet:
+
     the result is a standard basis (statt will be a standard basis)
+
 
 * Schreibweisen *
 =================
@@ -142,12 +149,6 @@
   werden. (Sonst bekommt man "overfull hbox"-Meldungen um die Ohren
   geschmissen.)
 
-+ Kommando-Beschreibungen (Purpose:) fangen mit einem Kleinbuchstaben an,
-  sind in der dritten Person Singular gehalten und schliessen mit einem
-  Punkt.  Vollstaendige Saetze formulieren.  Beispiel:
-
-  Purpose:  returns the number of ring parameters.
-
 + Hilfe-Texte in Libraries: keine TAB's verwenden
 
 * Cross-Referenzen *
@@ -202,5 +203,5 @@
   trennen.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.5 1998-05-18 13:36:31 schmidt Exp $
+$Id: STYLEGUIDE,v 1.6 1998-05-18 13:53:36 schmidt Exp $
 ------------------------------------------------------------
