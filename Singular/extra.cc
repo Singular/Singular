@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.24 1997-12-03 16:58:34 obachman Exp $ */
+/* $Id: extra.cc,v 1.25 1997-12-18 14:26:32 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -322,6 +322,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 #ifndef macintosh
 #ifndef MSDOS
 #ifndef atarist
+#ifdef unix
     if(strcmp((char*)(h->Data()),"alarm")==0)
     {
       if ((h->next!=NULL) &&(h->next->Typ()==INT_CMD))
@@ -339,6 +340,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         WerrorS("int expected");
     }
     else
+#endif
 #endif
 #endif
 #endif

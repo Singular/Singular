@@ -1,11 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.3 1997-12-03 16:58:35 obachman Exp $
+// $Id: fglmcomb.cc,v 1.4 1997-12-18 14:26:33 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* 
-* ABSTRACT - 
+/*
+* ABSTRACT -
 */
 
 #ifndef NOSTREAMIO
@@ -16,7 +16,7 @@
 #ifdef HAVE_FGLM
 #include "tok.h"
 #include "structs.h"
-#include "subexpr.h"  
+#include "subexpr.h"
 #include "polys.h"
 #include "ideals.h"
 #include "ring.h"
@@ -34,18 +34,18 @@
 
 // nur fuer debug-Ausgaben:
 int
-pSize( poly p ) 
+pSize( poly p )
 {
     int count = 0;
     while ( p != NULL ) {
-	count+= nSize( pGetCoeff( p ) );
-	p= pIter( p );
+        count+= nSize( pGetCoeff( p ) );
+        p= pIter( p );
     }
     return count;
 }
 
-void 
-fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numMonoms ) 
+void
+fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numMonoms )
 {
     poly temp = *pptr;
     poly pretemp = NULL;
@@ -53,115 +53,115 @@ fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numM
     int state;
 
     while ( (temp != NULL) && (point < numMonoms) ) {
-	state= pComp( temp, monomials[point] );
-	if ( state == 0 ) {
-	    // Eliminate this monomial
-	    poly todelete;
-	    if ( pretemp == NULL ) {
-		todelete = temp;
-		*pptr= pIter( *pptr );
-		temp= *pptr;
-	    }
-	    else {
-		todelete= temp;
-		temp= pIter( temp );
-		pretemp->next= temp;
-	    }
-	    pGetCoeff( todelete )= nNeg( pGetCoeff( todelete ) );
-	    number newelem = nAdd( pGetCoeff( todelete ), v.getconstelem( point+1 ) );
-	    v.setelem( point+1, newelem );
-	    nDelete( & pGetCoeff( todelete ) );
-	    pFree1( todelete );
-	    point++; 
-	}
-	else if ( state < 0 ) 
-	    point++;
-	else {
-	    pretemp= temp;
-	    temp= pIter( temp );
-	}
+        state= pComp( temp, monomials[point] );
+        if ( state == 0 ) {
+            // Eliminate this monomial
+            poly todelete;
+            if ( pretemp == NULL ) {
+                todelete = temp;
+                *pptr= pIter( *pptr );
+                temp= *pptr;
+            }
+            else {
+                todelete= temp;
+                temp= pIter( temp );
+                pretemp->next= temp;
+            }
+            pGetCoeff( todelete )= nNeg( pGetCoeff( todelete ) );
+            number newelem = nAdd( pGetCoeff( todelete ), v.getconstelem( point+1 ) );
+            v.setelem( point+1, newelem );
+            nDelete( & pGetCoeff( todelete ) );
+            pFree1( todelete );
+            point++;
+        }
+        else if ( state < 0 )
+            point++;
+        else {
+            pretemp= temp;
+            temp= pIter( temp );
+        }
     }
 }
 
 BOOLEAN
-fglmReductionStep( poly * pptr, ideal source, int * w ) 
+fglmReductionStep( poly * pptr, ideal source, int * w )
 {
 // returns TRUE if the leading monomial was reduced
     if ( *pptr == NULL ) return FALSE;
     int k;
     int best = 0;
     for ( k= IDELEMS( source ) - 1; k >= 0; k-- ) {
-	if ( pDivisibleBy( (source->m)[k], *pptr ) ) {
-	    if ( best == 0 ) {
-		best= k + 1;
-	    }
-	    else {
-		if ( w[k] < w[best-1] ) {
-		    best= k + 1;
-		}
-	    }
-	}
+        if ( pDivisibleBy( (source->m)[k], *pptr ) ) {
+            if ( best == 0 ) {
+                best= k + 1;
+            }
+            else {
+                if ( w[k] < w[best-1] ) {
+                    best= k + 1;
+                }
+            }
+        }
     }
     if ( best > 0 ) {
-	// OwnSPoly
-	poly p2 = (source->m)[best-1];
-	int i, diff;
-	
-	poly m = pOne();
-	for ( i= pVariables; i > 0; i-- ) {
-	    diff= pGetExp( *pptr, i ) - pGetExp( p2, i );
-	    pSetExp( m, i, diff );
-	}
-	pSetm( m );
-	number n1 = nCopy( pGetCoeff( *pptr ) );
-	number n2 = pGetCoeff( p2 );
-	
-	p2= pCopy( p2 );
-	pDelete1( pptr );
-	pDelete1( & p2 );
-	p2= pMult( m, p2 );
-	
-	number temp = nDiv( n1, n2 );
-	nNormalize( temp );
-	nDelete( & n1 );
-	n1= temp;
-	n1= nNeg( n1 );
-	pMultN( p2, n1 );
-// 	pNormalize( p2 );
-	nDelete( & n1 );
-	*pptr= pAdd( *pptr, p2 );
+        // OwnSPoly
+        poly p2 = (source->m)[best-1];
+        int i, diff;
+
+        poly m = pOne();
+        for ( i= pVariables; i > 0; i-- ) {
+            diff= pGetExp( *pptr, i ) - pGetExp( p2, i );
+            pSetExp( m, i, diff );
+        }
+        pSetm( m );
+        number n1 = nCopy( pGetCoeff( *pptr ) );
+        number n2 = pGetCoeff( p2 );
+
+        p2= pCopy( p2 );
+        pDelete1( pptr );
+        pDelete1( & p2 );
+        p2= pMult( m, p2 );
+
+        number temp = nDiv( n1, n2 );
+        nNormalize( temp );
+        nDelete( & n1 );
+        n1= temp;
+        n1= nNeg( n1 );
+        pMultN( p2, n1 );
+//         pNormalize( p2 );
+        nDelete( & n1 );
+        *pptr= pAdd( *pptr, p2 );
     }
     return ( (best > 0) );
 }
 
 void
-fglmReduce( poly * pptr, fglmVector & v, polyset m, int numMonoms, ideal source, int * w ) 
+fglmReduce( poly * pptr, fglmVector & v, polyset m, int numMonoms, ideal source, int * w )
 {
     BOOLEAN reduced = FALSE;
     reduced= fglmReductionStep( pptr, source, w );
     while ( reduced == TRUE ) {
-	fglmEliminateMonomials( pptr, v, m, numMonoms );
-	reduced= fglmReductionStep( pptr, source, w );
+        fglmEliminateMonomials( pptr, v, m, numMonoms );
+        reduced= fglmReductionStep( pptr, source, w );
     }
     STICKYPROT( "<" );
     poly temp = * pptr;
     if ( temp != NULL ) {
-	while ( pNext( temp ) != NULL ) {
-	    STICKYPROT( ">" );
-	    reduced= fglmReductionStep( & pNext( temp ), source, w );
-	    while ( reduced == TRUE ) {
-		fglmEliminateMonomials( & pNext( temp ), v, m, numMonoms );
-		reduced= fglmReductionStep( & pNext( temp ), source, w );
-	    }
-	    if ( pNext( temp ) != NULL ) {
-		temp= pIter( temp );
-	    }
-	}
+        while ( pNext( temp ) != NULL ) {
+            STICKYPROT( ">" );
+            reduced= fglmReductionStep( & pNext( temp ), source, w );
+            while ( reduced == TRUE ) {
+                fglmEliminateMonomials( & pNext( temp ), v, m, numMonoms );
+                reduced= fglmReductionStep( & pNext( temp ), source, w );
+            }
+            if ( pNext( temp ) != NULL ) {
+                temp= pIter( temp );
+            }
+        }
     }
 }
 
-poly 
-fglmNewLinearCombination( ideal source, poly monset ) 
+poly
+fglmNewLinearCombination( ideal source, poly monset )
 {
     polyset m = NULL;
     polyset nf = NULL;
@@ -188,10 +188,10 @@ fglmNewLinearCombination( ideal source, poly monset )
     m= (polyset)Alloc( numMonoms * sizeof( poly ) );
     poly temp= monset;
     for ( k= 0; k < numMonoms; k++ ) {
-	m[k]= pOne();
-	pSetExpV( m[k], temp->exp );
-	pSetm( m[k] );
-	temp= pIter( temp );
+        m[k]= pOne();
+        pSetExpV( m[k], temp->exp );
+        pSetm( m[k] );
+        temp= pIter( temp );
     }
 
     nf= (polyset)Alloc( numMonoms * sizeof( poly ) );
@@ -204,73 +204,79 @@ fglmNewLinearCombination( ideal source, poly monset )
     weights= (int *)Alloc( IDELEMS( source ) * sizeof( int ) );
     STICKYPROT( "weights: " );
     for ( k= 0; k < IDELEMS( source ); k++ ) {
-	poly temp= (source->m)[k];
-	int w = 0;
-	while ( temp != NULL ) {
-	    w+= nSize( pGetCoeff( temp ) );
-	    temp= pIter( temp );
-	}
-	weights[k]= w;
-	STICKYPROT2( "%i ", w );
+        poly temp= (source->m)[k];
+        int w = 0;
+        while ( temp != NULL ) {
+            w+= nSize( pGetCoeff( temp ) );
+            temp= pIter( temp );
+        }
+        weights[k]= w;
+        STICKYPROT2( "%i ", w );
     }
     STICKYPROT( "\n" );
     lengthes= (int *)Alloc( numMonoms * sizeof( int ) );
     order= (int *)Alloc( numMonoms * sizeof( int ) );
 
     // calculate the NormalForm in a special way
-    for ( k= 0; k < numMonoms; k++ ) {
-	STICKYPROT( "#" );
-	poly current = pCopy( m[k] );
-	fglmVector currV( numMonoms, k+1 );
-	
-	fglmReduce( & current, currV, m, numMonoms, source, weights );
-	poly temp = current;
-	int b;
-	while ( temp != NULL ) {
-	    BOOLEAN found = FALSE;
-	    for ( b= 0; (b < basisSize) && (found == FALSE); b++ ) {
-		if ( pEqual( temp, basis[b] ) ) {
-		    found= TRUE; 
-		} 
-	    }
-	    if ( found == FALSE ) {
-		if ( basisSize == basisMax ) {
-		    // Expand the basis
-		    basis= (polyset)ReAlloc( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
-		    basisMax+= basisBS;
-		}
-		basis[basisSize]= pOne();
-		pSetExpV( basis[basisSize], temp->exp );
-		pSetm( basis[basisSize] );
-		basisSize++;
-	    }
-	    temp= pIter( temp );
-	}
-	nf[k]= current;
-	mv[k].fglmVector( currV );
-	STICKYPROT( "\n" );
+    for ( k= 0; k < numMonoms; k++ )
+    {
+        STICKYPROT( "#" );
+        poly current = pCopy( m[k] );
+        fglmVector currV( numMonoms, k+1 );
+
+        fglmReduce( & current, currV, m, numMonoms, source, weights );
+        poly temp = current;
+        int b;
+        while ( temp != NULL )
+	{
+            BOOLEAN found = FALSE;
+            for ( b= 0; (b < basisSize) && (found == FALSE); b++ )
+	    {
+                if ( pEqual( temp, basis[b] ) )
+		{
+                    found= TRUE;
+                }
+            }
+            if ( found == FALSE )
+	    {
+                if ( basisSize == basisMax )
+		{
+                    // Expand the basis
+                    basis= (polyset)ReAlloc( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
+                    basisMax+= basisBS;
+                }
+                basis[basisSize]= pOne();
+                pSetExpV( basis[basisSize], temp->exp );
+                pSetm( basis[basisSize] );
+                basisSize++;
+            }
+            temp= pIter( temp );
+        }
+        nf[k]= current;
+        mv[k].fglmVector( currV );
+        STICKYPROT( "\n" );
     }
     // get the vector representation
     for ( k= 0; k < numMonoms; k++ ) {
-	STICKYPROT( "." );
-	v[k].fglmVector( basisSize );
-	poly mon= nf[k];
-	while ( mon != NULL ) {
-	    BOOLEAN found = FALSE;
-	    int b= 0;
-	    while ( found == FALSE ) {
-		if ( pEqual( mon, basis[b] ) ) {
-		    found= TRUE; 
-		}
-		else {
-		    b++; 
-		}
-	    }
-	    number coeff = nCopy( pGetCoeff( mon ) );
-	    v[k].setelem( b+1, coeff );
-	    mon= pIter( mon );
-	}
-	pDelete( nf + k );
+        STICKYPROT( "." );
+        v[k].fglmVector( basisSize );
+        poly mon= nf[k];
+        while ( mon != NULL ) {
+            BOOLEAN found = FALSE;
+            int b= 0;
+            while ( found == FALSE ) {
+                if ( pEqual( mon, basis[b] ) ) {
+                    found= TRUE;
+                }
+                else {
+                    b++;
+                }
+            }
+            number coeff = nCopy( pGetCoeff( mon ) );
+            v[k].setelem( b+1, coeff );
+            mon= pIter( mon );
+        }
+        pDelete( nf + k );
     }
     // Free Memory not needed anymore
     Free( (ADDRESS)nf, numMonoms * sizeof( poly ) );
@@ -278,8 +284,8 @@ fglmNewLinearCombination( ideal source, poly monset )
 
     STICKYPROT2( "\nbasis size: %i\n", basisSize );
     STICKYPROT( "(clear basis" );
-    for ( k= 0; k < basisSize; k++ ) 
-	pDelete( basis + k );
+    for ( k= 0; k < basisSize; k++ )
+        pDelete( basis + k );
     STICKYPROT( ")\n" );
     // gauss reduce
     gaussReducer gauss( basisSize );
@@ -288,92 +294,92 @@ fglmNewLinearCombination( ideal source, poly monset )
 
     STICKYPROT( "sizes: " );
     for ( k= 0; k < numMonoms; k++ ) {
-	lengthes[k]= v[k].numNonZeroElems();
-	STICKYPROT2( "%i ", lengthes[k] );
+        lengthes[k]= v[k].numNonZeroElems();
+        STICKYPROT2( "%i ", lengthes[k] );
     }
     STICKYPROT( "\n" );
 
     int act = 0;
     while ( (isZero == FALSE) && (act < numMonoms) ) {
-	int best = 0;
-	for ( k= numMonoms - 1; k >= 0; k-- ) {
-	    if ( lengthes[k] > 0 ) {
-		if ( best == 0 ) {
-		    best= k+1;
-		}
-		else {
-		    if ( lengthes[k] < lengthes[best-1] ) {
-			best= k+1;
-		    }
-		}
-	    }
-	}
-	lengthes[best-1]= 0;
-	order[act]= best-1;
-	STICKYPROT2( " (%i) ", best );
-	if ( ( isZero= gauss.reduce( v[best-1] )) == TRUE ) {
-	    p= gauss.getDependence(); 
-	}
-	else {
-	    STICKYPROT( "+" );
-	    gauss.store(); 
-	    act++;
-	}
-	v[best-1].~fglmVector();
+        int best = 0;
+        for ( k= numMonoms - 1; k >= 0; k-- ) {
+            if ( lengthes[k] > 0 ) {
+                if ( best == 0 ) {
+                    best= k+1;
+                }
+                else {
+                    if ( lengthes[k] < lengthes[best-1] ) {
+                        best= k+1;
+                    }
+                }
+            }
+        }
+        lengthes[best-1]= 0;
+        order[act]= best-1;
+        STICKYPROT2( " (%i) ", best );
+        if ( ( isZero= gauss.reduce( v[best-1] )) == TRUE ) {
+            p= gauss.getDependence();
+        }
+        else {
+            STICKYPROT( "+" );
+            gauss.store();
+            act++;
+        }
+        v[best-1].~fglmVector();
     }
     poly result = NULL;
     if ( isZero == TRUE ) {
-	number gcd = p.gcd();
-	if ( ! nIsZero( gcd ) && ! ( nIsOne( gcd ) ) ) {
-	    p/= gcd;
-	}
-	nDelete( & gcd );
-	fglmVector temp( numMonoms );
-	for ( k= 0; k < p.size(); k++ ) {
-	    if ( ! p.elemIsZero( k+1 ) ) {
-		temp+= p.getconstelem( k+1 ) * mv[order[k]];
-	    }
-	}
-	number denom = temp.clearDenom();
-	nDelete( & denom );
-	gcd = temp.gcd();
-	if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) ) {
-	    temp/= gcd;
-	}
-	nDelete( & gcd );
+        number gcd = p.gcd();
+        if ( ! nIsZero( gcd ) && ! ( nIsOne( gcd ) ) ) {
+            p/= gcd;
+        }
+        nDelete( & gcd );
+        fglmVector temp( numMonoms );
+        for ( k= 0; k < p.size(); k++ ) {
+            if ( ! p.elemIsZero( k+1 ) ) {
+                temp+= p.getconstelem( k+1 ) * mv[order[k]];
+            }
+        }
+        number denom = temp.clearDenom();
+        nDelete( & denom );
+        gcd = temp.gcd();
+        if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) ) {
+            temp/= gcd;
+        }
+        nDelete( & gcd );
 
-	poly sum = NULL;
-	for ( k= 1; k <= numMonoms; k++ ) {
-	    if ( ! temp.elemIsZero( k ) ) {
-		if ( result == NULL ) {
-		    result= pCopy( m[k-1] );
-		    sum= result;
-		}
-		else {
-		    sum->next= pCopy( m[k-1] );
-		    pIter( sum );
-		}
-		pSetCoeff( sum, nCopy( temp.getconstelem( k ) ) );
-	    }
-	}
-	pContent( result );
-	if ( ! nGreaterZero( pGetCoeff( result ) ) ) result= pNeg( result );
+        poly sum = NULL;
+        for ( k= 1; k <= numMonoms; k++ ) {
+            if ( ! temp.elemIsZero( k ) ) {
+                if ( result == NULL ) {
+                    result= pCopy( m[k-1] );
+                    sum= result;
+                }
+                else {
+                    sum->next= pCopy( m[k-1] );
+                    pIter( sum );
+                }
+                pSetCoeff( sum, nCopy( temp.getconstelem( k ) ) );
+            }
+        }
+        pContent( result );
+        if ( ! nGreaterZero( pGetCoeff( result ) ) ) result= pNeg( result );
     }
     // Free Memory
     Free( (ADDRESS)lengthes, numMonoms * sizeof( int ) );
     Free( (ADDRESS)order, numMonoms * sizeof( int ) );
 //     for ( k= 0; k < numMonoms; k++ )
-// 	v[k].~fglmVector();
+//         v[k].~fglmVector();
     Free( (ADDRESS)v, numMonoms * sizeof( fglmVector ) );
-    for ( k= 0; k < basisSize; k++ ) 
-	pDelete( basis + k );
+    for ( k= 0; k < basisSize; k++ )
+        pDelete( basis + k );
     Free( (ADDRESS)basis, basisMax * sizeof( poly ) );
-    for ( k= 0; k < numMonoms; k++ ) 
-	mv[k].~fglmVector();
+    for ( k= 0; k < numMonoms; k++ )
+        mv[k].~fglmVector();
     Free( (ADDRESS)mv, numMonoms * sizeof( fglmVector ) );
 
-    for ( k= 0; k < numMonoms; k++ ) 
-	pDelete( m + k );
+    for ( k= 0; k < numMonoms; k++ )
+        pDelete( m + k );
     Free( (ADDRESS)m, numMonoms * sizeof( poly ) );
 
     STICKYPROT( "\n" );
@@ -382,11 +388,11 @@ fglmNewLinearCombination( ideal source, poly monset )
 
 
 poly
-fglmLinearCombination( ideal source, poly monset ) 
+fglmLinearCombination( ideal source, poly monset )
 {
     int k;
     poly temp;
-    
+
     polyset m;
     polyset nf;
     fglmVector * v;
@@ -399,8 +405,8 @@ fglmLinearCombination( ideal source, poly monset )
     int numMonoms = 0;
     temp = monset;
     while ( temp != NULL ) {
-	numMonoms++;
-	temp= pIter( temp );
+        numMonoms++;
+        temp= pIter( temp );
     }
     // Allocate Memory
     m= (polyset)Alloc( numMonoms * sizeof( poly ) );
@@ -409,97 +415,97 @@ fglmLinearCombination( ideal source, poly monset )
     v= (fglmVector *)Alloc( numMonoms * sizeof( fglmVector ) );
     basisMax= basisBS;
     basis= (polyset)Alloc( basisMax * sizeof( poly ) );
-    
+
     // get the NormalForm and the basis monomials
     temp= monset;
     for ( k= 0; k < numMonoms; k++ ) {
-	poly mon= pHead( temp );
-	if ( ! nIsOne( pGetCoeff( mon ) ) ) {
-	    nDelete( & pGetCoeff( mon ) );
-	    pSetCoeff( mon, nInit( 1 ) );
-	}
-	STICKYPROT( "(" );
-	nf[k]= kNF( source, currRing->qideal, mon );
-	STICKYPROT( ")" );
+        poly mon= pHead( temp );
+        if ( ! nIsOne( pGetCoeff( mon ) ) ) {
+            nDelete( & pGetCoeff( mon ) );
+            pSetCoeff( mon, nInit( 1 ) );
+        }
+        STICKYPROT( "(" );
+        nf[k]= kNF( source, currRing->qideal, mon );
+        STICKYPROT( ")" );
 
-	// search through basis
-	STICKYPROT( "[" );
-	poly sm = nf[k];
-	while ( sm != NULL ) {
-	    BOOLEAN found = FALSE;
-	    int b;
-	    for ( b= 0; (b < basisSize) && (found == FALSE); b++ )
-		if ( pEqual( sm, basis[b] ) ) found= TRUE;
-	    if ( found == FALSE ) {
-		// Expand the basis
-		if ( basisSize == basisMax ) {
-		    basis= (polyset)ReAlloc( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
-		    basisMax+= basisBS;
-		}
-		basis[basisSize]= pHead( sm );
-		nDelete( & pGetCoeff( basis[basisSize] ) );
-	        pSetCoeff( basis[basisSize], nInit( 1 ) );
-		basisSize++;
-	    }
-	    sm= pIter( sm );
-	}
-	STICKYPROT( "]" );
-	m[k]= mon;
-	temp= pIter( temp );
+        // search through basis
+        STICKYPROT( "[" );
+        poly sm = nf[k];
+        while ( sm != NULL ) {
+            BOOLEAN found = FALSE;
+            int b;
+            for ( b= 0; (b < basisSize) && (found == FALSE); b++ )
+                if ( pEqual( sm, basis[b] ) ) found= TRUE;
+            if ( found == FALSE ) {
+                // Expand the basis
+                if ( basisSize == basisMax ) {
+                    basis= (polyset)ReAlloc( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
+                    basisMax+= basisBS;
+                }
+                basis[basisSize]= pHead( sm );
+                nDelete( & pGetCoeff( basis[basisSize] ) );
+                pSetCoeff( basis[basisSize], nInit( 1 ) );
+                basisSize++;
+            }
+            sm= pIter( sm );
+        }
+        STICKYPROT( "]" );
+        m[k]= mon;
+        temp= pIter( temp );
     }
     // get the vector representation
     STICKYPROT2( "(%i)", basisSize );
     for ( k= 0; k < numMonoms; k++ ) {
-	v[k].fglmVector( basisSize );
-	STICKYPROT( "(+" );
-	poly mon= nf[k];
-	while ( mon != NULL ) {
-	    BOOLEAN found = FALSE;
-	    int b= 0;
-	    while ( found == FALSE ) {
-		if ( pEqual( mon, basis[b] ) ) 
-		    found= TRUE;
-		else
-		    b++;
-	    }
-	    number coeff = nCopy( pGetCoeff( mon ) );
-	    v[k].setelem( b+1, coeff );
-	    mon= pIter( mon );
-	}
-	STICKYPROT( ")" );
+        v[k].fglmVector( basisSize );
+        STICKYPROT( "(+" );
+        poly mon= nf[k];
+        while ( mon != NULL ) {
+            BOOLEAN found = FALSE;
+            int b= 0;
+            while ( found == FALSE ) {
+                if ( pEqual( mon, basis[b] ) )
+                    found= TRUE;
+                else
+                    b++;
+            }
+            number coeff = nCopy( pGetCoeff( mon ) );
+            v[k].setelem( b+1, coeff );
+            mon= pIter( mon );
+        }
+        STICKYPROT( ")" );
     }
     // gauss reduce
     gaussReducer gauss( basisSize );
     BOOLEAN isZero = FALSE;
     fglmVector p;
     for ( k= 0; (k < numMonoms) && (isZero == FALSE); k++ ) {
-	STICKYPROT( "(-" );
-	if ( ( isZero= gauss.reduce( v[k] )) == TRUE ) 
-	    p= gauss.getDependence();
-	else
-	    gauss.store();
-	STICKYPROT( ")" );
+        STICKYPROT( "(-" );
+        if ( ( isZero= gauss.reduce( v[k] )) == TRUE )
+            p= gauss.getDependence();
+        else
+            gauss.store();
+        STICKYPROT( ")" );
     }
     poly comb = NULL;
     if ( isZero == TRUE ) {
-	number gcd = p.gcd();
-	if ( ! nIsZero( gcd ) && ! ( nIsOne( gcd ) ) )
-	    p/= gcd;
-	nDelete( & gcd );
-	for ( k= 1; k <= p.size(); k++ ) {
-	    if ( ! p.elemIsZero( k ) ) {
-		poly temp = pCopy( m[k-1] );
-		pSetCoeff( temp, nCopy( p.getconstelem( k ) ) );
-		comb= pAdd( comb, temp );
-	    }
-	}
-	if ( ! nGreaterZero( pGetCoeff( comb ) ) ) comb= pNeg( comb );
+        number gcd = p.gcd();
+        if ( ! nIsZero( gcd ) && ! ( nIsOne( gcd ) ) )
+            p/= gcd;
+        nDelete( & gcd );
+        for ( k= 1; k <= p.size(); k++ ) {
+            if ( ! p.elemIsZero( k ) ) {
+                poly temp = pCopy( m[k-1] );
+                pSetCoeff( temp, nCopy( p.getconstelem( k ) ) );
+                comb= pAdd( comb, temp );
+            }
+        }
+        if ( ! nGreaterZero( pGetCoeff( comb ) ) ) comb= pNeg( comb );
     }
 
     // Free Memory
     for ( k= 0; k < numMonoms; k++ ) {
-	pDelete( m + k );
-	pDelete( nf + k );
+        pDelete( m + k );
+        pDelete( nf + k );
     }
     Free( (ADDRESS)m, numMonoms * sizeof( poly ) );
     Free( (ADDRESS)nf, numMonoms * sizeof( poly ) );
@@ -507,7 +513,7 @@ fglmLinearCombination( ideal source, poly monset )
     for ( k= numMonoms - 1; k >= 0; k-- ) v[k].~fglmVector();
     Free( (ADDRESS)v, numMonoms * sizeof( fglmVector ) );
     for ( k= 0; k < basisSize; k++ )
-	pDelete( basis + k );
+        pDelete( basis + k );
     Free( (ADDRESS)basis, basisMax * sizeof( poly ) );
     STICKYPROT( "\n" );
     return comb;

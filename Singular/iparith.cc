@@ -124,9 +124,6 @@ cmdnames cmds[] =
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
   { "bareiss",     0, BAREISS_CMD ,       CMD_1},
   { "betti",       0, BETTI_CMD ,         CMD_1},
-//  #ifdef HAVE_DLD
-  { "binary",      0, BINARY_CMD ,        ROOT_DECL},
-//  #endif
   { "break",       0, BREAK_CMD ,         BREAK_CMD},
   { "char",        0, CHARACTERISTIC_CMD ,CMD_1},
   { "char_series", 0, CHAR_SERIES_CMD ,   CMD_1},
@@ -1227,22 +1224,6 @@ static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
   }
   return FALSE;
 }
-#ifdef HAVE_DLD
-static BOOLEAN jjBIN(leftv res, leftv u, leftv v)
-{
-  leftv sl = iiMake_binary((idhdl)u->data,v);
-  if (sl==NULL)
-  {
-    res->rtyp=NONE;
-  }
-  else
-  {
-    memcpy(res,sl,sizeof(sleftv));
-    Free((ADDRESS)sl,sizeof(sleftv));
-  }
-  return FALSE;
-}
-#endif
 static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
 {
   //Print("try to map %s with %s\n",$3.Name(),$1.Name());
@@ -1981,11 +1962,6 @@ struct sValCmd2 dArith2[]=
 ,{jjINDEX_V,   '[',            POLY_CMD,       VECTOR_CMD, INT_CMD PROFILER}
 ,{jjINDEX_V_IV,'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD PROFILER}
 ,{jjPROC,      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD PROFILER}
-#ifdef HAVE_DLD
-,{jjBIN,       '(',            ANY_TYPE/*set by p*/,BINARY_CMD, DEF_CMD PROFILER}
-#else
-,{jjWRONG2,    '(',            ANY_TYPE/*set by p*/,BINARY_CMD, DEF_CMD PROFILER}
-#endif
 ,{jjMAP,       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD PROFILER}
 ,{jjKLAMMER,   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD PROFILER}
 ,{jjKLAMMER_IV,'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD PROFILER}
@@ -2173,22 +2149,6 @@ static BOOLEAN jjPROC1(leftv res, leftv u)
   }
   return FALSE;
 }
-#ifdef HAVE_DLD
-static BOOLEAN jjBIN1(leftv res, leftv u)
-{
-  leftv sl = iiMake_binary((idhdl)u->data,NULL);
-  if (sl==NULL)
-  {
-    res->rtyp=NONE;
-  }
-  else
-  {
-    memcpy(res,sl,sizeof(sleftv));
-    Free((ADDRESS)sl,sizeof(sleftv));
-  }
-  return FALSE;
-}
-#endif
 static BOOLEAN jjBAREISS(leftv res, leftv v)
 {
   matrix m=(matrix)v->Data();
@@ -3058,11 +3018,6 @@ struct sValCmd1 dArith1[]=
 ,{jjUMINUS_IV,  '-',             INTVEC_CMD,     INTVEC_CMD }
 ,{jjUMINUS_IV,  '-',             INTMAT_CMD,     INTMAT_CMD }
 ,{jjPROC1,      '(',             ANY_TYPE/*set by p*/,PROC_CMD }
-#ifdef HAVE_DLD
-,{jjBIN1,       '(',             ANY_TYPE/*set by p*/,BINARY_CMD }
-#else
-,{jjWRONG,      '(',             ANY_TYPE/*set by p*/,BINARY_CMD }
-#endif
 ,{jjKLAMMER_LIB,'(',             NONE,           STRING_CMD }
 // and the procedures with 1 argument:
 ,{atATTRIB1,    ATTRIB_CMD,      NONE,           DEF_CMD }
@@ -5262,9 +5217,6 @@ int IsCmd(char *n, int & tok)
   {
     switch (tok)
     {
-      //#ifdef HAVE_DLD
-      case BINARY_CMD:
-      //#endif
       case IDEAL_CMD:
       case INT_CMD:
       case INTVEC_CMD:

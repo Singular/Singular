@@ -89,8 +89,7 @@ void sleftv::Print(leftv store, int spaces)
   else
 #endif
   {
-    if ((t/*Typ()*/!=PROC_CMD)
-    && (t/*Typ()*/!=BINARY_CMD))
+    if (t/*Typ()*/!=PROC_CMD)
     {
       const char *n=Name();
       char *s;
@@ -105,9 +104,6 @@ void sleftv::Print(leftv store, int spaces)
         case UNKNOWN:
         case DEF_CMD:
         case PACKAGE_CMD:
-        #ifdef HAVE_DLD
-        case BINARY_CMD:
-        #endif
           ::Print("%-*.*s`%s`",spaces,spaces," ",n);
           break;
         case NONE:

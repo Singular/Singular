@@ -1,3 +1,10 @@
+Thu Dec 18 15:23:29 MET 1997
+	* hannes:
+	- removed type "binary" and handling routines
+	(iparith.cc ipid.cc subexpr.cc tok.h)
+	- fixed m16ex (doc/examples.doc)
+	- fixed reference (doc/singular.doc, doc/start.doc)
+
 Wed Dec 17 09:47:58 MEZ 1997 Kai Krueger <krueger@mathematik.uni-kl.de>
         * test/dbm_test.[in/out]: rewrite of dbm-tests.
 	

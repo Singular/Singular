@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.7 1997-07-09 15:54:01 Singular Exp $ */
+/* $Id: ipid.cc,v 1.8 1997-12-18 14:26:35 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -104,10 +104,6 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
         IDLIST(h)=(lists)Alloc(sizeof(slists));
         IDLIST(h)->Init();
         break;
-      case BINARY_CMD:
-        WerrorS("`binary` objects cannot be declared");
-        Free(ADDRESS(h),sizeof(idrec));
-        return NULL;
     //the types with the standard init: set the struct to zero
       case LINK_CMD:
         len=sizeof(ip_link);
@@ -329,9 +325,6 @@ void killhdl(idhdl h, idhdl * ih)
   // string / proc / binary ------------------------------------------------
   else if ((IDTYP(h) == STRING_CMD)
            ||(IDTYP(h) == PROC_CMD)
-      #ifdef HAVE_DLD
-           ||(IDTYP(h) == BINARY_CMD)
-      #endif
       )
   {
     FreeL((ADDRESS)IDSTRING(h));
