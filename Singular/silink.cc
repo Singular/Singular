@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.9 1997-04-15 12:48:37 obachman Exp $ */
+/* $Id: silink.cc,v 1.10 1997-04-18 11:25:01 obachman Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -509,6 +509,12 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   // handle qrings separately
   if (type_id == QRING_CMD) return DumpQring(fd, h, type_str);
   
+  if (type_id == STRING_CMD && strcmp("LIB", IDID(h)) == 0)
+  {
+    if (fprintf(fd, "LIB \"%s\";\n", IDSTRING(h)) == EOF) return TRUE;
+    else return FALSE;
+  }
+                                      
   // put type and name 
   if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF) return TRUE;
 

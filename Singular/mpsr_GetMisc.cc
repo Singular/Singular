@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.4 1997-04-02 15:07:38 Singular Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.5 1997-04-18 11:25:00 obachman Exp $ */
 
 /***************************************************************
  *
@@ -415,7 +415,7 @@ static char* GenerateRingName()
 // the first found is returned together witht the respective ring
 idhdl mpsr_FindIdhdl(char *name, ring &r)
 {
-  idhdl h = idroot->get(name, 0), h2;
+  idhdl h = (idroot != NULL ? idroot->get(name, 0): NULL), h2;
   r = NULL;
   
   if (h != NULL)
@@ -429,7 +429,8 @@ idhdl mpsr_FindIdhdl(char *name, ring &r)
   {
     if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
     {
-      h2 = IDRING(h)->idroot->get(name, 0);
+      h2 = (IDRING(h)->idroot!=NULL ?IDRING(h)->idroot->get(name, 0) : NULL);
+      
       if (h2 != NULL)
       {
         r = IDRING(h);

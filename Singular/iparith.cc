@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.21 1997-04-17 17:52:18 Singular Exp $ */
+/* $Id: iparith.cc,v 1.22 1997-04-18 11:24:55 obachman Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -2141,7 +2141,9 @@ static BOOLEAN jjUMINUS_IV(leftv res, leftv u)
 }
 static BOOLEAN jjPROC1(leftv res, leftv u)
 {
-  leftv sl = iiMake_proc((idhdl)u->data,NULL);
+  if ((u->rtyp!=IDHDL) || (u->e!=NULL))
+    return TRUE;
+  leftv sl = iiMake_proc((idhdl) u->data,NULL);
   if (sl==NULL)
   {
     return TRUE;
@@ -3322,6 +3324,15 @@ static BOOLEAN jjBRACK_Ma_IV_IV(leftv res, leftv u, leftv v,leftv w)
   }
   return FALSE;
 }
+static BOOLEAN jjPROC3(leftv res, leftv u, leftv v, leftv w)
+{
+  v->next=(leftv)Alloc(sizeof(sleftv));
+  memcpy(v->next,w,sizeof(sleftv));
+  BOOLEAN r=iiExprArith2(res,u,'(',v);
+  v->rtyp=0; v->data=NULL; 
+  w->rtyp=0; w->data=NULL;
+  return r;
+}
 static BOOLEAN jjCALL3MANY(leftv res, leftv u, leftv v, leftv w)
 {
   u->next=(leftv)Alloc(sizeof(sleftv));
@@ -3655,6 +3666,7 @@ struct sValCmd3 dArith3[]=
 ,{jjBRACK_Ma_I_IV,  '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INTVEC_CMD }
 ,{jjBRACK_Ma_IV_I,  '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INT_CMD }
 ,{jjBRACK_Ma_IV_IV, '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INTVEC_CMD }
+,{jjPROC3,          '(',        ANY_TYPE,   PROC_CMD,   DEF_CMD,    DEF_CMD }
 ,{atATTRIB3,        ATTRIB_CMD, NONE,       IDHDL,      STRING_CMD, DEF_CMD }
 ,{jjCOEFFS3_P,      COEFFS_CMD, MATRIX_CMD, POLY_CMD,   POLY_CMD,   MATRIX_CMD }
 ,{jjCOEFFS3_P,      COEFFS_CMD, MATRIX_CMD, VECTOR_CMD, POLY_CMD,   MATRIX_CMD }

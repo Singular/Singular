@@ -1,3 +1,13 @@
+Fri Apr 18 09:47:22 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* silink.cc (DumpAsciiIdhdl): LIB string is dumped without type
+	  declaration 
+
+	* mpsr_Get.cc (InitIdentifierLeftv): used mpsr_SetCurrRing(r,
+	  TRUE) so that pOne works if no ring did previously exist.
+
+	* iparith.cc: Added jjPROC3.
+
 Tue Apr 15 12:07:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* silink.cc (slStandardInit): changed Ascii type specifyer from

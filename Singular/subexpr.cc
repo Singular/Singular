@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.12 1997-04-09 12:20:14 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.13 1997-04-18 11:25:03 obachman Exp $ */
 
 /*
 * ABSTRACT: handling of leftv
@@ -1198,11 +1198,14 @@ int sleftv::Eval()
   if(rtyp==IDHDL)
   {
     int t=Typ();
-    void *d=CopyD(t);
-    data=d;
-    rtyp=t;
-    name=NULL;
-    e=NULL;
+    if (t!=PROC_CMD)
+    {
+      void *d=CopyD(t);
+      data=d;
+      rtyp=t;
+      name=NULL;
+      e=NULL;
+    }
   }
   else if (rtyp==COMMAND)
   {
