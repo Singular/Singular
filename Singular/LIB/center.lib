@@ -1,4 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
+version="$Id: center.lib,v 1.7 2004-07-22 20:14:01 plural Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  center.lib      computation of central elements of G-algebras.
