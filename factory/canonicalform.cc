@@ -1,8 +1,11 @@
 // emacs editmode for this file is -*- C++ -*-
-// $Id: canonicalform.cc,v 1.0 1996-05-17 10:59:42 stobbe Exp $
+// $Id: canonicalform.cc,v 1.1 1996-06-13 07:15:50 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:42  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
@@ -357,7 +360,7 @@ CanonicalForm::deriv( const Variable & x ) const
 	for ( CFIterator i = (y==x) ? *this : swapvar( *this, x, y ); i.hasTerms(); i++ )
 	    if ( i.exp() > 0 )
 		res += power( y, i.exp()-1 ) * i.coeff() * i.exp();
-	return res;
+	return (y==x) ? res : swapvar( res, x, y );
     }
 }
 
