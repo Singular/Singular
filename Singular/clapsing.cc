@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.64 2000-04-11 15:03:52 Singular Exp $
+// $Id: clapsing.cc,v 1.65 2000-04-20 09:37:52 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -645,7 +645,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     setCharacteristic( nGetChar() );
     if (nGetChar()==0) /* Q */
     {
-      if (f!=NULL)
+      //if (f!=NULL) // already tested at start of routine
       {
         number n0=nCopy(pGetCoeff(f));
         if (with_exps==0)
