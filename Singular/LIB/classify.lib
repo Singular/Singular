@@ -1,8 +1,8 @@
-// $Id: classify.lib,v 1.29 1999-01-22 14:44:01 krueger Exp $
+// $Id: classify.lib,v 1.30 1999-01-26 15:26:05 Singular Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.29 1999-01-22 14:44:01 krueger Exp $";
+version  = "$Id: classify.lib,v 1.30 1999-01-26 15:26:05 Singular Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -2518,16 +2518,12 @@ COMPUTE:  Compute basic invariants of f: an upper bound d for the
 RETURN:   intvec: d, mu, c
 EXAMPLE:  example basicinvariants; shows an example"
 {
-  int k=1;
   intvec v;
-  ideal jf = jacob(f);
-  ideal Jfs = std(jf);
-  ideal m = std(maxideal(2) * jf);
-//  v[1] = system("HC")-1;
-  while( size( NF(maxideal(k), m)) != 0) { k++; }
-  v[1] = k;
+  ideal Jfs = std(jacob(f));
+  v[1] = system("HC")+1;
   v[2] = vdim(Jfs);
   v[3] = corank(f);
+  if( v[2]<v[1] ) { v[1] = v[2]+1; }
   return(v);
 }
 example
