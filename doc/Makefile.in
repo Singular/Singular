@@ -80,7 +80,7 @@ clean:
 	/bin/rm -f Z* doc2tex example.* save_i *~ *.tst manual.lst doe core
 	/bin/rm -f singular.?? singular.??s singular.aux singular.log singular.toc
 	/bin/rm -f tutor.?? tutor.??s tutor.aux tutor.log tutor.toc *.lst
-	/bin/rm -f sample.lib sample_lib0.lib doe* singular.info
+	/bin/rm -f doe* singular.info
 
 mostlyclean: clean
 
