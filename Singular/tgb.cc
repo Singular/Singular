@@ -2389,11 +2389,7 @@ int red_object::clear_to_poly(){
   kBucketClear(bucket,&p,&l);
   return l;
 }
-void red_object::reduction_step(int reduction_id, poly reductor_full, int full_len, poly reductor_part, reduction_accumulator* join_to, calc_dat* c)
-{
-  //we have to add support later for building new sums at this points, this involves a change in the interface
-      
-}
+
   
 
 void red_object::adjust_coefs(number c_r, number c_ac_r){
@@ -2427,27 +2423,38 @@ int red_object::guess_quality(calc_dat* c){
     return s;
 }
 void reduction_step::reduce(red_object* r, int l, int u){}
+void simple_reducer::target_is_no_sum_reduce(red_object & ro){
+  kBucketPolyRed(ro.bucket,p,
+		 p_len,
+		 c->strat->kNoether);
+}
+
+void simple_reducer::target_is_a_sum_reduce(red_object & ro){
+  assume(ro.sum!=NULL);
+  assume(ro.sum->ac!=NULL);
+  if(ro.sum->ac->last_reduction_id!=reduction_id){
+    number n1=kBucketPolyRed(ro.sum->ac->bucket,p, p_len, c->strat->kNoether);
+    number n2=nMult(n1,ro.sum->ac->multiplied);
+    nDelete(&ro.sum->ac->multiplied);
+    nDelete(&n1);
+    ro.sum->ac->multiplied=n2;
+  }
+}
 void simple_reducer::reduce(red_object* r, int l, int u){
   int i;
   for(i=l;i<=u;i++){
     if(r[i].sum==NULL)
-      kBucketPolyRed(r[i].bucket,p,
-		     p_len,
-		     c->strat->kNoether);
+      this->target_is_no_sum_reduce(r[i]);
+
     else 
     {
-      assume(r[i].sum->ac!=NULL);
-      if(r[i].sum->ac->last_reduction_id!=reduction_id){
-	number n1=kBucketPolyRed(r[i].sum->ac->bucket,p, p_len, c->strat->kNoether);
-	number n2=nMult(n1,r[i].sum->ac->multiplied);
-	nDelete(&r[i].sum->ac->multiplied);
-	nDelete(&n1);
-	r[i].sum->ac->multiplied=n2;
-      }
+      this->target_is_a_sum_reduce(r[i]);
       //reduce and adjust multiplied
       r[i].sum->ac->last_reduction_id=reduction_id;
       
     }
+    //most elegant would be multimethods at this point and subclassing
+    //red_object for sum
  
   }
   for(i=l;i<=u;i++)

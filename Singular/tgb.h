@@ -117,7 +117,6 @@ class red_object{
   unsigned long sev;
   void flatten();
   void validate();
-  void reduction_step(int reduction_id, poly reductor_full, int full_len, poly reductor_part, reduction_accumulator* join_to, calc_dat* c);
   void adjust_coefs(number c_r, number c_ac_r);
   int guess_quality(calc_dat* c);
   int clear_to_poly();
@@ -184,9 +183,12 @@ class simple_reducer:public reduction_step{
   poly p;
   kBucket_pt fill_back;
   int p_len;
-
-  void reduce(red_object* r, int l, int u);
+  
+  virtual void reduce(red_object* r, int l, int u);
   ~simple_reducer();
+ protected:
+  virtual void target_is_a_sum_reduce(red_object & ro);
+  virtual void target_is_no_sum_reduce(red_object & ro);
 };
 //class sum_canceling_reducer:public reduction_step {
 //  void reduce(red_object* r, int l, int u);
