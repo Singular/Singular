@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.33 2000-09-04 13:49:23 obachman Exp $
+# $Id: regress.cmd,v 1.34 2000-11-08 17:07:13 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -26,7 +26,8 @@ regress.cmd    -- regress test of Singular
   [-e [crit%[val]]] -- throw error if status difference [of crit] > val (in %)
   [-a [crit]]       -- add status results [of crit] to result file
   [-m]              -- add status result for current version to result file
-  [-t]              -- compute and call mtrack at the end, no diffs
+  [-t]              -- compute and call system("mtrack", 1) at the end, no diffs
+  [-tt max]         -- compute and call system("mtrack", max) at the end
   [file.lst]        -- read tst files from file.lst
   [file.tst]        -- test Singular script file.tst
 _EOM_
@@ -115,7 +116,7 @@ if ( (! (-e $singular)) || (! (-x $singular)))
   $singular = $curr_dir."/../Singular$ext";
 }
 # sed scripts which are applied to res files before they are diff'ed
-$sed_scripts = "-e '/used time:/d' -e '/tst_ignore:/d' -e '/Id:/d' -e '/error occurred in/d' -e '/tst_status/d' -e'/init >>/d'";
+$sed_scripts = "-e '/used time:/d' -e '/tst_ignore:/d' -e '/Id:/d' -e '/error occurred in/d' -e '/tst_status/d' -e'/init >>/d' -e 's/\\[[0-9]*:[0-9]*\\]//g'";
 # default value (in %) above which differences are reported on -r
 $report_val = 5;
 # default value (in %) above which differences cause an error on -e
@@ -386,7 +387,7 @@ sub tst_check
   }
 
   # generate $root.res
-  if ($generate ne "yes" && ! $mtrack)
+  if ($generate ne "yes" && ! defined($mtrack))
   {
     if ((-r "$root.res.gz.uu") && ! ( -z "$root.res.gz.uu"))
     {
@@ -405,12 +406,12 @@ sub tst_check
   }
 
   my $resfile = "$root.new.res";
-  $resfile = "$root.mtrack.res" if ($mtrack);
+  $resfile = "$root.mtrack.res" if (defined($mtrack));
   my $statfile = "$root.new.stat";
   &mysystem("$rm -f $statfile");
-  if ($mtrack)
+  if (defined($mtrack))
   {
-    $system_call = "$cat $root.tst | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");kill killall;system(\"mtrack\", \"$root.mtrack.unused\"); \\\$/' | $singular $singularOptions ";
+    $system_call = "$cat $root.tst | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");kill killall;system(\"mtrack\", \"$root.mtrack.unused\", $mtrack); \\\$/' | $singular $singularOptions ";
     $system_call .= ($verbosity > 2 ? " | $tee " : " > ");
     $system_call .= "$root.mtrack.res";
     $system_call .= " 2>&1 " if ($verbosity <= 2);
@@ -444,7 +445,7 @@ sub tst_check
     {
       $error_cause = "Segment fault";
     }
-    elsif (! $mtrack)
+    elsif (! defined($mtrack))
     {
       &mysystem("$rm -f $root.diff");
       if ($generate eq "yes")
@@ -470,7 +471,7 @@ sub tst_check
   mysystem("mv tst_status.out $statfile")
     if (! -e $statfile && -e "tst_status.out");
 
-  if (%checks && ! $exit_status && $generate ne "yes" && ! $mtrack)
+  if (%checks && ! $exit_status && $generate ne "yes" && ! defined($mtrack))
   {
     if (-e "$statfile")
     {
@@ -491,7 +492,7 @@ sub tst_check
   }
   else
   {
-    unless ($mtrack)
+    unless (defined($mtrack))
     {
       #clean up
       if ($generate eq "yes")
@@ -554,6 +555,10 @@ while ($ARGV[0] =~ /^-/)
   elsif(/^-v$/)
   {
     $verbosity = shift;
+  }
+  elsif (/^-tt/)
+  {
+    $mtrack = shift;
   }
   elsif(/^-t$/)
   {
