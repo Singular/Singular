@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.181 2000-06-07 13:13:34 obachman Exp $
+@comment $Id: general.doc,v 1.182 2000-07-27 15:47:50 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -254,6 +254,11 @@ Under Unix, the environment variable @code{DISPLAY} has to be set for
 the browsers @code{netscape}, @code{tkinfo}, and @code{xinfo} to work.
 
 @item
+@cindex NETSCAPE environment variable
+@cindex XINFO environment variable
+@cindex XTERM environment variable
+@cindex INFO environment variable
+@cindex help browsers, setting command to use
 The help browsers @code{netscape}, @code{tkinfo}, @code{xinfo}, and
 @code{info} are only available if the respective programs are installed
 on your system (for @code{xinfo}, the programs @code{xterm} and
