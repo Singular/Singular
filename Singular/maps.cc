@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.37 2001-08-27 14:47:10 Singular Exp $ */
+/* $Id: maps.cc,v 1.38 2002-01-22 09:57:53 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -558,7 +558,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         tmpR=((map)data)->preimage;
         ((matrix)data)->rank=((matrix)data)->rows();
       }
-      if (what==FETCH_CMD)
+      if ((what==FETCH_CMD)&& (nMap==nCopy))
       {
         for (i=R*C-1;i>=0;i--)
         {
@@ -567,7 +567,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         }
       }
       else
-      if (what==IMAP_CMD)
+      if ((what==IMAP_CMD) || ((what==FETCH_CMD) /* && (nMap!=nCopy)*/))
       {
         for (i=R*C-1;i>=0;i--)
         {
