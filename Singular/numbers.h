@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.30 2002-11-26 13:54:44 Singular Exp $ */
+/* $Id: numbers.h,v 1.31 2003-01-31 09:10:05 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -73,6 +73,7 @@ void ndDelete(number* d, const ring r);
 void nDummy2(number &d);
 number ndGcd(number a, number b, const ring);
 number ndCopy(number a);
+void   ndInpMult(number &a, number b, const ring r);
 
 #ifdef LDEBUG
 void nDBDummy1(number* d,char *f, int l);

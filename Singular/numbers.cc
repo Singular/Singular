@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.48 2002-11-26 13:54:43 Singular Exp $ */
+/* $Id: numbers.cc,v 1.49 2003-01-31 09:10:04 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -61,7 +61,7 @@ n_Procs_s *cf_root=NULL;
 
 void   nDummy1(number* d) { *d=NULL; }
 void   ndDelete(number* d, const ring r) { *d=NULL; }
-void   ndInpMult(number &a, number b, ring r) 
+void   ndInpMult(number &a, number b, const ring r)
 {
   number n=n_Mult(a,b,r);
   n_Delete(&a,r);
@@ -175,7 +175,7 @@ void nSetChar(ring r)
 */
 void nInitChar(ring r)
 {
-  short c=rInternalChar(r);
+  int c=rInternalChar(r);
   n_coeffType t=rFieldType(r);
 
   if (rField_is_Extension(r))
@@ -279,6 +279,7 @@ void nInitChar(ring r)
     n->nAdd   = nlAdd;
     n->nSub   = nlSub;
     n->nMult  = nlMult;
+    n->nInpMult=nlInpMult;
     n->nDiv   = nlDiv;
     n->nExactDiv= nlExactDiv;
     n->nIntDiv= nlIntDiv;
@@ -332,6 +333,15 @@ void nInitChar(ring r)
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
     //n->nDBTest=npDBTest;
+#endif
+#ifdef NV_OPS
+    if (c>NV_MAX_PRIME)
+    {
+      n->nMult  = nvMult;
+      n->nDiv   = nvDiv;
+      n->nExactDiv= nvDiv;
+      n->nInvers= nvInvers;
+    }
 #endif
   }
   /* -------------- GF(p^m) -----------------------*/
@@ -499,13 +509,17 @@ void nKillChar(ring r)
           {
             case n_Zp:
                  #ifdef HAVE_DIV_MOD
+		 if (r->cf->npInvTable!=NULL)
                  omFreeSize( (ADDRESS)r->cf->npInvTable,
                              r->cf->npPrimeM*sizeof(CARDINAL) );
                  #else
-                 omFreeSize( (ADDRESS)r->cf->npExpTable,
-                             r->cf->npPrimeM*sizeof(CARDINAL) );
-                 omFreeSize( (ADDRESS)r->cf->npLogTable,
-                             r->cf->npPrimeM*sizeof(CARDINAL) );
+		 if (r->cf->npExpTable!=NULL)
+		 {
+                   omFreeSize( (ADDRESS)r->cf->npExpTable,
+                               r->cf->npPrimeM*sizeof(CARDINAL) );
+                   omFreeSize( (ADDRESS)r->cf->npLogTable,
+                               r->cf->npPrimeM*sizeof(CARDINAL) );
+	         }
                  #endif
                  break;
 
