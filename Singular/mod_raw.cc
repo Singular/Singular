@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.2 1999-05-10 12:51:30 krueger Exp $ */
+/* $Id: mod_raw.cc,v 1.3 1999-09-22 12:03:33 hannes Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -12,15 +12,15 @@
 */
 
 #include "mod2.h"
-#ifdef HAVE_DYNAMIC_LOADING
+#if defined(HAVE_DYNAMIC_LOADING) || defined(HAVE_DYN_RL)
 #include "mod_raw.h"
 
 
 /*****************************************************************************
  * SECTION ix86-linux                                                        *
  *****************************************************************************/
-#  ifdef ix86_Linux
-#    include <dlfcn.h>
+#ifdef ix86_Linux
+#include <dlfcn.h>
 
 void *dynl_open(
   char *filename    /* I: filename to load */
@@ -43,13 +43,14 @@ const char *dynl_error()
 {
   return(dlerror());
 }
-#  endif /* ix86_Linux */
+#endif /* ix86_Linux */
 
 /*****************************************************************************
  * SECTION HPUX-9/10                                                         *
  *****************************************************************************/
-#  if defined(HPUX_9) || defined(HPUX_10)
-#    include <dl.h>
+#if defined(HPUX_9) || defined(HPUX_10)
+#include <dl.h>
+
 typedef char *((*func_ptr) ());
 
 void *dynl_open(char *filename)
@@ -79,7 +80,7 @@ int dynl_close (void *handle)
 const char *dynl_error()
 {
   static char errmsg[] = "shl_load failed";
-  
+
   return errmsg;
 }
 #endif /* HPUX_9  or HPUX_10 */
@@ -87,7 +88,7 @@ const char *dynl_error()
 /*****************************************************************************
  * SECTION 68k-MPW                                                           *
  *****************************************************************************/
-#  ifdef 68k_MPW
+#ifdef 68k_MPW
 /* #    include <> */
 
 void *dynl_open(char *filename)
@@ -108,7 +109,7 @@ int dynl_close (void *handle)
 const char *dynl_error()
 {
   static char errmsg[] = "support for dynamic loading not implemented";
-  
+
   return errmsg;
 }
 #  endif /* 68k_MPW */
@@ -117,7 +118,7 @@ const char *dynl_error()
 /*****************************************************************************
  * SECTION AIX-4                                                             *
  *****************************************************************************/
-#  ifdef AIX_4
+#ifdef AIX_4
 /* #    include <> */
 
 void *dynl_open(char *filename)
@@ -138,7 +139,7 @@ int dynl_close (void *handle)
 const char *dynl_error()
 {
   static char errmsg[] = "support for dynamic loading not implemented";
-  
+
   return errmsg;
 }
 #  endif /* AIX_4 */
@@ -146,7 +147,7 @@ const char *dynl_error()
 /*****************************************************************************
  * SECTION IRIX-6                                                            *
  *****************************************************************************/
-#  ifdef IRIX_6
+#ifdef IRIX_6
 /* #    include <> */
 
 void *dynl_open(char *filename)
@@ -167,7 +168,7 @@ int dynl_close (void *handle)
 const char *dynl_error()
 {
   static char errmsg[] = "support for dynamic loading not implemented";
-  
+
   return errmsg;
 }
 #  endif /* IRIX_6 */
@@ -175,7 +176,7 @@ const char *dynl_error()
 /*****************************************************************************
  * SECTION Sun3OS-4                                                          *
  *****************************************************************************/
-#  ifdef Sun3OS_4
+#ifdef Sun3OS_4
 /* #    include <> */
 
 void *dynl_open(char *filename)
@@ -196,15 +197,15 @@ int dynl_close (void *handle)
 const char *dynl_error()
 {
   static char errmsg[] = "support for dynamic loading not implemented";
-  
+
   return errmsg;
 }
-#  endif /* Sun3OS_4 */
+#endif /* Sun3OS_4 */
 
 /*****************************************************************************
  * SECTION SunOS-4/5                                                         *
  *****************************************************************************/
-#  if defined(SunOS_4) || defined(SunOS_5)
+#if defined(SunOS_4) || defined(SunOS_5)
 /* #    include <> */
 
 void *dynl_open(char *filename)
@@ -225,15 +226,15 @@ int dynl_close (void *handle)
 const char *dynl_error()
 {
   static char errmsg[] = "support for dynamic loading not implemented";
-  
+
   return errmsg;
 }
-#  endif /* SunOS_4 or SunOS_5 */
+#endif /* SunOS_4 or SunOS_5 */
 
 /*****************************************************************************
  * SECTION ix86-win                                                          *
  *****************************************************************************/
-#  ifdef ix86_win
+#ifdef ix86_win
 /* #    include <> */
 
 void *dynl_open(char *filename)
@@ -254,15 +255,15 @@ int dynl_close (void *handle)
 const char *dynl_error()
 {
   static char errmsg[] = "support for dynamic loading not implemented";
-  
+
   return errmsg;
 }
-#  endif /* ix86_win */
+#endif /* ix86_win */
 
 /*****************************************************************************
  * SECTION ppc-MPW                                                           *
  *****************************************************************************/
-#  ifdef ppc_MPW
+#ifdef ppc_MPW
 /* #    include <> */
 
 void *dynl_open(char *filename)
@@ -283,7 +284,6 @@ int dynl_close (void *handle)
 const char *dynl_error()
 {
   static char errmsg[] = "support for dynamic loading not implemented";
-  
   return errmsg;
 }
 #  endif /* ppc_MPW */
