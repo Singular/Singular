@@ -1,13 +1,13 @@
                         SINGULAR version 2-0-0
-			   Singular-factory
+			   Singular-Factory
 
                      University of Kaiserslautern
 
       Department of Mathematics and  Centre for Computer Algebra
 
-           Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
+  Authors: G.-M. Greuel, R. Stobbe, J. Schmidt, G. Pfister, H. Schoenemann
 
-                        Copyright (C) 1986-2001
+                        Copyright (C) 1991-2001
 
 
 
@@ -48,29 +48,4 @@ Availability
 
 The latest information about SINGULAR is always available from
 `http://www.singular.uni-kl.de'.
-
-Acknowledgements
-================
-
-The development of SINGULAR is directed and coordinated by Gert-Martin
-Greuel, Gerhard Pfister, and Hans Scho"nemann.
-
-Currently, the SINGULAR team has the following members: Olaf Bachmann,
-Anne Fru"bis-Kru"ger, Thomas Keilen, Kai Kru"ger, Christoph Lossen,
-Victor Levandovskyy, Wilfred Pohl, Mathias Schulze, Eric Westenberger,
-and Tim Wichmann.
-
-Past members of the SINGULAR team are: Hubert Grassmann, Wolfgang
-Neumann, Jens Schmidt, Ru"diger Stobbe.
-
-Further contributions to SINGULAR were made by: Thomas Bayer, Isabelle
-Bermejo, Stephan Endrass, Jose Ignacio Farran Martin, Wolfram Decker,
-Philippe Gimenez, Christian Gorzel, Agnes Heydtmann, Dietmar Hillebrand,
-Tobias Hirsch, Martin Lamm, Bernd Martin, Michael Messollen, Thomas
-Nu"ssler, Moritz Wenk.
-
-We should like to acknowledge the financial support given by the
-Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft and the
-Stiftung fu"r Innovation des Landes Rheinland-Pfalz to the SINGULAR
-project.
 
