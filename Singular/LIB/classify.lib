@@ -1,8 +1,8 @@
-e// $Id: classify.lib,v 1.37 1999-09-03 15:17:01 krueger Exp $
+e// $Id: classify.lib,v 1.38 1999-11-05 15:12:24 obachman Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.37 1999-09-03 15:17:01 krueger Exp $";
+version  = "$Id: classify.lib,v 1.38 1999-11-05 15:12:24 obachman Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -1446,7 +1446,7 @@ proc printresult (int step, poly f, string typ, list cstn, int m)
   debug_log(0,"   Arnold step number "+string(step));
   if( @DeBug >= 0 ) {
     "The singularity";
-    "   `"+Show(jet(f, K))+"'";
+    "   "+Show(jet(f, K))+"";
     if( typ != "error!" && typ != "NoClass" ) {
       "is R-equivalent to "+typ+".";
     }
@@ -1468,11 +1468,11 @@ proc Funktion47 (poly f, list cstn)
     int corank = cstn[1];
     int Mu = cstn[2];
     int K  = cstn[3];
-    string s = "The Singularity '";+Show(jet(f, K), corank, K);
+    string s = "The Singularity ";+Show(jet(f, K), corank, K);
     string tp="";
 //    return(printresult(47, f, tp, cstn, -1));
 
-    s = s +"' has 4-jet equal to zero. (F47), mu="+string(Mu);
+    s = s +" has 4-jet equal to zero. (F47), mu="+string(Mu);
 
     s; // +"  ("+SG_Typ+")";
     return(Show(f), tp, corank);
@@ -2406,7 +2406,7 @@ proc RandomPolyK (int M, string Typ)
 //  f = f +t2;
   if(crk==1) { f = f + y2 + z2; }
   if(crk==2) { f = f + z2; }
-  txt="RandomPoly-Series: gewaehlt fall `"+Typ+"' mit";
+  txt="RandomPoly-Series: gewaehlt fall "+Typ+" mit";
   txt=txt+" f="+string(f);
   txt;
   setring ring_ext;
