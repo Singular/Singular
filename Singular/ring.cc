@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.123 2000-10-23 12:02:19 obachman Exp $ */
+/* $Id: ring.cc,v 1.124 2000-10-23 15:21:15 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1904,7 +1904,7 @@ BOOLEAN rOrder_is_DegOrdering(rRingOrder_t order)
       case ringorder_ds:
       case ringorder_Ds:
         return TRUE;
-        
+
       default:
         return FALSE;
   }
@@ -1919,7 +1919,7 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing)
           (rOrder_is_DegOrdering((rRingOrder_t)r->order[0]) ||
            rOrder_is_DegOrdering(( rRingOrder_t)r->order[1])));
 }
-                             
+
 BOOLEAN rIsPolyVar(int v)
 {
   int  i=0;
@@ -2032,7 +2032,8 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
     for(j=0;j<r->OrdSize;j++)
     {
       if ((r->typ[j].ord_typ==ro_dp)
-      || (r->typ[j].ord_typ==ro_wp))
+      || (r->typ[j].ord_typ==ro_wp)
+      || (r->typ[j].ord_typ==ro_wp_neg))
       {
         if (r->typ[j].data.dp.start > r->typ[j].data.dp.end)
           dReportError("in ordrec %d: start(%d) > end(%d)",j,
@@ -2100,6 +2101,15 @@ static void rO_WDegree(int &place, int &bitplace, int start, int end,
   o[place]=1;
   place++;
   rO_Align(place,bitplace);
+  int i;
+  for(i=start;i<=end;i++)
+  {
+    if(weights[i-start]<=0)
+    {
+      ord_struct.ord_typ=ro_wp_neg;
+      break;
+    }
+  }
 }
 
 static void rO_WDegree_neg(int &place, int &bitplace, int start, int end,
@@ -2115,6 +2125,15 @@ static void rO_WDegree_neg(int &place, int &bitplace, int start, int end,
   o[place]=-1;
   place++;
   rO_Align(place,bitplace);
+  int i;
+  for(i=start;i<=end;i++)
+  {
+    if(weights[i-start]<=0)
+    {
+      ord_struct.ord_typ=ro_wp_neg;
+      break;
+    }
+  }
 }
 
 static void rO_LexVars(int &place, int &bitplace, int start, int end,
@@ -2487,7 +2506,7 @@ static void rSetOutParams(ring r)
       // hence, do the following awkward trick
       int N = omSizeWOfAddr(r->names);
       if (r->N < N) N = r->N;
-      
+
       for (i=(N-1);i>=0;i--)
       {
         if(r->names[i] != NULL && strlen(r->names[i])>1)
@@ -2545,7 +2564,7 @@ static void rSetDegStuff(ring r)
   int* order = r->order;
   int* block0 = r->block0;
   int* block1 = r->block1;
-  
+
   if (order[0]==ringorder_S ||order[0]==ringorder_s)
   {
     order++;
@@ -2641,7 +2660,7 @@ static void rSetDegStuff(ring r)
     }
     r->pFDeg = pWTotaldegree; // may be improved: pTotaldegree for lp/dp/ls/.. blocks
   }
-  if (r->pFDeg!=pWTotaldegree) 
+  if (r->pFDeg!=pWTotaldegree)
   {
     if (rOrd_is_Totaldegree_Ordering(r))
     {
@@ -2654,7 +2673,7 @@ static void rSetDegStuff(ring r)
   }
 }
 
-  
+
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
@@ -2666,7 +2685,7 @@ BOOLEAN rComplete(ring r, int force)
   r->bitmask=rGetExpSize(r->bitmask,bits);
   r->BitsPerExp = bits;
   r->divmask=rGetDivMask(bits);
-  
+
   // will be used for ordsgn:
   long *tmp_ordsgn=(long *)omAlloc0(2*(n+r->N)*sizeof(long));
   // will be used for VarOffset:
@@ -3012,7 +3031,7 @@ static void rSetVarL(ring r)
   poly p = p_Init(r);
   int* VarL_Offset = (int*) omAlloc0(r->ExpLSize*sizeof(int));
   int i,j;
-  
+
   for (i=1; i<=r->N; i++)
     p_SetExp(p, i, 1, r);
 
@@ -3034,13 +3053,13 @@ static void rSetVarL(ring r)
                                         j*sizeof(int));
   p_LmFree(p, r);
 }
-    
+
 // get r->divmask depending on bits per exponent
 static unsigned long rGetDivMask(int bits)
 {
   unsigned long divmask = 1;
   int i = bits;
-  
+
   while (i < BIT_SIZEOF_LONG)
   {
     divmask |= (1 << (unsigned long) i);
@@ -3057,7 +3076,8 @@ void rDebugPrint(ring r)
     PrintS("NULL ?\n");
     return;
   }
-  char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp", "ro_syz", "ro_none"};
+  char *TYP[]={"ro_dp","ro_wp","ro_wp_neg","ro_cp",
+               "ro_syzcomp", "ro_syz", "ro_none"};
   int i,j;
   PrintS("varoffset:\n");
   for(j=0;j<=r->N;j++) Print("  v%d at e-pos %d, bit %d\n",
@@ -3491,4 +3511,3 @@ BOOLEAN rRing_has_CompLastBlock(ring r)
   int lb = rBlocks(r) - 2;
   return (r->order[lb] == ringorder_c || r->order[lb] == ringorder_C);
 }
-

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.58 2000-10-23 12:02:16 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.59 2000-10-23 15:21:14 Singular Exp $ */
 
 /***************************************************************
  *
@@ -39,6 +39,7 @@ struct  spolyrec
 };
 #define POLYSIZE (sizeof(poly) + sizeof(number))
 #define POLYSIZEW (POLYSIZE / sizeof(long))
+#define POLY_NEGWEIGHT_OFFSET 0x80000000
 
 /***************************************************************
  *

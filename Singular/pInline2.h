@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.8 2000-10-16 12:06:37 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.9 2000-10-23 15:21:13 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -19,6 +19,7 @@
 #if !defined(NO_PINLINE2) || defined(PINLINE2_CC)
 
 #include "mod2.h"
+#include "tok.h"
 #include "omalloc.h"
 #include "structs.h"
 #include "p_polys.h"
@@ -38,13 +39,48 @@ PINLINE2 number p_SetCoeff(poly p, number n, ring r)
 PINLINE2 Order_t p_GetOrder(poly p, ring r)
 {
   p_CheckPolyRing2(p, r);
-  return ((p)->exp[r->pOrdIndex]);
+  int i=0;
+  loop
+  {
+    switch(r->typ[i].ord_typ)
+    {
+      case ro_wp_neg:
+        return (((int)((p)->exp[r->pOrdIndex]))-POLY_NEGWEIGHT_OFFSET);
+      case ro_syzcomp:
+      case ro_syz:
+      case ro_cp:
+        i++;
+        break;
+      //case ro_dp:
+      //case ro_wp:
+      default:
+        return ((p)->exp[r->pOrdIndex]);
+    }
+  }
 }
 
 PINLINE2 Order_t p_SetOrder(poly p, long o, ring r)
 {
   p_CheckPolyRing2(p, r);
   pAssume2(o >= 0);
+  int i=0;
+  loop
+  {
+    switch(r->typ[i].ord_typ)
+    {
+      case ro_wp_neg:
+        return (p)->exp[r->pOrdIndex]=o+POLY_NEGWEIGHT_OFFSET;
+      case ro_syzcomp:
+      case ro_syz:
+      case ro_cp:
+        i++;
+        break;
+      //case ro_dp:
+      //case ro_wp:
+      default:
+        return (p)->exp[r->pOrdIndex] = o;
+    }
+  }
   return (p)->exp[r->pOrdIndex] = o;
 }
 
@@ -275,7 +311,7 @@ PINLINE2 poly p_Copy(poly p, const ring lmRing, const ring tailRing)
 #ifndef PDEBUG
   if (tailRing == lmRing)
     return tailRing->p_Procs->p_Copy(p, tailRing);
-#endif    
+#endif
   if (p != NULL)
   {
     poly pres = p_Head(p, lmRing);
@@ -300,7 +336,7 @@ PINLINE2 void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
     tailRing->p_Procs->p_Delete(p, tailRing);
     return;
   }
-#endif  
+#endif
   if (*p != NULL)
   {
     if (pNext(*p) != NULL)
@@ -337,7 +373,7 @@ PINLINE2 poly p_Mult_nn(poly p, number n, const ring r)
   return r->p_Procs->p_Mult_nn(p, n, r);
 }
 
-PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing, 
+PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing,
                         const ring tailRing)
 {
 #ifndef PDEBUG
@@ -352,7 +388,7 @@ PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing,
   pNext(p) = tailRing->p_Procs->p_Mult_nn(pnext, n, tailRing);
   return p;
 }
-   
+
 // returns p*n, does not destroy p
 PINLINE2 poly pp_Mult_nn(poly p, number n, const ring r)
 {

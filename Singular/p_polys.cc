@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.1 2000-10-23 12:02:16 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.2 2000-10-23 15:21:14 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -22,6 +22,7 @@ void p_Setm(poly p, ring r)
   {
     while (1)
     {
+      long ord=0;
       sro_ord* o=&(r->typ[pos]);
       switch(o->ord_typ)
       {
@@ -30,18 +31,19 @@ void p_Setm(poly p, ring r)
           int a,e;
           a=o->data.dp.start;
           e=o->data.dp.end;
-          long ord=0; //0x40000000;
           for(int i=a;i<=e;i++) ord+=p_GetExp(p,i,r);
           p->exp[o->data.dp.place]=ord;
           break;
         }
+        case ro_wp_neg:
+          ord=POLY_NEGWEIGHT_OFFSET;
+          // no break;
         case ro_wp:
         {
           int a,e;
           a=o->data.wp.start;
           e=o->data.wp.end;
           int *w=o->data.wp.weights;
-          long ord=0; //0x40000000;
           for(int i=a;i<=e;i++) ord+=p_GetExp(p,i,r)*w[i-a];
           p->exp[o->data.wp.place]=ord;
           break;

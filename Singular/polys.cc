@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.65 2000-10-23 12:02:17 obachman Exp $ */
+/* $Id: polys.cc,v 1.66 2000-10-23 15:21:14 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -48,6 +48,7 @@ void rSetmS(poly p, int* Components, long* ShiftedComponents)
   {
     loop
     {
+      long ord=0;
       sro_ord* o=&(currRing->typ[pos]);
       switch(o->ord_typ)
       {
@@ -56,18 +57,19 @@ void rSetmS(poly p, int* Components, long* ShiftedComponents)
           int a,e;
           a=o->data.dp.start;
           e=o->data.dp.end;
-          long ord=0;
           for(int i=a;i<=e;i++) ord+=pGetExp(p,i);
           p->exp[o->data.dp.place]=ord;
           break;
         }
+	case ro_wp_neg:
+	  ord=POLY_NEGWEIGHT_OFFSET;
+	  // no break;
         case ro_wp:
         {
           int a,e;
           a=o->data.wp.start;
           e=o->data.wp.end;
           int *w=o->data.wp.weights;
-          long ord=0;
           for(int i=a;i<=e;i++) ord+=pGetExp(p,i)*w[i-a];
           p->exp[o->data.wp.place]=ord;
           break;
