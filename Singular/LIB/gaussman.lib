@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.64 2002-01-22 18:38:19 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.65 2002-01-24 13:32:33 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -1038,7 +1038,7 @@ EXAMPLE:  example tmatrix; shows examples
   module U1;
   module C;
   list F,I;
-  module F0,I0;
+  module F0,I0,U0;
   for(i0,j0=1,1;i0<=ncols(e);i0++)
   {
     C=matrix(0,mu,1);
@@ -1072,7 +1072,7 @@ EXAMPLE:  example tmatrix; shows examples
 
     I=list();
     I0=module();
-    module U0=std(0);
+    U0=std(module());
     for(i=size(F);i>=1;i--)
     {
       I[i]=module();
