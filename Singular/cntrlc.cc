@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.41 2004-08-13 10:39:13 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.42 2004-11-09 14:54:21 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -148,6 +148,15 @@ void sigsegv_handler(int sig, sigcontext s)
   exit(0);
 }
 
+void sig_ign_hdl(int sig)
+{
+  // some newer Linux version cannot have SIG_IGN for SIGCHLD,
+  // so use this nice routine here:
+  //  SuSe 9.x reports -1 always
+  //  Redhat 9.x/FC x reports sometimes -1
+  // see also: hpux_system
+}
+
 #ifdef PAGE_TEST
 #ifndef PAGE_INTERRUPT_TIME
 #define PAGE_INTERRUPT_TIME 1
@@ -217,13 +226,12 @@ void init_signals()
   {
     PrintS("cannot set signal handler for IOT\n");
   }
-#ifndef macintosh
   if (SIG_ERR==signal(SIGINT ,sigint_handler))
   {
     PrintS("cannot set signal handler for INT\n");
   }
-  signal(SIGCHLD, (void (*)(int))SIG_IGN);
-#endif
+  //signal(SIGCHLD, (void (*)(int))SIG_IGN);
+  signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
 }
 
 #else
