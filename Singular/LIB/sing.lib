@@ -1,4 +1,4 @@
-// $Id: sing.lib,v 1.6 1997-09-12 13:33:29 Singular Exp $
+// $Id: sing.lib,v 1.7 1997-12-15 11:31:32 Singular Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -656,7 +656,7 @@ EXAMPLE: example T12; shows an example
 {
 //--------------------------- initialisation ----------------------------------
    int  n,r1,r2,d1,d2;
-  def P = basering;
+   def P = basering;
    i = simplify(i,10);
    module jac,t1,t2,sbt1,sbt2;
    matrix Kos,Syz,SK,kbT1,Sx;
@@ -669,7 +669,7 @@ EXAMPLE: example T12; shows an example
    Kos = koszul(2,i);                           // koszul-relations
    SK  = modulo(Syz,Kos);                       // presentation of syz/kos
 //--------------------- fetch to quotient ring  mod i -------------------------
-  qring   Ox  = i0;                             // make P/i the basering
+   qring   Ox  = i0;                             // make P/i the basering
    module Jac = fetch(P,jac);
    matrix No  = transpose(fetch(P,Syz));        // ker(No) = Hom(syz,Ox)
    module So  = transpose(fetch(P,SK));         // Hom(syz/kos,R)
@@ -682,7 +682,7 @@ EXAMPLE: example T12; shows an example
    module T1  = modulo(Nx,Jac);                 // presentation of T1
    r1         = nrows(T1);
 //------------------------ pull back to basering ------------------------------
-  setring P;
+   setring P;
    t1   = fetch(Ox,T1)+i*freemodule(r1);
    t2   = fetch(Ox,T2)+i*freemodule(r2);
    sbt1 = std(t1);
@@ -692,10 +692,17 @@ EXAMPLE: example T12; shows an example
    dbprint(printlevel-voice+3,"// dim T1 = "+string(d1),"// dim T2 = "+string(d2));
    if  ( size(#)>0)
    {
-      kbT1 = fetch(Ox,Nx)*kbase(sbt1);
-      Sx   = fetch(Ox,Sx);
-      L = sbt1,sbt2,d1,d2,kbT1,Syz,Sx,t1,t2;
-      return(L);
+     if (d1>0)
+     {
+       kbT1 = fetch(Ox,Nx)*kbase(sbt1);
+     }
+     else
+     {
+       kbT1 = 0;
+     }	
+     Sx   = fetch(Ox,Sx);
+     L = sbt1,sbt2,d1,d2,kbT1,Syz,Sx,t1,t2;
+     return(L);
    }
    L = sbt1,sbt2;
    return(L);
