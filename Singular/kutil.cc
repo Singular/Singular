@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.6 1997-06-09 12:21:27 Singular Exp $ */
+/* $Id: kutil.cc,v 1.7 1997-06-20 08:17:14 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -2324,15 +2324,15 @@ void initS (ideal F, ideal Q,kStrategy strat)
       if (Q->m[i]!=NULL)
       {
         h.p = pCopy(Q->m[i]);
-        //if (TEST_OPT_INTSTRATEGY)
-        //{
-        //  //pContent(h.p);
-        //  pCleardenom(h.p); // also does a pContent
-        //}
-        //else
-        //{
-        //  pNorm(h.p);
-        //}
+        if (TEST_OPT_INTSTRATEGY)
+        {
+          //pContent(h.p);
+          pCleardenom(h.p); // also does a pContent
+        }
+        else
+        {
+          pNorm(h.p);
+        }
         strat->initEcart(&h);
         if (pOrdSgn==-1)
         {
