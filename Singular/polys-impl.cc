@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.16 1998-11-04 15:55:32 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.17 1998-11-05 08:37:46 obachman Exp $ */
 
 /***************************************************************
  *
@@ -76,7 +76,7 @@ void pGetVarIndicies_Lex(int nvars, int* VarOffset, int &VarCompIndex,
   VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
   VarOffset[0] = VarCompIndex;
   for (temp=1; temp<=nvars; temp++)
-    Varoffset[temp] = temp - 1;
+    VarOffset[temp] = temp - 1;
   VarLowIndex  = 0;
   VarHighIndex = nvars - 1;
 #else //  ! WORDS_BIGENDIAN
