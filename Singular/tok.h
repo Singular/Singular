@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.36 2000-01-11 17:51:15 Singular Exp $ */
+/* $Id: tok.h,v 1.37 2000-02-01 15:29:27 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -35,6 +35,18 @@ inline int min(const int a, const int b)  { return (a<b) ? a : b; }
 #define max(A,B) ((A) > (B) ? (A) : (B))
 #define min(A,B) ((A) < (B) ? (A) : (B))
 #endif
+
+/* the following defines should really go into mod2.h,
+   but configure dislikes it */
+
+#ifdef HAVE_SHIFTED_EXPONENTS
+/* Define the type of the exponents to be used in monomials */
+#undef EXPONENT_T 
+#define EXPONENT_T long
+/* Define the size of exponent */
+#define SIZEOF_EXPONENT SIZEOF_LONG
+#endif
+
 
 /* the follwing defines for infix operators should not be changed: *
 *  grammar.y does not use the symbolic names                       *

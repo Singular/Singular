@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.80 2000-01-26 18:10:52 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.81 2000-02-01 15:29:26 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -262,14 +262,6 @@
 #else /* SIZEOF_EXPONENT == 4 */
 #define MAX_EXPONENT 0x7fffffff
 #define MAX_COMPONENT 0xffffffff
-#endif
-
-#ifdef HAVE_SHIFTED_EXPONENTS
-/* Define the type of the exponents to be used in monomials */
-#undef EXPONENT_T
-#define EXPONENT_T long
-/* Define the size of exponent */
-#define SIZEOF_EXPONENT SIZEOF_SHORT
 #endif
 
 /*******************************************************************
