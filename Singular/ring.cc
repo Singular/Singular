@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.188 2002-02-08 08:48:26 anne Exp $ */
+/* $Id: ring.cc,v 1.189 2002-02-26 11:38:04 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -101,12 +101,6 @@ void rChangeCurrRing(ring r)
 
     /*------------ global variables related to polys -------------------*/
     pSetGlobals(r);
-
-    /*------------ set naMinimalPoly -----------------------------------*/
-    if (r->minpoly!=NULL)
-    {
-      naMinimalPoly=((lnumber)r->minpoly)->z;
-    }
   }
 }
 
