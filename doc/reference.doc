@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.13 1998-04-29 11:26:50 krueger Exp $
+@comment $Id: reference.doc,v 1.14 1998-04-29 11:42:02 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -252,7 +252,8 @@ value of type int is the multiplicity (see @ref{mult})
 matrix
 @item @strong{Purpose:}
 applies Bareiss' algorithm to a matrix.
-Result is a triangular matrix.
+
+Result is a lower triangular matrix.
 @item @strong{Example:}
 @example
 @c example
@@ -295,9 +296,9 @@ $R^n/M$:
 @*
 @end iftex
 @tex
-The entry d at (i,j) is the minimal number of generators in degree i+j of
-the j-th syzygy module of $R^n/M$ (the 0-th (resp.1-st) syzygy module of
-$R^n/M$ is
+The entry d of the intmat at place (i,j) is the minimal number of
+generators in degree i+j of the j-th syzygy module (= module of
+relations) of $R^n/M$ (the 0-th (resp.1-st) syzygy module of $R^n/M$ is
 $R^n$ (resp. $M$)).
 @end tex
 @ifinfo
@@ -305,9 +306,10 @@ compute the graded Betti numbers of
 R^n/M, if R denotes the basering and
 M a homogeneous submodule of R^n and the argument represents a resolution of
 R^n/M:
-@*The entry d at (i,j) is the minimal number of generators in degree i+j of
-the j-th syzygy module of R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is
-R^n (resp. M)).
+@*The entry d of the intmat at place (i,j) is the minimal number of
+generators in degree i+j of the j-th syzygy module (= module of
+relations) of R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n
+(resp. M)).
 @end ifinfo
 The argument is considered to be the result of a res/sres/mres command.
 (Only the initial monomials are considered for the computation
@@ -318,9 +320,13 @@ of the graded Betti numbers.)
   ring r=32003,(a,b,c,d),dp;
   ideal j=bc-ad,b3-a2c,c3-bd2,ac2-b2d;
   list T=mres(j,0); // 0 forces a full resolution
-  print(T[1]); // a minimal set of generators for j
-  print(T[2]); // the first syzygy module (minimal generating set)
-  print(T[3]); // the second syzygy module (minimal generating set)
+  // a minimal set of generators for j:
+  print(T[1]); 
+  // second syzygy module of r/j which is the first 
+  // syzygy module of j (minimal generating set):
+  print(T[2]); 
+  // the second syzygy module (minimal generating set):
+  print(T[3]); 
   print(T[4]);
   betti(T);
   // most useful for reading off the graded Betti numbers:
@@ -355,6 +361,8 @@ returns the characteristic of the coefficient field of a ring
 @c example
   ring r= 32003,(x,y),dp;
   char(r);
+  ring s= 0,(x,y),dp;
+  char(s);
 @c example
 @end example
 @end table
@@ -936,9 +944,9 @@ respective matrix for diff (ideal_expression, ideal_expression )
 @item @strong{Purpose:}
 computes the partial derivative of a polynomial object by a ring variable
 (first forms)
-@*respectively differentiates each element (1..n) of the second ideal
-by the differential operator corresponding to each element (1..m) in the first
-ideal, producing a m x n matrix
+@*respectively differentiates each polynomial (1..n) of the second ideal
+by the differential operator corresponding to each polynomial (1..m) in the first
+ideal, producing a m x n matrix.
 @item @strong{Example:}
 @example
 @c example
@@ -948,8 +956,10 @@ ideal, producing a m x n matrix
   diff(f,z);
   vector v=[f,y2+z];
   diff(v,z);
+  // corresponds to differential operators
+  // d2/dx2, d2/dx2+d2/dxdy, d3/dx/dy/dz:
   ideal i=x2,x2+yz,xyz;
-  ideal j=x2-yz,xyz;
+  ideal j=x2-yz,xyz;;  
   print(diff(i,j));
 @c example
 @end example
@@ -1177,7 +1187,7 @@ Moreover, such procedures cannot be precompiled (something
 @item @strong{Type:}
 list of 3 objects of the same type as the type of the arguments
 @item @strong{Purpose:}
-extended gcd: the first element is the greatest common divisor
+computes extended gcd: the first element is the greatest common divisor
 of the two arguments,
 the second and third are factors such that if @code{list L=extgcd(a,b);}
 then L[1]=a*L[2]+b*L[3].
@@ -1186,9 +1196,9 @@ polynomials must be univariate to apply @code{extgcd}
 @item @strong{Example:}
 @example
 @c example
-  extgcd(2,3);
+  extgcd(24,10);
   ring r=0,(x,y),lp;
-  extgcd((x2+x3)*(x2-x3),(x2+x5)*(x2+x3));
+  extgcd(x4-x6,(x2+x5)*(x2+x3));
 @c example
 @end example
 @end table
