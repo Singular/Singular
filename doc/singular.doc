@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.5 1998-04-24 17:03:01 Singular Exp $
+@comment $Id: singular.doc,v 1.6 1998-04-27 09:28:50 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -93,6 +93,7 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @node Data types, Commands, General concepts, Top
 @chapter Data types
 @cindex Data types
+@include types.tex
 
 @c ----------------------------------------------------------------------------
 @node Commands, Tricks and pitfalls, Data types, Top
