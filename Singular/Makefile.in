@@ -337,7 +337,7 @@ CCM		= gcc -MM
 CFLAGSG		= -g -Wall -Wno-unused ${PIPE} 
 CXXFLAGSG	= -g -Wall -Wno-unused ${PIPE} 
 CXXTEMPLFLAGSG	= -fno-implicit-templates
-DEFSG		= -D@SING_UNAME@
+DEFSG		= -D@SING_UNAME@ @DEFS@
 
 ##
 ## .og files for having -O and -g object versions available at the same time
