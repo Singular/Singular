@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.3 2004-07-28 11:49:35 plural Exp $";
+version="$Id: control.lib,v 1.4 2004-08-03 14:13:31 plural Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -19,6 +19,9 @@ autonom2(module R);           Computes everything related to autonomy(using dim)
 LeftKernel(module R);         Computing the left kernel of R
 RightKernel(module R);        Computing the right kernel of R
 
+Ext_Our(...)                  Copy of Ext_R from 'homolog.lib' in commutative case;
+is_zero_Our(module R)         Copy of is_zero from 'OBpoly.lib';
+LeftInverse(module R)         Computes left inverse of matrix(module)
 static space(int n)           Procedure used inside the procedure 'Print' to have a better formatted output
 static control_output();      Generating the output for the procedure 'control'
 static autonom_output();      Generating the output for the procedure 'autonom' and 'autonom2'
@@ -197,17 +200,37 @@ example
   ring r=0,(x,y,z),dp;
   
 };
+//-----------------------------------------------------------------------
+proc Ext_Our(int i, module R,list #)
+//copy of Ext_R;
+{
+  if ( size(#)==0 )
+  { 
+    return( Ext_R(i,R) ); 
+  }
+  else
+  {
+    return( Ext_R(i,R,#[1]) );
+  };
+};
+//------------------------------------------------------------------------
+proc is_zero_Our(module R)
+{
+  return( is_zero(R) ) ;
+};
 //------------------------------------------------------------------------
 static proc control_output(int i, int NVars, module R, module Ext_1) 
 //in this procedure the output list with all the contollability properties of the system is generated
 {
   int d=dim( std( Ann( transpose(R) ) ) ) ;;//this is the dimension of the system 
   string DofS= "dimension of the system:";
+  string Fn= "number of first nonzero Ext:";
   if(i==1)
   { 
     module RK=RightKernel(R);
     return( 
-            list ( i,
+            list ( Fn,
+	           i,
 	          "not controllable , image representation for controllable part:",
          	   RK,	    
 	          "kernel representation for controllable part:",
@@ -224,7 +247,8 @@ static proc control_output(int i, int NVars, module R, module Ext_1)
   
   if(i>NVars)
   { module RK =RightKernel(R); 
-    return( list( -1, 
+    return( list(  Fn,
+                   -1, 
                   "strongly controllable, image representation:",
 		   RK,
 		  "left inverse to image representation:",
@@ -240,8 +264,9 @@ static proc control_output(int i, int NVars, module R, module Ext_1)
        
   if( (i==2) )
   {
-    return( list( i, 
-                 "controllable, not reflexive, imagerepresentation:",
+    return( list( Fn,
+                  i, 
+                 "controllable, not reflexive, image representation:",
 		  RightKernel(R),
                   DofS,
                   d ) 
@@ -250,7 +275,8 @@ static proc control_output(int i, int NVars, module R, module Ext_1)
     
   if( (i>=3) )
   {
-    return( list ( i, 
+    return( list ( Fn,
+                   i, 
                   "reflexive, not strongly controllable, image representation:",
 		   RightKernel(R),
 		   DofS,
@@ -270,14 +296,14 @@ proc control(module R)
   int ExtIsZero;
  
        
-  module Ext_1 = std(Ext_R(1,R));
+  module Ext_1 = std(Ext_Our(1,R));
    
-  ExtIsZero=is_zero(Ext_1);
+  ExtIsZero=is_zero_Our(Ext_1);
   i=1;
   while( (ExtIsZero) && (i<=NVars) )
   {
     i++;
-    ExtIsZero = is_zero( Ext_R(i,R) );
+    ExtIsZero = is_zero_Our( Ext_Our(i,R) );
   };
   
   return( control_output( i, NVars, R, Ext_1 ) );
@@ -349,9 +375,11 @@ static proc autonom_output( int i, int NVars )
 {
   int d=NVars-i;//that is the dimension of the system
   string DofS="dimension of the system:";
+  string Fn = "number of first nonzero Ext:";
   if(i==0)
   { 
-    return( list(  i,
+    return( list(  Fn,
+                   i,
                   "not autonomous",
 		   DofS,
 		   d ) 
@@ -360,7 +388,8 @@ static proc autonom_output( int i, int NVars )
   
   if( i>NVars )
   {  
-    return( list( -1,
+    return( list( Fn,
+                  -1,
                   "trivial",
 		  DofS,
 		  d ) 
@@ -377,7 +406,8 @@ static proc autonom_output( int i, int NVars )
   //of strongly autonomous behavior, because it does not imply 
   //that system is overdetermined in this case
   {
-    return( list ( i, 
+    return( list ( Fn,
+                   i, 
                   "autonomous, not overdetermined",
 		   DofS,
 		   d ) 
@@ -386,7 +416,8 @@ static proc autonom_output( int i, int NVars )
     
   if( i==NVars )
   {  
-    return( list(  i,
+    return( list(  Fn,
+                   i,
                   "strongly autonomous,in particular overdetermined",
 		   DofS,
 		   d) 
@@ -395,7 +426,8 @@ static proc autonom_output( int i, int NVars )
   
   if( i<NVars )
   {
-    return( list ( i,
+    return( list ( Fn,
+                   i,
                   "overdetermined, not strongly autonomous",
 		   DofS, 
 		   d) 
@@ -465,13 +497,13 @@ proc autonom(module R)
   R=transpose(R); 
   
   
-  ExtIsZero=is_zero(Ext_R(0,R)); 
+  ExtIsZero=is_zero_Our(Ext_Our(0,R)); 
   
   i=0;
   while( (ExtIsZero)&&(i<=NVars) )
   {
     i++;
-    ExtIsZero = is_zero(Ext_R(i,R));
+    ExtIsZero = is_zero_Our(Ext_Our(i,R));
   };
   
   return(autonom_output(i,NVars));
