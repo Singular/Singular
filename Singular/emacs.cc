@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.15 2000-05-08 15:35:09 obachman Exp $ */
+/* $Id: emacs.cc,v 1.16 2000-08-02 13:40:28 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -18,6 +18,10 @@
 
 #if !defined(TSINGULAR) && !defined(ESINGULAR)
 #define ESINGULAR
+#endif
+
+#ifdef system
+#undef system
 #endif
 
 #define Alloc   malloc

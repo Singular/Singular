@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.135 2000-05-22 09:39:51 Singular Exp $ */
+/* $Id: extra.cc,v 1.136 2000-08-02 13:40:30 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -172,17 +172,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       res->rtyp=INT_CMD;
       #ifndef __MWERKS__
-      #ifdef HPUX_9
-      signal(SIGCHLD, (void (*)(int))SIG_DFL);
-      #endif
       if (h==NULL) res->data = (void *)system("sh");
       else if (h->Typ()==STRING_CMD)
         res->data = (void*) system((char*)(h->Data()));
       else
         WerrorS("string expected");
-      #ifdef HPUX_9
-      signal(SIGCHLD, (void (*)(int))SIG_IGN);
-      #endif
       #else
       res->data=(void *)0;
       #endif
