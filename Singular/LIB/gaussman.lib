@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.43 2001-05-30 18:32:37 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.44 2001-05-31 12:10:45 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -62,15 +62,14 @@ static proc stdtrans(ideal I)
     s[j..j+1]="  ";
   }
 
-  execute("ring @S="+charstr(R)+",(gmspoly,"+varstr(R)+"),(c,dp,"+s+");");
+  execute("ring S="+charstr(R)+",(gmspoly,"+varstr(R)+"),(c,dp,"+s+");");
 
   ideal I=homog(imap(R,I),gmspoly);
   module M=transpose(transpose(I)+freemodule(ncols(I)));
   M=std(M);
 
   setring(R);
-  execute("map h=@S,1,"+varstr(R)+";");
-
+  execute("map h=S,1,"+varstr(R)+";");
   module M=h(M);
 
   for(int i=ncols(M);i>=1;i--)
@@ -154,20 +153,17 @@ EXAMPLE:  example gms; shows examples
   matrix a=l[2];
   ideal m=kbase(g);
 
-  intvec w;
   int gmsmaxweight;
   for(i=nvars(R);i>=1;i--)
   {
-    w[i+1]=deg(var(i));
     if(deg(var(i))>gmsmaxweight)
     {
       gmsmaxweight=deg(var(i));
     }
   }
-  w[1]=deg(highcorner(g))+2*gmsmaxweight;
 
-  execute("ring G="+string(charstr(R))+",("+s+","+varstr(R)+"),ws("+
-    string(w)+");");
+  execute("ring G="+string(charstr(R))+",("+s+","+varstr(R)+"),(ws("+
+    string(deg(highcorner(g))+2*gmsmaxweight)+"),"+ordstr(R)+");");
 
   poly gmspoly=imap(R,t);
   ideal gmsjacob=imap(R,dt);
