@@ -145,6 +145,12 @@ either have to configure `config.h' and `GNUmakefile' by hand or you have
 to create a suitable `config.cache' file and run `configure' on a machine
 that supports it.
 
+  Factory compiles on Microsoft Windows NT 4.0 with the Microsoft Visual C++
+5.0 compiler. There is a preconfigured environment contained in the folder
+winnt which includes config.h, factoryconf.h, factory.h and a Makefile nt.mak,
+suitable for use under MS VC++ 5.0. There is also a file called INSTALL.nt
+which contains information about how to build under Windows NT.
+
 
 2. Building Factory
 ===================
