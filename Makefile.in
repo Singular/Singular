@@ -114,11 +114,11 @@ Tst: Tst-Old Tst-Short
 Tst-Old: ${SINGULAR} Tst/Old/universal.lst Tst/regress.cmd
 	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Old/universal.lst
 
-Tst-Short: ${SINGULAR} Tst/Short Tst/regress.cmd
-	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Short/*.tst
+Tst-Short: ${SINGULAR} Tst/Short/ok_s.lst Tst/regress.cmd 
+	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Short/ok_s.lst
 
-Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
-	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Long/*.tst
+Tst-Long:  ${SINGULAR} Tst/Long/ok_l.lst Tst/regress.cmd
+	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Long/ok_l.lst
 
 
 
@@ -141,7 +141,7 @@ BINDIST_NAME	= Singular-${S_VERSION}-${SINGUNAME}
 SHAREDIST_NAME  = Singular-${S_VERSION}-share
 
 
-install-dist: install-bindist install-sharedist
+install-dist install-local: install-bindist install-sharedist
 
 install-bindist:
 	for DIR in ${BINDIST_DIRS}; \
@@ -171,11 +171,7 @@ bindist ${BINDIST_NAME}.tar.gz:
 	mv ${TMPDIR}/Singular-${S_VERSION}-${SINGUNAME}.tar.gz .
 	rm -rf ${TMPDIR}
 
-install-local-dist: ${SHAREDIST_NAME}.tar.gz ${BINDIST_NAME}.tar.gz
-	cp ${SHAREDIST_NAME}.tar.gz ${BINDIST_NAME}.tar.gz ${localdir}
-	cd ${localdir}; ${GUNZIP} ${SHAREDIST_NAME}.tar.gz; tar xf ${SHAREDIST_NAME}.tar
-	cd ${localdir}; ${GUNZIP} ${BINDIST_NAME}.tar.gz; tar xf ${BINDIST_NAME}.tar
-	rm -rf ${localdir}/${SHAREDIST_NAME}.tar.gz ${localdir}/${BINDIST_NAME}.tar.gz
+install-root:
 	${MKINSTALLDIRS} ${localdir}/bin
 	${LN_S} ${localdir}/Singular/${S_VERSION}/${SINGUNAME}/Singular ${localdir}/bin/Singular-${S_VERSION}
 	${LN_S} ${localdir}/Singular/${S_VERSION}/${SINGUNAME}/ESingular ${localdir}/bin/ESingular-${S_VERSION}
