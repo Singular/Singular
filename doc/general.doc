@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.35 1998-05-07 08:19:32 schmidt Exp $
+@comment $Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -12,6 +12,7 @@
 @c @node General concepts, Data types, Introduction, Top
 @c @chapter General concepts
 
+@c test comment
 
 @menu
 * Interactive use::
@@ -2056,10 +2057,10 @@ define the version number for the library. It isdisplayed when the
 library is loaded.
 @item @strong{Example:}
 @example
-  version="$Id: general.doc,v 1.35 1998-05-07 08:19:32 schmidt Exp $";
+  version="$Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $";
 @end example
 @item @strong{Note:}
-It is common practice to simply define the version string to be "$Id: general.doc,v 1.35 1998-05-07 08:19:32 schmidt Exp $"
+It is common practice to simply define the version string to be "$Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $"
 and let a version control system expand it.
 @end table
 
@@ -2076,11 +2077,11 @@ best.
 
 @c @table @code
 @example
-  // $Id: general.doc,v 1.35 1998-05-07 08:19:32 schmidt Exp $
+  // $Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $
   //
   //
   ///////////////////////////////////////////////////////////////////////////
-  version="$Id: general.doc,v 1.35 1998-05-07 08:19:32 schmidt Exp $;
+  version="$Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $;
   info="
          LIBRARY: template.lib
 
