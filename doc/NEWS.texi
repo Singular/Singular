@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.29 2001-02-02 17:53:45 Singular Exp $
+@comment $Id: NEWS.texi,v 1.30 2001-02-23 17:37:29 obachman Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -21,27 +21,43 @@
 @end ifset
 
 The current version @value{VERSION} is the first release of the new 
-release series version 2-0.
-It contains a lot of new internal improvements, rewrites, new procedures etc.
+release series version 2-0. Its is a major upgrade from both, the 1-2 and 
+1-3 release serieses.
 
-Although there are no known bugs, it is to be
-expected that the current version @value{VERSION} has some bugs in the 
-code sections, since major changes were done to the @sc{Singular}
-kernel. Therefore, it is important to us, that users try out this new
-version.
+Singular version 2 is generally much faster than any previous 
+version of Singular, due to a rewrite of major parts of the Singular
+kernel (e.g., the kernel has a new memory manager and a new polynomial
+arithmetic) and due to new and better implemented algorithms (e.g., for
+comuting resolutions and determinants). 
 
-The current version is generally much faster as version
-1.2 - because of new, better algorithms and impproved
-polynomial operations.
+Besides theses internal changes, Singular version 2 offers many new
+features and functionlities (which were partly already incorporated in
+the 1-3 series). E.g., a native Windows distribution, an Emacs user
+interface, a new help system, 16  new libraries, etc. 
 
-Thank you very much for your support!
+All these changes are explained in more detail below.
+
+@heading Efficiency Improvements
+The following table shows some timings which compare the efficincy of
+Singular version 1-2-3 and Singular version 2. All times are in seconds
+and were obtained on an AMD Athlon with 700 MHz, 128 MB RAM, running
+Linux.
+
+@multitable @columnfractions .15 .15 .25 .15 .15 .15
+@item @strong{Example} @tab @strong{Comp} @tab @strong{Ring} @tab @strong{1-2} @tab @strong{2-0} @tab @strong{Speedup}
+@item @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/mora_1.sing,,mora_1} @tab std  @tab 32003,x(1..3),ds @tab 82 @tab 9.4 @tab 8.7
+@item @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/mora_9.sing,,mora_9} @tab std  @tab 32003,x(1..14),ds @tab 9600 @tab 96 @tab 100
+@item @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/homog_gonnet.sing,,homog_gonnet} @tab std  @tab 32003,x(1..18),dp @tab 33 @tab 8.9 @tab 4.5
+@item @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/homog_cyclic_8.sing,,homog_cyclic_8} @tab std  @tab 32003,x(1..9),dp @tab 1873 @tab 472 @tab 4.0
+@item  @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/cyclic_8.sing,,cyclic_8} @tab std @tab 32003,x(1..8),dp @tab >47800 @tab 478 @tab >100
+@end multitable
 
 
 @heading General Changes
 @table @asis
 @item @strong{Windows distribution}
 created with Installshield, includes Cygwin, Singular, and (optionally)
-XEmacs, distributed as various self-extracting archives.
+XEmacs, distributed as several self-extracting archives.
 @item @nref{Emacs user interface}
 the recommended interface for using @sc{Singular}
 @item @code{ESingular}
@@ -66,7 +82,6 @@ New WWW home-site of @sc{Singular}
 
 @table @asis
 @item new coefficient domains: arbitrary long real and complex numbers
-The current syntax is going to change slightly in the final version 2.0.
 @item no restriction on number of ring variables
 @item no restriction on number of parameters
 @c @item TBC: DegBound on exponent values
@@ -106,6 +121,20 @@ Invariant rings of reductive groups
 Procedures for roots and factorization
 @item @nref{qhmoduli_lib}
 Moduli spaces of sqh-singularities
+@end table
+
+@heading Changes in @sc{Singular} libraries
+Many procedures were moved into different libraries,
+the documentation of libraries was generally improved and 
+some libraries renamed:
+@table @asis
+@item @nref{ainvar_lib}
+renamed @code{invar.lib} to @code{ainvar.lib}
+(see also @code{rinvar.lib}, @code{finvar.lib}).
+@item @nref{deform_lib}
+renamed procedures @code{T1, T2, T12} to @code{T_1, T_2, T_12}.
+@item @nref{poly_lib}
+new procedures numerator/denominator
 @end table
 
 @heading New @sc{Singular} functions
@@ -166,20 +195,8 @@ run example for all kernel commands.
 Finer-grained control for formatted output.
 @item @code{pause}
 can be called with argument, must be called with parenthesis.
-@end table
-
-@heading Changes in @sc{Singular} libraries
-Many procedures got into different libraries,
-documentation of libraries improved,
-some libraries renamed:
-@table @asis
-@item @nref{ainvar_lib}
-renamed @code{invar.lib} to @code{ainvar.lib}
-(see also @code{rinvar.lib}, @code{finvar.lib}).
-@item @nref{deform_lib}
-renamed procedures @code{T1, T2, T12} to @code{T_1, T_2, T_12}.
-@item @nref{poly_lib}
-new procedures numerator/denominator
+@item @nref{option}
+new options: @code{oldStd}, @code{redThrough}, @code{notBuckets}
 @end table
 
 @heading Changes of command-line options and system resources
