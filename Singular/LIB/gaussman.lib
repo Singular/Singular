@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.5 2000-11-09 08:56:04 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.6 2000-11-09 10:29:51 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -545,6 +545,7 @@ EXAMPLE: example vfilt; shows an example
         d[k]=size(V[i])-size(V[i+1]);
       }
     }
+    j=k;
     if(number(eM[i])-1==number(n-1)/2)
     {
       Me=freemodule(mu*N);
@@ -554,7 +555,6 @@ EXAMPLE: example vfilt; shows an example
       }
       V1=module(V1)+syz(Me);
       V[i]=std(intersect(V1,V0));
-      j=k;
       if(size(V[i])>size(V[i+1]))
       {
         k++;
