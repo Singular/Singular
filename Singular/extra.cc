@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.9 1997-04-25 18:35:09 obachman Exp $ */
+/* $Id: extra.cc,v 1.10 1997-04-25 18:52:24 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -113,6 +113,90 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
     #endif
+/*==================== with ==================================*/
+    if(strcmp((char*)(h->Data()),"with")==0)
+    {
+      if (h->next==NULL)
+      {
+        res->rtyp=STRING_CMD;
+        char *s=mstrdup(""
+        #ifdef DRING
+          "DRING "
+        #endif
+        #ifdef HAVE_DBM
+          "DBM "
+        #endif
+        #ifdef HAVE_DLD
+          "DLD "
+        #endif
+        #ifdef HAVE_GMP
+          "gmp "
+        #endif
+        #ifdef HAVE_FACTORY
+          "factory "
+        #endif
+        #ifdef HAVE_LIBFAC_P
+          "libfac "
+        #endif
+        #ifdef HAVE_MPSR
+          "MP "
+        #endif
+        #ifdef HAVE_READLINE
+          "readline "
+        #endif
+        #ifdef HAVE_TCL
+          "tcl "
+        #endif
+        #ifdef SRING
+          "SRING "
+        #endif
+        );
+        s[strlen(s)-1]='\0';
+        res->data=(void *)s;
+        return FALSE;
+      }  
+      else if (h->next->Typ()==STRING_CMD)
+      {
+        #define TEST_FOR(A) if(strcmp(s,A)==0) res->data=(void *)1; else
+        char *s=(char *)h->next->Data();
+        res->rtyp=INT_CMD;
+        #ifdef DRING
+          TEST_FOR("DRING")
+        #endif
+        #ifdef HAVE_DBM
+          TEST_FOR("DBM")
+        #endif
+        #ifdef HAVE_DLD
+          TEST_FOR("DLD")
+        #endif
+        #ifdef HAVE_GMP
+          TEST_FOR("gmp")
+        #endif
+        #ifdef HAVE_FACTORY
+          TEST_FOR("factory")
+        #endif
+        #ifdef HAVE_LIBFAC_P
+          TEST_FOR("libfac")
+        #endif
+        #ifdef HAVE_MPSR
+          TEST_FOR("MP")
+        #endif
+        #ifdef HAVE_READLINE
+          TEST_FOR("readline")
+        #endif
+        #ifdef HAVE_TCL
+          TEST_FOR("tcl")
+        #endif
+        #ifdef SRING
+          TEST_FOR("SRING")
+        #endif
+          ;
+        return FALSE;
+        #undef TEST_FOR
+      }
+      return TRUE;
+    }
+    else
 /*==================== pid ==================================*/
     #ifndef MSDOS
     #ifndef macintosh
