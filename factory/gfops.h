@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.h,v 1.4 1997-09-10 14:14:39 schmidt Exp $ */
+/* $Id: gfops.h,v 1.5 1997-09-10 14:21:55 schmidt Exp $ */
 
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H
@@ -63,11 +63,7 @@ inline int gf_one()
 }
 
 //{{{ inline int gf_sign ( int a )
-//{{{ docu
-//
-// gf_sign() - return 0 if a=0, 1 otherwise.
-//
-//}}}
+// docu: see CanonicalForm::sign()
 inline
 int gf_sign ( int a )
 {
