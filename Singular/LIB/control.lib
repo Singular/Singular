@@ -1,5 +1,5 @@
-version="$Id: control.lib,v 1.14 2004-08-11 12:43:38 levandov Exp $";
-category="Miscellaneous";
+version="$Id: control.lib,v 1.15 2004-10-21 18:18:22 levandov Exp $";
+category="Applications";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
 AUTHORS:  Oleksandr Iena  yena@mathematik.uni-kl.de
@@ -237,7 +237,7 @@ NOTE:  in commutative case it is a left  module, in noncommutative (will be impl
 EXAMPLE:  example RightKernel; shows an example
 "
 { 
-  return(syz(M));
+  return(modulo(M,std(0)));
 }
 example
 {"EXAMPLE:";echo = 2;
@@ -255,7 +255,7 @@ RETURN:  left kernel of matrix M, i.e., the matrix whose rows are generators of 
 EXAMPLE:  example LeftKernel; shows an example
 "
 {
-  return( transpose( syz( transpose(M) ) ) );
+  return( transpose( modulo( transpose(M),std(0) ) ) );
 }
 example
 {"EXAMPLE:";echo = 2;
@@ -317,7 +317,7 @@ RETURN:  list with all the contollability properties of the system which is to b
 NOTE:  this procedure is used in 'control' procedure
 "
 {
-  int d=dim( std( Ann( transpose(R) ) ) ) ;;//this is the dimension of the system 
+  int d=dim( std( Ann( transpose(R) ) ) ) ;; //this is the dimension of the system 
   string DofS= "dimension of the system:";
   string Fn= "number of first nonzero Ext:";
   if(i==1)
@@ -840,10 +840,13 @@ proc ncdetection( r)
       {
         LExp = LExp + v[k];
       }
-      if( (d-d_lead != 0) || (LExp > 1) )
+      //      if( (d-d_lead != 0) || (LExp > 1) )
+      if( ( d-d_lead != 0) || (LExp > 1) || ((LExp==0)&& !((d_lead==1) || 
+							   (d_lead==-1))) )
       {
         return( "wrong input" );
       }
+
       if( v[j] == 1)                   //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(j)
       {
         if (leadcoef(d) < 0)
