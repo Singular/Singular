@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.28 2002-01-20 11:44:48 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.29 2002-02-05 13:09:05 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -321,7 +321,8 @@ ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
 
   for (int i= 0; i < m_id->n; i++)
   {
-    sBucketDestroyAdd(m_id->buckets[i], &(res->m[i]), &l);
+    if (m_id->buckets[i]!=NULL)
+      sBucketDestroyAdd(m_id->buckets[i], &(res->m[i]), &l);
   }
   omFree(m_id);
   return res;
@@ -374,7 +375,7 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
 
   // do the optimization step
 #if HAVE_MAP_OPTIMIZE > 0
-  maPoly_Optimize(mp, src_r);
+  if (mp!=NULL) maPoly_Optimize(mp, src_r);
 #endif
   if (TEST_OPT_PROT)
   {
@@ -394,9 +395,9 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   ideal res_image_id;
   if (dest_r != image_r)
   {
-    if (no_sort)
-      res_image_id = idrShallowCopyR_NoSort(res_dest_id, dest_r, image_r);
-    else
+    //if (no_sort) see Old/m134si.tst
+    //  res_image_id = idrShallowCopyR_NoSort(res_dest_id, dest_r, image_r);
+    //else
       res_image_id = idrShallowCopyR(res_dest_id, dest_r, image_r);
     id_ShallowDelete(&res_dest_id, dest_r);
   }
