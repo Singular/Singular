@@ -1,19 +1,25 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gcd.m4,v 1.1 1997-09-12 12:25:31 schmidt Exp $ */
+/* $Id: gcd.m4,v 1.2 1997-09-24 07:27:46 schmidt Exp $ */
+
+ftestSetNameOfGame( gcd,
+        `"Usage: gcd [<options>] [<envSpec>] <f> <g> [<realResult>]\n"
+        "  calculates gcd( f, g ).\n"
+    	"  If the gcd of f and g is already known, the optional argument\n"
+    	"  <realResult> may be used to check the result of the gcd\n"
+    	"  computation.\n"' )
 
 //{{{ docu
 //
-// gcd.m4 - gcd test program.
+// ftestAlgorithm.m4 - ftestAlgorithm test program.
 //
-// Syntax: type `gcd -?' for more information
+// To create ftestAlgorithm.cc, run m4 using the ftest_util.m4 library in
+// the following way:
+//
+// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc'
 //
 //}}}
 
 ftestPreprocInit();
-
-#include <factory.h>
-
-#include "ftest_util.h"
 
 ftestGlobalInit();
 
@@ -21,16 +27,37 @@ ftestGlobalInit();
 // - functions.
 //
 
-//{{{ int gcdCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & result )
+//{{{ ftestStatusT gcdCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & result, const CanonicalForm & realResult )
 //{{{ docu
 //
 // gcdCheck() - check result of gcd().
 //
 //}}}
-int
-gcdCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & result )
+ftestStatusT
+gcdCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & result, const CanonicalForm & realResult )
 {
-    return Passed;
+    // if realResult is given, use it to compare with result
+    if ( ! realResult.isZero() )
+	if ( realResult == result )
+	    return Passed;
+	else if ( -realResult == result )
+	    return Passed;
+	else
+	    return Failed;
+
+    if ( result.isZero() )
+	if ( f.isZero() && g.isZero() )
+	    return Passed;
+	else
+	    return Failed;
+
+    if ( divides( result, f ) && divides( result, g ) )
+	if ( gcd( f/result, g/result ).isOne() )
+	    return Passed;
+	else
+	    return Failed;
+    else
+	return Failed;
 }
 //}}}
 
@@ -40,30 +67,31 @@ gcdCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm
 int
 main ( int argc, char ** argv )
 {
+    // initialization
     ftestMainInit();
 
     // declare input and output variables
     ftestOutVar( CanonicalForm, result );
     ftestInVar( CanonicalForm, f );
     ftestInVar( CanonicalForm, g );
+    ftestInVar( CanonicalForm, realResult );
 
     // process argument list and set environment
     ftestGetOpts();
     ftestGetEnv();
     ftestGetInVar( f );
     ftestGetInVar( g );
-
-    ftestSetEnv();
+    ftestGetInVar( realResult, 0 );
 
     // do the test!
     ftestRun(
 	result = gcd( f, g ); );
 
     // do the check
-    ftestCheck( gcdCheck( f, g, result ) );
+    ftestCheck( gcdCheck( f, g, result, realResult ) );
 
     // print results
-    ftestOutput( "gcd", "gcd(f, g) =", result );
+    ftestOutput( "gcd(f, g) =", result );
 
     // clean up
     ftestMainExit();

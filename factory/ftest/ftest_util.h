@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.h,v 1.2 1997-09-12 10:06:41 schmidt Exp $ */
+/* $Id: ftest_util.h,v 1.3 1997-09-24 07:28:15 schmidt Exp $ */
 
 #ifndef INCL_FTEST_UTIL_H
 #define INCL_FTEST_UTIL_H
@@ -10,30 +10,34 @@
 //
 //}}}
 
-#include <factory.h>
+enum ftestStatusT {
+    Passed = 0, Failed, UndefinedResult
+};
 
-//{{{ constants
-const int Passed = 0;
-const int Failed = 1;
-const int UndefinedResult = 2;
-const int Error = 3;
+//{{{ enum ftestErrorT
+enum ftestErrorT
+{
+    Ok, CommandlineError, EnvSyntaxError,
+    SignalError, TimeoutError = SignalError + 14
+};
 //}}}
 
-//{{{ variable declarations
-extern long timing_ftestTimer_time;
 extern int ftestCircle;
-//}}}
+extern int ftestAlarm;
+extern int ftestPrintResultFlag;
 
-int ftestGetOpts ( int argc, char ** argv );
+void ftestSignalCatch ();
 
-int ftestGetEnv ( int argc, char ** argv, const int optind );
+void ftestSetName ( const char * execName, const char * algorithmName, const char * usage );
 
-CanonicalForm ftestGetCanonicalForm ( const char * stringF );
-Variable ftestGetVariable ( const char * stringVariable );
+void ftestGetOpts ( const int argc, char ** argv, int & optind );
+void ftestGetEnv ( const int, char ** argv, int & optind );
 
-void ftestPrintTimer ( const char * algorithm );
-void ftestPrintCheck ( const char * algorithm, int check );
-void ftestPrintCanonicalForm ( const char * algorithm, const char * result, const CanonicalForm & f );
-void ftestPrintExit ();
+void ftestPrintTimer ( const long timer );
+void ftestPrintCheck ( const ftestStatusT check );
+void ftestPrintEnv ();
+
+void ftestError ( const ftestErrorT errno, const char * format ... );
+void ftestPrint ( const char * longFormat, const char * shortFormat ... );
 
 #endif /* ! INCL_FTEST_UTIL_H */
