@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_gcd.cc,v 1.0 1996-05-17 11:56:37 stobbe Exp $
+// $Id: cf_gcd.cc,v 1.1 1996-06-03 08:32:56 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 11:56:37  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
@@ -10,11 +13,26 @@ $Log: not supported by cvs2svn $
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "cf_reval.h"
+#include "cf_primes.h"
+#include "cf_chinese.h"
+#include "templates/functions.h"
 
-static void indent ( int i )
+static CanonicalForm gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag );
+
+
+static int
+isqrt ( int a )
 {
-    for ( int j = 0; j < i; j++ )
-	cerr << "   ";
+    int h, x0, x1 = a;
+    do {
+	x0 = x1;
+	h = x0 * x0 + a - 1;
+	if ( h % (2 * x0) == 0 )
+	    x1 = h / (2 * x0);
+	else
+	    x1 = (h - 1)  / (2 * x0);
+    } while ( x1 < x0 );
+    return x1;
 }
 
 static bool
@@ -38,6 +56,67 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g )
     if ( e(F).taildegree() > 0 && e(G).taildegree() > 0 )
 	return false;
     return gcd( e( F ), e( G ) ).degree() < 1;
+}
+
+static CanonicalForm
+maxnorm ( const CanonicalForm & f )
+{
+    CanonicalForm m = 0, h;
+    CFIterator i;
+    for ( i = f; i.hasTerms(); i++ )
+	m = tmax( m, abs( i.coeff() ) );
+    return m;
+}
+
+static void
+chinesePoly ( const CanonicalForm & f1, const CanonicalForm & q1, const CanonicalForm & f2, const CanonicalForm & q2, CanonicalForm & f, CanonicalForm & q )
+{
+    CFIterator i1 = f1, i2 = f2;
+    CanonicalForm c;
+    Variable x = f1.mvar();
+    f = 0;
+    while ( i1.hasTerms() && i2.hasTerms() ) {
+	if ( i1.exp() == i2.exp() ) {
+	    chineseRemainder( i1.coeff(), q1, i2.coeff(), q2, c, q );
+	    f += power( x, i1.exp() ) * c;
+	    i1++; i2++;
+	}
+	else if ( i1.exp() > i2.exp() ) {
+	    chineseRemainder( 0, q1, i2.coeff(), q2, c, q );
+	    f += power( x, i2.exp() ) * c;
+	    i2++;
+	}
+	else {
+	    chineseRemainder( i1.coeff(), q1, 0, q2, c, q );
+	    f += power( x, i1.exp() ) * c;
+	    i1++;
+	}
+    }
+    while ( i1.hasTerms() ) {
+	chineseRemainder( i1.coeff(), q1, 0, q2, c, q );
+	f += power( x, i1.exp() ) * c;
+	i1++;
+    }
+    while ( i2.hasTerms() ) {
+	chineseRemainder( 0, q1, i2.coeff(), q2, c, q );
+	f += power( x, i2.exp() ) * c;
+	i2++;
+    }
+}
+
+static CanonicalForm
+balance ( const CanonicalForm & f, const CanonicalForm & q )
+{
+    CFIterator i;
+    CanonicalForm result = 0, qh = q / 2;
+    Variable x = f.mvar();
+    for ( i = f; i.hasTerms(); i++ ) {
+	if ( i.coeff() > qh )
+	    result += power( x, i.exp() ) * (i.coeff() - q);
+	else
+	    result += power( x, i.exp() ) * i.coeff();
+    }
+    return result;
 }
 
 CanonicalForm
@@ -131,8 +210,85 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     return p0;
 }
 
-CanonicalForm
-gcd_poly( const CanonicalForm & f, const CanonicalForm& g )
+static CanonicalForm
+gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
+{
+    CanonicalForm f, g, c, cg, cl, BB, B, M, q, Dp, newD, D, newq;
+    int p, i, n;
+
+    if ( primitive ) {
+	f = F;
+	g = G;
+	c = 1;
+    }
+    else {
+	CanonicalForm cF = content( F ), cG = content( G );
+	f = F / cF;
+	g = G / cG;
+	c = igcd( cF, cG );
+    }
+    cg = gcd( f.lc(), g.lc() );
+    cl = ( f.lc() / cg ) * g.lc();
+//     B = 2 * cg * tmin( 
+// 	maxnorm(f)*power(CanonicalForm(2),f.degree())*isqrt(f.degree()+1),
+// 	maxnorm(g)*power(CanonicalForm(2),g.degree())*isqrt(g.degree()+1)
+// 	)+1;
+    M = tmin( maxnorm(f), maxnorm(g) );
+    BB = power(CanonicalForm(2),tmin(f.degree(),g.degree()))*M;
+    q = 0;
+    i = 1;
+    n = cf_getNumBigPrimes();
+    while ( true ) {
+	B = BB;
+	while ( i < n && q < B ) {
+	    p = cf_getBigPrime( i );
+	    i++;
+	    while ( i < n && mod( cl, p ) == 0 ) {
+		p = cf_getBigPrime( i );
+		i++;
+	    }
+	    setCharacteristic( p );
+	    Dp = gcd( mapinto( f ), mapinto( g ) );
+	    Dp = ( Dp / Dp.lc() ) * mapinto( cg );
+	    setCharacteristic( 0 );
+	    if ( Dp.degree() == 0 ) return c;
+	    if ( q.isZero() ) {
+		D = mapinto( Dp );
+		q = p;
+		B = power(CanonicalForm(2),D.degree())*M+1;
+	    }
+	    else {
+		if ( Dp.degree() == D.degree() ) {
+		    chinesePoly( D, q, mapinto( Dp ), p, newD, newq );
+		    q = newq;
+		    D = newD;
+		}
+		else if ( Dp.degree() < D.degree() ) {
+		    // all previous p's are bad primes
+		    q = p;
+		    D = mapinto( Dp );
+		    B = power(CanonicalForm(2),D.degree())*M+1;
+		}
+		// else p is a bad prime
+	    }
+	}
+	if ( i < n ) {
+	    // now balance D mod q
+	    D = pp( balance( cg * D, q ) );
+	    if ( divides( D, f ) && divides( D, g ) )
+		return D * c;
+	    else
+		q = 0;
+	}
+	else {
+	    return gcd_poly( F, G, false );
+	}
+    }
+}
+
+
+static CanonicalForm
+gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag )
 {
     CanonicalForm C, Ci, Ci1, Hi, bi, pi, pi1, pi2;
     int delta;
@@ -147,9 +303,15 @@ gcd_poly( const CanonicalForm & f, const CanonicalForm& g )
     Ci = content( pi ); Ci1 = content( pi1 );
     C = gcd( Ci, Ci1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
-    if ( ! pi.isUnivariate() )
+    if ( ! pi.isUnivariate() ) {
 	if ( gcd_test_one( pi1, pi ) )
 	    return C;
+    }
+    else {
+	// pi is univariate
+	if ( modularflag )
+	    return gcd_poly_univar0( pi, pi1, true ) * C;
+    }
     delta = degree( pi, v ) - degree( pi1, v );
     Hi = power( LC( pi1, v ), delta );
     if ( (delta+1) % 2 )
@@ -260,12 +422,12 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
 		On( SW_RATIONAL );
 		CanonicalForm F = f * l, G = g * l;
 		Off( SW_RATIONAL );
-		l = gcd_poly( F, G );
+		l = gcd_poly( F, G, true );
 		On( SW_RATIONAL );
 		return l;
 	    }
 	    else
-		return gcd_poly( f, g );
+		return gcd_poly( f, g, getCharacteristic()==0 );
 	}
     else  if ( f.mvar() > g.mvar() )
 	return cf_content( f, g );
