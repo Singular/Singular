@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.16 1998-05-13 10:54:07 obachman Exp $
+// $Id: primdec.lib,v 1.17 1998-05-13 15:02:35 obachman Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann
 //////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.16 1998-05-13 10:54:07 obachman Exp $";
+version="$Id: primdec.lib,v 1.17 1998-05-13 15:02:35 obachman Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
 
@@ -3185,7 +3185,7 @@ proc AnnExt_R(int n,list re)
      module k=res(f,2)[2];             //the kernel
      matrix g=transpose(re[n]);        //the image of Hom(_,R)
 
-     ideal ann=quotient(g,k);           //the anihilator
+     ideal ann=quotient1(g,k);           //the anihilator
   }
   else
   {
@@ -3197,6 +3197,7 @@ proc AnnExt_R(int n,list re)
 proc quotient1(module a,module b)
 {
    int i;
+   a=std(a);     //<== neue Zeile
    ideal re=quotient(a,module(b[1]));
    for(i=2;i<=size(b);i++)
    {
@@ -4273,4 +4274,22 @@ proc special_ideals_equal( ideal k1, ideal k2)
 }
         
         
-  
+ proc quotient2(module a,module b)
+{
+  string s="ring @newr=("+charstr(basering)+"),(@t,"+varstr(basering)+"),dp;";
+  def @newP=basering;
+  execute s;
+  module b=imap(@newP,b);
+  module a=imap(@newP,a);
+ int i;
+ vector @b=b[1];
+ for(i=2;i<=size(b);i++)
+ {
+    @b=@t^(i-1)*b[i];
+ }
+ ideal re=quotient(a,module(@b));
+  setring @newP;
+ ideal re=imap(@newr,re);
+ return(re);   
+}
+//Im homogenen Fall system("LaScala",i) verwenden 
