@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.99 2002-06-26 11:16:43 Singular Exp $ */
+/* $Id: grammar.y,v 1.100 2002-12-13 16:20:04 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1106,8 +1106,15 @@ examplecmd:
 exportcmd:
         EXPORT_CMD exprlist
         {
-          if (iiExport(&$2,0)) YYERROR;
-            }
+#ifdef HAVE_NS
+	  if (basePack!=$2.req_packhdl)
+	  {
+	    if(iiExport(&$2,0,basePackHdl)) YYERROR;
+	  }
+	  else
+#endif /* HAVE_NS */
+            if (iiExport(&$2,0)) YYERROR;
+        }
         | EXPORT_CMD exprlist extendedid expr
         {
           if ((strcmp($3,"to")!=0) ||
@@ -1392,8 +1399,8 @@ setringcmd:
 #ifdef USE_IILOCALRING
                   iiLocalRing[myynest-1]=IDRING(h);
 #endif
-                  procstack->currRing=IDRING(h);
-                  procstack->currRingHdl=h;
+                  procstack->cRing=IDRING(h);
+                  procstack->cRingHdl=h;
                 }
                 else
                 {

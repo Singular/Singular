@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.100 2002-11-28 17:15:23 Singular Exp $ */
+/* $Id: iplib.cc,v 1.101 2002-12-13 16:20:06 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -31,7 +31,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror);
                                     char *procname, int line, long pos,
                                     BOOLEAN pstatic = FALSE);
 #endif /* HAVE_LIBPARSER */
-#define NS_LRING procstack->currRing
+#define NS_LRING (procstack->cRing)
 
 #include "mod_raw.h"
 
@@ -359,8 +359,8 @@ static void iiShowLevRings()
   while (p!=NULL)
   {
     Print("lev %d:",i);
-    if (p->currRingHdl==NULL) PrintS("NULL");
-    else                      Print("%s",IDID(p->currRingHdl));
+    if (p->cRingHdl==NULL) PrintS("NULL");
+    else                   Print("%s",IDID(p->cRingHdl));
     PrintLn();
     p=p->next;
   }
@@ -468,7 +468,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   }
 #ifdef USE_IILOCALRING
 #if 0
-  if(procstack->currRing != iiLocalRing[myynest]) Print("iiMake_proc: 1 ring not saved procs:%x, iiLocal:%x\n",procstack->currRing, iiLocalRing[myynest]);
+  if(procstack->cRing != iiLocalRing[myynest]) Print("iiMake_proc: 1 ring not saved procs:%x, iiLocal:%x\n",procstack->cRing, iiLocalRing[myynest]);
 #endif
   if (iiLocalRing[myynest] != currRing)
   {
@@ -498,13 +498,13 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     iiLocalRing[myynest]=NULL;
   }
 #else /* USE_IILOCALRING */
-  if (procstack->currRing != currRing)
+  if (procstack->cRing != currRing)
   {
-    //if (procstack->currRingHdl!=NULL)
-    //Print("procstack:%s,",IDID(procstack->currRingHdl));
+    //if (procstack->cRingHdl!=NULL)
+    //Print("procstack:%s,",IDID(procstack->cRingHdl));
     //if (currRingHdl!=NULL)
     //Print(" curr:%s\n",IDID(currRingHdl));
-    //Print("pr:%x, curr: %x\n",procstack->currRing,currRing);
+    //Print("pr:%x, curr: %x\n",procstack->cRing,currRing);
     if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
       && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
     || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
@@ -513,21 +513,21 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
       //idhdl hn;
       char *n;
       char *o;
-      if (procstack->currRing!=NULL)
+      if (procstack->cRing!=NULL)
       {
         //PrintS("reset ring\n");
-        procstack->currRingHdl=rFindHdl(procstack->currRing,NULL, NULL);
+        procstack->cRingHdl=rFindHdl(procstack->cRing,NULL, NULL);
         #ifdef HAVE_NS
-        if (procstack->currRingHdl==NULL)
-          procstack->currRingHdl=
-           rFindHdl(procstack->currRing,NULL,procstack->currPack->idroot);
-        if (procstack->currRingHdl==NULL)
-          procstack->currRingHdl=
-           rFindHdl(procstack->currRing,NULL,basePack->idroot);
+        if (procstack->cRingHdl==NULL)
+          procstack->cRingHdl=
+           rFindHdl(procstack->cRing,NULL,procstack->currPack->idroot);
+        if (procstack->cRingHdl==NULL)
+          procstack->cRingHdl=
+           rFindHdl(procstack->cRing,NULL,basePack->idroot);
         #endif
-        o=IDID(procstack->currRingHdl);
-        currRing=procstack->currRing;
-        currRingHdl=procstack->currRingHdl;
+        o=IDID(procstack->cRingHdl);
+        currRing=procstack->cRing;
+        currRingHdl=procstack->cRingHdl;
       }
       else                            o="none";
       if (currRing!=NULL)             n=IDID(currRingHdl);
@@ -539,9 +539,9 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
         err=TRUE;
       }
     }
-    if (procstack->currRingHdl!=NULL)
+    if (procstack->cRingHdl!=NULL)
     {
-      rSetHdl(procstack->currRingHdl);
+      rSetHdl(procstack->cRingHdl);
     }
     else
     { currRingHdl=NULL; currRing=NULL; }
@@ -617,7 +617,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   {
     if (NS_LRING!=NULL)
     {
-      idhdl rh=procstack->currRingHdl;
+      idhdl rh=procstack->cRingHdl;
       if ((rh==NULL)||(IDRING(rh)!=NS_LRING))
         rh=rFindHdl(NS_LRING,NULL, NULL);
       rSetHdl(rh);

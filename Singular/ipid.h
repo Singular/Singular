@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.36 2002-11-21 13:17:47 Singular Exp $ */
+/* $Id: ipid.h,v 1.37 2002-12-13 16:20:06 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -106,11 +106,11 @@ class idrec
 class proclevel {
   public:
   proclevel * next;
-  idhdl      currRingHdl;
-  ring       currRing;
+  idhdl      cRingHdl;
+  ring       cRing;
   #ifdef HAVE_NS
-  idhdl      currPackHdl;
-  package    currPack;
+  idhdl      cPackHdl;
+  package    cPack;
   #endif
   char      * name;
   proclevel()  { memset(this,0,sizeof(*this)); }

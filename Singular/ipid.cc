@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.64 2002-11-21 13:17:48 Singular Exp $ */
+/* $Id: ipid.cc,v 1.65 2002-12-13 16:20:05 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -927,12 +927,12 @@ void proclevel::push(char *n)
 {
   //Print("push %s\n",n);
   proclevel *p=(proclevel*)omAlloc0(sizeof(proclevel));
-  //p->currRing=::currRing;
-  //p->currRingHdl=::currRingHdl;
+  p->cRing=currRing;
+  p->cRingHdl=currRingHdl;
   p->name=n;
   #ifdef HAVE_NS
-  p->currPackHdl=::currPackHdl;
-  p->currPack=::currPack;
+  p->cPackHdl=currPackHdl;
+  p->cPack=currPack;
   #endif
   p->next=this;
   procstack=p;
@@ -948,8 +948,8 @@ void proclevel::pop()
   //  ::currRingHdl=rFindHdl(::currRing,NULL,NULL);
   #ifdef HAVE_NS
   //Print("restore pack=%s,1.obj=%s\n",IDID(currPackHdl),IDID(currPack->idroot));
-  ::currPackHdl=this->currPackHdl;
-  ::currPack=this->currPack;
+  currPackHdl=this->cPackHdl;
+  currPack=this->cPack;
   iiCheckPack(currPack);
   #endif
   proclevel *p=this;

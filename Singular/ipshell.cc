@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.77 2002-07-02 13:26:04 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.78 2002-12-13 16:20:06 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -973,15 +973,15 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
           Warn("redefining %s",IDID(h));
         }
 #ifdef USE_IILOCALRING
-            if (iiLocalRing[0]==IDRING(h)) iiLocalRing[0]=NULL;
+        if (iiLocalRing[0]==IDRING(h)) iiLocalRing[0]=NULL;
 #else
-            proclevel *p=procstack;
-            while (p->next!=NULL) p=p->next;
-            if (p->currRing==IDRING(h))
-            {
-              p->currRing=NULL;
-              p->currRingHdl=NULL;
-            }
+        proclevel *p=procstack;
+        while (p->next!=NULL) p=p->next;
+        if (p->cRing==IDRING(h))
+        {
+          p->cRing=NULL;
+          p->cRingHdl=NULL;
+        }
 #endif
         killhdl2(h,root,currRing);
       }
@@ -1010,7 +1010,7 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
   package frompack=v->req_packhdl; 
   if (frompack==NULL) frompack=currPack;
   package rootpack = IDPACKAGE(roothdl);
-  Print("iiInternalExport('%s',%d,%s) typ:%d\n", v->name, toLev, IDID(roothdl),v->Typ());
+//  Print("iiInternalExport('%s',%d,%s->%s) typ:%d\n", v->name, toLev, IDID(currPackHdl),IDID(roothdl),v->Typ());
   if (RingDependend(IDTYP(h)))
   {
     //Print("// ==> Ringdependent set nesting to 0\n");
@@ -1018,6 +1018,8 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
   }
   else
   {
+    IDLEV(h)=toLev;
+    v->req_packhdl=rootpack;
     if (h==frompack->idroot)
     {
       frompack->idroot=h->next;
@@ -1038,7 +1040,6 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
     h->next=rootpack->idroot;
     rootpack->idroot=h;
   }
-  IDLEV(h)=toLev;
   return FALSE;
 }
 #endif /* HAVE_NS */
