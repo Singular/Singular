@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.215 2002-03-07 18:31:37 mschulze Exp $
+@comment $Id: reference.doc,v 1.216 2002-11-11 18:48:45 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -165,6 +165,7 @@ brackets are allowed.
 * res::
 * reservedName::
 * resultant::
+* ringlist::
 * rvar::
 * setring::
 * simplify::
@@ -5233,7 +5234,7 @@ See
 @ref{string}.
 @c ref
 @c ---------------------------------------
-@node  resultant, rvar, reservedName, Functions
+@node  resultant, ringlist, reservedName, Functions
 @subsection resultant
 @cindex resultant
 @table @code
@@ -5260,7 +5261,33 @@ See
 @ref{ring}.
 @c ref
 @c ---------------------------------------
-@node rvar, setring, resultant, Functions
+@node  ringlist, rvar, resultant, Functions
+@subsection ringlist
+@cindex ringlist
+@table @code
+@item @strong{Syntax:}
+@code{ringlist (} ring_expression @code{)}
+@*@code{ringlist (} qring_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+decomposes a ring/qring into a list of 4 components: the field description,
+the variable names, the ordering and the quotient ideal.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=32003,(x,y,z),dp;
+  ringlist(r);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ring};
+@ref{qring}.
+@c ref
+@c ---------------------------------------
+@node rvar, setring, ringlist, Functions
 @subsection rvar
 @cindex rvar
 @table @code
