@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.60 2000-05-19 11:13:32 wichmann Exp $
+;; $Id: singular.el,v 1.61 2000-12-18 15:44:32 wichmann Exp $
 
 ;;; Commentary:
 
@@ -623,23 +623,62 @@ This function is called  at mode initialization time."
   "Menu definition for the inital library sub menu.
 This should be a list of vectors.")
 
+(defun singular-menu-build-libraries-menu (definition)
+  "Given a description of the libraries and their categories, builds up a
+menu definition including submenus which can be given to
+`easy-menu-change'.  By side effect sets the variable
+`singular-standard-libraries-alist' to the alist of all library names.
+This alist can be used for completion."
+  (let ((menudef ())
+        (libs definition)
+        elem)
+    (while libs
+      (setq elem (car libs))
+      (if (> (length elem) 1)
+          (setq menudef
+                (append 
+		 (list 
+		  (append (list (car elem))
+			  (singular-menu-build-libraries-menu (cdr elem))))
+		 menudef))
+        (setq menudef 
+	      (append (list (vector (car elem)
+				    (list 'singular-load-library nil
+					  (car elem))
+                                    t))
+		      menudef))
+        (setq singular-standard-libraries-alist 
+	      (append (list elem) singular-standard-libraries-alist)))
+      (setq libs (cdr libs)))
+    menudef))
+
 (defun singular-menu-install-libraries ()
   "Update the singular command menu with libraries.
-Steps through the alist `singular-standard-libraries-alist' and for 
-each entry add a new menu element in the submenu 
-(\"Commands\" \"libraries\")."  ;" font-lock-trick
+Scans the variable `singular-standard-libraries-with-categories' and builds
+up a menu with submenues for each category in the submenu (\"Commands\"
+\"Libraries\")."
   (singular-debug 'interactive (message "Installing library menu"))
-  (let ((libs singular-standard-libraries-alist)
-	current
-	(menudef (append '("---") singular-menu-initial-library-menu)))
-    (while libs
-      (setq current (car (car libs)))
-      (setq menudef (append (list (vector current
-					  (list 'singular-load-library nil current)
-					  t))
-			    menudef))
-      (setq libs (cdr libs)))
-    (easy-menu-change '("Commands") "Libraries" menudef)))
+  ;; To be compatible with older versions of singular.el (resp. of lib-cmpl.el)
+  ;; we check whether the variable
+  ;; `singular-standard-libraries-with-categories' is set.  If not, we use the
+  ;; value of `singular-standard-libraries-alist' instead.
+  (if (not singular-standard-libraries-with-categories)
+      (setq singular-standard-libraries-with-categories
+            singular-standard-libraries-alist))
+  (easy-menu-change '("Commands")
+		    "Libraries"
+		    (append 
+		     (singular-menu-build-libraries-menu
+		      singular-standard-libraries-with-categories)
+		     (append '("---") singular-menu-initial-library-menu))))
+
+(defun singular-menu-init ()
+  "Initialize menu stuff for Singular interactive mode.
+
+This function is called by `singular-exec'."
+  (singular-debug 'interactive (message "Initializing menue stuff"))
+  (make-local-variable 'singular-standard-libraries-alist)
+  (make-local-variable 'singular-standard-libraries-with-categories))
 
 (defun singular-menu-deinstall-libraries ()
   "Initialize library submenu from singular command menu.
@@ -2625,8 +2664,15 @@ This variable is buffer-local.")
 
 This variable is buffer-local.")
 
+(defvar singular-standard-libraries-with-categories nil
+  "A list containing all Singular standard library names and their category.
+
+This variable is buffer-local.")
+
 (defvar singular-standard-libraries-alist nil
-  "An alist containing all Singular standard libraries names.
+  "An alist containing all Singular standard library names.
+This variable is set automatically by `singular-menu-install-libraries'
+using the value of `singular-standard-libraries-with-categories'.
 
 This variable is buffer-local.")
 ;;}}}
@@ -2838,7 +2884,7 @@ Performs completion of Singular examples if point is at the end of an
 example command (\"example\").
 Otherwise performs completion of Singular commands."
   (interactive)
-  ;; Check if we are inside a string. The search is done back to the
+  ;; Check if we are inside a string.  The search is done back to the
   ;; process-mark which should be the beginning of the current input.
   ;; No check at this point whether there is a process!
   (if (save-excursion
@@ -3973,6 +4019,7 @@ Returns BUFFER."
 	    ;; completion should be initialized before scan header!
 	    (singular-completion-init)
 	    (singular-scan-header-init)
+            (singular-menu-init)
 
 	    ;; feed process with start file and read input ring.  Take
 	    ;; care about the undo information.
