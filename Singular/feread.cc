@@ -1,36 +1,37 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.16 1998-07-10 17:03:45 Singular Exp $ */
+/* $Id: feread.cc,v 1.17 1998-07-29 16:49:26 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
 
 
 #include "mod2.h"
+#include "tok.h"
+#include "febase.h"
+#include "mmemory.h"
 
 #ifdef HAVE_FEREAD
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#ifdef MSDOS
-#include <pc.h>
-#else
-#ifdef atarist
-#include <ioctl.h>
-#else
-#ifdef NeXT
-#include <sgtty.h>
-#include <sys/ioctl.h>
-#else
-#include <termios.h>
-#endif
-#endif
-#endif
-#include "tok.h"
-#include "mmemory.h"
-#include "febase.h"
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #ifdef MSDOS
+  #include <pc.h>
+ #else
+  #ifdef atarist
+   #include <ioctl.h>
+  #else
+   #ifdef NeXT
+    #include <sgtty.h>
+    #include <sys/ioctl.h>
+   #else
+    #include <termios.h>
+   #endif
+  #endif
+ #endif
+
 
 #ifndef STDIN_FILENO
 #define STDIN_FILENO 0
@@ -324,6 +325,19 @@ static void fe_get_hist(char *s, int size, int &pos,int change, int incr)
 
 char * fe_fgets_stdin(char *s, int size)
 {
+  #ifdef HAVE_TCL
+  if (tclmode)
+  {
+    PrintTCLS('P',pr);
+  }
+  else
+  #endif
+  if ((BVERBOSE(V_PROMPT))&&(!feBatch))
+  {
+    PrintS(pr);
+  }
+  mflush();
+
   if (fe_stdin_is_tty)
   {
     int h=fe_hist_pos;
@@ -569,39 +583,38 @@ char * fe_fgets_stdin(char *s, int size)
 /*=======================================================================*/
 #if defined(HAVE_READLINE) && !defined(HAVE_FEREAD)
 
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/file.h>
-#include <sys/stat.h>
-#include <sys/errno.h>
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <sys/types.h>
+ #include <sys/file.h>
+ #include <sys/stat.h>
+ #include <sys/errno.h>
 
 extern "C" {
-#ifdef READLINE_READLINE_H_OK
-#include <readline/readline.h>
-#ifdef HAVE_READLINE_HISTORY_H
-#include <readline/history.h>
-#endif
-#else /* declare everything we need explicitely and do not rely on includes */
-extern char * rl_readline_name;
-extern char *rl_line_buffer;
-char *filename_completion_function();
-typedef char **CPPFunction ();
-extern char ** completion_matches ();
-extern CPPFunction * rl_attempted_completion_function;
-extern FILE * rl_outstream;
-char * readline ();
-void add_history ();
-int write_history ();
-#endif /* READLINE_READLINE_H_OK */
+ #ifdef READLINE_READLINE_H_OK
+  #include <readline/readline.h>
+  #ifdef HAVE_READLINE_HISTORY_H
+   #include <readline/history.h>
+  #endif
+ #else /* declare everything we need explicitely and do not rely on includes */
+  extern char * rl_readline_name;
+  extern char *rl_line_buffer;
+  char *filename_completion_function();
+  typedef char **CPPFunction ();
+  extern char ** completion_matches ();
+  extern CPPFunction * rl_attempted_completion_function;
+  extern FILE * rl_outstream;
+  char * readline ();
+  void add_history ();
+  int write_history ();
+ #endif /* READLINE_READLINE_H_OK */
 }
 
 #ifndef STDOUT_FILENO
 #define STDOUT_FILENO 1
 #endif
 
-#include "febase.h"
 #include "ipshell.h"
 
 BOOLEAN fe_use_fgets=FALSE;
@@ -710,17 +723,27 @@ char * fe_fgets_stdin_rl(char *pr,char *s, int size)
   if(fe_use_fgets)
   {
     #ifdef HAVE_TCL
-    if (!tclmode)
+    if (tclmode)
+    {
+      PrintTCLS('P',pr);
+    }
+    else
     #endif
+    if (BVERBOSE(V_PROMPT))
     {
       PrintS(pr);
-      mflush();
     }
+    mflush();
     return fgets(s,size,stdin);
   }
 
-  char *line;
+  if (!BVERBOSE(V_PROMPT))
+  {
+    pr="";
+  }
+  mflush();
 
+  char *line;
   line = readline (pr);
 
   if (line==NULL)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.13 1998-07-29 13:55:46 Singular Exp $ */
+/* $Id: febase.inc,v 1.14 1998-07-29 16:49:27 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -354,29 +354,10 @@ BOOLEAN exitVoice()
 */
 static void feShowPrompt(void)
 {
-  //if (currentVoice->sw == BI_stdin)
-  {
-    fe_promptstr[0]=prompt_char;
-#ifdef HAVE_TCL
-    if (tclmode)
-    {
-      PrintTCLS('P',fe_promptstr);
-    }
-    else
-#endif
-#ifndef HAVE_READLINE
-    if ((BVERBOSE(V_PROMPT))&&(!feBatch))
-    {
-      PrintS(fe_promptstr);
-    }
-#else
-    ; /* dummy statemaent for else */
-#endif
-    mflush();
+  fe_promptstr[0]=prompt_char;
 #ifdef macintosh
-    cols = 0;
+  cols = 0;
 #endif
-  }
 }
 
 /*2
