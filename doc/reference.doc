@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.143 1999-08-30 17:32:40 Singular Exp $
+@comment $Id: reference.doc,v 1.144 1999-08-31 08:23:54 wenk Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -124,6 +124,7 @@ brackets are allowed.
 * minres::
 * modulo::
 * monitor::
+* mpresmat::
 * mres::
 * mstd::
 * mult::
@@ -2566,16 +2567,30 @@ See
 @node laguerre, lead, koszul, Functions
 @subsection laguerre
 @cindex laguerre
-TBC (wenk)
 @table @code
 @item @strong{Syntax:}
+@code{laguerre(} poly_expression@code{,} int_expression@code{,} int_expression @code{)} 
 @item @strong{Type:}
-matrix
+list
 @item @strong{Purpose:}
+computes all complex roots of an univariate polynomial using Laguerres' algorithm.
+The second argument defines the precision of the fractional part if ground field is the
+rational numbers, otherwise it will be ignored. The third argument gives the number
+of extra runs of Laguerres' algorithm with corrupted roots leading to better results
+(can be 0, 1 or 2).
+@item @strong{Notes:}
+If the ground field is the complex numbers, the elements of the list are of type
+number, otherwise of type string.
 @item @strong{Example:}
+@smallexample
+@c example
+ring rs1= 0,(x,y),lp;
+poly f = 15x5 + x3 + x2 - 10;
+laguerre(f,10,2);
+@c example
+@end smallexample
 @end table
 @c ref
-See
 @c ref
 @c -------------------------------------------------
 @node lead, leadcoef, laguerre, Functions
@@ -3284,7 +3299,7 @@ See
 @ref{syz}.
 @c ref
 @c ---------------------------------------
-@node monitor, mres, modulo, Functions
+@node monitor, mpresmat, modulo, Functions
 @subsection monitor
 @cindex monitor
 @table @code
@@ -3314,7 +3329,38 @@ and opens the file given by the first string expression.
 @end smallexample
 @end table
 @c ---------------------------------------
-@node  mres, mstd, monitor, Functions
+@node mpresmat, mres, monitor Functions
+@subsection mpresmat
+@cindex mpresmat
+@table @code
+@item @strong{Syntax:}
+@code{mpresmat(} ideal_expression@code{,} int_expression @code{)} 
+@item @strong{Type:}
+module representing the multipolynomial resultant matrix
+@item @strong{Purpose:}
+computes multipolynomial resultant matrix of input system.
+Uses sparse resultant matrix method of Gelfand, Kapranov and Zelevinsky (second parameter
+= 0) or resultant matrix method of Macaulay (second parameter
+= 1). 
+@item @strong{Notes:}
+When using resultant matrix method of Macaulay the input system must be homogeneous.
+Number of elements in input system must be number of variables in basering plus one.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring rsq= (0,u0,u1,u2),(x1,x2),lp;
+  ideal i= u0+u1*x1+u2*x2,x1^2 + x2^2 - 10,x1^2 + x1*x2 + 2*x2^2 - 16;
+  module m = mpresmat(i,0);
+  print(m);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{uressolve}.
+@c ref
+@c ---------------------------------------
+@node  mres, mstd, mpresmat, Functions
 @subsection mres
 @cindex mres
 @table @code
@@ -4261,25 +4307,18 @@ R^n/M, if R denotes the basering and if M is a homogeneous submodule of R^n.
 @end ifinfo
 The Betti numbers are printed in a matrix like format where the entry
 @tex
-$d$ in row $i$ and column $j$
+$R^n/M$, if $R$ denotes the basering and if $M$ is a homogeneous submodule of $R^n$:
 @end tex
 @ifinfo
-d in row i and column j
+R^n/M, if R denotes the basering and if M is a homogeneous submodule of R^n:
 @end ifinfo
-is the minimal number of generators in
-degree
+@*The entry d at (i,j) is the minimal number of generators in degree i+j of
+the j-th syzygy module of
 @tex
-$i+j$ of the $j$-th
+$R^n/M$ (the 0th (resp. 1st) syzygy module of $R^n/M$ is $R^n$ (resp.@: $M$))
 @end tex
 @ifinfo
-i+j of the j-th
-@end ifinfo
-syzygy module of
-@tex
-$R^n/M$ (the 0th and 1st syzygy module of $R^n/M$ is $R^n$ and $M$, resp).
-@end tex
-@ifinfo
-R^n/M (the 0th and 1st syzygy module of R^n/M is R^n and M, resp).
+R^n/M (the 0th (resp. 1st) syzygy module of R^n/M is R^n (resp.@: M))
 @end ifinfo
 @item "%s"
 returns @code{string(} expression @code{)}
@@ -5575,23 +5614,74 @@ See
 @node uressolve, vandermonde, typeof, Functions
 @subsection uressolve
 @cindex uressolve
-TBC (wenk)
 @table @code
 @item @strong{Syntax:}
+@code{urressolve(} ideal_expression@code{,} int_expression@code{,} int_expression@code{,} int_expression @code{)} 
 @item @strong{Type:}
+list
 @item @strong{Purpose:}
+computes all complex roots of a zerodimensional ideal
+Makes either use of the multipolynomial resultant of Macaulay (second argument = 1),
+which works only for homogeneous ideals,
+or uses the sparse resultant of Gelfand, Kapranov and Zelevinsky (second argument = 0).
+
+The sparse resultant algorithm uses a mixed polyhedral subdivision of the Minkowsky sum
+of the Newton polytopes in order to construct the sparse resultant matrix. Its
+determinant is a nonzero multiple of the sparse resultant. The u-resultant of
+B. L. van der Waerden and Laguerres' algorithm are used to determine the complex roots.
+
+The third argument defines the precision of the fractional part if ground field is the
+rational numbers, otherwise it will be ignored. The fourth argument gives the number
+of extra runs of Laguerres' algorithm with corrupted roots leading to better results
+(can be 0, 1 or 2).
+@item @strong{Notes:}
+If the ground field is the complex numbers, the elements of the list are of type
+number, otherwise of type string.
+@item @strong{Example:}
+@smallexample
+@c example
+ring rsc= (real,20,I),(x,y),lp;
+ideal i = (2+3*I)*x2 + (0.35+I*45.0e-2)*y2 - 8, x2 + xy + (42.7)*y2;
+list l= uressolve(i,0,0,2);
+l[1];
+subst(subst(i[1],x,l[1][1]),y,l[1][2]);
+@c example
+@end smallexample
 @end table
+@c ref
+See 
+@ref{laguerre}
+@ref{mpresmat}
+@c ref
 @c ---------------------------------------
 @node vandermonde, var, uressolve, Functions
 @subsection vandermonde
 @cindex vandermonde
-TBC (wenk)
 @table @code
 @item @strong{Syntax:}
+@code{vandermonde(} ideal_expression@code{,} ideal_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
+list
 @item @strong{Purpose:}
+solves the Vandermonde linear system $\sum_{i=1}^{N} x_i^{k-1}z_i = w_k$, $k=1,\ldots,N$.
 @item @strong{Example:}
+@smallexample
+@c example
+ring r2 = 0,(x,y),dp;
+// determine f with deg(f) = 3 and
+// v = values of f at 16 points (2,3)^0=(1,1),...,(2,3)^15=(2^15,3^15)
+// valuation point (2,3)
+ideal p = 2,3;
+ideal v= 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16;
+poly ip= vandermonde( p,v,3 );
+ip;
+// compute poly at point 2^15,3^15, result must be 16
+subst(subst(ip,x,2^15),y,3^15);
+@c example
+@end smallexample
 @end table
+@c ref
+@c ref
 @c ---------------------------------------
 @node var, varstr, vandermonde, Functions
 @subsection var
