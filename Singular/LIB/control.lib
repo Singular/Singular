@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.8 2004-08-09 12:57:20 levandov Exp $";
+version="$Id: control.lib,v 1.9 2004-08-09 13:50:11 levandov Exp $";
 category="Miscellaneous";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -19,6 +19,8 @@ RightKernel(module R);        a right kernel of R,
 LeftInverse(module R)         a left inverse of matrix (module).
 
 AUXILIARY PROCEDURES:
+ncdetection(ring r);          computes an ideal, presenting an involution map on non-comm algebra r;
+involution(m, map theta); applies the involution, presented by theta to  m of typ poly, vector, ideal, module;
 declare(string NameOfRing, string Variables[,string  Parameters, string Ordering]);     defines the ring, optional parametes are a string of parameters and a sting of ordering,
 view();                      Well-formatted output of lists, modules and matrixes
 ";
@@ -33,6 +35,7 @@ view();                      Well-formatted output of lists, modules and matrixe
 LIB "homolog.lib"; 
 LIB "poly.lib";
 LIB "primdec.lib";
+LIB "ncalg.lib";
 //---------------------------------------------------------------
 proc declare(string NameOfRing, string Variables, list #)
 "USAGE: declare(NameOfRing, Variables,[Parameters, Ordering]);
@@ -640,3 +643,243 @@ example
   view(autonom(R));	   
 };  
 //---------------------------------------------------------------------------
+static proc invo_poly(poly m, map theta)
+//applies the involution map theta to m, where m=polynomial
+{
+  int i,j;
+  intvec v;
+  poly p,z;
+  poly n = 0;
+  i = 1;
+  while(m[i]!=0)
+  {
+    v = leadexp(m[i]);
+    z =1;
+    for(j=nvars(basering); j>=1; j--)
+    {
+      if (v[j]!=0)
+      { 
+        p = var(j); 
+        p = theta(p);
+        z = z*(p^v[j]);
+      }
+    }    
+    n = n + (leadcoef(m[i])*z);
+    i++;  
+  }
+  return(n);
+}
+
+proc involution(m, map theta)
+//applies the involution map theta to m, where m=vector, polynomial,
+//module,ideal
+{
+  int i,j;
+  intvec v;
+  poly p,z;
+  if (typeof(m)=="poly")
+  {
+    return (invo_poly(m,theta));  
+  }
+  if ( typeof(m)=="ideal" )
+  {
+    ideal n;
+    for (i=1; i<=size(m); i++)
+    {
+      n[i] = invo_poly(m[i],theta);
+    } 
+    return(n);
+  }
+  if (typeof(m)=="vector")
+  {
+    for(i=1;i<=size(m);i++)
+    {
+      m[i] = invo_poly(m[i],theta);
+    }
+    return (m);  
+  }
+  
+  if ( (typeof(m)=="matrix") || (typeof(m)=="module"))
+  {  
+//    m=transpose(m);
+    matrix n = matrix(m);
+    int @R=nrows(n);
+    int @C=ncols(n);
+    for(i=1; i<=@R; i++)
+    {
+      for(j=1; j<=@C; j++)
+      {
+        n[i,j] = invo_poly( m[i,j], theta);
+      }
+    }
+   }
+  if (typeof(m)=="module")
+  {
+    return (module(n));
+  }
+  return(n);
+}
+example
+{ 
+  "EXAMPLE:";echo = 2;
+  ring r = 0,(x,d),dp;
+  ncalgebra(1,1); // Weyl-Algebra
+  map F = r,x,-d;
+  poly f =  x*d^2+d;
+  poly If = involution(f,F);
+  f-If;
+  poly g = x^2*d+2*x*d+3*x+7*d;
+  poly tg = -d*x^2-2*d*x+3*x-7*d;
+  poly Ig = involution(g,F);
+  tg-Ig;
+  ideal I = f,g;
+  ideal II = involution(I,F);
+  II;
+  I - involution(II,F);
+  module M  = [f,g,0],[g,0,x^2*d];
+  module IM = involution(M,F);
+  print(IM);
+  print(M - involution(IM,F));  
+}
+
+proc ncdetection( r)
+//in dieser proc. wird eine matrix erzeugt, die in der i-ten zeile die indices 
+//der differential-,shift- oder advance-operatoren enthaelt mit denen die i-te
+//variable nicht kommutiert. 
+{
+  int i,j,k,LExp;
+  int NVars=nvars(r);
+  matrix rel = NCRelations(r)[2];
+  intmat M[NVars][3];
+  int NRows = nrows(rel);
+  intvec v,w; 
+  poly d,d_lead;
+  ideal I;
+  map theta;
+ 
+  for( j=NRows;j>=2;j-- )
+  {
+   if( rel[j] == w )       //the whole column is zero
+    {
+      j--;
+      continue;
+    }
+    
+    for( i=1;i<j;i++ )         
+    {
+      if( rel[i,j]==1 )        //relation of type var(j)*var(i) = var(i)*var(j) +1
+      {
+         M[i,1]=j;
+      }
+      if( rel[i,j] == -1 )    //relation of type var(i)*var(j) = var(j)*var(i) -1
+      {
+        M[j,1]=i;
+      }
+      d = rel[i,j];
+      d_lead = lead(d);
+      v=leadexp(d_lead); //in the next lines we check wether we have a  relation of differential or shift type
+      LExp=0;
+      for( k=1;k<=NVars;k++)
+      {
+        LExp = LExp + v[k];
+      }
+      if( (d-d_lead != 0) || (LExp > 1) )
+      {
+        return( "wrong input" );
+      }
+      if( v[j] == 1)                   //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(j)
+      {
+        if (leadcoef(d) < 0)
+        {
+          M[i,2] = j;
+        }
+        else
+        {
+          M[i,3] = j;
+        }
+      }
+      if( v[i]==1 )                    //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(i)
+      {
+        if (leadcoef(d) > 0)
+        {
+          M[j,2] = i;
+        }
+        else
+        {
+          M[j,3] = i;
+        }
+      }
+    }
+  }
+  //ab hier wird die map ausgerechnet
+  for(i=1;i<=NVars;i++)
+  {
+    I=I+var(i);
+  }
+
+  for(i=1;i<=NVars;i++)
+  {
+    if( M[i,1..3]==(0,0,0) )
+    {
+      i++;
+      continue;
+    }
+    if( M[i,1]!=0 )
+    {
+      if( (M[i,2]!=0) && (M[i,3]!=0) )
+      {
+        I[M[i,1]] = -var(M[i,1]);
+        I[M[i,2]] = var(M[i,3]);
+        I[M[i,3]] = var(M[i,2]);
+      }
+      if( (M[i,2]==0) && (M[i,3]==0) )
+      {
+        I[M[i,1]] = -var(M[i,1]);
+      }                  
+      if( ( (M[i,2]!=0) && (M[i,3]==0) )|| ( (M[i,2]!=0) && (M[i,3]==0) ) 
+)
+      {
+        I[i] = -var(i);
+      }
+    }
+    else
+    {
+      if( (M[i,2]!=0) && (M[i,3]!=0) )
+      {
+        I[i] = -var(i);
+        I[M[i,2]] = var(M[i,3]);
+        I[M[i,3]] = var(M[i,2]);
+      }
+      else
+      {
+        I[i] = -var(i);
+      } 
+    }
+  }
+  return(I);
+
+}
+example
+{ 
+  "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z,D(1..3)),dp;
+  matrix D[6][6];
+  D[1,4]=1;
+  D[2,5]=1;
+  D[3,6]=1;
+  ncalgebra(1,D);
+  ncdetection(r);
+  kill r;
+  //----------------------------------------
+  ring r=0,(x,S),dp;
+  ncalgebra(1,-S);
+  ncdetection(r);
+  kill r;
+  //----------------------------------------
+  ring r=0,(x,D(1),S),dp;
+  matrix D[3][3];
+  D[1,2]=1;
+  D[1,3]=-S;
+  ncalgebra(1,D);
+  ncdetection(r);
+}
