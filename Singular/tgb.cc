@@ -1029,8 +1029,9 @@ static inline void clearS (poly p, unsigned long p_sev,int l, int* at, int* k,
   (*k)--;
 //  assume(lenS_correct(strat));
 }
-static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
+static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c, int* ip)
 {
+
   assume(h!=NULL);
 //  BOOLEAN corr=lenS_correct(c->strat);
   BOOLEAN R_found=FALSE;
@@ -1175,17 +1176,24 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
     c->Rcounter=0;
     cleanS(c->strat);
   }
-  qsort(nodes,spc,sizeof(sorted_pair_node*),pair_better_gen2);
-  int mc=0;
-  
-  c->apairs=merge(c->apairs,c->pair_top+1,nodes,spc,c);
-  c->pair_top+=spc;
-  clean_top_of_pair_list(c);
-
-
-  omfree(nodes);
-
+  if(!ip){
+    qsort(nodes,spc,sizeof(sorted_pair_node*),pair_better_gen2);
+ 
+    
+    c->apairs=merge(c->apairs,c->pair_top+1,nodes,spc,c);
+    c->pair_top+=spc;
+    clean_top_of_pair_list(c);
+    omfree(nodes);
+    return NULL;
   }
+  {
+    *ip=spc;
+    return nodes;
+  }
+
+  
+
+}
 #if 0
 static poly redNF (poly h,kStrategy strat)
 {
@@ -1444,7 +1452,7 @@ static poly redTailShort(poly h, kStrategy strat){
 
   int sl=strat->sl;
   int i;
-  int len;
+  int len=pLength(h);
   for(i=0;i<=strat->sl;i++){
     if(strat->lenS[i]>2)
       break;
@@ -1549,7 +1557,8 @@ static void go_on (calc_dat* c){
       
 //     }
 //   }
-  
+  int* ibuf=(int*) omalloc(i*sizeof(int));
+  sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
   for(j=0;j<i;j++){
  
  
@@ -1558,8 +1567,29 @@ static void go_on (calc_dat* c){
     kBucketClear(buf[j].bucket,&p, &len);
     // delete buf[j];
     //remember to free res here
-    add_to_basis(p,-1,-1,c);
+    p=redTailShort(p, c->strat);
+    sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
+    
   }
+  int sum=0;
+  for(j=0;j<i;j++){
+    sum+=ibuf[j];
+  }
+  sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
+  int partsum=0;
+  for(j=0;j<i;j++){
+    memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
+    omfree(sbuf[j]);
+    partsum+=ibuf[j];
+  }
+
+  qsort(big_sbuf,sum,sizeof(sorted_pair_node*),pair_better_gen2);
+  c->apairs=merge(c->apairs,c->pair_top+1,big_sbuf,sum,c);
+  c->pair_top+=sum;
+  clean_top_of_pair_list(c);
+  omfree(big_sbuf);
+  omfree(sbuf);
+  omfree(ibuf);
   omfree(buf);
   return;
 }
@@ -2482,11 +2512,14 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 }
 static find_erg multi_reduction_find(red_object* los, int losl,calc_dat* c,int startf){
   kStrategy strat=c->strat;
+
   assume(startf<=losl);
+  assume((startf==losl-1)||(pLmCmp(los[startf].p,los[startf+1].p)==-1));
   int i=startf;
   find_erg erg;
   int j;
   while(i>=0){
+    assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)<=0));
     j=kFindDivisibleByInS_easy(strat,los[i]);
     if(j>=0){
      
@@ -2499,12 +2532,26 @@ static find_erg multi_reduction_find(red_object* los, int losl,calc_dat* c,int s
 	  break;
       }
       erg.to_reduce_l=i2+1;
+      assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
       return erg;
     }
     if (j<0){
       
       //not reduceable, try to use this for reducing higher terms
       int i2;
+      i2=i;
+      while((i2>0)&&(pLmEqual(los[i].p,los[i2-1].p)))
+	i2--;
+      if(i2!=i){
+	
+	erg.to_reduce_u=i-1;
+	erg.to_reduce_l=i2;
+	erg.reduce_by=i;
+	erg.fromS=FALSE;
+	assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
+	return erg;
+      }
+ 
       for (i2=i+1;i2<losl;i2++){
 	if (p_LmShortDivisibleBy(los[i].p,los[i].sev,los[i2].p,~los[i2].sev,
 				c->r)){
@@ -2515,22 +2562,12 @@ static find_erg multi_reduction_find(red_object* los, int losl,calc_dat* c,int s
 	  erg.to_reduce_l=i2;
 	  erg.reduce_by=i;
 	  erg.fromS=FALSE;
+	  assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
 	  return erg;
 	}
 //	else {assume(!p_LmDivisibleBy(los[i].p, los[i2].p,c->r));}
       }
-      i2=i;
-      while((i2>0)&&(pLmEqual(los[i].p,los[i2-1].p)))
-	i2--;
-      if(i2!=i){
-	
-	erg.to_reduce_u=i-1;
-	erg.to_reduce_l=i2;
-	erg.reduce_by=i;
-	erg.fromS=FALSE;
-	return erg;
-      }
- 
+
       i--;
     }
   }
@@ -2678,9 +2715,9 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     curr_pos -= deleted;
 
     //Print("deleted %i \n",deleted);
-    //sort_region_down(los, erg.to_reduce_l, erg.to_reduce_u-deleted, c);
+    sort_region_down(los, erg.to_reduce_l, erg.to_reduce_u-deleted, c);
 //   sort_region_down(los, 0, losl-1, c);
-    //qsort(los,losl,sizeof(red_object),red_object_better_gen);
+    //  qsort(los,losl,sizeof(red_object),red_object_better_gen);
   }
   return;
 }
