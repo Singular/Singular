@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.6 1997-10-01 12:24:44 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.7 1997-10-02 11:09:20 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -13,6 +13,9 @@
 #include <signal.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
+#include <iostream.h>
+
 #include <GetOpt.h>
 
 // where is the declaration of this function?
@@ -56,6 +59,7 @@ struct varSpecT
 struct ftestEnvT
 {
     int seed;
+    bool seedSet;
     int characteristic;
     int extDegree;
     char extGen;
@@ -105,7 +109,9 @@ int ftestPrintResultFlag = 0;
 //   ftestGetEnv(), read by ftestPrintEnv() function.  This
 //   variable is quite spurious, but I keep it for future use.
 // ftestSwitchNames: symbolic names of switches
-//
+// ftestSeedFile: file where to read/to which to print the random
+//   generator seed.  Set by ftestParseRandom(), read by
+//   ftestWriteSeed().
 //
 //}}}
 static int ftestPrintTimingFlag = 0;
@@ -117,7 +123,7 @@ const char * ftestExecName = 0;
 const char * ftestAlgorithmName = 0;
 const char * ftestUsage = 0;
 
-ftestEnvT ftestEnv;
+static ftestEnvT ftestEnv;
 
 const char * ftestSwitchNames[] =
 {
@@ -130,6 +136,8 @@ const char * ftestSwitchNames[] =
     "USE_EZGCD",
     "USE_SPARSEMOD"
 };
+
+static char * ftestSeedFile = 0;
 //}}}
 
 //
@@ -201,10 +209,10 @@ ftestConcatEnv ( char ** argv, int & optind )
 }
 //}}}
 
-//{{{ static const char * ftestParseSeed ( const char * tokenString )
+//{{{ static const char * ftestParseRandom ( const char * tokenString )
 //{{{ docu
 //
-// ftestParseSeed() - parse seed specification and set factory's
+// ftestParseRandom() - parse random specification and set factory's
 //   random generator seed.
 //
 // The results are also stored in global variable `ftestEnv'.
@@ -212,22 +220,72 @@ ftestConcatEnv ( char ** argv, int & optind )
 //
 //}}}
 static const char *
-ftestParseSeed ( const char * tokenString )
+ftestParseRandom ( const char * tokenString )
 {
-    const char * tokenCursor;
+    int seed = 0;
+    bool seedSet = false;
 
-    tokenString++;			// strtol will skip blancs
-    int seed = (int)strtol( tokenString, (char **)&tokenCursor, 0 );
-    if ( tokenCursor == tokenString )
-	ftestError( EnvSyntaxError,
-		    "number expected in seed specification `%s'\n",
-		    tokenString );
+    do {
+	const char * tokenCursor;
+
+	// we skip either `@' or `,'
+	tokenString = ftestSkipBlancs( tokenString+1 );
+	if ( isdigit( *tokenString ) ) {
+	    // read seed specification from command line
+	    seed = (int)strtol( tokenString, (char **)&tokenCursor, 0 );
+	    if ( tokenCursor == tokenString )
+		ftestError( EnvSyntaxError,
+			    "bad seed specification `%s'\n",
+			    tokenString );
+	    seedSet = true;
+	} else if ( isalpha( *tokenString ) ) {
+	    // read seed specification from file
+	    tokenCursor = strpbrk( tokenString, ",/" );
+	    if ( ! tokenCursor )
+		tokenCursor = strchr( tokenString, '\0' );
+
+	    // store file name
+	    int nameLen = tokenCursor-tokenString;
+	    ftestSeedFile = new char[nameLen+1];
+	    strncpy( ftestSeedFile, tokenString, nameLen );
+	    ftestSeedFile[nameLen] = '\0';
+
+	    // open file, read seed, close file
+	    FILE * seedFile = fopen( ftestSeedFile, "r" );
+	    if ( seedFile ) {
+		// if file exists, read seed
+		if ( fscanf( seedFile, "%d", &seed ) != 1 )
+		    ftestError( FileError,
+				"garbled seed in seed file `%s'\n", ftestSeedFile );
+		fclose( seedFile );
+
+		seedSet = true;
+	    } else
+		if ( errno != ENOENT )
+		    ftestError( FileError,
+				"failed to open `%s' for reading: %s\n", ftestSeedFile,
+				strerror( errno ) );
+		else if ( ! (ftestEnv.seedSet || seedSet) ) {
+		    // if file does not exist, set seed to some
+		    // default value if it has not been set before
+		    seed = 0;
+		    seedSet = true;
+		}
+	} else
+	    ftestError( EnvSyntaxError,
+			"bad random specification `%s'\n", tokenString );
+
+	tokenString = ftestSkipBlancs( tokenCursor );
+    } while ( *tokenString == ',' );
 
     // set seed
-    ftestEnv.seed = seed;
-    factoryseed( seed );
+    ftestEnv.seedSet = seedSet;
+    if ( seedSet ) {
+	ftestEnv.seed = seed;
+	factoryseed( seed );
+    }
 
-    return tokenCursor;
+    return tokenString;
 }
 //}}}
 
@@ -303,7 +361,7 @@ ftestParseSwitches ( const char * tokenString )
     unsigned int switchNumber;
     bool switchSetting;
 
-    while ( *tokenString == '+' || *tokenString == '-') {
+    while ( *tokenString == '+' || *tokenString == '-' ) {
 	const char * tokenCursor;
 	if ( *tokenString == '+' )
 	    switchSetting = true;
@@ -330,6 +388,8 @@ ftestParseSwitches ( const char * tokenString )
 	ftestEnv.switches[switchNumber] = switchSetting;
 	if ( switchSetting )
 	    On( switchNumber );
+	else
+	    Off( switchNumber );
 
 	tokenString = ftestSkipBlancs( tokenCursor );
     }
@@ -381,11 +441,10 @@ ftestParseVars ( const char * tokenString )
 	    strncpy( mipoString, tokenString, mipoLen );
 	    mipoString[mipoLen] = '\0';
 	    mipo = ftestGetCanonicalForm( mipoString );
+	    delete [] mipoString;
 
 	    tokenString = ftestSkipBlancs( tokenCursor );
-	    delete [] mipoString;
 	}
-
 	if ( *tokenString == ',' )
 	    // skip optional separator
 	    tokenString = ftestSkipBlancs( tokenString+1 );
@@ -411,11 +470,6 @@ ftestParseVars ( const char * tokenString )
 	delete dummy;
     }
 
-    if ( *tokenString && *tokenString != '/' )
-	ftestError( EnvSyntaxError,
-		    "extra characters in variable specification `%s'\n",
-		    tokenString );
-
     return tokenString;
 }
 //}}}
@@ -427,20 +481,25 @@ ftestParseVars ( const char * tokenString )
 //   environment.
 //
 // The results are also stored in global variable `ftestEnv'.
-// Returns pointer behind last parsed character in tokenString.
+//
+// The parser is quite simple.  As long as `tokenString' starts
+// with a `/', he looks up the next character to determine which
+// token follows and parses it.  The functions used to do this
+// should leave `tokenString' behind the last character it
+// succeeded to read.
 //
 //}}}
 static void
 ftestParseEnv ( const char * tokenString )
 {
+    // read list of environment specifications
     tokenString = ftestSkipBlancs( tokenString );
     while ( *tokenString == '/' ) {
-
 	tokenString = ftestSkipBlancs( tokenString+1 );
 
 	if ( *tokenString == '@' ) {
-	    // seed specification
-	    tokenString = ftestParseSeed( tokenString );
+	    // random specification
+	    tokenString = ftestParseRandom( tokenString );
 	} else if ( isdigit( *tokenString ) ) {
 	    // specification of characteristics
 	    tokenString = ftestParseChar( tokenString );
@@ -457,7 +516,7 @@ ftestParseEnv ( const char * tokenString )
     // check if we reached end
     if ( *tokenString )
 	ftestError( EnvSyntaxError,
-		    "extra characters in environment specification `%s'\n",
+		    "extra characters in environment specification list `%s'\n",
 		    tokenString );
 }
 //}}}
@@ -558,6 +617,7 @@ ftestError ( const ftestErrorT errno, const char * format ... )
     case CommandlineError:
     case EnvSyntaxError: 
     case CanFormSpecError:
+    case FileError:
 	// ftestUsage();
 	break;
     case TimeoutError:
@@ -709,6 +769,7 @@ ftestGetEnv ( const int, char ** argv, int & optind )
 {
     // initialize environment
     ftestEnv.seed = 0;
+    ftestEnv.seedSet = false;
     ftestEnv.characteristic = 0;
     ftestEnv.extDegree = 0;
     ftestEnv.extGen = 'Z';
@@ -719,6 +780,27 @@ ftestGetEnv ( const int, char ** argv, int & optind )
     char * envString = ftestConcatEnv( argv, optind );
     ftestParseEnv( envString );
     delete [] envString;
+}
+//}}}
+
+//{{{ void ftestWriteSeed ()
+//{{{ docu
+//
+// ftestWriteSeed() - write current seed to seed file.
+//
+//}}}
+void
+ftestWriteSeed ()
+{
+    if ( ftestSeedFile ) {
+	FILE * seedFile = fopen( ftestSeedFile, "w" );
+	if ( ! seedFile )
+	    ftestError( FileError,
+			"failed to open `%s' for writing: %s\n", ftestSeedFile,
+			strerror( errno ) );
+	fprintf( seedFile, "%d\n", factoryrandom() );
+	fclose( seedFile );
+    }
 }
 //}}}
 
@@ -805,10 +887,16 @@ ftestPrintEnv ()
 	}
 	printf( "\n" );
 
-	// factory version and other information
+	// number of repetitions
 	ftestPrint( "circle: %d\n", "%d\n", ftestCircle );
-	ftestPrint( "seed  : %d\n", "%d\n", ftestEnv.seed );
 
+	// random generator seed
+	if ( ftestEnv.seedSet )
+	    ftestPrint( "seed  : %d\n", "%d\n", ftestEnv.seed );
+	else
+	    ftestPrint( "seed  : <not set>\n", "<not set>\n" );
+
+	// factory version
 	const char * version;
 	version = strchr( factoryVersion, '=' )+2;
 	ftestPrint( "vers  : %s\n", "%s\n", version );
@@ -849,19 +937,20 @@ ftestStrCat (char * to, const char * from)
 }
 //}}}
 
-//{{{ static void ftestSetSeed ()
+//{{{ static void ftestSetRandom ()
 //{{{ docu
 //
-// ftestSetSeed() - set random generator seed from `ftestEnv'.
+// ftestSetRandom() - set random generator seed from `ftestEnv'.
 //
 // This function is quite spurious, but I keep it for future
 // use.
 //
 //}}}
 static void
-ftestSetSeed ()
+ftestSetRandom ()
 {
-    factoryseed( ftestEnv.seed );
+    if ( ftestEnv.seedSet )
+	factoryseed( ftestEnv.seed );
 }
 //}}}
 
@@ -956,7 +1045,7 @@ ftestSetVars ()
 void
 ftestSetEnv ()
 {
-    ftestSetSeed();
+    ftestSetRandom();
     ftestSetSwitches();
     ftestSetChar();
     ftestSetVars();
