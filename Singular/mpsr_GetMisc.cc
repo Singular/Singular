@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.10 1998-11-04 17:32:23 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.11 1998-11-23 11:05:34 obachman Exp $ */
 
 /***************************************************************
  *
@@ -523,6 +523,7 @@ void mpFree(void* a)
 
 void mpsr_Init()
 {
+#ifndef EXTERNAL_MALLOC_H
   // memory management functions of MP (and MPT)
 #ifndef MDEBUG
   IMP_RawMemAllocFnc = mmAlloc;
@@ -534,6 +535,7 @@ void mpsr_Init()
   IMP_RawMemFreeFnc = mpFree;
   IMP_MemAllocFnc = mpAllocBlock;
   IMP_MemFreeFnc = mpFreeBlock;
+#endif
 #endif
 
   // Init of the MPT External Data functions
