@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.22 2002-06-10 18:38:09 keilen Exp $";
+version="$Id: inout.lib,v 1.23 2002-06-12 13:08:21 keilen Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -466,7 +466,7 @@ EXAMPLE: example show; shows an example
          listvar(number);listvar(resolution);
          for(int names@i=1;names@i<=size(na@me@s);names@i++)
          {
-           execute("def @hi@lf@="+na@me@s[names@i]+";");
+           def @hi@lf@=`na@me@s[names@i]`;
            if ((typeof(@hi@lf@)!="poly") and
                (typeof(@hi@lf@)!="ideal") and
                (typeof(@hi@lf@)!="vector") and
@@ -476,7 +476,7 @@ EXAMPLE: example show; shows an example
                (typeof(@hi@lf@)!="number") and
                (typeof(@hi@lf@)!="resolution"))
            {
-             execute("listvar("+na@me@s[names@i]+");");             
+             listvar(`na@me@s[names@i]`);             
            }
            kill(@hi@lf@);
          }
@@ -494,7 +494,7 @@ EXAMPLE: example show; shows an example
          listvar(number);listvar(resolution);
          for(int names@i=1;names@i<=size(na@me@s);names@i++)
          {
-           execute("def @hi@lf@="+na@me@s[names@i]+";");
+           def @hi@lf@=`na@me@s[names@i]`;
            if ((typeof(@hi@lf@)!="poly") and
                (typeof(@hi@lf@)!="ideal") and
                (typeof(@hi@lf@)!="vector") and
@@ -504,7 +504,7 @@ EXAMPLE: example show; shows an example
                (typeof(@hi@lf@)!="number") and
                (typeof(@hi@lf@)!="resolution"))
            {
-             execute("listvar("+na@me@s[names@i]+");");             
+             listvar(`na@me@s[names@i]`);             
            }
            kill(@hi@lf@);
          }
