@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.66 2003-03-10 16:43:50 Singular Exp $ */
+/* $Id: ipid.cc,v 1.67 2003-05-22 17:55:27 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -26,6 +26,9 @@
 #include "syz.h"
 #include "ipid.h"
 
+#ifdef HAVE_DYNAMIC_LOADING
+#include "mod_raw.h"
+#endif /* HAVE_DYNAMIC_LOADING */
 
 omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
 omBin ip_command_bin = omGetSpecBin(sizeof(ip_command));
@@ -862,7 +865,6 @@ void paCleanUp(package pack)
     {
       Print("//dlclose(%s)\n",pack->libname);
 #ifdef HAVE_DYNAMIC_LOADING
-      extern int dynl_close (void *handle);
       dynl_close (pack->handle);
 #endif /* HAVE_DYNAMIC_LOADING */
     }
