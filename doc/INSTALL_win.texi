@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.6 2000-06-07 13:13:34 obachman Exp $
+@comment $Id: INSTALL_win.texi,v 1.7 2000-06-13 07:38:07 obachman Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -39,6 +39,9 @@ To run @sc{ESingular} (i.e. @sc{Singular} within its Emacs interface) on
 MSWINDOWS requires furthermore that the (X)Emacs editor is installed on
 your system.
 
+@cindex Windows installation, components
+@cindex Components of Windows installation
+
 Therefore, the @sc{Singular} installation is devided into the following
 components: 
 @table @code
@@ -66,7 +69,7 @@ development environment we use to build/compile/develop @sc{Singular}
 under MSWINDOWS.
 @*Most of the programs of this component are installed into the
 directories @code{/bin} or @code{/usr/local/bin}.
-@table
+@end table
 
 @heading Downloading preliminaries
 
@@ -122,10 +125,6 @@ system, then uninstall it. Especially make sure that you delete the
 /} and @code{umount /bin} before deleting the installed Cygwin
 programs).
 @item 
-If you have Cygwin version 1.0 or higher installed on your system, you
-should either uninstall it, or, do not install the Cygwin component contained
-in the @sc{Singular} installation archives.
-@item 
 If you are running Windows NT/2000, make sure that you are logged on as
 @code{Administrator}.
 @item
@@ -142,31 +141,171 @@ When asked for the Setup Type, choose @code{Typical}, unless you know
 what you are doing. 
 @* If you choose @code{Compact}, the XEmacs editor is
 excluded from the installation. 
-@* If you choose @code{Custom}, make sure that you do @emph{not}
+@* If you choose @code{Custom} observe the following:
+@itemize
+@item 
+Make sure that you do @emph{not}
 de-select the @code{BasicCygwin} component, unless you already have
-Cygwin version 1.0   (or higher) installed on your system. 
-@* If you have the @emph{Cygwin} port of XEmacs version 21.1.10 (or higher)
+Cygwin version 1.0 (or higher) installed on your system. 
+@item
+If you have the @emph{Cygwin} port of XEmacs version 21.1.10 (or higher)
 already installed on your system, you can safely de-selct the
 @code{XEmacs} component. All other version of Emacs (resp. XEmacs) have
 some quirks and do not work right together with @sc{Singular} (i.e.,
 running @code{Esingular} results in problems).
-@* You only should install the @code{AdditionalCygwin} component, if you 
-plan on doing some software-development with cygwin. 
+@item
+You only need to install the @code{AdditionalCygwin} component, if you 
+plan on doing software-development with Cygwin. 
+@end itemize
 @item 
-At the end, you @emph{should} reboot your computer. Otherwise, some 
+At the end, you @emph{should} reboot your computer. Otherwise, the
+installed programs will @emph{not} work.
 @end enumerate
+
+The following step(s) are optional:
+@itemize
+@item 
+To conveniently access all files on your computer, mount the drives of
+your disk(s): 
+@enumerate
+@item 
+Open a bash shell.
+@item 
+For each drive (letter) issue the following command (the drive @code{C:}
+is used in the example):
+@example
+mount -f -s -t C: /C
+@end example
+@end enumerate
+After mounting the drive(s) this way, you can conveniently access the
+files on a drive from the bash and from Xemacs using the @code{/C/}
+prefix.
+
+@item
+Create your personal @code{HOME} directory. 
+@*Various applications (e.g., @code{bash} or @code{XEmacs}) store
+user-specific configuration/customization files in the @code{HOME}
+directory of the current user. During the installation, the @code{HOME}
+directory is globally set for all users to @code{/home/Singular}. To
+create your individual  @code{HOME} directory follow these steps:
+@enumerate
+@item 
+Create a directory (folder), say, @code{C:\home\MyHome}.
+@item 
+Copy all files from @code{/home/Singular} to @code{C:\home\MyHome}.
+@item
+Set the environment variable @code{HOME} to @code{C:\home\MyHome}:
+@*On Windows 95/98, edit the respective line ine the @code{AUTOEXEC.BAT}
+file.
+@*On Windows NT/2K add an entry in your @code{Environment} control
+panel.
+@item 
+Restart your computer.
+@end enumerate
+You may furthermore examine the files copied into your  @code{HOME}
+directory and adjust (i.e. edit) them to your personal
+preferences/needs.
+@end itemize
+
+
 
 @heading Uninstalling Singular
 
+You can uninstall individual or all installed components by opening the
+@code{Software} panel of the @code{System configuration} control
+panel. Simply double-click the @code{Singular-@value{VERSION}} item and
+follow the instructions given there.
+
+
 @heading Troubleshooting
+
+@table @strong
+@item On startup, the DLL @code{cygwin1.dll} can not be found.
+@itemize
+@item 
+Make sure that (1) the @code{BasicCygwin} component was not de-selected
+during a custom installation; (2) the destination folder choosen during
+the installation does not contain folder names which are longer than 8
+characters, or contain spaces or periods; (3) the installation did not
+generate any error messages; and (3) you have rebooted your machine after a
+successful installation.
+@item 
+Make sure the DLL @code{cygwin1.dll} is installed on your
+system: Say, @code{C:\} is the folder which you have choosen as the
+destination folder during the installation, then the  @code{cygwin1.dll}
+should be located at  @code{C:\bin\cygwin1.dll}.
+@item 
+If the problem pertains, please try to localize the source of the
+problem as explained below, and, in any event, @emph{please send} an email
+to  @email{singular@@mathematik.uni-kl-de} with a description of your problem.
+@item 
+Make sure the directories @code{C:\bin} and @code{C:\usr\local\bin}(if
+you have choosen another destination folder, substitute @code{C:} by
+this folder) are contained in your @code{PATH} environment variable. To
+check this, open an MS-DOS shell and type in @code{PATH}. If these
+directories are not contained in the listings of diroctories of the
+@code{PATH} variable, set them as follows and then @emph{restart} your
+computer:
+@*On Windows 95/98, add the following line to your @code{AUTOEXEC.BAT}
+file:
+@example
+SET PATH=C:\BIN;%PATH%;C:\USR\LOCAL\BIN
+@end example
+On Windows NT/2000 add a similar statements in your @code{Environment}
+control panel.
+@item 
+Make sure your choosen destination folder is correctly mounted to the
+root of your (Cygwin) file system: Open an MS-DOS shell, @code{cd}
+(change directory) to your choosen destination folder, and type in
+@example
+mount
+@end example
+This should produce an output which looks like:
+@example
+Device              Directory           Type         Flags
+C:                  /                   system       textmode
+@end example
+If not, make sure that the @code{mount.exe} command is contained in this
+directory, and then type at the MS-DOS prompt:
+@example
+mount -s -f -t C:\ /
+@end example
+@end itemize
+
+@item During the installation, an errror is displayed complaining that an environment variable can not be set.
+Repeat the installation, and make sure that:
+@*On Windows 95/98, the file @code{C:\AUTOEXEC.BAT} is not
+hidden and not write-protected.
+@* On Windows NT/2K, you are logged on as user
+@code{Administrator} during the installation.
+
+@item On start-up of @code{ESingular}, the @code{xemacs} editor can not be found.
+@*Make sure that (1) the folder @code{C:\usr\local\bin} is contained in your
+@code{PATH} (see above for details) and (2) that the file
+@code{C:\usr\local\bin\xemacs} exists (as above, substitute @code{C:\}
+by the destination folder choosen during the installation).
+@*Open a Bash shell and type in @code{/usr/local/bin/xemacs}. If this
+fails, make sure your root is correctly mounted (see above).
+
+@item On a Labtop which is not connected to the network, Xemacs hangs.
+Remove your network card and restart Xemacs.
+
+@item How do I cut and paste with the mouse?
+Under Windows, cutting and pasting does not work like it does under
+Unix. Nevertheless, you can copy and paste a region selected with the
+mouse using the @code{CTRL-Insert} (for copying) and @code{CTRL-Shift}
+(for paste) keys: this works both, within Xemacs, as well as within a
+Bash shell.
+@end table
 
 For any other troubles,
 please send an email to @email{singular@@mathematik.uni-kl.de}
 and include the header which is displayed by starting up @sc{Singular}
-with the @code{-v} option, and a description of your machine (issue the
-command @code{uname -a} on your shell) in your report.
+with the @code{-v} option, and a description of your machine and
+operating system.
 
 
+@ifclear singularmanual
 @heading More information about @sc{Singular}: Comments, Questions, Bug Reports
 More and up-to-date information about @sc{Singular} is always available
 from
@@ -179,7 +318,6 @@ contact us at
 @email{singular@@mathematik.uni-kl.de}.
 @end display
 
-@ifclear singularmanual
 GOOD LUCK and ENJOY!                         
 Your @sc{Singular} team.
 @end ifclear
