@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_univar.cc,v 1.4 1996-07-12 08:37:20 stobbe Exp $
+// $Id: fac_univar.cc,v 1.5 1997-03-27 09:54:41 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1996/07/12 08:37:20  stobbe
+"ZFactorizeUnivariate: now handles constants of the squarefree decomposition
+"
+
 Revision 1.3  1996/06/26 13:17:03  stobbe
 "ZFactorizeUnivariate: now handles the sign of the argument right.
 "
@@ -21,19 +25,14 @@ Initial revision
 
 */
 
-//#define TIMING
-
-#ifndef NDEBUG
-//#define DEBUGOUTPUT
-#endif
-
-#ifdef TIMING
-#include <sys/times.h>
-#endif
-
 #include <math.h>
+
 #include "assert.h"
+#include "debug.h"
+#include "timing.h"
+
 #include "cf_defs.h"
+
 #include "fac_util.h"
 #include "fac_univar.h"
 #include "fac_cantzass.h"
@@ -42,6 +41,11 @@ Initial revision
 #include "cf_primes.h"
 #include "fac_sqrfree.h"
 
+TIMING_DEFINE_PRINT(fac_choosePrimes);
+TIMING_DEFINE_PRINT(fac_facModPrimes);
+TIMING_DEFINE_PRINT(fac_liftFactors);
+TIMING_DEFINE_PRINT(fac_combineFactors);
+
 #define MAX_FP_FAC 3
 
 static modpk theModulus;
@@ -49,8 +53,7 @@ static modpk theModulus;
 CanonicalForm
 iextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b );
 
-#ifndef NDEBUG
-
+#ifdef DEBUGOUTPUT
 static void
 hprint ( int * a )
 {
@@ -62,9 +65,8 @@ hprint ( int * a )
 	    cerr << i << " ";
 	i++;
     }
-    cerr << ")" << endl;
+    cerr << ")" << endl << endl;
 }
-
 #endif
 
 static void
@@ -244,8 +246,9 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
     int no_iter = (int)(log(k)/log(2)+2);
     int * kvals = new int[no_iter];
 
-    DEBOUT( cerr, "quadratic lift called with p = ", p );
-    DEBOUTLN( cerr, "  and k = ", k );
+    DEBOUTSL( cerr );
+    DEBOUT( cerr, "quadratic lift called with p = " << p << "  and k = " << k );
+    DEBOUTENDL( cerr );
     for ( j = 0, i = k; i > 1; i = ( i+1 ) / 2, j++ ) kvals[j] = i;
     kvals[j] = 1;
 
@@ -272,8 +275,9 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
 	{
 	    j--;
 	    setCharacteristic( p, kvals[j+1] );
-	    DEBOUT( cerr, "lifting from p^", kvals[j+1] );
-	    DEBOUTLN( cerr, " to p^", kvals[j] );
+	    DEBOUTSL( cerr );
+	    DEBOUT( cerr, "lifting from p^" << kvals[j+1] << " to p^" << kvals[j] );
+	    DEBOUTENDL( cerr );
 	    c = mapinto( c );
 	    DEBOUTLN( cerr, " !!! g = ", mapinto( g ) );
 	    g1 = mapinto( lf ) / mapinto( lc( g ) ) * mapinto( g );
@@ -394,27 +398,16 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 	D = new int [n]; D[0] = n;
 	Dh = new int [n]; Dh[0] = n;
 	exp = J.getItem().exp();
-#ifdef TIMING
-	struct tms ts, te;
-	times( &ts );
-#endif
+	TIMING_START(fac_choosePrimes);
 	ok = choosePrimes( p, f );
-#ifdef TIMING
-	times( &te );
-	cout.setf( ios::fixed, ios::floatfield );
-	cout.precision(2);
-	cout << "time to choose the primes: "
-	     << float(te.tms_utime-ts.tms_utime) / CLK_TCK << " sec" << endl;
-#endif
+	TIMING_END_AND_PRINT(fac_choosePrimes, "time to choose the primes: ");
 	if ( ! ok ) {
-	    cerr << "factorize warnig: no good prime found" << endl;
-	    cerr << f << endl;
+	    DEBOUTLN( cerr, "error: no good prime found to factorize ", f );
+	    ASSERT( 0, "error: no good prime found" );
 	    ZF.append( CFFactor( f, exp ) );
 	}
 	else {
-#ifdef TIMING
-	    times( &ts );
-#endif
+	    TIMING_START(fac_facModPrimes);
 	    for ( i = 0; i < MAX_FP_FAC; i++ ) {
 		setCharacteristic( p[i] );
 		fp = mapinto( f );
@@ -423,35 +416,32 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 //		    F[i] = FpFactorizeUnivariateB( fp, true );
 //		else
 //		    F[i] = FpFactorizeUnivariateCZ( fp, true );
-		DEBOUT( cerr, "F[i] = ", F[i] );
-		DEBOUTLN( cerr, ", p = ", p[i] );
+		DEBOUTSL( cerr );
+		DEBOUT( cerr, "F[i] = " << F[i] << ", p = " << p[i] );
+		DEBOUTENDL( cerr );
 	    }
-#ifdef TIMING
-	times( &te );
-	cout.setf( ios::fixed, ios::floatfield );
-	cout.precision(2);
-	cout << "time to factorize mod primes: "
-	     << float(te.tms_utime-ts.tms_utime) / CLK_TCK << " sec" << endl;
-#endif
+	    TIMING_END_AND_PRINT(fac_facModPrimes, "time to factorize mod primes: ");
 	    setCharacteristic( 0 );
 #ifdef DEBUGOUTPUT
+	    DEBOUTLN( cerr, "D = ", ' ' );
 	    hprint( D );
 #endif
 	    initHG( D, F[0] );
 	    hgroup( D );
 #ifdef DEBUGOUTPUT
+	    DEBOUTLN( cerr, "D = ", ' ' );
 	    hprint( D );
 #endif
 	    for ( i = 1; i < MAX_FP_FAC; i++ ) {
 		initHG( Dh, F[i] );
 		hgroup( Dh );
 #ifdef DEBUGOUTPUT
-		cerr << "Dh = ";
+		DEBOUTLN( cerr, "Dh = ", ' ' );
 		hprint( Dh );
 #endif
 		hintersect( D, Dh );
 #ifdef DEBUGOUTPUT
-		cerr << "D = ";
+		DEBOUTLN( cerr, "D = ", ' ' );
 		hprint( D );
 #endif
 
@@ -474,9 +464,7 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 	    fp = mapinto( f );
 	    F[j].sort( cmpFactor );
 	    I = F[j]; i = 0;
-#ifdef TIMING
-	    times( &ts );
-#endif
+	    TIMING_START(fac_liftFactors);
 	    while ( I.hasItem() ) {
 		DEBOUTLN( cerr, "factor to lift = ", I.getItem().factor() );
 		if ( isOn( SW_FAC_QUADRATICLIFT ) )
@@ -490,7 +478,7 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 		    f = dummy2;
 		    fp /= I.getItem().factor();
 		    ZF.append( CFFactor( dummy1, exp ) );
-		    I.remove( 0 ); 
+		    I.remove( 0 );
 		    I = F[j];
 		    i = 0;
 		    DEBOUTLN( cerr, "F[j] = ", F[j] );
@@ -506,18 +494,12 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 		    I++;
 		}
 	    }
-#ifdef TIMING
-	times( &te );
-	cout.setf( ios::fixed, ios::floatfield );
-	cout.precision(2);
-	cout << "time to lift the factors: "
-	     << float(te.tms_utime-ts.tms_utime) / CLK_TCK << " sec" << endl;
-#endif
+	    TIMING_END_AND_PRINT(fac_liftFactors, "time to lift the factors: ");
 	    DEBOUTLN( cerr, "ZF = ", ZF );
 	    initHG( Dh, theFactors );
 	    hgroup( Dh );
 #ifdef DEBUGOUTPUT
-	    cerr << "Dh = ";
+	    DEBOUTLN( cerr, "Dh = ", ' ' );
 	    hprint( Dh );
 #endif
 	    hintersect( D, Dh );
@@ -526,29 +508,23 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 		theFactors[l] = 1;
 	    DEBOUTLN( cerr, "theFactors = ", theFactors );
 	    DEBOUTLN( cerr, "f = ", f );
-	    DEBOUT( cerr, "p = ", pk.getp() );
-	    DEBOUTLN( cerr, ", k = ", pk.getk() );
+	    DEBOUTSL( cerr );
+	    DEBOUT( cerr, "p = " << pk.getp() << ", k = " << pk.getk() );
+	    DEBOUTENDL( cerr );
 #ifdef DEBUGOUTPUT
+	    DEBOUTLN( cerr, "D = ", ' ' );
 	    hprint( D );
 #endif
 	    lf = lc( f );
 	    (void)iextgcd( pk.getpk(), lf, dummy1, recip_lf );
 	    DEBOUTLN( cerr, "recip_lf = ", recip_lf );
-#ifdef TIMING
-	    times( &ts );
-#endif
+	    TIMING_START(fac_combineFactors);
 	    for ( i = 1; i < D[0]; i++ )
 		if ( D[i] != 0 )
 		    while ( liftDegreeFactRec( theFactors, f, recip_lf, lf, pk, 0, i, ZF, exp ) );
 	    if ( degree( f ) > 0 )
 		ZF.append( CFFactor( f, exp ) );
-#ifdef TIMING
-	times( &te );
-	cout.setf( ios::fixed, ios::floatfield );
-	cout.precision(2);
-	cout << "time to combine the factors: "
-	     << float(te.tms_utime-ts.tms_utime) / CLK_TCK << " sec" << endl;
-#endif
+	    TIMING_END_AND_PRINT(fac_combineFactors, "time to combine the factors: ");
 	}
     }
     if ( ZF.getFirst().factor().inCoeffDomain() )
