@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.3 1999-12-03 11:20:44 obachman Exp $
+@comment $Id: NEWS.texi,v 1.4 1999-12-06 16:40:54 obachman Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -49,6 +49,8 @@ choose in which browser the on-line help is displayed;
 @item @nref{Source code debugger}
 interactive debugging of procedures written in the @sc{Singular}
 language
+@item @nref{example}
+Provide on-line examples for all kernel and library commands.
 @item file/directory layout of distribution
 @code{Singular/<version>/}
 @item http://singular.uni-kl.de ftp://singular.uni-kl.de
@@ -117,6 +119,8 @@ solve Vandermonde linear system
 @table @asis
 @item @nref{bareiss}
 new implementation after Lie-Saunders, much faster
+@item @nref{example}
+run example for all kernel commands.
 @item @nref{fetch}
 TBC
 @item @nref{print}
