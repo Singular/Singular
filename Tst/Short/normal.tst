@@ -61,4 +61,15 @@ setring r4;
 KK;
 
 kill r,r1;
+
 $
+// This is the example Theo 3 which is still broken due to the broken
+// minor command
+ring r=32003,(x,y,z),wp(3,5,15);
+ideal i=z*(y3-x5)+x10;
+list pr=normal(i);
+pr;
+def r1=pr[1];
+setring r1;
+KK;
+kill r, r1;

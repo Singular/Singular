@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.10 1998-05-20 11:46:28 obachman Exp $
+# $Id: regress.cmd,v 1.11 1998-05-25 21:22:43 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -21,7 +21,7 @@ regress.cmd    -- regress test of Singular
   [-n]             -- do not ignore output from tst_ignore when diffing
   [-k]             -- keep result (*.res) files, do not zip original res file
   [-v num]         -- set verbosity to num (used range 0..3, default: 1)
-  [-g]             -- generate result (*.res) files, only
+  [-g]             -- generate result (*.res.gz.uu) files, only
   [file.lst]       -- read tst files from file.lst
   [file.tst]       -- test Singular script file.tst 
 _EOM_
