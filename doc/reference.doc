@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.83 1998-05-29 15:02:05 Singular Exp $
+@comment $Id: reference.doc,v 1.84 1998-06-02 12:39:00 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3353,7 +3353,7 @@ See
 @ref{sres}.
 @c ref
 @c ---------------------------------------
-@node nrows, nvars, npars, Functions
+@node nrows, nvars, nres, Functions
 @subsection nrows
 @cindex nrows
 @table @code
