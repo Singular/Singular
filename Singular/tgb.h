@@ -98,5 +98,6 @@ static void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 static void soon_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 static int pLcmDeg(poly a, poly b);
 static int simple_posInS (kStrategy strat, poly p,int len);
-static BOOLEAN find_next_pair(calc_dat* c);
+static BOOLEAN find_next_pair(calc_dat* c, BOOLEAN go_higher=TRUE);
+static void soon_free_them(redNF_inf* inf, calc_dat* c);
 #endif

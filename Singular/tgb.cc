@@ -9,6 +9,38 @@ BOOLEAN lenS_correct(kStrategy strat){
     
 }
 
+static void notice_miss(int i, int j, calc_dat* c){
+      PrintS("-");
+      c->misses_counter++;
+      c->misses[i]++;
+      c->misses[j]++;
+      c->misses_series++;
+}
+static void soon_trep_them(redNF_inf* inf, calc_dat* c){
+  int_pair_node* hf=inf->soon_free;
+  
+  while(hf!=NULL)
+  {
+	      int_pair_node* s=hf;
+	      soon_t_rep(hf->a,hf->b,c);
+	      
+	      hf=hf->next;
+	      omfree(s);
+  }
+  inf->soon_free=NULL;
+}
+static void trep_them(redNF_inf* inf, calc_dat* c){
+  int_pair_node* hf=inf->soon_free;
+  
+  while(hf!=NULL)
+  {
+	      int_pair_node* s=hf;
+	      now_t_rep(hf->a,hf->b,c);
+	      
+	      hf=hf->next;
+	      omfree(s);
+  }
+}
 static void cleanS(kStrategy strat){
   int i=0;
   LObject P;
@@ -92,7 +124,7 @@ static void length_one_crit(calc_dat* c, int pos, int len)
     shorten_tails(c,c->S->m[pos]);
   }
 }
-static BOOLEAN find_next_pair(calc_dat* c)
+static BOOLEAN find_next_pair(calc_dat* c, BOOLEAN go_higher)
 {
   int start_i,start_j,i,j;
   start_i=0;
@@ -105,7 +137,7 @@ static BOOLEAN find_next_pair(calc_dat* c)
 #endif
   start_i=c->continue_i;
   start_j=c->continue_j;
-#ifndef DIAGONAL_GOING
+
   for (int i=start_i;i<c->n;i++){
     if (c->T_deg[i]>c->current_degree)
       {
@@ -141,39 +173,8 @@ static BOOLEAN find_next_pair(calc_dat* c)
     return find_next_pair(c);
   }
 
-#else
-  int z=0;
-  i=start_i;
-  j=start_j;
-  z=start_i+start_j;
-  while(z<=(2*c->n-3)){
 
-    while(i>j){
-      if(i>=c->n) {
-        if (c->skipped_i<0) c->skipped_i=i;
-      } else{
-        if(c->states[i][j]==UNCALCULATED){
-          if (c->deg[i][j]<=c->current_degree)
-	    {
-	      c->continue_i=c->found_i=i;
-	      c->continue_j=c->found_j=j;
-	      return TRUE;
-	    }
-          else
-	    {
-	      ++(c->skipped_pairs);
-	    }
-        }
-      }
-      --i;
-      ++j;
-    }
-    ++z;
-    i=z;
-    j=0;
-  }
-#endif
-  if (c->skipped_pairs>0){
+  if ((c->skipped_pairs>0) && go_higher){
     ++(c->current_degree);
     c->skipped_pairs=0;
     c->continue_i=0;
@@ -335,9 +336,28 @@ static void replace_pair(int & i, int & j, calc_dat* c)
 
 static void replace_pair(redNF_inf* inf, calc_dat* c)
 {
-  inf->soon_free=NULL;
+  
+//  inf->soon_free=NULL;
+  
   int & i=inf->i;
   int & j=inf->j;
+  int_pair_node* last=NULL;
+  if (last){
+    while(last->next){
+      last=last->next;
+    }
+  }
+  {
+    int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
+    if (last!=NULL)
+      last->next=h;
+    else
+      inf->soon_free=h;
+    h->next=NULL;
+    h->a=i;
+    h->b=j;
+    last=h;
+  }
   int curr_deg;
   poly lm=pOne();
 
@@ -360,7 +380,7 @@ static void replace_pair(redNF_inf* inf, calc_dat* c)
       //         }
       now_t_rep(i,j,c);
 //hack
-      i=j;
+//      i=j;
       omfree(i_con);
       p_Delete(&lm,c->r);
       return;
@@ -382,7 +402,7 @@ static void replace_pair(redNF_inf* inf, calc_dat* c)
   pSetm(lm);
   poly short_s;
   curr_deg=pFDeg(lm);
-  int_pair_node* last=NULL;
+
 
   for (int n=0;((n<c->n) && (j_con[n]>=0));n++){
     for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
@@ -390,7 +410,7 @@ static void replace_pair(redNF_inf* inf, calc_dat* c)
       pSetm(lm);
       if (pFDeg(lm)>=deciding_deg)
   {
-    soon_t_rep(i_con[m],j_con[n],c);
+    //soon_t_rep(i_con[m],j_con[n],c);
     int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
     if (last!=NULL)
       last->next=h;
@@ -619,10 +639,10 @@ static int init_red_phase1(calc_dat* c, int i, int j, int pos)
   c->work_on[pos].j=j;
   c->work_on[pos].h=NULL;
   c->work_on[pos].need_std_rep=FALSE;
-  soon_t_rep(i,j,c);
+ 
   replace_pair(&c->work_on[pos],c);
 //verhindern daß ein Paar mehrmals ausgerechnet wird
-  soon_t_rep(c->work_on[pos].i, c->work_on[pos].j,c);
+  soon_trep_them(&c->work_on[pos], c);
   return pos;
 }
 static void init_red_spoly_phase2(calc_dat* c,int pos){
@@ -1538,11 +1558,8 @@ static void do_this_spoly_stuff(int i,int j,calc_dat* c){
   c->normal_forms++;
   if (hr==NULL)
     {
-      PrintS("-");
-      c->misses_counter++;
-      c->misses[i]++;
-      c->misses[j]++;
-      c->misses_series++;
+      notice_miss(i, j, c);
+
     }
   else
     {
@@ -1578,6 +1595,7 @@ static BOOLEAN fillup(calc_dat* c){
   }
   return TRUE;
 }
+
 static BOOLEAN compute(calc_dat* c){
   int i=(c->last_index+ 1)%PAR_N;
   int len;
@@ -1588,18 +1606,10 @@ static BOOLEAN compute(calc_dat* c){
 	suc=TRUE;
 	//clear ressources ;; needs to be done
 	c->work_on[i].is_free=TRUE;
-	now_t_rep(c->work_on[i].i,c->work_on[i].j,c);
+	
 
-	   int_pair_node* hf=c->work_on[i].soon_free;
-	    now_t_rep(c->work_on[i].i,c->work_on[i].j,c);
-	    while(hf!=NULL)
-	    {
-	      int_pair_node* s=hf;
-	      now_t_rep(hf->a,hf->b,c);
-		  
-	      hf=hf->next;
-	      omfree(s);
-	    }
+	
+	trep_them(&c->work_on[i],c);
 	    c->work_on[i].soon_free=NULL;
 	    
 	    c->work_on[i].is_free=TRUE;
@@ -1610,16 +1620,10 @@ static BOOLEAN compute(calc_dat* c){
           init_red_spoly_phase2(c,i);
 	if (!c->work_on[i].is_free){
 	  if(redNF2_n_steps(&(c->work_on[i]),c,50)){
-	    int_pair_node* hf=c->work_on[i].soon_free;
-	    now_t_rep(c->work_on[i].i,c->work_on[i].j,c);
-	    while(hf!=NULL)
-	    {
-	      int_pair_node* s=hf;
-	      now_t_rep(hf->a,hf->b,c);
-		  
-	      hf=hf->next;
-	      omfree(s);
-	    }
+	    
+
+	    trep_them(&c->work_on[i],c);
+	    
 	    c->work_on[i].soon_free=NULL;
 	    
 	    c->work_on[i].is_free=TRUE;
@@ -1639,10 +1643,8 @@ static BOOLEAN compute(calc_dat* c){
 	  
 	    if (hr==NULL)
         {
-          PrintS("-");
-          c->misses_counter++;
-          c->misses[c->work_on[i].i]++;          c->misses[c->work_on[i].j]++;
-          c->misses_series++;
+	  notice_miss(c->work_on[i].i, c->work_on[i].j, c);
+
         }
 	    else
 	    {
@@ -1755,6 +1757,10 @@ static void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c){
 }
 static void soon_t_rep(const int& arg_i, const int& arg_j, calc_dat* c)
 {
+  assume(0<=i);
+  assume(0<=j);
+  assume(i<c->n);
+  assume(j<c->n);
   int i,j;
   if (arg_i==arg_j){
     return;
@@ -1771,7 +1777,10 @@ static void soon_t_rep(const int& arg_i, const int& arg_j, calc_dat* c)
     c->states[j][i]=SOONTREP;
 }
 static BOOLEAN has_t_rep(const int & arg_i, const  int & arg_j, calc_dat* state){
-
+  assume(0<=i);
+  assume(0<=j);
+  assume(i<c->n);
+  assume(j<c->n);
   if (arg_i==arg_j)
     {
       return (TRUE);
