@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.187 2000-12-19 16:16:54 Singular Exp $
+@comment $Id: general.doc,v 1.188 2000-12-19 16:19:15 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3388,6 +3388,7 @@ It is common practice to simply define the version string to be
 @comment !! Do not erase the @comment at the end of the previous line !!
 @comment !! It prevents cvs to substitute the id string                !!
 @code{d:$"} and let a version control system expand it.
+@end table
 
 @cindex  category in a library
 @table @code
