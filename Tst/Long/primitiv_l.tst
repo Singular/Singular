@@ -3,7 +3,8 @@
 LIB "tst.lib";
 tst_init();
 LIB "primitiv.lib";
-// ------------ test of primitive: -------------------
+// ------------ test of primitive and primitive_extra: -------------------
+printlevel=3;
 ring r=0,x,dp;
 primitive(ideal(x2+1));
 kill r;
@@ -22,8 +23,10 @@ if (size(v)>0)
 // else minpoly(a)=0, g_1(a) is squareroot of 2, g_2(a) is squareroot of 3
 // as it should be
 setring r;
+primitive_extra(i);
 i=x2-3,y2-x;
 primitive(i);
+primitive_extra(i);
 kill r;
 ring r=0,(x(0..3)),lp;
 int zeit=timer;
@@ -39,10 +42,17 @@ ideal o=primitive(ideal(f1,f2));
 tst_ignore(timer-zeit,"time");
 tst_ignore(kmemory(),"memory");
 "size of the result :",size(string(o)),"characters";
+zeit=timer;
+o=primitive_extra(ideal(f1,f2));
+tst_ignore(timer-zeit,"time");
+tst_ignore(kmemory(),"memory");
+"size of the result :",size(string(o)),"characters";
 kill r;
 ring r=3,(x,y,z),dp;
 ideal i=x2+1,y3-y-1,z2+yz-1;
 primitive(i);
+primitive_extra(i);
+primitive_extra(ideal(i[1],i[2]));
 kill r;
 // ------------ test of splitring: -------------------
 ring r=2,a,Dp;
@@ -73,4 +83,4 @@ L[3]^2;
 kill R1,r;
 // ------------ test of randomLast: ------------------
 example randomLast;
-tst_status(1);$
+$
