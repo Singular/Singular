@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.62 2001-02-08 13:13:02 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.63 2001-02-09 14:22:56 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -376,7 +376,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
     }
     all=TRUE;
   }
-  else if ((typ>BEGIN_RING) && (typ<END_RING))
+  else if (RingDependend(typ))
   {
     h = currRing->idroot;
   }
@@ -1001,7 +1001,7 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
         else PrintS("! ! ! ! ! r is empty!!!!!!!!!!!!\n");
       }
     }
-    else if ((BEGIN_RING<IDTYP(h)) && (IDTYP(h)<END_RING)
+    else if (RingDependend(IDTYP(h))
              || ((IDTYP(h)==LIST_CMD) && (lRingDependend(IDLIST(h))))) {
       //Print("// ==> Ringdependent set nesting to 0\n");
       if(iiInternalExport(v, toLev)) return TRUE;
@@ -1106,7 +1106,7 @@ BOOLEAN iiCheckRing(int i)
     if (siq<=0)
     {
     #endif
-      if ((i>BEGIN_RING) && (i<END_RING))
+      if (RingDependend(i))
       {
         WerrorS("no ring active");
         return TRUE;

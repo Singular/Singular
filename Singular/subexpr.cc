@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.71 2001-02-08 12:55:51 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.72 2001-02-09 14:22:57 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -447,7 +447,7 @@ void sleftv::CleanUp()
 BOOLEAN sleftv::RingDependend()
 {
   int rt=Typ();
-  if((BEGIN_RING<rt) && (rt<END_RING) && (rt!=QRING_CMD))
+  if(::RingDependend(rt) && (rt!=QRING_CMD))
     return TRUE;
   if (rt==LIST_CMD)
     return lRingDependend((lists)Data());
@@ -1569,8 +1569,7 @@ int sleftv::Eval()
           //d->arg1.rtyp=DEF_CMD;
           sleftv t;
           if(save_typ!=PROC_CMD) save_typ=d->arg2.rtyp;
-          if ((BEGIN_RING<d->arg2.rtyp)&&(d->arg2.rtyp<END_RING)
-          /*&&(QRING_CMD!=d->arg2.rtyp)*/)
+          if (::RingDependend(d->arg2.rtyp))
             nok=iiDeclCommand(&t,&d->arg1,0,save_typ,&currRing->idroot);
           else
             nok=iiDeclCommand(&t,&d->arg1,0,save_typ,&IDROOT);

@@ -3,12 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.27 2001-02-08 12:55:51 Singular Exp $ */
+/* $Id: subexpr.h,v 1.28 2001-02-09 14:22:56 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
 
 #include <string.h>
+#include "grammar.h"
+#include "tok.h"
 #include "structs.h"
 
 struct _ssubexpr
@@ -87,6 +89,7 @@ class sleftv
     BOOLEAN RingDependend();
 };
 
+inline BOOLEAN RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
 extern sleftv sLastPrinted;
 
 struct _sssym
