@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.115 1999-05-07 15:41:37 Singular Exp $
+@comment $Id: general.doc,v 1.116 1999-05-25 07:35:35 krueger Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -27,6 +27,7 @@
 * The SINGULAR language::
 * Input and output::
 * Procedures::
+* Namespaces::
 * Libraries::
 * Debugging tools::
 @end menu
@@ -280,7 +281,7 @@ this library is loaded on start-up.  @xref{Startup sequence}.
 Do not display warning messages.
 
 @item @code{--no-out}
-Suppress display of all ouput.
+Suppress display of all output. 
 
 @item @code{-t}, @code{--no-tty}
 Do not redefine the terminal characteristics.  This option should be
@@ -914,7 +915,7 @@ The given ideal must be zero-dimensional.
 computes a standard resp.@: Groebner bases using a heuristically chosen
 method.
 
-This is the prefered method to compute a standard resp.@: Groebner
+This is the preferred method to compute a standard resp.@: Groebner
 bases.
 @item mstd
 @ref{mstd}
@@ -983,7 +984,7 @@ modulo an ideal (resp.@: module).
 @ref{res}@*
 computes a free resolution of an ideal or module using a heuristically
 chosen method.
-This is the prefered method to compute free resolutions of ideals or
+This is the preferred method to compute free resolutions of ideals or
 modules.
 @item lres
 @ref{lres}@*
@@ -1099,14 +1100,15 @@ the progress of a computation.
 
 @sc{Singular} interprets commands given interactively on the command
 line as well as given in the context of user-defined procedures.  In
-fact, @sc{Singular} makes no distinction between these both cases.
+fact, @sc{Singular} makes no distinction between these two cases.
 Thus, @sc{Singular} offers a powerful programming language as well as
 an easy-to-use command line interface without differences in syntax or
 semantics.
 
 In the following, the basic language concepts such as commands,
 expressions, names, objects, etc., are discussed.  @xref{Procedures},
-and @ref{Libraries}, for the concepts of procedures and libraries.
+, @ref{Libraries} and @ref{Namespaces}, for the concepts of procedures
+and libraries.
 
 In many aspects, the @sc{Singular} language is similar to the C
 programming language.  For a description of some of the subtle
@@ -1338,6 +1340,8 @@ value of expression last displayed
 breakpoint in procedures
 @item @code{#}
 list of parameters in procedures without explicit parameter list
+@item @code{::}
+delimiter between package name and identifier
 @item @code{$}
 terminates @sc{Singular}
 @end table
@@ -1411,13 +1415,27 @@ under the special name @code{_}, e.g.,
 
 A string_expression enclosed in @code{`}@dots{}@code{`} (back ticks)
 evaluates to the value of the variable named by the string_expression.
-This feature is refered to as name substitution.
+This feature is referred to as name substitution.
 
 @example
 @c example
   int foo(1)=42;
   string bar="foo";
   `bar+"(1)"`;
+@c example
+@end example
+
+Names are grouped into namespaces (= packages) @xref{Namespaces}.
+Defined variables cannot interfere with names in other
+packages. 
+
+@example
+@c example
+  package packa;
+  package packb;
+  int packa::i=4;
+  string packb::i="some other var";
+  listvar(all);
 @c example
 @end example
 
@@ -1655,7 +1673,7 @@ Links are the communication channels of @sc{Singular}, i.e., something
 overview of the usage of links and of the different link types is given.
 
 Even though library loading may be considered an I/O operation, too,
-this section does not treat loading of libraries (@pxref{LIB}).
+this section does not treat loading of libraries (@pxref{load}).
 
 @unnumberedsubsec Monitoring
 A special form of I/O is monitoring.  When monitoring is enabled,
@@ -1820,14 +1838,14 @@ data bases).
 
 @c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
-@node Procedures, Libraries, Input and output, General concepts
+@node Procedures, Namespaces, Input and output, General concepts
 @section Procedures
 @cindex Procedures
 
 Procedures contain sequences of @sc{Singular}.  They are used to extend
 the set of commands with user defined commands.  Procedures are defined
 by either typing them in on the command line or by loading them from a
-so-called library file with the @ref{LIB} command.  Procedures are
+so-called library file with the @ref{load} command.  Procedures are
 invoked like normal built-in commands, i.e., by typing their name
 followed by the list of arguments in parentheses. The invocation then
 executes the sequence of commands stored in the specified procedure. All
@@ -1875,7 +1893,7 @@ which is executed by @code{example proc_name;}.
 @* The help_text, the parameter_list, and the example section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined
-interactively, i.e., if it was not loaded from a file by a @ref{LIB} command.
+interactively, i.e., if it was not loaded from a file by a @ref{load} command.
 @* Specifying @code{static} in front of the proc-definition (in a library file)
 makes this procedure local to the library, i.e., accessible only for the other
 procedures in the same library, but not for the users. So there is no
@@ -1915,7 +1933,7 @@ Now, we load the library and execute the procedures defined there:
   example tab;             // show an example
   "*"+tab(3)+"*";          // use the procedure tab
   // the static procedure internal_tab is not accessible
-  "*"+internal_tab(3)+"*";
+  "*"+Sample::internal_tab(3)+"*";
   // show the help section for tab
   help tab;
 @c example
@@ -1947,10 +1965,6 @@ All variables are local to the procedure they are defined in.
 Locally defined variables cannot interfere with names in other
 procedures and are automatically deleted after leaving
 the procedure.
-Names can be made global by @code{export} (see @ref{export}).
-These global names are not deleted automatically.
-Ring dependent variables are stored together with the ring and deleted
-when the ring is deleted.
 
 Internally, local variables are stored using the nesting level. A variable
 is said to have nesting level 1, if it is local to a procedure that was
@@ -1961,13 +1975,29 @@ displays the nesting level, nesting level 0 is used for global objects
 with @code{keepring} (see @ref{keepring}). All variables living in that
 ring are moved together with that ring.
 
+To keep local variables after leaving the procedure, they have to be
+exported (i.e. made known) to some higher level by @code{exportto}
+(see @ref{exportto}). There are three possibilities to do so:
+@table @bullet
+@item accessible in the calling procedure
+i.e. down by one nesting level.
+@item accessible in the whole package
+i.e. in the current namespace
+@item accessible everywhere
+@end table
+
+In the last two cases names are not deleted automatically.
+Ring dependent variables  resp. global names in packages are stored
+together with the ring resp. package and deleted
+when the object they live in is deleted.
+
 @example
 @c example
 proc xxx
 {
   int k=4;        //defines a local variable k
   int result=k+2;
-  export result;  //defines the global variable "result".
+  exportto(Top,result);  //defines the global variable "result".
 }
 xxx();
 listvar(all);
@@ -2055,12 +2085,54 @@ See
 
 @c ----------------------------------------------------------------------
 @c ----------------------------------------------------------------------
-@node Libraries, Debugging tools, Procedures, General concepts
+@node Namespaces, Libraries, Procedures, General concepts
+@section Namespaces
+@cindex Namespaces
+@cindex package
+
+Namespaces are subsets of the set of all defined names. The set of all
+namespaces and all names not belonging to one of those subsets is called
+top-level package (@code{Top}).
+
+Each time a library @ref{Libraries} is loaded, the corresponding namespace is
+created, if it does not already exist.
+
+All defined namespaces are displayed by the @code{listvar(package)}
+command. Usually the list of all package is equivalent to the list of
+all loaded libraries, but a namespace can also be created by a user:@*
+@code{package} package_name@code{;} @ref{package}.
+
+@example
+@c example
+  option(loadLib);   // show loading of libraries;
+                     // standard.lib is loaded
+  listvar(package);
+                     // the names of the procedures of inout.lib
+  load("inout.lib"); // are now known to Singular
+  listvar(package);
+@c example
+@end example
+
+Namespaces are not supported in versions of @sc{Singular} prior to 1.3.
+For a @sc{Singular} binary supporting namespaces, the command
+@code{system("with","Namespaces");} should return 1.
+
+@example
+@c example
+  system("with","Namespaces");
+@c example
+@end example
+
+@c ----------------------------------------------------------------------
+@c ----------------------------------------------------------------------
+@node Libraries, Debugging tools, Namespaces, General concepts
 @section Libraries
 @cindex Libraries
-A library is a collection of @sc{Singular} procedures in a file.
-@*@sc{Singular} reads a library with the command @code{LIB}, general
-information about the library is displayed by the command
+
+A library @ref{Singular library} / dynamic module @ref{dynamic module}
+is a collection of @sc{Singular} resp. C /C++
+procedures in a file. @*@sc{Singular} reads a library with the command
+@code{load}, general information about the library is displayed by the command
 @code{help lib_name}. After loading the library, its procedures can be used
 like the built-in @sc{Singular} functions. To have the full functionality
 of a built-in function (like checking of the type of parameters, automatic
@@ -2069,21 +2141,25 @@ comply with the syntax rules described below.
 
 @menu
 * Loading of a library::
-* Format of a library::
-* Guidelines for writing a library::
+* Singular library::
+* dynamic module::
 @end menu
+
 @c ---------------------------------------
-@node Loading of a library, Format of a library,, Libraries
+@node Loading of a library, Singular library, Libraries, Libraries
 @cindex Loading of a library
-Libraries can only be loaded with the @code{LIB} command:
+
+Libraries can be loaded with the @code{load} command:
+
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file reference.doc,
 @c   chapter "LIB".
+@c   chapter "load".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
 @table @code
 @item @strong{Syntax:}
-@code{LIB} string_expression@code{;}
+@code{load(} string_expression [@code{,"with"}]@code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -2097,37 +2173,48 @@ which @sc{Singular} uses to locate its libraries, by starting up
 @sc{Singular} with the option @code{-v}, or by issuing the command
 @code{system("with");"}.
 
-Only the names of the procedures in the library are loaded, the body of
-the procedures is read during the first call of this procedure. This minimizes
-memory consumption by unused procedures.  When @sc{Singular} is started
-with the @code{-q} or @code{--quiet} option, no message about the
-loading of a library is displayed.  More exactly, option @code{-q} (and
-likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
-monitoring of library loading (@pxref{option}).
-
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
+@end table
 
-All loaded libraries are displayed by the @code{LIB} command without
-arguments:
-@item @strong{Syntax:}
-@code{LIB;}
-@item @strong{Type:}
-string
-@item @strong{Purpose:}
-shows all loaded libraries.
-@item @strong{Example:}
+All loaded libraries are displayed by the @code{listvar(package);}
+command:
 @example
 @c example
-  option(loadLib); // show loading of libraries;
-                   // standard.lib is loaded
-  LIB;
-                   // the names of the procedures of inout.lib
-  LIB "inout.lib"; // are now known to Singular
-  LIB;
+  option(loadLib);   // show loading of libraries;
+                     // standard.lib is loaded
+  listvar(package);
+                     // the names of the procedures of inout.lib
+  load("inout.lib"); // are now known to Singular
+  listvar(package);
 @c example
 @end example
-@end table
+
+Each time a library @ref{Singular library} / dynamic module @ref{dynamic
+module} is loaded, the corresponding namespace is created, if it does
+not already exist. 
+
+The name of this namespace corresponding to a Singular library is
+derived from the name of the library file. The first letter is
+capitalized and everything to right of the left-most dot is
+dropped. 
+For a dynamic module the packagename is hard-coded in the binary file.
+
+@sc{Singular} also supports autoloading of packages.
+To use this features, just specify the identifier by its full name:
+
+@example
+@c example
+  listvar(package);
+  Inout::version;     // full name of a variable in the package Inout
+  listvar(package);   // the package Inout has been autoloaded
+@c example
+@end example
+
+For autoloading the base of the filename is generated by converting the
+packagename to lowercase letters. The search is done in the standard
+@sc{Singular} search path, first looking for a file of this name, and then
+appending to the base @code{.lib}, @code{.so}, @code{.sl} (in this order).
 
 @c ref
 See
@@ -2139,8 +2226,27 @@ See
 @ref{string};
 @ref{system}.
 @c ref
+
 @c ---------------------------------------
-@node Format of a library, Guidelines for writing a library, Loading of a library, Libraries
+@node Singular library, dynamic module, Loading of a library, Libraries
+@subsection Singular library
+@cindex Singular library
+
+Only the names of the procedures in the library are loaded, the body of
+the procedures is read during the first call of this procedure. This minimizes
+memory consumption by unused procedures.  When @sc{Singular} is started
+with the @code{-q} or @code{--quiet} option, no message about the
+loading of a library is displayed.  More exactly, option @code{-q} (and
+likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
+monitoring of library loading (@pxref{option}).
+
+@c ---------------------------------------
+@menu
+* Format of a library::
+* Guidelines for writing a library::
+@end menu
+@c ---------------------------------------
+@node Format of a library, Guidelines for writing a library, Singular library, Singular library
 @subsection Format of a library
 @cindex Format of a library
 
@@ -2151,6 +2257,7 @@ i.e. the following keywords are allowed:
 @code{info},
 @code{version},
 @code{LIB},
+@code{require},
 @code{/* ... */},
 @code{//},
 @code{[static] proc}.
@@ -2207,7 +2314,7 @@ It is common practice to simply define the version string to be
 
 
 @c ---------------------------------------
-@node Guidelines for writing a library, , Format of a library, Libraries
+@node Guidelines for writing a library, , Format of a library, Singular library
 @subsection Guidelines for writing a library
 
 Although there are very few enforced rules on how libraries are written
@@ -2307,6 +2414,28 @@ example
 @end enumerate
 @c @end table
 
+@c ---------------------------------------
+@node dynamic module, , Singular library, Libraries
+@subsection dynamic module
+@cindex dynamic module
+
+Dynamic modules are similar to Libraries but they are not written 
+in @sc{Singular} but in C++ and compiled into a shared library.
+
+Within a dynamic module it is possible to access nearly all
+@sc{Singular} internal functions and data structures.
+
+Dynamic module are not supported on all platforms and in versions of
+@sc{Singular} prior to 1.3. 
+For a @sc{Singular} binary supporting dynamic modules, the command
+@code{system("with","DynamicLoading");} should return 1.
+
+@example
+@c example
+  system("with","DynamicLoading");
+@c example
+@end example
+
 @c ----------------------------------------------------------------------
 @node Debugging tools,  , Libraries, General concepts
 @section Debugging tools
@@ -2405,7 +2534,7 @@ See @ref{dbprint}; @ref{voice}.
 distribution (at the place where the @sc{Singular} executable program
 resides), which cannot be called inside of @sc{Singular}. It is a
 debugging tool for libraries which performs exactly the same checks as
-the @code{LIB} command in @sc{Singular}, but generates more output during
+the @code{load} command in @sc{Singular}, but generates more output during
 parsing.  @code{libparse} is useful if an error
 occurs while loading the library, but the whole block around the line
 specified seems to be correct. In these situations the real error might

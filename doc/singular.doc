@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.52 1999-03-15 09:32:39 Singular Exp $
+@comment $Id: singular.doc,v 1.53 1999-05-25 07:35:41 krueger Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -169,7 +169,7 @@ differences. Most notably:
 * No case or switch statement::
 * Usage of commas::
 * Usage of brackets::
-* Behaviour of continue::
+* Behavior of continue::
 * Return type of procedures::
 @end menu
 @c ---------------------------------------
@@ -309,7 +309,7 @@ for (i,j = 1,5; i<5 || j<10; i++, j++) @{@dots{}@}
 @end example
 
 @c ---------------------------------------
-@node Usage of brackets, Behaviour of continue, Usage of commas, Major differences to the C programming language
+@node Usage of brackets, Behavior of continue, Usage of commas, Major differences to the C programming language
 @heading Usage of brackets
 @cindex bracket
 
@@ -333,8 +333,8 @@ if (i == 1) @{ return (i); @}
 @end example
 
 @c ---------------------------------------
-@node  Behaviour of continue, Return type of procedures, Usage of brackets, Major differences to the C programming language
-@heading Behaviour of continue
+@node  Behavior of continue, Return type of procedures, Usage of brackets, Major differences to the C programming language
+@heading Behavior of continue
 @cindex continue
 @sc{Singular}'s @code{continue} construct is only valid inside the body
 of a @code{for} or @code{while} construct. It skips the rest of the
@@ -359,7 +359,7 @@ for (int i = 1 ; i<=10; i=i+1)
 @end example
 
 @c ---------------------------------------
-@node Return type of procedures,,Behaviour of continue, Major differences to the C programming language
+@node Return type of procedures,,Behavior of continue, Major differences to the C programming language
 
 Although the @sc{Singular} language is a strongly typed programming
 language, the type of the
@@ -502,11 +502,27 @@ In particular,
   size(_);
   intvec v = 2,6;
   s[v];      // the second and the sixth char
-  string st = s[v];  // stick toghter by an assignment
+  string st = s[v];  // stick together by an assignment
   st;
   size(_);
   v = 2,6,8;
   s[v];
+@c example
+@end example
+
+@item packages and indexed variables
+
+See example
+@example
+@c example
+package K;
+string K::varok;
+string K::donotwork(1);
+int K::i(1..3);
+// Toplevel does not contain i(1..3)
+listvar();
+// i(1..3) are stored in Package 'K'
+listvar(K);
 @c example
 @end example
 @end enumerate
@@ -590,7 +606,7 @@ described in the following subsections.
 * finvar_lib:: procedures to calculate invariant rings & more
 * primdec_lib:: procedures for primary decomposition
 * invar_lib:: procedures to compute the ring of invariants
-* latex_lib:: procedures for typeseting in TeX
+* latex_lib:: procedures for typesetting in TeX
 * hnoether_lib:: procedures for the Hamburger-Noether-development
 * classify_lib:: procedures for classifying hypersurface singularities
 * graphics_lib:: procedures to draw  with Mathematica

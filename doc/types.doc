@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.80 1999-05-06 16:53:35 Singular Exp $
+@comment $Id: types.doc,v 1.81 1999-05-25 07:35:42 krueger Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -45,6 +45,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * matrix::
 * module::
 * number::
+* package::
 * poly::
 * proc::
 * qring::
@@ -1127,7 +1128,7 @@ is an element of the intvec; the first element has index one.
   iv+iv;              // componentwise addition
   iv[size(iv)-1];     // last-1 entry
   intvec iw=2,3,4,0;
-  iv==iw;             // lexicographic comparision
+  iv==iw;             // lexicographic comparison
   iv < iw;
   iv != iw;
   iv[2];
@@ -1151,7 +1152,7 @@ the exponent vector of the leading monomial (see @ref{leadexp})
 @item nrows
 number of rows (see @ref{nrows})
 @item qhweight
-returns quasihgomogeneous weights (see @ref{qhweight})
+returns quasihomogeneous weights (see @ref{qhweight})
 @item size
 length of the intvec (see @ref{size})
 @item sortvec
@@ -1212,7 +1213,7 @@ none
 @item Example:
 @example
 @c Tim: Let's only do the read here once, doing it twice without closing
-@c it first migth be confusing
+@c it first might be confusing
 @c example
   link l=":w example.txt";
   int i=22;          // cf. ASCII links for explanation
@@ -1555,7 +1556,7 @@ portnumber are substituted by the values from the link
 specification. The client "listens" at the given port until the server
 application does a connect call. If @sc{Singular} is used as server
 application it has to be started with the command line option @code{-b}.
-Since launching is done using a remote sheel command, the host on which
+Since launching is done using a remote shell command, the host on which
 the application should run must have an entry in the @code{.rhosts}
 file. Even the local machine must have an entry if applications should
 be launched locally.
@@ -1603,7 +1604,7 @@ is data to read.
   write(l, quote(getdump(mp_ll))); // server reads dump
   dump(l);           //  dump is written to server (includes proc's)
   read(l);           // result of previous write-command is read
-  killall("not", "link"); killall("proc"); // kills eveything, but links
+  killall("not", "link"); killall("proc"); // kills everything, but links
 
   write(l, quote(dump(mp_ll)));    // server writes dump
   getdump(l);        // dump is read from server
@@ -2025,7 +2026,7 @@ is a map entry (the image of the corresponding variable)
   f;
   poly p=x+2y3;
   f(p);
-  map g=f(f);    // the map g defined as  f^2, the involtution of f
+  map g=f(f);    // the map g defined as  f^2, the involution of f
   g;
   g(p) == p;
 @c example
@@ -2522,7 +2523,7 @@ of leading terms (see @ref{vdim})
 @c @end example
 
 @c ---------------------------------------
-@node number, poly, module, Data types
+@node number, package, module, Data types
 @section number
 @cindex number
 
@@ -2648,8 +2649,8 @@ comparison
 
 @strong{Note:} quotient and exponentiation is only recognized as a
 number expression is if is already a number, see @ref{Miscellaneous
-oddities}.
-@* To acces the denominator or nominator of a rtional number see
+oddities}. 
+@* To access the denominator or nominator of a rational number see
 @ref{Tricks and pitfalls}.
 @* For the behavior of comparison operators in rings with
 basering different from real or the rational numbers, see @ref{boolean
@@ -2696,7 +2697,77 @@ string form of ring parameter (see @ref{parstr})
 @end table
 
 @c ---------------------------------------
-@node poly, proc, number, Data types
+@node package, poly, number, Data types
+@section package
+@cindex package
+@cindex ::
+
+Package are a collection of identifier. 
+The set of all identifier is called toplevel package: @code{Top}.
+Other reserved package names are @code{Current} with denotes the current
+package name in use, and @code{Up} which will be the current package
+when leave the current one.
+@ref{Libraries}, @ref{Namespaces}.
+
+@c * package expressions::
+@c * package operations::
+@menu
+* package declarations::
+* package related functions::
+@end menu
+@c ------------------------------
+@node package declarations, package related functions, package, package
+@subsection package declarations
+@cindex package declarations
+
+@table @strong
+@item Syntax:
+@code{package} name @code{;}
+
+@item Purpose:
+defines a package
+
+@item Example:
+@example
+@c example
+  package Test;
+  int Test::i;
+  listvar();
+  listvar(Test);
+  package dummy = Test;
+  kill Test;
+  listvar(dummy);
+@c example
+@end example
+@end table
+
+@c ------------------------------
+@node package related functions,  , package declarations, package
+@subsection package related functions
+@cindex package related functions
+
+@table @code
+@item exportto
+(see @ref{exportto})
+@item importfrom
+(see @ref{importfrom})
+@item listvar
+(see @ref{listvar})
+@item names
+(see @ref{names})
+@item load
+(see @ref{load})
+@item LIB
+(see @ref{LIB})
+@item system
+@code{system("nsstack")}
+@code{system("nspop")}
+@code{system("nspush",}package @code{)}
+(see @ref{system})
+@end table
+
+@c ---------------------------------------
+@node poly, proc, package, Data types
 @section poly
 @cindex poly
 
@@ -2898,7 +2969,7 @@ monomials with degree smaller k+1 (see @ref{jet})
 @item ord
 degree of the leading monomial (see @ref{ord})
 @item qhweight
-quasihomogenous weights (see @ref{qhweight})
+quasihomogeneous weights (see @ref{qhweight})
 @item reduce
 normal form with respect to a standard base (see @ref{reduce})
 @item rvar
@@ -3206,7 +3277,7 @@ optionally followed by a size parameter in parentheses.
 weight vector given as an intvec_expression in parentheses.
 
 @item
-@code{M} followed by an intmat_expresion in parantheses.
+@code{M} followed by an intmat_expression in parentheses.
 
 @item
 @code{c} or @code{C}.

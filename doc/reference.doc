@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.109 1999-05-19 13:13:10 Singular Exp $
+@comment $Id: reference.doc,v 1.110 1999-05-25 07:35:38 krueger Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -232,7 +232,7 @@ considerably speed up computations.
 (not all are used at the moment)
 @table @code
 @item isSB
-standard basis - set by all commands compution a standard basis like
+standard basis - set by all commands computing a standard basis like
 @code{groebner}, @code{std}, @code{stdhilb} etc.; used by @code{lift}, @code{dim},
 @code{degree}, @code{mult}, @code{hilb}, @code{vdim}, @code{kbase}
 @item isHomog
@@ -448,7 +448,7 @@ matrix
 @item @strong{Purpose:}
 the rows of the matrix represent the irreducible characteristic series of the
 ideal with respect to the current variable ordering.
-@*One applicatation is the decomposition of the zero set.
+@*One application is the decomposition of the zero set.
 @item @strong{Example:}
 @example
 @c example
@@ -639,7 +639,7 @@ none
 @item @strong{Purpose:}
 determines the monomials in f divisible by one of the ring variables of m
 (where f is the first argument and m the second argument) and the coefficients
-of these monomails as polynomials in the remaining variables.
+of these monomials as polynomials in the remaining variables.
 
 First case:  returns a 2 x n matrix M, n being the number
 of the determined monomials.
@@ -696,13 +696,13 @@ See
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
-developes each polynomial from the first argument, say @code{J},
+develops each polynomial from the first argument, say @code{J},
 (poly_expression/ .. /module_expression) as a univariate polynomial
 in the given ring_variable,
 say @code{z}, and returns the coefficients as a @code{k} x @code{d}
 matrix @code{M},
 where:
-@* @code{d-1} = maximum @code{z}-degree of all occuring polynomials
+@* @code{d-1} = maximum @code{z}-degree of all occurring polynomials
 @* @code{k}   = 1 in case J is a polynomial resp. number of generators
 in case J is an ideal;
 in case of a vector or a module this procedure is repeated for each
@@ -1221,7 +1221,7 @@ none
 @item @strong{Purpose:}
 evaluates (quoted) expressions. Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
-effect of exactly one quote). Used only when receiveing a quoted expression
+effect of exactly one quote). Used only when receiving a quoted expression
 from a MPfile link.
 with @code{quote} and @code{write} to
 prevent local evaluations  when writing to an MPtcp link.
@@ -1480,7 +1480,7 @@ a Groebner basis in the current ring. Implements the so-called FGLM
 @*The ideal must be zero dimensional and given as a reduced Groebner
 basis in the given ring.
 The result is a reduced Groebner basis.
-@*The only permissable difference between the given ring and the current ring
+@*The only permissible difference between the given ring and the current ring
 may be the monomial ordering and a permutation of the variables
 resp. parameters.
 @*The main application is to compute a lexicographical Groebner basis
@@ -1731,7 +1731,7 @@ See
 ideal or module
 @item @strong{Purpose:}
 returns a standard basis of an ideal or module with respect to the
-monomial ordering of the basering using a heuristically choosen method.
+monomial ordering of the basering using a heuristically chosen method.
 @item @strong{Example:}
 @example
 @c example
@@ -2147,7 +2147,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{intersect (} expression_list of ideal_expression @code{)}
-@*@code{intersect (} expresion_list of module_expression @code{)}
+@*@code{intersect (} expression_list of module_expression @code{)}
 @item @strong{Type:}
 ideal resp. module
 @item @strong{Purpose:}
@@ -2274,8 +2274,8 @@ See
 @item @strong{Syntax:}
 @code{kbase (} ideal_expression @code{)}
 @*@code{kbase (} module_expression @code{)}
-@*@code{kbase (} ideal_expression@code{,} int_expresion@code{)}
-@*@code{kbase (} module_expression@code{,} int_expresion@code{)}
+@*@code{kbase (} ideal_expression@code{,} int_expression@code{)}
+@*@code{kbase (} module_expression@code{,} int_expression@code{)}
 @item @strong{Type:}
 the same as the input type of the first argument
 @item @strong{Purpose:}
@@ -2530,7 +2530,7 @@ See
 @item @strong{Type:}
 the same as the input type
 @item @strong{Purpose:}
-returns the leading monomial of a polynomial or a vector as a polynomail
+returns the leading monomial of a polynomial or a vector as a polynomial 
 or vector whose coefficient is one.
 @item @strong{Example:}
 @example
@@ -2563,35 +2563,16 @@ See
 @code{LIB} string_expression@code{;}
 @item @strong{Type:}
 none
-@item @strong{Purpose:}
-reads a library of procedures from a file. If the given filename does
-not start with  @kbd{~}, @kbd{.} or @kbd{/}, the following directories are
-searched for (in that order): the current directory, the directories given in
-the environment variable @code{SINGULARPATH}, some default directories
-relative to the location of the @sc{Singular} executable program, and
-finally some default absolute directories. You can view the search path
-which @sc{Singular} uses to locate its libraries, by starting up
-@sc{Singular} with the option @code{-v}, or by issuing the command
-@code{system("with");"}.
-
-
-Only the names of the procedures in the library are loaded, the body of
-the procedures is read during the first call of this procedure. This minimizes
-memory consumption by unused procedures.  When @sc{Singular} is started
-with the @code{-q} or @code{--quiet} option, no message about the
-loading of a library is displayed.  More exactly, option @code{-q} (and
-likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
-monitoring of library loading (@pxref{option}).
-
-Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
-library @code{standard.lib} is automatically loaded at start-up time.
+@item @strong{Notes:}
+This command is obsoleted by
+@code{load(}string_expression@code{,"with");}
 
 @item @strong{Syntax:}
 @code{LIB;}
 @item @strong{Type:}
 string
 @item @strong{Purpose:}
-shows all loaded libraries.
+shows all loaded libraries written in Singular.
 @item @strong{Example:}
 @example
 @c example
@@ -2611,6 +2592,9 @@ See
 @ref{proc};
 @ref{standard_lib};
 @ref{string};
+@ref{load};
+@ref{Namespaces};
+@ref{package};
 @ref{system}.
 @c ref
 @c -------------------------------------------------
@@ -2669,7 +2653,7 @@ matrix from the given ideal resp. module to the standard basis.
 @*Hence, if @code{m} is the ideal or module, @code{sm} the standard
 basis returned by @code{liftstd}, and @code{T} the transformation matrix
 then @code{matrix(sm)=matrix(m)*T} and @code{sm=ideal(matrix(m)*T)}
-respectivly @code{sm=module(matrix(m)*T)}.
+respectively @code{sm=module(matrix(m)*T)}.
 @item @strong{Example:}
 @example
 @c example
@@ -2700,15 +2684,15 @@ See @ref{ideal}; @ref{ring}; @ref{option}; @ref{std}; @ref{matrix}.
 @cindex listvar
 @table @code
 @item @strong{Syntax:}
-@code{listvar();}
-@*@code{listvar(} type @code{);}
-@*@code{listvar(} ring_name @code{);}
-@*@code{listvar(} name @code{);}
-@*@code{listvar( all );}
+@code{listvar(}[package]@code{);}
+@*@code{listvar(}[package @code{,}] type @code{);}
+@*@code{listvar(}[package @code{,}] ring_name @code{);}
+@*@code{listvar(}[package @code{,}] name @code{);}
+@*@code{listvar(}[package @code{,}] @code{all );}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-lists all (user-)defined names:
+lists all (user-)defined names in the current namespace:
 @*@code{listvar()}: all currently visible names except procedures
 @*@code{listvar(}type@code{)}: all currently visible names of the given type
 @*@code{listvar(}ring_name@code{)}: all names which belong to the given ring
@@ -2716,6 +2700,9 @@ lists all (user-)defined names:
 @*@code{listvar(all)}: all names except procedures
 @*The current basering is marked with a @code{*}.  The nesting level of
 variables in procedures is shown in square brackets.
+
+package can be @code{Current}, @code{Up}, @code{Top} or any other
+identifier of type package.
 @item @strong{Example:}
 @example
 @c example
@@ -2732,6 +2719,7 @@ variables in procedures is shown in square brackets.
   listvar(r);
   listvar(t1);
   listvar(proc);
+  listvar(Standard, proc);
 @c example
 @end example
 @end table
@@ -2739,8 +2727,10 @@ variables in procedures is shown in square brackets.
 See
 @ref{Names in procedures};
 @ref{Names};
+@ref{Namespaces};
 @ref{defined};
 @ref{names};
+@ref{package};
 @ref{type}.
 @c ref
 @c ---------------------------------------
@@ -3183,7 +3173,7 @@ list
 @item @strong{Purpose:}
 returns a list whose first entry is a standard basis and whose second
 entry is a set of generators of size smaller or equal to the input set,
-which is a minimal subset of the standard basis for homogenous
+which is a minimal subset of the standard basis for homogeneous
 input  (w.r.t. any monomial ordering).
 @item @strong{Example:}
 @example
@@ -3280,20 +3270,31 @@ See
 @item @strong{Syntax:}
 @code{names ( )}
 @*@code{names (} ring_name @code{)}
+@*@code{names (} package_name @code{)}
 @item @strong{Type:}
 list of strings
 @item @strong{Purpose:}
 returns the names of all user defined variables which are ring independent
 (this includes the names of  procedures) or, in the second case, belong to
 the given ring.
+
+package_name can be @code{Current}, @code{Up}, @code{Top} or any other
+identifier of type package.
 @item @strong{Example:}
 @example
 @c example
   int i = 9;
   ring r;
   poly f;
+  package p;
+  int p::j;
+  ring p::q;
+  poly g;
+  setring r;
   names();
   names(r);
+  names(p);
+  names(p::q);
 @c example
 @end example
 @end table
@@ -3564,7 +3565,7 @@ none
 restores the state of all options from an intvec (produced by @code{option(get)}).
 @sp 1
 @item @strong{Values:}
-The following options are used to manipulate the behaviour of
+The following options are used to manipulate the behavior of
 computations:
 @table @asis
 @item @code{none}
@@ -3583,7 +3584,7 @@ avoids divisions of coefficients during standard basis computations
 special (additional) minimizing during computations (res,mres),
 @*assumes homogeneous case and degree-compatible ordering
 @item @code{morePairs}
-creates addditional (useless) pairs to speed up computation in some cases
+creates additional (useless) pairs to speed up computation in some cases
 @item @code{notRegularity}
 disables the regularity bound for res/mres (see @ref{regularity})
 @item @code{notSugar}
@@ -3616,7 +3617,7 @@ automatically computes suitable weights for the weighted ecart and the
 weighted sugar method
 @end table
 @*
-There are further options that control the behaviour of the computations,
+There are further options that control the behavior of the computations,
 but these options are not manipulated using the @code{option} command:
 @table @asis
 @item @code{multBound}
@@ -4150,7 +4151,7 @@ See @ref{ideal}; @ref{intvec}; @ref{weight}.
 none
 @item @strong{Purpose:}
 prevents expressions from evaluation. Used only in connections with write in
-MPfile links, prevents evalution of an expression before sending to an other
+MPfile links, prevents evaluation of an expression before sending to an other
 @sc{Singular}process.
 Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
@@ -4454,7 +4455,7 @@ See @ref{res}; @ref{mres}; @ref{sres}; @ref{minres}; @ref{option}.
 resolution
 @item @strong{Purpose:}
 computes a minimal free resolution of an ideal or module M
-using a heuristically choosen method.
+using a heuristically chosen method.
 More precisely, let
 @tex
 $A_1$=matrix(M),
@@ -4937,7 +4938,7 @@ for approximately@: @code{i} microseconds, and afterwards the result of another
 call to @code{status(l,s1,s2)} is returned. The latter is useful for
 ``polling'' the @code{read} status of @code{MPtcp} links such that busy
 loops are avoided (see @ref{Parallelization with MPtcp links} for an
-example).  Note that on some systems, the minimium time for a process to
+example).  Note that on some systems, the minimum time for a process to
 be put to sleep is one second.
 @*The following string expressions are allowed:
 @table @code
@@ -5662,6 +5663,10 @@ See
 * continue::
 * else::
 * export::
+* exportto::
+* importfrom::
+* load::
+* unload::
 * for::
 * if::
 * keepring::
@@ -5784,7 +5789,7 @@ else
 See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
 @c ref
 @c ---------------------------------------
-@node export, for, else, Control structures
+@node export, exportto, else, Control structures
 @subsection export
 @cindex export
 @table @code
@@ -5793,6 +5798,25 @@ See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
 @*@code{export} list_of_names @code{;}
 @item @strong{Purpose:}
 converts a local variable of a procedure to a global one.
+@item @strong{Note:} obsoleted by @code{exportto}.
+@end table
+
+@c ref
+See @ref{exportto}, @ref{keepring}
+@c ref
+@c ---------------------------------------
+@node exportto, importfrom, export, Control structures
+@subsection exportto
+@cindex exportto
+@table @code
+@item @strong{Syntax:}
+@code{exportto(} package_name @code{, }name @code{);}
+@*@code{exportto(} package_name @code{,} list_of_names @code{);}
+@item @strong{Purpose:}
+converts a local variable of a procedure to a global one.
+package_name can be @code{Current}, @code{Up}, @code{Top} or any other
+identifier of type package.
+
 @item @strong{Note:} Objects defined in a ring are not automatically exported
 when exporting the ring, (use @code{keepring} instead).
 @item @strong{Example:}
@@ -5800,10 +5824,10 @@ when exporting the ring, (use @code{keepring} instead).
 proc p1
 @{
   int i,j;
-  export i;
+  exportto(Current,i);
   intmat m;
   listvar();
-  export m;
+  exportto(Top,m);
 @}
 p1();
 @expansion{} // m                    [1]  intmat 1 x 1
@@ -5818,7 +5842,152 @@ listvar();
 See @ref{keepring}.
 @c ref
 @c ---------------------------------------
-@node for, if, export, Control structures
+@node importfrom, load, exportto, Control structures
+@subsection importfrom
+@cindex importfrom
+@table @code
+@item @strong{Syntax:}
+@code{importfrom(}@code{);}
+@end table
+
+@c ref
+See @ref{exportto}.
+@c ref
+@c ---------------------------------------
+@node load, unload, importfrom, Control structures
+@subsection load
+@cindex load
+@table @code
+@item @strong{Syntax:}
+@code{load(} string_expression @code{);}
+@*@code{load(}string_expression@code{,"with");}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+@c reads a library of procedures or functions from a file. If the given
+@c filename does not start with  @kbd{~}, @kbd{.} or @kbd{/}, the following
+@c directories are searched for (in that order): the current directory, the
+@c directories given in the environment variable @code{SINGULARPATH}, some
+@c default directories relative to the location of the @sc{Singular}
+@c executable program, and finally some default absolute directories. You
+@c can view the search path which @sc{Singular} uses to locate its
+@c libraries, by starting up @sc{Singular} with the option @code{-v}, or by
+@c issuing the command @code{system("with");"}.
+reads a library of procedures from a file. If the given filename does
+not start with @kbd{.} or @kbd{/}, the following directories are
+searched for (in that order): the current directory, the directories given in
+the environment variable @code{SINGULARPATH}, some default directories
+relative to the location of the @sc{Singular} executable program, and
+finally some default absolute directories. You can view the search path
+which @sc{Singular} uses to locate its libraries, by starting up
+@sc{Singular} with the option @code{-v}, or by issuing the command
+@code{system("with");"}.
+
+Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
+library @code{standard.lib} is automatically loaded at start-up time.
+@end table
+
+All loaded libraries are displayed by the @code{listvar(package);}
+command:
+@example
+@c example
+  option(loadLib);   // show loading of libraries;
+                     // standard.lib is loaded
+  listvar(package);
+                     // the names of the procedures of inout.lib
+  load("inout.lib"); // are now known to Singular
+  listvar(package);
+@c example
+@end example
+
+Each time a library @ref{Singular library} / dynamic module @ref{dynamic
+module} is loaded, the corresponding namespace is created, if it does
+not already exist. 
+
+The name of this namespace corresponding to a Singular library is
+derived from the name of the library file. The first letter is
+capitalized and everything to right of the left-most dot is
+dropped. 
+For a dynamic module the packagename is hard-coded in the binary file.
+
+@sc{Singular} also supports autoloading of packages.
+To use this features, just specify the identifier by its full name:
+
+@example
+@c example
+  listvar(package);
+  Inout::version;     // full name of a variable in the package Inout
+  listvar(package);   // the package Inout has been autoloaded
+@c example
+@end example
+
+For autoloading the base of the filename is generated by converting the
+packagename to lowercase letters. The search is done in the standard
+@sc{Singular} search path, first looking for a file of this name, and then
+appending to the base @code{.lib}, @code{.so}, @code{.sl} (in this order).
+
+
+An identifier of type @code{package} is created and all procedures are
+stored in that package. 
+Before loading the type of the file is checking. For an Singular
+library, the package is set as filename until the first '.' in the name
+with an uppercase first letter. If the library to load is an binary file
+with procedures written in an higher language (e.g. C, C++, ...) the
+package name s hard-code in the library.
+
+ 
+The second argument @code{"with"} will automatically export all none
+static procedures to the toplevel.
+
+
+Only the names of the procedures in the library are loaded, the body of
+the procedures is read during the first call of this procedure. This minimizes
+memory consumption by unused procedures.  When @sc{Singular} is started
+with the @code{-q} or @code{--quiet} option, no message about the
+loading of a library is displayed.  More exactly, option @code{-q} (and
+likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
+monitoring of library loading (@pxref{option}).
+
+Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
+library @code{standard.lib} is automatically loaded at start-up time.
+
+@example
+@c example
+  option(loadLib); // show loading of libraries; standard.lib is loaded
+                   // the names of the procedures of inout.lib
+  load("inout.lib"); // are now known to Singular
+  listvar();
+@c example
+@end example
+@end table
+@c ref
+See
+@ref{Command line options};
+@ref{Procedures and libraries};
+@ref{SINGULAR libraries};
+@ref{proc};
+@ref{standard_lib};
+@ref{package};
+@ref{string};
+@ref{system}.
+@ref{LIB};
+@ref{exportto};
+@ref{importfrom};
+@ref{Namespaces};
+@ref{dynamic module}
+@c ref
+
+@c ---------------------------------------
+@node unload, for, load, Control structures
+@subsection unload
+@cindex unload
+@table @code
+@item @strong{Syntax:}
+@code{unload(}@code{);}
+@end table
+
+@c ---------------------------------------
+@node for, if, unload, Control structures
 @subsection for
 @cindex for
 @table @code
@@ -6169,7 +6338,7 @@ defining the ring.
 The minimal polynomial has to be specified in the syntax of a polynomial.
 Its variable is not one of the ring variables, but the algebraic element
 which is being adjoined to the field.
-Algebraic extension are in @sc{singular} only possibel over the rational
+Algebraic extension are in @sc{singular} only possible over the rational
 numbers or Z/p, p prime number.
 @c @*@strong{Warning:}
 @*@sc{Singular} does not check whether the given
