@@ -1,6 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@c * wichmann: + Changed "Precedence" to "precedence".
-@comment $Id: singular.doc,v 1.10 1998-04-30 09:35:14 Singular Exp $
+@comment $Id: singular.doc,v 1.11 1998-04-30 09:35:57 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
