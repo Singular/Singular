@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.14 2001-02-15 13:54:08 levandov Exp $ */
+/* $Id: mod_raw.cc,v 1.15 2001-03-08 13:06:54 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -278,9 +278,9 @@ const char *dynl_error()
 #endif /* Sun3OS_4 */
 
 /*****************************************************************************
- * SECTION SunOS-4/5                                                         *
+ * SECTION SunOS-4                                                         *
  *****************************************************************************/
-#if defined(SunOS_4) || defined(SunOS_5)
+#if defined(SunOS_4)
 /* #    include <> */
 
 void *dynl_open(char *filename)
@@ -304,7 +304,43 @@ const char *dynl_error()
 
   return errmsg;
 }
-#endif /* SunOS_4 or SunOS_5 */
+#endif /* SunOS_4 */
+ 
+/*****************************************************************************
+ * SECTION SunOs-5
+ *****************************************************************************/
+#if defined(SunOS_5)
+#include <dlfcn.h>
+
+static void* kernel_handle = NULL;
+void *dynl_open(
+  char *filename    /* I: filename to load */
+  )
+{
+  return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
+}
+
+void *dynl_sym(void *handle, char *symbol)
+{
+  if (handle == DYNL_KERNEL_HANDLE)
+  {
+    if (kernel_handle == NULL)
+      kernel_handle = dynl_open(NULL);
+    handle = kernel_handle;
+  }
+  return(dlsym(handle, symbol));
+}
+
+int dynl_close (void *handle)
+{
+  return(dlclose (handle));
+}
+
+const char *dynl_error()
+{
+  return(dlerror());
+}
+#endif /* SunOS_5 */
 
 /*****************************************************************************
  * SECTION ix86-Win                                                          *
