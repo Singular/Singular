@@ -1,4 +1,4 @@
-// $Id: homolog.lib,v 1.2 1997-04-28 19:27:19 obachman Exp $
+// $Id: homolog.lib,v 1.3 1997-05-06 13:08:33 Singular Exp $
 //(BM/GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -432,11 +432,6 @@ NOTE:    In order to compute Ext^k(M,R) use the command Ext_R(k,syz(M));
 EXAMPLE: example Ext_R; shows examples
 {
 
-//Bemerkung (nur fuer internen Gebrauch): Ext_R(v,M[,"sres",p]); bewirkt folgendes:
-// Es wird der input mit sres statt mres aufgeloest. Bei den bisherigen Versuchen
-// ist dies insgesamt langsamer, da sres zu gro§e Objekte zurueckliefert.
-// Der Versuch, auch spaeter sres statt mres zu verwenden, ist ganz aufgegeben,
-// da mit sres spaeter syz und modulo viel laenger dauern!
 // In case M is known to be a SB, set attrib(M,"isSB",1); in order to
 // avoid  unnecessary SB computations
 
