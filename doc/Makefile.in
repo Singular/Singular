@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.81 2002-12-11 17:37:43 levandov Exp $
+### $Id: Makefile.in,v 1.82 2002-12-11 18:11:11 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -171,6 +171,9 @@ manual.tex:  ${MANUAL_FILES} doc2tex.pl ${SINGULAR} singular.doc $(STANDALONE_TE
 
 singular.tex: ${MANUAL_FILES} doc2tex.pl ${LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} singular.doc $(STANDALONE_TEXI_FILES)
 	${DOC2TEX} -o singular.tex singular.doc
+
+plural.tex: ${PLU_MANUAL_FILES} doc2tex.pl ${PLU_LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} plural.doc $(STANDALONE_TEXI_FILES)
+	${DOC2TEX} -o plural.tex plural.doc
 
 #pattern rule for tex files
 %_noEx.tex : %.doc doc2tex.pl ${SINGULAR}
