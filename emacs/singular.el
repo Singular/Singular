@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.55 2000-04-27 10:07:27 obachman Exp $
+;; $Id: singular.el,v 1.56 2000-04-27 12:12:27 wichmann Exp $
 
 ;;; Commentary:
 
@@ -4015,7 +4015,7 @@ Sets singular-*-last values."
     ;; The check is done on both slash and backslash, but we unconditionally
     ;; insert a slash. Hopefully that works on NT, too.
     (and directory
-	 (memq (aref directory (1- (length directory))) '(?/ ?\\))
+	 (not (memq (aref directory (1- (length directory))) '(?/ ?\\)))
 	 (setq directory (concat directory "/")))
     
     (if (not buffer)
