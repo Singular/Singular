@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.12 1999-11-15 16:22:50 pohl Exp $ */
+/* $Id: gnumpfl.cc,v 1.13 2000-06-21 07:35:41 pohl Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -74,7 +74,7 @@ number ngfInit (int i)
   gmp_float* n= NULL;
   if ( i != 0 )
   {
-    n= new gmp_float( i );
+    n= new gmp_float( (double)i );
   }
   return (number)n;
 }
