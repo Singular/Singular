@@ -153,6 +153,7 @@ cmdnames cmds[] =
   { "eliminate",   0, ELIMINATION_CMD,    CMD_23},
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
   { "eval",        0, EVAL ,              EVAL},
+  { "example",     0, EXAMPLE_CMD ,       EXAMPLE_CMD},
   { "execute",     0, EXECUTE_CMD ,       EXECUTE_CMD},
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
   { "factorize",   0, FAC_CMD ,           CMD_12},
@@ -300,11 +301,10 @@ cmdnames cmds[] =
 
 
 /* other reserved words:scanner.l */
-  { "pause",       0, -1 ,             0},
+  { "pause",       2, -1 ,             0},
   { "while",       0, -1 ,             0},
   { "for",         0, -1 ,             0},
   { "help",        0, -1 ,             0},
-  { "example",     0, -1 ,             0},
   { "newline",     0, -1 ,             0},
   { "exit",        0, -1 ,             0},
   { "quit",        0, -1 ,             0},
@@ -2183,7 +2183,7 @@ static BOOLEAN jjCOLS_IV(leftv res, leftv v)
 static BOOLEAN jjCONTENT(leftv res, leftv v)
 {
   poly p=(poly)v->CopyD();
-  pCleardenom(p);
+  if (p!=NULL) pCleardenom(p);
   res->data = (char *)p;
   return FALSE;
 }

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.9 1998-02-27 14:06:24 Singular Exp $ */
+/* $Id: scanner.l,v 1.10 1998-03-31 09:00:44 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -18,7 +18,6 @@
 int feReadLine(char* b, int l);
 #define ALLOC(a) Alloc((a))
 int yylineno  = 0;
-int noeof = 0;
 static int blocknest = 0;
 extern char * yytext;
 //extern unsigned char * yytext;
@@ -93,42 +92,36 @@ parname        #
 \/\/[^\n]*               { }
 ^#![^\n]*                { }
 pause[ \t\n]*[\.;]       { fePause(); }
-while                    { blocknest = 0; noeof = noeof_brace; BEGIN(brace);
+while                    { blocknest = 0; yy_noeof = noeof_brace; BEGIN(brace);
                            return WHILE_CMD;}
-for                      { blocknest = 0; noeof = noeof_brace; BEGIN(brace);
+for                      { blocknest = 0; yy_noeof = noeof_brace; BEGIN(brace);
                            return FOR_CMD;}
 
-("help"|"?")[ \t\n]*     { noeof = noeof_asstring;
+("help"|"?")[ \t\n]*     { yy_noeof = noeof_asstring;
                            BEGIN(asstring);
                            return HELP_CMD;
-                         }
-
-example[ \t\n]*          { noeof = noeof_asstring;
-                           IsCmd("example",lvalp->i);
-                           BEGIN(asstring);
-                           return EXAMPLE_CMD;
                          }
 
 proc[ \t]+{name}[ \t]*\( {
                            char c; char *cp;
                            lvalp->name = mstrdup(iiProcName((char *)yytext,c,cp));
-                           noeof = noeof_procname;
+                           yy_noeof = noeof_procname;
                            blocknest = 1;
                            BEGIN(brace);
                            return PROC_DEF;
                          }
 <asstring>[^;\n]+        {
                            lvalp->name = mstrdup((char *)yytext);
-                           noeof = 0; BEGIN(INITIAL);
+                           yy_noeof = 0; BEGIN(INITIAL);
                            return STRINGTOK;
                          }
 <asstring>;              {
-                           noeof = 0; BEGIN(INITIAL);
+                           yy_noeof = 0; BEGIN(INITIAL);
                            return *yytext;
                          }
 
 <brace>"\""              {
-                           noeof = noeof_string;
+                           yy_noeof = noeof_string;
                            BEGIN(bracestr);
                            yymore();
                          }
@@ -144,7 +137,7 @@ proc[ \t]+{name}[ \t]*\( {
 <brace>")"               {
                            if (--blocknest <= 0)
                            {
-                             noeof = 0;
+                             yy_noeof = 0;
                              BEGIN(INITIAL);
                              lvalp->name = dupyytext();
                              return STRINGTOK;
@@ -152,7 +145,7 @@ proc[ \t]+{name}[ \t]*\( {
                            yymore();
                          }
 <bracestr>"\""           {
-                           noeof = noeof_brace;
+                           yy_noeof = noeof_brace;
                            BEGIN(brace);
                            yymore();
                          }
@@ -169,18 +162,18 @@ proc[ \t]+{name}[ \t]*\( {
                            return STRINGTOK;
                          }
 <bracket>")"             {
-                           noeof = 0; BEGIN(INITIAL);
+                           yy_noeof = 0; BEGIN(INITIAL);
                            return ')';
                          }
 
 "{"                      {
-                           blocklineno = yylineno;
+                           yy_blocklineno = yylineno;
                            blocknest = 1;
-                           noeof = noeof_block;
+                           yy_noeof = noeof_block;
                            BEGIN(block);
                          }
 <block>"\""              {
-                           noeof = noeof_string;
+                           yy_noeof = noeof_string;
                            BEGIN(blockstr);
                            yymore();
                          }
@@ -188,7 +181,7 @@ proc[ \t]+{name}[ \t]*\( {
 <blockstr>"\\\\"         { yymore(); }
 <blockstr>"\\\""         { yymore(); }
 <blockstr>"\""           {
-                           noeof = noeof_block;
+                           yy_noeof = noeof_block;
                            BEGIN(block);
                            yymore();
                          }
@@ -198,20 +191,20 @@ proc[ \t]+{name}[ \t]*\( {
                            if (--blocknest <= 0)
                            {
                              BEGIN(INITIAL);
-                             noeof = 0;
+                             yy_noeof = 0;
                              lvalp->name = dupyytextNL();
                              return BLOCKTOK;
                            }
                            yymore();
                          }
-"\""                     { BEGIN(string); noeof = noeof_string;}
+"\""                     { BEGIN(string); yy_noeof = noeof_string;}
 ~                        { return SYS_BREAK; }
 <string>[^\"]            { yymore(); }
 <string>"\\\\"           { yymore(); }
 <string>"\\\""           { yymore(); }
 <string>"\""             {
                            char * s;
-                           noeof = 0;
+                           yy_noeof = 0;
                            BEGIN(INITIAL);
                            s = lvalp->name = dupyytext();
                            while (*yytext)

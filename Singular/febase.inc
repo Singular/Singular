@@ -1,15 +1,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.4 1998-03-02 15:22:48 Singular Exp $ */
+/* $Id: febase.inc,v 1.5 1998-03-31 09:00:42 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
+#include <ctype.h>
 
-extern int noeof;
-int blocklineno;     // to get the lineno of the block start from scanner
+int    yy_noeof=0;     // the scanner "state"
+int    yy_blocklineno; // to get the lineno of the block start from scanner
 Voice  *currentVoice = NULL;
-FILE *feFilePending; /*temp. storage for grammar.y */
+FILE   *feFilePending; /*temp. storage for grammar.y */
 
 static char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
                        "BT_file","BT_execute","BT_if","BT_else"};
@@ -152,10 +153,10 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
                      break;
     case BT_if:
     case BT_else:
-                     yylineno = blocklineno;
+                     yylineno = yy_blocklineno;
                      break;
     case BT_break:
-                     yylineno = blocklineno-1;
+                     yylineno = yy_blocklineno-1;
                      break;
     //case BT_file:
     default:
@@ -319,7 +320,7 @@ BOOLEAN exitVoice()
     }
     else
     {
-      currentVoice->prev->ifsw=BI_stdin;
+      currentVoice->prev->ifsw=0;
     }
     if ((currentVoice->sw == BI_file)
     && (currentVoice->files!=NULL))
@@ -431,15 +432,37 @@ static int fePrintEcho(char *anf)
 int feReadLine(char* b, int l)
 {
   // try to read from the buffer:
-  b[1] = '\0';
+  // b[1] = '\0';
   if ((currentVoice->buffer!=NULL)
   && (currentVoice->buffer[currentVoice->fptr]!='\0'))
   {
 NewBuff:
-    b[0]=currentVoice->buffer[currentVoice->fptr];
+    int i=0;
+    int startfptr=currentVoice->fptr;
+    l--;
+    loop
+    {
+      char c=
+      b[i]=currentVoice->buffer[currentVoice->fptr];
+      i++;
+      if ((c<' ')
+      || (c==';')
+      //|| (c=='(')
+      || (c==')')
+      || (c=='}')
+      || (c=='"')
+      || (c=='$')) break;
+      if (i>=l) break;
+      currentVoice->fptr++;
+      if(currentVoice->buffer[currentVoice->fptr]=='\0') break;
+    }
+    //b[0]=currentVoice->buffer[currentVoice->fptr];
+    b[i]='\0';
+    //b[1]='\0';
     if (currentVoice->sw==BI_buffer)
     {
-      if (currentVoice->fptr==0)
+      //if (currentVoice->fptr==0)
+      if (startfptr==0)
       {
         char *anf=currentVoice->buffer;
         char *ss=strchr(anf,'\n');
@@ -452,10 +475,13 @@ NewBuff:
         fePrintEcho(s);
         FreeL((ADDRESS)s);
       }
-      else if (/*(currentVoice->fptr>0) &&*/
-      (currentVoice->buffer[currentVoice->fptr-1]=='\n'))
+      //else if (/*(currentVoice->fptr>0) &&*/
+      //(currentVoice->buffer[currentVoice->fptr-1]=='\n'))
+      else if (/*(startfptr>0) &&*/
+      (currentVoice->buffer[startfptr-1]=='\n'))
       {
-        char *anf=currentVoice->buffer+currentVoice->fptr;
+        //char *anf=currentVoice->buffer+currentVoice->fptr;
+        char *anf=currentVoice->buffer+startfptr;
         char *ss=strchr(anf,'\n');
         int len;
         if (ss==NULL) len=strlen(anf);
@@ -469,7 +495,8 @@ NewBuff:
       }
     }
     currentVoice->fptr++;
-    return 1;
+    return i;
+    //return 1;
   }
   // no buffer there or e-o-buffer or eoln:
   if (currentVoice->sw!=BI_buffer)
@@ -513,7 +540,7 @@ NewRead:
   }
   /* else if (s==NULL) */
   {
-    switch(noeof)
+    switch(yy_noeof)
     {
       case 0:
         return 0;

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.25 1998-02-17 15:07:51 obachman Exp $
+// $Id: clapsing.cc,v 1.26 1998-03-31 09:00:43 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -25,6 +25,9 @@
 
 poly singclap_gcd ( poly f, poly g )
 {
+  if ((f==NULL)||(g==NULL))
+    return pOne();
+
   poly res=NULL;
   
   pCleardenom(f);

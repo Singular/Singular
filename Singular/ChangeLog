@@ -1,3 +1,11 @@
+Tue Mar 31 10:47:06 MET DST 1998 hannes
+        * feread.cc: fixed handling of empty history
+	* clapsing.cc: fixed gcd(0,..) and gcd(..,0) -> pOne()
+	* febase.h/febase.inc: renaming of scanner variables
+	  ( yy_blocklineno, yy_noeof)
+	* febase.inc: increased speed in feReadLine
+	* minor changes in scanner/grammar/iparith.cc (example)
+
 1998-03-27  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* longalg.cc (naDBTest): fixed lines for number tests

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.8 1998-03-16 14:56:30 obachman Exp $ */
+/* $Id: febase.h,v 1.9 1998-03-31 09:00:43 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -17,7 +17,8 @@ extern FILE*  feFilePending; /*temp. storage for grammar.y */
 extern char   fe_promptstr[];
 extern int    si_echo, printlevel;
 extern int    pagelength, colmax;
-extern int    blocklineno;
+extern int    yy_blocklineno;
+extern int    yy_noeof;
 extern char   prompt_char;
 #ifdef HAVE_TCL
 extern BOOLEAN tclmode;
