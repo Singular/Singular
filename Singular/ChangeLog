@@ -1,3 +1,12 @@
+Wed Jun 11 09:56:05 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* longrat.[cc,h], tesths.cc, Makefile.in, configure.in: 
+	  added support for smallgmp
+
+Tue Jun 10 17:25:28 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* sing_mp.cc: Got rid off warnings, when incomplete link specs
+
 Thu Jun  5 15:16:19 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* tests/mpcheck: added check for correct remote shell 

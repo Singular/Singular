@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.15 1997-05-21 13:05:16 obachman Exp $ */
+/* $Id: tesths.cc,v 1.16 1997-06-11 08:00:16 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -152,7 +152,9 @@ int main(          /* main entry to Singular */
 #ifdef HAVE_GMP
 #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
               printf("\tGMP(%d.%d),\n",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
-#else
+#elif defined (HAVE_SMALLGMP)
+              printf("\tSmallGMP(2.0.2.0),\n");
+#else                
               printf("\tGMP(1.3),\n");
 #endif              
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.8 1997-05-05 15:15:13 Singular Exp $ */
+/* $Id: longrat.cc,v 1.9 1997-06-11 08:00:09 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -96,11 +96,7 @@ BOOLEAN nlSetMap(int c, char ** par, int nop, number minpol)
 /*#define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))*/
 #define SR_TO_INT(SR)   (((long)SR) >> 2)
 
-#ifdef macintosh
-#define MP_SMALL 2
-#else
 #define MP_SMALL 1
-#endif
 //#define mpz_isNeg(A) (mpz_cmp_si(A,(long)0)<0)
 #ifdef HAVE_LIBGMP1
 #define mpz_isNeg(A) ((A)->size<0)
@@ -113,7 +109,11 @@ BOOLEAN nlSetMap(int c, char ** par, int nop, number minpol)
 #define mpz_limb_size(A) ((A)->_mp_size)
 #define mpz_limb_d(A) ((A)->_mp_d)
 #define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
+#ifdef HAVE_SMALLGMP
+#define MPZ_EXACTDIV(A,B,C) mpz_tdiv_q((A),(B),(C))
+#else
 #define MPZ_EXACTDIV(A,B,C) mpz_divexact((A),(B),(C))
+#endif
 #define nlGmpSimple(A)
 #endif
 

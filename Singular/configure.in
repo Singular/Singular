@@ -115,10 +115,6 @@ AC_ARG_WITH(
   [  --without-readline   do not use readline for fancy display])
 
 AC_ARG_WITH(
-  gmp,
-  [  --without-gmp        do not use gmp library])
-    
-AC_ARG_WITH(
   MP,
   [  --without-MP         do not use MP (disables MP links)])
 
@@ -139,8 +135,9 @@ AC_ARG_WITH(
 AC_ARG_WITH(
   libfac,
   [  --without-libfac     do not use libfac (disables primary decompositions)])
-
-dnl without info !
+AC_ARG_WITH(apint, \
+ [ --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
+                          where PACKAGE can be gmp, smallgmp, or buildin])
 
 dnl
 dnl CHECK VARIOUS LIBRARIES
@@ -194,113 +191,166 @@ fi
 
 NEED_LIBS=$LIBS
 
+AC_CHECK_LIB(gmp, mpq_init)
+AC_CHECK_LIB(smallgmp, mpz_init)
+AC_CHECK_LIB(MP, IMP_PutGmpInt)
+AC_CHECK_LIB(MPT, MPT_GetTree)
+AC_CHECK_LIB(singcf, atof)
+AC_CHECK_LIB(singfac, atof)
+
+AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h)
+
+if test "$ac_cv_lib_gmp_mpq_init" = yes && \
+ test "$ac_cv_header_gmp_h" = yes; then
+    ac_gmp_ok=yes
+fi
+
+if test "$ac_cv_lib_smallgmp_mpz_init" = yes && \
+ test "$ac_cv_header_smallgmp_h" = yes && \
+ test "$ac_cv_header_gmp_h" = yes; then
+    ac_smallgmp_ok=yes
+fi
+
+if test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
+ test "$ac_cv_lib_MPT_MPT_GetTree" && \
+ test "$ac_cv_header_MP_h" = yes && \
+ test "$ac_cv_header_MPT_h" = yes; then
+  ac_MP_ok=yes
+fi
+
+if test "$ac_cv_lib_singcf_atof" = yes && \
+ test "$ac_cv_header_factory_h" = yes; then
+  ac_factory_ok=yes
+fi
+
+if test "$ac_cv_lib_singfac_atof" = yes && \
+ test "$ac_cv_header_factor_h" = yes; then
+  ac_libfac_ok=yes
+fi
+
 dnl Check gmp
-if test "$with_builtingmp" = yes; then
-  AC_DEFINE(HAVE_BUILTIN_GMP)
-  AC_DEFINE(HAVE_GMP)
-  ac_gmp_ok=yes
-elif test "$with_gmp" != no; then
-  AC_CHECK_LIB(gmp, mpz_init)
-  AC_CHECK_HEADER(gmp.h)
-  if test "$ac_cv_lib_gmp_mpz_init" = yes && \
-   test "$ac_cv_header_gmp_h" = yes; then
-    AC_DEFINE(HAVE_GMP)
-    NEED_LIBS="-lgmp ${NEED_LIBS}"
-    ac_gmp_ok=yes
+if test "$with_apint" != buildin; then
+  if test "$with_apint" = gmp; then
+    if test "$ac_gmp_ok" = yes; then
+      ac_will_have_gmp=yes
+    elif test "$enable_gmp" = yes; then
+      ac_will_have_gmp=yes
+      AC_MSG_WARN(install gmp before making Singular)
+    else
+      AC_MSG_ERROR(Can not use with gmp: lib/header not found)
+    fi
+  elif test "$with_apint" = smallgmp; then
+    if test "$ac_smallgmp_ok" = yes; then
+      ac_will_have_gmp=yes
+      ac_will have_smallgmp=yes
+    elif test "$enable_gmp" = yes; then
+      ac_will_have_gmp=yes
+      ac_will_have_smallgmp=yes
+      AC_MSG_WARN(install smallgmp before making Singular)
+    else
+      AC_MSG_ERROR(Can not use with smallgmp: lib/header not found)
+    fi
+  elif test "$ac_gmp_ok" = yes; then
+    ac_will_have_gmp=yes
+  elif test "$ac_smallgmp_ok" = yes || test "$enable_smallgmp" = yes; then
+    ac_will_have_gmp=yes
+    ac_will_have_smallgmp=yes
   elif test "$enable_gmp" = yes; then
-    AC_DEFINE(HAVE_GMP)
-    NEED_LIBS="-lgmp ${NEED_LIBS}"
-    ac_gmp_ok=yes
-    AC_MSG_WARN(install gmp before making Singular or configure --without-gmp)
-  else
-    AC_MSG_WARN(building without gmp: using build-in rational arithmetic)
+    ac_will_have_gmp=yes
   fi
+fi
+AC_MSG_CHECKING(which apint package to use)
+if test "$ac_will_have_gmp" = yes; then
+  AC_DEFINE(HAVE_GMP)
+  if test "$ac_will_have_smallgmp" = yes; then
+    NEED_LIBS="-lsmallgmp ${NEED_LIBS}"
+    AC_MSG_RESULT(smallgmp)
+    AC_DEFINE(HAVE_SMALLGMP)
+  else
+    NEED_LIBS="-lgmp ${NEED_LIBS}"
+    AC_MSG_RESULT(gmp)
+  fi
+else
+  AC_MSG_RESULT(buildin)
 fi
 
 dnl Check MP
 WITH_MP=no
 if test "$with_MP" != no; then
-  if test "$ac_gmp_ok" != yes; then
-    AC_MSG_WARN(building without MP: can not use MP without gmp)
+  if test "$ac_will_have_gmp" != yes; then
+    AC_MSG_WARN(Need gmp to build with MP)
   else
-    if test "$ac_cv_lib_gmp_mpz_init"=yes; then
-      AC_CHECK_LIB(MP, IMP_PutGmpInt)
-      AC_CHECK_LIB(MPT, MPT_GetTree)
-    fi
-    AC_CHECK_HEADERS(MP.h MPT.h)
-    if test "$ac_cv_lib_MPT_MPT_GetTree" = yes && \
-     test "$ac_cv_header_MP_h" = yes && \
-     test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
-     test "$ac_cv_header_MPT_h" = yes; then
-      AC_DEFINE(HAVE_MPSR)
-      NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
+    if test "$ac_MP_ok" = yes; then
       WITH_MP=yes
     elif test "$enable_MP" = yes; then
-      AC_DEFINE(HAVE_MPSR)
-      NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
       WITH_MP=yes
-      AC_MSG_WARN(install MP before making Singular or configure --without-MP)
+      AC_MSG_WARN(Install MP before making Singular)
     else
-      AC_MSG_WARN(building without MP: disabling MP links)
+      AC_MSG_WARN(Need MP library to build with MP)
     fi
   fi
 fi
+AC_MSG_CHECKING(whether to use with MP)
 AC_SUBST(WITH_MP)
+if test "$WITH_MP" = yes; then
+  AC_DEFINE(HAVE_MPSR)
+  NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
 
 dnl Check factory
 WITH_FACTORY=no
 if test "$with_factory" != no; then
-  if test "$ac_gmp_ok" != yes; then
-    AC_MSG_WARN(building without factory: can not use factory without gmp) 
+  if test "$ac_will_have_gmp" != yes; then
+    AC_MSG_WARN(Need gmp to build with factory)
   else
-    if test "$ac_cv_lib_gmp_mpz_init"=yes;then
-      AC_CHECK_LIB(singcf,atof)
-    fi
-    AC_CHECK_HEADERS(factory.h)
-    if test "$ac_cv_lib_singcf_atof" = yes && \
-     test "$ac_cv_header_factory_h" = yes; then
-      AC_DEFINE(HAVE_FACTORY)
-      NEED_LIBS="-lsingcf ${NEED_LIBS}"
+    if test "$ac_factory_ok" = yes; then
       WITH_FACTORY=yes
     elif test "$enable_factory" = yes; then
-      NEED_LIBS="-lsingcf ${NEED_LIBS}"
-      AC_DEFINE(HAVE_FACTORY)
       WITH_FACTORY=yes
-      AC_MSG_WARN(install factory before making Singular or configure --without-factory)
+      AC_MSG_WARN(Install factory before making Singular)
     else
-      AC_MSG_WARN(building without factory: disabling poly factorization)
+      AC_MSG_WARN(Need factory library to build with factory)
     fi
   fi
 fi
+AC_MSG_CHECKING(whether to use with factory)
 AC_SUBST(WITH_FACTORY)
+if test "$WITH_FACTORY" = yes; then
+  AC_DEFINE(HAVE_FACTORY)
+  NEED_LIBS="-lsingcf ${NEED_LIBS}"
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
 
 dnl Check libfac
 WITH_LIBFAC=no
 if test "$with_libfac" != no; then
-  if test "${WITH_FACTORY}" != yes; then
-    AC_MSG_WARN(building without libfac: can not use libfac without factory) 
+  if test "$WITH_FACTORY" != yes; then
+    AC_MSG_WARN(Need factory to build with libfac)
   else
-    if test "$ac_cv_lib_singcf_atof" = yes; then
-      AC_CHECK_LIB(singfac,atof)
-    fi
-    AC_CHECK_HEADERS(factor.h)
-    if test "$ac_cv_lib_singfac_atof" = yes && \
-     test "$ac_cv_header_factor_h" = yes; then
-      NEED_LIBS="-lsingfac ${NEED_LIBS}"
-      AC_DEFINE(HAVE_LIBFAC_P)
+    if test "$ac_libfac_ok" = yes; then
       WITH_LIBFAC=yes
     elif test "$enable_libfac" = yes; then
-      NEED_LIBS="-lsingfac ${NEED_LIBS}"
-      AC_DEFINE(HAVE_LIBFAC_P)
       WITH_LIBFAC=yes
-      AC_MSG_WARN(install libfac before making Singular or configure --without-libfac)
+      AC_MSG_WARN(Install libfac before making Singular)
     else
-      AC_MSG_WARN(building without libfac: disabling char series)
+      AC_MSG_WARN(Need libfac library to build with libfac)
     fi
   fi
 fi
+AC_MSG_CHECKING(whether to use with libfac)
 AC_SUBST(WITH_LIBFAC)
-
+if test "$WITH_LIBFAC" = yes; then
+  AC_DEFINE(HAVE_LIBFAC_P)
+  NEED_LIBS="-lsingfac ${NEED_LIBS}"
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
 AC_SUBST(NEED_LIBS)
 
 dnl

@@ -247,7 +247,7 @@ clean:
 distclean: clean
 	-rm -rf depend *.inc ${DIST_NAME} ${testdir}/out stamp-h
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
-	cd ${docdir}; ${MAKE} clean
+	cd ${docdir}; ${MAKE} distclean
 
 maintainer-clean: distclean
 	@echo "This command is intended for maintainers to use;"

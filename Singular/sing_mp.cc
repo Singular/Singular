@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.13 1997-06-05 16:41:21 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.14 1997-06-11 08:00:15 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -172,13 +172,10 @@ static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
   char *host = IMP_GetCmdlineArg(n_argc, n_argv, "-MPhost");
 
 
-  if (port == NULL)
-    Warn("No port number specified for MPtcp:connect; Used %s", argv[5]);
-  else argv[5] = port;
+  if (port != NULL) argv[5] = port;
 
   if (host == NULL)
   {
-    Warn("No host specified for MPtcp:connect; Used localhost");
     argv[7] = mp_Env->thishost;
   }
   else
@@ -192,9 +189,7 @@ static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
   char *argv[] = {"-MPtransp", "TCP", "-MPmode", "listen", "-MPport", "1025"};
   char *port = IMP_GetCmdlineArg(n_argc, n_argv, "-MPport");
 
-  if (port == NULL)
-    Warn("No port number specified for MPtcp:listen; Used %s", argv[5]);
-  else argv[5] = port;
+  if (port != NULL) argv[5] = port;
 
   return MP_OpenLink(mp_Env, 6, argv);
 }
@@ -207,13 +202,10 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   char *host = IMP_GetCmdlineArg(n_argc, n_argv, "-MPhost");
 
 
-  if (appl == NULL)
-    Warn("No application specified for MPtcp:launch; Used %s", argv[7]);
-  else argv[7] = appl;
+  if (appl != NULL) argv[7] = appl;
 
   if (host == NULL)
   {
-    Warn("No host specified for MPtcp:launch; Used localhost");
     argv[5] = mp_Env->thishost;
   }
   else
