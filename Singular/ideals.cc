@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.99 2000-08-14 14:35:51 Singular Exp $ */
+/* $Id: ideals.cc,v 1.100 2000-08-17 16:45:57 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1491,18 +1491,7 @@ ideal idXXX (ideal  h1, int k)
   if (orig_ring != syz_ring)
   {
     idDelete(&s_h1);
-    for (j=0; j<IDELEMS(s_h3); j++)
-    {
-      if (s_h3->m[j] != NULL)
-      {
-        if (pMinComp(s_h3->m[j],syz_ring) > k)
-          pShift(&s_h3->m[j], -k);
-        else
-          pDelete(&s_h3->m[j]);
-      }
-    }
     idSkipZeroes(s_h3);
-    s_h3->rank -= k;
     rChangeCurrRing(orig_ring, TRUE);
     s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
     rKill(syz_ring);
@@ -1510,23 +1499,7 @@ ideal idXXX (ideal  h1, int k)
     return s_h3;
   }
 
-  ideal e = idInit(IDELEMS(s_h3), s_h3->rank);
-
-  for (j=0; j<IDELEMS(s_h3); j++)
-  {
-    if (s_h3->m[j] != NULL)
-    {
-      if (pMinComp(s_h3->m[j],syz_ring) <= k)
-      {
-        e->m[j] = s_h3->m[j];
-        pDelete(&pNext(s_h3->m[j]));
-        s_h3->m[j] = NULL;
-      }
-    }
-  }
-
   idSkipZeroes(s_h3);
-  idDelete(&e);
   idTest(s_h3);
   return s_h3;
 }
