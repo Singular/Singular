@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.16 2000-05-24 15:10:35 obachman Exp $
+;;; $Id: .emacs-singular,v 1.17 2004-12-09 16:27:54 Singular Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -206,14 +206,14 @@
   (setq-default current-menubar current-menubar))
 
 ;; add Singular button to toolbar for XEmacs
-(if (fboundp 'toolbar-add-item)
-    (toolbar-add-item 
-     (vector 
-      (toolbar-make-button-list (concat singular-emacs-home-directory 
-					"singular.xpm"))
-      'singular t "Start Singular")
-     (length (specifier-instance default-toolbar))))
-
+;(if (fboundp 'toolbar-add-item)
+;    (toolbar-add-item 
+;     (vector 
+;      (toolbar-make-button-list (concat singular-emacs-home-directory 
+;					"singular.xpm"))
+;      'singular t "Start Singular")
+;     (length (specifier-instance default-toolbar))))
+;
 ;;;
 ;;; - load singular.el and .emacs-general
 ;;;
