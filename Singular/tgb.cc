@@ -1760,10 +1760,10 @@ static poly redNF (poly h,kStrategy strat, int &len)
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
 {
   if (h==NULL) return NULL;
-  if (pNext(h)==NULL) return h;
   pTest(h);
   if (0 > sl)
     return h;
+  if (pNext(h)==NULL) return h;
 
   int j;
   poly res=h;
