@@ -3509,8 +3509,27 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
-  c->is_homog=TRUE;
+  
   c->r=currRing;
+  c->is_homog=TRUE;
+  {
+    int hz;
+    for(hz=0;hz<IDELEMS(I);hz++){
+      assume(I->m[hz]!=NULL);
+      int d=pTotaldegree(I->m[hz]);
+      poly t=I->m[hz]->next;
+      while(t)
+      {
+	if (d!=pTotaldegree(t,c->r))
+	{
+	  c->is_homog=FALSE;
+	  break;
+	}
+	t=t->next;
+      }
+      if(!(c->is_homog)) break;
+    }
+  }
   void* h;
   poly hp;
   int i,j;
