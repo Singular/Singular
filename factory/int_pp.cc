@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.cc,v 1.7 1997-12-12 09:21:16 schmidt Exp $ */
+/* $Id: int_pp.cc,v 1.8 1997-12-17 11:42:41 schmidt Exp $ */
 
 #include <config.h>
 
@@ -319,7 +319,7 @@ InternalPrimePower::comparesame ( InternalCF * c )
 int
 InternalPrimePower::comparecoeff ( InternalCF * )
 {
-    ASSERT1( 0, "not implemented for class %s", this->classname() );
+    ASSERT1( 0, "comparecoeff() not implemented for class %s", this->classname() );
     return 0;
 }
 //}}}
