@@ -2900,6 +2900,7 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
 #define jjCOUNT_R        (proc1)22
 #define jjDIM_R          (proc1)23
 #define jjMINRES_R       (proc1)24
+#define jjidTransp       (proc1)25
 
 extern struct sValCmd1 dArith1[];
 void jjInitTab1()
@@ -2938,6 +2939,7 @@ void jjInitTab1()
         case (int)jjCOUNT_R:      dArith1[i].p=(proc1)syLength; break;
         case (int)jjDIM_R:        dArith1[i].p=(proc1)syDim; break;
         case (int)jjMINRES_R:     dArith1[i].p=(proc1)syMinimize; break;
+        case (int)jjidTransp:     dArith1[i].p=(proc1)idTransp; break;
 #ifdef GENTABLE
         default: Werror("missing proc1-definition for %d",(int)dArith1[i].p);
 #endif
@@ -3065,6 +3067,11 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
   res->data=(char *)syMinimize((syStrategy)v->Data());
   return FALSE;
 }
+static BOOLEAN jjidTransp(leftv res, leftv v)
+{
+  res->data = (char *)idTransp((ideal)v->Data());
+  return FALSE;
+}
 #else
 #define XS(A)          -((short)A)
 #define jjstrlen       (proc1)strlen
@@ -3092,6 +3099,7 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
 #define jjCOUNT_R        (proc1)syLength
 #define jjDIM_R        (proc1)syDim
 #define jjMINRES_R     (proc1)syMinimize
+#define jjidTransp     (proc1)idTransp
 #endif
 #endif
 BOOLEAN jjnInt(leftv res, leftv u)
@@ -3323,6 +3331,7 @@ struct sValCmd1 dArith1[]=
 ,{jjTRANSP_IV,  TRANSPOSE_CMD,   INTMAT_CMD,     INTVEC_CMD }
 ,{jjTRANSP_IV,  TRANSPOSE_CMD,   INTMAT_CMD,     INTMAT_CMD }
 ,{jjmpTransp,   TRANSPOSE_CMD,   XS(MATRIX_CMD), MATRIX_CMD }
+,{jjidTransp,   TRANSPOSE_CMD,   XS(MODUL_CMD),  MODUL_CMD }
 ,{jjTYPEOF,     TYPEOF_CMD,      STRING_CMD,     ANY_TYPE }
 ,{jjDUMMY,      VECTOR_CMD,      VECTOR_CMD,     VECTOR_CMD }
 ,{jjVDIM,       VDIM_CMD,        INT_CMD,        IDEAL_CMD }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.34 1998-07-14 07:46:26 siebert Exp $ */
+/* $Id: ideals.cc,v 1.35 1998-08-27 12:32:41 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3169,5 +3169,28 @@ ideal idMinEmbedding(ideal arg)
   delete toKill;
   delete indexMap;
   return res;
+}
+
+/*2
+* transpose a module
+*/
+ideal idTransp(ideal a)
+{
+  int r = a->rank, c = IDELEMS(a);
+  ideal b =  idInit(r,c);
+
+  for (int i=c; i>0; i--)
+  {
+    poly p=a->m[i-1];
+    while(p!=NULL)
+    {
+      poly h=pHead(p);
+      int co=pGetComp(h)-1;
+      pSetComp(h,i);
+      b->m[co]=pAdd(b->m[co],h);
+      pIter(p);
+    }
+  }
+  return b;
 }
 
