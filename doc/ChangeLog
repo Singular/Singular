@@ -1,3 +1,27 @@
+Mon May 25 09:52:16 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* general.doc (The SINGULAR language): text on general language
+	  concepts added
+
+	* general.doc: typos fixed
+
+	* examples.doc (Finite fields Ext, Polar curves, Depth, Invariants
+	  of a finite group, Factorization, Puiseux pairs): minor fixes
+
+	* singular.doc (No rvalue of increments and assignments): minor
+	  fixes
+	  (Evaluation of logical expressions): duplicate piece of text
+	  marked
+	  (No case/switch statement): renamed to `No case or switch
+	  statement'.  All references changed.
+	  (Usage of brackets): minor fixes
+
+	* types.doc (boolean expressions): duplicate piece of text marked
+
+	* reference.doc (status): more bug fixes
+
+	* reference.doc (status): bug fix
+
 Wed May 20 11:00:12 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* sample.lib (info): version string added
