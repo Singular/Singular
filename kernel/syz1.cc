@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.2 2004-01-20 15:17:46 bricken Exp $ */
+/* $Id: syz1.cc,v 1.3 2004-02-12 13:51:38 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1983,9 +1983,9 @@ void syPrint(syStrategy syzstr)
   l = 0;
   loop
   {
-    Print("%d",(*syzstr->resolution)[l]);
     if ((l>=syzstr->resolution->length()) || ((*syzstr->resolution)[l]==0))
       break;
+    Print("%d",(*syzstr->resolution)[l]);
     syPrintEmptySpaces1(sl+5);
     l++;
   }
@@ -1993,8 +1993,10 @@ void syPrint(syStrategy syzstr)
   l = 0;
   loop
   {
-    Print(sn);
     if ((l>=syzstr->resolution->length()) || ((*syzstr->resolution)[l]==0))
+      break;
+    Print(sn);
+    if (((l+1)>=syzstr->resolution->length()) || ((*syzstr->resolution)[(l+1)]==0))
       break;
     syPrintEmptySpaces((*syzstr->resolution)[l]);
     PrintS(" <-- ");
