@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.15 2000-07-12 10:23:13 mschulze Exp $";
+version="$Id: mondromy.lib,v 1.16 2000-08-06 08:19:13 mschulze Exp $";
 info="
 LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -821,8 +821,8 @@ ASSUME:  The polynomial f in a series ring (local ordering) defines
 RETURN:  The procedure returns a residue matrix M of the meromorphic
          Gauss-Manin connection of the singularity defined by f
          or an empty matrix if the assumptions are not fulfilled.
-         If opt=0 (default), exp(2*pi*i*M) is a monodromy matrix of f,
-         else, only the characteristic polynomial of exp(2*pi*i*M) coincides
+         If opt=0 (default), exp(-2*pi*i*M) is a monodromy matrix of f,
+         else, only the characteristic polynomial of exp(-2*pi*i*M) coincides
          with the characteristic polynomial of the monodromy of f.
 DISPLAY: The procedure displays more comments for higher printlevel.
 EXAMPLE: example monodromy; shows an example.
