@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.5 1997-06-17 12:20:07 pohl Exp $ */
+/* $Id: hilb.cc,v 1.6 1997-11-25 15:29:21 pohl Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -18,6 +18,20 @@
 static int  **Qpol;
 static int  *Q0, *Ql;
 static int  hLength;
+
+static int hMinModulweight(intvec *modulweight)
+{
+  int i,j,k;
+
+  if(modulweight==NULL) return 0;
+  j=(*modulweight)[0];
+  for(i=modulweight->rows()-1;i!=0;i--)
+  {
+    k=(*modulweight)[i];
+    if(k<j) j=k;
+  }
+  return j;
+}
 
 static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
 {
@@ -180,12 +194,13 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
   intvec *work, *hseries1=NULL;
   short  mc;
   int  *p0;
-  int  i, j, k, l, ii;
+  int  i, j, k, l, ii, mw;
   hexist = hInit(S, Q, &hNexist);
   if (hNexist==0)
   {
-    hseries1=new intvec(1);
+    hseries1=new intvec(2);
     (*hseries1)[0]=1;
+    (*hseries1)[1]=0;
     return hseries1;
   }
   p0 = (int *)Alloc(sizeof(int));
@@ -201,9 +216,13 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
   hLength = k = j = 0;
   mc = hisModule;
   if (mc!=0)
+  {
+    mw = hMinModulweight(modulweight);
     hstc = (scfmon)Alloc(hNexist * sizeof(scmon));
+  }
   else
   {
+    mw = 0;
     hstc = hexist;
     hNstc = hNexist;
   }
@@ -213,7 +232,7 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
     {
       hComp(hexist, hNexist, mc, hstc, &hNstc);
       if (modulweight != NULL)
-        j = (*modulweight)[mc-1];
+        j = (*modulweight)[mc-1]-mw;
     }
     if (hNstc!=0)
     {
@@ -277,25 +296,29 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
   }
   if (k==0)
   {
-    hseries1=new intvec(1);
+    hseries1=new intvec(2);
     (*hseries1)[0]=0;
+    (*hseries1)[1]=0;
   }
   else
   {
-    l = k;
-    while ((*hseries1)[l-1]==0) l--;
-    if (l<k)
+    l = k+1;
+    while ((*hseries1)[l-2]==0) l--;
+    if (l!=k)
     {
       work = new intvec(l);
-      for (ii=0; ii<l; ii++)
+      for (ii=l-2; ii>=0; ii--)
         (*work)[ii] = (*hseries1)[ii];
       delete hseries1;
       hseries1 = work;
     }
+    (*hseries1)[l-1] = mw;
   }
   for (i = 0; i <= pVariables; i++)
+  {
     if (Ql[i]!=0)
       Free((ADDRESS)Qpol[i], Ql[i] * sizeof(int));
+  }
   Free((ADDRESS)Q0, (pVariables + 1) * sizeof(int));
   Free((ADDRESS)Ql, (pVariables + 1) * sizeof(int));
   Free((ADDRESS)Qpol, (pVariables + 1) * sizeof(int *));
@@ -327,76 +350,35 @@ intvec * hSecondSeries(intvec *hseries1)
   int i, j, k, s, t, l;
   if (hseries1 == NULL)
     return NULL;
-  hseries2 = new intvec(hseries1);
-  k = l = hseries2->length();
+  work = new intvec(hseries1);
+  k = l = work->length()-1;
   s = 0;
   for (i = k-1; i >= 0; i--)
-    s += (*hseries2)[i];
+    s += (*work)[i];
   loop
   {
     if ((s != 0) || (k == 1))
       break;
     s = 0;
-    t = (*hseries2)[k-1];
+    t = (*work)[k-1];
     k--;
     for (i = k-1; i >= 0; i--)
     {
-      j = (*hseries2)[i];
-      (*hseries2)[i] = -t;
+      j = (*work)[i];
+      (*work)[i] = -t;
       s += t;
       t += j;
     }
   }
-  if (k < l)
-  {
-    work = new intvec(k);
-    for (i = k-1; i >= 0; i--)
-      (*work)[i] = (*hseries2)[i];
-    delete hseries2;
-    hseries2 = work;
-  }
+  hseries2 = new intvec(k+1);
+  for (i = k-1; i >= 0; i--)
+    (*hseries2)[i] = (*work)[i];
+  (*hseries2)[k] = (*work)[l];
+  delete work;
   return hseries2;
 }
 
-intvec * hThirdSeries(intvec *hseries, int dim)
-{
-  intvec *hseries3;
-  int i, j, k,  t, l;
-  if (hseries == NULL)
-    return NULL;
-  l = hseries->length();
-  t = 0;
-  for (i = l-1; i >= 0; i--)
-    t += (*hseries)[i];
-  if (t == 0)
-  {
-    hseries3 = hSecondSeries(hseries);
-    k = hseries3->length();
-    dim = pVariables+k-l;
-    l = k;
-  }
-  else
-    hseries3 = new intvec(hseries);
-  k = dim;
-  loop
-  {
-    if ((k == 0) || (l == 1))
-      break;
-    t = (*hseries3)[l-1];
-    k--;
-    l--;
-    for (i = l-1; i >= 0; i--)
-    {
-      j = (*hseries3)[i];
-      (*hseries3)[i] = -t;
-      t += j;
-    }
-    (*hseries3)[l] = t;
-  }
-  return hseries3;
-}
-
-void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
+static void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
 {
   int m, i, j, k;
   *co = *mu = 0;
@@ -407,57 +389,28 @@ void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
   if (j > i)
     return;
   m = 0;
-  for(k=0; k<j; k++)
+  for(k=j-2; k>=0; k--)
     m += (*s2)[k];
   *mu = m;
   *co = i - j;
 }
 
-static void hPrintHilb(intvec *hseries, int dim)
+static void hPrintHilb(intvec *hseries)
 {
   int  i, j, l, k;
   if (hseries == NULL)
     return;
-  l = hseries->length();
-  k = l-dim;
-  for (i = 0; i < k; i++)
+  l = hseries->length()-1;
+  k = (*hseries)[l];
+  for (i = 0; i < l; i++)
   {
     j = (*hseries)[i];
     if (j != 0)
     {
-      Print("//  %8d t^%d\n", j, i);
-    }
-  }
-  if (k < 0)
-  {
-    k--;
-    for (i = 0; i < l; i++)
-    {
-      j = (*hseries)[i];
-      if (j != 0)
-      {
-        Print("//  %8d (1-t)^-%d\n", j, i-k);
-      }
-    }
-  }
-  else
-  {
-    i = k;
-    k--;
-    for (; i < l; i++)
-    {
-      j = (*hseries)[i];
-      if (j != 0)
-      {
-        Print("//  %8d (1-t)^-%d\n", j, i-k);
-      }
+      Print("//  %8d t^%d\n", j, i+k);
     }
   }
 }
-
-/*
-*caller
-*/
 
 static void hPrintDegree(int co, int mu)
 {
@@ -469,35 +422,27 @@ static void hPrintDegree(int co, int mu)
       co, pVariables - co, mu);
 }
 
+/*
+*caller
+*/
 void hLookSeries(ideal S, intvec *modulweight, ideal Q)
 {
   int co, mu, l;
   intvec *hseries2;
-//  intvec *hseries3;
   intvec *hseries1 = hFirstSeries(S, modulweight, Q);
-  hPrintHilb(hseries1, 0);
-  l = hseries1->length();
+  hPrintHilb(hseries1);
+  l = hseries1->length()-1;
   if (l > 1)
     hseries2 = hSecondSeries(hseries1);
   else
     hseries2 = hseries1;
   hDegreeSeries(hseries1, hseries2, &co, &mu);
-//  if (co > 0)
-//  {
-    PrintLn();
-    hPrintHilb(hseries2, 0);
-//  }
+  PrintLn();
+  hPrintHilb(hseries2);
   if ((l == 1) &&(mu == 0))
     hPrintDegree(pVariables+1, 0);
   else
     hPrintDegree(co, mu);
-//  if (co < pVariables)
-//  {
-//    hseries3 = hThirdSeries(hseries2,pVariables-co);
-//    PrintLn();
-//    hPrintHilb(hseries3, pVariables-co);
-//    delete hseries3;
-//  }
   if (l>1)
     delete hseries1;
   delete hseries2;

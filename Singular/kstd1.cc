@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.9 1997-08-05 13:04:03 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.10 1997-11-25 15:30:27 pohl Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1697,7 +1697,7 @@ intvec * kModW;
 
 int kModDeg(poly p)
 {
-  int o=pOldFDeg(p);
+  int o=pTotaldegree(p);//quasihomogen!!
   int i=pGetComp(p);
   if (i==0) return o;
   return o+(*kModW)[i-1];

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.4 1997-04-02 15:07:14 Singular Exp $ */
+/* $Id: khstd.cc,v 1.5 1997-11-25 15:29:57 pohl Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven std
 */
@@ -40,27 +40,30 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
 */
 {
   intvec *newhilb;
-  int deg;
+  int deg,l,ln,mw;
   pFDegProc degp=pFDeg;
-  if (pFDeg!=kModDeg) { degp=pTotaldegree;}
+  if (pFDeg!=kModDeg) { degp=pTotaldegree;}//quasihomogen!!
 
   eledeg--;
   if (eledeg == 0)
   {
+    l = hilb->length()-1;
+    mw = (*hilb)[l];
     newhilb = hHstdSeries(strat->Shdl,w,Q);
-    deg = degp(strat->P.p);
+    ln = newhilb->length()-1;
+    deg = degp(strat->P.p)-mw;
     loop // compare the series in degree deg, try to increase deg -----------
     {
-      if (deg < newhilb->length()) // deg may be out of range
+      if (deg < ln) // deg may be out of range
       {
-        if (deg < hilb->length())
+        if (deg < l)
           eledeg = (*newhilb)[deg]-(*hilb)[deg];
         else
           eledeg = (*newhilb)[deg];
       }
       else
       {
-        if (deg < hilb->length())
+        if (deg < l)
           eledeg = -(*hilb)[deg];
         else // we have newhilb = hilb
         {
@@ -82,7 +85,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
       deg++;
     } /* loop */
     delete newhilb;
-    while ((strat->Ll>=0) && (degp(strat->L[strat->Ll].p) < deg)) // the essential step
+    while ((strat->Ll>=0) && (degp(strat->L[strat->Ll].p)-mw < deg)) // the essential step
     {
       count++;
       if(TEST_OPT_PROT)
