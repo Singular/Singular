@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.1 2003-05-30 09:49:36 mschulze Exp $";
+version="$Id: gmspoly.lib,v 1.2 2003-06-02 10:13:53 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -133,11 +133,10 @@ static proc pidbasis(module M0,module M)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc vfilt(matrix B)
+static proc vfilt(matrix B,int d)
 {
   int mu=ncols(B);
 
-  int d=maxdegree(B);
   module V=freemodule(mu);
   module V0=var(1)^(d-1)*freemodule(mu);
   attrib(V0,"isSB",1);
@@ -317,12 +316,8 @@ static proc fsplit(ideal e0,ideal e,intvec s,module V,matrix B,module G)
   }
 
   matrix B0=jet(B,0);
-  int d=maxdegree(B);
-  B=chart(B);
-
   module U,U0,U1,U2;
   matrix N;
-  s=0;
   for(i=size(F);i>=1;i--)
   {
     N=B0-e0[i];
@@ -359,8 +354,9 @@ static proc fsplit(ideal e0,ideal e,intvec s,module V,matrix B,module G)
 static proc glift(ideal e,module V,matrix B,module G)
 {
   int mu=ncols(e);
-  int d=maxdegree(B);
 
+  int d=maxdegree(B);
+  B=chart(B);
   G=std(G);
   G=simplify(G,1);
 
@@ -377,8 +373,8 @@ static proc glift(ideal e,module V,matrix B,module G)
   matrix m[mu][1];
   matrix a[mu][1];
   matrix A[mu][mu];
-  module M=var(1)^(d-1)*G;
-  module N=B*matrix(G)+var(1)^(d+1)*diff(matrix(G),var(1));
+  module M=var(1)^d*G;
+  module N=var(1)*B*matrix(G)+var(1)^(d+2)*diff(matrix(G),var(1));
   while(size(N)>0)
   {
     j=mu;
@@ -409,7 +405,7 @@ static proc glift(ideal e,module V,matrix B,module G)
       G[j]=G[j]+c*var(1)^(k-1)*G[i];
       M[j]=M[j]+c*var(1)^(k-1)*M[i];
       g=c*var(1)^(k-1)*G[i];
-      N[j]=N[j]+(B*g+var(1)^(d+1)*diff(g,var(1)))[1];
+      N[j]=N[j]+(var(1)*B*g+var(1)^(d+2)*diff(g,var(1)))[1];
       m=M[i];
       a=transpose(A)[j];
       N=N-c*var(1)^(k-1)*m*transpose(a);
@@ -429,7 +425,7 @@ ASSUME:   f is cohomologically tame
 RETURN:
 @format
 ring R;     basering with new variable s
-  ideal b;   [matrix(b)] is a good basis of Brieskorn lattice
+  ideal b;   [matrix(b)] is a good basis of the Brieskorn lattice
   matrix A;  A(s)=A0+s*A1 and t[matrix(b)]=[matrix(b)](A(s)+s^2*(d/ds))
 @end format
 KEYWORDS: tame polynomial; Gauss-Manin system; Brieskorn lattice;
@@ -516,13 +512,15 @@ EXAMPLE:  example gbasis; shows examples
     }
 
     A=lift(B,reduce(coeffs(f*b+var(1)^2*diff(b,var(1)),M,product(X)),L1));
+int d=maxdegree(A);
     A=chart(A);
-
+d;
     setring(@S);
 
-    e0,s0,V,B=vfilt(imap(@XS,A));
+    e0,s0,V,B=vfilt(imap(@XS,A),d);
+e0;
     a,e0,e,s,V,B,G=spec(e0,s0,V,B);
-
+e;
     a0=leadcoef(a[1]);
     for(i=2;i<=mu;i++)
     {
