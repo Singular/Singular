@@ -10,7 +10,21 @@
 //       try to create spolys as formal sums
 
 #include "tgb.h"
-
+#if 0
+omBin lm_bin=NULL;
+static inline poly p_Init_Special(const ring r)
+{
+  return p_Init(r,lm_bin);
+}
+static inline poly pOne_Sepcial(const ring r=currRing)
+{
+  poly rc = p_Init_Special(r);
+  pSetCoeff0(rc,r->cf->nInit(i));
+  return rc;
+}
+// zum Initialiseren: in t_rep_gb plazieren:
+lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
+#endif
 #define LEN_VAR1
 #define degbound(p) assume(pTotaldegree(p)<10)
 //#define inDebug(p) assume((debug_Ideal==NULL)||(kNF(debug_Ideal,NULL,p,0,0)==0))
@@ -412,14 +426,16 @@ BOOLEAN good_has_t_rep(int i, int j,calc_dat* c){
   assume(i>=0);
     assume(j>=0);
   if (has_t_rep(i,j,c)) return TRUE;
-  poly lm=pOne();
+  //poly lm=pOne();
+  assume (c->tmp_lm!=NULL);
+  poly lm=c->tmp_lm;
 
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
   assume(lm!=NULL);
   //int deciding_deg= pTotaldegree(lm);
   int* i_con =make_connections(i,j,lm,c);
-  p_Delete(&lm,c->r);
+  //p_Delete(&lm,c->r);
 
 
   for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
@@ -2980,7 +2996,7 @@ static void go_on_F4 (calc_dat* c){
       }
       h.f=s->lcm_of_lm;
       h.m=pOne();
-      pSetm(h.m);
+      //pSetm(h.m); done by pOne
       chosen[chosen_index++]=h;
       //must carefull remember to destroy such a h;
       poly_list_node* next=c->to_destroy;
@@ -3512,6 +3528,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
 
   c->soon_free=NULL;
 
+  c->tmp_lm=pOne();
 
   c->normal_forms=0;
   c->current_degree=1;
@@ -3520,6 +3537,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
  
   c->apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*c->max_pairs);
   c->pair_top=-1;
+
   int n=I->idelems();
   if (TEST_OPT_PROT)
     for (i=0;i<n;i++){
@@ -3866,7 +3884,10 @@ static BOOLEAN no_pairs(calc_dat* c){
 
 
 static void super_clean_top_of_pair_list(calc_dat* c){
-  while((c->pair_top>=0) && (c->apairs[c->pair_top]->i>=0) && (good_has_t_rep(c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c))){
+  while((c->pair_top>=0)
+  && (c->apairs[c->pair_top]->i>=0)
+  && (good_has_t_rep(c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c)))
+  {
 
     free_sorted_pair_node(c->apairs[c->pair_top],c->r);
     c->pair_top--;
@@ -4779,10 +4800,8 @@ void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
    
     for(int i=1;i<=pVariables;i++)
       pSetExp(my,i,(pGetExp(high_to, i)-pGetExp(p,i)));
-
-   
-   
     pSetm(my);
+
     last_reduction_id=-1;
     multiplied=nInit(1);
     bucket=kBucketCreate(currRing);
