@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.13 1998-11-04 18:28:02 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.14 1998-11-05 17:52:52 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -149,10 +149,10 @@ static void * iiN2P(void *data)
     p=pOne();
     pSetCoeff(p,(number)data);
   }
-  else
-  {
-    nDelete((number *)&data);
-  }  
+  //else
+  //{
+  //  nDelete((number *)&data);
+  //}  
   return (void *)p;
 }
 
@@ -165,10 +165,10 @@ static void * iiN2Ma(void *data)
     pSetCoeff(p,(number)data);
     I->m[0]=p;
   }
-  else
-  {
-    nDelete((number *)&data);
-  }  
+  //else
+  //{
+  //  nDelete((number *)&data);
+  //}  
   return (void *)I;
 }
 

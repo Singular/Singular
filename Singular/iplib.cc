@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.39 1998-10-29 13:27:56 Singular Exp $ */
+/* $Id: iplib.cc,v 1.40 1998-11-05 17:52:53 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -354,21 +354,24 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 //  printf("iiMake_proc: %s %s cur=%s\n", pi->libname, plib, namespaceroot->name);
   idhdl ns = namespaceroot->get(plib,0, TRUE);
   if((ns==NULL) && (slpn!=NULL) && (slpn->packhdl != NULL)) ns=slpn->packhdl;
-  if(pi->is_static) {
-    if(ns==NULL) {
+  if(pi->is_static)
+  {
+    if(ns==NULL)
+    {
       Werror("'%s::%s()' 1 is a local procedure and cannot be accessed by an user.",
              plib, pi->procname);
       FreeL(plib);
       return NULL;
     }
-    if(strcmp(plib, namespaceroot->name)!= 0) {
+    if(strcmp(plib, namespaceroot->name)!= 0)
+    {
       Werror("'%s::%s()' 2 is a local procedure and cannot be accessed by an user.",
              plib, pi->procname);
       FreeL(plib);
       return NULL;
     }
   }
-  FreeL(plib);
+  FreeL((ADDRESS)plib);
   if(ns != NULL)
   {
     namespaceroot->push(IDPACKAGE(ns), IDID(ns), myynest+1);
@@ -384,9 +387,11 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   {
     Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
            pi->libname, pi->procname);
+    FreeL((ADDRESS)plib);
     return NULL;
   }
   namespaceroot->push(NULL, plib, myynest+1);
+  FreeL((ADDRESS)plib);
 #endif /* HAVE_NAMESPACES */
   iiCheckNest();
 #ifdef USE_IILOCALRING
@@ -507,9 +512,10 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 {
   BOOLEAN err;
   int old_echo=si_echo;
-  char *plib = iiConvName(pi->libname);
 #ifdef HAVE_NAMESPACES
+  char *plib = iiConvName(pi->libname);
   idhdl ns = namespaceroot->get(plib,0, TRUE);
+  FreeL((ADDRESS)plib);
 #endif /* HAVE_NAMESPACES */
 
   newBuffer( example, BT_example, pi, pi->data.s.example_lineno );
@@ -598,7 +604,8 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 #ifdef HAVE_NAMESPACES
   int token;
 
-  if(IsCmd(plib, &token)) {
+  if(IsCmd(plib, &token))
+  {
     Werror("'%s' is resered identifier\n", plib);
     return TRUE;
   }
@@ -644,7 +651,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
         } while (p!=NULL);
       }
       if (f)
-        FreeL(s);
+        FreeL((ADDRESS)s);
       else
       {
         sprintf( s, "%s,%s", IDSTRING(hl), newlib);
@@ -674,8 +681,11 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
                   &NSROOT(namespaceroot->root), TRUE );
     IDPACKAGE(pl)->language = LANG_SINGULAR;
     IDPACKAGE(pl)->libname=mstrdup(newlib);
-  } else {
-    if(IDTYP(pl)!=PACKAGE_CMD) {
+  }
+  else
+  {
+    if(IDTYP(pl)!=PACKAGE_CMD)
+    {
       Warn("not of typ package.");
       return TRUE;
     }
@@ -699,23 +709,30 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 # else /* HAVE_NAMESPACES */
   yylplex(newlib, libnamebuf, &lib_style);
 # endif /* HAVE_NAMESPACES */
-  if(yylp_errno) {
+  if(yylp_errno)
+  {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
          current_pos(0));
-    if(yylp_errno==YYLP_BAD_CHAR) {
+    if(yylp_errno==YYLP_BAD_CHAR)
+    {
       Werror(yylp_errlist[yylp_errno], *text_buffer, yylplineno);
-      FreeL(text_buffer);
-    } else
+      FreeL((ADDRESS)text_buffer);
+    }
+    else
       Werror(yylp_errlist[yylp_errno], yylplineno);
     Werror("Cannot load library,... aborting.");
     reinit_yylp();
     fclose( yylpin );
     FreeL((ADDRESS)newlib);
+# ifdef HAVE_NAMESPACES
+    FreeL((ADDRESS)plib);
+# endif /* HAVE_NAMESPACES */
     return TRUE;
   }
   if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s %s\n", libnamebuf,
                                    text_buffer);
-  if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB))) {
+  if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
+  {
     Warn( "library %s has old format. This format is still accepted,", newlib);
     Warn( "but for functionality you may wish to change to the new");
     Warn( "format. Please refer to the manual for further information.");
@@ -723,12 +740,14 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   reinit_yylp();
   fclose( yylpin );
 #ifdef HAVE_NAMESPACES
-   namespaceroot->pop();
+  namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
   {
     libstackv ls;
-    for(ls = library_stack; (ls != NULL) && (ls != ls_start); ) {
-      if(ls->to_be_done) {
+    for(ls = library_stack; (ls != NULL) && (ls != ls_start); )
+    {
+      if(ls->to_be_done)
+      {
         //Print("// Processing id %d LIB:%s\n", ls->cnt, ls->get());
         ls->to_be_done=FALSE;
 #ifdef HAVE_NAMESPACES
@@ -828,7 +847,8 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
              h = enterid( mstrdup(p), myynest, PROC_CMD, &idroot, FALSE );
 #endif /* HAVE_NAMESPACES */
             FreeL((ADDRESS)p);
-          } else
+          }
+          else
 #endif
 #ifdef HAVE_NAMESPACES
             h = enterid(mstrdup(proc), myynest, PROC_CMD,
@@ -924,10 +944,10 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
 
   if( strcmp(procname,"_init")==0)
   {
-    char *p = iiConvName(libname);
-    pi->procname = mstrdup(p);
-    FreeL((ADDRESS)p);
-  } else pi->procname = mstrdup(procname);
+    pi->procname = iiConvName(libname);
+  }
+  else
+    pi->procname = mstrdup(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
   pi->is_static = pstatic;
@@ -1002,7 +1022,7 @@ char *iiConvName(char *libname)
   r = mstrdup(p);
   *r = mytoupper(*r);
   // printf("iiConvName: '%s' '%s' => '%s'\n", libname, tmpname, r);
-  FreeL(tmpname);
+  FreeL((ADDRESS)tmpname);
 
   return(r);
 }
@@ -1035,7 +1055,7 @@ void piShowProcList()
         name = (char *)AllocL(strlen(IDID(h))+strlen(proc->procname)+4);
         sprintf(name, "%s -> %s", IDID(h), proc->procname);
         Print( "%d %-15s  %20s ", proc->is_static ? 1 : 0, proc->libname, name);
-        FreeL(name);
+        FreeL((ADDRESS)name);
       }
       else
         Print( "%d %-15s  %20s ", proc->is_static ? 1 : 0, proc->libname,
@@ -1097,7 +1117,7 @@ void libstack::push(char *p, char *libname)
 libstackv libstack::pop(char *p)
 {
   libstackv ls = this;
-  //FreeL(ls->libname);
+  //FreeL((ADDRESS)ls->libname);
   library_stack = ls->next;
   Free((ADDRESS)ls, sizeof(libstack));
   return(library_stack);

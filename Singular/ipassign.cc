@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.40 1998-10-29 13:27:54 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.41 1998-11-05 17:52:50 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -315,6 +315,8 @@ static BOOLEAN jiA_1x1MATRIX(leftv res, leftv a,Subexpr e)
   pDelete(&MATELEM(m,i,j));
   pNormalize(MATELEM(am,1,1));
   MATELEM(m,i,j)=MATELEM(am,1,1);
+  MATELEM(am,1,1)=NULL;
+  idDelete((ideal *)&am);
   return FALSE;
 }
 static BOOLEAN jiA_STRING(leftv res, leftv a, Subexpr e)
