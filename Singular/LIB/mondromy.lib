@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.12 1999-12-15 22:29:51 greuel Exp $";
+version="$Id: mondromy.lib,v 1.13 1999-12-16 17:06:23 mschulze Exp $";
 info="
 LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -23,7 +23,6 @@ PROCEDURES:
 LIB "ring.lib";
 LIB "sing.lib";
 LIB "jordan.lib";
-LIB "poly.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -162,28 +161,22 @@ EXAMPLE: example invunit; shows an example.
 {
   if(pcvmindeg(u)==0)
   {
-    poly c = jet(u,0);
-    poly h = 1-u/c;
-    int d = mindeg(h);
-    int m = n div d;
-    if( m*d < n )
-    {
-      m=m+1;
-    }
-    poly g = 1;
-    poly v = 1;
     dbprint(printlevel-voice+2,"//computing inverse...");
     int t=timer;
-    int ii;
-    for( ii=1; ii<=m; ii++ )
+    poly u0=jet(u,0);
+    u=jet(1-u/u0,n);
+    poly ui=u;
+    poly v=1+u;
+    int m=n div pcvmindeg(u);
+    int i;
+    for(i=1;i<m;i++)
     {
-      g = jet(g*h,n);
-      v = v+g;
+      ui=jet(ui*u,n);
+      v=v+ui;
     }
-    v = jet(v,n)/c;    
+    v=jet(v,n)/u0;    
     dbprint(printlevel-voice+2,"//...inverse computed ["+string(timer-t)+
       " secs, "+string((memory(1)+1023)/1024)+" K]");
-
     return(v);
   }
   else
@@ -195,7 +188,7 @@ EXAMPLE: example invunit; shows an example.
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),dp;
-  invunit(3+x+x2+y3,10);
+  invunit(2+x3+xy4,10);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
