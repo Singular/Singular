@@ -29,9 +29,9 @@ $MAX_LINK_DEPTH = 0;
 
 $TMP = ''; # should be overwritten by cmd-line argument
 
-$DEBUG = 0;
+$DEBUG = 1;
 
-$VERBOSE = 1;
+$VERBOSE = 5;
 
 #
 # Options controlling Extensions and Special Features 

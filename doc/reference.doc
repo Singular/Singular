@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.117 1999-07-02 09:29:26 obachman Exp $
+@comment $Id: reference.doc,v 1.118 1999-07-06 11:58:12 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -85,10 +85,12 @@ brackets are allowed.
 * filecmd::
 * find::
 * finduni::
+* fprintf::
 * freemodule::
 * gcd::
 * gen::
 * getdump::
+* groebner::
 * help::
 * highcorner::
 * hilb::
@@ -141,8 +143,10 @@ brackets are allowed.
 * preimage::
 * prime::
 * print::
+* printf::
 * prune::
 * qhweight::
+* quot::
 * quote::
 * quotient::
 * random::
@@ -157,9 +161,12 @@ brackets are allowed.
 * simplify::
 * size::
 * sortvec::
+* sprintf::
 * sres::
 * status::
 * std::
+* stdfglm::
+* stdhilb::
 * subst::
 * system::
 * syz::
@@ -1617,7 +1624,7 @@ See
 @ref{string}.
 @c ref
 @c ---------------------------------------
-@node finduni, freemodule, find, Functions
+@node finduni, fprintf, find, Functions
 @subsection finduni
 @cindex finduni
 @table @code
@@ -1650,8 +1657,15 @@ See
 @ref{option};
 @ref{vdim}.
 @c ref
+
 @c ---------------------------------------
-@node freemodule, gcd, finduni, Functions
+@node fprintf, freemodule, finduni, Functions
+@subsection fprintf
+@cindex fprintf
+@c lib standard.lib:fprintf lib_fun lib_ex
+
+@c ---------------------------------------
+@node freemodule, gcd, fprintf, Functions
 @subsection freemodule
 @cindex freemodule
 
@@ -1739,7 +1753,7 @@ returns the i-th free generator of a free module.
 See @ref{freemodule}; @ref{int}; @ref{vector}.
 @c ref
 @c ---------------------------------------
-@node getdump, help, gen, Functions
+@node getdump, groebner, gen, Functions
 @subsection getdump
 @cindex getdump
 @table @code
@@ -1774,10 +1788,12 @@ See
 @ref{dump};
 @ref{read}.
 @c ref
-@c @c ---------------------------------------
-@c @node groebner, help, getdump, Functions
-@c @subsection groebner
-@c @cindex groebner
+@c ---------------------------------------
+@node groebner, help, getdump, Functions
+@subsection groebner
+@cindex groebner
+@c lib standard.lib:groebner lib_fun lib_ex
+
 @c @table @code
 @c @item @strong{Syntax:}
 @c @code{groebner (} ideal_expression @code{)}
@@ -1803,7 +1819,7 @@ See
 @c @ref{stdhilb}.
 @c @c ref
 @c ---------------------------------------
-@node help, highcorner, getdump, Functions
+@node help, highcorner, groebner, Functions
 @subsection help
 @cindex help
 @table @code
@@ -3936,6 +3952,7 @@ returns the description of the monomial ordering of the ring.
 @iftex
 See @ref{ring}; @ref{varstr}; @ref{parstr}; @ref{charstr}.
 @end iftex
+
 @c ---------------------------------------
 @node par, pardeg, ordstr, Functions
 @subsection par
@@ -4124,7 +4141,7 @@ returns the largest prime less then 32004 smaller or equal to the argument;
 See @ref{int}; @ref{general_lib}.
 @end iftex
 @c ---------------------------------------
-@node print, prune, prime, Functions
+@node print, printf, prime, Functions
 @subsection print
 @cindex print
 @table @code
@@ -4210,7 +4227,13 @@ See
 @c ref
 
 @c ---------------------------------------
-@node prune, qhweight, print, Functions
+@node printf, prune, print, Functions
+@subsection printf
+@cindex printf
+@c lib standard.lib:printf lib_fun lib_ex
+
+@c ---------------------------------------
+@node prune, qhweight, printf, Functions
 @subsection prune
 @cindex prune
 @table @code
@@ -4238,7 +4261,7 @@ corresponding factor modules are isomorphic.
 See @ref{module}.
 @end iftex
 @c ---------------------------------------
-@node qhweight, quote, prune, Functions
+@node qhweight, quot, prune, Functions
 @subsection qhweight
 @cindex qhweight
 @table @code
@@ -4266,8 +4289,16 @@ If the input is not weighted homogeneous, an intvec of zeros is returned.
 @iftex
 See @ref{ideal}; @ref{intvec}; @ref{weight}.
 @end iftex
+
 @c ---------------------------------------
-@node quote, quotient, qhweight, Functions
+@node quot, quote, qhweight, Functions
+@subsection quot
+@cindex quot
+@c lib standard.lib:quot lib_fun lib_ex
+
+
+@c ---------------------------------------
+@node quote, quotient, quot, Functions
 @subsection quote
 @cindex quote
 @table @code
@@ -4921,7 +4952,7 @@ See @ref{string};
 @ref{ncols}; @ref{nrows}.
 @end iftex
 @c ---------------------------------------
-@node sortvec, sres, size, Functions
+@node sortvec, sprintf, size, Functions
 @subsection sortvec
 @cindex sortvec
 @table @code
@@ -4951,7 +4982,13 @@ general_lib::
 See @ref{general_lib}.
 @end iftex
 @c ---------------------------------------
-@node sres, status, sortvec, Functions
+@node sprintf, sres, sortvec, Functions
+@subsection sprintf
+@cindex sprintf
+@c lib standard.lib:sprintf lib_fun lib_ex
+
+@c ---------------------------------------
+@node sres, status, sprintf, Functions
 @subsection sres
 @cindex sres
 @table @code
@@ -5107,7 +5144,7 @@ returns (depending on the type of the link and its status)
 See @ref{link}; @ref{open}; @ref{read}; @ref{write}.
 @end iftex
 @c ---------------------------------------
-@node std, subst, status, Functions
+@node std, stdfglm, status, Functions
 @subsection std
 @cindex std
 @table @code
@@ -5189,8 +5226,21 @@ See
 @ref{stdfglm};
 @ref{stdhilb}.
 @c ref
+
 @c ---------------------------------------
-@node subst, system, std, Functions
+@node stdfglm, stdhilb, std, Functions
+@subsection stdfglm
+@cindex stdfglm
+@c lib standard.lib:stdfglm lib_fun lib_ex
+
+@c ---------------------------------------
+@node stdhilb, subst, stdfglm, Functions
+@subsection stdhilb
+@cindex stdhilb
+@c lib standard.lib:stdhilb lib_fun lib_ex
+
+@c ---------------------------------------
+@node subst, system, stdhilb, Functions
 @subsection subst
 @cindex subst
 @table @code

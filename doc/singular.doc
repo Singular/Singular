@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.57 1999-07-02 13:30:45 Singular Exp $
+@comment $Id: singular.doc,v 1.58 1999-07-06 11:58:16 obachman Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -641,13 +641,25 @@ set of built-in commands and is automatically loaded
 during the start of @sc{Singular}, unless @sc{Singular} is started up
 with the @code{--no-stdlib} command line option (see 
 @ref{Command line options}).
+
+@c lib standard.lib:LibInfo lib_fun lib_ex
  
-@c lib standard.lib lib_fun lib_ex
 @c ----------------------------------------------------------
 @node all_lib, general_lib, standard_lib, SINGULAR libraries
 @section all_lib
 @cindex all_lib
-@c lib  all.lib
+
+The library @code{all.lib} provides a convenient way to load all
+libraries of the @sc{Singular} distribution. 
+
+@strong{Example:}
+@example
+@c example
+option(loadLib);
+LIB "all.lib";
+@c example
+@end example
+
 @c ----------------------------------------------------------
 @node general_lib, matrix_lib, all_lib, SINGULAR libraries
 @section general_lib
@@ -717,7 +729,7 @@ with the @code{--no-stdlib} command line option (see
 @node invar_lib,latex_lib,primdec_lib, SINGULAR libraries
 @section invar_lib
 @cindex invar_lib
-@c lib invar.lib
+@c @c lib invar.lib
 @c ---------------------------------------------------------
 @node latex_lib,hnoether_lib,invar_lib, SINGULAR libraries
 @section latex_lib

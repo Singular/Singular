@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.89 1999-07-02 13:30:48 Singular Exp $
+@comment $Id: types.doc,v 1.90 1999-07-06 11:58:18 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3635,6 +3635,8 @@ name of the n-th ring parameter (see @ref{parstr})
 read a file (see @ref{read})
 @item size
 length of a string (see @ref{size})
+@item sprintf
+string formatting (see @ref{sprintf})
 @item typeof
 type of an object (see @ref{typeof})
 @item varstr
