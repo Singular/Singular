@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.30 2003-03-11 19:59:17 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.31 2003-03-12 14:12:54 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -21,6 +21,7 @@
 #include "kstd1.h"
 #include "sbuckets.h"
 #include "prCopy.h"
+#include "ipid.h"
 
 /* global nc_macros : */
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(int))
@@ -124,8 +125,8 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
     cP=p_GetCoeff(p,r);
     cOut=n_Mult(cP,cM,r);
     //p_Delete(&v,r);
-    v= nc_mm_Mult_nn(P,M,r);
-    v=p_Mult_nn(v,cOut,r);
+    v = nc_mm_Mult_nn(P,M,r);
+    v = p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
     /* hats off before buckets! */
     sBucket_Add_p(bu_out,v,pLength(v));
@@ -330,7 +331,7 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
     /* g is univariate monomial */
   {
     /*    if (ri->nc->type==nc_skew) -- postpone to TU */
-    out=nc_mm_Mult_uu(F,jG,G[jG],r);
+    out = nc_mm_Mult_uu(F,jG,G[jG],r);
     freeT(F,rN);
     freeT(G,rN);
     return(out);
@@ -1441,15 +1442,14 @@ ideal twostd(ideal I)
   int flag;
   poly p=NULL;
   poly q=NULL;
-  ideal Quot=currRing->qideal; /* could be NULL */
-  ideal J=kStd(I, Quot, testHomog,NULL,NULL,0,0,NULL);
+  ideal J=kStd(I, currQuotient, testHomog,NULL,NULL,0,0,NULL);
   idSkipZeroes(J);
   ideal K=NULL;
   poly varj=NULL;
   ideal Q=NULL;
   ideal id_tmp=NULL;
   int rN=currRing->N;
-
+  int iSize=0;
   loop
   {
     flag=0;
@@ -1460,13 +1460,13 @@ ideal twostd(ideal I)
       p=J->m[i];
       for (j=1;j<=rN;j++)
       {
-        varj=pOne();
+        varj = pOne();
         pSetExp(varj,j,1);
         pSetm(varj);
-        q=nc_p_Mult_mm(pCopy(p),varj,currRing);
+        q = nc_p_Mult_mm(pCopy(p),varj,currRing);
         pDelete(&varj);
-        q=nc_spGSpolyRed(p,q,NULL,currRing);
-        q = kNF(J,Quot,q,0,0);
+        q = nc_spGSpolyRed(p,q,NULL,currRing);
+        q = kNF(J,currQuotient,q,0,0);
         if (q!=NULL)
         {
           if (pIsConstant(q))
@@ -1494,13 +1494,15 @@ ideal twostd(ideal I)
       idDelete(&K);
       return(J);
     }
-    /*    id_tmp=idAdd(J,K); */
-    id_tmp=kStd(K, J, testHomog,NULL,NULL,0,0,NULL);
+    /* now we update GrBasis J with K */
+    iSize=IDELEMS(J);
+    id_tmp=idSimpleAdd(J,K);
     idDelete(&K);
-    idDelete(&J);
-    /*    J=kStd(id_tmp,Quot,testHomog,NULL,NULL,0,0,NULL); */
-    /*    idDelete(&id_tmp); */
-    J=id_tmp;
+    idDelete(&J); 
+    BITSET save_test=test;
+    test|=Sy_bit(OPT_SB_1);
+    J=kStd(id_tmp, currQuotient, testHomog,NULL,NULL,0,iSize);
+    test=save_test;
     idSkipZeroes(J);
   }
 }
