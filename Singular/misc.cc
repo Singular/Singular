@@ -6,16 +6,14 @@
 */
 
 #include <string.h>
-#include "mod2.h"
-#ifndef macintosh
 #include <unistd.h>
-#endif
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
 #include <limits.h>
 
+#include "mod2.h"
 #include "tok.h"
 #include "febase.h"
 #include "cntrlc.h"
@@ -747,10 +745,12 @@ char * versionString()
               StringAppend("-g,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
+#ifndef __MWERKS__
 #ifdef HAVE_INFO
               StringAppend("InfoFile   : %s\n", feGetInfoFile());
               StringAppend("InfoProgram: %s\n", feGetInfoProgram());
 #endif
               StringAppend("Singular   : %s\n",feGetExpandedExecutable());
               return StringAppend("SearchPath : %s", feGetSearchPath());
+#endif
 }
