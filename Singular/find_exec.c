@@ -62,14 +62,27 @@ find_executable (const char *name)
       /* If we can execute the named file, and it is normal, then return it. */
       if (! access (name, X_OK)) {
         struct stat stat_temp;
+        char buf[MAXPATHLEN];
+        int ret;
 
         if (stat (name, &stat_temp))
           return 0;
 
+#ifdef HAVE_READLINK
+        if( (ret=readlink(name, buf, MAXPATHLEN))>0) {
+          char *p = strrchr(name, '/');
+          if(p!=NULL) *(p+1)='\0';
+          buf[ret]='\0';
+          if(buf[0]=='/') return(find_executable(buf));
+          strcat(name, buf);
+          return(find_executable(name));
+        }
+#endif /* HAVE_READLINK */
 #ifndef STAT_MACROS_BROKEN
         if (! S_ISREG(stat_temp.st_mode))
           return 0;
 #endif
+        
         return copy_of (name);
       }
     }
@@ -174,10 +187,22 @@ find_executable (const char *name)
       /* If we can execute the named file, and it is normal, then return it. */
       if (! access (tbuf, X_OK)) {
         struct stat stat_temp;
+        char buf[MAXPATHLEN];
+        int ret;
 
         if (stat (tbuf, &stat_temp))
           continue;
 
+#ifdef HAVE_READLINK
+        if( (ret=readlink(tbuf, buf, MAXPATHLEN))>0) {
+          char *p = strrchr(tbuf, '/');
+          if(p!=NULL) *(p+1)='\0';
+          buf[ret]='\0';
+          if(buf[0]=='/') return(find_executable(buf));
+          strcat(tbuf, buf);
+          return(find_executable(tbuf));
+        }
+#endif /* HAVE_READLINK */
 #ifndef STAT_MACROS_BROKEN
         if (! S_ISREG(stat_temp.st_mode))
           continue;
