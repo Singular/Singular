@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.20 1998-04-27 12:34:16 obachman Exp $ */
+/* $Id: iplib.cc,v 1.21 1998-04-27 14:58:09 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -193,7 +193,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     s[procbuflen] = '\0';
     strcat(s+procbuflen-3, "\n;return();\n\n" );
     p=strchr(s,'{');
-    if (p!=NULL) *s=' ';
+    if (p!=NULL) *p=' ';
     return(s);
   }
   return NULL;
@@ -321,6 +321,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   if(pi->language == LANG_C)
   {
     leftv res = (leftv)Alloc0(sizeof(sleftv));
+    res->rtyp=NONE;
     err = (pi->data.o.function)(res, sl);
     iiRETURNEXPR[myynest+1].Copy(res);
     Free((ADDRESS)res, sizeof(sleftv));
@@ -430,6 +431,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   return err;
 }
 
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 {
   char buf[256];
@@ -694,6 +696,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   return FALSE;
 }
 
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
                                  int line, long pos, BOOLEAN pstatic)
 {
@@ -719,6 +722,32 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
   pi->data.s.body = NULL;
   return(pi);
 }
+
+#ifdef HAVE_DYNAMIC_LOADING
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+	       BOOLEAN(*func)(leftv res, leftv v))
+{
+  procinfov pi;
+  idhdl h;
+
+  h = enterid(mstrdup(procname),0, PROC_CMD, &idroot, FALSE);
+  if ( h!= NULL ) {
+    Print("register binary proc: %s::%s\n", libname, procname);
+    pi = IDPROC(h);
+    pi->libname = mstrdup(libname);
+    pi->procname = mstrdup(procname);
+    pi->language = LANG_C;
+    pi->ref = 1;
+    pi->is_static = pstatic;
+    pi->data.o.function = func;
+    return(1);
+  } else {
+    Print("iiAddCproc: failed.\n");
+  }
+  return(0);
+}
+#endif /* HAVE_DYNAMIC_LOADING */
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 char *iiConvName(char *libname)
