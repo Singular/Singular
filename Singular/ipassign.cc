@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.34 1998-07-22 07:48:55 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.35 1998-10-15 15:15:31 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -891,11 +891,10 @@ static BOOLEAN jiA_L_LIST(leftv l, leftv r)
     r=r->next;
     h->next=NULL;
     rt=h->Typ();
-    if (rt==0)
+    if ((rt==0)||(rt==DEF_CMD))
     {
-      L->Clean();
       Werror("`%s` is undefined",h->Name());
-      return TRUE;
+      goto err;
     }
     if ((rt==RING_CMD)||(rt==QRING_CMD))
     {
@@ -905,10 +904,14 @@ static BOOLEAN jiA_L_LIST(leftv l, leftv r)
     }
     else
       L->m[i].Copy(h);
+    if(errorreported)  goto err;
   }
   IDLIST((idhdl)l->data)->Clean();
   IDLIST((idhdl)l->data)=L;
   return FALSE;
+err:
+  L->Clean();
+  return TRUE;
 }
 static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
 {
@@ -1160,6 +1163,7 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   {
     b=iiAssign(ld,r);
     l->e->next=ld->e;
+    ld->e=NULL;
   }
   return b;
 }
@@ -1220,11 +1224,14 @@ BOOLEAN iiAssign(leftv l, leftv r)
          b=jiA_L_LIST(l,r);
        else
          b=jiAssign_list(l,r);
-       if((l->rtyp==IDHDL) && (l->data!=NULL))
+       if(!b)
        {
-         ipMoveId((idhdl)l->data);
-         l->attribute=IDATTR((idhdl)l->data);
-         l->flag=IDFLAG((idhdl)l->data);
+         if((l->rtyp==IDHDL) && (l->data!=NULL))
+         {
+           ipMoveId((idhdl)l->data);
+           l->attribute=IDATTR((idhdl)l->data);
+           l->flag=IDFLAG((idhdl)l->data);
+         }
        }
        r->CleanUp();
        Subexpr h;
