@@ -123,11 +123,52 @@ Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
 
 ##############################################################
 # distribution targets
+#
+S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
+SINGUNAME	= @SINGUNAME@
+localdir        = /usr/local
+install_prefix  = ${localdir}/Singular/${S_VERSION}
+
+BINDIST_DIRS    = Singular 
+SHAREDIST_DIRS  = Singular doc emacs
+TMPDIR		= ${TMP_DIR}/singdist
+
 LN_S		= @LN_S@
 MKINSTALLDIRS 	= ./mkinstalldirs
-TMPDIR		= ${TMP_DIR}/singdist
-SINGUNAME 	= @SINGUNAME@
-S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
+
+
+install-dist: install-bindist install-sharedist
+
+install-bindist:
+	for DIR in ${BINDIST_DIRS}; \
+	do \
+	  (cd $${DIR}; ${MAKE} install-bindist install_prefix=${install_prefix});\
+	done
+
+install-sharedist: ${SINGULAR}
+	for DIR in ${SHAREDIST_DIRS}; \
+	do \
+	  (cd $${DIR}; ${MAKE} install-sharedist install_prefix=${install_prefix}); \
+	done
+
+install-local-dist: install-dist
+	${MKINSTALLDIRS} ${localdir}/bin
+	${LN_S} ${install_prefix}/${SINGUNAME}/Singular ${localdir}/bin/Singular-${S_VERSION}
+
+sharedist:
+	if test -e ${TMPDIR}; then rm -f ${TMPDIR}; fi
+	${MAKE} install-sharedist localdir=${TMPDIR}
+	cd ${TMPDIR}; tar czf Singular-${S_VERSION}-share.tgz
+	mv ${TMPDIR}/Singular-${S_VERSION}-share.tgz .
+	rm -rf ${TMPDIR}
+
+bindist: 
+	if test -e ${TMPDIR}; then rm -r ${TMPDIR}; fi
+	${MAKE} install-bindist localdir=${TMPDIR}
+	cd ${TMPDIR}; tar czf Singular-${S_VERSION}-${SINGUNAME}.tgz
+	mv ${TMPDIR}/Singular-${S_VERSION}-${SINGUNAME}.tgz .
+	rm -rf ${TMPDIR}
+
 BINDIR_NAME	= Singular/${S_VERSION}/${SINGUNAME}
 LIBDIR_NAME 	= Singular/${S_VERSION}/LIB
 GFTABLESDIR_NAME= Singular/${S_VERSION}/LIB/gftables
@@ -144,7 +185,7 @@ test_t:
 	echo ${S_VERSION}
 
 .PHONY: sharedist bindist static-bindist infodist win-sharedist
-sharedist: ${SINGULAR}
+_sharedist: ${SINGULAR}
 	cd doc; ${MAKE} all ps
 	cd emacs; ${MAKE} all
 	rm -rf ${TMPDIR}/
@@ -172,7 +213,7 @@ sharedist: ${SINGULAR}
 	rm -rf ${TMPDIR}/
 
 
-bindist: ${SINGULAR}
+_bindist: ${SINGULAR}
 	cd Singular; ${MAKE} Singular-$@ libparse
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}

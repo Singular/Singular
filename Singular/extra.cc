@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.120 1999-11-24 18:13:20 Singular Exp $ */
+/* $Id: extra.cc,v 1.121 1999-11-24 18:50:36 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -434,6 +434,46 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
+/*==================== pcv ==================================*/
+#ifndef HAVE_DYNAMIC_LOADING
+#ifdef HAVE_PCV
+    if(strcmp(sys_cmd,"pcvLAddL")==0)
+    {
+      return pcvLAddL(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"pcvPMulL")==0)
+    {
+      return pcvPMulL(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"pcvMinDeg")==0)
+    {
+      return pcvMinDeg(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"pcvP2CV")==0)
+    {
+      return pcvP2CV(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"pcvCV2P")==0)
+    {
+      return pcvCV2P(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"pcvDim")==0)
+    {
+      return pcvDim(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"pcvBasis")==0)
+    {
+      return pcvBasis(res,h);
+    }
+    else
+#endif
+#endif /* HAVE_DYNAMIC_LOADING */
 /*==================== contributors =============================*/
    if(strcmp(sys_cmd,"contributors") == 0)
    {
@@ -554,47 +594,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-/*==================== pcv ==================================*/
-#ifndef HAVE_DYNAMIC_LOADING
-#ifdef HAVE_PCV
-    if(strcmp(sys_cmd,"pcvLAddL")==0)
-    {
-      return pcvLAddL(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"pcvPMulL")==0)
-    {
-      return pcvPMulL(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"pcvMinDeg")==0)
-    {
-      return pcvMinDeg(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"pcvP2CV")==0)
-    {
-      return pcvP2CV(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"pcvCV2P")==0)
-    {
-      return pcvCV2P(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"pcvDim")==0)
-    {
-      return pcvDim(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"pcvBasis")==0)
-    {
-      return pcvBasis(res,h);
-    }
-    else
-#endif
-#endif /* HAVE_DYNAMIC_LOADING */
-
 /*==================== mtrack ==================================*/
     if(strcmp(sys_cmd,"mtrack")==0)
     {

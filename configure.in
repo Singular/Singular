@@ -66,6 +66,7 @@ dnl Those are needed to check for libs and headers, later on
 dnl
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_INSTALL
 AC_AIX
 
 AC_CHECK_PROGS(PERL, perl5 perl)

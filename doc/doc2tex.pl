@@ -1,12 +1,12 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.18 1999-10-25 12:45:27 obachman Exp $
+# $Id: doc2tex.pl,v 1.19 1999-11-24 18:50:40 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
 #  doc2tex: utility to generate the Singular manual
 #
 ####
-# @c example [error]
+# @c example [error] [no_comp]
 #    -> the text till the next @c example is feed into Singular,
 #       the text is then substituted by
 #       @c computed example $ex_prefix $doc_file:$line
@@ -19,7 +19,9 @@
 #       substituted @,{ and } by @@, @{ resp. @}
 #       wrap around output lines  longer than $ex_length = 73;
 #       Processing is aborted if error occures in Singular run, 
-#       unless 'error' is specified 
+#       unless 'error' is specified
+#       if no_comp is given, then computation is not run
+#       
 #
 ####
 # @c include file
@@ -185,7 +187,7 @@ print "==>$tex_file)\n" if ($verbose);
 
 
 ######################################################################
-# @c example [error]
+# @c example [error] [no_comp]
 #    -> the text till the next @c example is feed into Singular,
 #       the text is then substituted by
 #       @c computed example $ex_prefix $doc_file:$line
@@ -198,10 +200,11 @@ print "==>$tex_file)\n" if ($verbose);
 #       substituted @,{ and } by @@, @{ resp. @}
 #       wrap around output lines  longer than $ex_length = 73;
 #       Processing is aborted if error occures in Singular run, 
-#       unless 'error' is specified 
+#       unless 'error' is specified
+#       If [no_comp] is given, actual computation is not run
 sub HandleExample
 {
-  my($inc_file, $ex_file, $lline, $thisexample, $error_ok, $cache);
+  my($inc_file, $ex_file, $lline, $thisexample, $error_ok, $cache, $no_comp);
   
   $lline = $line;
   $section = 'unknown' unless $section;
@@ -228,13 +231,15 @@ sub HandleExample
 
   $thisexample = '';
   $error_ok = 1 if /error/;
+  $no_comp = 1 if /no_comp/;
+
   # print content in example file till next @c example 
   while (<DOC>)
   {
     $line++;
     last if (/^\@c\s*example\s*$/);
     s/^\s*//; # remove preceeding white spaces
-    if ($no_ex)
+    if ($no_ex || $no_comp)
     {
       &protect_texi;
       print TEX $_;
@@ -254,7 +259,7 @@ sub HandleExample
     unless (/^\@c\s*example\s*$/);
 
   # done, if no examples
-  return if ($no_ex);
+  return if ($no_ex || $no_comp);
 
   # check whether it can be reused
   if ($reuse && $cache)

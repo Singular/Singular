@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.161 1999-11-24 17:09:39 Singular Exp $
+@comment $Id: reference.doc,v 1.162 1999-11-24 18:50:41 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1614,6 +1614,8 @@ directly.
 @end table
 @c ref
 See
+@ref{stdfglm};
+@ref{fglmquot};
 @ref{ring};
 @ref{qring};
 @ref{std};

@@ -115,7 +115,14 @@ else
 # might cause directories to be created, which would be especially bad 
 # if $src (and thus $dsttmp) contains '*'.
 
-	if [ -f $src -o -d $src ]
+# obachman 6/15/98
+# Here is an ugly fix for a bug in cygwin
+# '[ test -f $src ]' evaluates to true, even if only $src.exe exists
+# However 'cp $src $dst' can  not find $src, if only $src.exe exists
+	if test -f "$src.exe" && test -x "$src.exe"; then
+		src="$src.exe"
+		true
+	elif [ -f $src -o -d $src ]
 	then
 		true
 	else
@@ -193,6 +200,7 @@ else
 	then
 		dstfile=`basename $dst`
 	else
+		echo "basename $dst $transformbasename | sed $transformarg$transformbasename"
 		dstfile=`basename $dst $transformbasename | 
 			sed $transformarg`$transformbasename
 	fi

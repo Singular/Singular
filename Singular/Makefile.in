@@ -25,7 +25,8 @@ bindir		= @bindir@
 # includes are taken from here
 includedir	= @includedir@
 slibdir		= ${prefix}/LIB
-
+install_bindir  = ${install_prefix}/${SINGUNAME}
+install_slibdir = ${install_prefix}/LIB
 
 ##
 ## various programs
@@ -37,7 +38,7 @@ LEX		= @LEX@
 PERL5		= @PERL5@
 BISON		= bison
 INSTALL		= ./install-sh -c
-INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_PROGRAM	= ${INSTALL} 
 INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ./mkinstalldirs
 LN_S		= @LN_S@
@@ -137,7 +138,10 @@ OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 
 ASO_OBJS := $(ASO_SOURCES:.aso.cc=.aso) 
 
+#
 # Singular libraries which go into distribution
+# MAKE SURE THAT THIS IS UP_TO_DATE
+#
 SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
         elim.lib           factor.lib         finvar.lib         general.lib \
         graphics.lib       hnoether.lib       homolog.lib        inout.lib   \
@@ -146,7 +150,11 @@ SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
         poly.lib           presolve.lib       primdec.lib                    \
         primitiv.lib       random.lib         ring.lib           sing.lib    \
         solve.lib          solver.lib         spcurve.lib        standard.lib\
-        surf.lib           template.lib
+        surf.lib           triang.lib         template.lib
+
+SLIBS_FILES = $(addprefix LIB/,${SLIBS})
+
+GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 
 ##
 ## Build Targets
@@ -240,6 +248,10 @@ libparse.cc: libparse.l
 ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o ESingular emacs.cc fegetopt.o ${LDFLAGS} ${LIBS}
+
+ESingular-static: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
+           feOptES.inc
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o ESingular emacs.cc fegetopt.o ${LDFLAGS} ${STATIC_LDFLAGS} ${LIBS}
 
 feOpt.h: feOpt.inc feOptES.inc
 
@@ -337,18 +349,35 @@ maintainer-clean: distclean srcclean
 Singular-bindist: ${OBJS} Makefile
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	${MAKE} Singular ESingular
-	strip Singular ESingular
-	${INSTALL} -s Singular Singular-bindist
-	${INSTALL} -s ESingular ESingular-bindist
+	${INSTALL_PROGRAM} -s Singular Singular-bindist
+	${INSTALL_PROGRAM} -s ESingular ESingular-bindist
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
 Singular-static-bindist: ${OBJS} Makefile
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
-	${MAKE} Singular-static ESingular
-	strip Singular-static ESingular
-	mv Singular-static Singular-static-bindist
-	${INSTALL} -s ESingular ESingular-bindist
+	${MAKE} Singular-static ESingular-static 
+	${INSTALL_PROGRAM} -s Singular-static Singular-static-bindist
+	${INSTALL_PROGRAM} -s ESingular-static ESingular-static-bindist
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
+
+install-bindist: Singular-bindist ESingular-bindist libparse
+	${MKINSTALLDIRS} ${install_bindir}
+	${INSTALL_PROGRAM} Singular-bindist ${install_bindir}/Singular
+	${INSTALL_PROGRAM} ESingular-bindist ${install_bindir}/ESingular
+	${INSTALL_PROGRAM} libparse ${install_bindir}/libparse
+
+install-static-bindist: Singular-static-bindist ESingular-static-bindist libparse
+	${MKINSTALLDIRS} ${install_bindir}
+	${INSTALL_PROGRAM} Singular-static-bindist ${install_bindir}/Singular
+	${INSTALL_PROGRAM} ESingular-static-bindist ${install_bindir}/ESingular
+	${INSTALL_PROGRAM} libparse ${install_bindir}/libparse
+
+install-sharedist: ${SLIBS_FILES} LIB/gftables
+	${MKINSTALLDIRS} ${install_slibdir}
+	cp ${SLIBS_FILES} ${install_slibdir}
+	${MKINSTALLDIRS} ${install_slibdir}/gftables
+	cp ${GFTABLES} ${install_slibdir}/gftables
+	chmod -R +rX ${install_slibdir}/*
 
 tar:
 	tar cf Singular-${SINGULAR_VERSION}-src.tar ${DISTFILES}
@@ -531,7 +560,7 @@ Singulart: scanner.cc  gmalloc.ot $(OBJT) iparith.ot mpsr_Tok.ot claptmpl.ot tes
 	tesths.cc iparith.ot mpsr_Tok.ot claptmpl.ot $(OBJT) ${LDFLAGST} ${LIBS} \
 	${LD_DYN_FLAGS} gmalloc.ot
 
-iparith.ot: iparith.inc iparith.cc
+iparith.ot: iparith.ic iparith.cc
 	$(CXXP)  ${CXXFLAGST} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFST} -c iparith.cc -o iparith.ot
 
 mpsr_Tok.ot: iparith.inc mpsr_Tok.cc

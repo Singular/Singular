@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.53 1999-11-24 14:06:58 obachman Exp $
+@comment $Id: examples.doc,v 1.54 1999-11-24 18:50:41 obachman Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -783,7 +783,8 @@ in each of the cases the miniversal deformation:
 @end ifclear
 
 @smallexample
-@c STILL BROKEN @c example
+@c STILL BROKEN !!!!!!!!!!!!!!!!!!!
+@c example no_comp
   LIB "deform.lib";
   ring R=32003,(x,y,z),ds;
   //----------------------------------------------------
@@ -831,7 +832,7 @@ in each of the cases the miniversal deformation:
   //  --> { A(1..4) |
   //         -A(1)*A(4) = A(3)*A(4) = -A(2)*A(4)-A(4)^2 = 0 }
   //----------------------------------------------------
-@c STILL BROKEN @c example
+@c example
 @end smallexample
 
 @c ----------------------------------------------------------------------------

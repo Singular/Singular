@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.40 1999-08-16 16:52:29 Singular Exp $
+### $Id: Makefile.in,v 1.41 1999-11-24 18:50:40 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -15,6 +15,9 @@ prefix		= @prefix@
 infodir		= ${prefix}/info
 bindir		= @bindir@
 htmldir         = ${prefix}/html
+install_infodir = ${install_prefix}/info
+install_htmldir = ${install_prefix}/html
+install_docdir  = ${install_prefix}/doc
 
 ##
 ## needed programs
@@ -208,6 +211,15 @@ install: singular.hlp html/index.htm singular.idx
 uninstall: 
 	rm -f ${infodir}/singular.hlp
 	- rmdir ${infodir}
+
+install-sharedist: singular.hlp html/index.htm singular.idx
+	${MKINSTALLDIRS} ${install_infodir}
+	${INSTALL_DATA} singular.hlp ${install_infodir}
+	${MKINSTALLDIRS} ${install_htmldir} 
+	cp ${HTML_SUBDIR}/* ${install_htmldir}
+	chmod 644 ${htmldir}/*
+	${MKINSTALLDIRS} ${install_docdir}
+	${INSTALL_DATA} singular.idx ${install_docdir}
 
 texi2html = $(TEXI2HTML:%.pl=%)
 

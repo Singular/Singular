@@ -6,9 +6,14 @@
 SHELL=/bin/sh
 
 prefix		= @prefix@
-PERL5		= @PERL5@
 docdir		= ${prefix}/doc
 SINGULAR	= @SINGULAR@
+emacsdir	= ${install_prefix}/emacs
+
+PERL5		= @PERL5@
+INSTALL		= ../install-sh -c
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ../mkinstalldirs
 
 SINGULAR_HLP	= ${docdir}/singular.hlp
 
@@ -30,6 +35,12 @@ lib-cmpl.el: ${prefix}/Singular/Makefile cmpl.pl
 clean:
 	rm cmd-cmpl.el hlp-cmpl.el lib-cmpl.el
 
-${SINGULAR_HLP}:
-	cd ${docdir}; make singular.hlp
+install-sharedist: all
+	${MKINSTALLDIRS} ${emacsdir}
+	${INSTALL_DATA} cmd-cmpl.el ${emacsdir}
+	${INSTALL_DATA} lib-cmpl.el ${emacsdir}
+	${INSTALL_DATA} hlp-cmpl.el ${emacsdir}
+	${INSTALL_DATA} singular.el ${emacsdir}
+	${INSTALL_DATA} .emacs-singular ${emacsdir}
+	${INSTALL_DATA} sing.xpm	${emacsdir}
 
