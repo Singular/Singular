@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_multihensel.cc,v 1.3 1997-04-08 10:29:10 schmidt Exp $
+// $Id: fac_multihensel.cc,v 1.4 1997-04-15 14:00:08 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  1997/04/08 10:29:10  schmidt
+ * #include <config.h> added
+ *
  * Revision 1.2  1997/03/27 09:45:49  schmidt
  * debug output rewritten
  * some spurious preprocessor directives removed
@@ -167,18 +170,18 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
     solveF( P0, Q0, S, T, 1, pk, r, a );
     TIMING_END(fac_solve);
 
-    DEBOUTLN( cerr, "trying to find correction coefficients for ", C );
-    DEBOUTLN( cerr, "which evaluates to ", C0 );
+    DEBOUTLN( cerr, "trying to find correction coefficients for " << C );
+    DEBOUTLN( cerr, "which evaluates to " << C0 );
 
     for ( i = 1; i <= r; i++ )
 	A[i] = remainder( pk( a[i] * C0 ), P0[i], pk );
-    DEBOUTLN( cerr, "the first approximation of the correction coefficients is ", A );
+    DEBOUTLN( cerr, "the first approximation of the correction coefficients is " << A );
 #ifdef DEBUGOUTPUT
     if ( check_dummy( A, P, Q ) - C != 0 ) {
-	DEBOUTLN( cerr, "there is an error detected, the correction coefficients do not", ' ' );
-	DEBOUTLN( cerr, "fulfill equation F(A)", ' ' );
-	DEBOUTLN( cerr, "corresponding P ", P );
-	DEBOUTLN( cerr, "              Q ", Q );
+	DEBOUTLN( cerr, "there is an error detected, the correction coefficients do not" );
+	DEBOUTLN( cerr, "fulfill equation F(A)" );
+	DEBOUTLN( cerr, "corresponding P " << P );
+	DEBOUTLN( cerr, "              Q " << Q );
     }
 #endif
     for ( m = 0; m <= h && ( m == 0 || Dm != 0 ); m++ ) {
@@ -212,14 +215,14 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
 		}
 	    }
 	}
-	DEBOUTLN( cerr, "the correction coefficients at step ", m );
-	DEBOUTLN( cerr, "are now ", A );
+	DEBOUTLN( cerr, "the correction coefficients at step " << m );
+	DEBOUTLN( cerr, "are now " << A );
 #ifdef DEBUGOUTPUT
     if ( check_dummy( A, P, Q ) - C != 0 ) {
-	DEBOUTLN( cerr, "there is an error detected, the correction coefficients do not", ' ' );
-	DEBOUTLN( cerr, "fulfill equation F(A)", ' ' );
-	DEBOUTLN( cerr, "corresponding P ", P );
-	DEBOUTLN( cerr, "              Q ", Q );
+	DEBOUTLN( cerr, "there is an error detected, the correction coefficients do not" );
+	DEBOUTLN( cerr, "fulfill equation F(A)" );
+	DEBOUTLN( cerr, "corresponding P " << P );
+	DEBOUTLN( cerr, "              Q " << Q );
     }
 #endif
     }
@@ -238,8 +241,8 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
     CanonicalForm dummy;
     int i, m;
 
-    DEBOUTLN( cerr, "we are now performing the liftstep to reach ", Variable(k) );
-    DEBOUTLN( cerr, "the factors so far are ", P );
+    DEBOUTLN( cerr, "we are now performing the liftstep to reach " << Variable(k) );
+    DEBOUTLN( cerr, "the factors so far are " << P );
 
     for ( i = 1; i <= r; i++ ) {
 	Variable vm = Variable( t + 1 );
@@ -247,7 +250,7 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
 	K[i] = swapvar( replaceLc( swapvar( P[i], v1, vm ), swapvar( A( lcG[i], k+1, t ), v1, vm ) ), v1, vm );
 	P[i] = A( K[i], k, t );
     }
-    DEBOUTLN( cerr, "lift K = ", K );
+    DEBOUTLN( cerr, "lift K = " << K );
 
 //    d = degree( Uk, Variable( k ) );
 
@@ -270,8 +273,8 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
 	TIMING_END(fac_modpk);
 #ifdef DEBUGOUTPUT
 	if ( mod( Rm, xa1 ) != 0 ) {
-	    DEBOUTLN( cerr, "something seems not to be ok with Rm which is ", Rm );
-	    DEBOUTLN( cerr, "and should reduce to zero modulo ", xa1 );
+	    DEBOUTLN( cerr, "something seems not to be ok with Rm which is " << Rm );
+	    DEBOUTLN( cerr, "and should reduce to zero modulo " << xa1 );
 	}
 #endif
 	if ( mod( Rm, xa2 ) != 0 ) {
@@ -286,14 +289,14 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
 // #ifdef DEBUGOUTPUT
 // 	    dummy = check_dummy( alpha, P, Q );
 // 	    if ( b(modDeltak( dummy, A, k, n )) != b(modDeltak( C, A, k, n )) ) {
-// 		DEBOUTLN( cerr, "lift fault", ' ' );
+// 		DEBOUTLN( cerr, "lift fault" );
 // 		DEBDECLEVEL( cerr, "liftStep" );
 // 		return false;
 // 	    }
 // #endif
 	    for ( i = 1; i <= r; i++ )
 		K[i] = b(K[i] - alpha[i] * xa1);
-	    DEBOUTLN( cerr, "the corrected K's are now ", K );
+	    DEBOUTLN( cerr, "the corrected K's are now " << K );
 	}
 	xa1 = xa2;
 	xa2 *= xa;
@@ -301,13 +304,13 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
     for ( i = 1; i <= r; i++ )
 	P[i] = K[i];
     if ( prod( K ) - Uk != 0 ) {
-	DEBOUTLN( cerr, "the liftstep produced the wrong result", ' ' );
-	DEBOUTLN( cerr, "the product of the factors calculated so far is ", prod(K) );
-	DEBOUTLN( cerr, "and the Uk that should have been reached is ", Uk );
+	DEBOUTLN( cerr, "the liftstep produced the wrong result" );
+	DEBOUTLN( cerr, "the product of the factors calculated so far is " << prod(K) );
+	DEBOUTLN( cerr, "and the Uk that should have been reached is " << Uk );
 	DEBDECLEVEL( cerr, "liftStep" );
 	return false;
     }
-    DEBOUTLN( cerr, "the lift seems ok so far", ' ' );
+    DEBOUTLN( cerr, "the lift seems ok so far" );
     DEBDECLEVEL( cerr, "liftStep" );
     return true; // check for divisibility
 }
@@ -331,7 +334,7 @@ Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evalua
 	for ( i = A.min(); i <= k; i++ )
 	    n[i] = degree( Uk[k], Variable(i) );
 	goodeval = liftStep( G, k, G.max(), t, bound, A, lcG, Uk[k], n, h );
-	DEBOUTLN( cerr, "Factorization so far: ", G );
+	DEBOUTLN( cerr, "Factorization so far: " << G );
     }
     DEBDECLEVEL( cerr, "Hensel" );
     return goodeval;

@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_ezgcd.cc,v 1.3 1997-04-07 16:22:20 schmidt Exp $
+// $Id: fac_ezgcd.cc,v 1.4 1997-04-15 13:59:23 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  1997/04/07 16:22:20  schmidt
+ * #include <config.h> added
+ *
  * Revision 1.2  1997/03/27 09:41:47  schmidt
  * some spurious preprocessor directives removed
  *
@@ -55,11 +58,11 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
     modpk bound;
 
     DEBINCLEVEL( cerr, "ezgcd" );
-    DEBOUTLN( cerr, "FF = ", FF );
-    DEBOUTLN( cerr, "GG = ", GG );
+    DEBOUTLN( cerr, "FF = " << FF );
+    DEBOUTLN( cerr, "GG = " << GG );
     f = content( FF, x ); g = content( GG, x ); d = gcd( f, g );
-    DEBOUTLN( cerr, "f = ", f );
-    DEBOUTLN( cerr, "g = ", g );
+    DEBOUTLN( cerr, "f = " << f );
+    DEBOUTLN( cerr, "g = " << g );
     F = FF / f; G = GG / g;
     if ( F.isUnivariate() && G.isUnivariate() )
 	return d * gcd( F, G );
@@ -75,14 +78,14 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 	b = REvaluation( 2, t, IntRandom( 100 ) );
     while ( ! gcdfound ) {
 	/// ---> A2
-	DEBOUTLN( cerr, "search for evaluation, delta = ", delta );
-	DEBOUTLN( cerr, "F = ", F );
-	DEBOUTLN( cerr, "G = ", G );
+	DEBOUTLN( cerr, "search for evaluation, delta = " << delta );
+	DEBOUTLN( cerr, "F = " << F );
+	DEBOUTLN( cerr, "G = " << G );
 	findeval( F, G, Fb, Gb, Db, b, delta, degF, degG );
-	DEBOUTLN( cerr, "found evaluation b = ", b );
-	DEBOUTLN( cerr, "F(b) = ", Fb );
-	DEBOUTLN( cerr, "G(b) = ", Gb );
-	DEBOUTLN( cerr, "D(b) = ", Db );
+	DEBOUTLN( cerr, "found evaluation b = " << b );
+	DEBOUTLN( cerr, "F(b) = " << Fb );
+	DEBOUTLN( cerr, "G(b) = " << Gb );
+	DEBOUTLN( cerr, "D(b) = " << Db );
 	delta = degree( Db );
 	/// ---> A3
 	if ( delta == 0 )
@@ -103,7 +106,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 		Db = Dbt; Fb = Fbt; Gb = Gbt;
 	    }
 	}
-	DEBOUTLN( cerr, "now after A4, delta = ", delta );
+	DEBOUTLN( cerr, "now after A4, delta = " << delta );
 	/// ---> A5
 	if ( degF <= degG && delta == degF && divides( F, G ) )
 	    return d*F;
@@ -139,13 +142,13 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 	    DD[2] = DD[2] * ( b( lcDD[2] ) / lc( DD[2] ) );
 	    DD[1] = DD[1] * ( b( lcDD[1] ) / lc( DD[1] ) );
 	    bound = enlargeBound( B, DD[2], DD[1], bound );
-	    DEBOUTLN( cerr, "(hensel) B    = ", B );
-	    DEBOUTLN( cerr, "(hensel) lcB  = ", LC( B, Variable(1) ) );
-	    DEBOUTLN( cerr, "(hensel) b(B) = ", b(B) );
-	    DEBOUTLN( cerr, "(hensel) DD   = ", DD );
-	    DEBOUTLN( cerr, "(hensel) lcDD = ", lcDD );
+	    DEBOUTLN( cerr, "(hensel) B    = " << B );
+	    DEBOUTLN( cerr, "(hensel) lcB  = " << LC( B, Variable(1) ) );
+	    DEBOUTLN( cerr, "(hensel) b(B) = " << b(B) );
+	    DEBOUTLN( cerr, "(hensel) DD   = " << DD );
+	    DEBOUTLN( cerr, "(hensel) lcDD = " << lcDD );
 	    gcdfound = Hensel( B, DD, lcDD, b, bound, x );
-	    DEBOUTLN( cerr, "(hensel finished) DD   = ", DD );
+	    DEBOUTLN( cerr, "(hensel finished) DD   = " << DD );
 	    /// ---> A8 (gcdfound)
 	}
     }
@@ -157,7 +160,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 static CanonicalForm
 ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluation & b, const modpk & bound )
 {
-    DEBOUTLN( cerr, "ezgcd: special case", ' ' );
+    DEBOUTLN( cerr, "ezgcd: special case" );
     CanonicalForm Ft, Gt, L, LL, Fb, Gb, Db, Lb, D, Ds, Dt, d;
     CFArray DD( 1, 2 ), lcDD( 1, 2 );
     Variable x = Variable( 1 );
@@ -165,54 +168,54 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
 
     Dt = 1;
     /// ---> S1
-    DEBOUTLN( cerr, "ezgcdspec: (S1)", ' ' );
+    DEBOUTLN( cerr, "ezgcdspec: (S1)" );
     Ft = ezgcd( F, F.deriv( x ) );
-    DEBOUTLN( cerr, "ezgcdspec: (S1) done, Ft = ", Ft );
+    DEBOUTLN( cerr, "ezgcdspec: (S1) done, Ft = " << Ft );
     L = F / Ft;
     /// ---> S2
-    DEBOUTLN( cerr, "ezgcdspec: (S2)", ' ' );
+    DEBOUTLN( cerr, "ezgcdspec: (S2)" );
     L = ezgcd( L, G, b, true );
-    DEBOUTLN( cerr, "ezgcdspec: (S2) done, Ds = ", Ds );
+    DEBOUTLN( cerr, "ezgcdspec: (S2) done, Ds = " << Ds );
     Gt = G / L;
     Ds = L; Dt = L;
     Lb = b( L ); Gb = b( Gt ); Fb = b( Ft );
     d = gcd( LC( L, x ), gcd( LC( Ft, x ), LC( Gt, x ) ) );
     while ( true ) {
 	/// ---> S3
-	DEBOUTLN( cerr, "ezgcdspec: (S3)", ' ' );
-	DEBOUTLN( cerr, "ezgcdspec: Fb = ", Fb );
-	DEBOUTLN( cerr, "ezgcdspec: Gb = ", Gb );
+	DEBOUTLN( cerr, "ezgcdspec: (S3)" );
+	DEBOUTLN( cerr, "ezgcdspec: Fb = " << Fb );
+	DEBOUTLN( cerr, "ezgcdspec: Gb = " << Gb );
 	DD[1] = gcd( Lb, gcd( Fb, Gb ) );
 	/// ---> S4
-	DEBOUTLN( cerr, "ezgcdspec: (S4)", ' ' );
+	DEBOUTLN( cerr, "ezgcdspec: (S4)" );
 	if ( degree( DD[1] ) == 0 )
 	    return Ds;
 	/// ---> S5
-	DEBOUTLN( cerr, "ezgcdspec: (S5)", ' ' );
-	DEBOUTLN( cerr, "ezgcdspec: Lb = ", Lb );
-	DEBOUTLN( cerr, "ezgcdspec: Db = ", DD[1] );
+	DEBOUTLN( cerr, "ezgcdspec: (S5)" );
+	DEBOUTLN( cerr, "ezgcdspec: Lb = " << Lb );
+	DEBOUTLN( cerr, "ezgcdspec: Db = " << DD[1] );
 	Db = DD[1];
 	if ( ! (DD[2] = Lb/DD[1]).isOne() ) {
-	    DEBOUTLN( cerr, "ezgcdspec: (S55)", ' ' );
+	    DEBOUTLN( cerr, "ezgcdspec: (S55)" );
 	    lcDD[2] = LC( L, x );
 	    lcDD[1] = d;
 	    DD[1] = ( DD[1] * b( d ) ) / lc( DD[1] );
 	    DD[2] = ( DD[2] * b( lcDD[2] ) ) / lc( DD[2] );
 	    LL = L * d;
 	    modpk newbound = enlargeBound( LL, DD[2], DD[1], bound );
-	    DEBOUTLN( cerr, "ezgcdspec: begin with lift.", ' ' );
-	    DEBOUTLN( cerr, "ezgcdspec: B     = ", LL );
-	    DEBOUTLN( cerr, "ezgcdspec: DD    = ", DD );
-	    DEBOUTLN( cerr, "ezgcdspec: lcDD  = ", lcDD );
-	    DEBOUTLN( cerr, "ezgcdspec: b     = ", b );
-	    DEBOUTLN( cerr, "ezgcdspec: bound = ", bound.getpk() );
-	    DEBOUTLN( cerr, "ezgcdspec: lc(B) = ", LC( LL, x ) );
-	    DEBOUTLN( cerr, "ezgcdspec: test  = ", b( LL ) - DD[1] * DD[2] );
+	    DEBOUTLN( cerr, "ezgcdspec: begin with lift." );
+	    DEBOUTLN( cerr, "ezgcdspec: B     = " << LL );
+	    DEBOUTLN( cerr, "ezgcdspec: DD    = " << DD );
+	    DEBOUTLN( cerr, "ezgcdspec: lcDD  = " << lcDD );
+	    DEBOUTLN( cerr, "ezgcdspec: b     = " << b );
+	    DEBOUTLN( cerr, "ezgcdspec: bound = " << bound.getpk() );
+	    DEBOUTLN( cerr, "ezgcdspec: lc(B) = " << LC( LL, x ) );
+	    DEBOUTLN( cerr, "ezgcdspec: test  = " << b( LL ) - DD[1] * DD[2] );
 	    gcdfound = Hensel( LL, DD, lcDD, b, newbound, x );
 	    ASSERT( gcdfound, "fatal error in algorithm" );
 	    Dt = pp( DD[1] );
 	}
-	DEBOUTLN( cerr, "ezgcdspec: (S7)", ' ' );
+	DEBOUTLN( cerr, "ezgcdspec: (S7)" );
 	Ds = Ds * Dt;
 	Fb = Fb / Db;
 	Gb = Gb / Db;
@@ -228,7 +231,7 @@ findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, 
     if ( delta != 0 )
 	b.nextpoint();
     do {
-	DEBOUTLN( cerr, "ezgcd: (findeval) b = ", b );
+	DEBOUTLN( cerr, "ezgcd: (findeval) b = " << b );
 	Fb = b( F );
 	ok = degree( Fb ) == degF;
 	if ( ok ) {
@@ -248,11 +251,11 @@ findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, 
 static modpk
 enlargeBound ( const CanonicalForm & F, const CanonicalForm & Lb, const CanonicalForm & Db, const modpk & pk )
 {
-    DEBOUTLN( cerr, "ezgcd: (enlarge bound) F      = ", F );
-    DEBOUTLN( cerr, "ezgcd: (enlarge bound) Lb     = ", Lb );
-    DEBOUTLN( cerr, "ezgcd: (enlarge bound) Db     = ", Db );
-    DEBOUTLN( cerr, "ezgcd: (enlarge bound) Lb % p = ", mod( Lb, pk.getp() ) );
-    DEBOUTLN( cerr, "ezgcd: (enlarge bound) Db % p = ", mod( Db, pk.getp() ) );
+    DEBOUTLN( cerr, "ezgcd: (enlarge bound) F      = " << F );
+    DEBOUTLN( cerr, "ezgcd: (enlarge bound) Lb     = " << Lb );
+    DEBOUTLN( cerr, "ezgcd: (enlarge bound) Db     = " << Db );
+    DEBOUTLN( cerr, "ezgcd: (enlarge bound) Lb % p = " << mod( Lb, pk.getp() ) );
+    DEBOUTLN( cerr, "ezgcd: (enlarge bound) Db % p = " << mod( Db, pk.getp() ) );
 
     CanonicalForm limit = power( CanonicalForm(2), degree( Db ) ) *
 	tmax( maxCoeff( Lb ), tmax( maxCoeff( Db ), maxCoeff( F ) ) );
@@ -264,7 +267,7 @@ enlargeBound ( const CanonicalForm & F, const CanonicalForm & Lb, const Canonica
 	bound *= p;
     }
     k *= 2;
-    DEBOUTLN( cerr, "ezgcd: (enlarge bound) newbound = ", power( CanonicalForm( p ), k ) );
+    DEBOUTLN( cerr, "ezgcd: (enlarge bound) newbound = " << power( CanonicalForm( p ), k ) );
     return modpk( p, k );
 }
 

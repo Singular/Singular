@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_multivar.cc,v 1.4 1997-04-08 10:30:59 schmidt Exp $
+// $Id: fac_multivar.cc,v 1.5 1997-04-15 14:01:08 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/04/08 10:30:59  schmidt
+#include <config.h> added
+
 Revision 1.3  1997/03/27 09:47:17  schmidt
 debug output rewritten
 some spurious preprocessor directives removed
@@ -98,9 +101,9 @@ coeffBound ( const CanonicalForm & f, int p )
 // static bool
 // nonDivisors ( CanonicalForm omega, CanonicalForm delta, const CFArray & F, CFArray & d )
 // {
-//     DEBOUTLN( cerr, "nondivisors omega = ", omega );
-//     DEBOUTLN( cerr, "nondivisors delta = ", delta );
-//     DEBOUTLN( cerr, "nondivisors F = ", F );
+//     DEBOUTLN( cerr, "nondivisors omega = " << omega );
+//     DEBOUTLN( cerr, "nondivisors delta = " << delta );
+//     DEBOUTLN( cerr, "nondivisors F = " << F );
 //     CanonicalForm q, r;
 //     int k = F.size();
 //     d = CFArray( 0, k );
@@ -136,16 +139,16 @@ findEvaluation ( const CanonicalForm & U, const CanonicalForm & V, const Canonic
 	Vn = A( V );
 	if ( Vn != 0 ) {
 	    U0 = A( U );
-	    DEBOUTLN( cerr, "U0 = ", U0 );
+	    DEBOUTLN( cerr, "U0 = " << U0 );
 	    if ( isSqrFree( U0 ) ) {
 		delta = content( U0 );
-		DEBOUTLN( cerr, "content( U0 ) = ", delta );
+		DEBOUTLN( cerr, "content( U0 ) = " << delta );
 		for ( I = F, j = 1; I.hasItem(); I++, j++ )
 		    FF[j] = A( I.getItem().factor() );
 		found = nonDivisors( omega, delta, FF, D );
 	    }
 	    else {
-		DEBOUTLN( cerr, "not sqrfree :", sqrFree( U0 ) );
+		DEBOUTLN( cerr, "not sqrfree : " << sqrFree( U0 ) );
 	    }
 	}
 	if ( ! found )
@@ -172,12 +175,12 @@ ZFactorizeMulti ( const CanonicalForm & arg )
     modpk b;
     bool negate = false;
 
-    DEBOUTLN( cerr, "-----------------------------------------------------", ' ' );
-    DEBOUTLN( cerr, "trying to factorize U = ", U );
-    DEBOUTLN( cerr, "U is a polynomial of level = ", arg.level() );
-    DEBOUTLN( cerr, "U will be factorized with respect to variable ", Variable(1) );
-    DEBOUTLN( cerr, "the leading coefficient of U with respect to that variable is ", V );
-    DEBOUTLN( cerr, "which is factorized as ", F );
+    DEBOUTLN( cerr, "-----------------------------------------------------" );
+    DEBOUTLN( cerr, "trying to factorize U = " << U );
+    DEBOUTLN( cerr, "U is a polynomial of level = " << arg.level() );
+    DEBOUTLN( cerr, "U will be factorized with respect to variable " << Variable(1) );
+    DEBOUTLN( cerr, "the leading coefficient of U with respect to that variable is " << V );
+    DEBOUTLN( cerr, "which is factorized as " << F );
 
     maxdeg = 0;
     for ( i = 2; i <= t; i++ ) {
@@ -207,43 +210,43 @@ ZFactorizeMulti ( const CanonicalForm & arg )
 	TIMING_START(fac_findeval);
 	findEvaluation( U, V, omega, F, A, U0, delta, D, r );
 	TIMING_END(fac_findeval);
-	DEBOUTLN( cerr, "the evaluation point to reduce to an univariate problem is ", A );
-	DEBOUTLN( cerr, "corresponding delta = ", delta );
-	DEBOUTLN( cerr, "              omega = ", omega );
-	DEBOUTLN( cerr, "              D     = ", D );
-	DEBOUTLN( cerr, "now factorize the univariate polynomial ", U0 );
+	DEBOUTLN( cerr, "the evaluation point to reduce to an univariate problem is " << A );
+	DEBOUTLN( cerr, "corresponding delta = " << delta );
+	DEBOUTLN( cerr, "              omega = " << omega );
+	DEBOUTLN( cerr, "              D     = " << D );
+	DEBOUTLN( cerr, "now factorize the univariate polynomial " << U0 );
 	G = conv_to_factor_array( factorize( U0, false ) );
-	DEBOUTLN( cerr, "which factorizes into ", G );
+	DEBOUTLN( cerr, "which factorizes into " << G );
 	b = coeffBound( U, getZFacModulus().getp() );
 	if ( getZFacModulus().getpk() > b.getpk() )
 	    b = getZFacModulus();
-	DEBOUTLN( cerr, "the coefficient bound of the factors of U is ", b.getpk() );
+	DEBOUTLN( cerr, "the coefficient bound of the factors of U is " << b.getpk() );
 
 	r = G.size();
 	lcG = CFArray( 1, r );
 	UU = U;
-	DEBOUTLN( cerr, "now trying to distribute the leading coefficients ...", ' ' );
+	DEBOUTLN( cerr, "now trying to distribute the leading coefficients ..." );
 	TIMING_START(fac_distrib);
 	goodeval = distributeLeadingCoeffs( UU, G, lcG, F, D, delta, omega, A, r );
 	TIMING_END(fac_distrib);
 #ifdef DEBUGOUTPUT
 	if ( goodeval ) {
-	    DEBOUTLN( cerr, "the univariate factors after distribution are ", G );
-	    DEBOUTLN( cerr, "the distributed leading coeffs are ", lcG );
-	    DEBOUTLN( cerr, "U may have changed and is now ", UU );
-	    DEBOUTLN( cerr, "which has leading coefficient ", LC( UU, Variable(1) ) );
+	    DEBOUTLN( cerr, "the univariate factors after distribution are " << G );
+	    DEBOUTLN( cerr, "the distributed leading coeffs are " << lcG );
+	    DEBOUTLN( cerr, "U may have changed and is now " << UU );
+	    DEBOUTLN( cerr, "which has leading coefficient " << LC( UU, Variable(1) ) );
 
 	    if ( LC( UU, Variable(1) ) != prod( lcG ) || A(UU) != prod( G ) ) {
-		DEBOUTLN( cerr, "!!! distribution was not correct !!!", ' ' );
-		DEBOUTLN( cerr, "product of leading coeffs is ", prod( lcG ) );
-		DEBOUTLN( cerr, "product of univariate factors is ", prod( G ) );
-		DEBOUTLN( cerr, "the new U is evaluated as ", A(UU) );
+		DEBOUTLN( cerr, "!!! distribution was not correct !!!" );
+		DEBOUTLN( cerr, "product of leading coeffs is " << prod( lcG ) );
+		DEBOUTLN( cerr, "product of univariate factors is " << prod( G ) );
+		DEBOUTLN( cerr, "the new U is evaluated as " << A(UU) );
 	    }
 	    else
-		DEBOUTLN( cerr, "leading coeffs correct", ' ' );
+		DEBOUTLN( cerr, "leading coeffs correct" );
 	}
 	else {
-	    DEBOUTLN( cerr, "we have found a bad evaluation point", ' ' );
+	    DEBOUTLN( cerr, "we have found a bad evaluation point" );
 	}
 #endif
 	if ( goodeval ) {
@@ -296,7 +299,7 @@ ZFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
 	    cont = swapvar( cont, v1, vm );
 	    n = i.getItem().exp();
 	    TIMING_END(fac_content);
-	    DEBOUTLN( cerr, "now after content ...", ' ' );
+	    DEBOUTLN( cerr, "now after content ..." );
 	    if ( g.isUnivariate() ) {
 		G = factorize( g, true );
 		for ( j = G; j.hasItem(); j++ )
