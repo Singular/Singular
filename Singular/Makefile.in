@@ -221,7 +221,7 @@ SLIB0 = COPYING \
         surf.lib     toric.lib     triang.lib    zeroset.lib    help.cnf 
  
 
-PLIBS = ncalg.lib ncdecomp.lib nctools.lib gkdim.lib qmatrix.lib
+PLIBS = center.lib ncalg.lib ncdecomp.lib nctools.lib gkdim.lib qmatrix.lib
 
 ifdef HAVE_PLURAL
 SLIBS = ${SLIB0} ${PLIBS}
