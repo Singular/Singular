@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.63 1998-05-18 20:29:51 wichmann Exp $
+@comment $Id: reference.doc,v 1.64 1998-05-19 07:52:02 schmidt Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2506,7 +2506,7 @@ shows all loaded libraries.
 @end table
 @c ref
 See
-@ref{Commandline options}; 
+@ref{Command line options}; 
 @ref{LIB in a library}; 
 @ref{Procedures and libraries};
 @ref{SINGULAR libraries};
@@ -4838,7 +4838,7 @@ computation or 0
 @item @code{system("Singular")} 
 returns the absolute (path) name of the running @sc{Singular} (type string)
 @item @code{system("--option_name")} 
-returns the value of the (command-line)
+returns the value of the command line
 option @code{"option_name"}; for on/off options, the return value is of type 
 int and either 1 or 0; for all other options, the return type is string.
 @end table
@@ -5945,7 +5945,7 @@ time is bigger than a (customizable) minimal time;
 The default setting of @code{timer} is 0, the default minimal time is
 0.5 seconds, and the default timer resolution is 1 (i.e., default unit
 of time is one second). The minimal time and timer resolution
-can be set using the commandline options @code{--min-time} and
+can be set using the command line options @code{--min-time} and
 @code{--ticks-per-sec} and can be checked using
 @code{system("--min-time")} and @code{system("--ticks-per-sec")}. 
 
@@ -5968,7 +5968,7 @@ commands, see example below.
 @end example
 @end table
 @c ref
-See @ref{Commandline options}, @ref{system}, @ref{rtimer}.
+See @ref{Command line options}, @ref{system}, @ref{rtimer}.
 @c ref
 @c ---------------------------------------
 @node TRACE var, rtimer, timer, System variables
@@ -6017,11 +6017,11 @@ times ar reported, instead of CPU times.
 @end table
 @menu
 * timer::
-* Commandline options::
+* Command line options::
 * system::
 @end menu
 @iftex
-See @ref{timer}, @ref{Commandline options}, @ref{system}.
+See @ref{timer}, @ref{Command line options}, @ref{system}.
 @end iftex
 @c ---------------------------------------
 @node voice,, rtimer, System variables
