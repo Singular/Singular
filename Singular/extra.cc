@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.101 1999-08-16 17:53:00 hannes Exp $ */
+/* $Id: extra.cc,v 1.102 1999-08-17 09:25:45 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -574,15 +574,31 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ring r0=(ring)h->Data();
       leftv v = h->next;
       w = r0->idroot->get(v->Name(),myynest);
-      i0 = IDIDEAL(w);
-      i1 = idInit(IDELEMS(i0),i0->rank);
-      for (k=0; k<IDELEMS(i1); k++)
+      if (w!=NULL)
       {
-        i1->m[k] = maAlgpolyFetch(r0, i0->m[k]);
+        if (IDTYP(w)==IDEAL_CMD)
+        {
+          i0 = IDIDEAL(w);
+          i1 = idInit(IDELEMS(i0),i0->rank);
+          for (k=0; k<IDELEMS(i1); k++)
+          {
+            i1->m[k] = maAlgpolyFetch(r0, i0->m[k]);
+          }
+          res->rtyp = IDEAL_CMD;
+          res->data = (void*)i1;
+          return FALSE;
+        }
+        else if (IDTYP(w)==POLY_CMD)
+        {
+          res->rtyp = POLY_CMD;
+          res->data = (void*)maAlgpolyFetch(r0,IDPOLY(w));
+          return FALSE;
+        }
+        else
+          WerrorS("`system(\"algfetch\",<ideal>/<poly>)` expected");
       }
-      res->rtyp = IDEAL_CMD;
-      res->data = (void*)i1;
-      return FALSE;
+      else
+        Werror("`%s` not found in `%s`",v->Name(),h->Name());
     }
     else
 /*==================== algmap =======================*/
