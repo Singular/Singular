@@ -1,0 +1,1454 @@
+version="$I@comment d:$";
+category="Singularities";
+info="
+LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
+AUTHOR:   Fernando Hernando Carrillo, hernando@mathematik.uni-kl.de
+          Thomas Keilen,   keilen@mathematik.uni-kl.de
+
+OVERVIEW:
+ A library for computing the resolution graph of a plane curve singularity f,
+ the total multiplicities of the total transforms of the branches of f along
+ the exceptional divisors of a minimal good resolution of f, the Alexander
+ polynomial of f, and the zeta function of its monodromy operator.  
+
+PROCEDURES:
+ resolutiongraph(f);        resolution graph f
+ totalmultiplicities(f);    resolution graph, total multiplicities and strict multiplicities of f
+ alexpoly(f);               Alexander polynomial of f
+ charexp2multseq(v);        converts characteristical exponents to multiplicity sequence 
+ multseq2charexp (v);       converts multiplicity sequence to characteristical exponents
+ charexp2poly(v,a);         calculates a polynomial f with characteristic exponents v
+ tau_es(f);                 equsingular Tjurina number of f
+
+KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities; 
+          topological invariants; Alexander polynomial; resolution graph;
+          total multiplicities; equsingular Tjurina number
+";
+
+///////////////////////////////////////////////////////////////////////////////////////////
+LIB "hnoether.lib";
+///////////////////////////////////////////////////////////////////////////////////////////
+
+proc resolutiongraph (def INPUT)
+"USAGE:  resolutiongraph(INPUT); INPUT poly or list
+ASSUME:  INPUT is either a bivariate polynomial defining a plane curve singularity,
+         or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
+         the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
+         @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
+         the contact matrix and a list of integer vectors with the characteristical exponents 
+         of the branches of a plane curve singularity, or an integer vector containing the
+         characteristical exponents of an irreducible plane curve singularity.
+RETURN:  intmat, the incidence matrix of the resolution graph of the plane curve 
+         defined by INPUT, where the entries on the diagonal are the weights of the 
+         vertices of the graph and a negative entry corresponds to the strict transform 
+         of a branch of the curve. 
+NOTE:    In case the Hamburger-Noether expansion of the curve f is needed
+         for other purposes as well it is better to calculate this first
+         with the aid of @code{hnexpansion} and use it as input instead of
+         the polynomial itself.
+SEE ALSO: develop, hnexpansion, totalmultiplicities, alexpoly
+EXAMPLE: example resolutiongraph;  shows an example
+"
+{
+  return(totalmultiplicities(INPUT)[1]);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  ring r=0,(x,y),ls;
+  poly f1=(y2-x3)^2-4x5y-x7;
+  poly f2=y2-x3;
+  poly f3=y3-x2;
+  resolutiongraph(f1*f2*f3);
+}
+
+
+proc totalmultiplicities (def INPUT)
+"USAGE:  totalmultiplicities(INPUT); INPUT poly or list
+ASSUME:  INPUT is either a bivariate polynomial defining a plane curve singularity,
+         or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
+         the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
+         @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
+         the contact matrix and a list of integer vectors with the characteristical exponents 
+         of the branches of a plane curve singularity, or an integer vector containing the
+         characteristical exponents of an irreducible plane curve singularity.
+RETURN:  list @code{L} of three integer matrices. @code{L[1]} is the incidence matrix of 
+         the resolution graph of the plane curve defined by INPUT, where the entries on the 
+         diagonal are the weights of the vertices of the graph and a negative entry corresponds
+         to the strict transform of a branch of the curve. @code{L[2]} is an integer matrix,
+         which has for each vertex in the graph a row and for each branch of the curve a column. 
+         The entry in position [i,j] contains the total multiplicity of the j-th branch (i.e. the
+         branch with weight -j in @code{L[1]}) along the exceptional divisor corresponding
+         to the i-th row in @code{L[1]}. In particular, the i-th row contains
+         the total multiplicities of the branches of the plane curve (defined by INPUT) along
+         the exceptional divisor which corresponds to the i-th row in the incidence matrix 
+         @code{L[1]}. @code{L[3]} is an integer matrix which contains the (strict) multiplicities 
+         of the branches of the curve along the exceptional divisors in the same way as @code{L[2]}
+         contains the total multiplicities. 
+NOTE:    The total multiplicty of a branch along an exceptional divisor is the multiplicity
+         with which this exceptional divisor occurs in the total transform of this branch
+         under the resolution corresponding to the resolution graph.
+         @*
+         In case the Hamburger-Noether expansion of the curve f is needed
+         for other purposes as well it is better to calculate this first
+         with the aid of @code{hnexpansion} and use it as input instead of
+         the polynomial itself.
+SEE ALSO: develop, hnexpansion, alexpoly, resolutiongraph
+EXAMPLE: example totalmultiplicities;  shows an example
+"
+{
+  int i,j,s,e;
+  /////////////////////////////////////////////////////////////////////////////////
+  // Decide, which kind of input we have, and define the contact matrix
+  /////////////////////////////////////////////////////////////////////////////////
+  // Input: a polynomial defining a plane curve singularity.
+  //////////////////////////////////////////////////////////////////////////////
+  if (typeof(INPUT)=="poly")
+  {
+    list I@N@V=invariants(INPUT);
+  }
+  else
+  {
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Input: the vector of characteristical exponents of an irreducible plane curve
+    ///////////////////////////////////////////////////////////////////////////////////
+    if (typeof(INPUT)=="intvec")
+    {
+      list charexp;
+      charexp[1]=INPUT;
+      intmat contact[1][1]=0;
+    }
+    else
+    {      
+      if (typeof(INPUT)=="list")
+      {
+        /////////////////////////////////////////////////////////////////////////////////
+        // Input: intersection-matrix and characteristical exponents.
+        //////////////////////////////////////////////////////////////////////////////
+        if (typeof(INPUT[1])=="intmat")    
+        { 
+          intmat contact=INPUT[1];
+          list charexp=INPUT[2];
+        }
+        else
+        {
+          /////////////////////////////////////////////////////////////////////////////////
+          // Input: output of hnexpansion or hne in the ring created by hnexpansion
+          //////////////////////////////////////////////////////////////////////////////
+          if ((typeof(INPUT[1])=="ring") or (typeof(INPUT[1])=="list"))
+          {
+            list I@N@V=invariants(INPUT);
+          }
+          else
+          {
+            ////////////////////////////////////////////////////////////////////////////////////
+            // Input: output of reddevelop or extdevelop -- irreducible plane curve singularity
+            ////////////////////////////////////////////////////////////////////////////////////
+            if (typeof(INPUT[1])=="matrix")
+            {
+              list charexp=invariants(INPUT)[1];
+              intmat contact[1][1]=0;
+            }
+            else
+            {
+              ERROR("The input is invalid!");
+            }
+          }
+        }
+      }
+      else
+      {
+        ERROR("The input is invalid!");
+      }
+    }
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // If the input was a poly or a HN-Expansion, then calculate the contact matrix and char.exponents.
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  if (defined(I@N@V))
+  {
+    intmat contact=I@N@V[size(I@N@V)][1];   // contact numbers
+    list charexp;                       // characteristical exponents
+    for (i=1;i<=size(I@N@V)-1;i++)
+    {
+      charexp[i]=I@N@V[i][1];
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////////
+  // Find the maximal contact numbers of the branches
+  //////////////////////////////////////////////////////////////////////////////
+  int r=ncols(contact);   // number of branches 
+  intvec maxcontact;      // maximal contactnumber of branch i with other branches
+  for (i=1;i<=r;i++)
+  {
+    maxcontact[i]=max_in_intvec(intvec(contact[i,1..r]));
+  }
+  ///////////////////////////////////////////////////////////////////////////////
+  // Define the graphs of the branches and prolong them if necessary.
+  ///////////////////////////////////////////////////////////////////////////////
+  intmat gr,gr_red,grp;      // a subgraph, a reduced subgraph, a prolonged subgraph
+  int omega;              // point of highest weight in subgraph
+  list graphs;            // contains the subgraphs of the C_i
+  list totmult;           // contains the total multiplicities of the subgraphs
+  list multipl;           // contains the multiplicities of the subgraphs
+  list gr_tm;             // takes a single subgraph and tot.mult.
+  intvec tm,mt;           // total multiplicities and multiplicities
+  for (i=1;i<=r;i++)
+  { 
+    gr_tm=irred_resgraph_totmult(charexp[i]); // graph, total multipl. and multipl. of the ith branch
+    gr=gr_tm[1];  // the graph of the ith branch
+    tm=gr_tm[2];  // the total multiplicities of the ith branch
+    mt=gr_tm[3];  // the multiplicities of the ith branch
+    omega=nrows(gr)-1;  // maximal weight in the graph of the ith branch
+    // If the maximal contact of the ith branch with some other branch is larger
+    // than the maximal weight omega, then the graph has to be polonged.
+    if (omega<maxcontact[i])
+    {
+      grp=intmat(intvec(0),maxcontact[i]+1,maxcontact[i]+1);
+      // save the graph without the point of the strict transform
+      if (omega>=1) // otherwise the graph consists only of the strict transform
+      {
+        grp[1..omega,1..omega]=gr[1..omega,1..omega];
+      }
+      // add the points of multiplicity 1 up to weight maxcontact[i] and the strict transform
+      // and connect them
+      for (j=omega+1;j<=maxcontact[i]+1;j++)
+      {
+        // adding the vertex to the graph and adding the total multiplicities
+        if (j<=maxcontact[i])
+        {
+          grp[j,j]=j;
+          if (j>1)
+          {
+            tm[j]=tm[j-1]+1;
+            mt[j]=1;
+          }
+          else  // then there is no previous point in the graph 
+          {
+            tm[j]=1;
+            mt[j]=1;
+          }
+        }
+        // connecting the vertex with the previous part of the graph
+        if (j>1)  // otherwise there is nothing to connect to
+        {
+          grp[j-1,j]=1;
+          grp[j,j-1]=1;
+        }
+      }
+      gr=grp;  // replace the subgraph by the prolonged subgraph
+    }
+    gr[nrows(gr),ncols(gr)]=-i;  // give the strict transform in the ith branch weight -i
+    graphs[i]=gr;
+    totmult[i]=tm;
+    multipl[i]=mt;
+  }
+  /////////////////////////////////////////////////////////////////////////////////////
+  // Glue the graphs together.
+  //////////////////////////////////////////////////////////////////////////////
+  intmat rgraph=graphs[1];                 // keeps the resolution graph
+  intmat rtm=intmat(totmult[1],nrows(rgraph),1); // keeps the tot.mult. at the vertices of the graph as rows
+  intmat rmt=intmat(multipl[1],nrows(rgraph),1); // keeps the mult. at the vertices of the graph as rows
+  intvec stricttransforms=0,ncols(rgraph);   // keeps the position of the ith strict 
+                                             // transform in rgraph at position i+1 !!!
+  intvec k,kp,p,q;   // highest contact numbers, num. of branch with hgt contact, separation points 
+  int maxc,maxcp;    
+  for (i=2;i<=r;i++)
+  {
+    //////////////////////////////////////////////////////////////////////////////////
+    // Find j<i minimal s.t. contact[i,j] is maximal.
+    maxcp=i;
+    for (j=1;j<i;j++)
+    {
+      if (contact[i,j]>contact[i,maxcp]){maxcp=j;}      
+    }
+    kp[i]=maxcp;            // the j such that C_i has its maximal contact to C_j
+    k[i]=contact[i,maxcp];  // the maximal contact of C_i with C_1,...,C_i-1
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Find in the graph of C_1,...,C_i-1 the points p of wgt k and q of wgt k-1
+    // connected to C_maxcp.
+    // Since non of C_j for j<maxcp has contact k with C_i, the point p lies in
+    // the remaining part of the graph of C_j.
+    s=rgraph[stricttransforms[maxcp]+1,stricttransforms[maxcp]+1];  
+    p[i]=stricttransforms[maxcp]+1+k[i]-s; // pt. to which reduced subgraph of C_i is glued
+    // If s<k[i], then q also lies in this part, otherwise it lies in the remaining part
+    // of the graph of the C_j to which C_maxcp is connected, i.e. j=kp[maxcp], since
+    // the contact of C_i and of C_maxcp to this C_j is strictly less than k.
+    // If s=k[i]=1, then p=1 and there is no q! We may thus set q=0.
+    if ((s<k[i]) or ((s==k[i]) and (s==1)))  // i.e. q is on the same subgraph as p, or q does not exist
+    {
+      q[i]=p[i]-1;
+    }
+    else               // i.e. q is on the subgraph to which the subgraph of p has been glued
+    {
+      s=rgraph[stricttransforms[kp[maxcp]]+1,stricttransforms[kp[maxcp]]+1];
+      q[i]=stricttransforms[kp[maxcp]]+k[i]-s;
+    }
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Reduce the graph of C_i and add it to the graph of C_1,...,C_i-1.
+    gr=graphs[i];
+    s=nrows(rgraph);
+    // Delete in the graph of C_i everything of weight <=k.
+    gr_red=intmat(intvec(gr[k[i]+1..nrows(gr),k[i]+1..ncols(gr)]),nrows(gr)-k[i],ncols(gr)-k[i]);
+    // Add this part to the graph of C_1,...,C_i-1.
+    rgraph=addmat(rgraph,gr_red);
+    /////////////////////////////////////////////////////////////////////////////////////
+    // Connect the two parts of the graph.
+    /////////////////////////////////////////////////////////////////////////////////////
+    // Connect the points connected to the point of wgt k in the graph of C_i to p[i].
+    for (j=k[i]+1;j<=ncols(gr);j++)
+    {
+      if(gr[k[i],j]==1)
+      {
+        rgraph[s+j-k[i],p[i]]=1;
+        rgraph[p[i],s+j-k[i]]=1;
+      }
+    }
+    // If pt. of wgt k is not connected to pt of wgt k-1 in graph of C_i, then points
+    // connected to the one of wgt k-1 have to be connected to q[i].
+    if (k[i]>1)
+    {
+      if (gr[k[i],k[i]-1]!=1)
+      {   
+        for (j=k[i]+1;j<=ncols(gr);j++)
+        {   
+          if(gr[k[i]-1,j]==1)
+          {
+            rgraph[s+j-k[i],q[i]]=1;
+            rgraph[q[i],s+j-k[i]]=1;
+          }
+        }
+        // Cut the connection from p[i] to q[i].    
+        rgraph[p[i],q[i]]=0;
+        rgraph[q[i],p[i]]=0;
+      }
+    }
+    stricttransforms[i+1]=ncols(rgraph);
+    ////////////////////////////////////////////////////////////////////////////////
+    // Adjust the total multiplicities
+    ////////////////////////////////////////////////////////////////////////////////
+    // Add the total multiplicities for the added subgraph to rtm
+    tm=totmult[i];
+    mt=multipl[i];
+    if (k[i]<size(tm)) // if the reduced subgraph of C_i has more than one point
+    {
+      rtm=addmat(rtm,intmat(intvec(tm[k[i]+1..size(tm)]),nrows(gr_red),1));    
+      rmt=addmat(rmt,intmat(intvec(mt[k[i]+1..size(mt)]),nrows(gr_red),1));    
+    }
+    else // if the reduced subgraph of C_i consists only of the strict transform
+    {
+      rtm=addmat(rtm,0);
+      rmt=addmat(rmt,0);
+    }
+    // Adjust the total multiplicities at the places where the subgraph has been glued.
+    e=k[i];    // the highest weight of a point that has not yet been assigned its tot. mult. 
+    while(e>=1)
+    {      
+      s=stricttransforms[maxcp]+1;  // Line in the graph of the start. pt. of the subgraph of C_maxcp.
+      for (j=rgraph[s,s];j<=e;j++)  // Adjust the multiplicities.
+      {
+        rtm[s+j-rgraph[s,s],i]=tm[j];
+        rmt[s+j-rgraph[s,s],i]=mt[j];
+      }
+      maxcp=kp[maxcp];  // To which subgraph has the subgraph of C_maxcp been glued?
+      e=rgraph[s,s]-1;  // What is the highest weight of a pt. that has not yet been assigned its tot.mult.?
+    }
+    e=nrows(rtm);  // Number of rows in the matrix of totalmultiplicities.
+    // The total multiplicities of the C_s for s=1,...,i-1 along the exceptional divisors
+    // which are introduced after the strict transform of C_s has separated (i.e. the entries
+    // in rows stricttransform[i]+1,...,stricttransform[i+1]-1 in the s-th column of the matrix
+    // of total multiplicities still have to be calculated. 
+    for (s=1;s<i;s++)
+    {
+      rtm[1..e,s]=adjust_tot_mult(intvec(rtm[1..e,i]),intvec(rtm[1..e,s]),intvec(rmt[1..e,i]),intvec(rmt[1..e,s]),p,q,stricttransforms,i);
+    }
+    // The total multiplicities of the C_i along the exceptional divisors
+    // which are introduced for the sake of C_s, s=1,...,i-1, after the strict transform 
+    // of C_i has separated (i.e. the entries in rows stricttransform[s]+1,...,stricttransform[s+1]-1 
+    // in the i-th column of the matrix of total multiplicities still have to be calculated. 
+    for (s=1;s<i;s++)
+    {
+      rtm[1..e,i]=adjust_tot_mult(intvec(rtm[1..e,s]),intvec(rtm[1..e,i]),intvec(rmt[1..e,s]),intvec(rmt[1..e,i]),p,q,stricttransforms,s);
+    }
+  }
+  list result=rgraph,rtm,rmt;
+  return(result);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  ring r=0,(x,y),ls;
+  poly f1=(y2-x3)^2-4x5y-x7;
+  poly f2=y2-x3;
+  poly f3=y3-x2;
+  totalmultiplicities(f1*f2*f3);
+}
+
+
+proc alexanderpolynomial (def INPUT)
+"USAGE:  alexanderpolynomial(INPUT); INPUT poly or list
+ASSUME:  INPUT is either a bivariate polynomial defining a plane curve singularity,
+         or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
+         the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
+         @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
+         the contact matrix and a list of integer vectors with the characteristical exponents 
+         of the branches of a plane curve singularity, or an integer vector containing the
+         characteristical exponents of an irreducible plane curve singularity.
+CREATE:  a ring with variables t, t(1), ..., t(r) (where r is the number of branches of
+         the plane curve singularity f defined by INPUT) and ordering ls over the
+         ground field of the basering. @*
+         Moreover, the ring contains the Alexander polynomial of f in variables t(1), ..., t(r)
+         (@code{alexpoly}), the zeta function of the monodromy operator of f in the variable t
+         (@code{zeta_monodromy}), and a list containing the factors of the Alexander 
+         polynomial with multiplicities (@code{alexfactors}).
+RETURN:  a list, say @code{ALEX}, where @code{ALEX[1]} is the created ring
+NOTE:    to use the ring type: @code{def ALEXring=ALEX[i]; setring ALEXring;}.
+         @*
+         Alternatively you may use the procedure sethnering and type: sethnering(ALEX,\"ALEXring\");
+         @*
+         To access the Alexander polynomial resp. the zeta function resp. the 
+         factors of the Alexander polynomial type: @code{alexpoly} resp. @code{zeta_monodromy} 
+         resp. @code{alexfactors}.@*
+         In case the Hamburger-Noether expansion of the curve f is needed
+         for other purposes as well it is better to calculate this first
+         with the aid of @code{hnexpansion} and use it as input instead of
+         the polynomial itself.
+SEE ALSO: resolutiongraph, totalmultiplicities
+EXAMPLE: example alexanderpolynomial;  shows an example
+"
+{
+  // Get the resolution graph and the total multiplicities.
+  list gr_tm=totalmultiplicities(INPUT); 
+  intmat gr=gr_tm[1];
+  intmat tm=gr_tm[2];
+  int r=ncols(tm);
+  int e=ncols(gr);
+  // Define the Ring for the Alexander Polynomial and the Zeta Function of the Monodromy.
+  execute("ring ALEXring=("+charstr(basering)+"),(t,t(1..r)),dp;");
+  poly hilfspoly=1;
+  poly alexnumerator=1;    // numerator of the Alexander polynomial
+  poly alexdenominator=1;  // denominator of the Alexander polynomial
+  list alexfactors;        // the factors of the Alexanderpolynomial with multiplicities
+  list alexfactor;
+  int chi=2;
+  int i,j,k;
+  int s=1;
+  // Consider every vertex of the resolution graph.
+  for (i=1;i<=e;i++)
+  {
+    if (gr[i,i]>0)  // If it belongs to an exceptional curve.
+    {
+      for (j=1;j<=e;j++)  // Calculate the Euler charateristik of the smooth locus of the exc. curve.
+      {
+        if ((gr[i,j]==1) and (i!=j))
+        {
+          chi=chi-1;
+        }
+      }
+      if (chi!=0)         // If the Euler characteristik is not zero, then it gives a factor in the AP.
+      {
+        for (k=1;k<=r;k++)
+        {
+          hilfspoly=hilfspoly*t(k)^tm[i,k];
+        }
+        hilfspoly=1-hilfspoly;
+        if (chi<0)       // ... either in the numerator ...
+        {
+          alexnumerator=alexnumerator * hilfspoly^-chi;
+        }
+        else             // ... or in the denominator.
+        {
+          alexdenominator=alexdenominator * hilfspoly^chi;
+        }        
+        alexfactor=hilfspoly,-chi;
+        alexfactors[s]=alexfactor;
+        s++;
+      }
+      chi=2;
+      hilfspoly=1;
+    }
+  }
+  // Calculate the Alexander Polynomial.
+  if (ncols(tm)==1)  // If we have only one branch, then the numerator has to be multiplied by 1-t.
+  {
+    alexnumerator=alexnumerator*(1-t(1));
+    alexfactor=1-t(1),1;
+    alexfactors[size(alexfactors)+1]=alexfactor;
+  }
+  poly alexpoly=alexnumerator / alexdenominator;
+  // Calculate the Zeta Function of the Monodromy Operator.
+  poly zeta_monodromy=alexpoly;
+  for (i=1;i<=r;i++)
+  {
+    zeta_monodromy=subst(zeta_monodromy,t(i),t);
+  }
+  export zeta_monodromy;  
+  export alexnumerator;
+  export alexdenominator;
+  export alexfactors;
+  export alexpoly;
+  list ALEX=ALEXring;
+  return(ALEX);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  ring r=0,(x,y),ls;
+  poly f1=(y2-x3)^2-4x5y-x7;
+  poly f2=y2-x3;
+  poly f3=y3-x2;
+  list ALEX=alexanderpolynomial(f1*f2*f3);
+  def ALEXring=ALEX[1];
+  setring ALEXring;
+  alexfactors;
+  alexpoly;
+  zeta_monodromy;
+}
+
+proc charexp2multseq (intvec charexp)
+"USAGE:      charexp2multseq(v),  v intvec
+ASSUME:      v contains the charakteristical exponents of an irreducible plane 
+             curve singularity
+RETURN:      intvec, the multiplicity sequence of the plane curve singularity
+NOTE:        If the curve singularity is smooth, then the multiplicity sequence is empty.
+             This is expressed by returning zero.
+SEE ALSO:    invariants, resolutiongraph, totalmultiplicities, alexpoly
+KEYWORDS:    characteristical exponents; multiplicity sequence; topological invariants
+EXAMPLE:     example charexp2multseq;   shows an example"
+{
+  int end=size(charexp);
+  // If the singularity is smooth!
+  if (end==1)
+  {
+    return(1); // ERROR: Should be 0, but for the time being, Singular returns 1.
+  }
+  intvec multseq=euclidseq(charexp[2],charexp[1]);
+  for (int i=3;i<=end;i++)
+  {
+    multseq=multseq,euclidseq(charexp[i]-charexp[i-1],multseq[size(multseq)]);
+  }
+  return(multseq);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  charexp2multseq(intvec(28,64,66,77));
+}
+
+proc  multseq2charexp(def v)   // Procedure written by Fernando.
+"USAGE:  multseq2charexp(v), v intvec
+ASSUME:  The input is an intvec, which contains the mutiplicity sequence 
+         of an irreducible plane curve singularity .
+RETURN:  An intvec, which contains the sequence of characteristic
+         exponents of the irreducible plane curve singularity defined by v.
+EXAMPLE: example multseq2charexp; shows an example.
+"
+{
+  ///////  Preamble which reduces the input of an intvec to  /////////////
+  ///////  the originally assumed input of a list of intvecs /////////////
+  ///////  and tests the input.                              /////////////
+  if (typeof(v)=="intvec")
+  {
+    list RESULT=multseq2charexp(list(v));
+    return(RESULT[1]);
+  }
+  if (typeof(v)!="list")
+  {
+    ERROR("Invalid Input!");
+  }
+  if (typeof(v)=="list")
+  {
+    int TESTV;
+    for (int III=1;III<=size(v);III++)
+    {
+      if (typeof(v[III])!="intvec")
+      {
+        TESTV=1;
+      }
+    }
+    if (TESTV==1)
+    {
+      ERROR("Invalid Input!");
+    }
+  }
+  ///////////////////////////////////////////////////////////
+  list L=v;
+  int n =size(L);
+  // ///////////////////////////////////////////////////////
+  // we look the size of each vector
+  intvec mm;
+  for(int j=1;j<=n;j++)
+  {   
+    mm[j]=size(L[j]);
+  }
+  // ///////////////////////////////////////////////////////
+  // we define some variables
+  list LL;
+  int temp, temp1,temp2;
+  int ind,r,l,boolean;
+  int old,new;
+  int contador;
+  list EUCLI,EUCLI1;
+  intvec exponent,exponentes1;
+  int new1,old1;
+  int contador1;
+  int a,b,f;
+  //with the for we round each branch. 
+  for(int k=1;k<=n;k++)
+  {
+    l=1;
+    old=L[k][l];
+    //if the vertor has more than one element 
+    if(mm[k]<>1)
+    {
+      // ///////////////////////////////////////////////////////////////////////////////
+      // the first step is special because is easy to know the two first characteristic exponents
+      new=L[k][l+1];
+      contador=1;
+      while(old==new)//we check how many consecutives elements are equal, starting in the first.
+      {
+        contador=contador+1;
+        old=new;
+        new=L[k][contador+1];
+      }
+      exponent=L[k][l],contador*L[k][l]+L[k][l+contador];// those are the first two characteristic exponents.
+      LL[k]=exponent;// we insert them in the final matrix 
+      EUCLI=euclides(LL[k][2],LL[k][1]);// compute the euclides algorithm for the two first characteristic exponents.
+      temp=size(EUCLI[1]);
+      // measure how many elements of the multiplicity sequence belong to the first euclidean algorithm.
+      for(ind=1;ind<=temp;ind=ind+1)
+      {
+        l=l+EUCLI[1][ind];
+      }
+      l=l-1;//this is the number we are looking for.
+      ///////////////////////////////////////////////////////////////
+      r=1;
+      //repeat the same process until the end of the multiplicity sequence.
+      if(mm[k]-1>l)
+      {
+        while( l<mm[k]-1)
+        {
+          r=r+1;
+          old1=L[k][l];
+          new1=L[k][l+1];
+          contador1=0;
+          boolean=1;
+          if(old1==new1)
+          {
+            while(old1==new1 and boolean==1)
+            {
+              contador1=contador1+1;
+              old1=new1;
+              new1=L[k][l+contador1+1];
+              if(size(L[k])<=l+contador1+1)
+              {
+                boolean =0;
+              }
+            }
+          }
+          temp1=size(LL[k]);
+          exponentes1=LL[k],LL[k][temp1]+(contador1*L[k][l])+L[k][contador1+l+1];
+          LL[k]=exponentes1;	
+          EUCLI1=euclides(LL[k][temp1+1]-LL[k][temp1],L[k][l]);
+          temp2=size(EUCLI1[1]);
+          for(ind=1;ind<=temp2;ind=ind+1)
+          {
+            l=l+EUCLI1[1][ind];
+          }		       	
+        }
+      }
+    }
+    // if the vector has only one element then the charexp is only 1.
+    else
+    {
+      LL[k]=1; 
+    }
+  }
+  return(LL);
+}   
+example
+{
+  "EXAMPLE:";echo=2;
+  ring A=0,(x,y),dp;
+  intvec v=2,1,1;
+  multseq2charexp(v);
+  intvec v1=4,2,2,1,1;
+  multseq2charexp(v1);
+}
+
+proc charexp2poly(intvec v, vector a)  // Procedure written by Fernando.
+"USAGE:  charexp2poly(v,a); intvec v, vector a.
+ASSUME:  v an intvec containing the characterictic exponents of an irreducible plane curve singularity.
+         a a vector containing the coefficients of a parametrization given by x(t)=x^v[1], 
+         y(t)=a(1)t^v[2]+...+a[n-1]t^v[n], i.e. the entries of a are of type number.
+RETURN:  A polynomial f in the first two variables of the basering, such that f defines an 
+         irreducible plane curve singularity with characteristic exponents v.
+NOTE:    The entries in a should be of type number and the vector v should be the sequence of
+         characteristic exponents of an irreducible plane curve singularity in order to 
+         get a sensible result,
+SEE ALSO: charexp2multseq, multseq2charexp.
+EXAMPLE: example charexp2poly;  shows an example
+"
+{
+  int n=size(v);
+  vector expo;
+  int i,j,s;
+  for(i=1;i<=v[1];i++)
+  {
+    expo[i]=0;//initialize to 0.
+  }
+  for(i=2;i<=n;i++)
+  {
+    s=v[i] mod v[1];//calculate the position.
+    expo=expo-a[i-1]*var(1)^((v[i]-s)/v[1])*gen(s+1);//save in expo -var(1) to the power the corresponding
+                                                     //but only in the right positions
+  }
+  matrix M[v[1]][v[1]];
+  //construct the matrix that generates the polynomial
+  for(i=1;i<=v[1];i++)
+  {
+    M[i,i]=var(2)+expo[1];//The  diagonal  
+    for(j=1;j<=v[1]-i;j++)
+ 	{
+ 	  M[j,j+i]=expo[i+1];//over diagonal                    
+ 	}
+    for(j=1;j<=v[1]-i;j++)
+ 	{
+ 	  M[j+i,j]=var(1)*expo[1+v[1]-i];//under diagonal                  
+ 	}
+  } 
+  //the poynomial is the determinant of the matrix  
+  poly irredpoly=det(M);
+  return(irredpoly)
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r=0,(x,y),dp;
+  intvec v=8,12,14,17;
+  vector a=[1,1,1];
+  poly f=charexp2poly(v,a);
+  f;
+  invariants(f)[1][1];  // The characteristic exponents of f.
+}
+
+proc tau_es (def INPUT)
+"USAGE:  tau_es(INPUT); INPUT poly or list
+ASSUME:  INPUT is either a bivariate polynomial defining a plane curve singularity,
+         or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
+         the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
+         @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
+         the contact matrix and a list of integer vectors with the characteristical exponents 
+         of the branches of a plane curve singularity, or an integer vector containing the
+         characteristical exponents of an irreducible plane curve singularity, or
+         the output of @code{totalmultiplicities(f)}, or a list containing the resolution graph
+         and the (strict) multiplicities as in output of @code{totalmultiplicities(f)}.
+RETURN:  int, the equisingular Tjurina number of f, i. e. the codimension of the mu-constant
+         stratum in the semiuniversal deformation of f, where mu is the Milnor number of f.
+NOTE:    The equisingular Tjurina number is calculated with the aid of a Hamburger-Noether
+         expansion, which is the hard part of the calculation.
+         In case the Hamburger-Noether expansion of the curve f is needed
+         for other purposes as well it is better to calculate this first
+         with the aid of @code{hnexpansion} and use it as input instead of
+         the polynomial itself.
+SEE ALSO: develop, hnexpansion, totalmultiplicities
+EXAMPLE: example tau_es;  shows an example
+"
+{
+  int i;                  // Laufvariable
+  int tau,multi,tau_i;    // Variable for es-Tjurina no., multiplicitiy, and es-Tjurina at blow ups 
+  intmat resgr, multseq;  // resolution graph and multiplicity sequence
+  /////////////////////////////////////////////////////////
+  // Check what type the input is, and act accordingly.
+  if (typeof(INPUT)=="list") 
+  {
+    if (size(INPUT)==3)
+    {
+      // If the INPUT is the output of totalmultiplicities
+      if ((typeof(INPUT[1])=="intmat") and (typeof(INPUT[2])=="intmat") and (typeof(INPUT[3])=="intmat"))
+      { 
+        resgr=INPUT[1];
+        multseq=INPUT[3];
+      }
+      // Otherwise call the procedure with the output of totalmultiplicities(INPUT).
+      else
+      {
+        return(tau_es(totalmultiplicities(INPUT)));
+      }
+    }
+    else 
+    {
+      if (size(INPUT)==2)
+      {
+        // If the INPUT is the resolution graph and the multiplicity sequences.
+        if ((typeof(INPUT[1])=="intmat") and (typeof(INPUT[2])=="intmat"))
+        {
+          resgr=INPUT[1];
+          multseq=INPUT[2];
+        }
+        // Otherwise call the procedure with the output of totalmultiplicities(INPUT).
+        else
+        {
+          return(tau_es(totalmultiplicities(INPUT)));
+        }
+      }
+      else
+      {
+        return(tau_es(totalmultiplicities(INPUT)));
+      }
+    }
+  }
+  // Otherwise call the procedure with the output of totalmultiplicities(INPUT).
+  else
+  {
+    return(tau_es(totalmultiplicities(INPUT)));
+  }
+  /// End of checking the input
+  ///////////////////////////////////////////////////////  
+  // If the singularity is smooth, the equisingular Tjurina number is zero.
+  if ((ncols(multseq)==1) and (multseq[1,1]<=1))
+  {
+    return(0);
+  }
+  // Otherwise calculate the multiplicity of the singularity.
+  for (i=1;i<=ncols(multseq);i++)
+  {
+    multi=multi+multseq[1,i];
+  }
+  // And then calculate the equisingular Tjurina numbers in the infinitely near points of
+  // first order plus some correction term (= the number of blow ups needed to separate the
+  // strict transform from the exceptional divisor in the corresponding infinitely near point)
+  // and add them.
+  list graphs=split_graph(resgr,multseq);
+  for (i=1;i<=size(graphs);i++)
+  {
+    // Calculate the equisingular Tjurina number of the i-th subgraph.
+    tau_i=tau_es(list(graphs[i][1],graphs[i][2]));
+    // If the branch was smooth, then the summand has to be reduced by 1.
+    if (tau_i==0)
+    {
+      tau_i=-1;
+    }  
+    tau=tau_i+graphs[i][3];
+  }
+  // The equisingular Tjurina number is then calculated by adding the following term.
+  tau=tau+((multi*(multi+1))/2)-2;
+  return(tau);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  ring r=0,(x,y),ls;
+  poly f1=y2-x3;
+  poly f2=(y2-x3)^2-4x5y-x7;
+  poly f3=y3-x2;
+  tau_es(f1);
+  tau_es(f2);
+  tau_es(f1*f2*f3);
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Static procedures.
+///////////////////////////////////////////////////////////////////////////////////////////
+
+static proc euclidseq(int a,int b)
+"USAGE:      euclidseq(a,b),  a,b integers
+RETURN:      intvec,  the divisors in the euclidean alogrithm with multiplicities
+KEYWORDS:    Euclidean algorithm, multiplicity sequence
+NOTE :       This procedure is for internal use only; it is called by charexp2multseq.
+"
+{
+  int i;
+  // multseq saves in each step of the Euclidean algorithm q-times the divisor b  
+  intvec multseq;
+  int q=a div b;
+  int r=a mod b;
+  for (i=1;i<=q;i++)
+  {
+    multseq[i]=b;
+  }  
+  int s=q;        // size of multseq
+  a=b;
+  b=r;
+  while(r<>0)
+  {
+	q=a div b;
+	r=a mod b;
+    for (i=1;i<=q;i++)
+    {
+      multseq[s+i]=b;
+    }  
+    s=s+q;        // size of multseq
+	a=b;
+	b=r;
+  }
+  return(multseq);
+}
+
+static proc puiseuxchainpart (int piij, int muij, intvec multpl, int initial_tm, int end_tm, int j)
+"USAGE:   puiseuxchainpart(piij,muiij,multpl,initial_tm,end_tm,j); 
+RETURN:   list L, L[1] incidence matrix of a part of the Puiseux chain, L[2] the total
+          multiplicities of this part of the Puiseux chain.
+NOTE:     This procedure is only for internal use; it is called by puiseuxchain.
+"
+{
+  int delta=1;
+  if (j==1){delta=0;}                 // Delta measures whether j is 1 or not.
+  intvec totalmultiplicity;           // Keeps the total multiplicities.
+  intmat pcp[muij][muij];             // Keeps the incidence matrix of the Puiseuxchainpart S_i,j.
+  // Calculate the total multiplicities and the Puiseuxchainpart S_i,j.
+  totalmultiplicity[1]=initial_tm+end_tm+multpl[1];
+  pcp[1,1]=piij+1;
+  for (int k=2;k<=muij;k++)
+  {
+    pcp[k,k]=piij+k;
+    pcp[k-1,k]=1;
+    pcp[k,k-1]=1;
+    totalmultiplicity[k]=totalmultiplicity[k-1]+delta*initial_tm+multpl[k];
+  }
+  list result=pcp,totalmultiplicity;
+  return(result);
+}
+
+static proc puiseuxchain (int initial, intvec divseq, intvec multpl, int initial_tm)
+"USAGE:   puiseuxchain(initial,divseq,multpl,initial_tm); int initial, initial_tm, intvec divseq, multpl
+RETURN:   list L, L[1] incidence matrix of a Puiseux chain, L[2] the weight of the point to which the
+          previous Puiseux chain has to be connected, L[3] the sequence of total multiplicities of
+          the points in this Puiseux chain.
+NOTE:     This procedure is only for internal use; it is called by irred_resgraph_totmult.
+"
+{  
+  int j,k,l,connectpoint;
+  intvec multpli;
+  int pc_tm=initial_tm;       // Keeps the total multipl. of the endpoint of P_i-1.
+  int end_tm=0;
+  int start=1;
+  int omega=size(divseq);
+  // Keep the endpoints of the puiseuxchainparts (minus initial)  s_i,j in divseq_sum.  
+  intvec divseq_sum=divseq[1];                 
+  for (j=2;j<=omega;j++)
+    {
+      divseq_sum[j]=divseq_sum[j-1]+divseq[j];
+    }  
+  // Define the connecting point of the Puiseuxchain P_i-1 with P_i.
+  if (divseq[1]==0)
+  {
+    // If divseq[1]=mu_i,1=0, then the Puiseuxchainpart S_i,1 is empty.
+    // We may start building the Puiseuxchain with part 2, i.e. set start=2.
+    start=2;
+    if (omega>=3)
+    {
+      connectpoint=initial+divseq_sum[2]+1;  // startpoint of s_i+1,3
+    }
+    else
+    {
+      connectpoint=initial+divseq_sum[2];    // endpoint of s_i+1,2
+    }    
+  }  
+  else
+  {
+    connectpoint=initial+1;
+  }  
+  // Build the Puiseuxchainparts s_i,j and put them as blocks into pc=P_i.
+  multpli=multpl[initial+1..initial+divseq_sum[start]];
+  list pcp=puiseuxchainpart(initial,divseq[start],multpli,initial_tm,end_tm,start);
+  intmat pc=pcp[1];
+  intvec tm=pcp[2];
+  for (j=start+1;j<=omega;j++)
+    { 
+      // Keep the final total multipl. of the puiseuxchainpart S_i,j-2 resp. P_i-1, if S_i,1 empty.
+      if (j>2){end_tm=initial_tm;}
+      // Calculate the endpoint of S_i,j-1.
+      initial=initial+divseq[j-1];
+      // Keep the total multiplicity of the endpoint of S_i,j-1
+      initial_tm=pcp[2][size(pcp[2])];
+      // Build the new puiseuxchainpart S_i,j
+      multpli=multpl[initial+1..initial+divseq[j]];
+      pcp=puiseuxchainpart(initial,divseq[j],multpli,initial_tm,end_tm,j);
+      pc=addmat(pc,pcp[1]);
+      tm=tm,pcp[2];
+    }
+  // Connect the Puiseuxchainparts s_i,j.
+  for (j=start;j<=omega-2;j++)
+    {
+      k=divseq_sum[j];          // endpoint of s_i,j
+      l=divseq_sum[j+1]+1;      // startpoint of s_i,j+2
+      pc[k,l]=1;            // connecting these
+      pc[l,k]=1;
+    }
+  if (omega>=start+1)   // If there are at least two non-empty s_i,j.
+    {
+      k=divseq_sum[omega-1];    // endpoint of s_i,omega-1
+      l=divseq_sum[omega];      // endpoint of s_i,omega
+      pc[k,l]=1;            // connecting these
+      pc[l,k]=1;
+    }
+  list ergebnis=pc,connectpoint,tm;  
+  return(ergebnis);  
+}
+
+static proc irred_resgraph_totmult (intvec charexp)
+"USAGE:   irred_resgraph_totmult(charexp); charexp intvec
+ASSUME:   charexp is an integer vector containg the characteristical exponents of
+          an irreducible plane curve singularity
+RETURN:   list L, L[1] is the incidence matrix of the resolution graph of the plane curve
+          singularity defined by INPUT, and L[2] is its sequence of total multiplicities
+NOTE:     This procedure is only for internal use; it is called by resgraph.
+"
+{
+  int k,l;
+  intvec multpl=charexp2multseq(charexp);  // multiplicity sequence of the singularity
+  // Do first the case where the singularity is actually smooth.
+  if (size(charexp)==1)
+  {
+    intmat resgraph[1][1]=0;
+    intvec tm=1;   // there is no exceptional divisor in the resolution - ERROR: should be 0,
+                   // but for the time being, Singular returns 1 as multiplicity of smooth curves
+    list result=resgraph,tm,multpl;
+    return(result);
+  }
+  // End of the smooth case
+  int initial_tm=0;                  // total multipl. of the endpoint of Puiseux chain P_i-1
+  int g=size(charexp);  
+  list es=divsequence(charexp[2],charexp[1]);   // keeps the lenghts of the Puiseuxchainparts s_i,j
+  intvec divseq=es[1];
+  int r=es[2];  
+  int initial=0;
+  // Build the Puiseuxchains P_i and put them as blocks into a matrix.
+  list pc=puiseuxchain(initial,divseq,multpl,initial_tm);
+  intmat resgraph=pc[1];
+  intvec endpoints=resgraph[nrows(resgraph),ncols(resgraph)];  
+  intvec connectpoints=pc[2];
+  intvec tm=pc[3];
+  for (int i=3;i<=g;i++)
+    {
+      initial_tm=tm[size(tm)];
+      es=divsequence(charexp[i]-charexp[i-1],r);      
+      divseq=es[1];
+      r=es[2];
+      initial=endpoints[size(endpoints)];
+      pc=puiseuxchain(initial,divseq,multpl,initial_tm);
+      resgraph=addmat(resgraph,pc[1]);
+      endpoints=endpoints,resgraph[nrows(resgraph),ncols(resgraph)];      
+      connectpoints=connectpoints,pc[2];
+      tm=tm,pc[3];
+    }
+  // Adding the * for the strict transform to the Graph.
+  resgraph=addmat(resgraph,0);
+  // The connecting point of the * with the graph.
+  connectpoints=connectpoints,nrows(resgraph);  
+  // Connect the P_i with each other and with *.
+  for (i=2;i<=g;i++)  
+  {
+    k=endpoints[i-1];          // endpoint of P_i-1
+    l=connectpoints[i];        // conncting point of P_i resp. of *
+    resgraph[k,l]=1;          // connecting these
+    resgraph[l,k]=1;
+  }  
+  list result=resgraph,tm,multpl; //HIER GEAENDERT!!!!
+  return(result);
+}
+
+static proc max_in_intvec (intvec v)
+"USAGE:   max_in_intvec(v); v intvec
+RETURN:   int m, maximum of the integers in v
+NOTE:     This procedure is only for internal use; this procedure is called by 
+          totalmultiplicities.
+"
+{
+  int max=v[1];
+  for (int i=2;i<=size(v);i++)
+  {
+    if (v[i]>max)
+    {
+      max=v[i];
+    }
+  }
+  return(max);
+}
+
+static proc addmat (intmat A,intmat B)
+"USAGE:   max_in_intvec(A,B); A, B integer matrices
+RETURN:   intmat C, block matrix with left-upper block A, right-lower block B
+NOTE:     This procedure is only for internal use; this procedure is called several times. 
+" 
+{ 
+  int nc=ncols(A);
+  int nr=nrows(A);
+  int mc=ncols(B);
+  int mr=nrows(B);
+  int i,j;  
+  intmat AB[nr+mr][nc+mc];
+  for (i=1;i<=nr;i++)
+    {
+      for (j=1;j<=nc;j++)
+	{
+	  AB[i,j]=A[i,j];	  
+	}
+    }
+  for (i=1;i<=mr;i++)
+    {
+      for (j=1;j<=mc;j++)
+	{
+	  AB[i+nr,j+nc]=B[i,j];
+	}
+    }
+  return(AB);
+}
+
+static proc divsequence(int a,int b)
+"USAGE:   divsequence(a,b); a,b integers
+RETURN:   list l, l[1] the multiplicities of the divisors in the Euclidean algorithm
+          and l[2] the last non-zero remainder in the Euclidean algorithm
+NOTE:     This procedure is only for internal use; it is called in irred_res_graph.
+"
+{
+  int q=a div b;
+  int r=a mod b;
+  intvec divseq=q;
+  while(r<>0)
+  {
+    a=b;
+    b=r;
+    q=a div b;
+    r=a mod b;
+    divseq = divseq,q;
+  }
+  list result=divseq,b;
+  return(result);
+}
+
+
+
+static proc adjust_tot_mult (intvec rtm_fix, rtm_var, rmt_fix, rmt_var, p, q, stricttransforms, int k)
+"USAGE:   divsequence(v1,v2,v3,v4,p,q,st,k); v1,...,st intvecs and k an integer
+RETURN:   intvec rtm_var, adjusted total multiplicities
+NOTE:     This procedure is only for internal use; it is called in totalmultiplicities.
+"
+{
+  int j,l,store;  // Help variables.
+  // Recalculate the entries in rtm_var from stricttransforms[k]+1,...,stricttransforms[k+1]-1.
+  for (j=stricttransforms[k]+1;j<stricttransforms[k+1];j++)
+  {
+    if (rtm_var[j]==0) // If the entry is non-zero, we know that it is already correct.
+    {
+      // Check if the vertex in the fixed part is connected to one or to two vertices of lower weight.
+      if (j==stricttransforms[k]+1)  // The vertex of weight 1 less is p[k], to which the subgraph is glued.
+      {
+        store=rtm_fix[j]-rmt_fix[j]-rtm_fix[p[k]];
+      }   
+      else                           // The vertex of weight 1 less belongs to the subgraph.
+      {
+        store=rtm_fix[j]-rmt_fix[j]-rtm_fix[j-1];
+      }   
+      // It is connected to two vertices V (which has weight one less) and W.
+      if (store>0)
+      {
+        if (j==stricttransforms[k]+1)  // V is p[k] (to which the subgrap was glued) and W is q[k], the
+        {                              // vertex of weight one less, to which p[k] is conncted. 
+          rtm_var[j]=rtm_var[p[k]]+rtm_var[q[k]];  // In this case the subgraph separates p[k] and q[k]!
+        }
+        if (j==stricttransforms[k]+2)  // V belongs to the subgraph (it is the vertex considerd in the
+        {                              // previous case!), and W is p[k]. In this case the subgraph
+          rtm_var[j]=rtm_var[j-1]+rtm_var[p[k]];  // separates p[k] and q[k].
+        } 
+        if (j>stricttransforms[k]+2)  // V and W both belong to the subgraph.
+        {
+          l=j-2;
+          while (store<rtm_fix[l]) // Find the second vertex W which is connected to which it is 
+          {                        // connected. It has total multipl. = store!
+            l=l-1;
+          }
+          rtm_var[j]=rtm_var[j-1]+rtm_var[l];
+        } 
+      }
+      // It is only connected to one vertex V, which then must be the one of weight one less. 
+      else
+      {
+        if (j==stricttransforms[k]+1) // V is p[k], the vertex, to which the subgraph was glued. 
+        {
+          rtm_var[j]=rtm_var[p[k]]; 
+        }
+        else
+        {
+          rtm_var[j]=rtm_var[j-1];  // V is belongs already to the subgraph.
+        }
+      }
+    }
+  }
+  return(rtm_var);
+}
+
+static proc euclides(int a,int b)  // Procedure of Fernando.
+"USAGE:   euclides(m,n);where m,n are integers.
+RETURN:   The divisor, the quotients and the remainders of the euclidean algorithm performing for m and n.
+NOTE:     This procedure is only for internal use; it is called in multseq2charexp.
+"
+{
+ int c=a div b;//we compute in c the integer division between a and b.
+ int r=a mod b;//in r the remainer of the division between a and b
+ intvec dividendo=c;// we define the intvec of the dividens and we initialize it to c
+ intvec remain=r;// we define the intvec of the remainders and we initialize it to r 
+ a=b;//change a to b 
+ b=r;// and b to r
+ 
+ while(r<>0)// while the current remainder is diferent to 0 we make the same af before
+  {
+    c=a div b;
+    r=a mod b;
+    dividendo =dividendo,c;
+    if(r<>0)
+      {
+	remain=remain,r;
+      }
+       a=b;
+       b=r;
+     }
+   list L=dividendo,remain;//we put in a list all the dividens and all the remainders
+   return(L);// and return the list
+}
+
+
+static proc split_graph (intmat resgr, intmat multseq)
+"USAGE:   split_graph(resgr,multseq), intmat resgr, multseq 
+RETURN:   list, each entry is a list which contains one subgraph connected to 
+          the point of weight one in the input graph, contains the multiplicity sequence
+          of this subgraph and the correction term (which is the number of blow ups
+          needed to separate the strict transform from the exceptional divisor in
+          this point)
+NOTE:     This procedure is only for internal use; it is called in tau_es.
+"
+{
+  int i,j,k;    // Laufvariablen
+  int anf=2;    // start point of subgraph to extract
+  int ende;     // end point of subgraph to extract
+  int anzahl;   // counter for number of branches in subgraph
+  int stelle=1; // no. of the first branch in the subgraph 
+  int start;    // one more than the position in the first subgraph connected to 1
+  list result;  // keeps the resolution graphs, multiplicities and correction terms of the subgraphs
+  intvec d;     // keeps the correction terms of the subgraphs
+  int l=1;      // number of next subgraph for which the correction term is to be calculated
+  // If the singularity is smooth, then the graph need not be split, and the correction term is zero.
+  // Actually this case will not occur, when called from inside tau_es.
+  if (ncols(resgr)==1)
+  {
+    result=list(list(resgr,multseq,0));
+    return(result);
+  }
+  // Find the position in the first subgraph that is connected to the point of weight 1.
+  j=2;
+  while (start==0)
+  {
+    if (resgr[1,j]!=0)
+    {
+      start=j+1;
+      // Calculate how many blow ups are needed, to separate the strict transform from
+      // the exceptional divisor - i.e. one less than the weight of the point connected 
+      // to the point of weight one, respectively one if the point is the strict transform,
+      // which then must be smooth.
+      if (resgr[j,j]>0)  
+      {
+        d[l]=resgr[j,j]-1;   
+      }
+      else
+      {
+        d[l]=1;
+      }
+    }
+    j++;
+  }
+  // If the graph had more than one subgraph connected to the point of weight 1,
+  // then start by finding the next one connected to it, and starting from this point
+  // backwards find the end point of the previous subgraph connected to the point
+  // of weight 1. That way we may extract it, and then go on. 
+  for (j=start;j<=ncols(resgr);j++)
+  {
+    if (resgr[1,j]!=0)
+    {
+      // Calculate how many blow ups are needed, to separate the strict transform from
+      // the exceptional divisor - i.e. one less than the weight of the point connected 
+      // to the point of weight one, respectively one if the point is the strict transform,
+      // which then must be smooth.
+      l++;  // no. of next subgraph for which the correction term d is to be calculated
+      if (resgr[j,j]>0)
+      {
+        d[l]=resgr[j,j]-1;   
+      }
+      else
+      {
+        d[l]=1;
+      }
+      // Find the end point of the previous graph
+      k=j;
+      while (ende<k)
+      {
+        k=k-1;
+        if (resgr[k,k]<=1)
+        {
+          ende=k;
+        }
+      }
+      // Find out, how many subgraphs belong to the previous subgraph.
+      for (i=anf;i<=ende;i++)
+      {
+        if (resgr[i,i]<0)
+        {
+          anzahl++;
+        }
+      }
+      // Extract the previous subgraph and its multiplicity sequence. 
+      result=insert(result,insert(extr_corr(resgr,multseq,anf,ende,stelle,stelle+anzahl-1,anzahl),d[l-1],2),size(result));
+      stelle=stelle+anzahl;
+      anf=ende+1;
+      anzahl=0;
+    }
+  }
+  // The last subgraph still has to be extracted. 
+  ende=ncols(resgr);
+  result=insert(result,insert(extr_corr(resgr,multseq,anf,ende,stelle,ncols(multseq),ncols(multseq)-stelle+1),d[l],2),size(result));
+  return(result);
+}
+
+  
+
+static proc extr_corr (intmat resgr, multseq, int anf, ende, stelle, endstelle, anzahl)
+"USAGE:   extr_corr(resgr,multseq), intmat resgr, multseq, int anf, ende, stelle, endstelle, anzahl
+RETURN:   list, containing two intmat, the resolution graph and the multiplicity sequence
+          which have been extracted and where the weights have been corrected
+NOTE:     This procedure is only for internal use; it is called in tau_es.
+"
+{
+  // Extract the subgraph and the corresponding multiplicity sequence.
+  intmat gr=intmat(intvec(resgr[anf..ende,anf..ende]),ende-anf+1,ende-anf+1);
+  intmat mt=intmat(intvec(multseq[anf..ende,stelle..endstelle]),ende-anf+1,anzahl);
+  // Correct the weights of the extracted subgraph by subtracting 1, and by
+  // renumbering the strict transforms.
+  anzahl=0;  // anzahl now used to count the number of total transforms in the subgraph
+  for (int i=1;i<=ncols(gr);i++)
+  {
+    if (gr[i,i]>0)     // correct weight of an exceptional divisor
+    {
+      gr[i,i]=gr[i,i]-1;
+    }
+    else               // correct weight=number of a strict transform
+    {
+      anzahl++;
+      gr[i,i]=-anzahl;          
+    }   
+  }
+  return(list(gr,mt));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// HIER IST DER FEHLER ZU BEHEBEN !!!
+
+/*
+    for (s=1;s<i;s++)
+    {
+      for (j=stricttransforms[i]+1;j<=stricttransforms[i+1]-1;j++)
+      {
+        if (j==stricttransforms[i]+1)
+        {
+          store=rtm[j,i]-rmt[j,i]-rtm[p[i],i];
+        }
+        else
+        {
+          store=rtm[j,i]-rmt[j,i]-rtm[j-1,i];
+        }
+        if (store>0)
+        {
+          if (j==stricttransforms[i]+2)
+          {
+            l=p[i];
+          }
+          else
+          {
+            l=j-2;    
+          }
+          while (store<rtm[l,i])
+          {
+            l=l-1;
+          }
+          rtm[j,s]=rtm[j-1,s]+rtm[l,s];
+        }
+        else
+        {
+          if (j==stricttransforms[i]+1)
+          {
+            rtm[j,s]=rtm[p[i],s];
+          }
+          else
+          {
+            rtm[j,s]=rtm[j-1,s];
+          }
+        }
+      }
+    }
+    
+
+// Totale Multiplizitaeten in Spalte i anpassen, bei denen die strikte Transformierte nicht mitspielt.
+    for (s=1;s<i;s++)
+    {
+      for (j=stricttransforms[s]+1;j<stricttransforms[s+1];j++)
+      {
+        if (rtm[j,i]==0)
+        {
+          if (j==stricttransforms[s]+1)
+          {
+            store=rtm[j,s]-rmt[j,s]-rtm[p[s],s];
+          }
+          else
+          {
+            store=rtm[j,s]-rmt[j,s]-rtm[j-1,s];
+          }
+          if (store>0)
+          {
+            if (j==stricttransforms[s]+2)
+            {
+              l=p[s];
+            }
+            else
+            {
+              l=j-2;
+            }
+            while (store<rtm[l,s])
+            {
+              l=l-1;
+            }
+            rtm[j,i]=rtm[j-1,i]+rtm[l,i];
+          }
+          else
+          {
+            if (j==stricttransforms[s]+1)
+            {
+              rtm[j,i]=rtm[p[s],i];
+            }
+            else
+            {
+              rtm[j,i]=rtm[j-1,i];
+            }
+          }
+        }
+      }
+    }
+*/
+    
