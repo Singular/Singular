@@ -1,5 +1,24 @@
 Mon Jun 30 15:38:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
+	* GNUmakefile.in (LIBCFLAGS, LIBCXXFLAGS, TMPLCXXFLAGS): option
+	  -Wall replaced by references to $(WARNFLAGS)
+	  (WARNFLAGS): new variable
+
+	* imm.h (MINIMMEDIATELL, MAXIMMEDIATELL): initialization for mac
+	  added (he does not like a 'LL' suffix)
+
+	* templates/ftmpl_matrix.cc: include paths for mac added
+	* templates/ftmpl_list.cc: include paths for mac added
+	* templates/ftmpl_factor.cc: include paths for mac added
+	* templates/ftmpl_array.cc: include paths for mac added
+	* factory.template: include paths for mac added
+	* canonicalform.h: include paths for mac added
+	* ftmpl_inst.cc: include paths for mac added
+	* cf_gcd.cc: include paths for mac added
+	* cf_map.cc: include paths for mac added
+	* cf_map.h: include paths for mac added
+	* fac_ezgcd.cc: include paths for mac added
+
 	* configure: checked into RCS
 	* readcf.cc: checked into RCS
 
@@ -153,15 +172,15 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	* configure.in: totally rewritten
 
 	* config.h.in, conf.h.in: conf.h.in replaced by a totally
-	  rewritten config.h.in.  Furthermore, config.h is now explecitely
+	  rewritten config.h.in.  Furthermore, config.h is now explicitly
  	  included in allmost every source file of the distribution.
 	* factoryconf.template: new file. factoyconf.h is included instead
 	  of config.h in all source files which are not translated but
  	  installed (e.g. templates).
 
-	* factory.template, factory.h: factory.h removed from
-	  distribution, factory.template added since makeheader is now
- 	  included in the distribution
+	* factory.template, factory.h: factory.h replaced by
+	  factory.template since makeheader is now included in
+	  the distribution
 	* factory.template: rewritten to new makeheader syntax
 
 	* factory.template, singfactory.h: Singular stuff moved from
