@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.23 2000-12-31 15:14:37 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.24 2001-02-23 15:41:11 levandov Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -23,6 +23,9 @@
 #include "numbers.h"
 #include "p_Procs.h"
 #include "sbuckets.h"
+#ifdef HAVE_PLURAL
+#include "gring.h"
+#endif
 
 PINLINE2 number p_SetCoeff(poly p, number n, ring r)
 {
@@ -476,6 +479,10 @@ PINLINE2 poly pp_Mult_mm(poly p, poly m, const ring r)
   else
   {
     poly last;
+#ifdef HAVE_PLURAL
+    if (rIsPluralRing(r))
+      return nc_pp_Mult_mm(p, m, r, last);
+#endif
     return r->p_Procs->pp_Mult_mm(p, m, r, last);
   }
 }
@@ -486,6 +493,10 @@ PINLINE2 poly p_Mult_mm(poly p, poly m, const ring r)
   if (p_LmIsConstant(m, r))
     return p_Mult_nn(p, pGetCoeff(m), r);
   else
+#ifdef HAVE_PLURAL
+    if (rIsPluralRing(r))
+      return nc_p_Mult_mm(p, m, r);
+#endif
     return r->p_Procs->p_Mult_mm(p, m, r);
 }
 
@@ -494,6 +505,10 @@ PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
 {
   int shorter;
   poly last;
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+    return nc_p_Minus_mm_Mult_qq(p, m, q, r);
+#endif
   return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
 }
 PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
@@ -501,9 +516,15 @@ PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
 {
   int shorter;
   poly last;
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+     poly res = nc_p_Minus_mm_Mult_qq(p, m, q, r);
+#else
   poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
+#endif
   lp = (lp + lq) - shorter;
   return res;
+
 }
 
 PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
@@ -545,9 +566,9 @@ PINLINE2 poly p_Mult_q(poly p, poly q, const ring r)
   {
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))
-      q = r->p_Procs->nc_mm_Mult_p(p, q, r);
+      q = nc_mm_Mult_p(p, q, r);
     else
-#endif HAVE_PLURAL
+#endif /* HAVE_PLURAL */
       q = r->p_Procs->p_Mult_mm(q, p, r);
 
     r->p_Procs->p_Delete(&p, r);
@@ -556,11 +577,20 @@ PINLINE2 poly p_Mult_q(poly p, poly q, const ring r)
 
   if (pNext(q) == NULL)
   {
-    p = r->p_Procs->p_Mult_mm(p, q, r);
+#ifdef HAVE_PLURAL
+    if (rIsPluralRing(r))
+      p = r->p_Procs->nc_p_Mult_mm(p, q, r);
+    else
+#endif /* HAVE_PLURAL */
+      p = r->p_Procs->p_Mult_mm(p, q, r);
+
     r->p_Procs->p_Delete(&q, r);
     return p;
   }
-
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+    return _nc_p_Mult_q(p, q, 0, r);
+#endif
   return _p_Mult_q(p, q, 0, r);
 }
 
@@ -571,16 +601,39 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
   if (p == NULL || q == NULL) return NULL;
 
   if (pNext(p) == NULL)
-    return r->p_Procs->pp_Mult_mm(q, p, r, last);
+#ifdef HAVE_PLURAL
+    {
+      if (rIsPluralRing(r))
+	return nc_mm_Mult_p(p, p_Copy(q,r), r);
+#endif
+      return r->p_Procs->pp_Mult_mm(q, p, r, last);
+#ifdef HAVE_PLURAL
+    }
+#endif
 
   if (pNext(q) == NULL)
-    return r->p_Procs->pp_Mult_mm(p, q, r, last);
+#ifdef HAVE_PLURAL
+    {
+      if (rIsPluralRing(r))
+	return nc_p_Mult_mm(p_Copy(p,r), q, r);
+#endif
+      return r->p_Procs->pp_Mult_mm(p, q, r, last);
+#ifdef HAVE_PLURAL
+    }
+#endif
 
   poly qq = q;
   if (p == q)
     qq = p_Copy(q, r);
 
-  poly res = _p_Mult_q(p, qq, 1, r);
+  poly res;
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+    res = _nc_p_Mult_q(p, qq, 1, r);
+  else
+#endif
+    res = _p_Mult_q(p, qq, 1, r);
+  
   if (qq != q)
     p_Delete(&qq, r);
   return res;
@@ -597,8 +650,13 @@ PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
   number n_neg = n_Copy(n_old, r);
   n_neg = n_Neg(n_neg, r);
   pSetCoeff0(m, n_neg);
-
-  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+    res = nc_p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
+  else
+#endif
+    res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
+ 
   lp = (lp + lq) - shorter;
   pSetCoeff0(m, n_old);
   n_Delete(&n_neg, r);

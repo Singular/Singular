@@ -6,11 +6,10 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.4 2001-02-22 19:14:27 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.5 2001-02-23 15:41:10 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "gring.h"
-#include "polys.h"
 #ifdef HAVE_PLURAL
 
 //global nc_macros :
@@ -24,17 +23,30 @@ poly nc_pp_Mult_mm(poly p, const poly m, const ring r, poly &last)
 }
 
 // poly nc_p_Mult_mm(poly p, poly m, const ring r); defined below
-poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, int &shorter, const poly spNoether, const ring r, poly &last)
+poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r)
 {
   number minus1=n_Init(-1,r);
   poly mc=p_Mult_nn(p_Copy(m,r),minus1,r);
-  mc=nc_mm_Mult_p(mc,p_Copy(q,r),r);
-  p=p_Add_q(p,mc,r);
+  poly mmc=nc_mm_Mult_p(mc,p_Copy(q,r),r);
+  p_Delete(&mc,r);
+  p=p_Add_q(p,mmc,r);
   n_Delete(&minus1,r);
   return(p);
 }
 
 //----------- auxiliary routines--------------------------
+poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r)
+  /* destroy p,q */
+{
+  poly res=0;
+  while (q!=NULL)
+    {
+      res=res+nc_pp_Mult_mm(p,p_Head(q,r),r);
+      p_LmDeleteAndNext(q,r);
+    }
+  p_Delete(&p,r);
+  return(res);
+}
 
 poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
 /* p is poly, m is mono with coeff, p killed after */
@@ -88,6 +100,7 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
       else
       {
         // REPORT_ERROR AND BREAK
+	Print("exponent mismatch");
         expOut=NULL;
       }
     }
@@ -101,7 +114,8 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
     v=p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
     out = p_Add_q(out,v,r);
-    p_DeleteLm(&p,r);
+    //    p_DeleteLm(&p,r);
+    p_LmDeleteAndNext(p,r);
   }
   freeT(P,r->N);
 //  freeT(M,r->N);
