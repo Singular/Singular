@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.16 1999-10-19 15:45:44 obachman Exp $
+// $Id: tst.lib,v 1.17 1999-10-19 17:01:22 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.16 1999-10-19 15:45:44 obachman Exp $";
+version="$Id: tst.lib,v 1.17 1999-10-19 17:01:22 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -434,11 +434,12 @@ static proc idPrintShort(ideal id, string name)
 }
 
 
-proc tst_test_res(ideal i)
+proc tst_test_res(ideal i, list #)
 
-"USAGE:    tst_test_res(ideal i)
+"USAGE:    tst_test_res(ideal i, only_lres_and_hres)
 RETURN:    1, if ok; 0 on error
 PURPOSE:   Tests sres, lres, hres, mres with betti commands and conversions
+           If optinal third argument is given, test only lres and hres
 EXAMPLE:  example tst_test_res shows an example"
 {
   int ret = 1;
@@ -450,38 +451,71 @@ EXAMPLE:  example tst_test_res shows an example"
     ERROR("ERROR: input ideal needs to be homogenous ");
   }
   
-  resolution rs = sres(std(i), 0);rs;
-  resolution rl = lres(i, 0);rl;
-  resolution rh = hres(i,0);rh;
-  resolution rm = mres(i,0);rm;
+  if (size(#) == 0)
+  {
+    resolution rs = sres(std(i), 0);rs;
+    resolution rm = mres(i,0);rm;
+  }
   
-  intmat is = betti(rs);is;
-  intmat il = betti(rl);il;
+  resolution rh = hres(i,0);rh;
+  resolution rl = lres(i, 0);rl;
+  
+  if (size(#) == 0)
+  {
+    intmat is = betti(rs);is;
+    intmat im = betti(rm);im;
+  }
+  
   intmat ih = betti(rh);ih;
-  intmat im = betti(rm);im;
+  intmat il = betti(rl);il;
 
-  if (is != il){"ERROR: is != il";ret=0;}
-  if (is != ih){"ERROR: is != ih";ret=0;}
-  if (is != im){"ERROR: is != im";ret=0;}
+  if (size(ih) != size(il)){"ERROR: size(ih) != size(il)";ret=0;}
+  if (size(#) == 0)
+  {
+    if (size(ih) != size(is)){"ERROR: size(ih) != size(is)";ret=0;}
+    if (size(ih) != size(im)){"ERROR: size(ih) != size(im)";ret=0;}
+  }
+  
+  if (ih != il){"ERROR: ih != il";ret=0;}
+  if (size(#) == 0)
+  {
+    if (ih != is){"ERROR: ih != is";ret=0;}
+    if (ih != im){"ERROR: ih != im";ret=0;}
+  }
 
-  list ls = list(rs);ls;
-  list ll = list(rl);ll;
+  if (size(#) == 0)
+  {
+    list ls = list(rs);ls;
+    list lm = list(rm);lm;
+  }
   list lh = list(rh);lh;
-  list lm = list(rm);lm;
+  list ll = list(rl);ll;
 
-  intmat is_1 = betti(ls);is_1;
-  intmat il_1 = betti(ll);il_1;
+  if (size(#) == 0)
+  {
+    intmat is_1 = betti(ls);is_1;
+    intmat im_1 = betti(lm);im_1;
+  }
   intmat ih_1 = betti(lh);ih_1;
-  intmat im_1 = betti(lm);im_1;
+  intmat il_1 = betti(ll);il_1;
 
-  if (is_1 != il_1){"ERROR: is_1 != il_1";ret=0;}
-  if (is_1 != ih_1){"ERROR: is_1 != ih_1";ret=0;}
-  if (is_1 != im_1){"ERROR: is_1 != im_1";ret=0;}
+  if (size(ih_1) != size(il_1)){"ERROR: size(ih_1) != size(il_1)";ret=0;}
+  if (size(#) == 0)
+  {
+    if (size(ih_1) != size(is_1)){"ERROR: size(ih_1) != size(is_1)";ret=0;}
+    if (size(ih_1) != size(im_1)){"ERROR: size(ih_1) != size(im_1)";ret=0;}
+  }
+  
+  if (ih_1 != il_1){"ERROR: ih_1 != il_1";ret=0;}
+  if (size(#) == 0)
+  {
+    if (ih_1 != is_1){"ERROR: ih_1 != is_1";ret=0;}
+    if (ih_1 != im_1){"ERROR: ih_1 != im_1";ret=0;}
+  }
 
-  if (is != is_1) {"ERROR: is != is_1";ret=0;}
-  if (il != il_1) {"ERROR: il != il_1";ret=0;}
+  
+  if (size(ih) != size(ih_1)) {"ERROR: size(ih) != size(ih_1)";ret=0;}
   if (ih != ih_1) {"ERROR: ih != ih_1";ret=0;}
-  if (im != im_1) {"ERROR: im != im_1";ret=0;}
 
   return (ret);
 }
