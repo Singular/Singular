@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.15 1999-07-13 15:06:52 Singular Exp $ */
+/* $Id: maps.cc,v 1.16 1999-07-19 10:50:43 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -248,6 +248,8 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
     j = 0;
   else
     j = IDELEMS(id);
+  int j0=j;
+  if (theImageRing->qideal!=NULL) j+=IDELEMS(theImageRing->qideal);
   temp1 = idInit(sourcering->N+j,1);
   for (i=0;i<sourcering->N;i++)
   {
@@ -266,10 +268,16 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
     pSetm(q);
     temp1->m[i] = p;
   }
-  for (i=sourcering->N;i<sourcering->N+j;i++)
+  for (i=sourcering->N;i<sourcering->N+j0;i++)
   {
     temp1->m[i] = pChangeSizeOfPoly(theImageRing,
                                     id->m[i-sourcering->N],1,imagepvariables);
+  }
+  for (i=sourcering->N+j0;i<sourcering->N+j;i++)
+  {
+    temp1->m[i] = pChangeSizeOfPoly(theImageRing,
+                                    theImageRing->qideal->m[i-sourcering->N-j0],
+				    1,imagepvariables);
   }
   // we ignore here homogenity - may be changed later:
   temp2 = kStd(temp1,NULL,isNotHomog,NULL);
