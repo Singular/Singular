@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.7 1999-12-02 23:03:51 wenk Exp $ */
+/* $Id: mpr_inout.cc,v 1.8 2000-02-29 16:47:13 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -322,8 +322,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
 //-> BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
 BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
 {
-  ideal gls;
-  gls= (ideal)(arg1->Data());
+  ideal gls = (ideal)(arg1->Data());
   int imtype= (int)arg2->Data();
 
   uResultant::resMatType mtype= determineMType( imtype );
