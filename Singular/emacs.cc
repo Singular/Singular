@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.24 2002-07-01 11:34:53 Singular Exp $ */
+/* $Id: emacs.cc,v 1.25 2002-07-24 16:12:50 Singular Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -77,11 +77,11 @@ void error(char* fmt, ...)
 #define feReportBug(s) fePrintReportBug(s, __FILE__, __LINE__)
 void fePrintReportBug(char* msg, char* file, int line)
 {
-  error("YOU HAVE FOUND A BUG IN SINGULAR.
-Please, email the following output to singular@mathematik.uni-kl.de
-Bug occured at %s:%d
-Message: %s
-Version: " S_UNAME S_VERSION1 " (%lu) " __DATE__ __TIME__,
+  error("YOU HAVE FOUND A BUG IN SINGULAR.\n"
+"Please, email the following output to singular@mathematik.uni-kl.de\n"
+"Bug occured at %s:%d\n"
+"Message: %s\n"
+"Version: " S_UNAME S_VERSION1 " (%lu) " __DATE__ __TIME__,
         file, line, msg, feVersionId);
 
 }
