@@ -1,4 +1,4 @@
-// $Id: classify.lib,v 1.10 1997-08-14 10:31:14 krueger Exp $
+// $Id: classify.lib,v 1.11 1997-08-15 07:34:55 krueger Exp $
 //=============================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
@@ -9,13 +9,39 @@ LIBRARY:  Classify.lib
 
  classify(f);            compute the Class of f.
 
+LIBRARY:  Kclass.lib
+  Klassifiziere(poly f);             determine the typ of the singularity f
+  Funktion1bis(poly f, int corank);  (for internal use only)
+  Funktion3(poly f, int corank);     (for internal use only)
+  Funktion6(poly f, int corank);     (for internal use only)
+  Funktion13(poly f, int corank);    (for internal use only)
+  Funktion17(poly f, int corank);    (for internal use only)
+  Funktion25(poly f, int corank);    (for internal use only)
+  Funktion40(poly f, int corank);    (for internal use only)
+  Funktion50(poly f, int corank);    (for internal use only)
+  Funktion51(poly f, int corank);    (for internal use only)
+  Funktion52(poly f, int corank);    (for internal use only)
+  Funktion54(poly f, int corank);    (for internal use only)
+  Funktion56(poly f, int corank);    (for internal use only)
+  Funktion58(poly f, int corank);    (for internal use only)
+  Funktion59(poly f, int corank);    (for internal use only)
+  Funktion66(poly f, int corank);    (for internal use only)
+  Funktion82(poly f, int corank);    (for internal use only)
+  Funktion83(poly f, int corank);    (for internal use only)
+  Funktion97(poly f, int corank);    (for internal use only)
+  Funktion103(poly f, int corank);   (for internal use only)
+  Funktion104(poly f, int corank);   (for internal use only)
+  Funktion105(poly f, int corank);   (for internal use only)
+  FunktionNoClass(poly f, int corank);  (for internal use only)
+  Isomorphie_s82_x(poly f, poly fk, int k); (for internal use only)
+  Isomorphie_s82_z(poly f, poly fk, int k); (for internal use only)
+  Tschirnhaus(poly f, int corank);   (for internal use only)
+  Isomorphie_s17 (poly f, poly fk, int k, int ct);
+
 // required libraries
 
 LIB "Morse.lib";
 LIB "tools.lib";
-LIB "Kclass.lib";
-LIB "Ausgaben.lib";
-LIB "HKclass.lib";
 LIB "NFlist.lib";
 LIB "Hilbert.lib";
 
@@ -126,4 +152,2058 @@ example
    poly f=(x2+3y-2z)^2+xyz-(x-y3+x2*z3)^3;
    poly g=classify(f);
 }
+//=============================================================================
+// Id: Kclass.lib,v 1.12 1997/08/13 17:21:05 krueger Exp 
+/=============================================================================
+//
+// Please send bugs and comments to krueger@mathematik.uni-kl.de
+//
+//=============================================================================
+
+//=========================================================================
+proc Kclass_lib
+{
+"
+  Klassifiziere(poly f);             determine the typ of the singularity f
+  Funktion1bis(poly f, int corank);  (for internal use only)
+  Funktion3(poly f, int corank);     (for internal use only)
+  Funktion6(poly f, int corank);     (for internal use only)
+  Funktion13(poly f, int corank);    (for internal use only)
+  Funktion17(poly f, int corank);    (for internal use only)
+  Funktion25(poly f, int corank);    (for internal use only)
+  Funktion40(poly f, int corank);    (for internal use only)
+  Funktion50(poly f, int corank);    (for internal use only)
+  Funktion51(poly f, int corank);    (for internal use only)
+  Funktion52(poly f, int corank);    (for internal use only)
+  Funktion54(poly f, int corank);    (for internal use only)
+  Funktion56(poly f, int corank);    (for internal use only)
+  Funktion58(poly f, int corank);    (for internal use only)
+  Funktion59(poly f, int corank);    (for internal use only)
+  Funktion66(poly f, int corank);    (for internal use only)
+  Funktion82(poly f, int corank);    (for internal use only)
+  Funktion83(poly f, int corank);    (for internal use only)
+  Funktion97(poly f, int corank);    (for internal use only)
+  Funktion103(poly f, int corank);   (for internal use only)
+  Funktion104(poly f, int corank);   (for internal use only)
+  Funktion105(poly f, int corank);   (for internal use only)
+  FunktionNoClass(poly f, int corank);  (for internal use only)
+  Isomorphie_s82_x(poly f, poly fk, int k); (for internal use only)
+  Isomorphie_s82_z(poly f, poly fk, int k); (for internal use only)
+  Tschirnhaus(poly f, int corank);   (for internal use only)
+";
+}
+
+//=============================================================================
+proc Klassifiziere (poly @f)
+USAGE:    Klassifiziere(f);
+{ 
+  string @s1;
+  int @cnt;
+// Warum hier init() noch einmal, keine Ahnung.
+// Wenn nicht geht's einfach nicht. Hans fragen!
+  init(1);
+  int  @n = nvars(basering);	// Zahl der Variablen des aktuellen Rings.
+
+  // Define always 'RingDisplay' to be able to run 'Show(f)'
+  if( defined(RingDisplay) == 0) { 
+    string RingDisplay;
+    export RingDisplay;
+  }
+  RingDisplay = "setring RingB;";
+
+  if(defined(SG_Typ) == 1) { kill SG_Typ; } // Typ(s) von f nach Hilbert.
+  string SG_Typ = "";
+  export SG_Typ;
+
+  //
+  @s1 = "ring RingB="+string(CharOfRing)+",("+A_Z("x", @n)+"),ds;";
+  execute @s1;			// in diesem Ring werden Polynome angezeigt.
+  @s1 = "map ShowPoly=Rtop,"+A_Z("x", @n)+";";
+  execute @s1;			// Hiermit werden Polynome angezeigt.
+  export ShowPoly;
+  setring Rtop;			// in den Ausgangs-ring zurueck.
+  export RingB;
+
+  //===============================================
+
+  if(jet(@f,0) != 0 ) { 
+    if(defined(CoRang) == 0) { int CoRang = CoRangf(@f); }
+    return("1", "f is a unit");
+  }
+
+  debug_log(1, "Computing Basicinvariants of f ...");
+  if(defined(Mu) == 1) { kill Mu; }
+  if(defined(K) == 1) { kill K; }
+  if(defined(CoRang) == 1) { kill CoRang; }
+  int K;
+  int Mu;
+  int CoRang;
+  K, Mu, CoRang = basicinvariants(@f);
+  "About the singularity :";
+  "          Milnor number(f)   = "+string(Mu);
+  "          Corank(f)          = "+string(CoRang);
+  "          Determinacy       <= "+string(K);
+  export CoRang, K, Mu;
+
+//  ideal @Jf = Jf;
+//  if(dim(std(EH(@Jf))) != @n) { return("x(1)","A[0]"); }
+  if( Mu == 0) { 
+    CoRang=1;
+    return("x(1)","A[0]");
+  }
+
+  if(Mu<0) {
+    "The Milnor number of the function is infinite.";
+    "The singularity is not in Arnolds list.";
+    return("", "Fehler!");
+  }
+
+  @f = jet(@f, K);
+  @s1,@cnt = HKclass(Hilb(@f));
+  if(@cnt>0) { "Guessing type via Hilbert polynomial: ", @s1; }
+  else { "Hilbert polynomial not recognised. Milnor code = ", Hilb(@f); }
+  "";
+  "Computing normal form ...";
+
+  // Einteilung nach Corang
+  if( defined(ShowPhi) == 0) { int ShowPhi = 0; }
+  if(CoRang == 0) { return(Funktion2(@f, CoRang)); }
+  if(CoRang == 1) { return(Funktion2(@f, CoRang)); }
+  if(CoRang == 2) { return(Funktion1bis(@f, CoRang)); }
+  if(CoRang == 3) { return(Funktion1bis(@f, CoRang)); }
+  return(Funktion105(@f, CoRang));
+}
+//=============================================================================
+proc Funktion1bis (poly @f, int corank)
+USAGE:    Funktion1bis();
+{ // pruefe ob abspaltung von Quadraten noetig, wenn ja tue dies.
+
+  int  @n = nvars(basering);
+  string @s1;
+  string @RestRing = nameof(basering);
+
+  if( @n > corank) {
+    "I have to apply the splitting lemma. This will take some time....:-)";
+    poly @g = Morse(@f, K, corank);
+
+    @g = ReOrder(@g);
+    if(defined(PhiG)==1) { kill PhiG; }
+    if(defined(Rrest) == 1) { kill Rrest; }
+    if(defined(ShowPoly) == 1 ) { kill ShowPoly; }
+    if(defined(RingB) == 1) { kill RingB; }
+
+    execute Setring(corank, "Rrest");
+    export Rrest;
+    @RestRing = nameof(basering);
+
+    map @MapReduce=Rtop,maxideal(1);
+    poly @G = @MapReduce(@g);
+
+    @s1 = "map PhiG=Rtop," + string(maxideal(1));// Konstruiere Id auf r
+    execute @s1;
+    export PhiG;
+
+    @s1 = "ring RingB=",string(CharOfRing),",("+A_Z("x", corank)+"),ds;";
+    execute @s1;
+    export RingB;
+  }
+  else { poly @G = @f; }
+
+  setring RingB;
+  @s1 = "map ShowPoly=",@RestRing,","+A_Z("x", corank)+";";
+  execute @s1;
+  export ShowPoly;
+  @s1 = "setring ",@RestRing,";";
+  execute @s1;
+
+  if(defined(PhiG)==0) {
+    map PhiG=basering, maxideal(1);
+    export PhiG;
+  }
+  if(corank == 2) { return(Funktion3(@G, corank)); }
+  if(corank == 3) { return(Funktion50(@G, corank)); }
+  return("","Fehler!");
+}
+//=============================================================================
+proc Funktion3 (poly @f, int corank);
+USAGE:    Funktion3();
+{ 
+  poly @f3 = jet(@f, 3);
+  debug_log(1, "Schritt 3");
+
+  if( @f3 == 0 ) { return(Funktion13(@f, corank)); }
+
+  // f3 ~ x3 , x2y+y3 , x2y
+  ideal @Jf = jacob(@f3);
+  @Jf = std(@Jf);
+  int @Dim = dim(@Jf);
+  if(@Dim == 0) { return(Funktion4(@f, corank)); } // D[4]
+
+  if(@Dim == 1) {
+    if( mult(@Jf) == 1) { return(Funktion5(@f, corank)); } // D[k]
+    if( mult(@Jf) == 2) { return(Funktion6(@f, corank)); } // E[k], J
+    "dimension 1 und deg != 1, 2 => error, this should never occur";
+    return("", "Fehler!");	// Should never occur
+  }
+  return("", "Fehler!");	// Should never occur
+}
+//=============================================================================
+//proc Funktion6 - put here
+proc Funktion6 (poly @f, int corank)
+USAGE:    Funktion6()
+{ 
+  int @n = nvars(basering);	// Zahl der Ringvariablen
+  poly @f3 = jet(@f, 3);	// 3-Jet von f
+  poly @fk;			// k-Jet von f mit Gewichten
+  ideal @JetId;			// Ideal fuer Gewichteten Jet
+  ideal @Jf;			// jacob(@fk)
+  int  @Dim;			// dim(@Jf)
+  int  @Mult;			// mult(@Jf)
+  int @k = 1;			//
+
+  debug_log(1, "   Schritt 6");
+
+  GetRf(@f, @n);
+  @f = Faktorisiere(@f, @f3, 3, 1);
+
+
+  //-------------------------------------------------------
+  // Bestimme nun Typ der E[k]
+  while( (6*@k) <= Mu ) {
+    @JetId = x(1)^3+x(2)^(3*@k);
+    @fk = jet(@f, 3*@k, weight(@JetId));
+    if( @fk == Coeff(@fk,x(1), x(1)^3)*x(1)^3 ) { 
+      //-------------------------------------------------------
+      //                      Pruefe Jet x3,y3k+1  : E[6k]
+      @JetId = x(1)^3+x(2)^(3*@k+1);
+      @fk = jet(@f, 3*(3*@k+1), weight(@JetId));
+      if( Coeff(@fk,x(2),x(2)^(3*@k+1)) != 0 ) { return(Funktion7(@f,@k)); }
+
+      //-------------------------------------------------------
+      //                      Pruefe Jet x3,xy2k+1 : E[6k+1]
+      @JetId = x(1)^3+x(1)*x(2)^(2*@k+1);
+      @fk = jet(@f, 3*(2*@k+1), weight(@JetId));
+      if( Coeff(@fk, x(1)*x(2), x(1)*x(2)^(2*@k+1)) != 0 ) {
+        return(Funktion8(@f,@k)); }
+
+      //-------------------------------------------------------
+      //                      Pruefe Jet x3,y3k+1  : E[6k+2]
+      @JetId = x(1)^3+x(2)^(3*@k+2);
+      @fk = jet(@f, 3*(3*@k+2), weight(@JetId));
+      if( Coeff(@fk,x(2),x(2)^(3*@k+2)) != 0 ) { return(Funktion9(@f,@k)); }
+
+      //-------------------------------------------------------
+      //                      Arnold - Funktion 10 mit k+1
+      // Gehe zu Funktion 10 mit k+1
+      @k=@k+1;
+      @JetId = x(1)^3+x(2)^(3*@k);
+      @fk = jet(@f, 3*@k, weight(@JetId));
+      @Jf = std(jacob(@fk));
+      @Dim = dim(@Jf);
+      //-------------------------------------------------
+      //       Pruefe : fk ~ x3 + ax2yk + y3k mit 4a3+27 <> 0
+      if( @Dim == 0 ) { return(Funktion11(@f,@k)); }
+
+      //-------------------------------------------------
+      //       Pruefe : fk ~ x3 + x2yk
+      @Mult = mult(@Jf);
+      if( @Dim ==1  && @Mult==1) { return(Funktion12(@f,@k)); }
+      //-------------------------------------------------
+      //       Pruefe : fk ~ x3
+      if( @Dim == 1  && @Mult == 2) {
+        if(Coeff(@fk, x(2), x(2)^(3*@k)) != 0) {
+          @f = Faktorisiere(@f, @fk, 3, @k);
+        }
+      }
+    }
+  }
+  return("","Fehler!");
+}
+//=============================================================================
+//proc Funktion13 - put here
+//=========================================================================
+// Id: lib_WorkOn,v 1.8 1995/01/27 12:53:11 krueger Exp
+//
+//=============================================================================
+//
+
+//=========================================================================
+proc Funktion13 (poly @f, int corank)
+USAGE:    Funktion13();
+{ 
+  poly @f4 = jet(@f, 4);
+  debug_log(1, "   Schritt 13");
+  if( @f4 == 0 ) { return(Funktion47(@f, corank)); }
+
+  // f4 ~ x4+ax2y2+y4, x4+x2y2, x2y2, x3y, x4
+  ideal @Jf = std(jacob(@f4));
+  int @Dim = dim(@Jf);
+  int @Mult = mult(@Jf);
+
+  if( @Dim == 0) { return(Funktion14(@f, corank)); } // X[9]=X[1,0]=T[2,4,4]
+  if( @Dim == 1) {
+    if( @Mult == 1 ) { return(Funktion15(@f, corank)); }
+    if( @Mult == 2 ) {
+      @Jf = @Jf, jacob(@Jf);
+      @Jf = std(@Jf);
+      @Dim = dim(@Jf);
+      if( @Dim == 0 ) { return(Funktion16(@f, corank)); }
+      if( @Dim == 1 ) { return(Funktion17(@f, corank)); }
+    }
+    if( @Mult == 3 ) { return(Funktion25(@f, corank)); }
+  } 
+  return("","Fehler!");
+}
+//=============================================================================
+//=============================================================================
+proc Funktion17 (poly @f, int corank)
+USAGE:    Funktion17();
+{ // Analog zu Fumktion 6
+  // Komb. 17-24
+  int   @p = 1;
+  poly  @fk = jet(@f, 4);
+  poly  @ft;
+  ideal @JetId;
+  ideal @Jf;
+  int   @Dim;
+  int   @Mult;
+
+  debug_log(1, "      Schritt 17");
+  while( 3*@p<= Mu) {
+    debug_log(1, "Schritt 18(", @p, ")");
+    @f = Isomorphie_s17(@f, @fk, @p, 1);
+    if ( @p>1) {
+      @JetId = x(1)^3*x(2) + x(2)^(3*@p); 	// weight(@JetId);
+      @fk = jet(@f, 3*@p, weight(@JetId));
+    }
+    // Z[6p+5]
+    @JetId = x(1)^3*x(2) + x(2)^(3*@p+2);
+    @fk = jet(@f, 3*(3*@p+2), weight(@JetId));
+    if( Coeff(@fk, x(2), x(2)^(3*@p+2)) != 0) { return(Funktion19(@f, @p));}
+
+    // Z[6p+6]
+    @JetId = x(1)^3*x(2) + x(1)*x(2)^(2*@p+2);
+    @fk = jet(@f, 2*(3*@p+2)+1, weight(@JetId));
+    if( Coeff(@fk, x(1)*x(2), x(1)*x(2)^(2*@p+2)) != 0) { 
+      return(Funktion20(@f, @p));}
+    
+    // Z[6p+7]
+    @JetId = x(1)^3*x(2) + x(2)^(3*@p+3);
+    @fk = jet(@f, 3*(3*@p+3), weight(@JetId));
+    if( Coeff(@fk, x(2), x(2)^(3*@p+3)) != 0) { return(Funktion21(@f, @p));}
+
+    @p = @p+1;
+    @JetId = x(1)^3*x(2) + x(2)^(3*@p+1); // weight(@JetId);
+    @fk = jet(@f, 3*@p+1, weight(@JetId));
+    @ft = Teile(@fk, x(2));
+    @Jf = std(jacob(@ft));
+    @Dim = dim(@Jf);
+    @Mult = mult(@Jf);
+//    "fk=",Show(@fk)," ft=",Show(@ft)," p=",@p," Dim=", @Dim, "  Mult=",@Mult;
+    if( @Dim == 0 ) { return(Funktion23(@f, @p)); }
+    if( @Mult == 1 ) { return(Funktion24(@f, @p)); }
+  }
+  return("","Fehler!");
+}
+//=============================================================================
+proc Funktion25 (poly @f, int CoRang)
+USAGE:    Funktion25();
+{
+//  // Komb. 25-46
+  // definition der Variablen
+  int   @k = 1;
+  poly  @fk = jet(@f, 4);
+  poly  @ft;
+  ideal @JetId;
+  ideal @Jf;
+  int   @Dim;
+  int   @Mult;
+  debug_log(1, "      Schritt 25");
+
+  // Code
+  while (@k<Mu) {
+    @f =  Faktorisiere(@f, @fk, 4 , @k);
+
+    // W[12k]
+    @JetId = x(1)^4 + x(2)^(4*@k+1);
+    @fk = jet(@f, 4*(4*@k+1), weight(@JetId));
+    if( Coeff(@fk, x(2), x(2)^(4*@k+1)) != 0) { return(Funktion27(@f, @k));}
+
+    // W[12k+1]
+    @JetId = x(1)^4 + x(1)*x(2)^(3*@k+1);
+    @fk = jet(@f, 4*(3*@k+1), weight(@JetId));
+    if( Coeff(@fk, x(1)*x(2), x(1)*x(2)^(3*@k+1)) != 0) {
+      return(Funktion28(@f, @k));}
+
+    //
+    @JetId = x(1)^4 + x(2)^(4*@k+2);
+    @fk = jet(@f, 2*(4*@k+2), weight(@JetId));
+    if( Coeff(@fk, x(2), x(2)^(4*@k+2)) != 0) { 
+      @Jf = std(jacob(@fk));
+      @Dim = dim(@Jf);
+      @Mult = mult(@Jf);
+//	"fk="+string(@fk)+" Dim="+string(@Dim)+" mult="+string(@Mult);
+      if( @Dim == 0 ) { return(Funktion30(@f, @k)); }
+      if( @Dim == 1 ) { return(Funktion32(@f, @k)); }
+      return("","Fehler!");
+    }
+    else {
+      // x^4 oder x^2(x^2+x(2)^2k+1)
+      @ft = Teile(@fk, x(1)^2);
+      @Jf = std(jacob(@ft));
+      @Dim = dim(@Jf);
+      @Mult = mult(@Jf);
+//	"1-fk="+string(@fk)+" Dim="+string(@Dim)+" mult="+string(@Mult);
+      if( @Dim == 0 ) { return(Funktion31(@f, @k)); }
+      if( @Dim != 1 ) { return("Fehler!",""); } 
+
+      @JetId = x(1)^4 + x(1)*x(2)^(3*@k+2);
+      @fk = jet(@f, 4*(3*@k+2), weight(@JetId));
+      if( Coeff(@fk, x(1)*x(2), x(1)*x(2)^(3*@k+2)) != 0) {
+	return(Funktion34(@f, @k)); }
+
+      @JetId = x(1)^4 + x(2)^(4*@k+3);
+      @fk = jet(@f, 4*(4*@k+3), weight(@JetId));
+      if( Coeff(@fk, x(2), x(2)^(4*@k+3)) != 0) { return(Funktion35(@f, @k)); }
+
+      @k = @k+1;
+      @JetId = x(1)^4 + x(2)^(4*@k);
+      @fk = jet(@f, (4*@k), weight(@JetId));
+
+      @Jf = std(jacob(@fk));
+      @Dim = dim(@Jf);
+      @Mult = mult(@Jf);
+//	"2-ft="+Show(@fk)+" Dim="+string(@Dim)+" mult="+string(@Mult);
+      if( @Dim == 0 ) { return(Funktion37(@f, @k)); }
+      if( @Dim == 1 ) { 
+	if( @Mult == 1 ) { return(Funktion38(@f, @k)); }
+	if( @Mult == 2 ) { 
+	  @ft = Teile(@fk, x(1)^2);
+	  @Jf = std(jacob(@ft));
+	  @Dim = dim(@Jf);
+	  @Mult = mult(@Jf);
+//	  "3-ft="+Show(@ft)+" Dim="+string(@Dim)+" mult="+string(@Mult);
+	  if( @Dim == 0) { return(Funktion40(@f, @k)); }
+	  if( @Dim == 1) { return(Funktion39(@f, @k)); }
+	}
+	if( @Mult != 3 ) { return("","Fehler!"); }
+      }
+      else { return("","Fehler!"); }
+    }
+  }  // Ende der While-Schleife
+  return("","Fehler!"):
+}
+//=============================================================================
+proc Funktion40  (poly @f, int @k)
+USAGE:    Funktion40();
+{
+//  poly @f = #[1];
+//  int @k = #[2];
+  int @r;
+  string @Typ;
+  string @fkt;
+  string @RestRing;
+  string @s1;
+  int @kr;
+  int @rr;
+  int @sr;
+  debug_log(1, "         Schritt 40" );
+  string @s = "Die Singularitaet `"+Show(jet(@f, K-1));
+  @s  = @s + "' ist vom Typ ";
+  @s = @s + "Z["+string(@k)+",i,p](F40), mu="+string(Mu);
+  @s = @s + ", m="+string(@k-1);
+  @s;
+
+"------------------------ F 40 --------------";
+  poly @a;
+  poly @b;
+  poly @c;
+  ideal @JetId = x(1)^4 + x(2)^(4*@k);
+  poly @fk = jet(@f, (4*@k), weight(@JetId));
+
+  poly @f2 = -@fk / x(1)^3;
+  ideal @Jfsyz = @f - @fk, x(1)^3, @f2;
+  "f2=", @f2;
+  "fk=", @fk;
+  @Jfsyz;
+  matrix @Mat = matrix(syz(@Jfsyz));
+  "Mat[1,1]="+Show(@Mat[1,1]);
+  "Mat[1,2]="+Show(@Mat[1,2]);
+  "Mat[2,1]="+Show(@Mat[2,1]);
+  "Mat[2,2]="+Show(@Mat[2,2]);
+  "Mat[3,1]="+Show(@Mat[3,1]);
+  "Mat[3,2]="+Show(@Mat[3,2]);
+  "---";
+  @a = @Mat[2,1] / @Mat[1,1] - @Mat[2,2];
+  @b = - @Mat[3,1] / @Mat[1,1] + @Mat[3,2];
+  "f1 = "+Show(@a);
+  "f2 = "+Show(@b);
+  "---";
+  "f1 * f2 = "+Show(jet(@a*@b,Mu));
+  "---";
+  "f1 * f2 - f = "+Show(jet(@a*@b - @f,Mu));
+  "---";
+  @JetId = x(1)^3 + x(2)^(3*@k);
+  "Jf2 = "+Show(jet(@b, (3*@k), weight(@JetId)));
+  "---";
+  @JetId = x(1) + x(2)^(@k);
+  "Jf1 = "+Show(jet(@a, @k, weight(@JetId)));
+  nameof(basering);
+  basering;
+  @b;
+"test-0";
+  milnor(@b);
+"test-1";
+  execute Setring(2);
+"test-2";
+  @s1 = "map CnV="+ @RestRing+ ",x(1), x(2);";
+  execute @s1;
+"test-3";
+  CnV(@b);
+"test-4";
+  milnor(CnV(@b));
+"test-5";
+  if( defined(r) == 1) { "R ist definiert"; }
+"test-6";
+ @fkt,@Typ=Klassifiziere(CnV(@b));
+"Klassifiziere-done";
+ @Typ,@kr,@rr,@sr=DecodeNormalFormString(@Typ);
+ @Typ,"=",@kr,@rr,@sr;
+ @r = @kr-@k;
+ if( @Typ == "E[6k]" ) { return(Funktion42(@f, @k, @r)); }
+ if( @Typ == "E[6k+1]" ) { return(Funktion43(@f, @k, @r)); }
+ if( @Typ == "E[6k+2]" ) { return(Funktion44(@f, @k, @r)); }
+ if( @Typ == "J[k,0]" ) { return(Funktion45(@f, @k, @r, @sr)); }
+ if( @Typ == "J[k,r]" ) { return(Funktion45(@f, @k, @r, @sr)); }
+ return("","Fehler!");
+}
+//=============================================================================
+//=============================================================================
+//proc Funktion50 - put here
+//=========================================================================
+// Id: lib_WorkOn,v 1.6 1995/08/29 18:04:09 krueger Exp
+//
+// Please send bugs and comments to krueger@mathematik.uni-kl.de
+//
+//=============================================================================
+
+LIB "elim.lib";
+
+//=========================================================================
+proc Funktion50 (poly @f, int corank)
+USAGE:    Funktion50();
+{ 
+  poly @f3 = jet(@f, 3);
+  debug_log(1, "Schritt 50");
+  if( @f3 == 0 ) { return(Funktion104(@f, corank)); }
+
+  // f3 ~ 
+  ideal @Jf1 = jacob(@f3);
+  ideal @Jf  = std(@Jf1);
+  ideal @Jf2;
+//  "Jf1=",Show(@Jf[1]);
+//  "Jf2=",Show(@Jf[2]);
+//  "Jf3=",Show(@Jf[3]);
+  int @Dim = dim(@Jf);
+  int @Mult = mult(@Jf);
+  "Dim=",@Dim,"  Mult=",@Mult," Jet3=", Show(@f3);
+
+  if(@Dim == 0) { return(Funktion51(@f, corank)); } // x3 + y3 + z3 + axyz
+  if(@Dim == 1) { 
+    if(@Mult == 2) {
+      @Jf2 = wedge(jacob(@Jf1),3-@Dim), @Jf1;
+      @Jf2 = std(@Jf2);
+      @Dim = dim(@Jf2);
+      @Mult = mult(@Jf2);
+      "dim=", @Dim, "Mult=",@Mult," Jf2=", @Jf2;
+      if (@Dim == 0) { return(Funktion54(@f, corank)); }  // x3 + xyz
+      if (@Dim == 1) { return(Funktion58(@f, corank)); }  // x3 + yz2
+    }
+    if(@Mult == 3) {
+      @Jf2 = wedge(jacob(@Jf1),3-@Dim), @Jf1;
+      @Jf2 = std(@Jf2);
+      @Dim = dim(@Jf2);
+      if(@Dim == 0) { return(Funktion56(@f, corank)); }	// xyz
+      if(@Dim == 1) { return(Funktion66(@f, corank)); }	// x2z + yz2
+    }
+    if(@Mult == 4) { return(Funktion82(@f, corank)); }	// x3 + xz2
+  }
+  if(@Dim == 2) {
+    if(@Mult == 1) { return(Funktion97(@f, corank)); }	// x2y
+    if(@Mult == 2) { return(Funktion103(@f, corank)); }	// x3
+  }
+  if(@Dim == 3) { return(Funktion52(@f, corank)); }	// x3 + y3 + xyz
+
+  return("","Fehler!");
+}
+//=============================================================================
+proc Funktion51 (poly @f, int @k)
+USAGE:    Funktion51();
+{
+  string @s = "Die Singularitaet `"+Show(jet(@f, K));
+  string @tp = "P[8]=T[3,3,3]";
+
+  @s  = @s +"' ist vom Typ "+@tp+"(F51), mu="+string(Mu)+", m="+string(@k-1);
+  @s+"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion52 (poly @f, int @k)
+USAGE:    Funktion52();
+{
+  int @p = 4;
+  string @s = "Die Singularitaet `"+Show(jet(@f, K));
+  string @tp = "P["+string(@p+5)+"]=T[3,3,"+string(@p+5)+"]";
+
+  @s  = @s +"' ist vom Typ "+@tp+"(F52), mu="+string(Mu)+", m="+string(@k-1);
+  @s+"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion54 (poly @f, int @k)
+USAGE:    Funktion54();
+{
+  int @p = 4;
+  string @s = "Die Singularitaet `"+Show(jet(@f, K));
+  string @tp = "R[p,q]=T[3,p,q]";
+
+  @s  = @s +"' ist vom Typ "+@tp+"(F54), mu="+string(Mu)+", m="+string(@k-1);
+  @s+"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion56 (poly @f, int @k)
+USAGE:    Funktion56();
+{
+  int @p = 4;
+  string @s = "Die Singularitaet `"+Show(jet(@f, K));
+  string @tp = "T[p,q,r]";
+
+  @s  = @s +"' ist vom Typ "+@tp+"(F56), mu="+string(Mu)+", m="+string(@k-1);
+  @s+"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion58 (poly @fin, int @k)
+USAGE:    Funktion58();
+{
+  poly @f = @fin;
+
+  "Schritt 58";
+  poly @f3 = jet(@f, 3);
+  string @tp="Nix";
+  int @kx = 1;	// Koordinate x
+  int @ky = 2;	// Koordinate y
+  int @kz = 3;	// Koordinate z
+  poly @a;
+  poly @b;
+  poly @phi;	// Rest im Grad 3
+  ideal @B = maxideal(1);     // ideal fuer Abbildungen
+  ideal @Jf3 = jacob(@f3);
+  ideal @S = sat(@Jf3, maxideal(1));
+  ideal @J1 = diff(@S[1], x(@kx)), diff(@S[1], x(@ky)), diff(@S[1], x(@kz)),
+	 diff(@S[2], x(@kx)), diff(@S[2], x(@ky)), diff(@S[2], x(@kz));
+  matrix @M[2][3] = @J1;
+  ideal @J2 = minor(@M, 2), @S;
+//--------------------------------------------------------------
+//  Bestimme die Koordinate 'x'
+//
+  @S = sat(@J2, maxideal(1));
+  @J1 = Coeff(@S[1], x(1), x(1)), Coeff(@S[1], x(2), x(2)),
+	 Coeff(@S[1], x(3), x(3)), Coeff(@S[2], x(1), x(1)),
+	 Coeff(@S[2], x(2), x(2)), Coeff(@S[2], x(3), x(3));
+  matrix @C[2][3] = @J1;
+  matrix @D = syz(@C);
+  kill @C;
+
+  poly @b1 = @D[1,1];
+  poly @b2 = @D[2,1];
+  poly @b3 = @D[3,1];
+
+  if(DeBug>5) { "f3,s1=", Show(@f3); }
+  if( @b1 != 0) {
+    map VERT=basering,-1*@b1*x(1), -1*@b2*x(1)+x(2), -1*@b3*x(1) + x(3); 
+    @kx=1; @ky=2; @kz=3;
+  }
+  else {
+    if( @b2 != 0) {
+      map VERT=basering, x(1) + -1*@b1*x(2), -1*@b2*x(2), -1*@b3*x(2) + x(3);
+      @kx=2; @ky=1; @kz=3;
+    }
+    else {
+      if( @b3 != 0) {
+        map VERT=basering, x(1) + -1*@b1*x(3), x(2) + -1*@b2*x(3), -1*@b3*x(3);
+        @kx=3; @ky=1; @kz=2;
+      }
+    }
+  }
+  @f = VERT(@f);
+  if(DeBug>5) { VERT; }
+  @f3 = jet(@f,3);
+  if(DeBug>5) { "f3,s2=", Show(@f3); }
+
+//--------------------------------------------------------------
+// die Variable 'x' ist nun isoliert worden. d.h j3f = xf2+f3
+// d.h Die rolle von 'x' ist nun bestimmt.
+// fuehre Koordinaten-transformation fuer f_2 aus.
+//
+  if(DeBug>5) { "1) x=", @kx, "  y=", @ky, "  z=", @kz; }
+  matrix @C = Coeffs(@f3, x(@kx)); 
+  @C;
+  poly @fb=@C[2,1];	// Coeff von x^1
+  poly @fc=@C[1,1];	// Coeff von x^0
+  "f-2=", Show(@fb);
+  "f-3=", Show(@fc);
+  if(diff(@fb, x(@ky)) != 0) {
+    kill VERT;
+    ideal @Jfsyz = @fb, diff(@fb, x(@ky));
+    matrix @Mat = matrix(syz(@Jfsyz));
+//    @Mat;
+    @B = maxideal(1);     // setze Abbildungs-ideal
+    if( nrows(@Mat) == 2) {
+      poly @Relation = -2 * @Mat[2,1] / @Mat[1,1];
+      @b = Coeff(@Relation, x(@kz), x(@kz));
+      @B[rvar(x(@ky))] = x(@ky)-@b*x(@kz);
+    } 
+    else {
+      @Jfsyz = @fb, diff(@fb, x(@kz));
+      @Mat = matrix(syz(@Jfsyz));
+      poly @Relation = -2 * @Mat[2,1];
+      @a = Coeff(@Relation, x(@ky), x(@ky));
+      @B[rvar(x(@kz))] = x(@kz)-@a*x(@kz);
+      @ky, @kz = swap(@ky, @kz);
+    }
+    map VERT=basering, @B;
+    VERT;
+    @f = VERT(@f);
+    @f3 = jet(@f,3);
+    kill @Mat;
+  } 
+  else { @ky,@kz = swap(@ky,@kz); }
+  "f3,s3=", Show(@f3);
+
+//--------------------------------------------------------------
+// fuehre nun Tschirnhaus in der Variablen 'z' durch und erhalte
+// f = f_1(x,y,z)y^2 + z^3
+//
+  "2) x=", @kx, "  y=", @ky, "  z=", @kz;
+  @C = Coeffs(@f3, x(@kx)); 
+  @fb=@C[2,1];	// Coeff von x^1
+  @fc=@C[1,1];	// Coeff von x^0
+  @fc, VERT = Tschirnhaus(@fc, x(@kz));
+  VERT;
+  @f = VERT(@f);
+  "-------------------------------------";
+  @f3 = jet(@f,3);
+  "j3f,s5=",Show(@f3);
+  "f=", Show(@f);
+  
+//--------------------------------------------------------------
+// fuehre Koordinaten-transformation fuer f_1 durch und erhalte
+// f=xy2 + z3
+//
+  "3) x=", @kx, "  y=", @ky, "  z=", @kz;
+// ACHTUNG Bug, fuer Sing22
+  Show(@f3 - 1*(Coeffs(@f3, x(@kz))[4,1])*x(@kz)^3);
+  poly @fa;
+  @fb = (@f3 - 1*(Coeffs(@f3, x(@kz))[4,1])*x(@kz)^3)/(x(@ky)^2);
+  "fb=", Show(@fb);
+  @fc = (x(@kx)-1*(Coeffs(@fb, x(@ky))[2,1])*x(@ky)-1*(Coeffs(@fb, x(@kz))[2,1])*x(@kz));
+  @fa = Coeffs(@fb, x(@kx))[2,1];
+  if ( @fa != 0 ) {
+    @B = maxideal(1);
+    @B[rvar(x(@kx))] = @fc / @fa;
+    map VERT=basering, @B;
+    VERT;
+    @f = VERT(@f);
+    @f3 = jet(@f,3);
+    "j3f,s6=",Show(@f3);
+
+//    map VERT = basering, x(4-@kx), x(4-@ky), x(4-@kz);
+//    @f = VERT(@f);
+//    map VERT = basering, x(1), x(3), x(2);
+//    @f = VERT(@f);
+//    @phi = jet(@f,3);
+//    @f3 = jet(@f,3);
+//    "j3f,s7=",Show(@phi);
+  }
+
+  
+//--------------------------------------------------------------
+  if(Coeffs(@f3, x(1))[4,1]!=0) { 
+    @kx=1;
+    if(Coeffs(@f3, x(2))[3,1]==0) { @ky=2; @kz=3; }
+    else { @ky=3; @kz=2; }
+  }
+  else {
+    if(Coeffs(@f3, x(2))[4,1]!=0) { 
+      @kx=2;
+      if(Coeffs(@f3, x(3))[3,1]==0) { @ky=3; @kz=1; }
+      else { @ky=1; @kz=3; }
+    }
+    else { 
+      @kx=3;
+      if(Coeffs(@f3, x(1))[3,1]==0) { @ky=1; @kz=2; }
+      else { @ky=2; @kz=1; }
+    }
+  }
+  "4) x=", @kx, "  y=", @ky, "  z=", @kz;
+  map VERT = basering, x(@kx), x(@ky), x(@kz);
+  @f = VERT(@f);
+  @f3 = jet(@f,3);
+  "j3f,s8=",Show(@f3);
+
+  return(Funktion59(@f, @k));
+}
+
+//=============================================================================
+proc Funktion59 (poly @f, int @k)
+USAGE:    Funktion59();
+{
+  int @p = 1;
+  string @tp="Nix";
+  poly @phi = jet(@f,3);
+  poly @fr = @f - @phi;
+  poly @fk;
+  poly @alpha = coeffs(@fr, x(1))[1,1];
+  poly @beta = (@fr - @alpha) / x(1);
+  ideal @JetId;
+  intvec @w;
+
+  "f    = ", Show(@f);
+  "fr   = ", Show(@fr);
+  "alpha= ", Show(@alpha);
+  "beta = ", Show(@beta);
+
+  while(@p<9) {
+    "Schritt 59_", @p;
+    @JetId = x(2)^(3*@p+1); weight(@JetId);
+    @JetId = @phi + x(2)^(3*@p+1);
+    @w = weight(@JetId);
+    @fk = jet(@fr, 3*@w[1], @w);
+"a)", @p, 3*@w[1], Show(@fk), @w;
+    if( @fk != 0 ) { return(Funktion60(@f,@p)); }
+
+    @JetId = @phi + x(1)*x(2)^(2*@p+1);
+    @w = weight(@JetId);
+    @fk = jet(@fr, 3*@w[1], @w);
+"b)", @p, 3*@w[1], Show(@fk), @w;
+    if( @fk != 0 ) { return(Funktion61(@f,@p)); }
+
+    @JetId = @phi + x(2)^(3*@p+2);
+    @w = weight(@JetId);
+    @fk = jet(@fr, 3*@w[1], @w);
+"c)", @p, 3*@w[1], Show(@fk), @w;
+    if( @fk != 0 ) { return(Funktion62(@f,@p)); }
+
+    @p = @p+1;   // Weiter mit Funktion 63 fuer p eins groesser
+    @JetId = @phi + x(2)^(3*@p);
+    @w = weight(@JetId);
+    @fk = jet(@f, 3*@w[1], @w);
+"d)", @p, 3*@w[1], Show(@fk), @w;
+//    if( @fk != 0 ) { 
+    @JetId = jacob(@fk);
+    @JetId = std(@JetId);
+    int @Dim = dim(@JetId);
+    int @Mult = mult(@JetId);
+    "Dim=",@Dim,"  Mult=",@Mult," Jetk=", Show(@fk);
+    if(@Dim == 0) { return(Funktion64(@f,@p)); }
+    if(@Dim == 1) { 
+      if(@Mult == 1) { return(Funktion65(@f,@p)); }
+      if(@Mult == 2) { 
+        "Faktorisiere";
+        @fk = jet(@fr, 3*@w[1], @w);
+        poly @tt=Coeffs(@phi, x(1))[4,1] *x(1)^3+@fk;
+        intvec RFlg=1,2,3;
+        export RFlg;
+        RFlg;
+        "tt=",Show(@tt);
+        "f=",Show(@f);
+        @f = Faktorisiere(@f, @tt, 3 , @p);
+        PhiG;
+        "f=",Show(@f);
+        @fr = @f - @phi;
+      }
+    }
+//    }
+  }
+  return(Show(@f), @tp);
+}
+
+//=============================================================================
+proc Funktion66 (poly @f, int @k)
+USAGE:    Funktion66();
+{
+  int @kx = 1;	// Koordinate x
+  int @ky = 2;	// Koordinate y
+  int @kz = 3;	// Koordinate z
+  poly @f3 = jet(@f, 3);
+  ideal @JetId;
+
+  debug_log(1, "Weiter-66");
+  debug_log(2, "F3=", Show(@f3));
+  poly @fx = diff(@f3, x(@kx));
+  @JetId = jacob(@fx);
+  @JetId = std(@JetId);
+  "nach x:",Show(@fx), "  Id=", @JetId, "  Dim=", dim(@JetId);
+
+  poly @fy = diff(@f3, x(@ky));
+  @JetId = jacob(@fx);
+  @JetId = std(@JetId);
+  "nach y:",Show(@fy), "  Id=", @JetId, "  Dim=", dim(@JetId);
+
+  poly @fz = diff(@f3, x(@kz));
+  @JetId = jacob(@fx);
+  @JetId = std(@JetId);
+  "nach z:",Show(@fz), "  Id=", @JetId, "  Dim=", dim(@JetId);
+}
+//=============================================================================
+proc Funktion82 (poly @f, int @k)
+USAGE:    Funktion82();
+{
+  poly @f3 = jet(@f,3);
+  int @kx = 1;	// Koordinate x
+  int @ky = 2;	// Koordinate y
+  int @kz = 3;	// Koordinate z
+  poly @b1, @b2, @b3;
+  intvec @kv = 1,2,3;
+  int    @i;
+  ideal @Jfsyz = jacob(@f3);
+  matrix @Mat;
+  int @Fall = 2;
+
+  debug_log(1, "Schritt 82");
+  if (diff(@f3, x(1)) == 0) { @kx, @ky = swap(@kx, @ky); }
+  if (diff(@f3, x(2)) == 0) {  }
+  if (diff(@f3, x(3)) == 0) { @kz, @ky = swap(@kz, @ky); }
+  if ( (diff(@f3, x(1)) != 0) && (diff(@f3, x(2)) != 0) &&
+	(diff(@f3, x(3)) != 0) ) {
+    @Mat = matrix(syz(@Jfsyz));
+    @b1 = @Mat[1,1];
+    @b2 = @Mat[2,1];
+    @b3 = @Mat[3,1];
+
+    debug_log(2, @Mat);
+    if( @b1 != 0) {
+      map VERT=basering,@b1*x(@kx), @b2*x(@kx)+x(@ky), @b3*x(@kx) + x(@kz);
+      @f = VERT(@f);
+      @kx, @ky = swap(@kx, @ky);
+    }
+    else {
+      if( @b2 != 0) {
+        map VERT=basering,x(@kx) + @b1*x(@ky), @b2*x(@ky), @b3*x(@ky) + x(@kz);
+        @f = VERT(@f);
+      }
+      else {
+        if( @b3 != 0) {
+          map VERT=basering,x(@kx)+ @b1*x(@kz), x(@ky)+ @b2*x(@kz), @b3*x(@kz);
+          @f = VERT(@f);
+        }
+      }
+    }
+debug_log(2, VERT);
+  }
+//  else {
+    map VERT=basering,x(@kx),x(@ky),x(@kz);
+debug_log(2, VERT);
+    @f = VERT(@f);
+//  }
+  @f3 = jet(@f,3);
+  if ( defined(VERT) == 1) { kill VERT; }
+  if( (@f3-subst(@f3, x(@kx), 0)) == 0) { @kx, @ky = swap(@kx, @ky); }
+  if( (@f3-subst(@f3, x(@kz), 0)) == 0) { @kz, @ky = swap(@kz, @ky); }
+debug_log(2,   "1)f??=", Show(@f3));
+debug_log(2,   "1)f3=", Show(@f));
+//------------------------------------------------------
+debug_log(2,   size(coeffs(@f3, x(@kx))));
+//  if (size(coeffs(@f3, x(@kx))) == 3) {
+    matrix @C = coeffs(@f3, x(@kx)); 
+debug_log(2, @C);
+    if(size(@C) == 3) { @C = coeffs(@f3, x(@kz)); }
+    if(@C[1,1] == 0 && @C[3,1] == 0) { @Fall = 1; }
+    if(@C[1,1] != 0 && @C[3,1] != 0 ) { @Fall = 3; }
+    if(@C[1,1] == 0 && @C[3,1] != 0 ) { @Fall = 2; }
+    if(@C[1,1] != 0 && @C[3,1] == 0 ) { @Fall = 2; @kx, @kz = swap(@kx, @kz); }
+
+debug_log(2, @C);
+debug_log(2, "Fall: ", @Fall, "  x=", @kx, "  z=", @kz);
+    map VERT;
+    if(@Fall == 2) { @b1, VERT = Tschirnhaus(@f3/x(@kz), x(@kx)); }
+    else { 
+      @b1, VERT = Tschirnhaus(@f3/x(@kx), x(@kx));
+      debug_log(2, "B1=", Show(jet(VERT(@f),3)));
+      @b2, VERT = Tschirnhaus(@f3/x(@kz), x(@kz));
+      debug_log(2, "B2=", Show(jet(VERT(@f),3)));
+    }
+    @f = VERT(@f);
+    @f3 = jet(@f,3);
+    debug_log(2, "2)f3=", Show(@f3));
+//  @f3, VERT = Tschirnhaus(@f3, x(1));
+    debug_log(2, "3)f3=", Show(jet(@f,3)));
+//  }
+
+  @C = coeffs(@f3, x(1)); 
+  if( @C[1,1] == 0 && @C[2,1] != 0 && @C[3,1] == 0 && @C[4,1] != 0 ) { 
+    Funktion83(@f, @k);
+  }
+  return("", "Fehler");
+}
+//=============================================================================
+proc Isomorphie_s82_z (poly @f, poly @fk, int @p)
+USAGE:    Isomorphie_s82_z();
+{
+  matrix @Mat;
+  poly @Relation, @a, @b;
+  ideal @Jfsyz, @B;
+
+  debug_log(1, "      Isomorphie 82/90 z");
+  debug_log(2, "tt=", Show(@fk));
+  @Jfsyz = @fk, diff(@fk, x(3));
+  @Mat = matrix(syz(@Jfsyz));
+  @Relation = -2 * @Mat[2,1] / @Mat[1,1];
+  @a = Coeff(@Relation, x(3), x(3));
+  @b = Coeff(@Relation, x(2), x(2)^@p);
+  @B = maxideal(1);
+  @B[rvar(x(3))] = x(3)-@b*x(2)^@p;
+  map VERT=basering,@B;
+  @f = VERT(@f);
+  debug_log(2, VERT);
+  debug_log(2, "      z res=", Show(VERT(@fk)));
+  return(@f);
+}
+
+//=============================================================================
+proc Isomorphie_s82_x (poly @f, poly @fk, int @p)
+USAGE:    Isomorphie_s82_x();
+{
+  matrix @Mat;
+  poly @Relation, @a, @b;
+  ideal @Jfsyz, @B;
+
+  debug_log(1, "      Isomorphie 82/90 x");
+  debug_log(2, "tt=", Show(@fk));
+  @Jfsyz = @fk, diff(@fk, x(1));
+  @Mat = matrix(syz(@Jfsyz));
+  @Relation = -3 * @Mat[2,1] / @Mat[1,1];
+  @a = Coeff(@Relation, x(1), x(1));
+  @b = Coeff(@Relation, x(2), x(2)^@p);
+  @B = maxideal(1);
+  @B[rvar(x(1))] = x(1)-@b*x(2)^@p;
+  map VERT=basering,@B;
+  @f = VERT(@f);
+  debug_log(2, VERT);
+  debug_log(2, "      x res=", Show(VERT(@fk)));
+
+  return(@f);
+}
+//=============================================================================
+proc Funktion83 (poly @f, int @k)
+USAGE:    Funktion83();
+{
+  int @p = 1;
+  ideal @JetId;
+  poly @fk;
+  intvec @w;
+  ideal @Jf;
+  poly @phi;
+  int @Dim, @Mult;
+  matrix @Mat;
+  poly @a, @b;
+  ideal @B;
+
+  debug_log(1, "   Schritt 83");
+  while(@p<10) {
+    debug_log(1, "     Schritt 83_"+string(@p));
+    @phi = jet(@f, 3);
+    @JetId = x(1)^3 + x(3)^3 + x(2)^(3*@p+1); weight(@JetId);
+    @w = weight(@JetId);
+    @fk = jet(@f- @phi, 3*@w[1], @w) ;
+debug_log(2, "a)", @p, 3*@w[1], Show(@fk), @w, Show(@phi));
+    if( @fk != 0 ) { return(Funktion84(@f,@p)); }
+
+    @JetId = x(1)^3 + x(3)^3 + x(1)*x(2)^(2*@p+1); weight(@JetId);
+    @w = weight(@JetId);
+    @fk = jet(@f, 3*@w[1], @w) ;
+debug_log(2, "b)", @p, 3*@w[1], Show(@fk), @w, Show(@phi));
+    if ( @fk != @phi ) {
+      @Jf=std(jacob(@fk));
+      @Dim = dim(@Jf);
+      @Mult = mult(@Jf);
+debug_log(2, "85-ft="+Show(@fk)+" Dim="+string(@Dim)+" mult="+string(@Mult));
+      if ( @Dim == 0 ) { return(Funktion86(@f,@p)); }
+      if ( @Dim == 1 ) { return(Funktion87(@f,@p)); }
+    }
+
+    @JetId = x(1)^3 + x(3)^3 + x(2)^(3*@p+2); weight(@JetId);
+    @w = weight(@JetId);
+    @fk = jet(@f- @phi, 3*@w[1], @w) ;
+debug_log(2, "c)", @p, 3*@w[1], Show(@fk), @w, Show(@phi));
+    if( @fk != 0 ) { return(Funktion89(@f,@p)); }
+
+    @p = @p + 1;
+    @JetId = x(1)^3 + x(3)^3 + x(2)^(3*@p); weight(@JetId);
+    @w = weight(@JetId);
+    @fk = jet(@f, 3*@w[1], @w) ;
+    @Jf=std(jacob(@fk));
+    @Dim = dim(@Jf);
+    @Mult = mult(@Jf);
+debug_log(2, "90 - ft="+Show(@fk)+" Dim="+string(@Dim)+" mult="+string(@Mult));
+    if ( @Dim == 0 ) { }
+    if ( @Dim == 1 ) {
+      if ( @Mult == 4 ) {
+	if( @fk - @phi != 0) { // b!=0  und/oder b'!=0 
+          if( Coeff(@fk,x(1)*x(2), x(1)^2*x(2)^@p) == 0 ) { // b=0 und b'!=0
+	    @a=(@fk - Coeff(@fk, x(1), x(1)^3)*x(1)^3) / x(1);
+            @f = Isomorphie_s82_z(@f, @a, @p);
+          } 
+          else {
+            if( Coeff(@fk,x(1)*x(2)*x(3), x(1)*x(2)^@p*x(3)) == 0 ){ 
+			// b!=0 und b'=0
+              debug_log(2, "Fall b'=2");
+	      @a=subst(@fk, x(3), 0);
+              @f = Isomorphie_s82_x(@f, @a, @p);
+            }
+            else {
+	      @a = Coeff(@fk,x(1)*x(2)*x(3), x(1)*x(2)^@p*x(3));
+	      @b = Coeff(@fk,x(2)*x(3), x(2)^(2*@p)*x(3));
+              @B = maxideal(1);
+              @B[rvar(x(1))] = x(1)-@b/@a*x(2)^@p;
+              map VERT=basering,@B;
+              @f = VERT(@f);
+              @fk = jet(@f, 3*@w[1], @w) ;
+              debug_log(2, VERT);
+
+              @a=(@fk - Coeff(@fk, x(1), x(1)^3)*x(1)^3) / x(1);
+              @f = Isomorphie_s82_z(@f, @a, @p);
+            } // ende else b!=0 und b'=0
+          } // ende else b=0 und b'!=0
+        } //ende @fk-@phi!=0
+      } // ende mult=4
+    } // ende dim=1
+  } // ENDE While
+  return("", "Fehler");
+}
+
+//=============================================================================
+proc Funktion97 (poly @f, int @K)
+USAGE:    Funktion97();
+{
+  int @kx = 1;	// Koordinate x
+  int @ky = 2;	// Koordinate y
+  int @kz = 3;	// Koordinate z
+  ideal @B = maxideal(1);	// Abbildungs-ideal
+
+  int @k = 2;
+  int @i;
+  int @pt = 2;
+  poly @f3 = jet(@f, 3);
+  ideal @Jfsyz;
+
+  poly  @l1;
+  poly  @l2;
+  poly  @a;
+  poly  @b;
+  poly  @c;
+  poly  @prod;
+  matrix @Mat;
+  int   @k = 1;
+
+  "Weiter-97";
+  "Jet3 = ", Show(@f3);
+  // vertausche 2 Koordinaten sodass d2f/dx2 <>0 ist.
+  for(@i=1;@i<4;@i=@i+1) {
+    if(diff(diff(@f3, x(@i)), x(@i)) != 0) { @kx = @i; @i=4; }
+  }
+  if(@kx == 2) { @ky = 1; @kz = 3; }
+  if(@kx == 3) { @ky = 2; @kz = 1; }
+
+  // bereche -l1l2 und anschliessend l1
+  @f3 = jet(@f, 3);
+  @Jfsyz = @f3, diff(@f3, x(@kx));
+  @Mat = matrix(syz(@Jfsyz));
+  @Jfsyz = @f3, @Mat[2,1];
+  @Mat = matrix(syz(@Jfsyz));
+
+  // berechen Abb. sodass f=x2*l2
+  @l1 = @Mat[2,1];
+  @a = Coeff(@l1, x(@kx), x(@kx));
+  @l1 =  @l1 / number(@a);
+  @b = Coeff(@l1, x(@ky), x(@ky));
+  @c = Coeff(@l1, x(@kz), x(@kz));
+  @B[rvar(x(@kx))] = x(@kx) - @b * x(@ky) - @c * x(@kz);
+  map VERT=basering, @B;
+  @f = VERT(@f);
+  kill VERT;
+  @f3 = jet(@f, 3);
+
+  "Jet3=", Show(@f3);
+  @l2 = @f3 / x(@kx)^2;
+  "l2=", @l2;
+
+  // sorge dafuer, dass b<>0 ist.
+  @b = Coeff(@l2, x(@ky), x(@ky));
+  if( @b== 0) { 
+    @ky, @kz = swap(@ky, @kz);
+  }
+
+  // Koordinaten-Transf. s.d. f=x2y
+  @b = Coeff(@l2, x(@ky), x(@ky));
+  @l2 =  @l2 / number(@b);
+  @a = Coeff(@l2, x(@kx), x(@kx));
+  @c = Coeff(@l2, x(@kz), x(@kz));
+  @B = maxideal(1);
+  @B[rvar(x(@ky))] = -@a * x(@kx) + x(@ky) - @c * x(@kz);
+  map VERT=basering, @B;
+  @f = VERT(@f);
+  kill VERT;
+
+  // bereche gewichteten jet von f
+  @f3 = jet(@f, 3);
+  "Jet3=", Show(@f3);
+  @Jfsyz = x(@kx)^2*x(@ky) + x(@ky)^4 + x(@kz)^4;
+  @a = jet(@f, 8, weight(@Jfsyz));
+  // der Gewichtete Jet betsteht nun aus den Monomen:
+  // x2y, y4, y4z, y2z2, yz3, z4, x2z
+  "a=", Show(@a);
+
+  ideal @Jf=jacob(@a);
+  ideal @j1=std(@Jf);
+  int @Dim=dim(@j1);
+  int @Mult=mult(@j1);
+  if( @Dim == 0) { return(Show(@f), "V[1,0]"); }
+  if( @Dim == 1) {
+    if( @Mult == 1 ) { return(Funktion100(@f, @K)); }
+    if( @Mult == 2 ) { return(Funktion101(@f, @K)); }
+  }
+  " Dim=",@Dim," Dim2=",dim(@j2)," Mult=",@Mult," Mult2=",mult(@j2);
+  return(Show(@f), "V[k,r]");
+}
+//=============================================================================
+proc Funktion103 (poly @f)
+USAGE:    Funktion103();
+{
+  return(FunktionNoClass(@f,"3-jet = x3"));
+}
+//=============================================================================
+proc Funktion104 (poly @f)
+USAGE:    Funktion104();
+{
+  return(FunktionNoClass(@f));
+}
+//=============================================================================
+proc Funktion105 (poly @f);
+USAGE:    Funktion105();
+{
+  return(FunktionNoClass(@f));
+}
+//=============================================================================
+proc FunktionNoClass (poly @f, list #)
+USAGE:    FunktionNoClass();
+
+{ 
+  if(size(#)==2) { string @txt=#[2]; }
+
+  string @s = "The singularity `"+Show(jet(@f, K));
+  @s = @s +"' is not in Arnolds list."+newline;
+  if(size(#)==2) { @s = @s + @txt; }
+  @s = @s + ", Milnor number = " + string(Mu);
+
+  return(Show(@f), @s);
+}
+//=============================================================================
+//=============================================================================
+proc Tschirnhaus (poly @f, poly @x)
+USAGE:    Tschirnhaus();
+{
+  int @n = nvars(basering);
+  int @j;
+
+// "Tschirnhaus fuer:", Show(@f);
+  matrix @cf = coeffs(@f, @x);
+  int @hc = nrows(@cf) - 1;	// hoechster exponent von x_i
+  poly @b = @cf[@hc+1,1];	// koeffizient von x_i^hc
+  ideal @B = maxideal(1);
+
+  string @s="map @EH="+nameof(basering);
+  for( @j=1; @j<=@n ; @j=@j+1) { @s = @s + ",0"; }
+  @s = @s + ";";
+  execute @s;
+"b=", @b;
+"EH(b)=", @EH(@b);
+
+  if ( @EH(@b) == 0)	// pruefe ob der Koeff von x_i^hc 
+  { map @Phi =basering, @B;
+    return(@f, @Phi);
+  }
+  @B[rvar(@x)] = @x -1*(@cf[@hc,1]/(@hc*@b));
+  map @Phi =basering, @B;
+  return(@Phi(@f), @Phi);
+}
+//=============================================================================
+//=============================================================================
+proc Isomorphie_s17 (poly @f, poly @fk, int @k, int @ct)
+USAGE:    Isomorphie_s17();
+{
+  ideal @Jfsyz;
+  poly  @Relation;
+  poly  @a, @b, @c, @d;
+  ideal @JetId;
+  matrix @Matx, @Maty;
+
+  // Ziel: bestimme a,b,c,d sodass  @fk = (ax+by^k)^3(cx+dy) gilt.
+  debug_log(2, "Isomorphie_s17:");
+  debug_log(2, "Faktor: f=",Show(@f)," Jet=",Show(@fk)," k=",@k);
+
+  if( defined(VERT) == 1) { kill VERT; }
+//  "Fak-1:",Show(@f)," jet=",Show(@fk);
+
+  if( @k == 1) {
+    @Jfsyz = @fk, diff(@fk, x(1));
+    @Matx = matrix(syz(@Jfsyz));
+    @Jfsyz = @fk, diff(@fk, x(2));
+    @Maty = matrix(syz(@Jfsyz));
+
+    @a = Coeff(@fk, x(1), x(1)^4);
+    @b = Coeff(@fk, x(2), x(2)^4);
+    @c = Coeff(@fk, x(1)*x(2), x(1)^3*x(2));
+    @d = Coeff(@fk, x(1)*x(2), x(1)*x(2)^3);
+
+    if( (@a != 0) && (@b != 0) ) {
+      int @B,@C, @alpha, @beta, @gamma, @g;
+      poly @an, @bn;
+
+      if(DeBug>7) {
+        Coeff(@Matx[1,1], x(2), x(2));
+        Coeff(@Maty[1,1], x(1), x(1));
+        Coeff(@Matx[2,1], x(1), x(1)^2);
+        Coeff(@Matx[2,1], x(1)*x(2), x(1)*x(2));
+        Coeff(@Matx[2,1], x(2), x(2)^2);
+      }
+      @B = -int(Coeff(@Matx[1,1], x(2), x(2)));
+      @C = -int(Coeff(@Maty[1,1], x(1), x(1)));
+      @alpha = int(Coeff(@Matx[2,1], x(1), x(1)^2));
+      @beta  = int(Coeff(@Matx[2,1], x(1)*x(2), x(1)*x(2)));
+      @gamma = int(Coeff(@Matx[2,1], x(2), x(2)^2));
+
+      if(DeBug>7) {
+        "B=", @B;
+        "C=", @C;
+        "alpha=", @alpha;
+        "beta =", @beta;
+        "gamma=", @gamma;
+     
+        "(@B-@beta)/2=", (@B-@beta)/2;
+        "(@C-@beta)/2=", (@C-@beta)/2;
+      }
+//      @a = gcd((@B-@beta)/2, @alpha);
+//      @b = gcd((@C-@beta)/2, @gamma);
+      map VERT=basering,(x(1) - 2*(@gamma / (@B - @beta))*x(2)),x(2);
+      @Relation = VERT(@f);
+      @fk = jet(@Relation, 4);
+
+      @an = Coeff(@fk, x(1), x(1)^4);
+      @bn = Coeff(@fk, x(2), x(2)^4);
+      if( (@an != 0) & (@bn != 0) ) {
+        VERT=basering,x(1),(x(2) + @a*x(1))/ @b;
+      }
+
+      @f = VERT(@f);
+      @fk = jet(@f, 4);
+      PhiG = VERT(PhiG);
+
+      @a = Coeff(@fk, x(1), x(1)^4);
+      @b = Coeff(@fk, x(2), x(2)^4);
+      @c = Coeff(@fk, x(1)*x(2), x(1)^3*x(2));
+      @d = Coeff(@fk, x(1)*x(2), x(1)*x(2)^3);
+      @Jfsyz = @fk, diff(@fk, x(1));
+      @Matx = matrix(syz(@Jfsyz));
+      @Jfsyz = @fk, diff(@fk, x(2));
+      @Maty = matrix(syz(@Jfsyz));
+    }
+
+    if( (@a == 0) || (@b == 0) ) {
+      if( @a == 0) {
+        if( @c == 0) { // y3(ax+by)
+          @Relation = - @Matx[2,1] / @Matx[1,1];
+          @a = Coeff(@Relation, x(1), x(1));
+          @b = Coeff(@Relation, x(2), x(2));
+          map VERT=basering,@a*x(2)^@k - @b*x(1), x(1);
+        }
+        else { // (ax+by)^3y
+          @Relation = - 3*@Matx[2,1] / @Matx[1,1];
+          @a = Coeff(@Relation, x(1), x(1));
+          @b = Coeff(@Relation, x(2), x(2));
+          map VERT=basering,@a*x(1) - @b*x(2), x(2);
+        }
+      }
+      else {
+        if( @d == 0) { // x3(ax+by)
+          @Relation = - @Maty[2,1] / @Maty[1,1];
+          @a = Coeff(@Relation, x(1), x(1));
+          @b = Coeff(@Relation, x(2), x(2));
+          map VERT=basering,x(1), @b*x(2)^@k - @a*x(1);
+        }
+        else { // x(ax+by)^3
+          @Relation = - 3*@Maty[2,1] / @Maty[1,1];
+          @a = Coeff(@Relation, x(1), x(1));
+          @b = Coeff(@Relation, x(2), x(2));
+          map VERT=basering,x(2), @b*x(1) - @a*x(2);
+        }
+      }
+      @f = VERT(@f);
+      PhiG = VERT(PhiG);
+    } 
+    else {
+//      "Weder b noch a sind 0";
+      if(@ct > 5) { return(@f); }
+      @fk = jet(@f, 4);
+      return(Isomorphie_s17(@f, @fk, @k, @ct+1));
+    }
+  } 
+  else {  // @k >1
+    @a = @fk/x(2);
+    @Jfsyz = @a, diff(@a, x(1));
+    @Matx = matrix(syz(@Jfsyz));
+    @Relation = -3 * @Matx[2,1] / @Matx[1,1];
+//    @Matx;
+    @a = Coeff(@Relation, x(1), x(1));
+    @b = Coeff(@Relation, x(2), x(2)^@k);
+    map VERT=basering,x(1)-@b*x(2)^@k,x(2);
+    @f = VERT(@f);
+//    VERT;
+    @JetId = x(1)^3*x(2) + x(2)^(3*@k+1);
+    @fk = jet(@f, 3*@k+1, weight(@JetId));
+//    "fuer k>1: f=", Show(@a);
+//    "fuer k>1: jet=", Show(jet(@fk, 4));
+  }
+
+//  @JetId = x(1)^3*x(2) + x(2)^(3*@k+1);
+//  @fk = jet(@f, 3*@k+1, weight(@JetId));
+//  "Coeff von x3=",Coeff(@fk, x(1), x(1)^3);
+//  "Coeff von y3=",Coeff(@fk, x(2), x(2)^3);
+//  "f  =", Show(@f);
+//  "k=", @k;
+//  "jet=", Show(jet(@fk, 4));
+  return(@f);
+
+}
+
+//=============================================================================
+//  Id: Ausgaben.lib,v 1.17 1997/08/13 07:39:04 krueger Exp
+/=============================================================================
+//
+// Please send bugs and comments to krueger@mathematik.uni-kl.de
+//
+//=============================================================================
+// required libraries
+
+//=============================================================================
+// required by 
+// LIB "Classify.lib"
+// LIB "Kclass.lib"
+
+//=========================================================================
+proc Ausgaben_lib
+{
+"
+  Funktion2(poly f,int k);	(for internal use only)
+  Funktion4(poly f,int k);	(for internal use only)
+  Funktion5(poly f,int k);	(for internal use only)
+  Funktion7(poly f,int k);	(for internal use only)
+  Funktion8(poly f,int k);	(for internal use only)
+  Funktion9(poly f,int k);	(for internal use only)
+  Funktion11(poly f,int k);	(for internal use only)
+  Funktion12(poly f,int k);	(for internal use only)
+  Funktion14(poly f,int k);	(for internal use only)
+  Funktion15(poly f,int k);	(for internal use only)
+  Funktion16(poly f,int k);	(for internal use only)
+  Funktion19(poly f,int k);	(for internal use only)
+  Funktion20(poly f,int k);	(for internal use only)
+  Funktion21(poly f,int k);	(for internal use only)
+  Funktion23(poly f,int k);	(for internal use only)
+  Funktion24(poly f,int k);	(for internal use only)
+  Funktion27(poly f,int k);	(for internal use only)
+  Funktion28(poly f,int k);	(for internal use only)
+  Funktion30(poly f,int k);	(for internal use only)
+  Funktion31(poly f,int k);	(for internal use only)
+  Funktion32(poly f,int k);	(for internal use only)
+  Funktion34(poly f,int k);	(for internal use only)
+  Funktion35(poly f,int k);	(for internal use only)
+  Funktion37(poly f,int k);	(for internal use only)
+  Funktion38(poly f,int k);	(for internal use only)
+  Funktion39(poly f,int k);	(for internal use only)
+  Funktion42(poly f,int k);	(for internal use only)
+  Funktion43(poly f,int k);	(for internal use only)
+  Funktion44(poly f,int k);	(for internal use only)
+  Funktion45(poly f,int k);	(for internal use only)
+  Funktion47(poly f,int k);	(for internal use only)
+  Funktion60(poly f,int k);	(for internal use only)
+  Funktion61(poly f,int k);	(for internal use only)
+  Funktion62(poly f,int k);	(for internal use only)
+  Funktion64(poly f,int k);	(for internal use only)
+  Funktion65(poly f,int k);	(for internal use only)
+  Funktion100(poly f,int k);	(for internal use only)
+  Funktion101(poly f,int k);	(for internal use only)
+";
+}
+
+//=============================================================================
+proc Funktion2
+USAGE:    
+{ 
+  poly @f = #[1];
+  string @s = "The singularity `"+string(Show(@f));
+  string @tp = "A["+string(Mu)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+".";
+  @s; // +"  ("+SG_Typ+")";
+  ring RingB=CharOfRing,x,ds;
+//  Morse(@f, Kbestimmt(@f));
+  return(string(x^(Mu+1)), @tp);
+}
+//=============================================================================
+proc Funktion4
+USAGE:    
+{ 
+  poly @f = #[1];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "D[4]";
+
+  @s = @s +"' is R-equivalent to "+@tp+".";
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion5
+USAGE:    
+{ 
+  poly @f = #[1];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "D["+string(Mu)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+".";
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion7
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "E["+string(6*@k)+"]";
+
+  @s  = @s + "' is R-equivalent to "+@tp + ", mu="+string(Mu)+", m="+string(@k-1);
+  if(6*@k != Mu) { "Fehler!!!"; }
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion8
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "E["+string(6*@k+1)+"]";
+
+  @s  = @s + "' is R-equivalent to "+@tp + ", mu="+string(Mu)+", m="+string(@k-1);
+  if( (6*@k+1) != Mu) { "Fehler!!!"; }
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion9
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "E["+string(6*@k+2)+"]";
+
+  @s  = @s + "' is R-equivalent to "+@tp + ", mu="+string(Mu)+", m="+string(@k-1);
+  if( (6*@k+2) != Mu) { "Fehler!!!"; }
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion11
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "J["+string(@k)+",0]";
+
+  @s  = @s + "' is R-equivalent to "+@tp + ", mu="+string(Mu)+", m="+string(@k-1);
+  if( (6*@k-2) != Mu) { "Fehler!!!"; }
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion12
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @p = Mu - 6*@k +2;
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "J["+string(@k)+","+string(@p),"]";
+
+  @s  = @s + "' is R-equivalent to "+@tp + ", mu="+string(Mu) + ", m="+string(@k-1);
+  if( (6*@k-2+@p) != Mu) { "Fehler!!!"; }
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion14
+USAGE:    
+{
+  poly @f = #[1];
+  string @s;
+  @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "T[2,4,4]";
+
+  @s = @s +"' is R-equivalent to X[9] = X[1,0] = "+@tp + "., mu="+string(Mu);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion15
+USAGE:    
+{
+  poly @f = #[1];
+  string @s;
+  int @p = Mu - 9;
+  @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "T[2,4," + string(4+@p) + "]";
+
+  @s = @s+"' is R-equivalent to X[1,"+string(@p)+"] = "+@tp+"., mu="+string(Mu);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion16
+USAGE:    
+{
+  poly @f = #[1];
+  string @s;
+  int @p;
+  int @q;
+  string @tp = "T[2,"+string(4+@p)+","+string(4+@q)+"]";
+
+  @s = "The singularity `"+Show(jet(@f, K));
+  @s = @s +"' is R-equivalent to Y[1,"+string(@p)+","+string(@q)+"]";
+  @s =@s+" = "+@tp+".p=??,q=??, mu="+string(Mu);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion19
+USAGE:    
+{
+  poly @f = #[1];
+  int @p = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Z["+string(6*@p+5)+"]";
+
+  @s  = @s + "' is R-equivalent to " + @tp+", mu="+string(Mu) + ", m="+string(@p-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion20
+USAGE:    
+{
+  poly @f = #[1];
+  int @p = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Z["+string(6*@p+6)+"]";
+
+  @s  = @s + "' is R-equivalent to " + @tp+", mu="+string(Mu) + ", m="+string(@p-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion21
+USAGE:    
+{
+  poly @f = #[1];
+  int @p = #[2];
+  string @s = "The singularity `"+Show(jet(@f,K));
+  string @tp = "Z["+string(6*@p+7)+"]";
+
+  @s  = @s + "' is R-equivalent to " + @tp+", mu="+string(Mu) + ", m="+string(@p-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion23
+USAGE:    
+{
+  poly @f = #[1];
+  int @p = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Z["+string(@p-1)+",0]";
+
+  @s  = @s + "' is R-equivalent to " + @tp+", mu="+string(Mu) + ", m="+string(@p-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion24
+USAGE:    
+{
+  poly @f = #[1];
+  int @p = #[2];
+  int @r = Mu - 15;
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Z["+string(@p-1)+","+string(@r)+"]";
+
+  @s  = @s + "' is R-equivalent to " + @tp+", mu="+string(Mu) + ", m="+string(@p-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion27
+USAGE:    
+{ 
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "W["+string(12*@k)+"]";
+
+  @s  = @s + "' is R-equivalent to " + @tp+", mu="+string(Mu) + ", m="+string(3*@k-2);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion28 
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "W["+string(12*@k+1)+"]";
+
+  @s  = @s + "' is R-equivalent to " + @tp+", mu="+string(Mu) + ", m="+string(3*@k-2);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion30 
+USAGE:    
+{ 
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "W["+string(@k)+",0]";
+
+  @s  = @s + "' is R-equivalent to " + @tp+", mu="+string(Mu) + ", m="+string(3*@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion31 
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @i = Mu - 12*@k - 3;
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "W["+string(@k)+","+string(@i)+"]";
+
+  @s  = @s +"' is R-equivalent to "+@tp+"(F31), mu="+string(Mu)+", m="+string(3*@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion32 
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @i = Mu - 12*@k - 2;
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "W#["+string(@k)+","+string(@i)+"]";
+
+  @s  = @s +"' is R-equivalent to "+@tp+"(F32), mu="+string(Mu)+", m="+string(3*@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion34 
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "W["+string(12*@k+5)+"]";
+
+  @s  = @s +"' is R-equivalent to "+@tp+"(F34), mu="+string(Mu)+", m="+string(3*@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion35 
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "W["+string(12*@k+6)+"]";
+
+  @s  = @s + "'is R-equivalent to "+@tp+"(F35), mu="+string(Mu)+", m="+string(3*@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion37 
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "X["+string(@k)+",0]";
+
+  @s  = @s +"' is R-equivalent to "+@tp+"(F37), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion38 
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @p = Mu - 12*@k + 3;
+  string @s = "The singularity `"+Show(jet(@f, K-1));
+  string @tp = "X["+string(@k)+","+string(@p)+"]";
+
+  @s  = @s +"' is R-equivalent to "+@tp+"(F38), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion39
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Y["+string(@k)+",r,s]";
+
+  @s  = @s +"' is R-equivalent to "+@tp+"(F39), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion42
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @r = #[3];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Z["+string(@k)+","+string(12*@k+6*@r-1)+"]";
+
+  @s  = @s +"' is R-equivalent to "+@tp+"(F42), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion43
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @r = #[3];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Z["+string(@k)+","+string(12*@k+6*@r)+"]";
+
+  @s  = @s +"' is R-equivalent to "+@tp+"(F43), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion44
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @r = #[3];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Z["+string(@k)+","+string(12*@k+6*@r+1)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+"(F44), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion45
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @r = #[3];
+  int @S = #[4];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Z["+string(@k)+","+string(@r)+","+string(@S)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+"(F45/46), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion47
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @r = #[3];
+  int @S = #[4];
+  string @s = "The Singularity '";+Show(jet(@f, K));
+  string @tp="";
+
+  @s = @s +"' has 4-jet equal to zero. (F47), mu="+string(Mu);
+
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion60
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Q["+string(6*@k+4)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+"(F60), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion61
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Q["+string(6*@k+5)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+"(F61), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion62
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Q["+string(6*@k+6)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+"(F62), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion64
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Q["+string(@k)+",0]";
+
+  @s = @s +"' is R-equivalent to "+@tp+"(F64), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion65
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  int @i = Mu - (6*@k + 2);
+  string @s = "The singularity `"+Show(jet(@f, K));
+  string @tp = "Q["+string(@k)+","+string(@i)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+"(F65), mu="+string(Mu)+", m="+string(@k-1);
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion84
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  "      Schritt 84";
+
+  return(FunktionNoClass(#[1]));
+}
+//=============================================================================
+proc Funktion86
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  "      Schritt 86";
+
+  return(FunktionNoClass(#[1]));
+}
+//=============================================================================
+proc Funktion87
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  "      Schritt 87";
+
+  return(FunktionNoClass(#[1]));
+}
+//=============================================================================
+proc Funktion89
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  "      Schritt 89";
+
+  return(FunktionNoClass(#[1]));
+}
+//=============================================================================
+proc Funktion100
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The Singularity '"+Show(jet(@f, K));
+  string @tp = "V[1,"+string(Mu-15)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+"(F100), mu="+string(Mu)+", m="+string(@k-1);
+
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
+proc Funktion101
+USAGE:    
+{
+  poly @f = #[1];
+  int @k = #[2];
+  string @s = "The Singularity '"+Show(jet(@f, @k));
+  string @tp = "V#[1,"+string(Mu-15)+"]";
+
+  @s = @s +"' is R-equivalent to "+@tp+"(F101), mu="+string(Mu)+", m="+string(@k-1);
+
+  @s; // +"  ("+SG_Typ+")";
+  return(Show(@f), @tp);
+}
+//=============================================================================
 // E n d   O f   F i l e
