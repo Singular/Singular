@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.27 2000-03-22 16:34:41 Singular Exp $ */
+/* $Id: longrat.cc,v 1.28 2000-05-02 14:55:41 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1188,10 +1188,10 @@ number nlMult (number a, number b)
   nlTest(a);
   nlTest(b);
 #endif
+  if (a==INT_TO_SR(0)) return INT_TO_SR(0);
+  if (b==INT_TO_SR(0)) return INT_TO_SR(0);
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    if (a==INT_TO_SR(0)) return INT_TO_SR(0);
-    if (b==INT_TO_SR(0)) return INT_TO_SR(0);
     int r=(SR_HDL(a)-1)*(SR_HDL(b)>>1);
     if ((r/(SR_HDL(b)>>1))==(SR_HDL(a)-1))
     {
@@ -1226,9 +1226,6 @@ number nlMult (number a, number b)
   }
   else
   {
-    if ((a==INT_TO_SR(0))
-    ||(b==INT_TO_SR(0)))
-      return INT_TO_SR(0);
     u=(number)AllocSizeOf(rnumber);
 #if defined(LDEBUG) && ! defined(HAVE_ASO)
     u->debug=123456;
