@@ -1086,7 +1086,9 @@ static void go_on (calc_dat* c){
   //set limit of 1000 for multireductions, at the moment for
   //programming reasons
   int i=0;
-  red_object* buf=(red_object*) omalloc(PAR_N*sizeof(red_object));
+
+  poly* p=(poly*) omalloc((PAR_N+1)*sizeof(poly));//nullterminated
+
   int curr_deg=-1;
   while(i<PAR_N){
     sorted_pair_node* s=top_pair(c);
@@ -1111,23 +1113,38 @@ static void go_on (calc_dat* c){
       h=s->lcm_of_lm;
     if(s->i>=0)
       now_t_rep(s->j,s->i,c);
+    number coef;
+    int mlen=pLength(h);
+    h=redNF2(h,c,mlen,coef,2);
+    redTailShort(h,c->strat);
+    nDelete(&coef);
+
     free_sorted_pair_node(s,c->r);
     if(!h) continue;
     int len=pLength(h);
-    buf[i].p=h;
-    buf[i].sev=pGetShortExpVector(h);
-    buf[i].sum=NULL;
-    buf[i].bucket = kBucketCreate(currRing);
-    kBucketInit(buf[i].bucket,buf[i].p,len);
+    p[i]=h;
+    
     i++;
   }
+  p[i]=NULL;
+  
+  red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
   c->normal_forms+=i;
+  int j;
+  for(j=0;j<i;j++){
+    buf[j].p=p[j];
+    buf[j].sev=pGetShortExpVector(p[j]);
+    buf[j].sum=NULL;
+    buf[j].bucket = kBucketCreate(currRing);
+    int len=pLength(p[j]);
+    kBucketInit(buf[j].bucket,buf[j].p,len);
+  }
+  omfree(p);
   qsort(buf,i,sizeof(red_object),red_object_better_gen);
 //    Print("\ncurr_deg:%i\n",curr_deg);
   Print("M[%i, ",i);  
   multi_reduction(buf, i, c);
-  Print("%i]",i);
-  int j;
+  Print("%i]",i); 
  //  for(j=0;j<i;j++){
 //     if(buf[j].p==NULL) PrintS("\n ZERO ALERT \n");
 //     int z;
