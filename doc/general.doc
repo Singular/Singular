@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.43 1998-05-08 11:20:11 obachman Exp $
+@comment $Id: general.doc,v 1.44 1998-05-08 13:53:26 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -30,20 +30,20 @@
 @cindex Interactive use
 
 @menu
-* How to enter and exit::
-* SINGULAR prompt and error recovery::
-* The online help system::
-* Interrupting SINGULAR::
-* Editing input::
-* Control parameters::
-* Startup sequence::
-* Reuse of output::
-* Commandline options::
+* How to enter and exit::       
+* SINGULAR prompt::             
+* The online help system::      
+* Interrupting SINGULAR::       
+* Editing input::               
+* Control parameters::          
+* Startup sequence::            
+* Reuse of output::             
+* Commandline options::         
 @end menu
 
 @c --------------------------------------------------------------------------
 @c @node How to enter and exit -- command line options,General syntax,,Command Syntax
-@node How to enter and exit,SINGULAR prompt and error recovery  , Interactive use, Interactive use
+@node How to enter and exit,SINGULAR prompt  , Interactive use, Interactive use
 @subsection How to enter and exit
 @cindex How to enter and exit
 
@@ -91,9 +91,9 @@ systems), and, finally, by searching through some default directories
 (e.g., @code{/usr/local/share/Singular}).
 
 @c --------------------------------------------------------------------------
-@node SINGULAR prompt and error recovery,The online help system,How to enter and exit, Interactive use
-@subsection SINGULAR prompt and error recovery
-@cindex SINGULAR prompt and error recovery
+@node SINGULAR prompt,The online help system,How to enter and exit, Interactive use
+@subsection SINGULAR prompt
+@cindex SINGULAR prompt
 @cindex prompt
 @cindex error recovery
 The @sc{Singular} prompt @code{>}
@@ -106,7 +106,7 @@ On the other hand additional @code{;} will not harm @sc{Singular}:
 extra semicolons are interpreted as empty statements.
 
 @c --------------------------------------------------------------------------
-@node The online help system,Interrupting SINGULAR,SINGULAR prompt and error recovery,Interactive use
+@node The online help system,Interrupting SINGULAR,SINGULAR prompt,Interactive use
 @subsection The online help system
 @cindex The online help system
 
@@ -486,7 +486,7 @@ The other types do not belong to a ring and can be accessed within every ring.
 @item @strong{Default:}
 @code{32003,(x,y,z),(dp,C);}
 @item @strong{Purpose:}
-defines a base ring for polynomials, ideals, vectors, modules, resolutions
+defines a basering for polynomials, ideals, vectors, modules, resolutions
 and matrices and set it as the actual basering.
 
 All advanced algorithms in @sc{Singular} require a ring.
@@ -635,7 +635,7 @@ are only implemented in the first case)
 @* Computation over the field @code{real} has computing errors because
 of rounding.
 @item @strong{Use in procedures:}
-All changes of the base ring by a definition of a new @code{ring} or a
+All changes of the basering by a definition of a new @code{ring} or a
 @code{setring} command in a procedure are local to this procedure
 (i.e. will not affect the calling procedure) unless a @code{keepring}
 command is used.
