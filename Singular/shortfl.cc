@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.15 2000-12-15 18:49:36 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.16 2001-01-30 11:45:47 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -14,6 +14,7 @@
 #include "febase.h"
 #include "numbers.h"
 #include "longrat.h"
+#include "mpr_complex.h"
 #include "ring.h"
 #include "shortfl.h"
 
@@ -320,7 +321,7 @@ typedef MP_INT lint;
 #define MPZ_INIT mpz_init
 #define MPZ_CLEAR mpz_clear
 
-static number nrMap0(number from)
+static number nrMapQ(number from)
 {
   lint h,*g,*z,*n;
   int i,j,t,s;
@@ -421,19 +422,39 @@ static number nrMapP(number from)
   return nf(r).N();
 }
 
+static number nrMapLongR(number from)
+{
+  float t =(float)mpf_get_d((mpf_t)from);
+  return nf(t).N();
+}
+static number nrMapC(number from)
+{
+  gmp_float *h = &((gmp_complex*)from)->real();
+  float t =(float)mpf_get_d((mpf_t)h);
+  return nf(t).N();
+}
+
 nMapFunc nrSetMap(ring src, ring dst)
 {
+  if (rField_is_Q(src))
+  {
+    return nrMapQ;
+  }
+  if (rField_is_long_R(src))
+  {
+    return nrMapLongR;
+  }
   if (rField_is_R(src))
   {
     return ndCopy;
   }
-  if (rField_is_Q(src))
-  {
-    return nrMap0;
-  }
   if(rField_is_Zp(src))
   {
     return nrMapP;
+  }
+  if (rField_is_long_C(src))
+  {
+    return nrMapC;
   }
   return NULL;
 }

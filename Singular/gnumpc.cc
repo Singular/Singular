@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.18 2001-01-18 16:53:57 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.19 2001-01-30 11:45:47 pohl Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -14,7 +14,7 @@
 #include "omalloc.h"
 #include "numbers.h"
 #include "longrat.h"
-
+#include "modulop.h"
 #include "gnumpc.h"
 #include "gnumpfl.h"
 #include "mpr_complex.h"
@@ -32,16 +32,64 @@ static number ngcMapQ(number from)
   else
     return NULL;
 }
+union nf
+{
+  float _f;
+  number _n;
+  nf(float f) {_f = f;}
+  nf(number n) {_n = n;}
+  float F() const {return _f;}
+  number N() const {return _n;}
+};
+static number ngcMapLongR(number from)
+{
+  if ( from != NULL )
+  {
+    gmp_complex *res=new gmp_complex(*((gmp_float *)from));
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+static number ngcMapR(number from)
+{
+  if ( from != NULL )
+  {
+    gmp_complex *res=new gmp_complex((double)nf(from).F());
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+static number ngcMapP(number from)
+{
+  if ( from != NULL)
+    return ngcInit(npInt(from));
+  else
+    return NULL;
+}
 
 nMapFunc ngcSetMap(ring src,ring dst)
 {
+  if(rField_is_Q(src))
+  {
+    return ngcMapQ;
+  }
+  if (rField_is_long_R(src))
+  {
+    return ngcMapLongR;
+  }
   if (rField_is_long_C(src))
   {
     return ngcCopy;
   }
-  if(rField_is_Q(src))
+  if(rField_is_R(src))
   {
-    return ngcMapQ;
+    return ngcMapR;
+  }
+  if (rField_is_Zp(src))
+  {
+    return ngcMapP;
   }
   return NULL;
 }

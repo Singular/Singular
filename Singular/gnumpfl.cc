@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.19 2001-01-18 16:53:57 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.20 2001-01-30 11:45:47 pohl Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -21,21 +21,47 @@
 
 extern size_t gmp_output_digits;
 
-static int ngfPrimeM;
 static number ngfMapP(number from)
 {
-  number to;
-  int save=npPrimeM;
-  npPrimeM=ngfPrimeM;
-  to = ngfInit(npInt(from));
-  npPrimeM=save;
-  return to;
+  if ( from != NULL)
+    return ngfInit(npInt(from));
+  else
+    return NULL;
 }
 static number ngfMapQ(number from)
 {
   if ( from != NULL )
   {
     gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+union nf
+{
+  float _f;
+  number _n;
+  nf(float f) {_f = f;}
+  nf(number n) {_n = n;}
+  float F() const {return _f;}
+  number N() const {return _n;}
+};
+static number ngfMapR(number from)
+{
+  if ( from != NULL )
+  {
+    gmp_float *res=new gmp_float((double)nf(from).F());
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+static number ngfMapC(number from)
+{
+  if ( (from != NULL) || ((gmp_complex*)from)->real().isZero() )
+  {
+    gmp_float *res=new gmp_float(((gmp_complex*)from)->real());
     return (number)res;
   }
   else
@@ -48,13 +74,21 @@ nMapFunc ngfSetMap(ring src, ring dst)
   {
     return ngfMapQ;
   }
-  else if (rField_is_Zp(src))
+  if (rField_is_long_R(src))
+  {
+    return ngfCopy;
+  }
+  if (rField_is_R(src))
+  {
+    return ngfMapR;
+  }
+  if (rField_is_Zp(src))
   {
     return ngfMapP;
   }
-  else if (rField_is_long_R(src))
+  if (rField_is_long_C(src))
   {
-    return ngfCopy;
+    return ngfMapC;
   }
   return NULL;
 }
