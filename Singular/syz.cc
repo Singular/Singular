@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.28 1999-11-15 17:20:52 obachman Exp $ */
+/* $Id: syz.cc,v 1.29 1999-11-16 12:39:31 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -499,7 +499,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 /*--- computing the syzygy modules --------------------------------*/
     if ((currQuotient==NULL)&&(syzIndex==0)&& (!TEST_OPT_DEGBOUND))
     {
-      res[/*syzIndex+*/1] = idSyzygies(res[0/*syzIndex*/],hom,&w,FALSE,TRUE,Kstd1_deg);
+      res[/*syzIndex+*/1] = idSyzygies(res[0/*syzIndex*/],hom,&w,FALSE,TRUE,&Kstd1_deg);
       if ((!TEST_OPT_NOTREGULARITY) && (Kstd1_deg>0)) test |= Sy_bit(OPT_DEGBOUND);
     }
     else

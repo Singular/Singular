@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.48 1999-11-15 17:20:53 obachman Exp $ */
+/* $Id: syz1.cc,v 1.49 1999-11-16 12:39:31 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1974,7 +1974,7 @@ void syPrint(syStrategy syzstr)
       while ((l<syzstr->length) && (rr[l]!=NULL))
       {
         j = IDELEMS(rr[l]);
-        while ((l>0) && (rr[l]->m[j-1]==NULL)) j--;
+        while ((j>0) && (rr[l]->m[j-1]==NULL)) j--;
         ((*syzstr->resolution)[l+1]) = j;
         l++;
       }

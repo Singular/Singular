@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.73 1999-11-15 17:20:06 obachman Exp $ */
+/* $Id: ideals.cc,v 1.74 1999-11-16 12:39:27 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1346,7 +1346,7 @@ static ideal idPrepare (ideal  h1, tHomog h, int syzcomp, intvec **w)
 * do not change h1,  w
 */
 ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
-                  BOOLEAN setRegularity, int &deg)
+                  BOOLEAN setRegularity, int *deg)
 {
   ideal s_h1;
   poly  p;
@@ -1425,7 +1425,8 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   idSkipZeroes(s_h3);
   idSkipZeroes(e);
   
-  if ((!isMonomial)
+  if (deg != NULL 
+  && (!isMonomial)
   && (!TEST_OPT_NOTREGULARITY)
   && (setRegularity)
   && (h==isHomog))
@@ -1435,7 +1436,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
       e = idrMoveR_NoSort(e, syz_ring);
     resolvente res = sySchreyerResolvente(e,-1,&length,TRUE, TRUE);
     intvec * dummy = syBetti(res,length,&reg, *w);
-    deg = reg+2;
+    *deg = reg+2;
     delete dummy;
     for (j=0;j<length;j++)
     {
