@@ -537,11 +537,16 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
         if(rc/b!=oldrc) overflow=TRUE;
       }
     }
+    if (overflow)
+      Warn("int overflow(^), result may be wrong");
+    res->data = (char *)rc;
+    return FALSE;
   }
-  if (overflow)
-    Warn("int overflow(^), result may be wrong");
-  res->data = (char *)rc;
-  return FALSE;
+  else
+  {
+    WerrorS("exponent must be non-negative");
+    return TRUE;
+  }
 }
 static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
 {

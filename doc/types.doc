@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.65 1998-05-25 09:03:19 schmidt Exp $
+@comment $Id: types.doc,v 1.66 1998-05-25 12:27:56 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -552,7 +552,7 @@ integer division (omitting the remainder)
 @item @code{%}, @code{mod}
 integer modulo (the remainder of the division)
 @item @code{^}, @code{**}
-exponentiation
+exponentiation (exponent must be non-negative)
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
 comparison
 @end table
