@@ -142,7 +142,7 @@ then
 # Darwin/MacOS X ##############################################
 elif (echo $uname_a | $egrep "Power Macintosh" > $devnull)
 then
-    prefix="PowerMacintosh"
+    prefix="ppcMac"
     if( uname -s | $egrep "Darwin" > $devnull)
     then
         echo ${prefix}-darwin
