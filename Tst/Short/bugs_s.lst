@@ -1,8 +1,5 @@
-bug_barei
-bug_sres ; (c, ls) problem (TS)
-bug_res  ; sres has wrong betti result (TS)
-bug_sres_betti ; again, sres has wrong betti result (TS)
 bug_sres_cyc5  ; core dump
-; INFINITE  
-; DIFF deform_s
+bug_sres ; (c, ls) and (c, dp) problem -- core dump
+bug_res  ; test of all res commands on the on example of bug_sres
+
 

@@ -16,7 +16,13 @@ bug_6
 bug_7
 bug_8
 bug_9
+bug_barei
 bug_c_dp
+bug_mres
+; CORE bug_res
+; CORE bug_sres
+bug_sres_betti
+; CORE bug_sres_cyc5
 dbm_s
 deform_s
 fetch_s
@@ -28,9 +34,9 @@ gcd0_s
 gcdp_s
 graphics
 highcorner_s
-hres_s
 hnoether_s
 homolog_s
+hres_s
 imap
 intdet_s
 intersect_s
@@ -55,9 +61,11 @@ res_s
 resultantp_s
 ringsum
 sing_s
+solve_s
 spcurve
 sres_s
 std_s
 string
+test_c_dp
 triang_s
 tst_s
