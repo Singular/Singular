@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.7 2004-07-22 20:07:51 plural Exp $";
+version="$Id: ncalg.lib,v 1.8 2004-08-05 12:42:17 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      definitions of important G-algebras
@@ -309,7 +309,7 @@ NOTE:    you have to activate this ring with the "setring" command
 SEE ALSO: sl, g2, gl, Qsl2, Qsl3, Qso3Casimir
 EXAMPLE: example Qso3; shows examples
 "{
-  @p = 2*defInt(#); 
+  int @p = 2*defInt(#); 
   ring @@@r=(0,Q),(x,y,z),dp;
   minpoly = RootOfUnity(@p);
   matrix C[3][3];
