@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.29 2004-04-16 13:55:32 Singular Exp $
+// $Id: deform.lib,v 1.30 2004-04-20 15:55:22 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.29 2004-04-16 13:55:32 Singular Exp $";
+version="$Id: deform.lib,v 1.30 2004-04-20 15:55:22 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -205,8 +205,8 @@ setring  Po;
         m_J  = std(J*ideal(Mon));
       degBound = 0;
 //--------------- obtain new base-ring ----------------------------------------
-        kill `myOx`;
         if(system("with","Namespaces")==1) { kill Top::`myOx`; }
+        if(defined(`myOx`)) {kill `myOx`;}
   qring `myOx` = J;
         matrix Fs,Rs,F_R,Cup,Cup',homFR,New,Rn,Fn;
         module hom';
@@ -453,10 +453,10 @@ EXAMPLE:example mod_versal; shows an example
      degBound=0;
       I_J = Io,J;                attrib(I_J,"isSB",1);
 //-------- obtain new base ring -----------------------------------------------
-      kill `myOx`;
-      if(system("with","Namespaces")==1) {
+      if(system("with","Namespaces")) {
          if(defined(Top::`myOx`)) { kill Top::`myOx`; }
       }
+      if (defined(`myOx`)) {kill `myOx`;}
  qring `myOx` = I_J;
       ideal null,tet;            attrib(null,"isSB",1);
       matrix Ms  = imap(`myQx`,Ms);
@@ -539,13 +539,9 @@ example
   mod_versal(Mo,Io);
   printlevel = p;
   if(system("with","Namespaces")) {
-     if(nameof(Current) == "Ring" ) {
         kill Top::Px,Top::Qx,Top::So;
-     } else {
-        kill Ring::Px,Ring::So;
-     }
   }
-  kill Px,Qx,So;
+  if (defined(Px)) {kill Px,Qx,So;}
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc kill_rings(list #)

@@ -1,6 +1,6 @@
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.17 2001-01-16 13:48:41 Singular Exp $";
+version="$Id: ring.lib,v 1.18 2004-04-20 15:55:22 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -68,14 +68,8 @@ example
    ring r=0,(x,y,u,v),(dp(2),ds);
    changechar("R","2,A"); R;"";
    changechar("R1","32003",R); R1;
-   kill R,R1;
-   if(system("with","Namespaces")) {
-      if( nameof(Current) == "Ring" ) {
-        kill Top::R,Top::R1;
-      } else {
-        kill Ring::R,Ring::R1;
-      }
-   }
+   if(system("with","Namespaces")) { kill Top::R,Top::R1; }
+   if (defined(R)) {kill R,R1;}
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -122,14 +116,8 @@ example
    ideal i = x^2,y^2-u^3,v;
    qring Q = std(i);
    changeord("Q'","lp",Q); Q';
-   kill R,Q,Q';
-   if(system("with","Namespaces")) {
-      if( nameof(Current) == "Ring" ) {
-        kill Top::R,Top::Q';
-      } else {
-        kill Ring::R,Ring::Q';
-      }
-   }
+   if(system("with","Namespaces")) { kill Top::R,Top::Q,Top::Q'; }
+   if (defined(R)) {kill R,Q,Q';}
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -187,14 +175,8 @@ example
    setring(r);
    changevar("R","A()"); R; "";
    changevar("Q'","a,b,c,d",Q); Q';
-   kill R,Q,Q';
-   if(system("with","Namespaces")) {
-      if( nameof(Current) == "Ring" ) {
-        kill Top::R,Top::Q';
-      } else {
-        kill Ring::R,Ring::Q';
-      }
-   }
+   if(system("with","Namespaces")) { kill Top::R,Top::Q,Top::Q'; }
+   if (defined(R)) {kill R,Q,Q';}
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -228,14 +210,8 @@ example
 { "EXAMPLE:"; echo = 2;
    defring("r","0",5,"u","ls"); r; "";
    defring("R","2,A",10,"x(","dp(3),ws(1,2,3),ds"); R;
-   kill r,R;
-   if(system("with","Namespaces")) {
-      if( nameof(Current) == "Ring" ) {
-        kill Top::r,Top::R;
-      } else {
-        kill Ring::r,Ring::R;
-      }
-   }
+   if(system("with","Namespaces")) { kill Top::R,Top::r; }
+   if (defined(R)) {kill R,r;}
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -268,14 +244,8 @@ example
 { "EXAMPLE:"; echo = 2;
    defrings(5,0); S5; "";
    defrings(30); S30;
-   kill S5, S30;
-   if(system("with","Namespaces")) {
-      if( nameof(Current) == "Ring" ) {
-        kill Top::S5,Top::S30;
-      } else {
-        kill Ring::S5,Ring::S30;
-      }
-   }
+   if(system("with","Namespaces")) { kill Top::S5,Top::S30; }
+   if (defined(R)) {kill S5,S30;}
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -309,14 +279,8 @@ example
 { "EXAMPLE:"; echo = 2;
    defringp(5,0); P5; "";
    defringp(30); P30;
-   kill P5, P30;
-   if(system("with","Namespaces")) {
-      if( nameof(Current) == "Ring" ) {
-        kill Top::P5,Top::P30;
-      } else {
-        kill Ring::P5,Ring::P30;
-      }
-   }
+   if(system("with","Namespaces")) { kill Top::P5,Top::P30; }
+   if (defined(R)) {kill P5,P30;}
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -471,14 +435,8 @@ example
          //next v[1] values (=v[2..4]) give weights
          //remaining components of v are used for the remaining blocks
    show(R4);
-   kill r,R1,R2,R3,R4;
-   if(system("with","Namespaces")) {
-      if( nameof(Current) == "Ring" ) {
-        kill Top::R1,Top::R2,Top::R3,Top::R4;
-      } else {
-        kill Ring::R1,Ring::R2,Ring::R3,Ring::R4;
-      }
-   }
+   if(system("with","Namespaces")){kill Top::r,Top::R1,Top::R2,Top::R3,Top::R4;}
+   if (defined(r)) { kill r,R1,R2,R3,R4; }
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -744,14 +702,8 @@ example
    qring qT=std(d2+e2-f3);       //create qring of T mod d2+e2-f3
    ringtensor("Q",s,qS,t,qT);
    type Q;
-   kill R,Q,S,T;
-   if(system("with","Namespaces")) {
-      if( nameof(Current) == "Ring" ) {
-        kill Top::R,Top::Q,Top::S,Top::T;
-      } else {
-        kill Ring::R,Ring::Q,Ring::S,Ring::T;
-      }
-   }
+   if(system("with","Namespaces")){kill Top::Q,Top::R,Top::S,Top::T;}
+   if (defined(R)) { kill R,S,T,Q; }
 }
 ///////////////////////////////////////////////////////////////////////////////
 
