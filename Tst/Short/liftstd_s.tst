@@ -96,7 +96,6 @@ ideal i1=maxideal(3);
 ideal i2=x6,y4,z5,xy,yz,xz;
 i2;
 matrix m1[3][3]=x,y,z,xz,yx,12zx,0,y2,3xy2;
-~;
 pmat(m1);
 liftstd(i2,m1);
 "---------------------------------";
