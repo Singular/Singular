@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.21 1999-11-22 15:41:32 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.22 1999-12-20 08:46:14 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -106,6 +106,7 @@ private:
   void smRowToCol();
   void smFinalMult();
   void smSparseHomog();
+  void smRealPivot();
   void smWeights();
   void smPivot();
   void smNewWeights();
@@ -552,8 +553,9 @@ void sparse_mat::smBareiss(int x, int y)
 *   - with x unreduced last rows, pivots from here are not allowed
 *   - the method will finish for number of unreduced columns < y
 */
-void sparse_mat::smNewBareiss(int x, int y)
+void sparse_mat::smNewBareiss(int x, int y0)
 {
+  int y=y0;
   if ((x > 0) && (x < nrows))
   {
     tored -= x;
@@ -567,7 +569,10 @@ void sparse_mat::smNewBareiss(int x, int y)
   }
   normalize = this->smCheckNormalize();
   if (normalize) this->smNormalize();
-  this->smPivot();
+  if(y0>=0)
+    this->smPivot();
+  else
+    this->smRealPivot();
   this->smSelectPR();
   this->sm1Elim();
   crd++;
@@ -586,7 +591,10 @@ void sparse_mat::smNewBareiss(int x, int y)
   loop
   {
     if (normalize) this->smNormalize();
-    this->smNewPivot();
+    if(y0>=0)
+      this->smNewPivot();
+    else
+      this->smRealPivot();
     this->smSelectPR();
     this->smMultCol();
     this->smHElim();
@@ -607,6 +615,59 @@ void sparse_mat::smNewBareiss(int x, int y)
 }
 
 /* ----------------- pivot method ------------------ */
+
+void sparse_mat::smRealPivot()
+{
+  smpoly a;
+  number nopt,n1;
+  int i, copt, ropt;
+
+  nopt=nInit(0);
+  for (i=act; i; i--)
+  {
+    a = m_act[i];
+    loop
+    {
+      if (a->pos > tored)
+        break;
+      n1=pGetCoeff(a->m);
+      if(nGreaterZero(n1))
+      {
+        if(nGreater(n1,nopt))
+        {
+          nDelete(&nopt);
+          nopt=nCopy(n1);
+          copt=i;
+          ropt=a->pos;
+        }
+      }
+      else
+      {
+        n1=nNeg(n1);
+        if(nGreater(n1,nopt))
+        {
+          nDelete(&nopt);
+          nopt=nCopy(n1);
+          copt=i;
+          ropt=a->pos;
+        }
+        n1=nNeg(n1);
+      }
+      a = a->n;
+      if (a == NULL)
+        break;
+    }
+  }
+  rpiv = ropt;
+  cpiv = copt;
+  nDelete(&nopt);
+  if (cpiv != act)
+  {
+    a = m_act[act];
+    m_act[act] = m_act[cpiv];
+    m_act[cpiv] = a;
+  }
+}
 
 /*
 * prepare smPivot, compute weights for rows and columns
