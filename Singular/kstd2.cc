@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.15 1998-04-06 17:59:30 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.16 1998-04-07 17:55:10 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1298,11 +1298,11 @@ lists bbaLink (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, stdLink 
   l->Init(2);
   l->m[0].rtyp = IDEAL_CMD;
   l->m[0].data = (void *) strat->Shdl;
-   if(stdTrace!=NULL )
-     {
-       l->m[1].rtyp = LIST_CMD;
-       l->m[1].data = (void *)stdTrace->RestTupel();
-     }
+  if(stdTrace!=NULL)
+  {
+    l->m[1].rtyp = LIST_CMD;
+    l->m[1].data = (void *)stdTrace->RestTupel();
+  }
   return (l);
 }
 
