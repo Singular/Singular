@@ -1,4 +1,4 @@
-% $Id: usercard.tex,v 1.4 1998-06-18 10:43:01 schmidt Exp $
+% $Id: usercard.tex,v 1.5 1998-06-18 15:46:17 schmidt Exp $
 
 %
 % usercard.tex - Singular user quick reference card.
@@ -59,12 +59,14 @@ BS\rmslash\ctl d&		remove character on the left/right of cursor\cr
 \endsec
 
 \sec Names and objects()
+\longentry {\it type\/} {\it name\/} \opt{= {\it expression\/}};&
+				declare variable {\it name}.  All names (=
+				identifiers) have to be declared before
+				they are used.\cr
+kill({\it name\/})&		delete variable {\it name}\cr
+\entryskip
 \sectext
 \parskip=\verysmallskipamount
-All names(=identifiers) have to be declared.  A declaration has the syntax
-
-{\tt\quad {\it type\/} {\it name\/} \opt{= {\it expression\/}};}
-
 Names of type {\tt number}, {\tt poly}, {\tt ideal}, {\tt vector}, {\tt
 module}, {\tt matrix}, {\tt map}, and {\tt resolution} may be declared
 only inside a ring.  They are local to that ring.  The same holds for a {\tt
@@ -74,15 +76,15 @@ declared at any time.  They are globally visible.
 Names may consist of alphanumeric characters including {\tt \_}
 (underscore) and have to start with a letter.  Capital and small letters
 are distinguished.  Names may be followed by an integer expression in
-parentheses, resulting in so-called {\it indexed names}.
-
-The expression {\tt {\it name\/}({\it n}..{\it m\/})} is a shortcut for {\tt
-{\it name\/}({\it n\/}), $\ldots$, {\it name\/}({\it m\/})} which in particular
-is useful for declaring ring variables (\eg {\tt ring r = 0, x(1..3), dp;}).
-
-The special name {\tt \_} (underscore) may be used to refer to the value of the
-last expression printed.
-\cr
+parentheses, resulting in so-called {\it indexed names}.\cr
+\entryskip
+{\it name\/}({\it n}..{\it m\/})&
+				shortcut for {\tt {\it name\/}({\it
+				n\/}), $\ldots$, {\it name\/}({\it
+				m\/})}\hfil\break
+				(\eg {\tt ring r = 0, x(1..3), dp;})\cr
+\_ {\rm (underscore)}&		refers to the value of the last expression
+				printed\cr
 \endsec
 
 \vfill
@@ -315,7 +317,7 @@ TRACE&				print information on procedures being executed
 \sec Input and output()
 < "{\it filename\/}";&		load and execute {\it filename\/}\cr
 \longentry write("{\it filename\/}", {\it expression}, \rep)&
-				write {\it expressions} to ASCII file {\it
+				write {\it expressions\/} to ASCII file {\it
 				filename}\cr
 \longentry read("{\it filename\/}");&
 				read ASCII file {\it filename\/} and return
@@ -378,6 +380,9 @@ $$
 \endsec
 
 \sec Miscellany(1.5cm)
+\longentry setring({\it name\/})&
+				make {\it name\/} the current basering\cr
+\subsec{Data on polynomials}
 \longentry ord({\it poly\/\alt vector\/})&
 				return (weighted) degree of initial term\cr
 \longentry deg({\it poly\/\alt vector\/})&
@@ -388,31 +393,66 @@ size({\it poly\/\alt vector\/})\par
 size({\it string\/\alt intvec\/\alt list\/})&
 				return (1) number of non-zero generators;
 				(2) number of monomials; (3) length\cr
-\longentry kill({\it name\/})&
-				delete variable {\it name}\cr
-\longentry setring({\it name}\/)&
-				make {\it name} the current basering\cr
+\longentry lead({\it expression\/})&
+				return initial term(s) of {\it expression}\cr
+\subsec{Operations on polynomials}
+\longentry gcd({\it $\hbox{poly}_1$}, {\it $\hbox{poly}_2$\/})&
+				return greatest common divisor of {\it
+				$\hbox{poly}_1$\/} and {\it $\hbox{poly}_2$}\cr
+\longentry factorize({\it poly\/}\opt{, {\it int\/}})&
+				return irreducible factors of {\it poly}.  A
+				constant factor and multiplicities are returned
+				in dependency on {\it int}.\cr
+\endsec
+
+\sec Differentiation and jets(1.5cm)
+\longentry
+diff({\it expression}, {\it ringvar\/})\par
+diff({\it $\hbox{ideal}_1$}, {\it $\hbox{ideal}_2$\/})&
+				(1) return partial deriv.\ of {\it expression\/}
+				by {\it ringvar\/}; (2) differentiate each elt.\
+				of {\it $\hbox{ideal}_2$\/} by the differential
+				operators corresponding to the elements of {\it
+				$\hbox{ideal}_1$}\cr
+\longentry jacob({\it poly\/\alt ideal\/})&
+				return the jacobi ideal or matrix, resp.\cr
+\longentry jet({\it expression}, {\it int\/}\opt{, {\it intvec\/}})&
+				return the {\it int\/}-jet of {\it expression}.
+				Return weighted {\it int\/}-jet if {\it
+				intvec\/} is specifified.\cr
 \endsec
 
 \sec Standard bases(1.5cm)
 \longentry groebner({\it ideal\/\alt module\/}\opt{, {\it int\/}})&
-				compute a standard basis using a heuristically
-				choosen method.  Delimit computation time to
+				compute a standard basis (SB) of {\it ideal\/}
+				resp.\ {\it module\/} using a heuristically
+				chosen method.  Delimit com\-pu\-tation time to
 				{\it int\/} seconds.\cr
 \longentry std({\it ideal\/\alt module\/}\opt{, {\it intvec\/}})&
-				compute a standard basis.  Use first
-				Hilbert-series {\it intvec\/} (result from {\tt
-				hilb($\ldots$, 1)}) for Hilbert-driven
-				computation.\cr
-\longentry stdfglm({\it ideal\/}\opt{,{\it string\/}})&
-				compute a standard basis\cr
-\longentry stdhilb({\it ideal\/}\opt{,{\it intvec\/}})&
-				compute a standard basis\cr
+				compute a SB.  Use first Hilbert series {\it
+				intvec\/} (result from {\tt hilb($\ldots$, 1)})
+				for Hilbert-driven computation.\cr
+\longentry stdfglm({\it ideal\/}\opt{, {\it string\/}})&
+				use FGLM algorithm to compute a SB from a SB
+				w.r.t.\ a ``simple'' ordering {\it string\/}
+				(de\-faults to {\tt dp})\cr
+\longentry stdhilb({\it ideal\/}\opt{, {\it intvec\/}})&
+				use Hilbert-driven algorithm to compute a SB.
+				If Hil\-bert series {\it intvec\/} is not
+				specified compute it first.\cr
+\longentry fglm({\it ringname}, {\it idealname\/})&
+				use FGLM algorithm to transform SB {\it
+				idealname\/} from ring {\it ringname\/} to a SB
+				w.r.t.\ the ordering of the current basering\cr
+\longentry reduce({\it expression}, {\it ideal\/\alt module\/}\opt{, {\it int\/}})&
+				reduce {\it expression\/} w.r.t.\ second
+				argument which should be a SB.  Use lazy
+				reduction if {\it int\/} equals one.\cr
 \endsec
 
 \sec Invariants of ideals and modules(1.5cm)
 \longentry hilb({\it ideal\/\alt module\/}\opt{, {\it int\/}})&
-				display first and second hilbert series with one
+				display first and second Hilbert series with one
 				argument.\cr
 \endsec
 
