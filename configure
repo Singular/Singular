@@ -16,10 +16,8 @@ ac_help="$ac_help
 \
   --enable-PACKAGE        configure and build PACKAGE
   --disable-PACKAGE       do not configure and build PACKAGE
-  --with-PACKAGE          use PACKAGE, provide dependent functionality
-  --without-PACKAGE       do not use PACKAGE, disable dependent functionality
  where PACKAGE can be:
-     gmp                  GNU multiple precision library"
+     smallgmp             minimal version of gmp written in C only"
 ac_help="$ac_help
 \
      MP                   Multi Protocol library"
@@ -31,7 +29,23 @@ ac_help="$ac_help
      libfac               char set and modp poly factorization library"
 ac_help="$ac_help
 \
-     Singular,            CAS for commutative algebra"
+     Singular             CAS for commutative algebra"
+ac_help="$ac_help
+\
+  --with-PACKAGE          use PACKAGE, provide dependent functionality
+  --without-PACKAGE       do not use PACKAGE, disable dependent functionality
+ where PACKAGE can be:
+     MP                    Multi Protocol"
+ac_help="$ac_help
+\
+     factory              polynomial factorization library"
+ac_help="$ac_help
+\
+     libfac               char set and modp poly factorization library"
+ac_help="$ac_help
+\
+  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
+                          where PACKAGE can be gmp, smallgmp, or buildin"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -669,7 +683,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:673: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:687: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -721,13 +735,13 @@ else
   # On the NeXT, cc -E runs the code through the compiler's parser,
   # not just through cpp.
   cat > conftest.$ac_ext <<EOF
-#line 725 "configure"
+#line 739 "configure"
 #include "confdefs.h"
 #include <assert.h>
 Syntax Error
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:731: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:745: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   :
@@ -736,13 +750,13 @@ else
   rm -rf conftest*
   CPP="${CC-cc} -E -traditional-cpp"
   cat > conftest.$ac_ext <<EOF
-#line 740 "configure"
+#line 754 "configure"
 #include "confdefs.h"
 #include <assert.h>
 Syntax Error
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:746: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:760: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   :
@@ -764,7 +778,7 @@ echo "$ac_t""$CPP" 1>&6
 
 echo $ac_n "checking for AIX""... $ac_c" 1>&6
 cat > conftest.$ac_ext <<EOF
-#line 768 "configure"
+#line 782 "configure"
 #include "confdefs.h"
 #ifdef _AIX
   yes
@@ -819,7 +833,7 @@ if eval "test \"`echo '$''{'ac_cv_is_aix'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 823 "configure"
+#line 837 "configure"
 #include "confdefs.h"
 #ifdef _AIX
     yes
@@ -853,7 +867,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lm  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 857 "configure"
+#line 871 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char atof();
@@ -863,7 +877,7 @@ int t() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:867: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:881: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -888,24 +902,24 @@ else
 fi
 
 echo $ac_n "checking for -lgmp""... $ac_c" 1>&6
-ac_lib_var=`echo gmp_mpz_init | tr '.-/+' '___p'`
+ac_lib_var=`echo gmp_mpq_init | tr '.-/+' '___p'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   ac_save_LIBS="$LIBS"
 LIBS="-lgmp  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 899 "configure"
+#line 913 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
-char mpz_init();
+char mpq_init();
 
 int main() { return 0; }
 int t() {
-mpz_init()
+mpq_init()
 ; return 0; }
 EOF
-if { (eval echo configure:909: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:923: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -929,6 +943,48 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
+echo $ac_n "checking for -lsmallgmp""... $ac_c" 1>&6
+ac_lib_var=`echo smallgmp_mpz_init | tr '.-/+' '___p'`
+if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  ac_save_LIBS="$LIBS"
+LIBS="-lsmallgmp  $LIBS"
+cat > conftest.$ac_ext <<EOF
+#line 955 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+char mpz_init();
+
+int main() { return 0; }
+int t() {
+mpz_init()
+; return 0; }
+EOF
+if { (eval echo configure:965: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=yes"
+else
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=no"
+fi
+rm -f conftest*
+LIBS="$ac_save_LIBS"
+
+fi
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+    ac_tr_lib=HAVE_LIB`echo smallgmp | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
+  cat >> confdefs.h <<EOF
+#define $ac_tr_lib 1
+EOF
+
+  LIBS="-lsmallgmp $LIBS"
+
+else
+  echo "$ac_t""no" 1>&6
+fi
+
 echo $ac_n "checking for -lMP""... $ac_c" 1>&6
 ac_lib_var=`echo MP_IMP_PutGmpInt | tr '.-/+' '___p'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
@@ -937,7 +993,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lMP  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 941 "configure"
+#line 997 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char IMP_PutGmpInt();
@@ -947,7 +1003,7 @@ int t() {
 IMP_PutGmpInt()
 ; return 0; }
 EOF
-if { (eval echo configure:951: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1007: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -979,7 +1035,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lMPT  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 983 "configure"
+#line 1039 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char MPT_GetTree();
@@ -989,7 +1045,7 @@ int t() {
 MPT_GetTree()
 ; return 0; }
 EOF
-if { (eval echo configure:993: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1049: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1021,7 +1077,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsingcf  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1025 "configure"
+#line 1081 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char atof();
@@ -1031,7 +1087,7 @@ int t() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:1035: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1091: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1063,7 +1119,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsingfac  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1067 "configure"
+#line 1123 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char atof();
@@ -1073,7 +1129,7 @@ int t() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:1077: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1133: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1098,7 +1154,7 @@ else
 fi
 
 
-for ac_hdr in gmp.h MP.h  MPT.h factory.h factor.h
+for ac_hdr in gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h
 do
 ac_safe=`echo "$ac_hdr" | tr './\055' '___'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -1106,12 +1162,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1110 "configure"
+#line 1166 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1115: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1171: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1136,9 +1192,15 @@ fi
 done
 
 
-if test "$ac_cv_lib_gmp_mpz_init" = yes && \
+if test "$ac_cv_lib_gmp_mpq_init" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
     ac_gmp_ok=yes
+fi
+
+if test "$ac_cv_lib_smallgmp_mpz_init" = yes && \
+ test "$ac_cv_header_smallgmp_h" = yes && \
+ test "$ac_cv_header_gmp_h" = yes; then
+    ac_smallgmp_ok=yes
 fi
 
 if test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
@@ -1160,9 +1222,9 @@ fi
 
 
   
-# Check whether --enable-gmp or --disable-gmp was given.
-if test "${enable_gmp+set}" = set; then
-  enableval="$enable_gmp"
+# Check whether --enable-smallgmp or --disable-smallgmp was given.
+if test "${enable_smallgmp+set}" = set; then
+  enableval="$enable_smallgmp"
   :
 fi
 
@@ -1191,34 +1253,60 @@ if test "${enable_Singular+set}" = set; then
 fi
 
 
-echo $ac_n "checking whether to configure and build gmp lib""... $ac_c" 1>&6
-if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
-  if test "$with_gmp" != no && test "$ac_gmp_ok" != yes; then
-    enable_gmp=yes
+# Check whether --with-MP or --without-MP was given.
+if test "${with_MP+set}" = set; then
+  withval="$with_MP"
+  :
+fi
+
+# Check whether --with-factory or --without-factory was given.
+if test "${with_factory+set}" = set; then
+  withval="$with_factory"
+  :
+fi
+
+# Check whether --with-libfac or --without-libfac was given.
+if test "${with_libfac+set}" = set; then
+  withval="$with_libfac"
+  :
+fi
+
+# Check whether --with-gmp or --without-gmp was given.
+if test "${with_gmp+set}" = set; then
+  withval="$with_gmp"
+  :
+fi
+
+
+echo $ac_n "checking whether to configure and build smallgmp lib""... $ac_c" 1>&6
+if test "$enable_smallgmp" != yes && test "$enable_smallgmp" != no; then
+  if test "$ac_smallgmp_ok" != yes && \
+   test "$ac_gmp_ok" != yes && \
+   (test "$with_apint" = smallgmp || test "${with_apint+set}" != set); then
+    enable_smallgmp=yes
   else
-    enable_gmp=no
+    enable_smallgmp=no
   fi
 fi
-if test "$enable_gmp" = yes && test -d gmp; then
-  if test "$ac_cv_is_aix" = yes && test "$GCC" = yes; then
-    echo "$ac_t""no" 1>&6
-    echo "configure: warning: Building gmp v2 with gcc results in a gmp lib with bugs" 1>&2
-    echo "configure: warning: Install gmp v2 with another compiler first or use gmp v1.3" 1>&2
-    echo "configure: warning: For the time being gmp is neither configured/built nor used" 1>&2 
-    enable_gmp=no
-    ac_configure_args="$ac_configure_args --disable-gmp"
-  else
-    echo "$ac_t""yes" 1>&6
-    CONFIG_SUBDIRS="gmp"
-    ac_configure_args="$ac_configure_args --enable-gmp"
-  fi
+if test "$enable_smallgmp" = yes && test -d smallgmp; then
+  echo "$ac_t""yes" 1>&6
+  CONFIG_SUBDIRS="$CONFIG_SUBDIRS smallgmp"
+  enable_smallgmp=yes
+  ac_will_have_gmp=yes
 else
   echo "$ac_t""no" 1>&6
-  if  test "$enable_gmp" = yes && test ! -d gmp; then
-    echo "configure: warning: Did not find gmp subdirectory" 1>&2
+  if test "$enable_smallgmp" = yes && test ! -d smallgmp; then
+    echo "configure: warning: Did not find smallgmp subdir" 1>&2
   fi
-  enable_gmp=no
-  ac_configure_args="$ac_configure_args --disable-gmp"
+  enable_smallgmp=no
+fi
+if test "$ac_gmp_ok" != yes && \
+  test "$ac_smallgmp_ok" != yes && \
+  test "$enable_smallgmp" != yes; then
+    echo "configure: warning: Would rather have gmp or smallgmp to build libs and Singular" 1>&2
+    ac_configure_args="$ac_configure_args --disable-gmp"
+else
+  ac_configure_args="$ac_configure_args --enable-gmp"
 fi
 
 echo $ac_n "checking whether to configure and build MP lib""... $ac_c" 1>&6
@@ -1230,14 +1318,14 @@ if test "$enable_MP" != yes && test "$enable_MP" != no; then
   fi
 fi
 if test "$enable_MP" = yes && test -d MP; then
-  if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
+  if test "$ac_will_have_gmp" = yes || test "$ac_gmp_ok" = yes; then
     echo "$ac_t""yes" 1>&6
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
     ac_configure_args="$ac_configure_args --enable-MP"
   else
     echo "$ac_t""no" 1>&6
-    echo "configure: warning: Can not build MP for Singular without having gmp" 1>&2
-    enable_MP=no
+    echo "configure: warning: Can not build MP without having gmp" 1>&2
+    enabl_MP=no
     ac_configure_args="$ac_configure_args --disable-MP"
   fi
 else
@@ -1249,11 +1337,6 @@ else
   ac_configure_args="$ac_configure_args --disable-MP"
 fi
 
-if test "$with_builtingmp" = yes; then
-  enable_gmp=yes
-  ac_configure_args="$ac_configure_args --enable-gmp"
-fi
-
 echo $ac_n "checking whether to configure and build factory lib""... $ac_c" 1>&6
 if test "$enable_factory" != yes && test "$enable_factory" != no; then
   if test "$with_factory" != no && test "$ac_factory_ok" != yes; then
@@ -1263,10 +1346,10 @@ if test "$enable_factory" != yes && test "$enable_factory" != no; then
   fi
 fi
 if test "$enable_factory" = yes && test -d factory; then
-  if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
-  echo "$ac_t""yes" 1>&6
-  CONFIG_SUBDIRS="$CONFIG_SUBDIRS factory"
-  ac_configure_args="$ac_configure_args --enable-factory"
+  if test "$ac_will_have_gmp" = yes  || test "$ac_gmp_ok" = yes; then
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS factory"
+    ac_configure_args="$ac_configure_args --enable-factory"
   else
     echo "$ac_t""no" 1>&6
     echo "configure: warning: Can not build factory without having gmp" 1>&2
@@ -1332,20 +1415,20 @@ else
 fi
 
 
-echo $ac_n "checking whether to use with gmp""... $ac_c" 1>&6
-if test "$with_gmp" != no && test "$with_gmp" != yes; then
-  if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
-    with_gmp=yes
-  else
-    with_gmp=no
-  fi
-  ac_configure_args="$ac_configure_args --with-gmp=$with_gmp"
+echo $ac_n "checking wich apint package to use""... $ac_c" 1>&6
+if test "$with_apint" != gmp && \
+  test "$with_apint" != smallgmp && \
+  test "$with_apint" != buildin; then
+   if test "$ac_gmp_ok" = yes; then
+     with_apint=gmp
+   elif test "$ac_enable_smallgmp" = yes; then
+     with_apint=smallgmp
+   else
+     with_apint=buildin
+   fi
+  ac_configure_args="$ac_configure_args --with-apint=$with_apint"
 fi
-if test "$with_gmp" = yes; then
-  echo "$ac_t""yes" 1>&6
-else
-  echo "$ac_t""no" 1>&6
-fi
+echo "$ac_t""${with_apint}" 1>&6
 
 echo $ac_n "checking whether to use with MP""... $ac_c" 1>&6
 if test "$with_MP" != no && test "$with_MP" != yes; then
@@ -1360,6 +1443,14 @@ if test "$with_MP" = yes; then
   echo "$ac_t""yes" 1>&6
 else
   echo "$ac_t""no" 1>&6
+fi
+
+if test "$enable_MP" = yes; then
+  if test "${with_apint}" = smallgmp; then
+    ac_configure_args="$ac_configure_args --with-default_apreal=none"
+  elif test "${with_apint}" = buildin; then
+    ac_configure_args="$ac_configure_args --with-default_apreal=none --with-default-apint=none"
+  fi
 fi
 
 echo $ac_n "checking whether to use with factory""... $ac_c" 1>&6
@@ -1408,8 +1499,8 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-if test -d gmp; then
-  SUBDIRS="gmp"
+if test -d smallgmp; then
+  SUBDIRS="smallgmp"
 fi
 if test -d MP; then
   SUBDIRS="$SUBDIRS MP"
