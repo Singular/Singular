@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.46 2002-06-10 16:00:45 Singular Exp $ */
+/* $Id: numbers.cc,v 1.47 2002-07-23 13:09:37 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -48,7 +48,6 @@ BOOLEAN (*nGreaterZero)(number a);
 void    (*nWrite)(number &a);
 char *  (*nRead)(char *s,number *a);
 void    (*nPower)(number a, int i, number * result);
-number  (*nGetDenom)(number &n);
 number  (*nGcd)(number a, number b, ring r);
 number  (*nLcm)(number a, number b, ring r);
 char * (*nName)(number n);
@@ -82,7 +81,7 @@ number ndGcd(number a, number b, const ring r) { return r->cf->nInit(1); }
 
 number ndIntMod(number a, number b) { return nInit(0); }
 
-number ndGetDenom(number &n) { return nInit(1); }
+number ndGetDenom(number &n, const ring r) { return n_Init(1,r); }
 
 int    nGetChar() { return nChar; }
 
@@ -164,7 +163,6 @@ void nSetChar(ring r)
   nLcm  = r->cf->nLcm;
   nName= r->cf->nName;
   nSize  = r->cf->nSize;
-  nGetDenom = r->cf->nGetDenom;
   nRePart = r->cf->nRePart;
   nImPart = r->cf->nImPart;
   if (!errorreported) nNULL=r->cf->nNULL;
@@ -218,7 +216,7 @@ void nInitChar(ring r)
   r->cf->nPar  = ndPar;
   r->cf->nParDeg=ndParDeg;
   r->cf->nSize = ndSize;
-  r->cf->nGetDenom= ndGetDenom;
+  r->cf->n_GetDenom= ndGetDenom;
   r->cf->nName =  ndName;
   r->cf->nImPart=ndReturn0;
   r->cf->cfDelete= ndDelete;
@@ -260,7 +258,7 @@ void nInitChar(ring r)
     r->cf->cfSetMap    = naSetMap;
     r->cf->nName       = naName;
     r->cf->nSize       = naSize;
-    r->cf->nGetDenom   = naGetDenom;
+    r->cf->n_GetDenom   = naGetDenom;
 #ifdef LDEBUG
     //r->cf->nDBTest     = naDBTest;
 #endif
@@ -296,7 +294,7 @@ void nInitChar(ring r)
     r->cf->nLcm  = nlLcm;
     r->cf->cfSetMap = nlSetMap;
     r->cf->nSize  = nlSize;
-    r->cf->nGetDenom = nlGetDenom;
+    r->cf->n_GetDenom = nlGetDenom;
 #ifdef LDEBUG
     //r->cf->nDBTest=nlDBTest;
 #endif

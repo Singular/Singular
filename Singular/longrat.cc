@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.43 2002-04-30 14:50:08 Singular Exp $ */
+/* $Id: longrat.cc,v 1.44 2002-07-23 13:09:36 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1372,7 +1372,7 @@ int nlModP(number n, int p)
 /*2
 * acces to denominator, other 1 for integers
 */
-number   nlGetDenom(number &n)
+number   nlGetDenom(number &n, const ring r)
 {
   if (!(SR_HDL(n) & SR_INT))
   {

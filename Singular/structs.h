@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.65 2002-06-10 15:25:35 Singular Exp $ */
+/* $Id: structs.h,v 1.66 2002-07-23 13:09:34 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -246,7 +246,7 @@ struct n_Procs_s
            (*nIsMOne)(number a),
            (*nGreaterZero)(number a);
    void    (*nPower)(number a, int i, number * result);
-   number  (*nGetDenom)(number &n);
+   number  (*n_GetDenom)(number &n, const ring r);
    number  (*nGcd)(number a, number b, const ring r);
    number  (*nLcm)(number a, number b, const ring r);
    void    (*cfDelete)(number * a, const ring r);

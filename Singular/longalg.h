@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.31 2002-06-10 15:25:34 Singular Exp $ */
+/* $Id: longalg.h,v 1.32 2002-07-23 13:09:35 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -130,6 +130,6 @@ extern BOOLEAN  (*nacIsZero)(number a);
 extern number   (*nacInit)(int i);
 extern void     (*nacNormalize)(number &a);
 extern void napWrite(napoly l);
-extern number   naGetDenom(number &n);
+extern number   naGetDenom(number &n, const ring r);
 #endif
 
