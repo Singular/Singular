@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.1.1.1 2003-10-06 12:15:58 Singular Exp $ */
+/* $Id: mpr_complex.h,v 1.2 2004-04-28 13:31:36 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -64,15 +64,45 @@ public:
     mpf_clear( t );
   }
 
+  inline gmp_float & operator = ( const gmp_float & a )
+  {
+    mpf_set( t, a.t );
+    return *this;
+  };
+  inline gmp_float & operator = ( const mpz_t & a )
+  {
+    mpf_set_z( t, a );
+    return *this;
+  };
+  inline gmp_float & operator = ( const mprfloat a )
+  {
+    mpf_set_d( t, (double) a );
+    return *this;
+  };
+  inline gmp_float & operator = ( const long a )
+  {
+    mpf_set_d( t, (double) a );
+    return *this;
+  };
+
+  gmp_float & operator += ( const gmp_float & a );
+  gmp_float & operator -= ( const gmp_float & a );
+  inline gmp_float & operator *= ( const gmp_float & a )
+  {
+    mpf_mul( t, t, a.t );
+    return *this;
+  };
+
+  inline gmp_float & operator /= ( const gmp_float & a )
+  {
+    mpf_div( t, t, a.t );
+    return *this;
+  };
+
   friend gmp_float operator + ( const gmp_float & a, const gmp_float & b );
   friend gmp_float operator - ( const gmp_float & a, const gmp_float & b );
   friend gmp_float operator * ( const gmp_float & a, const gmp_float & b );
   friend gmp_float operator / ( const gmp_float & a, const gmp_float & b );
-
-  gmp_float & operator += ( const gmp_float & a );
-  gmp_float & operator -= ( const gmp_float & a );
-  inline gmp_float & operator *= ( const gmp_float & a );
-  inline gmp_float & operator /= ( const gmp_float & a );
 
   friend bool operator == ( const gmp_float & a, const gmp_float & b );
   friend bool operator  > ( const gmp_float & a, const gmp_float & b );
@@ -82,12 +112,9 @@ public:
 
   friend gmp_float operator - ( const gmp_float & a );
 
-  gmp_float & operator = ( const gmp_float & a );
-  gmp_float & operator = ( const mpz_t & a );
-  gmp_float & operator = ( const mprfloat a );
-  gmp_float & operator = ( const long a );
-
-  inline int sign();    // t>0:+1, t==0:0, t<0:-1
+  inline int sign()    // t>0:+1, t==0:0, t<0:-1
+  { return mpf_sgn( t ); };
+  
   bool isZero();  // t == 0 ?
   bool isOne();   // t == 1 ?
   bool isMOne();  // t == -1 ?
@@ -95,89 +122,19 @@ public:
   void setFromStr( char * in );
 
   // access
-  inline const mpf_t *mpfp() const;
-  inline mpf_t *_mpfp();
+  inline const mpf_t *mpfp() const { return &t; };
+  inline mpf_t *_mpfp() { return &t; };
   
-  inline operator double();
-  inline operator double() const;
+  inline operator double() { return mpf_get_d( t ); };
+  inline operator double() const { return mpf_get_d( t ); };
 
-  inline operator int();
-  inline operator int() const;
+  inline operator int() { return (int)mpf_get_d( t ); };
+  inline operator int() const { return (int)mpf_get_d( t ); };
 
 private:
   mpf_t t;
 };
 
-// <gmp_float> operator <gmp_float>
-inline gmp_float & gmp_float::operator *= ( const gmp_float & a )
-{
-  mpf_mul( t, t, a.t );
-  return *this;
-}
-inline gmp_float & gmp_float::operator /= ( const gmp_float & a )
-{
-  mpf_div( t, t, a.t );
-  return *this;
-}
-
-// <gmp_float> = <*>
-inline gmp_float & gmp_float::operator = ( const gmp_float & a )
-{
-  mpf_set( t, a.t );
-  return *this;
-}
-inline gmp_float & gmp_float::operator = ( const mpz_t & a )
-{
-  mpf_set_z( t, a );
-  return *this;
-}
-inline gmp_float & gmp_float::operator = ( const mprfloat a )
-{
-  mpf_set_d( t, (double) a );
-  return *this;
-}
-inline gmp_float & gmp_float::operator = ( const long a )
-{
-  mpf_set_d( t, (double) a );
-  return *this;
-}
-
-// cast to double
-inline gmp_float::operator double()
-{
-  return mpf_get_d( t );
-}
-inline gmp_float::operator double() const
-{
-  return mpf_get_d( t );
-}
-
-// cast to int
-inline gmp_float::operator int()
-{
-  return (int)mpf_get_d( t );
-}
-inline gmp_float::operator int() const
-{
-  return (int)mpf_get_d( t );
-}
-
-// get sign of real number ( -1: t < 0; 0: t==0; 1: t > 0 )
-inline int gmp_float::sign()
-{
-  return mpf_sgn( t );
-}
-
-// access pointer
-inline const mpf_t *gmp_float::mpfp() const
-{
-  return &t;
-}
-
-inline mpf_t *gmp_float::_mpfp() 
-{
-  return &t;
-}
 
 // built-in functions of GMP
 gmp_float abs( const gmp_float & );
