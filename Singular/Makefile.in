@@ -65,7 +65,7 @@ STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 LIBS		= -lm @NEED_LIBS@ 
 else
-LIBS		= @NEED_LIBS@ 
+LIBS		= -lsingfac -lsingcf -lgmp -static -lreadline -lncurses
 endif
 MP_LIBS		= @MP_LIBS@
 DL_KERNEL	= @DL_KERNEL@
@@ -110,7 +110,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     subexpr.cc syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
     timer.cc weight.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
-    libparse.cc mod_raw.cc \
+    libparse.cc mod_raw.cc sing_win.cc\
     pcv.cc units.cc kbuckets.cc sbuckets.cc\
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
@@ -126,7 +126,7 @@ MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
 DBMSR_SOURCES =  ndbm.cc sing_dbm.cc
 
 # normal C source files
-CSOURCES=weight0.c fegetopt.c fereadl.c page.c feOpenWinntUrl.c dError.c mmstd.c 
+CSOURCES=weight0.c fegetopt.c fereadl.c page.c dError.c mmstd.c 
 
 # C++ sources which are used if part of the kernel are dynamically linked
 DL_KERNEL_SOURCES=p_Procs_Dynamic.cc slInit_Dynamic.cc 
