@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: s-polynomials
 */
-/* $Id: spolys.h,v 1.6 1998-06-12 17:41:39 obachman Exp $ */
+/* $Id: spolys.h,v 1.7 1999-09-27 14:43:43 obachman Exp $ */
 #include "structs.h"
 #include "spSpolyLoop.h"
 
@@ -27,5 +27,6 @@ extern poly (*spSpolyShortBba)(poly p1, poly p2);
 
 /* init */
 void spSet(ring r);
+int spCheckCoeff(number *a, number *b);
 #endif
 

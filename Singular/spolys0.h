@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.h,v 1.10 1998-06-12 17:41:40 obachman Exp $ */
+/* $Id: spolys0.h,v 1.11 1999-09-27 14:43:44 obachman Exp $ */
 /*
 * ABSTRACT: s-polynomials, internal header
 */
@@ -16,12 +16,8 @@
 #define spMemcpy(A,B)      pCopy2(A,B)
 
 
-#define spMonAdd(a,m)  \
-        {for(int ii=pVarLowIndex; ii<=pVarHighIndex; ii++) (a)->exp[ii] += (m)->exp[ii];\
-        pGetOrder(a) += pGetOrder(m);}
-#define spMonSub(a,b)  \
-        {for(int ii=pVarLowIndex; ii<=pVarHighIndex; ii++) (a)->exp[ii] -= (b)->exp[ii];\
-        pGetOrder(a) -= pGetOrder(b);}
+#define spMonAdd(a,m)  pMonAddFast(a,m)
+#define spMonSub(a,m)  pMonSubFast(a,m)
 
 void spModuleToPoly(poly a1);
 

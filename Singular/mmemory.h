@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.21 1999-09-24 16:39:46 Singular Exp $ */
+/* $Id: mmemory.h,v 1.22 1999-09-27 14:36:35 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -79,7 +79,7 @@ void   mmDBFreeAlignedBlock( void*, size_t, char*, int );
 #endif
 
 #define AllocHeap(res, heap)\
-  (res) = mmDBAllocHeap(heap, __FILE__, __LINE__)
+  (void*) (res) = mmDBAllocHeap(heap, __FILE__, __LINE__)
 #define FreeHeap(addr, heap)\
   mmDBFreeHeap(addr, heap,  __FILE__, __LINE__)
 #define Alloc(s)                mmDBAllocBlock(s, __FILE__, __LINE__)

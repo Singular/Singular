@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.32 1999-09-27 11:38:32 obachman Exp $ */
+/* $Id: ring.h,v 1.33 1999-09-27 14:39:26 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -29,6 +29,26 @@ void   rWrite(ring r);
 void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
+
+#ifdef PDEBUG
+#define rChangeSComps(c,s,l) rDBChangeSComps(c,s,l)
+#define rGetSComps(c,s,l) rDBGetSComps(c,s,l)
+void rDBChangeSComps(int* currComponents,
+                     long* currShiftedComponents,
+                     int length,
+                     ring r = currRing);
+void rDBGetSComps(int** currComponents,
+                  long** currShiftedComponents,
+                  int *length,
+                  ring r = currRing);
+#else
+#define rChangeSComps(c,s,l) rNChangeSComps(c,s)
+#define rGetSComps(c,s,l) rNGetSComps(c,s)
+#endif
+
+void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r = currRing);
+void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r = currRing);
+
 idhdl  rFindHdl(ring r, idhdl n, idhdl w);
 #ifdef DRING
 void rDSet();
@@ -45,8 +65,8 @@ char * rParStr(ring r);
 int    rIsExtension(ring r);
 int    rIsExtension();
 int    rSum(ring r1, ring r2, ring &sum);
+
 BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = 1);
-BOOLEAN   rComplete(ring r, int force = 0);
 void   rUnComplete(ring r);
 int    rBlocks(ring r);
 
@@ -95,6 +115,15 @@ inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 inline BOOLEAN rField_is_Extension(ring r=currRing)
 { return (rField_is_Q_a(r)) || (rField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 
+// this needs to be called whenever a new ring is created: new fields
+// in ring are created (like VarOffset), unless they already exist
+// with force == 1, new fields are _always_ created (overwritten),
+// even if they exist
+BOOLEAN rComplete(ring r, int force = 0);
+// use this to free fields created by rComplete
+void rUnComplete(ring r);
+int rBlocks(ring r);
+
 enum
 {
   ringorder_no = 0,
@@ -102,6 +131,7 @@ enum
   ringorder_c,
   ringorder_C,
   ringorder_M,
+  ringorder_S,
   ringorder_lp,
   ringorder_dp,
   ringorder_Dp,
@@ -124,7 +154,7 @@ typedef enum rOrderType_t
   rOrderType_Exp,         // simple ordering, exponent vector has priority
                           // component is compatible with exp-vector order
   rOrderType_Syz,         // syzygy ordering
-  rOrderType_Schreyer,     // Schreyer ordering
+  rOrderType_Schreyer,    // Schreyer ordering
   rOrderType_Syz2dpc,     // syzcomp2dpc
   rOrderType_ExpNoComp    // simple ordering, differences in component are
                           // not considered
@@ -139,7 +169,6 @@ BOOLEAN rIsPolyVar(int i); /* returns TRUE if var(i) belongs to p-block */
 void rOptimizeOrder(ring r);
 
 #ifdef RDEBUG
-extern short rNumber; /* current ring id (r->no) */
 #define rTest(r)    rDBTest(r, __FILE__, __LINE__)
 extern BOOLEAN rDBTest(ring r, char* fn, int l);
 #else

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.10 1999-09-20 18:03:50 obachman Exp $ */
+/* $Id: mmisc.c,v 1.11 1999-09-27 14:41:52 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -38,6 +38,20 @@ size_t mmSpecializeBlock( size_t size )
     mm_specSize = mmGetSize(mm_specIndex);
   }
   return mm_specSize;
+}
+
+memHeap mmGetSpecHeap( size_t size)
+{
+  int mm_new_specIndex = mmGetIndex( size );
+  if (mm_new_specIndex<0)
+  {
+      WerrorS("too many ring variables...");
+      return NULL;
+  }
+  else
+  {
+    return &(mm_theList[mm_new_specIndex]);
+  }
 }
 
 size_t mmGetSpecSize()

@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.67 1999-09-22 10:19:05 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.68 1999-09-27 14:37:13 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -235,6 +235,12 @@
 #if SIZEOF_VOIDP == 8
 #define ALIGN_8
 #endif
+
+#ifndef CHAR_BIT
+#define CHAR_BIT 8
+#endif
+
+#define BIT_SIZEOF_LONG CHAR_BIT*SIZEOF_LONG
 
 #define SINGULAR_VERSION (SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION)
 #ifdef DRING
