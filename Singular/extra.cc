@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.20 1997-10-06 12:19:06 obachman Exp $ */
+/* $Id: extra.cc,v 1.21 1997-10-18 11:04:13 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -531,6 +531,26 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else  
 #endif    
+#ifdef HAVE_FGLM
+/*==================== fglmhomog =============================*/
+    if (strcmp((char*)(h->Data()),"fglmhomog")==0)
+    {
+	if (h->next!=NULL)
+	{
+	    if (h->next->Typ()==RING_CMD)
+	    {
+		if (h->next->next != NULL) {
+		    res->rtyp = IDEAL_CMD;
+		    res->data= (void *)fglmhomProc(h->next, h->next->next);
+		}
+		else PrintS("Needs two arguments (ring,ideal)\n");
+	    }
+	    else PrintS("First argument has to be a ring\n");
+	}
+	else PrintS("Needs two arguments (ring,ideal)\n");
+	return FALSE;
+    }
+    else
 /*==================== fastcomb =============================*/
     if(strcmp((char*)(h->Data()),"fastcomb")==0)
     {
@@ -586,6 +606,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         WerrorS("ideal expected");
     }
     else
+#endif
 /*============================================================*/
       WerrorS("not implemented\n");
   }
