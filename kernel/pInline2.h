@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.2 2004-08-27 12:20:40 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.3 2004-09-28 16:04:45 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -47,7 +47,7 @@ PINLINE2 Order_t p_GetOrder(poly p, ring r)
     switch(r->typ[i].ord_typ)
     {
       case ro_wp_neg:
-        return (((long)((p)->exp[r->pOrdIndex]))-((long) POLY_NEGWEIGHT_OFFSET));
+        return (((long)((p)->exp[r->pOrdIndex]))-POLY_NEGWEIGHT_OFFSET);
       case ro_syzcomp:
       case ro_syz:
       case ro_cp:
