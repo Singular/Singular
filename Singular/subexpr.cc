@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.60 2000-09-04 13:39:07 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.61 2000-09-12 16:01:18 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1368,7 +1368,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
         {
           v->data = pGetCoeff(p);
           pGetCoeff(p)=NULL;
-          pFree1(p);
+          pFree(p);
           v->rtyp = NUMBER_CMD;
           v->name = id;
         }
@@ -1401,7 +1401,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
         {
           v->data = pGetCoeff(p);
           pGetCoeff(p)=NULL;
-          pFree1(p);
+          pFree(p);
           v->rtyp = NUMBER_CMD;
           v->name = id;
         }

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.28 2000-08-14 12:56:16 obachman Exp $
+// $Id: fglmzero.cc,v 1.29 2000-09-12 16:00:53 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -297,7 +297,7 @@ public:
     fglmVector nf;
     borderElem() : monom(NULL), nf() {}
     borderElem( poly p, fglmVector n ) : monom( p ), nf( n ) {}
-    ~borderElem() { pDelete1( &monom ); }
+    ~borderElem() { pDelete1(&monom); }
 #ifndef HAVE_EXPLICIT_CONSTR
     void insertElem( poly p, fglmVector n )
     {
@@ -476,7 +476,7 @@ fglmSdata::updateCandidates()
         pSetm( newmonom );
         done= FALSE;
         while ( list.hasItem() && (done == FALSE) ) {
-            if ( (state= pComp( list.getItem().monom, newmonom )) < 0 )
+            if ( (state= pCmp( list.getItem().monom, newmonom )) < 0 )
                 list++;
             else done= TRUE;
         }
@@ -486,7 +486,7 @@ fglmSdata::updateCandidates()
         }
         if ( state == 0 ) {
             list.getItem().newDivisor( k );
-            pDelete1( &newmonom );
+            pDelete1(&newmonom);
         }
         else {
             list.insert( fglmSelem( newmonom, k ) );
@@ -525,7 +525,7 @@ fglmSdata::getVectorRep( const poly p )
     poly m = p;
     int num = basisSize;
     while ( m != NULL ) {
-        int comp = pComp( m, basis[num] );
+        int comp = pCmp( m, basis[num] );
         if ( comp == 0 ) {
             fglmASSERT( num > 0, "Error(1) in fglmSdata::getVectorRep" );
             number newelem = nCopy( pGetCoeff( m ) );
@@ -604,7 +604,7 @@ internalCalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
                 // NF(p) = - ( tail(p)/LC(p) )
                 poly nf = data.getSpanPoly( edge );
                 pNorm( nf );
-                pDelete1( &nf );  //. deletes the leadingmonomial
+                pDelete1(&nf);  //. deletes the leadingmonomial
                 nf= pNeg( nf );
                 fglmVector nfv = data.getVectorRep( nf );
                 l.insertCols( candidate.divisors, nfv );
@@ -690,7 +690,7 @@ void
 fglmDelem::cleanup()
 {
     if ( monom != NULL ) {
-        pDelete1( &monom );
+        pDelete1(&monom);
     }
 }
 
@@ -803,7 +803,7 @@ fglmDdata::~fglmDdata()
     // use basisSize instead of dimen because of fglmquot!
     //. Remember: There is no poly in basis[0], thus k > 0
     for ( k= basisSize; k > 0; k-- )
-        pDelete1( basis + k );
+        pLmDelete( basis[k]);
     omFreeSize( (ADDRESS)basis, (dimen+1)*sizeof( poly ) );
 }
 
@@ -866,7 +866,7 @@ fglmDdata::updateCandidates( poly m, const fglmVector v )
         pSetm( newmonom );
         done= FALSE;
         while ( list.hasItem() && (done == FALSE) ) {
-            if ( (state= pComp( list.getItem().monom, newmonom )) < 0 )
+            if ( (state= pCmp( list.getItem().monom, newmonom )) < 0 )
                 list++;
             else done= TRUE;
         }

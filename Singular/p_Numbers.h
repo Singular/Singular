@@ -6,19 +6,10 @@
  *  Purpose: macros/inline functions for number oerations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Numbers.h,v 1.1 2000-09-04 14:08:18 obachman Exp $
+ *  Version: $Id: p_Numbers.h,v 1.2 2000-09-12 16:01:07 obachman Exp $
  *******************************************************************/
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H
-
-#define p_nCopy     p_nCopyFieldGeneral
-#define p_nDelete   p_nDelete_FieldGeneral
-#define p_nMult     p_nMult_FieldGeneral
-#define p_nAdd      p_nAdd_FieldGeneral
-#define p_nIsZero   p_nIsZero_FieldGeneral
-#define p_nEqual    p_nEqual_FieldGeneral
-#define p_nNeg      p_nNeg_FieldGeneral
-#define p_nSub      p_nSub_FieldGeneral
 
 #include "numbers.h"
 #define p_nCopy_FieldGeneral(n, r)          nCopy(n)

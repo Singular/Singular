@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopyTemplate.cc,v 1.1 1999-11-15 17:20:43 obachman Exp $ */
+/* $Id: prCopyTemplate.cc,v 1.2 2000-09-12 16:01:13 obachman Exp $ */
 /*
 * ABSTRACT - templates for pr routines
 */
@@ -14,7 +14,7 @@ static poly PR_NAME
   poly dest = &dest_s;
   poly tmp;
   PR_INIT_EVECTOR_COPY(r_src, r_dest); 
-  
+
   while (src != NULL)
   {
     pNext(dest) = (poly) PR_ALLOC_MONOM(r_dest);
@@ -28,6 +28,7 @@ static poly PR_NAME
   pNext(dest) = NULL;
   dest = pNext(&dest_s);
   PR_SORT_POLY(dest, r_dest);
+  prTest(dest, r_dest);
   return dest;
 }
 

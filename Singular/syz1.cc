@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.61 2000-08-24 11:21:47 Singular Exp $ */
+/* $Id: syz1.cc,v 1.62 2000-09-12 16:01:21 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -30,7 +30,6 @@
 #include "lists.h"
 #include "syz.h"
 #include "kbuckets.h"
-#include "polys-comp.h"
 #include "prCopy.h"
 
 extern void rSetmS(poly p, int* Components, long* ShiftedComponents);
@@ -231,8 +230,8 @@ static int syzcomp2dpc_test(poly p1, poly p2)
   cc2 = currcomponents[c2];
   ccc1 = currShiftedComponents[cc1];
   ccc2 = currShiftedComponents[cc2];
-  ec1 = p1->exp.l[currRing->typ[1].data.syzcomp.place];
-  ec2 = p2->exp.l[currRing->typ[1].data.syzcomp.place];
+  ec1 = p1->exp[currRing->typ[1].data.syzcomp.place];
+  ec2 = p2->exp[currRing->typ[1].data.syzcomp.place];
 
   if (ec1 != ccc1)
   {
@@ -1258,9 +1257,10 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
         nPm[ii] = NULL;
 	//#ifdef HAVE_SHIFTED_EXPONENTS
         //tso.order = pTotaldegree(p);
-	//p->exp.l[currRing->pOrdIndex]=tso.order+0x40000000;
+	//p->exp[currRing->pOrdIndex]=tso.order+0x40000000;
 	//#else
-        tso.order = pGetOrder(p) = pTotaldegree(p);
+        tso.order = pTotaldegree(p);
+        pSetOrder(p, tso.order);
 	//#endif
         if ((syzstr->cw!=NULL) && (index>0) && (pGetComp(q)>0))
         {
@@ -2113,7 +2113,7 @@ static resolvente syReorder(resolvente res,int length,
             for (l=pVariables;l>0;l--)
             {
               if (origR!=NULL)
-                pSubExp(tq,l, pRingGetExp(origR,ri1[pGetComp(tq)-1],l));
+                pSubExp(tq,l, p_GetExp(ri1[pGetComp(tq)-1],l,origR));
               else
                 pSubExp(tq,l, pGetExp(ri1[pGetComp(tq)-1],l));
             }
@@ -2358,7 +2358,7 @@ static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
           pSetCoeff0(tq,nDiv(pGetCoeff(p),pGetCoeff(pisN)));
           pGetCoeff(tq) = nNeg(pGetCoeff(tq));
           pSetm(tq);
-          q = pAdd(q,pMultT(pCopy(tempStripped),tq));
+          q = pAdd(q,pMult_mm(pCopy(tempStripped),tq));
           pDelete(&tq);
         }
         pIter(p);

@@ -3,24 +3,20 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.9 2000-08-14 12:56:31 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.10 2000-09-12 16:00:58 obachman Exp $ */
 #include "structs.h"
 
 /////////////////////////////////////////////////////////////////////////
 // configuration
 //
 
-// define to enable buckets
-#define HAVE_BUCKETS
-
 // define to not really use the bucket feature
 // #define HAVE_PSEUDO_BUCKETS
 
-#ifdef HAVE_BUCKETS
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
 //
-kBucket_pt kBucketCreate();
+kBucket_pt kBucketCreate(ring r = currRing);
 void kBucketDestroy(kBucket_pt *bucket);
 
 
@@ -32,7 +28,7 @@ void kBucketDestroy(kBucket_pt *bucket);
 // Assumes length <= 0 || pLength(p) == length
 //         Monoms of p are from heap
 //         Uses heap for intermediate monom allocations
-void kBucketInit(kBucket_pt bucket, poly p, int length, omBin heap = NULL);
+void kBucketInit(kBucket_pt bucket, poly p, int length);
 
 // Converts Bpoly into a poly and clears bucket
 // i.e., afterwards Bpoly == 0
@@ -117,44 +113,7 @@ public:
   int  buckets_length[MAX_BUCKET + 1]; // length if i-th poly
   int buckets_used;                    // max number of used bucket
 #endif
-  omBin heap;                        // used heap
+  ring bucket_ring;
 };
-
-/***************************************************************
- *
- * Memory Management
- *
- *
- ***************************************************************/
-#define kb_pNew(p, heap)            p = omAllocBin(currPolyBin)
-#define kb_pFree1(p, heap)          omFreeBin(p, currPolyBin)
-
-#define kb_pFree1AndAdvance(p, heap)            \
-do                                              \
-{                                               \
-  poly __p = p;                                 \
-  p = pNext(__p);                               \
-  kb_pFree1(__p, heap);                         \
-}                                               \
-while(0)
-
-#define kb_pDelete1AndAdvance(p,heap)           \
-do                                              \
-{                                               \
-  nDelete(&(pGetCoeff(p)));                     \
-  kb_pFree1AndAdvance(p,heap);                  \
-}                                               \
-while (0)
-
-#define kb_pDelete1(p, heap)                    \
-do                                              \
-{                                               \
-  nDelete(&(pGetCoeff(p)));                     \
-  kb_pFree1(p, heap);                           \
-}                                               \
-while (0)
-
-
-#endif /* HAVE_BUCKETS */
 
 #endif /* KBUCKETS_H */

@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.5 2000-09-07 13:39:44 sulandra Exp $
+ *  Version: $Id: p_Procs.cc,v 1.6 2000-09-12 16:01:07 obachman Exp $
  *******************************************************************/
 #include <string.h>
 #include "mod2.h"
@@ -45,7 +45,7 @@
 //   2 -- plus FieldZp_Length*_Ord* procs
 //   3 -- plus Field*_Length*_OrdGeneral procs
 //   4 -- all Field*_Length*_Ord* procs
-const int HAVE_FAST_P_PROCS = 4;
+const int HAVE_FAST_P_PROCS = 0;
 
 // Set HAVE_FAST_FIELD to:
 //   0 -- only FieldGeneral
@@ -700,7 +700,7 @@ inline int AlreadyHaveProc(p_Proc proc, p_Field field, p_Length length, p_Ord or
 const char* macros_field[] = {"p_nCopy","p_nDelete", "p_nMult", "p_nAdd", "p_nSub", "p_nIsZero", "p_nEqual" , "p_nNeg", NULL};
 
 const char* macros_length[] =
-{"p_MemCopy", "p_MemAdd", "p_MemIncr", NULL};
+{"p_MemCopy", "p_MemAdd", "p_MemSum", NULL};
 
 const char* macros_length_ord[] = {"p_MemCmp", NULL};
 int DummyProcs = 0;

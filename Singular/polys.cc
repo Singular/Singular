@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.59 2000-09-07 10:02:54 sulandra Exp $ */
+/* $Id: polys.cc,v 1.60 2000-09-12 16:01:10 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -19,7 +19,6 @@
 #include "polys.h"
 #include "ring.h"
 #include "binom.h"
-#include "polys-comp.h"
 
 /* ----------- global variables, set by pSetGlobals --------------------- */
 /* initializes the internal data from the exp vector */
@@ -77,14 +76,14 @@ static int * order;
 /*0 implementation*/
 /*-------- the several possibilities for pSetm:-----------------------*/
 
-void rSetm(poly p)
+void p_Setm(poly p, ring r)
 {
   int pos=0;
-  if (currRing->typ!=NULL)
+  if (r->typ!=NULL)
   {
     loop
     {
-      sro_ord* o=&(currRing->typ[pos]);
+      sro_ord* o=&(r->typ[pos]);
       switch(o->ord_typ)
       {
         case ro_dp:
@@ -93,8 +92,8 @@ void rSetm(poly p)
           a=o->data.dp.start;
           e=o->data.dp.end;
           long ord=0; //0x40000000;
-          for(int i=a;i<=e;i++) ord+=pGetExp(p,i);
-          p->exp.l[o->data.dp.place]=ord;
+          for(int i=a;i<=e;i++) ord+=p_GetExp(p,i,r);
+          p->exp[o->data.dp.place]=ord;
           break;
         }
         case ro_wp:
@@ -104,8 +103,8 @@ void rSetm(poly p)
           e=o->data.wp.end;
           int *w=o->data.wp.weights;
           long ord=0; //0x40000000;
-          for(int i=a;i<=e;i++) ord+=pGetExp(p,i)*w[i-a];
-          p->exp.l[o->data.wp.place]=ord;
+          for(int i=a;i<=e;i++) ord+=p_GetExp(p,i,r)*w[i-a];
+          p->exp[o->data.wp.place]=ord;
           break;
         }
         case ro_cp:
@@ -114,16 +113,16 @@ void rSetm(poly p)
           a=o->data.cp.start;
           e=o->data.cp.end;
           int pl=o->data.cp.place;
-	  #ifdef HAVE_SHIFTED_EXPONENTS
-          for(int i=a;i<=e;i++) { p->exp.l[pl]=pGetExp(p,i); pl++; }
-	  #else
-          for(int i=a;i<=e;i++) { p->exp.e[pl]=pGetExp(p,i); pl++; }
-	  #endif
+          #ifdef HAVE_SHIFTED_EXPONENTS
+          for(int i=a;i<=e;i++) { p->exp[pl]=p_GetExp(p,i,r); pl++; }
+          #else
+          for(int i=a;i<=e;i++) { p->exp.e[pl]=p_GetExp(p,i,r); pl++; }
+          #endif
           break;
         }
         case ro_syzcomp:
         {
-          int c=pGetComp(p);
+          int c=p_GetComp(p,r);
           long sc = c;
           if (o->data.syzcomp.ShiftedComponents != NULL)
           {
@@ -133,20 +132,20 @@ void rSetm(poly p)
               o->data.syzcomp.ShiftedComponents[o->data.syzcomp.Components[c]];
             assume(c == 0 || sc != 0);
           }
-          p->exp.l[o->data.syzcomp.place]=sc;
+          p->exp[o->data.syzcomp.place]=sc;
           break;
         }
         case ro_syz:
         {
           int c=pGetComp(p);
           if (c > o->data.syz.limit)
-            p->exp.l[o->data.syz.place] = o->data.syz.curr_index;
+            p->exp[o->data.syz.place] = o->data.syz.curr_index;
           else if (c > 0)
-            p->exp.l[o->data.syz.place]= o->data.syz.syz_index[c];
+            p->exp[o->data.syz.place]= o->data.syz.syz_index[c];
           else
           {
             assume(c == 0);
-            p->exp.l[o->data.syz.place]= 0;
+            p->exp[o->data.syz.place]= 0;
           }
           break;
         }
@@ -178,7 +177,7 @@ void rSetmS(poly p, int* Components, long* ShiftedComponents)
           e=o->data.dp.end;
           long ord=0;
           for(int i=a;i<=e;i++) ord+=pGetExp(p,i);
-          p->exp.l[o->data.dp.place]=ord;
+          p->exp[o->data.dp.place]=ord;
           break;
         }
         case ro_wp:
@@ -189,7 +188,7 @@ void rSetmS(poly p, int* Components, long* ShiftedComponents)
           int *w=o->data.wp.weights;
           long ord=0;
           for(int i=a;i<=e;i++) ord+=pGetExp(p,i)*w[i-a];
-          p->exp.l[o->data.wp.place]=ord;
+          p->exp[o->data.wp.place]=ord;
           break;
         }
         case ro_cp:
@@ -199,7 +198,7 @@ void rSetmS(poly p, int* Components, long* ShiftedComponents)
           e=o->data.cp.end;
           int pl=o->data.cp.place;
 	  #ifdef HAVE_SHIFTED_EXPONENTS
-          for(int i=a;i<=e;i++) { p->exp.l[pl]=pGetExp(p,i); pl++; }
+          for(int i=a;i<=e;i++) { p->exp[pl]=pGetExp(p,i); pl++; }
 	  #else
           for(int i=a;i<=e;i++) { p->exp.e[pl]=pGetExp(p,i); pl++; }
 	  #endif
@@ -207,13 +206,11 @@ void rSetmS(poly p, int* Components, long* ShiftedComponents)
         }
         case ro_syzcomp:
         {
-#if 1
           int c=pGetComp(p);
           long sc  = ShiftedComponents[Components[c]];
           assume(c == 0 || Components[c] != 0);
           assume(c == 0 || sc != 0);
-          p->exp.l[o->data.syzcomp.place]=sc;
-#endif
+          p->exp[o->data.syzcomp.place]=sc;
           break;
         }
         default:
@@ -248,16 +245,6 @@ while(0)
 }
 
 
-/*---------------------------------------------------*/
-
-int pComp(poly p1, poly p2)
-{
-  if (p2==NULL)
-    return 1;
-  if (p1==NULL)
-    return -1;
-  return pComp0(p1,p2);
-}
 
 
 /*----------pComp handling for syzygies---------------------*/
@@ -292,11 +279,11 @@ int mcompSchrB(poly p1,poly p2)
       cP1=SchreyerOrd[CompP1-1],cP2=SchreyerOrd[CompP2-1];
 
   //if (CompP1==CompP2) return pCompOld(p1,p2);
-  if (CompP1==CompP2) return pComp0(p1,p2);
+  if (CompP1==CompP2) return pLmCmp(p1,p2);
   pSetComp(p1,cP1);
   pSetComp(p2,cP2);
   //result = pCompOld(p1,p2);
-  result = pComp0(p1,p2);
+  result = pLmCmp(p1,p2);
   pSetComp(p1,CompP1);
   pSetComp(p2,CompP2);
   if (!result)
@@ -381,8 +368,8 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
         SchreyerOrd[i] = i;
       for (i=indexShift;i<maxSchreyer;i++)
         SchreyerOrd[i] = pGetComp(nextOrder[i-indexShift]);
-      //pCompOld = pComp0;
-      //pComp0 = mcompSchrM;
+      //pCompOld = pLmCmp;
+      //pLmCmp = mcompSchrM;
       pLDegOld = pLDeg;
       pLDeg = ldegSchrM;
     }
@@ -394,7 +381,7 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
       omFreeSize((ADDRESS)SchreyerOrd,maxSchreyer*sizeof(int));
       maxSchreyer = 0;
       indexShift = 0;
-      //pComp0 = pCompOld;
+      //pLmCmp = pCompOld;
       pLDeg = pLDegOld;
     }
   }
@@ -427,7 +414,7 @@ int pDeg(poly a)
 */
 int pTotaldegree(poly p)
 {
-  return pExpQuerSum(p);
+  return (int) pExpVectorQuerSum(p);
 }
 
 /*2
@@ -800,186 +787,8 @@ void pSetGlobals(ring r, BOOLEAN complete)
     {
       test &= ~Sy_bit(OPT_REDTAIL); /* noredTail */
     }
-    pSetm=rSetm;
   }
   if (pFDeg!=pWTotaldegree) pFDeg=pTotaldegree;
-}
-
-
-static Exponent_t pMultT_nok = 0;
-
-#ifndef HAVE_P_PROCS
-/* -------------------------------------------------------- */
-/*2
-* update the polynomial a by multipying it by
-* the (number) coefficient
-* and the exponent vector (of) exp (a well initialized polynomial)
-*/
-poly pMultT(poly a, poly exp )
-{
-  int i;
-  number t,x,y=pGetCoeff(exp);
-  poly aa=a;
-  poly prev=NULL;
-
-  pMultT_nok = pGetComp(exp);
-#ifdef PDEBUG
-  pTest(a);
-  pTest(exp);
-#endif
-  while (a !=NULL)
-  {
-    x=pGetCoeff(a);
-    t=nMult(x/*pGetCoeff(a)*/,y/*pGetCoeff(exp)*/);
-    nDelete(&x/*pGetCoeff(a)*/);
-    pSetCoeff0(a,t);
-    if (nIsZero(t))
-    {
-      if (prev==NULL) { pDelete1(&a); aa=a; }
-      else            { pDelete1(&prev->next); a=prev->next;}
-    }
-    else
-    {
-      {
-        if (pMultT_nok)  /* comp of exp != 0 */
-        {
-          if (pGetComp(a) != 0)
-          {
-            return NULL /*FALSE*/;
-          }
-        }
-        pMonAddOn(a,exp);
-      }
-      prev=a;
-      pIter(a);
-    }
-  }
-  pMultT_nok=0;
-  pTest(aa);
-  return aa; /*TRUE*/
-}
-
-
-/*2
-* update a by multiplying it with c (c will not be destroyed)
-*/
-void pMultN(poly a, number c)
-{
-  number t;
-
-  while (a!=NULL)
-  {
-    t=nMult(pGetCoeff(a), c);
-    //nNormalize(t);
-    pSetCoeff(a,t);
-    pIter(a);
-  }
-}
-
-/*2
-* return a copy of the poly a times the number c (a,c will not be destroyed)
-*/
-poly pMultCopyN(poly a, number c)
-{
-  poly result=NULL,hp;
-
-  if (a != NULL)
-  {
-    result=pNew();
-    pCopy2(result,a);
-    pNext(result)=NULL;
-    pGetCoeff(result)=nMult(pGetCoeff(a),c);
-    pIter(a);
-    hp=result;
-    while (a!=NULL)
-    {
-      hp=pNext(hp)=pNew();
-      pCopy2(hp,a);
-      pSetCoeff0(hp,nMult(pGetCoeff(a), c));
-      pIter(a);
-    }
-    pNext(hp)=NULL;
-  }
-  return result;
-}
-
-/*2
-* multiply p1 with p2, p1 and p2 are destroyed
-* do not put attention on speed: the procedure is only used in the interpreter
-*/
-
-#endif
-
-#ifdef HAVE_P_PROCS
-poly pMult_Old(poly p1, poly p2)
-#else
-poly pMult(poly p1, poly p2)
-#endif
-{
-  poly res, r, rn, a;
-  BOOLEAN cont;
-
-  if ((p1!=NULL) && (p2!=NULL))
-  {
-#ifdef PDEBUG
-    pTest(p1);
-    pTest(p2);
-#endif
-    cont = TRUE;
-    a = p1;
-    if (pNext(p2)!=NULL)
-      a = pCopy(a);
-    else
-      cont = FALSE;
-    res = pMultT(a, p2);
-    if (pMultT_nok)
-    {
-      if (cont) pDelete(&p1);
-      pDelete(&res);
-      pDelete(&p2);
-      return NULL;
-    }
-    pTest(res);
-    pDelete1(&p2);
-    r = res;
-    if (r!=NULL) rn = pNext(r);
-    else         rn=NULL;
-    while (cont)
-    {
-      if (pNext(p2)==NULL)
-      {
-        a = p1;
-        cont = FALSE;
-      }
-      else
-      {
-        a = pCopy(p1);
-      }
-      a=pMultT(a, p2); //sets pMultT_nok
-      pTest(a);
-      if (pMultT_nok)
-      {
-        if (cont) pDelete(&p1);
-        pDelete(&a);
-        pDelete(&res);
-        pDelete(&p2);
-        return NULL;
-      }
-      while ((rn!=NULL) && (pComp0(rn,a)>0))
-      {
-        r = rn;
-        pIter(rn);
-      }
-      if (r!=NULL) pNext(r) = rn = pAdd(a, rn);
-      else         res=r=a;
-      pDelete1(&p2);
-    }
-    pTest(res);
-    return res;
-  }
-  pDelete(&p1);
-  pDelete(&p2);
-  return NULL;
 }
 
 
@@ -990,7 +799,7 @@ poly pMult(poly p1, poly p2)
 poly pDivide(poly a, poly b)
 {
   int i;
-  poly result=pInit();
+  poly result = pInit();
 
   for(i=(int)pVariables; i; i--)
     pSetExp(result,i, pGetExp(a,i)- pGetExp(b,i));
@@ -1036,7 +845,7 @@ poly pDivideM(poly a, poly b)
       }
     }
   }
-  pMultN(result,inv);
+  pMult_nn(result,inv);
   nDelete(&inv);
   pDelete(&b);
   return result;
@@ -1175,7 +984,7 @@ poly pDehomogen (poly p1,poly p2,number n)
     if (P[i] != NULL)
     {
       nPower(n,i,&nn);
-      pMultN(P[i],nn);
+      pMult_nn(P[i],nn);
       p = pAdd(p,P[i]);
       //P[i] =NULL; // for safety, may be removed later
       nDelete(&nn);

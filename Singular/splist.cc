@@ -203,7 +203,7 @@ void    spectrumPolyList::insert_node( poly m,poly f )
     if( N==0 ||
               root->weight>newnode->weight ||
             ( root->weight==newnode->weight &&
-              pComp( root->mon,newnode->mon )<0 ) )
+              pCmp( root->mon,newnode->mon )<0 ) )
     {
         // ----------------------
         //  insert at position 0
@@ -232,7 +232,7 @@ void    spectrumPolyList::insert_node( poly m,poly f )
         while( next!=(spectrumPolyNode*)NULL &&
                ( newnode->weight>next->weight ||
                ( newnode->weight==next->weight &&
-                 pComp( newnode->mon,next->mon )<0 ) ) )
+                 pCmp( newnode->mon,next->mon )<0 ) ) )
         {
             actual = next;
             next   = next->next;
@@ -270,7 +270,7 @@ void    spectrumPolyList::delete_monomial( poly m )
 
     while( *node!=(spectrumPolyNode*)NULL )
     {
-        if( pComp( m,(*node)->mon )>=0 && pDivisibleBy2( m,(*node)->mon ) )
+        if( pCmp( m,(*node)->mon )>=0 && pDivisibleBy2( m,(*node)->mon ) )
         {
             delete_node( node );
         }
@@ -280,9 +280,9 @@ void    spectrumPolyList::delete_monomial( poly m )
 
             while( *f!=(poly)NULL )
             {
-                if( pComp( m,*f )>=0 && pDivisibleBy2( m,*f ) )
+                if( pCmp( m,*f )>=0 && pDivisibleBy2( m,*f ) )
                 {
-                    pDelete1( f );
+                    pDelete1(f);
                 }
                 else
                     {
@@ -354,7 +354,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
                     //  look for  (*node)->mon  in   f
                     // --------------------------------
 
-                    cmp = pComp( (*node)->mon,f );
+                    cmp = pCmp( (*node)->mon,f );
 
                     if( cmp<0 )
                     {
@@ -371,7 +371,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
                         //  normalize coefficient
 
                         number inv = nInvers( pGetCoeff( f ) );
-                        pMultN( search->nf,inv );
+                        pMult_nn( search->nf,inv );
                         nDelete( &inv );
 
                         //  exchange  normal forms
@@ -421,7 +421,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
                         //  look for  (*node)->mon  in   f
                         // --------------------------------
 
-                        cmp = pComp( (*node)->mon,f );
+                        cmp = pCmp( (*node)->mon,f );
 
                         if( cmp<0 )
                         {
@@ -430,7 +430,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
                         else if( cmp==0 )
                         {
                             search->nf = pSub( search->nf,
-                                pMultCopyN( (*node)->nf,pGetCoeff( f ) ) );
+                                ppMult_nn( (*node)->nf,pGetCoeff( f ) ) );
                             pNorm( search->nf );
                         }
                     }

@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.86 2000-09-04 13:39:00 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.87 2000-09-12 16:01:02 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -119,10 +119,6 @@
 #define SIZEOF_DOUBLE 8
 /* Define if your integer format is big endian */
 #undef WORDS_BIGENDIAN
-/* Define the type of the exponents to be used in monomials */
-#define EXPONENT_TYPE short
-/* Define the size of exponent */
-#define SIZEOF_EXPONENT SIZEOF_SHORT
 /* Define major version of Singular -- should be set in ../configure.in!!!*/
 #define SINGULAR_MAJOR_VERSION 0
 /* Define minor version of Singular -- should be set in ../configure.in!!! */
@@ -341,14 +337,16 @@ extern int pShortOut;
 /* undef PDEBUG to disable checks of polys
  *
  * define PDEBUG to
- * 0 for basic, explicitely requested tests
+ * 0 for 
  * 1 for tests in pProcs
  * 2 for low-level tests (Exponent access, primitive monom operations)
  * NOTE: for PDEBUG > 1 it gets very slow
  *       You can locally enable tests in pProcs by setting the 
  *       define at the beginning of pProcs.cc
  */
+#ifndef PDEBUG
 #define PDEBUG 0
+#endif
 
 /* PDEBUG requires MDEBUG -- obachman: really?? if yes, why???*/
 #ifdef PDEBUG
@@ -510,6 +508,8 @@ extern int pShortOut;
 
 #else /* not NDEBUG **************************************************** */
 
+#undef PDEBUG
+
 /* define YYDEBUG 1 for debugging bison texts, 0 otherwise */
 #define YYDEBUG 0
 
@@ -534,7 +534,7 @@ extern int pShortOut;
 #else /* ! HAVE_ASSUME */
 
 #define assume_violation(s,f,l) \
-  dReportError("assume violation at %s:%l condition:%s", f,l,s)
+  dReportError("assume violation at %s:%d condition: %s", f,l,s)
 
 #ifdef __cplusplus
 extern "C" {
@@ -569,7 +569,7 @@ do                                              \
 while (0)
 #endif /* HAVE_ASSUME */
 
-#if 0
+#if 1
 #define HAVE_SHIFTED_EXPONENTS
 #ifndef RDEBUG
 #define RDEBUG 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.35 2000-08-24 14:42:46 obachman Exp $ */
+/* $Id: structs.h,v 1.36 2000-09-12 16:01:17 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -21,16 +21,9 @@ typedef void * Sy_reference;
 /* the following defines should really go into mod2.h,
    but configure dislikes it */
 
-#ifdef HAVE_SHIFTED_EXPONENTS
-/* Define the type of the exponents to be used in monomials */
-#undef EXPONENT_TYPE
-#define EXPONENT_TYPE long
-/* Define the size of exponent */
-#undef SIZEOF_EXPONENT
-#define SIZEOF_EXPONENT SIZEOF_LONG
-#endif
 
-typedef EXPONENT_TYPE Exponent_t;
+typedef long Exponent_t;
+typedef unsigned long Order_t;
 
 enum tHomog
 {
@@ -258,15 +251,13 @@ struct sip_sring
 
   ideal      qideal; /* extension to the ring structure: qring */
 
-#ifdef HAVE_SHIFTED_EXPONENTS
   unsigned long bitmask;
-#endif
 
   int      *VarOffset;
-  /* mapping exp. of var(i) -> p->exp.l */
+  /* mapping exp. of var(i) -> p->exp */
 #ifdef HAVE_SHIFTED_EXPONENTS
   /* mapping exp. of var(i) ->
-  p->exp.l[(VarOffset[i] & 0xffffff)] >> (VarOffset[i] >> 24) & bitmask */
+  p->exp[(VarOffset[i] & 0xffffff)] >> (VarOffset[i] >> 24) & bitmask */
 #else
   /* mapping exp. of var(i) -> p->exp.e[VarOffset[i]] */
 #endif
@@ -285,20 +276,12 @@ struct sip_sring
                             /* pVarLow to pVarHigh */
   // contains component, but no weight fields in E */
   // better: pVarLowIndexE / pVarLowIndexL
-  #ifdef LONG_MONOMS
-  short      pDivLow;
-  short      pDivHigh; /* the same as pVarLow..pVarHigh, */
-                       /* but as index in the 'long' field */
-  #endif
-  #ifndef HAVE_SHIFTED_EXPONENTS
-  short      pCompLowIndex; // better: use pCompareLowIndexL
-  #endif
-  short      pCompHighIndex; /* use p->exp.l[pCompLowIndex..ppCompHighIndex] */
+  short      pCompHighIndex; /* use p->exp[pCompLowIndex..ppCompHighIndex] */
                              /* for comparing monomials */
   short      pCompLSize; // pCompHighIndex - pCompLowIndex + 1
 
   short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
-  short      pOrdIndex; /* p->exp.l[pOrdIndex] is pGetOrd(p) */
+  short      pOrdIndex; /* p->exp[pOrdIndex] is pGetOrd(p) */
 
   short      ExpESize; /* size of exponent vector in Exponent_t */
   short      ExpLSize; /* size of exponent vector in long */

@@ -1,14 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.6 1999-11-15 17:20:14 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.7 2000-09-12 16:00:58 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
 #include "mod2.h"
 #include "kutil.h"
 #include "polys.h"
-#include "prProcs.h"
 #include "numbers.h"
 
 // Define to enable tests in this file 
@@ -60,7 +59,7 @@ void ksReducePoly(LObject* PR,
     int ct = ksCheckCoeff(&an, &bn);
     pSetCoeff(lm, bn);
     if ((ct == 0) || (ct == 2)) 
-      p1 = pr_Mult_n(p1, an);
+      p1 = pMult_nn(p1, an);
     if (coef != NULL) *coef = an;
     else nDelete(&an);
   }
@@ -70,9 +69,11 @@ void ksReducePoly(LObject* PR,
   }
   
   
-  pMonSubFrom(lm, p2);
-
-  PR->p = pr_Minus_m_Mult_q(p1, lm, a2, spNoether);
+  // pMonSubFrom(lm, p2);
+  pExpVectorSub(lm, p2);
+  int dummy;
+  PR->p = currRing->p_Procs->p_Minus_mm_Mult_qq(p1, lm, a2, 
+                                                 dummy, spNoether, currRing);
 
   pDelete1(&lm);
 }
@@ -137,10 +138,13 @@ void ksCreateSpoly(LObject* Pair,
   pSetCoeff0(m2, lc1); // and now, m1 * LT(p1) == m2 * LT(p2)
 
   // get m2 * a2
-  a2 = pr_Mult_m(a2, m2, spNoether);
+  a2 = currRing->p_Procs->pp_Mult_mm(a2, m2, spNoether, currRing);
 
   // and, finally, the spoly
-  Pair->p = pr_Minus_m_Mult_q(a2, m1, a1, spNoether);
+  int dummy;
+  Pair->p = currRing->p_Procs->p_Minus_mm_Mult_qq(a2, m1, a1, 
+                                                  dummy, spNoether,
+                                                  currRing);
   
   // Clean-up time
   pDelete1(&m1);
@@ -183,7 +187,7 @@ void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
   if (! nIsOne(coef))
   {
     pNext(Current) = NULL;
-    pr_Mult_n(Lp, coef);
+    pMult_nn(Lp, coef);
   }
   nDelete(&coef);
   pNext(Current) = PR->p;
@@ -363,18 +367,18 @@ x1:
     }
     pSetm(m1);
     pSetm(m2);
-    cm = pComp0(m1, m2);
+    cm = pLmCmp(m1, m2);
     if (cm!=0)
     {
       if(cm==1)
       {
-        pFree1(m2);
+        pFree(m2);
         nNew(&(pGetCoeff(m1)));
         return m1;
       }
       else
       {
-        pFree1(m1);
+        pFree(m1);
         nNew(&(pGetCoeff(m2)));
         return m2;
       }
@@ -386,7 +390,7 @@ x1:
     nDelete(&t1);
     if (!equal)
     {
-      pFree1(m2);
+      pFree(m2);
       nNew(&(pGetCoeff(m1)));
       return m1;
     }
@@ -394,17 +398,17 @@ x1:
     pIter(a2);
     if (a2==NULL)
     {
-      pFree1(m2);
+      pFree(m2);
       if (a1==NULL)
       {
-        pFree1(m1);
+        pFree(m1);
         return NULL;
       }
       goto x1;
     }
     if (a1==NULL)
     {
-      pFree1(m1);
+      pFree(m1);
       goto x2;
     }
   }

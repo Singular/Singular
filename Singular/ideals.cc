@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.100 2000-08-17 16:45:57 Singular Exp $ */
+/* $Id: ideals.cc,v 1.101 2000-09-12 16:00:54 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -247,7 +247,7 @@ void idDelLmEquals(ideal id)
   {
     for (j=l-1; j>i; j--)
     {
-      if (pLmEqual(id->m[i], id->m[j]))
+      if (id->m[i] != NULL && id->m[j] != NULL && pEqual(id->m[i], id->m[j]))
       {
         pDelete(&id->m[j]);
         l--;
@@ -376,7 +376,7 @@ static int pComp_RevLex(poly a, poly b,BOOLEAN nolex)
   if (b==NULL) return 1;
   if (a==NULL) return -1;
 
-  if (nolex) return pComp0(a,b);
+  if (nolex) return pLmCmp(a,b);
   int l=pVariables;
   while ((l>0) && (pGetExp(a,l)==pGetExp(b,l))) l--;
   if (l==0)
@@ -560,7 +560,7 @@ ideal  idMult (ideal h1,ideal  h2)
       {
         if (h2->m[j] != NULL)
         {
-          hh->m[k] = pMult(pCopy(h1->m[i]),pCopy(h2->m[j]));
+          hh->m[k] = ppMult_qq(h1->m[i],h2->m[j]);
           k++;
         }
       }
@@ -1118,7 +1118,7 @@ ideal idSect (ideal h1,ideal h2)
   for (i=0;i<IDELEMS(temp1);i++)
   {
     if ((temp1->m[i]!=NULL)
-    && (pRingGetComp(syz_ring,temp1->m[i])>length))
+    && (p_GetComp(temp1->m[i],syz_ring)>length))
     {
       if(syz_ring==orig_ring)
         p = pCopy(temp1->m[i]);
@@ -1243,7 +1243,7 @@ ideal idMultSect(resolvente arg, int length)
   k = 0;
   for (j=0;j<IDELEMS(tempstd);j++)
   {
-    if ((tempstd->m[j]!=NULL) && (pRingGetComp(syz_ring,tempstd->m[j])>syzComp))
+    if ((tempstd->m[j]!=NULL) && (p_GetComp(tempstd->m[j],syz_ring)>syzComp))
     {
       if (k>=IDELEMS(result))
       {
@@ -2310,7 +2310,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   for (k=0; k<=i; k++)
   {
     l=pVariables;
-    while ((l>0) && (pRingGetExp(&tmpR, hh->m[k],l)*pGetExp(delVar,l)==0)) l--;
+    while ((l>0) && (p_GetExp( hh->m[k],l,&tmpR)*pGetExp(delVar,l)==0)) l--;
     if (l==0)
     {
       j++;

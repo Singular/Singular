@@ -8,7 +8,6 @@
 #include "spolys0.h"
 #include "spolys.h"
 #include "modulop.h"
-#include "polys-comp.h"
 #include "kutil.h"
 #include "ring.h"
 #include "spSpolyLoop.h"

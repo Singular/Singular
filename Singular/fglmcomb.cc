@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.17 2000-08-14 12:56:12 obachman Exp $
+// $Id: fglmcomb.cc,v 1.18 2000-09-12 16:00:53 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -52,7 +52,7 @@ fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numM
     int state;
 
     while ( (temp != NULL) && (point < numMonoms) ) {
-        state= pComp( temp, monomials[point] );
+        state= pCmp( temp, monomials[point] );
         if ( state == 0 ) {
             // Eliminate this monomial
             poly todelete;
@@ -70,7 +70,7 @@ fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numM
             number newelem = nAdd( pGetCoeff( todelete ), v.getconstelem( point+1 ) );
             v.setelem( point+1, newelem );
             nDelete( & pGetCoeff( todelete ) );
-            pFree1( todelete );
+            pFree( todelete );
             point++;
         }
         else if ( state < 0 )
@@ -116,7 +116,7 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         number n2 = pGetCoeff( p2 );
 
         p2= pCopy( p2 );
-        pDelete1( pptr );
+        pDelete1(pptr);
         pDelete1( & p2 );
         p2= pMult( m, p2 );
 
@@ -125,7 +125,7 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         nDelete( & n1 );
         n1= temp;
         n1= nNeg( n1 );
-        pMultN( p2, n1 );
+        pMult_nn( p2, n1 );
 //         pNormalize( p2 );
         nDelete( & n1 );
         *pptr= pAdd( *pptr, p2 );
@@ -190,8 +190,7 @@ fglmNewLinearCombination( ideal source, poly monset )
 //         m[k]= pOne();
 //         pSetExpV( m[k], temp->exp );
 //         pSetm( m[k] );
-        m[k]= pNew();
-        pCopy2( m[k], temp );
+        m[k]=pInit(temp);
         pSetCoeff( m[k], nInit(1) );
         pIter( temp );
     }
@@ -260,8 +259,7 @@ fglmNewLinearCombination( ideal source, poly monset )
 //                 basis[basisSize]= pOne();
 //                 pSetExpV( basis[basisSize], temp->exp );
 //                 pSetm( basis[basisSize] );
-                basis[basisSize]= pNew();
-                pCopy2( basis[basisSize], temp );
+                basis[basisSize]=pInit(temp);
                 pSetCoeff( basis[basisSize], nInit(1) );
                 basisSize++;
             }

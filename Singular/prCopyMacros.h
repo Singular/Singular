@@ -19,7 +19,7 @@ while (0)
 #define PR_NO_SORT 1
 #define PR_INIT_EVECTOR_COPY(r_src, r_dest) ((void)0)
 #define PR_CPY_EVECTOR(dest, dest_r, src, src_r) \
-  omMemcpyW(&(dest->exp.l[0]), &(src->exp.l[0]), dest_r->ExpLSize)
+  omMemcpyW(dest->exp, src->exp, dest_r->ExpLSize)
 #define PR_ALLOC_MONOM(r) omAllocBin(r->PolyBin)
 #else
 #define  PR_INIT_EVECTOR_COPY(r_src, r_dest) int _min = min(r_dest->N, r_src->N)

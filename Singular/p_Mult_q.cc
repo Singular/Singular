@@ -6,7 +6,7 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.cc,v 1.2 2000-09-04 13:39:01 obachman Exp $
+ *  Version: $Id: p_Mult_q.cc,v 1.3 2000-09-12 16:01:07 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -20,12 +20,13 @@
 #include "p_Procs.h"
 #include "p_Numbers.h"
 
+
 poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
 {
-  assume (p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
+  assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
+  assume(! pHaveCommonMonoms(p, q));
   pTest(p);
   pTest(q);
-  
   poly res = pp_Mult_mm(p,q,r);  // holds initially q1*p
   poly qq = pNext(q);           // we iter of this
   poly qn = pp_Mult_mm(qq, p,r); // holds p1*qi
@@ -54,7 +55,9 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   if (rn == NULL)
     pNext(rr) = pp_Mult_mm(pp, qq, r);
   else
+  {
     pNext(rr) = p_Plus_mm_Mult_qq(rn, qq, pp, r);
+  }
   
   pIter(qq);
   if (qq == NULL) goto Finish;
@@ -68,7 +71,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   if (p_nIsZero(n, r))
   {
     p_nDelete(&n, r);
-    pFreeAndNext(rn);
+    rn = pFreeAndNext(rn);
   }
   else
   {
@@ -77,17 +80,15 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     pIter(rn);
   }
   p_nDelete(&pGetCoeff(qn),r);
-  pFreeAndNext(qn);
+  qn = pFreeAndNext(qn);
   goto Work;
   
   Finish:
-  pTest(res);
   if (!copy)
   {
     p_Delete(&p, r);
     p_Delete(&q, r);
   }
-
   pTest(res);
   return res;
 }

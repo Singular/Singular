@@ -6,7 +6,7 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Add_q__Template.cc,v 1.1 2000-08-24 14:42:42 obachman Exp $
+ *  Version: $Id: p_Add_q__Template.cc,v 1.2 2000-09-12 16:01:05 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -37,10 +37,9 @@ poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
 
   Top:     // compare p and q w.r.t. monomial ordering
-  p_MemCmp(p->exp.l, q->exp.l, length, ordsgn, goto Equal, goto Greater , goto Smaller );
+  p_MemCmp(p->exp, q->exp, length, ordsgn, goto Equal, goto Greater , goto Smaller );
 
   Equal:
-  assume(rComp0(p, q) == 0);
   n1 = pGetCoeff(p);
   n2 = pGetCoeff(q);
   t = p_nAdd(n1,n2, r);
@@ -66,14 +65,12 @@ poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   goto Top;
      
   Greater:
-  assume(rComp0(p, q) == 1);
   a = pNext(a) = p;
   pIter(p);
   if (p==NULL) { pNext(a) = q; goto Finish;}
   goto Top;
     
   Smaller:
-  assume(rComp0(p, q) == -1);
   a = pNext(a) = q;
   pIter(q);
   if (q==NULL) { pNext(a) = p; goto Finish;}

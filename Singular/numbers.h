@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.12 1999-11-15 17:20:37 obachman Exp $ */
+/* $Id: numbers.h,v 1.13 2000-09-12 16:01:04 obachman Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -12,6 +12,15 @@
 /* typedefs */
 /*typedef void (*numberproc)(number a,number b,number * c);*/
 /*typedef number (*numberfunc)(number a,number b);*/
+
+#define p_nCopy(n, r)          nCopy(n)
+#define p_nDelete(n, r)        nDelete(n)
+#define p_nMult(n1, n2, r)     nMult(n1, n2)
+#define p_nAdd(n1, n2, r)      nAdd(n1, n2)
+#define p_nIsZero(n, r)	       nIsZero(n)
+#define p_nEqual(n1, n2, r)    nEqual(n1, n2)
+#define p_nNeg(n, r)	       nNeg(n)
+#define p_nSub(n1, n2, r)      nSub(n1, n2)
 
 /* variables */
 extern short fftable[];

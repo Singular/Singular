@@ -595,7 +595,7 @@ VERSION_SEP="-"
 
 SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-1}
 SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-3}
-SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-9}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-10}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
 VERSION_DATE=${VERSION_DATE:-"September 2000"}
 
@@ -4698,40 +4698,6 @@ EOF
 fi
 
 
-
-echo $ac_n "checking which exponent type to use""... $ac_c" 1>&6
-echo "configure:4704: checking which exponent type to use" >&5
-if test "$with_exp_type" = "char"; then
-  echo "$ac_t""char" 1>&6
-  cat >> confdefs.h <<\EOF
-#define EXPONENT_TYPE char
-EOF
-
-  cat >> confdefs.h <<\EOF
-#define SIZEOF_EXPONENT SIZEOF_CHAR
-EOF
-
-elif test "with_exp_type" = "int"; then
-  echo "$ac_t""int" 1>&6
-  cat >> confdefs.h <<\EOF
-#define EXPONENT_TYPE int
-EOF
-
-  cat >> confdefs.h <<\EOF
-#define SIZEOF_EXPONENT SIZEOF_INT
-EOF
-
-else
-  echo "$ac_t""short" 1>&6
-  cat >> confdefs.h <<\EOF
-#define EXPONENT_TYPE short
-EOF
-
-  cat >> confdefs.h <<\EOF
-#define SIZEOF_TYPE SIZEOF_SHORT
-EOF
-
-fi
 
 OUTPUT_MAKEFILES=Makefile
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.33 2000-08-14 12:56:37 obachman Exp $ */
+/* $Id: matpol.cc,v 1.34 2000-09-12 16:01:02 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -139,7 +139,7 @@ matrix mpMultI(matrix a, int f)
   matrix c = mpNew(n,m);
 
   for (k=m*n-1; k>0; k--)
-    c->m[k] = pMult(pCopy(a->m[k]), pCopy(p));
+    c->m[k] = ppMult_qq(a->m[k], p);
   c->m[0] = pMult(pCopy(a->m[0]), p);
   return c;
 }
@@ -272,7 +272,7 @@ poly TraceOfProd ( matrix a, matrix b, int n)
   {
     for (j=1; j<=n; j++)
     {
-      p = pMult(pCopy(MATELEM(a,i,j)), pCopy(MATELEM(b,j,i)));
+      p = ppMult_qq(MATELEM(a,i,j), MATELEM(b,j,i));
       t = pAdd(t, p);
     }
   }
@@ -521,7 +521,7 @@ poly mpDet (matrix m)
     p = pCopy(MATELEM(s,1,i));
     for (j=i-1; j>=1; j--)
     {
-      q = pMult(pCopy(MATELEM(s,1,j)), pCopy(MATELEM(a,1,i-j)));
+      q = ppMult_qq(MATELEM(s,1,j), MATELEM(a,1,i-j));
       pTest(q);
       p = pAdd(p,q);
     }
@@ -530,7 +530,7 @@ poly mpDet (matrix m)
     c = nDiv(ONE, d);
     nDelete(&d);
 
-    pMultN(p, c);
+    pMult_nn(p, c);
     pTest(p);
     MATELEM(a,1,i) = p;
     nDelete(&c);
@@ -547,7 +547,7 @@ poly mpDet (matrix m)
   if ((n/2)*2 < n)
   {
     d = nInit(-1);
-    pMultN(MATELEM(a,1,n), d);
+    pMult_nn(MATELEM(a,1,n), d);
     nDelete(&d);
   }
   nDelete(&ONE);
@@ -968,7 +968,7 @@ BOOLEAN mpEqual(matrix a, matrix b)
       if (b->m[i]!=NULL) return FALSE;
     }
     else
-      if (pComp(a->m[i],b->m[i])!=0) return FALSE;
+      if (pCmp(a->m[i],b->m[i])!=0) return FALSE;
     i--;
   }
   i=MATCOLS(a)*MATROWS(b)-1;
@@ -1551,7 +1551,7 @@ static poly minuscopy (poly p)
   number  e;
   e = nInit(-1);
   w = pCopy(p);
-  pMultN(w, e);
+  pMult_nn(w, e);
   nDelete(&e);
   return w;
 }
@@ -1572,7 +1572,7 @@ static poly pInsert(poly p1, poly p2)
   a = p  = pOne();
   loop
   {
-    c = pComp(a1, a2);
+    c = pCmp(a1, a2);
     if (c == 1)
     {
       a = pNext(a) = a1;

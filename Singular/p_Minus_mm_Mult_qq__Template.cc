@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.1 2000-08-29 14:10:26 obachman Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.2 2000-09-12 16:01:06 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -41,22 +41,21 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
   DECLARE_LENGTH(const unsigned long length = r->ExpLSize);
   DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
 
-  const unsigned long* m_e = m->exp.l;
+  const unsigned long* m_e = m->exp;
   omBin bin = r->PolyBin;
   
   if (p == NULL) goto Finish;           // return tneg*q if (p == NULL)
   
   omTypeAllocBin(poly, qm, bin);
   assume(pGetComp(q) == 0 || pGetComp(m) == 0);
-  p_MemAdd(qm->exp.l, q->exp.l, m_e, length);
+  p_MemSum(qm->exp, q->exp, m_e, length);
   
   // MAIN LOOP:
   Top:     
   // compare qm = m*q and p w.r.t. monomial ordering
-  p_MemCmp(qm->exp.l, p->exp.l, length, ordsgn, goto Equal, goto Greater, goto Smaller );
+  p_MemCmp(qm->exp, p->exp, length, ordsgn, goto Equal, goto Greater, goto Smaller );
   
   Equal:   // qm equals p
-  assume(rComp0(qm, p) == 0);
   tb = p_nMult(pGetCoeff(q), tm, r);
   tc = pGetCoeff(p);
   if (!p_nEqual(tc, tb, r))
@@ -78,12 +77,11 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
   pIter(q);
   if (q == NULL || p == NULL) goto Finish; // are we done ?
   // no, so update qm
-  p_MemAdd(qm->exp.l, q->exp.l, m_e, length);
+  p_MemSum(qm->exp, q->exp, m_e, length);
   goto Top;
 
 
   Greater:
-  assume(rComp0(qm, p) == 1);
   pSetCoeff0(qm, p_nMult(pGetCoeff(q), tneg, r));
   a = pNext(a) = qm;       // append qm to result and advance q
   pIter(q);
@@ -94,11 +92,10 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
   }
   // construct new qm 
   omTypeAllocBin(poly, qm, bin);
-  p_MemAdd(qm->exp.l, q->exp.l, m_e, length);
+  p_MemSum(qm->exp, q->exp, m_e, length);
   goto Top;
     
   Smaller:     
-  assume(rComp0(qm, p) == -1);
   a = pNext(a) = p;// append p to result and advance p
   pIter(p);
   if (p == NULL) goto Finish;;

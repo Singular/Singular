@@ -113,7 +113,7 @@ int     isMultiple( poly f,poly m )
     //  for a local order  f|m  is only possible if  f>=m
     // ---------------------------------------------------
 
-    if( pComp0( f,m )>=0 )
+    if( pLmCmp( f,m )>=0 )
     {
       if( pDivisibleBy2( f,m ) )
       {
@@ -159,7 +159,7 @@ poly    computeWC( const newtonPolygon &np,Rational max_weight )
     }
     pSetm( m );
 
-    if( i==1 || pComp( m,wc )<0 )
+    if( i==1 || pCmp( m,wc )<0 )
     {
       pDelete( &wc );
       wc = pHead( m );
@@ -183,7 +183,7 @@ static inline  poly    normalFormHC( poly f,poly hc )
 
   while( (*ptr)!=(poly)NULL )
   {
-    if( pComp0( *ptr,hc )>=0 )
+    if( pLmCmp( *ptr,hc )>=0 )
     {
       ptr = &(pNext( *ptr ));
     }
@@ -213,7 +213,7 @@ static inline  poly    normalFormZ( poly f,poly Z )
     }
     else
     {
-      pDelete1( ptr );
+      pDelete1(ptr);
     }
   }
 
@@ -236,7 +236,7 @@ static inline  int     isLeadMonomial( poly m,ideal stdJ )
 
   for( int i=0; i<IDELEMS(stdJ); i++ )
   {
-    if( pComp( stdJ->m[i],m )>=0 && pDivisibleBy( stdJ->m[i],m ) )
+    if( pCmp( stdJ->m[i],m )>=0 && pDivisibleBy( stdJ->m[i],m ) )
     {
       int     tmp = pLength( stdJ->m[i] );
 
@@ -338,7 +338,7 @@ static void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
       pDelete( &m );
       carry = TRUE;
     }
-    else if( pComp( m,hc ) < 0 || pComp( m,wc ) < 0 )
+    else if( pCmp( m,hc ) < 0 || pCmp( m,wc ) < 0 )
     {
       // -------------------
       //  we do not need  m
@@ -356,7 +356,7 @@ static void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
       poly    multiplicant = pDivide( m,stdJ->m[k] );
       pGetCoeff( multiplicant ) = nInit(1);
 
-      poly    nf = pMultT( pCopy( stdJ->m[k] ), multiplicant );
+      poly    nf = pMult_mm( pCopy( stdJ->m[k] ), multiplicant );
 
       pDelete( &multiplicant );
 
@@ -753,7 +753,7 @@ static BOOLEAN ringIsLocal( void )
     pSetExp( m,i,1 );
     pSetm( m );
 
-    if( pComp( m,one )>0 )
+    if( pCmp( m,one )>0 )
     {
       return  FALSE;
     }

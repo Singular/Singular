@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.221 2000-08-24 14:42:40 obachman Exp $ */
+/* $Id: iparith.cc,v 1.222 2000-09-12 16:00:55 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -19,11 +19,10 @@
 #include "ipid.h"
 #include "intvec.h"
 #include <omalloc.h>
+#include "polys.h"
 #include "febase.h"
 #include "sdb.h"
 #include "longalg.h"
-#include "polys.h"
-#include "polys-comp.h"
 #include "ideals.h"
 #include "matpol.h"
 #include "kstd1.h"
@@ -476,7 +475,7 @@ static BOOLEAN jjCOMPARE_P(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->Data();
   poly q=(poly)v->Data();
-  int r=pComp(p,q);
+  int r=pCmp(p,q);
   if (r==0)
   {
     /* compare lead coeffs */
@@ -1147,7 +1146,7 @@ static BOOLEAN jjEQUAL_P(leftv res, leftv u, leftv v)
     if (q==NULL) res->data=(char *)FALSE;
     else
     {
-      int r=pComp(p,q);
+      int r=pCmp(p,q);
       if (r==0)
       {
         p=pSub(pCopy(p),pCopy(q));
@@ -2753,7 +2752,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
       // now po!=NULL, p!=NULL
       int d=(pFDeg(po)-(*w)[pGetComp(po)-1] - pFDeg(p)+(*w)[i-1]);
       if (d==0)
-        d=pComp0(po,p);
+        d=pLmCmp(po,p);
       if (d > 0)
       {
         pDelete(&p);
@@ -2939,7 +2938,7 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
   }
   else
   {
-    poly lm = pCopy1(p);
+    poly lm = pInit(p);
     pSetCoeff(lm, nInit(1));
     res->data = (char*) lm;
   }

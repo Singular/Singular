@@ -6,7 +6,7 @@
  *  Purpose: template for pp_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_nn__Template.cc,v 1.1 2000-08-29 14:10:30 obachman Exp $
+ *  Version: $Id: pp_Mult_nn__Template.cc,v 1.2 2000-09-12 16:01:13 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -31,7 +31,7 @@ poly pp_Mult_nn(poly p, const number n, const ring r)
     q = pNext(q);
     number nc = pGetCoeff(p);
     pSetCoeff0(q, p_nMult(n, nc, r));
-    p_MemCopy(q->exp.l, p->exp.l, length);
+    p_MemCopy(q->exp, p->exp, length);
     pIter(p);
   }
   while (p != NULL);

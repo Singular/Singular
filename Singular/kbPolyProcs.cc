@@ -10,7 +10,6 @@
 #include "kbPolyProcs.h"
 #include "modulop.h"
 #include "spolys0.h"
-#include "polys-comp.h"
 
 #define HAVE_COMP_MACROS
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz3.cc,v 1.3 2000-08-14 12:56:55 obachman Exp $ */
+/* $Id: syz3.cc,v 1.4 2000-09-12 16:01:23 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -30,7 +30,6 @@
 #include "lists.h"
 #include "syz.h"
 #include "kbuckets.h"
-#include "polys-comp.h"
 #include "prCopy.h"
 #include "timer.h"
 #include "matpol.h"
@@ -199,13 +198,13 @@ static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
         if (current_ideal->m[i]!=NULL)
         {
           syzstr->res[index]->m[i+start] = pCopy(current_ideal->m[i]);
-          syzstr->res[index]->m[i+start] = pMultT(syzstr->res[index]->m[i+start],w_gen);
+          syzstr->res[index]->m[i+start] = pMult_mm(syzstr->res[index]->m[i+start],w_gen);
           pShift(&syzstr->res[index]->m[i+start],current_tl);
           syzstr->res[index]->m[i+start] = pAdd(syzstr->res[index]->m[i+start],
-            pMult(pCopy(current_repr->m[i]),pCopy(p)));
+            ppMult_qq(current_repr->m[i],p));
           syzstr->orderedRes[index]->m[i+start] = pCopy(current_repr->m[i]);
           syzstr->orderedRes[index]->m[i+start] = 
-            pMultT(syzstr->orderedRes[index]->m[i+start],w_gen);
+            pMult_mm(syzstr->orderedRes[index]->m[i+start],w_gen);
           if ((*syzstr->Tl)[index]!=0)
             pShift(&syzstr->orderedRes[index]->m[i+start],(*syzstr->Tl)[index]);
         }
@@ -217,7 +216,7 @@ static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
           if ((index==1) && ((i==IDELEMS(current_ideal) ||
                (totake[index-1]->m[i+1]==NULL)))) break;
           totake[index]->m[i+start_ttk] = 
-            pMultT(pCopy(totake[index-1]->m[i]),w_gen);
+            pMult_mm(pCopy(totake[index-1]->m[i]),w_gen);
           pShift(&totake[index]->m[i+start_ttk],current_tl);
 #ifdef FULL_TOTAKE
           poly pp=pCopy(p);
@@ -699,7 +698,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       pShift(&p,-1);
 #ifdef WITH_BUCKET
       poly pp;
-      pp = pMultT(pCopy(old_repr->m[tso.ind2]),p);
+      pp = pMult_mm(pCopy(old_repr->m[tso.ind2]),p);
       kBucketInit(syzstr->syz_bucket,pp,-1);
       pDelete1(&p);
       p = pNeg(p);
@@ -741,7 +740,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       pSetComp(tt,0);
       pSetmComp(tt);
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
-      tso.syz = pMultT(tso.syz,tt);
+      tso.syz = pMult_mm(tso.syz,tt);
       pDelete(&tt);
       coefgcd = nNeg(coefgcd);
       assume (old_repr->m[tso.ind2]!=NULL);
@@ -750,7 +749,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       pSetComp(tt,0);
       pSetmComp(tt);
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p2),coefgcd));
-      p = pMultT(p,tt);
+      p = pMult_mm(p,tt);
       pDelete(&tt);
       tso.syz = pAdd(p,tso.syz);
 #ifdef EXPERIMENT2
@@ -892,7 +891,7 @@ PrintLn();
     {
       n=nInvers(pGetCoeff(tso.p));
       pNorm(tso.p);
-      pMultN(tso.syz,n);
+      pMult_nn(tso.syz,n);
       nDelete(&n);
     }
     new_generators->m[ng_place] = tso.p;
@@ -1259,7 +1258,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
       pSetComp(tt,0);
       pSetmComp(tt);
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
-      tso.syz = pMultT(tso.syz,tt);
+      tso.syz = pMult_mm(tso.syz,tt);
       pDelete(&tt);
       coefgcd = nNeg(coefgcd);
       assume (add_repr->m[tso.ind2]!=NULL);
@@ -1268,7 +1267,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
       pSetComp(tt,0);
       pSetmComp(tt);
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p2),coefgcd));
-      p = pMultT(p,tt);
+      p = pMult_mm(p,tt);
       pDelete(&tt);
       tso.syz = pAdd(p,tso.syz);
       nDelete(&coefgcd);
@@ -1323,7 +1322,7 @@ PrintLn();
     {
       n=nInvers(pGetCoeff(tso.p));
       pNorm(tso.p);
-      pMultN(tso.syz,n);
+      pMult_nn(tso.syz,n);
       nDelete(&n);
     }
   }

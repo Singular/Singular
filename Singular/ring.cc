@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.113 2000-09-12 08:02:46 Singular Exp $ */
+/* $Id: ring.cc,v 1.114 2000-09-12 16:01:14 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -51,9 +51,7 @@ static const char * const ringorder_name[] =
   "Ds", //ringorder_Ds,
   "ws", //ringorder_ws,
   "Ws", //ringorder_Ws,
-  #ifdef HAVE_SHIFTED_EXPONENTS
   "L", //ringorder_L,
-  #endif
   " _" //ringorder_unspec
 };
 
@@ -281,13 +279,11 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
   {
     intvec *iv = (intvec *)(sl->data);
     if (((*iv)[1]==ringorder_c)||((*iv)[1]==ringorder_C)) i++;
-    #ifdef HAVE_SHIFTED_EXPONENTS
     else if ((*iv)[1]==ringorder_L)
     {
       R->bitmask=(*iv)[2];
       n--;
     }
-    #endif
     else if ((*iv)[1]!=ringorder_a) o++;
     n++;
     sl=sl->next;
@@ -326,88 +322,85 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
   {
     intvec *iv;
     iv = (intvec *)(sl->data);
-    #ifdef HAVE_SHIFTED_EXPONENTS
     if ((*iv)[1]!=ringorder_L)
     {
-    #endif
-    n++;
+      n++;
 
-    /* the format of an ordering:
-     *  iv[0]: factor
-     *  iv[1]: ordering
-     *  iv[2..end]: weights
-     */
-    R->order[n] = (*iv)[1];
-    switch ((*iv)[1])
-    {
-        case ringorder_ws:
-        case ringorder_Ws:
-          typ=-1;
-        case ringorder_wp:
-        case ringorder_Wp:
-          R->wvhdl[n]=(int*)omAlloc((iv->length()-1)*sizeof(int));
-          for (i=2; i<iv->length(); i++)
-            R->wvhdl[n][i-2] = (*iv)[i];
-          R->block0[n] = last+1;
-          last += iv->length()-2;
-          R->block1[n] = last;
-          break;
-        case ringorder_ls:
-        case ringorder_ds:
-        case ringorder_Ds:
-          typ=-1;
-        case ringorder_lp:
-        case ringorder_dp:
-        case ringorder_Dp:
-          R->block0[n] = last+1;
-          if (iv->length() == 3) last+=(*iv)[2];
-          else last += (*iv)[0];
-          R->block1[n] = last;
-          if (rCheckIV(iv)) return TRUE;
-          break;
-        case ringorder_S:
-        case ringorder_c:
-        case ringorder_C:
-          if (rCheckIV(iv)) return TRUE;
-          break;
-        case ringorder_a:
-          R->block0[n] = last+1;
-          R->block1[n] = last + iv->length() - 2;
-          R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int));
-          for (i=2; i<iv->length(); i++)
+      /* the format of an ordering:
+       *  iv[0]: factor
+       *  iv[1]: ordering
+       *  iv[2..end]: weights
+       */
+      R->order[n] = (*iv)[1];
+      switch ((*iv)[1])
+      {
+          case ringorder_ws:
+          case ringorder_Ws:
+            typ=-1;
+          case ringorder_wp:
+          case ringorder_Wp:
+            R->wvhdl[n]=(int*)omAlloc((iv->length()-1)*sizeof(int));
+            for (i=2; i<iv->length(); i++)
+              R->wvhdl[n][i-2] = (*iv)[i];
+            R->block0[n] = last+1;
+            last += iv->length()-2;
+            R->block1[n] = last;
+            break;
+          case ringorder_ls:
+          case ringorder_ds:
+          case ringorder_Ds:
+            typ=-1;
+          case ringorder_lp:
+          case ringorder_dp:
+          case ringorder_Dp:
+          case ringorder_rp:
+            R->block0[n] = last+1;
+            if (iv->length() == 3) last+=(*iv)[2];
+            else last += (*iv)[0];
+            R->block1[n] = last;
+            if (rCheckIV(iv)) return TRUE;
+            break;
+          case ringorder_S:
+          case ringorder_c:
+          case ringorder_C:
+            if (rCheckIV(iv)) return TRUE;
+            break;
+          case ringorder_a:
+            R->block0[n] = last+1;
+            R->block1[n] = last + iv->length() - 2;
+            R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int));
+            for (i=2; i<iv->length(); i++)
+            {
+              R->wvhdl[n][i-2]=(*iv)[i];
+              if ((*iv)[i]<0) typ=-1;
+            }
+            break;
+          case ringorder_M:
           {
-            R->wvhdl[n][i-2]=(*iv)[i];
-            if ((*iv)[i]<0) typ=-1;
+            int Mtyp=rTypeOfMatrixOrder(iv);
+            if (Mtyp==0) return TRUE;
+            if (Mtyp==-1) typ = -1;
+
+            R->wvhdl[n] =( int *)omAlloc((iv->length()-1)*sizeof(int));
+            for (i=2; i<iv->length();i++)
+              R->wvhdl[n][i-2]=(*iv)[i];
+
+            R->block0[n] = last+1;
+            last += (int)sqrt((double)(iv->length()-2));
+            R->block1[n] = last;
+            break;
           }
-          break;
-        case ringorder_M:
-        {
-          int Mtyp=rTypeOfMatrixOrder(iv);
-          if (Mtyp==0) return TRUE;
-          if (Mtyp==-1) typ = -1;
 
-          R->wvhdl[n] =( int *)omAlloc((iv->length()-1)*sizeof(int));
-          for (i=2; i<iv->length();i++)
-            R->wvhdl[n][i-2]=(*iv)[i];
+          case ringorder_no:
+            R->order[n] = ringorder_unspec;
+            return TRUE;
 
-          R->block0[n] = last+1;
-          last += (int)sqrt((double)(iv->length()-2));
-          R->block1[n] = last;
-          break;
-        }
-
-        case ringorder_no:
-           R->order[n] = ringorder_unspec;
-           return TRUE;
-
-        default:
-          Werror("Internal Error: Unknown ordering %d", (*iv)[1]);
-          R->order[n] = ringorder_unspec;
-          return TRUE;
+          default:
+            Werror("Internal Error: Unknown ordering %d", (*iv)[1]);
+            R->order[n] = ringorder_unspec;
+            return TRUE;
+      }
     }
-    #ifdef HAVE_SHIFTED_EXPONENTS
-    }
-    #endif
     sl=sl->next;
   }
 
@@ -419,6 +412,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
          (R->order[n]==ringorder_ds) ||
          (R->order[n]==ringorder_Dp) ||
          (R->order[n]==ringorder_Ds) ||
+         (R->order[n]==ringorder_rp) ||
          (R->order[n]==ringorder_lp) ||
          (R->order[n]==ringorder_ls))
         &&
@@ -1901,6 +1895,7 @@ rOrderType_t rGetOrderType(ring r)
 
           default:
             assume(r->order[0] == ringorder_lp ||
+                   r->order[0] == ringorder_rp ||
                    r->order[0] == ringorder_Dp ||
                    r->order[0] == ringorder_Wp ||
                    r->order[0] == ringorder_Ds ||
@@ -1954,6 +1949,7 @@ BOOLEAN rIsPolyVar(int v)
         case ringorder_M:
           return 2; /*don't know*/
         case ringorder_lp:
+        case ringorder_rp:
         case ringorder_dp:
         case ringorder_Dp:
         case ringorder_wp:
@@ -1982,7 +1978,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 
   if (r == NULL)
   {
-    Warn("Null ring in %s:%d\n", fn, l);
+    dReportError("Null ring in %s:%d", fn, l);
     return FALSE;
   }
 
@@ -2002,14 +1998,14 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 #endif
   if (r->VarOffset == NULL)
   {
-    Warn("Null ring VarOffset -- no rComplete (?) in n %s:%d\n", fn, l);
+    dReportError("Null ring VarOffset -- no rComplete (?) in n %s:%d", fn, l);
     return FALSE;
   }
   omCheckAddrSize(r->VarOffset,(r->N+1)*sizeof(int));
 
   if ((r->OrdSize==0)!=(r->typ==NULL))
   {
-    Warn("mismatch OrdSize and typ-pointer in %s:%d");
+    dReportError("mismatch OrdSize and typ-pointer in %s:%d");
     return FALSE;
   }
   omcheckAddrSize(r->typ,r->OrdSize*sizeof(*(r->typ)));
@@ -2024,36 +2020,25 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
         if (r->typ[j].ord_typ==ro_cp)
         {
           if(((short)r->VarOffset[i]) == r->typ[j].data.cp.place)
-            Warn("ordrec %d conflicts with var %d\n",j,i);
+            dReportError("ordrec %d conflicts with var %d",j,i);
         }
         else
-        #ifdef HAVE_SHIFTED_EXPONENTS
           if ((r->typ[j].ord_typ!=ro_syzcomp)
           && (r->VarOffset[i] == r->typ[j].data.dp.place))
-            Warn("ordrec %d conflicts with var %d\n",j,i);
-        #else
-          if ((r->typ[j].ord_typ!=ro_syzcomp)
-           && (r->VarOffset[i]/(sizeof(long)/sizeof(Exponent_t)))
-             == (size_t)r->typ[j].data.dp.place)
-            Warn("ordrec %d conflicts with var %d\n",j,i);
-        #endif
+            dReportError("ordrec %d conflicts with var %d",j,i);
       }
     }
     int tmp;
-    #ifdef HAVE_SHIFTED_EXPONENTS
       tmp=r->VarOffset[i] & 0xffffff;
       #if SIZEOF_LONG == 8
         if ((r->VarOffset[i] >> 24) >63)
       #else
         if ((r->VarOffset[i] >> 24) >31)
       #endif
-          Warn("bit_start out of range:%d\n",r->VarOffset[i] >> 24);
-    #else
-      tmp=r->VarOffset[i];
-    #endif
-    if ((tmp<0) ||(tmp>r->ExpESize-1))
+          dReportError("bit_start out of range:%d",r->VarOffset[i] >> 24);
+      if (i > 0 && ((tmp<0) ||(tmp>r->ExpESize-1)))
     {
-      Warn("varoffset out of range for var %d: %d\n",i,tmp);
+      dReportError("varoffset out of range for var %d: %d",i,tmp);
     }
   }
   if(r->typ!=NULL)
@@ -2064,11 +2049,11 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
       || (r->typ[j].ord_typ==ro_wp))
       {
         if (r->typ[j].data.dp.start > r->typ[j].data.dp.end)
-          Warn("in ordrec %d: start(%d) > end(%d)\n",j,
+          dReportError("in ordrec %d: start(%d) > end(%d)",j,
             r->typ[j].data.dp.start, r->typ[j].data.dp.end);
         if ((r->typ[j].data.dp.start < 1)
         || (r->typ[j].data.dp.end > r->N))
-          Warn("in ordrec %d: start(%d)<1 or end(%d)>vars(%d)\n",j,
+          dReportError("in ordrec %d: start(%d)<1 or end(%d)>vars(%d)",j,
             r->typ[j].data.dp.start, r->typ[j].data.dp.end,r->N);
       }
     }
@@ -2077,7 +2062,6 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 }
 #endif
 
-#ifdef HAVE_SHIFTED_EXPONENTS
 static void rO_Align(int &place, int &bitplace)
 {
   // increment place to the next aligned one
@@ -2327,10 +2311,10 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   need_other_ring = (exp_limit==r->bitmask);
 
   int nblocks=rBlocks(r);
-  int *order=omAlloc0((nblocks+1)*sizeof(int));
-  int *block0=omAlloc0((nblocks+1)*sizeof(int));
-  int *block1=omAlloc0((nblocks+1)*sizeof(int));
-  int **wvhdl=omAlloc0((nblocks+1)*sizeof(int_ptr));
+  int *order=(int*)omAlloc0((nblocks+1)*sizeof(int));
+  int *block0=(int*)omAlloc0((nblocks+1)*sizeof(int));
+  int *block1=(int*)omAlloc0((nblocks+1)*sizeof(int));
+  int **wvhdl=(int**)omAlloc0((nblocks+1)*sizeof(int_ptr));
 
   int i=0;
   int j=0; /*  i index in r, j index in res */
@@ -2424,7 +2408,7 @@ void rKillModifiedRing(ring r)
   omFreeBin(r,ip_sring_bin);
 }
 
-BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
+BOOLEAN rComplete(ring r, int force) 
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
 
@@ -2625,7 +2609,7 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
       case ringorder_unspec:
       case ringorder_no:
         default:
-          Print("undef. ringorder used\n");
+          dReportError("undef. ringorder used\n");
           break;
     }
   }
@@ -2711,10 +2695,6 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
 
   // ----------------------------
   // other indicies
-#ifdef LONG_MONOMS
-  r->pDivLow=r->pVarLowIndex;
-  r->pDivHigh=r->pVarHighIndex;
-#endif
   r->pCompIndex=(r->VarOffset[0] & 0xffff); //r->VarOffset[0];
   i=0; // position
   j=0; // index in r->typ
@@ -2729,503 +2709,10 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
 
   // ----------------------------
   // p_Procs
-  r->p_Procs = omAlloc(sizeof(p_Procs_s));
+  r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
   p_SetProcs(r, r->p_Procs);
   return FALSE;
 }
-#else /* not HAVE_SHIFTED_EXPONENTS: */
-static void rO_Align(int &place)
-{
-  // increment place to the next aligned one
-  // (count as Exponent_t,align as longs)
-  if (place & ((sizeof(long)/sizeof(Exponent_t))-1))
-  {
-    place += ((sizeof(long)/sizeof(Exponent_t))-1);
-    place &= (~((sizeof(long)/sizeof(Exponent_t))-1));
-  }
-}
-
-static void rO_TDegree(int &place, int start, int end,
-    long *o, sro_ord &ord_struct)
-{
-  // degree (aligned) of variables v_start..v_end, ordsgn 1
-  rO_Align(place);
-  ord_struct.ord_typ=ro_dp;
-  ord_struct.data.dp.start=start;
-  ord_struct.data.dp.end=end;
-  ord_struct.data.dp.place=place/(sizeof(long)/sizeof(Exponent_t));
-  o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
-  place++;
-  rO_Align(place);
-}
-
-static void rO_TDegree_neg(int &place, int start, int end,
-    long *o, sro_ord &ord_struct)
-{
-  // degree (aligned) of variables v_start..v_end, ordsgn -1
-  rO_Align(place);
-  ord_struct.ord_typ=ro_dp;
-  ord_struct.data.dp.start=start;
-  ord_struct.data.dp.end=end;
-  ord_struct.data.dp.place=place/(sizeof(long)/sizeof(Exponent_t));
-  o[place/(sizeof(long)/sizeof(Exponent_t))]=-1;
-  place++;
-  rO_Align(place);
-}
-
-static void rO_WDegree(int &place, int start, int end,
-    long *o, sro_ord &ord_struct, int *weights)
-{
-  // weighted degree (aligned) of variables v_start..v_end, ordsgn 1
-  rO_Align(place);
-  ord_struct.ord_typ=ro_wp;
-  ord_struct.data.wp.start=start;
-  ord_struct.data.wp.end=end;
-  ord_struct.data.wp.place=place/(sizeof(long)/sizeof(Exponent_t));
-  ord_struct.data.wp.weights=weights;
-  o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
-  place++;
-  rO_Align(place);
-}
-
-static void rO_WDegree_neg(int &place, int start, int end,
-    long *o, sro_ord &ord_struct, int *weights)
-{
-  // weighted degree (aligned) of variables v_start..v_end, ordsgn -1
-  rO_Align(place);
-  ord_struct.ord_typ=ro_wp;
-  ord_struct.data.wp.start=start;
-  ord_struct.data.wp.end=end;
-  ord_struct.data.wp.place=place/(sizeof(long)/sizeof(Exponent_t));
-  ord_struct.data.wp.weights=weights;
-  o[place/(sizeof(long)/sizeof(Exponent_t))]=-1;
-  place++;
-  rO_Align(place);
-}
-
-static void rO_LexVars(int &place, int start, int end, int &prev_ord,
-    long *o,int *v)
-{
-  // a block of variables v_start..v_end with lex order, ordsgn 1
-  int k;
-  int incr=1;
-  if(prev_ord!=1) rO_Align(place);
-  if (start>end)
-  {
-    incr=-1;
-  }
-  for(k=start;;k+=incr)
-  {
-    o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
-    v[k]=place;
-    place++;
-    if (k==end) break;
-  }
-  prev_ord=1;
-}
-
-static void rO_LexVars_neg(int &place, int start, int end, int &prev_ord,
-    long *o,int *v)
-{
-  // a block of variables v_start..v_end with lex order, ordsgn -1
-  int k;
-  int incr=1;
-  if(prev_ord!=-1) rO_Align(place);
-  if (start>end)
-  {
-    incr=-1;
-  }
-  for(k=start;;k+=incr)
-  {
-    o[place/(sizeof(long)/sizeof(Exponent_t))]=-1;
-    v[k]=place;
-    place++;
-    if (k==end) break;
-  }
-  prev_ord=-1;
-}
-
-#ifdef LONG_MONOMS
-static void rO_DupVars(int &place, int start, int end)
-{
-  // a block of variables v_start..v_end to be duplicated (for pDivisibleBy):
-  place+=(end-start+1);
-}
-#endif
-
-static void rO_Syzcomp(int &place, int &prev_ord,
-    long *o, sro_ord &ord_struct)
-{
-  // ordering is derived from component number
-  rO_Align(place);
-  ord_struct.ord_typ=ro_syzcomp;
-  ord_struct.data.syzcomp.place=place/(sizeof(long)/sizeof(Exponent_t));
-  ord_struct.data.syzcomp.Components=NULL;
-  ord_struct.data.syzcomp.ShiftedComponents=NULL;
-  o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
-  prev_ord=1;
-  place++;
-  rO_Align(place);
-}
-
-static void rO_Syz(int &place, int &prev_ord,
-    long *o, sro_ord &ord_struct)
-{
-  // ordering is derived from component number
-  if(prev_ord!= -1) rO_Align(place);
-  ord_struct.ord_typ=ro_syz;
-  ord_struct.data.syz.place=place/(sizeof(long)/sizeof(Exponent_t));
-  ord_struct.data.syz.limit=0;
-  o[place/(sizeof(long)/sizeof(Exponent_t))]=-1;
-  prev_ord=-1;
-  place++;
-  rO_Align(place);
-}
-
-BOOLEAN rComplete(ring r, int force)
-{
-  if (r->VarOffset!=NULL && force == 0) return FALSE;
-
-  int n=rBlocks(r)-1;
-  int i;
-  int j=0;
-  int prev_ordsgn=0;
-  long *tmp_ordsgn=(long *)omAlloc0(2*(n+r->N)*sizeof(long)); // wil be used for ordsgn
-  int *v=(int *)omAlloc((r->N+1)*sizeof(int)); // will be used for VarOffset
-  for(i=r->N; i>=0 ; i--)
-  {
-    v[i]=-1;
-  }
-  sro_ord *tmp_typ=(sro_ord *)omAlloc0(2*(n+r->N)*sizeof(sro_ord));
-  int typ_i=0;
-  r->pVarLowIndex=0;
-
-  // fill in v, tmp_typ, tmp_ordsgn, determine pVarLowIndex, typ_i (== ordSize)
-  for(i=0;i<n;i++)
-  {
-    switch (r->order[i])
-    {
-      case ringorder_a:
-        rO_WDegree(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
-                   r->wvhdl[i]);
-        r->pVarLowIndex=j;
-        typ_i++;
-        break;
-
-      case ringorder_c:
-        rO_LexVars_neg(j, 0,0, prev_ordsgn,tmp_ordsgn,v);
-        break;
-
-      case ringorder_C:
-        rO_LexVars(j, 0,0, prev_ordsgn,tmp_ordsgn,v);
-        break;
-
-      case ringorder_M:
-        {
-          int k,l;
-          k=r->block1[i]-r->block0[i]+1; // number of vars
-          for(l=0;l<k;l++)
-          {
-            rO_WDegree(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
-                       r->wvhdl[i]+(r->block1[i]-r->block0[i]+1)*l);
-            typ_i++;
-          }
-          r->pVarLowIndex=j;
-          break;
-        }
-
-      case ringorder_lp:
-        rO_LexVars(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v);
-        break;
-
-      case ringorder_ls:
-        rO_LexVars_neg(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v);
-        break;
-
-      case ringorder_dp:
-        if (r->block0[i]==r->block1[i])
-        {
-          rO_LexVars(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v);
-        }
-        else
-        {
-          rO_TDegree(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i]);
-          r->pVarLowIndex=j;
-          typ_i++;
-          rO_LexVars_neg(j, r->block1[i],r->block0[i]+1,
-                         prev_ordsgn,tmp_ordsgn,v);
-        }
-        break;
-
-      case ringorder_Dp:
-        if (r->block0[i]==r->block1[i])
-        {
-          rO_LexVars(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v);
-        }
-        else
-        {
-          rO_TDegree(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i]);
-          r->pVarLowIndex=j;
-          typ_i++;
-          rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ordsgn,tmp_ordsgn,v);
-        }
-        break;
-
-      case ringorder_ds:
-        if (r->block0[i]==r->block1[i])
-        {
-          rO_LexVars_neg(j, r->block0[i],r->block1[i],prev_ordsgn,tmp_ordsgn,v);
-        }
-        else
-        {
-          rO_TDegree_neg(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i]);
-          r->pVarLowIndex=j;
-          typ_i++;
-          rO_LexVars_neg(j, r->block1[i],r->block0[i]+1,
-                         prev_ordsgn,tmp_ordsgn,v);
-        }
-        break;
-
-      case ringorder_Ds:
-        if (r->block0[i]==r->block1[i])
-        {
-          rO_LexVars_neg(j, r->block0[i],r->block1[i],prev_ordsgn,tmp_ordsgn,v);
-        }
-        else
-        {
-          rO_TDegree_neg(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i]);
-          r->pVarLowIndex=j;
-          typ_i++;
-          rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ordsgn,tmp_ordsgn,v);
-        }
-        break;
-
-      case ringorder_wp:
-        rO_WDegree(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
-                   r->wvhdl[i]);
-        r->pVarLowIndex=j;
-        typ_i++;
-        if (r->block1[i]!=r->block0[i])
-          rO_LexVars_neg(j, r->block1[i],r->block0[i]+1, prev_ordsgn,tmp_ordsgn,v);
-        break;
-
-      case ringorder_Wp:
-        rO_WDegree(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
-                  r->wvhdl[i]);
-        r->pVarLowIndex=j;
-        typ_i++;
-        if (r->block1[i]!=r->block0[i])
-          rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ordsgn,tmp_ordsgn,v);
-        break;
-
-      case ringorder_ws:
-        rO_WDegree_neg(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
-                       r->wvhdl[i]);
-        r->pVarLowIndex=j;
-        typ_i++;
-        if (r->block1[i]!=r->block0[i])
-          rO_LexVars_neg(j, r->block1[i],r->block0[i]+1, prev_ordsgn,tmp_ordsgn,v);
-        break;
-
-      case ringorder_Ws:
-        rO_WDegree_neg(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
-                       r->wvhdl[i]);
-        r->pVarLowIndex=j;
-        typ_i++;
-        if (r->block1[i]!=r->block0[i])
-          rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ordsgn,tmp_ordsgn,v);
-        break;
-
-      case ringorder_S:
-        rO_Syzcomp(j, prev_ordsgn, tmp_ordsgn,tmp_typ[typ_i]);
-        r->pVarLowIndex=j;
-        typ_i++;
-        break;
-
-      case ringorder_s:
-        rO_Syz(j, prev_ordsgn, tmp_ordsgn,tmp_typ[typ_i]);
-        r->pVarLowIndex=j;
-        typ_i++;
-        break;
-
-      case ringorder_unspec:
-      case ringorder_no:
-        default:
-          Print("undef. ringorder used\n");
-          break;
-    }
-  }
-
-  int j0=j-1;
-  rO_Align(j);
-  r->pCompHighIndex=(j-1)/(sizeof(long)/sizeof(Exponent_t));
-  j=j0+1;
-
-  // fill in some empty slots with variables not already covered
-  // v0 is special, is therefore normally already covered
-  // but if not:
-  for(i=0 ; i<r->N+1 ; i++)
-  {
-    if(v[i]==(-1))
-    {
-      if (prev_ordsgn==1)
-      {
-        rO_LexVars(j, i,i, prev_ordsgn,tmp_ordsgn,v);
-      }
-      else
-      {
-        rO_LexVars_neg(j, i,i, prev_ordsgn,tmp_ordsgn,v);
-      }
-    }
-  }
-
-#ifdef LONG_MONOMS
-  // find out where we need duplicate variables (for divisibility tests)
-  for(i=1 ; i<r->N+1 ; i++)
-  {
-    if(v[i]<r->pVarLowIndex)
-    {
-      int start=i;
-      while((i<r->N) && (v[i+1]<r->pVarLowIndex)) i++;
-      tmp_typ[typ_i].ord_typ=ro_cp;
-      tmp_typ[typ_i].data.cp.place=j;
-      tmp_typ[typ_i].data.cp.start=start;
-      tmp_typ[typ_i].data.cp.end=i;
-      rO_DupVars(j, start,i);
-      typ_i++;
-    }
-  }
-#endif
-
-  r->pVarHighIndex=j-1;
-  rO_Align(j);
-  // ----------------------------
-  // finished with constructing the monomial, computing sizes:
-
-  r->ExpESize=j;
-  r->ExpLSize=j/(sizeof(long)/sizeof(Exponent_t));
-  r->PolyBin = omGetSpecBin(POLYSIZE + (r->ExpLSize)*sizeof(long));
-  assume(r->PolyBin != NULL);
-
-  // ----------------------------
-  // indices and ordsgn vector for comparison
-  //
-#ifndef WORDS_BIGENDIAN
-  r->pCompLowIndex = r->ExpLSize - 1 - r->pCompHighIndex;
-  r->pCompHighIndex = r->ExpLSize - 1;
-#else
-  r->pCompLowIndex=0;
-  // r->pCompHighIndex already set
-#endif
-  r->pCompLSize = r->pCompHighIndex - r->pCompLowIndex + 1;
-  r->ordsgn=(long *)omAlloc0(r->ExpLSize*sizeof(long));
-
-#ifndef WORDS_BIGENDIAN
-  for(j=r->pCompLowIndex;j<=r->pCompHighIndex;j++)
-  {
-    r->ordsgn[r->pCompLSize - (j - r->pCompLowIndex) - 1]
-      = tmp_ordsgn[j-r->pCompLowIndex];
-  }
-#else
-  for(j=r->pCompLowIndex;j<=r->pCompHighIndex;j++)
-  {
-    r->ordsgn[j]
-      = tmp_ordsgn[j-r->pCompLowIndex];
-  }
-#endif
-
-  omFreeSize((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
-
-  // ----------------------------
-  // description of orderings for setm:
-  //
-  r->OrdSize=typ_i;
-  if (typ_i==0) r->typ=NULL;
-  else
-  {
-    r->typ=(sro_ord*)omAlloc(typ_i*sizeof(sro_ord));
-    memcpy(r->typ,tmp_typ,typ_i*sizeof(sro_ord));
-  }
-  omFreeSize((ADDRESS)tmp_typ,(2*(n+r->N)*sizeof(sro_ord)));
-
-#ifndef WORDS_BIGENDIAN
-  // LITTLE_ENDIAN: revert some stuff in r->typ
-  for(j=r->OrdSize-1;j>=0;j--)
-  {
-    if(r->typ[j].ord_typ==ro_cp)
-    {
-      int end_place=r->typ[j].data.cp.place
-                     +r->typ[j].data.cp.end-r->typ[j].data.cp.start;
-      r->typ[j].data.cp.place=r->ExpESize-end_place-1;
-    }
-    //else if(r->typ[j].ord_typ==ro_syzcomp)
-    //{
-    //  int place=r->typ[j].data.syzcomp.place;
-    //  r->typ[j].data.syzcomp.place=r->ExpLSize-place-1;
-    //}
-    else
-    {
-      int new_index=r->ExpLSize-r->typ[j].data.dp.place-1;
-      r->typ[j].data.dp.place=new_index;
-    }
-  }
-#endif
-
-  // ----------------------------
-  // indices for (first copy of ) variable entries in exp.e vector (VarOffset):
-#ifdef WORDS_BIGENDIAN
-  // BIGENDIAN:
-  r->VarOffset=v;
-#else
-  // LITTLE-Endian: revert
-  r->VarOffset=(int *)omAlloc((r->N+1)*sizeof(int));
-  for(j=r->N;j>=0;j--)
-  {
-    r->VarOffset[j]=r->ExpESize-v[j]-1;
-  }
-  omFreeSize((ADDRESS)v,(r->N+1)*sizeof(int));
-  j=r->pVarLowIndex;
-  r->pVarLowIndex=r->ExpESize-r->pVarHighIndex-1;
-  r->pVarHighIndex=r->ExpESize-j-1;
-#endif
-
-  // ----------------------------
-  // other indicies
-#ifdef LONG_MONOMS
-  r->pDivLow=r->pVarLowIndex/(sizeof(long)/sizeof(Exponent_t));
-  r->pDivHigh=r->pVarHighIndex/(sizeof(long)/sizeof(Exponent_t));
-#endif
-  r->pCompIndex=r->VarOffset[0];
-#ifdef WORDS_BIGENDIAN
-  if (r->order[0] == ringorder_s)
-  {
-    /* l[0] is occupied by ringorder_s,
-    *  does l[1] contain the component-number ? */
-    if (r->pCompIndex < 2*sizeof(long)/sizeof(Exponent_t)) /* e-index of l[2] */
-      r->pOrdIndex = 2;
-    else
-      r->pOrdIndex = 1;
-  }
-  else if (r->pCompIndex  < sizeof(long)/sizeof(Exponent_t))
-    r->pOrdIndex=1;
-  else
-    r->pOrdIndex=0;
-#else
-  if (r->order[0] == ringorder_s)
-  {
-    if (r->pCompIndex == r->ExpESize-3)
-      r->pOrdIndex = r->ExpLSize-3;
-    else
-      r->pOrdIndex = r->ExpLSize-2;
-  }
-  else if (r->pCompIndex == r->ExpESize-1)
-    r->pOrdIndex=r->ExpLSize-2;
-  else
-    r->pOrdIndex=r->ExpLSize-1;
-#endif
-  return FALSE;
-}
-#endif
 
 void rUnComplete(ring r)
 {
@@ -3266,21 +2753,12 @@ void rDebugPrint(ring r)
   char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp", "ro_syz", "ro_none"};
   int i,j;
   PrintS("varoffset:\n");
-  #ifdef HAVE_SHIFTED_EXPONENTS
   for(j=0;j<=r->N;j++) Print("  v%d at e-pos %d, bit %d\n",
      j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
   Print("bitmask=0x%x\n",r->bitmask);
-  #else
-  for(j=0;j<=r->N;j++)
-    Print("  v%d at e-pos %d\n",j,r->VarOffset[j]);
-  #endif
   PrintS("ordsgn:\n");
   for(j=0;j<r->pCompLSize;j++)
-    #ifdef HAVE_SHIFTED_EXPONENTS
     Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j);
-    #else
-    Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j+r->pCompLowIndex);
-    #endif
   Print("OrdSgn:%d\n",r->OrdSgn);
   PrintS("ordrec:\n");
   for(j=0;j<r->OrdSize;j++)
@@ -3307,9 +2785,6 @@ void rDebugPrint(ring r)
   Print("pDivLow:%d ",r->pDivLow);
   Print("pDivHigh:%d\n",r->pDivHigh);
 #endif
-#ifndef HAVE_SHIFTED_EXPONENTS
-  Print("pCompLowIndex:%d ",r->pCompLowIndex);
-#endif
   Print("pCompHighIndex:%d\n",r->pCompHighIndex);
   Print("pOrdIndex:%d pCompIndex:%d\n", r->pOrdIndex, r->pCompIndex);
   Print("ExpESize:%d ",r->ExpESize);
@@ -3319,34 +2794,18 @@ void rDebugPrint(ring r)
   for(j=0;j<r->ExpLSize;j++)
   {
     Print("L[%d]: ",j);
-    #ifdef HAVE_SHIFTED_EXPONENTS
     if (j<=r->pCompHighIndex)
       Print("ordsgn %d ", r->ordsgn[j]);
-    #else
-    if ((j>=r->pCompLowIndex) && (j<=r->pCompHighIndex))
-      Print("ordsgn %d ", r->ordsgn[j-r->pCompLowIndex]);
-    #endif
     else
       PrintS("no comp ");
-    #ifdef HAVE_SHIFTED_EXPONENTS
     i=1;
-    #else
-    i=0;
-    #endif
     for(;i<=r->N;i++)
     {
-      #ifdef HAVE_SHIFTED_EXPONENTS
       if( (r->VarOffset[i] & 0xffffff) == j )
       {  Print("v%d at e[%d], bit %d; ", i,r->VarOffset[i] & 0xffffff,
                                          r->VarOffset[i] >>24 ); }
-      #else
-      if((((int)(r->VarOffset[i]*sizeof(Exponent_t))/sizeof(long))) == j)
-      {  Print("v%d at e[%d]; ", i, r->VarOffset[i]); }
-      #endif
     }
-    #ifdef HAVE_SHIFTED_EXPONENTS
     if( r->pCompIndex==j ) PrintS("v0; ");
-    #endif
     for(i=0;i<r->OrdSize;i++)
     {
       if (r->typ[i].data.dp.place == j)
@@ -3372,7 +2831,7 @@ void rDebugPrint(ring r)
 
   Print("p_Spec  : %s, %s, %s\n", field, length, ord);
   PrintS("p_Procs :\n");
-  for (i=0; i<sizeof(p_Procs_s)/sizeof(void*); i++)
+  for (i=0; i<(int) (sizeof(p_Procs_s)/sizeof(void*)); i++)
   {
     Print(" %s,\n", ((char**) &proc_names)[i]);
   }
@@ -3385,14 +2844,9 @@ void pDebugPrint(poly p)
   j=10;
   while(p!=NULL)
   {
-    #ifndef HAVE_SHIFTED_EXPONENTS
-    Print("exp.e[0..%d]\n",currRing->ExpESize-1);
-    for(i=0;i<currRing->ExpESize;i++)
-      Print("%d ",p->exp.e[i]);
-    #endif
-    Print("\nexp.l[0..%d]\n",currRing->ExpLSize-1);
+    Print("\nexp[0..%d]\n",currRing->ExpLSize-1);
     for(i=0;i<currRing->ExpLSize;i++)
-      Print("%d ",p->exp.l[i]);
+      Print("%d ",p->exp[i]);
     PrintLn();
     Print("v0:%d ",pGetComp(p));
     for(i=1;i<=pVariables;i++) Print(" v%d:%d",i,pGetExp(p,i));
@@ -3666,13 +3120,11 @@ void rSetSyzComp(int k)
   }
   else if ((currRing->order[0]!=ringorder_c) && (k!=0))
   {
-    WarnS("syzcomp in incompatible ring");
+    dReportError("syzcomp in incompatible ring");
   }
 #ifdef PDEBUG
-#ifdef HAVE_SHIFTED_EXPONENTS
   extern int pDBsyzComp;
   pDBsyzComp=k;
-#endif
 #endif
 }
 

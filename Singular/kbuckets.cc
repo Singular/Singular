@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.14 2000-08-14 12:56:30 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.15 2000-09-12 16:00:58 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -9,11 +9,9 @@
 #include <omalloc.h>
 #include "polys.h"
 #include "febase.h"
-#include "prProcs.h"
 #include "kbuckets.h"
 #include "numbers.h"
 
-#ifdef HAVE_BUCKETS
 static omBin kBucket_bin = omGetSpecBin(sizeof(kBucket));
 
 //////////////////////////////////////////////////////////////////////////
@@ -37,8 +35,6 @@ inline unsigned int pLogLength(poly p)
 {
   return pLogLength((unsigned int) pLength(p));
 }
-
-
 
 #if defined(PDEBUG) && ! defined(HAVE_PSEUDO_BUCKETS)
 
@@ -80,7 +76,7 @@ void kbDBTests(kBucket_pt bucket, char* file, int line)
   {
     kbDBTest(bucket, i, file, line);
     if (lm != NULL &&  bucket->buckets[i] != NULL
-        && pComp0(lm, bucket->buckets[i]) != 1)
+        && pLmCmp(lm, bucket->buckets[i]) != 1)
     {
       Warn("Bucket %d larger than lm in %s:%d", i, file, line);
       assume(0);
@@ -109,9 +105,11 @@ void kbDBTests(kBucket_pt bucket, char* file, int line)
 /// Creation/Destruction of buckets
 ///
 
-kBucket_pt kBucketCreate()
+kBucket_pt kBucketCreate(ring bucket_ring)
 {
+  assume(bucket_ring != NULL);
   kBucket_pt bucket = (kBucket_pt) omAlloc0Bin(kBucket_bin);
+  bucket->bucket_ring = bucket_ring;
   return bucket;
 }
 
@@ -169,8 +167,7 @@ static BOOLEAN kBucketIsCleared(kBucket_pt bucket)
   return TRUE;
 }
 
-void kBucketInit(kBucket_pt bucket, poly lm, int length,
-                 omBin heap)
+void kBucketInit(kBucket_pt bucket, poly lm, int length)
 {
   int i;
   assume(bucket != NULL);
@@ -195,8 +192,6 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length,
     bucket->buckets_used = 0;
     bucket->buckets_length[0] = 0;
   }
-  if (heap == NULL) bucket->heap = currPolyBin;
-  else bucket->heap = heap;
 }
 
 static int kBucketCanonicalize(kBucket_pt bucket);
@@ -216,7 +211,7 @@ static void kBucketSetLm(kBucket_pt bucket)
       if (bucket->buckets[i] != NULL)
       {
         int comp = (j == 0 ? 1 :
-                    pComp0(bucket->buckets[i], bucket->buckets[j]));
+                    p_LmCmp(bucket->buckets[i], bucket->buckets[j], bucket->bucket_ring));
 
         if (comp > 0)
         {
@@ -224,7 +219,7 @@ static void kBucketSetLm(kBucket_pt bucket)
               bucket->buckets[j] != NULL &&
               nIsZero(pGetCoeff(bucket->buckets[j])))
           {
-            kb_pDelete1AndAdvance(bucket->buckets[j], bucket->heap);
+            p_Delete1(&(bucket->buckets[j]), bucket->bucket_ring);
             (bucket->buckets_length[j])--;
           }
           j = i;
@@ -235,14 +230,14 @@ static void kBucketSetLm(kBucket_pt bucket)
           pSetCoeff0(bucket->buckets[j],
                      nAdd(pGetCoeff(bucket->buckets[i]), tn));
           nDelete(&tn);
-          kb_pDelete1AndAdvance(bucket->buckets[i], bucket->heap);
+          p_Delete1(&(bucket->buckets[i]), bucket->bucket_ring);
           (bucket->buckets_length[i])--;
         }
       }
     }
     if (j > 0 && nIsZero(pGetCoeff(bucket->buckets[j])))
     {
-      kb_pDelete1AndAdvance(bucket->buckets[j], bucket->heap);
+      p_Delete1(&(bucket->buckets[j]), bucket->bucket_ring);
       (bucket->buckets_length[j])--;
       j = -1;
     }
@@ -293,8 +288,8 @@ static int kBucketCanonicalize(kBucket_pt bucket)
 
   for (i=2; i<=bucket->buckets_used; i++)
   {
-    p = pr_Add_q(p, bucket->buckets[i],
-                 &pl, bucket->buckets_length[i]);
+    p = p_Add_q(p, bucket->buckets[i],
+                 pl, bucket->buckets_length[i], bucket->bucket_ring);
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
   }
@@ -343,8 +338,7 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
 
 #else // HAVE_PSEUDO_BUCKETS
 
-void kBucketInit(kBucket_pt bucket, poly lm, int length,
-                 omBin heap)
+void kBucketInit(kBucket_pt bucket, poly lm, int length)
 {
   int i;
 
@@ -355,7 +349,6 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length,
   if (length <= 0) bucket->l = pLength(lm);
   else bucket->l = length;
 
-  bucket->heap = heap;
 }
 
 const poly kBucketGetLm(kBucket_pt bucket)
@@ -384,33 +377,6 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
 
 #endif // ! HAVE_PSEUDO_BUCKETS
 
-/////////////////////////////////////////////////////////////////////////////
-// Compactification
-//
-
-#if 0
-// #if defined(KB_USE_HEAPS) && defined(KB_HAVE_HEAPS_GC)
-
-void kBucketCompactifyIfNecessary(kBucket_pt bucket)
-{
-  if (pShouldCompactify(bucket->heap, bucket->length))
-  {
-    int i = kBucketCanonicalize(bucket);
-    assume(i > 0 && bucket->length > 0);
-    pCompactifyHeap(bucket->heap, &(bucket->buckets[i]), bucket->length);
-    bucket->buckets[0] = bucket->buckets[i];
-    bucket->buckets[i] = pNext(bucket->buckets[i]);
-    (bucket->buckets_length[i])--;
-    pNext(bucket->buckets[0]) = NULL;
-  }
-}
-
-#else
-
-#define kBucketCompactifyIfNecessary(b)
-
-#endif
-
 //////////////////////////////////////////////////////////////////////////
 ///
 /// Multiply Bucket by number ,i.e. Bpoly == n*Bpoly
@@ -422,9 +388,9 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 
   for (i=0; i<= bucket->buckets_used; i++)
     if (bucket->buckets[i] != NULL)
-      bucket->buckets[i] = pr_Mult_n(bucket->buckets[i], n);
+      bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, bucket->bucket_ring);
 #else
-  bucket->p = pr_Mult_n(bucket->p, n);
+  bucket->p = p_Mult_nn(bucket->p, n, bucket->bucket_ring);
 #endif
 }
 
@@ -457,17 +423,18 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
   {
-    p1 = pr_Minus_m_Mult_q(bucket->buckets[i], m, p1,
-                         spNoether,
-                         &(bucket->buckets_length[i]), l1);
+    p1 = p_Minus_mm_Mult_qq(bucket->buckets[i], m, p1,
+                            bucket->buckets_length[i], l1, 
+                            spNoether,
+                            bucket->bucket_ring);
     l1 = bucket->buckets_length[i];
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
     i = pLogLength(l1);
     while (bucket->buckets[i] != NULL)
     {
-      p1 = pr_Add_q(p1, bucket->buckets[i],
-                   &l1, bucket->buckets_length[i]);
+      p1 = p_Add_q(p1, bucket->buckets[i],
+                     l1, bucket->buckets_length[i], bucket->bucket_ring);
       bucket->buckets[i] = NULL;
       bucket->buckets_length[i] = 0;
       i = pLogLength(l1);
@@ -476,7 +443,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   else
   {
     pSetCoeff0(m, nNeg(pGetCoeff(m)));
-    p1 = pr_Mult_m(p1, m, spNoether);
+    p1 = bucket->bucket_ring->p_Procs->pp_Mult_mm(p1, m, spNoether, bucket->bucket_ring);
     pSetCoeff0(m, nNeg(pGetCoeff(m)));
   }
 
@@ -487,9 +454,9 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   else
     kBucketAdjustBucketsUsed(bucket);
 #else // HAVE_PSEUDO_BUCKETS
-  bucket->p = pr_Minus_m_Mult_q(bucket->p, m,  p,
-                               &(bucket->l), l1,
-                               spNoether);
+  bucket->p = p_Minus_mm_Mult_qq(bucket->p, m,  p,
+                               bucket->l, l1,
+                               spNoether, bucket->bucket_ring);
 #endif
   kbTests(bucket);
 }
@@ -521,7 +488,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
         assume(pLength(q) == lq);
         bucket->buckets_length[i] -= lq;
         assume(pLength(bucket->buckets[i]) == bucket->buckets_length[i]);
-        p = pr_Add_q(p, q, &lp, lq);
+        p = p_Add_q(p, q, lp, lq, bucket->bucket_ring);
       }
     }
   }
@@ -553,7 +520,7 @@ void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
       if (q != NULL)
       {
         bucket->buckets_length[i] -= lq;
-        p = pr_Add_q(p, q, &lp, lq);
+        p = p_Add_q(p, q, lp, lq, bucket->bucket_ring);
       }
     }
   }
@@ -587,7 +554,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 
   if(a1==NULL)
   {
-    kb_pDelete1(lm, bucket->heap);
+    p_Delete1(&lm, bucket->bucket_ring);
     return nInit(1);
   }
 
@@ -612,12 +579,12 @@ number kBucketPolyRed(kBucket_pt bucket,
     pSetm(lm);
   }
 
-  pMonSubFrom(lm,p1);
+  pExpVectorSub(lm,p1);
   l1--;
 
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
 
-  kb_pDelete1(lm, bucket->heap);
+  p_Delete1(&lm, bucket->bucket_ring);
   if (reset_vec) pSetCompP(a1, 0);
   kbTests(bucket);
   return rn;
@@ -650,7 +617,7 @@ void kBucketRedHomog (LObject* h,kStrategy strat)
   }
 #endif
 
-  kBucketInit(&(strat->bucket), h->p, h->length, h->heap);
+  kBucketInit(&(strat->bucket), h->p, h->length);
 
   lm = kBucketGetLm(&(strat->bucket));
 
@@ -711,9 +678,6 @@ void kBucketRedHomog (LObject* h,kStrategy strat)
     if (strat->T[j].length <= 0)
       strat->T[j].length = pLength(strat->T[j].p);
 
-    // Compactify
-    kBucketCompactifyIfNecessary(&(strat->bucket));
-
     number up = kBucketPolyRed(&(strat->bucket),
                                strat->T[j].p, strat->T[j].length,
                                strat->kNoether);
@@ -727,7 +691,7 @@ void kBucketRedHomog (LObject* h,kStrategy strat)
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG) PrintS(" to 0\n");
 #endif
-      if (h->lcm!=NULL) pFree1((*h).lcm);
+      if (h->lcm!=NULL) pFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -880,7 +844,6 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
           /*- h will not become the next element to reduce -*/
         {
           kBucketClear(&(strat->bucket), &(h->p), &(h->length));
-          pCompactifyHeap( h->heap, &(h->p), h->length);
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" ecart too big: -> L%d\n",at);
@@ -901,7 +864,6 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
 #endif
 
     // Poly Reduction
-    kBucketCompactifyIfNecessary(&(strat->bucket));
     number up = kBucketPolyRed(&(strat->bucket),
                                pi, li,
                                strat->kNoether);
@@ -918,7 +880,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
 #endif
     if (lm == NULL)
     {
-      if (h->lcm!=NULL) pFree1((*h).lcm);
+      if (h->lcm!=NULL) pFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -960,7 +922,6 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
         } while (!pDivisibleBy1(strat->S[i], h->p));
 
         // enter in Lazyset and return
-        pCompactifyHeap( h->heap, &(h->p), h->length);
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -1006,7 +967,6 @@ void kBucketRedTail(LObject *hp, int pos, kStrategy strat)
 #ifdef KB_USE_HEAPS
           int i;
           if (hp->length <= 0) hp->length = pLength(hp->p);
-          pCompactifyHeap(hp->heap, &(hp->p), hp->length);
           h = hp->p;
           for (i = 1, h = hp->p; i < length; i++, h = pNext(h));
           hn = pNext(h);
@@ -1058,4 +1018,3 @@ void kBucketRedTail(LObject *hp, int pos, kStrategy strat)
 
 #endif // KB_USE_BUCKETS
 
-#endif // HAVE_BUCKETS

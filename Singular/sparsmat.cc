@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.32 2000-09-07 07:38:22 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.33 2000-09-12 16:01:15 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -219,7 +219,7 @@ poly smCallDet(ideal I)
   }
   if (nEqual(diag,h) == FALSE)
   {
-    pMultN(res,diag);
+    pMult_nn(res,diag);
     pNormalize(res);
   }
   nDelete(&diag);
@@ -1692,7 +1692,7 @@ poly smMult(poly a, poly b)
   if (pNext(b) == NULL)
   {
     if (pIsConstantComp(b))
-      return pMultCopyN(a, pGetCoeff(b));
+      return ppMult_nn(a, pGetCoeff(b));
     else
       return smEMult(a, b);
   }
@@ -1761,7 +1761,7 @@ void smPolyDiv(poly a, poly b)
     pNext(h) = NULL;
     a = pNext(a) = pAdd(pNext(a), pNext(dummy));
   } while (a!=NULL);
-  pFree1(dummy);
+  pFree(dummy);
 }
 
 /*
@@ -1783,7 +1783,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     if (pNext(b) == NULL)
     {
       if (pIsConstantComp(b))
-        return pMultCopyN(a, pGetCoeff(b));
+        return ppMult_nn(a, pGetCoeff(b));
       else
         return smEMult(a, b);
     }
@@ -1832,7 +1832,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     pIter(b);
     if (b == NULL)
     {
-      pFree1(e);
+      pFree(e);
       return res;
     }
   }
@@ -1855,7 +1855,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     }
     pIter(b);
   } while (b != NULL);
-  pFree1(e);
+  pFree(e);
   return res;
 }
 
@@ -1899,7 +1899,7 @@ static void smExactPolyDiv(poly a, poly b)
     nDelete(&yn);
     a = pNext(a) = pAdd(pNext(a), h);
   } while (a!=NULL);
-  pFree1(e);
+  pFree(e);
 }
 
 // orginal text:
@@ -1966,7 +1966,7 @@ static poly smEMult(poly t, const poly e)
   h = res = pNew();
   loop
   {
-    pCopy2(h,t);
+    pExpVectorCopy(h,t);
     for (i=pVariables; i; i--)
       pAddExp(h,i,pGetExp(e,i));
     pSetm(h);
@@ -2008,7 +2008,7 @@ static poly smDMult(poly t, const poly e)
   h = res = pNew();
   loop
   {
-    pCopy2(h,t);
+    pExpVectorCopy(h,t);
     pSetCoeff0(h,nMult(y,pGetCoeff(t)));
     loop
     {
@@ -2077,7 +2077,7 @@ static void smCombineChain(poly *px, poly r)
       pa = pNext(pa) = r;
       break;
     }
-    i = pComp0(pb, r);
+    i = pLmCmp(pb, r);
     if (i > 0)
       pa = pb;
     else
@@ -2117,7 +2117,7 @@ static void smFindRef(poly *ref, poly *px, poly r)
 
   loop
   {
-    i = pComp0(pa, r);
+    i = pLmCmp(pa, r);
     if (i > 0)
     {
       pp = pa;

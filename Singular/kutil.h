@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.27 2000-09-04 13:38:59 obachman Exp $ */
+/* $Id: kutil.h,v 1.28 2000-09-12 16:01:01 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -13,6 +13,14 @@
 #include "ring.h"
 
 #define setmax 16
+
+#undef NO_KINLINE
+#if defined(NDEBUG) && !defined(NO_INLINE)
+#define KINLINE inline
+#else
+#define KINLINE
+#define NO_KINLINE 1
+#endif
 
 typedef int* intset;
 
@@ -30,13 +38,14 @@ public:
       lmRing=currRing; 
       tailRing=currRing;
     }
-  inline poly SetP(poly p_new);
+  KINLINE poly SetP(poly p_new);
 };
 
 class sLObject
 {
 public:
   poly  p;
+  poly  tail;
   poly  p1,p2; /*- the pair p comes from -*/
   poly  lcm;   /*- the lcm of p1,p2 -*/
   ring lmRing;
@@ -44,12 +53,18 @@ public:
   int is_bucket;
   int ecart,length, pLength;
   unsigned long sev;
+  kBucket_pt bucket;
   sLObject() 
     { 
       memset((void*) this, 0, sizeof(sLObject));
       lmRing=currRing; 
       tailRing=currRing;
     }
+  // spoly related things
+  KINLINE poly SetP(poly new_p);
+  KINLINE poly Iter();
+  KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
+  KINLINE poly GetP(ring LmRing);
 };
 
 typedef class sTObject TObject;
@@ -183,7 +198,7 @@ void kFreeStrat(kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
 
-inline TSet initT () { return (TSet)omAlloc0(setmax*sizeof(TObject)); }
+KINLINE TSet initT ();
 
 #ifdef KDEBUG
 #define kTest(A) K_Test(__FILE__,__LINE__,A)
@@ -282,14 +297,6 @@ poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether = NULL);
 void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether);
 
 
-#include "polys.h"
-// Methods for tobjects
-inline poly sTObject::SetP(poly new_p)
-{
-  poly old_p = p;
-  memset((void*) this, 0, sizeof(sTObject));
-  p = new_p;
-  sev = pGetShortExpVector(p);
-  return p;
-}
+#include "kInline.cc"
+
 

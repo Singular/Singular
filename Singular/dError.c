@@ -6,7 +6,7 @@
  *  Purpose: implementation for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.c,v 1.1 2000-09-04 13:38:55 obachman Exp $
+ *  Version: $Id: dError.c,v 1.2 2000-09-12 16:00:52 obachman Exp $
  *******************************************************************/
 #ifndef DERROR_C
 #define DERROR_C
@@ -30,7 +30,7 @@ void dReportError(const char* fmt, ...)
 #ifndef MAKE_DISTRIBUTION
   fprintf(stderr, "// ***dErrror: ");
   vfprintf(stderr, fmt, ap);
-  fprintf(stderr, "\noccured at: ");
+  fprintf(stderr, " occured at: \n");
 #ifdef HAVE_CONFIG_H
   omPrintCurrentBackTrace(stderr);
 #endif

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.13 2000-08-14 12:56:35 obachman Exp $ */
+/* $Id: longalg.h,v 1.14 2000-09-12 16:01:01 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -15,13 +15,8 @@ struct slnumber;
 typedef struct slnumber * lnumber;
 
 //make parameter type same as exponent type
-#if 1
-#define PARAMETER_TYPE EXPONENT_TYPE
-#define SIZEOF_PARAMETER SIZEOF_EXPONENT
-#else
-#define PARAMETER_TYPE int
-#define SIZEOF_PARAMETER SIZEOF_EXPONENT
-#endif
+#define PARAMETER_TYPE short
+#define SIZEOF_PARAMETER SIZEOF_SHORT
 
 struct reca
 {

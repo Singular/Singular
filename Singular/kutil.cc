@@ -1,10 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.57 2000-09-07 13:39:43 sulandra Exp $ */
+/* $Id: kutil.cc,v 1.58 2000-09-12 16:01:00 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
+
+#ifndef KUTIL_CC
+#define KUTIL_CC
 
 #include <stdlib.h>
 #include <string.h>
@@ -41,7 +44,7 @@ void deleteHC(poly* p, int* e, int* l,kStrategy strat)
 
   if (strat->kHEdgeFound)
   {
-    if (pComp(*p,strat->kNoether) == -1)
+    if (pCmp(*p,strat->kNoether) == -1)
     {
       pDelete(p);
       *l = 0;
@@ -51,7 +54,7 @@ void deleteHC(poly* p, int* e, int* l,kStrategy strat)
     p1 = *p;
     while (pNext(p1)!=NULL)
     {
-      if (pComp0(pNext(p1), strat->kNoether) == -1)
+      if (pLmCmp(pNext(p1), strat->kNoether) == -1)
         pDelete(&pNext(p1));
       else
         pIter(p1);
@@ -463,12 +466,12 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
   int i;
 
   if (set[j].lcm!=NULL)
-    pFree1(set[j].lcm);
+    pFree(set[j].lcm);
   if (set[j].p!=NULL)
   {
     if (pNext(set[j].p) == strat->tail)
     {
-      pFree1(set[j].p);
+      pFree(set[j].p);
       /*- tail belongs to several int spolys -*/
     }
     else
@@ -628,7 +631,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
     */
       strat->cp++;
-      pFree1(Lp.lcm);
+      pFree(Lp.lcm);
       Lp.lcm=NULL;
       return;
     }
@@ -636,7 +639,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
       Lp.ecart = max(ecart,strat->ecartS[i]);
     if (strat->fromT && (strat->ecartS[i]>ecart))
     {
-      pFree1(Lp.lcm);
+      pFree(Lp.lcm);
       Lp.lcm=NULL;
       return;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
@@ -659,7 +662,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
           strat->c3++;
           if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
           {
-            pFree1(Lp.lcm);
+            pFree(Lp.lcm);
             return;
           }
           break;
@@ -693,13 +696,13 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
     */
       strat->cp++;
-      pFree1(Lp.lcm);
+      pFree(Lp.lcm);
       Lp.lcm=NULL;
       return;
     }
     if (strat->fromT && (strat->ecartS[i]>ecart))
     {
-      pFree1(Lp.lcm);
+      pFree(Lp.lcm);
       Lp.lcm=NULL;
       return;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
@@ -718,7 +721,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
         strat->c3++;
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
-          pFree1(Lp.lcm);
+          pFree(Lp.lcm);
           return;
         }
         break;
@@ -761,7 +764,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
     *the first case is handeled in chainCrit
     */
-    if (Lp.lcm!=NULL) pFree1(Lp.lcm);
+    if (Lp.lcm!=NULL) pFree(Lp.lcm);
   }
   else
   {
@@ -794,7 +797,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
   if(pHasNotCF(p,strat->S[i]))
   {
     strat->cp++;
-    pFree1(Lp.lcm);
+    pFree(Lp.lcm);
     Lp.lcm=NULL;
     return;
   }
@@ -804,7 +807,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
     if ((compare==1) || (pEqual(strat->L[j].lcm,Lp.lcm)))
     {
       strat->c3++;
-      pFree1(Lp.lcm);
+      pFree(Lp.lcm);
       return;
     }
     else if (compare ==-1)
@@ -818,7 +821,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
   Lp.p = ksCreateShortSpoly(strat->S[i],p);
   if (Lp.p == NULL)
   {
-     pFree1(Lp.lcm);
+     pFree(Lp.lcm);
   }
   else
   {
@@ -1295,14 +1298,14 @@ int posInS (polyset set,int length,poly p)
     int oo=pWTotaldegree(set[length]);
 
     if ((oo<o)
-    || ((o==oo) && (pComp0(set[length],p)!= cmp_int)))
+    || ((o==oo) && (pLmCmp(set[length],p)!= cmp_int)))
       return length+1;
 
     loop
     {
       if (an >= en-1)
       {
-        if ((pWTotaldegree(set[an])>=o) && (pComp0(set[an],p) == cmp_int))
+        if ((pWTotaldegree(set[an])>=o) && (pLmCmp(set[an],p) == cmp_int))
         {
           return an;
         }
@@ -1310,24 +1313,24 @@ int posInS (polyset set,int length,poly p)
       }
       i=(an+en) / 2;
       if ((pWTotaldegree(set[an])>=o)
-      && (pComp0(set[i],p) == cmp_int)) en=i;
+      && (pLmCmp(set[i],p) == cmp_int)) en=i;
       else                              an=i;
     }
   }
   else
   {
-    if (pComp0(set[length],p)!= pOrdSgn)
+    if (pLmCmp(set[length],p)!= pOrdSgn)
       return length+1;
 
     loop
     {
       if (an >= en-1)
       {
-        if (pComp0(set[an],p) == pOrdSgn) return an;
+        if (pLmCmp(set[an],p) == pOrdSgn) return an;
         return en;
       }
       i=(an+en) / 2;
-      if (pComp0(set[i],p) == pOrdSgn) en=i;
+      if (pLmCmp(set[i],p) == pOrdSgn) en=i;
       else                             an=i;
     }
   }
@@ -1353,7 +1356,7 @@ int posInT1 (const TSet set,const int length,const LObject &p)
 {
   if (length==-1) return 0;
 
-  if (pComp0(set[length].p,p.p)!= pOrdSgn) return length+1;
+  if (pLmCmp(set[length].p,p.p)!= pOrdSgn) return length+1;
 
   int i;
   int an = 0;
@@ -1363,11 +1366,11 @@ int posInT1 (const TSet set,const int length,const LObject &p)
   {
     if (an >= en-1)
     {
-      if (pComp0(set[an].p,p.p) == pOrdSgn) return an;
+      if (pLmCmp(set[an].p,p.p) == pOrdSgn) return an;
       return en;
     }
     i=(an+en) / 2;
-    if (pComp0(set[i].p,p.p) == pOrdSgn) en=i;
+    if (pLmCmp(set[i].p,p.p) == pOrdSgn) en=i;
     else                                 an=i;
   }
 }
@@ -1415,7 +1418,7 @@ int posInT11 (const TSet set,const int length,const LObject &p)
  * loop
  * {
  *   if ((pFDeg(set[j].p) > o)
- *   || ((pFDeg(set[j].p) == o) && (pComp0(set[j].p,p.p) == pOrdSgn)))
+ *   || ((pFDeg(set[j].p) == o) && (pLmCmp(set[j].p,p.p) == pOrdSgn)))
  *   {
  *     return j;
  *   }
@@ -1431,7 +1434,7 @@ int posInT11 (const TSet set,const int length,const LObject &p)
   int op = pFDeg(set[length].p);
 
   if ((op < o)
-  || ((op == o) && (pComp0(set[length].p,p.p) != pOrdSgn)))
+  || ((op == o) && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
     return length+1;
 
   int i;
@@ -1444,14 +1447,14 @@ int posInT11 (const TSet set,const int length,const LObject &p)
     {
       op= pFDeg(set[an].p);
       if ((op > o)
-      || (( op == o) && (pComp0(set[an].p,p.p) == pOrdSgn)))
+      || (( op == o) && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
         return an;
       return en;
     }
     i=(an+en) / 2;
     op = pFDeg(set[i].p);
     if (( op > o)
-    || (( op == o) && (pComp0(set[i].p,p.p) == pOrdSgn)))
+    || (( op == o) && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
       en=i;
     else
       an=i;
@@ -1473,7 +1476,7 @@ int posInT110 (const TSet set,const int length,const LObject &p)
   if (( op < o)
   || (( op == o) && (set[length].length<p.length))
   || (( op == o) && (set[length].length == p.length)
-     && (pComp0(set[length].p,p.p) != pOrdSgn)))
+     && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
     return length+1;
 
   int i;
@@ -1487,7 +1490,7 @@ int posInT110 (const TSet set,const int length,const LObject &p)
       if (( op > o)
       || (( op == o) && (set[an].length > p.length))
       || (( op == o) && (set[an].length == p.length)
-         && (pComp0(set[an].p,p.p) == pOrdSgn)))
+         && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
         return an;
       return en;
     }
@@ -1496,7 +1499,7 @@ int posInT110 (const TSet set,const int length,const LObject &p)
     if (( op > o)
     || (( op == o) && (set[i].length > p.length))
     || (( op == o) && (set[i].length == p.length)
-       && (pComp0(set[i].p,p.p) == pOrdSgn)))
+       && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
       en=i;
     else
       an=i;
@@ -1551,7 +1554,7 @@ int posInT15 (const TSet set,const int length,const LObject &p)
  * {
  *   if ((pFDeg(set[j].p)+set[j].ecart > o)
  *   || ((pFDeg(set[j].p)+set[j].ecart == o)
- *     && (pComp0(set[j].p,p.p) == pOrdSgn)))
+ *     && (pLmCmp(set[j].p,p.p) == pOrdSgn)))
  *   {
  *     return j;
  *   }
@@ -1568,7 +1571,7 @@ int posInT15 (const TSet set,const int length,const LObject &p)
 
   if ((op < o)
   || ((op == o)
-     && (pComp0(set[length].p,p.p) != pOrdSgn)))
+     && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
     return length+1;
 
   int i;
@@ -1580,14 +1583,14 @@ int posInT15 (const TSet set,const int length,const LObject &p)
     {
       op = pFDeg(set[an].p)+set[an].ecart;
       if (( op > o)
-      || (( op  == o) && (pComp0(set[an].p,p.p) == pOrdSgn)))
+      || (( op  == o) && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
         return an;
       return en;
     }
     i=(an+en) / 2;
     op = pFDeg(set[i].p)+set[i].ecart;
     if (( op > o)
-    || (( op == o) && (pComp0(set[i].p,p.p) == pOrdSgn)))
+    || (( op == o) && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
       en=i;
     else
       an=i;
@@ -1613,7 +1616,7 @@ int posInT17 (const TSet set,const int length,const LObject &p)
 *      && (set[j].ecart < p.ecart)))
 *    || ((pFDeg(set[j].p)+set[j].ecart == o)
 *      && (set[j].ecart==p.ecart)
-*      && (pComp0(set[j].p,p.p)==pOrdSgn)))
+*      && (pLmCmp(set[j].p,p.p)==pOrdSgn)))
 *      return j;
 *    j++;
 *    if (j > length) return j;
@@ -1629,7 +1632,7 @@ int posInT17 (const TSet set,const int length,const LObject &p)
   if ((op < o)
   || (( op == o) && (set[length].ecart > p.ecart))
   || (( op == o) && (set[length].ecart==p.ecart)
-     && (pComp0(set[length].p,p.p) != pOrdSgn)))
+     && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
     return length+1;
 
   int i;
@@ -1643,7 +1646,7 @@ int posInT17 (const TSet set,const int length,const LObject &p)
       if (( op > o)
       || (( op == o) && (set[an].ecart < p.ecart))
       || (( op  == o) && (set[an].ecart==p.ecart)
-         && (pComp0(set[an].p,p.p) == pOrdSgn)))
+         && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
         return an;
       return en;
     }
@@ -1652,7 +1655,7 @@ int posInT17 (const TSet set,const int length,const LObject &p)
     if ((op > o)
     || (( op == o) && (set[i].ecart < p.ecart))
     || (( op == o) && (set[i].ecart == p.ecart)
-       && (pComp0(set[i].p,p.p) == pOrdSgn)))
+       && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
       en=i;
     else
       an=i;
@@ -1680,7 +1683,7 @@ int posInT17_c (const TSet set,const int length,const LObject &p)
     if ((op < o)
     || ((op == o) && (set[length].ecart > p.ecart))
     || ((op == o) && (set[length].ecart==p.ecart)
-       && (pComp0(set[length].p,p.p) != pOrdSgn)))
+       && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
       return length+1;
   }
 
@@ -1699,7 +1702,7 @@ int posInT17_c (const TSet set,const int length,const LObject &p)
         if ((op > o)
         || ((op == o) && (set[an].ecart < p.ecart))
         || ((op == o) && (set[an].ecart==p.ecart)
-           && (pComp0(set[an].p,p.p) == pOrdSgn)))
+           && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
           return an;
       }
       return en;
@@ -1713,7 +1716,7 @@ int posInT17_c (const TSet set,const int length,const LObject &p)
       if ((op > o)
       || ((op == o) && (set[i].ecart < p.ecart))
       || ((op == o) && (set[i].ecart == p.ecart)
-         && (pComp0(set[i].p,p.p) == pOrdSgn)))
+         && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
         en=i;
       else
         an=i;
@@ -1796,7 +1799,7 @@ int posInLSpecial (const LSet set, const int length,
 
   if ((op > d)
   || ((op == d) && (p.p1!=NULL)&&(set[length].p1==NULL))
-  || (pComp0(set[length].p,p.p)== pOrdSgn))
+  || (pLmCmp(set[length].p,p.p)== pOrdSgn))
      return length+1;
 
   int i;
@@ -1809,7 +1812,7 @@ int posInLSpecial (const LSet set, const int length,
       op=pFDeg(set[an].p);
       if ((op > d)
       || ((op == d) && (p.p1!=NULL) && (set[an].p1==NULL))
-      || (pComp0(set[an].p,p.p)== pOrdSgn))
+      || (pLmCmp(set[an].p,p.p)== pOrdSgn))
          return en;
       return an;
     }
@@ -1817,7 +1820,7 @@ int posInLSpecial (const LSet set, const int length,
     op=pFDeg(set[i].p);
     if ((op>d)
     || ((op==d) && (p.p1!=NULL) && (set[i].p1==NULL))
-    || (pComp0(set[i].p,p.p) == pOrdSgn))
+    || (pLmCmp(set[i].p,p.p) == pOrdSgn))
       an=i;
     else
       en=i;
@@ -1834,7 +1837,7 @@ int posInL0 (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  if (pComp0(set[length].p,p.p)== pOrdSgn)
+  if (pLmCmp(set[length].p,p.p)== pOrdSgn)
     return length+1;
 
   int i;
@@ -1844,11 +1847,11 @@ int posInL0 (const LSet set, const int length,
   {
     if (an >= en-1)
     {
-      if (pComp0(set[an].p,p.p) == pOrdSgn) return en;
+      if (pLmCmp(set[an].p,p.p) == pOrdSgn) return en;
       return an;
     }
     i=(an+en) / 2;
-    if (pComp0(set[i].p,p.p) == pOrdSgn) an=i;
+    if (pLmCmp(set[i].p,p.p) == pOrdSgn) an=i;
     else                                 en=i;
     /*aend. fuer lazy == in !=- machen */
   }
@@ -1871,7 +1874,7 @@ int posInL11 (const LSet set, const int length,
  * {
  *   if (j > length)            return j;
  *   if ((pFDeg(set[j].p) < o)) return j;
- *   if ((pFDeg(set[j].p) == o) && (pComp0(set[j].p,p.p) == -pOrdSgn))
+ *   if ((pFDeg(set[j].p) == o) && (pLmCmp(set[j].p,p.p) == -pOrdSgn))
  *   {
  *     return j;
  *   }
@@ -1886,7 +1889,7 @@ int posInL11 (const LSet set, const int length,
   int op = pFDeg(set[length].p);
 
   if ((op > o)
-  || ((op == o) && (pComp0(set[length].p,p.p) != -pOrdSgn)))
+  || ((op == o) && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
     return length+1;
   int i;
   int an = 0;
@@ -1897,14 +1900,14 @@ int posInL11 (const LSet set, const int length,
     {
       op = pFDeg(set[an].p);
       if ((op > o)
-      || ((op == o) && (pComp0(set[an].p,p.p) != -pOrdSgn)))
+      || ((op == o) && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
         return en;
       return an;
     }
     i=(an+en) / 2;
     op = pFDeg(set[i].p);
     if ((op > o)
-    || ((op == o) && (pComp0(set[i].p,p.p) != -pOrdSgn)))
+    || ((op == o) && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
       an=i;
     else
       en=i;
@@ -1927,7 +1930,7 @@ int posInL110 (const LSet set, const int length,
   if ((op > o)
   || ((op == o) && (set[length].length >2*p.length))
   || ((op == o) && (set[length].length <= 2*p.length)
-     && (pComp0(set[length].p,p.p) != -pOrdSgn)))
+     && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
     return length+1;
   int i;
   int an = 0;
@@ -1940,7 +1943,7 @@ int posInL110 (const LSet set, const int length,
       if ((op > o)
       || ((op == o) && (set[an].length >2*p.length))
       || ((op == o) && (set[an].length <=2*p.length)
-         && (pComp0(set[an].p,p.p) != -pOrdSgn)))
+         && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
         return en;
       return an;
     }
@@ -1949,7 +1952,7 @@ int posInL110 (const LSet set, const int length,
     if ((op > o)
     || ((op == o) && (set[i].length > 2*p.length))
     || ((op == o) && (set[i].length <= 2*p.length)
-       && (pComp0(set[i].p,p.p) != -pOrdSgn)))
+       && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
       an=i;
     else
       en=i;
@@ -2009,7 +2012,7 @@ int posInL15 (const LSet set, const int length,
  *   if (j > length)                       return j;
  *   if (pFDeg(set[j].p)+set[j].ecart < o) return j;
  *   if ((pFDeg(set[j].p)+set[j].ecart == o)
- *   && (pComp0(set[j].p,p.p) == -pOrdSgn))
+ *   && (pLmCmp(set[j].p,p.p) == -pOrdSgn))
  *   {
  *     return j;
  *   }
@@ -2024,7 +2027,7 @@ int posInL15 (const LSet set, const int length,
   int op = pFDeg(set[length].p) + set[length].ecart;
 
   if ((op > o)
-  || ((op == o) && (pComp0(set[length].p,p.p) != -pOrdSgn)))
+  || ((op == o) && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
     return length+1;
   int i;
   int an = 0;
@@ -2035,14 +2038,14 @@ int posInL15 (const LSet set, const int length,
     {
       op = pFDeg(set[an].p) + set[an].ecart;
       if ((op > o)
-      || ((op == o) && (pComp0(set[an].p,p.p) != -pOrdSgn)))
+      || ((op == o) && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
         return en;
       return an;
     }
     i=(an+en) / 2;
     op = pFDeg(set[i].p) + set[i].ecart;
     if ((op > o)
-    || ((op == o) && (pComp0(set[i].p,p.p) != -pOrdSgn)))
+    || ((op == o) && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
       an=i;
     else
       en=i;
@@ -2067,7 +2070,7 @@ int posInL17 (const LSet set, const int length,
      && (set[length].ecart > p.ecart))
   || ((pFDeg(set[length].p) + set[length].ecart == o)
      && (set[length].ecart == p.ecart)
-     && (pComp0(set[length].p,p.p) != -pOrdSgn)))
+     && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
     return length+1;
   int i;
   int an = 0;
@@ -2081,7 +2084,7 @@ int posInL17 (const LSet set, const int length,
          && (set[an].ecart > p.ecart))
       || ((pFDeg(set[an].p) + set[an].ecart == o)
          && (set[an].ecart == p.ecart)
-         && (pComp0(set[an].p,p.p) != -pOrdSgn)))
+         && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
         return en;
       return an;
     }
@@ -2091,7 +2094,7 @@ int posInL17 (const LSet set, const int length,
        && (set[i].ecart > p.ecart))
     || ((pFDeg(set[i].p) +set[i].ecart == o)
        && (set[i].ecart == p.ecart)
-       && (pComp0(set[i].p,p.p) != -pOrdSgn)))
+       && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
       an=i;
     else
       en=i;
@@ -2115,7 +2118,7 @@ int posInL17 (const LSet set, const int length,
      && (set[length].ecart == p.ecart)
      //&& (set[length].lp+set[length].length == p.lp+p.length)
      && (set[length].length == p.length)
-     && (pComp0(set[length].p,p.p) != -pOrdSgn)))
+     && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
     return length+1;
   int i;
   int an = 0;
@@ -2136,7 +2139,7 @@ int posInL17 (const LSet set, const int length,
          && (set[an].ecart == p.ecart)
          //&& (set[length].lp+set[length].length == p.lp+p.length)
          && (set[length].length == p.length)
-         && (pComp0(set[an].p,p.p) != -pOrdSgn)))
+         && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
         return en;
       return an;
     }
@@ -2153,7 +2156,7 @@ int posInL17 (const LSet set, const int length,
        && (set[i].ecart == p.ecart)
        //&& (set[i].lp+set[i].length == p.lp+p.length)
        && (set[i].length == p.length)
-       && (pComp0(set[i].p,p.p) != -pOrdSgn)))
+       && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
       an=i;
     else
       en=i;
@@ -2185,7 +2188,7 @@ int posInL17_c (const LSet set, const int length,
        && (set[length].ecart > p.ecart))
     || ((pFDeg(set[length].p) + set[length].ecart == o)
        && (set[length].ecart == p.ecart)
-       && (pComp0(set[length].p,p.p) != -pOrdSgn)))
+       && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
       return length+1;
   }
   int i;
@@ -2204,7 +2207,7 @@ int posInL17_c (const LSet set, const int length,
            && (set[an].ecart > p.ecart))
         || ((pFDeg(set[an].p) + set[an].ecart == o)
            && (set[an].ecart == p.ecart)
-           && (pComp0(set[an].p,p.p) != -pOrdSgn)))
+           && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
           return en;
       }
       return an;
@@ -2219,7 +2222,7 @@ int posInL17_c (const LSet set, const int length,
          && (set[i].ecart > p.ecart))
       || ((pFDeg(set[i].p) +set[i].ecart == o)
          && (set[i].ecart == p.ecart)
-         && (pComp0(set[i].p,p.p) != -pOrdSgn)))
+         && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
         an=i;
       else
         en=i;
@@ -3002,12 +3005,12 @@ void updateS(BOOLEAN toT,kStrategy strat)
           strat->S[i] = redBba(strat->S[i],i-1,strat);
           if ((strat->ak!=0)&&(strat->S[i]!=NULL))
             strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
-          if (TEST_OPT_DEBUG && (pComp(redSi,strat->S[i])!=0))
+          if (TEST_OPT_DEBUG && (pCmp(redSi,strat->S[i])!=0))
           {
             PrintS("reduce:");
             wrp(redSi);PrintS(" to ");wrp(strat->S[i]);PrintLn();
           }
-          if (TEST_OPT_PROT && (pComp(redSi,strat->S[i])!=0))
+          if (TEST_OPT_PROT && (pCmp(redSi,strat->S[i])!=0))
           {
             if (strat->S[i]==NULL)
               PrintS("V");
@@ -3571,7 +3574,7 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
 
   scComputeHC(strat->Shdl,ak,strat->kHEdge);
   /* compare old and new noether*/
-  newNoether = pHead0(strat->kHEdge);
+  newNoether = pInit(strat->kHEdge);
   j = pFDeg(newNoether);
   for (i=1; i<=pVariables; i++)
   {
@@ -3593,13 +3596,13 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
       PrintLn();
     }
   }
-  if (pComp(strat->kNoether,newNoether)!=1)
+  if (pCmp(strat->kNoether,newNoether)!=1)
   {
     pDelete(&strat->kNoether);
     strat->kNoether=newNoether;
     return TRUE;
   }
-  pFree1(newNoether);
+  pFree(newNoether);
   return FALSE;
 }
 
@@ -3632,3 +3635,4 @@ rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp)
 }
 
 
+#endif // KUTIL_CC

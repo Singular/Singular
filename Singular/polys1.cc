@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.44 2000-08-29 14:10:30 obachman Exp $ */
+/* $Id: polys1.cc,v 1.45 2000-09-12 16:01:12 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -93,16 +93,6 @@ int pIsPurePower(const poly p)
   return k;
 }
 
-BOOLEAN pIsMonomOf(poly p, poly m)
-{
-  if (m == NULL) return TRUE;
-  while (p != NULL)
-  {
-    if (p == m) return TRUE;
-    pIter(p);
-  }
-  return FALSE;
-}
 
 /*-----------------------------------------------------------*/
 /*
@@ -134,94 +124,6 @@ void pSetModDeg(intvec *w)
     pLexOrder = pOldLexOrder;
   }
 }
-
-#ifndef HAVE_P_PROCS
-/*2
-* multiply a polynomial by -1
-*/
-poly pNeg(poly p)
-{
-  poly h = p;
-  while (h!=NULL)
-  {
-    pGetCoeff(h)=nNeg(pGetCoeff(h));
-    pIter(h);
-  }
-  return p;
-}
-
-/*-------------operations on polynomials:------------*/
-/*2
-* add p1 and p2, p1 and p2 are destroyed
-*/
-poly pAdd(poly p1, poly p2)
-{
-  static poly a1, p, a2, a;
-  int c;
-  number t;
-
-  if (p1==NULL) return p2;
-  if (p2==NULL) return p1;
-  a1 = p1;
-  a2 = p2;
-  a = p  = pInit();
-  nNew(&(p->coef));
-  loop
-  {
-    /* a1 and a2 are non-NULL, so we may use pComp0 instead of pComp */
-    c = pComp0(a1, a2);
-    if (c == 1)
-    {
-      a = pNext(a) = a1;
-      pIter(a1);
-      if (a1==NULL)
-      {
-        pNext(a) = a2;
-        break;
-      }
-    }
-    else if (c == -1)
-    {
-      a = pNext(a) = a2;
-      pIter(a2);
-      if (a2==NULL)
-      {
-        pNext(a) = a1;
-        break;
-      }
-    }
-    else
-    {
-      t=nAdd(a1->coef,a2->coef);
-      pDelete1(&a2);
-      if (nIsZero(t))
-      {
-        nDelete(&t);
-        pDelete1(&a1);
-      }
-      else
-      {
-        pSetCoeff(a1,t);
-        a = pNext(a) = a1;
-        pIter(a1);
-      }
-      if (a1==NULL)
-      {
-        pNext(a) = a2;
-        break;
-      }
-      else if (a2==NULL)
-      {
-        pNext(a) = a1;
-        break;
-      }
-    }
-  }
-  pDelete1(&p);
-  return p;
-}
-#endif
-
 
 
 /*2
@@ -329,7 +231,7 @@ static void pMonMult(poly p, poly q)
   //  pAddExp(p,i, pGetExp(q,i));
   //}
   //p->Order += q->Order;
-  pMonAddOn(p,q);
+  pExpVectorAdd(p,q);
 }
 
 /*3
@@ -344,7 +246,7 @@ static poly pMonMultC(poly p, poly q)
 
   x = nMult(pGetCoeff(p),pGetCoeff(q));
   pSetCoeff0(r,x);
-  pMonAdd(r,p, q);
+  pExpVectorSum(r,p, q);
   return r;
 }
 
@@ -552,9 +454,7 @@ poly pDiff(poly a, int k)
   {
     if (pGetExp(a,k)!=0)
     {
-      f = pNew();
-      pCopy2(f,a);
-      pNext(f)=NULL;
+      f = pInit(a);
       t = nInit(pGetExp(a,k));
       pSetCoeff0(f,nMult(t,pGetCoeff(a)));
       nDelete(&t);
@@ -680,11 +580,11 @@ int pMinComp(poly p, ring r)
   int result,i;
 
   if(p==NULL) return 0;
-  result = pRingGetComp(r,p);
+  result = p_GetComp(p,r);
   while (pNext(p)!=NULL)
   {
     pIter(p);
-    i = pRingGetComp(r,p);
+    i = p_GetComp(p,r);
     if (i<result) result = i;
   }
   return result;
@@ -707,6 +607,7 @@ BOOLEAN pOneComp(poly p)
   return TRUE;
 }
 
+#if 0
 /*2
 * multiplies the polynomial a by the column generator with number i
 */
@@ -719,6 +620,7 @@ void pSetCompP(poly p, int i)
     pIter(p);
   }
 }
+#endif
 
 /*2
 * handle memory request for sets of polynomials (ideals)
@@ -1015,7 +917,7 @@ poly pOrdPolyMerge(poly p)
         pTest(result);
         return result;
       }
-      if (pComp0(p,pNext(p)) != 1)
+      if (pLmCmp(p,pNext(p)) != 1)
       {
         pp = p;
         pIter(p);
@@ -1110,7 +1012,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
       }
       pTest(aq);
     }
-    pSetComp(qq, pRingGetComp(oldRing,p));
+    pSetComp(qq, p_GetComp(p,oldRing));
     if (nIsZero(pGetCoeff(qq)))
     {
       pDelete1(&qq);
@@ -1121,19 +1023,19 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
       int mapped_to_par=0;
       for(i=1; i<=OldpVariables; i++)
       {
-        int e=pRingGetExp(oldRing,p,i);
-        if (/*pRingGetExp(oldRing,p,i)*/e!=0)
+        int e=p_GetExp(p,i,oldRing);
+        if (e!=0)
         {
           if (perm==NULL)
           {
-            pSetExp(qq,i, e/*pRingGetExp(oldRing,p,i)*/);
+            pSetExp(qq,i, e);
           }
           else if (perm[i]>0)
-            pAddExp(qq,perm[i], e/*pRingGetExp(oldRing, p,i)*/);
+            pAddExp(qq,perm[i], e/*p_GetExp( p,i,oldRing)*/);
           else if (perm[i]<0)
           {
             lnumber c=(lnumber)pGetCoeff(qq);
-            c->z->e[-perm[i]-1]+=e/*pRingGetExp(oldRing, p,i)*/;
+            c->z->e[-perm[i]-1]+=e/*p_GetExp( p,i,oldRing)*/;
             mapped_to_par=1;
           }
           else
@@ -1430,15 +1332,9 @@ BOOLEAN pEqualPolys(poly p1,poly p2)
 {
   while ((p1 != NULL) && (p2 != NULL))
   {
-    /* p1 and p2 are non-NULL, so we may use pComp0 instead of pComp */
-    if (! pEqual(p1, p2))
-    {
+    /* p1 and p2 are non-NULL, so we may use pLmCmp instead of pComp */
+    if (! pLmEqual(p1, p2))
        return FALSE;
-    }
-    if (nEqual(pGetCoeff(p1),pGetCoeff(p2)) == FALSE)
-    {
-      return FALSE;
-    }
     pIter(p1);
     pIter(p2);
   }
@@ -1465,7 +1361,7 @@ BOOLEAN pComparePolys(poly p1,poly p2)
   n=nDiv(pGetCoeff(p1),pGetCoeff(p2));
   while ((p1 != NULL) /*&& (p2 != NULL)*/)
   {
-    if ( ! pLmEqual(p1, p2))
+    if ( ! pEqual(p1, p2))
     {
         nDelete(&n);
         return FALSE;

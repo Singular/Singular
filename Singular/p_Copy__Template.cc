@@ -6,7 +6,7 @@
  *  Purpose: template for p_Copy
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Copy__Template.cc,v 1.1 2000-08-24 14:42:42 obachman Exp $
+ *  Version: $Id: p_Copy__Template.cc,v 1.2 2000-09-12 16:01:06 obachman Exp $
  *******************************************************************/
 
 poly p_Copy(poly s_p, const ring r)
@@ -28,7 +28,7 @@ poly p_Copy(poly s_p, const ring r)
     // for MemCopy advances goes from low to high addresses
     h = s_p;
     s_p = pNext(s_p);
-    p_MemCopy(d_p->exp.l, h->exp.l, length);
+    p_MemCopy(d_p->exp, h->exp, length);
   }
   pNext(d_p) = NULL;
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.20 2000-08-14 12:56:18 obachman Exp $ */
+/* $Id: hdegree.cc,v 1.21 2000-09-12 16:00:54 obachman Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -978,7 +978,7 @@ static poly pWork;
 static void hHedge(poly hEdge)
 {
   pSetm(pWork);
-  if (pComp0(pWork, hEdge) == pOrdSgn)
+  if (pLmCmp(pWork, hEdge) == pOrdSgn)
   {
     for (int i = hNvar; i>0; i--)
       pSetExp(hEdge,i, pGetExp(pWork,i));
@@ -1071,7 +1071,7 @@ void scComputeHC(ideal S, int ak, poly &hEdge)
   hPure(hexist, 0, &hNstc, hvar, hNvar, hpure, &hNpure);
   hLexS(hexist, hNstc, hvar, hNvar);
   if (hEdge!=NULL)
-    pFree1(hEdge);
+    pFree(hEdge);
   hEdge = pInit();
   pWork = pInit();
   hHedgeStep(hpure, hexist, hNstc, hvar, hNvar,hEdge);
@@ -1081,7 +1081,7 @@ void scComputeHC(ideal S, int ak, poly &hEdge)
   omFreeSize((ADDRESS)hvar, (hNvar + 1) * sizeof(int));
   omFreeSize((ADDRESS)hpure, (1 + (hNvar * hNvar)) * sizeof(Exponent_t));
   hDelete(hexist, hNexist);
-  pFree1(pWork);
+  pFree(pWork);
 }
 
 

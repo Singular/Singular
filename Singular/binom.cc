@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.16 2000-08-14 12:55:54 obachman Exp $ */
+/* $Id: binom.cc,v 1.17 2000-09-12 16:00:48 obachman Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -18,7 +18,6 @@
 #include "tok.h"
 #include "febase.h"
 #include "polys.h"
-#include "polys-comp.h"
 #include "ring.h"
 
 extern int  pComponentOrder;

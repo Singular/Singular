@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.16 2000-08-14 12:56:55 obachman Exp $ */
+/* $Id: syz2.cc,v 1.17 2000-09-12 16:01:22 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -29,7 +29,6 @@
 #include "ring.h"
 #include "lists.h"
 #include "kbuckets.h"
-#include "polys-comp.h"
 #include "prCopy.h"
 
 //#define SHOW_PROT
@@ -236,13 +235,13 @@ Print("gefunden in Mod %d: ",index); poly_write((syzstr->resPairs[index])[ti].lc
           tso.syz = pCopy((syzstr->resPairs[index])[i].syz);
           poly tt = pDivide(tso.lcm,tso.p1);
           pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
-          tso.syz = pMultT(tso.syz,tt);
+          tso.syz = pMult_mm(tso.syz,tt);
           pDelete(&tt);
           coefgcd = nNeg(coefgcd);
           pp = pCopy((syzstr->resPairs[index])[r1].syz);
           tt = pDivide(tso.lcm,tso.p2);
           pSetCoeff(tt,nDiv(pGetCoeff(tso.p2),coefgcd));
-          pp = pMultT(pp,tt);
+          pp = pMult_mm(pp,tt);
           pDelete(&tt);
           tso.syz = pAdd(pp,tso.syz);
           nDelete(&coefgcd);
@@ -673,7 +672,7 @@ Print(" mit index %d, %d ",tso.ind1,tso.ind2);
         {
           number n=nInvers(pGetCoeff(tso.p));
           pNorm(tso.p);
-          pMultN(tso.syz,n);
+          pMult_nn(tso.syz,n);
           nDelete(&n);
         }
         if (k==IDELEMS((syzstr->res)[index]))

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.44 2000-09-04 13:38:58 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.45 2000-09-12 16:00:59 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -82,7 +82,7 @@ static int redHomog (LObject* h,kStrategy strat)
 #endif
     if (h->p == NULL)
     {
-      if (h->lcm!=NULL) pFree1((*h).lcm);
+      if (h->lcm!=NULL) pFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -139,7 +139,7 @@ static int redLazy (LObject* h,kStrategy strat)
 
     if ((*h).p == NULL)
     {
-      if (h->lcm!=NULL) pFree1((*h).lcm);
+      if (h->lcm!=NULL) pFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -290,7 +290,7 @@ static int redHoney (LObject*  h,kStrategy strat)
     }
     if ((*h).p == NULL)
     {
-      if (h->lcm!=NULL) pFree1((*h).lcm);
+      if (h->lcm!=NULL) pFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -379,33 +379,33 @@ static int redBest (LObject*  h,kStrategy strat)
               ph = ksCreateShortSpoly(strat->T[j].p,(*h).p);
               if (ph==NULL)
               {
-                pFree1(p);
+                pFree(p);
                 pDelete(&((*h).p));
-                if (h->lcm!=NULL) pFree1((*h).lcm);
+                if (h->lcm!=NULL) pFree((*h).lcm);
 #ifdef KDEBUG
                 (*h).lcm=NULL;
 #endif
                 return 0;
               }
-              else if (pComp0(ph,p) == -1)
+              else if (pLmCmp(ph,p) == -1)
               {
-                pFree1(p);
+                pFree(p);
                 p = ph;
                 jbest = j;
               }
               else
               {
-                pFree1(ph);
+                pFree(ph);
               }
             }
           }
         }
-        pFree1(p);
+        pFree(p);
         (*h).p = ksOldSpolyRed(strat->T[jbest].p,(*h).p,strat->kNoether);
       }
       else
       {
-        if (h->lcm!=NULL) pFree1((*h).lcm);
+        if (h->lcm!=NULL) pFree((*h).lcm);
 #ifdef KDEBUG
         (*h).lcm=NULL;
 #endif
@@ -605,7 +605,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (pNext(strat->P.p) == strat->tail)
     {
       /* deletes the short spoly and computes */
-      pFree1(strat->P.p);
+      pFree(strat->P.p);
       /* the real one */
       ksCreateSpoly(&(strat->P),
                     strat->kNoether);
@@ -668,7 +668,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->enterS(strat->P, pos, strat);
         if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }
-      if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
+      if (strat->P.lcm!=NULL) pFree(strat->P.lcm);
       if (strat->sl>srmax) srmax = strat->sl;
     }
 #ifdef KDEBUG

@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.3 2000-09-04 13:39:02 obachman Exp $
+ *  Version: $Id: p_Procs.h,v 1.4 2000-09-12 16:01:07 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
@@ -27,10 +27,6 @@
 // only the dispatching function call 
 
 /*------------- Allocation/Deletion ----------------------*/
-// returns a copy of p
-P_INLINE poly p_Copy(poly p, const ring r = currRing);
-// deletes *p, and sets *p to NULL
-P_INLINE void p_Delete(poly *p, const ring r = currRing);
 
 /*------------- comparisons ----------------------*/
 // returns 1 if Lm(p) > Lm(q)
@@ -40,28 +36,6 @@ P_INLINE void p_Delete(poly *p, const ring r = currRing);
 P_INLINE int p_LmCmp(const poly p, const poly q, const ring r = currRing);
 
 /*------------- Arithmetic operations ----------------------*/
-/* NOTE as a general rule that 
-   pp means input is constant; p means input is destroyed */
-// returns -p
-P_INLINE poly p_Neg(poly p, const ring r = currRing);
-// returns p*n, p is const
-P_INLINE poly pp_Mult_nn(poly p, number n, const ring r = currRing);
-// returns p*n, destroys p
-P_INLINE poly p_Mult_nn(poly p, number n, const ring r = currRing);
-// returns p*m, does neither destroy p nor m
-P_INLINE poly pp_Mult_mm(poly p, poly m, const ring r = currRing);
-// returns p*m, destroys p, const: m
-P_INLINE poly p_Mult_mm(poly p, poly m, const ring r = currRing);
-// returns p+q, destroys p and q
-P_INLINE poly p_Add_q(poly p, poly q, const ring r = currRing);
-// return p - m*q, destroys p; const: q,m
-P_INLINE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r = currRing);
-// returns p + m*q destroys p, const: q, m
-P_INLINE poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r = currRing);
-// returns p*q, destroys p and q
-P_INLINE poly p_Mult_q(poly p, poly q, const ring r = currRing);
-// returns p*q, does neither destroy p nor q
-P_INLINE poly pp_Mult_qq(poly p, poly q, const ring r = currRing);
 
 /*------------- p_Proc stuff ----------------------*/
 typedef poly (*p_Copy_Proc_Ptr)(poly p, const ring r);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.51 2000-08-14 12:56:32 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.52 2000-09-12 16:00:59 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -95,7 +95,7 @@ void deleteHCs (TObject* p,kStrategy strat)
     o = pFDeg(p1);
     while (pNext(p1) != NULL)
     {
-      if (pComp0(pNext(p1),strat->kNoether) == -1)
+      if (pLmCmp(pNext(p1),strat->kNoether) == -1)
       {
         pDelete(&(pNext(p1)));
         (*p).ecart = pLDeg((*p).p,&((*p).length))-o;
@@ -198,7 +198,7 @@ int redEcart19 (LObject* h,kStrategy strat)
       strat->fromT=FALSE;
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) pFree1((*h).lcm);
+        if (h->lcm!=NULL) pFree((*h).lcm);
         return 0;
       }
       h->sev = pGetShortExpVector(h->p);
@@ -355,7 +355,7 @@ int redEcart (LObject* h,kStrategy strat)
       strat->fromT=FALSE;
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) pFree1((*h).lcm);
+        if (h->lcm!=NULL) pFree((*h).lcm);
         return 0;
       }
       h->sev = pGetShortExpVector(h->p);
@@ -472,7 +472,7 @@ int redFirst (LObject* h,kStrategy strat)
       }
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) pFree1((*h).lcm);
+        if (h->lcm!=NULL) pFree((*h).lcm);
         h->sev = 0;
         return 0;
       }
@@ -622,7 +622,7 @@ int redMoraBest (LObject* h,kStrategy strat)
       strat->fromT=FALSE;
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) pFree1((*h).lcm);
+        if (h->lcm!=NULL) pFree((*h).lcm);
         return 0;
       }
       h->sev = pGetShortExpVector(h->p);
@@ -960,7 +960,7 @@ void updateL(kStrategy strat)
       if (j<0) break;
       if (pNext(strat->L[j].p) == strat->tail)
       {
-        pFree1(strat->L[j].p);    /*deletes the short spoly and computes*/
+        pFree(strat->L[j].p);    /*deletes the short spoly and computes*/
         strat->L[j].p=ksOldCreateSpoly(strat->L[j].p1,
                                     strat->L[j].p2,
                                     strat->kNoether);   /*the real one*/
@@ -993,14 +993,14 @@ void updateLHC(kStrategy strat)
     if (pNext(strat->L[i].p) == strat->tail)
     {
        /*- deletes the int spoly and computes -*/
-      if (pComp0(strat->L[i].p,strat->kNoether) == -1)
+      if (pLmCmp(strat->L[i].p,strat->kNoether) == -1)
       {
-        pFree1(strat->L[i].p);
+        pFree(strat->L[i].p);
         strat->L[i].p = NULL;
       }
       else
       {
-        pFree1(strat->L[i].p);
+        pFree(strat->L[i].p);
         strat->L[i].p = ksOldCreateSpoly(strat->L[i].p1,
                                          strat->L[i].p2,
                                          strat->kNoether);
@@ -1345,7 +1345,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->Ll--;
     if (pNext(strat->P.p) == strat->tail)
     {
-      pFree1(strat->P.p);/*- deletes the short spoly and computes -*/
+      pFree(strat->P.p);/*- deletes the short spoly and computes -*/
       strat->P.p = ksOldCreateSpoly(strat->P.p1,
                                     strat->P.p2,
                                     strat->kNoether);/*- the real one -*/
@@ -1395,7 +1395,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             }
             if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
           }
-          if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
+          if (strat->P.lcm!=NULL) pFree(strat->P.lcm);
           strat->P.lcm=NULL;
 #ifdef KDEBUG
       memset(&strat->P,0,sizeof(strat->P));

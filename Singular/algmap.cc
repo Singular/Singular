@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.16 2000-08-14 12:55:53 obachman Exp $ */
+/* $Id: algmap.cc,v 1.17 2000-09-12 16:00:48 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -36,7 +36,7 @@ static poly maLongalg1Fetch(poly res, poly p0, ring r0, int n,
   do
   {
     q0 = pInit();
-    pSetComp(q0,pRingGetComp(r0, p0));
+    pSetComp(q0,p_GetComp(p0, r0));
     if (t!=0)
     {
       pGetCoeff(q0) = (number)omAlloc0Bin(rnumber_bin);
@@ -53,7 +53,7 @@ static poly maLongalg1Fetch(poly res, poly p0, ring r0, int n,
     }
     for (i=m; i>0; i--)
     {
-      pSetExp(q0,i, pRingGetExp(r0, p0,i));
+      pSetExp(q0,i, p_GetExp( p0,i,r0));
     }
     j = t;
     for (i=m+1; i<=n; i++)
@@ -87,10 +87,10 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
     a0 = naGetNom0(pGetCoeff(p0));
   }
   q0 = pInit();
-  pSetComp(q0,pRingGetComp(r0, p0));
+  pSetComp(q0,p_GetComp(p0, r0));
   for (i=n; i>0; i--)
   {
-    pSetExp(q0,i, pRingGetExp(r0,p0,i));
+    pSetExp(q0,i, p_GetExp(p0,i,r0));
   }
   pSetm(q0);
   do
@@ -112,7 +112,7 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
     for (i=s+1; i<=t; i++)
     {
       j++;
-      napGetExp(b0,i) = pRingGetExp(r0,p0,j);
+      napGetExp(b0,i) = p_GetExp(p0,j,r0);
     }
     if (s==0)
     {
@@ -213,15 +213,15 @@ static poly maLongalgMap(poly res, ring r, poly p0, int s, int t,
       b0 = napNew();
       napGetCoeff(b0) = pGetCoeff(p0);
       naGetNom0(cc) = b0;
-      pMultN(monpart,cc);
+      pMult_nn(monpart,cc);
       napGetCoeff(b0) = NULL;
       nDelete(&cc);
     }
     else
     {
-      pMultN(monpart,pGetCoeff(p0));
+      pMult_nn(monpart,pGetCoeff(p0));
     }
-    pSetCompP(monpart, pRingGetComp(r, p0));
+    pSetCompP(monpart, p_GetComp(p0,r));
     return pAdd(res, monpart);
   }
   if (naGetDenom0(pGetCoeff(p0)) != NULL)
@@ -267,7 +267,7 @@ static poly maLongalgMap(poly res, ring r, poly p0, int s, int t,
   }
   while (a0 != NULL);
   q1 = pMult(q1,monpart);
-  pSetCompP(q1,pRingGetComp(r, p0));
+  pSetCompP(q1,p_GetComp(p0,r));
   return pAdd(res, q1);
 }
 

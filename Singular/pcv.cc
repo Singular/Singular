@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.29 2000-08-14 12:56:43 obachman Exp $ */
+/* $Id: pcv.cc,v 1.30 2000-09-12 16:01:08 obachman Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -61,7 +61,7 @@ lists pcvPMulL(poly p,lists l1)
     if(l1->m[i].rtyp==POLY_CMD)
     {
       l0->m[i].rtyp=POLY_CMD;
-      l0->m[i].data=pMult(pCopy(p),pCopy((poly)l1->m[i].data));
+      l0->m[i].data=ppMult_qq(p,(poly)l1->m[i].data);
     }
   }
   return(l0);

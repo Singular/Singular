@@ -97,9 +97,10 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
     ndbm.cc  libparse.cc mod_raw.cc\
-    pcv.cc kbuckets.cc prProcs.cc \
+    pcv.cc kbuckets.cc\
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
-    prCopy.cc p_Procs.cc p_Mult_q.cc 
+    prCopy.cc p_Procs.cc p_Mult_q.cc \
+    pInline2.cc pInline1.cc pInline0.cc
 
 
 # normal C source files
@@ -115,7 +116,6 @@ SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} mmalloc.cc\
         pp_Mult_mm__Template.cc p_Mult_mm__Template.cc \
         p_Minus_mm_Mult_qq__Template.cc p_Add_q__Template.cc \
 	p_Neg__Template.cc \
-	pInline.cc p_Inline.cc
 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
@@ -130,13 +130,14 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	fglmgauss.h fglmvec.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h \
 	kutil.h mpsr_Put.h sing_dld.h\
-	ndbm.h polys-impl.h polys-comp.h libparse.h \
+	ndbm.h polys-impl.h libparse.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
-	pcv.h mod_raw.h kbuckets.h prProcs.h \
+	pcv.h mod_raw.h kbuckets.h \
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
 	feOpt.h fegetopt.h distrib.h walk.h \
 	prCopy.h \
-        p_MemAdd.h p_MemCopy.h p_MemCmp.h p_Numbers.h
+        p_MemAdd.h p_MemCopy.h p_MemCmp.h p_Numbers.h \
+        pInline2.h pInline1.h pInline0.h 
 
 INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc feOpt.inc
 

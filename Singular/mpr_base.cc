@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.21 2000-08-14 12:56:39 obachman Exp $ */
+/* $Id: mpr_base.cc,v 1.22 2000-09-12 16:01:03 obachman Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -1446,7 +1446,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
     pSetExpV( epp, epp_mon );
 
     //
-    rowp= pMult( pCopy(epp), pCopy((gls->m)[(*E)[i]->rc.set]) );  // x^(p-a[ij]) * f(i)
+    rowp= ppMult_qq( epp, (gls->m)[(*E)[i]->rc.set] );  // x^(p-a[ij]) * f(i)
 
     cp= 2;
     // get column for every monomial in rowp and store it
@@ -2384,14 +2384,14 @@ void resMatrixDense::generateBaseData()
       for ( i= 0; i < numVectors; i++ ) resVectorList[k].numColVector[i]= nInit(0);
 
       // compute row poly
-      poly pi= pMult( pCopy( (gls->m)[ resVectorList[k].elementOfS ] ) , pCopy( resVectorList[k].mon ) );
+      poly pi= ppMult_qq( (gls->m)[ resVectorList[k].elementOfS ] , resVectorList[k].mon );
       pi= pDivideM( pCopy( pi ), pCopy( resVectorList[k].dividedBy ) );
 
       // fill in "matrix"
       while ( pi != NULL )
       {
         matEntry= nCopy(pGetCoeff(pi));
-        pmatchPos= pHead0( pi );
+        pmatchPos= pInit( pi );
         pSetCoeff0( pmatchPos, nInit(1) );
 
         for ( i= 0; i < numVectors; i++)

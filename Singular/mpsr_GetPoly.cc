@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.27 2000-08-14 12:56:42 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.28 2000-09-12 16:01:03 obachman Exp $ */
 
 /***************************************************************
  *
@@ -465,7 +465,7 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
   if (gNvars > 1)
   {
     mp_failr(IMP_GetSint32Vector(link, &gTa, n1));
-    pGetComp(pp) = gTa[0];
+    pSetComp(pp, gTa[0]);
     for (i=1; i<n1; i++)
       pSetExp(pp, i, (Exponent_t) gTa[i]);
     pSetm(pp);
@@ -476,7 +476,7 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32Vector(link, &gTa, n1));
-      pGetComp(pp) =  gTa[0];
+      pSetComp(pp, gTa[0]);
       for (i=1; i<n1; i++)
         pSetExp(pp,i, (Exponent_t) gTa[i]);
       pSetm(pp);
@@ -485,7 +485,7 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
   else
   {
     mp_failr(IMP_GetSint32(link, &i));
-    pGetComp(pp) = (Exponent_t) i;
+    pSetComp(pp, i);
     mp_failr(IMP_GetSint32(link, &i));
     pSetExp(pp,1, (Exponent_t) i);
     pSetm(pp);
@@ -496,7 +496,7 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32(link, &i));
-      pGetComp(pp) = (Exponent_t) i;
+      pSetComp(pp, i);
       mp_failr(IMP_GetSint32(link, &i));
       pSetExp(pp,1, (Exponent_t) i);
       pSetm(pp);
@@ -568,7 +568,7 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
       mpsr_SetCurrRing(r, TRUE);
       minpoly = maIMap(subring, minpoly);
       r->minpoly = minpoly->coef;
-      pFree1(minpoly);
+      pFree(minpoly);
     }
     rKill(subring);
   }

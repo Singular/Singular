@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__Template.cc,v 1.1 2000-08-29 14:10:30 obachman Exp $
+ *  Version: $Id: pp_Mult_mm__Template.cc,v 1.2 2000-09-12 16:01:12 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -25,7 +25,7 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
   number ln = pGetCoeff(m);
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpLSize);
-  const unsigned long* m_e = m->exp.l;
+  const unsigned long* m_e = m->exp;
   assume(!p_nIsZero(ln,r));
 
   if (spNoether == NULL)
@@ -35,7 +35,7 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
       omTypeAllocBin(poly, pNext(q), bin);
       q = pNext(q);
       pSetCoeff0(q, p_nMult(ln, pGetCoeff(p), ri));
-      p_MemAdd(q->exp.l, p->exp.l, m_e, length);
+      p_MemSum(q->exp, p->exp, m_e, length);
       p = pNext(p);
     }
     while (p != NULL);
@@ -46,9 +46,9 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
     while (p != NULL)
     {
       omTypeAllocBin(poly, r, bin);
-      p_MemAdd(r->exp.l, p->exp.l, m_e, length);
+      p_MemSum(r->exp, p->exp, m_e, length);
 
-      if (prComp0(r, spNoether, ri) == -1)
+      if (p_LmCmp(r, spNoether, ri) == -1)
       {
         omFreeBinAddr(r);
         break;

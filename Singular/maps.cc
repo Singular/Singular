@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.26 2000-09-07 16:22:39 Singular Exp $ */
+/* $Id: maps.cc,v 1.27 2000-09-12 16:01:02 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -74,8 +74,7 @@ poly maEvalVariable(poly p, int v,int pExp,matrix s)
     // multiply
     for(;j<=pExp;j++)
     {
-      p0=MATELEM(s,v,j)=pMult(pCopy(p0/*MATELEM(s,v,j-1)*/),
-                              pCopy(p/*theMap->m[v-1]*/));
+      p0=MATELEM(s,v,j)=ppMult_qq(p0, p);
       pNormalize(p0);
     }
     res=pCopy(p0/*MATELEM(s,v,pExp)*/);
@@ -95,7 +94,7 @@ poly maEvalMonom(map theMap, poly p,ring preimage_r,matrix s)
     int i;
     for(i=preimage_r->N; i>0; i--)
     {
-      int pExp=pRingGetExp(preimage_r, p,i);
+      int pExp=p_GetExp( p,i,preimage_r);
       if (pExp != 0)
       {
         if (theMap->m[i-1]!=NULL)
@@ -111,7 +110,7 @@ poly maEvalMonom(map theMap, poly p,ring preimage_r,matrix s)
         }
       }
     }
-    int modulComp = pRingGetComp(preimage_r, p);
+    int modulComp = p_GetComp( p,preimage_r);
     if (q!=NULL) pSetCompP(q,modulComp);
   return q;
 }
@@ -177,8 +176,8 @@ static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar)
   while (p!=NULL)
   {
     for (i=minvar;i<=maxvar;i++)
-      pSetExp(resultWorkP,i-minvar+1,pRingGetExp(p_ring,p,i));
-    pSetComp(resultWorkP,pRingGetComp(p_ring,p));
+      pSetExp(resultWorkP,i-minvar+1,p_GetExp(p,i,p_ring));
+    pSetComp(resultWorkP,p_GetComp(p,p_ring));
     n=nCopy(pGetCoeff(p));
     pSetCoeff(resultWorkP,n);
     pSetm(resultWorkP);
@@ -424,7 +423,7 @@ static int maMaxDeg_Ma(ideal a,ring preimage_r)
     {
       for(j=N-1;j>=0;j--)
       {
-        m[j]=max(m[j],pRingGetExp(preimage_r, p,j+1));
+        m[j]=max(m[j],p_GetExp( p,j+1,preimage_r));
         if (m[j]>=MAX_MAP_DEG)
         {
           i=MAX_MAP_DEG;
@@ -458,7 +457,7 @@ static int maMaxDeg_P(poly p,ring preimage_r)
   {
     for(j=N-1;j>=0;j--)
     {
-      m[j]=max(m[j],pRingGetExp(preimage_r,p,j+1));
+      m[j]=max(m[j],p_GetExp(p,j+1,preimage_r));
       if (m[j]>=MAX_MAP_DEG)
       {
         i=MAX_MAP_DEG;

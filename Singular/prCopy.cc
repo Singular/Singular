@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.4 2000-08-29 14:10:30 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.5 2000-09-12 16:01:13 obachman Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
@@ -13,7 +13,6 @@
 #include "tok.h"
 #include "ring.h"
 #include "ideals.h"
-#include "polys-comp.h"
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -26,9 +25,11 @@ poly prMergeR(poly p1, poly p2, ring r)
   
   spolyrec rp;
   poly p = &rp;
+  prTest(p1, r);
+  prTest(p2, r);
   
   Top:
-  _prMonCmp(p1, p2, r, goto Equal, goto Greater, goto Smaller);
+  p_LmCmpAction(p1, p2, r, goto Equal, goto Greater, goto Smaller);
   
   Equal:
   // should never get here
@@ -57,7 +58,7 @@ poly prMergeR(poly p1, poly p2, ring r)
   goto Finish;
   
   Finish:
-  assume(prTest(pNext(&rp), r));
+  prTest(pNext(&rp), r);
   return pNext(&rp);
 }
   
@@ -100,13 +101,17 @@ static inline void
 prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
 {
   assume(dest_r == currRing);
+  number n = pGetCoeff(dest);
   int i=0;
   for (i=max; i; i--)
   {
-    pRingSetExp(dest_r, dest, i, pRingGetExp(src_r, src, i));
+    p_SetExp(dest, i, p_GetExp( src, i,src_r), dest_r);
+    assume(n == pGetCoeff(dest));
   }
-  pSetComp(dest, pRingGetComp(src_r, src));
-  pSetm(dest);
+  p_SetComp(dest, p_GetComp( src,src_r), dest_r);
+    assume(n == pGetCoeff(dest));
+  p_Setm(dest, dest_r);
+  assume(n == pGetCoeff(dest));
 }
 
 #include "prCopy.inc"

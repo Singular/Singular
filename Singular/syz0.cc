@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.30 2000-08-14 12:56:54 obachman Exp $ */
+/* $Id: syz0.cc,v 1.31 2000-09-12 16:01:20 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -54,7 +54,7 @@ static void syInitSort(ideal arg,intvec **modcomp)
       if (k<Fl)
       {
         kk=jj;
-        while ((kk<Fl) && (F[kk]) && (pComp0(oldF[k],F[kk])!=syComponentOrder))
+        while ((kk<Fl) && (F[kk]) && (pLmCmp(oldF[k],F[kk])!=syComponentOrder))
         {
             kk++;
         }
@@ -635,7 +635,7 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
           toRed = ksOldCreateSpoly(F[j],F[k]);
         else
         {
-          q = pMultT(pCopy(F[j]),multWith);
+          q = pMult_mm(pCopy(F[j]),multWith);
           toRed = sySpecNormalize(q,mW);
           pDelete(&multWith);
         }
@@ -708,7 +708,7 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
 #ifdef WRITE_BUCKETS
               Print("multiplied with: ");nWrite(up);PrintLn();
 #endif
-              pMultN(syz,up);
+              pMult_nn(syz,up);
             }
             nDelete(&up);
 
@@ -821,7 +821,7 @@ static void syMergeSortResolventFB(resolvente res,int length, int initial=1)
                           -pGetExp(res[syzIndex-1]->m[pGetComp(pp)-1],j));
             }
             pSetm(pp);
-            if (pComp(p,pNext(p)) != 1)
+            if (pCmp(p,pNext(p)) != 1)
             {
               pp = p;
               pIter(p);
