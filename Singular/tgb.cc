@@ -173,6 +173,30 @@ bool find_next_pair(calc_dat* c)
   }
   return false;
 }
+void move_forward_in_S(int old_pos, int new_pos,kStrategy strat){
+  poly p=strat->S[old_pos];
+  int ecart=strat->ecartS[old_pos];
+  long sev=strat->sevS[old_pos];
+  int s_2_r=strat->S_2_R[old_pos];
+  int length=strat->lenS[old_pos];
+  int i;
+  for (i=old_pos; i>new_pos; i--)
+    {
+      strat->S[i] = strat->S[i-1];
+      strat->ecartS[i] = strat->ecartS[i-1];
+      strat->sevS[i] = strat->sevS[i-1];
+      strat->S_2_R[i] = strat->S_2_R[i-1];
+    }
+  if (strat->lenS!=NULL)
+    for (i=old_pos; i>new_pos; i--)
+      strat->lenS[i] = strat->lenS[i-1];
+    
+    strat->S[new_pos]=p;
+  strat->ecartS[new_pos]=ecart;
+  strat->sevS[new_pos]=sev;
+  strat->S_2_R[new_pos]=s_2_r;
+  strat->lenS[new_pos]=length;
+}
 void replace_pair(int & i, int & j, calc_dat* c)
 {
   c->soon_free=NULL;
@@ -719,7 +743,7 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
     }
   }
   if (c->lengths[c->n-1]==1)
-   shorten_tails(c,c->S->m[c->n-1]);
+    shorten_tails(c,c->S->m[c->n-1]);
     //you should really update c->lengths, c->strat->lenS, and the oder of polys in strat if you sort after lengths
 
   //for(i=c->strat->sl; i>0;i--)
@@ -984,26 +1008,58 @@ int pMinDeg3(poly f){
 
 
 void shorten_tails(calc_dat* c, poly monom){
-  PrintS("ENTER");
+ 
   for(int i=0;i<c->n;i++){
     //enter tail
     if (c->rep[i]!=i) continue;
     if (c->S->m[i]==NULL) continue;
     poly tail=c->S->m[i]->next;
     poly prev=c->S->m[i];
+    bool did_something=false;
     while((tail!=NULL)&& (pLmCmp(tail, monom)>=0)){
       if (p_LmDivisibleBy(monom,tail,c->r)){
 
-	
+	did_something=true;
 	prev->next=tail->next;
 	tail->next=NULL;
 	p_Delete(& tail,c->r);
 	tail=prev;
-	PrintS("Shortened");
+	//PrintS("Shortened");
+	c->lengths[i]--;
+	
       }
 
       prev=tail;
       tail=tail->next;
+    }
+    if (did_something){
+      int new_pos=simple_posInS(c->strat,c->S->m[i],c->lengths[i]);
+      int old_pos=-1;
+      //assume new_pos<old_pos
+      for (int z=new_pos;z<=c->strat->sl;z++)
+      {
+	if (c->strat->S[z]==c->S->m[i])
+	  {
+	    old_pos=z;
+	    break;
+	  }
+      }
+      assume(old_pos>=0);
+      assume(pLength(c->strat->S[old_pos])==c->lengths[i]);
+      c->strat->lenS[old_pos]=c->lengths[i];
+
+      move_forward_in_S(old_pos,new_pos,c->strat);
+      if (c->lengths[i]==1){
+	int j;
+	for ( j=0;j<i;j++){
+	  if (c->lengths[j]==1)
+	    c->states[i][j]=HASTREP;
+	}
+	for ( j=i+1;j<c->n;j++){
+	  if (c->lengths[j]==1)
+	    c->states[j][i]=HASTREP;
+	}
+      }
     }
   }
 }
