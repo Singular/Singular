@@ -1,6 +1,7 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.12 1998-04-29 10:26:27 obachman Exp $
+@comment $Id: general.doc,v 1.13 1998-04-29 11:40:51 Singular Exp $
 @comment this file contains the general information about Singular
+@c * wichmann: + removed typographical errors.
 
 @menu
 * Interactive use::             
@@ -414,7 +415,7 @@ The other types do not belong to a ring and can be accessed within every ring.
 defines a base ring for polynomials, ideals, vectors, modules, resolutions
 and matrices and set it as the actual basering
 
-All advanced algorithm in @sc{Singular} require a ring.
+All advanced algorithms in @sc{Singular} require a ring.
 The last defined ring is the basering until a new ring is defined
 or until it is changed with @code{setring} or @code{keepring} or
 it gets killed.
@@ -522,7 +523,7 @@ be omitted.
                 // a few powers of primes
                 // (see file gftable/49)
                 // the computations are faster
-                //   in this representation
+                // in this representation
 @end example
 @example
   ring r8=(181,A,B,Z),(x,y,z),dp;
