@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.10 1997-07-16 10:17:29 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.11 1997-07-31 13:31:29 schmidt Exp $ */
 
 #include <config.h>
 
@@ -156,8 +156,9 @@ cf2double ( const CanonicalForm & f )
 //
 // norm() - return euclidean norm of f.
 //
-// That, is norm(f) = sqrt(sum( f[i]^2 )).  f should be an
-// univariate poly over Z.
+// That is, returns the largest integer smaller or equal
+// norm(f) = sqrt(sum( f[i]^2 )).  f should be an univariate
+// polynomial over Z.
 //
 //}}}
 static CanonicalForm
@@ -174,13 +175,17 @@ norm ( const CanonicalForm & f )
 //{{{ static int kBound ( const CanonicalForm & f, int p )
 //{{{ docu
 //
-// kBound() - return bound of coefficients of factors of f (???).
+// kBound() - return bound of coefficients of factors of f.
+//
+// The bound is returned as an integer k such that p^k is larger
+// than all coefficients of all possible factors of f.  f should
+// be an univariate polynomial over Z.
 //
 //}}}
 static int
 kBound ( const CanonicalForm & f, int p )
 {
-    return (int)(f.degree() + (double)(ilog2( abs(lc(f)) * norm(f) ) + 1) / (double)ilog2(p)) + 1;
+    return (int)(f.degree() + (double)(ilog2( norm(f)+1 ) + 1) / (double)ilog2(p)) + 1;
 }
 //}}}
 
