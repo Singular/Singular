@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.41 1998-05-07 16:56:23 Singular Exp $
+@comment $Id: general.doc,v 1.42 1998-05-08 07:48:45 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -442,7 +442,7 @@ Objects from one ring can be mapped to another
 ring with an object of type @code{map}
 (or with the commands @code{fetch} or @code{imap}).
 They are all algebras over the ground
-field. Hence, in oder to compute in one of the ground fields,
+field. Hence, in order to compute in one of the ground fields,
 one has to define a ring (with at least one variable and a monomial
 ordering).
 
@@ -454,7 +454,7 @@ the rational numbers Q (char 0)
 a finite field Z/p, p a prime <= 32003 (char p)
 @item
 @tex
-a finite field with $q=p^n$ elements ($p^n<=\le 2^{15}$)
+\noindent a finite field with $q=p^n$ elements ($p^n<=\le 2^{15}$)
 @end tex
 @ifinfo
 a finite field with q=p^n elements (p^n<=2^15)
@@ -488,7 +488,7 @@ The other types do not belong to a ring and can be accessed within every ring.
 @code{32003,(x,y,z),(dp,C);}
 @item @strong{Purpose:}
 defines a base ring for polynomials, ideals, vectors, modules, resolutions
-and matrices and set it as the actual basering
+and matrices and set it as the actual basering.
 
 All advanced algorithms in @sc{Singular} require a ring.
 The last defined ring is the basering until a new ring is defined
@@ -635,11 +635,11 @@ are only implemented in the first case)
 
 @* Computation over the field @code{real} has computing errors because
 of rounding.
-@item @strong{Use in proc:}
-All changes of the base ring by a definition
-of a new ring or a setring command in a proc are local to this proc
-(i.e. will not affect the calling procedure)
-unless a @code{keepring} command is used.
+@item @strong{Use in procedures:}
+All changes of the base ring by a definition of a new @code{ring} or a
+@code{setring} command in a procedure are local to this procedure
+(i.e. will not affect the calling procedure) unless a @code{keepring}
+command is used.
 @end table
 @menu
 * ring::
@@ -1530,7 +1530,7 @@ the sequence of commands stored in the specified procedure.
 @code{proc} name block
 @*@code{proc} name parameter_list block
 @item @strong{Purpose:}
-define a new function
+defines a new function.
 @item @strong{Default:}
 none
 @item @strong{Example (for a procedure without an argument list):}
@@ -1622,7 +1622,7 @@ if you do a @code{listvar()} command inside a proc.
 @code{( )}
 @*@code{(} parameter_definition @code{)}
 @item @strong{Purpose:}
-define the number, type and names of the
+defines the number, type and names of the
 arguments to a @code{proc}.
 @*The parameter_list is optional.
 The default for a parameter_list is @code{(list #)}
@@ -1722,7 +1722,7 @@ see @ref{return}
    sequence_of_commands;
 @*@code{@}}
 @item @strong{Purpose:}
-define the @code{proc} proc_name with the additional information
+defines the @code{proc} proc_name with the additional information
 help_text, which is copied to the screen by @code{help proc_name;}
 and the @code{example} section
 which is executed by @code{example proc_name;}.
@@ -1815,7 +1815,7 @@ with the LIB command.
 @item @strong{Syntax:}
 @code{LIB} string_expression@code{;}
 @item @strong{Purpose:}
-read a library of procedures (proc) from a file. If the given
+reads a library of procedures (proc) from a file. If the given
 filename does not start with @kbd{.} or @kbd{/}, the following directories ares
 searched for the file: the current directory,
 the directories given in the environment variable
@@ -2026,7 +2026,7 @@ specifying the type of error and the line where it was detected.
 @item @strong{Syntax:}
 @code{LIB} string_constant @code{;}
 @item @strong{Purpose:}
-Load the given library, if it is not already loaded. Makes the procedures
+Loads the given library, if it is not already loaded. Makes the procedures
 of that given library available to @code{Singular}.
 If a library uses procedures from other libraries, theses should be
 called by such a @code{LIB} command.
@@ -2044,8 +2044,8 @@ called by such a @code{LIB} command.
 @item @strong{Syntax:}
 @code{info} = string_constant @code{;}
 @item @strong{Purpose:}
-define the general help for the library. This text is displayed on
-@code{help lib_name}.
+defines the general help for the library. This text is displayed on
+@code{help lib_name;}.
 @item @strong{Example:}
 @example
   info="
@@ -2069,7 +2069,7 @@ description of each procedure).
 @item @strong{Syntax:}
 @code{version} = string_constant @code{;}
 @item @strong{Purpose:}
-define the version number for the library. It is displayed when the
+defines the version number for the library. It is displayed when the
 library is loaded.
 @item @strong{Example:}
 @example

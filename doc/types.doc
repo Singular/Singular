@@ -1,9 +1,6 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.27 1998-05-08 06:48:32 wichmann Exp $
+@comment $Id: types.doc,v 1.28 1998-05-08 07:49:26 wichmann Exp $
 @comment this file contains the type definitions
-@c * wichmann: + added comment on MP and Unix platforms.
-@c             + added comment on .rhosts file.
-@c             + used new doc2tex feature @c ref.
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-b).
@@ -258,7 +255,7 @@ interreduction of an ideal (see @ref{interred})
 @item @code{intersect}
 ideal intersection (see @ref{intersect})
 @item @code{jacob}
-ideal of all partial derivatives resp. jacobi matrix (see @ref{jacob})
+ideal of all partial derivatives resp. jacobian matrix (see @ref{jacob})
 @item @code{jet}
 k-jet: Taylor series up to a given order (see @ref{jet})
 @item @code{kbase}
@@ -1289,9 +1286,11 @@ specification. The client "listens" at the given port until the server
 application does a connect call. If @sc{Singular} is used as server
 application it has to be started with the command line option @code{-b}.
 Since launching is done using @code{rsh}, the host on which the
-application should run must have an entry in your @code{.rhosts} file.
+application should run must have an entry in your @code{.rhosts}
+file. Even the local machine must have an entry if applications should
+be launched locally.
 
-It the MPtcp link is opened in fork mode a child of the current
+If the MPtcp link is opened in fork mode a child of the current
 @sc{Singular} is forked. All variables and their values are inherited by
 the child. The child acts as a server whereas the @sc{Singular} that
 actually opened the link acts as a client.
@@ -2531,11 +2530,11 @@ Rings are ... . See @ref{Rings and orderings}.
 @cindex ring declarations
 
 @c {{{ subsection ring declarations }}}
-@c ============================================================
+@c ------------------------------------------------------------
 @c   This piece of text exists also in the file general.doc, 
 @c   chapter "General syntax of a ring declaration".
 @c   If you change something here, change it there, too!
-@c ============================================================
+@c ------------------------------------------------------------
 @table @code
 @item @strong{Syntax:}
 @code{ring} name @code{=} field@code{,}
@@ -2553,7 +2552,7 @@ The coefficient field is given by either
 the characteristic (0 or a prime <= 32003)
 @item
 an expression_list of the characteristic and
-the names of  parameters
+the names of parameters
 @item
 an expression_list of the number of elements
 (a small prime characteristic p to the power of a small exponent n) and a
