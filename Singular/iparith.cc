@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.249 2001-01-15 09:41:08 Singular Exp $ */
+/* $Id: iparith.cc,v 1.250 2001-01-30 13:34:41 pohl Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2619,31 +2619,16 @@ static BOOLEAN jjDEFINED(leftv res, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjDET(leftv res, leftv v)
 {
-  int i,j;
   matrix m=(matrix)v->Data();
-  if (currRing->parameter==NULL)
+  poly p;
+  if (smCheckDet((ideal)m,m->cols(),TRUE))
   {
-    for(i=m->rows();i>0;i--)
-    {
-      for(j=m->cols();j>0;j--)
-      {
-        if((MATELEM(m,i,j)!=NULL)
-        && (!pIsConstant(MATELEM(m,i,j))))
-        {
-          goto nonconst;
-        }
-      }
-    }
-    res->data = (char *)singclap_det(m);
-    return FALSE;
+    ideal I=idMatrix2Module(mpCopy(m));
+    p=smCallDet(I);
+    idDelete(&I);
   }
-nonconst:
-  ideal I=idMatrix2Module(mpCopy(m));
-// TBC: CHECK THIS (barei.tst)!!
-//  ideal I=idMatrix2Module(m);
-//  v->SetData(NULL);
-  poly p=smCallDet(I);
-  idDelete(&I);
+  else
+    p=singclap_det(m);
   res ->data = (char *)p;
   return FALSE;
 }
@@ -2664,7 +2649,15 @@ static BOOLEAN jjDET_I(leftv res, leftv v)
 static BOOLEAN jjDET_S(leftv res, leftv v)
 {
   ideal I=(ideal)v->Data();
-  poly p=smCallDet(I);
+  poly p;
+  if (smCheckDet(I,IDELEMS(I),FALSE))
+  {
+    matrix m=idModule2Matrix(idCopy(I));
+    p=singclap_det(m);
+    idDelete((ideal *)&m);
+  }
+  else
+    p=smCallDet(I);
   res->data = (char *)p;
   return FALSE;
 }
