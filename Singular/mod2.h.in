@@ -147,6 +147,11 @@
 #define PROFILER 
 #endif
 
+/* Define if fglmzero constructors do not work */
+#if defined(__MWERKS__) || defined(WINNT)
+#define __NO_CONSTR__
+#endif
+
 /* Define to use gmp for rational arithmetic */
 #define HAVE_GMP
 
@@ -156,6 +161,11 @@
 /* FGLM needs factory */
 #ifdef HAVE_FACTORY
 #define HAVE_FGLM
+#endif
+
+/* Define if you want fglm for homogeneous case */
+#ifdef HAVE_FGLM
+#undef HAVE_FGLM_HOME
 #endif
 
 /* Undefine to disable real time measurments  */

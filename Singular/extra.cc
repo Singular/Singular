@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.51 1998-05-27 17:14:05 Singular Exp $ */
+/* $Id: extra.cc,v 1.52 1998-06-03 14:25:39 pohl Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -61,8 +61,6 @@
 #include "clapsing.h"
 #include "clapconv.h"
 #include "kstdfac.h"
-#include "fglmcomb.cc"
-#include "fglm.h"
 #endif
 
 #include "silink.h"
@@ -594,6 +592,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 /*==================== fastcomb =============================*/
     if(strcmp((char*)(h->Data()),"fastcomb")==0)
     {
+#include "fglmcomb.cc"
+#include "fglm.h"
       if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
       {
         int i=0;
@@ -615,6 +615,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 /*==================== comb =============================*/
     if(strcmp((char*)(h->Data()),"comb")==0)
     {
+#include "fglmcomb.cc"
+#include "fglm.h"
       if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
       {
         int i=0;

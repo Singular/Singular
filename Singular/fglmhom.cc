@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.8 1998-05-15 14:31:13 wichmann Exp $
+// $Id: fglmhom.cc,v 1.9 1998-06-03 14:25:40 pohl Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -14,7 +14,7 @@
 #endif
 
 #include "mod2.h"
-#ifdef HAVE_FGLM
+#ifdef HAVE_FGLM_HOM
 #include "tok.h"
 #include "structs.h"
 #include "subexpr.h"  
