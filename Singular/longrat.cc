@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.48 2003-03-25 09:56:57 Singular Exp $ */
+/* $Id: longrat.cc,v 1.49 2003-03-25 11:00:06 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -906,7 +906,13 @@ number nlDiv (number a, number b)
       if (a->s<2)
       {
         mpz_init_set(&u->n,&a->n);
-        mpz_mul_si(&u->n,&u->n,SR_TO_INT(b));
+        if ((int)b>0)
+          mpz_mul_ui(&u->n,&u->n,SR_TO_INT(b));
+        else
+        {
+          mpz_mul_ui(&u->n,&u->n,-SR_TO_INT(b));
+          mpz_neg(&u->z,&u->z);
+        }
       }
       else
       // long z / short b -> z/b
