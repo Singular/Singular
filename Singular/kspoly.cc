@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.8 2000-09-18 09:19:07 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.9 2000-09-25 10:44:47 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -87,6 +87,7 @@ void ksReducePoly(LObject* PR,
  ***************************************************************/
 void ksCreateSpoly(LObject* Pair, 
                    poly spNoether)
+                   
 {
   assume(kTest_L(Pair));
   poly p1 = Pair->p1;

@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.26 2000-09-04 13:39:07 obachman Exp $
+// $Id: tst.lib,v 1.27 2000-09-25 10:44:50 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.26 2000-09-04 13:39:07 obachman Exp $";
+version="$Id: tst.lib,v 1.27 2000-09-25 10:44:50 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -849,6 +849,13 @@ proc tst_cyclic(int n)
   }
   id[n] = p -1;
   return (id);
+}
+
+proc tst_hom_cyclic(int n)
+{
+  ideal i = tst_cyclic(n);
+  i[n] = i[n] + 1 + var(n+1)^n;
+  return (i);
 }
 
 proc tst_TestMult(ideal id, int how_often, int Module)
