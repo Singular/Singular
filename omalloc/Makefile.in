@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.14 2002-02-18 10:56:28 Singular Exp $
+### Version: $Id: Makefile.in,v 1.15 2002-03-08 12:23:05 hannes Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -234,7 +234,7 @@ mostlyclean:
 clean: mostlyclean
 
 distclean: clean
-	-rm -f  *~ .\#*  stamp-h configure omMalloc.h
+	-rm -f  *~ .\#*  stamp-h omMalloc.h
 	rm -rf omalloc-$(VERSION)
 	-rm -f omConfig.h omlimits.h Makefile TAGS* tags config.status config.cache config.log
 
