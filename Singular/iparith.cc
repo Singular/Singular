@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.278 2002-02-28 17:56:34 mschulze Exp $ */
+/* $Id: iparith.cc,v 1.279 2002-03-07 16:00:57 mschulze Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1660,8 +1660,8 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
   L->m[0].rtyp=MATRIX_CMD;   L->m[0].data=(void *)T;
-  L->m[1].rtyp=MATRIX_CMD;   L->m[1].data=(void *)U;
-  L->m[2].rtyp=u->Typ();     L->m[2].data=(void *)R;
+  L->m[1].rtyp=u->Typ();     L->m[1].data=(void *)R;
+  L->m[2].rtyp=MATRIX_CMD;   L->m[2].data=(void *)U;
   res->data=(char *)L;
   return FALSE;
 }
@@ -4857,13 +4857,16 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   ideal R=(ideal)L->m[1].data;
   if(v1->Typ()==POLY_CMD||v1->Typ()==VECTOR_CMD)
   {
+    if(v1->Typ()==POLY_CMD)
+      pShift(&R->m[0],-1);
     L->m[1].data=(void *)R->m[0];
     R->m[0]=NULL;
     idDelete(&R);
   }
-  else if(v1->Typ()==MATRIX_CMD)
+  else
+  if(v1->Typ()==IDEAL_CMD||v1->Typ()==MATRIX_CMD)
     L->m[1].data=(void *)idModule2Matrix(R);
-  else if(v1->Typ()!=IDEAL_CMD&&v1->Typ()!=MODUL_CMD)
+  else
     L->m[1].rtyp=MODUL_CMD;
   res->data=L;
   res->rtyp=LIST_CMD;

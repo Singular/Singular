@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.127 2002-02-28 17:56:33 mschulze Exp $ */
+/* $Id: ideals.cc,v 1.128 2002-03-07 16:00:58 mschulze Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1679,8 +1679,8 @@ static void idPrepareStd(ideal s_temp, int k)
 * of mod
 */
 
-ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
-               BOOLEAN isSB,BOOLEAN divide,matrix * unit)
+ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
+             BOOLEAN isSB, BOOLEAN divide, matrix *unit)
 {
   int lsmod =idRankFreeModule(submod), i, j, k;
   int comps_to_add=0;
@@ -1829,7 +1829,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
       if (s_rest->m[j-1]!=NULL)
       {
         pShift(&(s_rest->m[j-1]),-1);
-        s_rest->m[j-1] = pNeg(s_rest->m[j-1]);
+        s_rest->m[j-1] = s_rest->m[j-1];
       }
     }
   }
