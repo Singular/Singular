@@ -50,7 +50,7 @@ CPPFLAGS	= -I${srcdir} @CPPFLAGS@
 DEFS		= @DEFS@ -DNDEBUG
 LDFLAGS		= @LDFLAGS@
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
-LIBS		= @NEED_LIBS@
+LIBS		= -lm @NEED_LIBS@
 
 ##
 ## End configuration dependend stuff
