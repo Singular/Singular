@@ -3,10 +3,20 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.33 2000-08-24 14:42:45 obachman Exp $ */
+/* $Id: polys.h,v 1.34 2000-08-29 14:10:29 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
+
+// define/undef PINLINE to inlie some procedures
+#undef NO_PINLINE
+#if defined(NDEBUG) && !defined(NO_INLINE)
+#define PINLINE inline
+#else
+#define PINLINE
+#define NO_PINLINE 1
+#endif
+
 #include "polys-comp.h"
 #include "polys-impl.h"
 #define pFetchCopy(r,p)     _pFetchCopy(r,p)
@@ -161,8 +171,6 @@ extern  poly pHeadProc(poly p);
 #define pShallowCopyDelete(dest_heap, source_p, source_heap) \
   _pShallowCopyDelete(dest_heap, source_p, source_heap)
 
-
-
 // Adds exponents of p2 to exponents of p1
 // assumes that exponents >= 0 and and one Component != 0
 #define pMonAddOn(p1, p2)   _pMonAddOn(p1, p2)
@@ -176,13 +184,14 @@ poly      pmInit(char *s, BOOLEAN &ok);   /* monom -> poly */
 void      ppDelete(poly * a, ring r);
 
 /*-------------operations on polynomials:------------*/
-poly      pNeg(poly p);
 poly      pSub(poly a, poly b);
-poly      pMult(poly a, poly b);
+poly      pPower(poly p, int i);
+/*
 void      pMultN(poly a, number c);
 poly      pMultCopyN(poly a, number c);
-poly      pPower(poly p, int i);
-
+poly      pMult(poly a, poly b);
+poly      pNeg(poly p);
+*/
 
 // ----------------- define to enable new p_procs -----*/
 // #define HAVE_P_PROCS
@@ -191,12 +200,22 @@ poly      pPower(poly p, int i);
 #define pDelete p_Delete
 #define pCopy   p_Copy
 #define pAdd    p_Add_q
+#define pMult   p_Mult_q
+#define pNeg    p_Neg
+#define pMultN  p_Mult_nn
+#define pMultCopyN pp_Mult_nn
+#define pMultT     p_Mult_mm
 #else
 // deletes the whole polynomial p
 #define pDelete(p)      _pDelete(p, currPolyBin)
 // Returns copy of the whole polynomial
 #define pCopy(p)        _pCopy(currPolyBin, p)
+void      pMultN(poly a, number c);
+poly      pMultCopyN(poly a, number c);
 poly      pAdd(poly p1, poly p2);
+poly      pMult(poly a, poly b);
+poly      pNeg(poly p);
+poly      pMultT(poly a, poly e);
 #endif
 
 // return TRUE, if exponent and component of Lm(p1) and Lm(p2) are equal,
@@ -322,7 +341,6 @@ void  pVec2Polys(poly v, polyset *p, int *len);
 int   pVar(poly m);
 
 /*-----------specials for spoly-computations--------------*/
-poly    pMultT(poly a, poly e);
 int     pDivComp(poly p, poly q);
 BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm);
 BOOLEAN pEqualPolys(poly p1,poly p2);
@@ -332,7 +350,8 @@ BOOLEAN pComparePolys(poly p1,poly p2);
 // returns the "Short Exponent Vector" -- used to speed up divisibility
 // tests (see polys-impl.cc )
 unsigned long pGetShortExpVector(poly p);
-
+// reverses the monomials of p
+PINLINE poly pReverse(poly p);
 
 
 
@@ -352,3 +371,5 @@ BOOLEAN pDBTest(poly p,  omBin tail_heap, omBin lm_heap, char *f, int l);
 #define pDBTest(A,B,C)  (TRUE)
 #endif
 #endif
+
+#include "pInline.cc"

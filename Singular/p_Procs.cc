@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.2 2000-08-24 15:31:22 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.3 2000-08-29 14:10:27 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -41,7 +41,7 @@
 //   2 -- plus FieldZp_Length*_Ord* procs
 //   3 -- plus Field*_Length*_OrdGeneral procs
 //   4 -- all Field*_Length*_Ord* procs
-const int HAVE_FAST_P_PROCS = 2;
+const int HAVE_FAST_P_PROCS = 0;
 
 // Set HAVE_FAST_FIELD to:
 //   0 -- only FieldGeneral
@@ -55,7 +55,7 @@ const int HAVE_FAST_FIELD = 1;
 //   2 -- special cases for length <= 2
 //   3 -- special cases for length <= 4
 //   4 -- special cases for length <= 8
-const int HAVE_FAST_LENGTH = 3;
+const int HAVE_FAST_LENGTH = 8;
 
 // Set HAVE_FAST_ORD to:
 //  0  -- only OrdGeneral
@@ -71,7 +71,7 @@ const int HAVE_FAST_ORD = 4;
 //  0 -- no zero ords are considered 
 //  1 -- only ZeroOrds for OrdPosNomogPosZero, OrdNomogPosZero, OrdPomogNegZero
 //  2 -- ZeroOrds for all
-const int HAVE_FAST_ZERO_ORD = 1;
+const int HAVE_FAST_ZERO_ORD = 2;
 
 // Predicate which returns true if alloc/copy/free of numbers is
 // like that of Zp
@@ -164,10 +164,14 @@ typedef enum p_Proc
   p_Copy_Proc = 0,
   p_Delete_Proc,
   p_ShallowCopyDelete_Proc,
-  p_Mult_n_Proc,
-  p_Mult_m_Proc,
+  p_Mult_nn_Proc,
+  pp_Mult_nn_Proc,
+  pp_Mult_mm_Proc,
+  p_Mult_mm_Proc,
   p_Add_q_Proc,
-  p_Minus_m_Mult_q_Proc,
+  p_Minus_mm_Mult_qq_Proc,
+  p_ReverseNeg_Proc,
+  p_Neg_Proc,
   p_Unknown_Proc
 };
 
@@ -249,10 +253,14 @@ char* p_ProcEnum_2_String(p_Proc proc)
       case p_Copy_Proc: return "p_Copy_Proc";
       case p_Delete_Proc: return "p_Delete_Proc";
       case p_ShallowCopyDelete_Proc: return "p_ShallowCopyDelete_Proc";
-      case p_Mult_n_Proc: return "p_Mult_n_Proc";
-      case p_Mult_m_Proc: return "p_Mult_m_Proc";
+      case p_Mult_nn_Proc: return "p_Mult_nn_Proc";
+      case pp_Mult_nn_Proc: return "pp_Mult_nn_Proc";
+      case pp_Mult_mm_Proc: return "pp_Mult_mm_Proc";
+      case p_Mult_mm_Proc: return "p_Mult_mm_Proc";
       case p_Add_q_Proc: return "p_Add_q_Proc";
-      case p_Minus_m_Mult_q_Proc: return "p_Minus_m_Mult_q_Proc";
+      case p_Minus_mm_Mult_qq_Proc: return "p_Minus_mm_Mult_qq_Proc";
+      case p_ReverseNeg_Proc: return "p_ReverseNeg_Proc";
+      case p_Neg_Proc: return "p_Neg_Proc";
       case p_Unknown_Proc: return "p_Unknown_Proc";
   }
   return "NoProc_2_String";
@@ -453,18 +461,22 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
   switch(proc)
   {
       case p_Delete_Proc:
-      case p_Mult_n_Proc:
+      case p_Mult_nn_Proc:
+      case p_ReverseNeg_Proc:
+      case p_Neg_Proc:
         return field;
         
       case p_ShallowCopyDelete_Proc:
         return length;
         
       case p_Copy_Proc:
-      case p_Mult_m_Proc:
+      case pp_Mult_mm_Proc:
+      case p_Mult_mm_Proc:
+      case pp_Mult_nn_Proc:
         return index(field, length);
 
       case p_Add_q_Proc:
-      case p_Minus_m_Mult_q_Proc:
+      case p_Minus_mm_Mult_qq_Proc:
         return index(field, length, ord);
         
       default:
@@ -617,11 +629,15 @@ void p_SetProcs(ring r, p_Procs_s* p_Procs)
   assume(
     (p_Procs->p_Delete != NULL) &&
     (p_Procs->p_ShallowCopyDelete != NULL) &&
-    (p_Procs->p_Mult_n != NULL) &&
+    (p_Procs->p_Mult_nn != NULL) &&
+    (p_Procs->pp_Mult_nn != NULL) &&
     (p_Procs->p_Copy != NULL) &&
-    (p_Procs->p_Mult_m != NULL) &&
+    (p_Procs->pp_Mult_mm != NULL) &&
+    (p_Procs->p_Mult_mm != NULL) &&
     (p_Procs->p_Add_q != NULL) &&
-    (p_Procs->p_Minus_m_Mult_q != NULL));
+    (p_Procs->p_ReverseNeg != NULL) &&
+    (p_Procs->p_Neg != NULL) &&
+    (p_Procs->p_Minus_mm_Mult_qq != NULL));
 }
 
 #ifdef RDEBUG 
@@ -684,7 +700,7 @@ inline int AlreadyHaveProc(p_Proc proc, p_Field field, p_Length length, p_Ord or
 const char* macros_field[] = {"p_nCopy","p_nDelete", "p_nMult", "p_nAdd", "p_nSub", "p_nIsZero", "p_nEqual" , "p_nNeg", NULL};
 
 const char* macros_length[] =
-{"p_MemCopy", "p_MemAdd", NULL};
+{"p_MemCopy", "p_MemAdd", "p_MemIncr", NULL};
 
 const char* macros_length_ord[] = {"p_MemCmp", NULL};
 int DummyProcs = 0;
@@ -739,15 +755,15 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   else
     printf("#define DECLARE_ORDSGN(what) what\n");
 
-  // define p_Mult_m, for p_Minus_m_Mult_q
-  if (strcmp(s_what, "p_Minus_m_Mult_q") == 0)
+  // define pp_Mult_mm, for p_Minus_mm_Mult_qq
+  if (strcmp(s_what, "p_Minus_mm_Mult_qq") == 0)
   {
-    printf("#undef p_Mult_m\n");
-    printf("#define p_Mult_m p_Mult_m__%s_%s_OrdGeneral\n", s_field, s_length);
+    printf("#undef pp_Mult_mm\n");
+    printf("#define pp_Mult_mm pp_Mult_mm__%s_%s_OrdGeneral\n", s_field, s_length);
   }
   printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
   printf("#include \"%s__Template.cc\"\n", s_what);
-  printf("#undef %s\n#undef p_Mult_m\n", s_what);
+  printf("#undef %s\n#undef pp_Mult_mm\n", s_what);
 }
 
 void GenerateProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_Ord ord)
@@ -869,20 +885,24 @@ do                                                          \
   p_Field t_field = field;                                  \
   p_Ord t_ord = ord;                                        \
   p_Length t_length = length;                               \
-  FastProcFilter(what##_Proc, t_field, t_length, t_ord);   \
+  FastProcFilter(what##_Proc, t_field, t_length, t_ord);    \
   _SetProc(what, t_field, t_length, t_ord);                 \
 }                                                           \
-while (0)                                                   \
+while (0)
   
 static void SetProcs(p_Field field, p_Length length, p_Ord ord)
 {
   SetProc(p_Delete, field, LengthGeneral, OrdGeneral);
-  SetProc(p_Mult_n, field, LengthGeneral, OrdGeneral);
+  SetProc(p_Mult_nn, field, LengthGeneral, OrdGeneral);
+  SetProc(pp_Mult_nn, field, length, OrdGeneral);
   SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);
   SetProc(p_Copy, field, length, OrdGeneral);
-  SetProc(p_Mult_m, field, length, OrdGeneral);
+  SetProc(pp_Mult_mm, field, length, OrdGeneral);
+  SetProc(p_Mult_mm, field, length, OrdGeneral);
   SetProc(p_Add_q, field, length, ord);
-  SetProc(p_Minus_m_Mult_q, field, length, ord);
+  SetProc(p_Minus_mm_Mult_qq, field, length, ord);
+  SetProc(p_ReverseNeg, field, LengthGeneral, OrdGeneral);
+  SetProc(p_Neg, field, LengthGeneral, OrdGeneral);
 }
 
 

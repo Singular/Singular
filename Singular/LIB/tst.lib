@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.24 2000-08-14 11:26:30 obachman Exp $
+// $Id: tst.lib,v 1.25 2000-08-29 14:10:31 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.24 2000-08-14 11:26:30 obachman Exp $";
+version="$Id: tst.lib,v 1.25 2000-08-29 14:10:31 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -527,3 +527,352 @@ example
   kill an;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+proc tst_rgen_init_weights(int n)
+{
+  intvec v = 1..n;
+  return (v);
+}
+
+  
+proc tst_rgen_generate_block(int n_vars, string simple_ordering, int extra_weights)
+{
+  string order = simple_ordering;
+  if (extra_weights > n_vars)
+  {
+    extra_weights = n_vars;
+  }
+  
+  if ((simple_ordering[1] == "W") || (simple_ordering[1] == "w"))
+  {
+    order = order + "(" + string(tst_rgen_init_weights(n_vars)) + ")";
+  }
+  else
+  {
+    if (simple_ordering[1] == "M") 
+    {
+      order = order + "(" + string(tst_rgen_init_weights(n_vars*n_vars)) + ")";
+    }
+    else
+    {
+      order = order + "(" + string(n_vars) + ")";
+    }
+  }
+  if (extra_weights >= 1)
+  {
+    order = "a(" + string(tst_rgen_init_weights(extra_weights)) + ")," + order;
+  }
+  return (order);
+}
+
+proc tst_rgen_generate_blocks(int n_vars, list simple_orderings, intvec extra_weights)
+{
+  int i;
+  int j;
+  list blocks;
+  
+  for (i=1; i<=size(simple_orderings); i++)
+  {
+    for (j=1; j<=size(extra_weights); j++)
+    {
+      blocks = blocks + list(tst_rgen_generate_block(n_vars, simple_orderings[i], extra_weights[j]));
+    }
+  }
+  return (blocks);
+}
+
+proc tst_rgen_generate_product_orderings(int n_vars, list simple_orderings, intvec extra_weights, intvec products)
+{
+  list p_orderings;
+  int i;
+  int nn_vars, j, k,l;
+  list nb_orderings;
+  string n_ordering;
+  
+  for (i=1;i<=size(products);i++)
+  {
+    if (products[i] > 1 && products[i] <= n_vars)
+    {
+      nn_vars = n_vars / products[i];
+      nb_orderings = tst_rgen_generate_blocks(nn_vars, simple_orderings, extra_weights);
+      for (j=1; j<=size(nb_orderings); j++)
+      {
+        n_ordering = nb_orderings[j];
+        for (k=2; k<=products[i]; k++)
+        {
+          l = (j + k - 1) %  size(nb_orderings);
+          if (l == 0)
+          {
+            l = size(nb_orderings);
+          }
+          n_ordering = n_ordering + "," + nb_orderings[l];
+        }
+        if (products[i]*nn_vars < n_vars)
+        {
+          n_ordering = n_ordering + ", lp";
+        }
+        p_orderings = p_orderings + list(n_ordering);
+      }
+    }
+    else 
+    {
+      if (products[i] == 1)
+      {
+        p_orderings = p_orderings + tst_rgen_generate_blocks(n_vars, simple_orderings, extra_weights);
+      }
+    }
+  }
+  if (size(p_orderings) < 1)
+  {
+    p_orderings = tst_rgen_generate_blocks(n_vars, simple_orderings, extra_weights);
+  }
+  return (p_orderings);
+}
+
+
+proc tst_rgen_init()
+{
+  if (! defined(tst_rgen_charstrs))
+  {
+    list tst_rgen_charstrs;
+    export(tst_rgen_charstrs);
+    tst_rgen_charstrs = list("32003", "0");
+  }
+  if (! defined(tst_rgen_nvars))
+  {
+    intvec tst_rgen_nvars;
+    export(tst_rgen_nvars);
+    tst_rgen_nvars = 1..10;
+  }
+  if (! defined(tst_rgen_simple_orderings))
+  {
+    list tst_rgen_simple_orderings;
+    export(tst_rgen_simple_orderings);
+    tst_rgen_simple_orderings = list("lp", "dp", "Dp", "ls", "ds", "Ds", "wp","Wp","ws","Ws","M");
+  }
+  if (! defined(tst_rgen_comp_orderings))
+  {
+    list tst_rgen_comp_orderings;
+    export(tst_rgen_comp_orderings);
+    tst_rgen_comp_orderings = list("", "C", "c", "CC", "cc");
+  }
+  if (! defined(tst_rgen_products))
+  {
+    intvec tst_rgen_products;
+    export(tst_rgen_products);
+    tst_rgen_products = 1..3;
+  }
+  if (! defined(tst_rgen_extra_weights))
+  {
+    intvec tst_rgen_extra_weights;
+    export(tst_rgen_extra_weights);
+    tst_rgen_extra_weights = 0..2;
+  }
+
+  if (! defined(tst_rgen_char_index))
+  {
+    int tst_rgen_char_index, tst_rgen_var_index, tst_rgen_comp_index, tst_rgen_ordering_index;
+    list tst_rgen_orderings;
+    export (tst_rgen_char_index, tst_rgen_var_index, tst_rgen_comp_index, tst_rgen_ordering_index, tst_rgen_orderings);
+  }
+    
+  tst_rgen_char_index = 1;
+  tst_rgen_var_index = 1;
+  tst_rgen_comp_index = 1;
+  tst_rgen_ordering_index = 1;
+  tst_rgen_orderings = tst_rgen_generate_product_orderings(tst_rgen_nvars[1], tst_rgen_simple_orderings, tst_rgen_extra_weights, tst_rgen_products);
+}
+
+proc tst_next_ring()
+{
+  tst_rgen_ordering_index++;
+  if (tst_rgen_ordering_index > size(tst_rgen_orderings))
+  {
+    tst_rgen_comp_index++;
+    if (tst_rgen_comp_index > size(tst_rgen_comp_orderings))
+    {
+      tst_rgen_var_index++;
+      if (tst_rgen_var_index > size(tst_rgen_nvars))
+      {
+        tst_rgen_char_index++;
+        if (tst_rgen_char_index > size(tst_rgen_charstrs))
+        {
+          return ("");
+        }
+        tst_rgen_var_index = 1;
+      }
+      tst_rgen_comp_index = 1;
+      tst_rgen_orderings =  tst_rgen_generate_product_orderings(tst_rgen_nvars[tst_rgen_var_index], tst_rgen_simple_orderings, tst_rgen_extra_weights, tst_rgen_products);
+    }
+    tst_rgen_ordering_index = 1;
+  }
+  
+  string rs = "(" + tst_rgen_charstrs[tst_rgen_char_index] + "),(" + A_Z("a", tst_rgen_nvars[tst_rgen_var_index]) + "),(";
+
+  if (tst_rgen_comp_orderings[tst_rgen_comp_index] == "CC")
+  {
+    rs = rs + "C," + tst_rgen_orderings[tst_rgen_ordering_index];
+  }
+  else
+  {
+    if (tst_rgen_comp_orderings[tst_rgen_comp_index] == "cc")
+    {
+      rs = rs + "c," + tst_rgen_orderings[tst_rgen_ordering_index];
+    }
+    else 
+    {
+      if (tst_rgen_comp_orderings[tst_rgen_comp_index] == "C")
+      {
+        rs = rs + tst_rgen_orderings[tst_rgen_ordering_index] + ", C";
+      }
+      else 
+      {
+        if (tst_rgen_comp_orderings[tst_rgen_comp_index] == "c")
+        {
+          rs = rs + tst_rgen_orderings[tst_rgen_ordering_index] + ",c";
+        }
+        else
+        {
+          rs = rs + tst_rgen_orderings[tst_rgen_ordering_index];
+        }
+      }
+    }
+  }
+  rs = rs + ")";
+  return (rs);
+}
+
+
+proc tst_rgen_test()
+{
+  tst_rgen_init();
+  string rs = tst_next_ring();
+  
+  while (size(rs) > 1)
+  {
+    rs;
+    rs = "ring r = " + rs + ";";
+    execute (rs);
+    rs = tst_next_ring();
+  }
+}
+
+proc tst_AddIdeal(ideal id, int how_often)
+{
+  int i, j, k, l;
+  poly p;
+  if (! defined(db_print))
+  {
+    int db_print = 0;
+    export db_print;
+  }
+  
+  for (i=1; i<= size(id); i++)
+  {
+    if (id[i] == 0) 
+    {
+      id[i] = 1;
+    }
+  }
+  dbprint(db_print, id);
+  dbprint(db_print, "");
+  ideal idl = lead(id);
+  ideal idr = id;
+  l = 0;
+  for (j=1; j<= how_often; j++)
+  {
+    l++;
+    if (l > size(id))
+    {
+      l=1;
+    }
+    for (k=1; k<=size(id); k++)
+    {
+      p = id[k] + idl[l]*idr[k];
+      dbprint(db_print, p);
+      for (i=1; i<=k; i++)
+      {
+        dbprint(db_print, idr[i]);
+        p = p + idr[i];
+        dbprint(db_print, p);
+        dbprint(db_print, "");
+      }
+      idr[k] = p;
+    }
+  }
+  return (idr);
+}
+
+      
+proc tst_AddModule(ideal id, int how_often)
+{
+  int i, j, k, l;
+  vector v;
+  if (! defined(db_print))
+  {
+    int db_print = 0;
+    export db_print;
+  }
+  
+  for (i=1; i<= size(id); i++)
+  {
+    if (id[i] == 0) 
+    {
+      id[i] = 1;
+    }
+  }
+  ideal idl = lead(id);
+  module m = id;
+  
+  dbprint(db_print, id);
+  dbprint(db_print, "");
+  l = 0;
+  for (j=1; j<= how_often; j++)
+  {
+    l++;
+    if (l > size(id))
+    {
+      l=1;
+    }
+    for (k=1; k<=size(id); k++)
+    {
+      v = gen(k)*id[k];
+      v = v + idl[l]*m[k];
+      dbprint(db_print, v);
+      for (i=1; i<=k; i++)
+      {
+        dbprint(db_print, m[i]);
+        v = v + m[i];
+        dbprint(db_print, v);
+        dbprint(db_print, "");
+      }
+      m[k] = v;
+    }
+  }
+  return (m);
+}
+
+proc tst_TotalSize(def id)
+{
+  int i, s;
+  
+  for (i=1; i<=size(id); i++)
+  {
+    s = s + size(id[i]);
+  }
+  return (s);
+}
+
+proc tst_PrintStats(def id)
+{
+  int i, is, s;
+  
+  for (i=1; i<=size(id); i++)
+  {
+    is = size(id[i]);
+    s = s + is;
+    string(i) + " : " + string(is) + " : " + string(lead(id[i]));
+  }
+  "s : " + string(s);
+}
+  

@@ -99,7 +99,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ndbm.cc  libparse.cc mod_raw.cc\
     pcv.cc kbuckets.cc prProcs.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
-    prCopy.cc p_Procs.cc
+    prCopy.cc p_Procs.cc p_Mult_q.cc
 
 
 # normal C source files
@@ -111,8 +111,11 @@ ESOURCES=iparith.cc tesths.cc mpsr_Tok.cc claptmpl.cc
 SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} mmalloc.cc\
 	grammar.y scanner.l libparse.l syz2.cc \
         p_Delete__Template.cc p_ShallowCopyDelete__Template.cc \
-        p_Copy__Template.cc p_Mult_n__Template.cc p_Mult_m__Template.cc \
-        p_Minus_m_Mult_q__Template.cc p_Add_q__Template.cc
+        p_Copy__Template.cc p_Mult_nn__Template.cc  pp_Mult_nn__Template.cc \
+        pp_Mult_mm__Template.cc p_Mult_mm__Template.cc \
+        p_Minus_mm_Mult_qq__Template.cc p_Add_q__Template.cc \
+	p_Neg__Template.cc p_ReverseNeg__Template.cc \
+	pInline.cc p_Inline.cc
 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \

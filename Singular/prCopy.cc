@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.3 2000-08-14 12:56:46 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.4 2000-08-29 14:10:30 obachman Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
@@ -71,6 +71,7 @@ poly prSortR(poly p, ring r, BOOLEAN revert)
   
   if (revert)
   {
+    // there must be a bug here: consider m1->m2
     while (p != NULL)
     {
       qq = p;

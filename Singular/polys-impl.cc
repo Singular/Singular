@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.47 2000-08-24 14:42:44 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.48 2000-08-29 14:10:28 obachman Exp $ */
 
 /***************************************************************
  *
@@ -27,6 +27,7 @@
 #include "polys.h"
 #include "ring.h"
 #include "polys-impl.h"
+#include "p_Procs.h"
 
 #ifdef HAVE_SHIFTED_EXPONENTS
 #ifdef PDEBUG

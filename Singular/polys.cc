@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.56 2000-08-24 11:21:45 Singular Exp $ */
+/* $Id: polys.cc,v 1.57 2000-08-29 14:10:28 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -805,8 +805,9 @@ void pSetGlobals(ring r, BOOLEAN complete)
   if (pFDeg!=pWTotaldegree) pFDeg=pTotaldegree;
 }
 
-/* -------------------------------------------------------- */
 
+#ifndef HAVE_P_PROCS
+/* -------------------------------------------------------- */
 static Exponent_t pMultT_nok;
 /*2
 * update the polynomial a by multipying it by
@@ -855,6 +856,50 @@ poly pMultT(poly a, poly exp )
   pMultT_nok=0;
   pTest(aa);
   return aa; /*TRUE*/
+}
+
+
+/*2
+* update a by multiplying it with c (c will not be destroyed)
+*/
+void pMultN(poly a, number c)
+{
+  number t;
+
+  while (a!=NULL)
+  {
+    t=nMult(pGetCoeff(a), c);
+    //nNormalize(t);
+    pSetCoeff(a,t);
+    pIter(a);
+  }
+}
+
+/*2
+* return a copy of the poly a times the number c (a,c will not be destroyed)
+*/
+poly pMultCopyN(poly a, number c)
+{
+  poly result=NULL,hp;
+
+  if (a != NULL)
+  {
+    result=pNew();
+    pCopy2(result,a);
+    pNext(result)=NULL;
+    pGetCoeff(result)=nMult(pGetCoeff(a),c);
+    pIter(a);
+    hp=result;
+    while (a!=NULL)
+    {
+      hp=pNext(hp)=pNew();
+      pCopy2(hp,a);
+      pSetCoeff0(hp,nMult(pGetCoeff(a), c));
+      pIter(a);
+    }
+    pNext(hp)=NULL;
+  }
+  return result;
 }
 
 /*2
@@ -929,48 +974,7 @@ poly pMult(poly p1, poly p2)
   return NULL;
 }
 
-/*2
-* update a by multiplying it with c (c will not be destroyed)
-*/
-void pMultN(poly a, number c)
-{
-  number t;
-
-  while (a!=NULL)
-  {
-    t=nMult(pGetCoeff(a), c);
-    //nNormalize(t);
-    pSetCoeff(a,t);
-    pIter(a);
-  }
-}
-
-/*2
-* return a copy of the poly a times the number c (a,c will not be destroyed)
-*/
-poly pMultCopyN(poly a, number c)
-{
-  poly result=NULL,hp;
-
-  if (a != NULL)
-  {
-    result=pNew();
-    pCopy2(result,a);
-    pNext(result)=NULL;
-    pGetCoeff(result)=nMult(pGetCoeff(a),c);
-    pIter(a);
-    hp=result;
-    while (a!=NULL)
-    {
-      hp=pNext(hp)=pNew();
-      pCopy2(hp,a);
-      pSetCoeff0(hp,nMult(pGetCoeff(a), c));
-      pIter(a);
-    }
-    pNext(hp)=NULL;
-  }
-  return result;
-}
+#endif
 
 /*2
 * assumes that the head term of b is a multiple of the head term of a

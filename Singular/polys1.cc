@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.43 2000-08-24 14:42:45 obachman Exp $ */
+/* $Id: polys1.cc,v 1.44 2000-08-29 14:10:30 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -136,6 +136,20 @@ void pSetModDeg(intvec *w)
 }
 
 #ifndef HAVE_P_PROCS
+/*2
+* multiply a polynomial by -1
+*/
+poly pNeg(poly p)
+{
+  poly h = p;
+  while (h!=NULL)
+  {
+    pGetCoeff(h)=nNeg(pGetCoeff(h));
+    pIter(h);
+  }
+  return p;
+}
+
 /*-------------operations on polynomials:------------*/
 /*2
 * add p1 and p2, p1 and p2 are destroyed
@@ -209,19 +223,6 @@ poly pAdd(poly p1, poly p2)
 #endif
 
 
-/*2
-* multiply a polynomial by -1
-*/
-poly pNeg(poly p)
-{
-  poly h = p;
-  while (h!=NULL)
-  {
-    pGetCoeff(h)=nNeg(pGetCoeff(h));
-    pIter(h);
-  }
-  return p;
-}
 
 /*2
 * subtract p2 from p1, p1 and p2 are destroyed
