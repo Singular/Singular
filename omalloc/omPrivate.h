@@ -4,7 +4,7 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omPrivate.h,v 1.3 1999-11-23 20:40:13 obachman Exp $
+ *  Version: $Id: omPrivate.h,v 1.4 1999-11-26 17:57:54 obachman Exp $
  *******************************************************************/
 #ifndef OM_PRIVATE_H
 #define OM_PRIVATE_H
@@ -41,14 +41,8 @@
  *  
  *******************************************************************/
 struct omBinPage_s;
-struct omBin_s;
-struct omSpecBin_s;
 typedef struct omBinPage_s omBinPage_t;
-typedef struct omBin_s     omBin_t;
-typedef struct omSpecBin_s omSpecBin_t;
 typedef omBinPage_t*       omBinPage;
-typedef omBin_t*           omBin;
-typedef omSpecBin_t*       omSpecBin;
 
 
 /* Need to define it here, has to be known to macros */
@@ -101,8 +95,6 @@ extern  omBin       om_Size2Bin[];
 
 #include "omTables.inc"
  
-
-
 /*******************************************************************
  *  
  *  lowest level alloc/free macros
@@ -363,7 +355,6 @@ do                                                              \
 }                                                               \
 while (0)
 
-
 #else /* ! OM_ALIGNMENT_NEEDS_WORK */
 #define __omTypeAllocAlignedChunk  __omTypeAllocChunk
 #define __omTypeAlloc0AlignedChunk __omTypeAlloc0Chunk
@@ -425,26 +416,94 @@ OM_ALLOCSIZE_FUNC_WRAPPER(AllocChunk)
 OM_ALLOCSIZE_FUNC_WRAPPER(Alloc0Chunk)
 OM_FREE_FUNC_WRAPPER(FreeChunk)
 
+#ifdef OM_ALIGNMENT_NEEDS_WORK
+OM_ALLOCSIZE_FUNC_WRAPPER(AllocAlignedBlock)
+OM_ALLOCSIZE_FUNC_WRAPPER(Alloc0AlignedBlock)
+OM_ALLOCSIZE_FUNC_WRAPPER(AllocAlignedChunk)
+OM_ALLOCSIZE_FUNC_WRAPPER(Alloc0AlignedChunk)
+OM_FREE_FUNC_WRAPPER(FreeAlignedChunk)
+#else
+#define _omAllocAlignedBlock    _omAllocBlock
+#define _omAlloc0AlignedBlock   _omAlloc0Block
+#define _omAllocAlignedChunk    _omAllocChunk
+#define _omFreeAlignedChunk     _omFreeChunk
+#endif /* OM_ALIGNMENT_NEEDS_WORK */
+
 #else /* ! OM_INLINE */
 
 #define _omAllocBin      omFuncAllocBin
 #define _omAlloc0Bin     omFuncAlloc0Bin
 #define _omFreeBin       omFuncFreeBin
-#define _omAllocBlock     omFuncAllocBlock
-#define _omAlloc0Block    omFuncAlloc0Block
-#define _omFreeBlock      omFuncFreeBlock
-#define _omAlloc          omFuncAlloc
-#define _omAlloc0         omFuncAlloc0
-#define _omFree           omFuncFree
+#define _omAllocBlock    omFuncAllocBlock
+#define _omAlloc0Block   omFuncAlloc0Block
+#define _omFreeBlock     omFuncFreeBlock
+#define _omAlloc         omFuncAlloc
+#define _omAlloc0        omFuncAlloc0
+#define _omFree          omFuncFree
+#define _omAllocAlignedBlock    omFuncAllocAlignedBlock
+#define _omAlloc0AlignedBlock   omFuncAlloc0AlignedBlock
+#define _omAllocAlignedChunk    omFuncAllocAlignedChunk
+#define _omFreeAlignedChunk     omFuncFreeAlignedChunk
 
 #endif /* OM_INLINE */
 
-omBin omGetSpecBin(size_t size);
-void  omUnGetSpecBin(omBin *bin);
-unsigned long omGetNewStickyAllBinTag();
-void omSetStickyAllBinTag(unsigned long sticky);
-void omUnSetStickyAllBinTag(unsigned long sticky);
-void omDeleteStickyAllBinTag(unsigned long sticky);
+void* _omReallocBlock(void* old_addr, size_t old_size, size_t new_size);
+void* _omRealloc0Block(void* old_addr, size_t old_size, size_t new_size);
+void* _omReallocChunk(void* old_addr, size_t new_size);
+
+#ifdef OM_ALIGNMENT_NEEDS_WORK
+void* _omReallocAlignedBlock(void* old_addr, size_t old_size, size_t new_size);
+void* _omRealloc0AlignedBlock(void* old_addr, size_t old_size,size_t new_size);
+void* _omReallocAlignedChunk(void* old_addr, size_t new_size);
+#else
+#define _omReallocAlignedBlock  _omRealllocBlock
+#define _omRealloc0AlignedBlock _omReallloc0Block
+#define _omReallocAlignedChunk  _omReallocChunk
+#endif
+
+/*******************************************************************
+ *  
+ *  Declaration of Func
+ *  
+ *******************************************************************/
+void* omFuncAllocBin(omBin bin);
+void* omFuncAlloc0Bin(omBin bin);
+void  omFuncFreeBin(void* addr);
+
+void* omFuncAllocBlock(size_t size);
+void* omFuncAlloc0Block(size_t size);
+void  omFuncFreeBlock(void* addr, size_t size);
+#define omFuncReallocBlock  _omReallocBlock
+#define omFuncRealloc0Block _omRealloc0Block
+
+void* omFuncAllocChunk(size_t size);
+void* omFuncAlloc0Chunk(size_t size);
+void  omFuncFreeChunk(void* addr);
+#define omFuncReallocChunk  _omReallocChunk
+
+#ifdef OM_ALIGNMENT_NEEDS_WORK
+void* omFuncAllocAlignedBlock(size_t size);
+void* omFuncAlloc0AlignedBlock(size_t size);
+#define omFuncReallocAlignedBlock  _omReallocAlignedBlock
+#define omFuncRealloc0AlignedBlock _omRealloc0AlignedBlock
+
+void* omFuncAllocAlignedChunk(size_t size);
+void* omFuncAllocAligned0Chunk(size_t size);
+void  omFuncFreeAlignedChunk(void* addr);
+#define omFuncReallocAlignedChunk  _omReallocAlignedChunk
+#else
+#define omFuncAllocAlignedBlock    omFuncAllocBlock
+#define omFuncAlloc0AlignedBlock   omFuncAlloc0Block
+#define omFuncReallocAlignedBlock  omFuncReallocBlock
+#define omFuncRealloc0AlignedBlock omFuncRealloc0Block
+
+#define omFuncAllocAlignedChunk    omFuncAllocChunk
+#define omFuncAlloc0AlignedChunk   omFuncAlloc0Chunk
+#define omFuncReallocAlignedChunk  omFuncReallocBlock
+#define omFuncFreeAlignedChunk     omFuncFreeChunk
+#endif /* OM_ALIGNMENT_NEEDS_WORK */ 
+
+
 
 #endif /* ! OM_GENERATE_INC */
 

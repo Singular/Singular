@@ -4,7 +4,7 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omLocal.h,v 1.2 1999-11-22 18:12:59 obachman Exp $
+ *  Version: $Id: omLocal.h,v 1.3 1999-11-26 17:57:53 obachman Exp $
  *******************************************************************/
 #ifndef OM_LOCAL_H
 #define OM_LOCAL_H
@@ -72,10 +72,7 @@ extern omBin omGetBinOfAddr(void* addr);
  *  Declarations
  *  
  *******************************************************************/
-#include <stdio.h>
 extern int omIsStaticBin(omBin bin);
-extern void omPrintBinStats(FILE* fd);
-extern void omPrintBinStat(FILE * fd, omBin bin);
 
 /*******************************************************************
  *

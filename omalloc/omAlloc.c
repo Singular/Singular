@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omalloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAlloc.c,v 1.3 1999-11-23 20:40:12 obachman Exp $
+ *  Version: $Id: omAlloc.c,v 1.4 1999-11-26 17:57:51 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
@@ -69,9 +69,9 @@ void* _omReallocBlock(void* old_addr, size_t old_size, size_t new_size)
 void* _omRealloc0Block(void* old_addr, size_t old_size, size_t new_size)
 {
   void* new_addr;
-  int __om_fill = new_size - old_size;
+  int _om_fill = new_size - old_size;
   new_addr = _omReallocBlock(void*, new_addr, new_size, old_addr, old_size);
-  if (_om_fill > 0) memset(((void*) new_addr) + __om_fill, 0, __om_fill);
+  if (_om_fill > 0) memset(new_addr + _om_fill, 0, _om_fill);
   return new_addr;
 }
 
@@ -110,9 +110,9 @@ void* _omReallocAlignedBlock(void* old_addr, size_t old_size, size_t new_size)
 void* _omRealloc0AlignedBlock(void* old_addr, size_t old_size, size_t new_size)
 {
   void* new_addr;
-  int __om_fill = new_size - old_size;
+  int om_fill = new_size - old_size;
   __omTypeReallocAlignedBlock(void*, new_addr, new_size, old_addr, old_size);
-  if (_om_fill > 0) memset(((void*) new_addr) + __om_fill, 0, __om_fill);
+  if (om_fill > 0) memset(new_addr + om_fill, 0, om_fill);
   return new_addr;
 }
 #endif /* OM_ALIGNMENT_NEEDS_WORK */
@@ -225,6 +225,57 @@ void* _omReallocAlignedChunk(void* old_addr, size_t new_size)
 }
 #endif /* OM_ALIGNMENT_NEEDS_WORK */
 
+/*******************************************************************
+ *  
+ *  Definition of Func
+ *  
+ *******************************************************************/
+
+#define ALLOCBIN_FUNC_WRAPPER(func)             \
+void* omFunc##func (omBin bin)                  \
+{                                               \
+  void* addr;                                   \
+  __omType##func (void*, addr, bin);            \
+  return addr;                                  \
+}
+
+#define ALLOCSIZE_FUNC_WRAPPER(func)            \
+void* omFunc##func (size_t size)                \
+{                                               \
+  void* addr;                                   \
+  __omType##func (void*, addr, size);           \
+  return addr;                                  \
+}
+
+#define FREE_FUNC_WRAPPER(func)                 \
+void omFunc##func (void* addr)                  \
+{                                               \
+  __om##func (addr);                            \
+}
+
+#define FREEBLOCK_FUNC_WRAPPER(func)            \
+void omFunc##func (void* addr, size_t size)     \
+{                                               \
+  __om##func (addr, size);                      \
+}
+
+ALLOCBIN_FUNC_WRAPPER(AllocBin)
+ALLOCBIN_FUNC_WRAPPER(Alloc0Bin)
+FREE_FUNC_WRAPPER(FreeBin)
+ALLOCSIZE_FUNC_WRAPPER(AllocBlock)
+ALLOCSIZE_FUNC_WRAPPER(Alloc0Block)
+FREEBLOCK_FUNC_WRAPPER(FreeBlock)
+ALLOCSIZE_FUNC_WRAPPER(AllocChunk)
+ALLOCSIZE_FUNC_WRAPPER(Alloc0Chunk)
+FREE_FUNC_WRAPPER(FreeChunk)
+
+#ifdef OM_ALIGNMENT_NEEDS_WORK
+ALLOCSIZE_FUNC_WRAPPER(AllocAlignedBlock)
+ALLOCSIZE_FUNC_WRAPPER(Alloc0AlignedBlock)
+ALLOCSIZE_FUNC_WRAPPER(AllocAlignedChunk)
+ALLOCSIZE_FUNC_WRAPPER(Alloc0AlignedChunk)
+FREE_FUNC_WRAPPER(FreeAlignedChunk)
+#endif
 
 /*******************************************************************
  *  
