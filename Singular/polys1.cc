@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.50 2000-10-23 12:02:18 obachman Exp $ */
+/* $Id: polys1.cc,v 1.51 2000-10-30 13:40:25 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -88,7 +88,7 @@ static pFDegProc pOldFDeg;
 static intvec * pModW;
 static BOOLEAN pOldLexOrder;
 
-static int pModDeg(poly p, ring r = currRing)
+static long pModDeg(poly p, ring r = currRing)
 {
   return pOldFDeg(p, r)+(*pModW)[p_GetComp(p, r)-1];
 }
@@ -338,19 +338,11 @@ poly pPower(poly p, int i)
 
   if(p!=NULL)
   {
-#ifdef HAVE_SHIFTED_EXPONENTS
-    if (i > ((int)currRing->bitmask))
+    if ( (i > 0) && ((unsigned long ) i > (currRing->bitmask)))
     {
       Werror("exponent %d is too large, max. is %d",i,currRing->bitmask);
       return NULL;
     }
-#else
-    if (i > EXPONENT_MAX)
-    {
-      Werror("exponent %d is too large, max. is %d",i,EXPONENT_MAX);
-      return NULL;
-    }
-#endif
     switch (i)
     {
 // cannot happen, see above
@@ -375,38 +367,10 @@ poly pPower(poly p, int i)
       default:
         if (i < 0)
         {
-#ifdef DRING
-          if (pDRING)
-          {
-            int j,t;
-            rc=p;
-            while(p!=NULL)
-            {
-              for(j=1;j<=pdK;j++)
-              {
-                if(pGetExp(p,pdY(j))!=0)
-                {
-                  pDelete(&rc);
-                  return NULL;
-                }
-              }
-              for(j=1;j<=pdN;j++)
-              {
-                t=pGetExp(p,pdX(j));
-                pSetExp(p,pdX(j),pGetExp(p,pdIX(j)));
-                pSetExp(p,pdIX(j),t);
-              }
-              pIter(p);
-            }
-            return pPower(rc,-i);
-          }
-          else
-#endif
-          {
-            pDelete(&p);
-            return NULL;
-          }
+          pDelete(&p);
+          return NULL;
         }
+        else
         {
           rc = pNext(p);
           if (rc == NULL)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.57 2000-10-23 12:02:13 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.58 2000-10-30 13:40:18 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1665,17 +1665,17 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
 pFDegProc pOldFDeg;
 intvec * kModW, * kHomW;
 
-int kModDeg(poly p, ring r)
+long kModDeg(poly p, ring r)
 {
-  int o=pWDegree(p, r);
-  int i=p_GetComp(p, r);
+  long o=pWDegree(p, r);
+  long i=p_GetComp(p, r);
   if (i==0) return o;
   return o+(*kModW)[i-1];
 }
-int kHomModDeg(poly p, ring r)
+long kHomModDeg(poly p, ring r)
 {
   int i;
-  int j=0;
+  long j=0;
 
   for (i=r->N;i>0;i--)
     j+=p_GetExp(p,i,r)*(*kHomW)[i-1];

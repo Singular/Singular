@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.38 2000-10-26 16:31:36 obachman Exp $ */
+/* $Id: kutil.h,v 1.39 2000-10-30 13:40:20 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -51,16 +51,23 @@ public:
   KINLINE void Set(poly p_in, ring r=currRing);
   KINLINE void Set(poly p_in, ring c_r, ring t_r);
 
-  KINLINE void sTObject::Delete();
+  // Frees the polys of T
+  KINLINE void Delete();
+  // Sets polys to NULL
+  KINLINE void Clear();
   
-  // ring-dependent Lm access
-  KINLINE poly GetLm(); // equivalent to GetLmCurrRing
+  // ring-dependent Lm access: these might result in allocation of monomials
   KINLINE poly GetLmCurrRing();
   KINLINE poly GetLmTailRing();
   KINLINE poly GetLm(ring r);
+  // this returns Lm and ring r (preferably from tailRing), but does not
+  // allocate a new poly
+  KINLINE void GetLm(poly &p, ring &r) const;
 
   // makes sure that T.p exists
   KINLINE void SetLmCurrRing();
+  // sets sev
+  KINLINE void SetShortExpVector();
 
   // Iterations
   KINLINE void LmDeleteAndIter();

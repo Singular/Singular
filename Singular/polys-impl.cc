@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.51 2000-09-14 13:04:39 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.52 2000-10-30 13:40:24 obachman Exp $ */
 
 /***************************************************************
  *
@@ -139,7 +139,7 @@ unsigned long p_GetShortExpVector(poly p, ring r)
 int rComp0_Func(poly p1,poly p2)
 {
   int i;
-  for(i=0; i<=currRing->pCompHighIndex;i++)
+  for(i=0; i< currRing->CmpL_Size;i++)
   {
     if (p1->exp[i] != p2->exp[i])
     {
@@ -156,7 +156,7 @@ int rComp0_Func(poly p1,poly p2)
 int rComp0(poly p1,poly p2)
 {
   int i;
-  for(i=0; i<=currRing->pCompHighIndex;i++)
+  for(i=0; i<currRing->CmpL_Size;i++)
   {
     if (p1->exp[i] != p2->exp[i])
     {

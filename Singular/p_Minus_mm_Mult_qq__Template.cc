@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.3 2000-09-18 09:19:26 obachman Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.4 2000-10-30 13:40:22 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -44,7 +44,7 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
 
 
   int shorter = 0;
-  DECLARE_LENGTH(const unsigned long length = r->ExpLSize);
+  DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
   DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
 
   const unsigned long* m_e = m->exp;

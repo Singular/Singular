@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_mm__Template.cc,v 1.4 2000-09-18 09:19:26 obachman Exp $
+ *  Version: $Id: p_Mult_mm__Template.cc,v 1.5 2000-10-30 13:40:22 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -24,7 +24,7 @@ poly p_Mult_mm(poly p, const poly m, const ring ri)
   pAssume(m != NULL);
   poly q = p;
   number ln = pGetCoeff(m);
-  DECLARE_LENGTH(const unsigned long length = ri->ExpLSize);
+  DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
   const unsigned long* m_e = m->exp;
   pAssume(!n_IsZero(ln,ri));
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.70 2000-10-26 16:31:35 obachman Exp $ */
+/* $Id: kutil.cc,v 1.71 2000-10-30 13:40:19 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2436,6 +2436,7 @@ all_done:
   return p;
 }
 
+#ifndef HAVE_REDTAIL_WITH_T
 /*2
 *compute the normalform of the tail p->next of p
 *with respect to S
@@ -2508,6 +2509,8 @@ poly redtailBba (LObject* L, int pos, kStrategy strat)
   }
   return p;
 }
+#endif
+
 
 /*2
 *compute the "normalform" of the tail p->next of p

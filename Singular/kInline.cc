@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.10 2000-10-26 16:31:34 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.11 2000-10-30 13:40:17 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -150,17 +150,18 @@ KINLINE void sTObject::Delete()
   }
 }
 
-// Lm Extraction
-KINLINE poly sTObject::GetLm()
+KINLINE void sTObject::Clear()
+{
+  p = NULL;
+  t_p = NULL;
+}
+
+KINLINE poly sTObject::GetLmCurrRing()
 {
   if (p == NULL && t_p != NULL)
     p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
 
   return p;
-}
-KINLINE poly sTObject::GetLmCurrRing()
-{
-  return GetLm();
 }
 KINLINE poly sTObject::GetLmTailRing()
 {
@@ -179,7 +180,7 @@ KINLINE poly sTObject::GetLm(ring r)
 {
   assume(r == tailRing || r == currRing);
   if (r == currRing) 
-    return GetLm();
+    return GetLmCurrRing();
   
   if (t_p == NULL && p != NULL)
     t_p = k_LmInit_currRing_2_tailRing(p, tailRing);
@@ -187,10 +188,36 @@ KINLINE poly sTObject::GetLm(ring r)
   return t_p;
 }
 
+KINLINE void sTObject::GetLm(poly &p_r, ring &r_r) const
+{
+  if (t_p != NULL)
+  {
+    p_r = p;
+    r_r = tailRing;
+  }
+  else
+  {
+    p_r = p;
+    r_r = currRing;
+  }
+}
+
 KINLINE void sTObject::SetLmCurrRing()
 {
   if (p == NULL && t_p != NULL)
     p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
+}
+
+KINLINE void sTObject::SetShortExpVector()
+{
+  if (t_p != NULL)
+  {
+    sev = p_GetShortExpVector(t_p, tailRing);
+  }
+  else 
+  {
+    sev = p_GetShortExpVector(p, currRing);
+  }
 }
     
 // Iterations
@@ -211,6 +238,7 @@ KINLINE void sTObject::LmDeleteAndIter()
     p = p_LmDeleteAndNext(p, currRing);
   }
 }
+
 
 // arithmetic
 KINLINE void sTObject::Mult_nn(number n)
@@ -542,7 +570,7 @@ KINLINE poly ksOldSpolyRed(poly p1, poly p2, poly spNoether)
 
   ksReducePoly(&L, &T, spNoether);
   
-  return L.GetLm();
+  return L.GetLmCurrRing();
 }
 
 KINLINE poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether)
@@ -552,7 +580,7 @@ KINLINE poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether)
 
   ksReducePoly(&L, &T, spNoether);
   
-  return L.GetLm();
+  return L.GetLmCurrRing();
 }
 
 KINLINE poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether, ring r)
@@ -562,7 +590,7 @@ KINLINE poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether, ring r)
   L.p2 = p2;
   
   ksCreateSpoly(&L, spNoether);
-  return L.GetLm();
+  return L.GetLmCurrRing();
 }
 
 void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r)

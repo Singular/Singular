@@ -6,7 +6,7 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Add_q__Template.cc,v 1.3 2000-09-18 09:19:25 obachman Exp $
+ *  Version: $Id: p_Add_q__Template.cc,v 1.4 2000-10-30 13:40:22 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -33,7 +33,7 @@ poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   int shorter = 0;
   spolyrec rp;
   poly a = &rp;
-  DECLARE_LENGTH(const unsigned long length = r->pCompLSize);
+  DECLARE_LENGTH(const unsigned long length = r->CmpL_Size);
   DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
 
   Top:     // compare p and q w.r.t. monomial ordering

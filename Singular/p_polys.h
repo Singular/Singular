@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.9 2000-10-26 16:31:37 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.10 2000-10-30 13:40:23 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -131,7 +131,7 @@ PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r);
 PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r);
 // returns TRUE if ExpVector(p1) == ExpVector(p2), FALSE, otherwise
 PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r);
-// returns sum of all exponents
+// returns sum of all exponents of p
 PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r);
 
 PINLINE1 void p_GetExpV(poly p, Exponent_t *ev, ring r);
@@ -190,16 +190,23 @@ PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, ring r);
  * Misc things on polys
  *
  ***************************************************************/
-// return monomial r such that GetExp(r,i) is maximum of all
-// monomials in p; coeff == 0, next == NULL, ord is not set
-poly p_GetMaxExpP(poly p, ring r);
-// suppose that l is a long var in r, return maximal exponent of l
-PINLINE1 Exponent_t p_GetMaxExp(unsigned long l, ring r);
 // return the maximal exponent of p
 PINLINE2 Exponent_t p_GetMaxExp(poly p, ring r);
 // return the maximal exponent of p in form of the maximal long var
 unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max = 0);
+// return monomial r such that GetExp(r,i) is maximum of all
+// monomials in p; coeff == 0, next == NULL, ord is not set
+poly p_GetMaxExpP(poly p, ring r);
 
+// suppose that l is a long var in r, return maximal exponent of l
+PINLINE1 Exponent_t p_GetMaxExp(unsigned long l, ring r);
+// similar, except assume that l constains number_of_exps exponents
+PINLINE1 Exponent_t p_GetMaxExp(const unsigned long l, const ring r, const number_of_exps);
+
+// return the TotalDegree of the long var l
+PINLINE1 unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
+// return the total degree of the long var l containing number_of_exp exponents
+PINLINE1 unsigned long p_GetTotalDegree(const unsigned long l, const ring r, const number_of_exps);
 
 /***************************************************************
  *
@@ -272,7 +279,9 @@ PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r);
  * Misc stuff
  *
  ***************************************************************/
-extern void p_Setm(poly p, ring r);
+PINLINE2 void p_Setm(poly p, ring r);
+p_SetmProc p_GetSetmProc(ring r);
+
 // TODO:
 #define p_SetmComp  p_Setm
 
@@ -316,16 +325,17 @@ PINLINE2 void      p_wrp(poly p, ring p_ring);
  ***************************************************************/
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
-int pDeg(poly p, ring r);
-int pTotaldegree(poly p, ring r);
-int pWTotaldegree(poly p, ring r);
-int pWDegree(poly p, ring r);
-int pWeight(int i, ring r);
-int pLDeg0(poly p,int *l, ring r);
-int pLDeg0c(poly p,int *l, ring r);
-int pLDegb(poly p,int *l, ring r);
-int pLDeg1(poly p,int *l, ring r);
-int pLDeg1c(poly p,int *l, ring r);
+int  pWeight(int i, ring r);
+long pDeg(poly p, ring r);
+long pTotaldegree(poly p, ring r);
+long pWFirstTotalDegree(poly p, ring r);
+long pWTotaldegree(poly p, ring r);
+long pWDegree(poly p, ring r);
+long pLDeg0(poly p,int *l, ring r);
+long pLDeg0c(poly p,int *l, ring r);
+long pLDegb(poly p,int *l, ring r);
+long pLDeg1(poly p,int *l, ring r);
+long pLDeg1c(poly p,int *l, ring r);
 
 /***************************************************************
  *
@@ -379,7 +389,8 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
 
 #endif
 
-#endif // P_POLYS_H
-
 #include "pInline2.h"
 #include "pInline1.h"
+
+#endif // P_POLYS_H
+

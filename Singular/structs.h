@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.42 2000-10-26 06:39:31 obachman Exp $ */
+/* $Id: structs.h,v 1.43 2000-10-30 13:40:27 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -23,7 +23,7 @@ typedef void * Sy_reference;
 
 
 typedef long Exponent_t;
-typedef unsigned long Order_t;
+typedef long Order_t;
 
 enum tHomog
 {
@@ -156,8 +156,9 @@ typedef struct _scmdnames cmdnames;
 typedef number (*numberfunc)(number a,number b);
 
 extern ring      currRing;
-typedef int     (*pLDegProc)(poly p, int *length, ring r= currRing);
-typedef int     (*pFDegProc)(poly p, ring r = currRing);
+typedef long     (*pLDegProc)(poly p, int *length, ring r= currRing);
+typedef long     (*pFDegProc)(poly p, ring r = currRing);
+typedef void     (*p_SetmProc)(poly p, ring r = currRing);
 
 typedef enum
 {
@@ -253,7 +254,7 @@ struct sip_sring
 
   // what follows below here should be set by rComplete, _only_
   long      *ordsgn;  /* array of +/- 1 (or 0) for comparing monomials */
-                       /*  ExpLSize entries*/
+                       /*  ExpL_Size entries*/
 
   // is NULL for lp or N == 1, otherwise non-NULL (with OrdSize > 0 entries) */
   sro_ord*   typ;   /* array of orderings + sizes, OrdSize entries */
@@ -287,32 +288,31 @@ struct sip_sring
   
   
   // what follows below here should be set by rComplete, _only_
-  short      pVarLowIndex;  /* lowest index of a variable */
-  short      pVarHighIndex; /* highest index of a variable */
-                            /* pVarLow to pVarHigh */
   // contains component, but no weight fields in E */
-  // better: pVarLowIndexE / pVarLowIndexL
-  short      pCompHighIndex; /* use p->exp[pCompLowIndex..ppCompHighIndex] */
-                             /* for comparing monomials */
-  short      pCompLSize; // pCompHighIndex - pCompLowIndex + 1
-
-  short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
-  short      pOrdIndex; /* p->exp[pOrdIndex] is pGetOrd(p) */
-
-  short      ExpESize; /* size of exponent vector in Exponent_t */
-  short      ExpLSize; /* size of exponent vector in long */
-  short      OrdSize; /* size of ord vector (in sro_ord) */
-  short      BitsPerExp; /* number of bits per exponent */
-
-  short      ref; /* reference counter to the ring */
-
+  short      ExpL_Size; // size of exponent vector in long 
+  short      CmpL_Size; // portions which need to be compared
   /* number of long vars in exp vector: 
      long vars are those longs in the exponent vector which are 
      occupied by variables, only */
   short     VarL_Size;   
+
+  short      BitsPerExp; /* number of bits per exponent */
+  short      ExpPerLong; /* maximal number of Exponents per long */
+
+  short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
+  short      pOrdIndex; /* p->exp[pOrdIndex] is pGetOrd(p) */
+
+  short      OrdSize; /* size of ord vector (in sro_ord) */
+
+
+  short      ref; /* reference counter to the ring */
+
   /* if >= 0, long vars in exp vector are consecutive and start there
      if <  0, long vars in exp vector are not consecutive */
   short     VarL_LowIndex;
+  // number of exponents in r->VarL_Offset[0]
+  // is minimal number of exponents in a long var
+  short     MinExpPerLong;
   
   /* if this is > 0, then NegWeightL_Offset[0..size_1] is index of longs in
    ExpVector whose values need an offset due to negative weights */
@@ -332,6 +332,7 @@ struct sip_sring
   p_Procs_s*    p_Procs;
   pFDegProc     pFDeg;
   pLDegProc     pLDeg;
+  p_SetmProc    p_Setm;
 };
 
 struct sip_sideal

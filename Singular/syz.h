@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.27 2000-08-14 12:56:53 obachman Exp $ */
+/* $Id: syz.h,v 1.28 2000-10-30 13:40:28 obachman Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -13,7 +13,7 @@
 #define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8
 // Logarithm of "distance" between a new component and prev component
 #define SYZ_SHIFT_BASE_LOG (BIT_SIZEOF_LONG - 1 - SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE)
-#define SYZ_SHIFT_BASE (1 << SYZ_SHIFT_BASE_LOG)
+#define SYZ_SHIFT_BASE (((long)1) << SYZ_SHIFT_BASE_LOG)
 struct sSObject{
                  poly  p;
                  poly  p1,p2; /*- the pair p comes from -*/

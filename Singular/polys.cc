@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.66 2000-10-23 15:21:14 Singular Exp $ */
+/* $Id: polys.cc,v 1.67 2000-10-30 13:40:24 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -38,69 +38,6 @@ BOOLEAN pLexOrder;
 /* ----------- global variables, set by procedures from hecke/kstd1 ----- */
 /* the highest monomial below pHEdge */
 poly      ppNoether = NULL;
-
-
-void rSetmS(poly p, int* Components, long* ShiftedComponents)
-{
-  int pos=0;
-  assume(Components != NULL && ShiftedComponents != NULL);
-  if (currRing->typ!=NULL)
-  {
-    loop
-    {
-      long ord=0;
-      sro_ord* o=&(currRing->typ[pos]);
-      switch(o->ord_typ)
-      {
-        case ro_dp:
-        {
-          int a,e;
-          a=o->data.dp.start;
-          e=o->data.dp.end;
-          for(int i=a;i<=e;i++) ord+=pGetExp(p,i);
-          p->exp[o->data.dp.place]=ord;
-          break;
-        }
-	case ro_wp_neg:
-	  ord=POLY_NEGWEIGHT_OFFSET;
-	  // no break;
-        case ro_wp:
-        {
-          int a,e;
-          a=o->data.wp.start;
-          e=o->data.wp.end;
-          int *w=o->data.wp.weights;
-          for(int i=a;i<=e;i++) ord+=pGetExp(p,i)*w[i-a];
-          p->exp[o->data.wp.place]=ord;
-          break;
-        }
-        case ro_cp:
-        {
-          int a,e;
-          a=o->data.cp.start;
-          e=o->data.cp.end;
-          int pl=o->data.cp.place;
-          for(int i=a;i<=e;i++) { p->exp[pl]=pGetExp(p,i); pl++; }
-          break;
-        }
-        case ro_syzcomp:
-        {
-          int c=pGetComp(p);
-          long sc  = ShiftedComponents[Components[c]];
-          assume(c == 0 || Components[c] != 0);
-          assume(c == 0 || sc != 0);
-          p->exp[o->data.syzcomp.place]=sc;
-          break;
-        }
-        default:
-          Print("wrong ord in rSetm:%d\n",o->ord_typ);
-          return;
-      }
-      pos++;
-      if(pos==currRing->OrdSize) return;
-    }
-  }
-}
 
 /* -------------------------------------------------------- */
 /*2

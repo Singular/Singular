@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.134 2000-10-26 16:31:38 obachman Exp $ */
+/* $Id: ring.cc,v 1.135 2000-10-30 13:40:26 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -66,6 +66,8 @@ static void rDelete(ring r);
 static void rSetVarL(ring r);
 // get r->divmask depending on bits per exponent
 static unsigned long rGetDivMask(int bits);
+// right-adjust r->VarOffset
+static void rRightAdjustVarOffset(ring r);
 
 /*0 implementation*/
 //BOOLEAN rField_is_R(ring r=currRing)
@@ -1903,6 +1905,12 @@ BOOLEAN rOrder_is_DegOrdering(rRingOrder_t order)
       case ringorder_Dp:
       case ringorder_ds:
       case ringorder_Ds:
+#if 1
+      case ringorder_Ws:
+      case ringorder_Wp:
+      case ringorder_ws:
+      case ringorder_wp:
+#endif
         return TRUE;
 
       default:
@@ -2022,10 +2030,10 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
         if ((r->VarOffset[i] >> 24) >31)
       #endif
           dReportError("bit_start out of range:%d",r->VarOffset[i] >> 24);
-      if (i > 0 && ((tmp<0) ||(tmp>r->ExpESize-1)))
-    {
-      dReportError("varoffset out of range for var %d: %d",i,tmp);
-    }
+      if (i > 0 && ((tmp<0) ||(tmp>r->ExpL_Size-1)))
+      {
+        dReportError("varoffset out of range for var %d: %d",i,tmp);
+      }
   }
   if(r->typ!=NULL)
   {
@@ -2331,21 +2339,20 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits)
 */
 static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
 {
-#if SIZEOF_LONG == 8
-#define BITS_FOR_EXPS 64
-#else
-// SIZEOF_LONG ==4, 32 bits
-#define BITS_FOR_EXPS 32
-#endif
   bitmask =rGetExpSize(bitmask, bits);
-  int vars_per_long=BITS_FOR_EXPS/bits;
+  int vars_per_long=BIT_SIZEOF_LONG/bits;
   int bits1;
   loop
   {
+    if (bits == BIT_SIZEOF_LONG) 
+    {
+      bits =  BIT_SIZEOF_LONG - 1;
+      return LONG_MAX;
+    }
     unsigned long bitmask1 =rGetExpSize(bitmask+1, bits1);
-    int vars_per_long1=BITS_FOR_EXPS/bits1;
-    if (((N+vars_per_long-1)/vars_per_long)
-    == ((N+vars_per_long1-1)/vars_per_long1))
+    int vars_per_long1=BIT_SIZEOF_LONG/bits1;
+    if ((((N+vars_per_long-1)/vars_per_long) == 
+         ((N+vars_per_long1-1)/vars_per_long1)))
     {
       vars_per_long=vars_per_long1;
       bits=bits1;
@@ -2466,6 +2473,12 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   res->block1=block1;
   res->bitmask=exp_limit;
   rComplete(res, 1);
+
+  // adjust res->pFDeg: if it was changed gloabbly, then
+  // it must also be changed for new ring
+  if (pFDeg != r->pFDeg)
+    res->pFDeg = r->pFDeg;
+  
   return res;
 }
 
@@ -2671,17 +2684,8 @@ static void rSetDegStuff(ring r)
     }
     r->pFDeg = pWTotaldegree; // may be improved: pTotaldegree for lp/dp/ls/.. blocks
   }
-  if (r->pFDeg!=pWTotaldegree)
-  {
-    if (rOrd_is_Totaldegree_Ordering(r))
-    {
-      r->pFDeg = pDeg;
-    }
-    else
-    {
-      r->pFDeg=pTotaldegree;
-    }
-  }
+  if (rOrd_is_Totaldegree_Ordering(r))
+    r->pFDeg = pDeg;
 }
 
 /*2
@@ -2724,6 +2728,7 @@ BOOLEAN rComplete(ring r, int force)
   int bits;
   r->bitmask=rGetExpSize(r->bitmask,bits,r->N);
   r->BitsPerExp = bits;
+  r->ExpPerLong = BIT_SIZEOF_LONG / bits;
   r->divmask=rGetDivMask(bits);
 
   // will be used for ordsgn:
@@ -2737,9 +2742,8 @@ BOOLEAN rComplete(ring r, int force)
   sro_ord *tmp_typ=(sro_ord *)omAlloc0(2*(n+r->N)*sizeof(sro_ord));
   int typ_i=0;
   int prev_ordsgn=0;
-  r->pVarLowIndex=0;
 
-  // fill in v, tmp_typ, tmp_ordsgn, determine pVarLowIndex, typ_i (== ordSize)
+  // fill in v, tmp_typ, tmp_ordsgn, determine typ_i (== ordSize)
   int j=0;
   int j_bits=BITS_PER_LONG;
   BOOLEAN need_to_add_comp=FALSE;
@@ -2750,7 +2754,6 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_a:
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
                    r->wvhdl[i]);
-        r->pVarLowIndex=j;
         typ_i++;
         break;
 
@@ -2775,7 +2778,6 @@ BOOLEAN rComplete(ring r, int force)
                        r->wvhdl[i]+(r->block1[i]-r->block0[i]+1)*l);
             typ_i++;
           }
-          r->pVarLowIndex=j;
           break;
         }
 
@@ -2804,7 +2806,6 @@ BOOLEAN rComplete(ring r, int force)
         {
           rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                      tmp_typ[typ_i]);
-          r->pVarLowIndex=j;
           typ_i++;
           rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i]+1,
                          prev_ordsgn,tmp_ordsgn,v,bits, r->block0[i]);
@@ -2821,7 +2822,6 @@ BOOLEAN rComplete(ring r, int force)
         {
           rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                      tmp_typ[typ_i]);
-          r->pVarLowIndex=j;
           typ_i++;
           rO_LexVars(j, j_bits, r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits, r->block1[i]);
@@ -2838,7 +2838,6 @@ BOOLEAN rComplete(ring r, int force)
         {
           rO_TDegree_neg(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                          tmp_typ[typ_i]);
-          r->pVarLowIndex=j;
           typ_i++;
           rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i]+1,
                          prev_ordsgn,tmp_ordsgn,v,bits, r->block0[i]);
@@ -2855,7 +2854,6 @@ BOOLEAN rComplete(ring r, int force)
         {
           rO_TDegree_neg(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                          tmp_typ[typ_i]);
-          r->pVarLowIndex=j;
           typ_i++;
           rO_LexVars(j, j_bits, r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits, r->block1[i]);
@@ -2865,7 +2863,6 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_wp:
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                    tmp_typ[typ_i], r->wvhdl[i]);
-        r->pVarLowIndex=j;
         typ_i++;
         if (r->block1[i]!=r->block0[i])
         {
@@ -2877,7 +2874,6 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_Wp:
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                    tmp_typ[typ_i], r->wvhdl[i]);
-        r->pVarLowIndex=j;
         typ_i++;
         if (r->block1[i]!=r->block0[i])
         {
@@ -2889,7 +2885,6 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_ws:
         rO_WDegree_neg(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                        tmp_typ[typ_i], r->wvhdl[i]);
-        r->pVarLowIndex=j;
         typ_i++;
         if (r->block1[i]!=r->block0[i])
         {
@@ -2901,7 +2896,6 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_Ws:
         rO_WDegree_neg(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                        tmp_typ[typ_i], r->wvhdl[i]);
-        r->pVarLowIndex=j;
         typ_i++;
         if (r->block1[i]!=r->block0[i])
         {
@@ -2912,14 +2906,12 @@ BOOLEAN rComplete(ring r, int force)
 
       case ringorder_S:
         rO_Syzcomp(j, j_bits,prev_ordsgn, tmp_ordsgn,tmp_typ[typ_i]);
-        r->pVarLowIndex=j;
         need_to_add_comp=TRUE;
         typ_i++;
         break;
 
       case ringorder_s:
         rO_Syz(j, j_bits,prev_ordsgn, tmp_ordsgn,tmp_typ[typ_i]);
-        r->pVarLowIndex=j;
         need_to_add_comp=TRUE;
         typ_i++;
         break;
@@ -2935,7 +2927,7 @@ BOOLEAN rComplete(ring r, int force)
   int j0=j; // save j
   int j_bits0=j_bits; // save jbits
   rO_Align(j,j_bits);
-  r->pCompHighIndex=j-1;
+  r->CmpL_Size = j;
 
   j_bits=j_bits0; j=j0;
 
@@ -2971,24 +2963,21 @@ BOOLEAN rComplete(ring r, int force)
     }
   }
 
-  r->pVarHighIndex=j - (j_bits==0);
   rO_Align(j,j_bits);
   // ----------------------------
   // finished with constructing the monomial, computing sizes:
 
-  r->ExpESize=j;
-  r->ExpLSize=j;
-  r->PolyBin = omGetSpecBin(POLYSIZE + (r->ExpLSize)*sizeof(long));
+  r->ExpL_Size=j;
+  r->PolyBin = omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
   assume(r->PolyBin != NULL);
 
   // ----------------------------
   // indices and ordsgn vector for comparison
   //
   // r->pCompHighIndex already set
-  r->pCompLSize = r->pCompHighIndex + 1;
-  r->ordsgn=(long *)omAlloc0(r->ExpLSize*sizeof(long));
+  r->ordsgn=(long *)omAlloc0(r->ExpL_Size*sizeof(long));
 
-  for(j=0;j<=r->pCompHighIndex;j++)
+  for(j=0;j<r->CmpL_Size;j++)
   {
     r->ordsgn[j] = tmp_ordsgn[j];
   }
@@ -3026,6 +3015,10 @@ BOOLEAN rComplete(ring r, int force)
   r->pOrdIndex=i;
 
   // ----------------------------
+  // r->p_Setm
+  r->p_Setm = p_GetSetmProc(r);
+
+  // ----------------------------
   // p_Procs
   r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
   p_SetProcs(r, r->p_Procs);
@@ -3033,6 +3026,11 @@ BOOLEAN rComplete(ring r, int force)
   // ----------------------------
   // set VarL_*
   rSetVarL(r);
+
+  //  ----------------------------
+  // right-adjust VarOffset
+  rRightAdjustVarOffset(r);
+  
   // ----------------------------
   // set NegWeightL*
   rSetNegWeight(r);
@@ -3060,8 +3058,8 @@ void rUnComplete(ring r)
     {
       omFreeSize((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord));
     }
-    if (r->ordsgn != NULL && r->pCompLSize != 0)
-      omFreeSize((ADDRESS)r->ordsgn,r->ExpLSize*sizeof(long));
+    if (r->ordsgn != NULL && r->CmpL_Size != 0)
+      omFreeSize((ADDRESS)r->ordsgn,r->ExpL_Size*sizeof(long));
     if (r->p_Procs != NULL)
       omFreeSize(r->p_Procs, sizeof(p_Procs_s));
     omfreeSize(r->VarL_Offset, r->VarL_Size*sizeof(int));
@@ -3076,42 +3074,94 @@ void rUnComplete(ring r)
 // set r->VarL_Size, r->VarL_Offset, r->VarL_LowIndex
 static void rSetVarL(ring r)
 {
-  poly p = p_Init(r);
-  int* VarL_Offset = (int*) omAlloc0(r->ExpLSize*sizeof(int));
+  int  min = INT_MAX, min_j = -1;
+  int* VarL_Number = (int*) omAlloc0(r->ExpL_Size*sizeof(int));
+  
   int i,j;
 
+  // count how often a var long is occupied by an exponent
   for (i=1; i<=r->N; i++)
-    p_SetExp(p, i, 1, r);
-
-  r->VarL_LowIndex = 0;
-  for (i=0, j=0; i<r->ExpLSize; i++)
   {
-    if (p->exp[i] != 0)
+    VarL_Number[r->VarOffset[i] & 0xffffff]++;
+  }
+
+  // determine how many and min
+  for (i=0, j=0; i<r->ExpL_Size; i++)
+  {
+    if (VarL_Number[i] != 0) 
     {
-      VarL_Offset[j] = i;
-      if (j > 0 && VarL_Offset[j-1] != VarL_Offset[j] - 1)
+      if (min > VarL_Number[i])
+      {
+        min = VarL_Number[i];
+        min_j = j;
+      }
+      j++;
+    }
+  }
+
+  r->VarL_Size = j;
+  r->VarL_Offset = (int*) omAlloc(r->VarL_Size*sizeof(int));
+  r->VarL_LowIndex = 0;
+  
+  // set VarL_Offset
+  for (i=0, j=0; i<r->ExpL_Size; i++)
+  {
+    if (VarL_Number[i] != 0)
+    {
+      r->VarL_Offset[j] = i;
+      if (j > 0 && r->VarL_Offset[j-1] != r->VarL_Offset[j] - 1)
         r->VarL_LowIndex = -1;
       j++;
     }
   }
-  r->VarL_Size = j;
   if (r->VarL_LowIndex >= 0)
-    r->VarL_LowIndex = VarL_Offset[0];
-  r->VarL_Offset = (int*) omReallocSize(VarL_Offset,r->ExpLSize*sizeof(int),
-                                        j*sizeof(int));
-  p_LmFree(p, r);
+    r->VarL_LowIndex = r->VarL_Offset[0];
+
+  r->MinExpPerLong = min;
+  if (min_j != 0)
+  {
+    j = r->VarL_Offset[min_j];
+    r->VarL_Offset[min_j] = r->VarL_Offset[0];
+    r->VarL_Offset[0] = j;
+  }
+  omFree(VarL_Number);
+}
+
+static void rRightAdjustVarOffset(ring r)
+{
+  int* shifts = (int*) omAlloc(r->ExpL_Size*sizeof(int));
+  int i;
+  // initialize shifts
+  for (i=0;i<r->ExpL_Size;i++)
+    shifts[i] = BIT_SIZEOF_LONG;
+  
+  // find minimal bit in each long var
+  for (i=1;i<=r->N;i++)
+  {
+    if (shifts[r->VarOffset[i] & 0xffffff] > r->VarOffset[i] >> 24)
+      shifts[r->VarOffset[i] & 0xffffff] = r->VarOffset[i] >> 24;
+  }
+  // reset r->VarOffset
+  for (i=1;i<=r->N;i++)
+  {
+    if (shifts[r->VarOffset[i] & 0xffffff] != 0)
+      r->VarOffset[i] 
+        = (r->VarOffset[i] & 0xffffff) | 
+        (((r->VarOffset[i] >> 24) - shifts[r->VarOffset[i] & 0xffffff]) << 24);
+  }
+  omFree(shifts);
 }
 
 // get r->divmask depending on bits per exponent
 static unsigned long rGetDivMask(int bits)
 {
-  unsigned long divmask = 0;
-  int i = BIT_SIZEOF_LONG - bits;
+  unsigned long divmask = 1;
+  int i = bits;
 
-  while (i >= 0)
+  while (i < BIT_SIZEOF_LONG)
   {
-    divmask |= (1 << (unsigned long) i);
-    i -= bits;
+    divmask |= (((unsigned long) 1) << (unsigned long) i);
+    i += bits;
   }
   return divmask;
 }
@@ -3127,14 +3177,18 @@ void rDebugPrint(ring r)
   char *TYP[]={"ro_dp","ro_wp","ro_wp_neg","ro_cp",
                "ro_syzcomp", "ro_syz", "ro_none"};
   int i,j;
+  
+  Print("ExpL_Size:%d ",r->ExpL_Size);
+  Print("CmpL_Size:%d ",r->CmpL_Size);
+  Print("VarL_Size:%d\n",r->VarL_Size);
+  Print("bitmask=0x%x (expbound=%d) \n",r->bitmask, r->bitmask);
+  Print("BitsPerExp=%d ExpPerLong=%d MinExpPerLong=%d at L[%d]\n", r->BitsPerExp, r->ExpPerLong, r->MinExpPerLong, r->VarL_Offset[0]);
   PrintS("varoffset:\n");
   for(j=0;j<=r->N;j++) Print("  v%d at e-pos %d, bit %d\n",
      j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
-  Print("BitsPerExp=%d\n", r->BitsPerExp);
-  Print("bitmask=0x%x\n",r->bitmask);
   Print("divmask=%p\n", r->divmask);
   PrintS("ordsgn:\n");
-  for(j=0;j<r->pCompLSize;j++)
+  for(j=0;j<r->CmpL_Size;j++)
     Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j);
   Print("OrdSgn:%d\n",r->OrdSgn);
   PrintS("ordrec:\n");
@@ -3156,23 +3210,13 @@ void rDebugPrint(ring r)
     }
     PrintLn();
   }
-  Print("pVarLowIndex:%d ",r->pVarLowIndex);
-  Print("pVarHighIndex:%d\n",r->pVarHighIndex);
-  Print("VarL_Size:%d\nVarL_LowIndex:%d\n", r->VarL_Size, r->VarL_LowIndex);
-#ifdef LONG_MONOMS
-  Print("pDivLow:%d ",r->pDivLow);
-  Print("pDivHigh:%d\n",r->pDivHigh);
-#endif
-  Print("pCompHighIndex:%d\n",r->pCompHighIndex);
   Print("pOrdIndex:%d pCompIndex:%d\n", r->pOrdIndex, r->pCompIndex);
-  Print("ExpESize:%d ",r->ExpESize);
-  Print("ExpLSize:%d ",r->ExpLSize);
   Print("OrdSize:%d\n",r->OrdSize);
   PrintS("--------------------\n");
-  for(j=0;j<r->ExpLSize;j++)
+  for(j=0;j<r->ExpL_Size;j++)
   {
     Print("L[%d]: ",j);
-    if (j<=r->pCompHighIndex)
+    if (j< r->CmpL_Size)
       Print("ordsgn %d ", r->ordsgn[j]);
     else
       PrintS("no comp ");
@@ -3222,8 +3266,8 @@ void pDebugPrint(poly p)
   j=10;
   while(p!=NULL)
   {
-    Print("\nexp[0..%d]\n",currRing->ExpLSize-1);
-    for(i=0;i<currRing->ExpLSize;i++)
+    Print("\nexp[0..%d]\n",currRing->ExpL_Size-1);
+    for(i=0;i<currRing->ExpL_Size;i++)
       Print("%d ",p->exp[i]);
     PrintLn();
     Print("v0:%d ",pGetComp(p));

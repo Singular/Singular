@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.15 2000-10-26 06:39:27 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.16 2000-10-30 13:40:17 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -201,8 +201,8 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 BOOLEAN ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 {
   BOOLEAN ret;
-  poly Lp =     PR->GetLm();
-  poly Save =   PW->GetLm();
+  poly Lp =     PR->GetLmCurrRing();
+  poly Save =   PW->GetLmCurrRing();
   
   kTest_L(PR);
   kTest_T(PW);

@@ -6,7 +6,7 @@
  *  Purpose: template for pp_Mult_nn
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_nn__Template.cc,v 1.4 2000-10-16 12:06:39 obachman Exp $
+ *  Version: $Id: pp_Mult_nn__Template.cc,v 1.5 2000-10-30 13:40:26 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -23,7 +23,7 @@ poly pp_Mult_nn(poly p, const number n, const ring r)
   spolyrec rp;
   poly q = &rp;
   omBin bin = r->PolyBin;
-  DECLARE_LENGTH(const unsigned long length = r->ExpLSize);
+  DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
 
   do
   {

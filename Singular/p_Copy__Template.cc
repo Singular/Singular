@@ -6,7 +6,7 @@
  *  Purpose: template for p_Copy
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Copy__Template.cc,v 1.3 2000-09-18 09:19:25 obachman Exp $
+ *  Version: $Id: p_Copy__Template.cc,v 1.4 2000-10-30 13:40:22 obachman Exp $
  *******************************************************************/
 
 poly p_Copy(poly s_p, const ring r)
@@ -18,7 +18,7 @@ poly p_Copy(poly s_p, const ring r)
   omBin bin = r->PolyBin;
   poly h;
   
-  DECLARE_LENGTH(const unsigned long length = r->ExpLSize);
+  DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
 
   while (s_p != NULL)
   {

@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.10 2000-10-26 16:31:36 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.11 2000-10-30 13:40:20 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -162,6 +162,8 @@ BOOLEAN pHaveCommonMonoms(poly p, poly q)
  * Testing of polys
  *
  ***************************************************************/
+extern void p_Setm_General(poly p, ring r);
+
 static poly p_DebugInit(poly p, ring dest_ring, ring src_ring)
 {
   poly d_p = p_Init(dest_ring);
@@ -174,7 +176,8 @@ static poly p_DebugInit(poly p, ring dest_ring, ring src_ring)
   }
   if (rRing_has_Comp(dest_ring))
     p_SetComp(d_p, p_GetComp(p, src_ring), dest_ring);
-  p_Setm(d_p, dest_ring);
+  
+  p_Setm_General(d_p, dest_ring);
   return d_p;
 }
 

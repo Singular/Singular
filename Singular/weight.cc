@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.16 2000-10-24 07:00:46 pohl Exp $ */
+/* $Id: weight.cc,v 1.17 2000-10-30 13:40:29 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -260,10 +260,10 @@ short * iv2array(intvec * iv)
 *with respect to given ecartWeights
 *used for Graebes method if BTEST1(31) is set
 */
-int totaldegreeWecart(poly p, ring r)
+long totaldegreeWecart(poly p, ring r)
 {
   int i;
-  int j =0;
+  long j =0;
 
   for (i=r->N; i; i--)
     j += (int)(p_GetExp(p,i,r) * ecartWeights[i]);
@@ -276,11 +276,11 @@ int totaldegreeWecart(poly p, ring r)
 *computes the length of the polynomial
 *used for Graebes method if BTEST1(31) is set
 */
-int maxdegreeWecart(poly p,int *l, ring r)
+long maxdegreeWecart(poly p,int *l, ring r)
 {
   short k=p_GetComp(p, r);
   int ll=1;
-  int  t,max;
+  long t,max;
 
   max=totaldegreeWecart(p, r);
   pIter(p);

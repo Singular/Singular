@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.13 2000-10-26 16:31:36 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.14 2000-10-30 13:40:21 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -18,14 +18,10 @@
  ***************************************************************/
 #if !defined(NO_PINLINE2) || defined(PINLINE2_CC)
 
-#include "mod2.h"
 #include "tok.h"
 #include "omalloc.h"
-#include "structs.h"
-#include "p_polys.h"
 #include "numbers.h"
 #include "p_Procs.h"
-
 
 PINLINE2 number p_SetCoeff(poly p, number n, ring r)
 {
@@ -46,7 +42,7 @@ PINLINE2 Order_t p_GetOrder(poly p, ring r)
     switch(r->typ[i].ord_typ)
     {
       case ro_wp_neg:
-        return (((int)((p)->exp[r->pOrdIndex]))-POLY_NEGWEIGHT_OFFSET);
+        return (((long)((p)->exp[r->pOrdIndex]))-((long) POLY_NEGWEIGHT_OFFSET));
       case ro_syzcomp:
       case ro_syz:
       case ro_cp:
@@ -84,6 +80,13 @@ PINLINE2 Order_t p_SetOrder(poly p, long o, ring r)
     }
   }
   return (p)->exp[r->pOrdIndex] = o;
+}
+
+// Setm
+PINLINE2 void p_Setm(poly p, ring r)
+{
+  p_CheckRing2(r);
+  r->p_Setm(p, r);
 }
 
 // component
@@ -526,15 +529,15 @@ PINLINE2 char*     p_String0(poly p, ring p_ring)
 }
 PINLINE2 void      p_Write(poly p, ring p_ring)
 {
-  return p_Write(p, p_ring, p_ring);
+  p_Write(p, p_ring, p_ring);
 }
 PINLINE2 void      p_Write0(poly p, ring p_ring)
 {
-  return p_Write0(p, p_ring, p_ring);
+  p_Write0(p, p_ring, p_ring);
 }
 PINLINE2 void      p_wrp(poly p, ring p_ring)
 {
-  return p_wrp(p, p_ring, p_ring);
+  p_wrp(p, p_ring, p_ring);
 }
 #endif // !defined(NO_PINLINE2) || defined(POLYS_IMPL_CC)
 #endif // PINLINE2_H

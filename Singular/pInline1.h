@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.10 2000-10-26 16:31:36 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.11 2000-10-30 13:40:21 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -16,11 +16,9 @@
 #undef PDIV_DEBUG
 #endif
 #include <limits.h>
-
-#include "mod2.h"
-#include "structs.h"
 #include "p_MemCmp.h"
-#include "polys-impl.h"
+#include "tok.h"
+#include "numbers.h"
 
 #if PDEBUG > 0 || defined(NO_PINLINE1)
 
@@ -37,7 +35,7 @@ while(0)
 #else
 
 #define _p_LmCmpAction(p, q, r, actionE, actionG, actionS)                      \
- p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->pCompLSize, r->ordsgn,    \
+ p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->CmpL_Size, r->ordsgn,    \
                                    actionE, actionG, actionS)
 
 #endif
@@ -129,7 +127,7 @@ PINLINE1 poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
   p_LmCheckPolyRing1(p, r);
   pAssume1(bin->sizeW == r->PolyBin->sizeW);
   poly new_p = p_New(r);
-  p_MemCopy_LengthGeneral(new_p->exp, p->exp, r->ExpLSize);
+  p_MemCopy_LengthGeneral(new_p->exp, p->exp, r->ExpL_Size);
   pSetCoeff0(new_p, pGetCoeff(p));
   pNext(new_p) = pNext(p);
   omFreeBinAddr(p);
@@ -146,7 +144,7 @@ PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, ring r)
 {
   p_LmCheckPolyRing1(d_p, r);
   p_LmCheckPolyRing1(s_p, r);
-  p_MemCopy_LengthGeneral(d_p->exp, s_p->exp, r->ExpLSize);
+  p_MemCopy_LengthGeneral(d_p->exp, s_p->exp, r->ExpL_Size);
 }
 // ExpVector(p1) += ExpVector(p2)
 PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r)
@@ -159,7 +157,7 @@ PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r)
   pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
 #endif 
  
-  p_MemAdd_LengthGeneral(p1->exp, p2->exp, r->ExpLSize);
+  p_MemAdd_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
 }
 // ExpVector(p1) -= ExpVector(p2)
 PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
@@ -173,7 +171,7 @@ PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
           p_GetComp(p1, r) == p_GetComp(p2, r));
 #endif 
  
-  p_MemSub_LengthGeneral(p1->exp, p2->exp, r->ExpLSize);
+  p_MemSub_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
 }
 // ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
 PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r)
@@ -189,7 +187,7 @@ PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r)
            (p_GetComp(p1, r) == p_GetComp(p2, r) - p_GetComp(p3, r)));
 #endif 
  
-  p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpLSize);
+  p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpL_Size);
 }
 // ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
 PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
@@ -203,7 +201,7 @@ PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
   pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
 #endif  
 
-  p_MemSum_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpLSize);
+  p_MemSum_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
 }
 // ExpVector(pr) = ExpVector(p1) - ExpVector(p2)
 PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
@@ -217,7 +215,7 @@ PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
   pAssume1(!rRing_has_Comp(r) || p_GetComp(p1, r) == p_GetComp(p2, r));
 #endif 
  
-  p_MemDiff_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpLSize);
+  p_MemDiff_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
 }
 
 PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
@@ -225,7 +223,7 @@ PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
   p_LmCheckPolyRing1(p1, r);
   p_LmCheckPolyRing1(p2, r);
  
-  int i = r->ExpLSize;
+  int i = r->ExpL_Size;
   unsigned long *ep = p1->exp;
   unsigned long *eq = p2->exp;
 
@@ -241,15 +239,13 @@ PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
 PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r)
 {
   p_LmCheckPolyRing1(p, r);
-  unsigned long s = 0;
-  unsigned long i = r->N;
-  
-  do
+  unsigned long s = p_GetTotalDegree(p->exp[r->VarL_Offset[0]], 
+                                     r, 
+                                     r->MinExpPerLong);
+  for (int i = 1; i<r->VarL_Size; i++)
   {
-    s += p_GetExp(p, i, r);
-    i--;
+    s += p_GetTotalDegree(p->exp[r->VarL_Offset[i]], r);
   }
-  while (i);
   return s;
 }
 
@@ -281,7 +277,7 @@ PINLINE1 int p_LmCmp(poly p, poly q, ring r)
   p_LmCheckPolyRing1(p, r);
   p_LmCheckPolyRing1(q, r);
 
-  p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->pCompLSize, r->ordsgn, 
+  p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->CmpL_Size, r->ordsgn, 
                                     return 0, return 1, return -1);
 }
 
@@ -486,21 +482,63 @@ PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2,
   return TRUE;
 }
 
-PINLINE1 Exponent_t p_GetMaxExp(unsigned long l, ring r)
+
+PINLINE1 Exponent_t 
+p_GetMaxExp(const unsigned long l, const ring r, const number_of_exps)
 {
-  long shift = (BIT_SIZEOF_LONG - r->BitsPerExp);
-  unsigned long max = 0;
-  Exponent_t e;
+  unsigned long bitmask = r->bitmask;
+  unsigned long max = (l & bitmask);
+  unsigned long j = number_of_exps - 1;
   
-  for (;shift >= 0; shift -= r->BitsPerExp)
+  if (j > 0)
   {
-    e = ((l >> shift) & r->bitmask);
-    if ((unsigned long) e > max) 
-      max = e;
+    unsigned long i = r->BitsPerExp;
+    Exponent_t e;
+    while(1)
+    {
+      e = ((l >> i) & bitmask);
+      if ((unsigned long) e > max) 
+        max = e;
+      j--;
+      if (j==0) break;
+      i += r->BitsPerExp;
+    }
   }
   return max;
 }
 
+PINLINE1 Exponent_t p_GetMaxExp(const unsigned long l, const ring r)
+{
+  return p_GetMaxExp(l, r, r->ExpPerLong);
+}
+
+PINLINE1 unsigned long 
+p_GetTotalDegree(const unsigned long l, const ring r, const number_of_exps)
+{
+  const unsigned long bitmask = r->bitmask;
+  unsigned long sum = (l & bitmask);
+  unsigned long j = number_of_exps - 1;
+  
+  if (j > 0)
+  {
+    unsigned long i = r->BitsPerExp;
+    while(1)
+    {
+      sum += ((l >> i) & bitmask);
+      j--;
+      if (j==0) break;
+      i += r->BitsPerExp;
+    }
+  }
+  return sum;
+}
+
+PINLINE1 unsigned long 
+p_GetTotalDegree(const unsigned long l, const ring r)
+{
+  return p_GetTotalDegree(l, r, r->ExpPerLong);
+}
+  
 #endif // !defined(NO_PINLINE1) || defined(PINLINE1_CC)
 #endif // PINLINE1_CC
 

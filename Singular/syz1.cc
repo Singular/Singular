@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.66 2000-10-23 12:02:21 obachman Exp $ */
+/* $Id: syz1.cc,v 1.67 2000-10-30 13:40:28 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -32,7 +32,8 @@
 #include "kbuckets.h"
 #include "prCopy.h"
 
-extern void rSetmS(poly p, int* Components, long* ShiftedComponents);
+extern void p_Setm_Syz(poly p, ring r, 
+                       int* Components, long* ShiftedComponents);
 
 /*--------------static variables------------------------*/
 /*---points to the real components, shifted of the actual module-*/
@@ -442,7 +443,7 @@ long syReorderShiftedComponents(long * sc, int n)
   if (LONG_MAX - SYZ_SHIFT_BASE <= sc[n-1])
   {
     // need new components
-    new_comps = (1 << SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE) - 1;
+    new_comps = (((long) 1) << SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE) - 1;
     max = LONG_MAX;
   }
   else
@@ -904,11 +905,11 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
       pSetCoeff(p,nDiv(pGetCoeff(tso.p1),coefgcd));
       pGetCoeff(p) = nNeg(pGetCoeff(p));
       pSetComp(p,tso.ind2+1);
-      rSetmS(p, Components, ShiftedComponents); // actueller index
+      p_Setm_Syz(p, currRing, Components, ShiftedComponents); // actueller index
       pNext(p) = pHead(tso.lcm);
       pIter(p);
       pSetComp(p,tso.ind1+1);
-      rSetmS(p, Components, ShiftedComponents); // actueller index
+      p_Setm_Syz(p, currRing, Components, ShiftedComponents); // actueller index
       pSetCoeff(p,nDiv(pGetCoeff(tso.p2),coefgcd));
       nDelete(&coefgcd);
       if (tso.p != NULL)
@@ -925,7 +926,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
             pNext(p) = pHead(q);
             pIter(p);
             pSetComp(p,bin[j]+1);
-            rSetmS(p, Components, ShiftedComponents); // actueller index
+            p_Setm_Syz(p, currRing, Components, ShiftedComponents); // actueller index
 //if (pLength(redset[j])!=syzstr->elemLength[index][bin[j]])
 //Print("Halt");
 //if (pLength(redset[j])!=syzstr->elemLength[index][bin[j]])
@@ -971,7 +972,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
         pNorm(syzstr->res[index]->m[k-1]);
         need_reset = syOrder(syzstr->res[index]->m[k-1],syzstr,index,k);
         pSetComp(p,k); // actueller index
-        rSetmS(p, Components, ShiftedComponents);
+        p_Setm_Syz(p, currRing, Components, ShiftedComponents);
         pGetCoeff(p) = nNeg(pGetCoeff(p));
 
         tso.isNotMinimal = p;
@@ -1200,7 +1201,7 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
       p = pOne();
       pLcm(rs[jj],q,p);
       pSetComp(p,j+1);
-      rSetmS(p, Components, ShiftedComponents);
+      p_Setm_Syz(p, currRing, Components, ShiftedComponents);
       ii = first;
       loop
       {

@@ -6,7 +6,7 @@
  *  Purpose: template for pp_Mult_Coeff_mm__DivSelect
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_Coeff_mm_DivSelect__Template.cc,v 1.2 2000-10-19 15:00:20 obachman Exp $
+ *  Version: $Id: pp_Mult_Coeff_mm_DivSelect__Template.cc,v 1.3 2000-10-30 13:40:26 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -25,7 +25,7 @@ poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
   spolyrec rp;
   poly q = &rp;
   omBin bin = r->PolyBin;
-  DECLARE_LENGTH(const unsigned long length = r->ExpLSize);
+  DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
 
   do
   {

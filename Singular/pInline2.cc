@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.cc,v 1.2 2000-09-14 13:04:38 obachman Exp $
+ *  Version: $Id: pInline2.cc,v 1.3 2000-10-30 13:40:21 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_CC
 #define PINLINE2_CC
@@ -24,5 +24,6 @@
 
 #endif // PDEBUG
 
-#include "pInline2.h"
+#include "p_polys.h"
+
 #endif

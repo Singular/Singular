@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.43 2000-10-26 16:31:38 obachman Exp $ */
+/* $Id: polys.h,v 1.44 2000-10-30 13:40:25 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -259,16 +259,16 @@ extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
  ***************************************************************/
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
-int pDeg(poly p, ring r = currRing);
-int pTotaldegree(poly p, ring r = currRing);
-int pWTotaldegree(poly p, ring r = currRing);
-int pWDegree(poly p, ring r = currRing);
-int pWeight(int c, ring r = currRing);
-int pLDeg0(poly p,int *l, ring r = currRing);
-int pLDeg0c(poly p,int *l, ring r = currRing);
-int pLDegb(poly p,int *l, ring r = currRing);
-int pLDeg1(poly p,int *l, ring r = currRing);
-int pLDeg1c(poly p,int *l, ring r = currRing);
+int  pWeight(int c, ring r = currRing);
+long pDeg(poly p, ring r = currRing);
+long pTotaldegree(poly p, ring r = currRing);
+long pWTotaldegree(poly p, ring r = currRing);
+long pWDegree(poly p, ring r = currRing);
+long pLDeg0(poly p,int *l, ring r = currRing);
+long pLDeg0c(poly p,int *l, ring r = currRing);
+long pLDegb(poly p,int *l, ring r = currRing);
+long pLDeg1(poly p,int *l, ring r = currRing);
+long pLDeg1c(poly p,int *l, ring r = currRing);
 
 /*-------------pComp for syzygies:-------------------*/
 
@@ -302,9 +302,9 @@ BOOLEAN   pOneComp(poly p);
 // let's inline those, so that we can call them from the debugger
 inline char*   pString(poly p)    {return p_String(p, currRing, currRing);}
 inline char*   pString0(poly p)   {return p_String0(p, currRing, currRing);}
-inline void    pWrite(poly p)     {return p_Write(p, currRing, currRing);}
-inline void    pWrite0(poly p)    {return p_Write0(p, currRing, currRing);}
-inline void    wrp(poly p)        {return p_wrp(p, currRing, currRing);}
+inline void    pWrite(poly p)     {p_Write(p, currRing, currRing);}
+inline void    pWrite0(poly p)    {p_Write0(p, currRing, currRing);}
+inline void    wrp(poly p)        {p_wrp(p, currRing, currRing);}
 
 void      pEnlargeSet(polyset *p, int length, int increment);
 poly      pISet(int i);
@@ -348,7 +348,7 @@ void      pVectorHasUnit(poly p, int * k, int * len);
 poly      pTakeOutComp1(poly * p, int k);
 // Splits *p into two polys: *q which consists of all monoms with
 // component == comp and *p of all other monoms *lq == pLength(*q)
-// On rreturn all components pf *q == 0
+// On return all components pf *q == 0
 void pTakeOutComp(poly *p, Exponent_t comp, poly *q, int *lq);
 // Similar to pTakeOutComp, except that only those components are
 // taken out whose Order == order

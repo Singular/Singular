@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.cc,v 1.2 2000-09-14 13:04:38 obachman Exp $
+ *  Version: $Id: pInline1.cc,v 1.3 2000-10-30 13:40:21 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_CC
 #define PINLINE1_CC
@@ -25,7 +25,7 @@
 
 #endif // PDEBUG
 
-#include "pInline1.h"
+#include "p_polys.h"
 
 #endif // PINLINE1_CC
 

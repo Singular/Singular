@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__Template.cc,v 1.4 2000-09-20 13:25:42 obachman Exp $
+ *  Version: $Id: pp_Mult_mm__Template.cc,v 1.5 2000-10-30 13:40:26 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -26,7 +26,7 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
   poly q = &rp, r;
   number ln = pGetCoeff(m);
   omBin bin = ri->PolyBin;
-  DECLARE_LENGTH(const unsigned long length = ri->ExpLSize);
+  DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
   const unsigned long* m_e = m->exp;
   pAssume(!n_IsZero(ln,ri));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);

@@ -6,17 +6,26 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.5 2000-10-26 06:39:30 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.6 2000-10-30 13:40:23 obachman Exp $
  *******************************************************************/
 
 #include "mod2.h"
+#include "structs.h"
 #include "tok.h"
 #include "p_polys.h"
 #include "ring.h"
 
+/***************************************************************
+ *
+ * Completing what needs to be set for the monomial
+ *
+ ***************************************************************/
+// this is special for the syz stuff
+static int* _Components = NULL;
+static long* _ShiftedComponents = NULL;
+static int _ExternalComponents = 0;
 
-// complete the fields of the monomials
-void p_Setm(poly p, ring r)
+void p_Setm_General(poly p, ring r)
 {
   p_LmCheckPolyRing(p, r);
   int pos=0;
@@ -63,12 +72,15 @@ void p_Setm(poly p, ring r)
         {
           int c=p_GetComp(p,r);
           long sc = c;
-          if (o->data.syzcomp.ShiftedComponents != NULL)
+          int* Components = (_ExternalComponents ? _Components : 
+                             o->data.syzcomp.Components);
+          long* ShiftedComponents = (_ExternalComponents ? _ShiftedComponents: 
+                                     o->data.syzcomp.ShiftedComponents);
+          if (ShiftedComponents != NULL)
           {
-            assume(o->data.syzcomp.Components != NULL);
-            assume(c == 0 || o->data.syzcomp.Components[c] != 0);
-            sc =
-              o->data.syzcomp.ShiftedComponents[o->data.syzcomp.Components[c]];
+            assume(Components != NULL);
+            assume(c == 0 || Components[c] != 0);
+            sc = ShiftedComponents[Components[c]];
             assume(c == 0 || sc != 0);
           }
           p->exp[o->data.syzcomp.place]=sc;
@@ -98,6 +110,57 @@ void p_Setm(poly p, ring r)
   }
 }
 
+void p_Setm_Syz(poly p, ring r, int* Components, long* ShiftedComponents)
+{
+  _Components = Components;
+  _ShiftedComponents = ShiftedComponents;
+  _ExternalComponents = 1;
+  p_Setm_General(p, r);
+  _ExternalComponents = 0;
+}
+
+// dummy for lp, ls, etc
+void p_Setm_Dummy(poly p, ring r)
+{
+  p_LmCheckPolyRing(p, r);
+}
+
+// for dp, Dp, ds, etc
+void p_Setm_TotalDegree(poly p, ring r)
+{
+  p_LmCheckPolyRing(p, r);
+  p->exp[r->pOrdIndex] = p_ExpVectorQuerSum(p, r);
+}
+
+// for wp, Wp, ws, etc
+void p_Setm_WFirstTotalDegree(poly p, ring r)
+{
+  p_LmCheckPolyRing(p, r);
+  p->exp[r->pOrdIndex] = pWFirstTotalDegree(p, r);
+}
+
+p_SetmProc p_GetSetmProc(ring r)
+{
+  // covers lp, rp, ls, 
+  if (r->typ == NULL) return p_Setm_Dummy;
+
+  if (r->OrdSize == 1)
+  {
+    if (r->typ[0].ord_typ == ro_dp && 
+        r->typ[0].data.dp.start == 1 &&
+        r->typ[0].data.dp.end == r->N &&
+        r->typ[0].data.dp.place == r->pOrdIndex)
+      return p_Setm_TotalDegree;
+    if (r->typ[0].ord_typ == ro_wp && 
+        r->typ[0].data.wp.start == 1 &&
+        r->typ[0].data.wp.end == r->N &&
+        r->typ[0].data.wp.place == r->pOrdIndex &&
+        r->typ[0].data.wp.weights == r->firstwv)
+      return p_Setm_WFirstTotalDegree;
+  }
+  return p_Setm_General;
+}
+
 
 /* -------------------------------------------------------------------*/
 /* several possibilities for pFDeg: the degree of the head term       */
@@ -105,9 +168,10 @@ void p_Setm(poly p, ring r)
 * compute the degree of the leading monomial of p
 * the ordering is compatible with degree, use a->order
 */
-int pDeg(poly a, ring r)
+long pDeg(poly a, ring r)
 {
   p_LmCheckPolyRing(a, r);
+  pAssume(p_GetOrder(a, r) == pWTotaldegree(a, r));
   return p_GetOrder(a, r);
 }
 
@@ -117,22 +181,38 @@ int pDeg(poly a, ring r)
 * (all are 1 so save multiplications or they are of different signs)
 * the ordering is not compatible with degree so do not use p->Order
 */
-int pTotaldegree(poly p, ring r)
+long pTotaldegree(poly p, ring r)
 {
   p_LmCheckPolyRing(p, r);
-  return (int) p_ExpVectorQuerSum(p, r);
+  return (long) p_ExpVectorQuerSum(p, r);
 }
+
+
+// pWTotalDegree for weighted orderings which cover all variables
+// whose first block covers all variables
+long pWFirstTotalDegree(poly p, ring r)
+{
+  int i;
+  long sum = 0;
+  
+  for (i=1; i<= r->firstBlockEnds; i++)
+  {
+    sum += p_GetExp(p, i, r)*r->firstwv[i-1];
+  }
+  return sum;
+}
+
 
 /*2
 * compute the degree of the leading monomial of p
 * with respect to weigths from the ordering
 * the ordering is not compatible with degree so do not use p->Order
 */
-int pWTotaldegree(poly p, ring r)
+long pWTotaldegree(poly p, ring r)
 {
   p_LmCheckPolyRing(p, r);
   int i, k;
-  int j =0;
+  long j =0;
 
   // iterate through each block:
   for (i=0;r->order[i]!=0;i++)
@@ -184,14 +264,19 @@ int pWeight(int i, ring r)
   return r->firstwv[i-1];
 }
 
-int pWDegree(poly p, ring r)
+long pWDegree(poly p, ring r)
 {
+  if (r->firstwv==NULL) return pTotaldegree(p, r);
   p_LmCheckPolyRing(p, r);
   int i, k;
-  int j =0;
+  long j =0;
 
-  for(i=1;i<=r->N;i++)
+  for(i=1;i<=r->firstBlockEnds;i++)
+    j+=p_GetExp(p, i, r)*r->firstwv[i-1];
+
+  for (;i<=r->N;i++)
     j+=p_GetExp(p,i, r)*pWeight(i, r);
+
   return j;
 }
 
@@ -204,7 +289,7 @@ int pWDegree(poly p, ring r)
 * compute the length of a polynomial (in l)
 * and the degree of the monomial with maximal degree: the last one
 */
-int pLDeg0(poly p,int *l, ring r)
+long pLDeg0(poly p,int *l, ring r)
 {
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
@@ -224,10 +309,10 @@ int pLDeg0(poly p,int *l, ring r)
 * and the degree of the monomial with maximal degree: the last one
 * but search in all components before syzcomp
 */
-int pLDeg0c(poly p,int *l, ring r)
+long pLDeg0c(poly p,int *l, ring r)
 {
   p_CheckPolyRing(p, r);
-  int o=pFDeg(p, r);
+  long o=pFDeg(p, r);
   int ll=1;
 
   if (! rIsSyzIndexRing(r))
@@ -261,11 +346,11 @@ int pLDeg0c(poly p,int *l, ring r)
 * this works for the polynomial case with degree orderings
 * (both c,dp and dp,c)
 */
-int pLDegb(poly p,int *l, ring r)
+long pLDegb(poly p,int *l, ring r)
 {
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
-  int o = pFDeg(p, r);
+  long o = pFDeg(p, r);
   int ll=1;
 
   while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
@@ -281,12 +366,12 @@ int pLDegb(poly p,int *l, ring r)
 * and the degree of the monomial with maximal degree:
 * this is NOT the last one, we have to look for it
 */
-int pLDeg1(poly p,int *l, ring r)
+long pLDeg1(poly p,int *l, ring r)
 {
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
   int ll=1;
-  int  t,max;
+  long  t,max;
 
   max=pFDeg(p);
   while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
@@ -305,11 +390,11 @@ int pLDeg1(poly p,int *l, ring r)
 * this is NOT the last one, we have to look for it
 * in all components
 */
-int pLDeg1c(poly p,int *l, ring r)
+long pLDeg1c(poly p,int *l, ring r)
 {
   p_CheckPolyRing(p, r);
   int ll=1;
-  int  t,max;
+  long  t,max;
 
   max=pFDeg(p, r);
   while ((p=pNext(p))!=NULL)
@@ -333,18 +418,35 @@ int pLDeg1c(poly p,int *l, ring r)
  ***************************************************************/
 
 static inline unsigned long 
-p_GetMaxExp(unsigned long l1, unsigned long l2, ring r)
+p_GetMaxExpL2(unsigned long l1, unsigned long l2, ring r, 
+              unsigned long number_of_exp)
 {
-  unsigned long mask = r->bitmask << (BIT_SIZEOF_LONG - r->BitsPerExp);
-  unsigned long max = 0, ml1, ml2;
-  
-  for (;mask > 0; mask = mask >> r->BitsPerExp)
+  const unsigned long bitmask = r->bitmask;
+  unsigned long ml1 = l1 & bitmask;
+  unsigned long ml2 = l2 & bitmask;
+  unsigned long max = (ml1 > ml2 ? ml1 : ml2);
+  unsigned long j = number_of_exp - 1;
+
+  if (j > 0)
   {
-    ml1 = l1 & mask;
-    ml2 = l2 & mask;
-    max |= ((ml1 > ml2 ? ml1 : ml2) & mask);
+    unsigned long mask = bitmask << r->BitsPerExp;
+    while (1)
+    {
+      ml1 = l1 & mask;
+      ml2 = l2 & mask;
+      max |= ((ml1 > ml2 ? ml1 : ml2) & mask);
+      j--;
+      if (j == 0) break;
+      mask = mask << r->BitsPerExp;
+    }
   }
   return max;
+}
+
+static inline unsigned long
+p_GetMaxExpL2(unsigned long l1, unsigned long l2, ring r)
+{
+  return p_GetMaxExpL2(l1, l2, r, r->ExpPerLong);
 }
 
 poly p_GetMaxExpP(poly p, ring r)
@@ -354,46 +456,33 @@ poly p_GetMaxExpP(poly p, ring r)
   poly max = p_LmInit(p, r);
   pIter(p);
   if (p == NULL) return max;
-  int i;
+  int i, offset;
   unsigned long l_p, l_max;
   unsigned long divmask = r->divmask;
   
-  if (r->VarL_LowIndex >= 0)
+  do
   {
-    int VarL_HighIndex = r->VarL_LowIndex + r->VarL_Size;
-    do
+    offset = r->VarL_Offset[0];
+    l_p = p->exp[offset];
+    l_max = max->exp[offset];
+    // do the divisibility trick to find out whether l has an exponent
+    if (l_p > l_max || 
+        (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
+      max->exp[offset] = p_GetMaxExpL2(l_max, l_p, r, r->MinExpPerLong);
+
+    for (i=1; i<r->VarL_Size; i++)
     {
-      for (i=r->VarL_LowIndex; i<VarL_HighIndex; i++)
-      {
-        l_p = p->exp[i];
-        l_max = max->exp[i];
-        // do the divisibility trick to find out whether l_p has an exponent
-        // which is larger than the one in l_max
-        if (l_p > l_max || 
-            (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
-          max->exp[i] = p_GetMaxExp(l_max, l_p, r);
-      }
-      pIter(p);
+      offset = r->VarL_Offset[i];
+      l_p = p->exp[offset];
+      l_max = max->exp[offset];
+      // do the divisibility trick to find out whether l has an exponent
+      if (l_p > l_max || 
+          (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
+        max->exp[offset] = p_GetMaxExpL2(l_max, l_p, r);
     }
-    while (p != NULL);
+    pIter(p);
   }
-  else
-  {
-    do
-    {
-      for (i=0; i<r->VarL_Size; i++)
-      {
-        l_p = p->exp[r->VarL_Offset[i]];
-        l_max = max->exp[r->VarL_Offset[i]];
-        // do the divisibility trick to find out whether l has an exponent
-        if (l_p > l_max || 
-            (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
-          max->exp[r->VarL_Offset[i]] = p_GetMaxExp(l_max, l_p, r);
-      }
-      pIter(p);
-    }
-    while (p != NULL);
-  }
+  while (p != NULL);
   return max;
 }
 
@@ -404,13 +493,17 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
   
   while (p != NULL)
   {
-    for (i=0; i<r->VarL_Size; i++)
+    l_p = p->exp[r->VarL_Offset[0]];
+    if (l_p > l_max ||
+        (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
+      l_max = p_GetMaxExpL2(l_max, l_p, r, r->MinExpPerLong);
+    for (i=1; i<r->VarL_Size; i++)
     {
       l_p = p->exp[r->VarL_Offset[i]];
       // do the divisibility trick to find out whether l has an exponent
-        if (l_p > l_max || 
-            (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
-          l_max = p_GetMaxExp(l_max, l_p, r);
+      if (l_p > l_max || 
+          (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
+        l_max = p_GetMaxExpL2(l_max, l_p, r);
     }
     pIter(p);
   }

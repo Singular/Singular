@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.16 2000-10-26 16:31:37 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.17 2000-10-30 13:40:23 obachman Exp $
  *******************************************************************/
 #include <string.h>
 
@@ -73,7 +73,7 @@ const int HAVE_FAST_LENGTH = 4;
 //  4  -- special for all ords
 const int HAVE_FAST_ORD = 4;
 
-// undefine this, if ExpLSize always equals CompLSize
+// undefine this, if ExpL_Size always equals CompLSize
 #define HAVE_LENGTH_DIFF
 // Set HAVE_FAST_ZERO_ORD to:
 //  0 -- no zero ords are considered 
@@ -541,15 +541,15 @@ static inline p_Field p_FieldIs(ring r)
 
 static inline p_Length p_LengthIs(ring r)
 {
-  assume(r->ExpLSize > 0);
-  if (r->ExpLSize == 1) return LengthOne;
-  if (r->ExpLSize == 2) return LengthTwo;
-  if (r->ExpLSize == 3) return LengthThree;
-  if (r->ExpLSize == 4) return LengthFour;
-  if (r->ExpLSize == 5) return LengthFive;
-  if (r->ExpLSize == 6) return LengthSix;
-  if (r->ExpLSize == 7) return LengthSeven;
-  if (r->ExpLSize == 8) return LengthEight;
+  assume(r->ExpL_Size > 0);
+  if (r->ExpL_Size == 1) return LengthOne;
+  if (r->ExpL_Size == 2) return LengthTwo;
+  if (r->ExpL_Size == 3) return LengthThree;
+  if (r->ExpL_Size == 4) return LengthFour;
+  if (r->ExpL_Size == 5) return LengthFive;
+  if (r->ExpL_Size == 6) return LengthSix;
+  if (r->ExpL_Size == 7) return LengthSeven;
+  if (r->ExpL_Size == 8) return LengthEight;
   return LengthGeneral;
 }
 
@@ -573,7 +573,7 @@ static inline int p_IsPomog(long* sgn, int l)
 static inline p_Ord p_OrdIs(ring r)
 {
   long* sgn = r->ordsgn;
-  long l = r->ExpLSize;
+  long l = r->ExpL_Size;
   int zero = 0;
   
   if (sgn[l-1] == 0) 
