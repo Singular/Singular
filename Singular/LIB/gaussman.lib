@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.14 2000-12-06 14:56:26 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.15 2000-12-06 15:00:09 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -820,7 +820,7 @@ EXAMPLE: example vjacob; shows an example
   }
 
   dbprint(printlevel-voice+2,
-    "//gaussman::vjacob: compute multiplication of Jacobian algebra");
+    "//gaussman::vjacob: compute multiplication in Jacobian algebra");
   list M;
   for(i=ncols(m);i>=1;i--)
   {
@@ -838,7 +838,7 @@ EXAMPLE: example vjacob; shows an example
   while(r0<number(s[ncols(s)]-s[1]))
   {
     dbprint(printlevel-voice+2,
-      "//gaussman::vjacob: compute next difference r0 of spectral numbers");
+      "//gaussman::vjacob: find next possible index");
     r1=number(s[ncols(s)]-s[1]);
     for(j=ncols(s);j>=1;j--)
     {
@@ -859,7 +859,6 @@ EXAMPLE: example vjacob; shows an example
       }
     }
     r0=r1;
-    dbprint(printlevel-voice+2,"//gaussman::vjacob: r0="+string(r1));
 
     l=ideal();
     for(k=ncols(m);k>=2;k--)
@@ -867,7 +866,8 @@ EXAMPLE: example vjacob; shows an example
       l=l+list(ideal());
     }
 
-    dbprint(printlevel-voice+2,"//gaussman::vjacob: compute conditions");
+    dbprint(printlevel-voice+2,
+      "//gaussman::vjacob: collect conditions for V["+string(r0)+"]");
     j=ncols(s);
     j0=mu;
     while(j>=1)
@@ -896,7 +896,7 @@ EXAMPLE: example vjacob; shows an example
       j--;
     }
 
-    dbprint(printlevel-voice+2,"//gaussman::vjacob: compute condition matrix");
+    dbprint(printlevel-voice+2,"//gaussman::vjacob: compose condition matrix");
     L=transpose(module(l[1]));
     for(k=2;k<=ncols(m);k++)
     {
