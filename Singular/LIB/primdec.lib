@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.30 1999-03-15 12:18:28 Singular Exp $
+// $Id: primdec.lib,v 1.31 1999-03-16 14:18:51 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.30 1999-03-15 12:18:28 Singular Exp $";
+version="$Id: primdec.lib,v 1.31 1999-03-16 14:18:51 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -3150,7 +3150,7 @@ proc min_ass_prim_charsets1 (ideal PS)
 {
   def oldring=basering;
   string n=system("neworder",PS);
-  execute "ring r="+charstr(oldring)+",("+n+"),dp;";
+  execute "ring r=("+charstr(oldring)+"),("+n+"),dp;";
   ideal PS=imap(oldring,PS);
   matrix m=char_series(PS);  // We compute an irreducible
                              // characteristic series
