@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.23 1998-05-04 17:41:05 Singular Exp $
+@comment $Id: general.doc,v 1.24 1998-05-05 14:22:35 anne Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -199,13 +199,18 @@ kill the whole line
 save the current line to the history and
 send it to the @sc{Singular} parser for interpretation
 @end table
+<<<<<<< general.doc
+@* @strong{Remarks:}
+@* There is a history of the last 32 unique lines.
+=======
 @* @strong{Remark:}
 @c @* There is a history of the last 32 unique lines.
+>>>>>>> 1.23
 @* This section does not apply to the MPW-Macintosh version of
 @sc{Singular}.
 @* This section describes only a subset of the key bindings of
-@sc{Singular}s built with @code{readline}. See the @code{readline} manual
-for the key bindings.
+@sc{Singular} binaries built with GNU @code{Readline} library. 
+See the @code{RXSeadline} manual for the key bindings.
 
 @c --------------------------------------------------------------------------
 @node Control parameters, Startup sequence, Editing input, Interactive use
@@ -242,7 +247,7 @@ screen.
 
 @example
 pagewidth = 80;        // set pagewidth to 80 characters
-option(prot);          // short protocoll
+option(prot);          // short protocol
 timer = 1;             // activate the timer
 option(noredefine);   // supress redefine-warnings
 @end example
@@ -285,71 +290,95 @@ The synopsis of @sc{Singular} is
 
 @*@code{  Singular  [options] [file1 [file2 ...]] }
 
-@*with the options (which can be given in both, their long and
-short format):
+@*Options can be given in both, their long and short format. The following
+options control the general behaviour of @sc{Singular}:
 @table @asis
 
-@item @code{-b},@code{--batch}
-Run in MP batch mode. Opens a TCP/IP connection with host specified by
-@code{--MPhost} at the port specified by @code{--MPport}. Input is read
-from and output is written to this connection in the MP format.
-
-@item @code{-h},@code{--help}
-Print a short help message and exit.
-
-@item @code{-q},@code{--quiet}
-Do not print start-up banner and warnings and redirect stderr (all error
-messages)  to stdout (normal output channel).
-
-@item @code{-t},@code{--no-tty}
-Do not redefine the terminal characteristics (useful for batch
-processes, see @ref{Editing input}).
-
-@item @code{-v},@code{--version}
-Print extended information about the version and configuration of
-@sc{Singular}  (used optional parts, compilation date, start of random
-generator etc.). This information should be included if a user reports
-an error to the authors.
-
-@item @code{-e},@code{--echo[=VAL]}
+@item @code{-e},@code{--echo[=VAL]} 
 Set value of variable @code{echo} to @code{VAL} (integer in the range 0
 .. 9). Without an argument, @code{echo} is set to 1, which echoes all
 input coming from a file. By default, the value of @code{echo} is 0. See
 also @ref{System variables}.
 
-@item @code{-c},@code{--execute=STRING}
-Execute @code{STRING} as a (sequence) of @sc{Singular} commands on
-start-up after the @code{.singularrc} file is executed, but prior to
-executing the files given on the command line.
+@item @code{-h},@code{--help} 
+Print a short help message and a one line description of each command 
+line option.
 
-@item @code{-r},@code{--random=SEED}
-Seed (i.e., set initial value of) pseudo random generator with integer
-(integer) @code{SEED} (integer). If this option is not given, then the
-random generated is seeded with a time-based @code{SEED} (e.g., the
-number of seconds since January, 1, 1970, on Unix systems).
-
-@item @code{-u},@code{--user-option=STRING}
-Returns @code{STRING} on @code{system("--user-option")}. This is useful
-for passing arbitrary arguments (like filenames) from the command line to
-the @sc{Singular} interpreter (i.e. top-level of @sc{Singular}).
+@item @code{--no-rc}               
+Do not execute the @code{.singularrc} file on start-up. By default,
+@sc{Singular} searches first in the current directory and then in the
+home directory of the user for a file named @code{.singularrc}. If it is 
+found, then it is executed after the library @code{standard.lib} is
+loaded and prior to executing the string specified by
+@code{--user-option}.
 
 @item @code{--no-stdlib}
 Do not load the library @code{standard.lib} on start-up. By default,
 this library is loaded on start-up.
 
-@item @code{--no-rc}
-Do not execute the @code{.singularrc} file on start-up. By default,
-@sc{Singular} searches first in the current directory and then in the
-home directory of the user for a file named @code{.singularrc}. If it is
-found, then it is executed after the library @code{standard.lib} is
-loaded and prior to executing the string specified by
-@code{--user-option}.
+@item @code{-t},@code{--no-tty} 
+Do not redefine the terminal characteristics (useful for batch
+processes, see @ref{Editing input}).  
+
+@item @code{-q},@code{--quiet}
+Do not print start-up banner and warnings and redirect stderr (all error
+messages) to stdout (normal output channel). This option should be used
+if the output is redirected to a file.
+
+@item @code{-v},@code{--verbose}             
+Print extended information about the version and configuration of
+@sc{Singular}  (used optional parts, compilation date, start of random
+generator etc.). This information should be included if a user reports
+an error to the authors.
+@end table
+
+The following command line options allow manipulation of the timer and
+the pseudo random generator and passing of commands and strings to 
+@sc{Singular}:
+
+@table @asis
+@item @code{-c},@code{--execute=STRING} 
+Execute @code{STRING} as (a sequence of) @sc{Singular} commands on
+start-up after the @code{.singularrc} file is executed, but prior to
+executing the files given on the command line, e.g. 
+Singular -c "help all.lib; quit;" shows the help for the library all.lib
+and exits.
+
+@item @code{-u},@code{--user-option=STRING}
+Returns @code{STRING} on @code{system("--user-option")}. This is useful
+for passing arbitrary arguments (like filenames) from the command line to 
+the @sc{Singular} interpreter (i.e. top-level of @sc{Singular}), e.g.
+Singular -u "xxx.dump" -c 'getdump(system("--user-option"))' reads the
+file xxx.dump at startup and allows the user to start working with all the
+objects defined in the previous session. 
+
+@item @code{-r},@code{--random=SEED}
+Seed (i.e., set initial value of) pseudo random generator with integer
+@code{SEED}. If this option is not given, then the
+random generated is seeded with a time-based @code{SEED} (e.g., the
+number of seconds since January, 1, 1970, on Unix systems).
 
 @item @code{--min-time=SECS}
 If the @code{timer} variables is set, do only report times larger than
 @code{SECS} seconds (@code{SECS} needs to be a floating point number
 greater than 0). By default, this value is set to 0.5 (i.e., half a
-second).
+second), e.g. the option --min-time=0.01 forces Singular to report all
+times larger than 1/100 of a second.
+
+@item @code{--ticks-per-sec=TICKS} 
+Sets unit of timer to @code{TICKS} per second (i.e. the value reported by 
+the @code{timer} variable divided by @code{TICKS} gives the time in
+seconds). By default, this value is 1.
+
+@end table
+
+The last 3 options are of interest for the use with MP links:
+@table @asis
+@item @code{-b},@code{--batch} 
+Run in MP batch mode. Opens a TCP/IP connection with host specified by
+@code{--MPhost} at the port specified by @code{--MPport}. Input is read
+from and output is written to this connection in the MP format. See also
+@ref{MPtcp links}.
 
 @item @code{--MPport=PORT}
 Use @code{PORT} as default port number for MP connections (whenever not
@@ -360,11 +389,6 @@ option is given. See also @ref{MPtcp links}.
 Use @code{HOST} as default host for MP connections (whenever not
 further specified) . This option is mandatory when the @code{--batch}
 option is given. See also @ref{MPtcp links}.
-
-@item @code{--ticks-per-sec=TICKS}
-Sets unit of timer to @code{TICKS} per second (i.e. the value reported by
-the @code{timer} variable multiplied by @code{TICKS} gives the time in
-seconds.By default, this value is 1.
 
 @end table
 
@@ -389,7 +413,7 @@ seconds.By default, this value is 1.
 Almost all computations in @sc{Singular} require a basering which may be
 @itemize @bullet
 @item
-a polynomial ring
+a polynomial ring over a field
 @item
 a series ring, i.e a localization of a polynomial ring
 @item
