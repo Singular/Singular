@@ -47,5 +47,5 @@
 #define MP_CopBasicNot              24
 #define MP_CopBasicAssign           25
 #define MP_CopBasicComplex          26
-
+#define MP_CopBasicPackage          27
 #endif /* _MP_BasicDict_h */
