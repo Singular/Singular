@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.45 1998-06-03 10:04:26 obachman Exp $ */
+/* $Id: tesths.cc,v 1.46 1998-06-03 20:43:25 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -472,7 +472,7 @@ int main(          /* main entry to Singular */
 "                     SINGULAR                             /\n"
 " a Computer Algebra System for Polynomial Computations   /   version %s\n"
 "                                                       0<\n"
-"  by: G.-M. Greuel, G. Pfister, H. Schoenemann           \\   %s\n"
+"     by: G.-M. Greuel, G. Pfister, H. Schoenemann        \\   %s\n"
 "FB Mathematik der Universitaet, D-67653 Kaiserslautern    \\\n"
 , S_VERSION1,S_VERSION2);
   }
