@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.26 1999-08-19 14:16:51 hannes Exp $
+# $Id: regress.cmd,v 1.27 1999-09-27 11:06:29 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -90,7 +90,7 @@ else
 #
 # the default settings
 #
-$singularOptions = "--ticks-per-sec=100 -teqr12345678";
+$singularOptions = "--ticks-per-sec=100 -teqr12345678 --no-rc";
 $keep = "no";
 $verbosity = 1;
 $generate = "no";
