@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_intdiv.cc,v 1.3 1998-04-06 12:06:48 schmidt Exp $ */
+/* $Id: int_intdiv.cc,v 1.4 1998-06-12 14:36:04 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -9,6 +9,7 @@
 
 #include <config.h>
 
+#include "canonicalform.h"
 #include "imm.h"
 #include "int_cf.h"
 #include "int_int.h"
