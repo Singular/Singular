@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.19 1998-05-05 13:46:38 krueger Exp $ */
+/* $Id: libparse.l,v 1.20 1998-05-07 08:20:32 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -285,10 +285,12 @@ static     { p_static=TRUE; }
 #endif STANDALONE_PARSER
                SET_DEF_END(mode, pi, current_pos(yyleng+1));
 #if YYLPDEBUG
-               if(lpverbose)
-                  printf("// %s PROC '%s' at line %d,%d: (%d).\n", 
-                      p_static ? "local" : "global", proc,
+               if(lpverbose) {
+                  printf("// PROCEDURE '%s' status: %s, ", proc,
+                      p_static ? "local" : "global");
+                  printf("starting at line %d,%d: (%d).\n", 
                       yylplineno, current_pos(0), brace1);
+               }
 #endif
                p_static=FALSE;
 #ifndef STANDALONE_PARSER
