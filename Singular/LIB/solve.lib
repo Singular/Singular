@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.18 2000-12-22 14:48:14 greuel Exp $";
+version="$Id: solve.lib,v 1.19 2001-01-16 13:48:42 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -11,7 +11,7 @@ mp_res_mat(i,..);       multipolynomial resultant matrix of ideal i
 laguerre_solve(p,..);   find all roots of univariate polynom p
 interpolate(i,j,d);     interpolate poly from evaluation points i and results j
 fglm_solve(i,p,...);    find roots of 0-dim. ideal using FGLM and lex_solve
-triangL_solve(l,p,...); find roots using triangular system (Lazard) 
+triangL_solve(l,p,...); find roots using triangular system (Lazard)
 triangLf_solve(l,p,..); find roots using triangular sys. (factorizing Lazard)
 triangM_solve(l,p,...); find roots of given triangular system (Moeller)
 lex_solve(i,p,...);     find roots of reduced lexicographic standard basis
@@ -204,7 +204,7 @@ example
     ring rdq= (0,u0,u1,u2),(x0,x1,x2),lp;
     ideal h=  homog(imap(rsq,i),x0);
     h;
-  
+
     module m = mp_res_mat(h,1);
     print(m);
     // computing Macaulay resultant (should be the same as above!)
@@ -269,17 +269,17 @@ static proc psubst( int d, int dd, int n, list res,
     // elem: number of elements in ideal fi   (fixed value)
     //   fi: input ideal                      (fixed value)
     //   rl: output list of roots
-    //  res: actual list of roots 
-    //    n: 
+    //  res: actual list of roots
+    //    n:
     //   dd: actual element of fi
-    //    d: actual variable  
+    //    d: actual variable
 
     int olddd=dd;
 
-    if ( pdebug>=1 ) 
+    if ( pdebug>=1 )
     {"// 0 step "+string(dd)+" of "+string(elem);}
-  
-    if ( dd <= elem ) 
+
+    if ( dd <= elem )
     {
 	int loop = 1;
 	int k;
@@ -287,23 +287,23 @@ static proc psubst( int d, int dd, int n, list res,
 	poly ps;
 	int thedd;
 
-	if ( pdebug>=1 ) 
+	if ( pdebug>=1 )
 	{"// 1 dd = "+string(dd);}
 
 	thedd=0;
-	while ( (dd+1 <= elem) && loop ) 
+	while ( (dd+1 <= elem) && loop )
 	{
 	    ps= fi[dd+1];
 
-	    if ( n-1 > 0 ) 
+	    if ( n-1 > 0 )
 	    {
-		if ( pdebug>=2 ) 
+		if ( pdebug>=2 )
 		{
 		    "// 2 ps=fi["+string(dd+1)+"]"+" size="
 			+string(size(coeffs(ps,var(n-1))))
 			+"  leadexp(ps)="+string(leadexp(ps));
 		}
-		if ( size(coeffs(ps,var(n-1))) == 1 ) 
+		if ( size(coeffs(ps,var(n-1))) == 1 )
 		{
 		    dd++;
 		    // hier Leading-Exponent puefen???
@@ -317,18 +317,18 @@ static proc psubst( int d, int dd, int n, list res,
 	    }
 	    else
 	    {
-		if ( pdebug>=2 ) 
+		if ( pdebug>=2 )
 		{
 		    "// 2 ps=fi["+string(dd+1)+"]"+"  leadexp(ps)="
 			+string(leadexp(ps));
 		}
 		dd++;
 	    }
-	} 
+	}
 	thedd=dd;
 	ps= fi[thedd];
 
-	if ( pdebug>=1 ) 
+	if ( pdebug>=1 )
 	{
 	    "// 3    fi["+string(thedd-1)+"]"+"  leadexp(fi[thedd-1])="
 		+string(leadexp(fi[thedd-1]));
@@ -338,40 +338,40 @@ static proc psubst( int d, int dd, int n, list res,
 
 	for ( k= nv; k > nv-d; k-- )
 	{
-	    if ( pdebug>=2 ) 
-	    { 
+	    if ( pdebug>=2 )
+	    {
 		"// 4 subst(fi["+string(thedd)+"],"
-		    +string(var(k))+","+string(res[k])+");"; 
+		    +string(var(k))+","+string(res[k])+");";
 	    }
 	    ps = subst(ps,var(k),res[k]);
 	}
-	      
-	if ( pdebug>=2 ) 
+	
+	if ( pdebug>=2 )
 	{ "// 5 substituted ps="+string(ps); }
 
-	if ( ps != 0 ) 
+	if ( ps != 0 )
 	{
 	    lsr= laguerre_solve( ps );
 	}
 	else
 	{
-	    if ( pdebug>=1 ) 
+	    if ( pdebug>=1 )
 	    { "// 30 ps == 0, thats not cool..."; }
 	    lsr=@ln; // lsr=number(0);
 	}
 
-	if ( pdebug>=1 ) 
+	if ( pdebug>=1 )
 	{ "// 6 laguerre_solve found roots: lsr["+string(size(lsr))+"]"; }
-	  
-	if ( size(lsr) > 1 ) 
+	
+	if ( size(lsr) > 1 )
 	{
-	    if ( pdebug>=1 ) 
+	    if ( pdebug>=1 )
 	    {
 		"// 10 checking roots found before, range "
 		    +string(dd-olddd)+" -- "+string(dd);
 		"// 10 thedd = "+string(thedd);
 	    }
-	      
+	
 	    int i,j,l;
 	    int ls=size(lsr);
 	    int lss;
@@ -380,53 +380,53 @@ static proc psubst( int d, int dd, int n, list res,
 	    int rroot;
 	    int nares_size;
 
-	      
+	
 	    for ( i = 1; i <= ls; i++ ) // lsr[1..ls]
 	    {
 		rroot=1;
 
-		if ( pdebug>=2 ) 
+		if ( pdebug>=2 )
 		{"// 13 root lsr["+string(i)+"] = "+string(lsr[i]);}
-		for ( l = 0; l <= dd-olddd; l++ ) 
+		for ( l = 0; l <= dd-olddd; l++ )
 		{
 		    if ( l+olddd != thedd )
 		    {
-			if ( pdebug>=2 ) 
+			if ( pdebug>=2 )
 			{"// 11 checking ideal element "+string(l+olddd);}
 			ps=fi[l+olddd];
-			if ( pdebug>=3 ) 
+			if ( pdebug>=3 )
 			{"// 14 ps=fi["+string(l+olddd)+"]";}
 			for ( k= nv; k > nv-d; k-- )
 			{
-			    if ( pdebug>=3 ) 
+			    if ( pdebug>=3 )
 			    {
 				"// 11 subst(fi["+string(olddd+l)+"],"
 				    +string(var(k))+","+string(res[k])+");";
 			    }
 			    ps = subst(ps,var(k),res[k]);
-			  
+			
 			}
 			
 			pss=subst(ps,var(k),lsr[i]); // k=nv-d
-			if ( pdebug>=3 ) 
+			if ( pdebug>=3 )
 			{ "// 15 0 == "+string(pss); }
-			if ( pss != 0 ) 
+			if ( pss != 0 )
 			{
 			    if ( system("complexNearZero",
 					leadcoef(pss),
-					myCompDigits) ) 
+					myCompDigits) )
 			    {
-				if ( pdebug>=2 ) 
+				if ( pdebug>=2 )
 				{ "// 16 root "+string(i)+" is a real root"; }
 			    }
 			    else
 			    {
-				if ( pdebug>=2 ) 
+				if ( pdebug>=2 )
 				{ "// 17 0 == "+string(pss); }
 				rroot=0;
 			    }
 			}
-		      
+		
 		    }
 		}
 		
@@ -440,39 +440,39 @@ static proc psubst( int d, int dd, int n, list res,
 		    {
 			nares=lsr[i];
 		    }
-		    if ( pdebug>=2 ) 
+		    if ( pdebug>=2 )
 		    { "// 18 added root to list nares"; }
 		}
 	    }
 
 	    nares_size=size(nares);
-	    if ( nares_size == 0 ) 
+	    if ( nares_size == 0 )
 	    {
 		"Numerical problem: No root found...";
 		"Output may be incorrect!";
 		nares=@ln;
 	    }
-	      
-	    if ( pdebug>=1 ) 
+	
+	    if ( pdebug>=1 )
 	    { "// 20 found <"+string(size(nares))+"> roots"; }
 
 	    for ( i= 1; i <= nares_size; i++ )
 	    {
 		res[nv-d]= nares[i];
 
-		if ( dd < elem ) 
+		if ( dd < elem )
 		{
-		    if ( i > 1 ) 
-		    { 
-			rn@++; 
+		    if ( i > 1 )
+		    {
+			rn@++;
 		    }
 		    psubst( d+1, dd+1, n-1, res, fi, elem, nv );
 		}
 		else
 		{
-		    if ( pdebug>=1 ) 
+		    if ( pdebug>=1 )
 		    {"// 30_1 <"+string(rn@)+"> "+string(size(res))+" <-----";}
-		    if ( pdebug>=2 ) 
+		    if ( pdebug>=2 )
 		    { res; }
 		    rlist[rn@]=res;
 		}
@@ -480,19 +480,19 @@ static proc psubst( int d, int dd, int n, list res,
 	}
 	else
 	{
-	    if ( pdebug>=2 ) 
+	    if ( pdebug>=2 )
 	    { "// 21 found root to be: "+string(lsr[1]); }
 	    res[nv-d]= lsr[1];
 
-	    if ( dd < elem ) 
+	    if ( dd < elem )
 	    {
 		psubst( d+1, dd+1, n-1, res, fi, elem, nv );
 	    }
 	    else
 	    {
-		if ( pdebug>=1 ) 
+		if ( pdebug>=1 )
 		{ "// 30_2 <"+string(rn@)+"> "+string(size(res))+" <-----";}
-		if ( pdebug>=2 ) 
+		if ( pdebug>=2 )
 		{ res; }
 		rlist[rn@]=res;
 	    }
@@ -537,8 +537,8 @@ example
 
 proc lex_solve( ideal fi, int prec, list # )
 "USAGE:   lex_solve( i, d [, l] ); i ideal, p,d,l integers.
-         i a reduced lexicographical Groebner bases of a zero-dimensional 
-         ideal (i), sorted by increasing leading terms. 
+         i a reduced lexicographical Groebner bases of a zero-dimensional
+         ideal (i), sorted by increasing leading terms.
          p gives precision of complex numbers in digits,
          d gives precision (1<d<p) for near-zero-determination (default:1/2*p),
          l gives debug level (-1: no output,..., 3: lots of output, 0: default)
@@ -548,7 +548,7 @@ NOTE:    changes the given ring to the ring ring with complex coefficient
 EXAMPLE: example lex_solve; shows an example
 "
 {
-    if ( !defined(pdebug) ) 
+    if ( !defined(pdebug) )
     {
 	int pdebug;
 	export pdebug;
@@ -558,7 +558,7 @@ EXAMPLE: example lex_solve; shows an example
     string orings= nameof(basering);
     def oring= basering;
 
-    // change the ground field to complex numbers  
+    // change the ground field to complex numbers
     string nrings= "ring "+orings+"C=(real,"+string(prec)
 	+",I),("+varstr(basering)+"),lp;";
     execute(nrings);
@@ -571,7 +571,7 @@ EXAMPLE: example lex_solve; shows an example
 
     // list with entry 0 (number)
     number nn=0;
-    if ( !defined(@ln) ) 
+    if ( !defined(@ln) )
     {
 	list @ln;
 	export @ln;
@@ -580,7 +580,7 @@ EXAMPLE: example lex_solve; shows an example
 
     // set number of digits for zero-comparison of roots
     if ( !defined(myCompDigits) )
-    { 
+    {
 	int myCompDigits;
 	export  myCompDigits;
     }
@@ -606,7 +606,7 @@ EXAMPLE: example lex_solve; shows an example
 	list rlist;
 	export rlist;
     }
-    
+
     if ( !defined(rn@) )
     {
 	int rn@;
@@ -619,7 +619,7 @@ EXAMPLE: example lex_solve; shows an example
 
     if ( pdebug>=1 )
     {"// laguerre found roots: "+string(size(li));}
-    
+
     for ( j= 1; j <= lis; j++ )
     {
 	if ( pdebug>=1 )
@@ -628,7 +628,7 @@ EXAMPLE: example lex_solve; shows an example
 	res[nv]= li[j];
 	psubst( 1, 2, nv-1, res, fi, idelem, nv );
     }
-    
+
     if ( pdebug>=0 )
     {"// list of roots: "+nameof(rlist);}
 
@@ -651,8 +651,8 @@ proc triangLf_solve( ideal fi, list # )
 "USAGE:   triangLf_solve( i [, d ] ); i ideal, p integer.
          i zero-dimensional ideal
          p gives precision of complex numbers in digits,
-         uses a triangular system (Lazard's Algorithm with factorization) 
-         computed from a standard basis to determine recursively all complex 
+         uses a triangular system (Lazard's Algorithm with factorization)
+         computed from a standard basis to determine recursively all complex
          roots with Laguerre's algorithm of input ideal i
 RETURN:  a list of complex roots of type number.
 NOTE:    changes the given ring to the ring ring with complex coefficient
@@ -687,7 +687,7 @@ proc triangM_solve( ideal fi, list # )
          i zero-dimensional ideal
          p gives precision of complex numbers in digits,
          uses a triangular system (Moellers Algorithm) computed from a standard
-         basis to determine recursively all complex roots with Laguerre's 
+         basis to determine recursively all complex roots with Laguerre's
          algorithm of input ideal i
 RETURN:  a list of complex roots of type number.
 NOTE:    changes the given ring to the ring ring with complex coefficient
@@ -721,8 +721,8 @@ proc triangL_solve( ideal fi, list # )
 "USAGE:   triangL_solve( i [, d ] ); i ideal, p integer.
          i zero-dimensional ideal
          p gives precision of complex numbers in digits,
-         uses a triangular system (Lazard's Algorithm) 
-         computed from a standard basis to determine recursively all complex 
+         uses a triangular system (Lazard's Algorithm)
+         computed from a standard basis to determine recursively all complex
          roots with Laguerre's algorithm of input ideal i
 RETURN:  a list of complex roots of type number.
 NOTE:    changes the given ring to the ring ring with complex coefficient
@@ -757,11 +757,11 @@ proc triang_solve( list lfi, int prec, list # )
 "USAGE:   triang_solve( i, d [, l] ); l list, p,d,l integers.
          l a list of finitely many triangular systems, such that
          the union of their varieties equals the variety of the
-         initial ideal. 
+         initial ideal.
          p gives precision of complex numbers in digits,
          d gives precision (1<d<p) for near-zero-determination (default:1/2*p),
          l gives debug level (-1: no output,..., 3: lots of output, 0: default)
-ASSUME:  l was computed using Algorithm of Lazard or 
+ASSUME:  l was computed using Algorithm of Lazard or
          Algorithm of Moeller (see triang.lib).
 RETURN:  a list of complex roots of type number.
 NOTE:    changes the given ring to the ring ring with complex coefficient
@@ -769,7 +769,7 @@ NOTE:    changes the given ring to the ring ring with complex coefficient
 EXAMPLE: example triang_solve; shows an example
 "
 {
-    if ( !defined(pdebug) ) 
+    if ( !defined(pdebug) )
     {
 	int pdebug;
 	export pdebug;
@@ -779,7 +779,7 @@ EXAMPLE: example triang_solve; shows an example
     string orings= nameof(basering);
     def oring= basering;
 
-    // change the ground field to complex numbers  
+    // change the ground field to complex numbers
     string nrings= "ring "+orings+"C=(real,"+string(prec)
 	+",I),("+varstr(basering)+"),lp;";
     execute(nrings);
@@ -789,7 +789,7 @@ EXAMPLE: example triang_solve; shows an example
 
     // list with entry 0 (number)
     number nn=0;
-    if ( !defined(@ln) ) 
+    if ( !defined(@ln) )
     {
 	list @ln;
 	export @ln;
@@ -798,7 +798,7 @@ EXAMPLE: example triang_solve; shows an example
 
     // set number of digits for zero-comparison of roots
     if ( !defined(myCompDigits) )
-    { 
+    {
 	int myCompDigits;
 	export  myCompDigits;
     }
@@ -824,7 +824,7 @@ EXAMPLE: example triang_solve; shows an example
 	list rlist;
 	export rlist;
     }
-    
+
     if ( !defined(rn@) )
     {
 	int rn@;
@@ -838,7 +838,7 @@ EXAMPLE: example triang_solve; shows an example
     int slfi= size(lfi);
     ideal fi;
 
-    for ( i= 1; i <= slfi; i++ ) 
+    for ( i= 1; i <= slfi; i++ )
     {
 	// map fi from old to new ring
 	fi= lfi[i]; //imap(oring,lfi[i]);
@@ -894,15 +894,15 @@ EXAMPLE: example pcheck; shows an example
     poly ps;
     number nn;
     int cprec=0;
-    
+
     if ( size(#)>=1  && typeof(#[1])=="int" )
     {
 	cprec=#[1];
     }
-    if ( cprec <= 0 ) 
+    if ( cprec <= 0 )
     {
 	cprec=system("getPrecDigits")/2;
-    } 
+    }
 
     nnrfound=1;
     for ( j= 1; j <= size(fi); j++ )
@@ -916,13 +916,13 @@ EXAMPLE: example pcheck; shows an example
 	    }
 	    //ps;
 	    nn= leadcoef(ps);
-	    if ( nn != 0 ) 
+	    if ( nn != 0 )
 	    {
 		if ( !system("complexNearZero",nn,cprec) )
 		{
 		    " no root: ideal["+string(j)+"]( root "
 			+string(i)+"): 0 != "+string(ps);
-		    nnrfound=0; 
+		    nnrfound=0;
 		}
 	    }
 	}
@@ -977,30 +977,30 @@ EXAMPLE: example simplexOut; shows an example
 
   for ( i = 1; i <= rows; i++ )
   {
-    if (i == 1) 
+    if (i == 1)
     {
       "z = "+string(m[1][1]);
     }
-    else 
+    else
     {
-      if ( iposv[i-1] <= N+1 ) 
+      if ( iposv[i-1] <= N+1 )
       {
 	"x"+string(i-1)+" = "+string(m[1][iposv[i-1]]);
       }
-//        else 
+//        else
 //        {
 //  	     "Y"; iposv[i-1]-N+1;
 //        }
     }
-  } 
+  }
 }
 example
 {
     "EXAMPLE:";echo=2;
     ring r = (real,10),(x),lp;
 
-    // suppose we have the 
-    
+    // suppose we have the
+
     matrix sm[5][5]=(  0, 1, 1, 3,-0.5,
 		     740,-1, 0,-2, 0,
 		       0, 0,-2, 0, 7,

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.15 2000-12-22 14:23:35 greuel Exp $";
+version="$Id: presolve.lib,v 1.16 2001-01-16 13:48:37 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -118,7 +118,7 @@ EXAMPLE: example elimlinearpart; shows an example
      option(set,getoption);
      return(L);
    }
-  
+
    for ( ii=1; ii<=size(id); ii++ )
    {
       if( deg(id[ii]) > 1) { break; }
@@ -154,7 +154,7 @@ EXAMPLE: example elimlinearpart; shows an example
       ideal lin = imap(newP,lin);
       ideal neva = imap(newP,neva);
    }
- 
+
    eva = eva[ncols(eva)..1];  // sorting according to variables in basering
    lin = lin[ncols(lin)..1];
    ideal phi= neva;

@@ -1,7 +1,7 @@
-// $Id: sing.lib,v 1.22 2000-12-22 14:45:41 greuel Exp $
+// $Id: sing.lib,v 1.23 2001-01-16 13:48:42 Singular Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.22 2000-12-22 14:45:41 greuel Exp $";
+version="$Id: sing.lib,v 1.23 2001-01-16 13:48:42 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -362,8 +362,8 @@ proc slocus (ideal i)
 "USAGE:   slocus(i);  i ideal
 RETURN:  ideal of singular locus of i if i is pure dimensional
 NOTE:    this proc returns i and c-minors of jacobian ideal of i where c is the
-         codimension of i. Hence, if i is not pure dimensional, slocus may 
-         return an ideal such that its 0-locus is strictly contained in the 
+         codimension of i. Hence, if i is not pure dimensional, slocus may
+         return an ideal such that its 0-locus is strictly contained in the
          singular locus of i
 EXAMPLE: example slocus; shows an example
 "

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.8 2001-01-07 02:08:19 greuel Exp $";
+version="$Id: algebra.lib,v 1.9 2001-01-16 13:48:21 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -31,21 +31,21 @@ PROCEDURES:
 proc algebra_containment (poly p, ideal A, list #)
 "USAGE:   algebra_containment(p,A[,k]); p poly, A ideal, k integer.
 @*       A = A[1],...,A[m] generators of subalgebra of the basering
-RETURN:  
+RETURN:
 @format
          - k=0 (or if k is not given) an integer:
            1  : if p is contained in the subalgebra K[A[1],...,A[m]]
-           0  : if p is not contained in K[A[1],...,A[m]] 
+           0  : if p is not contained in K[A[1],...,A[m]]
          - k=1 : a list, say l, of size 2, l[1] integer, l[2] ring, satisfying
            l[1]=1 if p is in the subalgebra K[A[1],...,A[m]] and then the ring
            l[2] contains poly check = h(y(1),...,y(m)) if p=h(A[1],...,A[m])
            l[1]=0 if p is in not the subalgebra K[A[1],...,A[m]] and then
-           l[2] contains the poly check = h(x,y(1),...,y(m)) if p satisfies 
+           l[2] contains the poly check = h(x,y(1),...,y(m)) if p satisfies
            the nonlinear relation p = h(x,A[1],...,A[m]) where
            x = x(1),...,x(n) denote the variables of the basering
 @end format
 DISPLAY: if k=0 and printlevel >= voice+1 (default) display the poly check
-NOTE:    The proc inSubring uses a different algorithm which is sometimes 
+NOTE:    The proc inSubring uses a different algorithm which is sometimes
          faster.
 THEORY:  The ideal of algebraic relations of the algebra generators A[1],...,
          A[m] is computed introducing new variables y(i) and the product
@@ -55,10 +55,10 @@ THEORY:  The ideal of algebraic relations of the algebra generators A[1],...,
 EXAMPLE: example algebra_containment; shows an example
 "
 { int DEGB = degBound;
-  degBound = 0; 
+  degBound = 0;
     if (size(#)==0)
     { #[1] = 0;
-    }      
+    }
     def br=basering;
     int n = nvars(br);
     int m = ncols(A);
@@ -76,13 +76,13 @@ EXAMPLE: example algebra_containment; shows an example
     }
     A=std(A);
     check=reduce(check,A);
-    /*alternatively we could use reduce(check,A,1) which is a little faster 
+    /*alternatively we could use reduce(check,A,1) which is a little faster
       but result is bigger since it is not tail-reduced
     */
   //--- checking whether all variables from old ring have disappeared ------
   // if so, then the sum of the first n leading exponents is 0, hence i=1
   // use i also to control the display
-    i = (sum(leadexp(check),1..n)==0);   
+    i = (sum(leadexp(check),1..n)==0);
   degBound = DEGB;
     if( #[1] == 0 )
     { dbprint(printlevel-voice+3,"// "+string(check));
@@ -91,9 +91,9 @@ EXAMPLE: example algebra_containment; shows an example
     else
     { list l = i,R;
       kill A,vars,emb;
-      export check;       
+      export check;
       dbprint(printlevel-voice+3,"
-// 'algebra_containment' created a ring as 2nd element of the list. 
+// 'algebra_containment' created a ring as 2nd element of the list.
 // The ring contains the poly check which defines the algebraic relation.
 // To access to the ring and see check you must give the ring a name,
 // e.g.:
@@ -107,14 +107,14 @@ example
    int p = printlevel; printlevel = 1;
    ring R = 0,(x,y,z),dp;
    ideal A=x2+y2,z2,x4+y4,1,x2z-1y2z,xyz,x3y-1xy3;
-   poly p1=z; 
+   poly p1=z;
    poly p2=
    x10z3-x8y2z3+2x6y4z3-2x4y6z3+x2y8z3-y10z3+x6z4+3x4y2z4+3x2y4z4+y6z4;
    algebra_containment(p1,A);
    algebra_containment(p2,A);
    list L = algebra_containment(p2,A,1);
    L[1];
-   def S = L[2]; setring S;   
+   def S = L[2]; setring S;
    check;
    printlevel = p;
 }
@@ -122,20 +122,20 @@ example
 
 proc module_containment(poly p, ideal P, ideal S, list #)
 "USAGE:   module_containment(p,P,M[,k]); p poly, P ideal, M ideal, k int
-@*       P = P[1],...,P[n] generators of a subalgebra of the basering, 
+@*       P = P[1],...,P[n] generators of a subalgebra of the basering,
 @*       M = M[1],...,M[m] generators of a module over the subalgebra K[P]
 ASSUME:  ncols(P) = nvars(basering), the P[i] are algebraically independent
-RETURN: 
-@format 
+RETURN:
+@format
          - k=0 (or if k is not given), an integer:
            1    : if p is contained in the module <M[1],...,M[m]> over K[P]
            0    : if p is not contained in <M[1],...,M[m]>
          - k=1, a list, say l, of size 2, l[1] integer, l[2] ring:
            l[1]=1 : if p is in <M[1],...,M[m]> and then the ring l[2] contains
-             the polynomial check = h(y(1),...,y(m),z(1),...,z(n)) if 
+             the polynomial check = h(y(1),...,y(m),z(1),...,z(n)) if
              p = h(M[1],...,M[m],P[1],...,P[n])
            l[1]=0 : if p is in not in <M[1],...,M[m]>, then l[2] contains the
-             poly check = h(x,y(1),...,y(m),z(1),...,z(n)) if p satisfies 
+             poly check = h(x,y(1),...,y(m),z(1),...,z(n)) if p satisfies
              the nonlinear relation p = h(x,M[1],...,M[m],P[1],...,P[n]) where
              x = x(1),...,x(n) denote the variables of the basering
 @end format
@@ -162,7 +162,7 @@ EXAMPLE: example module_containment; shows an example
   { int m=ncols(S);
     string mp=string(minpoly);
   // ---------- create new ring with extra variables --------------------
-    execute 
+    execute
    ("ring R=("+charstr(br)+"),(x(1..n),y(1..m),z(1..n)),(lp(n),dp(m),lp(n));");
     execute ("minpoly=number("+mp+");");
     ideal vars = x(1..n);
@@ -181,7 +181,7 @@ EXAMPLE: example module_containment; shows an example
     check = reduce(check,I);
   //--- checking whether all variables from old ring have disappeared ------
   // if so, then the sum of the first n leading exponents is 0
-    i = (sum(leadexp(check),1..n)==0);   
+    i = (sum(leadexp(check),1..n)==0);
     if( #[1] == 0 )
     { dbprint(i*(printlevel-voice+3),"// "+string(check));
       return(i);
@@ -189,7 +189,7 @@ EXAMPLE: example module_containment; shows an example
     else
     { list l = i,R;
       kill I,vars,emb,P,S;
-      export check;       
+      export check;
       dbprint(printlevel-voice+3,"
 // 'module_containment' created a ring as 2nd element of the list. The
 // ring contains the poly check which defines the algebraic relation
@@ -227,9 +227,9 @@ proc inSubring(poly p, ideal I)
 RETURN:
 @format
          a list l of size 2, l[1] integer, l[2] string
-         l[1]=1 iff p is in the subring generated by i=i[1],...,i[k], 
-                and then l[2] = y(0)-h(y(1),...,y(k)) if p = h(i[1],...,i[k]) 
-         l[1]=0 iff p is in not the subring generated by i, 
+         l[1]=1 iff p is in the subring generated by i=i[1],...,i[k],
+                and then l[2] = y(0)-h(y(1),...,y(k)) if p = h(i[1],...,i[k])
+         l[1]=0 iff p is in not the subring generated by i,
                 and then l[2] = h(y(0),y(1),...,y(k) where p satisfies the
                 nonlinear relation h(p,i[1],...,i[k])=0.
 @end format
@@ -289,27 +289,27 @@ RETURN:
 @format	
          a list l  of size 2, l[1] integer, l[2] ring:
          - l[1] = 1 if f1,...,fm are algebraic dependent, 0 if not
-         - l[2] is a ring with variables x(1),...,x(n),y(1),...,y(m) if the 
-           basering has n variables. It contains the ideal 'ker', depending 
-           only on the y(i) and generating the algebraic relations between the 
+         - l[2] is a ring with variables x(1),...,x(n),y(1),...,y(m) if the
+           basering has n variables. It contains the ideal 'ker', depending
+           only on the y(i) and generating the algebraic relations between the
            f[i], i.e. substituting y(i) by fi yields 0. Of course, ker is
            nothing but the kernel of the ring map
               K[y(1),...,y(m)] ---> basering,  y(i) --> fi.
 @end format
-NOTE:    Three different algorithms are used depending on c = 1,2,3. 
+NOTE:    Three different algorithms are used depending on c = 1,2,3.
          If c is not given or c=0, a heuristically best method is choosen.
          The basering may be a quotient ring.
          To access to the ring l[2] and see ker you must give the ring a name,
-         e.g. def S=l[2]; setring S; ker; 
+         e.g. def S=l[2]; setring S; ker;
 DISPLAY: The above comment is displayed if printlevel >= 0 (default).
 EXAMPLE: example algDependent; shows an example
 "
-{   
+{
     int bestoption = 3;
     // bestoption is the default algorithm, it may be set to 1,2 or 3;
     // it should be changed, if another algorithm turns out to be faster
     // in general. Is perhaps dependent on the input (# vars, size ...)
-    int tt; 
+    int tt;
     if( size(#) > 0 )
     { if( typeof(#[1]) == "int" )
       { tt = #[1];
@@ -317,7 +317,7 @@ EXAMPLE: example algDependent; shows an example
     }
     if( size(#) == 0 or tt == 0 )
     { tt = bestoption;
-    }   
+    }
     def br=basering;
     int n = nvars(br);
     ideal B = ideal(br);
@@ -330,24 +330,24 @@ EXAMPLE: example algDependent; shows an example
     if ( tt == 1 )
     {
       execute ("ring R1=("+charstr(br)+"),y(1..m),dp;");
-      execute ("minpoly=number("+mp+");"); 
-      setring br; 
+      execute ("minpoly=number("+mp+");");
+      setring br;
       map phi = R1,A;
       setring R1;
-      ideal ker = preimage(br,phi,B);             
+      ideal ker = preimage(br,phi,B);
     }
  // ---------- create new ring with extra variables --------------------
-    execute ("ring R2=("+charstr(br)+"),(x(1..n),y(1..m)),(dp);"); 
+    execute ("ring R2=("+charstr(br)+"),(x(1..n),y(1..m)),(dp);");
     execute ("minpoly=number("+mp+");");
     if( tt == 1 )
     {
-      ideal ker = imap(R1,ker); 
+      ideal ker = imap(R1,ker);
     }
     else
     {
       ideal vars = x(1..n);
       map emb = br,vars;
-      ideal A = emb(A); 
+      ideal A = emb(A);
       for (i=1; i<=m; i=i+1)
       { A[i] = A[i]-y(i);
       }
@@ -385,7 +385,7 @@ EXAMPLE: example algDependent; shows an example
       }
     }
  // --------------------------- return ----------------------------------
-    s = size(ker); 
+    s = size(ker);
     list L = (s!=0), R2;
     export(ker);
     dbprint(printlevel-voice+3,"
@@ -414,12 +414,12 @@ example
 }
 //////////////////////////////////////////////////////////////////////////////
 proc alg_kernel( map phi, pr, list #)
-"USAGE:   alg_kernel(phi,pr[,s,c]); phi map to basering, pr preimage ring, 
+"USAGE:   alg_kernel(phi,pr[,s,c]); phi map to basering, pr preimage ring,
          s string (name of kernel in pr), c integer.
 RETURN:  a string, the kernel of phi as string.
-         If, moreover, a string s is given, the algorithm creates, in the 
+         If, moreover, a string s is given, the algorithm creates, in the
          preimage ring pr the kernel of phi with name s.
-         Three differnt algorithms are used depending on c = 1,2,3. 
+         Three differnt algorithms are used depending on c = 1,2,3.
          If c is not given or c=0, a heuristically best method is choosen.
          (alogrithm 1 uses the preimage command)
 NOTE:    Since the kernel of phi lives in pr, it cannot be returned to the
@@ -427,7 +427,7 @@ NOTE:    Since the kernel of phi lives in pr, it cannot be returned to the
          The basering may be a quotient ring.
 EXAMPLE: example alg_kernel; shows an example
 "
-{   int tt; 
+{   int tt;
    if( size(#) >0 )
    { if( typeof(#[1]) == "int")
      { tt = #[1];
@@ -476,7 +476,7 @@ example
    ideal I = x-w,u2w+1,yz-v;
    map phi = r,I;                // a map from r to s:
    alg_kernel(phi,r);            // a,b,c ---> x-w,u2w+1,yz-v
-  
+
    ring S = 0,(a,b,c),ds;
    ring R = 0,(x,y,z),dp;
    qring Q = std(x-y);
@@ -490,27 +490,27 @@ example
 
 proc is_injective( map phi, pr,list #)
 "USAGE:   is_injective(phi[,c,s]); phi map, pr reimage ring, c int, s string
-RETURN: 
-@format	 
-         - 1 (type int) if phi is injective, 0 if not (if s is not given). 
+RETURN:
+@format	
+         - 1 (type int) if phi is injective, 0 if not (if s is not given).
          - If s is given, return a list l of size 2, l[1] int, l[2] ring:
            l[1] is 1 if phi is injective, 0 if not
-           l[2] is a ring with variables x(1),...,x(n),y(1),...,y(m) if the 
-           basering has n variables and the map m components, it contains the 
+           l[2] is a ring with variables x(1),...,x(n),y(1),...,y(m) if the
+           basering has n variables and the map m components, it contains the
            ideal 'ker', depending only on the y(i), the kernel of the given map
 @end format
-NOTE:    Three differnt algorithms are used depending on c = 1,2,3. 
+NOTE:    Three differnt algorithms are used depending on c = 1,2,3.
          If c is not given or c=0, a heuristically best method is choosen.
          The basering may be a quotient ring. However, if the preimage ring is
          a quotient ring, say pr = P/I, consider phi as a map from P and then
          the algorithm returns 1 if the kernel of phi is 0 mod I.
          To access to the ring l[2] and see ker you must give the ring a name,
-         e.g. def S=l[2]; setring S; ker; 
+         e.g. def S=l[2]; setring S; ker;
 DISPLAY: The above comment is displayed if printlevel >= 0 (default).
 EXAMPLE: example is_injective; shows an example
 "
-{  def bsr = basering; 
-   int tt; 
+{  def bsr = basering;
+   int tt;
    if( size(#) >0 )
    { if( typeof(#[1]) == "int")
      { tt = #[1];
@@ -554,7 +554,7 @@ EXAMPLE: example is_injective; shows an example
     {  return (L[1]);
     }
     else
-    { 
+    {
       dbprint(printlevel-voice+3,"
 // The 2nd element of the list is a ring with variables x(1),...,x(n),
 // y(1),...,y(m) if the basering has n variables and the map is
@@ -569,7 +569,7 @@ EXAMPLE: example is_injective; shows an example
  }
 example
 { "EXAMPLE:"; echo = 2;
-   int p = printlevel; 
+   int p = printlevel;
    ring r = 0,(a,b,c),ds;
    ring s = 0,(x,y,z,u,v,w),dp;
    ideal I = x-w,u2w+1,yz-v;
@@ -588,11 +588,11 @@ example
 proc is_surjective( map phi )
 "USAGE:   is_surjective(phi); phi map to basering, or ideal defining it
 RETURN:  an integer,  1 if phi is surjective, 0 if not
-NOTE:    The algorithm returns 1 iff all the variables of the basering are 
+NOTE:    The algorithm returns 1 iff all the variables of the basering are
          contained in the polynomial subalgebra generated by the polynomials
-         defining phi. Hence, if the basering has local or mixed ordering 
+         defining phi. Hence, if the basering has local or mixed ordering
          or if the preimage ring is a quotient ring (in which case the map
-         may not be well defined) then the return value 1 means 
+         may not be well defined) then the return value 1 means
          \"surjectivity\" in this sense.
 EXAMPLE: example is_surjective; shows an example
 "
@@ -622,7 +622,7 @@ EXAMPLE: example is_surjective; shows an example
     { A[ii] = A [ii]-y(ii);
     }
     A=std(A);
-  // ------------- check whether the x(i) are in the image -----------------   
+  // ------------- check whether the x(i) are in the image -----------------
     poly check;
     for (ii=1; ii<=n; ii++ )
     {  check=reduce(x(ii),A,1);
@@ -656,7 +656,7 @@ proc is_bijective ( map phi, pr )
 "USAGE:   is_bijective(phi); phi map to basering, pr preimage ring
 RETURN:  an integer,  1 if phi is bijective, 0 if not
 NOTE:    The algorithm checks first injectivity and then surjectivity
-         To interprete this for local/mixed orderings, or for quotient rings 
+         To interprete this for local/mixed orderings, or for quotient rings
          type help is_surjective; and help is_injective;
 DISPLAY: A comment if printlevel >= voice-1 (default)
 EXAMPLE: example is_bijective; shows an example
@@ -696,10 +696,10 @@ EXAMPLE: example is_bijective; shows an example
     def bsr = basering;
  // ------- checking whether phi is injective by computing the kernel -------
     ideal ker = nselect(A,1,n);
-    t = size(ker); 
+    t = size(ker);
     setring pr;
     if ( size(ideal(pr)) != 0 )
-    { 
+    {
       ideal proj;
       proj[n+1..n+m] = maxideal(1);
       map psi = bsr,proj;
@@ -725,7 +725,7 @@ EXAMPLE: example is_bijective; shows an example
      }
      if ( t == 0 )
      {  dbprint(printlevel-voice+3,"// map injective, but not surjective" );
-     }    
+     }
      return(t);
    }
 }
@@ -738,23 +738,23 @@ example
    is_bijective(phi,R);
    qring Q = std(z-x2+y3);
    is_bijective(ideal(x,y,x2-y3),Q);
-   
+
    ring S = 0,(a,b,c,d),dp;
    map psi = R,ideal(a,a+b,c-a2+b3,0); // a map from R to S,
    is_bijective(psi,R);                // x->a, y->a+b, z->c-a2+b3
    qring T = std(d,c-a2+b3);
    map chi = Q,a,b,a2-b3;              // amap between two quotient rings
    is_bijective(chi,Q);
-   
+
    printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc noetherNormal(ideal i, list #)
 "USAGE:   noetherNormal(id[,p]);  id ideal, p integer
-RETURN: 
+RETURN:
 @format	
-         a list l two ideals, say I,J: 
+         a list l two ideals, say I,J:
          - I is generated by a subset of the variables with size(I) = dim(id)
          - J defines a map (coordinate change in the basering), such that:
            if we define  map phi=basering,J;
@@ -794,7 +794,7 @@ EXAMPLE: example noetherNormal; shows an example
     string s ="dp("+string(n-d)+"),lp";
    changeord("@S",s);
    ideal m;
-   
+
    // ----------------- sparse-random coordinate change  --------------------
    //creating lower triangular random generators for the maximal ideal
    //a procedure from random.lib, as sparse as possible
@@ -805,7 +805,7 @@ EXAMPLE: example noetherNormal; shows an example
    if(  char(@S) == 0 )
    {
       if ( voice <= 6 )
-      {      
+      {
         m=ideal(sparsetriag(n,n,p,10)*transpose(maxideal(1)));
       }
      if( voice > 6 and voice <= 11)
@@ -817,11 +817,11 @@ EXAMPLE: example noetherNormal; shows an example
         m=ideal(sparsetriag(n,n,p,30000)*transpose(maxideal(1)));
       }
    }
- 
+
    map phi=r,m;
    //map phi=@R,m;
    ideal i=std(phi(i));
-   
+
    // ----------------------- test for finiteness ---------------------------
    //We need a test whether the coordinate change was random enough, if yes
    //we are ready, else call noetherNormal again
@@ -831,7 +831,7 @@ EXAMPLE: example noetherNormal; shows an example
    list l=imap(@S,l);
 
    if(size(l[3]) == d)                    //the generic case
-   {                   
+   {
       good = fetch(@S,m),l[3];
       kill @S,@R;
       return(good);
@@ -863,27 +863,27 @@ example
 
 proc finitenessTest(ideal i,list #)
 "USAGE:   finitenessTest(J[,v]); J ideal, v intvec (say v1,...,vr with vi>0)
-RETURN:  
+RETURN:
 @format
          a list l with l[1] integer, l[2], l[3], l[4] ideals
          - l[1] = 1 if var(v1),...,var(vr) are in l[2] and 0 else
-         - l[2] (resp. l[3]) contains those variables which occur, 
-           (resp. occur not) as pure power in the leading term of one of the 
+         - l[2] (resp. l[3]) contains those variables which occur,
+           (resp. occur not) as pure power in the leading term of one of the
            generators of J,
          - l[4] contains those J[i] for which the leading term is a pure power
            of a variable (which is then in l[2])
          (default: v = [1,2,..,nvars(basering)])
 @end format
 THEORY:  If J is a standard basis of an ideal generated by x_1 - f_1(y),...,
-         x_n - f_n with y_j ordered lexicographically and y_j >> x_i, then, 
+         x_n - f_n with y_j ordered lexicographically and y_j >> x_i, then,
          if y_i appears as pure power in the leading term of J[k]. J[k] defines
-         an integral relation for y_i over the y_(i+1),... and the f's. 
+         an integral relation for y_i over the y_(i+1),... and the f's.
          Moreover, in this situation, if l[2] = y_1,...,y_r, then K[y_1,...y_r]
          is finite over K[f_1..f_n]. If J contains furthermore polynomials
-         h_j(y), then K[y_1,...y_z]/<h_j> is finite over K[f_1..f_n]. 
+         h_j(y), then K[y_1,...y_z]/<h_j> is finite over K[f_1..f_n].
 EXAMPLE: example finitenessTest; shows an example
 "
-{  int n = nvars(basering); 
+{  int n = nvars(basering);
    intvec v,w;
    int j,z,ii;
    intvec V = 1..n;
@@ -915,14 +915,14 @@ EXAMPLE: example finitenessTest; shows an example
    //the nonzero entries of v correspond to variables which occur as
    //pure power in the leading term of some polynomial in i
    for(j=1; j<=size(v); j++)
-   {  
+   {
       if(v[j]==0)
       {
          zero[size(zero)+1]=var(j);
       }
       else
       {
-        nonzero[size(nonzero)+1]=var(j); 
+        nonzero[size(nonzero)+1]=var(j);
       }
    }
    // ---------------- do we have all pure powers we want? -------------------
@@ -937,7 +937,7 @@ example
    ring s = 0,(x,y,z,a,b,c),(lp(3),dp);
    ideal i= a -(xy)^3+x2-z, b -y2-1, c -z3;
    ideal j = a -(xy)^3+x2-z, b -y2-1, c -z3, xy;
-   finitenessTest(std(i),1..3);       
+   finitenessTest(std(i),1..3);
    finitenessTest(std(j),1..3);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -966,7 +966,7 @@ EXAMPLE: example mapIsFinite; shows an example
   execute("ring @bsr = ("+charstr(bsr)+"),y(1..m),("+os+");");
   ideal J = fetch(bsr,J);
   ideal PHI = fetch(bsr,PHI);
-  
+
   // --------------------------- enlarging ring -----------------------------
   execute("ring @rr = ("+charstr(bsr)+"),(y(1..m),x(1..n)),(lp(m),dp);");
   ideal J = imap(@bsr,J);

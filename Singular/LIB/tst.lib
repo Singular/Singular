@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.31 2000-12-31 15:14:47 obachman Exp $
+// $Id: tst.lib,v 1.32 2001-01-16 13:48:47 Singular Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.31 2000-12-31 15:14:47 obachman Exp $";
+version="$Id: tst.lib,v 1.32 2001-01-16 13:48:47 Singular Exp $";
 category="Utilities";
 info="
 LIBRARY:  tst.lib      Procedures for running automatic tst Tests
@@ -22,7 +22,7 @@ PROCEDURES:
  tst_stdEqual(ideal i1, ideal i2)
                         test whether two std's are \"equal\"
 
- tst_test_res(ideal i)  test different res commands for homog ideal i 
+ tst_test_res(ideal i)  test different res commands for homog ideal i
 ";
 
 /////////////////////////////////////////////////////////////////////////////
@@ -194,7 +194,7 @@ proc tst_status (list #)
            start_up -- int
 RETURN:   none
 PURPOSE: writes to tst-output the current memory usage and used CPU time.
-         If no integer argument is given, the elapsed CPU time since 
+         If no integer argument is given, the elapsed CPU time since
          the last call to tst_status() is reported.
          If an integer argument is given, the elapsed CPU time since the
          start-up of Singular is reported.
@@ -206,7 +206,7 @@ SEE ALSO: tst_init
 "
 {
   int start_up;
-  
+
   if (size(#) > 0)
   {
     if (typeof(#[1]) == "string")
@@ -277,7 +277,7 @@ EXAMPLE: example tst_init; shows example
   if (! defined(tst_no_status))
   {
     string outfile = "";
-    
+
     if (size(#) > 0)
     {
       if (typeof(#[1]) == string)
@@ -390,7 +390,7 @@ SEE ALSO: tst_InitTimer, tst_GetTimer, tst_StopTimer, tst_ReportTimer, tst_init
 "
 {
   string prefix = "OutTimer";
-  
+
   if (size(#) > 0)
   {
     prefix = string(#[1]);
@@ -584,27 +584,27 @@ PURPOSE:   Tests sres, lres, hres, mres with betti commands and conversions
 EXAMPLE:  example tst_test_res shows an example"
 {
   int ret = 1;
-  
+
   if (! homog(i))
   {
     ERROR("ERROR: input ideal needs to be homogenous ");
   }
-  
+
   if (size(#) == 0)
   {
     resolution rs = sres(std(i), 0);
     resolution rm = mres(i,0);
   }
-  
+
   resolution rh = hres(i,0);
   resolution rl = lres(i, 0);
-  
+
   if (size(#) == 0)
   {
     intmat is = betti(rs);
     intmat im = betti(rm);
   }
-  
+
   intmat ih = betti(rh);
   intmat il = betti(rl);
 
@@ -614,7 +614,7 @@ EXAMPLE:  example tst_test_res shows an example"
     if (size(ih) != size(is)){"ERROR: size(ih) != size(is)";return(0);}
     if (size(ih) != size(im)){"ERROR: size(ih) != size(im)";return(0);}
   }
-  
+
   if (ih != il){"ERROR: ih != il";return(0);}
   if (size(#) == 0)
   {
@@ -644,7 +644,7 @@ EXAMPLE:  example tst_test_res shows an example"
     if (size(ih_1) != size(is_1)){"ERROR: size(ih_1) != size(is_1)";return(0);}
     if (size(ih_1) != size(im_1)){"ERROR: size(ih_1) != size(im_1)";return(0);}
   }
-  
+
   if (ih_1 != il_1){"ERROR: ih_1 != il_1";return(0);}
   if (size(#) == 0)
   {
@@ -652,7 +652,7 @@ EXAMPLE:  example tst_test_res shows an example"
     if (ih_1 != im_1){"ERROR: ih_1 != im_1";return(0);}
   }
 
-  
+
   if (size(ih) != size(ih_1)) {"ERROR: size(ih) != size(ih_1)";return(0);}
   if (ih != ih_1) {"ERROR: ih != ih_1";return(0);}
 
@@ -687,8 +687,8 @@ proc tst_rgen_init_matrix(int n)
     m[i,i] = 1;
   }
   return (m);
-} 
- 
+}
+
 proc tst_rgen_generate_block(int n_vars, string simple_ordering, int extra_weights)
 {
   string order = simple_ordering;
@@ -696,14 +696,14 @@ proc tst_rgen_generate_block(int n_vars, string simple_ordering, int extra_weigh
   {
     extra_weights = n_vars;
   }
-  
+
   if ((simple_ordering[1] == "W") || (simple_ordering[1] == "w"))
   {
     order = order + "(" + string(tst_rgen_init_weights(n_vars)) + ")";
   }
   else
   {
-    if (simple_ordering[1] == "M") 
+    if (simple_ordering[1] == "M")
     {
       order = order + "(" + string(tst_rgen_init_matrix(n_vars)) + ")";
     }
@@ -724,7 +724,7 @@ proc tst_rgen_generate_blocks(int n_vars, list simple_orderings, intvec extra_we
   int i;
   int j;
   list blocks;
-  
+
   for (i=1; i<=size(simple_orderings); i++)
   {
     for (j=1; j<=size(extra_weights); j++)
@@ -742,7 +742,7 @@ proc tst_rgen_generate_product_orderings(int n_vars, list simple_orderings, intv
   int nn_vars, j, k,l;
   list nb_orderings;
   string n_ordering;
-  
+
   for (i=1;i<=size(products);i++)
   {
     if (products[i] > 1 && products[i] <= n_vars)
@@ -768,7 +768,7 @@ proc tst_rgen_generate_product_orderings(int n_vars, list simple_orderings, intv
         p_orderings = p_orderings + list(n_ordering);
       }
     }
-    else 
+    else
     {
       if (products[i] == 1)
       {
@@ -828,7 +828,7 @@ proc tst_rgen_init()
     list tst_rgen_exp_bounds;
     export(tst_rgen_exp_bounds);
   }
-  
+
   if (! defined(tst_rgen_char_index))
   {
     int tst_rgen_char_index, tst_rgen_var_index, tst_rgen_comp_index, tst_rgen_ordering_index, tst_rgen_exp_bounds_index;
@@ -871,7 +871,7 @@ proc tst_next_ring()
     }
     tst_rgen_ordering_index = 1;
   }
-  
+
   if (tst_rgen_nvars[tst_rgen_var_index] <= 26)
   {
     string rs = "(" + tst_rgen_charstrs[tst_rgen_char_index] + "),(" + A_Z("a", tst_rgen_nvars[tst_rgen_var_index]) + "),(";
@@ -891,13 +891,13 @@ proc tst_next_ring()
     {
       rs = rs + "c," + tst_rgen_orderings[tst_rgen_ordering_index];
     }
-    else 
+    else
     {
       if (tst_rgen_comp_orderings[tst_rgen_comp_index] == "C")
       {
         rs = rs + tst_rgen_orderings[tst_rgen_ordering_index] + ", C";
       }
-      else 
+      else
       {
         if (tst_rgen_comp_orderings[tst_rgen_comp_index] == "c")
         {
@@ -910,7 +910,7 @@ proc tst_next_ring()
       }
     }
   }
-  if (size(tst_rgen_exp_bounds) > 0) 
+  if (size(tst_rgen_exp_bounds) > 0)
   {
     if (! defined(tst_rgen_Lring))
     {
@@ -931,7 +931,7 @@ proc tst_next_ring()
   {
     rs = rs + ")";
   }
-  
+
   return (rs);
 }
 
@@ -957,7 +957,7 @@ proc tst_cyclic(int n)
 {
   int i, j, k, l;
   ideal id;
-  
+
   poly p, q;
   for (i=1; i<n; i++)
   {
@@ -984,7 +984,7 @@ proc tst_cyclic(int n)
     }
     id[i] = p;
   }
-  
+
   p = var(1);
   for (i=2;i<=n;i++)
   {
@@ -1046,7 +1046,7 @@ proc tst_TestAdd(ideal id, int how_often, int Module)
   int i, j, k, l;
   module m;
   ideal idl = 1, maxideal(1);
-  
+
   if (Module > 0)
   {
     for (i=1; i<= size(id); i++)
@@ -1094,7 +1094,7 @@ proc tst_TestAdd(ideal id, int how_often, int Module)
 proc tst_PrintStats(def id)
 {
   int i, is, s;
-  
+
   for (i=1; i<=size(id); i++)
   {
     is = size(id[i]);
@@ -1103,4 +1103,4 @@ proc tst_PrintStats(def id)
   }
   "s : " + string(s);
 }
-  
+

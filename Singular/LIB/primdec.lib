@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.93 2001-01-15 16:17:49 pfister Exp $";
+version="$Id: primdec.lib,v 1.94 2001-01-16 13:48:38 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -7,7 +7,7 @@ AUTHORS:  Gerhard Pfister, pfister@mathematik.uni-kl.de (GTZ)
 @*        Wolfram Decker, decker@math.uni-sb.de         (SY)
 @*        Hans Schoenemann, hannes@mathematik.uni-kl.de (SY)
 
-OVERVIEW: 
+OVERVIEW:
     Algorithms for primary decomposition based on the ideas of
     Gianni,Trager,Zacharias was written by Gerhard Pfister.
     Algorithms for primary decomposition based on the ideas of
@@ -17,7 +17,7 @@ OVERVIEW:
  @* In small characteristic and for algebraic extensions, primdecGTZ and
     minAssGTZ may not terminate and primdecSY and minAssChar may not give
     a complete decomposition.
-    Algorithms for the computation of the radical based on the ideas of 
+    Algorithms for the computation of the radical based on the ideas of
     Krick/Logar and Kemper was written by Gerhard Pfister.
 
 PROCEDURES:
@@ -205,9 +205,9 @@ static proc quotMin(list tsil)
    if(specialIdealsEqual(star,laedi))
    {
       l=star,fac,f;
-      return(l);      
+      return(l);
    }
-  
+
    action=1;
 
    while(action==1)
@@ -466,7 +466,7 @@ static proc primaryTest (ideal i, poly p)
          if(e mod char(basering)==0)
          {
            if ( voice >=15 )
-           { 
+           {
               "// WARNING: The characteristic is perhaps too small to use";
               "// the algorithm of Gianni/Trager/Zacharias.";
               "// This may result in an infinte loop";
@@ -475,9 +475,9 @@ static proc primaryTest (ideal i, poly p)
            while(e mod char(basering)==0)
            {
               f=f*char(basering);
-              e=e/char(basering);  
+              e=e/char(basering);
            }
-       
+
          }
          t=leadcoef(i[m])*e*var(n)^f+(i[m]-lead(i[m]))/var(n)^((e-1)*f);
          i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
@@ -486,15 +486,15 @@ static proc primaryTest (ideal i, poly p)
            return(ideal(0));
          }
          if(f>1)
-         {       
+         {
             act=factorize(t);
             if(size(act[1])>2)
             {
-              return(ideal(0));   
+              return(ideal(0));
             }
             if(deg(act[1][2])>1)
             {
-              return(ideal(0));   
+              return(ideal(0));
             }
             t=act[1][2];
          }
@@ -771,7 +771,7 @@ static proc splitCharp(list l)
         ideal act;
         ideal t=imap(P,t);
         for(k=2;k<=m;k++)
-        { 
+        {
            act=factorize(t[k],1);
            if(size(act)>1)
            {
@@ -1627,14 +1627,14 @@ EXAMPLE: example minAssPrimes; shows an example
    intvec op=option(get);
    map phi=P,q[2];
 
-   i=groebner(q[1]);   
-   if((size(#)==0)||(dim(i)==0))   
+   i=groebner(q[1]);
+   if((size(#)==0)||(dim(i)==0))
    {
       re[1]=decomp(i,2);
       re=union(re);
       return(phi(re));
    }
-   
+
    option(redSB);
    q=facstd(i);
 
@@ -1750,12 +1750,12 @@ static proc union(list li)
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc equidim(ideal i,list #)
-"USAGE:  equidim(i) or equidim(i,1) ; i ideal 
+"USAGE:  equidim(i) or equidim(i,1) ; i ideal
          equidim(i,1) uses the algorithm of Eisenbud, Hunecke and Vasconcelos
 RETURN: list of equidimensional ideals a_1,...,a_s such that the following
          holds:
 @*       a_s is the equidimensional locus of i, a1,...a_s-1 are the lower
-         dimensional equidimensional loci  with (perhaps) modified embedded 
+         dimensional equidimensional loci  with (perhaps) modified embedded
          components. I.e. an embedded component q (primary ideal) of i can be
          replaced in the decomposition by a primary ideal q1 with the same
          radical as q.
@@ -1768,7 +1768,7 @@ EXAMPLE:example equidim; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  intvec op ;  
+  intvec op ;
   def  P = basering;
   list eq;
   intvec w;
@@ -1790,7 +1790,7 @@ EXAMPLE:example equidim; shows an example
      ideal j=i;
      if(a==1)
      {
-       attrib(j,"isSB",1); 
+       attrib(j,"isSB",1);
      }
      else
      {
@@ -1802,7 +1802,7 @@ EXAMPLE:example equidim; shows an example
      execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),dp;");
      ideal i=imap(P,i);
      ideal j=groebner(i);
-  }  
+  }
   if(homo==1)
   {
      for(n=1;n<=nvars(basering);n++)
@@ -1822,11 +1822,11 @@ EXAMPLE:example equidim; shows an example
 
   if(m==0)
   {
-     ideal k=equidimMax(j); 
+     ideal k=equidimMax(j);
   }
   else
   {
-     ideal k=equidimMaxEHV(j); 
+     ideal k=equidimMaxEHV(j);
   }
   if(size(reduce(k,j,1))==0)
   {
@@ -1836,11 +1836,11 @@ EXAMPLE:example equidim; shows an example
     return(eq);
   }
   op=option(get);
-  option(returnSB);  
+  option(returnSB);
   j=quotient(j,k);
   option(set,op);
 
-  list equi=equidim(j);  
+  list equi=equidim(j);
   if(deg(equi[size(equi)][1])<=0)
   {
       equi[size(equi)]=k;
@@ -1863,7 +1863,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc equidimMax(ideal i)
-"USAGE:  equidimMax(i); i ideal           
+"USAGE:  equidimMax(i); i ideal
 RETURN:  ideal of equidimensional locus (of maximal dimension) of i.
 EXAMPLE: example equidimMax; shows an example
 "
@@ -1881,7 +1881,7 @@ EXAMPLE: example equidimMax; shows an example
   int g=size(i);
   int a=attrib(i,"isSB");
   int homo=homog(i);
-   
+
   if(((homo==1)||(a==1))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
@@ -1891,7 +1891,7 @@ EXAMPLE: example equidimMax; shows an example
      ideal j=i;
      if(a==1)
      {
-       attrib(j,"isSB",1); 
+       attrib(j,"isSB",1);
      }
      else
      {
@@ -1948,7 +1948,7 @@ EXAMPLE: example equidimMax; shows an example
   kill quring;
 
   list l=minSat(j,h);
-  
+
   if(deg(l[2])>0)
   {
     equ=l[1];
@@ -2119,7 +2119,7 @@ EXAMPLE: example decomp; shows an example
     if(size(fried)>0)
     {
        string newva;
-       string newma; 
+       string newma;
        for(@k=1;@k<=nvars(basering);@k++)
        {
           @n1=0;
@@ -2130,7 +2130,7 @@ EXAMPLE: example decomp; shows an example
                 @n1=1;
                 break;
              }
-          } 
+          }
           if(@n1==0)
           {
             newva=newva+string(var(@k))+",";
@@ -2138,8 +2138,8 @@ EXAMPLE: example decomp; shows an example
           }
           else
           {
-            newma=newma+string(0)+",";   
-          }      
+            newma=newma+string(0)+",";
+          }
        }
        newva[size(newva)]=")";
        newma[size(newma)]=";";
@@ -2600,7 +2600,7 @@ EXAMPLE: example decomp; shows an example
            //leading coefficients of the polynomials  there (polynomials in
            //K[var(nnp+1),..,var(nva)]) are collected in the list h,
            //we need their ggt, gh, because of the following:
-           //let (j:gh^n)=(j:gh^infinity) then 
+           //let (j:gh^n)=(j:gh^infinity) then
            //j*K(var(nnp+1),..,var(nva))[..the rest..]
            //intersected with K[var(1),...,var(nva)] is (j:gh^n)
            //on the other hand j=(j,gh^n) intersected with (j:gh^n)
@@ -2646,10 +2646,10 @@ EXAMPLE: example decomp; shows an example
            list uprimary= zero_decomp(@j,ser,@wr);
            option(set,op);
 
-           //we need the intersection of the ideals in the list quprimary with 
+           //we need the intersection of the ideals in the list quprimary with
            //the polynomialring, i.e. let q=(f1,...,fr) in the quotientring
            //such an ideal but fi polynomials, then the intersection of q with
-           //the polynomialring is the saturation of the ideal generated by 
+           //the polynomialring is the saturation of the ideal generated by
            //f1,...,fr with respect toh which is the lcm of the leading
            //coefficients of the fi considered in the quotientring:
            //this is coded in saturn
@@ -2801,7 +2801,7 @@ static proc sep(poly f,int i, list #)
          an integer k considering the polynomial f defined over Fp(t1,...,tm)
          as polynomial over Fp(t(1)^(p^-k),...,t(m)^(p^-k))
  RETURN: the separabel part of f as polynomial in Fp(t1,...,tm)
-        and an integer k to indicate that f should be considerd 
+        and an integer k to indicate that f should be considerd
         as polynomial over Fp(t(1)^(p^-k),...,t(m)^(p^-k))
  EXAMPLE: example sep; shows an example
 {
@@ -2852,15 +2852,15 @@ static proc zeroRad(ideal I,list #)
 {
    if(homog(I)==1){return(maxideal(1));}
    //I needs to be a reduced standard basis
-   def R=basering; 
+   def R=basering;
    int m=npars(R);
    int n=nvars(R);
-   int p=char(R);  
+   int p=char(R);
    int i,k;
    list l;
    intvec op=option(get);
 
-   option(redSB);  
+   option(redSB);
    ideal F=finduni(I);//F[i] generates I intersected with K[var(i)]
    option(set,op);
    if(size(#)>0){I=#[1];}
@@ -2874,7 +2874,7 @@ static proc zeroRad(ideal I,list #)
 
    if(k==0){return(I+F);}        //the separable case
 
-   for(i=1;i<=n;i++)             //consider all polynomials over 
+   for(i=1;i<=n;i++)             //consider all polynomials over
    {                             //Fp(t(1)^(p^-k),...,t(m)^(p^-k))
       F[i]=powerCoeffs(F[i],k-l[i][2]);
    }
@@ -2932,7 +2932,7 @@ static proc radicalKL (ideal i,ideal ser,list #)
       {
          @w[@n]=ord(var(@n));
       }
-      @hilb=hilb(i,1,@w);     
+      @hilb=hilb(i,1,@w);
    }
 
 
@@ -3041,7 +3041,7 @@ static proc radicalKL (ideal i,ideal ser,list #)
          {
             @h[@n]=leadcoef(@j[@n]);
          }
-         op=option(get);     
+         op=option(get);
          option(redSB);
          @j=interred(@j);  //to obtain a reduced standardbasis
          attrib(@j,"isSB",1);
@@ -3060,9 +3060,9 @@ static proc radicalKL (ideal i,ideal ser,list #)
      //is the saturation of the ideal generated by f1,...,fr with respect to
      //h which is the lcm of the leading coefficients of the fi considered in
      //the quotientring: this is coded in saturn
-   
+
       zero_rad=std(zero_rad);
-    
+
       ideal hpl;
 
       for(@n=1;@n<=size(zero_rad);@n++)
@@ -3161,7 +3161,7 @@ EXAMPLE: example radicalEHV; shows an example
       );
    }
    if((char(basering)<100)&&(char(basering)!=0))
-   { 
+   {
       "WARNING: The characteristic is too small, the result may be wrong";
    }
    ideal J,I,I0,radI0,L,radI1,I2,radI2;
@@ -4381,9 +4381,9 @@ proc primdecGTZ(ideal i)
 "USAGE:   primdecGTZ(i); i ideal
 RETURN:  a list pr of primary ideals and their associated primes:
 @*       -  pr[i][1] the i-th primary component,
-@*       -  pr[i][2] the i-th prime component. 
-NOTE:    Algorithm of Gianni, Traeger, Zacharias. 
-         Designed for characteristic 0, works also in char k > 0, if it 
+@*       -  pr[i][2] the i-th prime component.
+NOTE:    Algorithm of Gianni, Traeger, Zacharias.
+         Designed for characteristic 0, works also in char k > 0, if it
          terminates (may result in an infinite loop in small characteristic!)
 EXAMPLE: example primdecGTZ; shows an example
 "
@@ -4415,7 +4415,7 @@ proc primdecSY(ideal i, list #))
 @*         if c=3, minAssGTZ and facstd is used
 RETURN:  a list pr of primary ideals and their associated primes:
 @*         -  pr[i][1] the i-th primary component,
-@*         -  pr[i][2] the i-th prime component. 
+@*         -  pr[i][2] the i-th prime component.
 NOTE:    Algorithm of Shimoyama-Yokoyama.
          Due to a bug in the factorization, the result may be not completely
          decomposed in small characteristic.
@@ -4476,7 +4476,7 @@ proc minAssChar(ideal i, list #)
          Otherwise, the system tries to find an optimal ordering,
          which in some cases may considerably speed up the algorithm.
 RETURN:  a list, the minimal associated prime ideals of i.
-NOTE:    Due to a bug in the factorization, the result may be not completely 
+NOTE:    Due to a bug in the factorization, the result may be not completely
          decomposed in small characteristic.
 EXAMPLE: example minAssChar; shows an example
 "
@@ -4741,24 +4741,24 @@ EXAMPLE: example zerodec; shows an example
       n[j,1..d]=m[1..d,1];
    }
    dbprint(printlevel-voice+2,
-      "// time for computing multiplication matrix (with generic element) : "+ 
+      "// time for computing multiplication matrix (with generic element) : "+
       string(timer-time));
 //---------------- compute characteristic polynomial of matrix --------------
    execute("ring P1=("+charstr(R)+"),T,dp;");
    matrix n=imap(R,n);
    time = timer;
    poly charpol=det(n-T*freemodule(d));
-   dbprint(printlevel-voice+2,"// time for computing char poly: "+ 
+   dbprint(printlevel-voice+2,"// time for computing char poly: "+
            string(timer-time));
 //------------------- factorize characteristic polynomial -------------------
-//check first if constant term of charpoly is != 0 (which is true for 
+//check first if constant term of charpoly is != 0 (which is true for
 //sufficiently generic element)
    if(charpol[size(charpol)]!=0)
    {
      time = timer;
      list fac=factor(charpol);
      testFactor(fac,charpol);
-     dbprint(printlevel-voice+2,"// time for factorizing char poly: "+ 
+     dbprint(printlevel-voice+2,"// time for factorizing char poly: "+
              string(timer-time));
      int f=size(fac[1]);
 //--------------------------- the irreducible case --------------------------
@@ -4769,10 +4769,10 @@ EXAMPLE: example zerodec; shows an example
        return(re);
      }
 //---------------------------- the reducible case ---------------------------
-//if f_i are the irreducible factors of charpoly, mult=ri, then <I,g_i^ri> 
-//are the primary components where g_i = f_i(p). However, substituting p in 
-//f_i may result in a huge object although the final result may be small. 
-//Hence it is better to simultaneously reduce with I. For this we need a new 
+//if f_i are the irreducible factors of charpoly, mult=ri, then <I,g_i^ri>
+//are the primary components where g_i = f_i(p). However, substituting p in
+//f_i may result in a huge object although the final result may be small.
+//Hence it is better to simultaneously reduce with I. For this we need a new
 //ring.
      execute("ring P=("+charstr(R)+"),(T,"+varstr(R)+"),(dp(1),dp);");
      list rfac=imap(P1,fac);
@@ -4783,14 +4783,14 @@ EXAMPLE: example zerodec; shows an example
      attrib(new, "isSB",1);    //we know that new is a standard basis
      for(j=1;j<=f;j++)
      {
-        re1[j]=reduce(rfac[1][j]^rfac[2][j],new); 
+        re1[j]=reduce(rfac[1][j]^rfac[2][j],new);
      }
      setring R;
      re = imap(P,re1);
      for(j=1;j<=f;j++)
      {
         J=I,re[j];
-        re[j]=interred(J); 
+        re[j]=interred(J);
      }
      option(set,ov);
      return(re);
@@ -4834,7 +4834,7 @@ time=timer; ideal ra =radical(gls); timer-time;size(pr);
 //2.cyclic5  vdim=70, 20 Komponenten
 //zerodec-time:36(28)  (matrix:1(0) charpoly:18(19) factor:17(9)
 //primdecGTZ-time: 28(5)
-//radical : 0 
+//radical : 0
 ring rs= 0,(a,b,c,d,e),dp;
 poly f0= a + b + c + d + e + 1;
 poly f1= a + b + c + d + e;
@@ -4846,7 +4846,7 @@ ideal gls= f1,f2,f3,f4,f5;
 
 //3. random vdim=40, 1 Komponente
 //zerodec-time:126(304)  (matrix:1 charpoly:115(298) factor:10(5))
-//primdecGTZ-time:17 (11) 
+//primdecGTZ-time:17 (11)
 ring rs=0,(x,y,z),dp;
 poly f1=2*x^2 + 4*x + 3*y^2 + 7*x*z + 9*y*z + 5*z^2;
 poly f2=7*x^3 + 8*x*y + 12*y^2 + 18*x*z + 3*y^4*z + 10*z^3 + 12;
@@ -4855,7 +4855,7 @@ ideal gls=f1,f2,f3;
 
 //4. introduction into resultants, sturmfels, vdim=28, 1 Komponente
 //zerodec-time:4  (matrix:0 charpoly:0 factor:4)
-//primdecGTZ-time:1 
+//primdecGTZ-time:1
 ring rs=0,(x,y),dp;
 poly f1= x4+y4-1;
 poly f2= x5y2-4x3y3+x2y5-1;
@@ -4863,7 +4863,7 @@ ideal gls=f1,f2;
 
 //5. 3 quadratic equations with random coeffs, vdim=8, 1 Komponente
 //zerodec-time:0(0)  (matrix:0 charpoly:0 factor:0)
-//primdecGTZ-time:1(0) 
+//primdecGTZ-time:1(0)
 ring rs=0,(x,y,z),dp;
 poly f1=2*x^2 + 4*x*y + 3*y^2 + 7*x*z + 9*y*z + 5*z^2 + 2;
 poly f2=7*x^2 + 8*x*y + 12*y^2 + 18*x*z + 3*y*z + 10*z^2 + 12;
@@ -4882,7 +4882,7 @@ poly f4=-4*x1 + x2 + x3 + x4;
 ideal gls=f1,f2,f3,f4;
 
 //7. ex43, PoSSo, caprasse   vdim=56, 16 Komponenten
-//zerodec-time:23(15)  (matrix:0 charpoly:16(13) factor:3(2)) 
+//zerodec-time:23(15)  (matrix:0 charpoly:16(13) factor:3(2))
 //primdecGTZ-time:3 (2)
 ring rs= 0,(y,z,x,t),dp;
 ideal gls=y^2*z+2*y*x*t-z-2*x,
@@ -4895,8 +4895,8 @@ ideal gls=y^2*z+2*y*x*t-z-2*x,
 //primdecGTZ-time(char32003) :81 (18)
 //ring rs= 0,(a,b,c,d,x,f),dp;
 ring rs= 32003,(a,b,c,d,x,f),dp;
-ideal gls=a+b+c+d+x+f, ab+bc+cd+dx+xf+af, abc+bcd+cdx+d*xf+axf+abf, 
-abcd+bcdx+cd*xf+ad*xf+abxf+abcf, abcdx+bcd*xf+acd*xf+abd*xf+abcxf+abcdf, 
+ideal gls=a+b+c+d+x+f, ab+bc+cd+dx+xf+af, abc+bcd+cdx+d*xf+axf+abf,
+abcd+bcdx+cd*xf+ad*xf+abxf+abcf, abcdx+bcd*xf+acd*xf+abd*xf+abcxf+abcdf,
 abcd*xf-1;
 
 //9. ex42, PoSSo, Methan6_1, vdim=27, 2 Komponenten

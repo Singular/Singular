@@ -12,12 +12,12 @@ OVERVIEW:
  which is a graded subalgebra of R[t]. The degree-k-component is the integral
  closure of the k-th power of I.
 
-PROCEDURES:  
+PROCEDURES:
  ReesAlgebra(I);	computes the Rees Algebra of an ideal I
  NormalI(I[,p[,r]]);	computes the integral closure of an ideal I using R[It]
 ";
 
-LIB "normal.lib";       // for HomJJ 
+LIB "normal.lib";       // for HomJJ
 LIB "standard.lib";     // for groebner
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,12 +41,12 @@ EXAMPLE:  example ReesAlgebra; shows an example
   int n = ncols(I);
   ideal m = maxideal(1);
 
-  
+
   // Create a new ring with variables for each generator of I
 
   execute ("ring Rees = "+oldchar+",("+oldvar+",U(1.."+string(n)+")),dp");
 
- 
+
   // Kxt is the old ring with additional variable t
   // Here I -> t*I, so the generators of I generate the subalgebra R[It] in Kxt
 
@@ -56,9 +56,9 @@ EXAMPLE:  example ReesAlgebra; shows an example
   int k;
   for (k=1;k<=n;k++)
   {
-    I[k]=t*I[k]; 
+    I[k]=t*I[k];
   }
-  
+
 
   // Now we map from Rees to Kxt, identity on the original variables, and
   // U(k) -> I[k]
@@ -73,11 +73,11 @@ EXAMPLE:  example ReesAlgebra; shows an example
   setring Rees;
   ideal ker = preimage(Kxt,phi,zero);
   export (ker);
- 
+
   list result = Rees,Kxt;
-  
+
   return(result);
- 
+
 }
 example
 {
@@ -90,24 +90,24 @@ example
   Rees;
   ker;                   // R[I*t] is isomorphic to Rees/ker
 }
- 
+
 
 ////////////////////////////////////////////////////////////////////////////
 
 static proc ClosureRees (list L)
-"USAGE:    ClosureRees (L); L a list containing 
-          - a ring L[1], inside L[1] an ideal ker such that L[1]/ker is 
+"USAGE:    ClosureRees (L); L a list containing
+          - a ring L[1], inside L[1] an ideal ker such that L[1]/ker is
             isomorphic to the Rees Algebra R[It] of an ideal I in k[x]
           - a ring L[2]=k[x,t], inside L[1] an ideal mapI defining the
             map L[1] --> L[2] with image R[It]
 COMPUTE:  quotients of elements of k[x,t] representing generators of the
-          integral closure of R[It] 
+          integral closure of R[It]
 RETURN:   a list images, the first size(images)-1 entries are the nu-
           merators of the generators, the last one is the universal deno-
           minator
 "
 {
-  int dblvl=printlevel-voice+2;   // toggles how much data is printed 
+  int dblvl=printlevel-voice+2;   // toggles how much data is printed
                                   // during the procedure
 
   def Kxt = basering;
@@ -131,7 +131,7 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
   if (dblvl>0)
   {
     "// STEP 1: Compute the integral closure of R[It]";
-  } 
+  }
 
   list RS;
 
@@ -181,12 +181,12 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
       {
         list JM=groebner(sin),sin;
       }
- 
+
       if (dim(JM[1])==0 && homog(SM[2])==1)
       {
         isIsoSing=1;
       }
-      J=equiRadical(JM[2]); 
+      J=equiRadical(JM[2]);
     }
     else
     {
@@ -199,7 +199,7 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
         ideal J=maxideal(1);
       }
     }
-    
+
     if (dblvl>0)
     {
       "// Radical of the singular locus:";
@@ -209,7 +209,7 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
     ideal SL=simplify(reduce(JM[2],SM[1]),2);
     JM =J,J;
     poly nzd=SL[1];           // universal denominator for HomJJ
-    
+
     if (dblvl>0)
     {
       "// The non-zerodivisor";
@@ -233,8 +233,8 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
     else                      // prepare the next iteration with new
     {                         // ring R(i+1)
       ideal MJ=JM[2];
- 
-      def R(i+1)=RS[1];       // the data of and some variable decla- 
+
+      def R(i+1)=RS[1];       // the data of and some variable decla-
       setring R(i+1);         // rations in R(i+1) needed in STEP 2
       ideal ker(i+1)=endid;
       map phi=R(i),endphi;
@@ -242,7 +242,7 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
 
       if (isIsoSing==0)       // fetch the singular locus if it is not
       {                       // an isolated singularity
-        list JM=mstd(simplify(phi(MJ)+ker(i+1),4)); 
+        list JM=mstd(simplify(phi(MJ)+ker(i+1),4));
       }
       i++;
     }
@@ -266,7 +266,7 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
 
   list preimages;          // here the fractions are stored in the
                            // form var(j)=preimages[j]/preimages[length+1]
-                           // ('=' means identification via the inclusion) 
+                           // ('=' means identification via the inclusion)
                            // the last entry corresponds to nzd in R(i)
 
   // For each variable (counter j) and for each intermediate ring (k):
@@ -296,9 +296,9 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
 
     for (k=i;k>1;k--)
     {
-      // clear the fraction in the representation in R(i)    
+      // clear the fraction in the representation in R(i)
 
-      p=p*phi(nzd);      
+      p=p*phi(nzd);
 
       // compute the preimage of [p mod ker(k)] under phi in R(k-1):
       // as p is an element of im(phi), there is a poly h such that
@@ -307,7 +307,7 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
 
          // compute this normal form h...
 
-      if (j==1)    // in the first iteration: construct S(k)=R(k)[Z], fetch 
+      if (j==1)    // in the first iteration: construct S(k)=R(k)[Z], fetch
                    // endphi (the ideal defining phi) and ker(k) and construct
                    // the ideal from above
       {
@@ -361,13 +361,13 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
   }
 
   // at the end: go back to the original basering and construct gene-
-  // rators of the closure of I 
+  // rators of the closure of I
 
   setring Kxt;
   map psi=R(1),mapI;              // from ReesAlgebra: the map Rees->Kxt
 
-  list images=psi(preimages);    
-  
+  list images=psi(preimages);
+
   if (dblvl>-1)
   {
     pause();
@@ -397,22 +397,22 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
 ////////////////////////////////////////////////////////////////////////////
 
 static proc ClosurePower(list images, list #)
-"USAGE:    ClosurePower (L [,#]); 
+"USAGE:    ClosurePower (L [,#]);
           - L a list containing generators of the closure of R[It] in k[x,t]
             (the first size(L)-1 elements are the numerators, the last one
             is the denominator)
-          - if # is given: #[1] is an integer, compute generators for the 
+          - if # is given: #[1] is an integer, compute generators for the
                            closure of I, I^2, ..., I^#[1]
 COMPUTE:  the integral closure of I, ... I^#[1]. If # is not given, compute
           the closure of all powers up to the maximum degree in t occurring
           in the closure of R[It] (so this is the last one that is not just
           the sum/product of the above ones).
-RETURN:   a list containing generators of the closure of the desired powers 
-          of I as elements of k[x,t]. 
+RETURN:   a list containing generators of the closure of the desired powers
+          of I as elements of k[x,t].
 "
 {
-  int dblvl=printlevel-voice+2;   // toggles how much data is printed 
-                                  // during the procedure  
+  int dblvl=printlevel-voice+2;   // toggles how much data is printed
+                                  // during the procedure
 
   int j,k,d,computepow;                    // some counters
   int pow=0;
@@ -433,7 +433,7 @@ RETURN:   a list containing generators of the closure of the desired powers
   }
 
   intmat m[nvars(basering)-1][1];  // an intvec used for jet and maxdeg1
-  intvec tw=m,1;                   // such that t has weight 1 and all 
+  intvec tw=m,1;                   // such that t has weight 1 and all
                                    // other variables have weight 0
 
   // Construct the generators of the closure of R[It] as elements of k[x,t]
@@ -455,7 +455,7 @@ RETURN:   a list containing generators of the closure of the desired powers
         pow=maxdeg1(image,tw);
       }
     }
-  }  
+  }
 
   if (dblvl>0)
   {
@@ -487,8 +487,8 @@ RETURN:   a list containing generators of the closure of the desired powers
     for (k=1;k<=pow;k++)
     {
       image=images[j]-jet(images[j],k-1,tw);
-      if (image<>0)                 
-      {                                        
+      if (image<>0)
+      {
         image=subst(image/t^k,t,0);
         if (image<>0)
         {
@@ -509,13 +509,13 @@ RETURN:   a list containing generators of the closure of the desired powers
   // finally, add the suitable products of generators in lower degrees
 
   for (k=2;k<=pow;k++)
-  { 
+  {
     for (j=1;j<=(k div 2);j++)
-    { 
+    {
       result[k]=result[k]+result[j]*result[k-j];
     }
   }
-  
+
   return(result);
 }
 
@@ -523,19 +523,19 @@ RETURN:   a list containing generators of the closure of the desired powers
 
 proc normalI(ideal I, list #)
 "USAGE:    normalI (I [,p[,r]]); I an ideal, p and r optional integers
-COMPUTE:  the integral closure of I, ..., I^p. If p is not given, or p==0, 
-          compute the closure of all powers up to the maximum degree in t 
-          occurring in the closure of R[It] (so this is the last one that 
+COMPUTE:  the integral closure of I, ..., I^p. If p is not given, or p==0,
+          compute the closure of all powers up to the maximum degree in t
+          occurring in the closure of R[It] (so this is the last one that
           is not just the sum/product of the above ones).
-          If r is given and <>1, the check whether the input ideal is 
+          If r is given and <>1, the check whether the input ideal is
           already a radical ideal is omitted.
 RETURN:   a list containing the closure of the desired powers of I as ideals
-          of the basering. 
+          of the basering.
 DISPLAY:  The procedure displays more comments for higher printlevel
 EXAMPLE:  example normalI; shows an example
 "
 {
-  int dblvl=printlevel-voice+2;   // toggles how much data is printed 
+  int dblvl=printlevel-voice+2;   // toggles how much data is printed
                                   // during the procedure
 
   def BAS=basering;               // remember the basering
@@ -548,7 +548,7 @@ EXAMPLE:  example normalI; shows an example
     if (dblvl>0)
     {
       "// Trivial case: I is a principal ideal";
-    } 
+    }
     list result=I;
     if (size(#)>0)
     {
@@ -556,7 +556,7 @@ EXAMPLE:  example normalI; shows an example
       {
         result=insert(result,I*result[k],k);
       }
-    } 
+    }
     return(result);
   }
 
@@ -588,7 +588,7 @@ EXAMPLE:  example normalI; shows an example
         {
           result=insert(result,I*result[k],k);
         }
-      } 
+      }
       return(result);
     }
   }
@@ -599,12 +599,12 @@ EXAMPLE:  example normalI; shows an example
   {
     "// We start with the Rees Algebra of I:";
   }
-  
+
   list Rees = ReesAlgebra(I);
   def R(1)=Rees[1];
   def Kxt=Rees[2];
   setring R(1);
-  
+
   if (dblvl>0)
   {
     R(1);
@@ -612,7 +612,7 @@ EXAMPLE:  example normalI; shows an example
     "";
     "// Now ClosureRees computes generators for the integral closure";
     "// of R[It] step by step";
-  } 
+  }
 
   // ClosureRees computes fractions in R[x,t] representing the generators
   // of the closure of R[It] in k[x,t], which is the same as the closure
@@ -632,7 +632,7 @@ EXAMPLE:  example normalI; shows an example
     {
       "//I is integrally closed!";
     }
-    
+
     setring BAS;
     list result=I;
     if (size(#)>0)
@@ -641,12 +641,12 @@ EXAMPLE:  example normalI; shows an example
       {
         result=insert(result,I*result[k],k);
       }
-    } 
+    }
     return(result);
   }
-    
+
   // construct the fractions corresponding to the generators of the
-  // closure of I and its powers, depending on # (in fact, they will 
+  // closure of I and its powers, depending on # (in fact, they will
   // not be real fractions, of course). This is done in ClosurePower.
 
   list result = ClosurePower(images,#);
@@ -655,7 +655,7 @@ EXAMPLE:  example normalI; shows an example
 
   setring BAS;
   list result=fetch(Kxt,result);
-  return(result);  
+  return(result);
 }
 example
 {

@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: triang.lib,v 1.5 2000-12-22 15:04:40 greuel Exp $";
+version="$Id: triang.lib,v 1.6 2001-01-16 13:48:46 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: triang.lib   Decompose Zero-dimensional Ideals into Triangular Sets
-AUTHOR:	D. Hillebrand 
+AUTHOR:	D. Hillebrand
 
 PROCEDURES:
  triangL(G);          Decomposition of (G) into triangular systems (Lazard).
@@ -34,7 +34,7 @@ NOTE:    Algorithm of Lazard (see: Lazard, D.: Solving
 EXAMPLE: example triangL; shows an example
 "
 {
-  
+
     // Test, ob G Groebnerbasis eines nulldimensionalen Ideals ist.
     if (attrib(G,"isSB") <> 1)
     {
@@ -62,7 +62,7 @@ EXAMPLE: example triangL; shows an example
     option(returnSB);
     list B;    // Bearbeitungsliste
     list F;    // Ergebnisliste = Triangulierung
-    ideal T, T_neu;  
+    ideal T, T_neu;
     poly p,p_neu,r,s,lt,lc,lcr;
     list inv;
     int u,v;
@@ -73,7 +73,7 @@ EXAMPLE: example triangL; shows an example
     attrib(T,"isSB",1);
     B = list(list(T,2));
 
-    while (size(B) > 0)     
+    while (size(B) > 0)
     {
         T   = B[1][1];
         h   = B[1][2];
@@ -89,7 +89,7 @@ EXAMPLE: example triangL; shows an example
 
           dbprint(string(timer)+" S"+st+": Anzahl Dreiecksbasen: "+string(size(inv))+".");
 
-        while (size(inv) > 0)   
+        while (size(inv) > 0)
         {
             r   = inv[1][1];
             s   = inv[1][2];
@@ -116,12 +116,12 @@ EXAMPLE: example triangL; shows an example
                 }
 
                 // Durchsuche restliche Stufen nach trivialen ggt's.
-                while (l <= size(G)) 
+                while (l <= size(G))
                 {
                     lc = lcoef(G[l],u);
                     lcr = reduce(lc,T_neu);
-                        
-                    while (lcr == 0) // Gehe bis zum ersten Polynom <> 0 
+
+                    while (lcr == 0) // Gehe bis zum ersten Polynom <> 0
                     {                // modulo (T_neu).
                         l++;
                         lc = lcoef(G[l],u);
@@ -234,12 +234,12 @@ NOTE:    Algorithmus von Lazard (siehe: Lazard, D.: Solving
     // Faktorisierungsschalter setzen.
     int fak;
     if (size(#) > 0 && typeof(#[1]) == "int")
-    { 
+    {
         if (#[1] == 2) {fak = 1;}
     }
 
     if (size(G) <= 2)  // schon Dreiecksbasis
-    {  
+    {
         list E;
         if (fak)
         {
@@ -256,7 +256,7 @@ NOTE:    Algorithmus von Lazard (siehe: Lazard, D.: Solving
     list B;    // Bearbeitungsliste
     list F;    // Ergebnisliste = Triangulierung
     list T_neu;
-    ideal T;  
+    ideal T;
     poly p,p_neu,r,s,lt,lc;
     list inv;
     int v;
@@ -265,7 +265,7 @@ NOTE:    Algorithmus von Lazard (siehe: Lazard, D.: Solving
 
     // B initialisieren
     if (fak)
-    { 
+    {
         B = H_anhaengen(faktorisiere_letzten(G[1]),2);
     }
     else
@@ -275,7 +275,7 @@ NOTE:    Algorithmus von Lazard (siehe: Lazard, D.: Solving
         B = list(list(T,2));
     }
 
-    while (size(B) > 0)     
+    while (size(B) > 0)
     {
         T   = B[1][1];
         h   = B[1][2];
@@ -290,7 +290,7 @@ NOTE:    Algorithmus von Lazard (siehe: Lazard, D.: Solving
         inv = invertieren(lc,T);
           dbprint(string(timer)+" S"+st+": Anzahl Dreiecksbasen: "+string(size(inv))+".");
 
-        while (size(inv) > 0)   
+        while (size(inv) > 0)
         {
             r   = inv[1][1];
             s   = inv[1][2];
@@ -307,7 +307,7 @@ NOTE:    Algorithmus von Lazard (siehe: Lazard, D.: Solving
                 lt    = var(v)**degv(p,v);
                 p_neu = cleardenom(s*lt + reduce(r*(p-lc*lt),T));
                 if (fak)
-                { 
+                {
                     T_neu = faktorisiere_letzten(list(T + p_neu));
                 }
                 else
@@ -353,19 +353,19 @@ RETURN:  Liste von Tripeln (Listen) bestehend aus einem Polynom ri,
     p = reduce(p,T);
     if (p == 0) {return(list(list(0,0,T)));}
     if (deg(p) == 0) {return(list(list(1,p,T)));}
-  
+
     list inv;
     int zerlegt;      // zerlegt ist Schalter dafuer, ob T zerlegt wurde,
     export zerlegt;   // einzige globale Variable.
     list toSee = list(list(p,T));  // zu bearbeitende Paare
     list toSave;                   // Ergebnisliste
     poly pr;
-                                   
-    while (size(toSee) > 0) 
+
+    while (size(toSee) > 0)
     {
         zerlegt = 0;             // zerlegt = FALSE
         p = toSee[1][1];
-        T = toSee[1][2];           
+        T = toSee[1][2];
         toSee = Listenrest(toSee);
 
         // invertieren_oT aufrufen, um p+(T) zu invertieren.
@@ -413,14 +413,14 @@ static proc invertieren_oT (poly p, ideal T)
 "USAGE:   invertieren_oT(p,T); T reduzierte Dreiecksbasis,
                               p <> 0 Polynom, irreduzibel modulo (T).
 RETURN:  Entweder ein Quasi-Inverses (r,s) von p modulo (T), d.h.
-         r*p = s mod (T) und s im Grundring, 
+         r*p = s mod (T) und s im Grundring,
          oder eine Triangulierung [T1,T2] von T
          mit (Ti) <> (T) fuer i = 1,2.
 "
 {
     // Quasi-Inverses von Konstante klar.
     if (deg(p) == 0) {return(list(1,p));}
-    
+
     ideal T_bis_k,T1,T2;
     poly g,a,b;
     list rq;
@@ -439,16 +439,16 @@ RETURN:  Entweder ein Quasi-Inverses (r,s) von p modulo (T), d.h.
         T_bis_k = T[1..(k-1)];
     }
     attrib(T_bis_k,"isSB",1);
-    
+
     // Um p+(T) zu invertieren, erw. eukl. Algorithmus anwenden.
     gab = Erw_ggt_oT(T[k],p,v,T_bis_k);
 
-    // Entweder Triangulierung von T_bis_k erhalten, 
+    // Entweder Triangulierung von T_bis_k erhalten,
     if (zerlegt)
-    {                            
-        // T[k..size(T)] an gab[i] anhaengen und reduzieren.             
-        T1 = gab[1];                                                        
-        T2 = gab[2];                                                      
+    {
+        // T[k..size(T)] an gab[i] anhaengen und reduzieren.
+        T1 = gab[1];
+        T2 = gab[2];
         for (i = k; i <= size(T); i++)
         {
             T1 = T1 + cleardenom(reduce(T[i],T1));
@@ -460,7 +460,7 @@ RETURN:  Entweder ein Quasi-Inverses (r,s) von p modulo (T), d.h.
     }
 
     // ansonsten gilt: a*T[k] + b*p = g mod (T_bis_k)
-    g = gab[1];            
+    g = gab[1];
     a = gab[2];
     b = gab[3];
 
@@ -469,13 +469,13 @@ RETURN:  Entweder ein Quasi-Inverses (r,s) von p modulo (T), d.h.
         rq = pdiv(T[k],g,v);
 
         T1 = T_bis_k;
-        T1[k] = cleardenom(reduce(g,T1));    
+        T1[k] = cleardenom(reduce(g,T1));
         attrib(T1,"isSB",1);
         T2 = T_bis_k;
         T2[k] = cleardenom(reduce(rq[2],T2));
         attrib(T2,"isSB",1);
 
-        // T[k..size(T)] an T1, T2 anhaengen und reduzieren. 
+        // T[k..size(T)] an T1, T2 anhaengen und reduzieren.
         for (i = k + 1; i <= size(T); i++)
         {
             T1 = T1 + cleardenom(reduce(T[i],T1));
@@ -485,7 +485,7 @@ RETURN:  Entweder ein Quasi-Inverses (r,s) von p modulo (T), d.h.
         }
 
         // zerlegt = TRUE, hier ist einzige Stelle, wo T zerlegt wird.
-        zerlegt = 1;          
+        zerlegt = 1;
         return(list(T1,T2));
     }
     else                      // ansonsten Quasi-Inverses gefunden.
@@ -513,7 +513,7 @@ NOTE:    Dies ist der erweiterte euklidische Algorithmus im Polynom-
 "
 {
     // Initialisierung fuer erw. eukl. Algorithmus.
-    poly p1 = f; 
+    poly p1 = f;
     poly p2 = g;
     poly a1 = 1;
     poly a2 = 0;
@@ -522,7 +522,7 @@ NOTE:    Dies ist der erweiterte euklidische Algorithmus im Polynom-
 
     // Normierung des Dividenden.
     list pab = normieren_oT(p2,a2,b2,v,T);
-    if (zerlegt) {return(pab);}  
+    if (zerlegt) {return(pab);}
     p2 = pab[1]; a2 = pab[2]; b2 = pab[3];
 
     poly p3,a3,b3,q;  // Hilfspolynome
@@ -536,13 +536,13 @@ NOTE:    Dies ist der erweiterte euklidische Algorithmus im Polynom-
     number psi = -1;
     number m;
 
-    // Pseudodivision 
+    // Pseudodivision
     rq = pdiv(p1,p2,v);
     q  = rq[2];
     p3 = reduce(rq[1],T);
 
     while (p3 <> 0)   // Hauptschleife des eukl. Algorithmus.
-    {         
+    {
         alpha = number(lcoef(p2,v));  // return von lcoef ist type poly
         m  = alpha**(delta + 1);   //m*p1 = q*p2 + p3  mod (T)
         p3 = p3 / beta;            //m*p1 = q*p2 + beta * p3  mod (T)
@@ -564,22 +564,22 @@ NOTE:    Dies ist der erweiterte euklidische Algorithmus im Polynom-
 
         // Normierung des Dividenden.
         pab = normieren_oT(p2,a2,b2,v,T);
-        if (zerlegt) {return(pab);}  
+        if (zerlegt) {return(pab);}
         p2 = pab[1]; a2 = pab[2]; b2 = pab[3];
 
         if (degv(p2,v) > 0)     // Dividend aus Grundring?, dann
         {                       // Subresultanten-Variabeln anpassen
-            if (delta > 0)    
+            if (delta > 0)
             {
                 psi = ((-alpha)**delta) / (psi**(delta-1));
             }
             delta = degv(p1,v)-degv(p2,v);
             beta  = (-alpha) * (psi**delta);
 
-            rq = pdiv(p1,p2,v); // und Pseudodivision, 
+            rq = pdiv(p1,p2,v); // und Pseudodivision,
             q  = rq[2];
             p3 = reduce(rq[1], T);
-        }                       
+        }
         else                    // ansonsten Ende.
         {
             p3 = 0;
@@ -590,13 +590,13 @@ NOTE:    Dies ist der erweiterte euklidische Algorithmus im Polynom-
     clden = cleardenom([p2,a2,b2]);
     return(list(clden[1],clden[2],clden[3]));
 }
-                                          
+
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc normieren_oT (poly p, poly a, poly b, int v, ideal T)
 "USAGE:   normieren_oT(p,a,b,v,T); p,a,b Polynome in var(v),
                                   T Dreiecksbasis.
-RETURN:  Entweder Triangulierung [T1,T2] von (T) oder 
+RETURN:  Entweder Triangulierung [T1,T2] von (T) oder
          Liste,wobei [1] = reduce(r*p,T),
                      [2] = reduce(r*a,T),
                      [3] = reduce(r*b,T),
@@ -605,7 +605,7 @@ RETURN:  Entweder Triangulierung [T1,T2] von (T) oder
 {
     poly lc = lcoef(p,v);
     if (deg(lc) == 0) {return(list(p,a,b));} // lc im Grundring
-    lc = cleardenom(lc);             
+    lc = cleardenom(lc);
 
     // invertieren_oT aufrufen, um lc+(T) zu invertieren.
     list inv = invertieren_oT(lc,T);
@@ -615,10 +615,10 @@ RETURN:  Entweder Triangulierung [T1,T2] von (T) oder
     p = reduce(inv[1] * p,T);
     a = reduce(inv[1] * a,T);
     b = reduce(inv[1] * b,T);
-    return(list(p,a,b));    
+    return(list(p,a,b));
 }
 
-                           
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  Der Moeller-Algorithmus
@@ -650,7 +650,7 @@ EXAMPLE: example triangM; shows an example
     // Faktorisierungsschalter setzen.
     int fak;
     if (size(#) > 0 && typeof(#[1]) == "int")
-    { 
+    {
         if (#[1] == 2) {fak = 1;}
     }
 
@@ -682,7 +682,7 @@ EXAMPLE: example triangM; shows an example
     int l;
     ideal lc,G1,G2,H;
     poly lcr;
-    int i,j,k;       
+    int i,j,k;
       string s = string(nvars(basering)-v+1); // fuer Protokoll
 
     // Oberes Dreieckssytem abschneiden.
@@ -725,10 +725,10 @@ EXAMPLE: example triangM; shows an example
     F = triangM(G1,#);
 
       dbprint(string(timer)+" S"+s+": Oberes Dreieckssystem anhaengen.");
-                                                                
+
     // Oberes Dreieckssystem an jede berechnete Dreiecksbasis anhaengen.
     for (j = m; j <= nG; j++)  // meist nur j = m = nG
-    {                          
+    {
         for (i = 1; i <= size(F); i++)
         {
             F[i] = F[i] + cleardenom(G[j][1] + reduce(G[j]-G[j][1],F[i]));
@@ -741,14 +741,14 @@ EXAMPLE: example triangM; shows an example
     }
 
         dbprint(string(timer)+" S"+s+": Zweiter Teil des Splitts, "+string(m-l-1)+" Leitkoeffizient(en).");
-                             
+
     // Zweiten Teil des Splitts berechnen.
     H = ideal(G[1..m]);
     attrib(H,"isSB",1);
 
     for (k = m-l-1; k >= 1; k--)  // Leitkoeffizientenliste durchgehen,
     {                             // angefangen mit lc des kleinsten Polynoms.
-        lcr = reduce(lc[k],H); 
+        lcr = reduce(lc[k],H);
         if (lcr <> 0)             // d.h. (H):lcr <> (1)
         {
               dbprint(string(timer)+" S"+s+"L"+string(m-l-k)+": Berechnung Idealquotient.");
@@ -792,7 +792,7 @@ EXAMPLE: example triangM; shows an example
     for (i = 1; i <= size(F); i++)
     {
         attrib(F[i],"isSB",1);
-    }    
+    }
     option(set, ovec);
     return(F);
 }
@@ -833,7 +833,7 @@ EXAMPLE: example triangMH; shows an example
     // Faktorisierungsschalter setzen.
     int fak;
     if (size(#) > 0 && typeof(#[1]) == "int")
-    { 
+    {
         if (#[1] == 2) {fak = 1;}
     }
 
@@ -865,7 +865,7 @@ EXAMPLE: example triangMH; shows an example
     int l;
     poly lcr;
     ideal lc,G1,G2,H;
-    int i,j,k;       
+    int i,j,k;
       string s = string(nvars(basering)-v+1); // fuer Protokoll
 
     // Oberes Dreieckssytem abschneiden.
@@ -908,10 +908,10 @@ EXAMPLE: example triangMH; shows an example
     F = triangMH(G1,#);
 
       dbprint(string(timer)+" S"+s+": Oberes Dreieckssystem anhaengen.");
-                                                                
+
     // Oberes Dreieckssystem an jede berechnete Dreiecksbasis anhaengen.
     for (j = m; j <= nG; j++)  // meist nur j = m = nG
-    {                          
+    {
         for (i = 1; i <= size(F); i++)
         {
             F[i] = F[i] + cleardenom(G[j][1] + reduce(G[j]-G[j][1],F[i]));
@@ -924,14 +924,14 @@ EXAMPLE: example triangMH; shows an example
     }
 
         dbprint(string(timer)+" S"+s+": Zweiter Teil des Splitts, "+string(m-l-1)+" Leitkoeffizient(en).");
-                             
+
     // Zweiten Teil des Splitts berechnen.
     H = ideal(G[1..l]);   // Nur die Polynome in var(u).
     attrib(H,"isSB",1);
 
     for (k = m-l-1; k >= 1; k--)  // Leitkoeffizientenliste durchgehen,
     {                             // angefangen mit lc des kleinsten Polynoms.
-        lcr = reduce(lc[k],H); 
+        lcr = reduce(lc[k],H);
         if (lcr <> 0)             // d.h. (H):lcr <> (1)
         {
               dbprint(string(timer)+" S"+s+"L"+string(m-l-k)+": Berechnung Saturation.");
@@ -956,8 +956,8 @@ EXAMPLE: example triangMH; shows an example
                 }
                 for (j = m+1; j <= nG; j++)  // oberes Dreieckssystem an jede
                 {                            // berechnete Dreiecksbasis anhaengen
-                    for (i = 1; i <= size(Fh); i++) 
-                    {                             
+                    for (i = 1; i <= size(Fh); i++)
+                    {
                         Fh[i] = Fh[i] + cleardenom(G[j][1]
                                       + reduce(G[j]-G[j][1],Fh[i]));
                         attrib(Fh[i],"isSB",1);
@@ -989,7 +989,7 @@ EXAMPLE: example triangMH; shows an example
     for (i = 1; i <= size(F); i++)
     {
         attrib(F[i],"isSB",1);
-    } 
+    }
     option(set, ovec);
     return(F);
 }
@@ -997,7 +997,7 @@ EXAMPLE: example triangMH; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring rC5 = 0,(e,d,c,b,a),lp;
-   triangMH(stdfglm(cyclic(5))); 
+   triangMH(stdfglm(cyclic(5)));
 }
 
 
@@ -1008,13 +1008,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc sort_red (ideal G)
-"USAGE:   sort_red(G);  G lexikographische Groebnerbasis. 
+"USAGE:   sort_red(G);  G lexikographische Groebnerbasis.
 RETURN:  reduzierte lex. GB G, deren Elemente nach aufsteigenden
          Leittermen sortiert sind.
 "
 {
     int i;
-   
+
     // sortieren
     G = sort(G)[1];
 
@@ -1028,7 +1028,7 @@ RETURN:  reduzierte lex. GB G, deren Elemente nach aufsteigenden
         attrib(Gred,"isSB",1);
     }
     attrib(Gred,"isSB",1);
-    return(Gred); 
+    return(Gred);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1039,32 +1039,32 @@ static proc Listenrest (list Liste)
 RETURN:  Liste ohne das erste Element.
 "
 {
-    return(delete(Liste,1));                                    
+    return(delete(Liste,1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc Idealrest (ideal i)
-"USAGE:   Idealrest(i); i Ideal, i <> (0).                                              
+"USAGE:   Idealrest(i); i Ideal, i <> (0).
 RETURN:  Ideal i ohne das erste Element bzw das Nullideal,
          falls i nur ein Erzeugendes besass.
-"                                                                            
+"
 {
     int ni = size(i);
     if (ni == 1)
     {
         return(ideal(0));    // Nullideal
-    }  
-    return(ideal(i[2..ni]));                                    
+    }
+    return(ideal(i[2..ni]));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc H_anhaengen (list L, int h)
-"USAGE:   H_anhaengen(L,h); L Liste aus Idealen, h natuerliche Zahl.                                              
+"USAGE:   H_anhaengen(L,h); L Liste aus Idealen, h natuerliche Zahl.
 RETURN:  Macht aus dem Listenelement i ein Paar [i,h] und setzt
          Attribut "isSB" fuer i.
-"                                                                            
+"
 {
     int i;
     list E; // Ergebnisliste
@@ -1080,10 +1080,10 @@ RETURN:  Macht aus dem Listenelement i ein Paar [i,h] und setzt
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc faktorisiere_letzten (list L)
-"USAGE:   faktorisiere_letzten(L); L Liste aus Idealen.                                              
+"USAGE:   faktorisiere_letzten(L); L Liste aus Idealen.
 RETURN:  Faktorisiert letztes Polynom aus jedem Ideal der Liste und
          zerlegt das Ideal entsprechend. Attribut "isSB" wird gesetzt.
-"                                                                            
+"
 {
     int i,j;
     ideal h;
@@ -1101,7 +1101,7 @@ RETURN:  Faktorisiert letztes Polynom aus jedem Ideal der Liste und
             E = insert(E,h,size(E));
             attrib(E[size(E)],"isSB",1);
         }
-    }       
+    }
     return(E);
 }
 
@@ -1112,15 +1112,15 @@ static proc faktorisiere_DB (ideal db)
 RETURN:  Liste aus reduzierten Dreiecksbasen,
          die ensteht, indem, mit dem ersten beginnend,
          jedes Polynom der Dreiecksbasis faktorisiert wird.
-"                                                                            
+"
 {
     int i,j;
     poly h;
     list E = faktorisiere_letzten(db[1]);
-            
-    for (j = 2; j <= size(db); j++)  
-    {                         
-        for (i = 1; i <= size(E); i++) 
+
+    for (j = 2; j <= size(db); j++)
+    {
+        for (i = 1; i <= size(E); i++)
         {
             h    = db[j][1] + reduce(db[j]-db[j][1],E[i]);
             E[i] = E[i] + h;
@@ -1131,14 +1131,14 @@ RETURN:  Liste aus reduzierten Dreiecksbasen,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-             
+
 static proc degv (poly f, int v)
-"USAGE:   degv(f,v);  f Polynom in var(v).                                             
+"USAGE:   degv(f,v);  f Polynom in var(v).
 RETURN:  Liefert den Grad von f bzgl. var(v) bzw -1, falls f == 0.
-"                                                                            
+"
 {
     if (f == 0) {return(-1);}
-    return(size(coeffs(f,var(v))) - 1);  
+    return(size(coeffs(f,var(v))) - 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1152,16 +1152,16 @@ NOTE:    Pseudodivision von f durch g.
 {
     // Initialisierung
     poly q      = 0;
-    poly rem    = f;             
+    poly rem    = f;
     int deg_g   = degv(g,v);
     int deg_rem = degv(rem,v);
     poly lcg    = lcoef(g,v);     // Im Lazard-Algor. aus dem Grundring.
     poly h;
     rem = rem*lcg**(deg_rem - deg_g + 1); // f durch g teilbar machen.
-                                   
+
     // Gewoehnliche Polynomdivision
     while (rem <> 0 and deg_rem >= deg_g)
-    {    
+    {
         h       = (lcoef(rem,v)/lcg)*var(v)**(deg_rem - deg_g);
         q       = q + h;
         rem     = rem - h*g;
@@ -1169,17 +1169,17 @@ NOTE:    Pseudodivision von f durch g.
     }
     return(list(rem,q));
 }
-             
+
 //////////////////////////////////////////////////////////////////////////////
 
 static proc lvar (poly f)
 "USAGE:   lvar(f);  f nicht-konstantes Polynom.
 RETURN:  groesste Variable von f bzgl. der aktuellen Termordnung.
 "
-{                                                                           
+{
     int i = 1;
     intvec exp = leadexp(f);
-                                                                            
+
     while (1)
     {
         if (exp[i] <> 0) {return(i);}

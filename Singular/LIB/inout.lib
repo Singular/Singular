@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.20 2000-12-30 15:44:31 greuel Exp $";
+version="$Id: inout.lib,v 1.21 2001-01-16 13:48:31 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -101,7 +101,7 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r= 0,(x,y,z),ds;
    poly f=((x+y)*(x-y)*(x+z)*(y+z)^2);
-   lprint(f,40); 
+   lprint(f,40);
    module m = [f*(x-y)],[0,f*(x-y)];
    string s=lprint(m); s;"";
    execute("matrix M[2][2]="+s+";");      //use the string s as input
@@ -183,11 +183,11 @@ example
 
 proc rMacaulay
 "USAGE:   rMacaulay(s[,n]);  s string, n integer
-RETURN:  A string which should be readable by Singular if s is a string which 
-         was produced by Macaulay. If a second argument is present the first 
-         n lines of the file are deleted (which is useful if the file was 
+RETURN:  A string which should be readable by Singular if s is a string which
+         was produced by Macaulay. If a second argument is present the first
+         n lines of the file are deleted (which is useful if the file was
          produced e.g. by the putstd command of Macaulay).
-NOTE:    This does not always work with 'cut and paste' since the character 
+NOTE:    This does not always work with 'cut and paste' since the character
          \ is treated differently
 EXAMPLE: example rMacaulay; shows an example
 "
@@ -505,8 +505,8 @@ proc showrecursive (id,poly p,list #)
          variables and ord=string (any allowed ordstr)
 DISPLAY: display 'id' in a recursive format as a polynomial in the variables
          occuring in p with coefficients in the remaining variables. This is
-         done by mapping to a ring with parameters [and ordering 'ord', 
-         if a 3rd argument is present (default: ord=\"dp\")] and applying 
+         done by mapping to a ring with parameters [and ordering 'ord',
+         if a 3rd argument is present (default: ord=\"dp\")] and applying
          procedure 'show'
 RETURN:  no return value
 EXAMPLE: example showrecursive; shows an example
@@ -601,7 +601,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc writelist (string fil, string nam, list L)
-"USAGE:   writelist(file,name,L);  file,name strings (file-name, list-name), 
+"USAGE:   writelist(file,name,L);  file,name strings (file-name, list-name),
           L a list.
 CREATE:  a file with name `file`, write the content of the list L into it and
          call the list `name`, keeping the list structure
@@ -613,7 +613,7 @@ NOTE:    The syntax of writelist uses and is similar to the syntax of the
          there the list L under the name L1. The Singular command
          execute(read(\"listfile\")); assignes the content of L (stored in
          listfile) to a list L1.
-@*       On a UNIX system, write(\">file\",...) overwrites an existing file 
+@*       On a UNIX system, write(\">file\",...) overwrites an existing file
          `file` while write(\"file\",...) and write(\">>file\",...) append.
 EXAMPLE: example writelist; shows an example
 "
@@ -637,7 +637,7 @@ example
    read("zumSpass");
    list L=res(i,0);                    //resolution of the ideal i
    writelist("res_list","res-name",L); "";
-   read("res_list");                   
+   read("res_list");
    // execute(read("res_list")); would create a list with name res-name,
    // which is the resolution of i (the same content as L)
 
@@ -653,7 +653,7 @@ proc pause(list #)
 "USAGE:    pause([ prompt ])  prompt string
 RETURN:   none
 PURPOSE:  interrupt the execution of commands until user input
-NOTE:     pause is useful in procedures in connection with printlevel to 
+NOTE:     pause is useful in procedures in connection with printlevel to
           interrupt the computation and to display intermediate results.
 SEE ALSO: read, printlevel
 EXAMPLE : example pause; shows an example
@@ -672,18 +672,18 @@ example
   // pause("press <return> to continue");
   // pause();
   // In the following pocedure TTT, xxx is printed and the execution of
-  // TTT is stopped until the return-key is pressed, if printlevel>0. 
+  // TTT is stopped until the return-key is pressed, if printlevel>0.
   // xxx may be any result of a previous computation or a comment, etc:
   //
   // proc TTT
   // { int pp = printlevel-voice+2;  //pp=0 if printlevel=0 and if TTT is
   //    ....                         //not called from another procedure
   //    if( pp>0 )
-  //    { 
+  //    {
   //       print( xxx );
   //       pause("press <return> to continue");
-  //    } 
+  //    }
   //     ....
-  // } 
+  // }
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.16 2001-01-07 01:56:52 greuel Exp $";
+version="$Id: ring.lib,v 1.17 2001-01-16 13:48:41 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -338,13 +338,13 @@ CREATE:  Define a ring with name `na` which extends the ring r by adding n new
             taken for the whole ordering in front resp. at the end. If o does
             not contain a 'c' or a 'C' the same rule applies to ordstr(r).
 @*        -  If no intvec iv is given, or if iv=0, o may be any allowed ordstr,
-            like \"ds\" or \"dp(2),wp(1,2,3),Ds(2)\" or \"ds(a),dp(b),ls\" if 
-            a and b are globally (!) defined integers and if a+b+1<=n. 
+            like \"ds\" or \"dp(2),wp(1,2,3),Ds(2)\" or \"ds(a),dp(b),ls\" if
+            a and b are globally (!) defined integers and if a+b+1<=n.
             If, however, a and b are local to a proc calling extendring, the
             intvec iv must be used to let extendring know the values of a and b
-@*        -  If an intvec iv !=0 is given, iv[1],iv[2],... is taken for the 
+@*        -  If an intvec iv !=0 is given, iv[1],iv[2],... is taken for the
             1st, 2nd,... block of o, if o contains no substring \"w\" or \"W\"
-            i.e. no weighted ordering (in the above case o=\"ds,dp,ls\" 
+            i.e. no weighted ordering (in the above case o=\"ds,dp,ls\"
             and iv=a,b).
             If o contains a weighted ordering (only one (!) weighted block is
             allowed) iv[1] is taken as size for the weight-vector, the next
@@ -608,7 +608,7 @@ example
 //   ring R=0,(x,y,z),dp;
 //   ideal j=x,y,z;
 //   matrix M[2][3]=1,2,3,x,y,z;
-//   map phi=R,x2,y2,z2; 
+//   map phi=R,x2,y2,z2;
 //   ring S=0,(a,b,c),ds;
 //   ideal i=c,a,b;
 //   mapall(R,i);         //map from R to S: x->c, y->a, z->b
@@ -660,7 +660,7 @@ example
    ring S = 0,(u,v),ls;
    ord_test(R);
    ord_test(S);
-   ord_test(R+S);   
+   ord_test(R+S);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -757,7 +757,7 @@ example
 
 proc ringweights (list # )
 "USAGE:   ringweights(P); P=name of an existing ring (true name, not a string)
-RETURN:  intvec consisting of the weights of the variables of P, as they 
+RETURN:  intvec consisting of the weights of the variables of P, as they
          appear when typing P;.
 NOTE:    This is useful when enlarging P but keeping the weights of the old
          variables.

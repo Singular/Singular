@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.32 2001-01-09 12:19:20 Singular Exp $";
+version="$Id: poly.lib,v 1.33 2001-01-16 13:48:36 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -133,10 +133,10 @@ proc kat_var(int i, int n)
 
 proc freerank
 "USAGE:   freerank(M[,any]);  M=poly/ideal/vector/module/matrix
-COMPUTE: rank of module presented by M in case it is free. 
+COMPUTE: rank of module presented by M in case it is free.
          By definition this is vdim(coker(M)/m*coker(M)) if coker(M)
          is free, where m = maximal ideal of the variables of the
-         basering and M is considered as matrix. 
+         basering and M is considered as matrix.
          (the 0-module is free of rank 0)
 RETURN:  rank of coker(M) if coker(M) is free and -1 else;
          in case of a second argument return a list:
@@ -161,7 +161,7 @@ example
   ideal i=x;
   module M=[x,0,1],[-x,0,-1];
   freerank(M);          // should be 2, coker(M) is not free
-  freerank(syz (M),""); 
+  freerank(syz (M),"");
   // [1] should be 1, coker(syz(M))=M is free of rank 1
   // [2] should be gen(2)+gen(1) (minimal relation of M)
   freerank(i);
@@ -210,7 +210,7 @@ example
 
 proc is_zero
 "USAGE:   is_zero(M[,any]); M=poly/ideal/vector/module/matrix
-RETURN:  integer, 1 if coker(M)=0 resp. 0 if coker(M)!=0, where M is 
+RETURN:  integer, 1 if coker(M)=0 resp. 0 if coker(M)!=0, where M is
          considered as matrix.
          If a second argument is given, return a list:
                 L[1] = 1 if coker(M)=0 resp. 0 if coker(M)!=0
@@ -567,8 +567,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 // Input: <ideal>=<f1,f2,...,fm> and <polynomial> g
 // Question: Does g lie in the radical of <ideal>?
-// Solution: Compute a standard basis G for <f1,f2,...,fm,gz-1> where z is a 
-//           new variable. Then g is contained in the radical of <ideal> <=> 
+// Solution: Compute a standard basis G for <f1,f2,...,fm,gz-1> where z is a
+//           new variable. Then g is contained in the radical of <ideal> <=>
 //           1 is generator in G.
 ///////////////////////////////////////////////////////////////////////////////
 proc rad_con (poly g,ideal I)
@@ -634,9 +634,9 @@ EXAMPLE: example lcm; shows an example
         }
      }
      int p,q;
-     if( i == 0 ) 
-     { 
-        return(0); 
+     if( i == 0 )
+     {
+        return(0);
      }
      for(j=1;j<=size(i);j++)
      {
@@ -655,10 +655,10 @@ EXAMPLE: example lcm; shows an example
            p=p*i[k];
         }
      }
-     if(p <0 ) 
+     if(p <0 )
      {return(-p);}
      return(p);
-   }    
+   }
 
 //----------------------------- polynomial case ------------------------------
   if( typeof(id) == "poly" or typeof(id) == "ideal" )
@@ -677,9 +677,9 @@ EXAMPLE: example lcm; shows an example
      }
      poly p,q;
      i=simplify(i,10);
-     if(size(i) == 0) 
-     { 
-        return(0); 
+     if(size(i) == 0)
+     {
+        return(0);
      }
      for(j=1;j<=size(i);j++)
      {
@@ -896,8 +896,8 @@ RETURN:  list l:
           l[1]=the monomials from mon in the order used
           l[2]=their coefficients after interreduction
           l[3]=l[1]*l[2]
-PUPOSE:  Do interred only w.r.t. a subset of variables.  
-         The procedure returns an interreduced system of generators of 
+PUPOSE:  Do interred only w.r.t. a subset of variables.
+         The procedure returns an interreduced system of generators of
          sm considered as a k[t_1,..,t_s]-submodule of the free module
          k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)]).
 EXAMPLE: example subrInterred; shows an example
@@ -997,4 +997,4 @@ example
 ////////////////////////////////////////////////////////////////////////
 
 
-  
+

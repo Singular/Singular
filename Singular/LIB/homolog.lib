@@ -1,10 +1,10 @@
 //(BM/GMG)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.14 2001-01-08 01:00:28 greuel Exp $";
+version="$Id: homolog.lib,v 1.15 2001-01-16 13:48:31 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
-AUTHORS:  Gert-Martin Greuel, greuel@mathematik.uni-kl.de, 
+AUTHORS:  Gert-Martin Greuel, greuel@mathematik.uni-kl.de,
 @*        Bernd Martin,  martin@math.tu-cottbus.de
 
 PROCEDURES:
@@ -216,8 +216,8 @@ proc cupproduct (module M,N,P,int p,q,list #)
 COMPUTE: cup-product Ext^p(M',N') x Ext^q(N',P') ---> Ext^p+q(M',P'),
          where M':=R^m/M, if M in R^m, R basering (i.e. M':=coker(matrix(M)))
 ASSUME:  all Ext's  are of finite dimension
-RETURN:  
-@format 
+RETURN:
+@format
          matrix of the associated linear map Ext^p(tensor)Ext^q-->Ext^p+q
          i.e. the columns of <matrix> present the coordinates of
          the cup products (b_i & c_j) with respect to a kbase of Ext^p+q
@@ -423,12 +423,12 @@ example
 
 proc Ext_R (intvec v, module M, list #)
 "USAGE:   Ext_R(v,M[,p]);  v int resp. intvec , M module, p int
-COMPUTE: 
+COMPUTE:
 @format
          A presentation of Ext^k(M',R); for k=v[1],v[2],..., M'=coker(M).
-         Let      ...--> F2 --> F1 --M-> F0-->M'-->0 
+         Let      ...--> F2 --> F1 --M-> F0-->M'-->0
          be a free resolution of M'. If
-                    0 <-- F0* <-A1-- F1* <-A2-- F2* <-A3--... 
+                    0 <-- F0* <-A1-- F1* <-A2-- F2* <-A3--...
          denotes the dual sequence, with Fi*=Hom(Fi,R),
          then Ext^k = ker(Ak)/im(Ak+1) is presented as in the following
          exact sequences:
@@ -436,14 +436,14 @@ COMPUTE:
                  Fk*/im(Ak+1) <-syz(Ak)-- R^p <-Ext^k-- R^q
          Hence Ext^k=modulo(syz(Ak),Ak+1) presents Ext^k(M',R).
 @end format
-RETURN:  
+RETURN:
 @format
          Ext^k, of type module, a presentation of Ext^k(M',R) if v is of type
          int, resp. a list of Ext^k (k=v[1],v[2],...) if v is of type intvec.
          In case of a third argument of type int return a list l:
            l[1] = module Ext^k resp. list of Ext^k
            l[2] = SB of Ext^k resp. list of SB of Ext^k
-           l[3] = matrix resp.list of matrices, 
+           l[3] = matrix resp.list of matrices,
                   each representing kbase of Ext^k (if finite dimensional)
 @end format
 DISPLAY: printlevel >=0: degree of Ext^k for each k  (default)
@@ -560,7 +560,7 @@ example
 
 proc Ext (intvec v, module M, module N, list #)
 "USAGE:   Ext(v,M,N[,any]);  v int resp. intvec, M,N modules
-COMPUTE: 
+COMPUTE:
 @format
          A presentation of Ext^k(M',N'); for k=v[1],v[2],... where
          M'=coker(M) and N'=coker(N). Let
@@ -586,7 +586,7 @@ COMPUTE:
 
          Hence Ext presents Ext^k(M',N').
 @end format
-RETURN:  
+RETURN:
 @format
          - module Ext, a presentation of Ext^k(M',N') if v is of type int
          - a list of Ext^k (k=v[1],v[2],...) if v is of type intvec.
@@ -733,7 +733,7 @@ example
 
 proc Hom (module M, module N, list #)
 "USAGE:   Hom(M,N,[any]);  M,N=modules
-COMPUTE: 
+COMPUTE:
 @format
          A presentation of Hom(M',N'), M'=coker(M), N'=coker(N) as follows:
          Let ...-->F1 --M-> F0-->M'-->0 and ...-->G1 --N-> G0-->N'-->0  be
@@ -904,7 +904,7 @@ example
 proc kohom (matrix M, int j)
 "USAGE:   kohom(A,k); A=matrix, k=integer
 RETURN:  matrix Hom(R^k,A), i.e. let A be a matrix defining a map: F1 --> F2
-         of free R-modules, then  matrix of Hom(R^k,F1)-->Hom(R^k,F2) 
+         of free R-modules, then  matrix of Hom(R^k,F1)-->Hom(R^k,F2)
          is computed.
 EXAMPLE: example kohom; shows an example
 "

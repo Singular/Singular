@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.54 2001-01-15 19:06:12 lossen Exp $";
+version="$Id: standard.lib,v 1.55 2001-01-16 13:48:44 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -142,12 +142,12 @@ proc groebner(def i, list #)
          @code{groebner (} module_expression@code{,} int_expression @code{)}
 TYPE:    type of the first argument
 PURPOSE: computes the standard basis of the first argument @code{I}
-         (ideal or module), by a heuristically chosen method: if the 
-         ordering of the current ring is a local ordering, or if it is a 
-         non-block ordering and the current ring has no parameters, then 
-         @code{std(I)} is returned. Otherwise, @code{I} is mapped into a 
-         ring with no parameters and ordering dp, where its Hilbert series 
-         is computed. This is followed by a Hilbert-series based std 
+         (ideal or module), by a heuristically chosen method: if the
+         ordering of the current ring is a local ordering, or if it is a
+         non-block ordering and the current ring has no parameters, then
+         @code{std(I)} is returned. Otherwise, @code{I} is mapped into a
+         ring with no parameters and ordering dp, where its Hilbert series
+         is computed. This is followed by a Hilbert-series based std
          computation in the original ring.
 NOTE: If a 2nd argument @code{wait} is given, then the computation proceeds
       at most @code{wait} seconds. That is, if no result could be computed in
@@ -448,7 +448,7 @@ following methods:
 @code{lres} (La'Scala's method), see @ref{lres}.
 
 @ifinfo
-@item *not minimized resolution and (homogeneous input with k<>0, 
+@item *not minimized resolution and (homogeneous input with k<>0,
 or local rings):*@*
 @end ifinfo
 @tex
@@ -599,10 +599,10 @@ example
 
 proc quot (m1,m2,list #)
 "SYNTAX: @code{quot (} module_expression@code{,} module_expression @code{)}
-         @*@code{quot (} module_expression@code{,} module_expression@code{,} 
+         @*@code{quot (} module_expression@code{,} module_expression@code{,}
             int_expression @code{)}
          @*@code{quot (} ideal_expression@code{,} ideal_expression @code{)}
-         @*@code{quot (} ideal_expression@code{,} ideal_expression@code{,} 
+         @*@code{quot (} ideal_expression@code{,} ideal_expression@code{,}
             int_expression @code{)}
 TYPE:    ideal
 SYNTAX:  @code{quot (} module_expression@code{,} ideal_expression @code{)}
@@ -858,17 +858,17 @@ proc sprintf(string fmt, list #)
 "SYNTAX:  @code{sprintf (} string_expression @code{[,} any_expressions
                @code{] )}
 RETURN:   string
-PURPOSE:  @code{sprintf(fmt,...);} performs output formatting. The first 
-          argument is a format control string. Additional arguments may be 
-          required, depending on the content of the control string. A series 
+PURPOSE:  @code{sprintf(fmt,...);} performs output formatting. The first
+          argument is a format control string. Additional arguments may be
+          required, depending on the content of the control string. A series
           of output characters is generated as directed by the control string;
           these characters are returned as a string. @*
           The control string @code{fmt} is simply text to be copied,
           except that the string may contain conversion specifications.@*
-          Do @code{help print;} for a listing of valid conversion 
-          specifications. As an addition to the conversions of @code{print}, 
-          the @code{%n} and @code{%2} conversion specification does not 
-          consume an additional argument, but simply generates a newline 
+          Do @code{help print;} for a listing of valid conversion
+          specifications. As an addition to the conversions of @code{print},
+          the @code{%n} and @code{%2} conversion specification does not
+          consume an additional argument, but simply generates a newline
           character.
 NOTE:     If one of the additional arguments is a list, then it should be
           enclosed once more into a @code{list()} command, since passing a list
@@ -947,20 +947,20 @@ example
 proc printf(string fmt, list #)
 "SYNTAX:  @code{printf (} string_expression @code{[,} any_expressions@code{] )}
 RETURN:   none
-PURPOSE:  @code{printf(fmt,...);} performs output formatting. The first 
-          argument is a format control string. Additional arguments may be 
-          required, depending on the content of the control string. A series 
+PURPOSE:  @code{printf(fmt,...);} performs output formatting. The first
+          argument is a format control string. Additional arguments may be
+          required, depending on the content of the control string. A series
           of output characters is generated as directed by the control string;
           these characters are displayed (i.e., printed to standard out). @*
-          The control string @code{fmt} is simply text to be copied, except 
+          The control string @code{fmt} is simply text to be copied, except
           that the string may contain conversion specifications. @*
-          Do @code{help print;} for a listing of valid conversion 
-          specifications. As an addition to the conversions of @code{print}, 
-          the @code{%n} and @code{%2} conversion specification does not 
-          consume an additional argument, but simply generates a newline 
+          Do @code{help print;} for a listing of valid conversion
+          specifications. As an addition to the conversions of @code{print},
+          the @code{%n} and @code{%2} conversion specification does not
+          consume an additional argument, but simply generates a newline
           character.
 NOTE:     If one of the additional arguments is a list, then it should be
-          enclosed once more into a @code{list()} command, since passing a 
+          enclosed once more into a @code{list()} command, since passing a
           list as an argument flattens the list by one level.
 SEE ALSO: sprintf, fprintf, print, string
 EXAMPLE : example printf; shows an example
@@ -985,24 +985,24 @@ example
 
 
 proc fprintf(link l, string fmt, list #)
-"SYNTAX:  @code{fprintf (} link_expression@code{,} string_expression @code{[,} 
+"SYNTAX:  @code{fprintf (} link_expression@code{,} string_expression @code{[,}
                 any_expressions@code{] )}
 RETURN:   none
-PURPOSE:  @code{fprintf(l,fmt,...);} performs output formatting. 
-          The second argument is a format control string. Additional 
-          arguments may be required, depending on the content of the 
-          control string. A series of output characters is generated as 
+PURPOSE:  @code{fprintf(l,fmt,...);} performs output formatting.
+          The second argument is a format control string. Additional
+          arguments may be required, depending on the content of the
+          control string. A series of output characters is generated as
           directed by the control string; these characters are
           written to the link l.
-          The control string @code{fmt} is simply text to be copied, except 
+          The control string @code{fmt} is simply text to be copied, except
           that the string may contain conversion specifications.@*
-          Do @code{help print;} for a listing of valid conversion 
-          specifications. As an addition to the conversions of @code{print}, 
-          the @code{%n} and @code{%2} conversion specification does not 
-          consume an additional argument, but simply generates a newline 
+          Do @code{help print;} for a listing of valid conversion
+          specifications. As an addition to the conversions of @code{print},
+          the @code{%n} and @code{%2} conversion specification does not
+          consume an additional argument, but simply generates a newline
           character.
 NOTE:     If one of the additional arguments is a list, then it should be
-          enclosed once more into a @code{list()} command, since passing 
+          enclosed once more into a @code{list()} command, since passing
           a list as an argument flattens the list by one level.
 SEE ALSO: sprintf, printf, print, string
 EXAMPLE : example fprintf; shows an example

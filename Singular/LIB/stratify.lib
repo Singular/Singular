@@ -1,10 +1,10 @@
 // (anne, last modified 23.5.00)
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: stratify.lib,v 1.5 2000-12-22 14:53:34 greuel Exp $";
+version="$Id: stratify.lib,v 1.6 2001-01-16 13:48:44 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY: stratify.lib   Algorithmic Stratification for Unipotent Group-Actions
-AUTHOR:  Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de 
+AUTHOR:  Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de
 last modified: 12.12.2000
 
 Procedures:
@@ -26,11 +26,11 @@ LIB "primdec.lib";
 /////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
-// For the kernel of the Kodaira-Spencer map in the case of hypersurface 
+// For the kernel of the Kodaira-Spencer map in the case of hypersurface
 // singularities or CM codimension 2 singularities:
 // * step=min{ord(x_i)}
 // * wr corresponds to the weight vector of the d/dt_i (i.e. to -ord(t_i))
-//   (since the entries should be non-negative it may be necessary to 
+//   (since the entries should be non-negative it may be necessary to
 //   multiply the whole vector by -1)
 // * ws corresponds to the weight vector of the delta_i
 // * M is the matrix delta_i(t_j)
@@ -40,12 +40,12 @@ proc prepMat(matrix M, intvec wr, intvec ws, int step)
 "USAGE:   prepMat(M,wr,ws,step);
          where M is a matrix, wr is an intvec of size ncols(M),
          ws an intvec of size nrows(M) and step is an integer
-RETURN:  2 lists of submatrices corresponding to the filtrations 
+RETURN:  2 lists of submatrices corresponding to the filtrations
          specified by wr and ws
          the first list corresponds to the list for the filtration
-         of AdA, i.e. the ranks of these matrices will be the r_i, 
+         of AdA, i.e. the ranks of these matrices will be the r_i,
          the second one to the list for the filtration of L, i.e.
-         the ranks of these matrices will be the s_i 
+         the ranks of these matrices will be the s_i
 NOTE:    * the entries of the matrix M are M_ij=delta_i(x_j),
          * wr is used to determine what subset of the set of all dx_i is
            generating AdF^l(A):
@@ -58,7 +58,7 @@ NOTE:    * the entries of the matrix M are M_ij=delta_i(x_j),
            of generators of Z_l(A) for l < k and the i-th row of M
            appears in each submatrix up to the (k-1)th
          * the entries of wr and ws as well as step should be positive
-           integers 
+           integers
 EXAMPLE: example prepMat; shows an example"
 {
 //----------------------------------------------------------------------
@@ -86,7 +86,7 @@ EXAMPLE: example prepMat; shows an example"
     wr=sortwr[1];
     M=N;
     kill N;
-  } 
+  }
   if(sortws[1]!=ws)
   {
     matrix N[nrows(M)][ncols(M)];
@@ -112,7 +112,7 @@ EXAMPLE: example prepMat; shows an example"
       if(j==size(wr)) break;
     }
     if(j!=0)
-    { 
+    {
       matrix N[nrows(M)][j]=M[1..nrows(M),1..j];
     }
     else
@@ -163,7 +163,7 @@ example
 static
 proc minorList (list matlist)
 "USAGE:   minorList(l);
-         where l is a list of matrices satisfying the condition that l[i] 
+         where l is a list of matrices satisfying the condition that l[i]
          is a submatrix of l[i+1]
 RETURN:  list of lists in which each entry of the returned list corresponds
          to one of the matrices of the list l and is itself the list of
@@ -221,7 +221,7 @@ EXAMPLE: example minorList(l); shows an example"
         if (defined(watchdog_interrupt))
         {
           kill watchdog_interrupt;
-        }                                
+        }
         string watchstring="radical(ideal(";
         for(counter=1;counter <size(minid);counter++)
         {
@@ -260,7 +260,7 @@ example
   list l=prepMat(M,wr,ws,step);
   l[1];
   minorList(l[1]);
-}  
+}
 /////////////////////////////////////////////////////////////////////////////
 static
 proc strataList(list Minors, list d, ideal V, int r, int nl)
@@ -277,16 +277,16 @@ RETURN:  list of lists, each entry of the big list corresponds to one
          locally closed set and has the following entries:
          1) intvec giving the corresponding r- resp. s-vector
          2) ideal determining the closed set (cf. 3rd parameter V)
-         3) list of polynomials determining the open set (cf. 2nd 
-            parameter d)  
-NOTE:    * sensible default values are 
+         3) list of polynomials determining the open set (cf. 2nd
+            parameter d)
+NOTE:    * sensible default values are
            d[1]=1; (list of length 1)
            V=ideal(0);
            r=0;
            nl=0;
            these parameters are only important in the recursion
-           (if you know what you are doing, you are free to set d, V 
-           and r, but setting nl to a value other than 0 may give 
+           (if you know what you are doing, you are free to set d, V
+           and r, but setting nl to a value other than 0 may give
            unexpected results)
          * no sanity checks are performed, since the procedure is designed
            for internal use only
@@ -438,7 +438,7 @@ EXAMPLE: example strataList; shows an example"
   if(size(Ml)==0)
   {
     list ret;
-    list templist; 
+    list templist;
     templist[1]=intvec(rv);
     templist[2]=mV;
     templist[3]=d;
@@ -486,7 +486,7 @@ EXAMPLE: example strataList; shows an example"
     for(j=0;j<=size(Did);j++)
     {
       if((i!=0)&&(j==0))
-      { 
+      {
         j++;
         continue;
       }
@@ -506,7 +506,7 @@ EXAMPLE: example strataList; shows an example"
       d=imap(rt,d);
       if(j==0)
       {
-        if(reduce(1,std(newV+poly(D*U-1)))==0) 
+        if(reduce(1,std(newV+poly(D*U-1)))==0)
         {
           j++;
           setring rt;
@@ -515,7 +515,7 @@ EXAMPLE: example strataList; shows an example"
       }
       if(i!=0)
       {
-        if(reduce(1,std(newV+poly(Did[j]*D*U-1)))==0) 
+        if(reduce(1,std(newV+poly(Did[j]*D*U-1)))==0)
         {
           j++;
           setring rt;
@@ -524,7 +524,7 @@ EXAMPLE: example strataList; shows an example"
         f=Did[j];
         for(k=2;k<=size(d);k++)
         {
-          while(((f/d[k])*d[k])==f) 
+          while(((f/d[k])*d[k])==f)
           {
             f=f/d[k];
           }
@@ -537,12 +537,12 @@ EXAMPLE: example strataList; shows an example"
 // otherwise factorize f, if it does not take too long,
 // and add its factors, resp. f itself, to the list d
       if(deg(f)>0)
-      { 
-        f=cleardenom(f); 
+      {
+        f=cleardenom(f);
         if (defined(watchdog_interrupt))
         {
           kill watchdog_interrupt;
-        }                                
+        }
         def watchtempid=watchdog(180,"factorize(eval(" + string(f) + "),1)");
         if (defined(watchdog_interrupt))
         {
@@ -568,7 +568,7 @@ EXAMPLE: example strataList; shows an example"
       {
         newd=d;
       }
-// take the corresponding sublist of the list of minors 
+// take the corresponding sublist of the list of minors
       list Mltemp=delete(Ml,1);
       for(k=1;k<=size(Mltemp);k++)
       {
@@ -591,7 +591,7 @@ EXAMPLE: example strataList; shows an example"
       if(size(templist)!=0)
       {
         k=1;
-        ll=1;        
+        ll=1;
         while(k<=size(templist))
         {
           if(size(templist[k])!=0)
@@ -610,7 +610,7 @@ EXAMPLE: example strataList; shows an example"
   for(i=1;i<=size(retlist);i++)
   {
     if(typeof(retlist[i])=="none")
-    { 
+    {
       delvec=delvec,i;
     }
   }
@@ -626,7 +626,7 @@ EXAMPLE: example strataList; shows an example"
     if(nl!=0)
     {
       intvec tempiv=rv,retlist[i][1];
-      retlist[i][1]=tempiv;    
+      retlist[i][1]=tempiv;
       kill tempiv;
     }
     else
@@ -658,9 +658,9 @@ example
 static
 proc cleanup(list stratlist)
 "USAGE:   cleanup(l);
-         where l is a list of lists in the format which is e.g. returned 
+         where l is a list of lists in the format which is e.g. returned
          by strataList
-RETURN:  list in which entries to the same integer vector have been 
+RETURN:  list in which entries to the same integer vector have been
          joined to one entry
          the changed entries may be identified by checking whether its
          3rd entry is an empty list, then all entries starting from the
@@ -668,7 +668,7 @@ RETURN:  list in which entries to the same integer vector have been
 NOTE:    use the procedure killdups first to kill entries which are
          contained in other entries to the same integer vector
          otherwise the result will be meaningless
-EXAMPLE: example cleanup; shows an example" 
+EXAMPLE: example cleanup; shows an example"
 {
   int i,j;
   list leer;
@@ -734,16 +734,16 @@ example
 static
 proc joinRS(list Rlist,list Slist)
 "USAGE:   joinRS(Rlist,Slist);
-         where Rlist and Slist are lists in the format returned by 
+         where Rlist and Slist are lists in the format returned by
          strataList
-RETURN:  one list in the format returned by stratalist in which the 
+RETURN:  one list in the format returned by stratalist in which the
          integer vector is the concatenation of the corresponding vectors
          from Rlist and Slist
          (of course only non-empty locally closed sets are returned)
 NOTE:    since Slist is a list returned by strataList corresponding to the
          s-vector, it corresponds to the list of minors read from back to
          front
-EXAMPLE: no example available at the moment" 
+EXAMPLE: no example available at the moment"
 {
   int j,k;
   list retlist;
@@ -758,25 +758,25 @@ EXAMPLE: no example available at the moment"
   setring rtu;
   def Rlist=imap(rt,Rlist);
   def Slist=imap(rt,Slist);
-  setring rt; 
+  setring rt;
   for(int i=1;i<=size(Rlist);i++)
   {
     for(j=1;j<=size(Slist);j++)
     {
 // skip empty sets
-      if(Rlist[i][1][size(Rlist[i][1])]<Slist[j][1][size(Slist[j][1])]) 
+      if(Rlist[i][1][size(Rlist[i][1])]<Slist[j][1][size(Slist[j][1])])
       {
         j++;
         continue;
       }
       setring rtu;
-      if(reduce(1,std(Slist[j][2]+poly(((Rlist[i][3][1])*U)-1)))==0) 
+      if(reduce(1,std(Slist[j][2]+poly(((Rlist[i][3][1])*U)-1)))==0)
       {
         j++;
         setring rt;
         continue;
       }
-      if(reduce(1,std(Rlist[i][2]+poly(((Slist[j][3][1])*U)-1)))==0) 
+      if(reduce(1,std(Rlist[i][2]+poly(((Slist[j][3][1])*U)-1)))==0)
       {
         j++;
         setring rt;
@@ -856,7 +856,7 @@ EXAMPLE: no example available at the moment"
   }
   return(retlist);
 }
-////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////
 
 proc stratify(matrix M, intvec wr, intvec ws,int step)
 "USAGE:   stratify(M,wr,ws,step);
@@ -865,24 +865,24 @@ proc stratify(matrix M, intvec wr, intvec ws,int step)
 RETURN:  list of lists, each entry of the big list corresponds to one
          locally closed set and has the following entries:
          1) intvec giving the corresponding rs-vector
-         2) ideal determining the closed set 
+         2) ideal determining the closed set
          3) list d of polynomials determining the open set D(d[1])
-            empty list if there is more than one open set 
+            empty list if there is more than one open set
          4-n) lists of polynomials determining open sets which all lead
             to the same rs-vector
-NOTE:    * ring ordering should be global, i.e. the ring should be a 
+NOTE:    * ring ordering should be global, i.e. the ring should be a
            polynomial ring
          * the entries of the matrix M are M_ij=delta_i(x_j),
          * wr is used to determine what subset of the set of all dx_i is
            generating AdF^l(A):
            if (k-1)*step < wr[i] <= k*step, then dx_i is in the set of
-           generators of AdF^l(A) for all l>=k 
+           generators of AdF^l(A) for all l>=k
          * ws is used to determine what subset of the set of all delta_i
            is generating Z_l(L):
            if (k-1)*step <= ws[i] < k*step, then delta_i is in the set
            of generators of Z_l(A) for l < k
          * the entries of wr and ws as well as step should be positive
-           integers 
+           integers
          * the filtrations have to be known, no sanity checks concerning
            the filtrations are performed !!!
 EXAMPLE: example stratify; shows an example"
@@ -916,7 +916,7 @@ EXAMPLE: example stratify; shows an example"
   }
   if(defined(symm)>1)
   {
-    if(symm==0) 
+    if(symm==0)
     {
       kill symm;
     }
@@ -994,7 +994,7 @@ EXAMPLE: example stratify; shows an example"
       ret;
     }
     ret=cleanup(ret);
-  }  
+  }
   else
   {
     list ret=cleanup(Rlist);
@@ -1018,7 +1018,7 @@ proc killdups(list l)
 RETURN:  list which is obtained from the previous list by leaving out
          entries which have the same intvec as another entry in which
          the locally closed set is contained
-EXAMPLE: no example available at the moment" 
+EXAMPLE: no example available at the moment"
 {
   int i=1;
   int j,k,skip;
@@ -1032,7 +1032,7 @@ EXAMPLE: no example available at the moment"
       {
         if((l[i][3][1]/l[j][3][1])*l[j][3][1]==l[i][3][1])
         {
-     
+
           delvec=delvec,i;
           break;
         }

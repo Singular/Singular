@@ -1,7 +1,7 @@
-// $Id: elim.lib,v 1.13 2001-01-08 00:59:48 greuel Exp $
+// $Id: elim.lib,v 1.14 2001-01-16 13:48:24 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.13 2001-01-08 00:59:48 greuel Exp $";
+version="$Id: elim.lib,v 1.14 2001-01-16 13:48:24 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -278,7 +278,7 @@ example
 
 proc select1 (id, int n, list#)
 "USAGE:   select1(id,n[,m]); id ideal/module, n, m integers
-RETURN:  generators of id containing the variable n 
+RETURN:  generators of id containing the variable n
          [at least one of the variables up to m]
 NOTE:    use 'select' for selecting generators containing all the
          variables between n and m
@@ -290,8 +290,8 @@ EXAMPLE: example select1; shows examples
    execute (typeof(id)+" I;");
    for( k=1; k<=ncols(id); k=k+1 )
    {  for( j=n; j<=#[1]; j=j+1 )
-      {   
-         if( size(subst(id[k],var(j),0)) != size(id[k]) ) 
+      {
+         if( size(subst(id[k],var(j),0)) != size(id[k]) )
          { I=I,id[k]; break; }
       }
    }

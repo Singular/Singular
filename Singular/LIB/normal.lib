@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.30 2001-01-16 13:15:16 pfister Exp $";
+version="$Id: normal.lib,v 1.31 2001-01-16 13:48:34 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -75,7 +75,7 @@ ASSUME:  R    = P/id,  P = basering, a polynomial ring, id an ideal of P,
 @*       SBid = standard basis of id,
 @*       J    = ideal of P containing the polynomial p,
 @*       p    = nonzero divisor of R
-COMPUTE: Endomorphism ring End_R(J)=Hom_R(J,J) with its ring structure as 
+COMPUTE: Endomorphism ring End_R(J)=Hom_R(J,J) with its ring structure as
          affine ring, together with the canonical map R --> Hom_R(J,J),
          where R is the quotient ring of P modulo the standard basis SBid.
 RETURN:  a list l of two objects
@@ -376,15 +376,15 @@ example
 
 proc normal(ideal id, list #)
 "USAGE:   normal(i [,choose]);  i a radical ideal, choose empty or 1
-         if choose=1 the normalization of the associated primes is computed 
+         if choose=1 the normalization of the associated primes is computed
          (which is sometimes more efficient)
-ASSUME:  The ideal must be radical, for non radical ideals the output may 
+ASSUME:  The ideal must be radical, for non radical ideals the output may
          be wrong (i=radical(i); makes i radical)
 RETURN:   a list of rings, say nor:
 @format
-         each ring nor[i] contains two ideals 
-         with given names norid and normap such that 
-           - the direct sum of the rings nor[i]/norid is 
+         each ring nor[i] contains two ideals
+         with given names norid and normap such that
+           - the direct sum of the rings nor[i]/norid is
              the normalization of basering/id;
            - normap gives the normalization map from basering/id
              to nor[i]/norid (for each i)
@@ -401,7 +401,7 @@ EXAMPLE: example normal; shows an example
    string sr;
    list result,prim,keepresult;
    y = printlevel-voice+2;
-   
+
    attrib(id,"isRadical",1);
    if ( ord_test(basering) != 1)
    {
@@ -416,22 +416,22 @@ EXAMPLE: example normal; shows an example
       {
          attrib(id,"isCohenMacaulay",1);
          attrib(id,"isEquidimensional",1);
-      } 
-   }       
+      }
+   }
    if( typeof(attrib(id,"isCohenMacaulay"))=="int" )
    {
       if(attrib(id,"isCohenMacaulay")==1)
       {
          attrib(id,"isEquidimensional",1);
-      } 
-   }       
+      }
+   }
    if( typeof(attrib(id,"isPrim"))=="int" )
    {
       if(attrib(id,"isPrim")==1)
       {
          attrib(id,"isEquidimensional",1);
-      } 
-   }       
+      }
+   }
    if(size(#)==0)
    {
       if( typeof(attrib(id,"isEquidimensional"))=="int" )
@@ -455,7 +455,7 @@ EXAMPLE: example normal; shows an example
       }
    }
    else
-   {  
+   {
       if( typeof(attrib(id,"isPrim"))=="int" )
       {
          if(attrib(id,"isPrim")==1)
@@ -463,14 +463,14 @@ EXAMPLE: example normal; shows an example
             prim[1]=id;
          }
          else
-         {   
+         {
             prim=minAssPrimes(id);
          }
       }
       else
       {
          prim=minAssPrimes(id);
-      }         
+      }
       if(y>=1)
       {
          "// we have ",size(prim),"irreducible components";
@@ -515,11 +515,11 @@ EXAMPLE: example normal; shows an example
       sr = string(size(result));
    }
       dbprint(y+1,"
-// 'normal' created a list of "+sr+" ring(s). 
+// 'normal' created a list of "+sr+" ring(s).
 // To see the rings, type (if the name of your list is nor):
-     show( nor);                  
+     show( nor);
 // To access the 1-st ring and map (similair for the others), type:
-     def R = nor[1]; setring R;  norid; normap; 
+     def R = nor[1]; setring R;  norid; normap;
 // R/norid is the 1-st ring of the normalization and
 // normap the map from the original basering to R/norid");
 
@@ -540,7 +540,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc normalizationPrimes(ideal i,ideal ihp, list #)
-"USAGE:   normalizationPrimes(i,ihp[,si]);  i prime ideal, ihp map 
+"USAGE:   normalizationPrimes(i,ihp[,si]);  i prime ideal, ihp map
          (partial normalization), si SB of singular locus
 RETURN:  a list of one ring L=R, in  R are two ideals
          S,M such that R/M is the normalization
@@ -551,7 +551,7 @@ EXAMPLE: example normalizationPrimes; shows an example
 "
 {
    int y = printlevel-voice+2;  // y=printlevel (default: y=0)
-  
+
    if(y>=1)
    {
      "";
@@ -589,7 +589,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    {
      "// SB-computation of the input ideal";
    }
-   
+
    list SM=mstd(i);                //here the work starts
    int dimSM =  dim(SM[1]);        //dimension of variety to normalize
   // Case: Get an ideal containing a unit
@@ -597,7 +597,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    {  "";
       "      // A unit ideal was found.";
       "      // Stop with partial result computed so far";"";
-      
+
          MB=SM[2];
          intvec rw;
          list LL=substpart(MB,ihp,0,rw);
@@ -612,7 +612,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          setring BAS;
          return(result);
    }
-   
+
    if(y>=1)
    {
       "//   the dimension is:"; "";
@@ -773,9 +773,9 @@ write (":a normal-fehler" ,
          "basering:",string(basering),"nvars:", nvars(basering),
        "dim(SM[1]):",dim(SM[1]),"ncols(jacob(SM[2]))",ncols(jacob(SM[2])),
        "SM:", SM);
- 
+
      pause();
-*/     
+*/
       J=minor(jacob(SM[2]),nvars(basering)-dim(SM[1]));
       //ti=timer;
       if(y >=1 )
@@ -830,13 +830,13 @@ write (":a normal-fehler" ,
      if(size(#)==0)
      {
         list JM=maxideal(1),maxideal(1);
-        
+
         attrib(JM[1],"isSB",1);
         attrib(SM[2],"isRegInCodim2",1);
      }
    }
    if((attrib(SM[2],"isRegInCodim2")==1)&&(attrib(SM[2],"isCohenMacaulay")==1))
-   {      
+   {
       if(y>=1)
       {
             "// the ideal was CohenMacaulay and regular in codimension 2";
@@ -853,18 +853,18 @@ write (":a normal-fehler" ,
       export normap;
       result=newR6;
       setring BAS;
-      return(result);          
+      return(result);
    }
    //if it is an isolated singularity things are easier
    //JM ideal of singular locus, SM ideal of variety
    if((dim(JM[1])==0)&&(homog(SM[2])==1))            //isolated sing. case
    {
       attrib(SM[2],"isIsolatedSingularity",1);
-      ideal SL=simplify(reduce(maxideal(1),SM[1]),2);  
+      ideal SL=simplify(reduce(maxideal(1),SM[1]),2);
            //vars not contained in ideal
       ideal Ann=quotient(SM[2],SL[1]);
       ideal qAnn=simplify(reduce(Ann,SM[1]),2);
-      
+
       //qAnn=0 ==> the first var(=SL[1]) not contained in SM is a nzd of R/SM
       if(size(qAnn)==0)
       {
@@ -911,7 +911,7 @@ write (":a normal-fehler" ,
        }
       //Now the case where qAnn!=0, i.e.SL[1] is a zero divisor of R/SM
       //and we have found a splitting: id and id1
-      //id=qAnn+SM[2] defines components of R/SM in the complement of V(SL[1]) 
+      //id=qAnn+SM[2] defines components of R/SM in the complement of V(SL[1])
       //id1 defines components of R/SM in the complement of V(id)
       //?????instead of id1 we can take SL[1]+Ann+SM[2]???????????
        else
@@ -1019,7 +1019,7 @@ write (":a normal-fehler" ,
       "// A (everywhere singular) component with ideal";
       "// equal to its Jacobian ideal was found";
       "// Procedure will stop with partial result computed so far";"";
-      
+
          MB=SM[2];
          intvec rw;
          list LL=substpart(MB,ihp,0,rw);
@@ -1117,7 +1117,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 static proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
 
-"//Repeated application of elimpart to endid, until no variables can be 
+"//Repeated application of elimpart to endid, until no variables can be
 //directy substituded. homo=1 if input is homogeneous, rw contains
 //original weights, endphi (partial) normalization map";
 

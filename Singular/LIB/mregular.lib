@@ -1,6 +1,6 @@
 // IB/PG/GMG, last modified:  21.7.2000
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: mregular.lib,v 1.5 2001-01-08 01:01:01 greuel Exp $";
+version = "$Id: mregular.lib,v 1.6 2001-01-16 13:48:33 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: mregular.lib   Castelnuovo-Mumford Regularity of CM-Schemes and Curves
@@ -8,14 +8,14 @@ AUTHORS: I.Bermejo,     ibermejo@ull.es
 @*       Ph.Gimenez,    pgimenez@agt.uva.es
 @*       G.-M.Greuel,   greuel@mathematik.uni-kl.de
 
-OVERVIEW: 
+OVERVIEW:
  A library for computing the Castelnuovo-Mumford regularity of a subscheme of
  the projective n-space that DOES NOT require the computation of a minimal
  graded free resolution of the saturated ideal defining the subscheme.
  The procedures are based on two papers by Isabel Bermejo and Philippe Gimenez:
- 'On Castelnuovo-Mumford regularity of projective curves' Proc.Amer.Math.Soc. 
- 128(5) (2000), and 'Computing the Castelnuovo-Mumford regularity of some 
- subschemes of Pn using quotients of monomial ideals', Proceedings of 
+ 'On Castelnuovo-Mumford regularity of projective curves' Proc.Amer.Math.Soc.
+ 128(5) (2000), and 'Computing the Castelnuovo-Mumford regularity of some
+ subschemes of Pn using quotients of monomial ideals', Proceedings of
  MEGA-2000, J. Pure Appl. Algebra (to appear).
  The algorithm assumes the variables to be in Noether position.
 

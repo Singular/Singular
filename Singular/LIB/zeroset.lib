@@ -1,7 +1,7 @@
 // Last change 10.12.2000
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: zeroset.lib,v 1.5 2000-12-22 15:59:36 greuel Exp $";
+version="$Id: zeroset.lib,v 1.6 2001-01-16 13:48:47 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
@@ -9,11 +9,11 @@ AUTHOR:   Thomas Bayer,    email: tbayer@mathematik.uni-kl.de
           http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/
           Current Adress: Institut fuer Informatik, TU Muenchen
 
-OVERVIEW: 
+OVERVIEW:
  Algorithms for finding the zero-set of a zero-dim. ideal in Q(a)[x_1,..x_n],
  Roots and Factorization of univariate polynomials over Q(a)[t]
- where a is an algebric number. Written in the frame of the 
- diploma thesis (advisor: Prof. Gert-Martin Greuel) 'Computations of moduli 
+ where a is an algebric number. Written in the frame of the
+ diploma thesis (advisor: Prof. Gert-Martin Greuel) 'Computations of moduli
  spaces of semiquasihomogenous singularities and an implementation in Singular'
  This library is meant as a preliminary extension of the functionality
  of Singular for univariate factorization of polynomials over simple algebraic
@@ -168,7 +168,7 @@ PURPOSE: compute all roots of f in a finite extension of the groundfield
          without multiplicities.
 RETURN:  list, all entries are polynomials
          _[1] = roots of f, each entry is a polynomial
-         _[2] = 'newA'  - if the groundfield is Q(a') and the extension field 
+         _[2] = 'newA'  - if the groundfield is Q(a') and the extension field
                 is Q(a), then 'newA' is the representation of a' in Q(a)
          _[3] = minpoly of the algebraic extension of the groundfield
 ASSUME:  basering = Q[x,a] ideal mpoly must be defined, it might be 0 !
@@ -320,7 +320,7 @@ ASSUME:  dim(I) = 0, and ground field to be Q or a simple extension of Q given
          by a minpoly.
 OPTIONS: opt = 0 no primary decomposition (default)
          opt > 0 primary decomposition
-NOTE:    If I contains an algebraic number (parameter) then 'I' must be 
+NOTE:    If I contains an algebraic number (parameter) then 'I' must be
          transformed w.r.t. 'newA' in the new ring.
 EXAMPLE: example ZeroSet; shows an example
 "
@@ -707,7 +707,7 @@ RETURN:  list
          _[1] = squarefree norm of g (poly)
          _[2] = g (= f(x - s*a)) (poly)
          _[3] = s (int)
-ASSUME:  f must be squarefree, basering = Q[x,a] and ideal 'mpoly' is equal to 
+ASSUME:  f must be squarefree, basering = Q[x,a] and ideal 'mpoly' is equal to
          'minpoly',this represents the ring Q(a)[x] together with 'minpoly'.
 NOTE:   the norm is an element of Q[x]
 EXAMPLE: example  SqfrNorm; shows an example
@@ -756,7 +756,7 @@ PUROPSE: compute the factorization of the squarefree poly f over Q(a)[t], minpol
 RETURN:  list
          _[1] = factors (monic), first entry is the leading coefficient
          _[2] = multiplicities (not yet)
-ASSUME:  basering must be the univariate polynomial ring over a field which 
+ASSUME:  basering must be the univariate polynomial ring over a field which
          is Q or a simple extension of Q given by a minpoly.
 NOTE:    if basering = Q[t] then this is the built-in 'factorize'.
 EXAMPLE: example  Factor; shows an example

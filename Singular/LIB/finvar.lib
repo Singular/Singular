@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.30 2001-01-03 21:24:27 obachman Exp $"
+version="$Id: finvar.lib,v 1.31 2001-01-16 13:48:25 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -189,7 +189,7 @@ EXAMPLE: example group_reynolds; shows an example
                                        // REY will contain the Reynolds
                                        // operator -
   matrix G(1)=#[1];                    // G(k) are elements of the group -
-  if (ch<>0 && minpoly==0 && gen_num<>1) // finding out of which order the 
+  if (ch<>0 && minpoly==0 && gen_num<>1) // finding out of which order the
   { matrix I=diag(1,n);                  // group element is
     matrix TEST=G(1);
     int o1=1;
@@ -256,7 +256,7 @@ EXAMPLE: example group_reynolds; shows an example
       { j++;                           // a new factor for next run
         g++;
         matrix G(g)=P(k);              // a new group element -
-        if (ch<>0 && minpoly==0 && i<>1) // finding out of which order the 
+        if (ch<>0 && minpoly==0 && i<>1) // finding out of which order the
         { TEST=G(g);                     //group element is
           o2=1;
           while (TEST<>I)

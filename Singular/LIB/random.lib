@@ -1,6 +1,6 @@
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: random.lib,v 1.15 2001-01-07 02:05:25 greuel Exp $";
+version="$Id: random.lib,v 1.16 2001-01-16 13:48:40 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  random.lib    Creating Random and Sparse Matrices, Ideals, Polys
@@ -128,7 +128,7 @@ EXAMPLE: example sparseid; shows an example
    if( size(#)==1 ) { int o=#[1]; int p=75; int b=30000; }
    if( size(#)==0 ) { int o=u; int p=75; int b=30000; }
 //------------------ use sparsemat for creation of sparseid -------------------
-   int ii; matrix i[1][k]; intmat m; 
+   int ii; matrix i[1][k]; intmat m;
    if( u <=0 )
    {
       m = sparsemat(1,k,p,b);
@@ -200,7 +200,7 @@ proc sparsematrix (int n, int m, int o, list #)
 "USAGE:   sparsematrix(n,m,o[,u,pe,pp,b]);  n,m,o,u,pe,pp,b integers
 RETURN:  nxm matrix, about pe percent of the entries are 0, the remaining
          are random polynomials of degree d, u<=d<=o, with  pp percent of
-         the terms being 0, the remaining have random coefficients 
+         the terms being 0, the remaining have random coefficients
          in the interval [1,b] [default: (pe,u,pp,b) = (0,50,75,100)]
 EXAMPLE: example sparsematrix; shows an example
 "
@@ -233,9 +233,9 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r = 0,(a,b,c,d),dp;
    // sparse matrix of sparse polys of degree <=2:
-   print(sparsematrix(3,4,2));"";       
+   print(sparsematrix(3,4,2));"";
    // dense matrix of sparse linear forms:
-   print(sparsematrix(3,3,1,1,0,55,9)); 
+   print(sparsematrix(3,3,1,1,0,55,9));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -303,7 +303,7 @@ proc triagmatrix (int n, int m, int o, list #)
 RETURN:  nxm lower triagonal matrix, diagonal entries equal to 1, about
          p percent of lower diagonal entries are 0, the remaining
          are random polynomials of degree d, u<=d<=o, with  pp percent of
-         the terms being 0, the remaining have random coefficients 
+         the terms being 0, the remaining have random coefficients
          in the interval [1,b] [default: (pe,u,pp,b) = (0,50,75,100)]
 EXAMPLE: example triagmatrix; shows an example
 "
@@ -340,9 +340,9 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r = 0,(a,b,c,d),dp;
    // sparse triagonal matrix of sparse polys of degree <=2:
-   print(triagmatrix(3,4,2));"";       
+   print(triagmatrix(3,4,2));"";
    // dense triagonal matrix of sparse linear forms:
-   print(triagmatrix(3,3,1,1,0,55,9)); 
+   print(triagmatrix(3,3,1,1,0,55,9));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -354,7 +354,7 @@ RETURN:  ideal = maxideal(1), but the last variable is exchanged by a random
 EXAMPLE: example randomLast; shows an example
 "
 {
-  ideal i=maxideal(1); 
+  ideal i=maxideal(1);
   int k=size(i);
   i[k]=0;
   i=randomid(i,size(i),b);

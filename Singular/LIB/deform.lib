@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.23 2000-12-22 13:41:22 greuel Exp $
+// $Id: deform.lib,v 1.24 2001-01-16 13:48:24 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.23 2000-12-22 13:41:22 greuel Exp $";
+version="$Id: deform.lib,v 1.24 2001-01-16 13:48:24 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -27,9 +27,9 @@ proc versal (ideal Fo,list #)
 "USAGE:   versal(Fo[,d,any]); Fo=ideal, d=int, any=list
 COMUPTE: miniversal deformation of Fo up to degree d (default d=100),
 CREATE:  Rings (exported):
-         'my'Px = extending the basering Po by new variables given by 
-           \"A,B,..\" (deformation parameters), returns as basering, the 
-           new variables come before the old ones, the ordering is the 
+         'my'Px = extending the basering Po by new variables given by
+           \"A,B,..\" (deformation parameters), returns as basering, the
+           new variables come before the old ones, the ordering is the
            product between \"ls\" and \"ord(Po)\"
          @*'my'Qx = Px/Fo extending Qo=Po/Fo,
          @*'my'So = being the embedding-ring of the versal base space,
@@ -298,14 +298,14 @@ proc mod_versal(matrix Mo, ideal I, list #)
 "USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list
 COMUPTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
 CREATE:  Ringsr (exported):
-         'my'Px  = extending the basering by new variables (deformation 
+         'my'Px  = extending the basering by new variables (deformation
                    parameters), the new variables come before the old ones,
-                   the ordering is the product between \"my_ord\" 
+                   the ordering is the product between \"my_ord\"
                    and \"ord(Po)\"
          @*'my'Qx  = Px/Io extending Qo (returns as basering),
          @*'my'Ox  = Px/(Io+Js) ring of the versal deformation of coker(Ms),
          @*'my'So  = embedding-ring of the versal base space.  (default 'my'=\"\")
-      
+
       Matrices (in Qx, exported):
          @*Js  = giving the versal base space (obstructions),
          @*Ms  = giving the versal family of Mo,
@@ -705,7 +705,7 @@ Sub-procedure: compute infinitesimal family of a module and its syzygies
 proc lift_rel_kb (module N, module M, list #)
 "USAGE:   lift_rel_kb(N,M[,kbaseM,p]);
 ASSUME:  [p a monomial ] or the product of all variables
-         N, M modules of same rank, M depending only on variables not in p 
+         N, M modules of same rank, M depending only on variables not in p
          and vdim(M) is finite in this ring,
          [ kbaseM the kbase of M in the subring given by variables not in p ]
          warning: these assumtions are not checked by the procedure

@@ -1,6 +1,6 @@
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.21 2001-01-12 12:46:19 greuel Exp $";
+version="$Id: matrix.lib,v 1.22 2001-01-16 13:48:32 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -53,7 +53,7 @@ EXAMPLE: example compress; shows an example
       ring r=0,x,lp;
       if( typeof(A)=="intvec" ) { intmat C=transpose(A); kill A; intmat A=C; }
       module m = matrix(A);
-      if ( size(m) == 0)  
+      if ( size(m) == 0)
       { intmat B; }
       else
       { intmat B[nrows(A)][size(m)]; }
@@ -362,7 +362,7 @@ proc skewmat (int n, list #)
 RETURN:  skew-symmetric nxn matrix, with entries from id
          (default: id=maxideal(1))
          kewmat(n); creates the generic skew-symmetric matrix
-NOTE:    if id has less than n*(n-1)/2 elements, the matrix is 
+NOTE:    if id has less than n*(n-1)/2 elements, the matrix is
          filled with 0's,
 EXAMPLE: example skewmat; shows an example
 "
@@ -461,13 +461,13 @@ EXAMPLE: example tensor; shows an example
 {
    int i,j;
    matrix C,D;
-   for( i=1; i<=nrows(A); i++ ) 
-   { 
+   for( i=1; i<=nrows(A); i++ )
+   {
      C = A[i,1]*B;
      for( j=2; j<=ncols(A); j++ )
      {
        C = concat(C,A[i,j]*B);
-     }  
+     }
      D = concat(D,transpose(C));
    }
    D = transpose(D);
@@ -504,10 +504,10 @@ example
 proc gauss_col (matrix A, list #)
 "USAGE:   gauss_col(A[,e]); A a matrix, e any type
 RETURN:  - a matrix B, if called with one argument; B is the complete column-
-           reduced upper-triangular normal form of A if A is constant, 
+           reduced upper-triangular normal form of A if A is constant,
            (resp. as far as this is possible if A is a polynomial matrix;
            no division by polynomials).
-@*       - a list L of two matrices, if called with two arguments;  
+@*       - a list L of two matrices, if called with two arguments;
            L satisfies L[1] = A * L[2] with L[1] the column-reduced form of A
            and L[2] the transformation matrix.
 NOTE:    * The procedure just applies interred to A with ordering (C,dp).
@@ -538,7 +538,7 @@ EXAMPLE: example gauss_col; shows an example
 //------------------------------ start computation ---------------------------
    option(redSB);
    M = simplify(interred(M),1);
-   if(size(#) != 0) 
+   if(size(#) != 0)
    {
       module N = lift(A,M);
    }
@@ -557,9 +557,9 @@ EXAMPLE: example gauss_col; shows an example
    // M = sort(M,size(M)..1)[1];
    A = matrix(M,n,m);
    if (size(#) != 0)
-   {      
+   {
      list L= A,matrix(N,m,m);
-     return(L); 
+     return(L);
    }
    return(matrix(M,n,m));
 }
@@ -567,13 +567,13 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r=(0,a,b),(A,B,C),dp;
    matrix m[8][6]=
-   0,    2*C, 0,    0,  0,   0,  
-   0,    -4*C,a*A,  0,  0,   0,  
-   b*B,  -A,  0,    0,  0,   0,  
-   -A,   B,   0,    0,  0,   0,  
-   -4*C, 0,   B,    2,  0,   0,  
-   2*A,  B,   0,    0,  0,   0,  
-   0,    3*B, 0,    0,  2b,  0,  
+   0,    2*C, 0,    0,  0,   0,
+   0,    -4*C,a*A,  0,  0,   0,
+   b*B,  -A,  0,    0,  0,   0,
+   -A,   B,   0,    0,  0,   0,
+   -4*C, 0,   B,    2,  0,   0,
+   2*A,  B,   0,    0,  0,   0,
+   0,    3*B, 0,    0,  2b,  0,
    0,    AB,  0,    2*A,A,   2a;"";
    list L=gauss_col(m,1);
    print(L[1]);
@@ -596,8 +596,8 @@ RETURN: - a matrix B, if called with one argument; B is the complete row-
           reduced lower-triangular normal form of A if A is constant,
           (resp. as far as this is possible if A is a polynomial matrix;
           no division by polynomials).
-@*      - a list L of two matrices, if called with two arguments; 
-          L satidfies L[1] = L[2] * A with L[1] the row-reduced form of A 
+@*      - a list L of two matrices, if called with two arguments;
+          L satidfies L[1] = L[2] * A with L[1] the row-reduced form of A
           and L[2] the transformation matrix.
 NOTE:   * This procedure just applies gauss_col to the transposed matrix.
           The transformation matrix is obtained by applying lift.
@@ -622,11 +622,11 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r=(0,a,b),(A,B,C),dp;
    matrix m[6][8]=
-   0, 0,  b*B, -A,-4C,2A,0, 0, 
+   0, 0,  b*B, -A,-4C,2A,0, 0,
    2C,-4C,-A,B, 0,  B, 3B,AB,
-   0,a*A,  0, 0, B,  0, 0, 0, 
+   0,a*A,  0, 0, B,  0, 0, 0,
    0, 0,  0, 0, 2,  0, 0, 2A,
-   0, 0,  0, 0, 0,  0, 2b, A, 
+   0, 0,  0, 0, 0,  0, 2b, A,
    0, 0,  0, 0, 0,  0, 0, 2a;"";
    print(gauss_row(m));"";
    ring S=0,x,dp;
@@ -754,17 +754,17 @@ example
 
 proc rowred (matrix A,list #)
 "USAGE:   rowred(A[,e]);  A matrix, e any type
-RETURN:  - a matrix B, being the row reduced form of A, if rowred is called 
+RETURN:  - a matrix B, being the row reduced form of A, if rowred is called
            with one argument.
-           (as far as this is possible over the polynomial ring; no division 
+           (as far as this is possible over the polynomial ring; no division
            by polynomials)
 @*       - a list L of two matrices, such that L[1] = L[2] * A with L[1]
            the row-reduced form of A and L[2] the transformation matrix
            (if rowred is called with two arguments).
 NOTE:    * This procedure is designed for teaching purposes mainly.
-@*       * The straight forward Gaussian algorithm is implemented in the 
+@*       * The straight forward Gaussian algorithm is implemented in the
            library (no standard basis computation).
-           The transformation matrix is obtained by concatenating a unit 
+           The transformation matrix is obtained by concatenating a unit
            matrix to A. proc gauss_row should be faster.
 @*       * It should only be used with exact coefficient field (there is no
            pivoting) over the polynomial ring (ordering lp or dp).
@@ -813,7 +813,7 @@ EXAMPLE: example rowred; shows an example
       }
    }
    d = submat(b,1..m,1..n);
-   if (size(#)) 
+   if (size(#))
    {
       list L=d,submat(b,1..m,n+1..n+m);
       return(L);
@@ -824,11 +824,11 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r=(0,a,b),(A,B,C),dp;
    matrix m[6][8]=
-   0, 0,  b*B, -A,-4C,2A,0, 0, 
+   0, 0,  b*B, -A,-4C,2A,0, 0,
    2C,-4C,-A,B, 0,  B, 3B,AB,
-   0,a*A,  0, 0, B,  0, 0, 0, 
+   0,a*A,  0, 0, B,  0, 0, 0,
    0, 0,  0, 0, 2,  0, 0, 2A,
-   0, 0,  0, 0, 0,  0, 2b, A, 
+   0, 0,  0, 0, 0,  0, 2b, A,
    0, 0,  0, 0, 0,  0, 0, 2a;"";
    print(rowred(m));"";
    list L=rowred(m,1);
@@ -839,9 +839,9 @@ example
 
 proc colred (matrix A,list #)
 "USAGE:   colred(A[,e]);  A matrix, e any type
-RETURN:  - a matrix B, being the column reduced form of A, if colred is 
+RETURN:  - a matrix B, being the column reduced form of A, if colred is
            called with one argument.
-           (as far as this is possible over the polynomial ring; 
+           (as far as this is possible over the polynomial ring;
            no division by polynomials)
 @*       - a list L of two matrices, such that L[1] = A * L[2] with L[1]
            the column-reduced form of A and L[2] the transformation matrix
@@ -867,13 +867,13 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r=(0,a,b),(A,B,C),dp;
    matrix m[8][6]=
-   0,    2*C, 0,    0,  0,   0,  
-   0,    -4*C,a*A,  0,  0,   0,  
-   b*B,  -A,  0,    0,  0,   0,  
-   -A,   B,   0,    0,  0,   0,  
-   -4*C, 0,   B,    2,  0,   0,  
-   2*A,  B,   0,    0,  0,   0,  
-   0,    3*B, 0,    0,  2b,  0,  
+   0,    2*C, 0,    0,  0,   0,
+   0,    -4*C,a*A,  0,  0,   0,
+   b*B,  -A,  0,    0,  0,   0,
+   -A,   B,   0,    0,  0,   0,
+   -4*C, 0,   B,    2,  0,   0,
+   2*A,  B,   0,    0,  0,   0,
+   0,    3*B, 0,    0,  2b,  0,
    0,    AB,  0,    2*A,A,   2a;"";
    print(colred(m));"";
    list L=colred(m,1);

@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.16 2001-01-10 15:40:19 Singular Exp $";
+version="$Id: surf.lib,v 1.17 2001-01-16 13:48:45 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
-AUTHOR: Hans Schoenemann, 
+AUTHOR: Hans Schoenemann,
         the program surf is written by Stefan Endrass
 
 NOTE:
@@ -73,12 +73,12 @@ EXAMPLE: example plot; shows an example
   if (ncols(I)==1 and n<=2) // curve
   {
     write(":w "+l,"clip=none;");
-      write(l, "width=500; height=500; set_size; do_background=yes; 
+      write(l, "width=500; height=500; set_size; do_background=yes;
 background_red=255; background_green=255; background_blue=255;");
     write(l,
     "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
     write(l, "curve_green=0; curve_blue=0; curve_width=1.5;");
-    if (size(#)>0) 
+    if (size(#)>0)
     {
       write(l,#[1]);
     }
@@ -91,11 +91,11 @@ background_red=255; background_green=255; background_blue=255;");
     {
       write(":w "+l,
       "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
-     write(l, "width=500; height=500; set_size; do_background=yes; 
+     write(l, "width=500; height=500; set_size; do_background=yes;
 background_red=255; background_green=255; background_blue=255;");
       write(l,"rot_x=0.14; rot_y=-0.3;");
-     if (size(#)>0) 
-       {   
+     if (size(#)>0)
+       {
          write(l,#[1]);
        }
       write(l,"surface=",I[1],";");

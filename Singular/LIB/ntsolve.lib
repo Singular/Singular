@@ -1,6 +1,6 @@
 //(GMG, last modified 16.12.00)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.10 2000-12-22 14:20:04 greuel Exp $";
+version="$Id: ntsolve.lib,v 1.11 2001-01-16 13:48:35 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  ntsolve.lib     Real Newton Solving of Polynomial Systems
@@ -20,8 +20,8 @@ proc nt_solve (ideal gls, ideal ini, list #)
          ini: ideal of initial values (approximate solutions to start with)
          ipar: control integers (default: ipar = 100,10)
          ipar[1] - max. number of iterations
-         ipar[2] - accuracy (we have the l_2-norm ||.||): accept solution 
-         sol if ||gls(sol)|| < eps0*(0.1^ipar[2]) where eps0 = ||gls(ini)|| 
+         ipar[2] - accuracy (we have the l_2-norm ||.||): accept solution
+         sol if ||gls(sol)|| < eps0*(0.1^ipar[2]) where eps0 = ||gls(ini)||
          is the initial error
 ASSUME:  gls is a zerodimensional ideal with nvars(basering) = size(gls) (>1)
 RETURN:  ideal, coordinates of one solution (if found), 0 else
@@ -56,7 +56,7 @@ EXAMPLE: example nt_solve; shows an example
     if ((acc <= 0)||(acc > prec-1)){acc = prec-1;}
 
     int dpl = di+1;
-    string out; 
+    string out;
     out = "ring rnewton=(real,prec),("+varstr(basering)+"),(c,dp);";
     execute(out);
 
@@ -88,12 +88,12 @@ EXAMPLE: example nt_solve; shows an example
 
     // compute initial error
     y1 = ml2norm(nt,genau);
-    dbprint(prot,"// initial error = "+string(y1)); 
+    dbprint(prot,"// initial error = "+string(y1));
     y2 = genau*y1;
 
   // begin of iteration
   for(i3=1;i3<=itmax;i3++){
-     dbprint(prot,"// iteration: "+string(i3)); 
+     dbprint(prot,"// iteration: "+string(i3));
 
     // find newton direction
     direction=bareiss(nt,1,-1);
@@ -254,13 +254,13 @@ number z1, number tt, number gg)
 
 proc triMNewton (ideal G, ideal a, list #)
 "USAGE:  triMNewton(G,a[,ipar]); G ideal, a ideal, ipar list or intvec
-ASSUME:  G:   g1,..,gn, a triangular system of n equations in n vars, 
+ASSUME:  G:   g1,..,gn, a triangular system of n equations in n vars,
               i.e gi=gi(var(n-i+1),..,var(n))
-         a:   ideal of numbers, coordinates of an approximation of a common 
+         a:   ideal of numbers, coordinates of an approximation of a common
               zero of G to start with (with a[i] to be substituted in var(i))
          ipar: control integer vector (default: ipar = 100,10)
          ipar[1] - max. number of iterations
-         ipar[2] - accuracy (we have as norm |.| absolute value ): 
+         ipar[2] - accuracy (we have as norm |.| absolute value ):
          accept solution  sol if |G(sol)| < |G(a)|*(0.1^ipar[2])
          itb: int, the maximal number of iterations performed
          err: number, an error bound
@@ -283,7 +283,7 @@ EXAMPLE: example triMNewton; shows an example
     int itb, err;
     if (i1 < 1) {itb = 100;} else {itb = ipar[1];}
     if (i1 < 2) {err = 10;} else {err = ipar[2];}
-  
+
     if (itb == 0)
     {
        dbprint(prot,"// ** iteration bound reached with error > error bound!");

@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.8 2000-12-22 13:53:49 greuel Exp $";
+version="$Id: graphics.lib,v 1.9 2001-01-16 13:48:29 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: graphics.lib    Procedures to use Graphics with Mathematica
-AUTHOR:   Christian Gorzel, gorzelc@math.uni-muenster.de 
+AUTHOR:   Christian Gorzel, gorzelc@math.uni-muenster.de
 
 PROCEDURES:
  staircase(fname,I);  Mathematica text for displaying staircase of I
@@ -149,7 +149,7 @@ static proc endstr(string filename)
 
 ///////////////////////////////////////////////////////////////////////////////
 proc  mplot(string fname,ideal I,list #)
-"USAGE:   mplot(fname, I[,s]); fname string; I ideal, s strings representing 
+"USAGE:   mplot(fname, I[,s]); fname string; I ideal, s strings representing
          the plot region or further ideals
 RETURN:  string, text with Mathematica commands to display a plot
 NOTE:    The plotregion is defaulted to -1,1 around zero

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: intprog.lib,v 1.3 2000-12-22 14:08:19 greuel Exp $";
+version="$Id: intprog.lib,v 1.4 2001-01-16 13:48:32 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: intprog.lib      Integer Programming with Groebner Basis Methods
@@ -633,18 +633,18 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
 
 proc solve_IP
 "USAGE:  solve_IP(A,bx,c,alg);  A intmat, bx intvec, c intvec, alg string
-        solve_IP(A,bx,c,alg);  A intmat, bx list of intvec, c intvec, 
+        solve_IP(A,bx,c,alg);  A intmat, bx list of intvec, c intvec,
                                  alg string
-        solve_IP(A,bx,c,alg,prsv);  A intmat, bx intvec, c intvec, 
+        solve_IP(A,bx,c,alg,prsv);  A intmat, bx intvec, c intvec,
                                  alg string, prsv intvec
-        solve_IP(A,bx,c,alg,prsv);  A intmat, bx list of intvec, c intvec, 
+        solve_IP(A,bx,c,alg,prsv);  A intmat, bx list of intvec, c intvec,
                                  alg string, prsv intvec
-RETURN: type of bx: solution of the associated integer programming 
+RETURN: type of bx: solution of the associated integer programming
         problem(s) as explained in
    @texinfo
    @ref{Toric ideals and integer programming}.
    @end texinfo
-NOTE:   This procedure returns the solution(s) of the given IP-problem(s) 
+NOTE:   This procedure returns the solution(s) of the given IP-problem(s)
         or the message `not solvable'.
         One may call the procedure with several different algorithms:
         - the algorithm of Conti/Traverso using elimination (ect),
@@ -652,30 +652,30 @@ NOTE:   This procedure returns the solution(s) of the given IP-problem(s)
         - an algorithm of Bigatti/La Scala/Robbiano (blr),
         - the algorithm of Hosten/Sturmfels (hs),
         - the algorithm of DiBiase/Urbanke (du).
-        The argument `alg' should be the abbreviation for an algorithm as 
+        The argument `alg' should be the abbreviation for an algorithm as
         above: ect, pt, blr, hs or du.
 
-        `ct' allows to compute an optimal solution of the IP-problem 
-        directly from the right-hand vector b. 
-        The same is true for its `positive' variant `pct' which may only be 
-        applied if A and b have nonnegative entries. 
+        `ct' allows to compute an optimal solution of the IP-problem
+        directly from the right-hand vector b.
+        The same is true for its `positive' variant `pct' which may only be
+        applied if A and b have nonnegative entries.
         All other algorithms need initial solutions of the IP-problem.
 
-        If `alg' is chosen to be `ct' or `pct', bx is read as the right hand 
-        vector b of the system Ax=b. b should then be an intvec of size m 
-        where m is the number of rows of A. 
-        Furthermore, bx and A should be nonnegative if `pct' is used. 
-        If `alg' is chosen to be `ect',`pt',`blr',`hs' or `du', 
-        bx is read as an initial solution x of the system Ax=b. 
-        bx should then be a nonnegative intvec of size n where n is the 
+        If `alg' is chosen to be `ct' or `pct', bx is read as the right hand
+        vector b of the system Ax=b. b should then be an intvec of size m
+        where m is the number of rows of A.
+        Furthermore, bx and A should be nonnegative if `pct' is used.
+        If `alg' is chosen to be `ect',`pt',`blr',`hs' or `du',
+        bx is read as an initial solution x of the system Ax=b.
+        bx should then be a nonnegative intvec of size n where n is the
         number of columns of A.
 
-        If `alg' is chosen to be `blr' or `hs', the algorithm needs a vector 
-        with positive coefficients in the row space of A. 
-        If no row of A contains only positive entries, one has to use the 
+        If `alg' is chosen to be `blr' or `hs', the algorithm needs a vector
+        with positive coefficients in the row space of A.
+        If no row of A contains only positive entries, one has to use the
         versions of solve_IP which take such a vector prsv as an argument.
 
-        solve_IP may also be called with a list bx of intvecs instead of a 
+        solve_IP may also be called with a list bx of intvecs instead of a
         single intvec.
 SEE ALSO: intprog_lib, toric_lib, Integer programming
 EXAMPLE:  example solve_IP; shows an example
