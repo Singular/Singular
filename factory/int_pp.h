@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.h,v 1.3 1997-06-19 12:22:29 schmidt Exp $ */
+/* $Id: int_pp.h,v 1.4 2003-10-15 17:19:41 Singular Exp $ */
 
 #ifndef INCL_INT_PP_H
 #define INCL_INT_PP_H
@@ -35,7 +35,7 @@ public:
 	ASSERT( 0, "ups there is something wrong in your code" );
     }
     InternalPrimePower( const int i );
-    InternalPrimePower( const char * str );
+    InternalPrimePower( const char * str, const int base=10 );
     InternalPrimePower( const MP_INT & );
     ~InternalPrimePower();
     InternalCF* deepCopyObject() const;

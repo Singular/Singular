@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.32 2001-06-18 08:44:35 pfister Exp $ */
+/* $Id: canonicalform.cc,v 1.33 2003-10-15 17:19:39 Singular Exp $ */
 
 #include <config.h>
 
@@ -48,7 +48,7 @@ initCanonicalForm( void )
 //}}}
 
 //{{{ constructors, destructors, selectors
-CanonicalForm::CanonicalForm( const char * str ) : value( CFFactory::basic( str ) )
+CanonicalForm::CanonicalForm( const char * str, const int base ) : value( CFFactory::basic( str, base ) )
 {
 }
 

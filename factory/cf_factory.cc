@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factory.cc,v 1.3 1997-06-19 12:27:13 schmidt Exp $ */
+/* $Id: cf_factory.cc,v 1.4 2003-10-15 17:19:40 Singular Exp $ */
 
 #include <config.h>
 
@@ -111,6 +111,49 @@ CFFactory::basic ( const char * str )
     }
     else  if ( currenttype == PrimePowerDomain )
 	return new InternalPrimePower( str );
+    else {
+	ASSERT( 0, "illegal basic domain!" );
+	return 0;
+    }
+}
+
+InternalCF *
+CFFactory::basic ( const char * str, int base )
+{
+    if ( currenttype == IntegerDomain ) {
+	InternalInteger * dummy = new InternalInteger( str, base );
+	if ( dummy->is_imm() ) {
+	    InternalCF * res = int2imm( dummy->intval() );
+	    delete dummy;
+	    return res;
+	}
+	else
+	    return dummy;
+    }
+//     else  if ( currenttype == RationalDomain ) {
+// 	InternalRational * dummy = new InternalRational( str );
+// 	if ( dummy->is_imm() ) {
+// 	    InternalCF * res = int2imm( dummy->intval() );
+// 	    delete dummy;
+// 	    return res;
+// 	}
+// 	else
+// 	    return dummy;
+//     }
+    else  if ( currenttype == FiniteFieldDomain ) {
+	InternalInteger * dummy = new InternalInteger( str, base );
+	InternalCF * res = int2imm_p( dummy->intmod( ff_prime ) );
+	delete dummy;
+	return res;
+    }
+    else  if ( currenttype == GaloisFieldDomain ) {
+	InternalInteger * dummy = new InternalInteger( str, base );
+	InternalCF * res = int2imm_gf( gf_int2gf( dummy->intmod( ff_prime ) ) );
+	delete dummy;
+	return res;
+    }
+    else  if ( currenttype == PrimePowerDomain )
+	return new InternalPrimePower( str, base );
     else {
 	ASSERT( 0, "illegal basic domain!" );
 	return 0;

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factory.h,v 1.3 2001-11-05 17:07:12 Singular Exp $ */
+/* $Id: cf_factory.h,v 1.4 2003-10-15 17:19:40 Singular Exp $ */
 
 #ifndef INCL_CF_FACTORY_H
 #define INCL_CF_FACTORY_H
@@ -24,6 +24,7 @@ public:
     static InternalCF * basic ( int value );
     static InternalCF * basic ( int type, int value );
     static InternalCF * basic ( const char * str );
+    static InternalCF * basic ( const char * str, int base );
     static InternalCF * basic ( int type, const char * const str );
     static InternalCF * basic ( int type, int value, bool nonimm );
     static InternalCF * basic ( const MP_INT & num );

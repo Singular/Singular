@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.27 2001-06-22 15:57:41 Singular Exp $ */
+/* $Id: canonicalform.h,v 1.28 2003-10-15 17:19:39 Singular Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -55,7 +55,7 @@ public:
     CF_INLINE CanonicalForm( const int );
     CF_INLINE CanonicalForm( const Variable & );
     CF_INLINE CanonicalForm( const Variable &, int );
-    CanonicalForm( const char * ); // use with caution - does only handle integers !!!
+    CanonicalForm( const char *, const int base=10 ); // use with caution - does only handle integers !!!
 
     CF_NO_INLINE ~CanonicalForm();
 

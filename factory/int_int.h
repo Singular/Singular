@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.h,v 1.10 2000-09-04 13:31:30 obachman Exp $ */
+/* $Id: int_int.h,v 1.11 2003-10-15 17:19:41 Singular Exp $ */
 
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
@@ -57,7 +57,7 @@ public:
 	ASSERT( 0, "ups there is something wrong in your code" );
     }
     InternalInteger( const int i );
-    InternalInteger( const char * str );
+    InternalInteger( const char * str, const int base=10 );
     InternalInteger( const MP_INT & );
     ~InternalInteger();
     InternalCF* deepCopyObject() const;

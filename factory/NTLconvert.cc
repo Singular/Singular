@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.11 2003-08-28 11:54:31 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.12 2003-10-15 17:19:38 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -452,6 +452,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
   }
   char dummy[2];
   int minusremainder=0;
+  char numbers[]="0123456789abcdef";
 
   coeff_long=to_long(coefficient);
 
@@ -478,12 +479,12 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
     }
 
     int l=0;
-    while (coefficient>9)
+    while (coefficient>15)
     {
       ZZ quotient,remaind;
-      ZZ ten;ten=10;
+      ZZ ten;ten=16;
       DivRem(quotient,remaind,coefficient,ten);
-      dummy[0]=(char)(to_long(remaind)+'0');
+      dummy[0]=numbers[to_long(remaind)];
       //tmp*=10; tmp+=to_long(remaind);
 
       l++;
@@ -504,7 +505,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
       coefficient=quotient;
     }
     //built up the string in dummy[0]
-    dummy[0]=(char)(to_long(coefficient)+'0');
+    dummy[0]=numbers[to_long(coefficient)];
     strcat(cf_stringtemp,dummy);
     //tmp*=10; tmp+=to_long(coefficient);
 
@@ -525,7 +526,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
   }
 
   //convert the string to canonicalform using the char*-Constructor
-  return CanonicalForm(cf_stringtemp2);
+  return CanonicalForm(cf_stringtemp2,16);
   //return tmp;
 }
 

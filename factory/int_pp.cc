@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.cc,v 1.9 1998-06-26 16:14:26 schmidt Exp $ */
+/* $Id: int_pp.cc,v 1.10 2003-10-15 17:19:41 Singular Exp $ */
 
 #include <config.h>
 
@@ -37,9 +37,9 @@ InternalPrimePower::InternalPrimePower( const int i )
 
 InternalPrimePower::InternalPrimePower( const MP_INT & mpi ) : thempi( mpi ) {}
 
-InternalPrimePower::InternalPrimePower( const char * str )
+InternalPrimePower::InternalPrimePower( const char * str, const int base )
 {
-    mpz_init_set_str( &thempi, str, 10 );
+    mpz_init_set_str( &thempi, str, base );
     if ( mpz_cmp_si( &thempi, 0 ) < 0 ) {
 	mpz_neg( &thempi, &thempi );
 	mpz_mod( &thempi, &thempi, &primepow );

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.16 2001-01-24 12:59:36 Singular Exp $ */
+/* $Id: int_int.cc,v 1.17 2003-10-15 17:19:40 Singular Exp $ */
 
 #include <config.h>
 
@@ -26,9 +26,9 @@ InternalInteger::InternalInteger( const int i )
 
 InternalInteger::InternalInteger( const MP_INT & mpi) : thempi( mpi ) {}
 
-InternalInteger::InternalInteger( const char * str )
+InternalInteger::InternalInteger( const char * str, const int base )
 {
-    mpz_init_set_str( &thempi, str, 10 );
+    mpz_init_set_str( &thempi, str, base );
 }
 
 InternalInteger::~InternalInteger()
