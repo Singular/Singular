@@ -1,8 +1,8 @@
 #
 #
 #
-CFLAGS	+= -I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR
-LIBS	+= -lgmp
+CFLAGS	+= -g -I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR
+LIBS	+= -L/usr/local/lib -lgmp
 
 OBJS	= scanner.o misc.o
 
@@ -14,13 +14,13 @@ OBJS	= scanner.o misc.o
 all	= modgen
 
 .cc.o:
-	cc -c ${CFLAGS} $<
+	gcc -c ${CFLAGS} $<
 
 .c.o:
-	cc -c ${CFLAGS} $<
+	gcc -c ${CFLAGS} $<
 
 modgen: ${OBJS} modgen.h decl.inc
-	cc -o $@ ${CFLAGS} ${LIBS} ${OBJS}
+	gcc -o $@ ${CFLAGS} ${OBJS} ${LIBS}
 
 scanner.cc: scanner.l
 	flex -oscanner.cc scanner.l

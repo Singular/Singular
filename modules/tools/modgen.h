@@ -1,9 +1,13 @@
 /*
- *  $Id: modgen.h,v 1.1 1998-11-19 15:16:42 krueger Exp $
+ *  $Id: modgen.h,v 1.2 1999-03-17 12:41:31 krueger Exp $
  *
  */
 
-#define MOD_GEN_VERSION "0.1"
+#define MOD_GEN_VERSION "0.2"
+
+#define BUFLEN 128
+#define TMPL_HEAD ""
+#define TMPL_FOOT ""
 
 class paramdef;
 class procdef;
@@ -30,6 +34,7 @@ class procdef {
   char *funcname;
   int is_static;
   paramdefv param;
+  int paramcnt;
 };
 
 class cfiles {
@@ -41,7 +46,7 @@ class cfiles {
 class moddef {
  public:
   char * name;
-  unsigned short major, minor, level;
+  unsigned int major, minor, level;
   char * version;
   char * revision;
   char * info;
@@ -55,7 +60,6 @@ extern int IsCmd(char *n, int & tok);
 extern char * decl2str(int n, char *name);
 
 extern procdefv Add2proclist(procdefv pi, char *name);
-extern PrintProclist(procdefv pi);
 extern void AddParam(procdefv pi, char *name, char *typname, int typ);
 extern void generate_mod(procdefv pi, moddefv module, cfilesv c_filelist);
 extern void generate_function(procdefv pi, FILE *fp);
@@ -65,3 +69,5 @@ extern void write_header(FILE *fp, char *module, char *comment="");
 extern void mod_create_makefile(moddefv module, cfilesv c_filelist);
 extern void make_version(char *p, moddefv module);
 extern cfilesv Add2files(cfilesv cf, char *buff);
+extern void PrintProclist(procdefv pi);
+

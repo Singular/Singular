@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.1 1998-11-19 15:16:43 krueger Exp $ */
+/* $Id: scanner.l,v 1.2 1999-03-17 12:41:31 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -121,7 +121,7 @@ eq             (=|{tos}+=|=+{tos}|{tos}+=+{tos})
 <pdef>\(     {
              }
 <pdef>{name}+, {
-             char param[256],n1[32],n2[32];
+             char param[256], n2[32];
              int cmd;
              param[0]='\0';
              sscanf( yytext, "%[^,],", param);
@@ -131,9 +131,10 @@ eq             (=|{tos}+=|=+{tos}|{tos}+=+{tos})
 			 proclist->procname, param);
            }
 <pdef>{name}+\)+{eq}+{name} {
-             char param[256],n1[32],n2[32],funcname[256];
+             char param[256], n2[32],funcname[256];
              int cmd;
              BEGIN(old_state);
+             memset(funcname, '\0', 256);
              param[0]='\0';
              sscanf( yytext, "%[^)])%*[^=]=%s", param, funcname);
              if(strlen(funcname)<=0)
@@ -147,7 +148,6 @@ eq             (=|{tos}+=|=+{tos}|{tos}+=+{tos})
            }
 <pdef>\)+{eq}+{name}|{eq}+{tos}+{name} {
              char funcname[256];
-             int cmd;
              BEGIN(old_state);
              sscanf( yytext, "%*[^=]=%s", funcname);
              if(strlen(funcname)<=0)
@@ -172,6 +172,7 @@ eq             (=|{tos}+=|=+{tos}|{tos}+=+{tos})
 extern "C" {
   int yywrap() {
     //printf("yywrap()\n");
+    return 1;
   }
 }
 
@@ -187,7 +188,7 @@ main( int argc, char *argv[] )
   module_def.info=NULL;
   module_def.helpfile=NULL;
   yylex();
-  //PrintProclist(proclist);
+  PrintProclist(proclist);
   generate_mod(proclist, &module_def, c_filelist);
   mod_create_makefile(&module_def, c_filelist);
 
