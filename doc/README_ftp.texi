@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_ftp.texi,v 1.9 2000-05-23 14:41:22 obachman Exp $
+@comment $Id: README_ftp.texi,v 1.10 2000-06-15 11:26:51 obachman Exp $
 @c FILE: README_download.texi
 @c PURPOSE: This should reside as README file in the main directory of the
 @c          Singular ftp site.
@@ -25,7 +25,7 @@ this directory is an alpha-release of the upcoming
 new release version 2-0 (should be there in the middle of
 2000). 
 
-So far, there are only version for Linux, HPUX, SunOS, and Windows.
+So far, there are only version for Linux, HPUX, SunOS, and Windows 95/98/Nt/2K.
 
 @macro nref{name,url}
 @ifhtml
@@ -44,6 +44,8 @@ news and changes of this version
 license information for @sc{Singular}
 @nref{INSTALL_unix, INSTALL_unix.html}
 Unix installation instructions
+@nref{INSTALL_win, INSTALL_win.html}
+Windows installation instructions
 @item @code{Singular-@value{VERSION}-share.tar.gz}
 @sc{Singular} distribution archive which contains architecture
 independent data like documentation and libraries.

@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.69 2000-06-14 10:19:06 obachman Exp $
+### $Id: Makefile.in,v 1.70 2000-06-15 11:26:50 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -213,7 +213,7 @@ WWW_DIR	= /singular/www/2-0/
 FTP_DIR = /ftp/pub/Math/Singular/Development
 
 install-standalone: standalone
-	cp INSTALL_unix.html COPYING.html ${WWW_DIR}
+	cp INSTALL_unix.html COPYING.html INSTALL_win.html ${WWW_DIR}
 	cp COPYING COPYING.html ${FTP_DIR}
 	cp INSTALL_unix INSTALL_unix.html ${FTP_DIR}
 	cp INSTALL_win INSTALL_win.html ${FTP_DIR}
