@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.2 1999-04-20 17:02:48 Singular Exp $ */
+/* $Id: sdb.cc,v 1.3 1999-04-29 16:57:18 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -14,7 +14,7 @@
 #include "ipid.h"
 #include "sdb.h"
 
-int sdb_lines[6]={-1,-1,-1,-1,-1,-1,-1};
+int sdb_lines[]={-1,-1,-1,-1,-1,-1,-1,-1};
 
 int sdb_checkline(char f)
 {
@@ -32,7 +32,7 @@ int sdb_checkline(char f)
 
 static char sdb_lastcmd='c';
 
-void sdb(Voice * currentVoice, char * currLine, int len)
+void sdb(Voice * currentVoice, char * currLine, int len, char *b)
 {
   int bp=0;
   if ((len>1)
@@ -65,13 +65,48 @@ void sdb(Voice * currentVoice, char * currLine, int len)
       switch(sdb_lastcmd)
       {
         case 'd':
+        {
+          fprintf(stdout,"delete break point %d\n",bp);
           currentVoice->pi->trace_flag &= (~Sy_bit(bp));
+          if (bp!=0)
+          {
+            sdb_lines[bp-1]=-1;
+          }
+          int f=currentVoice->pi->trace_flag;
+          fprintf(stdout,"active breakpoints: \n");
+          int i;
+          for(i=1;i<=7;i++)
+          {
+            f=f>>1;
+            if (f&1)
+              fprintf(stdout,"%d:line %d", i,  sdb_lines[i-1]);
+          }
+          fprintf(stdout,"\n");
           break;
+        }
         case 'n':
           currentVoice->pi->trace_flag|= 1;
           return;
-//        case 'e':
-//        {
+        case 'e':
+        {
+          int i=strlen(b);
+          while ((i>=0) && (b[i]<=' ')) i--;
+          if (i<0)
+          {
+            fprintf(stdout,"cannot set ~ at empty line\n");
+            break;
+          }
+          if (b[i]!=';')
+          {
+            fprintf(stdout,"cannot set ~ at char `%c`\n",b[i]);
+            break;
+          }
+          b[i+1]='~';
+          b[i+2]=';';
+          b[i+3]='\n';
+          b[i+4]='\0';
+          return;
+        }
 //          sdb_lastcmd='c';
 //          if (*(p+1)!=' ')
 //          {

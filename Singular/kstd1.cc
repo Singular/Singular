@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.32 1999-04-29 11:38:45 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.33 1999-04-29 16:57:14 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -101,6 +101,10 @@ void doRed (LObject* h,poly* with,BOOLEAN intoT,kStrategy strat)
 
   if (!TEST_OPT_INTSTRATEGY)
     pNorm(*with);
+  if (TEST_OPT_DEBUG)
+  {
+    PrintS("reduce ");wrp((*h).p); PrintS(" with ");wrp(*with);PrintLn();
+  }
   if (intoT)
   {
     hp = spSpolyRedNew(*with,(*h).p,strat->kNoether, strat->spSpolyLoop);
@@ -110,6 +114,10 @@ void doRed (LObject* h,poly* with,BOOLEAN intoT,kStrategy strat)
   else
   {
     (*h).p = spSpolyRed(*with,(*h).p,strat->kNoether, strat->spSpolyLoop);
+  }
+  if (TEST_OPT_DEBUG)
+  {
+    PrintS("to ");wrp((*h).p);PrintLn();
   }
 }
 
@@ -131,14 +139,11 @@ void redEcart19 (LObject* h,kStrategy strat)
   {
     if (j > strat->tl)
     {
-      if (TEST_OPT_DEBUG) PrintLn();
       return;
     }
-    if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy1(strat->T[j].p,(*h).p))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
-      if (TEST_OPT_DEBUG) PrintS("+");
       /*- compute the s-polynomial -*/
       if (strat->T[j].ecart > (*h).ecart)
       {
@@ -173,7 +178,6 @@ void redEcart19 (LObject* h,kStrategy strat)
       strat->fromT=FALSE;
       if ((*h).p == NULL)
       {
-        if (TEST_OPT_DEBUG) PrintS(" to 0\n");
         if (h->lcm!=NULL) pFree1((*h).lcm);
         return;
       }
@@ -229,11 +233,9 @@ void redEcart19 (LObject* h,kStrategy strat)
         Print(".%d",d);mflush();
       }
       j = 0;
-      if TEST_OPT_DEBUG PrintLn();
     }
     else
     {
-      if (TEST_OPT_DEBUG) PrintS("-");
       j++;
     }
   }
@@ -257,14 +259,11 @@ void redEcart (LObject* h,kStrategy strat)
   {
     if (j > strat->tl)
     {
-      if (TEST_OPT_DEBUG) PrintLn();
       return;
     }
-    if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy1(strat->T[j].p,(*h).p))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
-      if (TEST_OPT_DEBUG) PrintS("+");
       /*- compute the s-polynomial -*/
       pi = strat->T[j].p;
       ei = strat->T[j].ecart;
@@ -280,13 +279,11 @@ void redEcart (LObject* h,kStrategy strat)
         if (ei <= (*h).ecart) break;
         i++;
         if (i > strat->tl) break;
-        if (TEST_OPT_DEBUG) Print("%d",i);
         if ((((strat->T[i]).ecart < ei)
           || (((strat->T[i]).ecart == ei)
           && ((strat->T[i]).length < li)))
           && pDivisibleBy1((strat->T[i]).p,(*h).p))
         {
-          if (TEST_OPT_DEBUG) PrintS("+");
           /*
            * the polynomial to reduce with is now;
            */
@@ -294,7 +291,6 @@ void redEcart (LObject* h,kStrategy strat)
           ei = strat->T[i].ecart;
           li = strat->T[i].length;
         }
-        else if (TEST_OPT_DEBUG) PrintS("-");
       }
       /*
       * end of search: have to reduce with pi
@@ -328,20 +324,8 @@ void redEcart (LObject* h,kStrategy strat)
           enterpairs((*h).p,strat->sl,(*h).ecart,0,strat);
         }
       }
-      if (TEST_OPT_DEBUG)
-      {
-        wrp(h->p);
-        PrintS(" with ");
-        wrp(pi);
-      }
       doRed(h,&pi,strat->fromT,strat);
       strat->fromT=FALSE;
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS(" to ");
-        wrp(h->p);
-        PrintLn();
-      }
       if ((*h).p == NULL)
       {
         if (h->lcm!=NULL) pFree1((*h).lcm);
@@ -403,7 +387,6 @@ void redEcart (LObject* h,kStrategy strat)
     }
     else
     {
-      if (TEST_OPT_DEBUG) PrintS("-");
       j++;
     }
   }
@@ -426,14 +409,11 @@ void redFirst (LObject* h,kStrategy strat)
   {
     if (j > strat->tl)
     {
-      if (TEST_OPT_DEBUG) PrintLn();
       return;
     }
-    if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy1(strat->T[j].p,(*h).p))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
-      if (TEST_OPT_DEBUG) PrintS("+\n");
       /*
       * the polynomial to reduce with is;
       * T[j].p
@@ -442,6 +422,7 @@ void redFirst (LObject* h,kStrategy strat)
         pNorm(strat->T[j].p);
       if (TEST_OPT_DEBUG)
       {
+        PrintS("reduce ");
         wrp(h->p);
         PrintS(" with ");
         wrp(strat->T[j].p);
@@ -452,6 +433,7 @@ void redFirst (LObject* h,kStrategy strat)
       {
         PrintS(" to ");
         wrp(h->p);
+        PrintLn();
       }
       if ((*h).p == NULL)
       {
@@ -502,11 +484,9 @@ void redFirst (LObject* h,kStrategy strat)
         Print(".%d",d);mflush();
       }
       j = 0;
-      if TEST_OPT_DEBUG PrintLn();
     }
     else
     {
-      if (TEST_OPT_DEBUG) PrintS("-");
       j++;
     }
   }
@@ -530,14 +510,11 @@ void redMoraBest (LObject* h,kStrategy strat)
   {
     if (j > strat->tl)
     {
-      if (TEST_OPT_DEBUG) PrintLn();
       return;
     }
-    if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy1(strat->T[j].p,(*h).p))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
-      if (TEST_OPT_DEBUG) PrintS("+");
       /*- compute the s-polynomial -*/
       pi = strat->T[j].p;
       ei = strat->T[j].ecart;
@@ -552,23 +529,17 @@ void redMoraBest (LObject* h,kStrategy strat)
         /*- takes the best possible with respect to ecart and length -*/
         i++;
         if (i > strat->tl) break;
-        if (TEST_OPT_DEBUG) Print("%d",i);
         if (((strat->T[i].ecart < ei)
           || ((strat->T[i].ecart == ei)
         && (strat->T[i].length < li)))
         && pDivisibleBy1(strat->T[i].p,(*h).p))
         {
-          if (TEST_OPT_DEBUG) PrintS("+");
           /*
           * the polynomial to reduce with is now:
           */
           pi = strat->T[i].p;
           ei = strat->T[i].ecart;
           li = strat->T[i].length;
-        }
-        else
-        {
-          if (TEST_OPT_DEBUG) PrintS("-");
         }
       }
       /*
@@ -603,19 +574,8 @@ void redMoraBest (LObject* h,kStrategy strat)
           enterpairs((*h).p,strat->sl,(*h).ecart,0,strat);
         }
       }
-      if (TEST_OPT_DEBUG)
-      {
-        wrp(h->p);
-        PrintS(" with ");
-        wrp(pi);
-      }
       doRed(h,&pi,strat->fromT,strat);
       strat->fromT=FALSE;
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS(" to ");
-        wrp(h->p);
-      }
       if ((*h).p == NULL)
       {
         if (h->lcm!=NULL) pFree1((*h).lcm);
@@ -673,11 +633,9 @@ void redMoraBest (LObject* h,kStrategy strat)
         Print(".%d",d);mflush();
       }
       j = 0;
-      if TEST_OPT_DEBUG PrintLn();
     }
     else
     {
-      if (TEST_OPT_DEBUG) PrintS("-");
       j++;
     }
   }
@@ -704,14 +662,11 @@ static poly redMoraNF (poly h,kStrategy strat)
   {
     if (j > strat->tl)
     {
-      if (TEST_OPT_DEBUG) PrintLn();
       return H.p;
     }
-    if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy1(strat->T[j].p,H.p))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
-      if (TEST_OPT_DEBUG) PrintS("+");
       /*- remember the found T-poly -*/
       pi = strat->T[j].p;
       ei = strat->T[j].ecart;
@@ -727,23 +682,17 @@ static poly redMoraNF (poly h,kStrategy strat)
         j++;
         if (j > strat->tl) break;
         if (ei <= H.ecart) break;
-        if (TEST_OPT_DEBUG) Print("%d",j);
         if (((strat->T[j].ecart < ei)
           || ((strat->T[j].ecart == ei)
         && (strat->T[j].length < li)))
         && pDivisibleBy1(strat->T[j].p,H.p))
         {
-          if (TEST_OPT_DEBUG) PrintS("+");
           /*
           * the polynomial to reduce with is now;
           */
           pi = strat->T[j].p;
           ei = strat->T[j].ecart;
           li = strat->T[j].length;
-        }
-        else
-        {
-          if (TEST_OPT_DEBUG) PrintS("-");
         }
       }
       /*
@@ -764,7 +713,6 @@ static poly redMoraNF (poly h,kStrategy strat)
         doRed(&H,&pi,TRUE,strat);
         if (H.p == NULL)
         {
-          if (TEST_OPT_DEBUG) PrintS(" to 0\n");
           return NULL;
         }
       }
@@ -776,7 +724,6 @@ static poly redMoraNF (poly h,kStrategy strat)
         doRed(&H,&pi,FALSE,strat);
         if (H.p == NULL)
         {
-          if (TEST_OPT_DEBUG) PrintS(" to 0\n");
           return NULL;
         }
       }
@@ -788,7 +735,6 @@ static poly redMoraNF (poly h,kStrategy strat)
     }
     else
     {
-      if (TEST_OPT_DEBUG) PrintS("-");
       j++;
     }
   }
@@ -1351,7 +1297,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       */
       while ((strat->Ll >= 0)
         && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)> Kstd1_deg)
-	&& (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL))
+        && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL))
       {
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
         //if (TEST_OPT_PROT)

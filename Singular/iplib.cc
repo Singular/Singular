@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.54 1999-04-15 17:28:04 Singular Exp $ */
+/* $Id: iplib.cc,v 1.55 1999-04-29 16:57:13 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -171,9 +171,11 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     s[procbuflen+head+1] = '\n';
     s[procbuflen+head+2] = '\0';
     offset=0;
-    for(i=0;i<=procbuflen+head+2; i++) {
+    for(i=0;i<=procbuflen+head+2; i++)
+    {
       if(s[i]=='\\' &&
-         (s[i+1]=='"' || s[i+1]=='{' || s[i+1]=='}' || s[i+1]=='\\')) {
+         (s[i+1]=='"' || s[i+1]=='{' || s[i+1]=='}' || s[i+1]=='\\'))
+      {
         i++;
         offset++;
       }
@@ -315,7 +317,8 @@ static void iiShowLevRings()
 #endif
   {
     namehdl nshdl;
-    for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next) {
+    for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next)
+    {
       Print("%d lev %d:",nshdl->lev, nshdl->myynest);
       if (nshdl->currRing==NULL) PrintS("NULL");
       else                       Print("%d",nshdl->currRing);
@@ -602,11 +605,14 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
   idhdl packhdl;
   lib_types LT;
 
-  for(i=0; suffix[i] != NULL; i++) {
+  for(i=0; suffix[i] != NULL; i++)
+  {
     sprintf(libname, "%s%s", id, suffix[i]);
     *libname = mytolower(*libname);
-    if((LT = type_of_LIB(libname, libnamebuf)) != LT_NONE) {
-      if(!(LoadResult = iiLibCmd(mstrdup(libname), FALSE))) {
+    if((LT = type_of_LIB(libname, libnamebuf)) != LT_NONE)
+    {
+      if(!(LoadResult = iiLibCmd(mstrdup(libname), FALSE)))
+      {
         v->name = iiConvName(libname);
         break;
       }
@@ -812,7 +818,8 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     return TRUE;
   }
 #ifdef HAVE_NAMESPACES
-  if (BVERBOSE(V_LOAD_LIB)) {
+  if (BVERBOSE(V_LOAD_LIB))
+  {
     idhdl versionhdl  = namespaceroot->get("version",0);
     if(versionhdl != NULL)
       Print( "// ** loaded %s %s\n", libnamebuf, IDSTRING(versionhdl));
@@ -1040,9 +1047,12 @@ void piShowProcList()
   Print( "%-15s  %20s      %s,%s  %s,%s   %s,%s\n", "Library", "function",
          "line", "start", "line", "body", "line", "example");
 #ifdef HAVE_NAMESPACES
-//  for(pl = IDROOT; pl != NULL; pl = IDNEXT(pl)) {
-    for(pl = NSROOT(namespaceroot->root); pl != NULL; pl = IDNEXT(pl)) {
-    if(IDTYP(pl) == PACKAGE_CMD) {
+//  for(pl = IDROOT; pl != NULL; pl = IDNEXT(pl))
+//{
+    for(pl = NSROOT(namespaceroot->root); pl != NULL; pl = IDNEXT(pl))
+    {
+    if(IDTYP(pl) == PACKAGE_CMD)
+    {
       for(h = IDPACKAGE(pl)->idroot; h != NULL; h = IDNEXT(h))
 #else /* HAVE_NAMESPACES */
   for(h = IDROOT; h != NULL; h = IDNEXT(h))
@@ -1100,11 +1110,14 @@ void libstack::push(char *p, char *libname)
   libstackv lp;
   char *f = NULL;
   if(hl!=NULL) f = strstr(IDSTRING(hl),libname);
-  if( (hl==NULL) || (f == NULL)) {
-    for(lp = this;lp!=NULL;lp=lp->next) {
+  if( (hl==NULL) || (f == NULL))
+  {
+    for(lp = this;lp!=NULL;lp=lp->next)
+    {
       if(strcmp(lp->get(), libname)==0) break;
     }
-    if(lp==NULL) {
+    if(lp==NULL)
+    {
       libstackv ls = (libstack *)Alloc0(sizeof(libstack));
       ls->next = this;
       ls->libname = mstrdup(libname);
@@ -1132,7 +1145,7 @@ libstackv libstack::pop(char *p)
 
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
-  char	buf[HOWMANY+1];	/* one extra for terminating '\0' */
+  char        buf[HOWMANY+1];        /* one extra for terminating '\0' */
   struct stat sb;
   int nbytes = 0;
   int ret;
@@ -1145,31 +1158,37 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   {
     return LT;
   }
-  if((sb.st_mode & S_IFMT) != S_IFREG) {
+  if((sb.st_mode & S_IFMT) != S_IFREG)
+  {
     goto lib_type_end;
   }
-  if ((nbytes = fread((char *)buf, sizeof(char), HOWMANY, fp)) == -1) {
+  if ((nbytes = fread((char *)buf, sizeof(char), HOWMANY, fp)) == -1)
+  {
     goto lib_type_end;
     /*NOTREACHED*/
   }
   if (nbytes == 0)
     goto lib_type_end;
-  else {
-    buf[nbytes++] = '\0';	/* null-terminate it */
+  else
+  {
+    buf[nbytes++] = '\0';        /* null-terminate it */
   }
-  if( (strncmp(buf, "\177ELF\01\01\01", 7)==0) && buf[16]=='\03') {
+  if( (strncmp(buf, "\177ELF\01\01\01", 7)==0) && buf[16]=='\03')
+  {
     LT = LT_ELF;
     FreeL(newlib);
     newlib = mstrdup(libnamebuf);
     goto lib_type_end;
   }
-  if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0)) {
+  if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0))
+  {
     LT = LT_HPUX;
     FreeL(newlib);
     newlib = mstrdup(libnamebuf);
     goto lib_type_end;
   }
-  if(isprint(buf[0]) || buf[0]=='\n') { LT = LT_SINGULAR; goto lib_type_end; }
+  if(isprint(buf[0]) || buf[0]=='\n')
+  { LT = LT_SINGULAR; goto lib_type_end; }
 
   lib_type_end:
   fclose(fp);

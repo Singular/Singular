@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.32 1999-04-29 11:38:48 Singular Exp $ */
+/* $Id: kutil.cc,v 1.33 1999-04-29 16:57:16 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2749,7 +2749,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 #ifdef KDEBUG
         pTest(h.p);
 #endif
-#ifdef KDEBUG
+#ifdef SDRING
         if (TEST_OPT_DEBUG && pSDRING)
         {
           PrintS("new (aug) s:");
@@ -2919,7 +2919,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         if (pOrdSgn==1)
         {
           h.p=redBba(h.p,strat->sl,strat);
-	  if (h.p!=NULL)
+          if (h.p!=NULL)
             h.p=redtailBba(h.p,strat->sl,strat);
         }
         else
@@ -3093,6 +3093,11 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
       && ((e >= strat->ecartS[j]) || strat->kHEdgeFound))
       {
         h1 = spSpolyRedNew(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
+        if(TEST_OPT_DEBUG)
+        {
+          PrintS("reduce "); wrp(h); Print(" with S[%d] (",j);wrp(strat->S[j]);
+          PrintS(")\nto "); wrp(h1); PrintLn();
+        }
         pDelete(&h);
         if (h1 == NULL) return NULL;
         h = h1;
@@ -3146,16 +3151,16 @@ void updateS(BOOLEAN toT,kStrategy strat)
         if (((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
         && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
         {
-          if (TEST_OPT_DEBUG)
-          {
-            PrintS("reduce:");
-            wrp(strat->S[i]);
-          }
           pDelete(&redSi);
           redSi = pHead(strat->S[i]);
           strat->S[i] = redBba(strat->S[i],i-1,strat);
           if ((strat->ak!=0)&&(strat->S[i]!=NULL))
             strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
+          if (TEST_OPT_DEBUG && (pComp(redSi,strat->S[i])!=0))
+          {
+            PrintS("reduce:");
+            wrp(redSi);PrintS(" to ");wrp(strat->S[i]);PrintLn();
+          }
           if (TEST_OPT_PROT && (pComp(redSi,strat->S[i])!=0))
           {
             if (strat->S[i]==NULL)
@@ -3167,7 +3172,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
           if (strat->S[i]==NULL)
           {
             pDelete(&redSi);
-            if (TEST_OPT_DEBUG) PrintS(" to 0");
             deleteInS(i,strat);
             i--;
           }
@@ -3232,13 +3236,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             {
               pNorm(strat->S[i]);
             }
-            if (TEST_OPT_DEBUG)
-            {
-              PrintS(" to ");
-              wrp(strat->S[i]);
-            }
           }
-          if (TEST_OPT_DEBUG) PrintLn();
         }
         i++;
       }
@@ -3708,7 +3706,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
         0)
          /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
     else
-    #endif	
+    #endif
     /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
     // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
   }

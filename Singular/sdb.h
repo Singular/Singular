@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.h,v 1.2 1999-04-20 17:02:49 Singular Exp $ */
+/* $Id: sdb.h,v 1.3 1999-04-29 16:57:18 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -12,6 +12,6 @@
 
 extern int sdb_lines[];
 
-void sdb(Voice * currentVoice, char * currLine, int len);
+void sdb(Voice * currentVoice, char * currLine, int len, char * buffer);
 #endif
 

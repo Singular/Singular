@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.22 1999-04-20 17:02:48 Singular Exp $ */
+/* $Id: febase.inc,v 1.23 1999-04-29 16:57:12 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -365,7 +365,7 @@ static void feShowPrompt(void)
 /*2
 * print echo (si_echo or TRACE), set my_yylinebuf
 */
-static int fePrintEcho(char *anf)
+static int fePrintEcho(char *anf, char *b)
 {
   char *ss=strchr(anf,'\n');
   int len_s;
@@ -429,7 +429,7 @@ static int fePrintEcho(char *anf)
   && (currentVoice->pi!=NULL)
   && (currentVoice->pi->trace_flag!=0))
   {
-    sdb(currentVoice, anf, len_s);
+    sdb(currentVoice, anf, len_s, b);
   }
   prompt_char = '.';
   return len_s;
@@ -484,7 +484,7 @@ int feReadLine(char* b, int l)
           char *s=(char *)AllocL(len+2);
           strncpy(s,anf,len+2);
           s[len+1]='\0';
-          fePrintEcho(s);
+          fePrintEcho(s,b);
           FreeL((ADDRESS)s);
         }
         else if (/*(startfptr>0) &&*/
@@ -499,7 +499,7 @@ int feReadLine(char* b, int l)
           strncpy(s,anf,len+2);
           s[len+1]='\0';
           yylineno++;
-          fePrintEcho(s);
+          fePrintEcho(s,b);
           FreeL((ADDRESS)s);
         }
       }
@@ -540,7 +540,7 @@ int feReadLine(char* b, int l)
     {
       fputs(s,feProtFile);
     }
-    int rc=fePrintEcho(s)+1;
+    int rc=fePrintEcho(s,b)+1;
     //s[strlen(s)+1]='\0'; add an second \0 at the end of the string
     s[rc]='\0';
     // handel \\ :

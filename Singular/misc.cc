@@ -577,7 +577,7 @@ BOOLEAN setOption(leftv res, leftv v)
         verbose=(*w)[1];
 
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
-	&& rField_has_simple_inverse())
+        && rField_has_simple_inverse())
         {
           test &=~Sy_bit(OPT_INTSTRATEGY);
         }
@@ -601,7 +601,7 @@ BOOLEAN setOption(leftv res, leftv v)
         else
           Warn("cannot set option");
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
-	&& rField_has_simple_inverse())
+        && rField_has_simple_inverse())
         {
           test &=~Sy_bit(OPT_INTSTRATEGY);
         }
