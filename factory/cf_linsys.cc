@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_linsys.cc,v 1.6 1997-04-15 11:06:40 schmidt Exp $
+// $Id: cf_linsys.cc,v 1.7 1997-04-18 13:26:27 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  1997/04/15 11:06:40  schmidt
+calls to macro DEBOUTLN changed to new calling syntax
+
 Revision 1.5  1997/04/07 16:01:47  schmidt
 #include <config.h> added
 
@@ -97,6 +100,8 @@ bool fuzzy_result;
 bool
 linearSystemSolve( CFMatrix & M )
 {
+    typedef int* int_ptr;
+
     if ( ! matrix_in_Z( M ) ) {
 	int nrows = M.rows(), ncols = M.columns();
 	int i, j, k;
@@ -132,7 +137,7 @@ linearSystemSolve( CFMatrix & M )
     else {
 	int rows = M.rows(), cols = M.columns();
 	CFMatrix MM( rows, cols );
-	int ** mm = new (int*)[rows];
+	int ** mm = new int_ptr[rows];
 	CanonicalForm Q, Qhalf, mnew, qnew, B;
 	int i, j, p, pno;
 	bool ok;
@@ -234,13 +239,15 @@ fill_int_mat( const CFMatrix & M, int ** m, int rows )
 CanonicalForm
 determinant( const CFMatrix & M, int rows )
 {
+    typedef int* int_ptr;
+
     ASSERT( rows <= M.rows() && rows <= M.columns() && rows > 0, "undefined determinant" );
     if ( rows == 1 )
 	return M(1,1);
     else  if ( rows == 2 )
 	return M(1,1)*M(2,2)-M(2,1)*M(1,2);
     else  if ( matrix_in_Z( M, rows ) ) {
-	int ** mm = new (int*)[rows];
+	int ** mm = new int_ptr[rows];
 	CanonicalForm x, q, Qhalf, B;
 	int n, i, intdet, p, pno;
 	for ( i = 0; i < rows; i++ ) {
@@ -325,13 +332,15 @@ determinant( const CFMatrix & M, int rows )
 CanonicalForm
 determinant2( const CFMatrix & M, int rows )
 {
+    typedef int* int_ptr;
+
     ASSERT( rows <= M.rows() && rows <= M.columns() && rows > 0, "undefined determinant" );
     if ( rows == 1 )
 	return M(1,1);
     else  if ( rows == 2 )
 	return M(1,1)*M(2,2)-M(2,1)*M(1,2);
     else  if ( matrix_in_Z( M, rows ) ) {
-	int ** mm = new (int*)[rows];
+	int ** mm = new int_ptr[rows];
 	CanonicalForm QQ, Q, Qhalf, mnew, q, qnew, B;
 	CanonicalForm det, detnew, qdet;
 	int i, p, pcount, pno, intdet;
