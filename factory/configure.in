@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.36 2003-06-20 10:01:37 Singular Exp $
+dnl # $Id: configure.in,v 1.37 2003-06-20 14:25:29 hannes Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.36 2003-06-20 10:01:37 Singular Exp $)
+AC_REVISION($Id: configure.in,v 1.37 2003-06-20 14:25:29 hannes Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -299,14 +299,14 @@ AC_CHECK_HEADERS(omalloc.h,,)
 AC_LANG_C
 
 # cross-compiling ?!
-AC_C_CROSS
-if test "x$cross_compiling" = xyes; then
-  AC_MSG_WARN([you better specify a cache file to get the values for
-                    cross-compiling right (e.g., call \`configure
-                    --cache-file=yourTarget.cache').  In particular, you
-                    should make sure that your target machine supports
-                    arithmetic shift.])
-fi
+#AC_C_CROSS
+#if test "x$cross_compiling" = xyes; then
+#  AC_MSG_WARN([you better specify a cache file to get the values for
+#                    cross-compiling right (e.g., call \`configure
+#                    --cache-file=yourTarget.cache').  In particular, you
+#                    should make sure that your target machine supports
+#                    arithmetic shift.])
+#fi
 
 # font-lock-trick: '
 

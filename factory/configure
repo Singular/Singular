@@ -2115,14 +2115,14 @@ cross_compiling=$ac_cv_prog_cc_cross
 
 
 # cross-compiling ?!
-
-if test "x$cross_compiling" = xyes; then
-  echo "configure: warning: you better specify a cache file to get the values for
-                    cross-compiling right (e.g., call \`configure
-                    --cache-file=yourTarget.cache').  In particular, you
-                    should make sure that your target machine supports
-                    arithmetic shift." 1>&2
-fi
+#AC_C_CROSS
+#if test "x$cross_compiling" = xyes; then
+#  AC_MSG_WARN([you better specify a cache file to get the values for
+#                    cross-compiling right (e.g., call \`configure
+#                    --cache-file=yourTarget.cache').  In particular, you
+#                    should make sure that your target machine supports
+#                    arithmetic shift.])
+#fi
 
 # font-lock-trick: '
 
