@@ -20,7 +20,9 @@
 #endif
 
 #include<string.h>
+#ifndef ix86_Win
 #include<values.h>
+#endif
 
 #include"intvec.h"
 #include"lists.h"
