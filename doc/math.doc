@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.54 2000-05-16 08:02:36 Singular Exp $
+@comment $Id: math.doc,v 1.55 2000-05-16 08:13:16 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -414,7 +414,7 @@ characteristic series} of the ideal (G).
 @end smallexample
 @end table
 @c ---------------------------------------------------------------------------
-@node The spectrum, Toric ideals, Characteristic sets, Mathematical background
+@node The spectrum, Toric ideals and Integer Programming, Characteristic sets, Mathematical background
 @section The spectrum
 @cindex The spectrum
 
@@ -1021,7 +1021,7 @@ applied to more general ideals, but show to
 be especially useful in the toric case.
 
 @c ---------------------------------------------------------------------------
-@node Integer Programming, References, Toric ideals, Mathematical background
+@node Integer Programming, ,Toric ideals, Toric ideals and Integer Programming
 @subsection Integer Programming
 @cindex integer Programming
 
