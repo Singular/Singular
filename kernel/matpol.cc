@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $ */
+/* $Id: matpol.cc,v 1.2 2004-08-05 08:57:26 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -712,6 +712,7 @@ void   mpMonomials(matrix c, int r, int var, matrix m)
 
 matrix mpCoeffProc (poly f, poly vars)
 {
+  assume(vars!=NULL);
   poly sel, h;
   int l, i;
   int pos_of_1 = -1;
