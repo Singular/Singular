@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.24 1998-04-24 16:39:24 Singular Exp $ */
+/* $Id: polys.cc,v 1.25 1998-04-24 16:51:43 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1402,88 +1402,88 @@ void pSetGlobals(ring r, BOOLEAN complete)
     pMonomSize = pMonomSizeW*sizeof(void*);
   }
 
+  // Set default Var Indicies
+  pSetVarIndicies(pVariables);
+  
   // Initialize memory management
   mmSpecializeBlock(pMonomSize);
 
-  if (complete)
+  pOrdSgn = r->OrdSgn;
+  pVectorOut=(r->order[0]==ringorder_c);
+  order=r->order;
+  block0=r->block0;
+  block1=r->block1;
+  firstwv=NULL;
+  polys_wv=r->wvhdl;
+  /*------- only one real block ----------------------*/
+  pLexOrder=FALSE;
+  pMixedOrder=FALSE;
+  pFDeg=pDeg;
+  if (pOrdSgn == 1) pLDeg = ldegb;
+  else              pLDeg = ldeg0;
+  /*======== ordering type is (_,c) =========================*/
+  if ((order[0]==ringorder_unspec)
+  ||(
+    ((order[1]==ringorder_c)||(order[1]==ringorder_C))
+    && (order[0]!=ringorder_M)
+    && (order[2]==0))
+  )
   {
-    // Set default Var Indicies
-    pSetVarIndicies(pVariables);
-  
-    pOrdSgn = r->OrdSgn;
-    pVectorOut=(r->order[0]==ringorder_c);
-    order=r->order;
-    block0=r->block0;
-    block1=r->block1;
-    firstwv=NULL;
-    polys_wv=r->wvhdl;
-    /*------- only one real block ----------------------*/
-    pLexOrder=FALSE;
-    pMixedOrder=FALSE;
-    pFDeg=pDeg;
-    if (pOrdSgn == 1) pLDeg = ldegb;
-    else              pLDeg = ldeg0;
-    /*======== ordering type is (_,c) =========================*/
-    if ((order[0]==ringorder_unspec)
-    ||(
-      ((order[1]==ringorder_c)||(order[1]==ringorder_C))
-      && (order[0]!=ringorder_M)
-      && (order[2]==0))
-    )
+    if ((order[0]!=ringorder_unspec)
+    && (order[1]==ringorder_C))
+      pComponentOrder=-1;
+    if (pOrdSgn == -1) pLDeg = ldeg0c;
+    SimpleChoose(order[0],order[1], &pComp0);
+    SetpSetm(order[0],0);
+  }
+  /*======== ordering type is (c,_) =========================*/
+  else if (((order[0]==ringorder_c)||(order[0]==ringorder_C))
+  && (order[1]!=ringorder_M)
+  &&  (order[2]==0))
+  {
+    /* pLDeg = ldeg0; is standard*/
+    if (order[0]==ringorder_C)
+      pComponentOrder=-1;
+    SimpleChooseC(order[1], &pComp0);
+    SetpSetm(order[1],1);
+  }
+  /*------- more than one block ----------------------*/
+  else
+  {
+    //pLexOrder=TRUE;
+    pVectorOut=order[0]==ringorder_c;
+    if ((pVectorOut)||(order[0]==ringorder_C))
     {
-      if ((order[0]!=ringorder_unspec)
-      && (order[1]==ringorder_C))
-        pComponentOrder=-1;
-      if (pOrdSgn == -1) pLDeg = ldeg0c;
-      SimpleChoose(order[0],order[1], &pComp0);
-      SetpSetm(order[0],0);
+      if(block1[1]!=pVariables) pLexOrder=TRUE;
     }
-    /*======== ordering type is (c,_) =========================*/
-    else if (((order[0]==ringorder_c)||(order[0]==ringorder_C))
-    && (order[1]!=ringorder_M)
-    &&  (order[2]==0))
-    {
-      /* pLDeg = ldeg0; is standard*/
-      if (order[0]==ringorder_C)
-        pComponentOrder=-1;
-      SimpleChooseC(order[1], &pComp0);
-      SetpSetm(order[1],1);
-    }
-    /*------- more than one block ----------------------*/
     else
     {
-      //pLexOrder=TRUE;
-      pVectorOut=order[0]==ringorder_c;
-      if ((pVectorOut)||(order[0]==ringorder_C))
-      {
-        if(block1[1]!=pVariables) pLexOrder=TRUE;
-      }
-      else
-      {
-        if(block1[0]!=pVariables) pLexOrder=TRUE;
-      }
-      /*the number of orderings:*/
-      i = 0;
-      while (order[++i] != 0);
-      do
-      {
-        i--;
-        HighSet(i, order[i]);/*sets also pMixedOrder to TRUE, if...*/
-        SetpSetm(order[i],i);
-      }
-      while (i != 0);
-  
-      pComp0 = BlockComp;
-      if ((order[0]!=ringorder_c)&&(order[0]!=ringorder_C))
-      {
-        pLDeg = ldeg1c;
-      }
-      else
-      {
-        pLDeg = ldeg1;
-      }
-      pFDeg = pWTotaldegree; // may be improved: pTotaldegree for lp/dp/ls/.. blocks
+      if(block1[0]!=pVariables) pLexOrder=TRUE;
     }
+    /*the number of orderings:*/
+    i = 0;
+    while (order[++i] != 0);
+    do
+    {
+      i--;
+      HighSet(i, order[i]);/*sets also pMixedOrder to TRUE, if...*/
+      SetpSetm(order[i],i);
+    }
+    while (i != 0);
+
+    pComp0 = BlockComp;
+    if ((order[0]!=ringorder_c)&&(order[0]!=ringorder_C))
+    {
+      pLDeg = ldeg1c;
+    }
+    else
+    {
+      pLDeg = ldeg1;
+    }
+    pFDeg = pWTotaldegree; // may be improved: pTotaldegree for lp/dp/ls/.. blocks
+  }
+  if (complete)
+  {
     if ((pLexOrder) || (pOrdSgn==-1))
     {
       test &= ~Sy_bit(OPT_REDTAIL); /* noredTail */
