@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.20 2001-01-31 17:48:08 Singular Exp $
+# $Id: pl2doc.pl,v 1.21 2002-07-03 14:46:30 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -38,6 +38,8 @@ require $pl_file;
 $lib = $library;
 $lib =~ s|.*/(.*)$|$1|;
 $lib =~ s|(.*)\.lib$|$1|;
+$lib =~ s|(.*)\.so$|$1|;
+if ($library =~ /\.so$/) { $so_module="so";} else { $so_module="lib"; }
 
 ###################################################################
 # print  summary
@@ -53,8 +55,8 @@ print_doc_header(\*LDOC) if $doc;
 print LDOC "\@c ---content LibInfo---\n";
 print LDOC "\@c library version: $version\n";
 print LDOC "\@c library file: $library\n";
-print LDOC "\@cindex $lib.lib\n";
-print LDOC "\@cindex ${lib}_lib\n";
+print LDOC "\@cindex $lib.$so_module\n";
+print LDOC "\@cindex ${lib}_$so_module\n";
 undef @procs; # will be again defined by OutLibInfo
 $parsing = "info-string of lib $lib:";
 $ref = OutLibInfo(\*LDOC, $info, ! $no_fun);
@@ -519,8 +521,15 @@ sub CleanUpExample
   $example = $mexample;
   $example = undef unless $example =~ /\w/;
   # prepend LIB command
-  $example = "LIB \"$lib.lib\";\n".$example 
-    if ($example && $lib ne "standard");
+  if ($so_module =~ /lib/)
+  {
+    $example = "LIB \"$lib.lib\";\n".$example 
+      if ($example && $lib ne "standard");
+  }
+  else
+  {
+    $example = "LIB\(\"$lib.so\"\);\n".$example;
+  }  
   # erase empty lines
   $example =~ s/^\s*\n//g;
   # erase spaces from beginning of lines
