@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.4 2000-11-07 10:07:41 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.5 2000-11-09 08:56:04 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -529,7 +529,7 @@ EXAMPLE: example vfilt; shows an example
   intvec d;
   if(size(#)>0)
   {
-    for(i=ncols(eM);i>=1&&number(eM[i])-1>=number(n-1)/2;i--)
+    for(i=ncols(eM);number(eM[i])-1>number(n-1)/2;i--)
     {
       Me=freemodule(mu*N);
       for(i0=n;i0>=0;i0--) // Potenzen von Matrizen?
@@ -545,13 +545,22 @@ EXAMPLE: example vfilt; shows an example
         d[k]=size(V[i])-size(V[i+1]);
       }
     }
-    if(s[k]==number(n-1)/2)
+    if(number(eM[i])-1==number(n-1)/2)
     {
-      j=k-1;
-    }
-    else
-    {
+      Me=freemodule(mu*N);
+      for(i0=n;i0>=0;i0--) // Potenzen von Matrizen?
+      {
+        Me=Me*(M-eM[i]);
+      }
+      V1=module(V1)+syz(Me);
+      V[i]=std(intersect(V1,V0));
       j=k;
+      if(size(V[i])>size(V[i+1]))
+      {
+        k++;
+        s[k]=eM[i]-1;
+        d[k]=size(V[i])-size(V[i+1]);
+      }
     }
     while(j>=1)
     {
@@ -715,9 +724,9 @@ RETURN:  <ideal> l[1] : spectral numbers of the V-filtration on the
          <intvec> l[2] :
            <int> l[2][i] : multiplicity of spectral number l[1][i]
          <list> l[3] : 
-            <module> l[3][i] : vector space basis of l[1][i]-th graded part 
-                               of the V-filtration on the Jaconian algebra
-                               in terms of l[4]
+           <module> l[3][i] : vector space basis of l[1][i]-th graded part 
+                              of the V-filtration on the Jaconian algebra
+                              in terms of l[4]
          <ideal> l[4] : monomial vector space basis of the Jacobian algebra
          <ideal> l[5] : standard basis of Jacobian ideal
 EXAMPLE: example vjacob; shows an example
