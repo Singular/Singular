@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_ops.cc,v 1.4 1997-07-30 07:40:20 schmidt Exp $ */
+/* $Id: cf_ops.cc,v 1.5 1997-07-30 07:53:32 schmidt Exp $ */
 
 #include <config.h>
 
@@ -265,6 +265,101 @@ totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 
 	    if ( (dummy = totaldegree( i.coeff(), v1, v2 ) + i.exp()) > cdeg )
 		cdeg = dummy;
 	return cdeg;
+    }
+}
+//}}}
+
+//{{{ static void fillVarsRec ( const CanonicalForm & f, int * vars )
+//{{{ docu
+//
+// fillVarsRec - fill array describing occurences of variables in f.
+//
+// Only polynomial variables are looked up.  The information is
+// stored in the arrary vars.  vars should be large enough to
+// hold all information, i.e. larger than the level of f.
+//
+//}}}
+static void
+fillVarsRec ( const CanonicalForm & f, int * vars )
+{
+    int n;
+    if ( (n = f.level()) > 0 ) {
+	vars[n] = 1;
+	CFIterator i;
+	for ( i = f; i.hasTerms(); ++i )
+	    fillVarsRec( i.coeff(), vars );
+    }
+}
+//}}}
+
+//{{{ int getNumVars( const CanonicalForm & f )
+//{{{ docu
+//
+// getNumVars() - get number of polynomial variables in f.
+//
+//}}}
+int
+getNumVars( const CanonicalForm & f )
+{
+    int n;
+    if ( f.inCoeffDomain() )
+	return 0;
+    else  if ( (n = f.level()) == 1 )
+	return 1;
+    else {
+	int * vars = new int[ n+1 ];
+	int i;
+	for ( i = 0; i < n; i++ ) vars[i] = 0;
+
+	// look for variables
+	for ( CFIterator I = f; I.hasTerms(); ++I )
+	    fillVarsRec( I.coeff(), vars );
+
+	// count them
+	int m = 0;
+	for ( i = 1; i < n; i++ )
+	    if ( vars[i] != 0 ) m++;
+
+	delete [] vars;
+	// do not forget to count our own variable
+	return m+1;
+    }
+}
+//}}}
+
+//{{{ CanonicalForm getVars( const CanonicalForm & f )
+//{{{ docu
+//
+// getVars() - get polynomial variables of f.
+//
+// Return the product of all of them, 1 if there are not any.
+//
+//}}}
+CanonicalForm
+getVars( const CanonicalForm & f )
+{
+    int n;
+    if ( f.inCoeffDomain() )
+	return 1;
+    else  if ( (n = f.level()) == 1 )
+	return Variable( 1 );
+    else {
+	int * vars = new int[ n+1 ];
+	int i;
+	for ( i = 0; i <= n; i++ ) vars[i] = 0;
+
+	// look for variables
+	for ( CFIterator I = f; I.hasTerms(); ++I )
+	    fillVarsRec( I.coeff(), vars );
+
+	// multiply them all
+	CanonicalForm result = 1;
+	for ( i = n; i > 0; i-- )
+	    if ( vars[i] != 0 ) result *= Variable( i );
+
+	delete [] vars;
+	// do not forget our own variable
+	return f.mvar() * result;
     }
 }
 //}}}
