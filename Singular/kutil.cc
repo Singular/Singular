@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.24 1998-07-23 09:07:00 Singular Exp $ */
+/* $Id: kutil.cc,v 1.25 1998-07-28 15:24:07 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2640,8 +2640,9 @@ void initS (ideal F, ideal Q,kStrategy strat)
           deleteHC(&h.p, &h.ecart, &h.length,strat);
         }
         if (TEST_OPT_DEGBOUND
-        && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
-          || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
+        && (pFDeg(h.p)>Kstd1_deg))
+        //&& (((strat->honey) && (/*h.ecart+*/pFDeg(h.p)>Kstd1_deg))
+        //  || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
           pDelete(&h.p);
         else
         if (h.p!=NULL)
@@ -2776,8 +2777,9 @@ void initSL (ideal F, ideal Q,kStrategy strat)
           deleteHC(&h.p, &h.ecart, &h.length,strat);
         }
         if (TEST_OPT_DEGBOUND
-        && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
-          || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
+        && (pFDeg(h.p)>Kstd1_deg))
+        //&& (((strat->honey) && (/*h.ecart+*/pFDeg(h.p)>Kstd1_deg))
+        //  || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
           pDelete(&h.p);
         else
         if (h.p!=NULL)
@@ -2883,8 +2885,9 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           deleteHC(&h.p, &h.ecart, &h.length,strat);
       }
       if (TEST_OPT_DEGBOUND
-      && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
-        || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
+      && (pFDeg(h.p)>Kstd1_deg))
+      //&& (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
+      //  || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
         pDelete(&h.p);
       else
       if (h.p!=NULL)

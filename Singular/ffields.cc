@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.14 1998-06-04 17:17:24 Singular Exp $ */
+/* $Id: ffields.cc,v 1.15 1998-07-28 15:24:05 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -308,6 +308,7 @@ BOOLEAN nfIsMOne (number a)
 #ifdef LDEBUG
   nfTest(a);
 #endif
+  if (0 == (int)a) return FALSE;
   return nfM1 == (int)a;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.25 1998-06-29 13:14:29 pohl Exp $ */
+/* $Id: kstd1.cc,v 1.26 1998-07-28 15:24:06 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1450,15 +1450,25 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
     if (TEST_OPT_DEGBOUND
-    && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)> Kstd1_deg))
+    && (/*strat->L[strat->Ll].ecart+*/
+        pFDeg(strat->L[strat->Ll].p)> Kstd1_deg))
     {
       /*
       * stops computation if
       * - 24 (degBound)
-      *   && upper degree is bigger than Kstd1_deg
+      *   && degree is bigger than Kstd1_deg
       */
-      while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
-      break;
+      do
+      {
+        deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+        if (TEST_OPT_PROT)
+        {
+          PrintS("D"); mflush();
+        }
+      }
+      while ((strat->Ll >= 0)
+        && (pFDeg(strat->L[strat->Ll].p)> Kstd1_deg));
+      if (strat->Ll<0) break;
     }
     strat->P = strat->L[strat->Ll];/*- picks the last element from the lazyset L -*/
     if (strat->Ll==0) strat->interpt=TRUE;
