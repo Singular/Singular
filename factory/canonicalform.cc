@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.9 1997-07-14 12:45:07 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.10 1997-07-16 10:16:08 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1289,6 +1289,33 @@ CanonicalForm::sqrt ( ) const
 	return CanonicalForm( value->sqrt() );
 }
 
+//{{{ int CanonicalForm::ilog2( ) const
+//{{{ docu
+//
+// ilog2() - integer logarithm to base 2.
+//
+// Returns the largest integer smaller than logarithm of CO to
+// base 2.  CO should be an integer.
+//
+//}}}
+int
+CanonicalForm::ilog2( ) const
+{
+    if ( is_imm( value ) ) {
+	ASSERT( is_imm( value ) == INTMARK, "not implemented" );
+	int a = imm2int( value );
+	ASSERT( a > 0, "log arg <= 0" );
+	int n = -1;
+	while ( a != 0 ) {
+	    n++;
+	    a /= 2;
+	}
+	return n;
+    }
+    else
+	return value->ilog2();
+}
+//}}}
 
 int
 getNumVars( const CanonicalForm & f )
