@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.64 2000-11-17 14:07:10 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.65 2000-11-22 17:35:33 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1294,7 +1294,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
 
   if ((idIs0(F))&&(Q==NULL))
     return pCopy(q); /*F=0*/
-  strat->ak = idRankFreeModule(F);
+  strat->ak = max(idRankFreeModule(F),pMaxComp(q));
   /*- creating temp data structures------------------- -*/
   strat->kHEdgeFound = ppNoether != NULL;
   strat->kNoether    = pCopy(ppNoether);
@@ -1326,6 +1326,21 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   strat->sl = -1;
   /*- init local data struct.-------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
+  if ((strat->ak!=0)
+  && (strat->kHEdgeFound))
+  {
+    if (strat->ak!=1)
+    {
+      pSetComp(strat->kNoether,1);
+      pSetmComp(strat->kNoether);
+      poly p=pHead(strat->kNoether);
+      pSetComp(p,strat->ak);
+      pSetmComp(p);
+      p=pAdd(strat->kNoether,p);
+      strat->kNoether=pNext(p);
+      p_LmFree(p,currRing);
+    }
+  }
   if ((lazyReduce & 1)==0)
   {
     for (i=strat->sl; i>=0; i--)
@@ -1399,7 +1414,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   if (idIs0(q)) return idInit(1,q->rank);
   if ((idIs0(F))&&(Q==NULL))
     return idCopy(q); /*F=0*/
-  strat->ak = idRankFreeModule(F);
+  strat->ak = max(idRankFreeModule(F),idRankFreeModule(q));
   /*- creating temp data structures------------------- -*/
   strat->kHEdgeFound = ppNoether != NULL;
   strat->kNoether=pCopy(ppNoether);
@@ -1429,6 +1444,21 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   strat->sl = -1;
   /*- init local data struct.-------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
+  if ((strat->ak!=0)
+  && (strat->kHEdgeFound))
+  {
+    if (strat->ak!=1)
+    {
+      pSetComp(strat->kNoether,1);
+      pSetmComp(strat->kNoether);
+      poly p=pHead(strat->kNoether);
+      pSetComp(p,strat->ak);
+      pSetmComp(p);
+      p=pAdd(strat->kNoether,p);
+      strat->kNoether=pNext(p);
+      p_LmFree(p,currRing);
+    }
+  }
   if (TEST_OPT_INTSTRATEGY && ((lazyReduce & 1)==0))
   {
     for (i=strat->sl; i>=0; i--)
