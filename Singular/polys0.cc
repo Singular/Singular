@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.17 2000-10-26 16:31:38 obachman Exp $ */
+/* $Id: polys0.cc,v 1.18 2000-11-28 11:50:56 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -169,6 +169,7 @@ void p_wrp0(poly p, ring ri)
     }
   }
 }
+#if 1
 void p_wrp(poly p, ring lmRing, ring tailRing)
 {
   poly r;
@@ -187,3 +188,20 @@ void p_wrp(poly p, ring lmRing, ring tailRing)
     }
   }
 }
+#else
+// this is for use with buckets
+void p_wrp(poly p, ring lmRing, ring tailRing)
+{
+  poly r;
+
+  if (p==NULL) PrintS("NULL");
+  else if (pNext(p)==NULL) p_Write0(p, lmRing);
+  else
+  {
+    r = pNext(p);
+    pNext(p) = NULL;
+    p_Write0(p, lmRing, tailRing);
+    pNext(p) = r;
+  }
+}
+#endif

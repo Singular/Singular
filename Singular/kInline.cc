@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.17 2000-11-23 17:34:07 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.18 2000-11-28 11:50:51 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -258,7 +258,6 @@ KINLINE BOOLEAN sTObject::IsNull() const
 
 KINLINE int sTObject::GetpLength()
 {
-  assume(pLength <= 0 || pLength == ::pLength(p != NULL ? p : t_p));
   if (pLength <= 0) pLength = ::pLength(p != NULL ? p : t_p);
   return pLength;
 }
@@ -448,11 +447,13 @@ KINLINE void sLObject::PrepareRed(BOOLEAN use_bucket)
     if (use_bucket && l > 1)
     {
       poly tp = GetLmTailRing();
+      assume(l == ::pLength(tp));
       bucket = kBucketCreate(tailRing);
       kBucketInit(bucket, pNext(tp), l-1);
       pNext(tp) = NULL;
       if (p != NULL) pNext(p) = NULL;
       pLength = 0;
+      last = NULL;
     }
   }
 }
@@ -467,6 +468,7 @@ KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_buc
     kBucketInit(bucket, p_tail, p_Length);
     pNext(lm) = NULL;
     pLength = 0;
+    last = NULL;
   }
   else
   {
@@ -682,7 +684,9 @@ KINLINE int sLObject::GetpLength()
 KINLINE int sLObject::SetLength(BOOLEAN length_pLength)
 {
   if (length_pLength) 
+  {
     length = this->GetpLength();
+  }
   else
     this->pLDeg();
   return length;
@@ -702,7 +706,15 @@ KINLINE long sLObject::MinComp()
   else
     return p_MinComp(tp, tailRing);
 }
-
+KINLINE long sLObject::Comp()
+{
+  poly p;
+  ring r;
+  GetLm(p, r);
+  assume(p != NULL);
+  return p_GetComp(p, r);
+}
+  
 KINLINE sLObject& sLObject::operator=(const sTObject& t)
 {
   memset(this, 0, sizeof(*this));

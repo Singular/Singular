@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.44 2000-11-23 17:44:04 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.45 2000-11-28 11:50:56 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -148,6 +148,7 @@ ideal smRingCopy(ideal I, ring *ri, sip_sring &tmpR)
     ord[0]=ringorder_c;
     ord[1]=ringorder_dp;
     tmpR.order=ord;
+    tmpR.OrdSgn=1;
     block0[1]=1;
     tmpR.block0=block0;
     block1[1]=tmpR.N;

@@ -1,13 +1,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.67 2000-11-24 19:30:47 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.68 2000-11-28 11:50:52 obachman Exp $ */
 /*
 * ABSTRACT:
 */
 
 // define if LDEG should not be used in inner reduction loops
-#define NO_LDEG
+// #define NO_LDEG
+
+// define if buckets should be use
+#define MORA_USE_BUCKETS
 
 #include "mod2.h"
 #include "tok.h"
@@ -274,8 +277,9 @@ int redEcart (LObject* h,kStrategy strat)
 
     if (strat->syzComp!=0)
     {
-      if ((strat->syzComp>0) && (h->MinComp() > strat->syzComp))
+      if ((strat->syzComp>0) && (h->Comp() > strat->syzComp))
       {
+        assume(h->MinComp() > strat->syzComp);
         if (strat->honey) h->SetLength();
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
@@ -346,8 +350,6 @@ int redFirst (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0)
     {
-      if (strat->kNoether)
-        h->pLength = NULL;
       h->SetDegStuffReturnLDeg(strat->LDegLast);
       return 1;
     }
@@ -383,8 +385,9 @@ int redFirst (LObject* h,kStrategy strat)
     if ((strat->syzComp!=0) && !strat->honey)
     {
       if ((strat->syzComp>0) &&
-          (h->MinComp() > strat->syzComp))
+          (h->Comp() > strat->syzComp))
       {
+        assume(h->MinComp() > strat->syzComp);
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
 #endif
@@ -396,18 +399,19 @@ int redFirst (LObject* h,kStrategy strat)
     if (!strat->homog)
     {
 #ifdef NO_LDEG
-      h->SetpFDeg();
-      if (strat->T[j].ecart <= h->ecart)
-        h->ecart = d - h->GetpFDeg();
-      else
-        h->ecart = d - h->GetpFDeg() + strat->T[j].ecart - h->ecart;
+      if (strat->honey)
+      {
+        h->SetpFDeg();
+        if (strat->T[j].ecart <= h->ecart)
+          h->ecart = d - h->GetpFDeg();
+        else
+          h->ecart = d - h->GetpFDeg() + strat->T[j].ecart - h->ecart;
       
-      d = h->GetpFDeg() + h->ecart;
-#else
-      if (strat->kNoether != NULL)
-        h->pLength = 0;
-      d = h->SetDegStuffReturnLDeg(strat->LDegLast);
+        d = h->GetpFDeg() + h->ecart;
+      }
+      else
 #endif
+      d = h->SetDegStuffReturnLDeg(strat->LDegLast);
       /*- try to reduce the s-polynomial -*/
       pass++;
       /*
@@ -419,8 +423,6 @@ int redFirst (LObject* h,kStrategy strat)
           && ((d >= reddeg) || (pass > strat->LazyPass)))
       {
         h->SetLmCurrRing();
-        if (strat->kNoether != NULL)
-          h->pLength = NULL;
         if (strat->posInLDependsOnLength)
           h->SetLength(strat->length_pLength);
         at = strat->posInL(strat->L,strat->Ll,h,strat);
@@ -647,7 +649,7 @@ BOOLEAN hasPurePower (const poly p,int last, int *length,kStrategy strat)
   if (pNext(p) == strat->tail)
     return FALSE;
   pp_Test(p, currRing, strat->tailRing);
-  if (p_MinComp(p, currRing, strat->tailRing) == strat->ak)
+  if (strat->ak <= 0 || p_MinComp(p, currRing, strat->tailRing) == strat->ak)
   {
     i = p_IsPurePower(p, currRing);
     if (i == last) 
@@ -816,10 +818,13 @@ void updateLHC(kStrategy strat)
         /* create the real one */
         ksCreateSpoly(&(strat->L[i]), strat->kNoether, FALSE, 
                       strat->tailRing, m1, m2, strat->R);
-        strat->L[i].SetpFDeg();
-        strat->L[i].ecart 
-          = strat->L[i].pLDeg(strat->LDegLast) - strat->L[i].GetpFDeg();
-        if (strat->use_buckets) strat->L[i].PrepareRed(TRUE);
+        if (! strat->L[i].IsNull())
+        {
+          strat->L[i].SetpFDeg();
+          strat->L[i].ecart 
+            = strat->L[i].pLDeg(strat->LDegLast) - strat->L[i].GetpFDeg();
+          if (strat->use_buckets) strat->L[i].PrepareRed(TRUE);
+        }
       }
     }
     else
@@ -1155,58 +1160,55 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
     else if (strat->P.p1 == NULL)
     {
-      // for input polys, prepare reduction
+      // for input polys, prepare reduction (buckets !)
       strat->P.SetLength(strat->length_pLength);
       strat->P.PrepareRed(strat->use_buckets);
     }
     
+    if (!strat->P.IsNull())
+    {
+      // might be NULL from noether !!!
+      if (TEST_OPT_PROT) 
+        message(strat->P.ecart+strat->P.GetpFDeg(),&olddeg,&reduc,strat);
+      // reduce
+      strat->red(&strat->P,strat);
+    }
 
-    if (TEST_OPT_PROT) 
-      message(strat->P.ecart+strat->P.GetpFDeg(),&olddeg,&reduc,strat);
-
-    strat->red(&strat->P,strat);/*- reduction of the element choosen from L -*/
-
-    if (strat->P.p != NULL)
+    if (! strat->P.IsNull())
     {
       strat->P.GetP();
-      assume(strat->P.sev == 0 || strat->P.sev == pGetShortExpVector(strat->P.p));
-      if (TEST_OPT_PROT) PrintS("s");/*- statistic -*/
-      /*- enter P.p into s and b: -*/
+      // statistics
+      if (TEST_OPT_PROT) PrintS("s");
+      // normalization
       if (!TEST_OPT_INTSTRATEGY)
         strat->P.pNorm();
-
-      strat->P.p = redtail(strat->P.p,strat->sl,strat);
-      if (strat->redTailChange) 
-      {
-        strat->P.pLength = 0;
-        strat->P.last = NULL;
-      }
-      
+      // tailreduction
+      strat->P.p = redtail(&(strat->P),strat->sl,strat);
+      // set ecart -- might have changed because of tail reductions
       if ((!strat->noTailReduction) && (!strat->honey))
-      {
         strat->initEcart(&strat->P);
-      }
+      // for char 0, clear denominators
       if (TEST_OPT_INTSTRATEGY)
         strat->P.pCleardenom();
-      cancelunit(&strat->P);/*- tries to cancel a unit -*/
+      // cancel unit
+      cancelunit(&strat->P);
+
+      // put in T
       enterT(strat->P,strat);
-      int pos;
-      {
-        enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
-        if (strat->sl==-1)
-        {
-          pos=0;
-        }
-        else
-        {
-          pos = posInS(strat->S,strat->sl,strat->P.p);
-        }
-        strat->enterS(strat->P,pos,strat, strat->tl);
-      }
+      // build new pairs
+      enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
+      // put in S
+      strat->enterS(strat->P, posInS(strat->S,strat->sl,strat->P.p),
+                    strat, strat->tl);
+
+      // apply hilbert criterion
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+
+      // clear strat->P
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       strat->P.lcm=NULL;
 #ifdef KDEBUG
+      // make sure kTest_TS does not complain about strat->P
       memset(&strat->P,0,sizeof(strat->P));
 #endif
       if (strat->sl>srmax) srmax = strat->sl; /*stat.*/
@@ -1217,6 +1219,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if ((BTEST1(27))
       || ((TEST_OPT_MULTBOUND) && (scMult0Int((strat->Shdl)) < mu)))
       {
+        // obachman: is this still used ???
         /*
         * stops computation if strat->kHEdgeFound and
         * - 27 (finiteDeterminacyTest)
@@ -1857,6 +1860,7 @@ ideal kInterRed (ideal F, ideal Q)
 // returns TRUE if mora should use buckets, false otherwise
 static BOOLEAN kMoraUseBucket(kStrategy strat)
 {
+#ifdef MORA_USE_BUCKETS
   if (TEST_OPT_NOT_BUCKETS) 
     return FALSE;
   if (strat->red == redFirst)
@@ -1865,10 +1869,8 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
     if (!strat->syzComp)
       return TRUE;
 #else    
-    if (strat->homog && !strat->syzComp) 
+    if ((strat->homog || strat->honey) && !strat->syzComp) 
       return TRUE;
-    else
-      return FALSE;
 #endif
   }
   else
@@ -1876,7 +1878,7 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
     assume(strat->red == redEcart);
     if (strat->honey && !strat->syzComp)
       return TRUE;
-    else
-      return FALSE;
   }
+#endif
+  return FALSE;
 }

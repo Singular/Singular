@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.21 2000-11-24 19:30:47 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.22 2000-11-28 11:50:52 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -13,14 +13,13 @@
 #include "p_polys.h"
 #include "p_Procs.h"
 
-// Define to enable tests in this file 
-#define DEBUG_THIS
 
-#if ! (defined(DEBUG_THIS) || (defined(KDEBUG) && (KDEBUG > 1)))
-#undef assume
-#define assume(x) 
+#ifdef KDEBUG
+int red_count = 0;
+int create_count = 0;
+// define this if reductions are reported on TEST_OPT_DEBUG
+// #define TEST_OPT_DEBUG_RED
 #endif
-
 
 /***************************************************************
  *
@@ -34,6 +33,16 @@ int ksReducePoly(LObject* PR,
                  number *coef,
                  kStrategy strat)
 {
+#ifdef KDEBUG
+  red_count++;
+#ifdef TEST_OPT_DEBUG_RED
+  if (TEST_OPT_DEBUG)
+  {
+    Print("Red %d:", red_count); PR->wrp(); Print(" with:");
+    PW->wrp();
+  }
+#endif
+#endif
   int ret = 0;
   ring tailRing = PR->tailRing;
   kTest_L(PR);
@@ -102,6 +111,12 @@ int ksReducePoly(LObject* PR,
   // and finally, 
   PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
   PR->LmDeleteAndIter();
+#if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
+  if (TEST_OPT_DEBUG)
+  {
+    Print(" to: "); PR->wrp(); Print("\n");
+  }
+#endif
   return ret;
 }
 
@@ -115,6 +130,9 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
                    int use_buckets, ring tailRing, 
                    poly m1, poly m2, TObject** R)
 {
+#ifdef KDEBUG
+  create_count++;
+#endif
   kTest_L(Pair);
   poly p1 = Pair->p1;
   poly p2 = Pair->p2;
@@ -129,7 +147,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
   int co=0, ct = ksCheckCoeff(&lc1, &lc2);
 
-  int l1=0, l2=0, shorter=0;
+  int l1=0, l2=0;
   
   if (p_GetComp(p1, currRing)!=p_GetComp(p2, currRing))
   {
@@ -161,10 +179,14 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   
   // get m2 * a2
   if (spNoether != NULL)
+  {
+    l2 = -1;
     a2 = tailRing->p_Procs->pp_Mult_mm_Noether(a2, m2, spNoether, l2, tailRing,last);
+    assume(l2 == pLength(a2));
+  }
   else
     a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing,last);
-  Pair->SetLmTail(m2, a2, l2-shorter, use_buckets, tailRing, last);
+  Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing, last);
 
   // get m2*a2 - m1*a1
   Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
@@ -228,7 +250,8 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
       pNext(PR->t_p) = pNext(Current);
   }
 
-  if (Lp == Save) With.Delete();
+  if (Lp == Save) 
+    With.Delete();
   return ret;
 }
 

@@ -3,8 +3,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.12 2000-10-26 06:39:27 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.13 2000-11-28 11:50:52 obachman Exp $ */
 #include "structs.h"
+#include "p_Procs.h"
+#include "pShallowCopyDelete.h"
 
 /////////////////////////////////////////////////////////////////////////
 // configuration
@@ -43,13 +45,13 @@ int kBucketCanonicalize(kBucket_pt bucket);
 // Gets leading monom of bucket, does NOT change Bpoly!!!!!
 // Returned monom is READ ONLY, i.e. no manipulations are allowed !!!!
 //
-const poly kBucketGetLm(kBucket_pt bucket);
+inline const poly kBucketGetLm(kBucket_pt bucket);
 
 /////////////////////////////////////////////////////////////////////////////
 // Extracts lm of Bpoly, i.e. Bpoly is changed s.t.
 // Bpoly == Bpoly - Lm(Bpoly)
 //
-poly kBucketExtractLm(kBucket_pt bucket);
+inline poly kBucketExtractLm(kBucket_pt bucket);
 
 /////////////////////////////////////////////////////////////////////////////
 // Reduces Bpoly (say, q) with p, i.e.:
@@ -123,8 +125,16 @@ BOOLEAN kbTest(kBucket_pt bucket);
 /// Bucket definition (should be no one elses business, though)
 ///
 
-
+// define this if length of bucket polys are 2, 4, 8, etc
+// instead of 4, 16, 64 ... -- 
+// this seems to be less efficient, both, in theory and in practice
+// #define BUCKET_TWO_BASE 
+#ifdef BUCKET_TWO_BASE
+#define MAX_BUCKET 28
+#else
 #define MAX_BUCKET 14 // suitable for polys up to a length of 4^14 = 2^28
+#endif
+
 class kBucket
 {
 public:
@@ -138,5 +148,27 @@ public:
 #endif
   ring bucket_ring;
 };
+
+inline void kBucketAdjustBucketsUsed(kBucket_pt bucket)
+{
+  while ( bucket->buckets_used > 0 &&
+          bucket->buckets[bucket->buckets_used] == NULL)
+    (bucket->buckets_used)--;
+}
+
+inline const poly kBucketGetLm(kBucket_pt bucket)
+{
+  if (bucket->buckets[0] == NULL)
+    bucket->bucket_ring->p_Procs->p_kBucketSetLm(bucket);
+  return bucket->buckets[0];
+}
+
+inline poly kBucketExtractLm(kBucket_pt bucket)
+{
+  poly lm = kBucketGetLm(bucket);
+  bucket->buckets[0] = NULL;
+  bucket->buckets_length[0] = 0;
+  return lm;
+}
 
 #endif /* KBUCKETS_H */

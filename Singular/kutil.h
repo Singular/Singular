@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.45 2000-11-23 17:34:10 obachman Exp $ */
+/* $Id: kutil.h,v 1.46 2000-11-28 11:50:54 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -158,7 +158,10 @@ public:
   KINLINE long SetDegStuffReturnLDeg();
   KINLINE long SetDegStuffReturnLDeg(BOOLEAN use_last);
 
+  // returns minimal component of p
   KINLINE long MinComp();
+  // returns component of p
+  KINLINE long Comp();
 
   KINLINE void ShallowCopyDelete(ring new_tailRing,  
                                  pShallowCopyDeleteProc p_shallow_copy_delete);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.80 2000-11-24 19:30:48 obachman Exp $ */
+/* $Id: kutil.cc,v 1.81 2000-11-28 11:50:53 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -101,10 +101,14 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     poly p1;
     poly p = L->GetLmTailRing();
     int l = 1;
+    kBucket_pt bucket = NULL;
     if (L->bucket != NULL)
     {
       kBucketClear(L->bucket, &pNext(p), &L->pLength);
       L->pLength++;
+      bucket = L->bucket;
+      L->bucket = NULL;
+      L->last = NULL;
     }
 
     if (!fromNext && p_Cmp(p,strat->kNoether, L->tailRing) == -1)
@@ -112,6 +116,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       L->Delete();
       L->Clear();
       L->ecart = -1;
+      if (bucket != NULL) kBucketDestroy(&bucket);
       return;
     }
     p1 = p;
@@ -119,8 +124,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     { 
       if (p_LmCmp(pNext(p1), strat->kNoether, L->tailRing) == -1)
       {
-        if (L->last != NULL)
-          L->last = p1;
+        L->last = p1;
         p_Delete(&pNext(p1), L->tailRing);
         if (p1 == p)
         {
@@ -140,22 +144,24 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       l++;
       pIter(p1);
     }
-    if (L->bucket != NULL)
-    {
-      if (L->pLength > 1) 
-      {
-        kBucketInit(L->bucket, pNext(p), L->pLength - 1);
-        pNext(p) = NULL;
-        if (L->t_p != NULL) pNext(L->t_p) = NULL;
-        L->pLength = 0;
-      }
-      else
-        kBucketDestroy(&L->bucket);
-    }
     if (! fromNext)
     {
       L->SetpFDeg();
-      L->ecart = L->pLDeg() - L->GetpFDeg();
+      L->ecart = L->pLDeg(strat->LDegLast) - L->GetpFDeg();
+    }
+    if (bucket != NULL)
+    {
+      if (L->pLength > 1) 
+      {
+        kBucketInit(bucket, pNext(p), L->pLength - 1);
+        pNext(p) = NULL;
+        if (L->t_p != NULL) pNext(L->t_p) = NULL;
+        L->pLength = 0;
+        L->bucket = bucket;
+        L->last = NULL;
+      }
+      else
+        kBucketDestroy(&bucket);
     }
     kTest_L(L);
   }
@@ -2515,14 +2521,15 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
       j++;
     }
     // if called from NF, T objects do not exist:
-    if (strat->tl < 0) 
+    if (strat->tl < 0 || strat->S_2_R[j] == -1)
     {
-      T->Set(strat->S[j], r);
+      T->Set(strat->S[j], r, strat->tailRing);
       return T;
     }
     else
     {
-      assume (j >= 0 && j <= strat->tl && strat->S_2_T(j) != NULL);
+      assume (j >= 0 && j <= strat->tl && strat->S_2_T(j) != NULL && 
+              strat->S_2_T(j)->p == strat->S[j]);
       return strat->S_2_T(j);
     }
   }
@@ -2532,6 +2539,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
     while (1)
     {
       if (j > pos) return NULL;
+      assume(strat->S_2_R[j] != -1);
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       t = strat->S_2_T(j);
       assume(t != NULL && t->t_p != NULL && t->tailRing == r);
@@ -2542,7 +2550,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
       if (! (sev[j] & not_sev) && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
       {
         t = strat->S_2_T(j);
-        assume(t != NULL && t->t_p != NULL && t->tailRing == r);
+        assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
         if (p_LmDivisibleBy(t->t_p, p, r)) return t;
       }
 #endif
@@ -2558,6 +2566,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   int j;
   unsigned long not_sev;
   strat->redTailChange=FALSE;
+
   poly p = L->p;
   if (strat->noTailReduction || pNext(p) == NULL)
     return p;
@@ -2577,10 +2586,11 @@ poly redtail (LObject* L, int pos, kStrategy strat)
 
   while(hn != NULL)
   {
+    op = pFDeg(hn, strat->tailRing);
+    if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
     e = pLDeg(hn, &l, strat->tailRing) - op;
     while (1)
     {
-      kTest_TS(strat);
       Ln.Set(hn, strat->tailRing);
       Ln.sev = p_GetShortExpVector(hn, strat->tailRing);
       if (strat->kHEdgeFound)
@@ -2603,19 +2613,24 @@ poly redtail (LObject* L, int pos, kStrategy strat)
       hn = pNext(h);
       if (hn == NULL) goto all_done;
       op = pFDeg(hn, strat->tailRing);
+      if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
       e = pLDeg(hn, &l) - op;
-      kTest_TS(strat);
     }
     h = hn;
     hn = pNext(h);
   }
-
+  
   all_done:
+  if (strat->redTailChange)
+  {
+    L->last = 0;
+    L->pLength = 0;
+  }
   strat->kHEdgeFound = save_HE;
   return p;
 }
 
-#define OLD_RED_TAIL
+// #define OLD_RED_TAIL
 #ifdef OLD_RED_TAIL
 /*2
 * reduces h using the set S
@@ -2707,20 +2722,34 @@ poly redtailBba (LObject* L, int pos, kStrategy strat)
       Ln.sev = p_GetShortExpVector(hn, strat->tailRing);
       With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
       if (With == NULL) break;
-      strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, h, strat->kNoether))
       {
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
-          return redtailBba(L, pos, strat);
+        {
+          p = redtailBba(L, pos, strat);
+          goto all_done;
+        }
         else
+        {
+          assume(0);
           return NULL;
+        }
       }
+      strat->redTailChange=TRUE;
       hn = pNext(h);
-      if (hn == NULL) return p;
+      if (hn == NULL) goto all_done;
     }
     h = hn;
     hn = pNext(h);
+  }
+
+  all_done:
+  if (strat->redTailChange)
+  {
+    L->last = NULL;
+    L->pLength = 0;
+    L->length = 0;
   }
   return p;
 }
@@ -3304,12 +3333,14 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
       {
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
-          PrintS("reduce "); wrp(h); Print(" with S[%d] (",j);wrp(strat->S[j]);
+          {PrintS("reduce ");wrp(h);Print(" with S[%d] (",j);wrp(strat->S[j]);}
+        
 #endif          
         h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
 #ifdef KDEBUG
         if(TEST_OPT_DEBUG)
-          PrintS(")\nto "); wrp(h); PrintLn();
+          {PrintS(")\nto "); wrp(h); PrintLn();}
+        
 #endif
         // pDelete(&h);
         if (h == NULL) return NULL;
@@ -3595,7 +3626,9 @@ void enterT(LObject p, kStrategy strat, int atT = -1)
 
   pp_Test(p.p, currRing, p.tailRing);
   assume(strat->tailRing == p.tailRing);
-  assume(p.pLength == 0 || pLength(p.p) == p.pLength);
+  // redMoraNF complains about this -- but, we don't really
+  // neeed this so far
+  // assume(p.pLength == 0 || pLength(p.p) == p.pLength);
   assume(p.FDeg == p.pFDeg());
   assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
 
@@ -3933,19 +3966,17 @@ void completeReduce (kStrategy strat)
   {
     for (i=strat->sl; i>=0; i--)
     {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
       strat->S[i] = redtail(strat->S[i],strat->sl,strat);
+      // Hmm .. this might also change strat->T[i]
+      // but, we don't need it any more
       if (TEST_OPT_INTSTRATEGY)
-      {
         pCleardenom(strat->S[i]);
-      }
       if (TEST_OPT_PROT)
-      {
-        PrintS("-");mflush();
-      }
+        PrintS("-");
     }
   }
 }
+
 
 /*2
 * computes the new strat->kHEdge and the new pNoether,

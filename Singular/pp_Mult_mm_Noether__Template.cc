@@ -6,32 +6,34 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm_Noether__Template.cc,v 1.1 2000-11-25 11:59:57 Singular Exp $
+ *  Version: $Id: pp_Mult_mm_Noether__Template.cc,v 1.2 2000-11-28 11:50:56 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
  *
- *   Returns:  p*m
+ *   Returns:  p*m, ll
+ *   ll == pLength(p*m) , if on input ll < 0
+ *   pLength(p) - pLength(p*m), if on input ll >= 0
  *   Const:    p, m
- *   monoms which are smaller than spNoether are cut
  *
  ***************************************************************/
-poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int &ll, const ring ri, poly &last)
+poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int &ll, 
+                        const ring ri, poly &last)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
+  assume(spNoether != NULL);
   if (p == NULL) 
   {
-    last = NULL;
     ll = 0;
+    last = NULL;
     return NULL;
   }
   spolyrec rp;
   poly q = &rp, r;
+  const unsigned long *spNoether_exp = spNoether->exp;
   number ln = pGetCoeff(m);
   omBin bin = ri->PolyBin;
-  assume(spNoether != NULL);
-  unsigned long *spNoether_exp = spNoether->exp;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
   DECLARE_ORDSGN(const long* ordsgn = ri->ordsgn);
   const unsigned long* m_e = m->exp;
@@ -39,26 +41,33 @@ poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int &ll, con
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
   int l = 0;
   
-  while (p != NULL)
+  do
   {
-    p_AllocBin( r, bin, ri);
+    p_AllocBin(r, bin, ri);
     p_MemSum(r->exp, p->exp, m_e, length);
     p_MemAddAdjust(r, ri);
-    p_MemCmp(r->exp, spNoether->exp, length, ordsgn, goto Continue, goto Continue, goto Break);
+
+    p_MemCmp(r->exp, spNoether_exp, length, ordsgn, goto Continue, goto Continue, goto Break);
     
     Break:
     p_FreeBinAddr(r, ri);
     break;
-    
+
     Continue:
+    l++;
     q = pNext(q) = r;
     pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
-    l++;
     pIter(p);
-  }
-  if (q  != &rp) last = q;
+  } while (p != NULL);
+
+  if (ll < 0)
+    ll = l;
+  else
+    ll = pLength(p);
+  
+  if (q != &rp) 
+    last = q;
   pNext(q) = NULL;
-  ll = l;
 
   p_Test(pNext(&rp), ri);
   return pNext(&rp);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.63 2000-11-24 19:30:48 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.64 2000-11-28 11:50:53 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -38,7 +38,7 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
   ring r;
   L->GetLm(p, r);
 
-  assume(~not_sev == p_GetShortExpVector(p, r));
+  pAssume(~not_sev == p_GetShortExpVector(p, r));
   
   if (r == currRing)
   {
@@ -83,7 +83,7 @@ int kFindDivisibleByInS(const polyset &S, const unsigned long* sev, const int sl
   poly p = L->GetLmCurrRing();
   int j = 0;
 
-  assume(~not_sev == p_GetShortExpVector(p, currRing));
+  pAssume(~not_sev == p_GetShortExpVector(p, currRing));
   while (1)
   {
     if (j > sl) return -1;
@@ -595,7 +595,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
         {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat);
-          if (strat->redTailChange)  strat->P.pLength = 0;
           strat->P.pCleardenom();
         }
       }
@@ -603,10 +602,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       {
         strat->P.pNorm();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-        {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat);
-          if (strat->redTailChange)  strat->P.pLength = 0;
-        }
       }
 
 #ifdef KDEBUG

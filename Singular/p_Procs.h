@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.9 2000-11-24 19:30:50 obachman Exp $
+ *  Version: $Id: p_Procs.h,v 1.10 2000-11-28 11:50:55 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
@@ -24,32 +24,34 @@ typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, poly m,
                                     const ring r, 
                                     poly &last);
 typedef poly (*pp_Mult_mm_Noether_Proc_Ptr)(poly p, poly m, 
-                                            poly spNoether, int &length,
-                                            const ring r, 
-                                            poly &last);
+                                            const poly spNoether, int &ll,
+                                            const ring r, poly &last);
 typedef poly (*p_Add_q_Proc_Ptr)(poly p, poly q, int & shorter, const ring r);
 typedef poly (*p_Minus_mm_Mult_qq_Proc_Ptr)(poly p, poly m, poly q, 
-                                            int &shorter, poly spNoether, 
+                                            int &shorter, const poly spNoether,
                                             const ring r, poly &last);
 typedef poly (*p_Neg_Proc_Ptr)(poly p, const ring r);
-typedef poly (*pp_Mult_Coeff_mm_DivSelect_Proc_Ptr)(poly p, const poly m, const ring r);
+typedef poly (*pp_Mult_Coeff_mm_DivSelect_Proc_Ptr)(poly p, const poly m, 
+                                                    const ring r);
 typedef poly (*p_Merge_q_Proc_Ptr)(poly p, poly q, const ring r);
+typedef void (*p_kBucketSetLm_Proc_Ptr)(kBucket_pt bucket);
 
 typedef struct p_Procs_s
 {
-  p_Copy_Proc_Ptr               p_Copy;
-  p_Delete_Proc_Ptr             p_Delete;
-  p_ShallowCopyDelete_Proc_Ptr  p_ShallowCopyDelete;
-  p_Mult_nn_Proc_Ptr            p_Mult_nn;
-  pp_Mult_nn_Proc_Ptr           pp_Mult_nn;
-  pp_Mult_mm_Proc_Ptr           pp_Mult_mm;
-  pp_Mult_mm_Noether_Proc_Ptr   pp_Mult_mm_Noether;
-  p_Mult_mm_Proc_Ptr            p_Mult_mm;
-  p_Add_q_Proc_Ptr              p_Add_q;
-  p_Minus_mm_Mult_qq_Proc_Ptr   p_Minus_mm_Mult_qq;
-  p_Neg_Proc_Ptr                p_Neg;
-  pp_Mult_Coeff_mm_DivSelect_Proc_Ptr pp_Mult_Coeff_mm_DivSelect;
-  p_Merge_q_Proc_Ptr            p_Merge_q;
+  p_Copy_Proc_Ptr                       p_Copy;
+  p_Delete_Proc_Ptr                     p_Delete;
+  p_ShallowCopyDelete_Proc_Ptr          p_ShallowCopyDelete;
+  p_Mult_nn_Proc_Ptr                    p_Mult_nn;
+  pp_Mult_nn_Proc_Ptr                   pp_Mult_nn;
+  pp_Mult_mm_Proc_Ptr                   pp_Mult_mm;
+  pp_Mult_mm_Noether_Proc_Ptr           pp_Mult_mm_Noether;
+  p_Mult_mm_Proc_Ptr                    p_Mult_mm;
+  p_Add_q_Proc_Ptr                      p_Add_q;
+  p_Minus_mm_Mult_qq_Proc_Ptr           p_Minus_mm_Mult_qq;
+  p_Neg_Proc_Ptr                        p_Neg;
+  pp_Mult_Coeff_mm_DivSelect_Proc_Ptr   pp_Mult_Coeff_mm_DivSelect;
+  p_Merge_q_Proc_Ptr                    p_Merge_q;
+  p_kBucketSetLm_Proc_Ptr               p_kBucketSetLm;
 } pProcs_s;
 
   

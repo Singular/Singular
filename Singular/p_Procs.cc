@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.22 2000-11-24 19:30:50 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.23 2000-11-28 11:50:55 obachman Exp $
  *******************************************************************/
 #include <string.h>
 
@@ -188,6 +188,7 @@ typedef enum p_Proc
   p_Neg_Proc,
   pp_Mult_Coeff_mm_DivSelect_Proc,
   p_Merge_q_Proc,
+  p_kBucketSetLm_Proc,
   p_Unknown_Proc
 };
 
@@ -279,6 +280,7 @@ char* p_ProcEnum_2_String(p_Proc proc)
       case p_Neg_Proc: return "p_Neg_Proc";
       case pp_Mult_Coeff_mm_DivSelect_Proc: return "pp_Mult_Coeff_mm_DivSelect_Proc";
       case p_Merge_q_Proc: return "p_Merge_q_Proc";
+      case p_kBucketSetLm_Proc: return "p_kBucketSetLm_Proc";
       case p_Unknown_Proc: return "p_Unknown_Proc";
   }
   return "NoProc_2_String";
@@ -425,18 +427,16 @@ static inline void p_Add_q__Filter(p_Length &length, p_Ord &ord)
 static inline void pp_Mult_mm_Noether_Filter(p_Field &field, 
                                              p_Length &length, p_Ord &ord)
 {
-  // filter out all orderings which are not local degree orderings
-  if (! (ord == OrdNomog ||        // (ds, c)
-         ord == OrdNegPomog ||     // (Ds, c)
-         ord == OrdPosNomog ||    // (C, ds)
-         ord == OrdNomogPos ||    // (ds, C)
-         ord == OrdGeneral 
+  if (ord == OrdPomog 
+      || ord == OrdPomogZero
+      || (ord == OrdPomogNeg && length > LengthTwo) 
 #ifdef HAVE_LENGTH_DIFF
-         || ord == OrdNegPomogZero ||
-         ord == OrdNomogZero    // (ds, c) even vars
+      || (ord == OrdPomogZero)
+      || (ord == OrdPomogNegZero && length > LengthThree)
 #endif
-         ))
+      )
   {
+    // all the other orderings might occur (remeber Mixed Orderings!)
     field = FieldGeneral;
     ord = OrdGeneral;
     length = LengthGeneral;
@@ -461,6 +461,17 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
       case pp_Mult_mm_Noether_Proc:
         pp_Mult_mm_Noether_Filter(field, length, ord);
         break;
+        
+      case p_kBucketSetLm_Proc:
+      {
+        if (field != FieldZp)
+        {
+          field = FieldGeneral;
+          length = LengthGeneral;
+          ord = OrdGeneral;
+          return;
+        }
+      }
 
       default: break;
   }
@@ -534,6 +545,7 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
       case p_Add_q_Proc:
       case p_Minus_mm_Mult_qq_Proc:
       case pp_Mult_mm_Noether_Proc:
+      case p_kBucketSetLm_Proc:
         return index(field, length, ord);
         
       case p_Merge_q_Proc:
@@ -565,11 +577,14 @@ static void SetProcs(p_Field field, p_Length length, p_Ord ord);
 #include "p_MemCmp.h"
 #include "p_MemAdd.h"
 #include "p_MemCopy.h"
+#include "kbuckets.h"
+
 #ifdef NDEBUG
 #include "p_Procs.inc"
 #else
 #include "p_Procs_debug.inc"
 #endif
+
 
 // the rest is related to getting the procs
 static inline p_Field p_FieldIs(ring r)
@@ -691,8 +706,11 @@ void p_SetProcs(ring r, p_Procs_s* p_Procs)
     (p_Procs->p_Neg != NULL) &&
     (p_Procs->pp_Mult_Coeff_mm_DivSelect != NULL) &&
     (p_Procs->p_Merge_q != NULL) &&
+    (p_Procs->p_kBucketSetLm != NULL) &&
     (p_Procs->p_Minus_mm_Mult_qq != NULL));
-  assume(p_Procs->pp_Mult_mm_Noether != pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral || r->OrdSgn == 1 || r->LexOrder);
+  assume(p_Procs->pp_Mult_mm_Noether != pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral || 
+         p_Procs->p_Minus_mm_Mult_qq == p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral || 
+         r->OrdSgn == 1 || r->LexOrder);
 }
 
 #ifdef RDEBUG 
@@ -958,6 +976,7 @@ static void SetProcs(p_Field field, p_Length length, p_Ord ord)
   SetProc(p_Mult_mm, field, length, OrdGeneral);
   SetProc(p_Add_q, field, length, ord);
   SetProc(p_Minus_mm_Mult_qq, field, length, ord);
+  SetProc(p_kBucketSetLm, field, length, ord);
   SetProc(p_Neg, field, LengthGeneral, OrdGeneral);
   SetProc(pp_Mult_Coeff_mm_DivSelect, field, length, OrdGeneral);
   SetProc(p_Merge_q, FieldGeneral, length, ord);
