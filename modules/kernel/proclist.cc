@@ -2,7 +2,7 @@
 
 extern void piShowProcList();
 
-BOOLEAN kProclist(leftv res, leftv h)
+BOOLEAN kProclist(leftv res)
 {
   piShowProcList();
   res->rtyp=NONE;

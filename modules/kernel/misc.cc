@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.1 1998-11-19 15:49:24 krueger Exp $ */
+/* $Id: misc.cc,v 1.2 1999-03-19 14:13:27 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -12,10 +12,15 @@ BOOLEAN iiKernelMiscNN(leftv res, leftv h)
 {
   
   idhdl pck = NULL, id = NULL;
-  iiname2hdl((char *)(h->Data()), &pck, &id);
-  if(pck != NULL) Print("Pack: '%s'\n", pck->id);
-  if(id != NULL)  Print("Rec : '%s'\n", id->id);
-
+  printf("myTest 1\n");
+  if(h==NULL) printf("myTest 2\n");
+  else {
+    iiname2hdl((char *)(h->Data()), &pck, &id);
+    printf("myTest 1\n");
+    if(pck != NULL) Print("Pack: '%s'\n", pck->id);
+    if(id != NULL)  Print("Rec : '%s'\n", id->id);
+  }
+  
   res->rtyp=NONE;
   return FALSE;
 }

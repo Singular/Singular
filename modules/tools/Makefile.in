@@ -19,7 +19,7 @@ all	= modgen
 .c.o:
 	gcc -c ${CFLAGS} $<
 
-modgen: ${OBJS} modgen.h decl.inc
+modgen: ${OBJS} modgen.h decl.inc typmap.h
 	gcc -o $@ ${CFLAGS} ${OBJS} ${LIBS}
 
 scanner.cc: scanner.l
