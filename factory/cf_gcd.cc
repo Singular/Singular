@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.19 1998-03-12 10:27:48 schmidt Exp $ */
+/* $Id: cf_gcd.cc,v 1.20 1998-03-12 14:32:36 schmidt Exp $ */
 
 #include <config.h>
 
@@ -55,30 +55,6 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
 	return false;
     return gcd( e( F ), e( G ) ).degree() < 1;
 }
-
-//{{{ static CanonicalForm maxnorm ( const CanonicalForm & f )
-//{{{ docu
-//
-// maxnorm() - return the maximum of the absolute values of all
-//   coefficients of f.
-//
-// The absolute value and the maximum are calculated with respect
-// to operator < on canonical forms which is most meaningful for
-// rational numbers and integers.
-//
-// Used by gcd_poly_univar0().
-//
-//}}}
-static CanonicalForm
-maxnorm ( const CanonicalForm & f )
-{
-    CanonicalForm m = 0;
-    CFIterator i;
-    for ( i = f; i.hasTerms(); i++ )
-	m = tmax( m, abs( i.coeff() ) );
-    return m;
-}
-//}}}
 
 //{{{ static CanonicalForm balance ( const CanonicalForm & f, const CanonicalForm & q )
 //{{{ docu
@@ -213,7 +189,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 // 	maxnorm(f)*power(CanonicalForm(2),f.degree())*isqrt(f.degree()+1),
 // 	maxnorm(g)*power(CanonicalForm(2),g.degree())*isqrt(g.degree()+1)
 // 	)+1;
-    M = tmin( maxnorm(f), maxnorm(g) );
+    M = tmin( maxNorm(f), maxNorm(g) );
     BB = power(CanonicalForm(2),tmin(f.degree(),g.degree()))*M;
     q = 0;
     i = cf_getNumSmallPrimes() - 1;
