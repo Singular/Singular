@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.6 2001-08-08 14:26:56 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.7 2001-08-08 14:27:38 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -261,7 +261,7 @@ SqrFreed( const CanonicalForm & r ){
 #ifdef HAVE_SINGULAR_ERROR
   WerrorS("libfac: ERROR: SqrFreed: we should never fall trough here!");
 #else
-#infdef NOSTREAMIO
+#ifndef NOSTREAMIO
   cerr << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n"
        << rcsid << errmsg << endl;
 #endif
@@ -340,6 +340,9 @@ SqrFree(const CanonicalForm & r ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2001/08/08 14:26:56  Singular
+*hannes: Dan's HAVE_SINGULAR_ERROR
+
 Revision 1.5  2001/08/08 11:59:13  Singular
 *hannes: Dan's NOSTREAMIO changes
 

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.8 2001-08-08 11:59:13 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.9 2001-08-08 14:26:56 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -15,7 +15,10 @@
 #include "Truefactor.h"
 
 #ifdef SINGULAR
-#  define HAVE_SINGULAR
+#define HAVE_SINGULAR_ERROR
+#endif
+
+#ifdef HAVE_SINGULAR_ERROR
    extern "C" { void WerrorS(char *); }
 #endif
 
@@ -355,11 +358,15 @@ TakeNorms(const CFFList & PiList){
   if ( PossibleFactors.length() > 0 ){ // there are (at least two) items
     int n=2;
     if ( PossibleFactors.length() < n ) { // a little check
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
       WerrorS("libfac: ERROR: TakeNorms less then two items remaining!");
 #else
+#ifndef NOSTREAMIO
       cerr << "libfac: ERROR: TakeNorms less then two items remaining! "
            << endl;
+#else
+      ;
+#endif
 #endif
     }
     while ( n < PossibleFactors.length() ){
@@ -397,11 +404,13 @@ TakeNorms(const CFFList & PiList){
         TrueFactors.append(CFFactor(intermediate,1));
       }
       else{
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
         WerrorS("libfac: TakeNorms: somethings wrong with remaining factors!");
 #else
+#ifndef NOSTREAMIO
         cerr << "libfac: TakeNorms: somethings wrong with remaining factors!"
              << endl;
+#endif
 #endif
       }
     }
@@ -412,6 +421,9 @@ TakeNorms(const CFFList & PiList){
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2001/08/08 11:59:13  Singular
+*hannes: Dan's NOSTREAMIO changes
+
 Revision 1.7  2001/08/06 08:32:54  Singular
 * hannes: code cleanup
 
