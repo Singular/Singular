@@ -1,4 +1,4 @@
-// $Id: std_l.tst,v 1.2 1998-07-01 10:11:11 obachman Exp $
+// $Id: std_l.tst,v 1.3 2000-05-15 12:44:58 Singular Exp $
 
 // std_l.tst -- long tests for std
 // uses rcyclic examples from ISSAC'98 paper
@@ -8,8 +8,8 @@ tst_init();
 
 proc msetring(int charac, int nv, string ordering)
 {
-  execute "ring r = " + string(charac) + ",x(1.." + string(nv) + "), " +
-  ordering + ";"; 
+  execute("ring r = " + string(charac) + ",x(1.." + string(nv) + "), " +
+  ordering + ";"); 
   keepring r;
 }
 
