@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.20 2002-05-22 10:30:04 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.21 2003-02-20 13:49:32 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -95,6 +95,8 @@ struct fe_option feOptSpec[] =
 
   {"quiet",             no_argument,        'q',
    0,          "Do not print start-up banner and lib load messages",   feOptBool,    0,      0},
+  {"sort",             no_argument,        's',
+   0,          "// Sort NTL results",                                  feOptBool,    0,      0},
 
   {"random",            required_argument,  'r',
    "SEED",     "Seed random generator with integer (integer) SEED",    feOptInt,    0,      0},
@@ -166,7 +168,7 @@ struct fe_option feOptSpec[] =
   { 0, 0, 0, 0, 0, feOptInt, 0, 0}
 };
 
-const char SHORT_OPTS_STRING[] = "bdhqtvxec:r:u:";
+const char SHORT_OPTS_STRING[] = "bdhqstvxec:r:u:";
 
 //////////////////////////////////////////////////////////////
 //
