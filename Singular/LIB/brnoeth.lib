@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.1 2000-12-11 13:50:19 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.2 2000-12-11 14:16:01 Singular Exp $";
 info="
 LIBRARY:   brnoeth.lib
 
@@ -11,7 +11,15 @@ SEE ALSO:  hnoether_lib, triang_lib
 
 KEYWORDS:  Weierstrass semigroup; Algebraic Geometry codes; Brill-Noether algorithm
 
-MAIN PROCEDURES:
+OVERVIEW:  Implementation of the Brill-Noether algorithm for solving the
+           Riemann-Roch problem and applications in Algebraic Geometry codes.
+           The computation of Weierstrass semigroups is also implemented.@*
+           The procedures are intended only for plane (singular) curves 
+           defined over a prime field of positive charateristic.@* 
+           You can get more information about the library just
+           by reading the end of the file brnoeth.lib.
+
+PROCEDURES:
  Adj_div(f);            computes the conductor of a curve 
  NSplaces(h,A);         computes non-singular places up to given degree
  BrillNoether(D,C);     computes a vector space basis of the linear system L(D)
@@ -28,25 +36,15 @@ AUXILIARY PROCEDURES:
  sys_code(C);           computes an equivalent systematic code
  permute_L(L,P);        applies a permutation to a list
 
-OVERVIEW:  Implementation of the Brill-Noether algorithm for solving the
-           Riemann-Roch problem and applications in Algebraic Geometry codes.
-           The computation of Weierstrass semigroups is also implemented.@*
-           The procedures are intended only for plane (singular) curves 
-           defined over a prime field of positive charateristic.@* 
-           You can get more information about the library just
-           by reading the end of the file brnoeth.lib.
 ";
 
-
 // =============================================================================
-
 
 LIB "matrix.lib";
 LIB "triang.lib";
 LIB "hnoether.lib";
 // -> LIB "general.lib","ring.lib";
 // maybe useful : LIB "linalg.lib","primdec.lib","normal.lib";
-
 
 // =============================================================================
 
