@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.74 2000-11-08 15:34:58 obachman Exp $ */
+/* $Id: kutil.cc,v 1.75 2000-11-08 17:12:32 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -431,7 +431,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
         
         pFalseReturn(p_CheckPolyRing(T->max, tailRing));
         omCheckBinAddrSize(T->max, (tailRing->PolyBin->sizeW)*SIZEOF_LONG);
-#if KDEBUG > 1
+#if KDEBUG > 0
         poly test_max = p_GetMaxExpP(pNext(T->t_p), tailRing);
         p_Setm(T->max, tailRing);
         p_Setm(test_max, tailRing);

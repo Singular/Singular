@@ -6,7 +6,7 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Merge_q__Template.cc,v 1.1 2000-11-03 15:00:01 obachman Exp $
+ *  Version: $Id: p_Merge_q__Template.cc,v 1.2 2000-11-08 17:12:33 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -53,7 +53,7 @@ poly p_Merge_q(poly p, poly q, const ring r)
 
   p_Test(pNext(&rp), r);
 #if PDEBUG > 0
-  pAssume1(l - pLength(pNext(&rp)) == Shorter);
+  pAssume1(l - pLength(pNext(&rp)) == 0);
 #endif  
   return pNext(&rp);
 }

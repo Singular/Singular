@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.20 2000-11-03 16:31:21 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.21 2000-11-08 17:12:33 obachman Exp $
  *******************************************************************/
 #include <string.h>
 
@@ -338,7 +338,7 @@ static inline p_Ord ZeroOrd_2_NonZeroOrd(p_Ord ord, int strict)
  * choosen
  * 
  *******************************************************************/
-static inline void FastP_ProcsFilter(p_Field &field, p_Length &length, p_Ord &ord, const proc)
+static inline void FastP_ProcsFilter(p_Field &field, p_Length &length, p_Ord &ord, const p_Proc proc)
 {
   if (HAVE_FAST_P_PROCS >= 5) return;
   
