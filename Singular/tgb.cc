@@ -1349,6 +1349,9 @@ void pre_comp(poly* p,int & pn,calc_dat* c){
     }
     pa->next=NULL;
   }
+  for(i=0;i<e.n;i++){
+    pDelete(&ip[i]);  
+  }
   omfree(ip);
   omfree(ia);
 }
