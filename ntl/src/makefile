@@ -64,9 +64,9 @@ LDLIBS_CXX=$(LDLIBS)
 CPPFLAGS=
 # arguments for the C preprocessor
 
-PREFIX=/usr/local
-LIBDIR=$(PREFIX)/lib
-INCLUDEDIR=$(PREFIX)/include
+PREFIX=/usr/home/hannes/2-0
+LIBDIR=/usr/home/hannes/2-0/ix86-freebsd/lib
+INCLUDEDIR=/usr/home/hannes/2-0/ix86-freebsd/include
 DOCDIR=$(PREFIX)/doc
 # where to install NTL
 
@@ -294,11 +294,11 @@ LINK_CXX = $(CXX) $(NTL_INCLUDE) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS_CXX)
 
 
 all:
-	make setup1
-	make setup2
-	make setup3
-	make setup4
-	make ntl.a
+	${MAKE} setup1
+	${MAKE} setup2
+	${MAKE} setup3
+	${MAKE} setup4
+	${MAKE} ntl.a
 
 
 # setup1 generates the file ../incluse/NTL/mach_desc.h
@@ -361,7 +361,7 @@ GetTime.o: GetTime.c
 #################################################################
 
 check:
-	make Test
+	${MAKE} Test
 	./Test
 	- sh RemoveProg Test
 	sh TestScript
