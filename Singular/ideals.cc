@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.23 1998-04-29 07:05:25 siebert Exp $ */
+/* $Id: ideals.cc,v 1.24 1998-05-04 11:38:57 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2932,12 +2932,17 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
   poly p,q;
   intvec * convert;
   int i=IDELEMS(kbase),j=IDELEMS(arg),k,pos;
-
+#if 0
   while ((i>0) && (kbase->m[i-1]==NULL)) i--;
   if (idIs0(arg))
     return mpNew(i,1);
   while ((j>0) && (arg->m[j-1]==NULL)) j--;
   result = mpNew(i,j);
+#else
+  result = mpNew(i, j);
+  while ((j>0) && (arg->m[j-1]==NULL)) j--;
+#endif
+
   tempKbase = idCreateSpecialKbase(kbase,&convert);
   for (k=0;k<j;k++)
   {
