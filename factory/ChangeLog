@@ -1,3 +1,18 @@
+Mon Jun 30 15:38:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure: checked into RCS
+	* readcf.cc: checked into RCS
+
+Fri Jun 27 10:33:29 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* bin/makeheader: doc checked
+	* bin/install-sh: doc checked
+	* bin/mkinstalldirs: doc checked
+
+	* bin/makeheader: checked into RCS
+	* bin/install-sh: checked into RCS
+	* bin/mkinstalldirs: checked into RCS
+
 Thu Jun 26 16:06:39 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* GNUmakefile.in: doc checked
@@ -117,146 +132,104 @@ Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 
-	This is a list of most of the changes made after I took the
+	This is a list of most of the changes I made after I took the
 	responsibility for factory development and before I started to
 	update the ChangeLog regularily.  It is unlikely to be complete.
 
-	Besides minor changes at 'source code level' (bug fixes, new
- 	functionality) which are not really visible to the user in general
- 	there are quite a lot of changes at 'organization level' (aka
- 	preprocessor functionality) and at 'distribution level'
- 	(configure, Makefile).
+	Besides minor changes at "source code level" (bug fixes, new
+ 	features) which are not really visible to the user in general
+ 	there are quite a lot of changes at "organization level" (aka
+ 	preprocessor level) and at "distribution level" (configure,
+	Makefile).
 
 
 	First, the changes at distribution level:
 
-	* bin: some useful/necessary scripts added to the distribution
+	* bin: some useful/necessary scripts added to distribution
 	* install-sh: moved to bin
 
-	* ChangeLog: added to the distribution
+	* ChangeLog: added to distribution
 
 	* configure.in: totally rewritten
 
-	* conf.h.in, config.h.in: conf.h.in replaced by a totally
+	* config.h.in, conf.h.in: conf.h.in replaced by a totally
 	  rewritten config.h.in.  Furthermore, config.h is now explecitely
- 	  included in allmost every file of the distribution.
-	* factoryconf.template: the contents of config.h and assert.h is
-	  now pasted into factoryconf.h created from factoryconf.template.
-  	  factoyconf.h is included instead of config.h in all source files
- 	  which are not translated but installed (e.g. templates) and is
-	  installed, too.
+ 	  included in allmost every source file of the distribution.
+	* factoryconf.template: new file. factoyconf.h is included instead
+	  of config.h in all source files which are not translated but
+ 	  installed (e.g. templates).
 
-	* factory.template: rewritten to new makeheader syntax
-	* factory.template, factory.h: factory.h removed from the
+	* factory.template, factory.h: factory.h removed from
 	  distribution, factory.template added since makeheader is now
  	  included in the distribution
+	* factory.template: rewritten to new makeheader syntax
 
-	* factory.template, singfactory.h (SINGULAR): Singular-stuff moved
-	  from singfactory.h to factory.template.  Wrapped by #ifdef
+	* factory.template, singfactory.h: Singular stuff moved from
+	  singfactory.h to factory.template.  Wrapped by #ifdef
 	  SINGULAR.
 	* singfactory.h: removed from distribution
 
-	* gengftables.cc: code for generating gftables added to the
+	* gengftables.cc: code for generating gftables added to
 	  distribution
+
+	* GNUmakefile.in, Makefile.in: Makefile.in replaced by a totally
+	  rewritten GNUmakefile.in
 
 	* INSTALL: removed from distribution since not up to date
 
 	* memman.h, mmalloc.c, mmallocs.c, mmheap.c, mmprivate.h,
 	  mmutil.c, mmallocb.c, mmblock.c, mminit.c, mmspec.c: new memory
-	  manager added to the distribution
-
-	* Makefile.in, GNUmakefile.in: Makefile.in replaced by a totally
-	  rewritten GNUmakefile.in
+	  manager added to distribution
 
 	* mpext.cc, mpext.h, mpfactory.h: removed from distribution.  No
-	  more MULTIPROTOCOL support.
+	  more MP support.
+	* config.h.in (MULTIPROTOCOL): #define MULTIPROTOCOL removed
+	* int_int.h (class InternalInteger): declarations dependent on
+	  #define MULTIPROTOCOL removed
+	* int_rat.h (class InternalRational): declarations dependent on
+	  #define MULTIPROTOCOL removed
 
 	* readcf.cc: added to distribution since not all users have
 	  bison available
 
 
 	Now for the changes at organization level:
-!! Erkl"aren, was DEBOUT/ASSERT/TIMING macros sind
+	If we refer to the "DEBOUT macros", the "ASSERT macros", or the
+	"TIMING macros" we mean one (or more) of the macros defined in
+	debug.h, assert.h, and timing.h, resp.
 
-	* assert.h (NOASSERT, NDEBUG): the define to switch the assertions
-	  off is NOASSERT instead of NDEBUG.  But NDEBUG works, too, for
-	  backward compatibility.
-
-	* assert.h (__ASSERT1, ASSERT1, STICKYASSERT1): new assert macros
-	  which print additional argument
+	* assert.h (NOASSERT, NDEBUG): #define NDEBUG to switch off
+	  assertions replaced by #define NOASSERT.  For sake of backward
+	  compatibility NDEBUG works, too.
 
 	* assert.h (DEBINCLEVEL, DEBDECLEVEL, DEBOUTSL, DEBOUT, DEBOUTLN):
-	  debug functionality moved to debug.h
+	  DEBOUT macros moved to debug.h
 	* assert.cc: renamed to debug.cc
-	* debug.h, debug.cc: new files.  DEBOUT-functionality moved from
-	  assert.h/assert.cc to these files.  All sourcre files which need
-	  this functionality include debug.h.
+	* debug.h, debug.cc: new files.  DEBOUT macros moved from
+	  assert.h/assert.cc to debug.h/debug.cc.  All source files which
+ 	  need these macros include debug.h.
 
 	* assert.h (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT,
-	  PVIRT_CHARCC): PVIRT_*-functionality moved from int_cf.h to
-	  assert.h
+	  PVIRT_CHARCC): PVIRT_*-macros moved from int_cf.h to assert.h
 	* int_cf.h (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT,
-	  PVIRT_CHARCC): PVIRT_-*functionality moved to assert.h
-
-	* assert.h (__WARN, WARN, STICKYWARN): new macros
+	  PVIRT_CHARCC): PVIRT_*-macros moved to assert.h
 
 	* assert.h (__ASSERT, __STICKYASSERT): the preprocessor instead of
  	  fprintf() pastes the message into the format string now
 
---------
-nochmal checken
+	* assert.h (__ASSERT1, ASSERT1, STICKYASSERT1): new macros
 
-	* cf_factor.cc (factorize): dependency on #define MULTIFACTOR
+	* assert.h (__WARN, WARN, STICKYWARN): new macros
+
+	* canonicalform.cc (operator>>): dependency on #define SINGULAR
 	  removed
 
 	* cf_defs.h (INCL_CF_DEFS_H, incl_cf_defs_H): #define
 	  incl_cf_defs_H renamed to #define INCL_CF_DEFS_H so
 	  cf_defs.h is included only once
 
-	* cf_gcd.cc: debug output changed to calls of DEBOUT macros
-	* cf_linsys.cc: debug output rewritten and changed to calls of
-	  DEBOUT macros
-	* fac_berlekamp.cc (QPrintFF, QPrintGF): definition and calls of
-	  QPrintFF(), QPrintGF() wrapped by #ifdef DEBUGOUTPUT
-	* fac_univar.cc: debug output rewritten
-	  (hprint): calls to hprint() wrapped by calls to #define
- 	  DEBOUTHPRINT, which definition depends on #define DEBUGOUTPUT
-	  (instead of NDEBUG, as before).  All callers changed.
-
-	* timing.h (TIMING_DEFINE_PRINT, TIMING_END_AND_PRINT): stream IO
-	  changed to std IO
-
-	* cf_linsys.cc: superfluous #define TIMING removed
-	* fac_distrib.cc: superfluous #undef DEBUGOUTPUT removed
-	* fac_ezgcd.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
-	  and #includes removed
-	* fac_multihensel.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
+	* cf_factor.cc (factorize): dependency on #define MULTIFACTOR
 	  removed
-	* fac_multivar.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
-	  removed
-	* fac_univar.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
-	  and #includes removed
-
-========
-ab hier fertig
-
-	* config.h.in (GFTABLEDIR): new #define
-	* gfops.cc (gf_get_table): uses #define GFTABLEDIR to get path
-	  to the GF(q) tables
-
-	* config.h.in (MDEBUG, NOASSERT, TIMING, DEBUGOUTPUT): new
-	  #defines
-
-	* config.h.in (MULTIPROTOCOL): #define MULTIPROTOCOL removed.  No
-	  more MP support.
-	* int_int.h (class InternalInteger): declarations dependent on
-	  #define MULTIPROTOCOL removed
-	* int_rat.h (class InternalRational): declarations dependent on
-	  #define MULTIPROTOCOL removed
-
-	* config.h.in (NOSTREAMIO): new #define NOSTREAMIO to switch off
-	  stream IO.  Operators <<, >>, and related stuff wrapped by
- 	  #ifndef NOSTREAMIO.
 
 	* cf_factory.cc (CFFactory::basic( int, int )): error message
 	  changed to call of ASSERT macros
@@ -274,24 +247,50 @@ ab hier fertig
 	  ListIterator<T>::getItem): error messages changed to calls of
 	  ASSERT macros
 
-	* templates/matrix.cc (ASSERT): definition of ASSERT macros
-	  replaced by inclusion of factoryconf.h
+	* cf_gcd.cc: debug output changed to calls of DEBOUT macros
+	* cf_linsys.cc: debug output rewritten and changed to calls of
+	  DEBOUT macros
+	* fac_berlekamp.cc (QPrintFF, QPrintGF): definition and calls of
+	  QPrintFF(), QPrintGF() wrapped by #ifdef DEBUGOUTPUT
+	* fac_univar.cc: debug output rewritten
+	  (hprint): calls to hprint() wrapped by calls to #define
+ 	  DEBOUTHPRINT, which definition depends on #define DEBUGOUTPUT
+	  (instead of NDEBUG, as before).  All callers changed.
 
-	* fac_univar.cc (ZFactorizeUnivariate): timing stuff changed to
-	  calls of TIMING macros
+	* cf_linsys.cc: superfluous #define TIMING removed
+	* fac_distrib.cc: superfluous #undef DEBUGOUTPUT removed
+	* fac_ezgcd.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
+	  and #includes removed
+	* fac_multihensel.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
+	  removed
+	* fac_multivar.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
+	  removed
+	* fac_univar.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
+	  and #includes removed
+
+	* config.h.in (GFTABLEDIR): new #define
+	* gfops.cc (gf_get_table): uses #define GFTABLEDIR to get path
+	  to the GF(q) tables
+
+	* config.h.in (MDEBUG, NOASSERT, TIMING, DEBUGOUTPUT): new
+	  #defines
+
+	* config.h.in (NOSTREAMIO): new #define NOSTREAMIO to switch off
+	  stream IO.  Operators <<, >>, and related stuff wrapped by
+ 	  #ifndef NOSTREAMIO.
 
 	* debug.cc (deb_level, level_msg, deb_inc_level):
 	  deb_inc_level()'s output made more pretty at time of first call
-
-	* debug.h (DEBUGOUTPUT): #define DEBUGOUTPUT is switched off now
-	  if #define NDEBUG is switched on
 
 	* debug.h (DEBOUT, DEBOUTLN): slightly modified so they print
 	  "objects" instead of only one "msg" and one "object".  All
  	  callers changed.
 
-	* canonicalform.cc (operator>>): dependency on #define SINGULAR
-	  removed
+	* debug.h (DEBUGOUTPUT): #define DEBUGOUTPUT is switched off now
+	  if #define NDEBUG is switched on
+
+	* fac_univar.cc (ZFactorizeUnivariate): timing stuff changed to
+	  calls of TIMING macros
 
 	* gmpext.h: references to #define INCL_GCDEXT_H replaced by
 	  references to #define INCL_GMPEXT_H
@@ -306,10 +305,16 @@ ab hier fertig
 
 	* readcf.y: dependency on #define COMEAU removed
 
-	* timing.h (TIMING_END_AND_PRINT): new macro
+	* templates/matrix.cc (ASSERT): definition of ASSERT macros
+	  replaced by inclusion of factoryconf.h
 
 	* timing.h (HZ): new #define to calculate ticks per second in a
 	  more portable way.  All references changed.
+
+	* timing.h (TIMING_DEFINE_PRINT, TIMING_END_AND_PRINT): stream IO
+	  changed to std IO
+
+	* timing.h (TIMING_END_AND_PRINT): new macro
 
 
 	Last not least, changes at source code level:
