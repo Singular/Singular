@@ -137,7 +137,7 @@ AC_CHECK_PROGS(MYGZIP, gzip, ${pwd}/warn_not_found.sh gzip)
 AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html)
 AC_PROG_LN_S
 
-if test -e "${pwd}/mkinstalldirs"; then
+if test -r "${pwd}/mkinstalldirs"; then
   MKINSTALLDIRS=${pwd}/mkinstalldirs
   AC_SUBST(MKINSTALLDIRS)
 else

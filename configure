@@ -1467,7 +1467,7 @@ else
 fi
 
 
-if test -e "${pwd}/mkinstalldirs"; then
+if test -r "${pwd}/mkinstalldirs"; then
   MKINSTALLDIRS=${pwd}/mkinstalldirs
   
 else
