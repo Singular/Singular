@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_array.cc,v 1.0 1996-05-17 11:06:32 stobbe Exp $
+// $Id: ftmpl_array.cc,v 1.1 1996-07-16 12:24:56 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 11:06:32  stobbe
+Initial revision
+
 */
 
 #include <templates/array.h>
@@ -115,6 +118,7 @@ int Array<T>::max() const
     return _max;
 }
 
+/*
 template <class T>
 Array<T>& Array<T>::operator*= ( const T & t )
 {
@@ -141,6 +145,7 @@ Array<T>& Array<T>::operator+= ( const Array<T> & a )
 	    data[i] += a.data[i];
     return *this;
 }
+*/
 
 template <class T>
 void Array<T>::print ( ostream & os ) const
@@ -162,53 +167,3 @@ ostream& operator<< ( ostream & os, const Array<T> & a )
     return os;
 }
 
-template <class T>
-T sum ( const Array<T> & a, int f, int l )
-{
-    if ( f < a.min() ) f = a.min();
-    if ( l > a.max() ) l = a.max();
-    T s = 0;
-    for ( int i = f; i <= l; i++ )
-	s += a[i];
-    return s;
-}
-
-template <class T>
-T prod ( const Array<T> & a, int f, int l )
-{
-    if ( f < a.min() ) f = a.min();
-    if ( l > a.max() ) l = a.max();
-    T p = 1;
-    for ( int i = f; i <= l; i++ )
-	p *= a[i];
-    return p;
-}
-
-template <class T>
-T sum ( const Array<T> & a )
-{
-    return sum( a, a.min(), a.max() );
-}
-
-template <class T>
-T prod ( const Array<T> & a )
-{
-    return prod( a, a.min(), a.max() );
-}
-
-
-template <class T>
-T crossprod ( const Array<T> & a, const Array<T> & b )
-{
-    if ( a.size() != b.size() ) {
-	cerr << "warning: array size mismatch." << endl;
-	return 0;
-    }
-    T s = 0;
-    int fa = a.min();
-    int fb = b.min();
-    int n = a.max();
-    for ( ; fa <= n; fa++, fb++ )
-	s += a[fa] * b[fb];
-    return s;
-}
