@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.3 2004-08-04 13:21:55 Singular Exp $ */
+/* $Id: longrat.cc,v 1.4 2004-08-04 13:58:06 levandov Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1205,10 +1205,10 @@ void nlNormalize (number &x)
       int l;
       if ((mpz_alloc1(&x->n)>>1) >= (l=mpz_size1(&x->n)))
       {
-        _mpz_realloc(&x->n,il /* mpz_size1(&x->n)*/);
+        _mpz_realloc(&x->n,l /* mpz_size1(&x->n)*/);
       }
     }
-    if (divided)i
+    if (divided)
     {
       int l;
       if ((mpz_alloc1(&x->z)>>1) >= (l=mpz_size1(&x->z)))
