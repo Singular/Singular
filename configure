@@ -1368,7 +1368,7 @@ if test "$with_gmp" != no; then
   else
     ac_with_gmp=yes
   fi
-  if test "$ac_with_gmp" = yes; then
+  if test "$ac_with_gmp"=yes; then
     if test "$with_gmp" != yes; then
       with_gmp=yes
       ac_configure_args="$ac_configure_args --with-gmp"
@@ -1403,7 +1403,7 @@ if test "$with_MP" != no; then
   else
     ac_with_MP=yes
   fi
-  if test "$ac_with_MP" = yes; then
+  if test "$ac_with_MP"=yes; then
     if test "$with_MP" != yes; then
       with_MP=yes
       ac_configure_args="$ac_configure_args --with-MP"
@@ -1438,7 +1438,7 @@ if test "$with_factory" != no; then
   else
     ac_with_factory=yes
   fi
-  if test "$ac_with_factory" = yes; then
+  if test "$ac_with_factory"=yes; then
     if test "$with_factory" != yes; then
       with_factory=yes
       ac_configure_args="$ac_configure_args --with-factory"
@@ -1473,7 +1473,7 @@ if test "$with_libfac" != no; then
   else
     ac_with_libfac=yes
   fi
-  if test "$ac_with_libfac" = yes; then
+  if test "$ac_with_libfac"=yes; then
     if test "$with_libfac" != yes; then
       with_libfac=yes
       ac_configure_args="$ac_configure_args --with-libfac"
@@ -1499,7 +1499,7 @@ if test "$with_Singular" != no; then
   else
     ac_with_Singular=no
   fi
-  if test "$ac_with_Singular" = yes; then
+  if test "$ac_with_Singular"=yes; then
     if test "$with_Singular" != yes; then
       with_Singular=yes
       ac_configure_args="$ac_configure_args --with-Singular"
