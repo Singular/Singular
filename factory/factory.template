@@ -1,10 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: factory.template,v 1.1 1996-12-18 14:53:45 schmidt Exp $ */
+/* $Id: factory.template,v 1.2 1997-03-27 09:58:45 schmidt Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
 
+#ifndef NOSTREAMIO
 #include <iostream.h>
+#endif /* NOSTREAMIO */
 
 #include <templates/array.h>
 #include <templates/factor.h>
@@ -23,9 +25,9 @@
 
 .INCLUDE cf_generator.h
 
-.INCLUDE cf_random.h
+.INCLUDE cf_globals.h
 
-.INCLUDE cf_irred.h
+.INCLUDE cf_random.h
 
 .INCLUDE cf_eval.h
 
@@ -36,6 +38,8 @@
 .INCLUDE cf_map.h
 
 .INCLUDE fac_util.h
+
+.INCLUDE cf_irred.h
 
 .INCLUDE cf_primes.h
 
