@@ -330,6 +330,7 @@ TSingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
 	${LDFLAGS}  ${LIBS} -lomalloc_ndebug mmalloc.o
 
 feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
+extra.o: feOpt.inc
 
 feOpt.inc: feOpt.cc mod2.h feOpt.h
 	$(CXX) -DGENERATE_OPTION_INDEX feOpt.cc -o feOpt
