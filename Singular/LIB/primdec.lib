@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.29 1998-11-04 14:39:44 Singular Exp $
+// $Id: primdec.lib,v 1.30 1999-03-15 12:18:28 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.29 1998-11-04 14:39:44 Singular Exp $";
+version="$Id: primdec.lib,v 1.30 1999-03-15 12:18:28 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -486,6 +486,13 @@ proc primaryTest (ideal i, poly p)
 
       i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
 
+      if(i[m]==0)
+      {
+         "Warning: The characteristic ist too small to use";
+         "the Algorithm of Gianni/Trager/Zacharias.";
+         "The result may be wrong.";
+         "Try primdecSY";
+      }
       if (reduce(i[m]-t^e,prm,1) !=0)
       {
         return(ideal(0));
@@ -2127,6 +2134,7 @@ EXAMPLE: example decomp; shows an example
 
      for(@n=1;@n<=size(uprimary);@n++)
      {
+        uprimary[@n]=interred(uprimary[@n]); // temporary fix
         hpl=0;
         for(@n1=1;@n1<=size(uprimary[@n]);@n1++)
         {
@@ -2134,6 +2142,7 @@ EXAMPLE: example decomp; shows an example
         }
         saturn[@n]=hpl;
      }
+
      //--------------------------------------------------------------------
      //we leave  the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
      //back to the polynomialring
@@ -4191,11 +4200,12 @@ EXAMPLE: example radical; shows an example
    }
    for(j=1;j<=s;j++)
    {
-      if(pos[j]==0)
+      if(pos[s+1-j]==0)
       {
          re=intersect(re,radicalEHV(pr[s+1-j],re,il));
       }
    }
+   re=interred(re);
    return(phi(re));
 }
 example
