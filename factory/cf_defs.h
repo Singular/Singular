@@ -1,11 +1,14 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_defs.h,v 1.3 1997-04-02 13:06:25 schmidt Exp $
+// $Id: cf_defs.h,v 1.4 1997-04-15 10:16:22 schmidt Exp $
 
 #ifndef INCL_CF_DEFS_H
 #define INCL_CF_DEFS_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/04/02 13:06:25  schmidt
+inclusion of configuration header removed
+
 Revision 1.2  1996/07/08 08:16:06  stobbe
 "New definition of the level system.
 "
@@ -18,6 +21,8 @@ Revision 1.0  1996/05/17 10:59:38  stobbe
 Initial revision
 
 */
+
+#include <config.h>
 
 /*BEGINPUBLIC*/
 
@@ -40,6 +45,7 @@ Initial revision
 #define SW_FAC_USE_BIG_PRIMES 4
 #define SW_FAC_QUADRATICLIFT 5
 #define SW_USE_EZGCD 6
+#define SW_USE_SPARSEMOD 7
 
 /*ENDPUBLIC*/
 
