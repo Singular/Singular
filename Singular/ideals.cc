@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.46 1999-05-17 13:33:25 Singular Exp $ */
+/* $Id: ideals.cc,v 1.47 1999-05-19 11:41:46 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1706,10 +1706,12 @@ ideal  idLift (ideal  mod,ideal submod)
         {
           if (!reported)
           {
-            Warn("first module not a standardbasis(comp=%d,k=%d), q=",
-	      pMinComp(q),k);
-	      pWrite(q);
-            Warn("or second not a proper submodule");
+            WarnS("first module not a standardbasis\n"
+	    "or second not a proper submodule");
+            //Warn("first module not a standardbasis(comp=%d,k=%d), q=",
+	    //  pMinComp(q),k);
+	    //  pWrite(q);
+            //WarnS("or second not a proper submodule");
             reported=TRUE;
           }
           pDelete(&q);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.147 1999-05-07 15:41:34 Singular Exp $ */
+/* $Id: iparith.cc,v 1.148 1999-05-19 11:41:48 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4295,7 +4295,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
   ideal id=idInit(s,1);
   int rank=1;
   int i=0;
-  poly p=NULL;
+  poly p;
   while (h!=NULL)
   {
     switch(h->Typ())
@@ -4315,7 +4315,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
         }
         else
         {
-          //p=NULL;
+          p=NULL;
           nDelete(&n);
         }
         break;
@@ -4330,7 +4330,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
         }
         else
         {
-          //p=NULL;
+          p=NULL;
           nDelete(&n);
         }
         break;
