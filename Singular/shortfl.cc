@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.5 1997-05-06 18:04:53 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.6 1997-11-24 12:58:46 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -299,9 +299,130 @@ BOOLEAN nrDBTest(number a, char *f, int l)
 }
 #endif
 
+/* in longrat.h
+typedef MP_INT lint;
+#define SR_INT    1
+#ifdef HAVE_LIBGMP1
+#define mpz_size1(A) (ABS((A)->size))
+#else
+#define mpz_size1(A) (ABS((A)->_mp_size))
+#endif
+*/
+#define SR_HDL(A) ((long)(A))
+#ifdef HAVE_LIBGMP1
+#define mpz_isNeg(A) ((A)->size<0)
+#define mpz_limb_size(A) ((A)->size)
+#define mpz_limb_d(A) ((A)->d)
+#define MPZ_DIV(A,B,C) mpz_div((A),(B),(C))
+#else
+#define mpz_isNeg(A) ((A)->_mp_size<0)
+#define mpz_limb_size(A) ((A)->_mp_size)
+#define mpz_limb_d(A) ((A)->_mp_d)
+#define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
+#endif
+#define IS_INT(A) ((A)->s==3)
+#define IS_IMM(A) (SR_HDL(A)&SR_INT)
+#define GET_NOM(A) &((A)->z)
+#define GET_DENOM(A) &((A)->n)
+#define MPZ_INIT mpz_init
+#define MPZ_CLEAR mpz_clear
+
 static number nrMap0(number from)
 {
-  return nrInit(nlInt(from));
+  lint h,*g,*z,*n;
+  int i,j,t,s;
+  float ba,rr,rn,y;
+
+  if (IS_IMM(from))
+    return nf((float)nlInt(from)).N();
+  z=GET_NOM(from);
+  s=0X10000;
+  ba=(float)s;
+  ba*=ba;
+  rr=0.0;
+  i=mpz_size1(z);
+  if(IS_INT(from))
+  {
+    if(i>4)
+    {
+      Werror("float overflow");
+      return nf(rr).N();
+    }
+    i--;
+    rr=(float)mpz_limb_d(z)[i];
+    while(i)
+    {
+      i--;
+      y=(float)mpz_limb_d(z)[i];
+      rr=rr*ba+y;
+    }
+    if(mpz_isNeg(z))
+      rr=-rr;
+    return nf(rr).N();
+  }
+  n=GET_DENOM(from);
+  j=s=mpz_limb_size(n);
+  if(j>i)
+  {
+    g=n;
+    n=z;
+    z=g;
+    t=j;
+    j=i;
+    i=t;
+  }
+  t=i-j;
+  if(t>4)
+  {
+    if(j==s)
+      Werror("float overflow");
+    return nf(rr).N();
+  }
+  if(t>1)
+  {
+    g=&h;
+    MPZ_INIT(g);
+    MPZ_DIV(g,z,n);
+    t=mpz_size1(g);
+    if(t>4)
+    {
+      MPZ_CLEAR(g);
+      if(j==s)
+        Werror("float overflow");
+      return nf(rr).N();
+    }
+    t--;
+    rr=(float)mpz_limb_d(g)[t];
+    while(t)
+    {
+      t--;
+      y=(float)mpz_limb_d(g)[t];
+      rr=rr*ba+y;
+    }
+    MPZ_CLEAR(g);
+    if(j!=s)
+      rr=1.0/rr;
+    if(mpz_isNeg(z))
+      rr=-rr;
+    return nf(rr).N();
+  }
+  rn=(float)mpz_limb_d(n)[j-1];
+  rr=(float)mpz_limb_d(z)[i-1];
+  if(j>1)
+  {
+    rn=rn*ba+(float)mpz_limb_d(n)[j-2];
+    rr=rr*ba+(float)mpz_limb_d(z)[i-2];
+    i--;
+  }
+  if(t!=0)
+    rr=rr*ba+(float)mpz_limb_d(z)[i-2];
+  if(j==s)
+    rr=rr/rn;
+  else
+    rr=rn/rr;
+  if(mpz_isNeg(z))
+    rr=-rr;
+  return nf(rr).N();
 }
 
 static number nrMapP(number from)
