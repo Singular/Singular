@@ -1115,7 +1115,7 @@ int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:1119: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1119: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   ac_cv_cxx_have_exceptions=yes
 else

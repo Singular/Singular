@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.30 2000-12-14 15:37:57 obachman Exp $
+dnl # $Id: configure.in,v 1.31 2000-12-14 17:32:32 Singular Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.30 2000-12-14 15:37:57 obachman Exp $)
+AC_REVISION($Id: configure.in,v 1.31 2000-12-14 17:32:32 Singular Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -384,7 +384,7 @@ AC_MSG_CHECKING(whether gcc accepts --no-exceptions)
 tmp_flags=${CXXFLAGS}
 CXXFLAGS="${CXXFLAGS} --no-exceptions"
 AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
-AC_TRY_COMPILE(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
+AC_TRY_LINK(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
 )
 AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
 CXXFLAGS=$tmp_flags

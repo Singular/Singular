@@ -115,7 +115,7 @@ fi
 AC_MSG_CHECKING(whether gcc accepts --no-exceptions)
 CXXFLAGS="${CXXFLAGS} --no-exceptions"
 AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
-AC_TRY_COMPILE(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
+AC_TRY_LINK(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
 )
 AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
 if test "${ac_cv_cxx_have_exceptions}" != yes; then
