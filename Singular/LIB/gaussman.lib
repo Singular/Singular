@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.12 2000-12-06 11:21:03 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.13 2000-12-06 12:34:50 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -264,7 +264,6 @@ EXAMPLE: example monomat; shows an example
     dbprint(printlevel-voice+2,"//gaussman::monomat: mide="+string(mide));
 
     intvec b;
-    b[mu]=0;
     U=0;
     module dU;
     A0=jet(A,0);
@@ -299,7 +298,7 @@ EXAMPLE: example monomat; shows an example
         }
       }
     }
-    for(j,k=ncols(b),mu;j>=1;j--)
+    for(j,k=ncols(e),mu;j>=1;j--)
     {
       for(i=b[j];i>=1;i--)
       {
