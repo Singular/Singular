@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_resultant.cc,v 1.2 1997-09-01 10:33:42 schmidt Exp $ */
+/* $Id: cf_resultant.cc,v 1.3 1997-09-04 14:49:29 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -15,6 +15,7 @@
 
 #include "canonicalform.h"
 #include "variable.h"
+#include "cf_algorithm.h"
 
 //{{{ CFArray subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
