@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.22 1998-01-27 15:13:10 pohl Exp $ */
+/* $Id: ipassign.cc,v 1.23 1998-03-06 11:51:14 krueger Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -332,7 +332,8 @@ static BOOLEAN jiA_STRING(leftv res, leftv a, Subexpr e)
 static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
 {
   extern procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname,
-				   char *procname, int line, long pos);
+					  char *procname, int line,
+					  long pos, BOOLEAN pstatic=FALSE);
   extern void piCleanUp(procinfov pi);
 
   if(res->data!=NULL) piCleanUp((procinfo *)res->data);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.22 1998-02-27 14:06:16 Singular Exp $ */
+/* $Id: grammar.y,v 1.23 1998-03-06 11:51:13 krueger Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -46,8 +46,8 @@
 #include "lists.h"
 
 
-procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname,
-                                 char *procname, int line, long pos);
+procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname, char *procname,
+				 int line, long pos, BOOLEAN pstatic=FALSE);
 
 extern int   yylineno;
 extern FILE* yyin;
