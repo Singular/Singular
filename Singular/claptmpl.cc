@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.14 1998-04-08 13:18:18 pohl Exp $
+// $Id: claptmpl.cc,v 1.15 1998-06-03 14:48:18 pohl Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -31,6 +31,7 @@
       template List<CFFactor> Union<CFFactor>(const List<CFFactor>&,const List<CFFactor>&);
       template List<Variable> Union<Variable> ( const List<Variable>&, const List<Variable>& );
       template List<Variable> Difference<Variable> ( const List<Variable>&, const List<Variable>& );
+      template int operator == ( const Factor<CanonicalForm>&, const Factor<CanonicalForm>& );
     #endif
 
     template class Factor<CanonicalForm>;
@@ -50,6 +51,7 @@
 
     #ifndef __MWERKS__
       template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
+      template int operator == ( const Factor<CanonicalForm>&, const Factor<CanonicalForm>& );
 
       template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
       template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
