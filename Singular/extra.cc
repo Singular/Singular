@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.57 1998-06-13 13:24:26 obachman Exp $ */
+/* $Id: extra.cc,v 1.58 1998-06-14 13:46:03 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -50,7 +50,7 @@
 #include "polys.h"
 
 // Define to enable many more system commands
-// #define HAVE_EXTENDED_SYSTEM
+//#define HAVE_EXTENDED_SYSTEM
 
 #ifdef STDTRACE
 //#include "comm.h"
@@ -124,7 +124,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         r = (ring) h->next->Data();
       }
       res->rtyp = INT_CMD;
-      res->data = (void*) rBlocks(r) - 1;
+      res->data = (void*) (rBlocks(r) - 1);
       return FALSE;
     }
 /*==================== version ==================================*/
@@ -280,9 +280,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     if (strcmp((char*)(h->data), "Singular") == 0)
     {
       res->rtyp=STRING_CMD;
-      res->data=(void*)feGetExpandedExecutable();
-      if (res->data != NULL)
-        res->data = (void*) mstrdup((char*) res->data);
+      char *r=feGetExpandedExecutable();
+      if (r != NULL)
+        res->data = (void*) mstrdup( r );
       else
         res->data = (void*) mstrdup("");
       return FALSE;
@@ -296,14 +296,16 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 
       if (mainGetSingOptionValue(&((char*)(h->data))[2], &val))
       {
-        res->data = (void*) val;
         if ((unsigned int) val > 1)
         {
           res->rtyp=STRING_CMD;
-          res->data = (void*) mstrdup((char*) res->data);
+          res->data = (void*) mstrdup( val );
         }
         else
+	{
           res->rtyp=INT_CMD;
+          res->data=(void *)val;
+	}
         return FALSE;
       }
       else
@@ -363,8 +365,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
    if(strcmp((char*)(h->Data()),"contributors") == 0)
    {
      res->rtyp=STRING_CMD;
-     res->data=(void *)
-       "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Thomas Siebert, Ruediger Stobbe, Tim Wichmann";
+     res->data=(void *)mstrdup(
+       "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Thomas Siebert, Ruediger Stobbe, Tim Wichmann");
      return FALSE;
    }
    else
@@ -573,7 +575,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           }
         }
         res->rtyp=POLY_CMD;
-        res->data=(void *)fglmLinearCombination((ideal)h->next->Data(),(poly)h->next->next->Data());
+        res->data=(void *) fglmLinearCombination(
+	                   (ideal)h->next->Data(),(poly)h->next->next->Data());
         return FALSE;
       }
       else
@@ -594,7 +597,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           }
         }
         res->rtyp=POLY_CMD;
-        res->data=(void *)fglmNewLinearCombination((ideal)h->next->Data(),(poly)h->next->next->Data());
+        res->data=(void *)fglmNewLinearCombination(
+	                    (ideal)h->next->Data(),(poly)h->next->next->Data());
         return FALSE;
       }
       else
@@ -674,8 +678,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if ((hh!=NULL)&&(IDTYP(hh)==PROC_CMD))
       {
         res->rtyp=STRING_CMD;
-        res->data=mstrdup(iiGetLibName(IDPROC(hh)));
-        if (res->data==NULL) res->data=mstrdup("");
+        char *r=iiGetLibName(IDPROC(hh));
+	if (r==NULL) r="";
+        res->data=mstrdup(r);
         return FALSE;
       }
       else
@@ -718,8 +723,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== proclist =================================*/
     if(strcmp((char*)(h->Data()),"proclist")==0)
     {
-      //res->rtyp=STRING_CMD;
-      //res->data=(void *)mstrdup("");
       piShowProcList();
       return FALSE;
     }
@@ -739,10 +742,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 
         fprintf(stderr, "Loading %s\n", h->next->Data());
         res->data=(void *)mstrdup("");
-        if((vp=dlopen(h->next->Data(),RTLD_LAZY))==(void *)NULL) {
+        if((vp=dlopen(h->next->Data(),RTLD_LAZY))==(void *)NULL)
+	{
           WerrorS("dlopen failed");
           Werror("%s not found", h->next->Data());
-        } else {
+        }
+	else
+	{
           fktn = dlsym(vp, "mod_init");
           if( fktn!= NULL) (*fktn)(iiAddCproc);
           else Werror("mod_init: %s\n", dlerror());
@@ -791,7 +797,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 
 
 //  PrintS("Bin jetzt in extra.cc bei der Auswertung.\n"); // **********
- 
+
 
       lists L=(lists)Alloc(sizeof(slists));
       L->Init(6);
@@ -803,34 +809,34 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       L->m[2].data=(void *)r.deg;            // #degenerations
       if ( r.deg != 0)              // only if degenerations exist
       {
-          L->m[3].rtyp=INT_CMD;
-          L->m[3].data=(void *)r.anz_punkte;     // #points
-          //---<>--number of points------
-          int anz = r.anz_punkte;    // number of points
-          int dim = (currRing->N);     // dimension
-          intvec* v = new intvec( anz*dim );
-          for (i=0; i<anz*dim; i++)    // copy points
-            (*v)[i] = r.pu[i];
-          L->m[4].rtyp=INTVEC_CMD;
-          L->m[4].data=(void *)v;     
-          //---<>--degenerations---------
-          int deg = r.deg;    // number of points
-          intvec* w = new intvec( r.speicher );  // necessary memeory
-          i=0;               // start copying
-          do 
-            {
-              (*w)[i] = r.deg_tab[i];
-              i++;
-            }
-          while (r.deg_tab[i-1] != -2);   // mark for end of list
-          L->m[5].rtyp=INTVEC_CMD;
-          L->m[5].data=(void *)w;     
+        L->m[3].rtyp=INT_CMD;
+        L->m[3].data=(void *)r.anz_punkte;     // #points
+        //---<>--number of points------
+        int anz = r.anz_punkte;    // number of points
+        int dim = (currRing->N);     // dimension
+        intvec* v = new intvec( anz*dim );
+        for (i=0; i<anz*dim; i++)    // copy points
+          (*v)[i] = r.pu[i];
+        L->m[4].rtyp=INTVEC_CMD;
+        L->m[4].data=(void *)v;
+        //---<>--degenerations---------
+        int deg = r.deg;    // number of points
+        intvec* w = new intvec( r.speicher );  // necessary memeory
+        i=0;               // start copying
+        do
+        {
+          (*w)[i] = r.deg_tab[i];
+          i++;
+        }
+        while (r.deg_tab[i-1] != -2);   // mark for end of list
+        L->m[5].rtyp=INTVEC_CMD;
+        L->m[5].data=(void *)w;
       }
       else
       {
-          L->m[3].rtyp=INT_CMD; L->m[3].data=(char *)0;
-          L->m[4].rtyp=DEF_CMD; 
-          L->m[5].rtyp=DEF_CMD;
+        L->m[3].rtyp=INT_CMD; L->m[3].data=(char *)0;
+        L->m[4].rtyp=DEF_CMD;
+        L->m[5].rtyp=DEF_CMD;
       }
 
       res->data=(void *)L;
