@@ -20,8 +20,8 @@
     * extended fe_option structure    
 */
 
-#ifndef _GETOPT_H
-#define _GETOPT_H 1
+#ifndef FEGETOPT_H
+#define FEGETOPT_H 1
 
 #ifdef        __cplusplus
 extern "C" {
