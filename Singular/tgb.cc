@@ -1042,6 +1042,238 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   
 
 }
+
+
+static int iq_crit(const void* ap,const void* bp){
+
+  sorted_pair_node* a=*((sorted_pair_node**)ap);
+  sorted_pair_node* b=*((sorted_pair_node**)bp);
+  assume(a->i>a->j);
+  assume(b->i>b->j);
+  int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
+  if(comp!=0)
+    return comp;
+  if (a->deg<b->deg) return -1;
+  if (a->deg>b->deg) return 1;
+
+
+  if (a->expected_length<b->expected_length) return -1;
+  if (a->expected_length>b->expected_length) return 1;
+  if (a->j>b->j) return 1;
+  if (a->j<b->j) return -1;
+  return 0;
+}
+
+static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,calc_dat* c, int* ip)
+{
+
+  assume(h!=NULL);
+//  BOOLEAN corr=lenS_correct(c->strat);
+  BOOLEAN R_found=FALSE;
+  void* hp;
+
+  ++(c->n);
+  ++(c->S->ncols);
+  int i,j;
+  i=c->n-1;
+  sorted_pair_node** nodes=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
+  int spc=0;
+  c->T_deg=(int*) omrealloc(c->T_deg,c->n*sizeof(int));
+  c->T_deg[i]=pTotaldegree(h);
+  hp=omrealloc(c->rep, c->n *sizeof(int));
+  if (hp!=NULL){
+    c->rep=(int*) hp;
+  } else {
+    exit(1);
+  }
+  c->short_Exps=(long *) omrealloc(c->short_Exps ,c->n*sizeof(long));
+
+  hp=omrealloc(c->lengths, c->n *sizeof(int));
+  if (hp!=NULL){
+    c->lengths=(int*) hp;
+  } else {
+    exit(1);
+  }
+  c->lengths[i]=pLength(h);
+  hp=omrealloc(c->states, c->n * sizeof(char*));
+ 
+    c->states=(char**) hp;
+  c->gcd_of_terms=(poly*) omrealloc(c->gcd_of_terms, c->n *sizeof(poly));
+  c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
+  c->rep[i]=i;
+  hp=omalloc(i*sizeof(char));
+  if (hp!=NULL){
+    c->states[i]=(char*) hp;
+  } else {
+    exit(1);
+  }
+  hp=omrealloc(c->S->m,c->n*sizeof(poly));
+  if (hp!=NULL){
+    c->S->m=(poly*) hp;
+  } else {
+    exit(1);
+  }
+  c->S->m[i]=h;
+  c->short_Exps[i]=p_GetShortExpVector(h,c->r);
+  for (j=0;j<i;j++){
+    
+    //check product criterion
+    
+    c->states[i][j]=UNCALCULATED;
+    assume(p_LmDivisibleBy(c->S->m[i],c->S->m[j],c->r)==
+	   p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r));
+    if(!c->F4_mode)
+    {
+      assume(!(p_LmDivisibleBy(c->S->m[j],c->S->m[i],c->r)));
+    }
+    //lies I[i] under I[j] ?
+    
+    if ((c->lengths[i]==1) && (c->lengths[j]==1))
+      c->states[i][j]=HASTREP;
+    else if (pHasNotCF(c->S->m[i],c->S->m[j]))
+    {
+      c->easy_product_crit++;
+      c->states[i][j]=HASTREP;
+    }
+    else if(extended_product_criterion(c->S->m[i],c->gcd_of_terms[i],c->S->m[j],c->gcd_of_terms[j],c))
+    {
+      c->states[i][j]=HASTREP;
+      c->extended_product_crit++;
+      //PrintS("E");
+    }
+      //  if (c->states[i][j]==UNCALCULATED){
+
+      
+//      poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
+      //    if (short_s)
+      //    {
+    sorted_pair_node* s=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+    s->i=max(i,j);
+    s->j=min(i,j);
+    s->expected_length=c->lengths[i]+c->lengths[j]-2;
+      
+    poly lm=pOne();
+      
+    pLcm(c->S->m[i], c->S->m[j], lm);
+    pSetm(lm);
+    s->deg=pTotaldegree(lm);
+    s->lcm_of_lm=lm;
+    //          pDelete(&short_s);
+    //assume(lm!=NULL);
+    nodes[spc]=s;
+    spc++;
+	// }
+	//else
+	//{
+        //c->states[i][j]=HASTREP;
+	//}
+  }
+  
+  assume(spc==i);
+  //now ideal quotient crit
+  qsort(nodes,spc,sizeof(sorted_pair_node*),iq_crit);
+  
+    sorted_pair_node** nodes_final=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
+  int spc_final=0;
+  j=0;
+  while(j<spc)
+  {
+    int lower=j;
+    int upper;
+    BOOLEAN has=FALSE;
+    for(upper=lower+1;upper<spc;upper++)
+    {
+      
+      if(!pLmEqual(nodes[lower]->lcm_of_lm,nodes[upper]->lcm_of_lm))
+      {
+	break;
+      }
+      if (has_t_rep(nodes[upper]->i,nodes[upper]->j,c))
+	has=TRUE;
+
+    }
+    upper=upper-1;
+    int z;
+    assume(spc_final<=j);
+    for(z=0;z<spc_final;z++)
+    {
+      if(p_LmDivisibleBy(nodes_final[z]->lcm_of_lm,nodes[lower]->lcm_of_lm,c->r))
+      {
+	has=TRUE;
+	break;
+      }
+    }
+    
+    if(has)
+    {
+      for(;lower<=upper;lower++)
+      {
+	free_sorted_pair_node(nodes[lower],c->r);
+	nodes[lower]=NULL;
+      }
+      j=upper+1;
+      continue;
+    }
+    else
+    {
+      nodes_final[spc_final++]=nodes[lower];
+      nodes[lower]=NULL;
+      for(lower=lower+1;lower<=upper;lower++)
+      {
+	free_sorted_pair_node(nodes[lower],c->r);
+	nodes[lower]=NULL;
+      }
+      j=upper+1;
+      continue;
+    }
+  }
+
+  //  Print("i:%d,spc_final:%d",i,spc_final);
+
+
+
+
+  assume(spc_final<=spc);
+  omfree(nodes);
+  nodes=NULL;
+
+  add_to_reductors(c, h, c->lengths[c->n-1]);
+  //i=posInS(c->strat,c->strat->sl,h,0 ecart);
+
+  if (c->lengths[c->n-1]==1)
+    shorten_tails(c,c->S->m[c->n-1]);
+  //you should really update c->lengths, c->strat->lenS, and the oder of polys in strat if you sort after lengths
+
+  //for(i=c->strat->sl; i>0;i--)
+  //  if(c->strat->lenS[i]<c->strat->lenS[i-1]) printf("fehler bei %d\n",i);
+  if (c->Rcounter>50) {
+    c->Rcounter=0;
+    cleanS(c->strat,c);
+  }
+  if(!ip){
+    qsort(nodes_final,spc_final,sizeof(sorted_pair_node*),pair_better_gen2);
+ 
+    
+    c->apairs=merge(c->apairs,c->pair_top+1,nodes_final,spc_final,c);
+    c->pair_top+=spc_final;
+    clean_top_of_pair_list(c);
+    omfree(nodes_final);
+    return NULL;
+  }
+  {
+    *ip=spc_final;
+    return nodes_final;
+  }
+
+  
+
+}
+
+
+
+
+
+
 #if 0
 static poly redNF (poly h,kStrategy strat)
 {
@@ -1618,8 +1850,8 @@ static void go_on (calc_dat* c){
     // delete buf[j];
     //remember to free res here
     p=redTailShort(p, c->strat);
-    sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
-    
+    sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
+    // sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
   int sum=0;
   for(j=0;j<i;j++){
@@ -3134,7 +3366,7 @@ static void go_on_F4 (calc_dat* c){
     // delete buf[j];
     //remember to free res here
     //    p=redTailShort(p, c->strat);
-      sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
+      sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
     
     }
     int sum=0;
