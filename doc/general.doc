@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.64 1998-05-13 12:49:17 Singular Exp $
+@comment $Id: general.doc,v 1.65 1998-05-13 13:01:40 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -45,10 +45,8 @@
 * The online help system::      
 * Interrupting SINGULAR::       
 * Editing input::               
-* Control parameters::          
-* Startup sequence::            
-* Reuse of output::             
 * Commandline options::         
+* Startup sequence::            
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -56,15 +54,12 @@
 @subsection How to enter and exit
 @cindex How to enter and exit
 
-To start @sc{Singular}, enter @code{Singular} at the system prompt.
-You get a header which, among others, reports the version name and
-compilation date.
-Enter @code{help;} to get the online manual at the @sc{Singular} prompt
-@code{>}.
-Commands are always need to be ended by a @code{;} (semicolon) and
-@code{<ENTER>}.
-
-To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
+To start @sc{Singular}, enter @code{Singular} at the system prompt.  You
+get a header which, among others, reports the version name and
+compilation date.  Enter @code{help;} to get the online manual at the
+@sc{Singular} prompt @code{>}.  Commands always need to be terminated by
+a @code{;} (semicolon) and @code{<ENTER>}.  or @code{$}. To exit
+@sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
 
 @sc{Singular} may also be started with command-line options and with
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
@@ -72,32 +67,9 @@ filenames as arguments. More generally, the synopsis of @sc{Singular} is
 Singular  [options] [file1 [file2 ...]]
 @end example
 @c ref
-@xref{Commandline options}.
+@xref{Commandline options}, @xref{Startup sequence}.
 @c ref
 
-On start-up, @sc{Singular}
-@enumerate
-@item
-loads the library @code{standard.lib} (provided the @code{--no-stdlib}
-was not given)
-
-@item
-searches the current directory and then the
-home directory of the user for a file named @code{.singularrc} and
-executes it, if found (provided the @code{--no-rc} options was not
-given)
-
-@item
-executes the files @code{file1}, @code{file2} ...  (given on the command
-line) in that order.
-@end enumerate
-
-Unless specified otherwise, @sc{Singular} locates all (data) files and
-libraries by first searching the current working directory,
-and then by searching through all the directories specified by the
-environment variable @code{SINGULARPATH} (@code{SPATH} on DOS-based
-systems), and, finally, by searching through some default directories
-(e.g., @code{/usr/local/share/Singular}).
 
 @c --------------------------------------------------------------------------
 @node SINGULAR prompt,The online help system,How to enter and exit, Interactive use
@@ -131,10 +103,10 @@ and the name of an "Up" node (@code{Up:}).
 
 To move within info, type commands consisting of single characters.  Do not type
 @code{RETURN}.  You should not use cursor keys, either.  If you use some of the
-cursor keys by accident, you maybe will be popped to some totally different
+cursor keys by accident, you might get popped to some totally different
 node.  Type @code{l} to return to your original node.
 
-The most important commands:
+The most important commands are:
 @table @code
 @item q
 leave info
@@ -187,7 +159,7 @@ quits  @sc{Singular}
 @end table
 
 @c --------------------------------------------------------------------------
-@node Editing input,Control parameters,Interrupting SINGULAR,Interactive use
+@node Editing input,Commandline options,Interrupting SINGULAR,Interactive use
 @subsection Editing input
 @cindex Editing input
 
@@ -230,60 +202,6 @@ binaries built with the GNU Readline library.  @xref{Command Line Editing, GNU
 Readline Library, Command Line Editing, readline, The GNU Readline Library
 Manual}.
 
-@c --------------------------------------------------------------------------
-@node Control parameters, Startup sequence, Editing input, Interactive use
-@subsection Control parameters
-@cindex Control parameters
-
-You may wish to set some control parameters. Most often used are
-@code{timer}, @code{option(prot)} and @code{pagewidth}.
-
-@itemize @bullet
-@item
-If @code{timer} is set to 1 the time (in sec) used for the execution of
-a command
-is displayed if it is bigger than 0.5 sec (Unix: CPU-time
-or Macintosh/MSDOS: time between two commands).
-@item
-@code{option(prot)} shows a short protocol during std-computation: the
-number between brackets () is the number of critical pairs still
-to be reduced (except immediatly after an H 'high corner' where it shows the
-degree above which all monomials can be discarded), a - sign indicates
-that one critical pair has been reduced (either to 0 or to a new
-s-polynomial which indicated by an s), a number without brackets
-shows the degree in which the computation takes place (this is in
-particular useful if the input is homogeneous).
-There are many more options, mostly used to control the strategies
-for the std-computations, see the manual or type @code{help option;}.
-@item
-@code{pagewidth} sets the number of characters in a line printed on the
-screen.
-@item
-@code{option} also controls messages like warnings, loading libs, etc.
-@xref{option}, or type @code{help verbose;}.
-@end itemize
-
-@example
-pagewidth = 80;        // set pagewidth to 80 characters
-option(prot);          // short protocol
-timer = 1;             // activate the timer
-option(noredefine);   // supress redefine-warnings
-@end example
-
-The file @code{.singularrc} can be used to set your preferred
-parameters. If you start @sc{Singular} this file is automatically loaded
-such that your parameters are set (see @ref{Startup sequence}).
-
-@c --------------------------------------------------------------------------
-@node Startup sequence, Reuse of output, Control parameters, Interactive use
-@subsection Startup sequence
-@cindex Startup sequence
-
-@c --------------------------------------------------------------------------
-@node Reuse of output, Commandline options, Startup sequence, Interactive use
-@subsection Reuse of output
-@cindex Reuse of output
-
 The most recently printed expression is available
 under the special name @code{_}, e.g.
 @example
@@ -297,8 +215,9 @@ under the special name @code{_}, e.g.
 @c example
 @end example
 
+
 @c --------------------------------------------------------------------------
-@node Commandline options, ,Reuse of output,Interactive use
+@node Commandline options, Startup sequence, Editing input, Interactive use
 @subsection Commandline options
 @cindex Commandline options
 
@@ -317,8 +236,7 @@ input coming from a file. By default, the value of @code{echo} is 0. See
 also @ref{echo}.
 
 @item @code{-h}, @code{--help} 
-Print a short help message and a one line description of each command 
-line option.
+Print a one line description of each command  line option and exit.
 
 @item @code{--no-rc}               
 Do not execute the @code{.singularrc} file on start-up. By default,
@@ -348,7 +266,7 @@ generator etc.). This information should be included if a user reports
 an error to the authors.
 @end table
 
-The following command line options allow manipulation of the timer and
+The following command line options allow manipulations of the timer and
 the pseudo random generator and passing of commands and strings to 
 @sc{Singular}:
 
@@ -360,13 +278,13 @@ executing the files given on the command line, e.g.  @code{Singular -c
 "help all.lib; quit;"} shows the help for the library @code{all.lib} and
 exits.
 
-@item @code{-u}, @code{--user-option=STRING}
-Returns @code{STRING} on @code{system("--user-option")}. This is useful
-for passing arbitrary arguments (like filenames) from the command line
-to the @sc{Singular} interpreter (i.e. top-level of @sc{Singular}), e.g.
+@item @code{-u}, @code{--user-option=STRING} Returns @code{STRING} on
+@code{system("--user-option")}. This is useful for passing arbitrary
+arguments (like filenames) from the command line to the @sc{Singular}
+interpreter (i.e., to the top-level of @sc{Singular}), e.g., 
 @code{Singular -u "xxx.dump" -c 'getdump(system("--user-option"))'}
-reads the file @code{xxx.dump} at startup and allows the user to start working
-with all the objects defined in the previous session.
+reads the file @code{xxx.dump} at startup and allows the user to start
+working with all the objects defined in the previous session.
 
 @item @code{-r}, @code{--random=SEED}
 Seed (i.e., set initial value of) pseudo random generator with integer
@@ -378,7 +296,7 @@ number of seconds since January, 1, 1970, on Unix systems).
 If the @code{timer} (resp.  @code{rtimer}) variables is set, do only
 report times larger than @code{SECS} seconds (@code{SECS} needs to be a
 floating point number greater than 0). By default, this value is set to
-0.5 (i.e., half a second), e.g. the option @code{--min-time=0.01} forces
+0.5 (i.e., half a second), e.g., the option @code{--min-time=0.01} forces
 Singular to report all times larger than 1/100 of a second.
 
 @item @code{--ticks-per-sec=TICKS} 
@@ -398,7 +316,7 @@ from and output is written to this connection in the MP format. See also
 
 @item @code{--MPport=PORT}
 Use @code{PORT} as default port number for MP connections (whenever not
-further specified) . This option is mandatory when the @code{--batch}
+further specified). This option is mandatory when the @code{--batch}
 option is given. See also @ref{MPtcp links}.
 
 @item @code{--MPhost=HOST}
@@ -407,9 +325,10 @@ further specified) . This option is mandatory when the @code{--batch}
 option is given. See also @ref{MPtcp links}.
 
 @end table
-The value of options given to @sc{singular} (resp. their default values, 
+The value of options given to @sc{Singular} (resp. their default values, 
 if an option was not given), can be checked with the command
 @code{system(LongOptionNameString)}. See also @ref{system}.  
+
 @strong{Example:}
 @example
 @c example
@@ -417,6 +336,36 @@ if an option was not given), can be checked with the command
   system("--min-time"); // minimal reported time 
 @c example
 @end example
+@c --------------------------------------------------------------------------
+
+@node Startup sequence, , Commandline options, Interactive use
+@subsection Startup sequence
+@cindex Startup sequence
+
+On start-up, @sc{Singular}
+@enumerate
+@item
+loads the library @code{standard.lib} (provided the @code{--no-stdlib}
+was not given)
+
+@item
+searches the current directory and then the
+home directory of the user for a file named @code{.singularrc} and
+executes it, if found (provided the @code{--no-rc} options was not
+given)
+
+@item
+executes the files @code{file1}, @code{file2} ...  (given on the command
+line) in that order.
+@end enumerate
+
+Unless specified otherwise, @sc{Singular} locates all libraries and ASCII
+data files by first searching the current working directory, and then by
+searching through all the directories specified by the environment
+variable @code{SINGULARPATH} (@code{SPATH} on DOS-based systems), and,
+finally, by searching through some default directories (e.g.,
+@code{/usr/local/share/Singular}). 
+
 @c --------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
 @node Rings and orderings, Implemented algorithms, Interactive use, General concepts
@@ -456,7 +405,7 @@ Each object of type
 @code{resolution},
 @code{vector}
 belongs to a specific ring.
-Also @code{list}, if one of the objects belong to a ring.
+Also @code{list}, if one of the list elements belong to a ring.
 These objects are local to the ring, hence their names can be used for other
 objects in other rings.
 Objects from one ring can be mapped to another
@@ -1159,7 +1108,7 @@ E.g. @code{1..3} which is equivalent to @code{1, 2, 3}.
 @item @code{::}
 access specifier within packages (complete name is package_name@code{::}identifier)
 @item @code{_}
-expression last printed.  @xref{Reuse of output}.
+expression last printed.  
 @item @code{~}
 breakpoint in procedures.  @xref{Break points}.
 @item @code{#}
@@ -2369,7 +2318,7 @@ programs or for parallel computations (see, for example,
 
 @item DBM links (see @ref{DBM links})
 data is stored in and accessed from a data base. Writing is accomplished 
-by a key- and a value string and associates teh value with the key in
+by a key- and a value string and associates the value with the key in
 the specfied data base. Reading is accomplished w.r.t. a key
 (string), whose associated value (string) is returned.
 
