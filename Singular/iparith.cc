@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.250 2001-01-30 13:34:41 pohl Exp $ */
+/* $Id: iparith.cc,v 1.251 2001-01-31 18:01:49 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3554,7 +3554,7 @@ struct sValCmd1 dArith1[]=
 ,{jjLOAD1,      '(',             NONE,           STRING_CMD }
 // and the procedures with 1 argument:
 ,{atATTRIB1,    ATTRIB_CMD,      NONE,           DEF_CMD }
-,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
+//,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
 ,{jjBAREISS,    BAREISS_CMD,     LIST_CMD,       MODUL_CMD }
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD }
 ,{syBetti1,     BETTI_CMD,       INTMAT_CMD,     RESOLUTION_CMD }
