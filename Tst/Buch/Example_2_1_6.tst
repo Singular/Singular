@@ -13,7 +13,7 @@ proc contraHom(matrix M,int s)
       {
          for(c=1;c<=n;c++)
          {
-            R[(a-1)*m+b,(a-1)*n+c]=M[b,c];
+            R[(a-1)*n+c,(a-1)*m+b]=M[b,c];
          }
       }
    }
@@ -35,11 +35,11 @@ proc coHom(matrix M,int s)
    matrix R[s*m][s*n];
    for(b=1;b<=s;b++)
    {
-      for(a=1;a<=n;a++)
+      for(a=1;a<=m;a++)
       {
-         for(c=1;c<=m;c++)
+         for(c=1;c<=n;c++)
          {
-            R[(a-1)*s+b,(c-1)*s+b]=M[c,a];
+            R[(a-1)*s+b,(c-1)*s+b]=M[a,c];
          }
       }
    }
