@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.22 2002-01-22 15:27:42 mschulze Exp $";
+version="$Id: linalg.lib,v 1.23 2002-02-16 10:58:39 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -24,8 +24,6 @@ PROCEDURES:
  mat_rk(A);           rank of constant matrix A
  U_D_O(A);            P*A=U*D*O, P,D,U,O=permutaion,diag,lower-,upper-triang
  pos_def(A,i);        test symmetric matrix for positive definiteness
- hessenberg(M);       Hessenberg form of M
- spnf(a[,m][,V]);     spectrum normal form of (a,m,V)
  eigenvals(M);        eigenvalues and multiplicities of M
  jordan(M);           Jordan data of M
  jordanbasis(M);      Jordan basis and weight filtration of M
@@ -1236,231 +1234,6 @@ example
 //    AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc swap(matrix M,int i,int j)
-{
-  if(i==j)
-  {
-    return(M);
-  }
-  poly p;
-  for(int k=1;k<=nrows(M);k++)
-  {
-    p=M[i,k];
-    M[i,k]=M[j,k];
-    M[j,k]=p;
-  }
-  for(k=1;k<=ncols(M);k++)
-  {
-    p=M[k,i];
-    M[k,i]=M[k,j];
-    M[k,j]=p;
-  }
-  return(M);
-}
-//////////////////////////////////////////////////////////////////////////////
-
-static proc rowelim(matrix M,int i,int j,int k)
-{
-  if(jet(M[i,k],0)==0||jet(M[j,k],0)==0)
-  {
-    return(M);
-  }
-  number n=number(jet(M[i,k],0))/number(jet(M[j,k],0));
-  for(int l=1;l<=ncols(M);l++)
-  {
-    M[i,l]=M[i,l]-n*M[j,l];
-  }
-  for(l=1;l<=nrows(M);l++)
-  {
-    M[l,j]=M[l,j]+n*M[l,i];
-  }
-  return(M);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-static proc colelim(matrix M,int i,int j,int k)
-{
-  if(jet(M[k,i],0)==0||jet(M[k,j],0)==0)
-  {
-    return(M);
-  }
-  number n=number(jet(M[k,i],0))/number(jet(M[k,j],0));
-  for(int l=1;l<=nrows(M);l++)
-  {
-    M[l,i]=M[l,i]-m*M[l,j];
-  }
-  for(l=1;l<=ncols(M);l++)
-  {
-    M[j,l]=M[j,l]-n*M[i,l];
-  }
-  return(M);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc hessenberg(matrix M)
-"USAGE:   hessenberg(M); matrix M
-ASSUME:  M constant square matrix
-RETURN:  matrix H;  Hessenberg form of M
-EXAMPLE: example hessenberg; shows examples
-"
-{
-  int n=ncols(M);
-  int i,j;
-  for(int k=1;k<n-1;k++)
-  {
-    j=k+1;
-    while(j<n&&jet(M[j,k],0)==0)
-    {
-      j++;
-    }
-    if(jet(M[j,k],0)!=0)
-    {
-      M=swap(M,j,k+1);
-      for(i=j+1;i<=n;i++)
-      {
-        M=rowelim(M,i,k+1,k);
-      }
-    }
-  }
-  return(M);
-}
-example
-{ "EXAMPLE:"; echo=2;
-  ring R=0,x,dp;
-  matrix M[3][3]=3,2,1,0,2,1,0,0,3;
-  print(M);
-  print(hessenberg(M));
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc spnf(ideal e,list #)
-"USAGE:   spnf(e[,m][,V]); ideal e, intvec m, list V
-ASSUME:  ncols(e)==size(m)==size(V); typeof(V[i])=="int"
-RETURN:
-@format
-list sp;  spectrum normal form of (e,m,V)
-  ideal sp[1];  numbers in e in increasing order
-  intvec sp[2]; 
-    int sp[2][i];  multiplicity of number sp[1][i] in e
-  list sp[3]; 
-    module sp[3][i];  module associated to number sp[1][i]
-@end format
-EXAMPLE: example spnf; shows examples
-"
-{
-  int n=ncols(e);
-  intvec m;
-  module v;
-  list V;
-  int i,j;
-  while(i<size(#))
-  {
-    i++;
-    if(typeof(#[i])=="intvec")
-    {
-      m=#[i];
-    }
-    if(typeof(#[i])=="module")
-    {
-      v=#[i];
-      for(j=n;j>=1;j--)
-      {
-        V[j]=module(v[j]);
-      }
-    }
-    if(typeof(#[i])=="list")
-    {
-      V=#[i];
-    }
-  }
-  if(m==0)
-  {
-    for(i=n;i>=1;i--)
-    {
-      m[i]=1;
-    }
-  }
-
-  int k;
-  ideal e0;
-  intvec m0;
-  list V0;
-  number e1;
-  int m1;
-  for(i=n;i>=1;i--)
-  {
-    if(m[i]!=0)
-    {
-      for(j=i-1;j>=1;j--)
-      {
-        if(m[j]!=0)
-	{
-          if(number(e[i])>number(e[j]))
-          {
-            e1=number(e[i]);
-            e[i]=e[j];
-            e[j]=e1;
-            m1=m[i];
-            m[i]=m[j];
-            m[j]=m1;
-            if(size(V)>0)
-            {
-              v=V[i];
-              V[i]=V[j];
-              V[j]=v;
-            }
-          }
-          if(number(e[i])==number(e[j]))
-          {
-            m[i]=m[i]+m[j];
-            m[j]=0;
-            if(size(V)>0)
-            {
-              V[i]=V[i]+V[j];
-            }
-          }
-        }
-      }
-      k++;
-      e0[k]=e[i];
-      m0[k]=m[i];
-      if(size(V)>0)
-      {
-        V0[k]=V[i];
-      }
-    }
-  }
-
-  if(size(V0)>0)
-  {
-    n=size(V0);
-    module U=std(V0[n]);
-    for(i=n-1;i>=1;i--)
-    {
-      V0[i]=simplify(reduce(V0[i],U),1);
-      if(i>=2)
-      {
-        U=std(U+V0[i]);
-      }
-    }
-  }
-
-  list l;
-  if(k>0)
-  {
-    l=e0,m0;
-    if(size(V0)>0)
-    {
-      l[3]=V0;
-    }
-  }
-  return(l);
-}
-example
-{ "EXAMPLE:"; echo=2;
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc eigenvals(matrix M)
 "USAGE:   eigenvals(M); matrix M
 ASSUME:  eigenvalues of M in basefield
@@ -1475,55 +1248,14 @@ list l;
 EXAMPLE: example eigenvals; shows examples
 "
 {
-  M=jet(hessenberg(M),0);
-  int n=ncols(M);
-  int k;
-  ideal e;
-  intvec m;
-  number e0;
-  intvec v;
-  list l;
-  int i,j;
-  j=1;
-  while(j<=n)
-  {
-    v=j;
-    j++;
-    if(j<=n)
-    {
-      while(j<n&&M[j,j-1]!=0)
-      {
-        v=v,j;
-        j++;
-      }
-      if(M[j,j-1]!=0)
-      {
-        v=v,j;
-        j++;
-      }
-    }
-    if(size(v)==1)
-    {
-      k++;
-      e[k]=M[v,v];
-      m[k]=1;
-    }
-    else
-    {
-      l=factorize(det(submat(M,v,v)-var(1)));
-      for(i=size(l[1]);i>=1;i--)
-      {
-        e0=number(jet(l[1][i]/var(1),0));
-        if(e0!=0)
-	{
-          k++;
-          e[k]=(e0*var(1)-l[1][i])/e0;
-          m[k]=l[2][i];
-	}
-      }
-    }
-  }
-  return(spnf(e,m));
+  def R=basering;
+  ring P=0,t,dp;
+  map zero=R,0;
+  matrix M=zero(M);
+  list l=system("eigenvalues",M);
+  setring R;
+  map zero=P,0;
+  return(zero(l));
 }
 example
 { "EXAMPLE:"; echo=2;
