@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.22 1999-12-06 16:06:54 obachman Exp $
+# $Id: doc2tex.pl,v 1.23 1999-12-10 16:41:48 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -349,10 +349,12 @@ sub HandleExample
         s/\? error occurred in [^ ]* line/\? error occurred in line/;
 	# break after $ex_length characters
 	$to_do = $_;
-	while (length($to_do) > $ex_length && $to_do =~ /\w/)
+	while (length($to_do) > $ex_length && $to_do =~ /\w/ &&  
+	       substr($to_do, $ex_length) !~ /^\s*$/)
 	{
+	  
 	  $done .= substr($to_do, 0, $ex_length)."\\\n   ";
-	  $to_do = substr($to_do, $ex_length + 1);
+	  $to_do = substr($to_do, $ex_length);
 	}
 	$_ = $done.$to_do if($done);
 	&protect_texi;

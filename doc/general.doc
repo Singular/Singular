@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.169 1999-12-10 13:55:32 wichmann Exp $
+@comment $Id: general.doc,v 1.170 1999-12-10 16:41:48 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3605,7 +3605,8 @@ and the help string is assumed to be already in the texinfo format.
 help strings are typeset within a @code{@@table @@asis} environment
 (which is similar to a latex @code{description} environment).
 @item
-If a line starts with a character and contains a colon, then the text up
+If a line starts with  only uppercase words and contains a colon, then
+the text up 
 to the colon is taken to be the description-string of an item and the
 text following the colon is taken to be the content of the item.
 @item
