@@ -1,53 +1,104 @@
 LIB "tst.lib";
 tst_init();
 
-list l = 1, 2; string(l);
+
+proc MyPrint(def what)
+{
+   "what";
+   what;
+   "print(what)";
+   print(what);
+   "string(what)";
+   string(what);
+   "print(what, \"%s\")";
+   print(what, "%s");
+   "print(what, \"%p\")";
+   print(what, "%p");
+   "print(what, \"%t\")";
+   print(what, "%t");
+   "print(what, \"%;\")";
+   print(what, "%;");
+}
+
+list l = 1, 2; 
+MyPrint(l);
+l;
+
 list ll;
-string(ll);
-l = l = ll;
-l;
+MyPrint(ll);
+
+l = l + ll;
+MyPrint(l);
+
 l = insert(l, ll);
-l;
-string(l);
- l;
+MyPrint(l);
+
 l[10] = 5;
+
 string(l);
+MyPrint(l);
+
 l[3] = intvec(1,2,3);
 l[4] = "hi";
-string(l);
-l;
+MyPrint(l);
+
 l[6] = list("ho", "he");
-string(l);
- proc hi {1;};
-l[8] = hi;
-l;
-string(l);
+MyPrint(l);
+
+l[8] = MyPrint;
+MyPrint(l);
+
 link li = "/tmp";
-li;
-l[7] = li;
-l;
-string(l);
+l[8] = li;
+MyPrint(l);
+
 ring r;
+MyPrint(r);
+
 ideal i;
-string(i);
-string(r);
+MyPrint(i);
+
 l[8] = r;
 l[9] = i;
-l;
+MyPrint(l);
+
+matrix ma[2][2] = x,y,z,x2;
+MyPrint(ma);
+
+module m=[1,y],[0,x+z];
+MyPrint(m);
+
+l[1]= list(ma, m);
+MyPrint(l);
+
+intmat M=betti(mres(m,0));
+MyPrint(M);
+print(M,"betti");
+print(M, "%b");
+l[2] = M;
+MyPrint(l);
+ 
 ideal j = z2,x;
 resolution re = res(j,0);
-re;
-string(re);
+MyPrint(re);
 l[11] = re;
-l;
-string(l);
-string(l, l);
+MyPrint(re);
+
+matrix B(1..3);
+B(1)[1,1] = 1;
+B(2)[1,1] = 2;
+B(3)[1,1] = 3;
+
+B(1..3);
+print(B(1..3));
+string(B(1..3));
+
 qring qr = std(ideal(x,y));
-string(qr);
-l[12] = qr;
-l;
-string(l);
+MyPrint(qr);
+
 list l = 1, qr, list(2, qr);
-l;
-string(l);
+MyPrint(l);
+
+
 tst_status(1);$
+
