@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.6 1997-05-02 22:09:27 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.7 1997-05-04 11:11:53 obachman Exp $ */
 
 /***************************************************************
  *
@@ -73,6 +73,7 @@ static ring        currGetRing = NULL;
  ***************************************************************/
 static void        SetGetFuncs(ring r);
 static mpsr_Status_t GetModuloNumber(MP_Link_pt link, number *a);
+static mpsr_Status_t GetGaloisNumber(MP_Link_pt link, number *a);
 static mpsr_Status_t GetFloatNumber(MP_Link_pt link, number *a);
 static mpsr_Status_t GetApInt(MP_Link_pt link, mpz_ptr ap);
 static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *a);
@@ -117,9 +118,12 @@ static void SetGetFuncs(ring r)
     // rational numbers
     GetCoeff = GetRationalNumber;
   else if ((r->ch) > 1)
-    // Form our point of view, ModuloP numbers and numbers from
-    // GF(p,n) are the same, here. They only differ in the annots
-    GetCoeff = GetModuloNumber;
+  {
+    if (r->parameter == NULL)
+      GetCoeff = GetModuloNumber;
+    else
+      GetCoeff = GetGaloisNumber;
+  }
   else if ((r->ch) == -1)
     GetCoeff = GetFloatNumber;
   else
@@ -153,6 +157,11 @@ static mpsr_Status_t GetModuloNumber(MP_Link_pt link, number *a)
   mp_failr(IMP_GetUint32(link, &x));
   *a=npInit((int)x);
   return mpsr_Success;
+}
+
+static mpsr_Status_t GetGaloisNumber(MP_Link_pt link, number *a)
+{
+  mp_return(IMP_GetUint32(link, (MP_Uint32_t *) a));
 }
 
 static mpsr_Status_t GetFloatNumber(MP_Link_pt link, number *a)

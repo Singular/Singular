@@ -219,15 +219,18 @@ if test "$with_MP" != no; then
      test "$ac_cv_header_MPT_h" = yes; then
       AC_DEFINE(HAVE_MPSR)
       NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
+      HAVE_MPSR=HAVE_MP
     elif test "$enable_MP" = yes; then
       AC_DEFINE(HAVE_MPSR)
       NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
+      HAVE_MPSR=HAVE_MP
       AC_MSG_WARN(install MP before making Singular or configure --without-MP)
     else
       AC_MSG_WARN(building without MP: disabling MP links)
     fi
   fi
 fi
+AC_SUBST(HAVE_MPSR)
 
 dnl Check factory
 if test "$with_factory" != no; then

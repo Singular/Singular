@@ -1,4 +1,16 @@
+Sun May  4 11:14:44 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Added make target mpcheck; Update INSTALL file
+
+	* mpsr_PutPoly.cc (PutRationalNumber): Normalize if number->s == 0
+	  and not if number->s == 2
+
+	* mpsr_GetPoly.cc (GetGaloisNumber): Introduced special routines,
+	  since npInit op in GetModuloNumber messed things up
+
 Sat May  3 00:07:55 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Makefile.in (CPPFLAGS): put -I. before other CPPFLAGS
 
 	* febase.cc (feFopen): fixed bug in opening library from
 	  SINGULAR_DATADIR: SINGULAR_DATADIR is appended to
@@ -6,7 +18,7 @@ Sat May  3 00:07:55 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
 
 	* small mpsr Changes to reflect some name changes of MP Dicts
 
-	* configure.in Makefile.in: new schem for updating Makefile mod2.h
+	* configure.in Makefile.in: new scheme for updating Makefile mod2.h
 	  based on time-stamps 
 
 Fri May  2 17:29:32 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>

@@ -67,7 +67,7 @@ The simplest way to compile Singular is:
      all sorts of other programs in order to regenerate files that came
      with the distribution.
 
-  6. Other make targets are:
+  6. Other make targets include:
      'dist'      : Creates a distribution of all source files of
                    Singular.
      'TAGS'      : Creates/updates a tags table for Singular's source
@@ -78,6 +78,7 @@ The simplest way to compile Singular is:
      'uninstall' : Deletes all installed files that the 'install'
                    target created (i.e. Singular's executable program,
                    Singular's info file, and Singular's libraries)
+     'check'     : Tests basic Singular functionality
 
 Compilers and Options
 =====================

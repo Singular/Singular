@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.6 1997-05-02 22:09:29 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.7 1997-05-04 11:11:54 obachman Exp $ */
 
 /***************************************************************
  *
@@ -160,8 +160,12 @@ static mpsr_Status_t PutRationalNumber(MP_Link_pt link, number a)
 
   // Now we have a fraction
   // normalize, if necessary
-  if ((a->s) == 2)
+  if ((a->s) == 0)
+  {
     nlNormalize(a);
+    return PutRationalNumber(link, a);
+  }
+  
   // send number itself
   mp_failr(MP_PutCommonOperatorPacket(link,
                                       MP_BasicDict,

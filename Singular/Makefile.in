@@ -45,7 +45,7 @@ LEX		= flex
 CFLAGS		= @CFLAGS@
 CXXFLAGS	= @CXXFLAGS@
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
-CPPFLAGS	= @CPPFLAGS@ -I${srcdir}
+CPPFLAGS	= -I${srcdir} @CPPFLAGS@ 
 DEFS		= @DEFS@ -DNDEBUG
 LDFLAGS		= @LDFLAGS@
 LIBS		= @LIBS@
@@ -53,8 +53,10 @@ LIBS		= @LIBS@
 ##
 ## subdirectories
 ##
-docdir		= doc	# where the doumentation files are
-testsdir	= tests # where the tests files are 
+# where the doumentation files are
+docdir		= doc
+# where the tests files are 
+testdir		= tests
 
 ##
 ## End configuration dependend stuff
@@ -223,7 +225,8 @@ unistallinfo:
 mostlyclean: clean
 
 clean:
-	-rm -rf Singular* *.o *.og core *.d *.dd *~ \#* ${testdir}/out
+	-rm -rf Singular* *.o *.og core *.d *.dd *~ \#* /tmp/mp*
+	cd ${testdir} rm -f out.got *dump* 
 	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
@@ -240,8 +243,12 @@ maintainer-clean: distclean
 info dvi ps html:
 	cd ${docdir}; ${MAKE} $@
 
-check:	Singular ${testdir}/check ${testdir}/output
+check:	Singular ${testdir}/check ${testdir}/out.should
 	cd ${testdir}; SINGULARPATH=./../LIB/ ./check ./../Singular
+	if test -n "@HAVE_MPSR@"; then echo; ${MAKE} mpcheck; fi
+
+mpcheck: Singular ${testdir}/mpcheck ${testdir}/mpcheck.data
+	cd ${testdir}; ./mpcheck `pwd`/.. mpcheck.data
 
 ##
 ## miscellanous targets
