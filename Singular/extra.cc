@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.174 2002-01-20 11:44:47 Singular Exp $ */
+/* $Id: extra.cc,v 1.175 2002-02-06 14:06:22 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -652,7 +652,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #include "mpsr.h"
 
 #include "mod_raw.h"
-   
+
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
@@ -662,7 +662,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== locNF ======================================*/
     if(strcmp(sys_cmd,"locNF")==0)
     {
-#if 0
       if (h != NULL && h->Typ() == VECTOR_CMD)
       {
         poly f=(poly)h->Data();
@@ -755,7 +754,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         Warn("1st argument must be a vector!");
       }
       return FALSE;
-#endif
     }
     else
 /*==================== interred ==================================*/
