@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.14 1998-12-15 12:31:49 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.15 1998-12-17 14:25:19 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -12,11 +12,10 @@
 #include "numbers.h"
 #include "polys.h"
 #include "lists.h"
-#include "matpol.h"
 #include "febase.h"
 #include "pcv.h"
 
-static int pcvMaxDegree;
+static int pcvDegBound;
 static int pcvTableSize;
 static int pcvIndexSize;
 static unsigned* pcvTable=NULL;
@@ -90,19 +89,19 @@ BOOLEAN pcvMaxDeg(leftv res,leftv h)
 void pcvInit(int d)
 {
   if(d<0) d=0;
-  pcvMaxDegree=d;
-  pcvTableSize=pVariables*pcvMaxDegree*sizeof(unsigned);
+  pcvDegBound=d;
+  pcvTableSize=pVariables*pcvDegBound*sizeof(unsigned);
   pcvTable=(unsigned*)Alloc0(pcvTableSize);
   pcvIndexSize=pVariables*sizeof(unsigned*);
   pcvIndex=(unsigned**)Alloc(pcvIndexSize);
   for(int i=0;i<pVariables;i++)
-    pcvIndex[i]=pcvTable+i*pcvMaxDegree;
-  for(int i=0;i<pcvMaxDegree;i++)
+    pcvIndex[i]=pcvTable+i*pcvDegBound;
+  for(int i=0;i<pcvDegBound;i++)
     pcvIndex[0][i]=i;
   for(int i=1;i<pVariables;i++)
   {
     unsigned x=0;
-    for(int j=0;j<pcvMaxDegree;j++)
+    for(int j=0;j<pcvDegBound;j++)
     {
       x+=pcvIndex[i-1][j];
       pcvIndex[i][j]=x;
@@ -143,7 +142,7 @@ poly pcvN2M(int n)
   for(i=pVariables-1;i>=0;i--)
   {
     k=j;
-    for(j=0;j<pcvMaxDegree&&pcvIndex[i][j]<=n;j++);
+    for(j=0;j<pcvDegBound&&pcvIndex[i][j]<=n;j++);
     j--;
     n-=pcvIndex[i][j];
     if(i<pVariables-1) pSetExp(m,i+2,k-j);
@@ -161,7 +160,7 @@ poly pcvN2M(int n)
   }
 }
 
-poly pcvP2cv(poly p,int d0,int d1)
+poly pcvP2CV(poly p,int d0,int d1)
 {
   poly cv=NULL;
   while(p)
@@ -179,7 +178,7 @@ poly pcvP2cv(poly p,int d0,int d1)
   return cv;
 }
 
-poly pcvCv2p(poly cv,int d0,int d1)
+poly pcvCV2P(poly cv,int d0,int d1)
 {
   poly p=NULL;
   while(cv)
@@ -199,7 +198,7 @@ poly pcvCv2p(poly cv,int d0,int d1)
   return p;
 }
 
-lists pcvP2cv(lists pl,int d0,int d1)
+lists pcvP2CV(lists pl,int d0,int d1)
 {
   lists cvl=(lists)Alloc(sizeof(slists));
   cvl->Init(pl->nr+1);
@@ -209,14 +208,14 @@ lists pcvP2cv(lists pl,int d0,int d1)
     if(pl->m[i].rtyp==POLY_CMD)
     {
       cvl->m[i].rtyp=VECTOR_CMD;
-      cvl->m[i].data=pcvP2cv((poly)pl->m[i].data,d0,d1);
+      cvl->m[i].data=pcvP2CV((poly)pl->m[i].data,d0,d1);
     }
   }
   pcvClean();
   return cvl;
 }
 
-lists pcvCv2p(lists cvl,int d0,int d1)
+lists pcvCV2P(lists cvl,int d0,int d1)
 {
   lists pl=(lists)Alloc(sizeof(slists));
   pl->Init(cvl->nr+1);
@@ -226,14 +225,14 @@ lists pcvCv2p(lists cvl,int d0,int d1)
     if(cvl->m[i].rtyp==VECTOR_CMD)
     {
       pl->m[i].rtyp=POLY_CMD;
-      pl->m[i].data=pcvCv2p((poly)cvl->m[i].data,d0,d1);
+      pl->m[i].data=pcvCV2P((poly)cvl->m[i].data,d0,d1);
     }
   }
   pcvClean();
   return pl;
 }
 
-BOOLEAN pcvP2cv(leftv res,leftv h)
+BOOLEAN pcvP2CV(leftv res,leftv h)
 {
   if(currRingHdl)
   {
@@ -249,7 +248,7 @@ BOOLEAN pcvP2cv(leftv res,leftv h)
         {
           int d1=(int)h->Data();
           res->rtyp=LIST_CMD;
-          res->data=pcvP2cv(pl,d0,d1);
+          res->data=pcvP2CV(pl,d0,d1);
           return FALSE;
         }
       }
@@ -261,7 +260,7 @@ BOOLEAN pcvP2cv(leftv res,leftv h)
   return TRUE;
 }
 
-BOOLEAN pcvCv2p(leftv res,leftv h)
+BOOLEAN pcvCV2P(leftv res,leftv h)
 {
   if(currRingHdl)
   {
@@ -277,7 +276,7 @@ BOOLEAN pcvCv2p(leftv res,leftv h)
         {
           int d1=(int)h->Data();
           res->rtyp=LIST_CMD;
-          res->data=pcvCv2p(pl,d0,d1);
+          res->data=pcvCV2P(pl,d0,d1);
           return FALSE;
         }
       }
