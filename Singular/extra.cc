@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.183 2002-05-13 09:16:38 Singular Exp $ */
+/* $Id: extra.cc,v 1.184 2002-06-03 11:41:25 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -72,6 +72,9 @@
 #include "mod_raw.h"
 #endif
 #endif
+
+// for tests of t-rep-GB
+#include "tgb.cc"
 
 // Define to enable many more system commands
 #ifndef MAKE_DISTRIBUTION
@@ -1472,6 +1475,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== t-rep-GB ==================================*/
+    if (strcmp(sys_cmd, "trepgb")==0)
+    {
+      ring r = currRing;
+      ideal i = (ideal)h->Data();
+      res->data=t_rep_gb(r,i);
+      res->rtyp=IDEAL_CMD;
+      return(FALSE);
+    }
+    else
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
