@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.25 1998-05-06 09:21:20 Singular Exp $
+@comment $Id: general.doc,v 1.26 1998-05-06 09:34:05 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -471,7 +471,11 @@ The other types do not belong to a ring and can be accessed within every ring.
 @subsection General syntax of a ring definition
 @cindex General syntax of a ring definition
 
-
+@c ============================================================
+@c   This piece of text (partially) exists also in the 
+@c   file types.doc, chapter "ring declarations".
+@c   If you change something here, change it there, too!
+@c ============================================================
 @table @code
 @item @strong{Syntax:}
 @code{ring} name @code{=} field@code{,}
