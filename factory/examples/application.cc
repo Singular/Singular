@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: application.cc,v 1.3 1997-10-28 13:46:41 schmidt Exp $ */
+/* $Id: application.cc,v 1.4 1998-03-13 17:03:49 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -12,22 +12,20 @@
 int
 main()
 {
-    // set our ring
-    setCharacteristic( 0 );
-    On( SW_RATIONAL );
-
     Variable x( 'x' );
     Variable y( 'y' );
     Variable z( 'z' );
     CanonicalForm f;
     CanonicalForm g;
 
-    // call some of Factory's functions and methods and print
-    // their results
     cout << "Do not forget to terminate canonical forms with `;' in input!" << endl;
+
+    // set our ring
+    setCharacteristic( 0 );
+    On( SW_RATIONAL );
+
     cout << "Simple polynomial operations in characteristic 0." << endl;
     cout << "Please enter two multivariate polynomials over Q." << endl;
-
     cout << "f(x, y, z) = ";
     cin >> f;
     cout << "g(x, y, z) = ";
@@ -35,6 +33,8 @@ main()
     cout << "f                = " << f << endl;
     cout << "g                = " << g << endl;
 
+    // call some of Factory's functions and methods and print
+    // their results
     cout << "Polynomial information on f:" << endl;
     cout << "mvar(f)          = " << mvar( f ) << endl;
     cout << "degree(f)        = " << degree( f ) << endl;
