@@ -9,7 +9,7 @@ do
 done
 cd src
 
-./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix
+./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix CC=$CC CXX=$CXX
 
 cd ..
 
