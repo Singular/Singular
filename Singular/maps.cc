@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.18 1999-09-16 12:33:59 Singular Exp $ */
+/* $Id: maps.cc,v 1.19 1999-09-27 13:49:06 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -11,7 +11,7 @@
 #include "febase.h"
 #include "polys.h"
 #include "numbers.h"
-#include "ipid.h"
+//#include "ipid.h"
 #include "ring.h"
 #include "ideals.h"
 #include "matpol.h"
@@ -194,22 +194,21 @@ static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar)
 */
 ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 {
-  int i,j,sizeofpoly;
-  int ordersize;
+  int i,j;
+  int ordersize = rBlocks(currRing) + 1;
   poly p,pp,q;
   ideal temp1;
   ideal temp2;
-  short  ** wv;
-#define blockmax 5
-  int orders[blockmax],block0[blockmax], block1[blockmax];
+  int *orders = (int*) Alloc0(sizeof(int)*(ordersize));
+  int *block0 = (int*) Alloc0(sizeof(int)*(ordersize));
+  int *block1 = (int*) Alloc0(sizeof(int)*(ordersize));
+  int **wv = (int **) Alloc0(ordersize * sizeof(int *));
+
   int imagepvariables = theImageRing->N;
   ring sourcering = currRing;
   int N = pVariables+imagepvariables;
   sip_sring tmpR;
 
-  memset(block0, 0,sizeof(block0));
-  memset(block1, 0,sizeof(block1));
-  memset(orders, 0,sizeof(orders));
   if (theImageRing->OrdSgn == 1) orders[0] = ringorder_dp;
   else orders[0] = ringorder_ls;
   block1[0] = imagepvariables;
@@ -223,30 +222,24 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   *}
   *else
   */
+  for (i=0; i<ordersize - 1; i++)
   {
-    i=0;
-    while(sourcering->order[i])
-    {
-      orders[i+1] = sourcering->order[i];
-      block0[i+1] = sourcering->block0[i]+imagepvariables;
-      block1[i+1] = sourcering->block1[i]+imagepvariables;
-      i++;
-    }
+    orders[i+1] = sourcering->order[i];
+    block0[i+1] = sourcering->block0[i]+imagepvariables;
+    block1[i+1] = sourcering->block1[i]+imagepvariables;
+    wv[i+1] = sourcering->wvhdl[i];
   }
-  ordersize=i+1;
-  wv = (short **) Alloc0(ordersize * sizeof(short **));
-  for (i--;i!=0 ;i--) wv[i+1] = sourcering->wvhdl[i];
   tmpR = *currRing;
   tmpR.N = N;
   tmpR.order = orders;
   tmpR.block0 = block0;
   tmpR.block1 = block1;
   tmpR.wvhdl = wv;
-  rComplete(&tmpR);
+  rComplete(&tmpR, 1);
+  rTest(&tmpR);
 
   // change to new ring
   rChangeCurrRing(&tmpR, FALSE);
-  sizeofpoly = mmGetSpecSize();
   if (id==NULL)
     j = 0;
   else
@@ -297,7 +290,6 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   for (i=0;i<IDELEMS(temp2);i++)
   {
     p = temp2->m[i];
-    temp2->m[i]=NULL;
     if (p!=NULL)
     {
       q = pChangeSizeOfPoly(&tmpR, p,imagepvariables+1,N);
@@ -308,17 +300,17 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
       }
       temp1->m[j] = q;
       j++;
-      while (p!=NULL)
-      {
-        pp = pNext(p);
-        Free((ADDRESS)p,sizeofpoly);
-        p = pp;
-      }
     }
   }
+  rChangeCurrRing(&tmpR, FALSE);
   idDelete(&temp2);
-  Free((ADDRESS) wv, ordersize*sizeof(short **));
+  rChangeCurrRing(sourcering, TRUE);
   idSkipZeroes(temp1);
+  Free(orders, sizeof(int)*(ordersize));
+  Free(block0, sizeof(int)*(ordersize));
+  Free(block1, sizeof(int)*(ordersize));
+  Free(wv, sizeof(int*)*(ordersize));
+  rUnComplete(&tmpR);
   return temp1;
 }
 
@@ -524,6 +516,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
           res->data=(void *)c;
         }
       }
+      nTest((number) res->data);
       break;
     case POLY_CMD:
     case VECTOR_CMD:
@@ -603,8 +596,10 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         m->rank=((matrix)data)->rank;
       }
       res->data=(char *)m;
+      idTest((ideal) m);
       break;
     }
+
     case LIST_CMD:
     {
       lists l=(lists)data;
