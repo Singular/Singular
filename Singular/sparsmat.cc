@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.28 2000-06-07 13:42:50 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.29 2000-06-21 07:32:20 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -19,7 +19,6 @@
 #include "ipid.h"
 #include "ideals.h"
 #include "numbers.h"
-#include "longrat.h"
 #include "sparsmat.h"
 #include "prCopy.h"
 
@@ -2373,3 +2372,701 @@ static number smCleardenom(ideal id)
   return res;
 }
 
+/* ----------------- gauss elimination ------------------ */
+/* in structs.h */
+typedef struct smnrec sm_nrec;
+typedef sm_nrec * smnumber;
+struct smnrec{
+  smnumber n;          // the next element
+  int pos;             // position
+  number m;            // the element
+};
+
+/* declare internal 'C' stuff */
+static void smNumberDelete(smnumber *);
+static smnumber smNumberCopy(smnumber);
+static smnumber smPoly2Smnumber(poly);
+static poly smSmnumber2Poly(number);
+static BOOLEAN smCheckSolv(ideal);
+
+/* class for sparse number matrix:
+*/
+class sparse_number_mat{
+private:
+  int nrows, ncols;    // dimension of the problem
+  int act;             // number of unreduced columns (start: ncols)
+  int crd;             // number of reduced columns (start: 0)
+  int tored;           // border for rows to reduce
+  int sing;            // indicator for singular problem
+  int rpiv;            // row-position of the pivot
+  int *perm;           // permutation of rows
+  number one;          // the "1" 
+  number *sol;         // field for solution
+  int *wrw, *wcl;      // weights of rows and columns
+  smnumber * m_act;    // unreduced columns
+  smnumber * m_res;    // reduced columns (result)
+  smnumber * m_row;    // reduced part of rows
+  smnumber red;        // row to reduce
+  smnumber piv;        // pivot
+  smnumber dumm;       // allocated dummy
+  void smColToRow();
+  void smRowToCol();
+  void smSelectPR();
+  void smRealWeights();
+  void smRealPivot();
+  void smZeroToredElim();
+  void smGElim();
+  void smAllDel();
+public:
+  sparse_number_mat(ideal);
+  ~sparse_number_mat();
+  int smIsSing() { return sing; }
+  void smTriangular();
+  void smSolv();
+  ideal smRes2Ideal();
+};
+
+/* ----------------- basics (used from 'C') ------------------ */
+/*2
+* returns the solution of a linear equation
+* solution of M*x = r (M has dimension nXn) =>
+*   I = module(transprose(M)) + r*gen(n+1)
+* uses  Gauss-elimination
+*/
+ideal smCallSolv(ideal I)
+{
+  sparse_number_mat *linsolv;
+  int k;
+  ring origR;
+  sip_sring tmpR;
+  ideal rr, res;
+
+  I->rank = idRankFreeModule(I);
+  if (smCheckSolv(I)) return NULL;
+  rr=smRingCopy(I,&origR,tmpR);
+  res = NULL;
+  linsolv = new sparse_number_mat(rr);
+  linsolv->smTriangular();
+  if (linsolv->smIsSing() == 0)
+  {
+    linsolv->smSolv();
+    res = linsolv->smRes2Ideal();
+  }
+  else
+    WerrorS("singular problem for linsolv");
+  delete linsolv;
+  if ((origR!=NULL) && (res!=NULL))
+  {
+    rChangeCurrRing(origR,TRUE);
+    rr = idInit(IDELEMS(res), 1);
+    for (k=0;k<IDELEMS(res);k++)
+      rr->m[k] = prCopyR(res->m[k], &tmpR);
+    rChangeCurrRing(&tmpR,FALSE);
+    idDelete(&res);
+    res = rr;
+  }
+  if(origR!=NULL)
+    smRingClean(origR,tmpR);
+  return res;
+}
+
+/*
+* constructor, destroy smat
+*/
+sparse_number_mat::sparse_number_mat(ideal smat)
+{
+  int i;
+  polyset pmat;
+
+  crd = sing = 0;
+  act = ncols = smat->ncols;
+  tored = nrows = smat->rank;
+  i = tored+1;
+  perm = (int *)Alloc(sizeof(int)*i);
+  m_row = (smnumber *)Alloc0(sizeof(smnumber)*i);
+  wrw = (int *)Alloc(sizeof(int)*i);
+  i = ncols+1;
+  wcl = (int *)Alloc(sizeof(int)*i);
+  m_act = (smnumber *)Alloc(sizeof(smnumber)*i);
+  m_res = (smnumber *)Alloc0(sizeof(smnumber)*i);
+  dumm = (smnumber)AllocSizeOf(smnrec);
+  pmat = smat->m;
+  for(i=ncols; i; i--)
+  {
+    m_act[i] = smPoly2Smnumber(pmat[i-1]);
+  }
+  Free((ADDRESS)pmat,smat->ncols*sizeof(poly));
+  FreeSizeOf((ADDRESS)smat,sip_sideal);
+  one = nInit(1);
+}
+
+/*
+* destructor
+*/
+sparse_number_mat::~sparse_number_mat()
+{
+  int i;
+  FreeSizeOf((ADDRESS)dumm, smnrec);
+  i = ncols+1;
+  Free((ADDRESS)m_res, sizeof(smnumber)*i);
+  Free((ADDRESS)m_act, sizeof(smnumber)*i);
+  Free((ADDRESS)wcl, sizeof(int)*i);
+  i = nrows+1;
+  Free((ADDRESS)wrw, sizeof(int)*i);
+  Free((ADDRESS)m_row, sizeof(smnumber)*i);
+  Free((ADDRESS)perm, sizeof(int)*i);
+  nDelete(&one);
+}
+
+/*
+* triangularization by Gauss-elimination
+*/
+void sparse_number_mat::smTriangular()
+{
+  tored--;
+  this->smZeroToredElim();
+  if (sing != 0) return;
+  while (act > 1)
+  {
+    this->smRealPivot();
+    this->smSelectPR();
+    this->smGElim();
+    crd++;
+    this->smColToRow();
+    act--;
+    this->smRowToCol();
+    this->smZeroToredElim();
+    if (sing != 0) return;
+  }
+  piv = m_act[1];
+  rpiv = piv->pos;
+  m_act[1] = piv->n;
+  piv->n = NULL;
+  crd++;
+  this->smColToRow();
+  act--;
+  this->smRowToCol();
+}
+
+/*
+* solve the triangular system
+*/
+void sparse_number_mat::smSolv()
+{
+  int i, j;
+  number x, y, z;
+  smnumber s, d, r = m_row[nrows];
+
+  m_row[nrows] = NULL;
+  sol = (number *)Alloc0(sizeof(number)*(crd+1));
+  while (r != NULL)  // expand the rigth hand side
+  {
+    sol[r->pos] = r->m;
+    s = r;
+    r = r->n;
+    FreeSizeOf((ADDRESS)s, smnrec);
+  }
+  i = crd;  // solve triangular system
+  if (sol[i] != NULL)
+  {
+    x = sol[i];
+    sol[i] = nDiv(x, m_res[i]->m);
+    nDelete(&x);
+  }
+  i--;
+  while (i > 0)
+  {
+    x = NULL;
+    d = m_res[i];
+    s = d->n;
+    while (s != NULL)
+    {
+      j = s->pos;
+      if (sol[j] != NULL)
+      {
+        z = nMult(sol[j], s->m);
+        if (x != NULL)
+        {
+          y = x;
+          x = nSub(y, z);
+          nDelete(&y);
+          nDelete(&z);
+        }
+        else
+          x = nNeg(z);
+      }
+      s = s->n;
+    }
+    if (sol[i] != NULL)
+    {
+      if (x != NULL)
+      {
+        y = nAdd(x, sol[i]);
+        nDelete(&x);
+        if (nIsZero(y))
+        {
+          nDelete(&sol[i]);
+          sol[i] = NULL;
+        }
+        else
+          sol[i] = y;
+      }
+    }
+    else
+      sol[i] = x;
+    if (sol[i] != NULL)
+    {
+      x = sol[i];
+      sol[i] = nDiv(x, d->m);
+      nDelete(&x);
+    }
+    i--;
+  }
+  this->smAllDel();
+}
+
+/*
+* transform the result to an ideal
+*/
+ideal sparse_number_mat::smRes2Ideal()
+{
+  int i, j;
+  ideal res = idInit(crd, 1);
+
+  for (i=crd; i; i--)
+  {
+    j = perm[i]-1;
+    res->m[j] = smSmnumber2Poly(sol[i]);
+  }
+  Free((ADDRESS)sol, sizeof(number)*(crd+1));
+  return res;
+}
+
+/* ----------------- pivot method ------------------ */
+
+/*
+* prepare smPivot, compute weights for rows and columns
+* and the weight for all points
+*/
+void sparse_number_mat::smRealWeights()
+{
+  int wc;
+  smnumber a;
+  int i;
+
+  for (i=tored; i; i--) wrw[i] = 0; // ???
+  for (i=act; i; i--)
+  {
+    wc = 0;
+    a = m_act[i];
+    loop
+    {
+      wc++;
+      wrw[a->pos]++;
+      a = a->n;
+      if ((a == NULL) || (a->pos > tored))
+        break;
+    }
+    wcl[i] = wc;
+  }
+}
+
+/*
+* compute pivot
+*/
+void sparse_number_mat::smRealPivot()
+{
+  int wopt = 1<<30;
+  int w;
+  smnumber a;
+  number x, xo, xu;
+  int i, copt, ropt;
+
+  this->smRealWeights();
+  nNew(&xo);
+  nNew(&xu);
+  for (i=act; i; i--)
+  {
+    a = m_act[i];
+    while ((a!=NULL) && (a->pos<=tored))
+    {
+      w = (wcl[i]-1)*(wrw[a->pos]-1);
+      if (w==0) // row or column with only one point
+      {
+        rpiv = a->pos;
+        if (i != act)
+        {
+          a = m_act[act];
+          m_act[act] = m_act[i];
+          m_act[i] = a;
+        }
+        return;
+      }
+      if (w == wopt)
+      {
+        x = a->m;
+        if (nGreater(x,xo) || nGreater(xu,x))
+        {
+          nDelete(&xu);
+          nDelete(&xo);
+          xo = nCopy(x);
+          xu = nCopy(x);
+          if (nGreaterZero(xu)) xu = nNeg(xu);
+          else xo = nNeg(xo);
+          copt = i;
+          ropt = a->pos;
+        }
+      }
+      else if (w < wopt)
+      {
+        x = a->m;
+        wopt = w;
+        nDelete(&xu);
+        nDelete(&xo);
+        xo = nCopy(x);
+        xu = nCopy(x);
+        if (nGreaterZero(xu)) xu = nNeg(xu);
+        else xo = nNeg(xo);
+        copt = i;
+        ropt = a->pos;
+      }
+      a = a->n;
+    }
+  }
+  rpiv = ropt;
+  if (copt != act)
+  {
+    a = m_act[act];
+    m_act[act] = m_act[copt];
+    m_act[copt] = a;
+  }
+  nDelete(&xo);
+  nDelete(&xu);
+}
+
+/* ----------------- elimination ------------------ */
+
+/* one step of Gauss-elimination */
+void sparse_number_mat::smGElim()
+{
+  number p = nDiv(one,piv->m);  // pivotelement
+  smnumber c = m_act[act];      // pivotcolumn
+  smnumber r = red;             // row to reduce
+  smnumber res, a, b;
+  number w, ha, hb;
+
+  if ((c == NULL) || (r == NULL))
+  {
+    while (r!=NULL) smNumberDelete(&r);
+    return;
+  }
+  do
+  {
+    a = m_act[r->pos];
+    res = dumm;
+    res->n = NULL;
+    b = c;
+    w = nMult(r->m, p);
+    nDelete(&r->m);
+    r->m = w;
+    loop   // combine the chains a and b: a + w*b
+    {
+      if (a == NULL)
+      {
+        do
+        {
+          res = res->n = smNumberCopy(b);
+          res->m = nMult(b->m, w);
+          b = b->n;
+        } while (b != NULL);
+        break;
+      }
+      if (a->pos < b->pos)
+      {
+        res = res->n = a;
+        a = a->n;
+      }
+      else if (a->pos > b->pos)
+      {
+        res = res->n = smNumberCopy(b);
+        res->m = nMult(b->m, w);
+        b = b->n;
+      }
+      else
+      {
+        hb = nMult(b->m, w);
+        ha = nAdd(a->m, hb);
+        nDelete(&hb);
+        nDelete(&a->m);
+        if (nIsZero(ha))
+        {
+          smNumberDelete(&a);
+        }
+        else
+        {
+          a->m = ha;
+          res = res->n = a;
+          a = a->n;
+        }
+        b = b->n;
+      }
+      if (b == NULL)
+      {
+        res->n = a;
+        break;
+      }
+    }
+    m_act[r->pos] = dumm->n;
+    smNumberDelete(&r);
+  } while (r != NULL);
+  nDelete(&p);
+}
+
+/* ----------------- transfer ------------------ */
+
+/*
+* select the pivotrow and store it to red and piv
+*/
+void sparse_number_mat::smSelectPR()
+{
+  smnumber b = dumm;
+  smnumber a, ap;
+  int i;
+
+  a = m_act[act];
+  if (a->pos < rpiv)
+  {
+    do
+    {
+      ap = a;
+      a = a->n;
+    } while (a->pos < rpiv);
+    ap->n = a->n;
+  }
+  else
+    m_act[act] = a->n;
+  piv = a;
+  a->n = NULL;
+  for (i=1; i<act; i++)
+  {
+    a = m_act[i];
+    if (a->pos < rpiv)
+    {
+      loop
+      {
+        ap = a;
+        a = a->n;
+        if ((a == NULL) || (a->pos > rpiv))
+          break;
+        if (a->pos == rpiv)
+        {
+          ap->n = a->n;
+          a->m = nNeg(a->m);
+          b = b->n = a;
+          b->pos = i;
+          break;
+        }
+      }
+    }
+    else if (a->pos == rpiv)
+    {
+      m_act[i] = a->n;
+      a->m = nNeg(a->m);
+      b = b->n = a;
+      b->pos = i;
+    }
+  }
+  b->n = NULL;
+  red = dumm->n;
+}
+
+/*
+* store the pivotcol in m_row
+*   m_act[cols][pos(rows)] => m_row[rows][pos(cols)]
+*/
+void sparse_number_mat::smColToRow()
+{
+  smnumber c = m_act[act];
+  smnumber h;
+
+  while (c != NULL)
+  {
+    h = c;
+    c = c->n;
+    h->n = m_row[h->pos];
+    m_row[h->pos] = h;
+    h->pos = crd;
+  }
+}
+
+/*
+* store the pivot and the assosiated row in m_row
+* to m_res (result):
+*   piv + m_row[rows][pos(cols)] => m_res[cols][pos(rows)]
+*/
+void sparse_number_mat::smRowToCol()
+{
+  smnumber r = m_row[rpiv];
+  smnumber a, ap, h;
+
+  m_row[rpiv] = NULL;
+  perm[crd] = rpiv;
+  piv->pos = crd;
+  m_res[crd] = piv;
+  while (r != NULL)
+  {
+    ap = m_res[r->pos];
+    loop
+    {
+      a = ap->n;
+      if (a == NULL)
+      {
+        ap->n = h = r;
+        r = r->n;
+        h->n = a;
+        h->pos = crd;
+        break;
+      }
+      ap = a;
+    }
+  }
+}
+
+/* ----------------- C++ stuff ------------------ */
+
+/*
+*  check singularity
+*/
+void sparse_number_mat::smZeroToredElim()
+{
+  smnumber a;
+  int i = act;
+
+  loop
+  {
+    if (i == 0) return;
+    a = m_act[i];
+    if ((a==NULL) || (a->pos>tored))
+    {
+      sing = 1;
+      this->smAllDel();
+      return;
+    }
+    i--;
+  }
+}
+
+/*
+* delete all smnumber's
+*/
+void sparse_number_mat::smAllDel()
+{
+  smnumber a;
+  int i;
+
+  for (i=act; i; i--)
+  {
+    a = m_act[i];
+    while (a != NULL)
+      smNumberDelete(&a);
+  }
+  for (i=crd; i; i--)
+  {
+    a = m_res[i];
+    while (a != NULL)
+      smNumberDelete(&a);
+  }
+  if (act)
+  {
+    for (i=nrows; i; i--)
+    {
+      a = m_row[i];
+      while (a != NULL)
+        smNumberDelete(&a);
+    }
+  }
+}
+
+/* ----------------- internal 'C' stuff ------------------ */
+
+static void smNumberDelete(smnumber *r)
+{
+  smnumber a = *r, b = a->n;
+
+  nDelete(&a->m);
+  FreeSizeOf((ADDRESS)a, smnrec);
+  *r = b;
+}
+
+static smnumber smNumberCopy(smnumber a)
+{
+  smnumber r = (smnumber)AllocSizeOf(smnrec);
+  memcpy(r, a, sizeof(smnrec));
+  return r;
+}
+
+/*
+* from poly to smnumber
+* do not destroy p
+*/
+static smnumber smPoly2Smnumber(poly q)
+{
+  smnumber a, res;
+  poly p = q;
+
+  if (p == NULL)
+    return NULL;
+  a = res = (smnumber)AllocSizeOf(smnrec);
+  a->pos = pGetComp(p);
+  a->m = pGetCoeff(p);
+  nNew(&pGetCoeff(p));
+  loop
+  {
+    pIter(p);
+    if (p == NULL)
+    {
+      pDelete(&q);
+      a->n = NULL;
+      return res;
+    }
+    a = a->n = (smnumber)AllocSizeOf(smnrec);
+    a->pos = pGetComp(p);
+    a->m = pGetCoeff(p);
+    nNew(&pGetCoeff(p));
+  }
+}
+
+/*
+* from smnumber to poly
+* destroy a
+*/
+static poly smSmnumber2Poly(number a)
+{
+  poly res;
+
+  if (a == NULL) return NULL;
+  res = pInit();
+  pSetCoeff0(res, a);
+  return res;
+}
+
+/*2
+* check the input
+*/
+static BOOLEAN smCheckSolv(ideal I)
+{ int i = I->ncols;
+  if ((i == 0) || (i != I->rank-1))
+  {
+    WerrorS("wrong dimensions for linsolv");
+    return TRUE;
+  }
+  for(;i;i--)
+  {
+    if(I->m[i-1] == NULL)
+    {
+      WerrorS("singular input for linsolv");
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
