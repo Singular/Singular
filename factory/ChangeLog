@@ -1,3 +1,67 @@
+Tue Mar 17 16:57:10 MET 1998  Jens Schmidt
+
+	* int_int.cc, int_int.h, int_poly.cc, int_poly.h, int_intdiv.cc, 
+	* ChangeLog:
+	  ***** merge from branch `factory-gcd' to main trunk
+
+Tue Mar 17 16:34:46 MET 1998  Jens Schmidt
+
+	* GNUmakefile.in:
+	  ***** merge from branch `factory-gcd' to main trunk
+
+Tue Mar 17 15:27:30 MET 1998  Jens Schmidt
+
+	* timing.h, examples/application.cc:
+	  ***** merge from branch `factory-gcd' to main trunk
+
+Tue Mar 17 14:22:56 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* int_poly.cc (dividecoeff, divremcoeff): use `divideTermList()'
+	  to do their work
+	  (divideTermList): new function copied from former
+	  `divTermList()'.  Declaration added.
+
+	* int_poly.cc (divTermList): uses `div()' to divide coefficients
+
+	* int_int.cc (dividesame, dividecoeff, divsame, divcoeff,
+	  modulosame, modulocoeff, modsame, modcoeff, divremsame,
+	  divremcoeff, divremsamet, divremcoefft): methods moved to
+	  int_intdiv.cc.  Slightly speeded up.
+
+	* int_int.h (normalizeMPI, uiNormalizeMPI, normalizeMyself,
+	  uiNormalizeMyself): new `InternalIntger' methods.  Declarations
+	  added.
+
+	* int_int.h (class InternalInteger): static member `initialized' removed
+
+	* int_intdiv.cc: new file
+
+	* GNUmakefile.in (basefactorysrc): int_intdiv.cc added to
+	  distribution
+
+	* timing.h (TIMING_END_AND_PRINT): added for windows
+
+	  (TIMING_DEFINE_PRINTPROTO, TIMING_PRINT): macros common to all
+	  platforms extracted from `#ifdef' directive
+
+	* timing.h (TIMING_RESET): new macro
+
+Fri Mar 13 17:05:10 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* examples/application.cc (main): cosmetic changes
+
+	* canonicalform.cc, canonicalform.h, cf_algorithm.cc, cf_factor.cc,
+	* cf_map.cc, cf_map.h, fac_ezgcd.cc, fac_multivar.cc,
+	* fac_univar.cc, fac_util.cc, fac_util.h, ffops.cc, ftmpl_array.h,
+	* ftmpl_factor.h, ftmpl_functions.h, ftmpl_list.h, ftmpl_matrix.h,
+	* sm_sparsemod.cc, sm_util.cc, sm_util.h, ftest/ChangeLog,
+	* ftest/commonden.m4, ftest/norm.m4, templates/ftmpl_array.cc,
+	* templates/ftmpl_factor.cc, templates/ftmpl_functions.h,
+	* templates/ftmpl_list.cc, templates/ftmpl_matrix.cc, ChangeLog,
+	* GNUmakefile.in, cf_algorithm.h, cf_gcd.cc, factory.template,
+	* ftmpl_inst.cc:
+	  ***** merge from main trunk to branch `factory-gcd'
+
 Thu Mar 12 12:21:33 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* cf_gcd.cc (maxnorm): function removed.  All references replaced
@@ -41,6 +105,11 @@ Wed Mar 11 10:39:33 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* ffops.cc (ff_setprime): uses `memset()' to clear inversion
 	  table
 
+	* ftest/ChangeLog, ftest/ftest_io.cc, ftest/ftest_io.h,
+ 	* ftest/ftest_util.cc, ftest/ftest_util.h, ftest/ftest_util.m4,
+ 	* ftest/gcd.fex, ftest/runfex:
+  	  ***** merge from branch `factory-gcd' to main trunk
+
 Tue Mar 10 15:44:06 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* factory.template, ftmpl_inst.cc, templates/ftmpl_array.cc,
@@ -53,15 +122,112 @@ Tue Mar 10 15:44:06 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* GNUmakefile.in (basefactoryincl): new header files added to
 	  distribution
 
+Fri Feb 27 10:24:22 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* var_intglobal.cc, var_intglobal.h: files removed (do not belong
+	  to this branch!)
+
+	* cf_primetab.h: file removed
+
+	* cf_defs.h (SW_QUOTIENT, SW_FAC_USE_BIG_PRIMES): switches removed
+
+	* cf_linsys.cc (linearSystemSolve, solve, bound determinant2):
+	  incorrect respective unused code removed
+
+	* cf_char.cc (setCharacteristic): adapted to new prime generation
+	  scheme
+	* cf_char.cc (setCharacteristic): previous adaption slightly
+	  changed.  The largest small prime is now looked up only once.
+
+	* cf_gcd.cc (gcd_poly_univar0): adapted to new prime generation
+	  scheme
+	* fac_ezgcd.cc (findBound): adapted to new prime generation
+	  scheme
+	* cf_linsys.cc (determinant): adapted to prime generation
+	  scheme
+	* sm_sparsemod.cc (internalSparsemod): adapted to new prime
+	  generation scheme
+	* fac_univar.cc (choosePrimes): adapted to new prime generation
+	  scheme
+
+	* sm_sparsemod.cc (sparsemod): debug output added
+
+	* fac_univar.cc (cf2double): function removed
+
+	* fac_univar.cc (UnivariateQuadraticLift, UnivariateLinearLift):
+	  argument `Gamma' removed.  All callers changed.
+
+	* fac_univar.cc (UnivariateQuadraticLift, UnivariateLinearLift): call to
+	  `div( CF, CF )' replaced by call to `operator / ( CF, CF )'
+
+Thu Feb 26 17:58:31 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* gcd_pmultiv.h (class CFPrimitiveMultivariateGCD): renamed to
+	  `CFPrimitiveMultivariateGcd'.  All references changed.
+	  (class CFSubResGCD): renamed to `CFSubResGcd'.  All references
+	  changed.
+
+	* gcd_pmultiv.h (class CFPrimitiveMultivariateGCD): does no longer
+	  inherit virtual from `CFPrimitiveGcd'
+	  (class CFSubResGcd): does no longer inherit from
+	  `CFPrimitiveUnivariateGCD'
+
+	* gcd_pmultiv.h (class CFSubResGcd): new method `clone()'
+
+	* gcd_pmultiv.h: new file
+
+	* gcd_pmultiv.cc (CFSubResGcd::execute): bug fix.  Superfluous
+	  break removed.
+	  (execute): bug fix.  Assertion fixed.
+
+	* gcd_pmultiv.cc: new file
+
 Fri Feb 20 17:41:23 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* GNUmakefile.in (installcf, installmem): `ranlib' libraries after
 	  installing them for SUN machines
 
+Tue Feb 10 10:47:04 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_switches.h: doc fix
+
 Mon Feb  9 15:57:07 1998  Ruediger Stobbe  <rstobbe@de.oracle.com>
 
 	* cf_factor.cc (factorize): factorize now handles characteristic
 	  0 correct, e.g. rational coefficients and SW_RATIONAL = ON.
+
+Mon Feb  9 11:40:41 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_primetab.cc: new file
+
+Thu Feb  5 16:53:21 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in (enable_timing, enable_debugoutput): extra timing
+	  and debugoutput magic removed
+	* GNUmakefile.in (@timingtargets@, @debouttargets@,
+	  @debtimingtargets@): extra timing and debugoutput magic removed
+
+Tue Feb  3 14:03:00 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (ftestm4src): `bextgcd.m4' and `bgcd.m4'
+	  removed.  References variable `ftestm4src' instead.
+
+Mon Feb  2 09:55:16 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_chinese.cc (chineseRemainder( const CanonicalForm & ...)):
+	  completely rewritten
+
+Fri Jan 30 15:06:26 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_chinese.cc (chineseRemainder): debug output added
+
+	* cf_chinese.cc	(chineseRemainder( const CFArray & ...)): slightly
+	  speeded up
+
+	* cf_gcd.cc (iextgcd, igcd): functions removed.  All references
+	  replaced by `bextgcd()' and `bgcd()', resp.
+
+	* canonicalform.h (iextgcd): declaration removed
 
 Thu Jan 22 10:38:34 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
@@ -570,11 +736,7 @@ Tue Sep  9 09:06:17 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* INSTALL: doc fix
 
-	* cf_globals.h: doc checked
-	
 	* cf_globals.h: doc fix
-
-	* cf_globals.cc: doc checked
 
 	* cf_globals.cc: #include fix, doc fix
 
@@ -605,8 +767,6 @@ Tue Sep  9 09:06:17 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Mon Sep  8 12:39:09 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* cf_algorithm.cc: doc checked
-
 	* cf_algorithm.cc (psr, psq, psqr): assertions added
 
 	* cf_algorithm.cc (psq, psqr): return correct values now if deg(f)
@@ -627,8 +787,6 @@ Mon Sep  8 12:39:09 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* cf_switches.cc: doc fix
 
 Thu Sep  4 10:19:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
-
-	* cf_ops.cc: doc checked
 
 	* cf_ops.cc: (replacevar, replacevar_between): new functions
 	* canonicalform.h (replacevar): new declaration
@@ -654,10 +812,6 @@ Thu Sep  4 10:19:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	  now initialized to f.
 
 Mon Sep  1 10:47:41 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
-
-	* cf_algorithm.h: doc checked
-
-	* cf_resultant.cc: doc checked
 
 	* canonicalform.h (resultant): declaration moved to cf_algorithm.h
 	* cf_algorithm.h (resultant): declaration moved from
@@ -778,12 +932,8 @@ Thu Jul 24 12:44:46 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Wed Jul 23 09:45:35 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* cf_map.h: doc checked
-
 	* cf_map.h (class CFMap): references to List<CanonicalForm>
 	  replaced by CFList
-
-	* cf_map.cc: doc checked
 
 	* cf_map.cc (CFMap( CFList )): 'P.append()' replaced by 'P.insert()'
 
@@ -801,28 +951,16 @@ Tue Jul 22 11:04:30 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* canonicalform.cc (initCanonicalForm): initialization of switches
 	  removed since they are initialized by constructor
 
-	* bin/folding.el: doc checked
-
-	* bin/fold-docu.el: doc checked
-
 	* bin/folding.el: new file
 	* bin/fold-docu.el: new file
 	* bin/fold-docu.el (fold-docu): works now for all fold marks
 	* README: doc fix
-
-	* cf_switches.h: doc checked
-
-	* cf_switches.cc: doc checked
 
 	* cf_switches.h (CFSwitchesMax): new constant
 	* cf_switches.h (class CFSwitches): number of switches replaced by
 	  references to 'const int CFSwitchesMax'
 	* cf_switches.cc (CFSwitches): number of switches replaced by
 	  references to 'const int CFSwitchesMax'
-
-	* cf_util.h: doc checked
-
-	* cf_util.cc: doc checked
 
 
     **************** Factory Version 1.3a released ****************
@@ -905,10 +1043,6 @@ Thu Jul 17 11:05:04 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Wed Jul 16 11:35:06 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* cf_chinese.cc: doc checked
-
-	* cf_chinese.h: doc checked
-
 	* .cvsignore (config.cache): new entry
 
 	* canonicalform.cc (CanonicalForm::ilog2): new method
@@ -925,10 +1059,6 @@ Tue Jul 15 14:47:53 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* sm_util.h (REArray): new typedef.  All references to
 	  Array<REvaluation> changed to REArray.
-
-	* sm_util.h: doc checked
-
-	* sm_sparsemod.h: doc checked
 
 	* sm_sparsemod.h: new file
 
@@ -1047,17 +1177,11 @@ Mon Jun 30 15:38:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Fri Jun 27 10:33:29 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* bin/makeheader: doc checked
-	* bin/install-sh: doc checked
-	* bin/mkinstalldirs: doc checked
-
 	* bin/makeheader: checked into RCS
 	* bin/install-sh: checked into RCS
 	* bin/mkinstalldirs: checked into RCS
 
 Thu Jun 26 16:06:39 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
-
-	* GNUmakefile.in: doc checked
 
 	* GNUmakefile.in: doc fix
 
@@ -1067,8 +1191,6 @@ Wed Jun 25 10:02:51 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	(CPPFLAGS, LDFLAGS): bug fix
 
 Tue Jun 24 11:15:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
-
-	* configure.in: doc checked
 
 	* configure.in (with_builtingmp): command line option
 	  --with-builtingmp removed.  All references to with_builtingmp
@@ -1085,11 +1207,6 @@ Tue Jun 24 11:15:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* configure.in: doc fix
 
 Mon Jun 23 12:44:50 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
-
-	* config.h.in: doc checked
-	* factory.template: doc checked
-	* factoryconf.template: doc checked
-	* gengftables.cc: doc checked
 
 	* config.h.in: doc fix
 
