@@ -30,7 +30,7 @@ graphics
 highcorner_s
 hres_s
 hnoether_s
-; DIFF PROBABLY BUG homolog_s
+homolog_s
 imap
 intdet_s
 intersect_s
