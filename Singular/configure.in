@@ -807,8 +807,8 @@ fi
 AC_MSG_CHECKING(whether to have namespaces)
 if test "$with_namespaces" != no; then
   AC_MSG_RESULT(yes)
-else
   AC_DEFINE(HAVE_NAMESPACES)
+else
   AC_MSG_RESULT(no)
 fi
 
