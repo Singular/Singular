@@ -1,6 +1,7 @@
 allres_l
 bardet_probl_l
 bug_4
+bug_res
 classify_l
 deform_l
 det_minor
@@ -8,6 +9,7 @@ fetch_l
 fglm1_l
 fglmquot1_l
 finvar_l
+gaussm_l
 gcd0_l
 gcdp_l
 hnoether_l
@@ -19,7 +21,11 @@ makedbm_l
 minor_l
 modulo_l
 monodromy_l
-;; mpsr_l
+mora_1
+mora_2
+mora_4
+mora_8
+mpsr_l
 mre
 mre_nonhom
 Mregular
