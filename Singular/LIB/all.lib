@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.27 2000-09-14 12:37:08 Singular Exp $
+// $Id: all.lib,v 1.28 2000-12-11 13:14:08 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.27 2000-09-14 12:37:08 Singular Exp $";
+version="$Id: all.lib,v 1.28 2000-12-11 13:14:08 Singular Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -34,6 +34,8 @@ LIBRARY:  all.lib   Load all libraries
   jordan.lib    PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
   spcurve.lib   PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
   algebra.lib   PROCEDURES FOR COMPUTING WITH ALGBRAS AND MAPS
+  rinvar.lib    PROCEDURES FOR INVARIANT RINGS OF REDUCTIVE GROUPS
+  zeroset.lib   PROCEDURES FOR ROOTS AND FACTORIZATION
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,4 +73,6 @@ LIB "algebra.lib";
 LIB "intprog.lib";
 LIB "toric.lib";
 LIB "mregular.lib"
+LIB "rinvar.lib"
+LIB "zeroset.lib";
 
