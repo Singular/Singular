@@ -24,9 +24,9 @@
 
 #include "assert.h"
 
+#include "canonicalform.h"
 #include "cf_defs.h"
 #include "gfops.h"
-#include "canonicalform.h"
 #include "parseutil.h"
 #include "variable.h"
 
