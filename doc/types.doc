@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.95 1999-07-22 07:12:31 wichmann Exp $
+@comment $Id: types.doc,v 1.96 1999-07-23 08:45:54 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1859,7 +1859,7 @@ Maps are ring maps from a preimage ring into the basering.
 
 @strong{Note:}
 @itemize @bullet
-@item 
+@item
 the target of a map is ALWAYS the actual basering
 @item
 the preimage ring is stored "by name", that means, maps can only be
@@ -2328,7 +2328,7 @@ by its module of relations. The assignments
 create the presentation matrix of size
 @ifinfo
 n x k
-@end info
+@end ifinfo
 @tex
 n$\times$k
 @end tex
