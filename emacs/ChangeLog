@@ -1,3 +1,35 @@
+Thu Jul 30 11:45:28 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* singular.el (singular-process): new macro
+
+	* singular.el (singular-demo-command-on-enter,
+	  singular-demo-command-on-exit): new variables
+ 	  (singular-demo-mode): sends commands on entering and exiting
+
+	* singular.el (singular-demo-mode-init): function removed.
+	  Functionality moved to `singular-demo-mode'.
+	  (singular-demo-mode): more versatile.  Knows how to enter and to
+	  exit, too.  All callers adapted.
+	  (singular-demo-exit): new function
+	  (singular-demo-show-next-chunk): leaves demo mode after showing
+	  last chunk
+	  (singular-demo-load): does not show first chunk on startup
+
+	* singular.el (singular-remove-prompt-regexp): new variable
+	  (singular-remove-prompt): new function
+
+	* singular.el (singular-string-start-anchored-prompt-regexp):
+	  renamed to `singular-strip-leading-prompt-regexp'
+	  (singular-strip-prompts): renamed to
+	  `singular-strip-leading-prompt'
+	  (singular-prompt-sequence-regexp): renamed to
+	  `singular-skip-prompt-forward-regexp'
+
+	* singular.el (singular-fold-internal): bug fix.  Keeping undo
+	  information not up-to-date leads to a corrupt undo list.
+	  (singular-demo-show-next-chunk): ditto
+	  (singular-exit-sentinel): switches off demo mode on exit
+
 Wed Jul 29 10:50:47 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* singular.el (singular-extended-prompt-regexp,
@@ -11,8 +43,6 @@ Wed Jul 29 10:50:47 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	  save buffer-modified flag and do not switch off read only state
 	  (singular-output-filter): does not switch off read only state
 	  (singular-input-section-to-string): new function
-	  (singular-strip-white-space, singular-strip-prompts): new
-	  functions
 
 	* singular.el (singular-send-input): sends old input sections
 	  (singular-send-input): renamed to
