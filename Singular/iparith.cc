@@ -99,6 +99,7 @@ struct sValCmdM
 
 
 /*============= proc =======================*/
+static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport = FALSE);
 static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op);
 #ifdef MDEBUG
 #define jjMakeSub(A) jjDBMakeSub(A,__FILE__,__LINE__)
@@ -196,7 +197,7 @@ cmdnames cmds[] =
   { "link",        0, LINK_CMD ,          ROOT_DECL},
   { "listvar",     0, LISTVAR_CMD ,       LISTVAR_CMD},
   { "list",        0, LIST_CMD ,          ROOT_DECL_LIST},
-  { "load",        0, LOAD_CMD ,          CMD_1},
+  { "load",        0, LOAD_CMD ,          CMD_12},
   { "lres",        0, LRES_CMD ,          CMD_2},
   { "map",         0, MAP_CMD ,           RING_DECL},
   { "matrix",      0, MATRIX_CMD ,        MATRIX_CMD},
@@ -1906,6 +1907,17 @@ static BOOLEAN jjWRONG(leftv res, leftv u)
 {
   return TRUE;
 }
+
+static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
+{
+  char * s=(char *)u->Data();
+  if(strcmp(s, "with")==0)
+    return jjLOAD(res, v, TRUE);
+  Werror("invalid second argument");
+  Werror("load(\"libname\" [,\"with\"]);");
+  return TRUE;
+}
+
 /*=================== operations with 2 args.: table =================*/
 struct sValCmd2 dArith2[]=
 {
@@ -2169,6 +2181,9 @@ struct sValCmd2 dArith2[]=
 ,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD PROFILER}
 ,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD PROFILER}
 ,{jjWEDGE,     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD PROFILER}
+#ifdef HAVE_NAMESPACES
+,{jjLOAD_E,    LOAD_CMD,       NONE,           STRING_CMD, STRING_CMD PROFILER}
+#endif /* HAVE_NAMESPACES */
 ,{NULL,        0,              0,              0,          0 PROFILER}
 };
 /*=================== operations with 1 arg.: static proc =================*/
@@ -2918,7 +2933,12 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
   return FALSE;
 }
 
-static BOOLEAN jjLOAD(leftv res, leftv v)
+static BOOLEAN jjLOAD1(leftv res, leftv v)
+{
+  return jjLOAD(res, v);
+}
+
+static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 {
   char * s=mstrdup((char *)v->Data());
   char libnamebuf[256];
@@ -2935,12 +2955,12 @@ static BOOLEAN jjLOAD(leftv res, leftv v)
         break;
 
       case LT_SINGULAR:
-        result = iiLibCmd(s, FALSE);
+        result = iiLibCmd(s, autoexport);
         break;
  
       case LT_ELF:
 #ifdef HAVE_DYNAMIC_LOADING
-        result = load_modules(s, libnamebuf, FALSE);
+        result = load_modules(s, libnamebuf, autoexport);
 #else /* HAVE_DYNAMIC_LOADING */
         Print("Dynamic modules are not supported by this version of Singular");
 #endif /* HAVE_DYNAMIC_LOADING */
@@ -3423,7 +3443,7 @@ struct sValCmd1 dArith1[]=
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     IDEAL_CMD }
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     MODUL_CMD }
 #ifdef HAVE_NAMESPACES
- ,{jjLOAD,      LOAD_CMD,        NONE,           STRING_CMD }
+,{jjLOAD1,      LOAD_CMD,        NONE,           STRING_CMD }
 #endif /* HAVE_NAMESPACES */
 ,{NULL,         0,               0,              0}
 };
