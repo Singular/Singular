@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.5 1997-08-01 10:53:06 Singular Exp $
+// $Id: fglmzero.cc,v 1.6 1997-08-15 08:11:15 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -16,10 +16,6 @@
 
 #include "mod2.h"
 
-#ifndef NOSTREAMIO
-#include <iostream.h>
-#endif
-
 #ifdef HAVE_FGLM
 #include "tok.h"
 #include "structs.h"
@@ -32,8 +28,15 @@
 #include "mmemory.h"
 #include "fglm.h"
 #include "fglmvec.h"
+// assumes, that NOSTREAMIO is set in factoryconf.h, which is included
+// by templates/list.h. 
+#ifdef macintosh
+#include <::templates:list.h>
+#else
 #include <templates/list.h>
+#endif
 
+// internal Version: 1.3.1.12
 // ============================================================
 //!      The idealFunctionals 
 // ============================================================
@@ -280,6 +283,13 @@ public:
     borderElem() : monom(NULL), nf() {}
     borderElem( poly p, fglmVector n ) : monom( p ), nf( n ) {}
     ~borderElem() { pDelete1( &monom ); }
+#ifdef macintosh
+    void insertElem( poly p, fglmVector n ) 
+    {
+	monom= p;
+	nf= n;
+    }
+#endif
 };
 
 //     This class contains the relevant data for the 'candidates'
@@ -300,14 +310,6 @@ fglmSelem::cleanup()
 {
     Free( (ADDRESS)divisors, (numVars+1)*sizeof( int ) );
 }
-
-#ifndef NOSTREAMIO
-ostream &
-operator << ( ostream & os, const fglmSelem & l )
-{
-    return os;
-}
-#endif
 
 //     The data-structure for the Functional-Finding-Algorithm.
 class fglmSdata
@@ -360,7 +362,11 @@ fglmSdata::fglmSdata( const ideal thisIdeal )
     borderBS= 100;
     borderMax= borderBS;
     borderSize= 0;
+#ifdef macintosh
+    border= new borderElem[ borderMax ];
+#else
     border= (borderElem *)Alloc( borderMax*sizeof( borderElem ) );
+#endif
     // rem: the constructors are called in newBorderElem().
     _state= TRUE;
 }
@@ -370,10 +376,14 @@ fglmSdata::~fglmSdata()
     for ( int k = basisSize; k > 0; k-- )
 	pDelete1( basis + k );  //. rem: basis runs from basis[1]..basis[basisSize]
     Free( (ADDRESS)basis, basisMax*sizeof( poly ) );
+#ifdef macintosh
+    delete [] border;
+#else
     for ( int l = borderSize; l > 0; l-- )
 	// rem: the polys of borderElem are deleted via ~borderElem()
 	border[l].~borderElem();
     Free( (ADDRESS)border, borderMax*sizeof( borderElem ) );
+#endif
 }
 
 //     Inserts poly p without copying into basis, reAllocs Memory if necessary, 
@@ -402,10 +412,24 @@ fglmSdata::newBorderElem( poly & m, fglmVector v )
 {
     borderSize++;
     if ( borderSize == borderMax ) {
+#ifdef macintosh
+	borderElem * tempborder = new borderElem[ borderMax+borderBS ];
+	for ( int k = 0; k < borderMax; k++ ) {
+	    tempborder[k]= border[k];
+	    border[k].insertElem( NULL, fglmVector() );
+	}
+	delete [] border;
+	border= tempborder;
+#else
 	border= (borderElem *)ReAlloc( border, borderMax*sizeof( borderElem ), (borderMax + borderBS)*sizeof( borderElem ) );
+#endif
 	borderMax+= borderBS;
     }
+#ifdef macintosh
+    border[borderSize].insertElem( m, v );
+#else
     border[borderSize].borderElem( m, v );
+#endif
     m= NULL;
 }
 
@@ -494,16 +518,18 @@ fglmSdata::getVectorRep( const poly p )
 	    num--;
 	    m= pIter( m );
 	}
-        else if ( comp < 0 ) {
-	    num--;
-	}
-	else {
-	    // This is the place where we can detect if the sourceIdeal
-	    // is not reduced. In this case m is not in basis[]. Since basis[]
-	    // is ordered this is then and only then the case, if basis[i]<m
-	    // and basis[j]>m for all j>i
-	    _state= FALSE;
-	    return temp;
+        else { 
+	    if ( comp < 0 ) {
+		num--;
+	    }
+	    else {
+		// This is the place where we can detect if the sourceIdeal
+		// is not reduced. In this case m is not in basis[]. Since basis[]
+		// is ordered this is then and only then the case, if basis[i]<m
+		// and basis[j]>m for all j>i
+		_state= FALSE;
+		return temp;
+	    }
 	}
     }
     return temp;
@@ -515,6 +541,18 @@ fglmSdata::getVectorRep( const poly p )
 fglmVector
 fglmSdata::getBorderDiv( const poly m, int & var ) const
 {
+//     int num2 = borderSize;
+//     while ( num2 > 0 ) {
+// 	poly temp = border[num2].monom;
+// 	if ( pDivisibleBy( temp, m ) ) {
+// 	    poly divisor = pDivideM( m, temp );
+// 	    int var = pIsPurePower( divisor );
+// 	    if ( (var != 0) && (pGetCoeff( divisor, var ) == 1) ) {
+// 		Print( "poly %s divides poly %s", pString( temp ), pString( m ) );
+// 	    }
+// 	}
+// 	num2--;
+//     }
     int num = borderSize;
     while ( num > 0 ) {
 	poly temp = border[num].monom;
@@ -620,14 +658,6 @@ fglmDelem::cleanup()
     }
 }
 
-#ifndef NOSTREAMIO
-ostream &
-operator << ( ostream & os, const fglmDelem & l )
-{
-    return os;
-}
-#endif
-
 class gaussElem
 {
 public:
@@ -636,12 +666,26 @@ public:
     number pdenom;
     number fac;
 
+#ifdef macintosh
+    gaussElem() : v(), p(), pdenom( NULL ), fac( NULL ) {}
+#endif
     gaussElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac ) : v( newv ), p( newp ), pdenom( newpdenom ), fac( newfac )
     {
 	newpdenom= NULL;
 	newfac= NULL;
     }
     ~gaussElem();
+#ifdef macintosh
+    void insertElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac ) 
+    {
+	v= newv;
+	p= newp;
+	pdenom= newpdenom;
+	fac= newfac;
+	newpdenom= NULL;
+	newfac= NULL;
+    }
+#endif
 };
 
 gaussElem::~gaussElem()
@@ -690,7 +734,11 @@ fglmDdata::fglmDdata( int dimension )
     dimen= dimension;
     basisSize= 0;
     //. All arrays run from [1]..[dimen], thus Alloc( dimen + 1 )!
+#ifdef macintosh
+    gauss= new gaussElem[ dimen+1 ];
+#else
     gauss= (gaussElem *)Alloc( (dimen+1)*sizeof( gaussElem ) );
+#endif
     isPivot= (BOOLEAN *)Alloc( (dimen+1)*sizeof( BOOLEAN ) );
     for ( k= dimen; k > 0; k-- ) isPivot[k]= FALSE;
     perm= (int *)Alloc( (dimen+1)*sizeof( int ) );
@@ -704,9 +752,13 @@ fglmDdata::~fglmDdata()
 {
     fglmASSERT( dimen == basisSize, "Es wurden nicht alle BasisElemente gefunden!" );
     int k;
+#ifdef macintosh
+    delete [] gauss;
+#else
     for ( k= dimen; k > 0; k-- ) 
 	gauss[k].~gaussElem();
     Free( (ADDRESS)gauss, (dimen+1)*sizeof( gaussElem ) );
+#endif
     Free( (ADDRESS)isPivot, (dimen+1)*sizeof( BOOLEAN ) );
     Free( (ADDRESS)perm, (dimen+1)*sizeof( int ) );
     //. Remember: There is no poly in basis[0], thus k > 0
@@ -753,7 +805,11 @@ fglmDdata::newBasisElem( poly & m, fglmVector v, fglmVector p, number & denom )
     perm[basisSize]= pivotcol;
     
     pivot= nCopy( v.getconstelem( pivotcol ) );
+#ifdef macintosh
+    gauss[basisSize].insertElem( v, p, denom, pivot );
+#else
     gauss[basisSize].gaussElem( v, p, denom, pivot );
+#endif
 }
 
 void
