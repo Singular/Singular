@@ -589,7 +589,7 @@ Singulart: scanner.cc  gmalloc.ot $(OBJT) iparith.ot mpsr_Tok.ot claptmpl.ot tes
 	tesths.cc iparith.ot mpsr_Tok.ot claptmpl.ot $(OBJT) ${LDFLAGST} ${LIBS} \
 	${LD_DYN_FLAGS} gmalloc.ot
 
-iparith.ot: iparith.ic iparith.cc
+iparith.ot: iparith.inc iparith.cc
 	$(CXXP)  ${CXXFLAGST} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFST} -c iparith.cc -o iparith.ot
 
 mpsr_Tok.ot: iparith.inc mpsr_Tok.cc
