@@ -3755,6 +3755,9 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
       si->j=-1;
       si->expected_length=pLength(I->m[i]);
       si->deg=pTotaldegree(I->m[i]);
+      if (!rField_is_Zp(c->r)){ 
+	pCleardenom(I->m[i]);
+      }
       si->lcm_of_lm=I->m[i];
       
       //      c->apairs[n-1-i]=si;
@@ -4435,10 +4438,10 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     c->strat->lenS[j]=new_length;
     if(c->strat->lenSw)
       c->strat->lenS[j]=qal;
-    if(c->is_char0)
+    if (!rField_is_Zp(c->r))
     {
       pContent(clear_into);
-      pCleardenom(clear_into);
+      pCleardenom(clear_into);//should be unnecessary
     }
     else                     
       pNorm(clear_into);
