@@ -5,6 +5,18 @@
 * ABSTRACT
 */
 /* $Log: not supported by cvs2svn $
+// Revision 1.4  1997/03/28  21:44:36  obachman
+// Fri Mar 28 14:12:05 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* Added routines dump(link) and getdump(link) for ascii and MP
+// 	  links
+//
+// 	* ipconv.cc (dConvertTypes): added int->module conversion so that
+// 	  'module m = 0' works
+//
+// 	* iparith.cc (jjVAR1): added LINK_CMD to list of typeof(...)
+//
 // Revision 1.3  1997/03/26  14:58:02  obachman
 // Wed Mar 26 14:02:15 1997  Olaf Bachmann
 // <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
@@ -37,6 +49,7 @@ static BOOLEAN DumpAscii(FILE *fd, idhdl h);
 static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h);
 static char* GetIdString(idhdl h);
 static int DumpRhs(FILE *fd, idhdl h);
+static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str);
 
 /* =============== general utilities ====================================== */
 void GetCmdArgs(int *argc, char ***argv, char *str)
@@ -476,6 +489,9 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   // we do not throw an error if a wrong type was attempted to be dumped
   if (type_str == NULL) return FALSE;
 
+  // handle qrings separately
+  if (type_id == QRING_CMD) return DumpQring(fd, h, type_str);
+  
   // put type and name 
   if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF) return TRUE;
 
@@ -521,6 +537,7 @@ static char* GetIdString(idhdl h)
       case INTMAT_CMD:
       case STRING_CMD:
       case RING_CMD:
+      case QRING_CMD:
       case PROC_CMD:
       case NUMBER_CMD:
       case POLY_CMD:
@@ -530,9 +547,6 @@ static char* GetIdString(idhdl h)
       case MATRIX_CMD:
       case MAP_CMD:
         return Tok2Cmdname(type);
-
-      case QRING_CMD:
-        return Tok2Cmdname(RING_CMD);
         
       case LINK_CMD:
         return NULL;
@@ -543,6 +557,21 @@ static char* GetIdString(idhdl h)
   }
 }
 
+static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str)
+{
+  char *ideal_str = iiStringMatrix((matrix) IDRING(h)->qideal, 1);
+
+  if (ideal_str == NULL) return TRUE;
+  if (fprintf(fd, "%s temp_ideal = %s;\n", Tok2Cmdname(IDEAL_CMD), ideal_str)
+      == EOF) return TRUE;
+  if (fprintf(fd, "attrib(temp_ideal, \"isSB\", 1);\n") == EOF) return TRUE;
+  if (fprintf(fd, "%s %s = temp_ideal;\n", type_str, IDID(h)) == EOF)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+  
 static int DumpRhs(FILE *fd, idhdl h)
 {
   idtyp type_id = IDTYP(h);
