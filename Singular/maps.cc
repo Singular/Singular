@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.39 2002-03-07 18:48:13 Singular Exp $ */
+/* $Id: maps.cc,v 1.40 2003-03-12 12:27:42 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -91,7 +91,7 @@ static poly maEvalMonom(map theMap, poly p,ring preimage_r,matrix s, nMapFunc nM
     poly q=pNSet(nMap(pGetCoeff(p)));
 
     int i;
-    for(i=preimage_r->N; i>0; i--)
+    for(i=1;i<=preimage_r->N; i++)
     {
       int pExp=p_GetExp( p,i,preimage_r);
       if (pExp != 0)
