@@ -304,7 +304,6 @@ Gact
 Gaction
 galois
 gaussian
-gaussman
 gaussred
 gcd
 ge
@@ -329,6 +328,7 @@ GMP
 gmscoeffs
 gmsnf
 gmsring
+gmssing
 gn
 GNU's
 gonnet

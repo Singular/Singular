@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.68 2003-03-06 11:42:55 levandov Exp $
+@comment $Id: math.doc,v 1.69 2003-05-30 09:59:58 mschulze Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -459,7 +459,7 @@ These numbers give bounds for the maximal number of isolated singularties of a s
 such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
 The cone itself being a $\mu$-constant deformation of $x_0^d+\dots+x_n^d=0$, the singularities are bounded by the spectrum of $x_0^d+\dots+x_n^d$.
 
-Using the library {\tt gaussman.lib} one can compute the {\bf monodromy}, the V-fitration on $H''/H'$, and the spectrum.
+Using the library {\tt gmssing.lib} one can compute the {\bf monodromy}, the V-fitration on $H''/H'$, and the spectrum.
 @end tex
 
 @ifinfo
@@ -492,7 +492,7 @@ These numbers give bounds for the maximal number of isolated singularties of a s
 such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
 The cone itself being a mu-constant deformation of x_0^d+...+x_n^d=0, the singularities are bounded by the spectrum of x_0^d+...+x_n^d.
 
-Using the library @code{gaussman.lib} one can compute the @strong{monodromy}, the V-fitration on H''/H', and the spectrum.
+Using the library @code{gmssing.lib} one can compute the @strong{monodromy}, the V-fitration on H''/H', and the spectrum.
 @end ifinfo
 
 Let us consider as an example @math{f=x^5+x^2y^2+y^5}.
@@ -506,7 +506,7 @@ exp(-2*pi*i*M)
 is a monodromy matrix of @math{f} and the Jordan normal form of @math{M}:
 @smallexample
   // not computed !!
-  LIB "gaussman.lib";
+  LIB "gmssing.lib";
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
   matrix M=monodromy(f);
@@ -516,7 +516,7 @@ is a monodromy matrix of @math{f} and the Jordan normal form of @math{M}:
 Now, we compute the V-fitration on @math{H''/H'} and the spectrum:
 @smallexample
   // not computed !!
-  LIB "gaussman.lib";
+  LIB "gmssing.lib";
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
   list l=vfiltration(f);
