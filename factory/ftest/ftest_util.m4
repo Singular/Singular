@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.4 1997-10-01 10:49:41 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.5 1997-10-01 11:09:25 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -133,8 +133,13 @@ define(`ftestGetEnv', `dnl
 #
 define(`ftestGetInVar', `dnl
 ifelse(`$#', `1',
-  ``ftestArgGiven$1= true;
-    $1= ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] )'',
+  ``if ( argv[ optind ] ) {
+        ftestArgGiven$1= true;
+        $1= ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
+    } else
+	ftestError( CommandlineError,
+                    "expected '_stripTWS(`_ftestInType_$1')` at position %d in commandline\n",
+                    optind )'',
   ``if ( argv[ optind ] ) {
 	ftestArgGiven$1 = true;
 	$1 = ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
@@ -192,7 +197,7 @@ define(`_ftestOutput', `dnl
 ifelse(`$#', `0', ,
   `$#', `1', ,
 ``;
-    ftestPrintResult( $1, $2)'_ftestOutput(shift(shift($@)))')')
+    ftestPrintResult( $1, '_qstripTWS(`$2')` )'_ftestOutput(shift(shift($@)))')')
 
 define(`ftestOutput', `dnl
 `ftestPrintTimer( timing_ftestTimer_time );
