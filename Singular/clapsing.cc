@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.8 1997-06-17 10:59:33 Singular Exp $
+// $Id: clapsing.cc,v 1.9 1997-06-30 12:31:38 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -598,20 +598,26 @@ err:
 
 poly singclap_det( const matrix m )
 {
+  int r=m->rows();
+  if (r!=m->cols())
+  {
+    Werror("det of %d x %d matrix",r,m->cols());
+    return NULL;
+  }
   poly res=NULL;
   if ( nGetChar() == 0 || nGetChar() > 1 )
   {
     setCharacteristic( nGetChar() );
-    CFMatrix M(m->rows(),m->cols());
+    CFMatrix M(r,r);
     int i,j;
-    for(i=1;i<=m->rows();i++)
+    for(i=1;i<=r;i++)
     {
-      for(j=1;j<=m->cols();j++)
+      for(j=1;j<=r;j++)
       {
         M(i,j)=convSingPClapP(MATELEM(m,i,j));
       }
     }
-    res= convClapPSingP( determinant(M,m->rows())) ;
+    res= convClapPSingP( determinant(M,r) ) ;
   }
   // and over Q(a) / Fp(a)
   else if (( nGetChar()==1 ) /* Q(a) */
@@ -619,33 +625,33 @@ poly singclap_det( const matrix m )
   {
     if (nGetChar()==1) setCharacteristic( 0 );
     else               setCharacteristic( -nGetChar() );
-    CFMatrix M(m->rows(),m->cols());
+    CFMatrix M(r,r);
     poly res;
     if (currRing->minpoly!=NULL)
     {
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       int i,j;
-      for(i=1;i<=m->rows();i++)
+      for(i=1;i<=r;i++)
       {
-        for(j=1;j<=m->cols();j++)
+        for(j=1;j<=r;j++)
         {
           M(i,j)=convSingAPClapAP(MATELEM(m,i,j),a);
         }
       }
-      res= convClapAPSingAP( determinant(M,m->rows())) ;
+      res= convClapAPSingAP( determinant(M,r) ) ;
     }
     else
     {
       int i,j;
-      for(i=1;i<=m->rows();i++)
+      for(i=1;i<=r;i++)
       {
-        for(j=1;j<=m->cols();j++)
+        for(j=1;j<=r;j++)
         {
           M(i,j)=convSingTrPClapP(MATELEM(m,i,j));
         }
       }
-      res= convClapPSingTrP( determinant(M,m->rows()));
+      res= convClapPSingTrP( determinant(M,r) );
     }
   }
   else

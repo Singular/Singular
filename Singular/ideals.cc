@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.9 1997-06-17 09:44:22 Singular Exp $ */
+/* $Id: ideals.cc,v 1.10 1997-06-30 12:31:40 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1929,7 +1929,7 @@ ideal idMaxIdeal(int deg)
   {
     ideal I=idInit(1,1);
     I->m[0]=pOne();
-    return I; 
+    return I;
   }
   if (deg == 1)
   {
@@ -2157,6 +2157,11 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
 */
 ideal idMinors(matrix a, int ar)
 {
+  if(ar<=0)
+  {
+    Werror("%d-th minor ",ar);
+    return NULL;
+  }
   int     i,j,k,size;
   int *rowchoise,*colchoise;
   BOOLEAN rowch,colch;
@@ -2939,7 +2944,7 @@ ideal idMinEmbedding(ideal arg)
     }
     for (j=IDELEMS(res)-1;j>=0;j--)
     {
-      if ((res->m[j]!=NULL) && (pIsConstantComp(res->m[j])) && 
+      if ((res->m[j]!=NULL) && (pIsConstantComp(res->m[j])) &&
            (pNext(res->m[j])==NULL))
       {
         pC = pGetComp(res->m[j]);

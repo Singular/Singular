@@ -2280,9 +2280,16 @@ nonconst:
 }
 static BOOLEAN jjDET_I(leftv res, leftv v)
 {
-  int i,j;
   intvec * m=(intvec*)v->Data();
-  res->data = (char *)singclap_det_i(m);
+  int i,j;
+  i=m->rows();j=m->cols();
+  if(i==j)
+    res->data = (char *)singclap_det_i(m);
+  else  
+  {
+    Werror("det of %d x %d intmat",i,j);
+    return TRUE;
+  }  
   return FALSE;
 }
 #endif
