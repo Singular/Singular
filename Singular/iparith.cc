@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.302 2003-06-11 21:24:57 krueger Exp $ */
+/* $Id: iparith.cc,v 1.303 2003-06-13 10:54:20 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2355,7 +2355,7 @@ struct sValCmd2 dArith2[]=
 // and the procedures with 2 arguments:
 ,{atATTRIB2,   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    BAREISS_CMD,    0,              DEF_CMD,    DEF_CMD ALLOW_PLURAL}
-,{syBetti2,    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD NO_PLURAL}
+,{syBetti2,    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD ALLOW_PLURAL}
@@ -3627,8 +3627,8 @@ struct sValCmd1 dArith1[]=
 ,{atATTRIB1,    ATTRIB_CMD,      NONE,           DEF_CMD        ALLOW_PLURAL}
 //,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD   NO_PLURAL}
 ,{jjBAREISS,    BAREISS_CMD,     LIST_CMD,       MODUL_CMD      NO_PLURAL}
-,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD       NO_PLURAL}
-,{syBetti1,     BETTI_CMD,       INTMAT_CMD,     RESOLUTION_CMD NO_PLURAL}
+,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD       ALLOW_PLURAL}
+,{syBetti1,     BETTI_CMD,       INTMAT_CMD,     RESOLUTION_CMD ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD       ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD      ALLOW_PLURAL}
 #ifdef HAVE_FACTORY
