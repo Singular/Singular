@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.20 1998-05-18 13:42:59 Singular Exp $
+@comment $Id: math.doc,v 1.21 1998-05-18 15:52:23 Singular Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -1021,26 +1021,24 @@ ker (K[x]^q @expansion{} K[x]^r, sum w_i*e_i @expansion{} sum w_i*g_i).
 @end ifinfo
 
 @subheading Free resolutions
-Let A=matrix(M), then a free resolution of
-@ifinfo
-M1=coker(A)=coker(A1)
-is a long exact sequence
-@*...--> F2 --A2-> F1 --A1-> F0-->M1-->0,
-@end ifinfo
 @tex
-$M_1=coker(A)=coker(A_1)$
-is a long exact sequence
-$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M_1\longrightarrow 0,$$
+Let $I=(g_1,...,g_s)\subseteq K[\underline{x}]^r$ and $M= K[\underline{x}]^r/I$.
+A free resolution of $M$ is a long exact sequence
+$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M\longrightarrow 0,$$
 @end tex
+@ifinfo
+Let I=(g_1,...,g_s) in K[x]^r and M=K[x]^r/I.
+A free resolution of M is a long exact sequence
+is a long exact sequence
+@*...--> F2 --A2-> F1 --A1-> F0-->M-->0,
+@end ifinfo
 @*where the columns of the matrix
 @tex
-$A_1$
+$A_1$ are generators of $I$.
 @end tex
 @ifinfo
-A1
+A1 are generators of I.
 @end ifinfo
-are generators
-of M.
 The length of the sequence is at most n, where n is the number of variables in
 the polynomial resp. power series ring.
 Free resolutions over other rings may be infinite.
@@ -1203,9 +1201,10 @@ Becker, T.; Weisspfenning, V.:
 Groebner Bases - A computational Approach to Commutative Algebra. Springer, 1993
 @end ifinfo
 @item
-Cox; Little; O'Shea
+Cox, D.; Littlei, J.; O'Sheaa, D.:
+Ideals, Varieties and Algorithms. Springer, 1996
 @item
-Eisenbud
+Eisenbud, D.: Commutative Algebra. Springer, 1995
 @item
 Mishra, B.: Algorithmic Algebra, Texts and Monographs in Computer Science,
 Springer, 1993
@@ -1223,7 +1222,7 @@ To appear in: Greuel, G.-M.; Matzat, B. H.; Hiss, G. (Eds.),
 Algorithmic Algebra and Number Theory, Springer Verlag, Heidelberg, (1998). 
 
 @item
-Decker, W.; G.-M. Greuel, G.-M.; Pfister, G.; de Jong, T.:
+Decker, W.; G.-M. Greuel, G.-M.; de Jong, T.; Pfister, G.:
 The normalisation: a new algorithm,
 implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998. 
 
