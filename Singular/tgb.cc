@@ -1347,8 +1347,10 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
                 ||(len_upper_bound<strat->lenS[j]/2))
             {
               PrintS("e");
-              sec_copy=kBucketClear(P.bucket);
-              kBucketInit(P.bucket,pCopy(sec_copy),pLength(sec_copy));
+	      int dummy_len;
+              kBucketClear(P.bucket,&sec_copy,&dummy_len);
+              kBucketInit(P.bucket,pCopy(sec_copy),dummy_len
+	                                          /*pLength(sec_copy)*/);
               must_expand=TRUE;
             }
           }
@@ -1554,9 +1556,11 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
           //second test
           if (pLmEqual(obj->P->p,strat->S[j]))
           {
+	    int dummy_len;
             PrintS("b");
-            sec_copy=kBucketClear(obj->P->bucket);
-            kBucketInit(obj->P->bucket,pCopy(sec_copy),pLength(sec_copy));
+            kBucketClear(obj->P->bucket,&sec_copy,&dummy_len);
+            kBucketInit(obj->P->bucket,pCopy(sec_copy),dummy_len
+	                                                 /*pLength(sec_copy)*/);
           }
           else
           {
@@ -1568,9 +1572,11 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
 		(c->is_char0 && (wlen_upper<strat->lenSw[j]/100))
 )
             {
+	      int dummy_len;
               PrintS("e");
-              sec_copy=kBucketClear(obj->P->bucket);
-              kBucketInit(obj->P->bucket,pCopy(sec_copy),pLength(sec_copy));
+              kBucketClear(obj->P->bucket,&sec_copy,&dummy_len);
+              kBucketInit(obj->P->bucket,pCopy(sec_copy),dummy_len 
+	                                                 /*pLength(sec_copy)*/);
               must_expand=TRUE;
             }
           }
