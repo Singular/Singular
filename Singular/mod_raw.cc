@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.5 1999-12-13 18:11:07 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.6 1999-12-16 14:22:12 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -66,7 +66,10 @@ void *dynl_sym(void *handle, char *symbol)
 
   if (shl_findsym((shl_t *) & handle, symbol, TYPE_PROCEDURE, &f) == -1)
   {
-    f = (func_ptr) NULL;
+    if (shl_findsym((shl_t *) & handle, symbol, TYPE_UNDEFINED, &f) == -1)
+    {
+      f = (func_ptr) NULL;
+    }
   }
   return (f);
 }
