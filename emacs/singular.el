@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.50 1999-12-03 11:10:19 obachman Exp $
+;; $Id: singular.el,v 1.51 1999-12-03 11:11:48 obachman Exp $
 
 ;;; Commentary:
 
@@ -3869,11 +3869,11 @@ Inserts a string indicating that the Singular process is killed."
 (defun singular-control-c (mode)
   "Interrupt the Singular process running in the current buffer.
 If called interactiveley, asks wether to (a)bort the current Singular
-command, (q)uit the current Singular process, or (c)ontinue without doing
-anything (default).
+command, (q)uit or (r) restart the current Singular process, 
+or (c)ontinue without doing anything (default).
 
-If called non-interactiveley, MODE should be one of 'abort, 'quit, or
-'continue."
+If called non-interactiveley, MODE should be one of 'abort, 'quit, 'restart,
+or 'continue."
   (interactive
    (let (answer)
      (while (not answer) 
