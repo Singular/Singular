@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.93 2004-04-23 13:48:28 Singular Exp $
+### $Id: Makefile.in,v 1.94 2004-04-23 15:10:19 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -153,12 +153,12 @@ s-plural.tex: plural.tex ${PLU_MANUAL_FILES}
 	done
 	sed -e 's/@include plu/@include s-plu/' -e 's/@value{PSUFFIX}/(plural)/g' < plural.tex >s-plural.tex
 
-p-plural.tex: plural.tex ${PLU_MANUAL_FILES}
+p-pluralmain.tex: plural.tex pluralmain.tex ${PLU_MANUAL_FILES}
 	for PFILE in ${PLU_MANUAL_FILES};\
 	do \
-		sed 's/@value{PSUFFIX}//g' < $${PFILE}  >p-$${PFILE};\
+		sed -e 's/@value{PSUFFIX}//g' -e 's/@include plu/@include p-plu/' < $${PFILE}  >p-$${PFILE};\
 	done
-	sed -e 's/@include plu/@include p-plu/' -e 's/@value{PSUFFIX}/(plural)/g' < plural.tex >p-plural.tex
+	sed -e 's/@include plu/@include p-plu/' -e 's/@value{PSUFFIX}//g' < pluralmain.tex >p-pluralmain.tex
 
 singular.dvi: ${MANUAL_FILES} singular.tex s-plural.tex
 	${TEXI2DVI} singular.tex
@@ -451,6 +451,7 @@ mostlyclean:
 	/bin/rm -f Z* *.tst *.pag *.dir *.lst *.log *.aux *.cp *.cps
 	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
 	/bin/rm -f *.tps *.vr *.vrs *.dvi *.ps
+	/bin/rm -f s-*.tex p-*.tex
 	/bin/rm -f singular.hlp manual.hlp  ${DOC2TEX_FILES} singular.idx
 	/bin/rm -f plural.hlp manual.hlp  ${PLU_DOC2TEX_FILES}
 	/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
