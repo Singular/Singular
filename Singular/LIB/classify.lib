@@ -1,4 +1,4 @@
-// $Id: classify.lib,v 1.17 1997-12-02 18:34:08 krueger Exp $
+// $Id: classify.lib,v 1.18 1997-12-02 18:40:25 krueger Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES  
@@ -229,6 +229,7 @@ proc Funktion1bis (poly f, list cstn)
     map Phi = v_class[4];
     PhiG = Phi(PhiG);
     setring ring_top;
+    if(defined(conv)!=0) { kill conv; }
     map conv=ring_rest,maxideal(1);
     v[1] = conv(f_result);
     return(v);
@@ -400,9 +401,8 @@ proc Funktion17 (poly f, list cstn)
     while( 3*p<= Mu) {
       debug_log(1, "         Step 18("+string(p)+")");
       v   = Isomorphie_s17(f, fk, p, 1);
-      f   = v[1];
-      Phi = v[2];
-      PhiG = Phi(PhiG);
+      f, Phi  = v[1..2];
+      PhiG    = Phi(PhiG);
       cstn[4] = PhiG;
 
       if ( p>1) {
@@ -468,9 +468,8 @@ proc Funktion25 (poly f, list cstn)
 //---------------------------- begin of loop ----------------------------------
     while (k<Mu) {
       v    =  Faktorisiere(f, fk, 4 , k, RFlg);
-      f    = v[1];
-      Phi  = v[2];
-      PhiG = Phi(PhiG);
+      f, Phi  = v[1..2];
+      PhiG    = Phi(PhiG);
       cstn[4] = PhiG;
 
       //--------------------------- step 26(k) --------------------------------
@@ -563,6 +562,7 @@ proc Funktion40 (poly f, list cstn, int k)
     poly   fk, f2, a, b, c;
     ideal  JetId, Jfsyz;
     string Typ, RestRing, s1;
+    list   v1, v2;
     def ring_top=basering;
 
     debug_log(1, "         Step 40" );
@@ -580,10 +580,11 @@ proc Funktion40 (poly f, list cstn, int k)
     oldDebug = @DeBug;
     init_debug(-1);
 //------------------------------ classify f2 ----------------------------------
-    list v=Klassifiziere(map_top2tmp(b));
+    v1=Klassifiziere(map_top2tmp(b));
     init_debug(oldDebug);
     Typ = v[2];
-    Typ, kr, rr, sr = DecodeNormalFormString(Typ);
+    v2 = DecodeNormalFormString(Typ);
+    Typ, kr, rr, sr = v2[1..4];
     r   = kr-k;
     setring ring_top;
     if( Typ == "E[6k]" ) { 
@@ -765,8 +766,7 @@ proc Funktion58 (poly fin, list cstn)
     fb   = C[2,1];  // Coeff von x^1
     fc   = C[1,1];  // Coeff von x^0
     v    = tschirnhaus(fc, x(kz));
-    fc   = v[1];
-    VERT = v[2];
+    fc, VERT = v[1..2];
     f    = VERT(f);
     PhiG = VERT(PhiG);
     cstn[4] = PhiG;
@@ -988,18 +988,15 @@ proc Funktion82 (poly f, list cstn)
       VERT=ring_top,x(kx),x(ky),x(kz);
     }
     if(Fall == 2) { 
-       v    = tschirnhaus(f3/x(kz), x(kx));
-       b1   = v[1];
-       VERT = v[2];
+       v = tschirnhaus(f3/x(kz), x(kx));
+       b1, VERT = [1..2];
     }
     if(Fall == 3) { 
-      v    = tschirnhaus(f3/x(kx), x(kx));
-      b1   = v[1];
-      VERT = v[2];
+      v = tschirnhaus(f3/x(kx), x(kx));
+      b1, VERT = [1..2];
       debug_log(2, "B1=", Show(jet(VERT(f),3)));
-      v    = tschirnhaus(f3/x(kz), x(kz));
-      b2   = v[1];
-      VERT = v[2];
+      v = tschirnhaus(f3/x(kz), x(kz));
+      b2, VERT = [1..2];
       debug_log(2, "B2=", Show(jet(VERT(f),3)));
     }
     f    = VERT(f);
@@ -1036,8 +1033,7 @@ proc Isomorphie_s82_z (poly f, poly fk, int p)
     B = maxideal(1);
     B[rvar(x(3))] = x(3)-b*x(2)^p;
     VERT = ring_top,B;
-    v[1] = VERT(f);
-    v[2] = VERT;
+    v    = VERT(f), VERT;
     debug_log(2, VERT);
     debug_log(2, "      z res=", Show(VERT(fk)));
     return(v);
@@ -1064,8 +1060,7 @@ proc Isomorphie_s82_x (poly f, poly fk, int p)
     B = maxideal(1);
     B[rvar(x(1))] = x(1)-b*x(2)^p;
     VERT = ring_top,B;
-    v[1] = VERT(f);
-    v[2] = VERT;
+    v    = VERT(f), VERT;
     debug_log(2, VERT);
     debug_log(2, "      x res=", Show(VERT(fk)));
 
@@ -1146,9 +1141,8 @@ proc Funktion83 (poly f, list cstn)
                 v    = Isomorphie_s82_z(f, a, k);
               } // ende else b!=0 und b'=0
             } // ende else b=0 und b'!=0
-            f    = v[1];
-            Phi  = v[2];
-            PhiG = Phi(PhiG);
+            f, Phi  = v[1..2];
+            PhiG    = Phi(PhiG);
             cstn[4] = PhiG;
           } //ende fk-phi!=0
         } // ende mult=4
@@ -1387,8 +1381,7 @@ proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
       JetId = x(1)^3*x(2) + x(2)^(3*k+1);
       fk = jet(f, 3*k+1, weight(JetId));
     }
-    v[1] = f;
-    v[2] = PhiG;
+    v = f, PhiG;
     debug_log(2, "Isomorphie_s17: done");
     debug_log(2, "Faktor: f=",Show(f)," Jet=",Show(fk)," k=",k);
 
@@ -1402,9 +1395,7 @@ proc printresult (int step, poly f, string typ, list cstn, int m)
   int corank, Mu, K;
   list v;
 
-  corank = cstn[1];
-  Mu     = cstn[2];
-  K      = cstn[3];
+  corank, Mu, K = cstn[1..3];
   debug_log(0,"   Arnold step number "+string(step));
   if( @DeBug >= 0 ) {
     "The singularity";
@@ -1419,10 +1410,7 @@ proc printresult (int step, poly f, string typ, list cstn, int m)
     if(Mu>=0) { "   Milnor number = "+string(Mu); }
     if(m>=0)  { "   modality      = "+string(m); }
   }
-  v[1] = f;
-  v[2] = typ;
-  v[3] = corank;
-  v[4] = cstn[4];
+  v = f, typ, corank, cstn[4];
   return(v);
 }
 
@@ -1675,8 +1663,7 @@ proc Morse(poly f, int K, int corank, int ShowPhi)
     Phi  = ring_top,B;
     PhiG = Phi(PhiG);
     fi   = Phi(fi);
-    v[1] = fi;
-    v[2] = PhiG;
+    v    = fi, PhiG;
     debug_log(2, "rank determined with Morse rg=", Rang);
     debug_log(1, "Rest singularity f=",Show(fi));
     return(v);
@@ -1763,8 +1750,7 @@ EXAMPLE:  example quickclass; shows an example
   // typ: list of types matching the milnorcode
   // cnt: number of matches found
   v = HKclass(milnorcode(f));
-  Typ = v[1];
-  cnt = v[2];
+  Typ, cnt = v[1..2];
   "Singularity R-equivalent to :",Typ;
   if(cnt==0) {
     "Hilbert polynomial not recognised. Milnor code = ", milnorcode(f);
@@ -1779,7 +1765,7 @@ EXAMPLE:  example quickclass; shows an example
   "Hilbert-Code of Jf^2";
   "We have ", cnt, "cases to test";
   Cubic(f);
-  return(Typ,cnt);
+  return(v);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1919,13 +1905,12 @@ proc HKclass (intvec sg)
   // if trace/debug mode not set, do it!
   init_debug();
   debug_log(1, "Milnor code : ", sg );
-  if(size(sg) == 1) { v[1]="A["+string(sg[1])+"]"; v[2]=1; return(v); }
+  if(size(sg) == 1) { v ="A["+string(sg[1])+"]", 1; return(v); }
   if(size(sg) == 3) { return(HKclass3(sg, SG_Typ, cnt)); }
   if(size(sg) == 5) { return(HKclass5(sg, SG_Typ, cnt)); }
   if(size(sg) == 7) { return(HKclass7(sg, SG_Typ, cnt)); }
   debug_log(1, "No solution found." );
-  v[1] = "";
-  v[2] = 0;
+  v = "", 0;
   return(v);
 }
 
@@ -1971,8 +1956,7 @@ proc HKclass3_teil_1 (intvec sg, string SG_Typ, int cnt)
 
   debug_log(2, "finishing HKclass3_teil_1");
   debug_log(6, "HKclass3: ", SG_Typ, " cnt=", cnt);
-  v[1] = SG_Typ;
-  v[2] = cnt;
+  v = SG_Typ, cnt;
   return(v);
 }
 
@@ -2084,8 +2068,7 @@ proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
   }
   debug_log(2, "finishing HKclass5_teil_1");
   debug_log(6, "HKclass5_teil_1: ", SG_Typ, " cnt=", cnt);
-  v[1] = SG_Typ;
-  v[2] = cnt;
+  v = SG_Typ, cnt;
   return(v);
 }
 
@@ -2163,8 +2146,7 @@ proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
   }
   debug_log(2, "finishing HKclass5_teil_2");
   debug_log(6, "HKclass5_teil_2: ", SG_Typ, " cnt=", cnt);
-  v[1] = SG_Typ;
-  v[2] = cnt;
+  v = SG_Typ, cnt;
   return(v);
 }
 
@@ -2214,8 +2196,7 @@ proc HKclass7_teil_1 (intvec sg, string SG_Typ, int cnt)
   }
   debug_log(2, "finishing HKclass7_teil_1");
   debug_log(6, "HKclass7_teil_1: ", SG_Typ, " cnt=", cnt);
-  v[1] = SG_Typ;
-  v[2] = cnt;
+  v = SG_Typ, cnt;
   return(v);
 }
 
@@ -2236,8 +2217,9 @@ EXAMPLE:  example singularity; shows an example
   poly a1, a2, a3, a4, f;
   int k, r, s;
   int len = size(#);
-  list v;
+  list v, ret;
 
+  ret = 0, 0;
   k = #[1];
   if(len>=2) { r = #[2]; }
   else { r = 0; }
@@ -2246,7 +2228,7 @@ EXAMPLE:  example singularity; shows an example
   if( k<0 || r<0 || s<0) { 
     "Initial condition failed: k>=0; r>=0; s>=0";
     "k="+string(k)+" r="+string(r)+"   s="+string(s);
-    return(0);
+    return(ret);
   }
   int crk;
 
@@ -2269,13 +2251,14 @@ EXAMPLE:  example singularity; shows an example
   poly f;
   map Conv=ring_top,maxideal(1);
   v = Singularitaet(typ, k, r, s, Conv(a1), Conv(a2), Conv(a4), Conv(a4));
-  f = v[1]; crk = v[2];
+  f, crk = v[1..2];
   debug_log(2, "Info=", f );
   setring ring_top;
   if(defined(Phi) != 0 ) { kill Phi; }
   map Phi=RingNF,maxideal(1);
 
-  return(Phi(f), crk);
+  ret = Phi(f), crk;
+  return(ret);
 }
 example
 { "EXAMPLE"; echo=2;
@@ -2313,10 +2296,10 @@ proc Singularitaet (string typ,int k,int r,int s,poly a,poly b,poly c,poly d)
     execute read(dbmLink, Key)+";";
     debug_log(1, "Polynom f=", f,  "  crk=", crk, "  Mu=", Mu, 
                 " MlnCd=", MlnCd);
-    v[1] = f; v[2] = crk; v[3] = Mu; v[4] = MlnCd;
+    v = f, crk, Mu, MlnCd;
   }
   else {
-    v[1] = 0; v[2] = 0; v[3] = 0; v[4] = 0;
+    v = 0, 0, 0, 0;
   }
   close(dbmLink);
   return(v);
@@ -2331,6 +2314,7 @@ USAGE:    RandomPolyK(M, Typ)
   ideal  B;
   map    Phi;
   string txt, Tp;
+  list   v;
 
   def ring_ext=basering;
   n=4;
@@ -2345,7 +2329,8 @@ USAGE:    RandomPolyK(M, Typ)
   ring RgAnf=char(basering),(x,y,z,t),(c,ds);
   poly f;
 
-  f, crk = singularity(Typ, k, r, s);
+  v = singularity(Typ, k, r, s);
+  f, crk = v[1..2];
 //  f = f +t2;
   if(crk==1) { f = f + y2 + z2; }
   if(crk==2) { f = f + z2; }
@@ -2611,6 +2596,7 @@ USAGE:    DecodeNormalFormString
 //---------------------------- initialisation ---------------------------------
   int    C_eq, a, b, i, t, k, r, s;
   string s1, s2, s3, s4, s_in, Typ;
+  list v = "Error", 0, 0, 0;
 
   C_eq = find(S_in, "=")+1;
   s_in = S_in[C_eq,30];
@@ -2624,7 +2610,7 @@ USAGE:    DecodeNormalFormString
   r = 0;
   s = 0;
 
-  if(a<0 || b<0) { return("Error", 0, 0 ,0); }
+  if(a<0 || b<0) { return(v); }
   Typ = s_in[1..a-1];
   s1  = s_in[a..b];
   debug_log(6, "Suche Type:", Typ);
@@ -2702,7 +2688,8 @@ USAGE:    DecodeNormalFormString
   }
   debug_log(2, "Looking for Normalform of ",s2,"with (k,r,s) = (",
         k,",",r,",", s, ")" );
-  return(s2,k,r, s);
+  v = s2, k, r, s;
+  return(v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2747,6 +2734,7 @@ EXAMPLE:  example normalform; shows an example.
   string Typ;
   int    k, r, s, crk;
   poly   f;
+  list   v;
 
   if(checkring()) { return(s_in); }
   if(nvars(basering)<=1) {
@@ -2756,9 +2744,11 @@ EXAMPLE:  example normalform; shows an example.
   // if trace/debug mode not set, do it!
   init_debug();
 
-  Typ, k, r, s = DecodeNormalFormString(s_in);
+  v = DecodeNormalFormString(s_in);
+  Typ, k, r, s = v[1..4];
   if(Typ=="Error") { return(0); }
-  f, crk = singularity(Typ, k, r, s);
+  v = singularity(Typ, k, r, s);
+  f, crk = v[1..2];
   return(f);
 }
 example
