@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.3 2004-07-29 18:13:28 Singular Exp $ */
+/* $Id: mpr_complex.h,v 1.4 2004-07-30 12:18:50 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -30,6 +30,8 @@ size_t getGMPFloatDigits();
 /**
  * @short wrapper class for GNU Multi Precision Floats
  */
+class gmp_float;
+char *floatToStr( const gmp_float & r, const unsigned int oprec );
 class gmp_float
 {
 public:
@@ -131,14 +133,10 @@ public:
 #if 0
   inline operator int() { return (int)mpf_get_d( t ); };
   inline operator int() const { return (int)mpf_get_d( t ); };
-#else
+//#else
   inline operator int() const
   { if (mpf_fits_sint_p(t))
-    {
-      gmp_float tmp(*this); 
-      tmp+=gmp_float(0.5); 
-      return (int)mpf_get_si( tmp.t );
-    }
+    { return (int)mpf_get_si( t ); }
     return 0;
   };
 #endif  
@@ -164,7 +162,7 @@ gmp_float max( const gmp_float &, const gmp_float & );
 
 gmp_float numberToFloat( number num );
 gmp_float numberFieldToFloat( number num, int k );
-char *floatToStr( const gmp_float & r, const unsigned int oprec );
+//char *floatToStr( const gmp_float & r, const unsigned int oprec );
 //<-
 
 //-> class gmp_complex
