@@ -1,4 +1,4 @@
-dnl $Id: configure.in,v 1.4 1997-07-16 10:51:31 schmidt Exp $
+dnl $Id: configure.in,v 1.5 1997-07-21 14:56:49 schmidt Exp $
 
 dnl
 dnl configure.in - process this file with autoconf to generate
@@ -11,7 +11,7 @@ dnl
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.4 1997-07-16 10:51:31 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.5 1997-07-21 14:56:49 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -23,7 +23,7 @@ dnl
 dnl Change version here, do not believe the comment in the
 dnl preceding lines.
 dnl
-factory_version="1.2c"
+factory_version="1.3a"
 
 #
 # - check withs and enables.
@@ -90,7 +90,7 @@ AC_ARG_ENABLE(
 AC_ARG_ENABLE(
   gmp,
   [  --enable-gmp            together with --with-Singular means: installation
-                          in process, be gracefull when there is no gmp.h],
+                          in process, be graceful when there is no gmp.h],
   [ if test "x$with_Singular" = xyes && test "x$enable_gmp" != xno; then
       with_gmp='$(includedir)'
     fi ])
