@@ -33,15 +33,15 @@ list d=
 
 // parabolic
 
-"P_{8}","x,y,z","ls","x3+y3+z3",
-"X_{9}","x,y","ls","x4+y4",
-"J_{10}","x,y","ls","x3+y6",
+"P_{8}","x,y,z","ds","x3+y3+z3",
+"X_{9}","x,y","ds","x4+y4",
+"J_{10}","x,y","ds","x3+y6",
 
 // hyperbolic
 
-"T_{3,4,5}","x,y,z","ls","x3+y4+z5+xyz",
-"T_{3,4,6}","x,y,z","ls","x3+y4+z6+xyz",
-"T_{4,5,6}","x,y,z","ls","x4+y5+z6+xyz",
+"T_{3,4,5}","x,y,z","ds","x3+y4+z5+xyz",
+"T_{3,4,6}","x,y,z","ds","x3+y4+z6+xyz",
+"T_{4,5,6}","x,y,z","ds","x4+y5+z6+xyz",
 
 // 14 exceptional families
 
@@ -53,17 +53,17 @@ list d=
 "Z_{12}","x,y","ds","x3y+xy4",
 "Z_{13}","x,y","ds","x3y+y6",
 
-"W_{12}","x,y","ls","x4+y5",
-"W_{13}","x,y","ls","x4+xy4",
+"W_{12}","x,y","ds","x4+y5",
+"W_{13}","x,y","ds","x4+xy4",
 
-"Q_{10}","x,y,z","ls","x3+y4+yz2",
-"Q_{11}","x,y,z","ls","x3+y2z+xz3",
-"Q_{12}","x,y,z","ls","x3+y5+yz2",
+"Q_{10}","x,y,z","ds","x3+y4+yz2",
+"Q_{11}","x,y,z","ds","x3+y2z+xz3",
+"Q_{12}","x,y,z","ds","x3+y5+yz2",
 
-"S_{11}","x,y,z","ls","x4+y2z+xz2",
-"S_{12}","x,y,z","ls","x2y+y2z+xz3",
+"S_{11}","x,y,z","ds","x4+y2z+xz2",
+"S_{12}","x,y,z","ds","x2y+y2z+xz3",
 
-"U_{12}","x,y,z","ls","x3+y3+z4";
+"U_{12}","x,y,z","ds","x3+y3+z4";
 
 
 proc tst_gaussm(poly f)
@@ -71,21 +71,22 @@ proc tst_gaussm(poly f)
   basering;
   f;
   print(monodromy(f));
-  list l=vfiltration(f);
+  list l=vwfilt(f);
   l;
-  vfiltjacalg(l);
-  gamma(l);
+  l=spnf(l[1],l[3],l[4])+list(l[5],l[6]);
+  endvfilt(l);
+  spgamma(l);
 }
 
 
-string s;
-int i,t;
+string c;
+int i;
 for(i=1;i<=size(d);i=i+4)
 {
-  s="ring R=0,("+d[i+1]+"),"+d[i+2]+";";
-  execute(s);
-  s="poly f="+d[i+3]+";";
-  execute(s);
+  c="ring R=0,("+d[i+1]+"),"+d[i+2]+";";
+  execute(c);
+  c="poly f="+d[i+3]+";";
+  execute(c);
 
   tst_gaussm(f);
 

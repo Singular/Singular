@@ -4,9 +4,11 @@ tst_init();
 LIB "gaussman.lib";
 
 example monodromy;
-example vfiltration;
-example vfiltjacalg;
-example gamma;
+example vwfilt;
+example endvfilt;
+example spgamma;
+example tmatrix;
+example tmatrix;
 
 tst_status(1);
 $

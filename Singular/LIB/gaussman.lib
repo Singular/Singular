@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.63 2002-01-22 17:29:12 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.64 2002-01-22 18:38:19 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -1103,9 +1103,9 @@ EXAMPLE:  example tmatrix; shows examples
 
   dbprint(printlevel-voice+2,"// compute reduced standard basis of H''");
   degBound=k0+k1+2;
-  option("redSB");
+  option(redSB);
   H=std(H);
-  option("noredSB");
+  option(noredSB);
   degBound=0;
   H=simplify(jet(H,k0+k1),1);
 
@@ -1255,6 +1255,7 @@ EXAMPLE:  example endvfilt; shows examples
     v0[i+1]=std(v0[i+1]);
     v0[i]=std(reduce(v0[i],v0[i+1]));
   }
+  option(noredSB);
 
   dbprint(printlevel-voice+2,"// remove trivial graded parts");
   i=1;
