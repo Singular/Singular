@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.36 2000-12-14 08:29:07 obachman Exp $
+# $Id: regress.cmd,v 1.37 2001-02-15 14:15:57 levandov Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -81,15 +81,8 @@ sub mysystem_catch
 }
 
 $WINNT = 1 if (&mysystem("uname -a | $grep CYGWIN > /dev/null 2>&1") == 0);
-if ($WINNT)
-{
-  $uudecode = "uudeview.exe -i";
-}
-else
-{
-  $uuencode = "uuencode";
-  $uudecode = "uudecode";
-}
+$uuencode = "uuencode";
+$uudecode = "uudecode";
 
 #
 # flush stdout and stderr after every write
