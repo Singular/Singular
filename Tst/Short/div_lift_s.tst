@@ -1,0 +1,42 @@
+LIB "tst.lib";
+tst_init();
+//
+// test script for lift/division command
+//
+ring r;
+ideal i=x2,y2,z2;
+ideal ii=maxideal(2);
+ideal j=maxideal (3);
+"i";
+print(matrix(i));
+"j";
+print(matrix(j));
+matrix U;
+"lift(i,j)";
+print(lift(i,j));
+"lift(i,j,U)";
+print(lift(i,j,U));
+"U";
+print(U);
+"division(i,j)";
+list L=division(i,j);
+print(L[1]);
+print(L[2]);
+print(L[3]);
+"ii";
+print(matrix(ii));
+"j";
+print(matrix(j));
+matrix U;
+"lift(ii,j)";
+print(lift(ii,j));
+"lift(ii,j,U)";
+print(lift(ii,j,U));
+"U";
+print(U);
+"division(ii,j)";
+list L=division(ii,j);
+print(L[1]);
+print(L[2]);
+print(L[3]);
+tst_status(1);$;
