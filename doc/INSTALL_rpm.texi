@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.7 2002-03-26 17:10:06 mschulze Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.8 2002-03-27 17:38:18 keilen Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -149,8 +149,8 @@ ESingular-@value{VERSION}
 @end smallexample
 in a command shell.
 @item
-There is a menu @code{Singular @value{RPM_VERSION}} in the @sc{gnome} and @sc{kde} menu with menu items @code{Singular}, @code{ESingular}, and @code{Manual}.
-Click on the menu items @code{Singular} to run @sc{Singular} @value{RPM_VERSION} in a terminal, on the menu item @code{ESingular} to run @sc{Singular} @value{RPM_VERSION} under @sc{Emacs}, and on the menu item @code{Manual} to read the @sc{Singular} @value{RPM_VERSION} manual.
+There is a menu @code{Singular @value{RPM_VERSION}} in the @sc{gnome} and @sc{kde} menu with menu items @code{TSingular}, @code{ESingular}, and @code{Manual}.
+Click on the menu item @code{TSingular} to run @sc{Singular} @value{RPM_VERSION} in a terminal, on the menu item @code{ESingular} to run @sc{Singular} @value{RPM_VERSION} under @sc{Emacs}, and on the menu item @code{Manual} to read the @sc{Singular} @value{RPM_VERSION} manual.
 @end enumerate
 
 
