@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.2 1997-11-13 08:38:14 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.3 1999-02-16 17:13:41 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -30,6 +30,7 @@ SHELL =		/bin/sh
 #
 srcdir =	@srcdir@
 VPATH =		@srcdir@
+NTLPATH =	$(srcdir)/../../ntl-2.0
 
 #
 # - programs.
@@ -93,12 +94,20 @@ ftestexec :=	$(ftestm4src:.m4=)
 %: %.o
 %: %.cc
 
+# how to link the ntl test files
+%.ntl: %.ntl.o ftest_util.o ftest_io.o ntl_util.o ../libcf.a ../libcfmem.a ../ftmpl_inst.o
+		$(CXX) $^ $(FTESTLDFLAGS) $(NTLPATH)/ntl.a -o $@
+
+# how to create the ntl test file objects
+%.ntl.o: %.ntl.cc ../factory.h ftest_util.h ftest_io.h ntl_util.h
+		$(CXX) -c $< -I$(NTLPATH) $(FTESTCXXFLAGS) -o $@
+
 # how to link the test files
 %: %.o ftest_util.o ftest_io.o ../libcf.a ../libcfmem.a ../ftmpl_inst.o
 		$(CXX) $^ $(FTESTLDFLAGS) -o $@
 
 # how to create the test file objects
-%.o: %.cc ../factory.h
+%.o: %.cc ../factory.h ftest_util.h ftest_io.h
 		$(CXX) -c $< $(FTESTCXXFLAGS) -o $@
 
 # how to create the test programs
@@ -126,6 +135,9 @@ ftest_util.o:	ftest_util.cc ftest_util.h ftest_io.h ../factory.h
 
 ftest_io.o:	ftest_io.cc ftest_io.h ftest_util.h ../factory.h
 		$(CXX) -c $< $(LIBCXXFLAGS) -o $@
+
+ntl_util.o:	ntl_util.cc ntl_util.h ../factory.h
+		$(CXX) -c $< -I$(NTLPATH) $(LIBCXXFLAGS) -o $@
 
 #
 # - cleaning up.
