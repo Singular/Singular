@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.5 1997-03-27 10:32:36 Singular Exp $ 
+// $Id: fglm.cc,v 1.6 1997-03-27 16:09:55 Singular Exp $ 
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -242,9 +242,6 @@ BOOLEAN
 fglmProc( leftv result, leftv first, leftv second ) 
 {
     FglmState state = FglmOk;
-    //. array for the permutations of vars in both rings:
-    //. counts from perm[1]..perm[pvariables]
-    int * vperm = (int *)Alloc0( (pVariables+1)*sizeof( int ) );
 
     idhdl destRingHdl = currRingHdl;
     ring destRing = currRing;
@@ -252,7 +249,10 @@ fglmProc( leftv result, leftv first, leftv second )
     idhdl sourceRingHdl = (idhdl)first->data;
     rSetHdl( sourceRingHdl, TRUE );
     ring sourceRing = currRing;
+
+    int * vperm = (int *)Alloc0( (pVariables+1)*sizeof( int ) );
     state= fglmConsistency( sourceRingHdl, destRingHdl, vperm );
+    Free( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
 
     if ( state == FglmOk ) {
 	idhdl ih = currRing->idroot->get( second->Name(), myynest );
@@ -301,7 +301,6 @@ fglmProc( leftv result, leftv first, leftv second )
 	default:
 	    destIdeal= idInit(1,1);
     }
-    Free( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
 
     result->rtyp = IDEAL_CMD;
     result->data= (void *)destIdeal;
