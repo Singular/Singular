@@ -1,12 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gcd.m4,v 1.6 1997-11-21 11:22:42 schmidt Exp $ */
+/* $Id: gcd.m4,v 1.7 1998-07-07 16:31:01 schmidt Exp $ */
 
 ftestSetNameOfGame( gcd, `"
 Usage: gcd [<options>] [<envSpec>] <f> <g> [<realResult>]
-  calculates greatest common divider of canonical forms f and g.
-  If the gcd of f and g is already known, the optional canonical
-  form realResult may be used to check the result of the gcd
-  computation.
+  calculates greatest common divisor of canonical forms <f> and
+  <g>.  If the gcd of <f> and <g> is already known, the optional
+  canonical form <realResult> may be used to check the result of
+  the gcd computation.
 "'`' )
 
 //{{{ docu
@@ -28,6 +28,26 @@ ftestGlobalInit();
 // - functions.
 //
 
+//{{{ static CanonicalForm normalizeGcd ( const CanonicalForm & f )
+//{{{ docu
+//
+// normalizeGcd() - normalize result of gcd computation for
+//   testing.
+//
+// Unit normalization is done in case of a field, sign
+// normalization otherwise.
+//
+//}}}
+static CanonicalForm
+normalizeGcd ( const CanonicalForm & f )
+{
+    if ( getCharacteristic() > 0 || isOn( SW_RATIONAL ) )
+	return f/Lc( f );
+    else
+	return abs( f );
+}
+//}}}
+
 //{{{ ftestStatusT gcdCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & result, const CanonicalForm & realResult )
 //{{{ docu
 //
@@ -39,9 +59,7 @@ gcdCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm
 {
     // if realResult is given, use it to compare with result
     if ( ! realResult.isZero() )
-	if ( realResult == result )
-	    return Passed;
-	else if ( -realResult == result )
+	if ( normalizeGcd( realResult ) == normalizeGcd( result ) )
 	    return Passed;
 	else {
 	    ftestError( CheckError, "result and real result differ\n" );
@@ -56,17 +74,14 @@ gcdCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm
 	    return Failed;
 	}
 
-    if ( divides( result, f ) && divides( result, g ) )
-	if ( gcd( f/result, g/result ).isOne() )
-	    return Passed;
-	else {
-	    ftestError( CheckError, "result is not greatest common divisor\n" );
-	    return Failed;
-	}
-    else {
+    if ( ! divides( result, f ) || ! divides( result, g ) ) {
 	ftestError( CheckError, "result is not a common divisor\n" );
 	return Failed;
-    }
+    } else if ( ! gcd( f/result, g/result ).isOne() ) {
+	ftestError( CheckError, "result is not greatest common divisor\n" );
+	return Failed;
+    } else
+	return Passed;
 }
 //}}}
 
@@ -93,12 +108,10 @@ main ( int argc, char ** argv )
     ftestGetInVar( realResult, 0 );
 
     // do the test!
-    ftestRun(
-	result = gcd( f, g ); );
+    ftestRun( result = gcd( f, g ); );
 
     // do the check
-    ftestCheck(
-	gcdCheck( f, g, result, realResult ) );
+    ftestCheck( gcdCheck( f, g, result, realResult ) );
 
     // print results
     ftestOutput( "gcd(f, g)", result );
