@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.8 1997-11-05 14:19:14 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.9 1997-11-05 14:44:06 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -741,6 +741,33 @@ lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
       v.data=(void *)r;
       lists LL=lInsert0(L,&v,0);
       L=LL;
+    }
+  }
+  /* check for empty sets */
+  {
+    int j=L->nr;
+    while (j>0)
+    {
+      int i=0;
+      while(i<j)
+      {
+        ideal r=kNF((ideal)L->m[j].Data(),NULL,(ideal)L->m[i].Data(),0,TRUE);
+        if (idIs0(r))
+        {
+          if (TEST_OPT_DEBUG)
+          {
+            Print("empty set L[%d] because:L[%d]\n",j,i);
+          }
+          // delete L[j], 
+          i=0; j--;
+        }  
+        else
+        {
+          i++;
+        }
+        idDelete(&r);
+      }
+      j--;
     }
   }
 // Ende: aufraeumen
