@@ -2534,6 +2534,8 @@ void tgb_sparse_matrix::mult_row(int row,number factor){
    
     return;
   }
+  if(nIsOne(factor))
+    return;
   mac_mult_cons(mp[row],factor);
 }
 void tgb_sparse_matrix::free_row(int row, BOOLEAN free_non_zeros){
