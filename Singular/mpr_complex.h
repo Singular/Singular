@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.14 2000-06-27 12:10:29 pohl Exp $ */
+/* $Id: mpr_complex.h,v 1.15 2000-06-30 11:25:38 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -24,15 +24,6 @@ extern "C" {
 #define QTOF 2
 #define RTOF 3
 #define CTOF 4
-
-#define DEFPREC        20         // minimum number of digits (output operations)
-
-#define GMP_DEFAULT_PREC_BITS 512 // size of mantissa of floating-point number
-#define GMP_NEEDEQUAL_BITS    512-64 // a == b for the first gmp_equalupto_bits bits
-//<-
-
-void setGMPFloatPrecBytes( unsigned long int bytes );
-unsigned long int getGMPFloatPrecBytes();
 
 void setGMPFloatDigits( size_t digits );
 size_t getGMPFloatDigits();
@@ -115,24 +106,7 @@ public:
   inline operator int();
   inline operator int() const;
 
-  static void setPrecision( const unsigned long int prec ) {
-    gmp_default_prec_bits= prec;
-  }
-  static void setEqualBits( const unsigned long int prec ) {
-    gmp_needequal_bits= prec;
-  }
-
-  static const unsigned long int getPrecision() {
-    return gmp_default_prec_bits;
-  }
-  static const unsigned long int getEqualBits() {
-    return gmp_needequal_bits;
-  }
-
 private:
-  static unsigned long int gmp_default_prec_bits;
-  static unsigned long int gmp_needequal_bits;
-
   mpf_t t;
 };
 
