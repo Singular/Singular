@@ -4,6 +4,56 @@
 // #define OM_KEEP  1
 
 #include "tgb.h"
+static int posInPairs (sorted_pair_node**  p, int pn, sorted_pair_node* qe,calc_dat* c,int an=0)
+{
+  if(pn==0) return 0;
+
+  int length=pn-1;
+  int i;
+  //int an = 0;
+  int en= length;
+
+  if (pair_better(qe,p[en],c))
+    return length+1;
+
+  while(1)
+    {
+      //if (an >= en-1)
+      if(en-1<=an)
+      {
+	if (pair_better(p[an],qe,c)) return an;
+	return en;
+      }
+      i=(an+en) / 2;
+	if (pair_better(p[i],qe,c))
+          en=i;
+      else an=i;
+    }
+}
+sorted_pair_node**  merge(sorted_pair_node** p, int pn,sorted_pair_node **q, int qn,calc_dat* c){
+  int i;
+  int* a= (int*) omalloc(qn*sizeof(int));
+  
+  int lastpos=0;
+  for(i=0;i<qn;i++){
+    lastpos=posInPairs(p,pn-1,q[i],c, max(lastpos-1,0));
+    //   cout<<lastpos<<"\n";
+    a[i]=lastpos;
+
+  }
+  p=(sorted_pair_node**) realloc(p,(pn+qn)*sizeof(sorted_pair_node*));
+  for(i=qn-1;i>=0;i--){
+    size_t size;
+    if(qn-1>i)
+      size=(a[i+1]-a[i])*sizeof(sorted_pair_node*);
+    else
+      size=(pn-a[i])*sizeof(sorted_pair_node*); //as indices begin with 0
+    memmove (p+a[i]+(1+i), p+a[i], size);
+    p[a[i]+i]=q[i];
+  }
+  omfree(a);
+  return p;
+}
 static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,calc_dat* c){
 
 
@@ -2053,7 +2103,10 @@ ideal t_rep_gb(ring r,ideal arg_I){
   omfree(c->states);
   omfree(c->lengths);
   printf("calculated %d NFs\n",c->normal_forms);
+  I=c->S;
+  IDELEMS(I)=c->n;
   omfree(c);
+  
   return(I);
 }
 static void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c){
