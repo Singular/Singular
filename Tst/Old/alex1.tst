@@ -1,4 +1,4 @@
-test(0);
+option(prot);
 "========= Beipiel Alex1 =============";
 "=== elem 43, dim 1, mult 899 ========";
 //=== 15: 1 min
