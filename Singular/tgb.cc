@@ -1842,7 +1842,7 @@ static void simplify(monom_poly& h, calc_dat* c){
 	if(j<F_minus->size)
 	{
 	  pExpVectorSub(h.m,F->mp[i].m);
-	  h.f=F->mp[j].f;
+	  h.f=F_minus->p[j];
 	}
 	break;
       }
@@ -2253,12 +2253,12 @@ static void go_on_F4 (calc_dat* c){
   //next Step, simplify all pairs
   for(i=0;i<chosen_index;i++)
   {
-    PrintS("simplifying");
-    Print("from %s",pString(chosen[i].m));
-    Print(", %s", pString(chosen[i].f));
+    //    PrintS("simplifying ");
+    //Print("from %s",pString(chosen[i].m));
+    //Print(", %s", pString(chosen[i].f));
     simplify(chosen[i],c);
-    Print("to %s",pString(chosen[i].m));
-    Print(", %s", pString(chosen[i].f));
+    //Print(" to %s",pString(chosen[i].m));
+    //Print(", %s \n", pString(chosen[i].f));
   }
   
   //next Step remove duplicate entries
