@@ -3605,7 +3605,7 @@ if test "$ac_cv_sizeof_voidp" != 4 && test "$ac_cv_sizeof_voidp" != 8; then
   { echo "configure: error: need void* to be 4 or 8 bytes long" 1>&2; exit 1; }
 fi
 if test "$ac_cv_sizeof_voidp" != 4; then
-  DEFS="-UOMNDEBUG"
+  DEFS="-UOM_NDEBUG"
   
 fi
 
