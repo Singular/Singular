@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.2 2004-04-16 17:18:35 levandov Exp $ */
+/* $Id: syz.cc,v 1.3 2004-06-02 13:12:31 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -265,10 +265,13 @@ static void syDeleteAbove1(ideal up, int k)
       p = up->m[i];
       while ((p!=NULL) && (pGetComp(p)==k))
       {
+        /*
         pp = pNext(p);
         pNext(p) = NULL;
         pDelete(&p);
         p = pp;
+        */
+        pLmDelete(&p);
       }
       up->m[i] = p;
       if (p!=NULL)
@@ -277,10 +280,13 @@ static void syDeleteAbove1(ideal up, int k)
         {
           if (pGetComp(pNext(p))==k)
           {
+            /*
             pp = pNext(pNext(p));
             pNext(pNext(p)) = NULL;
             pDelete(&pNext(p));
             pNext(p) = pp;
+            */
+            pLmDelete(&pNext(p));
           }
           else
             pIter(p);
@@ -315,7 +321,7 @@ static void syMinStep1(resolvente res, int length)
         {
           j = pGetComp(reddeg0->m[i]);
           pDelete(&(res[index]->m[j-1]));
-          res[index]->m[j-1] = NULL;
+          /*res[index]->m[j-1] = NULL;*/
           (*have_del)[j-1] = 1;
         }
       }
