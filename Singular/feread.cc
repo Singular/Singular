@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.18 1998-08-03 16:39:05 Singular Exp $ */
+/* $Id: feread.cc,v 1.19 1998-09-07 15:27:30 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -64,12 +64,12 @@ char ** fe_hist=NULL;
 int     fe_hist_pos;
 
 #ifndef MSDOS
-  #ifdef HAVE_ATEXIT
-    void fe_reset_input_mode (void)
-  #else
+  #ifndef HAVE_ATEXIT
     extern "C" int on_exit(void (*f)(int, void *), void *arg);
 
     void fe_reset_input_mode (int i, void *v)
+  #else
+    void fe_reset_input_mode (void)
   #endif
   {
     if (fe_stdin_is_tty)
@@ -246,6 +246,7 @@ void fe_set_input_mode (void)
   }
 }
 
+/* delete to end of line */
 static void fe_ctrl_k(char *s,int i)
 {
   int j=i;
@@ -261,7 +262,8 @@ static void fe_ctrl_k(char *s,int i)
   }
 }
 
-static void fe_ctrl_x(char *s,int &i)
+/* delete the line */
+static void fe_ctrl_u(char *s,int &i)
 {
   fe_ctrl_k(s,i);
   while(i>0)
@@ -326,19 +328,60 @@ static void fe_get_hist(char *s, int size, int &pos,int change, int incr)
   }
 }
 
+static int fe_getchar()
+{
+  int c;
+  #ifndef MSDOS
+  c=0;
+  while (1!=read (STDIN_FILENO, &c, 1));
+  #else
+  c=getkey();
+  #endif
+  #ifndef MSDOS
+  if (c == 033)
+  {
+    /* check for CSI */
+    c=0;
+    read (STDIN_FILENO, &c, 1);
+    if (c == '[')
+    {
+      /* get command character */
+      c=0;
+      read (STDIN_FILENO, &c, 1);
+      switch (c)
+      {
+        case 'D': /* left arrow key */
+          c = feCTRL('B')/*002*/;
+          break;
+        case 'C': /* right arrow key */
+          c = feCTRL('F')/*006*/;
+          break;
+        case 'A': /* up arrow key */
+          c = feCTRL('P')/*020*/;
+          break;
+        case 'B': /* down arrow key */
+          c = feCTRL('N')/*016*/;
+          break;
+      }
+    }
+  }
+  #endif
+  return c;
+}
+
 char * fe_fgets_stdin(char *s, int size)
 {
   #ifdef HAVE_TCL
   if (tclmode)
   {
-    if(currRing!=NULL) PrintTCLS('P',pr);
-    else               PrintTCLS('U',pr);
+    if(currRing!=NULL) PrintTCLS('P',fe_promptstr);
+    else               PrintTCLS('U',fe_promptstr);
   }
   else
   #endif
   if ((BVERBOSE(V_PROMPT))&&(!feBatch))
   {
-    PrintS(pr);
+    PrintS(fe_promptstr);
   }
   mflush();
 
@@ -356,41 +399,7 @@ char * fe_fgets_stdin(char *s, int size)
 
     loop
     {
-      #ifndef MSDOS
-        c=0;
-        read (STDIN_FILENO, &c, 1);
-      #else
-        c=getkey();
-      #endif
-      #ifndef MSDOS
-      if (c == 033)
-      {
-        /* check for CSI */
-        c=0;
-        read (STDIN_FILENO, &c, 1);
-        if (c == '[')
-        {
-          /* get command character */
-          c=0;
-          read (STDIN_FILENO, &c, 1);
-          switch (c)
-          {
-            case 'D': /* left arrow key */
-              c = feCTRL('B')/*002*/;
-              break;
-            case 'C': /* right arrow key */
-              c = feCTRL('F')/*006*/;
-              break;
-            case 'A': /* up arrow key */
-              c = feCTRL('P')/*020*/;
-              break;
-            case 'B': /* down arrow key */
-              c = feCTRL('N')/*016*/;
-              break;
-          }
-        }
-      }
-      #endif
+      c=fe_getchar();
       switch(c)
       {
         case feCTRL('M'):
@@ -404,7 +413,7 @@ char * fe_fgets_stdin(char *s, int size)
           return s;
         }
         #ifdef MSDOS
-          case 0x153:
+        case 0x153:
         #endif
         case feCTRL('H'):
         case 127:       /*delete the character left of the cursor*/
@@ -420,7 +429,7 @@ char * fe_fgets_stdin(char *s, int size)
         case feCTRL('D'):  /*delete the character under the cursor or eof*/
         {
           int j;
-          if ((i==0)&&(c==feCTRL('D')&&(s[0]=='\0'))) return NULL; /*eof*/
+          if ((i==0) &&(s[0]=='\0')) return NULL; /*eof*/
           if (s[i]!='\0')
           {
             j=i;
@@ -438,7 +447,7 @@ char * fe_fgets_stdin(char *s, int size)
             }
           }
           #ifdef MSDOS
-            fputc('\b',fe_echo);
+          fputc('\b',fe_echo);
           #endif
           change=1;
           break;
@@ -463,8 +472,11 @@ char * fe_fgets_stdin(char *s, int size)
         }
         case feCTRL('B'): /* move the cursor backward one character */
         {
-          i--;
-          fputc('\b',fe_echo);
+	  if (i>0)
+	  {
+            i--;
+            fputc('\b',fe_echo);
+	  }
           break;
         }
         case feCTRL('F'): /* move the cursor forward  one character */
@@ -476,14 +488,14 @@ char * fe_fgets_stdin(char *s, int size)
           }
           break;
         }
-        /* change to ^U, to be consistent with readline:*/
         case feCTRL('U'): /* delete entire input line */
         {
-          fe_ctrl_x(s,i);
+          fe_ctrl_u(s,i);
           memset(s,0,size);
           change=1;
           break;
         }
+	#ifndef NDEBUG
         case feCTRL('W'): /* test hist. */
         {
           int i;
@@ -502,6 +514,7 @@ char * fe_fgets_stdin(char *s, int size)
           Print("end hist, next_pos=%d\n",fe_hist_pos);
           break;
         }
+	#endif
         case feCTRL('K'): /* delete up to the end of the line */
         {
           fe_ctrl_k(s,i);
@@ -511,7 +524,7 @@ char * fe_fgets_stdin(char *s, int size)
         }
         case feCTRL('P'): /* previous line */
         {
-          fe_ctrl_x(s,i);
+          fe_ctrl_u(s,i);
           fe_get_hist(s,size,h,change,-1);
           while(s[i]!='\0')
           {
@@ -523,7 +536,7 @@ char * fe_fgets_stdin(char *s, int size)
         }
         case feCTRL('N'): /* next line */
         {
-          fe_ctrl_x(s,i);
+          fe_ctrl_u(s,i);
           fe_get_hist(s,size,h,change,1);
           while(s[i]!='\0')
           {
