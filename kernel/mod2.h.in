@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.2 2005-03-09 13:40:38 bricken Exp $
+ *  Version: $Id: mod2.h.in,v 1.3 2005-03-09 13:53:26 bricken Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -164,7 +164,7 @@
 #include "mod2.mwerks.h"
 #else
 /* works around a quirk in gcc in the generation of parser tables */
-//#define INIT_BUG
+#define INIT_BUG
 #endif
 
 /* eigenvalues */
