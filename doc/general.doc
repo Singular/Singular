@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.146 1999-08-06 14:06:45 obachman Exp $
+@comment $Id: general.doc,v 1.147 1999-08-24 11:04:58 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -207,7 +207,7 @@ in your file @code{$HOME/.singularrc} sets your default browser to
 
 
 Obviously, certain external files and programs are required for the
-@sc{Singular}help system to work correctly. If something is not availbel 
+@sc{Singular} help system to work correctly. If something is not availabel 
 or goes wrong, here are some tips for troubleshooting the help system:
 
 @itemize
