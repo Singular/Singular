@@ -1,10 +1,13 @@
 ;;; here are those from universal.lst which are still buggy
-minbas
-mino
-hilb
-matrix
+m8ex
+m10ex
+m11ex
+m19ex
+m85si
+m114si
+regul
+sat
 moralex
-m89si
-m9ex
 err5
-bett
+syzygies
+res
