@@ -1,0 +1,11 @@
+lift_s
+homolog_s
+polylib_s
+sres_s
+spcurve  ; becomes  huge
+; INFINITE  
+deform_s
+bug_16  ; degBound not recognized 
+normal
+paramet
+
