@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.40 1998-06-08 09:04:50 Singular Exp $
+@comment $Id: singular.doc,v 1.41 1998-06-09 13:14:14 krueger Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -16,7 +16,12 @@
 @c ------------------------
 @set singularmanual 1
 @set VERSION 1.2
+@set manual 1
 @c ------------------------
+@c <CENTER><IMG SRC="Singular2.gif"></CENTER><BR>
+@html
+<CENTER><IMG SRC="/~zca/Singular/Images/singlogo.gif"></CENTER><BR>
+@end html
 @ifinfo
 this is the texinfo file describing Singular (version @value{VERSION})
 @end ifinfo
@@ -46,7 +51,9 @@ this is the texinfo file describing Singular (version @value{VERSION})
 @c ----------------------------------------------------------------------------
 @node Top, Preface, (dir), (dir)
 @ifinfo
+@manual 
 q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
+@end manual
 @sp 1
 @center Singular - Manual
 @center Version @value{VERSION}
