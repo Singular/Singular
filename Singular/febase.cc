@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.10 1997-04-29 12:01:54 Singular Exp $ */
+/* $Id: febase.cc,v 1.11 1997-04-29 19:54:48 obachman Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -118,9 +118,9 @@ BOOLEAN tclmode=FALSE;
 *  V:l:<option/no-option> option change (verbose)
 */
 
-/*2
-* fopen, but use 'SingularPath' from environment and '/usr/local/Singular'
-*/
+/*2 fopen, but use 'SINGULARPATH' from environment and SINGULARDATADIR
+* as set by configure
+*  */
 #ifdef macintosh
 #  define  FS_SEP ','
 #  define  DIR_SEP ':'

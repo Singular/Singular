@@ -21,10 +21,8 @@ srcdir		= @srcdir@
 prefix 		= @prefix@
 exec_prefix 	= @exec_prefix@
 libdir 		= @libdir@
-# program executable goes here
-bindir		= @bindir@
-# read-only architecture-independent data (like Singular libs) go here
-singulardatadir = @singulardatadir@
+bindir		= @bindir@          # program executable goes here
+singulardatadir = @singulardatadir@ # Singular libs go here
 includedir	= @includedir@
 
 ## 
@@ -32,12 +30,12 @@ includedir	= @includedir@
 ##
 CC		= @CC@
 CXX		= @CXX@
-BISON		= @BISON@
-LEX		= @LEX@
 INSTALL		= @INSTALL@
 INSTALL_DATA	= @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 MKINSTALLDIRS   = @MKINSTALLDIRS@
+BISON		= bison
+LEX		= flex
 
 ##
 ## compiler and linker options
@@ -51,8 +49,18 @@ LDFLAGS		= @LDFLAGS@
 LIBS		= @LIBS@
 
 ##
+## subdirectories
+##
+docdir		= doc	# where the doumentation files are
+testsdir	= tests # where the tests files are 
+
+##
 ## End configuration dependend stuff
 #################################################################
+
+###
+### file sets
+###
 
 CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     clapmem.cc clapsing.cc claptmpl.cc cntrlc.cc \
@@ -90,8 +98,16 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	kstdfac.h mpsr_Get.h spolys.h \
 	kutil.h mpsr_Put.h spolys0.h
 
+TESTS=${testdir}/check ${testdir}/input ${testdir}/output 
+
+DOCS=${docdir}/Makefile.in ${docdir}/copyright.tex ${docdir}/doc2tex.c \
+	${docdir}/examples.doc ${docdir}/examples.tex ${docdir}/proc.tex \
+	${docdir}/singular.doc ${docdir}/start.doc \
+	${docdir}/start.tex ${docdir}/tutor.tex ${docdir}/singular.tex 
+
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
-	mod2.h.in grammar.h testgh install-sh mkinstalldirs
+	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
+	${TESTS} ${DOCS}
 
 OBJS=grammar.o scanner.o matpol.o binom.o\
      febase.o feread.o timer.o intvec.o attrib.o lists.o\
@@ -112,6 +128,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 ## PRIMARY Targets
 ##
 
+
 .l.cc:
 	${LEX} -s -I -t $< > scanner.cc
 
@@ -125,6 +142,8 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
+all:	Singular
+
 Singular: mod2.h version.h scanner.cc ${OBJS} iparith.o mpsr_Tok.o tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o Singular \
 	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS}
@@ -134,8 +153,7 @@ iparith.o mpsr_Tok.o : iparith.inc
 claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 	
-
-iparith.inc : ${OBJS} iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h 
+iparith.inc : iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h 
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -DGENTABLE -o gentable \
 	iparith.cc tesths.cc mpsr_Tok.cc ${OBJS} ${LDFLAGS} ${LIBS}
 	./gentable
@@ -144,17 +162,21 @@ iparith.inc : ${OBJS} iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 	echo "#define VERSION_ID " `date '+%y%m%d%H'` >version.h
 
-mod2.h: configure mod2.h.in Makefile.in
-	./configure ${CONFIGURE_INPUT}
+mod2.h: config.status config.cache mod2.h.in Makefile.in
+	./config.status
 	touch -r mod2.h configure configure.in Makefile.in
+
+config.status config.cache : configure
+	./configure ${CONFIGURE_INPUT} --no-create
 
 configure: configure.in
 	autoconf configure.in > configure
 	chmod a+x configure
 
-all: Singular
-
-install: all installbin installdata
+##
+## install targets
+##
+install: all installbin installdata installinfo
 
 installbin: Singular
 	${MKINSTALLDIRS} ${bindir}
@@ -170,9 +192,12 @@ installdata:
 		${INSTALL_DATA} $${file} ${singulardatadir}; \
 	done
 
-uninstall: uninstallbin uninstalldata
+installinfo:
+	cd ${docdir}; ${MAKE} install
 
-uninstallin:
+uninstall: uninstallbin uninstalldata uninstallinfo
+
+uninstallbin:
 	-rm -f ${bindir}/Singular
 	-rmdir ${bindir}
 
@@ -180,22 +205,39 @@ uninstalldata:
 	-rm -rf ${singulardatadir}/*.lib ${singulardatadir}/gftables
 	-rmdir ${singulardatadir}
 
+unistallinfo:
+	cd ${docdir}; ${MAKE} uninstall
+
+##
+## clean targest
+##
 mostlyclean: clean
 
 clean:
-	-rm -f Singular* *.o *.og core *.d *.dd *~\#* 
+	-rm -rf Singular* *.o *.og core *.d *.dd *~ \#* ${testdir}/out
+	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
-	-rm -f depend *.inc ${DIST_NAME}
+	-rm -rf depend *.inc ${DIST_NAME} ${testdir}/out
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
+	cd ${docdir}; ${MAKE} clean
 
-maintainer-clean: distlean
+maintainer-clean: distclean
 	@echo "This command is intended for maintainers to use;"
-	@echo "it deletes files that may require special tools to rebuild."
+	@echo "Rebuilding the deleted files requires flex (version 2.3) "
+	@echo "bison and autoconf"
 	-rm configure scanner.cc grammar.h grammar.cc
+	cd ${docdir}; ${MAKE} distclean
 
-check:	Makefile.in tests/check tests/output
-	cd tests; tests/check ${bindir}/Singular; cd ..
+info dvi ps html:
+	cd ${docdir}; ${MAKE} $@
+
+check:	Singular ${testdir}/check ${testdir}/output
+	cd ${testdir}; SINGULARPATH=./../LIB/ ./check ./../Singular
+
+##
+## miscellanous targets
+##
 
 dist:
 	-rm -rf ${DIST_NAME}
@@ -215,7 +257,7 @@ TAGS:
 #################################################################
 
 ##
-## compiler and linker options
+## compiler and linker options for debug version
 ##
 
 CCG		= gcc
@@ -253,7 +295,7 @@ OBJG2= mmalloc.og mmallocb.og mmallocs.og mmblock.og mmheap.og \
 OBJG=$(OBJG1) $(OBJG2) claptmpl.og
 
 ##
-## Targets
+## Debug Targets
 ##
 
 claptmpl.og: claptmpl.cc mod2.h
@@ -268,7 +310,7 @@ Singularg: scanner.cc $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h
 	$(CXXG) ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
 	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS}
 
-iparith.og: iparith.inc iparith.cc
+iparith.og: ${OBJS} iparith.inc iparith.cc
 	$(CXXG)  ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og
 
 mpsr_Tok.og: iparith.inc mpsr_Tok.cc

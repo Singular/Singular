@@ -22,6 +22,7 @@ dnl paths stuff
 dnl
 AC_PREFIX_DEFAULT(`pwd`/..)
 
+dnl 
 if test "x$datadir" = 'x${prefix}/share'; then
   if test "x${prefix}" = xNONE; then
     singulardatadir=${ac_default_prefix}/share/Singular;
@@ -58,22 +59,34 @@ if test ${GXX} = yes; then
 fi  
 
 dnl and add to -I to CPPFLAGS and and -Lto LDFLAGS, just to be sure
-LDFLAGS="-L${libdir} ${LDFLAGS}"
-CPPFLAGS="-I${includedir} ${CPPFLAGS}"
-
-dnl programs to built the grammar/parser
-AC_PROG_LEX
-AC_CHECK_PROG(BISON, bison, bison)
-if test -z ${BISON}; then
-  AC_MSG_ERROR(install bison before Singular)
+if test "x$libdir" = '${prefix}/lib'; then
+  if test "x$prefix" = xNONE; then
+    LDFLAGS="-L${ac_default_prefix}/lib ${LDFLAGS}"
+  else
+    LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
+  fi
+else
+  LDFLAGS="-L${libdir} ${LDFLAGS}"
 fi
 
+if test "x$includedir" = '${prefix}/include'; then
+  if test "x$prefix" = xNONE; then
+    CPPFLAGS="-L${ac_default_prefix}/include ${CPPFLAGS}"
+  else
+    CPPFLAGS="-L${prefix}/include ${CPPFLAGS}"
+  fi
+else
+  CPPFLAGS="-L${includedir} ${CPPFLAGS}"
+fi
+
+dnl programs to built the grammar/parser
 dnl check for info
 AC_CHECK_PROG(INFO, info, info)
 if test -n "$INFO"; then
   AC_DEFINE(HAVE_INFO)
 fi
 
+  
 dnl programs for installation
 ac_save_path=${PATH}
 PATH="$PATH:.."  
@@ -362,7 +375,7 @@ dnl
 dnl Last, but not least, customize CFLAGS
 dnl
 if test ${GXX} = yes; then
-  CXXFLAGS="-O3 -w -fomit-frame-pointer -fstrength-reduce"
+  CXXFLAGS="-O3 -w -fomit-frame-pointer"
   CXXTEMPLFLAGS="-fno-implicit-templates"
 else
   CXXTEMPFLAGS=""
@@ -370,9 +383,9 @@ fi
 AC_SUBST(CXXTEMPLFLAGS)
 
 if test ${GCC} = yes; then
-  CFLAGS="-O3 -w -fomit-frame-pointer -fstrength-reduce"
+  CFLAGS="-O3 -w -fomit-frame-pointer"
 fi
 
 AC_SUBST(ac_configure_args)
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile doc/Makefile)
