@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.48 2003-03-05 18:02:09 Singular Exp $ */
+/* $Id: feread.cc,v 1.49 2003-03-06 06:54:11 bricken Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -10,8 +10,10 @@
 
 // ----------------------------------------
 // system settings:
-#undef USE_GCC3
+
 #undef USE_READLINE4
+
+
 //----------------------------------------
 #ifdef ix86_Win
 #define READLINE_STATIC
@@ -32,10 +34,6 @@
 #undef HAVE_DYN_RL
 #endif
 
-#ifndef USE_READLINE4
-#define rl_filename_completion_function filename_completion_function
-#define rl_completion_matches           completion_matches
-#endif
 
 
 #ifdef HAVE_TCL
@@ -110,8 +108,20 @@ extern "C" {
   #include <readline/readline.h>
   #ifdef HAVE_READLINE_HISTORY_H
    #include <readline/history.h>
+  
   #endif
- #else /* declare everything we need explicitely and do not rely on includes */
+#endif
+#ifdef RL_VERSION_MAJOR
+#if (RL_VERSION_MAJOR >= 4)
+#define USE_READLINE4
+#endif
+#endif
+#ifndef USE_READLINE4
+#define rl_filename_completion_function filename_completion_function
+#define rl_completion_matches           completion_matches
+#endif
+#ifndef READLINE_READLINE_H_OK  
+ /* declare everything we need explicitely and do not rely on includes */
   extern char * rl_readline_name;
   extern char *rl_line_buffer;
   char *rl_filename_completion_function(const char*, int);
@@ -381,8 +391,8 @@ static char * fe_fgets_stdin_init(char *pr,char *s, int size)
   /* Allow conditional parsing of the ~/.inputrc file. */
   rl_readline_name = "Singular";
   /* Tell the completer that we want a crack first. */
-#ifdef USE_GCC3
-  rl_attempted_completion_function = (RL_CPPFunction *)singular_completion;
+#ifdef USE_READLINE4
+  rl_attempted_completion_function = (rl_completion_func_t *)singular_completion;
 #else
   rl_attempted_completion_function = (CPPFunction *)singular_completion;
 #endif
