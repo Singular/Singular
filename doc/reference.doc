@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.72 1998-05-19 21:14:36 wichmann Exp $
+@comment $Id: reference.doc,v 1.73 1998-05-20 07:53:15 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4903,6 +4903,8 @@ returns shell environment variable given as the second argument
 resets the terminal
 @item @code{system("version")} 
 returns the version number of  @sc{Singular} (type int)
+@item @code{system("contributors")}
+returns names of people who contributed to the Singular kernel
 @item @code{system("random"},int_expression @code{)} 
 resets the random generator to the given value and return it (type int)
 @item @code{system("random")} 
