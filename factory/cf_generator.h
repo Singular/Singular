@@ -1,15 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_generator.h,v 1.1 1997-04-07 15:07:19 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_generator.h,v 1.2 1997-06-19 12:27:02 schmidt Exp $ */
 
 #ifndef INCL_CF_GENERATOR_H
 #define INCL_CF_GENERATOR_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.0  1996/05/17 10:59:38  stobbe
-Initial revision
-
-*/
 
 #include <config.h>
 
@@ -88,4 +81,4 @@ public:
 
 /*ENDPUBLIC*/
 
-#endif /* INCL_CF_GENERATOR_H */
+#endif /* ! INCL_CF_GENERATOR_H */

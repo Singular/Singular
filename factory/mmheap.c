@@ -1,12 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: mmheap.c,v 1.1 1997-04-15 09:24:52 schmidt Exp $ */
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.0  1996/05/17 10:59:48  stobbe
-Initial revision
-
-*/
+/* $Id: mmheap.c,v 1.2 1997-06-19 12:22:09 schmidt Exp $ */
 
 #define _POSIX_SOURCE 1
 

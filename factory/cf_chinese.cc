@@ -1,16 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_chinese.cc,v 1.2 1997-04-07 14:57:58 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1996/12/05 18:24:52  schmidt
-``Unconditional'' check-in.
-Now it is my turn to develop factory.
-
-Revision 1.0  1996/05/17 10:59:43  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_chinese.cc,v 1.3 1997-06-19 12:27:25 schmidt Exp $ */
 
 #include <config.h>
 

@@ -1,29 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_util.cc,v 1.5 1997-04-08 10:37:42 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.4  1997/03/27 09:56:58  schmidt
-error check changed to ASSERT
-
-Revision 1.3  1996/07/16 12:26:05  stobbe
-"New functions prod, crossprod ans sum for CFArrays, since these functions
-are no longer contained in the template specification of Array.
-"
-
-Revision 1.2  1996/07/08 08:22:02  stobbe
-"New organization of the factorization stuff. Some functions moved from
-fac_diophand.cc which no longer exists.
-"
-
-Revision 1.1  1996/06/27 11:34:24  stobbe
-"New function dviremainder.
-"
-
-Revision 1.0  1996/05/17 10:59:46  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_util.cc,v 1.6 1997-06-19 12:23:10 schmidt Exp $ */
 
 #include <config.h>
 

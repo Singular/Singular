@@ -1,23 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_iterfor.h,v 1.3 1997-04-07 16:24:16 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_iterfor.h,v 1.4 1997-06-19 12:23:29 schmidt Exp $ */
 
-#ifndef INCL_ITERFOR_H
-#define INCL_ITERFOR_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1997/03/27 09:43:47  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.1  1996/07/08 08:18:49  stobbe
-"IteratedFor now handles the cases in which the mainvariable is not of
-level 1.
-"
-
-Revision 1.0  1996/05/17 10:59:40  stobbe
-Initial revision
-
-*/
+#ifndef INCL_FAC_ITERFOR_H
+#define INCL_FAC_ITERFOR_H
 
 #include <config.h>
 
@@ -56,4 +41,4 @@ public:
 ostream& operator<< ( ostream &, const IteratedFor & );
 #endif /* NOSTREAMIO */
 
-#endif /* INCL_ITERFOR_H */
+#endif /* ! INCL_FAC_ITERFOR_H */

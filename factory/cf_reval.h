@@ -1,18 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_reval.h,v 1.2 1997-04-07 16:11:56 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_reval.h,v 1.3 1997-06-19 12:23:56 schmidt Exp $ */
 
-#ifndef INCL_R_EVALUATION_H
-#define INCL_R_EVALUATION_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/03/26 16:53:10  schmidt
-spurious #include <iostream.h> removed
-
-Revision 1.0  1996/05/17 10:59:39  stobbe
-Initial revision
-
-*/
+#ifndef INCL_CF_REVAL_H
+#define INCL_CF_REVAL_H
 
 #include <config.h>
 
@@ -37,4 +27,4 @@ public:
 
 /*ENDPUBLIC*/
 
-#endif /* INCL_R_EVALUATION_H */
+#endif /* ! INCL_CF_REVAL_H */

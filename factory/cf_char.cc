@@ -1,29 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_char.cc,v 1.5 1997-04-07 14:57:12 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.4  1996/07/08 08:12:23  stobbe
-"setCharacteristic: Now resets the pascal triangle in the case that the
-                   characteristic changes
-"
-
-Revision 1.3  1996/06/24 11:25:45  stobbe
-"setCharacteristic: minor bug fix, index correction
-"
-
-Revision 1.2  1996/06/18 12:09:43  stobbe
-"setCharacteristic: changed the setting of ff_big.
-"
-
-Revision 1.1  1996/06/18 06:52:45  stobbe
-"setCharacteristic: now sets the flag ff_big
-"
-
-Revision 1.0  1996/05/17 10:59:43  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_char.cc,v 1.6 1997-06-19 12:27:27 schmidt Exp $ */
 
 #include <config.h>
 

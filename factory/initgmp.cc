@@ -1,15 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: initgmp.cc,v 1.2 1997-04-15 09:09:30 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/03/27 10:01:44  schmidt
-dependency on SINGULAR removed
-
-Revision 1.0  1996/05/17 10:59:46  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: initgmp.cc,v 1.3 1997-06-19 12:22:52 schmidt Exp $ */
 
 #include <config.h>
 

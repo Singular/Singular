@@ -1,20 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_map.cc,v 1.3 1997-04-07 16:02:21 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1997/03/26 16:47:32  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.1  1996/07/08 08:17:22  stobbe
-"New function compress( f, g, M, N ) that maps the common variables to be
-the ones with the lowest level.
-"
-
-Revision 1.0  1996/05/17 10:59:44  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_map.cc,v 1.4 1997-06-19 12:24:17 schmidt Exp $ */
 
 #include <config.h>
 

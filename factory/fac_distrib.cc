@@ -1,18 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_distrib.cc,v 1.4 1997-04-15 11:11:36 schmidt Exp $
-
-/*
- * $Log: not supported by cvs2svn $
- * Revision 1.3  1997/04/07 16:21:32  schmidt
- * #include <config.h> added
- *
- * Revision 1.2  1997/03/27 09:39:51  schmidt
- * debug output rewritten
- *
- * Revision 1.1  1996/12/06 14:44:08  schmidt
- * Initial revision
- *
- */
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_distrib.cc,v 1.5 1997-06-19 12:23:38 schmidt Exp $ */
 
 #include <config.h>
 

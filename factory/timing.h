@@ -1,15 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: timing.h,v 1.2 1997-03-27 10:23:55 schmidt Exp $ */
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1996/12/06 14:49:07  schmidt
-Initial revision
-
- * Revision 1.0  1996/05/17  10:59:37  stobbe
- * Initial revision
- *
-*/
+/* $Id: timing.h,v 1.3 1997-06-19 12:21:54 schmidt Exp $ */
 
 /* It should be possible to include this file multiple times for different */
 /* settings of TIMING */

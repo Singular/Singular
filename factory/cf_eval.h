@@ -1,18 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_eval.h,v 1.2 1997-04-07 15:01:44 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_eval.h,v 1.3 1997-06-19 12:27:20 schmidt Exp $ */
 
-#ifndef INCL_EVALUATION_H
-#define INCL_EVALUATION_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/03/26 16:32:24  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.0  1996/05/17 10:59:38  stobbe
-Initial revision
-
-*/
+#ifndef INCL_CF_EVAL_H
+#define INCL_CF_EVAL_H
 
 #include <config.h>
 
@@ -48,4 +38,4 @@ public:
 
 /*ENDPUBLIC*/
 
-#endif /* INCL_EVALUATION_H */
+#endif /* ! INCL_CF_EVAL_H */

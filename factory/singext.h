@@ -1,18 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: singext.h,v 1.2 1997-04-30 12:48:57 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: singext.h,v 1.3 1997-06-19 12:21:57 schmidt Exp $ */
 
 #ifndef INCL_SINGEXT_H
 #define INCL_SINGEXT_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/04/15 09:38:18  schmidt
-#include <config.h> added
-
-Revision 1.0  1996/05/17 10:59:42  stobbe
-Initial revision
-
-*/
 
 #include <config.h>
 
@@ -40,4 +30,4 @@ CanonicalForm make_cf ( const MP_INT & n, const MP_INT & d, bool normalize );
 
 /*ENDPUBLIC*/
 
-#endif /* INCL_SINGEXT_H */
+#endif /* ! INCL_SINGEXT_H */

@@ -1,20 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: int_poly.cc,v 1.3 1997-04-15 09:13:49 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1997/03/27 10:07:37  schmidt
-stream-io wrapped by NOSTREAMIO
-debug output changed to DEBOUT
-
-Revision 1.1  1996/05/23 09:33:05  stobbe
-"modulocoeff: Bug fix, invert is now handled as it should be.
-"
-
-// Revision 1.0  1996/05/17  10:59:46  stobbe
-// Initial revision
-//
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: int_poly.cc,v 1.4 1997-06-19 12:22:42 schmidt Exp $ */
 
 #include <config.h>
 

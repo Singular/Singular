@@ -1,12 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: singext.cc,v 1.1 1997-04-15 09:37:55 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.0  1996/05/17 10:59:47  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: singext.cc,v 1.2 1997-06-19 12:21:59 schmidt Exp $ */
 
 #include <config.h>
 

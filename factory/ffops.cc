@@ -1,21 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: ffops.cc,v 1.3 1997-04-08 16:04:39 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1996/06/18 12:05:42  stobbe
-"ff_biginv: changed long's to long long int.
-"
-
-Revision 1.1  1996/06/18 06:57:00  stobbe
-"Now the functionality to handle prime numbers that are bigger than 2^15.
-This results in various changes and some new functions.
-"
-
-Revision 1.0  1996/05/17 10:59:46  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: ffops.cc,v 1.4 1997-06-19 12:23:06 schmidt Exp $ */
 
 #include <config.h>
 

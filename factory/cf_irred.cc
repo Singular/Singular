@@ -1,12 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_irred.cc,v 1.1 1997-04-07 15:11:00 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.0  1996/05/17 10:59:44  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_irred.cc,v 1.2 1997-06-19 12:24:26 schmidt Exp $ */
 
 #include <config.h>
 

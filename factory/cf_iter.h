@@ -1,18 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_iter.h,v 1.2 1997-04-07 16:01:03 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_iter.h,v 1.3 1997-06-19 12:24:22 schmidt Exp $ */
 
-#ifndef INCL_CFITERATOR_H
-#define INCL_CFITERATOR_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/03/26 16:44:13  schmidt
-spurious #include <iostream.h> removed
-
-Revision 1.0  1996/05/17 10:59:38  stobbe
-Initial revision
-
-*/
+#ifndef INCL_CF_ITER_H
+#define INCL_CF_ITER_H
 
 #include <config.h>
 
@@ -48,4 +38,4 @@ public:
 
 /*ENDPUBLIC*/
 
-#endif /* INCL_CFITERATOR_H */
+#endif /* ! INCL_CF_ITER_H */

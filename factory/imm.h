@@ -1,18 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: imm.h,v 1.2 1997-04-18 15:15:28 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: imm.h,v 1.3 1997-06-19 12:22:55 schmidt Exp $ */
 
-#ifndef INCL_IMMEDIATE_H
-#define INCL_IMMEDIATE_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/03/27 10:00:31  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.0  1996/05/17 10:59:41  stobbe
-Initial revision
-
-*/
+#ifndef INCL_IMM_H
+#define INCL_IMM_H
 
 #include <config.h>
 
@@ -373,4 +363,4 @@ inline int imm_sign ( const InternalCF * const op )
 	return -1;
 }
 
-#endif
+#endif /* ! INCL_IMM_H */

@@ -1,21 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_eval.cc,v 1.3 1997-04-07 15:00:58 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1997/03/26 16:29:50  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.1  1996/05/24 09:21:54  stobbe
-"operator(): Bug fix, operator( const CanonicalForm & ) now uses
-            values.min() as lower index instead of 2 and produces the
-            right result.
-"
-
-// Revision 1.0  1996/05/17  10:59:43  stobbe
-// Initial revision
-//
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_eval.cc,v 1.4 1997-06-19 12:27:22 schmidt Exp $ */
 
 #include <config.h>
 

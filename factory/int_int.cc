@@ -1,18 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: int_int.cc,v 1.3 1997-04-15 09:12:08 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1997/03/27 10:05:39  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.1  1996/12/20 15:35:26  schmidt
-Ruedigers last fryday afternoon fix
-
-Revision 1.0  1996/05/17 10:59:46  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: int_int.cc,v 1.4 1997-06-19 12:22:48 schmidt Exp $ */
 
 #include <config.h>
 

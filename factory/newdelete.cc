@@ -1,12 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: newdelete.cc,v 1.1 1997-04-15 09:33:49 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.0  1996/05/17 12:21:32  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: newdelete.cc,v 1.2 1997-06-19 12:22:03 schmidt Exp $ */
 
 #include <config.h>
 

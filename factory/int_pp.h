@@ -1,18 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: int_pp.h,v 1.2 1997-04-15 09:16:46 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: int_pp.h,v 1.3 1997-06-19 12:22:29 schmidt Exp $ */
 
-#ifndef INCL_INTERNALPRIMEPOWER_H
-#define INCL_INTERNALPRIMEPOWER_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/03/27 10:10:17  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.0  1996/05/17 10:59:41  stobbe
-Initial revision
-
-*/
+#ifndef INCL_INT_PP_H
+#define INCL_INT_PP_H
 
 #include <config.h>
 
@@ -105,4 +95,4 @@ inline MP_INT & InternalPrimePower::MPI( const InternalCF * const c )
     return (((InternalPrimePower*)c)->thempi);
 }
 
-#endif /* INCL_INTERNALPRIMEPOWER_H */
+#endif /* ! INCL_INT_PP_H */

@@ -1,23 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_map.h,v 1.3 1997-04-07 16:03:03 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_map.h,v 1.4 1997-06-19 12:24:15 schmidt Exp $ */
 
 #ifndef INCL_CF_MAP_H
 #define INCL_CF_MAP_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1997/03/26 16:48:36  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.1  1996/07/08 08:17:22  stobbe
-"New function compress( f, g, M, N ) that maps the common variables to be
-the ones with the lowest level.
-"
-
-Revision 1.0  1996/05/17 10:59:38  stobbe
-Initial revision
-
-*/
 
 #include <config.h>
 
@@ -79,4 +64,4 @@ void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFM
 
 /*ENDPUBLIC*/
 
-#endif /* INCL_CF_MAP_H */
+#endif /* ! INCL_CF_MAP_H */

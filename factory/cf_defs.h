@@ -1,26 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_defs.h,v 1.4 1997-04-15 10:16:22 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_defs.h,v 1.5 1997-06-19 12:27:23 schmidt Exp $ */
 
 #ifndef INCL_CF_DEFS_H
 #define INCL_CF_DEFS_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.3  1997/04/02 13:06:25  schmidt
-inclusion of configuration header removed
-
-Revision 1.2  1996/07/08 08:16:06  stobbe
-"New definition of the level system.
-"
-
-Revision 1.1  1996/07/02 11:18:57  stobbe
-"new switch SW_USE_EZGCD.
-"
-
-Revision 1.0  1996/05/17 10:59:38  stobbe
-Initial revision
-
-*/
 
 #include <config.h>
 
@@ -49,4 +31,4 @@ Initial revision
 
 /*ENDPUBLIC*/
 
-#endif /* INCL_CF_DEFS_H */
+#endif /* ! INCL_CF_DEFS_H */

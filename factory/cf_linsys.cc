@@ -1,34 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_linsys.cc,v 1.7 1997-04-18 13:26:27 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.6  1997/04/15 11:06:40  schmidt
-calls to macro DEBOUTLN changed to new calling syntax
-
-Revision 1.5  1997/04/07 16:01:47  schmidt
-#include <config.h> added
-
-Revision 1.4  1997/03/26 16:46:46  schmidt
-debug output rewritten
-debug output changed to DEBOUT
-
-Revision 1.3  1996/12/05 18:24:54  schmidt
-``Unconditional'' check-in.
-Now it is my turn to develop factory.
-
-Revision 1.2  1996/07/15 08:33:18  stobbe
-"changed interface to linearSystemSolve to use the class CFMatrix
-"
-
-Revision 1.1  1996/07/08 08:22:51  stobbe
-"New function determinant.
-"
-
-Revision 1.0  1996/05/17 10:59:44  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_linsys.cc,v 1.8 1997-06-19 12:24:21 schmidt Exp $ */
 
 #include <config.h>
 

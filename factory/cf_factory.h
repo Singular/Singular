@@ -1,15 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_factory.h,v 1.1 1997-04-07 15:04:37 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_factory.h,v 1.2 1997-06-19 12:27:11 schmidt Exp $ */
 
-#ifndef INCL_CFFACTORY_H
-#define INCL_CFFACTORY_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.0  1996/05/17 10:59:38  stobbe
-Initial revision
-
-*/
+#ifndef INCL_CF_FACTORY_H
+#define INCL_CF_FACTORY_H
 
 #include <config.h>
 
@@ -42,4 +35,4 @@ public:
 
 MP_INT getmpi ( InternalCF * value, bool symmetric = true );
 
-#endif
+#endif /* ! INCL_CF_FACTORY_H */

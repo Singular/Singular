@@ -1,30 +1,5 @@
-// emacs editmode for this file is -*- C++ -*-
-// $Id: canonicalform.cc,v 1.6 1997-06-05 13:02:53 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.5  1997/04/18 13:10:30  schmidt
-o mapinto(): mapping from immediate to GF(q) corrected
-
-Revision 1.4  1997/04/07 14:53:44  schmidt
-#include <config.h> added
-
-Revision 1.3  1997/03/26 16:27:09  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.2  1996/07/02 11:18:32  stobbe
-"initCanonicalForm: now initializes the switch system.
-"
-
-Revision 1.1  1996/06/13 07:15:50  stobbe
-"CanonicalForm::deriv(x): bug fix, result is now swapped back if x is not
-                         the main variable of *this
-"
-
-Revision 1.0  1996/05/17 10:59:42  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: canonicalform.cc,v 1.7 1997-06-19 12:21:05 schmidt Exp $ */
 
 #include <config.h>
 

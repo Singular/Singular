@@ -1,26 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_multivar.cc,v 1.5 1997-04-15 14:01:08 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.4  1997/04/08 10:30:59  schmidt
-#include <config.h> added
-
-Revision 1.3  1997/03/27 09:47:17  schmidt
-debug output rewritten
-some spurious preprocessor directives removed
-
-Revision 1.2  1996/12/05 18:24:54  schmidt
-``Unconditional'' check-in.
-Now it is my turn to develop factory.
-
-Revision 1.1  1996/07/23 09:18:35  stobbe
-Version in work.
-
-Revision 1.0  1996/05/17 10:59:45  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_multivar.cc,v 1.6 1997-06-19 12:23:25 schmidt Exp $ */
 
 #include <config.h>
 

@@ -1,5 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_sqrfree.cc,v 1.5 1997-04-18 16:02:55 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_sqrfree.cc,v 1.6 1997-06-19 12:23:21 schmidt Exp $ */
 
 #include <config.h>
 
@@ -7,30 +7,6 @@
 
 #include "cf_defs.h"
 #include "canonicalform.h"
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.4  1997/04/08 10:32:03  schmidt
-#include <config.h> added
-
-Revision 1.3  1996/12/05 18:24:55  schmidt
-``Unconditional'' check-in.
-Now it is my turn to develop factory.
-
-Revision 1.2  1996/06/26 13:15:28  stobbe
-"sqrFreeZ: Now handles the sign of the argument right.
-"
-
-Revision 1.1  1996/05/20 13:39:48  stobbe
-"sqrFree: Now the product of all factors found by sqrFree is equal to the
-         parameter of sqrFree. The bug resulted from an incorrect handling
-         of the leading coefficient of the argument of sqrFree.
-"
-
-// Revision 1.0  1996/05/17  10:59:45  stobbe
-// Initial revision
-//
-*/
 
 static int divexp = 1;
 

@@ -1,15 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_cantzass.h,v 1.1 1997-04-07 16:20:46 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_cantzass.h,v 1.2 1997-06-19 12:23:40 schmidt Exp $ */
 
-#ifndef INCL_CANTORZASSENHAUS_H
-#define INCL_CANTORZASSENHAUS_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.0  1996/05/17 10:59:39  stobbe
-Initial revision
-
-*/
+#ifndef INCL_FAC_CANTZASS_H
+#define INCL_FAC_CANTZASS_H
 
 #include <config.h>
 
@@ -20,4 +13,4 @@ CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree = false,
 
 //CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f );
 
-#endif /* INCL_CANTORZASSENHAUS_H */
+#endif /* ! INCL_FAC_CANTZASS_H */

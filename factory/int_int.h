@@ -1,21 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: int_int.h,v 1.3 1997-05-14 15:35:02 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: int_int.h,v 1.4 1997-06-19 12:22:44 schmidt Exp $ */
 
-#ifndef INCL_INTERNALINTEGER_H
-#define INCL_INTERNALINTEGER_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1997/04/15 09:12:51  schmidt
-#include <config.h> added
-
-Revision 1.1  1997/03/27 10:06:26  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.0  1996/05/17 10:59:41  stobbe
-Initial revision
-
-*/
+#ifndef INCL_INT_INT_H
+#define INCL_INT_INT_H
 
 #include <config.h>
 
@@ -104,4 +91,4 @@ inline MP_INT & InternalInteger::MPI( const InternalCF * const c )
     return (((InternalInteger*)c)->thempi);
 }
 
-#endif /* INCL_INTERNALINTEGER_H */
+#endif /* ! INCL_INT_INT_H */

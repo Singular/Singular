@@ -1,30 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: canonicalform.h,v 1.5 1997-04-18 15:58:17 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: canonicalform.h,v 1.6 1997-06-19 12:27:33 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.4  1997/04/07 14:54:53  schmidt
-include <config.h> added
-
-Revision 1.3  1997/03/26 16:28:31  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.2  1996/07/15 08:32:46  stobbe
-"new function linearSystemSolve
-"
-
-Revision 1.1  1996/06/24 11:26:36  stobbe
-"new function determinant.
-new template class Matrix<CanonicalForm>
-"
-
-Revision 1.0  1996/05/17 10:59:37  stobbe
-Initial revision
-
-*/
 
 #include <config.h>
 
@@ -324,4 +302,4 @@ bool isOn( int );
 
 /*ENDPUBLIC*/
 
-#endif /* INCL_CANONICALFORM_H */
+#endif /* ! INCL_CANONICALFORM_H */

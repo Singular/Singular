@@ -1,18 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: variable.h,v 1.2 1997-04-15 09:45:06 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: variable.h,v 1.3 1997-06-19 12:21:49 schmidt Exp $ */
 
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/03/27 10:25:06  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.0  1996/05/17 10:59:42  stobbe
-Initial revision
-
-*/
 
 #include <config.h>
 
@@ -94,4 +84,4 @@ InternalPoly * getInternalMipo ( const Variable & alpha );
 bool getReduce( const Variable & alpha );
 void setReduce( const Variable & alpha, bool reduce );
 
-#endif /* INCL_VARIABLE_H */
+#endif /* ! INCL_VARIABLE_H */

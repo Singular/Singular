@@ -1,15 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_random.cc,v 1.2 1997-04-18 13:35:59 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/04/07 16:10:17  schmidt
-#include <config.h> added
-
-Revision 1.0  1996/05/17 10:59:44  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_random.cc,v 1.3 1997-06-19 12:24:01 schmidt Exp $ */
 
 #include <config.h>
 

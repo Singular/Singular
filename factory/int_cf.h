@@ -1,20 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: int_cf.h,v 1.2 1997-04-15 09:10:59 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: int_cf.h,v 1.3 1997-06-19 12:22:49 schmidt Exp $ */
 
-#ifndef INCL_INTERNALCF_H
-#define INCL_INTERNALCF_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/03/27 10:04:57  schmidt
-stream-io wrapped by NOSTREAMIO
-debug output changed to ASSERT
-PVIRT fucntionality moved to assert.h
-
-Revision 1.0  1996/05/17 10:59:41  stobbe
-Initial revision
-
-*/
+#ifndef INCL_INT_CF_H
+#define INCL_INT_CF_H
 
 #include <config.h>
 
@@ -108,4 +96,4 @@ public:
 
 #define OBJDEL( x ) if ( (x)->deleteObject() ) delete (x)
 
-#endif /* INCL_INTERNALCF_H */
+#endif /* ! INCL_INT_CF_H */

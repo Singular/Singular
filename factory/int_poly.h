@@ -1,18 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: int_poly.h,v 1.2 1997-04-15 09:14:20 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: int_poly.h,v 1.3 1997-06-19 12:22:35 schmidt Exp $ */
 
-#ifndef INCL_INTERNALPOLY_H
-#define INCL_INTERNALPOLY_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.1  1997/03/27 10:08:06  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.0  1996/05/17 10:59:41  stobbe
-Initial revision
-
-*/
+#ifndef INCL_INT_POLY_H
+#define INCL_INT_POLY_H
 
 #include <config.h>
 
@@ -120,5 +110,4 @@ public:
     friend class CFIterator;
 };
 
-
-#endif /* INCL_INTERNALPOLY_H */
+#endif /* ! INCL_INT_POLY_H */

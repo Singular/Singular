@@ -1,12 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: mmutil.c,v 1.1 1997-04-15 09:26:34 schmidt Exp $ */
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.0  1996/05/17 10:59:48  stobbe
-Initial revision
-
-*/
+/* $Id: mmutil.c,v 1.2 1997-06-19 12:22:04 schmidt Exp $ */
 
 #define _POSIX_SOURCE 1
 

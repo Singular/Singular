@@ -1,16 +1,8 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_primetab.h,v 1.1 1997-04-07 16:09:22 schmidt Exp $
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_primetab.h,v 1.2 1997-06-19 12:24:05 schmidt Exp $ */
 
 #ifndef INCL_CF_PRIMETAB_H
 #define INCL_CF_PRIMETAB_H
-
-/*
- * $Log: not supported by cvs2svn $
- * Revision 1.0  1996/06/18 12:12:15  stobbe
- * Initial revision
- *
- */
-
 
 #include <config.h>
 
@@ -5348,5 +5340,4 @@ static const int bigprimes [] = {
     536870839, 536870849, 536870869, 536870879, 536870909, 0
 };
 
-
-#endif /* INCL_CF_PRIMETAB_H */
+#endif /* ! INCL_CF_PRIMETAB_H */

@@ -1,46 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_gcd.cc,v 1.8 1997-04-30 12:58:35 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.7  1997/04/07 15:05:38  schmidt
-#include <config.h> added
-
-Revision 1.6  1997/03/26 16:39:06  schmidt
-debug output changed to DEBOUT
-
-Revision 1.5  1996/12/05 18:24:53  schmidt
-``Unconditional'' check-in.
-Now it is my turn to develop factory.
-
-Revision 1.4  1996/07/08 08:21:10  stobbe
-"gcd_poly: now uses ezgcd if the switch SW_USE_EZGCD is on.
-"
-
-Revision 1.3  1996/06/18 12:22:54  stobbe
-"gcd_poly_univar0: now uses getSmallPrimes (due to changes in the handling
-                  of prime numbers in cf_primes.
-"
-
-Revision 1.2  1996/06/13 08:18:34  stobbe
-"balance: Now balaces polynomials even if the coefficient sizes are higher
-         than the bound.
-gcd: Now returns the results with positive leading coefficient.
-     The isOne test is now performed if pi or pi1 is multivariate.
-"
-
-Revision 1.1  1996/06/03 08:32:56  stobbe
-"gcd_poly: now uses new function gcd_poly_univar0 to compute univariate
-          polynomial gcd's over Z.
-gcd_poly_univar0: computes univariate polynomial gcd's in characteristic 0
-                  via chinese remaindering.
-maxnorm: computes the maximum norm of all coefficients of a polynomial.
-"
-
-Revision 1.0  1996/05/17 11:56:37  stobbe
-Initial revision
-
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: cf_gcd.cc,v 1.9 1997-06-19 12:27:09 schmidt Exp $ */
 
 #include <config.h>
 

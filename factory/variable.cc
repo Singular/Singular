@@ -1,19 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-// $Id: variable.cc,v 1.3 1997-04-15 09:44:26 schmidt Exp $
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.2  1997/03/27 10:24:37  schmidt
-stream-io wrapped by NOSTREAMIO
-
-Revision 1.1  1996/12/05 18:24:56  schmidt
-``Unconditional'' check-in.
-Now it is my turn to develop factory.
-
-// Revision 1.0  1996/05/17  10:59:47  stobbe
-// Initial revision
-//
-*/
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: variable.cc,v 1.4 1997-06-19 12:21:52 schmidt Exp $ */
 
 #include <config.h>
 

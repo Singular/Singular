@@ -1,15 +1,8 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: memman.h,v 1.1 1997-04-15 09:21:20 schmidt Exp $ */
+/* $Id: memman.h,v 1.2 1997-06-19 12:22:21 schmidt Exp $ */
 
-#ifndef MMEMORY_H
-#define MMEMORY_H
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.0  1996/05/17 10:59:41  stobbe
-Initial revision
-
-*/
+#ifndef INCL_MEMMAN_H
+#define INCL_MEMMAN_H
 
 #include <config.h>
 
@@ -132,4 +125,4 @@ void mmTestList();
 }
 #endif
 
-#endif
+#endif /* ! INCL_MEMMAN_H */
