@@ -1,4 +1,4 @@
-// $Id: poly.lib,v 1.7 1997-08-12 14:01:08 Singular Exp $
+// $Id: poly.lib,v 1.8 1997-11-18 16:12:59 Singular Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -547,7 +547,7 @@ EXAMPLE: example lcm; shows an example
   {
      if(deg(i[k])!=0)
      {
-        q=GCD(p,i[k]);
+        q=gcd(p,i[k]);
         if(deg(q)==0)
         {
            p=p*i[k];
