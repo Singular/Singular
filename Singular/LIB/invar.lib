@@ -1,4 +1,4 @@
-// $Id: invar.lib,v 1.3 1997-09-18 09:58:24 Singular Exp $
+// $Id: invar.lib,v 1.4 1998-02-16 12:07:01 pfister Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
@@ -6,7 +6,7 @@
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
-LIBRARY: invar.lib PROCEDURE FOR COMPUTING INVARIANTS UNDER (C,+)-ACTIONS
+LIBRARY: invar.lib PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
 
   invariantRing(matrix m,poly p,poly q,int choose)
   // ring of invariants of the action of the additive group
@@ -141,17 +141,17 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 
-proc reduction(poly p, ideal mo, list #)
-USAGE:   reduction(p,mo,q); p poly, mo ideal, q (optional) monomial
+proc reduction(poly p, ideal dom, list #)
+USAGE:   reduction(p,dom,q); p poly, dom ideal, q (optional) monomial
 RETURN:  poly= (p-H(f1,...,fr))/q^a, if Lt(p)=H(Lt(f1),...,Lt(fr)) for 
                some polynomial H in r variables over the base field,
                a maximal such that q^a devides p-H(f1,...,fr),
-               mo =(f1,...,fr)
+               dom =(f1,...,fr)
 NOTE:    
 EXAMPLE: example reduction; shows an example
 {
   int i;
-  int z=size(mo);
+  int z=size(dom);
   def bsr=basering;
  
   //arranges the monomial v for elimination
@@ -164,17 +164,17 @@ EXAMPLE: example reduction; shows an example
   //changes the basering bsr to bsr[@(0),...,@(z)]
   execute "ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;";
   
-  //costructes the ideal mo=(p-@(0),mo[1]-@(1),...,mo[z]-@(z))
-  ideal mo=imap(bsr,mo);
+  //costructes the ideal dom=(p-@(0),dom[1]-@(1),...,dom[z]-@(z))
+  ideal dom=imap(bsr,dom);
   for (i=1;i<=z;i++)
   {
-    mo[i]=lead(mo[i])-var(nvars(bsr)+i+1);
+    dom[i]=lead(dom[i])-var(nvars(bsr)+i+1);
   }
-  mo=lead(imap(bsr,p))-@(0),mo;
+  dom=lead(imap(bsr,p))-@(0),dom;
  
   //eliminates the variables of the basering bsr
-  //i.e. computes mo intersected with K[@(0),...,@(z)]
-  ideal kern=eliminate(mo,imap(bsr,v));
+  //i.e. computes dom intersected with K[@(0),...,@(z)]
+  ideal kern=eliminate(dom,imap(bsr,v));
 
   // test wether @(0)-h(@(1),...,@(z)) is in ker for some poly h
   poly h;
@@ -185,9 +185,9 @@ EXAMPLE: example reduction; shows an example
      if (deg(h)==0)
      {
         h=(1/h)*kern[i];
-        // defines the map psi : s ---> bsr defined by @(i) ---> p,mo[i]
+        // defines the map psi : s ---> bsr defined by @(i) ---> p,dom[i]
         setring bsr;
-        map psi=s,maxideal(1),p,mo;
+        map psi=s,maxideal(1),p,dom;
         poly re=psi(h);
 
         // devides by the maximal power of #[1] 
@@ -209,27 +209,27 @@ example
 { "EXAMPLE:"; echo = 2;
    ring q=0,(x,y,z,u,v,w),dp;
    poly p=x2yz-x2v;
-   ideal mo =x-w,u2w+1,yz-v;
-   reduction(p,mo);
-   reduction(p,mo,w);
+   ideal dom =x-w,u2w+1,yz-v;
+   reduction(p,dom);
+   reduction(p,dom,w);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc completeReduction(poly p, ideal mo, list #)
-USAGE:   completeReduction(p,mo,q); p poly, mo ideal, 
+proc completeReduction(poly p, ideal dom, list #)
+USAGE:   completeReduction(p,dom,q); p poly, dom ideal, 
                                      q (optional) monomial
-RETURN:  poly= the polynomial p reduced with mo via the procedure
+RETURN:  poly= the polynomial p reduced with dom via the procedure
                reduction as long as possible
 NOTE:    
 EXAMPLE: example completeReduction; shows an example
 {
   poly p1=p;
-  poly p2=reduction(p,mo,#);
+  poly p2=reduction(p,dom,#);
   while (p1!=p2)
   {
     p1=p2;
-    p2=reduction(p1,mo,#);
+    p2=reduction(p1,dom,#);
   }
   return(p2);
 }
@@ -237,21 +237,21 @@ example
 { "EXAMPLE:"; echo = 2;
    ring q=0,(x,y,z,u,v,w),dp;
    poly p=x2yz-x2v;
-   ideal mo =x-w,u2w+1,yz-v;
-   completeReduction(p,mo);
-   completeReduction(p,mo,w);
+   ideal dom =x-w,u2w+1,yz-v;
+   completeReduction(p,dom);
+   completeReduction(p,dom,w);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc inSubring(poly p, ideal mo)
-USAGE:   inSubring(p,mo); p poly, mo ideal
-RETURN:  list= 1,string(@(0)-h(@(1),...,@(size(mo)))) :if p = h(mo[1],...,mo[size(mo)])
-              0,string(h(@(0),...,@(size(mo)))) :if there is only a nonlinear relation
-              h(p,mo[1],...,mo[size(mo)])=0.
+proc inSubring(poly p, ideal dom)
+USAGE:   inSubring(p,dom); p poly, dom ideal
+RETURN:  list= 1,string(@(0)-h(@(1),...,@(size(dom)))) :if p = h(dom[1],...,dom[size(dom)])
+              0,string(h(@(0),...,@(size(dom)))) :if there is only a nonlinear relation
+              h(p,dom[1],...,dom[size(dom)])=0.
 NOTE:    
 EXAMPLE: example inSubring; shows an example
 {
-  int z=size(mo);
+  int z=size(dom);
   int i;
   def gnir=basering;
   list l;
@@ -261,10 +261,10 @@ EXAMPLE: example inSubring; shows an example
     mile=mile*var(i);
   }
   string eli=string(mile);
-  // the intersection of ideal nett=(p-@(0),mo[1]-@(1),...)
+  // the intersection of ideal nett=(p-@(0),dom[1]-@(1),...)
   // with the ring k[@(0),...,@(n)] is computed, the result is ker
   execute "ring r1="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;";
-  ideal nett=imap(gnir,mo);
+  ideal nett=imap(gnir,dom);
   poly p;
   for (i=1;i<=z;i++)
   {
@@ -298,8 +298,8 @@ example
 { "EXAMPLE:"; echo = 2;
    ring q=0,(x,y,z,u,v,w),dp;
    poly p=xyzu2w-1yzu2w2+u4w2-1xu2vw+u2vw2+xyz-1yzw+2u2w-1xv+vw+2;
-   ideal mo =x-w,u2w+1,yz-v;
-   inSubring(p,mo);
+   ideal dom =x-w,u2w+1,yz-v;
+   inSubring(p,dom);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -477,7 +477,7 @@ EXAMPLE: example furtherInvar; shows an example
      "the local invariants:";
      "                     ";
      karl;
-     pause;
+    // pause;
      "                     ";
   }
   // computation of further invariants
@@ -516,7 +516,7 @@ EXAMPLE: example furtherInvar; shows an example
        it;
        "                                  ";
        karl;
-       pause;
+      // pause;
        "                                  ";
     }
     if((bou>0) && (size(k1)>0))
@@ -642,4 +642,3 @@ example
   
   
 }
-///////////////////////////////////////////////////////////////////////////////

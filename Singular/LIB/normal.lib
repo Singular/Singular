@@ -1,4 +1,3 @@
-// $Id: normal.lib,v 1.1 1997-11-05 18:16:55 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // normal.lib
 // algorithms for computing the normalization based on
@@ -9,10 +8,10 @@
 LIBRARY: normal.lib: PROCEDURE FOR NORMALIZATION (I)
 
   normal(ideal I)
-  // computes a set of rings such that their product is the
-  // normalization of the reduced basering/I
+  // computes a set of rings such that their product is the 
+  // normalization of the reduced basering/I 
 
-LIB "sing.lib";
+LIB "sing.lib"; 
 LIB "primdec.lib";
 LIB "elim.lib";
 LIB "presolve.lib";
@@ -26,7 +25,7 @@ ASSUME:  R    = P/SBid,  P = basering
          J    = ideal in P containing the polynomial p,
          p    = nonzero divisor of R
 RETURN:  1 if R = R:J, 0 if not
-EXAMPLE: example isR_HomJR;  shows an example
+EXAMPLE: example isR_HomJR;  shows an example   
 {
    int n, ii;
  def P = basering;
@@ -42,8 +41,8 @@ EXAMPLE: example isR_HomJR;  shows an example
    ideal lp = std(p);
    n=1;
    for (ii=1; ii<=size(f); ii++ )
-   {
-      if ( reduce(f[ii],lp) != 0)
+   { 
+      if ( reduce(f[ii],lp) != 0) 
       { n = 0; break; }
    }
    return (n);
@@ -72,7 +71,7 @@ USAGE:   extraweight (P); P=name of an existing ring (true name, not a string)
 RETURN:  intvec, size=nvars(P), consisting of the weights of the variables of P
 NOTE:    This is useful when enlarging P but keeping the weights of the old
          variables
-EXAMPLE: example extraweight;  shows an example
+EXAMPLE: example extraweight;  shows an example   
 {
    int ii,q,fi,fo,fia;
    intvec rw,nw;
@@ -87,7 +86,7 @@ EXAMPLE: example extraweight;  shows an example
    {
       os = osP[fi+1,find(osP,")",fi)-fi-1];
       if( find(os,",") )
-      {
+      { 
          execute "nw = "+os+";";
          if( size(nw) > ii )
          {
@@ -100,8 +99,8 @@ EXAMPLE: example extraweight;  shows an example
       else
       {
          execute "q = "+os+";";
-         if( q > ii )
-         {
+         if( q > ii ) 
+         { 
             nw = 0; nw[q-ii] = 0;
             nw = nw + 1;          //creates an intvec 1,...,1 of length q-ii
             rw = rw,nw;
@@ -113,21 +112,21 @@ EXAMPLE: example extraweight;  shows an example
       fia = find(osP,"a",fo)+find(osP,"w",fo)+find(osP,"W",fo);
    }
 //-------------- adjust weight vector to length = nvars(P)  -------------------
-   if( fo > 1 )
+   if( fo > 1 ) 
    {                                            // case when weights were found
-      rw = rw[2..size(rw)];
-      if( size(rw) > nvars(P) )
-      {
-         rw = rw[1..nvars(P)];
+      rw = rw[2..size(rw)]; 
+      if( size(rw) > nvars(P) )  
+      { 
+         rw = rw[1..nvars(P)]; 
       }
-      if( size(rw) < nvars(P) )
-      {
-         nw=0; nw[nvars(P)-size(rw)]=0; nw=nw+1; rw=rw,nw;
+      if( size(rw) < nvars(P) ) 
+      { 
+         nw=0; nw[nvars(P)-size(rw)]=0; nw=nw+1; rw=rw,nw; 
       }
    }
-   else
+   else 
    {                                         // case when no weights were found
-      rw[nvars(P)]= 0; rw=rw+1;
+      rw[nvars(P)]= 0; rw=rw+1; 
    }
    return(rw);
 }
@@ -157,11 +156,11 @@ ASSUME:  R    = P/id,  P = basering, a polynomial ring, id an ideal of P,
 COMPUTE: Endomorphism ring End_R(J)=Hom_R(J,J) with its ring structure where
          R is the quotient ring of P modulo the standard basis SBid
 RETURN:  a list of two objects
-         _[1]: a polynomial ring, containing two ideals, 'endid' and 'endphi'
+         _[1]: a polynomial ring, containing two ideals, 'endid' and 'endphi' 
                s.t. _[1]/endid = Hom_R(J,J) and
                endphi describes the canonical map R -> Hom_R(J,J)
          _[2]: an integer which is 1 if phi is an isomorphism, 0 if not
-EXAMPLE: example HomJJ;  shows an example
+EXAMPLE: example HomJJ;  shows an example   
 {
 //---------- initialisation ---------------------------------------------------
 
@@ -179,8 +178,8 @@ EXAMPLE: example HomJJ;  shows an example
    int homo = homog(Li[2]);               //is 1 if id is homogeneous, 0 if not
 
 //---- set attributes for special cases where algorithm can be simplified -----
-   if( homo==1 )
-   {
+   if( homo==1 )  
+   { 
       rw = extraweight(P);
    }
    if( typeof(attrib(id,"isPrim"))=="int" )
@@ -212,9 +211,9 @@ EXAMPLE: example HomJJ;  shows an example
    module syzf;
 
 //---------- computation of p*Hom(J,J) as R-ideal -----------------------------
-   f  = quotient(p*J,J);
-   if(y==1)
-   {
+   f  = quotient(p*J,J); 
+   if(y==1)      
+   {               
       "the module Hom(rad(J),rad(J)) presented by the values on";
       "the non-zerodivisor";
       "  ";
@@ -237,17 +236,17 @@ EXAMPLE: example HomJJ;  shows an example
 //---------- Test: Hom(J,J) == R ?, if yes, go home ---------------------------
    rf = interred(reduce(f,f2));       // represents p*Hom(J,J)/p*R = Hom(J,J)/R
    if ( size(rf) == 0 )
-   {
+   { 
       if ( homog(f) && find(ordstr(basering),"s")==0 )
       {
-         ring newR1 = char(P),(X(1..nvars(P))),(a(rw),dp);
+         ring newR1 = char(P),(X(1..nvars(P))),(a(rw),dp);  
       }
       else
       {
-         ring newR1 = char(P),(X(1..nvars(P))),dp;
+         ring newR1 = char(P),(X(1..nvars(P))),dp;  
       }
       ideal endphi = maxideal(1);
-      ideal endid = fetch(P,id);
+      ideal endid = fetch(P,id); 
       attrib(endid,"isCohenMacaulay",isCo);
       attrib(endid,"isPrim",isPr);
       attrib(endid,"isIsolatedSingularity",isIso);
@@ -300,26 +299,26 @@ EXAMPLE: example HomJJ;  shows an example
    f = p,rf;          // generates pJ:J mod(p), i.e. p*Hom(J,J)/p*R as R-module
    q = size(f);
    syzf = syz(f);
-
+       
    if ( homo==1 )
    {
       rw1 = rw,0;
       for ( ii=2; ii<=q; ii++ )
       {
-         rw  = rw, deg(f[ii])-deg(f[1]);
-         rw1 = rw1, deg(f[ii])-deg(f[1]);
+         rw  = rw, deg(f[ii])-deg(f[1]);       
+         rw1 = rw1, deg(f[ii])-deg(f[1]);       
       }
-      ring newR1 = char(R),(X(1..nvars(R)),T(1..q)),(a(rw1),dp);
+      ring newR1 = char(R),(X(1..nvars(R)),T(1..q)),(a(rw1),dp);  
    }
    else
    {
-      ring newR1 = char(R),(X(1..nvars(R)),T(1..q)),dp;
+      ring newR1 = char(R),(X(1..nvars(R)),T(1..q)),dp;  
    }
 
    map psi1 = P,maxideal(1);
    ideal SBid = psi1(SBid);
    attrib(SBid,"isSB",1);
-
+   
  qring newR = std(SBid);
    map psi = R,ideal(X(1..nvars(R)));
    ideal id = psi(id);
@@ -330,7 +329,7 @@ EXAMPLE: example HomJJ;  shows an example
    list L1;
 
 //---------- computation of Hom(J,J) as ring ----------------------------------
-// determine kernel of: R[T1,...,Tq] -> J:J >-> R[1/p]=R[t]/(t*p-1),
+// determine kernel of: R[T1,...,Tq] -> J:J >-> R[1/p]=R[t]/(t*p-1), 
 // Ti -> fi/p -> t*fi (p=f1=f[1]), to get ring structure. This is of course
 // the same as the kernel of R[T1,...,Tq] -> pJ:J >-> R, Ti -> fi.
 // It is a fact, that the kernel is generated by the linear and the quadratic
@@ -338,7 +337,7 @@ EXAMPLE: example HomJJ;  shows an example
 
    pf = f[1]*f;
    T = matrix(ideal(T(1..q)),1,q);
-   Lin = ideal(T*syzf);
+   Lin = ideal(T*syzf); 
    if(y==1)
    {
       "the ring structure of Hom(rad(J),rad(J)) as R-algebra";
@@ -373,17 +372,17 @@ EXAMPLE: example HomJJ;  shows an example
    }
    else
    {
-      ring newRing = char(R),(X(1..nvars(R)),T(2..q)),dp;
+      ring newRing = char(R),(X(1..nvars(R)),T(2..q)),dp;  
    }
 
    ideal endid  = imap(newR,id)+imap(newR,Q);
    ideal endphi = ideal(X(1..nvars(R)));
 
    map phi = basering,maxideal(1);
-   list Le = elimpart(endid);
+   list Le = elimpart(endid);  
            //this proc and the next loop try to
    q = size(Le[2]);                 //substitute as many variables as possible
-   rw1 = 0;
+   rw1 = 0;                      
    rw1[nvars(basering)] = 0;
    rw1 = rw1+1;
 
@@ -394,16 +393,16 @@ EXAMPLE: example HomJJ;  shows an example
       phi = phi(ps);
       kill ps;
 
-      for( ii=1; ii<=size(rw1); ii++ )
-      {
-         if( Le[4][ii]==0 )
-         {
+      for( ii=1; ii<=size(rw1); ii++ ) 
+      { 
+         if( Le[4][ii]==0 ) 
+         {  
             rw1[ii]=0;                             //look for substituted vars
          }
       }
       Le=elimpart(endid);
       q = q + size(Le[2]);
-   }	
+   }	 
    endphi = phi(endphi);
 
 //---------- return -----------------------------------------------------------
@@ -411,15 +410,15 @@ EXAMPLE: example HomJJ;  shows an example
 // delete from rw those weights for which the corresponding entry of rw1 is 0
 
    if (homo==1 && nvars(newRing)-q >1 && size(endid) >0 )
-   {
+   {                           
       jj=1;
       for( ii=2; ii<size(rw1); ii++)
-      {
+      {  
          jj++;
-         if( rw1[ii]==0 )
-         {
+         if( rw1[ii]==0 )  
+         { 
             rw=rw[1..jj-1],rw[jj+1..size(rw)];
-            jj=jj-1;
+            jj=jj-1; 
          }
       }
       if( rw1[1]==0 ) { rw=rw[2..size(rw)]; }
@@ -429,16 +428,16 @@ EXAMPLE: example HomJJ;  shows an example
    }
    else
    {
-      ring lastRing = char(R),(T(1..nvars(newRing)-q)),dp;
+      ring lastRing = char(R),(T(1..nvars(newRing)-q)),dp;  
    }
 
-   ideal lastmap;
+   ideal lastmap; 
    q = 1;
    for(ii=1; ii<=size(rw1); ii++ )
    {
       if ( rw1[ii]==1 ) { lastmap[ii] = T(q); q=q+1; }
       if ( rw1[ii]==0 ) { lastmap[ii] = 0; }
-   }
+   }      
    map phi = newRing,lastmap;
    ideal endid  = phi(endid);
    ideal endphi = phi(endphi);
@@ -489,20 +488,20 @@ example
   list Li = std(id),id,J,p;
   list L   = HomJJ(Li);
   def end = L[1];      // defines ring L[1], containing ideals endid and endphi
-  setring end;         // makes end the basering
+  setring end;         // makes end the basering 
   end;
   endid;               // end/endid is isomorphic to End(r/id) as ring
   map psi = r,endphi;  // defines the canonical map r/id -> End(r/id)
   psi;
 
-  ring r   = 32003,(x,y,z),dp;
+  ring r   = 32003,(x,y,z),dp;  
   ideal id = x2-xy-xz+yz;
   ideal J =y-z,x-z;
   poly p = x+16001y+16001z;
   list Li = std(id),id,J,p;
   list L   = HomJJ(Li,0);
   def end = L[1];      // defines ring L[1], containing ideals endid and endphi
-  setring end;         // makes end the basering
+  setring end;         // makes end the basering 
   end;
   endid;               // end/endid is isomorphic to End(r/id) as ring
 
@@ -527,9 +526,9 @@ EXAMPLE: example normal; shows an example
       prim[1]=id;
       if( typeof(attrib(id,"isEquidimensional"))=="int" )
       {
-        if(attrib(id,"isEquidimensional")==1)
+        if(attrib(id,"isEquidimensional")==1)  
         {
-           attrib(prim[1],"isEquidimensional",1);
+           attrib(prim[1],"isEquidimensional",1); 
         }
       }
       else
@@ -538,16 +537,16 @@ EXAMPLE: example normal; shows an example
       }
       if( typeof(attrib(id,"isCompleteIntersection"))=="int" )
       {
-        if(attrib(id,"isCompleteIntersection")==1)
+        if(attrib(id,"isCompleteIntersection")==1)  
         {
-           attrib(prim[1],"isCompleteIntersection",1);
+           attrib(prim[1],"isCompleteIntersection",1); 
         }
       }
       else
       {
          attrib(prim[1],"isCompleteIntersection",0);
       }
-
+      
       if( typeof(attrib(id,"isPrim"))=="int" )
       {
         if(attrib(id,"isPrim")==1)  {attrib(prim[1],"isPrim",1); }
@@ -558,21 +557,21 @@ EXAMPLE: example normal; shows an example
       }
       if( typeof(attrib(id,"isIsolatedSingularity"))=="int" )
       {
-         if(attrib(id,"isIsolatedSingularity")==1)
+         if(attrib(id,"isIsolatedSingularity")==1) 
              {attrib(prim[1],"isIsolatedSingularity",1); }
       }
       else
       {
-         attrib(prim[1],"isIsolatedSingularity",0);
+         attrib(prim[1],"isIsolatedSingularity",0);        
       }
       if( typeof(attrib(id,"isCohenMacaulay"))=="int" )
       {
-         if(attrib(id,"isCohenMacaulay")==1)
+         if(attrib(id,"isCohenMacaulay")==1) 
            { attrib(prim[1],"isCohenMacaulay",1); }
       }
       else
       {
-         attrib(prim[1],"isCohenMacaulay",0);
+         attrib(prim[1],"isCohenMacaulay",0);       
       }
       if( typeof(attrib(id,"isRegInCodim2"))=="int" )
       {
@@ -581,7 +580,7 @@ EXAMPLE: example normal; shows an example
       }
       else
       {
-          attrib(prim[1],"isRegInCodim2",0);
+          attrib(prim[1],"isRegInCodim2",0);       
       }
       return(normalizationPrimes(prim[1],maxideal(1)));
    }
@@ -615,25 +614,25 @@ EXAMPLE: example normal; shows an example
 
          if( typeof(attrib(id,"isEquidimensional"))=="int" )
          {
-           if(attrib(id,"isEquidimensional")==1)
+           if(attrib(id,"isEquidimensional")==1)  
            {
-              attrib(prim[i],"isEquidimensional",1);
+              attrib(prim[i],"isEquidimensional",1); 
            }
          }
          else
          {
             attrib(prim[i],"isEquidimensional",0);
-         }
+         }      
          if( typeof(attrib(id,"isIsolatedSingularity"))=="int" )
          {
-            if(attrib(id,"isIsolatedSingularity")==1)
+            if(attrib(id,"isIsolatedSingularity")==1) 
              {attrib(prim[i],"isIsolatedSingularity",1); }
          }
          else
          {
-            attrib(prim[i],"isIsolatedSingularity",0);
+            attrib(prim[i],"isIsolatedSingularity",0);        
          }
-
+   
          keepresult=normalizationPrimes(prim[i],maxideal(1));
          for(j=1;j<=size(keepresult);j++)
          {
@@ -687,7 +686,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          ideal KK=ideal(0);
          ideal PP=fetch(BAS,ihp);
          export PP;
-         export KK;
+         export KK;     
          result=newR7;
          setring BAS;
          return(result);
@@ -858,11 +857,11 @@ EXAMPLE: example normalizationPrimes; shows an example
   //    test for CohenMacaulay
   //    if((dim(SM[1]))==depth)
   //    {
-  //    attrib(SM[2],"isCohenMacaulay",1);
+  //    attrib(SM[2],"isCohenMacaulay",1);    
   //    "it is CohenMacaulay";
-  //    }
+  //    }  
   // }
-
+   
    //compute the singular locus+lower dimensional components
    if(((attrib(SM[2],"isIsolatedSingularity")==0)||(homog(SM[2])==0))
         &&(size(#)==0))
@@ -945,7 +944,7 @@ EXAMPLE: example normalizationPrimes; shows an example
             "the ideal rad(J):                 ";
             "                                  ";
             maxideal(1);
-            "                                  ";
+            "                                  "; 
             "                                  ";
          }
          //again test for normality
@@ -962,7 +961,7 @@ EXAMPLE: example normalizationPrimes; shows an example
   //          SM=SM[2];
   //          export SB,MB;
   //          result=BAS;
-  //          return(result);
+  //          return(result); 
   //       }
   //       timer-ti;
          RR=SM[1],SM[2],maxideal(1),SL[1];
@@ -971,7 +970,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    //      timer-ti;
          if(RR[2]==0)
          {
-            def newR=RR[1];
+            def newR=RR[1];     
             setring newR;
             map psi=BAS,endphi;
          //   ti=timer;
@@ -979,7 +978,7 @@ EXAMPLE: example normalizationPrimes; shows an example
 
         //    timer-ti;
             setring BAS;
-            return(tluser);
+            return(tluser); 
          }
          MB=SM[2];
          execute "ring newR7="+charstr(basering)+",("+varstr(basering)+"),("
@@ -991,7 +990,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          result=newR7;
          setring BAS;
          return(result);
-
+ 
        }
        else
        {	
@@ -1025,7 +1024,7 @@ EXAMPLE: example normalizationPrimes; shows an example
           return(keepresult1);
        }
    }
-
+   
    //test for non-normality
    //Hom(I,I)<>R
    //we can use Hom(I,I) to continue
@@ -1051,13 +1050,13 @@ EXAMPLE: example normalizationPrimes; shows an example
  //        SM=SM[2];
  //        export SB,MB;
  //        result=BAS;
- //        return(result);
+ //        return(result); 
  //     }
  //     timer-ti;
 
  //     list  RR=SM[1],SM[2],JM[2],SL[1];
  //     ti=timer;
-      list RS;
+      list RS;   
  //   list RS=HomJJ(RR);
  //   timer-ti;
  //     if(RS[2]==0)
@@ -1067,7 +1066,7 @@ EXAMPLE: example normalizationPrimes; shows an example
  //        setring newR;
  //        list tluser=normalizationPrimes(SM);
  //        setring BAS;
- //        return(tluser);
+ //        return(tluser); 
  //     }
 
       //now we have to compute the radical
@@ -1076,13 +1075,13 @@ EXAMPLE: example normalizationPrimes; shows an example
          "radical computation";
       }
 //      ti=timer;
-
+      
 
       if((attrib(JM[2],"isRad")==0)&&(attrib(SM[2],"isEquidimensional")==0))
       {
            //J=radical(JM[2]);
           J=radical(SM[2]+ideal(SL[1]));
-
+         
           // evtl. test auf J=SM[2]+ideal(SL[1]) dann schon normal
       }
       if((attrib(JM[2],"isRad")==0)&&(attrib(SM[2],"isEquidimensional")==1))
@@ -1102,7 +1101,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       }
 //    timer-ti;
 
-      JM=J,J;
+      JM=J,J;        
 
       //evtl. fuer SL[1] anderen Nichtnullteiler aus J waehlen
       // SL=simplify(reduce(J,SM[1]),2);
@@ -1116,7 +1115,7 @@ EXAMPLE: example normalizationPrimes; shows an example
         // {
         //    keepresult1=insert(keepresult1,keepresult2[lauf]);
         // }
-        // return(keepresult1);
+        // return(keepresult1);    
       // }
       RR=SM[1],SM[2],JM[2],SL[1];
 
@@ -1139,7 +1138,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          export PP;
          export KK;
          setring BAS;
-        // return(RS[1]);
+        // return(RS[1]); 
          return(lastR);
       }
       int n=nvars(basering);
@@ -1152,7 +1151,7 @@ EXAMPLE: example normalizationPrimes; shows an example
              normalizationPrimes(endid,psi(ihp),simplify(psi(MJ)+endid,4));
             // normalizationPrimes(endid);
       setring BAS;
-      return(tluser);
+      return(tluser);  
    }
    else
    {
@@ -1161,7 +1160,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       execute "ring newR1="+charstr(basering)+",("+varstr(basering)+"),("
                       +ordstr(basering)+");";
       if(y==1)
-      {
+      {      
          "zero-divisor found";
       }
       ideal vid=fetch(BAS,new1);
@@ -1179,7 +1178,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          attrib(vid,"isEquidimensional",0);
       }
       attrib(vid,"isCompleteIntersection",0);
-
+    
       keepresult1=normalizationPrimes(vid,ihp);
 
       setring BAS;
@@ -1188,7 +1187,7 @@ EXAMPLE: example normalizationPrimes; shows an example
 //      ideal new2=SL[1]+SM[2];
       execute "ring newR2="+charstr(basering)+",("+varstr(basering)+"),("
                       +ordstr(basering)+");";
-
+  
       ideal vid=fetch(BAS,new2);
       ideal ihp=fetch(BAS,ihp);
       attrib(vid,"isCohenMacaulay",0);
@@ -1212,25 +1211,211 @@ EXAMPLE: example normalizationPrimes; shows an example
       {
          keepresult1=insert(keepresult1,keepresult2[lauf]);
       }
-      return(keepresult1);
-   }
+      return(keepresult1);    
+   }   
 }
 example
 { "EXAMPLE:";echo = 2;
+   LIB"normal.lib";
    //Huneke
-  ring qr=31991,(a,b,c,d,e),dp;
-  ideal i=
-  5abcde-a5-b5-c5-d5-e5,
-  ab3c+bc3d+a3be+cd3e+ade3,
-  a2bc2+b2cd2+a2d2e+ab2e2+c2de2,
-  abc5-b4c2d-2a2b2cde+ac3d2e-a4de2+bcd2e3+abe5,
-  ab2c4-b5cd-a2b3de+2abc2d2e+ad4e2-a2bce3-cde5,
-  a3b2cd-bc2d4+ab2c3e-b5de-d6e+3abcd2e2-a2be4-de6,
-  a4b2c-abc2d3-ab5e-b3c2de-ad5e+2a2bcde2+cd2e4,
-  b6c+bc6+a2b4e-3ab2c2de+c4d2e-a3cde2-abd3e2+bce5;
-  
-  list pr=normal(i);
-  def r1=pr[1];
-  setring r1;
-  KK;
+ring qr=31991,(a,b,c,d,e),dp;
+ideal i=
+5abcde-a5-b5-c5-d5-e5,
+ab3c+bc3d+a3be+cd3e+ade3,
+a2bc2+b2cd2+a2d2e+ab2e2+c2de2,
+abc5-b4c2d-2a2b2cde+ac3d2e-a4de2+bcd2e3+abe5,
+ab2c4-b5cd-a2b3de+2abc2d2e+ad4e2-a2bce3-cde5,
+a3b2cd-bc2d4+ab2c3e-b5de-d6e+3abcd2e2-a2be4-de6,
+a4b2c-abc2d3-ab5e-b3c2de-ad5e+2a2bcde2+cd2e4,
+b6c+bc6+a2b4e-3ab2c2de+c4d2e-a3cde2-abd3e2+bce5;
+
+list pr=normal(i);
+def r1=pr[1];
+setring r1;
+KK;
 }
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+LIB"normal.lib";
+int aa=timer;list pr=normal(i);timer-aa;
+
+
+
+//Huneke
+ring qr=31991,(a,b,c,d,e),dp;
+ideal i=
+5abcde-a5-b5-c5-d5-e5,
+ab3c+bc3d+a3be+cd3e+ade3,
+a2bc2+b2cd2+a2d2e+ab2e2+c2de2,
+abc5-b4c2d-2a2b2cde+ac3d2e-a4de2+bcd2e3+abe5,
+ab2c4-b5cd-a2b3de+2abc2d2e+ad4e2-a2bce3-cde5,
+a3b2cd-bc2d4+ab2c3e-b5de-d6e+3abcd2e2-a2be4-de6,
+a4b2c-abc2d3-ab5e-b3c2de-ad5e+2a2bcde2+cd2e4,
+b6c+bc6+a2b4e-3ab2c2de+c4d2e-a3cde2-abd3e2+bce5;
+
+
+//Vasconcelos
+ring r=32003,(x,y,z,w,t),dp;
+ideal i=
+x2+zw,
+y3+xwt,
+xw3+z3t+ywt2,
+y2w4-xy2z2t-w3t3;
+
+//Theo1
+ring r=32003,(x,y,z),wp(2,3,6);
+ideal i=zy2-zx3-x6;
+
+//Theo2 
+ring r=32003,(x,y,z),wp(3,4,12);
+ideal i=z*(y3-x4)+x8;
+
+//Theo2a
+ring r=32003,(T(1..4)),wp(3,4,12,17);
+ideal i=
+T(1)^8-T(1)^4*T(3)+T(2)^3*T(3),
+T(1)^4*T(2)^2-T(2)^2*T(3)+T(1)*T(4),
+T(1)^7+T(1)^3*T(2)^3-T(1)^3*T(3)+T(2)*T(4),
+T(1)^6*T(2)*T(3)+T(1)^2*T(2)^4*T(3)+T(1)^3*T(2)^2*T(4)-T(1)^2*T(2)*T(3)^2+T(4)^2;
+
+//Theo3
+ring r=32003,(x,y,z),wp(3,5,15);
+ideal i=z*(y3-x5)+x10;
+
+
+//Theo4
+ring r=32003,(x,y,z),dp;
+ideal i=(x-y)*(x-z)*(y-z);
+
+//Theo5
+ring r=32003,(x,y,z),wp(2,1,2);
+ideal i=z3-xy4;
+
+//Theo6
+ring r=32003,(x,y,z),dp;
+ideal i=x2y2+x2z2+y2z2;
+
+ring r=32003,(a,b,c,d,e,f),dp;
+ideal i=
+bf,
+af,
+bd,
+ad;
+
+//Beispiel, wo vorher Primaerzerlegung schneller
+//ist CM
+//Sturmfels
+ring r=32003,(b,s,t,u,v,w,x,y,z),dp;
+ideal i=
+bv+su,
+bw+tu,
+sw+tv,
+by+sx,
+bz+tx,
+sz+ty,
+uy+vx,
+uz+wx,
+vz+wy,
+bvz;
+
+//J S/Y
+ring r=32003,(x,y,z,t),dp;
+ideal i=
+x2z+xzt,
+xyz,
+xy2-xyt,
+x2y+xyt;
+
+//St_S/Y
+ring r=32003,(b,s,t,u,v,w,x,y,z),dp;
+ideal i=
+wy-vz,
+vx-uy,
+tv-sw,
+su-bv,
+tuy-bvz;
+
+//dauert laenger
+//Horrocks: 
+ring r=32003,(a,b,c,d,e,f),dp;
+ideal i=
+adef-16000be2f+16001cef2,
+ad2f+8002bdef+8001cdf2,
+abdf-16000b2ef+16001bcf2,
+a2df+8002abef+8001acf2,
+ad2e-8000bde2-7999cdef,
+acde-16000bce2+16001c2ef,
+a2de-8000abe2-7999acef,
+acd2+8002bcde+8001c2df,
+abd2-8000b2de-7999bcdf,
+a2d2+9603abde-10800b2e2-9601acdf+800bcef+11601c2f2,
+abde-8000b2e2-acdf-16001bcef-8001c2f2,
+abcd-16000b2ce+16001bc2f,
+a2cd+8002abce+8001ac2f,
+a2bd-8000ab2e-7999abcf,
+ab3f-3bdf3,
+a2b2f-2adf3-16000bef3+16001cf4,
+a3bf+4aef3,
+ac3e-10668cde3,
+a2c2e+10667ade3+16001be4+5334ce3f,
+a3ce+10669ae3f,
+bc3d+8001cd3e,
+ac3d+8000bc3e+16001cd2e2+8001c4f,
+b2c2d+16001ad4+4000bd3e+12001cd3f,
+b2c2e-10668bc3f-10667cd2ef,
+abc2e-cde2f,
+b3cd-8000bd3f,
+b3ce-10668b2c2f-10667bd2ef,
+abc2f-cdef2,
+a2bce-16000be3f+16001ce2f2,
+ab3d-8000b4e-8001b3cf+16000bd2f2,
+ab2cf-bdef2,
+a2bcf-16000be2f2+16001cef3,
+a4d-8000a3be+8001a3cf-2ae2f2;
+
+ 
+ring r=32003,(b,s,t,u,v,w,x,y,z),dp;
+
+ideal k=
+wy-vz,
+vx-uy,
+tv-sw,
+su-bv,
+tuy-bvz;
+ideal j=x2y2+x2z2+y2z2;
+ideal i=mstd(intersect(j,k))[2];
+
+//22
+ring r=32003,(b,s,t,u,v,w,x,y,z),dp;
+ideal i=
+wx2y3-vx2y2z+wx2yz2+wy3z2-vx2z3-vy2z3,
+vx3y2-ux2y3+vx3z2-ux2yz2+vxy2z2-uy3z2,
+tvx2y2-swx2y2+tvx2z2-swx2z2+tvy2z2-swy2z2,
+sux2y2-bvx2y2+sux2z2-bvx2z2+suy2z2-bvy2z2,
+tux2y3-bvx2y2z+tux2yz2+tuy3z2-bvx2z3-bvy2z3;
+
+
+//riemenschneider
+//33
+//normal+primary 3
+//primary 9
+//radical 1
+//minAssPrimes 2
+ring r=32000,(p,q,s,t,u,v,w,x,y,z),wp(1,1,1,1,1,1,2,1,1,1);
+ideal i=
+xz,
+vx,
+ux,
+su,
+qu,
+txy,
+stx,
+qtx,
+uv2z-uwz,
+uv3-uvw,
+puv2-puw;
+
+
