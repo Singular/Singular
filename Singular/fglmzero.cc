@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.8 1997-12-03 16:58:37 obachman Exp $
+// $Id: fglmzero.cc,v 1.9 1997-12-19 16:25:29 schmidt Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -36,9 +36,9 @@
 // assumes, that NOSTREAMIO is set in factoryconf.h, which is included
 // by templates/list.h. 
 #ifdef macintosh
-#include <::templates:list.h>
+#include <::templates:ftmpl_list.h>
 #else
-#include <templates/list.h>
+#include <templates/ftmpl_list.h>
 #endif
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)

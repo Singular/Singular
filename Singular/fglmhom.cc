@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.5 1997-12-15 22:46:23 obachman Exp $
+// $Id: fglmhom.cc,v 1.6 1997-12-19 16:25:23 schmidt Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -32,7 +32,7 @@
 #include "intvec.h"
 #include "kstd1.h"
 #include "stairc.h"  // -> hHStdSeries, hFirstSeries usw.
-#include <templates/list.h>
+#include <templates/ftmpl_list.h>
 
 // obachman: Got rid off those "redefiende messages by includeing fglm.h
 #include "fglm.h"

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.9 1997-06-17 09:52:48 pohl Exp $
+// $Id: claptmpl.cc,v 1.10 1997-12-19 16:25:09 schmidt Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -16,9 +16,9 @@
 
 #if defined(HAVE_FACTORY) || defined(HAVE_FGLM)
   #ifdef macintosh
-    #include <::templates:list.cc>
+    #include <::templates:ftmpl_list.cc>
   #else
-    #include <templates/list.cc>
+    #include <templates/ftmpl_list.cc>
   #endif
 
   #ifdef HAVE_FGLM
@@ -27,20 +27,20 @@
 
   #ifdef HAVE_FACTORY
     #ifdef macintosh
-      #include <::templates:array.cc>
-      #include <::templates:factor.cc>
-      #include <::templates:functions.h>
-      #include <::templates:matrix.cc>
+      #include <::templates:ftmpl_array.cc>
+      #include <::templates:ftmpl_factor.cc>
+      #include <::templates:ftmpl_functions.h>
+      #include <::templates:ftmpl_matrix.cc>
       template List<CanonicalForm> Difference<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
       template List<CanonicalForm> Union<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
       template List<CFFactor> Union<CFFactor>(const List<CFFactor>&,const List<CFFactor>&);
       template List<Variable> Union<Variable> ( const List<Variable>&, const List<Variable>& );
       template List<Variable> Difference<Variable> ( const List<Variable>&, const List<Variable>& );
     #else
-      #include <templates/array.cc>
-      #include <templates/factor.cc>
-      #include <templates/functions.h>
-      #include <templates/matrix.cc>
+      #include <templates/ftmpl_array.cc>
+      #include <templates/ftmpl_factor.cc>
+      #include <templates/ftmpl_functions.h>
+      #include <templates/ftmpl_matrix.cc>
     #endif
 
     template class Factor<CanonicalForm>;
@@ -51,6 +51,7 @@
     template class List<CanonicalForm>;
     template class ListIterator<CanonicalForm>;
     template class Array<CanonicalForm>;
+    template class Array<REvaluation>;
     template class List<MapPair>;
     template class ListItem<MapPair>;
     template class ListIterator<MapPair>;

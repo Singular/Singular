@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.4 1997-12-18 14:26:33 Singular Exp $
+// $Id: fglmcomb.cc,v 1.5 1997-12-19 16:25:17 schmidt Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -30,7 +30,7 @@
 #include "fglmgauss.h"
 #include "kstd1.h"
 #include "fglm.h"
-#include <templates/list.h>
+#include <templates/ftmpl_list.h>
 
 // nur fuer debug-Ausgaben:
 int
