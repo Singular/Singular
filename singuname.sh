@@ -1,4 +1,4 @@
-# !/bin/sh
+#!/bin/sh
 # 
 # FILE:    singuname
 # USAGE:   singuname
