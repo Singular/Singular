@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.21 2002-01-19 14:48:17 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.22 2003-03-11 16:07:37 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -196,7 +196,7 @@ PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, ring r);
  *
  ***************************************************************/
 // return the maximal exponent of p
-PINLINE2 Exponent_t p_GetMaxExp(poly p, ring r);
+PINLINE2 unsigned long p_GetMaxExp(poly p, ring r);
 // return the maximal exponent of p in form of the maximal long var
 unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max = 0);
 // return monomial r such that GetExp(r,i) is maximum of all
@@ -204,9 +204,9 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max = 0);
 poly p_GetMaxExpP(poly p, ring r);
 
 // suppose that l is a long var in r, return maximal exponent of l
-PINLINE2 Exponent_t p_GetMaxExp(unsigned long l, ring r);
+PINLINE2 unsigned long p_GetMaxExp(unsigned long l, ring r);
 // similar, except assume that l constains number_of_exps exponents
-PINLINE2 Exponent_t p_GetMaxExp(const unsigned long l, const ring r, const int number_of_exps);
+PINLINE2 unsigned long p_GetMaxExp(const unsigned long l, const ring r, const int number_of_exps);
 
 // return the TotalDegree of the long var l
 PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
