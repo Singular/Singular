@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.8 1997-12-12 09:26:41 schmidt Exp $ */
+/* $Id: int_rat.cc,v 1.9 1997-12-17 11:39:32 schmidt Exp $ */
 
 #include <config.h>
 
@@ -443,9 +443,7 @@ bool InternalRational::divremsamet( InternalCF* c, InternalCF*& quot, InternalCF
 // Note: Both operations may be relatively expensive due to the
 // multiplications.
 //
-// See also: CanonicalForm::operator ==(),
-// CanonicalForm::operator !=(), CanonicalForm::operator >(),
-// CanonicalForm::operator <(), 
+// See also: CanonicalForm::operator <(), CanonicalForm::operator ==()
 //
 //}}}
 int
