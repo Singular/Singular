@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.5 2000-01-27 12:39:59 krueger Exp $ */
+/* $Id: misc.cc,v 1.6 2000-02-14 21:44:04 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -55,6 +55,7 @@ char *lastreserved=NULL;
 extern void enter_id(FILE *fp, idtyp t, char *name, char *value,
                      int lineno, char *file);
 extern void write_enter_id(FILE *fp);
+extern void write_add_singular_proc(FILE *fp);
 
 static void  mod_write_ctext(FILE *fp, FILE *fp_in);
 char type_conv[MAX_TOK][32];
@@ -208,6 +209,7 @@ struct valid_cmds_def
   { "declaration",  write_function_declaration, CMD_DECL,   0 },
   { "typecheck",    write_function_typecheck,   CMD_CHECK,  0 },
   { "return",       write_function_return,      CMD_RETURN, 1 },
+  { "singularcmd",  0,      CMD_SINGULAR, 1 },
   { NULL,           0, CMD_NONE, 0 }
 };
 
@@ -477,6 +479,8 @@ void  mod_write_header(FILE *fp, char *module, char what)
   if(what != 'h') {
     fprintf(fp, "#include \"%s.h\"\n", module);
     write_enter_id(fp);
+    fprintf(fp, "\n");
+    write_add_singular_proc(fp);
     fprintf(fp, "\n");
   }
   fprintf(fp, "\n");
