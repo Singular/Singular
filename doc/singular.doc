@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.37 1998-05-25 09:02:47 schmidt Exp $
+@comment $Id: singular.doc,v 1.38 1998-05-27 10:49:40 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -584,6 +584,8 @@ set of built-in commands and is automatically loaded
 during the start of @sc{Singular}.
 It contains:
 @table @code
+@item groebner
+see @ref{groebner}.
 @item stdfglm
 see @ref{stdfglm}.
 @item stdhilb
