@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.14 2001-06-21 14:56:09 Singular Exp $ */
+/* $Id: int_poly.cc,v 1.15 2003-06-20 10:00:33 Singular Exp $ */
 
 #include <config.h>
 
@@ -17,6 +17,7 @@
 #include "cf_defs.h"
 #include "cf_factory.h"
 #include "int_cf.h"
+#include "int_int.h"
 #include "int_poly.h"
 #include "canonicalform.h"
 #include "variable.h"
@@ -310,12 +311,14 @@ InternalPoly::subsame( InternalCF* aCoeff )
 InternalCF*
 InternalPoly::mulsame( InternalCF* aCoeff )
 {
+    if (is_imm(aCoeff)) return mulcoeff(aCoeff);
     InternalPoly *aPoly = (InternalPoly*)aCoeff;
     termList resultFirst = 0, resultLast = 0;
     termList theCursor = firstTerm;
 
     while ( theCursor ) {
-        resultFirst = mulAddTermList( resultFirst, aPoly->firstTerm, theCursor->coeff, theCursor->exp, resultLast, false );
+        resultFirst = mulAddTermList( resultFirst, aPoly->firstTerm, 
+                          theCursor->coeff, theCursor->exp, resultLast, false );
         theCursor = theCursor->next;
     }
     if ( inExtension() && getReduce( var ) ) {
@@ -367,7 +370,8 @@ InternalPoly::divsame( InternalCF* aCoeff )
 {
     if ( inExtension() && getReduce( var ) ) {
         InternalCF * dummy = aCoeff->invert();
-        dummy = dummy->mulsame( this );
+        if (is_imm(dummy)) dummy=this->mulsame(dummy);
+        else dummy = dummy->mulsame( this );
         if ( getRefCount() == 1 ) {
              delete this;
              return dummy;
@@ -839,7 +843,17 @@ InternalPoly::dividecoeff( InternalCF* cc, bool invert )
     if ( inExtension() && getReduce( var ) && invert ) {
         InternalCF * dummy;
         dummy = this->invert();
-        dummy = dummy->mulcoeff( cc );
+        if (is_imm(dummy)) 
+        {
+          if (is_imm(cc))
+          {
+            InternalInteger *d=new InternalInteger(imm2int(dummy)*imm2int(cc));
+            dummy=d;
+          }
+          else
+            dummy=cc->mulcoeff(dummy);
+        }
+        else dummy = dummy->mulcoeff( cc );
         if ( getRefCount() == 1 ) {
             delete this;
             return dummy;
