@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.3 1997-06-19 12:22:55 schmidt Exp $ */
+/* $Id: imm.h,v 1.4 1997-06-30 15:57:50 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -26,8 +26,13 @@ const int GFMARK = 3;
 
 const int MINIMMEDIATE = -268435454; // -2^28-2
 const int MAXIMMEDIATE = 268435454;  // 2^28-2
+#ifdef macintosh
+const long long int MINIMMEDIATELL = -268435454;
+const long long int MAXIMMEDIATELL = 268435454;
+#else
 const long long int MINIMMEDIATELL = -268435454LL;
 const long long int MAXIMMEDIATELL = 268435454LL;
+#endif
 
 #ifdef HAS_ARITHMETIC_SHIFT
 
