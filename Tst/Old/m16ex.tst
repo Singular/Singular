@@ -21,4 +21,4 @@
   // with using random numbers between -1 and 1:       
   B(1..3)=invariant_ring_random(A,1);
   print(B(1..3));
-$
+LIB "tst.lib";tst_status(1);$

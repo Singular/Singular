@@ -35,4 +35,4 @@ i0=std( i);
 size(i0);
 degree(i0);
 i0;
-$
+LIB "tst.lib";tst_status(1);$

@@ -8,6 +8,6 @@ example nselect; newline;
 example sat; newline;
 example select; newline;
 kmemory();
-$
+LIB "tst.lib";tst_status(1);$
 
 

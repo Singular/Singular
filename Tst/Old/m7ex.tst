@@ -66,4 +66,4 @@
     }
   }
   "//",s,"solutions over GF("+string(p^k)+")";
-$
+LIB "tst.lib";tst_status(1);$

@@ -3,4 +3,4 @@
   iv[3];
   iv[7]=1;
   iv;
-$
+LIB "tst.lib";tst_status(1);$

@@ -3,4 +3,4 @@
   ring R=0,(a,b,x,y,c),lp;
   ideal i=imap(r,i);
   i;
-$
+LIB "tst.lib";tst_status(1);$

@@ -29,5 +29,5 @@ kill rq;
 ring r=0,(x,y),dp;
 ideal i=ideal(0,x);
 size(i[1]);// must be 0, was 1
-quit;
-$
+LIB "tst.lib";tst_status(1);$
+LIB "tst.lib";tst_status(1);$

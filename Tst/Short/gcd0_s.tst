@@ -1,4 +1,4 @@
-// $Id: gcd0_s.tst,v 1.1 1998-04-21 12:55:43 schmidt Exp $
+// $Id: gcd0_s.tst,v 1.2 1998-07-01 10:20:23 obachman Exp $
 
 //
 // gcd0_s.tst - short tests for gcd calculations in Z.
@@ -19,7 +19,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: gcd0_s.tst,v 1.1 1998-04-21 12:55:43 schmidt Exp $");
+tst_ignore("CVS ID  : $Id: gcd0_s.tst,v 1.2 1998-07-01 10:20:23 obachman Exp $");
 
 //
 // - ring r1=0,x,dp.
@@ -254,4 +254,4 @@ gcd(f, g);
 f=(-256*u^3*v+128*u^2*v^2-16*u*v^3);
 g=(-64*u^3+48*u^2*v^2+32*u^2*v-192*u^2-12*u*v^3-4*u*v^2+48*u*v);
 gcd(f, g);
-$
+tst_status(1);$

@@ -4,4 +4,4 @@
   ideal i=jacob(f);
   matrix T=lift(i,m);
   matrix(m)-matrix(i)*T;
-$
+LIB "tst.lib";tst_status(1);$

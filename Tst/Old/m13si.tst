@@ -8,4 +8,4 @@
   i+2;
   intvec v=i..i+3;
   v;
-$
+LIB "tst.lib";tst_status(1);$

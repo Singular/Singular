@@ -472,4 +472,4 @@ size(j);
 degree(j);
 
 kill testh4;
-$
+LIB "tst.lib";tst_status(1);$

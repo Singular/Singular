@@ -7,4 +7,4 @@ m[4,4]=a5;
 m[5,5]=a3;
 print(m);
 det(m);
-$
+LIB "tst.lib";tst_status(1);$

@@ -13,4 +13,4 @@ matrix A[3][4]=1;
 matrix B[3][2]=0,x,y;
 modulo(A,B);
 syz(A)+module(lift(A,intersect(A,B)));
-$
+tst_status(1);$

@@ -20,4 +20,4 @@ intvec IW=weight(ii1);
 I1;I2;I3;I4;
 " ";
 IW;
-$
+LIB "tst.lib";tst_status(1);$

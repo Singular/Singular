@@ -60,5 +60,5 @@ m1*s1;
 syz7;
 syz8;
 syz9;
-$
+LIB "tst.lib";tst_status(1);$
 

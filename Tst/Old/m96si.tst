@@ -3,4 +3,4 @@
   poly f;
   names();
   names(r);
-$
+LIB "tst.lib";tst_status(1);$

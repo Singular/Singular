@@ -51,4 +51,4 @@ D=(1/f)*D;
 list L=invariant_ring(A,D,intvec(0,0,1));
 L;
 
-$
+tst_status(1);$

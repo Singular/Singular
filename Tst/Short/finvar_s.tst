@@ -39,4 +39,4 @@ example orbit_variety;
 example relative_orbit_variety;
 example image_of_variety;
 
-$
+tst_status(1);$

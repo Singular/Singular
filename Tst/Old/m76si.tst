@@ -7,4 +7,4 @@
   ideal id2=x2+xyz,y2-z3y,z3+y5xz;
   ideal id3=intersect(id1,id2,ideal(x,y));
   id3;
-$
+LIB "tst.lib";tst_status(1);$

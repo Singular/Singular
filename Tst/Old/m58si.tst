@@ -7,4 +7,4 @@
   ideal i=x2,x2+yz,xyz;
   ideal j=x2-yz,xyz;
   print(diff(i,j));
-$
+LIB "tst.lib";tst_status(1);$

@@ -13,4 +13,4 @@ miniversal(j);
 setring Ont; 
 jetF;jetJ;
 "time";timer-time;
-$ 
+LIB "tst.lib";tst_status(1);$ 

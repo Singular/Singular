@@ -15,4 +15,4 @@ listvar(all);
 setring r;
 "poly p is shadowed by int p!!";
 diff(p,x);
-$
+LIB "tst.lib";tst_status(1);$

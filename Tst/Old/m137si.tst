@@ -3,4 +3,4 @@
   vdim(I);
   attrib(I,"isSB",0);  // the standard basis attribute is set to 0
   vdim(I);
-$
+LIB "tst.lib";tst_status(1);$

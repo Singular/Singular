@@ -2,4 +2,4 @@
   poly f=3*(x+2)^3+y;
   poly g=x+y+z;
   resultant(f,g,x);
-$
+LIB "tst.lib";tst_status(1);$

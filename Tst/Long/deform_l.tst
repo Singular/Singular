@@ -90,4 +90,4 @@ for (i'=4;i'<ii;i'=i'+1)
 mod_versal(m(2),Io,4,"qq","W","dp","oo");
 listvar(ring);
 qqQx;
-$
+tst_status(1);$

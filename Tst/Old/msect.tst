@@ -38,5 +38,5 @@ intersect(m1,m2,freemodule(5));
 "-------------------------";
 listvar(all);
 kill r1;
-$;
+LIB "tst.lib";tst_status(1);$;
 //bsp mit char 0

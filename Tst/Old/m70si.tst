@@ -4,4 +4,4 @@
   hilb(s);
   hilb(s,1);
   hilb(s,2);
-$
+LIB "tst.lib";tst_status(1);$

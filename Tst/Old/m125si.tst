@@ -4,4 +4,4 @@
   int a=1;
   subst(f,y,a);
   subst(f,y,z);
-$
+LIB "tst.lib";tst_status(1);$

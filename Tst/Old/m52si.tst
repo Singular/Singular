@@ -4,4 +4,4 @@
   print(M);
   ideal i=f,xyz+z^10*y^7;
   print(coeffs(i,y));
-$
+LIB "tst.lib";tst_status(1);$

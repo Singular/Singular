@@ -6,4 +6,4 @@
   j;
   vdim(std(j));
   kill Rt;
-$
+LIB "tst.lib";tst_status(1);$

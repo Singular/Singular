@@ -10,4 +10,4 @@ example sparsemat;newline;
 example sparsepoly;newline;
 example sparsetriag;newline;
 example kmemory;
-$
+LIB "tst.lib";tst_status(1);$

@@ -6,4 +6,4 @@
   s;
   execute s; // define the ideal k
   k;
-$
+LIB "tst.lib";tst_status(1);$

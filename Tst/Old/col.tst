@@ -31,4 +31,4 @@ c5=ncols(m5);
 c5;
 listvar(all);
 kill r;
-$;
+LIB "tst.lib";tst_status(1);$;

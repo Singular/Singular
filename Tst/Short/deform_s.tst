@@ -33,4 +33,4 @@ for (i'=0;i'<3;i'=i'+1)
   setring(Po);
  kill_rings();
 }
-$
+tst_status(1);$

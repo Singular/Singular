@@ -70,4 +70,4 @@ mult(m);
 degree(m);
 vdim(m);
 hilb(m);
-$
+LIB "tst.lib";tst_status(1);$

@@ -2286,4 +2286,4 @@ x*y+(2*a)*y^2,
 matrix N=std(M);
 N=elim(N,1,3);
 print(N);
-$
+LIB "tst.lib";tst_status(1);$

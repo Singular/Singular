@@ -36,5 +36,5 @@ i1=system("algfetch",r0,i0);
 i1;
 kill r2;
 
-$
+LIB "tst.lib";tst_status(1);$
 

@@ -30,4 +30,4 @@ proc mi
  }
 }
 mi(j);
-$
+LIB "tst.lib";tst_status(1);$

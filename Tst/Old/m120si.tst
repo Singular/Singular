@@ -13,4 +13,4 @@
   size(m);
   matrix mm[2][2];
   size(mm);
-$
+LIB "tst.lib";tst_status(1);$

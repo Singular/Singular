@@ -4,4 +4,4 @@
   rvar(y);
   rvar(var(3));
   rvar("x");
-$
+LIB "tst.lib";tst_status(1);$

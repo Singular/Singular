@@ -4,4 +4,4 @@
   list L  = mres(M,0);
   size(L);
   // projective dimension of M is 4
-$
+LIB "tst.lib";tst_status(1);$

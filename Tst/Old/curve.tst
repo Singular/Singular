@@ -7,4 +7,4 @@ list resi=minres(resii);
 resi[1];
 resi[2];
 print(betti(resi),"betti");
-$
+LIB "tst.lib";tst_status(1);$

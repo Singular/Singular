@@ -18,4 +18,4 @@ ideal i=x;
 ideal j=y;
 ideal k=intersect(i,j);
 k;
-$
+LIB "tst.lib";tst_status(1);$

@@ -70,4 +70,4 @@ proc formmat
   }
 }
 formmat(m);
-$
+LIB "tst.lib";tst_status(1);$

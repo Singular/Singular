@@ -3,4 +3,4 @@
   qring q=i;
   basering;
   std(ideal(x+y,x+y+z,z));
-$
+LIB "tst.lib";tst_status(1);$

@@ -1,4 +1,4 @@
-// $Id: fglm1_l.tst,v 1.1.1.1 1998-04-17 15:07:39 obachman Exp $
+// $Id: fglm1_l.tst,v 1.2 1998-07-01 10:10:40 obachman Exp $
 
 //
 // fglm_s.tst - long tests for fglm 
@@ -8,7 +8,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id: fglm1_l.tst,v 1.1.1.1 1998-04-17 15:07:39 obachman Exp $");
+tst_ignore("CVS: $Id: fglm1_l.tst,v 1.2 1998-07-01 10:10:40 obachman Exp $");
 
 option(redSB);
 
@@ -30,5 +30,5 @@ ring s=0,(y,x), lp;
 fglm(r,is);
 kill r,s;
 
-quit;
+tst_status(1);$
 

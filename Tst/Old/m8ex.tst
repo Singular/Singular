@@ -61,4 +61,4 @@
   j = nselect(j,1,4);            // select generators from j not
   j;                             // containing variable 1,...,4
   killall();
-$
+LIB "tst.lib";tst_status(1);$

@@ -1,4 +1,4 @@
-// $Id: fglm1_s.tst,v 1.1.1.1 1998-04-17 15:07:41 obachman Exp $
+// $Id: fglm1_s.tst,v 1.2 1998-07-01 10:20:18 obachman Exp $
 
 //
 // fglm_s.tst - short tests for fglm and stdfglm
@@ -9,7 +9,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id: fglm1_s.tst,v 1.1.1.1 1998-04-17 15:07:41 obachman Exp $");
+tst_ignore("CVS: $Id: fglm1_s.tst,v 1.2 1998-07-01 10:20:18 obachman Exp $");
 
 option(redSB);
 
@@ -90,4 +90,4 @@ ideal i= y2z+2xyt-2x-z, -x3z+4xy2z+4x2yt+2y3t+4x2-10y2+4xz-10yt+2, 2yzt+xt2-x-2z
 stdfglm(i);
 kill r;
 
-quit;
+tst_status(1);$

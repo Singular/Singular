@@ -126,7 +126,7 @@ proc check_fetch(int n, list olist)
 
 check_fetch(15, orderings);
 
-quit;
+tst_status(1);$
   
   
 

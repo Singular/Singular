@@ -29,4 +29,4 @@
   displayInvariants(hn);
   param(hn[2]);      // parametrization of 2nd branch
   // extended parametrization of 1st
-$
+LIB "tst.lib";tst_status(1);$

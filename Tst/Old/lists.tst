@@ -22,5 +22,5 @@ L[1][1] = 0;
 L;
 L[1][1];
 L;
-$
-$
+LIB "tst.lib";tst_status(1);$
+LIB "tst.lib";tst_status(1);$

@@ -7,4 +7,4 @@
   lead(v);
   lead(i);
   lead(m);
-$
+LIB "tst.lib";tst_status(1);$

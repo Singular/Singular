@@ -23,4 +23,4 @@
   // the user has acess to all betti numbers
   // the 2-nd column of B:
   B[1..4,2];
-$
+LIB "tst.lib";tst_status(1);$

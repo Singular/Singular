@@ -2,4 +2,4 @@
   ideal I=xy,xz,yz;
   indepSet(std(I));
   eliminate(I,yz);
-$
+LIB "tst.lib";tst_status(1);$

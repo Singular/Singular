@@ -4,4 +4,4 @@
   attrib(i);
   killattrib(i,"isSB");
   attrib(i);
-$
+LIB "tst.lib";tst_status(1);$

@@ -8,4 +8,4 @@
   ring r=32003,(a,b,c,d),wp(e);
   map f=h1,a,b,c,d;
   ideal i0=std(f(i));
-$
+LIB "tst.lib";tst_status(1);$

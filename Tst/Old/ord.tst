@@ -110,4 +110,4 @@ ring R13=0,x,(C,lp);
 matrix m=fetch(r2,m);
 print(module(transpose(m)));
 
-$
+LIB "tst.lib";tst_status(1);$

@@ -32,11 +32,11 @@ for (i=1; i<=16; i=i+1)
   }
   b;
 }
-$;
+LIB "tst.lib";tst_status(1);$;
 "binom(5,0)", binom(5,0);
 "binom(5,1)", binom(5,1);
 "binom(5,2)", binom(5,2);
 "binom(5,3)", binom(5,3);
 "binom(5,4)", binom(5,4);
 "binom(5,5)", binom(5,5);
-$;
+LIB "tst.lib";tst_status(1);$;

@@ -3,4 +3,4 @@
   kill i;
   getdump("example.txt");
   i;
-$
+LIB "tst.lib";tst_status(1);$

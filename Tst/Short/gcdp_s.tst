@@ -1,4 +1,4 @@
-// $Id: gcdp_s.tst,v 1.3 1998-04-24 06:49:21 schmidt Exp $
+// $Id: gcdp_s.tst,v 1.4 1998-07-01 10:20:25 obachman Exp $
 
 //
 // gcdp_s.tst - short tests for gcd calculations mod p.
@@ -16,7 +16,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: gcdp_s.tst,v 1.3 1998-04-24 06:49:21 schmidt Exp $");
+tst_ignore("CVS ID  : $Id: gcdp_s.tst,v 1.4 1998-07-01 10:20:25 obachman Exp $");
 
 //
 // - functions.
@@ -203,4 +203,4 @@ simplifyGcd(fPoly, gPoly);
 fPoly=(-8001*c^4*e*f*k^6+8001*c^4*f^3*h*k^4+8001*c^3*e^2*k^7+8001*c^3*e*f^2*h*k^5+16001*c^3*f^4*h^2*k^3+16001*c^2*e^2*f*h*k^6-16001*c^2*e*f^3*h^2*k^4);
 gPoly=(16001*c^7*e*h*k^3-15998*c^6*e*f*h^2*k^2-7*c^5*e*f^2*h^3*k-8*c^4*e^2*f*h^3*k^2+4*c^4*e*f^3*h^4+8*c^3*e^3*h^3*k^3+24*c^3*e^2*f^2*h^4*k-24*c^2*e^3*f*h^4*k^2-16*c^2*e^2*f^3*h^5+16*c*e^3*f^2*h^5*k);
 simplifyGcd(fPoly, gPoly);
-$
+tst_status(1);$

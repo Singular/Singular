@@ -6,4 +6,4 @@
   intvec v=1,3,5;
   s=s[v]; s;
   s="123456"; s=s[3..5]; s;
-$
+LIB "tst.lib";tst_status(1);$

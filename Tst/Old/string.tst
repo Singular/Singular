@@ -146,4 +146,4 @@ s1[8]=".";
 s1[9]=".";
 
 listvar(all);
-$
+LIB "tst.lib";tst_status(1);$

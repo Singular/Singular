@@ -22,4 +22,4 @@
   LIB "general.lib";
   killall("proc");
   dump("");                     // dump to stdout
-$
+LIB "tst.lib";tst_status(1);$

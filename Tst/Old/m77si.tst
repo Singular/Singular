@@ -3,4 +3,4 @@
   jacob(f);
   ideal i=jacob(f);
   print(jacob(i));
-$
+LIB "tst.lib";tst_status(1);$

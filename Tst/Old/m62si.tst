@@ -2,4 +2,4 @@
   ideal I=xyz,x2z;
   facstd(I);
   facstd(I,x);
-$
+LIB "tst.lib";tst_status(1);$

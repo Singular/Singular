@@ -14,4 +14,4 @@
   // maps from r1 to r2,
   // x to a2, y to b2, z to a2+b2
   phi(i);
-$
+LIB "tst.lib";tst_status(1);$

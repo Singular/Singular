@@ -20,4 +20,4 @@ i;
 ideal B[1][1];
 minor(B,1);
 minor(B,2);
-$
+tst_status(1);$

@@ -8,4 +8,4 @@ proc tt
 tt();
 <"echo1.tst";
 "t1:echo=",echo, voice;
-$
+LIB "tst.lib";tst_status(1);$

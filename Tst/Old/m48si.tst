@@ -3,4 +3,4 @@
           -3x2u-4yz-6xz+2y2+3xy,
           -3z2u-xu+y2z+y;
   print(char_series(i));
-$
+LIB "tst.lib";tst_status(1);$

@@ -13,4 +13,4 @@ example homology;
 example kernel; 
 example kohom;
 example kontrahom;
-$
+tst_status(1);$

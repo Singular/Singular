@@ -3,4 +3,4 @@
   i;
   int i=i+1;   // redefinition
   i;
-$
+LIB "tst.lib";tst_status(1);$

@@ -3,4 +3,4 @@
   ideal j=jacob(f),f;
   j=homog(j,t);j;
   mstd(j);
-$
+LIB "tst.lib";tst_status(1);$

@@ -24,4 +24,4 @@ example multrow; newline;
 example permcol; newline;
 example permrow; newline;
 kmemory();
-$
+LIB "tst.lib";tst_status(1);$

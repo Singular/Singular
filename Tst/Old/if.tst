@@ -127,4 +127,4 @@ else
      "wrong 1 1: else else";
    };
 }
-$
+LIB "tst.lib";tst_status(1);$

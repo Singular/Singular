@@ -2,4 +2,4 @@
   varstr(r);
   varstr(r,1);
   varstr(2);
-$
+LIB "tst.lib";tst_status(1);$

@@ -4,4 +4,4 @@
   ideal i=x,0,y;
   ncols(i);
   size(i);
-$
+LIB "tst.lib";tst_status(1);$

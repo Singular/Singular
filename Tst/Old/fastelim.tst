@@ -20,7 +20,7 @@ ideal i= -6s5x+a, -5s4tx-1s5y+b, -4s3t2x-2s4ty+c,
 LIB "elim.lib";
 j=nselect(j,1,4);
 j;
-$
+LIB "tst.lib";tst_status(1);$
 ==============
 Macaulay input:
 ==============

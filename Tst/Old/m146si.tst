@@ -4,4 +4,4 @@
   print(m);  // the columns generate m
   intmat M=betti(mres(m,0));
   print(M,"betti");
-$
+LIB "tst.lib";tst_status(1);$

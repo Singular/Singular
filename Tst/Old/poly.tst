@@ -106,4 +106,4 @@ poly f = (x+3)*(x+2);
 poly q = (x+2)^2;
 poly h = 20x + 40;
 (f*q)/h;
-$;
+LIB "tst.lib";tst_status(1);$;

@@ -10,4 +10,4 @@
   m=v1,v2;         // overwrite M with v1 and v2
   m;
   trace(m);
-$
+LIB "tst.lib";tst_status(1);$

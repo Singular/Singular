@@ -26,4 +26,4 @@
   print(LE[2]);
   print(kbase(LE[2]));
   killall();
-$
+LIB "tst.lib";tst_status(1);$

@@ -6,4 +6,4 @@
   ideal j=std(i);
   reduce(3z3yx2+7y4x2+yx5+z12y2x2,j);
   reduce(3z3yx2+7y4x2+yx5+z12y2x2,j,1);
-$
+LIB "tst.lib";tst_status(1);$

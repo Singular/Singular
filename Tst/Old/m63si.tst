@@ -2,4 +2,4 @@
   factorize(9*(x-1)^2*(y+z));
   factorize(9*(x-1)^2*(y+z),1);
   factorize(9*(x-1)^2*(y+z),2);
-$
+LIB "tst.lib";tst_status(1);$

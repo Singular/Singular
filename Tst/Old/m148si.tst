@@ -2,4 +2,4 @@
   ring Cxyz=(0,i),(x,y,z),dp;
   minpoly=i^2+1;
   i2;
-$
+LIB "tst.lib";tst_status(1);$

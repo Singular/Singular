@@ -3,4 +3,4 @@
   dbprint(debug,i);
   debug=1;
   dbprint(debug,i);
-$
+LIB "tst.lib";tst_status(1);$

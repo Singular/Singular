@@ -9,4 +9,4 @@
   ideal IJ = i*j;
   // generators i[k]*j[l], 1<=k<=size(i), 1<=l<=size(j)
   size(j), size(IJ);
-$
+LIB "tst.lib";tst_status(1);$

@@ -24,4 +24,4 @@ J = std(J);
 list R1=nres(J,0);
 print( R1);
 regularity( R1);
-$;
+LIB "tst.lib";tst_status(1);$;

@@ -15,4 +15,4 @@
   im=2,3,4,0,1,0,0,0;
   iv=im*iw;
   iv;
-$
+LIB "tst.lib";tst_status(1);$

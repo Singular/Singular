@@ -110,4 +110,4 @@ timer=1;
 list I=mres(i,0);
 betti(I);
 kill ra;
-$
+tst_status(1);$

@@ -39,4 +39,4 @@ ringbundle();                 // ask for help
 ringbundle(3,5,7,11);         // create rb(1) with characteristic 3, etc
 listvar(all);
 rb(4);
-$;
+LIB "tst.lib";tst_status(1);$;

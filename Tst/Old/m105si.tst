@@ -2,4 +2,4 @@
   parstr(r);
   parstr(2);
   parstr(r,3);
-$
+LIB "tst.lib";tst_status(1);$

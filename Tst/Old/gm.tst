@@ -195,4 +195,4 @@ j;
 //size(j)
 "dimension of omega 2 =";
 degree(j);
-$
+LIB "tst.lib";tst_status(1);$

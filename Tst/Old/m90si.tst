@@ -5,4 +5,4 @@
   size(R3);
   list R4=minres(R3);
   size(R4);
-$
+LIB "tst.lib";tst_status(1);$

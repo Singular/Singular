@@ -55,4 +55,4 @@ def imatres(1..3) = ll[1..3];
 matrix T = lift(imatres(2), module(jac));
 T;
 kill r;
-$;
+tst_status(1);$;

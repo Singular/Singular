@@ -230,4 +230,4 @@ ideal j=std(i);
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
 kill r5;
-$
+LIB "tst.lib";tst_status(1);$

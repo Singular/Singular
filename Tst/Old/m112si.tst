@@ -9,4 +9,4 @@
   string s="ideal k="+read("save_i")+";";
   execute s;
   k;
-$
+LIB "tst.lib";tst_status(1);$

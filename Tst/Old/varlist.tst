@@ -9,4 +9,4 @@ proc foo
   #[1000-999+3];
 }
 foo(3,4,5,6,7,8,9);
-$;
+LIB "tst.lib";tst_status(1);$;

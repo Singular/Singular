@@ -89,4 +89,4 @@ ring r;
 ordstr(r);
 varstr(r);
 charstr(r);
-$
+LIB "tst.lib";tst_status(1);$

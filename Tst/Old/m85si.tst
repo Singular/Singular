@@ -6,4 +6,4 @@
   sm;
   print(T);
   matrix(sm)-matrix(i)*T;
-$
+LIB "tst.lib";tst_status(1);$

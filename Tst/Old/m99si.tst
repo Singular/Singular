@@ -5,4 +5,4 @@
   module m=[0,0,1];
   nrows(m);
   nrows([0,x,0]);
-$
+LIB "tst.lib";tst_status(1);$

@@ -194,4 +194,4 @@ pr4;
 m;
 testPrimary(pr2,i);
 kill r;
-$
+tst_status(1);$

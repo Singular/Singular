@@ -31,5 +31,5 @@ for(i=1;i<=size(nn);i++)
 {
   nn[i]-nm[i];
 }
-$
+LIB "tst.lib";tst_status(1);$
 

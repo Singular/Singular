@@ -24,4 +24,4 @@ list(sres(m1,0));
 "-----------------------";
 listvar(all);
 kill r1;
-$;
+tst_status(1);$;

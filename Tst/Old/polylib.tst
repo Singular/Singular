@@ -9,4 +9,4 @@ example maxdeg1;
 example mindeg;
 example mindeg1;
 example normalize;
-$
+LIB "tst.lib";tst_status(1);$

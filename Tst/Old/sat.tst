@@ -15,5 +15,5 @@ J;
 option();
 ideal Jsat = sat(std(J),maxideal(1));
 Jsat;
-$
+LIB "tst.lib";tst_status(1);$
 

@@ -24,4 +24,4 @@ k4=char(r4);
 k4;
 listvar(all);
 kill r1,r2,r3,r4,k1,k2,k3,k4;
-$
+LIB "tst.lib";tst_status(1);$

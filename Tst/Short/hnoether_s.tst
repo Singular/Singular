@@ -86,4 +86,4 @@ example squarefree;
 example allsquarefree;
 list L=list(poly(x-y),ideal(x,y));
 set_list(L,intvec(2,1),x2+y7);
-$
+tst_status(1);$

@@ -5,4 +5,4 @@
   simplify(i,1+2);
   matrix A[2][3]=x,0,2x,y,0,2y;
   simplify(A,2+8); // by automatic conversion to module
-$
+LIB "tst.lib";tst_status(1);$

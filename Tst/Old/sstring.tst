@@ -22,4 +22,4 @@ find("1231231231234","2",12);
 find("1231231231234","2",20);
 listvar(all);
 kill r1;
-$;
+LIB "tst.lib";tst_status(1);$;

@@ -19,4 +19,4 @@ poly(2)<poly(0);
 poly(2)>=poly(0);
 poly(2)<=poly(0);
 poly(2)!=poly(0);
-$
+LIB "tst.lib";tst_status(1);$

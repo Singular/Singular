@@ -20,4 +20,4 @@
   "The Milnor number of f(11,5,3) for t=1:",vdim(j1);
   vdim(std(j1+f));   // compute the Tjurina number for t=1
   option(noprot);
-$
+LIB "tst.lib";tst_status(1);$

@@ -8,4 +8,4 @@ v;
 v=0;
 v=1; ;
 listvar(all);
-$;
+LIB "tst.lib";tst_status(1);$;

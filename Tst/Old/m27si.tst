@@ -20,4 +20,4 @@
   read(dbmLink,read(dbmLink));
   // close
   close(dbmLink);
-$
+LIB "tst.lib";tst_status(1);$

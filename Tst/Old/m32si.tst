@@ -3,4 +3,4 @@
   string s=s1+" "+s2; // concatenation of 3 strings
   s;
   s1,s2;   // 2 strings, separated by a blank in the output:
-$
+LIB "tst.lib";tst_status(1);$

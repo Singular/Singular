@@ -4,4 +4,4 @@
   noether = x^11;
   std(i);
   noether = 0;//disables noether
-$
+LIB "tst.lib";tst_status(1);$

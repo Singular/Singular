@@ -9,4 +9,4 @@
   n;
   n=0.25e+2;
   n;
-$
+LIB "tst.lib";tst_status(1);$

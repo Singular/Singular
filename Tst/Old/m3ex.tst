@@ -10,4 +10,4 @@
   // list and kill the variables defined so far:
   listvar();
   kill r2;
-$
+LIB "tst.lib";tst_status(1);$

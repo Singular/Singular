@@ -3,4 +3,4 @@
   print(m);
   ideal j = minor(m, 2);
   j;
-$
+LIB "tst.lib";tst_status(1);$

@@ -7,4 +7,4 @@
   "dimension of i =",dim(i),", multiplicity of i =",mult(i);
   "dimension of i = "+string(dim(i))+", multiplicity of i = "+string(mult(i));
   "a"+"b","c";
-$
+LIB "tst.lib";tst_status(1);$

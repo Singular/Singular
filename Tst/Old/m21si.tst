@@ -6,4 +6,4 @@
   number n=2/3; n;
   n=a+a^2;
   poly f=n*x+2;f;
-$
+LIB "tst.lib";tst_status(1);$

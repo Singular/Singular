@@ -23,4 +23,4 @@ setring r;
 q=0;
 qring qq=q;
 std(maxideal(1));
-$
+LIB "tst.lib";tst_status(1);$

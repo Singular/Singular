@@ -1,4 +1,4 @@
-// $Id: std_s.tst,v 1.1.1.1 1998-04-17 15:07:41 obachman Exp $
+// $Id: std_s.tst,v 1.2 1998-07-01 10:20:55 obachman Exp $
 
 // std_s.tst -- long tests for std
 // uses rcyclic examples from ISSAC'98 paper
@@ -334,4 +334,4 @@ std_range(6,10, 32003, list("dp"));
 std_range(2,5, 0, global_orderings);
 
 std_range(6,10, 0,list("dp"));
-$
+tst_status(1);$

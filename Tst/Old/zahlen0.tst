@@ -252,4 +252,4 @@ NF(m1[cc],m2);
 NF(m2[cc],m1);
 }
 
-$
+LIB "tst.lib";tst_status(1);$

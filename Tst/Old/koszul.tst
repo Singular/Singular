@@ -25,4 +25,4 @@ i;
 list c=koszul(0,i),koszul(1,i),koszul(2,i),koszul(3,i),koszul(4,i);
 c;
 isComplex(c);
-$
+LIB "tst.lib";tst_status(1);$

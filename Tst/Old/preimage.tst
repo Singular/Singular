@@ -27,5 +27,5 @@ ideal j2=preimage(r,ff,j2);
 type j2;
 ideal j3=preimage(r,ff,j3);
 type j3;
-$
+LIB "tst.lib";tst_status(1);$
 

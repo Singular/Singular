@@ -46,4 +46,4 @@
   //         -A(1)*A(4) = A(3)*A(4) = -A(2)*A(4)-A(4)^2 = 0 }
   //----------------------------------------------------
   killall(); // proc from general.lib, kills all user-defined variables
-$
+LIB "tst.lib";tst_status(1);$

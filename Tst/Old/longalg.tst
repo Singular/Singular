@@ -219,4 +219,4 @@ f2*f1;
 newline;
 
 kill w2;
-$
+LIB "tst.lib";tst_status(1);$

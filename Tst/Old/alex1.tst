@@ -18,4 +18,4 @@ degree(i0);
 i0;
 kill i,i0;
 kill a1;
-$
+LIB "tst.lib";tst_status(1);$

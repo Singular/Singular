@@ -39,4 +39,4 @@ matrix u[8][8] = unitmat(8,4);
 fixmat(u,3);
 kill r;
 memory(0);
-$
+LIB "tst.lib";tst_status(1);$

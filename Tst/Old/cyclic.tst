@@ -34,4 +34,4 @@ ideal j=std(i);
 "dim: "+ string(dim(j)) +",  mult: "+ string(mult(j)) +",  elem: "
                                                         + string(size(j));
 kill r6;
-$
+LIB "tst.lib";tst_status(1);$

@@ -26,5 +26,5 @@ defined(s2) and defined(s3);
 defined(m1) or defined(m3);
 listvar(all);
 kill r;
-$;
+LIB "tst.lib";tst_status(1);$;
 // fur proc?

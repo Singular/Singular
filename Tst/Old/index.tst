@@ -25,4 +25,4 @@ m[1..2,1];
 m[1,1..2];
 m[1..2,2..3] ;
 listvar(all);
-$
+LIB "tst.lib";tst_status(1);$

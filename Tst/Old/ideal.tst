@@ -16,4 +16,4 @@ ideal id6=id*id;
 id6;
 ideal id7=maxideal(10);
 id7;
-$;
+LIB "tst.lib";tst_status(1);$;

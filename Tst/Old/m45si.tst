@@ -8,4 +8,4 @@
   betti(T);
   // most useful for reading off the graded Betti numbers:
   print(betti(T),"betti");
-$
+LIB "tst.lib";tst_status(1);$

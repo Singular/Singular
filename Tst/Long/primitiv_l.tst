@@ -73,4 +73,4 @@ L[3]^2;
 kill R1,r;
 // ------------ test of randomLast: ------------------
 example randomLast;
-$
+tst_status(1);$

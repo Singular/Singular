@@ -2,4 +2,4 @@
   iv;
   iv[4];
   iv[3..size (iv)];
-$
+LIB "tst.lib";tst_status(1);$

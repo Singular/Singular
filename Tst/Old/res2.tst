@@ -24,4 +24,4 @@ list jmin=minres(jres);
 jmin[3];
 betti(jmin);
 kill a,b,c,t,rh3;
-$   
+LIB "tst.lib";tst_status(1);$   

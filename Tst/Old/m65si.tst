@@ -6,4 +6,4 @@
   ring s=0,(z,x,y),lp;
   ideal j=fglm(r,i);
   j;
-$
+LIB "tst.lib";tst_status(1);$

@@ -38,4 +38,4 @@ killall();
 
 example content;
 killall();
-$
+tst_status(1);$

@@ -4,4 +4,4 @@
   M       = std(M);
   list L  = sres(M,0);
   size(L);
-$
+LIB "tst.lib";tst_status(1);$

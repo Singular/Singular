@@ -36,4 +36,4 @@ ideal k=interred(i^2);
 degBound=1;
 ideal j=std(k);
 kill al1;
-$
+LIB "tst.lib";tst_status(1);$

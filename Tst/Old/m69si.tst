@@ -5,4 +5,4 @@
   v=v+f*gen(4); v;
   ring rr= 32003,(x,y,z),dp;
   fetch(r,v);
-$
+LIB "tst.lib";tst_status(1);$

@@ -35,4 +35,4 @@ p2();
 "call rec(3)";
 rec(3);
 "end";
-$
+LIB "tst.lib";tst_status(1);$

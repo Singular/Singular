@@ -22,5 +22,5 @@ listvar(i1);
 "--------------------------";
 listvar(all);
 kill r1,r2;
-$;
+LIB "tst.lib";tst_status(1);$;
 

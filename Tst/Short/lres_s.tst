@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: lres_s.tst,v 1.1 1998-06-30 17:00:38 obachman Exp $");
+tst_ignore("CVS ID $Id: lres_s.tst,v 1.2 1998-07-01 10:20:38 obachman Exp $");
 ring an=0,(w,x,y,z),(dp,C);
 ideal i=
 1w2xy+1w2xz+1w2yz+1wxyz+1x2yz+1xy2z+1xyz2,
@@ -73,4 +73,4 @@ minres(rs);
 list J=rs;
 betti(J);
 kill cyc5;
-$
+tst_status(1);$

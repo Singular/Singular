@@ -84,4 +84,4 @@ list mm11=bareiss(m11);
 mm11;
 "-------------------------------------";
 listvar(all);
-quit;
+tst_status(1);$

@@ -15,4 +15,4 @@ proc firsts
   }
 }
 firsts("s",6,"abcdefg");
-$;
+LIB "tst.lib";tst_status(1);$;

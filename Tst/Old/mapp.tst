@@ -20,4 +20,4 @@ m1(i1);
 "------------------------------";
 listvar(all);
 kill r1,r2,r3,r4;
-$;
+LIB "tst.lib";tst_status(1);$;

@@ -7,4 +7,4 @@ ideal i=x,y,z;
 list I=sres(i,0);
 size(I);
 I;
-$
+LIB "tst.lib";tst_status(1);$

@@ -58,4 +58,4 @@ for (d=2; d<9; d=d+1)
     }
   }
 }
-$
+LIB "tst.lib";tst_status(1);$

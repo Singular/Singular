@@ -17,5 +17,5 @@ ring r=11,t,dp;
 poly f=2678962/25;
 f;
 kill r;
-$
+LIB "tst.lib";tst_status(1);$
 

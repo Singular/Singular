@@ -9,4 +9,4 @@ for (int i = 2; i<1000; i=i+50)
 2L^2000;
 2L^5000;
 2L^10000;
-$.
+LIB "tst.lib";tst_status(1);$.

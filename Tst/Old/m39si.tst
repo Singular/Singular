@@ -9,4 +9,4 @@
   matrix A;   // the 1 x 1 zero matrix
   matrix C=m; // defines C as a 3 x 3 matrix equal to m
   print(C);
-$
+LIB "tst.lib";tst_status(1);$

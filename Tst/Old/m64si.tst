@@ -17,4 +17,4 @@
   v;
   ideal k=fetch(q,i);
   k;
-$
+LIB "tst.lib";tst_status(1);$

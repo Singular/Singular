@@ -13,4 +13,4 @@ example sort;
 example sum;
 
 example killall;
-$
+LIB "tst.lib";tst_status(1);$

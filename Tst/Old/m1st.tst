@@ -7,4 +7,4 @@
   kk;
   LIB "general.lib";
   write("", which("Singular"));;
-$
+LIB "tst.lib";tst_status(1);$

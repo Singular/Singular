@@ -18,4 +18,4 @@ example T1;newline;
 example T2;newline;
 example T12;newline;
 example kmemory;
-$
+LIB "tst.lib";tst_status(1);$

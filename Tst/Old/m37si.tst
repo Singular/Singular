@@ -5,4 +5,4 @@
   vector v = [s1, s2-s1, s3-s1]+ s1*gen(5);
   // v is a vector in the free module of rank 5
   v;
-$
+LIB "tst.lib";tst_status(1);$

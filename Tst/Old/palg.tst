@@ -2289,4 +2289,4 @@ N;
 module(N);
 
 print(N);
-$
+LIB "tst.lib";tst_status(1);$

@@ -19,4 +19,4 @@ reduce(p,i);
 
 newline; "lead ?";
 lead(p);
-$
+LIB "tst.lib";tst_status(1);$

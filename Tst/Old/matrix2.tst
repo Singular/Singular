@@ -42,4 +42,4 @@ int j = 999999999;
 matrix m6[3][2] = j,j..4;
 matrix m7[3][2] = ,;
 matrix m8[3][2] = ,4;
-$
+LIB "tst.lib";tst_status(1);$

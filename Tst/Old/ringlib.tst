@@ -10,4 +10,4 @@ example fetchall;
 example imapall;
 example mapall;
 example ringtensor;
-$
+LIB "tst.lib";tst_status(1);$

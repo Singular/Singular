@@ -3,4 +3,4 @@
   ideal j= homog(jacob(f),w);
   list jj=nres(j,0);
   regularity(jj);
-$
+LIB "tst.lib";tst_status(1);$

@@ -109,4 +109,4 @@ intersect(Ms,NN);
 intersect(Ms,NN,N);
 kill r;
 
-$;
+tst_status(1);$;

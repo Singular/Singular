@@ -5,4 +5,4 @@
   // timer as int_expression:
   timer-t;  // returns the time used in sec
             // since t was set to timer
-$
+LIB "tst.lib";tst_status(1);$

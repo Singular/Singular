@@ -70,4 +70,4 @@
   size(reduce(qh,std(qsat)));
   size(reduce(qsat,std(qh)));
   // both ideals coincide
-$
+LIB "tst.lib";tst_status(1);$

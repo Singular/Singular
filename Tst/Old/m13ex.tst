@@ -13,4 +13,4 @@
     "n =" + space + string (n);
   }
   kill n,j;
-$
+LIB "tst.lib";tst_status(1);$

@@ -25,4 +25,4 @@ v2=v2+f3*gen(36);
 v2;
 listvar(all);
 kill r1;
-$;
+LIB "tst.lib";tst_status(1);$;

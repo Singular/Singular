@@ -13,4 +13,4 @@
   t=timer;
   ideal j0 =std(i); 
   timer-t;    
-$
+LIB "tst.lib";tst_status(1);$

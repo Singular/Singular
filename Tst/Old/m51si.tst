@@ -10,4 +10,4 @@
   coef(v,y,mc,mm);
   print(mc);
   print(mm);
-$
+LIB "tst.lib";tst_status(1);$

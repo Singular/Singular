@@ -302,5 +302,5 @@ getdump("MPfile: /tmp/mptest");
 //read(ll);
 //close(ll);
 dump("");
-quit();
+LIB "tst.lib";tst_status(1);$
 

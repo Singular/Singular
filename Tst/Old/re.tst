@@ -22,4 +22,4 @@ def M(1..5)=M[1..5];
 "-----------------------";
 listvar(all);
 kill r1;
-$;
+LIB "tst.lib";tst_status(1);$;

@@ -29,5 +29,5 @@ number n;
 number n1 = 2*a^2*b*c -3*b*c + -1*a + 4;
 number n2 = n1 / (n1 - 5c)^2;
 n2;
-$
-$
+LIB "tst.lib";tst_status(1);$
+LIB "tst.lib";tst_status(1);$

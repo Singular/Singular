@@ -6,4 +6,4 @@
   setring r1;
   ideal i1=preimage(r,f,i1);
   i1;
-$
+LIB "tst.lib";tst_status(1);$

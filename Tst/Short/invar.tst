@@ -54,4 +54,4 @@ kill rd,r1;
   ideal in=invariantRing(m,x(2),x(1),0);
   in;
 kill w;
-$
+tst_status(1);$

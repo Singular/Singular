@@ -117,4 +117,4 @@ matrix M = jacob(i);
 M;
 ideal m = minor(M,4);
 m;
-$;
+LIB "tst.lib";tst_status(1);$;

@@ -20,4 +20,4 @@ ring Q=si;
 qring Q=si;
 x2+y2==0;
 // Aber das duerfte doch Singular nicht so durcheinander bringen?
-$
+LIB "tst.lib";tst_status(1);$

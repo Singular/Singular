@@ -128,5 +128,5 @@ kill r;
 // could not display number from lists (sleftv::String())
 // OB/HS
 ring r=0,x,dpi;list l=1/2;l[1];
-$
+LIB "tst.lib";tst_status(1);$
 

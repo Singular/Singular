@@ -17,4 +17,4 @@ s1;
 "------------------------";
 listvar(all);
 kill r;
-$;
+LIB "tst.lib";tst_status(1);$;

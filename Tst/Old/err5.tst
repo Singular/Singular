@@ -38,4 +38,4 @@ x*gen(2),
 y^3*gen(2);
 vdim(i);
 kbase(i);
-$
+LIB "tst.lib";tst_status(1);$

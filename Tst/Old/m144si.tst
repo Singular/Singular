@@ -4,4 +4,4 @@
   int i=7;
   ideal I=f,x,y;
   monitor("");
-$
+LIB "tst.lib";tst_status(1);$

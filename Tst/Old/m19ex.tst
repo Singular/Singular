@@ -29,4 +29,4 @@
                     //embedded (takes a few seconds)
   min_ass_prim_charsets(J,1);  
   radical(J);
-$
+LIB "tst.lib";tst_status(1);$

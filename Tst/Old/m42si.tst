@@ -5,4 +5,4 @@
   ideal i = x^2, y^2 + z^3;
   l[3] = i;
   l;
-$
+LIB "tst.lib";tst_status(1);$

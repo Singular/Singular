@@ -17,4 +17,4 @@ for (int ii=1; ii<=nrows(m); ii=ii+1)
 {
   execute mrows(m,ii);
 }
-$;
+LIB "tst.lib";tst_status(1);$;

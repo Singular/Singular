@@ -1,7 +1,7 @@
 LIB "tst.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: dbm_s.tst,v 1.1.1.1 1998-04-17 15:07:41 obachman Exp $");
+tst_ignore("CVS: $Id: dbm_s.tst,v 1.2 1998-07-01 10:20:13 obachman Exp $");
 
 "==============================================";
 " DBM link tests ";
@@ -67,4 +67,4 @@ read(l,"a1");
 i=system("sh", "/bin/rm -f db1.dir db1.pag db2.dir db2.pag");
 i=system("sh", "/bin/rm -f test.dir test.pag");
 
-quit;
+tst_status(1);$

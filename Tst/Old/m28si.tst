@@ -7,4 +7,4 @@
   s;
   s1,s2;
   f,i,s;
-$
+LIB "tst.lib";tst_status(1);$

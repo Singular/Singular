@@ -31,4 +31,4 @@ size(i0);
 degree (i0);
 i0;
 kill rh8,a,b,c,t;
-$
+LIB "tst.lib";tst_status(1);$

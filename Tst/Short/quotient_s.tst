@@ -28,4 +28,4 @@ ideal id6=quotient(id1,id2);
 id6;
 ideal id7=quotient(id2,id1);
 id7;
-$;
+tst_status(1);$;

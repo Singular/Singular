@@ -5,4 +5,4 @@
   ideal i = s1, s2, s3;
   // compute standard basis j
   ideal j = std(i);
-$
+LIB "tst.lib";tst_status(1);$

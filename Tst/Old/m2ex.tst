@@ -10,4 +10,4 @@
   vdim(std(j));
   vdim(std(j+f));
   timer=0;  // reset timer
-$
+LIB "tst.lib";tst_status(1);$

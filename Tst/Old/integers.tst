@@ -297,4 +297,4 @@ id >= 20;
 id and 20;
 id or 20;
 -(id + 20);
-$
+LIB "tst.lib";tst_status(1);$

@@ -13,4 +13,4 @@
   option(none);
   option(set,i);
   option();
-$
+LIB "tst.lib";tst_status(1);$

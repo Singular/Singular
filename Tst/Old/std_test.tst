@@ -118,5 +118,5 @@ option(prot);
 
 check_std_all(9, orderings)
 
-quit;
+LIB "tst.lib";tst_status(1);$
 

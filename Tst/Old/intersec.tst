@@ -40,5 +40,5 @@ intersect(x,y,z);
 intersect(ideal(x),ideal(y),ideal(z2),ideal(z));
 intersect(x,y,z2,z);
 kill r1;
-$;
+LIB "tst.lib";tst_status(1);$;
 //bsp mit char 0

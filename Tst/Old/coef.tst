@@ -15,4 +15,4 @@ ring r=32003,(x,y),ds;
 poly f=1+444x+xy+x3y;
 coef(f,x);
 kill r;
-$
+LIB "tst.lib";tst_status(1);$

@@ -19,4 +19,4 @@
   v=[f,1,0];
   module m=v,v,[1,x2,z3,0,1];
   jet(m,2);
-$
+LIB "tst.lib";tst_status(1);$

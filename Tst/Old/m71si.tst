@@ -7,4 +7,4 @@
   homog(i,z);
   homog(i);
   homog(homog(i,z));
-$
+LIB "tst.lib";tst_status(1);$

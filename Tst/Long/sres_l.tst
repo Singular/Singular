@@ -118,4 +118,4 @@ i=std(i);
 list I=sres(i,0);
 betti(I);
 kill ra;
-$
+tst_status(1);$

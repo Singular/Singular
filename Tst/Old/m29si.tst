@@ -7,4 +7,4 @@
   vector v=[1,2];
   print(matrix(v));
   module(matrix(i,3,2));
-$
+LIB "tst.lib";tst_status(1);$

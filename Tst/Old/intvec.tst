@@ -53,4 +53,4 @@ i;
 i*j;
 transpose(j)*j;
 trace(j);
-$
+LIB "tst.lib";tst_status(1);$

@@ -21,4 +21,4 @@ for (i=1; i<100; i=i+1)
   poly rp(i) = y^i;
 }
 listvar(all);
-$
+LIB "tst.lib";tst_status(1);$

@@ -34,6 +34,6 @@ ideal ii=
 t2xyz,tx2yz,t3yz,x3yz;
 ii=std(ii);
 degree(ii);
-$
+LIB "tst.lib";tst_status(1);$
 
-$;
+LIB "tst.lib";tst_status(1);$;

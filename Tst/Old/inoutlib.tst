@@ -12,5 +12,5 @@ example tab;newline;
 example writelist;
 LIB "lib0.lib";
 example kmemory;newline;
-$
+LIB "tst.lib";tst_status(1);$
 

@@ -14,4 +14,4 @@ LIB "lib";                             // make formmat available
 formmat(mm);
 kill r;
 memory(0);
-$;
+LIB "tst.lib";tst_status(1);$;

@@ -4,4 +4,4 @@
   // although maxideal(2) is a standard basis,
   // Singular does not know it:
   attrib(maxideal(2), "isSB");
-$
+LIB "tst.lib";tst_status(1);$

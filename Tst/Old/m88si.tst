@@ -3,4 +3,4 @@
   ideal id4=maxideal(3)+id2;
   id4;
   minbase(id4);
-$
+LIB "tst.lib";tst_status(1);$

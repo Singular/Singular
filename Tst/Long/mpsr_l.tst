@@ -375,7 +375,7 @@ tst_ignore(system("sh", "rm -rf _dump.*"));
 
 killall("proc");
 dump("");
-$
+tst_status(1);$
 
 
   

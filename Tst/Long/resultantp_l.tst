@@ -1,4 +1,4 @@
-// $Id: resultantp_l.tst,v 1.3 1998-04-22 07:58:14 schmidt Exp $
+// $Id: resultantp_l.tst,v 1.4 1998-07-01 10:11:02 obachman Exp $
 
 //
 // resultantp_l.tst - long tests for resultant calculations mod p.
@@ -17,7 +17,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: resultantp_l.tst,v 1.3 1998-04-22 07:58:14 schmidt Exp $");
+tst_ignore("CVS ID  : $Id: resultantp_l.tst,v 1.4 1998-07-01 10:11:02 obachman Exp $");
 
 //
 // - ring r1=32003,x,dp.
@@ -194,4 +194,4 @@ g=(7790*t^3*x^31+10495*t^2*x^31+3298*t*x^31+22265*x^31+17500*t^3*x^30+10225*t^2*
 
 resultant(f, g, x);
 resultant(f, g+1, x);
-$
+tst_status(1);$

@@ -6,4 +6,4 @@
   module m = s1, s2-s1,f*(s3-s1);
   // show m in the matrix format (columns generate m)
   print(m);
-$
+LIB "tst.lib";tst_status(1);$

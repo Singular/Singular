@@ -5,4 +5,4 @@
   vector w=[z3-x,3y];
   v-w;
   v*(z+x);
-$
+LIB "tst.lib";tst_status(1);$

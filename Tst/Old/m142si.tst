@@ -5,4 +5,4 @@
   kill i,r;
   i;
   listvar();
-$
+LIB "tst.lib";tst_status(1);$

@@ -3,4 +3,4 @@
   ideal i = std(jacob(f));
   mult(i);
   mult(std(f));
-$
+LIB "tst.lib";tst_status(1);$

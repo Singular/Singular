@@ -31,4 +31,4 @@
   v2;
   v1[3];                // 3-rd coefficient of the 1-st Hilbert series
   module N=T2(i);
-$
+LIB "tst.lib";tst_status(1);$

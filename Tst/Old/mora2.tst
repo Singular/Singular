@@ -42,4 +42,4 @@ ideal j=std(i);
                                                         + string(size(j));
 j;                                                        
 kill p2;
-$
+LIB "tst.lib";tst_status(1);$

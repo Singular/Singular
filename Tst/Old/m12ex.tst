@@ -26,4 +26,4 @@
   print(B,"betti");
   N-ncols(B)+1;                          // the desired depth
   killall();
-$
+LIB "tst.lib";tst_status(1);$

@@ -6,4 +6,4 @@
   ord(f);
   vector v=[x2,y];
   ord(v);
-$
+LIB "tst.lib";tst_status(1);$

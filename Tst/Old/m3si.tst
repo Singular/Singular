@@ -4,4 +4,4 @@
   ideal j(jindex);     // is equivalent with the above
   ideal j(2)=x;
   j(2..3);
-$
+LIB "tst.lib";tst_status(1);$

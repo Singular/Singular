@@ -91,4 +91,4 @@ option(prot);
 
 module E=Ext(2,D,J);
 
-$
+LIB "tst.lib";tst_status(1);$

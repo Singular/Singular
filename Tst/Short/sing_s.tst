@@ -20,4 +20,4 @@ example tjurina;
 example T1;
 example T2;
 example T12;
-$
+tst_status(1);$

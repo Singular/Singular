@@ -31,4 +31,4 @@ matrix T;
 ideal sm=liftstd(i,T);
 matrix(sm)-matrix(i)*T;
 kill R;
-$;
+tst_status(1);$;

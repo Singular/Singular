@@ -11,5 +11,5 @@ kill ii;
 ii(1);
 ii(2);
 ii(3);
-$
+LIB "tst.lib";tst_status(1);$
 

@@ -6,4 +6,4 @@ imap(r1,f);
 poly f=imap(r1,f);
 f;
 listvar(all);
-$
+LIB "tst.lib";tst_status(1);$

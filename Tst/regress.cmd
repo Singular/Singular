@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.18 1998-06-30 14:47:00 obachman Exp $
+# $Id: regress.cmd,v 1.19 1998-07-01 10:10:27 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -90,7 +90,7 @@ else
 # 
 # the default settings
 #
-$singularOptions = "--ticks-per-sec=10 -teqr12345678";
+$singularOptions = "--ticks-per-sec=100 -teqr12345678";
 $keep = "no";
 $verbosity = 1;
 $generate = "no";
@@ -104,7 +104,7 @@ if ( (! (-e $singular)) || (! (-x $singular)))
   $singular = $curr_dir."/../Singular$ext";
 }
 # sed scripts which are applied to res files before they are diff'ed
-$sed_scripts = "-e '/\\/\\/.*used time:/d' -e '/\\/\\/.*ignore:/d' -e '/error occurred in/d'";
+$sed_scripts = "-e '/\\/\\/.*used time:/d' -e '/\\/\\/.*tst_ignore:/d' -e '/error occurred in/d'";
 # default value (in %) above which differences are reported on -r
 $report_val = 10;
 # default value (in %) above which differences cause an error on -e
@@ -177,7 +177,7 @@ sub Diff
   }
   
   # clean up time
-#  &mysystem("$rm -f $root.res.cleaned $root.new.res.cleaned");
+  &mysystem("$rm -f $root.res.cleaned $root.new.res.cleaned");
   
   # there seems to be a bug here somewhere: even if diff reported
   # differenceses and exited with status != 0, then system still
@@ -208,11 +208,11 @@ sub tst_status_check
     {
       $prefix = "STDIN $1>";
     }
-    elsif ($line =~ /\/\/.*ignore:(\w+).*$hostname:(\d+)/ && $checks{$1})
+    elsif ($line =~ /\/\/.*tst_ignore:(\w+).*$hostname:(\d+)/ && $checks{$1})
     {
       $crit = $1;
       $res = $2;
-      if ($line =~ /\/\/.*ignore:$crit.*$hostname:(\d+)/)
+      if ($line =~ /\/\/.*tst_ignore:$crit.*$hostname:(\d+)/)
       {
 	$new_res = $1;
 	$res_diff = $res - $new_res;
@@ -258,19 +258,19 @@ sub tst_status_merge
   $line = <RES_FILE>;
   while ($line)
   {
-    if ($new_line =~ /\/\/.*ignore:(\w+).*$hostname:(\d+)/ && $merge{$1})
+    if ($new_line =~ /\/\/.*tst_ignore:(\w+).*$hostname:(\d+)/ && $merge{$1})
     {
       $crit = $1;
       $new_res = $2;
-      if ($line =~ /(.*)\/\/(.*)ignore:$crit(.*)$hostname:(\d+)(.*)/)
+      if ($line =~ /(.*)\/\/(.*)tst_ignore:$crit(.*)$hostname:(\d+)(.*)/)
       {
 	print(TEMP_FILE
-	      "$1//$2ignore:$crit$3$hostname:$new_res$4");
+	      "$1//$2tst_ignore:$crit$3$hostname:$new_res$4");
       }
-      elsif ($line =~ /(.*)\/\/(.*)ignore:$crit(.*)/)
+      elsif ($line =~ /(.*)\/\/(.*)tst_ignore:$crit(.*)/)
       {
 	print(TEMP_FILE
-	      "$1//$2ignore:$crit$3 $hostname:$new_res\n");
+	      "$1//$2tst_ignore:$crit$3 $hostname:$new_res\n");
       }
       else
       {

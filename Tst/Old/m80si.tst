@@ -4,4 +4,4 @@
   print(koszul(1,I));
   print(koszul(2,I));
   print(koszul(2,I)*koszul(3,I));
-$
+LIB "tst.lib";tst_status(1);$

@@ -2,4 +2,4 @@
   m;
   ring r = 0, (x,y,z), M(m);
   r;
-$
+LIB "tst.lib";tst_status(1);$

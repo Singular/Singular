@@ -4,4 +4,4 @@
   list l =bareiss(m);
   print(l[1]);
   l[2];
-$
+LIB "tst.lib";tst_status(1);$

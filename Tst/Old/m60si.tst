@@ -6,4 +6,4 @@
   eliminate(i,ts);
   intvec v=hilb(std(i),1);
   eliminate(i,ts,v);
-$
+LIB "tst.lib";tst_status(1);$

@@ -32,4 +32,4 @@ jet(v,1);
 jet(v,0);
 m;
 jet(m,2);
-$
+LIB "tst.lib";tst_status(1);$
