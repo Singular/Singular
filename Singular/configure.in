@@ -22,7 +22,8 @@ fi
 )
 AC_MSG_RESULT($ac_cv_singuname)
 if test "$ac_cv_singuname" = unknown; then
-  AC_MSG_ERROR(Unknown architecture: Check singuname.sh)
+  AC_MSG_WARN(Unknown architecture: Check singuname.sh)
+  ac_cv_singuname="unknown"
 fi
 AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname")
 
@@ -39,10 +40,10 @@ dnl
 dnl here are some defaults
 
 SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-1}
-SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-2}
+SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-3}
 SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-0}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"June 1998"}
+VERSION_DATE=${VERSION_DATE:-"July 1998"}
 
 dnl pass them on into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
