@@ -3,14 +3,20 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.29 2002-07-23 13:09:36 Singular Exp $ */
+/* $Id: longrat.h,v 1.30 2002-11-04 16:52:23 bricken Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
 #include "structs.h"
 
 extern "C" {
+#ifdef __cplusplus
+#undef __cplusplus
 #include <gmp.h>
+#define __cplusplus
+#else
+#include <gmp.h>
+#endif
 }
 #ifdef HAVE_SMALLGMP
 #  define HAVE_LIBGMP2
