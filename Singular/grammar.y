@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.13 1997-06-17 11:43:43 Singular Exp $ */
+/* $Id: grammar.y,v 1.14 1997-06-25 07:53:08 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -638,6 +638,24 @@ expr:   expr_arithmetic
         | quote_start expr quote_end
           {
             $$=$2;
+          }
+        | quote_start LIB_CMD '(' expr ')' quote_end
+          {
+            #ifdef SIQ
+            siq++;
+            if (siq>0)
+            { if (iiExprArith1(&$$,&$4,LIB_CMD)) YYERROR; }
+            else
+            #endif
+            {
+              memset(&$$,0,sizeof($$));
+              $$.rtyp=NONE;
+              if (($4.Typ()!=STRING_CMD)||(iiLibCmd((char *)$4.Data())))
+                YYERROR;
+            }
+            #ifdef SIQ
+            siq--;
+            #endif
           }
         | quote_start expr '=' expr quote_end
           {
