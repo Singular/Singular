@@ -72,7 +72,6 @@ LIBS		= -lsingfac -lsingcf -lntl -lgmp -lreadline -lncurses
 endif
 MP_LIBS		= @MP_LIBS@
 DL_KERNEL	= @DL_KERNEL@
-HAVE_MPSR       = @HAVE_MPSR@
 
 ifdef LD_STATIC
 LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS} 
@@ -95,35 +94,29 @@ endif
 ###
 
 # normal C++ source files
-CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
-    clapsing.cc cntrlc.cc mminit.cc\
-    extra.cc febase.cc feread.cc fehelp.cc feResource.cc feOpt.cc \
+CXXSOURCES=algmap.cc clapconv.cc \
+    clapsing.cc mminit.cc\
+    febase.cc feread.cc fehelp.cc feResource.cc feOpt.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     gring.cc gr_kstd2.cc\
     ideals.cc intvec.cc \
-    ipassign.cc ipconv.cc ipid.cc iplib.cc \
-    ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
-    kstd1.cc kstd2.cc kutil.cc lists.cc \
+    khstd.cc kstdfac.cc \
+    kstd1.cc kstd2.cc kutil.cc \
     longalg.cc longrat.cc longrat0.cc \
-    maps.cc matpol.cc misc.cc sdb.cc gnumpfl.cc gnumpc.cc \
+    maps.cc matpol.cc misc.cc gnumpfl.cc gnumpc.cc \
     modulop.cc mpr_complex.cc sparsmat.cc \
     fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
-    ring.cc shortfl.cc silink.cc kspoly.cc \
-    subexpr.cc syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
+    ring.cc shortfl.cc kspoly.cc \
+    syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
     timer.cc walk.cc weight.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
-    libparse.cc mod_raw.cc sing_win.cc\
-    eigenval.cc gms.cc pcv.cc units.cc kbuckets.cc sbuckets.cc\
+    mod_raw.cc sing_win.cc\
+    eigenval.cc pcv.cc units.cc kbuckets.cc sbuckets.cc\
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
     pShallowCopyDelete.cc 
-
-# stuff for MP
-MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
-	mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
-
 
 # stuff for dbm
 DBMSR_SOURCES =  ndbm.cc sing_dbm.cc
@@ -142,15 +135,15 @@ DL_LIB_SOURCES=p_Procs_Lib.cc
 STATIC_SOURCES=p_Procs_Static.cc slInit_Static.cc 
 
 # C++ sources for which both, shared and static object files are needed
-COMMON_SOURCES = $(MPSR_SOURCES) $(DBMSR_SOURCES)
+COMMON_SOURCES = $(DBMSR_SOURCES)
 
 # special C++ source files (need extra compiling and/or linking), for which
 # dependencies should be generated
-ESOURCES=mmalloc.cc iparith.cc $(COMMON_SOURCES) \
+ESOURCES=mmalloc.cc $(COMMON_SOURCES) \
 	$(DL_KERNEL_SOURCES) $(DL_LIB_SOURCES) $(STATIC_SOURCES) 
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
-	grammar.y scanner.l libparse.l syz2.cc prCopyTemplate.cc \
+	syz2.cc prCopyTemplate.cc \
         p_Delete__T.cc p_ShallowCopyDelete__T.cc \
         p_Copy__T.cc p_Mult_nn__T.cc  pp_Mult_nn__T.cc \
         pp_Mult_mm__T.cc p_Mult_mm__T.cc \
@@ -159,24 +152,24 @@ SOURCES=${CSOURCES} ${CXXSOURCES} \
 	pp_Mult_Coeff_mm_DivSelectMult__T.cc \
 	p_Merge_q__T.cc pp_Mult_mm_Noether__T.cc\
 	p_kBucketSetLm__T.cc \
-	kInline.cc utils.cc utils.h \
-	tesths.cc mpsr_Tok.cc claptmpl.cc 
+	kInline.cc \
+	claptmpl.cc 
 
-HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
-	longalg.h mpsr_Tok.h structs.h intvec.h longrat.h \
-	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
-	subexpr.h clapsing.h ipid.h matpol.h polys.h p_polys.h syz.h \
-	cntrlc.h ipprint.h ring.h timer.h sdb.h dError.h \
-	febase.h ipshell.h shortfl.h tok.h mpr_complex.h mpr_global.h \
+HEADERS=algmap.h hutil.h stairc.h ideals.h \
+	longalg.h structs.h intvec.h longrat.h \
+	numbers.h stype.h clapconv.h maps.h page.h \
+	clapsing.h matpol.h polys.h p_polys.h syz.h \
+	cntrlc.h ring.h timer.h sdb.h dError.h \
+	febase.h shortfl.h mpr_complex.h mpr_global.h \
 	page.h gring.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
-	fglmgauss.h fglmvec.h mpsr.h mpsr_sl.h\
-	kstdfac.h mpsr_Get.h kmatrix.h\
-	kutil.h mpsr_Put.h\
-	ndbm.h dbm_sl.h polys-impl.h libparse.h \
+	fglmgauss.h fglmvec.h \
+	kstdfac.h kmatrix.h\
+	kutil.h \
+	ndbm.h dbm_sl.h polys-impl.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
-	eigenval.h gms.h pcv.h units.h mod_raw.h kbuckets.h sbuckets.h\
+	eigenval.h units.h mod_raw.h kbuckets.h sbuckets.h\
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
 	feOpt.h fegetopt.h distrib.h walk.h \
 	prCopy.h prCopyMacros.h \
@@ -203,10 +196,6 @@ ifeq ($(DL_KERNEL),1)
 OBJS 	:= $(OBJS) $(DL_KERNEL_SOURCES:.cc=.o)
 DBMSR_SO= dbmsr.so
 DL_LIBS := $(P_PROCS_MODULES:%=p_Procs_%.so) $(DBMSR_SO)
-ifeq ($(HAVE_MPSR), 1)
-MPSR_SO	=	mpsr.so
-DL_LIBS := 	$(DL_LIBS) $(MPSR_SO)
-endif
 else
 ifndef LD_STATIC
 LIBS := $(MP_LIBS) $(LIBS)
@@ -239,21 +228,6 @@ GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 ##
 ## Build Targets
 ##
-.l.cc:
-	@if test "x${LEX}" = x; then \
-		echo Error: no lex given, could not rebuilt scanner.cc;\
-                exit 1; \
-	fi
-	${LEX} -s -I -t $< > scanner.cc
-.y.cc:
-	@if test "x${BISON}" = x; then \
-		echo Error: no bison given, could not rebuilt grammar.cc;\
-                exit 1; \
-	fi
-	${BISON} -d -t -o grammar.cc $<
-	chmod +x testgh
-	./testgh
-
 .cc.o:	
 	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 .c.o:
@@ -275,17 +249,15 @@ Singular-static: version.h
 	${MAKE} LD_STATIC=1 S_EXT="-static" Singular-static
 	echo "#undef HAVE_STATIC" > static.h
 
-Singular${S_EXT}: mod2.h Makefile version.h scanner.cc  ${OBJS} mmalloc.o \
-          iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS)
+Singular${S_EXT}: mod2.h Makefile version.h ${OBJS} mmalloc.o \
+          tesths.cc claptmpl.o $(DL_LIBS)
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	  -o Singular${S_EXT} \
-	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
+	  tesths.cc claptmpl.o\
 	  ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug mmalloc.o
 
 %.static: version.h
 	${MAKE} DL_KERNEL=0 S_EXT=".static" $@
-
-iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
 cntrlc.o cntrlc.og : feOptES.inc feOptTS.inc feOpt.inc
 
@@ -294,31 +266,9 @@ p_Procs_Lib.o: p_Procs_Lib.inc
 claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 
-iparith.inc mpsr_Tok.inc: claptmpl.o iparith.cc mmalloc.o\
-                          ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
-	     -o gentable claptmpl.o iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug mmalloc.o
-	./gentable
-	/bin/rm -f gentable gentable.exe
-
-
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
 	echo "#define feVersionId "  `date '+%Y%m%d%H'` >version.h
-
-libparse: libparse_main.o utils.o fegetopt.o febase.cc
-	${CXX}  -DSTANDALONE_PARSER -o libparse febase.cc libparse_main.o utils.o fegetopt.o
-
-libparse_main.o: libparse.cc
-	${CXX} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
-
-libparse.cc: libparse.l
-	@if test "x${LEX}" = x; then \
-		echo Error: no lex given, could not rebuilt libparse.cc;\
-                exit 1; \
-	fi
-	${LEX} -I -Pyylp -olibparse.cc libparse.l
 
 # Hmm compiling with -fomit-frame-pointer resulted in access violation
 # under cygwin
@@ -369,38 +319,21 @@ p_Procs_%.inc: p_Procs_Generate.cc p_Procs_Impl.h mod2.h
 p_Procs_%.so: p_Procs_Lib_%.dl_o
 	$(LD) ${SLDFLAGS} -o $@ $^
 
-mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
-	$(LD) ${SLDFLAGS} -o $@ $^ -L${libdir} ${MP_LIBS}
-
 dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
 	$(LD) ${SLDFLAGS} -o $@ $^
 
-src: scanner.cc grammar.h grammar.cc libparse.cc 
-
 mod2.h: stamp-h
 
-stamp-h : config.status mod2.h.in
-	CONFIG_FILES= CONFIG_HEADERS="mod2.h" ./config.status
+stamp-h : ../Singular/config.status mod2.h.in
+	CONFIG_FILES= CONFIG_HEADERS="mod2.h" ../Singular/config.status
 
-Makefile: Makefile.in config.status
-	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./config.status
-
-config.status: configure
-	./config.status --recheck
-
-configure: configure.in
-	@echo "WARNING: You need to rerun autoconf. I am proceeding, for now."
-	@touch configure
-#	autoconf
+Makefile: Makefile.in ../Singular/config.status
+	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./../Singular/config.status
 
 ifeq ($(SINGUNAME),ix86-Win)
 ##
 ## windows only targets
 ##
-
-## resources
-Singular.rc: Singular.rc.in config.status
-	CONFIG_FILES="Singular.rc" CONFIG_HEADERS= ./config.status
 
 ESingular_res.o: Singular.rc
 	windres -DESINGULAR -i Singular.rc -o ESingular_res.o
@@ -430,10 +363,10 @@ endif
 ##
 install: all installbin installslib
 
-installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
+installbin: ${SING_EXEC} ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
-	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
+	${INSTALL_PROGRAM} ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
 	chmod a+x ${SINGULAR}${EXEC_EXT}
 	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
@@ -454,7 +387,7 @@ uninstallbin:
 ## clean targest
 ##
 mostlyclean: 
-	-rm -f Singular Singular-static Singulara Singularg Singularp Singularb libparse feOpt*.inc p_Procs_*.inc
+	-rm -f Singular Singular-static Singulara Singularg Singularp Singularb feOpt*.inc p_Procs_*.inc
 	-rm -f *.o *.og core *.op *.ob *.ot Singulart *.od *_d.cc *_d.c p_Procs *.oa *.dl_o* *.so*
 	-rm -f ESingular* TSingular*
 
@@ -463,15 +396,9 @@ clean: mostlyclean
 	-rm -f ${slibdir}
 
 distclean: clean
-	-rm -f iparith.inc mpsr_Tok.inc stamp.h 
+	-rm -f stamp.h 
 	-rm -f Singular* *.gprof *.bprof *~ .\#* version.h
-	-rm -f mod2.h Makefile TAGS* tags config.status config.cache config.log
-
-srcclean:
-	@echo "This command is intended for maintainers to use;"
-	@echo "Rebuilding the deleted files requires flex"
-	@echo "bison, perl"
-	-rm -f scanner.cc grammar.h grammar.cc libparse.cc
+	-rm -f mod2.h Makefile TAGS* tags
 
 maintainer-clean: distclean srcclean
 	@echo "This command is intended for maintainers to use;"
@@ -486,10 +413,10 @@ maintainer-clean: distclean srcclean
 install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	sleep 1
-	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
+	${MAKE} ${SING_EXEC} ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${install_bindir} 
 	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
-	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${DL_LIBS} ${install_bindir}
+	${INSTALL_PROGRAM} -s  ${RUN_SINGULARS} ESingular TSingular ${DL_LIBS} ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
 install-sharedist: ${SLIBS_FILES} LIB/gftables
@@ -556,19 +483,19 @@ DL_TAILA=\"soa\"
 ifeq ($(DL_KERNEL),1)
 
 OBJG := $(OBJG) $(DL_KERNEL_SOURCES:.cc=.og)
-DL_LIBSG := $(P_PROCS_MODULES:%=p_Procs_%.sog) $(MPSR_SO:%.so=%.sog) $(DBMSR_SO:%.so=%.sog)
+DL_LIBSG := $(P_PROCS_MODULES:%=p_Procs_%.sog) $(DBMSR_SO:%.so=%.sog)
 
 OBJP := $(OBJP) $(DL_KERNEL_SOURCES:.cc=.op)
-DL_LIBSP := $(P_PROCS_MODULES:%=p_Procs_%.sop) $(MPSR_SO:%.so=%.sop) $(DBMSR_SO:%.so=%.sop)
+DL_LIBSP := $(P_PROCS_MODULES:%=p_Procs_%.sop) $(DBMSR_SO:%.so=%.sop)
 
 OBJB := $(OBJB) $(DL_KERNEL_SOURCES:.cc=.ob)
-DL_LIBSB := $(P_PROCS_MODULES:%=p_Procs_%.sob) $(MPSR_SO:%.so=%.sob) $(DBMSR_SO:%.so=%.sob)
+DL_LIBSB := $(P_PROCS_MODULES:%=p_Procs_%.sob) $(DBMSR_SO:%.so=%.sob)
 
 OBJT := $(OBJT) $(DL_KERNEL_SOURCES:.cc=.ot)
-DL_LIBST := $(P_PROCS_MODULES:%=p_Procs_%.sot) $(MPSR_SO:%.so=%.sot) $(DBMSR_SO:%.so=%.sot)
+DL_LIBST := $(P_PROCS_MODULES:%=p_Procs_%.sot) $(DBMSR_SO:%.so=%.sot)
 
 OBJA := $(OBJA) $(DL_KERNEL_SOURCES:.cc=.oa)
-DL_LIBSA := $(P_PROCS_MODULES:%=p_Procs_%.soa) $(MPSR_SO:%.so=%.soa) $(DBMSR_SO:%.so=%.soa)
+DL_LIBSA := $(P_PROCS_MODULES:%=p_Procs_%.soa) $(DBMSR_SO:%.so=%.soa)
 
 else
 
@@ -617,9 +544,6 @@ p_Procs_Lib_%.dl_og : p_Procs_Lib.cc  p_Procs_Dynamic.og
 %.dl_og: %.cc
 	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -c $< -o $@
 
-mpsr.sog: $(MPSR_SOURCES:.cc=.dl_og)
-	${CXXG} ${CXXFLAGSG} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
 dbmsr.sog: $(DBMSR_SOURCES:.cc=.dl_og)
 	${CXXG} ${CXXFLAGSG} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
@@ -632,17 +556,11 @@ claptmpl.og: claptmpl.cc mod2.h
 $(OBJG2) : %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-Singularg${S_EXT}: scanner.cc  $(OBJG)  mmalloc.og $(DL_LIBSG)\
-           iparith.og mpsr_Tok.og claptmpl.og tesths.cc version.h 
+Singularg${S_EXT}: $(OBJG)  mmalloc.og $(DL_LIBSG)\
+           claptmpl.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg${S_EXT} \
-	tesths.cc iparith.og mpsr_Tok.og claptmpl.og $(OBJG) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.og \
+	tesths.cc claptmpl.og $(OBJG) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.og \
 	${LD_DYN_FLAGS} ${LD_LIBC}
-
-iparith.og: iparith.inc iparith.cc
-	$(CXXG)  ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og
-
-mpsr_Tok.og: iparith.inc mpsr_Tok.cc
-	$(CXXG) ${CXXFLAGSG} ${CPPFLAGS} ${CXXTEMPLFLAGSG} ${DEFSG} -c mpsr_Tok.cc -o mpsr_Tok.og
 
 installg: Singularg
 	${MKINSTALLDIRS} ${bindir}
@@ -699,9 +617,6 @@ p_Procs_Lib_%.dl_op : p_Procs_Lib.cc p_Procs_Dynamic.op
 	${CXXP} ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} ${SFLAGS} -c $< -o $@
 
 
-mpsr.sop: $(MPSR_SOURCES:.cc=.dl_op)
-	${CXXP} ${CXXFLAGSP} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
 dbmsr.sop: $(DBMSR_SOURCES:.cc=.dl_op)
 	${CXXP} ${CXXFLAGSP} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
@@ -714,18 +629,11 @@ claptmpl.op: claptmpl.cc mod2.h
 $(OBJP2) : %.op: %.c
 	$(CCP)  ${CFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
-Singularp${S_EXT}: scanner.cc   $(OBJP) mmalloc.op\
-           iparith.op mpsr_Tok.op claptmpl.op tesths.cc version.h $(DL_LIBSP)
+Singularp${S_EXT}: $(OBJP) mmalloc.op\
+           claptmpl.op tesths.cc version.h $(DL_LIBSP)
 	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp${S_EXT} \
-	tesths.cc iparith.op mpsr_Tok.op claptmpl.op $(OBJP) ${LDFLAGSP} ${LIBS} -lomalloc_p mmalloc.op\
+	tesths.cc claptmpl.op $(OBJP) ${LDFLAGSP} ${LIBS} -lomalloc_p mmalloc.op\
 	${LD_DYN_FLAGS} 
-
-iparith.op: iparith.inc iparith.cc
-	$(CXXP)  ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -c iparith.cc -o iparith.op
-
-mpsr_Tok.op: iparith.inc mpsr_Tok.cc
-	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -c mpsr_Tok.cc -o mpsr_Tok.op
-
 
 ## for bprof
 p_Procs_%.sob: p_Procs_Lib_%.dl_ob
@@ -736,9 +644,6 @@ p_Procs_Lib_%.dl_ob : p_Procs_Lib.cc  p_Procs_Dynamic.ob
 
 %.dl_ob: %.cc
 	${CXXP} ${CXXFLAGSB} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSB} ${SFLAGS} -c $< -o $@
-
-mpsr.sob: $(MPSR_SOURCES:.cc=.dl_ob)
-	${CXXP} ${CXXFLAGSB} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
 dbmsr.sob: $(DBMSR_SOURCES:.cc=.dl_ob)
 	${CXXP} ${CXXFLAGSB} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
@@ -752,16 +657,10 @@ claptmpl.ob: claptmpl.cc mod2.h
 $(OBJB2) : %.ob: %.c
 	$(CCP)  ${CFLAGSP} ${CPPFLAGS} ${DEFSB} -c $< -o $@
 
-Singularb${S_EXT}: scanner.cc   $(OBJB) iparith.ob mpsr_Tok.ob claptmpl.ob tesths.cc version.h mmalloc.ob
+Singularb${S_EXT}: $(OBJB) claptmpl.ob tesths.cc version.h mmalloc.ob
 	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSB} -o Singularb${S_EXT} \
-	tesths.cc iparith.ob mpsr_Tok.ob claptmpl.ob $(OBJB) $(BPROFOBJ) \
+	tesths.cc claptmpl.ob $(OBJB) $(BPROFOBJ) \
 	${LDFLAGSP} ${LIBS} -lomalloc_ndebug mmalloc.ob ${LD_DYN_FLAGS} 
-
-iparith.ob: iparith.inc iparith.cc
-	$(CXXP)  ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSB} -c iparith.cc -o iparith.ob
-
-mpsr_Tok.ob: iparith.inc mpsr_Tok.cc
-	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSB} -c mpsr_Tok.cc -o mpsr_Tok.ob
 
 #
 # for mtrack
@@ -775,9 +674,6 @@ p_Procs_Lib_%.dl_ot : p_Procs_Lib.cc p_Procs_Dynamic.ot
 %.dl_ot: %.cc
 	${CXXP} ${CXXFLAGST} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFST} ${SFLAGS} -c $< -o $@
 
-mpsr.sot: $(MPSR_SOURCES:.cc=.dl_ot)
-	${CXXP} ${CXXFLAGST} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
 dbmsr.sot: $(DBMSR_SOURCES:.cc=.dl_ot)
 	${CXX} ${CXXFLAGST} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
@@ -790,17 +686,10 @@ claptmpl.ot: claptmpl.cc mod2.h
 $(OBJT2) : %.ot: %.c
 	$(CCP)  ${CFLAGST} ${CPPFLAGS} ${DEFST} -c $< -o $@
 
-Singulart${S_EXT}: scanner.cc   $(OBJT) iparith.ot mpsr_Tok.ot claptmpl.ot tesths.cc version.h  mmalloc.ot $(DL_LIBST)
+Singulart${S_EXT}: $(OBJT) claptmpl.ot tesths.cc version.h  mmalloc.ot $(DL_LIBST)
 	$(CXXP) ${CXXFLAGST} ${CPPFLAGS} ${DEFST} -o Singulart${S_EXT} \
-	tesths.cc iparith.ot mpsr_Tok.ot claptmpl.ot $(OBJT) ${LDFLAGST} ${LIBS} -lomalloc mmalloc.ot \
+	tesths.cc claptmpl.ot $(OBJT) ${LDFLAGST} ${LIBS} -lomalloc mmalloc.ot \
 	${LD_DYN_FLAGS} 
-
-iparith.ot: iparith.inc iparith.cc
-	$(CXXP)  ${CXXFLAGST} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFST} -c iparith.cc -o iparith.ot
-
-mpsr_Tok.ot: iparith.inc mpsr_Tok.cc
-	$(CXXP) ${CXXFLAGST} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFST} -c mpsr_Tok.cc -o mpsr_Tok.ot
-
 
 #
 # for Singulara
@@ -818,9 +707,6 @@ p_Procs_Lib_%.dl_oa : p_Procs_Lib.cc p_Procs_Dynamic.oa
 %.dl_oa: %.cc
 	${CXX} ${CXXFLAGSA} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSA} ${SFLAGS} -c $< -o $@
 
-mpsr.soa: $(MPSR_SOURCES:.cc=.dl_oa)
-	${CXX} ${CXXFLAGSA} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
 dbmsr.soa: $(DBMSR_SOURCES:.cc=.dl_oa)
 	${CXX} ${CXXFLAGSA} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
@@ -834,16 +720,10 @@ claptmpl.oa: claptmpl.cc mod2.h
 $(OBJA2) : %.oa: %.c
 	$(CC)  ${CFLAGSA} ${CPPFLAGS} ${DEFSA} -c $< -o $@
 
-Singulara${S_EXT}: scanner.cc   $(OBJA) iparith.oa mpsr_Tok.oa claptmpl.oa tesths.cc version.h  mmalloc.oa $(DL_LIBSA)
+Singulara${S_EXT}: $(OBJA) claptmpl.oa tesths.cc version.h  mmalloc.oa $(DL_LIBSA)
 	$(CXX) ${CXXFLAGSA} ${CPPFLAGS} ${DEFSA} -o Singulara${S_EXT} \
-	tesths.cc iparith.oa mpsr_Tok.oa claptmpl.oa $(OBJA) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.oa \
+	tesths.cc claptmpl.oa $(OBJA) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.oa \
 	${LD_DYN_FLAGS} 
-
-iparith.oa: iparith.inc iparith.cc
-	$(CXX)  ${CXXFLAGSA} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSA} -c iparith.cc -o iparith.oa
-
-mpsr_Tok.oa: iparith.inc mpsr_Tok.cc
-	$(CXX) ${CXXFLAGAT} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFSA} -c mpsr_Tok.cc -o mpsr_Tok.oa
 
 #
 # for Macro expansion
@@ -867,10 +747,10 @@ OBJD2 := $(CSOURCESD:.c=.od)
 %.od : %.cc
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-Singular_d: scanner.cc  $(OBJD)  mmalloc.od\
-           iparith.od mpsr_Tok.od claptmpl.og tesths.cc version.h 
+Singular_d: $(OBJD)  mmalloc.od\
+           claptmpl.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg_d \
-	tesths.cc iparith.od mpsr_Tok.od claptmpl.og $(OBJG) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.od \
+	tesths.cc claptmpl.og $(OBJG) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.od \
 	${LD_DYN_FLAGS} ${LD_LIBC} 
 
 ##
