@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.37 2000-12-31 15:14:35 obachman Exp $ */
+/* $Id: matpol.cc,v 1.38 2001-01-12 12:30:32 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -631,7 +631,7 @@ BOOLEAN mpJacobi(leftv res,leftv a)
 * returns the Koszul-matrix of degree d of a vectorspace with dimension n
 * uses the first n entrees of id, if id <> NULL
 */
-BOOLEAN mpKoszul(leftv res,leftv b/*in*/, leftv c/*ip*/,leftv id)
+BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id)
 {
   int n=(int)b->Data();
   int d=(int)c->Data();
