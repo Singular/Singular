@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.35 2002-06-26 11:16:44 Singular Exp $ */
+/* $Id: ipid.h,v 1.36 2002-11-21 13:17:47 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -158,6 +158,7 @@ idhdl packFindHdl(package r);
 #define FLAG_STD   0
 #define FLAG_DRING 1
 #define FLAG_DOPERATOR 2
+#define FLAG_TWOSTD  3
 #define hasFlag(A,F) Sy_inset((F),(A)->flag)
 #define setFlag(A,F) (A)->flag|=Sy_bit(F)
 #define resetFlag(A,F) (A)->flag&=~Sy_bit(F)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.63 2002-06-26 11:16:44 Singular Exp $ */
+/* $Id: ipid.cc,v 1.64 2002-11-21 13:17:48 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -710,6 +710,9 @@ void ipListFlag(idhdl h)
 {
   if (hasFlag(h,FLAG_STD)) PrintS(" (SB)");
   if (hasFlag(h,FLAG_DRING)) PrintS(" (D)");
+#ifdef HAVE_PLURAL  
+  if (hasFlag(h,FLAG_TWOSTD)) PrintS(" (2SB)");
+#endif  
 }
 
 lists ipNameList(idhdl root)
