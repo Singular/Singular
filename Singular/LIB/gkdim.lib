@@ -1,0 +1,104 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: gkdim.lib,v 1.1 2004-03-18 20:40:21 levandov Exp $";
+category="Noncommutative";
+info="
+LIBRARY: GKdim.lib     Procedures for calculating the Gelfand-Kirillov dimension
+AUTHORS: Lobillo, F.J., email: jlobillo@ugr.es
+	 Rabelo, C., email: crabelo@ugr.es
+
+SUPPORT: Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
+
+
+PROCEDURES:
+GKdim(M);  	Gelfand-Kirillov dimension computation of the factor module basering^n/M where M is a left submodule of basering^n
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc idGKdim(ideal I)
+// This procedure computes the Gelfand-Kirillov dimension of R/I using
+// the dim procedure.
+{
+  if (attrib(I,"isSB")<>1)
+  {
+    I=std(I);
+  }
+  int i;
+  for (i=1; i<=size(I); i++)
+  {
+    I[i]=leadmonom(I[i]);
+  }
+ 
+  def oldring=basering;
+  string newringstring="ring newring=("+charstr(basering)+"),("+varstr(basering)+"),("+ordstr(basering)+")";
+  execute (newringstring);
+  setring newring;
+  ideal J=imap(oldring,I);
+  int d=dim(std(J));
+  setring oldring;
+  if (d==-1) {d++;} // The GK-dimension of a finite dimensional module is zero
+  return (d);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc GKdim(list L)
+"USAGE:   GKdim(L); L is an ideal or a module
+RETURN:  int, the Gelfand-Kirillov dimension of R^n/L
+EXAMPLE: example GKdim; shows examples
+"{
+  def M=L[1];
+  if (typeof(M)=="ideal") 
+  {
+    int d=idGKdim(M);
+  } 
+  else 
+  {
+    if (typeof(M)=="module") 
+    {
+      M=std(M);
+      int d=0;
+      int n=ncols(M); // Num of vectors defining M
+      int m=nrows(M); // The rank of the free module where M is imbedded
+      int i,j;
+      for (j=1; j<=n; j++)
+      {
+	M[j]=leadmonom(M[j]); // Only consider the leader monomial of each vector
+      }
+      intmat v[1][m]; // v will be the dimension of each stable subset
+      ideal I;
+      for (i=1; i<=m; i++)
+      {
+	I=0;
+	for (j=1; j<=n; j++)
+	{ // Extract each row like an ideal
+	  I=I,M[i,j];
+	}
+	v[1,i]=idGKdim(I);
+	if (v[1,i]>d) {d=v[1,i];}
+      }
+    } 
+    else 
+    {
+      string d="Error: The input must be an ideal or a module.";
+    }
+ }
+ return (d);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r = 0,(x,y,z),Dp;
+  matrix C[3][3]=0,1,1,0,0,-1,0,0,0;
+  matrix D[3][3]=0,0,0,0,0,x;
+  system("PLURAL",C,D);
+  r;
+  ideal I=x;
+  GKdim(I);
+  ideal J=x2,y;
+  GKdim(J);
+  module M=[x2,y,1],[x,y2,0];
+  GKdim(M);
+}
+
+///////////////////////////////////////////////////////////////////////////////

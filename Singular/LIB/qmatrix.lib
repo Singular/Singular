@@ -1,0 +1,287 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: qmatrix.lib,v 1.1 2004-03-18 20:40:22 levandov Exp $";
+category="Noncommutative";
+info="
+LIBRARY: qmatrix.lib     Definition of quantum matrix ring and quantum minors.
+AUTHORS: Lobillo, F.J., email: jlobillo@ugr.es
+	 Rabelo, C., email: crabelo@ugr.es
+
+SUPPORT: Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
+
+MAIN PROCEDURES:
+quant(n);		generates the quantum matrix ring of order n
+qminor(u,v,nr);  	calculate a quantum minor of a quantum matrix
+
+AUXILIARY PROCEDURES:
+SymGroup(n);  		generates an intmat containing S(n), each row is an element of S(n)
+LengthSymElement(v);	calculates the length of the element v of S(n)
+LengthSym(M);		calculates the length of each element of M, being M a subset of S(n)
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc SymGroup(int n)
+"USAGE:   SymGroup(n); n an integer, n>0
+RETURN:  intmat, containing the symmetric group S(n)
+NOTE:    each row is an element of S(n)
+EXAMPLE: example SymGroup; shows examples
+"{
+  if (n<=0)
+  {
+    "n must be positive";
+    intmat M[1][1]=0;
+  } 
+  else 
+  {
+    if (n==1)
+    {
+      intmat M[1][1]=1;
+    } 
+    else 
+    {
+      def N=SymGroup(n-1); // N is the symmetric group S(n-1)
+      int m=nrows(N); // The order of S(n-1)=(n-1)!
+      intmat M[m*n][n]; // Matrix to save S(n), m*n=n*(n-1)!=n!=#S(n)
+      int i,j,k;
+      for (i=1; i<=m; i++)
+      { // fixed an element i of S(n-1)
+	for (j=n; j>0; j--)
+	{ // and fixed a position j to introduce an "n"
+	  for (k=1; k<j; k++)
+	  { // we want to copy the i-th element until position j-1
+	    M[n*(i-1)+(n-j+1),k]=N[i,k];
+	  }
+	  M[n*(i-1)+(n-j+1),j]=n; // we write the "n" in the position j
+	  for (k=j+1; k<=n; k++)
+	  {
+	    M[n*(i-1)+(n-j+1),k]=N[i,k-1]; // and we run until the end of copying
+	  }
+	}
+      }
+    }
+  }
+  return (M);
+} example {
+  "EXAMPLE:";echo=2;
+  //  "S(3)={(1,2,3),(1,3,2),(3,1,2),(2,1,3),(2,3,1),(3,2,1)}";
+  SymGroup(3);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// This procedure calculates the length of an element v of a symmetric group
+// If size(v)=n, the group is S(n). The permutation is i->v[i].
+
+proc LengthSymElement(intvec v)
+"USAGE:   LengthSymElement(v); v an intvec representing an element of S(n)
+RETURN:  int, the length of v
+NOTE:    if v doesn't represent an element of S(n) you may obtain a nonsense output
+EXAMPLE: example LengthSymElement; shows examples
+"{
+  int n=size(v);
+  int l=0;
+  int i,j;
+  for (i=1; i<n; i++)
+  {
+    for (j=i+1; j<=n; j++)
+    {
+      if (v[j]<v[i]) {l++;}
+    }
+  }
+  return (l);
+} 
+example 
+{
+  "EXAMPLE:";echo=2;
+  intvec v=1,3,4,2,8,9,6,5,7,10;
+  LengthSymElement(v);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc LengthSym(intmat M)
+"USAGE:   LengthSym(M); M an intmat representing a subset of S(n) (each row must be an element of S(n))
+RETURN:  intvec, the i-th element is the length of the i-th row of M
+NOTE:    If M is not a subset of S(n), the output may not have meaning
+EXAMPLE: example LengthSym; shows examples
+"{
+  int n=ncols(M); // this n is the n of S(n)
+  int m=nrows(M); // m=num of element of S(n) in M, if M=S(n) m=n!
+  intvec L=0;
+  int i;
+  for (i=1; i<=m; i++)
+  {
+    L=L,LengthSymElement(intvec(M[i,1..n]));
+  }
+  L=L[2..size(L)];
+  return (L);
+} 
+example 
+{
+  "EXAMPLE:";echo=2;
+  def M=SymGroup(3);
+  M;
+  LengthSym(M);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc quant(int n, list #)
+"USAGE:   quant(n, [p]); n integer, n>1, p (optional) integer
+RETURN:  a ring, describing the quantum matrix ring of order n; if p is specified, the quantum parameter will be specialized at p-th root of unity
+NOTE:    You have to activate this ring with the "setring" command.
+         The usual representation of the variables in this quantum
+	 algebra is not used because double indexes are not allowed
+	 in the variables. Instead the variables are listed reading
+	 the rows of the usual matrix representation.
+EXAMPLE: example quant; shows examples
+"{
+  if (n>1)
+  {
+    int nv=n^2;
+    intmat m[nv][nv];
+    int i,j;
+    for (i=1; i<=nv; i++)
+    {
+      m[i,nv+1-i]=1;
+    }
+    ring @rrr=(0,q),(y(1..nv)),Dp;
+    if (size(#)>0) // check whether we are at special q
+    {
+      if ( typeof( #[1] ) == "int" )
+      {
+	int chr = #[1];
+	if (chr>1)
+	{
+	  LIB "nctools.lib";
+	  minpoly = RooOfUnity(chr);
+	}
+	else
+	{
+	  "The degree of a root should be at least 2";
+	}
+      }
+    }
+    setring @rrr;
+    matrix C[nv][nv]=0;
+    matrix D[nv][nv]=0;
+    intvec idyi, idyj;
+    for (i=1; i<nv; i++)
+    {
+      for (j=i+1; j<=nv; j++)
+      {
+	idyi=itoij(i,n);
+	idyj=itoij(j,n);
+	if (idyi[1]==idyj[1] || idyi[2]==idyj[2]) 
+	{
+	  C[i,j]=1/q;
+	} 
+	else 
+	{
+	  if (idyi[2]<idyj[2])
+	  {
+	    C[i,j]=1;
+	    D[i,j]=(1/q - q)*y(ijtoi(idyi[1],idyj[2],n))*y(ijtoi(idyj[1],idyi[2],n));
+	  }
+	  else 
+	  {
+	    C[i,j]=1;
+	  }
+	}
+      }
+    }
+    ncalgebra(C,D);
+    return (@rrr);
+  } 
+  else 
+  {
+    "ERROR: n must be greater than 1";
+    return();
+  }
+} 
+example 
+{
+  "EXAMPLE:"; echo=2;
+  def r=quant(2); // generate O_q(M_2) at q generic 
+  setring r; 
+  r;
+  kill r;
+  def r=quant(2,5); // generate O_q(M_2) at q^5=1
+  setring r;
+  r;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc qminor(intvec I, intvec J, int nr)
+"USAGE:	qminor(I,J,nr); I is the ORDERED LIST of the rows to consider
+	in the minor, J is the ORDERED LIST of the cols to consider in the minor 
+        and nr is the order of the quantum matrix algebra where you are working (quant(nr)).
+RETURN: poly, the quantum minor.
+NOTE:    I and J must have the same number of elements.
+EXAMPLE: example qminor; shows examples
+"{
+  poly d=0;
+  poly f=0;
+  int k=0;
+  int n=size(I);
+  if ( size(I)!=size(J) )
+  {
+    "#I must be equal to #J";
+  } 
+  else 
+  {
+    def Sn=SymGroup(n);
+    def L=LengthSym(Sn);
+    int m=size(L); // m is the order of S(n)
+    int i,j;
+    for (i=1; i<=m; i++)
+    {
+      f=(-q)^(L[i]);
+      for (j=1; j<=n; j++)
+      {
+	k=ijtoi(I[j],J[Sn[i,j]],nr);
+	f=f*y(k);
+      }
+      d=d+f;
+    }
+  }
+  return (d);
+} 
+example 
+{
+  "EXAMPLE: Let r be the quantum matrix of order 3."; echo=2;
+  def r=quant(3); setring r; 
+  intvec u=1,2;
+  intvec v=2,3;
+  intvec w=1,2,3;
+  qminor(w,w,3);
+  qminor(u,v,3);
+  qminor(v,u,3);
+  qminor(u,u,3);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// For tecnical reasons we work with a list of variables {y(1)...y(n²)}.
+// In quantum matrices the usual is to work with a square matrix of variables {y(ij)}.
+// The formulas are easier if we use matricial notation.
+// The following two procedures change the index of a list to a matrix and viceversa in order
+// to use matricial notation in the calculus but use list notation in input and output.
+// n is the order of the quantum matrix algebra where we are working.
+
+static proc itoij(int i, n)
+{
+  intvec ij=0,0;
+  ij[1]=((i-1) div n)+1;
+  ij[2]=((i-1) mod n)+1;
+  return(ij);
+}
+
+static proc ijtoi(int i, j, n)
+{
+  return((j-1)+n*(i-1)+1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
