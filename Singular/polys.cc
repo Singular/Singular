@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.48 1999-10-15 16:07:09 obachman Exp $ */
+/* $Id: polys.cc,v 1.49 1999-10-19 09:50:41 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -141,9 +141,9 @@ void rSetm(poly p)
         {
           int c=pGetComp(p);
 	  if (c > o->data.syz.limit)
-            p->exp.l[o->data.syz.place]= 0;
-	  else
             p->exp.l[o->data.syz.place]= 1;
+	  else
+            p->exp.l[o->data.syz.place]= 0;
           break;
         }
         default:

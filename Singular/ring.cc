@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.73 1999-10-15 16:00:18 Singular Exp $ */
+/* $Id: ring.cc,v 1.74 1999-10-19 09:50:42 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -77,6 +77,8 @@ int rBlocks(ring r)
   return i+1;
 }
 
+static ring o1_ring=NULL;
+static ring o2_ring=NULL;
 // internally changes the gloabl ring and resets the relevant
 // global variables:
 // complete == FALSE : only delete operations are enabled
@@ -112,10 +114,13 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
       {
         naMinimalPoly=((lnumber)r->minpoly)->z;
       }
-
-      /*------------ Garbage Collection -----------------------------------*/
-      mmGarbageCollectHeaps(2);
     }
+
+    /*------------ Garbage Collection -----------------------------------*/
+    if ((r!=o1_ring) && (r!=o2_ring))
+      mmGarbageCollectHeaps(2);
+    o1_ring=o2_ring;
+    o2_ring=r;
   }
 }
 
@@ -2711,12 +2716,12 @@ static void rO_Syz(int &place, int &prev_ord,
     long *o, sro_ord &ord_struct)
 {
   // ordering is derived from component number
-  if(prev_ord!= 1) rO_Align(place);
+  if(prev_ord!= -1) rO_Align(place);
   ord_struct.ord_typ=ro_syz;
   ord_struct.data.syz.place=place/(sizeof(long)/sizeof(Exponent_t));
   ord_struct.data.syz.limit=0;
-  o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
-  prev_ord=1;
+  o[place/(sizeof(long)/sizeof(Exponent_t))]=-1;
+  prev_ord=-1;
   place++;
   rO_Align(place);
 }
