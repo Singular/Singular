@@ -12,7 +12,7 @@
 
 #include "mod2.h"
 
-#if ! defined(MSDOS) && ! defined(__MWERKS__) 
+#if ! defined(MSDOS) && ! defined(__MWERKS__)
 
 #include <unistd.h> /* always defiend */
 #include <stdlib.h>
