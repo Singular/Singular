@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.42 2000-04-27 10:07:10 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.43 2000-07-27 12:11:29 Singular Exp $ */
 
 /***************************************************************
  *
@@ -130,7 +130,11 @@ poly _pCopy(memHeap d_h, poly s_p)
 
   assume(d_h != NULL && (d_h == mm_specHeap) ||
          d_h->size == mm_specHeap->size);
+#if defined(MDEBUG) && defined(PDEBUG)
+  pDBTest(s_p,f,l);
+#else
   pTest(s_p);
+#endif
   while (s_p != NULL)
   {
 #ifdef MDEBUG

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.56 2000-05-23 14:33:23 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.57 2000-07-27 12:11:29 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -383,7 +383,7 @@ static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr e)
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   ideal I=idInit(1,1);
   I->m[0]=(poly)a->CopyD(POLY_CMD);
-  if (I->m[0]!=NULL) pSetComp(I->m[0],1);
+  if (I->m[0]!=NULL) pSetCompP(I->m[0],1);
   res->data=(void *)I;
   return FALSE;
 }

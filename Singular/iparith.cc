@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.218 2000-07-11 12:28:44 obachman Exp $ */
+/* $Id: iparith.cc,v 1.219 2000-07-27 12:11:27 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1921,7 +1921,11 @@ static BOOLEAN jjREDUCE_P(leftv res, leftv u, leftv v)
 static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(v);
-  res->data = (char *)kNF((ideal)v->Data(),currQuotient,(ideal)u->Data());
+  ideal ui=(ideal)u->Data();
+  idTest(ui);
+  ideal vi=(ideal)v->Data();
+  idTest(vi);
+  res->data = (char *)kNF(vi,currQuotient,ui);
   return FALSE;
 }
 static BOOLEAN jjRES(leftv res, leftv u, leftv v)
