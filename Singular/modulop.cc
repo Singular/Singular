@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.27 2003-01-31 09:09:46 Singular Exp $ */
+/* $Id: modulop.cc,v 1.28 2003-01-31 09:12:10 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -449,9 +449,6 @@ static number npMapLongR(number from)
   res = (number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   res->debug=123456;
-#endif
-#ifndef NL_OLDCOPY
-  res->ref=1;
 #endif
   dest = &(res->z);
 
