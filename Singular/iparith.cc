@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.136 1999-03-15 09:20:59 Singular Exp $ */
+/* $Id: iparith.cc,v 1.137 1999-03-16 13:38:08 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2515,22 +2515,23 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
 {
   assumeStdFlag(v);
   intvec *w=(intvec*)atGet(v,"isHomog");
-  intvec *module_w=NULL;
+  BOOLEAN delete_w=FALSE;
   ideal I=(ideal)v->Data();
   int i;
   poly p=NULL,po=NULL;
   int rk=idRankFreeModule(I);
-  if (w!=NULL)
-    module_w=new intvec(*w);
-  else
-    module_w = new intvec(rk);
+  if (w==NULL)
+  {
+    w = new intvec(rk);
+    delete_w=TRUE;
+  }
   for(i=rk;i>0;i--)
   {
     p=iiHighCorner(I,i);
     if (p==NULL)
     {
       Werror("module must be zero-dimensional");
-      delete module_w;
+      if (delete_w) delete w;
       return TRUE;
     }
     if (po==NULL)
@@ -2540,7 +2541,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
     else
     {
       // now po!=NULL, p!=NULL
-      int d=(pFDeg(po)+(*module_w)[pGetComp(po)-1] - pFDeg(p)-(*module_w)[i-1]);
+      int d=(pFDeg(po)+(*w)[pGetComp(po)-1] - pFDeg(p)-(*w)[i-1]);
       if (d==0)
         d=pComp0(p,po);
       if (d > 0)
@@ -2553,7 +2554,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
       }
     }
   }
-  delete module_w;
+  if (delete_w) delete w;
   res->data=(void *)po;
   return FALSE;
 }
