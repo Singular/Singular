@@ -1,3 +1,7 @@
+Thu May  7 17:24:39 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* factorize.m4 (main): accepts optional variable now
+
 Mon Apr  6 13:36:37 MET DST 1998  Jens Schmidt
 
 	* ChangeLog, ftest_io.h, ftest_util.m4, ftest_util.cc:
