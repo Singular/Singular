@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.4 1999-07-07 16:38:34 obachman Exp $
+# $Id: doc2tex.pl,v 1.5 1999-07-09 14:12:47 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -291,7 +291,7 @@ sub HandleExample
         s/\? error occurred in [^ ]* line/\? error occurred in line/;
 	# break after $ex_length characters
 	$to_do = $_;
-	while (length($to_do) > $ex_length)
+	while (length($to_do) > $ex_length && $to_do =~ /\w/)
 	{
 	  $done .= substr($to_do, 0, $ex_length)."\\\n   ";
 	  $to_do = substr($to_do, $ex_length + 1);
@@ -569,9 +569,9 @@ sub GenerateLibDoc
 	if ($example = &CleanUpExample($lib, $example{$procs[$i]}))
 	{
 	  print LDOC "\@strong{Example:}\n";
-	  print LDOC "\@example\n\@c example\n";
+	  print LDOC "\@smallexample\n\@c example\n";
 	  print LDOC $example;
-	  print LDOC "\n\@c example\n\@end example\n";
+	  print LDOC "\n\@c example\n\@end smallexample\n";
 	}
 	OutRef(\*LDOC, $ref) if $ref;
 	print LDOC "\@c ---end content $procs[$i]---\n";
@@ -638,11 +638,38 @@ sub OutInfo
 
 sub FormatInfoText
 {
-  s/^\s*//; # remove whitespaces from beginning and end
-  s/\s*$//;
-  s/ +/ /g;  # replace double whitespeces by one
-  &protect_texi; # protect texinfo special chars
-  s/\n/\n\@*/g; # replace newline by forced newline
+  my $length = shift;
+  $length = 0 unless $length;
+  # insert @* infront of all lines whose previous line is shorter than
+  # 60 characters
+  $_ = ' ' x $length . $_;
+  if (/^(.*)\n/)
+  {
+    $_ .= "\n";
+    my $pline;
+    my $line;
+    my $ptext = $_;
+    my $text = '';
+    while ($ptext =~ /(.*)\n/g)
+    {
+      $line = $1;
+      $text .= '@*' 
+	if ($line =~ /\w/ && $pline =~ /\w/ && 
+	    ((length($pline) < 60) || $line =~ /^\s*\w\(.*?\)/));
+      $line =~ s/\s*$//;
+      $text .= "$line\n";
+      $pline = $line;
+    }
+    $_ = $text;
+  }
+  s/\t/ /g;
+  s/\n +/\n/g;
+  s/\s*$//g;
+  s/ +/ /g;  # replace double whitespaces by one
+  s/\@\*\s*/\@\*/g;
+  s/(\@[^\*])/\@$1/g; # escape @ signs, except @*
+  s/{/\@{/g;
+  s/}/\@}/g;
 }
 
 sub OutInfoItem
@@ -677,11 +704,11 @@ sub OutInfoItem
     my ($proc, $pargs, $pinfo, $line);
     if ($l_fun)
     {
-      print $FH "\@strong{$item}\n\@menu\n";
+      print $FH "\@strong{$item:}\n\@menu\n";
     }
     else
     {
-      print $FH "\@item \@strong{$item}\n\@table \@asis\n";
+      print $FH "\@item \@strong{$item:}\n\@table \@asis\n";
     }
     while ($text =~ /(.*\n)/g)
     {
@@ -724,7 +751,7 @@ sub OutInfoItem
   else
   {
     # just print the text
-    &FormatInfoText;
+    FormatInfoText(length($item) + 1);
     # if functions are in text, then make it in code
     s/(\w+\(.*?\))/\@code{$1}/g
       if ($item =~ /usage/i || $item =~ /Return/i);
@@ -740,7 +767,7 @@ sub OutProcInfo
   local $_ = $pinfo;
   s/^[;\s]*//;
   s/\n/ /g;
-  &FormatInfoText;
+  FormatInfoText();
   
   if ($l_fun)
   {
@@ -789,8 +816,16 @@ sub CleanUpExample
   }
   # erase EXAMPLE, echo and pause statements
   $example =~ s/"EXAMPLE.*"[^;]*;//g;
-  $example =~ s/echo[^;\n]*;//g; 
-  $example =~ s/pause\(.*?\)[^;]*;//g;
+  $example .= "\n";
+  my ($mexample, $line);
+  while ($example =~ m/(.*)\n/g)
+  {
+    $line = $1;
+    $line =~ s|echo[^;]*;||g if $line !~ m|(.*)//(.*)echo[^;]*;|;
+    $line =~ s|pause\(.*?\)[^;]*;||g if $line !~ m|(.*)//(.*)pause\(.*?\)[^;]*;|;
+    $mexample .= "$line\n";
+  }
+  $example = $mexample;
   
   # prepend LIB command
   $example = "LIB \"$lib.lib\";\n".$example 

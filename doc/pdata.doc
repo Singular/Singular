@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.13 1999-07-06 11:58:10 obachman Exp $
+@comment $Id: pdata.doc,v 1.14 1999-07-09 14:12:53 obachman Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -641,14 +641,14 @@ x^\beta$ or ($x^\alpha = x^\beta $ and $ i < j$).
 @end tex
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r = 0, (x,y,z), ds;
   // the same as ring r = 0, (x,y,z), (ds, C);
   [x+y2,z3+xy];
   [x,x,x];
 @c example
-@end example
+@end smallexample
 
 @item (C,<):
 @ifinfo
@@ -671,13 +671,13 @@ i = j $ and $ x^\alpha < x^\beta $).
 @end tex
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r = 0, (x,y,z), (C,lp);
   [x+y2,z3+xy];
   [x,x,x];
 @c example
-@end example
+@end smallexample
 
 @item (<,c):
 @ifinfo
@@ -699,13 +699,13 @@ x^\beta$ or ($x^\alpha = x^\beta $ and $ i > j$).
 @end tex
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r = 0, (x,y,z), (lp,c);
   [x+y2,z3+xy];
   [x,x,x];
 @c example
-@end example
+@end smallexample
 
 @item (c,<):
 @ifinfo
@@ -728,13 +728,13 @@ i = j $ and $ x^\alpha < x^\beta $).
 @end tex
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r = 0, (x,y,z), (c,lp);
   [x+y2,z3+xy];
   [x,x,x];
 @c example
-@end example
+@end smallexample
 @end table
 
 @ifinfo
@@ -995,22 +995,22 @@ $\left(\matrix{
 @end tex
 
 @*@strong{Example}:
-@example
+@smallexample
 @c example
   ring r = 0, (x,y,z), M(1, 0, 0,
                          0, 1, 0,
                          0, 0, 1);
 @c example
-@end example
+@end smallexample
 @*which may also be written as:
-@example
+@smallexample
 @c example
   intmat m[3][3]=1, 0, 0, 0, 1, 0, 0, 0, 1;
   m;
   ring r = 0, (x,y,z), M(m);
   r;
 @c example
-@end example
+@end smallexample
 
 If the ring has n variables and the matrix contains less than n x n entries
 an error message is given, if there are more entries,
@@ -1119,8 +1119,8 @@ to insert an extra line of weights into the ordering
 matrix.
 
 @*@strong{Example}:
-@example
+@smallexample
 ring r = 0, (x,y,z),  (a(1,2,3),wp(4,5,2));
 ring s = 0, (x,y,z),  (a(1,2,3),dp);
 ring q = 0, (a,b,c,d),(lp(1),a(1,2,3),ds);
-@end example
+@end smallexample

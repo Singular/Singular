@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.36 1999-07-08 17:12:46 Singular Exp $
+@comment $Id: start.doc,v 1.37 1999-07-09 14:12:58 obachman Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -285,51 +285,51 @@ are available without a ring.
 Once @sc{Singular} is started, it awaits an input after the prompt
 @code{>}.  Every statement has to be terminated by @code{;} .
 
-@example
+@smallexample
 37+5;
 @expansion{} 42
-@end example
+@end smallexample
 
 All objects have a type, e.g., integer variables are defined by
 the word @code{int}. An assignment is done by the symbol @code{=} .
 
-@example
+@smallexample
 int k = 2;
-@end example
+@end smallexample
 
 @noindent Test for equality resp.@: inequality is done using @code{==}
 resp.@: @code{!=} (or @code{<>}), where @code{0} represents the boolean
 value FALSE, any other value represents TRUE.
 
-@example
+@smallexample
 k == 2;
 @expansion{} 1
 k != 2;
 @expansion{} 0
-@end example
+@end smallexample
 
 @noindent The value of an object is displayed by simply typing its name.
 
-@example
+@smallexample
 k;
 @expansion{} 2
-@end example
+@end smallexample
 
 @noindent On the other hand the output is suppressed if an assignment
 is made.
 
-@example
+@smallexample
 int j;
 j = k+1;
-@end example
+@end smallexample
 
 @noindent The last displayed (!) result is always available
 with the special symbol @code{_} .
 
-@example
+@smallexample
 2*_;   // the value from k displayed above
 @expansion{} 4
-@end example
+@end smallexample
 
 Text starting with @code{//} denotes a comment and is ignored in
 calculations, as seen in the previous example. Furthermore @sc{Singular}
@@ -341,9 +341,9 @@ The whole manual is available online by typing the command @code{help;} .
 Explanation on single topics, e.g., on @code{intmat}, which defines a
 matrix of integers, are obtained by
 
-@example
+@smallexample
 help intmat;
-@end example
+@end smallexample
 
 @ifset singularmanual
 @noindent This shows the text of @ref{intmat}, in the printed manual.
@@ -362,20 +362,20 @@ $3 \times 3$
  matrix of integers and initialize it with some values, row by row
 from left to right:
 
-@example
+@smallexample
 intmat m[3][3] = 1,2,3,4,5,6,7,8,9;
-@end example
+@end smallexample
 
 @noindent A single matrix entry may be selected and changed using
 square brackets @code{[} and @code{]}.
 
-@example
+@smallexample
 m[1,2]=0;
 m;
 @expansion{} 1,0,3,
 @expansion{} 4,5,6,
 @expansion{} 7,8,9
-@end example
+@end smallexample
 
 To calculate the trace of this matrix, we use a @code{for} loop. The
 curly brackets (@code{@{} and @code{@}}) denote the beginning resp.@:
@@ -385,12 +385,12 @@ assigns a default value for the specific type. In this case, the default
 value for integers is @code{0}. Note, that the integer variable @code{j}
 has already been defined above.
 
-@example
+@smallexample
 int tr;
 for ( j=1; j <= 3; j++ ) @{ tr=tr + m[j,j]; @}
 tr;
 @expansion{} 15
-@end example
+@end smallexample
 
 Variables of type string can also be defined and used without a ring
 being active. Strings are delimited by @code{"} (double quotes). They
@@ -400,9 +400,9 @@ executed using the function @code{execute}. The result is the same as if
 the commands would have been written on the command line. This feature
 is especially useful to define new rings inside procedures.
 
-@example
+@smallexample
 "example for strings:";
-@expansion{} example for strings:
+@expansion{} smallexample for strings:
 string s="The element of m ";
 s = s + "at position [2,3] is:";  // concatenation of strings by +
 s , m[2,3] , ".";
@@ -412,7 +412,7 @@ execute(s);
 @expansion{} 1,0,3,
 @expansion{} 0,5,6,
 @expansion{} 7,8,9
-@end example
+@end smallexample
 
 This example shows that expressions can be separated by @code{,} (comma)
 giving a list of expressions. @sc{Singular} evaluates each expression in
@@ -431,9 +431,9 @@ this list and prints all results separated by spaces.
 To calculate with objects as ideals, matrices, modules, and polynomial
 vectors, a ring has to be defined first.
 
-@example
+@smallexample
 ring r = 0,(x,y,z),dp;
-@end example
+@end smallexample
 
 The definition of a ring consists of three parts: the first part
 determines the ground field, the second part determines the names of the
@@ -490,12 +490,12 @@ Typing the name of a ring prints its definition. The example below
 shows that the default ring in @sc{Singular} is @math{Z/32003[x,y,z]}
 with degree reverse lexicographical ordering:
 
-@example
+@smallexample
 @c example
 ring r5;
 r5;
 @c example
-@end example
+@end smallexample
 
 Defining a ring makes this ring the current active basering, so each
 ring definition above switches to a new basering. The concept of rings
@@ -511,9 +511,9 @@ The basering now is @code{r5}. Since we want to calculate in the ring
 @code{r}, which we defined first, we have to switch back to it. This can
 be done using the function @code{setring}:
 
-@example
+@smallexample
 setring r;
-@end example
+@end smallexample
 
 Once a ring is active, we can define polynomials. A monomial, say
 @tex
@@ -529,20 +529,20 @@ of the ring variable consists of more than one character. Note, that
 @sc{Singular} always expands brackets and automatically sorts the terms
 with respect to the monomial ordering of the basering.
 
-@example
+@smallexample
 poly f =  x3+y3+(x-y)*x2y2+z2;
 f;
 @expansion{} x3y2-x2y3+x3+y3+z2
-@end example
+@end smallexample
 
 The command @code{size} determines in general the number of ''single
 entries`` in an object. In particular, for polynomials, @code{size}
 determines the number of monomials.
 
-@example
+@smallexample
 size(f);
 @expansion{} 5
-@end example
+@end smallexample
 
 A natural question is to ask if a point, e.g., @code{(x,y,z)=(1,2,0)}, lies
 on the variety defined by the polynomials @code{f} and @code{g}. For
@@ -550,7 +550,7 @@ this we define an ideal generated by both polynomials, substitute the
 coordinates of the point for the ring variables, and check if the result
 is zero:
 
-@example
+@smallexample
 poly g =  f^2 *(2x-y);
 ideal I = f,g;
 ideal J= subst(I,var(1),1);
@@ -559,7 +559,7 @@ J = subst(J,var(3),0);
 J;
 @expansion{} J[1]=5
 @expansion{} J[2]=0
-@end example
+@end smallexample
 
 @noindent Since the result is not zero, the point @code{(1,2,0)} does
 not lie on the variety @code{V(f,g)}.
@@ -570,11 +570,11 @@ ideal. For this we calculate a standard basis using the command
 @code{groebner} and afterwards reduce the polynomial with respect to
 this standard basis.
 
-@example
+@smallexample
 ideal sI = groebner(f);
 reduce(g,sI);
 @expansion{} 0
-@end example
+@end smallexample
 
 @noindent As the result is @code{0} the polynomial @code{g} belongs to the
 ideal defined by @code{f}.
@@ -599,14 +599,14 @@ explanation.
 
 The Jacobian ideal is obtained with the command @code{jacob}.
 
-@example
+@smallexample
 ideal J = jacob(f);
 @expansion{} // ** redefining J **
 J;
 @expansion{} J[1]=3x2y2-2xy3+3x2
 @expansion{} J[2]=2x3y-3x2y2+3y2
 @expansion{} J[3]=2z
-@end example
+@end smallexample
 
 @noindent @sc{Singular} prints the line @code{// ** redefining J
 **}. This indicates that we have previously defined a variable with name
@@ -616,7 +616,7 @@ To obtain a representing set of the quotient vector space we first
 calculate a standard basis, then we apply the function @code{kbase} to
 this standard basis.
 
-@example
+@smallexample
 J = groebner(J);
 ideal K = kbase(J);
 K;
@@ -632,14 +632,14 @@ K;
 @expansion{} K[10]=x2
 @expansion{} K[11]=x
 @expansion{} K[12]=1
-@end example
+@end smallexample
 
 @noindent Then
 
-@example
+@smallexample
 size(K);
 @expansion{} 12
-@end example
+@end smallexample
 
 @noindent gives the desired vector space dimension
 @tex
@@ -652,19 +652,19 @@ As in @sc{Singular} the functions may take the input directly from
 earlier calculations, the whole sequence of commands may be written
 in one single statement.
 
-@example
+@smallexample
 size(kbase(groebner(jacob(f))));
 @expansion{} 12
-@end example
+@end smallexample
 
 When we are not interested in a basis of the quotient vector space, but
 only in the resulting dimension we may even use the command @code{vdim}
 and write:
 
-@example
+@smallexample
 vdim(groebner(jacob(f)));
 @expansion{} 12
-@end example
+@end smallexample
 
 @c ------------------------------------------------------------------
 @node Procedures and libraries, Change of rings, Rings and standard bases, Getting started
@@ -685,12 +685,12 @@ command @code{return}.
 
 Define the following procedure called @code{Milnor}:
 
-@example
+@smallexample
 proc Milnor(poly h)
 @{
   return(vdim(groebner(jacob(h))));
 @}
-@end example
+@end smallexample
 
 Note: if you have entered the first line of the procedure and pressed
 @code{RETURN}, @sc{Singular} prints the prompt @code{.} (dot) instead of
@@ -701,10 +701,10 @@ is now complete.
 
 @noindent Then call the procedure:
 
-@example
+@smallexample
 Milnor(f);
 @expansion{} 12
-@end example
+@end smallexample
 
 @noindent Note, that the result may depend on the basering as we will
 see in the next chapter.
@@ -729,22 +729,22 @@ Libraries are loaded with the command @code{LIB}. Some additional
 information during the process of loading is displayed on the screen,
 which we omit here.
 
-@example
+@smallexample
 LIB "sing.lib";
-@end example
+@end smallexample
 
 As all input in @sc{Singular} is case sensitive, there is no conflict with
 the previously  defined procedure @code{Milnor}, but the result is the same.
 
-@example
+@smallexample
 milnor(f);
 @expansion{} 12
-@end example
+@end smallexample
 
 The procedures in a library have a help part
 which is displayed by typing
 
-@example
+@smallexample
 help milnor;
 @c @expansion{} // proc milnor from lib sing.lib
 @c @expansion{} proc milnor (ideal i)
@@ -755,11 +755,11 @@ help milnor;
 @c @expansion{}          printlevel >=0: display comments (default)
 @c @expansion{} EXAMPLE: example milnor; shows an example
 @c @expansion{}
-@end example
+@end smallexample
 
-@noindent as well as some examples, which are executed by
+@noindent as well as some smallexamples, which are executed by
 
-@example
+@smallexample
 example milnor;
 @c @expansion{} // proc milnor from lib sing.lib
 @c @expansion{} EXAMPLE:
@@ -775,15 +775,15 @@ example milnor;
 @c @expansion{} 28
 @c @expansion{}    printlevel = p;
 @c @expansion{}
-@end example
+@end smallexample
 
 @noindent Likewise, the library itself has a help part, to show a list of
 all the functions
 available for the user which are contained in the library.
 
-@example
+@smallexample
 help sing.lib;
-@end example
+@end smallexample
 
 @noindent The output of the help commands is omitted here.
 
@@ -807,19 +807,19 @@ Define the localization of the polynomial ring at the origin
 Define the localization of the polynomial ring at the origin.
 @end ifclear
 
-@example
+@smallexample
 ring rl = 0,(x,y,z),ds;
-@end example
+@end smallexample
 
 This ordering determines the standard basis which will be calculated.
 Fetch the polynomial defined in the ring @code{r} into this new ring,
 thus avoiding retyping the input.
 
-@example
+@smallexample
 poly f = fetch(r,f);
 f;
 @expansion{} z2+x3+y3+x3y2-x2y3
-@end example
+@end smallexample
 
 @noindent Instead of @code{fetch} we can use the function @code{imap}
 which is more general but less efficient.
@@ -834,10 +834,10 @@ The most general way to fetch data from one ring to another is to use maps.
 In this ring the terms are ordered by increasing exponents. The local Milnor
 number is now
 
-@example
+@smallexample
 Milnor(f);
 @expansion{} 4
-@end example
+@end smallexample
 
 This shows that @code{f} has outside the origin in affine 3-space
 singularities with local Milnor number adding up to
@@ -858,7 +858,7 @@ $3\times3$-matrix.
 3 x 3 - matrix.
 @end ifinfo
 
-@example
+@smallexample
 matrix H = jacob(jacob(f));
 H;
 @expansion{} H[1,1]=6x+6xy2-2y3
@@ -870,21 +870,21 @@ H;
 @expansion{} H[3,1]=0
 @expansion{} H[3,2]=0
 @expansion{} H[3,3]=2
-@end example
+@end smallexample
 
 The @code{print} command displays the matrix in a nicer form.
 
-@example
+@smallexample
 print(H);
 @expansion{} 6x+6xy2-2y3,6x2y-6xy2,  0,
 @expansion{} 6x2y-6xy2,  6y+2x3-6x2y,0,
 @expansion{} 0,          0,          2
-@end example
+@end smallexample
 
 We may calculate the determinant and (the ideal generated by all) minors of
 a given size.
 
-@example
+@smallexample
 det(H);
 @expansion{} 72xy+24x4-72x3y+72xy3-24y4-48x4y2+64x3y3-48x2y4
 minor(H,1);  // the 1x1 - minors
@@ -893,7 +893,7 @@ minor(H,1);  // the 1x1 - minors
 @expansion{} _[3]=6x2y-6xy2
 @expansion{} _[4]=6x2y-6xy2
 @expansion{} _[5]=6x+6xy2-2y3
-@end example
+@end smallexample
 
 The algorithm of the standard basis computations may be
 affected by the command @code{option}. For example, a reduced standard
@@ -905,11 +905,11 @@ $1 \times 1$-minors
 1 x 1 - minors
 @end ifinfo
 of H  is obtained in the following way:
-@example
+@smallexample
 option(redSB);
 groebner(minor(H,1));
 @expansion{} _[1]=1
-@end example
+@end smallexample
 
 This shows that 1 is contained in the ideal of the
 @tex
@@ -944,7 +944,7 @@ Now we shall give three more advanced examples.
 which can be defined as a basering. A free module of rank @code{n}
 is defined as follows:
 
-@example
+@smallexample
 ring rr;
 int n = 4;
 freemodule(4);
@@ -959,7 +959,7 @@ print(freemodule(4));
 @expansion{} 0,1,0,0,
 @expansion{} 0,0,1,0,
 @expansion{} 0,0,0,1
-@end example
+@end smallexample
 
 To define a module, we give a list of vectors generating a submodule of
 a free module. Then this set of vectors may be identified with the
@@ -967,7 +967,7 @@ columns of a matrix.  For that reason in @sc{Singular} matrices and
 modules may be interchanged. However, the representation is different
 (modules may be considered as sparse represented matrices).
 
-@example
+@smallexample
 ring r =0,(x,y,z),dp;
 module MD = [x,0,x],[y,z,-y],[0,z,-2y];
 matrix MM = MD;
@@ -975,7 +975,7 @@ print(MM);
 @expansion{} x,y,0,
 @expansion{} 0,z,z,
 @expansion{} x,-y,-2y
-@end example
+@end smallexample
 
 However the submodule @math{MD} may also be considered as the module
 of relations of the factor module
@@ -997,10 +997,10 @@ basering.
 In order to get the module of relations of @math{MD},
 we use the command @code{syz}.
 
-@example
+@smallexample
 syz(MD);
 @expansion{} _[1]=x*gen(3)-x*gen(2)+y*gen(1)
-@end example
+@end smallexample
 
 We want to calculate, as an application, the annihilator of a given module.
 Let
@@ -1018,9 +1018,9 @@ $M$.
 M.
 @end ifinfo
 
-@example
+@smallexample
 module U = [z3,xy2,x3],[yz2,1,xy5z+z3],[y2z,0,x3],[xyz+x2,y2,0],[xyz,x2y,1];
-@end example
+@end smallexample
 
 Then, by definition, the annihilator of M is the ideal
 @tex
@@ -1047,9 +1047,9 @@ The rank of the free module is determined by the choice of U and is the
 number of rows of the corresponding matrix. This may be determined by
 the function @code{nrows}. All we have to do now is the following:
 
-@example
+@smallexample
 quotient(U,freemodule(nrows(U)));
-@end example
+@end smallexample
 
 @noindent The result is too big to be shown here.
 
@@ -1071,7 +1071,7 @@ where @math{n=0} corresponds to the full resolution.
 Here we use the possibility to inspect the calculation process using the
 option @code{prot}.
 
-@example
+@smallexample
 ring R;      // the default ring in char 32003
 R;
 @expansion{} //   characteristic : 32003
@@ -1087,19 +1087,19 @@ resolution rs = mres(I,0);
 @expansion{} (6)(5).(4).(3)..(2)..(1).[1]
 @expansion{} (7)(6)(5)(4).(3)(2).(1)[2]
 @expansion{}  // .... rest of protocol omitted here
-@end example
+@end smallexample
 
 @noindent Disable this protocol with
 
-@example
+@smallexample
 option(noprot);
-@end example
+@end smallexample
 
 When we enter the name of the calculated resolution, we get a pictorial
 description of the resolution where the exponents denote the rank of the
 free modules.
 
-@example
+@smallexample
 rs;
 @expansion{} 1      4      5      2      0
 @expansion{}R  <-- R  <-- R  <-- R  <-- R
@@ -1116,20 +1116,20 @@ print(betti(rs),"betti");
 @expansion{}     5:     0     0     3     2
 @expansion{} ------------------------------
 @expansion{} total:     1     4     5     2
-@end example
+@end smallexample
 
 A single module in this resolution is obtained (as usual) with the
 brackets @code{[} and @code{]}. The @code{print} command can be used to
 display a module in a more readable format:
 
-@example
+@smallexample
 print(rs[3]);
 @expansion{} y2z,  y3,
 @expansion{} -y2,  -y2,
 @expansion{} x+y-z,x+y-z,
 @expansion{} -2z,  x-y+4z,
 @expansion{} -z,   -y+3z
-@end example
+@end smallexample
 
 In this case, the output is to be interpreted as follows: the 2nd syzygy
 module of R/I, @code{rs[3]}, is the rank-2-submodule of

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.120 1999-07-07 16:38:37 obachman Exp $
+@comment $Id: reference.doc,v 1.121 1999-07-09 14:12:55 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -192,13 +192,13 @@ none
 @item @strong{Purpose:}
 displays the attribute list of the object called @emph{name}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   ideal I=std(maxideal(2));
   attrib(I);
 @c example
-@end example
+@end smallexample
 @item @strong{Syntax:}
 @code{attrib (} name @code{,} string_expression @code{)}
 @item @strong{Type:}
@@ -207,7 +207,7 @@ any
 returns the value of the attribute @emph{string_expression} of the @emph{name}.
 If the attribute is not defined for this variable, attrib returns the empty string.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   ideal I=std(maxideal(2));
@@ -216,7 +216,7 @@ If the attribute is not defined for this variable, attrib returns the empty stri
   // SINGULAR does not know it:
   attrib(maxideal(2), "isSB");
 @c example
-@end example
+@end smallexample
 @item @strong{Syntax:}
 @code{attrib (} name@code{,} string_expression@code{,} expression @code{)}
 @item @strong{Type:}
@@ -225,7 +225,7 @@ none
 sets the attribute @emph{string_expression} of the @emph{name}
 to the value @emph{expression}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   ideal I=maxideal(2); // the attribute "isSB" is not set
@@ -233,7 +233,7 @@ to the value @emph{expression}.
   attrib(I,"isSB",1);  // the standard basis attribute is set here
   vdim(I);
 @c example
-@end example
+@end smallexample
 @item @strong{Remark:}
 An attribute may be described by any string_expression, but some are reserved.
 Only the reserved attributes are used by the kernel of @sc{Singular}.
@@ -304,7 +304,7 @@ the second is the number of last rows out of the elimination and the third is
 as follows, if the vectors to reduce in the algorithm
 are smaller or equal this number the method stops.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),(c,dp);
   module mm;
@@ -346,7 +346,7 @@ are smaller or equal this number the method stops.
   print(ss[1]);
   ss[2];
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -393,7 +393,7 @@ The argument is considered to be the result of a res/sres/mres/lres command.
 (Only the initial monomials are considered for the computation
 of the graded Betti numbers.)
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(a,b,c,d),dp;
   ideal j=bc-ad,b3-a2c,c3-bd2,ac2-b2d;
@@ -410,7 +410,7 @@ of the graded Betti numbers.)
   // most useful for reading off the graded Betti numbers:
   print(betti(T),"betti");
 @c example
-@end example
+@end smallexample
 @end table
 
 Hence
@@ -468,7 +468,7 @@ int
 @item @strong{Purpose:}
 returns the characteristic of the coefficient field of a ring.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= 32003,(x,y),dp;
   char(r);
@@ -482,7 +482,7 @@ returns the characteristic of the coefficient field of a ring.
   ring rr=real,x,dp;
   char(rr);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -504,12 +504,12 @@ the rows of the matrix represent the irreducible characteristic series of the
 ideal with respect to the current variable ordering.
 @*One applicatation is the decomposition of the zero-set.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= 32003,(x,y,z),dp;
   print(char_series(ideal(xyz,xz,y)));
 @c example
-@end example
+@end smallexample
 @c @item @strong{Background:}
 @c @tex
 @c Let $>$ be the lexicographical ordering $x_1 < ... < x_n$ on $R=K[x_1,...,x_n]$.
@@ -598,7 +598,7 @@ string
 @item @strong{Purpose:}
 returns the description of the coefficient field of a ring.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= 32003,(x,y),dp;
   charstr(r);
@@ -612,7 +612,7 @@ returns the description of the coefficient field of a ring.
   ring rr=real,x,dp;
   charstr(rr);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -635,17 +635,15 @@ same as the input type
 @item @strong{Purpose:}
 multiplies a polynomial resp. vector by a suitable constant to cancel
 all denominators from its coefficients and then divide it by its content.
-@item @strong{Note:}
-
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   poly f=(3x+6y)^5;
   f;
   cleardenom(f);
 @c example
-@end example
+@end smallexample
 @end table
 @c @menu
 @c * poly::
@@ -665,11 +663,11 @@ none
 @item @strong{Purpose:}
 closes a link.
 @item @strong{Example:}
-@example
+@smallexample
 link l="MPtcp:launch";
 open(l); // start SINGULAR "server" on localhost in batchmode
 close(l); // shut down SINGULAR server
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -711,7 +709,7 @@ while coeffs returns the coefficient 0 at the appropriate place if a
 monomial is not present (see @ref{coeffs}).
 
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   poly f=x5+5x4y+10x2y3+y5;
@@ -726,7 +724,7 @@ monomial is not present (see @ref{coeffs}).
   print(mc);
   print(mm);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -797,7 +795,7 @@ not present, while coef considers only monomials which really occur in the
 given expression.
 
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r;
   poly f=(x+y)^5;
@@ -806,7 +804,7 @@ given expression.
   ideal i=f,xyz+z^10*y^7;
   print(coeffs(i,y));
 @c example
-@end example
+@end smallexample
 @item @strong{Syntax:}
 @code{coeffs (} ideal_expression@code{,} ideal_expression@code{,} product_of_ringvars @code{)}
 @*@code{coeffs (} module_expression@code{,} module_expression@code{,} product_of_ringvars @code{)}
@@ -826,13 +824,13 @@ such that the entries of A do not contain any variable from P.
 M, then K*A=M' where M' is the part of M that can be expressed.
 
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   ideal M=x2z+y3,xy;
   print(coeffs(M,ideal(x2,xy,y2),xy));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -863,14 +861,14 @@ $${\rm contract}(x^A ,  x^B) := \cases{ x^{(B-A)}, &if $B\ge A$ elementwise\cr 0
 where A and B are the multiexponents of the ring variables represented by x.
 @code{contract} is extended bilinearly to all polynomials.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(a,b,c,d),dp;
   ideal I=a2,a2+bc,abc;
   ideal J=a2-bc,abcd;
   print(contract(I,J));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -899,10 +897,10 @@ none
 The print command is applied to the expression,
 if @code{printlevel=>voice}.
 @item @strong{Note:}
-@xref{Guidelines for writing a library}, for an example how this is used
+@xref{Guidelines for writing a library}, for an smallexample how this is used
 for the display of comments while procedures are executed.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   int debug=0;
   intvec i=1,2,3;
@@ -913,7 +911,7 @@ for the display of comments while procedures are executed.
   printlevel;
   dbprint(i);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -940,7 +938,7 @@ and 0 (FALSE) otherwise.
 the level of a procedure called by a first procedure, etc.).
 A local object @code{m} may be identified by @code{if (defined(m)==voice)}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= (0,t),(x,y),dp;
   matrix m[5][6]= x,y,1,2,0,x+y;
@@ -952,7 +950,7 @@ A local object @code{m} may be identified by @code{if (defined(m)==voice)}.
   defined(t);
   defined(42);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -975,7 +973,7 @@ returns the maximal (weighted) degree of
 the terms of a polynomial or a vector;
 @*deg(0) is -1.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),lp;
   deg(0);
@@ -989,7 +987,7 @@ the terms of a polynomial or a vector;
   vector v=[x2,y];
   deg(v);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1015,7 +1013,7 @@ prints it.   This is equal to the dimension, codimension and multiplicity
 of the ideal resp. module if the input is a standard basis with respect to a
 degree ordering.
 @item @strong{Example:}
-@example
+@smallexample
 ring r3=32003,(x,y,z),ds;
 int a,b,c,t =11,10,3,1;
 poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
@@ -1026,7 +1024,7 @@ degree(i0);
 @expansion{} //codimension 3
 @expansion{} //dimension 0
 @expansion{} //multiplicity 314
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1049,13 +1047,13 @@ list
 @item @strong{Purpose:}
 deletes the element with the given index from a list (the input is not changed).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   list l="a","b","c";
   list l1=delete(l,2);l1;
   l;
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1082,13 +1080,13 @@ Bareiss algorithm is used. In the other cases the chinese remainder
 algorithm is used. For large sparse problems the input as a module
 has advantages.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=7,(x,y),wp(2,3);
   matrix m[3][3]=1,2,3,4,5,6,7,8,x;
   det(m);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1121,7 +1119,7 @@ computes the partial derivative of a polynomial object by a ring variable
 by the differential operator corresponding to each polynomial (1..m) in the first
 ideal, producing a m x n matrix.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= 0,(x,y,z),dp;
   poly f=2*x^3*y+3*z^5;
@@ -1135,7 +1133,7 @@ ideal, producing a m x n matrix.
   ideal j=x2-yz,xyz;
   print(diff(i,j));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1168,13 +1166,13 @@ the Krull dimension of the basering modulo I.
 @*The dimension of a
 module is the dimension of its annihilator ideal.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   ideal I=std(ideal(x2,xy,y5));
   dim(I);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1199,7 +1197,7 @@ session (i.e., all defined variables and their values) to the specified
 link (which must be either an ASCII or MP link) such that a
 @code{getdump} can later retrieve it.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r;
   // write the whole session to the file dump.ascii
@@ -1211,7 +1209,7 @@ link (which must be either an ASCII or MP link) such that a
   getdump("dump.ascii");
   r;
 @c example
-@end example
+@end smallexample
 @item @strong{Restrictions:}
 For ASCII links, integer matrices contained in lists are  dumped as
 integer list elements (and not as integer matrices), and lists of list
@@ -1248,7 +1246,7 @@ argument) with a fast ordering (e.g., @code{dp}). Then make use of it to speed
 up the computation: a Hilbert-driven elimination uses the intvec
 provided as the third argument.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   ideal i=x2,xy,y5;
@@ -1259,7 +1257,7 @@ provided as the third argument.
   intvec v=hilb(std(i),1);
   eliminate(i,ts,v);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1285,7 +1283,7 @@ from a MPfile link.
 with @code{quote} and @code{write} to
 prevent local evaluations  when writing to an MPtcp link.
 @item @strong{Example:}
-@example
+@smallexample
 @c @c example
   link l="MPfile:w example.mp";
   ring r=0,(x,y,z),ds;
@@ -1301,7 +1299,7 @@ prevent local evaluations  when writing to an MPtcp link.
   read(l);
   close(l);
 @c @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1329,7 +1327,7 @@ whenever possible since it may give rise to name conflicts.  Moreover,
 such procedures cannot be precompiled (something @sc{Singular} will
 provide in the future).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   ideal i=x+y,z3+22y;
@@ -1340,7 +1338,7 @@ provide in the future).
   execute(s); // define the ideal k
   k;
 @c example
-@end example
+@end smallexample
 @end table
 @c ---------------------------------------
 @node exit, extgcd, execute, Functions
@@ -1372,13 +1370,13 @@ then L[1]=a*L[2]+b*L[3].
 @item @strong{Note:}
 polynomials must be univariate to apply @code{extgcd}
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   extgcd(24,10);
   ring r=0,(x,y),lp;
   extgcd(x4-x6,(x2+x5)*(x2+x3));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1414,14 +1412,14 @@ Not implemented for basering over real ground fields, galois fields and
 over algebraic extensions over the rational numbers (that is, only
 implemented for ground fields for which @ref{factorize} is implemented).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= 32003,(x,y,z),(c,dp);
   ideal I=xyz,x2z;
   facstd(I);
   facstd(I,x);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1459,14 +1457,14 @@ Not implemented for the coefficient fields real, finite fields of the
 type @code{(p^n, a)}, and algebraic extensions over the rational
 numbers.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   factorize(9*(x-1)^2*(y+z));
   factorize(9*(x-1)^2*(y+z),1);
   factorize(9*(x-1)^2*(y+z),2);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1493,7 +1491,7 @@ variable names or orderings, or to map objects from a ring to a quotient
 ring of that ring or vice versa. Compared with @code{imap},
 @code{fetch} is much more efficient, but less general.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   ideal i=maxideal(3);
@@ -1515,7 +1513,7 @@ ring of that ring or vice versa. Compared with @code{imap},
   ideal k=fetch(q,i);
   k;
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1549,7 +1547,7 @@ from a reduced Groebner basis with respect to a degree ordering. This
 can be much faster than computing a lexicographical Groebner basis
 directly.
 @c @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
@@ -1560,7 +1558,7 @@ directly.
   ideal j=fglm(r,i);
   j;
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1584,9 +1582,9 @@ none
 input comes from new file @file{filename}. This is shorthand
 @code{execute read(filename)}.
 @item @strong{Example:}
-@example
+@smallexample
 < "example"; //read in the file example and execute it
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1608,7 +1606,7 @@ returns the first position of the substring
 in the string or 0 (if not found),
 @*start the search at the position given in the 3rd argument.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   find("Aac","a");
   find("abab","a"+"b");
@@ -1616,7 +1614,7 @@ in the string or 0 (if not found),
   find("abab","ab",3);
   find("0123","abcd");
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1638,7 +1636,7 @@ in the i-th ring variable belonging to ideal_expression.
 ideal must be zero-dimensional and given as a reduced Groebner basis in
 the current ring.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring  r= 0,(x,y,z), dp;
   ideal i= y3+x2, x2y+x2, z4-x2-y;
@@ -1647,7 +1645,7 @@ the current ring.
   ideal k= finduni(i);
   print(k);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1677,14 +1675,14 @@ module
 creates the free module of rank n generated by
 @code{gen(1)}, @dots{}, @code{gen(n)}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= 32003,(x,y),(c,dp);
   freemodule(3);
   matrix m = freemodule(3); // generates the 3x3 unit matrix
   print(m);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1709,13 +1707,13 @@ Not implemented for the coefficient fields real, finite fields of the
 type @code{(p^n, a)}, and algebraic extensions over the rational
 numbers.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   gcd(2,3);
   ring r=0,(x,y,z),lp;
   gcd(3x2*(x+y),9x*(y2-x2));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1736,7 +1734,7 @@ vector
 @item @strong{Purpose:}
 returns the i-th free generator of a free module.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= 32003,(x,y,z),(c,dp);
   gen(3);
@@ -1746,7 +1744,7 @@ returns the i-th free generator of a free module.
   ring rr= 32003,(x,y,z),dp;
   fetch(r,v);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{freemodule}; @ref{int}; @ref{vector}.
@@ -1767,7 +1765,7 @@ from it. For ASCII links, @code{getdump} is equivalent to a
 @code{getdump} should only be used on data which was previously
 @code{dump}'ed.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   int i=3;
   dump(":w example.txt");
@@ -1776,7 +1774,7 @@ from it. For ASCII links, @code{getdump} is equivalent to a
   getdump("example.txt");
   i;
 @c example
-@end example
+@end smallexample
 @item @strong{Restrictions:}
 @code{getdump} is not supported for DBM links, or for a link connecting
 to @code{stdin} (standard input).
@@ -1841,12 +1839,12 @@ the online help system.
 @item @strong{Note:}
 @code{?} may be used instead of @code{help}.
 @item @strong{Example:}
-@example
+@smallexample
 help;
 help ring;
 help Rings and orderings;
 help all.lib;
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1884,14 +1882,14 @@ f_i by deleting all terms divisible by x(i)*m for all i with x(i) < 1.
 Then f_1',...,f_k' generate I.
 @end itemize
 @item @strong{Example:}
-@example
+@smallexample
 @c example
 ring r=0,(x,y),ds;
 ideal i=x3,x2y,y3;
 highcorner(std(i));
 highcorner(std(ideal(1)));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1927,7 +1925,7 @@ returns the n-th (n=1, 2) Hilbert series as intvec with two arguments.
 The leading number of the intvec is not part of the Hilbert series and
 is used in the Hilbert driven standard basis computation.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring R=32003,(x,y,z),dp;
   ideal i=x2,y2,z2;
@@ -1936,7 +1934,7 @@ is used in the Hilbert driven standard basis computation.
   hilb(s,1);
   hilb(s,2);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -1972,7 +1970,7 @@ homogenizes polynomials, vectors, ideals or modules by multiplying
 each monomial with a suitable power of the given ring variable (which must have
 weight 1).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),ds;
   poly s1=x3y2+x5y+3y9;
@@ -1984,7 +1982,7 @@ weight 1).
   homog(i);
   homog(homog(i,z));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2014,7 +2012,7 @@ Useful for mapping from a homogenizing ring to the original ring or
 for mappings from/to rings with/without parameters. Compared with
 @code{fetch}, @code{imap} is more general, but less efficient.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r = 0,(x,y,z,a,b,c),dp;
   ideal i = xy2z3a4b5 + 1, homog(xy2z3a4b5 + 1, c); i;
@@ -2023,7 +2021,7 @@ for mappings from/to rings with/without parameters. Compared with
   ring r2 = (0, a, b), (x,y,z), ls;
   ideal j = imap(r, i); j;
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2070,7 +2068,7 @@ list
 @item @strong{Purpose:}
 computes a list of all maximal sets (if the flag is 0), or of all sets of independent variables of the ideal given by the first argument
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z,u,v,w),dp;
   ideal I=xyzw,yzvw,uzw,xyv;
@@ -2081,7 +2079,7 @@ computes a list of all maximal sets (if the flag is 0), or of all sets of indepe
   indepSet(I,1);
   eliminate(I,xuv);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2103,13 +2101,13 @@ list
 inserts a new element into a list at the beginning or (if called with 3
 arguments) after the given position (the input is not changed).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   list L=1,2;
   insert(L,4,2);
   insert(L,4);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2197,7 +2195,7 @@ Remark: $L(g)$ denotes the leading term of $g$ and $ecart(g)=deg(g)-deg(L(g))$.
 Remark: L(g) denotes the leading term of g and ecart(g)=deg(g)-deg(L(g)).
 @end ifinfo
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   ideal i=x2+z,z,2z;
@@ -2206,7 +2204,7 @@ Remark: L(g) denotes the leading term of g and ecart(g)=deg(g)-deg(L(g)).
   ideal i=zx+y3,z+y3,z+xy;
   interred(i);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2229,7 +2227,7 @@ ideal resp. module intersection.
 @item @strong{Note:}
 If the option @code{returnSB} is enabled then the result is a standard basis.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring R=0,(x,y),dp;
   ideal i=x;
@@ -2241,7 +2239,7 @@ If the option @code{returnSB} is enabled then the result is a standard basis.
   ideal id3=intersect(id1,id2,ideal(x,y));
   id3;
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2264,7 +2262,7 @@ ideal, if the input is a polynomial
 computes the Jacobi ideal resp.@: Jacobi matrix generated by all
 partial derivatives of the input.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring R;
   poly f=x^2+y^3+z^5;
@@ -2272,7 +2270,7 @@ partial derivatives of the input.
   ideal i=jacob(f);
   print(jacob(i));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2302,7 +2300,7 @@ deletes from the first argument all terms of degree (resp. weighted degree where
 the weights are given by the third argument) bigger than the second
 argument.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),(c,dp);
   jet(1+x+x2+x3+x4,3);
@@ -2328,7 +2326,7 @@ argument.
   module m=v,v,[1,x2,z3,0,1];
   jet(m,2);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2364,7 +2362,7 @@ used and the result may have no meaning.
 a part of the same result with degree of the monomials equal to the
 second argument, the quotient need not be finite dimensional.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),ds;
   ideal i=x2,y2,z;
@@ -2372,7 +2370,7 @@ second argument, the quotient need not be finite dimensional.
   i=x2,y3,xyz;
   kbase(std(i),2);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2393,7 +2391,7 @@ none
 @item @strong{Purpose:}
 deletes objects.
 @item @strong{Example:}
-@example
+@smallexample
 @c example error
   int i=3;
   ring r= 0,x,dp;
@@ -2404,7 +2402,7 @@ deletes objects.
   i;
   listvar();
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2424,7 +2422,7 @@ none
 @item @strong{Purpose:}
 deletes the attribute given as the second argument.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= 32003,(x,y),lp;
   ideal i=maxideal(1);
@@ -2433,7 +2431,7 @@ deletes the attribute given as the second argument.
   killattrib(i,"isSB");
   attrib(i);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2464,7 +2462,7 @@ the first n generators of the ideal @code{id}.
 koszul(1,id),koszul(2,id),... form a complex, that is, the product
 of @code{koszul(i,id)} and @code{koszul(i+1,id)} equals zero.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   print(koszul(3,2));
@@ -2473,7 +2471,7 @@ of @code{koszul(i,id)} and @code{koszul(i+1,id)} equals zero.
   print(koszul(2,I));
   print(koszul(2,I)*koszul(3,I));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2500,7 +2498,7 @@ to the monomial ordering.
 @item @strong{Note:}
 @code{IN} may be used instead of @code{lead}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),(c,ds);
   poly f=2x2+3y+4z3;
@@ -2513,7 +2511,7 @@ to the monomial ordering.
   lead(m);
   lead(0);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2539,7 +2537,7 @@ number
 returns the leading (or initial) coefficient of a polynomial or a vector
 with respect to the monomial ordering.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),(c,ds);
   poly f=x2+y+z3;
@@ -2548,7 +2546,7 @@ with respect to the monomial ordering.
   leadcoef(v);
   leadcoef(0);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2573,7 +2571,7 @@ intvec
 returns the exponent vector of the leading monomial of a polynomial or a vector.
 In the case of a vector the last component is the index in the vector.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),(c,ds);
   poly f=x2+y+z3;
@@ -2582,7 +2580,7 @@ In the case of a vector the last component is the index in the vector.
   leadexp(v);
   leadexp(0);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2607,7 +2605,7 @@ the same as the input type
 returns the leading monomial of a polynomial or a vector as a polynomial
 or vector whose coefficient is one.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),(c,ds);
   poly f=2x2+3y+4z3;
@@ -2616,7 +2614,7 @@ or vector whose coefficient is one.
   leadmonom(v);
   leadmonom(0);
 @c example
-@end example
+@end smallexample
 @end table
 
 @c ref
@@ -2648,7 +2646,7 @@ string
 @item @strong{Purpose:}
 shows all loaded libraries written in Singular.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   option(loadLib); // show loading of libraried
   LIB;             // standard.lib is loaded
@@ -2657,7 +2655,7 @@ shows all loaded libraries written in Singular.
   LIB "inout.lib"; // are now known to Singular
   LIB;
 @c example
-@end example
+@end smallexample
 @end table
 @ifset namespaces
 @c ref
@@ -2710,7 +2708,7 @@ Gives a warning if @code{sm} is not a submodule.
 For local or mixed orderings this holds only up to units in the associated
 localized ring.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r;
   ideal m=3x2+yz,7y6+2x2y+5xz;
@@ -2719,7 +2717,7 @@ localized ring.
   matrix T=lift(i,m);
   matrix(m)-matrix(i)*T;
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2744,7 +2742,7 @@ basis returned by @code{liftstd}, and @code{T} the transformation matrix
 then @code{matrix(sm)=matrix(m)*T} and @code{sm=ideal(matrix(m)*T)}
 respectively @code{sm=module(matrix(m)*T)}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring R=0,(x,y,z),dp;
   poly f=x3+y7+z2+xyz;
@@ -2755,7 +2753,7 @@ respectively @code{sm=module(matrix(m)*T)}.
   print(T);
   matrix(sm)-matrix(i)*T;
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ideal::
@@ -2803,7 +2801,7 @@ variables in procedures is shown in square brackets.
 package can be @code{Current}, @code{Up}, @code{Top} or any other
 identifier of type package.
 @item @strong{Example:}
-@example
+@smallexample
 @c example error
   proc t1 { }
   proc t2 { }
@@ -2820,11 +2818,11 @@ identifier of type package.
   listvar(proc);
   listvar(Standard, proc);
 @c example
-@end example
+@end smallexample
 @end ifset
 @ifclear namespaces
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   proc t1 { }
   proc t2 { }
@@ -2840,7 +2838,7 @@ identifier of type package.
   listvar(t1);
   listvar(proc);
 @c example
-@end example
+@end smallexample
 @end ifclear
 @end table
 @ifset namespaces
@@ -2926,7 +2924,7 @@ $=M_i$
 To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take time.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   ideal i=xz,yz,x^3-y^3;
@@ -2935,7 +2933,7 @@ which also completes computations and may therefore take time.
   list ll=l;
   l[2];                   // elements can only be accessed in the list
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2961,12 +2959,12 @@ ideal
 returns the power given by int_expression of the maximal ideal
 generated by all variables (maxideal(i)=(1) for i<=0).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   maxideal(2);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -2991,13 +2989,13 @@ To monitor the memory usage during ongoing computations the option
 @code{mem} should be set (using the command @code{option(mem);}, see
 also @ref{option}).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   "Objects of SINGULAR use (at the moment) ",memory(0)," bytes,"
    +newline+
   "allocated from system (at the moment):", memory(1), "bytes";
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3017,7 +3015,7 @@ the same as the type of the argument
 returns a minimal set of generators of an ideal resp. module if the input is
 either homogeneous or if the ordering is local.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=181,(x,y,z),(c,ls);
   ideal id2=x2+xyz,y2-z3y,z3+y5xz;
@@ -3025,7 +3023,7 @@ either homogeneous or if the ordering is local.
   size(id4);
   minbase(id4);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3043,7 +3041,7 @@ ideal
 @item @strong{Purpose:}
 returns the set of all minors (=subdeterminants) of the given size of a matrix.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r = 0, (x(1..5)), ds;
   matrix m[2][4]= x(1..4), x(2..5);
@@ -3051,7 +3049,7 @@ returns the set of all minors (=subdeterminants) of the given size of a matrix.
   ideal j = minor(m, 2);
   j;
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3074,7 +3072,7 @@ resolution
 minimizes a free resolution of an ideal or module
 given by the list resp. resolution argument.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r1=32003,(x,y),dp;
   ideal i=x5+xy4,x3+x2y+xy2+y3;
@@ -3084,7 +3082,7 @@ given by the list resp. resolution argument.
   minres(rs);
   list(rs);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3145,20 +3143,20 @@ $R^k \buildrel{H_1}\over{\rightarrow} R^l
 \buildrel{H_2}\over{\leftarrow} R^m$
 @end tex
 @ifinfo
-@example
+@smallexample
      H1         H2
 R^k ----> R^l <---- R^m
-@end example
+@end smallexample
 @end ifinfo
 Then
 @tex
 $h_1/(h_1 \cap h_2) \cong R^k / ker(\overline{H_1})$
 @end tex
 @ifinfo
-@example
+@smallexample
                                               __
 h1/(h1 intersect h2) is isomorphic to R^k/ker(H1)
-@end example
+@end smallexample
 @end ifinfo
 where
 @tex
@@ -3172,7 +3170,7 @@ is the induced map.
 @*@code{modulo(h1,h2)} returns generators of
 the kernel of this induced map.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r;
   ideal h1 = x,y,z;
@@ -3180,7 +3178,7 @@ the kernel of this induced map.
   module m=modulo(h1,h2);
   print(m);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3205,7 +3203,7 @@ The second argument describes what to log: @code{"i"} means input,
 and opens the file given by the first string expression.
 @*@code{monitor ("")} turns off recording.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   monitor("doe.tmp","io"); // log input and output to doe.tmp
   ring r;
@@ -3214,7 +3212,7 @@ and opens the file given by the first string expression.
   ideal I=f,x,y;
   monitor("");             // stop logging
 @c example
-@end example
+@end smallexample
 @end table
 @c ---------------------------------------
 @node  mres, mstd, monitor, Functions
@@ -3274,7 +3272,7 @@ first syzygy module of L[p], is 0 (if the basering is not a qring).
 To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take time.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r  = 31991,(t,x,y,z,w),ls;
   ideal M = t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
@@ -3283,7 +3281,7 @@ which also completes computations and may therefore take time.
   L;
   // projective dimension of M is 5
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3308,7 +3306,7 @@ entry is a set of generators of size smaller or equal to the input set,
 which is a minimal subset of the standard basis for homogenous
 input  (w.r.t. any monomial ordering).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z,t),dp;
   poly f=x3+y4+z6+xyz;
@@ -3316,7 +3314,7 @@ input  (w.r.t. any monomial ordering).
   j=homog(j,t);j;
   mstd(j);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3344,7 +3342,7 @@ ring with respect to a local degree ordering
 then it returns the multiplicity of the ideal (in the sense of Samuel,
 with respect to the maximal ideal).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r= 32003,(x,y),ds;
   poly f = (x^3+y^5)^2+x^2*y^7;
@@ -3352,7 +3350,7 @@ with respect to the maximal ideal).
   mult(i);
   mult(std(f));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3374,7 +3372,7 @@ string
 @item @strong{Purpose:}
 returns the name of an expression as string.
 @item @strong{Example:}
-@example
+@smallexample
 @c example error
   int i = 9;
   string s = nameof(i);
@@ -3386,7 +3384,7 @@ returns the name of an expression as string.
   ring r;
   nameof(basering);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3416,7 +3414,7 @@ the given ring.
 package_name can be @code{Current}, @code{Up}, @code{Top} or any other
 identifier of type package.
 @item @strong{Example:}
-@example
+@smallexample
 @c example error
   int i = 9;
   ring r;
@@ -3431,11 +3429,11 @@ identifier of type package.
   names(p);
   names(p::q);
 @c example
-@end example
+@end smallexample
 @end ifset
 @ifclear namespaces
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   int i = 9;
   ring r;
@@ -3445,7 +3443,7 @@ identifier of type package.
   names();
   names(r);
 @c example
-@end example
+@end smallexample
 @end ifclear
 @end table
 @c ref
@@ -3471,7 +3469,7 @@ given generators of the ideal, including zeros.
 which are different from zero. (Use @code{nrows} to get the number of rows of a given
 matrix or intmat.)
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r;
   matrix m[5][6];
@@ -3480,7 +3478,7 @@ matrix or intmat.)
   ncols(i);
   size(i);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3500,13 +3498,13 @@ int
 @item @strong{Purpose:}
 returns the number of parameters of a ring.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=(23,t,v),(x,a(1..7)),lp;
   // the parameters are t,v
   npars(r);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3574,7 +3572,7 @@ $=M_i$
 @end tex
  in the notations from above).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r  = 31991,(t,x,y,z,w),ls;
   ideal M = t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
@@ -3582,7 +3580,7 @@ $=M_i$
   resolution L = nres(M,0);
   L;
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3612,7 +3610,7 @@ the minimal rank of a free module in which the given module or
 vector lives (the index of the last non-zero component). (Use @code{ncols}
 to get the number of columns of a given matrix or intmat.)
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring R;
   matrix M[2][3];
@@ -3622,7 +3620,7 @@ to get the number of columns of a given matrix or intmat.)
   nrows(m);
   nrows([0,x,0]);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3644,12 +3642,12 @@ int
 @item @strong{Purpose:}
 returns the number of variables of a ring.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=23,(x,a(1..7)),ls;
   nvars(r);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3668,11 +3666,11 @@ none
 @item @strong{Purpose:}
 opens a link.
 @item @strong{Example:}
-@example
+@smallexample
 link l="MPtcp:launch";
 open(l); // start SINGULAR "server" on localhost in batchmode
 close(l); // shut down SINGULAR server
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -3798,7 +3796,7 @@ warns about variable redefinitions (default)
 shows correct usage in error messages (default)
 @end table
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   option(prot);
   option();
@@ -3816,7 +3814,7 @@ shows correct usage in error messages (default)
   option(set,i);
   option();
 @c example
-@end example
+@end smallexample
 @end table
 
 @*The output reported on @code{option(prot)} has the following meaning:
@@ -3901,7 +3899,7 @@ the initial term of a polynomial or a vector;
 the weights are the weights used for the first block of the ring ordering.
 @*@code{ord(0)} is @code{-1}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=7,(x,y),wp(2,3);
   ord(0);
@@ -3913,7 +3911,7 @@ the weights are the weights used for the first block of the ring ordering.
   vector v=[x2,y];
   ord(v);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * deg::
@@ -3935,12 +3933,12 @@ string
 @item @strong{Purpose:}
 returns the description of the monomial ordering of the ring.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=7,(x,y),wp(2,3);
   ordstr(r);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ring::
@@ -3965,12 +3963,12 @@ number
 returns the n-th parameter of the basering. This command should only be used if the basering
 has at least one parameter.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=(0,a,b,c),(x,y,z),dp;
   par(2);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * npars::
@@ -3993,12 +3991,12 @@ int
 @item @strong{Purpose:}
 returns the degree of a number considered as a polynomial in the ring parameters.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=(0,a,b,c),(x,y,z),dp;
   pardeg(a^2*b);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * number::
@@ -4024,14 +4022,14 @@ returns the list of parameters of the ring as a string
 @*or the name of the n-th parameter for an integer n.
 @*@code{parstr(n)} is equivalent to @code{parstr(basering,n)}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=(7,a,b,c),(x,y),wp(2,3);
   parstr(r);
   parstr(2);
   parstr(r,3);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * charstr::
@@ -4068,7 +4066,7 @@ and the ideal has to be an ideal in the given ring.
 To compute the kernel of a map, the preimage of zero has to be determined. Hence there is no
 special command for computing the kernel of a map in @sc{Singular}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r1=32003,(x,y,z,w),lp;
   ring r=32003,(x,y,z),dp;
@@ -4082,7 +4080,7 @@ special command for computing the kernel of a map in @sc{Singular}.
   // the kernel of f
   preimage(r,f,i0);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * map::
@@ -4104,13 +4102,13 @@ int
 returns the largest prime less then 32004 smaller or equal to the argument;
 @*returns 2 for all arguments smaller than 3.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   prime(32004);
   prime(0);
   prime(-1);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * int::
@@ -4175,7 +4173,7 @@ returns the string equivalent to typing @code{print(expressions);}
 returns the string equivalent to typing @code{print(expressions, "betti");}
 @end table
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   module m=[1,y],[0,x+z];
@@ -4193,7 +4191,7 @@ returns the string equivalent to typing @code{print(expressions, "betti");}
   s = print(l, "%l"); s;
   s = print("", "%2s"); size(s); s; // a simple newline
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -4224,14 +4222,14 @@ module
 returns the module minimally embedded in a free module such that the
 corresponding factor modules are isomorphic.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   module m=gen(1),gen(3),[x,y,0,z],[x+y,0,0,0,1];
   print(m);
   print(prune(m));
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * module::
@@ -4252,13 +4250,13 @@ intvec
 computes the weight vector of the variables for a quasihomogeneous ideal.
 If the input is not weighted homogeneous, an intvec of zeros is returned.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring h1=32003,(t,x,y,z),dp;
   ideal i=x4+y3+z2;
   qhweight(i);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ideal::
@@ -4293,7 +4291,7 @@ Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
 effect of exactly one @code{quote}).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   link l="MPfile:w example.mp";
   ring r=0,(x,y,z),ds;
@@ -4307,7 +4305,7 @@ effect of exactly one @code{quote}).
   read(l);
   close(l);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * eval::
@@ -4351,7 +4349,7 @@ where $m\subset {\rm basering}^n$,
 @end tex
 in the second case.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
 ring r=181,(x,y,z),(c,ls);
 ideal id1=maxideal(3);
@@ -4363,7 +4361,7 @@ module m=x*freemodule(3),y*freemodule(2);
 ideal id3=x,y;
 quotient(m,id3);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ideal::
@@ -4395,7 +4393,7 @@ returns a random intmat of size rows x cols with entries between
 @item @strong{Note:} The random generator can be set to a startvalue with
 the function @code{system} by a commandline option.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   random(1,1000);
   random(1,2,3);
@@ -4406,7 +4404,7 @@ the function @code{system} by a commandline option.
   system("random",210);
   random(-1000,1000);    // the same random values again
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * Command line options::
@@ -4445,7 +4443,7 @@ there is data to read.
 data base, and a @code{read} with two arguments returns the value to the
 key given as the second argument from the data base.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   ideal i=x+y,z3+22y;
@@ -4458,7 +4456,7 @@ key given as the second argument from the data base.
   execute s;
   k;
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * execute::
@@ -4503,7 +4501,7 @@ only the leading term and does no tail reduction.
 @item @strong{Note:}
 @code{NF} may be used instead of @code{reduce}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r1 = 0,(z,y,x),ds;
   poly s1=2x5y+7x2y4+3x2yz3;
@@ -4514,7 +4512,7 @@ only the leading term and does no tail reduction.
   reduce(3z3yx2+7y4x2+yx5+z12y2x2,j);
   reduce(3z3yx2+7y4x2+yx5+z12y2x2,j,1);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ideal::
@@ -4557,7 +4555,7 @@ The regularity is the smallest number $s$ with the property deg($e_{a,i})
 the regularity is computed and used as a degree bound during
 the computation unless @code{option(notRegularity);} is given.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring rh3=32003,(w,x,y,z),(dp,C);
   poly f= x11+y10+z9+x5*y2+x2*y2*z3+x*y^3*(y2+x)^2;
@@ -4567,7 +4565,7 @@ the computation unless @code{option(notRegularity);} is given.
   list jj=jr;
   regularity(jj);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * res::
@@ -4643,7 +4641,7 @@ $=M_i$
 To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take time.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r  = 31991,(t,x,y,z,w),ls;
   ideal M = t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
@@ -4652,7 +4650,7 @@ which also completes computations and may therefore take time.
   L;
   betti(L);
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -4681,14 +4679,14 @@ int
 prints a list of all reserved identifiers (first form) or tests
 whether the string is a reserved identifier.
 @item @strong{Example:}
-@example
+@smallexample
 reservedName();
 @expansion{} ... // output skipped
 @c example
   reservedName("ring");
   reservedName("xyz");
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -4707,14 +4705,14 @@ poly
 computes the resultant of the first and second argument with respect
 to the variable given as the third argument.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   poly f=3*(x+2)^3+y;
   poly g=x+y+z;
   resultant(f,g,x);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * poly::
@@ -4738,7 +4736,7 @@ int
 returns the number of the variable (hence its boolean value is TRUE) if the name is a ring variable
 or if the string is the name of a ring variable of the basering.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=29,(x,y,z),lp;
   rvar(x);
@@ -4747,7 +4745,7 @@ or if the string is the name of a ring variable of the basering.
   rvar(var(3));
   rvar("x");
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * defined::
@@ -4770,7 +4768,7 @@ none
 @item @strong{Purpose:}
 changes the basering to another (already defined) ring.
 @item @strong{Example:}
-@example
+@smallexample
 @c @c example
   ring r1=0,(x,y),lp;
   // the basering is r1
@@ -4781,7 +4779,7 @@ changes the basering to another (already defined) ring.
   nameof(basering);
   listvar();
 @c @c example
-@end example
+@end smallexample
 @item @strong{Use in procedures:}
 All changes of the basering by a definition
 of a new ring or a setring command in a procedure are local to this procedure.
@@ -4832,7 +4830,7 @@ keep only those generators/columns whose leading monomials are
 not divisible.
 @end table
 @item @strong{Example:}
-@example
+@smallexample
 @c example
 ring r = 0, (x,y,z), (c, dp);
 ideal i = 0, 2x, 2x, 4x, 3x + y, 5x2;
@@ -4847,7 +4845,7 @@ simplify(i, 32 + 2 + 1);
 matrix A[2][3]=x,0,2x,y,0,2y;
 simplify(A,2+8); // by automatic conversion to module
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * poly::
@@ -4889,7 +4887,7 @@ returns the number of monomials.
 returns the number of entries (rows*columns).
 @end table
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   string s="hello";
   size(s);
@@ -4907,7 +4905,7 @@ returns the number of entries (rows*columns).
   matrix mm[2][2];
   size(mm);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ncols::
@@ -4945,13 +4943,13 @@ computes the permutation v: I[i] -> I[v[i]]
 which orders the ideal resp. module by their initial term,
 starting with the smallest.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   ideal I=x,y,z,x3,xz;
   sortvec(I);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 general_lib::
@@ -5026,7 +5024,7 @@ $=M_i$
 To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take time.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r  = 31991,(t,x,y,z,w),ls;
   ideal M = t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
@@ -5036,7 +5034,7 @@ which also completes computations and may therefore take time.
   L;
   print(betti(L),"betti");
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * betti::
@@ -5103,7 +5101,7 @@ returns (depending on the type of the link and its status)
 @code{"","w","a","r"} or @code{"rw"}
 @end table
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   link l=":w example.txt";
   status(l,"write");
@@ -5111,7 +5109,7 @@ returns (depending on the type of the link and its status)
   status(l,"write","ready");
   close(l);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * link::
@@ -5162,7 +5160,7 @@ chooses the "best" algorithm to compute a Groebner basis.
 to construct the standard basis from an already computed one (givenn as the
 first argument) and one additional generator (the second argument).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   // local computation 
   ring r = 32003, (x,y,z), ds;
@@ -5193,7 +5191,7 @@ first argument) and one additional generator (the second argument).
   ideal j = std(i,iw,w);
   j[1];
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -5233,7 +5231,7 @@ poly, vector, ideal or module (the same as the first argument)
 @item @strong{Purpose:}
 substitutes a ring variable by a term (a polynomial of length <=1).
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   poly f=x2+y2+z2+x+y+z;
@@ -5242,7 +5240,7 @@ substitutes a ring variable by a term (a polynomial of length <=1).
   subst(f,y,a);
   subst(f,y,z);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * poly::
@@ -5301,7 +5299,7 @@ option @code{"long_option_name"}; for on/off options, the return value is of typ
 int and either 1 or 0; for all other options, the return type is string.
 @end table
 @item @strong{Example for UNIX:}
-@example
+@smallexample
 // a listing of the current directory:
 system("sh","ls");
 // execute a shell, return to SINGULAR with exit:
@@ -5316,9 +5314,9 @@ system("Singular");
 // report minimal display time
 system("--min-time");
 @expansion{} 0.5
-@end example
+@end smallexample
 @item @strong{Example for MSDOS:}
-@example
+@smallexample
 // a listing of the current directory:
 system("sh","dir");
 // execute a shell, return to SINGULAR with exit:
@@ -5326,7 +5324,7 @@ system("sh","command");
 string unique_name="/tmp/xx"+string(system("pid"));
 unique_name;
 @expansion{} /tmp/xx0
-@end example
+@end smallexample
 @end table
 @c @menu
 @c @end menu
@@ -5347,13 +5345,13 @@ module
 computes the first syzygy (i.e. the module of relations of the given generators)
 of the ideal resp. module.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring R=0,(x,y),(c,dp);
   ideal i=x,y;
   syz(i);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ideal::
@@ -5381,13 +5379,13 @@ int resp. poly
 @item @strong{Purpose:}
 returns the trace of an intmat resp a matrix.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   intmat m[2][2]=1,2,3,4;
   print(m);
   trace(m);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * intmat::
@@ -5411,14 +5409,14 @@ same type as the argument
 @item @strong{Purpose:}
 transposes a matrix.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring R=0,x,dp;
   matrix m[2][3]=1,2,3,4,5,6;
   print(m);
   print(transpose(m));
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{intmat};
@@ -5438,13 +5436,13 @@ none
 lists the [name, level, type and] value of a variable. To display the
 value of an expression, it is sufficient to type @code{expression;}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   int i=3;
   i;
   type i;
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * listvar::
@@ -5492,7 +5490,7 @@ For internal use only are the types
 @code{"package"},
 @code{"?unknown type?"}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   int i = 9;
   i;
@@ -5508,7 +5506,7 @@ For internal use only are the types
   p();
   typeof(_);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * Data types::
@@ -5528,12 +5526,12 @@ poly
 @item @strong{Purpose:}
 returns the n-th ring variable for a given integer n.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   var(2);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ring::
@@ -5560,14 +5558,14 @@ returns the list of the names of the ring variables as a string
 @*or the name of the n-th ring variable for a given integer n.
 @*@code{varstr(n)} is equivalent to @code{varstr(basering,n)}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),dp;
   varstr(r);
   varstr(r,1);
   varstr(2);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ring::
@@ -5603,14 +5601,14 @@ this is the same as the vector space dimension of the ring (resp.
 free module) modulo the ideal (resp. module).
 @*If the ideal resp.@: module is not zero-dimensional, -1 is returned
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,(x,y),ds;
   ideal i=x2+y2,x2-y2;
   ideal j=std(i);
   vdim(j);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ideal::
@@ -5635,14 +5633,14 @@ matrix
 @item @strong{Purpose:}
 computes the n-th exterior power of matrix for a given integer n.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r;
   matrix m[2][3] = x,y,y,z,z,x;
   print(m);
   print(wedge(m,2));
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * matrix::
@@ -5668,7 +5666,7 @@ weight vector for the variables in order to speed up the standard basis
 algorithm.   If the input is weighted homogeneous, a weight vector for
 which the input is weighted homogeneous is found.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring h1=32003,(t,x,y,z),dp;
   ideal i=
@@ -5681,7 +5679,7 @@ which the input is weighted homogeneous is found.
   map f=h1,a,b,c,d;
   ideal i0=std(f(i));
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * ideal::
@@ -5721,7 +5719,7 @@ base.
 @*Called with two arguments it deletes the entry with the key
 specified by the string from the data base.
 @item @strong{Example:}
-@example
+@smallexample
 //write the lines with the values of the variables f and i
 //then the value of m+a into the file "outfile"
 write(":w outfile",f,i,m+a);
@@ -5738,7 +5736,7 @@ ring r=32003,(x,y,z),dp;
 string s=read("save_i");  //creates the string x+y,z3+22y
 execute "ideal k="+s+";"; // this defines an ideal k which
                           // is equal to i.
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -5791,7 +5789,7 @@ are not local to that block. Note that there is no ending semicolon at
 the end of the block.
 @table @code
 @item @strong{Example:}
-@example
+@smallexample
 if ( i>j )
 @{
   // This is the block
@@ -5801,7 +5799,7 @@ if ( i>j )
   j=temp;
   kill temp;
 @}
-@end example
+@end smallexample
 @end table
 
 @c ---------------------------------------
@@ -5814,7 +5812,7 @@ if ( i>j )
 @item @strong{Purpose:}
 leaves the innermost @code{for}- or @code{while}-block.
 @item @strong{Example:}
-@example
+@smallexample
 while (1)
 @{
   @dots{}
@@ -5823,7 +5821,7 @@ while (1)
     break; // leave the while block
   @}
 @}
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{Control structures};
@@ -5845,7 +5843,7 @@ construct.
 Unlike the C-construct it @strong{does not execute the increment statement}.
 The command @code{continue} is mainly for internal use.
 @item @strong{Example:}
-@example
+@smallexample
 for (int i = 1 ; i<=10; i=i+1)
 @{
    @dots{}
@@ -5859,7 +5857,7 @@ for (int i = 1 ; i<=10; i=i+1)
 @expansion{} 8
 @expansion{} 9
 @expansion{} 10
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{Control structures}; @ref{for}; @ref{while}.
@@ -5875,7 +5873,7 @@ executes false_block if the boolean_expression of the @code{if} statement
 is false. This command is only valid in combination with an @code{if}
 command.
 @item @strong{Example:}
-@example
+@smallexample
 int i=3;
 if (i > 5)
 @{
@@ -5886,7 +5884,7 @@ else
   "i is smaller than 6";
 @}
 @expansion{} i is smaller than 6
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
@@ -5939,7 +5937,7 @@ identifier of type package.
 @item @strong{Note:} Objects defined in a ring are not automatically exported
 when exporting the ring, (use @code{keepring} instead).
 @item @strong{Example:}
-@example
+@smallexample
 proc p1
 @{
   int i,j;
@@ -5955,7 +5953,7 @@ p1();
 listvar();
 @expansion{} // m                    [0]  intmat 1 x 1
 @expansion{} // i                    [0]  int 0
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{keepring}.
@@ -6008,7 +6006,7 @@ library @code{standard.lib} is automatically loaded at start-up time.
 
 All loaded libraries are displayed by the @code{listvar(package);}
 command:
-@example
+@smallexample
 @c example
   option(loadLib);   // show loading of libraries;
                      // standard.lib is loaded
@@ -6017,7 +6015,7 @@ command:
   load("inout.lib"); // are now known to Singular
   listvar(package);
 @c example
-@end example
+@end smallexample
 
 Each time a library @ref{Singular library} / dynamic module @ref{dynamic
 module} is loaded, the corresponding namespace is created, if it does
@@ -6032,13 +6030,13 @@ For a dynamic module the packagename is hard-coded in the binary file.
 @sc{Singular} also supports autoloading of packages.
 To use this features, just specify the identifier by its full name:
 
-@example
+@smallexample
 @c example error
   listvar(package);
   Inout::version;     // full name of a variable in the package Inout
   listvar(package);   // the package Inout has been autoloaded
 @c example
-@end example
+@end smallexample
 
 For autoloading the base of the filename is generated by converting the
 packagename to lowercase letters. The search is done in the standard
@@ -6070,14 +6068,14 @@ monitoring of library loading (@pxref{option}).
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
 
-@example
+@smallexample
 @c example
   option(loadLib); // show loading of libraries; standard.lib is loaded
                    // the names of the procedures of inout.lib
   load("inout.lib"); // are now known to Singular
   listvar();
 @c example
-@end example
+@end smallexample
 @c ref
 See
 @ref{Command line options};
@@ -6127,7 +6125,7 @@ statement is complete. After each execution of the block, the command
 iterate_command is executed and boolean_expression is evaluated.
 @*The command @code{break;} leaves the innermost @code{for} construct.
 @item @strong{Example:}
-@example
+@smallexample
 // sum of 1 to 10:
 int s=0;
 for (int i=1; i<=10; i=i+1)
@@ -6136,7 +6134,7 @@ for (int i=1; i<=10; i=i+1)
 @}
 s;
 @expansion{} 55
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{Control structures}; @ref{boolean expressions}; @ref{while}; @ref{if};
@@ -6156,14 +6154,14 @@ executes true_block if the boolean condition is true. If the @code{if}
 statement is followed by an @code{else} statement and the boolean
 condition is false, then false_block is executed.
 @item @strong{Example:}
-@example
+@smallexample
 int i = 9;
 matrix m [i][i];
 if (i > 5 and typeof(m) == "matrix")
 @{
   m[i][i] = i;
 @}
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{else}; @ref{break}; @ref{Control structures};
@@ -6183,7 +6181,7 @@ be used inside of procedures and it should be the last command before the
 a ring which is local to the procedure (and its objects) accessible after
 the procedure ended without making the ring global.
 @item @strong{Example:}
-@example
+@smallexample
 proc P1
 @{
   ring r=0,x,dp;
@@ -6201,7 +6199,7 @@ P2();
 @expansion{} inside P2, after call of P1: r
 "at top level: " + nameof(basering);
 @expansion{} at top level: r1
-@end example
+@end smallexample
 @end table
 @c ---------------------------------------
 @node quit, return, keepring, Control structures
@@ -6232,7 +6230,7 @@ any
 returns the result(s) of a procedure.
 @*Can only be used inside a procedure.
 @item @strong{Example:}
-@example
+@smallexample
 proc p2
 @{
   int i,j;
@@ -6255,7 +6253,7 @@ proc type_return (int i)
 // then we need def type (or list) to collect value
 def t1 = type_return(1);
 def t2 = type_return(-1);
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -6274,7 +6272,7 @@ repetitive, conditional execution of block.
 @*The command @code{break} leaves the innermost @code{while}
 construct.
 @item @strong{Example:}
-@example
+@smallexample
 int i = 9;
 while (i>0)
 @{
@@ -6289,7 +6287,7 @@ while (1)
      break;
    @}
 @}
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{Control structures}; @ref{boolean expressions}; @ref{break}.
@@ -6311,7 +6309,7 @@ characters.
 @sc{Singular} proceeds with the execution of the command following @code{~;}
 as soon as it receives an empty line.
 @item @strong{Example:}
-@example
+@smallexample
 proc t
 @{
   int i=2;
@@ -6327,7 +6325,7 @@ i;
 @expansion{} -- break point in t --
 
 @expansion{} 3
-@end example
+@end smallexample
 @end table
 @c ref
 See @ref{Break points}.
@@ -6402,7 +6400,7 @@ exceeds @code{degBound}.
 input.
 @*Reset this bound by setting @code{degBound} to 0.
 @item @strong{Example:}
-@example
+@smallexample
 degBound = 7;
 option();
 @expansion{} //options for 'std'-command: degBound
@@ -6410,7 +6408,7 @@ ideal j=std(i);
 degBound;
 @expansion{} 7
 degBound = 0; //resets degree bound to infinity
-@end example
+@end smallexample
 @end table
 @menu
 * deg::
@@ -6433,11 +6431,11 @@ input is echoed if @code{echo} >= @code{voice}.
 @*echo does not affect the output of commands.
 @item @strong{Example:}
 @c this example cannot be a computed one - echo interferes with -e
-@example
+@smallexample
 echo = 1;
 int i = echo;
 @expansion{} int i = echo;
-@end example
+@end smallexample
 @end table
 @menu
 * int::
@@ -6469,14 +6467,14 @@ numbers or Z/p, p prime number.
 polynomial is irreducible! It can be checked in advance with the
 function @code{factorize} @ref{factorize}.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   //(Q[i]/(i^2+1))[x,y,z]:
   ring Cxyz=(0,i),(x,y,z),dp;
   minpoly=i^2+1;
   i2;
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * factorize::
@@ -6498,7 +6496,7 @@ zero-dimensional in a ring with local ordering
 and its multiplicity (@code{mult}) is lower than @code{multBound}.
 @*Reset this bound by setting @code{multBound} to 0
 @item @strong{Example:}
-@example
+@smallexample
 multBound = 20;
 option();
 @expansion{}    //options for 'std'-command: multBound
@@ -6506,7 +6504,7 @@ ideal j=std(i);
 multBound;
 @expansion{} 20
 multBound = 0;  //disables multBound
-@end example
+@end smallexample
 @end table
 @menu
 * int::
@@ -6530,7 +6528,7 @@ cuts off  all monomials above
 the monomial @code{noether} during the computation.
 @*Reset @code{noether} by setting @code{noether} to 0
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring R=32003,(x,y,z),ds;
   ideal i=x2+y^12,y13;
@@ -6539,7 +6537,7 @@ the monomial @code{noether} during the computation.
   std(i);
   noether = 0; //disables noether
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * poly::
@@ -6561,10 +6559,10 @@ sets the debug level for dbprint.
 If @code{printlevel} >= @code{voice} @code{dbprint} is equivalent to
 @code{print}, otherwise nothing is printed.
 @item @strong{Note:}
-@xref{Guidelines for writing a library}, for an example how this is used
+@xref{Guidelines for writing a library}, for an smallexample how this is used
 for the display of comments while procedures are executed.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   voice;
   printlevel=0;
@@ -6572,7 +6570,7 @@ for the display of comments while procedures are executed.
   printlevel=voice;
   dbprint(1);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * int::
@@ -6598,7 +6596,7 @@ Both notations may be used as input.
 change of the basering sets @code{short} to the proper default value for
 that ring and overwrites the previous setting.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=23,x,dp;
   int save=short;
@@ -6608,7 +6606,7 @@ that ring and overwrites the previous setting.
   2x2,x2;
   short=save;//resets short to the previous value
 @c example
-@end example
+@end smallexample
 @end table
 @c -----------------------------------------------------
 @node timer, TRACE var, short, System variables
@@ -6647,7 +6645,7 @@ The value of the @code{timer} can not be used (resp. trusted) when
 of the Windows95/98 operating system). Use @ref{rtimer}, instead.
 
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   timer = 1; // The time of each command is printed
   int t=timer; // initialize t by timer
@@ -6660,7 +6658,7 @@ of the Windows95/98 operating system). Use @ref{rtimer}, instead.
   execute "int tps=" + system("--ticks-per-sec");
   t/tps; // yields the time in seconds
 @c example
-@end example
+@end smallexample
 @end table
 @c ref
 See
@@ -6693,13 +6691,13 @@ in this line is suspended until the user presses @code{RETURN}.
 @*@code{TRACE} is defaulted to 0.
 @*@code{TRACE} does not affect the output of commands.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   TRACE = 1;
   LIB "general.lib";
   sum(1..100);
 @c example
-@end example
+@end smallexample
 @end table
 @menu
 * int::
@@ -6731,10 +6729,10 @@ int
 @item @strong{Purpose:}
 shows the nesting level of procedures.
 @item @strong{Note:}
-@xref{Guidelines for writing a library}, for an example how this is used
+@xref{Guidelines for writing a library}, for an smallexample how this is used
 for the display of comments while procedures are executed.
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   voice;
 @c example
@@ -6743,7 +6741,7 @@ proc p
   voice;
 @}
 @expansion{} 2
-@end example
+@end smallexample
 @end table
 @menu
 * dbprint::

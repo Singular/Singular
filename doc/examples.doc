@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.45 1999-07-07 16:38:36 obachman Exp $
+@comment $Id: examples.doc,v 1.46 1999-07-09 14:12:48 obachman Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -10,7 +10,7 @@
 @ignore
 %**start
 \input texinfo.tex
-@setfilename examples.info
+@setfilename smallexamples.info
 @node Top, Examples
 @menu
 * General concepts::
@@ -191,7 +191,7 @@ then compute the Milnor number (=248) and the Tjurina number
 reset the option to @code{noprot}
 @end itemize
 
-@example
+@smallexample
 @c example
   option(prot);
   ring r1 = 32003,(x,y,z),ds;
@@ -216,7 +216,7 @@ reset the option to @code{noprot}
   vdim(std(j1+f));   // compute the Tjurina number for t=1
   option(noprot);
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @node Procedures and LIB, Critical points, Milnor and Tjurina, Examples
@@ -264,7 +264,7 @@ lists may be empty.)
   @end itemize
 @end itemize
 
-@example
+@smallexample
 LIB "sing.lib";
 // you should get the information that sing.lib has been loaded
 // together with some other libraries which are needed by sing.lib
@@ -306,7 +306,7 @@ milrina(f);     // a list containing Milnor and Tjurina number
 @expansion{}    24
 milrina(f)[2];  // the second element of the list
 @expansion{} 24
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @node Critical points, Saturation, Procedures and LIB, Examples
@@ -397,7 +397,7 @@ dim_K(K[x1,...,xn]/(jacob(f)+(f))),
 the affine surface @code{f}=0 is smooth outside the origin.
 @end itemize
 
-@example
+@smallexample
 @c example
   ring r1 = 32003,(x,y,z),ds;
   int a,b,c,t=11,5,3,0;
@@ -412,7 +412,7 @@ the affine surface @code{f}=0 is smooth outside the origin.
   vdim(std(j+f));
   timer=0;  // reset timer
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -452,7 +452,7 @@ ideal.  @code{sat} returns a list of two elements: the saturated ideal
 and the number of iterations.  (Note that @code{maxideal(n)} denotes the
 n-th power of the maximal ideal).
 
-@example
+@smallexample
 @c example
   LIB "elim.lib";         // loading library elim.lib
   // you should get the information that elim.lib has been loaded
@@ -466,7 +466,7 @@ n-th power of the maximal ideal).
   // list the variables defined so far:
   listvar();
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -486,7 +486,7 @@ the time needed for a standard basis computation is used in the
 computation of the coefficients (in char 0).
 The representation of long integers with real is demonstrated.
 
-@example
+@smallexample
 timer = 1;                              // activate the timer
 option(prot);
 ring R0 = 0,(x,y),lp;
@@ -591,7 +591,7 @@ j;
 @expansion{} j[3]=5x4+3x2y9+y9
 vdim(j);
 @expansion{} 40
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -648,7 +648,7 @@ $j_0=j|_{t=a}$.
 j_0=j_t=a
 @end ifinfo
 
-@example
+@smallexample
 @c example
   ring Rt = (0,t),(x,y),lp;
   Rt;
@@ -662,7 +662,7 @@ j_0=j_t=a
   ideal j=i,i[1]*i[2]+a*x5y8;  // deformed ideal, fixed integer a
   vdim(std(j));
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -708,7 +708,7 @@ create a polynomial encoding the Hilbert series
 compute the dimension of T2
 @end itemize
 
-@example
+@smallexample
 @c example
   LIB "sing.lib";
   ring R=32003,(x,y,z),ds;
@@ -744,8 +744,8 @@ compute the dimension of T2
   v1[3];                // 3-rd coefficient of the 1-st Hilbert series
   module N=T2(i);
 @c example
-@end example
-@example
+@end smallexample
+@smallexample
 // In some cases it might be useful to have a polynomial in some ring
 // encoding the Hilbert series. This polynomial can then be
 // differentiated, evaluated etc. It can be done as follows:
@@ -785,7 +785,7 @@ L[3];                 // vdim of T1
 @expansion{} 4
 L[4];                 // vdim of T2
 @expansion{} 3
-@end example
+@end smallexample
 @c killall();            // a procedure from general.lib
 @c @expansion{} // ** killing the basering for level 0
 @end ifset
@@ -856,7 +856,7 @@ complete intersection, the third no complete intersection and compute
 in each of the cases the miniversal deformation:
 @end ifclear
 
-@example
+@smallexample
 @c example
   LIB "deform.lib";
   ring R=32003,(x,y,z),ds;
@@ -906,7 +906,7 @@ in each of the cases the miniversal deformation:
   //         -A(1)*A(4) = A(3)*A(4) = -A(2)*A(4)-A(4)^2 = 0 }
   //----------------------------------------------------
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -929,7 +929,7 @@ In general there will be many more solutions in the second case.
 (Since the @sc{Singular} language is interpreted, the evaluation of many
 @code{for}-loops is not very fast):
 
-@example
+@smallexample
 @c example
   int p=3;  int n=3;  int d=5; int k=2;
   ring rp = p,(x(1..n)),dp;
@@ -1000,7 +1000,7 @@ In general there will be many more solutions in the second case.
   }
   "//",s,"solutions over GF("+string(p^k)+")";
 @c example
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -1033,10 +1033,10 @@ $$
 @end tex
 @ifinfo
 
-@example
+@smallexample
         j = J intersected with K[x1,...,xn]
 J=(x1-f1(t1,...,tr),...,xn-fn(t1,...,tr)) in k[t1,...tr,x1,...,xn]
-@end example
+@end smallexample
 
 @end ifinfo
 i.e of the ideal j obtained from J by eliminating the variables
@@ -1127,7 +1127,7 @@ P^4.
 @end ifinfo
 @end enumerate
 
-@example
+@smallexample
 @c example
   // 1. Compute equations of curve given in parametric form:
   // Two transversal cusps in (k^3,0):
@@ -1196,7 +1196,7 @@ P^4.
   j = nselect(j,1,4);            // select generators from j not
   j;                             // containing variable 1,...,4
 @c example
-@end example
+@end smallexample
 @c  killall();
 
 
@@ -1298,7 +1298,7 @@ from above.
 Finally we demonstrate the use of the type @code{resolution} in connection with
 the @code{lres} command.
 
-@example
+@smallexample
 @c example
   // Two transversal cusps in (k^3,0):
   ring r2 =0,(x,y,z),ds;
@@ -1344,7 +1344,7 @@ the @code{lres} command.
   minres(rs);                //minimizes the resolution
   size(list(rs));            //gets the minimized resolution
 @c example
-@end example
+@end smallexample
 
 
 @c ----------------------------------------------------------------------------
@@ -1384,7 +1384,7 @@ as ker/Im.
 
 We collect these statements in this short procedure.
 
-@example
+@smallexample
 proc ext(int n, ideal I)
 @{
   resolution rs = mres(I,n+1);
@@ -1393,11 +1393,11 @@ proc ext(int n, ideal I)
   module ext_n  = modulo(syz(tAn),tAn_1);
   return(ext_n);
 @}
-@end example
+@end smallexample
 
 Now consider the following example:
 
-@example
+@smallexample
 ring r5 = 32003,(a,b,c,d,e),dp;
 ideal I = a2b2+ab2c+b2cd, a2c2+ac2d+c2de,a2d2+ad2e+bd2e,a2e2+abe2+bce2;
 print(ext(2,I));
@@ -1409,7 +1409,7 @@ print(ext(2,I));
 @expansion{} 0,0,0,0,0,1,0,
 @expansion{} 0,0,0,0,0,0,1
 ext(3,I);   // too big to be displayed here
-@end example
+@end smallexample
 
 The library @code{homolog.lib} contains several procedures for computing
 Ext-modules and related modules, which are much more general and
@@ -1499,7 +1499,7 @@ Ext^k(R/i,R)
 for some ideal @math{i} and with an extra option
 @end itemize
 
-@example
+@smallexample
 @c example
   LIB "homolog.lib";
   ring R=0,(x,y),ds;
@@ -1529,7 +1529,7 @@ for some ideal @math{i} and with an extra option
   print(LE[2]);
   print(kbase(LE[2]));
 @c example
-@end example
+@end smallexample
 @c  killall();
 @end ifset
 @c ----------------------------------------------------------------------------
@@ -1591,7 +1591,7 @@ We shall compute now this for a family of curves.  We need the library
 @code{elim.lib} for saturation and @code{sing.lib} for the singular
 locus.
 
-@example
+@smallexample
 @c example
   LIB "elim.lib";
   LIB "sing.lib";
@@ -1665,7 +1665,7 @@ locus.
   size(reduce(qsat,std(qh)));
   // both ideals coincide
 @c example
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -1693,7 +1693,7 @@ depth(D_k(R)) >= m(m+1)/2 + m-1
 @end ifinfo
 could be improved.
 
-@example
+@smallexample
 @c example
   LIB "matrix.lib"; LIB "sing.lib";
   int n = 4;
@@ -1723,7 +1723,7 @@ could be improved.
   print(B,"betti");
   N-ncols(B)+1;                          // the desired depth
 @c example
-@end example
+@end smallexample
 @c  killall();
 @end ifset
 
@@ -1743,7 +1743,7 @@ First we compute the powers of 2 and comment the result with some text.
 Then we do the same and give the output a nice format by computing and
 adding appropriate space.
 
-@example
+@smallexample
 @c example
   // The powers of 2:
   int  n;
@@ -1760,7 +1760,7 @@ adding appropriate space.
     "n =" + space + string (n);
   }
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -1776,7 +1776,7 @@ procedure assumes that the variables consist of a single letter each
 standard basis of this ideal and some numerical information.  (This
 ideal is used as a classical benchmark for standard basis computations).
 
-@example
+@smallexample
 // We call the procedure 'cyclic':
 proc cyclic (int n)
 @{
@@ -1827,7 +1827,7 @@ degree(j);
 @expansion{} // codimension = 5
 @expansion{} // dimension   = 0
 @expansion{} // degree      = 70
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -1843,7 +1843,7 @@ $\sum x_i \partial /\partial x_{i+1}$.
 @ifinfo
 sum x(i)*d/dx(i+1).
 @end ifinfo
-@example
+@smallexample
 @c example
   LIB "invar.lib";
   int n=5;
@@ -1868,7 +1868,7 @@ sum x(i)*d/dx(i+1).
   ideal in=invariantRing(m,y,x);
   in; //invariant ring is generated by 6 invariants
 @c example
-@end example
+@end smallexample
 @c kill n,i,s,q;
 @end ifset
 @c ----------------------------------------------------------------------------
@@ -1898,7 +1898,7 @@ over Arbitrary Fields" by Kemper (1996, to appear in JSC).
 We calculate now an example from Sturmfels: "Algorithms in Invariant
 Theory 2.3.7":
 
-@example
+@smallexample
 @c example
   LIB "finvar.lib";
   ring R=0,(x,y,z),dp;
@@ -1924,7 +1924,7 @@ Theory 2.3.7":
   B(1..3)=invariant_ring_random(A,1);
   print(B(1..3));
 @c example
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -1940,7 +1940,7 @@ The factorization of polynomials is implemented in the C++ libraries
 Factory (written mainly by Ruediger Stobbe) and libfac (written by
 Michael Messollen) which are part of the @sc{Singular} system.
 
-@example
+@smallexample
 @c example
   ring r = 0,(x,y),dp;
   poly f = 9x16-18x13y2-9x12y3+9x10y4-18x11y2+36x8y4
@@ -1956,7 +1956,7 @@ Michael Messollen) which are part of the @sc{Singular} system.
   poly g = (y4+x8)*(x2+y2);
   factorize(g);
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -1995,7 +1995,7 @@ polygon of @math{f}, the squarefree part of @math{f} and a procedure to
 convert one set of invariants to another.
 
 
-@example
+@smallexample
 @c example
   LIB "hnoether.lib";
   // ======== The irreducible case ========
@@ -2032,7 +2032,7 @@ convert one set of invariants to another.
   param(hn[2]);      // parametrization of 2nd branch
   // extended parametrization of 1st
 @c example
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -2051,7 +2051,7 @@ a list of pairs of ideals,
 where the second ideal form the prime ideal and the first
 ideal form the corresponding primary ideal.
 
-@example
+@smallexample
 @c example
   LIB "primdec.lib";
   ring r = 0,(a,b,c,d,e,f),dp;
@@ -2081,7 +2081,7 @@ ideal form the corresponding primary ideal.
   minAssChar(J);
   radical(J);
 @c example
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -2094,7 +2094,7 @@ rings of this list. The normalization of @math{R/I} is the product of
 the factor rings of the rings in the list divided out by the ideals
 @code{norid}.
 
-@example
+@smallexample
 @c example
   LIB "normal.lib";
   // ----- first example: rational quadruple point -----
@@ -2113,7 +2113,7 @@ the factor rings of the rings in the list divided out by the ideals
   setring S2; norid;
   setring S3; norid;
 @c example
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -2140,7 +2140,7 @@ $$
 @end tex
 @ifinfo
 
-@example
+@smallexample
    r   A     m
   R  -----> R
             ^
@@ -2148,7 +2148,7 @@ $$
             |
              s
             R  .
-@end example
+@end smallexample
 
 @end ifinfo
 We want to compute the kernel of the map
@@ -2159,10 +2159,10 @@ R^m/\hbox{Im}(B) \;.$
 @end tex
 @ifinfo
 
-@example
+@smallexample
    r   A     m         m
   R  -----> R  -----> R /Im(B) .
-@end example
+@end smallexample
 
 @end ifinfo
 This can be done using the @code{modulo} command:
@@ -2174,21 +2174,21 @@ $$
 @end tex
 @ifinfo
 
-@example
+@smallexample
                    r   A     m
   modulo(A,B)=ker(R  -----> R /Im(B))  .
-@end example
+@end smallexample
 
 @end ifinfo
 
-@example
+@smallexample
 @c example
   ring r=0,(x,y,z),(c,dp);
   matrix A[2][2]=x,y,z,1;
   matrix B[2][2]=x2,y2,z2,xz;
   print(modulo(A,B));
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -2224,9 +2224,9 @@ K[x_1,\ldots,x_n,Y_1,\ldots,Y_r]$.
 @end tex
 @ifinfo
 
-@example
+@smallexample
 I=<Y_1-f_1,@dots{},Y_r-f_r> subset K[x1,@dots{},xn,Y_1,@dots{},Y_r].
-@end example
+@end smallexample
 
 @end ifinfo
 Then
@@ -2281,7 +2281,7 @@ the ideal of relations between the generators of the given ideal.
 Otherwise it checks for subring membership and returns the normal form
 of the second argument with respect to the ideal I.
 
-@example
+@smallexample
 @c example
   proc algebraicDep(ideal J, poly g)
   {
@@ -2343,7 +2343,7 @@ of the second argument with respect to the ideal I.
   setring r; kill Rhelp;
   algebraicDep(j,g);
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -2357,7 +2357,7 @@ library @code{classify.lib}. The classification is done using the
 algorithm of Arnold. Before entering this algorithm, a first guess based
 on the Hilbert polynomial of the Milnor algebra is made.
 
-@example
+@smallexample
 @c example
   LIB "classify.lib";
   ring r=0,(x,y,z),ds;
@@ -2383,7 +2383,7 @@ on the Hilbert polynomial of the Milnor algebra is made.
   corank(q);
   morsesplit(q);
 @c example
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -2401,7 +2401,7 @@ returns a reduced Groebner basis.
 For the ideal below, @code{stdfglm} is more than 100 times
 and @code{stdhilb} about 10 times faster than @code{std}.
 
-@example
+@smallexample
 @c example
   ring r =32003,(a,b,c,d,e),lp;
   ideal i=a+b+c+d, ab+bc+cd+ae+de, abc+bcd+abe+ade+cde,
@@ -2419,7 +2419,7 @@ and @code{stdhilb} about 10 times faster than @code{std}.
   ideal j0 =std(i);
   timer-t;
 @c example
-@end example
+@end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -2452,7 +2452,7 @@ Wichmann; Der FGLM-Algorithmus: verallgemeinert und implementiert in
 Singular; Diplomarbeit Fachbereich Mathematik, Universitaet
 Kaiserslautern; 1997} for more details.
 
-@example
+@smallexample
 @c example
 ring r=0,(a,b,c,u,v,w,x,y,z),lp;
 ideal i=a+c+v+2x-1, ab+cu+2vw+2xy+2xz-2/3,  ab2+cu2+2vw2+2xy2+2xz2-2/5,
@@ -2484,7 +2484,7 @@ else                                                    // 5.
   close(l_fglm); pid_hilb = system("sh","kill "+string(pid_hilb));
 }
 @c example
-@end example
+@end smallexample
 Some explainatory remarks are in order:
 @enumerate
 @item
@@ -2528,13 +2528,13 @@ not be terminated through the link while it is still computing.
 
 @c --------------------------------------------------------------------
 @ifclear singularmanual
-@section Further examples
+@section Further smallexamples
 
 The example section of the @sc{Singular} manual contains further examples,
 e.g.:
 @itemize @bullet
 @item Long coefficients
-@*how they arise in innocent examples
+@*how they arise in innocent smallexamples
 @item T1 and T2
 @*compute first order deformations and obstructions
 @item Finite fields
@@ -2553,7 +2553,7 @@ elements
 @item Depth
 @*various ways to compute the depth of a module
 @item Cyclic roots
-@*create and compute with this standard benchmark example
+@*create and compute with this standard benchmark smallexample
 @item Invariants of finite group
 @*compute invariant rings for finite group
 @item Puiseux pairs

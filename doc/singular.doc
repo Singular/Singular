@@ -1,42 +1,38 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.61 1999-07-08 17:12:45 Singular Exp $
+@comment $Id: singular.doc,v 1.62 1999-07-09 14:12:57 obachman Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
-@comment %**start of header
+@c %**start of header
 @c ------------------------
 @setfilename singular.hlp
 @settitle Singular Manual
+@setchapternewpage odd
+@paragraphindent 0
+@c ------------------------
+@c %**end of header
+@c ------------------------
+
+@c --------------------- general stting --------------------
 @iftex
 @afourpaper
 @finalout
 @pagesizes 23cm, 16.5cm
 @end iftex
-@paragraphindent 0
-@comment %**end of header
-@c redirect funtion index:
-@c @syncodeindex fn cp
-@c ------------------------
+
 @set singularmanual 1
 @c @set namespaces 1
 @include version.texi
-@c @set manual 1
-@c ------------------------
-@ifhtml
-<CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/Singular" TARGET="_parent">
-<IMG SRC="images/singular.jpg"></A><br>
-<h4> A Computer Algebra System for Polynomial Computations </h4>
-<p></p>
-<h4>HTML User Manual for Singular Version 1.2 </h4>
-</center>
-<CENTER><A HREF="http://www.uni-kl.de/" TARGET="_parent"><TT>University of Kaiserslautern</TT></A></CENTER>
-<CENTER><A HREF="http://www.mathematik.uni-kl.de/" TARGET="_parent"><TT>Department of Mathematics</TT></A></CENTER>
-<CENTER>and</CENTER>
-<CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/" TARGET="_parent"><TT>Centre for Computer Algebra</TT></A></CENTER>
-@end ifhtml
+
+@c --------------------- end general stting --------------------
+
+@c --------------------- Info header --------------------
 @ifinfo
-this is the texinfo file describing Singular (version @value{SHORT_VERSION})
+This is the texinfo file describing Singular (version @value{VERSION})
 @end ifinfo
-@c
+@c --------------------- end Info header --------------------
+
+
+@c --------------------- tex titlepage --------------------
 @titlepage
 @sp 2
 @center @titlefont{Singular}
@@ -44,7 +40,7 @@ this is the texinfo file describing Singular (version @value{SHORT_VERSION})
 @center A Computer Algebra System for Polynomial Computations
 @sp 5
 @center @titlefont{Manual}
-@center Version @value{SHORT_VERSION}
+@center Version @value{VERSION}
 @sp 2
 @center Singular is created and its development is directed and coordinated by
 @center G.-M. Greuel, G. Pfister, and H. Schoenemann
@@ -54,30 +50,22 @@ this is the texinfo file describing Singular (version @value{SHORT_VERSION})
 @center B. Martin, M. Messollen, W. Neumann, T. Nuessler, W. Pohl, T. Siebert, R. Stobbe, T. Wichmann
 @sp 2
 @author Fachbereich Mathematik
-@author und
 @author Zentrum fuer Computeralgebra
 @author Universitaet Kaiserslautern
 @author D-67653 Kaiserslautern
 @end titlepage
 @shortcontents
-@contents
+
 @c ----------------------------------------------------------------------------
-@ifinfo
-@c @manual
-@c q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
-@c @end manual
-@sp 1
-@center Singular
-@center A Computer Algebra System for Polynomial Computations
-@sp 1
-@center User Manual for Singular Version @value{SHORT_VERSION}
-@sp 2
-@center @uref{http://www.uni-kl.de/ ,University of Kaiserslautern}
-@center @uref{http://www.mathematik.uni-kl.de/ ,Department of Mathematics}
-@center and
-@center @uref{http://www.mathematik.uni-kl.de/~zca/ ,Centre for Computer Algebra}
-@end ifinfo
 @node Top, Preface, (dir), (dir)
+
+@ifnottex
+@center @strong{SINGULAR}
+@center A Computer Algebra System for Polynomial Computations
+@center User Manual for @sc{Singular} Version @value{VERSION}
+@center @uref{http://www.mathematik.uni-kl.de/~zca/Singular}
+@end ifnottex
+
 @menu
 * Preface::
 * Introduction::
@@ -92,11 +80,11 @@ this is the texinfo file describing Singular (version @value{SHORT_VERSION})
 * Library function index::
 * Index::
 @end menu
+
 @c ----------------------------------------------------------------------------
 @node Preface, Introduction, Top, Top
 @chapter Preface
 @cindex Preface
-
 @include copyright.tex
 @c ----------------------------------------------------------------------------
 @node Introduction, General concepts, Preface, Top
@@ -203,15 +191,15 @@ The increment @code{++} (resp.@: decrement operator @code{--}) has no
 rvalue, i.e., cannot be used on the right-hand sides of assignments.
 So, instead of
 
-@example
+@smallexample
 j = i++;  // WRONG!!!
-@end example
+@end smallexample
 
 @noindent (which results in an error), it must be written
 
-@example
+@smallexample
 i++; j = i;
-@end example
+@end smallexample
 
 Likewise, an assignment expression does not have a result.  Therefore,
 compound assignments like @code{i = j = k;} are not allowed and result
@@ -236,19 +224,19 @@ logical expressions @code{(a || b)} is evaluated by first evaluating
 influence on the value of @code{(a || b)}, if @code{a} evaluates to
 true. Therefore, the following results in a syntax error
 
-@example
+@smallexample
 if (defined(i) && i > 0) @{@} // WRONG!!!
-@end example
+@end smallexample
 
 @noindent if the variable @code{i} is undefined. This must be written
 instead as
 
-@example
+@smallexample
 if (defined(i))
 @{
   if (i > 0) @{@}
 @}
-@end example
+@end smallexample
 
 Note that this evaluation is different from the left-to-right, conditional
 evaluation of logical expressions (as found in most programming
@@ -265,9 +253,9 @@ If a variable (say, @code{i}) is only to be used as a boolean flag, then
 define (value is true) and undefine (value is false) @code{i} instead of
 assigning a value. Using this scheme, it is sufficient to simply write
 
-@example
+@smallexample
 if (defined(i))
-@end example
+@end smallexample
 
 in order to check whether @code{i} is true. Use the command @code{kill}
 to undefine a variable (@pxref{kill}).
@@ -276,13 +264,13 @@ If a variable  can have more than two values, then
 define it, if necessary, before it is used for the first time.
 For example, if the following is used within a procedure
 
-@example
+@smallexample
 if (! defined(DEBUG)) @{ int DEBUG = 1;@}
 @dots{}
 if (DEBUG == 3)  @{@dots{}@}
 if (DEBUG == 2)  @{@dots{}@}
 @dots{}
-@end example
+@end smallexample
 
 then a user of this procedure does not need to care about the existence
 of the @code{DEBUG} variable -- this remains hidden from the
@@ -299,7 +287,7 @@ value is overwritten by its global one.
 @sc{Singular} does not offer a @code{case} (or @code{switch})
 statement. However, it can be imitated in the following way:
 
-@example
+@smallexample
 while (1)
 @{
    if (choice == choice_1) @{ @dots{}; break;@}
@@ -308,7 +296,7 @@ while (1)
    // default case
    @dots{}; break;
 @}
-@end example
+@end smallexample
 
 @c ---------------------------------------
 @node Usage of commas, Usage of brackets, No case or switch statement, Major differences to the C programming language
@@ -320,15 +308,15 @@ expression is a list.
 Hence, commas can not be used to combine several expressions into
 a single expression. For example, instead of writing
 
-@example
+@smallexample
 for (i=1, j=5; i<5 || j<10; i++, j++) @{@dots{}@} // WRONG!!!!!!
-@end example
+@end smallexample
 
 @noindent one has to write
 
-@example
+@smallexample
 for (i,j = 1,5; i<5 || j<10; i++, j++) @{@dots{}@}
-@end example
+@end smallexample
 
 @c ---------------------------------------
 @node Usage of brackets, Behavior of continue, Usage of commas, Major differences to the C programming language
@@ -344,15 +332,15 @@ always} be used to enclose the return value.  Even if there is no value
 to return, parentheses have to be used after a return statement
 (i.e., @code{return();}).  For example,
 
-@example
+@smallexample
 if (i == 1) return i;    // WRONG!!!!!
-@end example
+@end smallexample
 
 @noindent results in a errors. Instead, it must be written as
 
-@example
+@smallexample
 if (i == 1) @{ return (i); @}
-@end example
+@end smallexample
 
 @c ---------------------------------------
 @node  Behavior of continue, Return type of procedures, Usage of brackets, Major differences to the C programming language
@@ -364,7 +352,7 @@ loop-body and jumps to the beginning of the block. Unlike the
 C-construct @sc{Singular}'s @code{continue} @strong{does not execute the
 increment statement}. For example,
 
-@example
+@smallexample
 for (int i = 1 ; i<=10; i=i+1)
 @{
    @dots{}
@@ -378,7 +366,7 @@ for (int i = 1 ; i<=10; i=i+1)
 @expansion{} 8
 @expansion{} 9
 @expansion{} 10
-@end example
+@end smallexample
 @c ---------------------------------------
 @node Return type of procedures,,Behavior of continue, Major differences to the C programming language
 @subsection Return type of procedures
@@ -392,7 +380,7 @@ example, depend on the input. However, the return value
 of such a procedure may then only be assigned to a variable of type
 @code{def}.
 
-@example
+@smallexample
 @c example
 proc type_return (int i)
 {
@@ -403,14 +391,14 @@ def t1 = type_return(1);
 def t2 = type_return(-1);
 typeof(t1); typeof(t2);
 @c example
-@end example
+@end smallexample
 
 Furthermore, it is mandatory to assign the return value of a procedure
 to a variable of type def, if a procedure changes the current ring using
 the @code{keepring} command (@pxref{keepring}) and returns a
 ring-dependent value (like a polynomial or module).
 
-@example
+@smallexample
 @c example
 proc def_return
 {
@@ -423,15 +411,15 @@ def p = def_return();
 // poly p = def_return(); would be WRONG!!!
 typeof(p);
 @c example
-@end example
+@end smallexample
 
 On the other hand, more than one value can be returned by a single
 @code{return} statement. For example,
 
-@example
+@smallexample
 proc tworeturn () @{ return (1,2); @}
 int i,j = tworeturn();
-@end example
+@end smallexample
 
 
 @c -------------------------------------------------------------------------
@@ -447,7 +435,7 @@ A sequence of digits and @code{/} without spaces is of type number.
 With spaces it is an expression of type int
 (and @code{/} is the integer division).
 To avoid confusion use the operand @code{div}.
-@example
+@smallexample
 @c example error
   ring r=32002,x,dp;
   3/2;
@@ -459,21 +447,21 @@ To avoid confusion use the operand @code{div}.
   a / b;
   a div b;
 @c example
-@end example
+@end smallexample
 
 
 @item monomials and precedence
 @cindex monomials and precedence
 
 The computation of a monomial has precedence over all operators:
-@example
+@smallexample
 @c example
   ring r=0,(x,y),dp;
   2xy^2 == (2*x*y)^2;
   2xy^2 == 2x*y^2;
   2x*y^2 == 2*x * (y^2);
 @c example
-@end example
+@end smallexample
 
 @item meaning of mult
 @cindex mult
@@ -518,7 +506,7 @@ the respective single characters of the string and returns them as an
 expression list of two strings.
 In particular,
 
-@example
+@smallexample
 @c example
   string s = "one-word";
   s[2,6];     // a substring starting at the second char
@@ -531,12 +519,12 @@ In particular,
   v = 2,6,8;
   s[v];
 @c example
-@end example
+@end smallexample
 
 @item packages and indexed variables
 
 See example
-@example
+@smallexample
 @c example error
 package K;
 string K::varok;
@@ -547,7 +535,7 @@ listvar();
 // i(1..3) are stored in Package 'K'
 listvar(K);
 @c example
-@end example
+@end smallexample
 @end enumerate
 
 @c ----------------------------------------------
@@ -576,14 +564,14 @@ Consequently, it is allowed to have general variables with the same name
 as ring  variables. However, the above identifier resolution order must
 be kept in mind. Otherwise, surprising results may come up.
 
-@example
+@smallexample
 @c example
 ring r=0,(x,y),dp;
 int x;
 x*y; // resolved product int*poly, i.e., 0*y
 xy; // "xy" is one identifier and resolved to monomial xy
 @c example
-@end example
+@end smallexample
 
 For these reasons, we strongly recommend not to use variables which
 have the same name(s) as ring variables.
@@ -667,12 +655,12 @@ The library @code{all.lib} provides a convenient way to load all
 libraries of the @sc{Singular} distribution.
 
 @strong{Example:}
-@example
+@smallexample
 @c example
 option(loadLib);
 LIB "all.lib";
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------
 @node general_lib, matrix_lib, all_lib, SINGULAR libraries
@@ -815,6 +803,7 @@ LIB "all.lib";
 @chapter Index
 @printindex cp
 @c ---------------------------------------------------------
-@c @shortcontents
-@c @contents
+
+@c generate table of content and short table of content
+@contents
 @bye

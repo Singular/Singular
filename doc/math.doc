@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.40 1999-07-02 12:38:17 obachman Exp $
+@comment $Id: math.doc,v 1.41 1999-07-09 14:12:51 obachman Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -308,7 +308,7 @@ characteristic series} of the ideal (G).
 
 @table @code
 @item @strong{Example:}
-@example
+@smallexample
 @c example
   ring R= 0,(x,y,z,u),dp;
   ideal i=-3zu+y2-2x+2,
@@ -316,7 +316,7 @@ characteristic series} of the ideal (G).
           -3z2u-xu+y2z+y;
   print(char_series(i));
 @c example
-@end example
+@end smallexample
 @end table
 @c ---------------------------------------------------------------------------
 @node References,  , Characteristic sets, Mathematical background

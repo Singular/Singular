@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.124 1999-07-08 17:12:44 Singular Exp $
+@comment $Id: general.doc,v 1.125 1999-07-09 14:12:49 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -77,9 +77,9 @@ To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
 
 @sc{Singular} may also be started with command line options and with
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
-@example
+@smallexample
 Singular  [options] [file1 [file2 @dots{}]]
-@end example
+@end smallexample
 
 @xref{Command line options}, @ref{Startup sequence}.
 
@@ -255,9 +255,9 @@ the commands of the current session.
 @cindex Command line options
 
 The synopsis of @sc{Singular} is
-@example
+@smallexample
 Singular  [options] [file1 [file2 @dots{}]]
-@end example
+@end smallexample
 Options can be given in both, their long and short format. The following
 options control the general behavior of @sc{Singular}:
 @table @asis
@@ -369,12 +369,12 @@ option is given.  @xref{MPtcp links}.
 The value of options given to @sc{Singular} (resp. their default values,
 if an option was not given), can be checked with the command
 @code{system("} long_option_name_string @code{")}.  @xref{system}.
-@example
+@smallexample
 @c example
   system("--quiet");    // if ``quiet'' 1, otherwise 0
   system("--min-time"); // minimal reported time
 @c example
-@end example
+@end smallexample
 @c --------------------------------------------------------------------------
 
 @node Startup sequence, , Command line options, Interactive use
@@ -497,27 +497,27 @@ the ring @math{Z/32003[x,y,z]} with degree reverse lexicographical
 ordering.  The exact ring declaration may be omitted in the first
 example since this is the default ring:
 
-@example
+@smallexample
 ring r;
 ring r = 32003,(x,y,z),dp;
-@end example
+@end smallexample
 
 @item
 the ring @math{Q[a,b,c,d]} with lexicographical ordering:
 
-@example
+@smallexample
 ring r = 0,(a,b,c,d),lp;
-@end example
+@end smallexample
 
 @item
 the ring @math{Z/7[x,y,z]} with local degree reverse lexicographical
 ordering.  The non-prime 10 is converted to the next lower prime in the
 second example:
 
-@example
+@smallexample
 ring r = 7,(x,y,z),ds;
 ring r = 10,(x,y,z),ds;
-@end example
+@end smallexample
 
 @item
 the ring
@@ -542,26 +542,26 @@ $x_4,\ldots,x_6$:
 x4,@dots{},x6:
 @end ifinfo
 
-@example
+@smallexample
 ring r = 7,(x(1..6)),(lp(3),dp);
-@end example
+@end smallexample
 
 @item
 the localization of @math{(Q[a,b,c])[x,y,z]} at the maximal ideal
 @math{(x,y,z)}:
 
-@example
+@smallexample
 ring r = 0,(x,y,z,a,b,c),(ds(3), dp(3));
-@end example
+@end smallexample
 
 @item
 the ring @math{Q[x,y,z]} with weighted reverse lexicographical ordering.
 The variables @math{x}, @math{y}, and @math{z} have the weights 2, 1,
 and 3, respectively, and  vectors are first ordered by components (in
 descending order) and then by monomials:
-@example
+@smallexample
 ring r = 0,(x,y,z),(c,wp(2,1,3));
-@end example
+@end smallexample
 For ascending component order, the component ordering @code{C} has to be
 used.
 
@@ -570,9 +570,9 @@ the ring @math{K[x,y,z]}, where @math{K=Z/7(a,b,c)} denotes the
 transcendental extension of @math{Z/7} by @math{a}, @math{b}, and
 @math{c}, with degree lexicographical ordering:
 
-@example
+@smallexample
 ring r = (7,a,b,c),(x,y,z),Dp;
-@end example
+@end smallexample
 
 @item
 the ring @math{K[x,y,z]}, where @math{K=Z/7[a]} denotes the algebraic extension of
@@ -588,54 +588,54 @@ mu_a=a^2+a+3,
 in the second case, @math{a}
 refers to some generator of the cyclic group of unities of @math{K}:
 
-@example
+@smallexample
 ring r = (7,a),(x,y,z),dp; minpoly = a^2+a+3;
 ring r = (7^2,a),(x,y,z),dp;
-@end example
+@end smallexample
 
 @item
 the ring @math{R'[x,y,z]}, where @math{R'} denotes the field of real
 numbers represented by simple precision floating point numbers:
 
-@example
+@smallexample
 ring r = real,(x,y,z),dp;
-@end example
+@end smallexample
 
 @item
 the ring @math{R''[x,y,z]}, where @math{R''} denotes the field of real
 numbers represented by floating point numbers of 50 valid decimal digits
 (the maximal precision is 32767):
 
-@example
+@smallexample
 ring r = (real,50),(x,y,z),dp;
-@end example
+@end smallexample
 
 @item
 the ring @math{R''(i)[x,y,z]}, where @math{R''} denotes the field of real
 numbers represented by floating point numbers of 50 valid decimal digits
 and @math{i} denotes the imaginary unit.
 
-@example
+@smallexample
 ring r = (real,50,i),(x,y,z),dp;
-@end example
+@end smallexample
 
 @item
 the ring @math{R''(i)[x,y,z]}, where @math{R''} denotes the field of real
 numbers represented by floating point numbers of 6 valid decimal digits
 and @math{i} denotes the imaginary unit.
 
-@example
+@smallexample
 ring r = (real,i),(x,y,z),dp;
-@end example
+@end smallexample
 
 @item
 the quotient ring @math{Z/7[x,y,z]} modulo the square of the maximal
 ideal @math{(x,y,z)}:
 
-@example
+@smallexample
 ring R = 7,(x,y,z), dp;
 qring r = std(maxideal(2));
-@end example
+@end smallexample
 @end itemize
 
 @c ---------------------------------------------------------------------------
@@ -766,7 +766,7 @@ during standard bases computations or by an explicit reduction using
 the command @code{reduce(f, std(0))} (@pxref{reduce}).
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=32003,(x,y),dp;
   poly f=x3+yx2+3y+4;
@@ -776,7 +776,7 @@ the command @code{reduce(f, std(0))} (@pxref{reduce}).
   g;
   reduce(g,std(0));
 @c example
-@end example
+@end smallexample
 
 @c ------------------------------------------------------------
 @c   End of duplicate piece of text.
@@ -1280,13 +1280,13 @@ the default value of the specific type to it.
 @xref{Names}, for more information on declarations.  @xref{Data types},
 for a description of all data types known to @sc{Singular}.
 
-@example
+@smallexample
 ring r;                   // the default ring
 poly f,g = x^2+y^3,xy+z2; // the polynomials f=x^2+y^3 and g=x*y+z^2
 ideal I = f,g;            // the ideal generated by f and g
 matrix m[3][3];           // a 3 x 3 zero matrix
 int i=2;                  // the integer i=2
-@end example
+@end smallexample
 
 @subsubheading Assignment
 @enumerate 3
@@ -1309,11 +1309,11 @@ name. @xref{Type conversion and casting}.
 An assignment itself does not yield a value. Hence, compound assignments
 like @code{i = j = k;} are not allowed and result in an error.
 
-@example
+@smallexample
 f = x^2 + y^2 ;      // overwrites the old value of f
 I = jacob(f);
 f,g = I[1],x^2+y^2 ; // overwrites the old values of f and g
-@end example
+@end smallexample
 
 @subsubheading Function without return value
 @enumerate 5
@@ -1329,34 +1329,34 @@ specified there to have a return type 'none'.
 Some of these functions have to be called without parentheses, e.g.,
 @code{help}, @code{LIB}.
 
-@example
+@smallexample
 @c example
   ring r;
   ideal i=x2+y2,x;
   i=std(i);
   degree(i);        // degree has no return value but prints output
 @c example
-@end example
+@end smallexample
 
 @subsubheading Print command
 @enumerate 6
 @item
 expression @code{;}
-@* prints the value of an expression, for example, of a variable.
+@* prints the value of an expression, for smallexample, of a variable.
 @end enumerate
 
 Use the function @code{print} (or the procedure show from inout.lib)
 to get a pretty output of various data
 types, e.g., matrix or intmat. @xref{print}.
 
-@example
+@smallexample
 @c example
   int i=2;
   i;
   intmat m[2][2]=1,7,10,0;
   print(m);
 @c example
-@end example
+@end smallexample
 
 @c ------------------------------------------------------------
 @node Special characters, Names, General command syntax, The SINGULAR language
@@ -1489,7 +1489,7 @@ change its type. A redefinition first sets the variable to the default
 value and then computes the expression. The difference between
 redefining and overwriting a variable is shown in the following example:
 
-@example
+@smallexample
 @c example
   int i=3;
   i=i+1;        // overwriting
@@ -1497,7 +1497,7 @@ redefining and overwriting a variable is shown in the following example:
   int i=i+1;    // redefinition
   i;
 @c example
-@end example
+@end smallexample
 
 User defined names should start with a letter and consist of letters and
 digits only.  As an exception of this rule, the character @code{@@} may
@@ -1506,7 +1506,7 @@ distinguished.  Indexed names are built as a name followed by an
 int_expression in parentheses.  A list of indexed names can be built as
 a name followed by an intvec_expression in parentheses.
 
-@example
+@smallexample
 @c example
   ring R;
   int n=3;
@@ -1515,7 +1515,7 @@ a name followed by an intvec_expression in parentheses.
   ideal j(2)=x;
   j(2..3);
 @c example
-@end example
+@end smallexample
 
 Names may not coincide with reserved names (keywords).  Type
 @code{reservedName();} to get a list of the reserved names.
@@ -1525,7 +1525,7 @@ resolution}.
 
 The most recently printed expression is available
 under the special name @code{_}, e.g.,
-@example
+@smallexample
 @c example
   ring r;
   ideal i=x2+y3,y3+z4;
@@ -1534,26 +1534,26 @@ under the special name @code{_}, e.g.,
   k*k+x;
   size(_[3]);
 @c example
-@end example
+@end smallexample
 
 A string_expression enclosed in @code{`}@dots{}@code{`} (back ticks)
 evaluates to the value of the variable named by the string_expression.
 This feature is referred to as name substitution.
 
-@example
+@smallexample
 @c example
   int foo(1)=42;
   string bar="foo";
   `bar+"(1)"`;
 @c example
-@end example
+@end smallexample
 
 @ifset namespaces
 Names are grouped into namespaces (= packages) @xref{Namespaces}.
 Defined variables cannot interfere with names in other
 packages.
 
-@example
+@smallexample
 @c example error
   package packa;
   package packb;
@@ -1561,7 +1561,7 @@ packages.
   string packb::i="some other var";
   listvar(all);
 @c example
-@end example
+@end smallexample
 @end ifset
 
 @c ------------------------------------------------------------
@@ -1576,7 +1576,7 @@ object@code{;}.  The type of an object may be determined by means of the
 @code{typeof} function, the attributes by means of the @code{attrib}
 function (@ref{typeof}, @ref{attrib}):
 
-@example
+@smallexample
 @c example
   ring r=0,x,dp;
   typeof(10);
@@ -1585,7 +1585,7 @@ function (@ref{typeof}, @ref{attrib}):
   attrib(x);
   attrib(std(ideal(x)));
 @c example
-@end example
+@end smallexample
 
 Each object of type
 @code{poly},
@@ -1735,7 +1735,7 @@ matrix (@pxref{matrix type cast})
 @end multitable
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r=0,x,(c,dp);
   number(3x);
@@ -1747,7 +1747,7 @@ matrix (@pxref{matrix type cast})
   print(matrix(v));
   module(matrix(i,3,2));
 @c example
-@end example
+@end smallexample
 
 
 @c ------------------------------------------------------------
@@ -1757,12 +1757,12 @@ matrix (@pxref{matrix type cast})
 @cindex block
 
 A block is a sequence of commands surrounded by @{ and @}.
-@example
+@smallexample
 @{
    command;
    @dots{}
 @}
-@end example
+@end smallexample
 Blocks are used whenever @sc{Singular} is used as a structured programming
 language. The @code{if} and @code{else} structures allow conditional
 execution of blocks (See @ref{if}, @ref{else}). @code{for} and @code{while}
@@ -1826,7 +1826,7 @@ For more information, see @ref{write}, @ref{read}, @ref{dump},
 @ref{getdump}.
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r; poly p = x+y;
   dump("MPfile:w test.mp");   // dump the session to the file test.mp
@@ -1835,7 +1835,7 @@ For more information, see @ref{write}, @ref{read}, @ref{dump},
   getdump("MPfile:r test.mp");// read the dump from the file
   listvar();
 @c example
-@end example
+@end smallexample
 
 Specifying a link can be as easy as specifying a filename as a string.
 Except for MPtcp links, links even do not need to be explicitly opened
@@ -1847,7 +1847,7 @@ Links have various properties which can be checked for using the
 @code{status} function (@pxref{status}).
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   link l = "MPtcp:fork";
   l;
@@ -1856,7 +1856,7 @@ Links have various properties which can be checked for using the
   close(l);
   status(l, "open");
 @c example
-@end example
+@end smallexample
 
 @unnumberedsubsec ASCII links
 Data that can be converted to a string can be written into files for
@@ -1872,7 +1872,7 @@ manipulate the data.
 @xref{ASCII links}, for more information.
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   // (over)write file test.ascii, link is specified as string
   write(":w test.ascii", "int i =", 3, ";");
@@ -1882,7 +1882,7 @@ manipulate the data.
   execute(read("test.ascii"));
   i;
 @c example
-@end example
+@end smallexample
 
 @unnumberedsubsec MPfile links
 Data is stored in the binary MP format.  Read and write access is very
@@ -1901,7 +1901,7 @@ MPfile links are implemented on Unix-like operating systems only.
 @xref{MPfile links}, for more information.
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r;
   // (over)write MPfile test.mp, link is specified as string
@@ -1910,7 +1910,7 @@ MPfile links are implemented on Unix-like operating systems only.
   def p = read("MPfile:r test.mp");
   typeof(p); p;
 @c example
-@end example
+@end smallexample
 
 @unnumberedsubsec MPtcp links
 Data is communicated with other processes (e.g., @sc{Singular}
@@ -1928,7 +1928,7 @@ MPtcp links are implemented on Unix-like operating systems only.
 @xref{MPtcp links}, for more information.
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r;
   link l = "MPtcp:launch"; // declare a link explicitly
@@ -1939,7 +1939,7 @@ MPtcp links are implemented on Unix-like operating systems only.
   typeof(p); p;
   close(l); // shuts down SINGULAR server
 @c example
-@end example
+@end smallexample
 
 @unnumberedsubsec DBM links
 Data is stored in and accessed from a data base.  Writing is
@@ -1956,7 +1956,7 @@ data bases).
 @xref{DBM links}, for more information.
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   ring r;
   // associate "x+y" with "mykey"
@@ -1964,7 +1964,7 @@ data bases).
   // get from data base what is stored under "mykey"
   execute(read("DBM: test.dbm", "mykey"));
 @c example
-@end example
+@end smallexample
 
 
 @c ---------------------------------------------------------------------------
@@ -2018,7 +2018,7 @@ defined procedures can be displayed by the command @code{listvar(proc);}.
 @end tex
    procedure_body
 @*@code{@}}
-@*[@code{example}
+@*[@code{smallexample}
 @*@code{@{}
 @*
 @tex
@@ -2031,7 +2031,7 @@ defines a new function, the @code{proc} proc_name, with the additional
 information help_text, which is copied to the screen by
 @code{help proc_name;} and the @code{example} section
 which is executed by @code{example proc_name;}.
-@* The help_text, the parameter_list, and the example section are optional.
+@* The help_text, the parameter_list, and the smallexample section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined
 @ifset namesapces
@@ -2048,7 +2048,7 @@ debugging harder).
 @end table
 
 @subsubheading Example of an interactive procedure definition
-@example
+@smallexample
 @c example
   proc milnor_number (poly p)
   {
@@ -2064,16 +2064,16 @@ debugging harder).
   poly p=x^2+y^2+z^5;
   milnor_number(p);
 @c example
-@end example
+@end smallexample
 
 @subsubheading Example of a procedure definition in a library
 First, the library definition:
-@example
+@smallexample
 @c include sample.lib
-@end example
+@end smallexample
 
 Now, we load the library and execute the procedures defined there:
-@example
+@smallexample
 @c example error
   LIB "sample.lib";        // load the library sample.lib
   example tab;             // show an example
@@ -2083,7 +2083,7 @@ Now, we load the library and execute the procedures defined there:
   // show the help section for tab
   help tab;
 @c example
-@end example
+@end smallexample
 
 @subsubheading Guidelines for the help section of a procedure
 The help text of a procedure should contain information about the usage,
@@ -2093,13 +2093,13 @@ objects are generated or manipulated.
 
 The libraries contained in the @sc{Singular} distribution use the following
 format for the help text:
-@example
+@smallexample
 USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
 [CREATE:  <description of created objects which are not returned>]
 RETURN:   <description of the purpose and return value>
 [NOTE:    <particular assumptions or limitations, details>]
 EXAMPLE:  example <proc_name>; shows an example
-@end example
+@end smallexample
 
 @c ---------------------------------------
 @node Names in procedures, Parameter list, Procedure definition, Procedures
@@ -2139,7 +2139,7 @@ Ring dependent variables  resp. global names in packages are stored
 together with the ring resp. package and deleted
 when the object they live in is deleted.
 
-@example
+@smallexample
 @c example error
 proc xxx
 {
@@ -2150,7 +2150,7 @@ proc xxx
 xxx();
 listvar(all);
 @c example
-@end example
+@end smallexample
 @end ifset
 @ifclear namespaces
 @code{export}
@@ -2166,7 +2166,7 @@ Ring dependent variables  are stored
 together with the ring and deleted
 when the object they live in is deleted.
 
-@example
+@smallexample
 @c example
 proc xxx
 {
@@ -2177,7 +2177,7 @@ proc xxx
 xxx();
 listvar(all);
 @c example
-@end example
+@end smallexample
 @end ifclear
 Note that the variable @code{result} became a global variable after the
 execution of @code{xxx}.
@@ -2197,7 +2197,7 @@ arguments to a @code{proc}.
 The default for a parameter_list is @code{(list #)}
 which means the arguments are referenced by @code{#[1], #[2]}, etc.
 @item @strong{Example:}
-@example
+@smallexample
 proc x0
 @{
     // can be called with
@@ -2229,13 +2229,13 @@ proc x5 (i,list #)
     // number of arguments: size(#)+1
 @}
 
-@end example
+@end smallexample
 @item @strong{Note:}
 @* The parameter_list may stretch across multiple lines.
 @* A parameter may have any type (including the types @code{proc}
    and @code{ring}). If a parameter is of type ring, then it
    can only be specified by name, but not with a type, e.g.
-@example
+@smallexample
 proc x6 (r)
 @{
 ... // this is correct even if the parameter is a ring
@@ -2245,7 +2245,7 @@ proc x7 (ring r)
 @{
 ... // this is NOT CORRECT
 @}
-@end example
+@end smallexample
 @end table
 
 @c --------------------------------------- ----------
@@ -2279,8 +2279,8 @@ command. Usually the list of all package is equivalent to the list of
 all loaded libraries, but a namespace can also be created by a user:@*
 @code{package} package_name@code{;} @ref{package}.
 
-@example
-@c example
+@smallexample
+@c example 
   option(loadLib);   // show loading of libraries;
                      // standard.lib is loaded
   listvar(package);
@@ -2288,17 +2288,17 @@ all loaded libraries, but a namespace can also be created by a user:@*
   load("inout.lib"); // are now known to Singular
   listvar(package);
 @c example
-@end example
+@end smallexample
 
 Namespaces are not supported in versions of @sc{Singular} prior to 1.3.
 For a @sc{Singular} binary supporting namespaces, the command
 @code{system("with","Namespaces");} should return 1.
 
-@example
+@smallexample
 @c example
   system("with","Namespaces");
 @c example
-@end example
+@end smallexample
 
 @end ifset
 @c ----------------------------------------------------------------------
@@ -2385,7 +2385,7 @@ library @code{standard.lib} is automatically loaded at start-up time.
 @ifclear namespaces
 All loaded libraries are displayed by the @code{LIB;}
 command:
-@example
+@smallexample
 @c example
   option(loadLib);   // show loading of libraries;
                      // standard.lib is loaded
@@ -2394,13 +2394,13 @@ command:
   LIB "inout.lib"; // are now known to Singular
   LIB;
 @c example
-@end example
+@end smallexample
 @end ifclear
 
 @ifset namespaces
 All loaded libraries are displayed by the @code{listvar(package);}
 command:
-@example
+@smallexample
 @c example error
   option(loadLib);   // show loading of libraries;
                      // standard.lib is loaded
@@ -2409,7 +2409,7 @@ command:
   load("inout.lib"); // are now known to Singular
   listvar(package);
 @c example
-@end example
+@end smallexample
 Each time a library @ref{Singular library} / dynamic module @ref{dynamic
 module} is loaded, the corresponding namespace is created, if it does
 not already exist.
@@ -2423,13 +2423,13 @@ For a dynamic module the packagename is hard-coded in the binary file.
 @sc{Singular} also supports autoloading of packages.
 To use this features, just specify the identifier by its full name:
 
-@example
+@smallexample
 @c example error
   listvar(package);
   Inout::version;     // full name of a variable in the package Inout
   listvar(package);   // the package Inout has been autoloaded
 @c example
-@end example
+@end smallexample
 
 For autoloading the base of the filename is generated by converting the
 packagename to lowercase letters. The search is done in the standard
@@ -2497,12 +2497,12 @@ The info- and version-string are defined as follows:
 defines the general help for the library. This text is displayed on
 @code{help lib_name;}.
 @item @strong{Example:}
-@example
+@smallexample
 info="
       This could be the general help of an library.
      Quote must be escaped with an \ such as \"
 ";
-@end example
+@end smallexample
 @item @strong{Note:}
 In the info-string the characters \ and " must be preceded by a \ (escaped).
 It is recommended that the info string is placed on the top of a
@@ -2519,13 +2519,13 @@ description of each procedure).
 defines the version number for the library. It is displayed when the
 library is loaded.
 @item @strong{Example:}
-@example
+@smallexample
 version="$I@comment
 @comment !! Do not erase the @comment at the end of the previous line !!
 @comment !! It prevents cvs to substitute the id string                !!
 d: sample.lib,v 1.2 1998/05/07 singular Exp $";
   version="some version string";
-@end example
+@end smallexample
 @item @strong{Note:}
 It is common practice to simply define the version string to be
 @code{"$I}@comment
@@ -2553,7 +2553,7 @@ library, before procedure definitions.
 
 @item
 The info-string should have the following format:
-@example
+@smallexample
 info="
       LIBRARY: <library_name> <one line description of the content>
       AUTHOR:  <name, affiliation, and email address of author>
@@ -2563,7 +2563,7 @@ info="
       .
       .
       <procedureN>;     <one line description of the purpose>";
-@end example
+@end smallexample
 The purpose of the one line procedure descriptions is not to give a short help
 for the procedure, but to help the user decide what procedure might be
 the right one for the job. Details can then be found in the help section
@@ -2607,11 +2607,11 @@ k (resp. k-1).
 Note furthermore, that the example part of a procedure
 behaves in this respect like a procedure (i.e., the value of @code{voice}
 is 1). Therefore, the command @code{printlevel=1;} is necessary for
-@samp{comment1} to be displayed on @code{ example Test;}. However,
+@samp{comment1} to be displayed on @code{ smallexample Test;}. However,
 since printlevel is a global variable, it should be reset to the old
 value after at the end of the example part.
 
-@example
+@smallexample
 proc Test
 "USAGE:   ...
          ...
@@ -2633,7 +2633,7 @@ example
    Test();
    printlevel = p;       //reset printlevel to old value
 @}
-@end example
+@end smallexample
 
 @end enumerate
 @c @end table
@@ -2661,11 +2661,11 @@ Dynamic module are not supported on all platforms and in versions of
 For a @sc{Singular} binary supporting dynamic modules, the command
 @code{system("with","DynamicLoading");} should return 1.
 
-@example
+@smallexample
 @c example
   system("with","DynamicLoading");
 @c example
-@end example
+@end smallexample
 
 @c ----------------------------------------------------------------------
 @node Debugging tools,  , Libraries, General concepts
@@ -2700,7 +2700,7 @@ See @ref{TRACE var}.
 @end iftex
 
 @strong{Example:}
-@example
+@smallexample
 @c example
   proc t1
   {
@@ -2711,7 +2711,7 @@ See @ref{TRACE var}.
   TRACE=3;
   t1();
 @c example
-@end example
+@end smallexample
 
 @c ---------------------------------------
 @node Break points, Printing of data, Tracing of procedures, Debugging tools
@@ -2724,7 +2724,7 @@ See @ref{~}.
 
 
 @strong{Example:}
-@example
+@smallexample
 proc t
 @{
   int i=2;
@@ -2739,7 +2739,7 @@ i;               // here local variables of the procedure can be accessed
 @expansion{} -- break point in t --
 
 @expansion{} 3
-@end example
+@end smallexample
 @sp 2
 
 @c ---------------------------------------
@@ -2799,14 +2799,14 @@ and comments, i.e // and @code{/* ... */} are allowed).
 @end itemize
 Its output lists all procedures that have been parsed successfully:
 
-@example
+@smallexample
 $ libparse sample.lib
 Checking library 'sample.lib'
   Library         function      line,start-eod line,body-eob  line,example-eoe
 Version:0.0.0;
 g Sample               tab line    9,  149-165   13,  271-298   14,  300-402
 l Sample      internal_tab line   24,  450-475   25,  476-496    0,    0-496
-@end example
+@end smallexample
 
 where the following abbreviations are used:
 @itemize @bullet
@@ -2820,8 +2820,8 @@ each of the following is the position of the byte in the library.
 @item eod: end of parameters
 @item body: start of procedurebody '@{'
 @item eob:  end of procedurebody '@}'
-@item example: position of 'example'
-@item eoe: end of example '@}'
+@item example: position of 'smallexample'
+@item eoe: end of smallexample '@}'
 @end itemize
 
 Hence in the above example, the first procedure of the library
@@ -2834,10 +2834,10 @@ character 300 to character 402.
 The following example shows the result of a missing close-bracket @} in
 line 26 of the library @code{sample.lib}.
 
-@example
+@smallexample
 LIB "sample.lib";
 @expansion{}    ? Library sample.lib: ERROR occurred: in line 26, 497.
 @expansion{}    ? missing close bracket '@}' at end of library in line 26.
 @expansion{}    ? Cannot load library,... aborting.
 @expansion{}    ? error occurred in STDIN line 1: `LIB "sample.lib";`
-@end example
+@end smallexample

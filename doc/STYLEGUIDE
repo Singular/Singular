@@ -144,12 +144,14 @@
 * Singular Beispiele und libraries *
 ====================================
 
+* generally use @samllexample for (code) examples
+
 * Die Kommandozeilen in einem Beispiel, das nicht von doc2tex
   gerechnet wird, beginnen NICHT MEHR mit zwei Leerzeichen:
-@example
+@smallexample
 ring r;
 ideal i=x,y;
-@end example
+@end smallexample
 
 * Beispiele, die von doc2tex gerechnet werden, muessen weiterhin mit
   zwei Leerzeichen beginnen. Diese beiden Leerzeichen werden auto-
@@ -162,24 +164,24 @@ ideal i=x,y;
   gerechnet werden soll, laenger als eine Zeile, muss das Kommando in der 
   untersten Zeile des Kommentars stehen (sonst wird in spaeter die 
   Singular-Ausgabe zwischen den Kommentar und das Kommando geschoben):
-@example
+@smallexample
 @c example
   ring r;
                  // the following option leads to some useful output     
   option(prot);  // during the Groebner basis computation.
 @c example
-@end example
+@end smallexample
 
 + Bei Beispielen, die nicht wirklich von doc2tex gerechnet, muss nach dem
   @expansion ein Leerzeichen kommen, und geschweifte Klammern muessen
   gequoted werden mit @:
-@example
+@smallexample
 int i=3; 
     // Kommentare ueber mehere Zeilen duerfen natuerlich
 i;  // mit Leerzeichen beginnen.
 @{@} // quote von geschweiften Klammern
 @expansion{} 3
-@end example
+@end smallexample
 
 + Beim Schreiben von Singular-Beispielen (insbesondere von
   Kommentaren) bitte darauf achten, dass die Zeilen nicht zu breit
@@ -247,4 +249,4 @@ i;  // mit Leerzeichen beginnen.
   domkumentiert. Siehe doc2tex.c.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.10 1999-07-01 12:47:59 obachman Exp $
+$Id: STYLEGUIDE,v 1.11 1999-07-09 14:12:46 obachman Exp $
