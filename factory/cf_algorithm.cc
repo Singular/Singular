@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.2 1997-09-08 16:02:02 schmidt Exp $ */
+/* $Id: cf_algorithm.cc,v 1.3 1997-10-09 14:39:02 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -162,3 +162,29 @@ common_den ( const CanonicalForm & f )
 	return 1;
 }
 //}}}
+
+//{{{ bool divides ( const CanonicalForm & f, const CanonicalForm & g )
+//{{{ docu
+//
+// divides() - check whether f divides g.
+//
+// Uses some extra checks to avoid polynomial division.
+//
+//}}}
+bool
+divides ( const CanonicalForm & f, const CanonicalForm & g )
+{
+    if ( g.level() > 0 && g.level() == f.level() )
+	if ( divides( f.tailcoeff(), g.tailcoeff() ) && divides( f.LC(), g.LC() ) ) {
+	    CanonicalForm q, r;
+	    bool ok = divremt( g, f, q, r );
+	    return ok && r == 0;
+	}
+	else
+	    return false;
+    else {
+	CanonicalForm q, r;
+	bool ok = divremt( g, f, q, r );
+	return ok && r == 0;
+    }
+}
