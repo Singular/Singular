@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.16 2004-10-18 18:57:06 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.17 2004-10-29 18:48:41 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1612,6 +1612,7 @@ poly nc_p_CopyGet(poly a, const ring r)
   if (r==r->nc->basering) return(p_Copy(a,r));
   else
   {
+    //    nFunc nMap = nSetMap();
     return(prCopyR_NoSort(a,r->nc->basering,r));
   }
 }
@@ -1905,11 +1906,17 @@ BOOLEAN nc_InitMultiplication(ring r)
     r->nc->IsSkewConstant=1;
     return FALSE;
   }
+  ring save = currRing;
+  int WeChangeRing = 0;
+  if (currRing!=r)
+  {
+    rChangeCurrRing(r);
+    WeChangeRing = 1;
+  }
   int i,j;
-  matrix COM;
   r->nc->MT = (matrix *)omAlloc0(r->N*(r->N-1)/2*sizeof(matrix));
   r->nc->MTsize = (int *)omAlloc0(r->N*(r->N-1)/2*sizeof(int));
-  COM = mpCopy(r->nc->C);
+  matrix COM = mpCopy(r->nc->C);
   poly p,q;
   short DefMTsize=7;
   int IsNonComm=0;
@@ -1929,12 +1936,13 @@ BOOLEAN nc_InitMultiplication(ring r)
       {
 	/* TODO check the special multiplication properties */
 	IsNonComm = 1;
+	p_Delete(&(MATELEM(COM,i,j)),r);
 	MATELEM(COM,i,j) = NULL;
 	r->nc->MTsize[UPMATELEM(i,j,r->N)] = DefMTsize; /* default sizes */
 	r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(DefMTsize, DefMTsize);
       }
       /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
-      p = pOne();
+      p = p_ISet(1,r); /* instead of     p = pOne(); */
       p_SetCoeff(p,nCopy(pGetCoeff(MATELEM(r->nc->C,i,j))),r);
       p_SetExp(p,i,1,r);
       p_SetExp(p,j,1,r);
@@ -1942,7 +1950,7 @@ BOOLEAN nc_InitMultiplication(ring r)
       q =  nc_p_CopyGet(MATELEM(r->nc->D,i,j),r);
       p = p_Add_q(p,q,r);
       MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1) = nc_p_CopyPut(p,r);
-      pDelete(&p);
+      p_Delete(&p,r);
       p = NULL;
     }
   }
@@ -1961,6 +1969,10 @@ BOOLEAN nc_InitMultiplication(ring r)
     }
   }
   r->nc->COM=COM;
+  if (WeChangeRing)
+  {
+    rChangeCurrRing(save);
+  }
   return FALSE;
 }
 
@@ -2238,6 +2250,13 @@ ring nc_rCreateNCcomm(ring r)
   /* creates a commutative nc extension; "converts" comm.ring to a Plural ring */
 {
   if (rIsPluralRing(r)) return r;
+  ring save = currRing;
+  int WeChangeRing = 0;
+  if (currRing!=r)
+  {
+    rChangeCurrRing(r);
+    WeChangeRing = 1;
+  }
   r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
   r->nc->ref = 1;
   r->nc->basering = r;
@@ -2258,6 +2277,10 @@ ring nc_rCreateNCcomm(ring r)
   if (nc_InitMultiplication(r))
   {
     WarnS("Error initializing multiplication!");
+  }
+  if (WeChangeRing)
+  {
+    rChangeCurrRing(save);
   }
   return r;
 }

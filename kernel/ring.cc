@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.26 2004-10-29 16:55:20 Singular Exp $ */
+/* $Id: ring.cc,v 1.27 2004-10-29 18:48:41 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1172,32 +1172,29 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       for (j=i+1; j<=rVar(R1); j++)
       {
-        MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
-	MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
-	//	MATELEM(C,i,j) = p_CopyEmbed(MATELEM(C1,i,j),R1,0,param_shift);
-	  //prCopyR_NoSort(MATELEM(C1,i,j),R1,sum);
-	//	MATELEM(D,i,j) = prCopyR(MATELEM(D1,i,j),R1,sum);
-	//	MATELEM(D,i,j) = p_CopyEmbed(MATELEM(D1,i,j),R1,0,param_shift);
 
+	MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
+	if (MATELEM(D1,i,j) != NULL)
+	{
+	  MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
+	}
       }
     }
     for (i=1; i< rVar(R2); i++)
     {
       for (j=i+1; j<=rVar(R2); j++)
       {
-	//	MATELEM(C,rVar(R1)+i,rVar(R1)+j) = prCopyR_NoSort(MATELEM(C2,i,j),R2,sum);
-	//	MATELEM(D,rVar(R1)+i,rVar(R1)+j) = prCopyR(MATELEM(D2,i,j),R2,sum);
-	//	MATELEM(C,rVar(R1)+i,rVar(R1)+j) = p_CopyEmbed(MATELEM(C2,i,j),R2, rVar(R1),param_shift);
-	//	MATELEM(D,rVar(R1)+i,rVar(R1)+j) = p_CopyEmbed(MATELEM(D2,i,j),R2, rVar(R1),param_shift);
-
         MATELEM(C,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(C2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
-	MATELEM(D,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(D2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
+      	if (MATELEM(D2,i,j) != NULL)
+	{
+	  MATELEM(D,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(D2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
+	}
       }
     }
-    sum->nc->C = C;
-    sum->nc->D = D;
     idTest((ideal)C);
     idTest((ideal)D);
+    sum->nc->C = C;
+    sum->nc->D = D;
     if (nc_InitMultiplication(sum))
       WarnS("Error initializing multiplication!");
     sum->nc->IsSkewConstant =(int)((R1->nc->IsSkewConstant) && (R2->nc->IsSkewConstant));
