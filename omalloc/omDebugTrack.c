@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.7 2000-09-14 12:59:53 obachman Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.8 2000-09-14 13:58:12 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -320,6 +320,9 @@ void* omAllocTrackAddr(void* bin_size,
       if (! (flags & OM_FZERO)) memset(o_addr, OM_INIT_PATTERN, o_size);
       memset(omTrackAddr_2_BackPattern(d_addr), OM_BACK_PATTERN, omTrackAddr_2_SizeOfBackPattern(d_addr));
 
+#ifdef OM_TRACK_CUSTOM
+      d_addr->custom = NULL;
+#endif
       if (track > 3)
       {
 #ifdef OM_TRACK_FILE_LINE
