@@ -38,4 +38,9 @@ killall();
 
 example content;
 killall();
+
+example numerator;
+
+example denominator;
+
 tst_status(1);$
