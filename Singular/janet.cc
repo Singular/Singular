@@ -250,7 +250,7 @@ int ValidatePoly(Poly *x, TreeM *F)
 	return 1;
 }
 
-Poly *NewPoly(poly p=NULL)
+Poly *NewPoly(poly p)
 {
 	Poly *beg=(Poly *)GCM(sizeof(Poly));
 
