@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_resultant.cc,v 1.4 1997-09-04 14:54:08 schmidt Exp $ */
+/* $Id: cf_resultant.cc,v 1.5 1997-09-29 06:48:17 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -138,6 +138,8 @@ subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable &
 //
 // x's level should be larger than f's and g's levels.  Either f
 // or g should be constant or both linear.
+//
+// Used by resultant().
 //
 //}}}
 static CanonicalForm
