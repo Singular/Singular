@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.42 1999-09-14 21:00:59 wichmann Exp $
+;; $Id: singular.el,v 1.43 1999-09-16 11:06:45 wichmann Exp $
 
 ;;; Commentary:
 
@@ -427,7 +427,11 @@ This function is called at mode initialization time."
   (append
    singular-interactive-font-lock-keywords-2
    '(
-     ("^   [\\?].*`\\(\\sw\\sw+\\)`" 1 font-lock-reference-name-face t)
+     ;; note: we use font-lock-reference-face here even Emacs says that
+     ;; this face is obsolete and suggests to use font-lock-constant-face,
+     ;; since XEmacs20/21 does not know the constant-face but the
+     ;; reference-face. 
+     ("^   [\\?].*`\\(\\sw\\sw+;?\\)`" 1 font-lock-reference-face t)
      ))
   "Gaudy level highlighting for Singular interactive mode.")
 
@@ -653,20 +657,18 @@ Sets the submenu (\"Commands\" \"Libraries\") to the value of
      singular-interactive-mode-map ""
      (list 
       "Commands"
-      ["Fold Latest Output" singular-folding-fold-latest-output t]
+      ["Fold/Unfold Latest Output" singular-folding-toggle-fold-latest-output t]
+      ["Fold/Unfold At Point" singular-folding-toggle-fold-at-point-or-all t]
       ["Fold All Output" singular-folding-fold-all-output t]
-      ["Fold At Point" singular-folding-fold-at-point t]
-      "---"
-      ["Unfold Latest Output" singular-folding-unfold-latest-output t]
       ["Unfold All Output" singular-folding-unfold-all-output t]
-      ["Unfold At Point" singular-folding-unfold-at-point t]
       "--"
       (append
        '("Libraries")
        singular-menu-initial-library-menu)
       ["Load File..." singular-load-file t]
       "---"
-      ["Load Demo" singular-demo-load (not singular-demo-mode)]
+      ["Load Demo..." singular-demo-load (or singular-demo-exit-on-load
+					     (not singular-demo-mode))]
       ["Exit Demo" singular-demo-exit singular-demo-mode]
       "---"
       ["Truncate Lines" singular-toggle-truncate-lines
@@ -684,7 +686,7 @@ Sets the submenu (\"Commands\" \"Libraries\") to the value of
 			["Exit" singular-exit-singular t]
 			"---"
 			["Preferences" (customize-group 'singular-interactive) t]
-			["Help" singular-help t])))
+			["Singular Help" singular-help t])))
 
 (defun customize-singular-interactive ()
   (interactive)
@@ -3040,7 +3042,7 @@ the demo file is still waiting to be sent to Singular."
   (if singular-demo-mode
       (if singular-demo-exit-on-load
 	  ;; silently exit running demo
-	  (singular-demo-exit)
+	  (singular-demo-exit t)
 	(error "There already is a demo running, exit with `singular-demo-exit' first")))
 
   ;; load new demo
@@ -3099,7 +3101,7 @@ the hooks on `singular-demo-mode-exit-hook'."
   (run-hooks 'singular-demo-mode-exit-hook)
   (force-mode-line-update))
 
-(defun singular-demo-exit ()
+(defun singular-demo-exit (&optional no-message)
   "Prematurely exit Singular demo mode.
 Cleans up everything that is left from the demo.
 Runs the hooks on `singular-demo-mode-exit-hook'.
@@ -3115,7 +3117,9 @@ Does nothing when Singular demo mode is not active."
 	    (delete-region old-point-max singular-demo-end))
 	;; this is unwind-protected
 	(narrow-to-region old-point-min old-point-max)))
-    (singular-demo-exit-internal)))
+    (singular-demo-exit-internal)
+    (or no-message
+	(if singular-demo-print-messages (message "Demo exited")))))
 
 (defun singular-demo-show-next-chunk ()
   "Show next chunk of demo file at input prompt.
@@ -3816,7 +3820,7 @@ This function is called by `singular-interrupt-singular' or by
 `singular-exit-sentinel'."
   (singular-debug 'interactive
 		  (message "exit-cleanup called"))
-  (singular-demo-exit)
+  (singular-demo-exit t)
   (singular-scan-header-exit)
   (singular-menu-deinstall-libraries)
   (singular-history-write)
@@ -3829,8 +3833,6 @@ Calls `singular-exit-cleanup' if `singular-exit-cleanup-done' is nil."
     (singular-debug 'interactive
 		    (message "Sentinel: %s" (substring message 0 -1)))
 
-    (singular-debug 'interactive
-		    (message "Sentinel: proc= %s, mark= %s" process (process-mark process)))
     (if (string-match "finished\\|exited\\|killed" message)
 	(let ((process-buffer (process-buffer process)))
 	  (if (and (not singular-exit-cleanup-done)
@@ -3849,6 +3851,11 @@ Inserts a string indicating that the Singular process is killed."
     (singular-exit-cleanup)
     (delete-process process)
     (save-excursion
+      ;; Because of timing problems it would be better if 
+      ;; singular-exit-sentinel would insert this string (see Version 1.41)
+      ;; but this is not possible for XEmacs: The function (process-mark)
+      ;; called within singular-exit-sentinel returns a mark with no
+      ;; associated buffer!
       (goto-char mark)
       (insert "// ** Singular process killed **\n"))))
 
