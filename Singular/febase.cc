@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.19 1997-07-16 11:21:34 Singular Exp $ */
+/* $Id: febase.cc,v 1.20 1997-07-16 11:25:55 Singular Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -461,7 +461,7 @@ int exitVoice()
 {
   if (voice <= 0)   
   {
-    if (feBatch) return 0;
+    if (feBatch) return 1;
     else m2_end(0);
   }  
   //printf("exitVoice %d, typ %d\n",voice,FileAttribs[voice].typ);
