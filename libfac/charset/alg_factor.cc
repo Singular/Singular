@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.2 1997-09-12 07:19:37 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.3 1998-03-12 12:34:24 schmidt Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -148,7 +148,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
   // Norm, resultante taken with respect to y
   while ( !sqfreetest ){
     DEBOUTLN(cout, "sqrf_norm_sub: Palpha= ", Palpha);
-    R = resultante(Palpha, g, y); R= R* common_den(R);
+    R = resultante(Palpha, g, y); R= R* bCommonDen(R);
     DEBOUTLN(cout, "sqrf_norm_sub: R= ", R);
     // sqfree check ; R is a polynomial in K[x]
     if ( getCharacteristic() == 0 ){
@@ -612,5 +612,8 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/09/12 07:19:37  Singular
+* hannes/michael: libfac-0.3.0
+
 */
 

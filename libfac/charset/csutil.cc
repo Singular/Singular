@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.3 1997-09-12 07:19:41 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.4 1998-03-12 12:34:35 schmidt Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -222,7 +222,7 @@ myfitting( const CanonicalForm &f ){
 //      cout << "lc(temp)= " << lc(temp) << endl;
 //      cout << "temp/lc(temp)= " << temp/lc(temp) << endl;
 //      cout << "num(rem/lc(rem))= " << num(rem/lc(rem)) << endl;
-     temp= common_den(temp/lc(temp))*(temp/lc(temp));
+     temp= bCommonDen(temp/lc(temp))*(temp/lc(temp));
      Off(SW_RATIONAL);
      rem= mapinto(temp);
      return rem;
@@ -648,6 +648,9 @@ Minus( const ListCFList & a, const ListCFList & b){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:41  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.3  1997/04/25 22:55:00  michael
 Version for libfac-0.2.1
 
