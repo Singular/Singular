@@ -1,23 +1,23 @@
-// $Id: deform.lib,v 1.8 1998-04-23 17:25:20 Singular Exp $
-//(bm, last modified 12/97)   
+// $Id: deform.lib,v 1.9 1998-05-03 14:09:50 obachman Exp $
+// author: Bernd Martin email: martin@math.tu-cottbus.de
+//(bm, last modified 4/98)   
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: deform.lib,v 1.8 1998-04-23 17:25:20 Singular Exp $";
+version="$Id: deform.lib,v 1.9 1998-05-03 14:09:50 obachman Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
-                            (new version)
- versal(Fo[,d,any])       miniversal deformation of isolated singularity Fo
- mod_versal(Mo,I,[,d,any])
-                          miniversal deformation of module Mo modulo ideal I
- lift_rel_kb(N,M[,kbM,p]) lifting N into a kbase of M
- kill_rings([\"prefix\"])   kills the exported rings from above
- lift_kbase(N,M);         coef-matrix expressing N as lin. comb. of k-basis of M
+                           by Bernd Martin (martin@math.tu-cottbus.de)
+
+ versal(Fo[,d,any])        miniversal deformation of isolated singularity Fo
+ mod_versal(Mo,I,[,d,any]) miniversal deformation of module Mo modulo ideal I
+ lift_kbase(N,M);          lifting N into standard kbase of M 
+ lift_rel_kb(N,M[,kbM,p])  relative lifting N into a kbase of M
+ kill_rings([\"prefix\"])    kills the exported rings from above
  
   SUB-PROCEDURES            used by main procedure:
                   get_rings,compute_ext,get_inf_def,interact1,
                   interact2,negative_part,homog_test
 ";
-
+///////////////////////////////////////////////////////////////////////////////
 LIB "inout.lib";
 LIB "general.lib";
 LIB "matrix.lib";
@@ -136,7 +136,6 @@ setring  Po;
   matrix Ro   = imap(Po,Ro);
   matrix homR = transpose(Ro);
   matrix homFR= concat(homR,homF);
-  print(homFR);
   module hom' = std(homFR);
   matrix Js[1][@t2]; 
   matrix F_R,Fs,Rs,Fn,Rn; 
@@ -172,8 +171,8 @@ setring  Po;
    {
      if( @t1==0) {break};
      dbprint(p,"// start computation in degree "+string(@d)+".");      
-     dbprint(p-1,">>> TIME = "+string(timer-time));
-     dbprint(p-1,"==> memory = "+string(kmemory())+"k");
+     dbprint(p-3,">>> TIME = "+string(timer-time));
+     dbprint(p-3,"==> memory = "+string(kmemory())+"k");
 //------- compute obstruction-vector  -----------------------------------------
      if (@smooth) { @noObstr=1;}
      else
@@ -260,7 +259,7 @@ setring  Po;
       write(out,"matrix Js[1][",@t2,"]=",Js,";matrix Fs[1][",@rowR,"]=",Fs,
       ";matrix Rs[",@rowR,"][",@colR,"]=",Rs,";");
    } 
-   dbprint(p,">>> TIME = "+string(timer-time));
+   dbprint(p-3,">>> TIME = "+string(timer-time));
    if (@is_qh != 0)
    { @degr = qhweight(ideal(Js));
      @degr = @degr[1..t1'];
@@ -419,8 +418,8 @@ EXAMPLE:example mod_versal; shows an example
 //----------- start the loop --------------------------------------------------
   for (@d=2;@d<=d_max;@d=@d+1)
   { 
-    dbprint(p-1,">>> time = "+string(timer-time));
-    dbprint(p-1,"==> memory = "+string(memory(0)/1000)+
+    dbprint(p-3,">>> time = "+string(timer-time));
+    dbprint(p-3,"==> memory = "+string(memory(0)/1000)+
                 ",  allocated = "+string(memory(1)/1000));
     dbprint(p,"// start deg = "+string(@d));   
 //-------- get obstruction ----------------------------------------------------
@@ -511,7 +510,7 @@ EXAMPLE:example mod_versal; shows an example
     write(out,"matrix Js[1][",e2,"]=",Js,";matrix Ms[",f0,"][",f1,"]=",Ms,
     ";matrix Ls[",f1,"][",f2,"]=",Ls,";");
   }
-  dbprint(p,">>> TIME = "+string(timer-time));
+  dbprint(p-3,">>> TIME = "+string(timer-time));
   if (@is_qh != 0)
   { @degr = qhweight(ideal(Js));
     @degr = @degr[1..e1'];
@@ -731,6 +730,34 @@ example
   print(reduce(N,std(M)));
 } 
 ///////////////////////////////////////////////////////////////////////////////
+proc lift_kbase (N, M)
+USAGE:   lift_kbase(N,M); N,M=poly/ideal/vector/module
+RETURN:  matrix A, coefficient matrix expressing N as linear combination of
+         k-basis of M. Let the k-basis have k elements and size(N)=c columns.
+         Then A satisfies:
+             matrix(reduce(N,std(M)),k,c) = matrix(kbase(std(M)))*A
+ASSUME:  dim(M)=0 and the monomial ordering is a well ordering or the last
+         block of the ordering is c or C
+EXAMPLE: example lift_kbase; shows an example
+{
+  return(lift_rel_kb(N,M));
+}
+example
+{"EXAMPLE:";     echo=2;
+  ring R=0,(x,y),ds;
+  module M=[x2,xy],[y2,xy],[0,xx],[0,yy];
+  module N=[x3+xy,x],[x,x+y2];
+  print(M);
+  module kb=kbase(std(M));
+  print(kb);
+  print(N);
+  matrix A=lift_kbase(N,M);
+  print(A);
+  matrix(reduce(N,std(M)),nrows(kb),ncols(A)) - matrix(kbase(std(M)))*A;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 proc interact1 ()
 
 Sub_procedure: asking for and reading your input-strings 
@@ -895,92 +922,4 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
  setring br; 
    kill nr;
    return(dv);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-proc lift_kbase (N, M)
-USAGE:   lift_kbase(N,M); N,M=poly/ideal/vector/module
-RETURN:  matrix A, coefficient matrix expressing N as linear combination of
-         k-basis of M. Let the k-basis have k elements and size(N)=c columns.
-         Then A satisfies:
-             matrix(reduce(N,std(M)),k,c) = matrix(kbase(std(M)))*A
-ASSUME:  dim(M)=0 and the monomial ordering is a well ordering or the last
-         block of the ordering is c or C
-EXAMPLE: example lift_kbase; shows an example
-{
-//----------  initialisation  -------------------------------------------------
-   string ords = ordstr(basering);
-   int    d,col,k,l;
-   module kb;
-   matrix testm;
-   vector v,p,q;
-//------- check wether ordering is correct ------------------------------------
-   k=1;
-   for( l=1;l<=nvars(basering);l=l+1 ) { k=k*(lead(1+var(l))==var(l)); }
-   if( k==0 )
-   {
-      if( ords[size(ords)]!="c" and ords[size(ords)]!="C" )
-      {
-         "// change ordering!";
-         "// ordering "+ordstr(basering)+" not implemented for this proc";
-         return();
-      }
-   }
-//----------  check assumtions  -----------------------------------------------
-   if( typeof(N)=="poly" ) { ideal J=ideal(N); kill N; module N=J; kill J; }
-   if( typeof(M)=="poly" ) { ideal J=ideal(M); kill M; module M=J; }
-   M = std(M);
-   d = vdim(M);
-   if( d<1 )
-   { "// second argument in `lift_kbase` has vdim",d; return(); }
-//----------  compute kbase and reduce(N,M) -----------------------------------
-   kb = kbase(M);
-   col = ncols(N);
-   N = reduce(N,M);
-   N = matrix(N,nrows(N),col);
-//----------  collecting coefficients of reduce(N,M) --------------------------
-   matrix result[d][col];
-   for( l=1;l<=col;l=l+1 )
-   {
-      v = N[l];
-      if( size(v)>0 )
-      {
-         for( k=1;k<=d;k=k+1 )
-         {
-            p = kb[k];
-            q = lead(v);
-            if( size(p-q)<2 )
-            {
-               result[k,l] = leadcoef(q);
-               v = v-q;
-               if( size(v)<1 ) { k=d+1; }
-               else { k=0; }
-            }
-         }
-      }
-   }
-//---------  final test -------------------------------------------------------
-   testm = matrix(N,nrows(kb),ncols(result))- matrix(kb)*result;
-   if( size(module(testm))!=0 )
-   {
-      "// proc `lift_kbase` did'nt work correctly!";
-      "// Please inform tthe authors";
-      return();
-   }
-   return(result);
-}
-example
-{"EXAMPLE:";     echo=2;
-  ring R=0,(x,y),ds;
-  module M=[x2,xy],[y2,xy],[0,xx],[0,yy];
-  module N=[x3+xy,x],[x,x+y2];
-  print(M);
-  module kb=kbase(std(M));
-  print(kb);
-  print(N);
-  matrix A=lift_kbase(N,M);
-  print(A);
-  matrix(reduce(N,std(M)),nrows(kb),ncols(A)) - matrix(kbase(std(M)))*A;
 }
