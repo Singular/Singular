@@ -1,14 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.88 2002-08-06 10:06:02 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.89 2003-03-03 17:34:00 mschulze Exp $";
 category="Singularities";
 
 info="
-LIBRARY:  gaussman.lib  Algorithmic Gauss-Manin Connection
+LIBRARY:  gaussman.lib  Local Gauss-Manin System
 
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
-OVERVIEW: A library to compute Hodge-theoretic invariants
-          of isolated hypersurface singularities
+OVERVIEW: A library for the Gauss-Manin system
+          of an isolated hypersurface singularity
 
 PROCEDURES:
  gmsring(t,s);              Gauss-Manin system of t with variable s
@@ -18,13 +18,11 @@ PROCEDURES:
  monodromy(t);              Jordan data of complex monodromy of t
  spectrum(t);               singularity spectrum of t
  sppairs(t);                spectral pairs of t
- spnf(a[,m][,V]);           spectrum normal form of (a,m,V)
- sppnf(a,w[,m][,V]);        spectral pairs normal form of (a,w,m,V)
  vfilt(t);                  V-filtration of t on Brieskorn lattice
  vwfilt(t);                 weighted V-filtration of t on Brieskorn lattice
  tmatrix(t);                C[[s]]-matrix of t on Brieskorn lattice
  endvfilt(V);               endomorphism V-filtration on Jacobian algebra
- spprint(sp);               print spectrum sp
+ sppnf(a,w[,m]);            spectral pairs normal form of (a,w[,m])
  sppprint(spp);             print spectral pairs spp
  spadd(sp1,sp2);            sum of spectra sp1 and sp2
  spsub(sp1,sp2);            difference of spectra sp1 and sp2
@@ -37,7 +35,7 @@ PROCEDURES:
 
 SEE ALSO: mondromy_lib, spectrum_lib
 
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice;
           monodromy; spectrum; spectral pairs;
           mixed Hodge structure; V-filtration; weight filtration
 ";
@@ -122,7 +120,7 @@ ring G;  Gauss-Manin system of t with variable s
   int gmsmaxdeg;  maximal weight of variables
 @end format
 NOTE:     gmsbasis is a C[[s]]-basis of H'' and [t,s]=s^2
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmsring; shows examples
 "
 {
@@ -223,7 +221,7 @@ list nf;
   ideal nf[2];  p==nf[1]+nf[2]
 @end format
 NOTE:     computation can be continued by setting p=nf[2]
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmsnf; shows examples
 "
 {
@@ -303,7 +301,7 @@ list l;
   ideal l[2];  p==matrix(gmsbasis)*l[1]+l[2]
 @end format
 NOTE:     computation can be continued by setting p=l[2]
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmscoeffs; shows examples
 "
 {
@@ -546,7 +544,7 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,
       }
       H0=transpose(H0);
 
-      l=sppnf(e,d,m);
+      l=sppnf(list(e,d,m));
       e,d,m=l[1..3];
 
       k--;
@@ -565,7 +563,7 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:   ideal r;  roots of the Bernstein polynomial b excluding the root -1
 NOTE:     the roots of b are negative rational numbers and -1 is a root of b
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; 
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice; 
           Bernstein polynomial
 EXAMPLE:  example bernstein; shows examples
 "
@@ -623,7 +621,7 @@ list l;  Jordan data jordan(M) of monodromy matrix exp(-2*pi*i*M)
     int l[3][i];  multiplicity of i-th Jordan block of M
 @end format
 SEE ALSO: mondromy_lib, linalg_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; monodromy
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice; monodromy
 EXAMPLE:  example monodromy; shows examples
 "
 {
@@ -669,13 +667,13 @@ list sp;  singularity spectrum of t
     int sp[2][i];  multiplicity of i-th spectral number
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; spectrum
 EXAMPLE:  example spectrum; shows examples
 "
 {
   list l=vwfilt(t);
-  return(spnf(l[1],l[3]));
+  return(spnf(list(l[1],l[3])));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -700,7 +698,7 @@ list spp;  spectral pairs of t
     int spp[3][i];  multiplicity of i-th spectral pair
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration;
           spectrum; spectral pairs
 EXAMPLE:  example sppairs; shows examples
@@ -714,251 +712,6 @@ example
   ring R=0,(x,y),ds;
   poly t=x5+x2y2+y5;
   sppprint(sppairs(t));
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc spnf(ideal a,list #)
-"USAGE:   spnf(a[,m][,V]); ideal a, intvec m, list V
-ASSUME:  ncols(a)==size(m)==size(V); typeof(V[i])=="int"
-RETURN:  order (a[i][,V[i]]) with multiplicity m[i] lexicographically
-EXAMPLE: example spnf; shows examples
-"
-{
-  int n=ncols(a);
-  intvec m;
-  module v;
-  list V;
-  int i,j;
-  while(i<size(#))
-  {
-    i++;
-    if(typeof(#[i])=="intvec")
-    {
-      m=#[i];
-    }
-    if(typeof(#[i])=="module")
-    {
-      v=#[i];
-      for(j=n;j>=1;j--)
-      {
-        V[j]=module(v[j]);
-      }
-    }
-    if(typeof(#[i])=="list")
-    {
-      V=#[i];
-    }
-  }
-  if(m==0)
-  {
-    for(i=n;i>=1;i--)
-    {
-      m[i]=1;
-    }
-  }
-
-  int k;
-  ideal a0;
-  intvec m0;
-  list V0;
-  number a1;
-  int m1;
-  for(i=n;i>=1;i--)
-  {
-    if(m[i]!=0)
-    {
-      for(j=i-1;j>=1;j--)
-      {
-        if(m[j]!=0)
-	{
-          if(number(a[i])>number(a[j]))
-          {
-            a1=number(a[i]);
-            a[i]=a[j];
-            a[j]=a1;
-            m1=m[i];
-            m[i]=m[j];
-            m[j]=m1;
-            if(size(V)>0)
-            {
-              v=V[i];
-              V[i]=V[j];
-              V[j]=v;
-            }
-          }
-          if(number(a[i])==number(a[j]))
-          {
-            m[i]=m[i]+m[j];
-            m[j]=0;
-            if(size(V)>0)
-            {
-              V[i]=V[i]+V[j];
-            }
-          }
-        }
-      }
-      k++;
-      a0[k]=a[i];
-      m0[k]=m[i];
-      if(size(V)>0)
-      {
-        V0[k]=V[i];
-      }
-    }
-  }
-
-  if(size(V0)>0)
-  {
-    n=size(V0);
-    module U=std(V0[n]);
-    for(i=n-1;i>=1;i--)
-    {
-      V0[i]=simplify(reduce(V0[i],U),1);
-      if(i>=2)
-      {
-        U=std(U+V0[i]);
-      }
-    }
-  }
-
-  list l;
-  if(k>0)
-  {
-    l=a0,m0;
-    if(size(V0)>0)
-    {
-      l[3]=V0;
-    }
-  }
-  return(l);
-}
-example
-{ "EXAMPLE:"; echo=2;
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc sppnf(ideal a,intvec w,list #)
-"USAGE:   sppnf(a,w[,m][,V]); ideal a, intvec w, intvec m, list V
-ASSUME:  ncols(e)=size(w)=size(m)=size(V); typeof(V[i])=="module"
-RETURN:  order (a[i][,w[i]][,V[i]]) with multiplicity m[i] lexicographically
-EXAMPLE: example sppnorm; shows examples
-"
-{
-  int n=ncols(a);
-  intvec m;
-  module v;
-  list V;
-  int i,j;
-  while(i<size(#))
-  {
-    i++;
-    if(typeof(#[i])=="intvec")
-    {
-      m=#[i];
-    }
-    if(typeof(#[i])=="module")
-    {
-      v=#[i];
-      for(j=n;j>=1;j--)
-      {
-        V[j]=module(v[j]);
-      }
-    }
-    if(typeof(#[i])=="list")
-    {
-      V=#[i];
-    }
-  }
-  if(m==0)
-  {
-    for(i=n;i>=1;i--)
-    {
-      m[i]=1;
-    }
-  }
-
-  int k;
-  ideal a0;
-  intvec w0,m0;
-  list V0;
-  number a1;
-  int w1,m1;
-  for(i=n;i>=1;i--)
-  {
-    if(m[i]!=0)
-    {
-      for(j=i-1;j>=1;j--)
-      {
-        if(m[j]!=0)
-        {
-          if(number(a[i])>number(a[j])||
-            (number(a[i])==number(a[j])&&w[i]<w[j]))
-          {
-            a1=number(a[i]);
-            a[i]=a[j];
-            a[j]=a1;
-            w1=w[i];
-            w[i]=w[j];
-            w[j]=w1;
-            m1=m[i];
-            m[i]=m[j];
-            m[j]=m1;
-            if(size(V)>0)
-            {
-              v=V[i];
-              V[i]=V[j];
-              V[j]=v;
-            }
-          }
-          if(number(a[i])==number(a[j])&&w[i]==w[j])
-          {
-            m[i]=m[i]+m[j];
-            m[j]=0;
-            if(size(V)>0)
-            {
-              V[i]=V[i]+V[j];
-            }
-          }
-        }
-      }
-      k++;
-      a0[k]=a[i];
-      w0[k]=w[i];
-      m0[k]=m[i];
-      if(size(V)>0)
-      {
-        V0[k]=V[i];
-      }
-    }
-  }
-
-  if(size(V0)>0)
-  {
-    n=size(V0);
-    module U=std(V0[n]);
-    for(i=n-1;i>=1;i--)
-    {
-      V0[i]=simplify(reduce(V0[i],U),1);
-      if(i>=2)
-      {
-        U=std(U+V0[i]);
-      }
-    }
-  }
-
-  list l;
-  if(k>0)
-  {
-    l=a0,w0,m0;
-    if(size(V0)>0)
-    {
-      l[4]=V0;
-    }
-  }
-  return(l);
-}
-example
-{ "EXAMPLE:"; echo=2;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -979,13 +732,13 @@ list v;  V-filtration on H''/s*H''
   ideal v[5];  standard basis of Jacobian ideal
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; spectrum
 EXAMPLE:  example vfilt; shows examples
 "
 {
   list l=vwfilt(t);
-  return(spnf(l[1],l[3],l[4])+list(l[5],l[6]));
+  return(spnf(list(l[1],l[3],l[4]))+list(l[5],l[6]));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1014,7 +767,7 @@ list vw;  weighted V-filtration on H''/s*H''
   ideal vw[6];  standard basis of Jacobian ideal
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration;
           spectrum; spectral pairs
 EXAMPLE:  example vwfilt; shows examples
@@ -1077,7 +830,7 @@ EXAMPLE:  example vwfilt; shows examples
   module v=simplify(jet(H*U0*H0,2*k0)/var(1)^(2*k0),1);
 
   kill l;
-  list l=sppnf(a,w,v)+list(gmsbasis,gmsstd);
+  list l=sppnf(list(a,w,v))+list(gmsbasis,gmsstd);
   setring(R);
   list l=imap(G,l);
   kill G,gmsmaxdeg;
@@ -1125,7 +878,7 @@ list l=A0,A1,T,M;
   module T;  C-basis of C^mu
   ideal M;  monomial C-basis of H''/sH''
 @end format
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; opposite Hodge filtration; V-filtration
 EXAMPLE:  example tmatrix; shows examples
 "
@@ -1334,7 +1087,7 @@ list ev;  V-filtration on Jacobian algebra
   ideal ev[4];  monomial vector space basis of Jacobian algebra
   ideal ev[5];  standard basis of Jacobian ideal
 @end format
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+KEYWORDS: singularity; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; endomorphism filtration
 EXAMPLE:  example endvfilt; shows examples
 "
@@ -1476,25 +1229,131 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc spprint(list sp)
-"USAGE:   spprint(sp); list sp
-RETURN:  string s;  spectrum sp
-EXAMPLE: example spprint; shows examples
+proc sppnf(list sp)
+"USAGE:   sppnf(list(a,w[,m])); ideal a, intvec w, intvec m
+ASSUME:  ncols(e)==size(w)==size(m)
+RETURN:  order (a[i][,w[i]]) with multiplicity m[i] lexicographically
+EXAMPLE: example sppnf; shows examples
 "
 {
-  string s;
-  for(int i=1;i<size(sp[2]);i++)
+  ideal a=sp[1];
+  intvec w=sp[2];
+  int n=ncols(a);
+  intvec m;
+  list V;
+  module v;
+  int i,j;
+  for(i=3;i<=size(sp);i++)
   {
-    s=s+"("+string(sp[1][i])+","+string(sp[2][i])+"),";
+    if(typeof(sp[i])=="intvec")
+    {
+      m=sp[i];
+    }
+    if(typeof(sp[i])=="module")
+    {
+      v=sp[i];
+      for(j=n;j>=1;j--)
+      {
+        V[j]=module(v[j]);
+      }
+    }
+    if(typeof(sp[i])=="list")
+    {
+      V=sp[i];
+    }
   }
-  s=s+"("+string(sp[1][i])+","+string(sp[2][i])+")";
-  return(s);
+  if(m==0)
+  {
+    for(i=n;i>=1;i--)
+    {
+      m[i]=1;
+    }
+  }
+
+  int k;
+  ideal a0;
+  intvec w0,m0;
+  list V0;
+  number a1;
+  int w1,m1;
+  for(i=n;i>=1;i--)
+  {
+    if(m[i]!=0)
+    {
+      for(j=i-1;j>=1;j--)
+      {
+        if(m[j]!=0)
+        {
+          if(number(a[i])>number(a[j])||
+            (number(a[i])==number(a[j])&&w[i]<w[j]))
+          {
+            a1=number(a[i]);
+            a[i]=a[j];
+            a[j]=a1;
+            w1=w[i];
+            w[i]=w[j];
+            w[j]=w1;
+            m1=m[i];
+            m[i]=m[j];
+            m[j]=m1;
+            if(size(V)>0)
+            {
+              v=V[i];
+              V[i]=V[j];
+              V[j]=v;
+            }
+          }
+          if(number(a[i])==number(a[j])&&w[i]==w[j])
+          {
+            m[i]=m[i]+m[j];
+            m[j]=0;
+            if(size(V)>0)
+            {
+              V[i]=V[i]+V[j];
+            }
+          }
+        }
+      }
+      k++;
+      a0[k]=a[i];
+      w0[k]=w[i];
+      m0[k]=m[i];
+      if(size(V)>0)
+      {
+        V0[k]=V[i];
+      }
+    }
+  }
+
+  if(size(V0)>0)
+  {
+    n=size(V0);
+    module U=std(V0[n]);
+    for(i=n-1;i>=1;i--)
+    {
+      V0[i]=simplify(reduce(V0[i],U),1);
+      if(i>=2)
+      {
+        U=std(U+V0[i]);
+      }
+    }
+  }
+
+  if(k>0)
+  {
+    sp=a0,w0,m0;
+    if(size(V0)>0)
+    {
+      sp[4]=V0;
+    }
+  }
+  return(sp);
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
-  list sp=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
-  spprint(sp);
+  list sp=list(ideal(-1/2,-3/10,-3/10,-1/10,-1/10,0,1/10,1/10,3/10,3/10,1/2),intvec(2,1,1,1,1,1,1,1,1,1,0));
+  sppprint(sppnf(sp));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
