@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.121 2004-04-28 14:48:48 levandov Exp $
+@comment $Id: types.doc,v 1.122 2004-05-13 16:27:55 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -691,7 +691,7 @@ a number comparison:
   m >= n
 @end smallexample
 For numbers from Z/p or from field extensions not all operations are useful:
-@* - 0 ist always the smallest element,
+@* - 0 is always the smallest element,
 @* - in Z/p the representatives in the range -(p-1)/2..(p-1)/2 when p>2 resp.
      0 and 1 for p=2 are used for comparisons,
 @* - in field extensions the last two operations
@@ -1352,7 +1352,7 @@ mode is set by the first @code{read} or @code{write} command. See also
 the example below.
 
 Note that the filename may contain a path. On Microsoft Windows
-(resp.@: MS-DOS) platforms, names of a drive can preceed the filename, but
+(resp.@: MS-DOS) platforms, names of a drive can precede the filename, but
 must be started with a @code{//} (as in @code{//c/temp/ex}. An ASCII
 link can be used either for reading or for writing, but not for both at
 the same time. A @code{close} command must be used before a change of
@@ -1598,8 +1598,7 @@ is data to read.
 
 @*@strong{Example:}
 @smallexample
-@c @c example unix_only
-  // not computed !!
+@c example unix_only
   LIB "general.lib"; // needed for "killall" command
   link l="MPtcp:launch";
   open(l); l;        // l is ready for writing but not for reading
@@ -1629,6 +1628,7 @@ is data to read.
   write(l,quote(i)); // Child inherited vars and their values
   read(l);
   close(l);          // shut down forked child
+@c example
 @end smallexample
 
 @c ------------------------------
@@ -1838,10 +1838,10 @@ free resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal, resp.@: module w.r.t. 
+minimal free resolution of an ideal, resp.@: module w.r.t.
 a minimal set of generators of the first module (see @ref{mres})
 @item names
-list of all userdefined variable names (see @ref{names})
+list of all user-defined variable names (see @ref{names})
 @item res
 free resolution of an ideal, resp.@: module (see @ref{res})
 @item size
@@ -1965,7 +1965,7 @@ C -> R : the real part
 @end itemize
 
 Finally, in Singular we allow the mapping from rings
-with coefficient field Q to rings whose ground fields 
+with coefficient field Q to rings whose ground fields
 have finite characteristic:
 
 @itemize @bullet
@@ -1985,28 +1985,26 @@ $Q \rightarrow (Z/p)(a, \ldots)$
 Q -> (Z/p)(a,..)
 @end ifinfo
 @end itemize
-In these cases the denominator and the numerator 
+In these cases the denominator and the numerator
 of a number are mapped separately by the usual
-map from Z to Z/p, and the image of the number 
+map from Z to Z/p, and the image of the number
 is built again afterwards by division. It is thus
-not allowed to map numbers whose denominator is 
-divisible by the characteristic of the target 
-ground field, or objects containing such numbers. 
-We, therefore, strongly recommend using such 
-maps only to map objects with integer coefficients. 
+not allowed to map numbers whose denominator is
+divisible by the characteristic of the target
+ground field, or objects containing such numbers.
+We, therefore, strongly recommend using such
+maps only to map objects with integer coefficients.
 
 
 @menu
 * map declarations::
 * map expressions::
 * map operations::
-* fetch::
-* imap::
-* subst::
+* map related functions::
 @end menu
-@iftex
-See @ref{imap}; @ref{fetch}; @ref{subst}.
-@end iftex
+@c @iftex
+@c See @ref{imap}; @ref{fetch}; @ref{subst}.
+@c @end iftex
 
 @c ------------------------------
 @node map declarations, map expressions, map, map
@@ -2087,7 +2085,7 @@ map expressions combined by composition using parentheses (@code{(}, @code{)})
 @end enumerate
 
 @c ------------------------------
-@node map operations,  , map expressions, map
+@node map operations, map related functions, map expressions, map
 @subsection map operations
 
 @cindex map operations
@@ -2115,6 +2113,26 @@ is a map entry (the image of the corresponding variable)
   g(p) == p;
 @c example
 @end smallexample
+
+@c ------------------------------
+@node map related functions,  , map operations, map
+@subsection map related functions
+
+@cindex map related functions
+
+@table @code
+@item fetch 
+the identity map between rings and qrings (see @ref{fetch})
+@item imap
+a convenient map procedure for inclusions and projections of rings (see @ref{imap})
+@item preimage
+preimage under a ring map (see @ref{preimage})
+@item subst
+substitute a ring variable (see @ref{subst})
+@end table
+
+See also the libraries @ref{algebra_lib} and @ref{ring_lib}, which contain more
+functions, related to maps.
 
 @c ---------------------------------------
 @node matrix, module, map, Data types
@@ -2401,7 +2419,7 @@ n x k
 @tex
 n$\times$k
 @end tex
-for
+ for
 @ifinfo
 R^n/M,
 @end ifinfo
@@ -2641,7 +2659,7 @@ which determines the coefficient field. See @ref{ring declarations} for
 declarations of coefficient fields.
 
 @strong{Warning:} Beware of the special meaning of the letter @code{e}
-(immediatly following a sequence of digits) if the field is real (or complex).
+(immediately following a sequence of digits) if the field is real (or complex).
 See @ref{number operations}, @ref{Miscellaneous oddities}.
 
 @menu
@@ -2668,9 +2686,9 @@ defines a number.
 
 @item Note:
 Numbers may only be declared w.r.t. the coefficient field of the current
-basering, i.e., a ring 
+basering, i.e., a ring
 has to be defined prior to any number declaration. See @ref{Rings and
-orderings} for a list of the available coeffficient fields.
+orderings} for a list of the available coefficient fields.
 
 @item Example:
 @smallexample
@@ -2782,6 +2800,7 @@ See
 @node number operations, number related functions, number expressions, number
 @subsection number operations
 @cindex number operations
+@cindex mod
 
 @table @asis
 @item @code{+}
@@ -2796,6 +2815,8 @@ division
 power, exponentiation (by an integer)
 @item @code{<=, >=, ==, <>}
 comparison
+@item @code{mod}
+integer modulo (the remainder of the division @code{div}), always non-negative
 @end table
 
 @strong{Note:} quotient and exponentiation is only recognized as a
@@ -2839,7 +2860,7 @@ cancel denominators of numbers in poly and divide it by its content
 imaginary part of a complex number, 0 otherwise
 (see @ref{impart}, @ref{repart})
 @item numerator, denominator
-return the numerator/denominator of a rational number 
+return the numerator/denominator of a rational number
 (see @ref{numerator}, @ref{denominator})
 @item leadcoef
 coefficient of the leading term (see @ref{leadcoef})
@@ -2941,7 +2962,7 @@ Polynomials are the basic data for all main algorithms in
 (coefficient*power product) which are combined by the usual polynomial
 operations (see @ref{poly expressions}). Polynomials can only be defined
 or accessed with respect to a basering which determines the coefficient
-type, the names of the indeterminants and the monomial ordering.
+type, the names of the indeterminates and the monomial ordering.
 
 @smallexample
 @c example
@@ -3384,7 +3405,7 @@ free resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal, resp.@: module w.r.t. a minimal set of generators of 
+minimal free resolution of an ideal, resp.@: module w.r.t. a minimal set of generators of
 the given ideal, resp.@: module (see @ref{mres})
 @item res
 free resolution of an ideal, resp.@: module, but not changing the
@@ -3436,7 +3457,7 @@ a non-negative int_expression less or equal 2147483629.
 @item
 an expression_list of an int_expression and one or more names.
 @item
-the name @code{real}.
+the name @code{real}
 @item
 an expression_list of the name @code{real} and an  int_expression.
 @item
@@ -3510,12 +3531,12 @@ construct a new ring @math{k[X,Y]} from @math{k_1[X]}  and @math{k_2[Y]}.
 @end table
 
 Concerning the ground fields @math{k_1} and @math{k_2} take the
-following guidelines into consideration:
+following guide lines into consideration:
 @itemize @bullet
 @item Neither @math{k_1} nor @math{k_2} may be @math{R} or @math{C}.
 @item If the characteristic of @math{k_1} and @math{k_2} differs, then one of them must be @math{Q}.
 @item At most one of @math{k_1} and @math{k_2} may have parameters.
-@item If one of @math{k_1} and @math{k_2} is an algebraic extension of @math{Z/p} it may not be defined by a @code{charstr} of type @code{(p^n,a)}. 
+@item If one of @math{k_1} and @math{k_2} is an algebraic extension of @math{Z/p} it may not be defined by a @code{charstr} of type @code{(p^n,a)}.
 @end itemize
 
 
@@ -3672,7 +3693,7 @@ type. The concatenated string of all concersions is returned.
 
 @*The elements of intvec, intmat, ideal, module, matrix, and list, are
 separated by a comma. No newlines are inserted.
-@*Not defined elements of a list are ommitted.
+@*Not defined elements of a list are omitted.
 @*For link, the name of the link is used.
 @*For map, the ideal defining the mapping is converted.
 
@@ -3696,7 +3717,7 @@ matrix, and list become indistinguishable.
   list l;
   string(l);
   l[3] = 1;
-  string(l); // notice that l[1],l[2] are ommited
+  string(l); // notice that l[1],l[2] are omitted
   l[2] = l;
   l;
   string(l); // notice that lists of list is flattened
@@ -3764,7 +3785,7 @@ executing string as command (see @ref{execute})
 @item find
 position of a substring in a string (see @ref{find})
 @item names
-list of strings of all userdefined variable names (see @ref{names})
+list of strings of all user-defined variable names (see @ref{names})
 @item nameof
 name of an object (see @ref{nameof})
 @item option
