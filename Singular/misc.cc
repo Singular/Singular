@@ -747,8 +747,10 @@ char * versionString()
               StringAppend("-g,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
-              StringAppend("SearchPath : %s\n", feGetSearchPath());
-              StringAppend("Singular   : %s\n", feGetExpandedExecutable());
+#ifdef HAVE_INFO
               StringAppend("InfoFile   : %s\n", feGetInfoFile());
-              return StringAppend("InfoProgram: %s", feGetInfoProgram());
+              StringAppend("InfoProgram: %s\n", feGetInfoProgram());
+#endif
+              StringAppend("Singular   : %s\n",feGetExpandedExecutable());
+              return StringAppend("SearchPath : %s", feGetSearchPath());
 }
