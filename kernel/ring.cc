@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.11 2004-05-25 16:45:57 levandov Exp $ */
+/* $Id: ring.cc,v 1.12 2004-07-29 09:42:03 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1099,7 +1099,8 @@ int rSum(ring r1, ring r2, ring &sum)
       switch (t1) 
       {
         case nc_comm:
-	  sum->nc->type = t2; break;
+	  sum->nc->type = t2;
+          break;
         case nc_lie:
 	  switch(t2)
 	  {
@@ -1108,7 +1109,7 @@ int rSum(ring r1, ring r2, ring &sum)
 	    case nc_comm:
 	      sum->nc->type = nc_lie;  break;
 	    default:
-	      sum->nc->type = nc_undef;  break;
+	      /*sum->nc->type = nc_undef;*/  break;
 	  }
 	  break;
         case nc_skew:
@@ -1119,8 +1120,11 @@ int rSum(ring r1, ring r2, ring &sum)
 	    case nc_comm:
 	      sum->nc->type = nc_skew;  break;
 	    default:
-	      sum->nc->type = nc_undef;  break;
+	      /*sum->nc->type = nc_undef;*/  break;
 	  }
+        default:
+          /*sum->nc->type = nc_undef;*/
+          break;
       }
     }
     if (sum->nc->type == nc_undef)
@@ -3014,7 +3018,8 @@ void rDebugPrint(ring r)
     {
       Print("  start %d",r->typ[j].data.dp.start);
       Print("  end %d",r->typ[j].data.dp.end);
-      if (r->typ[j].ord_typ==ro_wp)
+      if ((r->typ[j].ord_typ==ro_wp)
+      || (r->typ[j].ord_typ==ro_wp_neg))
       {
         Print(" w:");
         int l;
