@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.19 1998-05-04 07:25:26 Singular Exp $
+@comment $Id: reference.doc,v 1.20 1998-05-04 15:01:50 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4942,7 +4942,9 @@ See @ref{ideal expressions}; @ref{intvec expressions}; @ref{qhweight}.
 @table @code
 @item @strong{Syntax:}
 @code{write (} link@code{,} expression_list @code{);}
-@*@code{write} ( link , key , value ) // DBM links, only
+@*for DBM links:
+@*@code{write( } link@code{,} string_expression@code{,} string_expression @code{);} 
+@*@code{write( } link@code{,} string_expression @code{);} 
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -4957,8 +4959,10 @@ description. To prevent an evaluation of the expression before it is
 written, the @code{quote} command (possibly together with @code{eval})
 can be used. A @code{write} blocks (i.e. does not return), as long as a
 MPtcp link is not ready for writing. 
-@*For DBM links, @code{write} inserts (key, value) into the
-data base.
+@*For DBM links, @code{write} with three arguments inserts the first
+string as key and the second string as value into the dbm data
+base. Called with two arguments it deletes the entry with the key
+specified by the string from the data base.
 @item @strong{Example:}
 @example
   //write the lines with the values of the variables f and i
