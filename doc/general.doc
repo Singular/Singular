@@ -1,19 +1,25 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.54 1998-05-12 16:06:13 Singular Exp $
+@comment $Id: general.doc,v 1.55 1998-05-12 16:19:56 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
-@c with emacs (C-c C-e C-b).
-@c %**start
-@c \input texinfo.tex
-@c @setfilename general.info
-@c @node Top, General concepts
-@c @menu
-@c * General concepts::
-@c @end menu
-@c @node General concepts, Data types, Introduction, Top
-@c @chapter General concepts
-@c %**end
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ifset' and `@end' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the conditionals).
+@ifset thisVariableShouldNeverBeSet
+%**start
+\input texinfo.tex
+@setfilename general.info
+@node Top, General concepts
+@menu
+* General concepts::
+@end menu
+@node General concepts, Data types, Introduction, Top
+@chapter General concepts
+%**end
+@end ifset
+
 
 @menu
 * Interactive use::
@@ -64,10 +70,9 @@ or @code{$}.
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
 @*@code{  Singular  [options] [file1 [file2 ...]] }
 
-@ref{Commandline options}
-@menu
-* Commandline options::
-@end menu
+@c ref
+See @ref{Commandline options}.
+@c ref
 
 @*On start-up, @sc{Singular}
 @enumerate
@@ -113,7 +118,9 @@ extra semicolons are interpreted as empty statements.
 @subsection The online help system
 @cindex The online help system
 
-@sc{Singular} uses @code{info} (from @code{texinfo}) for it's help system.@*
+@sc{Singular} uses @code{info} for it's help system.
+@xref{Top, An Introduction to Info, Getting started, info, The Info Manual}.
+
 The whole manual is decomposed into "nodes" of information.
 A node contains text describing a specific topic at a specific level of
 detail. The top line of a node is its "header".  This node's header
@@ -122,37 +129,46 @@ the name of the next node (@code{Next:}),
 the name of the previous node (@code{Prev:}),
 and the name of an "Up" node (@code{Up:}).
 
-To move within info type commands of single characters and do not type a RETURN
-character. The most important commands:
-@table @asis
-@item @code{q}
+To move within info, type commands consisting of single characters.  Do not type
+@code{RETURN}.  You should not use cursor keys, either.  If you use some of the
+cursor keys by accident, you maybe will be popped to some totally different
+node.  Type @code{l} to return to your original node.
+
+The most important commands:
+@table @code
+@item q
 leave info
-@item @code{n}
+@item n
 go to the "next" node
-@item @code{p}
+@item p
 go to the "previous" node
-@item @code{u}
+@item u
 go to the "up" node
-@item @code{m}
+@item m
 pick a menu item specified by name. Reads name of menu entry
-@item @code{f}
+@item f
 follow a cross reference.  Reads name of reference
-@item @code{l}
+@item l
 go to the previous visited node
-@item @code{h}
-help about info (use @code{l} to come back)
-@item @code{b}
+@item b
 go to the begining of the current node
-@item @code{e}
+@item e
 go to the end of the current node
 @item SPACE
 scroll forward a page
 @item DEL
 scroll backward a page
-@item @code{s}
+@item h
+invoke info tutorial (use @code{l} to come back or @code{CTL-X 0} to remove
+extra window)
+@item CTRL-H
+show help on info system (use @code{l} to come back or @code{CTL-X 0} to remove
+extra window)
+@item s
 search through this Info file for a specified string,
 and select the node in which the next occurrence is found
 @end table
+
 @c --------------------------------------------------------------------------
 @node Interrupting SINGULAR,Editing input,The online help system,Interactive use
 @subsection Interrupting SINGULAR
@@ -161,12 +177,12 @@ and select the node in which the next occurrence is found
 Typing @code{CTL-C} (control C) interrupts Singular (system dependend).
 @sc{Singular} prints the current command and the current line.
 You have the following choices:
-@table @asis
-@item @code{a}
+@table @code
+@item a
 return to the toplevel after finishing the current command
-@item @code{c}
+@item c
 continues
-@item @code{q} 
+@item q
 quits  @sc{Singular}
 @end table
 
@@ -651,27 +667,21 @@ All changes of the basering by a definition of a new @code{ring} or a
 (i.e. will not affect the calling procedure) unless a @code{keepring}
 command is used.
 @end table
-@menu
-* ring::
-* Term orderings::
-* qring:: define quotient rings
-* charstr:: the coefficient field
-* npars:: number of parameters
-* nvars:: number of variables
-* ordstr:: the monomial ordering
-* parstr:: the parameters
-* par:: the parameter as number
-* varstr:: the ring variables
-* var:: the ring variables as poly
-* setring:: a local ring change
-* keepring:: ring change in the next (upper) level
-@end menu
-@iftex
-See @ref{ring}; @ref{Term orderings};
-@ref{qring}; @ref{charstr}; @ref{npars};
-@ref{nvars}; @ref{ordstr};
-@ref{varstr}; @ref{var}; @ref{setring}; @ref{keepring}.
-@end iftex
+
+@c ref
+See
+@ref{Term orderings};
+@ref{charstr};
+@ref{keepring}.
+@ref{npars};
+@ref{nvars};
+@ref{ordstr};
+@ref{qring};
+@ref{ring};
+@ref{setring};
+@ref{varstr};
+@ref{var};
+@c ref
 
 @c ---------------------------------------------------------------------------
 @node Term orderings, ,General syntax of a ring definition, Rings and orderings
@@ -977,11 +987,12 @@ the functions of the kernel of @sc{Singular} and from other libraries.
 See the section 'Writing procedures' of the tutorial.
 
 @menu
-* General command syntax::
-* Special characters::
-* Names and objects::
-* Type conversion and casting::
-* Flow control::
+* General command syntax::      
+* Special characters::          
+* Names::                       
+* Objects::                     
+* Type conversion and casting::  
+* Flow control::                
 @end menu
 
 @c ---------------------------------------------------------------------------
@@ -1004,7 +1015,7 @@ a @strong{definition}:
   int i=2;             // define the integer i and set i to 2
 @end example
 
-For more information on declarations, see @ref{Names and objects}.
+@xref{Names} for more information on declarations.
 @item
 an @strong{assignment}:
 @*   name  @code{=} expression @code{;}
@@ -1039,7 +1050,7 @@ a @strong{print command}:
 
 
 @c ------------------------------------------------------------
-@node Special characters, Names and objects, General command syntax, The SINGULAR language
+@node Special characters, Names, General command syntax, The SINGULAR language
 @subsection Special characters
 @cindex Special characters
 The following characters/operators have special meanings:
@@ -1116,34 +1127,34 @@ exits @sc{Singular}
 @end table
 
 @c ------------------------------------------------------------
-@node Names and objects, Type conversion and casting, Special characters, The SINGULAR language
-@subsection Names and objects
-@cindex Names and objects
+@node Names, Objects, Special characters, The SINGULAR language
+@subsection Names
+@cindex Names
 
+@itemize @bullet
+
+@item
 @sc{Singular} is a typed language.  This means that all names (=
 identifiers) have to be declared prior to their use.
 The general syntax of a declaration is
 
 type name [ @code{=} expression ] @code{;}
 
-where type stands for one of the data types of @sc{Singular},
-name for the name of the object you are creating and expression
-is any expression of the type or one that can be converted to the type
-of the object (see @ref{Type conversion and casting}).
-When expression is missing some default value is assigned whenever
-possible.
+where type stands for one of the data types of @sc{Singular}, name for the name
+of the object you are declaring, and expression is any expression of type or one
+that can be converted to type.  @xref{Type conversion and casting}). Expression
+is assigned to name as initial value.  When expression is missing some default
+value is assigned whenever possible.
 
-For a complete list of types, refer to the @code{typeof} command
-(@ref{typeof}).  To get information on the name and the object named by it, you
-may use the @code{type} command (@ref{type}).
+@xref{typeof}, for a complete list of types.  To get information on the name and
+the object named by it, you may use the @code{type} command (@ref{type}).
+@xref{Data types}, for a description of @sc{Singular}'s data types.
 
-It is possible to redefine or overwrite an already existing object
-(as an object of the same type).  A redefinition will
-first set the variable to the default value and then compute the expression.
-The difference between redefinition and overwriting is shown in the following
-example:
+It is possible to redefine or overwrite an already existing name (if it
+is a name of the same type).  A redefinition will first set the variable
+to the default value and then compute the expression.  The difference
+between redefinition and overwriting is shown in the following example:
 
-@strong{Example:}
 @example
 @c example
   int i=3;
@@ -1154,221 +1165,13 @@ example:
 @c example
 @end example
 
+@item
+User defined names should start with a letter and consist of letters and
+digits only.  All names are case sensitive.  Indexed names are built as
+name followed by @code{(} int_expression @code{)}.  A list of indexed
+names can be built as a name followed by @code{(} intvec_expression
+@code{)}.
 
-Every object in @sc{Singular} has a type and a value.
-In most cases it has also a name and in some cases an attribute list.
-
-Each object of type
-@code{poly},
-@code{ideal},
-@code{vector},
-@code{module},
-@code{map},
-@code{matrix},
-@code{number},
-@code{resolution}
-belongs to a specific ring.
-Also @code{list}, if one of the objects belong to a ring.
-
-These objects are local to the ring, hence their names can be used for other
-objects in other rings. Objects from one ring can be mapped to another
-ring with an object of type @code{map}
-(or with the commands @code{fetch} or @code{imap}).
-
-The other types do not belong to a ring and can be accessed within every ring.
-
-Usually @sc{Singular} (i.e. if possible) gives an error message or
-warning when the same name is defined again. However be sure not to use
-the name of an object as a name for a ring variable and vice versa. This
-may not be considered as an error, but the evaluation of the name may be
-confusing.
-
-The following names are predefined commands or variables
-and cannot be used otherwise:
-
-@c @code{alternating},
-@code{and},
-@code{attrib},
-@code{bareiss},
-@code{basering},
-@code{break},
-@code{char},
-@code{char_series},
-@code{charstr},
-@code{cleardenom},
-@code{close},
-@code{continue},
-@code{contract},
-@code{coef},
-@code{coeffs},
-@code{dbprint},
-@code{def},
-@code{defined},
-@code{deg},
-@code{degBound},
-@code{degree},
-@code{delete},
-@code{det},
-@code{diff},
-@code{dim},
-@code{div},
-@code{dring},
-@code{dump},
-@code{echo},
-@code{else},
-@code{eval},
-@code{exit},
-@code{execute},
-@code{export},
-@code{extgcd},
-@code{facstd},
-@code{factorize},
-@code{fetch},
-@code{fglm},
-@code{find},
-@code{finduni},
-@code{for},
-@code{forif},
-@code{freemodule},
-@code{gcd},
-@code{gen},
-@code{getdump},
-@code{help},
-@code{hilb},
-@code{homog},
-@code{ideal},
-@code{if},
-@code{imap},
-@code{indepSet},
-@code{insert},
-@code{int},
-@code{interred},
-@code{intersect},
-@code{intmat},
-@code{intvec},
-@code{jacob},
-@code{jet},
-@code{kbase},
-@code{keepring},
-@code{kill},
-@code{killattrib},
-@code{koszul},
-@code{lead},
-@code{leadcoef},
-@code{leadexp},
-@code{LIB},
-@code{lift},
-@code{liftstd},
-@code{link},
-@code{list},
-@code{listvar},
-@code{map},
-@code{matrix},
-@code{maxideal},
-@code{memory},
-@code{minbase},
-@code{minor},
-@code{minpoly},
-@code{minres},
-@code{mod},
-@code{module},
-@code{monitor},
-@code{mres},
-@code{mstd},
-@code{mult},
-@code{multBound},
-@code{nameof},
-@code{names},
-@code{ncols},
-@code{newline},
-@code{NF},
-@code{noether},
-@c @code{NOT},
-@code{not},
-@code{npars},
-@code{nrows},
-@code{number},
-@code{nvars},
-@code{open},
-@code{or},
-@code{ord},
-@code{ordstr},
-@code{option},
-@code{package},
-@code{pagelength},
-@code{pagewidth},
-@code{par},
-@code{parameter},
-@code{pardeg},
-@code{parstr},
-@code{pause},
-@code{poly},
-@code{preimage},
-@code{prime},
-@code{print},
-@code{printlevel},
-@code{proc},
-@code{prune},
-@code{qhweight},
-@code{qring},
-@code{quit},
-@code{quote},
-@code{quotient},
-@code{random},
-@c @code{rank},
-@code{read},
-@code{reduce},
-@code{regularity},
-@code{res},
-@code{reservedName},
-@code{resolution},
-@code{resultant},
-@code{return},
-@code{ring},
-@code{rtimer},
-@code{rvar},
-@code{setring},
-@code{short},
-@code{simplify},
-@code{size},
-@code{sortvec},
-@code{sres},
-@code{status},
-@code{std},
-@code{string},
-@code{subst},
-@code{system},
-@code{syz},
-@code{test},
-@code{timer},
-@code{TRACE},
-@code{trace},
-@code{transpose},
-@code{type},
-@code{typeof},
-@code{var},
-@code{varstr},
-@code{vdim},
-@code{vector},
-@code{verbose},
-@code{voice},
-@code{wedge},
-@code{weight},
-@code{while},
-@code{whileif},
-@code{write}.
-
-You  get a list of the reserved names by @code{reservedName();},
-see @ref{reservedName}.
-
-User defined global names start with a letter and consist only of letters and
-digits.
-They must not coincide with reserved names (keywords) and should not interfere
-with monomials. All names are case sensitive.
-Indexed names are built as
-name followed by @code{(} int_expression @code{)}.
-A list of indexed names can be built as a name followed by
-@code{(} int_expression @code{)}.
 @example
 @c example
   ring R;
@@ -1380,10 +1183,64 @@ A list of indexed names can be built as a name followed by
 @c example
 @end example
 
-Hier fehlt noch was ueber die defs.
+@item
+Names must not coincide with reserved names (keywords).  You get a list
+of the reserved names by @code{reservedName();}.  @xref{reservedName}.
+Names should not interfere with names of ring variables or, more
+generally, with monomials.  This may lead to unexpected results:
+
+@example
+@c example
+  ring r=0,x,dp;
+  xxx;
+  poly xxx=xxx;
+  xxx;
+@c example
+@end example
+@end itemize
 
 @c ------------------------------------------------------------
-@node Type conversion and casting, Flow control, Names and objects, The SINGULAR language
+@node Objects, Type conversion and casting, Names, The SINGULAR language
+@subsection Objects
+@cindex Objects
+
+
+Every object in @sc{Singular} has a type and a value.  In most cases it
+has also a name and in some cases an attribute list.  You may examine the
+value of an object simply by printing it with object@code{;}.  The type
+of an object you may determine by means of the @code{typeof} function,
+the attributes by means of @code{attrib}:
+
+@example
+@c example
+ring r=0,x,dp;
+typeof(10); typeof(10000000000000000);
+typeof(r);
+attrib(x);
+attrib(std(x));
+@c example
+@end example
+
+Each object of type
+@code{poly},
+@code{ideal},
+@code{vector},
+@code{module},
+@code{map},
+@code{matrix},
+@code{number},
+@code{resolution}
+belongs to a specific ring.  Also @code{list}, if one of the objects
+belong to a ring.  These objects are local to the ring.  Their names can
+be used for other objects in other rings.  Objects from one ring can be
+mapped to another ring with an object of type @code{map} (or with the
+commands @code{fetch} or @code{imap}).  @xref{map}.
+
+The other types do not belong to a ring and can be accessed within every
+ring and across rings.
+
+@c ------------------------------------------------------------
+@node Type conversion and casting, Flow control, Objects, The SINGULAR language
 @subsection Type conversion and casting
 @cindex Type conversion
 Assignments convert the type of an expression to the type
@@ -1556,8 +1413,8 @@ the sequence of commands stored in the specified procedure.
 @node Proc definition, Names in procedures, Procedures, Procedures
 @subsection Proc in a library
 @cindex Proc in a library
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{[static] proc} proc_name [parameter_list]
 @*["help_text"]
 @*@code{@{}
@@ -1575,7 +1432,7 @@ the sequence of commands stored in the specified procedure.
 @end tex
    sequence_of_commands;
 @*@code{@}}]
-@item @strong{Purpose:}
+@item Purpose:
 defines a new function, the @code{proc} proc_name, with the additional 
 information help_text, which is copied to the screen by 
 @code{help proc_name;} and the @code{example} section
@@ -1592,7 +1449,7 @@ procedures in the same library, but not for the users. So there is no
 reason anymore to define a procedure within another one (it just makes
 debugging harder). 
 
-@item @strong{Example of a procedure:}
+@item Example of a procedure:
 @example
 @c example
   //
@@ -1640,7 +1497,7 @@ debugging harder).
 @c example
 @end example
 
-@item @strong{Example of a static library procedure:}
+@item Example of a static library procedure:
 @example
 @c include sample.lib
 @end example
@@ -1677,7 +1534,7 @@ The differences between procedures from libraries and
 other procedures are that the help and example part are ignored in 
 interactive definitions and that static can only be specified in libraries.
 
-@item @strong{Guidelines for the help section of a procedure:}
+@item Guidelines for the help section of a procedure:
 @* The help text of a procedure should contain information about the usage,
    purpose, return values and generated objects. Particular assumptions or 
    limitations should be listed. If global objects are generated, this should 
