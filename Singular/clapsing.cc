@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.36 1998-07-07 16:09:31 Singular Exp $
+// $Id: clapsing.cc,v 1.37 1998-07-16 14:09:15 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -538,11 +538,11 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     else               setCharacteristic( -nGetChar() );
     if (currRing->minpoly!=NULL)
     {
-      //if (nGetChar()==1)
-      //{
-      //  WerrorS( feNotImplemented );
-      //  return NULL;
-      //}
+      if ((nGetChar()==1)||(pVariables>1)) /* Q(a) or multivariat */
+      {
+        WerrorS( feNotImplemented );
+        return NULL;
+      }
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPClapAP( f,a ) );
