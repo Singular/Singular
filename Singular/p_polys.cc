@@ -6,10 +6,11 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.2 2000-10-23 15:21:14 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.3 2000-10-23 15:53:12 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
+#include "tok.h"
 #include "p_polys.h"
 #include "ring.h"
 
@@ -20,7 +21,7 @@ void p_Setm(poly p, ring r)
   int pos=0;
   if (r->typ!=NULL)
   {
-    while (1)
+    loop
     {
       long ord=0;
       sro_ord* o=&(r->typ[pos]);
