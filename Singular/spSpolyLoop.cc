@@ -3130,15 +3130,15 @@ void spLoop_mac_1(poly a1, poly a2, poly m,poly spNoether)
   pCopyAddFast(b, a1, m);
 
   Top:
-  register long long d;
+  register long d;
 
 
   if ((pGetOrder(b)<0) && (pGetOrder(a2)<0)) goto Top0;
 
   //d = (long long)pGetOrder(b) - (long long)pGetOrder(a2);
   //NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual);
-  if (pGetOrder(b) > pGetOrder(a2)) { d=1; goto NotEqual; }
-  else if (pGetOrder(b) < pGetOrder(a2)) { d=-1; goto NotEqual; }
+  if (pGetOrder(b) > pGetOrder(a2)) { goto C_1; /*d=1; goto NotEqual;*/ }
+  else if (pGetOrder(b) < pGetOrder(a2)) { goto C_M1; /*d=-1; goto NotEqual;*/ }
 
   // now pGetOrder(b)==pGetOrder(a2):
   _pMonCmp_1(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);
@@ -3177,7 +3177,8 @@ void spLoop_mac_1(poly a1, poly a2, poly m,poly spNoether)
   goto Top;
 
   NotEqual: // i.e., b smaller than a2
-  if (d < 0)
+  if (d >= 0) goto C_1;
+  C_M1:
   {
     a = pNext(a) = a2;
     pIter(a2);
@@ -3192,6 +3193,7 @@ void spLoop_mac_1(poly a1, poly a2, poly m,poly spNoether)
     goto Top;
   }
 
+  C_1:
   // now d >= 0, i.e., b greater than a2
   pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
   a = pNext(a) = b;
@@ -3299,15 +3301,15 @@ void spLoop_mac_2(poly a1, poly a2, poly m,poly spNoether)
   pCopyAddFast(b, a1, m);
 
   Top:
-  register long long d;
+  register long d;
 
 
   if ((pGetOrder(b)<0) && (pGetOrder(a2)<0)) goto Top0;
 
   //d = (long long)pGetOrder(b) - (long long)pGetOrder(a2);
   //NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual);
-  if (pGetOrder(b) > pGetOrder(a2)) { d=1; goto NotEqual; }
-  else if (pGetOrder(b) < pGetOrder(a2)) { d=-1; goto NotEqual; }
+  if (pGetOrder(b) > pGetOrder(a2)) { goto C_1; /*d=1; goto NotEqual;*/ }
+  else if (pGetOrder(b) < pGetOrder(a2)) { goto C_M1; /*d=-1; goto NotEqual;*/ }
 
   // now pGetOrder(b)==pGetOrder(a2):
   _pMonCmp_2(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);
@@ -3346,7 +3348,8 @@ void spLoop_mac_2(poly a1, poly a2, poly m,poly spNoether)
   goto Top;
 
   NotEqual: // i.e., b smaller than a2
-  if (d < 0)
+  if (d >= 0) goto C_1;
+  C_M1:
   {
     a = pNext(a) = a2;
     pIter(a2);
@@ -3361,6 +3364,7 @@ void spLoop_mac_2(poly a1, poly a2, poly m,poly spNoether)
     goto Top;
   }
 
+  C_1:
   // now d >= 0, i.e., b greater than a2
   pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
   a = pNext(a) = b;
@@ -3468,15 +3472,15 @@ void spLoop_mac_2i(poly a1, poly a2, poly m,poly spNoether)
   pCopyAddFast(b, a1, m);
 
   Top:
-  register long long d;
+  register long d;
 
 
   if ((pGetOrder(b)<0) && (pGetOrder(a2)<0)) goto Top0;
 
   //d = (long long)pGetOrder(b) - (long long)pGetOrder(a2);
   //NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual);
-  if (pGetOrder(b) > pGetOrder(a2)) { d=1; goto NotEqual; }
-  else if (pGetOrder(b) < pGetOrder(a2)) { d=-1; goto NotEqual; }
+  if (pGetOrder(b) > pGetOrder(a2)) { goto C_1; /*d=1; goto NotEqual;*/ }
+  else if (pGetOrder(b) < pGetOrder(a2)) { goto C_M1; /*d=-1; goto NotEqual;*/ }
 
   // now pGetOrder(b)==pGetOrder(a2):
   _pMonCmp_2i(b, a2, LoopVariablesW, d,
@@ -3516,7 +3520,8 @@ void spLoop_mac_2i(poly a1, poly a2, poly m,poly spNoether)
   goto Top;
 
   NotEqual: // i.e., b smaller than a2
-  if (d < 0)
+  if (d >= 0) goto C_1;
+  C_M1:
   {
     a = pNext(a) = a2;
     pIter(a2);
@@ -3531,6 +3536,7 @@ void spLoop_mac_2i(poly a1, poly a2, poly m,poly spNoether)
     goto Top;
   }
 
+  C_1:
   // now d >= 0, i.e., b greater than a2
   pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
   a = pNext(a) = b;
@@ -3640,15 +3646,15 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
   pCopyAddFast(b, a1, m);
 
   Top:
-  register long long d;
+  register long d;
 
 
   if ((pGetOrder(b)<0) && (pGetOrder(a2)<0)) goto Top0;
 
   //d = (long long)pGetOrder(b) - (long long)pGetOrder(a2);
   //NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual);
-  if (pGetOrder(b) > pGetOrder(a2)) { d=1; goto NotEqual; }
-  else if (pGetOrder(b) < pGetOrder(a2)) { d=-1; goto NotEqual; }
+  if (pGetOrder(b) > pGetOrder(a2)) { goto C_1; /*d=1; goto NotEqual;*/ }
+  else if (pGetOrder(b) < pGetOrder(a2)) { goto C_M1; /*d=-1; goto NotEqual;*/ }
 
   // now pGetOrder(b)==pGetOrder(a2):
   _pMonCmp_2i_1(b, a2, LoopVariablesW, d,
@@ -3688,7 +3694,8 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
   goto Top;
 
   NotEqual: // i.e., b smaller than a2
-  if (d < 0)
+  if (d >= 0) goto C_1;
+  C_M1:
   {
     a = pNext(a) = a2;
     pIter(a2);
@@ -3703,6 +3710,7 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
     goto Top;
   }
 
+  C_1:
   // now d >= 0, i.e., b greater than a2
   pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
   a = pNext(a) = b;
