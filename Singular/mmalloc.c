@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.22 2000-03-02 17:43:49 Singular Exp $ */
+/* $Id: mmalloc.c,v 1.23 2000-06-07 13:36:13 pohl Exp $ */
 
 /*
 * ABSTRACT: implementation of alloc/free routines
@@ -488,6 +488,8 @@ void * mmAllocAlignedBlock( size_t size)
     {
 #ifdef MDEBUG
       good = mmDBAllocHeapS(&(mm_theList[i]), size, f, l);
+      /* this is relaly dirty and breaks oon the HP */
+      return good;
 #else
       good = AllocHeap(&(mm_theList[i]));
 #endif
