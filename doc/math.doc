@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.53 2000-05-11 14:17:05 Singular Exp $
+@comment $Id: math.doc,v 1.54 2000-05-16 08:02:36 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -31,8 +31,7 @@ some articles or text books (see @ref{References}).
 * Syzygies and resolutions::
 * Characteristic sets::
 * The spectrum::
-* Toric ideals::
-* Integer Programming::
+* Toric ideals and Integer Programming::
 * References::
 @end menu
 @c ---------------------------------------------------------------------------
@@ -666,14 +665,19 @@ principal part, then the spectrum may be computed much faster
 using @code{spectrum(f,1)}.
 
 @c ---------------------------------------------------------------------------
-@c @menu
-@c * Toric ideals::                Definition and computation.
-@c * Integer Programming::         An algorithm using toric ideals. 
-@c @end menu
+@node Toric ideals and Integer Programming, References, The spectrum, Mathematical background
+@section Toric ideals and Integer Programming
+@cindex Toric ideals and Integer Programming
 
-@node Toric ideals, Integer Programming, The spectrum, Mathematical background
+@menu
+* Toric ideals::                Definition and computation.
+* Integer Programming::         An algorithm using toric ideals. 
+@end menu
 
-@section Toric ideals
+@c ---------------------------------------------------------------------------
+@node Toric ideals, Integer Programming, , Toric ideals and Integer Programming
+
+@subsection Toric ideals
 @cindex toric ideals
 @cindex ideal, toric
 
@@ -710,14 +714,6 @@ I(A):= < x^u+ - x^u- | u in ker(A), u in Z^n >
 @end ifinfo
 is called a @strong{toric ideal}.
 
-@c The first problem in computing toric ideals is to find a finite
-@c generating set: Let $v_1,\ldots,v_r$ be a lattice basis of $\ker(A)\cap
-@c Z\!\!\! Z^n$ (i.e, a basis of the $Z\!\!\! Z$-module). Then  
-@c $$ I_A:=I:(x_1\cdot\ldots\cdot x_n)^\infty $$
-@c where
-@c $$ I=<x^{v_i^+}-x^{v_i^-}|i=1,\ldots,r> $$
-@c @end tex
-
 The first problem in computing toric ideals is to find a finite
 generating set: Let v(1),@dots{},v(r) be a lattice basis of ker(A) as a
 subset of Z^n (i.e., a basis of the Z-module). Then @* 
@@ -741,7 +737,7 @@ possibilities described in the menu entry Algorithms.
 @c -----------------------------------------------------------------------
 @node Algorithms, Buchberger algorithm, , Toric ideals
 @cindex Algorithms
-@subsection Algorithms
+@subsubsection Algorithms
 
 @menu
 * Conti and Traverso::                 
@@ -753,7 +749,7 @@ possibilities described in the menu entry Algorithms.
 
 @c -----------------------------------------------------------------------
 @node Conti and Traverso, Pottier, , Algorithms
-@subsubsection The algorithm of Conti and Traverso
+@strong{The algorithm of Conti and Traverso}
 @cindex Conti-Traverso algorithm
 @cindex algorithm of Conti and Traverso
 
@@ -801,7 +797,7 @@ a special importance in the application to integer programming
 
 @c ---------------------------------------------------------------------
 @node Pottier, Hosten and Sturmfels, Conti and Traverso, Algorithms
-@subsubsection The algorithm of Pottier
+@strong{The algorithm of Pottier}
 @cindex Pottier algorithm
 @cindex algorithm of Pottier
 
@@ -830,11 +826,10 @@ generator t * x(1) *@dots{}* x(n) -1 to obtain an ideal I2 in
 K[t,x(1),@dots{},x(n)] from which one computes I(A) by elimination of
 t. 
 @end ifinfo
-    
 
 @c ---------------------------------------------------------------------
 @node Hosten and Sturmfels, Di Biase and Urbanke, Pottier, Algorithms
-@subsubsection The algorithm of Hosten and Sturmfels
+@strong{The algorithm of Hosten and Sturmfels}
 @cindex Hosten-Sturmfels algorithm
 @cindex algorithm of Hosten and Sturmfels 
 
@@ -904,9 +899,10 @@ computations -- except from the first one -- show to be easy and fast in
 practice. 
 @end ifinfo
       
+@c -----------------------------------------------------------------
 @node Di Biase and Urbanke, Bigatti and La Scala and Robbiano, Hosten and Sturmfels, Algorithms 
 
-@subsubsection The algorithm of Di Biase and Urbanke
+@strong{The algorithm of Di Biase and Urbanke}
 @cindex Di Biase-Urbanke algorithm
 @cindex algorithm of Di Biase and Urbanke
 
@@ -985,7 +981,7 @@ is a generating set for I(A).
 
 @c ---------------------------------------------------------------------------
 @node Bigatti and La Scala and Robbiano, , Di Biase and Urbanke, Algorithms 
-@subsubsection The algorithm of Bigatti, La Scala and Robbiano
+@strong{The algorithm of Bigatti, La Scala and Robbiano}
 @cindex Bigatti-La Scala-Robbiano algorithm
 @cindex algorithm of Bigatti, La Scala and Robbiano
 
@@ -1011,7 +1007,7 @@ the computations (but which is not implemented in this library).
 
 @c ---------------------------------------------------------------------------
 @node Buchberger algorithm, , Algorithms, Toric ideals
-@subsection Buchberger algorithm for toric ideals
+@subsubsection Buchberger algorithm for toric ideals
 @cindex Buchberger algorithm for toric ideals
 
 Toric ideals have a very special structure that allows us to improve
@@ -1026,7 +1022,7 @@ be especially useful in the toric case.
 
 @c ---------------------------------------------------------------------------
 @node Integer Programming, References, Toric ideals, Mathematical background
-@section Integer Programming
+@subsection Integer Programming
 @cindex integer Programming
 
 @tex
@@ -1106,7 +1102,7 @@ solving only a single instance.
 For a detailed discussion see [The99].
 
 @c ---------------------------------------------------------------------------
-@node References, , Integer Programming, Mathematical background
+@node References, , Toric ideals and Integer Programming, Mathematical background
 @section References
 @cindex References
 
