@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.39 1999-09-22 10:19:04 Singular Exp $ */
+/* $Id: febase.h,v 1.40 1999-09-22 14:11:23 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -244,6 +244,16 @@ Voice * feInitStdin();
 /* the interface for reading: */
 extern  char * (*fe_fgets_stdin)(char *pr,char *s, int size);
 void fe_reset_input_mode();
+#ifndef MSDOS
+extern "C" {
+#ifndef HAVE_ATEXIT
+void fe_reset_fe (int i, void *v);
+#else
+void fe_reset_fe (void);
+#endif
+}
+#endif
+
 
 /* possible implementations: */
 

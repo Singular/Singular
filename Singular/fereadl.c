@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.1 1998-10-29 13:27:53 Singular Exp $ */
+/* $Id: fereadl.c,v 1.2 1999-09-22 14:11:24 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -22,6 +22,7 @@
  #ifdef MSDOS
   #include <pc.h>
  #else
+  #include <termcap.h>
   #ifdef atarist
    #include <ioctl.h>
   #else
@@ -70,9 +71,9 @@ int     fe_cursor_line; /* 0..pagelength-1*/
   #ifndef HAVE_ATEXIT
     extern "C" int on_exit(void (*f)(int, void *), void *arg);
 
-    void fe_reset_input_mode (int i, void *v)
+    void fe_reset_fe (int i, void *v)
   #else
-    void fe_reset_input_mode (void)
+    void fe_reset_fe (void)
   #endif
   {
     if (fe_stdin_is_tty && fe_is_raw_tty)
@@ -164,64 +165,85 @@ int     fe_cursor_line; /* 0..pagelength-1*/
 #endif
 
 static char termcap_buff[2048];
-static void fe_out_char(char c)
+static int fe_out_char(char c)
 {
   fputc(c,fe_echo);
+  return c;
 }
 void fe_init (void)
 {
+  #ifdef MSDOS
   extern short ospeed;
+  #endif
   fe_is_initialized=TRUE;
-  /* Make sure stdin is a terminal. */
   if ((!fe_use_fgets) && (isatty (STDIN_FILENO)))
   {
+    /* Make sure stdin is a terminal. */
     #ifndef MSDOS
       char *term=getenv("TERM");
 
-    /* Save the terminal attributes so we can restore them later. */
-      #if defined( atarist ) || defined( NeXT )
-        struct sgttyb tattr;
+      /*setup echo*/
+      if(isatty(STDOUT_FILENO))
+      {
+        fe_stdout_is_tty=1;
+        fe_echo=stdout;
+      }
+      else
+      {
+        fe_stdout_is_tty=0;
         #ifdef atarist
-          gtty(0, &fe_saved_attributes);
+          fe_echo = fopen( "/dev/tty", "w" );
         #else
-          ioctl(STDIN_FILENO, TIOCGETP, &fe_saved_attributes);
+          fe_echo = fopen( ttyname(fileno(stdin)), "w" );
         #endif
-      #else
-        struct termios tattr;
-        tcgetattr (STDIN_FILENO, &fe_saved_attributes);
-      #endif
-      #ifdef HAVE_ATEXIT
-        atexit(fe_reset_input_mode);
-      #else
-        on_exit(fe_reset_input_mode,NULL);
-      #endif
+      }
 
-    /* Set the funny terminal modes. */
-      #ifdef atarist
-        gtty(0, &tattr);
-        tattr.sg_flags |= RAW;
-        tattr.sg_flags |= CBREAK;
-        tattr.sg_flags &= ~ECHO;
-        stty(0, &tattr);
-      #else
-        #ifdef NeXT
-          ioctl(STDIN_FILENO, TIOCGETP, &tattr);
-          //tattr.sg_flags |= RAW;
+      /* Save the terminal attributes so we can restore them later. */
+      {
+        #if defined( atarist ) || defined( NeXT )
+          struct sgttyb tattr;
+          #ifdef atarist
+            gtty(0, &fe_saved_attributes);
+          #else
+            ioctl(STDIN_FILENO, TIOCGETP, &fe_saved_attributes);
+          #endif
+        #else
+          struct termios tattr;
+          tcgetattr (STDIN_FILENO, &fe_saved_attributes);
+        #endif
+        #ifdef HAVE_ATEXIT
+          atexit(fe_reset_fe);
+        #else
+          on_exit(fe_reset_fe,NULL);
+        #endif
+
+      /* Set the funny terminal modes. */
+        #ifdef atarist
+          gtty(0, &tattr);
+          tattr.sg_flags |= RAW;
           tattr.sg_flags |= CBREAK;
           tattr.sg_flags &= ~ECHO;
-          ioctl(STDIN_FILENO, TIOCSETP, &tattr);
-          ioctl(STDOUT_FILENO, TIOCGETP, &tattr);
-          tattr.sg_flags |= CRMOD;
-          ioctl(STDOUT_FILENO, TIOCSETP, &tattr);
+          stty(0, &tattr);
         #else
-          tcgetattr (STDIN_FILENO, &tattr);
-          tattr.c_lflag &= ~(ICANON|ECHO); /* Clear ICANON and ECHO. */
-          tattr.c_cc[VMIN] = 1;
-          tattr.c_cc[VTIME] = 0;
-          tcsetattr (STDIN_FILENO, TCSAFLUSH, &tattr);
+          #ifdef NeXT
+            ioctl(STDIN_FILENO, TIOCGETP, &tattr);
+            //tattr.sg_flags |= RAW;
+            tattr.sg_flags |= CBREAK;
+            tattr.sg_flags &= ~ECHO;
+            ioctl(STDIN_FILENO, TIOCSETP, &tattr);
+            ioctl(STDOUT_FILENO, TIOCGETP, &tattr);
+            tattr.sg_flags |= CRMOD;
+            ioctl(STDOUT_FILENO, TIOCSETP, &tattr);
+          #else
+            tcgetattr (STDIN_FILENO, &tattr);
+            tattr.c_lflag &= ~(ICANON|ECHO); /* Clear ICANON and ECHO. */
+            tattr.c_cc[VMIN] = 1;
+            tattr.c_cc[VTIME] = 0;
+            tcsetattr (STDIN_FILENO, TCSAFLUSH, &tattr);
+          #endif
+          ospeed=cfgetospeed(&tattr);
         #endif
-        ospeed=cfgetospeed(&tattr);
-      #endif
+      }
     #endif
     if(term==NULL)
     {
@@ -241,7 +263,7 @@ void fe_init (void)
 
       /* Extract information that termcap functions use.  */
       temp = tgetstr ("pc", &t_buf);
-      PC = (temp!=NULL) ? *temp : NULL;
+      PC = (temp!=NULL) ? *temp : '\0';
       BC=tgetstr("le",&t_buf);
       UP=tgetstr("up",&t_buf);
 
@@ -254,27 +276,11 @@ void fe_init (void)
       temp = tgetstr ("ti", &t_buf);
       if (temp!=NULL) tputs(temp,1,fe_out_char);
 
-      printf("TERM=%s, co=%d, li=%d\n",term,colmax,pagelength);
+      /* printf("TERM=%s, co=%d, li=%d\n",term,colmax,pagelength);*/
     }
 
     fe_stdin_is_tty=1;
     fe_is_raw_tty=1;
-
-    /*setup echo*/
-    if(isatty(STDOUT_FILENO))
-    {
-      fe_stdout_is_tty=1;
-      fe_echo=stdout;
-    }
-    else
-    {
-      fe_stdout_is_tty=0;
-      #ifdef atarist
-        fe_echo = fopen( "/dev/tty", "w" );
-      #else
-        fe_echo = fopen( ttyname(fileno(stdin)), "w" );
-      #endif
-    }
 
     /* setup history */
     fe_hist=(char **)Alloc0(fe_hist_max*sizeof(char *));
@@ -371,23 +377,22 @@ static void fe_get_hist(char *s, int size, int *pos,int change, int incr)
 
 static int fe_getchar()
 {
-  int c;
   #ifndef MSDOS
-  c=0;
+  char c='\0';
   while (1!=read (STDIN_FILENO, &c, 1));
   #else
-  c=getkey();
+  int c=getkey();
   #endif
   #ifndef MSDOS
   if (c == 033)
   {
     /* check for CSI */
-    c=0;
+    c='\0';
     read (STDIN_FILENO, &c, 1);
     if (c == '[')
     {
       /* get command character */
-      c=0;
+      c='\0';
       read (STDIN_FILENO, &c, 1);
       switch (c)
       {
@@ -628,7 +633,8 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
         case feCTRL('K'): /* delete up to the end of the line */
         {
           fe_ctrl_k(s,i);
-          s[i]='\0';
+	  memset(&(s[i]),'\0',size-i);
+          /* s[i]='\0';*/
           change=1;
           break;
         }

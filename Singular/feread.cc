@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.24 1999-09-22 10:19:04 Singular Exp $ */
+/* $Id: feread.cc,v 1.25 1999-09-22 14:11:24 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -11,6 +11,7 @@
 #include "tok.h"
 #include "febase.h"
 #include "mmemory.h"
+
 #ifdef HAVE_TCL
 #include "ipid.h"
 #endif
@@ -184,13 +185,14 @@ char * fe_fgets_stdin_emu(char *pr,char *s, int size)
 
 #if defined(HAVE_DYN_RL)
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/file.h>
-#include <sys/stat.h>
-#include <sys/errno.h>
-#include <dlfcn.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <sys/types.h>
+//#include <sys/file.h>
+//#include <sys/stat.h>
+//#include <sys/errno.h>
+//#include <dlfcn.h>
+#include "mod_raw.h"
 
 extern "C" {
   char *(*fe_filename_completion_function)(); /* 3 */
@@ -216,37 +218,37 @@ static int fe_init_dyn_rl()
   int res=0;
   loop
   {
-    fe_rl_hdl=dlopen("libreadline.so",RTLD_LAZY|RTLD_GLOBAL);
+    fe_rl_hdl=dynl_open("libreadline.so");
     if (fe_rl_hdl==NULL) { res=1; break;}
 
-    fe_readline=dlsym(fe_rl_hdl,"readline");
+    fe_readline=dynl_sym(fe_rl_hdl,"readline");
     if (fe_readline==NULL) { res=4; break; }
-    fe_add_history=dlsym(fe_rl_hdl,"add_history");
+    fe_add_history=dynl_sym(fe_rl_hdl,"add_history");
     if (fe_add_history==NULL) { res=5; break; }
-    fe_rl_readline_name=dlsym(fe_rl_hdl,"rl_readline_name");
+    fe_rl_readline_name=dynl_sym(fe_rl_hdl,"rl_readline_name");
     if (fe_rl_readline_name==NULL) { res=6; break; }
-    fe_rl_line_buffer=dlsym(fe_rl_hdl,"rl_line_buffer");
+    fe_rl_line_buffer=dynl_sym(fe_rl_hdl,"rl_line_buffer");
     if (fe_rl_line_buffer==NULL) { res=7; break; }
-    fe_rl_line_buffer=dlsym(fe_rl_hdl,"rl_line_buffer");
+    fe_rl_line_buffer=dynl_sym(fe_rl_hdl,"rl_line_buffer");
     if (fe_rl_line_buffer==NULL) { res=7; break; }
-    fe_completion_matches=dlsym(fe_rl_hdl,"completion_matches");
+    fe_completion_matches=dynl_sym(fe_rl_hdl,"completion_matches");
     if (fe_completion_matches==NULL) { res=8; break; }
     fe_rl_attempted_completion_function=
-      dlsym(fe_rl_hdl,"rl_attempted_completion_function");
+      dynl_sym(fe_rl_hdl,"rl_attempted_completion_function");
     if (fe_rl_attempted_completion_function==NULL) { res=9; break; }
-    fe_rl_outstream=dlsym(fe_rl_hdl,"rl_outstream");
+    fe_rl_outstream=dynl_sym(fe_rl_hdl,"rl_outstream");
     if (fe_rl_outstream==NULL) { res=10; break; }
-    fe_write_history=dlsym(fe_rl_hdl,"write_history");
+    fe_write_history=dynl_sym(fe_rl_hdl,"write_history");
     if (fe_write_history==NULL) { res=11; break; }
-    fe_history_total_bytes=dlsym(fe_rl_hdl,"history_total_bytes");
+    fe_history_total_bytes=dynl_sym(fe_rl_hdl,"history_total_bytes");
     if (fe_history_total_bytes==NULL) { res=12; break; }
-    fe_using_history=dlsym(fe_rl_hdl,"using_history");
+    fe_using_history=dynl_sym(fe_rl_hdl,"using_history");
     if (fe_using_history==NULL) { res=13; break; }
-    fe_read_history=dlsym(fe_rl_hdl,"read_history");
+    fe_read_history=dynl_sym(fe_rl_hdl,"read_history");
     if (fe_read_history==NULL) { res=14; break; }
     return 0;
   }
-  dlclose(fe_rl_hdl);
+  dynl_close(fe_rl_hdl);
   return res;
 }
 
@@ -424,7 +426,7 @@ void fe_reset_input_mode ()
 {
 #if defined(HAVE_DYN_RL)
   char *p = getenv("SINGULARHIST");
-  if (p != NULL)
+  if ((p != NULL) && (fe_history_total_bytes != NULL))
   {
     if((*fe_history_total_bytes)()!=0)
       (*fe_write_history) (p);
@@ -438,5 +440,11 @@ void fe_reset_input_mode ()
       write_history (p);
   }
 #endif
+#if !defined(MSDOS) && (defined(HAVE_FEREAD) || defined(HAVE_DYN_RL))
+  #ifndef HAVE_ATEXIT
+  fe_reset_fe(NULL,NULL);
+  #else
+  fe_reset_fe();
+  #endif
+#endif
 }
-
