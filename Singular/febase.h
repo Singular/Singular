@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.29 1999-07-06 15:32:44 Singular Exp $ */
+/* $Id: febase.h,v 1.30 1999-07-20 12:29:48 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -11,6 +11,31 @@
 #include <string.h>
 #include "structs.h"
 
+#ifdef macintosh
+#  define  DIR_SEP ':'
+#  define  DIR_SEPP ":"
+#else
+#ifdef MSDOS
+#  define  DIR_SEP '\\'
+#  define  DIR_SEPP "\\"
+#else
+#ifdef atarist
+#  define  DIR_SEP '\\'
+#  define  DIR_SEPP "\\"
+#else  /* unix */
+#  define  DIR_SEP '/'
+#  define  DIR_SEPP "/"
+#endif  /* atarist */
+#endif  /* MSDOS */
+#endif  /* macintosh */
+
+#if defined(WINNT)
+#  define  FS_SEP ';'
+#elif defined(macintosh)
+#define FS_SEP ','
+#else
+#define FS_SEP ':'
+#endif
 
 /*
 // These are our versions of fopen and fread They are very similar to

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.64 1999-07-16 16:07:19 Singular Exp $ */
+/* $Id: grammar.y,v 1.65 1999-07-20 12:29:49 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -437,7 +437,7 @@ elemexpr:
         RINGVAR
           {
             if (currRing==NULL) MYYERROR("no ring active");
-            syMake(&$$,$1);
+            syMake(&$$,mstrdup($1));
           }
         | extendedid
           {
