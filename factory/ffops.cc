@@ -1,8 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ffops.cc,v 1.1 1996-06-18 06:57:00 stobbe Exp $
+// $Id: ffops.cc,v 1.2 1996-06-18 12:05:42 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/06/18 06:57:00  stobbe
+"Now the functionality to handle prime numbers that are bigger than 2^15.
+This results in various changes and some new functions.
+"
+
 Revision 1.0  1996/05/17 10:59:46  stobbe
 Initial revision
 
@@ -15,7 +20,7 @@ Initial revision
 int ff_prime = 31991;
 int ff_halfprime = 31991 / 2;
 bool ff_big = false;
-short * ff_invtab = new short [31991];
+short * ff_invtab = new short [32767];
 
 void ff_setprime ( const int p )
 {
@@ -46,7 +51,7 @@ int ff_newinv ( const int a )
 
 int ff_biginv ( const int a )
 {
-    int u, r0 = a, r1 = ff_prime, q0 = 1, q1 = 0;
+    long long int u, r0 = a, r1 = ff_prime, q0 = 1, q1 = 0;
     while ( ( r0 > 0 ) && ( r1 > 0 ) ) {
 	u = r0 / r1;
 	r0 = r0 % r1;
@@ -58,7 +63,7 @@ int ff_biginv ( const int a )
 	}
     }
     if ( r0 == 0 )
-	return -q1;
+	return -(int)q1;
     else
-	return q0;
+	return (int)q0;
 }
