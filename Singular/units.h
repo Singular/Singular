@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: units.h,v 1.4 2001-02-08 13:13:05 Singular Exp $ */
+/* $Id: units.h,v 1.5 2001-02-27 18:05:16 mschulze Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
@@ -9,10 +9,7 @@
 #ifndef UNITS_H
 #define UNITS_H
 
-BOOLEAN invunit(leftv res,leftv h);
-poly invunit(int n,poly u);
-matrix invunit(int n,matrix U);
-ideal rednf(ideal N,ideal M,matrix U=NULL);
-poly rednf(ideal N,poly p,poly u=NULL);
+ideal redNF(ideal N,ideal M,matrix U=NULL,int d=-1,intvec *w=NULL);
+poly redNF(ideal N,poly p,poly u=NULL,int d=-1,intvec *w=NULL);
 
 #endif

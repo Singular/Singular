@@ -1,31 +1,24 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.7 2001-02-23 18:30:59 levandov Exp $ */
+/* $Id: units.cc,v 1.8 2001-02-27 18:05:16 mschulze Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
 
 #include "mod2.h"
 #include "tok.h"
-#include "ipid.h"
 #include "febase.h"
+#include "ipid.h"
 #include "numbers.h"
 #include "polys.h"
 #include "ideals.h"
+#include "intvec.h"
 #include "matpol.h"
 #include "kstd1.h"
 #include "units.h"
 
-matrix invunit(int n,matrix U)
-{
-  assume(MATCOLS(U)==MATROWS(U));
-  for(int i=MATCOLS(U);i>=1;i--)
-    MATELEM(U,i,i)=pInvers(n,MATELEM(U,i,i));
-  return U;
-}
-
-ideal rednf(ideal N,ideal M,matrix U=NULL)
+ideal redNF(ideal N,ideal M,matrix U=NULL,int d=-1,intvec *w=NULL)
 {
   matrix U0=NULL;
   if(U!=NULL)
@@ -40,8 +33,8 @@ ideal rednf(ideal N,ideal M,matrix U=NULL)
     }
   }
   ideal M0=idInit(IDELEMS(M),M->rank);
-  ideal M1=kNF(N,currQuotient,M);
-  while(idElem(M1)>0)
+  ideal M1=kNF(N,currQuotient,M,0,2);
+  while(idElem(M1)>0&&(d==-1||idMinDegW(M1,w)<=d))
   {
     for(int i=IDELEMS(M)-1;i>=0;i--)
     {
@@ -53,7 +46,7 @@ ideal rednf(ideal N,ideal M,matrix U=NULL)
         M->m[i]=pSub(M->m[i],pHead(pCopy(M1->m[i])));
     }
     idDelete(&M1);
-    M1=kNF(N,currQuotient,M);
+    M1=kNF(N,currQuotient,M,0,2);
   }
   idDelete(&M1);
   idDelete(&N);
@@ -63,18 +56,18 @@ ideal rednf(ideal N,ideal M,matrix U=NULL)
   return M0;
 }
 
-poly rednf(ideal N,poly p,poly u=NULL)
+poly redNF(ideal N,poly p,poly u=NULL,int d=-1,intvec *w=NULL)
 {
   ideal M=idInit(1,pGetComp(p));
   M->m[0]=p;
   ideal M0;
   if(u==NULL)
-    M0=rednf(N,M);
+    M0=redNF(N,M,NULL,d,w);
   else
   {
     matrix U=mpNew(1,1);
     MATELEM(U,1,1)=u;
-    M0=rednf(N,M,U);
+    M0=redNF(N,M,U,d,w);
     idDelete((ideal*)&U);
   }
   poly p0=M0->m[0];
@@ -82,3 +75,4 @@ poly rednf(ideal N,poly p,poly u=NULL)
   idDelete(&M0);
   return p0;
 }
+
