@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: gms.cc,v 1.6 2002-02-20 15:50:34 mschulze Exp $ */
+/* $Id: gms.cc,v 1.7 2002-02-20 17:32:12 mschulze Exp $ */
 /*
 * ABSTRACT: Gauss-Manin system normal form
 */

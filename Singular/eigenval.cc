@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval.cc,v 1.10 2002-02-20 15:50:34 mschulze Exp $ */
+/* $Id: eigenval.cc,v 1.11 2002-02-20 17:32:12 mschulze Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -81,12 +81,18 @@ matrix evRowElim(matrix M,int i,int j,int k)
     return(M);
 
   poly p=pNSet(nDiv(pGetCoeff(MATELEM(M,i,k)),pGetCoeff(MATELEM(M,j,k))));
+  pNormalize(p);
 
   for(int l=1;l<=MATCOLS(M);l++)
+  {
     MATELEM(M,i,l)=pSub(MATELEM(M,i,l),ppMult_qq(p,MATELEM(M,j,l)));
-
+    pNormalize(MATELEM(M,i,l));
+  }
   for(int l=1;l<=MATROWS(M);l++)
+  {
     MATELEM(M,l,j)=pAdd(MATELEM(M,l,j),ppMult_qq(p,MATELEM(M,l,i)));
+    pNormalize(MATELEM(M,l,j));
+  }
 
   pDelete(&p);
 
@@ -134,12 +140,18 @@ matrix evColElim(matrix M,int i,int j,int k)
     return(M);
 
   poly p=pNSet(nDiv(pGetCoeff(MATELEM(M,k,i)),pGetCoeff(MATELEM(M,k,j))));
+  pNormalize(p);
 
   for(int l=1;l<=MATROWS(M);l++)
+  {
     MATELEM(M,l,i)=pSub(MATELEM(M,l,i),ppMult_qq(p,MATELEM(M,l,j)));
-
+    pNormalize(MATELEM(M,l,i));
+  }
   for(int l=1;l<=MATCOLS(M);l++)
+  {
     MATELEM(M,j,l)=pAdd(MATELEM(M,j,l),ppMult_qq(p,MATELEM(M,i,l)));
+    pNormalize(MATELEM(M,j,l));
+  }
 
   pDelete(&p);
 
@@ -283,12 +295,14 @@ lists evEigenvals(matrix M)
           else
 	    e->m[k]=pNSet(nDiv(e1,pGetCoeff(pNext(e0->m[i]))));
           nDelete(&e1);
+          pNormalize(e->m[k]);
           (*m)[k]=(*m0)[i];
           k++;
         }
         else
 	{
           e->m[k]=e0->m[i];
+          pNormalize(e->m[k]);
           e0->m[i]=NULL;
           (*m)[k]=(*m0)[i];
           k++;
