@@ -1,0 +1,51 @@
+29.11.02
+        ref for ncstruct introduced,
+	used in extra.cc ("PLURAL"), rCopy0, rKill
+	new routine ncKill
+
+29.11.02
+	qring q=system("twostd",i); is introduced and tested
+	file: exterior1.tst
+	todo: forbid the use of non-twosided ideals
+
+6.12.02
+	DONE: option(redTail) is implemented and tested
+	file: exterior2.tst
+	DONE(11.12.02) todo: in twostd, running from qring should be
+	done another std() in order to get reduced result
+	
+	DONE: buckets in multiplication (p_Mult_mm, mm_Mult_p)
+	version 1.17 - add cvs -m "buckets added", not
+	just nCopy
+	todo: syz(i) with the canonical method, think about
+	Schreyer and LaScala (double homogenization)
+	Print(p) at gr_kstd2.cc:877 is commented out
+	
+23.01.03-
+31.01.03
+	Updated multiplication: 
+	now we search for the shortest path with nc_uu_Mult_ww_horvert
+	An old code is called nc_uu_Mult_ww_vert, is used by default.
+	
+	Further on, we should compute metrics.
+
+	A function added:
+	matrix ncMatPrint(int a, int b, ring r, int metric)
+  	/* returns matrix with the info on noncomm multiplication */
+Before these changes, we copied the exec to Singular.Jan.
+
+31.01.03
+	DONE syz, nres, mres;
+	small problems with minres.
+
+until
+17.03.03
+	fixed: minres, ideal multiplication, maps, syz
+	balanced the use of buckets in mult and bracket
+	added quasicommutative stuff in multiplication
+	gained about 30% speedup
+
+18.03.03
+	fixed: extra "type print" in ring.cc
+        new strategy of bucket used in bracket 
+

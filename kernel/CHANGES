@@ -1,0 +1,8 @@
+CHANGES FROM VERSION 1.0
+========================
+  * smallgmp lib added, gmp lib removed from source distribution
+ 
+  * configure option --without-info added
+
+  * MPtcp:fork mode added, default MPtcp mode is now fork, instead of
+    launch

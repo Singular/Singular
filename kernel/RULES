@@ -1,0 +1,6 @@
+* never use fopen, but myfopen, in order to open text files
+
+* call rComplete after constructing a ring
+
+* never allocate memory with 0 as size request
+

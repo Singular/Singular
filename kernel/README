@@ -1,0 +1,136 @@
+			 Singular version 1.0
+		     University of Kaiserslautern
+     Department of Mathematics        Centre for Computer Algebra
+	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
+		  (C) 1986-1997 All Rights Reserved
+
+		   README FILE FOR SINGULAR KERNEL
+		   ===============================
+
+This directory contains the source files for the Singular kernel and
+the following subdirectories:
+ 
+  'doc'	  -- contains sources for Singular documentation files 
+  'check' -- contains a small Singular self-test
+  'LIB'   -- contains Singular libraries written in Singular's
+             programming language
+
+See the following files in this directory
+  'INSTALL' -- for information on how to install Singular
+  'COPYING' -- for copying and license information
+
+See below for an overview of Singular, and for distribution and
+support information.
+
+If you receive this file as part of a complete Singular distribution,
+see also the README.src, COPYING.src, and INSTALL files contained in the top
+directory of the full Singular distribution.
+
+
+Overview of Singular
+====================
+Singular is a special-purpose computer algebra system for commutative
+algebra and algebraic geometry. The main features of Singular are:
+
+ * Computations in very general rings (polynomial rings, localizations
+   of rings at a prime ideal, tensor products of rings) over many
+   ground fields (rational numbers, mod p numbers, Galois fields,
+   transcendental/algebraic extensions) and monomial orderings (all
+   standard monomial orderings, including matrix orderings)
+
+ * Very fast standard (resp. Groebner) bases computations
+
+ * Polynomial factorization, resultant, and gcd computations
+
+ * Large variety of implemented related algorithm: FGLM,
+   Hilbert-driven, Factorizing Buchberger; Minimal resolutions,
+   Primary decomposition; Usual ideal theoretic operations; standard
+   combinatorial algorithms.
+
+ * Efficient and flexible communication links based on the MP
+   protocol and library
+
+ * Easy-to-use, command-driven user-interface
+
+ * Intuitive, C-like programming language
+
+ * Extensive libraries of procedures, written in Singular's
+   programming language
+
+ * Written in C/C++. Available as source and binary for some hard- and
+   software platforms (including most Un*x variants, MS-DOG, MacOS)
+
+
+Distribution of Singular
+========================
+The newest version of Singular is always available by anonymous ftp
+from 
+	     www.mathematik.uni-kl.de:/pub/Math/Singular
+
+Binary versions of Singular for common hard- and software
+platforms are contained in the files Singular-1.0.<platform>.gz where
+<platform> is, for example, 'linux', 'SunOS', etc.  See the file
+README.bin for more information about the distribution of Singular
+binaries.
+
+Architecture - independent files (such as libraries written in the
+Singular programming language, and the Singular documentation) are
+distributed as Singular-1.0-share.tar.gz. See the file README.share
+for more information. 
+
+In general, Singular is only available as binary program. For
+exceptions, you may contact us at
+        singular@mathematik.uni-kl.de
+
+The source is distributed in two versions:
+  1. A full source distribution of Singular is contained in
+     Singular-full-1.0.tar.gz.  This (gzip'ed and tar'ed) file
+     contains the source code, documentation, and supporting data
+     files for the Singular kernel, and for all add-on packages,
+     i.e. for the GMP, MP, Factory, and Libfac libraries.
+
+  2. A kernel source distribution of Singular can be found in
+     Singular-1.0.tar.gz This (gzip'ed and tar'ed) contains the
+     sources, documentation and supporting data files for Singular,
+     only, i.e., it comes WITHOUT the sources for any of the add-on
+     packages.
+
+Singular's performance is best, if it is linked with the GNU Multiple
+precision library (GMP), instead of the smallgmp library which is
+contained in the full source distribution. Furhtermore, Singular's
+terminal i/o is most convenient if it is linked with the GNU readline
+library.  The GMP library and the readline library is available at
+ftp.gnu.ai.mit.edu or its mirrors. You have to have these library
+already installed, before Singular can be linked with them. For more
+information, see the file README.src contained in this directory.
+
+The MP library library is avialbale from mcs.kent.edu:/pub/MP/
+For further information on MP, see also
+http://symbolicnet.mcs.kent.edu/areas/protocols/mp.html
+
+The factory and libfac library are available from
+www.mathematik.uni-kl.de:/pub/Math/
+
+Documentation to Singular is distributed as:
+Singular-1.0.dvi.gz	 - Reference manual in dvi format
+Tutorial.dvi.gz		 - Singular tutorial in dvi format
+Singular-1.0.ps.gz	 - Reference manual in postscript format
+Tutorial.dvi.gz		 - Singular tutorial in postscript format
+singular.hlp.gz		 - Reference manual in Info format
+Singular-1.0.html.tar.gz - Reference manual in html format
+
+
+More information about Singular: Comments, Questions, Bug Reports
+=================================================================
+
+More and up-to-date information about Singular is always available
+from 
+	   http://www.mathematik.uni-kl.de/~wwwzca/Singular
+We very much welcome any comments, questions, and bug reports. Please
+contact us at  
+		    singular@mathematik.uni-kl.de
+
+
+GOOD LUCK and ENJOY!                         Your Singular team.
+
+

@@ -1,0 +1,18 @@
+Here is a first short HowTo on how to locate memory holes in Singular:
+1.) Make sure you build with -DOM_TRACK=5 (e.g. use Singulart, Singularg).
+2.) Use system("mtrack", [<level>, [<filename>]]) to get a report about
+    unused memory, where
+ * 0 <= level <= 5 determines how many stackframes per not freed
+   address are printed (default is 5 -- 0 only prints a summary)
+ * <filename> is name of file where report should be output to
+   (defaults to stdout).
+3.) Running 'regress.cmd -tt <level> file.tst' creates the file
+    'file.mtrack.unused' with report of not freed addresses (<level> has 
+    same meaning as above).
+4.) Within the C/C++ sources, Use 'omMarkAsStatic(addr)' to mark an
+    address as static, i.e. as an address which is ok if it is not
+    freed. Addresses marked this way are not reported by
+    system("mtrack",...) (resp. regress.cmd -tt).
+5.) For some more details, see also extra.cc: system("mtrack", ...)
+
+

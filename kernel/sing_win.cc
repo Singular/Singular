@@ -1,0 +1,77 @@
+#include "mod2.h"
+#ifdef ix86_Win
+#include <windows.h>
+#include <winuser.h>
+#include <sys/cygwin.h>
+#include <stdio.h>
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
+
+void heOpenWinntHlp(const char* keyw, char* helppath )
+{
+  char path[MAXPATHLEN];
+#ifdef TEST
+  printf("keyw:%s\n", keyw);
+#endif
+  cygwin_conv_to_full_win32_path(helppath, path);
+#ifdef TEST
+  printf("path:%s\n", path);
+#endif
+      WinHelp(NULL, path, HELP_PARTIALKEY,(DWORD)keyw);
+}
+
+void heOpenWinntUrl(const char* url, int local)
+{
+#ifdef TEST
+  printf("url:%s:local:%d\n", url, local);
+#endif
+  if (local)
+  {
+    char path[MAXPATHLEN];
+    char *p;
+    cygwin_conv_to_full_win32_path(url, path);
+    /* seems like I can not open url's wit # at the end */
+    if ((p=strchr(path, '#')) != NULL) *p = '\0';
+#ifdef TEST
+    printf("path:%s:local:%d\n", path, local);
+#endif
+    ShellExecute(NULL, "open", path, 0, 0, SW_SHOWNORMAL);
+  }
+  else
+  {
+    // need to check whether this works
+    ShellExecute(NULL, "open", url, 0, 0, SW_SHOWNORMAL);
+  }
+}
+
+void *dynl_open(char *filename)
+{
+  char path[MAXPATHLEN];
+  cygwin_conv_to_full_win32_path(filename, path);
+  HINSTANCE hLibrary = LoadLibrary( TEXT(path));
+
+  return(hLibrary);
+}
+
+void *dynl_sym(void *handle, char *symbol)
+{
+  FARPROC f;
+  f = GetProcAddress((HINSTANCE)handle, TEXT (symbol));
+  return(f);
+}
+
+int dynl_close (void *handle)
+{
+  FreeLibrary((HINSTANCE)handle);
+  return(0);
+}
+
+const char *dynl_error()
+{
+  static char errmsg[] = "support for dynamic loading not implemented";
+
+  return errmsg;
+}
+
+#endif /*ix86_Win */
