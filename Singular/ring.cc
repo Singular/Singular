@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.96 2000-01-26 18:10:53 Singular Exp $ */
+/* $Id: ring.cc,v 1.97 2000-02-07 17:22:07 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2038,10 +2038,16 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
             Warn("ordrec %d conflicts with var %d\n",j,i);
         }
         else
-        if ((r->typ[j].ord_typ!=ro_syzcomp)
-         && (r->VarOffset[i]/(sizeof(long)/sizeof(Exponent_t)))
-           == (size_t)r->typ[j].data.dp.place)
-          Warn("ordrec %d conflicts with var %d\n",j,i);
+        #ifdef HAVE_SHIFTED_EXPONENTS
+          if ((r->typ[j].ord_typ!=ro_syzcomp)
+          && (r->VarOffset[i] == r->typ[j].data.dp.place))
+            Warn("ordrec %d conflicts with var %d\n",j,i);
+        #else
+          if ((r->typ[j].ord_typ!=ro_syzcomp)
+           && (r->VarOffset[i]/(sizeof(long)/sizeof(Exponent_t)))
+             == (size_t)r->typ[j].data.dp.place)
+            Warn("ordrec %d conflicts with var %d\n",j,i);
+        #endif
       }
     }
     int tmp;

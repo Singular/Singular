@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.34 1999-11-24 14:07:23 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.35 2000-02-07 17:21:48 Singular Exp $ */
 
 /***************************************************************
  *
@@ -816,6 +816,8 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
       return FALSE;
     }
     int i=pVariables;
+#ifndef HAVE_SHIFTED_EXPONENTS
+    // can not hapen for SHIFTED_EXPONENTS
     for(;i;i--)
     {
       if (pGetExp(p,i)<0)
@@ -824,6 +826,7 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
         return FALSE;
       }
     }
+#endif
     if (pGetComp(p)<0)
     {
       Warn("neg Component in %s:%d\n",f,l);
