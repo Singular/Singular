@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_util.cc,v 1.3 1997-08-29 07:26:46 schmidt Exp $ */
+/* $Id: sm_util.cc,v 1.4 1998-01-27 11:06:41 pohl Exp $ */
 
 //{{{ docu
 //
@@ -23,7 +23,7 @@
 #include "canonicalform.h"
 #include "variable.h"
 #ifdef macintosh
-#include <::templates:ftmpl_array.h>
+#include <:templates:ftmpl_array.h>
 #else
 #include "templates/ftmpl_array.h"
 #endif

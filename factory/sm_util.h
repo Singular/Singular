@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_util.h,v 1.3 1997-07-19 08:38:03 schmidt Exp $ */
+/* $Id: sm_util.h,v 1.4 1998-01-27 11:06:40 pohl Exp $ */
 
 #ifndef INCL_SM_UTIL_H
 #define INCL_SM_UTIL_H
@@ -17,7 +17,7 @@
 #include "canonicalform.h"
 #include "cf_reval.h"
 #ifdef macintosh
-#include <::templates:ftmpl_array.h>
+#include <:templates:ftmpl_array.h>
 #else
 #include "templates/ftmpl_array.h"
 #endif

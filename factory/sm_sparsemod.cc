@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.cc,v 1.4 1997-12-08 18:24:45 schmidt Exp $ */
+/* $Id: sm_sparsemod.cc,v 1.5 1998-01-27 11:01:29 pohl Exp $ */
 
 //{{{ docu
 //
@@ -28,8 +28,8 @@
 #include "sm_util.h"
 #include "sm_sparsemod.h"
 #ifdef macintosh
-#include <::templates:ftmpl_array.h>
-#include <::templates:ftmpl_functions.h>
+#include <:templates:ftmpl_array.h>
+#include <:templates:ftmpl_functions.h>
 #else
 #include "templates/ftmpl_array.h"
 #include "templates/ftmpl_functions.h"
