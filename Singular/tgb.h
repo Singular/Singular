@@ -189,7 +189,6 @@ struct calc_dat
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
 #endif
-  poly tmp_lm;
   unsigned int reduction_steps;
   int n;
   int normal_forms;
