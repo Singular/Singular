@@ -1,0 +1,56 @@
+/* emacs edit mode for this file is -*- C -*- */
+/* $Id: config.h.in,v 1.1 1997-06-05 13:55:25 schmidt Exp $ */
+
+#ifndef INCL_CONFIG_H
+#define INCL_CONFIG_H
+
+/* {{{ docu
+ *
+ * config.h.in - used by configure to create config.h.
+ *
+/* }}} */
+
+/************** START OF CONFIGURABLE SECTION **************/
+
+/* Define to empty if the keyword does not work.  */
+#undef const
+
+/* Define as __inline if that's what the C compiler calls it.  */
+#undef inline
+
+/* factory version */
+#undef FACTORYVERSION
+
+/* where the gftables live */
+#undef GFTABLEDIR
+
+/* define if your compiler does arithmetic shift */
+#undef HAS_ARITHMETIC_SHIFT
+
+/* define to build factory without stream IO */
+#undef NOSTREAMIO
+
+/* define if linked to Singular */
+#undef SINGULAR
+
+/* define if linked with factory memory manager */
+#undef USE_MEMUTIL
+
+/* define if linked with old factory memory manager */
+#undef USE_OLD_MEMMAN
+
+/* define if linked with new factory manager, debugging version */
+#undef MDEBUG
+
+/* define if you do not want to activate assertions */
+#undef NOASSERT
+
+/* define if you want to activate the timing stuff */
+#undef TIMING
+
+/* define if you want to have debugging output */
+#undef DEBUGOUTPUT
+
+/************** END OF CONFIGURABLE SECTION **************/
+
+#endif /* ! INCL_CONFIG_H */
