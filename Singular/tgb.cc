@@ -4,6 +4,8 @@
 // #define OM_KEEP  1
 
 #include "tgb.h"
+
+
 static int posInPairs (sorted_pair_node**  p, int pn, sorted_pair_node* qe,calc_dat* c,int an=0)
 {
   if(pn==0) return 0;
@@ -41,7 +43,10 @@ sorted_pair_node**  merge(sorted_pair_node** p, int pn,sorted_pair_node **q, int
     a[i]=lastpos;
 
   }
-  p=(sorted_pair_node**) realloc(p,(pn+qn)*sizeof(sorted_pair_node*));
+  if((pn+qn)>c->max_pairs){
+    p=(sorted_pair_node**) omrealloc(p,2*(pn+qn)*sizeof(sorted_pair_node*));
+    c->max_pairs=2*(pn+qn);
+  }
   for(i=qn-1;i>=0;i--){
     size_t size;
     if(qn-1>i)
@@ -964,7 +969,12 @@ static void initial_data2(calc_dat* c, ideal I){
   c->normal_forms=0;
   c->current_degree=1;
   c->skipped_pairs=0;
+  c->max_pairs=5*I->idelems();
+
   c->pairs=NULL;
+  c->apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*c->max_pairs);
+  
+  c->pair_top=-1;
   int n=I->idelems();
   for (i=0;i<n;i++){
     wrp(I->m[i]);
@@ -1018,11 +1028,12 @@ static void initial_data2(calc_dat* c, ideal I){
   sorted_pair_node* si;
   assume(n>0);
   add_to_basis(I->m[0],-1,-1,c);
-  sorted_pair_node** set_this= & (c->pairs);
+
   assume(c->strat->sl==c->strat->Shdl->idelems()-1);
  
   for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
    {
+
 //     add_to_basis(I->m[i],-1,-1,c);
      si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
       si->i=-1;
@@ -1032,9 +1043,10 @@ static void initial_data2(calc_dat* c, ideal I){
       si->lcm_of_lm=I->m[i];
       si->next=NULL;
       PrintS("ho");
-     (*set_this)=si;
-      set_this=&(si->next);
-      
+
+
+      c->apairs[n-1-i]=si;
+      ++(c->pair_top);
 
    }
   
@@ -1188,11 +1200,12 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
 	s->j=min(i,j);
 	s->expected_length=c->lengths[i]+c->lengths[j]-2;
 	s->deg=pFDeg(short_s);
-	//poly lm=pOne();
+	poly lm=pOne();
       
-	// pLcm(c->S->m[i], c->S->m[j], lm);
-	//pSetm(lm);
-	s->lcm_of_lm=short_s;
+	pLcm(c->S->m[i], c->S->m[j], lm);
+	pSetm(lm);
+	s->lcm_of_lm=lm;
+	  pDelete(&short_s);
 	//assume(lm!=NULL);
 	nodes[spc]=s;
 	spc++;
@@ -1229,40 +1242,42 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
     cleanS(c->strat);
   }
   qsort(nodes,spc,sizeof(sorted_pair_node*),pair_better_gen);
+  c->apairs=merge(c->apairs,c->pair_top+1,nodes,spc,c);
+  c->pair_top+=spc;
   clean_top_of_pair_list(c);
-  sorted_pair_node* last=c->pairs;
+
   
-  if(spc>0){
-    if (!c->pairs) 
-    {
-      --spc;
-      c->pairs=nodes[spc];
-      c->pairs->next=NULL;
-      last=c->pairs;
-    }
-    while(spc>0){
-      --spc;
-      sorted_pair_node* h=last->next;
+//   if(spc>0){
+//     if (!c->pairs) 
+//     {
+//       --spc;
+//       c->pairs=nodes[spc];
+//       c->pairs->next=NULL;
+//       last=c->pairs;
+//     }
+//     while(spc>0){
+//       --spc;
+//       sorted_pair_node* h=last->next;
       
-      while((h!=NULL)&&(pair_better(h,nodes[spc],c)))
-      {
-	if ((h->i>=0) && (!state_is(UNCALCULATED,h->j, h->i,c))){
-	  last->next=h->next;
+//       while((h!=NULL)&&(pair_better(h,nodes[spc],c)))
+//       {
+// 	if ((h->i>=0) && (!state_is(UNCALCULATED,h->j, h->i,c))){
+// 	  last->next=h->next;
 	  
-	  free_sorted_pair_node(h,c->r);
-	  h=last->next;
-	  if(!h) break;
-	}
-	last=h;
+// 	  free_sorted_pair_node(h,c->r);
+// 	  h=last->next;
+// 	  if(!h) break;
+// 	}
+// 	last=h;
        
-	h=h->next;
-	assume((h==NULL)||(h->lcm_of_lm!=NULL));
-      }
-      last->next=nodes[spc];
-      nodes[spc]->next=h;
-      last=nodes[spc];
-    }
-  }
+// 	h=h->next;
+// 	assume((h==NULL)||(h->lcm_of_lm!=NULL));
+//       }
+//       last->next=nodes[spc];
+//       nodes[spc]->next=h;
+//       last=nodes[spc];
+//     }
+//   }
 
   omfree(nodes);
 
@@ -2257,22 +2272,25 @@ static void shorten_tails(calc_dat* c, poly monom)
 }
 static sorted_pair_node* pop_pair(calc_dat* c){
   clean_top_of_pair_list(c);
-  if(c->pairs==NULL) return NULL;
-  sorted_pair_node* h=c->pairs;
-  c->pairs=c->pairs->next;
-  return h;
-  
+//   if(c->pairs==NULL) return NULL;
+//   sorted_pair_node* h=c->pairs;
+//   c->pairs=c->pairs->next;
+//   return h;
+  if(c->pair_top<0) return NULL;
+  else return (c->apairs[c->pair_top--]);
 }
 static BOOLEAN no_pairs(calc_dat* c){
   clean_top_of_pair_list(c);
-  return (c==NULL);
+  return (c->pair_top==-1);
 }
 
 static void clean_top_of_pair_list(calc_dat* c){
-  while((c->pairs) && (c->pairs->i>=0) && (!state_is(UNCALCULATED,c->pairs->j, c->pairs->i,c))){
-    sorted_pair_node* s=c->pairs;
-    c->pairs=c->pairs->next;
-    free_sorted_pair_node(s,c->r);
+  while((c->pair_top>0) && (c->apairs[c->pair_top]->i>=0) && (!state_is(UNCALCULATED,c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c))){
+ //    sorted_pair_node* s=c->pairs;
+//     c->pairs=c->pairs->next;
+    free_sorted_pair_node(c->apairs[c->pair_top],c->r);
+    c->pair_top--;
+ 
   }
 }
 static BOOLEAN state_is(calc_state state, const int & arg_i, const  int & arg_j, calc_dat* c){

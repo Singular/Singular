@@ -77,6 +77,7 @@ struct calc_dat
   int* misses;
   int_pair_node* soon_free;
   sorted_pair_node* pairs;
+  sorted_pair_node** apairs;
   redNF_inf* work_on;
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
@@ -96,6 +97,8 @@ struct calc_dat
   int misses_series;
   int Rcounter;
   int last_index;
+  int max_pairs;
+  int pair_top;
 };
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
 static poly redNF2 (poly h,calc_dat* c , int &len);
