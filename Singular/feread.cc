@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.31 1999-12-14 17:28:15 Singular Exp $ */
+/* $Id: feread.cc,v 1.32 1999-12-14 17:58:19 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -216,7 +216,6 @@ char * fe_fgets_stdin_rl(char *pr,char *s, int size);
 static int fe_init_dyn_rl()
 {
   int res=0;
-  return 1;
   loop
   {
     fe_rl_hdl=dynl_open("libreadline.so");
