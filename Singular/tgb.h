@@ -202,4 +202,7 @@ struct find_erg{
 };
 
 reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c);
+void finalize_reduction_step(reduction_step* r){
+  delete r;
+}
 #endif

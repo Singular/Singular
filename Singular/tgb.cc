@@ -2310,43 +2310,10 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     
     int i;
     int len;
-    poly reductor;
-    if(erg.fromS){
-      reductor=strat->S[erg.reduce_by];
-      len=strat->lenS[erg.reduce_by];
-      
-    }
-    else 
-    {
-      //bucket aufloesen reduzieren, neu füllen
-      
-   
-      int bn=kBucketCanonicalize(los[erg.reduce_by].bucket);
-      reductor=los[erg.reduce_by].bucket->buckets[bn];
-      len=los[erg.reduce_by].bucket->buckets_length[bn];
-      if(c->is_char0)
-	pContent(reductor);
- 
-    }
-    for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++)
-    {
-    
-      assume((erg.fromS)||(i!=erg.reduce_by));
-      assume(reductor!=NULL);
-       number coef=kBucketPolyRed(los[i].bucket,reductor,
-                                  len,
-				  strat->kNoether);
-       nDelete(&coef);
-       los[i].p = kBucketGetLm(los[i].bucket);
-//        if(los[i].p!=NULL)
-// 	 if((i>0)&&(los[i-1].p!=NULL)&&(pLmEqual(los[i-1].p,los[i].p)))
-// 	     los[i].sev=los[i-1].sev;
-// 	 else
-// 	   los[i].sev=pGetShortExpVector(los[i].p);
-       los[i].validate();
-       //better would be first sorting before sev
-    }
- 
+
+    reduction_step *rs=create_reduction_step(erg, los, c);
+    rs->reduce(los,erg.to_reduce_l,erg.to_reduce_u);
+    finalize_reduction_step(rs);
 		 
     int deleted=multi_reduction_clear_zeroes(los, losl, erg.to_reduce_l, erg.to_reduce_u);
     curr_pos=erg.to_reduce_u;
@@ -2494,9 +2461,7 @@ simple_reducer::~simple_reducer(){
   }
     
 }
-void finalize_reduction_step(reduction_step* r){
-  delete r;
-}
+
 reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c){
   static int id=0;
   id++;
@@ -2510,10 +2475,13 @@ reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c
   }
   else
   {
+    
     kBucket_pt bucket=r[erg.reduce_by].bucket;
     kBucketClear(bucket,&pointer->p,&pointer->p_len);
 
     pointer->fill_back=bucket;
+    if(c->is_char0)
+      pContent(pointer->p);
   }
 
   pointer->reduction_id=id;
