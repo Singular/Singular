@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.2 2003-11-04 16:44:19 Singular Exp $ */
+/* $Id: gring.h,v 1.3 2003-12-16 18:30:31 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -11,9 +11,17 @@
 #ifdef HAVE_PLURAL
 #include "structs.h"
 
-void ncKill(ring r);
+/* MACROS */
 
 #define UPMATELEM(i,j,nVar) ( (nVar * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1)-(i) )
+
+/* the part, related to the interface */ 
+BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r);
+BOOLEAN nc_InitMultiplication(ring r);
+
+void ncKill(ring r);
+void ncCleanUp(ring r); /* smaller than kill */
+
 // poly functions defined in p_Procs :
 poly nc_pp_Mult_mm(poly p, poly m, const ring r, poly &last);
 poly nc_p_Mult_mm(poly p, poly m, const ring r);

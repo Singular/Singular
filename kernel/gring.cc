@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.2 2003-12-08 17:31:02 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.3 2003-12-16 18:30:31 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1588,6 +1588,13 @@ void ncKill(ring r)
   r->nc=NULL;
 }
 
+void ncCleanUp(ring r)
+{
+  /* small CleanUp of r->nc */
+  omFreeSize((ADDRESS)r->nc,sizeof(nc_struct));
+  r->nc = NULL;
+}
+
 poly nc_p_CopyGet(poly a, ring r)
 /* for use in getting the mult. martix elements*/
 {
@@ -1678,5 +1685,221 @@ int nc_CheckSubalgebra(poly PolyVar, ring r)
 //   }
 //   return(TRUE);
 // }
+
+BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r)
+  /* returns TRUE if there were errors */
+  /* analyze inputs, check them for consistency */
+  /* detect nc_type, DO NOT initialize multiplication */
+  /* check the ordering condition and evtl. NDC */
+{
+  matrix C;
+  matrix D;
+  number nN,pN,qN;
+  int tmpIsSkewConstant;
+  int i,j;
+  if (r->nc != NULL)
+  {
+    WarnS("redefining algebra structure");
+    if (r->nc->ref>1) /* in use by somebody else */
+    {
+      r->nc->ref--;
+    }
+    else  /* kill the previous nc data */
+    {
+      ncKill(r); 
+    }
+  }
+  r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
+  r->nc->ref = 1;
+  r->nc->basering = r;
+  r->nc->type = nc_undef;
+  /* initialition of the matrix C */
+  if (CN != NULL)       /* create matrix C = CN * Id */
+  {
+    nN = p_GetCoeff(CN,r);
+    if (n_IsZero(nN,r))
+    {
+      Werror("Incorrect input : zero coefficients are not allowed");
+      ncCleanUp(r);
+      return TRUE;
+    }
+    if (nIsOne(nN)) 
+    {
+      r->nc->type = nc_lie; 
+    }
+    else 
+    {
+      r->nc->type = nc_general;
+    }
+    r->nc->IsSkewConstant = 1;
+    C = mpNew(r->N,r->N);
+    for(i=1; i<r->N; i++)
+    {
+      for(j=i+1; j<=r->N; j++)
+      {
+	MATELEM(C,i,j) = nc_p_CopyPut(CN,r);
+      }
+    }
+  }
+  if (CC != NULL) /* copy matrix C */
+  {
+    assume( CN==NULL );
+    C = mpCopy(CC);
+    /* analyze C */
+    pN = p_GetCoeff(MATELEM(C,1,2),r);
+    tmpIsSkewConstant = 1;
+    for(i=1; i<r->N; i++)
+    {
+      for(j=i+1; j<=r->N; j++)
+      { 
+	qN = p_GetCoeff(MATELEM(C,i,j),r);
+	if ( qN == NULL )   /* check the consistency: Cij!=0 */
+	{
+	  Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
+	  ncCleanUp(r);
+	  return TRUE;
+	}
+	if (!nEqual(pN,qN)) tmpIsSkewConstant = 0;
+      }
+    }
+    r->nc->IsSkewConstant=tmpIsSkewConstant;
+    if ( (tmpIsSkewConstant) && (nIsOne(pN)) ) 
+    {
+      r->nc->type = nc_lie;
+    }
+    else 
+    {
+      r->nc->type = nc_general;
+    }
+  }
+
+  /* initialition of the matrix D */
+  if (DD == NULL)     /* we treat DN only (it could also be NULL) */
+  {
+    D = mpNew(r->N,r->N);
+    if (DN  == NULL)
+    {
+      if ( (currRing->nc->type == nc_lie) || (currRing->nc->type == nc_undef) )  
+      {
+	currRing->nc->type = nc_comm; /* it was nc_skew earlier */
+      }
+      else /* nc_general, nc_skew */
+      {
+	currRing->nc->type = nc_skew;
+      }
+    }
+    else /* DN  != NULL */
+    { 
+      for(i=1; i<r->N; i++)
+      {
+	for(j=i+1; j<=r->N; j++)
+	{
+	  MATELEM(D,i,j) = nc_p_CopyPut(DN,r);
+	}
+      }
+    }
+  }
+  else /* DD != NULL */
+  { 
+    assume( DN==NULL );
+    D = mpCopy(DD); 
+  }
+  /* analyze D */ 
+  /* check the ordering condition for D (both matrix and poly cases) */
+  poly p,q;
+  int report = 1;
+  for(i=1; i<r->N; i++)
+  {
+    for(j=i+1; j<=r->N; j++)
+    { 
+      p = MATELEM(D,i,j);
+      if ( p != NULL)
+      {
+	q = pOne();
+	p_SetExp(q,i,1,r);
+	p_SetExp(q,j,1,r);
+	p_Setm(q,r);
+	if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)<=lm(q)  */
+	{
+	  Print("Bad ordering at %d,%d",i,j);
+	  report = 0;
+	}
+	p_Delete(&q,r);
+	p = NULL;
+      }
+    }
+  }
+  if (!report)
+  {
+    Werror("Matrix of polynomials violates the ordering condition");
+    ncCleanUp(r);
+    return TRUE;
+  }
+  r->nc->C = C;
+  r->nc->D = D;
+  return nc_InitMultiplication(r);
+}
+
+BOOLEAN nc_InitMultiplication(ring r)
+{
+  /* returns TRUE if there were errors */
+  /* initialize the multiplication */
+  int i,j;
+  matrix COM;
+  r->nc->MT = (matrix *)omAlloc0(r->N*(r->N-1)/2*sizeof(matrix));
+  r->nc->MTsize = (int *)omAlloc0(r->N*(r->N-1)/2*sizeof(int));
+  COM = mpCopy(r->nc->C);
+  poly p;
+  short DefMTsize=7;
+  int IsNonComm=0;
+  int tmpIsSkewConstant;
+  
+  for(i=1; i<r->N; i++)
+  {
+    for(j=i+1; j<=r->N; j++)
+    {
+      if ( MATELEM(r->nc->D,i,j) == NULL ) /* quasicommutative case */
+      {
+	/* 1x1 mult.matrix */
+	r->nc->MTsize[UPMATELEM(i,j,r->N)] = 1;
+	r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(1,1);
+      }
+      else /* pure noncommutative case */
+      {
+	/* TODO check the special multiplication properties */
+	IsNonComm = 1;
+	MATELEM(COM,i,j) = NULL;
+	r->nc->MTsize[UPMATELEM(i,j,r->N)] = DefMTsize; /* default sizes */
+	r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(DefMTsize, DefMTsize);
+      }
+      /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
+      p = pOne();
+      p_SetCoeff(p,nCopy(pGetCoeff(MATELEM(r->nc->C,i,j))),r);
+      p_SetExp(p,i,1,r);
+      p_SetExp(p,j,1,r);
+      p_Setm(p,r);
+      p = p_Add_q(p, nc_p_CopyGet(MATELEM(r->nc->D,i,j),r),r);
+      MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1) = nc_p_CopyPut(p,r);
+      pDelete(&p);
+      p = NULL;
+    }
+  }
+  if (r->nc->type==nc_undef)
+  {
+    if (IsNonComm==1)
+    {
+      //      assume(pN!=NULL);
+      //      if ((tmpIsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) r->nc->type=nc_lie;
+      //      else r->nc->type=nc_general;
+    }
+    if (IsNonComm==0) 
+    {
+      r->nc->type=nc_skew; /* TODO: check whether it is commutative */
+      r->nc->IsSkewConstant=tmpIsSkewConstant;
+    }
+  }
+  r->nc->COM=COM;
+  return FALSE;
+}
 
 #endif
