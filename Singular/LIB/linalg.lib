@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.23 2002-02-16 10:58:39 mschulze Exp $";
+version="$Id: linalg.lib,v 1.24 2002-02-16 13:50:19 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1248,14 +1248,7 @@ list l;
 EXAMPLE: example eigenvals; shows examples
 "
 {
-  def R=basering;
-  ring P=0,t,dp;
-  map zero=R,0;
-  matrix M=zero(M);
-  list l=system("eigenvalues",M);
-  setring R;
-  map zero=P,0;
-  return(zero(l));
+  return(system("eigenvalues",M));
 }
 example
 { "EXAMPLE:"; echo=2;
