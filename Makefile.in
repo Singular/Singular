@@ -43,7 +43,6 @@ dist:
 	mkdir ${TEMPDIR}/${DISTNAME}
 	- cp -pR . ${TEMPDIR}/${DISTNAME}
 	cd ${TEMPDIR}/${DISTNAME}; ${MAKE} distclean; 
-	- find ${TEMPDIR}/${DISTNAME} -name CVS -exec rm -rf {} \; 
 	cd ${TEMPDIR}; tar cf ${DISTNAME}.tar ${DISTNAME} 
 	rm -rf ${TEMPDIR}/${DISTNAME}
 	- gzip -9 ${TEMPDIR}/${DISTNAME}.tar
