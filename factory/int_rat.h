@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.h,v 1.4 1997-06-19 12:22:22 schmidt Exp $ */
+/* $Id: int_rat.h,v 1.5 1998-01-22 10:54:34 schmidt Exp $ */
 
 #ifndef INCL_INT_RAT_H
 #define INCL_INT_RAT_H
@@ -14,8 +14,9 @@
 
 #include "assert.h"
 
+#include "canonicalform.h"
 #include "int_cf.h"
-
+#include "imm.h"
 
 class InternalRational : public InternalCF
 {
@@ -79,6 +80,12 @@ public:
     InternalCF* modcoeff( InternalCF*, bool );
     void divremcoeff( InternalCF*, InternalCF*&, InternalCF*&, bool );
     bool divremcoefft( InternalCF*, InternalCF*&, InternalCF*&, bool );
+
+    InternalCF * bgcdsame ( const InternalCF * const ) const;
+    InternalCF * bgcdcoeff ( const InternalCF * const );
+
+    InternalCF * bextgcdsame ( InternalCF *, CanonicalForm &, CanonicalForm & );
+    InternalCF * bextgcdcoeff ( InternalCF *, CanonicalForm &, CanonicalForm & );
 
     int intval() const;
 

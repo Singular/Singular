@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.9 1997-12-17 11:39:32 schmidt Exp $ */
+/* $Id: int_rat.cc,v 1.10 1998-01-22 10:54:28 schmidt Exp $ */
 
 #include <config.h>
 
@@ -705,6 +705,38 @@ bool InternalRational::divremcoefft( InternalCF* c, InternalCF*& quot, InternalC
     divremcoeff( c, quot, rem, invert );
     return true;
 }
+
+//{{{ InternalCF * InternalRational::bgcdsame, bgcdcoeff ( const InternalCF * const )
+// docu: see CanonicalForm::bgcd()
+InternalCF *
+InternalRational::bgcdsame ( const InternalCF * const ) const
+{
+    return int2imm( 1 );
+}
+
+InternalCF *
+InternalRational::bgcdcoeff ( const InternalCF * const )
+{
+    return int2imm( 1 );
+}
+//}}}
+
+//{{{ InternalCF * InternalRational::bextgcdsame ( InternalCF * c, CanonicalForm & a, CanonicalForm & b )
+// docu: see CanonicalForm::bextgcd()
+InternalCF *
+InternalRational::bextgcdsame ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
+{
+    a = 1/CanonicalForm( copyObject() ); b = 0;
+    return int2imm( 1 );
+}
+
+InternalCF *
+InternalRational::bextgcdcoeff ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
+{
+    a = 1/CanonicalForm( copyObject() ); b = 0;
+    return int2imm( 1 );
+}
+//}}}
 
 InternalCF * InternalRational::normalize_myself()
 {

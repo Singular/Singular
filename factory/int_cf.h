@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.h,v 1.8 1997-12-17 14:10:13 schmidt Exp $ */
+/* $Id: int_cf.h,v 1.9 1998-01-22 10:54:07 schmidt Exp $ */
 
 #ifndef INCL_INT_CF_H
 #define INCL_INT_CF_H
@@ -60,7 +60,7 @@ public:
     virtual InternalCF* den();
 
     virtual InternalCF* neg() PVIRT_INTCF("neg");
-    virtual InternalCF* invert(); // semantically const, changes refCount const
+    virtual InternalCF* invert(); // semantically const, changes refCount
     virtual int comparesame ( InternalCF * ) PVIRT_INT("comparesame");
     virtual int comparecoeff ( InternalCF * ) PVIRT_INT("comparecoeff");
 
@@ -83,6 +83,12 @@ public:
     virtual InternalCF* modcoeff( InternalCF*, bool ) PVIRT_INTCF("modcoeff");
     virtual void divremcoeff( InternalCF*, InternalCF*&, InternalCF*&, bool ) PVIRT_VOID("divremcoeff");
     virtual bool divremcoefft( InternalCF*, InternalCF*&, InternalCF*&, bool ) PVIRT_BOOL("divremcoefft");
+
+    virtual InternalCF * bgcdsame ( const InternalCF * const ) const;
+    virtual InternalCF * bgcdcoeff ( const InternalCF * const ); // semantically const, changes refcount
+
+    virtual InternalCF * bextgcdsame ( InternalCF *, CanonicalForm &, CanonicalForm & ); // semantically const, changes refcount
+    virtual InternalCF * bextgcdcoeff ( InternalCF *, CanonicalForm &, CanonicalForm & ); // semantically const, changes refcount
 
     virtual InternalCF* sqrt();
     virtual int ilog2();

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.10 1997-12-17 11:47:48 schmidt Exp $ */
+/* $Id: int_int.cc,v 1.11 1998-01-22 10:54:15 schmidt Exp $ */
 
 #include <config.h>
 
@@ -752,6 +752,151 @@ bool InternalInteger::divremcoefft( InternalCF* c, InternalCF*& quot, InternalCF
     divremcoeff( c, quot, rem, invert );
     return true;
 }
+
+//{{{ InternalCF * InternalInteger::bgcdsame, bgcdcoeff ( const InternalCF * const c )
+// docu: see CanonicalForm::bgcd()
+InternalCF *
+InternalInteger::bgcdsame ( const InternalCF * const c ) const
+{
+    ASSERT( ! ::is_imm( c ) && c->levelcoeff() == IntegerDomain, "incompatible base coefficients" );
+
+    // simply return 1 if we are calculating over the rationals
+    if ( cf_glob_switches.isOn( SW_RATIONAL ) )
+	 return int2imm( 1 );
+
+    // calculate gcd
+    MP_INT result;
+    mpz_init( &result );
+    mpz_gcd( &result, &thempi, &MPI( c ) );
+    mpz_abs( &result, &result );
+
+    // check for immediate result
+    if ( mpz_is_imm( &result ) ) {
+	InternalCF * res = int2imm( mpz_get_si( &result ) );
+	mpz_clear( &result );
+	return res;
+    }
+    else
+	return new InternalInteger( result );
+}
+
+InternalCF *
+InternalInteger::bgcdcoeff ( const InternalCF * const c )
+{
+    ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
+
+    // simply return 1 if we are calculating over the rationals
+    if ( cf_glob_switches.isOn( SW_RATIONAL ) )
+	 return int2imm( 1 );
+
+    int cInt = imm2int( c );
+
+    // trivial cases
+    if ( cInt == 1 || cInt == -1 )
+	return int2imm( 1 );
+    else if ( cInt == 0 )
+	return copyObject();
+
+    // calculate gcd.  We need a positive operand since
+    // `mpz_gcd_ui()' operates an unsigned int's only.
+    if ( cInt < 0 ) cInt = -cInt;
+    MP_INT dummy;
+    mpz_init( &dummy );
+    // we do not need dummy since we know that cInt != 0
+    cInt = mpz_gcd_ui( &dummy, &thempi, cInt );
+    mpz_clear( &dummy );
+    if ( cInt < 0 ) cInt = -cInt;
+    return int2imm( cInt );
+}
+//}}}
+
+//{{{ InternalCF * InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm & b )
+InternalCF *
+InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm & b )
+{
+    ASSERT( ! ::is_imm( c ) && c->levelcoeff() == IntegerDomain, "incompatible base coefficients" );
+
+    // simply return 1 if we are calculating over the rationals
+    if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
+	a = 1/CanonicalForm( copyObject() ); b = 0;
+	return int2imm( 1 );
+    }
+
+    // calculate extended gcd
+    MP_INT result;
+    MP_INT aMPI;
+    MP_INT bMPI;
+    mpz_init( &result );
+    mpz_init( &aMPI );
+    mpz_init( &bMPI );
+    mpz_gcdext( &result, &aMPI, &bMPI, &thempi, &MPI( c ) );
+    
+    // check and modify signs
+    if ( mpz_sgn( &result ) < 0 ) {
+	mpz_neg( &result, &result );
+	mpz_neg( &aMPI, &aMPI );
+	mpz_neg( &bMPI, &bMPI );
+    }
+
+    // postconditioning of result
+    if ( mpz_is_imm( &aMPI ) ) {
+	a = CanonicalForm( int2imm( mpz_get_si( &aMPI ) ) );
+	mpz_clear( &aMPI );
+    } else
+	a = CanonicalForm( new InternalInteger( aMPI ) );
+    if ( mpz_is_imm( &bMPI ) ) {
+	b = CanonicalForm( int2imm( mpz_get_si( &bMPI ) ) );
+	mpz_clear( &bMPI );
+    } else
+	b = CanonicalForm( new InternalInteger( bMPI ) );
+    if ( mpz_is_imm( &result ) ) {
+	InternalCF * res = int2imm( mpz_get_si( &result ) );
+	mpz_clear( &result );
+	return res;
+    }
+    else
+	return new InternalInteger( result );
+}
+
+InternalCF *
+InternalInteger::bextgcdcoeff( InternalCF * c, CanonicalForm & a, CanonicalForm & b )
+{
+    ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
+
+    // simply return 1 if we are calculating over the rationals
+    if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
+	a = 1/CanonicalForm( copyObject() ); b = 0;
+	return int2imm( 1 );
+    }
+
+    int cInt = imm2int( c );
+
+    // trivial cases
+    if ( cInt == 1 || cInt == -1 ) {
+	a = 0; b = cInt;
+	return int2imm( 1 );
+    } else if ( cInt == 0 ) {
+	a = 1; b = 0;
+	return copyObject();
+    }
+
+    // calculate q and r such that CO = q*cInt + r
+    InternalCF * q = 0, * r = 0;
+    divremcoeff( c, q, r, false );
+
+    // we do not repeat all the code to calculate the gcd of two
+    // immediates.  Note that r is an immediate since c != 0, so
+    // we do not have to destroy it.  q is destroyed by the
+    // CanonicalForm destructor, hence we do not need to worry
+    // about it, either.
+    CanonicalForm aPrime, bPrime;
+    CanonicalForm result = bextgcd( c, r, aPrime, bPrime );
+    a = bPrime;
+    b = aPrime - CanonicalForm( q ) * bPrime;
+
+    return result.getval();
+}
+//}}}
 
 int InternalInteger::intval() const
 {

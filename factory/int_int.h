@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.h,v 1.6 1997-07-16 10:34:17 schmidt Exp $ */
+/* $Id: int_int.h,v 1.7 1998-01-22 10:54:22 schmidt Exp $ */
 
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
@@ -69,6 +69,12 @@ public:
     InternalCF* modcoeff( InternalCF*, bool );
     void divremcoeff( InternalCF*, InternalCF*&, InternalCF*&, bool );
     bool divremcoefft( InternalCF*, InternalCF*&, InternalCF*&, bool );
+
+    InternalCF * bgcdsame ( const InternalCF * const ) const;
+    InternalCF * bgcdcoeff ( const InternalCF * const );
+
+    InternalCF * bextgcdsame ( InternalCF *, CanonicalForm &, CanonicalForm & );
+    InternalCF * bextgcdcoeff ( InternalCF *, CanonicalForm &, CanonicalForm & );
 
     int intval() const;
 

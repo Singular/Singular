@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.cc,v 1.9 1997-12-17 11:30:06 schmidt Exp $ */
+/* $Id: int_cf.cc,v 1.10 1998-01-22 10:54:00 schmidt Exp $ */
 
 #include <config.h>
 
@@ -105,6 +105,42 @@ InternalCF::coeff ( int i )
 	return CanonicalForm( copyObject() );
     else
 	return CanonicalForm( 0 );
+}
+//}}}
+
+//{{{ InternalCF * InternalCF::bgcdsame, bgcdcoeff ( const InternalCF * const )
+// docu: see CanonicalForm::bgcd()
+InternalCF *
+InternalCF::bgcdsame ( const InternalCF * const ) const
+{
+    ASSERT1( 0, "bgcd() not implemented for class %s", this->classname() );
+    return CFFactory::basic( 0 );
+}
+
+InternalCF *
+InternalCF::bgcdcoeff ( const InternalCF * const )
+{
+    ASSERT1( 0, "bgcd() not implemented for class %s", this->classname() );
+    return CFFactory::basic( 0 );
+}
+//}}}
+
+//{{{ InternalCF * InternalCF::bextgcdsame ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
+// docu: see CanonicalForm::bextgcd()
+InternalCF *
+InternalCF::bextgcdsame ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
+{
+    ASSERT1( 0, "bextgcd() not implemented for class %s", this->classname() );
+    a = 0; b = 0;
+    return CFFactory::basic( 0 );
+}
+
+InternalCF *
+InternalCF::bextgcdcoeff ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
+{
+    ASSERT1( 0, "bextgcd() not implemented for class %s", this->classname() );
+    a = 0; b = 0;
+    return CFFactory::basic( 0 );
 }
 //}}}
 
