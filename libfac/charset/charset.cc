@@ -1,13 +1,14 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.1.1.1 1997-05-02 17:00:44 Singular Exp $";
+static char * rcsid = "$Id: charset.cc,v 1.2 1997-06-09 15:55:53 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
 // Factor - Includes
 #include <SqrFree.h>
 #include <Factor.h>
+#include <interrupt.h>
 // Charset - Includes
 #include "csutil.h"
 
@@ -32,6 +33,7 @@ static CFList     irras(CFList & AS, int &ja, CanonicalForm & reducible);
 #endif
 #include "debug.h"
 
+// the next computes a characteristic set (a basic set in Wang's sense)
 CFList
 BasicSet( const CFList &PS )
 {
@@ -85,7 +87,8 @@ BasicSet( const CFList &PS )
 #endif
 #include "debug.h"
 
-// The modified CharSet
+// The modified CharSet (an extended characteristic set with certain factors
+// canceled; this is a characteristic set in Wang's sense)
 CFList
 MCharSetN( const CFList &PS, PremForm & Remembern ){
   CFList QS = PS, RS = PS, CS, OLDCS;
@@ -143,6 +146,7 @@ MCharSetN( const CFList &PS, PremForm & Remembern ){
   return CS;
 }
 
+// the "original" extended characteristic set
 CFList
 CharSet( const CFList &PS ){
   CFList QS = PS, RS = PS, CS;
@@ -364,6 +368,11 @@ IrrCharSeries( const CFList &PS ){
     // Hier: removecontent einfuegen!!!!
     if ( cls(cs.getFirst()) > 0 ){
       ts = irras(cs,ts2, reducible);
+
+      // INTERRUPTHANDLER
+      if ( interrupt_handle() ) return ListCFList() ;
+      // INTERRUPTHANDLER
+
       DEBOUTLN(cout, "ts is: ", ts);
       DEBOUTLN(cout, "ts2 is: ", ts2);
       // next is preliminary: should be ==0
@@ -379,6 +388,11 @@ IrrCharSeries( const CFList &PS ){
 	  DEBOUTLN(cout, "pi is: ", pi);
 	  if ( cls(cs.getFirst()) > 0 ){
 	    ts = irras(cs,ts2,reducible);
+
+	    // INTERRUPTHANDLER
+	    if ( interrupt_handle() ) return ListCFList() ;
+	    // INTERRUPTHANDLER
+
 	    DEBOUTLN(cout, "ts is: ", ts);
 	    DEBOUTLN(cout, "ts2 is: ", ts2);
 	    // next is preliminary: should be ==0
@@ -468,6 +482,11 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
     nr += 1;
     DEBOUT(cout, "irras: factoring: ", elem);
     qs = Factorize(elem);
+
+    // INTERRUPTHANDLER
+    if ( interrupt_handle() ) return CFList() ;
+    // INTERRUPTHANDLER
+
     qs.removeFirst();
     DEBOUTLN(cout, "  = ", qs);
     //    if ( num(qs.getFirst().factor() / LC(qs.getFirst().factor())) !=

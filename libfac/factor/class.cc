@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "@(#) $Id: class.cc,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $";
+// static char * rcsid = "@(#) $Id: class.cc,v 1.2 1997-06-09 15:56:05 Singular Exp $";
 ////////////////////////////////////////////////////////////
 
 // #pragma implementation
@@ -35,9 +35,7 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
 template <class T>
 void Substitution<T>::print ( ostream& s ) const
 {
-#ifndef NOSTREAMIO
 	s << "(" << factor() << ")^" << exp();
-#endif	
 }
 
 ////////////////////////////////////////////////////////////

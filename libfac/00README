@@ -1,14 +1,15 @@
-This is the file 00README.libfac for version 0.2.1 of libfac.
+This is the file 00README.libfac for version 0.2.4 of libfac.
 
 ######### What is libfac?
 libfac is an extension to factory (see the factory documentation for details
-about factory and what it does), which implements factorization of polynomials
-over finite fields and algorithms for manipulation of polynomial ideals via
-the characteristic set methods (e.g., calculating the charcteristic set and the
-irreducible characteristic series).
+about factory and what it does; look at REQUIREMENTS how to get factory), 
+which implements factorization of polynomials over finite fields and algorithms
+for manipulation of polynomial ideals via the characteristic set methods 
+(e.g., calculating the characteristic set and the irreducible characteristic 
+series).
 
-Note: libfac is just beta-code. There are bugs, I think. Please help to test
-this code! Submit a bug-report if you found a bug!
+Note: libfac is just beta-code (as long version is < 1.0.0). There are bugs, I 
+think. Please help to test this code! Submit a bug-report if you found a bug!
 
 ######### Copyright #####################
 This software is copyrighted by Michael Messollen <michael@math.uni-sb.de>.
@@ -22,17 +23,18 @@ with their source code of the respective programs.
 Anyone is allowed to distribute:
  a) this 00README alone
  b) your code/binary or whatever which uses a binary version of this library 
-    (libfac.a and/or libfac-g.a), if you state anywhere in your documentation,
-    that you use this code, who is and how to contact the author.
-    If you don't have a documentation for your code/binary or whatever, you 
-    have to distribute this 00README as well.
+    (libfac.a, libfac-g.a, and/or libsingfac.a), if you state anywhere in your 
+    documentation, that you use this code, who is and how to contact the 
+    author.  If you don't have a documentation for your code/binary or 
+    whatever, you have to distribute this 00README as well.
 
 In other words: You are not allowed to distribute the sources or part of the 
 sources, even if you have got them with a distribution, e.g. like Macaulay2 or 
 Singular! Tell those people which want sources, how to contact the author.
 
 In no event you are allowed to modify the sources (beside the Makefile's,
-configure.in, configure and install-sh).
+configure.in, configure, makedirs and install-sh). 
+
 Note that no permission is granted to extract a portion of the source code of 
 this library and incorporate it into another program.
 
@@ -41,7 +43,7 @@ authorized uses.
 
 Note: This restricted copyright will change in future to a more "free" one.
 But for now I want to keep track of the sources (this is the intention of the
-restrictions of this licence). They aren't in their final state and there will 
+restrictions of this license). They aren't in their final state and there will 
 be bugs (or even "features"). So please let *me* fix any problems.
 
 If your intended use of this library is not covered by the license above,
@@ -72,19 +74,10 @@ How to contact the author:
   MODIFICATIONS.
 
 ######### REQUIREMENTS ###################
-* You need factory to compile this code. Factory is designed and maintained 
-  (at least until 30.9.96) by 
-       Ruediger Stobbe <stobbe@mathematik.uni-kl.de> .
-  This code compiles, works and is tested with factoryversion 1.1 
-  and factoryversion 1.2beta .
-  factory is not yet available to the public. You have to contact the holder 
-  of the copyright first. To my knowledge this is (at least since 1.10.96):
-          Prof. Dr. Gert-Martin Greuel
-          FB Mathematik
-          Uni. Kaiserslautern
-          D-67618 Kaiserslautern
-          GERMANY
-          email: greuel@mathematik.uni-kl.de
+* You need the library factory, which is part of Singular, to compile this 
+  code. Get it from 
+  ftp://www.mathematik.uni-kl.de/pub/Math/Factory  or
+  http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory
   
 * gcc 2.7.2 ( earlier versions of gcc *may* work as well as any other ANSI C++
   compiler; it is reported that gcc 2.6.3 works also, but beware of gcc 2.7.0;
@@ -97,14 +90,18 @@ A) Using configure
 For the library type:
   configure [--with-debug] [--with-Singular] [--includedir=path-to-factory.h]
   make
-this will produce libfac.a or singlibfac.a (depending on --with-Singular).
+this will produce libfac.a or libsingfac.a (depending on --with-Singular).
+The only difference between libfac.a and libsingfac.a is: we don't instantiate
+any templates for libsingfac.a.
 
-B) Using Makefile.dist
+B) Using Makefile.dist (this is not recommended; maybe you have to edit a lot 
+to reflect your systems configuration.)
 copy Makefile.dist to Makefile
 Edit the factoryversion and the path to the factory library in the top Makefile
 (in this directory).
 currently: factoryversion=1.2b
-(I have tested with factoryversion 1.1 & 1.2beta; earlier versions *don't* work)
+(I have tested with factoryversion 1.1 & 1.2beta & 1.2c; earlier versions 
+*don't* work)
 
 type:
    make
@@ -157,16 +154,16 @@ to start with:
 
 
 ########### KNOWN BUGS ############################
-* The  irreducible characteristic series stuff doesn't work for some problems.
+o The  irreducible characteristic series stuff doesn't work for some problems.
   You will get a warning:
          "Factorization over algebraic function field required!"
   if this program needs factorization over an algebraic function field, which
   is not yet implemented (but I'm working on it).
   Don't trust the result you'll get in such a case!!!!!!
 
-* The performance of the irreducible characteristic series stuff heavily
+o The performance of the irreducible characteristic series stuff heavily
   depends on the ordering of the variables in some cases. No (nearly) optimal
-  ordering of the variables is choosen automatically, right now. 
+  ordering of the variables is chosen automatically, right now. 
   E.g.: if your ideal is (t^10-x, t^31-t^6-t-y, t^8-z) and you choose the
   variable ordering with t > z > y > x, the calculation of the irreducible 
   characteristic series will take hours; if you choose t as the variable with 
@@ -175,18 +172,18 @@ to start with:
   I am thinking about the problem how to choose the ordering automatically. 
 Since version 0.2 of the library:
 (There is now a function: Varlist neworder(const CFList & PolyList ),
- which returns a list of heuristically optimal reorderd variables;
+ which returns a list of heuristically optimal reordered variables;
  if you use the library for programming purpose, look at factor.h how to
  use this function in your code)
 For users of Macaulay2 and/or Singular: look at the documentation of the
 respective program, if and how this is incorporated.
 
-* Factorization is slow for large polynomials. There are mainly two reasons
+o Factorization is slow for large polynomials. There are mainly two reasons
   for this:
    a) the factorization algorithm is shipped with no "tricks" yet. (I'm working
       on that, but it heavily depends on b) )
-   b) factory has an extremly slow GCD-algorithm for the case of characteristic
-      p>0 ( people are working on it )
+   b) factory has an extremely slow GCD-algorithm for the case of 
+      characteristic  p>0 ( people are working on it )
   There will be a quite different, faster factorization algorithm in the 
   future.
 
@@ -196,24 +193,69 @@ Problems will be fixed in a later version of libfac .
 Version coding scheme: major.minor.bugfixnumber
           e.g.: 0.1 major=0 minor=1 no bugfixnumber (no bugfix incorporated)
 
-V0.1	* Initial version for alpha-testers
+V0.1	o Initial version for alpha-testers
 
-V0.2	* Added neworder(..) and reorder(..) for IrrCharSeries
-	* Added external strings (in factor/version.cc):
+V0.2	o Added neworder(..) and reorder(..) for IrrCharSeries
+	o Added external strings (in factor/version.cc):
 	    libfac_name     - the name of the game
 	    libfac_version  - the version number
 	    libfac_date     - the date libfac_version was released
 	    libfac_author   - who wants to know?
-	* added support for factorization of homogenious polynomials (in 
+	o added support for factorization of homogeneous polynomials (in 
           factor/homogfactor.cc), 
           reorganized code in factor/Factor.cc and factor/Factor.h
-	* added files factor/debug.cc, factor/debug.h, factor/timing.h; 
+	o added files factor/debug.cc, factor/debug.h, factor/timing.h; 
 	  mainly for internal use
 
-V0.2.1  * changed lc == 1 to lc == unit in choose_mainvar (factor/Factor.cc)
-        * changed cerr and cout messages for use with Singular (all .cc files)
+V0.2.1  o changed lc == 1 to lc == unit in choose_mainvar (factor/Factor.cc)
+        o changed cerr and cout messages for use with Singular (all .cc files)
           (why the hell don't they use libiostream?)
-        * added configure -- basics only; (old)Makefile changed to 
+        o added configure -- basics only; (old)Makefile changed to 
           Makefile.dist (if nothing works...) 
           Makefile produced with configure uses GNU coding standards
+	o released Apr 25 1997
+
+V0.2.2	o Added ranlib in Makefile.in after installing - Sun's seem to need it
+	o Put -I. before CPPFLAGS in Makefile.in
+	o hardcoded ./install-sh and ./mkinstalldirs in Makefile.in for 
+	  INSTALL; some machines have a broken install (e.g. HP )
+	  commented out the search for AC_PROG_INSTALL in configure.in
+	o Internal note: Singular now contains definitions from class.cc and
+	  tmpl_inst.h in claptmpl.cc
+	o released May 15 1997
+
+V0.2.3	o Added factor/interrupt.cc and interrupt.h to support interrupting
+	  calculations: We define a global variable "libfac_interruptflag"
+          in factor/version.cc which, if not zero, interrupts the ongoing
+	  calculation. Factorize() will then return an empty list (CFFList), 
+	  IrrCharSeries will return an empty list of lists (ListCFList).
+	  Modified: factor/Factor.cc and charset/charset.cc for this purpose.
+	o version for Macaulay2-Testers
+	o released May 28 1997
+
+V0.2.4	o Changed factor/SqrFree.cc (SqrFreed): Have to interchange variables 
+          if one derivative is zero but not all (e.g. no p'th power)
+	  example: (y^12+x^10)^2 mod 5
+	  Internal note: have to look at SqrFreeTest!!
+	o Changed factor/Factor.cc (Factorize): multiplied exponent of factors
+	  into Output (should be one if Sqrfree doesn't fail); this is for
+	  security only (and should be removed later..)
+	o Changed factor/helpstuff (myappend): added support for lists with
+	  multiple copies of one element (this doesn't happen for this 
+	  algorithms... but you never know)
+	o Changed factor/interrupt.{cc|h}: Removed interrupt.cc; added (inline)
+	  code to interrupt.h; factor.h will now define the external variable
+	  "libfac_interruptflag"
+	  Doesn't any longer issue any message about user-interrupt - the 
+	  CA-System, which has control, should warn user that calculation is 
+	  aborted. Removed libfac_messageflag from factor/version.cc
+	o Summary: removed: factor/interrupt.cc
+		   changed: factor/SqrFree.cc factor/Factor.cc 
+			    factor/helpstuff.cc Makefile.in configure.in 
+			    factor/interrupt.h factor.h factor/version.cc 
+	o Internal note: something changed in unvivariate factorization over
+	  extension fields from factory-1.2b to 1.2c: same polynomial now uses
+	  4 to 12 times longer to factor! Perhaps it's this new random 
+          generator?
+	o released May 30 1997
 

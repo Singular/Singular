@@ -1,4 +1,4 @@
-//static char rcsid[] = "@(#) $Id: test.cc,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $";
+//static char rcsid[] = "@(#) $Id: test.cc,v 1.2 1997-06-09 15:56:11 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // CLAP - Includes
 //       (x+y+z)*(x+y-z)*(x-y+z)*(x-y-z)*x*y;

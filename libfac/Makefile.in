@@ -1,10 +1,13 @@
-# $Id: Makefile.in,v 1.6 1997-05-21 13:05:34 obachman Exp $
+# $Id: Makefile.in,v 1.7 1997-06-09 15:55:47 Singular Exp $
 #################################################
 SHELL		= /bin/sh
-RM		= rm -f
+RM		= -rm -f
 #################################################
 TARGETNAME		= @targetname@
-LIBFACVERSION		= @libfacversion@
+LIBFACNAME		= @libfac_name@
+LIBFACVERSION		= @libfac_version@
+LIBFACDATE		= @libfac_date@
+LIBFACAUTHOR		= @libfac_author@
 LIBFACNAME		= @libfac@
 SINGLIBFACNAME		= @libsingfac@
 LIBFACNAME-G		= @libfac_g@
@@ -19,7 +22,6 @@ prefix 		= @prefix@
 exec_prefix	= @exec_prefix@
 libdir 		= @libdir@
 includedir	= @includedir@
-templatedir	= ${includedir}/templates
 
 ## 
 ## various programs
@@ -28,9 +30,9 @@ AR		= @AR@ cr
 RANLIB		= @RANLIB@
 CXX		= @CXX@
 INSTALL		= ./install-sh -c
-INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
-MKINSTALLDIRS   = ./mkinstalldirs
+INSTALL_PROGRAM = ${INSTALL}
+MKINSTALLDIRS	= ./mkinstalldirs
 
 ##
 ## compiler and linker options
@@ -40,7 +42,7 @@ CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir} @CPPFLAGS@ 
 DEFS		= @DEFS@ 
 LDFLAGS		= @LDFLAGS@
-LIBS		= @LIBS@
+LIBS		= @LIBS@ -lfac -lcf -lmem -lgmp
 
 ##
 ## src and objects
@@ -49,7 +51,7 @@ LIBS		= @LIBS@
 FACTORSRC1 =	factor/SqrFree.cc factor/Factor.cc \
 		factor/MVMultiHensel.cc factor/Truefactor.cc \
 		factor/helpstuff.cc  factor/debug.cc factor/version.cc \
-		factor/homogfactor.cc
+		factor/homogfactor.cc 
 FACTORSRC2 =	factor/tmpl_inst.cc
 FACTORSRC = 	$(FACTORSRC2) $(FACTORSRC1)
 
@@ -58,9 +60,8 @@ CHARSETSRC = 	$(CHARSETSRC1)
 
 FACTORINCL =	factor/Factor.h factor/MVMultiHensel.h factor/Truefactor.h \
 		factor/tmpl_inst.h factor/SqrFree.h factor/helpstuff.h \
-		factor/debug.h factor/timing.h factor/homogfactor.h
-FACTORTEMPL =	factor/class.h factor/class.cc factor/tmpl_inst.h
-
+		factor/debug.h factor/timing.h factor/homogfactor.h \
+                factor/interrupt.h
 CHARSETINCL =	charset/csutil.h charset/charset.h charset/reorder.h
 
 OPTFACTOROBJ1 =	OPTOBJ/SqrFree.o OPTOBJ/Factor.o OPTOBJ/MVMultiHensel.o \
@@ -83,13 +84,9 @@ DEBCHARSETOBJ =	DEBOBJ/csutil.o DEBOBJ/charset.o DEBOBJ/reorder.o
 ## Primary targets
 ##
 
-
-all: OPTOBJ ${TARGETNAME} 
-
-OPTOBJ:
-	${MKINSTALLDIRS} OPTOBJ
-
 .SUFFIXES:      .cc .h .o
+
+all: ${TARGETNAME}
 
 OPTOBJ/%.o: %.cc 
 	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
@@ -143,10 +140,9 @@ libsingfac-g.a:	$(DEBFACTOROBJ1) $(DEBCHARSETOBJ)
 install:	all
 	${MKINSTALLDIRS} ${includedir}
 	${MKINSTALLDIRS} ${libdir}
-	${MKINSTALLDIRS} ${templatedir}
 	${INSTALL_DATA} ${LIBFACINCLUDE} ${includedir}
 	${INSTALL_PROGRAM} ${TARGETNAME}.a ${libdir}
-	${RANLIB} ${libdir}/${TARGETNAME}.a
+	$(RANLIB) ${libdir}/${TARGETNAME}.a
 
 uninstall: 
 	$(RM) ${includedir}/${LIBFACINCLUDE}

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: tmpl_inst.h,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $
+// $Id: tmpl_inst.h,v 1.2 1997-06-09 15:56:14 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef TMPL_INST_H
 #define TMPL_INST_H

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: SqrFree.h,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $
+// $Id: SqrFree.h,v 1.2 1997-06-09 15:56:03 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef SQRFREE_H
 #define SQRFREE_H

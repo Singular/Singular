@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: csutil.h,v 1.1.1.1 1997-05-02 17:00:44 Singular Exp $
+// $Id: csutil.h,v 1.2 1997-06-09 15:55:55 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_CSUTIL_H

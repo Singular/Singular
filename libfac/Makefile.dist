@@ -1,4 +1,4 @@
-# $Id: Makefile.dist,v 1.1.1.1 1997-05-02 17:00:43 Singular Exp $
+# $Id: Makefile.dist,v 1.2 1997-06-09 15:55:46 Singular Exp $
 #################################################
 factoryversion = 1.2b
 factorypath = ../factory/$(factoryversion)
@@ -6,10 +6,10 @@ RM = /bin/rm -f
 MV = /bin/mv
 AR = ar cr
 RANLIB = ranlib
-LIBPREF = libfac
+LIBPREFX = libfac
 OPTMARK =
-LIBFAC = $(LIBPREF)$(OPTMARK).a
-LIBFAC-G = $(LIBPREF)-g$(OPTMARK).a 
+LIBFAC = $(LIBPREFIX)$(OPTMARK).a
+LIBFAC-G = $(LIBPREFIX)-g$(OPTMARK).a 
 SINGLIBFAC = libsingfac$(OPTMARK).a
 SINGLIBFAC-G = libsingfac-g$(OPTMARK).a  
 
@@ -52,11 +52,6 @@ DEBOBJ/%.o: factor/%.cc ; $(CXX) -c $< $(CFLAGS) $(IFLAGS) $(DEBFLAGS) -o $@
 
 OPTOBJ/%.o: factor/%.cc ; $(OPTCXX) -c $< $(CFLAGS) $(IFLAGS) $(OPTFLAGS) -o $@
 
-.c.a: 
-	$(CXX) $(CFLAGS) $(OPTFLAGS) -c $< -o $*.o
-	$(AR) $@ $*.o
-	$(RANLIB) $@
-
 
 FACTORSRC1 =	factor/SqrFree.cc factor/Factor.cc \
 		factor/MVMultiHensel.cc factor/Truefactor.cc \
@@ -94,7 +89,7 @@ DEBLIBS = -lfac-g -lcf-debug -lmem-debug -lgmp -lm
 debtest:	libfac-g DEBOBJ/test.o
 		$(LD) -o test $(LIBPATH) DEBOBJ/test.o $(DEBLIBS)
 
-opttest:	libfac OPTOBJ/test.o   
+opttest:	libfac OPTOBJ/test.o
 		$(OPTLD) -o test $(LIBPATH) OPTOBJ/test.o $(OPTLIBS)
 
 libfac.a:	$(OPTFACTOROBJ) $(CHARSETOPTOBJ)
@@ -159,10 +154,4 @@ unpack:
 DEBOBJ/tmpl_inst.o: factor/tmpl_inst.cc ; $(CXX) -c $< $(CFLAGS) $(DEBFLAGSTMPL) $(IFLAGS) -o $@
 
 OPTOBJ/tmpl_inst.o: factor/tmpl_inst.cc ; $(OPTCXX) -c $< $(CFLAGS) $(OPTFLAGSTMPL) $(IFLAGS) -o $@
-
-OPTOBJ/optdepend:
-	./bin/makedep -P OPTOBJ  $(IFLAGS) $(FACTORSRC1)  $(CHARSETSRC1) > $@
-
-DEBOBJ/debdepend:
-	./bin/makedep -P DEBOBJ $(DEFINES) $(IFLAGS) $(FACTORSRC1) $(CHARSETSRC1) > $@
 

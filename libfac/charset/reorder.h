@@ -1,7 +1,7 @@
 /** Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: reorder.h,v 1.1.1.1 1997-05-02 17:00:44 Singular Exp $
+// $Id: reorder.h,v 1.2 1997-06-09 15:55:56 Singular Exp $
 ////////////////////////////////////////////////////////////
 #ifndef INCL_REORDER_H
 #define INCL_REORDER_H

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: class.h,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $
+// $Id: class.h,v 1.2 1997-06-09 15:56:06 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef INCL_CLASS_H
 #define INCL_CLASS_H
@@ -32,13 +32,11 @@ public:
 //     Substitution<T>& operator*= ( const T & f ) { _factor *= f; _exp *= f; return *this; }
     friend int operator== ( const Substitution<T>&, const Substitution<T>& );
     void print ( ostream& ) const;
-#ifndef NOSTREAMIO    
     friend ostream& operator<< ( ostream & os, const Substitution<T> & f )
     {
 	f.print( os );
 	return os;
     }
-#endif    
 };
 
 // #ifdef IMPL_CLASS_H

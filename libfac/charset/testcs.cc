@@ -1,4 +1,4 @@
-// $Id: testcs.cc,v 1.1.1.1 1997-05-02 17:00:44 Singular Exp $
+// $Id: testcs.cc,v 1.2 1997-06-09 15:55:57 Singular Exp $
 
 #include <factory.h>
 #include "charset.h"

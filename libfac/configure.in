@@ -2,13 +2,24 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
+dnl
+dnl Initialisation
+dnl
 AC_INIT(factor.h)
 
 dnl
 dnl Set up variables for Makefile.in
 dnl
-AC_SUBST(libfacversion)
-libfacversion="0.2.2"
+dnl Change libfac variables here:
+AC_SUBST(libfac_name)
+libfac_name="\"Factorization and characteristic sets library\""
+AC_SUBST(libfac_version)
+libfac_version="0.2.4"
+AC_SUBST(libfac_date)
+libfac_date="\"May 30 1997\""
+AC_SUBST(libfac_author)
+libfac_author="\"M. Messollen\""
+
 AC_SUBST(libfac)
 libfac="libfac"
 AC_SUBST(libfac_g)
@@ -65,16 +76,12 @@ if (test "x${prefix} != xNONE && test "${prefix} != "/usr/local") || \
 fi
 LDFLAGS="-L. ${LDFLAGS}"
 
-if test "${CXXFLAGS+set}" != set; then
-  ac_cxxflags_set=no
-  if test "$with_debug" = yes; then
-    CXXFLAGS="-g"
-  else
-    CXXFLAGS="-O"
-    AC_DEFINE(NDEBUG)  
-  fi
+if test "$with_debug" = yes; then
+  CXXFLAGS="-g"
+else
+  CXXFLAGS="-O"
+  AC_DEFINE(NDEBUG)  
 fi
-
 
 dnl
 dnl Checks for programs.
@@ -90,17 +97,18 @@ if test -z "$AR"; then
 fi
 
 dnl
+dnl programs for installation
+dnl
+dnl ac_save_path=${PATH}
+dnl PATH="$PATH:.."  
+dnl AC_PROG_INSTALL
+dnl AC_PATH_PROG(MKINSTALLDIRS, mkinstalldirs, -mkdir -p)
+dnl PATH="$ac_save_path"
+
+dnl
 dnl Checks for header files.
 dnl
-AC_CHECK_HEADERS(factory.h)
-
-if test "$ac_cv_header_factory_h" != yes; then
-  if test "$enable_factory" != yes; then
-    AC_MSG_ERROR(Need factory.h to built libfac)
-  else
-    AC_MSG_WARN(Make sure to _install_ factory.h befor building libfac)
-  fi
-fi
+AC_CHECK_HEADER(factory.h,,AC_MSG_WARN(factory.h not found! Install factory before building libfac!))
 
 dnl
 dnl Checks for libraries.
@@ -117,12 +125,10 @@ dnl
 dnl Last, but not least, customize CFLAGS
 dnl
 if test ${GXX} = yes; then
-  if test "$ac_cxxflags_set" = no; then
-    if test "$with_debug" = yes; then
-      CXXFLAGS="-O -g"
-    else
-      CXXFLAGS="-O3 "
-    fi
+  if test "$with_debug" = yes; then
+     CXXFLAGS="-O -g"
+  else
+     CXXFLAGS="-O3 "
   fi
   CXXTEMPLFLAGS="-fno-implicit-templates"
 else
@@ -131,3 +137,8 @@ fi
 AC_SUBST(CXXTEMPLFLAGS)
   
 AC_OUTPUT(Makefile)
+
+dnl 
+dnl Plans:
+dnl 1) look for libraries (warn if not found) for building testprog
+dnl 1) search for perl

@@ -1,7 +1,19 @@
 // Header file for libfac.a
 // Created by -- makeheader --
 ///////////////////////////////////////
+#ifndef FACTOR_H
+#define FACTOR_H
+
 #include <factory.h>
+
+// Set this to a nonzero value to interrupt the computation
+extern int libfac_interruptflag;
+
+// some values you can ask for:
+extern char * libfac_name;
+extern char * libfac_version;
+extern char * libfac_date;
+extern char * libfac_author;
 
 //// Note: second argument for Factorize is for internal use only.
 CFFList Factorize( const CanonicalForm & F, int is_SqrFree=0 ) ;
@@ -67,3 +79,5 @@ IntList  neworderint(const CFList & PolyList );
 // 
 CFList reorder( const Varlist & betterorder, const CFList & PS);
 ListCFList reorder(const Varlist & betterorder, const ListCFList & Q);
+
+#endif /* FACTOR_H */

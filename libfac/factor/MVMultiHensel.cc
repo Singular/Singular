@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.2 1997-06-09 15:56:00 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>

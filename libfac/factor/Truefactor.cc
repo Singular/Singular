@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.2 1997-06-09 15:56:04 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -18,6 +18,9 @@
 #include "debug.h"
 #include "timing.h"
 
+#ifdef HAVE_SINGULAR
+extern void WerrorS(char *);
+#endif
 ///////////////////////////////////////////////////////////////
 // generate all different k-subsets of the set with n        //
 // elements and return them in returnlist.                   //
@@ -85,6 +88,8 @@ static CFFList
 Remove_from_List( const CFFList & L, const CanonicalForm & elem ){
   CFFList Returnlist;
 
+  DEBOUTLN(cout, "Remove_from_List called with L= ",L);
+  DEBOUTLN(cout, "                     and  elem= ",elem);
   for ( ListIterator<CFFactor> i = L ; i.hasItem(); i++)
     if ( i.getItem().factor() != elem ) 
       Returnlist.append( i.getItem() );
@@ -157,26 +162,26 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
   DEBOUTLN(cout,"                     FAC= ", FAC);
 
 // step 2: Do we have to check combinations?
-    degU = L.length();
-    if ( degU == 0 ) // No elements: Return
+  degU = L.length();
+  if ( degU == 0 ) // No elements: Return
+    return FAC;
+  else
+    if ( degU < 4 ){ // Less then four elements: no combinations possible
+      FAC.append( CFFactor(U,1) );
       return FAC;
-    else
-      if ( degU < 4 ){ // Less then four elements: no combinations possible
-	FAC.append( CFFactor(U,1) );
-	return FAC;
-      }
-      else {
-	M = 1; r = r - FAC.length(); degU = degree(U, levelU)/2;
-      }
+    }
+    else {
+      M = 1; r = r - FAC.length(); degU = degree(U, levelU)/2;
+    }
 
-    DEBOUTLN(cout,"Truefactors: (step2) M   = ", M);
-    DEBOUTLN(cout,"                     r   = ", r);
-    DEBOUTLN(cout,"                     degU= ", degU);
-
+  DEBOUTLN(cout,"Truefactors: (step2) M   = ", M);
+  DEBOUTLN(cout,"                     r   = ", r);
+  DEBOUTLN(cout,"                     degU= ", degU);
+  
 // Now do the real work!
 // Test all the combinations of possible factors. 
 
-    onemore=1;
+  onemore=1;
 // steps 3 to 6
   while (1){
     // step 3 iff onemore == 1
@@ -211,6 +216,8 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
 	onemore = 0;
 	degU = degree(U, levelU)/2; // new degU
 	// L = L \ {factor}
+	// Hier ist noch etwas faul; wir muessen (f=prod(f_i)) die f_i 
+	// entfernen und nicht f!
 	L = Remove_from_List( L, factor.factor() );
 	r -= 1;
 	// delete from L any element with degree greater than degU
@@ -270,7 +277,6 @@ TakeNorms(const CFFList & PiList){
     int n=2;
     if ( PossibleFactors.length() < n ) { // a little check
 #ifdef HAVE_SINGULAR
-      extern void WerrorS(char *);
       WerrorS("libfac: ERROR: TakeNorms less then two items remaining!");
 #else
       cerr << "libfac: ERROR: TakeNorms less then two items remaining! " 
@@ -313,7 +319,6 @@ TakeNorms(const CFFList & PiList){
       }
       else{ 
 #ifdef HAVE_SINGULAR
-        extern void WerrorS(char *);
 	WerrorS("libfac: TakeNorms: somethings wrong with remaining factors!");
 #else
 	cerr << "libfac: TakeNorms: somethings wrong with remaining factors!" 

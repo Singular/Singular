@@ -1,4 +1,4 @@
-#!/bin/perl
+#!/usr/local/bin/perl
 
 ###
 ### makeheader - generate a header file out of several header file (ver 1.1)

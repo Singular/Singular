@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: helpstuff.cc,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $";
+// static char * rcsid = "$Id: helpstuff.cc,v 1.2 1997-06-09 15:56:08 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -37,7 +37,7 @@ myappend( const CFFList & Inputlist, const CFFactor & TheFactor){
   for ( i=Inputlist ; i.hasItem() ; i++ ){
     copy = i.getItem();
     if ( copy.factor() == TheFactor.factor() )
-      exp = copy.exp();
+      exp += copy.exp();
     else 
       Outputlist.append(copy);
   }

@@ -1,17 +1,8 @@
-//static char rcsid[] = "$Id: test.cc,v 1.1.1.1 1997-05-02 17:00:43 Singular Exp $";
+//static char rcsid[] = "$Id: test.cc,v 1.2 1997-06-09 15:55:50 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
-// FACTORY - Includes
-//       (x+y+z)*(x+y-z)*(x-y+z)*(x-y-z)*x*y;
-#include <factory.h>
 // Factor - Includes
 #include "factor.h"
-#include "tmpl_inst.h"
-#include "helpstuff.h"
 
-extern char * libfac_name;
-extern char * libfac_version;
-extern char * libfac_date;
-extern char * libfac_author;
 
 void
 setVarNames ( char * vnames )

@@ -1,4 +1,4 @@
-# static char rcsid[] = "@(#) $Id: Makefile,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $";
+# static char rcsid[] = "@(#) $Id: Makefile,v 1.2 1997-06-09 15:56:01 Singular Exp $";
 #############################################################################
 # testcs:   CharSet(F)
 # testgcs:  GeneralCharSet(F,CharSetN)

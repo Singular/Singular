@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.1.1.1 1997-05-02 17:00:46 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.2 1997-06-09 15:56:02 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -20,6 +20,10 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 #include "timing.h"
 TIMING_DEFINE_PRINT(squarefree_time);
 TIMING_DEFINE_PRINT(gcd_time);
+
+#ifdef HAVE_SINGULAR
+extern void WerrorS(char *);
+#endif  
 
 // forward declaration:
 CFFList SqrFree( const CanonicalForm & r );
@@ -121,7 +125,6 @@ SqrFreeTest( const CanonicalForm & r, int opt=1){
     else return 0 ;
   }
 #ifdef HAVE_SINGULAR
-  extern void WerrorS(char *);
   WerrorS("libfac: ERROR: SqrFreeTest: we should never fall trough here!");
 #else
   cerr << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n" 
@@ -188,10 +191,17 @@ SqrFreed( const CanonicalForm & r ){
 
 // is it Pth root?
   n=level(f); // maybe less indeterminants
-  if ( getCharacteristic() > 0 ){  // Pth roots only apply to char > 0
+  g= f.deriv();
+  if ( getCharacteristic() > 0 && g.isZero() ){  // Pth roots only apply to char > 0
     for (int k=1; k<=n; k++) {
       g=swapvar(f,k,n) ; g = g.deriv();
-      if ( ! g.isZero() )  break; // can`t be Pth root
+      if ( ! g.isZero() ){ // can`t be Pth root
+	CFFList Outputlist2= SqrFreed(swapvar(f,k,n));
+	for (CFFListIterator inter=Outputlist2; inter.hasItem(); inter++){
+	  Outputlist= myappend(Outputlist, CFFactor(swapvar(inter.getItem().factor(),k,n), inter.getItem().exp()));
+	}
+	return Outputlist;
+      }
       else 
 	if ( k==n ) { // really is Pth power
           DEBOUTLN(cout, "f is a p'th root: ", f);
@@ -241,7 +251,6 @@ SqrFreed( const CanonicalForm & r ){
     return Outputlist ;
   }
 #ifdef HAVE_SINGULAR
-  extern void WerrorS(char *);
   WerrorS("libfac: ERROR: SqrFreed: we should never fall trough here!");
 #else
   cerr << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n" 
