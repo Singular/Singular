@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.58 2000-09-04 13:39:04 obachman Exp $ */
+/* $Id: polys.cc,v 1.59 2000-09-07 10:02:54 sulandra Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -910,7 +910,11 @@ poly pMultCopyN(poly a, number c)
 
 #endif
 
+#ifdef HAVE_P_PROCS
 poly pMult_Old(poly p1, poly p2)
+#else
+poly pMult(poly p1, poly p2)
+#endif
 {
   poly res, r, rn, a;
   BOOLEAN cont;
