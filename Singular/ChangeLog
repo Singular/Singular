@@ -1,23 +1,6 @@
-Fri May 23 13:17:24 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+Thu Jun  5 15:16:19 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* configure.in: added option --without-info
-
-Thu May 22 16:39:16 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
-
-	* mod2.h.in: Added HAVE_BUILTIN_GMP which is set by configure 
-
-* hannes: ipshell.cc: fixed a bug in iiExport (multiple exports in rings)
-          subexpr.cc: implemented sleftv::Copy for ring/qring
-          syz1.cc: added missing idSkipZeros to LaScala*
-
-Tue May 13 11:32:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
-
-	* claptmpl.cc: changed template initializiation of libfac, so that
-	  class.cc and tmpl_inst.h does not need to be included
-
-Mon May 12 16:48:14 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
-
-	* misc.cc: Added / to Help_File and Info_File
+	* tests/mpcheck: added check for correct remote shell 
 
 Sun May 25 14:06:12 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
