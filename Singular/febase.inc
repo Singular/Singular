@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.5 1998-03-31 09:00:42 Singular Exp $ */
+/* $Id: febase.inc,v 1.6 1998-04-07 17:50:20 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -447,7 +447,6 @@ NewBuff:
       i++;
       if ((c<' ')
       || (c==';')
-      //|| (c=='(')
       || (c==')')
       || (c=='}')
       || (c=='"')
@@ -456,12 +455,9 @@ NewBuff:
       currentVoice->fptr++;
       if(currentVoice->buffer[currentVoice->fptr]=='\0') break;
     }
-    //b[0]=currentVoice->buffer[currentVoice->fptr];
     b[i]='\0';
-    //b[1]='\0';
     if (currentVoice->sw==BI_buffer)
     {
-      //if (currentVoice->fptr==0)
       if (startfptr==0)
       {
         char *anf=currentVoice->buffer;
@@ -475,12 +471,9 @@ NewBuff:
         fePrintEcho(s);
         FreeL((ADDRESS)s);
       }
-      //else if (/*(currentVoice->fptr>0) &&*/
-      //(currentVoice->buffer[currentVoice->fptr-1]=='\n'))
       else if (/*(startfptr>0) &&*/
       (currentVoice->buffer[startfptr-1]=='\n'))
       {
-        //char *anf=currentVoice->buffer+currentVoice->fptr;
         char *anf=currentVoice->buffer+startfptr;
         char *ss=strchr(anf,'\n');
         int len;
@@ -496,7 +489,6 @@ NewBuff:
     }
     currentVoice->fptr++;
     return i;
-    //return 1;
   }
   // no buffer there or e-o-buffer or eoln:
   if (currentVoice->sw!=BI_buffer)
