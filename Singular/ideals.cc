@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.129 2002-03-07 18:32:09 mschulze Exp $ */
+/* $Id: ideals.cc,v 1.130 2002-05-29 09:38:49 mschulze Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1888,7 +1888,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
 *computes division of P by Q with remainder up to (w-weighted) degree n
 *P, Q, and w are not changed
 */
-lists idLiftW(ideal P,ideal Q,int n,short *w=NULL)
+lists idLiftW(ideal P,ideal Q,int n,short *w)
 {
   int N=0;
   int i;
@@ -3023,7 +3023,7 @@ int idMinDeg(ideal M,intvec *w)
   return d;
 }
 
-ideal idSeries(int n,ideal M,matrix U=NULL,intvec *w=NULL)
+ideal idSeries(int n,ideal M,matrix U,intvec *w)
 {
   for(int i=IDELEMS(M)-1;i>=0;i--)
   {

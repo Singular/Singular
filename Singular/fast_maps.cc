@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.29 2002-02-05 13:09:05 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.30 2002-05-29 09:42:50 mschulze Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -128,7 +128,7 @@ void maPoly_Out(mapoly mpoly, ring src_r, ring dest_r = NULL)
 static omBin mapolyBin = omGetSpecBin(sizeof(mapoly_s));
 static omBin macoeffBin = omGetSpecBin(sizeof(macoeff_s));
 
-mapoly maMonomial_Create(poly p, ring r_p, sBucket_pt bucket = NULL)
+mapoly maMonomial_Create(poly p, ring r_p, sBucket_pt bucket)
 {
   mapoly mp = (mapoly) omAlloc0Bin(mapolyBin);
   //p_wrp(p,r_p);printf(" (%x) created\n",mp);
@@ -145,7 +145,7 @@ mapoly maMonomial_Create(poly p, ring r_p, sBucket_pt bucket = NULL)
   return mp;
 }
 
-void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r = NULL)
+void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r)
 {
   if (mp != NULL)
   {
@@ -223,7 +223,7 @@ mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r)
   return iter;
 }
 
-mapoly maPoly_InsertMonomial(mapoly &into, poly p, ring src_r, sBucket_pt bucket = NULL)
+mapoly maPoly_InsertMonomial(mapoly &into, poly p, ring src_r, sBucket_pt bucket)
 {
   return maPoly_InsertMonomial(into, maMonomial_Create(p, src_r, bucket), src_r);
 }
