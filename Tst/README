@@ -30,13 +30,26 @@ Do also
 and see the source code of ../regress.cmd for some more details on
 regress.cmd.
 
+Note: 
+(1) You should use regress.cmd -g to generate a result file! 
+(2) You need the (GNU) uuencode for regress.cmd to work
+
+To unpack a result file (say, xx)
+----------------------------------
+uudecode -o xx.res.gz xx.res.gz.uu; gunzip -f xx.res.gz
+
+To pack a result file (say, xx)
+--------------------------------
+gzip -f xx.res; uuencode xx.res.gz xx.res.gz > xx.res.gz.uu; rm -rf xx.res.gz
+
+
 To add a new test for a library/commando to the test-suite:
 -----------------------------------------------------------
 * The following files need to be provided:
 	short/xx_s.tst : Singular code for short and basic tests 
 	long/xx_l.tst : Singular code for long and extended tests
-	short/xx_s.res : Result output of xx_s.tst
-	long/xx_l.res : Result output of xx_l.tst
+	short/xx_s.res.gz.uu : Result output of xx_s.tst
+	long/xx_l.resres.gz.uu : Result output of xx_l.tst
   or, alternatively:
         short/xx.tst: Singular code for short tests, only
 	short/xx.res : Result output of xx.tst
@@ -50,7 +63,7 @@ To add a new test for a library/commando to the test-suite:
   cases/results are tested. Nevertheless, such a test should not run
   longer than, say, 10 minutes.
 
-* If useful test do generally execute in a short time, have xx.tst,
+* If useful tests do generally execute in a short time, have xx.tst,
   only.
 
 * Rules for providing tst files:
@@ -87,7 +100,7 @@ To add a new test for a library/commando to the test-suite:
   tst_ignore("time", timer - mytime);
   tst_ignore("memory", memory(0));
 
-* Command for generating *.res files: 
+* Command for generating *.res.gz.uu files: 
   cd <directopry where xx.tst should reside>; ../regress.cmd -g xx.tst
 
 
