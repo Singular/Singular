@@ -43,7 +43,7 @@
   // 'solution exponent: 0 1 5' means that (z^0,z^1,z^5) is a solution
   ring rpk=(p^k,z),(x(1..n)),dp;
   rpk;
-  execute ms;
+  execute(ms);
   s=0;
   ideal mt;
   for (i(1)=0;i(1)<p^k-k;i(1)=i(1)+1)

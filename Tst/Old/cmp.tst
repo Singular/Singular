@@ -11,8 +11,8 @@ proc generate_polys (int n, string ostring)
   polystr = polystr + "1;";
   ringstr;
   polystr;
-  execute ringstr;
-  execute polystr;
+  execute(ringstr);
+  execute(polystr);
   p;
   p^2 + p;
   (p^2+p)*(gen(2) + gen(3));

@@ -4,6 +4,6 @@
   ring r0=0,(x,y,z),Dp;
   string s="ideal k="+read("save_i")+";";
   s;
-  execute s; // define the ideal k
+  execute(s); // define the ideal k
   k;
 LIB "tst.lib";tst_status(1);$

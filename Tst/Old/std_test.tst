@@ -25,8 +25,8 @@ proc check_ideal_std(int n, string ostring)
   idealstr = idealstr + "x("+ string(i % n) + ")*x(" + string((i+1) % n)
     + ")*x(" + string((i+2) % n) + ");";
 
-  execute ringstr;
-  execute idealstr;
+  execute(ringstr);
+  execute(idealstr);
   r;
   j;
   std(j);
@@ -67,8 +67,8 @@ proc check_module_std(int n, string ostring)
   modulestr = modulestr + "x("+ string(i % n) + ")*x(" + string((i+1) % n)
     + ")*x(" + string((i+2) % n) + ")*gen(" +  string(i) + ");";
 
-  execute ringstr;
-  execute modulestr;
+  execute(ringstr);
+  execute(modulestr);
   r;
   j;
   std(j);

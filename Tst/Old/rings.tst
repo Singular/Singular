@@ -30,9 +30,9 @@ proc ringbundle
   for (int @i=1; @i<=size(#); @i=@i+1)
   {
     @ex = "ring rb(" , string(@i) + ")  = " +  string(#[@i]) + ",(x, y, z),lp;";
-    execute @ex;
+    execute(@ex);
     @ex = "export rb(" , string(@i) + ");";
-    execute @ex;
+    execute(@ex);
   }
 }
 ringbundle();                 // ask for help

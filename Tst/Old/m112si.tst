@@ -7,6 +7,6 @@
   // create an ideal k equal to the content
   // of the file save_i
   string s="ideal k="+read("save_i")+";";
-  execute s;
+  execute(s);
   k;
 LIB "tst.lib";tst_status(1);$

@@ -10,7 +10,7 @@
   write("example.txt","int j=5;");// data is appended to file
   read("example.txt");         // data is returned as string
   close(l);                    // link is closed
-  execute read(l);             // read string is executed
+  execute(read(l));             // read string is executed
   status(l, "open", "yes");    // now link is open
   status(l, "mode");           // in read mode
   close(l);                    // link is closed

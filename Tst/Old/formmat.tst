@@ -7,7 +7,7 @@ proc mrows
     @rc = @rc + "m[" + string(#[2]) + "," + string(@i) + "],";
   }
   @rc = @rc[1,size(@rc)-1] + ";";
-  execute "return (@rc);";
+  execute("return (@rc);");
 }
 ring r= 32003,(x,y,z),lp;
 matrix m[3][3] = 0;
@@ -23,7 +23,7 @@ for (int ii=1; ii<=nrows(m); ii=ii+1)
   ss;
   ss = ss +  string(mrows(m,ii));
   ss;
-  execute ss;
+  execute(ss);
   id(ii);
 }
 listvar(all);

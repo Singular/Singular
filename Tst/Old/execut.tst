@@ -10,7 +10,7 @@ system("sh","/bin/rm -f save_j");
 write("save_j",j);
 ring r2=0,(x,y,z),Dp;
 string s="ideal k="+read("save_j")+";";
-execute s;
+execute(s);
 k;
 "-------------------------------";
 listvar(all);
