@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.271 2001-11-05 13:25:36 Singular Exp $ */
+/* $Id: iparith.cc,v 1.272 2001-12-14 10:39:22 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3062,6 +3062,14 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
   }
   return FALSE;
 }
+static BOOLEAN jjLISTRING(leftv res, leftv v)
+{
+  ring r=rCompose((lists)v->Data());
+  if (r==NULL) return TRUE;
+  if (r->qideal!=NULL) res->rtyp=QRING_CMD;
+  res->data=(char *)r;
+  return FALSE;
+}
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
   omUpdateInfo();
@@ -3838,6 +3846,7 @@ struct sValCmd1 dArith1[]=
 ,{jjRINGLIST,   RINGLIST_CMD,    LIST_CMD,       RING_CMD }
 ,{jjRINGLIST,   RINGLIST_CMD,    LIST_CMD,       QRING_CMD }
 ,{jjDUMMY,      RING_CMD,        RING_CMD,       RING_CMD}
+,{jjLISTRING,   RING_CMD,        RING_CMD,       LIST_CMD}
 //,{jjWRONG,      ROWS_CMD,        0,              POLY_CMD }
 ,{jjpMaxComp,   ROWS_CMD,        XS(INT_CMD),    VECTOR_CMD }
 ,{jjROWS,       ROWS_CMD,        INT_CMD,        MODUL_CMD }

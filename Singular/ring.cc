@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.171 2001-10-23 14:04:25 Singular Exp $ */
+/* $Id: ring.cc,v 1.172 2001-12-14 10:39:00 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -929,18 +929,32 @@ void rKill(ring r)
 
 void rKill(idhdl h)
 {
-#ifndef HAVE_NAMESPACES1
+#ifndef HAVE_NAMESPACES
+  ring r = IDRING(h);
+  int ref=0;
+  if (r!=NULL)
+  {
+    ref=r->ref;
+    rKill(r);
+  }
+  if (h==currRingHdl)
+  {
+    if (ref<=0) { currRing=NULL; currRingHdl=NULL;}
+    else
+    {
+      currRingHdl=rFindHdl(r,NULL,NULL);
+    }
+  }
+#endif /* NOT HAVE_NAMESPACES */
+
+#ifdef HAVE_NAMESPACES
   ring r = IDRING(h);
   if (r!=NULL) rKill(r);
   if (h==currRingHdl)
   {
-#ifdef HAVE_NAMESPACES
     namehdl nsHdl = namespaceroot;
     while(nsHdl!=NULL) {
       currRingHdl=NSROOT(nsHdl);
-#else /* HAVE_NAMESPACES */
-      currRingHdl=IDROOT;
-#endif /* HAVE_NAMESPACES */
       while (currRingHdl!=NULL)
       {
         if ((currRingHdl!=h)
@@ -949,61 +963,27 @@ void rKill(idhdl h)
           break;
         currRingHdl=IDNEXT(currRingHdl);
       }
-#ifdef HAVE_NAMESPACES
       if ((currRingHdl != NULL) && (currRingHdl!=h)
           && (IDTYP(currRingHdl)==IDTYP(h))
           && (h->data.uring==currRingHdl->data.uring))
         break;
       nsHdl = nsHdl->next;
     }
-#endif /* HAVE_NAMESPACES */
   }
-#else
-    if(currRingHdl==NULL)
-    {
-      namehdl ns = namespaceroot;
-      BOOLEAN found=FALSE;
-
-      while(!ns->isroot)
-      {
-        currRingHdl=NSROOT(namespaceroot->next);
-        while (currRingHdl!=NULL)
-        {
-          if ((currRingHdl!=h)
-              && (IDTYP(currRingHdl)==IDTYP(h))
-              && (h->data.uring==currRingHdl->data.uring))
-          { found=TRUE; break; }
-
-          currRingHdl=IDNEXT(currRingHdl);
-        }
-        if(found) break;
-        ns=IDNEXT(ns);
-      }
-    }
-    if(currRingHdl == NULL || IDRING(h) != IDRING(currRingHdl))
-    {
-      currRingHdl = namespaceroot->currRingHdl;
-
-/*      PrintS("Running rFind()\n");
-      currRingHdl = rFindHdl(IDRING(h), NULL, NULL);
-      if(currRingHdl == NULL)
-      {
-        PrintS("rFind()return 0\n");
-      }
-      else
-      {
-        PrintS("Huppi rfind return an currRingHDL\n");
-        Print("%x, %x\n", IDRING(h),IDRING(currRingHdl) );
-      }
-*/
-    }
-    else
-    {
-      //PrintS("Huppi found an currRingHDL\n");
-      //Print("%x, %x\n", IDRING(h),IDRING(currRingHdl) );
-
-    }
 #endif /* HAVE_NAMESPACES */
+}
+
+idhdl rSimpleFindHdl(ring r, idhdl root)
+{
+  idhdl h=root;
+  while (h!=NULL)
+  {
+    if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+        && (h->data.uring==r))
+      return h;
+    h=IDNEXT(h);
+  }
+  return NULL;
 }
 
 idhdl rFindHdl(ring r, idhdl n, idhdl w)
@@ -1049,41 +1029,27 @@ idhdl rFindHdl(ring r, idhdl n, idhdl w)
   }
 #endif
 #else
-  idhdl h=IDROOT;
-  if(w != NULL) h = w;
-  while (h!=NULL)
-  {
-    if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
-        && (h->data.uring==r)
-        && (h!=n))
-      return h;
-    h=IDNEXT(h);
-  }
+  idhdl h=rSimpleFindHdl(r,IDROOT);
+  if (h!=NULL)  return h;
 #ifdef HAVE_NS
-  if (IDROOT!=basePack->idroot) h=basePack->idroot;
-  while (h!=NULL)
-  {
-    if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
-        && (h->data.uring==r)
-        && (h!=n))
-      return h;
-    h=IDNEXT(h);
-  }
+  if (IDROOT!=basePack->idroot) h=rSimpleFindHdl(r,basePack->idroot);
+  if (h!=NULL)  return h;
   proclevel *p=procstack;
   while(p!=NULL)
   {
     if ((p->currPack!=basePack)
     && (p->currPack!=currPack))
-      h=p->currPack->idroot;
-    while (h!=NULL)
-    {
-      if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
-        && (h->data.uring==r)
-        && (h!=n))
-      return h;
-      h=IDNEXT(h);
-    }
+      h=rSimpleFindHdl(r,p->currPack->idroot);
+    if (h!=NULL)  return h;
     p=p->next;
+  }
+  idhdl tmp=basePack->idroot;
+  while (tmp!=NULL)
+  {
+    if (IDTYP(tmp)==PACKAGE_CMD)
+      h=rSimpleFindHdl(r,IDPACKAGE(tmp)->idroot);
+    if (h!=NULL)  return h;
+    tmp=IDNEXT(tmp);
   }
 #endif
 #endif
@@ -3993,4 +3959,163 @@ lists rDecompose(ring r)
   else
     L->m[3].data=(void *)idCopy(r->qideal);
   return L;
+}
+
+ring rCompose(lists  L)
+{
+  if (L->nr!=3) return NULL;
+  // 0: char/ cf - ring
+  // 1: list (var)
+  // 2: list (ord)
+  // 3: qideal
+  ring R=(ring) omAlloc0Bin(sip_sring_bin);
+  if (L->m[0].Typ()==INT_CMD)
+  {
+    R->ch=(int)L->m[0].Data();
+  }
+  else if (L->m[0].Typ()==LIST_CMD)
+  {
+    R->algring=rCompose((lists)L->m[0].Data());
+    if (R->algring==NULL)
+    {
+      goto rCompose_err;
+    }
+    R->ch=R->algring->ch;
+    R->parameter=R->algring->names;
+    R->P=R->algring->N;
+  }
+  else
+  {
+    goto rCompose_err;
+  }
+  // ------------------------- VARS ---------------------------
+  if (L->m[1].Typ()==LIST_CMD)
+  {
+    lists v=(lists)L->m[1].Data();
+    R->N = v->nr+1;
+    R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
+    int i;
+    for(i=0;i<R->N;i++)
+    {
+      if (v->m[i].Typ()==STRING_CMD)
+        R->names[i]=omStrDup(v->m[i].Data());
+      else
+      {
+        i--;
+        while (i>=0) { omFree(R->names[i]); i--; }
+        omFree(R->names);
+        goto rCompose_err;
+      }
+    }
+  }
+  else
+  {
+    goto rCompose_err;
+  }
+  // ------------------------ ORDER ------------------------------
+  if (L->m[2].Typ()==LIST_CMD)
+  {
+    lists v=(lists)L->m[2].Data();
+    int n= v->nr+2;
+    int j;
+    // initialize fields of R
+    R->order=(int *)omAlloc0(n*sizeof(int));
+    R->block0=(int *)omAlloc0(n*sizeof(int));
+    R->block1=(int *)omAlloc0(n*sizeof(int));
+    R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
+    // init order, so that rBlocks works correctly
+    for (j=0; j < n-2; j++)
+      R->order[j] = (int) ringorder_unspec;
+    // orderings
+    R->OrdSgn=1;
+    for(j=0;j<n-1;j++)
+    {
+    // todo: a(..), M
+      lists vv=(lists)v->m[j].Data(); // assume LIST
+      R->order[j]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
+      if (j==0) R->block0[0]=1;
+      else      R->block0[j]=R->block1[j-1]+1;
+      intvec *iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
+      R->block1[j]=R->block0[j]+iv->length()-1;
+      int i;
+      switch (R->order[j])
+      {
+         case ringorder_ws:
+         case ringorder_Ws:
+            R->OrdSgn=-1;
+         case ringorder_wp:
+         case ringorder_Wp:
+           R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
+           for (i=1; i<iv->length();i++) R->wvhdl[n][i-1]=(*iv)[i];
+           break;
+         case ringorder_ls:
+         case ringorder_ds:
+         case ringorder_Ds:
+           R->OrdSgn=-1;
+         case ringorder_lp:
+         case ringorder_dp:
+         case ringorder_Dp:
+         case ringorder_rp:
+           break;
+         case ringorder_S:
+           break;
+         case ringorder_c:
+         case ringorder_C:
+           R->block1[j]=R->block0[j]-1;
+           break;
+         case ringorder_aa:
+         case ringorder_a:
+           R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
+           for (i=1; i<iv->length();i++) R->wvhdl[n][i-1]=(*iv)[i];
+         // todo
+           break;
+         case ringorder_M:
+         // todo
+           break;
+      }
+    }
+    // sanity check
+    j=n-2;
+    if ((R->order[j]==ringorder_c)
+    || (R->order[j]==ringorder_C)) j--;
+    if (R->block1[j] != R->N)
+    {
+      if (((R->order[j]==ringorder_dp) ||
+           (R->order[j]==ringorder_ds) ||
+           (R->order[j]==ringorder_Dp) ||
+           (R->order[j]==ringorder_Ds) ||
+           (R->order[j]==ringorder_rp) ||
+           (R->order[j]==ringorder_lp) ||
+           (R->order[j]==ringorder_ls))
+          &&
+            R->block0[j] <= R->N)
+      {
+        R->block1[j] = R->N;
+      }
+      else goto rCompose_err;
+    }
+  }
+  else
+  {
+    goto rCompose_err;
+  }
+  // ------------------------ Q-IDEAL ------------------------
+  if (L->m[3].Typ()==IDEAL_CMD)
+  {
+    ideal q=(ideal)L->m[3].Data();
+    if (q->m[0]!=NULL)
+      R->qideal=idCopy(q);
+  }
+  else
+  {
+    goto rCompose_err;
+  }
+
+  // todo
+  rComplete(R);
+  return R;
+
+rCompose_err:
+  omFree(R);
+  return NULL;
 }
