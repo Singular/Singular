@@ -21,5 +21,6 @@
   getdump("MPfile: example.mp");// get dump from file
   LIB "general.lib";
   killall("proc");
+  kill killall;
   dump("");                     // dump to stdout
 LIB "tst.lib";tst_status(1);$
