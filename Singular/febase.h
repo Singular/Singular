@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.13 1998-04-22 07:48:53 Singular Exp $ */
+/* $Id: febase.h,v 1.14 1998-04-23 18:52:49 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -90,8 +90,8 @@ char *  StringSet(char *fmt, ...);
 char *  StringSetS(char* s);
 const  char * VoiceName();
 void    VoiceBackTrack();
-void    WarnS(char *s);
-void    Warn(char *fmt, ...);
+void    WarnS(const char *s);
+void    Warn(const char *fmt, ...);
 BOOLEAN contBuffer(feBufferTypes typ);
 char *  eati(char *s, int *i);
 BOOLEAN exitBuffer(feBufferTypes typ);

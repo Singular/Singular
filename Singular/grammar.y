@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.26 1998-04-08 13:47:03 pohl Exp $ */
+/* $Id: grammar.y,v 1.27 1998-04-23 18:52:54 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -255,7 +255,6 @@ void yyerror(char * fmt)
 %token <i> SYS_BREAK
 %token <i> WHILE_CMD
 %token <i> RETURN
-%token <i> END_GRAMMAR
 %token <i> PARAMETER
 
 /* system variables */
@@ -1475,12 +1474,9 @@ returncmd:
           }
         | RETURN '(' ')'
           {
-            if ($1==RETURN)
-            {
-              if(iiRETURNEXPR==NULL) YYERROR;
-              iiRETURNEXPR[myynest].Init();
-              iiRETURNEXPR[myynest].rtyp=NONE;
-              if (exitBuffer(BT_proc)) YYERROR;
-            }
+            if(iiRETURNEXPR==NULL) YYERROR;
+            iiRETURNEXPR[myynest].Init();
+            iiRETURNEXPR[myynest].rtyp=NONE;
+            if (exitBuffer(BT_proc)) YYERROR;
           }
         ;

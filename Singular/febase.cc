@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.30 1998-04-22 07:48:52 Singular Exp $ */
+/* $Id: febase.cc,v 1.31 1998-04-23 18:52:48 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -465,7 +465,7 @@ void Werror(char *fmt, ...)
 }
 }
 
-void WarnS(char *s)
+void WarnS(const char *s)
 {
 #ifdef HAVE_TCL
   if (tclmode)
@@ -488,7 +488,7 @@ void WarnS(char *s)
   }
 }
 
-void Warn(char *fmt, ...)
+void Warn(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
