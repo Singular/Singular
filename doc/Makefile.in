@@ -104,7 +104,7 @@ usercard.ps: usercard.dvi
 
 # html stuff
 html: html/index.htm ${IMAGES_HTML}
-html/index.htm: ${MANUAL_FILES} t2h_singular.init t2h.init singular.tex ${TEXI2HTML}
+html/index.htm: t2h_singular.init t2h.init singular.tex singular.hlp ${TEXI2HTML}
 	${PERL5} ${TEXI2HTML} -init_file t2h_singular.init ${TEXI2HTML_OPTS} -subdir html singular.tex
 
 # html stuff

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.126 1999-07-14 15:50:01 obachman Exp $
+@comment $Id: general.doc,v 1.127 1999-07-17 14:49:11 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2443,6 +2443,7 @@ See
 @ref{Procedures and libraries};
 @ref{SINGULAR libraries};
 @ref{proc};
+@ref{LIB};
 @ref{standard_lib};
 @ref{string};
 @ref{system}.
@@ -2752,9 +2753,11 @@ argument is positive; it does nothing otherwise.
 * dbprint::
 * voice::
 @end menu
+@ifnothtml
 @iftex
 See @ref{dbprint}; @ref{voice}.
 @end iftex
+@end ifnothtml
 
 @c ---------------------------------------
 @node libparse,,Printing of data,Debugging tools

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.123 1999-07-15 17:31:23 Singular Exp $
+@comment $Id: reference.doc,v 1.124 1999-07-17 14:49:13 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2694,6 +2694,7 @@ See
 @c ref
 See
 @ref{Command line options};
+@ref{Loading of a library};
 @ref{Procedures and libraries};
 @ref{SINGULAR libraries};
 @ref{proc};

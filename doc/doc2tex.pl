@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.7 1999-07-15 17:06:11 obachman Exp $
+# $Id: doc2tex.pl,v 1.8 1999-07-17 14:49:10 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -357,7 +357,7 @@ sub HandleRef
     $line++;
     last if (/^\@c\s*ref\s*$/);
     
-    while (/\@ref{([^\s]*)}/)
+    while (/\@ref{(.*?)}/)
     {
       $refs{$1} = 1;
       $_ = $';
@@ -383,7 +383,7 @@ sub HandleRef
   }
   else
   {
-    print TEX "\@strong{See also:} ";
+    print TEX "\@strong{See also:}\n";
   }
   $lref = pop(@refs);
   foreach $ref (@refs) {print TEX "\@ref{".$ref."};\n";}
