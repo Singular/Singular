@@ -60,6 +60,22 @@ else
   fi
 fi
 
+AC_ARG_WITH(
+  Singularerror,
+  [  --with-Singularerror use error reporting from Singular])
+
+if test "$with_Singularerror" = yes; then
+  AC_DEFINE(SINGULAR_ERROR)
+fi
+
+AC_ARG_WITH(
+  NOSTREAMIO,
+  [  --with-NOSTREAMIO : do not require iostream include nor library])
+
+if test "$with_NOSTREAMIO" = yes; then
+  AC_DEFINE(NOSTREAMIO)
+fi
+
 dnl
 dnl add to -I and -L, if necessary
 dnl
