@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.163 2001-05-22 13:20:00 Singular Exp $ */
+/* $Id: ring.cc,v 1.164 2001-05-22 13:30:55 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3915,20 +3915,23 @@ lists rDecompose(ring r)
   for(; i>=0; i--)
   {
     intvec *iv;
+    int j;
     LL->m[i].rtyp=LIST_CMD;
     LLL=(lists)omAlloc0Bin(slists_bin);
     LLL->Init(2);
     LLL->m[0].rtyp=INT_CMD;
     LLL->m[0].data=(void *)r->order[i];
     LLL->m[1].rtyp=INTVEC_CMD;
-    iv=new intvec(r->block1[i]-r->block0[i]);
+    j=r->block1[i]-r->block0[i];
+    if (j==0) j=1;
+    iv=new intvec(j);
     LLL->m[1].data=(void *)iv;
-    if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
+    if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL)
+    && (r->block1[i]-r->block0[i] >0 ))
     {
-      int j;
-      for(j=0;j< iv->length(); j++)
+      for(;j>=0; j--)
        (*iv)[j]=r->wvhdl[i][j];
-    }	
+    }
     LL->m[i].data=(void *)LLL;
   }
   // ----------------------------------------
