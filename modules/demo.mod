@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: demo.mod,v 1.1 2002-06-25 08:20:49 anne Exp $
+ *  $Id: demo.mod,v 1.2 2002-07-03 12:52:25 anne Exp $
  *
  *  Test mod fuer modgen
  */
@@ -12,8 +12,9 @@ extern void piShowProcList();
 
 // some comments here
 
+category="tests";
 package="demo_module";
-version	= "$Id: demo.mod,v 1.1 2002-06-25 08:20:49 anne Exp $";
+version	= "$Id: demo.mod,v 1.2 2002-07-03 12:52:25 anne Exp $";
 info	="
 LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C
 
@@ -32,6 +33,19 @@ LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C
 */
 
 %%
+%Singular
+
+proc testa (int i,int j)
+" keine Hilfe"
+{
+  "testa";
+  int a=i-j;
+  return(a);
+}
+example
+{
+  testa(2,3);
+}
 %procedures
 /*
  * NAME:     proclist
