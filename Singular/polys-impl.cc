@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.18 1998-11-06 14:44:13 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.19 1998-11-10 17:18:20 Singular Exp $ */
 
 /***************************************************************
  *
@@ -202,22 +202,18 @@ poly _pFetchCopy(ring r, poly p)
     pCopy2(a,p);
     a->coef=nCopy(p->coef);
     pSetm(a);
-    if (pNext(p)!=NULL)
+    pIter(p);
+    while (p!=NULL)
     {
-      pIter(p);
-      do
-      {
 #ifdef PDEBUG
-        a = pNext(a) = pDBNew(f,l);
+      a = pNext(a) = pDBNew(f,l);
 #else
-        a = pNext(a) = pNew();
+      a = pNext(a) = pNew();
 #endif
-        pCopy2(a,p);
-        a->coef=nCopy(p->coef);
-        pSetm(a);
-        pIter(p);
-      }
-      while (p!=NULL);
+      pCopy2(a,p);
+      a->coef=nCopy(p->coef);
+      pSetm(a);
+      pIter(p);
     }
     pNext(a) = NULL;
   }
@@ -231,27 +227,23 @@ poly _pFetchCopy(ring r, poly p)
     res->coef = nCopy(p->coef);
     RingCopy2ExpV(res, p, r);
     pSetm(res);
-    if (pNext(p) != NULL)
+    pIter(p);
+    while (p != NULL)
     {
-      pIter(p);
-      do
-      {
-        // the VarOffset's are different: Hence we
-        // convert betweeen a lex order and a revlex order -- to speed
-        // up the sorting, we assemble new poly in inverse order
+      // the VarOffset's are different: Hence we
+      // convert betweeen a lex order and a revlex order -- to speed
+      // up the sorting, we assemble new poly in inverse order
 #ifdef PDEBUG
-        res = pDBInit(f,l);
+      res = pDBInit(f,l);
 #else
-        res = pInit();
+      res = pInit();
 #endif
-        pNext(res) = a;
-        a = res;
-        res->coef = nCopy(p->coef);
-        RingCopy2ExpV(res, p, r);
-        pSetm(res);
-        pIter(p);
-      }
-      while (p != NULL);
+      pNext(res) = a;
+      a = res;
+      res->coef = nCopy(p->coef);
+      RingCopy2ExpV(res, p, r);
+      pSetm(res);
+      pIter(p);
     }
   }
 #ifdef PDEBUG
