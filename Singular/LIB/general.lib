@@ -1,9 +1,9 @@
-// $Id: general.lib,v 1.9 1998-09-30 17:24:31 Singular Exp $
+// $Id: general.lib,v 1.10 1999-04-19 11:02:10 obachman Exp $
 //system("random",787422842);
 //GMG, last modified 30.9.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.9 1998-09-30 17:24:31 Singular Exp $";
+version="$Id: general.lib,v 1.10 1999-04-19 11:02:10 obachman Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -541,14 +541,14 @@ RETURN:  a list of two elements:
              given). The corresponding ordered list of exponent vectors is
              returned.
              (e.g. sort(id); sorts lexicographically, smaller int's come first)
-             WARNING: Since negative exponents create the 0 plynomial in
+             WARNING: Since negative exponents create the 0 polynomial in
              Singular, id should not contain negative integers: the result
-             might not be as exspected
+             might not be as expected
            - if id=intvec: id is treated as list of integers
            - if n!=0 the ordering is inverse, i.e. w.r.t. v(size(v)..1)
              default: n=0
          [2]: intvec, describing the permutation of the input (hence [2]=v if
-             v is given (with positive intergers)
+             v is given (with positive integers)
 NOTE:    If v is given id may be any simply indexed object (e.g. any list or
          string); if v[i]<0 and i<=size(id) v[i] is set internally to i;
          entries of v must be pairwise distinct to get a permutation if id.
