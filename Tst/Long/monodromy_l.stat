@@ -1,91 +1,84 @@
-Status Output of tst_status.out
-init >> USER    :hannes
-init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
-init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
-init >> date    :Thu Jun 24 11:09:49 MET DST 1999
-init >> version :1303
-init >> ticks   :100
-1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:154945
-1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:221225
-1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:180224
-1 >> tst_timer :: nepomuck.mathematik.uni-kl.de:23
-2 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:155345
-2 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:221225
-2 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:180224
-2 >> tst_timer :: nepomuck.mathematik.uni-kl.de:15
-3 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:155585
-3 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:221225
-3 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:180224
-3 >> tst_timer :: nepomuck.mathematik.uni-kl.de:16
-4 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:207541
-4 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:2850225
-4 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:3153920
-4 >> tst_timer :: nepomuck.mathematik.uni-kl.de:783
-5 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:244461
-5 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:5808741
-5 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6365184
-5 >> tst_timer :: nepomuck.mathematik.uni-kl.de:2154
-6 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:278133
-6 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:5825109
-6 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6365184
-6 >> tst_timer :: nepomuck.mathematik.uni-kl.de:1628
-7 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:307509
-7 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6029709
-7 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6365184
-7 >> tst_timer :: nepomuck.mathematik.uni-kl.de:514
-8 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:341173
-8 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6111549
-8 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6365184
-8 >> tst_timer :: nepomuck.mathematik.uni-kl.de:635
-9 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:382985
-9 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6226125
-9 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6389760
-9 >> tst_timer :: nepomuck.mathematik.uni-kl.de:502
-10 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:400945
-10 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001
-10 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6512640
-10 >> tst_timer :: nepomuck.mathematik.uni-kl.de:1099
-11 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:404981
-11 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001
-11 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6504448
-11 >> tst_timer :: nepomuck.mathematik.uni-kl.de:83
-12 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:432913
-12 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001
-12 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6483968
-12 >> tst_timer :: nepomuck.mathematik.uni-kl.de:295
-13 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:458217
-13 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001
-13 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6483968
-13 >> tst_timer :: nepomuck.mathematik.uni-kl.de:231
-14 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:485337
-14 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001
-14 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6512640
-14 >> tst_timer :: nepomuck.mathematik.uni-kl.de:274
-15 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:509753
-15 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6770361
-15 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6942720
-15 >> tst_timer :: nepomuck.mathematik.uni-kl.de:731
-16 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:531189
-16 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6786729
-16 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7176192
-16 >> tst_timer :: nepomuck.mathematik.uni-kl.de:942
-17 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:556377
-17 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6799005
-17 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7176192
-17 >> tst_timer :: nepomuck.mathematik.uni-kl.de:1146
-18 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:586889
-18 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7232757
-18 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8282112
-18 >> tst_timer :: nepomuck.mathematik.uni-kl.de:2616
-19 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:611041
-19 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7261401
-19 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8282112
-19 >> tst_timer :: nepomuck.mathematik.uni-kl.de:886
-20 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:639601
-20 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7261401
-20 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8282112
-20 >> tst_timer :: nepomuck.mathematik.uni-kl.de:457
-21 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:635405
-21 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7259721
-21 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8282112
-21 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:15052
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:154945 966254004:2000081403:1-3-8:HPUX-10:wilde13:156357
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:221225 966254004:2000081403:1-3-8:HPUX-10:wilde13:229765
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:180224 966254004:2000081403:1-3-8:HPUX-10:wilde13:208896
+1 >> tst_timer :: nepomuck.mathematik.uni-kl.de:23 966254004:2000081403:1-3-8:HPUX-10:wilde13:31
+2 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:155345 966254004:2000081403:1-3-8:HPUX-10:wilde13:156385
+2 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:221225 966254004:2000081403:1-3-8:HPUX-10:wilde13:229765
+2 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:180224 966254004:2000081403:1-3-8:HPUX-10:wilde13:208896
+2 >> tst_timer :: nepomuck.mathematik.uni-kl.de:15 966254004:2000081403:1-3-8:HPUX-10:wilde13:16
+3 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:155585 966254004:2000081403:1-3-8:HPUX-10:wilde13:156385
+3 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:221225 966254004:2000081403:1-3-8:HPUX-10:wilde13:229765
+3 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:180224 966254004:2000081403:1-3-8:HPUX-10:wilde13:208896
+3 >> tst_timer :: nepomuck.mathematik.uni-kl.de:16 966254004:2000081403:1-3-8:HPUX-10:wilde13:21
+4 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:207541 966254004:2000081403:1-3-8:HPUX-10:wilde13:202421
+4 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:2850225 966254004:2000081403:1-3-8:HPUX-10:wilde13:3332365
+4 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:3153920 966254004:2000081403:1-3-8:HPUX-10:wilde13:3661824
+4 >> tst_timer :: nepomuck.mathematik.uni-kl.de:783 966254004:2000081403:1-3-8:HPUX-10:wilde13:1301
+5 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:244461 966254004:2000081403:1-3-8:HPUX-10:wilde13:234065
+5 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:5808741 966254004:2000081403:1-3-8:HPUX-10:wilde13:6793485
+5 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6365184 966254004:2000081403:1-3-8:HPUX-10:wilde13:7397376
+5 >> tst_timer :: nepomuck.mathematik.uni-kl.de:2154 966254004:2000081403:1-3-8:HPUX-10:wilde13:4013
+6 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:278133 966254004:2000081403:1-3-8:HPUX-10:wilde13:261185
+6 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:5825109 966254004:2000081403:1-3-8:HPUX-10:wilde13:6797581
+6 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6365184 966254004:2000081403:1-3-8:HPUX-10:wilde13:7397376
+6 >> tst_timer :: nepomuck.mathematik.uni-kl.de:1628 966254004:2000081403:1-3-8:HPUX-10:wilde13:3048
+7 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:307509 966254004:2000081403:1-3-8:HPUX-10:wilde13:281533
+7 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6029709 966254004:2000081403:1-3-8:HPUX-10:wilde13:6990093
+7 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6365184 966254004:2000081403:1-3-8:HPUX-10:wilde13:7397376
+7 >> tst_timer :: nepomuck.mathematik.uni-kl.de:514 966254004:2000081403:1-3-8:HPUX-10:wilde13:758
+8 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:341173 966254004:2000081403:1-3-8:HPUX-10:wilde13:300509
+8 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6111549 966254004:2000081403:1-3-8:HPUX-10:wilde13:7067917
+8 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6365184 966254004:2000081403:1-3-8:HPUX-10:wilde13:7397376
+8 >> tst_timer :: nepomuck.mathematik.uni-kl.de:635 966254004:2000081403:1-3-8:HPUX-10:wilde13:1021
+9 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:382985 966254004:2000081403:1-3-8:HPUX-10:wilde13:338761
+9 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6226125 966254004:2000081403:1-3-8:HPUX-10:wilde13:7162125
+9 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6389760 966254004:2000081403:1-3-8:HPUX-10:wilde13:7397376
+9 >> tst_timer :: nepomuck.mathematik.uni-kl.de:502 966254004:2000081403:1-3-8:HPUX-10:wilde13:894
+10 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:400945 966254004:2000081403:1-3-8:HPUX-10:wilde13:385881
+10 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001 966254004:2000081403:1-3-8:HPUX-10:wilde13:7682317
+10 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6512640 966254004:2000081403:1-3-8:HPUX-10:wilde13:7749632
+10 >> tst_timer :: nepomuck.mathematik.uni-kl.de:1099 966254004:2000081403:1-3-8:HPUX-10:wilde13:1031
+11 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:404981 966254004:2000081403:1-3-8:HPUX-10:wilde13:388885
+11 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001 966254004:2000081403:1-3-8:HPUX-10:wilde13:7682317
+11 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6504448 966254004:2000081403:1-3-8:HPUX-10:wilde13:7720960
+11 >> tst_timer :: nepomuck.mathematik.uni-kl.de:83 966254004:2000081403:1-3-8:HPUX-10:wilde13:110
+12 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:432913 966254004:2000081403:1-3-8:HPUX-10:wilde13:413509
+12 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001 966254004:2000081403:1-3-8:HPUX-10:wilde13:7682317
+12 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6483968 966254004:2000081403:1-3-8:HPUX-10:wilde13:7720960
+12 >> tst_timer :: nepomuck.mathematik.uni-kl.de:295 966254004:2000081403:1-3-8:HPUX-10:wilde13:456
+13 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:458217 966254004:2000081403:1-3-8:HPUX-10:wilde13:434381
+13 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001 966254004:2000081403:1-3-8:HPUX-10:wilde13:7682317
+13 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6483968 966254004:2000081403:1-3-8:HPUX-10:wilde13:7720960
+13 >> tst_timer :: nepomuck.mathematik.uni-kl.de:231 966254004:2000081403:1-3-8:HPUX-10:wilde13:354
+14 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:485337 966254004:2000081403:1-3-8:HPUX-10:wilde13:458049
+14 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6443001 966254004:2000081403:1-3-8:HPUX-10:wilde13:7682317
+14 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6512640 966254004:2000081403:1-3-8:HPUX-10:wilde13:7720960
+14 >> tst_timer :: nepomuck.mathematik.uni-kl.de:274 966254004:2000081403:1-3-8:HPUX-10:wilde13:421
+15 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:509753 966254004:2000081403:1-3-8:HPUX-10:wilde13:490145
+15 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6770361 966254004:2000081403:1-3-8:HPUX-10:wilde13:8034573
+15 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:6942720 966254004:2000081403:1-3-8:HPUX-10:wilde13:8314880
+15 >> tst_timer :: nepomuck.mathematik.uni-kl.de:731 966254004:2000081403:1-3-8:HPUX-10:wilde13:1290
+16 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:531189 966254004:2000081403:1-3-8:HPUX-10:wilde13:505121
+16 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6786729 966254004:2000081403:1-3-8:HPUX-10:wilde13:8050957
+16 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7176192 966254004:2000081403:1-3-8:HPUX-10:wilde13:8314880
+16 >> tst_timer :: nepomuck.mathematik.uni-kl.de:942 966254004:2000081403:1-3-8:HPUX-10:wilde13:2135
+17 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:556377 966254004:2000081403:1-3-8:HPUX-10:wilde13:524177
+17 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6799005 966254004:2000081403:1-3-8:HPUX-10:wilde13:8063245
+17 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7176192 966254004:2000081403:1-3-8:HPUX-10:wilde13:8314880
+17 >> tst_timer :: nepomuck.mathematik.uni-kl.de:1146 966254004:2000081403:1-3-8:HPUX-10:wilde13:2719
+18 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:586889 966254004:2000081403:1-3-8:HPUX-10:wilde13:557525
+18 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7232757 966254004:2000081403:1-3-8:HPUX-10:wilde13:8710413
+18 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8282112 966254004:2000081403:1-3-8:HPUX-10:wilde13:8912896
+18 >> tst_timer :: nepomuck.mathematik.uni-kl.de:2616 966254004:2000081403:1-3-8:HPUX-10:wilde13:3288
+19 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:611041 966254004:2000081403:1-3-8:HPUX-10:wilde13:573693
+19 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7261401 966254004:2000081403:1-3-8:HPUX-10:wilde13:8739085
+19 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8282112 966254004:2000081403:1-3-8:HPUX-10:wilde13:8912896
+19 >> tst_timer :: nepomuck.mathematik.uni-kl.de:886 966254004:2000081403:1-3-8:HPUX-10:wilde13:1823
+20 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:639601 966254004:2000081403:1-3-8:HPUX-10:wilde13:597333
+20 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7261401 966254004:2000081403:1-3-8:HPUX-10:wilde13:8739085
+20 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8282112 966254004:2000081403:1-3-8:HPUX-10:wilde13:8912896
+20 >> tst_timer :: nepomuck.mathematik.uni-kl.de:457 966254004:2000081403:1-3-8:HPUX-10:wilde13:876
+21 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:635405 966254004:2000081403:1-3-8:HPUX-10:wilde13:593337
+21 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7259721 966254004:2000081403:1-3-8:HPUX-10:wilde13:8737405
+21 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8282112 966254004:2000081403:1-3-8:HPUX-10:wilde13:8912896
+21 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:15052 966254004:2000081403:1-3-8:HPUX-10:wilde13:25629

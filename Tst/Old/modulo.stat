@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: urmel:241690  nepomuck.mathematik.uni-kl.de:243254 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:243234
-1 >> tst_memory_1 :: urmel:250894  nepomuck.mathematik.uni-kl.de:316338 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:316338
-1 >> tst_memory_2 :: urmel:245760  nepomuck.mathematik.uni-kl.de:225280 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:225280
-1 >> tst_timer_1 :: urmel:13  nepomuck.mathematik.uni-kl.de:25 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:4
+1 >> tst_memory_0 :: urmel:241690  nepomuck.mathematik.uni-kl.de:243254 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:243234 966254004:2000081403:1-3-8:HPUX-10:wilde13:243686
+1 >> tst_memory_1 :: urmel:250894  nepomuck.mathematik.uni-kl.de:316338 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:316338 966254004:2000081403:1-3-8:HPUX-10:wilde13:316430
+1 >> tst_memory_2 :: urmel:245760  nepomuck.mathematik.uni-kl.de:225280 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:225280 966254004:2000081403:1-3-8:HPUX-10:wilde13:229376
+1 >> tst_timer_1 :: urmel:13  nepomuck.mathematik.uni-kl.de:25 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:4 966254004:2000081403:1-3-8:HPUX-10:wilde13:11

@@ -1,11 +1,4 @@
-Status Output of tst_status.out
-init >> USER    :lamm
-init >> HOSTNAME:schlupp
-init >> uname -a:HP-UX schlupp A.09.01 A 9000/735
-init >> date    :Thu Dec 16 11:13:51 MEZ 1999
-init >> version :1307
-init >> ticks   :100
-1 >> tst_memory_0 :: schlupp:200517
-1 >> tst_memory_1 :: schlupp:960825
-1 >> tst_memory_2 :: schlupp:909312
-1 >> tst_timer_1 :: schlupp:3269
+1 >> tst_memory_0 :: schlupp:200517 966254004:2000081403:1-3-8:HPUX-10:wilde13:200065
+1 >> tst_memory_1 :: schlupp:960825 966254004:2000081403:1-3-8:HPUX-10:wilde13:960825
+1 >> tst_memory_2 :: schlupp:909312 966254004:2000081403:1-3-8:HPUX-10:wilde13:905216
+1 >> tst_timer_1 :: schlupp:3269 966254004:2000081403:1-3-8:HPUX-10:wilde13:2395

@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:332137  topgun:342969 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:332049
-1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:495529  topgun:507805 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:495529
-1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:495616  topgun:503808 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:495616
-1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:166  topgun:36 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:55
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:332137  topgun:342969 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:332049 966254004:2000081403:1-3-8:HPUX-10:wilde13:332505
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:495529  topgun:507805 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:495529 966254004:2000081403:1-3-8:HPUX-10:wilde13:495773
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:495616  topgun:503808 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:495616 966254004:2000081403:1-3-8:HPUX-10:wilde13:479232
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:166  topgun:36 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:55 966254004:2000081403:1-3-8:HPUX-10:wilde13:74
