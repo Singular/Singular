@@ -1954,15 +1954,7 @@ static poly kBucketGcd(kBucket* b, ring r)
 }
 
 
-struct find_erg{
-  poly expand;
-  int expand_length;
-  int to_reduce_u;
-  int to_reduce_l;
-  int reduce_by;//index of reductor
-  BOOLEAN fromS;//else from los
 
-};
 static int guess_quality(const red_object & p, calc_dat* c){
   //looks only on bucket
   if (c->is_char0) return kSBucketLength(p.bucket);
@@ -2309,7 +2301,13 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 //     Print("fromS:%i\n",erg.fromS);
     if(erg.reduce_by<0) break;
     multi_reduction_lls_trick(los,losl,c,erg);
-    //erweitern? muß noch implementiert werden
+    int sum=0;
+    BOOLEAN join=FALSE;
+    for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
+      if(!los[i].sum) sum++;
+      if (sum>=AC_NEW_MIN) {join=TRUE;break;}
+    }
+    
     int i;
     int len;
     poly reductor;
@@ -2340,11 +2338,12 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 				  strat->kNoether);
        nDelete(&coef);
        los[i].p = kBucketGetLm(los[i].bucket);
-       if(los[i].p!=NULL)
-	 if((i>0)&&(los[i-1].p!=NULL)&&(pLmEqual(los[i-1].p,los[i].p)))
-	     los[i].sev=los[i-1].sev;
-	 else
-	   los[i].sev=pGetShortExpVector(los[i].p);
+//        if(los[i].p!=NULL)
+// 	 if((i>0)&&(los[i-1].p!=NULL)&&(pLmEqual(los[i-1].p,los[i].p)))
+// 	     los[i].sev=los[i-1].sev;
+// 	 else
+// 	   los[i].sev=pGetShortExpVector(los[i].p);
+       los[i].validate();
        //better would be first sorting before sev
     }
  
@@ -2401,16 +2400,21 @@ void red_object::validate(){
     if ((lm_ac==NULL)||((lm!=NULL) && (pLmCmp(lm,lm_ac)!=-1))){
       flatten();
       p=kBucketGetLm(bucket);
+      sev=pGetShortExpVector(p);
     } 
     else
     {
+ 
       p=lm_ac;
+      assume(sum->ac->sev==pGetShortExpVector(p));
+      sev=sum->ac->sev;
     }
     
   }
-  else
+  else{
     p=kBucketGetLm(bucket);
-
+    sev=pGetShortExpVector(p);
+  }
 }
 int red_object::clear_to_poly(){
   flatten();
@@ -2421,30 +2425,6 @@ int red_object::clear_to_poly(){
 void red_object::reduction_step(int reduction_id, poly reductor_full, int full_len, poly reductor_part, reduction_accumulator* join_to, calc_dat* c)
 {
   //we have to add support later for building new sums at this points, this involves a change in the interface
-  if(this->sum==NULL)
-    kBucketPolyRed(this->bucket,reductor_full,
-		   full_len,
-		   c->strat->kNoether);
-  else 
-  {
-    assume(sum->ac!=NULL);
-    if(sum->ac->last_reduction_id!=reduction_id){
-      
-
-
-      
-      
-      number n1=kBucketPolyRed(sum->ac->bucket,reductor_full, full_len, c->strat->kNoether);
-      number n2=nMult(n1,sum->ac->multiplied);
-      nDelete(&sum->ac->multiplied);
-      nDelete(&n1);
-      sum->ac->multiplied=n2;
-    }
-      //reduce and adjust multiplied
-      sum->ac->last_reduction_id=reduction_id;
-      
-  }
-    
       
 }
   
@@ -2479,3 +2459,65 @@ int red_object::guess_quality(calc_dat* c){
     }
     return s;
 }
+void reduction_step::reduce(red_object* r, int l, int u){}
+void simple_reducer::reduce(red_object* r, int l, int u){
+  int i;
+  for(i=l;i<=u;i++){
+    if(r[i].sum==NULL)
+      kBucketPolyRed(r[i].bucket,p,
+		     p_len,
+		     c->strat->kNoether);
+    else 
+    {
+      assume(r[i].sum->ac!=NULL);
+      if(r[i].sum->ac->last_reduction_id!=reduction_id){
+	number n1=kBucketPolyRed(r[i].sum->ac->bucket,p, p_len, c->strat->kNoether);
+	number n2=nMult(n1,r[i].sum->ac->multiplied);
+	nDelete(&r[i].sum->ac->multiplied);
+	nDelete(&n1);
+	r[i].sum->ac->multiplied=n2;
+      }
+      //reduce and adjust multiplied
+      r[i].sum->ac->last_reduction_id=reduction_id;
+      
+    }
+ 
+  }
+  for(i=l;i<=u;i++)
+    r[i].validate();
+}
+reduction_step::~reduction_step(){}
+simple_reducer::~simple_reducer(){
+  if(fill_back!=NULL)
+  {
+    kBucketInit(fill_back,p,p_len);
+  }
+    
+}
+void finalize_reduction_step(reduction_step* r){
+  delete r;
+}
+reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c){
+  static int id=0;
+  id++;
+  
+  simple_reducer* pointer= new simple_reducer();
+ 
+  if (erg.fromS){
+    pointer->p=c->strat->S[erg.reduce_by];
+    pointer->p_len=c->strat->lenS[erg.reduce_by];
+    pointer->fill_back=NULL;
+  }
+  else
+  {
+    kBucket_pt bucket=r[erg.reduce_by].bucket;
+    kBucketClear(bucket,&pointer->p,&pointer->p_len);
+
+    pointer->fill_back=bucket;
+  }
+
+  pointer->reduction_id=id;
+  pointer->c=c;
+ 
+  return pointer;
+};

@@ -24,6 +24,7 @@
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
 #define PAR_N 1000
+#define AC_NEW_MIN 5
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 struct sorted_pair_node{
@@ -47,6 +48,8 @@ class reduction_accumulator{
   number multiplied;
   ///the polynomial data
   kBucket_pt bucket;
+  /// the short exponent vector
+  unsigned long sev;
   /// the reference counter
   int counter;
   /// decrease the reference counter, at 0 it deletes the object
@@ -114,10 +117,10 @@ class red_object{
   unsigned long sev;
   void flatten();
   void validate();
-  void red_object::reduction_step(int reduction_id, poly reductor_full, int full_len, poly reductor_part, reduction_accumulator* join_to, calc_dat* c);
+  void reduction_step(int reduction_id, poly reductor_full, int full_len, poly reductor_part, reduction_accumulator* join_to, calc_dat* c);
   void adjust_coefs(number c_r, number c_ac_r);
   int guess_quality(calc_dat* c);
-  int red_object::clear_to_poly();
+  int clear_to_poly();
 };
 
 
@@ -163,5 +166,40 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c);
 static sorted_pair_node* quick_pop_pair(calc_dat* c);
 static sorted_pair_node* top_pair(calc_dat* c);
 static int quality(poly p, int len, calc_dat* c);
+/**
+   makes on each red_object in a region a single_step
+ **/
+class reduction_step{
+ public:
+  /// we assume hat all occuring red_objects have same lm, and all
+  /// occ. lm's in r[l...u] are the same, only reductor does not occur
+  virtual void reduce(red_object* r, int l, int u);
+  //int reduction_id;
+  virtual ~reduction_step();
+  calc_dat* c;
+  int reduction_id;
+};
+class simple_reducer:public reduction_step{
+ public:
+  poly p;
+  kBucket_pt fill_back;
+  int p_len;
 
+  void reduce(red_object* r, int l, int u);
+  ~simple_reducer();
+};
+//class sum_canceling_reducer:public reduction_step {
+//  void reduce(red_object* r, int l, int u);
+//};
+struct find_erg{
+  poly expand;
+  int expand_length;
+  int to_reduce_u;
+  int to_reduce_l;
+  int reduce_by;//index of reductor
+  BOOLEAN fromS;//else from los
+
+};
+
+reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c);
 #endif
