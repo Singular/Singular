@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.38 2001-10-09 16:36:25 Singular Exp $ */
+/* $Id: syz0.cc,v 1.39 2002-01-14 14:21:59 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -216,7 +216,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
 /*----------------construction of the new ordering----------*/
   if (rkF>0)
     rSetSyzComp(rkF);
-  else
+  else 
     rSetSyzComp(1);
 /*----------------creating S--------------------------------*/
   for(j=0;j<Fl;j++)
@@ -856,7 +856,7 @@ static void syPrintResolution(resolvente res,int start,int length)
     idTest(res[start]);
     //idPrint(res[start]);
     start++;
-  }
+  }  
 }
 
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
@@ -1008,18 +1008,21 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
 
 syStrategy sySchreyer(ideal arg, int maxlength)
 {
+  int rl;
+  resolvente fr = sySchreyerResolvente(arg,maxlength,&(rl));
+  if (fr==NULL) return NULL;
+
   int typ0;
   syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
-
-  resolvente fr = sySchreyerResolvente(arg,maxlength,&(result->length));
-  result->fullres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
-  for (int i=result->length-1;i>=0;i--)
+  result->length=rl;
+  result->fullres = (resolvente)omAlloc0((rl /*result->length*/+1)*sizeof(ideal));
+  for (int i=rl /*result->length*/-1;i>=0;i--)
   {
     if (fr[i]!=NULL)
       result->fullres[i] = fr[i];
       fr[i] = NULL;
   }
-  omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
+  omFreeSize((ADDRESS)fr,(rl /*result->length*/)*sizeof(ideal));
   return result;
 }
 
