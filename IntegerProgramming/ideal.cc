@@ -249,7 +249,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
 
 #ifdef _SHORT_
 
-      if(((A.H)[j][k]>SHRT_MAX) || ((A.H)[j][k]<SHRT_MIN))
+      if(((A.H)[j][k]>(const BigInt &)SHRT_MAX) || ((A.H)[j][k]<(const BigInt &)SHRT_MIN))
       {
         cerr<<"\nWARNING: ideal& ideal::Pottier_ideal(matrix&, const "
           "term_ordering&):\n"
@@ -373,7 +373,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
 
 #ifdef _SHORT_
 
-      if(((A.H)[j][k]>SHRT_MAX) || ((A.H)[j][k]<SHRT_MIN))
+      if(((A.H)[j][k]>(const BigInt &)SHRT_MAX) || ((A.H)[j][k]<(const BigInt &)SHRT_MIN))
       {
         cerr<<"\nWARNING: ideal& ideal::Hosten_Sturmfels_ideal(matrix&, const "
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
@@ -495,7 +495,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
 
 #ifdef _SHORT_
 
-      if(((A.H)[j][k]>SHRT_MAX) || ((A.H)[j][k]<SHRT_MIN))
+      if(((A.H)[j][k]>(const BigInt &)SHRT_MAX) || ((A.H)[j][k]<(const BigInt &)SHRT_MIN))
       {
         cerr<<"\nWARNING: ideal& ideal::DiBiase_Urbanke_ideal(matrix&, const "
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
@@ -616,7 +616,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
 
 #ifdef _SHORT_
 
-      if(((A.H)[j][k]>SHRT_MAX) || ((A.H)[j][k]<SHRT_MIN))
+      if(((A.H)[j][k]>(const BigInt &)SHRT_MAX) || ((A.H)[j][k]<(const BigInt &)SHRT_MIN))
       {
         cerr<<"\nWARNING: ideal& ideal::Bigatti_LaScala_Robbiano_ideal"
           "(matrix&, const term_ordering&):\nLLL-reduced kernel basis does "
