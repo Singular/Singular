@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.26 1998-03-12 10:28:56 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.27 1998-06-29 14:37:16 schmidt Exp $ */
 
 #include <config.h>
 
@@ -48,38 +48,8 @@ initCanonicalForm( void )
 //}}}
 
 //{{{ constructors, destructors, selectors
-CanonicalForm::CanonicalForm() : value( CFFactory::basic( (int)0 ) )
-{
-}
-
-CanonicalForm::CanonicalForm( const int i ) : value( CFFactory::basic( i ) )
-{
-}
-
-CanonicalForm::CanonicalForm( const CanonicalForm & cf ) : value( is_imm( cf.value ) ? cf.value : cf.value->copyObject() )
-{
-}
-
-CanonicalForm::CanonicalForm( InternalCF * cf ) : value( cf )
-{
-}
-
-CanonicalForm::CanonicalForm( const Variable & v ) : value( CFFactory::poly( v ) )
-{
-}
-
-CanonicalForm::CanonicalForm( const Variable & v, int e ) : value( CFFactory::poly( v, e ) )
-{
-}
-
 CanonicalForm::CanonicalForm( const char * str ) : value( CFFactory::basic( str ) )
 {
-}
-
-CanonicalForm::~CanonicalForm()
-{
-    if ( (! is_imm( value )) && value->deleteObject() )
-	delete value;
 }
 
 InternalCF*
@@ -102,32 +72,6 @@ CanonicalForm::deepCopy() const
 //}}}
 
 //{{{ predicates
-bool
-CanonicalForm::isOne() const
-{
-    if ( is_imm( value ) == FFMARK )
-	return imm_isone_p( value );
-    else  if ( is_imm( value ) == GFMARK )
-	return imm_isone_gf( value );
-    else  if ( is_imm( value ) )
-	return imm_isone( value );
-    else
-	return value->isOne();
-}
-
-bool
-CanonicalForm::isZero() const
-{
-    if ( is_imm( value ) == FFMARK )
-	return imm_iszero_p( value );
-    else  if ( is_imm( value ) == GFMARK )
-	return imm_iszero_gf( value );
-    else  if ( is_imm( value ) )
-	return imm_iszero( value );
-    else
-	return value->isZero();
-}
-
 bool
 CanonicalForm::isImm() const
 {
@@ -584,26 +528,6 @@ CanonicalForm::den () const
 //}}}
 
 //{{{ assignment operators
-CanonicalForm &
-CanonicalForm::operator = ( const CanonicalForm & cf )
-{
-    if ( this != &cf ) {
-	if ( (! is_imm( value )) && value->deleteObject() )
-	    delete value;
-	value = (is_imm( cf.value )) ? cf.value : cf.value->copyObject();
-    }
-    return *this;
-}
-
-CanonicalForm &
-CanonicalForm::operator = ( const int cf )
-{
-    if ( (! is_imm( value )) && value->deleteObject() )
-	delete value;
-    value = CFFactory::basic( cf );
-    return *this;
-}
-
 CanonicalForm &
 CanonicalForm::operator += ( const CanonicalForm & cf )
 {
@@ -1412,80 +1336,6 @@ operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 	    return rhs.value->comparecoeff( lhs.value ) > 0;
     else
 	return lhs.value->level() < rhs.value->level();
-}
-//}}}
-
-//{{{ arithmetic operators
-CanonicalForm
-operator - ( const CanonicalForm & cf )
-{
-    CanonicalForm result( cf );
-    int what = is_imm( result.value );
-    if ( what == FFMARK )
-	result.value = imm_neg_p( result.value );
-    else  if ( what == GFMARK )
-	result.value = imm_neg_gf( result.value );
-    else  if ( what )
-	result.value = imm_neg( result.value );
-    else
-	result.value = result.value->neg();
-    return result;
-}
-
-CanonicalForm
-operator + ( const CanonicalForm &c1, const CanonicalForm &c2 )
-{
-    CanonicalForm result( c1 );
-    result += c2;
-    return result;
-}
-
-CanonicalForm
-operator - ( const CanonicalForm &c1, const CanonicalForm &c2 )
-{
-    CanonicalForm result( c1 );
-    result -= c2;
-    return result;
-}
-
-CanonicalForm
-operator * ( const CanonicalForm &c1, const CanonicalForm &c2 )
-{
-    CanonicalForm result( c1 );
-    result *= c2;
-    return result;
-}
-
-CanonicalForm
-operator / ( const CanonicalForm &c1, const CanonicalForm &c2 )
-{
-    CanonicalForm result( c1 );
-    result /= c2;
-    return result;
-}
-
-CanonicalForm
-div ( const CanonicalForm &c1, const CanonicalForm &c2 )
-{
-    CanonicalForm result( c1 );
-    result.div( c2 );
-    return result;
-}
-
-CanonicalForm
-mod ( const CanonicalForm &c1, const CanonicalForm &c2 )
-{
-    CanonicalForm result( c1 );
-    result.mod( c2 );
-    return result;
-}
-
-CanonicalForm
-operator % ( const CanonicalForm &c1, const CanonicalForm &c2 )
-{
-    CanonicalForm result( c1 );
-    result %= c2;
-    return result;
 }
 //}}}
 
