@@ -1,11 +1,11 @@
 Status Output of tst_status.out
 init >> USER    :mschulze
-init >> HOSTNAME:urmel
-init >> uname -a:HP-UX urmel A.09.01 A 9000/735 2007379207 two-user license
-init >> date    :Tue Jun  1 14:14:10 METDST 1999
+init >> HOSTNAME:wilde13
+init >> uname -a:HP-UX wilde13 B.10.20 A 9000/780 2000149616 two-user license
+init >> date    :Wed Jun 16 20:22:43 METDST 1999
 init >> version :1303
 init >> ticks   :100
-1 >> tst_memory_0 :: urmel:180999
-1 >> tst_memory_1 :: urmel:477239
-1 >> tst_memory_2 :: urmel:536576
-1 >> tst_timer_1 :: urmel:501
+1 >> tst_memory_0 :: wilde13:181574
+1 >> tst_memory_1 :: wilde13:470450
+1 >> tst_memory_2 :: wilde13:565248
+1 >> tst_timer_1 :: wilde13:244
