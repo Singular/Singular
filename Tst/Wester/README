@@ -1,0 +1,41 @@
+These are the tests from the Lewis/Wester test suite for polynomial
+systems. Some details of Singular's performance:
+
+A:	divide factorials		ok
+B:	sum 1/i				ok
+C:	gcd (big integers)		ok
+D:	sum rational functions		ok
+E:	sum rational functions		ok
+F:	gcd(2 var polys)		ok
+G:	gcd(3 var polys)		ok
+G_p:	G mod 181			ok
+H:	det (Hilbert(80))		with bareiss ok
+I:	invert(Hilbert(40))		with inverse ok
+J:	check I				ok
+K:	invert(Hilbert(70))		with inverse ok
+L:	check K				ok
+M1:	det(sparse, rank 26, 5 var)	ok	
+M2:	det(sparse, rank 101, 5 var)	ok
+N:	subst algebraic numbers		no chance
+O1:	3 dets (sparse, rank 15, 22 var)	ok
+O2:	gcd of					???
+P:	det(sparse, rank 101, rationals)	ok
+P':	det(less sparse, rank 101, rationals)	ok
+Q:	det(sparse, rank 101, 1-var)		ok
+Q':	det(less sparse, rank 101, 1-var)	ok
+Pp:     P mod 181			ok
+P'p:	P' mod 181			ok
+Qp:	Q mod 181			ok
+Q'p:	Q' mod 181			ok
+S:	Hermite form			N/A
+T:	Hermite form			N/A
+U:	Smith form			N/A
+V:	Smith form			N/A
+W1:	Smith form			N/A
+W2:	Smith form			N/A
+X:	gcd(Galousfield, minpoly)	very long
+Y:	det(Galousfield, minpoly)	ok
+
+For the original stuff tey used ot benchmark singular, see 'singall'.
+For mupad and maple sources, see 'mupadall', 'mapleall'.
+For more details, see also www.fordham.edu/lewis/cacomp.html
