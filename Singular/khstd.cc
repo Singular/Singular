@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.7 1998-09-24 09:59:46 Singular Exp $ */
+/* $Id: khstd.cc,v 1.8 1998-12-15 10:06:47 pohl Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven kStd
 */
@@ -41,15 +41,16 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
 {
   intvec *newhilb;
   int deg,l,ln,mw;
-  pFDegProc degp=pFDeg;
-  if (pFDeg!=kModDeg) { degp=pTotaldegree;}//quasihomogen!!
+  pFDegProc degp;
 
   eledeg--;
   if (eledeg == 0)
   {
+    degp=pFDeg;
+    if ((degp!=kModDeg) && (degp!=kHomModDeg)) degp=pWDegree;
     l = hilb->length()-1;
     mw = (*hilb)[l];
-    newhilb = hHstdSeries(strat->Shdl,w,Q);
+    newhilb = hHstdSeries(strat->Shdl,w,strat->kHomW,Q);
     ln = newhilb->length()-1;
     deg = degp(strat->P.p)-mw;
     loop // compare the series in degree deg, try to increase deg -----------

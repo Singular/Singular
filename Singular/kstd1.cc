@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.29 1998-12-09 16:22:15 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.30 1998-12-15 10:06:46 pohl Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1833,14 +1833,26 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
 }
 
 pFDegProc pOldFDeg;
-intvec * kModW;
+intvec * kModW, * kHomW;
 
 int kModDeg(poly p)
 {
-  int o=pTotaldegree(p);//quasihomogen!!
+  int o=pWDegree(p);
   int i=pGetComp(p);
   if (i==0) return o;
   return o+(*kModW)[i-1];
+}
+int kHomModDeg(poly p)
+{
+  int i;
+  int j=0;
+
+  for (i=pVariables;i>0;i--)
+    j+=pGetExp(p,i)*(*kHomW)[i-1];
+  if (kModW == NULL) return j;
+  i = pGetComp(p);
+  if (i==0) return j;
+  return j+(*kModW)[i-1];
 }
 ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
           int newIdeal, intvec *vw)
@@ -1858,6 +1870,16 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   else                 strat->LazyPass=20;
   strat->LazyDegree = 1;
   strat->ak = idRankFreeModule(F);
+  strat->kModW=kModW=NULL;
+  strat->kHomW=kHomW=NULL;
+  if (vw != NULL)
+  {
+    pLexOrder=FALSE;
+    strat->kHomW=kHomW=vw;
+    pOldFDeg = pFDeg;
+    pFDeg = kHomModDeg;
+    toReset = TRUE;
+  }
   if ((h==testHomog)
 #ifdef DRING
   && (!pDRING)
@@ -1870,7 +1892,9 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       w=NULL;
     }
     else
+    {
       h = (tHomog)idHomModule(F,Q,w);
+    }
     //Print("test homog:%d\n",h);
     //if ((h==isHomog)&&(w!=NULL)&&(*w!=NULL))
     //{
@@ -1879,6 +1903,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     //  if (F!=NULL) jjPRINT_MA0(idModule2Matrix(idCopy(F)),sNoName);
     //}
   }
+  pLexOrder=b;
 #ifdef DRING
   if (pDRING) h=isNotHomog;
 #endif
@@ -1886,11 +1911,13 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   {
     if ((w!=NULL) && (*w!=NULL))
     {
-      kModW = *w;
-      strat->kModW = *w;
-      pOldFDeg = pFDeg;
-      pFDeg = kModDeg;
-      toReset = TRUE;
+      strat->kModW = kModW = *w;
+      if (vw == NULL)
+      {
+        pOldFDeg = pFDeg;
+        pFDeg = kModDeg;
+        toReset = TRUE;
+      }
     }
     pLexOrder = TRUE;
     if (hilb==NULL) strat->LazyPass*=2;
