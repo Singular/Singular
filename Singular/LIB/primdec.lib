@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.100 2001-08-27 14:47:58 Singular Exp $";
+version="$Id: primdec.lib,v 1.101 2002-01-21 09:30:10 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -4473,6 +4473,12 @@ EXAMPLE: example primdecSY; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
    }
+   i=simplify(i,2);
+   if (i[1]==0)
+   {
+     list L=list(ideal(0),ideal(0));
+     return(list(L));
+   }  
    if (size(#)==1)
    { return(prim_dec(i,#[1])); }
    else
