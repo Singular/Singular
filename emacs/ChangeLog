@@ -3,6 +3,7 @@
 	* singular.el (singular-internal): Removed bug: Adding of trailing
 	slash crashed if directory was nil
 	(singular-completion-do): Added completion of examples
+	(singular-example): Added (including key-binding and menu item)
 
 1999-09-14  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
 
