@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.15 1998-05-18 20:29:17 wichmann Exp $
+@comment $Id: start.doc,v 1.16 1998-05-19 12:04:04 wichmann Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -32,7 +32,7 @@
 @section Background
 @cindex Background
 
-@sc{Singular} is a computer algebra system for polynomial
+@sc{Singular} is a Computer Algebra system for polynomial
 computations with emphasize on the special needs of commutative
 algebra, algebraic geometry, and singularity theory.  
 
@@ -43,7 +43,7 @@ rationals, floats, algebraic extensions, transcendental extensions) or
 quotient rings with respect to an ideal.
 
 @sc{Singular} features one of the fastest and most general
-implementations of various algorithms for computing Groebner
+implementation of various algorithms for computing Groebner
 resp.@: standard bases. The implementation includes Buchberger's algorithm
 (if the ordering is a wellordering) and Mora's algorithm (if the
 ordering is a tangent cone ordering) as special cases.  Furthermore, it
@@ -51,12 +51,12 @@ provides polynomial factorizations, resultant, characteristic set and
 gcd computations, syzygy and free-resolution computations, and many more
 related functionalities.
 
-Based on an easy-to-use interactive shell and C-like programming
+Based on an easy-to-use interactive shell and a C-like programming
 language, @sc{Singular}'s internal functionality is augmented and
 user-extendible by libraries written in the @sc{Singular} programming
-language. A general and efficient implementation of links as endpoints
-of communications allows @sc{Singular} to make its functionality
-available to and be easily incorporated into other programs.
+language. A general and efficient implementation of communication links
+allows @sc{Singular} to make its functionality available to other
+programs.
 
 @sc{Singular}'s development started in 1984 with an implementation of
 Mora's Tangent Cone algorithms in Modula-2 on an Atari computer (K.P.
@@ -65,7 +65,7 @@ Neuendorf, G. Pfister,
 H.@: Schoenemann; Humboldt-Universitaet
 @end ifinfo
 @tex
-Sch\"onemann; Humboldt-Universit\"at
+H.@: Sch\"onemann; Humboldt-Universit\"at
 @end tex
 zu Berlin).  The need for a new system arose from the investigation of
 mathematical problems coming from singularity theory which none of the
@@ -106,16 +106,15 @@ problems using @sc{Singular}.
 @subsubheading For the systematic user
 In @ref{General concepts}, all basic concepts which are important to use
 and understand @sc{Singular} are developed.  But even for users
-preferring the systematic it will be helpful to have a look at the
-examples in @ref{Getting started}, every now and then.
-
-The topics in this chapter are organized more or less in the order the
-novice user has to deal with them.
+preferring the systematic approach it will be helpful to have a look at
+the examples in @ref{Getting started}, every now and then. The topics in
+the chapter are organized more or less in the order the novice user has
+to deal with them.
 
 @itemize @bullet
 @item
-In @ref{Interactive use}, and its subsections there are again some words
-on entering and exiting @sc{Singular}, followed by a number of other
+In @ref{Interactive use}, and its subsections there are some words on
+entering and exiting @sc{Singular}, followed by a number of other
 aspects concerning the interactive user-interface.
 
 @item
@@ -170,6 +169,39 @@ lexicographical ordering'' one should refer to this chapter.
 @ref{SINGULAR libraries}, and @ref{Library function index} lists the
 libraries which come with @sc{Singular} and the functions contained in
 them, resp.
+
+@subsubheading Typograhpical conventions
+Throughout this manual, the following typographical conventions are
+adopted:
+
+@itemize @bullet
+@item 
+text in @code{typewriter} denotes @sc{Singular} input and output as well 
+as reserved names:
+@itemize @asis
+@item The basering can be set using the command @code{setring}.
+@end itemize
+@item
+the arrow @expansion{} denotes @sc{Singular} output:
+@itemize @asis
+@item @code{poly p=x+y+z;}
+@item @code{p*p;}
+@item @code{@expansion{} x2+2xy+y2+2xz+2yz+z2}
+@end itemize
+@item
+square brackets are used to denote parts of syntax descriptions which
+are optional: 
+@itemize @asis
+[optional_text] required_text
+@end itemize
+@item 
+keys are denoted using typewriter: 
+@itemize @asis
+@item @code{N}
+@item @code{RETURN}
+@item @code{CTRL-P} (press control key together with the key @code{P})
+@end itemize
+@end itemize
 
 @c ------------------------------------------------------------------
 @node Getting started,  , How to use this manual, Introduction
