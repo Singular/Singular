@@ -126,9 +126,9 @@ sharedist: ${SINGULAR}
 	${MKINSTALLDIRS} ${TMPDIR}/Singular/doc/${S_VERSION}
 	${MKINSTALLDIRS} ${TMPDIR}/Singular/html/${S_VERSION}
 	${MKINSTALLDIRS} ${TMPDIR}/info
-	${MKINSTALLDIRS} ${TMPDIR}/LIB/gftables
+	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/gftables
 	cp Singular/LIB/*.lib ${TMPDIR}/Singular/LIB/${S_VERSION}
-	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/LIB/gftables
+	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/Singular/LIB/gftables
 	cd ${TMPDIR}/Singular/LIB/${S_VERSION}; \
 		${LN_S} ../gftables .
 	cp doc/singular.hlp doc/singular.ps doc/usercard.ps \
@@ -146,7 +146,7 @@ sharedist: ${SINGULAR}
            tar -cf sing.tar Singular info; \
            gzip sing.tar
 	cp ${TMPDIR}/sing.tar.gz ${SHAREDIST_NAME}.tar.gz
-	rm -rf ${TMPDIR}
+#	rm -rf ${TMPDIR}
 
 win-sharedist:
 	export SINGULAR_VERSION=${SINGULAR_DOS_VERSION} && ${MAKE} sharedist
