@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.283 2002-06-26 11:24:17 Singular Exp $ */
+/* $Id: iparith.cc,v 1.284 2003-01-27 13:05:05 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1584,7 +1584,8 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
 {
-  int p0=ABS((int)u->Data()),p1=ABS((int)v->Data());
+  int uu=(int)u->Data();int vv=(int)v->Data();
+  int p0=ABS(uu),p1=ABS(vv);
   int f0 = 1, f1 = 0, g0 = 0, g1 = 1, q, r;
 
   while ( p1!=0 )
@@ -1599,8 +1600,8 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   }
   int a = f0;
   int b = g0;
-  if ( (int)u->Data() < 0 ) a=-a;
-  if ( (int)v->Data() < 0 ) b=-b;
+  if ( uu /*(int)u->Data()*/ < 0 ) a=-a;
+  if ( vv /*(int)v->Data()*/ < 0 ) b=-b;
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
   L->m[0].rtyp=INT_CMD;   L->m[0].data=(void *)p0;
@@ -1736,7 +1737,8 @@ static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 {
-  int p0=ABS((int)u->Data()),p1=ABS((int)v->Data());
+  int uu=(int)u->Data();int vv=(int)v->Data();
+  int p0=ABS(uu),p1=ABS(vv);
   int r;
 
   while ( p1!=0 )
