@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.62 1999-10-18 17:56:20 siebert Exp $ */
+/* $Id: ideals.cc,v 1.63 1999-10-19 11:41:40 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1073,6 +1073,7 @@ ideal idFreeModule (int i)
   {
     h->m[j] = pOne();
     pSetComp(h->m[j],j+1);
+    pSetmComp(h->m[j]);
   }
   return h;
 }
@@ -1119,9 +1120,10 @@ ideal idSect (ideal h1,ideal h2)
         temp->m[k] = pPermPoly(first->m[i],NULL,orig_ring,NULL,0);
       q = pOne();
       pSetComp(q,i+1+length);
+      pSetmComp(q);
       if (flength==0) pShift(&(temp->m[k]),1);
       p = temp->m[k];
-      while (pNext(p)) pIter(p);
+      while (pNext(p)!=NULL) pIter(p);
       pNext(p) = q;
       k++;
     }
@@ -1165,6 +1167,7 @@ ideal idSect (ideal h1,ideal h2)
         pNext(p) = NULL;
         k = pGetComp(p)-1-length;
         pSetComp(p,0);
+        pSetmComp(p);
         result->m[j] = pAdd(result->m[j],pMult(pCopy(first->m[k]),p));
         p = q;
       }
@@ -1639,6 +1642,7 @@ ideal idSyzMin (ideal h1,ideal  quot, tHomog h,intvec **w,
       {
         j = pGetComp(p);
         pSetComp(p,(*reord)[j]);
+        pSetmComp(p);
         pIter(p);
       }
       ee->m[i-1] = pOrdPolyMerge(ee->m[i-1]);
@@ -1711,6 +1715,7 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
           pNext(p) = NULL;
           t=pGetComp(p);
           pSetComp(p,0);
+          pSetmComp(p);
           MATELEM(*ma,t-k,i+2) = pAdd(MATELEM(*ma,t-k,i+2),p);
         }
         else
@@ -1950,9 +1955,10 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsSB, BOOLEAN resultIsIdeal)
     }
   }
   kmax = j*k+1;
+  pSetSyzComp(kmax-1);
   p = pOne();
   pSetComp(p,kmax);
-  pSetSyzComp(kmax-1);
+  pSetmComp(p);
   q = pAdd(q,p);
   h4->m[0] = q;
   if (k2 == 0)
@@ -2832,6 +2838,7 @@ matrix idModule2Matrix(ideal mod)
 //      cp = max(1,pGetComp(h));     // if used for ideals too
       cp = pGetComp(h);
       pSetComp(h,0);
+      pSetmComp(h);
 #ifdef TEST
       if (cp>mod->rank)
       {
@@ -2880,6 +2887,7 @@ matrix idModule2formatedMatrix(ideal mod,int rows, int cols)
       if (cp<=r)
       {
         pSetComp(h,0);
+        pSetmComp(h);
         MATELEM(result,cp,i+1) = pAdd(MATELEM(result,cp,i+1),h);
       }
       else
@@ -3101,6 +3109,7 @@ ideal idModulo (ideal h2,ideal h1)
     temp->m[i] = pCopy(h2->m[i]);
     q = pOne();
     pSetComp(q,i+1+length);
+    pSetmComp(q);
     if(temp->m[i]!=NULL)
     {
       if (slength==0) pShift(&(temp->m[i]),1);
@@ -3430,11 +3439,16 @@ ideal idMinEmbedding(ideal arg)
         while ((p!=NULL) && (pNext(p)!=NULL))
         {
           pSetComp(p,(*indexMap)[pGetComp(p)]);
+          pSetmComp(p);
           while ((pNext(p)!=NULL) && ((*toKill)[pGetComp(pNext(p))]==1))
             pDelete1(&pNext(p));
           pIter(p);
         }
-        if (p!=NULL) pSetComp(p,(*indexMap)[pGetComp(p)]);
+        if (p!=NULL)
+        {
+          pSetComp(p,(*indexMap)[pGetComp(p)]);
+          pSetmComp(p);
+        }
       }
       idSkipZeroes(res);
     }
@@ -3466,6 +3480,7 @@ ideal idTransp(ideal a)
       poly h=pHead(p);
       int co=pGetComp(h)-1;
       pSetComp(h,i);
+      pSetmComp(h);
       b->m[co]=pAdd(b->m[co],h);
       pIter(p);
     }
