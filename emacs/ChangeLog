@@ -1,3 +1,40 @@
+Thu Jul 23 10:28:53 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* singular.el (singular): initializes the markers
+	  `comint-last-input-start', `comint-last-input-end', and
+	  `comint-last-output-start'
+	  (singular): goes to point max after Singular startup
+
+	* singular.el (singular-interactive-mode):
+	  `comint-truncate-buffer' is not longer added unconditionally to
+	  `comint-output-filter-functions'
+	  (singular): runs `comint-exec' instead of `make-comint'
+
+	* singular.el (comint-mode): advice removed
+	  (singular-interactive-mode): `comint-mode' is called now in a
+	  more regular way
+
+	* singular.el (singular-debug-output-filter): doc fix
+
+	* singular.el (singular-bogus-output-filter-calls): new variable
+
+	* singular.el (singular-interactive-mode-map): code for XEmacs
+	  added
+
+	* singular.el (singular-emacs-flavor,
+	  singular-emacs-major-version, singular-emacs-minor-version): new
+ 	  variables
+	  (singular-set-version, singular-fset): new functions
+
+	* singular.el (singular-debug-format): new function
+	  (singular-debug-bogus-output-filter-cnt): new variable
+	  (singular-debug-input-filter, singular-debug-output-filter): new
+	  variables
+	  (singular-interactive-mode): conditionally adds debugging
+	  filters
+
+	* singular.el: style and coding conventions added
+
 Wed Jul 22 11:45:56 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* singular.el (singular-interactive-mode):
