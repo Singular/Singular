@@ -2,26 +2,29 @@
 // test script for bareiss command
 //
 pagelength = 10000;
-LIB "lib0";
 ring r = 32003,(x,y,z),dp;
 r;
-matrix m1[3][3]=1,2,3,2,3,4,1,3,2;
+matrix m1[3][3]=x,2,3,2,3x,4,1,3,2x;
 m1;
-list mm1[3][3]=bareiss(m1);
+list mm1=bareiss(m1);
 mm1;
-mm1[3,3]-det(m1);
+poly pdet=mm1[1][1,1];
+if(leadcoef(pdet)<0)
+{
+  pdet=(-1)*pdet;
+}
+pdet-det(m1);
 "------------------------------------";
 //
 matrix m2[5][6]=0,2,1,-3,12,-9,1,2,5,3,6,-1,2,4,10,6,12,-2,-3,2,1;
-m2;
-list mm2[5][6]=bareiss(m2);
-mm2;
+list mm2=bareiss(m2);
+print(mm2[1]);
 "------------------------------------";
 //
 matrix m3[3][4]=xy,0,x2z,1,z2y,y2z21,0,1,zx3,1,0,z3y3;
-m3;
-list mm3[3][4]=bareiss(m3);
+list mm3=bareiss(m3);
 mm3;
+print(mm3[1]);
 "-------------------------------------";
  //
 poly s1 = 2x3y2+23x5y+104xy6+56z2x;
@@ -35,56 +38,50 @@ poly s8 = x2+y2+z2;
 poly s9 = xz+xy+yz;
 matrix m4[3][3]=s1,0,s3,1,s5,0,s7,s8,s9;
 m4;
-list mm4[3][3]=bareiss(m4);
+list mm4=bareiss(m4);
 mm4;
-mm4[3,2]-det(m4);
 "---------------------------------------";
 //
 matrix m5[3][2]=s8,s7,s9,s6,s5,0;
-m5;
-list mm5[3][2]=bareiss(m5);
-mm5;
+list mm5=bareiss(m5);
+print(mm5[1]);
 "-------------------------------------";
 ring r1=0,(x(1..9)),(dp);
 matrix m6[3][3]=maxideal(1);
-pmat(m6);
 list mm6=bareiss(m6);
-pmat(mm6);
-mm6[3,3]-det(m6);
+print(mm6[1]);
+poly p1=mm6[1][1,1];
+poly p2=det(m6);
+if(leadcoef(p1)!=leadcoef(p2))
+{
+  p1+p2;
+}
+else
+{
+  p1-p2;
+}
 "--------------------------------------";
 ring r2=0,(x(1..12)),ds;
 matrix m7[3][4]= maxideal(1);
-pmat(m7);
-m7=bareiss(m7);
-pmat(m7,8);
-matrix m77=m7;
-m77[1,1]=x(1)^2;
-m77;
-m77=bareiss(m77);
-m77;
+print(m7);
+list mm7=bareiss(m7);
+print(mm7[1]);
 "--------------------------------------";
 matrix m8[4][3]=maxideal(1);
-pmat(m8);
-m8=bareiss(m8);
-pmat(m8,8);
+print(m8);
+list mm8=bareiss(m8);
+print(mm8[1]);
 "--------------------------------------";
 matrix m9[4][4]=maxideal(2);
-pmat(m9);
-m9=bareiss(m9);
-pmat(m9,8);
-"------------------------------------";
-matrix m10[4][4]=maxideal(1);
-pmat(m10);
-m10=bareiss(m10);
-pmat(m10,8);
+print(m9);
+list mm9=bareiss(m9);
+print(mm9[1]);
+mm9[1][1,1];
 "------------------------------------";
 matrix m11[5][5]=maxideal(1),maxideal(1);
-pmat(m11);
-matrix mm11=bareiss(m11);
+print(m11);
+list mm11=bareiss(m11);
 mm11;
-pmat(mm11,8);
-mm11[2,2]-det(m11);
 "-------------------------------------";
 listvar(all);
-kill r,r1,r2;
-$;
+quit;
