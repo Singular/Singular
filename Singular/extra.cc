@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.215 2005-01-18 15:41:57 Singular Exp $ */
+/* $Id: extra.cc,v 1.216 2005-02-08 12:58:55 bricken Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -56,7 +56,7 @@
 
 #include "walk.h"
 #include "weight.h"
-
+#include "fast_mult.h"
 #ifdef HAVE_SPECTRUM
 #include "spectrum.h"
 #endif
@@ -1729,6 +1729,17 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	res->data=t_rep_gb(r,i);
       res->rtyp=IDEAL_CMD;
       setFlag(res,FLAG_STD);
+      return(FALSE);
+    }
+    else
+      if (strcmp(sys_cmd, "unifastmult")==0)
+    {
+      ring r = currRing;
+      poly f = (poly)h->Data();
+      h=h->next;
+      poly g=(poly)h->Data();
+      res->rtyp=POLY_CMD;
+      res->data=unifastmult(f,g);
       return(FALSE);
     }
     else
