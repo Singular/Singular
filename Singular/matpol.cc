@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.41 2001-04-05 15:41:09 Singular Exp $ */
+/* $Id: matpol.cc,v 1.42 2001-07-16 08:51:48 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -39,7 +39,7 @@ static int mpNextperm(perm * z, int max);
 static poly mpLeibnitz(matrix a);
 static poly minuscopy (poly p);
 static poly pInsert(poly p1, poly p2);
-static poly mpExdiv ( poly m, poly d);
+static poly mpExdiv ( poly m, poly d, poly vars);
 static poly mpSelect (poly fro, poly what);
 
 static void mpPartClean(matrix, int, int);
@@ -840,7 +840,7 @@ matrix mpCoeffProc (poly f, poly vars)
     {
       if (i!=pos_of_1)
       {
-        h = mpExdiv(f, MATELEM(co,1,i));
+        h = mpExdiv(f, MATELEM(co,1,i),vars);
         if (h!=NULL)
         {
           MATELEM(co,2,i) = pAdd(MATELEM(co,2,i), h);
@@ -852,7 +852,7 @@ matrix mpCoeffProc (poly f, poly vars)
         // check monom 1 last:
         if (pos_of_1 != -1)
         {
-          h = mpExdiv(f, MATELEM(co,1,pos_of_1));
+          h = mpExdiv(f, MATELEM(co,1,pos_of_1),vars);
           if (h!=NULL)
           {
             MATELEM(co,2,pos_of_1) = pAdd(MATELEM(co,2,pos_of_1), h);
@@ -870,14 +870,15 @@ matrix mpCoeffProc (poly f, poly vars)
 /*2
 *exact divisor: let d  == x^i*y^j, m is thought to have only one term;
 *    return m/d iff d divides m, and no x^k*y^l (k>i or l>j) divides m
+* consider all variables in vars
 */
-static poly mpExdiv ( poly m, poly d)
+static poly mpExdiv ( poly m, poly d, poly vars)
 {
   int i;
   poly h = pHead(m);
   for (i=1; i<=pVariables; i++)
   {
-    if (pGetExp(d,i) > 0)
+    if (pGetExp(vars,i) > 0)
     {
       if (pGetExp(d,i) != pGetExp(h,i))
       {
@@ -936,7 +937,7 @@ void mpCoef2(poly v, poly mon, matrix *c, matrix *m)
       poly mp=MATELEM(*m,j,i);
       if (mp!=NULL)
       {
-        h = mpExdiv(v, mp /*MATELEM(*m,j,i)*/);
+        h = mpExdiv(v, mp /*MATELEM(*m,j,i)*/, mp);
         if (h!=NULL)
         {
           pSetComp(h,0);
