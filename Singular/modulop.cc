@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.29 2003-01-31 09:14:19 Singular Exp $ */
+/* $Id: modulop.cc,v 1.30 2003-06-03 21:28:57 krueger Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -18,10 +18,10 @@
 #include "ring.h"
 #include "modulop.h"
 
-int npPrimeM=0;
+long npPrimeM=0;
 int npGen=0;
 int npPminus1M=0;
-int npMapPrime;
+long npMapPrime;
 
 #ifdef HAVE_DIV_MOD
 CARDINAL *npInvTable=NULL;
