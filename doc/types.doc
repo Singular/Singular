@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.111 2001-01-18 15:37:26 keilen Exp $
+@comment $Id: types.doc,v 1.112 2001-01-18 16:20:38 keilen Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1963,6 +1963,11 @@ R -> Q
 @end ifinfo
 @end itemize
 
+
+Furthermore, in Singular we allow the mapping from rings 
+with coefficient field Q to rings whose ground fields 
+have finite characteristic:
+
 @itemize @bullet
 @item
 @tex
@@ -1972,9 +1977,6 @@ $Q \rightarrow Z/p$
 Q -> Z/p
 @end ifinfo
 
-Furthermore, in Singular we allow the mapping from rings 
-with coefficient field Q to rings whose ground fields 
-have finite characteristic:
 @item
 @tex
 $Q \rightarrow (Z/p)(a, \ldots)$
