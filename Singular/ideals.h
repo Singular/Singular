@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.17 2000-01-04 15:17:16 siebert Exp $ */
+/* $Id: ideals.h,v 1.18 2000-01-13 14:18:57 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -20,6 +20,7 @@ ideal idInit (int size, int rank=1);
 void idDelete (ideal* h);
   /*- deletes an ideal -*/
 #endif
+void idShow(ideal id);
 void idPrint(ideal id);
   /*- initialise an ideal -*/
 ideal idMaxIdeal (int deg);
@@ -86,9 +87,10 @@ ideal   idSyzygies (ideal h1, tHomog h,intvec **w, BOOLEAN setSyzComp=TRUE,
                     BOOLEAN setRegularity=FALSE, int *deg = NULL);
 ideal   idLiftStd  (ideal h1, matrix *m, tHomog h=testHomog);
 
-ideal   idLift (ideal mod, ideal sumod,BOOLEAN goodShape=FALSE,
-               BOOLEAN isSB=TRUE);
-ideal   idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape=FALSE);
+ideal   idLift (ideal mod, ideal sumod,ideal * rest=NULL,
+             BOOLEAN goodShape=FALSE, BOOLEAN isSB=TRUE,BOOLEAN divide=FALSE);
+ideal   idLiftNonStB (ideal  mod, ideal submod,ideal * rest=NULL,
+             BOOLEAN goodShape=FALSE,BOOLEAN divide=FALSE);
 
 intvec * idMWLift(ideal mod,intvec * weights);
 

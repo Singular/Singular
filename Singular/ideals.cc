@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.81 2000-01-04 15:17:15 siebert Exp $ */
+/* $Id: ideals.cc,v 1.82 2000-01-13 14:18:58 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1608,19 +1608,40 @@ static void idPrepareStd(ideal s_temp, int k)
 *computes a representation of the generators of submod with respect to those
 * of mod
 */
-ideal idLiftNonStB(ideal  mod, ideal submod,BOOLEAN goodShape)
+ideal   idLiftNonStB (ideal  mod, ideal submod,ideal * rest,
+             BOOLEAN goodShape,BOOLEAN divide)
 {
-  return idLift(mod, submod, goodShape, FALSE);
+  return idLift(mod, submod, rest, goodShape, FALSE);
 }
 
 
-ideal idLift(ideal mod,ideal submod,BOOLEAN goodShape, BOOLEAN isSB)
+ideal   idLift (ideal mod, ideal submod,ideal * rest,
+             BOOLEAN goodShape, BOOLEAN isSB,BOOLEAN divide)
 {
   int   lsmod =idRankFreeModule(submod), i, j, k;
+  int ordSgn=currRing->OrdSgn;
+  int comps_to_add=0;
+  poly p;
 
   if (idIs0(mod))
     return idInit(1,mod->rank);
-
+//#define NEW_LIFT
+//#define TEST_LIFT
+#ifdef TEST_LIFT
+//divide=TRUE;
+Print("The module is:\n");
+idPrint(mod);
+Print("The submodule is:\n");
+idPrint(submod);
+#endif
+#ifdef NEW_LIFT
+  if (ordSgn==-1)
+  {
+    comps_to_add = IDELEMS(submod);
+    while ((comps_to_add>0) && (submod->m[comps_to_add-1]==NULL)) 
+      comps_to_add--;
+  }
+#endif
   k=idRankFreeModule(mod);
   if  ((k!=0) && (lsmod==0)) lsmod=1;
   k=max(k,1);
@@ -1644,11 +1665,11 @@ ideal idLift(ideal mod,ideal submod,BOOLEAN goodShape, BOOLEAN isSB)
   if (isSB)
   {
     s_h3 = idCopy(s_mod);
-    idPrepareStd(s_h3, k);
+    idPrepareStd(s_h3, k+comps_to_add);
   }
   else
   {
-    s_h3 = idPrepare(s_mod,(tHomog)FALSE,k,NULL);
+    s_h3 = idPrepare(s_mod,(tHomog)FALSE,k+comps_to_add,NULL);
   }
   if (!goodShape)
   {
@@ -1667,8 +1688,26 @@ ideal idLift(ideal mod,ideal submod,BOOLEAN goodShape, BOOLEAN isSB)
         pShift(&(s_temp->m[j-1]),1);
     }
   }
+#ifdef NEW_LIFT
+  if (ordSgn==-1)
+  {
+    for(j = 0;j<comps_to_add;j++)
+    {
+      p = s_temp->m[j];
+      if (p!=NULL)
+      {
+        while (pNext(p)!=NULL) pIter(p);
+        pNext(p) = pOne();
+        pIter(p);
+        pSetComp(p,1+j+k);
+        pSetmComp(p);
+      }
+    }
+  }
+#endif
   ideal s_result = kNF(s_h3,currQuotient,s_temp,k);
   s_result->rank = s_h3->rank;
+  ideal s_rest = idInit(IDELEMS(s_result),k);
   idDelete(&s_h3);
   idDelete(&s_temp);
 
@@ -1678,32 +1717,61 @@ ideal idLift(ideal mod,ideal submod,BOOLEAN goodShape, BOOLEAN isSB)
     {
       if (pGetComp(s_result->m[j])<=k)
       {
-        if (isSB)
+        if (!divide)
         {
-          WarnS("first module not a standardbasis\n"
-            "// ** or second not a proper submodule");
+          if (isSB)
+          {
+            WarnS("first module not a standardbasis\n"
+              "// ** or second not a proper submodule");
+          }
+          else
+            WerrorS("2nd module lies not in the first");
+          idDelete(&s_result);
+          idDelete(&s_rest);
+          s_result=idInit(IDELEMS(submod),submod->rank);
+          break;
         }
         else
-          WerrorS("2nd module lies not in the first");
-        idDelete(&s_result);
-        s_result=idInit(IDELEMS(submod),submod->rank);
-        break;
+        {
+          p = s_rest->m[j] = s_result->m[j];
+          while ((pNext(p)!=NULL) && (pGetComp(pNext(p))<=k)) pIter(p);
+          s_result->m[j] = pNext(p);
+          pNext(p) = NULL;
+        }
       }
-      else
+      pShift(&(s_result->m[j]),-k);
+      pNeg(s_result->m[j]);
+    }
+  }
+  if ((lsmod==0) && (!idIs0(s_rest)))
+  {
+    for (j=IDELEMS(s_rest);j>0;j--)
+    {
+      if (s_rest->m[j-1]!=NULL)
       {
-        pShift(&(s_result->m[j]),-k);
-        pNeg(s_result->m[j]);
+        pShift(&(s_rest->m[j-1]),-1);
+        s_rest->m[j-1] = pNeg(s_rest->m[j-1]);
       }
     }
   }
-
+#ifdef TEST_LIFT
+Print("The lift is:\n");
+idPrint(s_result);
+Print("The rest is:\n");
+if (s_rest!=NULL) idPrint(s_rest);
+#endif
   if(syz_ring!=orig_ring)
   {
     idDelete(&s_mod);
     rChangeCurrRing(orig_ring,TRUE);
     s_result = idrMoveR_NoSort(s_result, syz_ring);
+    s_rest = idrMoveR_NoSort(s_rest, syz_ring);
     rKill(syz_ring);
   }
+  if (rest!=NULL)
+    *rest = s_rest;
+  else
+    idDelete(&s_rest);
   return s_result;
 }
 

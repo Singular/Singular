@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.199 2000-01-13 10:33:19 Singular Exp $ */
+/* $Id: iparith.cc,v 1.200 2000-01-13 14:18:58 siebert Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1724,6 +1724,7 @@ static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
   ideal m;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
+  //if (currRing->OrdSgn==-1) ul += vl;  //to add if NEW_LIFT defined
   if (hasFlag(u,FLAG_STD))
   {
     m = idLift((ideal)u->Data(),(ideal)v->Data());
