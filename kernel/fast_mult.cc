@@ -399,6 +399,22 @@ static void p_MonMultMB(poly p, poly q,ring r)
   //p->Order += q->Order;
   p_ExpVectorAdd(p,q,r);
 }
+/*3
+* compute for monomials p*q
+* keeps p, q
+* uses bin only available in MCPower
+*/
+static poly p_MonMultCMB(poly p, poly q, ring r)
+{
+  number x;
+  int i;
+  poly res = p_Init(r,lm_bin);
+
+  x = n_Mult(p_GetCoeff(p,r),p_GetCoeff(q,r),r);
+  p_SetCoeff0(res,x,r);
+  p_ExpVectorSum(res,p, q,r);
+  return res;
+}
 static poly p_MonPowerMB(poly p, int exp, ring r)
 {
   int i;
@@ -418,7 +434,7 @@ static poly p_MonPowerMB(poly p, int exp, ring r)
   p_Setm(p,r);
   return p;
 }
-static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_len,kBucket_pt erg_bucket,ring r, number coef, poly & zw, poly tmp){
+static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_len,kBucket_pt erg_bucket,ring r, number coef, poly & zw, poly tmp, poly** term_pot){
  
   int i;
   //  poly term=p_Init(r);
@@ -441,12 +457,14 @@ static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_le
   for(i=0;i<f_len;i++){
     if(exp[i]!=0){
       ///poly term=p_Copy(f_terms[i],r);
-      poly term=tmp;
-      p_ExpVectorCopy(term,f_terms[i],r);
-      p_SetCoeff(term, n_Copy(p_GetCoeff(f_terms[i],r),r),r);
+      poly term=term_pot[i][exp[i]];
+	//tmp;
+	//p_ExpVectorCopy(term,f_terms[i],r);
+	//p_SetCoeff(term, n_Copy(p_GetCoeff(f_terms[i],r),r),r);
+	
       //term->next=NULL;
       
-      p_MonPowerMB(term, exp[i],r);
+      //p_MonPowerMB(term, exp[i],r);
       p_MonMultMB(erg,term,r);
       //p_Delete(&term,r);
     }
@@ -459,7 +477,7 @@ static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_le
 
 
 
-static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp,poly* f_terms,kBucket_pt erg_bucket,int pos,int sum, number coef, poly & zw, poly tmp){
+static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp,poly* f_terms,kBucket_pt erg_bucket,int pos,int sum, number coef, poly & zw, poly tmp, poly** term_pot){
   int i;
 
   if (pos<f_len-1){
@@ -468,7 +486,7 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
       exp[pos]=i;
       number new_coef=n_IntDiv(coef,facult[i],r);
       poly zw_real=NULL;
-      MC_iterate(f, n, r, f_len,facult, exp,f_terms,erg_bucket,pos+1,sum+i,new_coef,zw_real,tmp);
+      MC_iterate(f, n, r, f_len,facult, exp,f_terms,erg_bucket,pos+1,sum+i,new_coef,zw_real,tmp,term_pot);
       if (pos==f_len-2){
 	//get first small polys
 	
@@ -487,7 +505,7 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
     i=n-sum;
     exp[pos]=i;
     number new_coef=n_IntDiv(coef,facult[i],r);
-    buildTermAndAdd(n,facult,f_terms,exp,f_len,erg_bucket,r, new_coef,zw, tmp);
+    buildTermAndAdd(n,facult,f_terms,exp,f_len,erg_bucket,r, new_coef,zw, tmp,term_pot);
     // n_Delete(& new_coef,r);
   }
   assume(pos<=f_len-1);
@@ -517,15 +535,25 @@ poly pFastPowerMC(poly f, int n, ring r){
   int* exp=(int*)omalloc(f_len*sizeof(int));
   //poly f_terms[f_len];
   poly* f_terms=(poly*)omalloc(f_len*sizeof(poly));
+  poly** term_potences=(poly**) omalloc(f_len*sizeof(poly*));
+  
   poly f_iter=f;
   for(i=0;i<f_len;i++){
     f_terms[i]=f_iter;
     f_iter=pNext(f_iter);
   }
+  for(i=0;i<f_len;i++){
+    term_potences[i]=(poly*)omalloc((n+1)*sizeof(poly));
+    term_potences[i][0]=p_ISet(1,r);
+    int j;
+    for(j=1;j<=n;j++){
+      term_potences[i][j]=p_MonMultCMB(f_terms[i],term_potences[i][j-1],r);
+    }
+  }
   assume(f_iter==NULL);
   poly zw=NULL;
   poly tmp=p_Init(r);
-  MC_iterate(f,n,r,f_len,&facult[0], &exp[0], &f_terms[0],erg_bucket,0,0,facult[n],zw,tmp);
+  MC_iterate(f,n,r,f_len,&facult[0], &exp[0], &f_terms[0],erg_bucket,0,0,facult[n],zw,tmp, term_potences);
 
 
 
@@ -538,6 +566,15 @@ poly pFastPowerMC(poly f, int n, ring r){
   for(i=0;i<=n;i++){
     n_Delete(&facult[i],r);
   }
+  int i2;
+  for (i=0;i<f_len;i++){
+    for(i2=0;i2<=n;i2++){
+      p_Delete(&term_potences[i][i2],r);
+    }
+    omfree(term_potences[i]);
+    
+  }
+  omfree(term_potences);
   p_Delete(&tmp,r);
   omfree(exp);
   omfree(facult);
