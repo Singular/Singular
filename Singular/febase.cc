@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.77 1999-08-03 16:33:40 obachman Exp $ */
+/* $Id: febase.cc,v 1.78 1999-08-05 11:28:02 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -330,7 +330,7 @@ void WarnS(const char *s)
   }
   else
 #endif
-  if (feWarn) /* ignore warnings in when optin --no-warn was given */
+  if (feWarn) /* ignore warnings if option --no-warn was given */
   {
     fwrite(warn_str,1,6,stdout);
     fwrite(s,1,strlen(s),stdout);

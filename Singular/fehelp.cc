@@ -845,8 +845,8 @@ static void heEmacsHelp(heEntry hentry)
   WarnS("Your help command could not be executed. Use");
   Warn("C-h C-s %s", 
        (hentry != NULL && *(hentry->node) != '\0' ? hentry->node : "Top"));
-  Warn("to enter the Singular online help.");
-  Warn("For more information on singular-mode under Emacs, type C-h m");
+  Warn("to enter the Singular online help. For general");
+  Warn("information on Singular running under Emacs, type C-h m");
 }
 static BOOLEAN heBuiltinInit(int warn)
 {

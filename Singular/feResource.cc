@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.2 1999-08-04 15:38:25 obachman Exp $ */
+/* $Id: feResource.cc,v 1.3 1999-08-05 11:28:02 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -276,12 +276,12 @@ static char* feInitResource(feResourceConfig config, int warn)
     char* executable = find_executable(config->key);
     if (executable != NULL)
     {
-      config->value = strcpy(value, executable);
+      strcpy(value, executable);
       FreeL(executable);
       if (feVerifyResourceValue(config->type, 
                                 feCleanResourceValue(config->type, value)))
       {
-        config->value = mstrdup(value);
+        config->value = value;
 #ifdef RESOURCE_DEBUG
         printf("feInitResource: Set value of %s to =%s=\n", config->key, config->value);
 #endif
