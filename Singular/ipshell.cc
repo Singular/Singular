@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.88 2004-04-30 09:59:50 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.89 2004-05-20 13:22:57 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4167,14 +4167,6 @@ void rKill(ring r)
       id_Delete(&r->qideal, r);
       r->qideal = NULL;
     }
-    #ifdef HAVE_PLURAL
-    // delete noncommutative extension
-    if (r->nc!=NULL)
-    {
-      if (r->nc->ref>1) r->nc->ref--;
-      else ncKill(r);
-    }
-    #endif
     nKillChar(r);
     int i=1;
     int j;
