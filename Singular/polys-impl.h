@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.3 1997-12-15 22:46:35 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.4 1997-12-16 18:24:00 obachman Exp $ */
 
 /***************************************************************
  *
@@ -52,21 +52,29 @@ struct  spolyrec
      All the traditional routines are prefixed by t_
      
  * COMP_FAST 
-     Implements monomial comparisons using the fast
-     techniques. Undefine in case there are problems. All the fast
-     routines are prefixed by f_
+     Implements monomial operations using the fast vector
+     techniques and several other extensions which go along with that.
+     Undefine in case there are problems. 
      
  * COMP_STATISTIC  
      Provides several routines for accumulating statistics on monomial
-     comparisons
+     comparisons and divisibility tests
      
  * COMP_DEBUG 
-     Turns on debugging of COMP_FAST by comparing the resutsl of fast
+     Turns on debugging of COMP_FAST by comparing the results of fast
      comparison with traditional comparison
 
+ * COMP_NO_EXP_VECTOR_OPS
+    Like COMP_FAST, except that it turns off "vector techniques" of
+    monomial operations, i.e. does everything exponent-wise. 
  ***************************************************************/
 // #define COMP_FAST
+// #define COMP_NO_EXP_VECTOR_OPS
 #define COMP_TRADITIONAL
+
+#if defined(COMP_NO_EXP_VECTOR_OPS) && ! defined(COMP_FAST)
+#define COMP_FAST
+#endif
 
 #if defined(COMP_FAST) && ! defined(NDEBUG)
 #define COMP_DEBUG
@@ -174,7 +182,11 @@ inline void pGetVarIndicies_Lex(int nvars,
     temp = (temp / sizeof(long)) + 1; // now temp == nvars1W
 #ifdef WORDS_BIGENDIAN
   // e_1, e_2, ..., e_n, ..., comp : comp NEEDS TO BE be in last available slot
+#ifndef COMP_NO_EXP_VECTOR_OPS  
   VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
+#else
+  VarCompIndex = nvars;
+#endif  
   VarOffset    = -1;
   VarLowIndex  = 0;
   VarHighIndex = nvars - 1;
@@ -200,7 +212,11 @@ inline void pGetVarIndicies_RevLex(int nvars,
     temp = (temp / sizeof(long)) + 1;
 #ifdef WORDS_BIGENDIAN
   // e_n, .... , e_2, e_1, ..., comp
+#ifndef COMP_NO_EXP_VECTOR_OPS  
   VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
+#else
+  VarCompIndex = nvars;
+#endif  
   VarOffset    = nvars;
   VarLowIndex  = 0;
   VarHighIndex = nvars-1;
@@ -433,11 +449,18 @@ inline void _pMonAddFast(poly p1, poly p2)
   // dirty: the following only works correctly if all exponents are
   // positive and the sum of two exponents does not exceed
   // EXPONENT_MAX
+#ifndef COMP_NO_EXP_VECTOR_OPS  
   Exponent_t c2 = _pGetComp(p2);
   int i = pVariables1W;
   unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
   const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
   _pSetComp(p2, 0);
+#else
+  int i = pVariables;
+  Exponent_pt s1 = &(p1->exp[0]);
+  Exponent_pt s2 = &(p2->exp[0]);
+#endif
+  
   for (;;)
   {
     *s1 += *s2;
@@ -446,7 +469,9 @@ inline void _pMonAddFast(poly p1, poly p2)
     s1++;
     s2++;
   }
+#ifndef COMP_NO_EXP_VECTOR_OPS    
   _pSetComp(p2, c2);
+#endif  
   _pGetOrder(p1) += _pGetOrder(p2);
 }
 
@@ -462,11 +487,18 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   p1->next = p2->next;
   p1->coef = p2->coef;
 
+#ifndef COMP_NO_EXP_VECTOR_OPS
   unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
   const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
   const unsigned long* s3 = (unsigned long*) &(p3->exp[0]);
   const unsigned long* const ub = s3 + pVariables1W;
-
+#else
+  Exponent_t* s1 = (Exponent_t*) &(p1->exp[0]);
+  const Exponent_t* s2 = (Exponent_t*) &(p2->exp[0]);
+  const Exponent_t* s3 = (Exponent_t*) &(p3->exp[0]);
+  const Exponent_t* const ub = s3 + pVariables;
+#endif  
+  
   for (;;)
   {
     *s1 = *s2 + *s3;
@@ -492,10 +524,18 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
   p1->next = p2->next;
   p1->coef = p2->coef;
 
+#ifndef COMP_NO_EXP_VECTOR_OPS
   unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
   const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
   const unsigned long* s3 = (unsigned long*) &(p3->exp[0]);
   const unsigned long* const ub = s3 + pVariables1W;
+#else
+  _pSetComp(p1, 0);
+  Exponent_t* s1 = (Exponent_t*) &(p1->exp[0]);
+  const Exponent_t* s2 = (Exponent_t*) &(p2->exp[0]);
+  const Exponent_t* s3 = (Exponent_t*) &(p3->exp[0]);
+  const Exponent_t* const ub = s3 + pVariables;
+#endif  
 
   for (;;)
   {
@@ -509,6 +549,7 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
 }
 
 
+#ifndef COMP_NO_EXP_VECTOR_OPS
 
 #if SIZEOF_LONG == 4
 
@@ -529,7 +570,6 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
 #endif
 
 #endif
-
 
 inline BOOLEAN __pDivisibleBy(poly a, poly b)
 {
@@ -584,7 +624,40 @@ inline BOOLEAN __pDivisibleBy(poly a, poly b)
 #endif    
   }
 }
+
+#else //  ! COMP_NO_EXP_VECTOR_OPS
+
+inline BOOLEAN __pDivisibleBy(poly a, poly b)
+{
+#ifdef WORDS_BIGENDIAN
+  const Exponent_t* s1 = &(a->exp[pVariables-1]);
+  const Exponent_t* s2 = &(b->exp[pVariables-1]);
+  const Exponent_t* lb = (Exponent_t*) &(a->exp[0]);
+
+  for (;;)
+  {
+    if (*s1 > *s2) return FALSE;
+    if (s1 == lb) return TRUE;
+    s1--;
+    s2--;
+  }
   
+#else // !WORDS_BIGENDIAN
+  const Exponent_t* s1 = &(a->exp[0]);
+  const Exponent_t* s2 = &(b->exp[0]);
+  const Exponent_t* lb = (Exponent_t*) s1 + pVariables;
+
+  for (;;)
+  {
+   if (*s1 > *s2) return FALSE;
+   s1++;
+   if (s1 == lb) return TRUE;
+   s2++;
+  }
+#endif  // WORDS_BIGENDIAN
+}
+
+#endif //  COMP_NO_EXP_VECTOR_OPS
 
 #if defined(PDEBUG) && PDEBUG == 1
 #define _pDivisibleBy(a,b)   pDBDivisibleBy(a, b, __FILE__, __LINE__)
@@ -622,9 +695,16 @@ extern  BOOLEAN pDBDivisibleBy2(poly p1, poly p2, char* f, int l);
   
 DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
 {
+#ifndef COMP_NO_EXP_VECTOR_OPS  
   const long *s1 = (long*) &(p1->exp[0]);
   const long *s2 = (long*) &(p2->exp[0]);
   const long* const lb = s1 + pVariables1W;
+#else
+  const Exponent_t *s1 = (Exponent_t*) &(p1->exp[0]);
+  const Exponent_t *s2 = (Exponent_t*) &(p2->exp[0]);
+  const Exponent_t* const lb = s1 + pVariables;
+  if (_pGetComp(p1) != _pGetComp(p2)) return FALSE;
+#endif  
 
   for(;;)
   {

@@ -1,3 +1,9 @@
+Tue Dec 16 16:59:41 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* polys-impl.h: Introduced COMP_NO_EXP_VECTOR_OPS -- which turns
+	off "vector techniques" of monomial operations, i.e. does
+	everything exponent-wise
+
 Mon Dec 15 23:31:56 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* polys-impl.h: Various small bug - fixes and changes in

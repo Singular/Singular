@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.2 1997-12-15 22:46:35 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.3 1997-12-16 18:23:59 obachman Exp $ */
 
 /***************************************************************
  *
@@ -575,8 +575,6 @@ Exponent_t pPDMultExp(poly p, int v, Exponent_t e, char* f, int l)
 
 #ifdef COMP_FAST
 
-  
-
 // checks whether fast monom add did not overflow
 void pDBMonAddFast(poly p1, poly p2, char* f, int l)
 {
@@ -589,7 +587,7 @@ void pDBMonAddFast(poly p1, poly p2, char* f, int l)
   pGetOrder(ptemp) += pGetOrder(p2);
 
   if (! pEqual(ptemp, p1))
-    Print("Error inpMonAddFast in %s:%d\n", f, l);
+    Print("Error in pMonAddFast in %s:%d\n", f, l);
   pFree1(ptemp);
 }
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.1 1997-12-03 16:58:56 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.2 1997-12-16 18:23:58 obachman Exp $ */
 
 /***************************************************************
  *
@@ -20,6 +20,7 @@
 
 #ifdef WORDS_BIGENDIAN
 
+#ifndef COMP_NO_EXP_VECTOR_OPS
 #define _pMonCmp_1(p1, p2, d, actionD, actionE)              \
 do                                                          \
 {                                                           \
@@ -179,7 +180,75 @@ do                                                          \
   actionE;                                                  \
 }                                                           \
 while(0)
+
+#else // COMP_NO_EXP_VECTOR_OPS
+
+#define _pMonCmp(p1, p2, d, actionD, actionE)   \
+do                                              \
+{                                               \
+  Exponent_pt e1 = &(p1->exp[0]);               \
+  Exponent_pt e2 = &(p2->exp[0]);               \
+  Exponent_pt ub = e1 + pVariables + 1;         \
+                                                \
+  for (;;)                                      \
+  {                                             \
+    d = *e1 - *e2;                              \
+    if (d) actionD;                             \
+    e1++;                                       \
+    if (e1 == ub) actionE;                      \
+    e2++;                                       \
+  }                                             \
+}                                               \
+while(0)
+
+#define _pMonCmp_c(p1, p2, d, actionD, actionE) \
+do                                              \
+{                                               \
+  Exponent_pt e1 = &(p1->exp[0]);               \
+  Exponent_pt e2 = &(p2->exp[0]);               \
+  Exponent_pt ub = e1 + pVariables;             \
+                                                \
+  for (;;)                                      \
+  {                                             \
+    d = *e1 - *e2;                              \
+    if (d) actionD;                             \
+    e1++;                                       \
+    if (e1 == ub)                               \
+    {                                           \
+      d = pGetComp(p2) - pGetComp(p1);          \
+      if (d) actionD;                           \
+      actionE;                                  \
+    }                                           \
+    e2++;                                       \
+  }                                             \
+}                                               \
+while(0)
+
+#define _pMonCmp_1(p1, p2, d, actionD, actionE)  \
+  _pMonCmp(p1, p2, d, actionD, actionE)
+
+#define _pMonCmp_1_c(p1, p2, d, actionD, actionE)  \
+  _pMonCmp_c(p1, p2, d, actionD, actionE)
   
+#define _pMonCmp_2(p1, p2, d, actionD, actionE)  \
+  _pMonCmp(p1, p2, d, actionD, actionE)
+
+#define _pMonCmp_2_c(p1, p2, d, actionD, actionE)  \
+  _pMonCmp_c(p1, p2, d, actionD, actionE)
+  
+#define _pMonCmp_2i(p1, p2, length, d, actionD, actionE) \
+  _pMonCmp(p1, p2, d, actionD, actionE)
+
+#define _pMonCmp_2i_1(p1, p2, length, d, actionD, actionE) \
+  _pMonCmp(p1, p2, d, actionD, actionE)
+
+#define _pMonCmp_2i_c(p1, p2, length, d, actionD, actionE)   \
+  _pMonCmp_c(p1, p2, d, actionD, actionE)
+
+#define _pMonCmp_2i_1_c(p1, p2, length, d, actionD, actionE) \
+  _pMonCmp_c(p1, p2, d, actionD, actionE)
+
+#endif // COMP_NO_EXP_VECTOR_OPS 
 
 #else //  ! WORDS_BIGENDIAN
 

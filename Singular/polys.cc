@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.10 1997-12-15 22:46:36 obachman Exp $ */
+/* $Id: polys.cc,v 1.11 1997-12-16 18:24:00 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -3004,7 +3004,7 @@ poly pSubst(poly p, int n, poly e)
 
   int exponent,i;
   poly h, res, m;
-  short *me,*ee;
+  Exponent_t *me,*ee;
   number nu,nu1;
 
   me=(Exponent_t *)Alloc((pVariables+1)*sizeof(Exponent_t));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys.cc,v 1.5 1997-12-15 22:46:40 obachman Exp $ */
+/* $Id: spolys.cc,v 1.6 1997-12-16 18:24:02 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction for char p
@@ -229,7 +229,7 @@ void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
     {
       a = pNext(a) = pNew();
       spMemcpy(a,p);
-     pMonAddFast(a,m);
+      pMonAddFast(a,m);
       pSetCoeff0(a,npMultM(pGetCoeff(p),exp));
       pIter(p);
     }
@@ -243,7 +243,7 @@ void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
     {
       b = pNext(a) = pNew();
       spMemcpy(b,p);
-     pMonAddFast(b,m);
+      pMonAddFast(b,m);
       if (pComp0(b, spNoether) == -1)
       {
         pFree1(b);
@@ -294,7 +294,7 @@ static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
       {
         b = pNew();
         spMemcpy(b,a1);
-       pMonAddFast(b,m);
+        pMonAddFast(b,m);
       }
       else
       {
@@ -342,7 +342,7 @@ static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
         return;
       }
       spMemcpy(b,a1);
-     pMonAddFast(b,m);
+      pMonAddFast(b,m);
     }
   }
 }

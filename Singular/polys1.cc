@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.9 1997-12-15 22:46:37 obachman Exp $ */
+/* $Id: polys1.cc,v 1.10 1997-12-16 18:24:01 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -917,6 +917,7 @@ poly pOrdPolyInsertSetm(poly p)
     qq->next = NULL;
     pSetm(qq);
     result = pAdd(result,qq);
+    pTest(result);
   }
   return result;
 }
