@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.38 1998-07-21 16:07:46 Singular Exp $
+// $Id: clapsing.cc,v 1.39 1998-07-29 13:55:43 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -526,7 +526,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 #ifdef HAVE_LIBFAC_P
       L = Factorize( F );
 #else
-      return NULL;
+      goto notImpl;
 #endif
     }
   }
@@ -564,15 +564,14 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 #ifdef HAVE_LIBFAC_P
         L = Factorize( F );
 #else
-        return NULL;
+        goto notImpl;
 #endif
       }
     }
   }
   else
   {
-    WerrorS( feNotImplemented );
-    goto end;
+    goto notImpl;
   }
   {
     // the first factor should be a constant
@@ -648,8 +647,10 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       }
     }
   }
-end:
   return res;
+notImpl:
+  WerrorS( feNotImplemented );
+  return NULL;
 }
 
 matrix singclap_irrCharSeries ( ideal I)
@@ -922,9 +923,7 @@ BOOLEAN jjFAC_P(leftv res, leftv u)
 {
   intvec *v=NULL;
   ideal f=singclap_factorize((poly)(u->Data()), &v, 0);
-#ifndef HAVE_LIBFAC_P
   if (f==NULL) return TRUE;
-#endif
   lists l=(lists)Alloc(sizeof(slists));
   l->Init(2);
   l->m[0].rtyp=IDEAL_CMD;

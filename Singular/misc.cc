@@ -591,13 +591,13 @@ BOOLEAN setOption(leftv res, leftv v)
       if (strcmp(n,optionStruct[i].name)==0)
       {
         if (optionStruct[i].setval & validOpts)
-	{
+        {
           test |= optionStruct[i].setval;
           #ifdef HAVE_TCL
           if (tclmode)
             PrintTCLS('O',n);
           #endif
-	}
+        }
         else
           Warn("cannot set option");
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL) && (currRing->ch>=2))

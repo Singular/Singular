@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.61 1998-07-23 15:44:40 Singular Exp $ */
+/* $Id: febase.cc,v 1.62 1998-07-29 13:55:45 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -915,6 +915,7 @@ void WarnS(const char *s)
   {
     PrintTCLS('W',warn_str);
     PrintTCLS('W',s);
+    PrintTCLS('W',"\n");
   }
   else
 #endif

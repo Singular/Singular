@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.42 1998-07-24 16:41:13 Singular Exp $ */
+/* $Id: grammar.y,v 1.43 1998-07-29 13:55:48 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -83,8 +83,24 @@ void yyerror(char * fmt)
   }
   if(inerror==0)
   {
-    Werror( "error occurred in %s line %d: `%s`"
-           ,VoiceName(), yylineno, my_yylinebuf);
+    #ifdef HAVE_TCL
+    if (tclmode)
+    { /* omit output of line number if tclmode and stdin */
+      char *n=VoiceName();
+      if (strcmp(n,"STDIN")==0)
+        Werror( "error occurred in %s: `%s`"
+               ,n, my_yylinebuf);
+      else
+        Werror( "error occurred in %s line %d: `%s`"
+               ,n, yylineno, my_yylinebuf);
+    }
+    else
+    #else
+    {
+      Werror( "error occurred in %s line %d: `%s`"
+             ,VoiceName(), yylineno, my_yylinebuf);
+    }
+    #endif
     if (cmdtok!=0)
     {
       char *s=Tok2Cmdname(cmdtok);
