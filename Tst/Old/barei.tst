@@ -7,20 +7,20 @@ ring r = 32003,(x,y,z),dp;
 r;
 matrix m1[3][3]=1,2,3,2,3,4,1,3,2;
 m1;
-matrix mm1[3][3]=bareiss(m1);
+list mm1[3][3]=bareiss(m1);
 mm1;
 mm1[3,3]-det(m1);
 "------------------------------------";
 //
 matrix m2[5][6]=0,2,1,-3,12,-9,1,2,5,3,6,-1,2,4,10,6,12,-2,-3,2,1;
 m2;
-matrix mm2[5][6]=bareiss(m2);
+list mm2[5][6]=bareiss(m2);
 mm2;
 "------------------------------------";
 //
 matrix m3[3][4]=xy,0,x2z,1,z2y,y2z21,0,1,zx3,1,0,z3y3;
 m3;
-matrix mm3[3][4]=bareiss(m3);
+list mm3[3][4]=bareiss(m3);
 mm3;
 "-------------------------------------";
  //
@@ -35,20 +35,20 @@ poly s8 = x2+y2+z2;
 poly s9 = xz+xy+yz;
 matrix m4[3][3]=s1,0,s3,1,s5,0,s7,s8,s9;
 m4;
-matrix mm4[3][3]=bareiss(m4);
+list mm4[3][3]=bareiss(m4);
 mm4;
 mm4[3,2]-det(m4);
 "---------------------------------------";
 //
 matrix m5[3][2]=s8,s7,s9,s6,s5,0;
 m5;
-matrix mm5[3][2]=bareiss(m5);
+list mm5[3][2]=bareiss(m5);
 mm5;
 "-------------------------------------";
 ring r1=0,(x(1..9)),(dp);
 matrix m6[3][3]=maxideal(1);
 pmat(m6);
-matrix mm6=bareiss(m6);
+list mm6=bareiss(m6);
 pmat(mm6);
 mm6[3,3]-det(m6);
 "--------------------------------------";

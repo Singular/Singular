@@ -18,5 +18,7 @@
   dump(":w example.txt");
   kill r;
   getdump("example.txt");      // get dump from file
+  LIB "general.lib";
+  killall("proc");
   dump("");                    // dump to stdout
 $

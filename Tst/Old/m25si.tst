@@ -19,5 +19,7 @@
   dump("MPfile:w example.mp");  // dump everything to example.mp
   kill basering, s; listvar();  // kill all vars
   getdump("MPfile: example.mp");// get dump from file
+  LIB "general.lib";
+  killall("proc");
   dump("");                     // dump to stdout
 $
