@@ -1,0 +1,116 @@
+//=============================================================================
+// $Id: classify.lib,v 1.1 1995-01-02 22:58:50 krueger Exp $
+//
+//=============================================================================
+// Library-loader.
+//
+proc Lib_lib_Classify
+{
+  if(defined(SLib_lib_Classify) == 1) { return(); }
+  string SLib_lib_Classify="$Id: classify.lib,v 1.1 1995-01-02 22:58:50 krueger Exp $";
+  verbose (noloadLib);
+//  string @Required="lib0,lib1,lib_Classify";
+//  @Required=@Required+",lib_Setring,lib_ReOrder,lib_RandomPoly,lib_Morse";
+//  @Required=@Required+",lib_tools,lib_Kclass,lib_Ausgaben,lib_WorkOn";
+//  @Required=@Required+",lib_HKclass";
+//  int @len = size(@Required);
+//  int @i;
+//  int @k;
+//  string @s;
+
+//  for(@i=1;@i<@len;@i=@i+@k) {
+//    @s = @Required[@i..@len-@i];
+//    @k = substring(",", @s);
+//    @s = @Required[@i..@i+@k-2];
+//    @s;
+//    @i;
+//  }
+  if(defined(SLib_lib0) == 0)  { LIB "lib0"; Lib_lib0(); }
+  if(defined(SLib_lib1) == 0)  { LIB "lib1"; Lib_lib1(); }
+  if(defined(SLib_lib_Classify) == 0){LIB "lib_Classify"; Lib_lib_Classify(); }
+  if(defined(SLib_lib_Setring) == 0) {LIB "lib_Setring"; Lib_lib_Setring(); }
+  if(defined(SLib_lib_ReOrder) == 0) {LIB "lib_ReOrder"; Lib_lib_ReOrder(); }
+  if(defined(SLib_lib_RandomPoly)==0){LIB"lib_RandomPoly";Lib_lib_RandomPoly();}
+  if(defined(SLib_lib_Morse) == 0)   {LIB "lib_Morse"; Lib_lib_Morse(); }
+  if(defined(SLib_lib_Kclass) == 0)  {LIB "lib_Kclass"; Lib_lib_Kclass(); }
+  if(defined(SLib_lib_tools) == 0)   {LIB "lib_tools"; Lib_lib_tools(); }
+  if(defined(SLib_lib_Ausgaben) == 0){LIB "lib_Ausgaben"; Lib_lib_Ausgaben(); }
+  if(defined(SLib_lib_WorkOn) == 0)  {LIB "lib_WorkOn"; Lib_lib_WorkOn(); }
+  if(defined(SLib_lib_HKclass) == 0) {LIB "lib_HKclass"; Lib_lib_HKclass(); }
+//  if(defined(SLib_) == 0)  { LIB ""; Lib_(); }
+//  if(defined(SLib_) == 0)  { LIB ""; Lib_(); }
+}
+
+//=============================================================================
+//
+//
+proc ShowLibs
+{
+}
+proc Lib_lib0
+{
+  string SLib_lib0="Nix";
+}
+proc Lib_lib1
+{
+  string SLib_lib1="Nix";
+}
+
+
+//=============================================================================
+// TopLevel Funktion of the Arnold-Classifier.
+//
+proc Classify
+{
+  if( #ARGS != 1 ) {
+//=============================================================================
+    " USAGE:   Classify(<poly>)";
+    " RETURN:  Normal-Form of <poly>";
+    " NOTE:    Tells the typ of f";
+    " EXAMPLE: ring r;";
+    "          //int DeBug=1 / 6 / 11;
+    "          poly g=Classify(f);";
+//=============================================================================
+    return(#1);
+  }
+  if( typeof(#1) != "poly") {
+    "Classify: argv(1) must be poly";
+    return(#1);
+  }
+  Lib_lib_Classify();
+
+  poly @f_in = #1;
+  int @n = nvars(basering);
+  string @RingInput = "setring " + nameof(basering) + ";";
+  string @tmp = "map @Conv=" + nameof(basering) + ",";
+  int @i;
+
+  if( defined(Rtop) == 1) { kill Rtop; }
+  execute Setring(@n, "Rtop");
+  @tmp = @tmp + string(maxideal(1)) + ";";
+  execute @tmp;
+  execute RingInput;
+  map ShowPoly=Rtop,maxideal(1);
+  setring Rtop;
+  init();
+  string RingDisplay = @RingInput;
+
+  string @s1;
+  string @s2;
+  string @s3;
+  @s1,@s2=Klassifiziere(@Conv(@f_in));
+  @s3 = "poly @f_out="+@s1+";";
+  setring RingB;
+  execute @s3;
+  setring Rtop;
+  map @ConvUp=RingB,maxideal(1);
+  poly @f_out = @ConvUp(@f_out);
+  for(@i=CoRang+1;@i<=@n;@i=@i+1) {
+    @f_out = @f_out + x(@i)^2;
+  }
+  execute @RingInput;
+  map @ConvBack=Rtop,maxideal(1);
+// @s2;
+  return(@ConvBack(@f_out));     
+}
+// lib0: map SHB=r,A_Z("x",@n);
