@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.12 2003-04-25 18:34:58 levandov Exp $
+@comment $Id: plutypes.doc,v 1.13 2003-05-20 16:43:52 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -186,7 +186,8 @@ generator.
 @end ifset 
 
 @ifclear singularmanual
-@strong{Note:} For simplification of an ideal, see also @emph{simplify} in @sc{Singular}.
+@strong{Note:} For simplification of an ideal, see also section simplify
+in @sc{Singular} manual.
 @end ifclear  
 
 @*@strong{Example:}
@@ -299,7 +300,7 @@ n$\times$k
 R^n/M,
 @end ifinfo
 @tex
-R$^n$/M,
+$R^n$/M,
 @end tex
 i.e., the columns of A are the vectors
 @ifinfo
@@ -463,14 +464,14 @@ computation of the first syzygy module (see @ref{syz@value{PSUFFIX}})
 @cindex poly@value{PSUFFIX}
 
 Polynomials are the basic data for all main algorithms in
-@code{@sc{Plural}}. They consist of finitely many terms
+@sc{Plural}. They consist of finitely many terms
 (coefficient*power product) which are combined by the usual polynomial
 operations 
 @c (see @ref{poly expressions}).
  Polynomials can only be defined
 or accessed with respect to a basering which determines the coefficient
 type, the names of the indeterminants and the monomial ordering.
-
+@*@strong{Example:}
 @smallexample
 @c example
   ring r=32003,(x,y,z),dp;
@@ -559,7 +560,7 @@ a type cast to poly
         // but not equal to 2x^3 which will be interpreted as (2x)^3
         // since 2x is a monomial
 @c example
- ring r=0,(x,y),dp;
+ring r=0,(x,y),dp;
 poly f = 10x2y3 +2x2y2-2xy+y -x+2;
 lead(f);
 leadmonom(f);
@@ -571,7 +572,6 @@ poly(i);
 typeof(_); 
 @c example
 @end smallexample
-
 @*@strong{Remark:} In the non-commutative case see @ref{PLURAL conventions}.
  
 @*@strong{Example:}
@@ -897,10 +897,10 @@ following guide lines into consideration:
 @strong{Example:}
 @smallexample
 @c example
-  ring R1=0,(x,y),dp;
-  ring R2=32003,(a,b),dp;
-  def R=R1+R2;
-  R;
+ring R1=0,(x,y),dp;
+ring R2=32003,(a,b),dp;
+def R=R1+R2;
+R;
 @c example
 @end smallexample
 

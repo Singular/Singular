@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.12 2003-04-25 18:34:57 levandov Exp $
+@comment $Id: plureference.doc,v 1.13 2003-05-20 16:43:52 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -661,7 +661,7 @@ See
 @*@code{system(}"PLURAL", number_expression n, poly_expression p @code{)}
 @item @strong{Type:} ring
 @item @strong{Purpose:} 
-Based on the given ring @code{r}, say, with "k" variables, strictly upper
+Based on the given ring @code{r}, say, with k variables, strictly upper
 triangular matrices with numbers @code{(C)} from the ground field of @code{r}
 and polynomials from @code{(D)} from @code{r}.
 
