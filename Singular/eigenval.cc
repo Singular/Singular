@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval.cc,v 1.11 2002-02-20 17:32:12 mschulze Exp $ */
+/* $Id: eigenval.cc,v 1.12 2002-03-06 16:43:18 mschulze Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -196,6 +196,8 @@ BOOLEAN evColElim(leftv res,leftv h)
 matrix evHessenberg(matrix M)
 {
   int n=MATROWS(M);
+  if(n!=MATCOLS(M))
+    return(M);
 
   for(int k=1,j=2;k<n-1;k++,j=k+1)
   {
