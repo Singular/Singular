@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.37 2004-04-16 13:55:33 Singular Exp $";
+version="$Id: hnoether.lib,v 1.38 2004-04-21 14:27:23 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Development
@@ -169,6 +169,7 @@ RETURN:  f(x,y+d*x^Q)   if x,y are the ring variables
 EXAMPLE: example T1_Transform;  shows an example
 "
 {
+ nameof(basering);
  map T1 = basering,var(1),var(2)+d*var(1)^Q;
  return(T1(f));
 }
@@ -3880,8 +3881,16 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
 
   }
   keepring basering;
-  if (defined(transfproc)) { return(list(HNEs,transfproc)); }
-  else                     { return(list(HNEs,poly(-1))); }
+  if (system("with","Namespaces"))
+  {
+    if (defined(transfproc)) { return(list(HNEs,transfproc)); }
+    else                     { return(list(HNEs,poly(-1))); }
+  }
+  else
+  {
+    if (defined(transfproc)) { return(list(HNEs,transfproc)); }
+    else                     { return(list(HNEs,poly(-1))); }
+  }
  // -1 als 2. Rueckgabewert zeigt an, dass kein Ringwechsel stattgefunden hat -
  }
  else {
