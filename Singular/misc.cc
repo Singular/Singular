@@ -89,6 +89,7 @@ int inits(void)
 extern "C" {
 void m2_end(short i)
 {
+  fe_reset_input_mode();
   #ifdef PAGE_TEST
   mmEndStat();
   #endif
