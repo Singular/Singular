@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.64 2002-06-17 16:47:01 Singular Exp $ */
+/* $Id: kutil.h,v 1.65 2002-07-24 16:34:51 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -439,7 +439,7 @@ BOOLEAN kTest_L(LObject* L, ring tailRing = NULL,
                  BOOLEAN testp = FALSE, int lpos = -1,
                  TSet T = NULL, int tlength = -1);
 // test TObject
-BOOLEAN kTest_T(TObject* T, ring tailRing = NULL, int tpos = -1, char T = '?');
+BOOLEAN kTest_T(TObject* T, ring tailRing = NULL, int tpos = -1, char TN = '?');
 // test set strat->SevS
 BOOLEAN kTest_S(kStrategy strat);
 #else
