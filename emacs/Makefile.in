@@ -15,10 +15,10 @@ SINGULAR_HLP	= ${docdir}/singular.hlp
 all install: cmd-cmpl.el hlp-cmpl.el lib-cmpl.el
 
 cmd-cmpl.el: ${SINGULAR} cmpl.pl
-	cmpl.pl -Singular ${SINGULAR} -cmpl cmd > cmd-cmpl.el
+	${PERL5} cmpl.pl -Singular ${SINGULAR} -cmpl cmd > cmd-cmpl.el
 
 hlp-cmpl.el: ${SINGULAR_HLP} cmpl.pl
-	cmpl.pl -hlp ${SINGULAR_HLP} -cmpl hlp > hlp-cmpl.el
+	${PERL5} cmpl.pl -hlp ${SINGULAR_HLP} -cmpl hlp > hlp-cmpl.el
 
 # this is weird, if I work directly with _one_ pipe, 
 # then things break from time to time
