@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.cc,v 1.8 1997-12-17 11:42:41 schmidt Exp $ */
+/* $Id: int_pp.cc,v 1.9 1998-06-26 16:14:26 schmidt Exp $ */
 
 #include <config.h>
 
@@ -124,15 +124,20 @@ void InternalPrimePower::print( ostream & os, char * c )
 }
 #endif /* NOSTREAMIO */
 
-bool InternalPrimePower::isZero() const
+//{{{ bool InternalPrimePower::isOne, isZero () const
+// docu: see CanonicalForm::isOne(), CanonicalForm::isZero()
+bool
+InternalPrimePower::isOne () const
 {
-    return mpz_cmp_si( &thempi, 0 ) == 0;
+    return mpz_cmp_ui( &thempi, 1 ) == 0;
 }
 
-bool InternalPrimePower::isOne() const
+bool
+InternalPrimePower::isZero () const
 {
-    return mpz_cmp_si( &thempi, 1 ) == 0;
+    return mpz_sgn( &thempi ) == 0;
 }
+//}}}
 
 bool InternalPrimePower::is_imm() const
 {
@@ -155,7 +160,10 @@ InternalCF* InternalPrimePower::genOne()
 	return new InternalPrimePower();
 }
 
-InternalCF* InternalPrimePower::neg()
+//{{{ InternalCF * InternalPrimePower::neg ()
+// docu: see CanonicalForm::operator -()
+InternalCF *
+InternalPrimePower::neg ()
 {
     if ( getRefCount() > 1 ) {
 	decRefCount();
@@ -163,12 +171,12 @@ InternalCF* InternalPrimePower::neg()
 	mpz_init( &dummy );
 	mpz_sub( &dummy, &primepow, &thempi );
 	return new InternalPrimePower( dummy );
-    }
-    else {
+    } else {
 	mpz_sub( &thempi, &primepow, &thempi );
 	return this;
     }
 }
+//}}}
 
 
 InternalCF* InternalPrimePower::addsame( InternalCF * c )
