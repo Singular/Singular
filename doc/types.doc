@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.38 1998-05-13 14:53:52 wichmann Exp $
+@comment $Id: types.doc,v 1.39 1998-05-13 15:05:31 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -786,7 +786,7 @@ Brackets may be used to access elements of intmats: intmat expression
 @c example
 
 @c example
-@end exampl
+@end example
 
 @c ------------------------------
 @node intmat related functions, ,intmat operations, intmat
@@ -2282,6 +2282,7 @@ comparison
 @subsection number related functions
 @cindex ideal number functions
 
+@table @strong
 @item @code{leadcoef} 
 coefficient of the leading term (see @ref{leadcoef})
 @item @code{par} n-th paramter of the basering (see @ref{par})
