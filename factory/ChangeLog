@@ -43,3 +43,82 @@ Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* canonicalform.cc (operator >>): returns 0 now when compiled with
 	  Singular and with stream IO enabled
 
+Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
+
+	This is a list of most of the changes made after I took the
+	responsibility for factory development and before I started to
+	update the ChangeLog regularily.  It is unlikely to be complete...
+
+	* assert.h (NOASSERT, NDEBUG): the define to switch the assertions
+	  off is NOASSERT instead of NDEBUG.  But NDEBUG works, too, for
+	  backward compatibility.
+	  (__ASSERT1, ASSERT1, STICKYASSERT1): new assert macros which
+	  print additional argument
+	  (DEBINCLEVEL, DEBDECLEVEL, DEBOUTSL, DEBOUT, DEBOUTLN): debug
+	  functionality moved to debug.h and debug.cc
+	  (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT, PVIRT_CHARCC):
+	  PVIRT_*-functionality moved from int_cf.h to assert.h
+	  (__WARN, WARN, STICKYWARN): new macros
+	  (__ASSERT, __STICKYASSERT): the preprocessor instead of
+ 	  fpritnf() pastes the message into the format string now
+	  
+	* assert.cc: renamed to debug.cc
+	
+	* debug.h, debug.cc: new files.  DEBOUT-functionality moved from
+	  assert.h/assert.cc to these files.  All files which need this
+	  functionality include debug.h.
+	  (DEBUGOUTPUT, NDEBUG): DEBUGOUTPUT is switched off now if NDEBUG
+	  is switched on
+	  (DEBOUT, DEBOUTLN): slightly modified so they print 'objects'
+	  now instead of only one 'msg' and one 'object'.  All callers
+	  changed.
+	  (deb_level, level_msg, deb_inc_level): modified so
+	  deb_inc_level()'s output is more pretty at time of first call
+
+	* cf_gcd.cc (DEBOUT): debug output changed to calls of DEBOUT
+	  macros
+
+	* cf_linsys.cc (TIMING): #define TIMING removed
+	  (DEBOUT): debug output rewritten and changed to calls of DEBOUT
+	  macros
+	  (linearSystemSolve, determinant, determinant2): typedefs int_ptr
+	  introduced and used
+
+	* fac_berlekamp.cc (QPrintFF, QPrintGF, DEBOUT): debug output
+	  changed to calls of DEBOUT macros
+
+	* fac_distrib.cc (DEBUGOUTPUT): #undef DEBUGOUTPUT removed
+
+	* fac_ezgcd.cc (DEBUGOUTPUT, TIMING, timing.h): some spurious
+	  #define's and #include's removed
+
+	* fac_multihensel.cc (DEBUGOUTPUT, TIMING): some spurious
+	  #define's removed
+
+	* fac_multivar.cc (DEBUGOUTPUT, TIMING): some spurious
+	  #define's removed
+
+	* fac_univar.cc (DEBUGOUTPUT, TIMING, sys/times.h): some spurious
+	  #define's and #include's removed
+	  (TIMING, timing.h): timing stuff changed to calls of TIMING
+	  macros
+	  (DEBOUT, DEBOUTLN, DEBINCLEVEL, DEBDECLEVEL): debug output
+	  slightly rewritten
+	  (hprint, DEBOUTHPRINT, NDEBUG): calls to function hprint()
+	  wrapped by macro DEBOUTHPRINT, which definitions depends on
+	  DEBUGOUTPUT (instead of NDEBUG, as before).  All callers
+	  changed.
+	  (MAX_FP_FAC, max_fp_fac): #define changed to const int
+	  (initHG, ZFactorizeUnivariate): added STICKYWARNings because of
+	  some strange errors which occure in this function
+	  (kBound): added cast to double in calculation of the bound
+	  (UnivariateQuadraticLift): added cast to double in calculation
+	  of no_iter
+	  (ZFactorizeUnivariate): removed spurious declaration of CFFList
+	  G.  Some trivial structural changes.  Removed test on D != 0
+	  before deleting D.
+	  doc fix
+
+	* cf_reval.h (iostream.h): spurious #include <iostream.h> removed
+
+	* cf_switches.h (RATTIONAL): spurious #define RATIONAL removed
