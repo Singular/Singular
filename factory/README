@@ -10,20 +10,38 @@ NOTE: The copyright state of Factory is still unclear.  Sooner or later it
 will be free software, but by now please do *not* distribute the sources.
 
 Overview
---------
+========
+1. What is Factory?
+2. Comments, questions, bug reports
+3. Installation
+4. Distribution
+5. Prerequisites
+6. Memory manager
+7. Stream IO
+8. Diagnostic messages
+9. GF(q) tables
+10. A note on Singular
+11. Configure options, dependencies
+12. Documentation
+13. Examples and Tests
+14. Files in the distribution
+
+
+1. What is Factory?
+===================
   Factory is a C++ class library that implements a recursive representation
-of multivariate polynomial data.  It is being developed at the University
-of Kaiserslautern as an independent and self-contained part of the computer
-algebra system Singular (developed by G.-M. Greuel, G. Pfister and
-H. Schoenemann).
+of multivariate polynomial data.  It is being developed by Ruediger Stobbe
+and Jens Schmidt at the University of Kaiserslautern as an independent and
+self-contained part of the computer algebra system Singular (developed by
+G.-M. Greuel, G. Pfister and H. Schoenemann).
 
   Factory handles sparse multivariate polynomials over different
 coefficient domains, such as Z, Q and GF(q), as well as algebraic
-extensions over Q and GF(q) in an efficient way.  The recursive
-representation gives a univariate view to multivariate polynomials.  This
-means that each polynomial is represented as a univariate polynomial in a
-so-called main variable with coefficients which are elements of a
-polynomial ring.
+extensions over Q and GF(q) in an efficient way.  Factory includes
+algorithms for computing univariate and multivariate gcds, resultants,
+chinese remainders and several algorithms to factorize univariate
+polynomials over the integers and over finite fields.  Factorization of
+multivariate polynomials over the integers is in beta test stage.
 
   The interface to the polynomial system of Factory is provided by a single
 class CanonicalForm which can deal with elements of the coefficient domain
@@ -36,15 +54,24 @@ familar with C++ programming.
   There are a couple of utility classes provided by Factory such as lists,
 arrays, polynomial maps, etc.  These make the usage more comfortable.
 
-  Factory includes algorithms for computing univariate and multivariate
-gcds, resultants, chinese remainders and several algorithms to factorize
-univariate polynomials over the integers and over finite fields.
-Factorization of multivariate polynomials over the integers is in beta test
-stage.
+
+2. Comments, questions, bug reports
+====================================
+  Factory is a project in evolution.  That means there is no guarantee that
+Factory is bug free.  I am sure that there are bugs or at least features.
+If you find bugs or if you find a strange behavior of the library, please
+let me know (e-mail: Jens Schmidt <schmidt@mathematik.uni-kl.de>).
+Comments and questions are welcome, too.
 
 
-Installation
-------------
+3. Installation
+===============
+
+NOTE: If you have received this Factory distribution together with Singular
+you do not have to worry about compilation or installation at all.  The
+installation procedure for Singular should do everything for you.  For more
+information, see the section 'A note on Singular'.
+
   See the INSTALL file for instructions on how to install Factory.  The
 installation procedure conforms more or less to the GNU standard:
 
@@ -54,8 +81,8 @@ However, I recommend to read the instructions since there are a lot of
 non-standard options to configure.
 
 
-Distribution
-------------
+4. Distribution
+===============
   The newest version of Factory is always available by anonymous ftp from
 
 		www.mathematik.uni-kl.de:/pub/Math/Factory
@@ -67,8 +94,8 @@ o some preliminary documentation on Factory (factory-doc-prelim.tgz);
 o Factory GF(q) addition tables (factory-gftables.tgz, see below).
 
 
-Prerequisites
--------------
+5. Prerequisites
+================
   You need GNU make to build and install Factory.  Furthermore, I strongly
 recommend to build Factory with GNU CC (version 2.7 or newer).  To build
 Factory and to link your programs with Factory you need the GNU Multiple
@@ -78,7 +105,7 @@ be linked with the so called small GMP library which comes with the full
 version of Singular (not recommended).
 
 Configure options:
-~~~~~~~~~~~~~~~~~~
+------------------
   --with-gmp(=<gmp_inc_path>(,<gmp_lib_path>))
                           specify where to find gmp library.
   --enable-gmp            together with --with-Singular means: installation
@@ -106,42 +133,44 @@ libgmp.a will reside in these directories.
 gift to Singular, so it may be used with option --with-Singular only.
 
 
-Memory manager
---------------
-  You can use one of the memory managment tools provided with Factory.
+6. Memory manager
+=================
+  You can use one of the memory management tools provided with Factory.
 There are the 'new' and the 'old' memory manager.  In fact, on some systems
-the 'old' memory managment seems to be faster then the new one, but so far
-there have not been systematic timings.
+the 'old' memory management seems to be faster then the new one, but so far
+there have not been systematic timings.  If you configure Factory with
+'--with-memman=no' it will use the standard C++ operators new/delete, which
+is not recommended.
   You may trace the actions (alloc/free) of the new memory manager by
-enabling memory managment debugging.  This produces a *lot* of output.
+enabling memory management debugging.  This produces a *lot* of output.
 
 Configure options:
-~~~~~~~~~~~~~~~~~~
-  --with-memman(=<memman>) specify factory memory manager.
+------------------
+  --with-memman(=<memman>) specify Factory memory manager.
                           <memman> is either 'old' (default), 'new', or 'no'.
-  --enable-memdebug=<level> switch on memory managment debugging.  Meaningful
+  --enable-memdebug=<level> switch on memory management debugging.  Meaningful
                           with --with-memman=new only.  <level> may be either
                           'no' (default), 'normal', or 'full'.
 
 
-Stream IO
----------
-  For use with other systems which have there own IO routines to print
+7. Stream IO
+============
+  For use with other systems which have their own IO routines to print
 polynomials it is possible to switch off Factory's stream IO.  In this
 case, you do not need to link libg++ or libiostream with Factory.
 
 Configure options:
-~~~~~~~~~~~~~~~~~~
-  --disable-streamio      build factory without streamio
+------------------
+  --disable-streamio      build Factory without stream IO
 
 
-Diagnostic messages
--------------------
+8. Diagnostic messages
+======================
 Factory has three types of diagnostic messages:
 - Assertions (implemented by the ASSERT macros in assert.h) are used to
-  ensure preconditions before running an algorithm.  A typical example is
+  ensure preconditions before running some algorithm.  A typical example is
   to test f != 0 before dividing by f.
-- Debugoutput (implemented by the DEBOUT macros in debug.h/debug.cc) is
+- Debug output (implemented by the DEBOUT macros in debug.h/debug.cc) is
   used to trace complex algorithms, e.g. factorization.
 - Timing information may be accumulated and printed using the TIMING macros
   in timing.h.
@@ -153,29 +182,29 @@ for different configurations' in the INSTALL file.  By default, all
 diagnostic messages are disabled.
 
 Configure options:
-~~~~~~~~~~~~~~~~~~
-  --enable-assertions     build factory with assertions activated
-  --enable-timing         build factory so it will print timing information
-  --enable-debugoutput    build factory so it will print debugging information
+------------------
+  --enable-assertions     build Factory with assertions activated
+  --enable-timing         build Factory so it will print timing information
+  --enable-debugoutput    build Factory so it will print debugging information
 
 
-GF(q) tables
-------------
+9. GF(q) tables
+===============
   Factory uses addition tables to calculate in GF(p^n) in an efficient way.
 
 NOTE: Since the format of the GF(q) tables changed from Factory Version
 1.2b to Factory Version 1.3a you should get/create them by new!
 
 There are two possibilities to get these tables:
-o you get them from the net (factory-gftables.tgz) where you got Factory
+o get them from the net (factory-gftables.tgz) where you got Factory
   from.  The files unpack into a directory gftables/.
-o you create them with gengftables which is a part of Factory.  Building
+o create them with gengftables which is a part of Factory.  Building
   the tables takes quite a while!
 See the INSTALL file for more information.
 
 
-A note on Singular
-------------------
+10. A note on Singular
+=====================
   If you have received this Factory distribution together with Singular you
 do not have to worry about compilation or installation at all.  The
 installation procedure for Singular should do everything for you.  If you
@@ -193,23 +222,27 @@ specify '--prefix=..'.
 
   The Singular GF(q) tables are the same as the Factory GF(q) tables.
 However, Singular uses a different naming scheme.  Therefore, a Factory
-configured with '--with-Singular' will not find the GF(q) tables created by
-gengftables.  But this is not a major drawback since Singular is
-distributed with ready-to-use GF(q) tables.
+configured with '--without-Singular' will not find Singular's GF(q) tables
+as well as a Factory configured with '--with-Singular' will not find the
+GF(q) tables created by gengftables.  But this is not a major drawback
+since Singular is distributed with ready-to-use GF(q) tables.
+
+  The newest version of Singular is always available at
+www.mathematik.uni-kl.de:/pub/Math/Singular.
 
 Configure options:
-~~~~~~~~~~~~~~~~~~
+------------------
   --with-Singular         build for use with computer algebra system Singular.
 
   Except from setting the #define SINGULAR, this option only changes the
 defaults to: '--with-memman=no --disable-streamio'.
 
 
-Configure options, dependencies
--------------------------------
+11. Configure options, dependencies
+===================================
 - do not configure '--with-Singular --with-memman'.  In this case
-  both Singular and the library will try to initialize memory
-  managment.
+  both Singular and the library will try to initialize their own memory
+  management.
 
 - do not configure '--disable-streamio --enable-debugoutput'.  The
   DEBOUT macros need stream IO.
@@ -230,8 +263,8 @@ Configure options, dependencies
   --with-memman=new
 
 
-Documentation
--------------
+12. Documentation
+=================
   So far there are only preliminary versions of a user/reference manual and
 a tutorial ('A quick start into Factory').  Please do not expect them to
 be complete or even error-free.  For this reason, the documentation is not
@@ -240,23 +273,14 @@ sources and compiled dvi files reside in factory-doc-prelim.tgz. They will
 unpack into a directory factory-doc-prelim/.
 
 
-Examples and Tests
-------------------
+13. Examples and Tests
+======================
   So far neither examples nor tests, sorry.  You may have a look at
 gengftables.cc which is an application of the most basic Factory features.
 
-
-Comments, questions, bug reports
---------------------------------
-  Factory is a project in evolution.  That means there is no guarantee that
-Factory is bug free.  I am sure that there are bugs or at least features.
-If you find bugs or if you find a strange behavior of the library, please
-let me know (e-mail: Jens Schmidt <schmidt@mathematik.uni-kl.de>).
-Comments and questions are welcome, too.
-
 
-Files in the distribution
--------------------------
+14. Files in the distribution
+=============================
 ChangeLog	- history of changes
 INSTALL		- installation instructions
 README		- this file
@@ -296,8 +320,8 @@ variable.cc
 variable.h	- high level classes and functions.  User interface to
 		  the polynomial (and other) arithmetic.
 
-templates/	- factory templates
-ftmpl_inst.cc	- template instantiation for factory templates
+templates/	- Factory templates
+ftmpl_inst.cc	- template instantiation for Factory templates
 
 fac_*.cc
 fac_*.h		- high level algorithms (factorization, gcd, sqfr
