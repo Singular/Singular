@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.112 2000-09-07 16:30:43 Singular Exp $ */
+/* $Id: ring.cc,v 1.113 2000-09-12 08:02:46 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2448,6 +2448,7 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
   // fill in v, tmp_typ, tmp_ordsgn, determine pVarLowIndex, typ_i (== ordSize)
   int j=0;
   int j_bits=BITS_PER_LONG;
+  BOOLEAN need_to_add_comp=FALSE;
   for(i=0;i<n;i++)
   {
     switch (r->order[i])
@@ -2610,12 +2611,14 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
       case ringorder_S:
         rO_Syzcomp(j, j_bits,prev_ordsgn, tmp_ordsgn,tmp_typ[typ_i]);
         r->pVarLowIndex=j;
+        need_to_add_comp=TRUE;
         typ_i++;
         break;
 
       case ringorder_s:
         rO_Syz(j, j_bits,prev_ordsgn, tmp_ordsgn,tmp_typ[typ_i]);
         r->pVarLowIndex=j;
+        need_to_add_comp=TRUE;
         typ_i++;
         break;
 
@@ -2636,10 +2639,8 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
 
   // fill in some empty slots with variables not already covered
   // v0 is special, is therefore normally already covered
-  // but if not:
   // now we do have rings without comp...
-  #if 0
-  if (v[0]== -1)
+  if((need_to_add_comp) && (v[0]== -1))
   {
     if (prev_ordsgn==1)
     {
@@ -2652,7 +2653,6 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
       rO_LexVars_neg(j, j_bits, 0,0, prev_ordsgn,tmp_ordsgn,v,BITS_PER_LONG);
     }
   }
-  #endif
   // the variables
   for(i=1 ; i<r->N+1 ; i++)
   {
@@ -2715,8 +2715,7 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
   r->pDivLow=r->pVarLowIndex;
   r->pDivHigh=r->pVarHighIndex;
 #endif
-  r->pCompIndex=(r->VarOffset[0] & 0xffffff); //r->VarOffset[0];
-  if (r->pCompIndex==0xffffff) r->pCompIndex=-1;
+  r->pCompIndex=(r->VarOffset[0] & 0xffff); //r->VarOffset[0];
   i=0; // position
   j=0; // index in r->typ
   if (i==r->pCompIndex) i++;
