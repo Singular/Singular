@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.4 2000-09-18 09:19:24 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.5 2000-09-20 12:56:36 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -264,10 +264,43 @@ PINLINE2 poly p_Copy(poly p, const ring r)
   return r->p_Procs->p_Copy(p, r);
 }
 
+PINLINE2 poly p_Copy(poly p, const ring lmRing, const ring tailRing)
+{
+#ifndef PDEBUG
+  if (tailRing->p_Procs->p_Copy == lmRing->p_Procs->p_Copy)
+    return tailRing->p_Procs->p_Copy(p, tailRing);
+#endif    
+  if (p != NULL)
+  {
+    poly pres = p_Head(p, lmRing);
+    pNext(pres) = tailRing->p_Procs->p_Copy(pNext(p), tailRing);
+    return pres;
+  }
+  else
+    return NULL;
+}
+
 // deletes *p, and sets *p to NULL
 PINLINE2 void p_Delete(poly *p, const ring r)
 {
   r->p_Procs->p_Delete(p, r);
+}
+
+PINLINE2 void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
+{
+#ifndef PDEBUG
+  if (tailRing->p_Procs->p_Delete == lmRing->p_Procs->p_Delete)
+  {
+    tailRing->p_Procs->p_Delete(p, tailRing);
+    return;
+  }
+#endif  
+  if (*p != NULL)
+  {
+    if (pNext(*p) != NULL)
+      tailRing->p_Procs->p_Delete(&pNext(*p), tailRing);
+    p_LmDelete(p, lmRing);
+  }
 }
 
 // returns p+q, destroys p and q
@@ -291,6 +324,22 @@ PINLINE2 poly p_Mult_nn(poly p, number n, const ring r)
   return r->p_Procs->p_Mult_nn(p, n, r);
 }
 
+PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing, 
+                        const ring tailRing)
+{
+#ifndef PDEBUG
+  if (lmRing->p_Procs->p_Mult_nn == tailRing->p_Procs->p_Mult_nn)
+  {
+    return p_Mult_nn(p, n, tailRing);
+  }
+#endif
+  poly pnext = pNext(p);
+  pNext(p) = NULL;
+  p = lmRing->p_Procs->p_Mult_nn(p, n, lmRing);
+  pNext(p) = tailRing->p_Procs->p_Mult_nn(pNext(p), n, tailRing);
+  return p;
+}
+   
 // returns p*n, does not destroy p
 PINLINE2 poly pp_Mult_nn(poly p, number n, const ring r)
 {

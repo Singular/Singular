@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.38 2000-09-18 09:19:30 obachman Exp $ */
+/* $Id: polys.h,v 1.39 2000-09-20 12:56:37 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -278,8 +278,10 @@ void      pLcm(poly a, poly b, poly m);
 poly      pDiff(poly a, int k);
 poly      pDiffOp(poly a, poly b,BOOLEAN multiply);
 
-int       pMaxComp(poly p);
-int       pMinComp(poly p, ring r=currRing);
+#define   pMaxComp(p)   p_MaxComp(p, currRing)
+#define   pMinComp(p)   p_MinComp(p, currRing)
+int pMaxCompProc(poly p);
+
 BOOLEAN   pOneComp(poly p);
 int       pWeight(int c);
 #define   pSetCompP(a,i)    p_SetCompP(a, i, currRing)

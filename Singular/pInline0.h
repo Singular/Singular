@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.2 2000-09-18 09:19:24 obachman Exp $
+ *  Version: $Id: pInline0.h,v 1.3 2000-09-20 12:56:36 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -40,6 +40,44 @@ PINLINE0 void p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
   }
 }
 
+
+// returns minimal column number in the modul element a (or 0)
+PINLINE0 int p_MinComp(poly p, ring r)
+{
+  int result,i;
+
+  if(p==NULL) return 0;
+  result = p_GetComp(p,r);
+  while (pNext(p)!=NULL)
+  {
+    pIter(p);
+    i = p_GetComp(p,r);
+    if (i<result) result = i;
+  }
+  return result;
+}
+
+// returns maximal column number in the modul element a (or 0)
+PINLINE0 int p_MaxComp(poly p, ring r)
+{
+  int result,i;
+
+  if(p==NULL) return 0;
+  result = p_GetComp(p, r);
+  while (pNext(p)!=NULL)
+  {
+    pIter(p);
+    i = p_GetComp(p, r);
+    if (i>result) result = i;
+  }
+  return result;
+}
+
+/***************************************************************
+ *
+ * poly things which are independent of ring
+ *
+ ***************************************************************/
 PINLINE0 poly pReverse(poly p)
 {
   if (p == NULL || pNext(p) == NULL) return p;
@@ -56,6 +94,22 @@ PINLINE0 poly pReverse(poly p)
   }
   while (qn != NULL);
   return p;
+}
+
+
+/*2
+* returns the length of a (numbers of monomials)
+*/
+PINLINE0 int pLength(poly a)
+{
+  int l = 0;
+
+  while (a!=NULL)
+  {
+    pIter(a);
+    l++;
+  }
+  return l;
 }
 
 #endif // PINLINE_CC

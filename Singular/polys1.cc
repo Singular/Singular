@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.46 2000-09-18 09:19:30 obachman Exp $ */
+/* $Id: polys1.cc,v 1.47 2000-09-20 12:56:36 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -532,21 +532,6 @@ poly pDiffOp(poly a, poly b,BOOLEAN multiply)
   return result;
 }
 
-/*2
-* returns the length of a (numbers of monomials)
-*/
-int pLength(poly a)
-{
-  int l = 0;
-
-  while (a!=NULL)
-  {
-    pIter(a);
-    l++;
-  }
-  return l;
-}
-
 
 void pSplit(poly p, poly *h)
 {
@@ -554,41 +539,6 @@ void pSplit(poly p, poly *h)
   pNext(p)=NULL;
 }
 
-/*2
-* returns maximal column number in the modul element a (or 0)
-*/
-int pMaxComp(poly p)
-{
-  int result,i;
-
-  if(p==NULL) return 0;
-  result = pGetComp(p);
-  while (pNext(p)!=NULL)
-  {
-    pIter(p);
-    i = pGetComp(p);
-    if (i>result) result = i;
-  }
-  return result;
-}
-
-/*2
-* returns minimal column number in the modul element a (or 0)
-*/
-int pMinComp(poly p, ring r)
-{
-  int result,i;
-
-  if(p==NULL) return 0;
-  result = p_GetComp(p,r);
-  while (pNext(p)!=NULL)
-  {
-    pIter(p);
-    i = p_GetComp(p,r);
-    if (i<result) result = i;
-  }
-  return result;
-}
 
 /*2
 * returns TRUE, if all monoms have the same component
@@ -607,20 +557,10 @@ BOOLEAN pOneComp(poly p)
   return TRUE;
 }
 
-#if 0
-/*2
-* multiplies the polynomial a by the column generator with number i
-*/
-void pSetCompP(poly p, int i)
+int pMaxCompProc(poly p)
 {
-  while (p!=NULL)
-  {
-    pSetComp(p, (Exponent_t)i);
-    pSetmComp(p);
-    pIter(p);
-  }
+  return pMaxComp(p);
 }
-#endif
 
 /*2
 * handle memory request for sets of polynomials (ideals)

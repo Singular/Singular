@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.1 2000-09-18 09:19:28 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.2 2000-09-20 12:56:37 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -158,10 +158,13 @@ PINLINE2 int p_Cmp(poly p1, poly p2, ring r);
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r);
 PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, poly b, ring r);
 PINLINE1 BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, ring r);
-PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b);
 unsigned long p_GetShortExpVector(poly a, ring r);
 PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, 
                                       poly b, unsigned long not_sev_b, ring r);
+
+PINLINE1 BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b);
+PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b);
+
 
 /***************************************************************
  *
@@ -174,6 +177,7 @@ PINLINE2 poly p_Copy(poly p, const ring r);
 PINLINE2 poly p_Copy(poly p, const ring lmRing, const ring tailRing);
 // deletes *p, and sets *p to NULL
 PINLINE2 void p_Delete(poly *p, const ring r);
+PINLINE2 void p_Delete(poly *p, const ring lmRing, const ring tailRing);
 
 
 /***************************************************************
@@ -193,6 +197,7 @@ PINLINE2 poly p_Neg(poly p, const ring r);
 PINLINE2 poly pp_Mult_nn(poly p, number n, const ring r);
 // returns p*n, destroys p
 PINLINE2 poly p_Mult_nn(poly p, number n, const ring r);
+PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing, const ring tailRing);
 
 // returns p*m, does neither destroy p nor m
 PINLINE2 poly pp_Mult_mm(poly p, poly m, const ring r);
@@ -231,13 +236,15 @@ extern void p_Setm(poly p, ring r);
 // reverses the monomials of p
 PINLINE0   void p_SetCompP(poly a, int i, ring r);
 PINLINE0   void p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
+PINLINE0   int  p_MaxComp(poly p, ring r);
+PINLINE0   int  p_MinComp(poly p, ring r);
 
 /***************************************************************
  *
  * poly things which are independent of ring
  *
  ***************************************************************/
-int       pLength(poly a);
+PINLINE0 int       pLength(poly a);
 PINLINE0 poly pReverse(poly p);
 
 
