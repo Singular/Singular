@@ -3,7 +3,7 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.6 2000-08-16 12:06:11 obachman Exp $
+ *  Version: $Id: omFindExec.c,v 1.7 2000-12-12 16:25:43 levandov Exp $
  *******************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -22,6 +22,10 @@
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
+#endif
+
+#ifdef WINNT
+#include "om_Alloc.h"
 #endif
 
 /* ABSOLUTE_FILENAME_P (fname): True if fname is an absolute filename */
