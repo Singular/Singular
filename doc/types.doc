@@ -1,26 +1,26 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.11 1998-04-27 15:51:38 Singular Exp $
+@comment $Id: types.doc,v 1.12 1998-04-27 16:36:56 Singular Exp $
 @comment this file contains the type definitions
 @c + moved subsection "boolean expressions" into section "int"
 @c + removed node boolean (now in node int)
 @c + added additional structure for link-chapter
 @menu
-* ideal::                       
-* int::                         
-* intmat::                      
-* intvec::                      
-* link::                        
-* list::                        
-* map::                         
-* matrix::                      
-* module::                      
-* number::                      
-* poly::                        
-* proc::                        
-* ring::                        
-* string::                      
-* def::                         
-* vector::                      
+* ideal::
+* int::
+* intmat::
+* intvec::
+* link::
+* list::
+* map::
+* matrix::
+* module::
+* number::
+* poly::
+* proc::
+* ring::
+* string::
+* def::
+* vector::
 @end menu
 
 @c ---------------------------------------
@@ -29,14 +29,14 @@
 @cindex ideal
 
 @c --> section ideal
-@c ------------------------------
 @menu
-* ideal declarations::          
-* ideal expressions::           
-* ideal operations::            
-* ideal related functions::     
+* ideal declarations::
+* ideal expressions::
+* ideal operations::
+* ideal related functions::
 @end menu
 
+@c ---------------------------------------
 @node ideal declarations, ideal expressions, ideal, ideal
 @subsection ideal declarations
 @cindex ideal declarations
@@ -114,7 +114,7 @@ See @ref{ideal}; @ref{ideal operations}; @ref{ideal related functions};
 @c <--
 
 @c ------------------------------
-@node ideal operations, ideal related functions, ideal expressions, ideal 
+@node ideal operations, ideal related functions, ideal expressions, ideal
 @subsection ideal operations
 @cindex ideal operations
 @c --> subsection ideal oparations
@@ -246,16 +246,17 @@ Brackets may be used to access elements of ideals:
 @cindex int
 
 @c --> section int
-@c ------------------------------
+
 @menu
-* int declarations::            
-* int expressions::             
-* int operations::              
-* boolean expressions::         
-* boolean operations::          
-* int related functions::       
+* int declarations::
+* int expressions::
+* int operations::
+* boolean expressions::
+* boolean operations::
+* int related functions::
 @end menu
 
+@c ---------------------------------------
 @node int declarations, int expressions, int, int
 @subsection int declarations
 @cindex int declarations
@@ -363,7 +364,7 @@ See @ref{implicit type conversions}; @ref{type casting}; @ref{int related functi
 @c <--
 
 @c ------------------------------
-@node int operations, int related functions, int expressions, int 
+@node int operations, int related functions, int expressions, int
 @subsection int operations
 @cindex int operations
 @cindex mod
@@ -554,14 +555,14 @@ module (see @ref{vdim})
 @cindex intmat
 
 @c --> section intmat
-@c ------------------------------
-@menu
-* intmat declarations::         
-* intmat expressions::          
-* intmat operations::           
-* intmat related functions::    
-@end menu
 
+@menu
+* intmat declarations::
+* intmat expressions::
+* intmat operations::
+* intmat related functions::
+@end menu
+@c ------------------------------
 @node intmat declarations, intmat expressions, intmat, intmat
 @subsection intmat declarations
 @cindex intmat declarations
@@ -639,7 +640,7 @@ intmat comparison (yielding int): @code{<>}, @code{==}
 @c <--
 
 @c ------------------------------
-@node intmat operations, intmat related functions, intmat expressions, intmat 
+@node intmat operations, intmat related functions, intmat expressions, intmat
 @subsection intmat operations
 @cindex intmat operations
 
@@ -677,14 +678,15 @@ trace of an intmat (see @ref{trace})
 @cindex intvec
 
 @c --> section intvec
-@c ------------------------------
+
 @menu
-* intvec declarations::         
-* intvec expressions::          
-* intvec operations::           
-* intvec related functions::    
+* intvec declarations::
+* intvec expressions::
+* intvec operations::
+* intvec related functions::
 @end menu
 
+@c ------------------------------
 @node intvec declarations, intvec expressions, intvec, intvec
 @subsection intvec declarations
 @cindex intvec declarations
@@ -781,7 +783,7 @@ See @ref{intvec functions}.
 @c <--
 
 @c ------------------------------
-@node intvec operations, intvec related functions, intvec expressions, intvec 
+@node intvec operations, intvec related functions, intvec expressions, intvec
 @subsection intvec operations
 @cindex intvec operations
 
@@ -819,17 +821,18 @@ returns weights for the weigted ecart method (see @ref{weight})
 @cindex link
 
 @c --> section link
-@c ------------------------------
+
 @menu
-* link declarations::           
-* link expressions::            
-* link operations::             
-* link related functions::      
-* ASCII links::                 
-* MP links::                    
-* DBM links::                   
+* link declarations::
+* link expressions::
+* link operations::
+* link related functions::
+* ASCII links::
+* MP links::
+* DBM links::
 @end menu
 
+@c ------------------------------
 @node link declarations, link expressions, link, link
 @subsection link declarations
 @cindex link declarations
@@ -840,7 +843,7 @@ returns weights for the weigted ecart method (see @ref{weight})
 @cindex link expressions
 
 @c ------------------------------
-@node link operations, link related functions, link expressions, link 
+@node link operations, link related functions, link expressions, link
 @subsection link operations
 @cindex link operations
 
@@ -871,14 +874,15 @@ returns weights for the weigted ecart method (see @ref{weight})
 @cindex list
 
 @c --> section list
-@c ------------------------------
+
 @menu
-* list declarations::           
-* list expressions::            
-* list operations::             
-* list related functions::      
+* list declarations::
+* list expressions::
+* list operations::
+* list related functions::
 @end menu
 
+@c ------------------------------
 @node list declarations, list expressions, list, list
 @subsection list declarations
 @cindex list declarations
@@ -954,7 +958,7 @@ See @ref{list}; @ref{list operations}; @ref{list functions};
 @c <--
 
 @c ------------------------------
-@node list operations, list related functions, list expressions, list 
+@node list operations, list related functions, list expressions, list
 @subsection list operations
 @cindex list operations
 @c --> subsection list operations
@@ -1012,47 +1016,137 @@ Brackets may be used to access elements of lists:
 @section map
 @cindex map
 
-@c --> section map
-@c ------------------------------
+Maps are ring maps from a preimage ring into the base ring.
+Note that the target of a map is ALWAYS the actual base ring.
+Maps between rings with different coefficient fields are
+possible, the map of the coefficients is defined in the following way:
+@table @asis
+@item Z/p -> Q
+@tex
+$[i]_p \rightarrow i \in [-p/2,p/2] \subseteq $Z
+@end tex
+@ifinfo
+[i]_p -> i in [-p/2,p/2] in Z
+@end ifinfo
+@item Z/p -> Z/p'
+@tex
+$[i]_p \in $Z/p$ \rightarrow i \in [-p/2,p/2] \subseteq $Z$ \rightarrow [i]_{p'} \in $Z/p'
+@end tex
+@ifinfo
+[i]_p in Z/p -> i in [-p/2,p/2] in Z -> [i]_p' in Z/p'
+@end ifinfo
+@item Q -> Z/p
+@itemx Q -> (Z/p)(a,..)
+@itemx Q -> Q(a,..)
+@itemx Z/p ->(Z/p)(a,...)
+as usual
+@end table
+
 @menu
-* map declarations::            
-* map expressions::             
-* map operations::              
-* map related functions::       
+* map declarations::
+* map expressions::
 @end menu
 
+@iftex
+See @ref{imap}; @ref{fetch}; @ref{subst}.
+@end iftex
+
+@c ------------------------------
 @node map declarations, map expressions, map, map
 @subsection map declarations
 @cindex map declarations
 
+@table @code
+@item @strong{Syntax:}
+@code{map} name @code{=} preimage_ring_name @code{,} ideal_expression @code{;}
+@item @strong{Purpose:}
+define a ring map from preimage_ring to basering
+@sp 1
+map the variables of the preimage ring to the generators of the ideal.
+If the ideal contains less elements than variables in the
+preimage_ring the remaining variables are maped to 0, if the ideal contains
+more elements these are ignored.
+The image ring is always the actual base ring.
+For the mapping of coefficients from different fields see @ref{map}.
+@item @strong{Default:}
+none
+@*Maps may be composed.
+@item @strong{Remark:}
+There are standard mappings for the identity map: @code{fetch} and @code{imap}.
+@item @strong{Example:}
+@example
+@c example
+  ring r1=32003,(x,y,z),dp;
+  ideal i=x,y,z;
+  ring r2=32003,(a,b),dp;
+  map f=r1,a,b,a+b;
+  // maps from r1 to r2,
+  // x to a, y to b and z to a+b
+  f(i);
+  // operations like f(i[1]) or f(i*i) are not allowed
+  ideal i=f(i);
+  // objects in different rings may have the same name
+  map g   = r2,a2,b2;
+  map phi = g(f);
+  // composition of map f and g
+  // maps from r1 to r2,
+  // x to a2, y to b2, z to a2+b2
+  phi(i);
+@c example
+@end example
+@end table
+@menu
+* map::
+* ideal expression::
+* ring::
+* fetch::
+* imap::
+@end menu
+@iftex
+See @ref{map}; @ref{ideal expression}; @ref{ring};
+@ref{imap}; @ref{fetch}.
+@end iftex
 @c ------------------------------
-@node map expressions, map operations, map declarations, map
+@node map expressions, map related functions, map declarations, map
 @subsection map expressions
 @cindex map expressions
 
-@c ------------------------------
-@node map operations, map related functions, map expressions, map
-@subsection map operations
-@cindex map operations
-
+A map expression is:
+@enumerate
+@item
+an identifier of type map
+@item
+a function returning map
+@item
+map expressions combined by composition
+@end enumerate
+@c @c ------------------------------
+@c @node map operations, map related functions, map expressions, map
+@c @subsection map operations
+@c @cindex map operations
+@c
 @c ------------------------------
 @node map related functions, ,map operations, map
 @subsection map related functions
 @cindex map related functions
-@c <--
+
+@strong{Apply a map:}
+the name of a map serves as the function which maps objects from the
+preimage_ring into the base ring.  These objects must be defined
+by names (no evaluation in the preimage ring is possible).
 
 @c ---------------------------------------
 @node matrix, module, map, Data types
-@section matrix 
+@section matrix
 @cindex matrix
 
 @c --> section matrix
 @c ------------------------------
 @menu
-* matrix declarations::         
-* matrix expressions::          
-* matrix operations::           
-* matrix related functions::    
+* matrix declarations::
+* matrix expressions::
+* matrix operations::
+* matrix related functions::
 @end menu
 
 @node matrix declarations, matrix expressions, matrix, matrix
@@ -1138,7 +1232,7 @@ See @ref{matrix}; @ref{matrix operations}; @ref{matrix functions};
 @c <--
 
 @c ------------------------------
-@node matrix operations, matrix related functions, matrix expressions, matrix 
+@node matrix operations, matrix related functions, matrix expressions, matrix
 @subsection matrix operations
 @cindex matrix operations
 @c --> subsection matrix oparations
@@ -1210,16 +1304,16 @@ Brackets may be used to access elements of matrices:
 
 @c ---------------------------------------
 @node module, number, matrix, Data types
-@section module 
+@section module
 @cindex module
 
 @c --> section module
 @c ------------------------------
 @menu
-* module declarations::         
-* module expressions::          
-* module operations::           
-* module related functions::    
+* module declarations::
+* module expressions::
+* module operations::
+* module related functions::
 @end menu
 
 @node module declarations, module expressions, module, module
@@ -1330,7 +1424,7 @@ See @ref{module}; @ref{module operations}; @ref{module functions};
 @c <--
 
 @c ------------------------------
-@node module operations, module related functions, module expressions, module 
+@node module operations, module related functions, module expressions, module
 @subsection module operations
 @cindex module operations
 @c --> subsection module oparations
@@ -1383,7 +1477,7 @@ lift-matrix (see @ref{lift})
 @item @code{liftstd}
 standardbasis and transformation matrix computation (see @ref{liftstd})
 @item @code{minbase}
-minimal generating set of a homogeneous ideal/module or an ideal/module 
+minimal generating set of a homogeneous ideal/module or an ideal/module
 over a local ring
 (see @ref{minbase})
 @item @code{modulo}
@@ -1436,16 +1530,16 @@ vector space dimension of free module over the basering modulo module (see @ref{
 
 @c ---------------------------------------
 @node number, poly, module, Data types
-@section number 
+@section number
 @cindex number
 
 @c --> section number
 @c ------------------------------
 @menu
-* number declarations::         
-* number expressions::          
-* number operations::           
-* number related functions::    
+* number declarations::
+* number expressions::
+* number operations::
+* number related functions::
 @end menu
 
 @node number declarations, number expressions, number, number
@@ -1538,7 +1632,7 @@ See @ref{number}; @ref{ring}; @ref{number operations};
 @c <--
 
 @c ------------------------------
-@node number operations, number related functions, number expressions, number 
+@node number operations, number related functions, number expressions, number
 @subsection number operations
 @cindex number operations
 @c --> subsection number operations
@@ -1572,16 +1666,16 @@ coefficient of the leading term (see @ref{leadcoef})
 
 @c ---------------------------------------
 @node poly, proc, number, Data types
-@section poly 
+@section poly
 @cindex poly
 
 @c --> section poly
 @c ------------------------------
 @menu
-* poly declarations::           
-* poly expressions::            
-* poly operations::             
-* poly related functions::      
+* poly declarations::
+* poly expressions::
+* poly operations::
+* poly related functions::
 @end menu
 
 @node poly declarations, poly expressions, poly, poly
@@ -1671,7 +1765,7 @@ See @ref{ring}; @ref{poly}; @ref{poly operations}; @ref{poly related functions};
 @c <--
 
 @c ------------------------------
-@node poly operations, poly related functions, poly expressions, poly 
+@node poly operations, poly related functions, poly expressions, poly
 @subsection poly operations
 @cindex poly operations
 @c --> subsection poly operations
@@ -1766,16 +1860,16 @@ the indicated variable of the ring (see @ref{var})
 
 @c ---------------------------------------
 @node proc, ring, poly, Data types
-@section proc 
+@section proc
 @cindex proc
 
 @c --> section proc
 @c ------------------------------
 @menu
-* proc declarations::           
-* proc expressions::            
-* proc operations::             
-* proc related functions::      
+* proc declarations::
+* proc expressions::
+* proc operations::
+* proc related functions::
 @end menu
 
 @node proc declarations, proc expressions, proc, proc
@@ -1788,7 +1882,7 @@ the indicated variable of the ring (see @ref{var})
 @cindex proc expressions
 
 @c ------------------------------
-@node proc operations, proc related functions, proc expressions, proc 
+@node proc operations, proc related functions, proc expressions, proc
 @subsection proc operations
 @cindex proc operations
 
@@ -1800,16 +1894,16 @@ the indicated variable of the ring (see @ref{var})
 
 @c ---------------------------------------
 @node ring, string, proc, Data types
-@section ring 
+@section ring
 @cindex ring
 
 @c --> section ring
 @c ------------------------------
 @menu
-* ring declarations::           
-* ring expressions::            
-* ring operations::             
-* ring related functions::      
+* ring declarations::
+* ring expressions::
+* ring operations::
+* ring related functions::
 @end menu
 
 @node ring declarations, ring expressions, ring, ring
@@ -1822,7 +1916,7 @@ the indicated variable of the ring (see @ref{var})
 @cindex ring expressions
 
 @c ------------------------------
-@node ring operations, ring related functions, ring expressions, ring 
+@node ring operations, ring related functions, ring expressions, ring
 @subsection ring operations
 @cindex ring operations
 
@@ -1834,16 +1928,16 @@ the indicated variable of the ring (see @ref{var})
 
 @c ---------------------------------------
 @node string, def, ring, Data types
-@section string 
+@section string
 @cindex string
 
 @c --> section string
 @c ------------------------------
 @menu
-* string declarations::         
-* string expressions::          
-* string operations::           
-* string related functions::    
+* string declarations::
+* string expressions::
+* string operations::
+* string related functions::
 @end menu
 
 @node string declarations, string expressions, string, string
@@ -1956,7 +2050,7 @@ See @ref{implicit type conversions}; @ref{type casting}.
 @c <--
 
 @c ------------------------------
-@node string operations, string related functions, string expressions, string 
+@node string operations, string related functions, string expressions, string
 @subsection string operations
 @cindex string operations
 @c --> subsection string operations
@@ -2024,16 +2118,16 @@ name of the n-th ring variable (see @ref{varstr})
 
 @c ---------------------------------------
 @node def, vector, string, Data types
-@section def 
+@section def
 @cindex def
 
 @c --> section def
 @c ------------------------------
 @menu
-* def declarations::  
-* def expressions::  
-* def operations::  
-* def related functions::  
+* def declarations::
+* def expressions::
+* def operations::
+* def related functions::
 @end menu
 
 @node def declarations, def expressions, def, def
@@ -2046,7 +2140,7 @@ name of the n-th ring variable (see @ref{varstr})
 @cindex def expressions
 
 @c ------------------------------
-@node def operations, def related functions, def expressions, def 
+@node def operations, def related functions, def expressions, def
 @subsection def operations
 @cindex def operations
 
@@ -2058,16 +2152,16 @@ name of the n-th ring variable (see @ref{varstr})
 
 @c ---------------------------------------
 @node vector,  , def, Data types
-@section vector 
+@section vector
 @cindex vector
 
 @c --> section vector
 @c ------------------------------
 @menu
-* vector declarations::         
-* vector expressions::          
-* vector operations::           
-* vector related functions::    
+* vector declarations::
+* vector expressions::
+* vector operations::
+* vector related functions::
 @end menu
 
 @node vector declarations, vector expressions, vector, vector
@@ -2154,7 +2248,7 @@ See @ref{ring}; @ref{vector}; @ref{vector operations}; @ref{vector related funct
 @c <--
 
 @c ------------------------------
-@node vector operations, vector related functions, vector expressions, vector 
+@node vector operations, vector related functions, vector expressions, vector
 @subsection vector operations
 @cindex vector operations
 @c --> subsection vector operations

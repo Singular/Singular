@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.6 1998-04-27 14:29:37 krueger Exp $
+@comment $Id: reference.doc,v 1.7 1998-04-27 16:36:55 Singular Exp $
 @comment this file contains the reference part of the manual
 @c ---------------------------------------
 @c @node Functions, Control structures, Declaration commands, Commands
@@ -273,25 +273,25 @@ or Dongming Wang, Characteristic Sets and Zero Structure of Polynomial Sets
 @c variable in lead(f) (the leading term of f with respect to $>$),
 @c i.e. if $f=a_k(x_1,...,x_{k-1})x_k^s+...+a_0(x_1,...,x_{k-1})$ for some
 @c $k \leq n$ then $lvar(f)=x_k$, moreover let $ini(f):=a_k(x_1,...,x_{k-1})$.
-@c 
+@c
 @c A set $T=\{f_1,...,f_r\} \subset R$ is called triangular if $lvar(f_1)<...<lvar(f_r)$.
 @c The pseudoremainder $r=prem(g,f)$ of $g$ with respect to $f$ is defined by
 @c $ini(f)^a*g=q*f+r$ with the property $deg_{lvar(f)}(r)<deg_{lvar(f)}(f)$,
 @c a minimal.
-@c 
+@c
 @c (T,U) is called a triangular system, if T is a triangular set such that ini(T)
 @c does not vanish on $Zero(T) \setminus Zero(U)
 @c ( =:Zero(T\setminus U))$.
-@c 
+@c
 @c T is called irreducible if for every i there are no $d_i$,$f_i'$,$f_i''$ with
 @c the property:
 @c $$   lvar(d_i)<lvar(f_i) $$
 @c $$   lvar(f_i')=lvar(f_i'')=lvar(f_i)$$
 @c $$   0 \not\in prem(\{ d_i, ini(f_i'), ini(f_i'')\},\{ f_1,...,f_(i-1)\})$$
 @c such that $prem(d_i*f_i-f_i'*f_i'',\{f_1,...,f_(i-1)\})=0$.
-@c 
+@c
 @c (T,U) is irreducible if T is irreducible.
-@c 
+@c
 @c Let $G=\{g_1,...,g_s\}$ then there are irreducible triangular sets $T_1,...,T_l$
 @c such that $Zero(G)=\bigcup(i=1..l: Zero(T_i\setminus I_i))$
 @c where $I_i=\{ini(f), f \in T_i \}$.
@@ -302,25 +302,25 @@ or Dongming Wang, Characteristic Sets and Zero Structure of Polynomial Sets
 @c variable in lead(f) (the leading term of f with respect to >),
 @c i.e. if f=a_k(x_1,...,x_(k-1))x_k^s+...+a_0(x_1,...,x_(k-1)) for some
 @c k<=n then lvar(f)=x_k, moreover let ini(f):=a_k(x_1,...,x_(k-1)).
-@c 
+@c
 @c A set T=@{f_1,...,f_r@} in R is called triangular if lvar(f_1)<...<lvar(f_r).
 @c The pseudoremainder r=prem(g,f) of g with respect to f is defined by
 @c ini(f)^a*g=q*f+r with the property deg_(lvar(f))(r)<deg_(lvar(f))(f),s
 @c a minimal.
-@c 
+@c
 @c (T,U) is called a triangular system, if T is a triangular set such that ini(T)
 @c does not vanish on the zero set of T \ zero set of U
 @c ( =:Zero(T\U)).
-@c 
+@c
 @c T is called irreducible if for every i there are no d_i,f_i',f_i'' with
 @c the property:
 @c @*   lvar(d_i)<lvar(f_i)
 @c @*   lvar(f_i')=lvar(f_i'')=lvar(f_i)
 @c @*   0 not in prem(@{ d_i, ini(f_i'), ini(f_i'')@},@{ f_1,...,f_(i-1)@})
 @c @*such that prem(d_i*f_i-f_i'*f_i'',@{f_1,...,f_(i-1)@})=0.
-@c 
+@c
 @c (T,U) is irreducible if T is irreducible.
-@c 
+@c
 @c Let G=@{g_1,...,g_s@} then there are irreducible triangular sets T_1,...,T_l
 @c such that Zero(G)=Union(i=1..l: Zero(T_i\I_i))
 @c where I_i=@{ini(f), f in T_i @}.
@@ -961,7 +961,7 @@ number, poly, vector, ideal, module, matrix or list
 @item @strong{Purpose:}
 map objects between "almost identical" rings.@*
 @code{fetch} is the
-identity map between rings, qrings and drings with the same
+identity map between rings, and qrings with the same
 coefficient field and the same number of variables (but possible with
 different orderings), the i-th variable of the source ring is mapped to
 the i-th variable of the base ring.
@@ -995,11 +995,10 @@ ring to a quotient ring of that ring or vice versa.
 @menu
 * ring::
 * qring::
-* dring::
 * imap::
 @end menu
 @iftex
-See @ref{ring}; @ref{qring}; @ref{dring};
+See @ref{ring}; @ref{qring};
 @ref{imap}.
 @end iftex
 @c ---------------------------------------
@@ -1085,10 +1084,10 @@ See @ref{string expressions}.
 @code{finduni (} ideal_expression@code{)}
 @item @strong{Type:}
 ideal
-@item @strong{Purpose:} 
+@item @strong{Purpose:}
 the ith generator of the returned ideal is a univariate
 polynomial of minimal degree in the ith (ring) variable such that this
-polynomial belongs to the given ideal.  
+polynomial belongs to the given ideal.
 @*The ideal must be zero
 dimensional and given as a reduced Groebner basis in the current ring.
 @item @strong{Example:}
@@ -1109,7 +1108,7 @@ dimensional and given as a reduced Groebner basis in the current ring.
 * vdim::
 @end menu
 @iftex
-See @ref{ring}; 
+See @ref{ring};
 @ref{std}; @ref{option}; @ref{vdim}.
 @end iftex
 @c ---------------------------------------
@@ -1331,7 +1330,7 @@ number, poly, vector, ideal, module, matrix or list
 @item @strong{Purpose:}
 identity map on common subrings.@*
 @code{imap} is the
-map between rings, qrings and drings with the same
+map between rings, and qrings with the same
 coefficient field which is the identity on variables of
 the same name and 0 otherwise.
 @item @strong{Example:}
@@ -1348,11 +1347,10 @@ the same name and 0 otherwise.
 @menu
 * ring::
 * qring::
-* dring::
 * fetch::
 @end menu
 @iftex
-See @ref{ring}; @ref{qring}; @ref{dring};
+See @ref{ring}; @ref{qring};
 @ref{fetch}.
 @end iftex
 @c ---------------------------------------
@@ -2862,18 +2860,18 @@ See @ref{int expressions}; @ref{intmat expressions}.
 @item @strong{Type:}
 any
 @item @strong{Purpose:}
-Read data from a link. 
+Read data from a link.
 @*For Ascii links, the content of the entire
-file is returned as one string. 
+file is returned as one string.
 @*For MP links, one expression is read
 from the link, and returned after an evaluation. A link blocks
 (i.e. does not return) as long as there is no data to read from an MPtcp
 link. The @code{status} command can be used to check whether or not
-there is data to read. 
-@*For DBM links, a 
+there is data to read.
+@*For DBM links, a
 @code{read} with one argument returns the value of the next entry in the
 data base, and a @code{read} with two arguments returns the value to the
-key from the data base. 
+key from the data base.
 @item @strong{Example:}
 @example
 @c example
@@ -3385,7 +3383,7 @@ Even if @code{sres} does not compute a minimal resolution, the @code{betti}
 command gives the true betti numbers! In many cases of interest
 @code{sres} is much faster than any other known method.
 Let @code{list l=sres(M,0);} then L[1]=M is identical to the input,
-L[2] is a standard basis with respect to the Schreyer ordering of 
+L[2] is a standard basis with respect to the Schreyer ordering of
 the first szyzgy
 module of L[1], etc.
 ( L[i]
@@ -4292,7 +4290,7 @@ return the result(s) of a procedure
       j=j+i;
     @}
     return(j);
-  @}    
+  @}
   // other examples:
   return ( 0 );
   return("NIL");
@@ -4418,10 +4416,10 @@ value of type list is a free resolution
 value of type int is the dimension (see @ref{dim})
 @item @code{withMult}
 value of type int is the multiplicity (see @ref{mult})
-@item @code{D}
-object is an differential operator, if set to 1;
-@*object is in a module, if set to 0
-@*only valid in a dring (see @ref{dring}).
+@c @item @code{D}
+@c object is an differential operator, if set to 1;
+@c @*object is in a module, if set to 0
+@c @*only valid in a dring (see @ref{dring}).
 @end table
 @end table
 @c @menu
@@ -4546,7 +4544,7 @@ See @ref{ideal}; @ref{std}; @ref{dim}; @ref{vdim}; @ref{mult}.
 @item @strong{Purpose:}
 Dumps (i.e. write in one "message" or "block") the state of the Singular
 session (i.e., all defined variables and their values) to the specified
-link (which must be either an Ascii or MP link). 
+link (which must be either an Ascii or MP link).
 @item @strong{Example:}
 @example
 @c example
@@ -4660,7 +4658,7 @@ reads the contents of the entire file/link and restores all variables
 from it. For Ascii links, @code{getdump} is equivalent to a
 @code{execute read (} link @code{);} command. For MP links,
 @code{getdump} should only be used on data which was previously
-@code{dump}'ed. 
+@code{dump}'ed.
 @item @strong{Example:}
 @example
 @c example
@@ -4671,7 +4669,7 @@ from it. For Ascii links, @code{getdump} is equivalent to a
   i;
 @c example
 @end example
-@item @strong{Restrictions:} 
+@item @strong{Restrictions:}
 @code{getdump} is not supported fro DBM links, or for a link connecting
 to @code{stdin} (standard input).
 @end table
@@ -5239,17 +5237,17 @@ See @ref{Expressions}.
 @code{write (} link@code{,} expression_list @code{);}
 @*@code{write} ( link , key , value ) // DBM links, only
 @item @strong{Purpose:}
-Write data to a link. 
+Write data to a link.
 @*If the link is of type @code{Ascii}, all expressions are converted to
 strings  (and separated by a newline character) before they are
 written (as a consequence, only such values which can be converted to a
-string can be written to an  @code{Ascii} link). 
+string can be written to an  @code{Ascii} link).
 @*For MP links,
 ring-dependent expressions are written together with a ring
 description. To prevent an evaluation of the expression before it is
 written, the @code{quote} command (possibly together with @code{eval})
 can be used. A @code{write} blocks (i.e. does not return), as long as a
-MPtcp link is nor ready for writing. 
+MPtcp link is nor ready for writing.
 @*For DBM links, @code{write} inserts (key, value) into the
 data base.
 @item @strong{Example:}
@@ -5413,7 +5411,7 @@ See @ref{int expressions}; ref{voice}.
 describe the coefficient field of the current basering as
 an algebraic extension with the minimal polynomial equal to @code{minpoly}.
 Setting the @code{minpoly} should be the first command after
-defining the ring. 
+defining the ring.
 @*@strong{Warning:} @sc{Singular} does not check whether the given
 polynomial is irreducible!
 @item @strong{Example:}

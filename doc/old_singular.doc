@@ -2157,37 +2157,6 @@ main memory it will be loaded and kept there. The call then executes
 the sequence of commands stored in the specified procedure.
 @* See @ref{proc}; @ref{LIB}.
 @c ---------------------------------------
-@node maps, untyped definitions, procedures, Expressions
-@section maps
-@cindex maps
-
-Maps are ring maps from a preimage ring into the base ring.
-Note that the target of a map is ALWAYS the actual base ring.
-Maps between rings with different coefficient fields are
-possible, the map of the coefficients is defined in the following way:
-@table @asis
-@item Z/p -> Q
-@tex
-$[i]_p \rightarrow i \in [-p/2,p/2] \subseteq $Z
-@end tex
-@ifinfo
-[i]_p -> i in [-p/2,p/2] in Z
-@end ifinfo
-@item Z/p -> Z/p'
-@tex
-$[i]_p \in $Z/p$ \rightarrow i \in [-p/2,p/2] \subseteq $Z$ \rightarrow [i]_{p'} \in $Z/p'
-@end tex
-@ifinfo
-[i]_p in Z/p -> i in [-p/2,p/2] in Z -> [i]_p' in Z/p'
-@end ifinfo
-@item Q -> Z/p
-@itemx Q -> (Z/p)(a,..)
-@itemx Q -> Q(a,..)
-@itemx Z/p ->(Z/p)(a,...)
-as usual
-@end table
-See @ref{map}; @ref{imap}; @ref{fetch}; @ref{subst}.
-@c ---------------------------------------
 @node untyped definitions, expression list, maps, Expressions
 @section untyped definitions
 @cindex untyped definitions
@@ -2730,65 +2699,6 @@ See @ref{module expression};
 @end menu
 @iftex
 See @ref{matrix expression}; @ref{poly expression}.
-@end iftex
-@c ---------------------------------------
-@node  map, qring, matrix, Declaration commands
-@subsection map
-@cindex map
-
-@table @code
-@item @strong{Syntax:}
-@code{map} name @code{=} preimage_ring_name @code{,} ideal_expression @code{;}
-@item @strong{Purpose:}
-define a ring map from preimage_ring to basering
-@sp 1
-map the variables of the preimage ring to the generators of the ideal.
-If the ideal contains less elements than variables in the
-preimage_ring the remaining variables are maped to 0, if the ideal contains
-more elements these are ignored.
-The image ring is always the actual base ring.
-For the mapping of coefficients from different fields see @ref{maps}.
-@item @strong{Default:}
-none
-@item @strong{Apply a map:}
-the name of a map serves as the function which maps objects from the
-preimage_ring into the base ring.  These objects must be defined
-by names (no evaluation in the preimage ring is possible).
-@*Maps may be composed.
-@item @strong{Remark:}
-There are standard mappings for the identity map: @code{fetch} and @code{imap}.
-@item @strong{Example:}
-@example
-@c example
-  ring r1=32003,(x,y,z),dp;
-  ideal i=x,y,z;
-  ring r2=32003,(a,b),dp;
-  map f=r1,a,b,a+b;
-  // maps from r1 to r2,
-  // x to a, y to b and z to a+b
-  f(i);
-  // operations like f(i[1]) or f(i*i) are not allowed
-  ideal i=f(i);
-  // objects in different rings may have the same name
-  map g   = r2,a2,b2;
-  map phi = g(f);
-  // composition of map f and g
-  // maps from r1 to r2,
-  // x to a2, y to b2, z to a2+b2
-  phi(i);
-@c example
-@end example
-@end table
-@menu
-* maps::
-* ideal expression::
-* ring::
-* fetch::
-* imap::
-@end menu
-@iftex
-See @ref{maps}; @ref{ideal expression}; @ref{ring};
-@ref{imap}; @ref{fetch}.
 @end iftex
 @c ---------------------------------------
 @node  qring, dring, map, Declaration commands
