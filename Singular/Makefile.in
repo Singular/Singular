@@ -212,7 +212,7 @@ endif
 SLIBS = algebra.lib        all.lib            brnoeth.lib       classify.lib \
         deform.lib         elim.lib           finvar.lib        general.lib \
         graphics.lib       hnoether.lib       homolog.lib       inout.lib   \
-        ainvar.lib         jordan.lib         latex.lib         linalg.lib  \
+        ainvar.lib                            latex.lib         linalg.lib  \
         matrix.lib         mondromy.lib       normal.lib        makedbm.lib \
         poly.lib           presolve.lib       primdec.lib       primitiv.lib\
 	qhmoduli.lib       random.lib         ring.lib          sing.lib    \
