@@ -225,6 +225,7 @@ int siRand()
 
 void singular_example(char *str)
 {
+  assume(str!=NULL);
   char *s=str;
   while (*s==' ') s++;
   char *ss=s;
@@ -261,9 +262,13 @@ void singular_example(char *str)
   else
   {
     char sing_file[MAXPATHLEN];
-    FILE *fd;
-    sprintf(sing_file, "%s/%s.sing", feResource('m', 0), s);
-    fd = feFopen(sing_file, "r");
+    FILE *fd=NULL;
+    char *res_m=feResource('m', 0);
+    if (res_m!=NULL)
+    {
+      sprintf(sing_file, "%s/%s.sing", res_m, s);
+      fd = feFopen(sing_file, "r");
+    }  
     if (fd != NULL)
     {
 
