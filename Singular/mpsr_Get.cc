@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.24 1999-06-08 08:02:35 Singular Exp $ */
+/* $Id: mpsr_Get.cc,v 1.25 1999-07-09 14:06:47 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -718,7 +718,7 @@ static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
   ideal id = (ideal) mlv2->lv->data;
 
   idhdl h = mpsr_FindIdhdl(name, r2);
-  if (h == NULL || IDTYP(h) != RING_CMD || ! mpsr_RingEqual(IDRING(h), r))
+  if (h == NULL || IDTYP(h) != RING_CMD || ! rEqual(IDRING(h), r))
   {
     h = mpsr_InitIdhdl(RING_CMD, r, name);
     h->next = IDROOT;

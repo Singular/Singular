@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.29 1999-07-08 13:38:42 Singular Exp $ */
+/* $Id: ring.h,v 1.30 1999-07-09 14:06:51 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -46,6 +46,7 @@ char * rParStr(ring r);
 int    rIsExtension(ring r);
 int    rIsExtension();
 int    rSum(ring r1, ring r2, ring &sum);
+BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = 1);
 BOOLEAN   rComplete(ring r, int force = 0);
 void   rUnComplete(ring r);
 int    rBlocks(ring r);

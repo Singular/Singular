@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.156 1999-07-08 10:18:09 wenk Exp $ */
+/* $Id: iparith.cc,v 1.157 1999-07-09 14:06:45 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2652,8 +2652,7 @@ static BOOLEAN jjIDEAL_R(leftv res, leftv v)
   if (currRing!=NULL)
   {
     ring q=(ring)v->Data();
-    if ((rInternalChar(q)==rInternalChar(currRing))
-    && (q->N==currRing->N)) /* && varnames equ. */
+    if (rEqual(currRing, q, 0))
     {
       if (q->qideal==NULL)
         res->data=(char *)idInit(1,1);
@@ -2662,6 +2661,7 @@ static BOOLEAN jjIDEAL_R(leftv res, leftv v)
       return FALSE;
     }
   }
+  WerrorS("can only get ideal from identical qring");
   return TRUE;
 }
 static BOOLEAN jjIm2Iv(leftv res, leftv v)

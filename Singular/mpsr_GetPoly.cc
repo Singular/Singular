@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.21 1999-03-08 17:30:47 Singular Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.22 1999-07-09 14:06:49 obachman Exp $ */
 
 /***************************************************************
  *
@@ -955,7 +955,7 @@ static mpsr_Status_t GetDefRelsAnnot(MPT_Node_pt node, ring r)
   r1 = mlv->r;
   lv = mlv->lv;
 
-  if (! mpsr_RingEqual(r1, r)) return mpsr_Failure;
+  if (! rEqual(r1, r)) return mpsr_Failure;
 
   if (lv->rtyp == POLY_CMD)
   {

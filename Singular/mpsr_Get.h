@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.5 1998-12-16 18:43:42 Singular Exp $ */
+/* $Id: mpsr_Get.h,v 1.6 1999-07-09 14:06:47 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -48,7 +48,6 @@ typedef mpsr_sleftv * mpsr_leftv;
 // from mpsr_GetMisc.cc
 extern int mpsr_rDefault(short ch, char *name, ring &r);
 extern ring mpsr_rDefault(short ch);
-extern BOOLEAN mpsr_RingEqual(ring r1, ring r2);
 extern mpsr_Status_t mpsr_MergeLeftv(mpsr_leftv mlv1, mpsr_leftv mlv2);
 extern void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring);
 extern void mpsr_SetCurrRingHdl(ring r);

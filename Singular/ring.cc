@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.58 1999-07-08 17:16:29 Singular Exp $ */
+/* $Id: ring.cc,v 1.59 1999-07-09 14:06:50 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1819,6 +1819,86 @@ ring rCopy(ring r)
 #endif
 
   return res;
+}
+
+// returns TRUE, if r1 equals r2 FALSE, otherwise Equality is
+// determined componentwise, if qr == 1, then qrideal equality is
+// tested, as well
+BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
+{
+  int i, j;
+
+  if (r1 == r2) return 1;
+
+  if (r1 == NULL || r2 == NULL) return 0;
+
+  if ((rInternalChar(r1) != rInternalChar(r2))
+  // orig: r1->ch == r2->ch ???
+  || (r1->N != r2->N) || (r1->OrdSgn != r2->OrdSgn)
+      || (rPar(r1) != rPar(r2)))
+    return 0;
+
+  for (i=0; i<r1->N; i++)
+    if (strcmp(r1->names[i], r2->names[i])) return 0;
+
+  i=0;
+  while (r1->order[i] != 0)
+  {
+    if (r2->order[i] == 0) return 0;
+    if ((r1->order[i] != r2->order[i]) ||
+        (r1->block0[i] != r2->block0[i]) || (r2->block0[i] != r1->block0[i]))
+      return 0;
+    if (r1->wvhdl[i] != NULL)
+    {
+      if (r2->wvhdl[i] == NULL)
+        return 0;
+      for (j=0; j<r1->block1[i]-r1->block0[i]+1; j++)
+        if (r2->wvhdl[i][j] != r1->wvhdl[i][j])
+          return 0;
+    }
+    else if (r2->wvhdl[i] != NULL) return 0;
+    i++;
+  }
+
+  for (i=0; i<rPar(r1);i++)
+  {
+      if (strcmp(r1->parameter[i], r2->parameter[i])!=0)
+        return 0;
+  }
+
+  if (r1->minpoly != NULL)
+  {
+    if (r2->minpoly == NULL) return 0;
+    if (currRing == r1 || currRing == r2)
+    {
+      if (! nEqual(r1->minpoly, r2->minpoly)) return 0;
+    }
+  }
+  else if (r2->minpoly != NULL) return 0;
+
+  if (qr)
+  {
+    if (r1->qideal != NULL)
+    {
+      ideal id1 = r1->qideal, id2 = r2->qideal;
+      int i, n;
+      poly *m1, *m2;
+
+      if (id2 == NULL) return 0;
+      if ((n = IDELEMS(id1)) != IDELEMS(id2)) return 0;
+
+      if (currRing == r1 || currRing == r2)
+      {
+        m1 = id1->m;
+        m2 = id2->m;
+        for (i=0; i<n; i++)
+          if (! pEqualPolys(m1[i],m2[i])) return 0;
+      }
+    }
+    else if (r2->qideal != NULL) return 0;
+  }
+
+  return 1;
 }
 
 rOrderType_t rGetOrderType(ring r)
