@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.14 2001-03-02 13:09:13 Singular Exp $
+@comment $Id: INSTALL_unix.texi,v 1.15 2001-04-04 13:53:56 lossen Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on  Unix 
 @c
@@ -60,8 +60,12 @@ the file COPYING contained in the distribution
 for license
 information on @sc{Singular}. In particular, notice that we only grant you
 permission to use @sc{Singular} if you have registered yourself as a
-@sc{Singular} user by sending email to @email{singular@@mathematik.uni-kl.de}
-with the subject line (or, mail body) @code{register}.
+@sc{Singular} user by using the registration form on the @sc{Singular} 
+homepage @uref{http://www.singular.uni-kl.de}.
+If for some reason you cannot access the registration form, you can also
+register by sending an email to @email{singular@@mathematik.uni-kl.de}
+with subject line @code{register} and body containing the following data:
+your name, email address, organisation, country and platform(s).
 @end ifclear
 
 @heading To install SINGULAR

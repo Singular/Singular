@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.10 2001-03-22 16:54:52 Singular Exp $
+@comment $Id: COPYING.texi,v 1.11 2001-04-04 13:53:57 lossen Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -53,10 +53,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 Please send any comments or bug reports to
 @email{singular@@mathematik.uni-kl.de}.
 
-Please register yourself as a @sc{Singular} user by sending email to 
-@email{singular@@mathematik.uni-kl.de}
-with the subject line 
-@code{register}.
+Please register yourself as a @sc{Singular} user by using the 
+registration form on the @sc{Singular} homepage
+              @uref{http://www.singular.uni-kl.de}.
+If for some reason you cannot access the registration form, you 
+can also register by sending an email to 
+              @email{singular@@mathematik.uni-kl.de}
+with subject line @code{register} and body containing the following data:
+     your name, email address, organisation, country and platform(s).
+
 
 If you use Singular or parts thereof in a project and/or publish
 results that were partly obtained using @sc{Singular}, we ask you to
