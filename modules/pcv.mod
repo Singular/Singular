@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: pcv.mod,v 1.1 2002-06-27 13:58:17 anne Exp $
+ *  $Id: pcv.mod,v 1.2 2003-06-11 10:21:28 anne Exp $
  *
  *  Test mod fuer modgen
  */
@@ -58,7 +58,7 @@ BOOLEAN pcvBasis(leftv res,leftv h);
 // module="pcv";
 package="pcv";
 
-version="$Id: pcv.mod,v 1.1 2002-06-27 13:58:17 anne Exp $";
+version="$Id: pcv.mod,v 1.2 2003-06-11 10:21:28 anne Exp $";
 info="
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -69,6 +69,10 @@ AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
  Dim(d0,d1);     number of monomials from deg d0 to d1
  Basis(d0,d1);   list of monomials from deg d0 to d1
 ";
+
+%modinitial
+// no commands to be run upon loading the module
+%endinitial
 
 %procedures
 
@@ -139,8 +143,6 @@ list Basis(int d0,int d1)
 }
 
 %C
-
-// pcvLAddL 
 lists pcvLAddL(lists l1,lists l2)
 {
   lists l0=(lists)omAllocBin(slists_bin);
