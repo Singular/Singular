@@ -125,8 +125,13 @@
 #undef SRING
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
+#ifdef __MWERKS__
+/* static tables only */
+#define PROC_BUG
+#else
 /* works around a quirk in the generation of parser tables */
 #define INIT_BUG
+#endif
 
 /* Define to use new namespaces techniks */
 #undef HAVE_NAMESPACES
