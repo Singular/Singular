@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.19 1999-11-22 12:40:03 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.20 1999-11-22 13:45:36 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -573,7 +573,7 @@ void sparse_mat::smNewBareiss(int x, int y)
   this->smZeroElim();
   if (tored != nrows)
     this->smToredElim();
-  if (act < y)
+  if (act <= y)
   {
     this->smFinalMult();
     this->smCopToRes();
@@ -944,6 +944,18 @@ void sparse_mat::sm1Elim()
     w = r->m;
     loop                  // combine the chains a and b: p*a + w*b
     {
+      if (a == NULL)
+      {
+        do
+        {
+          res = res->n = smElemCopy(b);
+          res->m = smMult(b->m, w);
+          res->e = 1;
+          res->f = smPolyWeight(res);
+          b = b->n;
+        } while (b != NULL);
+        break;
+      }
       if (a->pos < b->pos)
       {
         res = res->n = a;
@@ -982,18 +994,6 @@ void sparse_mat::sm1Elim()
         res->n = a;
         break;
       }
-      if (a == NULL)
-      {
-        do
-        {
-          res = res->n = smElemCopy(b);
-          res->m = smMult(b->m, w);
-          res->e = 1;
-          res->f = smPolyWeight(res);
-          b = b->n;
-        } while (b != NULL);
-        break;
-      }
     }
     m_act[r->pos] = dumm->n;
     smElemDelete(&r);
@@ -1029,6 +1029,20 @@ void sparse_mat::smHElim()
     ir = r->e;
     loop                  // combine the chains a and b: (hp,gp)*a(l) + hr*b(h)
     {
+      if (a == NULL)
+      {
+        do
+        {
+          res = res->n = smElemCopy(b);
+          x = SM_MULT(b->m, hr, m_res[ir]->m);
+          b = b->n;
+          if(ir) SM_DIV(x, m_res[ir]->m);
+          res->m = x;
+          res->e = e;
+          res->f = smPolyWeight(res);
+        } while (b != NULL);
+        break;
+      }
       if (a->pos < b->pos)
       {
         res = res->n = a;
@@ -1112,20 +1126,6 @@ void sparse_mat::smHElim()
       if (b == NULL)
       {
         res->n = a;
-        break;
-      }
-      if (a == NULL)
-      {
-        do
-        {
-          res = res->n = smElemCopy(b);
-          x = SM_MULT(b->m, hr, m_res[ir]->m);
-          b = b->n;
-          if(ir) SM_DIV(x, m_res[ir]->m);
-          res->m = x;
-          res->e = e;
-          res->f = smPolyWeight(res);
-        } while (b != NULL);
         break;
       }
     }
