@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.12 1997-08-29 07:41:02 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.13 1997-08-29 08:33:11 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -192,7 +192,6 @@ basefactoryincl := \
 		cf_binom.h \
 		cf_defs.h \
 		cf_eval.h \
-		cf_factor.h \
 		cf_factory.h \
 		cf_generator.h \
 		cf_globals.h \
