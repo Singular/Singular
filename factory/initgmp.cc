@@ -1,13 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: initgmp.cc,v 1.0 1996-05-17 10:59:46 stobbe Exp $
+// $Id: initgmp.cc,v 1.1 1997-03-27 10:01:44 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:46  stobbe
+Initial revision
+
 */
 
 #include "cf_gmp.h"
 
 #include "assert.h"
+
 #include "cf_defs.h"
 
 #ifdef USE_MEMUTIL
@@ -43,7 +47,7 @@ int initializeGMP()
 
   if ( ! initialized ) {
     initialized = 1;
-#if defined USE_MEMUTIL && ! defined SINGULAR
+#ifdef USE_MEMUTIL
 #ifdef USE_OLD_MEMMAN
     mp_set_memory_functions( getBlock, reallocBlock, freeBlock );
 #else
