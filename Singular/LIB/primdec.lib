@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.64 2000-05-15 11:05:39 pfister Exp $
+// $Id: primdec.lib,v 1.65 2000-05-15 14:29:22 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.64 2000-05-15 11:05:39 pfister Exp $";
+version="$Id: primdec.lib,v 1.65 2000-05-15 14:29:22 Singular Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -84,7 +84,7 @@ EXAMPLE: example sat2; shows an example
    def @P= basering;
    if(ordstr(basering)[1,2]!="dp")
    {
-      execute "ring @Phelp=("+charstr(@P)+"),("+varstr(@P)+"),(C,dp);";
+      execute("ring @Phelp=("+charstr(@P)+"),("+varstr(@P)+"),(C,dp);");
       ideal inew=std(imap(@P,id));
       ideal  @h=imap(@P,h);
    }
@@ -465,7 +465,7 @@ proc primaryTest (ideal i, poly p)
          if(e mod char(basering)==0)
          {
            if ( voice >=15 )
-           { 
+           {
               "// WARNING: The characteristic is perhaps too small to use";
               "// the algorithm of Gianni/Trager/Zacharias.";
               "// This may result in an infinte loop";
@@ -474,9 +474,9 @@ proc primaryTest (ideal i, poly p)
            while(e mod char(basering)==0)
            {
               f=f*char(basering);
-              e=e/char(basering);  
+              e=e/char(basering);
            }
-       
+
          }
          t=leadcoef(i[m])*e*var(n)^f+(i[m]-lead(i[m]))/var(n)^((e-1)*f);
          i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
@@ -485,15 +485,15 @@ proc primaryTest (ideal i, poly p)
            return(ideal(0));
          }
          if(f>1)
-         {       
+         {
             act=factorize(t);
             if(size(act[1])>2)
             {
-              return(ideal(0));   
+              return(ideal(0));
             }
             if(deg(act[1][2])>1)
             {
-              return(ideal(0));   
+              return(ideal(0));
             }
             t=act[1][2];
          }
@@ -1181,12 +1181,12 @@ proc coeffLcm(ideal h)
    }
    def bsr= basering;
    string @id=string(h);
-   execute "ring @r=0,("+@pa+","+varstr(bsr)+"),(C,dp);";
-   execute "ideal @i="+@id+";";
+   execute("ring @r=0,("+@pa+","+varstr(bsr)+"),(C,dp);");
+   execute("ideal @i="+@id+";");
    poly @p=lcmP(@i);
    string @ps=string(@p);
    setring bsr;
-   execute "poly @p="+@ps+";";
+   execute("poly @p="+@ps+";");
    return(@p);
 }
 example
@@ -1506,8 +1506,8 @@ example
    def @Q=basering;
    list l= prepareQuotientring(3);
    l;
-   execute l[1];
-   execute l[2];
+   execute(l[1]);
+   execute(l[2]);
    basering;
    phi;
    setring @Q;
@@ -1561,8 +1561,8 @@ EXAMPLE: example minAssPrimes; shows an example
    map phi=@P,qr[2];
    i=qr[1];
 
-   execute "ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),("
-             +ordstr(basering)+");";
+   execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),("
+             +ordstr(basering)+");");
 
 
    ideal i=fetch(@P,i);
@@ -1596,8 +1596,8 @@ EXAMPLE: example minAssPrimes; shows an example
       {
          setring @P;
         // kill gnir;
-         execute "ring gnir1 = ("+charstr(basering)+"),
-                              ("+varstr(basering)+"),(C,lp);";
+         execute("ring gnir1 = ("+charstr(basering)+"),
+                              ("+varstr(basering)+"),(C,lp);");
          ideal i=fetch(@P,i);
          list @pr=facstd(i);
         // ideal ser;
@@ -1683,7 +1683,7 @@ proc union(list li)
 
   def P=basering;
 
-  execute "ring ir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);";
+  execute("ring ir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
   list l=fetch(P,li);
   list @erg;
 
@@ -1764,8 +1764,8 @@ proc radicalOld(ideal i)
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc equidim(ideal i,list #)
-"USAGE:  equidim(i) or equidim(i,1) ; i ideal 
-         equidim(i,1) uses the algorithm of Eisenbud, Hunecke and Vasconcelos          
+"USAGE:  equidim(i) or equidim(i,1) ; i ideal
+         equidim(i,1) uses the algorithm of Eisenbud, Hunecke and Vasconcelos
  RETURN: list = list of equidimensional ideals a1,...,as such that
          i is the intersection of a1,...,as. as is the equidimensional
          locus of i, ai are the lower dimensional equidimensional loci
@@ -1790,13 +1790,13 @@ proc equidim(ideal i,list #)
   if(((homo==1)||(a==1))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
-     execute "ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),("
-                              +ordstr(basering)+");";
+     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),("
+                              +ordstr(basering)+");");
      ideal i=imap(P,i);
      ideal j=i;
      if(a==1)
      {
-       attrib(j,"isSB",1); 
+       attrib(j,"isSB",1);
      }
      else
      {
@@ -1805,10 +1805,10 @@ proc equidim(ideal i,list #)
   }
   else
   {
-     execute "ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),dp;";
+     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),dp;");
      ideal i=imap(P,i);
      ideal j=groebner(i);
-  }  
+  }
   if(homo==1)
   {
      for(n=1;n<=nvars(basering);n++)
@@ -1828,11 +1828,11 @@ proc equidim(ideal i,list #)
 
   if(m==0)
   {
-     ideal k=equidimMax(j); 
+     ideal k=equidimMax(j);
   }
   else
   {
-     ideal k=equidimMaxEHV(j); 
+     ideal k=equidimMaxEHV(j);
   }
   if(size(reduce(k,j,1))==0)
   {
@@ -1842,11 +1842,11 @@ proc equidim(ideal i,list #)
     return(eq);
   }
 
-  option(returnSB);  
+  option(returnSB);
   j=quotient(i,k);
   option(noreturnSB);
 
-  list equi=equidim(j);  
+  list equi=equidim(j);
   if(deg(equi[size(equi)][1])<=0)
   {
       equi[size(equi)]=k;
@@ -1869,7 +1869,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc equidimMax(ideal i)
-"USAGE:  equidimMax(i); i ideal           
+"USAGE:  equidimMax(i); i ideal
  RETURN:  ideal = ideal of equidimensional locus
  EXAMPLE: example equidimMax; shows an example
 "
@@ -1881,17 +1881,17 @@ proc equidimMax(ideal i)
   int g=size(i);
   int a=attrib(i,"isSB");
   int homo=homog(i);
-   
+
   if(((homo==1)||(a==1))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
-     execute "ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),("
-                              +ordstr(basering)+");";
+     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),("
+                              +ordstr(basering)+");");
      ideal i=imap(P,i);
      ideal j=i;
      if(a==1)
      {
-       attrib(j,"isSB",1); 
+       attrib(j,"isSB",1);
      }
      else
      {
@@ -1900,7 +1900,7 @@ proc equidimMax(ideal i)
   }
   else
   {
-     execute "ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),dp;";
+     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),dp;");
      ideal i=imap(P,i);
      ideal j=groebner(i);
   }
@@ -1923,8 +1923,8 @@ proc equidimMax(ideal i)
 
   indep=maxIndependSet(j);
 
-  execute "ring gnir1 = ("+charstr(basering)+"),("+indep[1][1]+"),("
-                              +indep[1][2]+");";
+  execute("ring gnir1 = ("+charstr(basering)+"),("+indep[1][1]+"),("
+                              +indep[1][2]+");");
   if(homo==1)
   {
      ideal j=std(imap(gnir,i),hil,w);
@@ -1934,7 +1934,7 @@ proc equidimMax(ideal i)
      ideal j=groebner(imap(gnir,i));
   }
   string quotring=prepareQuotientring(nvars(basering)-indep[1][3]);
-  execute quotring;
+  execute(quotring);
   ideal j=imap(gnir1,j);
   kill gnir1;
   j=clearSB(j);
@@ -2056,7 +2056,7 @@ EXAMPLE: example decomp; shows an example
   //pass to the lexicographical ordering and compute a standardbasis
   //----------------------------------------------------------------
 
-  execute "ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);";
+  execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
   option(redSB);
 
   ideal ser=fetch(@P,ser);
@@ -2208,11 +2208,11 @@ EXAMPLE: example decomp; shows an example
   ideal jkeep=@j;
   if(ordstr(@P)[1]=="w")
   {
-     execute "ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),("+ordstr(@P)+");";
+     execute("ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),("+ordstr(@P)+");");
   }
   else
   {
-     execute "ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),(C,dp);";
+     execute("ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),(C,dp);");
   }
 
   if(homo==1)
@@ -2249,8 +2249,8 @@ EXAMPLE: example decomp; shows an example
      //this is the good case, nothing to do, just to have the same notations
      //change the ring
      {
-        execute "ring gnir1 = ("+charstr(basering)+"),("+varstr(basering)+"),("
-                              +ordstr(basering)+");";
+        execute("ring gnir1 = ("+charstr(basering)+"),("+varstr(basering)+"),("
+                              +ordstr(basering)+");");
         ideal @j=fetch(gnir,@j);
         attrib(@j,"isSB",1);
         ideal ser=fetch(gnir,ser);
@@ -2259,9 +2259,9 @@ EXAMPLE: example decomp; shows an example
      else
      {
         @va=string(maxideal(1));
-        execute "ring gnir1 = ("+charstr(basering)+"),("+indep[@m][1]+"),("
-                              +indep[@m][2]+");";
-        execute "map phi=gnir,"+@va+";";
+        execute("ring gnir1 = ("+charstr(basering)+"),("+indep[@m][1]+"),("
+                              +indep[@m][2]+");");
+        execute("map phi=gnir,"+@va+";");
         if(homo==1)
         {
            ideal @j=std(phi(@j),@hilb);
@@ -2306,7 +2306,7 @@ EXAMPLE: example decomp; shows an example
      //we pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
      //---------------------------------------------------------------------
 
-     execute quotring;
+     execute(quotring);
 
     // @j considered in the quotientring
      ideal @j=imap(gnir1,@j);
@@ -2517,17 +2517,17 @@ EXAMPLE: example decomp; shows an example
            //the good case, nothing to do, just to have the same notations
            //change the ring
            {
-              execute "ring gnir1 = ("+charstr(basering)+"),("+
-                varstr(basering)+"),("+ordstr(basering)+");";
+              execute("ring gnir1 = ("+charstr(basering)+"),("+
+                varstr(basering)+"),("+ordstr(basering)+");");
               ideal @j=fetch(gnir,jkeep);
               attrib(@j,"isSB",1);
            }
            else
            {
               @va=string(maxideal(1));
-              execute "ring gnir1 = ("+charstr(basering)+"),("+
-                      restindep[@m][1]+"),(" +restindep[@m][2]+");";
-              execute "map phi=gnir,"+@va+";";
+              execute("ring gnir1 = ("+charstr(basering)+"),("+
+                      restindep[@m][1]+"),(" +restindep[@m][2]+");");
+              execute("map phi=gnir,"+@va+";");
               if(homo==1)
               {
                  ideal @j=std(phi(jkeep),keephilb);
@@ -2551,7 +2551,7 @@ EXAMPLE: example decomp; shows an example
            //leading coefficients of the polynomials  there (polynomials in
            //K[var(nnp+1),..,var(nva)]) are collected in the list h,
            //we need their ggt, gh, because of the following:
-           //let (j:gh^n)=(j:gh^infinity) then 
+           //let (j:gh^n)=(j:gh^infinity) then
            //j*K(var(nnp+1),..,var(nva))[..the rest..]
            //intersected with K[var(1),...,var(nva)] is (j:gh^n)
            //on the other hand j=(j,gh^n) intersected with (j:gh^n)
@@ -2570,7 +2570,7 @@ EXAMPLE: example decomp; shows an example
            //we pass to the quotientring  K(var(nnp+1),..,var(nva))[..rest..]
            //------------------------------------------------------------------
 
-           execute quotring;
+           execute(quotring);
 
            // @j considered in the quotientring
            ideal @j=imap(gnir1,@j);
@@ -2597,10 +2597,10 @@ EXAMPLE: example decomp; shows an example
            option(noredSB);
 
 
-           //we need the intersection of the ideals in the list quprimary with 
+           //we need the intersection of the ideals in the list quprimary with
            //the polynomialring, i.e. let q=(f1,...,fr) in the quotientring
            //such an ideal but fi polynomials, then the intersection of q with
-           //the polynomialring is the saturation of the ideal generated by 
+           //the polynomialring is the saturation of the ideal generated by
            //f1,...,fr with respect toh which is the lcm of the leading
            //coefficients of the fi considered in the quotientring:
            //this is coded in saturn
@@ -2855,17 +2855,17 @@ proc radicalKL (list m,ideal ser,list #)
       //this is the good case, nothing to do, just to have the same notations
       //change the ring
       {
-        execute "ring gnir1 = ("+charstr(basering)+"),("+varstr(basering)+"),("
-                              +ordstr(basering)+");";
+        execute("ring gnir1 = ("+charstr(basering)+"),("+varstr(basering)+"),("
+                              +ordstr(basering)+");");
          ideal @j=fetch(@P,@j);
          attrib(@j,"isSB",1);
       }
       else
       {
          @va=string(maxideal(1));
-         execute "ring gnir1 = ("+charstr(basering)+"),("+indep[@m][1]+"),("
-                              +indep[@m][2]+");";
-         execute "map phi=@P,"+@va+";";
+         execute("ring gnir1 = ("+charstr(basering)+"),("+indep[@m][1]+"),("
+                              +indep[@m][2]+");");
+         execute("map phi=@P,"+@va+";");
          if(homo==1)
          {
             ideal @j=std(phi(@j),@hilb);
@@ -2907,7 +2907,7 @@ proc radicalKL (list m,ideal ser,list #)
      //we pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
      //------------------------------------------------------------------------
 
-      execute quotring;
+      execute(quotring);
 
     // @j considered in the quotientring
       ideal @j=imap(gnir1,@j);
@@ -3376,7 +3376,7 @@ proc min_ass_prim_charsets1 (ideal PS)
 {
   def oldring=basering;
   string n=system("neworder",PS);
-  execute "ring r=("+charstr(oldring)+"),("+n+"),dp;";
+  execute("ring r=("+charstr(oldring)+"),("+n+"),dp;");
   ideal PS=imap(oldring,PS);
   matrix m=char_series(PS);  // We compute an irreducible
                              // characteristic series
@@ -3973,12 +3973,12 @@ proc extraction (ideal SI, ideal SP)
       }
 
       U[size(U)]=")";           // we compute the extractor of I (w.r.t. U)
-      execute "ring RAU="+charstr(basering)+",("+A+U+",(dp("+string(a)+"),dp);";
+      execute("ring RAU="+charstr(basering)+",("+A+U+",(dp("+string(a)+"),dp);");
       ideal I=imap(R,SI);
       //I=std(I,hv);            // the standard basis in (R[U])[A]
       I=std(I);            // the standard basis in (R[U])[A]
       A[size(A)]=")";
-      execute "ring Rloc=("+charstr(basering)+","+U+",("+A+",dp;";
+      execute("ring Rloc=("+charstr(basering)+","+U+",("+A+",dp;");
       ideal I=imap(RAU,I);
       //"std in lokalisierung:"+newline,I;
       ideal h;
@@ -4253,9 +4253,9 @@ proc reconvList(list l)
 proc primdecGTZ(ideal i)
 "USAGE:   primdecGTZ(i); i ideal
 RETURN:  a list, say pr, of primary ideals and their associated primes
-         pr[i][1], resp. pr[i][2] is the i-th primary resp. prime component 
-NOTE:    Algorithm of Gianni, Traeger, Zacharias 
-         designed for characteristic 0, works also in char k > 0, if it 
+         pr[i][1], resp. pr[i][2] is the i-th primary resp. prime component
+NOTE:    Algorithm of Gianni, Traeger, Zacharias
+         designed for characteristic 0, works also in char k > 0, if it
          terminates (may result in an infinite loop in small characteristic!)
 EXAMPLE: example primdecGTZ; shows an example
 "
@@ -4280,7 +4280,7 @@ proc primdecSY(ideal i, list #))
          if c=2, minAssGTZ is used
          if c=3, minAssGTZ and facstd is used
 RETURN:  a list, say pr, of primary ideals and their associated primes
-         pr[i][1], resp. pr[i][2] is the i-th primary resp. prime component 
+         pr[i][1], resp. pr[i][2] is the i-th primary resp. prime component
 NOTE:    Algorithm of Shimoyama-Yokoyama
          implemented for characteristic 0, works also in char k > 0,
          the result may be not completely decomposed in small characteristic
@@ -4351,8 +4351,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc equiRadical(ideal i)
 "USAGE:   equiRadical(i); i ideal
-RETURN:  ideal, intersection of associated primes of i of maximal  dimension 
-NOTE:    designed for characteristic 0, works also in char k > 0 if it 
+RETURN:  ideal, intersection of associated primes of i of maximal  dimension
+NOTE:    designed for characteristic 0, works also in char k > 0 if it
          terminates, may result in an infinite loop in small characteristic
 EXAMPLE: example equiRadical; shows an example
 "
@@ -4372,9 +4372,9 @@ example
 proc radical(ideal i,list #)
 "USAGE:   radical(i); i ideal
 RETURN:  ideal = the radical of i
-NOTE:    a combination of the algorithms of Krick/Logar and 
+NOTE:    a combination of the algorithms of Krick/Logar and
          Eisenbud/Huneke/Vasconcelos
-         designed for characteristic 0, works also in char k > 0 if it 
+         designed for characteristic 0, works also in char k > 0 if it
          terminates, may result in an infinite loop in small characteristic
 EXAMPLE: example radical; shows an example
 "
@@ -4403,8 +4403,8 @@ EXAMPLE: example radical; shows an example
       }
       if(dim(pr[1])>1)
       {
-         execute "ring gnir = ("+charstr(basering)+"),
-                              ("+varstr(basering)+"),(C,lp);";
+         execute("ring gnir = ("+charstr(basering)+"),
+                              ("+varstr(basering)+"),(C,lp);");
          ideal i=fetch(@P,i);
          list @pr=facstd(i);
          setring @P;
