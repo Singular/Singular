@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.142 2000-11-21 15:03:04 Singular Exp $ */
+/* $Id: ring.cc,v 1.143 2000-11-22 13:16:46 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1486,7 +1486,7 @@ int rSum(ring r1, ring r2, ring &sum)
 
     if (b)
     {
-      Print("name : %d: %s\n",k,r1->names[i]);
+      //Print("name : %d: %s\n",k,r1->names[i]);
       names[k]=omStrDup(r1->names[i]);
       k++;
     }
@@ -1525,7 +1525,7 @@ int rSum(ring r1, ring r2, ring &sum)
       }
       if (b)
       {
-        Print("name : %d : %s\n",k,r2->names[i]);
+        //Print("name : %d : %s\n",k,r2->names[i]);
         names[k]=omStrDup(r2->names[i]);
         k++;
       }
