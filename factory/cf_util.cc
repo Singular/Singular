@@ -1,10 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_util.cc,v 1.3 1997-07-22 10:17:19 schmidt Exp $ */
+/* $Id: cf_util.cc,v 1.4 1997-07-22 12:10:51 schmidt Exp $ */
 
 //{{{ docu
 //
 // cf_util.cc - miscellaneous functions, not necessarily related
 //   to canonical forms.
+//
+// Used by: fac_cantzass.cc, gfops.cc
 //
 //}}}
 
