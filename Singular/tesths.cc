@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.43 1998-05-20 07:52:24 obachman Exp $ */
+/* $Id: tesths.cc,v 1.44 1998-05-25 15:32:13 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -111,7 +111,7 @@ static struct sing_option sing_longopts[] =
   {LON_NO_TTY,      0,          "Do not redefine the terminal characteristics",         0},
   {LON_VERSION,     0,          "Print extended version and configuration info",        0},
 #ifdef HAVE_TCL
-  {LON_TCLMODE      0,          "Run in TCL mode, i.e., with TCL user interface",       0},
+  {LON_TCLMODE,     0,          "Run in TCL mode, i.e., with TCL user interface",       0},
 #endif
   {LON_ECHO,        "VAL",      "Set value of variable `echo' to (integer) VAL",        ""},
   {LON_EXECUTE,     "STRING",   "Execute STRING on start-up",                           ""},
@@ -332,7 +332,7 @@ int main(          /* main entry to Singular */
         case 'x':
 #ifdef HAVE_TCL
           tclmode = TRUE;
-          mainSetSingOptionValue(LON_TCL-MODE, (char*) 1);
+          mainSetSingOptionValue(LON_TCLMODE, (char*) 1);
           break;
 #else
           printf("%s: Option `-x' not supported in this configuration\n", argv[0]);
