@@ -33,6 +33,14 @@ struct int_pair_node{
   int a;
   int b;
 };
+struct sorted_pair_node{
+  //criterium, which is stable 0. small lcm 1. small i 2. small j
+  sorted_pair_node* next;
+  int i;
+  int j;
+  poly lcm_of_lm;
+};
+
 struct redNF_inf{
   poly h;
   LObject* P;
@@ -66,6 +74,7 @@ struct calc_dat
   int* T_deg;
   int* misses;
   int_pair_node* soon_free;
+  sorted_pair_node* pairs;
   redNF_inf* work_on;
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
@@ -85,6 +94,7 @@ struct calc_dat
   int Rcounter;
   int last_index;
 };
+static void free_sorted_pair_node(sorted_pair_node* s, ring r);
 static void shorten_tails(calc_dat* c, poly monom);
 static void replace_pair(int & i, int & j, calc_dat* c);
 static void initial_data(calc_dat* c);
@@ -100,4 +110,10 @@ static int pLcmDeg(poly a, poly b);
 static int simple_posInS (kStrategy strat, poly p,int len);
 static BOOLEAN find_next_pair(calc_dat* c, BOOLEAN go_higher=TRUE);
 static void soon_free_them(redNF_inf* inf, calc_dat* c);
+static sorted_pair_node* pop_pair(calc_dat* c);
+static BOOLEAN no_pairs(calc_dat* c);
+static void clean_top_of_pair_list(calc_dat* c);
+static BOOLEAN state_is(calc_state state, const int & i, const int & j, calc_dat* c);
+static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, calc_dat* c);
+static void sort_pair_in(int i, int j,calc_dat* c);
 #endif
