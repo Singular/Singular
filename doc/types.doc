@@ -1,22 +1,32 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.37 1998-05-13 13:16:57 gorzel Exp $
+@comment $Id: types.doc,v 1.38 1998-05-13 14:53:52 wichmann Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
-@c with emacs (C-c C-e C-b).
-@c @setfilename types.info
-@c @node Top, Data types
-@c @menu
-@c * Data types::
-@c @end menu
-@c @node Data types, , Top, Top
-@c @chapter Data types
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ifset' and `@end' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the conditionals).
+@ifset thisVariableShouldNeverBeSet
+%**start
+\input texinfo.tex
+@setfilename reference.info
+@node Top, Functions and system variables
+@menu
+* Data types::
+@end menu
+@node Functions and system variables, Tricks and pitfalls, Data types, Top
+
+@node Functions and system variables, Tricks and pitfalls, Data types, Top
+@chapter Functions and system variables
+%**end
+@end ifset
 
 @cindex expression list
 This chapter explains all data types known by @sc{Singular} in
 alphabetical order. For every type there is a description of the
 declaration syntax as well as information about how to build expressions
-of certain types. A list of expression (in the following referred to as
+of certain types. A list of expressions (in the following referred to as
 expression_list) in @sc{Singular} is any comma separated list of
 expressions.
 
@@ -231,7 +241,7 @@ multiplication (with ideal, poly, vector, module)
 power, exponentiation (by an integer)
 @end table
 Brackets may be used to access elements of ideals:
-@emph{ideal expressions} @code{[} @emph{position} @code{]} is a generator of the ideal.
+ideal expressions @code{[} int_expression @code{]} is a generator of the ideal.
 @strong{Example:}
 @example
 @c example
@@ -758,10 +768,18 @@ See @ref{Type conversion and casting}.
 @subsection intmat operations
 @cindex intmat operations
 
-@table @asis
-@code{<>}, @code{==} comparison
-@end tableBrackets may be used to access elements of intmats:
-@emph{ideal expressions} @code{[} @emph{row, column} @code{]} is a iintmat entry.
+@table @code
+@item + 
+addition with intmat, intvec and int
+@item -
+subtraction with intmat, intvec and int
+@item *
+mulitplication with intmat and intvec
+@item @code{<>}, @code{==} 
+comparison
+@end table
+Brackets may be used to access elements of intmats: intmat expression
+@code{[} int_expressions@code{,} int_expression @code{]} is an intmat entry.
 
 @strong{Example:}
 @example
@@ -900,7 +918,14 @@ See @ref{Type conversion and casting}.
 @node intvec operations, intvec related functions, intvec expressions, intvec
 @subsection intvec operations
 @cindex intvec operations
-@table @asis
+
+@table @code
+@item +
+addition with intvec and int
+@item -
+subtraction with intvec and int
+@item * 
+multiplication with int
 @item  @code{+} addition with integers or intvec
 @item  @code{-} subtraction of integer or intvec
 @item  @code{*} multiplication with integer or intmat
@@ -1557,7 +1582,7 @@ concatenation
 construct a new list whose elements are the parts of the expression list
 @end table
 Brackets may be used to access elements of lists:
-@emph{list expressions} @code{[} @emph{int expressions} @code{]} is a list entry.
+list_expression @code{[} int_expression @code{]} is a list entry.
 @strong{Example:}
 @example
 @c example 
@@ -1844,8 +1869,9 @@ multiplication (with poly, matrix)
 @item @code{==}, @code{<>}
 comparison
 @end table
-Brackets may be used to access elements of matrices:
-@emph{matrix expressions} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry; @emph{matrix expressions} @code{[} @emph{column} @code{]} is a vector.
+Brackets may be used to access elements of matrices: matrix_expressions
+@code{[} int_expression@code{,} int_expression @code{]} is a matrix
+entry.
 @strong{Example:}
 @example
 @c example
@@ -2375,8 +2401,6 @@ comparison
 @*Brackets may be used to access single terms of a polynomial:
 @emph{list expressions} @code{[} @emph{int expressions} @code{]} is a poly  entry
 
-
-
 @strong{Example:}
 @example
 @c example
@@ -2452,21 +2476,91 @@ variable in string form (see @ref{varstr})
 @section proc
 @cindex proc
 
-@strong{Example:}
+Procedures are sequences of @sc{Singular} commands in a special
+format. They are used to extend the set of @sc{Singular} commands with
+user definable commands. Once a procedure is defined it can be used as
+any other @sc{Singular} command. Procedures may be defined by either
+typing them on the command line or by loading them from a file. For a
+detailed description on the concept of procedures in @sc{Singular} see
+@ref{Procedures}. A file containing procedure definitions which complies 
+certain syntax rules is called a library. Such a file can be loaded
+using the command @code{LIB}. For more information on libraries see
+@ref{Libraries}. 
+
+@menu
+* proc declaration::            
+@end menu
+
+@c ---------------------------------------
+@node proc declaration,  , proc, proc
+@subsection proc declaration
+@cindex proc declaration
+
+@c ------------------------------------------------------------
+@c   This piece of text exists also in the file general.doc, 
+@c   chapter "Proc in a library".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
+@table @code
+@item @strong{Syntax:}
+[@code{static}] @code{proc} proc_name [parameter_list]
+@*["help_text"]
+@*@code{@{}
+@*
+@tex
+\quad
+@end tex
+   procedure_body
+@*@code{@}}
+@*[@code{example}
+@*@code{@{}
+@*
+@tex
+\quad
+@end tex
+   sequence_of_commands;
+@*@code{@}}]
+@item @strong{Purpose:}
+defines a new function, the @code{proc} proc_name, with the additional 
+information help_text, which is copied to the screen by 
+@code{help proc_name;} and the @code{example} section
+which is executed by @code{example proc_name;}. 
+@* The help_text, the parameter_list, and the example section are optional.
+@* Specifying @code{static} in front of the procedure definition (in a
+library file) makes this procedure local to the library.
+@item @strong{Example:}
 @example
-@c example 
-
-@c example 
+@c example
+  proc milnor_number (poly p)
+  {
+    ideal i= std(jacob(p));
+    int m_nr=vdim(i);
+    if (m_nr<0) 
+    { 
+      "// not an isolated singularity";
+    }
+    return(m_nr);         // the value of m_nr is returned
+  }
+  ring r1=0,(x,y,z),ds;
+  poly p=x^2+y^2+z^5;
+  milnor_number(p);
+@c example
 @end example
-
-See @ref{Procedures}.
+@end table
 
 @c ---------------------------------------
 @node qring, resolution, proc, Data types
 @section qring
 @cindex qring
 
-  -- TEXT --
+@menu
+* qring declaration::           
+@end menu
+
+@node qring declaration, , qring, qring
+@subsection qring declaration
+@cindex qring declaration
+
 @table @code
 @item @strong{Syntax:}
 @code{qring} name @code{=} ideal_expression @code{;}
@@ -2771,13 +2865,12 @@ concatenation
 @item @code{<=}, @code{>=}, @code{==}, @code{<>}
 comparison (lexicographic with respect to the ASCII coding)
 @end table
-@*
-Brackets may be used to access parts of a string:
-@emph{string expressions} @code{[} @emph{position} @code{]} is a character of the string,
-@emph{string expressions} @code{[} @emph{position}@code{,} @emph{length} @code{]} is a substring filled up with blanks if @emph{length} exceeds the total size
-of the string
-and @emph{string expressions} @code{[} @emph{intvec} @code{]} is a list of characters
-from the string.
+@* Brackets may be used to access parts of a string: string_expression
+@code{[} int_expression @code{]} is a character of the string,
+string_expressions @code{[} int_expression@code{,} int_expression
+@code{]} is a substring filled up with blanks if length_int_expression
+exceeds the total size of the string, and string_expressions @code{[}
+intvec_expression @code{]} is a list of characters from the string.
 
 @strong{Example:}
 @example
