@@ -6,6 +6,9 @@
 # configure it, change the variables at the beginning of the
 # file.
 #
+# For more information on the files in the `examples/' directory,
+# see the section "Examples and Tests" in the `README' file.
+#
 
 #
 # - paths.
