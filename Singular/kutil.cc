@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.100 2001-04-05 15:41:07 Singular Exp $ */
+/* $Id: kutil.cc,v 1.101 2001-07-17 09:42:25 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -291,7 +291,7 @@ void HEckeTest (poly pp,kStrategy strat)
   int   j,k,p;
 
   strat->kHEdgeFound=FALSE;
-  if (pLexOrder)
+  if (pLexOrder || currRing->MixedOrder)
   {
     return;
   }
@@ -1476,12 +1476,12 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
 *(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
 *superfluous elements in S will be deleted
 */
-void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1)
+void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
   int j=pos;
 
   initenterpairs(h,k,ecart,0,strat, atR);
-  if ((!strat->fromT)
+  if ( (!strat->fromT)
   && ((strat->syzComp==0)
     ||(pGetComp(h)<=strat->syzComp)))
   {
@@ -3674,7 +3674,7 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
 /*2
 * puts p to the set T at position atT
 */
-void enterT(LObject p, kStrategy strat, int atT = -1)
+void enterT(LObject p, kStrategy strat, int atT)
 {
   int i;
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.165 2001-05-22 14:23:31 Singular Exp $ */
+/* $Id: ring.cc,v 1.166 2001-07-17 09:42:26 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -355,7 +355,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_aa:
           case ringorder_a:
             R->block0[n] = last+1;
-            R->block1[n] = last + iv->length() - 2;
+            R->block1[n] = min(last+iv->length()-2 , R->N);
             R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int));
             for (i=2; i<iv->length(); i++)
             {
@@ -2713,8 +2713,9 @@ static void rSetOutParams(ring r)
 /*2
 * sets pMixedOrder and pComponentOrder for orderings with more than one block
 * block of variables (ip is the block number, o_r the number of the ordering)
+* o is the position of the orderingering in r
 */
-static void rHighSet(ring r, int o_r)
+static void rHighSet(ring r, int o_r, int o)
 {
   switch(o_r)
   {
@@ -2731,9 +2732,15 @@ static void rHighSet(ring r, int o_r)
     case ringorder_ls:
     case ringorder_ds:
     case ringorder_Ds:
+    case ringorder_s:
+      break;
     case ringorder_ws:
     case ringorder_Ws:
-    case ringorder_s:
+      {
+        int i;
+        for(i=r->block1[o]-r->block0[o];i>=0;i--)
+          if (r->wvhdl[o][i]<0) { r->MixedOrder=TRUE; break; }
+      }
       break;
     case ringorder_c:
       r->ComponentOrder=1;
@@ -2758,6 +2765,12 @@ static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
   if(block1[i]!=r->N) r->LexOrder=TRUE;
   r->firstBlockEnds=block1[i];
   r->firstwv = wvhdl[i];
+  if ((order[i]== ringorder_ws) || (order[i]==ringorder_Ws))
+  {
+    int j;
+    for(j=block1[i]-r->block0[i];j>=0;j--)
+      if (r->firstwv[j]<0) { r->MixedOrder=TRUE; break; }
+  }
 }
 
 static void rOptimizeLDeg(ring r)
@@ -2870,7 +2883,7 @@ static void rSetDegStuff(ring r)
     do
     {
       i--;
-      rHighSet(r, order[i]);
+      rHighSet(r, order[i],i);
     }
     while (i != 0);
 
