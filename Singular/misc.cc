@@ -621,8 +621,8 @@ char * versionString()
     #endif
   #endif
 #endif
-#ifdef PLURAL
-              StringAppendS("PLURAL,");
+#ifdef HAVE_PLURAL
+              StringAppendS("Plural,");
 #endif
 #ifdef HAVE_DBM
               StringAppendS("DBM,\n\t");

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.34 2002-02-11 12:03:58 Singular Exp $ */
+/* $Id: feResource.cc,v 1.35 2003-04-25 12:53:47 levandov Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -76,14 +76,27 @@ static feResourceConfig_s feResourceConfigs[25] =
    "%d/LIB;"
    "%d/../LIB"
    ""},
+#ifdef HAVE_PLURAL
+  {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/"S_UNAME"/Plural",""},
+#else
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/"S_UNAME"/Singular",""},
+#endif
   {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/"S_UNAME            ""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                ""},
   {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  ""},
+#ifdef HAVE_PLURAL
+  {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%r/info/plural.hlp", ""},
+  {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/plural.idx",  ""},
+#else
   {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%r/info/singular.hlp", ""},
   {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/singular.idx",  ""},
+#endif
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              ""},
+#ifdef HAVE_PLURAL
+  {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/plural/Manual/"S_VERSION1,    ""},
+#else
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/"S_VERSION1,    ""},
+#endif
   {"ExDir",      'm',   feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",              ""},
 #if !defined(macintosh)
   {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
@@ -100,11 +113,19 @@ static feResourceConfig_s feResourceConfigs[25] =
 #ifdef ESINGULAR
   {"emacs",    'E',    feResBinary, "ESINGULAR_EMACS",      "%b/emacs",              ""},
   {"xemacs",    'A',    feResBinary, "ESINGULAR_EMACS",      "%b/xemacs",              ""},
+#ifdef HAVE_PLURAL
+  {"SingularEmacs",'M',feResBinary, "ESINGULAR_SINGULAR",    "%b/Plural",           ""},
+#else
   {"SingularEmacs",'M',feResBinary, "ESINGULAR_SINGULAR",    "%b/Singular",           ""},
+#endif
   {"EmacsLoad",'l',    feResFile,   "ESINGULAR_EMACS_LOAD",  "%e/.emacs-singular",             ""},
   {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",   "%r/emacs",             ""},
 #elif defined(TSINGULAR)
+#ifdef HAVE_PLURAL
+  {"SingularXterm",'M',feResBinary, "TSINGULAR_SINGULAR",    "%b/Plural",           ""},
+#else
   {"SingularXterm",'M',feResBinary, "TSINGULAR_SINGULAR",    "%b/Singular",           ""},
+#endif
 #else
   {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             ""},
 #endif
