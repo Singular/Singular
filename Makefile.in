@@ -1,3 +1,13 @@
+#################################################################
+###
+### Top-level Makefile for Singular
+###
+### The main purpose of this Makefile is to call `make'
+### recursively in the subdirectories determined at configuration
+### time.
+###
+#################################################################
+
 SHELL		= /bin/sh
 
 SINGULAR_MAJOR_VERSION	= @SINGULAR_MAJOR_VERSION@
@@ -82,9 +92,12 @@ Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
 
 
 ##############################################################
-#stuff for configure
+# stuff for configure
 Makefile : Makefile.in config.status
-	./config.status
+	CONFIG_FILES=Makefile ./config.status
+
+doc/Makefile: doc/Makefile.in config.status
+	CONFIG_FILES=doc/Makefile ./config.status
 
 config.status: configure
 	./config.status --recheck
