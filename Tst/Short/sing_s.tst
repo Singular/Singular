@@ -17,7 +17,7 @@ example slocus;
 example qhspectrum;
 example Tjurina;
 example tjurina;
-example T1;
-example T2;
-example T12;
+example T_1;
+example T_2;
+example T_12;
 tst_status(1);$

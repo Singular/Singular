@@ -1,11 +1,11 @@
 Status Output of tst_status.out
-init >> USER    :siebert
-init >> HOSTNAME:pitti
-init >> uname -a:Linux pitti 2.0.35 #130 Mon Jul 27 11:06:31 MEST 1998 i586 unknown
-init >> date    :Mon Nov 22 16:45:57 MET 1999
-init >> version :1306
+init >> USER    :obachman
+init >> HOSTNAME:topgun
+init >> uname -a:Linux topgun 2.2.5 #15 Thu Sep 2 18:37:32 CEST 1999 i586 unknown
+init >> date    :Mon Dec 13 17:18:43 CET 1999
+init >> version :1307
 init >> ticks   :100
-1 >> tst_memory_0 :: pitti:533037
-1 >> tst_memory_1 :: pitti:738473
-1 >> tst_memory_2 :: pitti:733184
-1 >> tst_timer_1 :: pitti:168
+1 >> tst_memory_0 :: topgun:488274
+1 >> tst_memory_1 :: topgun:701674
+1 >> tst_memory_2 :: topgun:692224
+1 >> tst_timer_1 :: topgun:132

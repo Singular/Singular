@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "invar.lib";
+LIB "ainvar.lib";
 
 example sortier; newline;
 example derivate; newline;

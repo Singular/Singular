@@ -1,4 +1,4 @@
-  LIB "invar.lib";
+  LIB "ainvar.lib";
   int n=5;
   int i;
   ring s=32003,(x(1..n)),wp(1,2,3,4,5);

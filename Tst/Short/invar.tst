@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB"invar.lib";
+LIB "ainvar.lib";
 
   ring rw=0,(x(1..5)),dp;
   matrix m[5][1];

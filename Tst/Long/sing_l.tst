@@ -65,43 +65,43 @@ ring r    = 0,(x,y,z),ds;
 //pause;   
    Tjurina(j,1);
    ideal i    = xy,xz,yz;
-   module T   = T1(i);
-   vdim(T);                   "// Tjurina number = dim_K(T1), should be 3";
+   module T   = T_1(i);
+   vdim(T);                   "// Tjurina number = dim_K(T_1), should be 3";
 //pause;
-   list L=T1(i,"");
+   list L=T_1(i,"");
    print(transpose(L[3])*L[2]); "// should be 0 (mod i)";
    L;
 //pause; 
    kill r;   
    ring  r    = 0,(x,y),(c,dp);
    ideal j    = x6-y4,x6y6,x2y4-x5y2;
-   module T   = T2(j);
+   module T   = T_2(j);
    vdim(T);
    hilb(T);"";
 //pause;
-   T2(j,1);
+   T_2(j,1);
    ring r1    = 0,(x,y,z),dp;
    ideal id   = xy,xz,yz;
-   list L     = T2(id,"");
+   list L     = T_2(id,"");
    vdim(L[1]);                        
 //pause;
    L;
    ring r2     = 0,(x,y,z,u,v),(c,ds);
    ideal i    = xz-y2,yz2-xu,xv-yzu,yu-z3,z2u-yv,zv-u2;
-   list L     = T12(i,1);
+   list L     = T_12(i,1);
 //pause;
     L;
     kill r1,r2;
 //
 ring  r1  = 0,(x,y,z,u),dp;
 ideal i6 = z2-xz,zu-xu,u2-yu,yz-xu; 
-list L=T12(i6,1);
+list L=T_12(i6,1);
 L;
 kill r1;
 //
 ring r7   = 0,(x,y,z,u,v),dp;
  ideal I1 = xy,xz,xu,xv,yz,yu,yv,zu,zv,uv;    " //t1=15, t2=20";
- list L=T12(I1,1);
+ list L=T_12(I1,1);
  L;
  kill r7;
 //
@@ -130,5 +130,5 @@ ring r8   = 0,(w(1..9)),dp;
             w(1)*w(6)*w(8)-w(2)*w(3)*w(9),
             w(2)*w(6)^2-w(3)^2*w(8),
             w(1)*w(6)^2-w(2)*w(3)*w(8);
-T12(I3);
+T_12(I3);
 tst_status(1);$
