@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.13 1999-10-14 14:27:31 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.14 1999-10-20 15:58:35 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -32,7 +32,17 @@
 #define SM_DIV smSpecialPolyDiv
 #endif
 /* ----------------- general definitions ------------------ */
-
+/* in structs.h
+typedef struct smprec sm_prec;
+typedef sm_prec * smpoly;
+struct smprec{
+  smpoly n;            // the next element
+  int pos;             // position
+  int e;               // level
+  poly m;              // the element
+  float f;             // complexity of the element
+};
+*/
 /* declare internal 'C' stuff */
 static void smExactPolyDiv(poly, poly);
 static BOOLEAN smIsScalar(const poly);
@@ -224,26 +234,47 @@ poly smCallDet(ideal I)
 
 lists smCallBareiss(ideal I, int x, int y)
 {
+  ring origR;
+  sip_sring tmpR;
   lists res=(lists)AllocSizeOf(slists);
-  ideal II = idCopy(I);
+  ideal II = smRingCopy(I,&origR,tmpR);
   sparse_mat *bareiss = new sparse_mat(II);
+  ideal mm=II;
   intvec *v;
   ideal m;
 
-  idDelete(&II);
   if (bareiss->smGetAct() == NULL)
   {
-    FreeSizeOf((ADDRESS)res, slists);
-    return NULL;
+    delete bareiss;
+    if (origR!=NULL) smRingClean(origR,tmpR);
+    v=new intvec(1,pVariables);
   }
-  bareiss->smBareiss(x, y);
-  m = bareiss->smRes2Mod();
-  v = new intvec(bareiss->smGetRed());
-  bareiss->smToIntvec(v);
-  delete bareiss;
+  else
+  {
+    idDelete(&II);
+    bareiss->smBareiss(x, y);
+    m = bareiss->smRes2Mod();
+    v = new intvec(bareiss->smGetRed());
+    bareiss->smToIntvec(v);
+    delete bareiss;
+    if (origR!=NULL)
+    {
+      rChangeCurrRing(origR,TRUE);
+      mm=idInit(IDELEMS(m),m->rank);
+      int k;
+      for (k=0;k<IDELEMS(m);k++) mm->m[k] = pFetchCopy(&tmpR, m->m[k]);
+      rChangeCurrRing(&tmpR,FALSE);
+      idDelete(&m);
+      smRingClean(origR,tmpR);
+    }
+    else
+    {
+      mm=m;
+    }
+  }
   res->Init(2);
   res->m[0].rtyp=MODUL_CMD;
-  res->m[0].data=(void *)m;
+  res->m[0].data=(void *)mm;
   res->m[1].rtyp=INTVEC_CMD;
   res->m[1].data=(void *)v;
   return res;
@@ -466,12 +497,14 @@ void sparse_mat::smBareiss(int x, int y)
     tored -= x;
     this->smToredElim();
   }
-  if (y < 2) y = 2;
-  if (act < y)
+  if (y < 1) y = 1;
+  if (act <= y)
   {
     this->smCopToRes();
     return;
   }
+  normalize = this->smCheckNormalize();
+  if (normalize) this->smNormalize();
   this->smPivot();
   this->smSelectPR();
   this->smElim();
@@ -489,6 +522,7 @@ void sparse_mat::smBareiss(int x, int y)
   }
   loop
   {
+    if (normalize) this->smNormalize();
     this->smPivot();
     oldpiv = piv;
     this->smSelectPR();
@@ -780,14 +814,14 @@ void sparse_mat::smElim()
     for (i=1; i<act; i++)
     {
       a = m_act[i];
-      do
+      while (a != NULL)
       {
         ha = SM_MULT(a->m, p, q);
         pDelete(&a->m);
         if (q) SM_DIV(ha, q);
         a->m = ha;
         a = a->n;
-      } while (a != NULL);
+      }
     }
     return;
   }
@@ -796,14 +830,14 @@ void sparse_mat::smElim()
     a = m_act[i];
     if ((r == NULL) || (i != r->pos))  // cols without elimination
     {
-      do
+      while (a != NULL)
       {
         ha = SM_MULT(a->m, p, q);
         pDelete(&a->m);
         if (q) SM_DIV(ha, q);
         a->m = ha;
         a = a->n;
-      } while (a != NULL);
+      }
     }
     else                    // cols with elimination
     {
@@ -813,6 +847,36 @@ void sparse_mat::smElim()
       w = r->m;
       loop                  // combine the chains a and b: p*a + w*b
       {
+        if (a == NULL)
+        {
+          if (b != NULL)
+          {
+            do
+            {
+              res = res->n = smElemCopy(b);
+              hb = SM_MULT(b->m, w, q);
+              if (q) SM_DIV(hb, q);
+              res->m = hb;
+              b = b->n;
+            } while (b != NULL);
+          }
+          else
+            res->n = NULL;
+          break;
+        }
+        if (b == NULL)
+        {
+          do
+          {
+            ha = SM_MULT(a->m, p, q);
+            pDelete(&a->m);
+            if (q) SM_DIV(ha, q);
+            a->m = ha;
+            res = res->n = a;
+            a = a->n;
+          } while (a != NULL);
+          break;
+        }
         if (a->pos < b->pos)
         {
           ha = SM_MULT(a->m, p, q);
@@ -849,36 +913,6 @@ void sparse_mat::smElim()
           }
           b = b->n;
         }
-        if (a == NULL)
-        {
-          if (b != NULL)
-          {
-            do
-            {
-              res = res->n = smElemCopy(b);
-              hb = SM_MULT(b->m, w, q);
-              if (q) SM_DIV(hb, q);
-              res->m = hb;
-              b = b->n;
-            } while (b != NULL);
-          }
-          else
-            res->n = NULL;
-          break;
-        }
-        if (b == NULL)
-        {
-          do
-          {
-            ha = SM_MULT(a->m, p, q);
-            pDelete(&a->m);
-            if (q) SM_DIV(ha, q);
-            a->m = ha;
-            res = res->n = a;
-            a = a->n;
-          } while (a != NULL);
-          break;
-        }
       }
       m_act[i] = dumm->n;
       if (r) smElemDelete(&r);
@@ -896,7 +930,10 @@ void sparse_mat::sm1Elim()
   poly w, ha, hb;
 
   if ((c == NULL) || (r == NULL))
-    return; 
+  {
+    while (r!=NULL) smElemDelete(&r);
+    return;
+  }
   do
   {
     a = m_act[r->pos];
@@ -975,6 +1012,7 @@ void sparse_mat::smHElim()
 
   if ((c == NULL) || (r == NULL))
   {
+    while(r!=NULL) smElemDelete(&r);
     pDelete(&hp);
     return;
   }
@@ -1918,38 +1956,40 @@ static BOOLEAN smCheckLead(const poly t, const poly e)
 static poly smDMult(poly t, const poly e)
 {
   const number y = pGetCoeff(e);
-  number x;
-  poly res, h, r;
+  poly r = NULL;
+  poly res, h;
   int i;
   EXPONENT_TYPE w;
 
-  r = h = res = pInit();
+  h = res = pInit();
   loop
   {
-    x = pGetCoeff(t);
-    for (i=pVariables; i; i--)
+    i=pVariables;
+    loop
     {
       w = pGetExp(e,i)+pGetExp(t,i);
       if (w < 0) break;
       pSetExp(h,i,w);
+      i--;
+      if (i == 0)
+      {
+        pSetm(h);
+        pSetCoeff0(h,nMult(y,pGetCoeff(t)));
+        pIter(t);
+        if (t == NULL)
+        {
+          pNext(h) = NULL;
+          return res;
+        }
+        r = h;
+        h = pNext(h) = pInit();
+        i=pVariables;
+      }
     }
     pIter(t);
-    if (i == 0)
+    if (t == NULL)
     {
-      //pSetComp(h,0);
-      pSetm(h);
-      pSetCoeff0(h,nMult(y,x));
-      if (t == NULL)
-      {
-        pNext(h) = NULL;
-        return res;
-      }
-      r = h;
-      h = pNext(h) = pInit();
-    }
-    else if (t == NULL)
-    {
-      if (r != h)
+      if (r != NULL)
         pNext(r) = NULL;
       else
         res = NULL;
@@ -2097,7 +2137,6 @@ static void smElemDelete(smpoly *r)
 static smpoly smElemCopy(smpoly a)
 {
   smpoly r = (smpoly)AllocSizeOf(smprec);
-
   memcpy(r, a, sizeof(smprec));
 /*  r->m = pCopy(r->m); */
   return r;
