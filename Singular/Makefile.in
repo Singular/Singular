@@ -243,10 +243,9 @@ ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
 
 feOpt.h: feOpt.inc feOptES.inc
 
-feOpt.inc: feOpt.cc
-	$(CXX) -DGENERATE_OPTION_INDEX -DHAVE_ASO=0 feOpt.cc
-	./a.out
-	rm a.out
+feOpt.inc: feOpt.cc mod2.h
+	$(CXX) -DGENERATE_OPTION_INDEX -DHAVE_ASO=0 feOpt.cc -o feOpt
+	feOpt
 
 feOptES.inc: feOpt.cc
 	$(CXX) -DGENERATE_OPTION_INDEX  -DHAVE_ASO=0 -DESINGULAR feOpt.cc
