@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.25 2002-07-24 16:12:50 Singular Exp $ */
+/* $Id: emacs.cc,v 1.26 2004-07-12 15:01:19 Singular Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -86,7 +86,7 @@ void fePrintReportBug(char* msg, char* file, int line)
 
 }
 
-#include "feResource.cc"
+#include "../kernel/feResource.cc"
 #include "feOpt.cc"
 
 void mainUsage()
