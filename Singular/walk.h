@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.h,v 1.2 1999-11-15 17:20:56 obachman Exp $ */
+/* $Id: walk.h,v 1.3 2000-09-07 13:39:45 sulandra Exp $ */
 /*
 * ABSTRACT: Declaration of the Groebner walk
 */
@@ -45,3 +45,5 @@ int* walkNextWeight(const int* curr_weight, const int* target_weight,
 // assume polys of G are ordererd decreasingly w.r.t. curr_weight
 // returns ideal consisting of leading (w.r.t. curr_weight) monomials
 ideal walkInitials(ideal G);
+
+intvec* walkAddIntVec(intvec* v1, intvec* v2);

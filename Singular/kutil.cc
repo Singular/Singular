@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.56 2000-09-04 13:38:59 obachman Exp $ */
+/* $Id: kutil.cc,v 1.57 2000-09-07 13:39:43 sulandra Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -261,7 +261,7 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
   #ifdef PDEBUG
   if (testp)
   {
-    if (! pDBTest(L->p, L->heap, f, l))
+    if (! pDBTest(L->p, f, l))
     {
       Warn("for L->p");
       ret = FALSE;
@@ -374,7 +374,7 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
 BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
 {
   #ifdef PDEBUG
-  BOOLEAN ret = pDBTest(T->p, T->heap, f, l);
+  BOOLEAN ret = pDBTest(T->p, f, l);
   #else
   BOOLEAN ret=FALSE;
   #endif
@@ -3216,7 +3216,6 @@ void enterT (LObject p,kStrategy strat)
 {
   int i,atT;
 
-  pHeapTest(p.p, (p.heap == NULL ? currPolyBin : p.heap));
   assume(p.pLength == 0 || pLength(p.p) == p.pLength);
 
   strat->newt = TRUE;

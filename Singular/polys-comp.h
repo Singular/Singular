@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.24 2000-08-24 14:42:44 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.25 2000-09-07 13:39:44 sulandra Exp $ */
 
 /***************************************************************
  *
@@ -136,14 +136,10 @@ while (0)
 
 #endif
 
-#ifdef PDEBUG
-extern int rComp0(poly p1, poly p2);
-#else
 inline int rComp0(poly p1, poly p2)
 {
   _prMonCmp(p1, p2, currRing, return 0, return 1, return -1);
 }
-#endif
 
 inline int prComp0(poly p1, poly p2, ring r)
 {

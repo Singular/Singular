@@ -99,7 +99,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ndbm.cc  libparse.cc mod_raw.cc\
     pcv.cc kbuckets.cc prProcs.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
-    prCopy.cc p_Procs.cc p_Mult_q.cc
+    prCopy.cc p_Procs.cc p_Mult_q.cc walk.cc
 
 
 # normal C source files

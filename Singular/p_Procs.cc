@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.4 2000-09-04 13:39:01 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.5 2000-09-07 13:39:44 sulandra Exp $
  *******************************************************************/
 #include <string.h>
 #include "mod2.h"
@@ -520,10 +520,6 @@ do                                              \
 }                                               \
 while (0)
 
-// now include the generated pprocs
-extern int rComp0_Func(poly p1,poly p2);
-#undef rComp0
-#define rComp0 rComp0_Func
 #include "p_Procs.inc"
 
 // the rest is related to getting the procs

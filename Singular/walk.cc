@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.3 2000-08-14 12:56:57 obachman Exp $ */
+/* $Id: walk.cc,v 1.4 2000-09-07 13:39:45 sulandra Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -13,6 +13,24 @@
 #include "intvec.h"
 #include "ipid.h"
 
+// add two intvecs:
+intvec* walkAddIntVec(intvec* v1, intvec* v2)
+{
+  int n = v1->length();
+  int i;
+  intvec *result = new intvec(n);
+  if (v2->length() > n) n = v2->length();
+  
+  for (i=0; i<n; i++)
+  {
+    (*result)[i] = (*v1)[i] + (*v2)[i];
+  }
+  
+  return result;
+}
+
+  
+  
 
 // scalar product of weights and exponent vector of p
 // assumes that weights and exponent vector have length n
