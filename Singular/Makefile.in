@@ -167,7 +167,7 @@ SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
         primitiv.lib       random.lib         ring.lib           sing.lib    \
         solve.lib          solver.lib         spcurve.lib        standard.lib\
         surf.lib           triang.lib         template.lib       spectrum.lib\
-	mregular.lib       toric.lib          intprog.lib
+	mregular.lib       toric.lib          intprog.lib	 gaussman.lib
 
 SLIBS_FILES = $(addprefix LIB/,${SLIBS})
 
