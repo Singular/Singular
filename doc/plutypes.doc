@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.2 2002-12-20 14:11:26 levandov Exp $
+@comment $Id: plutypes.doc,v 1.3 2003-02-03 13:55:20 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -11,13 +11,13 @@
 @ignore
 %**start
 \input texinfo.tex
-@setfilename plureference.info
+@setfilename plutypes.info
 @node Top, Data types
 @menu
 * Data types::
 @end menu
 
-@node Data types, Functions and system Variables, General concepts, Top
+@node Data types, Functions and system variables, General concepts, Top
 @chapter Data types
 %**end
 @end ignore
@@ -31,7 +31,8 @@ of certain types.
 The term expression list in @sc{Singular} refers to any comma separated
 list of expressions.
 
-For the general syntax of a declaration see @ref{General command syntax}.
+For the general syntax of a declaration see 
+@c @ref{General command syntax}.
 
 @menu
 * ideal::
@@ -43,15 +44,15 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * resolution::
 * ring::
 @ifset namespaces
-* package::
 @end ifset
 @end menu
 
 
 @c ---------------------------------------
+
 @node ideal, list, Data types, Data types
 @section ideal
-@c@cindex ideal
+@c @cindex ideal
 @cindex  untyped definitions 
 
 Ideals are represented as lists of polynomials which are interpreted as
@@ -72,7 +73,9 @@ whereas @code{ncols} counts all generators.
 * ideal related functions::
 @end menu
 
+
 @c ---------------------------------------
+
 @node ideal declarations, ideal expressions, ideal, ideal
 @subsection ideal declarations
 @cindex ideal declarations
@@ -103,7 +106,10 @@ defines an ideal.
 @end smallexample
 @end table
 
+
+
 @c ------------------------------
+
 @node ideal expressions, ideal operations, ideal declarations, ideal
 @subsection ideal expressions
 @cindex ideal expressions
@@ -150,7 +156,9 @@ a type cast to ideal
 @c example
 @end smallexample
 
+
 @c ------------------------------
+
 @node ideal operations, ideal related functions, ideal expressions, ideal
 @subsection ideal operations
 @cindex ideal operations
@@ -167,8 +175,9 @@ multiplication with ideal)
 exponentiation (by a non-negative integer)
 
 @item ideal_expression @code{[} intvec_expression @code{]}
-are polynomial generators of the ideal, index 1 gives the first generator.
-@end table
+are polynomial generators of the ideal, index 1 gives the first
+generator.
+
 
 @strong{Note:} For simplification of an ideal, see also ???
 @c @ref{simplify}.
@@ -192,140 +201,25 @@ are polynomial generators of the ideal, index 1 gives the first generator.
   II;
 @c example
 @end smallexample
+@end table
 
 @c ------------------------------
-@node ideal related functions, list  , ideal operations, ideal
+
+@node ideal related functions,  , ideal operations, ideal
 @subsection ideal related functions
 @cindex ideal related functions
 
-@table @code
-@item char_series
-irreducible characteristic series (see @ref{char_series})
-@item coeffs
-matrix of coefficients (see @ref{coeffs})
-@item contract
-contraction by an ideal (see @ref{contract})
-@item diff
-partial derivative (see @ref{diff})
-@item degree
-multiplicity, dimension and codimension of the ideal of leading terms (see @ref{degree})
-@item dim
-Krull dimension of basering modulo the ideal of leading terms (see @ref{dim})
-@item eliminate
-elimination of variables (see @ref{eliminate})
-@item facstd
-factorizing Groebner basis algorithm (see @ref{facstd})
-@item factorize
-ideal of factors of a polynomial (see @ref{factorize})
-@item fglm
-Groebner basis computation from a Groebner basis w.r.t.@: a different
-ordering (see @ref{fglm})
-@item finduni
-computation of univariate polynomials lying in a zero dimensional ideal
-(see @ref{finduni})
-@item groebner
-Groebner basis computation (a wrapper around @code{std,stdhilb,stdfglm},...)
-(see @ref{groebner})
-@item highcorner
-computes the smallest monomial not contained in the ideal.
-The ideal has to be zero-dimensional.
-(see @ref{highcorner})
-@item homog
-homogenization with respect to a variable (see @ref{homog})
-@item hilb
-Hilbert series of a standard basis (see @ref{hilb})
-@item indepSet
-sets of independent variables of an ideal (see @ref{indepSet})
-@item interred
-interreduction of an ideal (see @ref{interred})
-@item intersect
-ideal intersection (see @ref{intersect})
-@item jacob
-ideal of all partial derivatives resp.@: jacobian matrix (see @ref{jacob})
-@item jet
-Taylor series up to a given order (see @ref{jet})
-@item kbase
-vector space basis of basering modulo ideal of leading terms
-(see @ref{kbase})
-@item koszul
-Koszul matrix (see @ref{koszul})
-@item lead
-leading terms of a set of generators (see @ref{lead})
-@item lift
-lift-matrix (see @ref{lift})
-@item liftstd
-standard basis and transformation matrix computation (see @ref{liftstd})
-@item lres
-free resolution for homogeneous ideals (see @ref{lres})
-@item maxideal
-power of the maximal ideal at 0 (see @ref{maxideal})
-@item minbase
-minimal generating set of a homogeneous ideal, resp.@: module, or an ideal, resp.@: module, in a local ring
-(see @ref{minbase})
-@item minor
-set of minors of a matrix (see @ref{minor})
-@item modulo
-represents
-@tex
-$(h1+h2)/h1 \cong h2/(h1 \cap h2)$
-@end tex
-@ifinfo
-(h1+h2)/h1=h2/(h1 intersect h2)
-@end ifinfo
-(see @ref{modulo})
-@item mres
-minimal free resolution of an ideal resp.@: module w.r.t. a minimal set of generators of the given ideal resp.@: module
-(see @ref{mres})
-@item mstd
-standard basis and minimal generating set of an ideal (see @ref{mstd})
-@item mult
-multiplicity, resp.@: degree, of the ideal of leading terms (see @ref{mult})
-@item ncols
-number of columns (see @ref{ncols})
-@item preimage
-preimage under a ring map (see @ref{preimage})
-@item qhweight
-quasihomogeneous weights of an ideal (see @ref{qhweight})
-@item quotient
-ideal quotient (see @ref{quotient})
-@item reduce
-normalform with respect to a standard basis (see @ref{reduce})
-@item res
-free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module
-(see @ref{res})
-@item simplify
-simplify a set of polynomials (see @ref{simplify})
-@item size
-number of non-zero generators (see @ref{size})
-@item sortvec
-permutation for sorting ideals resp@:. modules (see @ref{sortvec})
-@item sres
-free resolution of a standard basis (see @ref{sres})
-@item std
-standard basis computation (see @ref{std})
-@item stdfglm
-standard basis computation with fglm technique (see @ref{stdfglm})
-@item stdhilb
-Hilbert driven standard basis computation (see @ref{stdhilb}
-@item subst
-substitute a ring variable (see @ref{subst})
-@item syz
-computation of the first syzygy module (see @ref{syz})
-@item vdim
-vector space dimension of basering modulo ideal of leading terms
-(see @ref{vdim})
-@item weight
-optimal weights (see @ref{weight})
-@end table
+
+
+
+        
 
 
 
 
 
+@c ------------------------------
 
-
-
-@c ---------------------------------------
 @node list, map,  ideal, Data types
 @c link, Data types
 @section list
@@ -353,6 +247,7 @@ is not a copy but another reference to the same ring.
 @end menu
 
 @c ------------------------------
+
 @node list declarations, list expressions, list, list
 @subsection list declarations
 @cindex list declarations
@@ -385,6 +280,7 @@ empty list
 @end table
 
 @c ------------------------------
+
 @node list expressions, list operations, list declarations, list
 @subsection list expressions
 @cindex list expressions
@@ -403,9 +299,6 @@ list expressions combined by the arithmetic operation @code{+}
 a type cast to list
 @end enumerate
 
-@c ref
-See @ref{Type conversion and casting}.
-@c ref
 
 @*@strong{Example:}
 @smallexample
@@ -420,21 +313,13 @@ See @ref{Type conversion and casting}.
 @c example
 @end smallexample
 
+
 @c ------------------------------
+
 @node list operations, list related functions, list expressions, list
 @subsection list operations
 @cindex list operations
 
-@table @asis
-@item @code{+}
-concatenation
-@item @code{delete}
-deletes one element from list, returns new list
-@item @code{insert}
-inserts or appends a new element to list, returns a new list
-@item list_expression @code{[} int_expression @code{]}
-is a list entry; the index 1 gives the first element.
-@end table
 
 @*@strong{Example:}
 @smallexample
@@ -449,43 +334,21 @@ is a list entry; the index 1 gives the first element.
 @end smallexample
 
 @c ------------------------------
+
 @node list related functions,  , list operations, list
 @subsection list related functions
 @cindex list related functions
 
-@table @code
-@item bareiss
-returns a list of a matrix (lower triangular) and
-of an intvec (permutations of columns, see @ref{bareiss})
-@item betti
-Betti numbers of a resolution (see @ref{betti})
-@item delete
-deletes an element from a list (see @ref{delete})
-@item facstd
-factorizing Groebner basis algorithm (see @ref{facstd})
-@item factorize
-list of factors of a polynomial (see @ref{factorize})
-@item insert
-inserts or appends a new element to a list (see @ref{insert})
-@item lres
-free resolution (see @ref{lres})
-@item minres
-minimize a free resolution (see @ref{minres})
-@item mres
-minimal free resolution of an ideal, resp.@: module w.r.t. 
-a minimal set of generators of the first module (see @ref{mres})
-@item names
-list of all userdefined variable names (see @ref{names})
-@item res
-free resolution of an ideal, resp.@: module (see @ref{res})
-@item size
-number of entries (see @ref{size})
-@item sres
-free resolution of an ideal, resp.@: module, given by a standard base (see @ref{sres})
-@end table
+
+
+
+
+
+
 
 
 @c ---------------------------------------
+
 @node map, module, list,  Data types
 @section map
 @cindex map
@@ -500,8 +363,7 @@ the target of a map is @strong{ALWAYS} the actual basering
 the preimage ring is stored "by name", that means, maps can only be
 used in such contexts, where the name of the preimage ring can be
 resolved (i.e., there might be problems for rings/maps defined in
-subprocedures). See also @ref{Identifier resolution}, @ref{Names in
-procedures}.
+subprocedures). 
 @end itemize
 
 Maps between rings with different coefficient fields are
@@ -634,15 +496,10 @@ maps only to map objects with integer coefficients.
 * map declarations::
 * map expressions::
 * map operations::
-* fetch::
-* imap::
-* subst::
 @end menu
-@iftex
-See @ref{imap}; @ref{fetch}; @ref{subst}.
-@end iftex
 
 @c ------------------------------
+
 @node map declarations, map expressions, map, map
 @subsection map declarations
 @cindex map declarations
@@ -662,12 +519,7 @@ more elements these are ignored.
 The image ring is always the actual basering.
 For the mapping of coefficients from different fields see @ref{map}.
 
-@item Default:
-none
 
-@item Note:
-There are standard mappings for maps which are close to the identity
-map: @code{fetch} and @code{imap}.
 
 The name of a map serves as the function which maps objects from the
 preimage_ring into the basering.  These objects must be defined
@@ -700,12 +552,9 @@ by names (no evaluation in the preimage ring is possible).
 @end smallexample
 @end table
 
-@c ref
-See @ref{map}; @ref{ideal expressions}; @ref{ring};
-@ref{imap}; @ref{fetch}.
-@c ref
 
 @c ------------------------------
+
 @node map expressions, map operations, map declarations, map
 @subsection map expressions
 @cindex map expressions
@@ -754,8 +603,13 @@ is a map entry (the image of the corresponding variable)
 
 
 
+
+
+
+
 @c ---------------------------------------
-@node module, map, poly,  Data types
+
+@node module, poly, map,  Data types
 @section module
 @cindex module
 
@@ -810,7 +664,7 @@ v_1, @dots{}, v_k
 @tex
 $v_1, \ldots, v_k$
 @end tex
-which generate M (cf. @ref{Representation of mathematical objects}).
+which generate M 
 
 @menu
 * module declarations::
@@ -820,6 +674,7 @@ which generate M (cf. @ref{Representation of mathematical objects}).
 @end menu
 
 @c ------------------------------
+
 @node module declarations, module expressions, module, module
 @subsection module declarations
 @cindex module declarations
@@ -855,6 +710,7 @@ defines a left  module.
 @end table
 
 @c ------------------------------
+
 @node module expressions, module operations, module declarations, module
 @subsection module expressions
 @cindex module expressions
@@ -873,13 +729,6 @@ multiplication of a module expression with an ideal or a poly expression: @code{
 a type cast to module
 @end enumerate
 
-@c ref
-See
-@ref{ideal};
-@ref{poly};
-@ref{Type conversion and casting};
-@ref{vector}.
-@c ref
 
 @c @*@strong{Example:}
 @c @example
@@ -917,106 +766,17 @@ is a vector, where the index indicates the column
 @end smallexample
 
 @c ------------------------------
-@node module related functions, poly, module operations, module
+
+@node module related functions, , module operations, module
 @subsection module related functions
 @cindex module related functions
 
-@table @code
-@item coeffs
-matrix of coefficients (see @ref{coeffs})
-@item degree
-multiplicity, dimension and codimension of the module of leading terms (see @ref{degree})
-@item diff
-partial derivative (see @ref{diff})
-@item dim
-Krull dimension of free module over the basering modulo the module of leading terms (see @ref{dim})
-@item eliminate
-elimination of variables (see @ref{eliminate})
-@item freemodule
-the free module of given rank (see @ref{freemodule})
-@item groebner
-Groebner basis computation (a wrapper around @code{std,stdhilb,stdfglm},...)
-(see @ref{groebner})
-@item hilb
-Hilbert function of a standard basis (see @ref{hilb})
-@item homog
-homogenization with respect to a variable (see @ref{homog})
-@item interred
-interreduction of a module (see @ref{interred})
-@item intersect
-module intersection (see @ref{intersect})
-@item jet
-Taylor series up to a given order (see @ref{jet})
-@item kbase
-vector space basis of free module over the basering modulo the module of
-leading terms (see @ref{kbase})
-@item lead
-initial module (see @ref{lead})
-@item lift
-lift-matrix (see @ref{lift})
-@item liftstd
-standard basis and transformation matrix computation (see @ref{liftstd})
-@item lres
-free resolution (see @ref{lres})
-@item minbase
-minimal generating set of a homogeneous ideal, resp.@: module, or an ideal, resp.@: module,
-over a local ring
-@item modulo
-represents
-@tex
-$(h1+h2)/h1=h2/(h1 \cap h2)$
-@end tex
-@ifinfo
-(h1+h2)/h1=h2/(h1 intersect h2)
-@end ifinfo
-(see @ref{modulo})
-@item mres
-minimal free resolution of an ideal resp.@: module w.r.t. a minimal set of generators of the given module
-(see @ref{mres})
-@item mult
-multiplicity, resp.@: degree, of the module of leading terms (see @ref{mult})
-@item ncols
-number of columns (see @ref{ncols})
-@item nrows
-number of rows (see @ref{nrows})
-@item print
-nice print format (see @ref{print})
-@item prune
-minimize the embedding into a free module (see @ref{prune})
-@item qhweight
-quasihomogeneous weights of an ideal, resp.@: module (see @ref{qhweight})
-@item quotient
-module quotient (see @ref{quotient})
-@item reduce
-normalform with respect to a standard basis (see @ref{reduce})
-@item res
-free resolution of an ideal, resp.@: module, but not changing the given ideal, resp.@: module
-(see @ref{res})
-@item simplify
-simplify a set of vectors (see @ref{simplify})
-@item size
-number of non-zero generators (see @ref{size})
-@item sortvec
-permutation for sorting ideals/modules (see @ref{sortvec})
-@item sres
-free resolution of a standard basis (see @ref{sres})
-@item std
-standard basis computation (see @ref{std}, @ref{liftstd})
-@item subst
-substitute a ring variable (see @ref{subst})
-@item syz
-computation of the first syzygy module (see @ref{syz})
-@item vdim
-vector space dimension of free module over the basering modulo module
-of leading terms (see @ref{vdim})
-@item weight
-"optimal" weights (see @ref{weight})
-@end table
 
 
 
 
 @c ---------------------------------------
+
 @ifset namespaces
 @node poly,qring, module, Data types
 @end ifset
@@ -1029,7 +789,9 @@ of leading terms (see @ref{vdim})
 Polynomials are the basic data for all main algorithms in
 @code{@sc{Singular}}. They consist of finitely many terms
 (coefficient*power product) which are combined by the usual polynomial
-operations (see @ref{poly expressions}). Polynomials can only be defined
+operations 
+@c (see @ref{poly expressions}).
+ Polynomials can only be defined
 or accessed with respect to a basering which determines the coefficient
 type, the names of the indeterminants and the monomial ordering.
 
@@ -1048,6 +810,7 @@ type, the names of the indeterminants and the monomial ordering.
 @end menu
 
 @c ------------------------------
+
 @node poly declarations, poly expressions, poly, poly
 @subsection poly declarations
 @cindex poly declarations
@@ -1077,13 +840,11 @@ defines a polynomial.
 @c example
 @end smallexample
 @end table
-@c ref
-@ref{short}
-@c ref
 
 
 
 @c ----------------------------
+
 @node poly expressions, poly operations, poly declarations, poly
 @subsection poly expressions
 @cindex poly expressions
@@ -1095,10 +856,11 @@ a monomial (there are NO spaces allowed inside a monomial)
 @smallexample
   [coefficient] ring_variable [ exponent] [ring_variable [exponent] @dots{}]
 @end smallexample
-monomials which contain an indexed ring variable
-must be built from @code{ring_variable} and @code{coefficient}
-with the operations @code{*} and @code{^}
-@item
+
+@c monomials which contain an indexed ring variable
+@c must be built from @code{ring_variable} and @code{coefficient}
+@c with the operations @code{*} and @code{^}
+ @item
 an identifier of type poly
 @item
 a function returning poly
@@ -1106,7 +868,7 @@ a function returning poly
 poly expressions combined by the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{/}, or @code{^}
 @item
-an int expression (see @ref{Type conversion and casting})
+
 @item
 a type cast to poly
 @end enumerate
@@ -1150,11 +912,9 @@ y*x;     // correct input
 @c example
 @end smallexample 
 
-@c ref
-See @ref{ring}; @ref{Type conversion and casting}.
-@c ref
 
 @c ------------------------------
+
 @node poly operations, poly related functions, poly expressions, poly
 @subsection poly operations
 @cindex poly operations
@@ -1182,104 +942,16 @@ comparison (w.r.t. monomial ordering)
 the monomial at the indicated place w.r.t.@: the monomial ordering
 @end table
 
-@*@strong{Example:}
-@smallexample
-@c example
-  ring R=0,(x,y),dp;
-  poly f = x3y2 + 2x2y2 + xy - x + y + 1;
-  f;
-  f + x5 + 2;
-  f * x2;
-  (x+y)/x;
-  f/3x2;
-  x5 > f;
-  x<=y;
-  x>y;
-  ring r=0,(x,y),ds;
-  poly f = fetch(R,f);
-  f;
-  x5 > f;
-  f[2..4];
-  size(f);
-  f[size(f)+1]; f[-1];    // monomials out of range are 0
-  intvec v = 6,1,3;
-  f[v];          // the polynom built from the 1st, 3rd and 6th monomial of f
-@c example
-@end smallexample
 
 @c ------------------------------
-@node poly related functions, qring, poly operations, poly
+
+@node poly related functions, , poly operations, poly
 @subsection poly related functions
 @cindex poly related functions
 
-@table @code
-@item cleardenom
-cancel denominators of numbers in poly and divide it by its content
-(see @ref{cleardenom})
-@item coef
-matrix of coefficients and monomials (see @ref{coef})
-@item coeffs
-matrix of coefficients (see @ref{coeffs})
-@item deg
-degree (see @ref{deg})
-@item det
-determinant (see @ref{det})
-@item diff
-partial derivative (see @ref{diff})
-@item extgcd
-Bezout representation of gcd (see @ref{extgcd})
-@item factorize
-factorize polynomial (see @ref{factorize})
-@item finduni
-find univariate polynomials in a zero-dimensional ideal (see @ref{finduni})
-@item gcd
-greatest common divisor (see @ref{gcd})
-@item homog
-homogenization (see @ref{homog})
-@item jacob
-ideal, resp.@: matrix, of all partial derivatives (see @ref{jacob})
-@item lead
-leading term (see @ref{lead})
-@item leadcoef
-coefficient of the leading term (see @ref{leadcoef})
-@item leadexp
-the exponent vector of the leading monomial (see @ref{leadexp})
-@item leadmonom
-leading monomial (see @ref{leadmonom})
-@item jet
-monomials with degree smaller k+1 (see @ref{jet})
-@item ord
-degree of the leading monomial (see @ref{ord})
-@item qhweight
-quasihomogeneous weights (see @ref{qhweight})
-@item reduce
-normal form with respect to a standard base (see @ref{reduce})
-@item rvar
-test for ring variable (see @ref{rvar})
-@item simplify
-normalize a polynomial (see @ref{simplify})
-@item size
-number of monomials (see @ref{size})
-@item subst
-substitute a ring variable (see @ref{subst})
-@item trace
-trace of a matrix (see @ref{trace})
-@item var
-the indicated variable of the ring (see @ref{var})
-@item varstr
-variable in string form (see @ref{varstr})
-@end table
-
-@c @*@strong{Example:}
-@c @example
-@c @end example
-
-
-
-
-
 
 @c ---------------------------------------
+
 @node qring, resolution, poly, Data types
 @section qring
 @cindex qring
@@ -1295,6 +967,7 @@ of rings and quotient rings see ???
 @end menu
 
 @c ---------------------------------------
+
 @node qring declaration,  , qring, qring
 @subsection qring declaration
 @cindex qring declaration
@@ -1304,30 +977,10 @@ of rings and quotient rings see ???
 @c   chapter "General syntax of a ring declaration".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
-@table @strong
-@item Syntax:
-@code{qring} name @code{=} ideal_expression @code{;}
-@item Default:
-none
-@item Purpose:
-declares a quotient ring as the basering modulo two-sided ideal_expressions. Sets
-it as current basering.
-@item Example:
-@smallexample
-@c example 
-ring r=0,(x,y,z,t),dp;
-system("PLURAL",-1,0);
-option(redSB);
-option(redTail);
-ideal i=x^2,y^2,z^2,t^2;
-qring q=system("twostd",i);
-q;
-// this is an exterior algebra 
-@c example
-@end smallexample
-@end table
+
 
 @c ---------------------------------------
+
 @node resolution, ring, qring, Data types
 @section resolution
 @cindex resolution
@@ -1351,6 +1004,7 @@ implicitly a cast to a list).
 @end menu
 
 @c ---------------------------------------
+
 @node resolution declarations, resolution expressions, resolution, resolution
 @subsection resolution declarations
 @cindex resolution declarations
@@ -1380,6 +1034,7 @@ none
 @end table
 
 @c ------------------------------
+
 @node resolution expressions, resolution related functions, resolution declarations, resolution
 @subsection resolution expressions
 @cindex resolution expressions
@@ -1394,45 +1049,23 @@ a function returning a resolution
 a type cast to resolution from a list of ideals, resp.@: modules..
 @end enumerate
 
-@c ref
-See @ref{Type conversion and casting}.
-@c ref
 
 @c ------------------------------
+
 @node resolution related functions,  , resolution expressions, resolution
 @subsection resolution related functions
 @cindex resolution related functions
 
-@table @code
-@item betti
-Betti numbers of a resolution (see @ref{betti})
-@item lres
-free resolution (see @ref{lres})
-@item minres
-minimize a free resolution (see @ref{minres})
-@item mres
-minimal free resolution of an ideal, resp.@: module w.r.t. a minimal set of generators of 
-the given ideal, resp.@: module (see @ref{mres})
-@item res
-free resolution of an ideal, resp.@: module, but not changing the
-given ideal, resp.@: module (see @ref{res})
-@item sres
-free resolution of a standard basis (see @ref{sres})
-@end table
-
-@c @*@strong{Example:}
-@c @example
-@c @end example
 
 @c ---------------------------------------
-@node ring, string, resolution, Data types
+
+@node ring, , resolution, Data types
 @section ring
 @cindex ring
 
 Rings are used to describe properties of polynomials, ideals etc.
 Almost all computations in @sc{Singular} require a basering.
 For a detailed description of the concept of rings see
-@ref{Rings and orderings}.
 
 @menu
 * ring declarations::
@@ -1441,6 +1074,7 @@ For a detailed description of the concept of rings see
 @end menu
 
 @c ---------------------------------------
+
 @node ring declarations, ring related functions, ring, ring
 @subsection ring declarations
 @cindex ring declarations
@@ -1471,7 +1105,6 @@ an expression_list of the name @code{complex}, an optional int_expression
 and a name.
 @end enumerate
 
-For the definition of the 'coefficient_field', see @ref{Rings and orderings}.
 
 'names_of_ring_variables' must be a list of names or indexed names.
 
@@ -1492,43 +1125,21 @@ weight vector given as an intvec_expression in parentheses.
 @code{c} or @code{C}.
 @end enumerate
 
-For the definition of the orderings, see @ref{Term orderings},
-@ref{Monomial orderings}.
 
 If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
 
 @c ---------------------------------------
+
 @node ring related functions, ring operations, ring declarations, ring
 @subsection ring related functions
 @cindex ring related functions
 
-@table @code
-@item charstr
-description of the coefficient field of a ring (see @ref{charstr})
-@item keepring
-move ring to next upper level (see @ref{keepring})
-@item npars
-number of ring parameters (see @ref{npars})
-@item nvars
-number of ring variables (see @ref{nvars})
-@item ordstr
-monomial ordering of a ring (see @ref{ordstr})
-@item parstr
-names of all ring parameters or the
-name of the n-th ring parameter (see @ref{parstr})
-@item qring
-quotient ring (see @ref{qring})
-@item setring
-set a new basering (see @ref{setring})
-@item varstr
-names of all ring variables or the
-name of the n-th ring variable (see @ref{varstr})
-@end table
 
 @c ---------------------------------------
-@node ring operations, Data types , ring related functions, ring
+
+@node ring operations, , ring related functions, ring
 @subsection ring operations
 @cindex ring operations
 @table @asis
@@ -1550,18 +1161,9 @@ following guide lines into consideration:
 @smallexample
 @c example
   ring R1=0,(x,y),dp;
-  ring R2=32003,(a,b),dp;
+  ring R2=32ple003,(a,b),dp;
   def R=R1+R2;
   R;
 @c example
 @end smallexample
 
-@c ref
-@ref{ring_lib}
-@c ref
-
-@c // This is some quasi--commutative algebra@end table
-
-@c @*@strong{Example:}
-@c @example
-@c @end example
