@@ -1,3 +1,8 @@
+Tue Sep 16 15:45:44 MET DST 1997
+        * hannes: changed/corrected/clean naNormalize, naLcm, pCleardenom, pContent
+            (polys1.cc, longalg.cc)
+            added singclap_alglcm (clapconv.cc, clapsing.cc)
+
 Tue Sep  9 11:05:28 MET DST 1997
         * hannes: flex-staff is now in febase.inc
                changed tutorial (doc/examples.doc, version-no: doc/tutor.tex)
