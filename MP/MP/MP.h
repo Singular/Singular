@@ -484,10 +484,11 @@ enum MP_Errors { MP_Failure,
                  MP_CantWriteLink,
                  MP_CantReadLink,
                  MP_NotCommonIdentifier,
-		 MP_WrongBasicVectorType,
+		         MP_WrongBasicVectorType,
                  MP_DummyBigNum,
                  MP_CantSkipMsg,
                  MP_CantInitMsg,
+                 MP_ExternalError,
                  MP_MaxError };
 
 typedef enum MP_Errors  MP_Status_t;
@@ -1919,9 +1920,12 @@ EXTERN MP_Status_t MP_TbSetTerm _ANSI_ARGS_((MP_Link_pt link, term *t));
  * Meta type definitions
  *
  ***************************************************************************/
-#define MP_CmtNumberRational           1
+#define MP_CmtNumberRational            1
 #define MP_CmtNumberInteger             2
 #define MP_CmtNumberComplex             3
+#define MP_CmtNumberReal                4
+#define MP_CmtNumberCharp               5
+#define MP_CmtNumberModulo              6
 
 
 /***************************************************************************

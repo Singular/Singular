@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.2 1998-11-12 13:30:48 Singular Exp $ */
+/* $Id: pcv.cc,v 1.3 1998-11-12 13:34:48 hannes Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -12,6 +12,8 @@
 #include "numbers.h"
 #include "polys.h"
 #include "ideals.h"
+#include "intvec.h"
+#include "pcv.h"
 
 static int pcvMaxDeg;
 static int pcvTableSize;
