@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.71 2002-01-10 12:33:20 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.72 2002-01-19 17:11:00 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -35,6 +35,13 @@
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory.h>
+#endif
+
+// define this if you want to use the fast_map routine for mapping ideals
+//#define FAST_MAP
+
+#ifdef FAST_MAP
+#include "fast_maps.h"
 #endif
 
 leftv iiCurrArgs=NULL;
@@ -735,6 +742,14 @@ leftv iiMap(map theMap, char * what)
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp=IDTYP(w);
       tmpW.data=IDDATA(w);
+      #ifdef FAST_MAP
+      if ((tmpW.rtyp==IDEAL_CMD) && (nMap==nCopy))
+      {
+        v->rtyp=IDEAL_CMD;
+	v->data=fast_map(IDIDEAL(w), IDRING(r), (ideal)theMap, currRing);
+      }
+      else
+      #endif
       if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0,nMap))
       {
         Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
