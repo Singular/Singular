@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.33 2001-02-26 13:15:33 Singular Exp $
+@comment $Id: NEWS.texi,v 1.34 2001-02-26 16:28:51 mschulze Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -99,6 +99,8 @@ Reorganisation of libraries into "Categories".
 @item @nref{mregular_lib}  procedures for computing the Castelnuovo-Mumford regularity
 @item @nref{mondromy_lib}
 procedures for computing the monodromy of a singularity
+@item @nref{gaussman_lib}
+procedures for the Gauss-Manin connection of a singularity
 @item @nref{spcurve_lib}
 procedures for CM codimension 2 singularities
 @item @nref{triang_lib}
@@ -135,6 +137,8 @@ renamed @code{invar.lib} to @code{ainvar.lib}
 renamed procedures @code{T1, T2, T12} to @code{T_1, T_2, T_12}.
 @item @nref{poly_lib}
 new procedures numerator/denominator
+@item @nref{linalg_lib}
+included @code{jordan.lib} in @code{linalg.lib}
 @end table
 
 @heading New @sc{Singular} functions
@@ -170,6 +174,10 @@ calculate module representing the multipolynomial resultant matrix
 compute all complex roots of a zerodimensional ideal
 @item @nref{vandermonde}
 solve Vandermonde linear system
+@item @nref{jet}
+extended for series expansions of rational expressions
+@item @nref{reduce}
+extended for reduced normal form of rational expressions
 @end table
 
 @heading @sc{Singular} functions whose syntax/semantics has changed
