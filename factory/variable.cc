@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: variable.cc,v 1.1 1996-12-05 18:24:56 schmidt Exp $
+// $Id: variable.cc,v 1.2 1997-03-27 10:24:37 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/12/05 18:24:56  schmidt
+``Unconditional'' check-in.
+Now it is my turn to develop factory.
+
 // Revision 1.0  1996/05/17  10:59:47  stobbe
 // Initial revision
 //
@@ -11,7 +15,9 @@ $Log: not supported by cvs2svn $
 #include <string.h>
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "variable.h"
 #include "canonicalform.h"
 #include "cf_factory.h"
@@ -51,12 +57,12 @@ Variable::Variable( int l, bool flag ) : _level(l)
 {
     ASSERT( flag, "illegal level" );
 }
-    
+
 Variable::Variable( int l ) : _level(l)
 {
     ASSERT( l > 0 && l != LEVELQUOT, "illegal level" );
 }
-    
+
 Variable::Variable( char name )
 {
     bool isext = false;
@@ -132,6 +138,7 @@ Variable::name() const
 	return '@';
 }
 
+#ifndef NOSTREAMIO
 ostream & operator << ( ostream & os, const Variable & v )
 {
     if ( v._level == LEVELBASE )
@@ -151,6 +158,7 @@ ostream & operator << ( ostream & os, const Variable & v )
     }
     return os;
 }
+#endif /* NOSTREAMIO */
 
 static bool legal_mipo( const CanonicalForm & mipo )
 {

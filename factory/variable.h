@@ -1,14 +1,19 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: variable.h,v 1.0 1996-05-17 10:59:42 stobbe Exp $
+// $Id: variable.h,v 1.1 1997-03-27 10:25:06 schmidt Exp $
 
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:42  stobbe
+Initial revision
+
 */
 
+#ifndef NOSTREAMIO
 #include <iostream.h>
+#endif /* NOSTREAMIO */
 
 #include "cf_defs.h"
 
@@ -61,7 +66,9 @@ public:
     {
 	return lhs._level <= rhs._level;
     }
+#ifndef NOSTREAMIO
     friend ostream & operator << ( ostream & os, const Variable & v );
+#endif /* NOSTREAMIO */
     friend Variable rootOf( const CanonicalForm &, char name = '@' );
 };
 

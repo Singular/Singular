@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_factor.cc,v 1.0 1996-05-17 11:06:32 stobbe Exp $
+// $Id: ftmpl_factor.cc,v 1.1 1997-03-27 10:30:00 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 11:06:32  stobbe
+Initial revision
+
 */
 
 #include <templates/factor.h>
@@ -32,6 +35,7 @@ int operator== ( const Factor<T> &f1, const Factor<T> &f2 )
     return (f1.exp() == f2.exp()) && (f1.factor() == f2.factor());
 }
 
+#ifndef NOSTREAMIO
 template <class T>
 void Factor<T>::print ( ostream& s ) const
 {
@@ -47,3 +51,4 @@ ostream& operator<< ( ostream & os, const Factor<T> & f )
     f.print( os );
     return os;
 }
+#endif /* NOSTREAMIO */

@@ -1,14 +1,19 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_list.h,v 1.0 1996-05-17 11:06:32 stobbe Exp $
+// $Id: ftmpl_list.h,v 1.1 1997-03-27 10:32:32 schmidt Exp $
 
 #ifndef INCL_LIST_H
 #define INCL_LIST_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 11:06:32  stobbe
+Initial revision
+
 */
 
+#ifndef NOSTREAMIO
 #include <iostream.h>
+#endif /* NOSTREAMIO */
 
 
 template <class T>
@@ -27,7 +32,9 @@ public:
     ListItem<T>* getNext();
     ListItem<T>* getPrev();
     T& getItem();
+#ifndef NOSTREAMIO
     void print ( ostream& );
+#endif /* NOSTREAMIO */
     friend class ListIterator<T>;
     friend class List<T>;
 };
@@ -56,12 +63,16 @@ public:
     T getLast() const;
     void removeLast();
     void sort ( int (*) ( const T&, const T& ) );
+#ifndef NOSTREAMIO
     void print ( ostream & ) const;
+#endif /* NOSTREAMIO */
     friend class ListIterator<T>;
 };
 
+#ifndef NOSTREAMIO
 template <class T>
 ostream& operator<<( ostream & os, const List<T> & l );
+#endif /* NOSTREAMIO */
 
 template <class T>
 class ListIterator {
