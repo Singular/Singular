@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.23 1999-12-10 16:41:48 obachman Exp $
+# $Id: doc2tex.pl,v 1.24 2000-03-09 16:37:23 hannes Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -509,7 +509,7 @@ sub HandleLib
   if ($make)
   {
     print "<lib $lib " if ($verbose);
-    System("make $make_opts VERBOSE=$verbose $tex_file"); 
+    System("$make $make_opts VERBOSE=$verbose $tex_file"); 
   }
   
   # make sure file exists
