@@ -4614,7 +4614,7 @@ else
 fi
 
 	  NEED_LIBS="-ldld ${NEED_LIBS}"
-	  LD_DYN_FLAGS="-E"
+	  LD_DYN_FLAGS="-Xlinker -E"
 	;;
 	HPUX-10)
 	  echo $ac_n "checking for shl_load in -ldld""... $ac_c" 1>&6
@@ -4665,7 +4665,7 @@ else
 fi
 
 	  NEED_LIBS="-ldld ${NEED_LIBS}"
-	  LD_DYN_FLAGS="-E"
+	  LD_DYN_FLAGS="-Xlinker -E"
 	;;
 	ix86-Linux)
 	  LD_DYN_FLAGS="-rdynamic -ldl"

@@ -839,12 +839,12 @@ else
 	HPUX-9)
 	  AC_CHECK_LIB(dld, shl_load)
 	  NEED_LIBS="-ldld ${NEED_LIBS}"
-	  LD_DYN_FLAGS="-E"
+	  LD_DYN_FLAGS="-Xlinker -E"
 	;;
 	HPUX-10)
 	  AC_CHECK_LIB(dld, shl_load)
 	  NEED_LIBS="-ldld ${NEED_LIBS}"
-	  LD_DYN_FLAGS="-E"
+	  LD_DYN_FLAGS="-Xlinker -E"
 	;;
 	ix86-Linux)
 	  LD_DYN_FLAGS="-rdynamic -ldl"
