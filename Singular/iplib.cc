@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.97 2002-05-02 15:16:00 Singular Exp $ */
+/* $Id: iplib.cc,v 1.98 2002-07-03 13:15:34 anne Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -1025,9 +1025,11 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   int token;
   char FullName[256];
 
+  memset(FullName,0,256);
+
   if( *fullname != '/' &&  *fullname != '.' )
     sprintf(FullName, "./%s", newlib);
-  else strcpy(FullName, fullname);
+  else strncpy(FullName, fullname,255);
 
 
   if(IsCmd(plib, token))
@@ -1059,10 +1061,14 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   }
   else
   {
+    package s=currPack;
+    currPack=IDPACKAGE(pl);
     fktn = (fktn_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
     if( fktn!= NULL) (*fktn)(iiAddCproc);
     else Werror("mod_init: %s\n", dynl_error());
     if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
+    currPack->loaded=1;
+    currPack=s;
   }
   RET=FALSE;
 
@@ -1228,15 +1234,15 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   if( (strncmp(buf, "\177ELF\01\01\01", 7)==0) && buf[16]=='\03')
   {
     LT = LT_ELF;
-    omFree(newlib);
-    newlib = omStrDup(libnamebuf);
+    //omFree(newlib);
+    //newlib = omStrDup(libnamebuf);
     goto lib_type_end;
   }
   if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0))
   {
     LT = LT_HPUX;
-    omFree(newlib);
-    newlib = omStrDup(libnamebuf);
+    //omFree(newlib);
+    //newlib = omStrDup(libnamebuf);
     goto lib_type_end;
   }
   if(isprint(buf[0]) || buf[0]=='\n')
