@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.20 2005-02-09 12:55:12 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.21 2005-02-11 20:19:46 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -2399,6 +2399,11 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
   if (rBase->N != rCandidate->N) diagnose = FALSE;
   /* nc and comm ring */
   if ( rIsPluralRing(rBase) != rIsPluralRing(rCandidate) ) diagnose = FALSE;
+  /* both are qrings */
+  /* NO CHECK, since it is used in building opposite qring */
+  /*  if ( ((rBase->qideal != NULL) && (rCandidate->qideal == NULL)) */
+  /*       || ((rBase->qideal == NULL) && (rCandidate->qideal != NULL)) ) */
+  /*  diagnose = FALSE; */
   /* TODO: varnames are e->E etc */
   return diagnose;
 }
