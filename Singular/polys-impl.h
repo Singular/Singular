@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.37 1999-10-14 14:27:28 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.38 1999-10-25 08:32:18 obachman Exp $ */
 
 /***************************************************************
  *
@@ -206,7 +206,6 @@ inline void _pSetExpV(poly p, Exponent_t *ev)
 #define pDBNew(h, f, l)   (poly) mmDBAllocHeap(h, f, l)
 #define pDBInit(h, f, l)  (poly) mmDBAlloc0Heap(h, f, l)
 #define pDBFree1(a,h,f,l)   mmDBFreeHeap((void*)a, h, f, l)
-
 poly    pDBCopy(poly a, char *f, int l);
 poly    pDBCopy(memHeap h, poly a, char *f, int l);
 poly    pDBCopy1(poly a, char *f, int l);
@@ -223,7 +222,6 @@ poly    pDBShallowCopyDelete(memHeap d_h,poly *s_p,memHeap s_h, char *f,int l);
 
 void    pDBDelete(poly * a, memHeap h, char * f, int l);
 void    pDBDelete1(poly * a, memHeap h, char * f, int l);
-
 
 #define _pDelete(a, h)     pDBDelete((a),h, __FILE__,__LINE__)
 #define _pDelete1(a, h)    pDBDelete1((a),h, __FILE__,__LINE__)
@@ -460,8 +458,14 @@ extern  BOOLEAN pDBDivisibleBy2(poly p1, poly p2, char* f, int l);
 #define _pDivisibleBy2(a,b) __pDivisibleBy(a,b)
 #endif // defined(PDEBUG) && PDEBUG > 1
 
+#ifdef PDEBUG
+#define _pEqual(p, q)       mmDBEqual(p, q, __FILE__, __LINE__)
+BOOLEAN mmDBEqual(poly p, poly q, char* file, int line);
+#else
+#define _pEqual __pEqual
+#endif
 
-DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
+DECLARE(BOOLEAN, __pEqual(poly p1, poly p2))
 {
   const unsigned long *s1 = (unsigned long*) &(p1->exp.l[0]);
   const unsigned long *s2 = (unsigned long*) &(p2->exp.l[0]);

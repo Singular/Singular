@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.69 1999-10-22 11:14:09 obachman Exp $ */
+/* $Id: ideals.cc,v 1.70 1999-10-25 08:32:15 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1394,8 +1394,11 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
     return idFreeModule(IDELEMS(h1));
   k=max(1,idRankFreeModule(h1));
 
+  assume(currRing != NULL);
   ring orig_ring=currRing;
   ring syz_ring=rAddSyzComp(currRing);
+  
+  
   pSetSyzComp(k);
 
   ideal s_h1=idRingCopy(h1,orig_ring);
@@ -1468,7 +1471,7 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
   {
     idSkipZeroes(s_h3); // works ring independend
     ideal h3=idRingCopy(s_h3,syz_ring);
-    resolvente res = sySchreyerResolvente(h3,-1,&length,TRUE);
+    resolvente res = sySchreyerResolvente(h3,-1,&length,TRUE, TRUE);
     intvec * dummy = syBetti(res,length,&reg, *w);
     deg = reg+2;
     delete dummy;

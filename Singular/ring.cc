@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.76 1999-10-19 12:42:48 obachman Exp $ */
+/* $Id: ring.cc,v 1.77 1999-10-25 08:32:18 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -83,13 +83,12 @@ int rBlocks(ring r)
 // complete == TRUE  : full reset of all variables
 void rChangeCurrRing(ring r, BOOLEAN complete)
 {
+  rTest(r);
   /*------------ set global ring vars --------------------------------*/
   currRing = r;
   currQuotient=NULL;
-
   if (r != NULL)
   {
-    rTest(r);
     if (complete)
     {
       /*------------ set global ring vars --------------------------------*/
@@ -639,6 +638,8 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord)
   if (rComplete(R))
     goto rInitError;
 
+  rTest(R);
+
   // try to enter the ring into the name list //
   // need to clean up sleftv here, before this ring can be set to
   // new currRing or currRing can be killed beacuse new ring has
@@ -868,7 +869,6 @@ static void rDelete(ring r)
 
 void rKill(ring r)
 {
-  rTest(r);
   if ((r->ref<=0)&&(r->order!=NULL))
   {
 #ifdef RDEBUG
@@ -1738,6 +1738,7 @@ int rSum(ring r1, ring r2, ring &sum)
 ring rCopy0(ring r)
 {
   if (r == NULL) return NULL;
+  rTest(r);
   int i,j;
   int *pi;
   ring res=(ring)AllocSizeOf(ip_sring);
@@ -1995,6 +1996,10 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
   mmDBTestBlock(r->block0,i*sizeof(int),fn,l);
   mmDBTestBlock(r->block1,i*sizeof(int),fn,l);
   mmDBTestBlock(r->wvhdl,i*sizeof(int *),fn,l);
+  for (j=0;j<i; j++)
+  {
+    if (r->wvhdl[j] != NULL) mmDBTest(r->wvhdl[j], fn, l);
+  }
 #endif
   if (r->VarOffset == NULL)
   {
@@ -2575,7 +2580,6 @@ BOOLEAN rComplete(ring r, int force)
   if(r->pCompIndex==r->ExpESize-1) r->pOrdIndex=r->ExpLSize-2;
   else                             r->pOrdIndex=r->ExpLSize-1;
 #endif
-  rTest(r);
   return FALSE;
 }
 #else /* not HAVE_SHIFTED_EXPONENTS: */
@@ -3036,7 +3040,6 @@ BOOLEAN rComplete(ring r, int force)
   if(r->pCompIndex==r->ExpESize-1) r->pOrdIndex=r->ExpLSize-2;
   else                             r->pOrdIndex=r->ExpLSize-1;
 #endif
-  rTest(r);
   return FALSE;
 }
 #endif
@@ -3160,10 +3163,14 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 
 ring rAddSyzComp(ring r)
 {
+  // HANNES: WHAT's THIS ????
   nMap=nCopy;
   if (r->order[0]==ringorder_c)
     return currRing;
-
+  
+  assume(currRing->order[0] != ringorder_s && 
+         currRing->order[0] != ringorder_S);
+  
   ring res=rCopy0(r);
   if (res->qideal!=NULL)
   {
@@ -3185,9 +3192,10 @@ ring rAddSyzComp(ring r)
   res->block1=(int *)Alloc0((i+1)*sizeof(int));
   for(j=i;j>0;j--) res->block1[j]=r->block1[j-1];
 
+  int ** wvhdl =(int **)Alloc0((i+1)*sizeof(int**));
+  for(j=i;j>0;j--) wvhdl[j]=res->wvhdl[j-1];
   Free((ADDRESS)res->wvhdl,i*sizeof(int*));
-  res->wvhdl=(int **)Alloc0((i+1)*sizeof(int**));
-  for(j=i;j>0;j--) res->wvhdl[j]=r->wvhdl[j-1];
+  res->wvhdl = wvhdl;
 
   rComplete(res,1);
   rChangeCurrRing(res,TRUE);

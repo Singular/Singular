@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.23 1999-10-22 11:14:18 obachman Exp $ */
+/* $Id: syz0.cc,v 1.24 1999-10-25 08:32:19 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -633,7 +633,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
               pDelete(&toRed);
               pDelete(&syz);
               for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
-              Free((ADDRESS)pairs,Fl*sizeof(poly));
+              Free((ADDRESS)pairs,(Fl + IDELEMS(currQuotient))*sizeof(poly));
               if (noSort)
               {
                 Free((ADDRESS)F,Fl*sizeof(poly));
@@ -803,19 +803,18 @@ static void syMergeSortResolventFB(resolvente res,int length, int initial=1)
 BOOLEAN syTestOrder(ideal M)
 {
   int i=idRankFreeModule(M);
+  if (i == 0) return FALSE;
   int j=0;
 
   while ((currRing->order[j]!=ringorder_c) && (currRing->order[j]!=ringorder_C))
     j++;
-  if ((i>0) && (currRing->order[j+1]!=0))
-  {
+  if (currRing->order[j+1]!=0)
     return TRUE;
-  }
   return FALSE;
 }
 
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
-                                BOOLEAN isMonomial,BOOLEAN notReplace)
+                                BOOLEAN isMonomial, BOOLEAN notReplace)
 {
   ideal mW=NULL;
   int i,syzIndex = 0,j=0,lgth,*ord=NULL,*bl0=NULL,*bl1=NULL;
@@ -859,7 +858,13 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       sySchreyersSyzygiesFM(res[syzIndex]->m,i,&(res[syzIndex+1]->m),
         &(IDELEMS(res[syzIndex+1])),sort);
 //idPrint(res[syzIndex+1]);
+
+// #define THOMAS_THOUGHT_ABOUT_IT
+#ifdef THOMAS_THOUGHT_ABOUT_IT
     if ((syzIndex==0) && (currRing->OrdSgn==1))
+#else
+    if ((syzIndex==0))
+#endif
     {
       j = 0;
       // Thomas: I do not understand why you change the ring here
@@ -904,8 +909,11 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         tmpR.wvhdl = wv;
         rComplete(&tmpR, 1);
         rChangeCurrRing(&tmpR, TRUE);
-        // Thomas: Now you might have to pFetchCopy any data which you
-        // later need -- see below on how to do it (e.g., res[0] ?!)
+        for (i=0; i<IDELEMS(res[1]); i++)
+        {
+          res[1]->m[i] = pFetchCopyDelete(origR, res[1]->m[i]);
+        }
+        idTest(res[1]);
       }
     }
     if (sort) sort=FALSE;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.9 1999-10-19 17:19:38 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.10 1999-10-25 08:32:17 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -290,7 +290,7 @@ poly p_Minus_m_Mult_q_General (poly p,
 
 
   Greater:
-  assume(pComp0(qm, p) == 1);
+  assume(pComp0(qm, p) == 1 && ! pEqual(qm, p));
       pSetCoeff0(qm,nMult(pGetCoeff(q), tneg));
       a = pNext(a) = qm;       // append qm to result and advance q
       pIter(q);
@@ -306,7 +306,7 @@ poly p_Minus_m_Mult_q_General (poly p,
       goto Top;
     
   Smaller:     
-  assume(pComp0(qm, p) == -1);
+  assume(pComp0(qm, p) == -1 && ! pEqual(qm, p));
       a = pNext(a) = p;// append p to result and advance p
       pIter(p);
       if (p == NULL) goto Finish;;

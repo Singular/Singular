@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.30 1999-10-19 12:42:47 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.31 1999-10-25 08:32:17 obachman Exp $ */
 
 /***************************************************************
  *
@@ -37,7 +37,11 @@
 inline void pRingCopy2ExpV(poly dest, poly src, ring src_r)
 {
   for (int i=pVariables; i != 0; i--)
+  {
+    assume(pRingGetExp(src_r, src, i) >= 0);
     pSetExp(dest, i, pRingGetExp(src_r, src, i));
+  }
+  assume( pRingGetComp(src_r, src) >= 0);
   pSetComp(dest, pRingGetComp(src_r, src));
 }
 
@@ -134,12 +138,21 @@ poly _pFetchCopyDelete(ring r, poly p)
   poly res, tmp, a, w;
   int ii;
 
+#ifdef PDEBUG
+  ring cring = currRing;
+  rChangeCurrRing(r);
+  assume(pTest(p));
+  rChangeCurrRing(cring);
+#endif
+  
+  
   if (p==NULL) return NULL;
 
   if ((r->N == pVariables)
       && (0==memcmp(r->VarOffset,currRing->VarOffset,
                     (pVariables+1)*sizeof(currRing->VarOffset[0])))
-      && r->ExpLSize == currRing->ExpLSize)
+      && r->ExpLSize == currRing->ExpLSize 
+      && r->pCompIndex == currRing->pCompIndex)
   {
 #ifdef MDEBUG
     res = (poly) mmDBAllocHeap(mm_specHeap, f,l);
@@ -993,6 +1006,23 @@ BOOLEAN pDBDivisibleBy2(poly a, poly b, char* f, int l)
 #endif //  defined(PDEBUG) && PDEBUG > 1
 
 #ifdef PDEBUG
+BOOLEAN mmDBEqual(poly p, poly q, char *f, int l)
+{
+  int i;
+  
+  for (i = 1; i<=pVariables; i++)
+  {
+    if (pGetExp(p,i) != pGetExp(q, i)) return FALSE;
+  }
+  if (pGetComp(p) != pGetComp(q)) return FALSE;
+  if (__pEqual(p, q) != TRUE)
+  {
+    Warn("Error in pEqual: exp/comp same, bug monoms different in %s:%d",
+         f, l);
+  }
+  return TRUE;
+}
+
 BOOLEAN pDBTest(poly p, char *f, int l)
 {
   return pDBTest(p, mm_specHeap, f,l);
@@ -1091,7 +1121,6 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
         return FALSE;
       }
     }
-
     old=p;
     pIter(p);
     if (pComp(old,p)!=1)

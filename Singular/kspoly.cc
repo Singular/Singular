@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.3 1999-09-30 16:27:44 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.4 1999-10-25 08:32:15 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -75,6 +75,7 @@ void ksReducePoly(LObject* PR,
     reset_vec = TRUE;
     // need to make sure that Comp of lm is same as comp of p2
     pSetComp(lm, pGetComp(p2));
+    pSetmComp(lm);
   }
 
   pMonSubFrom(lm, p2);

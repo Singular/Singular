@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.15 1999-10-22 16:31:21 obachman Exp $ */
+/* $Id: mmbt.c,v 1.16 1999-10-25 08:32:16 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
+#include <stddef.h>
 #include "mod2.h"
 #include "tok.h"
 #include "mmprivate.h"
@@ -64,23 +66,39 @@ int mmTrackInit ()
   return 1;
 }
 
-extern void* main;
+static mmTrack_sig11_caught = 0;
+typedef void (*si_hdl_typ)(int);
+
+void mmTrack_sig11_handler(int sig)
+{
+  mmTrack_sig11_caught = 1;
+  printf("SIG11 Caught\n");
+  fflush(stdout);
+}
+
 void mmTrack (unsigned long *bt_stack)
 {
   unsigned long pc, *fp = getfp ((unsigned long *) &bt_stack);
   int i=0;
-
+#if 0 /* Geht nicht */
+  si_hdl_typ sig11_handler = signal(SIGSEGV, (si_hdl_typ) mmTrack_sig11_handler);
+  mmTrack_sig11_caught = 0;
+#endif
+  
   if (mm_lowpc==0) mmTrackInit();
-
+  
+  
   while ((fp!=NULL) && ((unsigned long)fp>4095)  
-  && ((unsigned long)fp < ((unsigned long)0xf0000000))
+  && ((unsigned long)fp < ((unsigned long)0xff000000)) 
   && *fp && (pc = getpc (fp)) 
   && !entrypc (pc) && (i<BT_MAXSTACK))
   {
+    if ( mmTrack_sig11_caught) break;
     bt_stack[i]=pc; i++;
-    if (((unsigned long) pc) == ((unsigned long) &main)) break;
     fp = (unsigned long *) *fp;
+    
   }
+/*  signal(SIGSEGV, (si_hdl_typ) sig11_handler); */
   while(i<BT_MAXSTACK)
   {
     bt_stack[i]=0; i++;

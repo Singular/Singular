@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.c,v 1.13 1999-10-19 14:55:39 obachman Exp $ */
+/* $Id: mmheap.c,v 1.14 1999-10-25 08:32:16 obachman Exp $ */
 #include <stdio.h>
 #include "mod2.h"
 #include "structs.h"
@@ -46,7 +46,7 @@ memHeapPage mmAllocNewHeapPage(memHeap heap)
     return NULL;
   }
   else
-#endif
+#endif /* ! HAVE_AUTOMATIC_GC */
   {
     memHeapPage newpage;
     int i = 1, n = SIZE_OF_HEAP_PAGE / heap->size;
@@ -65,7 +65,7 @@ memHeapPage mmAllocNewHeapPage(memHeap heap)
     newpage->used_blocks = 0;
     newpage->current = (void*) (((char*)newpage) + SIZE_OF_HEAP_PAGE_HEADER);
     tmp = newpage->current;
-#endif    
+#endif   /* ! HAVE_AUTOMATIC_GC */ 
 
     while (i < n)
     {
@@ -279,46 +279,113 @@ void mmGarbageCollectHeap(memHeap heap, int strict)
 
 memHeapPage mmGetNewCurrentPage(memHeap heap)
 {
-  assume(heap->current_page->current == NULL);
-  assume(heap->current_page == mmZeroPage ||
-         (heap->current_page->next->prev == heap->current_page &&
-          heap->current_page->prev->next == heap->current_page));
-  if (heap->current_page != mmZeroPage && 
-      heap->current_page->next->current != NULL)
-  {
-    heap->current_page = heap->current_page->next;
-  }
-  else
+  if (heap->current_page == mmZeroPage)
   {
     memHeapPage new_page = mmAllocNewHeapPage(heap);
-    if (heap->current_page == mmZeroPage)
+    new_page->next = mmZeroPage;
+    new_page->prev = NULL;
+    heap->current_page = new_page;
+    return new_page;
+  }
+  else 
+  {
+    heap->current_page->used_blocks = 1;
+    heap->current_page->current = (void*) heap;
+    if (heap->current_page->next->current != NULL)
     {
-      new_page->next = new_page;
-      new_page->prev = new_page;
+      heap->current_page = heap->current_page->next;
+      return heap->current_page;
     }
     else
     {
-      new_page->next = heap->current_page->next;
-      new_page->prev = heap->current_page->prev;
-      if (heap->current_page->next != heap->current_page)
-      {
-        assume(heap->current_page->prev != heap->current_page &&
-               heap->current_page->prev != heap->current_page->next);
-        heap->current_page->prev->next = new_page;
-        heap->current_page->next->prev = new_page;
-      }
+      memHeapPage new_page = mmAllocNewHeapPage(heap);
+      new_page->next = mmZeroPage;
+      heap->current_page->next = new_page;
+      new_page->previous = heap->current_page;
+      heap->current_page = new_page;
+      return new_page;
     }
-    heap->current_page = new_page;
   }
-  assume(heap->current_page->next->prev == heap->current_page);
-  assume(heap->current_page->prev->next == heap->current_page);
-  return heap->current_page;
 }
 
-void mmRearrangeHeapPages(memHeapPage page, memHeap heap)
+
+static void mmTakeOutHeapPage(memHeapPage page, memHeap heap)
 {
-  assume(page != mmZeroPage && 
-         page->used_blocks < page->next->used_blocks);
+  if (heap->current_page == page) heap->current_page = page->next;
+  if (page->prev != NULL) page->prev->next = page->next;
+  if (page->next != mmZeroPage) page->next->prev = page->prev;
+}
+
+static void mmInsertHeapPage(memHeapPage after, memHeapPage page, memHeap heap)
+{
+  if (after == mmZeroPage)
+  {
+    page->next = mmZeroPage;
+    page->prev = NULL;
+    heap->current_page = page;
+  }
+  else
+  {
+    page->next = after->next;
+    page->prev = after;
+    if (after->next != mmZeroPage) after->next->prev = page;
+    after->next page;
+  }
+}
+
+void mmRearrangeHeapPages(memHeapPage page, void* addr)
+{
+  memHeap heap;
+  if (mmGetPageOfAddr(page->current) == page)
+  {
+    // get heap
+    heap = (memHeap) *(page->current + 1);
+     mmTakeOutHeapPage(page, heap);
+    // page can be freed
+    mmFreePage(page);
+  }
+  else
+  {
+    // page was full
+    heap = (memHeap) page->current;
+    page->current = addr;
+    page->used_blocks = (SIZE_OF_HEAP_PAGE / heap->block) - 1;
+    if (page->used_blocks <= 0) page->used_blocks = 1;
+    *(page->current + 1) = heap;
+    mmTakeOutHeapPage(page, heap);
+#if defined(PAGE_BEFORE_CURRENT)
+    if (heap->current_page->prev != NULL)
+    {
+      mmInsertHeapPage(heap->current_page->prev, page);
+    }
+    else
+    {
+      mmInsertHeapPage(heap->current, page, heap);
+    }
+    heap->current = page;
+#elsif defined(PAGE_AFTER_CURRENT)
+    mmInsertHeapPage(heap->current, page, heap);
+#else
+    {
+      memPage lastpage = heap->current_page;
+      if (lastpage != mmZeroPage) 
+      {
+        memPage lastpage = heap->current_page;
+        while (lastpage->next != mmZeroPage)
+        {
+          lastpage = lastpage->next;
+        }
+      }
+      mmInsertHeapPage(lastpage, page, heap);
+    }
+#endif    
+  }
+}
+
+  
+    
+    
+    
 
   if (page->used_blocks == 0)
   {

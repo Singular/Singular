@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.27 1999-10-22 09:07:05 obachman Exp $ */
+/* $Id: mmemory.h,v 1.28 1999-10-25 08:32:16 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -339,14 +339,12 @@ struct sip_memHeapPage
 
 struct sip_memHeap
 {
-  memHeapPage current_page;   /* pointer to page of current freelist */
-  memHeapPage first_free;
-  memHeapPage last_free;
-  long size;           /* size of blocks */
+  memHeapPage current_page;   /* page of current freelist */
+  long size;                  /* size of blocks */
 };
 
 extern memHeapPage  mmGetNewCurrentPage(memHeap heap);
-extern void mmRearrangeHeapPages(memHeapPage page, memHeap heap);
+extern void mmRearrangeHeapPages(memHeapPage page, memHeap heap, void* addr);
 extern struct sip_memHeapPage mmZeroPage[];
 #ifndef mmGetPageOfAddr
 #define mmGetPageOfAddr(addr) \
@@ -364,26 +362,13 @@ do                                                                  \
 }                                                                   \
 while (0)
 
-#ifdef GC_KEEP_SORTED
-#define _mmFreeHeap(addr, heap)                         \
-do                                                      \
-{                                                       \
-  register memHeapPage _page = mmGetPageOfAddr(addr);   \
-  _page->used_blocks--;                                 \
-  if (_page->used_blocks < _page->next->used_blocks)    \
-    mmRearrangeHeapPages(_page, heap);                  \
-  *((void**) addr) = _page->current;                    \
-  _page->current = addr;                                \
-}                                                       \
-while (0)
-#else
 #define _mmFreeHeap(addr, heap)                         \
 do                                                      \
 {                                                       \
   register memHeapPage _page = mmGetPageOfAddr(addr);   \
   _page->used_blocks--;                                 \
   if (_page->used_blocks == 0)                          \
-    mmRearrangeHeapPages(_page, heap,addr);             \
+    mmRearrangeHeapPages(_page, heap, addr);            \
   else                                                  \
   {                                                     \
     *((void**) addr) = _page->current;                  \
@@ -391,7 +376,6 @@ do                                                      \
   }                                                     \
 }                                                       \
 while (0)
-#endif
 
 #endif /* ! HAVE_AUTOMATIC_GC */
 
