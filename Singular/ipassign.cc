@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.62 2000-12-06 11:03:14 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.63 2001-02-22 09:40:17 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -324,7 +324,6 @@ static BOOLEAN jiA_STRING(leftv res, leftv a, Subexpr e)
     void* tmp = res->data;
     res->data=(void *)a->CopyD(STRING_CMD);
     jiAssignAttr(res,a);
-    //OB: ???   
     omfree(tmp);
   }
   else
@@ -371,6 +370,7 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   res->data=(void *)a->CopyD(MATRIX_CMD);
+  idNormalize((ideal)res->data);
   jiAssignAttr(res,a);
   return FALSE;
 }
@@ -387,6 +387,7 @@ static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr e)
   ideal I=idInit(1,1);
   I->m[0]=(poly)a->CopyD(POLY_CMD);
   if (I->m[0]!=NULL) pSetCompP(I->m[0],1);
+  pNormalize(I->m[0]);
   res->data=(void *)I;
   return FALSE;
 }
@@ -397,6 +398,7 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr e)
   IDELEMS((ideal)m)=MATROWS(m)*MATCOLS(m);
   ((ideal)m)->rank=1;
   MATROWS(m)=1;
+  idNormalize((ideal)m);
   res->data=(void *)m;
   return FALSE;
 }
@@ -445,6 +447,7 @@ static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr e)
   idDelete((ideal *)&f);
   res->data=(void *)a->CopyD(IDEAL_CMD);
   f=(map)res->data;
+  idNormalize((ideal)f);
   f->preimage = rn;
   return FALSE;
 }
@@ -1052,6 +1055,7 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
     {
       m=mpNew(1,1);
       MATELEM(m,1,1)=(poly)r->CopyD(POLY_CMD);
+      pNormalize(MATELEM(m,1,1));
     }
     else
     {
@@ -1438,6 +1442,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
             hh->next=t.next;
             if (nok) break;
             lm->m[i]=(poly)t.CopyD(etyp);
+            pNormalize(lm->m[i]);
             if (module_assign) rk=max(rk,pMaxComp(lm->m[i]));
             i++;
           }
@@ -1458,6 +1463,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
             for(k=0;k<j;k++,i++)
             {
               lm->m[i]=rm->m[k];
+              pNormalize(lm->m[i]);
               rm->m[k]=NULL;
             }
             idDelete((ideal *)&rm);

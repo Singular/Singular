@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.121 2001-02-08 13:12:59 Singular Exp $ */
+/* $Id: ideals.cc,v 1.122 2001-02-22 09:40:15 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3447,4 +3447,20 @@ BOOLEAN idIsZeroDim(ideal I)
   }
   omFreeSize(UsedAxis,pVariables*sizeof(BOOLEAN));
   return res;
+}
+
+void idNormalize(ideal I)
+{
+  if (rField_has_simple_inverse()) return; /* Z/p, GF(p,n), R, long R/C */
+  int i;
+  poly p;
+  for(i=IDELEMS(I)-1;i>=0;i--)
+  {
+    p=I->m[i] ;
+    while(p!=NULL)
+    {
+      nNormalize(pGetCoeff(p));
+      pIter(p);
+    }
+  }
 }
