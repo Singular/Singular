@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.4 1998-01-12 18:59:51 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.5 1998-01-15 16:18:41 obachman Exp $ */
 
 /***************************************************************
  *
@@ -577,7 +577,10 @@ Exponent_t pPDMultExp(poly p, int v, Exponent_t e, char* f, int l)
 void pDBMonAddFast(poly p1, poly p2, char* f, int l)
 {
   poly ptemp = pNew();
+  poly ptemp2 = pNew();
   pCopy2(ptemp, p1);
+  pCopy2(ptemp2, p1);
+  
   _pMonAddFast(p1, p2);
 
   for (int i=1; i<=pVariables; i++)
@@ -585,8 +588,13 @@ void pDBMonAddFast(poly p1, poly p2, char* f, int l)
   pGetOrder(ptemp) += pGetOrder(p2);
 
   if (! pEqual(ptemp, p1))
+  {
     Print("Error in pMonAddFast in %s:%d\n", f, l);
+    _pMonAddFast(ptemp2, p2);
+  }
+  
   pFree1(ptemp);
+  pFree1(ptemp2);
 }
 
 void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
@@ -595,6 +603,13 @@ void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
   {
     Print("Error in CopyAddFast: Destination equals source in %s:%d\n", f, l);
   }
+#if 0  
+  if (pGetComp(p2) != pGetComp(p3) && pGetComp(p2) != 0)
+  {
+    Print("Error in CopyAddFast: Different non-zero components in %s: %d\n",
+           f, l);
+  }
+#endif  
   poly ptemp = pNew();
   __pCopyAddFast(ptemp, p2, p3);
 

@@ -445,8 +445,7 @@ $(OBJP2): %.op: %.c
 
 Singularp: scanner.cc $(OBJP) iparith.op mpsr_Tok.op tesths.cc version.h 
 	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp \
-	tesths.cc iparith.op mpsr_Tok.op $(OBJP) \
-	${STATIC_LDFLAGS} ${LDFLAGSP} ${LIBS}
+	tesths.cc iparith.op mpsr_Tok.op $(OBJP) ${LDFLAGSP} ${LIBS}
 
 iparith.op: iparith.inc iparith.cc
 	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c iparith.cc -o iparith.op
