@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.4 1999-07-02 14:28:51 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.5 1999-07-02 16:14:38 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -284,11 +284,12 @@ BOOLEAN ngcIsZero (number a)
 }
 
 /*2
-* za >= 0 ?
+* za >= 0 ? ( real() > 0 || imag() > 0 )
 */
 BOOLEAN ngcGreaterZero (number a)
 {
-  return TRUE;
+  if ( a == NULL ) return TRUE;
+  return ( ((gmp_complex*)a)->real().sign() > 0 || ((gmp_complex*)a)->imag().sign() > 0 );
 }
 
 /*2
@@ -329,7 +330,8 @@ BOOLEAN ngcEqual (number a, number b)
 BOOLEAN ngcIsOne (number a)
 {
   if ( a == NULL ) return FALSE;
-  return (((gmp_complex*)a)->real().isOne() && ((gmp_complex*)a)->imag().isZero());
+  //return (((gmp_complex*)a)->real().isOne() && ((gmp_complex*)a)->imag().isZero());
+  return (((gmp_complex*)a)->real().isOne());
 }
 
 /*2
@@ -338,7 +340,8 @@ BOOLEAN ngcIsOne (number a)
 BOOLEAN ngcIsMOne (number a)
 {
   if ( a == NULL ) return FALSE;
-  return (((gmp_complex*)a)->real().isMOne() && ((gmp_complex*)a)->imag().isZero());
+  //  return (((gmp_complex*)a)->real().isMOne() && ((gmp_complex*)a)->imag().isZero());
+  return (((gmp_complex*)a)->real().isMOne());
 }
 
 /*2

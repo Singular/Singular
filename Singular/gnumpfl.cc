@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.6 1999-07-02 15:01:42 wenk Exp $ */
+/* $Id: gnumpfl.cc,v 1.7 1999-07-02 16:14:39 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -372,26 +372,33 @@ char * ngfRead (char * s, number * a)
 {
   char *start= s;
 
+  //Print("%s\n",s);
+
   s= ngfEatFloatNExp( s );
 
-  if (*s=='\0')
+  if (*s=='\0')  // 0
   {
     if ( *(gmp_float**)a == NULL ) (*(gmp_float**)a)= new gmp_float();
     (*(gmp_float**)a)->setFromStr(start);
   }
-  else if (s==start)
+  else if (s==start)  // 1
   {
     if ( *(gmp_float**)a != NULL )  delete (*(gmp_float**)a);
     (*(gmp_float**)a)= new gmp_float(1);
   }
   else
   {
+    if ( *s == '/' ) {
+    }
     char c=*s;
     *s='\0';
     if ( *(gmp_float**)a == NULL ) (*(gmp_float**)a)= new gmp_float();
     (*(gmp_float**)a)->setFromStr(start);
     *s=c;
   }
+
+ 
+
   return s;
 }
 

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.6 1999-07-02 14:33:45 wenk Exp $";
+version="$Id: solve.lib,v 1.7 1999-07-02 16:14:41 wenk Exp $";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
@@ -82,7 +82,7 @@ example
   pause;
   // now with complex coefficient field, precision is 10 digits 
   ring rsc= (real,10,I),(x,y),lp;
-  ideal i = x2 + y2 - 8, x2 + xy + 2y2;
+  ideal i = (2+3*I)*x2 + (0.35+I*45.0e-2)*y2 - 8, x2 + xy + (42.7)*y2;
   ures_solve(i);
   // result is a list of (x,y)-coordinates of complex numbers
 }
@@ -145,7 +145,7 @@ example
   pause;
   // Now with complex coefficients, precision is 20 digits:
   ring rsc= (real,20,I),x,lp;
-  poly f = (15+I*5)*x^5 + (0.25+I*2)*x^3 + x2 - 10*I;
+  poly f = (15.4+I*5)*x^5 + (25.0e-2+I*2)*x^3 + x2 - 10*I;
   list l = laguerre_solve(f);
   l;
 }

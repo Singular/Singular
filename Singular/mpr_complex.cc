@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.10 1999-07-02 15:01:43 wenk Exp $ */
+/* $Id: mpr_complex.cc,v 1.11 1999-07-02 16:14:40 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -507,28 +507,32 @@ char *complexToStr( const gmp_complex & c, const unsigned int oprec )
   if ( !c.imag().isZero() )
   {
 
-      in_real=floatToStr( c.real(), oprec );         // get real part
+    in_real=floatToStr( c.real(), oprec );         // get real part
     in_imag=floatToStr( abs(c.imag()), oprec );    // get imaginary part
 
     if (rField_is_long_C())
     {
-      int len=(strlen(in_real)+strlen(in_imag)+5+strlen(currRing->parameter[0]))*sizeof(char);
+      int len=(strlen(in_real)+strlen(in_imag)+7+strlen(currRing->parameter[0]))*sizeof(char);
       out=(char*)AllocL(len);
       memset(out,0,len);
-      if (  !c.real().isZero() ) 
-	sprintf(out,"(%s%s%s*%s)",in_real,c.imag().sign()>=0?"+":"-",currRing->parameter[0],in_imag);
-      else
-	sprintf(out,"(%s%s*%s)",c.imag().sign()>=0?"":"-",currRing->parameter[0],in_imag);
+      if (  !c.real().isZero() )  // (-23-i*5.43) or (15.1+i*5.3)
+	sprintf(out,"%s(%s%s%s*%s)",(c.imag().sign()<0&&c.real().sign()<0)?"+":"",
+		in_real,c.imag().sign()>=0?"+":"-",currRing->parameter[0],in_imag);
+      else // +(-i*43) or +(i*34)
+	sprintf(out,"%s(%s%s*%s)",c.imag().sign()>=0?"":"+",
+		c.imag().sign()>=0?"":"-",currRing->parameter[0],in_imag);
     }
     else
     {
-      int len=(strlen(in_real)+strlen(in_imag)+8) * sizeof(char);
+      int len=(strlen(in_real)+strlen(in_imag)+9) * sizeof(char);
       out=(char*)AllocL( len );
       memset(out,0,len);
       if (  !c.real().isZero() ) 
-	sprintf(out,"(%s%s%s)",in_real,c.imag().sign()>=0?"+I*":"-I*",in_imag);
+	sprintf(out,"%s(%s%s%s)",(c.imag().sign()<0&&c.real().sign()<0)?"+":"",
+		in_real,c.imag().sign()>=0?"+I*":"-I*",in_imag);
       else
-	sprintf(out,"(%s%s)",c.imag().sign()>=0?"I*":"-I*",in_imag);
+	sprintf(out,"%s(%s%s)",c.imag().sign()>=0?"":"+",
+		c.imag().sign()>=0?"I*":"-I*",in_imag);
     }
     FreeL( (ADDRESS) in_real );
     FreeL( (ADDRESS) in_imag );
