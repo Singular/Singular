@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.16 2005-01-25 13:20:33 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.17 2005-02-03 14:05:55 Singular Exp $ */
 
 #include <config.h>
 
@@ -207,6 +207,12 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
         b.nextpoint();
 	return ezgcd( F, G, b, true );
     }
+#if 1
+    extern CanonicalForm
+gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag );
+
+    return gcd_poly1( F, G, getCharacteristic()==0 );
+#else
 
     DEBOUTLN( cerr, "ezgcdspec: (S1) done, Ft = " << Ft );
     L = F / Ft;
@@ -261,6 +267,7 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
     }
     // this point is never reached, but to avoid compiler warnings let's return a value
     return 0;
+#endif
 }
 
 static void

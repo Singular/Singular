@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.27 2005-01-05 11:27:17 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.28 2005-02-03 14:05:55 Singular Exp $ */
 
 #include <config.h>
 
@@ -297,7 +297,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
   }
 }
 
-static CanonicalForm
+CanonicalForm
 gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 {
     CanonicalForm C, Ci, Ci1, Hi, bi, pi, pi1, pi2;
