@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.72 1998-05-15 07:15:54 schmidt Exp $
+@comment $Id: general.doc,v 1.73 1998-05-15 07:45:22 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -955,18 +955,19 @@ call to a function without return type, or a print command. The general
 form of a command is described in the following subsections.
 @subsubheading Declaration
 @c ------------------------------------------------------------
-@c   This piece of text exists also in the file types.doc, 
-@c   chapter "Data types".
+@c   This piece of text exists in the file types.doc, 
+@c   chapter "Data types", general.doc, chapter "Names" and
+@c   chapter "General command syntax".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
 @enumerate
-@item 
-type name @code{=} expression @code{;}
+@item type name @code{=} expression @code{;}
 @* declares a variable with the given name of the given type and assigns
-the expression as initial value to it.
+the expression as initial value to it.  Expression is any expression of
+the specified type or one that can be converted to that type.
+@xref{Type conversion and casting}).
 
-@item 
-type name @code{;}
+@item type name @code{;}
 @* declares a variable with the given name of the given type and assigns
 the default value of the specific type to it.
 @end enumerate
@@ -974,7 +975,7 @@ the default value of the specific type to it.
 @c   End of duplicate piece of text.
 @c ------------------------------------------------------------
 
-@xref{Names} for more information on declarations and @ref{Data types}
+@xref{Names}, for more information on declarations.  @xref{Data types},
 for a description on all data types known by @sc{Singular}.
 
 @example
@@ -1130,31 +1131,41 @@ terminates @sc{Singular}
 @subsection Names
 @cindex Names
 
-@itemize @bullet
-
-@item
 @sc{Singular} is a strongly typed language.  This means that all names (=
 identifiers) have to be declared prior to their use.
-The general syntax of a declaration is
+The general syntax of a declaration is either:
 
-<type> name [ @code{=} expression ] @code{;}
+@c ------------------------------------------------------------
+@c   This piece of text exists in the file types.doc, 
+@c   chapter "Data types", general.doc, chapter "Names" and
+@c   chapter "General command syntax".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
+@enumerate
+@item type name @code{=} expression @code{;}
+@* declares a variable with the given name of the given type and assigns
+the expression as initial value to it.  Expression is any expression of
+the specified type or one that can be converted to that type.
+@xref{Type conversion and casting}).
 
-where <type> stands for one of the data types of @sc{Singular}, 
-name for the name of the object to be declared, and 
-expression is any expression of type or one
-that can be converted to type.  @xref{Type conversion and casting}). Expression
-is assigned to name as initial value.  When expression is missing a default
-value is assigned whenever possible.
+@item type name @code{;}
+@* declares a variable with the given name of the given type and assigns
+the default value of the specific type to it.
+@end enumerate
+@c ------------------------------------------------------------
+@c   End of duplicate piece of text.
+@c ------------------------------------------------------------
 
-@xref{typeof}, for a complete list of types.  To get information on the 
-name and the object named by it, the @code{type} command may be used
-(@ref{type}).
 @xref{Data types}, for a description of @sc{Singular}'s data types.
+@xref{typeof}, for a short overview list of types.  To get information
+on the name and the object named by it, the @code{type} command may be
+used (@ref{type}).
 
-It is possible to redefine or overwrite an already existing name (if it
-is a name of the same type).  A redefinition will first set the variable
+It is possible to redefine or overwrite an already existing name if it
+is a name of the same type.  A redefinition will first set the variable
 to the default value and then compute the expression.  The difference
-between redefinition and overwriting is shown in the following example:
+between redefining and overwriting a variable is shown in the following
+example:
 
 @example
 @c example
@@ -1166,29 +1177,29 @@ between redefinition and overwriting is shown in the following example:
 @c example
 @end example
 
-@item
 User defined names should start with a letter and consist of letters and
-digits only.  All names are case sensitive.  Indexed names are built as
-name followed by @code{(} int_expression @code{)}.  A list of indexed
-names can be built as a name followed by @code{(} intvec_expression
-@code{)}.
+digits only.  For historical reasons, the character @code{@@} may be used
+as part of a name, too, but its use is discouraged.  Capital and small
+letters are distinguished.  Indexed names are built as a name followed by
+@code{(} int_expression @code{)}.  A list of indexed names can be built as
+a name followed by @code{(} intvec_expression @code{)}.
 
 @example
 @c example
   ring R;
   int n=3;
   ideal j(3);
-  ideal j(n);     // is equivalent with the above
+  ideal j(n);     // is equivalent to the above
   ideal j(2)=x;
   j(2..3);
 @c example
 @end example
 
-@item
-Names must not coincide with reserved names (keywords).  You get a list
-of the reserved names by @code{reservedName();}.  @xref{reservedName}.
-Names should not interfere with names of ring variables or, more
-generally, with monomials.  This may lead to unexpected results:
+Names must not coincide with reserved names (keywords).  Type
+@code{reservedName();} to get a list of the reserved names.
+@xref{reservedName}.  Names should not interfere with names of ring
+variables or, more generally, with monomials.  This may lead to unexpected
+results:
 
 @example
 @c example
@@ -1198,7 +1209,6 @@ generally, with monomials.  This may lead to unexpected results:
   xxx;
 @c example
 @end example
-@end itemize
 
 @c ------------------------------------------------------------
 @node Objects, Type conversion and casting, Names, The SINGULAR language
