@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.34 1999-08-18 18:40:44 wichmann Exp $
+;; $Id: singular.el,v 1.35 1999-08-24 07:12:08 wichmann Exp $
 
 ;;; Commentary:
 
@@ -626,14 +626,10 @@ Sets the submenu (\"Commands\" \"libraries\") to the value of
 		  (message "Removing libraries from menu"))
   (easy-menu-change '("Commands") "libraries" singular-menu-initial-library-menu))
 
-(or singular-interactive-mode-menu-1
-    (easy-menu-define singular-interactive-mode-menu-1
-		      singular-interactive-mode-map ""
-		      '("Singular"
-			["start default" singular t]
-			["start..." singular-other t]
-			["exit" singular-exit-singular t])))
-
+;; For some reasons emacs inserts new menus in the oppsite order.
+;; Defining menu-2 prior to menu-1 will result in the follwoing menu:
+;;   Singular   Commands
+;; That's what we want. So DO NOT exchange both (or ..) statements!
 (or singular-interactive-mode-menu-2
     (easy-menu-define 
      singular-interactive-mode-menu-2
@@ -660,22 +656,36 @@ Sets the submenu (\"Commands\" \"libraries\") to the value of
       ["unfold at point" singular-unfold-at-point t]
       )))
 
-;; NOT READY
-;; This is just a temporary hack for XEmacs demo.
-(defvar singular-install-in-main-menu nil
-  "NOT READY [docu]")
-
-(if singular-install-in-main-menu
-    (cond
-     ;; XEmacs
-     ((eq singular-emacs-flavor 'xemacs)
-      (add-submenu nil 
-		   singular-start-menu-definition))))
+(or singular-interactive-mode-menu-1
+    (easy-menu-define singular-interactive-mode-menu-1
+		      singular-interactive-mode-map ""
+		      '("Singular"
+			["start default" singular t]
+			["start..." singular-other t]
+			["restart" singular-restart t]
+			["exit" singular-exit-singular t])))
 
 (defun singular-interactive-mode-menu-init ()
   "Initialize menus for Singular interactive mode.
 
 This function is called  at mode initialization time."
+  ;; Remove any potential menu which comint-mode might has added.
+  (cond 
+   ;; Emacs
+   ((eq singular-emacs-flavor 'emacs)
+    ;; Note that easy-menu-remove is a nop in emacs.
+    (define-key comint-mode-map [menu-bar signals] nil)
+    (define-key comint-mode-map [menu-bar inout] nil)
+    (define-key comint-mode-map [menu-bar completion] nil))
+   ;;Xemacs
+   (t
+    (easy-menu-remove '("Comint1"))	; XEmacs 20
+    (easy-menu-remove '("Comint2"))	; XEmacs 20
+    (easy-menu-remove '("History"))	; XEmacs 20
+    (easy-menu-remove '("Complete"))	; XEmacs 21
+    (easy-menu-remove '("In/Out"))	; XEmacs 21
+    (easy-menu-remove '("Signals"))))	; XEmacs 21
+
   ;; Note: easy-menu-add is not necessary in emacs, since the menu
   ;; is added automatically with the keymap. 
   ;; See help on `easy-menu-add'
@@ -3367,7 +3377,7 @@ NOT READY [much more to come.  See shell.el.]!"
 
 ;;{{{ Starting singular
 (defcustom singular-start-file "~/.emacs_singularrc"
-  "Name of start-up file to pass to Singular.
+  "*Name of start-up file to pass to Singular.
 If the file named by this variable exists it is given as initial input
 to any Singular process being started.  Note that this may lose due to
 a timing error if Singular discards input when it starts up."
@@ -3376,7 +3386,7 @@ a timing error if Singular discards input when it starts up."
   :group 'singular-interactive-miscellaneous)
 
 (defcustom singular-executable-default "Singular"
-  "Default name of Singular executable.
+  "*Default name of Singular executable.
 Used by `singular' when new Singular processes are started.
 If the name is given without path the executable is searched using the
 `PATH' environment variable."
@@ -3390,7 +3400,7 @@ If the name is given without path the executable is searched using the
 This variable is buffer-local.")
 
 (defcustom singular-directory-default nil
-  "Default working directory of Singular buffer.
+  "*Default working directory of Singular buffer.
 Should be either nil (which means do not set the default directory) or an
 existing directory."
   :type '(choice (const nil) (directory :value "~/"))
@@ -3405,7 +3415,7 @@ This variable is buffer-local.")
 ;; no singular-directory-history here. Usual file history is used.
 
 (defcustom singular-switches-default '()
-  "List of default switches for Singular processes.
+  "*List of default switches for Singular processes.
 Should be a list of strings, one string for each switch.
 Used by `singular' when new Singular processes are started."
   :type '(repeat string)
@@ -3428,7 +3438,7 @@ This list should at least contain the option \"--emacs\". If you are
 running an older version of Singular, remove this option from the list.")
 
 (defcustom singular-name-default "singular"
-  "Default process name for Singular process.
+  "*Default process name for Singular process.
 Used by `singular' when new Singular processes are started.
 This string surrounded by \"*\" will also be the buffer name."
   :type 'string
@@ -3467,7 +3477,6 @@ exit procedures."
 		    (message "Sentinel: %s" (substring message 0 -1)))
     ;; exit demo mode if necessary
     (singular-demo-exit)
-    (singular-menu-deinstall-libraries)
     (singular-scan-header-exit)
     (if (string-match "finished\\|exited" message)
 	(let ((process-buffer (process-buffer process)))
@@ -3475,7 +3484,9 @@ exit procedures."
 		   (buffer-name process-buffer)
 		   (set-buffer process-buffer))
 	      ;; write back history
-	      (singular-history-write))))))
+	      (progn
+		(singular-menu-deinstall-libraries)
+		(singular-history-write)))))))
 
 (defun singular-exec (buffer name executable start-file switches)
   "Start a new Singular process NAME in BUFFER, running EXECUTABLE.
@@ -3540,6 +3551,8 @@ Returns BUFFER."
       ;; this code is unwide-protected
       (set-buffer old-buffer))))
 
+
+;; TODO: Documentation!
 ;; Note:
 ;;
 ;; In contrast to shell.el, `singular' does not run
@@ -3661,7 +3674,6 @@ If no last values are available, uses the default values."
 Interactively asks values for the executable, the default directory, the
 buffer name and the command line switches, and starts Singular."
   (interactive)
-  (interactive "fSingular executable: ")
   (let* ((executable (read-file-name "Singular executable: "))
 	 ;; Remark: Do NOT call `expand-file-name' after the 
 	 ;; above read-file-name! It has to be possible to enter a command
@@ -3699,7 +3711,7 @@ buffer name and the command line switches, and starts Singular."
     (if (string-match "^\\*\\(.*\\)\\*$" name)
 	(setq name (substring name (match-beginning 1) (match-end 1))))
 
-    (singular-internal executable directory switches name))) 
+    (singular-internal executable directory switches name)))
 
 ;; for convenience only
 (defalias 'Singular 'singular)
