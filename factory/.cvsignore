@@ -3,6 +3,5 @@ config.h
 config.cache
 config.log
 config.status
-stamp-h
 factoryconf.h
 factory.h
