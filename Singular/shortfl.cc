@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.6 1997-11-24 12:58:46 pohl Exp $ */
+/* $Id: shortfl.cc,v 1.7 1997-11-24 15:35:39 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -10,6 +10,7 @@
 #include <limits.h>
 #include <string.h>
 #include "mod2.h"
+#include "tok.h"
 #include "febase.h"
 #include "numbers.h"
 #include "longrat.h"
