@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.12 2000-03-31 13:45:04 Singular Exp $ */
+/* $Id: kstd1.h,v 1.13 2000-05-09 14:33:03 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -75,6 +75,7 @@ extern intvec * kModW;
 29 kStd + 1 new element
 30 noRedSyz
 31 weight
+verbose:31 stop at certain weights
 */
 
 #endif

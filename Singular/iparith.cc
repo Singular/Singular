@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.209 2000-04-13 13:01:49 Singular Exp $ */
+/* $Id: iparith.cc,v 1.210 2000-05-09 14:35:11 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -270,7 +270,7 @@ cmdnames cmds[] =
   { "quotient",    0, QUOTIENT_CMD ,      CMD_2},
   { "random",      0, RANDOM_CMD ,        CMD_23},
   { "read",        0, READ_CMD ,          CMD_12},
-  { "reduce",      0, REDUCE_CMD ,        CMD_23},
+  { "reduce",      0, REDUCE_CMD ,        CMD_M},
   { "regularity",  0, REGULARITY_CMD ,    CMD_1},
   { "reservedName",0, RESERVEDNAME_CMD ,  CMD_M},
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
@@ -315,7 +315,7 @@ cmdnames cmds[] =
   { "write",       0, WRITE_CMD ,         CMD_M},
 /* delete for next version:*/
   { "IN",          1, LEAD_CMD ,          CMD_1},
-  { "NF",          1, REDUCE_CMD ,        CMD_23},
+  { "NF",          1, REDUCE_CMD ,        CMD_M},
   { "multiplicity",1, MULTIPLICITY_CMD ,  CMD_1},
   { "verbose",     2, OPTION_CMD ,        CMD_M},
 //  { "rank",        1, ROWS_CMD ,          CMD_1},
@@ -4788,6 +4788,30 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
   res->rtyp=NONE;
   return setOption(res,v);
 }
+static BOOLEAN jjREDUCE4(leftv res, leftv v)
+{
+  // poly, ideal, deg, weights
+  leftv u1=v;
+  leftv u2=v->next;
+  leftv u3=u2->next; u2->next=NULL;
+  leftv u4=u3->next;
+  if ((u3->Typ()!=INT_CMD)||(u4->Typ()!=INTVEC_CMD))
+  {
+    Werror("%s(`poly`,`ideal`,`int`,`intvec`) exppected",Tok2Cmdname(iiOp));
+    return TRUE;
+  }
+  int save_d=Kstd1_deg;
+  Kstd1_deg=(int)u3->Data();
+  kModW=(intvec *)u4->Data();
+  BITSET save=verbose;
+  verbose|=Sy_bit(V_DEG_STOP);
+  BOOLEAN r=jjCALL2ARG(res,v);
+  kModW=NULL;
+  Kstd1_deg=save_d;
+  verbose=save;
+  v->next->next=u3;
+  return r;
+}
 static BOOLEAN jjRESERVED0(leftv res, leftv v)
 {
   int i=1;
@@ -5015,6 +5039,9 @@ struct sValCmdM dArithM[]=
 ,{jjCALL1ARG,  NAMES_CMD,       LIST_CMD,            1 }
 ,{jjNAMES0,    NAMES_CMD,       LIST_CMD,            0 }
 ,{jjOPTION_PL, OPTION_CMD,      STRING_CMD/*or set by p*/,-1 }
+,{jjCALL2ARG,  REDUCE_CMD,      IDEAL_CMD/*or set by p*/,          2  }
+,{jjCALL3ARG,  REDUCE_CMD,      IDEAL_CMD/*or set by p*/,          3  }
+,{jjREDUCE4,   REDUCE_CMD,      IDEAL_CMD/*or set by p*/,          4  }
 ,{jjCALL1ARG,  RESERVEDNAME_CMD, INT_CMD,            1 }
 ,{jjRESERVED0, RESERVEDNAME_CMD, NONE,               0 }
 ,{jjSTRING_PL, STRING_CMD,      STRING_CMD,         -1 }

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.40 2000-03-31 13:46:37 Singular Exp $ */
+/* $Id: tok.h,v 1.41 2000-05-09 14:33:03 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -173,8 +173,8 @@ enum {
 #define V_IMAP      12
 #define V_PROMPT    13
 #define V_NSB       14
+#define V_DEG_STOP  31
 
-#define TEST_VERB_NSB              BVERBOSE(V_NSB)
 
 #define OPT_PROT           0
 #define OPT_REDSB          1
@@ -218,5 +218,8 @@ enum {
 #define TEST_OPT_SB_1              BTEST1(OPT_SB_1)
 #define TEST_OPT_NOTREGULARITY     BTEST1(OPT_NOTREGULARITY)
 #define TEST_OPT_WEIGHTM           BTEST1(OPT_WEIGHTM)
+
+#define TEST_VERB_NSB              BVERBOSE(V_NSB)
+#define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)
 
 #endif

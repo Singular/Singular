@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.49 2000-03-31 13:44:50 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.50 2000-05-09 14:35:10 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -695,31 +695,33 @@ int redMoraBest (LObject* h,kStrategy strat)
 */
 static poly redMoraNF (poly h,kStrategy strat, int flag)
 {
-  poly pi;
   LObject H;
-  int o,ei,li;
+  H.p = h;
   int j = 0;
   int z = 10;
-  unsigned long not_sev;
-  H.p = h;
-  o = pFDeg(h);
+  int o = pFDeg(h);
   H.ecart = pLDeg(H.p,&H.length)-o;
   if (flag==0) cancelunit(&H);
   H.sev = pGetShortExpVector(H.p);
-  not_sev = ~ H.sev;
+  unsigned long not_sev = ~ H.sev;
   loop
   {
     if (j > strat->tl)
     {
       return H.p;
     }
+    if (TEST_V_DEG_STOP)
+    {
+      if (kModDeg(H.p)>Kstd1_deg) pDelete1(&H.p);
+      if (H.p==NULL) return NULL;
+    }
     if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, H.p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- remember the found T-poly -*/
-      pi = strat->T[j].p;
-      ei = strat->T[j].ecart;
-      li = strat->T[j].length;
+      poly pi = strat->T[j].p;
+      int ei = strat->T[j].ecart;
+      int li = strat->T[j].length;
       /*
       * the polynomial to reduce with (up to the moment) is;
       * pi with ecart ei and length li
@@ -1469,6 +1471,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   test|=Sy_bit(OPT_REDTAIL);
   test&=~Sy_bit(OPT_INTSTRATEGY);
   if (TEST_OPT_STAIRCASEBOUND
+  && (! TEST_V_DEG_STOP)
   && (0<Kstd1_deg)
   && ((!strat->kHEdgeFound)
     ||(TEST_OPT_DEGBOUND && (pWTotaldegree(strat->kNoether)<Kstd1_deg))))
