@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.18 1998-05-16 18:28:21 gorzel Exp $
+@comment $Id: math.doc,v 1.19 1998-05-16 23:14:53 gorzel Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -1098,8 +1098,8 @@ The regularity is the smallest number $s$ with the property deg($e_{a,i})
 @end tex
 @c ---------------------------------------------------------------------------
 @node Characteristic sets,References,Syzygies and resolutions,Mathematical background
-@section Characteritic sets
-@cindex Characteritic sets
+@section Characteristic sets
+@cindex Characteristic sets
 
 @tex
 Let $<$ be the lexicographical ordering $x_1 < ... < x_n$ on $R=K[x_1,...,x_n]$.
@@ -1162,7 +1162,8 @@ such that Zero(G)=Union(i=1,...,l: Zero(T_i\I_i))
 where I_i=@{ini(f), f in T_i @}.
 @end ifinfo
 
-@*@strong{Example:}
+@table @code
+@item @strong{Example:}
 @example
 @c example
   ring R= 0,(x,y,z,u),dp;
@@ -1172,6 +1173,7 @@ where I_i=@{ini(f), f in T_i @}.
   print(char_series(i));
 @c example
 @end example
+@end table
 @c ---------------------------------------------------------------------------
 @node References,,Characteritic sets,Mathematical background
 @section References
@@ -1202,7 +1204,8 @@ Eisenbud
 @item
 Mishra, B.: Algorithmic Algebra, Texts and Monographs in Computer Science,
 Springer, 1993
-@item Vasconcelos, V.:
+@item
+Vasconcelos, V.:
 @end table
 
 @subheading Descriptions of algorithms
@@ -1223,6 +1226,7 @@ implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998.
 Grassmann, H.; Greuel, G.-M.; Martin, B.; Neumann,
 W.; Pfister, G.; Pohl, W.;
 @tex
+\noindent
 Sch\"onemann,
 @end tex
 @ifinfo
@@ -1238,7 +1242,6 @@ syzygies, Arch. d. Math. 63(1995)
 
 @item
 @tex
-\noindent
 Sch\"onemann, H:
 @end tex
 @ifinfo
