@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.29 1998-05-06 14:02:15 Singular Exp $
+@comment $Id: reference.doc,v 1.30 1998-05-06 14:44:57 schmidt Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4794,30 +4794,33 @@ See @ref{Data types}.
 @item @strong{Type:}
 string
 @item @strong{Purpose:}
-returns the type of an expression as string
-@*(if the expression is an expression list:
-the type of the first list element).
-@*Possible types are: @code{
-"ideal",
-"int",
-"intmat",
-"intvec",
-"list",
-"map",
-"matrix",
-"module",
-"number",
-"none",
-"package"}@footnote{reserved for
-future extensions}@code{,
-"poly",
-"proc",
-"qring",
-"resolution",
-"ring",
-"string",
-"vector",
-"?unknown type?"}
+returns the type of an expression as string.
+
+Returns the type of the first list element if the expression is an
+expression list.
+
+Possible types are:
+@code{"ideal"},
+@code{"int"},
+@code{"intmat"},
+@code{"intvec"},
+@code{"list"},
+@code{"map"},
+@code{"matrix"},
+@code{"module"},
+@code{"number"},
+@code{"poly"},
+@code{"proc"},
+@code{"qring"},
+@code{"resolution"},
+@code{"ring"},
+@code{"string"},
+@code{"vector"}.
+
+For internal use only are the types
+@code{"package"},
+@code{"none"},
+@code{"?unknown type?"}.
 @item @strong{Example:}
 @example
 @c example
