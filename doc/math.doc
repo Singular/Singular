@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.26 1998-05-19 14:32:11 Singular Exp $
+@comment $Id: math.doc,v 1.27 1998-05-19 15:55:26 wichmann Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -325,7 +325,7 @@ Other sources to check are @code{http://symbolicnet.mcs.kent.edu/},
 @code{http://www.can.nl/},... and the following book list:
 
 @subheading Text books on computational algebraic geometry
-@table @bullet
+@itemize @bullet
 @item
 @tex
 \noindent
@@ -336,28 +336,34 @@ Gr\"obner Bases - A computational Approach to Commutative Algebra. Springer, 199
 Becker, T.; Weisspfenning, V.:
 Groebner Bases - A computational Approach to Commutative Algebra. Springer, 1993
 @end ifinfo
+
 @item
 Cohen, H.:
 A Course in Computational Algebraic Number Theory,
 Springer, 1995
+
 @item
-Cox, D.; Littlei, J.; O'Sheaa, D.:
+Cox, D.; Littlei, J.; O'Shea, D.:
 Ideals, Varieties and Algorithms. Springer, 1996
+
 @item
 Eisenbud, D.: Commutative Algebra. Springer, 1995
+
 @item
 Mishra, B.: Algorithmic Algebra, Texts and Monographs in Computer Science,
 Springer, 1993
+
 @item
 Vasconcelos, V.:
-@end table
+@end itemize
 
 @subheading Descriptions of algorithms
-@table @bullet
+@itemize @bullet
 @item
 Bareiss, E.:
 Sylvester's identity and multistep integer-preserving Gaussian elimination,
 Math. Comp. 22 (1968), 565-578.
+
 @item
 Decker, W.; G.-M. Greuel, G.-M.; Pfister, G.:
 Primary decomposition: algorithms and
@@ -369,6 +375,23 @@ Algorithmic Algebra and Number Theory, Springer Verlag, Heidelberg, (1998).
 Decker, W.; G.-M. Greuel, G.-M.; de Jong, T.; Pfister, G.:
 The normalisation: a new algorithm,
 implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998. 
+
+@item 
+@tex
+Faug\`ere, 
+@end tex
+@ifinfo
+Faugere,
+@end ifinfo
+J. C.; Gianni, P.; Lazard, D.; Mora, T.: Efficient computation
+of zero-dimensional 
+@tex
+Gr\"obner
+@end tex
+@ifinfo
+Groebner
+@end ifinfo
+bases by change of ordering, Journal of Symbolic Computation, 1989
 
 @item
 Grassmann, H.; Greuel, G.-M.; Martin, B.; Neumann,
@@ -383,6 +406,7 @@ Sch\"onemann,
  H.; Siebert, T.:  On an
 implementation of standard bases and syzygies in  @sc{Singular},
 Proceedings of the Workshop  Computational Methods in Lie theory in AAECC (1995).
+
 @item
 Greuel, G.-M.; Pfister, G.:
 Advances and improvements in the theory of standard bases and
@@ -402,4 +426,4 @@ Reports on Computer Algebra 2(1996), Kaiserslautern.
 Siebert, T.:
 On strategies and implementations for computations of free resolutions.
 Reports on Computer Algebra 8(1996), Kaiserslautern.
-@end table
+@end itemize
