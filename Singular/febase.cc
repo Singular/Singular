@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.25 1998-02-27 14:06:10 Singular Exp $ */
+/* $Id: febase.cc,v 1.26 1998-03-31 07:41:21 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -114,7 +114,12 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
   char *res;
   int idat=strlen(SINGULAR_DATADIR),ipath=strlen(path);
   char *env=getenv("SINGULARPATH");
-  int ienv=strlen(env), ii=ienv;
+  int ienv=0, ii=0;
+  if (env!=NULL)
+  {
+    ienv=strlen(env);
+    ii=ienv;
+  }
   if (ii<idat) ii = idat;
   if (ii==0)
   {
