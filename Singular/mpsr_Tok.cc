@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.27 2000-12-12 08:44:48 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.28 2001-01-30 16:58:52 Singular Exp $ */
 
 /***************************************************************
  *
@@ -135,12 +135,12 @@ static struct
 
 MP_Common_t mpsr_ord2mp(int sr_ord)
 {
-  int or = ringorder_no;
+  int i = ringorder_no;
 
-  while (sing_mp_ord[or].sing_ord != sr_ord &&
-         sing_mp_ord[or].sing_ord <= ringorder_unspec) or++;
+  while (sing_mp_ord[i].sing_ord != sr_ord &&
+         sing_mp_ord[i].sing_ord <= ringorder_unspec) i++;
 
-  return sing_mp_ord[or].mp_ord;
+  return sing_mp_ord[i].mp_ord;
 }
 
 short mpsr_mp2ord(MP_Common_t mp_ord)
