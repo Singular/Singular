@@ -29,7 +29,7 @@ example power_products;
 example secondary_char0;
 example secondary_charp;
 example secondary_no_molien;
-example secondary_with_irreducible_ones_no_molien;
+example secondary_and_irreducibles_no_molien;
 example secondary_not_cohen_macaulay;
 example invariant_ring;
 example invariant_ring_random;
