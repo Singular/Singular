@@ -1,6 +1,6 @@
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: random.lib,v 1.14 2001-01-03 01:21:37 greuel Exp $";
+version="$Id: random.lib,v 1.15 2001-01-07 02:05:25 greuel Exp $";
 category="General purpose";
 info="
 LIBRARY:  random.lib    Creating Random and Sparse Matrices, Ideals, Polys
@@ -10,9 +10,11 @@ PROCEDURES:
  randomid(id,[k,b]);     random linear combinations of generators of id
  randommat(n,m[,id,b]);  nxm matrix of random linear combinations of id
  sparseid(k,u[,o,p,b]);  ideal of k random sparse poly's of degree d [u<=d<=o]
+ sparsematrix(n,m,o[,.]);nxm sparse matrix of polynomials of degree<=o
  sparsemat(n,m[,p,b]);   nxm sparse integer matrix with random coefficients
  sparsepoly(u[,o,p,b]);  random sparse polynomial with terms of degree in [u,o]
  sparsetriag(n,m[,.]);   nxm sparse lower-triag intmat with random coefficients
+ triagmatrix(n,m,o[,.]); nxm sparse lower-triag matrix of poly's of degree<=o
  randomLast(b);          random transformation of the last variable
  randomBinomial(k,u,..); binomial ideal, k random generators of degree >=u
            (parameters in square brackets [] are optional)
@@ -294,6 +296,53 @@ example
    sparsetriag(7,5,90);"";
    sparsetriag(5,5,0);"";
    sparsetriag(5,5,50,100);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc triagmatrix (int n, int m, int o, list #)
+"USAGE:   triagmatrix(n,m,o[,u,pe,pp,b]);  n,m,o,u,pe,pp,b integers
+RETURN:  nxm lower triagonal matrix, diagonal entries equal to 1, about
+         p percent of lower diagonal entries are 0, the remaining
+         are random polynomials of degree d, u<=d<=o, with  pp percent of
+         the terms being 0, the remaining have random coefficients 
+         in the interval [1,b] [default: (pe,u,pp,b) = (0,50,75,100)]
+EXAMPLE: example triagmatrix; shows an example
+"
+{
+   int ii,jj;
+   ideal id;
+   matrix M[n][m];
+//----------------------------- set defaults ----------------------------------
+   int pe=50;int u=0;int pp=75;int b=100;
+   if( size(#)==4 ) { u=#[1]; pe=#[2]; pp=#[3]; b=#[4]; }
+   if( size(#)==3 ) { u=#[1]; pe=#[2]; pp=#[3]; }
+   if( size(#)==2 ) { u=#[1]; pe=#[2]; }
+   if( size(#)==1 ) { u=#[1]; }
+//------------------- use sparsemat and sparseid  -----------------------------
+   intmat I = sparsetriag(n,m,pe,1);
+   for(ii=1; ii<=n;ii++)
+   {
+     id = sparseid(m,u,o,pp,b);
+     for(jj=1; jj<ii; jj++)
+     {
+        if( I[ii,jj] !=0)
+        {
+          M[ii,jj]=id[jj];
+        }
+     }
+   }
+   for(ii=1; ii<=n;ii++)
+   {
+      M[ii,ii]=1;
+   }
+   return(M);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(a,b,c,d),dp;
+   // sparse triagonal matrix of sparse polys of degree <=2:
+   print(triagmatrix(3,4,2));"";       
+   // dense triagonal matrix of sparse linear forms:
+   print(triagmatrix(3,3,1,1,0,55,9)); 
 }
 ///////////////////////////////////////////////////////////////////////////////
 
