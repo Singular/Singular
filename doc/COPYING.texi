@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.8 2001-01-19 10:38:54 keilen Exp $
+@comment $Id: COPYING.texi,v 1.9 2001-03-21 15:40:10 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -17,62 +17,51 @@
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
 @center Authors: @uref{http://www.mathematik.uni-kl.de/~wwwagag/E/Greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~wwwagag/E/Pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
-@center Copyright @copyright{} 1986-2000; All Rights Reserved
+@center Copyright @copyright{} 1986-2001
 @sp 2
 @center @strong{NOTICE}
 
-Permission to use, copy, modify, and distribute this software or parts
-thereof and its documentation or parts thereof for non-commercial
-purposes and without fee is hereby granted provided the following four
-conditions are satisfied:
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version with the
+following additional restrictions (which override any conflicting
+restrictions in the GPL):
 
-@enumerate
-@item
-The above copyright notice appears in all copies of the software
-and both the copyright notice and this permission notice
-appear in supporting documentation.
-
-@item
-The name of the program ("@sc{Singular}") is retained.
-
-@item
-Portions of the software which are modified are marked.
-
-@item
-You have registered yourself as a @sc{Singular} user by sending email to 
-@email{singular@@mathematik.uni-kl.de}
-with the subject line 
-@code{register}.
-@end enumerate
-
-Neither the University of Kaiserslautern nor the authors make any
-representations about the suitability of this software for any
-purpose.  This software is provided ``as is'' without express or
-implied warranty.
-
-If your intended use of @sc{Singular} is not covered by the license above,
-please contact us.  Notice that in the license above we have not
-granted permission to make copies of Singular to be sold, distributed
-on media which are sold, or distributed along with software which is
-sold.
-
-If you use Singular or parts thereof in a project and/or publish
-results that were partly obtained using @sc{Singular}, we request that you
-cite @sc{Singular} and inform us thereof -- see
-@uref{http://www.singular.uni-kl.de/how_to_cite.html},
-for information on how to cite Singular.
-
-Please send any comments or bug reports to
-@email{singular@@mathematik.uni-kl.de}.
-
-The following parts of @sc{Singular} have their own copyright: the Gnu
-Multiple Precision Library (GMP), the Multi Protocol library (MP), the
-Factory library, the libfac library, and, for the Windows 9X/NT
+The following parts of @sc{Singular} have their own copyright: 
+the omalloc library, the readline library,
+the Gnu Multiple Precision Library (GMP),
+the Multi Protocol library (MP), the
+Singular-Factory library, the Singular-libfac library, and,
+for the Windows 9X/NT
 distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
 
 Their copyrights and licences can be found in the accompanying files
 which are distributed along with these packages.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Please send any comments or bug reports to
+@email{singular@@mathematik.uni-kl.de}.
+
+Please register yourself as a @sc{Singular} user by sending email to 
+@email{singular@@mathematik.uni-kl.de}
+with the subject line 
+@code{register}.
+
+If you use Singular or parts thereof in a project and/or publish
+results that were partly obtained using @sc{Singular}, we ask you to
+cite @sc{Singular} and inform us thereof -- see
+@uref{http://www.singular.uni-kl.de/how_to_cite.html},
+for information on how to cite Singular.
 
 @heading Availability
 
@@ -82,20 +71,19 @@ The latest information about @sc{Singular} is always available from
 The program @sc{Singular} and the above mentioned parts are available via
 anonymous ftp through the following addresses:
 @table @asis
-@item GMP
+@item GMP, libreadline
 @copyright{} Free Software Foundation
 @* @uref{ftp://ftp.gnu.ai.mit.edu} or its mirrors
 @item MP
 @copyright{} Gray/Kajler/Wang, Kent State University
 @* @uref{http://SymbolicNet.mcs.kent.edu/areas/protocols/mp.html}
-@item Factory
+@item Singular-Factory
 @copyright{} Greuel/Stobbe, University of Kaiserslautern:
-@* Contact @email{factory@@mathematik.uni-kl.de} for details on Factory.
-@item libfac
-@copyright{}  Messollen, University of
-Saarbr@"ucken:
-@* Contact @email{michael@@math.uni-sb.de} for details on libfac.
-@item @sc{Singular} binaries
+@* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
+@item Singular-libfac
+@copyright{}  Messollen, University of Saarbr@"ucken:
+@* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Libfac}
+@item @sc{Singular} binaries and sources
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/} or via a
 WWW brow@-ser from
 @uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/}
@@ -116,64 +104,56 @@ Sch@"onemann.
 @cindex  Pfister, Gerhard
 @cindex Sch@"onemann, Hans
 
-Contributions to the kernel of @sc{Singular} have been made by
+Currently, the @sc{Singular} team has the following members: 
 Olaf Bachmann,
-Hubert Grassmann,
+Anne Fr@"ubis-Kr@"uger,
+Thomas Keilen,
 Kai Kr@"uger,
-Michael Me@ss{}ollen,
-Wolfgang Neumann,
-Thomas N@"u@ss{}ler,
+Christoph Lossen,
+Victor Levandovskyy,
 Wilfred Pohl,
-Jens Schmidt,
-Thomas Siebert,
-R@"udiger Stobbe,
-Moritz Wenk
+Mathias Schulze,
+Eric Westenberger,
 and
 Tim Wichmann.
 @cindex Bachmann, Olaf
-@cindex Grassmann, Hubert
+@cindex Fr@"ubis-Kr@"uge,r Anne
+@cindex Keilen, Thomas
 @cindex Kr@"uger, Kai
-@cindex Messollen Michael
-@cindex Neumann, Wolfgang
-@cindex N@"u@ss{}ler, Thomas
+@cindex Lossen, Christoph
+@cindex Levandovskyy, Victor
 @cindex Pohl, Wilfred
-@cindex Schmidt, Jens
-@cindex Siebert, Thomas
-@cindex Stobbe, R@"udiger
-@cindex Wenk, Moritz
+@cindex Schulze, Mathias
+@cindex Westenberger, Eric
 @cindex Wichmann, Tim
 
+Past members of the @sc{Singular} team are: 
+Hubert Grassmann,
+Wolfgang Neumann,
+Jens Schmidt,
+R@"udiger Stobbe.
+@cindex Grassmann, Hubert
+@cindex Neumann, Wolfgang
+@cindex Schmidt, Jens
+@cindex Stobbe, R@"udiger
 
-@sc{Singular} libraries have furthermore been contributed by
+Further contributions to @sc{Singular} were made by:
+Thomas Bayer,
+Isabelle Bermejo,
 Stephan Endra@ss{},
+Jose Ignacio Farran Martin,
 Wolfram Decker,
-Ignacio Farran, 
-Anne Fr@"ubis-Kr@"uger,
+Philippe Gimenez,
 Christian Gorzel,
-Agnes Eileen Heydtmann,
+Agnes Heydtmann,
 Dietmar Hillebrand,
-Thomas Keilen,
-Ulrich Klein,
+Tobias Hirsch,
 Martin Lamm,
-Christoph Lossen,
 Bernd Martin,
-Mathias Schulze,
-and
+Michael Me@ss{}ollen,
+Thomas N@"u@ss{}ler,
 Moritz Wenk.
 
-@cindex Endra@ss{}, Stephan
-@cindex Decker, Wolfram
-@cindex Farran, Ignacio
-@cindex  Fr@"ubis-Kr@"uge,r Anne
-@cindex Gorzel, Christian
-@cindex Heydtmann, Agnes Eileen 
-@cindex Hillebrand, Dietmar
-@cindex Keilen, Thomas
-@cindex Klein, Ulrich
-@cindex Lamm, Martin
-@cindex Lossen, Christoph
-@cindex Martin, Bernd
-@cindex Schulze, Mathias
 
 We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung,

@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.76 2000-08-16 14:24:59 obachman Exp $
+### $Id: Makefile.in,v 1.77 2001-03-21 15:40:11 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -186,7 +186,7 @@ singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.p
 # stand-alone targest
 #
 
-STANDALONE_TXT_FILES := $(STANDALONE_TEXI_FILES:.texi=.txt)
+STANDALONE_TXT_FILES := $(STANDALONE_TEXI_FILES:.texi=.txt) 
 STANDALONE_HTML_FILES := $(STANDALONE_TEXI_FILES:.texi=.html)
 STANDALONE_FILES      := $(STANDALONE_TEXI_FILES:.texi=)
 
@@ -295,6 +295,7 @@ install-sharedist: singular.hlp html singular.idx \
 	chmod -R +rX ${install_htmldir}
 	${MKINSTALLDIRS} ${install_docdir}
 	${INSTALL_DATA} singular.idx ${install_docdir}
+	${INSTALL_DATA} ../GPL ${install_prefix}/GPL
 	${INSTALL_DATA} COPYING.txt ${install_prefix}/COPYING
 	${INSTALL_DATA} COPYING.html ${install_prefix}
 	${INSTALL_DATA} NEWS.txt ${install_prefix}/NEWS
