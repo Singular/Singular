@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.40 1998-09-22 14:09:01 Singular Exp $
+// $Id: clapsing.cc,v 1.41 1998-10-05 17:24:04 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -97,8 +97,8 @@ poly singclap_gcd ( poly f, poly g )
 {
   poly res=NULL;
 
-  if (f) pCleardenom(f);
-  if (g) pCleardenom(g);
+  if (f!=NULL) pCleardenom(f);
+  if (g!=NULL) pCleardenom(g);
 
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
@@ -496,6 +496,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   On(SW_SYMMETRIC_FF);
   CFFList L;
   number N=NULL;
+  number NN=NULL;
 
   if (( (nGetChar() == 0) || (nGetChar() > 1) )
   && (currRing->parameter==NULL))
@@ -505,14 +506,16 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     {
       if (f!=NULL)
       {
+        number n0=nCopy(pGetCoeff(f));
         if (with_exps==0)
-          N=nCopy(pGetCoeff(f));
+          N=nCopy(n0);
         pCleardenom(f);
+	NN=nDiv(n0,pGetCoeff(f));
+	nDelete(&n0);
         if (with_exps==0)
         {
-          number nn=nDiv(N,pGetCoeff(f));
           nDelete(&N);
-          N=nn;
+          N=nCopy(NN);
         }
       }
     }
@@ -608,6 +611,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     {
       pMultN(res->m[0],N);
       nDelete(&N);
+      N=NULL;
     }
     // delete constants
     if ((with_exps!=0) && (res!=NULL))
@@ -647,10 +651,19 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       }
     }
   }
-  return res;
 notImpl:
-  WerrorS( feNotImplemented );
-  return NULL;
+  if (res==NULL)
+    WerrorS( feNotImplemented );
+  if (NN!=NULL)
+  {
+    pMultN(f,NN);
+    nDelete(&NN);
+  }
+  if (N!=NULL)
+  {
+    nDelete(&N);
+  }
+  return res;
 }
 
 matrix singclap_irrCharSeries ( ideal I)
