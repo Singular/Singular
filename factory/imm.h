@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.9 1997-12-09 08:54:42 schmidt Exp $ */
+/* $Id: imm.h,v 1.10 1997-12-17 10:38:33 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -196,8 +196,10 @@ imm_cmp_p ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( imm2int( lhs ) == imm2int( rhs ) )
 	return 0;
-    else
+    else if ( imm2int( lhs ) > imm2int( rhs ) )
 	return 1;
+    else
+	return -1;
 }
 
 inline int
@@ -205,6 +207,9 @@ imm_cmp_gf ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( imm2int( lhs ) == imm2int( rhs ) )
 	return 0;
+    // check is done in this way because zero should be minimal
+    else if ( imm2int( lhs ) > imm2int( rhs ) )
+	return -1;
     else
 	return 1;
 }
