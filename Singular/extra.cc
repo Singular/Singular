@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.176 2002-02-12 18:25:13 mschulze Exp $ */
+/* $Id: extra.cc,v 1.177 2002-02-16 10:57:54 mschulze Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -101,11 +101,6 @@
 #include "pcv.h"
 #endif
 //#endif /* not HAVE_DYNAMIC_LOADING */
-
-// eigenvalues of constant square matrices
-#ifdef HAVE_EIGENVAL
-#include "eigenval.h"
-#endif
 
 // see clapsing.cc for a description of the `FACTORY_*' options
 
@@ -546,17 +541,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
 #endif
 //#endif /* HAVE_DYNAMIC_LOADING */
-/*==================== eigenval =============================*/
-    if(strcmp(sys_cmd,"tridiag")==0)
-    {
-      return tridiag(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"eigenval")==0)
-    {
-      return eigenval(res,h);
-    }
-    else
 /*==================== contributors =============================*/
    if(strcmp(sys_cmd,"contributors") == 0)
    {
@@ -651,7 +635,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #endif
 #include "mpsr.h"
 #include "mod_raw.h"
+#ifdef HAVE_EIGENVAL
+#include "eigenval.h"
+#endif
+#ifdef HAVE_GMS
 #include "gms.h"
+#endif
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -1471,12 +1460,27 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
 #endif
 #endif
-/*==================== Gauss-Manin system normal form =================*/
-      if(strcmp(sys_cmd,"gmsnf")==0)
-      {
-        return gmsnf(res,h);
-      }
-      else
+/*==================== eigenvalues ==================================*/
+#ifdef HAVE_EIGENVAL
+    if(strcmp(sys_cmd,"hessenberg")==0)
+    {
+      return evHessenberg(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"eigenvalues")==0)
+    {
+      return evEigenvalue(res,h);
+    }
+    else
+#endif
+/*==================== Gauss-Manin system ==================================*/
+#ifdef HAVE_GMS
+    if(strcmp(sys_cmd,"gmsnf")==0)
+    {
+      return gmsNF(res,h);
+    }
+    else
+#endif
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
