@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.22 1998-06-13 12:44:42 krueger Exp $ */
+/* $Id: ipshell.cc,v 1.23 1998-07-30 12:46:16 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -695,6 +695,10 @@ void iiDebug()
   {
     iiDebugMarker=TRUE;
   }
+  //else if(strncmp(s,"cont;",5)==0)
+  //{
+  //  iiDebugMarker=TRUE;
+  //}
   else
   {
     strcat( s, "\n;~\n");

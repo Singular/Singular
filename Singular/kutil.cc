@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.26 1998-07-30 07:32:52 Singular Exp $ */
+/* $Id: kutil.cc,v 1.27 1998-07-30 12:46:18 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2640,9 +2640,8 @@ void initS (ideal F, ideal Q,kStrategy strat)
           deleteHC(&h.p, &h.ecart, &h.length,strat);
         }
         if (TEST_OPT_DEGBOUND
-        && (pFDeg(h.p)>Kstd1_deg))
-        //&& (((strat->honey) && (/*h.ecart+*/pFDeg(h.p)>Kstd1_deg))
-        //  || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
+        && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
+          || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
           pDelete(&h.p);
         else
         if (h.p!=NULL)
@@ -2777,9 +2776,8 @@ void initSL (ideal F, ideal Q,kStrategy strat)
           deleteHC(&h.p, &h.ecart, &h.length,strat);
         }
         if (TEST_OPT_DEGBOUND
-        && (pFDeg(h.p)>Kstd1_deg))
-        //&& (((strat->honey) && (/*h.ecart+*/pFDeg(h.p)>Kstd1_deg))
-        //  || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
+        && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
+          || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
           pDelete(&h.p);
         else
         if (h.p!=NULL)
@@ -2885,9 +2883,8 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           deleteHC(&h.p, &h.ecart, &h.length,strat);
       }
       if (TEST_OPT_DEGBOUND
-      && (pFDeg(h.p)>Kstd1_deg))
-      //&& (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
-      //  || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
+      && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
+        || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
         pDelete(&h.p);
       else
       if (h.p!=NULL)
@@ -2924,8 +2921,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         if (pOrdSgn==1)
         {
           h.p=redBba(h.p,strat->sl,strat);
-	  if (h.p!=NULL)
-            h.p=redtailBba(h.p,strat->sl,strat);
+          h.p=redtailBba(h.p,strat->sl,strat);
         }
         else
         {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.15 1998-07-28 15:24:05 Singular Exp $ */
+/* $Id: ffields.cc,v 1.16 1998-07-30 12:46:15 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -141,7 +141,7 @@ BOOLEAN nfDBTest (number a, char *f, int l)
 }
 #define nfTest(N) nfDBTest(N,__FILE__,__LINE__)
 #endif
-            
+
 /*2
 * k >= 0 ?
 */
@@ -243,6 +243,8 @@ number nfAdd (number a, number b)
   nfTest(a);
   nfTest(b);
 #endif
+  if (nfCharQ == (int)a) return b;
+  if (nfCharQ == (int)b) return a;
   int zb,zab,r;
   if ((int)a >= (int)b)
   {
@@ -308,7 +310,7 @@ BOOLEAN nfIsMOne (number a)
 #ifdef LDEBUG
   nfTest(a);
 #endif
-  if (0 == (int)a) return FALSE;
+  if (0 == (int)a) return FALSE; /* special handling of char 2*/
   return nfM1 == (int)a;
 }
 
@@ -368,6 +370,7 @@ number nfNeg (number c)
 #ifdef LDEBUG
   nfTest(c);
 #endif
+  if (nfCharQ == (int)c) return c;
   int i=(int)c+nfM1;
   if (i>=nfCharQ1) i-=nfCharQ1;
 #ifdef LDEBUG
@@ -410,7 +413,7 @@ void nfWrite (number &a)
 #endif
   if ((int)a==nfCharQ)  StringAppendS("0");
   else if ((int)a==0)   StringAppendS("1");
-  else                  
+  else
   {
     StringAppendS(nfParameter);
     if ((int)a!=1)
@@ -592,18 +595,19 @@ static void nfReadMipo(char *s)
     l=n;
     j++;
     i--;
-  }  
+  }
   if (i>=0)
   {
     WerrorS("error in reading minpoly from gftables");
-  }  
-}  
+  }
+}
 
 /*2
 * init global variables from files 'gftables/%d'
 */
 void nfSetChar(int c, char **param)
 {
+  //Print("GF(%d)\n",c);
   nfParameter=param[0];
   if ((c==nfCharQ)||(c==-nfCharQ))
     /*this field is already set*/  return;
@@ -640,6 +644,7 @@ void nfSetChar(int c, char **param)
     sscanf(buf,"%d %d",&nfCharP,&q);
     nfReadMipo(buf);
     nfCharQ1=nfCharQ-1;
+    //Print("nfCharQ=%d,nfCharQ1=%d,mipo=>>%s<<\n",nfCharQ,nfCharQ1,buf);
     nfPlus1Table= (CARDINAL *)Alloc( (nfCharQ)*sizeof(CARDINAL) );
     int digs = gf_tab_numdigits62( nfCharQ );
     char * bufptr;
@@ -657,7 +662,7 @@ void nfSetChar(int c, char **param)
         if(nfPlus1Table[i]>nfCharQ)
         {
           Print("wrong entry %d: %d(%c%c%c)\n",i,nfPlus1Table[i],bufptr[0],bufptr[1],bufptr[2]);
-        }  
+        }
         bufptr += digs;
         if (nfPlus1Table[i]==nfCharQ)
         {
@@ -678,7 +683,7 @@ void nfSetChar(int c, char **param)
   else
     nfCharQ=0;
 #ifdef LDEBUG
-  nfTest((number)0);  
+  nfTest((number)0);
 #endif
   return;
 err:
