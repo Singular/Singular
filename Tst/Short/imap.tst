@@ -340,7 +340,7 @@ fetch(r2, p);
 fetch(s0, p);
 fetch (s1, p);
 fetch(s2, p);
-fetch(t0, p); core dump nsetMap ok -- while doing permutation
+fetch(t0, p); 
 fetch (t1, p);
 fetch(t2, p);
 fetch(f2, p);
@@ -542,5 +542,11 @@ map m_t2 = t2,maxideal(1); m_t2(p);
 map m_f2 = f2,maxideal(1); m_f2(p);
 map m_f1 = f1,maxideal(1); m_f1(p);
 map m_f0 = f0,maxideal(1); m_f0(p);
+
+// an example (fixed in 2-0-5, Jan 2004)
+ring S=(0,a),(x,u),lp;
+poly q=(a2+1)*x2u2;
+ring K=(0,a,u),(x),lp;
+imap(S,q);
 
 tst_status(1);$

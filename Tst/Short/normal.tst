@@ -62,7 +62,13 @@ norid; normap;
 
 kill r,r1;
 
+
+example deltaLoc;
+example genus; 
+
 tst_status(1);$
+
+
 // This is the example Theo 3 which is still broken due to the broken
 // minor command
 ring r=32003,(x,y,z),wp(3,5,15);

@@ -99,7 +99,7 @@ list L=list(poly(x-y),ideal(x,y));
 example further_hn_proc;
 example leit;
 example testreducible;
-example T_Transfor;
+example T_Transform;
 example T1_Transform;
 example T2_Transform;
 example koeff;
@@ -119,5 +119,9 @@ example factorlist;
 example develop;
 example param;
 example reddevelop;
+example hnexpansion;
+example sethnering;
+example delta;
+example is_NND;
 
 tst_status(1);$

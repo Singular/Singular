@@ -9,6 +9,7 @@ example endvfilt;
 example spgamma;
 example tmatrix;
 example tmatrix;
+example bernstein;
 
 tst_status(1);
 $

@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: brnoeth_s.tst,v 1.1 2000-12-12 12:18:22 Singular Exp $");
+tst_ignore("CVS ID $Id: brnoeth_s.tst,v 1.2 2004-02-12 14:19:40 Singular Exp $");
 
 // tst_status();
 
@@ -57,7 +57,7 @@ intvec G,D,F;
 
 f=x3y+y3+x;
 list KLEIN=Adj_div(f);
-KLEIN=NSplaces(5,KLEIN);
+KLEIN=NSplaces(1..5,KLEIN);
 def R=KLEIN[1][2];
 setring R;
 G=4,4;
@@ -96,7 +96,7 @@ kill(R,RR,RP);
 
 f=x3+y2+y;
 list HC2=Adj_div(f);
-HC2=NSplaces(5,HC2);
+HC2=NSplaces(1..5,HC2);
 HC2=extcurve(2,HC2);
 def RP=HC2[1][5];
 setring RP;
@@ -135,7 +135,7 @@ killall();
 
 ring r=3,(x,y),lp;
 list HC3=Adj_div(y3+y-x4);
-HC3=NSplaces(3,HC3);
+HC3=NSplaces(1..3,HC3);
 HC3=extcurve(2,HC3);
 def projR=HC3[1][2];
 setring projR;

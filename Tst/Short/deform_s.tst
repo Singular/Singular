@@ -16,7 +16,7 @@ example versal;
    hilb(std(Js)); 
    printlevel     = p;
    if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
-   else{ kill Px,Qx,So; }
+   kill Px,Qx,So;
 example mod_versal;
 example lift_rel_kb;
 // rest of what used to be in that example

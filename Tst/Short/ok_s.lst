@@ -26,6 +26,9 @@ bug_28
 bug_29
 bug_3
 bug_30
+bug_31
+bug_32
+bug_31
 bug_5
 bug_6
 bug_7
@@ -38,7 +41,7 @@ bug_factorize
 bug_mres
 bug_napMultT
 bug_primdec
-; TODO brnoeth_s
+brnoeth_s
 cyc5_lp
 bug_sres
 bug_sres_betti
@@ -53,7 +56,7 @@ eliminate_4
 eliminate_5
 eliminate_7
 elimlib_s
-; TODO equising
+equising
 facstd
 fetch_s
 fglm1_s
@@ -61,16 +64,16 @@ fglmquot1_s
 finduni_s
 finvar_s
 finvarlb
-; TODO gaussm_ex
-; TODO gaussm_s
+gaussm_ex
+gaussm_s
 gcd0_s
 gcdp_s
-; TODO general_s
+general_s
 graphics
 groebner_s
 highcorner_s
 hilb_weights
-; TODO hnoether_s
+hnoether_s
 homolog_s
 hres_s
 imap
@@ -84,13 +87,13 @@ liftstd_s
 lres_s
 minor_s
 modulo_s
-; TODO monodromy_s
+monodromy_s
 mora_10
 mora_5
 mora_6
 mora_7
 mora_9
-; TODO mpsr_s
+mpsr_s
 mres_s
 normal
 pAddManyVarsManyL_s
@@ -117,7 +120,7 @@ solve_s
 spcurve
 sres_s
 std_s
-; TODO stratify
+stratify
 string
 test_c_dp
 triang_s

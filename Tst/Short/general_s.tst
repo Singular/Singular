@@ -8,6 +8,7 @@ example deleteSublist;
 example factorial;
 example fibonacci;
 //example kmemory;
+example killall;
 example number_e;
 example number_pi;
 example primes;
@@ -31,7 +32,7 @@ else
   poly pp = x16+x14y2-x10y6-x8y8-x6y10+x2y14+y16;
   if (typeof(l) == "list")
   {
-    if (l[1][5] == pp)    
+    if (l[1][2] == pp)    
     {
      ok = 1;
     }
@@ -40,6 +41,6 @@ else
 ok;
 watchdog(100,"factorize(eval("+string(f)+"))");
 
-example killall;
+    
 
 tst_status(1);$
