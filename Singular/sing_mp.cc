@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.9 1997-04-10 13:08:40 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.10 1997-04-10 15:22:18 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -176,7 +176,7 @@ static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
 
   if (host == NULL)
   {
-    Warn("No host specified for MPtcp:connect; Used %s", mp_Env->thishost);
+    Warn("No host specified for MPtcp:connect; Used localhost");
     argv[7] = mp_Env->thishost;
   }
   else
@@ -211,7 +211,7 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
 
   if (host == NULL)
   {
-    Warn("No host specified for MPtcp:launch; Used %s", mp_Env->thishost);
+    Warn("No host specified for MPtcp:launch; Used localhost");
     argv[5] = mp_Env->thishost;
   }
   else
@@ -269,7 +269,7 @@ BOOLEAN slOpenMPTcp(si_link l, short flag)
 
 BOOLEAN slWriteMP(si_link l, leftv v)
 {
-  leftv next = (v != NULL ? v->next : NULL);
+  leftv next = (v != NULL ? v->next : (leftv) NULL);
   mpsr_ClearError();
 
   // writing is done with one leftv at a time
