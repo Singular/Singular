@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.24 1998-10-21 10:25:46 krueger Exp $ */
+/* $Id: silink.cc,v 1.25 1998-10-29 13:15:16 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -414,9 +414,9 @@ leftv slReadAscii(si_link l)
     else
   #endif
     {
-      PrintS("? "); mflush();
+      //PrintS("? "); mflush();
       buf=(char *)AllocL(80);
-      fe_fgets_stdin(buf,80);
+      fe_fgets_stdin("? ",buf,80);
     }
   }
   leftv v=(leftv)Alloc0(sizeof(sleftv));

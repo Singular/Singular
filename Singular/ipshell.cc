@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.29 1998-10-28 12:05:30 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.30 1998-10-29 13:15:17 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -764,7 +764,7 @@ void iiDebug()
   char * s;
   iiDebugMarker=FALSE;
   s = (char *)AllocL(84);
-  fe_fgets_stdin(s,80);
+  fe_fgets_stdin("",s,80);
   if (*s=='\n')
   {
     iiDebugMarker=TRUE;

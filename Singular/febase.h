@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.23 1998-10-15 11:45:53 obachman Exp $ */
+/* $Id: febase.h,v 1.24 1998-10-29 13:15:13 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -21,11 +21,11 @@
 // do never use fopen and fread
 */
 #ifndef unix
-extern FILE *myfopen(char *path, char *mode);
+FILE *myfopen(char *path, char *mode);
 #else
 #define myfopen fopen
 #endif
-extern size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
 
 extern char*  feErrors;
@@ -56,12 +56,22 @@ extern BOOLEAN feOut;
 #define PROT_IO   3
 
 /* the C-part: */
+#define mflush() fflush(stdout)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void   Werror(char *fmt, ...);
 void   WerrorS(const char *s);
+void   Print(char* fmt, ...);
+void   PrintLn();
+#ifdef HAVE_TCL
+void   PrintTCLS(const char c, const char * s);
+#else
+#define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
+#endif
+void   PrintS(char* s);
 
 #ifdef __cplusplus
 }
@@ -96,12 +106,9 @@ char*   feGetInfoFile();
 
 FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
 void    fePause(void);
-void    Print(char* fmt, ...);
-void    PrintS(char* s);
-void     PrintLn();
 #ifndef __MWERKS__
 #ifdef HAVE_TCL
-void    PrintTCLS(const char c, const char * s);
+
 inline void PrintTCL(const char c, int l,const char *s)
 {
   if (s!=NULL) printf("%c:%d:%s",c,l,s);
@@ -110,7 +117,6 @@ inline void PrintTCL(const char c, int l,const char *s)
   fflush(stdout);
 }
 #else
-#define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
 #define PrintTCL(A,B,C) Print("TCL-Err:%s",C)
 #endif
 #endif
@@ -127,7 +133,6 @@ BOOLEAN contBuffer(feBufferTypes typ);
 char *  eati(char *s, int *i);
 BOOLEAN exitBuffer(feBufferTypes typ);
 BOOLEAN exitVoice();
-#define mflush() fflush(stdout)
 void    monitor(char* s,int mode);
 BOOLEAN newFile(char* fname, FILE *f=NULL);
 void    newBuffer(char* s, feBufferTypes t, procinfo *pname = NULL, int start_lineno = 0);
@@ -187,27 +192,18 @@ Voice * feInitStdin();
 
 /* feread.cc: */
 #ifdef HAVE_FEREAD
-  void fe_set_input_mode (void);
-  void fe_temp_set (void);
-  void fe_temp_reset (void);
-  char * fe_fgets_stdin(char *s, int size);
-  #ifndef MSDOS
-    #ifdef HAVE_ATEXIT
-      void fe_reset_input_mode (void);
-    #else
-      void fe_reset_input_mode (int i, void *v);
-    #endif
-  #else
-    #define fe_reset_input_mode()
-  #endif
+  //void fe_set_input_mode (void);
+  //void fe_temp_set (void);
+  //void fe_temp_reset (void);
+  char * fe_fgets_stdin(char *pr,char *s, int size);
 #else
   #ifdef HAVE_READLINE
     void fe_set_input_mode (void);
     void fe_reset_input_mode (void);
     char * fe_fgets_stdin_rl(char *pr,char *s, int size);
-    #define fe_fgets_stdin(A,B) fe_fgets_stdin_rl(fe_promptstr,A,B)
+    #define fe_fgets_stdin(p,A,B) fe_fgets_stdin_rl(p,A,B)
   #else
-    #define fe_fgets_stdin(A,B) fgets(A,B,stdin)
+    #define fe_fgets_stdin(p,A,B) fgets(A,B,stdin)
   #endif
 #endif
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.68 1998-10-15 11:45:53 obachman Exp $ */
+/* $Id: febase.cc,v 1.69 1998-10-29 13:15:15 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -178,7 +178,7 @@ static char* feGetSearchPath(const char* bindir)
     env=getenv("SINGULARPATH");
 #endif
 #ifdef PATH_DEBUG
-    Print("I'm going to chatter about the Search path:\n");
+    PrintS("I'm going to chatter about the Search path:\n");
 #endif
     if (env != NULL)
       plength = strlen(env);
@@ -274,7 +274,7 @@ static char* feGetInfoFile(const char* bindir)
                                   + 50);
 
 #ifdef PATH_DEBUG
-  Print("Search for singular.hlp\n");
+  PrintS("Search for singular.hlp\n");
 #endif
 
   if (bindir != NULL)
@@ -534,7 +534,7 @@ static char* CleanUpPath(char* path)
   for (i=0; i<n_comps; i++)
     path_comps[i] = CleanUpName(path_comps[i]);
 #ifdef PATH_DEBUG
-  Print("After CleanUpName: ");
+  PrintS("After CleanUpName: ");
   for (i=0; i<n_comps; i++)
     Print("%s:", path_comps[i]);
   Print("\n");
@@ -853,10 +853,12 @@ char * StringSetS(char *st)
 
 #ifndef __MWERKS__
 #ifdef HAVE_TCL
+extern "C" {
 void PrintTCLS(const char c, const char *s)
 {
   int l=strlen(s);
   if (l>0) PrintTCL(c,l,s);
+}
 }
 #endif
 #endif
@@ -994,6 +996,7 @@ void mwrite(uchar c)
 }
 #endif
 
+extern "C" {
 void PrintS(char *s)
 {
   if (feOut) /* do not print when option --no-out was given */
@@ -1074,6 +1077,9 @@ void Print(char *fmt, ...)
 #endif
     va_end(ap);
   }
+}
+
+/* end extern "C" */
 }
 
 void fePause()

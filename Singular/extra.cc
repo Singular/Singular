@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.71 1998-10-28 12:43:28 Singular Exp $ */
+/* $Id: extra.cc,v 1.72 1998-10-29 13:15:18 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -148,13 +148,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /*==================== sh ==================================*/
     if(strcmp(sys_cmd,"sh")==0)
     {
-      #ifndef __MWERKS__
-      #ifndef MSDOS
-      #ifdef HAVE_FEREAD
-      fe_temp_reset();
-      #endif
-      #endif
-      #endif
       res->rtyp=INT_CMD;
       #ifndef __MWERKS__
       if (h==NULL) res->data = (void *)system("sh");
@@ -164,13 +157,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         WerrorS("string expected");
       #else
       res->data=(void *)0;
-      #endif
-      #ifndef __MWERKS__
-      #ifndef MSDOS
-      #ifdef HAVE_FEREAD
-      fe_temp_set();
-      #endif
-      #endif
       #endif
       return FALSE;
     }
@@ -271,19 +257,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
     if (strcmp(sys_cmd,"tty")==0)
     {
-      #ifdef HAVE_FEREAD
-      #ifdef HAVE_ATEXIT
-      fe_reset_input_mode();
-      #else
-      fe_reset_input_mode(0,NULL);
-      #endif
-      #elif defined(HAVE_READLINE)
+      #if defined(HAVE_READLINE) || defined(HAVE_FEREAD)
       system("stty sane");
       #endif
       if ((h!=NULL)&&(h->Typ()==INT_CMD))
       {
         fe_use_fgets=(int)h->Data();
-        fe_set_input_mode();
       }
       return FALSE;
     }
@@ -693,7 +672,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         res->rtyp=MATRIX_CMD;
         res->data=(void *)mpOneStepBareiss((matrix)h->Data(),
                                            &div,&r,&c);
-        Print("div: ");pWrite(div);
+        PrintS("div: ");pWrite(div);
         Print("rows: %d, cols: %d\n",r,c);
         pDelete(&div);
         return FALSE;
