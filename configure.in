@@ -343,6 +343,10 @@ case "$ac_cv_singuname" in
 	with_malloc=system
 	ac_configure_args="$ac_configure_args --with-malloc=system"
         ;;
+	PowerMacintosh-darwin*)
+	with_malloc=system
+	ac_configure_args="$ac_configure_args --with-malloc=system"
+        ;;
 esac
 fi
   else
