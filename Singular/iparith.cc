@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.322 2004-07-20 15:27:57 Singular Exp $ */
+/* $Id: iparith.cc,v 1.323 2004-07-20 15:42:58 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2510,6 +2510,7 @@ struct sValCmd2 dArith2[]=
 // and the procedures with 2 arguments:
 ,{atATTRIB2,   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    BAREISS_CMD,    0,              DEF_CMD,    DEF_CMD ALLOW_PLURAL}
+,{jjBETTI2,    BETTI_CMD,      INTMAT_CMD,     LIST_CMD,   INT_CMD ALLOW_PLURAL}
 ,{syBetti2,    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD ALLOW_PLURAL}
 #ifdef HAVE_PLURAL
 ,{jjBRACKET,   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}

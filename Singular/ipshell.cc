@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.90 2004-05-25 16:46:28 levandov Exp $ */
+/* $Id: ipshell.cc,v 1.91 2004-07-20 15:41:00 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -848,15 +848,28 @@ BOOLEAN jjMINRES(leftv res, leftv v)
   return FALSE;
 }
 
-BOOLEAN jjBETTI(leftv res, leftv v)
+BOOLEAN jjBETTI(leftv res, leftv u)
+{
+  sleftv tmp;
+  memset(&tmp,0,sizeof(tmp));
+  tmp.rtyp=INT_CMD;
+  tmp.data=(void *)1;  
+  return jjBETTI2(res,u,&tmp);
+}
+
+BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
 {
   resolvente r;
   int len;
   int reg,typ0;
+  lists l=(lists)u->Data();
 
-  r=liFindRes((lists)v->Data(),&len,&typ0);
+  intvec *weights=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD); 
+  //Print("attr:%x\n",weights);
+
+  r=liFindRes(l,&len,&typ0);
   if (r==NULL) return TRUE;
-  res->data=(char *)syBetti(r,len,&reg);
+  res->data=(char *)syBetti(r,len,&reg,weights,(int)v->Data());
   omFreeSize((ADDRESS)r,(len)*sizeof(ideal));
   return FALSE;
 }
@@ -1775,17 +1788,28 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w)
   syStrategy syzstr=(syStrategy)u->Data();
   BOOLEAN minim=(int)w->Data();
   int row_shift=0;
-
-  res->data=(void *)syBettiOfComputation(syzstr,minim,&row_shift);
-  atSet(res,omStrDup("rowShift"),(void*)row_shift,INT_CMD);
+  int add_row_shift=0;
+  intvec *weights=NULL;
+  intvec *ww=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+  if (ww!=NULL)
+  {
+     weights=ivCopy(ww);
+     add_row_shift = ww->min_in();
+     (*weights) -= add_row_shift;
+  }
+  res->data=(void *)syBettiOfComputation(syzstr,minim,&row_shift,weights);
+  //row_shift += add_row_shift;
+  //Print("row_shift=%d, add_row_shift=%d\n",row_shift,add_row_shift);
+  atSet(res,omStrDup("rowShift"),(void*)add_row_shift,INT_CMD);
   return FALSE;
 }
 BOOLEAN syBetti1(leftv res, leftv u)
 {
-  syStrategy syzstr=(syStrategy)u->Data();
-
-  res->data=(void *)syBettiOfComputation(syzstr);
-  return FALSE;
+  sleftv tmp;
+  memset(&tmp,0,sizeof(tmp));
+  tmp.rtyp=INT_CMD;
+  tmp.data=(void *)1;  
+  return syBetti2(res,u,&tmp);
 }
 
 /*3
