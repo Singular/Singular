@@ -200,6 +200,8 @@ char* feHelpBrowser(char* which, int warn)
       return heCurrentHelpBrowser->browser;
 
     // First, try emacs, if emacs-option is set
+    // Under Win, always use html
+#ifndef WINNT
     if (feOptValue(FE_OPT_EMACS) != NULL)
     {
       while (heHelpBrowsers[i].browser != NULL)
@@ -214,6 +216,7 @@ char* feHelpBrowser(char* which, int warn)
       }
       i=0;
     }
+#endif
     while (heHelpBrowsers[i].browser != NULL)
     {
       if (heHelpBrowsers[i].init_proc(0))

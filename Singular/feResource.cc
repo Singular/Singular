@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.24 2000-05-05 18:40:28 obachman Exp $ */
+/* $Id: feResource.cc,v 1.25 2000-05-23 14:40:47 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -331,7 +331,7 @@ static char* feInitResource(feResourceConfig config, int warn)
   }
 
 #ifdef RESOURCE_DEBUG
-      printf("value:%s\n", value);
+  printf("value:%s\n", value);
 #endif
 
   if (*value == '\0' && config->fmt != NULL )
