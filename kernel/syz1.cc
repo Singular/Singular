@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.4 2004-02-12 14:21:18 Singular Exp $ */
+/* $Id: syz1.cc,v 1.5 2004-04-16 17:18:35 levandov Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1786,7 +1786,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
     jj = jj+2;
     result=new intvec(j,jj-sh,0);
     IMATELEM(*result,1,1)
-      = si_max(1,idRankFreeModule(syzstr->res[1],
+      = si_max(1,(int)idRankFreeModule(syzstr->res[1],
                                (syzstr->syRing!=NULL?syzstr->syRing:currRing)));
     for (i=sh;i<jj;i++)
     {
@@ -1942,7 +1942,7 @@ void syPrint(syStrategy syzstr)
       syzstr->resolution = new intvec(syzstr->length+1);
       SRes rP=syzstr->resPairs;
       (*syzstr->resolution)[0]
-        = si_max(1,idRankFreeModule(syzstr->res[1],
+        = si_max(1,(int)idRankFreeModule(syzstr->res[1],
                                  (syzstr->syRing != NULL ? syzstr->syRing : currRing)));
       while ((l<syzstr->length) && (rP[l]!=NULL))
       {
@@ -1966,7 +1966,7 @@ void syPrint(syStrategy syzstr)
       else
         rr = syzstr->fullres;
       (*syzstr->resolution)[0]
-        = si_max(1,idRankFreeModule(rr[0],
+        = si_max(1,(int)idRankFreeModule(rr[0],
                                  (syzstr->syRing != NULL ? syzstr->syRing : currRing)));
       while ((l<syzstr->length) && (rr[l]!=NULL))
       {

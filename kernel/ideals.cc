@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.2 2004-03-25 16:50:04 levandov Exp $ */
+/* $Id: ideals.cc,v 1.3 2004-04-16 17:18:34 levandov Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1394,7 +1394,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     }
     return result;
   }
-  k=si_max(1,idRankFreeModule(h1));
+  k=si_max(1,(int)idRankFreeModule(h1));
 
   assume(currRing != NULL);
   ring orig_ring=currRing;
@@ -1561,7 +1561,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   *ma=mpNew(1,0);
   if (idIs0(h1))
     return idInit(1,h1->rank);
-  k=si_max(1,idRankFreeModule(h1));
+  k=si_max(1,(int)idRankFreeModule(h1));
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssure_SyzComp();
@@ -1893,7 +1893,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
 */
 void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
 {
-  int N=0;
+  long N=0;
   int i;
   for(i=IDELEMS(Q)-1;i>=0;i--)
     if(w==NULL)
@@ -2891,7 +2891,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   for (i=length-1;i>=0;i--)
   {
     p=F[i]=P[i];
-    cmax=si_max(cmax,pMaxComp(p)+1);
+    cmax=si_max(cmax,(int)pMaxComp(p)+1);
   }
   diff = (int *)omAlloc0(cmax*sizeof(int));
   if (w!=NULL) *w=new intvec(cmax-1);

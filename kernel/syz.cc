@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.1.1.1 2003-10-06 12:15:54 Singular Exp $ */
+/* $Id: syz.cc,v 1.2 2004-04-16 17:18:35 levandov Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -401,7 +401,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   tHomog hom=isNotHomog;
   ideal temp=NULL;
   intvec *w = NULL,**tempW;
-  int i,k,syzIndex = 0,j,rk_arg=si_max(1,idRankFreeModule(arg));
+  int i,k,syzIndex = 0,j,rk_arg=si_max(1,(int)idRankFreeModule(arg));
   int Kstd1_OldDeg=Kstd1_deg;
   BOOLEAN completeMinim;
   BOOLEAN oldDegBound=TEST_OPT_DEGBOUND;
