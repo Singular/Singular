@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $ */
+/* $Id: febase.cc,v 1.2 2003-12-11 16:28:51 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -114,12 +114,13 @@ static char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
 /*2
 * the name of the current 'Voice': the procname (or filename)
 */
+const char * sNoName_fe="_";
 const char * VoiceName()
 {
   if ((currentVoice!=NULL)
   && (currentVoice->filename!=NULL))
     return currentVoice->filename;
-  return sNoName;
+  return sNoName_fe;
 }
 
 /*2
