@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.16 2001-01-30 11:45:47 pohl Exp $ */
+/* $Id: shortfl.cc,v 1.17 2001-01-31 18:39:27 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -429,8 +429,8 @@ static number nrMapLongR(number from)
 }
 static number nrMapC(number from)
 {
-  gmp_float *h = &((gmp_complex*)from)->real();
-  float t =(float)mpf_get_d((mpf_t)h);
+  gmp_float h = ((gmp_complex*)from)->real();
+  float t =(float)mpf_get_d((mpf_t)&h);
   return nf(t).N();
 }
 
