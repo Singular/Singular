@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.110 2000-12-19 16:16:32 Singular Exp $
+@comment $Id: types.doc,v 1.111 2001-01-18 15:37:26 keilen Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -217,7 +217,7 @@ a type cast to ideal
   poly f = x2;
   poly g = y3;
   ideal i = x*y*z , f-g, g*(x-y) + f^4 ,0, 2x-z2y;
-  ideal M = maxideal(10);
+  ideal M = i + maxideal(10);
   timer =0;
   i = M*M;
   timer;
@@ -337,7 +337,7 @@ lift-matrix (see @ref{lift})
 @item liftstd
 standard basis and transformation matrix computation (see @ref{liftstd})
 @item lres
-minimal resolution for homogeneous ideals (see @ref{lres})
+free resolution for homogeneous ideals (see @ref{lres})
 @item maxideal
 power of the maximal ideal at 0 (see @ref{maxideal})
 @item minbase
@@ -355,7 +355,7 @@ $(h1+h2)/h1 \cong h2/(h1 \cap h2)$
 @end ifinfo
 (see @ref{modulo})
 @item mres
-minimal free resolution of an ideal resp.@: module, also minimizing the given ideal resp.@: module
+minimal free resolution of an ideal resp.@: module w.r.t. a minimal set of generators of the given ideal resp.@: module
 (see @ref{mres})
 @item mstd
 standard basis and minimal generating set of an ideal (see @ref{mstd})
@@ -372,7 +372,7 @@ ideal quotient (see @ref{quotient})
 @item reduce
 normalform with respect to a standard basis (see @ref{reduce})
 @item res
-minimal free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module
+free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module
 (see @ref{res})
 @item simplify
 simplify a set of polynomials (see @ref{simplify})
@@ -733,7 +733,7 @@ boolean expressions combined by boolean operations (@code{and},
 @c   chapter "Evaluation of logical expressions".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
-All arguments of a logical expressions are first evaluated and
+All arguments of a logical expression are first evaluated and
 then the value of the logical expression is determined. For example, the
 logical expression @code{(a || b)} is evaluated by first evaluating
 @code{a} @emph{and} @code{b}, even though the value of @code{b} has no
@@ -899,7 +899,7 @@ intmat
 @item @strong{Purpose:}
 Converts expression to an intmat, where expression must be of type
 intvec, or intmat. If
-int_n and int_m are supplied, then they specifify the dimension of the
+int_n and int_m are supplied, then they specify the dimension of the
 intmat. Otherwise, the size (resp.@: dimensions) of the intmat
 are determined  by the size (resp.@: dimensions) of the
 expression.
@@ -944,7 +944,7 @@ entries modulo int (remainder of the division)
 @item @code{<>}, @code{==}
 comparison
 
-@item intmat_expression @code{[} intvec_expressions@code{,} intvec_expression @code{]}
+@item intmat_expression @code{[} intvec_expression@code{,} intvec_expression @code{]}
 is an intmat entry, where the first index indicates the row and the
 second the column
 @end table
@@ -1005,7 +1005,7 @@ Variables of type intvec are lists of integers.  For the range of
 integers see @ref{Limitations}. They may be used for simulating
 sets of integers (and other sets if the intvec is used as an index set
 for other objects). Addition and subtraction of an
-intvec within int is done element-wise.
+intvec with an int or an intvec is done element-wise.
 @c @example
 @c @c example
 @c   intvec iv=1,2,5,7;
@@ -1510,7 +1510,7 @@ connect call.
 @item connect mode:
 @enumerate 2
 @item @code{"MPtcp:connect --MPport "} + portnumber
-@item @code{"MPtcp:connect --MPhost" } + hostname + @code{" --MPport "} +
+@item @code{"MPtcp:connect --MPhost "} + hostname + @code{" --MPport "} +
 portnumber
 @end enumerate
 @sc{Singular} becomes a client and connects to a server waiting at
@@ -1518,10 +1518,10 @@ the host and port.
 @item launch mode:
 @enumerate 4
 @item @code{"MPtcp:launch"}
-@item @code{"MPtcp:launch" --MPrsh "} + rsh
-@item @code{"MPtcp:launch" --MPrsh "} + rsh  + @code{" --MPhost "} +
+@item @code{"MPtcp:launch --MPrsh "} + rsh
+@item @code{"MPtcp:launch --MPrsh "} + rsh  + @code{" --MPhost "} +
 hostname
-@item @code{"MPtcp:launch" --MPrsh "} + rsh  + @code{" --MPhost "} +
+@item @code{"MPtcp:launch --MPrsh "} + rsh  + @code{" --MPhost "} +
 hostname + @code{" --MPapplication "} + application
 @end enumerate
 @sc{Singular} becomes a client and starts (launches) the application
@@ -1545,9 +1545,9 @@ There are the following default values:
 @code{ssh} is used.
 
 @item if no application is specified (in mode @code{launch}) the default
-application is the value of @code{system("Singular") + " -bq"}.
+application is the value of @code{system("Singular") + "-bq"}.
 (This evaluates to the absolute path of the @sc{Singular} currently running
-with the option "-bq" appended.)
+with the option @code{"-bq"} appended.)
 
 @item if no hostname is specified the local host is used as default host.
 @end itemize
@@ -1834,16 +1834,16 @@ list of factors of a polynomial (see @ref{factorize})
 @item insert
 inserts or appends a new element to a list (see @ref{insert})
 @item lres
-minimal resolution (see @ref{lres})
+free resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal, resp.@: module, also
-minimizing the first module (see @ref{mres})
+minimal free resolution of an ideal, resp.@: module w.r.t. 
+a minimal set of generators of the first module (see @ref{mres})
 @item names
 list of all userdefined variable names (see @ref{names})
 @item res
-minimal free resolution of an ideal, resp.@: module (see @ref{res})
+free resolution of an ideal, resp.@: module (see @ref{res})
 @item size
 number of entries (see @ref{size})
 @item sres
@@ -1898,22 +1898,6 @@ Z/p -> Z/p' : [i]_p in Z/p -> i in [-p/2,p/2] in Z, i -> [i]_p' in Z/p'
 
 and, as usual:
 @itemize @bullet
-@item
-@tex
-$Q \rightarrow Z/p$
-@end tex
-@ifinfo
-Q -> Z/p
-@end ifinfo
-
-@item
-@tex
-$Q \rightarrow (Z/p)(a, \ldots)$
-@end tex
-@ifinfo
-Q -> (Z/p)(a,..)
-@end ifinfo
-
 @item
 @tex
 $Q \rightarrow  Q(a, \ldots)$
@@ -1978,6 +1962,37 @@ $R \rightarrow Q$
 R -> Q
 @end ifinfo
 @end itemize
+
+@itemize @bullet
+@item
+@tex
+$Q \rightarrow Z/p$
+@end tex
+@ifinfo
+Q -> Z/p
+@end ifinfo
+
+Furthermore, in Singular we allow the mapping from rings 
+with coefficient field Q to rings whose ground fields 
+have finite characteristic:
+@item
+@tex
+$Q \rightarrow (Z/p)(a, \ldots)$
+@end tex
+@ifinfo
+Q -> (Z/p)(a,..)
+@end ifinfo
+@end itemize
+In these cases the denominator and the numerator 
+of a number are mapped seperately by the usual
+map from Z to Z/p, and the image of the number 
+is build again afterwards by division. It is thus
+not allowed to map numbers whose denominator is 
+divisible by the charakteristic of the target 
+ground field, or objects containing such numbers. 
+We, therefore, strongly recommend to use such 
+maps only to map objects with integer coefficients. 
+
 
 @menu
 * map declarations::
@@ -2093,7 +2108,7 @@ is a map entry (the image of the corresponding variable)
   f;
   poly p=x+2y3;
   f(p);
-  map g=f(f);    // the map g defined as  f^2, the involution of f
+  map g=f(f);    // the map g defined as  f^2 is the identity
   g;
   g(p) == p;
 @c example
@@ -2194,7 +2209,7 @@ a type cast to matrix (@pxref{matrix type cast})
 @*@strong{Example:}
 @smallexample
 @c example
-  ring r=0,(x,y),dp;;
+  ring r=0,(x,y),dp;
   poly f= x3y2 + 2x2y2 +2;
   matrix H = jacob(jacob(f));    // the Hessian of f
   matrix mc = coef(f,y);
@@ -2218,7 +2233,7 @@ matrix
 @item @strong{Purpose:}
 Converts expression to a matrix, where expression must be of type int,
 intmat, intvec, number, poly, ideal, vector, module, or matrix. If
-int_n and int_m are supplied, then they specifify the dimension of the
+int_n and int_m are supplied, then they specify the dimension of the
 matrix. Otherwise, the size (resp.@: dimensions) of the matrix
 are determined  by the size (resp.@: dimensions) of the
 expression.
@@ -2280,8 +2295,8 @@ second the column
   matrix B =x*E - A;
   print(B);
   det(B);        // the characteristic polynomial of A
-  A*A*A - 6 * A*A - 26*A == -29*E;  // Cayley-Hamilton
-  vector v =[ x,-1,x2];
+  A*A*A - 8 * A*A - 2*A == E;  // Cayley-Hamilton
+  vector v =[x,-1,x2];
   A*v; // multiplication of matrix and vector
   matrix m[2][2]=1,2,3;
   print(m-transpose(m));
@@ -2539,7 +2554,7 @@ lift-matrix (see @ref{lift})
 @item liftstd
 standard basis and transformation matrix computation (see @ref{liftstd})
 @item lres
-minimal resolution (see @ref{lres})
+free resolution (see @ref{lres})
 @item minbase
 minimal generating set of a homogeneous ideal, resp.@: module, or an ideal, resp.@: module,
 over a local ring
@@ -2553,7 +2568,7 @@ $(h1+h2)/h1=h2/(h1 \cap h2)$
 @end ifinfo
 (see @ref{modulo})
 @item mres
-minimal free resolution of an ideal resp.@: module, also minimizing the given module
+minimal free resolution of an ideal resp.@: module w.r.t. a minimal set of generators of the given module
 (see @ref{mres})
 @item mult
 multiplicity, resp.@: degree, of the module of leading terms (see @ref{mult})
@@ -2568,11 +2583,11 @@ minimize the embedding into a free module (see @ref{prune})
 @item qhweight
 quasihomogeneous weights of an ideal, resp.@: module (see @ref{qhweight})
 @item quotient
-ideal quotient (see @ref{quotient})
+module quotient (see @ref{quotient})
 @item reduce
 normalform with respect to a standard basis (see @ref{reduce})
 @item res
-minimal free resolution of an ideal, resp.@: module, but not changing the given ideal, resp.@: module
+free resolution of an ideal, resp.@: module, but not changing the given ideal, resp.@: module
 (see @ref{res})
 @item simplify
 simplify a set of vectors (see @ref{simplify})
@@ -2661,7 +2676,7 @@ orderings} for a list of the available coeffficient fields.
   n;
   // finite field GF(p^n), p^n <= 32767
   // z is a primitive root of the minimal polynomial
-  ring rg= (49,z),x,dp;
+  ring rg= (7^2,z),x,dp;
   number n = 4/9+z;
   n;
   // the rational numbers
@@ -3046,7 +3061,7 @@ division by a monomial, non divisible terms yield 0
 power by an integer
 
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
-comparison (of leading terms w.r.t. monomial ordering)
+comparison (w.r.t. monomial ordering)
 
 @item poly_expression @code{[} intvec_expression @code{]}
 the monomial at the indicated place w.r.t.@: the monomial ordering
@@ -3071,9 +3086,9 @@ the monomial at the indicated place w.r.t.@: the monomial ordering
   x5 > f;
   f[2..4];
   size(f);
-  f[size(f)+1]; f[-1];    // monoms out of range are 0
+  f[size(f)+1]; f[-1];    // monomials out of range are 0
   intvec v = 6,1,3;
-  f[v];          // the polynom built from the 1st, 3rd and 6th monom of f
+  f[v];          // the polynom built from the 1st, 3rd and 6th monomial of f
 @c example
 @end smallexample
 
@@ -3185,7 +3200,7 @@ using the command @code{LIB}. For more information on libraries see
 @end tex
    procedure_body
 @*@code{@}}
-@*[@code{smallexample}
+@*[@code{example}
 @*@code{@{}
 @*
 @tex
@@ -3200,7 +3215,7 @@ defines a new function, the @code{proc} proc_name, with the additional
 information help_text, which is copied to the screen by
 @code{help proc_name;} and the @code{example} section
 which is executed by @code{example proc_name;}.
-@* The help_text, the parameter_list, and the smallexample section are optional.
+@* The help_text, the parameter_list, and the example section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined
 interactively, i.e., if it was not loaded from a file by a @ref{LIB} command.
@@ -3360,14 +3375,14 @@ See @ref{Type conversion and casting}.
 @item betti
 Betti numbers of a resolution (see @ref{betti})
 @item lres
-minimal resolution (see @ref{lres})
+free resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal, resp.@: module, also minimizing the
-given ideal, resp.@: module (see @ref{mres})
+minimal free resolution of an ideal, resp.@: module w.r.t. a minimal set of generators of 
+the given ideal, resp.@: module (see @ref{mres})
 @item res
-minimal free resolution of an ideal, resp.@: module, but not changing the
+free resolution of an ideal, resp.@: module, but not changing the
 given ideal, resp.@: module (see @ref{res})
 @item sres
 free resolution of a standard basis (see @ref{sres})
@@ -3511,7 +3526,7 @@ construct a new ring @math{k[X,Y]} from @math{k_1[X]}  and @math{k_2[Y]}.
 
 Variables of type @code{string} are used for output (almost every type
 can be "converted" to @code{string}) and for creating new
-commands at runtime (see @ref{execute}).  They are also return values of
+commands at runtime see @ref{execute}.  They are also return values of
 certain interpreter related functions (see @ref{Functions}).  String
 constants consist of a sequence of ANY characters (including newline!)
 between a starting @code{"} and a closing @code{"}.  There is also a
@@ -3644,8 +3659,6 @@ type. The concatenated string of all concersions is returned.
 separated by a comma. No newlines are inserted.
 @*Not defined elements of a list are ommitted.
 @*For link, the name of the link is used.
-@*For qring, the ideal defining the quotient is appended to the ring
-string.
 @*For map, the ideal defining the mapping is converted.
 
 @item @strong{Note:}
@@ -3674,7 +3687,7 @@ matrix, and list become indistinguishable.
   string(l); // notice that lists of list is flattened
   l[1] = intvec(1,2,3);
   l;
-  string(l) // notice that intvec elements are not distinguishable
+  string(l); // notice that intvec elements are not distinguishable
 @c example
 @end smallexample
 @end table
@@ -3695,7 +3708,7 @@ See
 concatenation
 
 @item @code{<=}, @code{>=}, @code{==}, @code{<>}
-comparison (lexicographic with respect to the ASCII encoding)
+comparison (lexicographical with respect to the ASCII encoding)
 
 @item string_expression @code{[} int_expression @code{]}
 is a character of the string; the index 1 gives the first character.
@@ -3778,7 +3791,7 @@ Like polynomials they
 can only be defined or accessed with respect to the basering.
 (E.g., if @code{f} and @code{g} are polynomials then
 @code{f*gen(1)+g*gen(3)+gen(4)} may also be written as @code{[f,0,g,1]}
-or as @code{[f,0,g,1,0]}.). Note that the elements of a vector have to be
+or as @code{[f,0,g,1,0]}.) Note that the elements of a vector have to be
 surrounded by square brackets (@code{[}  , @code{]})
 (cf. @ref{Representation of mathematical objects}).
 
