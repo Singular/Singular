@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.43 1999-01-18 17:25:25 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.44 1999-02-26 14:29:01 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -268,19 +268,16 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     if (e->next==NULL)
     {
       j=i; i=1;
-      // for ideal/module: check indices
-      if (res->rtyp!=MAP_CMD)
+      // for all ideal like data types: check indices
+      if (j>MATCOLS(m))
       {
-        if (j>MATCOLS(m))
-        {
-          pEnlargeSet(&(m->m),MATCOLS(m),j-MATCOLS(m));
-          MATCOLS(m)=j;
-        }
-        else if (j<=0)
-        {
-          Werror("index[%d] must be positive",j/*e->start*/);
-          return TRUE;
-        }
+        pEnlargeSet(&(m->m),MATCOLS(m),j-MATCOLS(m));
+        MATCOLS(m)=j;
+      }
+      else if (j<=0)
+      {
+        Werror("index[%d] must be positive",j/*e->start*/);
+        return TRUE;
       }
     }
     else
