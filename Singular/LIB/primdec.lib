@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.72 2000-05-25 11:22:19 pfister Exp $
+// $Id: primdec.lib,v 1.73 2000-05-25 11:44:57 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.72 2000-05-25 11:22:19 pfister Exp $";
+version="$Id: primdec.lib,v 1.73 2000-05-25 11:44:57 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -1998,8 +1998,8 @@ EXAMPLE: example decomp; shows an example
 {
   def  @P = basering;
   list primary,indep,ltras;
-  intvec @vh,isat;
-  int @wr,@k,@n,@m,@n1,@n2,@n3,homo,seri,keepdi,@w;
+  intvec @vh,isat,@w;
+  int @wr,@k,@n,@m,@n1,@n2,@n3,homo,seri,keepdi;
   ideal peek=i;
   ideal ser,tras;
 
@@ -2049,9 +2049,9 @@ EXAMPLE: example decomp; shows an example
         }
         return(primary);
      }
-     for(n=1;n<=nvars(basering);n++)
+     for(@n=1;@n<=nvars(basering);@n++)
      {
-        @w[n]=ord(var(n));
+        @w[@n]=ord(var(@n));
      }
      intvec @hilb=hilb(tras,1,@w);
      intvec keephilb=@hilb;
