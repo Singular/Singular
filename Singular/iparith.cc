@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.292 2003-03-19 23:08:59 levandov Exp $ */
+/* $Id: iparith.cc,v 1.293 2003-03-28 10:50:38 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1506,6 +1506,17 @@ static BOOLEAN jjCONTRACT(leftv res, leftv u, leftv v)
   res->data=(char *)idDiffOp((ideal)u->Data(),(ideal)v->Data(),FALSE);
   return FALSE;
 }
+static BOOLEAN jjDEG_M_IV(leftv res, leftv u, leftv v)
+{
+  short *iv=iv2array((intvec *)v->Data());
+  ideal I=(ideal)u->Data();
+  int d=-1;
+  int i;
+  for(i=IDELEMS(I);i>=0;i--) d=max(d,pDegW(I->m[i],iv));
+  omFreeSize((ADDRESS)iv,(pVariables+1)*sizeof(short));
+  res->data = (char *)d;
+  return FALSE;
+}
 static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
 {
   short *iv=iv2array((intvec *)v->Data());
@@ -2351,6 +2362,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCONTRACT,  CONTRACT_CMD,   MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjDEG_IV,    DEG_CMD,        INT_CMD,        POLY_CMD,   INTVEC_CMD ALLOW_PLURAL}
 ,{jjDEG_IV,    DEG_CMD,        INT_CMD,        VECTOR_CMD, INTVEC_CMD ALLOW_PLURAL}
+,{jjDEG_M_IV,  DEG_CMD,        INT_CMD,        MATRIX_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{lDelete,     DELETE_CMD,     LIST_CMD,       LIST_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjDIFF_P,    DIFF_CMD,       POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjDIFF_P,    DIFF_CMD,       VECTOR_CMD,     VECTOR_CMD, POLY_CMD ALLOW_PLURAL}
@@ -2633,6 +2645,17 @@ static BOOLEAN jjDEG(leftv res, leftv v)
   poly p=(poly)v->Data();
   if (p!=NULL) res->data = (char *)pLDeg(p,&dummy);
   else res->data=(char *)-1;
+  return FALSE;
+}
+static BOOLEAN jjDEG_M(leftv res, leftv u)
+{
+  ideal I=(ideal)u->Data();
+  int d=-1;
+  int dummy;
+  int i;
+  for(i=IDELEMS(I);i>=0;i--)
+    if (I->m[i]!=NULL) d=max(d,pLDeg(I->m[i],&dummy));
+  res->data = (char *)d;
   return FALSE;
 }
 static BOOLEAN jjDEGREE(leftv res, leftv v)
@@ -3638,6 +3661,7 @@ struct sValCmd1 dArith1[]=
 ,{jjWRONG,      DEF_CMD,         0,              ANY_TYPE       ALLOW_PLURAL}
 ,{jjDEG,        DEG_CMD,         INT_CMD,        POLY_CMD       ALLOW_PLURAL}
 ,{jjDEG,        DEG_CMD,         INT_CMD,        VECTOR_CMD     ALLOW_PLURAL}
+,{jjDEG_M,      DEG_CMD,         INT_CMD,        MATRIX_CMD     ALLOW_PLURAL}
 ,{jjDEGREE,     DEGREE_CMD,      NONE,           IDEAL_CMD      NO_PLURAL}
 ,{jjDEGREE,     DEGREE_CMD,      NONE,           MODUL_CMD      NO_PLURAL}
 ,{jjDEFINED,    DEFINED_CMD,     INT_CMD,        DEF_CMD        ALLOW_PLURAL}
