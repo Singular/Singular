@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.46 1998-06-19 13:19:14 krueger Exp $
+@comment $Id: singular.doc,v 1.47 1998-06-19 14:12:17 gorzel Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -445,8 +445,9 @@ The computation of a monomial has precedence over all operators:
 @example
 @c example
   ring r=0,(x,y),dp;
-  xy^2 == (x*y)^2;
-  x*y^2 == (x) * (y^2)
+  2xy^2 == (2*x*y)^2;
+  2xy^2 == 2x*y^2;
+  2x*y^2 == 2*x * (y^2);
 @c example
 @end example
 
@@ -475,10 +476,11 @@ the ideal (resp.@: module).
 @item computations in qrings
 
 @sc{Singular} computes in a quotient rings as long as possible with the
-given representative of a polynomial, say, @code{p}.  I.e., it usually
-does not reduce @code{p} w.r.t. the quotient ideal.  This is only done
+given representative of a polynomial, say, @code{f}.  I.e., it usually
+does not reduce @code{f} w.r.t. the quotient ideal.  This is only done
+when necessary 
 during standard bases computations or by an explicit reduction using
-the command @code{reduce(p, std(0))} (@pxref{reduce}).
+the command @code{reduce(f, std(0))} (@pxref{reduce}).
 
 @item substring selection
 
@@ -490,12 +492,16 @@ In particular,
 
 @example
 @c example
-  string s = "hello";
-  s[1,4];
-  intvec v = 1,4;
+  string s = "one-word";
+  s[2,6];     // a substring starting at the second char
+  size(_);
+  intvec v = 2,6;
+  s[v];      // the second and the sixth char
+  string st = _;  // stick toghter by an assignment
+  st;
+  size(_);
+  v = 2,6,8;
   s[v];
-  size(s[1,4]);
-  size(s[v]);
 @c example
 @end example
 @end enumerate
@@ -579,9 +585,10 @@ described in the following subsections.
 * finvar_lib:: procedures to calculate invariant rings & more
 * primdec_lib:: procedures for primary decomposition
 * invar_lib:: procedures to compute the ring of invariants
-* tex_lib:: procedures for typeseting in TeX
+* latex_lib:: procedures for typeseting in TeX
 * hnoether_lib:: procedures for the Hamburger-Noether-development
 * classify_lib:: procedures for classifying hypersurface singularities
+* graphics.lib:: procedures to draw  with Mathematica
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, all_lib, SINGULAR libraries, SINGULAR libraries
@@ -670,25 +677,30 @@ see @ref{stdhilb}.
 @cindex primdec_lib
 @c lib primdec.lib
 @c ----------------------------------------------------------
-@node invar_lib,tex_lib,primdec_lib, SINGULAR libraries
+@node invar_lib,latex_lib,primdec_lib, SINGULAR libraries
 @section invar_lib
 @cindex invar_lib
 @c lib invar.lib
 @c ---------------------------------------------------------
-@node tex_lib,hnoether_lib,invar_lib, SINGULAR libraries
-@section tex_lib
-@cindex tex_lib
-@c lib tex.lib
+@node latex_lib,hnoether_lib,invar_lib, SINGULAR libraries
+@section latex_lib
+@cindex latex_lib
+@c lib latex.lib
 @c ---------------------------------------------------------
-@node hnoether_lib,classify_lib,tex_lib, SINGULAR libraries
+@node hnoether_lib,classify_lib,latex_lib, SINGULAR libraries
 @section hnoether_lib
 @cindex hnoether_lib
 @c lib hnoether.lib
 @c ---------------------------------------------------------
-@node classify_lib,,hnoether_lib, SINGULAR libraries
+@node classify_lib,graphics_lib,hnoether_lib, SINGULAR libraries
 @section classify_lib
 @cindex classify_lib
 @c lib classify.lib
+@c ---------------------------------------------------------
+@node graphics_lib,,classify_lib, SINGULAR libraries
+@section graphics_lib
+@cindex graphics_lib
+@c lib graphics.lib
 @c ----------------------------------------------------------
 @node Library function index, Index, SINGULAR libraries, Top
 @appendix Library function index

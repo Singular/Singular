@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.105 1998-06-19 13:38:44 obachman Exp $
+@comment $Id: general.doc,v 1.106 1998-06-19 14:12:03 gorzel Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -719,10 +719,11 @@ The most convenient way to map objects from a ring to its quotient ring
 and vice versa is to use the @code{fetch} function (@pxref{fetch}).
 
 @sc{Singular} computes in a quotient rings as long as possible with the
-given representative of a polynomial, say, @code{p}.  I.e., it usually
-does not reduce @code{p} w.r.t. the quotient ideal.  This is only done
+given representative of a polynomial, say, @code{f}.  I.e., it usually
+does not reduce @code{f} w.r.t. the quotient ideal.  This is only done
+when necessary 
 during standard bases computations or by an explicate reduction using
-the command @code{reduce(p, std(0))} (@pxref{reduce}).
+the command @code{reduce(f, std(0))} (@pxref{reduce}).
 
 @strong{Example:}
 @example
@@ -1561,7 +1562,8 @@ matrix.
 @item
 @  10. @tab to @code{poly} @tab   from @code{int}, @code{number}
 @item
-@  11. @tab to @code{string} @tab from @code{ideal}, @code{int}, @code{map}, @code{matrix},
+@  11. @tab to @code{string} @tab from @code{ideal}, @code{int}, @code{map},
+@code{map}, @code{matrix},
 @code{module}, @code{number}, @code{poly}, @code{proc}, @code{vector}
 @end multitable
 

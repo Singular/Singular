@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.70 1998-06-19 13:33:57 obachman Exp $
+@comment $Id: types.doc,v 1.71 1998-06-19 14:12:20 gorzel Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -198,9 +198,8 @@ ideal expressions combined by the arithmetic operations
 @item
 a power of an ideal expression (operator @code{^} or @code{**})
 @*Note that the computation of the product @code{i*i} involves
-all products of generators of @code{i} and simplifies the product
-while @code{i^2} involves only the different ones,
-but does not simplify the result and is therefore faster.
+all products of generators of @code{i} while @code{i^2} involves 
+only the different ones, and is therefore faster.
 @item
 a type cast to ideal
 @end enumerate
@@ -484,11 +483,11 @@ ring r=0,x,dp;
 12345678901;
 typeof(_);
 // Note: 11*13*17*100*200*2000*503*1111*222222
-// would return a machine integer:
+// returns a machine integer:
 11*13*17*100*200*2000*503*1111*222222;
 // using the type cast number for a greater allowed range
 number(11)*13*17*100*200*2000*503*1111*222222;
-ring rp=320003,x,dp;
+ring rp=32003,x,dp;
 12345678901;
 typeof(_);
 intmat m[2][2] = 1,2,3,4;
@@ -500,24 +499,17 @@ m[1,1] + m[2,1] == trace(m);
 ! 0;
 1 and 2;
 intvec v = 1,2,3;
-def d =transpose(v)*v;    // scalarproduct
+def d =transpose(v)*v;    // scalarproduct gives an 1x1 intvec
 typeof(d);
-int i = d[1];             // no cast from intvec to int, access first element
-ring rr=32003,(x,y,z),dp;
+int i = d[1];             // access the first (the only) entry in the intvec 
+ring rr=31,(x,y,z),dp;
 poly f = 1;
 i = int(f);               // cast to int
-//----------------------------------------------------
-int j=1;
-// dimension of factor ring defined by (x,y)
-// (i.e. R/(x,y)) if it is given by a standard basis
-i=dim(std(ideal(x,y)));
-int compare = i<j;
-compare;      // 0 (FALSE) if i >= j, 1 (TRUE) if i<j
-//----------------------------------------------------
-// Integers may be converted to polynomials by an assignment,
-poly g=j;
+// Integers may be converted to constant  polynomials by an assignment,
+poly g=37;
 // define the constant polynomial g equal to the image of
-// the integer j in the actual coefficient field
+// the integer j in the actual coefficient field, here it equals 6
+g;
 @c example
 @end example
 
@@ -685,8 +677,8 @@ a number comparison:
 @end example
 For numbers from Z/p or from field extensions not all operations are useful:
 @* - 0 ist always the smallest element,
-@* - in Z/p the representatives in the range -p/2..p/2 are used for
-comparisons,
+@* - in Z/p the representatives in the range -(p-1)/2..(p-1)/2 when p>2 resp. 
+     0 and 1 for p=2 are used for comparisons,
 @* - in field extensions the last two operations
 (@code{>=,<=}) yield always TRUE (1) and
 the @code{<} and @code{>} are equivalent to @code{!=}.
@@ -857,7 +849,7 @@ a type cast to intmat
 @c example
   intmat Idm[3][3];
   Idm +1;          // add the unit intmat
-  intmat m1[4][2] = _,1,-2;
+  intmat m1[4][2] = _;  // take entries from the last result 
   m1;
   intmat m2[2][3]=1,0,2,4,5,1;
   transpose(m2);
@@ -922,7 +914,7 @@ second the column
   m2 div 2;
   m2[2,1];          // entry at row 2, col 1
   m1[2..3,2..3];   // submatrix
-  m1[nrows(m1),ncols(m1)];      // the last intmat entry
+  m2[nrows(m1),ncols(m1)];      // the last entry of intmat m2
 @c example
 @end example
 
@@ -1093,6 +1085,9 @@ is an element of the intvec; the first element has index one.
   iv==iw;             // lexicographic comparision
   iv < iw;
   iv != iw;
+  iv[2];
+  iw = 4,1,2;
+  iv[iw];
 @c example
 @end example
 
@@ -1681,9 +1676,11 @@ empty list
   l[1];
   l[2];
   ring r;
+  listvar(r);
   ideal i = x^2, y^2 + z^3;
   l[3] = i;
   l;
+  listvar(r);     // the list l belongs now to the ring r
 @c example
 @end example
 @end table
@@ -1713,15 +1710,18 @@ a type cast to list
 See @ref{Type conversion and casting}.
 @c ref
 
-@c @*@strong{Example:}
-@c @example
-@c @c example
-@c   list l1=1,2;
-@c   list l2=2,3;
-@c   list A=l1+l2; A;
-@c   list B=l1,l2; B;
-@c @c example
-@c @end example
+@*@strong{Example:}
+@example
+@c example
+  list l = "hello",1;
+  l;
+  l = list();
+  l;
+  ring r =0,x,dp;
+  factorize((x+1)^2);
+  list(1,2,3);
+@c example
+@end example
 
 @c ------------------------------
 @node list operations, list related functions, list expressions, list
@@ -1748,15 +1748,6 @@ is a list entry; the index 1 gives the first element.
   list l3 =_;
   l1,l2;            // two lists
   l2[2];
-  intvec v =-1,0;
-  l2[2] = v;
-  l2;
-  insert(l1,"one word");
-  l1;               // l1 remains unchanged
-  l1 = insert(l1,list(),2);  // insert empty list after 2 position
-  l1;
-  l3 = delete(l2,2);
-  l3;
 @c example
 @end example
 
@@ -1964,15 +1955,17 @@ and @code{g}.
 is a map entry (the image of the corresponding variable)
 @end table
 
-
 @*@strong{Example:}
 @example
 @c example
   ring r=0,(x,y),dp;
-  map f=r,y,x;
-  poly p=x+2*y^3;
-  map g=f(f);
-  g(p);
+  map f=r,y,x;    // the map f permutes the variables 
+  f;
+  poly p=x+2y3;
+  f(p);
+  map g=f(f);    // the map g defined as  f^2, the involtution of f
+  g;
+  g(p) == p;
 @c example
 @end example
 
@@ -2069,11 +2062,19 @@ matrix expressions combined by the arithmetic operations
 a type cast to matrix
 @end enumerate
 
-@c @*@strong{Example:}
-@c @example
-@c @c example
-@c @c example
-@c @end example
+@*@strong{Example:}
+@example
+@c example
+  ring r=0,(x,y),dp;;
+  poly f= x3y2 + 2x2y2 +2;
+  matrix H = jacob(jacob(f));    // the Hessian of f
+  matrix mc = coef(f,y);
+  print(mc);
+  module MD = [x+y,1,x],[x+y,0,y];
+  matrix M = MD;
+  print(M);
+@c example
+@end example
 
 @c ------------------------------
 @node matrix operations, matrix related functions, matrix expressions, matrix
@@ -2105,6 +2106,15 @@ second the column
 @example
 @c example
   ring r=32003,x,dp;
+  matrix A[3][3] = 1,3,2,5,0,3,2,4,5;
+  print(A);
+  matrix E[3][3]; E = E + 1;  // the unit matrix
+  matrix B =x*E - A;
+  print(B);
+  det(B);        // the characteristic polynomial of A
+  A*A*A - 6 * A*A - 26*A == -29*E;  // Cayley-Hamilton
+  vector v =[ x,-1,x2];
+  A*v;
   matrix m[2][2]=1,2,3;
   print(m-transpose(m));
 @c example
@@ -2536,7 +2546,10 @@ comparison
 
 @strong{Note:} quotient and exponentiation is only recognized as a
 number expression is if is already a number, see @ref{Miscellaneous
-oddities}.  For the behavior of comparison operators in rings with
+oddities}. 
+@* To acces the denominator or nominator of a rtional number see
+@ref{Tricks and pitfalls}.
+@* For the behavior of comparison operators in rings with
 basering different from real or the rational numbers, see @ref{boolean
 expressions}.
 
@@ -2547,6 +2560,8 @@ expressions}.
   number n = 1/2 +1/3;
   n;
   n/2;
+  1/2/3;
+  1/2 * 1/3;
   n = 2;
   n^-2;
   // the following oddities appear here
@@ -2554,6 +2569,8 @@ expressions}.
   number(2)/(2+3);
   2^-2;
   number(2)^-2;
+  3/4>=2/5;
+  2/6==1/3;
 @c example
 @end example
 
@@ -2563,6 +2580,9 @@ expressions}.
 @cindex number related functions
 
 @table @code
+@item cleardenom
+cancels denominators of numbers in poly and divide by its content
+(see @ref{cleardenom})
 @item leadcoef
 coefficient of the leading term (see @ref{leadcoef})
 @item par
@@ -2661,6 +2681,17 @@ a type cast to poly
 2*x^3;  //  is a valid poly expression equal to 2x3 (a valid monomial)
         // but not equal to 2x^3
         // which will be interpreted as (2x)^3
+@c example
+  ring r=0,(x,y),dp;
+  poly f = 10x2y3 +2x2y2-2xy+y -x+2;
+  lead(f);
+  simplify(f,1);     // normalize leading coefficient
+  poly g = 1/2x2 + 1/3y;
+  cleardenom(g);
+  int i = 102;
+  poly(i);
+  typeof(_);
+@c example
 @end example
 
 @c ref
@@ -2691,7 +2722,7 @@ power by an integer
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
 comparison
 
-@item poly_expression @code{[} int_expression @code{]}
+@item poly_expression @code{[} intvec_expression @code{]}
 the monomial at the indicated place w.r.t.@: the monomial order
 @end table
 
@@ -2699,10 +2730,24 @@ the monomial at the indicated place w.r.t.@: the monomial order
 @example
 @c example
   ring R=0,(x,y),dp;
-  x+y;
-  x<=y;
-  (x+y+x^2)[2]; // the 2nd biggest monomial
+  poly f = x3y2 + 2x2y2 + xy - x + y + 1;
+  f;
+  f + x5 + 2;  
+  f * x2;
   (x+y)/x;
+  f/3x2;
+  x5 > f;
+  x<=y;
+  x>y;  
+  ring r=0,(x,y),ds;
+  poly f = fetch(R,f);
+  f;
+  x5 > f;
+  f[2..4];
+  size(f);
+  f[size(f)+1]; f[-1];    // monoms out of range are 0
+  intvec v = 6,1,3;
+  f[v];          // the polynom built from the 1st, 3rd and 6th monom of f
 @c example
 @end example
 
@@ -2713,7 +2758,8 @@ the monomial at the indicated place w.r.t.@: the monomial order
 
 @table @code
 @item cleardenom
-quotient of a poly by its content (see @ref{cleardenom})
+cancels denominators of numbers in poly and divide by its content
+(see @ref{cleardenom})
 @item coef
 matrix of coefficients and monomials (see @ref{coef})
 @item coeffs

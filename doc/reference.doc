@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.87 1998-06-19 13:33:54 obachman Exp $
+@comment $Id: reference.doc,v 1.88 1998-06-19 14:12:12 gorzel Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -37,8 +37,8 @@ The general syntax of a function is
 @* If no target is specified, the result is printed.
 
 In some cases (e.g. @code{execute, export, keepring, kill, setring, type})
-the brackets are optional. In the syntax of the commands @code{help} and
-@code{LIB} no brackets are allowed.
+the brackets are optional. In the syntax of the commands @code{help}, @code{break},
+@code{quit}, @code{exit} and @code{LIB} no brackets are allowed.
 
 @ifinfo
 @*List of all supported functions.
@@ -819,8 +819,8 @@ conditions.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-The print command is applied to the expression.
-if @code{printlevel>voice}.
+The print command is applied to the expression,
+if @code{printlevel=>voice}.
 @item @strong{Example:}
 @example
 @c example
@@ -829,6 +829,9 @@ if @code{printlevel>voice}.
   dbprint(debug,i);
   debug=1;
   dbprint(debug,i);
+  voice;
+  printlevel;
+  dbprint(i);
 @c example
 @end example
 @end table
@@ -861,17 +864,25 @@ Local objects may be identified by @code{if (defined(..)==voice) ..}.
 @item @strong{Example:}
 @example
 @c example
-  ring r= 0,(x,y),dp;
+  ring r= (0,t),(x,y),dp;
   matrix m[5][6]= x,y,1,2,0,x+y;
   defined(mm);
   defined(r) and defined(m);
+  defined(x);
+  defined(z);
+  defined(t);
+  defined(42);
 @c example
 @end example
 @end table
-@c ref
+@menu
+* rvar::
+* voice::
+@end menu
+@iftex
 See
-@ref{voice}.
-@c ref
+@ref{rvar}; @ref{voice}.
+@end iftex
 @c ---------------------------------------
 @node deg, degree, defined, Functions
 @subsection deg
@@ -886,11 +897,12 @@ int
 @item @strong{Purpose:}
 returns the maximal (weighted) degree of
 the terms of a polynomial or a vector;
-@*deg(0) is -1
+@*deg(0) is -1.
 @item @strong{Example:}
 @example
 @c example
   ring r=0,(x,y,z),lp;
+  deg(0);
   deg(x3+y4+xyz3);
   ring rr=7,(x,y),wp(2,3);
   poly f=x2+y3;
@@ -904,12 +916,13 @@ the terms of a polynomial or a vector;
 @end example
 @end table
 @menu
+* jet::
 * ord::
 * poly::
 * vector::
 @end menu
 @iftex
-See @ref{ord}; @ref{poly}; @ref{vector}.
+See @ref{jet}; @ref{ord}; @ref{poly}; @ref{vector}.
 @end iftex
 @c ---------------------------------------
 @node degree, delete, deg, Functions
@@ -1208,7 +1221,9 @@ none
 @item @strong{Purpose:}
 evaluates (quoted) expressions. Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
-effect of exactly one quote). Used with @code{quote} and @code{write} to
+effect of exactly one quote). Used only when receiveing a quoted expression
+from a MPfile link.
+with @code{quote} and @code{write} to
 prevent local evaluations  when writing to an MPtcp link.
 @item @strong{Example:}
 @example
@@ -1230,11 +1245,12 @@ prevent local evaluations  when writing to an MPtcp link.
 @end example
 @end table
 @menu
+* MPfile links:
 * quote::
 * write::
 @end menu
 @iftex
-See @ref{MPtcp links}; @ref{quote}; @ref{write}.
+See @ref{MPfile links}; @ref{quote}; @ref{write}.
 @end iftex
 @c ---------------------------------------
 @node execute, exit, eval, Functions
@@ -2089,7 +2105,12 @@ ecart(gi) > ecart(gj)
 $ecart(g_i) > ecart(g_j)$
 @end tex
 @end itemize
+@tex
+Remark: $L(g)$ denotes the leading term of $g$ and $ecart(g)=deg(g)-deg(L(g))$.
+@end tex
+@ifinfo
 Remark: L(g) denotes the leading term of g and ecart(g)=deg(g)-deg(L(g)).
+@end ifinfo
 @item @strong{Example:}
 @example
 @c example
@@ -2126,7 +2147,7 @@ ideal resp. module
 @item @strong{Purpose:}
 ideal resp. module intersection.
 @item @strong{Note:}
-If the option @code{computeSB} is in effect the result is a standard basis.
+If the option @code{computeSB} is enabled the result is a standard basis.
 @item @strong{Example:}
 @example
 @c example
@@ -2214,7 +2235,7 @@ argument.
 @c example
   ring r=32003,(x,y,z),(c,dp);
   jet(1+x+x2+x3+x4,3);
-  poly f=1+x+y+z+x2+xy+xz+y2+x3+y3+z4;
+  poly f=1+x+y+z+x2+xy+xz+y2+x3+y3+x2y2+z4;
   jet(f,3);
   intvec iv=2,1,1;
   jet(f,3,iv);
@@ -2222,6 +2243,8 @@ argument.
   f-jet(f,3);
   // the homogeneous part of f of degree 2:
   jet(f,2)-jet(f,1);
+  // the part of maximal degree:
+  jet(f,deg(f))-jet(f,deg(f)-1);
   // the absolute term of f:
   jet(f,0);
   // now for other types:
@@ -2237,19 +2260,21 @@ argument.
 @end example
 @end table
 @menu
-* poly::
-* vector::
+* intvec::
 * ideal::
 * module::
-* int::
-* intvec::
+* poly::
+* vector::
 @end menu
 @iftex
-See @ref{poly}; @ref{vector};
+See 
+@ref{deg};
+@ref{int};
+@ref{intvec};
 @ref{ideal};
 @ref{module};
-@ref{int};
-@ref{intvec}.
+@ref{poly}; 
+ref{vector}.
 @end iftex
 @c ---------------------------------------
 @node kbase, kill, jet, Functions
@@ -2313,7 +2338,7 @@ deletes objects.
   poly p;
   listvar();
   kill i,r;
-  i;
+  i;          // the variable `i` is no longer existent
   listvar();
 @c example
 @end example
@@ -2520,7 +2545,7 @@ See
 none
 @item @strong{Purpose:}
 reads a library of procedures from a file. If the given filename does
-not start with @kbd{.} or @kbd{/}, the following directories are
+not start with  @kbd{~}, @kbd{.} or @kbd{/}, the following directories are
 searched for (in that order): the current directory, the directories given in
 the environment variable @code{SINGULARPATH}, some default directories
 relative to the location of the @sc{Singular} executable program, and
@@ -2528,6 +2553,7 @@ finally some default absolute directories. You can view the search path
 which @sc{Singular} uses to locate its libraries, by starting up
 @sc{Singular} with the option @code{-v}, or by issuing the command
 @code{system("with");"}.
+
 
 Only the names of the procedures in the library are loaded, the body of
 the procedures is read during the first call of this procedure. This minimizes
@@ -2744,7 +2770,7 @@ number of variables of the basering.
 
 Let @code{list l=lres(M,0);} then L[1] generates M,
 L[2] generates
-the first szyzgy
+the first syzygy
 module of L[1], etc.
 ( L[i]
 @ifinfo
@@ -2818,10 +2844,12 @@ returns statistics concerning the memory management:
 @c example
 @end example
 @end table
-@c @menu
-@c @end menu
-@c @iftex
-@c @end iftex
+@menu
+* option::
+@end menu
+@iftex
+See @ref{option}.
+@end iftex
 @c ---------------------------------------
 @node minbase, minor, memory, Functions
 @subsection minbase
@@ -2846,10 +2874,12 @@ either homogeneous or if the ordering is local.
 @c example
 @end example
 @end table
-@c @menu
-@c @end menu
-@c @iftex
-@c @end iftex
+@menu
+* minstd::
+@end menu
+@iftex
+See @ref{minstd}.
+@end iftex
 @c ---------------------------------------
 @node minor, minres, minbase, Functions
 @subsection minor
@@ -3202,8 +3232,9 @@ See @ref{typeof}; @ref{names}; @ref{reservedName}.
 @item @strong{Type:}
 list of strings
 @item @strong{Purpose:}
-returns the names of all user defined variables and procedures
-which are ring independent or, in the second case, belong to the given ring.
+returns the names of all user defined variables which are ring independent 
+(this includes the names of  procedures) or, in the second case, belong to 
+the given ring.
 @item @strong{Example:}
 @example
 @c example
@@ -3560,7 +3591,7 @@ warns about syntax errors during loading of libraries
 @item @code{loadProc}
 shows loading of procedures from libraries
 @item @code{mem}
-shows memory usage in square brackets
+shows memory usage in square brackets (see @ref{memory})
 @item @code{prompt}
 shows prompt (@code{>} resp. @code{.}) if ready for input (default)
 @item @code{reading}
@@ -3901,9 +3932,10 @@ returns the largest prime less then 32004 smaller or equal to the argument;
 @end table
 @menu
 * int::
+* general_lib::
 @end menu
 @iftex
-See @ref{int}.
+See @ref{int}; @ref{general_lib}.
 @end iftex
 @c ---------------------------------------
 @node print, prune, prime, Functions
@@ -4026,9 +4058,12 @@ See @ref{ideal}; @ref{intvec}; @ref{weight}.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-prevents expressions from evaluation. Within a quoted expression, the
+prevents expressions from evaluation. Used only in connections with write in 
+MPfile links, prevents evalution of an expression before sending to an other 
+@sc{Singular}process.
+Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
-effect of exactly one @code{quote}). Used with @code{write}.
+effect of exactly one @code{quote}).
 @item @strong{Example:}
 @example
 @c example
@@ -4047,11 +4082,12 @@ effect of exactly one @code{quote}). Used with @code{write}.
 @end example
 @end table
 @menu
-* write::
 * eval::
+* write::
+* MPfile links::
 @end menu
 @iftex
-See @ref{write}; @ref{eval}.
+See @ref{eval}; @ref{write}; @ref{MPfile links}.
 @end iftex
 @c ---------------------------------------
 @node quotient, random, quote, Functions
@@ -4125,20 +4161,29 @@ intmat
 @item @strong{Purpose:}
 returns a random intmat of size rows x cols with entries between
 -max_integer and +max_integer (inclusive).
+@item @strong{Note:} The random generator can be set to a startvalue with
+the function @code{system} by a commandline option.
 @item @strong{Example:}
 @example
 @c example
   random(1,1000);
   random(1,2,3);
+  system("random",210);     // start the random generator with 210
+  random(-1000,1000);
+  random(-1000,1000);
+  system("random",210);
+  random(-1000,1000);         // the same random values again
 @c example
 @end example
 @end table
 @menu
+* Command line options::
 * int::
 * intmat::
+* system::
 @end menu
 @iftex
-See @ref{int}; @ref{intmat}.
+See @ref{Command line options}; @ref{int}; @ref{intmat}; @ref{system}.
 @end iftex
 @c ---------------------------------------
 @node read, reduce, random, Functions
@@ -4155,7 +4200,8 @@ any
 @item @strong{Purpose:}
 reads data from a link.
 @*For ASCII links, the content of the entire
-file is returned as one string.
+file is returned as one string. If the ASCII link is the empty string, 
+@code{read} reads from standard input the keyboard. 
 @*For MP links, one expression is read
 from the link, and returned after an evaluation.
 As long as there is no data to read from an MPtcp
@@ -4374,10 +4420,11 @@ $=M_i$
 * module::
 * mres::
 * sres::
+* syz::
 @end menu
 @iftex
 See @ref{ideal}; @ref{lres}; @ref{module};
-@ref{mres};@ref{sres}.
+@ref{mres};@ref{sres}; @ref{syz}.
 @end iftex
 @c ---------------------------------------
 @node reservedName, resultant, res, Functions
@@ -4496,6 +4543,8 @@ changes the basering to another (already defined) ring.
   // the basering is r2
   setring r1;
   // the basering is again r1
+  nameof(basering);
+  listvar();
 @c @c example
 @end example
 @item @strong{Use in procedures:}
@@ -4503,13 +4552,15 @@ All changes of the basering by a definition
 of a new ring or a setring command in a procedure are local to this procedure.
 Use keepring to move a ring which is local to a procedure up by one nesting
 level.
+
 @end table
 @menu
 * ring::
+* qring::
 * keepring::
 @end menu
 @iftex
-See @ref{ring}; @ref{keepring}.
+See @ref{qring}; @ref{ring}; @ref{keepring}.
 @end iftex
 @c ---------------------------------------
 @node simplify, size, setring, Functions
@@ -4750,10 +4801,11 @@ $=M_i$
 * module::
 * mres::
 * res::
+* syz::
 @end menu
 @iftex
 See @ref{betti}; @ref{ideal}; @ref{int};
-@ref{lres}; @ref{minres}; @ref{module}; @ref{mres}; @ref{res}.
+@ref{lres}; @ref{minres}; @ref{module}; @ref{mres}; @ref{res}; @ref{syz}.
 @end iftex
 @c ---------------------------------------
 @node status, std, sres, Functions
@@ -4929,7 +4981,7 @@ monomial ordering of the basering
 First the hilbert series is computed (if not given).
 @*Use an optional
 second argument as Hilbert series
-(result of @code{hilb(i,1)}, see @ref{hilb}),
+(result of @code{hilb(i,1)}, see @ref{hilb}).
 @item @strong{Example:}
 @example
 @c example
@@ -4944,16 +4996,16 @@ second argument as Hilbert series
 @end table
 @menu
 * ideal::
+* hilb::
 * ring::
 * option::        Sets certain strategies.
-* hilb::
 * facstd::
 * mstd::
 * std::
 * stdfglm::
 @end menu
 @iftex
-See @ref{ideal}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
+See @ref{ideal}; @ref{hilb}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
 @ref{std}; @ref{stdfglm}.
 @end iftex
 @c ---------------------------------------
@@ -5098,10 +5150,16 @@ of the ideal resp. module.
 @end table
 @menu
 * ideal::
+* lres::
 * module::
+* mres::
+* nres::
+* res::
+* sres::
 @end menu
 @iftex
-See @ref{ideal}; @ref{module}.
+See @ref{ideal}; @ref{lres}; @ref{module}; @ref{mres}; @ref{nres}; 
+@ref{res}; @ref{sres}.
 @end iftex
 @c ---------------------------------------
 @node trace, transpose, syz, Functions
@@ -5125,12 +5183,12 @@ returns the trace of an intmat resp a matrix.
 @end example
 @end table
 @menu
-* matrix::
 * intmat::
+* matrix::
 @end menu
 @iftex
-See @ref{matrix};
-@ref{intmat}.
+See 
+@ref{intmat}; @ref{matrix}.
 @end iftex
 @c ---------------------------------------
 @node transpose, type, trace, Functions
@@ -5155,10 +5213,11 @@ transposes a matrix.
 @end example
 @end table
 @menu
+* intmat::
 * matrix::
 @end menu
 @iftex
-See @ref{matrix}.
+See @ref{intmat}; @ref{matrix}.
 @end iftex
 @c ---------------------------------------
 @node type, typeof, transpose, Functions
@@ -5631,6 +5690,8 @@ See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
 @*@code{export} list_of_names @code{;}
 @item @strong{Purpose:}
 converts a local variable of a procedure to a global one.
+@item @strong{Note:} Objects defined in a ring are not automatically exported
+when exporting the ring, (use @code{keepring} instead).
 @item @strong{Example:}
 @example
 proc p1
@@ -5650,15 +5711,18 @@ listvar();
 @expansion{} // i                    [0]  int 0
 @end example
 @end table
+@c ref
+See @ref{keepring}.
+@ ref
 @c ---------------------------------------
 @node for, if, export, Control structures
 @subsection for
 @cindex for
 @table @code
 @item @strong{Syntax:}
-@code{for (} init_command@code{;}
+@code{for (} init_commands@code{;}
 boolean_expression@code{;}
-iterate_command@code{)} block
+iterate_commands@code{)} block
 @item @strong{Purpose:}
 repetitive, conditional execution of a command block.
 @*The command init_command is executed first. Then boolean_expression is
@@ -5903,7 +5967,6 @@ See @ref{Break points}.
 @c @end example
 @c @end table
 @c @menu
-@c @strong{See:}
 @c * int expressions::
 @c * ring::
 @c @end menu
@@ -5936,12 +5999,12 @@ degBound = 0; //resets degree bound to infinity
 @end example
 @end table
 @menu
-@strong{See:}
+* deg::
 * int::
 * option::
 @end menu
 @iftex
-See @ref{int}; @ref{option}.
+See @ref{deg}; @ref{int}; @ref{option}.
 @end iftex
 @c -----------------------------------------------------
 @node echo, minpoly, degBound, System variables
@@ -5963,7 +6026,6 @@ int i = echo;
 @end example
 @end table
 @menu
-@strong{See:}
 * int::
 * voice::
 @end menu
@@ -6003,7 +6065,7 @@ function @code{factorize} @ref{factorize}.
 @end example
 @end table
 @menu
-@strong{See:}
+* factorize::
 * ring::
 @end menu
 @iftex
@@ -6025,20 +6087,20 @@ and its multiplicity (@code{mult}) is lower than @code{multBound}.
 @example
 multBound = 20;
 option();
-@expansion{} //options for 'std'-command: multBound
+@expansion{}    //options for 'std'-command: multBound
 ideal j=std(i);
 multBound;
 @expansion{} 20
-multBound = 0;//disbales multBound
+multBound = 0;  //disables multBound
 @end example
 @end table
 @menu
-@strong{See:}
 * int::
+* mult::
 * option::
 @end menu
 @iftex
-See @ref{int}; @ref{option}.
+See @ref{int}; @ref{mult}; @ref{option}.
 @end iftex
 @c -----------------------------------------------------
 @node noether, printlevel, multBound, System variables
@@ -6066,7 +6128,6 @@ the monomial @code{noether} during the computation.
 @end example
 @end table
 @menu
-@strong{See:}
 * poly::
 * degBound::
 * std::
@@ -6088,6 +6149,7 @@ If @code{printlevel} >= @code{voice} @code{dbprint} is equivalent to
 @item @strong{Example:}
 @example
 @c example
+  voice;
   printlevel=0;
   dbprint(1);
   printlevel=voice;
@@ -6096,7 +6158,6 @@ If @code{printlevel} >= @code{voice} @code{dbprint} is equivalent to
 @end example
 @end table
 @menu
-@strong{See:}
 * int::
 * dbprint::
 * voice::
@@ -6117,8 +6178,8 @@ if @code{short} is nonzero. A C-like notion is used, if short is zero.
 Both notations may be used as input.
 @*The default depends on the names of the ring variables
 (0 if there are names of variables longer than 1 character, 1 otherwise). Every
-change of the basering sets @code{short} and overwrites
-the previous setting.
+change of the basering sets @code{short} to the proper default value for that ring 
+and overwrites the previous setting.
 @item @strong{Example:}
 @example
 @c example
@@ -6174,9 +6235,13 @@ commands, see example below.
 @c example
 @end example
 @end table
-@c ref
+@menu
+* Command line options::
+* system::
+* rtimer::
+@iftex
 See @ref{Command line options}; @ref{system}; @ref{rtimer}.
-@c ref
+@end iftex
 @c ---------------------------------------
 @node TRACE var, rtimer, timer, System variables
 @subsection TRACE
@@ -6224,6 +6289,11 @@ int
 @item @strong{Purpose:}
 identical to @code{timer}, except that real times (i.e., wall-clock)
 times are reported, instead of CPU times.
+@item @strong{Example:}
+@example
+@c example
+@c example
+@end example
 @end table
 @menu
 * timer::
@@ -6242,7 +6312,7 @@ See @ref{timer}; @ref{Command line options}; @ref{system}.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-nesting level of procedures.
+shows the nesting level of procedures.
 @item @strong{Example:}
 @example
 @c example
@@ -6257,10 +6327,10 @@ proc p
 @end table
 @menu
 * dbprint::
-* int::
+* listvar::
 * printlevel::
 @end menu
 @iftex
-See @ref{dbprint}; @ref{int}; @ref{printlevel}.
+See @ref{dbprint}; @ref{listvar}; @ref{printlevel}.
 @end iftex
 @c ---------------------------------------

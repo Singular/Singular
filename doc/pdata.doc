@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.6 1998-05-20 09:06:47 anne Exp $
+@comment $Id: pdata.doc,v 1.7 1998-06-19 14:12:08 gorzel Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -31,7 +31,7 @@
 @cindex Representation of mathematical objects
 
 @sc{Singular} distinguishes between objects which do not belong to a ring
-and those which do belong to a specific ring (see @ref{Rings and orderings}).
+and those which belong to a specific ring (see @ref{Rings and orderings}).
 We comment only on the latter ones.
 
 Internally all ring-dependent objects are polynomials or structures built from
