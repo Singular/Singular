@@ -1,3 +1,9 @@
+Tue Jan 13 14:56:42 1998  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* configure.in (factory_configuration): changed order of library
+	  checks (-lm before -lgmp); check for atof in -lm check, to work
+	  around a bug on some linux machines
+
 Wed Dec 17 09:56:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* canonicalform.cc (operator ==, operator !=): rewritten and
