@@ -1,3 +1,7 @@
+Fri Apr 24 18:25:23 MET DST 1998 hannes
+  * fixed bug in maps.cc: size of monom is not pMonomSize but mmGetSpecSize()
+  * changed header in tesths.cc
+  * changed handling of ring changes (polys*.cc ring.cc)
 Thu Apr 23 20:53:06 MET DST 1998 hannes
   * removed END_GRAMMAR ("RETURN") from iparith.cc, grammar.y
 Thu Apr 23 20:16:24 MET DST 1998 hannes

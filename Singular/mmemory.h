@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.5 1998-01-16 12:40:02 obachman Exp $ */
+/* $Id: mmemory.h,v 1.6 1998-04-24 16:39:22 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -49,6 +49,9 @@ int mmMemUsed( void );
 /* char * mstrdup(char *s); */
 
 size_t mmSizeL( void* );
+#define mmGetSpecSize() mm_specSize
+
+extern size_t mm_specSize;
 
 #ifdef MM_STAT
 void mmStat(int slot);

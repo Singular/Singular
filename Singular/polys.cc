@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.23 1998-04-23 18:17:39 Singular Exp $ */
+/* $Id: polys.cc,v 1.24 1998-04-24 16:39:24 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1372,48 +1372,44 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
 void pSetGlobals(ring r, BOOLEAN complete)
 {
   int i;
-  pVariables = r->N;
-  if (complete)
-  {
-    pComponentOrder=1;
-    if (ppNoether!=NULL) pDelete(&ppNoether);
+  pComponentOrder=1;
+  if (ppNoether!=NULL) pDelete(&ppNoether);
 #ifdef SRING
-    pSRING=FALSE;
-    pAltVars=r->N+1;
+  pSRING=FALSE;
+  pAltVars=r->N+1;
 #endif
+  pVariables = r->N;
 
-    // set the various size parameters and initialize memory
-    if ((((pVariables+1)*sizeof(Exponent_t)) % sizeof(void*)) == 0)
-      pVariables1W = (pVariables+1)*sizeof(Exponent_t) / sizeof(void*);
-    else
-      pVariables1W = ((pVariables+1)*sizeof(Exponent_t) / sizeof(void*)) + 1;
+  // set the various size parameters and initialize memory
+  if ((((pVariables+1)*sizeof(Exponent_t)) % sizeof(void*)) == 0)
+    pVariables1W = (pVariables+1)*sizeof(Exponent_t) / sizeof(void*);
+  else
+    pVariables1W = ((pVariables+1)*sizeof(Exponent_t) / sizeof(void*)) + 1;
 
-    if ((((pVariables)*sizeof(Exponent_t)) % sizeof(void*)) == 0)
-      pVariablesW = (pVariables)*sizeof(Exponent_t) / sizeof(void*);
-    else
-      pVariablesW = ((pVariables)*sizeof(Exponent_t) / sizeof(void*)) + 1;
-  }
+  if ((((pVariables)*sizeof(Exponent_t)) % sizeof(void*)) == 0)
+    pVariablesW = (pVariables)*sizeof(Exponent_t) / sizeof(void*);
+  else
+    pVariablesW = ((pVariables)*sizeof(Exponent_t) / sizeof(void*)) + 1;
 
   pMonomSize = POLYSIZE + (pVariables + 1) * sizeof(Exponent_t);
+  if ((pMonomSize % sizeof(void*)) == 0)
+  {
+    pMonomSizeW = pMonomSize/sizeof(void*);
+  }
+  else
+  {
+    pMonomSizeW = pMonomSize/sizeof(void*) + 1;
+    pMonomSize = pMonomSizeW*sizeof(void*);
+  }
 
   // Initialize memory management
   mmSpecializeBlock(pMonomSize);
 
   if (complete)
   {
-    if ((pMonomSize % sizeof(void*)) == 0)
-    {
-      pMonomSizeW = pMonomSize/sizeof(void*);
-    }
-    else
-    {
-      pMonomSizeW = pMonomSize/sizeof(void*) + 1;
-      pMonomSize = pMonomSizeW*sizeof(void*);
-    }
-
     // Set default Var Indicies
     pSetVarIndicies(pVariables);
-
+  
     pOrdSgn = r->OrdSgn;
     pVectorOut=(r->order[0]==ringorder_c);
     order=r->order;
@@ -1476,7 +1472,7 @@ void pSetGlobals(ring r, BOOLEAN complete)
         SetpSetm(order[i],i);
       }
       while (i != 0);
-
+  
       pComp0 = BlockComp;
       if ((order[0]!=ringorder_c)&&(order[0]!=ringorder_C))
       {
@@ -1486,8 +1482,7 @@ void pSetGlobals(ring r, BOOLEAN complete)
       {
         pLDeg = ldeg1;
       }
-      // may be improved: pTotaldegree for lp/dp/ls/.. blocks
-      pFDeg = pWTotaldegree;
+      pFDeg = pWTotaldegree; // may be improved: pTotaldegree for lp/dp/ls/.. blocks
     }
     if ((pLexOrder) || (pOrdSgn==-1))
     {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.8 1998-04-08 16:04:28 Singular Exp $ */
+/* $Id: maps.cc,v 1.9 1998-04-24 16:39:21 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -210,7 +210,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 
   // change to new ring
   rChangeCurrRing(&tmpR, FALSE);
-  sizeofpoly = pMonomSize; /*POLYSIZE+sizeof(monomial);*/
+  sizeofpoly = mmGetSpecSize();
   if (id==NULL)
     j = 0;
   else

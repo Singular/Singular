@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.34 1998-04-17 09:39:00 obachman Exp $ */
+/* $Id: tesths.cc,v 1.35 1998-04-24 16:39:26 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -468,15 +468,20 @@ int main(          /* main entry to Singular */
   {
     printf(
 "              Welcome to SINGULAR                  /\n"
-"           A Computer Algebra System             o<\n"
-" for Commutative Algebra and Algebraic Geometry    \\\n\n"
+"           A Computer Algebra System             o<     %s\n"
+" for Commutative Algebra and Algebraic Geometry    \\    %s\n\n"
 "by: G.-M. Greuel, G. Pfister, H. Schoenemann\n"
 "Fachbereich Mathematik der Universitaet, D-67653 Kaiserslautern\n"
+#if 0
 "contributions: O.Bachmann,W.Decker,H.Grassmann,B.Martin,M.Messollen,W.Neumann,\n"
 "\tW.Pohl,T.Siebert,R.Stobbe,T.Wichmann\n"
-"e-mail: singular@mathematik.uni-kl.de\n");
+"e-mail: singular@mathematik.uni-kl.de\n", S_VERSION1,S_VERSION2);
+#endif    
+, S_VERSION1,S_VERSION2);
+#if 0
     printf("%s  %s  (%d)",S_VERSION1,S_VERSION2, SINGULAR_VERSION_ID);
-    printf("\n\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
+#endif    
+    printf("\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
            "\"\n(e.g., help; help command; help General syntax; help ring; quit;)\n\n");
   }
   else

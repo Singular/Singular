@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.22 1998-04-23 18:17:37 Singular Exp $ */
+/* $Id: ring.cc,v 1.23 1998-04-24 16:39:26 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -48,14 +48,15 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
 {
   /*------------ set global ring vars --------------------------------*/
   currRing = r;
+  currQuotient=NULL;
   if (r != NULL)
   {
-    /*------------ set global ring vars --------------------------------*/
-    currQuotient=r->qideal;
 
-    /*------------ set redTail, except reset by nSetChar or pChangeRing */
     if (complete) 
     {
+      /*------------ set global ring vars --------------------------------*/
+      currQuotient=r->qideal;
+      /*------------ set redTail, except reset by nSetChar or pChangeRing */
       test |= Sy_bit(OPT_REDTAIL);
     }
 
@@ -100,10 +101,6 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
     /*------------ set spolys ------------------------------------------*/
       spSet(r);
     }
-  }
-  else
-  {
-    currQuotient=NULL;
   }
 }
 
