@@ -1,13 +1,13 @@
 
 
-       --- This INSTALL file corresponds to Factory version 1.2c ---
+       --- This INSTALL file corresponds to Factory version 1.3a ---
 
 
 			 INSTALL file for Factory
 			 ========================
 
-!! IMPORTANT: copyright notice still missing
-
+NOTE: The copyright state of Factory is still unclear.  Sooner or later it
+will be free software, but by now please do *not* distribute the sources.
 
 Overview				Installation for the impatient
 ========				==============================
@@ -52,8 +52,8 @@ Or on systems that have the env program, you can do it like this:
 
   env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
 
-In contrast to the GNU-world, Factory is translated by default with
-'CFLAGS=-O2 -fomit-frame-pointer' 'CXXFLAGS=-O2 -fomit-frame-pointer'.  If
+  In contrast to the GNU-world, Factory is translated with 'CFLAGS=-O2
+-fomit-frame-pointer' 'CXXFLAGS=-O2 -fomit-frame-pointer' by default.  If
 you do not like this, configure with
 
   CFLAGS='-g -O' CXXFLAGS='-g -O' ./configure
@@ -72,7 +72,7 @@ prefix other than /usr/local by giving configure the option
   You can specify seperate installation prefixes for architecture-specific
 files and architecture-independent files.  If you give configure the option
 '--exec-prefix=<path>' the package will use <path> as the prefix for
-installing the libraries.  The other data files willl still use the regular
+installing the libraries.  The other data files will still use the regular
 prefix.
 
 Configuring and building Factory for different configurations
@@ -96,13 +96,13 @@ additional options.  Here is a list of them which you can get entering
   --enable-gmp            together with --with-Singular means: installation
                           in process, be graceful when there is no gmp.h
 
-  For more deatiled information, see the README file.  Note that not all
-possible combinations of the with's and enable's are meaningfull.  The
+  For more detailed information, see the README file.  Note that not all
+possible combinations of the with's and enable's are meaningful.  The
 dependencies between them are described in the README file, too.
 
   You can compile the package for more than one configuration at the same
-time.  I recommend to build an optimized and a debug version.  The dbug
-version is much slower but includes many assertiions that will show you a
+time.  I recommend to build an optimized and a debug version.  The debug
+version is much slower but includes many assertions that will show you a
 probable misuse or malfunction of the library.  Here is the sequence of
 commands necessary to do that:
 
@@ -122,17 +122,17 @@ commands necessary to do that:
   cd OPTDIR
   ../configure --srcdir=.. --prefix=/usr/local/factory.opt
   make install
-  # better set a symbolic link from on $(gftabledir) to the other.  There
-  # are not any configuration dependent differences
+  # Better set a symbolic link from one $(gftabledir) to the other.  There
+  # are not any configuration dependent differences.
   make installgftables
   
 
 Configuring for Macintosh or other non-Unix platforms
 -----------------------------------------------------
-  Factory translates now on Macintosh with the Metroworks CodeWarrior
-compile.  If you want to build Factory on this or other non-Unix platforms
-you either have to configure config.g and GNUmakefile by hand or you have
-to create a suitable config.cache file and run configure on a machine that
+  Factory translates on Macintosh with the Metroworks CodeWarrior compile
+now.  If you want to build Factory on this or other non-Unix platforms you
+either have to configure config.h and GNUmakefile by hand or you have to
+create a suitable config.cache file and run configure on a machine that
 supports it.
 
 
@@ -142,14 +142,15 @@ supports it.
 
 'make all'
 ----------
-  Build Factory.  According to configuration, 'make all' builds only Factory
-('make cf') or Factory and the memory manager ('make cf; make mem').
+  Builds Factory.  According to configuration, 'make all' builds only
+Factory ('make cf') or Factory and the Factory memory manager ('make cf;
+make mem').
 
 'make clean', 'make mostlyclean', 'make distclean'
 --------------------------------------------------
-  Delete all files from the current directory that have been created by
+  Deletes all files from the current directory that have been created by
 building Factory.  In addition, 'make mostlyclean' deletes the GF(q) tables
-if they have been created by 'make gftables'.  'make distclean' id like
+if they have been created by 'make gftables'.  'make distclean' is like
 'make mostlyclean', but also deletes all files from the current directoy
 that have been created by configuring.  If you have unpacked the source and
 built the program without creating any other files, 'make distclean' leaves
@@ -157,29 +158,28 @@ only the files that were in the distribution.
 
 'make TAGS'
 -----------
-  Update a tags table for Factory.
+  Updates a tags table for Factory.
 
 'make depend'
 -------------
-  Create dependencies.  Once created, they will be automatically updated as
+  Creates dependencies.  Once created, they will be automatically updated as
 source files change.  Intended to be used by developers.
 
 'make ftmpl_inst.o'
 -------------------
-  Create the Factory template instantiation.  Necessary when you link
-Factory with your application.  For more information, see the README file.
+  Creates the Factory template instantiation.  Necessary when you link
+Factory with your application.
 
 
 3. Creating GF(q) tables
 ========================
 
 NOTE: Since the format of the GF(q) tables changed from Factory Version
-1.2b to Factory Version 1.3a you should get/recreate them by new!
+1.2b to Factory Version 1.3a you should get/create them by new!
 
 There are two possibilities to get the tables:
 a) Get them from the net where you got Factory from.  Unpack the archive
-   factory-gftables.tgz in the directory in which you are going to build
-   Factory.
+   factory-gftables.tgz in the source directory (factory-<version>.tgz).
 b) Create them using Factory itself.  Since this process does not require
    arithmetics in GF(q) there are not any bootstrapping problems.  There
    are two targets which accomplish this, the second depending from the
@@ -187,11 +187,11 @@ b) Create them using Factory itself.  Since this process does not require
 
    'make gengftables'
    ------------------
-     Create the executable necessary to build the tables.
+     Creates the executable necessary to build the tables.
 
    'make gftables'
    ---------------
-     Create a directory gftables/ and execute gengftables.  This is a
+     Creates a directory gftables/ and execute gengftables.  This is a
    rather time consuming process, so you maybe want to start it in the
    background or as 'nohup' ('nohup make gftables &').
 
@@ -202,7 +202,7 @@ b) Create them using Factory itself.  Since this process does not require
 
 'make install'
 --------------
-  Build Factory and install it.  This target also creates the directories
+  Builds Factory and install it.  This target also creates the directories
 in which Factory will be installed, if they do not already exist.
 The files are installed in the following directories:
 
@@ -228,17 +228,16 @@ gftables/*	$(gftabledir)	= /usr/local/share/factory/gftables
 
 'make uninstall'
 ----------------
-  Delete all the installed files that the install target created.  Also
-attempt to delete the directories crestes by installation process.
+  Deletes all the installed files that the install target created.  Also
+attempt to delete the directories created by installation process.
 
 
 5. Installing GF(q) tables
 ==========================
 'make installgftables'
 ----------------------
-  Create the GF(q) tables if they are not present and install them
-in $(gftabledir).
+  Installs the GF(q) tables in $(gftabledir).
 
 'make unistallgftables'
 -----------------------
-  Uninstall the GF(q) tables.
+  Uninstalls the GF(q) tables.
