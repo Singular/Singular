@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: jordan.lib,v 1.19 2000-12-22 14:09:44 greuel Exp $";
+version="$Id: jordan.lib,v 1.20 2001-01-02 14:33:25 greuel Exp $";
 category="Linear Algebra";
 info="
 LIBRARY: jordan.lib  Jordan Normal Form of a Matrix with rational Eigenvalues
@@ -58,17 +58,19 @@ static proc getblock(matrix M,intvec v)
 proc jordan(matrix M,list #)
 "USAGE:   jordan(M[,opt]); M constant square matrix, opt integer
 ASSUME:  The eigenvalues of M are in the coefficient field.
-RETURN:  The procedure returns a list jd with 3 entries of type
-         ideal, list of intvecs, matrix with
-         jd[1] eigenvalues of M,
-         jd[2][i][j] size of j-th Jordan block with eigenvalue jd[1][i], and
-         jd[3]^(-1)*M*jd[3] in Jordan normal form.
+RETURN:  The procedure returns a list jd with 3 entries:
+@format       
+         - jd[1] ideal, eigenvalues of M,
+         - jd[2] list of intvecs, jd[2][i][j] size of j-th Jordan block with 
+           eigenvalue jd[1][i], and
+         - jd[3] a matrix, jd[3]^(-1)*M*jd[3] in Jordan normal form.
          Depending on opt, only certain entries of jd are computed.
-         If opt=-1, jd[1] is computed,
-         if opt= 0, jd[1] and jd[2] are computed,
-         if opt= 1, jd[1], jd[2], and jd[3] are computed, and,
-         if opt= 2, jd[1] and jd[3] are computed.
+           If opt=-1, jd[1] is computed,
+           if opt= 0, jd[1] and jd[2] are computed,
+           if opt= 1, jd[1], jd[2], and jd[3] are computed, and,
+           if opt= 2, jd[1] and jd[3] are computed.
          By default, opt=0.
+@end format
 NOTE:    A non constant polynomial matrix M is replaced by its constant part.
 DISPLAY: The procedure displays comments if printlevel>=1.
 EXAMPLE: example jordan; shows an example.
@@ -399,8 +401,9 @@ example
 
 proc jordanmatrix(list jd)
 "USAGE:   jordanmatrix(jd); jd list of ideal and list of intvecs
-RETURN:  The procedure returns the Jordan matrix J with eigenvalues jd[1] and
-         size jd[2][i][j] of j-th Jordan block with eigenvalue jd[1][i].
+RETURN:  The procedure returns the Jordan matrix J, satisfying:
+@*       - eigenvalues of J are given by jd[1]
+@*       - j-th Jordan block of J with eigenvalue jd[1][i] has size jd[2][i][j]
 DISPLAY: The procedure displays comments if printlevel>=1.
 EXAMPLE: example jordanmatrix; shows an example.
 "
@@ -491,7 +494,7 @@ example
 proc jordanform(matrix M)
 "USAGE:   jordanform(M); M constant square matrix
 ASSUME:  The eigenvalues of M are in the coefficient field.
-RETURN:  The procedure returns the Jordan normal form of M.
+RETURN:  matrix, the Jordan normal form of M.
 NOTE:    A non constant polynomial matrix M is replaced by its constant part.
 DISPLAY: The procedure displays more comments for higher printlevel.
 EXAMPLE: example jordanform; shows an example.
@@ -522,8 +525,8 @@ EXAMPLE: example invmat; shows an example.
   }
   else
   {
-    print("//no square matrix");
-    matrix[1][0]=invM;
+    ERROR("// ** no square matrix");
+    //matrix invM[1][0];
   }
   return(invM);
 }
