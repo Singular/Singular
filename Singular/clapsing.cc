@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.35 1998-04-27 14:47:02 Singular Exp $
+// $Id: clapsing.cc,v 1.36 1998-07-07 16:09:31 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -284,6 +284,7 @@ lists singclap_extgcd ( poly f, poly g )
       return NULL;
     }
     CanonicalForm Fa,Gb;
+    On(SW_RATIONAL);
     res=convClapPSingP( extgcd( F, G, Fa, Gb ) );
     pa=convClapPSingP(Fa);
     pb=convClapPSingP(Gb);
