@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.3 2004-04-29 15:04:22 Singular Exp $ */
+/* $Id: longalg.cc,v 1.4 2004-05-14 16:45:33 levandov Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2710,7 +2710,9 @@ nMapFunc naSetMap(ring src, ring dst)
       napMapRing=src;
 #endif /* LONGALGNEW */
       nacMap=nacCopy;
-      return naMapQaQb;   /* Q(a) -> Q(a) */
+      if ((naParsToCopy==rPar(dst))&&(naParsToCopy==rPar(src)))
+        return naCopy;    /* Q(a) -> Q(a) */
+      return naMapQaQb;   /* Q(a..) -> Q(a..) */
     }
   }
   /*-----------------------------------------------------*/
@@ -2756,6 +2758,9 @@ nMapFunc naSetMap(ring src, ring dst)
 #ifdef LONGALGNEW
       napMapRing=src;
 #endif /* LONGALGNEW */
+      if ((naParsToCopy==rPar(dst))&&(naParsToCopy==rPar(src))
+      && (nacMap==nacCopy))
+        return naCopy;    /* Z/p(a) -> Z/p(a) */
       return naMapQaQb;   /* Z/p(a),Z/p'(a) -> Z/p(b)*/
     }
   }
