@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.47 2001-01-07 15:20:08 greuel Exp $";
+version  = "$Id: classify.lib,v 1.48 2001-02-06 11:26:15 anne Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -56,14 +56,13 @@ proc classify_init
 proc classify (poly f_in)
 "USAGE:    classify(f);  f=poly
 COMPUTE:  normal form and singularity type of f with respect to right
-          equivalence, as given in the book \"Singularities of
-          differentiables maps, Volume I\" by V.I. Arnold, S.M. Gusein-Zade,
-          A.N. Varchenko
+          equivalence, as given in the book \"Singularities of differentiable 
+          maps, Volume I\" by V.I. Arnold, S.M. Gusein-Zade, A.N. Varchenko
 RETURN:   normal form of f, of type poly
-REMARK:   This version of classify is only alpha. Please send bugs and
-          comments to: \"Kai Krueger\" <krueger@mathematik.uni-kl.de>
-          Be sure to have at least Singular version 0.9.3, better 1.0.1
-          Updates can be found under:
+REMARK:   This version of classify is only beta. Please send bugs and
+          comments to: \"Kai Krueger\" <krueger@mathematik.uni-kl.de> @*
+          Be sure to have at least Singular version 1.0.1. Updates can be 
+          found at: @*
           URL=http://www.mathematik.uni-kl.de/~krueger/Singular/
 NOTE:     type init_debug(n); (0 <= n <= 10) in order to get intermediate
           information, higher values of n give more information.
@@ -1582,13 +1581,13 @@ static proc Morse(poly f, int K, int corank, int ShowPhi)
 
   def ring_top=basering;
 
-  debug_log(3, "Spalte folgendes Polynom mit Bestimmtheit: ", string(K));
+  debug_log(3, "Split the polynomial below using determinacy: ", string(K));
   debug_log(3, Show(fi));
 
   for( j=1; j<=n ; j++) { Abb[j] = 0; }
 
   RFlg = GetRf(fi, n);
-  debug_log(2, "Reihenfolge fuer Vertauschungen:", RFlg );
+  debug_log(2, "Permutations:", RFlg );
   PhiG=ring_top,maxideal(1);
 
 //----------------- find quadratic term, if there is only one -----------------
@@ -1721,7 +1720,7 @@ static proc Morse(poly f, int K, int corank, int ShowPhi)
   fi   = Phi(fi);
   v    = fi, PhiG;
   debug_log(2, "rank determined with Morse rg=", Rang);
-  debug_log(1, "Rest singularity f=",Show(fi));
+  debug_log(1, "Residual singularity f=",Show(fi));
   return(v);
 }
 
@@ -1778,7 +1777,7 @@ proc quickclass(poly f)
 USAGE:    quickclass(f);         f=poly
 RETURN:   Normal form of f in Arnold's list
 REMARK:   try to determine the normal form of f by invariants, mainly by
-          computing the Hilbert function of the Milnor albegra,
+          computing the Hilbert function of the Milnor algebra,
           no coordinate change is needed (see also proc 'milnorcode').
 EXAMPLE:  example quickclass; shows an example"
 {
@@ -2262,11 +2261,11 @@ proc singularity(string typ, list #)
 "USAGE:    singularity(t, l); t=string (name of singularity),
           l=list of integers/polynomials (indices/parmeters of singularity)
 COMPUTE:  get the singularity named by type t from the database.
-          list l is as follows:
-          l= k [,r [,s [,a [,b [,c [,d]..]: k,r,s=int   a,b,c,d=poly.
+          list l is as follows: @*
+          l= k [,r [,s [,a [,b [,c [,d]..]: k,r,s=int   a,b,c,d=poly. @*
           The name of the dbm-databasefile is: NFlist.[dir,pag].
           The file is found in the current directory. If it does not
-          exists, please run the script MakeDBM first.
+          exist, please run the script MakeDBM first.
 RETURN:   Normal form and corank of the singularity named by type t and its
           index (indices) l.
 EXAMPLE:  example singularity; shows an example"
@@ -2626,7 +2625,7 @@ static proc GetRf (poly fi, int n)
     RFlg[j]        = l1;
     Haeufigkeit[l1] = 0;
   }
-  debug_log(2, "Reihenfolge fuer Vertauschungen:", RFlg);
+  debug_log(2, "Permutations:", RFlg);
   return(RFlg);
 }
 
