@@ -1,13 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.12 1998-01-12 19:00:02 obachman Exp $ */
+/* $Id: syz0.cc,v 1.13 1998-01-17 18:08:01 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
 
 
 #include "mod2.h"
+#include "tok.h"
 #include "mmemory.h"
 #include "polys.h"
 #include "febase.h"
@@ -20,7 +21,6 @@
 #include "ipid.h"
 #include "intvec.h"
 #include "ipshell.h"
-#include "tok.h"
 #include "numbers.h"
 #include "ideals.h"
 #include "intvec.h"

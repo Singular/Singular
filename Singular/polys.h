@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.8 1998-01-12 18:59:56 obachman Exp $ */
+/* $Id: polys.h,v 1.9 1998-01-17 18:08:00 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -187,6 +187,8 @@ extern  poly pHeadProc(poly p);
 
 // Is equivalent to pCopy2(p1, p2);pMonAddFast(p1, p3);
 #define pCopyAddFast(p1, p2, p3)    _pCopyAddFast(p1, p2, p3)
+#define pbCopyAddFast(p1, p2, p3)   _pbCopyAddFast(p1, p2, p3)
+#define pbCopyAddFast0(p1, p2, p3)  _pbCopyAddFast0(p1, p2, p3)
 // Similar to pCopyAddFast, except that components of p2, and p3 must be 0
 #define pCopyAddFast1(p1, p2, p3)    _pCopyAddFast1(p1, p2, p3)
 

@@ -1,12 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.13 1998-01-05 16:39:21 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.14 1998-01-17 18:07:57 Singular Exp $ */
 /*
 * ABSTRACT:
 */
 
 #include "mod2.h"
+#include "tok.h"
 #include "mmemory.h"
 #include "polys.h"
 #include "febase.h"
@@ -23,7 +24,6 @@
 #include "ipshell.h"
 #include "ipid.h"
 #include "timer.h"
-#include "tok.h"
 #include "lists.h"
 #ifdef STDTRACE
 #include "comm.h"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.7 1998-01-16 08:24:03 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.8 1998-01-17 18:07:58 Singular Exp $ */
 
 /***************************************************************
  *
@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "mod2.h"
+#include "tok.h"
 #include "structs.h"
 #include "mmemory.h"
 #include "febase.h"
@@ -598,6 +599,31 @@ void pDBMonAddFast(poly p1, poly p2, char* f, int l)
   pFree1(ptemp);
 }
 
+#ifdef TEST_MAC_ORDER
+// checks whether fast monom add did not overflow
+void pbDBMonAddFast0(poly p1, poly p2, char* f, int l)
+{
+  poly ptemp = pNew();
+  pCopy2(ptemp, p1);
+  
+  _pbMonAddFast0(p1, p2);
+
+  for (int i=1; i<=pVariables; i++)
+  {
+    pAddExp(ptemp, i, pGetExp(p2, i));
+  }
+  if (bNoAdd) bSetm(ptemp);else
+  pGetOrder(ptemp) += pGetOrder(p2);
+
+  if (! pEqual(ptemp, p1))
+  {
+    Print("Error in pbMonAddFast in %s:%d\n", f, l);
+  }
+  
+  pFree1(ptemp);
+}
+
+#endif
 void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
 {
   if (p2 == p1 || p3 == p1)
@@ -744,8 +770,9 @@ BOOLEAN pDBTest(poly p, char *f, int l)
     pIter(p);
     if (pComp(old,p)!=1)
     {
-      Print("wrong order in %s:%d\n",f,l);
-      pComp(old, p);
+      PrintS("wrong order (");
+      wrp(old);
+      Print(") in %s:%d\n",f,l);
       return FALSE;
     }
   }

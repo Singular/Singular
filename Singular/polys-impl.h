@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.13 1998-01-17 17:49:25 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.14 1998-01-17 18:07:59 Singular Exp $ */
 
 /***************************************************************
  *
@@ -15,6 +15,7 @@
  * encapsulations in polys.h should be used, instead.
  *
  ***************************************************************/
+#include "tok.h"
 #include "structs.h"
 #include "mmemory.h"
 #include "binom.h"
@@ -504,6 +505,7 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   p1->coef = p2->coef;
 //  memset(p1, 0, pMonomSize);
 
+  //memset(p1,0,pMonomSize);
 #ifndef COMP_NO_EXP_VECTOR_OPS
   unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
   const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
@@ -834,7 +836,7 @@ DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
 
 /***************************************************************
  *
- * Routines which implement low-level manipulations/operations on exponets
+ * Routines which implement low-level manipulations/operations on exponents
  *
  ***************************************************************/
 
@@ -868,6 +870,234 @@ DECLARE(int, __pExpQuerSum2(poly p, int from, int to))
 #define _pExpQuerSum(p)             __pExpQuerSum2(p, 1, pVariables)
 #define _pExpQuerSum1(p, to)        __pExpQuerSum2(p, 1, to)
 #define _pExpQuerSum2(p, from, to)  __pExpQuerSum2(p, from, to)
+
+#endif
+
+/***************************************************************
+ *
+ * Routines which implement macaulay ordering routines
+ *
+ ***************************************************************/
+#ifdef TEST_MAC_ORDER
+
+DECLARE(void, _bSetm0(poly p))
+{
+
+  int i=1;
+  int ord = -INT_MAX;
+  Exponent_t *ep;
+
+  if(_pHasReverseExp)
+  {
+    ep=&(p->exp[pVarHighIndex]);
+    int *ip=bBinomials+(*ep); /*_pGetExp(p,1);*/
+    loop
+    {
+      ord += (*ip);
+      if (i==pVariables) break;
+      i++;
+      //ip+=bHighdeg_1+_pGetExp(p,i);
+      ep--;
+      ip+=bHighdeg_1+(*ep);
+    }
+  }
+  else
+  {
+    ep=&(p->exp[pVarLowIndex]);
+    int *ip=bBinomials+(*ep); /*_pGetExp(p,1);*/
+    loop
+    {
+      ord += (*ip);
+      if (i==pVariables) break;
+      i++;
+      //ip+=bHighdeg_1+_pGetExp(p,i);
+      ep++;
+      ip+=bHighdeg_1+(*ep);
+    }
+  }
+  p->Order=ord;
+}
+
+DECLARE(void, _bSetm(poly p))
+{
+  int ord = _pExpQuerSum(p);
+
+  if (ord<=bHighdeg)
+    _bSetm0(p);
+  else
+    p->Order=ord;
+}
+
+// ordering dp,c or c,dp, general case
+#if defined(PDEBUG) && PDEBUG == 1
+#define pbMonAddFast(p1, p2)  pDBMonAddFast(p1, p2, __FILE__, __LINE__)
+extern  void pbDBMonAddFast(poly p1, poly p2, char* f, int l);
+inline void _pbMonAddFast(poly p1, poly p2)
+#else
+#define pbMonAddFast(p1, p2)  _pbMonAddFast(p1, p2)
+DECLARE(void, _pbMonAddFast(poly p1, poly p2))
+#endif // defined(PDEBUG) && PDEBUG == 1
+{
+  // OK -- this might be the only place where we are kind of quick and
+  // dirty: the following only works correctly if all exponents are
+  // positive and the sum of two exponents does not exceed
+  // EXPONENT_MAX
+#ifndef COMP_NO_EXP_VECTOR_OPS
+  Exponent_t c2 = _pGetComp(p2);
+  int i = pVariables1W;
+  unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
+  const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
+  // set comp of p2 temporarily to 0, so that nothing is added to comp of p1
+  _pSetComp(p2, 0);
+#else
+  int i = pVariables;
+  Exponent_pt s1 = &(p1->exp[pVarLowIndex]);
+  Exponent_pt s2 = &(p2->exp[pVarLowIndex]);
+#endif
+
+  for (;;)
+  {
+    *s1 += *s2;
+    i--;
+    if (i==0) break;
+    s1++;
+    s2++;
+  }
+#ifndef COMP_NO_EXP_VECTOR_OPS
+  // reset comp of p2
+  _pSetComp(p2, c2);
+#endif
+  if ((_pGetOrder(p1)|_pGetOrder(p2))>0) // i.e. overflow of mac order
+    _pGetOrder(p1) += _pGetOrder(p2);
+  else
+    _bSetm(p1);
+}
+
+// ordering dp,c or c,dp, below degree limit
+#if defined(PDEBUG) && PDEBUG == 1
+#define pbMonAddFast0(p1, p2)  pbDBMonAddFast0(p1, p2, __FILE__, __LINE__)
+extern  void pbDBMonAddFast0(poly p1, poly p2, char* f, int l);
+inline void _pbMonAddFast0(poly p1, poly p2)
+#else
+  DECLARE(void, pbMonAddFast0(poly p1, poly p2))
+#endif // defined(PDEBUG) && PDEBUG == 1
+{
+  // OK -- this might be the only place where we are kind of quick and
+  // dirty: the following only works correctly if all exponents are
+  // positive and the sum of two exponents does not exceed
+  // EXPONENT_MAX
+#ifndef COMP_NO_EXP_VECTOR_OPS
+  Exponent_t c2 = _pGetComp(p2);
+  int i = pVariables1W;
+  unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
+  const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
+  // set comp of p2 temporarily to 0, so that nothing is added to comp of p1
+  _pSetComp(p2, 0);
+#else
+  int i = pVariables;
+  Exponent_pt s1 = &(p1->exp[pVarLowIndex]);
+  Exponent_pt s2 = &(p2->exp[pVarLowIndex]);
+#endif
+
+  for (;;)
+  {
+    *s1 += *s2;
+    i--;
+    if (i==0) break;
+    s1++;
+    s2++;
+  }
+#ifndef COMP_NO_EXP_VECTOR_OPS
+  // reset comp of p2
+  _pSetComp(p2, c2);
+#endif
+  _bSetm0(p1);
+}
+
+// ordering dp,c or c,dp, below degree limit
+// Makes p1 a copy of p2 and adds on exponets of p3
+#if defined(PDEBUG) && PDEBUG == 1
+#define _pbCopyAddFast0(p1, p2, p3)  pDBCopyAddFast(p1, p2, p3, __FILE__, __LINE__)
+inline void __pbCopyAddFast0(poly p1, poly p2, poly p3)
+#else
+  DECLARE(void, _pbCopyAddFast0(poly p1, poly p2, poly p3))
+#endif // defined(PDEBUG) && PDEBUG == 1
+{
+  p1->next = p2->next;
+  p1->coef = p2->coef;
+
+#ifndef COMP_NO_EXP_VECTOR_OPS
+  unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
+  const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
+  const unsigned long* s3 = (unsigned long*) &(p3->exp[0]);
+  const unsigned long* const ub = s3 + pVariables1W;
+#else
+  Exponent_t* s1 = (Exponent_t*) &(p1->exp[pVarLowIndex]);
+  const Exponent_t* s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
+  const Exponent_t* s3 = (Exponent_t*) &(p3->exp[pVarLowIndex]);
+  const Exponent_t* const ub = s3 + pVariables;
+// need to zero the "fill in" slots (i.e., empty exponents)
+#ifdef  WORDS_BIGENDIAN
+  *((unsigned long*) p1 + pMonomSizeW -1) = 0;
+#else
+  *((unsigned long *) p1->exp) = 0;
+#endif
+#endif
+
+  for (;;)
+  {
+    *s1 = *s2 + *s3;
+    s3++;
+    if (s3 == ub) break;
+    s1++;
+    s2++;
+  }
+  // we first are supposed to do a copy from p2 to p1 -- therefore,
+  // component of p1 is set to comp of p2
+  _pSetComp(p1, _pGetComp(p2));
+  _bSetm0(p1);
+}
+
+// Similar to pCopyAddFast, except that we assume that the component
+// of p2 and p3 is zero component
+#if defined(PDEBUG) && PDEBUG == 1
+#define _pbCopyAddFast10(p1, p2, p3)  pbDBCopyAddFast0(p1, p2, p3, __FILE__, __LINE__)
+extern  void pbDBCopyAddFast0(poly p1, poly p2, poly p3, char* f, int l);
+inline void __pbCopyAddFast10(poly p1, poly p2, poly p3)
+#else
+  DECLARE(void, _pbCopyAddFast10(poly p1, poly p2, poly p3))
+#endif // defined(PDEBUG) && PDEBUG == 1
+{
+  p1->next = p2->next;
+  p1->coef = p2->coef;
+
+#ifndef COMP_NO_EXP_VECTOR_OPS
+  unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
+  const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
+  const unsigned long* s3 = (unsigned long*) &(p3->exp[0]);
+  const unsigned long* const ub = s3 + pVariables1W;
+#else
+  Exponent_t* s1 = (Exponent_t*) &(p1->exp[pVarLowIndex]);
+  const Exponent_t* s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
+  const Exponent_t* s3 = (Exponent_t*) &(p3->exp[pVarLowIndex]);
+  const Exponent_t* const ub = s3 + pVariables;
+#ifdef  WORDS_BIGENDIAN
+  *((unsigned long*) p1 + pMonomSizeW -1) = 0;
+#else
+  *((unsigned long *) p1->exp) = 0;
+#endif
+#endif
+
+  for (;;)
+  {
+    *s1 = *s2 + *s3;
+    s3++;
+    if (s3 == ub) break;
+    s1++;
+    s2++;
+  }
+  _bSetm0(p1);
+}
 
 #endif
 

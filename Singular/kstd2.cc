@@ -1,12 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.9 1998-01-05 16:39:22 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.10 1998-01-17 18:07:58 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
 
 #include "mod2.h"
+#include "tok.h"
 #include "mmemory.h"
 #include "polys.h"
 #include "ideals.h"
@@ -21,7 +22,6 @@
 #include "ipid.h"
 #include "ipshell.h"
 #include "intvec.h"
-#include "tok.h"
 #ifdef STDTRACE
 #include "comm.h"
 #include "lists.h"
@@ -1383,6 +1383,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       kTest(strat);
       /* reduction of the element choosen from L */
       strat->red(&strat->P,strat);
+      pTest(strat->P.p);
     }
     kTest(strat);
     if (strat->P.p != NULL)

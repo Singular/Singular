@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.7 1997-11-11 15:46:40 siebert Exp $ */
+/* $Id: syz.cc,v 1.8 1998-01-17 18:08:00 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -9,6 +9,7 @@
 
 
 #include "mod2.h"
+#include "tok.h"
 #include "mmemory.h"
 #include "polys.h"
 #include "febase.h"
@@ -21,7 +22,6 @@
 #include "ipid.h"
 #include "intvec.h"
 #include "ipshell.h"
-#include "tok.h"
 #include "numbers.h"
 #include "ideals.h"
 #include "intvec.h"

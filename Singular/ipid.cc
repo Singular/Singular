@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.9 1998-01-16 14:29:52 krueger Exp $ */
+/* $Id: ipid.cc,v 1.10 1998-01-17 18:07:56 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -493,10 +493,10 @@ char * piProcinfo(procinfov pi, char *request)
     }
   } else if (strcmp(request, "ref")      == 0) {
     char p[8];
-    sprintf(p, "%d\0", pi->ref);
-    return mstrdup(p);
+    sprintf(p, "%d", pi->ref);
+    return mstrdup(p);  // MEMORY-LEAK
   }
-
+  return "??";
 }
 
 void piCleanUp(procinfov pi)
