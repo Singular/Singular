@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.102 2000-12-11 15:09:08 Singular Exp $
+@comment $Id: singular.doc,v 1.103 2000-12-15 11:53:41 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -337,10 +337,13 @@ LIB "all.lib";
 @menu
 * classify_lib:: procedures for the Arnold-classifier of singularities
 * deform_lib:: procedures for computing miniversal deformation
+* equising_lib:: procedures for equisingularity strata
+* gaussman_lib:: procedures for gauss-manin connection of a singularity
 * hnoether_lib:: procedures for the Hamburger-Noether (Puiseux) development
 * mondromy_lib:: procedures to compute the monodromy of a singularity
 * sing_lib:: procedures for computing invariants of singularities
 * spcurve_lib:: procedures for cm codimension 2 singularities
+* spectrum_lib:: procedures for computing singularity spectra
 @end menu
 
 @c ---------------------------------------------------------
@@ -348,11 +351,19 @@ LIB "all.lib";
 @subsection classify_lib
 @c lib classify.lib unix_only
 @c ----------------------------------------------------------
-@node deform_lib, hnoether_lib, classify_lib, Singularities
+@node deform_lib, equising_lib, classify_lib, Singularities
 @subsection deform_lib
 @c lib deform.lib
+@c ----------------------------------------------------------
+@node equising_lib, gaussman_lib, deform_lib, Singularities
+@subsection equising_lib
+@c lib equising.lib
+@c ----------------------------------------------------------
+@node gaussman_lib, hnoether_lib, equising_lib, Singularities
+@subsection gaussman_lib
+@c lib gaussman.lib
 @c ---------------------------------------------------------
-@node hnoether_lib, mondromy_lib, deform_lib, Singularities
+@node hnoether_lib, mondromy_lib, gaussman_lib, Singularities
 @subsection hnoether_lib
 @c lib hnoether.lib
 @c ---------------------------------------------------------
@@ -364,9 +375,13 @@ LIB "all.lib";
 @subsection sing_lib
 @c lib sing.lib
 @c ---------------------------------------------------------
-@node spcurve_lib, , sing_lib, Singularities
+@node spcurve_lib, spectrum_lib, sing_lib, Singularities
 @subsection spcurve_lib
 @c lib spcurve.lib
+@c ---------------------------------------------------------
+@node spectrum_lib, , spcurve_lib, Singularities
+@subsection spectrum_lib
+@c lib spectrum.lib
 @c ----------------------------------------------------------------------------
 @node Invariant theory, Symbolic-numerical solving, Singularities, SINGULAR libraries
 @section Invariant theory
