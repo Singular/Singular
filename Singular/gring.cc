@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.17 2002-12-06 21:50:09 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.18 2002-12-20 17:16:58 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1079,7 +1079,8 @@ ideal twostd(ideal I)
   int flag;
   poly p=NULL;
   poly q=NULL;
-  ideal J=kStd(I, NULL, testHomog,NULL,NULL,0,0,NULL);
+  ideal Quot=currRing->qideal; /* could be NULL */
+  ideal J=kStd(I, Quot, testHomog,NULL,NULL,0,0,NULL);
   idSkipZeroes(J);
   ideal K=NULL;
   poly varj=NULL;
@@ -1102,7 +1103,7 @@ ideal twostd(ideal I)
         q=nc_p_Mult_mm(pCopy(p),varj,currRing); 
 	pDelete(&varj);
 	q=nc_spGSpolyRed(p,q,NULL,currRing);
-	q = kNF(J,NULL,q,0,0);
+	q = kNF(J,Quot,q,0,0);
         if (q!=NULL)
         {
 	  if (pIsConstant(q))
@@ -1133,7 +1134,7 @@ ideal twostd(ideal I)
     id_tmp=idAdd(J,K);
     idDelete(&K);
     idDelete(&J);
-    J=kStd(id_tmp,NULL,testHomog,NULL,NULL,0,0,NULL);
+    J=kStd(id_tmp,Quot,testHomog,NULL,NULL,0,0,NULL);
     idDelete(&id_tmp);
     idSkipZeroes(J);
   }
