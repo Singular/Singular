@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval.cc,v 1.7 2002-02-16 13:49:03 mschulze Exp $ */
+/* $Id: eigenval.cc,v 1.8 2002-02-16 18:07:49 mschulze Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -184,19 +184,17 @@ BOOLEAN evColElim(leftv res,leftv h)
 matrix evHessenberg(matrix M)
 {
   int n=MATROWS(M);
-  int i,j;
 
-  for(int k=1;k<n-1;k++)
+  for(int k=1,j=2;k<n-1;k++,j=k+1)
   {
-    j=k+1;
-    while(j<n&&MATELEM(M,j,k)==0)
+    while(j<=n&&MATELEM(M,j,k)==0)
       j++;
 
-    if(MATELEM(M,j,k)!=0)
+    if(j<=n)
     {
       M=evSwap(M,j,k+1);
 
-      for(i=j+1;i<=n;i++)
+      for(int i=j+1;i<=n;i++)
         M=evRowElim(M,i,k+1,k);
     }
   }
@@ -232,6 +230,8 @@ lists evEigenvalue(matrix M)
     l->Init(0);
     return(l);
   }
+
+  M=(matrix)idJet((ideal)M,0);
 
   M=evHessenberg(M);
 
@@ -270,15 +270,31 @@ lists evEigenvalue(matrix M)
 
       for(int i=0;i<IDELEMS(e0);i++)
       {
-        number e1=nNeg(pGetCoeff(e0->m[i]));
-        pDeleteLm(&e0->m[i]);
-        if(pGetExp(e0->m[i],1)==0)
-          e->m[k]=pNSet(nDiv(pGetCoeff(e0->m[i]),e1));
+        if(pNext(e0->m[i])==NULL)
+	{
+          (*m)[k]=(*m0)[i];
+          k++;
+        }
         else
-	  e->m[k]=pNSet(nDiv(e1,pGetCoeff(e0->m[i])));
-        nDelete(&e1);
-        (*m)[k]=(*m0)[i];
-        k++;
+        if(pGetExp(e0->m[i],1)<2&&pGetExp(pNext(e0->m[i]),1)<2&&
+           pNext(pNext(e0->m[i]))==NULL)
+	{
+          number e1=nNeg(pGetCoeff(e0->m[i]));
+          if(pGetExp(pNext(e0->m[i]),1)==0)
+            e->m[k]=pNSet(nDiv(pGetCoeff(pNext(e0->m[i])),e1));
+          else
+	    e->m[k]=pNSet(nDiv(e1,pGetCoeff(pNext(e0->m[i]))));
+          nDelete(&e1);
+          (*m)[k]=(*m0)[i];
+          k++;
+        }
+        else
+	{
+          e->m[k]=e0->m[i];
+          e0->m[i]=NULL;
+          (*m)[k]=(*m0)[i];
+          k++;
+	}
       }
 
       delete(m0);
@@ -289,26 +305,32 @@ lists evEigenvalue(matrix M)
   pDelete(&t);
   idDelete((ideal *)&M);
 
-  for(int i=0;i<n-1;i++)
+  for(int i0=0;i0<n-1;i0++)
   {
-    if(e->m[i]!=NULL)
-    for(int j=i+1;j<n;j++)
+    for(int i1=i0+1;i1<n;i1++)
     {
-      if(e->m[j]!=NULL)
-      if(nEqual(pGetCoeff(e->m[i]),pGetCoeff(e->m[j])))
+      if(pEqualPolys(e->m[i0],e->m[i1]))
       {
-        (*m)[i]+=(*m)[j];
-        (*m)[j]=0;
+        (*m)[i0]+=(*m)[i1];
+        (*m)[i1]=0;
       }
       else
-      if(nGreater(pGetCoeff(e->m[i]),pGetCoeff(e->m[j])))
       {
-        poly p=e->m[i];
-        e->m[i]=e->m[j];
-        e->m[j]=p;
-        int k=(*m)[i];
-        (*m)[i]=(*m)[j];
-        (*m)[j]=k;
+        if(e->m[i0]==NULL&&!nGreaterZero(pGetCoeff(e->m[i1]))||
+           e->m[i1]==NULL&&
+	  (nGreaterZero(pGetCoeff(e->m[i0]))||pNext(e->m[i0])!=NULL)||
+           e->m[i0]!=NULL&&e->m[i1]!=NULL&&
+          (pNext(e->m[i0])!=NULL&&pNext(e->m[i1])==NULL||
+           pNext(e->m[i0])==NULL&&pNext(e->m[i1])==NULL&&
+           nGreater(pGetCoeff(e->m[i0]),pGetCoeff(e->m[i1]))))
+        {
+          poly e1=e->m[i0];
+          e->m[i0]=e->m[i1];
+          e->m[i1]=e1;
+          int m1=(*m)[i0];
+          (*m)[i0]=(*m)[i1];
+          (*m)[i1]=m1;
+        }
       }
     }
   }
