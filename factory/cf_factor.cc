@@ -1,14 +1,19 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_factor.cc,v 1.0 1996-05-17 10:59:43 stobbe Exp $
+// $Id: cf_factor.cc,v 1.1 1997-03-18 14:43:52 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:43  stobbe
+Initial revision
+
 */
 
 #include "cf_gmp.h"
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "cf_globals.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
@@ -16,9 +21,7 @@ $Log: not supported by cvs2svn $
 #include "fac_berlekamp.h"
 #include "fac_cantzass.h"
 #include "fac_univar.h"
-#ifdef MULTIFACTOR
 #include "fac_multivar.h"
-#endif
 #include "fac_sqrfree.h"
 
 
@@ -30,8 +33,6 @@ static bool isUnivariateBaseDomain( const CanonicalForm & f )
     while ( i.hasTerms() && ( ok = ok && i.coeff().inBaseDomain() ) ) i++;
     return ok;
 }
-
-#ifdef MULTIFACTOR
 
 CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 {
@@ -51,27 +52,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 	    return ZFactorizeMultivariate( f, issqrfree );
     }
 }
-
-#else
-
-CFFList factorize ( const CanonicalForm & f, bool issqrfree )
-{
-    if ( f.inCoeffDomain() )
-	return CFFList( f );
-    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-    if ( getCharacteristic() > 0 ) {
-	if ( cf_glob_switches.isOn( SW_BERLEKAMP ) )
-	    return FpFactorizeUnivariateB( f, issqrfree );
-	else
-	    return FpFactorizeUnivariateCZ( f, issqrfree );
-    }
-    else {
-	ASSERT( isUnivariateBaseDomain( f ), "factorization in char 0 over algebraic extensions not implemented" );
-	return ZFactorizeUnivariate( f, issqrfree );
-    }
-}
-
-#endif
 
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 {
