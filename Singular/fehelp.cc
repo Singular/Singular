@@ -109,7 +109,7 @@ void feHelp(char *str)
 
   BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
   heEntry_s hentry;
-  char* idxfile = feResource("IdxFile");
+  char* idxfile = feResource('x' /*"IdxFile"*/);
   
   // Try exact match of help string with key in index
   if (!key_is_regexp && idxfile != NULL && heKey2Entry(idxfile, str, &hentry))
@@ -681,7 +681,7 @@ static void heInfoHelp(heEntry hentry)
 #if ! defined(WINNT) && ! defined(macintosh)
 static BOOLEAN heNetscapeInit(int warn)
 {
-  if (feResource("netscape", warn) == NULL)
+  if (feResource('N' /*"netscape"*/, warn) == NULL)
   {
     if (warn) WarnS("'netscape' help browser not available: no 'netscape' program found");
     return FALSE;
@@ -693,10 +693,10 @@ static BOOLEAN heNetscapeInit(int warn)
     return FALSE;
   }
   
-  if (feResource("HtmlDir", warn) == NULL)
+  if (feResource('h' /*"HtmlDir"*/, warn) == NULL)
   {
     if (warn) WarnS("no local HtmlDir found");
-    if (warn) Warn("using %s instead", feResource("ManualUrl", warn));
+    if (warn) Warn("using %s instead", feResource('u' /*"ManualUrl"*/, warn));
   }
   return TRUE;
 }
@@ -704,13 +704,13 @@ static void heNetscapeHelp(heEntry hentry)
 {
   char sys[MAX_SYSCMD_LEN];
   char url[MAXPATHLEN];
-  char* htmldir = feResource("HtmlDir");
+  char* htmldir = feResource('h' /*"HtmlDir"*/);
   char* urltype;
   
   if (htmldir == NULL) 
   {
     urltype = "";
-    htmldir = feResource("ManualUrl");
+    htmldir = feResource('u' /*"ManualUrl"*/);
   }
   else
   {
@@ -726,12 +726,12 @@ static void heNetscapeHelp(heEntry hentry)
     sprintf(url, "%s%s/index.htm", urltype, htmldir);
   }
   sprintf(sys, "%s --remote 'OpenUrl(%s)' > /dev/null 2>&1", 
-          feResource("netscape"), url);
+          feResource('N' /*"netscape"*/), url);
   
   // --remote exits with status != 0 if netscaep isn't already running
   if (system(sys) != 0)
   {
-    sprintf(sys, "%s %s &", feResource("netscape"), url);
+    sprintf(sys, "%s %s &", feResource('N' /*"netscape"*/), url);
     system(sys);
   }
 }
