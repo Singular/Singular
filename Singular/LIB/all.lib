@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.23 1999-12-13 15:53:37 obachman Exp $
+// $Id: all.lib,v 1.24 1999-12-13 17:32:37 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.23 1999-12-13 15:53:37 obachman Exp $";
+version="$Id: all.lib,v 1.24 1999-12-13 17:32:37 obachman Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -48,7 +48,7 @@ LIB "graphics.lib";
 LIB "hnoether.lib";
 LIB "homolog.lib";
 LIB "inout.lib";
-LIB "invar.lib";
+LIB "ainvar.lib";
 LIB "latex.lib";
 LIB "linalg.lib";
 LIB "matrix.lib";
