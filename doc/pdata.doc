@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.3 1998-05-19 15:57:18 Singular Exp $
+@comment $Id: pdata.doc,v 1.4 1998-05-19 16:00:11 wichmann Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -13,12 +13,17 @@
 @setfilename pdata.info
 @node Top, Polynomial data
 @menu
-* Polynomial data::
+* Polynomial data::             
 @end menu
 @node Polynomial data, Examples, Mathematical background, Top
 @chapter Polynomial data
 %**end
 @end ignore
+
+@menu
+* Representation of mathematical objects::  
+* Monomial orderings::          
+@end menu
 
 @c -----------------------------------------------------------------
 @node Representation of mathematical objects,Monomial orderings,,Polynomial data
