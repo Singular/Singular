@@ -1,14 +1,22 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_poly.h,v 1.0 1996-05-17 10:59:41 stobbe Exp $
+// $Id: int_poly.h,v 1.1 1997-03-27 10:08:06 schmidt Exp $
 
 #ifndef INCL_INTERNALPOLY_H
 #define INCL_INTERNALPOLY_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:41  stobbe
+Initial revision
+
 */
 
+#ifndef NOSTREAMIO
+#include <iostream.h>
+#endif /* NOSTREAMIO */
+
 #include "cf_defs.h"
+
 #include "int_cf.h"
 #include "variable.h"
 #include "canonicalform.h"
@@ -61,7 +69,9 @@ public:
     int taildegree();
     CanonicalForm tailcoeff();
     CanonicalForm coeff( int i );
+#ifndef NOSTREAMIO
     void print( ostream&, char* );
+#endif /* NOSTREAMIO */
     bool isZero() const { return false; }
     bool isOne() const { return false; }
     bool inBaseDomain() const { return false; }
@@ -81,7 +91,7 @@ public:
 
     InternalCF* addsame( InternalCF* );
     InternalCF* subsame( InternalCF* );
-    InternalCF* mulsame( InternalCF* ); 
+    InternalCF* mulsame( InternalCF* );
     InternalCF* dividesame( InternalCF* );
     InternalCF* modulosame( InternalCF* );
     InternalCF* divsame( InternalCF* );
@@ -93,10 +103,10 @@ public:
 
     InternalCF* addcoeff( InternalCF* );
     InternalCF* subcoeff( InternalCF*, bool );
-    InternalCF* mulcoeff( InternalCF* ); 
-    InternalCF* dividecoeff( InternalCF*, bool ); 
-    InternalCF* modulocoeff( InternalCF*, bool ); 
-    InternalCF* divcoeff( InternalCF*, bool ); 
+    InternalCF* mulcoeff( InternalCF* );
+    InternalCF* dividecoeff( InternalCF*, bool );
+    InternalCF* modulocoeff( InternalCF*, bool );
+    InternalCF* divcoeff( InternalCF*, bool );
     InternalCF* modcoeff( InternalCF*, bool );
     void divremcoeff( InternalCF*, InternalCF*&, InternalCF*&, bool );
     bool divremcoefft( InternalCF*, InternalCF*&, InternalCF*&, bool );
@@ -108,5 +118,3 @@ public:
 
 
 #endif /* INCL_INTERNALPOLY_H */
-
-

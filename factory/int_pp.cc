@@ -1,12 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_pp.cc,v 1.0 1996-05-17 10:59:46 stobbe Exp $
+// $Id: int_pp.cc,v 1.1 1997-03-27 10:09:37 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:46  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "cf_globals.h"
 #include "int_pp.h"
 #include "canonicalform.h"
@@ -111,6 +116,7 @@ InternalPrimePower::getk()
     return exp;
 }
 
+#ifndef NOSTREAMIO
 void InternalPrimePower::print( ostream & os, char * c )
 {
     if ( *c == '*' && mpz_cmp_si( &thempi, 1 ) == 0 )
@@ -124,6 +130,7 @@ void InternalPrimePower::print( ostream & os, char * c )
 	delete [] str;
     }
 }
+#endif /* NOSTREAMIO */
 
 bool InternalPrimePower::isZero() const
 {

@@ -1,15 +1,23 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_rat.h,v 1.0 1996-05-17 10:59:41 stobbe Exp $
+// $Id: int_rat.h,v 1.1 1997-03-27 10:11:36 schmidt Exp $
 
 #ifndef INCL_INTERNALRATIONAL_H
 #define INCL_INTERNALRATIONAL_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:41  stobbe
+Initial revision
+
 */
 
+#ifndef NOSTREAMIO
 #include <iostream.h>
+#endif /* NOSTREAMIO */
+
 #include "cf_gmp.h"
+
+#include "assert.h"
 
 #include "int_cf.h"
 
@@ -37,7 +45,9 @@ public:
     ~InternalRational();
     InternalCF* deepCopyObject() const;
     const char * const classname() const { return "InternalRational"; }
+#ifndef NOSTREAMIO
     void print( ostream&, char* );
+#endif /* NOSTREAMIO */
     bool isZero() const;
     bool isOne() const;
     InternalCF* genZero();
@@ -55,11 +65,11 @@ public:
 
     InternalCF* addsame( InternalCF* );
     InternalCF* subsame( InternalCF* );
-    InternalCF* mulsame( InternalCF* ); 
+    InternalCF* mulsame( InternalCF* );
     InternalCF* dividesame( InternalCF* );
     InternalCF* modulosame( InternalCF* );
-    InternalCF* divsame( InternalCF* ); 
-    InternalCF* modsame( InternalCF* ); 
+    InternalCF* divsame( InternalCF* );
+    InternalCF* modsame( InternalCF* );
     void divremsame( InternalCF*, InternalCF*&, InternalCF*& );
     bool divremsamet( InternalCF*, InternalCF*&, InternalCF*& );
 
@@ -67,10 +77,10 @@ public:
 
     InternalCF* addcoeff( InternalCF* );
     InternalCF* subcoeff( InternalCF*, bool );
-    InternalCF* mulcoeff( InternalCF* ); 
+    InternalCF* mulcoeff( InternalCF* );
     InternalCF* dividecoeff( InternalCF*, bool );
     InternalCF* modulocoeff( InternalCF*, bool );
-    InternalCF* divcoeff( InternalCF*, bool ); 
+    InternalCF* divcoeff( InternalCF*, bool );
     InternalCF* modcoeff( InternalCF*, bool );
     void divremcoeff( InternalCF*, InternalCF*&, InternalCF*&, bool );
     bool divremcoefft( InternalCF*, InternalCF*&, InternalCF*&, bool );

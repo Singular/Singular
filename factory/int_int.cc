@@ -1,15 +1,20 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_int.cc,v 1.1 1996-12-20 15:35:26 schmidt Exp $
+// $Id: int_int.cc,v 1.2 1997-03-27 10:05:39 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/12/20 15:35:26  schmidt
+Ruedigers last fryday afternoon fix
+
 Revision 1.0  1996/05/17 10:59:46  stobbe
 Initial revision
 
 */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "cf_globals.h"
 #include "int_int.h"
 #include "int_rat.h"
@@ -18,7 +23,6 @@ Initial revision
 #include "gmpext.h"
 
 #define IntInt InternalInteger
-
 
 InternalInteger::InternalInteger()
 {
@@ -49,6 +53,7 @@ InternalCF* InternalInteger::deepCopyObject() const
     return new InternalInteger( dummy );
 }
 
+#ifndef NOSTREAMIO
 void InternalInteger::print( ostream & os, char * c )
 {
     if ( *c == '*' && mpz_cmp_si( &thempi, 1 ) == 0 )
@@ -62,6 +67,7 @@ void InternalInteger::print( ostream & os, char * c )
 	delete [] str;
     }
 }
+#endif /* NOSTREAMIO */
 
 bool InternalInteger::isZero() const
 {
@@ -782,5 +788,3 @@ InternalInteger::sqrt()
     else
 	return new InternalInteger( result );
 }
-
-
