@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.74 1998-05-20 12:39:54 schmidt Exp $
+@comment $Id: reference.doc,v 1.75 1998-05-20 13:58:59 pohl Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -273,7 +273,7 @@ list of matrix and intvec
 applies Gauss-Bareiss algorithm (see @ref{References})
 to a matrix with an 'optimal' pivotstrategy.
 Result is a list: the first entry a lower triangular matrix,
-the second entry an intvec with the permutations of the colums 
+the second entry an intvec with the permutations of the columns 
 w.r.t. the original matrix.
 @item @strong{Example:}
 @example
@@ -1955,14 +1955,18 @@ i.e., eliminating the remaining variables gives (0).
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-computes a list of all (if the flag is 1) or of all maximal sets U of independent variables of the ideal given by the first argument
+computes a list of all maximal sets (if the flag is 0), or of all sets of independent variables of the ideal given by the first argument
 @item @strong{Example:}
 @example
 @c example
-  ring r=32003,(x,y,z),dp;
-  ideal I=xy,xz,yz;
-  indepSet(std(I));
-  eliminate(I,yz);
+  ring r=32003,(x,y,z,u,v,w),dp;
+  ideal I=xyzw,yzvw,uzw,xyv;
+  attrib(I,"isSB",1);
+  indepSet(I);
+  eliminate(I,vw);
+  indepSet(I,0);
+  indepSet(I,1);
+  eliminate(I,xuv);
 @c example
 @end example
 @end table
