@@ -1,5 +1,5 @@
-#! /home/schmidt/bin/bash
-# $Id: runfex,v 1.6 1998-03-11 16:11:28 schmidt Exp $
+#! /bin/bash
+# $Id: runfex,v 1.7 1998-03-31 10:49:08 schmidt Exp $
 
 #{{{ docu
 #
@@ -10,243 +10,95 @@
 set -o nounset
 set -o noglob
 
-#{{{ global constants
-#{{{ docu
-#
-# - global constants.
-#
-# ExecName: used to prefix error messages.  Used by warn().
-# XXColWidth: default width for data columns.  Used by main() and
-#   example().
-# EvalAlg: algorithm to read run/collection data from.  Used by
-#   main().
-#
-#}}}
-readonly ExecName="$0"
-
-typeset	-ir TBColWidth=80
-typeset	-ir ROColWidth=80
-
-readonly EvalAlg="feval"
-#}}}
-
-#{{{ global variables
-#{{{ docu
-#
-# - global variables.
-#
-# runOptions, collectionOptions, runEnvironment,
-# collectionEnvironment: options and environment for the
-#   examples.  Used by runAlgorithm().
-# runConfiguration: which configurations' executables to use.
-#   Used by runAlgorithm().
-# collectionROOptions: options to print run overview.  Use by
-#   main().
-# runTBOptions, collectionTBOptions: options to print XX tables.
-#   Used by example().
-# debugMode: do not execute anything, just print what we would
-#   have executed.  Used by main(), example(), and
-#   runAlgorithm().
-#
-# The run* variables and debugMode are set in the main program,
-# the rest of the collection* variables in collection().
-#
-#}}}
-runOptions=""
-runEnvironment=""
-runTBOptions=""
-runConfiguration="opt"
-
-collectionOptions=""
-collectionEnvironment=""
-collectionTBOptions=""
-collectionROOptions=""
-
-debugMode=""
-#}}}
+trap signalHandlerInterrupt SIGINT
+trap signalHandlerQuit SIGQUIT
 
 #
 # - functions.
 #
 
+#{{{ signalHandlerInterrupt (), signalHandlerQuit ()
+#{{{ docu
+#
+# signalHandler*() - catch signals.
+#
+#}}}
+signalHandlerInterrupt()
+{
+    warn "received signal SIGINT"
+    exit
+}
+
+signalHandlerQuit()
+{
+    warn "received signal SIGQUIT"
+    exit
+}
+#}}}
+
 #{{{ warn ()
 #{{{ docu
 #
-# warn() - print arguments to stderr prefixed $ExecName.
+# warn() - print arguments to stderr prefixed by ExecName.
 #
-# Global variables used:
-#   ExecName
+# ExecName (global constant): name of the shell script
+#   being executed
 #
 #}}}
+readonly ExecName="$0"
+
 warn()
 {
     echo "$ExecName:" "${@-}" >&2
 }
 #}}}
 
-#{{{ runAlgorithm ()
-#{{{ docu
-#
-# runAlgorithm() - run algorithm with the correct options.
-#
-# $1: algorithm to run
-# $2: output options
-# rest: arguments to algorithm
-#
-# Global variables used:
-#   runOptions, runEnvironment, runConfiguration,
-#   collectionOptions, collectionEnvironment,
-#   exampleOptions, exampleEnvironment,
-#   debugMode
-#
-#}}}
-runAlgorithm()
+#{{{ usage ()
+usage()
 {
-    typeset \
-	algorithmName="$1" \
-	outputOptions="$2" \
-	algorithmOptions="$collectionOptions${exampleOptions-}$runOptions" \
-	algorithmEnvironment="$collectionEnvironment${exampleEnvironment-}$runEnvironment"
-    shift 2
+echo "
+Usage: runfex [<options>] [<factoryOpts>] [<factoryEnvSpec>] <fexFile> [<examplePatterns>]
 
-    # reset factory environemnt to exclude external influences
-    FTEST_ENV=""
-    FTEST_CIRCLE=""
-    FTEST_ALARM=""
+Runs all examples in <fexFile> matching <examplePattern>.
+<examplePatterns> should be regular shell patterns, which may be
+preceded by a \`^' to exclude all examples matching <examplePattern>.
 
-    if [ -n "$debugMode" ]; then
-	echo "calling $algorithmName.$runConfiguration" $algorithmOptions "$outputOptions" "$algorithmEnvironment" "$@"
-    else
-	"$algorithmName.$runConfiguration" $algorithmOptions "$outputOptions" "$algorithmEnvironment" "$@"
-    fi
-}
-#}}}
+When run in foreground, SIGQUIT immediately interrupts \`runfex',
+while SIGINT only interrupts the example currently being
+calculated.  In background, SIGTERM interrupts \`runfex' after the
+current example has been finished.
 
-#{{{ printData ()
-#{{{ docu
-#
-# printData() - print example/run table.
-#
-# $1: options how to print data
-# $2: default width to print data
-# $3: name of example/collection
-# $4: note on example/collection
-#
-# Global variables used:
-#   alg* algorithm information,
-#
-#}}}
-printData()
-{
-    typeset \
-	options="$1" \
-	name="$3" \
-	note="$4" \
-	colWidth
+<options>:  -d:         debug mode.  In debug mode, examples are
+                        echoed to stdout instead of being executed.
+            -C <runConfiguration>: specifies which object/executable
+                        configuration to use.  Defaults to \`opt'.
+            -t:         do not run checks
 
-    colWidth="${options//[a-z]/}"
-    colWidth="${colWidth:-$2}"
-    options="${options//[0-9]/}"
+Besides from regular shell commands, the commands \`collection'
+and \`example' may be used in a Factory example file.
+\`collection' specifies options and environment common to a
+collection of examples, \`example' defines an example.
 
-    typeset -i i=0 n=0
+collection <collectionName> [<collectionOptions>] [<factoryOpts>] [<factoryEnvSpec>]
+example <exampleName> [<exampleOptions>] [<factoryOpts>] [<factoryEnvSpec>] <example>
 
-    while [ -n "$options" ]; do
-	case "$options" in
-	    (*h*)
-		# do some pretty printing
-		if [ ${#name} -lt 7 ]; then
-		    echo "$name:		$note."
-		elif  [ ${#name} -lt 15 ]; then
-		    echo "$name:	$note."
-		else
-		    echo "$name: $note."
-		fi
-		 options="${options//h/}" ;;
-	    (*p*) echo "$algChar"
-		 options="${options//p/}" ;;
-	    (*s*) echo "$algSwitch"
-		 options="${options//s/}" ;;
-	    (*v*) echo "$algVars"
-		 options="${options//v/}" ;;
-	    (*n*) echo "$algCircle"
-		 options="${options//n/}" ;;
-	    (*g*) echo "$algSeed"
-		 options="${options//g/}" ;;
-	    (*f*) echo "$algVers"
-		 options="${options//f/}" ;;
-	    (*t*) echo "$algTime"
-		 options="${options//t/}" ;;
-	    (*c*) echo "$algCheck"
-		 options="${options//c/}" ;;
-	    (*r*)
-		n=${#algResult[@]}
-		i=0
-		while [ $i -lt $n ]; do
-		    echo "${algResult[i]}" | fold -s -w$colWidth
-		    i=i+1
-		done
-		options="${options//r/}" ;;
-	    (*)   warn "unknown output type specifier '$options' in table specification"
-		 options="" ;;
-	esac
-    done
-}
-#}}}
+<collectionOptions>/<exampleOptions>:
+            -n <note>: specifies comment on the collection/example
 
-#{{{ collection ()
-#{{{ docu
-#
-# collection() - set up collection data.
-#
-# All we do is setting the collection* variables (except
-# collectionName) from commandline.
-# We do not set collectionNote and collectionXXOptions if they
-# are already set but reset collectionOptions and
-# collectionEnvironment on each run to allow for multiple calls
-# to collection() in one example collection file (though this is
-# bad style).
-#
-# Global variables used: none
-#
-#}}}
-collection()
-{
-    collectionOptions=""
-    collectionEnvironment=""
+<factoryOpts>:
+            -a <time>:  sets alarm option
+            -c <times>: sets times option
+            -O <options>: specifies optional arguments
+            -o <outputOptions>: specifies which results to print
 
-    # read collection name
-    if [ "$#" = "0" ]; then
-	warn "no collection name specified"
-	exit 1
-    fi
-    collectionName="$1"
-    shift
-
-    #{{{ read options and environment
-    # read options
-    typeset opt
-    while getopts "n:a:c:t:r:" opt; do
-	case "$opt" in
-	    (n)	collectionNote="${collectionNote:-$OPTARG}" ;;
-	    (a)	collectionOptions="$collectionOptions -a$OPTARG" ;;
-	    (c)	collectionOptions="$collectionOptions -c$OPTARG" ;;
-	    (t)	collectionTBOptions="${collectionTBOptions:-$OPTARG}" ;;
-	    (r)	collectionROOptions="${collectionROOptions:-$OPTARG}" ;;
-	    (?)	warn "bad collection option"; exit 1 ;;
-	esac
-    done
-    # shift options and reset OPTIND
-    typeset -i optind
-    optind=OPTIND-1
-    shift $optind
-    OPTIND=1
-
-    # read environment
-    while [ "${1-}" != "${1+${1#/}}" ]; do
-	collectionEnvironment="$collectionEnvironment $1"
-	shift
-    done
-    #}}}
+<outputOptions>:
+            <number>: column width              x: do not print anything
+            h: header                           p: characteristic
+            s: switches                         v: variables
+            n: number fo runs                   g: random generator seed
+            f: Factories version                t: time
+            c: check                            r: result" \
+    >& 2
 }
 #}}}
 
@@ -254,6 +106,11 @@ collection()
 #{{{ docu
 #
 # defineSkip() - define function skipExample().
+#
+# rest: the patterns
+#
+# One function at least that does not use neither global
+# variables nor constants.
 #
 #}}}
 defineSkip()
@@ -317,56 +174,201 @@ skipExample()
 }
 #}}}
 
+#{{{ runAlgorithm ()
+#{{{ docu
+#
+# runAlgorithm() - run algorithm with the correct options.
+#
+# To a pity, there is a lot of global variables necessary to
+# determine the "correct options".  The run* variables are set
+# in main program, the collection* variables in collection()
+# and the example* variables in example().
+# All of these variables are exclusively used here.
+#
+# $1: debugMode
+# $2: algorithm to run
+# rest: its arguments
+#
+# runConfiguration (global variable): which configurations'
+#   executables to use
+# run* (global variables): options, optional arguments, and
+#   environment specified at run level
+# collection* (global variables): options, optional arguments,
+#   and environment specified at collection level
+# example* (global variables): options, optional arguments,
+#   and environment specified at example level
+#
+#}}}
+runConfiguration="opt"
+
+runOptions=""
+runOptArguments=""
+runEnvironment=""
+
+collectionOptions=""
+collectionOptArguments=""
+collectionEnvironment=""
+
+exampleOptions=""
+exampleOptArguments=""
+exampleEnvironment=""
+
+runAlgorithm()
+{
+    typeset debugMode="$1" \
+	    name="$2"
+    shift 2
+
+    # now its time to paste the options together
+    $debugMode "$name.$runConfiguration" \
+	$collectionOptions $exampleOptions $runOptions -oa -- \
+	$collectionEnvironment $exampleEnvironment $runEnvironment \
+	${runOptArguments:-${exampleOptArguments:-${collectionOptArguments}}} \
+	"$@"
+}
+#}}}
+
+#{{{ printData ()
+#{{{ docu
+#
+# printData() - print example data.
+#
+# Yet another bunch of global variables.  The *OutputOptions are
+# set by the main program, collection(), and example(), resp.,
+# and determine which information to print.  All the variables
+# are used exclusively here.
+#
+# $1: name
+# $2: note
+#
+# defColWidth (global constant): default width to print results
+# *OutputOptions (global variables): which information to print
+#
+#}}}
+typeset	-ir defColWidth=80
+
+runOutputOptions=""
+collectionOutputOptions=""
+exampleOutputOptions=""
+
+printData()
+{
+    typeset -i colWidth
+
+    typeset name="$1" \
+	    note="$2" \
+	    options="${runOutputOptions:-${exampleOutputOptions:-${collectionOutputOptions}}}" \
+	    line=""
+
+    # get column width (we use line as a dummy here)
+    line="$( echo "$options" | sed s/[^0-9]//g )"
+    colWidth=${line:-$defColWidth}
+
+    case "$options" in
+	(*x*) return ;;
+    esac
+
+    case "$options" in
+	(*h*)
+	    # do some pretty printing
+	    if [ ${#name} -lt 7 ]; then
+		echo "$name:		$note."
+	    elif  [ ${#name} -lt 15 ]; then
+		echo "$name:	$note."
+	    else
+		echo "$name: $note."
+	    fi ;;
+    esac
+    if read line; then case "$options" in
+	(*p*) echo "$line" ;;
+    esac; fi
+    if read line; then case "$options" in
+	(*s*) echo "$line" ;;
+    esac; fi
+    if read line; then case "$options" in
+	(*v*) echo "$line" ;;
+    esac; fi
+    if read line; then case "$options" in
+	(*n*) echo "$line" ;;
+    esac; fi
+    if read line; then case "$options" in
+	(*g*) echo "$line" ;;
+    esac; fi
+    if read line; then case "$options" in
+	(*f*) echo "$line" ;;
+    esac; fi
+    if read line; then case "$options" in
+	(*t*) echo "$line" ;;
+    esac; fi
+    if read line; then case "$options" in
+	(*c*) echo "$line" ;;
+    esac; fi
+
+    # format the result
+    case "$options" in
+	(*r*)
+	    if [ $colWidth = 0 ]; then
+		cat -u
+	    else
+		fold -s -w "$colWidth"
+	    fi ;;
+    esac
+}
+#}}}
+
 #{{{ example ()
 #{{{ docu
 #
 # example() - run an example.
 #
-# Global variables used:
-#   debugMode,
-#   runTBOptions,
-#   collectionTBOptions,
-#   TBColWidth
+# Sets the example* variables from the commandline.  Runs the
+# example in dependency on debugMode and on the result of
+# skipExample().  Collects data from the example in the alg*
+# variables for printData().
+#
+# debugMode (global variable): set by main program.  Whether to
+#   run examples or to print them.
 #
 #}}}
+debugMode=""
+
 example()
 {
-    typeset exampleName="" \
-	    exampleNote="" \
-	    exampleOptions="" \
-	    exampleEnvironment="" \
-	    exampleTBOptions=""
+    typeset name="" \
+	    note="" \
+	    \
+	    options="" \
+	    optArguments="" \
+	    environment="" \
+	    \
+	    outputOptions=""
 
-    typeset algorithm="" \
-	    algorithmTBOptions=""
-
-    #{{{ read example name and skip it if necessary
+    # read example name and skip if necessary
     if [ "$#" = "0" ]; then
 	warn "no example name specified"
 	exit 1
     fi
-    exampleName="$1"
+    name="$1"
     shift
 
-    if skipExample "$exampleName"; then
+    if skipExample "$name"; then
 	if [ -n "$debugMode" ]; then
-	    echo "skipping $exampleName"
+	    echo "skipping $name"
 	fi
 	return
     else
-	warn "running $exampleName"
+	warn "running $name"
     fi
-    #}}}
     
-    #{{{ read options and environment
     # read options
     typeset opt
-    while getopts "n:a:c:t:x:" opt; do
+    while getopts "n:a:c:O:o:" opt; do
 	case "$opt" in
-	    (n)	exampleNote="$OPTARG" ;;
-	    (a)	exampleOptions="$exampleOptions -a$OPTARG" ;;
-	    (c)	exampleOptions="$exampleOptions -c$OPTARG" ;;
-	    (t)	exampleTBOptions="$OPTARG" ;;
+	    (n)	note="$OPTARG" ;;
+	    (a)	options="$options -a$OPTARG" ;;
+	    (c)	options="$options -c$OPTARG" ;;
+	    (O) optArguments="$optArguments $OPTARG" ;;
+	    (o)	outputOptions="$OPTARG" ;;
 	    (?)	warn "bad example option"; exit 1 ;;
 	esac
     done
@@ -378,65 +380,77 @@ example()
 
     # read environment
     while [ "${1-}" != "${1+${1#/}}" ]; do
-	exampleEnvironment="$exampleEnvironment $1"
+	environment="$environment $1"
 	shift
     done
-    #}}}
 
-    #{{{ read rest of arguments
+    # set global variables
+    exampleOptions="$options"
+    exampleOptArguments="$optArguments"
+    exampleEnvironment="$environment"
+    exampleOutputOptions="$outputOptions"
+
+    # run algorithm and print data
+    if [ -n "$debugMode" ]; then
+	runAlgorithm "echo" "$@"
+    else
+	runAlgorithm "" "$@" | printData "$name" "$note"
+    fi
+}
+#}}}
+
+#{{{ collection ()
+#{{{ docu
+#
+# collection() - set up collection data.
+#
+# Sets the collection* variables from commandline.
+#
+#}}}
+collection()
+{
+    typeset options="" \
+	    optArguments="" \
+	    environment="" \
+	    \
+	    outputOptions="" \
+    
+    # read collection name (and ignore it)
     if [ "$#" = "0" ]; then
-	warn "no example specified"
+	warn "no collection name specified"
 	exit 1
     fi
-    algorithm="$1"
     shift
-    #}}}
 
-    # check for debug mode
-    if [ -n "$debugMode" ]; then
-	runAlgorithm "$algorithm" -oa "$@"
-	return
-    fi
+    # read options
+    typeset opt
+    while getopts "n:a:c:O:o:" opt; do
+	case "$opt" in
+	    (n)	: ;;
+	    (a)	options="$options -a$OPTARG" ;;
+	    (c)	options="$options -c$OPTARG" ;;
+	    (O) optArguments="$optArguments $OPTARG" ;;
+	    (o)	outputOptions="$OPTARG" ;;
+	    (?)	warn "bad collection option"; exit 1 ;;
+	esac
+    done
+    # shift options and reset OPTIND
+    typeset -i optind
+    optind=OPTIND-1
+    shift $optind
+    OPTIND=1
 
-    # collect output options
-    algorithmTBOptions="${runTBOptions:-${exampleTBOptions:-$collectionTBOptions}}"
+    # read environment
+    while [ "${1-}" != "${1+${1#/}}" ]; do
+	environment="$environment $1"
+	shift
+    done
 
-    #{{{ read and print data
-    typeset algChar \
-	    algSwitch \
-	    algVars \
-	    algCircle \
-	    algSeed \
-	    algVers \
-	    algTime \
-	    algCheck
-    
-    typeset -a algResult
-
-    typeset -i j=0
-
-    # read data
-    runAlgorithm "$algorithm" -oa "$@" \
-	| {
-	read algChar
-	read algSwitch
-	read algVars
-	read algCircle
-	read algSeed
-	read algVers
-	read algTime
-	read algCheck
-
-	# preprocess output and store result in the arrays
-	while read line; do
-	    algResult[j]="$line"
-	    j=j+1
-	done
-
-	# print table
-	printData "$algorithmTBOptions" "$TBColWidth" "$exampleName" "$exampleNote"
-    }
-    #}}}
+    # set global variables
+    collectionOptions="$options"
+    collectionOptArguments="$optArguments"
+    collectionEnvironment="$environment"
+    collectionOutputOptions="$outputOptions"
 }
 #}}}
 
@@ -445,30 +459,33 @@ example()
 #
 # - main program.
 #
-# runROOptions: options for RO table.  Read from commandline.
-# rawCollectionName: collection name with full path
-#
-# Global variables used:
-#   collectionROOptions,
-#   debugMode,
-#   ROColWidth, EvalAlg
+# Sets the run* variables for runAlgorithm() and printData()
+# from commandline.  Sets debugMode for example().  Reads the
+# collection.
 #
 #}}}
-typeset runROOptions=""
-typeset rawCollectionName=""
+typeset configuration="opt" \
+	\
+	options="" \
+	optArguments="" \
+	environment="" \
+	\
+	outputOptions="" \
+	\
+	fexFile=""
 
-#{{{ read options and environment
 # read options
 typeset opt
-while getopts "a:c:C:t:r:d" opt; do
+while getopts "dC:ta:c:O:o:" opt; do
     case "$opt" in
-	(a)  runOptions="$runOptions -a$OPTARG" ;;
-	(c)  runOptions="$runOptions -c$OPTARG" ;;
-	(C)  runConfiguration="$OPTARG" ;;
-	(t)  runTBOptions="$OPTARG" ;;
-	(r)  runROOptions="$OPTARG" ;;
 	(d)  debugMode="1" ;;
-	(?)  warn "bad run option"; exit 1 ;;
+	(C)  configuration="$OPTARG" ;;
+	(t)  options="$options -t" ;;
+	(a)  options="$options -a$OPTARG" ;;
+	(c)  options="$options -c$OPTARG" ;;
+	(O)  optArguments="$optArguments $OPTARG" ;;
+	(o)  outputOptions="$OPTARG" ;;
+	(?)  warn "bad run option"; usage; exit 1 ;;
     esac
 done
 # shift options and reset OPTIND
@@ -479,54 +496,38 @@ OPTIND=1
 
 # read environment
 while [ "${1-}" != "${1+${1#/}}" ]; do
-    runEnvironment="$runEnvironment $1"
+    environment="$environment $1"
     shift
 done
-#}}}
 
 # process rest of arguments
 if [ "$#" = "0" ]; then
-    warn "no collection name specified"
+    warn "no fexFile specified"
+    usage
     exit 1
 fi
-rawCollectionName="${1%.fex}"
+fexFile="${1%.fex}"
 shift
 
 defineSkip "$@"
 
 # before going on, check for existence of collection
-if [ ! -f "$rawCollectionName.fex" ]; then
-    warn "collection $rawCollectionName.fex not found"
+if [ ! -f "$fexFile.fex" ]; then
+    warn "collection $fexFile.fex not found"
     exit 1
 fi
 
-# execute collection
-. "$rawCollectionName.fex"
+# reset factory environemnt to exclude external influences
+FTEST_ENV=""
+FTEST_CIRCLE=""
+FTEST_ALARM=""
 
-if [ -z "$debugMode" ]; then
-    typeset algChar
-    typeset algSwitch
-    typeset algVars
-    typeset algCircle
-    typeset algSeed
-    typeset algVers
+# set global variables and execute collection
+runConfiguration="$configuration"
+runOptions="$options"
+runOptArguments="$optArguments"
+runEnvironment="$environment"
+runOutputOptions="$outputOptions"
 
-    # read data
-    runAlgorithm "$EvalAlg" -oe \
-	| {
-	read algChar
-	read algSwitch
-	read algVars
-	read algCircle
-	read algSeed
-	read algVers
-
-	# print data
-	typeset options="${runROOptions:-$collectionROOptions}"
-	# remove some options
-	options="${options//tcrd/}"
-
-	printData "$options" "$ROColWidth" "$collectionName" "$collectionNote"
-    }
-fi
+. "$fexFile.fex"
 #}}}
