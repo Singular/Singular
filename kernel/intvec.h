@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.2 2004-07-16 08:43:00 Singular Exp $ */
+/* $Id: intvec.h,v 1.3 2004-07-19 16:46:36 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -76,7 +76,7 @@ public:
   inline int min_in()
   {
     int m=v[0];
-    for (int i=row*col; i>0; i--) if (v[i]<m) m=v[i];
+    for (int i=row*col-1; i>0; i--) if (v[i]<m) m=v[i];
     return m;
   }
   // keiner (ausser obachman) darf das folgenden benutzen !!!
