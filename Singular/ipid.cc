@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.55 2001-10-23 14:04:22 Singular Exp $ */
+/* $Id: ipid.cc,v 1.56 2002-01-07 17:20:48 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -417,9 +417,10 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
   return *root;
 
   errlabel:
-    Werror("identifier `%s` in use(lev h=%d,typ=%d,t=%d, curr=%d)",s,IDLEV(h),IDTYP(h),t,lev);
+    //Werror("identifier `%s` in use(lev h=%d,typ=%d,t=%d, curr=%d)",s,IDLEV(h),IDTYP(h),t,lev);
+    Werror("identifier `%s` in use",s);
 #ifdef HAVE_NS
-    listall();
+    //listall();
 #endif
     omFree(s);
     return NULL;
@@ -779,13 +780,19 @@ idhdl ggetid(const char *n, BOOLEAN local)
   return h3;
 #else /* HAVE_NAMESPACES */
   idhdl h = IDROOT->get(n,myynest);
+  if ((h!=NULL)&&(IDLEV(h)==myynest)) return h;
   idhdl h2=NULL;
-  if ((currRing!=NULL) && ((h==NULL)||(IDLEV(h)!=myynest)))
+  if (currRing!=NULL)
   {
     h2 = currRing->idroot->get(n,myynest);
   }
-  if (h2==NULL) return h;
-  return h2;
+  if (h2!=NULL) return h2;
+  if (h!=NULL) return h;
+#ifdef HAVE_NS  
+  if (basePack!=currPack)
+    return basePack->idroot->get(n,myynest);
+#endif      
+  return NULL; 
 #endif /* HAVE_NAMESPACES */
 }
 
@@ -1054,8 +1061,8 @@ void proclevel::push(char *n)
 {
   //Print("push %s\n",n);
   proclevel *p=(proclevel*)omAlloc0(sizeof(proclevel));
-  p->currRing=::currRing;
-  p->currRingHdl=::currRingHdl;
+  //p->currRing=::currRing;
+  //p->currRingHdl=::currRingHdl;
   p->name=n;
   #ifdef HAVE_NS
   p->currPackHdl=::currPackHdl;
