@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.20 1998-05-19 12:03:27 wichmann Exp $
+@comment $Id: examples.doc,v 1.21 1998-05-19 14:05:07 wichmann Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -25,51 +25,53 @@ The following topics are treated:
 @end ifinfo
 
 @menu
-* Start SINGULAR::
-* Milnor and Tjurina::
-* Procedures and LIB::
-* Critical points::
-* Saturation::
-* Long coefficients::
-* Parameters::
-* T1 and T2::
-* Deformations::
-* Finite fields::
-* Elimination::
-* Free resolution::
-* Ext::
-* Polar curves::
-* Depth::
-* Formating output::
-* Cyclic roots::
-* Fast lexicographical GB::
-* G_a -Invariants::
-* Invariants of a finite group::
-* Factorization::
-* Puiseux pairs::
-* Primary decomposition::
-* Classification::
-* Parallelization with MPtcp links::
+* Milnor and Tjurina::          
+* Procedures and LIB::          
+* Critical points::             
+* Saturation::                  
+* Long coefficients::           
+* Parameters::                  
+* T1 and T2::                   
+* Deformations::                
+* Finite fields::               
+* Elimination::                 
+* Free resolution::             
+* Ext::                         
+* Polar curves::                
+* Depth::                       
+* Formating output::            
+* Cyclic roots::                
+* G_a -Invariants::             
+* Invariants of a finite group::  
+* Factorization::               
+* Puiseux pairs::               
+* Primary decomposition::       
+* Normalization::               
+* Kernel of module homomorphisms::  
+* Algebraic dependence::        
+* Classification::              
+* Fast lexicographical GB::     
+* Parallelization with MPtcp links::  
 @end menu
 
 @c ----------------------------------------------------------------------------
-@node Start SINGULAR, Milnor and Tjurina,Examples, Examples
-@section Start SINGULAR
-@cindex Start SINGULAR
+@c @node Start SINGULAR, Milnor and Tjurina,Examples, Examples
+@c @section Start SINGULAR
+@c @cindex Start SINGULAR
 
-Call @sc{Singular} by typing @code{Singular} [return]
+@c Call @sc{Singular} by typing @code{Singular} [return]
 
-To use the online help type for instance:
-   @code{help;} @code{help command;} @code{help General syntax;} @code{help ring;}...
-Please note:  EVERY COMMAND MUST END WITH A SEMICOLON ";"
+@c To use the online help type for instance:
+@c    @code{help;} @code{help command;} @code{help General syntax;} @code{help ring;}...
+@c Please note:  EVERY COMMAND MUST END WITH A SEMICOLON ";"
 
-To leave @sc{Singular}, type one of the:
-   @code{quit;} @code{exit;} @code{$}
+@c To leave @sc{Singular}, type one of the:
+@c    @code{quit;} @code{exit;} @code{$}
 
-The two characters @code{//} make the rest of the line a comment.
+@c The two characters @code{//} make the rest of the line a comment.
 
 @c ----------------------------------------------------------------------------
-@node Milnor and Tjurina,Procedures and LIB,Start SINGULAR,Examples
+@node Milnor and Tjurina, Procedures and LIB, Examples, Examples
 @section Milnor and Tjurina
 @cindex Milnor
 @cindex Tjurina
@@ -194,7 +196,7 @@ reset the option to @code{noprot}
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Procedures and LIB,Critical points,Milnor and Tjurina,Examples
+@node Procedures and LIB, Critical points, Milnor and Tjurina, Examples
 @section Procedures and LIB
 @cindex Procedures and LIB
 
@@ -223,7 +225,7 @@ compute Milnor number and Tjurina number by using the procedures
 write your own procedures:
 (A procedure has a list of input parameters and of return values, both
 lists may be empty.)
-  @itemize @bullet
+  @itemize @minus
   @item
   'proc mil' which must be called with one parameter, a polynomial.
   The name g is local to the procedure and is killed automatically.
@@ -284,7 +286,7 @@ milrina(f)[2];  // the second element of the list
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Critical points,Saturation,Procedures and LIB,Examples
+@node Critical points, Saturation, Procedures and LIB, Examples
 @section Critical points
 @cindex Critical points
 
@@ -371,7 +373,6 @@ the affine surface f=0 is smooth outside the origin.
   int a,b,c,t=11,5,3,0;
   poly f = x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3+
            x^(c-2)*y^c*(y^2+t*x)^2;
-  option (prot);
   timer=1;
   ring r2 = 32003,(x,y,z),dp;
   poly f=fetch(r1,f);
@@ -383,7 +384,7 @@ the affine surface f=0 is smooth outside the origin.
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Saturation,Long coefficients,Critical points,Examples
+@node Saturation, Long coefficients, Critical points, Examples
 @section Saturation
 @cindex Saturation
 
@@ -434,7 +435,7 @@ the number of iterations.
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Long coefficients,Parameters,Saturation,Examples
+@node Long coefficients, Parameters, Saturation, Examples
 @section Long coefficients
 @cindex Long coefficients
 
@@ -524,7 +525,7 @@ kill R0;
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Parameters,T1 and T2,Long coefficients,Examples
+@node Parameters, T1 and T2, Long coefficients, Examples
 @section Parameters
 @cindex Parameters
 
@@ -548,7 +549,7 @@ deformation was "generic").
 @end example
 
 @c ----------------------------------------------------------------------------
-@node T1 and T2,Deformations,Parameters,Examples
+@node T1 and T2, Deformations, Parameters, Examples
 @section T1 and T2
 @cindex T1
 @cindex T2
@@ -671,7 +672,7 @@ killall();            // a procedure from general.lib
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Deformations,Finite fields,T1 and T2,Examples
+@node Deformations, Finite fields, T1 and T2, Examples
 @section Deformations
 @cindex Deformations
 
@@ -760,7 +761,7 @@ the miniversal deformations:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Finite fields,Elimination,Deformations,Examples
+@node Finite fields, Elimination, Deformations, Examples
 @section Finite fields
 @cindex Finite fields
 
@@ -854,7 +855,7 @@ We need the file 'gftables/9' with a table for the small finite fields with 9 el
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Elimination,Free resolution,Finite fields,Examples
+@node Elimination, Free resolution, Finite fields, Examples
 @section Elimination
 @cindex Elimination
 
@@ -1044,7 +1045,7 @@ P^4.
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Free resolution,Ext,Elimination,Examples
+@node Free resolution, Ext, Elimination, Examples
 @section  Free resolution
 @cindex  Free resolution
 
@@ -1054,20 +1055,19 @@ the input module (minimized if @code{mres} is used), the k-th module in the
 list is the first syzygy-module (module of relations) of the (k-1)st module.
 There are 3 resolution commands @code{sres}, @code{res}, @code{mres}
 and the command @code{syz}:
-@itemize @asis
-@item @code{sres}
+@table @code
+@item sres
 requires a standard basis as input, does not give a minimal resolution.
-         Is quite often (in symmetric or determinantal situations which are
-         far from a complete intersection) much faster than the other
-         two commands.
-@item @code{mres}
+Is quite often (in symmetric or determinantal situations which are far
+from a complete intersection) much faster than the other two commands.
+@item mres
  computes a minimal resolution, also minimizing the first module
-@item @code{res}
+@item res
   minimizes every module in the resolution except the first module
-@item @code{syz}
+@item syz
   computes the 1-st syzygy module of the input, i.e. the module of
          relations between the given generators.
-@end itemize
+@end table
 @code{sres(i,r)}, @code{mres(i,r)}, @code{res(i,r)} compute the
 first r modules of the resolution
 of i, resp. the full resolution if r=0 and the basering is not a qring.
@@ -1133,7 +1133,7 @@ from above.
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Ext,Polar curves,Free resolution,Examples
+@node Ext, Polar curves, Free resolution, Examples
 @section  Ext
 @cindex  Ext
 
@@ -1239,7 +1239,7 @@ for some ideal i and with an extra option
   //We see from the matrices that T2K and E are isomorphic
   //as it should be; but both are differently presented
   //-------------------------------------------
-  ring R=0,(x,y,z),dp;
+  ring S=0,(x,y,z),dp;
   ideal  i = x2y,y2z,z3x;
   module E = Ext_R(2,i);
   print(E);
@@ -1255,7 +1255,7 @@ for some ideal i and with an extra option
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Polar curves,Depth,Ext,Examples
+@node Polar curves, Depth, Ext, Examples
 @section   Polar curves
 @cindex Polar curves
 
@@ -1388,7 +1388,7 @@ We need the library 'elim.lib' for saturation and 'sing.lib' for the singular lo
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Depth,Formating output,Polar curves,Examples
+@node Depth, Formating output, Polar curves, Examples
 @section Depth
 @cindex Depth
 
@@ -1447,7 +1447,7 @@ could be improved.)
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Formating output,Cyclic roots,Depth,Examples
+@node Formating output, Cyclic roots, Depth, Examples
 @section Formating output
 @cindex Formating output
 
@@ -1478,7 +1478,7 @@ adding appropriate space.
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Cyclic roots,Fast lexicographical GB,Formating output,Examples
+@node Cyclic roots, G_a -Invariants, Formating output, Examples
 @section Cyclic roots
 @cindex Cyclic roots
 
@@ -1542,41 +1542,9 @@ degree(j);
 @expansion{} // dimension   = 0
 @expansion{} // degree      = 70
 @end example
+
 @c ----------------------------------------------------------------------------
-@node Fast lexicographical GB,G_a -Invariants,Cyclic roots,Examples
-@section Fast lexicographical GB
-@cindex Fast lexicographical GB
-
-Compute Groebner basis in lexicographical ordering
-by using FGLM algorithm (@code{stdfglm)} and Hilbert driven
-Groebner (@code{stdhilb}).
-
-The command @code{stdfglm} works only for zero dimensional ideals.
-
-For the ideal below, @code{stdfglm} is more than 100 times
-and @code{stdhilb} about 10 times faster than std.
-
-@example
-@c example
-  ring r =32003,(a,b,c,d,e),lp;
-  ideal i=a+b+c+d, ab+bc+cd+ae+de, abc+bcd+abe+ade+cde,
-          abc+abce+abde+acde+bcde, abcde-1;
-  int t=timer;
-  ideal j1=stdfglm(i);
-  timer-t;
-  size(j1);   // size (no. of polys) in computed GB
-  t=timer;
-  ideal j2=stdhilb(i);
-  timer-t;
-  size(j2);   // size (no. of polys) in computed GB
-  // usual Groebner basis computation for lex ordering
-  t=timer;
-  ideal j0 =std(i);
-  timer-t;
-@c example
-@end example
-@c ----------------------------------------------------------------------------
-@node G_a -Invariants,Invariants of a finite group,Fast lexicographical GB,Examples
+@node G_a -Invariants, Invariants of a finite group, Cyclic roots, Examples
 @section G_a -Invariants
 @cindex G_a -Invariants
 
@@ -1617,7 +1585,7 @@ sum x(i)*d/dx(i+1).
 @c example
 @end example
 @c ----------------------------------------------------------------------------
-@node Invariants of a finite group,Factorization,G_a -Invariants,Examples
+@node Invariants of a finite group, Factorization, G_a -Invariants, Examples
 @section Invariants of a finite group
 @cindex Invariants of a finite group
 
@@ -1672,7 +1640,7 @@ Sturmfels: "Algorithms in Invariant Theory 2.3.7:".
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Factorization,Puiseux pairs,Invariants of a finite group,Examples
+@node Factorization, Puiseux pairs, Invariants of a finite group, Examples
 @section Factorization
 @cindex Factorization
 
@@ -1700,7 +1668,7 @@ Messollen) which are part of the @sc{Singular} system.
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Puiseux pairs,Primary decomposition,Factorization,Examples
+@node Puiseux pairs, Primary decomposition, Factorization, Examples
 @section Puiseux pairs
 @cindex Puiseux pairs
 
@@ -1777,7 +1745,7 @@ another.
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Primary decomposition,Classification,Puiseux pairs,Examples
+@node Primary decomposition, Normalization, Puiseux pairs, Examples
 @section Primary decomposition
 @cindex Primary decomposition
 
@@ -1797,12 +1765,8 @@ the primary ideal and the corresponding prime ideal.
 @example
 @c example
   LIB "primdec.lib";
-  ring r = 0,(x,y,z,t,w),dp;
-  ideal i=
-     x2+2y2+2z2+2t2-x,
-     2xy+2yz+2zt-y,
-     y2+2xz+2yt-z,
-     x+2y+2z+2t-1;
+  ring r = 0,(a,b,c,d,e,f),dp;
+  ideal i= f3, ef2, e2f, bcf-adf, de+cf, be+af, e3;
   primdecGTZ(i);
   // We consider now the ideal J of the base space of the
   // miniversal deformation of the cone over the rational
@@ -1823,22 +1787,254 @@ the primary ideal and the corresponding prime ideal.
   // the radical. We use the Characteristic set methods
   // from prim_dec.lib.
   J = intersect(J,maxideal(3));
-                       //shows that the maximal ideal is
-  primdecSY(J,1);      //embedded (takes a few seconds)
-  min_ass_prim_charsets(J,1);
+                     //shows that the maximal ideal is
+  primdecSY(J);      //embedded (takes a few seconds)
+  minAssChar(J);
   radical(J);
 @c example
 @end example
+
 @c ----------------------------------------------------------------------------
-@node Classification, Parallelization with MPtcp links, Primary decomposition, Examples
+@node Normalization, Kernel of module homomorphisms, Primary decomposition, Examples
+@section Normalization
+@cindex Normalization
+The normalization will be computed for a reduced ring @math{R/I}. The
+result is a list of rings; ideals are always called @code{KK} in the
+rings of this list. The normalization of @math{R/I} is the product of
+the factor rings of the rings in the list divided out by the ideals
+@code{KK}.
+
+@example
+@c example
+  LIB "normal.lib";
+  // ----- first example: -----
+  ring R=32003,(x,y,z),wp(3,5,15);
+  ideal I=z*(y3-x5)+x10;
+  list pr=normal(I);
+  def S=pr[1];
+  setring S;
+  KK;
+  // ----- second example: union of straight lines -----
+  ring R1=0,(x,y,z),dp;
+  ideal I=(x-y)*(x-z)*(y-z);
+  list qr=normal(I);
+  def S1=qr[1]; def S2=qr[2]; def S3=qr[3];
+  setring S1; KK;
+  setring S2; KK;
+  setring S3; KK;
+@c example
+@end example
+
+@c ----------------------------------------------------------------------------
+@node Kernel of module homomorphisms, Algebraic dependence, Normalization, Examples
+@section Kernel of module homomorphisms
+@cindex Kernel of module homomorphisms
+Let @math{A}, @math{B} two matrices of size
+@tex
+$m\times r$ and $m\times s$
+@end tex
+@ifinfo
+m x r and m x s
+@end ifinfo
+over the ring @math{R} and consider the corresponding maps
+@tex
+$$
+R^r \buildrel{A}\over{\longrightarrow} 
+R^m \buildrel{B}\over{\longleftarrow} R^s\;.
+$$
+@end tex
+@ifinfo
+
+@example
+   r   A     m
+  R  -----> R
+            ^
+            |
+            |
+             s
+            R  .
+@end example
+
+@end ifinfo
+We want to compute the kernel of the map
+@tex
+$R^r \buildrel{A}\over{\longrightarrow}
+R^m\longrightarrow 
+R^m/\hbox{Im}(B) \;.$
+@end tex
+@ifinfo
+
+@example
+   r   A     m         m
+  R  -----> R  -----> R /Im(B) .
+@end example
+
+@end ifinfo
+This can be done using the @code{modulo} command:
+@tex
+$$
+\hbox{\tt modulo}(A,B)=\hbox{ker}(R^r
+\buildrel{A}\over{\longrightarrow}R^m/\hbox{Im}(B)) \; .
+$$
+@end tex
+@ifinfo
+
+@example
+                   r   A     m
+  modulo(A,B)=ker(R  -----> R /Im(B))  .
+@end example
+
+@end ifinfo
+
+@example
+@c example
+  ring r=0,(x,y,z),(c,dp);
+  matrix A[2][2]=x,y,z,1;
+  matrix B[2][2]=x2,y2,z2,xz;
+  modulo(A,B);
+@c example
+@end example
+
+@c ----------------------------------------------------------------------------
+@node Algebraic dependence, Classification, Kernel of module homomorphisms, Examples
+@section Algebraic dependence
+@cindex Algebraic dependence
+Let
+@tex
+$g$, $f_1$, \dots, $f_r\in K[x_1,\ldots,x_n]$.
+@end tex
+@ifinfo
+g, f_1, @dots{}, f_r in K[x1,@dots{},xn].
+@end ifinfo
+We want to check wether
+@enumerate
+@item
+@tex
+$f_1$, \dots, $f_r$
+@end tex
+@ifinfo
+f_1, @dots{}, f_r
+@end ifinfo
+are algebraically dependent.
+
+Let
+@tex
+$I=\langle Y_1-f_1,\ldots,Y_r-f_r \rangle \subseteq
+K[x_1,\ldots,x_n,Y_1,\ldots,Y_r]$.
+@end tex
+@ifinfo
+
+@example
+I=<Y_1-f_1,@dots{},Y_r-f_r> subset K[x1,@dots{},xn,Y_1,@dots{},Y_r].
+@end example
+
+@end ifinfo
+Then
+@tex
+$I \cap K[Y_1,\ldots,Y_r]$
+@end tex
+@ifinfo
+I intersected with K[Y_1,@dots{},Y_r]
+@end ifinfo
+are the algebraic relations between 
+@tex
+$f_1$, \dots, $f_r$.
+@end tex
+@ifinfo
+f_1, @dots{}, f_r.
+@end ifinfo
+
+@item
+@tex
+$g \in K [f_1,\ldots,f_r]$.
+@end tex
+@ifinfo
+g in K[f_1,@dots{},f_r].
+@end ifinfo
+
+There holds
+@tex
+$g \in K[f_1,\ldots,f_r]$
+@end tex
+@ifinfo
+g in K[f_1,@dots{},f_r]
+@end ifinfo
+if and only if the normalform of @math{g} with respect to @math{I} and a 
+blockordering with respect to
+@tex
+$X=(x_1,\ldots,x_n)$ and $Y=(Y_1,\ldots,Y_r)$ with $X>Y$
+@end tex
+@ifinfo
+X=(x1,@dots{},xn) and Y=(Y_1,@dots{},Y_r) with X>Y
+@end ifinfo
+is in @math{K[Y]}. Then 
+@tex
+$g=h(f_1,\ldots,f_r)$.
+@end tex
+@ifinfo
+g=h(f_1,@dots{},f_r).
+@end ifinfo
+@end enumerate
+
+Both questions can be answered using the following procedure. If the
+second argument is zero, it checks for algebraic dependency, otherwise
+it checks for ideal membership.
+
+@example
+proc algebraicDep(ideal I, poly g)
+@{
+  def R=basering;
+  int n=size(I);
+  int k=nvars(R);
+  int i;
+  intvec v;
+  
+  //construction of the new ring 
+  
+  v[n+k]=0;
+  for(i=1;i<=k;i++)
+  @{
+    v[i]=1;
+  @}
+  string orde="(a("+string(v)+"),dp);";
+  string ri="ring Rhelp=("+charstr(R)+"),
+                        ("+varstr(R)+",Y(1.."+string(n)+")),"+orde;
+  
+  execute(ri);
+  keepring(Rhelp);
+  ideal I=imap(R,I);
+  for(i=1;i<=n;i++)
+  @{
+    I[i]=I[i]-var(k+i); 
+  @}
+  poly g=imap(R,g);
+  if(g==0)
+  @{
+    poly el=var(1);
+    for(i=2;i<=k;i++)
+    @{
+       el=el*var(i);
+    @}
+    ideal KK=eliminate(I,el);
+    export(KK);
+    return(KK);
+  @}
+  ideal KK=reduce(g,std(I));
+  export(KK);
+  return(KK);
+@}
+@end example
+
+@c ----------------------------------------------------------------------------
+@node Classification, Fast lexicographical GB, Algebraic dependence, Examples
 @section Classification
 @cindex Classification
 
-Classification of isolated hypersurface singularities with respect
-to right equivalence is provided by the command @code{classify}. 
-The classification is done using the algorithm of Arnold. Before 
-entering this algorithm, a first guess based on the Hilbert polynomial 
-of the Milnor algebra is made.
+Classification of isolated hypersurface singularities with respect to
+right equivalence is provided by the command @code{classify} of the
+library @code{classify.lib}. The classification is done using the
+algorithm of Arnold. Before entering this algorithm, a first guess based
+on the Hilbert polynomial of the Milnor algebra is made.
 
 @example
 @c example
@@ -1856,7 +2052,7 @@ of the Milnor algebra is made.
   // singularity which is not in normal form:
   map phi=r,x+y,y+z,x;
   poly q=phi(p);
-  // Yes, q really looks ugly,now:
+  // Yes, q really looks ugly, now:
   q;
   // Classification
   classify(q);
@@ -1868,15 +2064,49 @@ of the Milnor algebra is made.
 @c example
 @end example  
 
+@c ----------------------------------------------------------------------------
+@node Fast lexicographical GB, Parallelization with MPtcp links, Classification, Examples
+@section Fast lexicographical GB
+@cindex Fast lexicographical GB
+
+Compute Groebner basis in lexicographical ordering
+by using FGLM algorithm (@code{stdfglm)} and Hilbert driven
+Groebner (@code{stdhilb}).
+
+The command @code{stdfglm} works only for zero dimensional ideals and
+returns a reduced Groebner basis.
+
+For the ideal below, @code{stdfglm} is more than 100 times
+and @code{stdhilb} about 10 times faster than std.
+
+@example
+@c example
+  ring r =32003,(a,b,c,d,e),lp;
+  ideal i=a+b+c+d, ab+bc+cd+ae+de, abc+bcd+abe+ade+cde,
+          abc+abce+abde+acde+bcde, abcde-1;
+  int t=timer;
+  ideal j1=stdfglm(i);
+  timer-t;
+  size(j1);   // size (no. of polys) in computed GB
+  t=timer;
+  ideal j2=stdhilb(i);
+  timer-t;
+  size(j2);   // size (no. of polys) in computed GB
+  // usual Groebner basis computation for lex ordering
+  t=timer;
+  ideal j0 =std(i);
+  timer-t;
+@c example
+@end example
 
 @c ----------------------------------------------------------------------------
-@node  Parallelization with MPtcp links,, Classification,Examples
+@node  Parallelization with MPtcp links,  , Fast lexicographical GB, Examples
 @section Parallelization with MPtcp links
 @cindex Parallelization
 @cindex MPtcp
 @cindex link
 In this example, we demonstrate how MPtcp links can be used to
-paralellize computations. 
+parallelize computations. 
 
 To compute a standard base for a zero-dimensional ideal in the
 lexicographical ordering, one of the two powerful routines
