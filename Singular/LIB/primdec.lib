@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.33 1999-06-09 09:49:47 Singular Exp $
+// $Id: primdec.lib,v 1.34 1999-06-09 10:48:03 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.33 1999-06-09 09:49:47 Singular Exp $";
+version="$Id: primdec.lib,v 1.34 1999-06-09 10:48:03 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -4113,38 +4113,6 @@ example
    list pr= primdecSY(i);
    pr;
 }
-///////////////////////////////////////////////////////////////////////////////
-proc minAssGTZ(ideal i)
-"USAGE:  minAssGTZ(i); i ideal
-RETURN:  list = the minimal associated prime ideals of i
-NOTE:    designed for characteristic 0, works also in char k >> 0,
-         may result in an infinite loop in small characteristic
-EXAMPLE: example minAssGTZ; shows an example
-"
-{
-   return(minAssPrimes(i,1));
-}
-example
-{ "EXAMPLE:";  echo = 2;
-   ring  r = 32003,(x,y,z),dp;
-   poly  p = z2+1;
-   poly  q = z4+2;
-EXAMPLE: example minAssChar; shows an example
-"
-
-{
-   return(min_ass_prim_charsets(i,1));
-}
-example
-{ "EXAMPLE:";  echo = 2;
-   ring  r = 32003,(x,y,z),dp;
-   poly  p = z2+1;
-   poly  q = z4+2;
-   ideal i = p^2*q^3,(y-z3)^3,(x-yz+z4)^4;
-   list pr= minAssChar(i);
-   pr;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 proc equiRadical(ideal i)
 "USAGE:  equiRadical(i); i ideal
