@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.h,v 1.4 2003-08-28 11:54:32 Singular Exp $ */
+/* $Id: NTLconvert.h,v 1.5 2003-08-28 14:13:44 Singular Exp $ */
 #ifndef INCL_NTLCONVERT_H
 #define INCL_NTLCONVERT_H
 
@@ -20,13 +20,13 @@
 
 #ifdef HAVE_NTL
 
-#include <NTL/ZZXFactoring.h>
-#include <NTL/ZZ_pXFactoring.h>
-#include <NTL/GF2XFactoring.h>
+#include <NTL/ZZX.h>
+#include <NTL/ZZ_p.h>
+#include <NTL/GF2X.h>
 #include "int_int.h"
 #include <limits.h>
-#include <NTL/ZZ_pEXFactoring.h>
-#include <NTL/GF2EXFactoring.h>
+#include <NTL/ZZ_pE.h>
+#include <NTL/GF2EX.h>
 
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
 NTL_CLIENT
