@@ -612,6 +612,8 @@ if test "$ac_cv_with_readline" = dynamic; then
   AC_DEFINE(HAVE_DYN_RL)
 elif test "$ac_cv_have_readline" = yes; then
   AC_MSG_RESULT(static)
+elif test "$ac_cv_singuname" = PowerMacintosh-darwin; then
+  AC_MSG_ERROR(building without readline impossible on PowerMacintosh-darwin)
 else
   AC_MSG_RESULT(none)
   AC_MSG_WARN(building without readline: disabling fancy display)

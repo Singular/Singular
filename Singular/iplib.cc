@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.87 2001-08-28 13:03:05 mschulze Exp $ */
+/* $Id: iplib.cc,v 1.88 2001-09-19 14:16:40 anne Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -1305,7 +1305,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   if( (strncmp(buf, "\177ELF\01\01\01", 7)==0) && buf[16]=='\03')
   {
     LT = LT_ELF;
-    omFree(newlib);
+    // omFree(newlib);
     newlib = omStrDup(libnamebuf);
     goto lib_type_end;
   }
