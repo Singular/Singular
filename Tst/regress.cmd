@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.28 1999-10-22 11:12:50 obachman Exp $
+# $Id: regress.cmd,v 1.29 1999-12-08 23:45:20 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -86,6 +86,14 @@ else
   $uuencode = "uuencode";
   $uudecode = "uudecode";
 }
+
+#
+# flush stdout and stderr after every write
+#
+select(STDERR);
+$| = 1;
+select(STDOUT);
+$| = 1;
 
 #################################################################
 #
