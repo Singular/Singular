@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.1 1998-03-06 11:49:24 krueger Exp $ */
+/* $Id: libparse.l,v 1.2 1998-03-06 12:12:03 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -148,6 +148,7 @@ name           ({letter}({letter}*{digit}*_*)*|_)
 letters        ({letter}|{digit}|[_./#%^*:,])
 string         ({letters}*)
 comment        [\/][\/]
+dolar          [$]
 
 /* %start START */
 
@@ -219,7 +220,7 @@ LIB[ \t]+"\""            { quote++;
                            BEGIN(libcmd);
                          }
 
-<header>({comment}+[ \t]*+$Id: libparse.l,v 1.1 1998-03-06 11:49:24 krueger Exp $Header:+{string}+[^\n]*) {
+<header>({comment}+[ \t]*+{dolar}+Id:+{string}+[^\n]*)|({comment}+[ \t]*+{dolar}+Header:+{string}+[^\n]*) {
                            char ver[10];
                            char date[16];
                            ver[0]='?'; ver[1]='.'; ver[2]='?'; ver[3]='\0';
@@ -530,7 +531,8 @@ print_version(char *p)
 #ifdef STANDALONE_PARSER
    //printf("loading %s%s", p, libnamebuf);
 #else
-   Warn( "loading %s%s", p, libnamebuf);
+   if (BVERBOSE(V_LOAD_LIB))
+      Warn( "loading %s%s", p, libnamebuf);
 #endif
 }
 
