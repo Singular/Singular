@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.54 2000-05-15 14:11:02 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.55 2000-05-15 14:21:45 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -115,27 +115,28 @@ static BOOLEAN jjSHORTOUT(leftv res, leftv a)
 }
 static BOOLEAN jjMINPOLY(leftv res, leftv a)
 {
-  if ((rPar(currRing)!=1)
-    || (rField_is_GF()))
-  {
-    WerrorS("no minpoly allowed");
-    return TRUE;
-  }
-  if (currRing->minpoly!=NULL)
-  {
-    WerrorS("minpoly already set");
-    return TRUE;
-  }
   number p=(number)a->CopyD(NUMBER_CMD);
-  if (!nIsZero(p))
+  if (nIsZero(p))
   {
-    nNormalize(p);
-    currRing->minpoly=p;
-    naMinimalPoly=((lnumber)currRing->minpoly)->z;
+    currRing->minpoly=NULL;
+    naMinimalPoly=NULL;
   }
   else
   {
-    naMinimalPoly=NULL;
+    if ((rPar(currRing)!=1)
+      || (rField_is_GF()))
+    {
+      WerrorS("no minpoly allowed");
+      return TRUE;
+    }
+    if (currRing->minpoly!=NULL)
+    {
+      WerrorS("minpoly already set");
+      return TRUE;
+    }
+    nNormalize(p);
+    currRing->minpoly=p;
+    naMinimalPoly=((lnumber)currRing->minpoly)->z;
   }
   return FALSE;
 }
