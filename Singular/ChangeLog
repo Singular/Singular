@@ -1,3 +1,6 @@
+Wed Dec 17 09:47:58 MEZ 1997 Kai Krueger <krueger@mathematik.uni-kl.de>
+        * test/dbm_test.[in/out]: rewrite of dbm-tests.
+	
 Tue Dec 16 16:59:41 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* polys-impl.h: Introduced COMP_NO_EXP_VECTOR_OPS -- which turns
