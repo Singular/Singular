@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.5 2002-03-26 13:39:49 mschulze Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.6 2002-03-26 16:58:02 mschulze Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -21,15 +21,15 @@ The installation of @sc{Singular} on a general @sc{Unix} system is described in 
 There are the following @sc{Singular} @sc{rpm} packages.
 
 @table @code
-@item Singular-@value{RPM_VERSION}-1.i386.rpm
+@item @uref{Singular-@value{RPM_VERSION}-1.i386.rpm}
 contains architecture dependend executables like the Singular program.
-@item Singular-static-@value{RPM_VERSION}-1.i386.rpm
+@item @uref{Singular-static-@value{RPM_VERSION}-1.i386.rpm}
 contains the static version of the architecture dependend executables.
-@item Singular-share-@value{RPM_VERSION}-1.noarch.rpm
+@item @uref{Singular-share-@value{RPM_VERSION}-1.noarch.rpm}
 contains architecture independend data like documentation and libraries.
-@item Singular-redhat-@value{RPM_VERSION}-1.noarch.rpm
+@item @uref{Singular-redhat-@value{RPM_VERSION}-1.noarch.rpm}
 contains icons and menues for @sc{gnome} and @sc{kde} under @sc{RedHat Linux}.
-@item Singular-suse-@value{RPM_VERSION}-1.noarch.rpm
+@item @uref{Singular-suse-@value{RPM_VERSION}-1.noarch.rpm}
 contains icons and menues for @sc{gnome} and @sc{kde} under @sc{SuSE Linux}.
 @end table
 
