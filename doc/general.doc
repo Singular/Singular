@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.2 1998-04-24 14:20:31 Singular Exp $
+@comment $Id: general.doc,v 1.3 1998-04-24 15:15:08 krueger Exp $
 @comment this file contains the general information about Singular
 
 @menu
@@ -20,15 +20,16 @@
 @cindex Rings and orderings
 
 @c ---------------------------------------------------------------------------
-@node The SINGULAR language, Procedures and libraries, Rings and orderings, General concepts
+@node The SINGULAR language, Procedures, Rings and orderings, General concepts
 @section The SINGULAR language
 @cindex The SINGULAR language
 
 @c ---------------------------------------------------------------------------
-@node Procedures and libraries, Implemented algorithms, The SINGULAR language, General concepts
-@section Procedures and libraries
-@cindex Procedures and libraries
+@c @node , Implemented algorithms, The SINGULAR language, General concepts
 @include libraries.tex
+@c @node Procedures, Libraries, The SINGULAR language, General concepts
+@c @node Libraries, Debugging tools, Procedures, General concepts
+@c @node Debugging tools, Implemented algorithms, Libraries, General concepts
 
 @c ---------------------------------------------------------------------------
 @node Implemented algorithms, , Procedures and libraries, General concepts
