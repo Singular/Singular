@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.5 1998-04-29 14:48:41 Singular Exp $
+@comment $Id: examples.doc,v 1.6 1998-04-30 09:28:16 Singular Exp $
 @comment this file contains the examples
 
 @ifinfo
@@ -7,7 +7,7 @@ The following topics are treated:
 @end ifinfo
 
 @menu
-* Start Singular::
+* Start SINGULAR::
 * Milnor and Tjurina::
 * Procedures and LIB::
 * Critical points::
@@ -27,16 +27,16 @@ The following topics are treated:
 * Fast lexicographical GB::
 * G_a -Invariants::
 * Invariants of a finite group::
-* Factorisation::
+* Factorization::
 * Puiseux pairs::
 * Primary decomposition::
 * Classification::
 @end menu
 
 @c ----------------------------------------------------------------------------
-@node Start Singular, Milnor and Tjurina,Examples, Examples
-@section Start Singular
-@cindex Start Singular
+@node Start SINGULAR, Milnor and Tjurina,Examples, Examples
+@section Start SINGULAR
+@cindex Start SINGULAR
 
 Call @sc{Singular} by typing @code{Singular} [return]
 
@@ -50,7 +50,7 @@ To leave @sc{Singular}, type one of the:
 The two characters @code{//} make the rest of the line a comment.
 
 @c ----------------------------------------------------------------------------
-@node Milnor and Tjurina,Procedures and LIB,Start Singular,Examples
+@node Milnor and Tjurina,Procedures and LIB,Start SINGULAR,Examples
 @section Milnor and Tjurina
 @cindex Milnor
 @cindex Tjurina
@@ -1588,7 +1588,7 @@ sum x(i)*d/dx(i+1)
 @c @c example
 @end example
 @c ----------------------------------------------------------------------------
-@node Invariants of a finite group,Factorisation,G_a -Invariants,Examples
+@node Invariants of a finite group,Factorization,G_a -Invariants,Examples
 @section Invariants of a finite group
 @cindex Invariants of a finite group
 
@@ -1643,9 +1643,9 @@ Sturmfels: "Algorithms in Invariant Theory 2.3.7:".
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Factorisation,Puiseux pairs,Invariants of a finite group,Examples
-@section Factorisation
-@cindex Factorisation
+@node Factorization,Puiseux pairs,Invariants of a finite group,Examples
+@section Factorization
+@cindex Factorization
 
 The factorization of polynomialsis is implemented in
 the C++ -libraries 'Factory' (written mainly by 
@@ -1671,7 +1671,7 @@ Messollen) which are part of the Singular system.
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Puiseux pairs,Primary decomposition,Factorisation,Examples
+@node Puiseux pairs,Primary decomposition,Factorization,Examples
 @section Puiseux pairs
 @cindex Puiseux pairs
 
