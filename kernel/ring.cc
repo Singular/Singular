@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.25 2004-10-18 18:57:07 levandov Exp $ */
+/* $Id: ring.cc,v 1.26 2004-10-29 16:55:20 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3727,7 +3727,7 @@ ring rOpposite(ring src)
         {
           r->order[j]=ringorder_wp;
           i++;
-          l=rReallocM1(r,src,l,j);
+          //l=rReallocM1(r,src,l,j);
         }
         else
         {
