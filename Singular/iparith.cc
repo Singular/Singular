@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.340 2005-02-17 09:49:18 Singular Exp $ */
+/* $Id: iparith.cc,v 1.341 2005-02-22 15:25:55 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1993,6 +1993,17 @@ static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
   res->data = (char *)idModulo((ideal)u->Data(),(ideal)v->Data());
   return FALSE;
 }
+static BOOLEAN jjMOD_N(leftv res, leftv u, leftv v)
+{
+  number q=(number)v->Data();
+  if (nIsZero(q))
+  {
+    WerrorS(ii_div_by_0);
+    return TRUE;
+  }
+  res->data =(char *) nIntMod((number)u->Data(),q);
+  return FALSE;
+}
 static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
 {
   char *opt=(char *)v->Data();
@@ -2557,6 +2568,7 @@ struct sValCmd2 dArith2[]=
 ,{jjDIVMOD_I,  INTMOD_CMD,     INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   INTMOD_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   INTMOD_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD ALLOW_PLURAL}
+,{jjMOD_N,     INTMOD_CMD,     NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjPOWER_I,   '^',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjPOWER_N,   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjPOWER_P,   '^',            POLY_CMD,       POLY_CMD,   INT_CMD ALLOW_PLURAL}
