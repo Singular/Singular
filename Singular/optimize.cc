@@ -100,9 +100,19 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
     iter=iter->next;
   }
   if(ggT!=NULL){
-  maPoly_InsertMonomial(mp, fp_p, r, NULL);
-  maPoly_InsertMonomial(mp, fq_p, r, NULL);
-  return maPoly_InsertMonomial(mp, ggT, r, NULL);
+    
+    int dq =pTotaldegree(fq_p,r);
+    if (dq!=0){
+      fq=maPoly_InsertMonomial(mp, fq_p, r, NULL);
+      fp=maPoly_InsertMonomial(mp, fp_p, r, NULL);
+      return maPoly_InsertMonomial(mp, ggT, r, NULL);
+    }
+    else {
+      fq=NULL;
+      fp=maPoly_InsertMonomial(mp, fp_p, r, NULL);
+      choice->ref++;
+      return choice;
+    }
   }
   else {
     return NULL;
@@ -126,9 +136,11 @@ mapoly maPoly_Optimize(mapoly mpoly, ring src_r){
       if (choice!=NULL){
 	iter->f1=fp;
 	iter->f2=ggT;
-	ggT->ref++;//there are two references to ggT not one
-	choice->f1=fq;
-	choice->f2=ggT;
+	if (fq!=NULL){
+	  ggT->ref++;
+	  choice->f1=fq;
+	  choice->f2=ggT;
+	}
       }
 
     }
