@@ -35,16 +35,16 @@
 #endif
 
 
-/* Do not return copies of sth, but simply the strings 
+/* Do not return copies of sth, but simply the strings
    -- we make copies later */
 #define copy_of(string) mstrdup(string)
 
 /* ABSOLUTE_FILENAME_P (fname): True if fname is an absolute filename */
 #ifdef atarist
-#define ABSOLUTE_FILENAME_P(fname)	((fname[0] == '/') || \
-	(fname[0] && (fname[1] == ':')))
+#define ABSOLUTE_FILENAME_P(fname)        ((fname[0] == '/') || \
+        (fname[0] && (fname[1] == ':')))
 #else
-#define ABSOLUTE_FILENAME_P(fname)	(fname[0] == '/')
+#define ABSOLUTE_FILENAME_P(fname)        (fname[0] == '/')
 #endif /* atarist */
 
 /* Return the absolute name of the program named NAME.  This function
@@ -60,16 +60,16 @@ find_executable (const char *name)
   if (ABSOLUTE_FILENAME_P(name)) {
       /* If we can execute the named file, and it is normal, then return it. */
       if (! access (name, X_OK)) {
-	struct stat stat_temp;
+        struct stat stat_temp;
 
-	if (stat (name, &stat_temp))
-	  return 0;
+        if (stat (name, &stat_temp))
+          return 0;
 
 #ifndef STAT_MACROS_BROKEN
-	if (! S_ISREG(stat_temp.st_mode))
-	  return 0;
+        if (! S_ISREG(stat_temp.st_mode))
+          return 0;
 #endif
-	return copy_of (name);
+        return copy_of (name);
       }
     }
   else {
@@ -96,57 +96,57 @@ find_executable (const char *name)
 
       /* Perform tilde-expansion. Stolen from GNU readline/tilde.c. */
       if (p[0] == '~') {
-	if (! p[1] || p[1] == '/') {
-	  /* Prepend $HOME to the rest of the string. */
-	  char *temp_home = (char *) getenv ("HOME");
+        if (! p[1] || p[1] == '/') {
+          /* Prepend $HOME to the rest of the string. */
+          char *temp_home = (char *) getenv ("HOME");
 
-	  /* If there is no HOME variable, look up the directory in the
-	     password database. */
-	  if (! temp_home) {
-	    struct passwd *entry;
+          /* If there is no HOME variable, look up the directory in the
+             password database. */
+          if (! temp_home) {
+            struct passwd *entry;
 
-	    entry = getpwuid (getuid ());
-	    if (entry)
-	      temp_home = entry->pw_dir;
-	  }
+            entry = getpwuid (getuid ());
+            if (entry)
+              temp_home = entry->pw_dir;
+          }
 
-	  strcpy (tbuf, temp_home);
-	  next = tbuf + strlen (tbuf);
-	  p ++;
-	}
-	else {
-	  char username[MAXPATHLEN];
-	  struct passwd *user_entry;
-	  int i;
+          strcpy (tbuf, temp_home);
+          next = tbuf + strlen (tbuf);
+          p ++;
+        }
+        else {
+          char username[MAXPATHLEN];
+          struct passwd *user_entry;
+          int i;
 
-	  p ++;			/* Skip the tilde. */
-	  for (i = 0; *p && *p != '/' && *p != ':'; i++)
-	    username[i] = *p ++;
-	  username[i] = '\0';
+          p ++;                        /* Skip the tilde. */
+          for (i = 0; *p && *p != '/' && *p != ':'; i++)
+            username[i] = *p ++;
+          username[i] = '\0';
 
-	  user_entry = getpwnam (username);
-	  if (user_entry) {
-	    strcpy (tbuf, user_entry->pw_dir);
-	    next = tbuf + strlen (tbuf);
-	  }
-	}
+          user_entry = getpwnam (username);
+          if (user_entry) {
+            strcpy (tbuf, user_entry->pw_dir);
+            next = tbuf + strlen (tbuf);
+          }
+        }
 
-	endpwent ();
+        endpwent ();
       }
 
       /* Copy directory name into [tbuf]. */
       while (*p && *p != ':')
-	*next ++ = *p ++;
+        *next ++ = *p ++;
       *next = '\0';
       if (*p != '\0')
-	p ++;
+        p ++;
 
       if (tbuf[0] == '.' && tbuf[1] == '\0') {
 #ifdef HAVE_GETCWD
-	getcwd (tbuf, MAXPATHLEN);
+        getcwd (tbuf, MAXPATHLEN);
 #else
 # ifdef HAVE_GETWD
-	getwd (tbuf);
+        getwd (tbuf);
 # endif
 #endif
       }
@@ -156,16 +156,16 @@ find_executable (const char *name)
 
       /* If we can execute the named file, and it is normal, then return it. */
       if (! access (tbuf, X_OK)) {
-	struct stat stat_temp;
+        struct stat stat_temp;
 
-	if (stat (tbuf, &stat_temp))
-	  continue;
+        if (stat (tbuf, &stat_temp))
+          continue;
 
 #ifndef STAT_MACROS_BROKEN
-	if (! S_ISREG(stat_temp.st_mode))
-	  continue;
+        if (! S_ISREG(stat_temp.st_mode))
+          continue;
 #endif
-	return copy_of (tbuf);
+        return copy_of (tbuf);
       }
     }
   }
