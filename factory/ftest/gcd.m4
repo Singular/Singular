@@ -1,11 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gcd.m4,v 1.2 1997-09-24 07:27:46 schmidt Exp $ */
+/* $Id: gcd.m4,v 1.3 1997-09-29 13:00:17 schmidt Exp $ */
 
 ftestSetNameOfGame( gcd,
         `"Usage: gcd [<options>] [<envSpec>] <f> <g> [<realResult>]\n"
-        "  calculates gcd( f, g ).\n"
-    	"  If the gcd of f and g is already known, the optional argument\n"
-    	"  <realResult> may be used to check the result of the gcd\n"
+        "  calculates greatest common divider of canonical forms f and g.\n"
+    	"  If the gcd of f and g is already known, the optional canonical\n"
+    	"  form <realResult> may be used to check the result of the gcd\n"
     	"  computation.\n"' )
 
 //{{{ docu
@@ -91,7 +91,7 @@ main ( int argc, char ** argv )
     ftestCheck( gcdCheck( f, g, result, realResult ) );
 
     // print results
-    ftestOutput( "gcd(f, g) =", result );
+    ftestOutput( "gcd(f, g)", result );
 
     // clean up
     ftestMainExit();
