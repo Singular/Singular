@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.33 1999-08-18 06:40:21 wichmann Exp $
+;; $Id: singular.el,v 1.34 1999-08-18 18:40:44 wichmann Exp $
 
 ;;; Commentary:
 
@@ -2251,6 +2251,15 @@ For more information one should refer to the `singular-help' function."
   :type 'file
   :group 'singular-interactive-miscellaneous)
 
+(defvar singular-help-file-name nil
+  "File name of the Singular help file.
+This variable gets initialized in `singular-scan-header-init' and is set
+usually automatically by `singular-scan-header-pre-output-filter'. If set
+before evaluation of singular.el, the header of the first Singular will not
+be scanned for the help file name.
+
+This variable is buffer-local.")
+
 (defvar singular-help-time-stamp 0
   "A time stamp set by `singular-help-pre-input-hook'.
 This time stamp is set to `(current-time)' when the user issues a help
@@ -2379,31 +2388,65 @@ This function is called at mode initialization time."
   (add-hook 'singular-post-output-filter-functions 'singular-help-post-output-filter))
 ;;}}}
 
+;;{{{ Singular commands, help topics and standard libraries alists
+(defvar singular-commands-alist nil 
+  "An alist containing all Singular commands to complete.
+
+This variable is buffer-local.")
+
+(defvar singular-help-topics-alist nil
+  "An alist containg all Singular help topics to complete.
+
+This variable is buffer-local.")
+
+(defvar singular-standard-libraries-alist nil
+  "An alist containing all Singular standard libraries names.
+
+This variable is buffer-local.")
+;;}}}
+
 ;;{{{ Scanning of header and handling of emacs home directory
 ;;
 ;; Scanning of header
 ;;
-(defvar singular-scan-header-emacs-home-regexp "^// \\*\\* EmacsDir: \\(.+\\)\n"
+(defconst singular-scan-header-emacs-home-regexp "^// \\*\\* EmacsDir: \\(.+\\)\n"
   "Regular expression matching the location of emacs home in Singular 
 header.")
 
-(defvar singular-scan-header-info-file-regexp "^// \\*\\* InfoFile: \\(.+\\)\n"
+(defconst singular-scan-header-info-file-regexp "^// \\*\\* InfoFile: \\(.+\\)\n"
   "Regular expression matching the location of Singular info file in 
 Singular header.")
 
-(defvar singular-scan-header-time-stamp 0
+(defconst singular-scan-header-time-stamp 0
   "A time stamp set by singular-scan-header.
 
 This variable is buffer-local.")
 
-(defvar singular-scan-header-scan-for '(emacs-home info-file)
+(defvar singular-scan-header-scan-for '()
   "List of things to scan for in Singular header.
 If `singular-scan-header-pre-output-filter' finds one thing in the current
 output, it removes the corresponding value from the list.
 If this variable gets nil, `singular-scan-header-pre-output-filter' is
 removed from the pre-output-filter.
+This variable is initialized in `singular-scan-header-init'. Possible
+values of this list are up to now `help-file' and `emacs-home'.
 
 This variable is buffer-local.")
+
+(defun singular-scan-header-got-emacs-home ()
+  "Load Singular completion and libraries files.
+Assumes that `singular-emacs-home-directory' is set to the appropriate
+value and loads the files \"cmd-cmpl.el\", \"hlp-cmpl.el\", and
+\"lib-cmpl.el\".
+On success calls `singular-menu-install-libraries'."
+  (or (load (singular-expand-emacs-file-name "cmd-cmpl.el" t) t t t)
+      (message "Can't find command completion file! Command completion disabled."))
+  (or (load (singular-expand-emacs-file-name "hlp-cmpl.el" t) t t t)
+      (message "Can't find help topic completion file! Help completion disabled."))
+  (if (load (singular-expand-emacs-file-name "lib-cmpl.el" t) t t t)
+      (singular-menu-install-libraries)
+    (message "Can't find library index file!")))
+  
 
 (defun singular-scan-header-pre-output-filter (output)
   "Filter function for hook `singular-pro-output-filter-functions'.
@@ -2419,29 +2462,32 @@ been searching for more than 20 seconds."
 
     ;; Search for emacs home directory
     (when (string-match singular-scan-header-emacs-home-regexp output)
-      (singular-debug 'interactive 
-		      (message "scan header: emacs home path found"))
-      (setq singular-scan-header-scan-for (delq 'emacs-home singular-scan-header-scan-for))
-      (setq singular-emacs-home-directory (substring output (match-beginning 1) (match-end 1)))
-      (setq output (replace-match "" t t output))
-      (setq changed t)
-
-      (or (load (singular-expand-emacs-file-name "cmd-cmpl.el" t) t t t)
-	  (message "Can't find command completion file! Command completion disabled."))
-      (or (load (singular-expand-emacs-file-name "hlp-cmpl.el" t) t t t)
-	  (message "Can't find help topic completion file! Help completion disabled."))
-      (if (load (singular-expand-emacs-file-name "lib-cmpl.el" t) t t t)
-	  (singular-menu-install-libraries)
-	(message "Can't find library index file!")))
+      (let ((emacs-home (substring output (match-beginning 1) (match-end 1))))
+	(singular-debug 'interactive 
+			(message "scan header: emacs home path found"))
+	;; in any case, remove marker from output
+	(setq output (replace-match "" t t output))
+	(setq changed t)
+	;; if not already done, do action an singular-emacs-home
+	(when (memq 'emacs-home singular-scan-header-scan-for)
+	  (singular-debug 'interactive (message "scan header: initializing emacs-home-directory"))
+	  (setq singular-scan-header-scan-for (delq 'emacs-home singular-scan-header-scan-for))
+	  (setq singular-emacs-home-directory emacs-home)
+	  (singular-scan-header-got-emacs-home))))
 
     ;; Search for Singular info file
     (when (string-match singular-scan-header-info-file-regexp output)
-      (singular-debug 'interactive 
-		      (message "scan header: singular.hlp path found"))
-      (setq singular-scan-header-scan-for (delq 'info-file singular-scan-header-scan-for))
-      (setq singular-help-file-name (substring output (match-beginning 1) (match-end 1)))
-      (setq output (replace-match "" t t output))
-      (setq changed t))
+      (let ((file-name (substring output (match-beginning 1) (match-end 1))))
+	(singular-debug 'interactive 
+			(message "scan header: singular.hlp path found"))
+	;; in any case, remove marker from output
+	(setq output (replace-match "" t t output))
+	(setq changed t)
+	;; if not already done, do action on help-file-name
+	(when (memq 'info-file singular-scan-header-scan-for)
+	  (singular-debug 'interactive (message "scan header: initializing help-file-name"))
+	  (setq singular-scan-header-scan-for (delq 'info-file singular-scan-header-scan-for))
+	  (setq singular-help-file-name file-name))))
 
     ;; Remove from hook if everything is found or if we already waited 
     ;; too long.
@@ -2458,18 +2504,46 @@ been searching for more than 20 seconds."
 This function is called by `singular-exec'."
   (singular-debug 'interactive (message "Initializing scan-header"))
   (set (make-local-variable 'singular-scan-header-time-stamp) (current-time))
-  (set (make-local-variable 'singular-emacs-home-directory) nil)
-  (set (make-local-variable 'singular-scan-header-scan-for) '(emacs-home info-file))
+  (set (make-local-variable 'singular-scan-header-scan-for) '())
+
+  (make-local-variable 'singular-emacs-home-directory)
+  ;; if singular-emacs-home is set try to load the completion files.
+  ;; Otherwise set marker that we still have to search for it.
+  (if singular-emacs-home-directory
+      (singular-scan-header-got-emacs-home)
+    (setq singular-scan-header-scan-for (append singular-scan-header-scan-for '(emacs-home))))
+
   ;; Up to now this seems to be the best place to initialize
   ;; `singular-help-file-name' since singular-help gets initialized 
   ;; only on mode start-up, not on Singular start-up
-  (set (make-local-variable 'singular-help-file-name) nil)
+  ;;
+  ;; if singular-help-file-name is not set, mark, that we have to scan for it
+  (make-local-variable 'singular-help-file-name)
+  (or singular-help-file-name
+      (setq singular-scan-header-scan-for (append singular-scan-header-scan-for '(info-file))))
 
   (add-hook 'singular-pre-output-filter-functions 'singular-scan-header-pre-output-filter))
+
+(defun singular-scan-header-exit ()
+  "Reinitialize scanning of header for Singular interactive mode.
+
+This function is called by `singular-exit-sentinel'."
+  ;; unset variables so that all subsequent calls of Singular will
+  ;; scan the header.
+  (singular-debug 'interactive (message "Deinitializing scan-header"))
+  (setq singular-emacs-home-directory nil)
+  (setq singular-help-file-name nil))
 
 ;;
 ;; handling of emacs home directory
 ;;
+;; A note on `singular-emacs-home-directory': If this variable is set 
+;; before singular.el is evaluated, the header of the first Singular
+;; started is NOT searched for the singular-emacs-home-directory.
+;; Anyhow, all subsequent calls of Singular will scan the header 
+;; regardless of the initial state of this variable. (The exit-sentinel
+;; will set this variable back to nil.) 
+;; See also `singular-scan-header-exit'.
 (defvar singular-emacs-home-directory nil
   "Path to the emacs sub-directory of Singular as string.
 `singular-scan-header-pre-output-filter' searches the Singular header for
@@ -2491,16 +2565,6 @@ an error unless optional argument NOERROR is not nil."
 ;;}}}
 
 ;;{{{ Filename, Command, and Help Completion
-(defvar singular-commands-alist nil
-  "An alist containing all Singular commands to complete.
-
-This variable is buffer-local.")
-
-(defvar singular-help-topics-alist nil
-  "An alist containg all Singular help topics to complete.
-
-This variable is buffer-local.")
-
 (defun singular-completion-init ()
   "Initialize completion for Singular interactive mode.
 Initializes completion of file names, commands and help topics.
@@ -3302,41 +3366,59 @@ NOT READY [much more to come.  See shell.el.]!"
 ;;}}}
 
 ;;{{{ Starting singular
-;; TODO: should be defcustom
-(defvar singular-start-file "~/.emacs_singularrc"
+(defcustom singular-start-file "~/.emacs_singularrc"
   "Name of start-up file to pass to Singular.
 If the file named by this variable exists it is given as initial input
 to any Singular process being started.  Note that this may lose due to
-a timing error if Singular discards input when it starts up.")
+a timing error if Singular discards input when it starts up."
+  :type 'file
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
 
-;; TODO: should be defcustom
-(defvar singular-executable-default "Singular"
+(defcustom singular-executable-default "Singular"
   "Default name of Singular executable.
-Used by `singular' when new Singular processes are started.")
+Used by `singular' when new Singular processes are started.
+If the name is given without path the executable is searched using the
+`PATH' environment variable."
+  :type 'file
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
 
 (defvar singular-executable-last singular-executable-default
-  "")
+  "Singular executable name of the last Singular command used.
 
-;; TODO: should be defcustom
-(defvar singular-directory-default "."
-  "Default working directory of Singular buffer.")
+This variable is buffer-local.")
+
+(defcustom singular-directory-default nil
+  "Default working directory of Singular buffer.
+Should be either nil (which means do not set the default directory) or an
+existing directory."
+  :type '(choice (const nil) (directory :value "~/"))
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
 
 (defvar singular-directory-last singular-directory-default
-  "")
+  "Working directory of last Singular command used.
+
+This variable is buffer-local.")
 
 ;; no singular-directory-history here. Usual file history is used.
 
-;; TODO: should be defcustom
-(defvar singular-switches-default '()
-  "Default switches for Singular processes.
-Should be a list of string, one string for each switch.
-Used by `singular' when new Singular processes are started.")
+(defcustom singular-switches-default '()
+  "List of default switches for Singular processes.
+Should be a list of strings, one string for each switch.
+Used by `singular' when new Singular processes are started."
+  :type '(repeat string)
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
 
 (defvar singular-switches-last singular-switches-default
-  "")
+  "Switches of last Singular command used.
+
+This variable is buffer-local.")
 
 (defvar singular-switches-history nil
-  "")
+  "History list of Singular switches.")
 
 (defvar singular-switches-magic '("--emacs")
   "Additional magic switches for Singular process.
@@ -3345,16 +3427,21 @@ processes are started.
 This list should at least contain the option \"--emacs\". If you are
 running an older version of Singular, remove this option from the list.")
 
-;; TODO: should be defcustom
-(defvar singular-name-default "singular"
+(defcustom singular-name-default "singular"
   "Default process name for Singular process.
-Used by `singular' when new Singular processes are started.")
+Used by `singular' when new Singular processes are started.
+This string surrounded by \"*\" will also be the buffer name."
+  :type 'string
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
 
 (defvar singular-name-last singular-name-default
-  "")
+  "provess name of the last Singular command used.
+
+This variable is buffer-local.")
 
 (defvar singular-name-history nil
-  "")
+  "History list of Singular process names.")
 
 (defun singular-exec-init ()
   "Initialize defaults for starting Singular.
@@ -3372,14 +3459,16 @@ This function is called at mode initialization time."
 
 (defun singular-exit-sentinel (process message)
  "Clean up after termination of Singular.
-Writes back input ring after regular termination of Singular if
-process buffer is still alive."
+Writes back input ring after regular termination of Singular if process
+buffer is still alive, deinstalls the library menu und calls several other
+exit procedures."
   (save-excursion
     (singular-debug 'interactive
 		    (message "Sentinel: %s" (substring message 0 -1)))
     ;; exit demo mode if necessary
     (singular-demo-exit)
     (singular-menu-deinstall-libraries)
+    (singular-scan-header-exit)
     (if (string-match "finished\\|exited" message)
 	(let ((process-buffer (process-buffer process)))
 	  (if (and process-buffer
@@ -3426,8 +3515,9 @@ Returns BUFFER."
 	    (singular-output-filter-init (point))
 	    (singular-simple-sec-init (point))
 	    
-	    (singular-scan-header-init)
+	    ;; completion should be initialized before scan header!
 	    (singular-completion-init)
+	    (singular-scan-header-init)
 
 	    ;; feed process with start file and read input ring.  Take
 	    ;; care about the undo information.
@@ -3481,6 +3571,7 @@ Returns BUFFER."
   "Run an inferior Singular process, with I/O through an Emacs buffer.
 
 Appends `singular-switches-magic' to switches.
+Sets default-directory if directory is not-nil.
 Sets singular-*-last values."
   (singular-debug 'interactive
 		  (message "singular-internal: %s %s %s %s"
@@ -3495,6 +3586,8 @@ Sets singular-*-last values."
 	  (singular-debug 'interactive (message "Creating new buffer"))
 	  (setq buffer (get-buffer-create buffer-name))
 	  (set-buffer buffer)
+	  (and directory
+	       (setq default-directory directory))
 	  
 	  (singular-debug 'interactive (message "Calling `singular-interactive-mode'"))
 	  (singular-interactive-mode)))
@@ -3576,7 +3669,10 @@ buffer name and the command line switches, and starts Singular."
 	 ;; `start-process' is intelligent enough to start commands with
 	 ;; not-expanded name.
 	 (directory (file-name-directory (read-file-name "Default directory: "
-							 nil nil t)))
+							 nil 
+							 (or singular-directory-default
+							     default-directory)
+							 t)))
 	 (switches "")
 	 (name (singular-generate-new-buffer-name 
 		(downcase (file-name-nondirectory executable)))))
