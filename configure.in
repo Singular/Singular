@@ -104,6 +104,9 @@ AC_PROG_INSTALL
 AC_AIX
 AC_PROG_CXX
 
+SING_CC=${CC}; export SING_CC
+SING_CXX=${CXX}; export SING_CXX
+
 # check whether the compiler accepts -pipe
 AC_MSG_CHECKING(whether compiler accepts -pipe)
 temp_cflags=${CFLAGS}
