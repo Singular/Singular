@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_distribution.texi,v 1.5 2000-02-04 13:21:14 obachman Exp $
+@comment $Id: README_distribution.texi,v 1.6 2000-06-17 07:55:30 obachman Exp $
 @c FILE: README_distribution.texi
 @c PURPOSE: general README file to be included in the distribution 
 @c
@@ -52,7 +52,8 @@ for news and changes of this version
 @nref{COPYING, COPYING.html}
 for license information for @sc{Singular}
 @nref{INSTALL, INSTALL.html}
-for installation instructions
+for installation instructions, troubleshooting tips, and answers to
+Frequently Asked Questions (FAQs).
 @end table
 
 
