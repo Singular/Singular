@@ -364,7 +364,7 @@ p_Procs_%.so: p_Procs_Lib_%.dl_o
 	ld ${SLDFLAGS} -o $@ $^
 
 mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
-	ld ${SLDFLAGS} -o $@ $^
+	ld ${SLDFLAGS} -o $@ $^ -L${libdir} ${MP_LIBS}
 
 dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
 	ld ${SLDFLAGS} -o $@ $^
