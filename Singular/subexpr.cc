@@ -103,13 +103,18 @@ void sleftv::Print(leftv store, int spaces)
           {
             char *typ;
             language_defs lang = ((package)d)->language;
-            ::Print("// Package : %-*.*s`%s`\n",spaces,spaces," ",n);
+            ::Print("// Package : %-*.*s`%s`, ref=%d\n",spaces,spaces," ",n,
+                    ((package)d)->ref);
             switch (lang) {
+                case LANG_TOP:      typ="Toplevel"; break;
                 case LANG_SINGULAR: typ="singular"; break;
                 case LANG_C:        typ="object";   break;
                 case LANG_NONE:     typ="none";     break;
                 default:            typ="unknow language";
             }
+            if(((package)d)->libname!=NULL)
+              ::Print("// libname : %s\n", ((package)d)->libname);
+            
             ::Print("// language: %-*.*s%s",spaces,spaces," ",typ);
           }
 #else /* HAVE_NAMESPACES */
@@ -441,6 +446,8 @@ void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
       #endif
     case POINTER_CMD:
       return d;
+    case PACKAGE_CMD:
+      return  (void *)paCopy((package) d);
     case PROC_CMD:
       return  (void *)piCopy((procinfov) d);
     case POLY_CMD:
@@ -1113,6 +1120,15 @@ void syMake(leftv v,char * id, idhdl packhdl)
         v->flag = IDFLAG(h);
         v->name = IDID(h);
         v->attribute=IDATTR(h);
+        return;
+      }
+      if (strcmp(id,"Up")==0)
+      { namehdl ns=namespaceroot;
+        if (!ns->isroot) ns=ns->next;
+        if (id!=ns->name) FreeL((ADDRESS)id);
+        v->rtyp = NSHDL;
+        v->data = (char *)ns;
+        v->name = mstrdup(ns->name);
         return;
       }
       h=ggetid(id, packhdl==NULL ? FALSE : TRUE, &(v->packhdl));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.26 1998-10-21 10:25:35 krueger Exp $ */
+/* $Id: ipshell.cc,v 1.27 1998-10-22 12:26:11 krueger Exp $ */
 /*
 * ABSTRACT:
 */
@@ -102,12 +102,16 @@ char * iiTwoOps(int t)
   }
 }
 
-static void list1(char* s, idhdl h,BOOLEAN c)
+static void list1(char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
 {
   char buffer[22];
   int l;
+  char buf2[128];
 
-  Print("%s%-20.20s [%d]  ",s,IDID(h),IDLEV(h));
+  if(fullname) sprintf(buf2, "%s::%s\0", "", IDID(h));
+  else sprintf(buf2, "%s\0", IDID(h));
+
+  Print("%s%-20.20s [%d]  ",s,buf2,IDLEV(h));
   if (h == currRingHdl) PrintS("*");
   PrintS(Tok2Cmdname((int)IDTYP(h)));
 
@@ -138,10 +142,22 @@ static void list1(char* s, idhdl h,BOOLEAN c)
                       ,MATCOLS(IDMATRIX(h))
                     );
                     break;
+    case PACKAGE_CMD:
+                    Print(" (");
+                    switch (IDPACKAGE(h)->language) {
+                        case LANG_SINGULAR: Print("S"); break;
+                        case LANG_C:        Print("C"); break;
+                        case LANG_TOP:      Print("T"); break;
+                        case LANG_NONE:     Print("N"); break;
+                        default:            Print("U");
+                    }
+                    if(IDPACKAGE(h)->libname!=NULL) Print(",%s", IDPACKAGE(h)->libname);
+                    Print(")");
+                    break;
     case PROC_CMD: if(strlen(IDPROC(h)->libname)>0)
                      Print(" from %s",IDPROC(h)->libname);
                    if(IDPROC(h)->is_static)
-		     Print(" (static)");
+                     Print(" (static)");
                    break;
     case STRING_CMD:
                    {
@@ -178,7 +194,7 @@ void type_cmd(idhdl h)
 {
   int saveShortOut=pShortOut;
   pShortOut=1;
-  list1("// ",h,FALSE);
+  list1("// ",h,FALSE,FALSE);
   if (IDTYP(h)!=INT_CMD)
   {
     sleftv expr;
@@ -292,12 +308,14 @@ void killlocals(int v)
   if (myynest<=1) iiNoKeepRing=TRUE;
 }
 
-void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
+void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN fullname)
 {
   idhdl h,start;
   BOOLEAN all = typ==-1;
   BOOLEAN really_all=FALSE;
-
+  BOOLEAN do_packages=FALSE;
+  
+  if ( typ < 0 ) do_packages=TRUE;
   if ( typ==0 )
   {
     if (strcmp(what,"all")==0)
@@ -317,7 +335,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
 #endif /* HAVE_NAMESPACES */
       if (h!=NULL)
       {
-        if (iterate) list1(prefix,h,TRUE);
+        if (iterate) list1(prefix,h,TRUE,fullname);
         if ((IDTYP(h)==RING_CMD)
             || (IDTYP(h)==QRING_CMD))
         {
@@ -352,7 +370,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
     if ((all && (IDTYP(h)!=PROC_CMD)) || (typ == IDTYP(h))
     || ((IDTYP(h)==QRING_CMD) && (typ==RING_CMD)))
     {
-      list1(prefix,h,start==currRingHdl);
+      list1(prefix,h,start==currRingHdl, fullname);
       if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
         && (really_all || (all && (h==currRingHdl)))
         && ((IDLEV(h)==0)||(IDLEV(h)==myynest)))
@@ -370,6 +388,13 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
     }
     h = IDNEXT(h);
   }
+#ifdef HAVE_NAMESPACES
+  if(!namespaceroot->isroot && do_packages) {
+    //namespaceroot->push(namespaceroot->root->pack, "Top", myynest);
+    list_cmd(PACKAGE_CMD,"Top","// ",FALSE, TRUE);
+    //namespaceroot->pop();
+  }
+#endif /* HAVE_NAMESPACES */
 }
 
 void test_cmd(int i)

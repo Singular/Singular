@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.18 1998-10-21 10:25:33 krueger Exp $ */
+/* $Id: ipid.h,v 1.19 1998-10-22 12:26:13 krueger Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -73,10 +73,17 @@ struct sip_command
 
 struct sip_package
 {
-  idhdl      idroot; /* local objects */
-  short      ref;
+  idhdl         idroot; /* local objects */
+  char          *libname;
+  short         ref;
   language_defs language;
 };
+
+inline package paCopy(package pack)
+{
+  pack->ref++;
+  return pack;
+}
 
 union uutypes;
 

@@ -1,3 +1,12 @@
+Thu Oct 22 14:21:17 MEST 1998 <krueger@mathematik.uni-kl.de>
+	* tesths.cc,subexpr.h,subexpr.cc,ipshell.h,ipshell.cc,iplib.cc
+	* ipid.h,ipid.cc,ipassign.cc,iparith.cc
+	  - Added assignment <package>=<package> via ref-counter
+	    rewriten killhdl for packages
+	  - Added libname,language to packages
+	  - exportto(Up,...) 'Up' defined in syMake
+	  - listvar() shows toplevel-packages too.
+	  
 Mon Oct 19 16:01:18 MESZ 1998 hannes
 * hannes: limitations on length of arguments removed (was 200 chars)
   (iplib.cc)

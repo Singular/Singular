@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.14 1998-10-21 10:25:36 krueger Exp $ */
+/* $Id: ipshell.h,v 1.15 1998-10-22 12:26:11 krueger Exp $ */
 /*
 * ABSTRACT
 */
@@ -35,7 +35,8 @@ BOOLEAN iiPStart(idhdl pn, sleftv * sl);
 BOOLEAN iiEStart(char* example, procinfo *pi);
 void    type_cmd(idhdl h);
 void    test_cmd(int i);
-void    list_cmd(int typ, const char* what, char * prefix, BOOLEAN iterate);
+void    list_cmd(int typ, const char* what, char * prefix, BOOLEAN iterate,
+                 BOOLEAN fullname=FALSE);
 void    iiWriteMatrix(matrix im, const char *n, int dim, int spaces=0);
 char *  iiStringMatrix(matrix im, int dim, char ch=',');
 void    killlocals(int v);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.37 1998-10-21 15:56:04 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.38 1998-10-22 12:26:14 krueger Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -502,21 +502,8 @@ static BOOLEAN jiA_RING(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr e)
 {
-  Print("Currently not supported\n");
-    return FALSE;
-  package pack=IDPACKAGE((idhdl)a->data);
-  printf("Copy package - 1\n");
-
-  idhdl rl=(idhdl)res->data;
-  if(rl == NULL) {
-    return TRUE;
-  }
-  printf("Copy package - 2\n");
-  if (&IDPACKAGE(rl)!=NULL) Free(IDPACKAGE(rl), sizeof(ip_package));
-  IDPACKAGE(rl)=pack;
-  printf("Copy package - 3\n");
-  pack->ref++;
-  printf("Copy package - 4\n");
+  res->data=(void *)a->CopyD(PACKAGE_CMD);
+  jiAssignAttr(res,a);
   return FALSE;
 }
 /*=================== table =================*/

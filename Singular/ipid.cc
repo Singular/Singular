@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.20 1998-10-21 15:56:05 Singular Exp $ */
+/* $Id: ipid.cc,v 1.21 1998-10-22 12:26:14 krueger Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -35,6 +35,9 @@ idhdl currRingHdl = NULL;
 ring  currRing = NULL;
 ideal currQuotient = NULL;
 char* iiNoName="_";
+
+void paCleanUp(package pack);
+BOOLEAN paKill(package pack, BOOLEAN force_top=FALSE);
 
 /*0 implementation*/
 
@@ -172,6 +175,11 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
     {
       IDPROC(h)->language=LANG_NONE;
     }
+    else if (t == PACKAGE_CMD)
+    {
+      IDPACKAGE(h)->language=LANG_NONE;
+    }
+
   }
   // --------------------------------------------------------
   return  h;
@@ -207,10 +215,10 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
         Warn(" redefining %s **",s);
 #endif
 #ifdef HAVE_NAMESPACES
-        if(strcmp(s,"Top")==0) {
-        Warn("identifier `%s` in use",s);
-        return(h);
-      }
+        if(t==PACKAGE_CMD && strcmp(s,"Top")==0) {
+          Warn("identifier `%s` in use",s);
+          return(h);
+        }
 #endif /* HAVE_NAMESPACES */
         if (s==IDID(h))
         IDID(h)=NULL;
@@ -349,7 +357,6 @@ void killhdl(idhdl h, idhdl * ih)
     //h->attribute=NULL;
   }
   // ring / qring  --------------------------------------------------------
-  // package  -------------------------------------------------------------
   if ((IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
   {
     idhdl savecurrRingHdl = currRingHdl;
@@ -393,22 +400,16 @@ void killhdl(idhdl h, idhdl * ih)
 #ifdef HAVE_NAMESPACES
   // package -------------------------------------------------------------
   else if (IDTYP(h) == PACKAGE_CMD) {
-    package pack = IDPACKAGE(h);
-    if(!checkPackage(pack)) return;
-    idhdl hdh = pack->idroot;
-    //idhdl  hdh = IDNEXT(*hd);
-    idhdl  temp;
-    //Print(">>>>>>Free package\n");
-    while (hdh!=NULL)
-    {
-      temp = IDNEXT(hdh);
-      //Print("killing %s\n", IDID(hdh));
-      killhdl(hdh,&(IDPACKAGE(h)->idroot));
-      hdh = temp;
+    if(IDPACKAGE(h)->language!=LANG_TOP) {
+      if(!paKill(IDPACKAGE(h))) return;
+    } else {
+      if(strcmp(IDID(h), "Top")!=0) {
+        if(!paKill(IDPACKAGE(h))) return;
+      }
+      else {
+        if(!paKill(IDPACKAGE(h), TRUE)) return;
+      }
     }
-    //Print("killing last %s\n", IDID(*hd));
-    //killhdl(*hd,hd);
-    //Print(">>>>>>Free package... done\n");
   }
   // pointer -------------------------------------------------------------
   else if(IDTYP(h)==POINTER_CMD) {
@@ -691,6 +692,45 @@ void piKill(procinfov pi)
     Free((ADDRESS)pi, sizeof(procinfo));
 }
 
+void paCleanUp(package pack)
+{
+  (pack->ref)--;
+  if (pack->ref < 0)
+  {
+    if( pack->language == LANG_C)
+    {
+      Print("//dclose(%s)\n",pack->libname);
+      
+    }
+    FreeL((ADDRESS)pack->libname);
+    memset((void *) pack, 0, sizeof(package));
+    pack->language=LANG_NONE;
+  }
+}
+
+BOOLEAN paKill(package pack, BOOLEAN force_top)
+{
+  if (pack->ref <= 0 || force_top) {
+    idhdl hdh = pack->idroot;
+    idhdl temp;
+    while (hdh!=NULL)
+    {
+      temp = IDNEXT(hdh);
+      if((IDTYP(hdh)!=PACKAGE_CMD) ||
+         (IDTYP(hdh)==PACKAGE_CMD && IDPACKAGE(hdh)->language!=LANG_TOP) ||
+         (IDTYP(hdh)==PACKAGE_CMD && IDPACKAGE(hdh)->language==LANG_TOP &&
+         IDPACKAGE(hdh)->ref>0 ))
+        killhdl(hdh,&(pack->idroot));
+      hdh = temp;
+    }
+    if(checkPackage(pack)) {
+      paCleanUp(pack);
+      Free((ADDRESS)pack, sizeof(package));
+    } else return FALSE;
+  } else paCleanUp(pack);
+  return TRUE;
+}
+
 char *idhdl2id(idhdl pck, idhdl h)
 {
   char *name = (char *)AllocL(strlen(pck->id) + strlen(h->id) + 3);
@@ -856,6 +896,7 @@ BOOLEAN checkPackage(package pack)
     }
   }
   if (nshdl->pack==pack) {
+    //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
     Warn("package '%s' still in use on level %d",nshdl->name, nshdl->lev);
     return FALSE;
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.37 1998-10-21 15:56:06 Singular Exp $ */
+/* $Id: iplib.cc,v 1.38 1998-10-22 12:26:12 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -673,6 +673,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     pl = enterid( mstrdup(plib),0, PACKAGE_CMD,
                   &NSROOT(namespaceroot->root), TRUE );
     IDPACKAGE(pl)->language = LANG_SINGULAR;
+    IDPACKAGE(pl)->libname=mstrdup(newlib);
   } else {
     if(IDTYP(pl)!=PACKAGE_CMD) {
       Warn("not of typ package.");

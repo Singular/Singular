@@ -196,7 +196,7 @@ cmdnames cmds[] =
   { "link",        0, LINK_CMD ,          ROOT_DECL},
   { "listvar",     0, LISTVAR_CMD ,       LISTVAR_CMD},
   { "list",        0, LIST_CMD ,          ROOT_DECL_LIST},
-  { "load",        0, LOAD_CMD ,          CMD_M},
+  { "load",        0, LOAD_CMD ,          CMD_1},
   { "lres",        0, LRES_CMD ,          CMD_2},
   { "map",         0, MAP_CMD ,           RING_DECL},
   { "matrix",      0, MATRIX_CMD ,        MATRIX_CMD},
@@ -295,6 +295,10 @@ cmdnames cmds[] =
   { "multiplicity",1, MULTIPLICITY_CMD ,  CMD_1},
   { "verbose",     2, OPTION_CMD ,        CMD_M},
 //  { "rank",        1, ROWS_CMD ,          CMD_1},
+
+//  { "Current",     0, -1 ,                SYSVAR},
+//  { "Top",         0, -1 ,                SYSVAR},
+//  { "Up",          0, -1 ,                SYSVAR},
 
 /* set sys vars*/
 //#ifdef SRING
@@ -2910,6 +2914,12 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
   res->data = (char *)scMult0Int((ideal)v->Data(),currQuotient);
   return FALSE;
 }
+
+static BOOLEAN jjLOAD(leftv res, leftv v)
+{
+  return(iiLibCmd((char *)v->CopyD(), FALSE));
+}
+
 /*=================== operations with 1 arg.: table =================*/
 
 #ifdef INIT_BUG
@@ -3382,6 +3392,9 @@ struct sValCmd1 dArith1[]=
 ,{jjrVarStr,    VARSTR_CMD,      XS(STRING_CMD), QRING_CMD }
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     IDEAL_CMD }
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     MODUL_CMD }
+#ifdef HAVE_NAMESPACES
+ ,{jjLOAD,      LOAD_CMD,        NONE,           STRING_CMD }
+#endif /* HAVE_NAMESPACES */
 ,{NULL,         0,               0,              0}
 };
 #undef s
@@ -4293,11 +4306,7 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
 }
 static BOOLEAN jjNAMES0(leftv res, leftv v)
 {
-#ifdef HAVE_NAMESPACES
-  res->data=(void *)ipNameList(NSROOT(namespaceroot->root));
-#else /* HAVE_NAMESPACES */
   res->data=(void *)ipNameList(IDROOT);
-#endif /* HAVE_NAMESPACES */
   return FALSE;
 }
 static BOOLEAN jjOPTION_PL(leftv res, leftv v)
@@ -4421,18 +4430,27 @@ static BOOLEAN jjEXPORTTO(leftv res, leftv v)
 {
 #ifdef HAVE_NAMESPACES
   BOOLEAN nok=TRUE;
-  if(v->rtyp==NSHDL) {
-    Print("Export to toplevel\n");
+  leftv u=v;
+  if(u->rtyp==NSHDL) {
+    namehdl ns = (namehdl)(u->data);
+    idhdl h = namespaceroot->root->get(ns->name, 0, TRUE);
+    Print("Export to '%s', lev %d\n", ns->name, ns->myynest);
     while(v->next!=NULL) {
-      nok = iiInternalExport(v->next, 0, v->data);
-      if(nok) return nok;
+      nok = iiInternalExport(v->next, ns->myynest, h);
+      if(nok) { return nok; }
+      
+      v = v->next;
     }
+    return FALSE;
   }
-  if(v->Typ()==PACKAGE_CMD) {
+  if(u->Typ()==PACKAGE_CMD) {
+    Print("export to package\n");
     while(v->next!=NULL) {
-      nok = iiInternalExport(v->next, 0, v->data);
+      nok = iiInternalExport(v->next, 0, u->data);
       if(nok) return nok;
+      v = v->next;
     }
+    return FALSE;
   }
 #else /* HAVE_NAMESPACES */
 #endif /* HAVE_NAMESPACES */
@@ -4457,20 +4475,6 @@ static BOOLEAN jjIMPORTFROM(leftv res, leftv v)
     return FALSE;
   }
   return TRUE;
-}
-
-static BOOLEAN jjLOAD(leftv res, leftv v)
-{
-  BOOLEAN nok=FALSE;
-  while( v!= NULL) {
-    if(v->Typ()==STRING_CMD) {
-      nok = iiLibCmd((char *)v->CopyD(), FALSE);
-      if(nok) return nok;
-    } else
-      return TRUE;
-    v = v->next;
-  }
-  return FALSE;
 }
 
 static BOOLEAN jjUNLOAD(leftv res, leftv v)
@@ -4525,10 +4529,9 @@ struct sValCmdM dArithM[]=
 ,{jjSTATUS_M,  STATUS_CMD,      INT_CMD,             4 }
 #endif
 ,{jjIMPORTFROM,IMPORTFROM_CMD,  ANY_TYPE,           -2 }
-,{jjEXPORTTO,  EXPORTTO_CMD,    ANY_TYPE,           -2 }
+,{jjEXPORTTO,  EXPORTTO_CMD,    NONE,               -2 }
 #ifdef HAVE_NAMESPACES
- ,{jjLOAD,      LOAD_CMD,        NONE,              -2 }
- ,{jjUNLOAD,    UNLOAD_CMD,      NONE,              -2 }
+ ,{jjUNLOAD,   UNLOAD_CMD,      NONE,               -2 }
 #endif /* HAVE_NAMESPACES */
  ,{NULL,        0,               0,                  0  }
 };

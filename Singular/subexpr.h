@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.10 1998-10-21 10:25:43 krueger Exp $ */
+/* $Id: subexpr.h,v 1.11 1998-10-22 12:26:09 krueger Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -132,8 +132,10 @@ public:
 
 typedef union uprocinfodata procinfodata;
 
-typedef enum { LANG_NONE, LANG_SINGULAR, LANG_C } language_defs;
-
+typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C } language_defs;
+// LANG_TOP     : Toplevel package only
+// LANG_SINGULAR:
+// LANG_C       :
 class procinfo
 {
 public:
