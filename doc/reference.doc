@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.81 1998-05-27 07:38:44 wichmann Exp $
+@comment $Id: reference.doc,v 1.82 1998-05-27 10:46:25 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -37,8 +37,8 @@ The general syntax of a function is
 @* If no target is specified, the result is printed.
 
 In some cases (e.g. @code{execute, export, keepring, kill, setring, type})
-the brackets are optional. In the syntax of the commands @code{help} and 
-@code{LIB} no brackets are allowed. 
+the brackets are optional. In the syntax of the commands @code{help} and
+@code{LIB} no brackets are allowed.
 
 @ifinfo
 @*List of all supported functions.
@@ -273,7 +273,7 @@ list of matrix and intvec
 applies Gauss-Bareiss algorithm (see @ref{References})
 to a matrix with an 'optimal' pivotstrategy.
 Result is a list: the first entry a lower triangular matrix,
-the second entry an intvec with the permutations of the columns 
+the second entry an intvec with the permutations of the columns
 w.r.t. the original matrix.
 @item @strong{Example:}
 @example
@@ -366,7 +366,7 @@ generators (one in degree 2 and three in degree 3)
 module has 4 generators (all in degree 4)
 
 @item the 3rd syzygy module has
-1 generator in degree 5 
+1 generator in degree 5
 @end itemize
 
 where the generators are the columns of the
@@ -386,18 +386,16 @@ $$
 @*0 <-- r/j <-- r(1) <------ r(2)+r^3(3) <------ r^4(4) <------ r(5) <-- 0 .
 @end ifinfo
 
-@menu
-* res::
-* lres::
-* mres::
-* sres::
-* print::
-* list::
-* resolution::
-@end menu
-@iftex
-See @ref{res}; @ref{lres}; @ref{mres}; @ref{sres}; @ref{print}; @ref{list}; @ref{resolution}.
-@end iftex
+@c ref
+See
+@ref{lres};
+@ref{mres};
+@ref{print};
+@ref{res};
+@ref{sres};
+@ref{Syzygies and resolutions};
+@ref{resolution}.
+@c ref
 @c ---------------------------------------
 @node char, char_series, betti, Functions
 @subsection char
@@ -419,7 +417,7 @@ returns the characteristic of the coefficient field of a ring.
   char(s);
   ring ra=(7,a),(x,y),dp;
   minpoly=a^3+a+1;
-  char(ra);  
+  char(ra);
   ring rp=(49,a),(x,y),dp;
   char(rp);
   ring rr=real,x,dp;
@@ -528,6 +526,11 @@ or Dongming Wang, Characteristic Sets and Zero Structure of Polynomial Sets
 @c @c example
 @c @end example
 @end table
+
+@c ref
+See
+@ref{Characteristic sets}.
+@c ref
 @c ---------------------------------------
 @node charstr, cleardenom, char_series, Functions
 @subsection charstr
@@ -549,7 +552,7 @@ returns the description of the coefficient field of a ring.
   charstr(s);
   ring ra=(7,a),(x,y),dp;
   minpoly=a^3+a+1;
-  charstr(ra);  
+  charstr(ra);
   ring rp=(49,a),(x,y),dp;
   charstr(rp);
   ring rr=real,x,dp;
@@ -633,11 +636,11 @@ See @ref{link}; @ref{open}.
 @item @strong{Syntax:}
 @code{coef (} poly_expression@code{,} product_of_ringvars @code{)}
 @item @strong{Type:}
-matrix 
+matrix
 @item @strong{Syntax:}
 @code{coef (} vector_expression@code{,} product_of_ringvars@code{,} matrix_name@code{,} matrix_name @code{)}
 @item @strong{Type:}
-none 
+none
 @item @strong{Purpose:}
 determines the monomials in f occurring in m, where f is the first argument
 and m the second argument.
@@ -669,13 +672,10 @@ coefficients of the monomials in the vector.
 @c example
 @end example
 @end table
-@menu
-* poly::
-* coeffs::
-@end menu
-@iftex
-See @ref{poly}; @ref{coeffs}.
-@end iftex
+@c ref
+See
+@ref{coeffs}.
+@c ref
 @c ---------------------------------------
 @node coeffs, contract, coef, Functions
 @subsection coeffs
@@ -756,13 +756,10 @@ such that the entries of A does not contain any variable from P.
 @c example
 @end example
 @end table
-@menu
-* poly::
-* coef::
-@end menu
-@iftex
-See @ref{poly}; @ref{coef}.
-@end iftex
+@c ref
+See
+@ref{coef}.
+@c ref
 @c ---------------------------------------
 @node contract, dbprint, coeffs, Functions
 @subsection contract
@@ -797,13 +794,10 @@ where A and B are the multiexponents of the ring variables represented by x.
 @c example
 @end example
 @end table
-@menu
-* diff::
-* ideal::
-@end menu
-@iftex
-See @ref{diff}; @ref{ideal}; @ref{leadexp}; @ref{matrix}.
-@end iftex
+@c ref
+See
+@ref{diff}.
+@c ref
 @c ---------------------------------------
 @node dbprint, defined, contract, Functions
 @subsection dbprint
@@ -873,12 +867,10 @@ Local objects may be identified by @code{if (defined(..)==voice) ..}.
 @c example
 @end example
 @end table
-@menu
-* voice::
-@end menu
-@iftex
-See @ref{voice}.
-@end iftex
+@c ref
+See
+@ref{voice}.
+@c ref
 @c ---------------------------------------
 @node deg, degree, defined, Functions
 @subsection deg
@@ -1033,7 +1025,7 @@ the same as the type of the first argument
 @item @strong{Syntax:}
 @code{diff (} ideal_expression@code{,} ideal_expression @code{)}
 @item @strong{Type:}
-matrix 
+matrix
 @item @strong{Purpose:}
 computes the partial derivative of a polynomial object by a ring variable
 (first forms)
@@ -1215,7 +1207,7 @@ none
 @item @strong{Purpose:}
 evaluates (quoted) expressions. Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
-effect of exactly one quote). Used with @code{quote} and @code{write} to 
+effect of exactly one quote). Used with @code{quote} and @code{write} to
 prevent local evaluations  when writing to an MPtcp link.
 @item @strong{Example:}
 @example
@@ -1244,7 +1236,7 @@ prevent local evaluations  when writing to an MPtcp link.
 See @ref{MPtcp links}; @ref{quote}; @ref{write}.
 @end iftex
 @c ---------------------------------------
-@node execute, exit, eval, Functions 
+@node execute, exit, eval, Functions
 @subsection execute
 @cindex execute
 @table @code
@@ -1255,7 +1247,7 @@ none
 @item @strong{Purpose:}
 executes a string containing a sequence of @sc{Singular} commands.
 
-@item @strong{Note:} 
+@item @strong{Note:}
 The string is inserted into the input stream at the next line break,
 @emph{NOT} after the @code{;} !  Hence, @code{execute} should be the
 only command on a line. @code{execute} should be avoided in procedures
@@ -1480,7 +1472,7 @@ ideal
 @item @strong{Purpose:}
 calculates for the given ideal ideal_name in the given ring ring_name
 a Groebner basis in the current ring. Implements the so-called FGLM
-(Faugere, Gianni, Lazard, Mora)  algorithm. 
+(Faugere, Gianni, Lazard, Mora)  algorithm.
 @*The ideal must be zero dimensional and given as a reduced Groebner
 basis in the given ring.
 The result is a reduced Groebner basis.
@@ -1490,7 +1482,7 @@ resp. parameters.
 @*The main application is to compute a lexicographical Groebner basis
 from a reduced Groebner basis with respect to a degree ordering. This
 can be much faster than computing a lexicographical Groebner basis
-directly. 
+directly.
 @c @item @strong{Example:}
 @example
 @c example
@@ -1722,6 +1714,7 @@ from it. For ASCII links, @code{getdump} is equivalent to a
   int i=3;
   dump(":w example.txt");
   kill i;
+  option(noredefine);
   getdump("example.txt");
   i;
 @c example
@@ -2474,8 +2467,8 @@ with respect to the monomial ordering.
 @end example
 @end table
 @c ref
-See 
-@ref{number} 
+See
+@ref{number}
 @ref{poly};
 @ref{vector}.
 @c ref
@@ -2504,7 +2497,7 @@ returns the exponent vector of the leading monomial of a polynomial or a vector.
 @end example
 @end table
 @c ref
-See 
+See
 @ref{intvec};
 @ref{poly};
 @ref{vector}.
@@ -2524,7 +2517,7 @@ not start with @kbd{.} or @kbd{/}, the following directories are
 searched for the file: the current directory, the directories given in
 the environment variable @code{SINGULARPATH}@footnote{@code{SPATH} on
 MS-DOS}, and finally some default directory (like
-@code{/usr/local/share/Singular}).
+@code{/usr/local/Singular/LIB}).
 
 Only the names of the procedures in the library are loaded, the body of
 the proc is read during the first call of this proc. This minimizes
@@ -2552,11 +2545,11 @@ shows all loaded libraries.
 @end table
 @c ref
 See
-@ref{Command line options}; 
-@ref{LIB in a library}; 
+@ref{Command line options};
+@ref{LIB in a library};
 @ref{Procedures and libraries};
 @ref{SINGULAR libraries};
-@ref{proc}; 
+@ref{proc};
 @ref{string}.
 @c ref
 @c -------------------------------------------------
@@ -3433,15 +3426,15 @@ disables the regularity bound for res/mres (see @ref{regularity})
 disables the sugar strategy
 @item @code{prot}
 shows protocol information indicating the
-progress during the following computations: 
-@code{facstd}, 
-@code{fglm}, 
+progress during the following computations:
+@code{facstd},
+@code{fglm},
 @code{lres},
-@code{mres}, 
+@code{mres},
 @code{minres},
-@code{res}, 
+@code{res},
 @code{sres},
-@code{std}, 
+@code{std},
 @code{syz}.
 See below for more details.
 @item @code{redSB}
@@ -3508,7 +3501,7 @@ shows correct usage in error messages (default)
 @*The output reported on @code{option(prot)} has the following meaning:
 @multitable @columnfractions .01 .14 .11 .65
 
-@item @tab @code{facstd} 
+@item @tab @code{facstd}
 @tab @code{F} @tab found a new factor
 @item @tab @tab @tab all other characters: like the output of @code{std}
 
@@ -3524,18 +3517,18 @@ shows correct usage in error messages (default)
 @math{n}
 @item @tab @tab @code{g} @tab pair found giving reductum and syzygy
 
-@item @tab @code{mres} 
-@tab @code{[}@math{d}@code{]} 
-@tab computations of the @math{d}-th syzygy module 
-@item @tab @tab @tab all other characters: like the output of @code{std}  
+@item @tab @code{mres}
+@tab @code{[}@math{d}@code{]}
+@tab computations of the @math{d}-th syzygy module
+@item @tab @tab @tab all other characters: like the output of @code{std}
 
-@item @tab @code{minres} 
-@tab @code{[}@math{d}@code{]} 
-@tab minimizing of the @math{d}-th syzygy module 
+@item @tab @code{minres}
+@tab @code{[}@math{d}@code{]}
+@tab minimizing of the @math{d}-th syzygy module
 
-@item @tab @code{res} 
-@tab @code{[}@math{d}@code{]} 
-@tab computations of the @math{d}-th syzygy module 
+@item @tab @code{res}
+@tab @code{[}@math{d}@code{]}
+@tab computations of the @math{d}-th syzygy module
 @item @tab @tab @tab all other characters: like the output of @code{std}
 
 @item @tab @code{sres}
@@ -3543,20 +3536,20 @@ shows correct usage in error messages (default)
 @item @tab @tab @code{(}@math{n}@code{)} @tab @math{n} elements remaining
 @item @tab @tab @code{[}@math{n}@code{]} @tab finished module @math{n}
 
-@item @tab @code{std} 
-@tab @code{s} @tab found a new element of the standard basis 
+@item @tab @code{std}
+@tab @code{s} @tab found a new element of the standard basis
 @item @tab @tab @code{-} @tab reduced a pair/S-polynomial to 0
 @item @tab @tab @code{.} @tab postponed a reduction of a
-pair/S-polynomial 
+pair/S-polynomial
 @item @tab @tab @code{h} @tab used Hilbert series criterion
 @item @tab @tab @code{H(}@math{d}@code{)} @tab found a 'highest corner'
 of degree @math{d}, no need to consider higher degrees
 @item @tab @tab @code{(}@math{n}@code{)} @tab @math{n} critical pairs
-are still to be reduced  
+are still to be reduced
 @item @tab @tab @code{(S:}@math{n}@code{)} @tab doing complete reduction
-of @math{n} elements  
+of @math{n} elements
 @item @tab @tab @math{d} @tab the degree of the leading terms is
-currently @math{d} 
+currently @math{d}
 @item @tab @code{syz} @tab @tab all characters: like the output of @code{std}
 @end multitable
 
@@ -3643,7 +3636,7 @@ See @ref{ring}; @ref{varstr}; @ref{parstr}; @ref{charstr}.
 number
 @item @strong{Purpose:}
 returns the n-th parameter of the basering. This command should only be used if the basering
-has at least one parameter. 
+has at least one parameter.
 @item @strong{Example:}
 @example
 @c example
@@ -3763,7 +3756,7 @@ returns the preimage of an ideal under a given map.
 @*
 The second argument has to be a map from the basering to the given ring
 (or an ideal defining such a map),
-and the ideal has to be an ideal in the given ring. 
+and the ideal has to be an ideal in the given ring.
 @item @strong{Note:}
 To compute the kernel of a map, the preimage of zero has to be determined. Hence there is no
 special command for computing the kernel of a map in @sc{Singular}.
@@ -3995,7 +3988,7 @@ in the first case and
 @{b in basering | b j in m @}, where m in basering^n,
 @end ifinfo
 @tex
-$\{b \in {\rm basering}^n \mid b j \subset m\}$, 
+$\{b \in {\rm basering}^n \mid b j \subset m\}$,
 where $m\subset {\rm basering}^n$,
 @end tex
 in the second case.
@@ -4062,7 +4055,7 @@ See @ref{int}; @ref{intmat}.
 @code{read (} link_expression @code{)}
 @*for DBM links:
 @*@code{read (} link_expression @code{)}
-@*@code{read (} link_expression@code{,} string_expression @code{)} 
+@*@code{read (} link_expression@code{,} string_expression @code{)}
 @item @strong{Type:}
 any
 @item @strong{Purpose:}
@@ -4414,8 +4407,8 @@ changes the basering to another (already defined) ring.
 @item @strong{Use in procedures:}
 All changes of the basering by a definition
 of a new ring or a setring command in a procedure are local to this procedure.
-Use keepring to move a ring which is local to a procedure up by one nesting 
-level.  
+Use keepring to move a ring which is local to a procedure up by one nesting
+level.
 @end table
 @menu
 * ring::
@@ -4454,7 +4447,7 @@ from the ground field
 @item 16
 keep only the first from generators/columns whose leading monomials
 differ
-@item 32 
+@item 32
 keep only the first from generators/columns whose leading monomials are
 not divisible.
 @end table
@@ -4552,7 +4545,7 @@ See @ref{string};
 @ref{intmat};
 @ref{poly};
 @ref{vector};
-@ref{ideal}; 
+@ref{ideal};
 @ref{module};
 @ref{ncols}; @ref{nrows}.
 @end iftex
@@ -4921,37 +4914,37 @@ interface to internal data and the operating system.
 @*Not all functions work on every platform.
 @item @strong{Functions:}
 @table @code
-@item @code{system("sh"},string_expression @code{)} 
+@item @code{system("sh"},string_expression @code{)}
 shell escape, returns the return code of the shell
-@item @code{system("pid")} 
+@item @code{system("pid")}
 returns the process number (for creating unique names)
 @item @code{system("getenv",}string_expression@code{)}
 returns shell environment variable given as the second argument
-@item @code{system("tty")} 
+@item @code{system("tty")}
 resets the terminal
-@item @code{system("version")} 
+@item @code{system("version")}
 returns the version number of  @sc{Singular} (type int)
 @item @code{system("contributors")}
 returns names of people who contributed to the Singular kernel
-@item @code{system("random"},int_expression @code{)} 
+@item @code{system("random"},int_expression @code{)}
 resets the random generator to the given value and return it (type int)
-@item @code{system("random")} 
+@item @code{system("random")}
 returns the seed of the random generator (type int)
-@item @code{system("gen")} 
+@item @code{system("gen")}
 returns the generating element of the multiplicative
 group of Z/p\@{0@} (as int) where p is the characteristic of the
 basering
-@item @code{system("nblocks" [, ring]} 
-returns the number of blocks of @code{ring}, or the number of parameters 
+@item @code{system("nblocks" [, ring]}
+returns the number of blocks of @code{ring}, or the number of parameters
 of the current basering, if no second argument is given.
-@item @code{system("HC")} 
+@item @code{system("HC")}
 returns the order of the highest corner of the last
 computation or 0
-@item @code{system("Singular")} 
+@item @code{system("Singular")}
 returns the absolute (path) name of the running @sc{Singular} (type string)
-@item @code{system("long_option_name")} 
+@item @code{system("long_option_name")}
 returns the value of the (command-line)
-option @code{"long_option_name"}; for on/off options, the return value is of type 
+option @code{"long_option_name"}; for on/off options, the return value is of type
 int and either 1 or 0; for all other options, the return type is string.
 @end table
 @item @strong{Example for UNIX:}
@@ -5365,7 +5358,7 @@ can be used. A @code{write} blocks (i.e. does not return), as long as a
 MPtcp link is not ready for writing.
 @*For DBM links, @code{write} with three arguments inserts the first
 string as key and the second string as value into the dbm data
-base. 
+base.
 @*Called with two arguments it deletes the entry with the key
 specified by the string from the data base.
 @item @strong{Example:}
@@ -5428,11 +5421,11 @@ A sequence of commands surrounded by curly brackets (@code{@{} and
 @code{@}}) is a so called block. Blocks are used in @sc{Singular} in
 order to define procedures and to collect commands belonging to
 @code{if}, @code{else}, @code{for} and @code{while} statements and to the
-@code{example} part in libraries. Even if 
+@code{example} part in libraries. Even if
 the sequence of statements consists of only a single command it has to be
-surrounded by curly brackets! 
+surrounded by curly brackets!
 Variables which are defined inside a block
-are not local to that block. Note that there is no ending semicolon at 
+are not local to that block. Note that there is no ending semicolon at
 the end of the block.
 @table @code
 @item @strong{Example:}
@@ -5440,7 +5433,7 @@ the end of the block.
 if ( i>j )
 @{
   // This is the block
-  int temp; 
+  int temp;
   i=temp;
   i=j;
   j=temp;
@@ -5463,8 +5456,8 @@ leaves the innermost @code{for}- or @code{while}-block.
 while (1)
 @{
   @dots{}
-  if ( @dots{} )  
-  @{  
+  if ( @dots{} )
+  @{
     break; // leave the while block
   @}
 @}
@@ -5504,7 +5497,7 @@ for (int i = 1 ; i<=10; i=i+1)
 @expansion{} 10
 @end example
 @end table
-@c ref 
+@c ref
 See @ref{Control structures}; @ref{for}; @ref{while}.
 @c ref
 @c ---------------------------------------
@@ -5516,7 +5509,7 @@ See @ref{Control structures}; @ref{for}; @ref{while}.
 @item @strong{Purpose:}
 executes false_block if the boolean_expression of the @code{if} statement
 is false. This command is only valid in combination with an @code{if}
-command. 
+command.
 @item @strong{Example:}
 @example
 int i=3;
@@ -5569,8 +5562,8 @@ listvar();
 @cindex for
 @table @code
 @item @strong{Syntax:}
-@code{for (} init_command@code{;} 
-boolean_expression@code{;} 
+@code{for (} init_command@code{;}
+boolean_expression@code{;}
 iterate_command@code{)} block
 @item @strong{Purpose:}
 repetitive, conditional execution of a command block.
@@ -5619,7 +5612,7 @@ if (i > 5 and typeof(m) == "matrix")
 @end example
 @end table
 @c ref
-See @ref{else}; @ref{break}; @ref{Control structures}; 
+See @ref{else}; @ref{break}; @ref{Control structures};
 @ref{boolean expressions}.
 @c ref
 @c ---------------------------------------
@@ -5700,10 +5693,10 @@ proc tworeturn ()
 @{ return (1,2); @}
 int i,j = tworeturn();
 // return type may even depend on the input
-proc type_return (int i) 
-@{ 
-  if (i > 0) @{return (i);@} 
-  else @{return (list(i));@} 
+proc type_return (int i)
+@{
+  if (i > 0) @{return (i);@}
+  else @{return (list(i));@}
 @}
 // then we need def type (or list) to collect value
 def t1 = type_return(1);
@@ -5711,8 +5704,8 @@ def t2 = type_return(-1);
 @end example
 @end table
 @c ref
-See 
-@ref{Data types}; 
+See
+@ref{Data types};
 @ref{proc}.
 @c ref
 @c ---------------------------------------
@@ -5723,7 +5716,7 @@ See
 @item @strong{Syntax:}
 @code{while (}boolean_expression@code{)} block
 @item @strong{Purpose:}
-repetitive, conditional execution of block.  
+repetitive, conditional execution of block.
 @*The command @code{break} leaves the innermost @code{while}
 construct.
 @item @strong{Example:}
@@ -5758,8 +5751,8 @@ See @ref{Control structures}; @ref{boolean expressions}; @ref{break}.
 @code{~;}
 @item @strong{Purpose:}
 sets a breakpoint. Whenever @sc{Singular} reaches the command @code{~;}
-in a sequence of commands it prompts for input. The user may now input 
-lines of @sc{Singular} commands. The line length can not exceed 80 
+in a sequence of commands it prompts for input. The user may now input
+lines of @sc{Singular} commands. The line length can not exceed 80
 characters.
 @sc{Singular} proceeds with the execution of the command following @code{~;}
 as soon as it receives an empty line.
@@ -5898,12 +5891,12 @@ defining the ring.
 @item @strong{Note:}
 The minimal polynomial has to be specified in the syntax of a polynomial.
 Its variable is not one of the ring variables, but the algebraic element
-which is being adjoined to the field. 
+which is being adjoined to the field.
 Algebraic extension are in @sc{singular} only possibel over the rational
 numbers or Z/p, p prime number.
-@c @*@strong{Warning:} 
+@c @*@strong{Warning:}
 @*@sc{Singular} does not check whether the given
-polynomial is irreducible! It can be checked in advance with the 
+polynomial is irreducible! It can be checked in advance with the
 function @code{factorize} @ref{factorize}.
 @item @strong{Example:}
 @example
@@ -6056,7 +6049,7 @@ int
 @enumerate
 @item
 the CPU time used for each command is printed if timer >0 and if this
-time is bigger than a (customizable) minimal time; 
+time is bigger than a (customizable) minimal time;
 @item
 yields the used CPU time since the start-up of @sc{Singular} in a
 (customizable) resolution.
@@ -6067,7 +6060,7 @@ The default setting of @code{timer} is 0, the default minimal time is
 of time is one second). The minimal time and timer resolution
 can be set using the command line options @code{--min-time} and
 @code{--ticks-per-sec} and can be checked using
-@code{system("--min-time")} and @code{system("--ticks-per-sec")}. 
+@code{system("--min-time")} and @code{system("--ticks-per-sec")}.
 
 How to use @code{timer} in order to measure the time for a sequence of
 commands, see example below.
@@ -6101,12 +6094,12 @@ int
 @item @strong{Purpose:}
 sets level of debugging.
 @table @asis
-@item @code{TRACE=1} 
+@item @code{TRACE=1}
 messages about entering and leaving of procedures are displayed.
-@item @code{TRACE=3} 
+@item @code{TRACE=3}
 messages about entering and leaving of procedures together with
 line numbers are displayed.
-@item @code{TRACE=4} 
+@item @code{TRACE=4}
 each line is echoed and the interpretation of commands
 in this line is suspended until the user presses @code{RETURN}.
 @end table

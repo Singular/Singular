@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.29 1998-05-19 17:14:02 wichmann Exp $
+@comment $Id: math.doc,v 1.30 1998-05-27 10:46:24 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -26,11 +26,11 @@ most prominent definitions and properties and refer for details to
 some articles or text books.
 
 @menu
-* Standard bases::              
-* Hilbert function::            
-* Syzygies and resolutions::    
-* Characteristic sets::         
-* References::                  
+* Standard bases::
+* Hilbert function::
+* Syzygies and resolutions::
+* Characteristic sets::
+* References::
 @end menu
 @c ---------------------------------------------------------------------------
 @node Standard bases, Hilbert function, ,Mathematical background
@@ -350,82 +350,82 @@ Ideals, Varieties and Algorithms. Springer, 1996
 Eisenbud, D.: Commutative Algebra. Springer, 1995
 
 @item
-Mishra, B.: Algorithmic Algebra, Texts and Monographs in Computer Science,
+Mishra, B.: Algorithmic Algebra, Texts and Monographs in Computer Science.
 Springer, 1993
 
 @item
-Vasconcelos, V.:
+Vasconcelos, W.: Computational Methods in Commutative Algebra and Algebraics
+Geometrya. Springer, 1998
 @end itemize
 
 @subheading Descriptions of algorithms
 @itemize @bullet
 @item
 Bareiss, E.:
-Sylvester's identity and multistep integer-preserving Gaussian elimination,
+Sylvester's identity and multistep integer-preserving Gaussian elimination.
 Math. Comp. 22 (1968), 565-578
 
 @item
-Campillo, A.: Algebroid curves in positive characteristic, SLN 813, 1980
+Campillo, A.: Algebroid curves in positive characteristic. SLN 813, 1980
 
 @item
 Decker, W.; G.-M. Greuel, G.-M.; Pfister, G.:
 Primary decomposition: algorithms and
 comparisons.  Preprint, Univ. Kaiserslautern, 1998.
 To appear in: Greuel, G.-M.; Matzat, B. H.; Hiss, G. (Eds.),
-Algorithmic Algebra and Number Theory, Springer Verlag, Heidelberg, (1998)
+Algorithmic Algebra and Number Theory. Springer Verlag, Heidelberg, 1998
 
 @item
 Decker, W.; G.-M. Greuel, G.-M.; de Jong, T.; Pfister, G.:
 The normalisation: a new algorithm,
 implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998
 
-@item 
+@item
 Decker, Heydtmann, Schreyer: Generating a Noetherian Normalization of
 the Invariant Ring of a Finite Group, 1997, to appear in Journal of
 Symbolic Computation
 
-@item 
+@item
 @tex
-Faug\`ere, 
+Faug\`ere,
 @end tex
 @ifinfo
 Faugere,
 @end ifinfo
 J. C.; Gianni, P.; Lazard, D.; Mora, T.: Efficient computation
-of zero-dimensional 
+of zero-dimensional
 @tex
 Gr\"obner
 @end tex
 @ifinfo
 Groebner
 @end ifinfo
-bases by change of ordering, Journal of Symbolic Computation, 1989
+bases by change of ordering. Journal of Symbolic Computation, 1989
 
 @item
 Grassmann, H.; Greuel, G.-M.; Martin, B.; Neumann,
 W.; Pfister, G.; Pohl, W.;
 @tex
-\noindent
 Sch\"onemann,
 @end tex
 @ifinfo
- Schoenemann
+Schoenemann
 @end ifinfo
  H.; Siebert, T.:  On an
-implementation of standard bases and syzygies in  @sc{Singular},
+implementation of standard bases and syzygies in  @sc{Singular}.
 Proceedings of the Workshop  Computational Methods in Lie theory in AAECC (1995)
 
 @item
 Greuel, G.-M.; Pfister, G.:
 Advances and improvements in the theory of standard bases and
-syzygies, Arch. d. Math. 63(1995)
+syzygies. Arch. d. Math. 63(1995)
 
 @item
 Kemper; Generating Invariant Rings of Finite Groups over Arbitrary
-Fields, 1996, to appear in Journal of Symbolic Computation
+Fields. 1996, to appear in Journal of Symbolic Computation
 
 @item
-Kemper and Steel: Some Algorithms in Invariant Theory of Finite Groups, 1997
+Kemper and Steel: Some Algorithms in Invariant Theory of Finite Groups. 1997
 
 @item
 @tex
