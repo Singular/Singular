@@ -1,8 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_util.cc,v 1.3 1996-07-16 12:26:05 stobbe Exp $
+// $Id: fac_util.cc,v 1.4 1997-03-27 09:56:58 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1996/07/16 12:26:05  stobbe
+"New functions prod, crossprod ans sum for CFArrays, since these functions
+are no longer contained in the template specification of Array.
+"
+
 Revision 1.2  1996/07/08 08:22:02  stobbe
 "New organization of the factorization stuff. Some functions moved from
 fac_diophand.cc which no longer exists.
@@ -18,7 +23,9 @@ Initial revision
 */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "fac_util.h"
@@ -84,7 +91,7 @@ modpk::inverse( const CanonicalForm & f, bool symmetric ) const
 	return this->operator()( pk-q1, symmetric );
     else
 	return this->operator()( q0, symmetric );
-}   
+}
 
 CanonicalForm
 modpk::operator() ( const CanonicalForm & f, bool symmetric ) const
@@ -254,10 +261,7 @@ prod ( const CFArray & a )
 CanonicalForm
 crossprod ( const CFArray & a, const CFArray & b )
 {
-    if ( a.size() != b.size() ) {
-	cerr << "warning: array size mismatch." << endl;
-	return 0;
-    }
+    ASSERT( a.size() == b.size(), "array size mismatch" );
     CanonicalForm s = 0;
     int fa = a.min();
     int fb = b.min();
