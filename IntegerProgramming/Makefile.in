@@ -4,6 +4,8 @@
 ## various paths
 ##
 bindir          = @bindir@
+prefix          = @prefix@
+slibdir         = ${prefix}/LIB
 
 ##
 ## various programs
@@ -49,7 +51,10 @@ clean:
 
 distclean: clean
 	rm -f $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
-
+	-rm -f ${bindir}/$(MAIN1)
+	-rm -f ${bindir}/$(MAIN2)
+	-rm -f ${bindir}/$(MAIN3)
+	-rm -f ${bindir}/$(MAIN4)
 
 $(MAIN1): term_ordering.o binomial.o list.o BigInt.o LLL.o matrix.o \
 	ideal.o \
