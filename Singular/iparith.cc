@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.318 2004-04-29 17:11:47 levandov Exp $ */
+/* $Id: iparith.cc,v 1.319 2004-05-12 11:25:10 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2414,9 +2414,9 @@ struct sValCmd2 dArith2[]=
 ,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD ALLOW_PLURAL}
 ,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTVEC_CMD, INTMAT_CMD ALLOW_PLURAL}
 ,{jjDIV_N,     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
-,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD NO_PLURAL}
-,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD NO_PLURAL}
-,{jjDIV_Ma,    '/',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD NO_PLURAL}
+,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
+,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD ALLOW_PLURAL}
+,{jjDIV_Ma,    '/',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD ALLOW_PLURAL}
 ,{jjDIVMOD_I,  '/',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD ALLOW_PLURAL}
@@ -2505,7 +2505,7 @@ struct sValCmd2 dArith2[]=
 ,{jjINDEX_V,   '[',            POLY_CMD,       VECTOR_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjINDEX_V_IV,'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjPROC,      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD ALLOW_PLURAL}
-,{jjMAP,       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD NO_PLURAL}
+,{jjMAP,       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD ALLOW_PLURAL}
 ,{jjKLAMMER,   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD ALLOW_PLURAL}
 ,{jjKLAMMER_IV,'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD ALLOW_PLURAL}
 // and the procedures with 2 arguments:
@@ -4897,8 +4897,8 @@ struct sValCmd3 dArith3[]=
 #endif
 ,{jjLIFT3,          LIFT_CMD,   MATRIX_CMD, IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD NO_PLURAL}
 ,{jjLIFT3,          LIFT_CMD,   MATRIX_CMD, MODUL_CMD,  MODUL_CMD,  MATRIX_CMD NO_PLURAL}
-,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, RING_CMD,  ANY_TYPE,   ANY_TYPE NO_PLURAL}
-,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, QRING_CMD, ANY_TYPE,   ANY_TYPE NO_PLURAL}
+,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, RING_CMD,  ANY_TYPE,   ANY_TYPE ALLOW_PLURAL}
+,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, QRING_CMD, ANY_TYPE,   ANY_TYPE ALLOW_PLURAL}
 ,{jjRANDOM_Im,      RANDOM_CMD, INTMAT_CMD, INT_CMD,    INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjREDUCE3_P,      REDUCE_CMD, POLY_CMD,   POLY_CMD,   IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjREDUCE3_P,      REDUCE_CMD, VECTOR_CMD, VECTOR_CMD, IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
