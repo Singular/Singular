@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.11 1997-05-02 15:10:12 Singular Exp $ */
+/* $Id: ffields.cc,v 1.12 1998-04-21 10:48:56 obachman Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -580,22 +580,13 @@ static void nfReadMipo(char *s)
 {
   char *l=strchr(s,';')+1;
   char *n;
-#ifdef HAVE_STRTOL  
   int i=strtol(l,&n,10);
-#else
-  int i;
-  sscanf(l, "%d", &i);
-#endif  
   l=n;
   int j=1;
   nfMinPoly[0]=i;
   while(i>=0)
   {
-#ifdef HAVE_STRTOL
     nfMinPoly[j]=strtol(l,&n,10);
-#else
-    sscanf(l, "%d", &(nfMinPoly[j]));
-#endif    
     if (l==n) break;
     l=n;
     j++;
