@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.95 2001-02-21 10:08:12 Singular Exp $ */
+/* $Id: kutil.cc,v 1.96 2001-02-21 10:39:26 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1596,7 +1596,7 @@ void reorderS (int* suc,kStrategy strat)
   *suc = -1;
   for (i=1; i<=strat->sl; i++)
   {
-    at = posInS(strat->S,i-1,strat->S[i]);
+    at = posInS(strat,i-1,strat->S[i]);
     if (at != i)
     {
       if ((*suc > at) || (*suc == -1)) *suc = at;
@@ -1636,9 +1636,10 @@ void reorderS (int* suc,kStrategy strat)
 * Assumption: posInS only depends on the leading term
 *             otherwise, bba has to be changed
 */
-int posInS (polyset set,int length,poly p)
+int posInS (kStrategy strat, int length,poly p)
 {
   if(length==-1) return 0;
+  polyset set=strat->S;
   int i;
   int an = 0;
   int en= length;
@@ -1680,16 +1681,16 @@ int posInS (polyset set,int length,poly p)
       {
         if (pLmCmp(set[an],p) == pOrdSgn) return an;
         if (pLmCmp(set[an],p) == -pOrdSgn) return en;
-	if (pLDeg(set[an],&dummy)<pLDeg(p,&dummy)) return an;
+        if (pLDeg(set[an],&dummy)<pLDeg(p,&dummy)) return an;
         return en;
       }
       i=(an+en) / 2;
       if (pLmCmp(set[i],p) == pOrdSgn) en=i;
       else if (pLmCmp(set[i],p) == -pOrdSgn) an=i;
-      else 
+      else
       {
-	if (pLDeg(set[i],&dummy)<pLDeg(p,&dummy)) en=i;
-	else                                    an=i;
+        if (pLDeg(set[i],&dummy)<pLDeg(p,&dummy)) en=i;
+        else                                    an=i;
       }
     }
   }
@@ -2935,7 +2936,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
             pos =0;
           else
           {
-            pos = posInS(strat->S,strat->sl,h.p);
+            pos = posInS(strat,strat->sl,h.p);
           }
           h.sev = pGetShortExpVector(h.p);
           strat->enterS(h,pos,strat);
@@ -2976,7 +2977,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
             pos =0;
           else
           {
-            pos = posInS(strat->S,strat->sl,h.p);
+            pos = posInS(strat,strat->sl,h.p);
           }
           h.sev = pGetShortExpVector(h.p);
           strat->enterS(h,pos,strat);
@@ -3034,7 +3035,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
             pos =0;
           else
           {
-            pos = posInS(strat->S,strat->sl,h.p);
+            pos = posInS(strat,strat->sl,h.p);
           }
           h.sev = pGetShortExpVector(h.p);
           strat->enterS(h,pos,strat);
@@ -3138,7 +3139,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
             pos =0;
           else
           {
-            pos = posInS(strat->S,strat->sl,h.p);
+            pos = posInS(strat,strat->sl,h.p);
           }
           h.sev = pGetShortExpVector(h.p);
           h.SetpFDeg();
@@ -3176,7 +3177,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           pos =0;
         else
         {
-          pos = posInS(strat->S,strat->sl,h.p);
+          pos = posInS(strat,strat->sl,h.p);
         }
         h.sev = pGetShortExpVector(h.p);
         strat->enterS(h,pos,strat, strat->tl+1);
@@ -3228,7 +3229,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           }
           h.sev = pGetShortExpVector(h.p);
           h.SetpFDeg();
-          pos = posInS(strat->S,strat->sl,h.p);
+          pos = posInS(strat,strat->sl,h.p);
           enterpairsSpecial(h.p,strat->sl,h.ecart,pos,strat,strat->tl+1);
           strat->enterS(h,pos,strat, strat->tl+1);
           enterT(h,strat);

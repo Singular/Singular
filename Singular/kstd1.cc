@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.80 2001-02-21 10:08:12 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.81 2001-02-21 10:39:24 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1198,7 +1198,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // build new pairs
       enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       // put in S
-      strat->enterS(strat->P, posInS(strat->S,strat->sl,strat->P.p),
+      strat->enterS(strat->P, posInS(strat,strat->sl,strat->P.p),
                     strat, strat->tl);
 
       // apply hilbert criterion

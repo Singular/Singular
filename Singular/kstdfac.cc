@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.49 2000-12-20 11:15:44 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.50 2001-02-21 10:39:25 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -311,7 +311,7 @@ static void completeReduceFac (kStrategy strat, lists FL)
       /* enter P.p into s and L */
       int pos;
       if (n->sl==-1) pos=0;
-      else pos=posInS(n->S,n->sl,n->P.p);
+      else pos=posInS(n,n->sl,n->P.p);
       if (TEST_OPT_INTSTRATEGY)
       {
         n->P.p = redtailBba(n->P.p,pos-1,n);
@@ -595,7 +595,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         /* enter P.p into s and L */
         int pos;
         if (n->sl==-1) pos=0;
-        else pos=posInS(n->S,n->sl,n->P.p);
+        else pos=posInS(n,n->sl,n->P.p);
 
         // we have already reduced all elements from fac....
         if (TEST_OPT_INTSTRATEGY)

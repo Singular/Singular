@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.57 2001-02-16 09:19:35 Singular Exp $ */
+/* $Id: kutil.h,v 1.58 2001-02-21 10:39:27 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -309,7 +309,7 @@ void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
 void enterSBba (LObject p,int atS,kStrategy strat, int atR = -1);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
-int posInS (polyset set,int length,poly p);
+int posInS (kStrategy strat,int length,poly p);
 int posInT0 (const TSet set,const int length,LObject &p);
 int posInT1 (const TSet set,const int length,LObject &p);
 int posInT2 (const TSet set,const int length,LObject &p);
