@@ -1,3 +1,7 @@
+Wed May 20 15:03:28 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* LIB/primdec.lib (info): info string reformated
+
 1998-05-19  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* find_exec.c (find_executable): add "." top path, if under WINNT
@@ -37,11 +41,23 @@ Tue May 12 11:57:50 MET DST 1998 hannes
 
 	* exteded system("random") to always return the seed of the random 
 	generator
-vThu May  7 19:49:34 MET DST 1998 hannes
+
+Thu May  7 19:49:34 MET DST 1998 hannes
         * added syntax rule "proc <name> <arglist> <string> <body>"
 	* speedup for feReadLine
+
+Wed May  6 19:10:59 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* find_exec.c (find_executable): bug fix.  Recognizes
+	  `../Singular' properly.
+
+Tue May  5 14:06:12 1998  Jens/Kai
+
+	* libparse.l: message fix
+
 Thu Apr 30 19:16:45 MET DST 1998 hannes
 	* fixed "missing e-o-buffer" for long lines in febase.inc
+
 Wed Apr 29 18:26:19 MET DST 1998 hannes
 	* added filed list_length tossyStrategy
 	( for conversion list <-> resolution): syz.h, syz1.cc, iparith.cc
