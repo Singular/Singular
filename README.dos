@@ -1,0 +1,142 @@
+			 Singular version 1.0
+		     University of Kaiserslautern
+     Department of Mathematics        Centre for Computer Algebra
+	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
+		  (C) 1986-1997 All Rights Reserved
+
+      README FILE FOR SINGULAR MS-DOS DISTRIBUTION
+      ============================================
+
+IMPORTANT: Please see the COPYING file contained in this directory
+for license information for Singular.
+
+This distribution contains the following subdirectories
+  'share/Singular'      -- contains Singular library files and compute tables
+  'info'                -- contains Singular's info help file
+  	
+and the file
+  'COPYING'     -- for licence and copying information information
+   Singular.exe -- Singular executable program
+
+
+Installing the Singular executable program
+==========================================
+After you have unpacked the file Singular.zip (using the command
+'pkunzip -d singular' -- you can obtain the program pkunzip from The
+place where you obtained this ditribution), you can run Singular by 
+
+(i) if you run MS-DOS: 
+	1.) cd to the directory cotaining the File Singular.exe
+	2.) type Singular
+
+(ii) if you run Windows:
+	1.) double-click on the Singular.exe icon
+
+IMPORTANT: For the help system to work, you furthermore must have the
+'info' program installed on your system, or have it reside in the same
+directory as the Singular executable. You can obtain the 'info'
+program from the same place from where you obtained this distribution.
+
+We furthermore ask you to register as a  Singular
+user so that we can notify you about updates and news. Please do
+so by sending an email to singular@mathematik.uni-kl.de with the
+subject line "register".
+
+Overview of Singular
+====================
+Singular is a special-purpose computer algebra system for commutative
+algebra, algebraic geometry and singularity theory. The main features
+of Singular are: 
+
+ * Computations in very general rings (polynomial rings, localizations
+   of rings at a prime ideal, tensor products of rings) over many
+   ground fields (rational numbers, mod p numbers, Galois fields,
+   transcendental/algebraic extensions) and monomial orderings (all
+   standard monomial orderings, including matrix orderings)
+
+ * Very fast standard (resp. Groebner) bases computations
+
+ * Polynomial factorization, resultant, and gcd computations
+
+ * Large variety of implemented related algorithm: FGLM,
+   Hilbert-driven, Factorizing Buchberger; Minimal resolutions,
+   Primary decomposition; Usual ideal theoretic operations; standard
+   combinatorial algorithms.
+
+ * Efficient and flexible communication links based on the MP
+   protocol and library
+
+ * Easy-to-use, command-driven user-interface
+
+ * Intuitive, C-like programming language
+
+ * Extensive libraries of procedures, written in Singular's
+   programming language
+
+ * Written in C/C++. Available as binary program for common hard- and
+   software platforms (including most Un*x variants, MS-DOG, MacOS)
+
+
+Acknowledgments
+================
+Singular 1.0 is linked with the following libraries: 
+  gmp	  --  The Gnu Multiple precision library (v: 2.0.2) distribution
+              (C) Free Software Foundation
+  factory --  The factory library (v: 1.2c) for polynomial factorization
+	      (C) Greuel/Stobbe U of Kaiserslautern
+  libfac  --  The libfac library (v: 0.2.1) for characteristic set computations
+              (C) Mesollen U of Saarbruecken
+We would like to thank all authors of these who contributed these
+libraries. 
+
+
+Distribution of Singular
+========================
+The newest version of Singular is always available by anonymous ftp
+from 
+	     www.mathematik.uni-kl.de:/pub/Math/Singular
+
+Binary versions of Singular for common hard- and software
+platforms are contained in the files bin/Singular-1.0.<platform>.gz where
+<platform> is, for example, 'linux', 'SunOS', etc.  
+
+In general, Singular is only available as binary program. For
+exceptions, you may contact us at
+        singular@mathematik.uni-kl.de
+
+Architecture - independent files (such as libraries written in the
+Singular programming language, and the Singular documentation) are
+distributed as Singular-1.0-share.tar.gz. See the file README.share
+for more information. 
+
+Documentation to Singular is distributed as:
+Singular-1.0.dvi.gz	 - Reference manual in dvi format
+Tutorial.dvi.gz		 - Singular tutorial in dvi format
+Singular-1.0.ps.gz	 - Reference manual in postscript format
+Tutorial.dvi.gz		 - Singular tutorial in postscript format
+singular.hlp.gz		 - Reference manual in Info format
+Singular-1.0.html.tar.gz - Reference manual in html format
+
+The GMP library and the readline library are available at
+ftp.gnu.ai.mit.edu or its mirrors.
+
+The MP library library is avialbale from mcs.kent.edu:/pub/MP/
+For further information on MP, see also
+http://symbolicnet.mcs.kent.edu/areas/protocols/mp.html
+
+The factory and libfac library are available from
+www.mathematik.uni-kl.de:/pub/Math/
+
+
+More information about Singular: Comments, Questions, Bug Reports
+=================================================================
+
+More and up-to-date information about Singular is always available
+from 
+	   http://www.mathematik.uni-kl.de/~zca/Singular
+We very much welcome any comments, questions, and bug reports. Please
+contact us at  
+		    singular@mathematik.uni-kl.de
+
+
+GOOD LUCK and ENJOY!                         Your Singular team.

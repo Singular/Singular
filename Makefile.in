@@ -74,6 +74,22 @@ bindist: ${bindir}/Singular
 	strip ${BINDISTNAME}
 	gzip -9 ${BINDISTNAME}
 
+dosdist: Singular/Singular.exe
+	mkdir /tmp/singdos
+	mkdir /tmp/singdos/Singular
+	mkdir /tmp/singdos/Singular/info
+	mkdir /tmp/singdos/Singular/share
+	mkdir /tmp/singdos/Singular/share/Singular
+	cp Singular/doc/singular.hlp /tmp/singdos/Singular/info
+	cp Singular/Singular.exe /tmp/singdos/Singular
+	cp Singular/LIB/*.lib /tmp/singdos/Singular/share/Singular
+	cp -R Singular/LIB/gftables /tmp/singdos/Singular/share/Singular
+	cp COPYING.share /tmp/singdos/Singular/COPYING
+	cp README.dos /tmp/singdos/Singular/README
+	cd /tmp/singdos/; zip -k -r sing Singular; cd -
+	mv /tmp/singdos/sing.zip Singular.zip
+	/bin/rm -rf /tmp/singdos
+
 sharedist: ${bindir}/Singular
 	cd Singular; ${MAKE} dvi; ${MAKE} info
 	/bin/rm -rf ${TEMPDIR}/Singular-share
@@ -98,12 +114,17 @@ sharedist: ${bindir}/Singular
 ${bindir}/Singular: 
 	${MAKE} install	
 
+Singular/Singular.exe:
+	./configure.dos
+	${MAKE} clean
+	${MAKE} install
+
 Singular factory libfac MP gmp:
 	cd $@; ${MAKE} all
 
 check:
 	cd Singular; ${MAKE} check
-	
+
 Makefile : Makefile.in config.status
 	./config.status
 

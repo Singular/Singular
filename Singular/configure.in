@@ -42,10 +42,6 @@ if test "x$infodir" = 'x${prefix}/info'; then
 else
   singularinfodir=$infodir;
 fi
-AC_DEFINE_UNQUOTED(SINGULAR_DATADIR, "${singulardatadir}")
-AC_DEFINE_UNQUOTED(SINGULAR_INFODIR, "${singularinfodir}")
-
-AC_SUBST(singulardatadir)
 
 dnl
 dnl Checks for programs.
@@ -83,6 +79,16 @@ else
   DOS_CROSS=no
 fi
 AC_SUBST(DOS_CROSS)
+
+if test "$ac_c_cross_dos" = yes; then
+  AC_DEFINE(SINGULAR_DATADIR, "share\\Singular")
+  AC_DEFINE(SINGULAR_INFODIR, "info")
+else
+  AC_DEFINE_UNQUOTED(SINGULAR_DATADIR, "${singulardatadir}")
+  AC_DEFINE_UNQUOTED(SINGULAR_INFODIR, "${singularinfodir}")
+fi
+AC_SUBST(singulardatadir)
+
 
 dnl we prefer using gcc for compiling C++ files, provided the user did
 dnl not overwrite it explicitely
@@ -498,7 +504,6 @@ if test "$ac_cv_is_aix" = yes; then
 else
   AC_MSG_RESULT(no)
 fi
-
 
 if test ${GXX} = yes; then
   if test "$ac_cxxflags_set" = no; then
