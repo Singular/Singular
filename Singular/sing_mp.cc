@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.33 2000-09-18 09:19:33 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.34 2000-11-21 15:35:46 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -384,7 +384,7 @@ static void SentQuitMsg(si_link l)
   leftv v = (leftv) omAlloc0Bin(sleftv_bin);
 
   v->rtyp = STRING_CMD;
-  v->data = MPSR_QUIT_STRING;
+  v->data = (void *)MPSR_QUIT_STRING;
   slWriteMP(l, v);
   omFreeBin(v, sleftv_bin);
 }
