@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.165 1999-11-29 14:46:00 Singular Exp $
+@comment $Id: reference.doc,v 1.166 1999-12-01 15:53:04 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -165,7 +165,6 @@ brackets are allowed.
 * simplify::
 * size::
 * sortvec::
-* spectrum::
 * sprintf::
 * sres::
 * status::
@@ -6230,7 +6229,7 @@ See
 @ref{Source code debugger}.
 @c ref
 @c ---------------------------------------
-@node continue, else, break, Control structures
+@node continue, else, breakpoint, Control structures
 @subsection continue
 @cindex continue
 @table @code

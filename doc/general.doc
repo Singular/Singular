@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.162 1999-11-29 21:37:54 wichmann Exp $
+@comment $Id: general.doc,v 1.163 1999-12-01 15:53:02 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -766,10 +766,11 @@ awaits user input from the usual @sc{Singular} prompt.
 
 @menu 
 * A quick guide to Emacs::
+* A quick guide to running Singular under Emacs::
 @end menu
 
 @c --------------------------------------------------------------------------
-@node A quick guide to Emacs,,,Overview of the Emacs user interface
+@node A quick guide to Emacs, A quick guide to running Singular under Emacs,,Overview of the Emacs user interface
 @subsubsection A quick guide to Emacs
 
 Emacs commands generally involve the @code{CONTROL} key (sometimes
@@ -849,25 +850,36 @@ The most important buffer commands are
 @end multitable
 Alternatively, you can switch to or kill buffers using the @code{Buffer} 
 menu.
-@end table
 
-@strong{Important notes}: 
-@itemize
-@item 
+@item How to exit
 To end the Emacs (and, @sc{Singular}) session,
 type @code{C-x C-c} (two characters), or use the @code{File -> Exit}
 menu.
-@item
+@item When Emacs is hung
 If Emacs stops responding to your commands, you can stop it safely by
-typing @code{C-g}, or, if even this fails, by typing @code{C-]}.
-@item 
-help
-@item 
-mouse
-@end itemize
+typing @code{C-g}, or, if this fails, by typing @code{C-]}.
+@item More help
+Nearly all aspects of Emacs are very well documented: type
+@code{C-h}  and then a character saying what kind of help you want. 
+For example, typing @code{C-h i} enters the @code{Info} documentation
+browser.
+@item Using the mouse
+Emacs is fully integrated with the mouse. In particular, clicking the
+right mouse button brings up a popup menu which usually contains a few
+commonly used commands.
+@end table
 
+@c --------------------------------------------------------------------------
+@node A quick guide to running Singular under Emacs,,A quick guide to Emacs,Overview of the Emacs user interface
+@subsubsection A quick guide to running Singular under Emacs
 
+On first sight, running @sc{Singular} under Emacs is almost identical to 
+running @sc{Singular} in an ASCII-terminal. In particular, all the
+editing commands (and, key-bindings) are the same (@pxref{Editing
+input}). 
 
+An important difference of the Emacs interface is that @code{C-c} does
+not interrupt @sc{Singular}. TBC !!!!
 
 
 Most Emacs 
@@ -916,7 +928,7 @@ which usually reside in the @code{emacs} subdirectory of your
 @sc{Singular} distribution. This directory is called
 singular-emacs-home-directory in the following.
 
-@subheading{Starting the interface using ESingular}
+@subheading Starting the interface using ESingular
 
 As mentioned above, @code{ESingular} is an "out-of-the-box" solution:
 You don't have to add special things to your @code{.emacs} startup file
@@ -965,7 +977,7 @@ Start @code{PROG} as @sc{Singular} program within Emacs
 
 @end table
 
-@subheading{Starting the interface using running Emacs}
+@subheading Starting the interface using running Emacs
 
 If you are a more experienced Emacs user and you already have your own
 local @code{.emacs} startup file, you might want to start the interface
@@ -994,7 +1006,7 @@ useful for your @code{.emacs} file, too. And if you are a Emacs wizard,
 it is of course a good idea to take a look at @code{singular.el} in the
 singular-emacs-home-directory.
 
-@subheading{Starting and stopping SINGULAR}
+@subheading Starting and stopping SINGULAR
 
 There are the following commands to start and stop @sc{Singular}:
 
