@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.6 1997-04-03 12:16:47 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.7 1997-04-16 18:38:05 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -300,9 +300,10 @@ void sigint_handler(int sig)
                 signal(SIGINT ,(s_hdl_typ)sigint_handler);
                 return;          
       case 'a':
-                siCntrlc ++;
-                if (siCntrlc>2) signal(SIGINT,(s_hdl_typ) sigsegv_handler);
-                else            signal(SIGINT,(s_hdl_typ) sigint_handler);
+                m2_end(2);
+                //siCntrlc ++;
+                //if (siCntrlc>2) signal(SIGINT,(s_hdl_typ) sigsegv_handler);
+                //else            signal(SIGINT,(s_hdl_typ) sigint_handler);
     }
   }
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.5 1997-04-12 16:04:44 Singular Exp $ */
+/* $Id: ring.cc,v 1.6 1997-04-16 18:38:07 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -290,7 +290,8 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       if (fftable[l]==0) ch = IsPrime(ch);
       else
       {
-        nfSetChar(ch,(char **)&sNoName);
+        char *m[1]={(char *)sNoName};
+        nfSetChar(ch,m);
         if(errorreported) ch=IsPrime(ch);
         else ffChar=TRUE;
       }
@@ -708,7 +709,14 @@ void rWrite(ring r)
       }
     }
     else
+    {
       Print("//   primitive element : %s\n", r->parameter[0]);
+      if (r==currRing) 
+      {
+        PrintS("//   minpoly        : ");
+        nfShowMipo();PrintLn();
+      }  
+    }  
   }
   Print("//   number of vars : %d",r->N);
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.6 1997-04-12 16:04:35 Singular Exp $ */
+/* $Id: ffields.cc,v 1.7 1997-04-16 18:38:06 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -9,6 +9,7 @@
 #include <limits.h>
 #include <string.h>
 #include "mod2.h"
+#include "tok.h"
 #include "febase.h"
 #include "mmemory.h"
 #include "numbers.h"
@@ -449,6 +450,46 @@ static int convertback62 ( char * p, int n )
 }
 #endif
 
+int nfMinPoly[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+void nfShowMipo()
+{
+  int i=nfMinPoly[0];
+  int j=0;
+  loop
+  {
+    j++;
+    if (nfMinPoly[j]!=0)
+      Print("%d*%s^%d",nfMinPoly[j],nfParameter,i);
+    i--;
+    if(i<0) break;
+    if (nfMinPoly[j]!=0)
+      PrintS("+");
+  }  
+}
+
+static void nfReadMipo(char *s)
+{
+  char *l=strchr(s,';')+1;
+  char *n;
+  int i=strtol(l,&n,10);
+  l=n;
+  int j=1;
+  nfMinPoly[0]=i;
+  while(i>=0)
+  {
+    nfMinPoly[j]=strtol(l,&n,10);
+    if (l==n) break;
+    l=n;
+    j++;
+    i--;
+  }  
+  if (i>=0)
+  {
+    WerrorS("error in reading minpoly from gftables");
+  }  
+}  
+
 /*2
 * init global variables from files 'gftables/%d'
 */
@@ -466,7 +507,6 @@ void nfSetChar(int c, char **param)
     Free( (ADDRESS)nfPlus1Table,nfCharQ*sizeof(CARDINAL) );
     nfPlus1Table=NULL;
   }
-  //Print("ff:%d\n",c);
   if ((c>1) || (c<0))
   {
     if (c>1) nfCharQ = c;
@@ -495,7 +535,7 @@ void nfSetChar(int c, char **param)
     }
     int q;
     sscanf(buf,"%d %d",&nfCharP,&q);
-    PrintS(buf);PrintLn();
+    nfReadMipo(buf);
     nfCharQ1=nfCharQ-1;
     nfPlus1Table= (CARDINAL *)Alloc( (nfCharQ)*sizeof(CARDINAL) );
     int digs = gf_tab_numdigits62( nfCharQ );
