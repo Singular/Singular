@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.38 2000-12-12 08:44:52 obachman Exp $ */
+/* $Id: silink.cc,v 1.39 2001-02-27 15:50:04 levandov Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -210,9 +210,18 @@ BOOLEAN slClose(si_link l)
 
 leftv slRead(si_link l, leftv a)
 {
+  char *mode;
   leftv v = NULL;
   if( ! SI_LINK_R_OPEN_P(l)) // open r ?
   {
+#ifdef HAVE_DBM
+#ifdef USE_GDBM
+    if (! SI_LINK_CLOSE_P(l))
+      {
+	if (slClose(l)) return NULL;
+      }
+#endif
+#endif
     if (slOpen(l, SI_LINK_READ)) return NULL;
   }
 
@@ -252,10 +261,18 @@ BOOLEAN slWrite(si_link l, leftv v)
 
   if(! SI_LINK_W_OPEN_P(l)) // open w ?
   {
+#ifdef HAVE_DBM
+#ifdef USE_GDBM
+    if (! SI_LINK_CLOSE_P(l))
+      {
+	if (slClose(l)) return TRUE;
+      }
+#endif
+#endif
     if (slOpen(l, SI_LINK_WRITE)) return TRUE;
   }
 
-  if(SI_LINK_W_OPEN_P(l))
+  if (SI_LINK_W_OPEN_P(l))
   { // now open w
     if (l->m->Write != NULL)
       res = l->m->Write(l,v);
