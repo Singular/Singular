@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.13 2003-07-29 17:50:02 levandov Exp $
+@comment $Id: plumath.doc,v 1.14 2003-07-31 19:54:14 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -703,7 +703,7 @@ A. Kandri-Rody and V. Weispfenning.
  Levandovskyy, V. 
    PBW Bases, Non--Degeneracy Conditions and Applications.
   In  Buchweitz, R.-O. and Lenzing, H., editor,    Proceedings of
-  the ICRA X conference,  submitted.
+  the ICRA X conference, Toronto, 2003.
 
 @item
 @c LS  InProc
@@ -711,7 +711,7 @@ Levandovskyy V.; Sch@"onemann, H.
   Plural --- a computer algebra system for noncommutative polynomial
   algebras.
   In  Proc. of the International Symposium on Symbolic and
-  Algebraic Computation (ISSAC'03). ACM Press, to appear.
+  Algebraic Computation (ISSAC'03). ACM Press, 2003.
 
 @item
 @c MoraNC  article

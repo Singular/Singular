@@ -41,6 +41,7 @@
 * PLURAL libraries::
 @c * Release Notes::
 @ifclear singularmanual
+* Release Notes::
 * Index::
 @end ifclear
 @end menu
@@ -168,7 +169,13 @@ Use the @code{LIB} command for loading of single libraries.
 @c ----------------------------------------------------------
 
 @ifclear singularmanual
-@node Index,  ,PLURAL libraries, Top
+@node Release Notes, Index , PLURAL libraries, Top
+@chapter Release Notes
+@cindex Release Notes
+@include pluplatform.tex
+
+@c ----------------------------------------------------------
+@node Index,  ,Release Notes, Top
 @appendix Index
 @cindex  Index
 @printindex cp
