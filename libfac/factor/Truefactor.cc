@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.5 2001-06-21 14:57:06 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.6 2001-06-27 13:58:06 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -40,7 +40,27 @@ int hasAlgVar(const CanonicalForm &f, const Variable &v)
     {
       if (hasAlgVar(i.coeff(),v)) return 1;
     }
-  }  
+  }
+  return 0;
+}
+
+int hasVar(const CanonicalForm &f, const Variable &v)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.mvar()==v) return 1;
+    return hasAlgVar(f.LC(),v);
+  }
+  if (f.inPolyDomain())
+  {
+    if (f.mvar()==v) return 1;
+    if (hasVar(f.LC(),v)) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (hasVar(i.coeff(),v)) return 1;
+    }
+  }
   return 0;
 }
 
@@ -49,11 +69,11 @@ int hasAlgVar(const CanonicalForm &f)
   if (f.inBaseDomain()) return 0;
   if (f.inCoeffDomain())
   {
-    if (f.level()!=0) 
+    if (f.level()!=0)
     {
       //cout << "hasAlgVar:" << f.mvar() <<endl;
       return 1;
-    }  
+    }
     return hasAlgVar(f.LC());
   }
   if (f.inPolyDomain())
@@ -63,7 +83,7 @@ int hasAlgVar(const CanonicalForm &f)
     {
       if (hasAlgVar(i.coeff())) return 1;
     }
-  }  
+  }
   return 0;
 }
 
@@ -71,7 +91,7 @@ int hasAlgVar(const CanonicalForm &f)
 // generate all different k-subsets of the set with n        //
 // elements and return them in returnlist.                   //
 ///////////////////////////////////////////////////////////////
-static void 
+static void
 combinat( int k, int n, List<IntList> & returnlist ){
   ListIntList ListofLists;
   IntList intermediate,intermediate2;
@@ -87,10 +107,10 @@ combinat( int k, int n, List<IntList> & returnlist ){
       intermediate = l.getItem();
       value = intermediate.getLast();
       if ( value != n )
-	for ( j=value+1; j<=n; j++ ){
-	  intermediate2 = intermediate; intermediate2.append(j);
-	  ListofLists.append( intermediate2 );
-	}
+        for ( j=value+1; j<=n; j++ ){
+          intermediate2 = intermediate; intermediate2.append(j);
+          ListofLists.append( intermediate2 );
+        }
     }
     returnlist = ListofLists;
   }
@@ -99,7 +119,7 @@ combinat( int k, int n, List<IntList> & returnlist ){
 ///////////////////////////////////////////////////////////////
 // Return the CanonicalForm number nr in  Factorlist.        //
 ///////////////////////////////////////////////////////////////
-static CanonicalForm 
+static CanonicalForm
 getItemNr(int nr, const CFFList & Factorlist ){
   ListIterator<CFFactor> i=Factorlist;
   int Nr=nr;
@@ -111,7 +131,7 @@ getItemNr(int nr, const CFFList & Factorlist ){
 ///////////////////////////////////////////////////////////////
 // Generate all sets of m factors out of LiftedFactors list. //
 ///////////////////////////////////////////////////////////////
-static CFFList 
+static CFFList
 combine( int m, const CFFList & LiftedFactors ){
   CFFList result;
   ListIntList CombinatList;
@@ -122,7 +142,7 @@ combine( int m, const CFFList & LiftedFactors ){
     intermediate=1;
     for ( IntListIterator k=j.getItem(); k.hasItem(); k++ )
       intermediate *= getItemNr(k.getItem(), LiftedFactors);
-    if (!hasAlgVar(intermediate))    
+    if (!hasAlgVar(intermediate))
     result.append(CFFactor(intermediate,1));
   }
   return result;
@@ -131,14 +151,14 @@ combine( int m, const CFFList & LiftedFactors ){
 ///////////////////////////////////////////////////////////////
 // Remove element elem from the list L.                      //
 ///////////////////////////////////////////////////////////////
-static CFFList 
+static CFFList
 Remove_from_List( const CFFList & L, const CanonicalForm & elem ){
   CFFList Returnlist;
 
   DEBOUTLN(cout, "Remove_from_List called with L= ",L);
   DEBOUTLN(cout, "                     and  elem= ",elem);
   for ( ListIterator<CFFactor> i = L ; i.hasItem(); i++)
-    if ( i.getItem().factor() != elem ) 
+    if ( i.getItem().factor() != elem )
       Returnlist.append( i.getItem() );
 
   return Returnlist;
@@ -147,7 +167,7 @@ Remove_from_List( const CFFList & L, const CanonicalForm & elem ){
 ///////////////////////////////////////////////////////////////
 // Here we solve:          G= F mod ( P, S^h )               //
 ///////////////////////////////////////////////////////////////
-static CanonicalForm 
+static CanonicalForm
 Multmod_power( const CanonicalForm & F, const SFormList & Substituionlist, int h, int levelF){
   CanonicalForm G;
 
@@ -163,7 +183,7 @@ Multmod_power( const CanonicalForm & F, const SFormList & Substituionlist, int h
 // of factors, i.e. delete any element from list CombL which //
 // degree in the main variable levelU exceeeds degU.         //
 ///////////////////////////////////////////////////////////////
-static CFFList 
+static CFFList
 Rightdegree( const CFFList & CombL, int degU, int levelU ){
   CFFList Returnlist;
   CFFactor factor;
@@ -185,7 +205,7 @@ Rightdegree( const CFFList & CombL, int degU, int levelU ){
 // Factoring Multivariate Polynomials Over the Integers      //
 // Math. Comp. V29 Nr131 (July 1975) p. 935-950              //
 ///////////////////////////////////////////////////////////////
-CFFList 
+CFFList
 Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionList, const CFFList & PiList){
   CanonicalForm U=Ua,a,b,Y;
   CFFactor factor;
@@ -232,9 +252,9 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
   DEBOUTLN(cout,"Truefactors: (step2) M   = ", M);
   DEBOUTLN(cout,"                     r   = ", r);
   DEBOUTLN(cout,"                     degU= ", degU);
-  
+
 // Now do the real work!
-// Test all the combinations of possible factors. 
+// Test all the combinations of possible factors.
 
   onemore=1;
 // steps 3 to 6
@@ -264,19 +284,19 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
       c = mydivremt(U,Y,a,b);
       //      if (  c  && b == U.genZero()) { // Y divides U
       if ( c && b.isZero() ){
-	DEBOUT(cout,"Truefactors: (step6): ",Y );
-	DEBOUTLN(cout, "  divides  ",U);
-	U = a;
-	FAC.append(Y); // Y is a real factor
-	onemore = 0;
-	degU = degree(U, levelU)/2; // new degU
-	// L = L \ {factor}
-	// Hier ist noch etwas faul; wir muessen (f=prod(f_i)) die f_i 
-	// entfernen und nicht f!
-	L = Remove_from_List( L, factor.factor() );
-	r -= 1;
-	// delete from L any element with degree greater than degU
-	L = Rightdegree( L, degU, levelU );
+        DEBOUT(cout,"Truefactors: (step6): ",Y );
+        DEBOUTLN(cout, "  divides  ",U);
+        U = a;
+        FAC.append(Y); // Y is a real factor
+        onemore = 0;
+        degU = degree(U, levelU)/2; // new degU
+        // L = L \ {factor}
+        // Hier ist noch etwas faul; wir muessen (f=prod(f_i)) die f_i
+        // entfernen und nicht f!
+        L = Remove_from_List( L, factor.factor() );
+        r -= 1;
+        // delete from L any element with degree greater than degU
+        L = Rightdegree( L, degU, levelU );
       }
     }
   }
@@ -287,7 +307,7 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
 ///////////////////////////////////////////////////////////////
 // Check if poly f is in Fp (returns true) or in Fp(a)       //
 ///////////////////////////////////////////////////////////////
-static bool 
+static bool
 is_in_Fp( const CanonicalForm & f ){
   if ( f.inCoeffDomain() )
     return f.inBaseDomain() ;
@@ -334,50 +354,50 @@ TakeNorms(const CFFList & PiList){
 #ifdef HAVE_SINGULAR
       WerrorS("libfac: ERROR: TakeNorms less then two items remaining!");
 #else
-      cerr << "libfac: ERROR: TakeNorms less then two items remaining! " 
-	   << endl;
+      cerr << "libfac: ERROR: TakeNorms less then two items remaining! "
+           << endl;
 #endif
     }
     while ( n < PossibleFactors.length() ){
       // generate all combinations of n elements
       combinat(n, PossibleFactors.length(), CombinatList);
       for ( j=CombinatList ; j.hasItem(); j++ ){
-	intermediate=1;
-	for ( k=j.getItem(); k.hasItem(); k++ )
-	  intermediate *= getItemNr( k.getItem(), PossibleFactors );
-	if ( is_in_Fp( intermediate ) ){ 
-	  TrueFactors.append(intermediate); // found a true factor
-	  CopyPossibleFactors=PossibleFactors; // save list
-	  for ( k=j.getItem(); k.hasItem(); k++ ) 
-	    //remove combined factors from PossibleFactors
-	    PossibleFactors=Remove_from_List(PossibleFactors,
-				getItemNr( k.getItem(), CopyPossibleFactors ));
-	  n-=1; // look for the same number of combined factors:
-	  break;
-	}
-	else { 
-	  //cout << "Schade!" << endl; 
-	}
-	DEBOUT(cout, "Truefactor: Combined ", n);
-	DEBOUTLN(cout, " factors to: ", intermediate);
+        intermediate=1;
+        for ( k=j.getItem(); k.hasItem(); k++ )
+          intermediate *= getItemNr( k.getItem(), PossibleFactors );
+        if ( is_in_Fp( intermediate ) ){
+          TrueFactors.append(intermediate); // found a true factor
+          CopyPossibleFactors=PossibleFactors; // save list
+          for ( k=j.getItem(); k.hasItem(); k++ )
+            //remove combined factors from PossibleFactors
+            PossibleFactors=Remove_from_List(PossibleFactors,
+                                getItemNr( k.getItem(), CopyPossibleFactors ));
+          n-=1; // look for the same number of combined factors:
+          break;
+        }
+        else {
+          //cout << "Schade!" << endl;
+        }
+        DEBOUT(cout, "Truefactor: Combined ", n);
+        DEBOUTLN(cout, " factors to: ", intermediate);
       }
       n += 1;
     }
-  // All remaining factors in PossibleFactors multiplied 
+  // All remaining factors in PossibleFactors multiplied
   // should lie in Fp domain
     if ( PossibleFactors.length() >=1 ){
       for ( i=PossibleFactors; i.hasItem(); i++ )
-	intermediate *= i.getItem().factor();
+        intermediate *= i.getItem().factor();
       // a last check:
       if ( is_in_Fp(intermediate) ){
-	TrueFactors.append(CFFactor(intermediate,1));
+        TrueFactors.append(CFFactor(intermediate,1));
       }
-      else{ 
+      else{
 #ifdef HAVE_SINGULAR
-	WerrorS("libfac: TakeNorms: somethings wrong with remaining factors!");
+        WerrorS("libfac: TakeNorms: somethings wrong with remaining factors!");
 #else
-	cerr << "libfac: TakeNorms: somethings wrong with remaining factors!" 
-	     << endl;
+        cerr << "libfac: TakeNorms: somethings wrong with remaining factors!"
+             << endl;
 #endif
       }
     }
@@ -388,6 +408,9 @@ TakeNorms(const CFFList & PiList){
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2001/06/21 14:57:06  Singular
+*hannes/GP: Factorize, newfactoras, ...
+
 Revision 1.4  1997/11/18 16:39:07  Singular
 * hannes: moved WerrorS from C++ to C
      (Factor.cc MVMultiHensel.cc SqrFree.cc Truefactor.cc)

@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.6 2001-06-21 14:57:04 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.7 2001-06-27 13:58:05 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -28,6 +28,9 @@ static char * rcsid = "$Id: alg_factor.cc,v 1.6 2001-06-21 14:57:04 Singular Exp
 #include "debug.h"
 #include "timing.h"
 TIMING_DEFINE_PRINT(newfactoras_time);
+
+static Varlist
+Var_is_in_AS(const Varlist & uord, const CFList & Astar);
 
 int getAlgVar(const CanonicalForm &f, Variable &X)
 {
@@ -176,7 +179,8 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
     DEBOUTLN(cout, "sqrf_norm_sub: R= ", R);
     // sqfree check ; R is a polynomial in K[x]
-    if ( getCharacteristic() == 0 ){
+    if ( getCharacteristic() == 0 )
+    {
       temp= gcd(R, R.deriv(vf));
       DEBOUTLN(cout, "sqrf_norm_sub: temp= ", temp);
       if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
@@ -354,6 +358,7 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
   CFList substlist;
 
   DEBINCLEVEL(cout,"alg_factor");
+  DEBOUTLN(cout, "alg_factor: f= ", f);
   substlist= simpleextension(Astar, vminpoly, Rstar);
   DEBOUTLN(cout, "alg_factor: substlist= ", substlist);
   DEBOUTLN(cout, "alg_factor: minpoly Rstar= ", Rstar);
@@ -665,6 +670,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2001/06/21 14:57:04  Singular
+*hannes/GP: Factorize, newfactoras, ...
+
 Revision 1.5  2001/06/18 08:44:39  pfister
 * hannes/GP/michael: factory debug, Factorize
 
@@ -684,4 +692,3 @@ Revision 1.2  1997/09/12 07:19:37  Singular
 * hannes/michael: libfac-0.3.0
 
 */
-

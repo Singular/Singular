@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.6 2000-03-08 12:54:35 obachman Exp $";
+static char * rcsid = "$Id: charset.cc,v 1.7 2001-06-27 13:58:06 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -54,23 +54,23 @@ BasicSet( const CFList &PS )
     DEBOUTLN(cout, "BasicSet: called with ps= ", PS);
     if ( PS.length() < 2 ) return PS;
     while ( ! QS.isEmpty() ) {
-	b = lowestRank( QS );
-	cb = rank( b );
-	DEBOUTLN(cout, "BasicSet: choose b  = ", b);
-	DEBOUTLN(cout, "BasicSet: it's rank = ", cb);
-	BS=Union(CFList(b),BS);//BS.append( b );
-	if ( rank( b ) == 0 )
-	    return Union(PS, CFList(b)) ; // b should be the first elem!
-	else {
-	    RS = CFList();
-	    // QS:= {q \in QS -{B} | q is reduced wrt b}
-	    // We can process whole QS, because b is not reduced wrt. b
-	    for ( CFListIterator i = QS; i.hasItem(); ++i )
-		if ( degree( i.getItem(), cb ) < degree( b ) )
-		    //RS.append( i.getItem() );
+        b = lowestRank( QS );
+        cb = rank( b );
+        DEBOUTLN(cout, "BasicSet: choose b  = ", b);
+        DEBOUTLN(cout, "BasicSet: it's rank = ", cb);
+        BS=Union(CFList(b),BS);//BS.append( b );
+        if ( rank( b ) == 0 )
+            return Union(PS, CFList(b)) ; // b should be the first elem!
+        else {
+            RS = CFList();
+            // QS:= {q \in QS -{B} | q is reduced wrt b}
+            // We can process whole QS, because b is not reduced wrt. b
+            for ( CFListIterator i = QS; i.hasItem(); ++i )
+                if ( degree( i.getItem(), cb ) < degree( b ) )
+                    //RS.append( i.getItem() );
                     RS = Union(CFList(i.getItem()),RS);
-	    QS = RS;
-	}
+            QS = RS;
+        }
     }
     DEBOUTLN(cout, "BasicSet: returning bs= ", BS);
     return BS;
@@ -84,8 +84,8 @@ checkok( const CFList & PS, CFList & FS2){
     elem= i.getItem();
     for (CFListIterator j=FS2; j.hasItem(); j++){
       if (elem == j.getItem()){
- 	//	FS2= Difference(FS2,CFList(elem));
- 	return 0;
+         //        FS2= Difference(FS2,CFList(elem));
+         return 0;
       }
     }
   }
@@ -129,20 +129,20 @@ MCharSetN( const CFList &PS, PremForm & Remembern ){
       //PremForm Oldremember=Remembern;
       //PremForm Newremember=Remembern;
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
-	CanonicalForm r = Prem( i.getItem(), CS );
-	DEBOUT(cout,"MCharSetN: Prem(", i.getItem()  );
-	DEBOUT(cout, ",", CS);
-	DEBOUTLN(cout,") = ", r); 
+        CanonicalForm r = Prem( i.getItem(), CS );
+        DEBOUT(cout,"MCharSetN: Prem(", i.getItem()  );
+        DEBOUT(cout, ",", CS);
+        DEBOUTLN(cout,") = ", r);
 //cout << "MCharSetN: Prem("<< i.getItem() << "," << CS << ") = " << r << endl;
-	if ( r != 0 ){
-	  //removefactor( r, Newremember );
-	  removefactor( r, Remembern );
-	  //Remembern.FS2 = Union(Remembern.FS2, Newremember.FS2);
-	  //Newremember = Oldremember; 
-	  //if ( cls(r) > 0 )
-	    //RS=Union(CFList(r),RS);//RS.append( r );
+        if ( r != 0 ){
+          //removefactor( r, Newremember );
+          removefactor( r, Remembern );
+          //Remembern.FS2 = Union(Remembern.FS2, Newremember.FS2);
+          //Newremember = Oldremember;
+          //if ( cls(r) > 0 )
+            //RS=Union(CFList(r),RS);//RS.append( r );
             RS=Union(RS,CFList(r));
-	}
+        }
       }
       if ( ! checkok(RS,Remembern.FS2)) return CFList(CanonicalForm(1));
       DEBOUTLN(cout, "MCharSetN: RS= ", RS);
@@ -178,12 +178,13 @@ CharSet( const CFList &PS ){
 
   while ( ! RS.isEmpty() ) {
     CS = BasicSet( QS );
+    DEBOUTLN(cout, "CharSet: CS= ", CS);
     RS = CFList();
     if ( rank( CS.getFirst() ) != 0 ) {
       CFList D = Difference( QS, CS );
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
-	CanonicalForm r = Prem( i.getItem(), CS );
-	if ( r != 0 )  RS=Union(CFList(r),RS);//RS.append( r );
+        CanonicalForm r = Prem( i.getItem(), CS );
+        if ( r != 0 )  RS=Union(CFList(r),RS);//RS.append( r );
       }
       QS = Union( QS, RS );
     }
@@ -201,8 +202,8 @@ charseta( const CFList & PS ){
     if ( rank( CS.getFirst() ) != 0 ) {
       CFList D = Difference( QS, CS );
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
-	CanonicalForm r = Prem( i.getItem(), CS );
-	if ( r != 0 )  RS=Union(CFList(r),RS);//RS.append( r );
+        CanonicalForm r = Prem( i.getItem(), CS );
+        if ( r != 0 )  RS=Union(CFList(r),RS);//RS.append( r );
       }
       QS = Union(CS,Union( QS, RS ));
     }
@@ -234,22 +235,22 @@ contract( const ListCFList & cs){
     iitem=i.getItem();
     if ( ! member(iitem, mem))
       for ( ListCFListIterator j=i; j.hasItem(); j++){
-	jitem=j.getItem(); 
-	if ( ! same( iitem, jitem ) )
-	  if ( ! member(jitem, mem))
-	    if ( contractsub(iitem, jitem) ){ 
-	      ts.append(jitem); mem.append(jitem);
-	    }
-	    else
-	      if ( contractsub(jitem, iitem) ){
-		ts.append(iitem);
-	      }
+        jitem=j.getItem();
+        if ( ! same( iitem, jitem ) )
+          if ( ! member(jitem, mem))
+            if ( contractsub(iitem, jitem) ){
+              ts.append(jitem); mem.append(jitem);
+            }
+            else
+              if ( contractsub(jitem, iitem) ){
+                ts.append(iitem);
+              }
       }
   }
   return Minus(cs,ts);
 }
 
-static ListCFList 
+static ListCFList
 adjoin(const CFList & is, const CFList & qs, const ListCFList & qh ){
   ListCFList iss,qhi;
   ListCFListIterator j;
@@ -260,7 +261,7 @@ adjoin(const CFList & is, const CFList & qs, const ListCFList & qh ){
 
   for ( i=is ; i.hasItem(); i++ ){
     elem=i.getItem();
-    if ( cls(elem) > 0 ) iscopy=Union(CFList(elem),iscopy); 
+    if ( cls(elem) > 0 ) iscopy=Union(CFList(elem),iscopy);
   }
   if ( iscopy.isEmpty() ) return iss;
   qhi = MyDifference(qh,qs);
@@ -270,13 +271,13 @@ adjoin(const CFList & is, const CFList & qs, const ListCFList & qh ){
     ind = 0;
     if ( length > 0 )
       for ( j=qhi; j.hasItem(); j++ )
-	if ( subset(j.getItem(),itt )) ind=1; 
+        if ( subset(j.getItem(),itt )) ind=1;
     if ( ind == 0 ) iss.append(itt);
   }
   return iss;
 }
 
-static ListCFList 
+static ListCFList
 adjoinb(const CFList & is, const CFList & qs, const ListCFList & qh ,const CFList & cs){
   ListCFList iss,qhi;
   ListCFListIterator j;
@@ -287,7 +288,7 @@ adjoinb(const CFList & is, const CFList & qs, const ListCFList & qh ,const CFLis
 
   for ( i=is ; i.hasItem(); i++ ){
     elem=i.getItem();
-    if ( cls(elem) > 0 ) iscopy=Union(CFList(elem),iscopy); 
+    if ( cls(elem) > 0 ) iscopy=Union(CFList(elem),iscopy);
   }
   if ( iscopy.isEmpty() ) return iss;
   qhi = MyDifference(qh,qs);
@@ -297,7 +298,7 @@ adjoinb(const CFList & is, const CFList & qs, const ListCFList & qh ,const CFLis
     ind = 0;
     if ( length > 0 )
       for ( j=qhi; j.hasItem(); j++ )
-	if ( subset(j.getItem(),itt )) ind=1; 
+        if ( subset(j.getItem(),itt )) ind=1;
     if ( ind == 0 ) {iss.append(itt);}
   }
   return iss;
@@ -312,7 +313,7 @@ sort( const ListCFList & list_to_sort ){
   if ( copy.length() == 0 ){ return ListCFList(l); }
   for ( ListCFListIterator i=copy ; i.hasItem(); i++ ){
     elem = i.getItem();
-    if ( elem.length() > l.length() ) { 
+    if ( elem.length() > l.length() ) {
       output = MyUnion( ListCFList(l), output);
       l= elem;
     }
@@ -324,7 +325,7 @@ sort( const ListCFList & list_to_sort ){
 }
 
 #ifdef EXPERIMENTAL
-static CFList 
+static CFList
 getItemNr( int nr, const ListCFList & copy){
   int i =1;
   CFList elem;
@@ -348,7 +349,7 @@ msort( const ListCFList & list_to_sort ){
   int nr, number = list_to_sort.length();
   ListCFList output;
 
-  cout << "Sort: list to sort is: " <<  list_to_sort << endl; 
+  cout << "Sort: list to sort is: " <<  list_to_sort << endl;
   for (int i=1; i<= number; i++){
     cout << " Next elem = "; cin >> nr;
     output.append(getItemNr(nr,list_to_sort));
@@ -369,7 +370,7 @@ IrrCharSeries( const CFList &PS, int opt ){
   CanonicalForm reducible,reducible2;
   CFList qs,cs,factorset,is,ts;
   ListCFList pi,ppi,qqi,qsi,iss,qhi= ListCFList(PS);
-  int nr_of_iteration=0,ts2,highestlevel=0; 
+  int nr_of_iteration=0,ts2,highestlevel=0;
 #ifdef EXPERIMENTAL
   int choice=1;;
 #endif
@@ -425,72 +426,72 @@ IrrCharSeries( const CFList &PS, int opt ){
       DEBOUTLN(cout, "ts2 is: ", ts2);
       // next is preliminary: should be ==0
       if ( ts2 <= 0 ){ //irreducible
-	if ( ! subset(cs,qs) ){ 
-	  DEBOUTMSG(cout, "cs is not a subset of qs");
-	  cs = charseta(Union(qs,cs));
-	  DEBOUTLN(cout, "new cs is: ", cs);
-	}
-	if ( ! member(cs,pi) ){ 
-	  pi = MyUnion(pi, ListCFList(cs));
-	  DEBOUTMSG(cout, "cs is not a member of pi");
-	  DEBOUTLN(cout, "pi is: ", pi);
-	  if ( cls(cs.getFirst()) > 0 ){
-	    ts = irras(cs,ts2,reducible);
+        if ( ! subset(cs,qs) ){
+          DEBOUTMSG(cout, "cs is not a subset of qs");
+          cs = charseta(Union(qs,cs));
+          DEBOUTLN(cout, "new cs is: ", cs);
+        }
+        if ( ! member(cs,pi) ){
+          pi = MyUnion(pi, ListCFList(cs));
+          DEBOUTMSG(cout, "cs is not a member of pi");
+          DEBOUTLN(cout, "pi is: ", pi);
+          if ( cls(cs.getFirst()) > 0 ){
+            ts = irras(cs,ts2,reducible);
 
-	    // INTERRUPTHANDLER
-	    if ( interrupt_handle() ) return ListCFList() ;
-	    // INTERRUPTHANDLER
+            // INTERRUPTHANDLER
+            if ( interrupt_handle() ) return ListCFList() ;
+            // INTERRUPTHANDLER
 
-	    DEBOUTLN(cout, "ts is: ", ts);
-	    DEBOUTLN(cout, "ts2 is: ", ts2);
-	    // next is preliminary: should be ==0
-	    if ( ts2 <= 0 ){ //irreducible
-	      qsi = MyUnion(qsi,ListCFList(cs));
-	      DEBOUTLN(cout, "qsi is: ", qsi);
-	      if ( cs.length() == highestlevel ){
-		DEBOUTLN(cout, "cs.length() == nops(ord) :", cs.length());
-		is = factorps(factorset);
-	      }
-	      else{
-		DEBOUT(cout,"cs.length() != nops(ord) :", cs.length());
-		DEBOUTLN(cout, "  nops(ord)= ", highestlevel);
-		is = Union(initalset1(cs),factorps(factorset));
-	      }
-	      DEBOUTLN(cout, "is is: ", is);
-	      iss = adjoin(is,qs,qqi);
-	      DEBOUTLN(cout, "iss is: ", iss);
-	    }
-	  }
-	  else{ iss = adjoin(factorps(factorset),qs,qqi); }
-	}
-	else{ 
-	  DEBOUTMSG(cout, "cs is a member of pi");
-	  iss = adjoin(factorps(factorset),qs,qqi); }
-	DEBOUTLN(cout, "iss is: ", iss);
-	DEBOUTLN(cout, "   factorps(factorset)= ", factorps(factorset));
-	DEBOUTLN(cout, "   qs= ", qs);
-	DEBOUTLN(cout, "   qqi= ", qqi);
+            DEBOUTLN(cout, "ts is: ", ts);
+            DEBOUTLN(cout, "ts2 is: ", ts2);
+            // next is preliminary: should be ==0
+            if ( ts2 <= 0 ){ //irreducible
+              qsi = MyUnion(qsi,ListCFList(cs));
+              DEBOUTLN(cout, "qsi is: ", qsi);
+              if ( cs.length() == highestlevel ){
+                DEBOUTLN(cout, "cs.length() == nops(ord) :", cs.length());
+                is = factorps(factorset);
+              }
+              else{
+                DEBOUT(cout,"cs.length() != nops(ord) :", cs.length());
+                DEBOUTLN(cout, "  nops(ord)= ", highestlevel);
+                is = Union(initalset1(cs),factorps(factorset));
+              }
+              DEBOUTLN(cout, "is is: ", is);
+              iss = adjoin(is,qs,qqi);
+              DEBOUTLN(cout, "iss is: ", iss);
+            }
+          }
+          else{ iss = adjoin(factorps(factorset),qs,qqi); }
+        }
+        else{
+          DEBOUTMSG(cout, "cs is a member of pi");
+          iss = adjoin(factorps(factorset),qs,qqi); }
+        DEBOUTLN(cout, "iss is: ", iss);
+        DEBOUTLN(cout, "   factorps(factorset)= ", factorps(factorset));
+        DEBOUTLN(cout, "   qs= ", qs);
+        DEBOUTLN(cout, "   qqi= ", qqi);
       }
       // next is preliminary: should be !=0
       if ( ts2 > 0 ){
-	is = factorps(factorset);
-	DEBOUTLN(cout, "is is: ", is);
-	if ( ts2 > 1 ){ 
-	  // setup cst: need it later for adjoinb
-	  CFList cst;
-	  for ( CFListIterator i=cs ; i.hasItem(); i++){
-	    if ( i.getItem() == reducible ) { break; }
-	    else { cst.append(i.getItem()); }
-	  }
-	  is = Union(initalset1(cst), is);
-	  iss = MyUnion(adjoin(is,qs,qqi), adjoinb(ts,qs,qqi,cst));
-	}
-	else{ iss = adjoin(Union(is,ts),qs,qqi); }
-	DEBOUTLN(cout, "iss is: ", iss);
+        is = factorps(factorset);
+        DEBOUTLN(cout, "is is: ", is);
+        if ( ts2 > 1 ){
+          // setup cst: need it later for adjoinb
+          CFList cst;
+          for ( CFListIterator i=cs ; i.hasItem(); i++){
+            if ( i.getItem() == reducible ) { break; }
+            else { cst.append(i.getItem()); }
+          }
+          is = Union(initalset1(cst), is);
+          iss = MyUnion(adjoin(is,qs,qqi), adjoinb(ts,qs,qqi,cst));
+        }
+        else{ iss = adjoin(Union(is,ts),qs,qqi); }
+        DEBOUTLN(cout, "iss is: ", iss);
       }
     }
-    else{ 
-      iss = adjoin(factorps(factorset),qs,qqi); 
+    else{
+      iss = adjoin(factorps(factorset),qs,qqi);
       DEBOUTMSG(cout, "case: cs is a constant.");
       DEBOUTLN(cout, "  qs = ", qs);
       DEBOUTLN(cout, "  qqi = ", qqi);
@@ -500,15 +501,15 @@ IrrCharSeries( const CFList &PS, int opt ){
     else{ qhi = iss; }
     DEBOUTLN(cout, "iss is: ", iss);
   }
-  if ( ! qsi.isEmpty() ){ 
+  if ( ! qsi.isEmpty() ){
     DEBOUTLN(cout, "qsi before contract= ", qsi);
     if ( opt == 0 ){
-       return contract( qsi ); 
+       return contract( qsi );
     }
     else { return qsi; }
   }
   else{ return ListCFList() ; }
-}  
+}
 
 // tests for characteristic sets
 //////////////////////////////////
@@ -547,7 +548,7 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
     qs.removeFirst();
     if ( (qs.length() >= 2 ) || (qs.getFirst().exp() > 1)){
       DEBOUTLN(cout, "irras: Setting ind=0, ja= ", nr);
-      ja=nr; ind=0; reducible= elem; 
+      ja=nr; ind=0; reducible= elem;
       break;
     }
     //    else{ as.append(elem) ; }
@@ -555,38 +556,38 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
   //  cout << "ind= " << ind << endl;
   if ( (ind == 1) ){ //&& ( as.length() > 1) ){
     if ( irreducible(AS) ){ // as quasilinear? => irreducible!
-      ja = 0; 
+      ja = 0;
       DEBOUTLN(cout, "as is irreducible. as= ", AS);
     }
     else {
       i=AS;
       for ( nr=1; nr< AS.length(); nr++){
-	as.append(i.getItem());
-	i++;
-	if ( degree(i.getItem()) > 1 ){// search for a non linear elem
-	  elem=i.getItem();
-//	  cout << "f=  " << elem << endl;
+        as.append(i.getItem());
+        i++;
+        if ( degree(i.getItem()) > 1 ){// search for a non linear elem
+          elem=i.getItem();
+//          cout << "f=  " << elem << endl;
 //        cout << "as= " << as << endl;
-	  qs= newfactoras(elem,as,success);
-//	  cout << "irras:newfactoras    qs= " << qs << endl;
-//	  qs= factoras(elem,as,success);
-//	  cout << "irras:factoras qs= " << qs << endl;
-	  if ( qs.length() > 1 || qs.getFirst().exp() > 1 ){ //found elem is reducible
-	    reducible=elem;
-	    ja=nr+1;
-	    break;
-	  }
-	  else
-	  {
+          qs= newfactoras(elem,as,success);
+//          cout << "irras:newfactoras    qs= " << qs << endl;
+//          qs= factoras(elem,as,success);
+//          cout << "irras:factoras qs= " << qs << endl;
+          if ( qs.length() > 1 || qs.getFirst().exp() > 1 ){ //found elem is reducible
+            reducible=elem;
+            ja=nr+1;
+            break;
+          }
+          else
+          {
 #ifdef SINGULAR
-//            WarnS("libfac: Factoring over algebraic function field required!");
-#else 
+            WarnS("libfac: Factoring over algebraic function field required!");
+#else
 #ifndef NOSTREAMIO
             cerr << "libfac: Factoring over algebraic function field!" << endl;
 #endif
 #endif
-	  }
-	}
+          }
+        }
       }
     }
   }
@@ -597,6 +598,10 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2000/03/08 12:54:35  obachman
+ * comment out warning "libfac: Factoring over algebraic function
+   field required!"
+
 Revision 1.5  2000/03/08 12:45:41  obachman
 * fixed Singular includes
 

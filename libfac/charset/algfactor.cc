@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: algfactor.cc,v 1.4 2001-06-21 14:57:04 Singular Exp $";
+static char * rcsid = "$Id: algfactor.cc,v 1.5 2001-06-27 13:58:05 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -27,6 +27,8 @@ static char * rcsid = "$Id: algfactor.cc,v 1.4 2001-06-21 14:57:04 Singular Exp 
 #include "debug.h"
 #include "timing.h"
 TIMING_DEFINE_PRINT(newfactoras_time);
+
+int hasVar(const CanonicalForm &f, const Variable &v);
 
 static CFFList
 myminus( const CFFList & Inputlist, const CFFactor & TheFactor){
@@ -145,8 +147,10 @@ algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const
 
   // check trivial case:
   if ( degree(f, order.getLast())==0 || degree(g, order.getLast())==0)
+  {
+    DEBOUTLN(cout, "algcd Result= ", 1);
     return CanonicalForm(1);
-
+  }
 
   CFList bs; bs.append(f); bs.append(g);
   PremForm Remembern;
@@ -162,10 +166,20 @@ algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const
   if (cs.length()==nas)
   {
     result= cs.getLast();
-    result/=result.Lc();
+    CanonicalForm c=vcontent(result,Variable(1));
+    //CanonicalForm c=result.Lc();
+    result/=c;
+    for(CFListIterator i=as;i.hasItem(); i++ )
+    {
+      if(hasVar(result,i.getItem().mvar()))
+      {
+        c=vcontent(result,Variable(i.getItem().level()+1));
+        result/=c;
+      }
+    }
   }
   else result= CanonicalForm(1);
-  DEBOUTLN(cout, "Result= ", result);
+  DEBOUTLN(cout, "algcd Result= ", result);
   return result;
 }
 
@@ -339,9 +353,7 @@ F4: //[GCD Computation]
     DEBOUT(cout, "Calculating fp= gcd(", g);
     DEBOUT(cout, ",", fp(substback,vf));
     DEBOUT(cout, ") over K_r wrt ", vf);
-    //cout << "algcd(" << g << "," << fp(substback,vf) << " as:" << as <<endl;
     fp= algcd(g,fp(substback,vf), as, oldord);
-    //cout << "algcd res:" << fp << endl;
     DEBOUTLN(cout, " = ", fp);
     if ( degree(fp,vf) > 0 ){ //otherwise it's a constant
       g= divide(g, fp,as);
@@ -359,9 +371,7 @@ F4: //[GCD Computation]
     DEBOUT(cout, "Calculating fp= gcd(", g);
     DEBOUT(cout, ",", fp(substback,vf));
     DEBOUT(cout, ") over K_r wrt ", vf);
-    //cout << "algcd(" << g << "," << fp(substback,vf) << " as:" << as <<endl;
     fp= algcd(g,fp(substback,vf), as, oldord);
-    //cout << "algcd res:" << fp << endl;
     DEBOUTLN(cout, " = ", fp);
     if ( degree(fp,vf) > 0 ){ //otherwise it's a constant
       g= divide(g, fp,as);
@@ -437,6 +447,9 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  2001/06/21 14:57:04  Singular
+*hannes/GP: Factorize, newfactoras, ...
+
 Revision 1.3  2001/06/18 08:44:40  pfister
 * hannes/GP/michael: factory debug, Factorize
 
