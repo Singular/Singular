@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.38 2004-02-23 10:19:11 Singular Exp $";
+version="$Id: normal.lib,v 1.39 2004-04-19 15:15:34 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -50,7 +50,6 @@ EXAMPLE: example HomJJ;  shows an example
 "
 {
 //---------- initialisation ---------------------------------------------------
-
    int isIso,isPr,isCo,isRe,isEq,oSAZ,ii,jj,q,y;
    intvec rw,rw1;
    list L;
@@ -117,7 +116,6 @@ EXAMPLE: example HomJJ;  shows an example
 //---------- Test: Hom(J,J) == R ?, if yes, go home ---------------------------
 
    rf = interred(reduce(f,f2));       // represents p*Hom(J,J)/p*R = Hom(J,J)/R
-
    if ( size(rf) == 0 )
    {
       if ( homog(f) && find(ordstr(basering),"s")==0 )
@@ -349,16 +347,21 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc normal(ideal id, list #)
-"USAGE:   normal(i [,choose]);  i a radical ideal, choose empty, 1 or \"wd\"
+"USAGE:   normal(i [,choose]);  i a radical ideal, choose empty, 1 ,\"g\" \"wd\"
          if choose=1 the normalization of the associated primes is computed
          (which is sometimes more efficient);
          if @code{choose=\"wd\"} the delta invariant is computed
          simultaneously; this may take much more time in the reducible case,
          since the factorizing standard basis algorithm cannot be used.
+         if @code{choose=\"g\"} the generators of the integral closure
+         are computed.
 ASSUME:  The ideal must be radical, for non-radical ideals the output may
          be wrong (i=radical(i); makes i radical)
 RETURN:  a list of rings, say nor and in case of @code{choose=\"wd\"} an 
          integer at the end of the list. 
+         In case of @code{choose=\"g\"} it returns a list of polynomials
+         g_1,...,g_k+1 at the end of the list such that g_1/g_k+1,...
+         g_k/g_k+1 generate the integral closure.
          Each ring @code{nor[i]} contains two ideals with given names 
          @code{norid} and @code{normap} such that@*
          - the direct sum of the rings @code{nor[i]/norid} is the 
@@ -374,7 +377,7 @@ KEYWORDS: normalization; delta invariant.
 EXAMPLE: example normal; shows an example
 "
 {
-   int i,j,y,withdelta;
+   int i,j,y,withdelta,withgens;
    string sr;
    list result,prim,keepresult;
    y = printlevel-voice+2;
@@ -382,9 +385,16 @@ EXAMPLE: example normal; shows an example
    {
      if(typeof(#[1])=="string")
      {
+       if(#[1]=="g")
+       {
+          withgens=1;
+       }
+       else
+       {
+          withdelta=1;
+       }
        kill #;
        list #;
-       withdelta=1;
      }
    }
    attrib(id,"isRadical",1);
@@ -394,6 +404,31 @@ EXAMPLE: example normal; shows an example
      "// Not implemented for this ordering,";
      "// please change to global ordering!";
      return(result);
+   }
+   if(withgens)
+   {
+      list pr=minAssGTZ(id);
+      if(size(pr)>1){ERROR("ideal is not prime");}
+      def R=basering;
+      if(defined(ker)){kill ker;}
+      ideal ker=id;
+      export(ker);
+      list l=R;
+      l=primeClosure(l);
+      list gens=closureGenerators(l);
+      list resu=l[size(l)],gens;
+      dbprint(y+1,"
+// 'normal' created a list of one ring.
+// nor[2] is a list of elements of the basering such that
+// nor[2][i]/nor[2][size(nor[2])] generate the integral closure.
+// To see the rings, type (if the name of your list is nor):
+     show( nor);
+// To access the 1-st ring and map (similar for the others), type:
+     def R = nor[1]; setring R;  norid; normap;
+// R/norid is the 1-st ring of the normalization and
+// normap the map from the original basering to R/norid");
+
+      return(resu);
    }
    if( typeof(attrib(id,"isCompleteIntersection"))=="int" )
    {
@@ -558,6 +593,8 @@ example
    ideal i=(x-y^2)^2 - y*x^3;
    nor=normal(i,"wd");
    //the delta-invariant
+   nor[size(nor)];
+   nor=normal(i,"g");
    nor[size(nor)];
 }
 
@@ -830,7 +867,6 @@ EXAMPLE: example normalizationPrimes; shows an example
         kill BASL;
       }
    }
-
    //compute the singular locus
    if((attrib(SM[2],"onlySingularAtZero")==0)&&(size(#)==0))
    {
@@ -1024,7 +1060,6 @@ EXAMPLE: example normalizationPrimes; shows an example
       {
          "// radical computation of singular locus";
       }
-
       J=radical(JM[2]);   //the singular locus
       JM=mstd(J);
       
@@ -1038,7 +1073,6 @@ EXAMPLE: example normalizationPrimes; shows an example
         J;
         "";
       }
-
       if(deg(SL[1])>deg(J[1]))
       {
          Ann=quotient(SM[2],J[1]);
@@ -1190,7 +1224,7 @@ example
    normap;
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
+proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
 
 "//Repeated application of elimpart to endid, until no variables can be
 //directy substituded. homo=1 if input is homogeneous, rw contains
@@ -1305,7 +1339,7 @@ EXAMPLE: example genus; shows an example
       I=homog(std(I),@t);
    }
    ideal J=std(I);
-   if((dim(J)!=2)||((nvars(basering)==2)&&(dim(J)!=1)))
+   if((dim(J)!=2)||((nvars(basering)==2)&&(dim(J)<1)))
    {
       ERROR("This is not a curve");
    }
@@ -1348,7 +1382,7 @@ EXAMPLE: example genus; shows an example
          K=phi(J);
          K=eliminate(K,m,v);
          if(size(K)==1){de=deg(K[1]);}
-         if(i==5)
+         if((i==5)&&(d!=de))   
          {
             K=reduce(equidimMax(J),J);
             if(size(K)!=0){ERROR("This is not equidimensional");}
@@ -1363,6 +1397,7 @@ EXAMPLE: example genus; shows an example
    
    if(nvars(basering)==2)
    {
+      if(p==0) { return(0); }
       if(deg(squarefree(p))<deg(p)){ERROR("Curve is not reduced");}
       return(-deg(p)+1);
    }
@@ -1616,7 +1651,8 @@ EXAMPLE: example deltaLoc;  shows an example
    execute("ring S=("+charstr(R)+"),(x,y),lp;");
    map phi=R,x,y;
    ideal singL=phi(singL);
-   singL=std(singL);
+   singL=simplify(std(singL),1);
+   attrib(singL,"isSB",1);
    int d=vdim(singL);
    poly f=phi(f);
    int i;
@@ -1625,7 +1661,6 @@ EXAMPLE: example deltaLoc;  shows an example
    {
       map alpha=S,var(1)-singL[2][2],var(2)-singL[1][2];
       f=alpha(f);
-
       execute("ring C=("+charstr(S)+"),("+varstr(S)+"),ds;");
       poly f=imap(S,f);
       ideal singL=imap(S,singL);
@@ -1665,7 +1700,7 @@ EXAMPLE: example deltaLoc;  shows an example
          f=psi(f);
          singL=psi(singL);
          p=singL[2];
-         c=singL[1]-lead(singL[1]);;
+         c=singL[1]-lead(singL[1]);
          co=leadcoef(singL[1]);
       }
       
@@ -1677,7 +1712,6 @@ EXAMPLE: example deltaLoc;  shows an example
       number p=number(imap(B,p));
       
       minpoly=p;
-      //number c=number(imap(S,c));
       map iota=S,a,a;
       number c=number(iota(c));
       number co=iota(co);
@@ -1828,6 +1862,493 @@ static proc w_deg(poly p, intvec v)
 //   return(hp);
 //}
 
+
+//////////////////////////////////////////////////////////////////////////////
+
+proc primeClosure (list L, list #)
+"USAGE:    primeClosure(L [,c]); L a list of a ring containing a prime ideal
+                                 ker, c an optional integer
+RETURN:   a list L consisting of rings L[1],...,L[n] such that
+          - L[1] is a copy of (not a reference to!) the input ring L[1]
+          - all rings L[i] contain ideals ker, L[2],...,L[n] contain ideals phi
+            such that
+                    L[1]/ker --> ... --> L[n]/ker
+            are injections given by the corresponding ideals phi, and L[n]/ker
+            is the integral closure of L[1]/ker in its quotient field.
+          - all rings L[i] contain a polynomial nzd such that elements of
+            L[i]/ker are quotients of elements of L[i-1]/ker with denominator
+            nzd via the injection phi.
+NOTE:     - L is constructed by recursive calls of primeClosure itself.
+          - c determines the choice of nzd:
+               - c not given or equal to 0: first generator of the ideal SL,
+                 the singular locus of Spec(L[i]/ker)
+               - c<>0: the generator of SL with least number of monomials.
+EXAMPLE:  example primeClosure; shows an example
+"
+{
+// Start with a consistency check:
+
+  if (!(typeof(L[1])=="ring"))
+    {
+      "// Parameter must be a ring or a list containing a ring!";
+      return(-1);
+    }
+
+  int dblvl=printlevel-voice+2;
+
+
+// Some auxiliary variables:
+
+  int n=size(L);
+
+// How to choose the non-zerodivisor later on?
+
+  int nzdoption=0;
+  if (size(#)>0)
+    {
+      nzdoption=#[1];
+    }
+
+// R0 is the ring to work with, if we are in step one, make a copy of the
+// input ring, so that all objects are created in the copy, not in the original
+// ring (therefore a copy, not a reference is defined).
+
+  if (n==1)
+    {
+      def R=L[1];
+      def BAS=basering;
+      setring R;
+      if (!(typeof(ker)=="ideal"))
+        {
+          "// No ideal ker in the input ring!";
+          return (-1);
+        }
+      ker=simplify(interred(ker),15);
+      execute ("ring R0="+charstr(R)+",("+varstr(R)+"),("+ordstr(R)+");");
+      ideal ker=fetch(R,ker);
+ 	
+      // check whether we compute the normalization of the blow up of
+      // an isolated singularity at the origin (checked in normalI)
+
+      if (typeof(attrib(L[1],"iso_sing_Rees"))=="int")
+      {
+        attrib(R0,"iso_sing_Rees",attrib(L[1],"iso_sing_Rees"));
+      }
+      L=R0;
+    }
+  else
+    {
+      def R0=L[n];
+      setring R0;
+    }
+
+
+// In order to apply HomJJ from normal.lib, we need the radical of the singular
+// locus of ker, J:=rad(ker):
+
+//  if (homog(ker)==1)
+//    {
+      list SM=mstd(ker);
+//    }
+/*  else
+    {
+      list SM=groebner(ker),ker;
+    }*/
+
+// In the first iteration, we have to compute the singular locus "from
+// scratch". In further iterations, we can fetch it from the previous one but
+// have to compute its radical.
+
+  if (n==1)
+    {
+      if (typeof(attrib(R0,"iso_sing_Rees"))=="int")
+      {
+        ideal J;
+        for (int s=1;s<=attrib(R0,"iso_sing_Rees");s++)
+	{
+          J=J,var(s);
+        }
+      }
+      else
+      {
+        ideal J=minor(jacob(SM[2]),nvars(basering)-dim(SM[1]));
+      }
+      J=J+SM[2];
+      if (homog(J)==1)
+        {
+          J=mstd(J)[2];			
+        }
+      J=radical(interred(J));			
+    }
+  else
+    {
+      J=radical(interred(J));	
+    }
+
+  // having computed the radical J of the ideal of the singular locus,
+  // we now need to pick an element nzd of J
+
+  poly nzd=J[1];
+  if (nzdoption)
+  {
+    for (int ii=2;ii<=ncols(J);ii++)
+    {
+      if ( (deg(nzd)>=deg(J[ii])) && (size(nzd)>size(J[ii])) )
+      {
+        nzd=J[ii];
+      }
+    }
+  }
+
+  export nzd;
+  list RR=SM[1],SM[2],J,nzd;
+  list RS=HomJJ(RR);  
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+// If we've reached the integral closure (as determined by the result of
+// HomJJ), then we are done, otherwise we have to prepare the next iteration.
+
+  if (RS[2]==1)               // we've reached the integral closure
+    {
+      kill(J);
+      return(L);
+    }
+  else                        // prepare the next iteration
+    {
+      if (n==1)               // In the first iteration: keep only the data
+        {                     // needed later on.
+          kill (RR,SM);
+
+          export(ker);
+        }
+
+      def R1=RS[1];           // The data of the next ring R1:
+      setring R1;             // keep only what is necessary and kill
+      ideal ker=endid;        // everything else.
+      export(ker);
+      ideal norid=endid;
+      export(norid);
+      kill(endid);
+
+      map phi=R0,endphi;      // fetch the singular locus
+      ideal J=mstd(simplify(phi(J)+ker,4))[2];	
+      export(J);
+      if(n>1)
+      {	
+         ideal normap=phi(normap);
+      }
+      else
+      {
+         ideal normap=endphi;
+      }
+      export(normap);
+      kill(phi);              // we save phi as ideal, not as map, so that
+      ideal phi=endphi;       // we have more flexibility in the ring names
+      kill(endphi);           // later on.
+      export(phi);
+      L=insert(L,R1,n);       // Add the new ring R1 and go on with the
+      if (size(#)>0)
+        {
+          return (primeClosure(L,#));
+        }
+      else
+        {
+          return(primeClosure(L));         // next iteration.
+        }
+    }
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),dp;
+  ideal I=x4,y4;
+  def K=ReesAlgebra(I)[1];        // K contains ker such that K/ker=R[It]
+  list L=primeClosure(K);
+  def R(1)=L[1];                  // L[4] contains ker, L[4]/ker is the
+  def R(4)=L[4];                  // integral closure of L[1]/ker
+  setring R(1);
+  R(1);
+  ker;
+  setring R(4);
+  R(4);
+  ker;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+proc closureRingtower(list L)
+"USAGE:    closureRingtower(list L); L a list of rings
+CREATE:   rings R(1),...,R(n) such that R(i)=L[i] for all i
+EXAMPLE:  example closureRingtower; shows an example
+"
+{
+  int n=size(L);
+
+  for (int i=1;i<=n;i++)
+    {
+      def R(i)=L[i];
+      keepring (R(i));
+    }
+
+  return();
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),dp;
+  ideal I=x4,y4;
+  list L=primeClosure(ReesAlgebra(I)[1]);
+  closureRingtower(L);
+  R(1);
+  R(4);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+proc closureFrac(list L);
+"USAGE:    closureFrac (L); L a list as in the result of primeClosure, L[n]
+                           containing an additional poly f
+CREATE:   a list fraction of two elements of L[1], such that
+          f=fraction[1]/fraction[2] via the injections phi L[i]-->L[i+1].
+EXAMPLE:  example closureFrac; shows an example
+"
+{
+// Define some auxiliary variables:
+
+  int n=size(L);
+  int j,k,l;
+  string mapstr;
+
+  closureRingtower(L);         // The rings of L get names R[1],...,R[n]
+
+// The quotient representing f is computed as in 'closureGenerators' with
+// the differences that
+//   - the loop is done twice: for the numerator and for the denominator;
+//   - the result is stored in the list fraction and
+//   - we have to make sure that no more objects of the rings R(i) survive.
+
+  for (j=1;j<=2;j++)
+    {
+      setring R(n);
+      if (j==1)
+        {
+          poly p=f;
+        }
+      else
+        {
+          p=1;
+        }
+
+      for (k=n;k>1;k--)
+        {
+
+          if (j==1)
+            {
+              map phimap=R(k-1),phi;
+            }
+
+          p=p*phimap(nzd);
+
+          if (j==2)
+            {
+              kill(phimap);
+            }
+
+          if (j==1)
+            {
+              execute ("ring S(k) = "+charstr(R(k))+",("+varstr(R(k))+",
+                       Z(1.."+string(ncols(phi))+")),(dp("+string(nvars(R(k)))
+                       +"),dp("+string(ncols(phi))+"));");
+              ideal phi = imap(R(k),phi);
+              ideal J= imap (R(k),ker);
+              for (l=1;l<=ncols(phi);l++)
+                {
+                  J=J+(Z(l)-phi[l]);
+                }
+              J=groebner(J);
+              poly h=NF(imap(R(k),p),J);
+            }
+          else
+            {
+              setring S(k);
+              h=NF(imap(R(k),p),J);
+              setring R(k);
+              kill(p);
+            }
+
+          setring R(k-1);
+
+          if (j==1)
+            {
+              mapstr=" map backmap = S(k),";
+              for (l=1;l<=nvars(R(k));l++)
+                {
+                  mapstr=mapstr+"0,";
+                }
+              execute (mapstr+"maxideal(1);");
+
+              poly p;
+            }
+          p=NF(backmap(h),std(ker));
+          if (j==2)
+            {
+              kill(backmap);
+            }
+        }
+
+      if (j==1)
+        {
+          if (defined(fraction))
+            {
+              kill(fraction);
+              list fraction=p;
+            }
+          else
+            {
+              list fraction=p;
+            }
+        }
+      else
+        {
+          fraction=insert(fraction,p,1);
+        }
+    }
+  export(fraction);
+  return ();
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),dp;
+  ideal ker=x2+y2;
+  export R;
+  list L=primeClosure(R);          // We normalize R/ker
+  closureRingtower(L);             // Now R/ker=R(1) with normalization R(2)
+  setring R(2);
+  kill(R);
+  phi;                             // The map R(1)-->R(2)
+  poly f=T(1)*T(2);                // We will get a representation of f
+  export R(2);
+  closureFrac(L);
+  setring R(1);
+  kill (R(2));
+  fraction;                        // f=fraction[1]/fraction[2] via phi
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+static
+proc closureGenerators(list L);    // called inside normalI
+{
+  // In the list L of rings R(1),...,R(n), compute representations of the ring
+  // ring variables of the last ring R(n) as fractions of elements of R(1).
+
+  def Rees=basering;              // when called inside normalI, the Rees
+                                  // Algebra is the current basering.
+
+  // First of all we need some variable declarations...
+
+  list preimages;
+  int n=size(L);                  // the number of rings R(1)-->...-->R(n)
+  int j,k,l;
+  int length=nvars(L[n]);         // the number of variables of the last ring
+  string mapstr;
+
+  closureRingtower(L);            // ...and the rings R(1),...,R(n) out of L.
+
+  // For each variable (counter j) and for each intermediate ring (counter k):
+  // Find a preimage of var_j*phi(nzd(k-1)) in R(k-1).
+  // Finally, do the same for nzd.
+
+  for (j=1;j<=length+1;j++)
+    {
+      setring R(n);
+
+      if (j==1)
+        {
+          poly p;
+        }
+
+      if (j<=nvars(R(n)))
+        {
+          p=var(j);
+        }
+      else
+        {
+          p=1;
+        }
+
+      for (k=n;k>1;k--)
+        {
+
+          if (j==1)
+            {
+	      map phimap=R(k-1),phi;      // phimap is the map corresponding
+            }                             // to phi
+
+          p=p*phimap(nzd);
+
+          // Compute the preimage of [p mod ker(k)] under phi in R(k-1):
+          // As p is an element of Image(phi), there is a polynomial h such
+          // that h is mapped to [p mod ker(k)], and h can be computed as the
+          // normal form of p w.r.t. a Gröbner basis of
+          // J(k):=<ker(k),Z(l)-phi(k)(l)> in R(k)[Z]=:S(k)
+
+          if (j==1)   // In the first iteration: Create S(k), fetch phi and
+                      // ker(k) and construct the ideal J(k).
+            {
+              execute ("ring S(k) = "+charstr(R(k))+",("+varstr(R(k))+",
+                       Z(1.."+string(ncols(phi))+")),(dp("+string(nvars(R(k)))
+                       +"),dp("+string(ncols(phi))+"));");
+              ideal phi=imap(R(k),phi);
+              ideal J=imap (R(k),ker);
+              for (l=1;l<=ncols(phi);l++)
+                {
+                  J=J+(Z(l)-phi[l]);
+                }
+              J=groebner(J);
+              poly h=NF(imap(R(k),p),J);
+            }
+          else
+            {
+              setring S(k);
+              h=NF(imap(R(k),p),J);
+            }
+
+          setring R(k-1);
+
+          if (j==1)  // In the first iteration: Compute backmap:S(k)-->R(k-1)
+            {
+              mapstr=" map backmap = S(k),";
+              for (l=1;l<=nvars(R(k));l++)
+                {
+                  mapstr=mapstr+"0,";
+                }
+              execute (mapstr+"maxideal(1);");
+
+              poly p;
+            }
+          p=NF(backmap(h),std(ker));
+        }
+
+      // When down to R(1), store the result in the list preimages
+
+      preimages = insert(preimages,p,j-1);
+    }
+
+  // R(1) was a copy of Rees, so we have to get back to the basering Rees from
+  // the beginning and fetch the result (the list preimages) to this ring.
+
+  setring Rees;
+  return (fetch(R(1),preimages));
+}
 ///////////////////////////////////////////////////////////////////////////
 
 /*
