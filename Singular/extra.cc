@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.114 1999-11-14 21:34:26 wenk Exp $ */
+/* $Id: extra.cc,v 1.115 1999-11-14 21:46:28 wenk Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -512,7 +512,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       res->data=(int)getGMPFloatDigits();
       return FALSE;
     }
-=======
 /*==================== poly debug ==================================*/
     if(strcmp(sys_cmd,"p")==0)
     {
