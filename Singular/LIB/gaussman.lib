@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.56 2001-11-05 13:58:38 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.57 2001-11-07 09:55:50 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -21,7 +21,7 @@ PROCEDURES:
  vfilt(t);                  V-filtration of t on H''/H'
  vwfilt(t);                 weight refined V-filtration of t on H''/H'
  saito(t);                  matrix A0+A1*s of t on H''
- endvfilt(V);               endomorphism V-filtration
+ endvfilt(V);               endomorphism V-filtration on Jacobian algebra
  spprint(sp);               print spectrum sp
  sppprint(spp);             print spectral pairs spp
  spadd(sp1,sp2);            sum of spectra sp1 and sp2
@@ -901,7 +901,7 @@ ASSUME:   basering with characteristic 0 and local degree ordering,
 RETURN:   list A: matrix A[1]+A[2]*s of t on H''
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           mixed Hodge structure; opposite Hodge filtration; V-filtration;
-EXAMPLE:  example saito; shows examples
+EXAMPLE:  example tmat; shows examples
 "
 {
   def R=basering;
@@ -1078,7 +1078,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc endvfilt(list V)
-"USAGE:   endvwfilt(V); list V
+"USAGE:   endvfilt(V); list V
 ASSUME:  V computed by vfilt
 RETURN:
 @format
@@ -1094,7 +1094,7 @@ list EV: endomorphism V-filtration on the Jacobian algebra
 @end format
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           mixed Hodge structure; V-filtration; endomorphism filtration
-EXAMPLE: example endvwfilt; shows examples
+EXAMPLE: example endvfilt; shows examples
 "
 {
   def a,d,v,m,g=V[1..5];
