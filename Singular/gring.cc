@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.12 2002-05-31 17:24:44 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.13 2002-06-04 11:49:27 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -211,11 +211,10 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
   Exponent_t *F=(Exponent_t *)omAlloc0(ExpSize);
   Exponent_t *G=(Exponent_t *)omAlloc0(ExpSize);
 
-  for(i=1;i<=r->N;i++)
-  {
-    F[i]=F0[i];
-    G[i]=G0[i];
-  }
+  memcpy(F, F0,(r->N+1)*sizeof(Exponent_t));
+  // pExpVectorCopy(F,F0);
+  memcpy(G, G0,(r->N+1)*sizeof(Exponent_t));
+  //  pExpVectorCopy(G,G0);
   F[0]=0;
   G[0]=0;
   
@@ -473,10 +472,9 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
   Exponent_t *On=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
   Exponent_t *U=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
 
-  for (int ii=1;ii<=r->N;ii++)
-  {
-    U[ii]=Nxt[ii];
-  }
+
+  //  pExpVectorCopy(U,Nxt);
+  memcpy(U, Nxt,(r->N+1)*sizeof(Exponent_t));
   U[jG] = U[jG] + bG;
 
   /* Op=Nxt and initial On=(0); */
@@ -644,9 +642,9 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
         for (m=1;m<=cMTsize;m++)
         {
            MATELEM(tmp,k,m) = MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m);
-	   omCheckAddr(tmp->m);
+	   //	   omCheckAddr(tmp->m);
            MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m)=NULL;
-	   omCheckAddr(r->nc->MT[UPMATELEM(j,i,r->N)]->m);
+	   //	   omCheckAddr(r->nc->MT[UPMATELEM(j,i,r->N)]->m);
         }
      }
      id_Delete((ideal *)&(r->nc->MT[UPMATELEM(j,i,r->N)]),r);
@@ -671,7 +669,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
         t=p_Copy(MATELEM(cMT,k-1,1),r);
         t = nc_mm_Mult_p(y,t,r);
         MATELEM(cMT,k,1) = t;
-	omCheckAddr(cMT->m);
+	//	omCheckAddr(cMT->m);
      }
      t=NULL;
   }
@@ -684,7 +682,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
         t=p_Copy(MATELEM(cMT,a,m-1),r);
         t = nc_p_Mult_mm(t,x,r);
         MATELEM(cMT,a,m) = t;
-	omCheckAddr(cMT->m);
+	//	omCheckAddr(cMT->m);
      }
      t=NULL;
   }
@@ -878,6 +876,144 @@ void nc_kBucketPolyRed(kBucket_pt b, poly p)
   nDelete(&MinusOne);
   int l=pLength(p);
   kBucket_Add_q(b,p,&l);
+}
+
+poly nc_p_Bracket_qq(poly p, poly q)
+  /* returns [p,q], destroys p */
+{
+  if (!rIsPluralRing(currRing)) return(NULL);
+  if (pComparePolys(p,q)) return(NULL);
+  /* Components !? */
+  poly Q=NULL;
+  number coef=NULL;
+  poly res=NULL;
+  poly pres=NULL;
+  while (p!=NULL)
+  {
+    Q=q;
+    while(Q!=NULL)
+    {
+      pres=nc_mm_Bracket_nn(p,Q); /* since no coeffs are taken into account there */
+      if (pres!=NULL) 
+      {
+	coef=nMult(pGetCoeff(p),pGetCoeff(Q));
+	if (!nIsOne(coef)) pres=p_Mult_nn(pres,coef,currRing);
+	res=p_Add_q(res,pres,currRing);
+        nDelete(&coef);
+      }
+      pIter(Q);
+    }
+    p=pLmDeleteAndNext(p);
+  }
+  return(res);
+}
+
+poly nc_mm_Bracket_nn(poly m1, poly m2)
+  /*returns [m1,m2] for two monoms, destroys nothing */
+  /* without coeffs */
+{
+  if (pLmIsConstant(m1) || pLmIsConstant(m1)) return(NULL);
+  if (pLmCmp(m1,m2)==0) return(NULL);
+  Exponent_t *M1=(Exponent_t *)omAlloc0((currRing->N+1)*sizeof(Exponent_t));
+  Exponent_t *M2=(Exponent_t *)omAlloc0((currRing->N+1)*sizeof(Exponent_t));
+  Exponent_t *PREFIX=(Exponent_t *)omAlloc0((currRing->N+1)*sizeof(Exponent_t));
+  Exponent_t *SUFFIX=(Exponent_t *)omAlloc0((currRing->N+1)*sizeof(Exponent_t));
+  pGetExpV(m1,M1);
+  pGetExpV(m2,M2);
+  poly res=NULL;
+  poly ares=NULL;
+  poly bres=NULL;
+  poly tmp=pOne();
+  poly prefix=pOne();
+  poly suffix=pOne();
+  int nMin,nMax;
+  number nTmp=NULL;
+  number MinusOne=nInit(-1);
+  int i,j,k;
+  for (i=1;i<=currRing->N;i++)
+  {
+    if (M2[i]!=0)
+    {
+      ares=NULL;
+      for (j=1;j<=currRing->N;j++)
+      {
+	if (M1[j]!=0) 
+	{
+	  bres=NULL;
+	  /* compute [ x_j^M1[j],x_i^M2[i] ] */
+	  if (i<j) {nMax=j;  nMin=i;} else {nMax=i;  nMin=j;}
+	  if ( (i==j) || ((MATELEM(currRing->nc->COM,nMin,nMax)!=NULL) && nIsOne(pGetCoeff(MATELEM(currRing->nc->C,nMin,nMax))) )) /* not (the same exp. or commuting exps)*/
+	  { bres=NULL; }
+	  else
+	  {
+	    if (i<j) { bres=nc_uu_Mult_ww(j,M1[j],i,M2[i],currRing); }
+	    else bres=nc_uu_Mult_ww(i,M2[i],j,M1[j],currRing);
+	    if (nIsOne(pGetCoeff(bres)))
+	    {
+	      bres=pLmDeleteAndNext(bres);
+	    }
+	    else
+	    {
+	      nTmp=nInit(1);
+	      nTmp=nSub(pGetCoeff(bres),nTmp);
+	      pSetCoeff(bres,nTmp); /* only lc ! */
+	    }
+	    pTest(bres);
+	    if (i>j)  bres=p_Mult_nn(bres, MinusOne,currRing);
+	  }
+	  if (bres!=NULL)
+	  {
+	    /* now mult (prefix, bres, suffix) */
+	    memcpy(SUFFIX, M1,(currRing->N+1)*sizeof(Exponent_t));
+	    memcpy(PREFIX, M1,(currRing->N+1)*sizeof(Exponent_t));
+	    for (k=1;k<=j;k++) SUFFIX[k]=0;
+	    for (k=j;k<=currRing->N;k++) PREFIX[k]=0;
+	    SUFFIX[0]=0;
+	    PREFIX[0]=0;
+	    prefix=pOne();
+	    suffix=pOne();
+	    pSetExpV(prefix,PREFIX);
+	    pSetm(prefix);
+	    pSetExpV(suffix,SUFFIX);
+	    pSetm(suffix);
+	    if (!pLmIsConstant(prefix)) bres = nc_mm_Mult_p(prefix, bres,currRing);
+	    if (!pLmIsConstant(suffix)) bres = nc_p_Mult_mm(bres, suffix,currRing);
+	    ares=p_Add_q(ares, bres,currRing);
+	    /* What to give free? */
+	    pDelete(&prefix);
+	    pDelete(&suffix);
+	  }
+	}
+      }
+      if (ares!=NULL)
+      {
+	/* now mult (prefix, bres, suffix) */
+	memcpy(SUFFIX, M2,(currRing->N+1)*sizeof(Exponent_t));
+	memcpy(PREFIX, M2,(currRing->N+1)*sizeof(Exponent_t));
+	for (k=1;k<=i;k++) SUFFIX[k]=0;
+	for (k=i;k<=currRing->N;k++) PREFIX[k]=0;
+	SUFFIX[0]=0;
+	PREFIX[0]=0;
+	prefix=pOne();
+	suffix=pOne();
+	pSetExpV(prefix,PREFIX);
+	pSetm(prefix);
+	pSetExpV(suffix,SUFFIX);
+	pSetm(suffix);
+	bres=ares;
+	if (!pLmIsConstant(prefix)) bres = nc_mm_Mult_p(prefix, bres,currRing);
+	if (!pLmIsConstant(suffix)) bres = nc_p_Mult_mm(bres, suffix,currRing);
+	res=p_Add_q(res, bres,currRing);
+	pDelete(&prefix);
+	pDelete(&suffix);
+      }
+    }
+  }
+  freeT(M1,currRing->N);
+  freeT(M2,currRing->N);
+  freeT(PREFIX, currRing->N);
+  freeT(SUFFIX, currRing->N);
+  return(res);
 }
 
 #endif

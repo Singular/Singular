@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.5 2002-05-31 17:24:44 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.6 2002-06-04 11:49:28 levandov Exp $ */
 /* $Log: not supported by cvs2svn $
+/* Revision 1.5  2002/05/31 17:24:44  levandov
+/* Plural: buckets added to NF and other fixes
+/*
 /* Revision 1.4  2002/04/30 13:35:10  levandov
 /* Big Plural Update
 /*
@@ -858,7 +861,8 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
           /* statistic */
           if (TEST_OPT_PROT) 
 	  {
-	    PrintS("s");
+	    PrintS("s\n");
+	    pWrite(strat->P.p);
 	  }
           /* enter P.p into s and L */
           {

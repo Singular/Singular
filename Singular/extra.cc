@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.184 2002-06-03 11:41:25 Singular Exp $ */
+/* $Id: extra.cc,v 1.185 2002-06-04 11:49:27 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1314,6 +1314,26 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #ifdef HAVE_PLURAL
 /*==================== PLURAL =================*/
+    if (strcmp(sys_cmd, "bracket") == 0)
+    {
+      poly p;
+      poly q;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+        p=(poly)h->CopyD();
+        h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+        q=(poly)h->Data();
+      }
+      else return TRUE;
+      res->rtyp=POLY_CMD;
+      if (rIsPluralRing(currRing))  res->data=nc_p_Bracket_qq(p,q);
+      else res->data=NULL;     
+      return FALSE;
+    }
     if (strcmp(sys_cmd, "PLURAL") == 0)
     {
       matrix C;

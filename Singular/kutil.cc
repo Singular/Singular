@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.108 2002-05-27 09:36:55 Singular Exp $ */
+/* $Id: kutil.cc,v 1.109 2002-06-04 11:49:28 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -15,6 +15,9 @@
 #include <string.h>
 #include "mod2.h"
 #include <mylimits.h>
+#ifdef HAVE_PLURAL
+#include "gring.h"
+#endif
 #ifdef KDEBUG
 #undef KDEBUG
 #define KDEBUG 2
@@ -1107,7 +1110,15 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 #ifdef HAVE_PLURAL
     if (currRing->nc!=NULL) 
     {
-      Lp.p = nc_spGSpolyCreate(strat->S[i],p,NULL,currRing);
+      if (pHasNotCF(p,strat->S[i])) /* generalized prod-crit for lie-type */
+      {
+	strat->cp++;
+	Lp.p=nc_p_Bracket_qq(pCopy(p),strat->S[i]);
+      }
+      else
+      {
+	Lp.p = nc_spGSpolyCreate(strat->S[i],p,NULL,currRing);
+      }
     }
     else
     {

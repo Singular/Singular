@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.11 2002-05-31 17:24:45 levandov Exp $ */
+/* $Id: gring.h,v 1.12 2002-06-04 11:49:29 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -31,6 +31,11 @@ poly nc_spShort(poly p1, poly p2, const ring r=currRing);
 void nc_kBucketPolyRed(kBucket_pt b, poly p);
 
 ideal gr_bba (ideal F, ideal Q,kStrategy strat);
+
+// brackets:
+poly nc_p_Bracket_qq(poly p, poly q);
+poly nc_mm_Bracket_nn(poly m1, poly m2);
+
 #endif /* HAVE_PLURAL */
 #endif
 
