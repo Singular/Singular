@@ -593,7 +593,7 @@ endif
 ##
 
 CCG		= gcc
-CXXG		= gcc
+CXXG		= @CXX@
 CXXM		= gcc -MM -MG -DGENERATE_DEPEND
 CCM		= gcc -MM -MG -DGENERATE_DEPEND
 
