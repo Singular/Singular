@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_eval.cc,v 1.0 1996-05-17 10:59:43 stobbe Exp $
+// $Id: cf_eval.cc,v 1.1 1996-05-24 09:21:54 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+// Revision 1.0  1996/05/17  10:59:43  stobbe
+// Initial revision
+//
 */
 
 #include "assert.h"
@@ -26,9 +29,9 @@ Evaluation::operator() ( const CanonicalForm & f ) const
     if ( f.inCoeffDomain() || f.level() < values.min() )
 	return f;
     else  if ( f.level() < values.max() )
-	return evalCF( f, values, 2, f.level() );
+	return evalCF( f, values, values.min(), f.level() );
     else
-	return evalCF( f, values, 2, values.max() );
+	return evalCF( f, values, values.min(), values.max() );
 }
 
 CanonicalForm
