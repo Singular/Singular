@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.15 2005-01-05 11:27:17 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.16 2005-01-25 13:20:33 Singular Exp $ */
 
 #include <config.h>
 
@@ -169,15 +169,11 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 	      {
                 DEBOUTLN( cerr, "(test) G: "<<G<<" % gcd:"<<cand<<" -> " << G%cand );
                 gcdfound= divides(cand,G);
-                //gcdfound= ((G-((G/cand)*cand))==0);
-                //gcdfound= ((G % cand)==0);
               }
 	      else
 	      { 
                 DEBOUTLN( cerr, "(test) F: "<<F<<" % gcd:"<<cand<<" -> " << F%cand);
                 gcdfound= divides(cand,F);
-                //gcdfound= ((F-((F/cand)*cand))==0);
-                //gcdfound= ((F % cand)==0);
 	      }
 	    }
             /// ---> A8 (gcdfound)
@@ -270,17 +266,10 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
 static void
 findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, REvaluation & b, int delta, int degF, int degG )
 {
-//    int t=tmax(F.level(),G.level());
     int i;
     bool ok;
     if ( delta != 0 )
         b.nextpoint();
-//    i=2;
-//    while(i<=t)
-//    {
-//      if (b[i]==0) { b.nextpoint(); i=2; }
-//      else i++;
-//    }
     DEBOUTLN( cerr, "ezgcd: (findeval) F = " << F  <<", G="<< G);
     DEBOUTLN( cerr, "ezgcd: (findeval) degF = " << degF << ", degG="<<degG );
     do {
@@ -292,15 +281,11 @@ findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, 
             ok = degree( Gb ) == degG;
         }
        
-        if ( ok ) {
-//	    if ((Fb.isZero())||(Gb.isZero()))
-//	      ok=false;
-//	    else
-	    {    
-              Db = gcd( Fb, Gb );
-              if ( delta > 0 )
-                ok = degree( Db ) < delta;
-	    }
+        if ( ok )
+	{    
+            Db = gcd( Fb, Gb );
+            if ( delta > 0 )
+              ok = degree( Db ) < delta;
         }
         if ( ! ok )
             b.nextpoint();
