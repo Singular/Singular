@@ -20,7 +20,7 @@ bug_barei
 bug_c_dp
 bug_mres
 ; CORE bug_primdec
-cyc_5
+cyc_5_lp
 ; CORE bug_res
 ; CORE bug_sres
 bug_sres_betti
@@ -29,6 +29,7 @@ dbm_s
 deform_s
 fetch_s
 fglm1_s
+fglmquot1_s
 finduni_s
 finvar_s
 finvarlb
