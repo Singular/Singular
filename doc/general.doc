@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.112 1999-02-09 08:16:09 obachman Exp $
+@comment $Id: general.doc,v 1.113 1999-04-16 08:55:48 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1549,19 +1549,22 @@ Possible type casts are:
 @c too.
 @c ------------------------------------------------
 @multitable @columnfractions .05 .15 .83
+@item 
+@    @tab to @tab from
 @item
-@   1. @tab to @code{ideal} @tab  from expression lists of @code{int}, @code{number}, @code{poly}
+@    @tab  @code{ideal} @tab  expression lists of @code{int}, @code{number}, @code{poly}
 @item
-@   2. @tab to @code{ideal} @tab  from @code{int}, @code{matrix}, @code{module}, @code{number},
-@code{poly}, @code{vector}
+@    @tab  @code{ideal} @tab  @code{int}, @code{matrix}, @code{module},@code{number}, @code{poly}, @code{vector}
 @item
-@   3. @tab to @code{int} @tab    from @code{number}, @code{poly}
+@    @tab  @code{int} @tab    @code{number}, @code{poly}
 @item
-@   4. @tab to @code{intvec} @tab from expression lists of @code{int}, @code{intmat}
+@    @tab  @code{intvec} @tab expression lists of @code{int}, @code{intmat}
+@item 
+@    @tab  @code{intmat} @tab @code{intvec} (@pxref{intmat type cast})
 @item
-@   5. @tab to @code{list} @tab   from expression lists of any type
+@    @tab  @code{list} @tab   expression lists of any type
 @item
-@   6. @tab to @code{matrix} @tab from @code{module}, @code{ideal},
+@    @tab  @code{matrix} @tab @code{module}, @code{ideal},
 @code{vector}, @code{matrix}.
 @* There are two forms to convert something to a matrix: if @code{matrix(}
 expression @code{)} is used then the size of the matrix is determined
@@ -1574,20 +1577,18 @@ $ m @times n $
 @ifinfo
 m x n
 @end ifinfo
-matrix.
+matrix (@pxref{matrix type cast})
 @item
-@   7. @tab to @code{module} @tab from expression lists of @code{int}, @code{number},
+@    @tab  @code{module} @tab expression lists of @code{int}, @code{number},
 @code{poly}, @code{vector}
 @item
-@   8. @tab to @code{module} @tab from @code{ideal}, @code{matrix}, @code{vector}
+@    @tab  @code{module} @tab @code{ideal}, @code{matrix}, @code{vector}
 @item
-@   9. @tab to @code{number} @tab from @code{poly}
+@    @tab  @code{number} @tab @code{poly}
 @item
-@  10. @tab to @code{poly} @tab   from @code{int}, @code{number}
+@   @tab  @code{poly} @tab   @code{int}, @code{number}
 @item
-@  11. @tab to @code{string} @tab from @code{ideal}, @code{int}, @code{map},
-@code{map}, @code{matrix},
-@code{module}, @code{number}, @code{poly}, @code{proc}, @code{vector}
+@   @tab  @code{string} @tab   any type (@pxref{string type cast})
 @end multitable
 
 @strong{Example:}
