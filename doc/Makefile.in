@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.85 2003-02-06 19:54:38 levandov Exp $
+### $Id: Makefile.in,v 1.86 2003-03-06 11:44:15 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -103,7 +103,7 @@ DOC2TEX_FILES	= \
 		start.tex types.tex pdata.tex tricks.tex platform.tex
 
 PLU_DOC2TEX_FILES	= \
-		plural.tex plumath.tex plureference.tex plutypes.tex
+		plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 
