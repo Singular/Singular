@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 version="$id reesclos.lib,v 1.32 2001/01/16 hirsch Exp $";
+category="Commutative Algebra";
 
 info="
 LIBRARY:     reesclos.lib   PROCEDURES TO COMPUTE THE INT. CLOSURE OF AN IDEAL
