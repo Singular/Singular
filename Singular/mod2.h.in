@@ -152,6 +152,9 @@
 #define INIT_BUG
 #endif
 
+/* linear algebra extensions from pcv.h/pcv.cc */
+#define HAVE_PCV 1
+
 /* Define to use old mechanismen for saving currRing with procedures
  * Does not work with HAVE_NAMESPACES enabled
  */
