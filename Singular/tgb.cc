@@ -1205,6 +1205,7 @@ static void go_on (calc_dat* c){
  
     int len;
     poly p;
+    buf[j].flatten();
     kBucketClear(buf[j].bucket,&p, &len);
     kBucketDestroy(&buf[j].bucket);
     // delete buf[j];
@@ -2345,24 +2346,32 @@ void red_object::flatten(){
       else
 	add_this=clear_into;
       pMult_nn(add_this, sum->c_ac);
-      nDelete(&sum->c_ac);
-      nDelete(&sum->c_my);
-      nDelete(&mult_my);
-      sum->ac->decrease_counter();
-      delete sum;
+      
       kBucket_Add_q(bucket,add_this, &len);
-      p=kBucketGetLm(bucket);
-      sum=NULL;
+       nDelete(&mult_my);
+     
     }
+    nDelete(&sum->c_ac);
+    nDelete(&sum->c_my);
+   
+    sum->ac->decrease_counter();
+    delete sum;
+    p=kBucketGetLm(bucket);
+    sum=NULL;
   }
+  assume(p==kBucketGetLm(bucket));
+  assume(sum==NULL);
 }
 void red_object::validate(){
+  BOOLEAN flattened=FALSE;
   if(sum!=NULL)
   {
     poly lm=kBucketGetLm(bucket);
     poly lm_ac=kBucketGetLm(sum->ac->bucket);
     if ((lm_ac==NULL)||((lm!=NULL) && (pLmCmp(lm,lm_ac)!=-1))){
       flatten();
+      assume(sum==NULL);
+      flattened=TRUE;
       p=kBucketGetLm(bucket);
       if (p!=NULL)
 	sev=pGetShortExpVector(p);
@@ -2381,6 +2390,7 @@ void red_object::validate(){
     if(p)
     sev=pGetShortExpVector(p);
   }
+  assume((sum==NULL)||(kBucketGetLm(sum->ac->bucket)!=NULL));
 }
 int red_object::clear_to_poly(){
   flatten();
@@ -2429,6 +2439,9 @@ void simple_reducer::target_is_no_sum_reduce(red_object & ro){
 }
 
 void simple_reducer::target_is_a_sum_reduce(red_object & ro){
+  pTest(p);
+  kbTest(ro.bucket);
+  kbTest(ro.sum->ac->bucket);
   assume(ro.sum!=NULL);
   assume(ro.sum->ac!=NULL);
   if(ro.sum->ac->last_reduction_id!=reduction_id){
@@ -2508,13 +2521,15 @@ reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c
   }
   else
   {
+    if(r[erg.reduce_by].sum)
+      kbTest(r[erg.reduce_by].sum->ac->bucket);
     r[erg.reduce_by].flatten();
     int len;
     kBucket_pt bucket=r[erg.reduce_by].bucket;
     kBucketClear(bucket,&p,&len);
     if(c->is_char0)
 	 pContent(p);
-
+    pTest(p);
     if ((!join)||(p->next==NULL))
       pointer=new simple_reducer(p,len);
     else
