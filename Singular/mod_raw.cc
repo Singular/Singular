@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.12 2000-12-21 16:37:52 obachman Exp $ */
+/* $Id: mod_raw.cc,v 1.13 2001-02-01 13:12:09 krueger Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -310,20 +310,29 @@ const char *dynl_error()
  * SECTION ix86-win                                                          *
  *****************************************************************************/
 #ifdef ix86_win
-/* #    include <> */
+#    include <windows.h>
 
 void *dynl_open(char *filename)
 {
-  return(NULL);
+  HINSTANCE hLibrary = LoadLibrary( TEXT (filename));;
+
+  return(hLibrary);
 }
 
 void *dynl_sym(void *handle, char *symbol)
 {
-  return(NULL);
+  FARPROC f;
+  
+  if (handle == DYNL_KERNEL_HANDLE) 
+    handle = PROG_HANDLE;
+
+  f = GetProcAddress(handle , TEXT (symbol));
+  return(f);
 }
 
 int dynl_close (void *handle)
 {
+  FreeLibrary(handle);
   return(0);
 }
 
