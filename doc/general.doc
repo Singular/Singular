@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.71 1998-05-15 06:45:25 wichmann Exp $
+@comment $Id: general.doc,v 1.72 1998-05-15 07:15:54 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -914,7 +914,8 @@ the main variable to be specified by the user.
 @table @code
 @item bareiss
 @ref{bareiss}@*
-Bareiss' algorithm: a division-free Gaussian elimination
+Bareiss' algorithm is a division-free Gaussian elimination applicable
+for arbitrary integral domains.
 @item det
 @ref{det}@*
 For matrices with integer entries a modular algorithm is used.
@@ -927,7 +928,7 @@ For matrices with integer entries a modular algorithm is used.
 
 @sc{Singular} has a convenient programming language similar to C
 allowing the user to extend the set of predefined functions. However,
-@sc{Singular} interprets commands given interactiveley on the command
+@sc{Singular} interprets commands given interactively on the command
 line as well as given in the context of user defined procedures. In
 particular, the control structures @code{for}, @code{if} .. @code{else}
 and @code{while} are not restricted to the use in procedures.
@@ -1055,7 +1056,7 @@ types, e.g., matrix or intmat. @xref{print}.
 @node Special characters, Names, General command syntax, The SINGULAR language
 @subsection Special characters
 @cindex Special characters
-The following characters/operators have special meanings:
+The following characters and operators have special meaning:
 @table @asis
 @item @code{=}
 assignment
@@ -1063,40 +1064,40 @@ assignment
 in expressions, for indexed names and for argument lists
 @item @code{[}, @code{]}
 access operator for strings, integer vectors, ideals, matrices,
-polynomials, and lists.  Used to build vectors of polynomials.
-Examples: @code{s[3]}, @code{m[1,3]}, @code{i[1..3]},
+polynomials, resolutions, and lists.  Used to build vectors of
+polynomials.  Example: @code{s[3]}, @code{m[1,3]}, @code{i[1..3]},
 @code{[f,g+x,0,0,1]}.
 @item @code{+}
-addition
+addition operator
 @item @code{-}
-subtraction
+subtraction operator
 @item @code{*}
-multiplication
+multiplication operator
 @item @code{/}
-division of numbers (coefficients of polynomials) and polynomials
-(but see also @ref{int operations})
+division  operator.  @xref{Miscellaneous oddities}, for the difference
+between the division operators @code{/} and @code{div}.
 @item @code{%}
-integer modulo (see also @ref{int operations})
+modulo operator
 @item @code{^} or @code{**}
-exponentiation
+exponentiation operator
 @item @code{==}
-equal.  E.g. @code{if (i==j)...}
+comparison operator equal
 @item @code{!=} or @code{<>}
-not equal.  E.g. @code{if (i<>j)...}
+comparison operator not equal
 @item @code{>=}
-bigger or equal
+comparison operator bigger or equal
 @item @code{>}
-bigger
+comparison operator bigger
 @item @code{<=}
-smaller or equal
+comparison operator smaller or equal
 @item @code{<}
-smaller, but also used for file input.  @xref{filecmd}.
+comparison operator smaller.  Also used for file input.  @xref{filecmd}.
 @item @code{!}
-synonym for @code{not}
+boolean operator not
 @item @code{&&}
-synonym for @code{and}
+boolean operator and
 @item @code{||}
-synonym for @code{or}
+boolean operator or
 @item @code{"}
 delimiter for string constants
 @item @code{`}
@@ -1110,21 +1111,16 @@ statement separator
 @item @code{,}
 separator for expression lists and function arguments
 @item @code{\}
-escape character for @code{"} and @code{\} within strings.  @xref{string expressions}.
+escape character for @code{"} and @code{\} within strings
 @item @code{..}
-interval specifier for intvecs (see @ref{intvec expressions}).
+interval specifier returning intvec.
 E.g. @code{1..3} which is equivalent to @code{1, 2, 3}.
-@item @code{::}
-access specifier within packages (complete name is package_name@code{::}identifier)
 @item @code{_}
-accesses the last displayed result.
+value of expression last displayed
 @item @code{~}
-breakpoint in procedures.  @xref{Break points}.
+breakpoint in procedures
 @item @code{#}
-list of parameters in procedures without explicit parameter list.
-@xref{Parameter list}.
-@item @code{@@}
-is a letter.  Its use in identifiers is discouraged.
+list of parameters in procedures without explicit parameter list
 @item @code{$}
 terminates @sc{Singular}
 @end table
