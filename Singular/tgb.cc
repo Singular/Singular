@@ -4504,7 +4504,8 @@ void red_object::flatten(){
       }
       else
 	add_this=clear_into;
-      pMult_nn(add_this, sum->c_ac);
+      if(!nIsOne(sum->c_ac))
+	pMult_nn(add_this, sum->c_ac);
       
       kBucket_Add_q(bucket,add_this, &len);
        nDelete(&mult_my);
