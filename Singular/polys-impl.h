@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.22 1998-06-02 15:30:02 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.23 1998-08-05 14:09:45 obachman Exp $ */
 
 /***************************************************************
  *
@@ -27,7 +27,11 @@
 // EXPONENT_TYPE is determined by configure und defined in mod2.h
 typedef EXPONENT_TYPE Exponent_t;
 
+#ifndef NDEBUG
 #define VARS (10)   /*max. number of variables as constant*/
+#else
+#define VARS (0)
+#endif
 
 typedef Exponent_t  monomial[VARS + 1];
 typedef Exponent_t* Exponent_pt;
