@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.102 1998-06-04 13:59:33 obachman Exp $
+@comment $Id: general.doc,v 1.103 1998-06-08 08:48:48 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2508,5 +2508,5 @@ LIB "sample.lib";
 @expansion{}    ? Library sample.lib: ERROR occured: in line 26, 497.
 @expansion{}    ? missing close bracket '@}' at end of library in line 26.
 @expansion{}    ? Cannot load library,... aborting.
-@expansion{}    ? error occurred in STDIN line 1: `LIB "newdoc/sample.lib";`
+@expansion{}    ? error occurred in STDIN line 1: `LIB "sample.lib";`
 @end example
