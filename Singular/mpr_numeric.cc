@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.7 1999-12-02 23:03:51 wenk Exp $ */
+/* $Id: mpr_numeric.cc,v 1.8 2000-04-04 11:20:04 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -387,7 +387,7 @@ poly rootContainer::getPoly()
 //      return *theroots[i];
 //    }
 //    // warning
-//    Werror("rootContainer::getRoot: Wrong index %d, found_roots %s",i,found_roots?"true":"false");
+//    Warn("rootContainer::getRoot: Wrong index %d, found_roots %s",i,found_roots?"true":"false");
 //    gmp_complex *tmp= new gmp_complex();
 //    return *tmp;
 //  }
@@ -397,9 +397,9 @@ poly rootContainer::getPoly()
 gmp_complex & rootContainer::evPointCoord( const int i )
 {
   if (! ((i >= 0) && (i < anz+2) ) )
-    WerrorS("rootContainer::evPointCoord: index out of range");
+    WarnS("rootContainer::evPointCoord: index out of range");
   if (ievpoint == NULL)
-    WerrorS("rootContainer::evPointCoord: ievpoint == NULL");
+    WarnS("rootContainer::evPointCoord: ievpoint == NULL");
 
   if ( (rt == cspecialmu) && found_roots ) {  // FIX ME
     if ( ievpoint[i] != NULL )
@@ -410,12 +410,12 @@ gmp_complex & rootContainer::evPointCoord( const int i )
     }
     else
     {
-      Werror("rootContainer::evPointCoord: NULL index %d",i);
+      Warn("rootContainer::evPointCoord: NULL index %d",i);
     }
   }
 
   // warning
-  Werror("rootContainer::evPointCoord: Wrong index %d, found_roots %s",i,found_roots?"true":"false");
+  Warn("rootContainer::evPointCoord: Wrong index %d, found_roots %s",i,found_roots?"true":"false");
   gmp_complex *tmp= new gmp_complex();
   return *tmp;
 }
@@ -436,7 +436,7 @@ bool rootContainer::swapRoots( const int from, const int to )
   }
 
   // warning
-  Werror(" rootContainer::changeRoots: Wrong index %d, %d",from,to);
+  Warn(" rootContainer::changeRoots: Wrong index %d, %d",from,to);
   return false;
 }
 //<-
@@ -466,7 +466,7 @@ bool rootContainer::solver( const int polishmode )
     found_roots= laguer_driver( ad, theroots, polishmode == PM_POLISH );
     if (!found_roots)
     {
-      WerrorS("rootContainer::solver: No roots found!");
+      WarnS("rootContainer::solver: No roots found!");
       goto solverend;
     }
     break;
@@ -479,12 +479,12 @@ bool rootContainer::solver( const int polishmode )
     found_roots= laguer_driver( ad, theroots, true );
     if (!found_roots)
     {
-      WerrorS("rootContainer::solver: No roots found!");
+      WarnS("rootContainer::solver: No roots found!");
       goto solverend;
     }
     break;
   default:
-    Werror("rootContainer::solver: Unsupported polish mode %d! Valid are [0,1,2].",polishmode);
+    Warn("rootContainer::solver: Unsupported polish mode %d! Valid are [0,1,2].",polishmode);
     found_roots= false;
   } // switch
 
@@ -516,7 +516,7 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
 
     mprSTICKYPROT(ST_ROOTS_LGSTEP);
     if ( its > MAXIT ) {  // error
-      WerrorS("rootContainer::laguer_driver: To many iterations!");
+      WarnS("rootContainer::laguer_driver: To many iterations!");
       ret= false;
       goto theend;
     }
@@ -547,7 +547,7 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
       mprSTICKYPROT(ST_ROOTS_LGSTEP);
       if ( its > MAXIT )
       {  // error
-        WerrorS("rootContainer::laguer_driver: To many iterations!");
+        WarnS("rootContainer::laguer_driver: To many iterations!");
         ret= false;
         goto theend;
       }
@@ -717,9 +717,9 @@ void rootArranger::arrange()
       } // rtest
       if ( !found )
       {
-        Werror("rootArranger::arrange: No match? coord %d, root %d.",xkoord,r);
+        Warn("rootArranger::arrange: No match? coord %d, root %d.",xkoord,r);
 #ifdef mprDEBUG_PROT
-        WerrorS("One of these ...");
+        WarnS("One of these ...");
         for ( rtest= r; rtest < anzr; rtest++ )
         {
           tmp= gmp_complex();
@@ -728,12 +728,12 @@ void rootArranger::arrange()
             tmp-= (*roots[xk])[r] * mu[xkoord]->evPointCoord(xk+1);
           }
           tmp-= (*roots[xk])[rtest] * mu[xkoord]->evPointCoord(xk+1); // xkoord+2
-          Werror("  %s",complexToStr(tmp,gmp_output_digits+1),rtest);
+          Warn("  %s",complexToStr(tmp,gmp_output_digits+1),rtest);
         }
-        WerrorS(" ... must match to one of these:");
+        WarnS(" ... must match to one of these:");
         for ( mtest= 0; mtest < anzr; mtest++ )
         {
-          Werror("                  %s",complexToStr((*mu[xkoord])[mtest],gmp_output_digits+1));
+          Warn("                  %s",complexToStr((*mu[xkoord])[mtest],gmp_output_digits+1));
         }
 #endif
       }
@@ -849,7 +849,7 @@ BOOLEAN simplex::mapFromMatrix( matrix m )
 {
   int i,j;
 //    if ( MATROWS( m ) > LiPM_rows ||  MATCOLS( m ) > LiPM_cols ) {
-//      WerrorS("");
+//      WarnS("");
 //      return FALSE;
 //    }
 
@@ -878,7 +878,7 @@ matrix simplex::mapToMatrix( matrix m )
 {
   int i,j;
 //    if ( MATROWS( m ) < LiPM_rows-3 ||  MATCOLS( m ) < LiPM_cols-2 ) {
-//      WerrorS("");
+//      WarnS("");
 //      return NULL;
 //    }
 
@@ -938,7 +938,7 @@ void simplex::compute()
   if ( m != (m1+m2+m3) )
   {
     // error: bad input
-    error(WerrorS("simplex::compute: Bad input constraint counts!");)
+    error(WarnS("simplex::compute: Bad input constraint counts!");)
     icase=-2;
     return;
   }
@@ -955,8 +955,8 @@ void simplex::compute()
     if ( LiPM[i+1][1] < 0.0 )
     {
       // error: bad input
-      error(WerrorS("simplex::compute: Bad input tableau!");)
-      error(Werror("simplex::compute: in input Matrix row %d, column 1, value %f",i+1,LiPM[i+1][1]);)
+      error(WarnS("simplex::compute: Bad input tableau!");)
+      error(Warn("simplex::compute: in input Matrix row %d, column 1, value %f",i+1,LiPM[i+1][1]);)
       icase=-2;
       // free mem l1,l2,l3;
       Free( (ADDRESS) l3, (m+1) * sizeof(int) );
