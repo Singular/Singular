@@ -3928,17 +3928,19 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
 {
-  ideal m;
-  int ul= IDELEMS((ideal)u->Data());
-  int vl= IDELEMS((ideal)v->Data());
-  if (hasFlag(u,FLAG_STD))
+  int sw=(int)w->Data();
+  if (sw==0)
   {
-    m = idLift((ideal)u->Data(),(ideal)v->Data());
-    res->data = (char *)idModule2formatedMatrix(m,ul,vl);
+    return jjLIFT(res,u,v);
   }
   else
   {
-    m = idLiftNonStB((ideal)u->Data(),(ideal)v->Data(), (int)w->Data());
+    ideal m;
+    ideal ui=(ideal)u->Data();
+    ideal vi=(ideal)v->Data();
+    int ul= IDELEMS(ui);
+    int vl= IDELEMS(vi);
+    m = idLiftNonStB(ui,vi, sw);
     res->data = (char *)idModule2formatedMatrix(m,ul,vl);
   }
   return FALSE;
