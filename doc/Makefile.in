@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.95 2004-12-17 17:53:53 Singular Exp $
+### $Id: Makefile.in,v 1.96 2004-12-17 20:47:10 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -168,14 +168,19 @@ singular.pdf: ${MANUAL_FILES} singular.tex s-plural.tex
 	${TEXI2PDF} singular.tex
 
 plural.dvi: ${PLU_MANUAL_FILES} p-pluralmain.tex
-plural.dvi: ${PLU_MANUAL_FILES} p-pluralmain.tex
 	${TEXI2DVI} p-pluralmain.tex; mv p-pluralmain.dvi plural.dvi
+
+plural.pdf: ${PLU_MANUAL_FILES} p-pluralmain.tex
+	${TEXI2PDF} p-pluralmain.tex; mv p-pluralmain.pdf plural.pdf
 
 manual.dvi: ${MANUAL_FILES} manual.tex s-plural.tex
 	${TEXI2DVI} manual.tex
 
 tutor.dvi: ${TUTOR_FILES}
 	${TEXI2DVI} tutor.tex
+
+tutor.pdf: ${TUTOR_FILES}
+	${TEXI2PDF} tutor.tex
 
 usercard.dvi: usercard.tex singcard.tex
 	${TEX} $<
