@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.156 2001-02-02 11:32:15 mschulze Exp $ */
+/* $Id: extra.cc,v 1.157 2001-02-02 14:40:13 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -496,24 +496,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
       else
         WerrorS("ideal expected");
-    }
-    else
-#endif
-#ifdef HAVE_UNITS
-/*==================== units ==================================*/
-    if(strcmp(sys_cmd,"invunit")==0)
-    {
-      return invunit(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"series")==0)
-    {
-      return series(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"rednf")==0)
-    {
-      return rednf(res,h);
     }
     else
 #endif
@@ -1179,6 +1161,24 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#ifdef HAVE_UNITS
+/*==================== units ==================================*/
+    if(strcmp(sys_cmd,"invunit")==0)
+    {
+      return invunit(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"series")==0)
+    {
+      return series(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"rednf")==0)
+    {
+      return rednf(res,h);
+    }
+    else
+#endif
 #ifdef HAVE_PLURAL
 /*==================== PLURAL =================*/
     if (strcmp(sys_cmd, "PLURAL") == 0)
