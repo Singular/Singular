@@ -32,10 +32,6 @@ class Rational
     Rational( unsigned long int );
     Rational( int );
     Rational( unsigned int );
-    Rational( short int );
-    Rational( unsigned short int );
-    Rational( char );
-    Rational( unsigned char );
     Rational( double );
     Rational( float );
     Rational( char* );
@@ -44,26 +40,13 @@ class Rational
     Rational( unsigned long int,unsigned long int );
     Rational( int, unsigned int );
     Rational( unsigned int,unsigned int );
-    Rational( short int,unsigned short int );
-    Rational( unsigned short int,unsigned short int );
-    Rational( char,unsigned char );
-    Rational( unsigned char,unsigned char );
     Rational( const Rational&,const Rational& );
     Rational( long int,long int );
     Rational( int,int );
-    Rational( short int,short int );
-    Rational( char,char );
     Rational( char*,char* );
     ~Rational( );
 
-    Rational& operator = ( long int );
-    Rational& operator = ( unsigned long int );
     Rational& operator = ( int );
-    Rational& operator = ( unsigned int );
-    Rational& operator = ( short int );
-    Rational& operator = ( unsigned short int );
-    Rational& operator = ( char );
-    Rational& operator = ( unsigned char );
     Rational& operator = ( double );
     Rational& operator = ( float );
     Rational& operator = ( char *s );
@@ -112,7 +95,6 @@ class Rational
 
     friend int      sgn ( const Rational& );
     friend Rational abs ( const Rational& );
-    friend Rational sqrt( const Rational& );
     friend Rational pow ( const Rational&,int );
 
     double   complexity( ) const;
@@ -127,11 +109,6 @@ Rational operator + ( const Rational&, const Rational& );
 Rational operator - ( const Rational&, const Rational& );
 Rational operator * ( const Rational&, const Rational& );
 Rational operator / ( const Rational&, const Rational& );
-
-Rational exp( const Rational& );
-Rational sin( const Rational& );
-Rational cos( const Rational& );
-Rational tan( const Rational& );
 
 #endif /* GMPRAT_H */
 

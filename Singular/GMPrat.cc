@@ -30,22 +30,8 @@
 // ----------------------------------------------------------------------------
 //  Miscellaneous
 // ----------------------------------------------------------------------------
-extern int mmInit();
-static int GMPIsInitialized=mmInit();
 
 Rational Rational::save;    // dummy variable
-Rational RAT_EPS("1e-15");  // epsilon used in transcendental functions
-
-// ----------------------------------------------------------------------------
-//  the number Pi up to 25, 50, 75 and 100 digits
-// ----------------------------------------------------------------------------
-
-//Rational RAT_PI_25("3.141592653589793238462643");
-//Rational RAT_PI_50("3.1415926535897932384626433832795028841971693993751");
-//Rational RAT_PI_75("3.141592653589793238462643383279502884197169399375105820974944592307816406286");
-//Rational RAT_PI_100("3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068");
-//Rational RAT_PI(RAT_PI_25);
-
 
 // ----------------------------------------------------------------------------
 //  disconnect a rational from its reference
@@ -101,34 +87,6 @@ Rational::Rational( unsigned int a )
     p = new rep;
     mpq_init( p->rat );
     mpq_set_ui( p->rat,(unsigned long)a,1 );
-}
-
-Rational::Rational( short int a )
-{
-    p = new rep;
-    mpq_init( p->rat );
-    mpq_set_si( p->rat,(long int)a,1 );
-}
-
-Rational::Rational( unsigned short int a )
-{
-    p = new rep;
-    mpq_init( p->rat );
-    mpq_set_ui( p->rat,(unsigned long int)a,1 );
-}
-
-Rational::Rational( char a )
-{
-    p = new rep;
-    mpq_init( p->rat );
-    mpq_set_si( p->rat,(long int)a,1 );
-}
-
-Rational::Rational( unsigned char a )
-{
-    p = new rep;
-    mpq_init( p->rat );
-    mpq_set_ui( p->rat,(unsigned long int)a,1 );
 }
 
 Rational::Rational( const Rational& a )
@@ -282,38 +240,6 @@ Rational::Rational(unsigned int a, unsigned int b)
     mpq_canonicalize(p->rat);
 }
 
-Rational::Rational(short int a, unsigned short int b)
-{
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_si(p->rat,(long int) a,(unsigned long int) b);
-    mpq_canonicalize(p->rat);
-}
-
-Rational::Rational(unsigned short int a, unsigned short int b)
-{
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_ui(p->rat,(unsigned long int) a,(unsigned long int) b);
-    mpq_canonicalize(p->rat);
-}
-
-Rational::Rational(char a, unsigned char b)
-{
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_si(p->rat,(long int) a,(unsigned long int) b);
-    mpq_canonicalize(p->rat);
-}
-
-Rational::Rational(unsigned char a, unsigned char b)
-{
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_ui(p->rat,(unsigned long int) a,(unsigned long int) b);
-    mpq_canonicalize(p->rat);
-}
-
 Rational::Rational(const Rational& a, const Rational& b)
 {
     p=new rep;
@@ -331,24 +257,6 @@ Rational::Rational(long int a, long int b)
 }
 
 Rational::Rational(int a, int b)
-{
-    if (b<0) a=-a;
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_si(p->rat,(long int) a,(unsigned long int) abs(b));
-    mpq_canonicalize(p->rat);
-}
-
-Rational::Rational(short int a, short int b)
-{
-    if (b<0) a=-a;
-    p=new rep;
-    mpq_init(p->rat);
-    mpq_set_si(p->rat,(long int) a,(unsigned long int) abs(b));
-    mpq_canonicalize(p->rat);
-}
-
-Rational::Rational(char a, char b)
 {
     if (b<0) a=-a;
     p=new rep;
@@ -383,60 +291,10 @@ Rational::~Rational()
 // ----------------------------------------------------------------------------
 //  Assignment operators
 // ----------------------------------------------------------------------------
-
-Rational& Rational::operator=(long int a)
-{
-  disconnect();
-  mpq_set_si(p->rat,a,1);
-  return *this;
-}
-
-Rational& Rational::operator=(unsigned long int a)
-{
-  disconnect();
-  mpq_set_ui(p->rat,a,1);
-  return *this;
-}
-
 Rational& Rational::operator=(int a)
 {
   disconnect();
   mpq_set_si(p->rat,(long int) a,1);
-  return *this;
-}
-
-Rational& Rational::operator=(unsigned int a)
-{
-  disconnect();
-  mpq_set_ui(p->rat,(unsigned long int) a,1);
-  return *this;
-}
-
-Rational& Rational::operator=(short int a)
-{
-  disconnect();
-  mpq_set_si(p->rat,(long int) a,1);
-  return *this;
-}
-
-Rational& Rational::operator=(unsigned short int a)
-{
-  disconnect();
-  mpq_set_ui(p->rat,(unsigned long int) a,1);
-  return *this;
-}
-
-Rational& Rational::operator=(char a)
-{
-  disconnect();
-  mpq_set_si(p->rat,(long int) a,1);
-  return *this;
-}
-
-Rational& Rational::operator=(unsigned char a)
-{
-  disconnect();
-  mpq_set_ui(p->rat,(unsigned long int) a,1);
   return *this;
 }
 
@@ -1011,125 +869,6 @@ abs(const Rational& a)
   else
     mpq_set(erg.p->rat,a.p->rat);
   return erg;
-}
-
-Rational
-sqrt(const Rational& a)
-{
-  Rational
-    erg;
-  mpz_t
-    h1,
-    h2;
-
-  mpz_init_set(h1,mpq_numref(a.p->rat));
-  mpz_init(h2);
-  mpz_set_ui(h2,1);
-  mpz_mul(h1,h1,mpq_denref(a.p->rat));
-  mpz_mul(h1,h1,mpq_denref(RAT_EPS.p->rat));
-  mpz_mul(h1,h1,mpq_denref(RAT_EPS.p->rat));
-  mpz_div(h1,h1,mpq_numref(RAT_EPS.p->rat));
-  mpz_div(h1,h1,mpq_numref(RAT_EPS.p->rat));
-  mpz_sqrt(h1,h1);
-  mpz_mul(h2,mpq_denref(a.p->rat),mpq_denref(RAT_EPS.p->rat));
-  mpz_div(h2,h2,mpq_numref(RAT_EPS.p->rat));
-  mpq_set_num(erg.p->rat,h1);
-  mpq_set_den(erg.p->rat,h2);
-  mpq_canonicalize(erg.p->rat);
-  mpz_clear(h1);
-  mpz_clear(h2);
-  return erg;
-}
-
-Rational
-exp(const Rational& a)
-{
-  Rational
-    erg(1),
-    pow(a),
-    fak(1),
-    rem,
-    i(2);
-
-  do{
-    erg+=pow/fak;
-    fak*=i++;
-    pow*=a;
-    rem=(((Rational)2)*abs(pow))/fak;
-    if (rem<RAT_EPS) break;
-  } while (true);
-  return erg;
-}
-
-Rational
-sin(const Rational& a)
-{
-  Rational
-    erg(a),
-    pow(a),
-    fak(6),
-    rem,
-    i(4),
-    aq(a);
-
-  aq*=a;
-  do {
-    pow*=-aq;
-    erg+=pow/fak;
-    fak*=i++;
-    fak*=i++;
-    rem=(abs(pow*aq))/fak;
-    if (rem<RAT_EPS) break;
-  } while(true);
-  return erg;
-}
-
-Rational
-cos(const Rational& a)
-{
-  Rational
-    erg(1),
-    pow(1),
-    fak(2),
-    rem,
-    i(3),
-    aq(a);
-
-  aq*=a;
-  do {
-    pow*=-aq;
-    erg+=pow/fak;
-    fak*=i++;
-    fak*=i++;
-    rem=(abs(pow*aq))/fak;
-    if (rem<RAT_EPS) break;
-  } while(true);
-  return erg;
-}
-
-Rational
-tan(const Rational& a)
-{
-  Rational
-    ergsin(a),
-    ergcos(1),
-    pow(a),
-    fak(2),
-    i(3),
-    rem,
-    eps2(((Rational)2)*RAT_EPS);
-
-  do{
-    pow*=a*(-1);
-    ergcos+=pow/fak;
-    pow*=a;
-    fak*=i++;
-    ergsin+=pow/fak;
-    fak*=i++;
-    rem=(abs(pow*a*a))/fak;
-    if (rem<eps2) break;
-  } while(true);
-  return ergsin/ergcos;
 }
 
 Rational gcd( const Rational &a,const Rational &b )
