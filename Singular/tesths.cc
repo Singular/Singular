@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.59 1999-05-01 15:30:45 obachman Exp $ */
+/* $Id: tesths.cc,v 1.60 1999-05-03 12:26:59 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -498,7 +498,7 @@ int main(          /* main entry to Singular */
     printf(
 "                     SINGULAR                             /"
 #ifndef MAKE_DISTRIBUTION
-"  Develeopment"
+"  Development"
 #endif
 "\n"
 " A Computer Algebra System for Polynomial Computations   /   version %s\n"

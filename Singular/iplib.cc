@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.55 1999-04-29 16:57:13 Singular Exp $ */
+/* $Id: iplib.cc,v 1.56 1999-05-03 12:26:58 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -809,6 +809,7 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     {
       Werror(yylp_errlist[yylp_errno], *text_buffer, yylplineno);
       FreeL((ADDRESS)text_buffer);
+      text_buffer=NULL;
     }
     else
       Werror(yylp_errlist[yylp_errno], yylplineno);
