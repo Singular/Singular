@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.62 1999-09-22 14:49:37 obachman Exp $ */
+/* $Id: iplib.cc,v 1.63 1999-09-22 14:58:36 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -794,19 +794,20 @@ static void iiCleanProcs(idhdl &root)
     if (root==NULL) return;
     if (IDTYP(root)==PROC_CMD)
     {
-      procinfo pi=(procinfo)IDDATA(root);
+      procinfo *pi=(procinfo*)IDDATA(root);
       if ((pi->language == LANG_SINGULAR)
       && (pi->data.s.body_start == 0L))
       {
         // procinfo data incorrect:
         // - no proc body can start at the beginning of the file
-        killhdl(&root);
+        killhdl(root);
       }
       continue;
     }
     root=IDNEXT(root);
   }
 }
+#endif
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
              idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
