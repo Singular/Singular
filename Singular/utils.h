@@ -1,0 +1,50 @@
+/*
+ */
+
+class procinfo;
+typedef procinfo *         procinfov;
+
+class proc_singular
+{
+public:
+  long   proc_start;       // position where proc is starting
+  long   def_end;          // position where proc header is ending
+  long   help_start;       // position where help is starting
+  long   body_start;       // position where proc-body is starting
+  long   body_end;         // position where proc-body is ending
+  long   example_start;    // position where example is starting
+  long   proc_end;         // position where proc is ending
+  int    proc_lineno;
+  int    body_lineno;
+  int    example_lineno;
+  char   *body;
+};
+
+struct proc_object
+{
+  int (*function)( void );
+};
+
+union uprocinfodata;
+
+union uprocinfodata
+{
+public:
+  proc_singular  s;        // data of Singular-procedure
+  struct proc_object    o; // pointer to binary-function
+};
+
+typedef union uprocinfodata procinfodata;
+
+typedef enum { LANG_NONE, LANG_SINGULAR, LANG_C } language_defs;
+
+class procinfo
+{
+public:
+  char          *libname;
+  char          *procname;
+  language_defs language;
+  short         ref;
+  char          is_static;        // if set, proc not accessible for user
+  procinfodata  data;
+};
