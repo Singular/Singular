@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.36 1999-07-14 13:16:05 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.37 1999-09-13 08:16:20 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -647,7 +647,7 @@ void redMoraBest (LObject* h,kStrategy strat)
 * element in T with respect to the given ecart
 * used for computing normal forms outside kStd
 */
-static poly redMoraNF (poly h,kStrategy strat)
+static poly redMoraNF (poly h,kStrategy strat, int flag)
 {
   poly pi;
   LObject H;
@@ -658,7 +658,7 @@ static poly redMoraNF (poly h,kStrategy strat)
   H.p = h;
   o = pFDeg(h);
   H.ecart = pLDeg(H.p,&H.length)-o;
-  cancelunit(&H);
+  if (flag==0) cancelunit(&H);
   loop
   {
     if (j > strat->tl)
@@ -1510,7 +1510,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   strat->sl = -1;
   /*- init local data struct.-------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
-  if (lazyReduce==0)
+  if ((lazyReduce & 1)==0)
   {
     for (i=strat->sl; i>=0; i--)
       pNorm(strat->S[i]);
@@ -1527,8 +1527,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   p = pCopy(q);
   deleteHC(&p,&o,&j,strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
-  if (p!=NULL) p = redMoraNF(p,strat);
-  if ((p!=NULL)&&(lazyReduce==0))
+  if (p!=NULL) p = redMoraNF(p,strat, lazyReduce & 2);
+  if ((p!=NULL)&&((lazyReduce & 1)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
     p = redtail(p,strat->sl,strat);
@@ -1606,7 +1606,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   strat->sl = -1;
   /*- init local data struct.-------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
-  if (TEST_OPT_INTSTRATEGY && (lazyReduce==0))
+  if (TEST_OPT_INTSTRATEGY && ((lazyReduce & 1)==0))
   {
     for (i=strat->sl; i>=0; i--)
       pNorm(strat->S[i]);
@@ -1630,8 +1630,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
           enterT(h,strat);
         }
         if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
-        p = redMoraNF(p,strat);
-        if ((p!=NULL)&&(lazyReduce==0))
+        p = redMoraNF(p,strat, lazyReduce & 2);
+        if ((p!=NULL)&&((lazyReduce & 1)==0))
         {
           if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
           p = redtail(p,strat->sl,strat);
