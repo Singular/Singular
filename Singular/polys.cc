@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.30 1998-06-12 17:41:33 obachman Exp $ */
+/* $Id: polys.cc,v 1.31 1998-09-01 09:20:42 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1546,7 +1546,7 @@ poly pMultCopyN(poly a, number c)
     pGetCoeff(result)=nMult(pGetCoeff(a),c);
     pIter(a);
     hp=result;
-    while (a)
+    while (a!=NULL)
     {
       hp=pNext(hp)=pNew();
       pCopy2(hp,a);
