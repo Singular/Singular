@@ -865,7 +865,7 @@ static void heEmacsHelp(heEntry hentry)
   Warn("C-h C-s %s",
        (hentry != NULL && *(hentry->node) != '\0' ? hentry->node : "Top"));
   Warn("to enter the Singular online help. For general");
-  Warn("information on Singular running under Emacs, type C-h m");
+  Warn("information on Singular running under Emacs, type C-h m.");
 }
 static BOOLEAN heBuiltinInit(int warn)
 {
