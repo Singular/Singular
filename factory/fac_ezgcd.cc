@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.12 1998-09-23 17:07:45 schmidt Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.13 2001-01-23 17:41:52 Singular Exp $ */
 
 #include <config.h>
 
@@ -151,7 +151,7 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
     DEBOUTLN( cerr, "ezgcd: special case" );
     CanonicalForm Ft, Gt, L, LL, Fb, Gb, Db, Lb, D, Ds, Dt, d;
     CFArray DD( 1, 2 ), lcDD( 1, 2 );
-    Variable x = Variable( 1 );
+    Variable x = F.mvar();
     bool gcdfound;
 
     Dt = 1;
