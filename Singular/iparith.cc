@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.295 2003-04-03 13:22:00 Singular Exp $ */
+/* $Id: iparith.cc,v 1.296 2003-04-09 11:24:35 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5846,7 +5846,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
           }
           else if (dArith2[i].valid_for_plural==COMM_PLURAL)
           {
-            Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+            Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
           }
           /* else ALLOW_PLURAL */
         }
@@ -5889,7 +5889,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
               }
               else if (dArith2[i].valid_for_plural==COMM_PLURAL)
               {
-                Warn("assume commutative subalgebra for cmd `%s`,
+                Warn("assume commutative subalgebra for cmd `%s`",
                       Tok2Cmdname(i));
               }
               /* else ALLOW_PLURAL */
@@ -6023,7 +6023,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           }
           else if (dArith1[i].valid_for_plural==COMM_PLURAL)
           {
-            Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+            Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
           }
           /* else ALLOW_PLURAL */
         }
@@ -6074,7 +6074,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
             }
             else if (dArith1[i].valid_for_plural==COMM_PLURAL)
             {
-              Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+              Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
             }
             /* else ALLOW_PLURAL */
           }
@@ -6203,7 +6203,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
             }
             else if (dArith3[i].valid_for_plural==COMM_PLURAL)
             {
-              Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+              Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
             }
             /* else ALLOW_PLURAL */
         }
@@ -6249,7 +6249,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
                  }
                  else if (dArith3[i].valid_for_plural==COMM_PLURAL)
                  {
-                   Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+                   Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
                  }
                  /* else ALLOW_PLURAL */
               }
@@ -6435,7 +6435,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
           }
           else if (dArithM[i].valid_for_plural==COMM_PLURAL)
           {
-            Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+            Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
           }
           /* else ALLOW_PLURAL */
         }
