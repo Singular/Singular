@@ -1,3 +1,7 @@
+2000-05-19  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
+
+	* singular.el (singular-exec): Remove empty strings from SWITCHES
+
 1999-12-06  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
 
 	* singular.el (singular-internal): Removed bug: Adding of trailing
