@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.8 1997-08-01 11:45:54 schmidt Exp $ */
+/* $Id: cf_map.cc,v 1.9 1997-09-08 11:08:40 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -19,6 +19,72 @@
 #else
 #include "templates/ftmpl_functions.h"
 #endif
+
+//{{{ MapPair & MapPair::operator = ( const MapPair & p )
+//{{{ docu
+//
+// MapPair::operator = - assignment operator.
+//
+//}}}
+MapPair &
+MapPair::operator = ( const MapPair & p )
+{
+    if ( this != &p ) {
+	V = p.V;
+	S = p.S;
+    }
+    return *this;
+}
+//}}}
+
+#ifndef NOSTREAMIO
+//{{{ ostream & operator << ( ostream & s, const MapPair & p )
+//{{{ docu
+//
+// operator << - print a map pair ("V -> S").
+//
+//}}}
+ostream &
+operator << ( ostream & s, const MapPair & p )
+{
+    s << p.var() << " -> " << p.subst();
+    return s;
+}
+//}}}
+#endif /* NOSTREAMIO */
+
+//{{{ CFMap::CFMap ( const CFList & L )
+//{{{ docu
+//
+// CFMap::CFMap() - construct a CFMap from a CFList.
+//
+// Variable[i] will be mapped to CFList[i] under the resulting
+// map.
+//
+//}}}
+CFMap::CFMap ( const CFList & L )
+{
+    CFListIterator i;
+    int j;
+    for ( i = L, j = 1; i.hasItem(); i++, j++ )
+	P.insert( MapPair( Variable(j), i.getItem() ) );
+}
+//}}}
+
+//{{{ CFMap & CFMap::operator = ( const CFMap & m )
+//{{{ docu
+//
+// CFMap::operator = - assignment operator.
+//
+//}}}
+CFMap &
+CFMap::operator = ( const CFMap & m )
+{
+    if ( this != &m )
+	P = m.P;
+    return *this;
+}
+//}}}
 
 //{{{ static int cmpfunc ( const MapPair & p1, const MapPair & p2 )
 //{{{ docu
@@ -44,7 +110,7 @@ cmpfunc ( const MapPair & p1, const MapPair & p2 )
 // insfunc() - assign newp to orgp.
 //
 // cmpfunc() and insfunc() are used as functions for inserting a
-// map pair into a Map.
+// map pair into a map by CFMap::newpair().
 //
 //}}}
 static void
@@ -54,7 +120,20 @@ insfunc ( MapPair & orgp, const MapPair & newp )
 }
 //}}}
 
-//{{{ static CanonicalForm subsrec( const CanonicalForm & f, const MPListIterator & i )
+//{{{ void CFMap::newpair ( const Variable & v, const CanonicalForm & s )
+//{{{ docu
+//
+// CFMap::newpair() - insert a MapPair into a CFMap.
+//
+//}}}
+void
+CFMap::newpair ( const Variable & v, const CanonicalForm & s )
+{
+    P.insert( MapPair( v, s ), cmpfunc, insfunc );
+}
+//}}}
+
+//{{{ static CanonicalForm subsrec ( const CanonicalForm & f, const MPListIterator & i )
 //{{{ docu
 //
 // subsrec() - recursively apply the substitutions in i to f.
@@ -62,9 +141,11 @@ insfunc ( MapPair & orgp, const MapPair & newp )
 // Substitutes algebraic variables, too.  The substituted
 // expression are not subject to further substitutions.
 //
+// Used by: CFMap::operator ()().
+//
 //}}}
 static CanonicalForm
-subsrec( const CanonicalForm & f, const MPListIterator & i )
+subsrec ( const CanonicalForm & f, const MPListIterator & i )
 {
     if ( f.inBaseDomain() ) return f;
     MPListIterator j = i;
@@ -99,89 +180,10 @@ subsrec( const CanonicalForm & f, const MPListIterator & i )
 }
 //}}}
 
-//{{{ MapPair& MapPair::operator = ( const MapPair & p )
-//{{{ docu
-//
-// MapPair::operator = - assignment operator.
-//
-//}}}
-MapPair&
-MapPair::operator = ( const MapPair & p )
-{
-    if ( this != &p ) {
-	V = p.V;
-	S = p.S;
-    }
-    return *this;
-}
-//}}}
-
-#ifndef NOSTREAMIO
-//{{{ ostream& operator << ( ostream& s, const MapPair & p )
-//{{{ docu
-//
-// operator << - print a map pair ("V -> S").
-//
-//}}}
-ostream&
-operator << ( ostream& s, const MapPair & p )
-{
-    s << p.var() << " -> " << p.subst();
-    return s;
-}
-//}}}
-#endif /* NOSTREAMIO */
-
-//{{{ CFMap::CFMap ( const CFList & L )
-//{{{ docu
-//
-// CFMap::CFMap() - construct a CFMap from a CFList.
-//
-// Variable[i] will be mapped to CFList[i] under the resulting
-// map.
-//
-//}}}
-CFMap::CFMap ( const CFList & L )
-{
-    CFListIterator i;
-    int j;
-    for ( i = L, j = 1; i.hasItem(); i++, j++ )
-	P.insert( MapPair( Variable(j), i.getItem() ) );
-}
-//}}}
-
-//{{{ CFMap& CFMap::operator = ( const CFMap & m )
-//{{{ docu
-//
-// CFMap::operator = - assignment operator.
-//
-//}}}
-CFMap&
-CFMap::operator = ( const CFMap & m )
-{
-    if ( this != &m )
-	P = m.P;
-    return *this;
-}
-//}}}
-
-//{{{ void CFMap::newpair( const Variable & v, const CanonicalForm & s )
-//{{{ docu
-//
-// CFMap::newpair() - inserts a MapPair into a CFMap.
-//
-//}}}
-void
-CFMap::newpair( const Variable & v, const CanonicalForm & s )
-{
-    P.insert( MapPair( v, s ), cmpfunc, insfunc );
-}
-//}}}
-
 //{{{ CanonicalForm CFMap::operator () ( const CanonicalForm & f ) const
 //{{{ docu
 //
-// CFMap::operator () - apply the map to f.
+// CFMap::operator () - apply CO to f.
 //
 // See subsrec() for more detailed information.
 //
@@ -195,14 +197,14 @@ CFMap::operator () ( const CanonicalForm & f ) const
 //}}}
 
 #ifndef NOSTREAMIO
-//{{{ ostream& operator << ( ostream& s, const CFMap & m )
+//{{{ ostream & operator << ( ostream & s, const CFMap & m )
 //{{{ docu
 //
 // operator << - print a CFMap ("( V[1] -> S[1], ..., V[n] -> // S[n] )".
 //
 //}}}
-ostream&
-operator << ( ostream& s, const CFMap & m )
+ostream &
+operator << ( ostream & s, const CFMap & m )
 {
     return s << m.P;
 }
