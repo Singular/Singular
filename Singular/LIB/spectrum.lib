@@ -1,7 +1,7 @@
-// $Id: spectrum.lib,v 1.2 1999-11-25 11:40:00 Singular Exp $
+// $Id: spectrum.lib,v 1.3 1999-11-25 15:37:35 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: spectrum.lib,v 1.2 1999-11-25 11:40:00 Singular Exp $";
+version="$Id: spectrum.lib,v 1.3 1999-11-25 15:37:35 obachman Exp $";
 info="
 LIBRARY:  spectrum.lib   PROCEDURES FOR COMPUTING SPECTRA
 
@@ -21,7 +21,7 @@ EXAMPLE: example spectrum; shows examples
 {
   if(size(#)==0)
   {  return(system("spectrum",f)); }
-  return (system("spectrum",f,#[1]);
+  return (system("spectrum",f,#[1]));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -36,7 +36,7 @@ EXAMPLE: example semic; shows examples
 {
   if(size(#)==0)
   {  return(system("semic",s,ss)); }
-  return (system("semic",s,ss,#[1]);
+  return (system("semic",s,ss,#[1]));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -48,7 +48,7 @@ RETURN:  int
 EXAMPLE: example semicsqh; shows examples
 "
 {
-  return (system("semic",s,ss,1);
+  return (system("semic",s,ss,1));
 }
 example
 { "EXAMPLE:"; echo = 2;
