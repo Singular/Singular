@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.1 1997-08-29 07:40:05 schmidt Exp $ */
+/* $Id: cf_algorithm.h,v 1.2 1997-08-29 08:40:35 schmidt Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -13,13 +13,14 @@
 // on canonical forms (factorization, gcd, etc.).
 //
 // This header file corresponds to:
-// cf_chinese.cc
+// cf_chinese.cc, cf_factor.cc
 //
 //}}}
 
 #include <config.h>
 
 #include "canonicalform.h"
+#include "variable.h"
 
 /*BEGINPUBLIC*/
 
@@ -27,6 +28,16 @@
 void chineseRemainder( const CanonicalForm x1, const CanonicalForm q1, const CanonicalForm x2, const CanonicalForm q2, CanonicalForm & xnew, CanonicalForm & qnew );
 
 void chineseRemainder( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew );
+//}}}
+
+//{{{ declarations from cf_factor.cc
+CFFList factorize ( const CanonicalForm & f, bool issqrfree = false );
+
+CFFList factorize ( const CanonicalForm & f, const Variable & alpha );
+
+CFFList sqrFree ( const CanonicalForm & f, bool sort = false );
+
+bool isSqrFree ( const CanonicalForm & f );
 //}}}
 
 /*ENDPUBLIC*/
