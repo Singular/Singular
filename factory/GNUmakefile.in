@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.14 1997-09-04 15:18:09 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.15 1997-09-29 15:09:31 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -330,10 +330,10 @@ distfiles :=	\
 	$(CC) -c $< $(LIBCFLAGS) -o $@
 
 # how to create dependency files
-%.d: %.cc config.h
+%.d: %.cc config.h factoryconf.h
 	echo $@ "\\" > $@
 	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@
-%.d: %.c config.h
+%.d: %.c config.h factoryconf.h
 	echo $@ "\\" > $@
 	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@
 %.d: %.template
