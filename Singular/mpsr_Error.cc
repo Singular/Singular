@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Error.cc,v 1.7 1999-04-09 12:14:56 Singular Exp $ */
+/* $Id: mpsr_Error.cc,v 1.8 1999-07-15 16:17:10 Singular Exp $ */
 
 /***************************************************************
  *
@@ -42,7 +42,7 @@ char *mpsr_errlist[] =
 
 
 static mpsr_Status_t mpsr_errno = mpsr_Success;
-static mpsr_MP_errno = MP_Failure;
+static MP_Errors mpsr_MP_errno = MP_Failure;
 
 mpsr_Status_t mpsr_SetError(mpsr_Status_t error)
 {
