@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.297 2003-04-09 14:44:29 Singular Exp $ */
+/* $Id: iparith.cc,v 1.298 2003-04-09 20:43:09 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2426,8 +2426,8 @@ struct sValCmd2 dArith2[]=
 ,{jjJET_P,     JET_CMD,        VECTOR_CMD,     VECTOR_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjJET_ID,    JET_CMD,        MODUL_CMD,      MODUL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjJET_ID,    JET_CMD,        MATRIX_CMD,     MATRIX_CMD,  INT_CMD ALLOW_PLURAL}
-,{jjKBASE2,    KBASE_CMD,      IDEAL_CMD,      IDEAL_CMD,  INT_CMD NO_PLURAL}
-,{jjKBASE2,    KBASE_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD NO_PLURAL}
+,{jjKBASE2,    KBASE_CMD,      IDEAL_CMD,      IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
+,{jjKBASE2,    KBASE_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{atKILLATTR2, KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD ALLOW_PLURAL}
 ,{jjKoszul,    KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    INT_CMD NO_PLURAL}
 ,{jjKoszul_Id, KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    IDEAL_CMD NO_PLURAL}
@@ -2445,8 +2445,8 @@ struct sValCmd2 dArith2[]=
 ,{jjMONITOR2,  MONITOR_CMD,    NONE,           STRING_CMD, STRING_CMD ALLOW_PLURAL}
 //,{jjRES,       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD NO_PLURAL}
 //,{jjRES,       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD NO_PLURAL}
-,{jjRES,       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD NO_PLURAL}
-,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD NO_PLURAL}
+,{jjRES,       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
+,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjPRINT_FORMAT, PRINT_CMD,   ANY_TYPE,       DEF_CMD,    STRING_CMD ALLOW_PLURAL}
@@ -3727,8 +3727,8 @@ struct sValCmd1 dArith1[]=
 ,{jjIS_RINGVAR0,IS_RINGVAR,      INT_CMD,        ANY_TYPE       ALLOW_PLURAL}
 ,{jjJACOB_P,    JACOB_CMD,       IDEAL_CMD,      POLY_CMD       ALLOW_PLURAL}
 ,{mpJacobi,     JACOB_CMD,       MATRIX_CMD,     IDEAL_CMD      ALLOW_PLURAL}
-,{jjKBASE,      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD      NO_PLURAL}
-,{jjKBASE,      KBASE_CMD,       MODUL_CMD,      MODUL_CMD      NO_PLURAL}
+,{jjKBASE,      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
+,{jjKBASE,      KBASE_CMD,       MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
 ,{atKILLATTR1,  KILLATTR_CMD,    NONE,           IDHDL          ALLOW_PLURAL}
 #ifdef MDEBUG
 ,{jjpHead,      LEAD_CMD,        POLY_CMD,       POLY_CMD       ALLOW_PLURAL}
@@ -4661,8 +4661,8 @@ struct sValCmd3 dArith3[]=
 ,{jjMINOR3,         MINOR_CMD,  IDEAL_CMD,  MATRIX_CMD, INT_CMD,    IDEAL_CMD NO_PLURAL}
 ,{jjCALL3MANY,      MODUL_CMD,  MODUL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 #ifdef OLD_RES
-,{jjRES3,           MRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE NO_PLURAL}
-,{jjRES3,           MRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE NO_PLURAL}
+,{jjRES3,           MRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE ALLOW_PLURAL}
+,{jjRES3,           MRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE ALLOW_PLURAL}
 #endif
 ,{jjLIFT3,          LIFT_CMD,   MATRIX_CMD, IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD NO_PLURAL}
 ,{jjLIFT3,          LIFT_CMD,   MATRIX_CMD, MODUL_CMD,  MODUL_CMD,  MATRIX_CMD NO_PLURAL}
@@ -5844,7 +5844,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
             Werror("not implemented for non-commutative rings");
             break;
           }
-          else if (dArith2[i].valid_for_plural==COMM_PLURAL)
+          else if (dArith2[i].valid_for_plural==2 /* COMM_PLURAL */)
           {
             Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
           }
@@ -5887,7 +5887,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
                 Werror("not implemented for non-commutative rings");
                 break;
               }
-              else if (dArith2[i].valid_for_plural==COMM_PLURAL)
+              else if (dArith2[i].valid_for_plural==2 /* COMM_PLURAL */)
               {
                 Warn("assume commutative subalgebra for cmd `%s`",
                       Tok2Cmdname(i));
@@ -6021,7 +6021,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
             Werror("not implemented for non-commutative rings");
             break;
           }
-          else if (dArith1[i].valid_for_plural==COMM_PLURAL)
+          else if (dArith1[i].valid_for_plural==2 /* COMM_PLURAL */)
           {
             Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
           }
@@ -6072,7 +6072,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
               Werror("not implemented for non-commutative rings");
               break;
             }
-            else if (dArith1[i].valid_for_plural==COMM_PLURAL)
+            else if (dArith1[i].valid_for_plural==2 /* COMM_PLURAL */)
             {
               Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
             }
@@ -6201,7 +6201,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
               Werror("not implemented for non-commutative rings");
               break;
             }
-            else if (dArith3[i].valid_for_plural==COMM_PLURAL)
+            else if (dArith3[i].valid_for_plural==2 /* COMM_PLURAL */)
             {
               Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
             }
@@ -6247,7 +6247,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
                    Werror("not implemented for non-commutative rings");
                    break;
                  }
-                 else if (dArith3[i].valid_for_plural==COMM_PLURAL)
+                 else if (dArith3[i].valid_for_plural==2 /* COMM_PLURAL */)
                  {
                    Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
                  }
@@ -6433,7 +6433,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
             Werror("not implemented for non-commutative rings");
             break;
           }
-          else if (dArithM[i].valid_for_plural==COMM_PLURAL)
+          else if (dArithM[i].valid_for_plural==2 /* COMM_PLURAL */)
           {
             Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
           }
