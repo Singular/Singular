@@ -1,55 +1,64 @@
+//(GMG, last modified 16.12.00)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.7 2000-12-15 12:08:46 Singular Exp $";
+version="$Id: ntsolve.lib,v 1.8 2000-12-16 01:14:43 greuel Exp $";
 info="
-LIBRARY: ntsolve.lib ONE REAL SOLUTION OF POLYNOMIAL SYSTEMS (NEWTON ITERATION)
-AUTHORS:  Wilfred Pohl,   email: pohl@mathematik.uni-kl.de
+LIBRARY:  ntsolve.lib     REAL NEWTON SOLVING OF POLYNOMIAL SYSTEMS
+AUTHORS:  Wilfred Pohl, email: pohl@mathematik.uni-kl.de
           Dietmar Hillebrand
 
 PROCEDURES:
-nt_solve(G,..);        find one real root of 0-dimensional ideal G
-triMNewton(G,..);      find one real root for 0-dim. triangular system G
+ nt_solve(G,..);        find one real root of 0-dimensional ideal G
+ triMNewton(G,..);      find one real root for 0-dim triangular system G
 ";
+
 ///////////////////////////////////////////////////////////////////////////////
 
-proc nt_solve( ideal gls, ideal ini, intvec ipar )
-"USAGE:   nt_solve(gls,ini,ipar);
-         gls: the equations
-         ini: the ideal of initial values
-         ipar: control
-           ipar[1] - max. number of iterations
-           ipar[2] - accuracy, have the l2-norm ||.||
-                     for the initial error eps0 = ||gls(ini)||
-                     accept solution sol with
-                     ||gls(sol)|| <  eps0*(0.1^ipar[2])
-           ipar[3] - some output for contol if != 0
-           defaults - 100, 10, 0
-ASSUME:  gls is a zerodimensional ideal with
-         nvars(basering) = size(gls) (> 1)
-RETURN:  ideal of one solution (if found)
-         0 (else)
+proc nt_solve (ideal gls, ideal ini, list #)
+"USAGE:   nt_solve(gls,ini[,ipar]); gls ideal, ini ideal, ipar list or intvec
+         gls: contains the equations, for which a solution will be computed
+         ini: ideal of initial values (approximate solutions to start with)
+         ipar: control integers (default: ipar = 100,10)
+         ipar[1] - max. number of iterations
+         ipar[2] - accuracy (we have the l_2-norm ||.||): accept solution 
+         sol if ||gls(sol)|| < eps0*(0.1^ipar[2]) where eps0 = ||gls(ini)|| 
+         is the initial error
+ASSUME:  gls is a zerodimensional ideal with nvars(basering) = size(gls) (>1)
+RETURN:  ideal, coordinates of one solution (if found), 0 else
+NOTE:    printlevel >0: displays comments (default =0)
 EXAMPLE: example nt_solve; shows an example
 "
 {
     def rn = basering;
     int di = size(gls);
     if (nvars(basering) != di){
-      ERROR("wrong dimension");}
+      ERROR("// wrong number of equations");}
     if (size(ini) != di){
-      ERROR("wrong number of initial values");}
+      ERROR("// wrong number of initial values");}
     int prec = system("getPrecDigits"); // precision
 
     int i1,i2,i3;
-    i1 = size(ipar);
-    int itmax, acc, prot;
+    int itmax, acc;
+    intvec ipar;
+    if ( size(#)>0 ){
+       i1=1;
+       if (typeof(#[1])=="intvec") {ipar=#[1];}
+       if (typeof(#[1])=="int") {ipar[1]=#[1];}
+       if ( size(#)>1 ){
+          i1=2;
+          if (typeof(#[2])=="int") {ipar[2]=#[2];}
+       }
+    }
+
+    int prot = printlevel-voice+2;  // prot=printlevel (default:prot=0)
     if (i1 < 1){itmax = 100;}else{itmax = ipar[1];}
     if (i1 < 2){acc = prec/2;}else{acc = ipar[2];}
-    if (i1 < 3){prot = 0;}else{prot = ipar[3];}
     if ((acc <= 0)||(acc > prec-1)){acc = prec-1;}
 
     int dpl = di+1;
-    string out; // for prot != 0 and more
+    string out; 
     out = "ring rnewton=(real,prec),("+varstr(basering)+"),(c,dp);";
     execute(out);
+
     ideal gls1=imap(rn,gls);
     module nt,sub;
     sub = transpose(jacob(gls1));
@@ -57,7 +66,8 @@ EXAMPLE: example nt_solve; shows an example
       if(sub[i1]==0){break;}}
     if (i1>0){
       setring rn; kill rnewton;
-      ERROR("one var not in equation");}
+      ERROR("// one var not in equation");}
+
     list direction;
     ideal ini1;
     ini1 = imap(rn,ini);
@@ -65,22 +75,24 @@ EXAMPLE: example nt_solve; shows an example
     genau = 0.1;
     dum = genau;
     genau = genau^acc;
+
     for (i1=di;i1>0;i1--){
       sub[i1]=sub[i1]+gls1[i1]*gen(dpl);}
     nt = sub;
     for (i1=di;i1>0;i1--){
       nt = subst(nt,var(i1),ini1[i1]);}
+
     // now we have in sub the general structure
     // and in nt the structure with subst. vars
 
     // compute initial error
     y1 = ml2norm(nt,genau);
-    if(prot){out=" initial error = "+string(y1);out;}
+    dbprint(prot,"// initial error = "+string(y1)); 
     y2 = genau*y1;
 
   // begin of iteration
   for(i3=1;i3<=itmax;i3++){
-    if(prot){out="  Nr. "+string(i3);out;}
+     dbprint(prot,"// iteration: "+string(i3)); 
 
     // find newton direction
     direction=bareiss(nt,1,-1);
@@ -94,7 +106,7 @@ EXAMPLE: example nt_solve; shows an example
         dum = 1.0;
       }
     }
-    if(prot){out="  dumping = "+string(dum);out;}
+    dbprint(prot,"// dumping = "+string(dum));
 
     // new value
     for(i1=di;i1>0;i1--){
@@ -103,12 +115,12 @@ EXAMPLE: example nt_solve; shows an example
     for (i1=di;i1>0;i1--){
       nt = subst(nt,var(i1),ini1[i1]);}
     y1 = ml2norm(nt,genau);
-    if(prot){out="  error = "+string(y1);out;}
+    dbprint(prot,"// error = "+string(y1));
     if(y1<y2){break;} // we are ready
   }
 
     if (y1>y2){
-      "WARNING: no convergence";}
+      "// ** WARNING: iteration bound reached with error > error bound!";}
     setring rn;
     ini = imap(rnewton,ini1);
     kill rnewton;
@@ -120,7 +132,7 @@ example
     ring rsq = (real,40),(x,y,z,w),lp;
     ideal gls =  x2+y2+z2-10, y2+z3+w-8, xy+yz+xz+w5 - 1,w3+y;
     ideal ini = 3.1,2.9,1.1,0.5;
-    intvec ipar = 200,0,1;
+    intvec ipar = 200,0;
     ideal sol = nt_solve(gls,ini,ipar);
     sol;
 }
@@ -233,39 +245,48 @@ number z1, number tt, number gg)
   return(ss);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
-// solver.lib                                                                //
-// algorithms for solving algebraic system of dimension zero                 //
-// written by Dietmar Hillebrand and ...                                     //
-//                                                                           //
-///////////////////////////////////////////////////////////////////////////////
-
-
-
-///////////////////////////////////////////////////////////////////////////////
 //
 //   Multivariate Newton for triangular systems
-//
-//
+//   algorithms for solving algebraic system of dimension zero
+//   written by Dietmar Hillebrand
 ///////////////////////////////////////////////////////////////////////////////
 
-proc triMNewton (ideal G, list a, number err, int itb)
-"USAGE:  triMNewtion(G,a,err,itb);
-             ideal G=g1,..,gn, a triangular system
-                 in n vars, i.e gi=gi(var(n-i+1),..,var(n));
-             list of numbers a, an approximation of a common zero of G,
-                 (a[i] to be substituted in var(i));
-             number err, an error bound;
-             int itb, the maximal number of iterations performed.
-RETURN:  an improved approximation for a common zero of G;
+proc triMNewton (ideal G, ideal a, list #)
+"USAGE:  triMNewton(G,a[,ipar]); G ideal, a ideal, ipar list or intvec
+ASSUME:  G:   g1,..,gn, a triangular system of n equations in n vars, 
+              i.e gi=gi(var(n-i+1),..,var(n))
+         a:   ideal of numbers, coordinates of an approximation of a common 
+              zero of G to start with (with a[i] to be substituted in var(i))
+         ipar: control integer vector (default: ipar = 100,10)
+         ipar[1] - max. number of iterations
+         ipar[2] - accuracy (we have as norm |.| absolute value ): 
+         accept solution  sol if |G(sol)| < |G(a)|*(0.1^ipar[2])
+         itb: int, the maximal number of iterations performed
+         err: number, an error bound
+RETURN:  an ideal, coordinates of a better approximation of a zero of G
 EXAMPLE: example triMNewton; shows an example
 "
 {
+    int prot = printlevel;
+    int i1,i2,i3;
+    intvec ipar;
+    if ( size(#)>0 ){
+       i1=1;
+       if (typeof(#[1])=="intvec") {ipar=#[1];}
+       if (typeof(#[1])=="int") {ipar[1]=#[1];}
+       if ( size(#)>1 ){
+          i1=2;
+          if (typeof(#[2])=="int") {ipar[2]=#[2];}
+       }
+    }
+    int itb, err;
+    if (i1 < 1) {itb = 100;} else {itb = ipar[1];}
+    if (i1 < 2) {err = 10;} else {err = ipar[2];}
+  
     if (itb == 0)
     {
-        dbprint("iteration bound performed!");
-        return(a);
+       dbprint(prot,"// ** iteration bound reached with error > error bound!");
+       return(a);
     }
 
     int i,j,k;
@@ -288,7 +309,7 @@ EXAMPLE: example triMNewton; shows an example
         }
         if (J[i,n-i+1] == 0)
         {
-            print("Error: ideal not radical!");
+            ERROR("// ideal not radical");
             return();
         }
 
@@ -303,7 +324,7 @@ EXAMPLE: example triMNewton; shows an example
 
     for (i = 1; i <= n; i++)
     {
-        if ( abs(h[i]) > err)
+        if ( abs(h[i]) > (1/10)^err)
         {
             fertig = 0;
             break;
@@ -311,11 +332,17 @@ EXAMPLE: example triMNewton; shows an example
     }
     if ( not fertig )
     {
+        if (prot > 0)
+        {
+           "// error:"; print(abs(h[i]));
+           "// iterations to be performed: "+string(itb);
+        }
         for (i = 1; i <= n; i++)
         {
             a[i] = a[i] + h[i];
         }
-        return(triMNewton(G,a,err,itb-1));
+        ipar = itb-1,err;
+        return(triMNewton(G,a,ipar));
     }
     else
     {
@@ -324,17 +351,14 @@ EXAMPLE: example triMNewton; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=real,(z,y,x),(lp);
-   ideal i=x^2-1,y^2+x4-3,z2-y4+x-1;
-   list a=2,3,4;
-   number e=1.0e-10;
-
-   list l = triMNewton(i,a,e,20);
+   ring r = (real,30),(z,y,x),(lp);
+   ideal i = x^2-1,y^2+x4-3,z2-y4+x-1;
+   ideal a = 2,3,4;
+   intvec e = 20,10;
+   ideal l = triMNewton(i,a,e);
    l;
 }
-
-
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 static proc abs( number r)
 {
@@ -347,4 +371,5 @@ static proc abs( number r)
        return(-r);
    }
 }
+///////////////////////////////////////////////////////////////////////////////
 
