@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.12 1999-11-15 17:20:05 obachman Exp $ */
+/* $Id: hutil.cc,v 1.13 2000-02-22 18:06:57 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -66,14 +66,14 @@ scfmon hInit(ideal S, ideal Q, int *Nexist)
   ss = si;
   for (i = sl; i; i--)
   {
-    if (*ss)
+    if (*ss!=0)
       k++;
     ss++;
   }
   ss = qi;
   for (i = ql; i; i--)
   {
-    if (*ss)
+    if (*ss!=0)
       k++;
     ss++;
   }
@@ -94,7 +94,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist)
   }
   for (i = ql; i; i--)
   {
-    if (*qi)
+    if (*qi!=NULL)
     {
       *ek = (Exponent_t*) Alloc((pVariables+1)*sizeof(Exponent_t));
       pGetExpV(*qi, *ek);
@@ -404,16 +404,16 @@ void hRadical(scfmon rad, int *Nrad, int Nvar)
   i = 0;
   j = 1;
   n = rad[j];
-  o = *rad;
+  o = rad[0];
   k = Nvar;
   loop
   {
-    if (o[k] && !n[k])
+    if ((o[k]!=0) && (n[k]==0))
     {
       loop
       {
         k--;
-        if (!k)
+        if (k==0)
         {
           rad[i] = NULL;
           z++;
@@ -421,7 +421,7 @@ void hRadical(scfmon rad, int *Nrad, int Nvar)
         }
         else
         {
-          if (!o[k] && n[k])
+          if ((o[k]==0) && (n[k]!=0))
             break;
         }
       }
@@ -496,7 +496,7 @@ void hLexS(scfmon stc, int Nstc, varset var, int Nvar)
     return;
   int  j = 1, i = 0;
   scmon n = stc[j];
-  scmon o = *stc;
+  scmon o = stc[0];
   int k = Nvar;
   loop
   {
@@ -515,7 +515,7 @@ void hLexS(scfmon stc, int Nstc, varset var, int Nvar)
         if (j < Nstc)
         {
           i = 0;
-          o = *stc;
+          o = stc[0];
           n = stc[j];
           k = Nvar;
         }
@@ -533,7 +533,7 @@ void hLexS(scfmon stc, int Nstc, varset var, int Nvar)
       if (j < Nstc)
       {
         i = 0;
-        o = *stc;
+        o = stc[0];
         n = stc[j];
         k = Nvar;
       }
@@ -553,7 +553,7 @@ void hLexR(scfmon rad, int Nrad, varset var, int Nvar)
   if (Nrad < 2)
     return;
   n = rad[j];
-  o = *rad;
+  o = rad[0];
   k = Nvar;
   loop
   {
@@ -572,7 +572,7 @@ void hLexR(scfmon rad, int Nrad, varset var, int Nvar)
         if (j < Nrad)
         {
           i = 0;
-          o = *rad;
+          o = rad[0];
           n = rad[j];
           k = Nvar;
         }
@@ -589,7 +589,7 @@ void hLexR(scfmon rad, int Nrad, varset var, int Nvar)
       if (j < Nrad)
       {
         i = 0;
-        o = *rad;
+        o = rad[0];
         n = rad[j];
         k = Nvar;
       }
@@ -645,7 +645,7 @@ void hPure(scfmon stc, int a, int *Nstc, varset var, int Nvar,
     }
   }
   *Npure = np;
-  if (nq)
+  if (nq!=0)
   {
     *Nstc -= nq;
     hShrink(stc, a, nc);
@@ -662,7 +662,7 @@ void hElimS(scfmon stc, int *e1, int a2, int e2, varset var, int Nvar)
   j = 0;
   i = a2;
   o = stc[i];
-  n = *stc;
+  n = stc[0];
   k = Nvar;
   loop
   {
@@ -673,7 +673,8 @@ void hElimS(scfmon stc, int *e1, int a2, int e2, varset var, int Nvar)
       i++;
       if (i < e2)
         o = stc[i];
-      else {
+      else
+      {
         j++;
         if (j < nc)
         {
@@ -683,7 +684,7 @@ void hElimS(scfmon stc, int *e1, int a2, int e2, varset var, int Nvar)
         }
         else
         {
-          if (z)
+          if (z!=0)
           {
             *e1 -= z;
             hShrink(stc, 0, nc);
@@ -695,7 +696,7 @@ void hElimS(scfmon stc, int *e1, int a2, int e2, varset var, int Nvar)
     else
     {
       k--;
-      if (!k)
+      if (k==0)
       {
         stc[j] = NULL;
         z++;
@@ -709,7 +710,7 @@ void hElimS(scfmon stc, int *e1, int a2, int e2, varset var, int Nvar)
         }
         else
         {
-          if (z)
+          if (z!=0)
           {
             *e1 -= z;
             hShrink(stc, 0, nc);
@@ -731,7 +732,7 @@ void hElimR(scfmon rad, int *e1, int a2, int e2, varset var, int Nvar)
   j = 0;
   i = a2;
   o = rad[i];
-  n = *rad;
+  n = rad[0];
   k = Nvar;
   loop
   {
@@ -753,7 +754,7 @@ void hElimR(scfmon rad, int *e1, int a2, int e2, varset var, int Nvar)
         }
         else
         {
-          if (z)
+          if (z!=0)
           {
             *e1 -= z;
             hShrink(rad, 0, nc);
@@ -779,7 +780,7 @@ void hElimR(scfmon rad, int *e1, int a2, int e2, varset var, int Nvar)
         }
         else
         {
-          if (z)
+          if (z!=0)
           {
             *e1 -= z;
             hShrink(rad, 0, nc);
@@ -993,9 +994,9 @@ monf hCreate(int Nvar)
 void hKill(monf xmem, int Nvar)
 {
   int  i;
-  for (i = Nvar; i; i--)
+  for (i = Nvar; i!=0; i--)
   {
-    if (xmem[i]->mo)
+    if (xmem[i]->mo!=NULL)
       Free((ADDRESS)xmem[i]->mo, xmem[i]->a * sizeof(scmon));
     Free((ADDRESS)xmem[i], LEN_MON);
   }
