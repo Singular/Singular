@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.23 2001-11-12 11:16:33 pohl Exp $";
+version="$Id: solve.lib,v 1.24 2001-12-11 09:42:15 pohl Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -8,46 +8,47 @@ AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
 
 PROCEDURES:
 ures_solve(i,[..]);     find all roots of 0-dimensional ideal i with resultants
+laguerre_solve(p,[..]); find all roots of univariate polynomial p
 mp_res_mat(i,[..]);     multipolynomial resultant matrix of ideal i
-laguerre_solve(p,[..]); find all (or all different) roots of univariate polynom p
 interpolate(p,v,d);     interpolate poly from evaluation points i and results j
 fglm_solve(i,[..]);     find roots of 0-dim. ideal using FGLM and lex_solve
-triangL_solve(l,[..]);  find roots using triangular system (Lazard)
+lex_solve(i,p,[..]);    find roots of reduced lexicographic standard basis
 triangLf_solve(l,[..]); find roots using triangular sys. (factorizing Lazard)
 triangM_solve(l,[..]);  find roots of given triangular system (Moeller)
-lex_solve(i,p,[..]);    find roots of reduced lexicographic standard basis
+triangL_solve(l,[..]);  find roots using triangular system (Lazard)
 triang_solve(l,p,[..]); find roots of given triangular system
-pcheck(i,l,[..]);       checks if elements (numbers) of l are roots of ideal i
-";
+pcheck(i,l,[..]);       checks if elements (numbers) of l are roots of ideal i";
 
-LIB "triang.lib";    // needed for triang*_solve
+LIB "triang.lib";    // needed for triang_solve
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc ures_solve( ideal gls, list # )
-"USAGE:   ures_solve(i [, k, p, m] ); i=ideal, k,l,m=integers,@*
-k=0: use sparse resultant matrix of Gelfand, Kapranov and Zelevinsky,@*
-k=1: use resultant matrix of Macaulay,@*
-p>0: defines precision of fractional part if ground field is Q,@*
-m=0,1,2: number of iterations for approximation of roots,@*
-(default: k,p,m=0,30,2)
-ASSUME:  the ground field has char 0;
-         i is a zerodimensional ideal with@*
-         nvars(basering) = ncols(i) = number of vars actually occuring in i
-RETURN:  list of all (complex) roots of the polynomial system i = 0;@*
+"USAGE:   ures_solve(i [, k, p] ); i = ideal, k, p = integers
+ @format
+         k=0: use sparse resultant matrix of Gelfand, Kapranov and Zelevinsky,
+         k=1: use resultant matrix of Macaulay which works only for
+              homogeneous ideals,
+         p>0: defines precision of the long floats for internal computation
+              if the basering is not complex (in decimal digits),
+              (default: k, p = 0, 30)
+ @end format
+ASSUME:  i is a zerodimensional ideal with
+         nvars(basering) = ncols(i) = number of vars
+         actually occuring in i,
+RETURN:  list of all (complex) roots of the polynomial system i = 0,
+ @format
          the result is
-  @format
-  of type number: if the ground field are the complex numbers,
-  of type string: if the ground field are the rational or real numbers
-  @end format
+         of type string: if the basering is not complex,
+         of type number: otherwise.
+ @end format
 EXAMPLE: example ures_solve; shows an example
 "
 {
-    int typ=0;
-    int polish=2;
+    int typ=0;// defaults
     int prec=30;
 
-    if ( size(#) >= 1 )
+    if ( size(#) > 0 )
     {
         typ= #[1];
         if ( typ < 0 || typ > 1 )
@@ -57,31 +58,18 @@ EXAMPLE: example ures_solve; shows an example
                    1: use Macaulay Resultant");
         }
     }
-    if ( size(#) >= 2 )
+    if ( size(#) > 1 )
     {
         prec= #[2];
-        if ( prec == 0 ) { prec = 30; }
-        if ( prec < 0 )
+        if ( prec < 8 )
         {
-            ERROR("Third parameter l must be positive!");
-        }    }
-    if ( size(#) >= 3 )
-    {
-        polish= #[3];
-        if ( polish < 0 || polish > 2 )
-        {
-            ERROR("Valid values for fourth parameter m are:
-                   0,1,2: number of iterations for approximation of roots");
+            prec = 8;
         }
     }
 
-    if ( size(#) > 3 )
-    {
-        ERROR("only three parameters allowed!");
-    }
-
-    return(uressolve(gls,typ,prec,polish));
-
+    return(uressolve(gls,typ,prec,1));
+    // the last nonzero parameter gives an extra run of
+    // Laguerre's algorithm leading to better results
 }
 example
 {
@@ -89,11 +77,11 @@ example
     // compute the intersection points of two curves
     ring rsq = 0,(x,y),lp;
     ideal gls=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
-    ures_solve(gls,0,8);
+    ures_solve(gls,0,16);
     // result is a list (x,y)-coordinates as strings
 
-    // now with complex coefficient field, precision is 10 digits
-    ring rsc= (real,10,I),(x,y),lp;
+    // now with complex coefficient field, precision is 20 digits
+    ring rsc= (real,20,I),(x,y),lp;
     ideal i = (2+3*I)*x2 + (0.35+I*45.0e-2)*y2 - 8, x2 + xy + (42.7)*y2;
     list l= ures_solve(i,0,10);
     // result is a list of (x,y)-coordinates of complex numbers
@@ -104,31 +92,43 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc laguerre_solve( poly f, list # )
-"USAGE:   laguerre_solve(p [, l, m, n, s] ); f=polynomial,@*
-   l,m,n,s=integers(control of the method),@*
-   l>=8: defines precision in the complex solution field@*
-   m>=4,m<=l: defines precision of the solution (|f(root)|<0.1^m)@*
-   n: control of multiplicity or of spliting
-      <0, no split of p (be shure that all roots are simple)
-      =0, return only different roots
-      >0, default, try to split and all roots
-   s!=0: returns an error for |f(root)|>0.1^m
-   (default: l,m,n,s=30,10,1,0)
-ASSUME:  f is an univariate polynom
-RETURN:  list of (complex) roots of the polynomial f (see #[3]);@*
-         result is
-  @format
-  of type string: if the basering is not complex,
-  of type number: otherwise,
-  @end format
-NOTE:    if printlevel >0: displays comments (default =0)
+"USAGE:   laguerre_solve(f [, l, m, n, s] ); f = polynomial,@*
+         l, m, n, s = integers (control parameters of the method)
+ @format
+         l: precision of internal computation in decimal digits ( l >=8 )
+            only if the basering is not complex or complex with smaller
+            precision,
+         m: precision of output in digits ( 4 <= m <= l ), if basering is not
+            the ring of complex numbers;
+            (if s != 0, m defines also the precision of the residual error
+            i.e. | f(root) | should be <= 0.1^m ).
+         n: control of multiplicity of roots or of splitting of f into
+            squarefree factors
+            n < 0, no split of f (good, if all roots are simple)
+            n >= 0, try to split
+            n = 0, return only different roots
+            n > 0, find all roots (with multiplicity)
+         s: s != 0, returns ERROR if  | f(root) | > 0.1^m
+         ( default: l, m, n, s = 30, 10, 1, 0 )
+ @end format
+ASSUME:  f is an univariate polynomial
+RETURN:  list of (complex) roots of the polynomial f, depending on n.
+ @format
+         The result is
+         of type string: if the basering is not complex,
+         of type number: otherwise.
+ @end format
+NOTE:    If printlevel >0: displays comments ( default = 0 ).
+         If s != 0 and if the procrdure stops with ERROR, try a higher
+         internal precision m.
 EXAMPLE: example laguerre_solve; shows an example
 "
 {
+  int OLD_COMPLEX=0;
   int iv=checkv(f);
   if(iv==0){ERROR("Wrong polynomial!");}
   poly v=var(iv);
-  
+
   int numberprec=30;// set the control
   int solutionprec=10;
   int splitcontrol=1;
@@ -141,7 +141,8 @@ EXAMPLE: example laguerre_solve; shows an example
   if(size(#)>2){splitcontrol=#[3];}
   if(size(#)>3){rootcheck=#[4];}
   int prot=printlevel-voice+2;
-  
+  int ringprec=0;
+
   poly p=divzero(f,iv);// divide out zeros as solution
   int iz=deg(f)-deg(p);
   if(prot!=0)
@@ -153,12 +154,29 @@ EXAMPLE: example laguerre_solve; shows an example
     dbprint(prot,pout);
   }
   string ss,tt,oo;
-  ss="";oo="";
+  ss="";oo=ss;
   if(npars(basering)==1)
   {
-    tt="1,"+string(par(1));
-    if(tt==charstr(basering)){ss=tt;}
+    if(OLD_COMPLEX)
+    {
+      tt="1,"+string(par(1));
+      if(tt==charstr(basering))
+      {ss=tt;ringprec=system("getPrecDigits");}
+    }
+    else
+    {
+      tt=charstr(basering);
+      if(size(tt)>7)
+      {
+        if(tt[1..7]=="complex")
+        {
+          ss=tt;
+          ringprec=system("getPrecDigits");
+        }
+      }
+    }
   }
+
   list roots,simple;
   if(deg(p)==0)// only zeros
   {
@@ -166,7 +184,7 @@ EXAMPLE: example laguerre_solve; shows an example
     if(prot!=0){dbprint(prot,"//END laguerre_solve");}
     return(roots);
   }
-  
+
   if(prot!=0)// more informations
   {
     pout="//control: complex ring with precision "+string(numberprec);
@@ -174,31 +192,34 @@ EXAMPLE: example laguerre_solve; shows an example
         "//         basering not complex, hence solutiontype string";
     if(solutionprec<numberprec){pout=pout+nl+
         "//         with precision "+string(solutionprec);}}
-    if(splitcontrol<0){pout=pout+nl+"//         no spliting";}
-    if(splitcontrol==0){pout=pout+nl+"//         output without multiple roots";}
+    if(splitcontrol<0){pout=pout+nl+ "//       no spliting";}
+    if(splitcontrol==0){pout=pout+nl+"//       output without multiple roots";}
     if(rootcheck){pout=pout+nl+
         "//         check roots with precision "+string(solutionprec);}
     dbprint(prot,pout);
   }
 
   def rn = basering;// set the complex groundfield
-  tt="ring lagc=(complex,"+string(numberprec)+","+string(numberprec)+
-     "),"+string(var(iv))+",lp;";
-  execute(tt);
-  poly p=imap(rn,p);
-  poly v=var(1);
+  if (ringprec<numberprec)
+  {
+    tt="ring lagc=(complex,"+string(numberprec)+","+string(numberprec)+
+       "),"+string(var(iv))+",lp;";
+    execute(tt);
+    poly p=imap(rn,p);
+    poly v=var(1);
+  }
   int ima=0;
   if(size(ss)!=0){ima=checkim(p);}
   number prc=0.1;// set precision of the solution
   prc=prc^solutionprec;
   if(prot!=0)
   {
-    pout="//working in:  "+tt;
+    if(ringprec<numberprec){pout="//working in:  "+tt;}
     if((size(ss)!=0)&&(ima!=0)){pout=pout+nl+
         "//         polynomial has complex coefficients";}
     dbprint(prot,pout);
   }
-  
+
   int i1=1;
   int i2=1;
   ideal SPLIT=p;
@@ -295,8 +316,11 @@ EXAMPLE: example laguerre_solve; shows an example
   if(size(ss)==0){roots=transroots(roots);}// transform to string
   else         // or map in basering
   {
-    setring rn;
-    list roots=imap(lagc,roots);
+    if(ringprec<numberprec)
+    {
+      setring rn;
+      list roots=imap(lagc,roots);
+    }
   }
   if(iz>0){roots=addzero(roots,ss,iz,splitcontrol);}
   if(prot!=0){dbprint(prot,"//END laguerre_solve");}
@@ -322,6 +346,8 @@ example
     subst(f,x,l[1]);
     subst(f,x,l[2]);
 }
+//////////////////////////////////////////////////////////////////////////////
+//                subprocedures for laguerre_solve
 /*
 *  if p depends only on var(i)
 *       returns i
@@ -332,7 +358,7 @@ static proc checkv(poly p)
   int n=nvars(basering);
   int i=0;
   int v;
-  
+
   while (n>0)
   {
     if ((p-subst(p,var(n),0))!=0)
@@ -353,7 +379,7 @@ static proc checkv(poly p)
 static proc checkim(poly p)
 {
   poly q=p;
-  
+
   while(q!=0)
   {
     if(impart(leadcoef(q))!=0){return(1);}
@@ -371,7 +397,7 @@ static proc makemult(list si,int m)
   int k2,k3;
   number ro;
   list msi;
-  
+
   for(k2=1;k2<=k1;k2++)
   {
     ro=si[k2];
@@ -417,7 +443,8 @@ static proc exdiv(poly f,poly g,poly v)
 /*
 *  p is uniform in x
 *  perform a split of p into squarefree factors
-*  such that the returned ideal split is
+*  such that the returned ideal 'split' consists of
+*  the faktors, i.e.
 *    p = n * product ( split[i]^i ) , n a number
 */
 proc splitsqrfree(poly p, poly x)
@@ -485,7 +512,7 @@ static proc checkroots(poly p,poly v,list r,int ima,number pr)
   int j;
   number n,m;
   ideal li;
-  
+
   while(i<size(r))
   {
     i++;
@@ -542,7 +569,7 @@ static proc addzero(list zz,string ss,int iz,int a)
 {
     int i=1;
     int j=size(zz);
-    
+
     if(size(ss)==0){zz[j+1]="0";}
     else{zz[j+1]=number(0);}
     if(a==0){return(zz);}
@@ -557,19 +584,24 @@ static proc addzero(list zz,string ss,int iz,int a)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc mp_res_mat( ideal i, list # )
-"USAGE:   mp_res_mat(i [, k] ); i ideal, k integer,@*
-k=0: sparse resultant matrix of Gelfand, Kapranov and Zelevinsky,@*
-k=1: resultant matrix of Macaulay (k=0 is default)
-ASSUME:  the ground field has char 0;@*
-         nvars(basering) = ncols(i)-1 = number of vars actually occuring in i,@*
-         if k=1 then i must be homogeneous
+"USAGE:   mp_res_mat(i [, k] ); i ideal, k integer,
+ @format
+         k=0: sparse resultant matrix of Gelfand, Kapranov and Zelevinsky,
+         k=1: resultant matrix of Macaulay (k=0 is default)
+ @end format
+ASSUME:
+ @format
+         the number of elements in the input system must be
+         the number of variables in the basering plus one,
+         if k=1 then i must be homogeneous,
+ @end format
 RETURN:  module representing the multipolynomial resultant matrix
 EXAMPLE: example mp_res_mat; shows an example
 "
 {
-    int typ=2;
+    int typ=0;
 
-    if ( size(#) == 1 )
+    if ( size(#) > 0 )
     {
         typ= #[1];
         if ( typ < 0 || typ > 1 )
@@ -578,10 +610,6 @@ EXAMPLE: example mp_res_mat; shows an example
                    0: sparse resultant (default)
                    1: Macaulay resultant");
         }
-    }
-    if ( size(#) > 1 )
-    {
-        ERROR("only two parameters allowed!");
     }
 
     return(mpresmat(i,typ));
@@ -619,17 +647,28 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc interpolate( ideal p, ideal w, int d )
-"USAGE:   interpolate(p,v,d); p,v=ideals, d=integer
-ASSUME:  ground field K are the rational numbers,
-         p and v are lists consisting of elements of the ground field K,
-         size(p)=n and size(v)=N=(d+1)^n where n=nvars(basering)
-COMPUTE: polynomial f of degree d with prescribed values at certain points
-         p1,..,pN derived from p;@*
-         more precisely: consider p as point in K^n and v as N elements in K,
-         let pi=(p[1]^i,..,p[n]^i), i=1,..,N, then the procedure computes the
-         polynomial f of degree d satisfying f(pi) = v[i]
-RETURN:  polynomial f of degree d
-NOTE:    mainly useful when n=1, i.e. f is satisfying f(p^(i-1)) = v[i], i=1..d+1
+"USAGE:   interpolate(p,v,d); p,v=ideals of numbers, d=integer
+ASSUME:
+@format
+         ground field K are the rational numbers,
+         p and v consists of elements of the ground field K
+         with the following number of elements:
+         size(p) = n and size(v)=N=(d+1)^n with n equals
+         the number of variables,
+         p is considered as point in K^n and with
+         pi=(p[1]^i,..,p[n]^i), i=1,..,N the returned
+         polynomial f satisfies f(pi) = v[i]
+         (p[j] != -1,0,1);
+@end format
+RETURN:
+@format
+         the unique polynomial f of degree n*d with prescribed
+         values v at certain points p1,..,pN derived from p;
+@end format
+NOTE:    mainly useful when n=1, i.e. f is satisfying
+@format
+         f(p^(i-1)) = v[i], i=1..d+1
+@end format
 EXAMPLE: example interpolate; shows an example
 "
 {
@@ -646,14 +685,14 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc psubst( int d, int dd, int n, list res,
-                    ideal fi, int elem, int nv )
+static proc psubst( int d, int dd, int n, list resl,
+                    ideal fi, int elem, int nv, int prec )
 {
     //   nv: number of ring variables         (fixed value)
     // elem: number of elements in ideal fi   (fixed value)
     //   fi: input ideal                      (fixed value)
     //   rl: output list of roots
-    //  res: actual list of roots
+    // resl: actual list of roots
     //    n:
     //   dd: actual element of fi
     //    d: actual variable
@@ -690,7 +729,7 @@ static proc psubst( int d, int dd, int n, list res,
                 if ( size(coeffs(ps,var(n-1))) == 1 )
                 {
                     dd++;
-                    // hier Leading-Exponent puefen???
+                    // hier Leading-Exponent pruefen???
                     // oder ist das Poly immer als letztes in der Liste?!?
                     // leadexp(ps)
                 }
@@ -725,9 +764,9 @@ static proc psubst( int d, int dd, int n, list res,
             if ( pdebug>=2 )
             {
                 "// 4 subst(fi["+string(thedd)+"],"
-                    +string(var(k))+","+string(res[k])+");";
+                    +string(var(k))+","+string(resl[k])+");";
             }
-            ps = subst(ps,var(k),res[k]);
+            ps = subst(ps,var(k),resl[k]);
         }
 
         if ( pdebug>=2 )
@@ -735,7 +774,7 @@ static proc psubst( int d, int dd, int n, list res,
 
         if ( ps != 0 )
         {
-            lsr= laguerre_solve( ps );
+            lsr= laguerre_solve( ps, prec, prec/2, 0 );
         }
         else
         {
@@ -785,9 +824,9 @@ static proc psubst( int d, int dd, int n, list res,
                             if ( pdebug>=3 )
                             {
                                 "// 11 subst(fi["+string(olddd+l)+"],"
-                                    +string(var(k))+","+string(res[k])+");";
+                                    +string(var(k))+","+string(resl[k])+");";
                             }
-                            ps = subst(ps,var(k),res[k]);
+                            ps = subst(ps,var(k),resl[k]);
 
                         }
 
@@ -798,7 +837,7 @@ static proc psubst( int d, int dd, int n, list res,
                         {
                             if ( system("complexNearZero",
                                         leadcoef(pss),
-                                        myCompDigits) )
+                                        prec) )
                             {
                                 if ( pdebug>=2 )
                                 { "// 16 root "+string(i)+" is a real root"; }
@@ -842,7 +881,7 @@ static proc psubst( int d, int dd, int n, list res,
 
             for ( i= 1; i <= nares_size; i++ )
             {
-                res[nv-d]= nares[i];
+                resl[nv-d]= nares[i];
 
                 if ( dd < elem )
                 {
@@ -850,15 +889,15 @@ static proc psubst( int d, int dd, int n, list res,
                     {
                         rn@++;
                     }
-                    psubst( d+1, dd+1, n-1, res, fi, elem, nv );
+                    psubst( d+1, dd+1, n-1, resl, fi, elem, nv, prec );
                 }
                 else
                 {
                     if ( pdebug>=1 )
-                    {"// 30_1 <"+string(rn@)+"> "+string(size(res))+" <-----";}
+                    {"// 30_1 <"+string(rn@)+"> "+string(size(resl))+" <-----";}
                     if ( pdebug>=2 )
-                    { res; }
-                    rlist[rn@]=res;
+                    { resl; }
+                    rlist[rn@]=resl;
                 }
             }
         }
@@ -866,19 +905,19 @@ static proc psubst( int d, int dd, int n, list res,
         {
             if ( pdebug>=2 )
             { "// 21 found root to be: "+string(lsr[1]); }
-            res[nv-d]= lsr[1];
+            resl[nv-d]= lsr[1];
 
             if ( dd < elem )
             {
-                psubst( d+1, dd+1, n-1, res, fi, elem, nv );
+                psubst( d+1, dd+1, n-1, resl, fi, elem, nv, prec );
             }
             else
             {
                 if ( pdebug>=1 )
-                { "// 30_2 <"+string(rn@)+"> "+string(size(res))+" <-----";}
+                { "// 30_2 <"+string(rn@)+"> "+string(size(resl))+" <-----";}
                 if ( pdebug>=2 )
-                { res; }
-                rlist[rn@]=res;
+                { resl; }
+                rlist[rn@]=resl;
             }
         }
     }
@@ -887,17 +926,23 @@ static proc psubst( int d, int dd, int n, list res,
 ///////////////////////////////////////////////////////////////////////////////
 
 proc fglm_solve( ideal fi, list # )
-"USAGE:   fglm_solve(i [, p] ); i=ideal, p=integer,@*
-p>0: gives precision of complex numbers in digits,@*
-(default: p=30)
+"USAGE:   fglm_solve(i [, p] ); i=ideal, p=integer,
+ @format
+         p>0: gives precision of complex numbers
+         in decimal digits (default: p=30),
+ @end format
 ASSUME:  the ground field has char 0.
-RETURN:  a list of complex roots of type number.@*
-         The proc uses a standard basis of i to determine recursively all
-         complex roots of i.
-CREATE:  The procedure creates a ring rC with the same number of variables but
-         with complex coefficients (and precision p).@*
-         In rC a list @code{rlist} of numbers is created, in which the complex
-         roots of i are stored.
+RETURN:
+ @format
+         a list of complex roots of type number, the procedure
+         uses a standard basis of i to determine all complex
+         roots of i.
+ @end format
+NOTE:
+ @format
+         The procedure creates a ring rC with the same number
+         of variables but with complex coefficients (and precision p).
+ @end format
 EXAMPLE: example fglm_solve; shows an example
 "
 {
@@ -923,36 +968,48 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc lex_solve( ideal fi, int prec, list # )
-"USAGE:   lex_solve( i,p [, d, l] ); i=ideal, p,d,l=integers,@*
-p>0 : precision of complex numbers in digits,@*
-d>0 : precision (1<d<p) for near-zero-determination@*
-l : debug level (-1: no output,..., 3: lots of output)@*
-(default: d,l=1/2*p,0)
-ASSUME:  the ground field has char 0;@*
-         i is a reduced lexicographical Groebner bases of a zero-dimensional
-         ideal (i), sorted by increasing leading terms.
+proc lex_solve( ideal fi, list # )
+"USAGE:   lex_solve( i[,p] ); i=ideal, p=integer,
+ @format
+         p>0: gives precision of complex numbers
+         in decimal digits (default: p=30),
+ @end format
+ASSUME:
+ @format
+         i is a reduced lexicographical Groebner bases of a
+         zero-dimensional ideal (i), sorted by increasing leading terms.
+ @end format
 RETURN:  nothing
-CREATE:  The procedure creates a ring rC with the same number of variables but
-         with complex coefficients (and precision p).@*
-         In rC a list @code{rlist} of numbers is created, in which the complex
-         roots of i are stored.
+CREATE:
+ @format
+         The procedure creates a complec ring with the same variables but
+         with complex coefficients (and precision p).
+         In this ring a list @code{rlist} of numbers is created,
+         in which the complex roots of i are stored.
+ @format
 EXAMPLE: example lex_solve; shows an example
 "
 {
+    int prec=30;
+
+    if ( size(#)>=1  && typeof(#[1])=="int")
+    {
+        prec=#[1];
+    }
+
     if ( !defined(pdebug) )
     {
         int pdebug;
+        pdebug=0;
         export pdebug;
     }
-    pdebug=0;
 
     string orings= nameof(basering);
     def oring= basering;
 
     // change the ground field to complex numbers
-    string nrings= "ring "+orings+"C=(real,"+string(prec)
-        +",I),("+varstr(basering)+"),lp;";
+    string nrings= "ring "+orings+"C=(complex,"+string(prec)
+        +"),("+varstr(basering)+"),lp;";
     execute(nrings);
 
     if ( pdebug>=0 )
@@ -970,28 +1027,10 @@ EXAMPLE: example lex_solve; shows an example
     }
     @ln=nn;
 
-    // set number of digits for zero-comparison of roots
-    if ( !defined(myCompDigits) )
-    {
-        int myCompDigits;
-        export  myCompDigits;
-    }
-    if ( size(#)>=1  && typeof(#[1])=="int")
-    {
-        myCompDigits=#[1];
-    }
-    else
-    {
-        myCompDigits=(system("getPrecDigits")/2);
-    }
-
-    if ( pdebug>=1 )
-    {"// myCompDigits="+string(myCompDigits);}
-
     int idelem= size(fi);
     int nv= nvars(basering);
     int i,j,k,lis;
-    list res,li;
+    list resl,li;
 
     if ( !defined(rlist) )
     {
@@ -1006,7 +1045,7 @@ EXAMPLE: example lex_solve; shows an example
     }
     rn@=0;
 
-    li= laguerre_solve(fi[1]);
+    li= laguerre_solve(fi[1],prec,prec/2,0);
     lis= size(li);
 
     if ( pdebug>=1 )
@@ -1017,8 +1056,8 @@ EXAMPLE: example lex_solve; shows an example
         if ( pdebug>=1 )
         {"// root "+string(j);}
         rn@++;
-        res[nv]= li[j];
-        psubst( 1, 2, nv-1, res, fi, idelem, nv );
+        resl[nv]= li[j];
+        psubst( 1, 2, nv-1, resl, fi, idelem, nv, prec );
     }
 
     if ( pdebug>=0 )
@@ -1216,7 +1255,7 @@ EXAMPLE: example triang_solve; shows an example
     }
     else
     {
-        myCompDigits=(system("getPrecDigits")/2);
+        myCompDigits=(system("getPrecDigits"));
     }
 
     if ( pdebug>=1 )
@@ -1254,7 +1293,7 @@ EXAMPLE: example triang_solve; shows an example
         idelem= size(fi);
 
         // solve fi[1]
-        li= laguerre_solve(fi[1],myCompDigits,2);
+        li= laguerre_solve(fi[1],myCompDigits,myCompDigits/2,0);
         lis= size(li);
 
         if ( pdebug>=1 )
@@ -1266,7 +1305,7 @@ EXAMPLE: example triang_solve; shows an example
             {"// root "+string(j);}
             rn@++;
             res[nv]= li[j];
-            psubst( 1, 2, nv-1, res, fi, idelem, nv );
+            psubst( 1, 2, nv-1, res, fi, idelem, nv, myCompDigits );
         }
     }
 
