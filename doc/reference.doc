@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.194 2000-10-04 13:13:28 obachman Exp $
+@comment $Id: reference.doc,v 1.195 2000-11-06 15:45:21 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7180,8 +7180,9 @@ if @code{short} is non-zero. A C-like notion is used, if short is zero.
 Both notations may be used as input.
 @*The default depends on the names of the ring variables
 (0 if there are names of variables longer than 1 character, 1 otherwise). Every
-change of the basering sets @code{short} to the proper default value for
-that ring and overwrites the previous setting.
+change of the basering sets @code{short} to the previous value for
+that ring. In other words, the value of the variable @code{short} is
+"ring-local".
 @item @strong{Example:}
 @smallexample
 @c example
