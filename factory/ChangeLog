@@ -1,3 +1,8 @@
+Mon Feb  9 15:57:07 1998  Ruediger Stobbe  <rstobbe@de.oracle.com>
+
+	* cf_factor.cc (factorize): factorize now handles characteristic
+	  0 correct, e.g. rational coefficients and SW_RATIONAL = ON.
+
 Thu Jan 22 10:38:34 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* int_cf.cc, int_int.cc int_rat.cc (bgcdsame, bgcdcoeff,
