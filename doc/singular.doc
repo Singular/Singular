@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.95 2000-05-19 09:49:42 Singular Exp $
+@comment $Id: singular.doc,v 1.96 2000-08-14 11:51:44 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -279,7 +279,7 @@ LIB "all.lib";
 * algebra_lib:: procedures for computing with algebras and maps
 * elim_lib:: procedures for elimination, saturation and blowing up
 * homolog_lib:: procedures for homological algebra
-* Mregular_lib:: procedures for Castelnuovo-Mumford regularity
+* mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * normal_lib:: procedure for normalization
 * primdec_lib:: procedures for primary decomposition
 * primitiv_lib:: procedures for finding a primitive element
@@ -296,15 +296,15 @@ LIB "all.lib";
 @subsection elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
-@node homolog_lib, Mregular_lib, elim_lib, Commutative algebra
+@node homolog_lib, mregular_lib, elim_lib, Commutative algebra
 @subsection homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
-@node Mregular_lib, normal_lib, homolog_lib, Commutative algebra
+@node mregular_lib, normal_lib, homolog_lib, Commutative algebra
 @subsection Mregular_lib
-@c lib Mregular.lib
+@c lib mregular.lib
 @c ---------------------------------------------------------
-@node normal_lib, primdec_lib, Mregular_lib, Commutative algebra
+@node normal_lib, primdec_lib, mregular_lib, Commutative algebra
 @subsection normal_lib
 @c lib normal.lib
 @c ----------------------------------------------------------
@@ -318,11 +318,11 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node ip_lib, toric_lib, primitiv_lib, Commutative algebra
 @subsection ip_lib
-@c lib ip.lib
+@c lib ip.lib no_ex
 @c ---------------------------------------------------------
 @node toric_lib, ,ip_lib, Commutative algebra
 @subsection toric_lib
-@c lib toric.lib
+@c lib toric.lib no_ex
 @c ----------------------------------------------------------------------------
 @node Singularities, Invariant theory, Commutative algebra, SINGULAR libraries
 @section Singularities
