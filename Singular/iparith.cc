@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.150 1999-06-07 15:46:05 obachman Exp $ */
+/* $Id: iparith.cc,v 1.151 1999-06-14 16:35:34 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -617,9 +617,20 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
     if (v==NULL) return FALSE;      /* u==NULL, v==NULL */
     if (iiOp=='-')                  /* u==NULL, v<>NULL, iiOp=='-'*/
     {
-      if (res->next==NULL)
-        res->next = (leftv)Alloc(sizeof(sleftv));
-      return iiExprArith1(res->next,v,'-');
+      do
+      {
+        if (res->next==NULL)
+          res->next = (leftv)Alloc0(sizeof(sleftv));
+        leftv tmp_v=v->next;
+        v->next=NULL;
+        BOOLEAN b=iiExprArith1(res->next,v,'-');
+        v->next=tmp_v;
+        if (b)
+          return TRUE;
+        v=tmp_v;
+        res=res->next;
+      } while (v!=NULL);
+      return FALSE;
     }
     loop                            /* u==NULL, v<>NULL, iiOp=='+' */
     {
@@ -633,8 +644,21 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
   }
   if (v!=NULL)                     /* u<>NULL, v<>NULL */
   {
-    res->next = (leftv)Alloc(sizeof(sleftv));
-    return iiExprArith2(res->next,u,iiOp,v);
+    do
+    {
+      res->next = (leftv)Alloc0(sizeof(sleftv));
+      leftv tmp_u=u->next; u->next=NULL;
+      leftv tmp_v=v->next; v->next=NULL;
+      BOOLEAN b=iiExprArith2(res->next,u,iiOp,v);
+      u->next=tmp_u;
+      v->next=tmp_v;
+      if (b)
+        return TRUE;
+      u=tmp_u;
+      v=tmp_v;
+      res=res->next;
+    } while ((u!=NULL) && (v!=NULL));
+    return FALSE;
   }
   loop                             /* u<>NULL, v==NULL */
   {
@@ -3896,12 +3920,12 @@ static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
   intvec* im= new intvec((int)v->Data(),(int)w->Data(), 0);
   intvec* arg = (intvec*) u->Data();
   int i, n = min(im->cols()*im->rows(), arg->cols()*arg->rows());
-  
+
   for (i=0; i<n; i++)
   {
     (*im)[i] = (*arg)[i];
   }
-  
+
   res->data = (char *)im;
   return FALSE;
 }
@@ -4578,10 +4602,10 @@ static BOOLEAN jjSTRING_PL(leftv res, leftv v)
     res->data = v->String();
     return FALSE;
   }
-  
+
   char** slist = (char**) Alloc(n*sizeof(char*));
   int i, j;
-  
+
   for (i=0, j=0; i<n; i++, v = v ->next)
   {
     slist[i] = v->String();
