@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_globals.cc,v 1.7 1997-09-09 09:16:20 schmidt Exp $ */
+/* $Id: cf_globals.cc,v 1.8 1997-10-23 12:14:01 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -24,6 +24,19 @@
 //
 //}}}
 extern const char factoryVersion[] = "@(#) factoryVersion = " FACTORYVERSION;
+
+//{{{ extern const char factoryConfiguration[];
+//{{{ docu
+//
+// factoryConfiguration - factory configuration.
+//
+// factoryConfiguration is initialized from #define
+// FACTORYCONFIGURATION which is defined in config.h.  It is set
+// to the option configure was called with plus the directory it
+// was called in.  It is not used in factory itself.
+//
+//}}}
+extern const char factoryConfiguration[] = "@(#) factoryConfiguration = " FACTORYCONFIGURATION;
 //}}}
 
 //{{{ CFSwitches cf_glob_switches;
