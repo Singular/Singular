@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.13 1998-04-28 09:33:57 pohl Exp $ */
+/* $Id: libparse.l,v 1.14 1998-04-28 14:26:29 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -626,10 +626,10 @@ void copy_string(lp_modes mode)
     long current_location = ftell(yylpin);
     int len = (int)(current_pos(0) - string_start);
     fseek(yylpin, string_start, SEEK_SET);
-    text_buffer = (char *)AllocL(len+1);
-    text_buffer[len]='\0';
+    text_buffer = (char *)AllocL(len+2);
     myfread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
+    text_buffer[len]='\0';
   }
 #  endif /* STANDALONE_PARSER */
 }
