@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.5 1997-05-02 15:10:15 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.6 1997-07-09 15:54:00 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -18,7 +18,7 @@
 #include "numbers.h"
 #include "matpol.h"
 #include "silink.h"
-//#include "ipshell.h"
+#include "syz.h"
 #include "ipconv.h"
 
 typedef void *   (*iiConvertProc)(void * data);
@@ -167,6 +167,11 @@ static void * iiS2Link(void *data)
   return (void *)l;
 }
 
+static void * iiR2L(void * data)
+{
+  return (void *)syConvRes((syStrategy)data);  
+}
+
 //
 // conversions:
 //
@@ -221,6 +226,8 @@ struct sConvertTypes dConvertTypes[] =
 //  intvec
 //  link
    { STRING_CMD,      LINK_CMD,       iiS2Link },
+// resolution -> list   
+   { RESOLUTION_CMD,  LIST_CMD,       iiR2L },
 //  end of list
    { 0,               0,              NULL }
 };

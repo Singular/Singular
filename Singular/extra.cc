@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.13 1997-07-01 15:41:48 Singular Exp $ */
+/* $Id: extra.cc,v 1.14 1997-07-09 15:53:51 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -45,6 +45,7 @@
 #include "longalg.h"
 #include "ideals.h"
 #include "kstd1.h"
+#include "syz.h"
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -235,20 +236,20 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     #ifndef MSDOS
     if (strcmp((char*)(h->Data()),"tty")==0)
     {
-        #ifdef HAVE_FEREAD
-        #ifdef HAVE_ATEXIT
-        fe_reset_input_mode();
-        #else
-        fe_reset_input_mode(0,NULL);
-        #endif
-        if ((h->next!=NULL)&&(h->next->Typ()==INT_CMD))
-        {
-          fe_use_fgets=(int)h->next->Data();
-          fe_set_input_mode();
-        }
-        #elif HAVE_READLINE
-        system("stty sane");
-        #endif
+      #ifdef HAVE_FEREAD
+      #ifdef HAVE_ATEXIT
+      fe_reset_input_mode();
+      #else
+      fe_reset_input_mode(0,NULL);
+      #endif
+      #elif defined(HAVE_READLINE)
+      system("stty sane");
+      #endif
+      if ((h->next!=NULL)&&(h->next->Typ()==INT_CMD))
+      {
+        fe_use_fgets=(int)h->next->Data();
+        fe_set_input_mode();
+      }
       return FALSE;
     }
     else
@@ -277,6 +278,28 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       }
       else
         WerrorS("int expected");
+    }
+    else
+/*==================== LaScala ==================================*/
+    if(strcmp((char*)(h->Data()),"LaScala")==0)
+    {
+      if ((h->next!=NULL) 
+      &&((h->next->Typ()==IDEAL_CMD)||(h->next->Typ()==MODUL_CMD)))
+      {
+        int dummy;
+        res->data=(void *)syLaScala3((ideal)h->next->Data(),&dummy);
+        mmTest(res->data,sizeof(ssyStrategy));
+        syStrategy s=(syStrategy)res->data;
+        for (int i=s->length;i>=0;i--)
+        {
+          if (s->res[i]!=NULL)
+            idTest(s->res[i]);
+        }
+        res->rtyp=RESOLUTION_CMD;
+        return FALSE;
+      }
+      else
+         WerrorS("ideal/module expected");
     }
     else
 /*==================== naIdeal ==================================*/

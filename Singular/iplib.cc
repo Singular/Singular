@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.6 1997-05-02 15:10:15 Singular Exp $ */
+/* $Id: iplib.cc,v 1.7 1997-07-09 15:54:01 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -498,12 +498,12 @@ BOOLEAN iiEStart(char* example)
   return err;
 }
 
-BOOLEAN iiLibCmd( char *newlib )
+BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 {
   char buf[256];
   char libnamebuf[128];
   idhdl h,hl;
-  FILE * fp = feFopen( newlib, "r", libnamebuf, TRUE );
+  FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
   if (fp==NULL)
   {
     return TRUE;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.22 1997-07-04 13:46:45 Singular Exp $ */
+/* $Id: tesths.cc,v 1.23 1997-07-09 15:54:08 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -99,32 +99,6 @@ int main(          /* main entry to Singular */
         }
       }
     }
-    else if (strcmp(argv[1], "-d") == 0)
-    {
-      if (argc > 2)
-      {
-        char* ptr = NULL;
-#ifdef HAVE_STRTOL        
-        long res = strtol(argv[2], &ptr, 10);
-        if (errno != ERANGE && ptr != argv[2] && res > 0)
-#else
-        long res = 0;
-        sscanf(argv[2],"%d", &res);
-        if (res > 0)
-#endif          
-        {
-          argc--;
-          argv++;
-          SetTimerResolution(res);
-        }
-        else
-          fprintf(stderr,"Can not convert %s to an integer > 0\n", argv[2]);
-      }
-      else
-      {
-        fprintf(stderr,"Need an integer to set timer resolution");
-      }
-    }
     else
     {
     
@@ -202,6 +176,33 @@ int main(          /* main entry to Singular */
                 printf("search path:%s\n\n", SINGULAR_DATADIR);
               break;
             }
+            case 'd':
+            {
+              if (argc > 2)
+              {
+                char* ptr = NULL;
+#ifdef HAVE_STRTOL        
+                long res = strtol(argv[2], &ptr, 10);
+                if (errno != ERANGE && ptr != argv[2] && res > 0)
+#else
+                long res = 0;
+                sscanf(argv[2],"%d", &res);
+                if (res > 0)
+#endif          
+                {
+                  argc--;
+                  argv++;
+                  i=0;
+                  SetTimerResolution(res);
+                }
+                else
+                  fprintf(stderr,"Can not convert %s to an integer > 0\n", argv[2]);
+              }
+              else
+              {
+                fprintf(stderr,"Need an integer to set timer resolution");
+              }
+            }
             case 'e': if ((argv[1][i+1]>'0') && (argv[1][i+1]<='9'))
             {
               i++;
@@ -232,7 +233,7 @@ int main(          /* main entry to Singular */
             case 'q': verbose &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
               break;
             case 't':
-#ifdef HAVE_FEREAD
+#if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
               fe_use_fgets=TRUE;
 #endif
               break;
@@ -273,10 +274,18 @@ int main(          /* main entry to Singular */
   slStandardInit();
   dlInit(thisfile);
   myynest=0;
+  iiLibCmd(mstrdup("standard.lib"),FALSE);
+#ifndef macintosh
+#if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
+  fe_set_input_mode();
+#endif
+#endif
+  setjmp(si_start_jmpbuf);
   /* if script is given */
   if ((argc > 1)&&(argv[1][0]!='-'))
   {
     /* read and run the Script */
+    argc=1;
     iiPStart(NULL,argv[1],NULL);
   }
   /* start shell */
@@ -290,11 +299,6 @@ int main(          /* main entry to Singular */
     return 1;
 #endif // HAVE_MPSR
   }
-#ifndef macintosh
-#if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
-  fe_set_input_mode();
-#endif
-#endif
   setjmp(si_start_jmpbuf);
   yyparse();
 #endif

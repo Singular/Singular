@@ -33,6 +33,7 @@
 #include "lists.h"
 #include "attrib.h"
 #include "silink.h"
+#include "syz.h"
 #include "subexpr.h"
 
 sleftv     sLastPrinted;
@@ -133,6 +134,9 @@ void sleftv::Print(leftv store, int spaces)
           ::Print("%-*.*s",spaces,spaces," ");
           pWrite0((poly)d);
           break;
+        case RESOLUTION_CMD:
+          syPrint((syStrategy)d);
+          break;  
         case STRING_CMD:
           ::Print("%-*.*s%s",spaces,spaces," ",(char *)d);
           break;
@@ -273,6 +277,11 @@ void sleftv::CleanUp()
         Free((ADDRESS)data,sizeof(ip_command));
         break;
       }
+      case RESOLUTION_CMD:
+      {
+        syKillComputation((syStrategy)data);
+        break;
+      }
 #ifdef TEST
       // the following types do not take memory
       // or are not copied
@@ -368,10 +377,9 @@ void sleftv::CleanUp()
   }
 }
 
-void * slInternalCopy(leftv source)
+void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
 {
-  void *d=source->data;
-  switch (source->rtyp)
+  switch (t)
   {
     case INTVEC_CMD:
     case INTMAT_CMD:
@@ -382,6 +390,24 @@ void * slInternalCopy(leftv source)
     case MODUL_CMD:
       return  (void *)idCopy((ideal)d);
     case STRING_CMD:
+      if ((e==NULL)
+      || (source->rtyp==LIST_CMD)
+      || ((source->rtyp==IDHDL)&&(IDTYP((idhdl)source->data)==LIST_CMD)))
+        return (void *)mstrdup((char *)d);
+      else if (e->next==NULL)
+      {
+        char *s=(char *)AllocL(2);
+        s[0]=*(char *)d;
+        s[1]='\0';
+        return s;
+      }
+      #ifdef TEST
+      else
+      {
+        Werror("not impl. string-op in `%s`",my_yylinebuf);
+        return NULL;
+      }
+      #endif
     case PROC_CMD:
       return  (void *)mstrdup((char *)d);
     case POLY_CMD:
@@ -404,6 +430,8 @@ void * slInternalCopy(leftv source)
         r->ref++;
         return d;
       }
+    case RESOLUTION_CMD:
+      return (void*)syCopy((syStrategy)d);
 #ifdef TEST
     case DEF_CMD:
     case NONE:
@@ -505,75 +533,14 @@ void * sleftv::CopyD(int t)
     void *x=data;
     if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
     else if (rtyp==LIB_CMD)
-      x=(void *)mstrdup(Data());
+      x=(void *)mstrdup((char *)Data());
     else if ((rtyp==VMINPOLY)&& (currRing->minpoly!=NULL)&&(currRing->ch<2))
       x=(void *)nCopy(currRing->minpoly);
     data=NULL;
     return x;
   }
   void *d=Data();
-  if (!errorreported)
-  switch (t)
-  {
-    case INTVEC_CMD:
-    case INTMAT_CMD:
-      return (void *)ivCopy((intvec *)d);
-    case MATRIX_CMD:
-      return (void *)mpCopy((matrix)d);
-    case IDEAL_CMD:
-    case MODUL_CMD:
-      return (void *)idCopy((ideal)d);
-    case STRING_CMD:
-    case PROC_CMD:
-    case BINARY_CMD:
-      if ((e==NULL)
-      || (rtyp==LIST_CMD)
-      || ((rtyp==IDHDL)&&(IDTYP((idhdl)data)==LIST_CMD)))
-        return (void *)mstrdup((char *)d);
-      else if (e->next==NULL)
-      {
-        char *s=(char *)AllocL(2);
-        s[0]=*(char *)d;
-        s[1]='\0';
-        return s;
-      }
-#ifdef TEST
-      else
-      {
-        Werror("not impl. string-op in `%s`",my_yylinebuf);
-        return NULL;
-      }
-#endif
-      break;
-    case POLY_CMD:
-    case VECTOR_CMD:
-      return (void *)pCopy((poly)d);
-    case INT_CMD:
-      return d;
-    case NUMBER_CMD:
-      return (void *)nCopy((number)d);
-    case MAP_CMD:
-      return (void *)maCopy((map)d);
-    case LIST_CMD:
-      return (void *)lCopy((lists)d);
-    case LINK_CMD:
-      return (void *)slCopy((si_link) d);
-    case RING_CMD:
-    case QRING_CMD:
-      {
-        ring r=(ring)d;
-        r->ref++;
-        return d;
-      }
-    case 0:
-    case DEF_CMD:
-      break;
-#ifdef TEST
-    //case COMMAND:
-    default:
-      Warn("CopyD: cannot copy type %s(%d)",Tok2Cmdname(t),t);
-#endif
-  }
+  if (!errorreported) return slInternalCopy(this,t,d,e);
   return NULL;
 }
 
@@ -834,7 +801,7 @@ void * sleftv::Data()
       case VNOETHER:   return (void *) ppNoether;
       case LIB_CMD:    {
                          idhdl h = ggetid( "LIB" );
-                         if(h==NULL) return sNoName;
+                         if(h==NULL) return (void *)sNoName;
                          return IDSTRING(h);
                        }  
       case IDHDL:

@@ -243,6 +243,7 @@ cmdnames cmds[] =
   { "regularity",  0, REGULARITY_CMD ,    CMD_1},
   { "res",         0, RES_CMD ,           CMD_23},
   { "reservedName",0, RESERVEDNAME_CMD ,  CMD_M},
+  { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
   { "return",      0, RETURN ,            RETURN},
 #ifdef SIC
@@ -2181,6 +2182,11 @@ static BOOLEAN jjBAREISS_IM(leftv res, leftv v)
   res->data = (char *)m;
   return FALSE;
 }
+//static BOOLEAN jjBETTI_R(leftv res, leftv v)
+//{
+//  res->data=(char *)syBettiOfComputation((syStrategy)v->Data());
+//  return FALSE;
+//}
 static BOOLEAN jjCALL1MANY(leftv res, leftv u)
 {
   return iiExprArithM(res,u,iiOp);
@@ -2229,6 +2235,11 @@ static BOOLEAN jjCOUNT_IV(leftv res, leftv v)
   res->data = (char *)((intvec*)(v->Data()))->length();
   return FALSE;
 }
+//static BOOLEAN jjCOUNT_R(leftv res, leftv v)
+//{
+//  res->data=(char *)syLength((syStrategy)v->Data());
+//  return FALSE;
+//}
 static BOOLEAN jjDEG(leftv res, leftv v)
 {
   int dummy;
@@ -2300,6 +2311,11 @@ static BOOLEAN jjDIM(leftv res, leftv v)
   res->data = (char *)scDimInt((ideal)(v->Data()),currQuotient);
   return FALSE;
 }
+//static BOOLEAN jjDIM_R(leftv res, leftv v)
+//{
+//  res->data = (char *)syDim((syStrategy)v->Data());
+//  return FALSE;
+//}
 static BOOLEAN jjDUMP(leftv res, leftv v)
 {
   si_link l = (si_link)v->Data();
@@ -2454,6 +2470,11 @@ static BOOLEAN jjpHead(leftv res, leftv v)
   return FALSE;
 }
 #endif
+static BOOLEAN jjL2R(leftv res, leftv v)
+{
+  res->data=(char *)syConvList((lists)v->Data());
+  return FALSE;
+}  
 static BOOLEAN jjLEADCOEF(leftv res, leftv v)
 {
   poly p=(poly)v->Data();
@@ -2504,6 +2525,11 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   return FALSE;
 #endif
 }
+//static BOOLEAN jjMINRES_R(leftv res, leftv v)
+//{
+//  res->data=(char *)syMinimize((syStrategy)v->Data());
+//  return FALSE;
+//}
 static BOOLEAN jjMONITOR1(leftv res, leftv v)
 {
   monitor((char *)(v->Data()),PROT_I);
@@ -2745,6 +2771,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case LIST_CMD:   res->data=mstrdup("list"); break;
     case PACKAGE_CMD: res->data=mstrdup("package"); break;
     case LINK_CMD:   res->data=mstrdup("link"); break;
+    case RESOLUTION_CMD:res->data=mstrdup("resolution");break;
     case DEF_CMD:
     case NONE:    res->data=mstrdup("none"); break;
     default:       res->data=mstrdup("?unknown type?");
@@ -2815,6 +2842,10 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
 #define jjrVarStr      (proc1)18
 #define jjrParStr      (proc1)19
 #define jjidMinEmbedding (proc1)20
+#define jjBETTI_R        (proc1)21
+#define jjCOUNT_R        (proc1)22
+#define jjDIM_R          (proc1)23
+#define jjMINRES_R       (proc1)24
 
 extern struct sValCmd1 dArith1[];
 void jjInitTab1()
@@ -2849,6 +2880,10 @@ void jjInitTab1()
         case (int)jjrVarStr:      dArith1[i].p=(proc1)rVarStr; break;
         case (int)jjrParStr:      dArith1[i].p=(proc1)rParStr; break;
         case (int)jjidMinEmbedding: dArith1[i].p=(proc1)idMinEmbedding; break;
+        case (int)jjBETTI_R:      dArith1[i].p=(proc1)syBettiOfComputation; break;
+        case (int)jjCOUNT_R:      dArith1[i].p=(proc1)syLength; break;
+        case (int)jjDIM_R:        dArith1[i].p=(proc1)syDim; break;
+        case (int)jjMINRES_R:     dArith1[i].p=(proc1)syMinimize; break;
 #ifdef GENTABLE
         default: Werror("missing proc1-definition for %d",(int)dArith1[i].p);
 #endif
@@ -2878,6 +2913,10 @@ void jjInitTab1()
 #define jjrVarStr      (proc1)rVarStr
 #define jjrParStr      (proc1)rParStr
 #define jjidMinEmbedding (proc1)idMinEmbedding
+#define jjBETTI_R        (proc1)syBettiOfComputation
+#define jjCOUNT_R        (proc1)syLength
+#define jjDIM_R        (proc1)syDim
+#define jjMINRES_R     (proc1)syMinimize
 #endif
 BOOLEAN jjnInt(leftv res, leftv u)
 {
@@ -2912,6 +2951,7 @@ struct sValCmd1 dArith1[]=
 ,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
 ,{jjBAREISS,    BAREISS_CMD,     MATRIX_CMD,     MATRIX_CMD }
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD }
+,{jjBETTI_R,    BETTI_CMD,      -((s)INTMAT_CMD),RESOLUTION_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD }
 #ifdef HAVE_FACTORY
@@ -2931,6 +2971,7 @@ struct sValCmd1 dArith1[]=
 ,{jjCONTENT,    CONTENT_CMD,     POLY_CMD,       POLY_CMD }
 ,{jjCONTENT,    CONTENT_CMD,     VECTOR_CMD,     VECTOR_CMD }
 ,{jjCOUNT_N,    COUNT_CMD,       INT_CMD,        NUMBER_CMD }
+,{jjCOUNT_R,    COUNT_CMD,      -((s)INT_CMD),   RESOLUTION_CMD }
 ,{jjstrlen,     COUNT_CMD,      -((s)INT_CMD),   STRING_CMD }
 ,{jjpLength,    COUNT_CMD,      -((s)INT_CMD),   POLY_CMD }
 ,{jjpLength,    COUNT_CMD,      -((s)INT_CMD),   VECTOR_CMD }
@@ -2956,6 +2997,7 @@ struct sValCmd1 dArith1[]=
 #endif
 ,{jjDIM,        DIM_CMD,         INT_CMD,        IDEAL_CMD }
 ,{jjDIM,        DIM_CMD,         INT_CMD,        MODUL_CMD }
+,{jjDIM_R,      DIM_CMD,        -((s)INT_CMD),   RESOLUTION_CMD }
 ,{jjDUMP,       DUMP_CMD,        NONE,           LINK_CMD }
 ,{jjE,          E_CMD,           VECTOR_CMD,     INT_CMD }
 #ifdef HAVE_FACTORY
@@ -3021,6 +3063,7 @@ struct sValCmd1 dArith1[]=
 ,{jjidMinBase,  MINBASE_CMD,    -((s)IDEAL_CMD), IDEAL_CMD }
 ,{jjidMinBase,  MINBASE_CMD,    -((s)MODUL_CMD), MODUL_CMD }
 ,{jjMINRES,     MINRES_CMD,      LIST_CMD,       LIST_CMD }
+,{jjMINRES_R,   MINRES_CMD,     -((s)RESOLUTION_CMD), RESOLUTION_CMD }
 ,{jjDUMMY,      MODUL_CMD,       MODUL_CMD,      MODUL_CMD }
 ,{jjMONITOR1,   MONITOR_CMD,     NONE,           STRING_CMD }
 ,{jjMULT,       MULTIPLICITY_CMD,  INT_CMD,      IDEAL_CMD }
@@ -3063,6 +3106,7 @@ struct sValCmd1 dArith1[]=
 ,{jjREAD,       READ_CMD,        STRING_CMD,     LINK_CMD }
 ,{jjREGULARITY, REGULARITY_CMD,  INT_CMD,        LIST_CMD }
 ,{jjRESERVEDNAME,RESERVEDNAME_CMD, INT_CMD,      STRING_CMD }
+,{jjL2R,        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD }
 ,{jjWRONG,      ROWS_CMD,        0,              POLY_CMD }
 ,{jjpMaxComp,   ROWS_CMD,       -((s)INT_CMD),   VECTOR_CMD }
 ,{jjROWS,       ROWS_CMD,        INT_CMD,        MODUL_CMD }
@@ -3953,39 +3997,47 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
 {
   int sl=0;
   if (v!=NULL) sl = v->listLength();
-  lists L=(lists)Alloc(sizeof(slists));
-  leftv h=NULL;
-  int i;
-  int rt;
-
-  L->Init(sl);
-  for (i=0;i<sl;i++)
+  lists L;
+  if((sl==1)&&(v->Typ()==RESOLUTION_CMD))
   {
-    if (h!=NULL) { /* e.g. not in the first step:
-                   * h is the pointer to the old sleftv,
-                   * v is the pointer to the next sleftv
-                   * (in this moment) */
-                   h->next=v;
-                 }
-    h=v;
-    v=v->next;
-    h->next=NULL;
-    rt=h->Typ();
-    if (rt==0)
-    {
-      L->Clean();
-      Werror("`%s` is undefined",h->Name());
-      return TRUE;
-    }
-    if ((rt==RING_CMD)||(rt==QRING_CMD))
-    {
-      L->m[i].rtyp=rt;
-      L->m[i].data=h->Data();
-      ((ring)L->m[i].data)->ref++;
-    }
-    else
-      L->m[i].Copy(h);
+    L=syConvRes((syStrategy)v->Data());
   }
+  else
+  {
+    L=(lists)Alloc(sizeof(slists));
+    leftv h=NULL;
+    int i;
+    int rt;
+  
+    L->Init(sl);
+    for (i=0;i<sl;i++)
+    {
+      if (h!=NULL) { /* e.g. not in the first step:
+                     * h is the pointer to the old sleftv,
+                     * v is the pointer to the next sleftv
+                     * (in this moment) */
+                     h->next=v;
+                   }
+      h=v;
+      v=v->next;
+      h->next=NULL;
+      rt=h->Typ();
+      if (rt==0)
+      {
+        L->Clean();
+        Werror("`%s` is undefined",h->Name());
+        return TRUE;
+      }
+      if ((rt==RING_CMD)||(rt==QRING_CMD))
+      {
+        L->m[i].rtyp=rt;
+        L->m[i].data=h->Data();
+        ((ring)L->m[i].data)->ref++;
+      }
+      else
+        L->m[i].Copy(h);
+    }
+  }  
   res->data=(char *)L;
   return FALSE;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.6 1997-07-02 16:44:11 Singular Exp $ */
+/* $Id: ipid.cc,v 1.7 1997-07-09 15:54:01 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -23,6 +23,7 @@
 #include "lists.h"
 #include "attrib.h"
 #include "silink.h"
+#include "syz.h"
 #include "ipid.h"
 
 idhdl idroot = NULL;
@@ -118,6 +119,9 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
       case PACKAGE_CMD:
         len = sizeof(ip_package);
         break;
+      case RESOLUTION_CMD:
+        len=sizeof(ssyStrategy);
+        break;   
     //other types: without init (int,script,poly,def,package)
     }
     if (len!=0)
@@ -354,6 +358,10 @@ void killhdl(idhdl h, idhdl * ih)
   else if (IDTYP(h)==LINK_CMD)
   {
     slKill(IDLINK(h));
+  }
+  else if((IDTYP(h)==RESOLUTION_CMD)&&(IDDATA(h)!=NULL))
+  {
+    syKillComputation((syStrategy)IDDATA(h));
   }
 #ifdef TEST
   else if ((IDTYP(h)!= INT_CMD)&&(IDTYP(h)!=DEF_CMD))

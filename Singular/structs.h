@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.3 1997-04-09 12:20:13 Singular Exp $ */
+/* $Id: structs.h,v 1.4 1997-07-09 15:54:04 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -32,6 +32,7 @@ class sleftv;
 class slists;
 class sattr;
 class skStrategy;
+class ssyStrategy;
 
 struct  sip_sring;
 struct  sip_sideal;
@@ -76,6 +77,7 @@ typedef skStrategy *       kStrategy;
 typedef ip_command *       command;
 typedef ip_package *       package;
 typedef struct s_si_link_extension *si_link_extension;
+typedef ssyStrategy *      syStrategy;
 
 struct _scmdnames
 {

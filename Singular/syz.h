@@ -3,9 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.4 1997-04-09 12:20:16 Singular Exp $ */
+/* $Id: syz.h,v 1.5 1997-07-09 15:54:06 Singular Exp $ */
 /*
-* ABSTRACT: resolutions
+* ABSTRACT: Resolutions
 */
 #include "structs.h"
 
@@ -15,12 +15,34 @@ struct sSObject{
                  poly  lcm;   /*- the lcm of p1,p2 -*/
                  poly  syz;   /*- the syzygy associated to p1,p2 -*/
                  int   ind1,ind2; /*- the indeces of p1,p2 -*/
-                 int isNotMinimal;
-                 int order;
+                 poly  isNotMinimal;
+                 int   syzind;
+                 int   order;
                };
 typedef struct sSObject SObject;
 typedef SObject * SSet;
 typedef SSet * SRes;
+
+class ssyStrategy;
+typedef ssyStrategy * syStrategy;
+class ssyStrategy{
+  public:
+  int length;
+  int ** truecomponents;
+  int ** backcomponents;
+  int ** Howmuch;
+  int ** Firstelem;
+  resolvente res;
+  resolvente orderedRes;
+  SRes resPairs;
+  intvec * Tl;
+  resolvente fullres;
+  resolvente minres;
+  int references;
+  int * binom;
+  int highdeg_1;
+  intvec * resolution;
+};
 
 void sySchreyersSyzygiesM(polyset F,int Fmax,polyset* Shdl,int* Smax,
    BOOLEAN noSort);
@@ -47,7 +69,18 @@ BOOLEAN syTestOrder(ideal i);
 
 void syReOrderResolventFB(resolvente res,int length, int initial=1);
 
-resolvente syLaScala(ideal arg,int * length);
 resolvente syLaScala1(ideal arg,int * length);
+syStrategy syLaScala3(ideal arg,int * length);
 
+void syKillComputation(syStrategy syzstr);
+intvec * syBettiOfComputation(syStrategy syzstr);
+int syLength(syStrategy syzstr);
+int sySize(syStrategy syzstr);
+int syDim(syStrategy syzstr);
+syStrategy syCopy(syStrategy syzstr);
+void syPrint(syStrategy syzstr);
+lists syConvRes(syStrategy syzstr);
+syStrategy syConvList(lists li);
+syStrategy syForceMin(lists li);
+syStrategy syMinimize(syStrategy syzstr);
 #endif

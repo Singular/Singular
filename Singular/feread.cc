@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.4 1997-04-25 15:03:57 obachman Exp $ */
+/* $Id: feread.cc,v 1.5 1997-07-09 15:53:52 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -584,6 +584,7 @@ extern "C" {
 #define STDOUT_FILENO 1
 #endif
 
+#include "febase.h"
 #include "ipshell.h"
 
 BOOLEAN fe_use_fgets=FALSE;
@@ -650,22 +651,31 @@ void fe_set_input_mode(void)
   /* Allow conditional parsing of the ~/.inputrc file. */
   rl_readline_name = "Singular";
 
-  /* Tell the completer that we want a crack first. */
-  rl_attempted_completion_function = (CPPFunction *)singular_completion;
-
-  /* set the output stream */
-  if(!isatty(STDOUT_FILENO))
+  if(!fe_use_fgets)
   {
-    #ifdef atarist
-      rl_outstream = fopen( "/dev/tty", "w" );
-    #else
-      rl_outstream = fopen( ttyname(fileno(stdin)), "w" );
-    #endif
-  }
+    /* Tell the completer that we want a crack first. */
+    rl_attempted_completion_function = (CPPFunction *)singular_completion;
+
+    /* set the output stream */
+    if(!isatty(STDOUT_FILENO))
+    {
+      #ifdef atarist
+        rl_outstream = fopen( "/dev/tty", "w" );
+      #else
+        rl_outstream = fopen( ttyname(fileno(stdin)), "w" );
+      #endif
+    }
+  }  
 }
 
 char * fe_fgets_stdin_rl(char *pr,char *s, int size)
 {
+  if(fe_use_fgets)
+  {
+    PrintS(pr);mflush();
+    return fgets(s,size,stdin);
+  }
+
   char *line;
 
   line = readline (pr);

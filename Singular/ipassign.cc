@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.15 1997-07-02 16:44:10 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.16 1997-07-09 15:53:59 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -343,6 +343,13 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
   jiAssignAttr(res,a);
   return FALSE;
 }
+static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr e)
+{
+  if (res->data!=NULL) syKillComputation((syStrategy)res->data);
+  res->data=(void *)a->CopyD(RESOLUTION_CMD);
+  jiAssignAttr(res,a);
+  return FALSE;
+}
 static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
@@ -454,6 +461,7 @@ struct sValAssign dAssign[]=
 {
 // proc         res             arg
  {jiA_IDEAL,    IDEAL_CMD,      IDEAL_CMD }
+,{jiA_RESOLUTION,RESOLUTION_CMD,RESOLUTION_CMD }
 ,{jiA_IDEAL_M,  IDEAL_CMD,      MATRIX_CMD }
 ,{jiA_INT,      INT_CMD,        INT_CMD }
 ,{jiA_IDEAL,    MATRIX_CMD,     MATRIX_CMD }

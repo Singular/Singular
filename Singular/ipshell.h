@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.7 1997-07-02 16:44:12 Singular Exp $ */
+/* $Id: ipshell.h,v 1.8 1997-07-09 15:54:02 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -49,7 +49,7 @@ char *  iiGetLibName(char *procstr);
 char *  iiGetLibProcBuffer( char* libname, char* procname, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
 char *  iiProcArgs(char *e,BOOLEAN withParenth);
-BOOLEAN iiLibCmd( char *newlib );
+BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror=TRUE );
 leftv   iiMap(map theMap, char * what);
 void    iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
            intvec ** weights=NULL);
