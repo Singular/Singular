@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.4 1998-12-02 14:08:34 obachman Exp $ */
+/* $Id: mmbt.c,v 1.5 1999-03-18 16:30:52 Singular Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -22,6 +22,8 @@
 #include "mod2.h"
 #include "tok.h"
 #include "mmprivate.h"
+#include "febase.h"
+#include "mmbt.h"
 
 #ifdef MTRACK
 #ifndef __OPTIMIZE__
@@ -30,11 +32,9 @@
 */
 #if defined(linux) && defined(__i386__)
 
-#undef ulong
-#define ulong unsigned long
+static ulong mm_lowpc=0, mm_highpc=0;
 
 extern int etext ();
-static ulong mm_lowpc=0, mm_highpc=0;
 
 /*
  * Number of words between saved pc and saved fp.
@@ -70,12 +70,12 @@ void mmTrack (ulong *bt_stack)
   if (mm_lowpc==0) mmTrackInit();
 
   while ((fp!=NULL) && ((ulong)fp>4095)  && *fp && (pc = getpc (fp)) 
-  && !entrypc (pc) && (i<BT_STACKMAX))
+  && !entrypc (pc) && (i<BT_MAXSTACK))
   {
     bt_stack[i]=pc; i++;
     fp = (ulong *) *fp;
   }
-  while(i<BT_STACKMAX)
+  while(i<BT_MAXSTACK)
   {
     bt_stack[i]=0; i++;
   }
@@ -93,12 +93,12 @@ void mmP2cNameInit()
   FILE *f;
   int i,j;
   char n[128];
-  system("./mprnm -p Singularg >nm.log");
+  system("mprnm -p Singularg >nm.log");
   f=fopen("nm.log","r");
   i=0;
   loop
   {
-    j=fscanf(f,"%d %s\n",&p2n[i].p,n);
+    j=fscanf(f,"%d %s\n",(int *)&p2n[i].p,n);
     if (j!=2) break;
     p2n[i].name=strdup(n);
     i++;
@@ -143,6 +143,17 @@ char * mmP2cName(ulong p)
   }
   return "??";
 #endif
+}
+
+void mmPrintStack(ulong *bt_stack) /* print stack */
+{
+  int i=0;
+  do
+  {
+    Print(":%x(%s)",bt_stack[i],mmP2cName(bt_stack[i]));
+    i++;
+  } while ((i<BT_MAXSTACK) && (bt_stack[i]!=0));
+  PrintLn();
 }
 #endif /* linux, i386 */
 #endif /* not optimize */
