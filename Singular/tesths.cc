@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.61 1999-05-07 15:41:35 Singular Exp $ */
+/* $Id: tesths.cc,v 1.62 1999-05-29 11:58:26 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -55,6 +55,7 @@
 #define LON_MP_HOST         "MPhost"
 #define LON_NO_WARN         "no-warn"
 #define LON_NO_OUT          "no-out"
+#define LON_SDB             "sdb"
 // undocumented options
 #ifdef HAVE_MPSR
 #define LON_MP_TRANSP       "MPtransp"
@@ -68,6 +69,7 @@ static struct option longopts[] =
   {LON_BATCH,             0,  0,  'b'},
 #endif
   {LON_EXECUTE,           1,  0,  'c'},
+  {LON_SDB,               0,  0,  'd'},
   {LON_ECHO,              2,  0,  'e'},
   {LON_HELP,              0,  0,  'h'},
   {LON_QUIET,             0,  0,  'q'},
@@ -81,7 +83,7 @@ static struct option longopts[] =
   {LON_NO_STDLIB,         0,  0,  LONG_OPTION_RETURN},
   {LON_NO_RC,             0,  0,  LONG_OPTION_RETURN},
   {LON_NO_WARN,           0,  0,  LONG_OPTION_RETURN},
-  {LON_NO_OUT,           0,  0,  LONG_OPTION_RETURN},
+  {LON_NO_OUT,            0,  0,  LONG_OPTION_RETURN},
   {LON_MIN_TIME,          1,  0,  LONG_OPTION_RETURN},
 #ifdef HAVE_MPSR
   {LON_MP_PORT,           1,  0,  LONG_OPTION_RETURN},
@@ -97,7 +99,7 @@ static struct option longopts[] =
   { 0, 0, 0, 0 }
 };
 // #define SHORT_OPTS_STRING "bc:e::hqr:tu:v"
-#define SHORT_OPTS_STRING "bhqtvxec:r:u:"
+#define SHORT_OPTS_STRING "bdhqtvxec:r:u:"
 
 struct sing_option
 {
@@ -116,6 +118,7 @@ static struct sing_option sing_longopts[] =
 #endif
   {LON_HELP,        0,          "Print help message and exit",                          0},
   {LON_QUIET,       0,          "Do not print start-up banner and library load messages",            0},
+  {LON_SDB,         0,          "Enable sdb debugger (experimental)",            0},
   {LON_NO_TTY,      0,          "Do not redefine the terminal characteristics",         0},
   {LON_VERSION,     0,          "Print extended version and configuration info",        0},
 #ifdef HAVE_TCL
@@ -313,7 +316,6 @@ int main(          /* main entry to Singular */
           mainUsage(argv[0]);
           exit(1);
 #endif
-
         case 'h':
           mainHelp(argv[0]);
           exit(0);
@@ -329,6 +331,10 @@ int main(          /* main entry to Singular */
 #endif
           mainSetSingOptionValue(LON_NO_TTY, (char*) 1);
           break;
+
+        case 'd':
+	  sdb_flags = 1;
+	  break;
 
         case 'v':
           printf("Singular for %s version %s  (%d)  %s %s\n",
