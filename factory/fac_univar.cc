@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.16 1998-02-02 08:58:49 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.17 1998-03-12 14:32:54 schmidt Exp $ */
 
 #include <config.h>
 
@@ -147,29 +147,6 @@ cf2double ( const CanonicalForm & f )
     return res;
 }
 
-//{{{ static CanonicalForm norm ( const CanonicalForm & f )
-//{{{ docu
-//
-// norm() - return euclidean norm of f.
-//
-// That is, returns the largest integer smaller or equal
-// norm(f) = sqrt(sum( f[i]^2 )).  f should be an univariate
-// polynomial over Z.
-//
-// Used by kbound().
-//
-//}}}
-static CanonicalForm
-norm ( const CanonicalForm & f )
-{
-    CFIterator i;
-    CanonicalForm sum = 0;
-    for ( i = f; i.hasTerms(); i++ ) sum += i.coeff() * i.coeff();
-    DEBOUTLN( cerr, "sum = " << sum );
-    return sqrt( sum );
-}
-//}}}
-
 //{{{ static int kBound ( const CanonicalForm & f, int p )
 //{{{ docu
 //
@@ -190,7 +167,7 @@ norm ( const CanonicalForm & f )
 static int
 kBound ( const CanonicalForm & f, int p )
 {
-    return (int)(f.degree() + (double)(ilog2( norm(f)+1 ) + 1) / (double)ilog2(p)) + 1;
+    return (int)(f.degree() + (double)(ilog2( euclideanNorm(f)+1 ) + 1) / (double)ilog2(p)) + 1;
 }
 //}}}
 
