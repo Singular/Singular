@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.16 1998-05-19 12:04:04 wichmann Exp $
+@comment $Id: start.doc,v 1.17 1998-05-19 18:53:49 schmidt Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -137,7 +137,7 @@ well as tools to debug them are considered in the following sections:
 @ref{Procedures}, @ref{Libraries}, and @ref{Debugging tools}.
 
 @item
-Finally, in @ref{In- and output},  @sc{Singular}'s mechanisms to
+Finally, in @ref{Input and output},  @sc{Singular}'s mechanisms to
 store and retrieve data are discussed.
 
 @end itemize

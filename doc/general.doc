@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.89 1998-05-19 18:45:02 schmidt Exp $
+@comment $Id: general.doc,v 1.90 1998-05-19 18:53:37 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -21,14 +21,14 @@
 @end ignore
 
 @menu
-* Interactive use::
-* Rings and orderings::
-* Implemented algorithms::
-* The SINGULAR language::
-* Procedures::
-* Libraries::
-* Debugging tools::
-* In- and output::
+* Interactive use::             
+* Rings and orderings::         
+* Implemented algorithms::      
+* The SINGULAR language::       
+* Input and output::              
+* Procedures::                  
+* Libraries::                   
+* Debugging tools::             
 @end menu
 
 
@@ -1010,7 +1010,7 @@ other domains, elementary algorithms are used.
 @end table
 
 @c ---------------------------------------------------------------------------
-@node The SINGULAR language, Procedures, Implemented algorithms, General concepts
+@node The SINGULAR language, Input and output, Implemented algorithms, General concepts
 @section The SINGULAR language
 @cindex The SINGULAR language
 
@@ -1504,8 +1504,152 @@ as well(See @ref{proc}).
 @end menu
 
 
+@c ----------------------------------------------------------------------
+@c ----------------------------------------------------------------------
+@node Input and output, Procedures, The SINGULAR language, General concepts
+@section Input and output
+@cindex input
+@cindex output
+
+
+With one exception, @sc{Singular}'s in- and output (short, I/O) is
+realized using links. This one exception is the loading of libraries
+which has to be realized with the @code{LIB} command (see @ref{LIB}).
+
+In other words, links are the communication channels of @sc{Singular},
+i.e.  something @sc{Singular} can write to and/or read from. Currently,
+@sc{Singular} supports four different link types:
+@table @asis
+@item ASCII links (see @ref{ASCII links}):
+data that can be converted to a string can be written into files for
+storage or communcation with other programs. The data is written in
+plain ASCII format. Reading from an ASCII link returns a string -
+conversion into other data is up to the user. This can be done, for
+example, using the command @code{execute} (see @ref{execute}).
+
+@strong{Example:}
+@example
+@c example
+  // (over)write file test.ascii, link is specified as string
+  write(":w test.ascii", "int i =", 3, ";");
+  // reading simply returns the string
+  read("test.ascii");
+  // but now test.ascii is "executed"
+  execute read("test.ascii");
+  i;
+@c example
+@end example
+ASCII links should primarily be used for storing small amounts of data,
+especially if it might become necessary to manually inspect or
+manipulate the data.
+
+@item MPfile links (see @ref{MPfile links}):
+data is stored in the binary MP format: read and write access is very
+fast compared to ASCII links. All data (including such data that can not
+be converted to a string) can be written to an MPfile link. Reading from
+an MP link returns the written expression(s) (i.e., not a string, in
+general).
+
+@strong{Example:}
+@example
+@c example
+  ring r;
+  // (over)write MPfile test.mp, link is specified as string
+  write("MPfile:w test.mp", x+y);
+  kill r;
+  def p = read("MPfile:r test.mp");
+  typeof(p); p;
+@c example
+@end example
+MPfile links should primarily be used for storing large amounts of data
+(like dumps of the content of an entire @sc{Singular} session), and if
+the data to be stored can not be (easily) converted from/to a string
+(like rings, or maps).
+
+@item MPtcp links (see @ref{MPtcp links}):
+data is communicated with other processes (e.g., @sc{Singular}
+processes) which may run on the same or on different computers.
+Data exchange is accomplished using TCP/IP links
+in the binary MP format.
+
+@strong{Example:}
+@example
+@c example
+  ring r;
+  link l = "MPtcp:launch"; // declare a link explicitely
+  open(l); // need an open, launches another SINGULAR as a server
+  write(l, x+y);
+  kill r;
+  def p = read(l);
+  typeof(p); p;
+  close(l); // shuts down SINGULAR server
+@c example
+@end example
+MPtcp links should primarily be used for communications with other
+programs or for parallel computations (see, for example,
+@ref{Parallelization with MPtcp links}).
+
+@item DBM links (see @ref{DBM links})
+data is stored in and accessed from a data base. Writing is accomplished
+by a key- and a value string and associates the value with the key in
+the specfied data base. Reading is accomplished w.r.t. a key
+(string), whose associated value (string) is returned.
+
+@strong{Example:}
+@example
+@c example
+  ring r;
+  // associate "x+y" with "mykey"
+  write("DBM:w test.dbm", "mykey", string(x+y));
+  // get from data base what is stored under "mykey"
+  execute read("DBM: test.dbm", "mykey");
+@c example
+@end example
+DBM links should primarily be used when data needs to be accessed not in a
+sequential way (like with files) but in an associative way (like with
+data bases).
+
+@end table
+
+Besides the usual I/O commands @code{write} (see @ref{write}) and
+@code{read} (see @ref{read}), there are
+also the commands @code{dump} (see @ref{dump}) and @code{getdump} (see
+@ref{getdump}) (except for DBM links) which store (resp. retrieve) the
+content of an entire @sc{Singular} session to (resp. from) a link.
+
+@strong{Example:}
+@example
+@c example
+  ring r; poly p = x+y;
+  dump("MPfile:w test.mp");
+  kill r;
+  getdump("MPfile:r test.mp");
+  listvar();
+@c example
+@end example
+
+Specifying a link can be as easy as using a filename(string). In most
+cases (except for MPtcp links), links do not need to be explicitely
+opened (see @ref{open}) or closed (see @ref{close}) before (resp. after)
+they are used. Furthermore, links have various properties which can be
+checked for using the @code{status} (see @ref{status}) command.
+
+@strong{Example:}
+@example
+@c example
+  link l = "MPtcp:fork";
+  l;
+  open(l);
+  l;
+  status(l, "mode");
+  close(l);
+@c example
+@end example
+
+
 @c ---------------------------------------------------------------------------
-@node Procedures, Libraries, The SINGULAR language, General concepts
+@c ---------------------------------------------------------------------------
+@node Procedures, Libraries, Input and output, General concepts
 @section Procedures
 @cindex Procedures
 Procedures contain sequences of @sc{Singular} commands in a special format.
@@ -2111,7 +2255,7 @@ necessary.
 @c @end table
 
 @c ----------------------------------------------------------------------
-@node Debugging tools,  In- and output, Libraries, General concepts
+@node Debugging tools,  , Libraries, General concepts
 @section Debugging tools
 @cindex Debugging tools
 
@@ -2298,143 +2442,3 @@ The error message specifies a missing @} in line 664. But the output of
 libparse shows that the last properly recognized proc was
 @code{binomial} starting at line 86. So the error must be in the next
 proc  @code{factorial}.
-@c ----------------------------------------------------------------------
-@node In- and output,, Debugging tools, General concepts
-@section In- and output
-@cindex input
-@cindex output
-
-
-With one exception, @sc{Singular}'s in- and output (short, I/O) is
-realized using links. This one exception is the loading of libraries
-which has to be realized with the @code{LIB} command (see @ref{LIB}).
-
-In other words, links are the communication channels of @sc{Singular},
-i.e.  something @sc{Singular} can write to and/or read from. Currently,
-@sc{Singular} supports four different link types:
-@table @asis
-@item ASCII links (see @ref{ASCII links}):
-data that can be converted to a string can be written into files for
-storage or communcation with other programs. The data is written in
-plain ASCII format. Reading from an ASCII link returns a string -
-conversion into other data is up to the user. This can be done, for
-example, using the command @code{execute} (see @ref{execute}).
-
-@strong{Example:}
-@example
-@c example
-  // (over)write file test.ascii, link is specified as string
-  write(":w test.ascii", "int i =", 3, ";");
-  // reading simply returns the string
-  read("test.ascii");
-  // but now test.ascii is "executed"
-  execute read("test.ascii");
-  i;
-@c example
-@end example
-ASCII links should primarily be used for storing small amounts of data,
-especially if it might become necessary to manually inspect or
-manipulate the data.
-
-@item MPfile links (see @ref{MPfile links}):
-data is stored in the binary MP format: read and write access is very
-fast compared to ASCII links. All data (including such data that can not
-be converted to a string) can be written to an MPfile link. Reading from
-an MP link returns the written expression(s) (i.e., not a string, in
-general).
-
-@strong{Example:}
-@example
-@c example
-  ring r;
-  // (over)write MPfile test.mp, link is specified as string
-  write("MPfile:w test.mp", x+y);
-  kill r;
-  def p = read("MPfile:r test.mp");
-  typeof(p); p;
-@c example
-@end example
-MPfile links should primarily be used for storing large amounts of data
-(like dumps of the content of an entire @sc{Singular} session), and if
-the data to be stored can not be (easily) converted from/to a string
-(like rings, or maps).
-
-@item MPtcp links (see @ref{MPtcp links}):
-data is communicated with other processes (e.g., @sc{Singular}
-processes) which may run on the same or on different computers.
-Data exchange is accomplished using TCP/IP links
-in the binary MP format.
-
-@strong{Example:}
-@example
-@c example
-  ring r;
-  link l = "MPtcp:launch"; // declare a link explicitely
-  open(l); // need an open, launches another SINGULAR as a server
-  write(l, x+y);
-  kill r;
-  def p = read(l);
-  typeof(p); p;
-  close(l); // shuts down SINGULAR server
-@c example
-@end example
-MPtcp links should primarily be used for communications with other
-programs or for parallel computations (see, for example,
-@ref{Parallelization with MPtcp links}).
-
-@item DBM links (see @ref{DBM links})
-data is stored in and accessed from a data base. Writing is accomplished
-by a key- and a value string and associates the value with the key in
-the specfied data base. Reading is accomplished w.r.t. a key
-(string), whose associated value (string) is returned.
-
-@strong{Example:}
-@example
-@c example
-  ring r;
-  // associate "x+y" with "mykey"
-  write("DBM:w test.dbm", "mykey", string(x+y));
-  // get from data base what is stored under "mykey"
-  execute read("DBM: test.dbm", "mykey");
-@c example
-@end example
-DBM links should primarily be used when data needs to be accessed not in a
-sequential way (like with files) but in an associative way (like with
-data bases).
-
-@end table
-
-Besides the usual I/O commands @code{write} (see @ref{write}) and
-@code{read} (see @ref{read}), there are
-also the commands @code{dump} (see @ref{dump}) and @code{getdump} (see
-@ref{getdump}) (except for DBM links) which store (resp. retrieve) the
-content of an entire @sc{Singular} session to (resp. from) a link.
-
-@strong{Example:}
-@example
-@c example
-  ring r; poly p = x+y;
-  dump("MPfile:w test.mp");
-  kill r;
-  getdump("MPfile:r test.mp");
-  listvar();
-@c example
-@end example
-
-Specifying a link can be as easy as using a filename(string). In most
-cases (except for MPtcp links), links do not need to be explicitely
-opened (see @ref{open}) or closed (see @ref{close}) before (resp. after)
-they are used. Furthermore, links have various properties which can be
-checked for using the @code{status} (see @ref{status}) command.
-
-@strong{Example:}
-@example
-@c example
-  link l = "MPtcp:fork";
-  l;
-  open(l);
-  l;
-  status(l, "mode");
-  close(l);
-@c example
-@end example
