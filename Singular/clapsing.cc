@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.3 1997-04-09 12:19:40 Singular Exp $
+// $Id: clapsing.cc,v 1.4 1997-04-23 12:14:34 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -281,12 +281,21 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
   CFFList L;
+  number N=NULL;
+
   if ( (nGetChar() == 0) || (nGetChar() > 1) )
   {
     setCharacteristic( nGetChar() );
     if (nGetChar()==0) /* Q */
     {
-      pContent(f);
+      if ((with_exps!=0)&&(f!=NULL))
+      {
+        N=nCopy(pGetCoeff(f));
+        pContent(f);
+        number nn=nDiv(N,pGetCoeff(f));
+        nDelete(&N);
+        N=nn;
+      }  
     }
     CanonicalForm F( convSingPClapP( f ) );
     if (nGetChar()==0) /* Q */
@@ -373,6 +382,11 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
           res->m[j] = convClapAPSingAP( J.getItem().factor() );
       }
     }
+    if (N!=NULL) 
+    {
+      pMultN(res->m[0],N);
+      nDelete(&N);
+    }  
     // delete constants
     if ((with_exps!=0) && (res!=NULL))
     {
