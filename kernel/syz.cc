@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.4 2004-08-10 12:48:06 Singular Exp $ */
+/* $Id: syz.cc,v 1.5 2004-10-18 12:49:44 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -440,6 +440,17 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   }
 
 /*--- creating weights for the module components ---------------*/
+  if ((weights!=NULL) && (*weights!=NULL)&& ((*weights)[0]!=NULL))
+  {
+    if (!idTestHomModule(res[0],currQuotient,(*weights)[0]))
+    {
+      WarnS("1wrong weights given:"); (*weights)[0]->show();PrintLn();
+      idHomModule(res[0],currQuotient,&w);
+      w->show();PrintLn();
+      *weights=NULL;
+    }
+  }
+
   if ((weights==NULL) || (*weights==NULL) || ((*weights)[0]==NULL))
   {
     hom=(tHomog)idHomModule(res[0],currQuotient,&w);
@@ -603,6 +614,13 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
   int typ0;
   syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
+  if ((w!=NULL) && (!idTestHomModule(arg,currQuotient,w)))
+  {
+    WarnS("wrong weights given");w->show();PrintLn();
+    idHomModule(arg,currQuotient,&w);
+    w->show();PrintLn();
+    w=NULL;
+  }
   if (w!=NULL)
   {
     result->weights = (intvec**)omAlloc0Bin(void_ptr_bin);
@@ -678,7 +696,8 @@ int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
   {
     if (homog)
     {
-      k = pFDeg(id->m[j])+degrees[pGetComp(id->m[j])];
+      if (index==0)      k = pFDeg(temp->m[j])+degrees[pGetComp(temp->m[j])];
+      else               k = degrees[pGetComp(temp->m[j])];
       if (k>=index) tocancel[k-index]++;
       if ((k>=0) && (index==0)) subFromRank++;
     }
@@ -750,14 +769,30 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       result = new intvec(1,1,res[0]->rank);
     return result;
   }
-  r0_len=IDELEMS(res[0]);
-  while ((r0_len>0) && (res[0]->m[r0_len-1]==NULL)) r0_len--;
   intvec *w=NULL;
+  if (weights!=NULL)
+  {
+    if (!idTestHomModule(res[0],currQuotient,weights))
+    {
+      WarnS("wrong weights given");weights->show();PrintLn();
+      idHomModule(res[0],currQuotient,&w);
+      if (w!=NULL) { w->show();PrintLn();}
+      weights=NULL;
+    }
+  }
   if (idHomModule(res[0],currQuotient,&w)!=isHomog)
   {
     Warn("betti-command: Input is not homogeneous!");
+    weights=NULL;
   }
-  delete w;
+  if (weights==NULL) weights=w;
+  else delete w;
+  r0_len=IDELEMS(res[0]);
+  while ((r0_len>0) && (res[0]->m[r0_len-1]==NULL)) r0_len--;
+  #ifdef SHOW_W
+  PrintS("weights:");if (weights!=NULL) weights->show(); else Print("NULL"); P
+rintLn();
+  #endif
   int rkl=l = si_max(idRankFreeModule(res[0]),res[0]->rank);
   i = 0;
   while ((i<length) && (res[i]!=NULL))
@@ -806,16 +841,41 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   }
   /*------ computation betti numbers --------------*/
   rows -= mr;
-  result = new intvec(rows,cols,0);
-  (*result)[(-mr)*cols] = /*idRankFreeModule(res[0])*/ rkl;
-  if ((!idIs0(res[0])) && ((*result)[(-mr)*cols]==0))
-    (*result)[(-mr)*cols] = 1;
+  result = new intvec(rows+1,cols,0);
+  if (weights!=NULL)
+  {
+    for(j=0;j<weights->length();j++)
+    {
+      IMATELEM((*result),(-mr)+(*weights)[j]+1,1) ++;
+      // Print("imat(%d,%d)++ -> %d\n",(-mr)+(*weights)[j]+1, 1, IMATELEM((*result),(-mr)+(*weights)[j]+1,1));
+    }
+  }
+  else
+  {
+    (*result)[(-mr)*cols] = /*idRankFreeModule(res[0])*/ rkl;
+    if ((!idIs0(res[0])) && ((*result)[(-mr)*cols]==0))
+      (*result)[(-mr)*cols] = 1;
+  }
   tocancel = (int*)omAlloc0((rows+1)*sizeof(int));
-  memset(temp2,0,l*sizeof(int));
   memset(temp1,0,(l+1)*sizeof(int));
+  if (weights!=NULL)
+  {
+    memset(temp2,0,l*sizeof(int));
+    pSetModDeg(weights);
+  }
+  else
+    memset(temp2,0,l*sizeof(int));
   int dummy = syDetect(res[0],0,TRUE,temp2,tocancel);
+  if (weights!=NULL) pSetModDeg(NULL);
   if (tomin)
-    (*result)[(-mr)*cols] -= dummy;
+  {
+    //(*result)[(-mr)*cols] -= dummy;
+    for(j=0;j<=rows+mr;j++)
+    {
+      // Print("tocancel[%d]=%d imat(%d,%d)=%d\n",j,tocancel[j],(-mr)+j+1,1,IMATELEM((*result),(-mr)+j+1,1));
+      IMATELEM((*result),(-mr)+j+1,1) -= tocancel[j];
+    }
+  }
   for (i=0;i<cols-1;i++)
   {
     if ((i==0) && (weights!=NULL)) pSetModDeg(weights);
@@ -856,27 +916,28 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     temp3 = temp1;
     temp1 = temp2;
     temp2 = temp3;
-    for (j=0;j<rows;j++)
+    for (j=0;j<=rows;j++)
     {
     //  if (((*result)[i+1+j*cols]!=0) && (j>*regularity)) *regularity = j;
       if ((IMATELEM((*result),j+1,i+2)!=0) && (j>*regularity)) *regularity = j;
     }
     if ((i==0) && (weights!=NULL)) pSetModDeg(NULL);
   }
+  // Print("nach minim:\n"); result->show(); PrintLn();
   /*------ clean up --------------*/
   omFreeSize((ADDRESS)tocancel,(rows+1)*sizeof(int));
   omFreeSize((ADDRESS)temp1,(l+1)*sizeof(int));
   omFreeSize((ADDRESS)temp2,(l+1)*sizeof(int));
   if ((tomin) && (mr<0))  // deletes the first (zero) line
   {
-    for (j=1;j<=rows+mr;j++)
+    for (j=1;j<=rows+mr+1;j++)
     {
       for (k=1;k<=cols;k++)
       {
         IMATELEM((*result),j,k) = IMATELEM((*result),j-mr,k);
       }
     }
-    for (j=rows+mr+1;j<=rows;j++)
+    for (j=rows+mr+1;j<=rows+1;j++)
     {
       for (k=1;k<=cols;k++)
       {
@@ -886,12 +947,13 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   }
   j = 0;
   k = 0;
-  for (i=0;i<rows*cols;i++)
+  for (i=1;i<=result->rows();i++)
   {
-    if ((*result)[i] != 0)
+    for(l=1;l<=result->cols();l++)
+    if (IMATELEM((*result),i,l) != 0)
     {
-      if (i/cols>j) j = i/cols;
-      if (i>k+(i/cols)*cols) k = i-(i/cols)*cols;
+      j = si_max(j, i-1);
+      k = si_max(k, l-1);
     }
   }
   intvec * exactresult=new intvec(j+1,k+1,0);
