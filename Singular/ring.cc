@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.110 2000-09-04 14:38:02 obachman Exp $ */
+/* $Id: ring.cc,v 1.111 2000-09-07 16:22:01 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2313,46 +2313,43 @@ unsigned long rGetExpSize(unsigned long bitmask, int & bits)
  * may share data structures with currRing
  * DOES CALL rComplete
  */
-#if 0
-// TODO: exp_limit
-// omit_comp
-ring rModifyRing(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, int exp_limit)
+ring rModifyRing(ring r, BOOLEAN omit_degree,
+                         BOOLEAN omit_comp,
+                         unsigned long exp_limit)
 {
   assume (r != NULL );
   assume (exp_limit > 1);
 
-  ring res=(ring)omAllocBin(ip_sring_bin);
+  BOOLEAN need_other_ring;
+  int bits;
 
-  memcpy4(res,r,sizeof(ip_sring));
-  res->VarOffset = NULL;
-  res->ref=0;
-  if (r->parameter!=NULL)
-  {
-    res->minpoly=r->minpoly;
-    int l=rPar(r);
-    res->parameter=r->parameter;
-  }
-  int j1,j2;
-  int i=rBlocks(r);
-  res->wvhdl   = r->wvhdl;
-  res->order   = (int *) omAlloc(i * sizeof(int));
-  res->block0  = r->block0;
-  res->block1  = r->block1;
-  j=0; /*  index in r, index in res */
+  exp_limit=rGetExpSize(exp_limit, bits);
+  need_other_ring = (exp_limit==r->bitmask);
+
+  int nblocks=rBlocks(r);
+  int *order=omAlloc0((nblocks+1)*sizeof(int));
+  int *block0=omAlloc0((nblocks+1)*sizeof(int));
+  int *block1=omAlloc0((nblocks+1)*sizeof(int));
+  int **wvhdl=omAlloc0((nblocks+1)*sizeof(int_ptr));
+
+  int i=0;
+  int j=0; /*  i index in r, j index in res */
   loop
   {
-    switch(r->order[j])
+    switch(r->order[i])
     {
       case ringorder_C:
       case ringorder_c:
         if (!omit_comp)
         {
-          res->order[j]=r->order[j];
+          order[j]=r->order[i];
         }
-	else
-	{
-	  ............
-	}
+        else
+        {
+          j--;
+          need_other_ring=TRUE;
+          omit_comp=FALSE;
+        }
         break;
       case ringorder_wp:
       case ringorder_dp:
@@ -2360,12 +2357,13 @@ ring rModifyRing(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, int exp_limit)
       case ringorder_ds:
         if(!omit_degree)
         {
-          res->order[j]=r->order[j];
-          omit_degree=FALSE;
+          order[j]=r->order[i];
         }
         else
         {
           res->order[j]=ringorder_rp;
+          need_other_ring=TRUE;
+          omit_degree=FALSE;
         }
         break;
       case ringorder_Wp:
@@ -2374,30 +2372,57 @@ ring rModifyRing(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, int exp_limit)
       case ringorder_Ds:
         if(!omit_degree)
         {
-          res->order[j]=r->order[j];
-          omit_degree=FALSE;
+          order[j]=r->order[i];
         }
         else
         {
-          res->order[j]=ringorder_lp;
+          order[j]=ringorder_lp;
+          need_other_ring=TRUE;
+          omit_degree=FALSE;
         }
         break;
       default:
-        res->order[j]=r->order[j];
+        order[j]=r->order[i];
         break;
     }
-    j++;
-    res->order[j]=ringorder_no;
-    if (j==i) break;
+    block0[i]=r->block0[j];
+    block1[i]=r->block1[j];
+    wvhdl[i]=r->wvhdl[j];
+    i++;j++;
+    // order[j]=ringorder_no; //  done by omAlloc0
+    if (i==nblocks) break;
   }
-
+  if(!need_other_ring)
+  {
+    omFreeSize(order,(nblocks+1)*sizeof(int));
+    omFreeSize(block0,(nblocks+1)*sizeof(int));
+    omFreeSize(block1,(nblocks+1)*sizeof(int));
+    omFreeSize(wvhdl,(nblocks+1)*sizeof(int_ptr));
+    return r;
+  }
+  ring res=(ring)omAlloc0Bin(ip_sring_bin);
+  memcpy(res,r,sizeof(*r));
   res->names   = r->names;
-  res->idroot = NULL;
-  res->qideal =  r->names;
+  // res->idroot = NULL;
+  res->qideal =  r->qideal; // ?? or NULL
+  res->wvhdl=wvhdl;
+  res->order=order;
+  res->block0=block0;
+  res->block1=block1;
+  res->bitmask=exp_limit;
   rComplete(res);
   return res;
 }
-#endif
+
+void rKillModifiedRing(ring r)
+{
+  rUnComplete(r);
+  omFree(r->order);
+  omFree(r->block0);
+  omFree(r->block1);
+  omFree(r->wvhdl);
+  omFreeBin(r,ip_sring_bin);
+}
 
 BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
 {
@@ -2612,6 +2637,8 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
   // fill in some empty slots with variables not already covered
   // v0 is special, is therefore normally already covered
   // but if not:
+  // now we do have rings without comp...
+  #if 0
   if (v[0]== -1)
   {
     if (prev_ordsgn==1)
@@ -2625,6 +2652,7 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
       rO_LexVars_neg(j, j_bits, 0,0, prev_ordsgn,tmp_ordsgn,v,BITS_PER_LONG);
     }
   }
+  #endif
   // the variables
   for(i=1 ; i<r->N+1 ; i++)
   {
@@ -2688,6 +2716,7 @@ BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
   r->pDivHigh=r->pVarHighIndex;
 #endif
   r->pCompIndex=(r->VarOffset[0] & 0xffffff); //r->VarOffset[0];
+  if (r->pCompIndex==0xffffff) r->pCompIndex=-1;
   i=0; // position
   j=0; // index in r->typ
   if (i==r->pCompIndex) i++;
