@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.10 2000-02-04 13:21:14 obachman Exp $
+@comment $Id: INSTALL_unix.texi,v 1.11 2000-03-20 14:03:14 obachman Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on  Unix 
 @c
@@ -242,6 +242,15 @@ browser programs such as @code{info} or @code{Emacs}.
 @itemize @bullet
 @item General: @sc{Singular} can not find its libraries or on-line help
 @enumerate
+@item
+Make sure that you have read and/or excute permission the files and
+directories of the Singular distribution. If in doubt, @code{cd} to the
+directory where you unpacked @sc{Singular}, and do (as root, if
+necessary):
+@smallexample
+chmod +rX Singular 
+@end smallexample 
+
 @item
 Start up @sc{Singular}, and issue the command @code{system("Singular");}.
 If this does not return the correct and expanded location of the
