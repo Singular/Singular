@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.46 2001-07-31 17:37:43 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.47 2001-08-01 12:33:41 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -358,7 +358,6 @@ example
 
 static proc maxintdif(ideal e)
 {
-  dbprint(printlevel-voice+2,"//gaussman::maxintdif");
   int i,j,id;
   int mid=0;
   for(i=ncols(e);i>=1;i--)
@@ -382,7 +381,6 @@ static proc maxintdif(ideal e)
 
 static proc maxorddif(matrix H)
 {
-  dbprint(printlevel-voice+2,"//gaussman::maxorddif");
   int i,j,d;
   int d0,d1=-1,-1;
   for(i=nrows(H);i>=1;i--)
@@ -438,6 +436,7 @@ EXAMPLE:  example monodromy; shows examples
   int n=nvars(R)-1;
   def G=gmsring(f,"s");
   setring G;
+
   int mu,modm=ncols(gmsbasis),maxorddif(gmsbasis);
   ideal r=gmspoly*gmsbasis;
   list l;
@@ -449,8 +448,8 @@ EXAMPLE:  example monodromy; shows examples
   while(size(reduce(H,std(H0*s)))>0)
   {
     k++;
-    dbprint(printlevel-voice+2,"//gaussman::monodromy: k="+string(k));
-    dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
+    dbprint(printlevel-voice+2,"// k="+string(k));
+    dbprint(printlevel-voice+2,"// compute matrix A of t");
     if(opt==0)
     {
       l=gmscoeffs(r,k,mu);
@@ -462,21 +461,18 @@ EXAMPLE:  example monodromy; shows examples
     C,r=l[1..2];
     A0=A0+C;
 
+    dbprint(printlevel-voice+2,"// compute saturation of H''");
     H0=H;
-    dbprint(printlevel-voice+2,"//gaussman::monodromy: compute dH");
     dH=jet(module(A0*dH+s^2*diff(matrix(dH),s)),k);
     H=H*s+dH;
-
-    dbprint(printlevel-voice+2,"//gaussman::monodromy: test dH==0");
   }
   A0=A0-k*s;
 
-  dbprint(printlevel-voice+2,
-    "//gaussman::monodromy: compute basis of saturation");
+  dbprint(printlevel-voice+2,"// compute basis of saturation of H''");
   H=std(H0);
   int modH=maxorddif(H)/deg(s);
-  dbprint(printlevel-voice+2,"//gaussman::monodromy: k="+string(modH+1));
-  dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
+  dbprint(printlevel-voice+2,"// k="+string(modH+1));
+  dbprint(printlevel-voice+2,"// compute matrix A of t");
   if(opt==0)
   {
     l=gmscoeffs(r,modH+1,modH+1);
@@ -487,19 +483,16 @@ EXAMPLE:  example monodromy; shows examples
   }
   C,r=l[1..2];
   A0=A0+C;
-  dbprint(printlevel-voice+2,
-    "//gaussman::monodromy: compute A on saturation");
+  dbprint(printlevel-voice+2,"// transform A to saturation of H''");
   l=division(H*s,A0*H+s^2*diff(matrix(H),s));
   matrix A=jet(l[1],l[2],0);
 
   dbprint(printlevel-voice+2,
-    "//gaussman::monodromy: compute eigenvalues e and "+
-    "multiplicities b of A");
+    "// compute eigenvalues e with multiplicities m of A");
   l=eigenval(jet(A,0));
-  ideal e=l[1];
-  intvec b=l[2];
-  dbprint(printlevel-voice+2,"//gaussman::monodromy: e="+string(e));
-  dbprint(printlevel-voice+2,"//gaussman::monodromy: b="+string(b));
+  def e,m=l[1..2];
+  dbprint(printlevel-voice+2,"// e="+string(e));
+  dbprint(printlevel-voice+2,"// m="+string(m));
 
   if(opt==0)
   {
@@ -508,15 +501,18 @@ EXAMPLE:  example monodromy; shows examples
     return(list(e));
   }
 
+  dbprint(printlevel-voice+2,"// compute maximal integer difference of e");
   int mide=maxintdif(e);
+  dbprint(printlevel-voice+2,"// mide="+string(mide));
+
   if(mide>0)
   {
-    dbprint(printlevel-voice+2,
-      "//gaussman::monodromy: k="+string(modH+1+mide));
-    dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
+    dbprint(printlevel-voice+2,"// k="+string(modH+1+mide));
+    dbprint(printlevel-voice+2,"// compute matrix A of t");
     l=gmscoeffs(r,modH+1+mide,modH+1+mide);
     C,r=l[1..2];
     A0=A0+C;
+    dbprint(printlevel-voice+2,"// transform A to saturation of H''");
     l=division(H*s,A0*H+s^2*diff(matrix(H),s));
     A=jet(l[1],l[2],mide);
 
@@ -540,7 +536,7 @@ EXAMPLE:  example monodromy; shows examples
     }
     for(j,k=ncols(e),mu;j>=1;j--)
     {
-      for(i=b[j];i>=1;i--)
+      for(i=m[j];i>=1;i--)
       {
         ide[k]=ide[j];
         k--;
@@ -549,7 +545,7 @@ EXAMPLE:  example monodromy; shows examples
 
     while(mide>0)
     {
-      dbprint(printlevel-voice+2,"//gaussman::monodromy: mide="+string(mide));
+      dbprint(printlevel-voice+2,"// transform basis to reduce mide by 1");
 
       A0=jet(A,0);
       U=0;
@@ -584,7 +580,9 @@ EXAMPLE:  example monodromy; shows examples
           ide[i]=ide[i]-1;
         }
       }
+
       mide--;
+      dbprint(printlevel-voice+2,"// mide="+string(mide));
     }
 
     A=jet(A,0);
@@ -638,10 +636,10 @@ EXAMPLE:  example vfilt; shows examples
   }
 
   def R=basering;
+  int n=nvars(R)-1;
   def G=gmsring(f,"s");
   setring G;
 
-  int n=nvars(R)-1;
   int mu,modm=ncols(gmsbasis),maxorddif(gmsbasis);
   ideal r=gmspoly*gmsbasis;
   list l;
@@ -649,46 +647,39 @@ EXAMPLE:  example vfilt; shows examples
   matrix A[mu][mu],C;
   module H,dH=freemodule(mu),freemodule(mu);
   module H0;
-  int sdH=1;
   int k=-1;
   int N=n+1;
 
-  while(sdH>0)
+  while(size(reduce(H,std(H0*s)))>0)
   {
     k++;
-    dbprint(printlevel-voice+2,"//gaussman::vfilt: k="+string(k));
-    dbprint(printlevel-voice+2,"//gaussman::vfilt: compute C");
+    dbprint(printlevel-voice+2,"// k="+string(k));
+    dbprint(printlevel-voice+2,"// compute matrix A of t");
     l=gmscoeffs(r,k);
     C,r=l[1..2];
     A=A+C;
 
+    dbprint(printlevel-voice+2,"// compute saturation of H''");
     H0=H;
-    dbprint(printlevel-voice+2,"//gaussman::vfilt: compute dH");
     dH=jet(module(A*dH+s^2*diff(matrix(dH),s)),k);
     H=H*s+dH;
-
-    dbprint(printlevel-voice+2,"//gaussman::vfilt: test dH==0");
-    sdH=size(reduce(H,std(H0*s)));
   }
   A=A-k*s;
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: compute basis of saturation");
-  H=minbase(H0);
+  dbprint(printlevel-voice+2,"// compute basis of saturation of H''");
+  H=std(H0);
   int modH=maxorddif(H)/deg(s);
-  dbprint(printlevel-voice+2,"//gaussman::monodromy: k="+string(N+modH));
-  dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
+  dbprint(printlevel-voice+2,"// k="+string(N+modH));
+  dbprint(printlevel-voice+2,"// compute matrix A of t");
   l=gmscoeffs(r,N+modH,N+modH);
   C,r=l[1..2];
   A=A+C;
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: transform H0 to saturation");
+  dbprint(printlevel-voice+2,"// transform H'' to saturation of H''");
   l=division(H,freemodule(mu)*s^k);
   H0=jet(l[1],l[2],N-1);
 
-  dbprint(printlevel-voice+2,
-    "//gaussman::vfilt: compute H0 as vector space V0");
-  dbprint(printlevel-voice+2,
-    "//gaussman::vfilt: compute H1 as vector space V1");
+  dbprint(printlevel-voice+2,"// compute vector spaces");
   poly p;
   int i0,j0,i1,j1;
   matrix V0[mu*N][mu*N];
@@ -715,11 +706,11 @@ EXAMPLE:  example vfilt; shows examples
     }
   }
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: compute A on saturation");
+  dbprint(printlevel-voice+2,"// transform A to saturation of H''");
   l=division(H*s,A*H+s^2*diff(matrix(H),s));
   A=jet(l[1],l[2],N-1);
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: compute matrix M of A");
+  dbprint(printlevel-voice+2,"// compute matrix M of A");
   matrix M[mu*N][mu*N];
   for(i0=mu;i0>=1;i0--)
   {
@@ -745,11 +736,11 @@ EXAMPLE:  example vfilt; shows examples
     }
   }
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: compute eigenvalues eA of A");
+  dbprint(printlevel-voice+2,"// compute eigenvalues eA of A");
   ideal eA=eigenval(jet(A,0))[1];
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: eA="+string(eA));
+  dbprint(printlevel-voice+2,"// eA="+string(eA));
 
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: compute eigenvalues eM of M");
+  dbprint(printlevel-voice+2,"// compute eigenvalues eM of M");
   ideal eM;
   k=0;
   intvec u;
@@ -775,10 +766,9 @@ EXAMPLE:  example vfilt; shows examples
       i0=i1+1;
     }
   }
-  dbprint(printlevel-voice+2,"//gaussman::vfilt: eM="+string(eM));
+  dbprint(printlevel-voice+2,"// eM="+string(eM));
 
-  dbprint(printlevel-voice+2,
-    "//gaussman::vfilt: compute V-filtration on H0/H1");
+  dbprint(printlevel-voice+2,"// compute V-filtration on H''/sH''");
   ideal a;
   k=0;
   list V;
@@ -788,8 +778,7 @@ EXAMPLE:  example vfilt; shows examples
   {
     for(i=ncols(eM);number(eM[i])-1>number(n-1)/2;i--)
     {
-      dbprint(printlevel-voice+2,
-        "//gaussman::vfilt: compute V["+string(i)+"]");
+      dbprint(printlevel-voice+2,"// compute V["+string(i)+"]");
       V1=module(V1)+syz(power(M-eM[i],n+1));
       V[i]=interred(intersect(V1,V0));
 
@@ -801,14 +790,12 @@ EXAMPLE:  example vfilt; shows examples
       }
     }
 
-    dbprint(printlevel-voice+2,
-      "//gaussman::vfilt: symmetry index found");
+    dbprint(printlevel-voice+2,"// symmetry index found");
     int j=k;
 
     if(number(eM[i])-1==number(n-1)/2)
     {
-      dbprint(printlevel-voice+2,
-        "//gaussman::vfilt: compute V["+string(i)+"]");
+      dbprint(printlevel-voice+2,"// compute V["+string(i)+"]");
       V1=module(V1)+syz(power(M-eM[i],n+1));
       V[i]=interred(intersect(V1,V0));
 
@@ -820,7 +807,7 @@ EXAMPLE:  example vfilt; shows examples
       }
     }
 
-    dbprint(printlevel-voice+2,"//gaussman::vfilt: apply symmetry");
+    dbprint(printlevel-voice+2,"// apply symmetry");
     while(j>=1)
     {
       k++;
@@ -840,8 +827,7 @@ EXAMPLE:  example vfilt; shows examples
     int j=-1;
     for(i=ncols(eM);i>=1;i--)
     {
-      dbprint(printlevel-voice+2,
-        "//gaussman::vfilt: compute V["+string(i)+"]");
+      dbprint(printlevel-voice+2,"// compute V["+string(i)+"]");
       V1=module(V1)+syz(power(M-eM[i],n+1));
       V[i]=interred(intersect(V1,V0));
 
@@ -851,8 +837,6 @@ EXAMPLE:  example vfilt; shows examples
         {
           k++;
           a[k]=eM[i]-1;
-          dbprint(printlevel-voice+2,
-            "//gaussman::vfilt: transform to V0");
           v[k]=matrix(freemodule(ncols(V[i])),mu,mu*N)*division(V0,V[i])[1];
         }
         else
@@ -872,15 +856,13 @@ EXAMPLE:  example vfilt; shows examples
           a[k]=a[j];
           a[j]=eM[i]-1;
           v[k]=v[j];
-          dbprint(printlevel-voice+2,
-            "//gaussman::vfilt: transform to V0");
           v[j]=matrix(freemodule(ncols(V[i])),mu,mu*N)*division(V0,V[i])[1];
           j--;
         }
       }
     }
 
-    dbprint(printlevel-voice+2,"//gaussman::vfilt: compute graded parts");
+    dbprint(printlevel-voice+2,"// compute graded parts");
     for(k=1;k<size(v);k++)
     {
       v[k]=interred(reduce(v[k],std(v[k+1])));
@@ -959,8 +941,7 @@ EXAMPLE: example endfilt; shows examples
     V0=V0,v[i];
   }
 
-  dbprint(printlevel-voice+2,
-    "//gaussman::endfilt: compute multiplication in Jacobian algebra");
+  dbprint(printlevel-voice+2,"// compute multiplication in Jacobian algebra");
   list M;
   matrix U=freemodule(ncols(m));
   for(i=ncols(m);i>=1;i--)
@@ -978,8 +959,7 @@ EXAMPLE: example endfilt; shows examples
 
   while(b0<number(a[ncols(a)]-a[1]))
   {
-    dbprint(printlevel-voice+2,
-      "//gaussman::endfilt: find next possible index");
+    dbprint(printlevel-voice+2,"// find next possible index");
     b1=number(a[ncols(a)]-a[1]);
     for(j=ncols(a);j>=1;j--)
     {
@@ -1007,8 +987,7 @@ EXAMPLE: example endfilt; shows examples
       l=l+list(ideal());
     }
 
-    dbprint(printlevel-voice+2,
-      "//gaussman::endfilt: collect conditions for V1["+string(b0)+"]");
+    dbprint(printlevel-voice+2,"// collect conditions for V1["+string(b0)+"]");
     j=ncols(a);
     j0=mu;
     while(j>=1)
@@ -1037,21 +1016,19 @@ EXAMPLE: example endfilt; shows examples
       j--;
     }
 
-    dbprint(printlevel-voice+2,
-      "//gaussman::endfilt: compose condition matrix");
+    dbprint(printlevel-voice+2,"// compose condition matrix");
     L=transpose(module(l[1]));
     for(k=2;k<=ncols(m);k++)
     {
       L=L,transpose(module(l[k]));
     }
 
-    dbprint(printlevel-voice+2,
-      "//gaussman::endfilt: compute kernel of condition matrix");
+    dbprint(printlevel-voice+2,"// compute kernel of condition matrix");
     v0=v0+list(syz(L));
     a0=a0,b0;
   }
 
-  dbprint(printlevel-voice+2,"//gaussman::endfilt: compute graded parts");
+  dbprint(printlevel-voice+2,"// compute graded parts");
   option(redSB);
   for(i=1;i<size(v0);i++)
   {
@@ -1059,8 +1036,7 @@ EXAMPLE: example endfilt; shows examples
     v0[i]=std(reduce(v0[i],v0[i+1]));
   }
 
-  dbprint(printlevel-voice+2,
-    "//gaussman::endfilt: remove trivial graded parts");
+  dbprint(printlevel-voice+2,"// remove trivial graded parts");
   i=1;
   while(size(v0[i])==0)
   {
@@ -1129,7 +1105,7 @@ list Sp: spectrum of f
 if opt=1:
 list Spp: spectral pairs of f
   ideal Spp[1]: spectral numbers in increasing order
-  intvec Spp[2]: corresponding nilpotency indices in increasing order
+  intvec Spp[2]: corresponding weight filtration indices in increasing order
   intvec Spp[3]: corresponding multiplicities of spectral pairs
 default: opt=1
 @end format
@@ -1152,6 +1128,7 @@ EXAMPLE:  example sppairs; shows examples
   int n=nvars(R)-1;
   def G=gmsring(f,"s");
   setring(G);
+
   int mu,modm=ncols(gmsbasis),maxorddif(gmsbasis);
   ideal r=gmspoly*gmsbasis;
   list l;
@@ -1163,22 +1140,32 @@ EXAMPLE:  example sppairs; shows examples
   while(size(reduce(H,std(H0*s)))>0)
   {
     k++;
+    dbprint(printlevel-voice+2,"// k="+string(k));
+    dbprint(printlevel-voice+2,"// compute matrix A of t");
     l=gmscoeffs(r,k,mu+n);
     C,r=l[1..2];
     A0=A0+C;
+
+    dbprint(printlevel-voice+2,"// compute saturation of H''");
     H0=H;
     dH=jet(module(A0*dH+s^2*diff(matrix(dH),s)),k);
     H=H*s+dH;
   }
   A0=A0-k*s;
 
+  dbprint(printlevel-voice+2,"// compute basis of saturation of H''");
   H=std(H0);
   int modH=maxorddif(H)/deg(s);
+  dbprint(printlevel-voice+2,"// transform H'' to saturation of H''");
   l=division(H,freemodule(mu)*s^k);
   H0=l[1];
+
+  dbprint(printlevel-voice+2,"// k="+string(modH+1));
+  dbprint(printlevel-voice+2,"// compute matrix A of t");
   l=gmscoeffs(r,modH+1,modH+1+n);
   C,r=l[1..2];
   A0=A0+C;
+  dbprint(printlevel-voice+2,"// transform A to saturation of H''");
   l=division(H*s,A0*H+s^2*diff(matrix(H),s));
   matrix A=jet(l[1],l[2],0);
 
@@ -1186,28 +1173,43 @@ EXAMPLE:  example sppairs; shows examples
   matrix V;
   if(!opt)
   {
-    U=jordanbasis(A);
+    dbprint(printlevel-voice+2,"// transform to Jordan basis");
+    U=jordanbasis(A)[1];
     V=lift(U,freemodule(mu));
     A=V*A*U;
+    dbprint(printlevel-voice+2,"// compute normal form of H''");
     H0=std(V*H0);
+
+    dbprint(printlevel-voice+2,"// compute spectral numbers");
     ideal a;
     for(i=1;i<=mu;i++)
     {
       j=leadexp(H0[i])[nvars(basering)+1];
       a[i]=A[j,j]+deg(lead(H0[i]))/deg(s)-1;
     }
+
     setring(R);
     return(spgen(imap(G,a)));
   }
 
+  dbprint(printlevel-voice+2,
+    "// compute eigenvalues e with multiplicities m of A");
   l=eigenval(A);
-  def e,b=l[1..2];
+  def e,m=l[1..2];
+  dbprint(printlevel-voice+2,"// e="+string(e));
+  dbprint(printlevel-voice+2,"// m="+string(m));
+  dbprint(printlevel-voice+2,"// compute maximal integer difference of e");
   int mide=maxintdif(e);
+  dbprint(printlevel-voice+2,"// mide="+string(mide));
+
   if(mide>0)
   {
+    dbprint(printlevel-voice+2,"// k="+string(modH+1+mide));
+    dbprint(printlevel-voice+2,"// compute matrix A of t");
     l=gmscoeffs(r,modH+1+mide,modH+1+mide);
     C,r=l[1..2];
     A0=A0+C;
+    dbprint(printlevel-voice+2,"// transform A to saturation of H''");
     l=division(H*s,A0*H+s^2*diff(matrix(H),s));
     A=jet(l[1],l[2],mide);
 
@@ -1230,7 +1232,7 @@ EXAMPLE:  example sppairs; shows examples
     }
     for(j,k=ncols(e),mu;j>=1;j--)
     {
-      for(i=b[j];i>=1;i--)
+      for(i=m[j];i>=1;i--)
       {
         ide[k]=ide[j];
         k--;
@@ -1239,6 +1241,7 @@ EXAMPLE:  example sppairs; shows examples
 
     while(mide>0)
     {
+      dbprint(printlevel-voice+2,"// transform to separate eigenvalues");
       A0=jet(A,0);
       U=0;
       for(i=ncols(e);i>=1;i--)
@@ -1249,6 +1252,7 @@ EXAMPLE:  example sppairs; shows examples
       A=V*A*U;
       H0=V*H0;
 
+      dbprint(printlevel-voice+2,"// transform to reduce mide by 1");
       for(i=mu;i>=1;i--)
       {
         for(j=mu;j>=1;j--)
@@ -1277,56 +1281,66 @@ EXAMPLE:  example sppairs; shows examples
         }
       }
       H0=transpose(H0);
+
       mide--;
+      dbprint(printlevel-voice+2,"// mide="+string(mide));
     }
 
     A=jet(A,0);
   }
 
-  U=jordanbasis(A);
+  dbprint(printlevel-voice+2,"// transform to Jordan basis");
+  intvec w0;
+  l=jordanbasis(A);
+  U,w0=l[1..2];
   V=lift(U,freemodule(mu));
   A0=V*A*U;
 
-  intvec w;
-  w[mu]=1;
-  j=1;
-  for(i=mu-1;i>=1;i--)
-  {
-    j++;
-    if(A0[i,i+1]==0)
-    {
-      j=1;
-    }
-    w[i]=j;
-  }
-
+  dbprint(printlevel-voice+2,"// compute weight filtration basis");
   vector u;
-  for(i=1;i<ncols(A);i++)
+  i=1;
+  while(i<ncols(A))
   {
     j=i+1;
     while(j<ncols(A)&&A[i,i]==A[j,j])
     {
-      if(w[i]<w[j])
+      if(w0[i]>w0[j])
       {
-        k=w[i];
-        w[i]=w[j];
-        w[i]=k;
+        k=w0[i];
+        w0[i]=w0[j];
+        w0[i]=k;
         u=U[i];
         U[i]=U[j];
         U[j]=u;
       }
       j++;
     }
+    if(j==ncols(A)&&A[i,i]==A[j,j]&&w0[i]>w0[j])
+    {
+      k=w0[i];
+      w0[i]=w0[j];
+      w0[i]=k;
+      u=U[i];
+      U[i]=U[j];
+      U[j]=u;
+    }
+    i=j;
   }
 
+  dbprint(printlevel-voice+2,"// transform to weight filtration basis");
   V=lift(U,freemodule(mu));
   A=V*A*U;
+  dbprint(printlevel-voice+2,"// compute normal form of H''");
   H0=std(V*H0);
+
+  dbprint(printlevel-voice+2,"// compute spectral pairs");
   ideal a;
+  intvec w;
   for(i=1;i<=mu;i++)
   {
     j=leadexp(H0[i])[nvars(basering)+1];
     a[i]=A[j,j]+deg(lead(H0[i]))/deg(s)-1;
+    w[i]=w0[j]+n;
   }
   setring(R);
   return(sppgen(imap(G,a),w));
@@ -1352,16 +1366,16 @@ EXAMPLE: example spgen; shows examples
 {
   ideal a0=jet(a,0);
   int i,j;
-  number n;
+  poly p;
   for(i=1;i<=ncols(a0);i++)
   {
     for(j=i+1;j<=ncols(a0);j++)
     {
       if(number(a0[i])>number(a0[j]))
       {
-        n=a0[i];
+        p=a0[i];
         a0[i]=a0[j];
-        a0[j]=n;
+        a0[j]=p;
       }
     }
   }
@@ -1406,16 +1420,16 @@ EXAMPLE: example sppgen; shows examples
   ideal a0=jet(a,0);
   intvec w0=w;
   int i,j,k;
-  number n;
+  poly p;
   for(i=1;i<=ncols(a0);i++)
   {
     for(j=i+1;j<=ncols(a0);j++)
     {
       if(number(a0[i])>number(a0[j])||a0[i]==a0[j]&&w0[i]>w0[j])
       {
-        n=a0[i];
+        p=a0[i];
         a0[i]=a0[j];
-        a0[j]=n;
+        a0[j]=p;
         k=w0[i];
         w0[i]=w0[j];
         w0[j]=k;
