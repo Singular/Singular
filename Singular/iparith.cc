@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.202 2000-01-28 09:43:38 Singular Exp $ */
+/* $Id: iparith.cc,v 1.203 2000-02-04 14:53:33 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1600,6 +1600,19 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         if (par_perm_size!=0)
           for(i=0;i<min(rPar(r),rPar(currRing));i++) par_perm[i]=-(i+1);
         for(i=1;i<=min(r->N,pVariables);i++) perm[i]=i;
+      }
+    }
+    if ((iiOp==FETCH_CMD) &&(BVERBOSE(V_IMAP)))
+    {
+      int i;
+      for(i=1;i<=min(r->N,pVariables);i++)
+      {
+        Print("// var nr %d: %s -> %s\n",i,r->names[i+1],currRing->names[i+1]);
+      }
+      for(i=1;i<=min(rPar(r),rPar(currRing));i++) // possibly empty loop
+      {
+        Print("// par nr %d: %s -> %s\n",
+              i,r->parameter[i+1],currRing->parameter[i+1]);
       }
     }
     sleftv tmpW;
@@ -4194,7 +4207,7 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
   if (w->rtyp!=IDHDL) return TRUE;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
-  ideal m 
+  ideal m
     = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD),
              FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
   res->data = (char *)idModule2formatedMatrix(m,ul,vl);
