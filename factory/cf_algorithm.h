@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.9 1998-01-16 08:56:34 schmidt Exp $ */
+/* $Id: cf_algorithm.h,v 1.10 1998-03-12 10:26:47 schmidt Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -10,7 +10,9 @@
 //
 // This header file collects declarations of most of the
 // functions in factory which implement higher level algorithms
-// on canonical forms (factorization, gcd, etc.).
+// on canonical forms (factorization, gcd, etc.) and declarations
+// of some low level mathematical functions, too (absolute vale,
+// euclidean norm, etc.).
 //
 // This header file corresponds to:
 //
@@ -33,9 +35,13 @@ CanonicalForm psq ( const CanonicalForm & f, const CanonicalForm & g, const Vari
 
 void psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const Variable & x );
 
-CanonicalForm common_den ( const CanonicalForm & f );
+CanonicalForm bCommonDen ( const CanonicalForm & f );
 
 bool divides ( const CanonicalForm & f, const CanonicalForm & g );
+
+CanonicalForm maxNorm ( const CanonicalForm & f );
+
+CanonicalForm euclideanNorm ( const CanonicalForm & f );
 //}}}
 
 //{{{ function declarations from cf_chinese.cc
@@ -64,6 +70,31 @@ CanonicalForm determinant ( const CFMatrix & M, int n );
 CFArray subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
 
 CanonicalForm resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
+//}}}
+
+//{{{ inline CanonicalForm abs ( const CanonicalForm & f )
+//{{{ docu
+//
+// abs() - return absolute value of `f'.
+//
+// The absolute value is defined in terms of the function
+// `sign()'.  If it reports negative sign for `f' than -`f' is
+// returned, otherwise `f'.
+//
+// Most useful for integers and rationals.  May be used to
+// sign-normalize the leading coefficient of arbitrary
+// polynomials, too.
+//
+//}}}
+inline CanonicalForm
+abs ( const CanonicalForm & f )
+{
+    // it is not only more general using `sign()', it is faster, too
+    if ( sign( f ) < 0 )
+	return -f;
+    else
+	return f;
+}
 //}}}
 
 /*ENDPUBLIC*/
