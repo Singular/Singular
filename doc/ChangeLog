@@ -1,3 +1,22 @@
+Fri May 15 09:00:30 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* general.doc (Objects): section reviewed
+	  (Type conversion and casting): section reviewed
+
+	* general.doc (Names): section reviewed
+
+	* STYLEGUIDE: new style added
+
+	* general.doc (General command syntax): duplicate text updated
+
+	* types.doc (Data types): duplicate text updated
+
+	* general.doc (Special characters): section reviewed
+
+	* singular.doc (Miscellaneous oddities): changed `@cindex'
+
+	* general.doc (Implemented algorithms): minor changes
+
 Wed May 13 09:07:31 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* start.doc (How to use this manual): slightly reordered
