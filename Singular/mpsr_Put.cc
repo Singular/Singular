@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.16 1999-03-08 17:30:47 Singular Exp $ */
+/* $Id: mpsr_Put.cc,v 1.17 1999-09-27 15:05:27 obachman Exp $ */
 
 /***************************************************************
  *
@@ -551,7 +551,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
   ring r;
   sip_command cmd;
   leftv lv;
-  
+
   mpsr_ClearError();
   memset(&(cmd), 0, sizeof(sip_command));
   cmd.argc = 2;
@@ -572,22 +572,22 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
     }
     // do not dump LIB string and Links and Top PACKAGE
     else if (!(IDTYP(h) == STRING_CMD && strcmp("LIB", IDID(h)) == 0) &&
-             IDTYP(h) != LINK_CMD && 
+             IDTYP(h) != LINK_CMD &&
              ! (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") == 0))
     {
 #ifdef HAVE_NAMESPACES
-      cmd.arg1.name = (char*) 
+      cmd.arg1.name = (char*)
         AllocL(strlen(IDID(h)) + strlen(namespaceroot->name) + 3);
       sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h));
 #else
       cmd.arg1.name = IDID(h);
-#endif      
+#endif
       cmd.arg2.data=IDDATA(h);
       cmd.arg2.flag=h->flag;
       cmd.arg2.attribute=h->attribute;
       cmd.arg2.rtyp=h->typ;
 #ifdef HAVE_NAMESPACES
-      if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success) 
+      if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success)
       {
         FreeL(cmd.arg1.name);
         break;
@@ -596,11 +596,11 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
 #else
       if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
 #endif
-      
+
 #ifdef MPSR_DEBUG
       Print("Dumped %s\n", IDID(h));
 #endif
-      if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD || 
+      if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD ||
           (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") != 0))
       {
         // we don't really need to do that, it's only for convenience
@@ -619,18 +619,18 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
         while (h2 != NULL)
         {
 #ifdef HAVE_NAMESPACES
-          cmd.arg1.name = (char*) 
+          cmd.arg1.name = (char*)
             AllocL(strlen(IDID(h2)) + strlen(namespaceroot->name) + 3);
           sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h2));
 #else
           cmd.arg1.name = IDID(h2);
-#endif      
+#endif
           cmd.arg2.data=IDDATA(h2);
           cmd.arg2.flag = h2->flag;
           cmd.arg2.attribute = h2->attribute;
           cmd.arg2.rtyp = h2->typ;
 #ifdef HAVE_NAMESPACES
-          if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success) 
+          if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success)
           {
             FreeL(cmd.arg1.name);
             break;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.h,v 1.8 1999-06-08 07:37:18 Singular Exp $ */
+/* $Id: mmheap.h,v 1.9 1999-09-27 15:05:25 obachman Exp $ */
 #include <stdlib.h>
 #include "mod2.h"
 #include "structs.h"
@@ -200,6 +200,8 @@ while (0)
 #ifdef __cplusplus
 }
 #endif
+
+memHeap mmGetSpecHeap( size_t size);
 
 #endif /* MEMHEAP_H */
 

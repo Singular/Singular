@@ -1,0 +1,1050 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: syz2.cc,v 1.1 1999-09-27 15:05:34 obachman Exp $ */
+/*
+* ABSTRACT: resolutions
+*/
+
+
+//#define SHOW_PROT
+//#define SHOW_RED
+//#define SHOW_HILB
+//#define SHOW_RESULT
+//#define INVERT_PAIRS
+#define SHOW_CRIT
+//#define SHOW_SPRFL
+#define USE_CHAINCRIT
+/*--- some heuristics to optimize the pair sets---*/
+/*--- chose only one (!!!) at the same time ------*/
+//#define USE_HEURISTIC1
+#define USE_HEURISTIC2
+
+#ifdef SHOW_CRIT
+static int crit;
+static int crit1;
+static int spfl;
+#endif
+typedef struct sopen_pairs open_pairs;
+typedef open_pairs* crit_pairs;
+struct sopen_pairs
+{
+  crit_pairs next;
+  int first_poly;
+  int second_poly;
+};
+/*3
+* computes pairs from the new elements (beginning with the element newEl)
+* in the module index
+*/
+static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
+            int actdeg)
+{
+  SSet temp;
+  SObject tso;
+  poly toHandle,tsyz=NULL,p,pp;
+  int r1,r2=0,rr,l=(*syzstr->Tl)[index];
+  int i,j,r=0,ti;
+  BOOLEAN toComp=FALSE;
+#ifdef USE_CHAINCRIT
+  crit_pairs cp=NULL,tcp;
+#endif
+  actdeg += index;
+
+  while ((l>0) && ((syzstr->resPairs[index])[l-1].lcm==NULL)) l--;
+  rr = l-1;
+  while ((rr>=0) && (((syzstr->resPairs[index])[rr].p==NULL) ||
+        ((syzstr->resPairs[index])[rr].order>actdeg))) rr--;
+  r2 = rr+1;
+  while ((rr>=0) && ((syzstr->resPairs[index])[rr].order==actdeg)
+         && ((syzstr->resPairs[index])[rr].syzind<0))
+  {
+    rr--;
+    r++;
+  }
+  if (r==0) return;
+  ideal nP=idInit(l,syzstr->res[index]->rank);
+#ifdef INVERT_PAIRS
+  r1 = rr+1;
+#else
+  r1 = r2-1;
+#endif
+/*---------- there are new pairs ------------------------------*/
+  loop
+  {
+/*--- chose first new elements --------------------------------*/
+    toComp = FALSE;
+    toHandle = (syzstr->resPairs[index])[r1].p;
+    if (toHandle!=NULL)
+    {
+      int tc=pGetComp(toHandle);
+      tsyz = pCopy((syzstr->resPairs[index])[r1].syz);
+      (syzstr->resPairs[index])[r1].syzind = 0;
+      for (i=0; i<r1;i++)
+      {
+        if (((syzstr->resPairs[index])[i].p!=NULL) &&
+            (pGetComp((syzstr->resPairs[index])[i].p)==tc))
+        {
+#ifdef USE_CHAINCRIT
+          tcp = cp;
+          if (tcp!=NULL)
+          {
+            while ((tcp!=NULL) &&
+              ((tcp->first_poly!=i)||(tcp->second_poly!=r1))) tcp = tcp->next;
+          }
+          if (tcp==NULL)
+          {
+#endif
+            p = pOne();
+            pLcm((syzstr->resPairs[index])[i].p,toHandle,p);
+            //pSetComp(p,pGetComp(tsyz));
+            pSetm(p);
+            j = 0;
+            while (j<i)
+            {
+              if (nP->m[j]!=NULL)
+              {
+                if (pDivisibleBy2(nP->m[j],p))
+                {
+                  pDelete(&p);
+                  p = NULL;
+                  break;
+                }
+                else if (pDivisibleBy2(p,nP->m[j]))
+                {
+                  pDelete(&(nP->m[j]));
+                  nP->m[j] = NULL;
+                }
+#ifdef USE_CHAINCRIT
+                else
+                {
+                  poly p1,p2;
+                  int ip=pVariables;
+                  p1 = pDivide(p,(syzstr->resPairs[index])[i].p);
+                  p2 = pDivide(nP->m[j],(syzstr->resPairs[index])[j].p);
+                  while ((ip>0) && (pGetExp(p1,ip)*pGetExp(p2,ip)==0)) ip--;
+                  if (ip==0)
+                  {
+#ifdef SHOW_SPRFL
+Print("Hier: %d, %d\n",j,i);
+#endif
+                    if (i>rr)
+                    {
+                      tcp=(crit_pairs)Alloc0(sizeof(sopen_pairs));
+                      tcp->next = cp;
+                      tcp->first_poly = j;
+                      tcp->second_poly = i;
+                      cp = tcp;
+                      tcp = NULL;
+                    }
+                    else
+                    {
+                      ti=0;
+                      while ((ti<l) && (((syzstr->resPairs[index])[ti].ind1!=j)||
+                             ((syzstr->resPairs[index])[ti].ind2!=i))) ti++;
+                      if (ti<l)
+                      {
+#ifdef SHOW_SPRFL
+Print("gefunden in Mod %d: ",index); pWrite((syzstr->resPairs[index])[ti].lcm);
+#endif
+                        syDeletePair(&(syzstr->resPairs[index])[ti]);
+#ifdef SHOW_CRIT
+                        crit1++;
+#endif
+                        toComp = TRUE;
+                      }
+                    }
+                  }
+                  pDelete(&p1);
+                  pDelete(&p2);
+                }
+#endif
+              }
+              j++;
+            }
+            if (p!=NULL)
+            {
+              nP->m[i] = p;
+            }
+#ifdef USE_CHAINCRIT
+          }
+          else
+          {
+#ifdef SHOW_CRIT
+            crit1++;
+#endif
+          }
+#endif
+        }
+      }
+      if (toComp) syCompactify1(syzstr->resPairs[index],&l,r1);
+      for (i=0;i<r1;i++)
+      {
+        if (nP->m[i]!=NULL)
+        {
+          tso.lcm = p = nP->m[i];
+          nP->m[i] = NULL;
+          tso.order = pTotaldegree(p);
+          if ((syzstr->cw!=NULL) && (index>0) && (pGetComp(p)>0))
+          {
+            int ii=index-1,jj=pGetComp(p);
+            while (ii>0)
+            {
+              jj = pGetComp(syzstr->res[ii]->m[jj-1]);
+              ii--;
+            }
+            tso.order += (*syzstr->cw)[jj-1];
+          }
+          tso.p1 = (syzstr->resPairs[index])[i].p;
+          tso.p2 = toHandle;
+          tso.ind1 = i;
+          tso.ind2 = r1;
+          tso.syzind = -1;
+          tso.isNotMinimal = (poly)1;
+          tso.p = NULL;
+          tso.length = -1;
+          currcomponents = syzstr->truecomponents[index];
+          number coefgcd =
+            nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2));
+          tso.syz = pCopy((syzstr->resPairs[index])[i].syz);
+          poly tt = pDivide(tso.lcm,tso.p1);
+          pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
+          tso.syz = pMultT(tso.syz,tt);
+          pDelete(&tt);
+          coefgcd = nNeg(coefgcd);
+          pp = pCopy(tsyz);
+          tt = pDivide(tso.lcm,tso.p2);
+          pSetCoeff(tt,nDiv(pGetCoeff(tso.p2),coefgcd));
+          pp = pMultT(pp,tt);
+          pDelete(&tt);
+          tso.syz = pAdd(pp,tso.syz);
+          nDelete(&coefgcd);
+          currcomponents = syzstr->truecomponents[index-1];
+          pSetComp(tso.lcm,pGetComp(tsyz));
+#ifdef SHOW_PROT
+Print("erzeuge Paar im Modul %d,%d mit: \n",index,tso.order);
+Print("poly1: ");pWrite(tso.p1);
+Print("poly2: ");pWrite(tso.p2);
+Print("syz: ");pWrite(tso.syz);
+Print("sPoly: ");pWrite(tso.p);
+PrintLn();
+#endif
+          syEnterPair(syzstr,&tso,&l,index);
+        }
+      }
+      pDelete(&tsyz);
+      tsyz = NULL;
+    }
+#ifdef INVERT_PAIRS
+    r1++;
+    if (r1>=r2) break;
+#else
+    r1--;
+    if (r1<=rr) break;
+#endif
+  }
+#ifdef USE_CHAINCRIT
+  while (cp!=NULL)
+  {
+    tcp = cp;
+    cp = cp->next;
+    Free((ADDRESS)tcp,sizeof(sopen_pairs));
+  }
+#endif
+}
+
+/*3
+* determines the place of a polynomial in the right ordered resolution
+* set the vectors of truecomponents
+*/
+static void syOrder_Hilb(poly p,syStrategy syzstr,int index,
+                    int realcomp)
+{
+  int i=IDELEMS(syzstr->res[index-1])+1,j=0,k,tc,orc,ie;
+  int *trind1=syzstr->truecomponents[index-1];
+  int *trind=syzstr->truecomponents[index];
+  poly pp;
+  polyset o_r=syzstr->orderedRes[index]->m;
+
+  if (p==NULL) return;
+  if (realcomp==0) realcomp=1;
+  ie = IDELEMS(syzstr->orderedRes[index]);
+  while ((ie>0) && (syzstr->orderedRes[index]->m[ie-1]==NULL)) ie--;
+  if (ie==0)
+  {
+    j = 0;
+  }
+  else
+  {
+    if (index>1)
+      tc = trind1[pGetComp(p)];
+    else
+      tc = pGetComp(p);
+    loop
+    {
+      orc = pGetComp(o_r[j]);
+      if (trind1[orc]>tc) break;
+      j++;
+      if (j==ie) break;
+    }
+  }
+  if (o_r[j]!=NULL)
+  {
+    for (k=ie;k>j;k--)
+    {
+      o_r[k] = o_r[k-1];
+    }
+  }
+  o_r[j] = p;
+  for (k=0;k<IDELEMS((syzstr->res)[index]);k++)
+  {
+    if (trind[k]>j)
+      trind[k] += 1;
+  }
+  for (k=IDELEMS((syzstr->res)[index])-1;k>realcomp;k--)
+    trind[k] = trind[k-1];
+  trind[realcomp] = j+1;
+}
+
+static void syHalfPair(poly syz, int newEl, syStrategy syzstr, int index)
+{
+  SObject tso;
+  int l=(*syzstr->Tl)[index];
+
+  while ((l>0) && ((syzstr->resPairs[index])[l-1].syz==NULL)) l--;
+  if ((syzstr->cw!=NULL) && (index>0) && (pGetComp(syz)>0))
+  {
+    int ii=index-1,jj=pGetComp(syz);
+    while (ii>0)
+    {
+      jj = pGetComp(syzstr->res[ii]->m[jj-1]);
+      ii--;
+    }
+    tso.order += (*syzstr->cw)[jj-1];
+  }
+  tso.p1 = NULL;
+  tso.p2 = NULL;
+  tso.ind1 = 0;
+  tso.ind2 = 0;
+  tso.syzind = -1;
+  tso.isNotMinimal = NULL;
+  tso.p = syz;
+  tso.order = pTotaldegree(syz);
+  tso.syz = pHead(syz);
+  pSetComp(tso.syz,newEl+1);
+  pSetm(tso.syz);
+  tso.lcm = pHead(tso.syz);
+  tso.length = pLength(syz);
+  syOrder_Hilb(syz,syzstr,index,newEl+1);
+#ifdef SHOW_PROT
+Print("erzeuge Halbpaar im Module %d,%d mit: \n",index,tso.order);
+Print("syz: ");pWrite(tso.syz);
+Print("sPoly: ");pWrite(tso.p);
+PrintLn();
+#endif
+  syEnterPair(syzstr,&tso,&l,index);
+}
+/*3
+* computes the order of pairs of same degree
+* must be monoton
+*/
+static intvec* syLinStrat2(SSet nextPairs, syStrategy syzstr,
+                          int howmuch, int index,intvec ** secondpairs)
+{
+  ideal o_r=syzstr->res[index+1];
+  int i=0,i1=0,i2=0,l,ll=IDELEMS(o_r);
+  intvec *result=new intvec(howmuch+1);
+  BOOLEAN isDivisible;
+  SObject tso;
+
+#ifndef USE_HEURISTIC2
+  while (i1<howmuch)
+  {
+    (*result)[i1] = i1+1;
+    i1++;
+  }
+  return result;
+#else
+  while ((ll>0) && (o_r->m[ll-1]==NULL)) ll--;
+  while (i<howmuch)
+  {
+    tso = nextPairs[i];
+    isDivisible = FALSE;
+    l = 0;
+    while ((l<ll) && (!isDivisible))
+    {
+      if (o_r->m[l]!=NULL)
+      {
+        isDivisible = isDivisible ||
+          pDivisibleBy1(o_r->m[l],tso.lcm);
+      }
+      l++;
+    }
+    if (isDivisible)
+    {
+#ifdef SHOW_PROT
+Print("streiche Paar im Modul %d,%d mit: \n",index,nextPairs[i].order);
+Print("poly1: ");pWrite(nextPairs[i].p1);
+Print("poly2: ");pWrite(nextPairs[i].p2);
+Print("syz: ");pWrite(nextPairs[i].syz);
+Print("sPoly: ");pWrite(nextPairs[i].p);
+PrintLn();
+#endif
+      //syDeletePair(&nextPairs[i]);
+      if (*secondpairs==NULL) *secondpairs = new intvec(howmuch);
+      (**secondpairs)[i2] = i+1;
+      i2++;
+#ifdef SHOW_CRIT
+      crit++;
+#endif
+    }
+    else
+    {
+//      nextPairs[i].p = sySPoly(tso.p1, tso.p2,tso.lcm);
+      (*result)[i1] = i+1;
+      i1++;
+    }
+    i++;
+  }
+  return result;
+#endif
+}
+
+inline void sySPRedSyz(syStrategy syzstr,sSObject redWith,poly q=NULL)
+{
+  poly p=pDivide(q,redWith.p);
+  pSetCoeff(p,nDiv(pGetCoeff(q),pGetCoeff(redWith.p)));
+  int il=-1;
+  kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,redWith.syz,&il,NULL);
+}
+
+static poly syRed_Hilb(poly toRed,syStrategy syzstr,int index)
+{
+  ideal redWith=syzstr->res[index];
+  if (redWith==NULL) return toRed;
+  int j=IDELEMS(redWith),i;
+  poly q,result=NULL,resultp;
+
+  while ((j>0) && (redWith->m[j-1]==NULL)) j--;
+  if ((toRed==NULL) || (j==0)) return toRed;
+  kBucketInit(syzstr->bucket,toRed,-1);
+  q = kBucketGetLm(syzstr->bucket);
+  loop
+  {
+    if (q==NULL)
+    {
+      break;
+    }
+    i = 0;
+    loop
+    {
+      if (pDivisibleBy1(redWith->m[i],q))
+      {
+        number up = kBucketPolyRed(syzstr->bucket,redWith->m[i],
+                         pLength(redWith->m[i]), NULL);
+        nDelete(&up);
+        q = kBucketGetLm(syzstr->bucket);
+        if (toRed==NULL) break;
+        i = 0;
+      }
+      else
+      {
+        i++;
+      }
+      if ((i>=j) || (q==NULL)) break;
+    }
+    if (q!=NULL)
+    {
+      if (result==NULL)
+      {
+        resultp = result = kBucketExtractLm(syzstr->bucket);
+      }
+      else
+      {
+        pNext(resultp) = kBucketExtractLm(syzstr->bucket);
+        pIter(resultp);
+      }
+      q = kBucketGetLm(syzstr->bucket);
+    }
+  }
+  kBucketClear(syzstr->bucket,&q,&i);
+  if (q!=NULL) Print("Hier ist was schief gelaufen!\n");
+  return result;
+}
+
+intvec *ivStrip(intvec* arg)
+{
+  int l=arg->rows()*arg->cols(),i=0,ii=0;
+  intvec *tempV=new intvec(l);
+
+  while (i+ii<l)
+  {
+    if ((*arg)[i+ii]==0)
+    {
+      ii++;
+    }
+    else
+    {
+      (*tempV)[i] = (*arg)[i+ii];
+      i++;
+    }
+  }
+  if (i==0)
+  {
+    delete tempV;
+    return NULL;
+  }
+  intvec * result=new intvec(i+1);
+  for (ii=0;ii<i;ii++)
+   (*result)[ii] = (*tempV)[ii];
+  delete tempV;
+  return result;
+}
+
+/*3
+* reduces all pairs of degree deg in the module index
+* put the reduced generators to the resolvente which contains
+* the truncated kStd
+*/
+static void syRedNextPairs_Hilb(SSet nextPairs, syStrategy syzstr,
+               int howmuch, int index,int actord=-1,int* toSub=NULL)
+{
+pComp0=syzcomp1dpc;
+  int i,j,k=IDELEMS(syzstr->res[index]);
+  int ks=IDELEMS(syzstr->res[index+1]),kk,l,ll;
+  int kres=(*syzstr->Tl)[index];
+  int toGo=0;
+  number coefgcd,n;
+  SSet redset=syzstr->resPairs[index];
+  poly p=NULL,q,tp;
+  intvec *spl1=new intvec(howmuch+1);
+  SObject tso;
+  intvec *spl3=NULL;
+#ifdef USE_HEURISTIC1
+  intvec *spl2=new intvec(howmuch+1,howmuch+1,0);
+  int there_are_superfluous=0;
+  int step=1,jj,j1,j2;
+#endif
+
+  actord += index;
+  if ((nextPairs==NULL) || (howmuch==0)) return;
+  while ((k>0) && (syzstr->res[index]->m[k-1]==NULL)) k--;
+  while ((ks>0) && (syzstr->res[index+1]->m[ks-1]==NULL)) ks--;
+  while ((kres>0) &&
+        ((redset[kres-1].p==NULL) || (redset[kres-1].order>actord))) kres--;
+  while ((kres<(*syzstr->Tl)[index]) &&
+         (redset[kres-1].order!=0) && (redset[kres-1].order<=actord)) kres++;
+  spl1 = syLinStrat2(nextPairs,syzstr,howmuch,index,&spl3);
+#ifdef SHOW_PROT
+Print("spl1 ist hier: ");spl1->show(0,0);
+#endif
+  i=0;
+  kk = (*spl1)[i]-1;
+  if (index==1)
+  {
+    intvec * temp1_hilb = hHstdSeries(syzstr->res[index],NULL,NULL,NULL);
+    if (actord<temp1_hilb->length())
+    {
+      toGo = (*temp1_hilb)[actord];
+#ifdef SHOW_HILB
+Print("\nStze toGo im Modul %d und Grad %d auf: %d\n",1,actord-1,toGo);
+#endif
+    }
+    delete temp1_hilb;
+  }
+  else
+  {
+    if (actord<=(syzstr->hilb_coeffs[index])->length())
+    {
+      toGo = (*syzstr->hilb_coeffs[index])[actord-1];
+#ifdef SHOW_HILB
+Print("\nStze toGo im Modul %d und Grad %d auf: %d\n",index,actord-1,toGo);
+#endif
+    }
+  }
+  if ((syzstr->hilb_coeffs[index+1]!=NULL) &&
+      (actord<=(syzstr->hilb_coeffs[index+1])->length()))
+  {
+    toGo += (*syzstr->hilb_coeffs[index+1])[actord-1];
+#ifdef SHOW_HILB
+Print("\nAddiere zu toGo aus Modul %d und Grad %d: %d\n",index+1,actord-1,(*syzstr->hilb_coeffs[index+1])[actord-1]);
+#endif
+  }
+#ifdef SHOW_HILB
+Print("<H%d>",toGo);
+#endif
+  while (kk>=0)
+  {
+    if (toGo==0)
+    {
+      while (kk>=0)
+      {
+        pDelete(&nextPairs[kk].p);
+        pDelete(&nextPairs[kk].syz);
+        syDeletePair(&nextPairs[kk]);
+        nextPairs[kk].p = nextPairs[kk].syz = nextPairs[kk].lcm = NULL;
+        i++;
+        kk = (*spl1)[i]-1;
+#ifdef USE_HEURISTIC2
+        if (kk<0)
+        {
+          i = 0;
+          delete spl1;
+          spl1 = spl3;
+          spl3 = NULL;
+          if (spl1!=NULL)
+            kk = (*spl1)[i]-1;
+        }
+#endif
+      }
+      if (spl1!=NULL) delete spl1;
+      break;
+    }
+    tso = nextPairs[kk];
+    if ((tso.p1!=NULL) && (tso.p2!=NULL))
+    {
+      //tso.p = sySPoly(tso.p1, tso.p2,tso.lcm);
+      tso.p = spSpolyCreate(tso.p2, tso.p1,NULL,spSpolyLoop_General);
+#ifdef SHOW_PROT
+Print("reduziere Paar mit: \n");
+Print("poly1: ");pWrite(tso.p1);
+Print("poly2: ");pWrite(tso.p2);
+Print("syz: ");pWrite(tso.syz);
+Print("sPoly: ");pWrite(tso.p);
+#endif
+      if (tso.p != NULL)
+      {
+        kBucketInit(syzstr->bucket,tso.p,-1);
+        kBucketInit(syzstr->syz_bucket,tso.syz,-1);
+        q = kBucketGetLm(syzstr->bucket);
+        j = 0;
+        while (j<kres)
+        {
+          if ((redset[j].p!=NULL) && (pDivisibleBy1(redset[j].p,q))
+              && ((redset[j].ind1!=tso.ind1) || (redset[j].ind2!=tso.ind2)))
+          {
+#ifdef SHOW_RED
+Print("reduziere: ");pWrite(tso.p);
+Print("syz: ");pWrite(tso.syz);
+Print("mit: ");pWrite(redset[j].p);
+Print("syz: ");pWrite(redset[j].syz);
+#endif
+            currcomponents = syzstr->truecomponents[index];
+            sySPRedSyz(syzstr,redset[j],q);
+            currcomponents = syzstr->truecomponents[index-1];
+            number up = kBucketPolyRed(syzstr->bucket,redset[j].p,
+                         redset[j].length, NULL);
+            nDelete(&up);
+            q = kBucketGetLm(syzstr->bucket);
+#ifdef SHOW_RED
+Print("zu: ");pWrite(tso.p);
+Print("syz: ");pWrite(tso.syz);
+PrintLn();
+#endif
+            if (q==NULL) break;
+            j = 0;
+          }
+          else
+          {
+            j++;
+          }
+        }
+        kBucketClear(syzstr->bucket,&tso.p,&tso.length);
+        currcomponents = syzstr->truecomponents[index];
+        int il;
+        kBucketClear(syzstr->syz_bucket,&tso.syz,&il);
+        currcomponents = syzstr->truecomponents[index-1];
+      }
+#ifdef SHOW_PROT
+Print("erhalte Paar mit: \n");
+Print("syz: ");pWrite(tso.syz);
+Print("sPoly: ");pWrite(tso.p);
+PrintLn();
+#endif
+#ifdef SHOW_SPRFL
+//PrintLn();
+wrp(tso.lcm);
+Print(" mit index %d, %d ",tso.ind1,tso.ind2);
+#endif
+      if (tso.p != NULL)
+      {
+        if (TEST_OPT_PROT) PrintS("g");
+        (*toSub)++;
+        toGo--;
+        if (!nIsOne(pGetCoeff(tso.p)))
+        {
+          number n=nInvers(pGetCoeff(tso.p));
+          pNorm(tso.p);
+          pMultN(tso.syz,n);
+          nDelete(&n);
+        }
+        if (k==IDELEMS((syzstr->res)[index]))
+          syEnlargeFields(syzstr,index);
+        syzstr->res[index]->m[k] = tso.p;
+        k++;
+      }
+      else
+      {
+        if (ks==IDELEMS(syzstr->res[index+1]))
+          syEnlargeFields(syzstr,index+1);
+        currcomponents = syzstr->truecomponents[index];
+        syzstr->res[index+1]->m[ks] = syRed_Hilb(tso.syz,syzstr,index+1);
+        currcomponents = syzstr->truecomponents[index-1];
+        if (syzstr->res[index+1]->m[ks]!=NULL)
+        {
+          if (TEST_OPT_PROT) PrintS("s");
+          toGo--;
+          pNorm(syzstr->res[index+1]->m[ks]);
+pComp0=syzcomp2dpc;
+          syHalfPair(syzstr->res[index+1]->m[ks],ks,syzstr,index+1);
+pComp0=syzcomp1dpc;
+          ks++;
+        }
+        else
+        {
+          if (TEST_OPT_PROT) PrintS("-");
+#ifdef SHOW_CRIT
+          spfl++;
+#endif
+#ifdef USE_HEURISTIC1
+          if (there_are_superfluous>=0)
+          {
+            j = i+1;
+            jj = (*spl1)[j]-1;
+            j1 = 1;
+            while (jj>=0)
+            {
+              if (tso.ind2==nextPairs[jj].ind2)
+              {
+                IMATELEM(*spl2,j1,step) = jj+1;
+                j1++;
+                for (j2=j;j2<spl1->length()-1;j2++)
+                {
+                  (*spl1)[j2] = (*spl1)[j2+1];
+                }
+              }
+              else
+              {
+                j++;
+              }
+              jj = (*spl1)[j]-1;
+            }
+            step++;
+            if (there_are_superfluous==0) there_are_superfluous = 1;
+          }
+#endif
+#ifdef SHOW_SPRFL
+Print("ist ueberfluessig in Mod %d",index);
+//Print("\n ueberfluessig in Mod %d:",index);
+//wrp(tso.lcm);
+//PrintLn();
+#endif
+        }
+        tso.syz = NULL;
+        syDeletePair(&tso);
+        tso.p = tso.syz = tso.lcm = NULL;
+      }
+      nextPairs[kk] = tso;
+    }
+#ifdef SHOW_SPRFL
+PrintLn();
+#endif
+    i++;
+#ifdef SHOW_PROT
+Print("spl1 ist hier: ");spl1->show(0,0);
+Print("naechstes i ist: %d",i);
+#endif
+    kk = (*spl1)[i]-1;
+#ifdef USE_HEURISTIC1
+    if ((kk<0) && (there_are_superfluous>0))
+    {
+      i = 0;
+      delete spl1;
+      spl1 = ivStrip(spl2);
+      delete spl2;
+      if (spl1!=NULL)
+      {
+        there_are_superfluous = -1;
+        kk = (*spl1)[i]-1;
+      }
+    }
+#endif
+#ifdef USE_HEURISTIC2
+    if ((kk<0) && (toGo>0))
+    {
+      i = 0;
+      delete spl1;
+      spl1 = spl3;
+      spl3 = NULL;
+      if (spl1!=NULL)
+        kk = (*spl1)[i]-1;
+    }
+#endif
+  }
+  delete spl1;
+pComp0=syzcomp2dpc;
+}
+
+void sySetNewHilb(syStrategy syzstr, int toSub,int index,int actord)
+{
+  int i;
+  actord += index;
+  intvec * temp_hilb = hHstdSeries(syzstr->res[index+1],NULL,NULL,NULL);
+  if (syzstr->hilb_coeffs[index+1]==NULL)
+  {
+    syzstr->hilb_coeffs[index+1] = new intvec(16*((actord/16)+1));
+  }
+  else if (actord>=syzstr->hilb_coeffs[index+1]->length())
+  {
+    intvec * ttt=new intvec(16*((actord/16)+1));
+    for (i=syzstr->hilb_coeffs[index+1]->length()-1;i>=0;i--)
+    {
+      (*ttt)[i] = (*(syzstr->hilb_coeffs[index+1]))[i];
+    }
+    delete syzstr->hilb_coeffs[index+1];
+    syzstr->hilb_coeffs[index+1] = ttt;
+  }
+  if (actord+1<temp_hilb->length())
+  {
+#ifdef SHOW_HILB
+Print("\nSetze fuer Modul %d im Grad %d die Wert: \n",index+1,actord);
+(temp_hilb)->show(0,0);
+#endif
+    int k=min(temp_hilb->length()-1,(syzstr->hilb_coeffs[index+1])->length());
+    for (int j=k;j>actord;j--)
+      (*(syzstr->hilb_coeffs[index+1]))[j-1] = (*temp_hilb)[j];
+  }
+  else
+  {
+    (*(syzstr->hilb_coeffs[index+1]))[actord] = 0;
+  }
+  delete temp_hilb;
+  if ((index>1) && (actord<=syzstr->hilb_coeffs[index]->length()))
+  {
+#ifdef SHOW_HILB
+Print("\nSubtrahiere im Modul %d im Grad %d den Wert: %d\n",index,actord-1,toSub);
+#endif
+    (*syzstr->hilb_coeffs[index])[actord-1]-=toSub;
+  }
+#ifdef SHOW_HILB
+Print("<h,%d>",(*(syzstr->hilb_coeffs[index+1]))[actord]);
+#endif
+}
+
+/*3
+* reduces the generators of the module index in degree deg
+* (which are actual syzygies of the module index-1)
+* wrt. the ideal generated by elements of lower degrees
+*/
+static void syRedGenerOfCurrDeg_Hilb(syStrategy syzstr, int deg, int index)
+{
+  ideal res=syzstr->res[index];
+  int i=0,j,kk=(*syzstr->Tl)[index],k=IDELEMS(res);
+  SSet sPairs1=syzstr->resPairs[index];
+  SSet sPairs=syzstr->resPairs[index-1];
+
+  while ((k>0) && (res->m[k-1]==NULL)) k--;
+  while ((kk>0) && ((sPairs1[kk-1].p==NULL)||((sPairs1[kk-1].order>deg)))) kk--;
+  while ((i<(*syzstr->Tl)[index-1]) && (((sPairs)[i].syz==NULL) ||
+          ((sPairs)[i].order<deg)))
+    i++;
+  if ((i>=(*syzstr->Tl)[index-1]) || ((sPairs)[i].order>deg)) return;
+  while ((i<(*syzstr->Tl)[index-1]) && (((sPairs)[i].syz==NULL) ||
+         ((sPairs)[i].order==deg)))
+  {
+    if ((sPairs)[i].syz!=NULL)
+    {
+#ifdef SHOW_PROT
+Print("reduziere Erzeuger: \n");
+Print("syz: ");pWrite((sPairs)[i].syz);
+#endif
+      (sPairs)[i].syz = syRed_Hilb((sPairs)[i].syz,syzstr,index);
+#ifdef SHOW_PROT
+Print("erhalte Erzeuger: \n");
+Print("syz: ");pWrite((sPairs)[i].syz);
+PrintLn();
+#endif
+      if ((sPairs)[i].syz != NULL)
+      {
+        if (k==IDELEMS(res))
+        {
+          syEnlargeFields(syzstr,index);
+          res=syzstr->res[index];
+        }
+        if (BTEST1(6))
+        {
+          if ((sPairs)[i].isNotMinimal==NULL)
+          {
+            PrintS("\nminimal generator: ");
+            pWrite((syzstr->resPairs[index-1])[i].syz);
+            PrintS("comes from: ");pWrite((syzstr->resPairs[index-1])[i].p1);
+            PrintS("and: ");pWrite((syzstr->resPairs[index-1])[i].p2);
+          }
+        }
+        res->m[k] = (sPairs)[i].syz;
+        pNorm(res->m[k]);
+        syHalfPair(res->m[k],k,syzstr,index);
+        kk++;
+        k++;
+      }
+    }
+    i++;
+  }
+}
+
+syStrategy syHilb(ideal arg,int * length)
+{
+  int i,j,*ord,*b0,*b1,actdeg=32000,index=0,reg=-1;
+  int startdeg,howmuch,toSub=0;
+  ideal temp=NULL;
+  SSet nextPairs;
+  sip_sring tmpR;
+  ring origR = currRing;
+  pSetmProc oldSetm=pSetm;
+  pCompProc oldComp0=pComp0;
+
+  if (idIs0(arg)) return NULL;
+  if ((currRing->order[0]==ringorder_dp)
+  &&  (currRing->order[1]==ringorder_C)
+  &&  (currRing->order[2]==0))
+  {
+    ord=NULL;
+  }
+/*--- changes to a dpC-ring with special comp0------*/
+  else
+  {
+    ord = (int*)Alloc0(3*sizeof(int));
+    b0 = (int*)Alloc0(3*sizeof(int));
+    b1 = (int*)Alloc0(3*sizeof(int));
+    ord[0] = ringorder_dp;
+    ord[1] = ringorder_C;
+    b0[1] = 1;
+    b1[0] = pVariables;
+    tmpR  = *origR;
+    tmpR.order = ord;
+    tmpR.block0 = b0;
+    tmpR.block1 = b1;
+    rComplete(&tmpR);
+    //pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
+    rChangeCurrRing(&tmpR, TRUE);
+  }
+/*--- initializes the data structures---------------*/
+#ifdef SHOW_CRIT
+  crit = 0;
+  crit1 = 0;
+  spfl = 0;
+#endif
+  syStrategy syzstr=(syStrategy)Alloc0(sizeof(ssyStrategy));
+  syzstr->length = *length = pVariables+2;
+  syzstr->Tl = new intvec(*length+1);
+  temp = idInit(IDELEMS(arg),arg->rank);
+  for (i=0;i<IDELEMS(arg);i++)
+  {
+    temp->m[i] = pOrdPolyInsertSetm(pCopy(arg->m[i]));
+    if (temp->m[i]!=NULL)
+    {
+      j = pTotaldegree(temp->m[i]);
+      if (j<actdeg) actdeg = j;
+    }
+  }
+  idSkipZeroes(temp);
+  pComp0 = syzcomp2dpc;
+  currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));
+  for (i=0;i<=arg->rank;i++)
+    currcomponents[i] = i;
+  syzstr->resPairs = syInitRes(temp,length,syzstr->Tl,syzstr->cw);
+  Free((ADDRESS)currcomponents,(arg->rank+1)*sizeof(int));
+  syzstr->res = (resolvente)Alloc0((*length+1)*sizeof(ideal));
+  syzstr->orderedRes = (resolvente)Alloc0((*length+1)*sizeof(ideal));
+  syzstr->elemLength = (int**)Alloc0((*length+1)*sizeof(int*));
+  syzstr->truecomponents = (int**)Alloc0((*length+1)*sizeof(int*));
+  syzstr->backcomponents = (int**)Alloc0((*length+1)*sizeof(int*));
+  syzstr->ShiftedComponents = (long**)Alloc0((*length+1)*sizeof(long*));
+  syzstr->Howmuch = (int**)Alloc0((*length+1)*sizeof(int*));
+  syzstr->Firstelem = (int**)Alloc0((*length+1)*sizeof(int*));
+  syzstr->hilb_coeffs = (intvec**)Alloc0((*length+1)*sizeof(intvec*));
+  syzstr->bucket = kBucketCreate();
+  syzstr->syz_bucket = kBucketCreate();
+  kbSetPolyProcs(&syzstr->pProcs,currRing,rOrderType_Syz2dpc,FALSE);
+  startdeg = actdeg;
+  nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
+/*--- computes the resolution ----------------------*/
+  while (nextPairs!=NULL)
+  {
+#ifdef SHOW_PROT
+Print("compute %d Paare im Module %d im Grad %d \n",howmuch,index,actdeg+index);
+#endif
+    if (TEST_OPT_PROT) Print("%d",actdeg);
+    if (TEST_OPT_PROT) Print("(m%d)",index);
+    if (index==0)
+      i = syInitSyzMod(syzstr,index,idRankFreeModule(arg)+1);
+    else
+      i = syInitSyzMod(syzstr,index);
+    currcomponents = syzstr->truecomponents[max(index-1,0)];
+    currShiftedComponents = syzstr->ShiftedComponents[max(index-1,0)];
+    j = syInitSyzMod(syzstr,index+1);
+    if (index>0)
+    {
+      syRedNextPairs_Hilb(nextPairs,syzstr,howmuch,index,actdeg,&toSub);
+      sySetNewHilb(syzstr,toSub,index,actdeg);
+      toSub = 0;
+      syCompactifyPairSet(syzstr->resPairs[index],(*syzstr->Tl)[index],0);
+    }
+    else
+      syRedGenerOfCurrDeg_Hilb(syzstr,actdeg,index+1);
+/*--- creates new pairs -----------------------------*/
+#ifdef SHOW_PROT
+Print("Bilde neue Paare in Modul %d!\n",index);
+#endif
+    syCreateNewPairs_Hilb(syzstr,index,actdeg);
+    if (index<(*length)-1)
+    {
+#ifdef SHOW_PROT
+Print("Bilde neue Paare in Modul %d!\n",index+1);
+#endif
+      syCreateNewPairs_Hilb(syzstr,index+1,actdeg-1);
+    }
+    index++;
+    nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
+  }
+#ifdef SHOW_RESULT
+Print("minimal resolution:\n");
+for (int ti=1;ti<=*length;ti++)
+{
+  if (!idIs0(syzstr->orderedRes[ti])) idPrint(syzstr->orderedRes[ti]);
+}
+Print("full resolution:\n");
+for (int ti=1;ti<=*length;ti++)
+{
+  if (!idIs0(syzstr->res[ti])) idPrint(syzstr->res[ti]);
+}
+#endif
+#ifdef SHOW_CRIT
+Print("Criterion %d times applied\n",crit);
+Print("Criterion1 %d times applied\n",crit1);
+Print("%d superfluous pairs\n",spfl);
+crit = 0;
+crit1 = 0;
+spfl = 0;
+#endif
+  if (temp!=NULL) idDelete(&temp);
+  kBucketDestroy(&(syzstr->bucket));
+  kBucketDestroy(&(syzstr->syz_bucket));
+  if (ord!=NULL)
+  {
+    rChangeCurrRing(origR,TRUE);
+  }
+  else
+  {
+    pSetm=oldSetm;
+    pComp0=oldComp0;
+  }
+  if (ord!=NULL)
+  {
+    Free((ADDRESS)ord,3*sizeof(int));
+    Free((ADDRESS)b0,3*sizeof(int));
+    Free((ADDRESS)b1,3*sizeof(int));
+  }
+  if (TEST_OPT_PROT) PrintLn();
+  return syzstr;
+}

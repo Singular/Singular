@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.10 1999-04-29 11:38:54 Singular Exp $ */
+/* $Id: polys0.cc,v 1.11 1999-09-27 15:05:31 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -14,7 +14,7 @@
 #include "febase.h"
 #include "numbers.h"
 #include "ring.h"
-#include "ipid.h"
+//#include "ipid.h"
 #include "polys.h"
 
 BOOLEAN pVectorOut=TRUE;
@@ -51,7 +51,7 @@ static void writemon(poly p, int ko)
       wroteCoef=((pShortOut==0)||(currRing->parameter!=NULL));
       writeGen=TRUE;
     }
-    else 
+    else
       StringAppendS("-");
   }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.25 1999-08-23 13:15:58 Singular Exp $ */
+/* $Id: polys1.cc,v 1.26 1999-09-27 15:05:31 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -22,7 +22,7 @@
 #include "ring.h"
 #include "ideals.h"
 #include "polys.h"
-#include "ipid.h"
+//#include "ipid.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #endif
@@ -277,12 +277,7 @@ static poly pMonPower(poly p, int exp)
   {
     pMultExp(p,i, exp);
   }
-  #ifdef TEST_MAC_ORDER
-  if (bNoAdd)
-    pSetm(p);
-  else
-  #endif
-    p->Order *= exp;
+  pSetm(p);
   return p;
 }
 
@@ -299,11 +294,12 @@ static void pMonMult(poly p, poly q)
   x = nMult(y,pGetCoeff(q));
   nDelete(&y);
   pSetCoeff0(p,x);
-  for (i=pVariables; i!=0; i--)
-  {
-    pAddExp(p,i, pGetExp(q,i));
-  }
-  p->Order += q->Order;
+  //for (i=pVariables; i!=0; i--)
+  //{
+  //  pAddExp(p,i, pGetExp(q,i));
+  //}
+  //p->Order += q->Order;
+  pAddCompVector(p,q);
 }
 
 /*3
@@ -319,11 +315,12 @@ static poly pMonMultC(poly p, poly q)
   x = nMult(pGetCoeff(p),pGetCoeff(q));
   pSetCoeff0(r,x);
   pSetComp(r, pGetComp(p));
-  for (i=pVariables; i!=0; i--)
-  {
-    pSetExp(r,i, pGetExp(p,i) + pGetExp(q,i));
-  }
-  r->Order = p->Order + q->Order;
+  //for (i=pVariables; i!=0; i--)
+  //{
+  //  pSetExp(r,i, pGetExp(p,i) + pGetExp(q,i));
+  //}
+  //r->Order = p->Order + q->Order;
+  pAddCompVector(r,p,q);
   return r;
 }
 
@@ -687,14 +684,10 @@ BOOLEAN pOneComp(poly p)
 */
 void pSetCompP(poly p, int i)
 {
-
-  if ((p!=NULL) && (pGetComp(p)==0))
+  while (p!=NULL)
   {
-    do
-    {
-      pSetComp(p, (Exponent_t)i);
-      pIter(p);
-    } while (p!=NULL);
+    pSetComp(p, (Exponent_t)i);
+    pIter(p);
   }
 }
 
@@ -729,10 +722,6 @@ poly pISet(int i)
     pSetCoeff0(rc,nInit(i));
     if (nIsZero(pGetCoeff(rc)))
       pDelete1(&rc);
-#ifdef TEST_MAC_ORDER
-    else if (bNoAdd)
-      pSetm(rc);
-#endif
   }
   return rc;
 }
@@ -971,7 +960,6 @@ BOOLEAN pIsHomogeneous (poly p)
 
 // orders monoms of poly using merge sort (ususally faster than
 // insertion sort). ASSUMES that pSetm was performed on monoms
-// (i.e. that Order field is set correctly)
 poly pOrdPolyMerge(poly p)
 {
   poly qq,pp,result=NULL;
@@ -983,8 +971,13 @@ poly pOrdPolyMerge(poly p)
     qq = p;
     loop
     {
-      if (pNext(p) == NULL) return pAdd(result, qq);
-      if (pComp(p,pNext(p)) != 1)
+      if (pNext(p) == NULL)
+      {
+        result=pAdd(result, qq);
+	pTest(result);
+        return result;
+      }
+      if (pComp0(p,pNext(p)) != 1)
       {
         pp = p;
         pIter(p);
@@ -997,8 +990,7 @@ poly pOrdPolyMerge(poly p)
   }
 }
 
-// orders monoms of poly using insertion sort, performs pSetm on each
-// monom (i.e. sets Order field)
+// orders monoms of poly using insertion sort, performs pSetm on each monom
 poly pOrdPolyInsertSetm(poly p)
 {
   poly qq,result = NULL;
@@ -1071,18 +1063,19 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
       int i;
       for(i=1; i<=OldpVariables; i++)
       {
-        if (pRingGetExp(oldRing,p,i)!=0)
+        int e=pRingGetExp(oldRing,p,i);
+        if (/*pRingGetExp(oldRing,p,i)*/e!=0)
         {
           if (perm==NULL)
           {
-            pSetExp(qq,i, pRingGetExp(oldRing,p,i));
+            pSetExp(qq,i, e/*pRingGetExp(oldRing,p,i)*/);
           }
           else if (perm[i]>0)
-            pAddExp(qq,perm[i], pRingGetExp(oldRing, p,i));
+            pAddExp(qq,perm[i], e/*pRingGetExp(oldRing, p,i)*/);
           else if (perm[i]<0)
           {
             lnumber c=(lnumber)pGetCoeff(qq);
-            c->z->e[-perm[i]-1]+=pRingGetExp(oldRing, p,i);
+            c->z->e[-perm[i]-1]+=e/*pRingGetExp(oldRing, p,i)*/;
           }
           else
           {

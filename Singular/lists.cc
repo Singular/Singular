@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.16 1999-04-19 13:04:58 Singular Exp $ */
+/* $Id: lists.cc,v 1.17 1999-09-27 15:05:24 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "ipid.h"
+//#include "ipid.h"
 #include "polys.h"
 #include "ideals.h"
 #include "attrib.h"

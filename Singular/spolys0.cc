@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.14 1999-05-26 16:24:01 obachman Exp $ */
+/* $Id: spolys0.cc,v 1.15 1999-09-27 15:05:32 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -544,7 +544,7 @@ void spGSpolyTail(poly p1, poly q, poly q2, poly spNoether,
 * reduction of p2 with p1
 * do not destroy p1 and p2
 */
-poly spGSpolyRedNew(poly p1, poly p2,poly spNoether, 
+poly spGSpolyRedNew(poly p1, poly p2,poly spNoether,
                     spSpolyLoopProc spSpolyLoop)
 {
   poly m;
@@ -608,7 +608,7 @@ poly spGSpolyRedNew(poly p1, poly p2,poly spNoether,
 * creates the S-polynomial of p1 and p2
 * do not destroy p1 and p2
 */
-poly spGSpolyCreate(poly p1, poly p2,poly spNoether, 
+poly spGSpolyCreate(poly p1, poly p2,poly spNoether,
                     spSpolyLoopProc spSpolyLoop)
 {
   Exponent_t x;

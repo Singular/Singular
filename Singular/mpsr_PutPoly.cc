@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.15 1999-03-12 12:05:24 Singular Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.16 1999-09-27 15:05:28 obachman Exp $ */
 
 /***************************************************************
  *
@@ -12,7 +12,7 @@
  *
  * Change History (most recent first):
  *  o 1/97 obachman
- *    Updated routines to MP and MPP v1.1 
+ *    Updated routines to MP and MPP v1.1
  *
  ***************************************************************/
 #include "mod2.h"
@@ -25,7 +25,7 @@
 #include "mmemory.h"
 #include "ring.h"
 #include "polys.h"
-#include "ipid.h"
+//#include "ipid.h"
 
 #ifdef PARI_BIGINT_TEST
 #include "MP_PariBigInt.h"
@@ -143,7 +143,7 @@ static mpsr_Status_t PutRationalNumber(MP_Link_pt link, number a)
   // Check for case number == NULL == 0
   if (a == NULL)
     mp_return( MP_PutSint32Packet(link, 0, 0));
-  
+
   // check for SR_INT type
   if (SR_HDL(a) & SR_INT)
     mp_return( MP_PutSint32Packet(link, SR_TO_INT(a), 0));
@@ -159,7 +159,7 @@ static mpsr_Status_t PutRationalNumber(MP_Link_pt link, number a)
 // //    nlNormalize(a);
 //     return PutRationalNumber(link, a);
 //   }
-  
+
   // send number itself
   mp_failr(MP_PutCommonOperatorPacket(link,
                                       MP_BasicDict,
@@ -258,12 +258,12 @@ mpsr_Status_t mpsr_PutPolyData(MP_Link_pt link, poly p, ring cring)
   if (currRing == cring)
     pTest(p);
 #endif
-  
+
   if (gNvars > 1)
   {
     short i;
     MP_Sint32_t *ta1 = &(gTa[1]);
-    
+
     while (p != NULL)
     {
       failr(PutCoeff(link, pGetCoeff(p)));
@@ -289,7 +289,7 @@ mpsr_Status_t mpsr_PutPolyVectorData(MP_Link_pt link, poly p, ring cring)
 
   if (cring != CurrPutRing)
     SetPutFuncs(cring);
-  
+
   if (gNvars > 1)
   {
     short i, n1= gNvars + 1;
@@ -347,7 +347,7 @@ mpsr_Status_t mpsr_PutRingAnnots(MP_Link_pt link, ring r, BOOLEAN mv)
   // but to be used in a recursive call of mpsr_PutRingAnnots
   if (r->minpoly != NULL && r->parameter == NULL && r->ch > 0)
     failr(PutMinPolyAnnot(link,r));
-  
+
   if (r->qideal != NULL)
     return PutDefRelsAnnot(link, r);
 
@@ -357,7 +357,7 @@ mpsr_Status_t mpsr_PutRingAnnots(MP_Link_pt link, ring r, BOOLEAN mv)
 static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
                                        BOOLEAN mv)
 {
-  // each element of the poly is a 
+  // each element of the poly is a
   mp_failr(MP_PutAnnotationPacket(link,
                                   MP_ProtoDict,
                                   MP_AnnotProtoPrototype,
@@ -391,7 +391,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
                                     MP_ProtoDict,
                                     MP_CmtProtoIMP_Uint32,
                                     1));
-    // but are taken as modulo numbers 
+    // but are taken as modulo numbers
     mp_failr(MP_PutAnnotationPacket(link,
                                     MP_NumberDict,
                                     MP_AnnotNumberModulos,
@@ -417,7 +417,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
   }
   else if (rField_is_R(r))
   {
-    // floats 
+    // floats
     mp_failr(MP_PutCommonMetaTypePacket(link,
                                     MP_ProtoDict,
                                     MP_CmtProtoIMP_Real32,
@@ -438,7 +438,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
     alg_r->names = r->parameter;
     alg_r->minpoly = r->minpoly;
 
-    // Algebraic numbers are 
+    // Algebraic numbers are
     // a fraction of two Dense Dist Polys
     mp_failr(MP_PutCommonMetaOperatorPacket(link,
                                             MP_BasicDict,
@@ -477,7 +477,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
                                    0));
 }
 
-    
+
 static mpsr_Status_t PutVarNamesAnnot(MP_Link_pt link, ring r)
 {
   // first, we put the annot packet, with flags (1, 0, 1, 0)
@@ -506,7 +506,7 @@ static mpsr_Status_t PutVarNamesAnnot(MP_Link_pt link, ring r)
                                     MP_ProtoDict,
                                     MP_AnnotProtoPrototype,
                                     MP_AnnotReqValNode));
-                                 
+
     mp_failr(MP_PutCommonMetaTypePacket(link,
                                     MP_ProtoDict,
                                     MP_CmtProtoIMP_Identifier,
@@ -527,7 +527,7 @@ static mpsr_Status_t PutVarNumberAnnot(MP_Link_pt link, ring r, BOOLEAN mv)
   mp_return(MP_PutUint32Packet(link, (mv ? r->N + 1 : r->N), 0));
 }
 
-  
+
 static mpsr_Status_t PutOrderingAnnot(MP_Link_pt link, ring r, BOOLEAN mv)
 {
   int index = 0, nblocks = 0;
@@ -565,7 +565,7 @@ static mpsr_Status_t PutOrderingAnnot(MP_Link_pt link, ring r, BOOLEAN mv)
     if (! (mv == 0 && (order[index] == ringorder_C ||
                        order[index] == ringorder_c)))
     {
-      // a product ordering is sent as triple 
+      // a product ordering is sent as triple
       mp_failr(MP_PutCommonOperatorPacket(link,
                                           MP_BasicDict,
                                           MP_CopBasicList,
@@ -597,7 +597,7 @@ static mpsr_Status_t PutSimpleOrdering(MP_Link_pt link, ring r, short index)
 
   if (vlength == 0) return mpsr_Success;
 
-  // deal with the weights 
+  // deal with the weights
   mp_failr(MP_PutAnnotationPacket(link,
                                   MP_PolyDict,
                                   MP_AnnotPolyWeights,
@@ -648,7 +648,7 @@ static mpsr_Status_t PutSimpleOrdering(MP_Link_pt link, ring r, short index)
                                     0));
   }
 
-  // weights are all what remains 
+  // weights are all what remains
   for (i=0; i<vlength; i++)
     mp_failr(IMP_PutSint32(link, (MP_Sint32_t) r->wvhdl[index][i]));
 
@@ -658,7 +658,7 @@ static mpsr_Status_t PutSimpleOrdering(MP_Link_pt link, ring r, short index)
 static mpsr_Status_t PutMinPolyAnnot(MP_Link_pt link, ring r)
 {
   mpsr_assume(r->minpoly != NULL && r->ch > 0 && r->parameter == NULL);
-  
+
   number minpoly = r->minpoly;
   r->minpoly = 0;
 
@@ -687,12 +687,12 @@ static mpsr_Status_t PutMinPolyAnnot(MP_Link_pt link, ring r)
   else
     PutAlgAlgNumber = PutRationalNumber;
   gNalgvars = r->N;
-  
+
   r->minpoly = minpoly;
   return PutAlgPoly(link, ((lnumber) minpoly)->z);
 }
 
-  
+
 static mpsr_Status_t PutDefRelsAnnot(MP_Link_pt link, ring r)
 {
   int i, idn;

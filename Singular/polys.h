@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.20 1999-05-26 16:24:00 obachman Exp $ */
+/* $Id: polys.h,v 1.21 1999-09-27 15:05:30 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -17,7 +17,6 @@ extern BOOLEAN  pMixedOrder;
 extern poly     ppNoether;
 extern BOOLEAN  pVectorOut;
 // 1 for lex ordering (except ls), -1 otherwise
-extern int pLexSgn;
 extern int pComponentOrder;
 
 #ifdef DRING
@@ -124,9 +123,7 @@ void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 
 
 /*-------------ring management:----------------------*/
-extern void   pChangeRing(int N, int OrdSgn,
-                         int* ord, int* block0, int* block1,
-                         short** wv);
+//extern void pChangeRing(ring newRing);
 extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
 
 /*-----------the ordering of monomials:-------------*/
@@ -152,15 +149,22 @@ int  pModuleOrder();
 
 /*-------------storage management:-------------------*/
 // allocates the space for a new monomial -- no initialization !!!
-#define pNew()      _pNew()
+#define pNew()          _pNew(mm_specHeap)
 // allocates a new monomial and initializes everything to 0
-#define pInit()     _pInit()
+#define pInit()         _pInit(mm_specHeap)
 // frees the space of the monomial m (coef is not freed)
-#define pFree1(m)       _pFree1(m)
-// frees the space of monoial and frees coefficient
-#define pDelete1(m)     _pDelete1(m)
+#define pFree1(m)       _pFree1(m, mm_specHeap)
+// frees the space of monomial and frees coefficient
+#define pDelete1(m)     _pDelete1(m, mm_specHeap)
 // deletes the whole polynomial p
-#define pDelete(p)      _pDelete(p)
+#define pDelete(p)      _pDelete(p, mm_specHeap)
+
+// similar to routines above, except that monomials are assumed to be from heap h (resp. are allocated from heap h)
+#define pHeapNew(h)             _pNew(h)
+#define pHeapInit(h)            _pInit(h)
+#define pHeapFree1(m, h)        _pFree1(m, h)
+#define pHeapDelete1(m, h)      _pDelete1(m, h)
+#define pHeapDelete(p, h)       _pDelete(p, h)
 
 // makes a simple memcpy of m2 into m1 -- does _not_ allocate memory for m1
 #define pCopy2(m1, m2)  _pCopy2(m1, m2)
@@ -172,28 +176,58 @@ int  pModuleOrder();
 #define pHead0(p)       _pHead0(p)
 // Returns a newly allocated copy of the monomial, copy includes copy of coeff
 // sets the next-field to NULL
-#define pHead(p)        _pHead(p)
+#define pHead(p)        _pHead(mm_specHeap, p)
+// Similar to pHead, except that new monom is taken from heap dest_heap
+#define pHeapHead(dest_heap, p) _pHead(dest_heap, p)
+// Returns a shallow copy (i.e. only monomial is copied) of head of source_p
+// Monom of copy is from dest_heap, assumes monoms of p are from source_heap
+// Head of source_p is deleted along the way
+#define pShallowCopyDeleteHead(dest_heap, source_p, source_heap) \
+  _pShallowCopyDeleteHead(dest_heap, source_p, source_heap)
+
 extern  poly pHeadProc(poly p);
 // Returns copy of the whole polynomial
-#define pCopy(p)        _pCopy(p)
+#define pCopy(p)        _pCopy(mm_specHeap, p)
+// Returns copy of the whole poly, new monomials are taken from dest_heap
+#define pHeapCopy(dest_heap, p) _pCopy(dest_heap, p)
+
+// Returns a shallow copy (i.e. only monomials are copied) of source_p
+// Monoms of copy are from dest_heap, assumes monoms of p are from source_heap
+// source_p is deleted along the way
+#define pShallowCopyDelete(dest_heap, source_p, source_heap) \
+  _pShallowCopyDelete(dest_heap, source_p, source_heap)
+
+
 // Returns a converted copy (in the sense that returned poly is in
 // poly of currRing) of poly p which is from ring r -- assumes that
 // currRing and r have the same number of variables, i.e. that polys
 // from r can be "fetched" into currRing
 #define pFetchCopy(r,p)     _pFetchCopy(r,p)
+// Similar to pFetchCopy, except that poly p is deleted
+#define pFetchCopyDelete(r, p) _pFetchCopyDelete(r, p)
+// Similar tp pFetchCopy resp. pHead, i.e., lead monomial of p which
+// lives in (fetchable) ring r is copied
+#define pFetchHead(r, p)    _pFetchHead(r, p)
+// similar to pFetchHead, except that lead monom of p is deleted
+#define pFetchHeadDelete(r, p) _pFetchHeadDelete(r, p)
+// Similar to pFree1, except that m lives in ring r
+#define pRingFree1(r, m)        _pRingFree1(r, m)
+// similar to pDelete1, except that m lives in ring r, which MUST be a
+// "fetchable" ring w.r.t. currRing
+#define pRingDelete1(r, m)        _pRingDelete1(r, m)
+// similar to pDelete, except that m lives in ring r, which MUST be a
+// "fetchable" ring w.r.t. currRing
+#define pRingDelete(r, m)        _pRingDelete(r, m)
 
 
-// Adds exponents of p2 to exponents of p1; updates Order field
-// assumes that exponents > 0 and < MAX_EXPONENT / 2
+// Adds exponents of p2 to exponents of p1; updates all Order fields
+// assumes that exponents >= 0 and < MAX_EXPONENT / 2
 #define pMonAddFast(p1, p2) _pMonAddFast(p1, p2)
+#define pMonSubFast(p1, p2) _pMonSubFast(p1, p2)
 // Is equivalent to pCopy2(p1, p2);pMonAddFast(p1, p3);
 #define pCopyAddFast(p1, p2, p3)    _pCopyAddFast(p1, p2, p3)
 // Similar to pCopyAddFast, except that we do not care about the next field
 #define pCopyAddFast0(p1, p2, p3)  _pCopyAddFast0(p1, p2, p3)
-// Similar to pCopyAddFast0, except that we do not recompute the Order,
-// but assume that it is the sum of the Order of p2 and p3
-#define pCopyAddFastHomog(p1, p2, p3, Order)  \
-  _pCopyAddFastHomog(p1, p2, p3, Order)
 
 poly      pmInit(char *s, BOOLEAN &ok);   /* monom -> poly */
 void      ppDelete(poly * a, ring r);
@@ -231,6 +265,12 @@ inline BOOLEAN pLmEqual(poly p1, poly p2) // no assumptions
 // like pDivisibleBy1, does not check components
 #define pDivisibleBy2(a, b) _pDivisibleBy2(a,b)
 
+// Divisibility tests based on Short Exponent vectors
+// sev_a     == pGetShortExpVector(a)
+// not_sev_b == ~ pGetShortExpVector(b)
+#define pShortDivisibleBy(a, sev_a, b, not_sev_b) \
+  _pShortDivisibleBy(a, sev_a, b, not_sev_b)
+
 
 poly      pDivide(poly a, poly b);
 poly      pDivideM(poly a, poly b);
@@ -247,8 +287,6 @@ void      pSetCompP(poly a, int i);
 
 // Quer sum (total degree) of all exponents of leading monomial
 #define pExpQuerSum(p1)             _pExpQuerSum(p1)
-// sum from 1st to "to"th exponent (including the "to" one)
-#define pExpQuerSum1(p1, to)        _pExpQuerSum1(p1, to)
 // sum from "from"th to "to"th exponent (including borders)
 #define pExpQuerSum2(p1, from, to)  _pExpQuerSum2(p1, from, to)
 
@@ -298,7 +336,7 @@ void      pSetSyzComp(int k);
 BOOLEAN   pVectorHasUnitB(poly p, int * k);
 void      pVectorHasUnit(poly p, int * k, int * len);
 poly      pTakeOutComp1(poly * p, int k);
-// Splits *p into two polys: *q which consists of all monoms with 
+// Splits *p into two polys: *q which consists of all monoms with
 // component == comp and *p of all other monoms *lq == pLength(*q)
 // On rreturn all components pf *q == 0
 void pTakeOutComp(poly *p, Exponent_t comp, poly *q, int *lq);
@@ -308,7 +346,7 @@ void pTakeOutComp(poly *p, Exponent_t comp, poly *q, int *lq);
 //         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
 void pDecrOrdTakeOutComp(poly *p, Exponent_t comp, Order_t order,
                          poly *q, int *lq);
-// This is something weird -- Don't use it, unless you know what you are doing 
+// This is something weird -- Don't use it, unless you know what you are doing
 poly      pTakeOutComp(poly * p, int k);
 void      pDeleteComp(poly * p,int k);
 void      pNorm(poly p);
@@ -332,18 +370,25 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm);
 BOOLEAN pEqualPolys(poly p1,poly p2);
 BOOLEAN pComparePolys(poly p1,poly p2);
 
+/*-----------Misc stuff-----------------------------------*/
+// returns the "Short Exponent Vector" -- used to speed up divisibility
+// tests (see polys-impl.cc )
+unsigned long pGetShortExpVector(poly p);
+
 
 #ifdef PDEBUG
 #define pHeapTest(A,B)  pDBTest(A, B, __FILE__,__LINE__)
-#define pHeapHeapTest(p, THeap, LmHeap) pDBTest(p, THeap, LmHeap, __FILE__, __LINE__)
 #define pTest(A) pDBTest(A, mm_specHeap, __FILE__,__LINE__)
 BOOLEAN pDBTest(poly p, char *f, int l);
 BOOLEAN pDBTest(poly p, memHeap tail_heap, char *f, int l);
 BOOLEAN pDBTest(poly p,  memHeap tail_heap, memHeap lm_heap, char *f, int l);
 #else
-#define pHeapHeapTest(p,a,b)
 #define pHeapTest(A,B)
 #define pTest(A)
 #define pDBTest(A,B,C)
 #endif
+
+
+void pAddCompVector(poly p,poly exp);
+void pAddCompVector(poly p,poly exp1, poly exp2);
 #endif

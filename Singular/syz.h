@@ -1,13 +1,14 @@
 #ifndef SYZ_H
-#define SYZ_h
+#define SYZ_H
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.16 1999-08-19 15:51:30 Singular Exp $ */
+/* $Id: syz.h,v 1.17 1999-09-27 15:05:33 obachman Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
 #include "structs.h"
+#include "kbPolyProcs.h"
 
 struct sSObject{
                  poly  p;
@@ -18,6 +19,8 @@ struct sSObject{
                  poly  isNotMinimal;
                  int   syzind;
                  int   order;
+                 int   length;
+                 int   reference;
                };
 typedef struct sSObject SObject;
 typedef SObject * SSet;
@@ -28,23 +31,28 @@ typedef ssyStrategy * syStrategy;
 class ssyStrategy{
   public:
   int ** truecomponents;
+  long** ShiftedComponents;
   int ** backcomponents;
   int ** Howmuch;
   int ** Firstelem;
+  int ** elemLength;
   intvec ** weights;
-  resolvente res;
-  resolvente orderedRes;
-  SRes resPairs;
+  intvec ** hilb_coeffs;
+  resolvente res;              //polynomial data for internal use only
+  resolvente orderedRes;       //polynomial data for internal use only
+  SRes resPairs;               //polynomial data for internal use only
   intvec * Tl;
-  resolvente fullres;
-  resolvente minres;
-  int * binom;
   intvec * resolution;
   intvec * cw;
-  int highdeg_1;
-  int length;
   short list_length;
   short references;
+  kBucket_pt bucket;
+  kBucket_pt syz_bucket;
+  ring syRing;
+  kbPolyProcs pProcs;
+  int length;
+  resolvente fullres;
+  resolvente minres;
 };
 
 void sySchreyersSyzygiesM(polyset F,int Fmax,polyset* Shdl,int* Smax,
@@ -67,8 +75,6 @@ resolvente syMinRes(ideal arg, int maxlength, int * length, BOOLEAN minim);
 
 void syMinimizeResolvente(resolvente res, int length, int first);
 
-resolvente syFastMin(resolvente res,int length);
-
 intvec * syBetti(resolvente res,int length, int * regularity,
                  intvec* weights=NULL,BOOLEAN tomin=TRUE);
 
@@ -80,7 +86,10 @@ void syReOrderResolventFB(resolvente res,int length, int initial=1);
 
 resolvente syLaScala1(ideal arg,int * length);
 syStrategy syLaScala3(ideal arg,int * length);
+syStrategy syHilb(ideal arg,int * length);
+syStrategy syKosz(ideal arg,int * length);
 
+void syDeleteRes(resolvente * res,int length);
 void syKillComputation(syStrategy syzstr);
 intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim=TRUE);
 BOOLEAN syBetti1(leftv res, leftv u);
@@ -95,5 +104,8 @@ syStrategy syConvList(lists li,BOOLEAN toDel=FALSE);
 syStrategy syForceMin(lists li);
 syStrategy syMinimize(syStrategy syzstr);
 void syKillEmptyEntres(resolvente res,int length);
+
+extern int *  currcomponents;
+extern long *  currShiftedComponents;
 
 #endif

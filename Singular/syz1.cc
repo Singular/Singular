@@ -1,11 +1,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.39 1999-08-19 15:51:30 Singular Exp $ */
+/* $Id: syz1.cc,v 1.40 1999-09-27 15:05:33 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
-
 
 #include "mod2.h"
 #include "tok.h"
@@ -30,16 +29,24 @@
 #include "ring.h"
 #include "lists.h"
 #include "syz.h"
+#include "kbuckets.h"
+#include "kbPolyProcs.h"
+#include <limits.h>
 
+extern void rSetmS(poly p, int* Components, long* ShiftedComponents);
 
 /*--------------static variables------------------------*/
-/*---contains the real components wrt. cdp--------------*/
-//static int ** truecomponents=NULL;
-//static int ** backcomponents=NULL;
-//static int ** Howmuch=NULL;
-//static int ** Firstelem=NULL;
-/*---points to the real components of the actual module-*/
+/*---points to the real components, shifted of the actual module-*/
 static int *  currcomponents=NULL;
+static long *  currShiftedComponents=NULL;
+
+// Logarithm of estimate of maximal number of new components
+#define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8
+// Logarithm of "distance" between a new component and prev component
+#define SYZ_SHIFT_BASE_LOG (BIT_SIZEOF_LONG - 1 - SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE)
+#define SYZ_SHIFT_BASE (1 << SYZ_SHIFT_BASE_LOG)
+
+
 /*---head-term-polynomials for the reduction------------*/
 static poly redpol=NULL;
 /*---counts number of applications of GM-criteria-------*/
@@ -72,6 +79,25 @@ static void syDeletePair(SObject * so)
   (*so).syzind = -1;
   (*so).order = 0;
   (*so).isNotMinimal = NULL;
+  (*so).length = -1;
+}
+
+/*3
+* initializes all entres of a pair
+*/
+static void syInitializePair(SObject * so)
+{
+  (*so).p = NULL;
+  (*so).lcm = NULL;
+  (*so).syz = NULL;
+  (*so).p1 = NULL;
+  (*so).p2 = NULL;
+  (*so).ind1 = 0;
+  (*so).ind2 = 0;
+  (*so).syzind = -1;
+  (*so).order = 0;
+  (*so).isNotMinimal = NULL;
+  (*so).length = -1;
 }
 
 /*3
@@ -80,16 +106,6 @@ static void syDeletePair(SObject * so)
 static void syCopyPair(SObject * argso, SObject * imso)
 {
   *imso=*argso;
-  //(*imso).p = (*argso).p;
-  //(*imso).p1 = (*argso).p1;
-  //(*imso).p2 = (*argso).p2;
-  //(*imso).lcm = (*argso).lcm;
-  //(*imso).syz = (*argso).syz;
-  //(*imso).ind1 = (*argso).ind1;
-  //(*imso).ind2 = (*argso).ind2;
-  //(*imso).syzind = (*argso).syzind;
-  //(*imso).order = (*argso).order;
-  //(*imso).isNotMinimal = (*argso).isNotMinimal;
   (*argso).p = NULL;
   (*argso).p1 = NULL;
   (*argso).p2 = NULL;
@@ -100,6 +116,7 @@ static void syCopyPair(SObject * argso, SObject * imso)
   (*argso).syzind = -1;
   (*argso).order = 0;
   (*argso).isNotMinimal = NULL;
+  (*argso).length = -1;
 }
 
 /*3
@@ -123,6 +140,11 @@ static void syCompactifyPairSet(SSet sPairs, int sPlength, int first)
       kk++;
     }
   }
+  while (k<sPlength)
+  {
+    syInitializePair(&sPairs[k]);
+    k++;
+  }
 }
 
 /*3
@@ -134,7 +156,7 @@ static void syCompactify1(SSet sPairs, int* sPlength, int first)
 {
   int k=first,kk=0;
 
-  while (k+kk<=*sPlength)
+  while (k+kk<*sPlength)
   {
     if (sPairs[k+kk].lcm!=NULL)
     {
@@ -146,6 +168,11 @@ static void syCompactify1(SSet sPairs, int* sPlength, int first)
       kk++;
     }
   }
+  while (k<*sPlength)
+  {
+    syInitializePair(&sPairs[k]);
+    k++;
+  }
   *sPlength -= kk;
 }
 
@@ -154,7 +181,7 @@ static void syCompactify1(SSet sPairs, int* sPlength, int first)
 * compares with components of currcomponents instead of the
 * exp[0]
 */
-static int syzcomp1dpc(poly p1, poly p2)
+static int syzcomp0dpc(poly p1, poly p2)
 {
   /*4 compare monomials by order then revlex*/
     int i = pVariables;
@@ -165,7 +192,6 @@ static int syzcomp1dpc(poly p1, poly p2)
         i--;
         if (i <= 1)
         {
-          //(*orderingdepth)[pVariables-i]++;
            /*4 handle module case:*/
            if (pGetComp(p1)==pGetComp(p2)) return 0;
            else if
@@ -175,7 +201,6 @@ static int syzcomp1dpc(poly p1, poly p2)
         }
       } while ((pGetExp(p1,i) == pGetExp(p2,i)));
     }
-    //(*orderingdepth)[pVariables-i]++;
     if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
     return -1;
 }
@@ -185,38 +210,75 @@ static int syzcomp1dpc(poly p1, poly p2)
 * compares with components of currcomponents instead of the
 * exp[0]
 */
-
-#ifdef SY_VEC_DEBUG
-static int normal_syzcomp2dpc(poly p1, poly p2);
-
-static int syzcomp2dpc(poly p1, poly p2)
+static int syzcomp1dpc(poly p1, poly p2)
 {
-  int n1 = normal_syzcomp2dpc(p1, p2);
-  int n2 = SyVecSyzCmp(p1, p2);
-
-  if (n1 != n2)
+  int i = pVariables;
+  while ((i>1) && (pGetExp(p1,i)==pGetExp(p2,i)))
+    i--;
+  if (i>1)
   {
-    PrintS("Error in syzcomp\n");
-    SyVecSyzCmp(p1, p2);
-    normal_syzcomp2dpc(p1, p2);
+    if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
+    return -1;
   }
-  return n1;
+  int o1=pGetComp(p1);
+  int o2=pGetComp(p2);
+  if (o1==o2/*pGetComp(p1)==pGetComp(p2)*/) return 0;
+  if (currcomponents[o1]>currcomponents[o2]) return 1;
+  return -1;
+
 }
 
-static int normal_syzcomp2dpc(poly p1, poly p2)
+/*3
+* replaces comp1dpc during homogeneous syzygy-computations
+* compares with components of currcomponents instead of the
+* exp[0]
+*/
+
+extern int rComp0(poly p1, poly p2);
+#ifdef NDEBUG
+#define syzcomp2dpc rComp0
 #else
-#ifdef HAVE_SY_VECTOR
-static int dummy(poly p1, poly p2)
-#else
-static int syzcomp2dpc(poly p1, poly p2)
-#endif
-#endif
+static int syzcomp2dpc_test(poly p1, poly p2)
 {
+  long c1, c2, cc1, cc2, ccc1, ccc2, ec1, ec2;
+  c1 = pGetComp(p1);
+  c2 = pGetComp(p2);
+  cc1 = currcomponents[c1];
+  cc2 = currcomponents[c2];
+  ccc1 = currShiftedComponents[cc1];
+  ccc2 = currShiftedComponents[cc2];
+  ec1 = p1->exp.l[currRing->typ[1].data.syzcomp.place];
+  ec2 = p2->exp.l[currRing->typ[1].data.syzcomp.place];
+
+  if (ec1 != ccc1)
+  {
+    Warn("Shifted comp of p1 out of sync. should %d, is %d", ccc1, ec1);
+    //mmDBInfoBlock(p1);
+  }
+  if (ec2 != ccc2)
+  {
+    Warn("Shifted comp of p2 out of sync. should %d, is %d", ccc2, ec2);
+    //mmDBInfoBlock(p2);
+  }
+
+  if (c1 == c2)
+  {
+    assume(ccc1 == ccc2);
+  }
+  else if (cc1 > cc2)
+  {
+    assume(ccc1 > ccc2);
+  }
+  else
+  {
+    assume (cc1 < cc2);
+    assume (ccc1 < ccc2);
+  }
   int o1=pGetOrder(p1), o2=pGetOrder(p2);
   if (o1 > o2) return 1;
   if (o1 < o2) return -1;
 
-  if (o1>0)
+  //if (o1>0)
   {
     int i = pVariables;
     while ((i>1) && (pGetExp(p1,i)==pGetExp(p2,i)))
@@ -234,6 +296,19 @@ static int syzcomp2dpc(poly p1, poly p2)
   if (currcomponents[o1]>currcomponents[o2]) return 1;
   return -1;
 }
+static int syzcomp2dpc(poly p1, poly p2)
+{
+  int test = syzcomp2dpc_test(p1, p2);
+  int rc = rComp0(p1, p2);
+  if (test != rc)
+  {
+    assume(0);
+    syzcomp2dpc_test(p1, p2);
+    rComp0(p1, p2);
+  }
+  return test;
+}
+#endif // NDEBUG
 
 /*3
 * compares only the monomial without component
@@ -262,565 +337,9 @@ static int syzcompmonomdp(poly p1, poly p2)
   return -1;
 }
 
-/*
-* (i,j) in binomials[j-1,i-j+1]
-* table size is: pVariables * (highdeg+1)
-* highdeg_1==highdeg+1
-*/
-static void syBinomSet()
-{
-  highdeg_1=highdeg+1;
-  for(int j=1;j<=highdeg;j++)
-  {
-    binomials[j/*0,j*/] = j;
-    for (int i=1;i<pVariables;i++)
-    {
-      binomials[i*(highdeg_1)+j/*i,j*/]
-      = binomials[(i-1)*(highdeg_1)+j/*i-1,j*/]*(j+i)/(i+1);
-    }
-  }
-  for (int i=0;i<pVariables;i++)
-  {
-    binomials[i*(highdeg_1)/*i,0*/]=0;
-  }
-}
-
-static inline int syBinom(int i,int j)
-{
-  return binomials[(j-1)*(highdeg_1)+i-j+1/*j-1,i-j*/];
-}
-
-#if defined(HAVE_SY_VECTOR) && ! defined(SY_VEC_DEBUG)
-#define syzSetm(p) pSetm(p)
-#else
-static void syzSetm(poly p)
-{
-  int i = 0,j;
-  for (j=pVariables;j>0;j--)
-    i += pGetExp(p,j);
-
-  if (i<=highdeg)
-  {
-    i=1;
-    j = -MAX_INT_VAL;
-    int *ip=binomials+pGetExp(p,1);
-    loop
-    {
-      j += (*ip);
-      if (i==pVariables) break;
-      i++;
-      ip+=highdeg_1+pGetExp(p,i);
-    }
-    pGetOrder(p) = j;
-  }
-  else
-    pGetOrder(p)=i;
-}
-#endif
-
-static inline poly syMultT(poly p,poly m)
-{
-  poly q,result=q=pNew();
-  int j;
-
-  if (pGetOrder(p)>0)
-  {
-    loop
-    {
-      spMemcpy(q,p);
-      for (j=pVariables;j>0;j--)
-        pAddExp(q,j, pGetExp(m,j));
-      pSetCoeff0(q,nCopy(pGetCoeff(p)));
-      syzSetm(q);
-      pIter(p);
-      if (p!=NULL)
-      {
-        pNext(q) = pNew();
-        pIter(q);
-      }
-      else break;
-    }
-  }
-  else
-  {
-    poly lastmon=NULL;
-    int i=0;
-    loop
-    {
-      if (pGetOrder(p)!=i)
-      {
-        spMemcpy(q,p);
-        for (j=pVariables;j>0;j--)
-          pAddExp(q,j,  pGetExp(m,j));
-        syzSetm(q);
-        lastmon = q;
-        i = pGetOrder(p);
-      }
-      else
-      {
-        spMemcpy(q,lastmon);
-        pSetComp(q,pGetComp(p));
-      }
-      pSetCoeff0(q,nCopy(pGetCoeff(p)));
-      pIter(p);
-      if (p!=NULL)
-      {
-        pNext(q) = pNew();
-        pIter(q);
-      }
-      else break;
-    }
-  }
-  pNext(q) = NULL;
-  return result;
-}
-
-static inline poly syMultTNeg(poly p,poly m)
-{
-  poly q,result=q=pNew();
-  int j;
-
-  if (pGetOrder(p)>0)
-  {
-    loop
-    {
-      spMemcpy(q,p);
-      for (j=pVariables;j>0;j--)
-        pAddExp(q,j, pGetExp(m,j));
-      pSetCoeff0(q,nCopy(pGetCoeff(p)));
-      pGetCoeff(q) = nNeg(pGetCoeff(q));
-      syzSetm(q);
-      pIter(p);
-      if (p!=NULL)
-      {
-        pNext(q) = pNew();
-        pIter(q);
-      }
-      else break;
-    }
-  }
-  else
-  {
-    poly lastmon=NULL;
-    int i=0;
-    loop
-    {
-      if (pGetOrder(p)!=i)
-      {
-        spMemcpy(q,p);
-        for (j=pVariables;j>0;j--)
-          pAddExp(q,j, pGetExp(m,j));
-        syzSetm(q);
-        lastmon = q;
-        i = pGetOrder(p);
-      }
-      else
-      {
-        spMemcpy(q,lastmon);
-        pSetComp(q,pGetComp(p));
-      }
-      pSetCoeff0(q,nCopy(pGetCoeff(p)));
-      pGetCoeff(q) = nNeg(pGetCoeff(q));
-      pIter(p);
-      if (p!=NULL)
-      {
-        pNext(q) = pNew();
-        pIter(q);
-      }
-      else break;
-    }
-  }
-  pNext(q) = NULL;
-  return result;
-}
-
-static poly syMultT1(poly p,poly m)
-{
-  poly q,result=q=pNew();
-  int j;
-
-  if (pGetOrder(p)>0)
-  {
-    loop
-    {
-      spMemcpy(q,p);
-      for (j=pVariables;j>0;j--)
-        pAddExp(q,j, pGetExp(m,j));
-      pSetCoeff0(q,nMult(pGetCoeff(p),pGetCoeff(m)));
-      syzSetm(q);
-      pIter(p);
-      if (p!=NULL)
-      {
-        pNext(q) = pNew();
-        pIter(q);
-      }
-      else break;
-    }
-  }
-  else
-  {
-    poly lastmon=NULL;
-    int i=0;
-    loop
-    {
-      if (pGetOrder(p)!=i)
-      {
-        spMemcpy(q,p);
-        for (j=pVariables;j>0;j--)
-          pAddExp(q,j, pGetExp(m,j));
-        syzSetm(q);
-        lastmon = q;
-        i = pGetOrder(p);
-      }
-      else
-      {
-        spMemcpy(q,lastmon);
-        pSetComp(q,pGetComp(p));
-      }
-      pSetCoeff0(q,nMult(pGetCoeff(p),pGetCoeff(m)));
-      pIter(p);
-      if (p!=NULL)
-      {
-        pNext(q) = pNew();
-        pIter(q);
-      }
-      else break;
-    }
-  }
-  pNext(q) = NULL;
-  return result;
-}
-
-static inline poly syAdd(poly m1,poly m2)
-{
-  if (m1==NULL)
-    return m2;
-  if (m2==NULL)
-    return m1;
-  if ((pGetOrder(m1)>0) && (pGetOrder(m2)>0))
-  {
-    return pAdd(m1,m2);
-  }
-  else
-  {
-    poly p,result=p=pInit();
-    number n;
-    loop
-    {
-      if (pGetOrder(m1)>pGetOrder(m2))
-      {
-        pNext(p) = m1;
-        pIter(p);
-        pIter(m1);
-      }
-      else if (pGetOrder(m1)<pGetOrder(m2))
-      {
-        pNext(p) = m2;
-        pIter(p);
-        pIter(m2);
-      }
-      else if (currcomponents[pGetComp(m1)]>currcomponents[pGetComp(m2)])
-      {
-        pNext(p) = m1;
-        pIter(p);
-        pIter(m1);
-      }
-      else if (currcomponents[pGetComp(m1)]<currcomponents[pGetComp(m2)])
-      {
-        pNext(p) = m2;
-        pIter(p);
-        pIter(m2);
-      }
-      else
-      {
-        n = nAdd(pGetCoeff(m1),pGetCoeff(m2));
-        if (nIsZero(n))
-        {
-          pDelete1(&m1);
-        }
-        else
-        {
-          pNext(p) = m1;
-          pIter(p);
-          pIter(m1);
-          pSetCoeff(p,n);
-        }
-        pDelete1(&m2);
-      }
-      if (m1==NULL)
-      {
-        pNext(p) = m2;
-        break;
-      }
-      if (m2==NULL)
-      {
-        pNext(p) = m1;
-        break;
-      }
-    }
-    pDelete1(&result);
-    return result;
-  }
-}
-
 poly syOrdPolySchreyer(poly p)
 {
   return pOrdPolyMerge(p);
-}
-
-#ifdef SY_VEC_DEBUG
-static poly normal_sySPAdd(poly m1,poly m2,poly m);
-static poly sySPAdd(poly m1, poly m2, poly m)
-{
-  poly temp1 = pCopy(m1);
-
-  poly p1 = normal_sySPAdd(m1, m2, m);
-  poly p2 = syVecSpoly(m2, temp1, m);
-
-  pTest(p1);
-  pTest(p2);
-  if (p1 != NULL)
-  {
-    if (p2 == NULL || ! pEqual(p1, p2))
-    {
-      PrintS("Error in SySpoly\n");
-//      poly temp5 = pCopy(temp3);
-//      poly temp6 = pCopy(temp4);
-//      p1 = normal_sySPAdd(temp3, temp4, m);
-//      p2 = syVecSpoly(temp6, temp5, m);
-    }
-  }
-  else if (p2 != NULL)
-    PrintS("Error in SySpoly\n");
-
-  return p1;
-}
-
-static poly normal_sySPAdd(poly m1,poly m2,poly m)
-#else
-#ifdef HAVE_SY_VECTOR
-#define sySPAdd(p1, p2, m) syVecSpoly(p2, p1, m)
-static poly dummy(poly m1,poly m2,poly m)
-#else
-static poly sySPAdd(poly m1,poly m2,poly m)
-#endif
-#endif
-{
-  int i2=-MAX_INT_VAL;
-  int i1;
-  int j;
-  //register poly m1=m11;
-  poly p=redpol;
-  poly tm2=pNew();
-  number multwith=pGetCoeff(m);
-
-  pDelete1(&m1);
-  i1 = pGetOrder(m1);
-  pIter(m2);
-  spMemcpy(tm2,m2);
-  j = 1;
-  pAddExp(tm2,1, pGetExp(m,1));
-  int *ip=binomials+pGetExp(tm2,1);
-  loop
-  {
-    i2 += (*ip);
-    if (j==pVariables) break;
-    j++;
-    pAddExp(tm2,j,pGetExp(m,j));
-    ip+=highdeg_1+pGetExp(tm2,j);
-  }
-  pGetOrder(tm2) = i2;
-  pSetCoeff0(tm2,nMult(pGetCoeff(m2),multwith));
-  loop
-  {
-    j = i1-i2;
-    if (j>0/*m1->order>tm2->order*/)
-    {
-      p = pNext(p) = m1;
-      pIter(m1);
-      if (m1!=NULL)
-        i1 = pGetOrder(m1);
-      else
-        break;
-    }
-    else if (j<0/*m1->order<tm2->order*/)
-    {
-      p = pNext(p) = tm2;
-      j = pGetOrder(m2);
-      pIter(m2);
-      if (m2!=NULL)
-      {
-        j -=pGetOrder(m2);
-        tm2 = pNew();
-        if (j!=0)
-        {
-          spMemcpy(tm2,m2);
-          j = 1;
-          pAddExp(tm2,1, pGetExp(m,1));
-          int *ip=binomials+pGetExp(tm2,1);
-          i2=-MAX_INT_VAL;
-          loop
-          {
-            i2 += (*ip);
-            if (j==pVariables) break;
-            j++;
-            pAddExp(tm2,j, pGetExp(m,j));
-            ip+=highdeg_1+pGetExp(tm2,j);
-          }
-          pGetOrder(tm2) = i2;
-          //simple++;
-        }
-        else
-        {
-          spMemcpy(tm2,p);
-          pSetComp(tm2,pGetComp(m2));
-          //dsim++;
-        }
-        //pNext(tm2) = NULL;
-        pSetCoeff0(tm2,nMult(pGetCoeff(m2),multwith));
-      }
-      else
-        break;
-    }
-    else
-    {
-      j = currcomponents[pGetComp(m1)]-currcomponents[pGetComp(m2)];
-      if (j>0/*currcomponents[pGetComp(m1)]>currcomponents[pGetComp(m2)]*/)
-      {
-        p = pNext(p) = m1;
-        pIter(m1);
-        if (m1!=NULL)
-          i1 = pGetOrder(m1);
-        else
-          break;
-      }
-      else
-      {
-        if (j<0/*currcomponents[pGetComp(m1)]<currcomponents[pGetComp(m2)]*/)
-        {
-          p = pNext(p) = tm2;
-          j = pGetOrder(m2);
-        }
-        else
-        {
-          number n = nAdd(pGetCoeff(m1),pGetCoeff(tm2));
-          if (nIsZero(n))
-          {
-            pDelete1(&tm2);
-            nDelete(&n);
-            j = 0;
-          }
-          else
-          {
-            p = pNext(p) = tm2;
-            pSetCoeff(p,n);
-            j = pGetOrder(m2);
-          }
-          pDelete1(&m1);
-          if (m1==NULL)
-          {
-            pIter(m2);
-            break;
-          }
-          else
-            i1 = pGetOrder(m1);
-        }
-        pIter(m2);
-        if (m2!=NULL)
-        {
-          j -=pGetOrder(m2);
-          tm2 = pNew();
-          if (j!=0)
-          {
-            spMemcpy(tm2,m2);
-            j = 1;
-            pAddExp(tm2,1, pGetExp(m,1));
-            int *ip=binomials+pGetExp(tm2,1);
-            i2=-MAX_INT_VAL;
-            loop
-            {
-              i2 += (*ip);
-              if (j==pVariables) break;
-              j++;
-              pAddExp(tm2,j, pGetExp(m,j));
-              ip+=highdeg_1+pGetExp(tm2,j);
-            }
-            pGetOrder(tm2) = i2;
-            //simple++;
-          }
-          else
-          {
-            spMemcpy(tm2,p);
-            pSetComp(tm2,pGetComp(m2));
-            //dsim++;
-          }
-          //pNext(tm2) = NULL;
-          pSetCoeff0(tm2,nMult(pGetCoeff(m2),multwith));
-        }
-        else
-          break;
-      }
-    }
-  }
-  if (m2==NULL)
-  {
-    pNext(p) = m1;
-  }
-  else
-  {
-    pNext(p) = syMultT1(m2,m);
-  }
-  return pNext(redpol);
-}
-
-static inline poly sySPoly(poly m1,poly m2,poly lcm)
-{
-  poly a=pDivide(lcm,m1);
-  poly b1=NULL,b2=NULL;
-  if (pNext(m1)!=NULL)
-    b1 = syMultT(pNext(m1),a);
-  pDelete(&a);
-  a=pDivide(lcm,m2);
-  if (pNext(m2)!=NULL)
-    b2 = syMultTNeg(pNext(m2),a);
-  pDelete(&a);
-  return syAdd(b1,b2);
-}
-
-static poly sySPolyRed(poly m1,poly m2)
-{
-  if (pNext(m2)==NULL)
-  {
-    pDelete1(&m1);
-    return m1;
-  }
-  poly a=pDivide(m1,m2);
-  pSetCoeff0(a,nCopy(pGetCoeff(m1)));
-  pGetCoeff(a) = nNeg(pGetCoeff(a));
-  //return spSpolyRed(m2,m1,NULL);
-  if (pNext(m2)==NULL)
-  {
-    pDelete1(&m1);
-    return m1;
-  }
-  if (pNext(m1)==NULL)
-    return syMultT1(pNext(m2),a);
-  poly res;
-#if defined(HAVE_SY_VECTOR) && ! defined (SY_VEC_DEBUG)
-    res = sySpolyProc(m2, m1,a);
-#else
-  if (pGetOrder(m1)>0)
-  {
-    // TBC: initialize spSpolyLoop where ordering is set!!!
-    res = spSpolyRed(m2,m1,NULL, NULL);
-  }
-  else
-  {
-    res = sySPAdd(m1,m2,a);
-  }
-#endif
-  pDelete1(&a);
-  return res;
 }
 
 static int syLength(poly p)
@@ -853,30 +372,8 @@ poly syRedtail (poly p, syStrategy syzstr, int index)
       {
         if (pDivisibleBy2(redWith->m[j], hn))
         {
-           //int syL=syLength(redWith->m[j]);
-            //PrintS("r");
-//for(int jj=j+1;jj<pos;jj++)
-//{
-  //if (syDivisibleBy1(redWith->m[jj],hn))
-  //{
-    //int syL1=syLength(redWith->m[jj]);
-    //if (syL1<syL)
-    //{
-      //j = jj;
-      //syL = syL1;
-      //Print("take poly %d with %d monomials\n",j,syL);
-      //Print("have poly %d with %d monomials\n",jj,syL1);
-    //}
-  //}
-//}
-          //if (pGetComp(redWith->m[j])!=pGetComp(hn))
-          //{
-            //PrintS("Hilfe!!!!!!!\n");
-            //Print("Fehler in Modul %d bei Elem %d\n",index,j);
-            //PrintS("Poly p: ");pWrite(hn);
-            //PrintS("Poly redWith: ");pWrite(redWith->m[j]);
-          //}
-          hn = sySPolyRed(hn,redWith->m[j]);
+          //hn = sySPolyRed(hn,redWith->m[j]);
+          hn = spSpolyRed(redWith->m[j],hn,NULL,spSpolyLoop_General);
           if (hn == NULL)
           {
             pNext(h) = NULL;
@@ -896,6 +393,7 @@ poly syRedtail (poly p, syStrategy syzstr, int index)
   }
   return p;
 }
+
 
 /*3
 * local procedure for of syInitRes for the module case
@@ -963,24 +461,135 @@ static SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw=NULL)
   return resPairs;
 }
 
+// rearrange shifted components
+static long syReorderShiftedComponents(long * sc, int n)
+{
+  long holes = 0;
+  int i;
+  long new_comps = 0, new_space, max;
+
+  // count number of holes
+  for (i=1; i<n; i++)
+  {
+    if (sc[i-1] + 1 < sc[i]) holes++;
+  }
+
+  if (LONG_MAX - SYZ_SHIFT_BASE <= sc[n-1])
+  {
+    // need new components
+    new_comps = (1 << SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE) - 1;
+    max = LONG_MAX;
+  }
+  else
+  {
+    max = sc[n-1] + SYZ_SHIFT_BASE;
+  }
+
+  // no we arrange things such that
+  // (n - holes) + holes*new_space + new_comps*SYZ_SHIFT_BASE= LONG_MAX
+  new_space = (max - n + holes - new_comps*SYZ_SHIFT_BASE) / holes;
+
+  assume(new_space < SYZ_SHIFT_BASE && new_space >= 4);
+
+  long* tc = ( long*) Alloc(n*sizeof(long));
+  tc[0] = sc[0];
+  // rearrange things
+  for (i=1; i<n; i++)
+  {
+    if (sc[i-1] + 1 < sc[i])
+    {
+      tc[i] = tc[i-1] + new_space;
+    }
+    else
+    {
+      tc[i] = tc[i-1] + 1;
+    }
+    assume(tc[i] > tc[i-1]);
+  }
+
+  assume(LONG_MAX -  SYZ_SHIFT_BASE > tc[n-1]);
+#ifdef HAVE_ASSUME
+  for (i=1; i<n; i++)
+  {
+    assume(tc[i] >= 0);
+    assume(tc[i-1] + 1 <= tc[i]);
+  }
+#endif
+
+  memcpyW(sc, tc, n);
+  Free(tc, n*sizeof(long));
+  return new_space;
+}
+
+// this make a Setm on p
+static void pResetSetm(poly p)
+{
+#ifdef PDEBUG
+  poly q = p;
+#endif
+  while (p!= NULL)
+  {
+    pSetm(p);
+    pIter(p);
+  }
+#ifdef PDEBUG
+  if (! pTest(q))
+  {
+    pSetm(p);
+  }
+#endif
+}
+
+static void syResetShiftedComponents(syStrategy syzstr, int index)
+{
+  assume(index > 0);
+  int i;
+  if (syzstr->res[index] != NULL)
+  {
+    long * prev_s;
+    int* prev_c;
+    int p_length;
+    rGetSComps(&prev_c, &prev_s, &p_length);
+    currcomponents = syzstr->truecomponents[index-1];
+    currShiftedComponents = syzstr->ShiftedComponents[index-1];
+    rChangeSComps(currcomponents,
+                  currShiftedComponents,
+                  IDELEMS(syzstr->res[index-1]));
+    ideal id = syzstr->res[index];
+    for (i=0; i<IDELEMS(id); i++)
+    {
+      pResetSetm(id->m[i]);
+    }
+    currcomponents  = prev_c;
+    currShiftedComponents = prev_s;
+    rChangeSComps(prev_c, prev_s, p_length);
+  }
+}
+
 /*3
 * determines the place of a polynomial in the right ordered resolution
 * set the vectors of truecomponents
 */
-static void syOrder(poly p,syStrategy syzstr,int index,
+static BOOLEAN syOrder(poly p,syStrategy syzstr,int index,
                     int realcomp)
 {
   int i=IDELEMS(syzstr->res[index-1])+1,j=0,k,tc,orc,ie=realcomp-1;
   int *trind1=syzstr->truecomponents[index-1];
   int *trind=syzstr->truecomponents[index];
+  long *shind=syzstr->ShiftedComponents[index];
   int *bc=syzstr->backcomponents[index];
   int *F1=syzstr->Firstelem[index-1];
   int *H1=syzstr->Howmuch[index-1];
   poly pp;
   polyset o_r=syzstr->orderedRes[index]->m;
   polyset or1=syzstr->orderedRes[index-1]->m;
+  BOOLEAN ret = FALSE;
 
-  if (p==NULL) return;
+  // if != 0, then new element can go into same component
+  // i.e., we do not need to leave space in shifted components
+  long same_comp = 0;
+
+  if (p==NULL) return FALSE;
   if (realcomp==0) realcomp=1;
 
   if (index>1)
@@ -995,15 +604,80 @@ static void syOrder(poly p,syStrategy syzstr,int index,
     {
       orc = pGetComp(o_r[j]);
       if (trind1[orc]>tc+1) break;
+      else if (trind1[orc] == tc+1)
+      {
+        same_comp = 1;
+      }
+      else
+      {
+        assume(same_comp == 0);
+      }
       j += H1[orc];
     }
   }
   if (j>ie)
   {
     WerrorS("orderedRes to small");
-    return;
+    return FALSE;
   }
   ie++;
+  if (j == (ie -1))
+  {
+    // new element is the last in ordered module
+    if (same_comp == 0)
+      same_comp = SYZ_SHIFT_BASE;
+
+    // test wheter we have enough space for new shifted component
+    if ((LONG_MAX - same_comp) <= shind[ie-1])
+    {
+      long new_space = syReorderShiftedComponents(shind, ie);
+      assume((LONG_MAX - same_comp) > shind[ie-1]);
+      ret = TRUE;
+      if (TEST_OPT_PROT) Print("(T%u)", new_space);
+    }
+
+    // yes, then set new shifted component
+    assume(ie == 1 || shind[ie-1] > 0);
+    shind[ie] = shind[ie-1] + same_comp;
+  }
+  else
+  {
+    // new element must come in between
+    // i.e. at place j+1
+    long prev, next;
+
+    // test whether new component can get shifted value
+    prev = shind[j];
+    next = shind[j+1];
+    assume(next > prev);
+    if ((same_comp && prev + 2 >= next) || (!same_comp && next - prev < 4))
+    {
+       long new_space = syReorderShiftedComponents(shind, ie);
+      prev = shind[j];
+      next = shind[j+1];
+      assume((same_comp && prev + 2 < next) || (!same_comp && next - prev >= 4));
+      ret = TRUE;
+     if (TEST_OPT_PROT) Print("(B%u)", new_space);
+    }
+
+    // make room for insertion of j+1 shifted component
+    for (k=ie; k > j+1; k--) shind[k] = shind[k-1];
+
+    if (same_comp)
+    {
+      // can simply add one
+      shind[j+1] = prev + 1;
+      assume(shind[j+1] + 1 < shind[j+2]);
+    }
+    else
+    {
+      // need to leave more breathing room - i.e. value goes in
+      // between
+      shind[j+1]  = prev + ((next - prev) >> 1);
+      assume (shind[j] + 1 < shind[j+1] && shind[j+1] + 1 < shind[j+2]);
+    }
+  }
+
   if (o_r[j]!=NULL)
   {
     for (k=ie-1;k>j;k--)
@@ -1022,9 +696,6 @@ static void syOrder(poly p,syStrategy syzstr,int index,
   }
   if (F1[pGetComp(p)]==0)
     F1[pGetComp(p)]=j+1;
-//Print("write in sort %d till %d\n",index-1,i-1);
-//PrintS("poly: ");pWrite(p);
-//Print("in module %d as %d -th element\n",index,j);
   for (k=0;k<IDELEMS((syzstr->res)[index]);k++)
   {
     if (trind[k]>j)
@@ -1033,8 +704,11 @@ static void syOrder(poly p,syStrategy syzstr,int index,
   for (k=IDELEMS((syzstr->res)[index])-1;k>realcomp;k--)
     trind[k] = trind[k-1];
   trind[realcomp] = j+1;
+  return ret;
 }
 
+//#define OLD_PAIR_ORDER
+#ifdef OLD_PAIR_ORDER
 static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
                           int howmuch, int index)
 {
@@ -1076,7 +750,8 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
     else
     {
       nextPairs[i].p =
-        sySPoly(tso.p1, tso.p2,tso.lcm);
+        //sySPoly(tso.p1, tso.p2,tso.lcm);
+        spSpolyCreate(tso.p2, tso.p1,NULL,spSpolyLoop_General);
       (*result)[i1] = i+1;
       i1++;
     }
@@ -1084,8 +759,8 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
   }
   return result;
 }
-
-static intvec* syLinStrat1(SSet nextPairs, syStrategy syzstr,
+#else
+static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
                           int howmuch, int index)
 {
   int i=howmuch-1,i1=0,i2,i3,l,ll;
@@ -1126,13 +801,14 @@ static intvec* syLinStrat1(SSet nextPairs, syStrategy syzstr,
     }
     else
     {
+      pTest(tso.p2);
+      pTest(tso.p1);
       nextPairs[i].p =
-        sySPoly(tso.p1, tso.p2,tso.lcm);
+        spSpolyCreate(tso.p2, tso.p1,NULL,spSpolyLoop_General);
       (*spl)[i] = pLength(nextPairs[i].p);
     }
     i--;
   }
-//PrintLn();Print("Laengenvektor: ");spl->show(1,1);PrintLn();
   i3 = 0;
   loop
   {
@@ -1167,7 +843,35 @@ static intvec* syLinStrat1(SSet nextPairs, syStrategy syzstr,
   }
   return result;
 }
+#endif
 
+static void syEnlargeFields(syStrategy syzstr,int index)
+{
+  pEnlargeSet(&(syzstr->res[index]->m),IDELEMS(syzstr->res[index]),16);
+  syzstr->truecomponents[index]=(int*)ReAlloc0((ADDRESS)syzstr->truecomponents[index],
+                               (IDELEMS(syzstr->res[index])+1)*sizeof(int),
+                               (IDELEMS(syzstr->res[index])+17)*sizeof(int));
+  syzstr->ShiftedComponents[index]
+    =(long*)ReAlloc0((ADDRESS)syzstr->ShiftedComponents[index],
+                              (IDELEMS(syzstr->res[index])+1)*sizeof(long),
+                              (IDELEMS(syzstr->res[index])+17)*sizeof(long));
+  syzstr->backcomponents[index]=(int*)ReAlloc0((ADDRESS)syzstr->backcomponents[index],
+                               (IDELEMS(syzstr->res[index])+1)*sizeof(int),
+                               (IDELEMS(syzstr->res[index])+17)*sizeof(int));
+  syzstr->Howmuch[index]=(int*)ReAlloc0((ADDRESS)syzstr->Howmuch[index],
+                               (IDELEMS(syzstr->res[index])+1)*sizeof(int),
+                               (IDELEMS(syzstr->res[index])+17)*sizeof(int));
+  syzstr->Firstelem[index]=(int*)ReAlloc0((ADDRESS)syzstr->Firstelem[index],
+                               (IDELEMS(syzstr->res[index])+1)*sizeof(int),
+                               (IDELEMS(syzstr->res[index])+17)*sizeof(int));
+  syzstr->elemLength[index]=(int*)ReAlloc0((ADDRESS)syzstr->elemLength[index],
+                               (IDELEMS(syzstr->res[index])+1)*sizeof(int),
+                               (IDELEMS(syzstr->res[index])+17)*sizeof(int));
+//Print("sort %d has now size %d\n",index,IDELEMS(res[index])+17);
+  IDELEMS(syzstr->res[index]) += 16;
+  pEnlargeSet(&(syzstr->orderedRes[index]->m),IDELEMS(syzstr->orderedRes[index]),16);
+  IDELEMS(syzstr->orderedRes[index]) += 16;
+}
 /*3
 * reduces all pairs of degree deg in the module index
 * put the reduced generators to the resolvente which contains
@@ -1178,74 +882,73 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
 {
   int i,j,k=IDELEMS(syzstr->res[index]);
   int ks=IDELEMS(syzstr->res[index+1]),kk,l,ll;
-  int ** Fin=syzstr->Firstelem;
-  int ** Hin=syzstr->Howmuch;
-  int ** bin=syzstr->backcomponents;
+  int * Fin=syzstr->Firstelem[index-1];
+  int * Hin=syzstr->Howmuch[index-1];
+  int * bin=syzstr->backcomponents[index];
+  int * elL=syzstr->elemLength[index];
   number coefgcd,n;
   polyset redset=syzstr->orderedRes[index]->m;
   poly p=NULL,q;
   intvec *spl1=new intvec(howmuch+1);
   SObject tso;
+  long * ShiftedComponents = syzstr->ShiftedComponents[index];
+  int* Components = syzstr->truecomponents[index];
+  assume(Components != NULL && ShiftedComponents != NULL);
+  BOOLEAN need_reset;
 
   if ((nextPairs==NULL) || (howmuch==0)) return;
   while ((k>0) && (syzstr->res[index]->m[k-1]==NULL)) k--;
   while ((ks>0) && (syzstr->res[index+1]->m[ks-1]==NULL)) ks--;
-  spl1 = syLinStrat1(nextPairs,syzstr,howmuch,index);
-//PrintLn();Print("Ordnungsvektor: ");spl1->show(1,1);PrintLn();
+  spl1 = syLinStrat(nextPairs,syzstr,howmuch,index);
   i=0;
   while ((*spl1)[i]>0)
   {
+    need_reset = FALSE;
     tso = nextPairs[(*spl1)[i]-1];
     if ((tso.p1!=NULL) && (tso.p2!=NULL))
     {
       coefgcd =
         nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2));
       tso.syz = pHead(tso.lcm);
-      pSetm(tso.syz);
       p = tso.syz;
       pSetCoeff(p,nDiv(pGetCoeff(tso.p1),coefgcd));
       pGetCoeff(p) = nNeg(pGetCoeff(p));
       pSetComp(p,tso.ind2+1);
+      rSetmS(p, Components, ShiftedComponents); // actuelleler index
       pNext(p) = pHead(tso.lcm);
       pIter(p);
-      pSetm(p);
       pSetComp(p,tso.ind1+1);
+      rSetmS(p, Components, ShiftedComponents); // actuaeller index
       pSetCoeff(p,nDiv(pGetCoeff(tso.p2),coefgcd));
       nDelete(&coefgcd);
       if (tso.p != NULL)
       {
-        q = tso.p;
-        j = Fin[index-1][pGetComp(q)]-1;
-        int pos = j+Hin[index-1][pGetComp(q)];
+        kBucketInit(syzstr->bucket,tso.p,-1);
+        q = kBucketGetLm(syzstr->bucket);
+        j = Fin[pGetComp(q)]-1;
+        int pos = j+Hin[pGetComp(q)];
         loop
         {
           if (j<0) break;
           if (pDivisibleBy2(redset[j],q))
           {
-            //int syL=syLength(redset[j]);
-            //PrintS("r");
-//for(int jj=j+1;jj<k;jj++)
-//{
-  //if (syDivisibleBy(redset[jj],q))
-  //{
-    //int syL1=syLength(redset[jj]);
-    //if (syL1<syL)
-    //{
-      //j = jj;
-      //syL = syL1;
-      //Print("take poly %d with %d monomials\n",j,syL);
-      //Print("have poly %d with %d monomials\n",jj,syL1);
-    //}
-  //}
-//}
             pNext(p) = pHead(q);
             pIter(p);
-            pSetComp(p,bin[index][j]+1);
+            pSetComp(p,bin[j]+1);
+            rSetmS(p, Components, ShiftedComponents); // actueller index
+//if (pLength(redset[j])!=syzstr->elemLength[index][bin[j]])
+//Print("Halt");
+//if (pLength(redset[j])!=syzstr->elemLength[index][bin[j]])
+//Print("Halt");
             pGetCoeff(p) = nNeg(pGetCoeff(p));
-            q = sySPolyRed(q,redset[j]);
+            number up = kBucketPolyRed(syzstr->bucket,redset[j],elL[bin[j]],
+                                       NULL);
+            // Thomas: Check whether you need number here
+            nDelete(&up);
+            q = kBucketGetLm(syzstr->bucket);
             if (q==NULL) break;
-            j = Fin[index-1][pGetComp(q)]-1;
-            pos = j+Hin[index-1][pGetComp(q)];
+            j = Fin[pGetComp(q)]-1;
+            pos = j+Hin[pGetComp(q)];
           }
           else
           {
@@ -1253,97 +956,58 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
             if (j==pos) break;
           }
         }
-        tso.p = q;
+        int lb;
+        kBucketClear(syzstr->bucket,&tso.p,&lb);
       }
       if (tso.p != NULL)
       {
-        if (TEST_OPT_PROT) PrintS("g");
+        if (TEST_OPT_PROT) Print("g");
         if (k==IDELEMS((syzstr->res)[index]))
         {
-          pEnlargeSet(&(syzstr->res[index]->m),IDELEMS(syzstr->res[index]),16);
-          syzstr->truecomponents[index]=(int*)ReAlloc((ADDRESS)syzstr->truecomponents[index],
-                                       (IDELEMS(syzstr->res[index])+1)*sizeof(int),
-                                       (IDELEMS(syzstr->res[index])+17)*sizeof(int));
-          syzstr->backcomponents[index]=(int*)ReAlloc((ADDRESS)syzstr->backcomponents[index],
-                                       (IDELEMS(syzstr->res[index])+1)*sizeof(int),
-                                       (IDELEMS(syzstr->res[index])+17)*sizeof(int));
-          syzstr->Howmuch[index]=(int*)ReAlloc((ADDRESS)syzstr->Howmuch[index],
-                                       (IDELEMS(syzstr->res[index])+1)*sizeof(int),
-                                       (IDELEMS(syzstr->res[index])+17)*sizeof(int));
-          syzstr->Firstelem[index]=(int*)ReAlloc((ADDRESS)syzstr->Firstelem[index],
-                                       (IDELEMS(syzstr->res[index])+1)*sizeof(int),
-                                       (IDELEMS(syzstr->res[index])+17)*sizeof(int));
-        int mk;
-        for (mk=IDELEMS(syzstr->res[index])+1;mk<IDELEMS(syzstr->res[index])+17;mk++)
-        {
-          syzstr->Howmuch[index][mk] = 0;
-          syzstr->Firstelem[index][mk] = 0;
-        }
-//Print("sort %d has now size %d\n",index,IDELEMS(res[index])+17);
-          IDELEMS(syzstr->res[index]) += 16;
-          pEnlargeSet(&(syzstr->orderedRes[index]->m),IDELEMS(syzstr->orderedRes[index]),16);
-          IDELEMS(syzstr->orderedRes[index]) += 16;
+          syEnlargeFields(syzstr,index);
+          bin=syzstr->backcomponents[index];
+          elL=syzstr->elemLength[index];
           redset=syzstr->orderedRes[index]->m;
+          Components = syzstr->truecomponents[index];
+          ShiftedComponents = syzstr->ShiftedComponents[index];
         }
         pNext(p) = pHead(tso.p);
         pIter(p);
-        if (p!=NULL)
-        {
-          k++;
-          pSetComp(p,k);
-          pGetCoeff(p) = nNeg(pGetCoeff(p));
-        }
-        if (tso.p!=NULL)
-        {
-          syzstr->res[index]->m[k-1] = tso.p;
-          pNorm(syzstr->res[index]->m[k-1]);
-          syOrder(syzstr->res[index]->m[k-1],syzstr,index,k);
-        }
+
+        assume(p!= NULL);
+        k++;
+        syzstr->res[index]->m[k-1] = tso.p;
+        syzstr->elemLength[index][k-1] = pLength(tso.p);
+        pNorm(syzstr->res[index]->m[k-1]);
+        need_reset = syOrder(syzstr->res[index]->m[k-1],syzstr,index,k);
+        pSetComp(p,k); // actueller index
+        rSetmS(p, Components, ShiftedComponents);
+        pGetCoeff(p) = nNeg(pGetCoeff(p));
+
         tso.isNotMinimal = p;
         tso.p = NULL;
       }
       else
       {
-        if (TEST_OPT_PROT) PrintS(".");
-        if (index % 2==0)
-          euler++;
-        else
-          euler--;
+        if (TEST_OPT_PROT) Print(".");
+        //if (index % 2==0)
+          //euler++;
+        //else
+          //euler--;
       }
       if (ks==IDELEMS(syzstr->res[index+1]))
       {
-        pEnlargeSet(&(syzstr->res[index+1]->m),IDELEMS(syzstr->res[index+1]),16);
-        syzstr->truecomponents[index+1]=(int*)ReAlloc((ADDRESS)syzstr->truecomponents[index+1],
-                                       (IDELEMS(syzstr->res[index+1])+1)*sizeof(int),
-                                       (IDELEMS(syzstr->res[index+1])+17)*sizeof(int));
-        syzstr->backcomponents[index+1]=(int*)ReAlloc((ADDRESS)syzstr->backcomponents[index+1],
-                                       (IDELEMS(syzstr->res[index+1])+1)*sizeof(int),
-                                       (IDELEMS(syzstr->res[index+1])+17)*sizeof(int));
-        syzstr->Howmuch[index+1]=(int*)ReAlloc((ADDRESS)syzstr->Howmuch[index+1],
-                                       (IDELEMS(syzstr->res[index+1])+1)*sizeof(int),
-                                       (IDELEMS(syzstr->res[index+1])+17)*sizeof(int));
-        syzstr->Firstelem[index+1]=(int*)ReAlloc((ADDRESS)syzstr->Firstelem[index+1],
-                                       (IDELEMS(syzstr->res[index+1])+1)*sizeof(int),
-                                       (IDELEMS(syzstr->res[index+1])+17)*sizeof(int));
-        int mk;
-        for (mk=IDELEMS(syzstr->res[index+1])+1;mk<IDELEMS(syzstr->res[index+1])+17;mk++)
-        {
-          syzstr->Howmuch[index+1][mk] = 0;
-          syzstr->Firstelem[index+1][mk] = 0;
-        }
-//Print("sort %d has now size %d\n",index+1,IDELEMS(res[index+1])+17);
-        IDELEMS(syzstr->res[index+1]) += 16;
-        pEnlargeSet(&(syzstr->orderedRes[index+1]->m),IDELEMS(syzstr->orderedRes[index+1]),16);
-        IDELEMS(syzstr->orderedRes[index+1]) += 16;
+        syEnlargeFields(syzstr,index+1);
       }
-      currcomponents = syzstr->truecomponents[index];
-      syzstr->res[index+1]->m[ks] = syRedtail(tso.syz,syzstr,index+1);
-      currcomponents = syzstr->truecomponents[index-1];
       syzstr->res[index+1]->m[ks] = tso.syz;
+      syzstr->elemLength[index+1][ks] = pLength(tso.syz);
       pNorm(syzstr->res[index+1]->m[ks]);
       tso.syz =NULL;
       tso.syzind = ks;
-      syOrder(syzstr->res[index+1]->m[ks],syzstr,index+1,ks+1);
+      if (need_reset)
+        syResetShiftedComponents(syzstr, index+1);
+      if (syOrder(syzstr->res[index+1]->m[ks],syzstr,index+1,ks+1))
+         syResetShiftedComponents(syzstr, index+2);
       ks++;
       p = NULL;
       nextPairs[(*spl1)[i]-1] = tso;
@@ -1380,10 +1044,9 @@ static void syRedGenerOfCurrDeg(syStrategy syzstr, int deg, int index)
       {
         if (pDivisibleBy1(res->m[j],(sPairs)[i].syz))
         {
-          //PrintS("r");
           (sPairs)[i].syz =
-            //spSpolyRed(res->m[j],(sPairs)[i].syz,NULL);
-            sySPolyRed((sPairs)[i].syz,res->m[j]);
+            spSpolyRed(res->m[j],(sPairs)[i].syz,NULL,spSpolyLoop_General);
+            //sySPolyRed((sPairs)[i].syz,res->m[j]);
           j = k-1;
         }
         else
@@ -1395,48 +1058,29 @@ static void syRedGenerOfCurrDeg(syStrategy syzstr, int deg, int index)
       {
         if (k==IDELEMS(res))
         {
-          pEnlargeSet(&(res->m),IDELEMS(res),16);
-          syzstr->truecomponents[index]=(int*)ReAlloc((ADDRESS)syzstr->truecomponents[index],
-                                       (IDELEMS(res)+1)*sizeof(int),
-                                       (IDELEMS(res)+17)*sizeof(int));
-          syzstr->backcomponents[index]=(int*)ReAlloc((ADDRESS)syzstr->backcomponents[index],
-                                       (IDELEMS(res)+1)*sizeof(int),
-                                       (IDELEMS(res)+17)*sizeof(int));
-          syzstr->Howmuch[index]=(int*)ReAlloc((ADDRESS)syzstr->Howmuch[index],
-                                       (IDELEMS(res)+1)*sizeof(int),
-                                       (IDELEMS(res)+17)*sizeof(int));
-          syzstr->Firstelem[index]=(int*)ReAlloc((ADDRESS)syzstr->Firstelem[index],
-                                       (IDELEMS(res)+1)*sizeof(int),
-                                       (IDELEMS(res)+17)*sizeof(int));
-        int mk;
-        for (mk=IDELEMS(res)+1;mk<IDELEMS(res)+17;mk++)
-        {
-          syzstr->Howmuch[index][mk] = 0;
-          syzstr->Firstelem[index][mk] = 0;
-        }
-//Print("sort %d has now size %d\n",index,IDELEMS(res[index])+17);
-          IDELEMS(res) += 16;
-          pEnlargeSet(&(syzstr->orderedRes[index]->m),IDELEMS(syzstr->orderedRes[index]),16);
-          IDELEMS(syzstr->orderedRes[index]) += 16;
+          syEnlargeFields(syzstr,index);
+          res=syzstr->res[index];
         }
         if (BTEST1(6))
         {
           if ((sPairs)[i].isNotMinimal==NULL)
           {
-            PrintS("\nminimal generator: ");
-            pWrite((syzstr->resPairs[index-1])[i].syz);
-            PrintS("comes from: ");pWrite((syzstr->resPairs[index-1])[i].p1);
-            PrintS("and: ");pWrite((syzstr->resPairs[index-1])[i].p2);
+            PrintLn();
+            Print("minimal generator: ");pWrite((syzstr->resPairs[index-1])[i].syz);
+            Print("comes from: ");pWrite((syzstr->resPairs[index-1])[i].p1);
+            Print("and: ");pWrite((syzstr->resPairs[index-1])[i].p2);
           }
         }
         //res->m[k] = (sPairs)[i].syz;
         res->m[k] = syRedtail((sPairs)[i].syz,syzstr,index);
         (sPairs)[i].syzind = k;
+        syzstr->elemLength[index][k] = pLength((sPairs)[i].syz);
         pNorm(res->m[k]);
   //      (sPairs)[i].syz = NULL;
         k++;
-        syOrder(res->m[k-1],syzstr,index,k);
-        euler++;
+        if (syOrder(res->m[k-1],syzstr,index,k))
+          syResetShiftedComponents(syzstr, index);
+        //euler++;
       }
       else
         (sPairs)[i].syzind = -1;
@@ -1481,7 +1125,7 @@ static void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int index)
         }
         else
         {
-          PrintS("Hier ist was faul!\n");
+          Print("Hier ist was faul!\n");
           break;
         }
       }
@@ -1499,6 +1143,33 @@ static void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int index)
   syCopyPair(so,&sPairs[ll]);
   (*sPlength)++;
 }
+static void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int index)
+{
+  int ll;
+
+  if (*sPlength>=(*syzstr->Tl)[index])
+  {
+    SSet temp = (SSet)Alloc0(((*syzstr->Tl)[index]+16)*sizeof(SObject));
+    for (ll=0;ll<(*syzstr->Tl)[index];ll++)
+    {
+      temp[ll].p = (syzstr->resPairs[index])[ll].p;
+      temp[ll].p1 = (syzstr->resPairs[index])[ll].p1;
+      temp[ll].p2 = (syzstr->resPairs[index])[ll].p2;
+      temp[ll].syz = (syzstr->resPairs[index])[ll].syz;
+      temp[ll].lcm = (syzstr->resPairs[index])[ll].lcm;
+      temp[ll].ind1 = (syzstr->resPairs[index])[ll].ind1;
+      temp[ll].ind2 = (syzstr->resPairs[index])[ll].ind2;
+      temp[ll].syzind = (syzstr->resPairs[index])[ll].syzind;
+      temp[ll].order = (syzstr->resPairs[index])[ll].order;
+      temp[ll].isNotMinimal = (syzstr->resPairs[index])[ll].isNotMinimal;
+      temp[ll].length = (syzstr->resPairs[index])[ll].length;
+    }
+    Free((ADDRESS)syzstr->resPairs[index],(*syzstr->Tl)[index]*sizeof(SObject));
+    (*syzstr->Tl)[index] += 16;
+    syzstr->resPairs[index] = temp;
+  }
+  syEnterPair(syzstr->resPairs[index],so,sPlength,index);
+}
 
 /*3
 * computes pairs from the new elements (beginning with the element newEl)
@@ -1514,12 +1185,16 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
   poly p,q;
   polyset rs=syzstr->res[index]->m,nPm;
 
+
   while ((k>0) && (rs[k-1]==NULL)) k--;
   if (newEl>=k) return;
+
+  long * ShiftedComponents = syzstr->ShiftedComponents[index];
+  int* Components = syzstr->truecomponents[index];
+
   ideal nP=idInit(k,syzstr->res[index]->rank);
   nPm=nP->m;
   while ((l>0) && ((syzstr->resPairs[index])[l-1].p1==NULL)) l--;
-//Print("new pairs in module %d\n",index);
   for (j=newEl;j<k;j++)
   {
     q = rs[j];
@@ -1533,6 +1208,7 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
       p = pOne();
       pLcm(rs[jj],q,p);
       pSetComp(p,j+1);
+      rSetmS(p, Components, ShiftedComponents);
       ii = first;
       loop
       {
@@ -1558,7 +1234,6 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
         nPm[jj] = p;
       }
     }
-    //for (i=0;i<j;i++)
     for (i=first;i<pos;i++)
     {
       ii = bci[i];
@@ -1610,25 +1285,6 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
     }
   }
   idDelete(&nP);
-}
-
-/*2
-* tail reduction for the LaScala algorithm
-* takes care of the special ordering
-*/
-static void sySyzTail(syStrategy syzstr, int index, int newEl)
-{
-  int j,ll,k=IDELEMS((syzstr->res)[index]);
-  while ((k>0) && ((syzstr->res)[index]->m[k-1]==NULL)) k--;
-  for (j=newEl;j<k;j++)
-  {
-    ll = 0;
-    while ((ll<(*syzstr->Tl)[index]) && (syzstr->resPairs[index][ll].p1!=NULL) &&
-           (syzstr->resPairs[index][ll].ind1!=j) && (syzstr->resPairs[index][ll].ind2!=j))
-      ll++;
-    if ((ll<(*syzstr->Tl)[index]) && (syzstr->resPairs[index][ll].p1!=NULL))
-      syzstr->res[index]->m[j] = syRedtail(syzstr->res[index]->m[j],syzstr,index);
-  }
 }
 
 static SSet syChosePairsPutIn(syStrategy syzstr, int *index,
@@ -1913,15 +1569,19 @@ static int syInitSyzMod(syStrategy syzstr, int index, int init=17)
   {
     syzstr->res[index] = idInit(init-1,1);
     syzstr->truecomponents[index] = (int*)Alloc0(init*sizeof(int));
+    syzstr->ShiftedComponents[index] = (long*)Alloc0(init*sizeof(long));
     if (index==0)
     {
       for (int i=0;i<init;i++)
+      {
         syzstr->truecomponents[0][i] = i;
+        syzstr->ShiftedComponents[0][i] = (i)*SYZ_SHIFT_BASE;
+      }
     }
     syzstr->backcomponents[index] = (int*)Alloc0(init*sizeof(int));
     syzstr->Howmuch[index] = (int*)Alloc0(init*sizeof(int));
     syzstr->Firstelem[index] = (int*)Alloc0(init*sizeof(int));
-//Print("sort %d has now size %d\n",index,init);
+    syzstr->elemLength[index] = (int*)Alloc0(init*sizeof(int));
     syzstr->orderedRes[index] = idInit(init-1,1);
     result = 0;
   }
@@ -1938,7 +1598,6 @@ static int syInitSyzMod(syStrategy syzstr, int index, int init=17)
 */
 void syKillComputation(syStrategy syzstr)
 {
-//Print("ref: %d\n",syzstr->references);
   if (syzstr->references>0)
   {
     (syzstr->references)--;
@@ -1946,6 +1605,42 @@ void syKillComputation(syStrategy syzstr)
   else
   {
     int i,j;
+    if (syzstr->minres!=NULL)
+    {
+      for (i=0;i<syzstr->length;i++)
+      {
+        if (syzstr->minres[i]!=NULL)
+        {
+          for (j=0;j<IDELEMS(syzstr->minres[i]);j++)
+          {
+            if (syzstr->minres[i]->m[j]!=NULL)
+              pDelete(&(syzstr->minres[i]->m[j]));
+          }
+        }
+        idDelete(&(syzstr->minres[i]));
+      }
+      Free((ADDRESS)syzstr->minres,(syzstr->length+1)*sizeof(ideal));
+    }
+    if (syzstr->fullres!=NULL)
+    {
+      for (i=0;i<syzstr->length;i++)
+      {
+        if (syzstr->fullres[i]!=NULL)
+        {
+          for (j=0;j<IDELEMS(syzstr->fullres[i]);j++)
+          {
+            if (syzstr->fullres[i]->m[j]!=NULL)
+              pDelete(&(syzstr->fullres[i]->m[j]));
+          }
+        }
+        idDelete(&(syzstr->fullres[i]));
+      }
+      Free((ADDRESS)syzstr->fullres,(syzstr->length+1)*sizeof(ideal));
+    }
+    ring origR = currRing;
+
+    if (syzstr->syRing != NULL)
+      rChangeCurrRing(syzstr->syRing, FALSE);
 
     if (syzstr->resPairs!=NULL)
     {
@@ -1968,6 +1663,8 @@ void syKillComputation(syStrategy syzstr)
         {
           Free((ADDRESS)syzstr->truecomponents[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
           syzstr->truecomponents[i]=NULL;
+          Free((ADDRESS)syzstr->ShiftedComponents[i],(IDELEMS(syzstr->res[i])+1)*sizeof(long));
+          syzstr->ShiftedComponents[i]=NULL;
         }
         if (syzstr->backcomponents[i]!=NULL)
         {
@@ -2006,48 +1703,22 @@ void syKillComputation(syStrategy syzstr)
       Free((ADDRESS)syzstr->resPairs,syzstr->length*sizeof(SObject*));
       Free((ADDRESS)syzstr->res,(syzstr->length+1)*sizeof(ideal));
       Free((ADDRESS)syzstr->orderedRes,(syzstr->length+1)*sizeof(ideal));
+      Free((ADDRESS)syzstr->elemLength,(syzstr->length+1)*sizeof(int*));
       Free((ADDRESS)syzstr->truecomponents,(syzstr->length+1)*sizeof(int*));
+      Free((ADDRESS)syzstr->ShiftedComponents,(syzstr->length+1)*sizeof(long*));
       Free((ADDRESS)syzstr->backcomponents,(syzstr->length+1)*sizeof(int*));
       Free((ADDRESS)syzstr->Howmuch,(syzstr->length+1)*sizeof(int*));
       Free((ADDRESS)syzstr->Firstelem,(syzstr->length+1)*sizeof(int*));
-      Free((ADDRESS)syzstr->binom,pVariables*(syzstr->highdeg_1)*sizeof(int));
-    }
-    if (syzstr->minres!=NULL)
-    {
-      for (i=0;i<syzstr->length;i++)
-      {
-        if (syzstr->minres[i]!=NULL)
-        {
-          for (j=0;j<IDELEMS(syzstr->minres[i]);j++)
-          {
-            if (syzstr->minres[i]->m[j]!=NULL)
-              pDelete(&(syzstr->minres[i]->m[j]));
-          }
-        }
-        idDelete(&(syzstr->minres[i]));
-      }
-      Free((ADDRESS)syzstr->minres,(syzstr->length+1)*sizeof(ideal));
-    }
-    if (syzstr->fullres!=NULL)
-    {
-      for (i=0;i<syzstr->length;i++)
-      {
-        if (syzstr->fullres[i]!=NULL)
-        {
-          for (j=0;j<IDELEMS(syzstr->fullres[i]);j++)
-          {
-            if (syzstr->fullres[i]->m[j]!=NULL)
-              pDelete(&(syzstr->fullres[i]->m[j]));
-          }
-        }
-        idDelete(&(syzstr->fullres[i]));
-      }
-      Free((ADDRESS)syzstr->fullres,(syzstr->length+1)*sizeof(ideal));
     }
     if (syzstr->cw!=NULL)
       delete syzstr->cw;
     if (syzstr->resolution!=NULL)
       delete syzstr->resolution;
+    if (syzstr->syRing != NULL)
+    {
+      rChangeCurrRing(origR, FALSE);
+      rKill(syzstr->syRing);
+    }
     Free((ADDRESS)syzstr,sizeof(ssyStrategy));
   }
 }
@@ -2061,18 +1732,19 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
   int dummy;
   if (syzstr->resPairs!=NULL)
   {
-    int i,j=-1,jj=-1,l;
+    int i,j=-1,jj=-1,l,sh=0;
     SRes rP=syzstr->resPairs;
 
+    if (syzstr->hilb_coeffs!=NULL) sh = 1;
     l = syzstr->length;
     while ((l>0) && (rP[l-1]==NULL)) l--;
     if (l==0) return NULL;
     l--;
-    while (l>=0)
+    while (l>=sh)
     {
       i = 0;
       while ((i<(*syzstr->Tl)[l]) &&
-        ((rP[l][i].lcm!=NULL) || (rP[l][i].syz!=NULL) || (rP[l][i].syzind==-1)))
+        ((rP[l][i].lcm!=NULL) || (rP[l][i].syz!=NULL)))
       {
         if (rP[l][i].isNotMinimal==NULL)
         {
@@ -2085,17 +1757,18 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
       }
       l--;
     }
-    jj=jj+2;
-    intvec *result=new intvec(j,jj,0);
+    j = j+sh;
+    jj = jj+2;
+    intvec *result=new intvec(j,jj-sh,0);
     IMATELEM(*result,1,1) = max(1,idRankFreeModule(syzstr->res[1]));
-    for (i=0;i<jj;i++)
+    for (i=sh;i<jj;i++)
     {
       j = 0;
-      while ((j<(*syzstr->Tl)[i]))
+      while (j<(*syzstr->Tl)[i])
       {
-        if ((rP[i][j].isNotMinimal==NULL) &&
-            ((rP[i][j].lcm!=NULL) || (rP[i][j].syz!=NULL)))
-          IMATELEM(*result,rP[i][j].order-i,i+2)++;
+        if ((rP[i][j].isNotMinimal==NULL)&&
+           ((rP[i][j].lcm!=NULL) || (rP[i][j].syz!=NULL)))
+          IMATELEM(*result,rP[i][j].order-i+sh,i+2-sh)++;
         j++;
       }
     }
@@ -2115,14 +1788,14 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w)
 {
   syStrategy syzstr=(syStrategy)u->Data();
   BOOLEAN minim=(int)w->Data();
-  
+
   res->data=(void *)syBettiOfComputation(syzstr,minim);
   return FALSE;
 }
 BOOLEAN syBetti1(leftv res, leftv u)
 {
   syStrategy syzstr=(syStrategy)u->Data();
-  
+
   res->data=(void *)syBettiOfComputation(syzstr);
   return FALSE;
 }
@@ -2207,7 +1880,7 @@ static void syPrintEmptySpaces(int i)
 {
   if (i!=0)
   {
-    PrintS(" ");
+    Print(" ");
     syPrintEmptySpaces(i/10);
   }
 }
@@ -2219,7 +1892,7 @@ static void syPrintEmptySpaces1(int i)
 {
   if (i!=0)
   {
-    PrintS(" ");
+    Print(" ");
     syPrintEmptySpaces1(i-1);
   }
 }
@@ -2240,27 +1913,6 @@ static int syLengthInt(int i)
   return j;
 }
 
-static void syLoadResTrad(syStrategy syzstr)
-{
-  resolvente rr;
-  int l=0,j;
-
-  if (syzstr->minres!=NULL)
-    rr = syzstr->minres;
-  else
-    rr = syzstr->fullres;
-  if (syzstr->resolution!=NULL) delete syzstr->resolution;
-  syzstr->resolution = new intvec(syzstr->length+2);
-  (*syzstr->resolution)[0] = max(1,idRankFreeModule(rr[0]));
-  while ((l<syzstr->length) && (rr[l]!=NULL))
-  {
-    j = IDELEMS(rr[l]);
-    while ((j>0) && (rr[l]->m[j-1]==NULL)) j--;
-    ((*syzstr->resolution)[l+1]) = j;
-    l++;
-  }
-}
-
 /*3
 * prints the resolution as sequence of free modules
 */
@@ -2269,7 +1921,7 @@ void syPrint(syStrategy syzstr)
   if ((syzstr->resPairs==NULL) && (syzstr->fullres==NULL)
      && (syzstr->minres==NULL))
   {
-    PrintS("No resolution defined\n");
+    Print("No resolution defined\n");
     return;
   }
   int l=0;
@@ -2296,7 +1948,20 @@ void syPrint(syStrategy syzstr)
     }
     else
     {
-      syLoadResTrad(syzstr);
+      resolvente rr;
+      syzstr->resolution = new intvec(syzstr->length+2);
+      if (syzstr->minres!=NULL)
+        rr = syzstr->minres;
+      else
+        rr = syzstr->fullres;
+      (*syzstr->resolution)[0] = max(1,idRankFreeModule(rr[0]));
+      while ((l<syzstr->length) && (rr[l]!=NULL))
+      {
+        j = IDELEMS(rr[l]);
+        while ((l>0) && (rr[l]->m[j-1]==NULL)) j--;
+        ((*syzstr->resolution)[l+1]) = j;
+        l++;
+      }
     }
   }
   char *sn=currRingHdl->id;
@@ -2319,7 +1984,7 @@ void syPrint(syStrategy syzstr)
     if ((l>=syzstr->resolution->length()) || ((*syzstr->resolution)[l]==0))
       break;
     syPrintEmptySpaces((*syzstr->resolution)[l]);
-    PrintS(" <-- ");
+    Print(" <-- ");
     l++;
   }
   PrintLn();
@@ -2337,13 +2002,14 @@ void syPrint(syStrategy syzstr)
   PrintLn();
   if (syzstr->minres==NULL)
   {
-    PrintS("resolution not minimized yet\n");
+    Print("resolution not minimized yet");
+    PrintLn();
   }
 }
 
 /*2
 * divides out the weight monomials (given by the Schreyer-ordering)
-* fronm the LaScala-resolution
+* from the LaScala-resolution
 */
 static resolvente syReorder(resolvente res,int length,
         syStrategy syzstr,BOOLEAN toCopy=TRUE,resolvente totake=NULL)
@@ -2352,6 +2018,7 @@ static resolvente syReorder(resolvente res,int length,
   poly p,q,tq;
   polyset ri1;
   resolvente fullres;
+  ring origR=syzstr->syRing;
   fullres = (resolvente)Alloc0((length+1)*sizeof(ideal));
   if (totake==NULL)
     totake = res;
@@ -2373,17 +2040,36 @@ static resolvente syReorder(resolvente res,int length,
           {
             if (toCopy)
             {
-              tq = pHead(p);
+              if (origR!=NULL)
+                tq = pFetchHead(origR,p);
+              else
+                tq = pHead(p);
               pIter(p);
             }
             else
             {
-              tq = p;
-              pIter(p);
-              pNext(tq) = NULL;
+              res[i]->m[j] = NULL;
+              if (origR!=NULL)
+              {
+                poly pp=p;
+                pIter(p);
+                pNext(pp)=NULL;
+                tq = pFetchCopyDelete(origR,pp);
+              }
+              else
+              {
+                tq = p;
+                pIter(p);
+                pNext(tq) = NULL;
+              }
             }
             for (l=pVariables;l>0;l--)
-              pSubExp(tq,l, pGetExp(ri1[pGetComp(tq)-1],l));
+            {
+              if (origR!=NULL)
+                pSubExp(tq,l, pRingGetExp(origR,ri1[pGetComp(tq)-1],l));
+              else
+                pSubExp(tq,l, pGetExp(ri1[pGetComp(tq)-1],l));
+            }
             pSetm(tq);
             q = pAdd(q,tq);
           }
@@ -2392,12 +2078,36 @@ static resolvente syReorder(resolvente res,int length,
       }
       else
       {
-        if (toCopy)
-          fullres[i-1] = idCopy(res[i]);
+        if (origR!=NULL)
+        {
+          fullres[i-1] = idInit(IDELEMS(res[i]),res[i]->rank);
+          for (j=IDELEMS(res[i])-1;j>=0;j--)
+          {
+            if (toCopy)
+              fullres[i-1]->m[j] = pFetchCopy(origR,res[i]->m[j]);
+            else
+            {
+              fullres[i-1]->m[j] = pFetchCopyDelete(origR,res[i]->m[j]);
+              res[i]->m[j] = NULL;
+            }
+          }
+        }
         else
-          fullres[i-1] = res[i];
-        for (j=IDELEMS(res[i])-1;j>=0;j--)
+        {
+          if (toCopy)
+            fullres[i-1] = idCopy(res[i]);
+          else
+          {
+            fullres[i-1] = res[i];
+            res[i] = NULL;
+          }
+        }
+        for (j=IDELEMS(fullres[i-1])-1;j>=0;j--)
           fullres[i-1]->m[j] = pOrdPolyInsertSetm(fullres[i-1]->m[j]);
+      }
+      if (!toCopy)
+      {
+        if (res[i]!=NULL) idDelete(&res[i]);
       }
     }
   }
@@ -2414,7 +2124,15 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
 {
   if ((syzstr->fullres==NULL) && (syzstr->minres==NULL))
   {
-    syzstr->fullres = syReorder(syzstr->res,syzstr->length,syzstr);
+    if (syzstr->hilb_coeffs==NULL)
+    {
+      syzstr->fullres = syReorder(syzstr->res,syzstr->length,syzstr);
+    }
+    else
+    {
+      syzstr->minres = syReorder(syzstr->orderedRes,syzstr->length,syzstr);
+      syKillEmptyEntres(syzstr->minres,syzstr->length);
+    }
   }
   resolvente tr;
   int typ0=IDEAL_CMD;
@@ -2461,7 +2179,7 @@ syStrategy syConvList(lists li,BOOLEAN toDel)
   resolvente fr = liFindRes(li,&(result->length),&typ0,&(result->weights));
   if (fr != NULL)
   {
-    
+
     result->fullres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
     for (int i=result->length-1;i>=0;i--)
     {
@@ -2524,6 +2242,37 @@ static poly syStripOut(poly p,intvec * toStrip)
   return p;
 }
 
+/*2
+* copies only those monomials the component of which correspond
+* to minimal generators
+*/
+static poly syStripOutCopy(poly p,intvec * toStrip)
+{
+  if (toStrip==NULL) return pCopy(p);
+  poly result=NULL,pp;
+
+  while (p!=NULL)
+  {
+    if ((*toStrip)[pGetComp(p)]==0)
+    {
+      if (result==NULL)
+      {
+        result = pp = pHead(p);
+      }
+      else
+      {
+        pNext(pp) = pHead(p);
+        pIter(pp);
+      }
+    }
+    pIter(p);
+  }
+  return result;
+}
+
+/*2
+* minimizes toMin
+*/
 static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
                         intvec * toStrip)
 {
@@ -2532,9 +2281,10 @@ static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
   SSet sPairs=syzstr->resPairs[index];
   poly tempStripped=NULL;
 
-  pp=pCopy(syzstr->res[index+1]->m[toMin]);
-  pp = syStripOut(pp,toStrip);
-  while ((ii<ordn->length()) && ((*ordn)[ii]!=-1) && (sPairs[(*ordn)[ii]].syzind!=toMin))
+  //pp=pCopy(syzstr->res[index+1]->m[toMin]);
+  pp = syStripOutCopy(syzstr->res[index+1]->m[toMin],toStrip);
+  while ((ii<ordn->length()) && ((*ordn)[ii]!=-1) &&
+             (sPairs[(*ordn)[ii]].syzind!=toMin))
   {
     ii++;
   }
@@ -2543,7 +2293,8 @@ static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
     i = (*ordn)[ii];
     if (sPairs[i].isNotMinimal!=NULL)
     {
-      tempStripped = syStripOut(pCopy(syzstr->res[index+1]->m[sPairs[i].syzind]),toStrip);
+      tempStripped =
+        syStripOutCopy(syzstr->res[index+1]->m[sPairs[i].syzind],toStrip);
       pisN = sPairs[i].isNotMinimal;
       tc = pGetComp(pisN);
       p = pp;
@@ -2557,13 +2308,15 @@ static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
           pSetComp(tq, 0);
           pSetCoeff0(tq,nDiv(pGetCoeff(p),pGetCoeff(pisN)));
           pGetCoeff(tq) = nNeg(pGetCoeff(tq));
-          q = syAdd(q,syMultT1(tempStripped,tq));
+          pSetm(tq);
+          q = pAdd(q,pMultT(pCopy(tempStripped),tq));
+          pDelete(&tq);
         }
         pIter(p);
       }
       if (q!=NULL)
       {
-        pp = syAdd(pp,q);
+        pp = pAdd(pp,q);
         q = NULL;
       }
       pDelete(&tempStripped);
@@ -2573,6 +2326,57 @@ static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
   return pp;
 }
 
+/*2
+* minimizes toMin
+*/
+static poly syMinimizeP1(int toMin,syStrategy syzstr,intvec * ordn,int index,
+                        intvec * toStrip)
+{
+  int ii=0,i,j,tc,lp,ltS=-1;
+  poly p,mp=NULL,pp,q=NULL,tq,pisN;
+  SSet sPairs=syzstr->resPairs[index];
+  poly tempStripped=NULL;
+
+  pp = syStripOutCopy(syzstr->res[index+1]->m[toMin],toStrip);
+  kBucketInit(syzstr->bucket,pp,-1);
+  while ((ii<ordn->length()) && ((*ordn)[ii]!=-1) &&
+             (sPairs[(*ordn)[ii]].syzind!=toMin))
+  {
+    ii++;
+  }
+  while (ii>=0)
+  {
+    i = (*ordn)[ii];
+    if (sPairs[i].isNotMinimal!=NULL)
+    {
+      tempStripped =
+        syStripOutCopy(syzstr->res[index+1]->m[sPairs[i].syzind],toStrip);
+      tc = pGetComp(sPairs[i].isNotMinimal);
+      //p = pTakeOutComp1(&tempStripped,tc);
+      int lu;
+      pTakeOutComp(&tempStripped,tc,&p,&lu);
+      kBucketTakeOutComp(syzstr->bucket,tc,&mp,&lp);
+      mp = pDivideM(mp,p);
+      while (mp!=NULL)
+      {
+        p = pNext(mp);
+        pNext(mp) = NULL;
+        ltS = -1;
+        kBucket_Minus_m_Mult_p(syzstr->bucket,mp,tempStripped,&ltS);
+        mp = p;
+      }
+      pDelete(&mp);
+      pDelete(&tempStripped);
+    }
+    ii--;
+  }
+  kBucketClear(syzstr->bucket,&pp,&lp);
+  return pp;
+}
+
+/*2
+* deletes empty components after minimization
+*/
 void syKillEmptyEntres(resolvente res,int length)
 {
   int i,j,jj,k,rj;
@@ -2613,6 +2417,7 @@ void syKillEmptyEntres(resolvente res,int length)
           while (p!=NULL)
           {
             pSetComp(p,(*changes)[pGetComp(p)]);
+            pSetm(p);
             pIter(p);
           }
         }
@@ -2621,6 +2426,9 @@ void syKillEmptyEntres(resolvente res,int length)
   }
 }
 
+/*2
+* determines the components for minimization
+*/
 static intvec * syToStrip(syStrategy syzstr, int index)
 {
   intvec * result=NULL;
@@ -2639,6 +2447,10 @@ static intvec * syToStrip(syStrategy syzstr, int index)
   return result;
 }
 
+/*2
+* re-computes the order of pairs during the algorithm
+* this ensures to procede with a triangular matrix
+*/
 static intvec * syOrdPairs(SSet sPairs, int length)
 {
   intvec * result=new intvec(length,1,-1);
@@ -2674,14 +2486,18 @@ static intvec * syOrdPairs(SSet sPairs, int length)
   return result;
 }
 
+/*2
+* minimizes the output of LaScala
+*/
 static resolvente syReadOutMinimalRes(syStrategy syzstr,
            BOOLEAN computeStd=FALSE)
 {
   intvec * Strip, * ordn;
   resolvente tres=(resolvente)Alloc0((syzstr->length+1)*sizeof(ideal));
-  sip_sring tmpR;
+  ring tmpR = NULL;
   ring origR = currRing;
 
+//Print("Hier ");
   if (computeStd)
   {
     tres[0] = syzstr->res[1];
@@ -2696,53 +2512,35 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
   pSetmProc oldSetm=pSetm;
   pCompProc oldComp0=pComp0;
 
-  if ((currRing->order[0]==ringorder_dp)
-  &&  (currRing->order[1]==ringorder_C)
-  &&  (currRing->order[2]==0))
-  {
-    ord=NULL;
-  }
-/*--- changes to a dpC-ring with special comp0------*/
-  else
-  {
-    ord = (int*)Alloc0(3*sizeof(int));
-    b0 = (int*)Alloc0(3*sizeof(int));
-    b1 = (int*)Alloc0(3*sizeof(int));
-    ord[0] = ringorder_dp;
-    ord[1] = ringorder_C;
-    b0[1] = 1;
-    b1[0] = pVariables;
-    tmpR  = *origR;
-    tmpR.order = ord;
-    tmpR.block0 = b0;
-    tmpR.block1 = b1;
-    rComplete(&tmpR);
-    //pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
-    rChangeCurrRing(&tmpR, TRUE);
-  }
-#if ! defined(HAVE_SY_VECTOR) || defined(SY_VEC_DEBUG)
-  pSetm =syzSetm;
-#endif
+  assume(syzstr->syRing != NULL);
+  rChangeCurrRing(syzstr->syRing, TRUE);
+//Print("laeufts ");
   pComp0 = syzcomp2dpc;
-  binomials = syzstr->binom;
-  highdeg_1 = syzstr->highdeg_1;
+  syzstr->bucket = kBucketCreate();
+  kbSetPolyProcs(&syzstr->pProcs,currRing,rOrderType_Syz2dpc,FALSE);
   for (index=syzstr->length-1;index>0;index--)
   {
     if (syzstr->resPairs[index]!=NULL)
     {
+//Print("ideal %d: \n",index);
       currcomponents = syzstr->truecomponents[index];
+      currShiftedComponents = syzstr->ShiftedComponents[index];
+      rChangeSComps(currcomponents, currShiftedComponents,
+                    IDELEMS(syzstr->res[index]));
       sPairs = syzstr->resPairs[index];
       Strip = syToStrip(syzstr,index);
       tres[index+1] = idInit(IDELEMS(syzstr->res[index+1]),syzstr->res[index+1]->rank);
       i1 = (*syzstr->Tl)[index];
+//Print("i1= %d\n",i1);
       ordn = syOrdPairs(sPairs,i1);
       for (i=0;i<i1;i++)
       {
         if ((sPairs[i].isNotMinimal==NULL) && (sPairs[i].lcm!=NULL))
         {
           l = sPairs[i].syzind;
+//Print("Minimiere Poly %d: ",l);pWrite(syzstr->res[index+1]->m[l]);
           tres[index+1]->m[l] =
-            syMinimizeP(l,syzstr,ordn,index,Strip);
+            syMinimizeP1(l,syzstr,ordn,index,Strip);
         }
       }
       delete Strip;
@@ -2750,6 +2548,9 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
     }
   }
   currcomponents = syzstr->truecomponents[0];
+  currShiftedComponents = syzstr->ShiftedComponents[0];
+  rChangeSComps( currcomponents, currShiftedComponents,
+                 IDELEMS(syzstr->res[0]));
   tres[1] = idInit(IDELEMS(syzstr->res[1]),syzstr->res[1]->rank);
   sPairs = syzstr->resPairs[0];
   for (i=(*syzstr->Tl)[0]-1;i>=0;i--)
@@ -2760,11 +2561,11 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
     }
   }
 /*--- changes to the original ring------------------*/
-  if (ord!=NULL)
+  if (syzstr->syRing != NULL)
   {
-    //pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
-    //currRing->block0,currRing->block1,currRing->wvhdl);
     rChangeCurrRing(origR,TRUE);
+    // Thomas: now make sure that all data which you need is pFetchCopied
+    // maybe incoporate it into syReorder ??
   }
   else
   {
@@ -2773,59 +2574,39 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
   }
   tres = syReorder(tres,syzstr->length,syzstr,FALSE,syzstr->res);
   syKillEmptyEntres(tres,syzstr->length);
+  kBucketDestroy(&syzstr->bucket);
   idSkipZeroes(tres[0]);
   return tres;
 }
 
+/*3
+* minimizes any kind of resolution
+*/
 syStrategy syMinimize(syStrategy syzstr)
 {
   if (syzstr->minres==NULL)
   {
     if (syzstr->resPairs!=NULL)
     {
-      syzstr->minres = syReadOutMinimalRes(syzstr);
+      if (syzstr->hilb_coeffs==NULL)
+      {
+        syzstr->minres = syReadOutMinimalRes(syzstr);
+      }
+      else
+      {
+        syzstr->minres = syReorder(syzstr->orderedRes,syzstr->length,syzstr);
+        syKillEmptyEntres(syzstr->minres,syzstr->length);
+      }
     }
     else if (syzstr->fullres!=NULL)
     {
       syMinimizeResolvente(syzstr->fullres,syzstr->length,1);
       syzstr->minres = syzstr->fullres;
       syzstr->fullres = NULL;
-      syLoadResTrad(syzstr);
     }
   }
   (syzstr->references)++;
   return syzstr;
-}
-
-static void sySetHighdeg()
-{
-#ifdef __MWERKS__
-  const double m=(double)MAX_INT_VAL;
-  double t=1.0;
-  unsigned int h_d=1;
-  unsigned int h_n=1+pVariables;
-  loop
-  {
-    t *=(double)h_n;
-    t /=(double)h_d;
-    if (t>=m) break;
-    h_d++;
-    h_n++;
-  }
-  h_d--;
-  highdeg = h_d;
-#else
-  long long t=1, h_d=1;
-  long long h_n=1+pVariables;
-  while ((t=((t*h_n)/h_d))<MAX_INT_VAL)
-  {
-    h_d++;
-    h_n++;
-  }
-  h_d--;
-  highdeg = h_d;
-#endif
-  //Print("max deg=%d\n",highdeg);
 }
 
 /*2
@@ -2842,7 +2623,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   ideal temp;
   SSet nextPairs;
   syStrategy syzstr=(syStrategy)Alloc0(sizeof(ssyStrategy));
-  sip_sring tmpR;
+  ring tmpR = NULL;
   ring origR = currRing;
 
   if ((idIs0(arg)) ||
@@ -2857,44 +2638,60 @@ syStrategy syLaScala3(ideal arg,int * length)
   pCompProc oldComp0=pComp0;
 
   //crit = 0;
-  //zeroRed = 0;
-  //simple = 0;
-  //dsim = 0;
-  euler = -1;
+  //euler = -1;
   redpol = pInit();
-  //orderingdepth = new intvec(pVariables+1);
   syzstr->length = *length = pVariables+2;
-  if (idIs0(arg)) return NULL;
-  if ((currRing->order[0]==ringorder_dp)
-  &&  (currRing->order[1]==ringorder_C)
-  &&  (currRing->order[2]==0))
+
+  // construct new ring
+  tmpR = (ring) Alloc0(sizeof(sip_sring));
+  tmpR->wvhdl = (int **)Alloc0(3 * sizeof(int *));
+  ord = (int*)Alloc0(3*sizeof(int));
+  b0 = (int*)Alloc0(3*sizeof(int));
+  b1 = (int*)Alloc0(3*sizeof(int));
+  ord[0] = ringorder_dp;
+  ord[1] = ringorder_S;
+  b0[0] = 1;
+  b1[0] = currRing->N;
+  tmpR->OrdSgn = 1;
+  tmpR->N = currRing->N;
+  tmpR->ch = currRing->ch;
+  tmpR->order = ord;
+  tmpR->block0 = b0;
+  tmpR->block1 = b1;
+  tmpR->P = currRing->P;
+
+  if (currRing->parameter!=NULL)
   {
-    ord=NULL;
+    tmpR->minpoly=nCopy(currRing->minpoly);
+    tmpR->parameter=(char **)Alloc(rPar(currRing)*sizeof(char *));
+    for(i=0;i<tmpR->P;i++)
+    {
+      tmpR->parameter[i]=mstrdup(currRing->parameter[i]);
+    }
   }
-/*--- changes to a dpC-ring with special comp0------*/
-  else
+  tmpR->names   = (char **)Alloc(tmpR->N * sizeof(char *));
+  for (i=0; i<tmpR->N; i++)
   {
-    ord = (int*)Alloc0(3*sizeof(int));
-    b0 = (int*)Alloc0(3*sizeof(int));
-    b1 = (int*)Alloc0(3*sizeof(int));
-    ord[0] = ringorder_dp;
-    ord[1] = ringorder_C;
-    b0[1] = 1;
-    b1[0] = pVariables;
-    tmpR  = *origR;
-    tmpR.order = ord;
-    tmpR.block0 = b0;
-    tmpR.block1 = b1;
-    rComplete(&tmpR);
-    //pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
-    rChangeCurrRing(&tmpR, TRUE);
+    tmpR->names[i] = mstrdup(currRing->names[i]);
   }
+  currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));
+  currShiftedComponents = (long*)Alloc0((arg->rank+1)*sizeof(long));
+  for (i=0;i<=arg->rank;i++)
+  {
+    currShiftedComponents[i] = (i)*SYZ_SHIFT_BASE;
+    currcomponents[i] = i;
+  }
+  rComplete(tmpR, 1);
+  rChangeCurrRing(tmpR, TRUE);
+  rChangeSComps(currcomponents, currShiftedComponents, arg->rank);
+  syzstr->syRing = tmpR;
+  pComp0 = syzcomp2dpc;
 /*--- initializes the data structures---------------*/
   syzstr->Tl = new intvec(*length);
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
-    temp->m[i] = pOrdPolyInsertSetm(pCopy(arg->m[i]));
+    temp->m[i] = pFetchCopy(origR, arg->m[i]);
     if (temp->m[i]!=NULL)
     {
       j = pTotaldegree(temp->m[i]);
@@ -2904,41 +2701,20 @@ syStrategy syLaScala3(ideal arg,int * length)
   idTest(temp);
   idSkipZeroes(temp);
   idTest(temp);
-  sySetHighdeg();
-  binomials = (int*)Alloc(pVariables*(highdeg+1)*sizeof(int));
-  syBinomSet();
-#if ! defined(HAVE_SY_VECTOR) || defined(SY_VEC_DEBUG)
-  pSetm =syzSetm;
-  for (i=0;i<IDELEMS(temp);i++)
-  {
-    p = temp->m[i];
-    while (p!=NULL)
-    {
-      pSetm(p);
-      pIter(p);
-    }
-  }
-#else
-  SetSpolyProc();
-#endif
-  pComp0 = syzcomp2dpc;
-  currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));
-  for (i=0;i<=arg->rank;i++)
-    currcomponents[i] = i;
   syzstr->resPairs = syInitRes(temp,length,syzstr->Tl,syzstr->cw);
   Free((ADDRESS)currcomponents,(arg->rank+1)*sizeof(int));
+  Free((ADDRESS)currShiftedComponents,(arg->rank+1)*sizeof(long));
   syzstr->res = (resolvente)Alloc0((*length+1)*sizeof(ideal));
   syzstr->orderedRes = (resolvente)Alloc0((*length+1)*sizeof(ideal));
+  syzstr->elemLength = (int**)Alloc0((*length+1)*sizeof(int*));
   syzstr->truecomponents = (int**)Alloc0((*length+1)*sizeof(int*));
+  syzstr->ShiftedComponents = (long**)Alloc0((*length+1)*sizeof(long*));
   syzstr->backcomponents = (int**)Alloc0((*length+1)*sizeof(int*));
   syzstr->Howmuch = (int**)Alloc0((*length+1)*sizeof(int*));
   syzstr->Firstelem = (int**)Alloc0((*length+1)*sizeof(int*));
+  syzstr->bucket = kBucketCreate();
+  kbSetPolyProcs(&syzstr->pProcs,currRing,rOrderType_Syz2dpc,FALSE);
   int len0=idRankFreeModule(arg)+1;
-  //syzstr->truecomponents[0] = (int*)Alloc(len0*sizeof(int));
-  //syzstr->backcomponents[0] = (int*)Alloc(len0*sizeof(int));
-  //syzstr->Howmuch[0] = (int*)Alloc(len0*sizeof(int));
-  //syzstr->Firstelem[0] = (int*)Alloc(len0*sizeof(int));
-//Print("sort %d has now size %d\n",0,len0);
   startdeg = actdeg;
   nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
   //if (TEST_OPT_PROT) Print("(%d,%d)",howmuch,index);
@@ -2952,6 +2728,9 @@ syStrategy syLaScala3(ideal arg,int * length)
     else
       i = syInitSyzMod(syzstr,index);
     currcomponents = syzstr->truecomponents[max(index-1,0)];
+    currShiftedComponents = syzstr->ShiftedComponents[max(index-1,0)];
+    rChangeSComps(currcomponents, currShiftedComponents,
+                  IDELEMS(syzstr->res[max(index-1,0)]));
     j = syInitSyzMod(syzstr,index+1);
     if (index>0)
     {
@@ -2965,19 +2744,15 @@ syStrategy syLaScala3(ideal arg,int * length)
     if (index<(*length)-1)
     {
       syCreateNewPairs(syzstr,index+1,j);
-      //currcomponents = syzstr->truecomponents[index];
-      //sySyzTail(syzstr,index+1,j);
-      //currcomponents = syzstr->truecomponents[index-1];
     }
     index++;
     nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
     //if (TEST_OPT_PROT) Print("(%d,%d)",howmuch,index);
   }
   if (temp!=NULL) idDelete(&temp);
+  kBucketDestroy(&(syzstr->bucket));
   if (ord!=NULL)
   {
-    //pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
-    //currRing->block0,currRing->block1,currRing->wvhdl);
     rChangeCurrRing(origR,TRUE);
   }
   else
@@ -2985,15 +2760,12 @@ syStrategy syLaScala3(ideal arg,int * length)
     pSetm=oldSetm;
     pComp0=oldComp0;
   }
-  if (ord!=NULL)
-  {
-    Free((ADDRESS)ord,3*sizeof(int));
-    Free((ADDRESS)b0,3*sizeof(int));
-    Free((ADDRESS)b1,3*sizeof(int));
-  }
-  syzstr->binom = binomials;
-  syzstr->highdeg_1 = highdeg_1;
   pDelete1(&redpol);
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
 }
+
+#define HAVE_HILB_SYZ
+#ifdef HAVE_HILB_SYZ
+#include "syz2.cc"
+#endif

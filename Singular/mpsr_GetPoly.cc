@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.22 1999-07-09 14:06:49 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.23 1999-09-27 15:05:27 obachman Exp $ */
 
 /***************************************************************
  *
@@ -23,6 +23,7 @@
 #include "mmemory.h"
 #include "tok.h"
 #include "ipid.h"
+#include "ring.h"
 #include "longalg.h"
 #include "maps.h"
 #include "ideals.h"
@@ -125,7 +126,7 @@ static void SetGetFuncs(ring r)
     else
       GetAlgNumberNumber = GetRationalNumber;
   }
-  
+
   // still need to set the global ring
   mpsr_SetCurrRing(r, TRUE);
 }
@@ -134,7 +135,7 @@ static void SetGetFuncs(ring r)
 
 /***************************************************************
  *
- * Routines for Getting coeffs 
+ * Routines for Getting coeffs
  *
  ***************************************************************/
 // we always Get modulo numbers without a node, since
@@ -165,7 +166,7 @@ static mpsr_Status_t GetApInt(MP_Link_pt link, mpz_ptr ap)
   MP_NumAnnot_t     num_annots;
   MP_Common_t       cvalue;
   MP_Boolean_t      req = 0;
-  
+
   mp_failr(IMP_GetNodeHeader(link,&node,&dict, &cvalue, &num_annots,
                              &num_child));
 
@@ -194,16 +195,16 @@ static mpsr_Status_t GetApInt(MP_Link_pt link, mpz_ptr ap)
   }
   else
     return mpsr_SetError(mpsr_WrongNodeType);
-  
+
   if (num_annots > 0)
   {
     mpt_failr(MPT_SkipAnnots(link, num_annots, &req));
     if (req) return mpsr_SetError(mpsr_ReqAnnotSkip);
   }
-  
+
   return mpsr_Success;
 }
-    
+
 // This supposes that number is of char 0, i.e. a rational number
 static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
 {
@@ -220,7 +221,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
                              &num_child));
 
   // start with the most frequent cases
-  if (node == MP_Sint32Type) 
+  if (node == MP_Sint32Type)
   {
     mp_failr(IMP_GetSint32(link, &i));
     *x = nlInit(i);
@@ -284,7 +285,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
   }
   else
     return mpsr_SetError(mpsr_WrongNodeType);
-  
+
   if (num_annots > 0)
   {
     mpt_failr(MPT_SkipAnnots(link, num_annots, &req));
@@ -323,7 +324,7 @@ static inline mpsr_Status_t GetAlgPoly(MP_Link_pt link, alg *p)
   mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, naNumbOfPar));
   for (i=0; i<naNumbOfPar; i++)
     a->e[i] = (PARAMETER_TYPE) gTa[i];
-#endif  
+#endif
 
   for (j=1; j<nm; j++)
   {
@@ -337,7 +338,7 @@ static inline mpsr_Status_t GetAlgPoly(MP_Link_pt link, alg *p)
   mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, naNumbOfPar));
   for (i=0; i<naNumbOfPar; i++)
     a->e[i] = (PARAMETER_TYPE) gTa[i];
-#endif  
+#endif
   }
   a->ne = NULL;
 
@@ -385,13 +386,13 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
 
   if (! IsCurrGetRing(cring))
     SetGetFuncs(cring);
-  
+
   if (nmon == 0)
   {
     p = NULL;
     return mpsr_Success;
   }
-  
+
   pp = pInit();
   p = pp;
   failr(GetCoeff(link, &(pp->coef)));
@@ -419,7 +420,7 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
     mp_failr(IMP_GetSint32(link, &i));
     pSetExp(pp,1, (Exponent_t) i);
     pSetm(pp);
-    
+
     for (j=1; j<nmon; j++)
     {
       pp->next = pInit();
@@ -445,14 +446,14 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
 
   if (!IsCurrGetRing(cring))
     SetGetFuncs(cring);
-  
+
   n1 = gNvars + 1;
   if (nmon == 0)
   {
     p = NULL;
     return mpsr_Success;
   }
-  
+
   pp = pInit();
   p = pp;
   failr(GetCoeff(link, &(pp->coef)));
@@ -483,7 +484,7 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
     mp_failr(IMP_GetSint32(link, &i));
     pSetExp(pp,1, (Exponent_t) i);
     pSetm(pp);
-    
+
     for (j=1; j<nmon; j++)
     {
       pp->next = pInit();
@@ -517,7 +518,7 @@ while (0)
 // MP_Succcess, if annots of node can be used to construct a
 // Singular ring (in which case r is the respective ring) or,
 // MP_Failure, if not
-mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r, 
+mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
                                  BOOLEAN &mv, BOOLEAN &IsUnOrdered)
 {
   sip_sring r1, *subring;
@@ -576,7 +577,7 @@ static mpsr_Status_t GetVarNumberAnnot(MPT_Node_pt node, ring r, BOOLEAN mv)
 {
   MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict, MP_AnnotPolyVarNumber);
 
-  if (annot != NULL) 
+  if (annot != NULL)
   {
     if (annot->value != NULL && annot->value->node->type == MP_Uint32Type)
     {
@@ -589,7 +590,7 @@ static mpsr_Status_t GetVarNumberAnnot(MPT_Node_pt node, ring r, BOOLEAN mv)
   return mpsr_Failure;
 }
 
-          
+
 static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
                                        ring &subring)
 {
@@ -598,7 +599,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
   MPT_Tree_pt  *ta;
 
   subring = NULL;
-  
+
   // look for prototype annot
   if ((val = MPT_ProtoAnnotValue(node)) == NULL)
     return mpsr_Failure;
@@ -618,7 +619,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
                    MP_CopProtoArray) && node->numchild > 0))
     return mpsr_Failure;
   // check r->N and reset, if necessary
-  if (mv) 
+  if (mv)
   {
     if (r->N != (int) (node->numchild - 1))
     {
@@ -637,7 +638,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
   // check for type of exponent
   if ((val = MPT_ProtoAnnotValue(node)) == NULL)
     return mpsr_Failure;
-  
+
   node = val->node;
   falser(NodeCheck(node, MP_CommonMetaType, MP_ProtoDict, MP_CmtProtoIMP_Sint32));
 
@@ -684,7 +685,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
     }
     else
       return mpsr_SetError(mpsr_UnknownCoeffDomain);
-    
+
     return mpsr_Success;
   }
   else
@@ -706,7 +707,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
     // GetRingAnnots
     failr(mpsr_GetRingAnnots(node, subring, mv2, IsUnOrdered));
     // Check whether the ring can be "coerced" to an algebraic number
-    falser( (rField_is_Zp(subring)||rField_is_Q(subring)) && 
+    falser( (rField_is_Zp(subring)||rField_is_Q(subring)) &&
            // orig: subring->ch >= 0 &&a ???
            subring->order[0] == ringorder_lp &&
            subring->order[2] == 0 &&
@@ -719,7 +720,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
     r->P = subring->N;
     for (i=0; i < subring->N; i++)
       r->parameter[i] = mstrdup(subring->names[i]);
-    
+
     // everything is ok
     return mpsr_Success;
   }
@@ -733,7 +734,7 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
   mpsr_assume(r != NULL);
   N = r->N;
   r->names = (char **) Alloc(N * sizeof(char *));
-  
+
   // fill in varnames from the back
   if (annot != NULL && annot->value != NULL)
   {
@@ -746,7 +747,7 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
           NodeCheck(val->node, MP_CommonMetaType, MP_ProtoDict,
                     MP_CmtProtoIMP_Identifier))
       {
-        MPT_Arg_pt arg_pt = annot->value->args;        
+        MPT_Arg_pt arg_pt = annot->value->args;
         lb = min(nc, N);
         offset = N - (short) nc;
         if (offset < 0) offset = 0;
@@ -778,11 +779,11 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
   else return mpsr_Success;
 }
 
-static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r, 
+static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r,
                                       BOOLEAN mv, BOOLEAN &IsUnOrdered)
 {
-  MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict, 
-                                 MP_AnnotShouldHavePolyOrdering); 
+  MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict,
+                                 MP_AnnotShouldHavePolyOrdering);
   IsUnOrdered = FALSE;
   mpsr_Status_t status = mpsr_Success;
   if (annot == NULL)
@@ -809,7 +810,7 @@ static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r,
     if (! mv) nc += 2; else nc++;
     r->block0 = (int *) Alloc0(nc*sizeof(int *));
     r->block1 = (int *) Alloc0(nc*sizeof(int *));
-    r->wvhdl  = (short **) Alloc0(nc*sizeof(short *));
+    r->wvhdl  = (int **) Alloc0(nc*sizeof(int *));
     r->order  = (int *) Alloc0(nc*sizeof(int *));
 
     if (! mv)
@@ -849,7 +850,7 @@ static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r,
     }
 
     if (status == mpsr_Success) status = mpsr_rSetOrdSgn(r);
-    
+
     // Clean up if sth went wrong
     if (status == mpsr_Failure)
     {
@@ -865,7 +866,7 @@ static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r,
   }
 
   // Either Simple Ordering, or sth failed from before
-  r->wvhdl = (short **)Alloc0(3 * sizeof(short *));
+  r->wvhdl = (int **)Alloc0(3 * sizeof(int *));
   r->order = (int *) Alloc0(3 * sizeof(int *));
   r->block0 = (int *)Alloc0(3 * sizeof(int *));
   r->block1 = (int *)Alloc0(3 * sizeof(int *));
@@ -882,7 +883,7 @@ static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r,
     r->order[0] = ringorder_unspec;
     IsUnOrdered = FALSE;
   }
-  
+
   return mpsr_rSetOrdSgn(r);
 }
 
@@ -892,7 +893,7 @@ static mpsr_Status_t GetSimpleOrdering(MPT_Node_pt node, ring r, short i)
     return mpsr_Failure;
 
   int sr_ord =  mpsr_mp2ord(MP_COMMON_T(node->nvalue));
-  
+
   r->order[i] = sr_ord;
   if (r->order[i] == ringorder_unspec) return mpsr_Failure;
 
@@ -920,7 +921,7 @@ static mpsr_Status_t GetSimpleOrdering(MPT_Node_pt node, ring r, short i)
       return mpsr_Failure;
   }
 
-  MPT_Annot_pt 
+  MPT_Annot_pt
     annot2 = MPT_Annot(node, MP_ProtoDict, MP_AnnotProtoPrototype);
 
   if (annot2 == NULL ||
@@ -930,8 +931,8 @@ static mpsr_Status_t GetSimpleOrdering(MPT_Node_pt node, ring r, short i)
 
   MP_Uint32_t nc = node->numchild, j;
   MP_Sint32_t *w = (MP_Sint32_t *) annot->value->args;
-  short *w2 = (short *) AllocL(nc*sizeof(short));
-  
+  int *w2 = (int *) AllocL(nc*sizeof(int));
+
   r->wvhdl[i] = w2;
   for (j = 0; j < nc ; j++)
     w2[j] = w[j];
@@ -969,10 +970,10 @@ static mpsr_Status_t GetDefRelsAnnot(MPT_Node_pt node, ring r)
     lv->data = NULL;
   }
   else return mpsr_Failure;
-  
+
   return mpsr_Success;
 }
-  
+
 extern mpsr_Status_t mpsr_rSetOrdSgn(ring r)
 {
   short i = 0, order;
@@ -992,8 +993,8 @@ extern mpsr_Status_t mpsr_rSetOrdSgn(ring r)
     if (order == ringorder_M)
     {
       int sz = r->block1[i] - r->block0[i] + 1, j, k=0;
-      short *matrix = r->wvhdl[i];
-      
+      int *matrix = r->wvhdl[i];
+
       while (k < sz)
       {
         j = 0;

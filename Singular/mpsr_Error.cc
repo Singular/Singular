@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Error.cc,v 1.8 1999-07-15 16:17:10 Singular Exp $ */
+/* $Id: mpsr_Error.cc,v 1.9 1999-09-27 15:05:26 obachman Exp $ */
 
 /***************************************************************
  *
@@ -74,7 +74,7 @@ void mpsr_PrintError(mpsr_Status_t error, MP_Link_pt link)
                 (mpsr_errno < mpsr_MaxError ? mpsr_errlist[mpsr_errno] :
                  "Unknown mpsr error"));
   }
-  
+
 }
 void mpsr_PrintError(MP_Link_pt link)
 {

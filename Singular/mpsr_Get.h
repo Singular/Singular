@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.6 1999-07-09 14:06:47 obachman Exp $ */
+/* $Id: mpsr_Get.h,v 1.7 1999-09-27 15:05:27 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -19,6 +19,7 @@
 #include "numbers.h"
 #include "polys.h"
 #include "febase.h"
+#include "ipid.h"
 
 #include"mpsr.h"
 

@@ -3,14 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.8 1999-04-17 14:58:52 obachman Exp $ */
+/* $Id: lists.h,v 1.9 1999-09-27 15:05:25 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
 #include "structs.h"
 #include "mmemory.h"
 #include "subexpr.h"
-#include "ipid.h"
 #include "tok.h"
 
 class slists

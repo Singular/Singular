@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys.cc,v 1.21 1999-08-10 15:19:53 Singular Exp $ */
+/* $Id: spolys.cc,v 1.22 1999-09-27 15:05:32 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction for char p
@@ -15,7 +15,7 @@
 #include "numbers.h"
 #include "modulop.h"
 #include "polys.h"
-#include "ipid.h"
+//#include "ipid.h"
 #include "febase.h"
 #include "spolys0.h"
 #include "spolys.h"
@@ -259,6 +259,8 @@ void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
 static poly spPSpolyRed(poly p1, poly p2,poly spNoether,
                         spSpolyLoopProc SpolyLoop)
 {
+  pTest(p1);
+  pTest(p2);
   poly a1 = pNext(p1), a2 = pNext(p2);
   if(a1==NULL)
   {
@@ -271,6 +273,8 @@ static poly spPSpolyRed(poly p1, poly p2,poly spNoether,
     pSetCompP(a1,pGetComp(p2));
     reset_vec=TRUE;
   }
+  pTest(p1);
+  pTest(p2);
   spMonSub(p2,p1);
   if (1!=(int)pGetCoeff(p2))
   {

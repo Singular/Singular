@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.22 1999-03-08 17:30:49 Singular Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.23 1999-09-27 15:05:28 obachman Exp $ */
 
 /***************************************************************
  *
@@ -109,7 +109,7 @@ mpsr_Status_t mpsr_mp2tok(MP_DictTag_t dict, MP_Common_t cop, short *o_tok)
 
 #define MAX_ORD ringorder_unspec
 
-static struct 
+static struct
 {
   int sing_ord;
   int mp_ord;
@@ -132,21 +132,21 @@ static struct
   {ringorder_Ws,    MP_CcPolyOrdering_NegLex},
   {ringorder_unspec, MP_CcPolyOrdering_Unknown}
 };
-  
+
 MP_Common_t mpsr_ord2mp(int sr_ord)
 {
   int or = ringorder_no;
-  
-  while (sing_mp_ord[or].sing_ord != sr_ord && 
+
+  while (sing_mp_ord[or].sing_ord != sr_ord &&
          sing_mp_ord[or].sing_ord <= ringorder_unspec) or++;
-  
+
   return sing_mp_ord[or].mp_ord;
 }
 
 short mpsr_mp2ord(MP_Common_t mp_ord)
 {
   int or = ringorder_no;
-  
+
   while (sing_mp_ord[or].mp_ord != mp_ord &&
          sing_mp_ord[or].sing_ord <= ringorder_unspec) or++;
   return sing_mp_ord[or].sing_ord;
@@ -588,7 +588,7 @@ void mpsr_ttGen()
   system("touch mpsr_Tok.inc");
 #else
   // simulate touch on a macintosh
-  FILE *fd = fopen("mpsr_Tok.inc", "w"); 
+  FILE *fd = fopen("mpsr_Tok.inc", "w");
   close(fd);
 #endif
 }

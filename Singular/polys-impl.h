@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.31 1999-08-23 13:15:58 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.32 1999-09-27 15:05:29 obachman Exp $ */
 
 /***************************************************************
  *
@@ -30,8 +30,14 @@
 #else
 #define VARS (0)
 #endif
+union s_exp
+{
+   Exponent_t e[VARS +1];
+   long       l[(VARS +1)/2];
+};
 
-typedef Exponent_t  monomial[VARS + 1];
+//typedef Exponent_t  monomial[VARS + 1];
+typedef s_exp  monomial;
 typedef Exponent_t* Exponent_pt;
 
 typedef long Order_t;
@@ -39,7 +45,6 @@ struct  spolyrec
 {
   poly      next; // next needs to be the first field
   number    coef; // and coef the second --- do not change this !!!
-  Order_t   Order;
   monomial  exp; // make sure that exp is aligned
 };
 
@@ -49,7 +54,7 @@ struct  spolyrec
  *
  ***************************************************************/
 
-#define POLYSIZE (sizeof(poly) + sizeof(number) + sizeof(Order_t))
+#define POLYSIZE (sizeof(poly) + sizeof(number))
 #define POLYSIZEW (POLYSIZE / sizeof(long))
 #define MAX_EXPONENT_NUMBER ((MAX_BLOCK_SIZE - POLYSIZE) / SIZEOF_EXPONENT)
 
@@ -60,39 +65,24 @@ extern int pMonomSize;
 // size of a monom in units of sizeof(void*) -- i.e. in words
 extern int pMonomSizeW;
 // Ceiling((pVariables+1) / sizeof(void*)) == length of exp-vector in words
-extern int pVariables1W;
+// extern int pVariables1W;
 // Ceiling((pVariables) / sizeof(void*))
-extern int pVariablesW;
+// extern int pVariablesW;
 extern int *pVarOffset;
-extern int pVarLowIndex;
-extern int pVarHighIndex;
-extern int pVarCompIndex;
+// extern int pVarLowIndex;
+// extern int pVarHighIndex;
+// extern int pVarCompIndex;
 
 /***************************************************************
  *
  * Primitives for determening/setting  the way exponents are arranged
  *
  ***************************************************************/
-#define _pExpIndex(i) pVarOffset[(i)]
+#define _pExpIndex(i) (currRing->VarOffset[(i)])
 #define _pRingExpIndex(r, i)  (r)->VarOffset[(i)]
 
-#define _pCompIndex        pVarOffset[0]
-#define _pRingCompIndex(r)  ((r)->VarOffset[0])
-
-// for simple, lex orderings
-extern void pGetVarIndicies_Lex(int nvars, int* VarOffset, int &VarCompIndex,
-                                int &VarLowIndex, int &VarHighIndex);
-// for simple, revlex orderings
-extern void pGetVarIndicies_RevLex(int nvars,int *VarOffset,int &VarCompIndex,
-                                   int &VarLowIndex, int &VarHighIndex);
-// for all non-simple orderings
-extern void pGetVarIndicies(int nvars, int *VarOffset, int &VarCompIndex,
-                            int &VarLowIndex, int &VarHighIndex);
-// gets var indicies w.r.t. the ring r --
-// determines which one of three pGetVarIndicies((int nvars, ...) to use
-// based on properties of r
-extern void pGetVarIndicies(ring r, int *VarOffset, int &VarCompIndex,
-                            int &VarLowIndex, int &VarHighIndex);
+#define _pCompIndex        (currRing->pCompIndex)
+#define _pRingCompIndex(r)  ((r)->pCompIndex)
 
 /***************************************************************
  *
@@ -106,7 +96,7 @@ extern void pGetVarIndicies(ring r, int *VarOffset, int &VarCompIndex,
 #define _pSetCoeff(p,n)     {nDelete(&((p)->coef));(p)->coef=n;}
 #define _pSetCoeff0(p,n)    (p)->coef=n
 
-#define _pGetOrder(p)       ((p)->Order)
+#define _pGetOrder(p)       ((p)->exp.l[currRing->pOrdIndex])
 
 #if defined(PDEBUG) && PDEBUG != 0
 extern Exponent_t pPDSetExp(poly p, int v, Exponent_t e, char* f, int l);
@@ -120,6 +110,13 @@ extern Exponent_t pPDSubExp(poly p, int v, Exponent_t e, char* f, int l);
 extern Exponent_t pPDRingSetExp(ring r,poly p,int v,Exponent_t e,char* f,int l);
 extern Exponent_t pPDRingGetExp(ring r,poly p, int v, char* f, int l);
 
+extern Exponent_t pDBSetComp(poly p, Exponent_t k, int l, char* f, int l);
+extern Exponent_t pDBDecrComp(poly p, char* f, int l);
+extern Exponent_t pDBAddComp(poly p, Exponent_t k, int l, char* f, int l);
+extern Exponent_t pDBSubComp(poly p, Exponent_t k, char* f, int l);
+extern Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l);
+
+
 #define _pSetExp(p,v,e)     pPDSetExp(p,v,e,__FILE__,__LINE__)
 #define _pGetExp(p,v)       pPDGetExp(p,v,__FILE__,__LINE__)
 #define _pIncrExp(p,v)      pPDIncrExp(p,v,__FILE__,__LINE__)
@@ -131,41 +128,51 @@ extern Exponent_t pPDRingGetExp(ring r,poly p, int v, char* f, int l);
 #define _pRingSetExp(r,p,v,e)     pPDRingSetExp(r,p,v,e,__FILE__,__LINE__)
 #define _pRingGetExp(r,p,v)       pPDRingGetExp(r,p,v,__FILE__,__LINE__)
 
+#define _pSetComp(p,k)      pDBSetComp(p, k, 0, __FILE__, __LINE__)
+#define _pDecrComp(p)       pDBDecrComp(p, __FILE__, __LINE__)
+#define _pAddComp(p,v)      pDBAddComp(p,v, 0, __FILE__, __LINE__)
+#define _pSubComp(p,v)      pDBSubComp(p,v, __FILE__, __LINE__)
+#define _pRingSetComp(r,p,k)  pDBRingSetComp(r, p, k, __FILE__, __LINE__)
+
+#define pSetCompS(p, k, l) pDBSetComp(p, k, l, __FILE__, __LINE__)
+
 #else  // ! (defined(PDEBUG) && PDEBUG != 0)
 
-#define _pSetExp(p,v,e)     (p)->exp[_pExpIndex(v)]=(e)
-#define _pGetExp(p,v)       (p)->exp[_pExpIndex(v)]
-#define _pIncrExp(p,v)      ((p)->exp[_pExpIndex(v)])++
-#define _pDecrExp(p,v)      ((p)->exp[_pExpIndex(v)])--
-#define _pAddExp(p,i,v)     ((p)->exp[_pExpIndex(i)]) += (v)
-#define _pSubExp(p,i,v)     ((p)->exp[_pExpIndex(i)]) -= (v)
-#define _pMultExp(p,i,v)    ((p)->exp[_pExpIndex(i)]) *= (v)
+#define _pSetExp(p,v,E)     (p)->exp.e[_pExpIndex(v)]=(E)
+#define _pGetExp(p,v)       (p)->exp.e[_pExpIndex(v)]
+#define _pIncrExp(p,v)      ((p)->exp.e[_pExpIndex(v)])++
+#define _pDecrExp(p,v)      ((p)->exp.e[_pExpIndex(v)])--
+#define _pAddExp(p,i,v)     ((p)->exp.e[_pExpIndex(i)]) += (v)
+#define _pSubExp(p,i,v)     ((p)->exp.e[_pExpIndex(i)]) -= (v)
+#define _pMultExp(p,i,v)    ((p)->exp.e[_pExpIndex(i)]) *= (v)
 
-#define _pRingSetExp(r,p,v,e)     (p)->exp[_pRingExpIndex(r,v)]=(e)
-#define _pRingGetExp(r,p,v)       (p)->exp[_pRingExpIndex(r,v)]
+#define _pRingSetExp(r,p,v,e)     (p)->exp.e[_pRingExpIndex(r,v)]=(e)
+#define _pRingGetExp(r,p,v)       (p)->exp.e[_pRingExpIndex(r,v)]
+
+#define _pSetComp(p,k)      _pGetComp(p) = (k)
+#define _pDecrComp(p)       _pGetComp(p)--
+#define _pAddComp(p,v)      _pGetComp(p) += (v)
+#define _pSubComp(p,v)      _pGetComp(p) -= (v)
+#define _pRingSetComp(r,p,k)      (_pRingGetComp(r, p) = (k))
+#define pSetCompS(p, k,l)     _pSetComp(p, k)
 
 #endif // defined(PDEBUG) && PDEBUG != 0
+
+#define _pGetComp(p)        ((p)->exp.e[_pCompIndex])
+#define _pIncrComp(p)       _pGetComp(p)++
+#define _pRingGetComp(r,p)        ((p)->exp.e[_pRingCompIndex(r)])
 
 inline Exponent_t _pGetExpSum(poly p1, poly p2, int i)
 {
   int index = _pExpIndex(i);
-  return p1->exp[index] + p2->exp[index];
+  return p1->exp.e[index] + p2->exp.e[index];
 }
 inline Exponent_t _pGetExpDiff(poly p1, poly p2, int i)
 {
   int index = _pExpIndex(i);
-  return p1->exp[index] - p2->exp[index];
+  return p1->exp.e[index] - p2->exp.e[index];
 }
 
-#define _pGetComp(p)        ((p)->exp[_pCompIndex])
-#define _pSetComp(p,k)      _pGetComp(p) = (k)
-#define _pIncrComp(p)       _pGetComp(p)++
-#define _pDecrComp(p)       _pGetComp(p)--
-#define _pAddComp(p,v)      _pGetComp(p) += (v)
-#define _pSubComp(p,v)      _pGetComp(p) -= (v)
-
-#define _pRingGetComp(r,p)        ((p)->exp[_pRingCompIndex(r)])
-#define _pRingSetComp(r,p,k)      (_pRingGetComp(p) = (k))
 
 inline void _pGetExpV(poly p, Exponent_t *ev)
 {
@@ -192,59 +199,95 @@ inline void _pSetExpV(poly p, Exponent_t *ev)
  ***************************************************************/
 #ifdef MDEBUG
 
-poly    pDBInit(char *f, int l);
+poly    pDBInit(memHeap h, char *f, int l);
 poly    pDBCopy(poly a, char *f, int l);
+poly    pDBCopy(memHeap h, poly a, char *f, int l);
 poly    pDBCopy1(poly a, char *f, int l);
-poly    pDBHead(poly a, char *f, int l);
+poly    pDBHead(memHeap h, poly a, char *f, int l);
 poly    pDBHead0(poly a, char *f, int l);
 poly    pDBFetchCopy(ring r, poly a, char *f, int l);
+poly    pDBFetchCopyDelete(ring r, poly a, char *f, int l);
+poly    pDBFetchHead(ring r, poly a, char *f, int l);
+poly    pDBFetchHeadDelete(ring r, poly a, char *f, int l);
+poly    pDBShallowCopyDeleteHead(memHeap d_h,poly *s_p,memHeap s_h,
+                                 char *f,int l);
+poly    pDBShallowCopyDelete(memHeap d_h,poly *s_p,memHeap s_h, char *f,int l);
 
-void    pDBDelete(poly * a, char * f, int l);
-void    pDBDelete1(poly * a, char * f, int l);
 
-#define pDBNew(f,l)  (poly) mmDBAllocHeap(mm_specHeap, f,l)
-#define _pNew()      (poly) mmDBAllocHeap(mm_specHeap, __FILE__, __LINE__)
-#define _pInit()     (poly) pDBInit(__FILE__,__LINE__)
+void    pDBDelete(poly * a, memHeap h, char * f, int l);
+void    pDBDelete1(poly * a, memHeap h, char * f, int l);
 
-#define pDBFree1(a,f,l) mmDBFreeHeap((void*)a, mm_specHeap, f, l)
+#define pDBNew(h, f,l)  (poly) mmDBAllocHeap(h, f,l)
+#define _pNew(h)        (poly) mmDBAllocHeap(h, __FILE__, __LINE__)
+#define _pInit(h)       (poly) pDBInit(h, __FILE__,__LINE__)
 
-#define _pDelete(a)     pDBDelete((a),__FILE__,__LINE__)
-#define _pDelete1(a)    pDBDelete1((a),__FILE__,__LINE__)
+#define pDBFree1(a,h,f,l)   mmDBFreeHeap((void*)a, h, f, l)
+#define _pFree1(a, h)       mmDBFreeHeap((void*)a, h, __FILE__, __LINE__)
 
-#define _pCopy(A)       pDBCopy(A,__FILE__,__LINE__)
+#define _pDelete(a, h)     pDBDelete((a),h, __FILE__,__LINE__)
+#define _pDelete1(a, h)    pDBDelete1((a),h, __FILE__,__LINE__)
+
+#define _pCopy(h, A)    pDBCopy(h,A,__FILE__,__LINE__)
 #define _pCopy1(A)      pDBCopy1(A, __FILE__,__LINE__)
-#define _pHead(A)       pDBHead(A,__FILE__,__LINE__)
+#define _pHead(h, A)    pDBHead(h, A,__FILE__,__LINE__)
 #define _pHead0(A)      pDBHead0(A, __FILE__,__LINE__)
-#define _pFetchCopy(r,A)    pDBFetchCopy(r, A,__FILE__,__LINE__)
+
+#define _pShallowCopyDeleteHead(dest_heap, source_p, source_heap) \
+  pDBShallowCopyDeleteHead(dest_heap, source_p, source_heap,__FILE__,__LINE__)
+#define _pShallowCopyDelete(dest_heap, source_p, source_heap) \
+  pDBShallowCopyDelete(dest_heap, source_p, source_heap,__FILE__,__LINE__)
+
+#define _pFetchCopy(r,A)        pDBFetchCopy(r, A,__FILE__,__LINE__)
+#define _pFetchCopyDelete(r,A)  pDBFetchCopyDelete(r, A,__FILE__,__LINE__)
+#define _pFetchHead(r,A)        pDBFetchHead(r, A,__FILE__,__LINE__)
+#define _pFetchHeadDelete(r,A)  pDBFetchHeadDelete(r, A,__FILE__,__LINE__)
+
+#define _pRingFree1(r, A)      pDBFreeHeap(A,r->mm_specHeap,__FILE__,__LINE__)
+#define _pRingDelete1(r, A)     pDBDelete1(A,r->mm_specHeap,__FILE__,__LINE__)
+#define _pRingDelete(r, A)      pDBDelete(A,r->mm_specHeap,__FILE__, __LINE__)
 
 #else // ! MDEBUG
 
-inline poly _pNew()
+inline poly _pNew(memHeap h)
 {
-  void * p;
-  AllocHeap(p, mm_specHeap);
-  return (poly)p;
-}
-
-inline poly    _pInit(void)
-{
-  poly p = _pNew();
-  memsetW((long*)p,0, pMonomSizeW);
+  poly p;
+  AllocHeap(p, h);
   return p;
 }
 
-extern void    _pDelete(poly * a);
-extern void    _pDelete1(poly * a);
+inline poly    _pInit(memHeap h)
+{
+  poly p;
+  AllocHeap(p, h);
+  memsetW((long *)p,0, pMonomSizeW);
+  return p;
+}
+
+#define _pFree1(a, h)       FreeHeap(a, h)
+#define _pRingFree1(r, a)   FreeHeap(a, r->mm_specHeap)
+#define _pRingDelete1(r, A) _pDelete1(A, r->mm_specHeap)
+#define _pRingDelete(r, A)  _pDelete(A, r->mm_specHeap)
+
+extern void    _pDelete(poly * a, memHeap h);
+extern void    _pDelete1(poly * a, memHeap h);
 
 extern poly    _pCopy(poly a);
+extern poly    _pCopy(memHeap h, poly a);
 extern poly    _pCopy1(poly a);
-extern poly    _pHead(poly a);
+extern poly    _pHead(memHeap h, poly a);
 extern poly    _pHead0(poly a);
+extern poly    _pShallowCopyDeleteHead(memHeap d_h, poly *s_p, memHeap s_h);
+extern poly    _pShallowCopyDelete(memHeap d_h, poly *s_p, memHeap s_h);
+
 extern poly    _pFetchCopy(ring r,poly a);
+extern poly    _pFetchCopyDelete(ring r,poly a);
+extern poly    _pFetchHead(ring r,poly a);
+extern poly    _pFetchHeadDelete(ring r,poly a);
+
 #endif // MDEBUG
 
 #define _pCopy2(p1, p2)     memcpyW(p1, p2, pMonomSizeW)
-#define _pFree1(a)          FreeHeap(a, mm_specHeap)
+
 
 /***************************************************************
  *
@@ -279,17 +322,9 @@ inline void __pMonAddFast(poly p1, poly p2)
   DECLARE(void, _pMonAddFast(poly p1, poly p2))
 #endif // defined(PDEBUG) && PDEBUG == 1
 {
-  // OK -- this might be the only place where we are kind of quick and
-  // dirty: the following only works correctly if all exponents are
-  // positive and the sum of two exponents does not exceed
-  // EXPONENT_MAX
-  Exponent_t c2 = _pGetComp(p2);
-  int i = pVariables1W;
-  unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
-  const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
-  // set comp of p2 temporarily to 0, so that nothing is added to comp of p1
-  _pSetComp(p2, 0);
-
+  int i = currRing->ExpLSize;
+  long* s1 = &(p1->exp.l[0]);
+  const long* s2 = &(p2->exp.l[0]);
   for (;;)
   {
     *s1 += *s2;
@@ -298,12 +333,31 @@ inline void __pMonAddFast(poly p1, poly p2)
     s1++;
     s2++;
   }
-  // reset comp of p2
-  _pSetComp(p2, c2);
-  _pGetOrder(p1) += _pGetOrder(p2);
 }
 
-// Makes p1 a copy of p2 and adds on exponets of p3
+#if defined(PDEBUG) && PDEBUG == 1
+#define _pMonSubFast(p1, p2)  pDBMonSubFast(p1, p2, __FILE__, __LINE__)
+extern  void pDBMonSubFast(poly p1, poly p2, char* f, int l);
+inline void __pMonSubFast(poly p1, poly p2)
+#else
+  DECLARE(void, _pMonSubFast(poly p1, poly p2))
+#endif // defined(PDEBUG) && PDEBUG == 1
+{
+  int i = currRing->ExpLSize;
+  long* s1 = &(p1->exp.l[0]);
+  const long* s2 = &(p2->exp.l[0]);
+
+  for (;;)
+  {
+    *s1 -= *s2;
+    i--;
+    if (i==0) break;
+    s1++;
+    s2++;
+  }
+}
+
+// Makes p1 a copy of p2 and adds on exponents of p3
 #if defined(PDEBUG) && PDEBUG == 1
 #define _pCopyAddFast(p1, p2, p3)  pDBCopyAddFast(p1, p2, p3, __FILE__, __LINE__)
 extern  void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l);
@@ -312,10 +366,10 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   DECLARE(void, _pCopyAddFast(poly p1, poly p2, poly p3))
 #endif // defined(PDEBUG) && PDEBUG == 1
 {
-  unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
-  const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
-  const unsigned long* s3 = (unsigned long*) &(p3->exp[0]);
-  const unsigned long* const ub = s3 + pVariables1W;
+  long* s1 = &(p1->exp.l[0]);
+  const long* s2 = &(p2->exp.l[0]);
+  const long* s3 = &(p3->exp.l[0]);
+  const long* const ub = s3 + currRing->ExpLSize;
 
   p1->next = p2->next;
   p1->coef = p2->coef;
@@ -330,8 +384,7 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   }
   // we first are supposed to do a copy from p2 to p1 -- therefore,
   // component of p1 is set to comp of p2
-  _pSetComp(p1, _pGetComp(p2));
-  _pGetOrder(p1) = _pGetOrder(p2) + _pGetOrder(p3);
+  // _pSetComp(p1, _pGetComp(p2));
 }
 
 // Similar to pCopyAddFast, except that we do not care about the "next" field
@@ -343,10 +396,10 @@ inline void __pCopyAddFast0(poly p1, poly p2, poly p3)
   DECLARE(void, _pCopyAddFast0(poly p1, poly p2, poly p3))
 #endif // defined(PDEBUG) && PDEBUG == 1
 {
-  unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
-  const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
-  const unsigned long* s3 = (unsigned long*) &(p3->exp[0]);
-  const unsigned long* const ub = s3 + pVariables1W;
+  long* s1 = &(p1->exp.l[0]);
+  const long* s2 = &(p2->exp.l[0]);
+  const long* s3 = &(p3->exp.l[0]);
+  const long* const ub = s3 + currRing->ExpLSize;
 
   p1->coef = p2->coef;
 
@@ -358,39 +411,7 @@ inline void __pCopyAddFast0(poly p1, poly p2, poly p3)
     s1++;
     s2++;
   }
-  _pSetComp(p1, _pGetComp(p2));
-  _pGetOrder(p1) = _pGetOrder(p2) + _pGetOrder(p3);
-}
-
-// Similar to pCopyAddFast0, except that we do not recompute the Order,
-// but assume that it is the sum of the Order of p2 and p3
-#if defined(PDEBUG) && PDEBUG == 1
-#define _pCopyAddFastHomog(p1, p2, p3, Order)  \
-   pDBCopyAddFastHomog(p1, p2, p3, Order, __FILE__, __LINE__)
-extern  void pDBCopyAddFastHomog(poly p1, poly p2, poly p3, Order_t Order,
-                                 char* f, int l);
-inline void __pCopyAddFastHomog(poly p1, poly p2, poly p3, Order_t Order)
-#else
-  DECLARE(void, _pCopyAddFastHomog(poly p1, poly p2, poly p3, Order_t Order))
-#endif // defined(PDEBUG) && PDEBUG == 1
-{
-  unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
-  const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
-  const unsigned long* s3 = (unsigned long*) &(p3->exp[0]);
-  const unsigned long* const ub = s3 + pVariables1W;
-
-  p1->coef = p2->coef;
-  p1->Order = Order;
-
-  for (;;)
-  {
-    *s1 = *s2 + *s3;
-    s3++;
-    if (s3 == ub) break;
-    s1++;
-    s2++;
-  }
-  _pSetComp(p1, _pGetComp(p2));
+  // _pSetComp(p1, _pGetComp(p2));
 }
 
 #if SIZEOF_LONG == 4
@@ -418,34 +439,40 @@ inline void __pCopyAddFastHomog(poly p1, poly p2, poly p3, Order_t Order)
 
 #endif
 
+// #define LONG_MONOMS
+
+#ifdef LONG_MONOMS
 DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
 {
-#ifdef WORDS_BIGENDIAN
-  const unsigned long* const lb = (unsigned long*) &(a->exp[0]);;
-  const unsigned long* s1 = ((unsigned long*) a) + pMonomSizeW -1;
-  const unsigned long* s2 = ((unsigned long*) b) + pMonomSizeW -1;
-#else
-  const unsigned long* const lb = ((unsigned long*) a) + pMonomSizeW;
-  const unsigned long* s1 = (unsigned long*) &(a->exp[0]);
-  const unsigned long* s2 = (unsigned long*) &(b->exp[0]);
-#endif
+  const unsigned long* const lb = (unsigned long*) &(a->exp.l[currRing->pDivLow]);
+  const unsigned long* s1 = (unsigned long*) &(a->exp.l[currRing->pDivHigh]);
+  const unsigned long* s2 = (unsigned long*) &(b->exp.l[currRing->pDivHigh]);
 
   for (;;)
   {
     // Yes, the following is correct, provided that the exponents do
     // not have their first bit set
     if ((*s2 - *s1) & P_DIV_MASK) return FALSE;
-#ifdef WORDS_BIGENDIAN
     if (s1 == lb) return TRUE;
     s1--;
     s2--;
-#else
-    s1++;
-    if (s1 == lb) return TRUE;
-    s2++;
-#endif
   }
 }
+#else
+DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
+{
+  int i=pVariables; // assume i>0
+
+  for (;;)
+  {
+    if (_pGetExp(a,i) > _pGetExp(b,i))
+      return FALSE;
+    i--;
+    if (i==0)
+      return TRUE;
+  }
+}
+#endif
 
 #if defined(PDEBUG) && PDEBUG == 1
 #define _pDivisibleBy(a,b)   pDBDivisibleBy(a, b, __FILE__, __LINE__)
@@ -485,9 +512,9 @@ extern  BOOLEAN pDBDivisibleBy2(poly p1, poly p2, char* f, int l);
 
 DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
 {
-  const long *s1 = (long*) &(p1->exp[0]);
-  const long *s2 = (long*) &(p2->exp[0]);
-  const long* const lb = s1 + pVariables1W;
+  const long *s1 = (long*) &(p1->exp.l[0]);
+  const long *s2 = (long*) &(p2->exp.l[0]);
+  const long* const lb = s1 + currRing->ExpLSize;
 
   for(;;)
   {
@@ -497,6 +524,24 @@ DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
     s2++;
   }
 }
+/***************************************************************
+ *
+ * Misc. things
+ * 
+ *
+ ***************************************************************/
+// Divisiblity tests based on Short Exponent Vectors
+#ifdef PDEBUG
+#define _pShortDivisibleBy(a, sev_a, b, not_sev_b) \
+  pDBShortDivisibleBy(a, sev_a, b, not_sev_b, __FILE__, __LINE__)
+BOOLEAN pDBShortDivisibleBy(poly p1, unsigned long sev_1,
+                            poly p2, unsigned long not_sev_2, 
+                            char* f, int l);
+#else
+#define _pShortDivisibleBy(a, sev_a, b, not_sev_b) \
+  ( ! (sev_a & not_sev_b) && pDivisibleBy(a, b))
+#endif
+
 
 /***************************************************************
  *
@@ -505,32 +550,24 @@ DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
  *
  ***************************************************************/
 
+#ifdef LONG_MONOMS
 DECLARE(int, __pExpQuerSum2(poly p, int from, int to))
 {
-  int j = p->exp[from];
-  int i = from + 1;
+  int j = 0;
+  int i = from ;
 
   for(;;)
   {
-    if (i > to) return j;
-    j += p->exp[i];
+    if (i > to) break;
+    j += p->exp.e[i];
     i++;
   }
+  if (from <= _pCompIndex && to >= _pCompIndex)
+    return j - _pGetComp(p);
+  return j;
 }
 
-#define _pExpQuerSum(p)  __pExpQuerSum2(p, pVarLowIndex, pVarHighIndex)
-
-inline int _pExpQuerSum1(poly p, int to)
-{
-  int ei_to = _pExpIndex(to);
-  int ei_1 = _pExpIndex(1);
-
-  if (ei_1 > ei_to)
-    return __pExpQuerSum2(p, ei_to, ei_1);
-  else
-    return __pExpQuerSum2(p, ei_1, ei_to);
-}
-
+#define _pExpQuerSum(p)  __pExpQuerSum2(p, currRing->pVarLowIndex, currRing->pVarHighIndex)
 
 inline int _pExpQuerSum2(poly p,int from,int to)
 {
@@ -542,5 +579,19 @@ inline int _pExpQuerSum2(poly p,int from,int to)
   else
     return __pExpQuerSum2(p, ei_from, ei_to);
 }
+
+#else
+DECLARE(int, _pExpQuerSum(poly p))
+{
+  int s = 0;
+  int i = pVariables;
+  for (;;)
+  {
+    s += _pGetExp(p, i);
+    i--;
+    if (i==0) return s;
+  }
+}
+#endif
 
 #endif // POLYS_IMPL_H

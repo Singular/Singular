@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.15 1999-04-29 11:38:51 Singular Exp $ */
+/* $Id: mpsr.h,v 1.16 1999-09-27 15:05:26 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -24,8 +24,8 @@ extern "C"
 
 #include"MPT.h"
 #include"structs.h"
+#include"subexpr.h"
 #include"mmemory.h"
-#include"ipid.h"
 #include"polys.h"
 #include"numbers.h"
 #include"ring.h"
@@ -103,8 +103,8 @@ inline void mpsr_SetCurrRing(ring rg, BOOLEAN complete)
 #else
     nSetChar(rg, complete);
 #endif
-    pChangeRing(rg->N, rg->OrdSgn, rg->order, rg->block0, rg->block1,
-                rg->wvhdl);
+    rComplete(rg);
+    pSetGlobals(rg);
     currRing = rg;
     currComplete = complete;
   }

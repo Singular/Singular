@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.26 1999-08-19 15:26:13 pohl Exp $ */
+/* $Id: matpol.cc,v 1.27 1999-09-27 15:05:25 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -19,7 +19,7 @@
 #include "febase.h"
 #include "numbers.h"
 #include "ideals.h"
-#include "ipid.h"
+//#include "ipid.h"
 #include "subexpr.h"
 #include "intvec.h"
 #include "ring.h"
@@ -96,6 +96,7 @@ matrix mpNew(int r, int c)
 */
 matrix mpCopy (matrix a)
 {
+  idTest((ideal)a);
   poly t;
   int i, m=MATROWS(a), n=MATCOLS(a);
   matrix b = mpNew(m, n);
@@ -1627,7 +1628,7 @@ static poly mpSelect (poly fro, poly what)
   return res;
 }
 
-/* 
+/*
 *static void ppp(matrix a)
 *{
 *  int j,i,r=a->nrows,c=a->ncols;
@@ -1716,7 +1717,7 @@ static int mpPivBar(matrix a, int lr, int lc)
     }
   }
   if (io<0) return 0;
-  else return io+1; 
+  else return io+1;
 }
 
 /*
@@ -1813,13 +1814,13 @@ static void mpSwapCol(matrix a, int pos, int lr, int lc)
 static void mpElimBar(matrix a0, matrix re, poly div, int lr, int lc)
 {
   int r=lr-1, c=lc-1;
-  poly *b = a0->m, *x = re->m; 
+  poly *b = a0->m, *x = re->m;
   poly piv, elim, q1, q2, *ap, *a, *q;
   int i, j;
 
   ap = &b[r*a0->ncols];
   piv = ap[c];
-  for(j=c-1; j>=0; j--) 
+  for(j=c-1; j>=0; j--)
     if (ap[j] != NULL) ap[j] = pNeg(ap[j]);
   for(i=r-1; i>=0; i--)
   {

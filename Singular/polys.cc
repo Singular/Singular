@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.39 1999-05-26 16:23:59 obachman Exp $ */
+/* $Id: polys.cc,v 1.40 1999-09-27 15:05:30 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -19,10 +19,9 @@
 #include "polys.h"
 #include "ring.h"
 #include "binom.h"
-#include "ipid.h"
 #include "polys-comp.h"
 
-/* ----------- global variables, set by pChangeRing --------------------- */
+/* ----------- global variables, set by pSetGlobals --------------------- */
 /* initializes the internal data from the exp vector */
 pSetmProc pSetm;
 /* computes length and maximal degree of a POLYnomial */
@@ -34,15 +33,14 @@ pFDegProc pFDeg;
 pCompProc pComp0;
 
 int pVariables;     // number of variables
-int pVariablesW;    // number of words of pVariables exponents
-int pVariables1W;   // number of words of (pVariables+1) exponents
+//int pVariablesW;    // number of words of pVariables exponents
+//int pVariables1W;   // number of words of (pVariables+1) exponents
 int pMonomSize;     // size of monom (in bytes)
 int pMonomSizeW;    // size of monom (in words)
-int pLexSgn;        // 1, for lex monom comps; -1 otherwise (exception: ls)
-int *pVarOffset;     // controls the way exponents are stored in a vector
-int pVarLowIndex;   // lowest exponent index
-int pVarHighIndex;  // highest exponent index
-int pVarCompIndex;  // Location of component in exponent vector
+int *pVarOffset;    // controls the way exponents are stored in a vector
+//int pVarLowIndex;   // lowest exponent index
+//int pVarHighIndex;  // highest exponent index
+//int pVarCompIndex;  // Location of component in exponent vector
 
 /* 1 for polynomial ring, -1 otherwise */
 int     pOrdSgn;
@@ -87,9 +85,7 @@ static int maxSchreyer=0;
 static int indexShift=0;
 static pLDegProc pLDegOld;
 
-typedef int (*bcompProc)(poly p1, poly p2, int i1, int i2, short * w);
-static bcompProc bcomph[20];
-static short**   polys_wv;
+static int**   polys_wv;
 static short *   firstwv;
 static int * block0;
 static int * block1;
@@ -99,48 +95,134 @@ static int * order;
 /*0 implementation*/
 /*-------- the several possibilities for pSetm:-----------------------*/
 
-/* Remark: These could be made more efficient by avoiding using pGetExp */
-
-/*2
-* define the order of p with respect to lex. ordering, N=1
-*/
-static void setlex1(poly p)
+void rSetm(poly p)
 {
-  p->Order = (Order_t)pGetExp(p,1);
-}
-
-/*2
-* define the order of p with respect to lex. ordering, N>1
-*/
-static void setlex2(poly p)
-{
-  p->Order = (((Order_t)pGetExp(p,1))<<(sizeof(Exponent_t)*8))
-    + (Order_t)pGetExp(p,2);
-}
-
-/*2
-* define the order of p with respect to a degree ordering
-*/
-static void setdeg1(poly p)
-{
-  p->Order = pExpQuerSum1(p, firstBlockEnds);
-}
-
-/*2
-* define the order of p with respect to a degree ordering
-* with weigthts
-*/
-static void setdeg1w(poly p)
-{
-  Order_t i, j = 0;
-
-  for (i = firstBlockEnds; i>0; i--)
+  int pos=0;
+  if (currRing->typ!=NULL)
   {
-     j += ((Order_t) pGetExp(p,i))*firstwv[i-1];
+    loop
+    {
+      sro_ord* o=&(currRing->typ[pos]);
+      switch(o->ord_typ)
+      {
+        case ro_dp:
+        {
+          int a,e;
+          a=o->data.dp.start;
+          e=o->data.dp.end;
+          long ord=0;
+          for(int i=a;i<=e;i++) ord+=pGetExp(p,i);
+          p->exp.l[o->data.dp.place]=ord;
+          break;
+        }
+        case ro_wp:
+        {
+          int a,e;
+          a=o->data.wp.start;
+          e=o->data.wp.end;
+          int *w=o->data.wp.weights;
+          long ord=0;
+          for(int i=a;i<=e;i++) ord+=pGetExp(p,i)*w[i-a];
+          p->exp.l[o->data.wp.place]=ord;
+          break;
+        }
+        case ro_cp:
+        {
+          int a,e;
+          a=o->data.cp.start;
+          e=o->data.cp.end;
+          int pl=o->data.cp.place;
+          for(int i=a;i<=e;i++) { p->exp.e[pl]=pGetExp(p,i); pl++; }
+          break;
+        }
+        case ro_syzcomp:
+        {
+          int c=pGetComp(p);
+          long sc = c;
+#if 1
+          if (o->data.syzcomp.ShiftedComponents != NULL)
+          {
+            assume(o->data.syzcomp.Components != NULL);
+            assume(c == 0 || o->data.syzcomp.Components[c] != 0);
+            sc =
+              o->data.syzcomp.ShiftedComponents[o->data.syzcomp.Components[c]];
+            assume(c == 0 || sc != 0);
+          }
+          p->exp.l[o->data.syzcomp.place]=sc;
+#endif
+          break;
+        }
+        default:
+          Print("wrong ord in rSetm:%d\n",o->ord_typ);
+          return;
+      }
+      pos++;
+      if(pos==currRing->OrdSize) return;
+    }
   }
-  p->Order = j;
 }
 
+void rSetmS(poly p, int* Components, long* ShiftedComponents)
+{
+  int pos=0;
+  assume(Components != NULL && ShiftedComponents != NULL);
+  if (currRing->typ!=NULL)
+  {
+    loop
+    {
+      sro_ord* o=&(currRing->typ[pos]);
+      switch(o->ord_typ)
+      {
+        case ro_dp:
+        {
+          int a,e;
+          a=o->data.dp.start;
+          e=o->data.dp.end;
+          long ord=0;
+          for(int i=a;i<=e;i++) ord+=pGetExp(p,i);
+          p->exp.l[o->data.dp.place]=ord;
+          break;
+        }
+        case ro_wp:
+        {
+          int a,e;
+          a=o->data.wp.start;
+          e=o->data.wp.end;
+          int *w=o->data.wp.weights;
+          long ord=0;
+          for(int i=a;i<=e;i++) ord+=pGetExp(p,i)*w[i-a];
+          p->exp.l[o->data.wp.place]=ord;
+          break;
+        }
+        case ro_cp:
+        {
+          int a,e;
+          a=o->data.cp.start;
+          e=o->data.cp.end;
+          int pl=o->data.cp.place;
+          for(int i=a;i<=e;i++) { p->exp.e[pl]=pGetExp(p,i); pl++; }
+          break;
+        }
+        case ro_syzcomp:
+        {
+#if 1
+          int c=pGetComp(p);
+          long sc  = ShiftedComponents[Components[c]];
+          assume(c == 0 || Components[c] != 0);
+          assume(c == 0 || sc != 0);
+          p->exp.l[o->data.syzcomp.place]=sc;
+#endif
+          break;
+        }
+        default:
+          Print("wrong ord in rSetm:%d\n",o->ord_typ);
+          return;
+      }
+      pos++;
+      if(pos==currRing->OrdSize) return;
+    }
+  }
+}
 
 /*-------- IMPLEMENTATION OF MONOMIAL COMPARISONS ---------------------*/
 
@@ -164,416 +246,7 @@ while(0)
 }
 
 
-static int pComp_otEXP(poly p1, poly p2);
-static int pComp_otCOMPEXP(poly p1, poly p2);
-static int pComp_otEXPCOMP(poly p1, poly p2);
-
-static int pComp_otEXP(poly p1, poly p2)
-{
-  register long d = pGetOrder(p1) - pGetOrder(p2);
-  if (d) Mreturn(d, pOrdSgn);
-
-  _pMonComp_otEXP_nwGEN(p1, p2,  pVariables1W, d, goto NotEqual , return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
-static int pComp_otCOMPEXP(poly p1, poly p2)
-{
-  register long d = pGetComp(p2) - pGetComp(p1);
-  if (d) Mreturn(d, pComponentOrder);
-
-  d = pGetOrder(p1) - pGetOrder(p2);
-  if (d) Mreturn(d, pOrdSgn);
-
-  _pMonComp_otEXP_nwGEN(p1, p2,  pVariablesW, d, goto NotEqual , return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
-static int pComp_otEXPCOMP(poly p1, poly p2)
-{
-  register long d = pGetOrder(p1) - pGetOrder(p2);
-  if (d) Mreturn(d, pOrdSgn);
-
-  _pMonComp_otEXPCOMP_nwGEN(p1, p2,  pVariables1W, d, goto NotEqual , return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
 /*---------------------------------------------------*/
-
-/*2
-* compare the head monomial of p1 and p2 with weight vector
-*/
-static int comp1a  ( poly p1, poly p2, int f, int l, short * w )
-{
-  int d= pGetOrder(p1) - pGetOrder(p2);
-  if ( d > 0 /*p1->Order > p2->Order*/ )
-    return 1;
-  else if ( d < 0 /*p1->Order < p2->Order*/ )
-    return -1;
-  return 0;
-}
-
-
-/* These functions could be made faster if you use pointers to the
-* exponent vectors and pointer arithmetic instead of using the
-* macro pGetExp !!!
-*/
-
-/*2
-* compare the head monomial of p1 and p2 with lexicographic ordering
-*/
-static int comp_lp ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i = f;
-  while ( ( i <= l ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-    i++;
-  if ( i > l )
-    return 0;
-  if ( pGetExp(p1,i) > pGetExp(p2,i) )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with degree reverse lexicographic
-* ordering
-*/
-static int comp_dp ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, s1 = 0, s2 = 0;
-
-  for ( i = f; i <= l; i++ )
-  {
-    s1 += pGetExp(p1,i);
-    s2 += pGetExp(p2,i);
-  }
-  if ( s1 == s2 )
-  {
-    i = l;
-    while ( (i >= f ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-      i--;
-    if ( i < f )
-      return 0;
-    if ( pGetExp(p1,i) > pGetExp(p2,i) )
-      return -1;
-    return 1;
-  }
-  if ( s1 > s2 )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with degree lexicographic ordering
-*/
-static int comp_Dp ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, s1 = 0, s2 = 0;
-
-  for ( i = f; i <= l; i++ )
-  {
-    s1 += pGetExp(p1,i);
-    s2 += pGetExp(p2,i);
-  }
-  if ( s1 == s2 )
-  {
-    i = f;
-    while ( ( i <= l ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-      i++;
-    if ( i > l )
-      return 0;
-    if ( pGetExp(p1,i) > pGetExp(p2,i) )
-      return 1;
-    return -1;
-  }
-  if ( s1 > s2 )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with weighted degree reverse
-* lexicographic ordering
-*/
-static int comp_wp ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, s1 = 0, s2 = 0;
-
-  for ( i = f; i <= l; i++, w++ )
-  {
-    s1 += (int)pGetExp(p1,i)*(*w);
-    s2 += (int)pGetExp(p2,i)*(*w);
-  }
-  if ( s1 == s2 )
-  {
-    i = l;
-    while ( ( i >= f ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-      i--;
-    if ( i < f )
-      return 0;
-    if ( pGetExp(p1,i) > pGetExp(p2,i) )
-      return -1;
-    return 1;
-  }
-  if ( s1 > s2 )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with weighted degree lexicographic
-* ordering
-*/
-static int comp_Wp ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, s1 = 0, s2 = 0;
-
-  for ( i = f; i <= l; i++, w++ )
-  {
-    s1 += (int)pGetExp(p1,i)*(*w);
-    s2 += (int)pGetExp(p2,i)*(*w);
-  }
-  if ( s1 == s2 )
-  {
-    i = f;
-    while ( ( i <= l ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-      i++;
-    if ( i > l )
-      return 0;
-    if ( pGetExp(p1,i) > pGetExp(p2,i) )
-      return 1;
-    return -1;
-  }
-  if ( s1 > s2 )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with lexicographic ordering
-* (power series case)
-*/
-static int comp_ls ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i;
-
-  i = f;
-  while ( ( i <= l ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-    i++;
-  if ( i > l )
-    return 0;
-  if ( pGetExp(p1,i) < pGetExp(p2,i) )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with degree reverse lexicographic
-* ordering (power series case)
-*/
-static int comp_ds ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, s1 = 0, s2 = 0;
-
-  for ( i = f; i <= l; i++ )
-  {
-    s1 += pGetExp(p1,i);
-    s2 += pGetExp(p2,i);
-  }
-  if ( s1 == s2 )
-  {
-    i = l;
-    while ( ( i >= f ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-      i--;
-    if ( i < f )
-      return 0;
-    if ( pGetExp(p1,i) < pGetExp(p2,i) )
-      return 1;
-    return -1;
-  }
-  if ( s1 < s2 )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with degree lexicographic ordering
-* (power series case)
-*/
-static int comp_Ds ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, s1 = 0, s2 = 0;
-
-  for ( i = f; i <= l; i++ )
-  {
-    s1 += pGetExp(p1,i);
-    s2 += pGetExp(p2,i);
-  }
-  if ( s1 == s2 )
-  {
-    i = f;
-    while ( ( i <= l ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-      i++;
-    if ( i > l )
-      return 0;
-    if ( pGetExp(p1,i) < pGetExp(p2,i) )
-      return -1;
-    return 1;
-  }
-  if ( s1 < s2 )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with weighted degree reverse
-* lexicographic ordering (power series case)
-*/
-static int comp_ws ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, s1 = 0, s2 = 0;
-
-  for ( i = f; i <= l; i++, w++ )
-  {
-    s1 += (int)pGetExp(p1,i)*(*w);
-    s2 += (int)pGetExp(p2,i)*(*w);
-  }
-  if ( s1 == s2 )
-  {
-    i = l;
-    while ( ( i >= f ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-      i--;
-    if ( i < f )
-      return 0;
-    if ( pGetExp(p1,i) < pGetExp(p2,i) )
-      return 1;
-    return -1;
-  }
-  if ( s1 < s2 )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with weighted degree lexicographic
-* ordering (power series case)
-*/
-static int comp_Ws ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, s1 = 0, s2 = 0;
-
-  for ( i = f; i <= l; i++, w++ )
-  {
-    s1 += (int)pGetExp(p1,i)*(*w);
-    s2 += (int)pGetExp(p2,i)*(*w);
-  }
-  if ( s1 == s2 )
-  {
-    i = f;
-    while ( ( i <= l ) && ( pGetExp(p1,i) == pGetExp(p2,i) ) )
-      i++;
-    if ( i > l )
-      return 0;
-    if ( pGetExp(p1,i) < pGetExp(p2,i) )
-      return -1;
-    return 1;
-  }
-  if ( s1 < s2 )
-    return 1;
-  return -1;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with matrix order
-* w contains a series of l-f+1 lines
-*/
-static int comp_M ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, j, s1, s2;
-
-  for ( i = f; i <= l; i++ )
-  {
-    s1 = s2 = 0;
-    for ( j = f; j <= l; j++, w++ )
-    {
-      s1 += (int)pGetExp(p1,j)*(int)(*w);
-      s2 += (int)pGetExp(p2,j)*(int)(*w);
-    }
-    if ( s1 < s2 )
-      return -1;
-    if ( s1 > s2 )
-      return 1;
-    /* now w points to the last element of the current row, the next w++ */
-    /* moves on to the first element of the next row ! */
-  }
-  return 0;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with weight vector
-*/
-static int comp_a  ( poly p1, poly p2, int f, int l, short * w )
-{
-  int i, s1 = 0, s2 = 0;
-
-  for ( i = f; i <= l; i++, w++ )
-  {
-    s1 += (int)pGetExp(p1,i)*(*w);
-    s2 += (int)pGetExp(p2,i)*(*w);
-  }
-  if ( s1 > s2 )
-    return 1;
-  if ( s1 < s2 )
-    return -1;
-  return 0;
-}
-
-/*2
-* compare the head monomial of p1 and p2 with module component
-*/
-static int comp_c  ( poly p1, poly p2, int f, int l, short * w )
-{
-  if ( pGetComp(p1) > pGetComp(p2) )
-    return -pComponentOrder;
-  if ( pGetComp(p1) < pGetComp(p2) )
-    return pComponentOrder;
-  return 0;
-}
-
-/*---------------------------------------------------------------*/
-
-/*2
-* compare p1 and p2 by a block ordering
-* uses (*bcomph[])() to do the real work
-*/
-static int BlockComp(poly p1, poly p2)
-{
-  int res, i, e, a;
-
-  /*4 compare in all blocks,*
-  * each block has var numbers a(=block0[i]) to e (=block1[i])*
-  * the block number starts with 0*/
-  e = 0;
-  i = 0;
-  loop
-  {
-    a = block0[i];
-    e = block1[i];
-    res = (*bcomph[i])(p1, p2, a, e , polys_wv[i]);
-    if (res)
-      return res;
-    i++;
-    if (order[i]==0)
-      break;
-  }
-  return 0;
-}
 
 int pComp(poly p1, poly p2)
 {
@@ -582,6 +255,18 @@ int pComp(poly p1, poly p2)
   if (p1==NULL)
     return -1;
   return pComp0(p1,p2);
+}
+
+
+int rComp0(poly p1, poly p2)
+{
+  register long d;
+
+  _pMonComp(p1, p2, d, goto NotEquals, return 0);
+
+  NotEquals:
+  if (d < 0) return -1;
+  return 1;
 }
 
 /*----------pComp handling for syzygies---------------------*/
@@ -777,7 +462,7 @@ int pModuleOrder()
 */
 int pDeg(poly a)
 {
-  return (a->Order);
+  return pGetOrder(a);
 }
 
 /*2
@@ -829,6 +514,7 @@ int pWTotaldegree(poly p)
         break;
       case ringorder_c:
       case ringorder_C:
+      case ringorder_S:
         break;
       case ringorder_a:
         for (k=block0[i];k<=block1[i];k++)
@@ -869,7 +555,7 @@ static int ldeg0(poly p,int *l)
     ll++;
   }
   *l=ll;
-  return (p->Order);
+  return pGetOrder(p);
 }
 
 /*2
@@ -915,7 +601,7 @@ static int ldeg0c(poly p,int *l)
 static int ldegb(poly p,int *l)
 {
   Exponent_t k= pGetComp(p);
-  int o = p->Order;
+  int o = pFDeg(p);
   int ll=1;
 
   while (((p=pNext(p))!=NULL) && (pGetComp(p)==k))
@@ -977,167 +663,6 @@ static int ldeg1c(poly p,int *l)
 /* set the variables for a choosen ordering                 */
 
 
-/*
-* sets the comparision routine for monomials: for simple monomial orderings
-* Priority is given to exponent vector
-*/
-static void SimpleChoose(int o_r, int comp_order, pCompProc *p)
-{
-  switch(o_r)
-  {
-      case ringorder_dp:
-      case ringorder_wp:
-      case ringorder_ds:
-      case ringorder_ws:
-      case ringorder_ls:
-      case ringorder_unspec:
-        pGetVarIndicies_RevLex(pVariables, pVarOffset, pVarCompIndex,
-                               pVarLowIndex, pVarHighIndex);
-        pLexSgn = -1;
-        if (comp_order == ringorder_C || o_r == ringorder_unspec)
-        {
-          *p = pComp_otEXPCOMP;
-        }
-        else
-        {
-          // component is compatible with exponent vector
-          *p = pComp_otEXP;
-        }
-        break;
-
-#ifdef PDEBUG
-      case ringorder_lp:
-      case ringorder_Dp:
-      case ringorder_Wp:
-      case ringorder_Ds:
-      case ringorder_Ws:
-#else
-      default:
-#endif
-        pGetVarIndicies_Lex(pVariables, pVarOffset, pVarCompIndex,
-                            pVarLowIndex, pVarHighIndex);
-        pLexSgn = 1;
-        if (comp_order == ringorder_c)
-        {
-          *p = pComp_otEXPCOMP;
-        }
-        else
-        {
-          // component is compatible with exponent vector
-          *p = pComp_otEXP;
-        }
-#ifdef PDEBUG
-        break;
-      default:
-        Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
-#endif
-  }
-
-  if (o_r == ringorder_lp || o_r == ringorder_ls)
-  {
-    pLexOrder=TRUE;
-    pFDeg = pTotaldegree;
-    pLDeg = ldeg1c;
-    if (o_r == ringorder_ls)
-      pGetVarIndicies_Lex(pVariables, pVarOffset, pVarCompIndex,
-                          pVarLowIndex, pVarHighIndex);
-
-  }
-}
-
-/*
-* sets the comparision routine for monomials: for simple monomial orderings
-* Priority is given to component
-*/
-static void SimpleChooseC(int o_r, pCompProc *p)
-{
-  switch(o_r)
-  {
-      case ringorder_dp:
-      case ringorder_wp:
-      case ringorder_ds:
-      case ringorder_ls:
-      case ringorder_ws:
-        pGetVarIndicies_RevLex(pVariables, pVarOffset, pVarCompIndex,
-                               pVarLowIndex, pVarHighIndex);
-        pLexSgn = -1;
-        *p = pComp_otCOMPEXP;
-        break;
-
-#ifdef PDEBUG
-      case ringorder_lp:
-      case ringorder_Dp:
-      case ringorder_Wp:
-      case ringorder_Ds:
-      case ringorder_Ws:
-#else
-      default:
-#endif
-        pGetVarIndicies_Lex(pVariables, pVarOffset, pVarCompIndex,
-                            pVarLowIndex, pVarHighIndex);
-        pLexSgn = 1;
-        *p = pComp_otCOMPEXP;
-#ifdef PDEBUG
-        break;
-      default:
-        Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
-#endif
-  }
-  if (o_r == ringorder_lp || o_r == ringorder_ls)
-  {
-    pLexOrder=TRUE;
-    pFDeg = pTotaldegree;
-    pLDeg = ldeg1c;
-    if (o_r == ringorder_ls)
-        pGetVarIndicies_Lex(pVariables, pVarOffset, pVarCompIndex,
-                            pVarLowIndex, pVarHighIndex);
-  }
-}
-
-/*2
-* sets pSetm
-* (according o_r = order of first block)
-*/
-static void SetpSetm(int o_r, int ip)
-{
-  switch(o_r)
-  {
-    case ringorder_lp:
-    case ringorder_ls:
-      if (pVariables>1)
-        pSetm= setlex2;
-      else
-        pSetm= setlex1;
-      break;
-    case ringorder_dp:
-    case ringorder_Dp:
-    case ringorder_ds:
-    case ringorder_Ds:
-    case ringorder_unspec:
-      pSetm= setdeg1;
-      break;
-    case ringorder_a:
-    case ringorder_wp:
-    case ringorder_Wp:
-    case ringorder_ws:
-    case ringorder_Ws:
-    case ringorder_M:
-      pSetm= setdeg1w;
-      firstwv=polys_wv[ip];
-      break;
-    case ringorder_c:
-    case ringorder_C:
-      return;
-      /*do not set firstBlockEnds for this orderings*/
-#ifdef TEST
-    default:
-      Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
-#endif
-  }
-  firstBlockEnds=block1[ip];
-}
-
-
 /*2
 * sets the comparision routine for monomials: for all but the first
 * block of variables (ip is the block number, o_r the number of the ordering)
@@ -1147,58 +672,28 @@ static void HighSet(int ip, int o_r)
   switch(o_r)
   {
     case ringorder_lp:
-      bcomph[ip]=comp_lp;
-      if (pOrdSgn==-1) pMixedOrder=TRUE;
-      break;
     case ringorder_dp:
-      bcomph[ip]=comp_dp;
-      if (pOrdSgn==-1) pMixedOrder=TRUE;
-      break;
     case ringorder_Dp:
-      bcomph[ip]=comp_Dp;
-      if (pOrdSgn==-1) pMixedOrder=TRUE;
-      break;
     case ringorder_wp:
-      bcomph[ip]=comp_wp;
-      if (pOrdSgn==-1) pMixedOrder=TRUE;
-      break;
     case ringorder_Wp:
-      bcomph[ip]=comp_Wp;
+    case ringorder_a:
       if (pOrdSgn==-1) pMixedOrder=TRUE;
       break;
     case ringorder_ls:
-      bcomph[ip]=comp_ls;
-      break;
     case ringorder_ds:
-      bcomph[ip]=comp_ds;
-      break;
     case ringorder_Ds:
-      bcomph[ip]=comp_Ds;
-      break;
     case ringorder_ws:
-      bcomph[ip]=comp_ws;
-      break;
     case ringorder_Ws:
-      bcomph[ip]=comp_Ws;
       break;
     case ringorder_c:
       pComponentOrder=1;
-      bcomph[ip]=comp_c;
       break;
     case ringorder_C:
+    case ringorder_S:
       pComponentOrder=-1;
-      bcomph[ip]=comp_c;
       break;
     case ringorder_M:
-      bcomph[ip]=comp_M;
       pMixedOrder=TRUE;
-      break;
-    case ringorder_a:
-      if (pOrdSgn==-1) pMixedOrder=TRUE;
-      if (ip==0)
-        bcomph[0]=comp1a;
-      else
-        bcomph[ip]=comp_a;
       break;
 #ifdef TEST
     default:
@@ -1212,20 +707,11 @@ static void HighSet(int ip, int o_r)
 * change all variables to fit the description of the new ring
 */
 
-void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
-         short ** wv)
-{
-  sip_sring tmpR;
-  memset(&tmpR, 0, sizeof(sip_sring));
-  tmpR.N = n;
-  tmpR.OrdSgn = Sgn;
-  tmpR.order = orders;
-  tmpR.block0 = b0;
-  tmpR.block1 = b1;
-  tmpR.wvhdl = wv;
-  rComplete(&tmpR);
-  pSetGlobals(&tmpR);
-}
+//void pChangeRing(ring newRing)
+//{
+//  rComplete(newRing);
+//  pSetGlobals(newRing);
+//}
 
 void pSetGlobals(ring r, BOOLEAN complete)
 {
@@ -1239,32 +725,14 @@ void pSetGlobals(ring r, BOOLEAN complete)
   pVariables = r->N;
 
   // set the various size parameters and initialize memory
-  if ((((pVariables+1)*sizeof(Exponent_t)) % sizeof(void*)) == 0)
-    pVariables1W = (pVariables+1)*sizeof(Exponent_t) / sizeof(void*);
-  else
-    pVariables1W = ((pVariables+1)*sizeof(Exponent_t) / sizeof(void*)) + 1;
-
-  if ((((pVariables)*sizeof(Exponent_t)) % sizeof(void*)) == 0)
-    pVariablesW = (pVariables)*sizeof(Exponent_t) / sizeof(void*);
-  else
-    pVariablesW = ((pVariables)*sizeof(Exponent_t) / sizeof(void*)) + 1;
-
-  pMonomSize = POLYSIZE + (pVariables + 1) * sizeof(Exponent_t);
-  if ((pMonomSize % sizeof(void*)) == 0)
-  {
-    pMonomSizeW = pMonomSize/sizeof(void*);
-  }
-  else
-  {
-    pMonomSizeW = pMonomSize/sizeof(void*) + 1;
-    pMonomSize = pMonomSizeW*sizeof(void*);
-  }
+  pMonomSize = POLYSIZE + r->ExpLSize * sizeof(long);
+  pMonomSizeW = pMonomSize/sizeof(void*);
 
   // Initialize memory management
-  mmSpecializeBlock(pMonomSize);
+  mm_specHeap = r->mm_specHeap;
 
   pVarOffset = r->VarOffset;
-  
+
   pOrdSgn = r->OrdSgn;
   pVectorOut=(r->order[0]==ringorder_c);
   order=r->order;
@@ -1272,52 +740,77 @@ void pSetGlobals(ring r, BOOLEAN complete)
   block1=r->block1;
   firstwv=NULL;
   polys_wv=r->wvhdl;
+  if (order[0]==ringorder_S)
+  {
+    order++;
+    block0++;
+    block1++;
+    polys_wv++;
+  }
+  pFDeg=pTotaldegree;
   /*------- only one real block ----------------------*/
   pLexOrder=FALSE;
   pMixedOrder=FALSE;
-  pFDeg=pDeg;
   if (pOrdSgn == 1) pLDeg = ldegb;
   else              pLDeg = ldeg0;
   /*======== ordering type is (_,c) =========================*/
   if ((order[0]==ringorder_unspec)
   ||(
-    ((order[1]==ringorder_c)||(order[1]==ringorder_C))
+    ((order[1]==ringorder_c)||(order[1]==ringorder_C)||(order[1]==ringorder_S))
     && (order[0]!=ringorder_M)
     && (order[2]==0))
   )
   {
     if ((order[0]!=ringorder_unspec)
-    && (order[1]==ringorder_C))
+    && ((order[1]==ringorder_C)||(order[1]==ringorder_S)))
       pComponentOrder=-1;
     if (pOrdSgn == -1) pLDeg = ldeg0c;
-    SimpleChoose(order[0],order[1], &pComp0);
-    SetpSetm(order[0],0);
+    if ((order[0] == ringorder_lp) || (order[0] == ringorder_ls))
+    {
+      pLexOrder=TRUE;
+      pLDeg = ldeg1c;
+    }
+    if (order[0] == ringorder_wp || order[0] == ringorder_Wp ||
+        order[0] == ringorder_ws || order[0] == ringorder_Ws)
+      pFDeg = pWTotaldegree;
+    firstBlockEnds=block1[0];
   }
   /*======== ordering type is (c,_) =========================*/
-  else if (((order[0]==ringorder_c)||(order[0]==ringorder_C))
+  else if (((order[0]==ringorder_c)
+    ||(order[0]==ringorder_C)
+    ||(order[0]==ringorder_S))
   && (order[1]!=ringorder_M)
   &&  (order[2]==0))
   {
     /* pLDeg = ldeg0; is standard*/
-    if (order[0]==ringorder_C)
+    if ((order[0]==ringorder_C)||(order[0]==ringorder_S))
       pComponentOrder=-1;
-    SimpleChooseC(order[1], &pComp0);
-    SetpSetm(order[1],1);
+    if ((order[1] == ringorder_lp) || (order[1] == ringorder_ls))
+    {
+      pLexOrder=TRUE;
+      pLDeg = ldeg1c;
+    }
+    firstBlockEnds=block1[1];
+    if (order[1] == ringorder_wp || order[1] == ringorder_Wp ||
+        order[1] == ringorder_ws || order[1] == ringorder_Ws)
+      pFDeg = pWTotaldegree;
   }
   /*------- more than one block ----------------------*/
   else
   {
-    pGetVarIndicies(pVariables, pVarOffset, pVarCompIndex, pVarLowIndex,
-                    pVarHighIndex);
+    //pGetVarIndicies(pVariables, pVarOffset, pVarCompIndex, pVarLowIndex,
+    //                pVarHighIndex);
     //pLexOrder=TRUE;
     pVectorOut=order[0]==ringorder_c;
-    if ((pVectorOut)||(order[0]==ringorder_C))
+    if ((pVectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S))
     {
       if(block1[1]!=pVariables) pLexOrder=TRUE;
+      firstBlockEnds=block1[1];
     }
     else
     {
       if(block1[0]!=pVariables) pLexOrder=TRUE;
+      firstBlockEnds=block1[0];
     }
     /*the number of orderings:*/
     i = 0;
@@ -1326,12 +819,12 @@ void pSetGlobals(ring r, BOOLEAN complete)
     {
       i--;
       HighSet(i, order[i]);/*sets also pMixedOrder to TRUE, if...*/
-      SetpSetm(order[i],i);
     }
     while (i != 0);
 
-    pComp0 = BlockComp;
-    if ((order[0]!=ringorder_c)&&(order[0]!=ringorder_C))
+    if ((order[0]!=ringorder_c)
+    &&(order[0]!=ringorder_C)
+    &&(order[0]!=ringorder_S))
     {
       pLDeg = ldeg1c;
     }
@@ -1347,12 +840,15 @@ void pSetGlobals(ring r, BOOLEAN complete)
     {
       test &= ~Sy_bit(OPT_REDTAIL); /* noredTail */
     }
+    pSetm=rSetm;
+    pComp0=rComp0;
   }
+  if (pFDeg!=pWTotaldegree) pFDeg=pTotaldegree;
 }
 
 /* -------------------------------------------------------- */
 
-static BOOLEAN pMultT_nok;
+static Exponent_t pMultT_nok;
 /*2
 * update the polynomial a by multipying it by
 * the (number) coefficient
@@ -1422,27 +918,14 @@ poly pMultT(poly a, poly exp )
       else
 #endif
       {
-        for (i=pVariables; i != 0; i--)
+        if (pMultT_nok)  /* comp of exp != 0 */
         {
-           pAddExp(a,i, pGetExp(exp,i));
-        }
-        #ifdef TEST_MAC_ORDER
-        if (bNoAdd)
-          pSetm(a);
-        else
-        #endif
-          a->Order += exp->Order;
-        if (pMultT_nok)
-        {
-          if (pGetComp(a) == 0)
-          {
-             pSetComp(a, pGetComp(exp));
-          }
-          else
+          if (pGetComp(a) != 0)
           {
             return NULL /*FALSE*/;
           }
         }
+        pAddCompVector(a,exp);
       }
       prev=a;
       pIter(a);
@@ -1926,7 +1409,6 @@ poly pTakeOutComp(poly * p, int k)
   return result;
 }
 
-
 // Splits *p into two polys: *q which consists of all monoms with
 // component == comp and *p of all other monoms *lq == pLength(*q)
 void pTakeOutComp(poly *r_p, Exponent_t comp, poly *r_q, int *lq)
@@ -2029,6 +1511,7 @@ void pDecrOrdTakeOutComp(poly *r_p, Exponent_t comp, Order_t order,
   *lq = l;
 }
 
+#if 1
 poly pTakeOutComp1(poly * p, int k)
 {
   poly q = *p;
@@ -2077,6 +1560,7 @@ poly pTakeOutComp1(poly * p, int k)
   }
   return result;
 }
+#endif
 
 void pDeleteComp(poly * p,int k)
 {
@@ -2226,7 +1710,7 @@ static poly pSubst1 (poly p,int n)
   int l = pLength(p) - 1;
   poly* monoms = (poly*) Alloc(l*sizeof(poly));
   int i;
-  
+
   for (i=0; i<l; i++)
   {
     if (pGetExp(p, n) != 0)
@@ -2261,7 +1745,7 @@ static poly pSubst2 (poly p,int n, number e)
   number nn, nm;
   int exp;
   assume( ! nIsZero(e) );
-  
+
   if (p == NULL) return NULL;
   if (pNext(p) == NULL)
   {
@@ -2281,7 +1765,7 @@ static poly pSubst2 (poly p,int n, number e)
   int l = pLength(p) - 1;
   poly* monoms = (poly*) Alloc(l*sizeof(poly));
   int i;
-  
+
   for (i=0; i<l; i++)
   {
     exp = pGetExp(p, n);
@@ -2322,7 +1806,7 @@ poly pSubst0(poly p, int n)
   spolyrec res;
   poly h = &res;
   pNext(h) = p;
-  
+
   while (pNext(h)!=NULL)
   {
     if (pGetExp(pNext(h),n)!=0)
@@ -2449,4 +1933,19 @@ int pWeight(int i)
     return 1;
   }
   return firstwv[i-1];
+}
+
+void pAddCompVector(poly p,poly exp)
+{
+  // p+=exp
+  int i=currRing->ExpLSize-1;
+  for(;i>=0;i--)
+    p->exp.l[i]+=exp->exp.l[i];
+}
+void pAddCompVector(poly p,poly exp1, poly exp2)
+{
+  // p=exp1+exp2
+  int i=currRing->ExpLSize-1;
+  for(;i>=0;i--)
+    p->exp.l[i]=exp1->exp.l[i]+exp2->exp.l[i];
 }

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.25 1999-07-09 14:06:47 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.26 1999-09-27 15:05:26 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -61,13 +61,13 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
 
 /***************************************************************
  *
- * Inlines 
+ * Inlines
  *
  ***************************************************************/
 
-// 
+//
 // Predicates which examine nodes for primitive Singular types
-// 
+//
 #define fr(cond)    if (! (cond)) return FALSE
 
 inline BOOLEAN IsIntVecNode(MPT_Node_pt node)
@@ -99,7 +99,7 @@ inline BOOLEAN IsRingNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   BOOLEAN mv;
-  
+
   //for the timne being, we only accept DDP's
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
@@ -107,11 +107,11 @@ inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
     mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == mpsr_Success;
 }
 
-inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r, 
+inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r,
                                 BOOLEAN &IsUnOrdered)
 {
   BOOLEAN mv;
-  
+
   //for the timne being, we only accept DDP's
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
@@ -119,7 +119,7 @@ inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r,
     mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == mpsr_Success;
 }
 
-inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r, 
+inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r,
                            BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_PolyDict, MP_CopPolyIdeal));
@@ -191,11 +191,11 @@ inline void InitReal32Leftv(mpsr_leftv mlv, MPT_Arg_t r32)
   mlv->r = mpsr_rDefault(-1);
   mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
 }
-  
+
 inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
 {
   int pos;
-  
+
   if (quote <= 0)
   {
     idhdl h = mpsr_FindIdhdl(name, mlv->r);
@@ -207,7 +207,7 @@ inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
     else
     {
       poly p;
-      
+
       pos = mpsr_rDefault(0, name, mlv->r);
       mpsr_SetCurrRing(mlv->r, TRUE);
       p = pOne();
@@ -233,7 +233,7 @@ inline mpsr_Status_t mpsr_GetIntLeftv(MPT_Node_pt node, mpsr_leftv mlv)
   return mpsr_Success;
 }
 
-inline mpsr_Status_t mpsr_GetReal32Leftv(MPT_Node_pt node, mpsr_leftv mlv) 
+inline mpsr_Status_t mpsr_GetReal32Leftv(MPT_Node_pt node, mpsr_leftv mlv)
 {
   mpsr_assume(node->type == MP_Real32Type);
   InitReal32Leftv(mlv, node->nvalue);
@@ -267,11 +267,11 @@ inline mpsr_Status_t mpsr_GetIdentifierLeftv(MPT_Node_pt node, mpsr_leftv mlv,
     id = MP_STRING_T(node->nvalue);
     node->nvalue = NULL;
   }
-  
+
   InitIdentifierLeftv(mlv, id, quote);
 
   if (proc_annot != NULL) mlv->lv->rtyp = PROC_CMD;
-    
+
   return mpsr_Success;
 }
 
@@ -304,7 +304,7 @@ mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
   mlv1.r = NULL;
 
   status = (MP_InitMsg(link) == MP_Success ? mpsr_Success : mpsr_MP_Failure);
-  
+
   if (status == mpsr_Success && ! MP_TestEofMsg(link))
     status = mpsr_GetLeftv(link, &mlv, 0);
   else
@@ -326,7 +326,7 @@ mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
   {
     // Now mlv is our leftv -- check whether r has an ordering set
     if (mlv.r != NULL && mlv.r->order[0] == ringorder_unspec)
-    { 
+    {
         ring r = rCopy(mlv.r);
         r->order[0] = ringorder_dp;
         mpsr_rSetOrdSgn(r);
@@ -334,13 +334,13 @@ mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
         rKill(mlv.r);
         mlv.r = r;
     }
-      
+
     mpsr_SetCurrRingHdl(mlv.r);
 
     lv = mlv.lv;
   }
-  else lv = mpsr_InitLeftv(NONE, NULL); 
-  
+  else lv = mpsr_InitLeftv(NONE, NULL);
+
   return status;
 }
 
@@ -373,30 +373,30 @@ mpsr_Status_t mpsr_GetLeftv(MP_Link_pt link, mpsr_leftv mlv, short quote)
     {
         case MP_ApIntType:
           failr(mpsr_GetApIntLeftv(node, mlv));
-          break;        
+          break;
 
         case MP_StringType:
           failr(mpsr_GetStringLeftv(node, mlv));
-          break;        
+          break;
 
         case MP_Real32Type:
           failr(mpsr_GetReal32Leftv(node, mlv));
-          break;        
-        
+          break;
+
         case MP_CommonOperatorType:
           failr(mpsr_GetCommonOperatorLeftv(link, node, mlv, quote));
-          break;        
+          break;
 
         case MP_OperatorType:
           failr(mpsr_GetOperatorLeftv(link, node, mlv, quote));
-          break;        
+          break;
 
         default:
           MPT_DeleteNode(node);
           return mpsr_SetError(mpsr_UnknownMPNodeType);
     }
   }
-  
+
   // everything was ok
   MPT_DeleteNode(node);
   return mpsr_Success;
@@ -414,7 +414,7 @@ mpsr_Status_t mpsr_GetCommonOperatorLeftv(MP_Link_pt link,
 {
   mpsr_assume(node->type == MP_CommonOperatorType);
   BOOLEAN IsUnOrdered;
-  
+
   // Check for Singular data types
   // IntVec
   if (IsIntVecNode(node))
@@ -425,7 +425,7 @@ mpsr_Status_t mpsr_GetCommonOperatorLeftv(MP_Link_pt link,
   // Ring
   else if (IsRingNode(node, mlv->r, IsUnOrdered))
     return GetRingLeftv(link, node, mlv);
-  // Poly 
+  // Poly
   else if (IsPolyNode(node, mlv->r, IsUnOrdered))
     return GetPolyLeftv(link, node, mlv, IsUnOrdered);
   // PolyVector
@@ -442,7 +442,7 @@ mpsr_Status_t mpsr_GetCommonOperatorLeftv(MP_Link_pt link,
     return GetMatrixLeftv(link, node, mlv, IsUnOrdered);
   else if (IsQuitNode(node))
     return GetQuitLeftv(mlv);
-  // Map 
+  // Map
   else
     // now it should be a command (which handles Proc, Map and List
     // seperately)
@@ -457,7 +457,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
   mpsr_assume(node->type == MP_OperatorType);
   MP_NumChild_t nc = node->numchild, i;
   mpsr_sleftv smlv1, *mlv1 = &smlv1;
-  
+
 
   if (MPT_ProtoAnnotValue(node) != NULL)
     return mpsr_SetError(mpsr_CanNotHandlePrototype);
@@ -471,7 +471,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
       failr(mpsr_MergeLeftv(mlv, mlv1));
     }
   }
-  
+
   command cmd = (command) Alloc0(sizeof(sip_command));
   cmd->op = PROC_CMD;
   cmd->arg1.rtyp = STRING_CMD;
@@ -488,7 +488,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
   mlv->lv = mpsr_InitLeftv(COMMAND, (void *) cmd);
   return mpsr_Success;
 }
-  
+
 /***************************************************************
  *
  * Get*Leftv routines
@@ -535,7 +535,7 @@ static mpsr_Status_t GetIntMatLeftv(MP_Link_pt link, MPT_Node_pt node,
   mp_failr(IMP_GetSint32Vector(link, &v, node->numchild));
   mlv->lv = mpsr_InitLeftv(INTMAT_CMD, (void *) iv);
   return mpsr_Success;
-}  
+}
 
 static mpsr_Status_t GetRingLeftv(MP_Link_pt link, MPT_Node_pt node,
                                 mpsr_leftv mlv)
@@ -557,7 +557,7 @@ static mpsr_Status_t GetPolyLeftv(MP_Link_pt link, MPT_Node_pt node,
   poly p;
 
   mpsr_assume(mlv->r != NULL);
-  
+
   failr(mpsr_GetPoly(link, p, node->numchild, mlv->r));
   if (IsUnOrdered) p = pOrdPolyMerge(p);
   pTest(p);
@@ -571,7 +571,7 @@ static mpsr_Status_t GetPolyVectorLeftv(MP_Link_pt link, MPT_Node_pt node,
   poly p;
 
   mpsr_assume(mlv->r != NULL);
-  
+
   failr(mpsr_GetPolyVector(link, p, node->numchild, mlv->r));
   if (IsUnOrdered) p = pOrdPolyMerge(p);
   pTest(p);
@@ -607,9 +607,9 @@ static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
   MP_Uint32_t nmon, rank = 1;
   MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict,
                                      MP_AnnotPolyModuleRank);
-  if (annot != NULL && 
+  if (annot != NULL &&
       annot->value != NULL &&
-      annot->value->node->type == MP_Uint32Type 
+      annot->value->node->type == MP_Uint32Type
       )
     rank = MP_UINT32_T(annot->value->node->nvalue);
 
@@ -668,9 +668,9 @@ static mpsr_Status_t GetPackageLeftv(MP_Link_pt link, MPT_Node_pt node,
                                      mpsr_leftv mlv)
 {
   package pack = (package) Alloc0(sizeof(sip_package));
-  
+
   pack->language = LANG_NONE;
-  
+
   if (node->numchild > 0)
   {
     failr(mpsr_GetLeftv(link, mlv, 0));
@@ -684,7 +684,7 @@ static mpsr_Status_t GetPackageLeftv(MP_Link_pt link, MPT_Node_pt node,
 
   mlv->lv->data = (void*) pack;
 
-  MPT_Annot_pt annot = MPT_Annot(node, MP_SingularDict, 
+  MPT_Annot_pt annot = MPT_Annot(node, MP_SingularDict,
                                  MP_AnnotSingularPackageType);
   if (annot != NULL && annot->value != NULL && annot->value->node)
   {
@@ -694,8 +694,8 @@ static mpsr_Status_t GetPackageLeftv(MP_Link_pt link, MPT_Node_pt node,
   }
   return mpsr_Success;
 }
-  
-    
+
+
 static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
                                mpsr_leftv mlv)
 {
@@ -703,7 +703,7 @@ static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
 
   if (node->numchild != 3)
     return mpsr_SetError(mpsr_WrongNumofArgs);
-  
+
   failr(mpsr_GetLeftv(link, mlv, 0));
   failr(mpsr_GetLeftv(link, mlv1, 0));
   failr(mpsr_GetLeftv(link, mlv2, 0));
@@ -735,7 +735,7 @@ static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
 
   FreeL(mlv1->lv->data);
   Free(mlv1->lv, sizeof(sleftv));
-  
+
   Free(id, sizeof(sip_sideal));
   Free(mlv2->lv, sizeof(sleftv));
 
@@ -745,7 +745,7 @@ static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
   return mpsr_Success;
 }
 
-  
+
 static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
                                         mpsr_leftv mlv, short quote)
 {
@@ -753,8 +753,8 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
   MP_NumChild_t nc = node->numchild, i;
   mpsr_sleftv smlv1, *mlv1 = &smlv1;
   MPT_Tree_pt typespec;
-  
-  
+
+
   failr(mpsr_mp2tok(node->dict, MP_COMMON_T(node->nvalue), &tok));
 
   if ((typespec = MPT_ProtoAnnotValue(node)) &&
@@ -846,7 +846,7 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
   return mpsr_Success;
 }
 
-  
+
 /***************************************************************
  *
  * The routine for Getting External Data
@@ -860,7 +860,7 @@ MPT_Status_t mpsr_GetExternalData(MP_Link_pt link,
                                   MPT_Node_pt node)
 {
   *odata = NULL;
-  
+
   if (node->type == MP_CommonOperatorType)
   {
     mpsr_sleftv mlv;
@@ -890,9 +890,9 @@ MPT_Status_t mpsr_GetExternalData(MP_Link_pt link,
     return MPT_NotExternalData;
 }
 
-    
+
 /***************************************************************
- *  
+ *
  * A routine which gets the previous dump of Singular
  *
  ***************************************************************/
@@ -913,7 +913,7 @@ mpsr_Status_t mpsr_GetDump(MP_Link_pt link)
       command cmd = (command) mlv.lv->data;
       fprintf(stdout, "Dump got %s \n", cmd->arg1.name);
       fflush(stdout);
-#endif      
+#endif
       mpsr_SetCurrRingHdl(mlv.r);
       if (mlv.lv != NULL)
       {

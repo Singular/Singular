@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.22 1999-07-28 17:51:07 Singular Exp $ */
+/* $Id: structs.h,v 1.23 1999-09-27 15:05:33 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -117,6 +117,69 @@ struct _scmdnames
 };
 typedef struct _scmdnames cmdnames;
 
+typedef enum
+{
+  ro_dp, // ordering is a degree ordering
+  ro_wp, // ordering is a weighted degree ordering
+  ro_cp, // ordering duplicates variables
+  ro_syzcomp, // ordering indicates "subset" of component number
+  ro_none
+}
+ro_typ;
+
+// ordering is a degree ordering
+struct sro_dp
+{
+  short place;  // where degree is stored (in L):
+  short start;  // bounds of ordering (in E):
+  short end;
+};
+typedef struct sro_dp sro_dp;
+
+// ordering is a weighted degree ordering
+struct sro_wp
+{
+  short place;  // where weighted degree is stored (in L)
+  short start;  // bounds of ordering (in E)
+  short end;
+  int *weights; // pointers into wvhdl field
+};
+typedef struct sro_wp sro_wp;
+
+// ordering duplicates variables
+struct sro_cp
+{
+  short place;  // where start is copied to (in E)
+  short start;  // bounds of sources of copied variables (in E)
+  short end;
+};
+typedef struct sro_cp sro_cp;
+
+// ordering indicates "subset" of component number
+struct sro_syzcomp
+{
+  short place;  // where the index is stored (in L)
+  long *ShiftedComponents; // pointer into index field
+  int* Components;
+#ifdef PDEBUG
+  long length;
+#endif
+};
+typedef struct sro_syzcomp sro_syzcomp;
+
+
+struct sro_ord
+{
+  ro_typ  ord_typ;
+  union
+  {
+     sro_dp dp;
+     sro_wp wp;
+     sro_cp cp;
+     sro_syzcomp syzcomp;
+  } data;
+};
+
 struct sip_sring
 {
   idhdl      idroot; /* local objects */
@@ -125,31 +188,54 @@ struct sip_sring
   int*       block1; /* ending pos.*/
   char**     parameter; /* names of parameters */
   number     minpoly;
-  short**    wvhdl;  /* array of weight vectors */
+  int**      wvhdl;  /* array of weight vectors */
   char **    names;  /* array of variable names */
-  /* extension to the ring structure: qring */
-  ideal      qideal;
+
+  // what follows below here should be set by rComplete, _only_
+  long      *ordsgn;  /* array of +/- 1 (or 0) for comparing monomials */
+                       /*  ExpLSize entries*/
+
+  // is NULL for lp or N == 1, otherwise non-NULL (with OrdSize > 0 entries) */
+  sro_ord *  typ;   /* array of orderings + sizes, OrdSize entries */
+
+  ideal      qideal; /* extension to the ring structure: qring */
+
+  int      *VarOffset; /* mapping exp. of var(i) -> p->exp.e[VarOffset[i]] */
+
+  memHeap   mm_specHeap; /* Heap from where monoms are allocated */
 #ifdef SDRING
   short      partN;
 #endif
   short      ch;     /* characteristic */
   short      ch_flags; /* additional char-flags */
+
   short      N;      /* number of vars */
 
   short      P;      /* number of pars */
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
-
-  short      ref;
-
   // what follows below here should be set by rComplete, _only_
-  int       *VarOffset;   /* controls indexing of exponents */
-  short     VarCompIndex; /* location of component in exp vector */
-  short     VarLowIndex;  /* lowest index of an exponent */
-  short     VarHighIndex; /* Highest index of an expoentn */
+  short      pVarLowIndex;  /* lowest index of a variable */
+  short      pVarHighIndex; /* highest index of a variable */
+                            /* pVarLow to pVarHigh */
+  // contains component, but no weight fields in E */
+  // better: pVarLowIndexE / pVarLowIndexL
+  short      pDivLow;
+  short      pDivHigh; /* the same as pVarLow..pVarHigh, */
+                       /* but as index in the 'long' field */
 
-#ifdef RDEBUG
-  short      no; /* unique id for rings */
-#endif
+  short      pCompLowIndex; // better: use pCompareLowIndexL
+  short      pCompHighIndex; /* use p->exp.l[pCompLowIndex..ppCompHighIndex] */
+                             /* for comparing monomials */
+  short      pCompLSize; // pCompHighIndex - pCompLowIndex + 1
+
+  short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
+  short      pOrdIndex; /* p->exp.l[pOrdIndex] is pGetOrd(p) */
+
+  short      ExpESize; /* size of exponent vector in Exponent_t */
+  short      ExpLSize; /* size of exponent vector in long */
+  short      OrdSize; /* size of ord vector (in sro_ord) */
+
+  short      ref; /* reference counter to the ring */
 };
 
 struct sip_sideal
