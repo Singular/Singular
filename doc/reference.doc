@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.14 1998-04-29 11:42:02 Singular Exp $
+@comment $Id: reference.doc,v 1.15 1998-04-29 12:16:06 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1369,7 +1369,7 @@ resp. parameters.
 @c @item @strong{Example:}
 @example
 @c example
-  ring r=0,(x,y,z),Dp;
+  ring r=0,(x,y,z),dp;
   ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
   option(redSB);   // force the computation of a reduced SB
   i=std(i);
@@ -1419,9 +1419,9 @@ input will come from new file @file{filename}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the position of the substring
+returns the first position of the substring
 in the string or 0 (if not found),
-@*start the search at the position given in the 3rd argument
+@*start the search at the position given in the 3rd argument.
 @item @strong{Example:}
 @example
 @c example
@@ -1457,11 +1457,12 @@ dimensional and given as a reduced Groebner basis in the current ring.
 @item @strong{Example:}
 @example
 @c example
-  ring r=0,(x,y), dp;
-  ideal k = jacob(x5+y11+xy9+x3y9);
+  ring  r= 0,(x,y,z), dp;
+  ideal i= y3+x2, x2y+x2, z4-x2-y;
   option(redSB);  // force computation of reduced basis
-  k=std(k);
-  finduni(k);
+  i= std(i);
+  ideal k= finduni(i);
+  print(k);
 @c example
 @end example
 @end table
@@ -1493,6 +1494,8 @@ gen(1), @dots{} , gen(n)
 @c example
   ring r= 32003,(x,y),(c,dp);
   freemodule(3);
+  matrix m = freemodule(3); // generates the 3x3 unit matrix
+  print(m);
 @c example
 @end example
 @end table
