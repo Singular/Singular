@@ -105,14 +105,9 @@ TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
 	${testdir}/mpcheck ${testdir}/mpcheck.data \
 	${testdir}/dbm_test.in ${testdir}/dbm_test.out
 
-DOCS=${docdir}/Makefile.in ${docdir}/copyright.tex ${docdir}/doc2tex.c \
-	${docdir}/examples.doc ${docdir}/examples.tex ${docdir}/proc.tex \
-	${docdir}/singular.doc ${docdir}/start.doc \
-	${docdir}/start.tex ${docdir}/tutor.tex ${docdir}/singular.tex 
-
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
-	${INCS} ${DOCS}
+	${INCS}
 
 OBJS=grammar.o scanner.o matpol.o binom.o\
      febase.o feread.o timer.o intvec.o attrib.o lists.o\
@@ -266,7 +261,6 @@ distclean: clean
 	-rm -f depend iparith.inc mpsr_Tok.inc 
 	-rm -f Singular* *.gprof *.bprof *~ .\#*
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
-	cd ${docdir}; ${MAKE} distclean
 
 maintainer-clean: distclean
 	@echo "This command is intended for maintainers to use;"
