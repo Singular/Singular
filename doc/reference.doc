@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.116 1999-07-01 16:12:29 obachman Exp $
+@comment $Id: reference.doc,v 1.117 1999-07-02 09:29:26 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6611,6 +6611,12 @@ can be set using the command line options @code{--min-time} and
 
 How to use @code{timer} in order to measure the time for a sequence of
 commands, see example below.
+
+@item @strong{Note for Windows95/98:}
+The value of the @code{timer} can not be used (resp. trusted) when
+@sc{Singular} is run under Windows95/98 (this is due to the shortcomings 
+of the Windows95/98 operating system). Use @ref{rtimer}, instead.
+
 @item @strong{Example:}
 @example
 @c example
@@ -6681,7 +6687,9 @@ See @ref{int}.
 int
 @item @strong{Purpose:}
 identical to @code{timer} (@pxref{timer}), except that real times (i.e.,
-wall-clock) times are reported, instead of CPU times.
+wall-clock) times are reported, instead of CPU times. This can be
+trusted on all operating systems (including Windows95/98).
+
 @end table
 @c ---------------------------------------
 @node voice,, rtimer, System variables

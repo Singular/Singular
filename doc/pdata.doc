@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.11 1999-07-01 16:12:28 obachman Exp $
+@comment $Id: pdata.doc,v 1.12 1999-07-02 09:29:24 obachman Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -249,7 +249,9 @@ computes a normal form of a polynomial f in a quotient ring (cf.@:
 @c --------------------------------------------------------------------------
 @node Introduction to orderings, General definitions for orderings, , Monomial orderings
 @subsection Introduction to orderings
-@cindex orderings, monomial orderings, term orderings
+@cindex orderings introduction
+@cindex term orderings introduction
+@cindex monomial orderings introduction
 
 @sc{Singular} offers a great variety of monomial orderings which provide
 an enourmous functionality, if used diligently. However, this
@@ -285,7 +287,9 @@ result in much less efficient computations.
 @c --------------------------------------------------------------------------
 @node General definitions for orderings, Global orderings, Introduction to orderings, Monomial orderings
 @subsection General definitions for orderings
-@cindex orderings, monomial orderings, term orderings
+@cindex orderings
+@cindex term orderings
+@cindex monomial orderings
 
 @tex
 A monomial ordering (term ordering) on $K[x_1, \ldots, x_n]$ is
@@ -335,7 +339,7 @@ x_i), local orderings satisfy 1 > x_i for each variable.
 If some variables are ordered globally and others locally we
 call it a mixed ordering.   Local or mixed orderings are not wellorderings.
 
-If K is the groundfield, x = (x_1, @dots{}, x_n) the
+If K is the ground field, x = (x_1, @dots{}, x_n) the
 variables and < a monomial ordering, then Loc K[x] denotes the
 localization of K[x] with respect to the multiplicatively closed set @{1 +
 g | g = 0 or g in K[x]\@{0@} and L(g) < 1@}.   L(g)
