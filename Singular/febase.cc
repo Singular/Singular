@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.56 1998-06-16 18:09:46 obachman Exp $ */
+/* $Id: febase.cc,v 1.57 1998-06-18 17:11:52 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -337,7 +337,7 @@ static char* feGetInfoFile(const char* bindir)
   FILE *file = feFopen("singular.hlp", "r", hlpfile, 0);
   if (file != NULL)
   {
-    close(file);
+    fclose(file);
     return feFixFileName(hlpfile);
   }
   *hlpfile = '\0';
