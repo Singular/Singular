@@ -1,5 +1,5 @@
-// emacs edit mode for this file is -*- C++ -*-
-/* $Id: factory.template,v 1.5 1997-05-06 15:24:24 schmidt Exp $ */
+/* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: factory.template,v 1.6 1997-06-19 12:36:20 schmidt Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
@@ -77,4 +77,4 @@ extern "C" {
 #include "singext.h"
 #endif
 
-#endif /* INCL_FACTORY_H */
+#endif /* ! INCL_FACTORY_H */
