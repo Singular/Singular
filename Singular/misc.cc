@@ -747,5 +747,8 @@ char * versionString()
               StringAppend("-g,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
-              return StringAppend("search path %s", feGetSearchPath());
+              StringAppend("SearchPath : %s\n", feGetSearchPath());
+              StringAppend("Singular   : %s\n", feGetExpandedExecutable());
+              StringAppend("InfoFile   : %s\n", feGetInfoFile());
+              return StringAppend("InfoProgram: %s", feGetInfoProgram());
 }
