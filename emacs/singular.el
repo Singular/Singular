@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.46 1999-09-20 19:37:11 obachman Exp $
+;; $Id: singular.el,v 1.47 1999-10-22 11:43:57 obachman Exp $
 
 ;;; Commentary:
 
@@ -1016,13 +1016,13 @@ the user, otherwise it is expanded using `expand-file-name'."
     (singular-send-string process string)))
 
 (defvar singular-load-library-history nil
-  "History list for loading of singular libraries.
+  "History list for loading of Singular libraries.
 Is used by `singular-load-library'.")
 
 (defun singular-load-library (nonstdlib &optional file)
   "Read a Singular library (via 'LIB \"FILE\";').
 If called interactively asks for the name of a standard Singular
-library. If interactively called with a prefix argument asks for a file
+library. If called interactively with a prefix argument asks for a file
 name of a Singular library."
   (interactive "P")
   (let ((string (or file
@@ -2506,7 +2506,8 @@ Removes it and sets `singular-help-topic' accordingly."
 (defun singular-help-post-output-filter (&rest ignore)
   "Call `singular-help' if `singular-help-topic' is non-nil."
   (when singular-help-topic
-    (save-excursion (singular-help singular-help-topic))
+    (save-excursion 
+      (singular-help singular-help-topic))
     (setq singular-help-topic nil)))
 
 (defvar singular-help-topic-history nil
@@ -2789,7 +2790,7 @@ This function is called by `singular-exec'."
 
 (defun singular-completion-do (pattern beg end completion-alist)
   "Try completion on string PATTERN using alist COMPLETION-ALIST.
-Insert completed version of PATTERN as new text between BEG and END.
+Inserts completed version of PATTERN as new text between BEG and END.
 Assumes the COMPLETION-ALIST is not nil."
   (let ((completion (try-completion pattern completion-alist)))
     (cond ((eq completion t)
@@ -2810,10 +2811,10 @@ Assumes the COMPLETION-ALIST is not nil."
 
 (defun singular-dynamic-complete ()
   "Dynamic complete word before point.
-Perform file name completion if point is inside a string.
-Perform completion of Singular help topics if point is at the end of a 
+Performs file name completion if point is inside a string.
+Performs completion of Singular help topics if point is at the end of a 
 help command (\"help\" or \"?\").
-Otherwise perform completion of Singular commands."
+Otherwise performs completion of Singular commands."
   (interactive)
   ;; Check if we are inside a string. The search is done back to the
   ;; process-mark which should be the beginning of the current input.

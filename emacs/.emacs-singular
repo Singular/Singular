@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.4 1999-09-08 18:21:58 wichmann Exp $
+;;; $Id: .emacs-singular,v 1.5 1999-10-22 11:43:57 obachman Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -124,15 +124,14 @@
 
 ;; add global menus for Singular, Emacs version
 (unless (fboundp 'add-submenu)
-  (setq singular-start-map (make-sparse-keymap))
-  (define-key singular-start-map [menu-bar singular]
-    (cons "Singular" (make-sparse-keymap "Singular")))
-  (define-key singular-start-map [menu-bar singular restart]
+  (setq singular-start-map (make-sparse-keymap "Singular"))
+  (define-key singular-start-map [singular-other]
     '("Start..." . singular-other))
-  (define-key singular-start-map [menu-bar singular start-default]
+  (define-key singular-start-map [singular-default]
     '("Start default" . singular))
-  (setq menu-bar-final-item (append '(singular) menu-bar-final-items))
-  (use-local-map singular-start-map))
+  (setq menu-bar-final-items (append '(singular) menu-bar-final-items))
+  (define-key global-map [menu-bar singular] 
+    (cons "Singular" singular-start-map)))
 
 ;; add global menus for Singular, XEmacs version
 (when (fboundp 'add-submenu)
