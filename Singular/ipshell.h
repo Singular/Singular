@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.30 2003-12-09 18:15:26 Singular Exp $ */
+/* $Id: ipshell.h,v 1.31 2003-12-10 17:34:29 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -24,7 +24,6 @@ extern int  myynest;
 extern char *  currid;
 extern int     iiRETURNEXPR_len;
 extern sleftv *iiRETURNEXPR;
-const char sNoName[]="_";
 #ifdef USE_IILOCALRING
 extern ring   *iiLocalRing;
 #endif

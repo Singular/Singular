@@ -249,6 +249,9 @@ GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
+%.dl_o : %.cc
+	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -c $< -o $@
+
 all:	$(SING_EXEC)
 
 Singular-static: version.h
