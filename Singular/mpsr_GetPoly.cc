@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.14 1998-03-27 14:44:25 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.15 1998-04-07 18:35:26 obachman Exp $ */
 
 /***************************************************************
  *
@@ -241,6 +241,9 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
   {
     mpz_ptr gnum;
     y =  (number) Alloc0(sizeof(rnumber));
+#ifdef LDEBUG
+    y->debug = 123456;
+#endif
     y->s = 3;
     gnum = &(y->z);
     mpz_init(gnum);
@@ -259,6 +262,9 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     }
     *x =  (number) Alloc0(sizeof(rnumber));
     y = (number) *x;
+#ifdef LDEBUG
+    y->debug = 123456;
+#endif
     y->s = 1;
     failr(GetApInt(link, &(y->z)));
     return GetApInt(link, &(y->n));
@@ -281,6 +287,9 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
       // otherwise, make an apint out of it
       *x =  (number) Alloc0(sizeof(rnumber));
       y = (number) *x;
+#ifdef LDEBUG
+      y->debug = 123456;
+#endif
       mpz_init_set_ui(&(y->z), ui);
       y->s = 3;
     }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.7 1998-01-16 14:29:55 krueger Exp $ */
+/* $Id: mpsr_Put.cc,v 1.8 1998-04-07 18:35:27 obachman Exp $ */
 
 
 /***************************************************************
@@ -533,7 +533,9 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
       Print("Dumped Proc %s\n", IDID(h));
 #endif
     }
-    else if (IDTYP(h) != LINK_CMD)
+    // do not dump LIB string and Links
+    else if (!(IDTYP(h) == STRING_CMD && strcmp("LIB", IDID(h)) == 0) &&
+             IDTYP(h) != LINK_CMD)
     {
       cmd.arg1.name = IDID(h);
       memcpy(&(cmd.arg2), h, sizeof(sleftv));

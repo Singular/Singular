@@ -1,3 +1,10 @@
+1998-04-07  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* mpsr_Put.cc (mpsr_PutDump): dump does not dump LIB string any more
+
+	* extra.cc (jjSYSTEM): added System("whoami") to return full
+	executable pathname of running Singular
+
 Tue Apr  7 10:27:50 MET DST 1998 hannes
         * fixed scanner bug: ignoring { and } in <block> (scanner.l)
 

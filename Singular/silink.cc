@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.15 1998-02-27 16:28:01 Singular Exp $ */
+/* $Id: silink.cc,v 1.16 1998-04-07 18:35:27 obachman Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -458,7 +458,7 @@ BOOLEAN slDumpAscii(si_link l)
   if (! status ) status = DumpAsciiMaps(fd, h, NULL);
 
   if (currRingHdl != rh) rSetHdl(rh, TRUE);
-  fwrite("RETURN();\n",1,10,fd);
+  fprintf(fd, "RETURN();\n");
   fflush(fd);
   
   return status;
@@ -525,10 +525,10 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   // handle qrings separately
   if (type_id == QRING_CMD) return DumpQring(fd, h, type_str);
   
+  // do not dump LIB string
   if (type_id == STRING_CMD && strcmp("LIB", IDID(h)) == 0)
   {
-    if (fprintf(fd, "LIB \"%s\";\n", IDSTRING(h)) == EOF) return TRUE;
-    else return FALSE;
+    return FALSE;
   }
                                       
   // put type and name 
@@ -645,7 +645,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     fputc('"', fd);
     while (*pstr != '\0')
     {
-      if (*pstr == '"') fputc('\\', fd);
+      if (*pstr == '"' || *pstr == '\\')  fputc('\\', fd);
       fputc(*pstr, fd);
       pstr++;
     }
@@ -659,9 +659,9 @@ static int DumpRhs(FILE *fd, idhdl h)
       char *pstr = pi->data.s.body, c;
       fputc('"', fd);
       while (*pstr != '\0') {
-	if (*pstr == '"') fputc('\\', fd);
-	fputc(*pstr, fd);
-	pstr++;
+        if (*pstr == '"' || *pstr == '\\') fputc('\\', fd);
+        fputc(*pstr, fd);
+        pstr++;
       }
       fputc('"', fd);
     } else fputs("(null)", fd);

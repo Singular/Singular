@@ -1524,7 +1524,6 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-      assume(pComp0(b,a2) == 1);
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);

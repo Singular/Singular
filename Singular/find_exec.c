@@ -170,37 +170,9 @@ find_executable (const char *name)
   return NULL;
 }
 
-char* find_executable_path(const char *name)
-{
-  char *ef = find_executable(name);
-  char *temp, *temp2;
-  
-  temp2 = ef;
-  if (ef != NULL)
-  {
-    temp = NULL;
-    while (*ef != '\0')
-    {
-      if (*ef == '/') temp = ef;
-      ef++;
-    }
-    if (temp != NULL)
-    {
-      *temp = '\0';
-    }
-  }
-  return temp2;
-}
-
-  
 #else
 
 char* find_executable (const char *name)
-{
-  return NULL;
-}
-
-char* find_executable_path(const char *name)
 {
   return NULL;
 }

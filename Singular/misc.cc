@@ -674,7 +674,7 @@ char * versionString()
 {
   StringSet("\t");
 #ifdef HAVE_FACTORY
-              StringAppend("factory (%s),", factoryVersion);
+              StringAppend("factory(%s),", factoryVersion);
 #endif
 #ifdef HAVE_LIBFAC_P
               StringAppend("libfac(%s,%s),\n\t",libfac_version,libfac_date);

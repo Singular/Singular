@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.14 1997-12-03 16:58:54 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.15 1998-04-07 18:35:25 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -170,7 +170,9 @@ inline void InitIntLeftv(mpsr_leftv mlv, int i)
 inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
 {
   number n = (number) Alloc(sizeof(rnumber));
-
+#ifdef LDEBUG
+    n->debug=123456;
+#endif
   mlv->r = mpsr_rDefault(0);
   n->s = 3;
   memcpy(&(n->z), apint, sizeof(MP_INT));
@@ -845,8 +847,8 @@ mpsr_Status_t mpsr_GetDump(MP_Link_pt link)
   mpsr_sleftv mlv;
   mpsr_Status_t status = mpsr_Success;
 
-  MP_SkipMsg(link);
-  while ((! MP_TestEofMsg(link)) && (status == mpsr_Success))
+  status = (MP_InitMsg(link) == MP_Success ? mpsr_Success : mpsr_MP_Failure);
+  while ((status == mpsr_Success) && (! MP_TestEofMsg(link)))
   {
     status=mpsr_GetLeftv(link, &mlv, 0);
 

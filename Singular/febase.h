@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.10 1998-04-06 17:59:28 obachman Exp $ */
+/* $Id: febase.h,v 1.11 1998-04-07 18:35:23 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -65,6 +65,7 @@ enum   feBufferInputs
 };
 
 char*   feGetSearchPath(const char* argv0 = NULL);
+char*   feGetExpandedExecutable(const char* argv0 = NULL);
 FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
 void    fePause(void);
 void    Print(char* fmt, ...);

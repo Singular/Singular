@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.33 1998-04-06 17:59:27 obachman Exp $ */
+/* $Id: extra.cc,v 1.34 1998-04-07 18:35:21 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -244,13 +244,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     #endif
     #endif
     #endif
-#if 0
 /*==================== whoami ==================================*/
     if (strcmp((char*)(h->data), "whoami") == 0)
     {
-      res->rtype=STRING_CMD;
+      res->rtyp=STRING_CMD;
+      res->data=(void*)feGetExpandedExecutable();
+      if (res->data != NULL)
+        res->data = mstrdup((char*) res->data);
+      else
+        res->data = mstrdup("");
+      return FALSE;
     }
-#endif
 /*==================== HC ==================================*/
     if (strcmp((char*)(h->data),"HC")==0)
     {

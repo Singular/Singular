@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.27 1998-04-06 17:59:27 obachman Exp $ */
+/* $Id: febase.cc,v 1.28 1998-04-07 18:35:22 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -102,11 +102,47 @@ BOOLEAN tclmode=FALSE;
 #endif  /* MSDOS */
 #endif  /* macintosh */
 
-extern "C" char* find_executable_path(const char* argv0);
+extern "C" char* find_executable(const char* argv0);
 
 #define SINGULAR_RELATIVE_DATA_DIR "LIB"
 
 static char* SearchPath = NULL;
+static char* ExpandedExecutable = NULL;
+
+char* feGetExpandedExecutable(const char* argv0)
+{
+  if (ExpandedExecutable == NULL)
+  {
+    if (argv0 != NULL)
+      ExpandedExecutable = find_executable(argv0);
+  }
+  return ExpandedExecutable;
+}
+
+static char* feRemovePathnameHead(const char* ef)
+{
+  if (ef != NULL)
+  {
+    char *temp, *temp2, *temp3;
+
+    temp2 = mstrdup(ef);
+    temp3 = temp2;
+    temp = NULL;
+    while (*temp3 != '\0')
+    {
+      if (*temp3 == DIR_SEP) temp = temp3;
+      temp3++;
+    }
+    if (temp != NULL)
+    {
+      *temp = '\0';
+    }
+    return temp2;
+  }
+  else 
+    return NULL;
+}
+
 
 // Return the file search path for singular w.r.t. the following priorities:
 // Env-variables + Relative Data Dir + Burned-in data dir
@@ -124,7 +160,7 @@ char* feGetSearchPath(const char* argv0)
 #endif
   
     if (argv0 != NULL)
-      sibbling = find_executable_path(argv0);
+      sibbling = feRemovePathnameHead(feGetExpandedExecutable(argv0));
   
     if (env != NULL)
       plength = strlen(env) + 1;
