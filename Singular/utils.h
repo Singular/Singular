@@ -29,6 +29,7 @@ public:
   int    body_lineno;
   int    example_lineno;
   char   *body;
+  unsigned long help_chksum;
 };
 
 struct proc_object

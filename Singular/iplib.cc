@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.56 1999-05-03 12:26:58 Singular Exp $ */
+/* $Id: iplib.cc,v 1.57 1999-07-21 19:58:40 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -901,6 +901,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
   pi->data.s.body_lineno = 0;
   pi->data.s.example_lineno = 0;
   pi->data.s.body = NULL;
+  pi->data.s.help_chksum = 0;
   return(pi);
 }
 
