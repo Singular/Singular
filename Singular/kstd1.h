@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.6 1998-06-02 15:29:55 Singular Exp $ */
+/* $Id: kstd1.h,v 1.7 1998-12-09 16:22:15 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -22,8 +22,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);
 poly kNF (ideal F, ideal Q, poly p,int syzComp=0, int lazyReduce=0);
 ideal kNF(ideal F, ideal Q, ideal p,int syzComp=0, int lazyReduce=0);
 
-ideal kStd(ideal F, ideal Q, tHomog h, intvec ** w,intvec *hilb=NULL,
-          int syzComp=0,int newIdeal=0);
+ideal kStd(ideal F, ideal Q, tHomog h, intvec ** mw,intvec *hilb=NULL,
+          int syzComp=0,int newIdeal=0, intvec *vw=NULL);
 #ifdef STDTRACE
 lists TraceStd(leftv,int , ideal F, ideal Q, tHomog h, intvec ** w,intvec *hilb=NULL,
           int syzComp=0,int newIdeal=0);

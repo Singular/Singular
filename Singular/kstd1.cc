@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.28 1998-11-11 14:40:39 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.29 1998-12-09 16:22:15 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1843,7 +1843,7 @@ int kModDeg(poly p)
   return o+(*kModW)[i-1];
 }
 ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
-          int newIdeal)
+          int newIdeal, intvec *vw)
 {
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;

@@ -267,7 +267,7 @@ cmdnames cmds[] =
   { "sres",        0, SRES_CMD ,          CMD_2},
   #endif
   { "status",      0, STATUS_CMD,         CMD_M},
-  { "std",         0, STD_CMD ,           CMD_12},
+  { "std",         0, STD_CMD ,           CMD_123},
   { "string",      0, STRING_CMD ,        ROOT_DECL_LIST},
   { "subst",       0, SUBST_CMD ,         CMD_3},
   { "system",      0, SYSTEM_CMD,         CMD_M},
@@ -4066,6 +4066,29 @@ static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
   res->data = (void *) yes;
   return FALSE;
 }
+static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
+{
+  ideal result;
+  intvec *ww=(intvec *)atGet(u,"isHomog");
+  tHomog hom=testHomog;
+  if (ww!=NULL)
+  {
+    ww=ivCopy(ww);
+    hom=isHomog;
+  }
+  result=kStd((ideal)(u->Data()),
+              currQuotient,
+	      hom,
+	      &ww,                  // module weights
+	      (intvec *)v->Data(),  // hilbert series
+	      0,0,                  // syzComp, newIdeal
+              (intvec *)w->Data()); // weights of vars
+  idSkipZeroes(result);
+  res->data = (char *)result;
+  setFlag(res,FLAG_STD);
+  if (ww!=NULL) atSet(res,mstrdup("isHomog"),w,INTVEC_CMD);
+  return FALSE;
+}
 
 /*=================== operations with 3 args.: table =================*/
 struct sValCmd3 dArith3[]=
@@ -4133,6 +4156,8 @@ struct sValCmd3 dArith3[]=
 ,{jjRES3,           SRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
 #endif
 ,{jjSTATUS3,        STATUS_CMD, INT_CMD,    LINK_CMD,   STRING_CMD, STRING_CMD}
+,{jjSTD_HILB_W,     STD_CMD,    IDEAL_CMD,  IDEAL_CMD,  INTVEC_CMD, INTVEC_CMD}
+,{jjSTD_HILB_W,     STD_CMD,    MODUL_CMD,  MODUL_CMD,  INTVEC_CMD, INTVEC_CMD}
 ,{jjSUBST_P,        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD }
 ,{jjSUBST_P,        SUBST_CMD,  VECTOR_CMD, VECTOR_CMD, POLY_CMD,   POLY_CMD }
 ,{jjSUBST_Id,       SUBST_CMD,  IDEAL_CMD,  IDEAL_CMD,  POLY_CMD,   POLY_CMD }
