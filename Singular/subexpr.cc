@@ -9,10 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-
-#ifndef macintosh
 #include <unistd.h>
-#endif
 
 #include "mod2.h"
 #include "tok.h"
