@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.11 1998-06-26 16:16:03 schmidt Exp $ */
+/* $Id: int_rat.cc,v 1.12 1999-09-24 08:43:29 Singular Exp $ */
 
 #include <config.h>
 
@@ -741,6 +741,8 @@ InternalCF * InternalRational::normalize_myself()
 	mpz_div( &_num, &_num, &g );
 	mpz_div( &_den, &_den, &g );
     }
+    // Hier brauchen wir ein mpz_clear, J.M. 
+    mpz_clear( &g );
     if ( mpz_cmp_si( &_den, 0 ) < 0 ) {
 	mpz_neg( &_num, &_num );
 	mpz_neg( &_den, &_den );
