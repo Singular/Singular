@@ -1,8 +1,8 @@
-// $Id: finvar.lib,v 1.24 1999-12-10 16:43:31 obachman Exp $
+// $Id: finvar.lib,v 1.25 1999-12-13 15:53:37 obachman Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.24 1999-12-10 16:43:31 obachman Exp $"
+version="$Id: finvar.lib,v 1.25 1999-12-13 15:53:37 obachman Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS OF FINITE GROUPS
 AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de
@@ -17,7 +17,7 @@ MAIN PROCEDURES:
  primary_invariants()              primary invariants (p.i.)
  primary_invariants_random()       primary invariants, randomized alg.
 
-SUB-PROCEDURES:
+SUB PROCEDURES:
  cyclotomic()                      cyclotomic polynomial
  group_reynolds()                  finite group and Reynolds operator (R.o.)
  molien()                          Molien series (M.s.)

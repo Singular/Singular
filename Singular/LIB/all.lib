@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.22 1999-10-22 09:07:07 obachman Exp $
+// $Id: all.lib,v 1.23 1999-12-13 15:53:37 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.22 1999-10-22 09:07:07 obachman Exp $";
+version="$Id: all.lib,v 1.23 1999-12-13 15:53:37 obachman Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -14,7 +14,7 @@ LIBRARY:  all.lib   Load all libraries
   hnoether.lib  PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
   homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
   inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
-  invar.lib     PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
+  ainvar.lib    PROCEDURES FOR COMPUTING INVARIANTS OF (K,+)-ACTIONS
   latex.lib     PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN LATEX2E
   linalg.lib    PROCEDURES FOR PROCEDURES FOR ALGORITHMIC LINEAR ALGEBRA
   matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
