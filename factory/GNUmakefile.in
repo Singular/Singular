@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.5 1997-07-01 13:53:44 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.6 1997-07-11 10:28:50 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -20,7 +20,7 @@
 SHELL =		/bin/sh
 
 #
-# - versions.
+# - versions.  Do not change version here !!!
 #
 version =	@factory_version@
 distname =	factory-$(version)
@@ -43,9 +43,6 @@ VPATH =		@srcdir@
 # - the name of the game.
 #
 libfactory =	@libfactory@
-libmem =	@libmem@
-headerfactory =	@headerfactory@
-factoryconf =	@factoryconf@
 
 #
 # - programs.
@@ -96,10 +93,12 @@ uninstalltargets=@uninstalltargets@
 #
 WARNFLAGS =	-w
 
+# flags to translate library c files
 LIBCFLAGS =	$(WARNFLAGS) \
 		-I. -I$(srcdir) \
 		$(DEFS) $(CPPFLAGS) $(CFLAGS)
 
+# flags to translate library c++ files
 LIBCXXFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
 		-I. -I$(srcdir) \
 		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
@@ -110,8 +109,10 @@ TMPLCXXFLAGS =	$(WARNFLAGS) \
 		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
 
 # flags to link test programs
-TESTLDFLAGS = 	-L. \
-		$(LIBS) $(LDFLAGS)
+TESTCXXFLAGS =	$(LIBCXXFLAGS)
+
+# flags to link test programs
+TESTLDFLAGS = 	$(LIBS) $(LDFLAGS)
 
 # flags to create dependency lists
 DEPCXXFLAGS =	-I. -I$(srcdir) \
@@ -271,12 +272,12 @@ distmemmanincl := \
 templatesrc :=	\
 		ftmpl_array.cc \
 		ftmpl_factor.cc \
+		ftmpl_functions.h \
 		ftmpl_list.cc \
 		ftmpl_matrix.cc
 templateincl :=	\
 		ftmpl_array.h \
 		ftmpl_factor.h \
-		ftmpl_functions.h \
 		ftmpl_list.h \
 		ftmpl_matrix.h
 
@@ -307,10 +308,10 @@ distfiles :=	\
 #
 # - phony targets.
 #
-.PHONY:		all cf mem depend dist\
-		clean mostlyclean distclean maintainer-clean realmaintainer-clean \
-		install installcf installcflinks installmem installgftables \
-		uninstall uninstallcf uninstallcflinks uninstallmem uninstallgftables
+.PHONY:		all cf mem dist depend \
+		clean mostlyclean distclean maintainer-clean \
+		install installcf installmem installgftables \
+		uninstall uninstallcf uninstallmem uninstallgftables
 
 #
 # - pattern rules.
@@ -345,7 +346,7 @@ all:		$(alltargets)
 
 cf:		factoryconf.h factory.h $(libfactory)
 
-mem:		$(libmem)
+mem:		libcfmem.a
 
 #
 # - explicit targets.
@@ -354,7 +355,7 @@ $(libfactory):	$(factoryobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
 
-$(libmem):	$(memmanobj)
+libcfmem.a:	$(memmanobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
 
@@ -366,22 +367,24 @@ ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
 		$(addprefix templates/,$(templateincl))
 		$(CXX) -c $< $(TMPLCXXFLAGS) -o $@
 
-gengftables.o:	gengftables.cc factory.h cf_util.h gf_tabutil.h
+# this are not all dependencies, but the most important ones
+gengftables.o:	gengftables.cc factory.h gf_tabutil.h \
+		factoryconf.h config.h
 		@if test -z "$(filter mem,$(alltargets))" \
 		  || test -z "$(filter readcf.y,$(factorysrc))"; then \
-		  echo "You should configure --with-memman --enable-streamio"; \
+		  echo "You have to configure --with-memman --enable-streamio"; \
 		  echo "to make gengftables."; \
 		  exit 1; \
 		fi
-		$(CXX) -c $< $(LIBCXXFLAGS) -o $@
+		$(CXX) -c $< $(TESTCXXFLAGS) -o $@
 
-gengftables:	gengftables.o ftmpl_inst.o all
-		$(CXX) $< ftmpl_inst.o -lcf -lcfmem $(TESTLDFLAGS) -o $@
+gengftables:	gengftables.o ftmpl_inst.o $(libfactory) libcfmem.a
+		$(CXX) $< ftmpl_inst.o -L. -lcf -lcfmem $(TESTLDFLAGS) -o $@
 
 gftables:	gengftables
 		@echo "This command will take quite a long time to execute;"
 		@echo "maybe you want to get the tables directly via ftp (see"
-		@echo "INSTALL)."
+		@echo "the INSTALL file)."
 		$(MKINSTALLDIRS) gftables
 		./gengftables
 
@@ -401,21 +404,21 @@ installcf:	cf
 		$(MKINSTALLDIRS) $(includedir)
 		$(MKINSTALLDIRS) $(templatedir)
 		$(INSTALL_DATA) $(libfactory) $(libdir)/$(libfactory)
-		$(INSTALL_DATA) $(headerfactory) $(includedir)/$(headerfactory)
-		$(INSTALL_DATA) $(factoryconf) $(includedir)/$(factoryconf)
-		$(INSTALL_DATA) $(srcdir)/ftmpl_inst.cc $(templatedir)
+		$(INSTALL_DATA) factory.h $(includedir)/factory.h
+		$(INSTALL_DATA) factoryconf.h $(includedir)/factoryconf.h
+		$(INSTALL_DATA) $(srcdir)/ftmpl_inst.cc $(templatedir)/ftmpl_inst.cc
 		for file in $(templatesrc) $(templateincl); do \
-		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(templatedir); \
+		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(templatedir)/$$file; \
 		done
 
 installmem:	mem
 		$(MKINSTALLDIRS) $(libdir)
-		$(INSTALL_DATA) $(libmem) $(libdir)/$(libmem)
+		$(INSTALL_DATA) libcfmem.a $(libdir)/libcfmem.a
 
 installgftables: gftables
 		$(MKINSTALLDIRS) $(gftabledir)
 		for file in $</*; do \
-		  $(INSTALL_DATA) $$file $(gftabledir); \
+		  $(INSTALL_DATA) $$file $(gftabledir)/$$file; \
 		done
 
 #
@@ -424,19 +427,19 @@ installgftables: gftables
 uninstall:	$(uninstalltargets)
 
 uninstallcf:
-		-for file in $(templatesrc) $(templateincl) ftmpl_inst.cc; do \
+		-for file in $(templatesrc) $(templateincl); do \
 		  rm -f $(templatedir)/$$file; \
 		done
 		-rm -f $(templatedir)/ftmpl_inst.cc
-		-rm -f $(includedir)/$(factoryconf)
-		-rm -f $(includedir)/$(headerfactory)
+		-rm -f $(includedir)/factoryconf.h
+		-rm -f $(includedir)/factory.h
 		-rm -f $(libdir)/$(libfactory)
 		-rmdir $(templatedir)
 		-rmdir $(includedir)
 		-rmdir $(libdir)
 
 uninstallmem:
-		-rm -f $(libdir)/$(libmem)
+		-rm -f $(libdir)/libcfmem.a
 		-rmdir $(libdir)
 
 uninstallgftables:
@@ -461,8 +464,8 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 # - cleaning up.
 #
 clean:		
-		-rm -f $(libfactory) $(libmem) gengftables \
-		  factoryconf.h factory.h *.o *.d core *~
+		-rm -f $(libfactory) libcfmem.a gengftables \
+		  factoryconf.h factory.h *.o *.d
 
 # remove gftables only if we built them
 mostlyclean:	clean
@@ -481,11 +484,6 @@ maintainer-clean: distclean
 		@echo "it deletes files that require bison to rebuild."
 		-rm -f $(srcdir)/readcf.cc
 
-realmaintainer-clean: maintainer-clean
-		@echo "This command is intended for *real* maintainers to use; it"
-		@echo "deletes files that requires the autoconf tools to rebuild."
-		-rm -f $(srcdir)/configure
-
 #
 # - dependencies.
 #
@@ -495,8 +493,7 @@ realmaintainer-clean: maintainer-clean
 # require the dependencies.  say 'make depend' to create the
 # dependencies explicitly.
 #
-depend:		config.h factoryconf.h \
-		$(factorydep) $(memmandep) $(hdrtempldep)
+depend:		$(factorydep) $(memmandep) $(hdrtempldep)
 
 ifneq ($(wildcard *.d),)
   include $(factorydep) $(memmandep) $(hdrtempldep)
