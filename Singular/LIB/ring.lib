@@ -1,6 +1,6 @@
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.14 2000-12-22 14:33:13 greuel Exp $";
+version="$Id: ring.lib,v 1.15 2000-12-31 01:57:42 greuel Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -31,12 +31,12 @@ CREATE:  create a new ring with name `newr` and make it the basering if r is
          an existing ring [default: r=basering].
          The new ring differs from the old ring only in the characteristic.
          If, say, (newr,c) = (\"R\",\"0,A\") and the ring r exists, the new
-         basering will have name R characteristic 0 and one parameter A.
+         basering will have name R, characteristic 0 and one parameter A.
 RETURN:  No return value
 NOTE:    Works for qrings if map from old_char to new_char is implemented
          This proc uses 'execute' or calls a procedure using 'execute'.
          If you use it in your own proc, let the local names of your proc
-         start with @ (see the file HelpForProc)
+         start with @.
 EXAMPLE: example changechar; shows an example
 "
 {
@@ -88,7 +88,7 @@ CREATE:  create a new ring with name `newr` and make it the basering if r is
 RETURN:  No return value
 NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
          If you use it in your own proc, let the local names of your proc
-         start with @ (see the file HelpForProc)
+         start with @.
 EXAMPLE: example changeord; shows an example
 "
 {
@@ -146,7 +146,7 @@ NOTE:    This procedure is useful in connection with the procedure ringtensor,
          when a conflict between variable names must be avoided.
          This proc uses 'execute' or calls a procedure using 'execute'.
          If you use it in your own proc, let the local names of your proc
-         start with @ (see the file HelpForProc)
+         start with @.
 EXAMPLE: example changevar; shows an example
 "
 {
@@ -209,7 +209,7 @@ RETURN:  No return value
 NOTE:    This proc is useful for defining a ring in a procedure.
          This proc uses 'execute' or calls a procedure using 'execute'.
          If you use it in your own proc, let the local names of your proc
-         start with @ (see the file HelpForProc)
+         start with @.
 EXAMPLE: example defring; shows an example
 "
 {
@@ -324,26 +324,27 @@ proc extendring (string na, int n, string va, string o, list #)
          n,i=integers, r=ring, iv=intvec of positive integers or iv=0
 CREATE:  Define a ring with name `na` which extends the ring r by adding n new
          variables in front of [after, if i!=0] the old variables and make it
-         the basering [default: (i,r)=(0,basering)]
-         -- The characteristic is the characteristic of r
-         -- The new vars are derived from va. If va is a single letter, say
+         the basering [default: (i,r)=(0,basering)].
+@*       -- The characteristic is the characteristic of r.
+@*       -- The new vars are derived from va. If va is a single letter, say
             va=\"T\", and if n<=26 then T and the following n-1 letters from
             T..Z..T (resp. T(1..n) if n>26) are taken as additional variables.
             If va is a single letter followed by (, say va=\"x(\", the new
-            variables are x(1),...,x(n)
-         -- The ordering is the product ordering between the ordering of r and
-            an ordering derived from `o` [and iv]
-         -  If o contains a 'c' or a 'C' in front resp. at the end this is
+            variables are x(1),...,x(n).
+@*       -- The ordering is the product ordering between the ordering of r and
+            an ordering derived from `o` [and iv].
+@*        -  If o contains a 'c' or a 'C' in front resp. at the end this is
             taken for the whole ordering in front resp. at the end. If o does
             not contain a 'c' or a 'C' the same rule applies to ordstr(r).
-         -  If no intvec iv is given, or if iv=0, o may be any allowed ordstr,
-            like \"ds\" or \"dp(2),wp(1,2,3),Ds(2)\" or \"ds(a),dp(b),ls\" if a and b
-            are globally (!) defined integers and if a+b+1<=n
+@*        -  If no intvec iv is given, or if iv=0, o may be any allowed ordstr,
+            like \"ds\" or \"dp(2),wp(1,2,3),Ds(2)\" or \"ds(a),dp(b),ls\" if 
+            a and b are globally (!) defined integers and if a+b+1<=n. 
             If, however, a and b are local to a proc calling extendring, the
             intvec iv must be used to let extendring know the values of a and b
-         -  If an intvec iv !=0 is given, iv[1],iv[2],... is taken for the 1st,
-            2nd,... block of o, if o contains no substring \"w\" or \"W\" i.e. no
-            weighted ordering (in the above case o=\"ds,dp,ls\" and iv=a,b).
+@*        -  If an intvec iv !=0 is given, iv[1],iv[2],... is taken for the 
+            1st, 2nd,... block of o, if o contains no substring \"w\" or \"W\"
+            i.e. no weighted ordering (in the above case o=\"ds,dp,ls\" 
+            and iv=a,b).
             If o contains a weighted ordering (only one (!) weighted block is
             allowed) iv[1] is taken as size for the weight-vector, the next
             iv[1] values of iv are taken as weights and the remaining values of
@@ -391,7 +392,7 @@ EXAMPLE: example extendring; shows an example
 //----------------- prepare ordering if an intvec is given --------------------
    if( typeof(#[1])=="intvec" and #[1]!=0 )
    {
-      @k=n;                               //@k counts no of vars not yet ordered
+      @k=n;                             //@k counts no of vars not yet ordered
       @w=find(o,"w")+find(o,"W");o=o+" ";
       if( @w!=0 )
       {
@@ -447,22 +448,22 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,z),ds;
    show(r);"";
-   //no intvec given, no blocksize given: blocksize is derived from no of vars
+   //blocksize is derived from no of vars:
    int t=5;
    extendring("R1",t,"a","dp");         //t global: "dp" -> "dp(5)"
    show(R1); "";
    extendring("R2",4,"T(","c,dp",1,r);    //"dp" -> "c,..,dp(4)"
    show(R2);"";
 
-   //no intvec given, blocksize given: given blocksize is used
+   //no intvec given, blocksize given: given blocksize is used:
    extendring("R3",4,"T(","dp(2)",0,r);   // "dp(2)" -> "dp(2)"
    show(R3);"";
 
    //intvec given: weights and blocksize is derived from given intvec
    //(no specification of a blocksize in the given ordstr is allowed!)
-   //if intvec does not cover all given blocks, the last block is used for
-   //the remaining variables, if intvec has too many components, the last
-   //ones are ignored
+   //if intvec does not cover all given blocks, the last block is used
+   //for the remaining variables, if intvec has too many components,
+   //the last ones are ignored
    intvec v=3,2,3,4,1,3;
    extendring("R4",10,"A","ds,ws,Dp,dp",v,0,r);
          //v covers 3 blocks: v[1] (=3) : no of components of ws
@@ -492,8 +493,8 @@ NOTE:    As fetch, this procedure maps the 1st, 2nd, ... variable of R to the
          1st, 2nd, ... variable of the basering.
          The 3rd argument is useful in order to avoid conflicts of names, the
          empty string is allowed
-CAUTION: fetchall does not work inside a procedure
-         //***at the moment it does not work if R contains a map
+CAUTION: fetchall does not work inside a procedure.
+         It does not work if R contains a map.
 EXAMPLE: example fetchall; shows an example
 "
 {
@@ -509,17 +510,17 @@ EXAMPLE: example fetchall; shows an example
 }
 example
 {  "EXAMPLE:"; echo=2;
-// This example is not executed since fetchall does not work in a procedure;
-// (and hence not in the example procedure). Just try the following commands:;
+// The example is not shown since fetchall does not work in a procedure;
+// (and hence not in the example procedure). Try the following commands:
 //   ring R=0,(x,y,z),dp;
 //   ideal j=x,y2,z2;
 //   matrix M[2][3]=1,2,3,x,y,z;
 //   j; print(M);
 //   ring S=0,(a,b,c),ds;
-//   fetchall(R);           // map from R to S: x->a, y->b, z->c;
+//   fetchall(R);       //map from R to S: x->a, y->b, z->c;
 //   names(S);
 //   j; print(M);
-//   fetchall(S,"1");       // identity map of S: copy objects, change names;
+//   fetchall(S,"1");   //identity map of S: copy objects, change names
 //   names(S);
 //   kill R,S;
 }
@@ -538,7 +539,7 @@ NOTE:    As imap, this procedure maps the variables of R to the variables with
          The 3rd argument is useful in order to avoid conflicts of names, the
          empty string is allowed
 CAUTION: imapall does not work inside a procedure
-         //***at the moment it does not work if R contains a map
+         It does not work if R contains a map
 EXAMPLE: example imapall; shows an example
 "
 {
@@ -554,17 +555,17 @@ EXAMPLE: example imapall; shows an example
 }
 example
 {  "EXAMPLE:"; echo = 2;
-// This example is not executed since imapall does not work in a procedure
-// (and hence not in the example procedure). Just try the following commands:
+// The example is not shown since imapall does not work in a procedure
+// (and hence not in the example procedure). Try the following commands:
 //   ring R=0,(x,y,z,u),dp;
 //   ideal j=x,y,z,u2+ux+z;
 //   matrix M[2][3]=1,2,3,x,y,uz;
 //   j; print(M);
 //   ring S=0,(a,b,c,x,z,y),ds;
-//   imapall(R);           // map from R to S: x->x, y->y, z->z, u->0
+//   imapall(R);         //map from R to S: x->x, y->y, z->z, u->0
 //   names(S);
 //   j; print(M);
-//   imapall(S,"1");       // identity map of S: copy objects, change names
+//   imapall(S,"1");     //identity map of S: copy objects, change names
 //   names(S);
 //   kill R,S;
 }
@@ -577,15 +578,15 @@ CREATE:  map all objects of ring R (of type poly/ideal/vector/module/number/
          the jth generator of the ideal i. If no 3rd argument is present, the
          names are the same as in R. If, say, f is a poly in R and the 3rd
          argument is the string \"R\", then f is maped to f_R etc.
-RETURN:  no return value
+RETURN:  no return value.
 NOTE:    This procedure has the same effect as defining a map, say psi, by
          map psi=R,i; and then applying psi to all objects of R. In particular,
          maps from R to some ring S are composed with psi, creating thus a map
          from the basering to S.
          mapall may be combined with copyring to change vars for all objects.
          The 3rd argument is useful in order to avoid conflicts of names, the
-         empty string is allowed
-CAUTION: mapall does not work inside a procedure
+         empty string is allowed.
+CAUTION: mapall does not work inside a procedure.
 EXAMPLE: example mapall; shows an example
 "
 {
@@ -601,23 +602,23 @@ EXAMPLE: example mapall; shows an example
 }
 example
 {  "EXAMPLE:"; echo = 2;
-// This example is not executed since mapall does not work in a procedure
-// (and hence not in the example procedure). Just try the following commands:
+// The example is not shown since mapall does not work in a procedure
+// (and hence not in the example procedure). Try the following commands:
 //   ring R=0,(x,y,z),dp;
 //   ideal j=x,y,z;
 //   matrix M[2][3]=1,2,3,x,y,z;
 //   map phi=R,x2,y2,z2; 
 //   ring S=0,(a,b,c),ds;
 //   ideal i=c,a,b;
-//   mapall(R,i);             // map from R to S: x->c, y->a, z->b
+//   mapall(R,i);         //map from R to S: x->c, y->a, z->b
 //   names(S);
-//   j; print(M); phi;        // phi is a map from R to S: x->c2, y->a2, z->b2
+//   j; print(M); phi;    //phi maps R to S: x->c2, y->a2, z->b2
 //   ideal i1=a2,a+b,1;
-//   mapall(R,i1,\"\");         // map from R to S: x->a2, y->a+b, z->1
+//   mapall(R,i1,\"\");   //map from R to S: x->a2, y->a+b, z->1
 //   names(S);
 //   j_; print(M_); phi_;
-//   changevar(\"T\",\"x()\",R);  // change vars in R and call result T
-//   mapall(R,maxideal(1));   // identity map from R to T
+//   changevar(\"T\",\"x()\",R);  //change vars in R and call result T
+//   mapall(R,maxideal(1));       //identity map from R to T
 //   names(T);
 //   j; print(M); phi;
 //   kill R,S,T;
@@ -736,9 +737,9 @@ example
    type R;
    setring s;
    ideal i = a2+b3+c5;
-   changevar("S","x,y,z");      //set S (change vars of s to x,y,z) the basering
+   changevar("S","x,y,z");       //change vars of sand make S the basering
    qring qS =std(fetch(s,i));    //create qring of S mod i (maped to S)
-   changevar("T","d,e,f,g,h",t); //set T (change vars of t to d..h) the basering
+   changevar("T","d,e,f,g,h",t); //change vars of t and make T the basering
    qring qT=std(d2+e2-f3);       //create qring of T mod d2+e2-f3
    ringtensor("Q",s,qS,t,qT);
    type Q;
