@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.56 1999-07-01 16:12:31 obachman Exp $
+@comment $Id: singular.doc,v 1.57 1999-07-02 13:30:45 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -145,7 +145,8 @@ the characteristic of a prime field must be less than 32004
 @item
 the (weighted) degree of a monomial must be smaller than 2147483648
 @item
-the exponent of a ring variable must be smaller than 32768
+the exponent of a ring variable and the rank of any free module
+must be smaller than 32768
 @item
 a ring must have 505 variables or less
 @*(501 on a DEC Alpha)

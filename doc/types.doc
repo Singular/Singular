@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.88 1999-07-02 12:38:19 obachman Exp $
+@comment $Id: types.doc,v 1.89 1999-07-02 13:30:48 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -571,9 +571,9 @@ the value of @code{j}, see @ref{Limitations}.
   int j;
   i++; i;  i--; i;
   // ++ and -- do not return a value as in C, can not assign
-  j = i++; 
+  j = i++;
   // the value of j is unchanged
-  j; i; 
+  j; i;
   i+2, 2-i, 5^2;
   5 div 2, 8%3;
   1<2, 2<=2;
@@ -1863,7 +1863,7 @@ possible, coefficients are mapped in the following way:
 @item
 @tex
 % This is quite a hack, but for now it works.
-$Z/p \rightarrow Q, 
+$Z/p \rightarrow Q,
 \quad
 [i]_p \mapsto i \in [-p/2, \, p/2]
 \subseteq Z$
@@ -1873,7 +1873,7 @@ Z/p -> Q : [i]_p -> i in [-p/2, p/2] in Z
 @end ifinfo
 @item
 @tex
-$Z/p \rightarrow Z/p^\prime, 
+$Z/p \rightarrow Z/p^\prime,
 \quad
 [i]_p \mapsto i \in [-p/2, \, p/2] \subseteq Z, \;
 i \mapsto [i]_{p^\prime} \in Z/p^\prime$
@@ -2210,11 +2210,11 @@ second the column
 @c example
   ring r=32003,x,dp;
   matrix A[3][3] = 1,3,2,5,0,3,2,4,5; // define a matrix
-  print(A); // nice printing of small matrices  
+  print(A); // nice printing of small matrices
   A[2,3];   // matrix entry
   A[2,3] = A[2,3] + 1; // change entry
   A[2,1..3] = 1,2,3;   // change 2nd row
-  print(A); 
+  print(A);
   matrix E[3][3]; E = E + 1;  // the unit matrix
   matrix B =x*E - A;
   print(B);
@@ -2223,7 +2223,7 @@ second the column
   vector v =[ x,-1,x2];
   A*v; // multiplication of matrix and vector
   matrix m[2][2]=1,2,3;
-  print(m-transpose(m)); 
+  print(m-transpose(m));
 @c example
 @end example
 
@@ -2546,10 +2546,14 @@ of leading terms (see @ref{vdim})
 @cindex ground field
 @cindex field
 
-Numbers are elements from the coefficient field.
+Numbers are elements from the coefficient field (or ground field).
 They can only be defined or accessed with respect to a basering
 which determines the coefficient field. See @ref{ring declarations} for
 declarations of coefficient fields.
+
+@strong{Warning:} Beware of the special meaning of the letter @code{e}
+(immediatly following a sequence of digits) if the field is real (or complex).
+See @ref{number operations}, @ref{Miscellaneous oddities}.
 
 @menu
 * number declarations::
@@ -2576,16 +2580,48 @@ defines a number.
 @item Example:
 @example
 @c example
+  // finite field Z/p, p<= 32003
   ring r = 32003,(x,y,z),dp;
   number n = 4/6;
   n;
+  // finite field GF(p^n), p^n <= 32767
+  // z is a primitive root of the minimal polynomial
+  ring rg= (49,z),x,dp;
+  number n = 4/9+z;
+  n;
+  // the rational numbers
   ring r0 = 0,x,dp;
   number n = 4/6;
   n;
-  ring R=real,x,dp;
+  // algebraic extensions of Z/p or Q
+  ring ra=(0,a),x,dp;
+  minpoly=a^2+1;
+  number n=a3+a2+2a-1;
+  n;
+  a^2;
+  // transcedental extensions of Z/p or Q
+  ring rt=(0,a),x,dp;
+  number n=a3+a2+2a-1;
+  n;
+  a^2;
+  // machine floating point numbers, single precision
+  ring R_0=real,x,dp;
   number n=4/6;
   n;
-//  n=0.25e+2;
+  n=0.25e+2;
+  n;
+  // floating point numbers, arbitrary prescribed precision
+  ring R_1=(real,50),x,dp;
+  number n=4.0/6;
+  n;
+  n=0.25e+2;
+  n;
+  // floating point complex numbers, arbitrary prescribed precision
+  // the third parameter gives the name of the imaginary unit
+  ring R_2=(real,50,i),x,dp;
+  number n=4.0/6;
+  n;
+  n=0.25e+2*i+n;
   n;
 @c example
 @end example
@@ -2631,7 +2667,7 @@ a type cast to number
   leadcoef(f);
   typeof(_);
   ring rr =real,x,dp;
-//  1.7e-2; 1.7e+2; // are valid (but  1.7e2 not), if the field is `real`
+  1.7e-2; 1.7e+2; // are valid (but  1.7e2 not), if the field is `real`
   ring rp = (31,t),x,dp;
   2/3, 4/8, 2/2 ; // are numbers
   poly g = (3t2 +1)*x2 +1;
@@ -3262,15 +3298,14 @@ For a detailed description of the concept of rings see
 @menu
 * ring declarations::
 * ring related functions::
+* ring operations::
 @end menu
 
-@c TBC: ring operations --> + 
+@c ---------------------------------------
 @node ring declarations, ring related functions, ring, ring
 @subsection ring declarations
 @cindex ring declarations
 
-
-@c ---------------------------------------
 @table @strong
 @item Syntax:
 @code{ring} name @code{= (} coefficient_field @code{),}
@@ -3320,7 +3355,7 @@ consists of only one entry, the parentheses around this entry may be
 omitted.
 
 @c ---------------------------------------
-@node ring related functions,  , ring declarations, ring
+@node ring related functions, ring operations, ring declarations, ring
 @subsection ring related functions
 @cindex ring related functions
 
@@ -3347,6 +3382,11 @@ names of all ring variables or the
 name of the n-th ring variable (see @ref{varstr})
 @end table
 
+@c ---------------------------------------
+@node ring operations, , ring related functions, ring
+@subsection ring operations
+@cindex ring operations
+@c TBC: ring operations --> +
 @c ---------------------------------------
 @node string, vector, ring, Data types
 @section string
