@@ -1,17 +1,22 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_util.h,v 1.1 1996-06-27 11:34:25 stobbe Exp $
+// $Id: fac_util.h,v 1.2 1996-07-08 08:22:02 stobbe Exp $
 
 #ifndef INCL_FAC_UTIL_H
 #define INCL_FAC_UTIL_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/06/27 11:34:25  stobbe
+"New function dviremainder.
+"
+
 Revision 1.0  1996/05/17 10:59:40  stobbe
 Initial revision
 
 */
 
 #include "canonicalform.h"
+#include "cf_eval.h"
 
 /*BEGINPUBLIC*/
 
@@ -42,6 +47,16 @@ CanonicalForm remainder( const CanonicalForm & f, const CanonicalForm & g, const
 
 void divremainder( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & quot, CanonicalForm & rem, const modpk & pk );
 
+CanonicalForm maxCoeff( const CanonicalForm & f );
+
+bool Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const modpk & bound, const Variable & x );
+
 /*ENDPUBLIC*/
+
+bool gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap );
+
+CanonicalForm ezgcd ( const CanonicalForm & f, const CanonicalForm & g );
+
+void extgcd ( const CanonicalForm & a, const CanonicalForm & b, CanonicalForm & S, CanonicalForm & T, const modpk & pk );
 
 #endif /* INCL_FAC_UTIL_H */

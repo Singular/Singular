@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_util.cc,v 1.1 1996-06-27 11:34:24 stobbe Exp $
+// $Id: fac_util.cc,v 1.2 1996-07-08 08:22:02 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/06/27 11:34:24  stobbe
+"New function dviremainder.
+"
+
 Revision 1.0  1996/05/17 10:59:46  stobbe
 Initial revision
 
@@ -10,6 +14,8 @@ Initial revision
 
 #include "assert.h"
 #include "cf_defs.h"
+#include "canonicalform.h"
+#include "cf_iter.h"
 #include "fac_util.h"
 
 static CanonicalForm PK, PKHALF;
@@ -143,6 +149,21 @@ divremainder( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & 
 }
 
 CanonicalForm
+maxCoeff( const CanonicalForm & f )
+{
+    if ( f.inCoeffDomain() )
+	return abs( f );
+    else {
+	CanonicalForm M = 0, m;
+	for ( CFIterator i = f; i.hasTerms(); i++ )
+	    if ( (m = maxCoeff( i.coeff() )) > M )
+		M = m;
+	return M;
+    }
+}
+
+
+CanonicalForm
 mappksymmetric ( const CanonicalForm & f )
 {
     CanonicalForm result = mod( f, PK );
@@ -157,3 +178,37 @@ mappk ( const CanonicalForm & f )
 {
     return mod( f, PK );
 }
+
+void
+extgcd ( const CanonicalForm & a, const CanonicalForm & b, CanonicalForm & S, CanonicalForm & T, const modpk & pk )
+{
+    int p = pk.getp(), k = pk.getk(), j;
+    CanonicalForm amodp, bmodp, smodp, tmodp, s, t, sigma, tau, e;
+    CanonicalForm modulus = p, sigmat, taut, q;
+
+    setCharacteristic( p );
+    {
+	amodp = mapinto( a ); bmodp = mapinto( b );
+	(void)extgcd( amodp, bmodp, smodp, tmodp );
+    }
+    setCharacteristic( 0 );
+    s = mapinto( smodp ); t = mapinto( tmodp );
+
+    for ( j = 1; j < k; j++ ) {
+	e = ( 1 - s * a - t * b ) / modulus;
+	setCharacteristic( p );
+	{
+	    e = mapinto( e );
+	    sigmat = smodp * e;
+	    taut = tmodp * e;
+	    divrem( sigmat, bmodp, q, sigma );
+	    tau = taut + q * amodp;
+	}
+	setCharacteristic( 0 );
+	s += mapinto( sigma ) * modulus;
+	t += mapinto( tau ) * modulus;
+	modulus *= p;
+    }
+    S = s; T = t;
+}
+
