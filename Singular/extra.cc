@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.11 1997-05-02 07:44:48 Singular Exp $ */
+/* $Id: extra.cc,v 1.12 1997-06-30 17:04:42 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -52,6 +52,9 @@
 #include "clapconv.h"
 #include "kstdfac.h"
 #endif
+
+#include "silink.h"
+#include "mpsr.h"
 
 //void emStart();
 /*2
@@ -514,6 +517,40 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       }
       else
         WerrorS("ideal expected");
+    }
+/*==================== indsetall =============================*/
+    if(strcmp((char*)(h->Data()),"ftest")==0)
+    {
+      MP_Link_pt rlink = (MP_Link_pt) ((si_link) h->next->Data())->data;
+//      MP_Link_pt wlink = (MP_Link_pt) ((si_link) h->next->next->Data())->data;
+      MPT_Tree_pt tree1 = NULL, tree2;
+
+      MPT_GetExternalData = MPT_DefaultGetExternalData;
+      if (MP_InitMsg(rlink) != MP_Success)
+      {
+        WerrorS("Init failed\n");
+        return TRUE;
+      }
+      
+      if (MPT_GetTree(rlink, &tree1) != MPT_Success)
+      {
+        WerrorS("GetTree failed\n");
+        return TRUE;
+      }
+        
+//      MPT_CpyTree(&tree2, tree1);
+//      MPT_DeleteTree(tree1);
+//      tree2 = tree1;
+//      tree2 = MPT_UntypespecTree(tree2);
+//      MPT_PutTree(link, tree2);
+      MP_Sint32_t ch;
+      MPT_Tree_pt var_tree;
+      MP_Common_t ordering;
+      MPT_IsDDPTree(tree1, &ch, &var_tree, &ordering);
+      MPT_CpyTree(&tree2, tree1);
+      tree1 = MPT_DDP_2_ExpTree(tree1);
+      MPT_DeleteTree(tree1);
+      return FALSE;
     }
     else
 /*============================================================*/

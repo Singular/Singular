@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.7 1997-05-04 11:11:54 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.8 1997-06-30 17:04:48 obachman Exp $ */
 
 /***************************************************************
  *
@@ -443,9 +443,18 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
     // Algebraic numbers are 
     // a fraction of two Dense Dist Polys
     mp_failr(MP_PutCommonMetaOperatorPacket(link,
+                                            MP_BasicDict,
+                                            MP_CopBasicDiv,
+                                            1,
+                                            0));
+    mp_failr(MP_PutAnnotationPacket(link,
+                                    MP_ProtoDict,
+                                    MP_AnnotProtoPrototype,
+                                    MP_AnnotReqValNode));
+    mp_failr(MP_PutCommonMetaOperatorPacket(link,
                                             MP_PolyDict,
-                                            MP_CopPolyDenseDistPolyFrac,
-                                            mpsr_GetNumOfRingAnnots(alg_r,0),
+                                            MP_CopPolyDenseDistPoly,
+                                            mpsr_GetNumOfRingAnnots(alg_r, 0),
                                             0));
     failr(mpsr_PutRingAnnots(link, alg_r, 0));
 

@@ -110,7 +110,7 @@ config.status : configure
 	./config.status --recheck
 
 configure: configure.in
-	echo "You need to rerun autoconf. I am proceeding, for now."
-	touch configure
+	@echo "You need to rerun autoconf. I am proceeding, for now."
+	@touch configure
 # 	autoconf 
 #

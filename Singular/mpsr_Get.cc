@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.10 1997-05-02 22:09:27 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.11 1997-06-30 17:04:45 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -697,11 +697,12 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
   short tok;
   MP_NumChild_t nc = node->numchild, i;
   mpsr_sleftv smlv1, *mlv1 = &smlv1;
+  MPT_Tree_pt typespec;
   
   
   failr(mpsr_mp2tok(node->dict, MP_COMMON_T(node->nvalue), &tok));
 
-  if (MPT_GetProtoTypespec(node) != NULL)
+  if ((typespec = MPT_GetProtoTypespec(node)) && MPT_IsTrueProtoTypeSpec(typespec))
     return mpsr_SetError(mpsr_CanNotHandlePrototype);
 
   if (tok == MAP_CMD) return GetMapLeftv(link, node, mlv);

@@ -1,4 +1,14 @@
+Fri Jun 20 12:18:10 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* tesths.cc (main): fixed condition of mprs_ttGen execution
+
+Thu Jun 19 10:49:10 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* mpsr_Put.h: corrected efinitions of MP_AnnotReqValTree, MP_AnnotReqValNode
+
 Tue Jun 17 11:47:47 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Makefile.in (Singular): added mod2.h to dependencies of iparith.inc
 
 	* tok.h: no discrimination of mac for inline definition any more
 

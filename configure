@@ -35,7 +35,7 @@ ac_help="$ac_help
   --with-PACKAGE          use PACKAGE, provide dependent functionality
   --without-PACKAGE       do not use PACKAGE, disable dependent functionality
  where PACKAGE can be:
-     MP                    Multi Protocol"
+     MP                   Multi Protocol library"
 ac_help="$ac_help
 \
      factory              polynomial factorization library"
@@ -804,11 +804,14 @@ if test "$libdir" = '${exec_prefix}/lib'; then
   if test "x$exec_prefix" = xNONE; then
     if test "x$prefix" = xNONE; then
       LDFLAGS="-L${ac_default_prefix}/lib ${LDFLAGS}"
+      ac_configure_args="$ac_configure_args --libdir=${ac_default_prefix}/lib"
     else
       LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
+      ac_configure_args="$ac_configure_args --libdir=${prefix}/lib"
     fi
   else
     LDFLAGS="-L${exec_prefix}/lib ${LDFLAGS}"
+    ac_configure_args="$ac_configure_args --libdir=${exec_prefix}/lib"
   fi
 else
   LDFLAGS="-L${libdir} ${LDFLAGS}"
@@ -817,8 +820,10 @@ fi
 if test "$includedir" = '${prefix}/include'; then
   if test "x$prefix" = xNONE; then
     CPPFLAGS="-I${ac_default_prefix}/include ${CPPFLAGS}"
+    ac_configure_args="$ac_configure_args --includedir=${ac_default_prefix}/include"
   else
     CPPFLAGS="-I${prefix}/include ${CPPFLAGS}"
+    ac_configure_args="$ac_configure_args --includedir=${prefix}/include"
   fi
 else
   CPPFLAGS="-I${includedir} ${CPPFLAGS}"
@@ -833,7 +838,7 @@ if eval "test \"`echo '$''{'ac_cv_is_aix'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 837 "configure"
+#line 842 "configure"
 #include "confdefs.h"
 #ifdef _AIX
     yes
@@ -867,7 +872,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lm  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 871 "configure"
+#line 876 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char atof();
@@ -877,7 +882,7 @@ int t() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:881: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:886: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -909,7 +914,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lgmp  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 913 "configure"
+#line 918 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char mpq_init();
@@ -919,7 +924,7 @@ int t() {
 mpq_init()
 ; return 0; }
 EOF
-if { (eval echo configure:923: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:928: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -951,7 +956,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsmallgmp  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 955 "configure"
+#line 960 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char mpz_init();
@@ -961,7 +966,7 @@ int t() {
 mpz_init()
 ; return 0; }
 EOF
-if { (eval echo configure:965: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:970: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -993,7 +998,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lMP  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 997 "configure"
+#line 1002 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char IMP_PutGmpInt();
@@ -1003,7 +1008,7 @@ int t() {
 IMP_PutGmpInt()
 ; return 0; }
 EOF
-if { (eval echo configure:1007: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1012: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1035,7 +1040,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lMPT  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1039 "configure"
+#line 1044 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char MPT_GetTree();
@@ -1045,7 +1050,7 @@ int t() {
 MPT_GetTree()
 ; return 0; }
 EOF
-if { (eval echo configure:1049: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1054: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1077,7 +1082,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsingcf  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1081 "configure"
+#line 1086 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char atof();
@@ -1087,7 +1092,7 @@ int t() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:1091: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1096: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1119,7 +1124,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsingfac  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1123 "configure"
+#line 1128 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char atof();
@@ -1129,7 +1134,7 @@ int t() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:1133: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1138: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1162,12 +1167,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1166 "configure"
+#line 1171 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1171: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1176: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*

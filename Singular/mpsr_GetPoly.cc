@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.7 1997-05-04 11:11:53 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.8 1997-06-30 17:04:46 obachman Exp $ */
 
 /***************************************************************
  *
@@ -688,8 +688,14 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
     int i;
 
     // DDP Frac Node check
+    falser(NodeCheck(node, MP_CommonMetaOperatorType, MP_BasicDict,
+                    MP_CopBasicDiv) &&
+           node->numchild == 0);
+    falser((val = MPT_GetProtoTypespec(node)) != NULL);
+    node = val->node;
+    mpsr_assume(node != NULL);
     falser(NodeCheck(node, MP_CommonMetaOperatorType, MP_PolyDict,
-                    MP_CopPolyDenseDistPolyFrac) &&
+                     MP_CopPolyDenseDistPoly) &&
            node->numchild == 0);
     // GetRingAnnots
     failr(mpsr_GetRingAnnots(node, subring, mv2));

@@ -18,11 +18,14 @@ if test "$libdir" = '${exec_prefix}/lib'; then
   if test "x$exec_prefix" = xNONE; then
     if test "x$prefix" = xNONE; then
       LDFLAGS="-L${ac_default_prefix}/lib ${LDFLAGS}"
+      ac_configure_args="$ac_configure_args --libdir=${ac_default_prefix}/lib"
     else
       LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
+      ac_configure_args="$ac_configure_args --libdir=${prefix}/lib"
     fi
   else
     LDFLAGS="-L${exec_prefix}/lib ${LDFLAGS}"
+    ac_configure_args="$ac_configure_args --libdir=${exec_prefix}/lib"
   fi
 else
   LDFLAGS="-L${libdir} ${LDFLAGS}"
@@ -31,8 +34,10 @@ fi
 if test "$includedir" = '${prefix}/include'; then
   if test "x$prefix" = xNONE; then
     CPPFLAGS="-I${ac_default_prefix}/include ${CPPFLAGS}"
+    ac_configure_args="$ac_configure_args --includedir=${ac_default_prefix}/include"
   else
     CPPFLAGS="-I${prefix}/include ${CPPFLAGS}"
+    ac_configure_args="$ac_configure_args --includedir=${prefix}/include"
   fi
 else
   CPPFLAGS="-I${includedir} ${CPPFLAGS}"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.h,v 1.4 1997-05-02 22:09:28 obachman Exp $ */
+/* $Id: mpsr_Put.h,v 1.5 1997-06-30 17:04:47 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Put.h
@@ -31,8 +31,12 @@
  *
  ***************************************************************/
 // some often used flags settings for annotations 
-#define MP_AnnotReqValTree 0x07
-#define MP_AnnotReqValNode 0x06
+#define MP_AnnotReqValTree                                  \
+(MP_AnnotRequired | MP_AnnotValuated | MP_AnnotTreeScope)
+
+#define MP_AnnotReqValNode                      \
+(MP_AnnotRequired | MP_AnnotValuated)
+
 
 /***************************************************************
  *

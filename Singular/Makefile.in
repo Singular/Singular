@@ -196,7 +196,7 @@ config.status: configure
 
 configure: configure.in
 	@echo "WARNING: You need to rerun autoconf. I am proceeding, for now."
-	touch configure
+	@touch configure
 #	autoconf 
 
 ##
