@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.50 1999-11-17 13:51:58 pfister Exp $
+// $Id: primdec.lib,v 1.51 1999-11-30 10:09:41 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.50 1999-11-17 13:51:58 pfister Exp $";
+version="$Id: primdec.lib,v 1.51 1999-11-30 10:09:41 pfister Exp $";
 info="
 LIBRARY: primdec.lib:   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -522,7 +522,6 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
    list keepresult,act,keepprime;
    poly @f;
    int sl=size(l);
-
    for(i=1;i<=sl/2;i++)
    {
       if(sact[2][i]>1)
@@ -857,9 +856,7 @@ EXAMPLE: example zero_decomp; shows an example
   }
   if(size(#)==0)
   {
-
      primary=splitPrimary(primary,ser,@wr,act);
-
   }
 
 //test whether all ideals in the decomposition are primary and
@@ -916,11 +913,11 @@ EXAMPLE: example zero_decomp; shows an example
        }
        if(size(subst(jmap[nva],var(1),0)-var(nva))!=0)
        {
-          jmap[nva]=subst(jmap[nva],var(1),0);
+         // jmap[nva]=subst(jmap[nva],var(1),0);
+         //hier geaendert +untersuchen!!!!!!!!!!!!!!
        }
        phi1=@P,jmap1;
        phi=@P,jmap;
-
        for(@n=1;@n<=nva;@n++)
        {
           jmap[@n]=-(jmap[@n]-2*var(@n));
@@ -929,7 +926,6 @@ EXAMPLE: example zero_decomp; shows an example
        psi1=@P,jmap2;
 
        @qh=phi(@qht);
-
        if(npars(@P)>0)
        {
           @ri= "ring @Phelp ="
@@ -959,7 +955,6 @@ EXAMPLE: example zero_decomp; shows an example
        @qh=clearSB(@qh);
        attrib(@qh,"isSB",1);
        ser1=phi1(ser);
-
 
        @lh=zero_decomp (@qh,phi(ser1),@wr);
 //       @lh=zero_decomp (@qh,psi(ser),@wr);
@@ -1951,7 +1946,6 @@ EXAMPLE: example decomp; shows an example
  //------------------------------------------------------------------
  //the zero-dimensional case
  //------------------------------------------------------------------
-
   if (dim(@j)==0)
   {
     option(redSB);
@@ -2003,7 +1997,6 @@ EXAMPLE: example decomp; shows an example
    }
 
   ideal jkeep=@j;
-
   if(ordstr(@P)[1]=="w")
   {
      execute "ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),("+ordstr(@P)+");";
@@ -2137,7 +2130,6 @@ EXAMPLE: example decomp; shows an example
        uprimary[1]=ideal(1);
        uprimary[2]=ideal(1);
      }
-
      //we need the intersection of the ideals in the list quprimary with the
      //polynomialring, i.e. let q=(f1,...,fr) in the quotientring such an ideal
      //but fi polynomials, then the intersection of q with the polynomialring
