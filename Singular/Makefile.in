@@ -139,7 +139,7 @@ ASO_OBJS := $(ASO_SOURCES:.aso.cc=.aso)
 SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
         elim.lib           factor.lib         finvar.lib         general.lib \
         graphics.lib       hnoether.lib       homolog.lib        inout.lib   \
-        invar.lib          jordan.lib         latex.lib                      \
+        invar.lib          jordan.lib         latex.lib          linalg.lib  \
         matrix.lib         mondromy.lib       normal.lib                     \
         poly.lib           presolve.lib       primdec.lib                    \
         primitiv.lib       random.lib         ring.lib           sing.lib    \

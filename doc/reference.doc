@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.156 1999-10-19 16:07:34 Singular Exp $
+@comment $Id: reference.doc,v 1.157 1999-10-25 12:45:27 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2135,14 +2135,14 @@ To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take some time.
 @item @strong{Example:}
 @smallexample
-@c example
+@c CHANGE @c example
   ring r=0,(x,y,z),dp;
   ideal i=xz,yz,x^3-y^3;
   def l=hres(i,0);
   print(betti(l),"betti");// input to betti may be of type resolution
   list ll=l;
   l[2];                   // elements can only be accessed in the list
-@c example
+@c CHANGE example
 @end smallexample
 @end table
 @c ref
@@ -2160,7 +2160,7 @@ See
 
 
 @c ---------------------------------------
-@node imap, indepSet, homog, Functions
+@node imap, indepSet, hres, Functions
 @subsection imap
 @cindex imap
 
@@ -3214,7 +3214,7 @@ immediate garbage collection can be enforced with the command
 @item @strong{Example:}
 @smallexample
 @c example
-  ring r = 0,(x(1..1000)),dp; poly p = (x(1) + x(1000))^50;
+  ring r = 0,(x(1..500)),dp; poly p = (x(1) + x(500))^50;
   proc ReportMemoryUsage()
   { "Memory currently used by SINGULAR     :",memory(0),"Byte (",
      memory(0)/1023, "KByte)" +newline+
@@ -3224,7 +3224,7 @@ immediate garbage collection can be enforced with the command
   ReportMemoryUsage();
   kill p;
   ReportMemoryUsage(); // less memory used: p killed
-  system("gc");
+//  system("gc");
   ReportMemoryUsage(); // less memory allocated: garbage collect
   kill r;
   ReportMemoryUsage(); // even less memory: r killed and implicit gc

@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.82 1999-10-25 09:08:07 obachman Exp $
+@comment $Id: singular.doc,v 1.83 1999-10-25 12:45:29 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -265,9 +265,9 @@ LIB "all.lib";
 @subsection jordan_lib
 @c lib jordan.lib
 @c ---------------------------------------------------------
-@node linalg__lib, , jordan_lib, Linear algebra
+@node linalg_lib, , jordan_lib, Linear algebra
 @subsection linalg_lib
-@c lib linalg.lib
+@c lib linalg.lib no_ex
 @c ----------------------------------------------------------------------------
 @node Commutative algebra, Singularities, Linear algebra, SINGULAR libraries
 @section Commutative algebra

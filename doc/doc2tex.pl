@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.17 1999-09-02 14:24:45 Singular Exp $
+# $Id: doc2tex.pl,v 1.18 1999-10-25 12:45:27 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -52,7 +52,7 @@
 # default settings of command-line arguments
 #
 $Singular = "../Singular/Singular"; # should be overwritten
-$Singular_opts = " -teqr12345678";
+$Singular_opts = " -teqr12345678 --no-rc";
 $clean = 0;
 $verbose = 1;
 $reuse = 1;

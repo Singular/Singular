@@ -2,7 +2,7 @@
 //	last modified: 
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: linalg.lib,v 1.2 1999-10-22 09:07:07 obachman Exp $";
+version="$Id: linalg.lib,v 1.3 1999-10-25 12:45:16 obachman Exp $";
 info="
 LIBRARY:  linalg.lib	PROCEDURES FOR ALGORITHMIC LINEAR ALGEBRA
 AUTHOR:	  Ivor Saynisch (ivs@math.tu-cottbus.de)
@@ -13,7 +13,7 @@ PROCEDURES:
  inverse_L(A);      list(matrix Inv,poly p),Inv*A=p*En ( using lift )
  sym_gauss(A);      symmetric gauss algorithm
  orthogonalize(A);  Gram-Schmidt orthogonalization
- diag_test(A);
+ diag_test(A);      test whether A can be diagnolized
  busadj(A);         coefficients of Adj(E*t-A) and coefficients of det(E*t-A)
  charpoly(A,v);     characteristic polynomial of A. ( using busadj(A) ) 
  adj(A);            ( using busadj(A) )

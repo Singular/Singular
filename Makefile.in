@@ -163,6 +163,7 @@ sharedist: ${SINGULAR}
 	cp doc/singular.hlp ${TMPDIR}/${INFODIR_NAME}
 	cp -R doc/html/* ${TMPDIR}/${HTMLDIR_NAME}
 	cp emacs/*.el ${TMPDIR}/${EMACSDIR_NAME}
+	cp emacs/.emacs-singular ${TMPDIR}/${EMACSDIR_NAME}
 	chmod -R  a+rX  ${TMPDIR}/Singular
 	cd ${TMPDIR}; \
 	    ${ZIP} -r ${SHAREDIST_NAME} Singular; \
@@ -176,6 +177,7 @@ bindist: ${SINGULAR}
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}
 	cp Singular/Singular-$@ ${TMPDIR}/${BINDIR_NAME}/Singular
+	cp Singular/ESingular ${TMPDIR}/${BINDIR_NAME}/ESingular
 	cp Singular/libparse ${TMPDIR}/${BINDIR_NAME}
 	-strip ${TMPDIR}/${BINDIR_NAME}/*
 	cd ${TMPDIR}; chmod -R a+rX *;\
