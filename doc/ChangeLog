@@ -1,17 +1,46 @@
+Tue May 12 09:21:20 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* Makefile.in (usercard.dvi): new target
+	  (dvi): `usercard.dvi' added
+
+	* singcard.tex, usecard.tex: new files
+
 Mon May 11 09:59:01 MET DST 1998 hannes
 	* new feature in doc2tex: @c include
+
 Mon May 11 09:45:16 MET DST 1998 hannes
 	* frames for det, bareiss, char_series ... in "impl. alg."
+
 Thu May  7 19:52:20 MET DST 1998 hannes
         * change doc2tex for "@c ref ... @c ref"
+
 Thu May  7 18:54:58 MET DST 1998 hannes
         * change node "Control structures" in general.doc to "Flow control"
 	  (there is also "Control structures" in reference.doc),
 	  adjusted info-links
+
 Thu May  7 18:17:44 MET DST 1998 hannes
 	* first try: "Background" (start.doc)
         * "Interrupting Singular"
+
+Thu May  7 10:14:32 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* general.doc (General command syntax): reference `Names and
+	  objects' added
+	  (General command syntax): stuff on names moved to `Names and
+	  objects'
+	  (Names and objects): information on possible types removed
+	  (Names and objects): some other minor changes
+
+	* general.doc: again `libraries.doc' added.  Tim, dieser
+	  Schlingel!!
+
 Wed May  6 12:06:41 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* reference.doc (typeof): complete list of types moved from
+	  general.doc to `typeof'
+
+	* reference.doc: someone forgot to uncomment the emacs header!!!
 
 	* .cvsignore: new file
 
