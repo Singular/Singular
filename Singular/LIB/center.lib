@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.8 2004-08-05 14:49:14 levandov Exp $";
+version="$Id: center.lib,v 1.9 2004-08-11 11:40:21 plural Exp $";
 category="Noncommutative";
 info="
-LIBRARY:  center.lib      computation of central elements of G-algebras.
+LIBRARY:  center.lib      computation of central elements of G-algebras and Q-algebras.
 AUTHORS:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 OVERVIEW:
- This is a library for computing the central elements and centralisators of elements in various noncommutative algebras.
- Implementation is partially based on algorithms, written in the frame of the diploma thesis by Oleksandr Motsak (advisors: Prof. S.A. Ovsienko, V.Levandovskyy) at Kyiv Taras Shevchenko University:  'An algorithm for the computation of the center of noncommutative polynomial algebra'.
+ This is a library for computing the central elements and centralisators of elements in various noncommutative algebras. 
+ Implementation is mainly based on algorithms, written in the frame of the diploma thesis by Oleksandr Motsak (advisor: Prof. S.A. Ovsienko, using the definitions from diploma thesis by V.Levandovskyy), at Kyiv Taras Shevchenko University:  'An algorithm for the computation of the center of noncommutative polynomial algebra'.
  @* The last version of this library can be found via internet.
 
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis'
@@ -20,6 +20,7 @@ PROCEDURES:
 SEE ALSO:  ncalg_lib, nctools_lib
 KEYWORDS:  inCenter; inCentralizer; center; centralizer
 ";
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // stuff
@@ -82,6 +83,16 @@ static proc myString ( list # )
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+static proc myIdeal ( list # )
+"
+	return 0 or ideal(#)
+"
+{
+	ideal @p;
+	return (myValue ( @p, # ));
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// for debug
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,7 +115,7 @@ static proc BCall(string Name, list #)
 {
 	if( toprint() )
 	{
-		"CALL: ", Name, "({ ", string(#), " }):";
+		"CALL: ", Name, "( ", string(#), " )";
 	};
 };
 
@@ -113,7 +124,7 @@ static proc ECall(string Name, list #)
 {
    if( toprint() )
    {
-		"RESULT: ", Name, "(...)={ ", string(#), " }.";
+		"RET: ", Name, "(...)={ ", string(#), " }";
    };
 };
 
@@ -288,80 +299,6 @@ static proc my_commutators ()
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc my_ord ( poly p, poly v )
-"
-	return : order of polynom p wrt v
-"
-{
-	matrix m = coef(p, v);
-
-	return ( myMonomDeg(m[1, ncols(m)]));
-};
-
-LIB "linalg.lib"; // for charpoly
-
-///////////////////////////////////////////////////////////////////////////////
-static proc ord_of_sum (def r, list AAA)
-"
-	return : int : order of char poly of a special matrix
-	Note: based on my_ord
-"
-{
-	int N  = nvars(r);
-	int NN = size(AAA);
-	int P  = npars ( r );
-
-	list MIN = AAA;
-	
-
-	string new_ring = " ring NEW_RING = (" + charstr(r) + ") , ( C(1.."+string(NN)+"), t ), dp; setring NEW_RING; minpoly = " + string(minpoly) + "; ";
-	execute ( new_ring );
-
-	matrix A[N][N] = 0;
-
-	list MMM = imap( r, MIN );
-	for ( int i = 1; i<= NN; i++ )
-	{
-		A = A + var(i) * MMM[i];
-	};
-
-	poly p = charpoly( A, "t");
-
-	int result = my_ord( p, t );
-	kill (NEW_RING);
-	return ( result );
-
-};
-
-///////////////////////////////////////////////////////////////////////////////
-static proc is_lie_algebra ()
-"
-    check whether all commutators [var(k), var(i)] are linear combinations of var(j), j=1..N
-    return: int: 
-	 0 - is not a U(lie Algebra)
-	 1 - is     a U(lie Algebra)
-"
-{
-	matrix M = my_commutators(); // should be NxN
-	int    N = nrows(M);
-	
-	int i;
-
-	for ( int k = 2; k <= N; k++ )
-	{
-		for ( i = 1; i < k; i++ )
-		{
-		    if ( ( maxDeg( myMonomDeg, M[k,i] ) > 1 ) or ( minDeg( myMonomDeg, M[k,i] ) == 0) ) 
-		    {
-			return (0);
-		    };
-		};
-	};	
-	return (1);
-};
-
-
-///////////////////////////////////////////////////////////////////////////////
 static proc my_associated ()
 "
     return list of records:
@@ -416,90 +353,6 @@ static proc my_associated ()
 	};
 	
 	return (RESULT);
-
-};
-
-///////////////////////////////////////////////////////////////////////////////
-static proc lie_rank ( list # )
-"
-    computation of lie rank of algebra...
-    that is, the number of generators of center
-"
-{
-	int rank = 0;
-	
-	def save = basering;
-	def r = myRing(#);
-	setring r;
-
-	if (! is_lie_algebra() )
-	{
-	    print ("The given algebra is not of type U(lie Algebra)!!!");
-	    
-	    setring save; 
-	    kill (r); 
-	    return (rank);
-	};
-
-	list V   = my_associated();
-	list ALL = list();
-
-	for ( int i = 1; i<= size(V); i++ )
-	{
-	    ALL[i] = V[i][3];
-	};
-	
-	rank = ord_of_sum( r, ALL );
-
-	setring save;
-	kill (r);
-	return (rank);
-
-};
-
-///////////////////////////////////////////////////////////////////////////////
-static proc lie_rank_cartan ( list # )
-"
-    in all tested cases it is the same as lie rank,
-    but MUCH faster!!!
-    
-    Note: there is no proof that it is exactly the lie rank of algebra, 
-	  use on your own risk.
-"
-{
-	int rank = 0;
-	
-	def save = basering;
-	def r = myRing(#);
-	setring r;
-
-	if (! is_lie_algebra() )
-	{
-	    print ("The given algebra is not of type U(lie Algebra)!!!");
-	    
-	    setring save; 
-	    kill (r); 
-	    return (rank);
-	};
-
-	list V      = my_associated();
-	list CARTAN = list();
-	int  j      = 1;
-
-	for ( int i = 1; i<= size(V); i++ )
-	{
-	    if ( V[i][2] )
-	    {
-		CARTAN[j] = V[i][3];
-		j++;
-	    };
-	};
-	
-	rank = ord_of_sum( r, CARTAN );
-
-	setring save;
-	kill (r);
-	return (rank);
 
 };
 
@@ -592,7 +445,57 @@ static proc myBitParam( int param, int n )
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc NFList ( list l, list # )
+static proc QNF_init(list #)
+{
+    if( defined(@@@MY_QIDEAL) )
+    {
+		kill (@@@MY_QIDEAL);
+    };
+
+    if( typeof(basering) == "qring" )
+    {
+		ideal @@@MY_QIDEAL = twostd(myIdeal(#));
+		/// setup redSB, redTail options
+		export(@@@MY_QIDEAL);
+	
+		option(redSB);
+		option(redTail);
+
+    };
+};
+
+///////////////////////////////////////////////////////////////////////////////
+static proc QNF_done()
+{
+    if( defined(@@@MY_QIDEAL) )
+    {
+		kill (@@@MY_QIDEAL);
+    };
+};
+
+///////////////////////////////////////////////////////////////////////////////
+static proc QNF_poly ( poly p, list # ) )
+{
+    if( defined(@@@MY_QIDEAL) )
+    {
+/*
+	int param = 1 ; // by def: reduce both 1st and 2nd entries
+	param = myValue(param, #); 
+	string bits = myBitParam( param, 8 );
+*/
+  	BCall( "QNF_poly", p );
+
+	p = NF( p, @@@MY_QIDEAL );
+
+  	ECall( "QNF_poly", p );
+    }; /// QRing
+
+    return(p);
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc QNF_list ( list l, list # )
 "
     expects list of records with two polynomial entries
     and in case of Qring allpies NF( * , std(0) ) to entries (depends on parameter)
@@ -601,40 +504,69 @@ static proc NFList ( list l, list # )
 
 +1    8 => reduce every 1st entry
 +2    7 => reduce every 2nd entry
-    
-+4    6=> (for PBW in qrings) kill out pbw entries where pbw monom was affected
 
+	--- (for PBW in qrings) ---
+
++4    6 => kill out pbw entries where pbw monom (1) was affected
+
+//?? wofuer?
 +8    5 => reduce every 3rd entry
     
 "
 {
 
-    if( typeof(basering) == "qring" )
+    if( defined(@@@MY_QIDEAL) )
     {
 
-  	  "(NFList) debug me!";
+	int param = 1 + 2; // by def: reduce both 1st and 2nd entries
+	param = myValue(param, #); 
+	
+	string bits = myBitParam( param, 8 );
 
-	  int param = 3; // by def: reduce both 1st and 2nd entries
-	  param = myValue(param, #); 
-	
-	  string bits = myBitParam( param, 8 );
-	
-	  poly temp;
+  	BCall( "QNF_list", "list, " + bits );
+
+	poly temp;
 	
 	for ( int i = size(l); i>0 ; i -- )
 	{
+
+	    if ( typeof( l[i] ) == "poly" )
+	    {
+
+		    if ( (bits[8] == "1") or (bits[6] == "1") )
+		    {
+			    temp = NF( l[i], @@@MY_QIDEAL );
+			    
+			    if ( bits[6] == "1" ) 
+			    {/// for PBW in qrings: kill out pbw entries where pbw monom was reduced
+			    
+				if( temp != l[i] ) 
+				{
+				    l = delete( l, i );
+				    i --;
+				    continue;
+				};
+			    };
+			    
+			    if ( bits[8] == "1" ) 
+			    {
+			    	l[i] = temp;
+			    };
+		    };
+	    };
+
 	    if ( typeof( l[i] ) == "list" )
 	    {	
-	    
 		/// 1st 
-		
+
 	        if ( size(l[i])>0 )
 	        {		
-		    if ( bits[8] == "1" )
+		    if ( (bits[8] == "1") or (bits[6] == "1") )
 		    {
 			if( typeof( l[i][1] ) == "poly" )
 			{
-			    temp = NF( l[i][1], std(0) );
+
+			    temp = NF( l[i][1], @@@MY_QIDEAL );
 			    
 			    if ( bits[6] == "1" ) 
 			    {/// for PBW in qrings: kill out pbw entries where pbw monom was reduced
@@ -647,8 +579,11 @@ static proc NFList ( list l, list # )
 				};
 			    };
 			    
-			    l[i][1] = temp;
-			    
+			    if ( bits[8] == "1" ) 
+			    {
+			    	l[i][1] = temp;
+			    };
+
 			};
 		    };
 		};
@@ -661,32 +596,18 @@ static proc NFList ( list l, list # )
 		    {
 			if( typeof( l[i][2] ) == "poly" )
 			{
-			    temp = NF( l[i][2], std(0) );
+			    temp = NF( l[i][2], @@@MY_QIDEAL );
 			    
 			    l[i][2] = temp; 
 			};
 		    };
-		};		
-
-
-		// 3rd
-		
-	        if ( size(l[i])>2 )
-	        {		
-		    if ( bits[5] == "1" )
-		    {
-			if( typeof( l[i][3] ) == "poly" )
-			{
-			    temp = NF( l[i][3], std(0) );
-			    
-			    l[i][3] = temp; 
-			};
-		    };
 		};
-
 	    };
 	};
-    };
+
+  	ECall( "QNF_list", "list" );
+
+    }; // Qring
     
     return ( l );
 };
@@ -890,10 +811,9 @@ static proc zRefine ( list @z )
 	Note: based on myCoeff	
 "
 {
-	int @i, @j;
+	BCall("zRefine", "list");
 
-//	print ( "//////////// before REFINE /////////////// ");
-//	print 	( @z );
+	int @i, @j;
 
 	poly @f  = 0; // leadmonom
 
@@ -954,8 +874,7 @@ static proc zRefine ( list @z )
 		};
 	};
 
-//	print ( "//////////// after REFINE /////////////// ");
-//	print 	( @z );
+	ECall("zRefine", "list");
 
 	return 	( @z );
 
@@ -1310,7 +1229,7 @@ static proc zAddBad ( list @leads, list @newz, int @maxDeg, int kind )
 
 	poly @sum_old, @sum_new;
 	
-	poly a, b;
+	poly a, b, @temp;
 
 /*
 	if kind = 0 => for PBW - no products
@@ -1320,17 +1239,14 @@ static proc zAddBad ( list @leads, list @newz, int @maxDeg, int kind )
 	poly pr = 0; int pri; list prs;
 
 	for ( @i = @newSize; @i > 0; @i -- )
-	{// for every new element do 
-
-		// new element: @newz[@i]
+	{// for every new poly (@newz[@i]) do 
 
 		@m   = leadmonom( @newz[@i] ); 
 		@deg = deg(@m);
 		@exp = leadexp(@m);
 
-		@newzz = init_bads(@maxDeg );
-
 		//// newzz void new list
+		@newzz = init_bads(@maxDeg );
 
 		for( @mydeg = @deg; @mydeg <= @maxDeg;  @mydeg = @mydeg + @deg )
 		{/// adding all possiblities for @newz[@i]^@j;
@@ -1341,7 +1257,7 @@ static proc zAddBad ( list @leads, list @newz, int @maxDeg, int kind )
 				@tm 	= LM ( @texp );
 				if ( kind != 0)
 				{
-					pr = pr * @newz[@i]; /// degrees must be there!!!
+					pr = QNF_poly( pr * @newz[@i] ); /// degrees must be there!!!
 				};
 			} else
 			{
@@ -1353,12 +1269,16 @@ static proc zAddBad ( list @leads, list @newz, int @maxDeg, int kind )
 				};
 			};
 
-			/// will work for any PBW base
-			/// but for 2nd (with unit) - it's posibly to cut the following if out ;-)
+			@temp =  QNF_poly(@tm);
+			if( @temp != @tm )
+			{
+				break;
+			};
 
-			@newzz[index(@mydeg)] = addRecordUniq( @leads[index(@mydeg)], @newzz[index(@mydeg)], @texp, @tm, kind, list(pr) );
+/*!!*/			@newzz[index(@mydeg)] = 
+/*!!*/	addRecordUniq( @leads[index(@mydeg)], @newzz[index(@mydeg)], @texp, @tm, kind, list(pr) );
 
-			for ( @dd = 0; (@dd <= @maxDeg) and ((@dd + @mydeg) <= @maxDeg ); @dd ++ )
+			for ( @dd = 1; (@dd <= @maxDeg) and ((@dd + @mydeg) <= @maxDeg ); @dd ++ )
 			{ //// for every good "deg" 
 				
 				@newdeg = @dd + @mydeg; /// any deg should be additive!!!
@@ -1376,25 +1296,30 @@ static proc zAddBad ( list @leads, list @newz, int @maxDeg, int kind )
 						for( pri = 1; pri <= size(@leads[index(@dd)][1][@k][3]); pri++)
 						{
 							/// to do products into list and add one list !!!
-							a = pr*@leads[index(@dd)][1][@k][3][pri];
-							b = @leads[index(@dd)][1][@k][3][pri]*pr;
+							a = QNF_poly( pr*@leads[index(@dd)][1][@k][3][pri]);
+							b = QNF_poly( @leads[index(@dd)][1][@k][3][pri]*pr);
 
 							prs= prs + list(a);
 
-							if ( a != b )
+							if ( a!=b )
 							{
 							    prs= prs + list(b);
 							};
 						};
 
-						@newzz[index(@newdeg)] = 
-		addRecordUniq( @leads[index(@newdeg)], @newzz[index(@newdeg)], @ttexp, @ttm, kind, prs );
-
 					} else
 					{
-							@newzz[index(@newdeg)] = 
-		addRecordUniq( @leads[index(@newdeg)], @newzz[index(@newdeg)], @ttexp, @ttm, kind, list(pr) );
+						prs = list(pr);
 					};
+
+					@temp =  QNF_poly(@ttm);
+					if( @temp == @ttm )
+					{
+
+/*!!*/						@newzz[index(@newdeg)] = 
+/*!!*/	addRecordUniq( @leads[index(@newdeg)], @newzz[index(@newdeg)], @ttexp, @ttm, kind, prs );
+					};
+
 
 				};				
 			}; /// for
@@ -1593,19 +1518,16 @@ static proc zReduce( list @z )
 			};
 		};
 
-		@red = zRefine( @red ); //??
+		@red = zRefine( @red ); /// there will be no zeroes after ???
 
 		if( size(@red) > 0 )
-		{ 
-		    /// there will be no zeroes after ???
-		    
+		{ 		    
 		    leads = zAddBad( leads, @red, d, 1); 
-
 		};
 
 		if ( f_add == 1 )
-		{// something new....
-			result = result + list(@red); // ????which one? - try all 
+		{// we got something new....
+			result = result + list(@red); // ??? which one to add? => trying to add all 
 		};
 	};
 	
@@ -1635,6 +1557,7 @@ record:
 	[3] : 1
 "
 {
+	BCall( "PBW_init" );
 	return (list(list(1, 0, 1))); 
 };
 
@@ -1651,11 +1574,14 @@ record[i] =
 	?? need debug ??
 "
 {
+
+	BCall( "PBW_sys" );
+
 	poly t; 
 	for (int v = size(VARS); v>0; v -- )
 	{
 		t    	= VARS[v];
-		VARS[v] = list( t, p*t - t*p, deg(t) );
+		VARS[v] = list( t, QNF_poly( p*t - t*p ), deg(t) ) ;
 	};
 		
 	return (VARS);
@@ -1669,6 +1595,8 @@ static proc PBW_done( list PBW )
 	Note: also the last vars... 
 "
 {
+	BCall( "PBW_done" );
+
 	list result = list();
 
 	int n = size(PBW);
@@ -1683,6 +1611,8 @@ static proc PBW_done( list PBW )
 /////////////////////////////////////////////////////////////////////////////
 static proc PBW_next ( list PBW, int k, list sys)
 {
+	BCall( "PBW_next", k );
+
 	list temp;
 	int kk, nn, ii;
 	list result = list(); // PBW[ index(k) ] ought to be empty ??
@@ -1710,13 +1640,17 @@ static proc PBW_next ( list PBW, int k, list sys)
 		};
 	};
 
+	result = QNF_list( result, 2 + 4);
+	ECall( "PBW_next", "list result" );
 	return (result);
-//	result = NF1List( result, 1 + 2 );
+	
 };
 
 /////////////////////////////////////////////////////////////////////////////
 static proc PBW_base( int MaxDeg, poly p )
 {
+	BCall( "PBW_base", MaxDeg, p );
+
 	list PBW = list();
 	list SYS = PBW_sys( my_vars(), p );
 
@@ -1981,6 +1915,7 @@ static proc my_calc (list @given, poly @BASE_POLY, list #)
 
 
 /******************************************************************************/ 
+/*
 static proc add2list( poly l, poly q )
 "
 	l is a sorted list of monomials (polynom with coefs: 0 or 1)
@@ -2009,9 +1944,10 @@ static proc add2list( poly l, poly q )
 	ECall( "add2list", "{" + string(l) + "}" );
 	return (l);
 };
-
+*/
 
 /******************************************************************************/ 
+/*
 static proc rm4list( poly l, poly q )
 "
 	l is a sorted list of monomials (polynom with coefs: 0 or 1)
@@ -2043,6 +1979,7 @@ static proc rm4list( poly l, poly q )
 	ECall( "rm4list", "{" + string(l) + "}" );
 	return (l);
 };
+*/
 
 /******************************************************************************/ 
 static proc reduce_one_per_row(list @given)
@@ -2298,10 +2235,10 @@ static proc calc_k_base (list l, list #)
   calculation of Ker as Vector Space
 "
 {
-	BCall( "calc_k_base", "{...l...}[, " + string(#) + "]" );
+	BCall( "calc_k_base", "list, " + string(#) );
 
 	list t = reduce_one_per_row( l, 0); /// optimization (a1)
-	return( calc_base(t, #) );          /// calculation of groupps (a2) + gauss.
+	return( QNF_list ( calc_base(t, #), 2) );          /// calculation of groupps (a2) + gauss.
 
 };
 
@@ -2346,15 +2283,15 @@ static proc inCenter_poly( poly p )
     poly t;
     for (int k = nvars(basering); k>0; k-- )
     {
-	  t = var(k);
-	  if ( t * p != p * t )
-	  {
+	t = var(k);
+        if ( QNF_poly(t * p - p * t) != 0 )
+	{
 		  if( toprint() ) 
 		  {
 			"POLY: ", string (p), " is NOT in center";
 		  };
 		  return (0);
-	  };
+	};
     };
 
     if( toprint() ) 
@@ -2393,22 +2330,22 @@ static proc inCenter_list(def l)
 /******************************************************************************/ 
 static proc inCentralizer_poly( poly p, poly f )
 "
-  if p in Centralizer(f) => return 1
+  if p in centralizer(f) => return 1
       otherwise     return 0
 "
 {
-    if ( f * p != p * f )
+    if ( QNF_poly(f * p - p * f) != 0 )
     {	  
 	  if( toprint() ) 
 	  {
-		"POLY: ", string (p), " is NOT in Centralizer(f)";
+		"POLY: ", string (p), " is NOT in centralizer(f)";
 	  };
 	  return (0);
     };
 	
     if( toprint() ) 
     {
-	"POLY: ", string (p), " is in Centralizer(f)";
+	"POLY: ", string (p), " is in centralizer(f)";
     };
 	return (1);
 };
@@ -2473,6 +2410,7 @@ static proc inCentralizer_list( def l, poly f )
 	list @q; int @i; int N = nvars(basering);
 
 	my_var_init(); // setup for my_var(n)
+	QNF_init();
 
 	list PBW = list();
 	list PBW_PLAIN = list();
@@ -2540,13 +2478,14 @@ static proc inCentralizer_list( def l, poly f )
 		k ++;
 	};
 
+	QNF_done();
 	my_var_done();
 
 	return (makeIdeal(@z));
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/* static */ proc center_vectorspace( int MaxDeg )
+static proc center_vectorspace( int MaxDeg )
 "
 	pure calculation of center as a finitely dimmensional Vector Space (deg <= MaxDeg )
 "
@@ -2576,16 +2515,21 @@ static proc inCentralizer_list( def l, poly f )
     Note: reduction by zReduce.
 "
 {
-	return( makeIdeal( zReduce( center_vectorspace( MaxDeg))));
+
+	QNF_init();
+	ideal res = makeIdeal( zReduce( center_vectorspace( MaxDeg)));
+	QNF_done();
+
+	return( res );
 };
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-/// Centralizer's computations
+/// centralizer's computations
 
 ///////////////////////////////////////////////////////////////////////////////
-/* static */ proc centralizer_vectorspace( poly p, int MaxDeg )
+static proc centralizer_vectorspace( poly p, int MaxDeg )
 {
 	return( calc_k_base( PBW_base( MaxDeg, p )));
 };
@@ -2593,7 +2537,12 @@ static proc inCentralizer_list( def l, poly f )
 ///////////////////////////////////////////////////////////////////////////////
 /* static */ proc centralizer_min_vectorspace( poly p, int MaxDeg )
 {
-	return( makeIdeal( zReduce( centralizer_vectorspace( p, MaxDeg))));
+
+	QNF_init();
+	ideal res = makeIdeal( zReduce( centralizer_vectorspace( p, MaxDeg)));
+	QNF_done();
+
+	return( res );
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2606,6 +2555,8 @@ static proc inCentralizer_list( def l, poly f )
   Note: no proof that it is really centralizer and moreover 'minimal' centralizer
 "
 {
+	QNF_init();
+
 	int n = myInt(#);
 	int m = (MaxDeg < 0);
 	
@@ -2675,6 +2626,7 @@ static proc inCentralizer_list( def l, poly f )
 
 	};
 
+	QNF_done();
 	return (makeIdeal(@z));
 };
 
@@ -2690,15 +2642,25 @@ proc inCenter( def a )
 RETURN:  integer (1 if a in center, 0 otherwise)
 EXAMPLE: example inCenter; shows examples"
 {
-  if ( typeof(a) == "poly" )
-  {
-	return (inCenter_poly(a));
-  };
-
-  if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
-  {
-	return (inCenter_list(a));
-  };
+	QNF_init();
+	def res;
+	
+	if ( typeof(a) == "poly" )
+	{
+		res = inCenter_poly(a);
+	} else
+	{
+		if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
+		{
+			res = inCenter_list(a);
+		} else 
+		{
+			res = a;
+		};
+	};
+	
+	QNF_done();
+	return (res);
 }
 example
 {
@@ -2726,15 +2688,25 @@ proc inCentralizer( def a, poly f )
 RETURN:  integer (1 if a in centralizer(f), 0 otherwise)
 EXAMPLE: example inCentralizer; shows examples"
 {
-  if ( typeof(a) == "poly" )
-  {
-	return (inCentralizer_poly(a, f));
-  };
+	QNF_init();
+	def res;
 
-  if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
-  {
-	return (inCentralizer_list(a, f));
-  };
+	if ( typeof(a) == "poly" )
+	{
+		res = inCentralizer_poly(a, f); 
+	} else
+	{
+	  	if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
+	  	{
+			res = inCentralizer_list(a, f); 
+  		} else
+		{
+			res = a;
+		};
+	};
+
+	QNF_done();
+	return (res);
 }
 example
 {
