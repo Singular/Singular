@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.h,v 1.7 1999-06-08 07:34:38 Singular Exp $ */
+/* $Id: mmheap.h,v 1.8 1999-06-08 07:37:18 Singular Exp $ */
 #include <stdlib.h>
 #include "mod2.h"
 #include "structs.h"
@@ -71,7 +71,7 @@ void mmMergeHeap(memHeap into, memHeap what);
 extern int mm_HEAP_DEBUG;
   
 #define mmAllocHeap(res, heap)\
-  (res) = (void *)mmDebugAllocHeap(heap, __FILE__, __LINE__)
+  (res) = mmDebugAllocHeap(heap, __FILE__, __LINE__)
 void * mmDebugAllocHeap(memHeap heap, const char*, int );
 
 #define mmFreeHeap(addr, heap)\
@@ -176,7 +176,7 @@ do                                                          \
 {                                                           \
   register memHeap _heap = heap;                            \
   if ((_heap)->current == NULL) mmAllocNewHeapPage(_heap);  \
-  ((void*) (what)) = (_heap)->current;                      \
+  (what) = (void *)((_heap)->current);                      \
   (_heap)->current =  *((void**)(_heap)->current);          \
 }                                                           \
 while (0)
