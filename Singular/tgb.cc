@@ -2494,13 +2494,13 @@ static void go_on_F4 (calc_dat* c){
     
     }
     int sum=0;
-    for(j=0;j<i;j++)
+    for(j=0;j<F_plus_index;j++)
     {
       sum+=ibuf[j];
     }
     sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
     int partsum=0;
-    for(j=0;j<i;j++)
+    for(j=0;j<F_plus_index;j++)
     {
       memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
       omfree(sbuf[j]);
