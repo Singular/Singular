@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.4 1999-11-15 17:20:28 obachman Exp $ */
+/* $Id: mod_raw.cc,v 1.5 1999-12-13 18:11:07 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -17,9 +17,9 @@
 
 
 /*****************************************************************************
- * SECTION ix86-linux                                                        *
+ * SECTION ix86-linux / alpha-linux                                          *
  *****************************************************************************/
-#ifdef ix86_Linux
+#if defined(ix86_Linux) || defined(DecAlpha_Linux)
 #include <dlfcn.h>
 
 void *dynl_open(
