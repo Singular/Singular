@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.4 1998-04-23 10:19:42 obachman Exp $
+# $Id: regress.cmd,v 1.5 1998-04-23 12:44:46 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -81,11 +81,11 @@ sub tst_check
     print (STDERR "Can not read $root.tst\n");
     return (1);
   }
-  if (! (-r "$root.res"))
+  if ((! (-r "$root.res")) || (-z "$root.res"))
   {
-    if (! (-r "$root.res.gz"))
+    if ((! (-r "$root.res.gz")) || (-z "$root.res.gz"))
     {
-      if (! (-r "$root.res.gz.uu"))
+      if ((! (-r "$root.res.gz.uu")) || (-z "$root.res.gz.uu"))
       {
 	if ($generate ne "yes")
 	{
