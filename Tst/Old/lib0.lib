@@ -1,0 +1,1068 @@
+// $Id: lib0.lib,v 1.1.1.1 1998-04-17 15:06:54 obachman Exp $
+//system("random",787422842);
+//(GMG)
+///////////////////////////////////////////////////////////////////////////////
+
+LIBRARY:  lib0.lib       PROCEDURES OF GENERAL TYPE
+
+ A_Z("a",n);             string of n comma seperated letters starting with a
+ binomial(n,m[,int/str]);n choose m (type int), [type string/type number]
+ changechar(r,"c","R");  makes a copy R of ring r with new char c the basering
+ changeord(r,"ord","R"); makes a copy R of ring r with new ord the basering
+ changevar(r,"vars","R");same as copyring
+ copyring(r,"vars","R"); makes a copy R of ring r with new vars the basering
+ copyring1(r,"vars","R");string to make a copy R of ring r with new variables
+ defrings(n[,p]);        define ring Sn in n vars, char 32003 [or p], ds
+ defringp(n[,p]);        define ring Pn in n vars, char 32003 [or p], dp
+ factorial(n[,int/str]); n factorial (=n!) (type int), [type string/number]
+ fetchall(R[,str]);      fetch all objects of ring R to basering
+ fibonacci(n[,p]);       nth Fibonacci number [char p]
+ ishomog(poly/...);      int, =1 resp. =0 if input is homogeneous resp. not
+ kmemory();              int = active memory (kilobyte)
+ killall();              kill all user-defined variables
+ imapall(R [,str]);      imap all objects of ring R to basering
+ mapall(R,i[,str]);      map all objects of ring R via ideal i to basering
+ maxcoef(poly/...);      maximal length of coefficient occuring in poly/...
+ maxdeg(poly/...);       int/intmat = degree/s of terms of maximal order
+ mindeg(poly/...);       int/intmat = degree/s of terms of minimal order
+ normalize(poly/...);    normalize poly/... such that leading coefficient is 1
+ primes(n,m);            intvec of primes p, n<=p<=m
+ product(vector/..[,v]); multiply components of vector/ideal/...[indices v]
+ ringsum(s,t,..."r");    create a ring r from existing rings s,t,...
+ ringweights(r);         intvec of weights of ring variables of ring r
+ sort(ideal/module);     sort generators according to monomial ordering
+ sum(vector/id/..[,v]);  add components of vector/ideal/...[with indices v]
+           (parameters in square brackets [] are optional)
+
+LIB "inout.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+proc A_Z (string s,int n)
+USAGE:   A_Z("a",n);  a any letter, n integer (-26<= n <=26, !=0)
+RETURN:  string of n small (if a is small) or capital (if a is capital)
+         letters, comma seperated, beginning with a, in alphabetical
+         order (or revers alphabetical order if n<0)
+EXAMPLE: example A_Z; shows an example
+{
+  if ( n>=-26 and n<=26 and n!=0 )
+  {
+    string alpha =
+    "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,"+
+    "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,"+
+    "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,"+
+    "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z";
+    int ii; int aa;
+    for(ii=1; ii<=51; ii=ii+2)
+    {
+       if( alpha[ii]==s ) { aa=ii; }
+    }
+    if ( aa==0)
+    {
+      for(ii=105; ii<=155; ii=ii+2)
+      {
+        if( alpha[ii]==s ) { aa=ii; }
+      }
+    }
+    if( aa!=0 )
+    {
+      string out;
+      if (n > 0) { out = alpha[aa,2*(n)-1];  return (out); }
+      if (n < 0)
+      {
+        string beta =
+        "z,y,x,w,v,u,t,s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,"+
+        "z,y,x,w,v,u,t,s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,"+
+        "Z,Y,X,W,V,U,T,S,R,Q,P,O,N,M,L,K,J,I,H,G,F,E,D,C,B,A,"+
+        "Z,Y,X,W,V,U,T,S,R,Q,P,O,N,M,L,K,J,I,H,G,F,E,D,C,B,A";
+        if ( aa < 52 ) { aa=52-aa; }
+        if ( aa > 104 ) { aa=260-aa; }
+        out = beta[aa,2*(-n)-1]; return (out);
+      }
+    }
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   A_Z("c",5);
+   A_Z("Z",-5);
+   string sR = "ring R = (0,"+A_Z("A",6)+"),("+A_Z("a",10)+"),dp;";
+   sR;
+   execute sR;
+   R;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc binomial (int n, int k, list #)
+USAGE:   binomial(n,k[,p/s]); n,k,p integers, s string
+RETURN:  binomial(n,k);    binomial coefficient n choose k of type int
+                           (machine integer, limited size! )
+         binomial(n,k,p);  n choose k in char p of type string
+         binomial(n,k,s);  n choose k of type number (s any string), computed
+                           in char of basering if a basering is defined
+EXAMPLE: example binomial; shows an example
+{
+   if ( size(#)==0 ) { int rr=1; }
+   if ( typeof(#[1])=="int") { ring bin = #[1],x,dp; number rr=1; }
+   if ( typeof(#[1])=="string") { number rr=1; }
+   if ( size(#)==0 or typeof(#[1])=="int" or typeof(#[1])=="string" )
+   {
+      def r = rr;
+      if ( k<=0 or k>n ) { return((k==0)*r); }
+      if ( k>=n-k ) { k = n-k; }
+      int l;
+      for (l=1 ; l<=k ; l++ )
+      {
+         r=r*(n+1-l)/l;
+      }
+      if ( typeof(#[1])=="int" ) { return(string(r)); }
+      return(r);
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   int b1 = binomial(10,7); b1;
+   binomial(37,17,0);
+   ring t = 31,x,dp;
+   number b2 = binomial(37,17,""); b2;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc changechar (r, string c, string newr)
+USAGE:   changechar(r,c,newr);  r=ring/qring, c,newr=strings
+CREATE:  creates a new ring with name `newr` and makes it the basering if r is
+         an existing ring/qring.
+         The new ring differs from the old ring only in the characteristic. If,
+         say, (c,newr) = ("0,A","R") and the ring r exists, the new basering
+         will have name R characteristic 0 and one parameter A.
+RETURN:  No return value
+NOTE:    //*** Buggy for qrings
+EXAMPLE: example changechar; shows an example
+{
+   setring r;
+   ideal i = ideal(r); int q = size(i);
+   if( q!=0 )
+      { string s = "newr1"; }
+   else
+      { string s = newr; }
+   string newring = s+"=("+c+"),("+varstr(r)+"),("+ordstr(r)+");";
+   execute("ring "+newring);
+   if( q!=0 )
+   {
+      map phi = r,maxideal(1);
+      ideal i = phi(i);
+      attrib(i,"isSB",1);         //*** attrib funktioniert ?
+      execute("qring "+newr+"=i;");
+   }
+   export(`newr`);
+   keepring(`newr`);
+   return();
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,u,v),(dp(2),ds);
+   show(r);
+   changechar(r,"2,A","R");
+   show(R);
+   kill R;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc changeord (r, string o, string newr)
+USAGE:   changeord(r,o,newr);  r=ring/qring, o,newr=strings
+CREATE:  creates a new ring with name `newr` and makes it the basering if r is
+         an existing ring/qring.
+         The new ring differs from the old ring only in the ordering. If, say,
+         (o,newr) = ("wp(2,3),dp","R") and the ring r exists and has >=3
+         variables, the new basering will have name R and ordering wp(2,3),dp.
+RETURN:  No return value
+EXAMPLE: example changeord; shows an example
+{
+   setring r;
+   ideal i = ideal(r); int q = size(i);
+   if( q!=0 )
+      { string s = "newr1"; }
+   else
+      { string s = newr; }
+   string newring = s+"=("+charstr(r)+"),("+varstr(r)+"),("+o+");";
+   execute("ring "+newring);
+   if( q!=0 )
+   {
+      map phi = r,maxideal(1);
+      ideal i = phi(i);
+      attrib(i,"isSB",1);         //*** attrib funktioniert ?
+      execute("qring "+newr+"=i;");
+   }
+   export(`newr`);
+   keepring(`newr`);
+   return();
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,u,v),(dp(2),ds);
+   changeord(r,"wp(2,3),dp","R");
+   show(R);
+   ideal i = x^2,y^2-u^3,v;
+   qring Q = std(i);
+   changeord(Q,"lp","Q'");
+   show(Q');
+   kill R,Q,Q';
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc changevar (r, string vars, string newr)
+USAGE:   changevar(r,vars,newr);  r=ring/qring, vars,newr=strings
+CREATE:  creates a new ring with name `newr` and makes it the basering if r is
+         an existing ring/qring.
+NOTE:    This procedure is the same as copyring
+EXAMPLE: example changevar; shows an example
+{
+   copyring(r,vars,newr);
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,u,v),(dp(2),ds);
+   changevar(r,"A()","R");
+   show(R);
+   ideal i = x^2,y^2-u^3,v;
+   qring Q = std(i);
+   changevar(Q,"a,b,c,d","Q'");
+   show(Q');
+   kill R,Q,Q';
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc copyring (r, string vars, string newr)
+USAGE:   copyring(r,vars,newr);  r ring/qring, vars, newr strings
+CREATE:  creates a new ring with name `newr` and makes it the basering if r is
+         an existing ring/qring.
+         The new ring differs from the old ring only in the variables. If, say,
+         (vars,newr) = ("t()","R") and the ring r exists and has n variables,
+         the new basering will have name R and variables t(1),...,t(n).
+         If vars = "a,b,c,d", the new ring will have the variables a,b,c,d.
+RETURN:  No return value
+NOTE:    This procedure is useful in connection with the procedure ringsum,
+         when a conflict between variable names must be avoided. See proc
+         copyring1 for an alternative
+EXAMPLE: example copyring; shows an example
+{
+   setring r;
+   ideal i = ideal(r); int q = size(i);
+   if( q!=0 )
+      { string s = "newr1"; }
+   else
+      { string s = newr; }
+   string newring = s+"=("+charstr(r)+"),(";
+   if( vars[size(vars)-1]=="(" and vars[size(vars)]==")" )
+   {
+      newring = newring+vars[1,size(vars)-2]+"(1.."+string(nvars(r))+")";
+   }
+   else { newring = newring+vars; }
+   newring = newring+"),("+ordstr(r)+");";
+   execute("ring "+newring);
+   if( q!=0 )
+   {
+      map phi = r,maxideal(1);
+      ideal i = phi(i);
+      attrib(i,"isSB",1);         //*** attrib funktioniert ?
+      execute("qring "+newr+"=i;");
+   }
+   export(`newr`);
+   keepring(`newr`);
+   return();
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,u,v),(dp(2),ds);
+   copyring(r,"A()","R");
+   type R;
+   ideal i = A(1)^2,A(2)^2-A(3)^3,A(4);
+   qring Q = std(i);
+   copyring(Q,"a,b,c,d","Q'");
+   type Q';
+   kill R,Q,Q';
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc copyring1 (r, string vars, string newr)
+USAGE:   copyring1(r,vars,newr);  r ring, vars, newr strings
+RETURN:  a string which can be executed to define a new ring with name equal
+         to `newr` if r is an existing ring name.
+         The new ring differs from the old ring only in the variables. If, say,
+         (vars,newr) = ("t()","R") and the ring r exists and has n variables,
+         the new basering will have name R and variables t(1),...,t(n).
+         If vars = "a,b,c,d", the new ring will have the variables a,b,c,d.
+NOTE:    This procedure differs from copyring that it returns the string to
+         create newring, but does not execute this string. Contrary to
+         copyring this procedure does not work for a qring
+EXAMPLE: example copyring1; shows an example
+{
+   string newring = "ring "+newr+"=("+charstr(r)+"),(";
+   if( vars[size(vars)-1]=="(" and vars[size(vars)]==")" )
+        { string v = vars[1,size(vars)-2]+"(1.."+string(nvars(r))+")"; }
+   else { string v = vars; }
+   return(newring+v+"),("+ordstr(r)+");");
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,u,v),(dp(2),ds);
+   string s=copyring1(r,"A()","R");s;
+   execute(s);
+   type R;
+   execute(copyring1(R,"a,b,c,d,e","r'"));
+   type r';
+   kill R,r';
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc defring (string s1, string s2, int n, string s3, string s4)
+USAGE:   defring(s1,s2,n,s3,s4);  s1..s4=strings, n=integer
+CREATE:  Defines a ring with name 's1', characteristic 's2', ordering 's4' and
+         n variables with names derived from s3: if s3 is a single letter, say
+         s3="a", and if n<=26 then a and the following n-1 letters from the
+         alphabeth (cyclic order) are taken as variables. If n>26 or if s3 is
+         a single letter followed by (, say s3="T(", the variables are
+         T(1),...,T(n).
+RETURN:  No return value
+EXAMPLE: example defring; shows an example
+{
+   string newring = "ring "+s1+"=("+s2+"),(";
+   if( n>26 or s3[2]=="(" ) { string v = s3[1]+"(1.."+string(n)+")"; }
+   else { string v = A_Z(s3,n); }
+   newring=newring+v+"),("+s4+");";
+   execute(newring);
+   export(basering);
+   keepring(`s1`);
+   if (voice==2) { "// basering is now:",s1; }
+   return();
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   defring("r","0",5,"u","ls"); r;
+   defring("R","2,A",10,"x(","dp(3),ws(1,2,3),ds"); R;
+   kill r,R;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc defrings (int n, list #)
+USAGE:   defrings(n,[p]);  n,p integers
+CREATE:  Defines a ring with name Sn, characteristic p, ordering ds and n
+         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26) and makes it
+         the basering (default: p=32003)
+RETURN:  No return value
+EXAMPLE: example defrings; shows an example
+{
+   int p;
+   if (size(#)==0) { p=32003; }
+   else { p=#[1]; }
+   if (n >26)
+   {
+      string s="ring S"+string(n)+"="+string(p)+",x(1.."+string(n)+"),ds;";
+   }
+   else
+   {
+      string s="ring S"+string(n)+"="+string(p)+",("+A_Z("x",n)+"),ds;";
+   }
+   execute(s);
+   export basering;
+   execute("keepring S"+string(n)+";");
+   if (voice==2) { "// basering is now:",s; }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   defrings(5,0); S5;
+   defrings(30); S30;
+   kill S5, S30;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc defringp (int n,list #)
+USAGE:   defringp(n,[p]);  n,p=integers
+CREATE:  defines a ring with name Pn, characteristic p, ordering dp and n
+         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26) and makes it
+         the basering (default: p=32003)
+RETURN:  No return value
+EXAMPLE: example defringp; shows an example
+{
+   int p;
+   if (size(#)==0) { p=32003; }
+   else { p=#[1]; }
+   if (n >26)
+   {
+      string s="ring P"+string(n)+"="+string(p)+",x(1.."+string(n)+"),dp;";
+   }
+   else
+   {
+     string s="ring P"+string(n)+"="+string(p)+",("+A_Z("x",n)+"),dp;";
+   }
+   execute(s);
+   export basering;
+   execute("keepring P"+string(n)+";");
+   //the next comment is only shown if defringp is not called by another proc
+   if (voice==2) { "// basering is now:",s; }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   defringp(5,0); P5;
+   defringp(30); P30;
+   kill P5, P30;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc factorial (int n, list #)
+USAGE:   factorial(n[,string]);  n integer
+RETURN:  factorial(n); string of n! in char 0
+         factorial(n,s);  n! of type number (s any string), computed in char of
+         basering if a basering is defined
+EXAMPLE: example factorial; shows an example
+{
+   if ( size(#)==0 ) { ring R = 0,x,dp; poly r=1; }
+   if ( typeof(#[1])=="string" ) { number r=1; }
+   if ( size(#)==0 or typeof(#[1])=="string" )
+   {
+      int l;
+      for (l=2; l<=n; l++)
+      {
+         r=r*l;
+      }
+      if ( size(#)==0 ) { return(string(r)); }
+      return(r);
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   factorial(37);
+   ring r1 = 32003,(x,y,z),ds;
+   number p = factorial(37,""); p;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc fetchall (R, list #)
+USAGE:   fetchall(R[,s]);  R=ring/qring, s=string
+CREATE:  fetch all objects of ring R (of type poly, ideal, vector, module,
+         number, matrix) into the basering.
+         If no 3rd argument is present, the names are the same as in R. If, say,
+         f is a poly in R and the 3rd argument is the string "R", then f is
+         maped to f_R etc.
+RETURN:  no return value
+NOTE:    As fetch, this procedure maps the 1st, 2nd, ... variable of R to the
+         1st, 2nd, ... variable of the basering.
+         The 3rd argument is useful in order to avoid conflicts of names, the
+         empty string is allowed
+CAUTION: fetchall does not work inside a procedure
+         //***at the moment it does not work if R contains a map
+EXAMPLE: example fetchall; shows an example
+{
+   list @L@=names(R);
+   int @ii@; string @s@;
+   if( size(#) > 0 ) { @s@=@s@+"_"+#[1]; }
+   for( @ii@=size(@L@); @ii@>0; @ii@=@ii@-- )
+   {
+         execute("def "+@L@[@ii@]+@s@+"=fetch(R,`@L@[@ii@]`);");
+         execute("export "+@L@[@ii@]+@s@+";");
+   }
+   return();
+}
+example
+{  "EXAMPLE:";
+"// This example is not executed since fetchall does not work in a procedure";
+"// (and hence not in the example procedure). Just try the following commands:";
+"   ring R=0,(x,y,z),dp;";
+"   ideal j=x,y2,z2;";
+"   matrix M[2][3]=1,2,3,x,y,z;";
+"   j; print(M);";
+"   ring S=0,(a,b,c),ds;";
+"   fetchall(R);           // map from R to S: x->a, y->b, z->c";
+"   names(S);";
+"   j; print(M);";
+"   fetchall(S,\"1\");       // identity map of S: copy objects, change names";
+"   names(S);";
+"   kill R,S;";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc fibonacci (int n, list #)
+USAGE:   fibonacci(n[,string]);  (n integer)
+RETURN:  fibonacci(n); string of nth Fibonacci number,
+            f(0)=f(1)=1, f(i+1)=f(i-1)+f(i)
+         fibonacci(n,s);  nth Fibonacci number of type number (s any string),
+         computed in characteristic of basering if a basering is defined
+EXAMPLE: example fibonacci; shows an example
+{
+   if ( size(#)==0 ) { ring fibo = 0,x,dp; number f=1; }
+   if ( typeof(#[1])=="string" ) { number f=1; }
+   if ( size(#)==0 or typeof(#[1])=="string" )
+   {
+      number g,h = 1,1; int ii;
+      for (ii=3; ii<=n; ii++)
+      {
+         h = f+g; f = g; g = h;
+      }
+      if ( size(#)==0 ) { return(string(h)); }
+      return(h);
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   fibonacci(37);
+   ring r = 17,x,dp;
+   number b = fibonacci(37,""); b;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc ishomog (id)
+USAGE:   ishomog(id);  id  poly/ideal/vector/module/matrix
+RETURN:  integer which is 1 if input is homogeneous (resp. weighted homogeneous
+         if the monomial ordering consists of one block of type ws,Ws,wp or Wp,
+         assuming that all weights are positive) and 0 otherwise
+NOTE:    A vector is homogeneous, if the components are homogeneous of same
+         degree, a module/matrix is homogeneous if all column vectors are
+         homogeneous
+         //*** ergaenzen, wenn Matrizen Spalten Gewichte haben
+EXAMPLE: example ishomog; shows an example
+{
+   module M = module(matrix(id));
+   M = simplify(M,2);                        // remove 0-columns
+   intvec v = ringweights(basering);
+   int i,j=1,1;
+   for (i=1; i<=ncols(M); i++)
+   {
+      if( M[i]!=jet(M[i],deg(lead(M[i])),v)-jet(M[i],deg(lead(M[i]))-1,v))
+      { return(0); }
+   }
+   return(1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),wp(1,2,3);
+   ishomog(x5-yz+y3);
+   ideal i = x6+y3+z2, x9-z3;
+   ishomog(i);
+   ring s = 0,(a,b,c),ds;
+   vector v = [a2,0,ac+bc];
+   vector w = [a3,b3,c4];
+   ishomog(v);
+   ishomog(w);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc kmemory ()
+USAGE:   kmemory();
+RETURN:  memory used by active variables, of type int (in kilobyte)
+EXAMPLE: example kmemory; shows an example
+{
+  if ( voice==2 ) { "// memory used by active variables (kilobyte):"; }
+   return ((memory(0)+1023)/1024);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   kmemory();
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc killall ()
+USAGE:   killall(); (no parameter)
+CREATE:  kill all user-defined variables but not loaded procedures
+RETURN:  no return value
+NOTE:    killall should never be used inside a procedure
+EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
+{
+   list L=names(); int joni=size(L);
+   for ( ; joni>0; joni-- )
+   {
+      if( L[joni]!="LIB" and typeof(`L[joni]`)!="proc" ) { kill `L[joni]`; }
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring rtest; ideal i=x,y,z; number n=37; string str="hi";
+   export rtest,i,n,str;     //this makes the local variables global
+   listvar(all);
+   killall();
+   listvar(all);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc imapall (R, list #)
+USAGE:   imapall(R[,s]);  R=ring/qring, s=string
+CREATE:  map all objects of ring R (of type poly, ideal, vector, module, number,
+         matrix) into the basering, by applying imap to all objects of R.
+         If no 3rd argument is present, the names are the same as in R. If, say,
+         f is a poly in R and the 3rd argument is the string "R", then f is
+         maped to f_R etc.
+RETURN:  no return value
+NOTE:    As imap, this procedure maps the variables of R to the variables with
+         the same name in the basering, the other variables are maped to 0.
+         The 3rd argument is useful in order to avoid conflicts of names, the
+         empty string is allowed
+CAUTION: imapall does not work inside a procedure
+         //***at the moment it does not work if R contains a map
+EXAMPLE: example imapall; shows an example
+{
+   list @L@=names(R);
+   int @ii@; string @s@;
+   if( size(#) > 0 ) { @s@=@s@+"_"+#[1]; }
+   for( @ii@=size(@L@); @ii@>0; @ii@=@ii@-- )
+   {
+         execute("def "+@L@[@ii@]+@s@+"=imap(R,`@L@[@ii@]`);");
+         execute("export "+@L@[@ii@]+@s@+";");
+   }
+   return();
+}
+example
+{  "EXAMPLE:";
+"// This example is not executed since imapall does not work in a procedure";
+"// (and hence not in the example procedure). Just try the following commands:";
+"   ring R=0,(x,y,z,u),dp;";
+"   ideal j=x,y,z,u2+ux+z;";
+"   matrix M[2][3]=1,2,3,x,y,uz;";
+"   j; print(M);";
+"   ring S=0,(a,b,c,x,z,y),ds;";
+"   imapall(R);           // map from R to S: x->x, y->y, z->z, u->0";
+"   names(S);";
+"   j; print(M);";
+"   imapall(S,\"1\");       // identity map of S: copy objects, change names";
+"   names(S);";
+"   kill R,S;";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc mapall (R, ideal i, list #)
+USAGE:   mapall(R,i[,s]);  R=ring/qring, i=ideal of basering, s=string
+CREATE:  map all objects of ring R (of type poly, ideal, vector, module, number,
+         matrix, map) into the basering, by mapping the jth variable of R to
+         the jth generator of the ideal i. If no 3rd argument is present, the
+         names are the same as in R. If, say, f is a poly in R and the 3rd
+         argument is the string "R", then f is maped to f_R etc.
+RETURN:  no return value
+NOTE:    This procedure has the same effect as defining a map, say psi, by
+         map psi=R,i; and then applying psi to all objects of R. In particular,
+         maps from R to some ring S are composed with psi, creating thus a map
+         from the basering to S.
+         mapall may be combined with copyring to change vars for all objects.
+         The 3rd argument is useful in order to avoid conflicts of names, the
+         empty string is allowed
+CAUTION: mapall does not work inside a procedure
+EXAMPLE: example mapall; shows an example
+{
+   list @L@=names(R); map @psi@ = R,i;
+   int @ii@; string @s@;
+   if( size(#) > 0 ) { @s@=@s@+"_"+#[1]; }
+   for( @ii@=size(@L@); @ii@>0; @ii@=@ii@-- )
+   {
+      execute("def "+@L@[@ii@]+@s@+"=@psi@(`@L@[@ii@]`);");
+      execute("export "+@L@[@ii@]+@s@+";");
+   }
+   return();
+}
+example
+{  "EXAMPLE:";
+"// This example is not executed since mapall does not work in a procedure";
+"// (and hence not in the example procedure). Just try the following commands:";
+"   ring R=0,(x,y,z),dp;";
+"   ideal j=x,y,z;";
+"   matrix M[2][3]=1,2,3,x,y,z;";
+"   map phi=R,x2,y2,z2; ";
+"   ring S=0,(a,b,c),ds;";
+"   ideal i=c,a,b;";
+"   mapall(R,i);             // map from R to S: x->c, y->a, z->b";
+"   names(S);";
+"   j; print(M); phi;        // phi is a map from R to S: x->c2, y->a2, z->b2";
+"   ideal i1=a2,a+b,1;";
+"   mapall(R,i1,\"\");         // map from R to S: x->a2, y->a+b, z->1";
+"   names(S);";
+"   j_; print(M_); phi_;";
+"   copyring(S,\"x()\",\"T\");";
+"   mapall(R,maxideal(1));   // identity map from R to T";
+"   names(T);";
+"   j; print(M); phi;";
+"   kill R,S,T;";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc maxcoef (f)
+USAGE:   maxcoef(f);  f  poly/ideal/vector/module/matrix
+RETURN:  maximal length of coefficient of f of type int (by counting the
+         length of the string of each coefficient)
+EXAMPLE: example maxcoef; shows an example
+{
+   int max,s,ii,jj; string t;
+   ideal i = ideal(matrix(f));
+   i = simplify(i,6);         //* delete 0's and keep first of equal elements
+   poly m = var(1); matrix C;
+   for (ii=2;ii<=nvars(basering);ii++) { m = m*var(ii); }
+   for (ii=1; ii<=size(i); ii++)
+   {
+      C = coef(i[ii],m);
+      for (jj=1; jj<=ncols(C); jj++)
+      {
+         t = string(C[2,jj]);  s = size(t);
+         if ( t[1] == "-" ) { s = s - 1; }
+         if ( s > max ) { max = s; }
+      }
+   }
+   return(max);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r= 0,(x,y,z),ds;
+   poly g = 345x2-1234567890y+7/4z;
+   maxcoef(g);
+   ideal i = g,10/1234567890;
+   maxcoef(i);
+   // since i[2]=1/123456789
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc maxdeg (id)
+USAGE:   maxdeg(id);  id  poly/ideal/vector/module/matrix
+RETURN:  maximal degree/s of monomials of id independent of ring ordering
+         (maxdeg of each variable is 1)
+         of type int if id is of type poly, of type intmat else
+EXAMPLE: example maxdeg; shows an example
+{
+//------------------- find maximal degree of given component ------------------
+   proc findmaxdeg
+   {
+      poly c = #[1];
+      if (c==0) { return(-1); }
+   //--- guess upper 'o' and lower 'u' bound, in case of negative weights -----
+      int d = (deg(c)>=0)*deg(c)-(deg(c)<0)*deg(c);
+      int i = d;
+      while ( c-jet(c,i) != 0 ) { i = 2*(i+1); }
+      int o = i-1;
+      int u = (d != i)*((i/ 2)-1);
+   //----------------------- "quick search" for maxdeg ------------------------
+      while ( (c-jet(c,i)==0)*(c-jet(c,i-1)!=0) == 0)
+      {
+         i = (o+1+u)/ 2;
+         if (c-jet(c,i)!=0) { u = i+1; }
+         else { o = i-1; }
+      }
+      return(i);
+   }
+//------------------------------ main program ---------------------------------
+   matrix M = matrix(id);
+   int r,c = nrows(M), ncols(M); int i,j;
+   intmat m[r][c];
+   for (i=r; i>0; i--)
+   {
+      for (j=c; j>0; j--) { m[i,j] = findmaxdeg(M[i,j]); }
+   }
+   if( typeof(id)=="poly" ) { return(m[1,1]); }
+   return(m);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),wp(-1,-2,-3);
+   poly f = x+y2+z3;
+   deg(f);               //deg returns weighted degree (in case of 1 block)!
+   maxdeg(f);
+   matrix m[2][2]=f+x10,1,0,f^2;
+   maxdeg(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc mindeg (id)
+USAGE:   mindeg(id);  id  poly/ideal/vector/module/matrix
+RETURN:  minimal degree/s of monomials of id independent of ring ordering
+         (mindeg of each variable is 1)
+         of type int if id is of type poly, of type intmat else
+EXAMPLE: example mindeg; shows an example
+{
+//------------------- find minimal degree of given component ------------------
+   proc findmindeg
+   {
+      poly c = #[1];
+      if (c==0) { return(-1); }
+   //--- guess upper 'o' and lower 'u' bound, in case of negative weights -----
+      int d = (ord(c)>=0)*ord(c)-(ord(c)<0)*ord(c);
+      int i = d;
+      while ( jet(c,i) == 0 ) { i = 2*(i+1); }
+      int o = i-1;
+      int u = (d != i)*((i/ 2)-1);
+//----------------------- "quick search" for mindeg --------------------------
+      while ( (jet(c,u)==0)*(jet(c,o)!=0) )
+      {
+         i = (o+u)/ 2;
+         if (jet(c,i)==0) { u = i+1; }
+         else { o = i-1; }
+      }
+      if (jet(c,u)!=0) { return(u); }
+      else { return(o+1); }
+   }
+//------------------------------ main program ---------------------------------
+   matrix M = matrix(id);
+   int r,c = nrows(M), ncols(M); int i,j;
+   intmat m[r][c];
+   for (i=r; i>0; i--)
+   {
+      for (j=c; j>0; j--) { m[i,j] = findmindeg(M[i,j]); }
+   }
+   if (typeof(id)=="poly") { return(m[1,1]); }
+   return(m);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),ls;
+   poly f = x5+y2+z3;
+   ord(f);                // ord returns weighted order of leading term!
+   mindeg(f);
+   matrix m[2][2]=x10,1,0,f^2;
+   mindeg(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc normalize (id)
+USAGE:   normalize(id);  id=poly/vector/ideal/module
+RETURN:  object of same type with leading coefficient equal to 1
+EXAMPLE: example normalize; shows an example
+{
+   return(simplify(id,1));
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),ls;
+   poly f = 2x5+3y2+4z3;
+   normalize(f);
+   module m=[9xy,0,3z3],[4z,6y,2x];
+   show(normalize(m));
+   ring s = 0,(x,y,z),(c,ls);
+   module m=[9xy,0,3z3],[4z,6y,2x];
+   show(normalize(m));
+   normalize(matrix(m));  // by automatic type conversion to module!
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc primes (int n, int m)
+USAGE:   primes(n,m);  n,m integers
+RETURN:  intvec, consisting of all primes p, prime(n)<=p<=m, in increasing
+         order if n<=m, resp. prime(m)<=p<=n, in decreasing order if m<n
+NOTE:    prime(n); returns the biggest prime number <= n (if n>=2, else 2)
+EXAMPLE: example primes; shows an example
+{  int change;
+   if ( n>m ) { change=n; n=m ; m=change; change=1; }
+   int q,p = prime(m),prime(n); intvec v = q; q = q-1;
+   while ( q>=p ) { q = prime(q); v = q,v; q = q-1; }
+   if ( change==1 ) { v = v[size(v)..1]; }
+   return(v);
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   primes(50,100);
+   intvec v = primes(37,1); v;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc product (id, list #)
+USAGE:    product(id[,v]); id=ideal/vector/module/matrix
+          resp.id=intvec/intmat, v=intvec (e.g. v=1..n, n=integer)
+RETURN:   poly resp. int which is the product of all entries of id, with index
+          given by v (default: v=1..number of entries of id)
+NOTE:     id is treated as a list of polys resp. integers. A module m is
+          identified with corresponding matrix M (columns of M generate m)
+EXAMPLE:  example product; shows an example
+{
+   int n,j;
+   if( typeof(id)=="poly" or typeof(id)=="ideal" or typeof(id)=="vector"
+       or typeof(id)=="module" or typeof(id)=="matrix" )
+   {
+      ideal i = ideal(matrix(id));
+      if( size(#)!=0 ) { i = i[#[1]]; }
+      n = ncols(i); poly f=1;
+   }
+   if( typeof(id)=="int" or typeof(id)=="intvec" or typeof(id)=="intmat" )
+   {
+      intmat S = intmat(id);
+      intvec i = S[1..nrows(S),1..ncols(S)];
+      if( size(#)!=0 ) { i = i[#[1]]; }
+      n = size(i); int f=1;
+   }
+   for( j=1; j<=n; j++ ) { f=f*i[j]; }
+   return(f);
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r= 0,(x,y,z),dp;
+   ideal m = maxideal(1);
+   product(m);
+   matrix M[2][3] = 1,x,2,y,3,z;
+   product(M);
+   intvec v=2,4,6;
+   product(M,v);
+   intvec iv = 1,2,3,4,5,6,7,8,9;
+   v=1..5,7,9;
+   product(iv,v);
+   intmat A[2][3] = 1,1,1,2,2,2;
+   product(A,3..5);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc ringsum (list #)
+USAGE:   ringsum(r1,r2,...,s); r1,r2,... rings, s string (name of result ring)
+CREATE:  A new base ring with name equal to s if r1,r2,... are existing rings.
+         If, say, s = "R" and the rings r1,r2,... exist, the new ring will
+         have name R, variables from all rings r1,r2,... and as monomial
+         ordering the block (product) ordering of r1,r2,.... Mathematically, R
+         is the tensor product of the rings r1,r2,... with ordering matrix
+         equal to the direct sum of the ordering matrices of r1,r2,...
+RETURN:  no return value
+NOTE:    The characteristic of the new ring will be that of r1. The names of
+         variables in the rings r1,r2,... should differ (if a name, say x,
+         occurs in r1 and r2, then, in the new ring r, x always refers to the
+         variable with name x in r1, there is no access to x in r2).
+         The procedure works also for quotient rings.
+EXAMPLE: example ringsum; shows an example
+{
+   int ii,q;
+   int n = size(#);
+   string vars,order,oi,s;
+   for(ii=1; ii<=n-1; ii++)
+   {
+      if( ordstr(#[ii])[1]=="C" or ordstr(#[ii])[1]=="c" )
+           { oi=ordstr(#[ii])[3,size(ordstr(#[ii]))-2]; }
+      else { oi=ordstr(#[ii])[1,size(ordstr(#[ii]))-2]; }
+      vars = vars+varstr(#[ii])+",";
+      order= order+oi+",";
+      def r(ii)=#[ii];
+      setring r(ii);
+      ideal i(ii)=ideal(r(ii));
+      int q(ii)=size(i(ii));
+      q=q+q(ii);
+   }
+   if( q!=0 ) { s = "newr"; }
+   else {  s = #[size(#)]; }
+   string newring ="=("+charstr(#[1])+"),("+vars[1,size(vars)-1]+"),("
+                  +order[1,size(order)-1]+");";
+   execute("ring "+s+newring);
+   if( q!=0 )
+   {
+      ideal i;
+      for(ii=1; ii<=n-1; ii++)
+      {
+         if( q(ii)!=0 )
+         {
+            map phi = r(ii),maxideal(1);
+            i = i+phi(i(ii));
+            kill phi;
+         }
+      }
+      i=std(i);
+      execute("qring "+#[size(#)]+"=i;");
+   }
+   export(`#[size(#)]`);
+   keepring(`#[size(#)]`);
+   return();
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,u,v),dp;
+   ring s=32003,(a,b,c),wp(1,2,3);
+   ring t=37,x(1..5),(c,ls);
+   ringsum(r,s,t,"R");
+   type R;
+   setring s;
+   ideal i = a2+b3+c5; i=std(i);
+   qring qs =i;
+   setring s; qring qt=i;
+   ringsum(r,qs,t,qt,"Q");
+   type Q;
+   kill R,Q;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc ringweights (r)
+USAGE:   ringweights(r); r ring
+RETURN:  intvec of weights of ring variables. If, say, x(1),...,x(n) are the
+         variables of the ring r, in this order, the resulting intvec is
+         deg(x(1)),...,deg(x(n)) where deg denotes the weighted degree if
+         the monomial ordering of r has only one block of type ws,Ws,wp or Wp.
+NOTE:    In all other cases, in particular if there is more than one block,
+         the resulting intvec is 1,...,1
+EXAMPLE: example ringweights; shows an example
+{
+   int i; intvec v; setring r;
+   for (i=1; i<=nvars(basering); i++) { v[i] = deg(var(i)); }
+   return(v);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r1=32003,(x,y,z),wp(1,2,3);
+   ring r2=32003,(x,y,z),Ws(1,2,3);
+   ring r=0,(x,y,u,v),lp;
+   intvec vr=ringweights(r1); vr;
+   ringweights(r2);
+   ringweights(r);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sort
+USAGE:    sort(id); id ideal or module
+RETURN:   ideal with generators of id sorted with respect to monomial ordering
+          of the basering (generators with smaller leading term come first)
+EXAMPLE:  example sort; shows an example
+{
+  intvec v = sortvec(#[1]);
+  int s    = size(v);
+  def m    = #[1];
+  for (int jj=1;jj<=s;jj++) { m[jj] = #[1][v[jj]]; }
+  return(m);
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r0 = 0,(x,y,z),lp;
+   ideal i = x3,y3,z3,x2z,x2y,y2z,y2x,z2y,z2x,xyz;
+   sort(i);
+   ring r1  = 0,t,ls;
+   ideal i = t47,t14,t6;
+   ideal j = i;
+   int ii;
+   for (ii=1;ii<=8;ii=ii+1) { j=simplify(jet(j+i^ii,50),6); }
+   print (matrix(j));
+   print (matrix(sort(j)));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sum (id, list #)
+USAGE:    sum(id[,v]); id=ideal/vector/module/matrix resp. id=intvec/intmat,
+                       v=intvec (e.g. v=1..n, n=integer)
+RETURN:   poly resp. int which is the sum of all entries of id, with index
+          given by v (default: v=1..number of entries of id)
+NOTE:     id is treated as a list of polys resp. integers. A module m is
+          identified with corresponding matrix M (columns of M generate m)
+EXAMPLE:  example sum; shows an example
+{
+   if( typeof(id)=="poly" or typeof(id)=="ideal" or typeof(id)=="vector"
+       or typeof(id)=="module" or typeof(id)=="matrix" )
+   {
+      ideal i = ideal(matrix(id));
+      if( size(#)!=0 ) { i = i[#[1]]; }
+      matrix Z = matrix(i);
+      intvec v; v[ncols(Z)]=0; v=v+1;
+   }
+   if( typeof(id)=="int" or typeof(id)=="intvec" or typeof(id)=="intmat" )
+   {
+      intmat S = intmat(id);
+      intvec v = S[1..nrows(S),1..ncols(S)];
+      if( size(#)!=0 ) { v = v[#[1]]; }
+      intvec z; z[size(v)]=0; z=z+1;
+      intmat Z=transpose(z);
+   }
+   return((Z*v)[1,1]);
+}
+example
+{  "EXAMPLE:"; echo = 2;
+   ring r= 0,(x,y,z),dp;
+   vector pv = [xy,xz,yz,x2,y2,z2];
+   sum(pv);
+   sum(pv,2..5);
+   matrix M[2][3] = 1,x,2,y,3,z;
+   sum(M);
+   intvec v=2,4,6;
+   sum(M,v);
+   intvec iv = 1,2,3,4,5,6,7,8,9;
+   v=1..5,7,9;
+   sum(iv,v);
+   intmat m[2][3] = 1,1,1,2,2,2;
+   sum(m,3..4);
+}
+///////////////////////////////////////////////////////////////////////////////

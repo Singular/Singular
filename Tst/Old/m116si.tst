@@ -1,0 +1,3 @@
+  reservedName("ring");
+  reservedName("xyz");
+$

@@ -1,0 +1,23 @@
+int a=11;
+int b=12;
+int c=13;
+ring r;
+ideal i1=x3+xyz+z3,y4+y2z2+z4,x5+x2y2z+y5;
+ideal i2=x3+xyz;
+ideal i3=x3+xyz+z3,y4+y2z2+z4,x5+x2y2z+y5,x6+x4y2+y2x2z2+z4x2+z6+y4z2+y6;
+ideal i4=x3+xyz+z3,y4+y2z2+z4,x5+x2y2z+y5,x6+x4y2+y2x2z2+z4x2+z6+y4z3+y6;
+ideal j=x^a,y^b,z^c;
+map f=r,j;
+ideal ii1=f(i1);
+ideal ii2=f(i2);
+ideal ii3=f(i3);
+ideal ii4=f(i4);
+intvec I1=qhweight(ii1);
+intvec I2=qhweight(ii2);
+intvec I3=qhweight(ii3);
+intvec I4=qhweight(ii4);
+intvec IW=weight(ii1);
+I1;I2;I3;I4;
+" ";
+IW;
+$

@@ -1,0 +1,956 @@
+//===========================================================================//
+// LIBRARY:  lib0           library of some general procedures               //
+//           type lib0();   to list the procedures                           //
+//                          7/94 GMG+BM                                      //
+//===========================================================================//
+
+proc A_Z (string s,int n)
+USAGE:    A_Z("a",n);  a any letter, n integer (-26<= n <=26, !=0)
+RETURN:   string of n small (if a is small) or capital (if a is capital)
+          letters, comma seperated, beginning with a, in alphabetical
+          order (or revers alphabetical order if n<0)
+EXAMPLE:  example A_Z; shows an example
+{
+  if (n>=-26 and n<=26 and n!=0 )
+  {
+    string @alpha =
+      "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,"+
+      "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,"+
+      "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,"+
+      "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z";
+    int @ii; int @aa;
+    for (@ii=1; @ii<=51; @ii=@ii+2)
+    {
+      if ( @alpha[@ii] ==  s )
+      {
+        @aa = @ii;
+      }
+    }
+    if ( @aa == 0)
+    {
+      for (@ii=105; @ii<=155; @ii=@ii+2)
+      {
+        if ( @alpha[@ii] ==  s )
+        {
+          @aa = @ii;
+        }
+     }
+    }
+  }
+  if ( @aa != 0)
+  {
+    string @out;
+    if (n > 0)
+    {
+      @out = @alpha[@aa,2*(n)-1];
+      return (@out);
+    }
+    string @beta =
+      "z,y,x,w,v,u,t,s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,"+
+      "z,y,x,w,v,u,t,s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,"+
+      "Z,Y,X,W,V,U,T,S,R,Q,P,O,N,M,L,K,J,I,H,G,F,E,D,C,B,A,"+
+      "Z,Y,X,W,V,U,T,S,R,Q,P,O,N,M,L,K,J,I,H,G,F,E,D,C,B,A";
+    if ( @aa < 52 )
+    {
+      @aa=52-@aa;
+    }
+    if ( @aa > 104 )
+    {
+      @aa=260-@aa;
+    }
+    @out = @beta[@aa,2*(-n)-1];
+    return (@out);
+  }
+}
+example
+{
+//--------------------------------- EXAMPLE ----------------------------------
+  "EXAMPLE:";
+  "   A_Z(\"c\",5);";                                        A_Z("c",5);
+  "   A_Z(\"Z\",-5);";                                       A_Z("Z",-5);
+  "   string sR = \"ring R = (0,\"+A_Z(\"A\",6)+\"),(\"+A_Z(\"a\",10)+\"),dp;\" ";
+    string @sR = "ring R = (0,"+A_Z("A",6)+"),("+A_Z("a",10)+"),dp;";
+  "   sR;";                                                  @sR;
+  "   execute sR;";                                          execute @sR;
+  "   R;";                                                   R;
+  "   kill R;";                                              kill R;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc bin (int n,int m)
+USAGE:    bin(n,m);   n, m integers
+RETURN:   n choose m  of type <int>, limited size (machine integers)!
+NOTE:     Use proc binom and ring of characteristic 0 for bigger integers
+{
+  int @r;
+  if ( m < 0 or m > n )
+  {
+    return(@r);
+  }
+  @r=1;
+  if (m == 0)
+  {
+    return(@r);
+  }
+  if (m >= n-m)
+  {
+    m=n-m;
+  }
+  for (int @l=1 ; @l<=m ; @l=@l+1 )
+  {
+    @r=@r*(n+1-@l) / @l;
+  }
+  return (@r);
+}
+example
+{
+  "EXAMPLE:";
+  " bin(7,3);";                   bin(7,3);
+  " int n=10; int m=7;";          int @n=10; int @m=7;
+  " int b=bin(n,m); b;";          int @b=bin(@n,@m); @b;
+  kill @n,@m,@b;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc binom
+{
+   if (#ARGS !=1 and #ARGS !=2)
+   {
+//=============================================================================
+  " USAGE:   binom(n,k); n, k integers";
+  " RETURN:  n choose k  of type <poly>, uses characteristic of basering";
+  " NOTE:    needs a basering(!), result is computed in corresponding char,";
+  "          for small integers you may use procedure bin;";
+  " EXAMPLE: binom(\"ex\"); shows an example";
+//=============================================================================
+      return();
+   }
+
+   parameter = "n", "k";
+   if( #ARGS ==2 and defined(basering) )
+   {
+      if ( typeof(#1) == "int" and typeof(#2) == "int" )
+      {
+         poly @r;
+         if (#k < 0)
+         {
+            return(@r);
+         }
+         if (#k > #n)
+         {
+         return(@r);
+         }
+         @r=1;
+         if (#k == 0)
+         {
+            return(@r);
+         }
+         if (#k >= #n-#k)
+         {
+            #k = #n-#k;
+         }
+         int @l;
+         string @st;
+         for (@l=1 ; @l<=#k ; @l=@l+1 )
+         {
+            @r=@r*(#n+1-@l);
+            @st="@r=@r*(1/"+string(@l)+");";
+            execute(@st);
+         }
+         return (@r);
+      }
+   }
+//--------------------------------- EXAMPLE -----------------------------------
+   if (( typeof(#1) == "string" ) and ( #1 == "ex" ))
+   {
+      "EXAMPLE:";
+      " ring r1=0,x,ls;";             ring @r1=0,x,ls;
+      " binom(37,17);";               binom(37,17);
+      " ring r2=31,x,dp;";            ring @r2=31,x,dp;
+      " poly p = binom(37,17);p;";    poly @p = binom(37,17);@p;
+      return();
+   }
+   " USAGE:   binom(n,k); n, k integers";
+   " RETURN:  n choose k  of type <poly>, uses characteristic of basering";
+   " NOTE:    needs a basering(!), result is computed in corresponding char,";
+   "          for small integers you may use procedure bin;";
+   " EXAMPLE: binom(\"ex\"); shows an example";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc fac
+{
+   if ( #ARGS !=1 )
+   {
+//=============================================================================
+  " USAGE:   fac(n);  (n integer)";
+  " RETURN:  n!, of type <poly>, uses characteristic of basering";
+  " NOTE:    needs a basering(!), result is computed in corresponding char,";
+  " EXAMPLE: fac(\"ex\"); shows an example";
+//=============================================================================
+      return();
+   }
+
+   parameter = "n";
+   if( typeof(#1) == "int" and defined(basering) )
+   {
+      poly @p=1;
+      int @i;
+      for ( @i=1; @i<=#n; @i=@i+1)
+      {
+         @p=@p*@i;
+      }
+      return(@p);
+   }
+//--------------------------------- EXAMPLE -----------------------------------
+   if (( typeof(#1) == "string" ) and ( #1 == "ex" ))
+   {
+      "EXAMPLE:";
+      " ring r1=0,x,ls;";             ring @r1=0,x,ls;
+      " fac(37);";                    fac(37);
+      " ring r2=17,x,dp;";            ring @r2=17,x,dp;
+      " poly p = fac(37);p;";         poly @p = fac(37);@p;
+      return();
+   }
+   " USAGE:   fac(n);  (n integer)";
+   " RETURN:  n!, of type <poly>, uses characteristic of basering";
+   " NOTE:    needs a basering(!), result is computed in corresponding char,";
+   " EXAMPLE: fac(\"ex\"); shows an example";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc koszul1
+{
+   if (#ARGS != 1 and #ARGS != 2)
+   {
+//=============================================================================
+" USAGE:    koszul1(<ideal>,n); n integer";
+" RETURN:   <matrix>:= n-th koszul1 matrix of <ideal>";
+" EXAMPLE:  koszul1(\"ex\"); shows an example";
+//=============================================================================
+     return();
+   }
+
+   if (#ARGS == 2)
+   {
+      if (typeof(#1) == "ideal" and typeof(#2) == "int")
+      {
+//-------------------------- compare_index(iv,iv) -----------------------------
+ proc compare_ind
+ {
+   parameter="v1","v2";
+   int @q=size(#v1);
+   intvec @res;
+   int @a;int @b;int @c=1;int @d;
+   for (@a=1; @a<=@q; @a=@a+1)
+   {
+      @b=@b+1;
+      if (#v1[@a] != #v2[@b])
+      {
+         @d=@d+1;
+         if (@d>1)
+         {
+            @res=0,1;
+            return(@res);
+         }
+         @res=#v2[@b],@c;
+         @a=@a-1;
+      }
+      @c=-@c;
+      if (@d == 0)
+      {
+         @res=#v2[@q+1],@c;
+      }
+   }
+   return(@res);
+ }
+//--------------------------- next_ind(#iv,#n,#p) -----------------------------
+ proc next_ind
+ {
+    parameter="v","n","p";
+    int @l;int @q;int @s;intvec @res=#v;
+    for ( @l=#p; @l>0; @l=@l-1 )
+    {
+       @s=#v[@l]-#n+#p-@l;
+       if (@s<0)
+       {
+          @s=#v[@l];
+          for (@q=@l; @q<=#p; @q=@q+1 )
+          {
+             @res[@q]=@s+@q-@l+1;
+          }
+          return(@res);
+       }
+    }
+    return(0);
+ }
+//------------------------------ alt_ind(#n,#p) -------------------------------
+ proc alt_ind
+ {
+   parameter="n","p";
+   int @m=bin(#n,#p);int @a;
+   intvec ind(1)=1..#p;
+   for (  @a=2; @a<=@m; @a=@a+1 )
+   {
+     intvec ind(@a)=next_ind(ind(@a-1),#n,#p);
+   }
+   return();
+ }
+//------------------------------- end_ind(#m) ---------------------------------
+ proc end_ind
+ {
+   parameter="m";
+   int @n;
+   for (@n=1; @n<=#m; @n=@n+1)
+   {
+      kill ind(@n);
+   }
+   return();
+ }
+//------------------------------ koszul1(id,nr) --------------------------------
+      int @t;
+      int @w;
+      int @e;
+      int @n=ncols(#1);
+      int @p=#2;
+      ideal @id=#1;
+      intvec @zz;
+      if ((@p>@n) or (@p<=0))
+      {
+         kill compare_ind; kill next_ind; kill alt_ind; kill end_ind;
+         return("#2 out of range");
+      }
+      int @c=bin(@n,@p);
+      int @r=bin(@n,@p-1);
+      matrix @res[@r][@c];
+      alt_ind(@n,@p);
+      intvec @riv=1..@p-1;
+      for (@t=1; @t<=@n-@p+1; @t=@t+1)
+      {
+         @res[1,@t]=@id[@t+@p-1];
+         if (@p-2*(@p/2)==0)
+         {
+            @res[1,@t]=-@res[1,@t];
+         }
+      }
+      for (@e=2; @e<=@r; @e=@e+1)
+      {
+         @riv=next_ind(@riv,@n,@p-1);
+         for (@w=1; @w<=@c; @w=@w+1)
+         {
+            @zz=compare_ind(@riv,ind(@w));
+            if (@zz[1] != 0)
+            {
+               @res[@e,@w]=@id[@zz[1]]*@zz[2];
+            }
+         }
+      }
+      end_ind(@c);
+      kill compare_ind; kill next_ind; kill alt_ind; kill end_ind;
+      return(@res);
+   }
+   }
+//--------------------------------- EXAMPLE -----------------------------------
+   if (( typeof(#1)=="string") and (#1 == "ex"))
+   {
+      "EXAMPLE:";
+      " ring r=200,(a,b,c,d),ds;"; ring @r=200,(a,b,c,d),ds;
+      " ideal i=a,b,c,d;";         ideal @i=a,b,c,d;
+      " pmat(koszul1(i,2));";       pmat(koszul1(@i,2));
+      return();
+   }
+   " USAGE:    koszul1(<id>,<int>);";
+   " RETURN:   <mat>:= i-th koszul1 matrix of <id>";
+   " EXAMPLE:  koszul1(\"ex\"); shows an example";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc mem
+{
+   if ( #ARGS !=1 )
+   {
+//=============================================================================
+  " USAGE:   mem(n);  n integer ";
+  " RETURNS: mem(0) = memory used by active variables";
+  "          mem(1) = total memory used";
+//=============================================================================
+      return();
+   }
+
+   parameter = "n";
+   if (typeof(#n) == "int")
+   {
+      if (#n == 0)
+      {
+         string @m =
+         "//memory used by active variables: ",string((memory(0)+1023)/1024),"k";
+         return(@m);
+      }
+      if (#n != 0)
+      {
+         string @m =
+         "//total memory used: ",string((memory(1)+1023)/1024),"k";
+         return(@m);
+      }
+   }
+//--------------------------------- EXAMPLE -----------------------------------
+   if ( typeof(#1) == "string" )
+   {  if ( #1 == "ex" )
+      {
+         "EXAMPLE:";
+         " mem(0);";                         mem(0);
+         " string s=mem(1); s;";             string @s=mem(1); @s;
+         return();
+       }
+   }
+   " USAGE:   mem(n);  n integer ";
+   " RETURNS: mem(0) = memory used by active variables";
+   "          mem(1) = total memory used";
+             return();
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc multiply
+{
+   if (#ARGS !=1 and #ARGS !=2)
+   {
+//=============================================================================
+  " USAGE1:  multiply(<ideal/poly>,<module>);";
+  " RETURN:  module <ideal/poly>*<module>";
+  " USAGE2:  multiply(<ideal>,<matrix>);";
+  " RETURN:  ideal <ideal>*<matrix> (consider <ideal> as row vector)";
+  " USAGE3:  multiply(<poly>,<matrix>);";
+  " RETURN:  matrix <poly>*<matrix> (mult. each entry of <matrix> with <poly>)";
+  " USAGE4:  multiply(<matrix>,<vector>);";
+  " RETURN:  vector <matrix>*<vector> (consider <vector> as column vector)";
+  " EXAMPLE: multiply(\"ex\"); shows an example";
+//=============================================================================
+      return();
+   }
+
+   parameter = "i", "m";
+   if ( #ARGS == 2 )
+   {
+      int @ii; int @jj;
+//-------------------------- <ideal/poly>*<module> ----------------------------
+      if ((typeof(#i)=="ideal" or typeof(#i)=="poly") and typeof(#m)=="module")
+      {
+         ideal @i = #i;
+         module @m; module @mo;
+         for ( @ii=1; @ii<=size(@i); @ii=@ii+1 )
+         {
+            for ( @jj=1; @jj<=size(#m); @jj=@jj+1 )
+            {
+               @m = @m,@i[@ii]*#m[@jj];
+            }
+         }
+         return(@m+@mo);
+      }
+//----------------------------- <ideal>*<matrix> ------------------------------
+      if ( typeof(#i) == "ideal" and typeof(#m) == "matrix" )
+      {
+         if ( nrows(#m) != ncols(#i) )
+         {
+         "//size not compatible: ncols(<ideal>) != nrows(<matrix>)";
+         return();
+         }
+         return(ideal(matrix(#i)*#m));
+      }
+//----------------------------- <poly>*<matrix> -------------------------------
+      if ( typeof(#i) == "poly" and typeof(#m) == "matrix")
+      {
+         matrix @m[nrows(#m)][ncols(#m)];
+         for ( @ii=1; @ii<=nrows(#m); @ii=@ii+1 )
+         {
+            for ( @jj=1; @jj<=ncols(#m); @jj=@jj+1 )
+            {
+               @m[@ii,@jj] = #1*#m[@ii,@jj];
+            }
+         }
+         return(@m);
+      }
+//----------------------------- <matrix>*<vector> -----------------------------
+      if ( typeof(#i) == "matrix" and typeof(#m) == "vector" )
+      {
+         module @m=#m;
+         matrix @a=matrix(@m);
+         if ( nrows(@a) != ncols(#i) )
+         {
+         "//size not compatible: ncols(<matrix>) != nrows(<vector>)";
+         return();
+         }
+         module @i = module(#i*@a);
+         vector @v = @i[1];
+         return(@v);
+      }
+   }
+//--------------------------------- EXAMPLE -----------------------------------
+   if (( typeof(#1) == "string" ) and ( #1 == "ex" ))
+   {
+      "EXAMPLE:";
+      " ring r=0,(x,y,z),(c,dp);";          ring @r=0,(x,y,z),(c,dp);
+      " ideal i = xy,xz,yz;";               ideal @i = xy,xz,yz;
+      " poly f = xyz;";                     poly @f = xyz;
+      " module m = [1,2,3],[x,y,z];";       module @m = [1,2,3],[x,y,z];
+      " vector v = [xy,xz,yz];";            vector @v = [xy,xz,yz];
+      " matrix M[2][3] = 1,2,3,x,y,z;";     matrix @M[2][3] =1,2,3,x,y,z;
+      " pmat(M);";                          pmat(@M);
+      " multiply(i,m);";                    multiply(@i,@m);
+      " multiply(f,m);";                    multiply(@f,@m);
+      " multiply(i,transpose(M));";         multiply(@i,transpose(@M));
+      " pmat(multiply(f,M));";              pmat(multiply(@f,@M));
+      " multiply(M,v);";                    multiply(@M,@v);
+      return();
+   }
+   " USAGE1:  multiply(<ideal/poly>,<module>);";
+   " RETURN:  module <ideal/poly>*<module>";
+   " USAGE2:  multiply(<ideal>,<matrix>);";
+   " RETURN:  ideal <ideal>*<matrix> (consider <ideal> as row vector)";
+   " USAGE3:  multiply(<poly>,<matrix>);";
+   " RETURN:  matrix <poly>*<matrix> (mult. each entry of <matrix> with <poly>)";
+   " USAGE4:  multiply(<matrix>,<vector>);";
+   " RETURN:  vector <matrix>*<vector> (consider <vector> as column vector)";
+   " EXAMPLE: multiply(\"ex\"); shows an example";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc pmat (matrix m,list #)
+USAGE:    pmat(<matrix>,[n]);  n integer
+RETURNS:  <matrix> in array format if it fits into pagewidth. If n is
+          given, only the first n characters of each colum are shown
+{
+  if ( size(#) == 0)
+  {
+//------------- main case: input is a matrix, no second argument---------------
+    int @elems;
+    int @mlen;
+    int @slen;
+    int @c;
+    int @r;
+//-------------- count maximal size of each column, and sum up ----------------
+
+    for ( @c=1; @c<=ncols(m); @c=@c+1)
+    {  int @len(@c);
+      for (@r=1; @r<=nrows(m); @r=@r+1)
+      {
+        @elems = @elems + 1;
+        string @s(@elems) = string(m[@r,@c])+",";
+        @slen = size(@s(@elems));
+        if (@slen > @len(@c))
+        {
+          @len(@c) = @slen;
+        }
+      }
+      @mlen = @mlen + @len(@c);
+    }
+//---------------------- print all - except last - rows -----------------------
+
+    string @aus;
+    string @sep = " ";
+    if (@mlen >= pagewidth)
+    {
+      @sep = newline;
+    }
+
+    for (@r=1; @r<nrows(m); @r=@r+1)
+    {
+      @elems = @r;
+      @aus = "";
+      for (@c=1; @c<=ncols(m); @c=@c+1)
+      {
+        @aus = @aus + @s(@elems)[1,@len(@c)] + @sep;
+        @elems = @elems + nrows(m);
+      }
+      @aus;
+    }
+//--------------- print last row (no comma after last entry) ------------------
+
+    @aus = "";
+    @elems = nrows(m);
+    for (@c=1; @c<ncols(m); @c=@c+1)
+    {
+      @aus = @aus + @s(@elems)[1,@len(@c)] + @sep;
+      @elems = @elems + nrows(m);
+    }
+    @aus = @aus + string(m[nrows(m),ncols(m)]);
+    @aus;
+    return();
+  }
+//--------- second case: input is a matrix, second argument is given ----------
+
+  if ( size(#) == 1 )
+  {
+    if ( typeof(#[1]) == "int" )
+    {
+      string @aus;
+      string @tmp;
+      int @ll;
+      int @c;
+      int @r;
+      for ( @r=1; @r<=nrows(m); @r=@r+1)
+      {
+        @aus = "";
+        for (@c=1; @c<=ncols(m); @c=@c+1)
+        {
+          @tmp = string(m[@r,@c]);
+          @aus = @aus + @tmp[1,#[1]] + " ";
+        }
+        @aus;
+      }
+    }
+  }
+}
+example
+{
+//--------------------------------- EXAMPLE ----------------------------------
+  " EXAMPLE:";
+  " ring r=0,(x,y,z),ls;";     ring @r=0,(x,y,z),ls;
+  " ideal i= x,z+3y,x+y,z;";   ideal @i= x,z+3y,x+y,z;
+  " matrix m[3][3] =i^2;";     matrix @m[3][3]=@i^2;
+  " pmat(m);";                 pmat(@m);
+  " pmat(m,3);";               pmat(@m,3);
+  kill @r;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc randommat
+{
+   if (#ARGS != 1 and #ARGS != 3 and #ARGS != 5)
+   {
+//=============================================================================
+  " USAGE:   randommat(n,m,d[,u,o]);  n,m,d,u,o integers";
+  " RETURNS: nxm matrix with entries homogeneous polynomials of degree d";
+  "          [and coefficients between u and o]";
+  " NOTE:    For performance reasons try small bounds u and o in char 0";
+  " EXAMPLE: randommat(\"ex\"); shows an example";
+//=============================================================================
+      return();
+   }
+
+   parameter="n","m","d","u","o";
+   if (#ARGS == 3)
+   {
+      int #u=-30000;
+      int #o= 30000;
+      #ARGS=5;
+   }
+   if (#ARGS == 5)
+   {
+      if ( typeof(#n)=="int" and typeof(#m)=="int" and
+         typeof(#d)=="int" and typeof(#u)=="int" and typeof(#o)=="int" )
+      {
+         int @g =size(maxideal(#d));
+         matrix @m = matrix(maxideal(#d));
+         matrix @col[@g][1];
+         matrix @random[#n][#m];
+         int @k; int @l; int @ii;
+         for ( @k=#n; @k>0; @k=@k-1)
+         {
+            for ( @l=#m; @l>0; @l=@l-1)
+            {
+               for ( @ii=1; @ii<=@g; @ii=@ii+1)
+               {
+                  @col[@ii,1] = random(#u,#o);
+               }
+               @random[@k,@l]=(@m*@col)[1,1];
+            }
+         }
+         return(@random);
+      }
+   }
+//--------------------------------- EXAMPLE -----------------------------------
+   if (( typeof(#1) == "string" ) and  ( #1 == "ex" ))
+   {
+      "EXAMPLE:";
+      " ring r=0,(x,y,z),dp;";            ring @r=0,(x,y,z),dp;
+      " matrix A=randommat(3,3,2,-9,9);"; matrix @A=randommat(3,3,2,-9,9);
+      " A; pmat(A);";                     @A; pmat(@A);
+      return();
+   }
+   " USAGE:   randommat(n,m,d[,u,o]);  n,m,d,u,o integers";
+   " RETURNS: nxm matrix with entries homogeneous polynomials of degree d";
+   "          [and coefficients between u and o]";
+   " NOTE:    For performance reasons try small bounds u and o in char 0";
+   " EXAMPLE: randommat(\"ex\"); shows an example";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc shift
+{
+   if ( #ARGS != 1 and #ARGS != 2 )
+   {
+//=============================================================================
+  " USAGE:    shift(<ideal>,n);  n integer";
+  " RETURN:   module <ideal>*gen(n), n-th component generated by <ideal>";
+  " EXAMPLE:  shift(\"ex\"); shows an example";
+//=============================================================================
+      return();
+   }
+
+   parameter = "i","n";
+   if (#ARGS == 2)
+   {
+      if (typeof(#1) == "ideal" and typeof(#2) == "int")
+      {
+         module @m=#i[1]*gen(#n);
+         for (int @n=2; @n<=ncols(#i) ; @n=@n+1 )
+         {
+            @m=@m,#i[@n]*gen(#n);
+         }
+         return(@m);
+      }
+   }
+//--------------------------------- EXAMPLE ----------------------------------
+   if (( typeof(#1) == "string" ) and ( #1 == "ex" ))
+   {
+      "EXAMPLE:";
+      " ring r = 0,(x,y,z),(c,dp);";        ring @r= 0,(x,y,z),(c,dp);
+      " ideal i = xy,xz,yz;";               ideal @i= xy,xz,yz;
+      " module m = shift(i,2)+shift(i,4);"; module @m=shift(@i,2)+shift(@i,4);
+      " m;";                                @m;
+      return();
+   }
+   " USAGE:    shift(<ideal>,n);  n integer";
+   " RETURN:   module <ideal>*gen(n), n-th component generated by <ideal>";
+   " EXAMPLE:  shift(\"ex\"); shows an example";
+   return();
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sum
+{
+   if ( #ARGS !=1 )
+   {
+//=============================================================================
+  " USAGE:    sum(v);  v vector or intvec";
+  " RETURN:   <poly> or <int> = sum of components of v";
+  " EXAMPLE:  sum(\"ex\"); shows an example";
+//=============================================================================
+      return();
+   }
+
+   if ( #ARGS ==1 )
+   {
+      if ( typeof(#1) == "vector" )
+      {
+         poly @v;
+         module @m = #1;
+         matrix @mat=matrix(@m);
+         for ( int @n=1 ; @n<=nrows(@mat); @n=@n+1)
+         {
+            @v=@v+@mat[@n,1];
+         }
+         return(@v);
+      }
+      if ( typeof(#1) == "intvec" )
+      {
+         int @v;
+         for (int @n=1 ; @n<=size(#1); @n=@n+1)
+         {
+            @v=@v+#1[@n];
+         }
+         return(@v);
+      }
+   }
+//--------------------------------- EXAMPLE ----------------------------------
+   if (( typeof(#1) == "string" ) and ( #1 == "ex" ))
+   {
+      "EXAMPLE:";
+      " ring r = 0,(x,y,z),dp;";            ring @r= 0,(x,y,z),dp;
+      " vector v = [xy,xz,yz];";            vector @pv = [xy,xz,yz];
+      " sum(v);";                           sum(@pv);
+      " intvec iv = 1,2,3,4,5;";            intvec @iv = 1,2,3,4,5;
+      " sum(iv);";                          sum(@iv);
+      return();
+   }
+   " USAGE:    sum(v);  v vector or intvec";
+   " RETURN:   <poly> or <int> = sum of components of v";
+   " EXAMPLE:  sum(\"ex\"); shows an example";
+   return();
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc trmod
+{
+   if (#ARGS != 1)
+   {
+//=============================================================================
+  " USAGE:    trmod(<module>);";
+  " RETURNS:  transposed (dual) module";
+  " EXAMPLE:  trmod(\"ex\"); shows an example";
+//=============================================================================
+      return();
+   }
+
+   if (typeof(#1) == "module")
+   {
+      matrix @mat=matrix(#1);
+      module @mod=module(transpose(@mat));
+      return(@mod);
+    }
+//--------------------------------- EXAMPLE ----------------------------------
+   if (( typeof(#1) == "string" ) and ( #1 == "ex" ))
+   {
+      "EXAMPLE:";
+      " ring r = 0,(x,y,z),(c,dp);";        ring @r= 0,(x,y,z),(c,dp);
+      " module m = [xy,xz,yz]; m;";         module m = [xy,xz,yz]; m;
+      " m = trmod(m); m;";                  m=trmod(m); m;
+      return();
+   }
+   " USAGE:    trmod(<module>);";
+   " RETURNS:  transposed (dual) module";
+   " EXAMPLE:  trmod(\"ex\"); shows an example";
+   return();
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc tab
+USAGE:    tab(n);  (n integer)
+RETURNS:  string of n space tabs
+EXAMPLE:  example tab; shows an example
+{
+  if (#ARGS == 1)
+  {
+    if (typeof(#1) == "int")
+    {
+      if (#1 == 0)
+      {
+        return("");
+      }
+      string @s=" ";
+      return(@s[1,#1]);
+    }
+  }
+}
+example
+{
+  "EXAMPLE:";
+  " for(int n=0; n<=5; n=n+1)";
+  " { tab(5-n)+\"*\"+tab(n)+\"+\"+tab(n)+\"*\"; }";
+  for(int @n=0; @n<=5; @n=@n+1)
+  {
+     tab(5-@n)+"*"+tab(@n)+"+"+tab(@n)+"*";
+  }
+  kill @n;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc primes
+{
+   if ( #ARGS !=2 and #ARGS != 1)
+   {
+//=============================================================================
+ " USAGE:   primes(n,m);  n,m integers ";
+ " RETURNS: intvec, consisting of all primes p, prime(n)<=p<=m, in increasing";
+ "          order if n<m, resp. prime(m)<=p<=n, in decreasing order if m<n";
+ " EXAMPLE: primes(\"ex\"); shows an example";
+//=============================================================================
+      return();
+   }
+
+   parameter = "n", "m";
+   if ( #ARGS ==2 )
+   {
+      if ( typeof(#n)=="int" and typeof(#m)=="int" )
+      {
+         int @n = #n; int @m = #m;
+         if (#n>#m)
+         {
+            @n=#m ; @m= #n;
+         }
+         int @q = prime(@m);
+         int @p = prime(@n);
+         intvec @v = @q;
+         @q = @q-1;
+         if ( #n>#m )
+         {
+            while ( @q>=@p )
+            {
+               @q = prime(@q);
+               @v = @v,@q;
+               @q = @q-1;
+            }
+            return(@v);
+         }
+         while ( @q>=@p )
+         {
+            @q = prime(@q);
+            @v = @q,@v;
+            @q = @q-1;
+         }
+         return(@v) ;
+      }
+   }
+//--------------------------------- EXAMPLE -----------------------------------
+   if (( typeof(#1) == "string" ) and ( #1 == "ex" ))
+   {
+      "EXAMPLE:";
+      "primes(50,100);";                primes(50,100);
+      "intvec v=primes(37,1); v;";      intvec @v = primes(37,1); @v;
+      return();
+   }
+   " USAGE:   primes(n,m);  n,m integers ";
+   " RETURNS: intvec, consisting of all primes p, prime(n)<=p<=m, in increasing";
+   "          order if n<m (resp. prime(m)<=p<=n, in decreasing order if m<n)";
+   " EXAMPLE: primes(\"ex\"); shows an example";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc split
+{
+   if ( #ARGS!=1 and #ARGS!=2 )
+   {
+//=============================================================================
+  " USAGE:    split(s,n); s string, n integer ";
+  " RETURNS:  same string, split into lines of length n separated by \\";
+  " EXAMPLE:  split(\"ex\"); shows an example";
+//=============================================================================
+      return();
+   }
+
+   parameter = "s","n";
+   if ( #ARGS == 2 )
+   {
+      if ( typeof(#s) == "string" and typeof(#n) == "int" )
+      {
+         string @line;
+         string @res="";
+         int @l=size(#s);
+         int @p;
+         int @i;
+         if ( #s[@l,1] != newline )
+         {
+             #s=#s+newline;
+         }
+         while (1)
+         {
+            @l=find(#s,newline);
+            @line=#s[1,@l];
+            @p=1;
+            while ( @l>=#n )
+            {
+               @res=@res+@line[@p,#n-1]+"\\"+newline;
+               @p=@p+#n-1;
+               @l=@l-#n+1;
+            }
+            @res=@res+@line[@p,@l];
+            @l=size(@line);
+            if ( @l>=size(#s)) break;
+            #s=#s[@l+1,size(#s)-@l];
+         }
+         return (@res);
+      }
+   }
+//--------------------------------- EXAMPLE ----------------------------------
+   if (( typeof(#1) == "string" ) and ( #1 == "ex" ))
+   {
+      "EXAMPLE:";
+      " ring r = 0,(x,y,z),ds;";       ring @r= 0,(x,y,z),ds;
+      " poly f = (x+y+z)^9;";          poly @f = (x+y+z)^9;
+      " split(string(f),40);";         split(string(@f),40);
+      return();
+   }
+   " USAGE:    split(s,n); s string, n integer ";
+   " RETURNS:  same string, split into lines of length n separated by \\";
+   " EXAMPLE:  split(\"ex\"); shows an example";
+}
+///////////////////////////////////////////////////////////////////////////////

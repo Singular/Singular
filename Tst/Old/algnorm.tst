@@ -1,0 +1,33 @@
+ring r=(0,a),x,dp;
+poly p=1/a*x+1;
+cleardenom (p);
+p=2/(2a+1)*x+1/(2a+1);
+p;
+cleardenom (p);
+p=2/(2*a2/3+1)*x+(2/3)/(2a+1);
+p;
+cleardenom (p);
+ring R=(0,a,b),(x,y),dp;
+poly p=(a/(1/2*b+1))/((b+5)/(2*(a+b)))*x+1/2*y;
+p;
+cleardenom(p);
+ring r=(32003,a),x,dp;
+poly p=1/a*x+1;
+cleardenom (p);
+p=2/(2a+1)*x+1/(2a+1);
+p;
+cleardenom (p);
+p=2/(2*a2/3+1)*x+(2/3)/(2a+1);
+p;
+cleardenom (p);
+ring R=(32003,a,b),(x,y),dp;
+poly p=(a/(1/2*b+1))/((b+5)/(2*(a+b)))*x+1/2*y;
+p;
+cleardenom(p);
+ring r3=(7,a, b, c),(x,y,z),dp;
+number n;
+number n1 = 2*a^2*b*c -3*b*c + -1*a + 4;
+number n2 = n1 / (n1 - 5c)^2;
+n2;
+$
+$

@@ -1,0 +1,11 @@
+ring r= 32003,(x,y,z),(c,lp);
+matrix m[2][2] = x,y,x2,y2;
+m;
+module mo = [x,y],[x2,y2];
+mo;
+vector v=[x,0,1];
+v;
+v=0;
+v=1; ;
+listvar(all);
+$;

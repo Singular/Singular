@@ -1,0 +1,23 @@
+//
+// test script for res command
+//
+pagelength = 10000;
+//option(prot);
+ring r1=32003,(a,b,x,y,z),ls;
+r1;
+"-------------------------";
+ideal i=a2x2+ax2y+x2yz,a2y2+ay2z+y2zb,a2z2+az2b+xz2b,a2b2+axb2+xyb2;
+i;
+ideal i1=std(i);
+i1;
+res(i1,4,T);
+"------------------------";
+module m=[x2y,0],[1,x2z3];
+m;
+module m1=std(m);
+m1;
+res(m1,0,M);
+"-----------------------";
+listvar(all);
+kill r1;
+$;

@@ -1,0 +1,144 @@
+;test bareiss
+barei
+;test betti
+bett
+;test char
+ch
+;test coef????????????????
+;coeff
+;test  ncols
+col
+;test HC
+corner
+;test defined
+def
+;test deg?????????????????????????????
+;degr
+;test degre
+degre
+;test dim
+dimens
+;test execute, read
+execut
+; test fetch
+fetch
+;test freemodule
+freemod
+;test gen
+generat
+;test hilb
+hilbert
+;test homog
+homo
+;test ideal
+idea
+;test lead
+initial
+;test int
+integ
+;test interred
+interred
+;test intersect
+intersec
+;test jacob
+jacobi
+;test jet
+jett
+;test kbase
+kbas
+;test kill
+kil
+;test lift
+lif
+;test liftstd
+liftstan
+;test list
+liste
+;test map
+mapp
+;test matrix
+matr
+;test maxdegr
+maxdegr
+;test maxideal
+maxid
+;test memory
+mem
+;test minbase
+minbas
+;test minor
+mino
+;test module
+modu
+;test mres
+mre
+;test multiplicity
+mult
+;test nameof
+;namof???????????????????????????????????????????????????
+;test reduce
+normalf
+;test nvars
+numvar
+;test option
+opt
+;test ord
+order
+;test diff
+part
+;test poly
+pol
+;test preimage
+preim
+;test prime
+prim
+;test qring
+qrin
+;test rank
+rang
+;test res
+re
+;test regularity
+regul
+;test ring
+ringdef
+;test nrow
+row
+;test rvar
+rvari
+;test setring
+setrin
+;test short
+shor
+;test size
+siz
+;test sres
+sre
+;test substring
+sstring
+;test subst
+substit
+;test syz
+syzygy
+;test test
+teste
+;test timer
+time
+;test trace
+;trac????????????????????????????????????????????????????????
+;test transp
+trans
+;test type
+typ
+;test typeof
+typof
+;test var
+va
+;test vdim
+vdimen
+;test vector
+vec
+;test wedge
+wedg
+;test write
+;writ

@@ -1,0 +1,84 @@
+README file for Singular test-suite
+===================================
+
+This is the test-suite for Singular. This directory contains 
+
+regress.cmd	-- perl script which drives tests
+Short		-- directory containing "short" tests
+Long		-- directory containing "long" tests
+Old		-- directory containing "old" (TST) tests
+
+To run Singular test(s):
+------------------------
+1.) Put the Singular binary in this directory
+2.) cd to one of the directories above
+3.) run 
+     ../regress.cmd [*.tst] [*.lst]
+    with the desired tst (i.e., Singular test scripts) or lst (list 
+    of tst files) file(s).
+4.) For each file xx.tst, 
+      ../Singular -tqr12345678 xx.tst > xx.new.tst
+      diff xx.res xx.new.res | tee xx.diff
+    is run. 
+5.) If no diffs were found, xx.diff and xx.new.res are rm'ed and
+    xx.res is gzip'ed. Otherwise (i.e., diffs were found), xx.diff and
+    xx.new.res are kept, diffs are printed to stdout, and regress.cmd
+    exits with exit status != 0.
+
+Do also 
+   ../regress.cmd -h
+for some more details on regress.cmd.
+
+To add a new test for a library/commando to the test-suite:
+-----------------------------------------------------------
+* The following files need to be provided:
+	short/xx_s.tst : Singular code for short and basic tests 
+	long/xx_l.tst : Singular code for long and extended tests
+	short/xx_s.res : Result output of xx_s.tst
+	long/xx_l.res : Result output of xx_l.tst
+  or, alternatively:
+        short/xx.tst: Singular code for short tests, only
+	short/xx.res : Result output of xx.tst
+
+* xx_s.tst should test the essential functionality of the
+  library/commando in a relatively short time (say, in no more than
+  30s).
+
+* xx_l.tst should test the functionality of the
+  library/commando in detail so that, if possible, all relevant
+  cases/results are tested. Nevertheless, such a test should not run
+  longer than, say, 10 minutes.
+
+* If useful test do generally execute in a short time, have xx.tst,
+  only.
+
+* Rules for providing tst files:
+  1.) tst files always start with the following three commandos as
+  preamble: 
+         LIB "tst.lib";
+         tst_init();
+	 tst_ignore("CVS ID $Id:$");
+  tst_init() writes some general info to stdout (like date,
+  uname, hostname, version, etc.). The library tst.lib (appended
+  below) provides, among others, the routines tst_init() and
+  tst_ignore(). 
+
+  2.) All system-dependent output (like run-times, memory usages,
+  pathnames, dates, etc.) must be output by means of the routine
+  tst_ignore(...):
+  tst_ignore(val [, keyword]): 'val' can have arbitrary type for which
+                               a string conversion exists;
+                               if present, keyword must be one of the
+                               following strings: "time", "memory"
+  tst_ignore() outputs 'val' by prepending the following prefix:
+  no keyword --       // ignore: 
+  "time" keyword --   // ignore: time:
+  "memory" keyword -- // ignore: memory:
+  which causes automatic tests to ignore these lines when doing a diff 
+  on result files. If possible, short tests should not contain
+  system-dependent output. 
+
+* Command for generating *.res files: 
+  cd <directopry where xx.tst should reside>; ../regress.cmd -g xx.tst
+
+

@@ -1,0 +1,202 @@
+//
+// lib with useful ? procs
+//
+proc prideal (ideal id)
+{
+  "// ideal";
+  for (int @i=1; @i<=nrows(id); @i=@i+1)
+  {
+    "//id[" +  string(@i) + "] : "+  string(id[@i]);
+  }
+  "// dim  :", dim(id);
+  "// mult :", multiplicity(id);
+  return();
+}
+
+proc formmat (matrix m)
+{
+  int @elems = 0;
+  int @mlen  = 0;
+  int @slen  = 0;
+  int @c;
+  for (int @r=1; @r<=nrows(m); @r=@r+1)
+  {
+    for (@c=1; @c<=ncols(m); @c=@c+1)
+    {
+      @elems = @elems + 1;
+      string @s(@elems) = string(m[@r,@c]);
+      @slen = size(@s(@elems));
+      if (@slen > @mlen)
+      {
+        @mlen = @slen;
+      }
+    }
+  }
+  @elems = 0;
+  string @aus = "";
+  string @sep = " ";
+  if (@mlen * ncols(m) >= pagewidth)
+  {
+    @sep = newline;
+  }
+  for (@r=1; @r<=nrows(m); @r=@r+1)
+  {
+    for (@c=1; @c<=ncols(m); @c=@c+1)
+    {
+      @elems = @elems + 1;
+      @slen = size(@s(@elems));
+      @aus = @aus + @s(@elems)[1,@mlen] + @sep;
+    }
+    @aus = @aus + newline;
+//    @aus = "";
+  }
+  return(@aus);
+}
+proc fixmat (matrix m,int l)
+{
+  string @aus;
+  string @tmp;
+  int @ll;
+  int @c;
+  for (int @r=1; @r<=nrows(m); @r=@r+1)
+  {
+    @aus = "";
+    for (@c=1; @c<=ncols(m); @c=@c+1)
+    {
+      @tmp = string(m[@r,@c]);
+      @aus = @aus + @tmp[1,l] + " ";
+    }
+    @aus;
+  }
+}
+proc stransp (int r, int c, list #)
+{
+  // transpose a submatrix
+  matrix @m[r][c];
+  int @ii = 1;
+  int @j;
+  for (int @i = 1; @i<=r; @i=@i+1)
+  {
+    for (@j = 1; @j<=c; @j=@j+1)
+    {
+      @m[@i,@j] = #[@ii];
+      @ii=@ii+1;
+    }
+  }
+  return(transpose(@m));
+}
+proc unitmat (int r, list #)
+{
+  // create an unit matrix, # is optional
+  poly @p = 1;
+  if (size(#) == 1)
+  {
+    @p = #[1];
+  }
+  matrix @m[r][r];
+  return (@m + @p);
+}
+//
+// declare a ring with a different dialog
+// using defaults etc;
+//
+
+proc permute (int n, list #)
+{
+  //if (#ARGS == 2)
+  //{
+  //  string @actionstring = #action +"();";
+  //}
+  if (defined(PERMUTE_DATA) or defined(PERMUTE_WORK))
+  {
+    "permute: PERMUTE_WORK/DATA already defined, please kill them!";
+    return();
+  }
+  //
+  // initialize global data
+  //
+  intvec PERMUTE_DATA = n;  // must be global
+  intvec PERMUTE_WORK = 1;   // must be global
+  export PERMUTE_DATA, PERMUTE_WORK;
+  for (int @i=#n-1; @i>0; @i=@i-1)
+  {
+    PERMUTE_DATA = PERMUTE_DATA, @i;
+    PERMUTE_WORK = PERMUTE_WORK, 1;
+  }
+  int @done = 0;
+  while (@done == 0)
+  {
+    "permute", PERMUTE_DATA;  // this could be an action call
+    //if (#ARGS == 2)
+    //{
+    //  execute @actionstring;
+    //}
+    @done = next_permute(n);
+  }
+  kill PERMUTE_DATA, PERMUTE_WORK;
+  return ("-----------");
+}
+
+proc next_permute (int n)
+{
+  int @rc = 1;
+  if (n > 1)
+  {
+    if(PERMUTE_WORK[n] < n)
+    {
+      PERMUTE_DATA[PERMUTE_WORK[n]] = PERMUTE_DATA[PERMUTE_WORK[n] + 1];
+      PERMUTE_DATA[PERMUTE_WORK[n] + 1] = n;
+      PERMUTE_WORK[n] = PERMUTE_WORK[n] + 1;
+      return(0);
+    }
+    @rc = next_permute(n-1);
+    for(int @i=n-1; @i>=1; @i=@i-1)
+    {
+      PERMUTE_DATA[@i+1] = PERMUTE_DATA[@i];
+    }
+    PERMUTE_DATA[1] = n;
+    PERMUTE_WORK[n] = 1;
+    return(@rc);
+  }
+  return (@rc);
+}
+//
+// permutations as described in:
+//   data structures, algorithms, and program style using c
+//   james f. korsh
+//   leonard j. garrett
+//   pp. 162
+//
+proc permute1 (int n)
+{
+  int @done = 0;
+  while (@done == 0)
+  {
+    "permute", all;  // this could be an action call
+    @done = next(n);
+  }
+  return ("-----------");
+}
+proc next (int n)
+{
+  int @rc = 1;
+  if (n > 1)
+  {
+    if(l[n] < n)
+    {
+      all[l[n]] = all[l[n] + 1];
+      all[l[n] + 1] = n;
+      l[n] = l[n] + 1;
+      return(0);
+    }
+    @rc = next(n-1);
+    for(int @i=n-1; @i>=1; @i=@i-1)
+    {
+      all[@i+1] = all[@i];
+    }
+    all[1] = n;
+    l[n] = 1;
+    return(@rc);
+  }
+  return (@rc);
+}

@@ -1,0 +1,36 @@
+//===========================================================================//
+// LIBRARY:  lib2           procedures for elimination and saturation        //
+//           type lib2();   to list the procedures                           //
+//                          7/94 GMG+BM                                      //
+// version for the regression test
+//===========================================================================//
+///////////////////////////////////////////////////////////////////////////////
+
+proc sat (ideal i,ideal j)
+USAGE:   sat(<i>,<j>);  i,j ideals
+RETURNS: ideal, union_(k=1...) of i:j^k
+{
+  ideal @i;
+  int @ii;
+  while ( @ii<=size(@i))
+  {
+    @i=quotient(i,j);
+    for ( @ii=1; @ii <= size(@i); @ii=@ii+1)
+    {
+      if (NF(@i[@ii],i)!=0)
+        break;
+    }
+    i=@i;
+  }
+  return (@i);
+}		
+example
+{  "EXAMPLE:";
+   " ring r=2,(x,y,z),dp;";            ring @r=2,(x,y,z),dp;
+   " poly F=x5+y5+(x-y)^2*xyz;";       poly @F=x5+y5+(x-y)^2*xyz;
+   " ideal j=jacob(F);";               ideal @j= jacob(@F);
+   " sat(j,maxideal(1));";             sat(@j,maxideal(1));
+   kill @r;
+}
+///////////////////////////////////////////////////////////////////////////////
+

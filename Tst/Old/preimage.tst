@@ -1,0 +1,31 @@
+ring r;
+type r;
+ring r1=32003,(x,y,z,w),lp;
+type r1;
+setring r;
+ideal i=x,y,z;
+ideal ii=x2+y2,xy,z3;
+map f=r1,i;
+map ff=r1,ii;
+type f;
+type ff;
+ideal j1=0;
+ideal j2=maxideal(2);
+ideal j3=x2+yz,y2+zx,z2+xy;
+setring r1;
+ideal i1=preimage(r,f,i);
+type i1;
+ideal i2=preimage(r,ff,i);
+type i2;
+ideal ii1=preimage(r,f,ii);
+type ii1;
+ideal ii2=preimage(r,ff,ii);
+type ii2;
+ideal j1=preimage(r,ff,j1);
+type j1;
+ideal j2=preimage(r,ff,j2);
+type j2;
+ideal j3=preimage(r,ff,j3);
+type j3;
+$
+

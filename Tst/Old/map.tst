@@ -1,0 +1,28 @@
+ring r;
+ideal i=y,x;
+map F=r,i;
+map g=F(F);
+g;
+F;
+map h=F;
+h;
+F;
+type F;
+kill F;
+type g;
+type h;
+kill g;
+type h;
+//timer=1;
+map F=r,x+y+z3,y+z+x2z3,z+1+xyz;
+poly f=(x+y+z+xz)^3;
+poly ff=F(f);
+F(ff);
+matrix m=f;
+matrix mm=F(m);
+F(mm);
+ring r1=0,(x,y,a,b,z,c),dp;
+poly f=x+2y+3z+4a+5b+6c+11x2+12xy+13xz+14xa+15xb+16xc+25y2b3;
+ring r2=0,(x,z,y),dp;
+imap(r1,f);
+$

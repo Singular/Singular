@@ -1,0 +1,123 @@
+; some general interpreter tests
+aa
+formmat
+if
+; buchberger algorithm, will take some time
+alex1
+; betti numbers
+betti
+; recursive proc and int  operations
+binomial
+; identifier handling
+bluff
+; ring changes
+cring
+curve
+ord
+cmp
+; coef command
+coef
+coeff
+; handling duplicate identifiers
+dups
+; the echo variable
+echo
+ech
+; fixed errors
+err1
+err2
+err3
+err4
+err5
+err6
+err7
+sat
+; recursive proc: will take some time
+fak
+; nested scripts
+filenest
+firsts
+; mora algorithm: very long script
+gm
+; homogeneous variant
+h4
+; hilbert function, degree, etc.
+hilb
+; ideal/module oprations
+ideal
+idealop
+modul
+modul1
+modulo
+quot
+fastelim
+; integer oprations
+integers
+; intvec operations
+intvec
+intmat
+index
+; the jet command
+jet
+; list type
+lists
+; coefficient arithmetics: will take some time
+longalg
+lpowers
+palg
+algmap
+algnorm
+det
+; ring maps
+map
+imap
+; matrix operations
+matrix
+matrows
+; mora algorithm, part 2
+mora1
+moralex
+; handling files
+nofile
+; poly operations
+poly
+deg
+comp
+;altern
+; proc, intvec, ... 
+permutat
+;
+preimage
+;
+proc
+; qring
+qring
+qring1
+; lead, diff
+regr1
+;
+ring
+rings
+; int, string
+smm
+;
+std1
+std_test
+stdhilb
+redtail
+;
+string
+namof
+; substructs of ideal, matrix
+subexpr
+subexpr1
+; syzygies and resolutions
+koszul
+res
+sres
+syzygies
+; variable argument lists
+varlist
+; weights etc.
+qhw
+weight
