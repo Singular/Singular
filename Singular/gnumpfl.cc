@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.4 1999-06-23 08:26:43 wenk Exp $ */
+/* $Id: gnumpfl.cc,v 1.5 1999-07-02 14:28:52 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -240,12 +240,14 @@ number ngfDiv (number a, number b)
 void ngfPower ( number x, int exp, number * u )
 {
   if ( exp == 0 )
-  {
+  { 
+    nNew(u);
     *(gmp_float*)u= (gmp_float)1.0;
     return;
   }
   if ( exp == 1 )
   {
+    nNew(u);
     if ( x == NULL )
     {
       *(gmp_float*)(*u) = (gmp_float)0.0;

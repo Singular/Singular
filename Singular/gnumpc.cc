@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.3 1999-06-29 09:03:42 wenk Exp $ */
+/* $Id: gnumpc.cc,v 1.4 1999-07-02 14:28:51 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -73,7 +73,8 @@ number   ngcPar(int i)
 
 void ngcNew (number * r)
 {
-  *r= NULL;
+  gmp_complex* n= new gmp_complex( );
+  *r=(number)n;
 }
 
 /*2
@@ -249,23 +250,31 @@ void ngcPower ( number x, int exp, number * u )
 {
   if ( exp == 0 )
   {
-    *(gmp_complex*)u= (gmp_complex)1.0;
+    gmp_complex* n = new gmp_complex(1);
+    *u=(number)n; 
     return;
   }
   if ( exp == 1 )
   {
+    nNew(u);
     if ( x == NULL )
     {
-      *(gmp_complex*)u= (gmp_complex)0.0;
+      gmp_complex* n = new gmp_complex();
+      *u=(number)n; 
     }
     else
     {
-      *(gmp_complex*)u= *(gmp_complex*)x;
+      gmp_complex* n = new gmp_complex();
+      *n= *(gmp_complex*)x;
+      *u=(number)n; 
     }
     return;
   }
   ngcPower(x,exp-1,u);
-  *(gmp_complex*)u*= *(gmp_complex*)x;
+  gmp_complex *n=new gmp_complex();
+  *n=*(gmp_complex*)x;
+  *(gmp_complex*)(*u) *= *(gmp_complex*)n;
+  delete n;
 }
 
 BOOLEAN ngcIsZero (number a)

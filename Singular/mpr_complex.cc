@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.8 1999-06-28 16:06:26 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.9 1999-07-02 14:28:53 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -508,12 +508,16 @@ char *complexToStr( const gmp_complex & c, const unsigned int oprec )
 
     if (rField_is_long_C())
     {
-      out=(char*)AllocL((strlen(in_real)+strlen(in_imag)+5+strlen(currRing->parameter[0]))*sizeof(char));
+      int len=(strlen(in_real)+strlen(in_imag)+5+strlen(currRing->parameter[0]))*sizeof(char);
+      out=(char*)AllocL(len);
+      memset(out,0,len);
       sprintf(out,"%s%s%s*%s",in_real,c.imag().sign()>=0?"+":"-",currRing->parameter[0],in_imag);
     }
     else
     {
-      out=(char*)AllocL( (strlen(in_real)+strlen(in_imag)+8) * sizeof(char));
+      int len=(strlen(in_real)+strlen(in_imag)+8) * sizeof(char);
+      out=(char*)AllocL( len );
+      memset(out,0,len);
       sprintf(out,"%s%s%s",in_real,c.imag().sign()>=0?" + I ":" - I ",in_imag);
     }
     FreeL( (ADDRESS) in_real );
