@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.62 1999-07-09 14:58:24 Singular Exp $ */
+/* $Id: grammar.y,v 1.63 1999-07-14 13:16:00 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -235,6 +235,7 @@ void yyerror(char * fmt)
 %token <i> CMD_2
 %token <i> CMD_3
 %token <i> CMD_12
+%token <i> CMD_13
 %token <i> CMD_23
 %token <i> CMD_123
 %token <i> CMD_M
@@ -614,6 +615,10 @@ expr:   expr_arithmetic
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
+        | CMD_13 '(' expr ')'
+          {
+            if(iiExprArith1(&$$,&$3,$1)) YYERROR;
+          }
         | CMD_12 '(' expr ',' expr ')'
           {
             if(iiExprArith2(&$$,&$3,$1,&$5,TRUE)) YYERROR;
@@ -625,6 +630,10 @@ expr:   expr_arithmetic
         | CMD_123 '(' expr ',' expr ')'
           {
             if(iiExprArith2(&$$,&$3,$1,&$5,TRUE)) YYERROR;
+          }
+        | CMD_13 '(' expr ',' expr ',' expr ')'
+          {
+            if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
           }
         | CMD_123 '(' expr ',' expr ',' expr ')'
           {

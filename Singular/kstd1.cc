@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.35 1999-06-30 15:42:11 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.36 1999-07-14 13:16:05 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1526,9 +1526,11 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   /*- compute------------------------------------------- -*/
   p = pCopy(q);
   deleteHC(&p,&o,&j,strat);
+  if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   if (p!=NULL) p = redMoraNF(p,strat);
   if ((p!=NULL)&&(lazyReduce==0))
   {
+    if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
     p = redtail(p,strat->sl,strat);
   }
   /*- release temp data------------------------------- -*/
@@ -1556,6 +1558,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   }
   idDelete(&strat->Shdl);
   test=save_test;
+  if (TEST_OPT_PROT) PrintLn();
   return p;
 }
 
@@ -1626,9 +1629,11 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
           h.length = pLength(h.p);
           enterT(h,strat);
         }
+        if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
         p = redMoraNF(p,strat);
         if ((p!=NULL)&&(lazyReduce==0))
         {
+          if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
           p = redtail(p,strat->sl,strat);
         }
         cleanT(strat);
@@ -1637,10 +1642,6 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     }
     //else
     //  res->m[i]=NULL;
-    if (TEST_OPT_PROT)
-    {
-      PrintS("-");mflush();
-    }
   }
   /*- release temp data------------------------------- -*/
   Free((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
@@ -1666,6 +1667,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   }
   idDelete(&strat->Shdl);
   test=save_test;
+  if (TEST_OPT_PROT) PrintLn();
   return res;
 }
 
@@ -2064,10 +2066,6 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
     res=kNF1(F,Q,p,strat,lazyReduce);
   else
     res=kNF2(F,Q,p,strat,lazyReduce);
-  if (TEST_OPT_PROT)
-  {
-    PrintLn();
-  }
   Free((ADDRESS)strat,sizeof(skStrategy));
   return res;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.161 1999-07-13 16:24:45 Singular Exp $ */
+/* $Id: iparith.cc,v 1.162 1999-07-14 13:16:03 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -251,7 +251,7 @@ cmdnames cmds[] =
   { "pardeg",      0, PARDEG_CMD ,        CMD_1},
   { "parstr",      0, PARSTR_CMD ,        CMD_12},
   { "poly",        0, POLY_CMD ,          RING_DECL},
-  { "preimage",    0, PREIMAGE_CMD ,      CMD_3},
+  { "preimage",    0, PREIMAGE_CMD ,      CMD_13},
   { "prime",       0, PRIME_CMD ,         CMD_1},
   { "print",       0, PRINT_CMD ,         CMD_12},
   { "prune",       0, PRUNE_CMD ,         CMD_1},
@@ -2911,6 +2911,12 @@ static BOOLEAN jjP2I(leftv res, leftv v)
   res->data = (char *)nInt(pGetCoeff(p));
   return FALSE;
 }
+static BOOLEAN jjPREIMAGE_R(leftv res, leftv v)
+{
+  map mapping=(map)v->Data();
+  syMake(res,mstrdup(mapping->preimage));
+  return FALSE;
+}
 static BOOLEAN jjPRIME(leftv res, leftv v)
 {
   int i = IsPrime((int)(v->Data()));
@@ -3549,6 +3555,7 @@ struct sValCmd1 dArith1[]=
 ,{jjrParStr,    PARSTR_CMD,      XS(STRING_CMD), RING_CMD }
 ,{jjrParStr,    PARSTR_CMD,      XS(STRING_CMD), QRING_CMD }
 ,{jjDUMMY,      POLY_CMD,        POLY_CMD,       POLY_CMD }
+,{jjPREIMAGE_R, PREIMAGE_CMD,    RING_CMD,       MAP_CMD }
 ,{jjPRIME,      PRIME_CMD,       INT_CMD,        INT_CMD }
 ,{jjPRINT,      PRINT_CMD,       NONE,           LIST_CMD}
 ,{jjPRINT,      PRINT_CMD,       NONE,           DEF_CMD}
@@ -3844,7 +3851,6 @@ static BOOLEAN jjCALL3MANY(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
 {
-  
   lists l=smCallNewBareiss((ideal)u->Data(),(int)v->Data(),(int)w->Data());
   res->data = (char *)l;
   return FALSE;
@@ -3978,6 +3984,13 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
     if (h->typ==MAP_CMD)
     {
       mapping=IDMAP(h);
+      idhdl preim_ring=idroot->get(mapping->preimage,myynest);
+      if ((preim_ring==NULL)
+      || (IDRING(preim_ring)!=currRing))
+      {
+        Werror("preimage ring `%s` is not the basering",mapping->preimage);
+        return TRUE;
+      }
     }
     else if (h->typ==IDEAL_CMD)
     {
@@ -4521,7 +4534,7 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
 }
 static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
 {
-  if ((yyInRingConstruction) 
+  if ((yyInRingConstruction)
   && ((strcmp(u->Name(),"real")==0) || (strcmp(u->Name(),"complex")==0)))
   {
     memcpy(res,u,sizeof(sleftv));

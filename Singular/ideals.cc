@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.49 1999-05-20 11:57:40 Singular Exp $ */
+/* $Id: ideals.cc,v 1.50 1999-07-14 13:16:02 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -24,7 +24,7 @@
 #include "lists.h"
 
 
-// #define WITH_OLD_MINOR
+#define WITH_OLD_MINOR
 
 static poly * idpower;
 /*collects the monomials in makemonoms, must be allocated befor*/
@@ -736,7 +736,7 @@ int pLowVar (poly p)
   {
     l = 1;
     lex = pGetExp(p,l);
-    while ((l <= pVariables) && (lex == 0))
+    while ((l < pVariables) && (lex == 0))
     {
       l++;
       lex = pGetExp(p,l);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.26 1999-05-29 11:59:16 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.27 1999-07-14 13:16:06 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -869,7 +869,7 @@ static poly redNF (poly h,kStrategy strat)
       {
         PrintS("\nto:");
         wrp(h);
-	PrintLn();
+        PrintLn();
       }
       if (h == NULL) return NULL;
       z++;
@@ -1478,10 +1478,12 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
       pNorm(strat->S[i]);
   }
   kTest(strat);
+  if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   p = redNF(pCopy(q),strat);
   kTest(strat);
   if ((p!=NULL)&&(lazyReduce==0))
   {
+    if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
     p = redtailBba(p,strat->sl,strat);
   }
   kTest(strat);
@@ -1489,6 +1491,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   idDelete(&strat->Shdl);
   test=save_test;
+  if (TEST_OPT_PROT) PrintLn();
   return p;
 }
 
@@ -1527,24 +1530,23 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   {
     if (q->m[i]!=NULL)
     {
+      if (TEST_OPT_PROT) { PrintS("r");mflush(); }
       p = redNF(pCopy(q->m[i]),strat);
       if ((p!=NULL)&&(lazyReduce==0))
       {
+        if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
         p = redtailBba(p,strat->sl,strat);
       }
       res->m[i]=p;
     }
     //else
     //  res->m[i]=NULL;
-    if (TEST_OPT_PROT)
-    {
-      PrintS("-");mflush();
-    }
   }
   /*- release temp data------------------------------- -*/
   Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   idDelete(&strat->Shdl);
   test=save_test;
+  if (TEST_OPT_PROT) PrintLn();
   return res;
 }
 
