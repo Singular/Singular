@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 version="Id: qhmoduli.lib,v 1.0 2000/12/12 12:32:15 Singular Exp $";
+category="Singularities";
 info="
 LIBRARY:  qhmoduli.lib    PROCEDURES FOR MODULI SPACES OF SQH-SINGULARITIES
 AUTHOR:   Thomas Bayer, email: bayert@in.tum.de

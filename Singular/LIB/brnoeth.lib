@@ -1,4 +1,5 @@
-version="$Id: brnoeth.lib,v 1.4 2000-12-15 12:22:56 obachman Exp $";
+version="$Id: brnoeth.lib,v 1.5 2000-12-19 15:05:16 anne Exp $";
+category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  PROCEDURES FOR THE BRILL-NOETHER ALGORITHM
            

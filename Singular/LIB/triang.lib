@@ -1,6 +1,7 @@
-// "$Id: triang.lib,v 1.3 1999-12-10 16:43:34 obachman Exp $";
+// "$Id: triang.lib,v 1.4 2000-12-19 15:05:46 anne Exp $";
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: triang.lib,v 1.3 1999-12-10 16:43:34 obachman Exp $";
+version="$Id: triang.lib,v 1.4 2000-12-19 15:05:46 anne Exp $";
+category="Symbolic-numerical solving";
 info="
 LIBRARY: triang.lib   PROCEDURES FOR DECOMPOSING ZERO-DIMENSIONAL IDEALS
 

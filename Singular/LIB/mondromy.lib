@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.16 2000-08-06 08:19:13 mschulze Exp $";
+version="$Id: mondromy.lib,v 1.17 2000-12-19 15:05:30 anne Exp $";
+category="Singularities";
 info="
 LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de

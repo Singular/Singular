@@ -1,8 +1,9 @@
-// $Id: sing.lib,v 1.20 2000-05-23 23:01:38 greuel Exp $
+// $Id: sing.lib,v 1.21 2000-12-19 15:05:34 anne Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.20 2000-05-23 23:01:38 greuel Exp $";
+version="$Id: sing.lib,v 1.21 2000-12-19 15:05:34 anne Exp $";
+category="Singularities";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de

@@ -1,7 +1,8 @@
-// $Id: ainvar.lib,v 1.2 2000-05-12 12:25:40 Singular Exp $
+// $Id: ainvar.lib,v 1.3 2000-12-19 15:05:15 anne Exp $
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: ainvar.lib,v 1.2 2000-05-12 12:25:40 Singular Exp $";
+version="$Id: ainvar.lib,v 1.3 2000-12-19 15:05:15 anne Exp $";
+category="Invariant theory";
 info="
 LIBRARY: ainvar.lib   PROCEDURES FOR COMPUTING INVARIANTS RINGS OF THE ADDITIVE GROUP
 AUTHORS: Gerhard Pfister,  email: pfister@mathematik.uni-kl.de

@@ -1,8 +1,9 @@
-// $Id: deform.lib,v 1.21 2000-05-12 12:25:42 Singular Exp $
+// $Id: deform.lib,v 1.22 2000-12-19 15:05:19 anne Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.21 2000-05-12 12:25:42 Singular Exp $";
+version="$Id: deform.lib,v 1.22 2000-12-19 15:05:19 anne Exp $";
+category="Singularities";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
 

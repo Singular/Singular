@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.15 2000-12-06 15:00:09 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.16 2000-12-19 15:05:25 anne Exp $";
+category="Singularities";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 

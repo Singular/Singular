@@ -1,9 +1,10 @@
-// $Id: hnoether.lib,v 1.24 2000-12-13 20:55:14 lamm Exp $
+// $Id: hnoether.lib,v 1.25 2000-12-19 15:05:27 anne Exp $
 // last change:           31.08.00
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-7 or newer
 
-version="$Id: hnoether.lib,v 1.24 2000-12-13 20:55:14 lamm Exp $";
+version="$Id: hnoether.lib,v 1.25 2000-12-19 15:05:27 anne Exp $";
+category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Procedures for the Hamburger-Noether (Puiseux) development
 

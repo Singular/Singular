@@ -1,8 +1,9 @@
-e// $Id: classify.lib,v 1.43 2000-12-04 13:48:16 Singular Exp $
+e// $Id: classify.lib,v 1.44 2000-12-19 15:05:17 anne Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.43 2000-12-04 13:48:16 Singular Exp $";
+version  = "$Id: classify.lib,v 1.44 2000-12-19 15:05:17 anne Exp $";
+category="Singularities";
 info="
 LIBRARY:  classify.lib  Procedures for the Arnold-Classifier of Singularities
 

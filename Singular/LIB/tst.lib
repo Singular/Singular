@@ -1,8 +1,9 @@
-// $Id: tst.lib,v 1.28 2000-12-12 08:44:55 obachman Exp $
+// $Id: tst.lib,v 1.29 2000-12-19 15:05:48 anne Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.28 2000-12-12 08:44:55 obachman Exp $";
+version="$Id: tst.lib,v 1.29 2000-12-19 15:05:48 anne Exp $";
+category="Utilities";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 

@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 version="Id: rinvar.lib,v 1.0 2000/12/10 17:32:15 Singular Exp $";
+category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      PROCEDURES FOR INVARIANT RINGS OF REDUCTIVE GROUPS
 

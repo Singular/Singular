@@ -1,11 +1,12 @@
-// $Id: makedbm.lib,v 1.8 1998-05-14 18:45:09 Singular Exp $
+// $Id: makedbm.lib,v 1.9 2000-12-19 15:05:29 anne Exp $
 //=========================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
 //=============================================================================
 
-version="$Id: makedbm.lib,v 1.8 1998-05-14 18:45:09 Singular Exp $";
+version="$Id: makedbm.lib,v 1.9 2000-12-19 15:05:29 anne Exp $";
+category="Utilities";
 info="
 LIBRARY:  makedbm.lib     some usefull tools needed by the Arnold-Classifier.
 

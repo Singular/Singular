@@ -1,6 +1,7 @@
 //(GMG, last modified 16.12.00)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.8 2000-12-16 01:14:43 greuel Exp $";
+version="$Id: ntsolve.lib,v 1.9 2000-12-19 15:05:31 anne Exp $";
+category="Symbolic-numerical solving";
 info="
 LIBRARY:  ntsolve.lib     REAL NEWTON SOLVING OF POLYNOMIAL SYSTEMS
 AUTHORS:  Wilfred Pohl, email: pohl@mathematik.uni-kl.de

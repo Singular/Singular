@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 version="Id: zeroset.lib,v 1.0 2000/05/19 12:32:15 Singular Exp $";
+category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      PROCEDURES FOR ROOTS AND FACTORIZATION
 

@@ -1,8 +1,9 @@
-// $Id: finvar.lib,v 1.27 2000-05-12 12:25:43 Singular Exp $
+// $Id: finvar.lib,v 1.28 2000-12-19 15:05:21 anne Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.27 2000-05-12 12:25:43 Singular Exp $"
+version="$Id: finvar.lib,v 1.28 2000-12-19 15:05:21 anne Exp $"
+category="Invariant theory";
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS OF FINITE GROUPS
 AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de

@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.16 2000-06-29 08:46:44 pohl Exp $";
+version="$Id: solve.lib,v 1.17 2000-12-19 15:05:35 anne Exp $";
+category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de

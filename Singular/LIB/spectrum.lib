@@ -1,7 +1,8 @@
-// $Id: spectrum.lib,v 1.7 2000-12-15 16:20:45 Singular Exp $
+// $Id: spectrum.lib,v 1.8 2000-12-19 15:05:37 anne Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: spectrum.lib,v 1.7 2000-12-15 16:20:45 Singular Exp $";
+version="$Id: spectrum.lib,v 1.8 2000-12-19 15:05:37 anne Exp $";
+category="Singularities";
 info="
 LIBRARY:  spectrum.lib   PROCEDURES FOR COMPUTING SINGULARITY SPECTRA
 

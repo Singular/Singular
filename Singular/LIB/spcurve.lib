@@ -1,8 +1,9 @@
-// $Id: spcurve.lib,v 1.11 2000-12-12 13:50:46 anne Exp $
+// $Id: spcurve.lib,v 1.12 2000-12-19 15:05:36 anne Exp $
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: spcurve.lib,v 1.11 2000-12-12 13:50:46 anne Exp $";
+version="$Id: spcurve.lib,v 1.12 2000-12-19 15:05:36 anne Exp $";
+category="Singularities";
 info="
 LIBRARY: spcurve.lib    PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
 AUTHOR:  Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de

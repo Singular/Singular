@@ -1,9 +1,10 @@
-// $Id: graphics.lib,v 1.6 1999-12-13 15:33:46 obachman Exp $
+// $Id: graphics.lib,v 1.7 2000-12-19 15:05:26 anne Exp $
 //
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.6 1999-12-13 15:33:46 obachman Exp $";
+version="$Id: graphics.lib,v 1.7 2000-12-19 15:05:26 anne Exp $";
+category="Visualization";
 info="
 LIBRARY: graphics.lib    PROCEDURES FOR GRAPHICS WITH MATHEMATICA
 
