@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.64 1999-07-15 14:15:06 obachman Exp $
+@comment $Id: singular.doc,v 1.65 1999-07-15 17:06:12 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -82,7 +82,6 @@ This is the texinfo file describing Singular (version @value{VERSION})
 * Polynomial data::
 * Mathematical background::
 * SINGULAR libraries::
-* Library function index::
 * Index::
 @end menu
 
@@ -139,7 +138,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @cindex Mathematical background
 @include math.tex
 @c ----------------------------------------------------------------------------
-@node SINGULAR libraries, Library function index, Mathematical background, Top
+@node SINGULAR libraries, Index, Mathematical background, Top
 @appendix SINGULAR libraries
 @cindex SINGULAR libraries
 @cindex LIBs
@@ -342,11 +341,7 @@ LIB "all.lib";
 @c lib spcurve.lib
 
 @c ----------------------------------------------------------
-@node Library function index, Index, SINGULAR libraries, Top
-@appendix Library function index
-@printindex fn
-@c ----------------------------------------------------------
-@node Index, ,Library function index, Top
+@node Index, ,SINGULAR libraries, Top
 @chapter Index
 @printindex cp
 @c ---------------------------------------------------------

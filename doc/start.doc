@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.37 1999-07-09 14:12:58 obachman Exp $
+@comment $Id: start.doc,v 1.38 1999-07-15 17:06:12 obachman Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -195,7 +195,7 @@ notions and definitions used throughout this manual.  For example, if in
 doubt what exactly @sc{Singular} means by a ``negative degree reverse
 lexicographical ordering'' one should refer to this chapter.
 
-@ref{SINGULAR libraries}, and @ref{Library function index}, lists the
+@ref{SINGULAR libraries} lists the
 libraries which come with @sc{Singular} and the functions contained in
 them, respectively.
 @end ifset

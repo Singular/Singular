@@ -34,6 +34,9 @@ $T2H_SHORT_REF = 1;
 # if set, chatter about what we are doing
 $T2H_VERBOSE = 1;
 
+# print index summary for 'cp' index
+$T2H_IDX_SUMMARY = 'cp';
+
 # inside <BODY ..>
 $T2H_BODYTEXT = 'LANG="EN"  BACKGROUND="bg.jpg"';
 

@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.6 1999-07-15 14:15:06 obachman Exp $
+# $Id: doc2tex.pl,v 1.7 1999-07-15 17:06:11 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -555,10 +555,10 @@ sub GenerateLibDoc
 	print LDOC " ".$procs[$i-1] if ($i > 0);
 	print LDOC ", " . $lib ."_lib\n";
 	print LDOC "\@subsection " . $procs[$i] . "\n";
-	print LDOC "\@findex ". $procs[$i] . "\n";
-	print LDOC "\@cindex ". $procs[$i] . "\n" if ($lib eq "standard");
+	print LDOC "\@cindex ". $procs[$i] . "\n";
 
 	print LDOC "\@c ---content $procs[$i]---\n";
+	print LDOC "Procedure from library \@code{$lib.lib} (\@pxref{${lib}_lib}).\n\n";
 	print LDOC "\@table \@asis\n";
 	$table_is_open = 1;
 	# print help
@@ -744,7 +744,7 @@ sub OutInfoItem
     $text = $';
     if ($text =~ /\w/)
     {
-      print $FH "\n" . '@item @strong{Purpose:'."}\n";
+      print $FH '@item @strong{Purpose:'."}\n";
       print $FH lc $text;
     }
   }
@@ -756,7 +756,7 @@ sub OutInfoItem
     s/(\w+\(.*?\))/\@code{$1}/g
       if ($item =~ /usage/i || $item =~ /Return/i);
 
-    print $FH "$_\n\n";
+    print $FH "$_\n";
   }
   return '';
 }
@@ -777,7 +777,7 @@ sub OutProcInfo
   else
   {
     print $FH "\@item \@code{$proc($procargs)}  ";
-    print $FH "\n\@findex $proc\n$_\n";
+    print $FH "\n\@cindex $proc\n$_\n";
   }
 }
 
