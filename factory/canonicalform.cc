@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.22 1997-10-22 15:51:36 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.23 1997-10-27 14:15:36 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1322,7 +1322,7 @@ operator > ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
 	    return lhs.value->comparesame( rhs.value ) > 0;
 	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
-	    return lhs.value->comparecoeff( lhs.value ) > 0;
+	    return lhs.value->comparecoeff( rhs.value ) > 0;
 	else
 	    return rhs.value->comparecoeff( lhs.value ) < 0;
     else
@@ -1360,7 +1360,7 @@ operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
 	    return lhs.value->comparesame( rhs.value ) < 0;
 	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
-	    return lhs.value->comparecoeff( lhs.value ) < 0;
+	    return lhs.value->comparecoeff( rhs.value ) < 0;
 	else
 	    return rhs.value->comparecoeff( lhs.value ) > 0;
     else
