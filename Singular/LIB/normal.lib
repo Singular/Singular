@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.40 2004-04-20 14:27:46 Singular Exp $";
+version="$Id: normal.lib,v 1.41 2005-01-04 10:38:34 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -1325,52 +1325,95 @@ EXAMPLE: example genus; shows an example
 {
    int w = printlevel-voice+2;  // w=printlevel (default: w=0)
 
-   def R=basering;
-
-   if(homog(I))
+   def R0=basering;
+   I=std(I);
+   if(dim(I)!=1)
    {
-      execute("ring newR=("+charstr(R)+"),("+varstr(R)+"),dp;"); 
-      ideal I=imap(R,I);  
+      if(((homog(I))&&(dim(I)!=2))||(!homog(I)))
+      {
+        // ERROR("This is not a curve");
+        if(w==1){"WARNING:This is not a curve";}
+      }
+   }
+   list L=elimpart(I);    
+   if(size(L[2])!=0)
+   {
+      map psi=R0,L[5];
+      I=std(psi(I));
+   }
+   if(size(I)==0)
+   {
+      return(0);
+   }
+   list N=findvars(I,0);
+   if(size(N[1])==1)
+   {
+
+      poly p=I[1];
+     // if(deg(squarefree(p))<deg(p)){ERROR("Curve is not reduced");}
+      return(-deg(p)+1);
+   }
+   if(size(N[1])<nvars(R0))
+   {
+      string newvar=string(N[1]);
+      execute("ring R=("+charstr(R0)+"),("+newvar+"),dp;");
+      ideal I =imap(R0,I); 
+      attrib(I,"isSB",1);
    }
    else
    {
-      execute("ring newR=("+charstr(R)+"),("+varstr(R)+",@t),dp;"); 
-      ideal I=imap(R,I);  
-      I=homog(std(I),@t);
+      def R=basering;
    }
-   ideal J=std(I);
-   if((dim(J)!=2)||((nvars(basering)==2)&&(dim(J)<1)))
+   if(dim(I)==2)
    {
-      ERROR("This is not a curve");
+      def newR=basering;
    }
-   if((nvars(basering)<=3)&&(size(J)>1))
+   else
+   {
+      if(dim(I)==0)
+      {
+         execute("ring Rhelp=("+charstr(R0)+"),(@s,@t),dp;");
+      }
+      else
+      {
+         execute("ring Rhelp=("+charstr(R0)+"),(@s),dp;");
+      }
+      def newR=R+Rhelp;
+      setring newR;
+      ideal I=imap(R,I);
+      I=homog(I,@s);
+      attrib(I,"isSB",1);
+   }
+ 
+   if((nvars(basering)<=3)&&(size(I)>1))
    {
        ERROR("This is not equidimensional");
    } 
    
-   intvec hp=hilbPoly(J);
+   intvec hp=hilbPoly(I);
    int p_a=1-hp[1];
    int d=hp[2];
 
    if(w>=1)
    {
-      "";"The ideal of the projective curve:";"";J;"";
+      "";"The ideal of the projective curve:";"";I;"";
       "The coefficients of the Hilbert polynomial";hp;
       "arithmetic genus:";p_a;
       "degree:";d;"";
    }
    
-   intvec v = hilb(J,1);
-   int o,i;
-   
+   intvec v = hilb(I,1);
+   int i,o;
    if(nvars(basering)>3)
    {
       map phi=newR,maxideal(1);
       int de;
-      ideal K,L;
+      ideal K,L1;
+      matrix M;
       poly m=var(4);
+      poly he;
       for(i=5;i<=nvars(basering);i++){m=m*var(i);}
-      K=eliminate(J,m,v);
+      K=eliminate(I,m,v);
       if(size(K)==1){de=deg(K[1]);}
       m=var(1);
       for(i=2;i<=nvars(basering)-3;i++){m=m*var(i);}
@@ -1379,29 +1422,47 @@ EXAMPLE: example genus; shows an example
       {
          o=1;
          i++;
-         K=phi(J);
+         K=phi(I);
          K=eliminate(K,m,v);
          if(size(K)==1){de=deg(K[1]);}
          if((i==5)&&(d!=de))   
          {
-            K=reduce(equidimMax(J),J);
+            K=reduce(equidimMax(I),I);
             if(size(K)!=0){ERROR("This is not equidimensional");}
-          }
-          if(i==10){ERROR("did not find a good projection");}
-          L=sparsetriag(nvars(newR),nvars(newR),80-5*i,i)*transpose(maxideal(1));
-          phi=newR,L;
+         }
+         if(i==10)
+         {
+            J;K;
+            ERROR("genus: did not find a good projection for to 
+                           the plain");
+         }
+         if(i<5)
+         {
+            M=sparsetriag(nvars(newR),nvars(newR),80-5*i,i);
+         }
+         else
+         {
+            if(i<8)
+            {
+               M=transpose(sparsetriag(nvars(newR),nvars(newR),80-5*i,i));
+            }
+            else
+            {
+               he=0;
+               while(he==0)
+               {
+                  M=randommat(nvars(newR),nvars(newR),ideal(1),20);
+                  he=det(M);
+               }
+            }
+         }
+         L1=M*transpose(maxideal(1));
+         phi=newR,L1;
       }
-      J=K;
+      I=K;
    }
-   poly p=J[1];
-   
-   if(nvars(basering)==2)
-   {
-      if(p==0) { return(0); }
-      if(deg(squarefree(p))<deg(p)){ERROR("Curve is not reduced");}
-      return(-deg(p)+1);
-   }
-   
+   poly p=I[1];
+      
    execute("ring S=("+charstr(R)+"),(x,y,t),dp;");
    ideal L=maxideal(1);
    execute("ring C=("+charstr(R)+"),(x,y),ds;");
@@ -1500,7 +1561,7 @@ EXAMPLE: example genus; shows an example
       list nor=normal(I,"wd");
       delt=nor[size(nor)];
       genus=genus-delt-deltainf;
-      setring R;
+      setring R0;
       return(genus);
    }
 
@@ -1609,7 +1670,7 @@ EXAMPLE: example genus; shows an example
       "====================================================";
       "";
    }
-   setring R;
+   setring R0;
    return(genus);
 }
 example
@@ -1805,11 +1866,23 @@ EXAMPLE: example deltaLoc;  shows an example
            de=w_deg(h,v);
          }
          nb=deltaLoc(f1,maxideal(1))[3]+deltaLoc(f2,maxideal(1))[3];
+         setring R;
          return(list(d*(mu+nb-1)/2,d*tau,d*nb));
       }
 
       f=jet(f,deg(hc)+2);
       if(w>=1){"now we have to use Hamburger-Noether (Puiseux) expansion";}
+      ideal fac=factorize(f,1);
+      if(size(fac)>1)
+      {
+         nb=0;
+         for(i=1;i<=size(fac);i++)
+         {
+            nb=nb+deltaLoc(fac[i],maxideal(1))[3];           
+         }
+         setring R;
+         return(list(d*(mu+nb-1)/2,d*tau,d*nb));
+      }
       list hne=reddevelop(f);
       nb=size(hne);
       setring R;
