@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_ftp.texi,v 1.4 1999-12-08 18:44:10 obachman Exp $
+@comment $Id: README_ftp.texi,v 1.5 1999-12-08 22:55:55 obachman Exp $
 @c FILE: README_download.texi
 @c PURPOSE: This should reside as README file in the main directory of the
 @c          Singular ftp site.
@@ -42,10 +42,10 @@ news and changes of this version
 license information for @sc{Singular}
 @nref{INSTALL_unix, INSTALL_unix.html}
 Unix installation instructions
-@item @code{Singular-@value{VERSION}-share.tgz}
+@item @code{Singular-@value{VERSION}-share.tar.gz}
 @sc{Singular} distribution archive which contains architecture
 independent data like documentation and libraries.
-@item @code{Singular-@value{VERSION}-<uname>}.tgz
+@item @code{Singular-@value{VERSION}-<uname>}.tar.gz
 @sc{Singular} distribution archives which contain architecture dependent
 executables, like the @sc{Singular} program.
 @end table

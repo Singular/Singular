@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.2 1999-12-08 17:00:39 obachman Exp $
+@comment $Id: README_download.texi,v 1.3 1999-12-08 22:55:54 obachman Exp $
 @c FILE: README_download.texi
 @c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
 @c
@@ -17,11 +17,11 @@ these steps.
 @item
 You need to download two (archive) files:
 @table @code
-@item Singular-@value{VERSION}-share.tgz 
+@item Singular-@value{VERSION}-share.tar.gz 
 contains architecture independent data like documentation and libraries
 (alternatively, you may also download 
 @code{Singular-@value{VERSION}-share.zip}).
-@item Singular-@value{VERSION}-<uname>.tgz
+@item Singular-@value{VERSION}-<uname>.tar.gz
 contains architecture dependent executables, like the @sc{Singular}
 program.
 @end table
@@ -55,8 +55,8 @@ tree.
 @item
 Unpack the archives:
 @smallexample
-gzip -dc Singular-@value{VERSION}-<uname>.tgz | tar -pxf -
-gzip -dc Singular-@value{VERSION}-share.tgz | tar -pxf -
+gzip -dc Singular-@value{VERSION}-<uname>.tar.gz | tar -pxf -
+gzip -dc Singular-@value{VERSION}-share.tar.gz | tar -pxf -
 @end smallexample
 If you have downloaded @code{Singular-@value{VERSION}-share.zip},
 unpack with 
