@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.70 1999-09-20 18:03:51 obachman Exp $ */
+/* $Id: tesths.cc,v 1.71 1999-09-20 20:00:35 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -63,7 +63,7 @@ int main(          /* main entry to Singular */
   feInitResources(argv[0]);
 
   // parse command line options
-  while((optc = fe_getopt_long_only(argc, argv,
+  while((optc = fe_getopt_long(argc, argv,
                                SHORT_OPTS_STRING, feOptSpec, &option_index))
 //                               "", feOptSpec, &option_index))
         != EOF)
@@ -77,7 +77,7 @@ int main(          /* main entry to Singular */
     if (optc != LONG_OPTION_RETURN)
       option_index = feGetOptIndex(optc);
 
-    assume(option_index > 0 && option_index < (int) FE_OPT_UNDEF);
+    assume(option_index >= 0 && option_index < (int) FE_OPT_UNDEF);
     
     if (fe_optarg == NULL && 
         (feOptSpec[option_index].type == feOptBool ||

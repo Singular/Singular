@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.45 1999-09-20 17:45:42 Singular Exp $
+// $Id: standard.lib,v 1.46 1999-09-20 20:00:35 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.45 1999-09-20 17:45:42 Singular Exp $";
+version="$Id: standard.lib,v 1.46 1999-09-20 20:00:35 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -592,10 +592,10 @@ example
 /////////////////////////////////////////////////////////////////////////
 
 proc quot (m1,m2,list #)
-"SYNTAX:  quot(module_expression, module_expression);
-         quot(module_expression, module_expression, int_expression);
-         quot(ideal_expression, ideal_expression);
-         quot(ideal_expression, ideal_expression, int_expression);
+"SYNTAX: quot(module_expression, module_expression);
+         @*quot(module_expression, module_expression, int_expression);
+         @*quot(ideal_expression, ideal_expression);
+         @*quot(ideal_expression, ideal_expression, int_expression);
 TYPE:    ideal
 SYNTAX:  quot(module_expression, ideal_expression);
 TYPE:    module

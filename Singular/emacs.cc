@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.8 1999-09-20 18:03:43 obachman Exp $ */
+/* $Id: emacs.cc,v 1.9 1999-09-20 20:00:34 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -87,8 +87,8 @@ int main(int argc, char** argv)
   
   int optc, option_index;
   
-  while ((optc = fe_getopt_long_only(argc, argv, SHORT_OPTS_STRING, 
-                                     feOptSpec, &option_index))
+  while ((optc = fe_getopt_long(argc, argv, SHORT_OPTS_STRING, 
+                                feOptSpec, &option_index))
         != EOF)
   {
     switch(optc)
