@@ -36,7 +36,7 @@ IMAGES		= contents_motif.gif index_motif.gif \
 		next_motif.gif next_motif_gr.gif \
 		previous_motif.gif previous_motif_gr.gif \
 		singular-small.jpg singular.jpg \
-		invisible.xbm bg_left.gif bg_right.gif
+		invisible.xbm bg_left.gif bg_right.gif bg.jpg spacer3.gif
 
 # d2t stuff
 SINGULAR	= @SINGULAR@
@@ -59,6 +59,11 @@ DOC2TEX_FILES	= \
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 TUTOR_FILES	= \
 		tutor.tex examples.tex start.tex copyright.tex
+
+IMAGES_UU := $(IMAGES:%=images/%.uu)
+IMAGES_SRC := $(IMAGES:%=images/%)
+IMAGES_HTML := $(IMAGES:%=html/%)
+IMAGES_TUTOR :=  $(IMAGES:%=html_tutor/%)
 
 # prepend bindir to path so that programs from there are taken first
 export PATH := "${bindir}:${PATH}"
@@ -98,12 +103,12 @@ usercard.ps: usercard.dvi
 	${DVIPS} $< -o $@
 
 # html stuff
-html: html/index.htm
+html: html/index.htm ${IMAGES_HTML}
 html/index.htm: ${MANUAL_FILES} t2h_singular.init t2h.init singular.tex ${TEXI2HTML}
 	${PERL5} ${TEXI2HTML} -init_file t2h_singular.init ${TEXI2HTML_OPTS} -subdir html singular.tex
 
 # html stuff
-html_tutor: ${TUTOR_FILES}
+html_tutor: ${TUTOR_FILES} ${IMAGES_TUTOR}
 	test -d html_tutor || mkdir html_tutor
 	cd html_tutor && ${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} ../tutor.tex
 	test -d html || mkdir html
@@ -130,6 +135,22 @@ singular.tex: ${MANUAL_FILES} doc2tex.pl ${SINGULAR} ${LIBPARSE} singular.doc
 COPYING: copyright.tex
 	${MAKEINFO} --no-header -o COPYING copyright.tex 
 
+${IMAGES_HTML} : ${IMAGES_SRC}
+	test -d html || mkdir html
+	cp ${IMAGES_SRC} html
+
+${IMAGES_TUTOR} : ${IMAGES_SRC}
+	test -d html_tutor || mkdir html_tutor
+	cp ${IMAGES_SRC} html_tutor
+
+images/%.gif : images/%.gif.uu
+	uudecode $< -o $@
+
+images/%.jpg : images/%.jpg.uu
+	uudecode $< -o $@
+
+images/%.xbm : images/%.xbm.uu
+	uudecode $< -o $@
 
 # targets concerned with maintenance
 install: singular.hlp

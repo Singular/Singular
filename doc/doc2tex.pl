@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.5 1999-07-09 14:12:47 obachman Exp $
+# $Id: doc2tex.pl,v 1.6 1999-07-15 14:15:06 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -655,7 +655,7 @@ sub FormatInfoText
       $line = $1;
       $text .= '@*' 
 	if ($line =~ /\w/ && $pline =~ /\w/ && 
-	    ((length($pline) < 60) || $line =~ /^\s*\w\(.*?\)/));
+	    ((length($pline) < 60) || $line =~ /^\s*\w*\(.*?\)/));
       $line =~ s/\s*$//;
       $text .= "$line\n";
       $pline = $line;
