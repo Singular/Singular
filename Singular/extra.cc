@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.137 2000-08-14 12:56:04 obachman Exp $ */
+/* $Id: extra.cc,v 1.138 2000-08-14 14:35:50 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1155,6 +1155,27 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== stdX =================*/
+    if (strcmp(sys_cmd, "std") == 0)
+    {
+      ideal i1;
+      int i2;
+      if ((h!=NULL) && (h->Typ()==MODUL_CMD))
+      {
+        i1=(ideal)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+        i2=(int)h->Data();
+      }
+      else return TRUE;
+      res->rtyp=MODUL_CMD;
+      res->data=idXXX(i1,i2);
+      return FALSE;
+    }
+    else
 #ifdef HAVE_WALK
 /*==================== walk stuff =================*/
     if (strcmp(sys_cmd, "walkNextWeight") == 0)

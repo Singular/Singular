@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.98 2000-08-14 12:56:20 obachman Exp $ */
+/* $Id: ideals.cc,v 1.99 2000-08-14 14:35:51 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1458,6 +1458,79 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   return s_h3;
 }
 
+/*2
+*/
+ideal idXXX (ideal  h1, int k)
+{
+  ideal s_h1;
+  int j;
+  intvec *w=NULL;
+
+  assume(currRing != NULL);
+  ring orig_ring=currRing;
+  ring syz_ring=rCurrRingAssure_SyzComp();
+
+  rSetSyzComp(k);
+
+  if (orig_ring != syz_ring)
+  {
+    s_h1=idrCopyR_NoSort(h1,orig_ring);
+  }
+  else
+  {
+    s_h1 = h1;
+  }
+
+  ideal s_h3=kStd(s_h1,NULL,testHomog,&w,NULL,k);
+
+  if (s_h3==NULL)
+  {
+    return idFreeModule(IDELEMS(h1));
+  }
+
+  if (orig_ring != syz_ring)
+  {
+    idDelete(&s_h1);
+    for (j=0; j<IDELEMS(s_h3); j++)
+    {
+      if (s_h3->m[j] != NULL)
+      {
+        if (pMinComp(s_h3->m[j],syz_ring) > k)
+          pShift(&s_h3->m[j], -k);
+        else
+          pDelete(&s_h3->m[j]);
+      }
+    }
+    idSkipZeroes(s_h3);
+    s_h3->rank -= k;
+    rChangeCurrRing(orig_ring, TRUE);
+    s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
+    rKill(syz_ring);
+    idTest(s_h3);
+    return s_h3;
+  }
+
+  ideal e = idInit(IDELEMS(s_h3), s_h3->rank);
+
+  for (j=0; j<IDELEMS(s_h3); j++)
+  {
+    if (s_h3->m[j] != NULL)
+    {
+      if (pMinComp(s_h3->m[j],syz_ring) <= k)
+      {
+        e->m[j] = s_h3->m[j];
+        pDelete(&pNext(s_h3->m[j]));
+        s_h3->m[j] = NULL;
+      }
+    }
+  }
+
+  idSkipZeroes(s_h3);
+  idDelete(&e);
+  idTest(s_h3);
+  return s_h3;
+}
+
 /*
 *computes a standard basis for h1 and stores the transformation matrix
 * in ma
@@ -1801,7 +1874,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
 /*2
 *computes the quotient of h1,h2 : interanl routine for idQuot
 *BEWARE: the returned ideals may contain incorrected orderd polys !
-* 
+*
 */
 static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
                                BOOLEAN *addOnlyOne, int *kkmax)
@@ -2460,12 +2533,12 @@ ideal idCompactify(ideal id)
 //        (*v)[i]--;
 //      for (i=0;i<IDELEMS(result)-1;i++)
 //      {
-//	if (((*v)[i]>=0)
+//        if (((*v)[i]>=0)
 //        && (result->m[(*v)[i]]!=NULL))
 //        {
 //          j=i+1;
 //          while ((j<IDELEMS(result))
-//	  && ((*v)[j]>=0)
+//          && ((*v)[j]>=0)
 //          && (result->m[(*v)[j]]!=NULL)
 //          && (pComparePolys(result->m[(*v)[i]],result->m[(*v)[j]])))
 //          {
