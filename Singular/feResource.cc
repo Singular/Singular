@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.4 1999-08-06 14:06:38 obachman Exp $ */
+/* $Id: feResource.cc,v 1.5 1999-08-12 10:57:32 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -11,7 +11,6 @@
 #include "mod2.h"
 #include "mmemory.h"
 #include "febase.h"
-#include "version.h"
 
 // define RESOURCE_DEBUG for chattering about resource management
 // #define RESOURCE_DEBUG

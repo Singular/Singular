@@ -4,6 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
+ *  Version: $Id: mod2.h.in,v 1.64 1999-08-12 10:57:34 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -129,7 +130,7 @@
 /* Define pagesize of your system */
 #define SIZE_OF_SYSTEM_PAGE 4096
 /* size of page as we can use it */
-#define SIZE_OF_PAGE SIZE_OF_SYSTEM_PAGE 
+#define SIZE_OF_PAGE SIZE_OF_SYSTEM_PAGE
 /* valloc routine which returns chunk of SIZE_OF_PAGE */
 #define PALLOC malloc
 #define PFREE  free
@@ -200,6 +201,11 @@
 /* Define if you want fglm for homogeneous case */
 #ifdef HAVE_FGLM
 #undef HAVE_FGLM_HOME
+#endif
+
+/* Spectrum needs GMP */
+#ifdef HAVE_GMP
+/* #define HAVE_SPECTRUM */
 #endif
 
 /* Undefine to disable real time measurments  */
@@ -308,8 +314,8 @@ extern int pShortOut;
 #define HAVE_ASSUME
 
 /* undef MDEBUG to disable memory checks
- * 
- * define MDEBUG to 
+ *
+ * define MDEBUG to
  * 0 to enable basic memory checks (at least on each alloc/free)
  * 1 for addtl. containment checks in free/alloc list for each memory check
  * 2 for addtl. checks of entire free/alloc list at each memory check
@@ -321,14 +327,14 @@ extern int pShortOut;
 #define MDEBUG 0
 
 /* undef HEAP_DEBUG to disable heap checks
- * 
- * define HEAP_DEBUG to 
+ *
+ * define HEAP_DEBUG to
  * 0 to enable basic heap addr checks (at least on each alloc/free)
  * 1 for addtl. containment checks in free/alloc list of heap
  * 2 for addtl. check of entire  heap at each heap addr check
  * NOTE: For HEAP_DEBUG > 1 on, it gets very slow
  * You can control HEAP_DEBUG at run-time by setting the value of the
- * variable mm_HEAP_DEBUG (defined in mmheap.c) to the appropriate value. 
+ * variable mm_HEAP_DEBUG (defined in mmheap.c) to the appropriate value.
  */
 #define HEAP_DEBUG 0
 
@@ -336,7 +342,6 @@ extern int pShortOut;
 #ifndef PAGE_DEBUG
 #undef PAGE_DEBUG
 #endif
-
 
 
 /* define PDEBUG checking polys, undefine otherwise */
@@ -353,7 +358,7 @@ extern int pShortOut;
 /* define MLIST for printing block of used memory on exit */
 #define MLIST 1
 
-#ifdef HAVE_MTRACK 
+#ifdef HAVE_MTRACK
 /* define MTRACK for allowing to keep track of Alloc/Free with a backtrace */
 /* works only under linux/elf */
 #define MTRACK
@@ -405,7 +410,42 @@ extern int pShortOut;
 #define BT_MAXSTACK 10
 #endif /* MTRACK */
 
-#else /* not NDEBUG */
+/* define SPECTRUM_DEBUG and SPECTRUM_PRINT for debugging the spectrum code */
+/* define SPECTRUM_IOSTREAM to use C++ iostream for error messages          */
+
+/* #define SPECTRUM_DEBUG */
+/* #define SPECTRUM_PRINT */
+#undef  SPECTRUM_IOSTREAM
+
+#ifdef  SPECTRUM_DEBUG
+#define MULTICNT_DEBUG
+#define GMPRAT_DEBUG
+#define KMATRIX_DEBUG
+#define SPLIST_DEBUG
+#define NPOLYGON_DEBUG
+#define SEMIC_DEBUG
+#endif
+
+#ifdef  SPECTRUM_PRINT
+#define MULTICNT_PRINT
+#define GMPRAT_PRINT
+#define KMATRIX_PRINT
+#define SPLIST_PRINT
+#define NPOLYGON_PRINT
+#define SEMIC_PRINT
+#endif
+
+#ifdef  SPECTRUM_IOSTREAM
+#define MULTICNT_IOSTREAM
+#define GMPRAT_IOSTREAM
+#define KMATRIX_IOSTREAM
+#define SPLIST_IOSTREAM
+#define NPOLYGON_IOSTREAM
+#define SEMIC_IOSTREAM
+#endif
+
+
+#else /* not NDEBUG **************************************************** */
 
 /* define YYDEBUG 1 for debugging bison texts, 0 otherwise */
 #define YYDEBUG 0
@@ -421,7 +461,7 @@ extern int pShortOut;
 
 /*******************************************************************
  *
- * assume(x) -- a handy macro for assumptions 
+ * assume(x) -- a handy macro for assumptions
  *
  ******************************************************************/
 

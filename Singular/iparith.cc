@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.166 1999-08-06 14:06:39 obachman Exp $ */
+/* $Id: iparith.cc,v 1.167 1999-08-12 10:57:33 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -47,6 +47,10 @@
 #ifdef HAVE_FGLM
 #include "fglm.h"
 #endif
+#ifdef HAVE_SPECTRUM
+#include "spectrum.h"
+#endif
+
 #include "ipshell.h"
 
 #include "mpr_inout.h"
@@ -275,6 +279,14 @@ cmdnames cmds[] =
   { "simplify",    0, SIMPLIFY_CMD ,      CMD_2},
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
+  #ifdef HAVE_SPECTRUM
+  { "spectrum",    0, SPECTRUM_CMD ,      CMD_1},
+  { "spectrumnd",  0, SPECTRUMF_CMD ,     CMD_1},
+  { "spadd",       0, SPADD_CMD ,         CMD_2},
+  { "spmul",       0, SPMUL_CMD ,         CMD_2},
+  { "semic",       0, SEMIC_CMD ,         CMD_2},
+  { "semicsqh",    0, SEMICH_CMD ,        CMD_2},
+  #endif
   #ifdef OLD_RES
   { "sres",        0, SRES_CMD ,          CMD_23},
   #else
@@ -2272,6 +2284,12 @@ struct sValCmd2 dArith2[]=
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD PROFILER}
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
+#ifdef HAVE_SPECTRUM
+,{spaddProc,   SPADD_CMD,      LIST_CMD,       LIST_CMD,   LIST_CMD PROFILER}
+,{spmulProc,   SPMUL_CMD,      LIST_CMD,       LIST_CMD,   INT_CMD  PROFILER}
+,{semicProc,   SEMIC_CMD,      INT_CMD,        LIST_CMD,   LIST_CMD PROFILER}
+,{semichProc,  SEMICH_CMD,     INT_CMD,        LIST_CMD,   LIST_CMD PROFILER}
+#endif
 //,{jjRES,       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
 //,{jjRES,       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
 ,{jjRES,       SRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
@@ -3583,6 +3601,10 @@ struct sValCmd1 dArith1[]=
 ,{jjCOUNT_IV,   ROWS_CMD,        INT_CMD,        INTVEC_CMD }
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD }
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD }
+#ifdef HAVE_SPECTRUM
+,{spectrumProc, SPECTRUM_CMD,    LIST_CMD,       POLY_CMD }
+,{spectrumfProc,SPECTRUMF_CMD,   LIST_CMD,       POLY_CMD }
+#endif
 ,{jjSTD,        STD_CMD,         IDEAL_CMD,      IDEAL_CMD }
 ,{jjSTD,        STD_CMD,         MODUL_CMD,      MODUL_CMD }
 ,{jjDUMMY,      STRING_CMD,      STRING_CMD,     STRING_CMD }

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.18 1998-09-24 09:59:35 Singular Exp $
+// $Id: claptmpl.cc,v 1.19 1999-08-12 10:57:32 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -152,3 +152,35 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
   template class List<fglmDelem>;
   template class ListIterator<fglmDelem>;
 #endif
+
+// ----------------------------------------------------------------------------
+//  kmatrix.cc
+//  begin of file
+//  Stephan Endrass, endrass@mathematik.uni-mainz.de
+//  23.7.99
+// ----------------------------------------------------------------------------
+
+#ifdef HAVE_SPECTRUM
+
+#ifdef   KMATRIX_PRINT
+#include <iostream.h>
+#ifndef   KMATRIX_IOSTREAM
+#include <stdio.h>
+#endif
+#endif
+
+#include "GMPrat.h"
+#include "kmatrix.h"
+
+template    class   KMatrix<Rational>;
+
+#ifdef   KMATRIX_PRINT
+template    ostream &   operator << ( ostream&,const KMatrix<Rational>& );
+template    static  void    print_rational( ostream&,int,const Rational& );
+#endif
+
+#endif /* HAVE_SPECTRUM */
+// ----------------------------------------------------------------------------
+//  kmatrix.cc
+//  end of file
+// ----------------------------------------------------------------------------

@@ -4,9 +4,9 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: token for interpreter, as types; general macros
+* ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.24 1999-06-28 12:48:17 wenk Exp $ */
+/* $Id: tok.h,v 1.25 1999-08-12 10:57:37 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -102,8 +102,16 @@ enum {
   RESERVEDNAME_CMD,
   RESULTANT_CMD,
   ROWS_CMD,
-  STATUS_CMD,
+#ifdef HAVE_SPECTRUM
+  SPECTRUM_CMD,
+  SPECTRUMF_CMD,
+  SPADD_CMD,
+  SPMUL_CMD,
+  SEMIC_CMD,
+  SEMICH_CMD,
+#endif
   SQR_FREE_DEC_CMD,
+  STATUS_CMD,
   STRING_CMD,
   SYSTEM_CMD,
   TEST_CMD,
