@@ -32,7 +32,7 @@
 struct MP_Link_t
 {
     int               link_id;
-    int               errno;
+    int               MP_errno;
     MP_Env_pt         env;
     MP_Transport_t    transp;
     MP_BigNum_t       bignum;       /* bignum type & fncs struct  */

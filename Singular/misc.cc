@@ -318,7 +318,7 @@ int singular_manual(char *str)
   (void)sprintf(String, " %s ", str);
 
   while(!feof(index)
-        && *fgets(buffer, BUF_LEN, index) != EOF
+        && fgets(buffer, BUF_LEN, index) != (char *)0
         && buffer[0] != FIN_INDEX);
 
   while(!feof(index))

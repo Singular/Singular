@@ -138,7 +138,7 @@
  */
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Link.c,v 1.4 1998-10-14 16:44:38 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Link.c,v 1.5 1999-04-09 12:14:52 Singular Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -260,7 +260,7 @@ MP_Link_pt MP_OpenLink(env, argc, argv)
             return NULL;
     }
 
-    link->errno       = MP_Success;
+    link->MP_errno    = MP_Success;
     link->logmask     = MP_LOG_INIT_EVENTS;
     link->num_o_buff  = counter;
     link->fbtbc       = 0;

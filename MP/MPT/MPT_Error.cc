@@ -48,7 +48,7 @@ char*  MPT_ErrorStr(MPT_Status_t error)
 char* MPT_LinkErrorStr(MP_Link_pt link, MPT_Status_t error)
 {
   if (error == MPT_MP_Failure &&
-      link != NULL && link->errno >= 0 && link->errno != MP_Success)
+      link != NULL && link->MP_errno >= 0 && link->MP_errno != MP_Success)
     return MP_ErrorStr(link);
   
   if (error >= 0 && error < MPT_MaxError)

@@ -808,7 +808,7 @@ EXTERN MP_Status_t open_logfile _ANSI_ARGS_((MP_ENV env));
 struct MP_Link_t
 {
     int               link_id;
-    int               errno;
+    int               MP_errno;
     MP_Env_pt         env;
     MP_Transport_t    transp;
     MP_BigNum_t       bignum;       /* bignum type & fncs struct  */
@@ -985,7 +985,7 @@ EXTERN void MP_LogEvent _ANSI_ARGS_((MP_Link_pt link, char *event, char *msg));
 EXTERN MP_Status_t MP_SetError _ANSI_ARGS_((MP_Link_pt link, 
                                             MP_Status_t the_err));
 
-#define MP_ClearError(link) ((MP_Status_t) (link)->errno = MP_Success)
+#define MP_ClearError(link) ((MP_Status_t) (link)->MP_errno = MP_Success)
 
 EXTERN void MP_PrintError _ANSI_ARGS_((MP_Link_pt link));
 

@@ -37,7 +37,7 @@
  **********************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Util.c,v 1.4 1998-10-14 16:44:39 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Util.c,v 1.5 1999-04-09 12:14:52 Singular Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -113,11 +113,11 @@ MP_Status_t MP_SetError(link, the_err)
     MP_Status_t the_err;
 #endif
 {
-    link->errno = the_err;
+    link->MP_errno = the_err;
     if (the_err != MP_Failure && the_err >= 0 && the_err < MP_MaxError)
         MP_LogEvent(link, MP_ERROR_EVENT, MP_errlist[the_err]);
     else {
-        sprintf(fix_log_msg, "Unknown error number %d", link->errno);
+        sprintf(fix_log_msg, "Unknown error number %d", link->MP_errno);
         MP_LogEvent(link, MP_ERROR_EVENT, fix_log_msg);
     }
 
@@ -133,7 +133,7 @@ MP_Status_t MP_ClearError(link)
     MP_Link_pt link;
 #endif
 {
-   return (link->errno = MP_Success);
+   return (link->MP_errno = MP_Success);
 }
 */
 
@@ -145,11 +145,11 @@ void MP_PrintError(link)
   MP_Link_pt link;
 #endif
 {
-    if (link->errno >= 0 && link->errno < MP_MaxError) {
-        fprintf(stderr, "\nMP ERROR: %s\n", MP_errlist[link->errno]);
+    if (link->MP_errno >= 0 && link->MP_errno < MP_MaxError) {
+        fprintf(stderr, "\nMP ERROR: %s\n", MP_errlist[link->MP_errno]);
         fflush(stderr);
     } else
-        fprintf(stderr, "MP: Unknown error number %d\n", link->errno);
+        fprintf(stderr, "MP: Unknown error number %d\n", link->MP_errno);
 }
 
 
@@ -160,8 +160,8 @@ char* MP_ErrorStr(link)
   MP_Link_pt link;
 #endif
 {
-  if (link->errno >= 0 && link->errno < MP_MaxError)
-    return MP_errlist[link->errno];
+  if (link->MP_errno >= 0 && link->MP_errno < MP_MaxError)
+    return MP_errlist[link->MP_errno];
   else
     return "MP: Unknown error number";
 
@@ -175,17 +175,17 @@ char* MP_ErrorStr(link, status)
   MP_Status_t status;
 #endif
 {
-  if (link->errno != MP_Success && link->errno != MP_Failure 
-      && link->errno < MP_MaxError && link->errno >= 0)
+  if (link->MP_errno != MP_Success && link->MP_errno != MP_Failure 
+      && link->MP_errno < MP_MaxError && link->MP_errno >= 0)
     return MP_ErrorStr(link);
   if (status != MP_Success && status != MP_Failure && 
       status < MP_MaxError && status >= 0)
     return MP_errlist[status];
   
-  if (status == MP_Failure || link->errno == MP_Failure)
+  if (status == MP_Failure || link->MP_errno == MP_Failure)
     return MP_errlist[MP_Failure];
 
-  if (status == MP_Success && link->errno == MP_Success)
+  if (status == MP_Success && link->MP_errno == MP_Success)
     return MP_errlist[MP_Success];
   
   return "MP: Unknown Error number";
