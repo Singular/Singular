@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.10 2000-10-23 16:32:25 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.11 2000-10-24 11:03:59 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -39,6 +39,7 @@ PINLINE2 number p_SetCoeff(poly p, number n, ring r)
 PINLINE2 Order_t p_GetOrder(poly p, ring r)
 {
   p_LmCheckPolyRing2(p, r);
+  if (r->typ==NULL) return ((p)->exp[r->pOrdIndex]);
   int i=0;
   loop
   {
@@ -63,6 +64,7 @@ PINLINE2 Order_t p_SetOrder(poly p, long o, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(o >= 0);
+  if (r->typ==NULL) return ((p)->exp[r->pOrdIndex]=o);
   int i=0;
   loop
   {
