@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.22 1998-05-20 13:06:48 obachman Exp $ */
+/* $Id: kutil.cc,v 1.23 1998-06-12 10:13:34 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1418,7 +1418,7 @@ int posInS (polyset set,int length,poly p)
 * looks up the position of p in set
 * the position is the last one
 */
-int posInT0 (TSet set,int length,LObject p)
+int posInT0 (const TSet set,const int length,const LObject &p)
 {
   return (length+1);
 }
@@ -1429,7 +1429,7 @@ int posInT0 (TSet set,int length,LObject p)
 * set[0] is the smallest with respect to the ordering-procedure
 * pComp
 */
-int posInT1 (TSet set,int length,LObject p)
+int posInT1 (const TSet set,const int length,const LObject &p)
 {
   if (length==-1) return 0;
 
@@ -1457,7 +1457,7 @@ int posInT1 (TSet set,int length,LObject p)
 * set[0] is the smallest with respect to the ordering-procedure
 * length
 */
-int posInT2 (TSet set,int length,LObject p)
+int posInT2 (const TSet set,const int length,const LObject &p)
 {
   if (length==-1)
     return 0;
@@ -1486,7 +1486,7 @@ int posInT2 (TSet set,int length,LObject p)
 * set[0] is the smallest with respect to the ordering-procedure
 * totaldegree,pComp
 */
-int posInT11 (TSet set,int length,LObject p)
+int posInT11 (const TSet set,const int length,const LObject &p)
 /*{
  * int j=0;
  * int o;
@@ -1543,7 +1543,7 @@ int posInT11 (TSet set,int length,LObject p)
 * set[0] is the smallest with respect to the ordering-procedure
 * totaldegree,pComp
 */
-int posInT110 (TSet set,int length,LObject p)
+int posInT110 (const TSet set,const int length,const LObject &p)
 {
   if (length==-1) return 0;
 
@@ -1588,7 +1588,7 @@ int posInT110 (TSet set,int length,LObject p)
 * set[0] is the smallest with respect to the ordering-procedure
 * pFDeg
 */
-int posInT13 (TSet set,int length,LObject p)
+int posInT13 (const TSet set,const int length,const LObject &p)
 {
   if (length==-1) return 0;
 
@@ -1621,7 +1621,7 @@ int posInT13 (TSet set,int length,LObject p)
 * set[0] is the smallest with respect to the ordering-procedure
 * maximaldegree, pComp
 */
-int posInT15 (TSet set,int length,LObject p)
+int posInT15 (const TSet set,const int length,const LObject &p)
 /*{
  *int j=0;
  * int o;
@@ -1679,7 +1679,7 @@ int posInT15 (TSet set,int length,LObject p)
 * set[0] is the smallest with respect to the ordering-procedure
 * pFDeg+ecart, ecart, pComp
 */
-int posInT17 (TSet set,int length,LObject p)
+int posInT17 (const TSet set,const int length,const LObject &p)
 /*
 *{
 * int j=0;
@@ -1743,7 +1743,7 @@ int posInT17 (TSet set,int length,LObject p)
 * set[0] is the smallest with respect to the ordering-procedure
 * pGetComp, pFDeg+ecart, ecart, pComp
 */
-int posInT17_c (TSet set,int length,LObject p)
+int posInT17_c (const TSet set,const int length,const LObject &p)
 {
   if (length==-1) return 0;
 
@@ -1808,7 +1808,7 @@ int posInT17_c (TSet set,int length,LObject p)
 * set[0] is the smallest with respect to
 * ecart, pFDeg, length
 */
-int posInT19 (TSet set,int length,LObject p)
+int posInT19 (const TSet set,const int length,const LObject &p)
 {
   if (length==-1) return 0;
 
@@ -1866,7 +1866,8 @@ int posInT19 (TSet set,int length,LObject p)
 *set[length] is the smallest element in set with respect
 *to the ordering-procedure pComp
 */
-int posInLSpecial (LSet set, int length, LObject p,kStrategy strat)
+int posInLSpecial (const LSet set, const int length,
+                   const LObject &p,const kStrategy strat)
 {
   if (length<0) return 0;
 
@@ -1908,7 +1909,8 @@ int posInLSpecial (LSet set, int length, LObject p,kStrategy strat)
 *set[length] is the smallest element in set with respect
 *to the ordering-procedure pComp
 */
-int posInL0 (LSet set, int length, LObject p,kStrategy strat)
+int posInL0 (const LSet set, const int length,
+             const LObject &p,const kStrategy strat)
 {
   if (length<0) return 0;
 
@@ -1938,7 +1940,8 @@ int posInL0 (LSet set, int length, LObject p,kStrategy strat)
 * set[length] is the smallest element in set with respect
 * to the ordering-procedure totaldegree,pComp
 */
-int posInL11 (LSet set, int length, LObject p,kStrategy strat)
+int posInL11 (const LSet set, const int length,
+              const LObject &p,const kStrategy strat)
 /*{
  * int j=0;
  * int o;
@@ -1993,7 +1996,8 @@ int posInL11 (LSet set, int length, LObject p,kStrategy strat)
 * set[length] is the smallest element in set with respect
 * to the ordering-procedure totaldegree,pLength0
 */
-int posInL110 (LSet set, int length, LObject p,kStrategy strat)
+int posInL110 (const LSet set, const int length,
+               const LObject &p,const kStrategy strat)
 {
   if (length<0) return 0;
 
@@ -2038,7 +2042,8 @@ int posInL110 (LSet set, int length, LObject p,kStrategy strat)
 * set[length] is the smallest element in set with respect
 * to the ordering-procedure totaldegree
 */
-int posInL13 (LSet set, int length, LObject p,kStrategy strat)
+int posInL13 (const LSet set, const int length,
+              const LObject &p,const kStrategy strat)
 {
   if (length<0) return 0;
 
@@ -2072,7 +2077,8 @@ int posInL13 (LSet set, int length, LObject p,kStrategy strat)
 * set[length] is the smallest element in set with respect
 * to the ordering-procedure maximaldegree,pComp
 */
-int posInL15 (LSet set, int length, LObject p,kStrategy strat)
+int posInL15 (const LSet set, const int length,
+              const LObject &p,const kStrategy strat)
 /*{
  * int j=0;
  * int o;
@@ -2129,30 +2135,8 @@ int posInL15 (LSet set, int length, LObject p,kStrategy strat)
 * set[length] is the smallest element in set with respect
 * to the ordering-procedure totaldegree
 */
-int posInL17 (LSet set, int length, LObject p,kStrategy strat)
-/*
-*{
-*  int j=0;
-* int o;
-*
-*  o = pFDeg(p.p)+p.ecart;
-*  loop
-*  {
-*    if (j > length)
-*     return j;
-*    if (pFDeg(set[j].p)+set[j].ecart < o)
-*      return j;
-*    if ((pFDeg(set[j].p)+set[j].ecart == o)
-*    && (set[j].ecart < p.ecart))
-*      return j;
-*    if ((pFDeg(set[j].p)+set[j].ecart == o)
-*    && (set[j].ecart == p.ecart)
-*    && (pComp0(set[j].p,p.p)==(-pOrdSgn)))
-*      return j;
-*    j++;
-*  }
-* }
-*/
+int posInL17 (const LSet set, const int length,
+              const LObject &p,const kStrategy strat)
 {
   if (length<0) return 0;
 
@@ -2193,13 +2177,77 @@ int posInL17 (LSet set, int length, LObject p,kStrategy strat)
       en=i;
   }
 }
+#if 0
+{
+  if (length<0) return 0;
+
+  int o = pFDeg(p.p) + p.ecart;
+  int ol = pFDeg(set[length].p) + set[length].ecart;
+
+  if ((ol > o)
+  || ((ol == o)
+     && (set[length].ecart > p.ecart))
+  || ((ol == o)
+     && (set[length].ecart == p.ecart)
+     //&& (set[length].lp+set[length].length > p.lp+p.length))
+     && (set[length].length > p.length))
+  || ((ol == o)
+     && (set[length].ecart == p.ecart)
+     //&& (set[length].lp+set[length].length == p.lp+p.length)
+     && (set[length].length == p.length)
+     && (pComp0(set[length].p,p.p) != -pOrdSgn)))
+    return length+1;
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      ol = pFDeg(set[an].p) + set[an].ecart;
+      if ((ol > o)
+      || ((ol == o)
+         && (set[an].ecart > p.ecart))
+      || ((ol == o)
+         && (set[an].ecart == p.ecart)
+         //&& (set[length].lp+set[length].length > p.lp+p.length))
+         && (set[length].length > p.length))
+      || ((ol == o)
+         && (set[an].ecart == p.ecart)
+         //&& (set[length].lp+set[length].length == p.lp+p.length)
+         && (set[length].length == p.length)
+         && (pComp0(set[an].p,p.p) != -pOrdSgn)))
+        return en;
+      return an;
+    }
+    i=(an+en) / 2;
+    ol = pFDeg(set[i].p) + set[i].ecart;
+    if ((ol > o)
+    || ((ol == o)
+       && (set[i].ecart > p.ecart))
+    || ((ol == o)
+       && (set[i].ecart == p.ecart)
+       //&& (set[i].lp+set[i].length > p.lp+p.length))
+       && (set[i].length > p.length))
+    || ((ol == o)
+       && (set[i].ecart == p.ecart)
+       //&& (set[i].lp+set[i].length == p.lp+p.length)
+       && (set[i].length == p.length)
+       && (pComp0(set[i].p,p.p) != -pOrdSgn)))
+      an=i;
+    else
+      en=i;
+  }
+}
+#endif
 /*2
 * looks up the position of polynomial p in set
 * e is the ecart of p
 * set[length] is the smallest element in set with respect
 * to the ordering-procedure pComp
 */
-int posInL17_c (LSet set, int length, LObject p,kStrategy strat)
+int posInL17_c (const LSet set, const int length,
+                const LObject &p,const kStrategy strat)
 {
   if (length<0) return 0;
 

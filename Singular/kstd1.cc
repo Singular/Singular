@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.22 1998-05-20 10:08:39 pfister Exp $ */
+/* $Id: kstd1.cc,v 1.23 1998-06-12 10:13:32 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1008,7 +1008,7 @@ BOOLEAN hasPurePower (poly p,int last, int *length,kStrategy strat)
 * looks up the position of polynomial p in L
 * in the case of looking for the pure powers
 */
-int posInL10 (LSet set, int length, LObject p,kStrategy strat)
+int posInL10 (LSet set, int length, LObject &p,kStrategy strat)
 {
   int j,dp,dL;
 

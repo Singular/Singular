@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.28 1998-05-28 16:50:50 Singular Exp $ */
+/* $Id: polys.cc,v 1.29 1998-06-12 10:13:36 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -911,7 +911,7 @@ int pModuleOrder()
 */
 int pDeg(poly a)
 {
-  return ((a!=NULL) ? (a->Order) : (-1));
+  return (a->Order);
 }
 
 /*2

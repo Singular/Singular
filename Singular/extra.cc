@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.54 1998-06-08 13:11:25 Singular Exp $ */
+/* $Id: extra.cc,v 1.55 1998-06-12 10:13:32 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -50,7 +50,7 @@
 #include "polys.h"
 
 // Define to enable many more system commands
-//#define HAVE_EXTENDED_SYSTEM
+#define HAVE_EXTENDED_SYSTEM
 
 #ifdef STDTRACE
 //#include "comm.h"
@@ -380,6 +380,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 // You can put your own system calls here
 #include "fglmcomb.cc"
 #include "fglm.h"
+#ifdef HAVE_NEWTON
+#include <hc_newton.h>
+#endif
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
@@ -745,6 +748,97 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif /* HAVE_DYNAMIC_LOADING */
+/* ==================== newton ================================*/
+#ifdef HAVE_NEWTON
+    if(strcmp((char*)(h->Data()),"newton")==0)
+    {
+      if ((h->next->Typ()!=POLY_CMD)
+      || (h->next->next->Typ()!=INT_CMD)
+      || (h->next->next->next->Typ()!=INT_CMD))
+      {
+        WerrorS("system(\"newton\",<poly>,<int>,<int>) expected");
+        return TRUE;
+      }
+      poly  p=(poly)(h->next->Data());
+      int l=pLength(p);
+      short *points=(short *)Alloc(currRing->N*l*sizeof(short));
+      int i,j,k;
+      k=0;
+      poly pp=p;
+      for (i=0;pp!=NULL;i++)
+      {
+        for(j=1;j<=currRing->N;j++)
+        {
+          points[k]=pGetExp(pp,j);
+          k++;
+        }
+        pIter(pp);
+      }
+      hc_ERG r=hc_KOENIG(currRing->N,      // dimension
+                l,      // number of points
+                (short*) points,   // points: x_1, y_1,z_1, x_2,y_2,z2,...
+                currRing->OrdSgn==-1,
+                (int) (h->next->next->Data()),      // 1: Milnor, 0: Newton
+                (int) (h->next->next->next->Data()) // debug
+               );
+      //----<>---Output-----------------------
+
+
+//  PrintS("Bin jetzt in extra.cc bei der Auswertung.\n"); // **********
+ 
+
+      lists L=(lists)Alloc(sizeof(slists));
+      L->Init(6);
+      L->m[0].rtyp=STRING_CMD;               // newtonnumber;
+      L->m[0].data=(void *)mstrdup(r.nZahl);
+      L->m[1].rtyp=INT_CMD;
+      L->m[1].data=(void *)r.achse;          // flag for unoccupied axes
+      L->m[2].rtyp=INT_CMD;
+      L->m[2].data=(void *)r.deg;            // #degenerations
+      if ( r.deg != 0)              // only if degenerations exist
+      {
+          L->m[3].rtyp=INT_CMD;
+          L->m[3].data=(void *)r.anz_punkte;     // #points
+          //---<>--number of points------
+          int anz = r.anz_punkte;    // number of points
+          int dim = (currRing->N);     // dimension
+          intvec* v = new intvec( anz*dim );
+          for (i=0; i<anz*dim; i++)    // copy points
+            (*v)[i] = r.pu[i];
+          L->m[4].rtyp=INTVEC_CMD;
+          L->m[4].data=(void *)v;     
+          //---<>--degenerations---------
+          int deg = r.deg;    // number of points
+          intvec* w = new intvec( r.speicher );  // necessary memeory
+          i=0;               // start copying
+          do 
+            {
+              (*w)[i] = r.deg_tab[i];
+              i++;
+            }
+          while (r.deg_tab[i-1] != -2);   // mark for end of list
+          L->m[5].rtyp=INTVEC_CMD;
+          L->m[5].data=(void *)w;     
+      }
+      else
+      {
+          L->m[3].rtyp=INT_CMD; L->m[3].data=(char *)0;
+          L->m[4].rtyp=DEF_CMD; 
+          L->m[5].rtyp=DEF_CMD;
+      }
+
+      res->data=(void *)L;
+      res->rtyp=LIST_CMD;
+      // free all pointer in r:
+      delete[] r.nZahl;
+      delete[] r.pu;
+      delete[] r.deg_tab;      // Ist das ein Problem??
+
+      Free((ADDRESS)points,currRing->N*l*sizeof(short));
+      return FALSE;
+    }
+    else
+#endif
 /*==================== print all option values =================*/
 #ifndef NDEBUG
     if (strcmp((char*)(h->data), "options") == 0)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.10 1998-05-14 13:04:20 Singular Exp $ */
+/* $Id: kutil.h,v 1.11 1998-06-12 10:13:35 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -31,34 +31,7 @@ typedef struct sLObject LObject;
 typedef TObject * TSet;
 typedef LObject * LSet;
 
-//extern BOOLEAN interpt;
-//extern BOOLEAN kActive;
-//extern int cp,c3;
-//extern BOOLEAN homog;
-//extern BOOLEAN news;
-//extern ideal Shdl;
-//extern polyset S;
-//extern int sl;
-//extern intset ecartS;
-//extern intset fromQ;
-//extern TSet T;
-//extern int tl,tmax;
-//extern LSet L;
-//extern int Ll,Lmax;
-//extern BOOLEAN honey,sugarCrit;
-//extern BOOLEAN * NotUsedAxis;
-//extern void (*red)(LObject * L,kStrategy strat);
-//extern void (*initEcart)(LObject * L);
-//extern int (*posInT)(TSet T,int tl,LObject h);
-//extern int (*posInL)(LSet set, int length, LObject L,kStrategy strat);
-//extern void (*enterS)(LObject h, int pos,kStrategy strat);
-//extern void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
-//extern int ak;
 extern int HCord;
-//extern LObject P;
-//extern poly tail;
-//extern BOOLEAN fromT;
-//extern sleftv kIdeal;
 
 class skStrategy;
 typedef skStrategy * kStrategy;
@@ -68,11 +41,13 @@ class skStrategy
     kStrategy next;
     void (*red)(LObject * L,kStrategy strat);
     void (*initEcart)(LObject * L);
-    int (*posInT)(TSet T,int tl,LObject h);
-    int (*posInL)(LSet set, int length, LObject L,kStrategy strat);
+    int (*posInT)(const TSet T,const int tl,const LObject &h);
+    int (*posInL)(const LSet set, const int length,
+                  const LObject &L,const kStrategy strat);
     void (*enterS)(LObject h, int pos,kStrategy strat);
     void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
-    int (*posInLOld)(LSet L,int Ll, LObject l,kStrategy strat);
+    int (*posInLOld)(const LSet L,const int Ll,
+                     const LObject &L,const kStrategy strat);
     void (*spSpolyLoop)(poly p1, poly p2, poly m, poly spNoether);
     pFDegProc pOldFDeg;
     ideal Shdl;
@@ -127,20 +102,25 @@ void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 int posInS (polyset set,int length,poly p);
-int posInT0 (TSet set,int length,LObject p);
-int posInT1 (TSet set,int length,LObject p);
-int posInT2 (TSet set,int length,LObject p);
-int posInT11 (TSet set,int length,LObject p);
-int posInT13 (TSet set,int length,LObject p);
-int posInT15 (TSet set,int length,LObject p);
-int posInT17 (TSet set,int length,LObject p);
-int posInT19 (TSet set,int length,LObject p);
+int posInT0 (const TSet set,const int length,const LObject &p);
+int posInT1 (const TSet set,const int length,const LObject &p);
+int posInT2 (const TSet set,const int length,const LObject &p);
+int posInT11 (const TSet set,const int length,const LObject &p);
+int posInT13 (const TSet set,const int length,const LObject &p);
+int posInT15 (const TSet set,const int length,const LObject &p);
+int posInT17 (const TSet set,const int length,const LObject &p);
+int posInT19 (const TSet set,const int length,const LObject &p);
 void reorderS (int* suc,kStrategy strat);
-int posInL0 (LSet set, int length, LObject L,kStrategy strat);
-int posInL11 (LSet set, int length, LObject L,kStrategy strat);
-int posInL13 (LSet set, int length, LObject L,kStrategy strat);
-int posInL15 (LSet set, int length, LObject L,kStrategy strat);
-int posInL17 (LSet set, int length, LObject L,kStrategy strat);
+int posInL0 (const LSet set, const int length,
+             const LObject &L,const kStrategy strat);
+int posInL11 (const LSet set, const int length,
+             const LObject &L,const kStrategy strat);
+int posInL13 (const LSet set, const int length,
+             const LObject &L,const kStrategy strat);
+int posInL15 (const LSet set, const int length,
+             const LObject &L,const kStrategy strat);
+int posInL17 (const LSet set, const int length,
+             const LObject &L,const kStrategy strat);
 poly redtailBba (poly p,int pos,kStrategy strat);
 poly redtailSyz (poly p,int pos,kStrategy strat);
 poly redtail (poly p,int pos,kStrategy strat);

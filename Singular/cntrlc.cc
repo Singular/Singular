@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.17 1998-02-27 14:06:04 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.18 1998-06-12 10:13:31 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -72,6 +72,9 @@ void sigint_handler(int sig);
 #endif
 
 #if defined(linux) && defined(__i386__)
+#ifdef HAVE_SIGCONTEXT
+#include <asm/sigcontext.h>
+#else
 struct sigcontext_struct {
         unsigned short gs, __gsh;
         unsigned short fs, __fsh;
@@ -96,6 +99,7 @@ struct sigcontext_struct {
         unsigned long oldmask;
         unsigned long cr2;
 };
+#endif
 typedef struct sigcontext_struct sigcontext;
 
 /*2

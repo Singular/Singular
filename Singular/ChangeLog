@@ -1,3 +1,8 @@
+Fri Jun 12 12:11:06 MET DST 1998 hannes
+	* minor optimizations in polys.cc, kutil.* kstd1.cc:
+	  pass pointers, not structures to posIn[LT],
+	  do not check for NULL in pDeg (as pFDeg does not check)
+
 Wed Jun  3 16:20:22 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* Makefile.in (DOCS): target removed
@@ -34,7 +39,7 @@ Wed May 20 15:03:28 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 1998-05-18  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* extra.cc (jjSYSTEM): changed "whoami" --> "Singular", added
-	"nblocks" 
+	"nblocks"
 
 Sat May 16 14:14:20 MET DST 1998 hannes
 * avoid multiple objects of the same name (fix keepring)
@@ -58,7 +63,7 @@ Tue May 12 11:57:50 MET DST 1998 hannes
 	* extra.cc (jjSYSTEM): put all undocumented system calls into
 	#ifdef HAVE_EXTENDED_SYSTEM which is _not_ defined by default
 
-	* exteded system("random") to always return the seed of the random 
+	* exteded system("random") to always return the seed of the random
 	generator
 
 Thu May  7 19:49:34 MET DST 1998 hannes
@@ -92,7 +97,7 @@ Tue Apr 28 19:56:46 MET DST 1998 hannes
 	* kstd2.cc (redHomog): Some more ouput for KDEBUG && TEST_OPT_DEBUG
 
 	* mminit.cc: introduced memory(2) which measures physical memory
-	consumption using the system call sbrk (this never lies!) 
+	consumption using the system call sbrk (this never lies!)
 
 Mon Apr 27 18:07:21 MET DST 1998 hannes
 	* use ReAlloc for enlargeT, enlargeL  (kutil.cc)
@@ -101,7 +106,7 @@ Mon Apr 27 16:45:41 MET DST 1998 hannes
 
 1998-04-27  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* febase.cc (myfread): introduced myfread and myfopen which assure 
+	* febase.cc (myfread): introduced myfread and myfopen which assure
 	that newlines in text files are always \n
 
 Fri Apr 24 19:14:42 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
@@ -191,7 +196,7 @@ Fri Apr 17 09:53:53 MET DST 1998 hannes
 
 	* extra.cc: added system("--option") which returns value of
 	option; in debug mode: system("OptionValues") lists all option
-	values 
+	values
 	
 	* sing_mp.cc: use long option names for MP link options
 	* MPtcp:launch: Uses find_exec as default application
@@ -238,7 +243,7 @@ Wed Apr  1 20:55:15 MET DST 1998 hannes
 	* iparith.cc ipconv.cc: added conversion list <-> resolution
 	* lists.cc, syz1.cc : fixed bug in conversion (list<->res.):
 	  handling "empty" case
-	* scanner.l: added option: %option always-interactive  
+	* scanner.l: added option: %option always-interactive
 
 Tue Mar 31 10:47:06 MET DST 1998 hannes
         * feread.cc: fixed handling of empty history
@@ -272,7 +277,7 @@ Tue Mar 31 10:47:06 MET DST 1998 hannes
 	* Makefile.in: added Singularb target for bprof
 
 	* polys-impl.h, polys-comp.h: Cleaned up COMP_FAST and related
-	#defines 
+	#defines
 
 1998-03-16  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
