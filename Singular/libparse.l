@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.4 1998-04-03 22:46:56 krueger Exp $ */
+/* $Id: libparse.l,v 1.5 1998-04-06 16:27:20 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -82,6 +82,20 @@ int yylp_errno = 0;
 #define YYLP_MISS_BR2   11
 #define YYLP_MISS_BR3   12
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#ifdef macintosh
+int    fileno(FILE *stream);
+FILE   *fdopen(int filedes, char *type);
+long   ftell(FILE *fp);
+long   tell(int filedes);
+int    isatty(int filedes);
+#endif /* macintosh */
+#ifdef __cplusplus
+}
+#endif
+
 #ifdef STANDALONE_PARSER
 procinfov pi;
 procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
@@ -132,7 +146,7 @@ extern libstackv library_stack;
   #undef YY_DECL
   #define YY_DECL int yylex(char *newlib, char *libfile, \
 				 lib_style_types *lib_style, \
-				 lp_modes mode = LOAD_LIB)
+				 lp_modes mode)
 
   #undef YY_INPUT
   #define YY_INPUT(buf,result,max_size) \
@@ -164,7 +178,7 @@ letters        ({letter}|{digit}|[_./#%^*:,])
 string         ({letters}*)
 comment        [\/][\/]
 dolar          [$]
-symbols        [~!@#$%^&*()_+-={}\\\|\[\];:,<.>/\?\' \n\~\`]
+symbols        [~!@#$%^&*()_+-={}\\\|\[\];:,<.>/\?\' \n\~\`\r]
 aletters       ({letter}|{digit}|{symbols}|{dolar}|{escquote})
 strings        ({aletters}*)
 quote          [\"]
@@ -202,7 +216,8 @@ info=+"\"" { old_state = YYSTATE; quote++; BEGIN(string);
 #ifdef STANDALONE_PARSER
                printf("Version:%s;\n", libnamebuf);
 #else
-               text_buffer = mstrdup(libnamebuf);
+               //text_buffer = mstrdup(libnamebuf);
+               print_version(mode, libnamebuf);
 #endif
              }
            }
@@ -260,19 +275,23 @@ LIB[ \t]+"\"" { quote++;
 
 <header>({comment}+{tos}+{dolar}+Id:+{string}+[^\n]*)|({comment}+{tos}+{dolar}+Header:+{string}+[^\n]*) {
              make_version(yytext, 0); 
-           }
-<header>^{comment}+[^\n]* { 
+             //print_version(mode, "");
 #if YYLPDEBUG > 1
-             printf("+HEAD:%s\n", yytext);
+             printf("+(id)HEAD:%s\n", yytext);
 #endif
            }
-<header>(^#![^\n]*)      { 
+<header>(^{comment}+[^\n]*) { 
+#if YYLPDEBUG > 1
+             printf("+(cmt)HEAD:%s\n", yytext);
+#endif
+           }
+<header>(^#![^\n]*) { 
 #if YYLPDEBUG > 1
              printf("-HEAD:%s\n", yytext);
 #endif
            }
 <header>^proc\  { yyless(0);
-             print_version(mode, libfile);
+             //print_version(mode, libfile);
              BEGIN(INITIAL);
              yymore();
            }
@@ -283,7 +302,7 @@ LIB[ \t]+"\"" { quote++;
            }
 
 <header>^LIB[ \t]+"\""   { quote++;
-             print_version(mode, libfile);
+             //print_version(mode, libfile);
              BEGIN(libcmd);
            }
 <header>\n { yylplineno++; }
@@ -291,19 +310,24 @@ LIB[ \t]+"\"" { quote++;
 #if YYLPDEBUG > 1
              printf(" HEAD:%s\n", yytext);
 #endif
-             print_version(mode, libfile);
+             //print_version(mode, libfile);
              BEGIN(help);
            }
-<help>^{comment}+[^\n]*  { 
+<help>(^{comment}+[^\n]*)  { 
 #if YYLPDEBUG > 1
              printf(" HELP:%s\n", yytext);
 #endif
              BEGIN(INITIAL); }
-<help>^#![^\n]*          { 
+<help>(^#![^\n]*) { 
 #if YYLPDEBUG > 1
              printf(" HELP:%s\n", yytext);
 #endif
              BEGIN(INITIAL);
+           }
+<help>(info=\")|(version=\")|(version+{tos}+=\")|(version+{tos}+=+{tos}+\")|(version=+{tos}+\") { yyless(0);
+             *lib_style = NEW_LIBSTYLE;
+             BEGIN(INITIAL);
+             yymore();
            }
 <help>^proc\  {
              yyless(0);
@@ -315,7 +339,7 @@ LIB[ \t]+"\"" { quote++;
              BEGIN(libcmd);
            }
 
-<help>\n   { yylplineno++; }
+<help>\n { yylplineno++; }
 <help>.    { 
 #if YYLPDEBUG > 1
              printf("-HELP:%s\n", yytext);
@@ -370,15 +394,15 @@ LIB[ \t]+"\"" { quote++;
                SET_BODY_START(mode, pi, yylplineno, current_pos(0));
              }
            }
-<pdef>\n   { yylplineno++;
-             if(brace2<=0) { 
+<pdef>\n { yylplineno++;
+              if(brace2<=0) { 
 #if YYLPDEBUG
-               printf("BEGIN(phead-2){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
+                printf("BEGIN(phead-2){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
-               SET_HELP_START(mode, pi, current_pos(0));
-               BEGIN(phead);
-             }
-           }
+                SET_HELP_START(mode, pi, current_pos(0));
+                BEGIN(phead);
+              }
+            }
 <pdef>.    { 
              if(brace2<=0) { 
                SET_HELP_START(mode, pi, current_pos(0));
@@ -397,10 +421,10 @@ LIB[ \t]+"\"" { quote++;
                            printf("BODY at %d/%d", yylplineno, current_pos(0));
 #endif
                          }
-<phead>\n                { yylplineno++; }
+<phead>\n             { yylplineno++; }
 <phead>.                 { }
 
-<pbody>{comment}[^\n]*        { }
+<pbody>({comment}[^\n]*) { }
 <pbody>"\""              { quote++; old_state = YYSTATE;
                            BEGIN(string); /* printf("%s", yytext); */
                          }
@@ -464,7 +488,7 @@ LIB[ \t]+"\"" { quote++;
 <string>\n               { yylplineno++; }
 <string>.                { }
 
-<pexample>\/\/[^\n]*     { }
+<pexample>(\/\/[^\n]*)  { }
 <pexample>"\""           { quote++; old_state = YYSTATE;
                            BEGIN(string); /* printf("%s", yytext); */
                          }
@@ -533,6 +557,16 @@ int libread(FILE* f, char* buf, int max_size)
 
   offset = ftell(f);
   rc  = fread( buf, 1, max_size, f );
+#if YYLPDEBUG >2
+  printf("fread: %d of %d\n", rc, max_size);
+#endif
+#ifdef macintosh
+  char *p = buf, *q;
+  while( (q = strchr(p, '\r')) != NULL) {
+    *q = '\n';
+    p = q;
+  }
+#endif
   yylp_buffer_start = buf;
   return rc;
 }
@@ -581,7 +615,7 @@ void copy_string(lp_modes mode)
     long current_location = ftell(yylpin);
     int len = (int)(current_pos(0) - string_start);
     fseek(yylpin, string_start, SEEK_SET);
-    text_buffer = AllocL(len+1);
+    text_buffer = (char *)AllocL(len+1);
     fread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
   }
@@ -598,8 +632,8 @@ void print_version(lp_modes mode, char *p)
   //printf("loading %s%s", p, libnamebuf);
 #else
   if ( mode == LOAD_LIB ) {
-    if (BVERBOSE(V_LOAD_LIB))
-       Warn( "loading %s%s", p, libnamebuf);
+    if (BVERBOSE(V_LOAD_LIB) && p!=NULL ) Print(" %s...", p);
+       //Warn( "loading %s%s", p, libnamebuf);
   }
 #endif
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.14 1998-04-03 22:46:53 krueger Exp $ */
+/* $Id: iplib.cc,v 1.15 1998-04-06 16:27:17 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -24,8 +24,6 @@
 #  include "libparse.h"
 #endif /* HAVE_LIBPARSER */
 
-procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname, char *procname,
-                                 int line, long pos, BOOLEAN pstatic=FALSE);
 char *iiConvName(char *p);
 #ifdef HAVE_LIBPARSER
 void yylprestart (FILE *input_file );
@@ -501,14 +499,13 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 # if YYLPDEBUG > 1
   print_init();
 #  endif
-  Warn( "loading %s...", libnamebuf);
+  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loading %s...", libnamebuf);
   yylplex(newlib, libnamebuf, &lib_style);
   if(lib_style == OLD_LIBSTYLE)
     Warn( "library %s has an old format. Please fix it for the next time",
 	  newlib);
   else {
-    Warn( "loading %s done, version: %s", newlib, text_buffer);
-    FreeL(text_buffer);
+    if (BVERBOSE(V_LOAD_LIB)) Print("done.\n");
   }
   if(yylp_errno) {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,

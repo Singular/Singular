@@ -1,12 +1,14 @@
-// $Id: classify.lib,v 1.20 1998-04-03 23:18:15 krueger Exp $
+// $Id: classify.lib,v 1.21 1998-04-06 16:31:31 krueger Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
+version  =	 "$Id: classify.lib,v 1.21 1998-04-06 16:31:31 krueger Exp $";
+info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES  
 
    A library for classifying isolated hypersurface singularities w.r.t. right
    equivalence, based on the determinator of singularities by V.I. Arnold.
    Author: Kai Krueger, krueger@mathematik.uni-kl.de
-   last modified: 08.11.1997
+   last modified: 04.04.1997
 
 basicinvariants(f);  computes Milnor number, determinacy-bound and corank of f
 classify(f);         normal form of poly f determined with Arnold's method
@@ -24,6 +26,7 @@ A_L(s/f)              shortcut for quickclass(f) or normalform(s)
 normalform(s);       normal form of singularity given by its name s
 debug_log (lev,[])   print trace and debugging information w.r.t level>@DeBug
            (parameters in square brackets [] are optional)
+";
 
 LIB "inout.lib";
 LIB "elim.lib";
@@ -119,6 +122,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Klassifiziere (poly f)
 { 
 //--------------------------- initialisation ----------------------------------
@@ -189,6 +193,7 @@ proc Klassifiziere (poly f)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion1bis (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
@@ -255,6 +260,7 @@ proc Funktion1bis (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion3 (poly f, list cstn)
 { 
 //---------------------------- initialisation ---------------------------------
@@ -285,6 +291,7 @@ proc Funktion3 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion6 (poly f, list cstn)
 { // Arnold's steps 6-12
 //---------------------------- initialisation ---------------------------------
@@ -363,6 +370,7 @@ proc Funktion6 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion13 (poly f, list cstn)
 { 
 //---------------------------- initialisation ---------------------------------
@@ -400,6 +408,7 @@ proc Funktion13 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion17 (poly f, list cstn)
 { // Analog zu Fumktion 6, Kombination 17-24
 //---------------------------- initialisation ---------------------------------
@@ -466,6 +475,7 @@ proc Funktion17 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion25 (poly f, list cstn)
 { // Analog zu Fumktion 6, Kombination 25-46
 //---------------------------- initialisation ---------------------------------
@@ -574,6 +584,7 @@ proc Funktion25 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion40 (poly f, list cstn, int k)
 {
 //---------------------------- initialisation ---------------------------------
@@ -631,6 +642,7 @@ proc Funktion40 (poly f, list cstn, int k)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion50 (poly f, list cstn)
 { 
 //---------------------------- initialisation ---------------------------------
@@ -683,6 +695,7 @@ proc Funktion50 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion58 (poly fin, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
@@ -832,6 +845,7 @@ proc Funktion58 (poly fin, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion59 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
@@ -909,6 +923,7 @@ proc Funktion59 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion66 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
@@ -938,6 +953,7 @@ proc Funktion66 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion82 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
@@ -1032,6 +1048,7 @@ proc Funktion82 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Isomorphie_s82_z (poly f, poly fk, int p)
 {
 //---------------------------- initialisation ---------------------------------
@@ -1059,6 +1076,7 @@ proc Isomorphie_s82_z (poly f, poly fk, int p)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Isomorphie_s82_x (poly f, poly fk, int p)
 {
 //---------------------------- initialisation ---------------------------------
@@ -1087,6 +1105,7 @@ proc Isomorphie_s82_x (poly f, poly fk, int p)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion83 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
@@ -1173,6 +1192,7 @@ proc Funktion83 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion97 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
@@ -1289,6 +1309,7 @@ USAGE:    tschirnhaus();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
 {
 //---------------------------- initialisation ---------------------------------
@@ -1408,6 +1429,7 @@ proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc printresult (int step, poly f, string typ, list cstn, int m)
 {
 //---------------------------- initialisation ---------------------------------
@@ -1434,12 +1456,13 @@ proc printresult (int step, poly f, string typ, list cstn, int m)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion47 (poly f, list cstn)
 {
     int corank = cstn[1];
     int Mu = cstn[2];
     int K  = cstn[3];
-    string s = "The Singularity '";+Show(jet(f, K), corank, K));
+    string s = "The Singularity '";+Show(jet(f, K), corank, K);
     string tp="";
 //    return(printresult(47, f, tp, cstn, -1));
 
@@ -1450,6 +1473,7 @@ proc Funktion47 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion91 (poly f, list cstn, int k)
 {
     string tp  = "U*[k,0]";
@@ -1457,6 +1481,7 @@ proc Funktion91 (poly f, list cstn, int k)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion92 (poly f, list cstn, int k)
 {
     string tp  = "UP[k]";
@@ -1464,6 +1489,7 @@ proc Funktion92 (poly f, list cstn, int k)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion93 (poly f, list cstn, int k)
 {
     string tp  = "UQ[k]";
@@ -1471,6 +1497,7 @@ proc Funktion93 (poly f, list cstn, int k)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion94 (poly f, list cstn, int k)
 {
     string tp  = "UR[k]";
@@ -1478,6 +1505,7 @@ proc Funktion94 (poly f, list cstn, int k)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion95 (poly f, list cstn, int k)
 {
     string tp  = "US[k]";
@@ -1485,6 +1513,7 @@ proc Funktion95 (poly f, list cstn, int k)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Funktion96 (poly f, list cstn, int k)
 {
     string tp  = "UT[k]";
@@ -1535,6 +1564,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Coeffs (list #)
 {
   matrix m=matrix(coeffs(#[1],#[2]), deg(#[1])+1, 1);
@@ -1542,6 +1572,7 @@ proc Coeffs (list #)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Morse(poly f, int K, int corank, int ShowPhi)
 { 
 //---------------------------- initialisation ---------------------------------
@@ -1689,6 +1720,7 @@ proc Morse(poly f, int K, int corank, int ShowPhi)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Coeff(poly f, list #)
 { 
 //---------------------------- initialisation ---------------------------------
@@ -1712,6 +1744,7 @@ proc Coeff(poly f, list #)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc ReOrder(poly f)
 {
 //---------------------------- initialisation ---------------------------------
@@ -1861,6 +1894,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Cubic (poly f)
 { 
 //---------------------------- initialisation ---------------------------------
@@ -1905,6 +1939,7 @@ proc Cubic (poly f)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc parity  (int e)
 USAGE:    parity()
 { 
@@ -1914,6 +1949,7 @@ USAGE:    parity()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc HKclass (intvec sg)
 {
 //---------------------------- initialisation ---------------------------------
@@ -1934,6 +1970,7 @@ proc HKclass (intvec sg)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc HKclass3 (intvec sg, string SG_Typ, int cnt)
 { 
   list v;
@@ -1944,6 +1981,7 @@ proc HKclass3 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc HKclass3_teil_1 (intvec sg, string SG_Typ, int cnt)
 { 
   int  k, r, s;
@@ -1980,6 +2018,7 @@ proc HKclass3_teil_1 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc HKclass5 (intvec sg, string SG_Typ, int cnt)
 { 
   list v;
@@ -1991,6 +2030,7 @@ proc HKclass5 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
 {
   int  k, r, s;
@@ -2092,6 +2132,7 @@ proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
 {
   int k, r, s;
@@ -2170,6 +2211,7 @@ proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc HKclass7 (intvec sg, string SG_Typ, int cnt)
 { 
   list v;
@@ -2180,6 +2222,7 @@ proc HKclass7 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc HKclass7_teil_1 (intvec sg, string SG_Typ, int cnt)
 {
   int k, r, s;
@@ -2291,6 +2334,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Singularitaet (string typ,int k,int r,int s,poly a,poly b,poly c,poly d)
 {
   list   v;  
@@ -2392,6 +2436,11 @@ EXAMPLE:  example debug_log; shows an example
 SEE ALSO: init_debug();
 { 
    int len = size(#);
+//   int printresult = printlevel - level +1;
+//   if(level>1) {
+//     dbprint(printresult, "Debug:("+ string(level)+ "): ", #[2..len]);
+//   }
+//   else { dbprint(printresult, #[1..len]); }
    if( defined(@DeBug) == 0 ) { init_debug(); }
    if(@DeBug>=level) { 
       if(level>1) { "Debug:("+ string(level)+ "): ", #[1..len]; }
@@ -2443,6 +2492,7 @@ EXAMPLE:  example init_debug; shows an example
       }
     }
   }
+  printlevel = @DeBug;
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -2496,6 +2546,7 @@ example
   corank(f);
 }
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Faktorisiere(poly f, poly fk, int pt, int k, intvec RFlg)
 {
 //---------------------------- initialisation ---------------------------------
@@ -2547,6 +2598,7 @@ proc Faktorisiere(poly f, poly fk, int pt, int k, intvec RFlg)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Teile(poly f, poly fk)
 {
   ideal  Jfsyz = f, fk;
@@ -2557,6 +2609,7 @@ proc Teile(poly f, poly fk)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc GetRf (poly fi, int n)
 USAGE:    GetRf();
 { 
@@ -2585,6 +2638,7 @@ USAGE:    GetRf();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc Show(poly g)
 { 
   string s;
@@ -2598,6 +2652,7 @@ proc Show(poly g)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc checkring
 {
   int CH = char(basering);
@@ -2610,6 +2665,7 @@ proc checkring
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static
 proc DecodeNormalFormString (string S_in)
 USAGE:    DecodeNormalFormString
 {
@@ -2803,7 +2859,7 @@ USAGE:   internalfunctions();
 RETURN:  nothing, display names of internal procedures of classify.lib
 EXAMPLE: no example
 { "   Internal functions for the classification using Arnold's method,";
-  "   the function numbers correspond to numbers in Arnold's classifier:";
+ "   the function numbers correspond to numbers in Arnold's classifier:";
  "Klassifiziere(poly f);             determine the type of the singularity f
   Funktion1bis (poly f, list cstn)
   Funktion3 (poly f, list cstn)
