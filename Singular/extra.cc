@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.190 2002-11-21 13:36:21 Singular Exp $ */
+/* $Id: extra.cc,v 1.191 2002-11-21 13:37:20 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1324,7 +1324,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	  res->rtyp=IDEAL_CMD;
 	  if (rIsPluralRing(currRing)) res->data=twostd(I);
 	  else res->data=I;  
-	  setFlag(FLAG_TWOSTD);
+	  setFlag(res,FLAG_TWOSTD);
+          setFlag(res,FLAG_STD);
 	}
 	else return TRUE;
 	return FALSE;
