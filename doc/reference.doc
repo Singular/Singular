@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.213 2002-03-07 17:58:39 mschulze Exp $
+@comment $Id: reference.doc,v 1.214 2002-03-07 18:01:58 mschulze Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1254,8 +1254,7 @@ ring R=0,(x,y),ds;
 poly f=x5+x2y2+y5;
 division(f,jacob(f));
 division(f^2,jacob(f));
-list l=division(ideal(f^2),jacob(f),10,intvec(1,1));
-matrix(ideal(f^2))-matrix(jacob(f))*l[1]-matrix(l[2]);
+division(ideal(f^2),jacob(f),10,intvec(1,1));
 @c example
 @end smallexample
 @end table
