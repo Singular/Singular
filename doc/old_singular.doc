@@ -1527,31 +1527,6 @@ See @ref{matrix expression}; @ref{poly expression}.
 @end iftex
 @c ---------------------------------------
 @node  qring, dring, map, Declaration commands
-@subsection qring
-@cindex qring
-
-@table @code
-@item @strong{Syntax:}
-@code{qring} name @code{=} ideal_expression @code{;}
-@item @strong{Purpose:}
-defines a quotient ring as the base ring modulo an ideal.
-
-The ideal must be a standard basis.
-The qring command performs a change of the base ring to this
-new ring.
-@item @strong{Default:}
-none
-@item @strong{Example:}
-@example
-@c example
-  ring r1=32003,(x,y,z),dp;
-  ideal i=std(ideal(x,y));
-  qring q=i;
-  basering;
-  std(ideal(x+y,x+y+z,z));
-@c example
-@end example
-@end table
 @menu
 * ideal expression::
 * ring::
@@ -1597,7 +1572,7 @@ none
   // this proc tests if it is called with exactly one argument n
   // and print the numbers 1 to n
   // If the proc is called without an argument or with more
-  //  than one argument, a message is displayed
+  // than one argument, a message is displayed
   // # is a reserved name and denotes the list of arguments,
   // #[i] is the i-th argument
   proc print_n
