@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.33 2001-02-21 10:08:16 Singular Exp $";
+version="$Id: normal.lib,v 1.34 2001-02-22 09:25:01 lossen Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -518,7 +518,7 @@ EXAMPLE: example normal; shows an example
 // 'normal' created a list of "+sr+" ring(s).
 // To see the rings, type (if the name of your list is nor):
      show( nor);
-// To access the 1-st ring and map (similair for the others), type:
+// To access the 1-st ring and map (similar for the others), type:
      def R = nor[1]; setring R;  norid; normap;
 // R/norid is the 1-st ring of the normalization and
 // normap the map from the original basering to R/norid");
