@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.5 1997-04-24 18:01:30 Singular Exp $ */
+/* $Id: mminit.cc,v 1.6 1997-06-17 10:59:34 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -173,5 +173,6 @@ int mmInit( void )
 #endif
   }
 #endif
+  mmIsInitialized=1;
   return 1;
 }
