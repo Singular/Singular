@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.43 1998-06-04 16:34:19 pohl Exp $ */
+/* $Id: febase.cc,v 1.44 1998-06-04 16:42:38 pohl Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -239,6 +239,18 @@ static char* feGetSearchPath(const char* bindir)
     return CleanUpPath(opath);
 }
 
+static void mystrcpy(char* d, char* s)
+{
+  assume(d != NULL && s != NULL);
+  while (*s != '\0')
+  {
+    *d = *s;
+    d++;
+    s++;
+  }
+  *d = '\0';
+}
+
 // Return location of file singular.hlp. Search for it as follows:
 // bindir/../doc/singular.hlp
 // bindir/../info/singular.hlp
@@ -265,8 +277,8 @@ static char* feGetInfoFile(const char* bindir)
 {
   char* hlpfile = (char*) AllocL(max((bindir != NULL ? strlen(bindir) : 0),
                                      strlen(SINGULAR_ROOT_DIR))
-
                                   + 30);
+
 #ifdef PATH_DEBUG
   printf("Search for singular.hlp\n");
 #endif
@@ -277,42 +289,39 @@ static char* feGetInfoFile(const char* bindir)
 #ifdef PATH_DEBUG
     printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif    
-    if (! access(hlpfile, R_OK)) return hlpfile;
+    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/../info/singular.hlp", bindir);
 #ifdef PATH_DEBUG
     printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif    
-    if (! access(hlpfile, R_OK)) return hlpfile;
+    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/../../doc/singular.hlp", bindir);
 #ifdef PATH_DEBUG
     printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif    
-    if (! access(hlpfile, R_OK)) return hlpfile;
+    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/../../info/singular.hlp", bindir);
 #ifdef PATH_DEBUG
     printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif    
-    if (! access(hlpfile, R_OK)) return hlpfile;
+    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/doc/singular.hlp", SINGULAR_ROOT_DIR);
 #ifdef PATH_DEBUG
     printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif    
-    if (! access(hlpfile, R_OK)) return hlpfile;
+    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/info/singular.hlp", SINGULAR_ROOT_DIR);
  #ifdef PATH_DEBUG
     printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif    
-   if (! access(hlpfile, R_OK)) return hlpfile;
+   if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
   }
   *hlpfile = '\0';
-#ifdef PATH_DEBUG
-  printf("No luck: Trying with %s\n", hlpfile);
-#endif  
   return hlpfile;
 }
 
@@ -525,18 +534,6 @@ static char* CleanUpPath(char* path)
   printf("SearchPath is: %s\n", opath);
 #endif
   return opath;
-}
-
-static void mystrcpy(char* d, char* s)
-{
-  assume(d != NULL && s != NULL);
-  while (*s != '\0')
-  {
-    *d = *s;
-    d++;
-    s++;
-  }
-  *d = '\0';
 }
 
 static char* CleanUpName(char* fname)
