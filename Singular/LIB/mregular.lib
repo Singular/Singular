@@ -1,12 +1,12 @@
 // IB/PG/GMG, last modified:  21.7.2000
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: mregular.lib,v 1.4 2000-12-22 14:17:21 greuel Exp $";
+version = "$Id: mregular.lib,v 1.5 2001-01-08 01:01:01 greuel Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: mregular.lib   Castelnuovo-Mumford Regularity of CM-Schemes and Curves
 AUTHORS: I.Bermejo,     ibermejo@ull.es
-         Ph.Gimenez,    pgimenez@agt.uva.es
-         G.-M.Greuel,   greuel@mathematik.uni-kl.de
+@*       Ph.Gimenez,    pgimenez@agt.uva.es
+@*       G.-M.Greuel,   greuel@mathematik.uni-kl.de
 
 OVERVIEW: 
  A library for computing the Castelnuovo-Mumford regularity of a subscheme of

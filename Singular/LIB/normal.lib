@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.28 2000-12-22 14:18:34 greuel Exp $";
+version="$Id: normal.lib,v 1.29 2001-01-08 01:01:46 greuel Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
-AUTHORS:  G.-M. Greuel   greuel@mathematik.uni-kl.de,
-          G. Pfister     pfister@mathematik.uni-kl.de
+AUTHORS:  G.-M. Greuel,  greuel@mathematik.uni-kl.de,
+@*        G. Pfister,    pfister@mathematik.uni-kl.de
 
 PROCEDURES:
  normal(I);             computes the normalization of basering/I
@@ -17,6 +17,7 @@ LIB "primdec.lib";
 LIB "elim.lib";
 LIB "presolve.lib";
 LIB "inout.lib";
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 static proc isR_HomJR (list Li)
 "USAGE:   isR_HomJR (Li);  Li = list: ideal SBid, ideal J, poly p
@@ -71,16 +72,19 @@ example
 proc HomJJ (list Li)
 "USAGE:   HomJJ (Li);  Li = list: ideal SBid, ideal id, ideal J, poly p
 ASSUME:  R    = P/id,  P = basering, a polynomial ring, id an ideal of P,
-         SBid = standard basis of id,
-         J    = ideal of P containing the polynomial p,
-         p    = nonzero divisor of R
-COMPUTE: Endomorphism ring End_R(J)=Hom_R(J,J) with its ring structure where
-         R is the quotient ring of P modulo the standard basis SBid
-RETURN:  a list of two objects
-         _[1]: a polynomial ring, containing two ideals, 'endid' and 'endphi'
-               s.t. _[1]/endid = Hom_R(J,J) and
+@*       SBid = standard basis of id,
+@*       J    = ideal of P containing the polynomial p,
+@*       p    = nonzero divisor of R
+COMPUTE: Endomorphism ring End_R(J)=Hom_R(J,J) with its ring structure as 
+         affine ring, together with the canonical map R --> Hom_R(J,J),
+         where R is the quotient ring of P modulo the standard basis SBid.
+RETURN:  a list l of two objects
+@format	
+         l[1] : a polynomial ring, containing two ideals, 'endid' and 'endphi'
+               such that l[1]/endid = Hom_R(J,J) and
                endphi describes the canonical map R -> Hom_R(J,J)
-         _[2]: an integer which is 1 if phi is an isomorphism, 0 if not
+         l[2] : an integer which is 1 if phi is an isomorphism, 0 if not
+@end format
 NOTE:    printlevel >=1: display comments (default: printlevel=0)
 EXAMPLE: example HomJJ;  shows an example
 "
@@ -360,7 +364,7 @@ example
   poly p   = x;
   list Li = std(id),id,J,p;
   list L   = HomJJ(Li);
-  def end = L[1];    // defines ring L[1], containing ideals endid and endphi
+  def end = L[1];    // defines ring L[1], containing ideals endid, endphi
   setring end;       // makes end the basering
   end;
   endid;             // end/endid is isomorphic to End(r/id) as ring
@@ -376,14 +380,19 @@ proc normal(ideal id, list #)
          (which is sometimes more efficient)
 ASSUME:  The ideal must be radical, for non radical ideals the output may 
          be wrong (i=radical(i); makes i radical)
-RETURN:  a list of rings (say nor), in each ring nor[i] are two ideals
-         norid, normap such that the direct sum of the rings nor[i]/norid is 
-         the normalization of basering/id; normap gives the normalization map 
-         from basering/id to nor[i]/norid (for each i)
-NOTE:    to use the i-th ring type: def R=nor[i]; setring R;
-         increasing printlevel displays more comments (default: printlevel=0)
-         Not implemented for local or mixed orderings.
-         If the input ideal i is weighted homogeneous a weighted ordering may
+RETURN:   a list of rings, say nor:
+@format
+         each ring nor[i] contains two ideals 
+         with given names norid and normap such that 
+           - the direct sum of the rings nor[i]/norid is 
+             the normalization of basering/id;
+           - normap gives the normalization map from basering/id
+             to nor[i]/norid (for each i)
+@end format
+NOTE:    to use the i-th ring type: def R=nor[i]; setring R;.
+@*       Increasing printlevel displays more comments (default: printlevel=0)
+@*       Not implemented for local or mixed orderings.
+@*       If the input ideal i is weighted homogeneous a weighted ordering may
          be used (qhweight(i); computes weights).
 EXAMPLE: example normal; shows an example
 "
@@ -394,7 +403,7 @@ EXAMPLE: example normal; shows an example
    y = printlevel-voice+2;
    
    attrib(id,"isRadical",1);
-   if ( find(ordstr(basering),"s")+find(ordstr(basering),"M") != 0)
+   if ( ord_test(basering) != 1)
    {
      "";
      "// Not implemented for this ordering,";
@@ -509,7 +518,7 @@ EXAMPLE: example normal; shows an example
 // 'normal' created a list of "+sr+" ring(s). 
 // To see the rings, type (if the name of your list is nor):
      show( nor);                  
-// To access the 1-st ring and map (and similair for the others), type:
+// To access the 1-st ring and map (similair for the others), type:
      def R = nor[1]; setring R;  norid; normap; 
 // R/norid is the 1-st ring of the normalization and
 // normap the map from the original basering to R/norid");
@@ -1107,7 +1116,7 @@ write (":a normal-fehler" ,
 }
 example
 { "EXAMPLE:";echo = 2;
-   //Huneke
+   // Huneke
    ring qr=31991,(a,b,c,d,e),dp;
    ideal i=
    5abcde-a5-b5-c5-d5-e5,
