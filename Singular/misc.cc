@@ -593,6 +593,9 @@ char * versionString()
 #else
               StringAppendS("GMP(1.3),");
 #endif
+#ifdef HAVE_NTL
+              StringAppendS("NTL,");
+#endif
 #ifdef HAVE_MPSR
               StringAppend("MP(%s),",MP_VERSION);
 #endif
