@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.319 2004-05-12 11:25:10 levandov Exp $ */
+/* $Id: iparith.cc,v 1.320 2004-06-28 13:50:15 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5073,7 +5073,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   L->m[0].data=(char *)T;
 
   res->data=L;
-  //res->rtyp=LIST_CMD;
+  res->rtyp=LIST_CMD;
 
   return FALSE;
 }
