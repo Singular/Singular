@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factory.template,v 1.8 1997-06-23 11:05:35 schmidt Exp $ */
+/* $Id: factory.template,v 1.9 1997-06-30 15:41:28 schmidt Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
@@ -33,10 +33,17 @@ extern "C" {
 }
 #endif /* SINGULAR */
 
+#ifdef macintosh
+#include <::templates:ftmpl_array.h>
+#include <::templates:ftmpl_factor.h>
+#include <::templates:ftmpl_list.h>
+#include <::templates:ftmpl_matrix.h>
+#else
 #include <templates/ftmpl_array.h>
 #include <templates/ftmpl_factor.h>
 #include <templates/ftmpl_list.h>
 #include <templates/ftmpl_matrix.h>
+#endif
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cf_globals.h"
