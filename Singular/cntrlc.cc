@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.11 1997-05-02 15:07:25 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.12 1997-06-09 12:17:48 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -55,7 +55,7 @@ static void stack_trace_sigchld (int);
 #endif
 
 /* data */
-static BOOLEAN siCntrlc = FALSE;
+BOOLEAN siCntrlc = FALSE;
 int siRandomStart;
 
 /*0 implementation*/
@@ -306,21 +306,24 @@ void sigint_handler(int sig)
   mflush();
   loop
   {
+    int cnt=0;
     fputs("\nabort(a), continue(c) or quit(q) ?",stderr);fflush(stderr);
     switch(fgetc(stdin))
     {
       case 'q':
                 m2_end(2);
+      case 'a':
+                siCntrlc++;
       case 'c':
                 fgetc(stdin);
                 signal(SIGINT ,(s_hdl_typ)sigint_handler);
                 return;          
-      case 'a':
-                m2_end(2);
                 //siCntrlc ++;
                 //if (siCntrlc>2) signal(SIGINT,(s_hdl_typ) sigsegv_handler);
                 //else            signal(SIGINT,(s_hdl_typ) sigint_handler);
     }
+    cnt++;
+    if(cnt>5) m2_end(2);
   }
 }
 #endif
@@ -385,22 +388,22 @@ void sigint_handler(int sig)
 #endif
 
 #ifndef MSDOS
-void test_int()
-{
-#ifndef macintosh
-  if (siCntrlc!=0)
-  {
-    int saveecho = si_echo;
-    siCntrlc = FALSE;
-    signal(SIGINT ,sigint_handler);
-//#ifdef macintosh
-//    flush_intr();
+//void test_int()
+//{
+//#ifndef macintosh
+//  if (siCntrlc!=0)
+//  {
+//    int saveecho = si_echo;
+//    siCntrlc = FALSE;
+//    signal(SIGINT ,sigint_handler);
+////#ifdef macintosh
+////    flush_intr();
+////#endif
+//    iiDebug();
+//    si_echo = saveecho;
+//  }
 //#endif
-    iiDebug();
-    si_echo = saveecho;
-  }
-#endif
-}
+//}
 #endif
 
 #ifdef unix
