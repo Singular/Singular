@@ -1,7 +1,7 @@
-// $Id: elim.lib,v 1.15 2003-04-16 09:54:36 mschulze Exp $
+// $Id: elim.lib,v 1.16 2004-06-21 10:13:48 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.15 2003-04-16 09:54:36 mschulze Exp $";
+version="$Id: elim.lib,v 1.16 2004-06-21 10:13:48 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -55,7 +55,7 @@ EXAMPLE: example blowup0; shows examples
    if( k<=26 and size(#[2])==1 ) { string nv = A_Z(#[2],k)+","; }
    else { string nv = (#[2])[1]+"(1.."+string(k)+"),"; }
    intvec v;
-   if( is_homog(j) )
+   if( homog(j) )
    {
       v=1;
       for( i=1; i<=k; i=i+1) { v[i+1]=deg(j[i]); }
