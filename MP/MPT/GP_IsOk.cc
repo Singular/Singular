@@ -483,6 +483,7 @@ bool GP_Ordering_t::IsOk(const int nvars)
   }
 }
 
+#if 0
 //
 //OBJECTS = mpGP.o
 //
@@ -503,3 +504,4 @@ MFUNC( test, MCnop )
       MFreturn( MFcopy(MVfalse) );
 } MFEND
 
+#endif
