@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.15 1998-08-25 13:33:18 krueger Exp $ */
+/* $Id: ipid.cc,v 1.16 1998-09-09 13:10:26 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -631,7 +631,7 @@ void piKill(procinfov pi)
 
 char *idhdl2id(idhdl pck, idhdl h)
 {
-  char *name = AllocL(strlen(pck->id) + strlen(h->id) + 3);
+  char *name = (char *)AllocL(strlen(pck->id) + strlen(h->id) + 3);
   sprintf(name, "%s::%s", pck->id, h->id);
   return(name);
 }
@@ -644,7 +644,7 @@ void iiname2hdl(char *name, idhdl *pck, idhdl *h)
   if(q==NULL)
   {
     p = mstrdup("");
-    i = AllocL(strlen(name)+1);
+    i = (char *)AllocL(strlen(name)+1);
     *i = '\0';
     sscanf(name, "%s", i);
 #ifdef HAVE_NAMESPACES
@@ -654,7 +654,7 @@ void iiname2hdl(char *name, idhdl *pck, idhdl *h)
   }
   else {
     if( *(q+1) != ':') return;
-    i = AllocL(strlen(name)+1);
+    i = (char *)AllocL(strlen(name)+1);
     *i = '\0';
     if(name == q)
     {
@@ -667,7 +667,7 @@ void iiname2hdl(char *name, idhdl *pck, idhdl *h)
     }
     else
     {
-      p = AllocL(strlen(name)+1);
+      p = (char *)AllocL(strlen(name)+1);
       sscanf(name, "%[^:]::%s", p, i);
 #ifdef HAVE_NAMESPACES
       *pck =namespaceroot->get(p, myynest, TRUE); // search in toplevel namespace
