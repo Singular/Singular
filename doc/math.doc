@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.16 1998-05-14 18:21:47 Singular Exp $
+@comment $Id: math.doc,v 1.17 1998-05-14 19:31:56 Singular Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -1177,10 +1177,24 @@ where I_i=@{ini(f), f in T_i @}.
 @section References
 @cindex References
 
+The Centre for Computer Algebra Kaiserslautern publishes a series of preprint
+which are electronically available
+(@code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca}).
+Other sources to check are @code{http://symbolicnet.mcs.kent.edu/},
+@code{http://www.can.nl/},... and the following book list:
+
 @subheading Text books on computational algebraic geometry
 @table @bullet
 @item
-Becker; Weisspfennig
+@tex
+\noindent
+Becker, T.; Weisspfenning, V.:
+Gr\"obner Bases - A computational Approach to Commutative Algebra. Springer, 1993
+@end tex
+@ifinfo
+Becker, T.; Weisspfenning, V.:
+Groebner Bases - A computational Approach to Commutative Algebra. Springer, 1993
+@end ifinfo
 @item
 Cox; Little; O'Shea
 @item
@@ -1189,8 +1203,21 @@ Eisenbud
 Mishra, B.: Algorithmic Algebra, Texts and Monographs in Computer Science,
 Springer, 1993
 @end table
-@subheading Description of algorithms
+
+@subheading Descriptions of algorithms
 @table @bullet
+@item
+Decker, W.; G.-M. Greuel, G.-M.; Pfister, G.:
+Primary decomposition: algorithms and
+comparisons.  Preprint, Univ. Kaiserslautern, 1998.
+To appear in: Greuel, G.-M.; Matzat, B. H.; Hiss, G. (Eds.),
+Algorithmic Algebra and Number Theory, Springer Verlag, Heidelberg, (1998). 
+
+@item
+Decker, W.; G.-M. Greuel, G.-M.; Pfister, G.; de Jong, T.:
+The normalisation: a new algorithm,
+implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998. 
+
 @item
 Grassmann, H.; Greuel, G.-M.; Martin, B.; Neumann,
 W.; Pfister, G.; Pohl, W.;
@@ -1209,14 +1236,18 @@ Advances and improvements in the theory of standard bases and
 syzygies, Arch. d. Math. 63(1995)
 
 @item
-W. Decker; G.-M. Greuel; G. Pfister: Primary decomposition: algorithms and
-comparisons.  Preprint, Univ. Kaiserslautern, 1998.
-To appear in: Greuel, G.-M.; Matzat, B. H.; Hiss, G. (Eds.),
-Algorithmic Algebra and Number Theory, Springer Verlag, Heidelberg, (1998). 
+@tex
+\noindent
+Sch\"onemann, H:
+@end tex
+@ifinfo
+Schoenemann, H.:
+@end ifinfo
+Algorithms in @sc{Singular},
+Reports on Computer Algebra 2(1996), Kaiserslautern.
 
 @item
-W. Decker; G.-M. Greuel; G. Pfister; T. de Jong:
-The normalisation: a new algorithm,
-implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998. 
-
+Siebert, T.:
+On strategies and implementations for computations of free resolutions.
+Reports on Computer Algebra 8(1996), Kaiserslautern.
 @end table
