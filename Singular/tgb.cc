@@ -15,7 +15,7 @@
 #include "kstd1.h"
 
 #define FULLREDUCTIONS
-
+//#define HOMOGENEOUS_EXAMPLE
 //#define QUICK_SPOLY_TEST
 //#define DIAGONAL_GOING
 //#define RANDOM_WALK
@@ -72,6 +72,7 @@ void do_this_spoly_stuff(int i,int j,calc_dat* c);
 ideal t_rep_gb(ring r,ideal arg_I);
 bool has_t_rep(const int & arg_i, const int & arg_j, calc_dat* state);
 int* make_connections(int from, poly bound, calc_dat* c);
+int* make_connections(int from, int to, poly bound, calc_dat* c);
 void now_t_rep(int arg_i, int arg_j, calc_dat* c);
 int pLcmDeg(poly a, poly b);
 
@@ -174,7 +175,7 @@ void replace_pair(int & i, int & j, calc_dat* c)
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
   int deciding_deg= pFDeg(lm);
-  int* i_con =make_connections(i,lm,c);
+  int* i_con =make_connections(i,j,lm,c);
   int z=0;
   
   for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
@@ -327,6 +328,102 @@ int* make_connections(int from, poly bound, calc_dat* c)
   if (connected_length<c->n){
     connected[connected_length]=-1;
   }
+  omfree(cans);
+  return connected;
+}
+int* make_connections(int from, int to, poly bound, calc_dat* c)
+{
+  ideal I=c->S;
+  int s=pFDeg(bound);
+  int* cans=(int*) omalloc(c->n*sizeof(int));
+  int* connected=(int*) omalloc(c->n*sizeof(int));
+  cans[0]=to;
+  int cans_length=1;
+  connected[0]=from;
+  int last_cans_pos=-1;
+  int connected_length=1;
+  long neg_bounds_short= ~p_GetShortExpVector(bound,c->r);
+  // for (int i=0;i<c->n;i++){
+//     if (c->T_deg[i]>s) continue;
+//     if (i!=from){
+//       if(p_LmShortDivisibleBy(I->m[i],c->short_Exps[i],bound,neg_bounds_short,c->r)){
+//         cans[cans_length]=i;
+//         cans_length++;
+//       }
+//     }
+//   }
+  int not_yet_found=cans_length;
+  int con_checked=0;
+  int pos;
+  bool can_find_more=true;
+  while(((not_yet_found>0) && (con_checked<connected_length))||can_find_more){
+    if ((con_checked<connected_length)&& (not_yet_found>0)){
+      pos=connected[con_checked];
+      for(int i=0;i<cans_length;i++){
+	if (cans[i]<0) continue;
+	if (has_t_rep(pos,cans[i],c)){
+	  
+	  connected[connected_length]=cans[i];
+	  connected_length++;
+	  cans[i]=-1;
+	  --not_yet_found;
+
+	  if (connected[connected_length-1]==to){
+	    if (connected_length<c->n){
+	      connected[connected_length]=-1;
+	    }
+	    
+	    omfree(cans);
+	    return connected;
+	  }
+	}
+      }
+      con_checked++;
+    } else {
+     
+      for(last_cans_pos++;last_cans_pos<=c->n;last_cans_pos++){
+	if (last_cans_pos==c->n){
+	  if (connected_length<c->n){
+	    connected[connected_length]=-1;
+	  }
+	  omfree(cans);
+	  return connected;
+	}
+	if ((last_cans_pos==from)||(last_cans_pos==to))
+	  continue;
+	if(p_LmShortDivisibleBy(I->m[last_cans_pos],c->short_Exps[last_cans_pos],bound,neg_bounds_short,c->r)){
+	  cans[cans_length]=last_cans_pos;
+	  cans_length++;
+	  break;
+	}
+      }
+      not_yet_found++;
+      for (int i=0;i<con_checked;i++){
+	if (has_t_rep(connected[i],last_cans_pos,c)){
+	  
+	  connected[connected_length]=last_cans_pos;
+	  connected_length++;
+	  cans[cans_length-1]=-1;
+
+	  --not_yet_found;
+	  if (connected[connected_length-1]==to){
+	    if (connected_length<c->n){
+	      connected[connected_length]=-1;
+	    }
+	    
+	    omfree(cans);
+	    return connected;
+	  }
+	  break;
+	}
+	
+      }
+    }
+  }
+  if (connected_length<c->n){
+    connected[connected_length]=-1;
+  }
+  
   omfree(cans);
   return connected;
 }
