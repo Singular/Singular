@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.174 1999-12-15 22:32:50 greuel Exp $
+@comment $Id: general.doc,v 1.175 2000-02-04 13:21:15 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -269,7 +269,7 @@ has @emph{explicitely} been set (see @ref{Command line options} and
 @ref{system} for more info on 
 setting values of command-line options), then it dispatches the html
 pages from
-@url{http://www.mathematik.uni-kl.de/~zca/Singular/Manual} (note that
+@url{http://www.singular.uni-kl.de/Manual} (note that
 the non-local net-access of HTML pages is disabled, by default). 
 @*An
 alternative location of a local directory where the html pages reside

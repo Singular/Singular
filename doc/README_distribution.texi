@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_distribution.texi,v 1.4 2000-01-31 13:05:03 obachman Exp $
+@comment $Id: README_distribution.texi,v 1.5 2000-02-04 13:21:14 obachman Exp $
 @c FILE: README_distribution.texi
 @c PURPOSE: general README file to be included in the distribution 
 @c
@@ -16,7 +16,7 @@ geometry, singularity theory and polynomial system solving. For a more
 detailed overview of 
 @sc{Singular}, see 
 @display
-@uref{http://www.mathematik.uni-kl.de/~zca/Singular/Overview/}
+@uref{http://www.singular.uni-kl.de/Overview/}
 @end display
 
 
@@ -59,7 +59,7 @@ for installation instructions
 More and up-to-date information about @sc{Singular} is always available
 from
 @display
-@uref{http://www.mathematik.uni-kl.de/~zca/Singular}.
+@uref{http://www.singular.uni-kl.de}.
 @end display
 We very much welcome any comments, questions, and bug reports,
 especially comments about our new version. Please

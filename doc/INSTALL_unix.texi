@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.9 1999-12-08 22:54:41 obachman Exp $
+@comment $Id: INSTALL_unix.texi,v 1.10 2000-02-04 13:21:14 obachman Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on  Unix 
 @c
@@ -207,7 +207,7 @@ In particular, creating the file
 system("--allow-net", 1);
 @end smallexample
 in it, allows the on-line help system to fetch its @code{html} pages
-from @uref{http://www.mathemtaik.uni-kl.de/~zca/Singular, Singular's WWW
+from @uref{http://www.singular.uni-kl.de, Singular's WWW
 home site} 
 in case its local html pages are not found. That is, you may delete your
 local html pages, after setting this option. 
@@ -309,7 +309,7 @@ command @code{uname -a} on your shell) in your report.
 More and up-to-date information about @sc{Singular} is always available
 from
 @display
-@uref{http://www.mathematik.uni-kl.de/~zca/Singular}.
+@uref{http://www.singular.uni-kl.de}.
 @end display
 We very much welcome any comments, questions, and bug reports. Please
 contact us at

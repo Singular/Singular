@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_ftp.texi,v 1.6 2000-01-31 13:05:03 obachman Exp $
+@comment $Id: README_ftp.texi,v 1.7 2000-02-04 13:21:15 obachman Exp $
 @c FILE: README_download.texi
 @c PURPOSE: This should reside as README file in the main directory of the
 @c          Singular ftp site.
@@ -17,7 +17,7 @@ geometry, singularity theory and polynomial system solving. For a more
 detailed overview of 
 @sc{Singular}, see 
 @display
-@uref{http://www.mathematik.uni-kl.de/~zca/Singular/Overview/}
+@uref{http://www.singular.uni-kl.de/Overview/}
 @end display
 
 The new @sc{Singular} version @value{VERSION} which can be downloaded from
@@ -66,7 +66,7 @@ advance for your support.
 More and up-to-date information about @sc{Singular} is always available
 from
 @display
-@uref{http://www.mathematik.uni-kl.de/~zca/Singular}.
+@uref{http://www.singular.uni-kl.de/}.
 @end display
 We very much welcome any comments, questions, and bug reports,
 especially comments about our new version. Please

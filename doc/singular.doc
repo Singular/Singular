@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.90 2000-01-12 13:31:00 pohl Exp $
+@comment $Id: singular.doc,v 1.91 2000-02-04 13:21:16 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -70,14 +70,14 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @center @strong{SINGULAR}
 @center A Computer Algebra System for Polynomial Computations
 @center User Manual for @sc{Singular} Version @value{VERSION}
-@center @uref{http://www.mathematik.uni-kl.de/~zca/Singular}
+@center @uref{http://www.singular.uni-kl.de}
 @end ifinfo
 @end ifnothtml
 
 @ifhtml
 @html
 <CENTER>
-<A HREF="http://www.mathematik.uni-kl.de/~zca/Singular">
+<A HREF="http://www.singular.uni-kl.de">
 <IMG SRC="singular.jpg"></A><br>
 <h3> A Computer Algebra System for Polynomial Computations </h3>
 <p></p>
