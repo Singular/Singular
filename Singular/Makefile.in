@@ -168,6 +168,7 @@ mod2.h: config.status config.cache mod2.h.in Makefile.in
 
 config.status config.cache : configure
 	./configure ${CONFIGURE_INPUT} --no-create
+	touch -r configure config.cache config.status
 
 configure: configure.in
 	autoconf configure.in > configure
