@@ -1,7 +1,7 @@
-// $Id: classify.lib,v 1.25 1998-05-14 18:44:55 Singular Exp $
+// $Id: classify.lib,v 1.26 1998-05-19 17:20:31 pohl Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.25 1998-05-14 18:44:55 Singular Exp $";
+version  = "$Id: classify.lib,v 1.26 1998-05-19 17:20:31 pohl Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -2538,7 +2538,8 @@ REMARK:   corank(f) is the number of variables occuring in the residual
 EXAMPLE:  example corank; shows an example"
 {
   matrix M = jacob(jacob(jet(f,2)));
-  int cr = nvars(basering) - size(module(transpose(bareiss(M))));
+  list lba = bareiss(M);
+  int cr = nvars(basering) - size(module(transpose(lba[1])));
   return(cr);
 }
 example
