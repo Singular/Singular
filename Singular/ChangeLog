@@ -1,3 +1,5 @@
+Thu Apr 30 19:16:45 MET DST 1998 hannes
+	* fixed "missing e-o-buffer" for long lines in febase.inc
 Wed Apr 29 18:26:19 MET DST 1998 hannes
 	* added filed list_length tossyStrategy
 	( for conversion list <-> resolution): syz.h, syz1.cc, iparith.cc

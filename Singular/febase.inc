@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.7 1998-04-28 08:57:23 pohl Exp $ */
+/* $Id: febase.inc,v 1.8 1998-04-30 17:17:36 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -504,11 +504,13 @@ NewRead:
   if (currentVoice->sw==BI_stdin)
   {
     feShowPrompt();
-    s=fe_fgets_stdin(currentVoice->buffer+offset,(4096-sizeof(ADDRESS))-offset);
+    s=fe_fgets_stdin(currentVoice->buffer+offset,(4096-1-sizeof(ADDRESS))-offset);
   }
   else if (currentVoice->sw==BI_file)
-    s=fgets(currentVoice->buffer+offset,(4096-sizeof(ADDRESS))-offset,
+  {
+    s=fgets(currentVoice->buffer+offset,(4096-1-sizeof(ADDRESS))-offset,
             currentVoice->files);
+  }
   else /* BI_buffer */
   {
     return 0;
@@ -520,8 +522,11 @@ NewRead:
     {
       fputs(s,feProtFile);
     }
-    int rc=fePrintEcho(s)-2;
+    int rc=fePrintEcho(s)+1;
+    //s[strlen(s)+1]='\0'; add an second \0 at the end of the string
+    s[rc]='\0';
     // handel \\ :
+    rc-=3;
     if ((s[rc]=='\\')&&(currentVoice->sw!=BI_buffer))
     {
       s[rc]='\0';
