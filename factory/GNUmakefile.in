@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.1 1997-06-02 15:56:32 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.2 1997-06-20 10:30:30 schmidt Exp $
 #
 # GNUmakefile - master makefile for factory.
 # note:		use GNU make to make with this makefile.
@@ -24,7 +24,6 @@ libdir =	@libdir@
 datadir =	@datadir@
 gftabledir =	@gftabledir@
 includedir =	@includedir@
-tagtemplatedir =@tagtemplatedir@
 templatedir =	@templatedir@
 
 srcdir =	@srcdir@
@@ -34,13 +33,6 @@ VPATH =		@srcdir@
 # - the name of the game.
 #
 
-# files with version tag included (used to install factory)
-taglibfactory =	@taglibfactory@
-taglibmem =	@taglibmem@
-tagheaderfactory=@tagheaderfactory@
-tagfactoryconf =@tagfactoryconf@
-
-# raw file names (used to build factory)
 libfactory =	@libfactory@
 libmem =	@libmem@
 headerfactory =	@headerfactory@
@@ -57,7 +49,6 @@ CXX =		@CXX@
 INSTALL =	$(srcdir)/bin/install-sh -c
 INSTALL_DATA =	@INSTALL_DATA@
 INSTALL_PROGRAM=@INSTALL_PROGRAM@
-LN_S =		@LN_S@
 RANLIB =	@RANLIB@
 
 AR =		@AR@
@@ -108,7 +99,7 @@ LIBCXXFLAGS =	-Wall -fno-implicit-templates \
 		-I. -I$(srcdir) \
 		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
 
-# flags to translate tmpl_inst.cc
+# flags to translate ftmpl_inst.cc
 TMPLCXXFLAGS =	-Wall \
 		-I. -I$(srcdir) \
 		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
@@ -272,16 +263,16 @@ distmemmanincl := \
 
 # factory template files
 templatesrc :=	\
-		array.cc \
-		factor.cc \
-		list.cc \
-		matrix.cc
+		ftmpl_array.cc \
+		ftmpl_factor.cc \
+		ftmpl_list.cc \
+		ftmpl_matrix.cc
 templateincl :=	\
-		array.h \
-		factor.h \
-		functions.h \
-		list.h \
-		matrix.h
+		ftmpl_array.h \
+		ftmpl_factor.h \
+		ftmpl_functions.h \
+		ftmpl_list.h \
+		ftmpl_matrix.h
 
 # header templates
 hdrtemplsrc := \
@@ -293,7 +284,7 @@ hdrtempldep :=	$(hdrtemplsrc:.template=.d)
 distsrc :=	\
 		$(distfactorysrc) $(distmemmansrc) \
 		$(addprefix templates/,$(templatesrc)) \
-		readcf.cc tmpl_inst.cc
+		readcf.cc ftmpl_inst.cc gengftables.cc
 
 # all the C/C++ include files in the distribution
 distincl :=	\
@@ -303,8 +294,8 @@ distincl :=	\
 # all files in the distribution
 distfiles :=	\
 		$(distsrc) $(distincl) $(hdrtemplsrc) \
-		GNUmakefile.in configure.in acconfig.h stamp-h.in \
-		config.h.in configure \
+		GNUmakefile.in configure.in config.h.in configure \
+		ChangeLog \
 		bin/install-sh bin/makeheader bin/mkinstalldirs
 
 #
@@ -367,18 +358,27 @@ $(libmem):	$(memmanobj)
 $(srcdir)/readcf.cc: readcf.y
 		$(BISON) $< -o $@
 
-tmpl_inst.o:	tmpl_inst.cc factoryconf.h factory.h \
+ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
 		$(addprefix templates/,$(templatesrc)) \
 		$(addprefix templates/,$(templateincl))
 		$(CXX) -c $< $(TMPLCXXFLAGS) -o $@
 
 gengftables.o:	gengftables.cc factory.h cf_util.h gf_tabutil.h
+		@if test -z "$(filter mem,$(alltargets))" \
+		  || test -z "$(filter readcf.y,$(factorysrc))"; then \
+		  echo "You should configure --with-memman --enable-streamio"; \
+		  echo "to make gengftables."; \
+		  exit 1; \
+		fi
+		$(CXX) -c $< $(LIBCXXFLAGS) -o $@
 
-gengftables:	gengftables.o tmpl_inst.o cf mem
-		$(CXX) $< tmpl_inst.o -lcf -lcfmem $(TESTLDFLAGS) -o $@
+gengftables:	gengftables.o ftmpl_inst.o all
+		$(CXX) $< ftmpl_inst.o -lcf -lcfmem $(TESTLDFLAGS) -o $@
 
-#! not ready yet (gengftables.cc not in the distribution yet)
 gftables:	gengftables
+		@echo "This command will take quite a long time to execute;"
+		@echo "maybe you want to get the tables directly via ftp (see"
+		@echo "INSTALL)."
 		$(MKINSTALLDIRS) gftables
 		./gengftables
 
@@ -397,32 +397,18 @@ install:	$(installtargets)
 installcf:	cf
 		$(MKINSTALLDIRS) $(libdir)
 		$(MKINSTALLDIRS) $(includedir)
-		$(MKINSTALLDIRS) $(tagtemplatedir)
-		$(INSTALL_DATA) $(libfactory) $(libdir)/$(taglibfactory)
-		$(INSTALL_DATA) $(headerfactory) $(includedir)/$(tagheaderfactory)
-		$(INSTALL_DATA) $(factoryconf) $(includedir)/$(tagfactoryconf)
-		$(INSTALL_DATA) $(srcdir)/tmpl_inst.cc $(tagtemplatedir)
+		$(MKINSTALLDIRS) $(templatedir)
+		$(INSTALL_DATA) $(libfactory) $(libdir)/$(libfactory)
+		$(INSTALL_DATA) $(headerfactory) $(includedir)/$(headerfactory)
+		$(INSTALL_DATA) $(factoryconf) $(includedir)/$(factoryconf)
+		$(INSTALL_DATA) $(srcdir)/ftmpl_inst.cc $(templatedir)
 		for file in $(templatesrc) $(templateincl); do \
-		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(tagtemplatedir); \
+		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(templatedir); \
 		done
 
-# remove old links before installing new ones
-installcflinks:	installcf
-		-rm -f $(libdir)/$(libfactory)
-		-rm -f $(includedir)/$(headerfactory)
-		-rm -f $(includedir)/$(factoryconf)
-		-rm -f $(templatedir)
-		$(LN_S) $(libdir)/$(taglibfactory) $(libdir)/$(libfactory)
-		$(LN_S) $(includedir)/$(tagheaderfactory) $(includedir)/$(headerfactory)
-		$(LN_S) $(includedir)/$(tagfactoryconf) $(includedir)/$(factoryconf)
-		$(LN_S) $(tagtemplatedir) $(templatedir)
-
-# remove old link before installing new one
 installmem:	mem
 		$(MKINSTALLDIRS) $(libdir)
-		-rm -f $(libdir)/$(libmem)
-		$(INSTALL_DATA) $(libmem) $(libdir)/$(taglibmem)
-		$(LN_S) $(libdir)/$(taglibmem) $(libdir)/$(libmem)
+		$(INSTALL_DATA) $(libmem) $(libdir)/$(libmem)
 
 installgftables: gftables
 		$(MKINSTALLDIRS) $(gftabledir)
@@ -437,26 +423,18 @@ installgftables: gftables
 uninstall:	$(uninstalltargets)
 
 uninstallcf:
-		-rm -f $(libdir)/$(taglibfactory)
-		-rm -f $(includedir)/$(tagheaderfactory)
-		-rm -f $(includedir)/$(tagfactoryconf)
-		-for file in $(templatesrc) $(templateincl) tmpl_inst.cc; do \
-		  rm -f $(tagtemplatedir)/$$file; \
+		-for file in $(templatesrc) $(templateincl) ftmpl_inst.cc; do \
+		  rm -f $(templatedir)/$$file; \
 		done
-		-rmdir $(libdir)
-		-rmdir $(tagtemplatedir)
-		-rmdir $(includedir)
-
-uninstallcflinks: uninstallcf
-		-rm -f $(libdir)/$(libfactory)
-		-rm -f $(includedir)/$(headerfactory)
+		-rm -f $(templatedir)/ftmpl_inst.cc
 		-rm -f $(includedir)/$(factoryconf)
-		-rm -f $(templatedir)
-		-rmdir $(libdir)
+		-rm -f $(includedir)/$(headerfactory)
+		-rm -f $(libdir)/$(libfactory)
+		-rmdir $(templatedir)
 		-rmdir $(includedir)
+		-rmdir $(libdir)
 
 uninstallmem:
-		-rm -f $(libdir)/$(taglibmem)
 		-rm -f $(libdir)/$(libmem)
 		-rmdir $(libdir)
 
@@ -467,15 +445,13 @@ uninstallgftables:
 # - building a distribution.
 #
 
-dist:		$(srcdir)/readcf.cc \
-		$(srcdir)/config.h.in $(srcdir)/stamp-h.in \
-		$(srcdir)/configure
+dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 		rm -f $(distname).tar.gz
 		rm -rf $(distname)
 		$(MKINSTALLDIRS) $(distname)/templates
 		$(MKINSTALLDIRS) $(distname)/bin
-		for file in $(distfiles); do \
 #! better use ln instead of cp
+		for file in $(distfiles); do \
 		  cp $(srcdir)/$$file $(distname)/$$file; \
 		done
 		chmod -R u+w,o+r $(distname)
@@ -488,7 +464,7 @@ dist:		$(srcdir)/readcf.cc \
 #
 
 clean:		
-		-rm -f $(libfactory) $(libmem) \
+		-rm -f $(libfactory) $(libmem) gengftables \
 		  factoryconf.h factory.h *.o *.d core *~
 
 # remove gftables only if we built them
@@ -511,7 +487,7 @@ maintainer-clean: distclean
 realmaintainer-clean: maintainer-clean
 		@echo "This command is intended for *real* maintainers to use; it"
 		@echo "deletes files that requires the autoconf tools to rebuild."
-		-rm -f $(srcdir)/configure $(srcdir)/config.h.in $(srcdir)/stamp-h.in
+		-rm -f $(srcdir)/configure
 
 #
 # - include dependencies but do not generate them automatically if
@@ -533,15 +509,7 @@ endif
 #
 
 $(srcdir)/configure: configure.in
-		cd $(srcdir) && autoconf
-
-# autoheader might not change config.h.in, so touch a stamp file
-$(srcdir)/config.h.in: stamp-h.in
-		@:
-
-$(srcdir)/stamp-h.in: configure.in acconfig.h
-		cd $(srcdir) && autoheader
-		echo timestamp > $(srcdir)/stamp-h.in
+		-cd $(srcdir) && autoconf
 
 # seems gmake needs at least a trivial command.  otherwise all
 # files which depend on config.h will be remade even if congig.h
