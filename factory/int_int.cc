@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.7 1997-09-24 10:52:42 schmidt Exp $ */
+/* $Id: int_int.cc,v 1.8 1997-10-10 10:51:57 schmidt Exp $ */
 
 #include <config.h>
 
@@ -766,9 +766,9 @@ InternalInteger::sign () const
 }
 //}}}
 
-//{{{ InternalCF* InternalInteger::sqrt ()
+//{{{ InternalCF * InternalInteger::sqrt ()
 // docu: see CanonicalForm::sqrt()
-InternalCF*
+InternalCF *
 InternalInteger::sqrt ()
 {
     ASSERT( mpz_cmp_si( &thempi, 0 ) >= 0, "illegal instruction" );
