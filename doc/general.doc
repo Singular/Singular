@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.7 1998-04-28 09:29:52 krueger Exp $
+@comment $Id: general.doc,v 1.8 1998-04-28 10:55:45 krueger Exp $
 @comment this file contains the general information about Singular
 
 @menu
@@ -18,15 +18,15 @@
 @cindex Interactive use
 
 @menu
-* How to enter and exit::
-* Singular prompt and error recovery::
-* The online help system::
-* Interrupting SINGULAR::
-* Editing Input::
-* Control parameters::
-* Sources of input::
-* Reuse of output::
-* Commandline options::
+* How to enter and exit::       
+* Singular prompt and error recovery::  
+* The online help system::      
+* Interrupting SINGULAR::       
+* Editing Input::               
+* Control parameters::          
+* Startup sequence::            
+* Reuse of output::             
+* Commandline options::         
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -154,7 +154,7 @@ send it to the Singular parser for interpretation
 for the key bindings.
 
 @c --------------------------------------------------------------------------
-@node Control parameters,Sources of input,Editing Input,Interactive use
+@node Control parameters, Startup sequence, Editing Input, Interactive use
 @subsection Control parameters
 @cindex Control parameters
 
@@ -200,12 +200,12 @@ by typing '@code{Singular init}' the @code{init} file and hence all commands
 contained in @code{init} are executed.
 
 @c --------------------------------------------------------------------------
-@node Sources of input,Reuse of output,Control parameters,Interactive use
-@subsection Sources of input
-@cindex Sources of input
+@node Startup sequence, Reuse of output, Control parameters, Interactive use
+@subsection Startup sequence
+@cindex Startup sequence
 
 @c --------------------------------------------------------------------------
-@node Reuse of output,Commandline options,Sources of input,Interactive use
+@node Reuse of output, Commandline options, Startup sequence, Interactive use
 @subsection Reuse of output
 @cindex Reuse of output
 
@@ -350,7 +350,6 @@ seconds.By default, this value is 1.
 * Names and objects::           
 * Special characters::          
 * Controll structures::         
-* Proc commands::               
 @end menu
 
 @node General command syntax, Names and objects, The SINGULAR language, The SINGULAR language
@@ -369,12 +368,6 @@ seconds.By default, this value is 1.
 @node Controll structures, , Special characters,The SINGULAR language 
 @subsection Controll structures
 @cindex Controll structures
-
-@clear proccommandsmain
-@c @subsection Proc commands
-@c @cindex Proc commands
-@c @node Proc Commands, ,Controll structures, The SINGULAR language 
-@c @include proccommands.tex
 
 @c ---------------------------------------------------------------------------
 @include libraries.tex
