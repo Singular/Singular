@@ -1,2 +1,2 @@
 #! /bin/sh
-./configure --without-MP --without-dld --disable-sgroup --disable-MP --without-sgroup --no-recursion
+./configure --with-readline=no --without-MP --without-dld --disable-sgroup --disable-MP --without-sgroup --without-dbm --disable-dbm --with-malloc=system
