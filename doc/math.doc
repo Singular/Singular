@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.46 1999-08-24 12:00:39 Singular Exp $
+@comment $Id: math.doc,v 1.47 1999-09-14 18:13:07 wichmann Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -152,7 +152,7 @@ for s >= N.
 Let $R = \hbox{Loc}_< K[\underline{x}]$ and let \hbox{$I=(g_1, ..., g_s)
 \subseteq R^r$}.  Then, the {\bf module of syzygies} (or {\bf 1st syzygy
 module}, {\bf module of relations}) of $I$, syz($I$), is defined to be the
-kernel of the map \hbox{$R^s \rightarrow R^r, \sum_{i=1}^s w_ie_i \mapsto
+kernel of the map \hbox{$R^s \rightarrow R^r,\; \sum_{i=1}^s w_ie_i \mapsto
 \sum_{i=1}^s w_ig_i$.}
 @end tex
 @ifinfo
