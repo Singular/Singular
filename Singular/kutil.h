@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.65 2002-07-24 16:34:51 Singular Exp $ */
+/* $Id: kutil.h,v 1.66 2003-01-06 11:21:42 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -244,6 +244,7 @@ public:
   polyset S;
   intset ecartS;
   intset lenS;
+  intset lenSw; /* for tgb.ccc */
   intset fromQ;
   unsigned long* sevS;
   unsigned long* sevT;
