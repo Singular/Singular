@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.62 2000-12-31 15:14:44 obachman Exp $ */
+/* $Id: ring.h,v 1.63 2000-12-31 15:54:47 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -236,9 +236,9 @@ rOrderType_t    rGetOrderType(ring r);
 /* returns TRUE if var(i) belongs to p-block */
 BOOLEAN rIsPolyVar(int i, ring r = currRing); 
 
-inline BOOLEAN rOrd_is_c_dp(ring r)
+inline BOOLEAN rOrd_is_Comp_dp(ring r)
 {
-  return (r->order[0] == ringorder_c && 
+  return ((r->order[0] == ringorder_c || r->order[0] == ringorder_C) &&
           r->order[1] == ringorder_dp && 
           r->order[2] == 0);
 }

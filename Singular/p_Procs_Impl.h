@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.4 2000-12-31 15:14:39 obachman Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.5 2000-12-31 15:54:46 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -522,7 +522,7 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
         break;
 
         case pp_Mult_Coeff_mm_DivSelectMult_Proc:
-          if (length == LengthOne)
+          if (length == LengthOne || length == LengthTwo)
           {
             field = FieldGeneral;
             length = LengthGeneral;

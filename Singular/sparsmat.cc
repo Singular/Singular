@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.47 2000-12-31 15:14:45 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.48 2000-12-31 15:54:47 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -58,8 +58,12 @@ static number smCleardenom(ideal);
 static poly pp_Mult_Coeff_mm_DivSelect_MultDiv(poly p, int &lp, poly m, 
                                                poly a, poly b)
 {
-  if (rOrd_is_c_dp(currRing))
+  if (rOrd_is_Comp_dp(currRing) && currRing->ExpL_Size > 2)
   {
+    // pp_Mult_Coeff_mm_DivSelectMult only works for (c/C,dp) and
+    // ExpL_Size > 2
+    // should be generalized, at least to dp with ExpL_Size == 2
+    // (is the case for 1 variable)
     int shorter;
     p = currRing->p_Procs->pp_Mult_Coeff_mm_DivSelectMult(p, m, a, b, 
                                                           shorter, currRing);
