@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.15 1998-05-11 10:42:21 schmidt Exp $ */
+/* $Id: imm.h,v 1.16 1998-06-03 12:52:20 pohl Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -27,7 +27,7 @@ const int GFMARK = 3;
 const int MINIMMEDIATE = -268435454; // -2^28-2
 const int MAXIMMEDIATE = 268435454;  // 2^28-2
 #ifndef __MWERKS__
-#ifdef WINNT
+#if defined(WINNT) && ! defined(__GNUC__)
 const INT64 MINIMMEDIATELL = -268435454i64;
 const INT64 MAXIMMEDIATELL = 268435454i64;
 #else

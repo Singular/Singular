@@ -1,11 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.10 1998-03-17 15:56:31 schmidt Exp $ */
+/* $Id: int_poly.cc,v 1.11 1998-06-03 12:51:22 pohl Exp $ */
 
 #include <config.h>
 
 #ifndef NOSTREAMIO
 #include <string.h>
-#ifdef WINNT
+#if defined(WINNT) && ! defined(__GNUC__)
 #include <strstrea.h>
 #else
 #include <strstream.h>

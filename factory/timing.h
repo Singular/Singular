@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: timing.h,v 1.5 1998-03-17 13:26:12 schmidt Exp $ */
+/* $Id: timing.h,v 1.6 1998-06-03 12:52:00 pohl Exp $ */
 
 /* It should be possible to include this file multiple times for different */
 /* settings of TIMING */
@@ -13,7 +13,7 @@
 
 #ifdef TIMING
 #include <time.h>
-#ifndef WINNT
+#if defined(WINNT) && ! defined(__GNUC__)
 #include <sys/times.h>
 #include <sys/param.h>
 #endif
@@ -35,7 +35,7 @@
 #endif
 #endif
 
-#ifdef WINNT
+#if defined(WINNT) && ! defined(__GNUC__)
 
 #define TIMING_START(t) { clock_t timing_ ## t ## _start, timing_ ## t ## _end; \
   timing_ ## t ## _start = clock();

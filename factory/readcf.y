@@ -1,9 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.6 1997-12-13 12:51:41 schmidt Exp $ */
+/* $Id: readcf.y,v 1.7 1998-06-03 12:51:40 pohl Exp $ */
 
 %{
 
-#ifdef WINNT
+#if defined(WINNT) && ! defined(__GNUC__)
 #include <malloc.h>
 #include <memory.h>
 #define alloca _alloca
