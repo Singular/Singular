@@ -4,7 +4,7 @@
  *           -- the real version
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omalloc.c,v 1.7 2001-04-30 09:02:12 Singular Exp $
+ *  Version: $Id: omalloc.c,v 1.8 2002-02-20 15:30:16 Singular Exp $
  *******************************************************************/
 
 #include <stdlib.h>
@@ -84,10 +84,11 @@ void* realloc(void* old_addr, size_t new_size)
 
 /* on some systems strdup is a macro -- replace it unless OMALLOC_FUNC
    is defined */
-#if !defined(OMALOC_FUNC)
+#ifndef OMALLOC_USES_MALLOC
+#if !defined(OMALLOC_FUNC)
 #undef strdup
 #endif
-char* strdup(const char* addr)
+char* strdup_(const char* addr)
 {
   char* n_s;
   if (addr)
@@ -98,6 +99,7 @@ char* strdup(const char* addr)
   }
   return NULL;
 }
+#endif
 void freeSize(void* addr, size_t size)
 {
   if (addr) omFreeSize(addr, size);
