@@ -1,5 +1,5 @@
-/* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: assert.h,v 1.5 1997-06-19 12:13:49 schmidt Exp $ */
+/* emacs edit mode for this file is -*- C -*- */
+/* $Id: assert.h,v 1.6 1997-09-29 06:56:27 schmidt Exp $ */
 
 /* This is for compatibility with standard assert.h */
 #if defined (NDEBUG) && ! defined (NOASSERT)
@@ -9,6 +9,7 @@
 /* It should be possible to include this file multiple times for different */
 /* settings of NOASSERT */
 
+/* {{{ undefines */
 #undef __ASSERT
 #undef __ASSERT1
 #undef STICKYASSERT
@@ -25,16 +26,20 @@
 #undef PVIRT_BOOL
 #undef PVIRT_INT
 #undef PVIRT_CHARCC
+/* }}} */
 
 #include <stdio.h>
 #include <stdlib.h>
 
+/* {{{ permanent macro definitions */
+#ifndef __GNUC__
 #define __ASSERT(expression, message, file, line) \
 (fprintf( stderr, "error: " message "\n%s:%u: failed assertion `%s'\n", \
  file, line, expression ), abort(), 0 )
 #define __ASSERT1(expression, message, parameter1, file, line)  \
 (fprintf( stderr, "error: " message "\n%s:%u: failed assertion `%s'\n", \
  parameter1, file, line, expression ), abort(), 0 )
+
 #define STICKYASSERT(expression, message) \
 ((void)((expression) ? 0 : __ASSERT(#expression, message, __FILE__, __LINE__)))
 #define STICKYASSERT1(expression, message, parameter1) \
@@ -45,8 +50,31 @@
  file, line, expression ), 0 )
 #define STICKYWARN(expression, message) \
 ((void)((expression) ? 0 : __WARN(#expression, message, __FILE__, __LINE__)))
+#else /* __GNUCC__ */
+/* use preprocessor macro __PRETTY_FUNCTION__ for more informative output */
+#define __ASSERT(expression, message, file, line, function) \
+(fprintf( stderr, "error: " message "\n%s:%u: In function `%s':\nfailed assertion `%s'\n", \
+ file, line, function, expression ), abort(), 0 )
+#define __ASSERT1(expression, message, parameter1, file, line, function)  \
+(fprintf( stderr, "error: " message "\n%s:%u: In function `%s':\nfailed assertion `%s'\n", \
+ parameter1, file, line, function, expression ), abort(), 0 )
 
+#define STICKYASSERT(expression, message) \
+((void)((expression) ? 0 : __ASSERT(#expression, message, __FILE__, __LINE__, __PRETTY_FUNCTION__)))
+#define STICKYASSERT1(expression, message, parameter1) \
+((void)((expression) ? 0 : __ASSERT1(#expression, message, parameter1, __FILE__, __LINE__, __PRETTY_FUNCTION__)))
+
+#define __WARN(expression, message, file, line, function)  \
+(fprintf( stderr, "warning: " message "\n%s:%u: In function `%s':\nfailed assertion `%s'\n", \
+ file, line, function, expression ), 0 )
+#define STICKYWARN(expression, message) \
+((void)((expression) ? 0 : __WARN(#expression, message, __FILE__, __LINE__, __PRETTY_FUNCTION__)))
+#endif /* __GNUCC__ */
+/* }}} */
+
+/* {{{ macro definitions dependent on NOASSERT */
 #ifndef NOASSERT
+#ifndef __GNUC__
 #define ASSERT(expression, message) \
 ((void)((expression) ? 0 : __ASSERT(#expression, message, __FILE__, __LINE__)))
 #define ASSERT1(expression, message, parameter1) \
@@ -54,6 +82,16 @@
 
 #define WARN(expression, message) \
 ((void)((expression) ? 0 : __WARN(#expression, message, __FILE__, __LINE__)))
+#else /* __GNUCC__ */
+/* use preprocessor macro __PRETTY_FUNCTION__ for more informative output */
+#define ASSERT(expression, message) \
+((void)((expression) ? 0 : __ASSERT(#expression, message, __FILE__, __LINE__, __PRETTY_FUNCTION__)))
+#define ASSERT1(expression, message, parameter1) \
+((void)((expression) ? 0 : __ASSERT1(#expression, message, parameter1, __FILE__, __LINE__, __PRETTY_FUNCTION__)))
+
+#define WARN(expression, message) \
+((void)((expression) ? 0 : __WARN(#expression, message, __FILE__, __LINE__, __PRETTY_FUNCTION__)))
+#endif /* __GNUCC__ */
 
 #define PVIRT_VOID(msg) \
 { fprintf( stderr, "pure method( " msg " ) called\n" ); abort(); }
@@ -77,3 +115,4 @@
 #define PVIRT_INT(msg) = 0
 #define PVIRT_CHARCC(msg) = 0
 #endif /* NOASSERT */
+/* }}} */
