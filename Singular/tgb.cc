@@ -1699,7 +1699,7 @@ void pre_comp(poly* p,int & pn,calc_dat* c){
     for(i=row+1;i<pn;i++){
       if(q[i]->exp==q[row]->exp){
 	
-	number c1=nNeg(q[i]->coef);
+	number c1=nNeg(nCopy(q[i]->coef));
 	number c2=q[row]->coef;
 	//use checkcoeff later
 	mac_mult_cons(q[i],c2);
@@ -2716,7 +2716,7 @@ void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c){
       if(row_cache[i]==col)
       {
 	
-	number c1=nNeg(mat->get(i,col));
+	number c1=nNeg(nCopy(mat->get(i,col)));
 	number c2=mat->get(row,col);
 	number n1=c1;
 	number n2=c2;
@@ -2879,7 +2879,7 @@ void simple_gauss2(tgb_matrix* mat){
 	if(!(mat->is_zero_entry(i,col)))
 	{
 	  
-	  number c1=nNeg(mat->get(i,col));
+	  number c1=nNeg(nCopy(mat->get(i,col)));
 	  number c2=mat->get(row,col);
 	  number n1=c1;
 	  number n2=c2;
@@ -4873,7 +4873,7 @@ void red_object::adjust_coefs(number c_r, number c_ac_r){
   int ct = ksCheckCoeff(&n1, &n2);
   sum->c_my=n1;
   sum->c_ac=nNeg(n2);
-  nDelete(&n2);
+  //  nDelete(&n2);
   
 
 }
