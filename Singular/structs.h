@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.60 2001-10-09 16:36:24 Singular Exp $ */
+/* $Id: structs.h,v 1.61 2002-03-07 18:44:19 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -553,6 +553,7 @@ extern struct omBin_s* sip_sring_bin;
 extern struct omBin_s* ip_sideal_bin;
 extern struct omBin_s* ip_smap_bin;
 extern struct omBin_s* ip_sring_bin;
+extern struct omBin_s* sleftv_bin;
 
 #endif
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.31 2002-01-10 12:33:24 Singular Exp $ */
+/* $Id: subexpr.h,v 1.32 2002-03-07 18:45:06 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -191,7 +191,6 @@ struct omBin_s;
 #endif
 
 extern omBin_s* sSubexpr_bin;
-extern omBin_s* sleftv_bin;
 extern omBin_s* procinfo_bin;
 extern omBin_s* libstack_bin;
 
