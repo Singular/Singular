@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.25 1999-11-24 14:03:49 wichmann Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.26 2000-05-16 08:50:49 Singular Exp $ */
 
 /***************************************************************
  *
@@ -188,6 +188,7 @@ short sr_cmds[] =
   DEGREE_CMD,
   DEFINED_CMD,
   E_CMD,
+  EXECUTE_CMD,
   FREEMODULE_CMD,
   INT_CMD,
   INTERRED_CMD,
