@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.cc,v 1.6 1997-10-10 10:57:48 schmidt Exp $ */
+/* $Id: int_pp.cc,v 1.7 1997-12-12 09:21:16 schmidt Exp $ */
 
 #include <config.h>
 
@@ -9,6 +9,7 @@
 #include "int_pp.h"
 #include "canonicalform.h"
 #include "cf_factory.h"
+#include "imm.h"
 
 MP_INT InternalPrimePower::primepow;
 MP_INT InternalPrimePower::primepowhalf;
@@ -170,11 +171,6 @@ InternalCF* InternalPrimePower::neg()
 }
 
 
-int InternalPrimePower::comparesame( InternalCF * c )
-{
-    return mpz_cmp( &thempi, &MPI( c ) );
-}
-
 InternalCF* InternalPrimePower::addsame( InternalCF * c )
 {
     if ( getRefCount() > 1 ) {
@@ -311,12 +307,22 @@ InternalPrimePower::divremsamet ( InternalCF * c, InternalCF * & quot, InternalC
     return true;
 }
 
+//{{{ int InternalPrimePower::comparesame, comparecoeff ( InternalCF * c )
+// docu: see CanonicalForm::operator <(), CanonicalForm::operator ==()
+int
+InternalPrimePower::comparesame ( InternalCF * c )
+{
+    ASSERT( ! ::is_imm( c ) && c->levelcoeff() == PrimePowerDomain, "incompatible base coefficients" );
+    return mpz_cmp( &thempi, &MPI( c ) );
+}
+
 int
 InternalPrimePower::comparecoeff ( InternalCF * )
 {
-    ASSERT( 0, "this function should never be called" );
+    ASSERT1( 0, "not implemented for class %s", this->classname() );
     return 0;
 }
+//}}}
 
 InternalCF *
 InternalPrimePower::addcoeff ( InternalCF * )
