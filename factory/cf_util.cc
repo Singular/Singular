@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_util.cc,v 1.4 1997-07-22 12:10:51 schmidt Exp $ */
+/* $Id: cf_util.cc,v 1.5 1997-09-09 07:10:22 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -11,8 +11,6 @@
 //}}}
 
 #include <config.h>
-
-#include "cf_util.h"
 
 //{{{ int ipower ( int b, int m )
 //{{{ docu
