@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.36 2001-03-20 18:19:48 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.37 2001-04-26 12:05:15 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -337,14 +337,15 @@ RETURN:
 @format
 list V: V-filtration of f on H''/H'
 if opt==0 or opt==1:
-  ideal V[1]: spectral numbers in increasing order
-  intvec V[2]:
-    int V[2][i]: multiplicity of spectral number V[1][i]
+  intvec V[1]: numerators of spectral numbers
+  intvec V[2]: denominators of spectral numbers
+  intvec V[3]:
+    int V[3][i]: multiplicity of spectral number V[1][i]/V[2][i]
 if opt==1:
-  list V[3]:
-    module V[3][i]: vector space basis of V[1][i]-th graded part
-                    in terms of V[4]
-  ideal V[4]: monomial vector space basis
+  list V[4]:
+    module V[4][i]: vector space basis of V[1][i]/V[2][i]-th graded part
+                    in terms of V[5]
+  ideal V[5]: monomial vector space basis
 default: opt=1
 @end format
 NOTE:     H' and H'' denote the Brieskorn lattices
@@ -1153,17 +1154,36 @@ EXAMPLE: example spsemicont; shows an example
 "
 {
   list l,l0;
-  int i,k;
+  int i,j,k;
   while(spissemicont(S0,#))
   {
     if(size(S)>1)
     {
       l0=spsemicont(S0,list(S[1..size(S)-1]));
-      for(i=size(l0);i>=1;i--)
+      for(i=1;i<=size(l0);i++)
       {
-        l0[i][size(S)]=k;
+        if(size(l)>0)
+	{
+          j=1;
+          while(j<size(l)&&l[j]!=l0[i])
+	  {
+            j++;
+          }
+          if(l[j]==l0[i])
+	  {
+            l[j][size(S)]=k;
+          }
+          else
+	  {
+            l0[i][size(S)]=k;
+            l=l+list(l0[i]);
+          }
+	}
+        else
+	{
+          l=l0;
+	}
       }
-      l=l+l0;
     }
     S0=spsub(S0,S[size(S)]);
     k++;
