@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.189 2000-06-05 08:15:14 Singular Exp $
+@comment $Id: reference.doc,v 1.190 2000-06-05 12:58:51 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4629,6 +4629,9 @@ See
 @ref{type}
 @ref{betti}
 @ref{string type cast}
+@ref{sprintf}
+@ref{printf}
+@ref{fprintf}
 @ref{Type conversion and casting}.
 @c ref
 
