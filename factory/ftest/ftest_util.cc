@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.5 1997-09-29 13:14:56 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.6 1997-10-01 12:24:44 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -158,23 +158,6 @@ ftestSubStr( const char * subString, const char * string )
 	return stringStart;
     else
 	return string;
-}
-//}}}
-
-//{{{ static const char * ftestSkipBlancs ( const char * string )
-//{{{ docu
-//
-// ftestSkipBlancs() - skip all leading blancs in string.
-//
-// Return new position.
-//
-//}}}
-static const char *
-ftestSkipBlancs ( const char * string )
-{
-    while ( *string && isspace( *string ) )
-	string++;
-    return string;
 }
 //}}}
 
@@ -533,6 +516,23 @@ ftestAlarmHandler ( int )
 // - external functions.
 //
 
+//{{{ const char * ftestSkipBlancs ( const char * string )
+//{{{ docu
+//
+// ftestSkipBlancs() - skip all leading blancs in string.
+//
+// Return new position.
+//
+//}}}
+const char *
+ftestSkipBlancs ( const char * string )
+{
+    while ( *string && isspace( *string ) )
+	string++;
+    return string;
+}
+//}}}
+
 //{{{ void ftestError ( const ftestErrorT errno, const char * format ... )
 //{{{ docu
 //
@@ -557,6 +557,7 @@ ftestError ( const ftestErrorT errno, const char * format ... )
     switch ( errno ) {
     case CommandlineError:
     case EnvSyntaxError: 
+    case CanFormSpecError:
 	// ftestUsage();
 	break;
     case TimeoutError:
