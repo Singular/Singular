@@ -27,6 +27,7 @@
 #define PAR_N 100
 #define AC_NEW_MIN 2
 #define AC_FLATTEN 1
+//#define FIND_DETERMINISTIC
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 struct sorted_pair_node{

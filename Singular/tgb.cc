@@ -1451,16 +1451,18 @@ static void go_on (calc_dat* c){
   qsort(buf,i,sizeof(red_object),red_object_better_gen);
 //    Print("\ncurr_deg:%i\n",curr_deg);
   Print("M[%i, ",i);
+#ifdef FIND_DETERMINISTIC
   c->modifiedS=(BOOLEAN*) omalloc((c->strat->sl+1)*sizeof(BOOLEAN));
   c->expandS=(poly*) omalloc((1)*sizeof(poly));
   c->expandS[0]=NULL;
   int z2;
   for(z2=0;z2<=c->strat->sl;z2++)
     c->modifiedS[z2]=FALSE;
+#endif
   multi_reduction(buf, i, c);
 
   //resort S
-
+#ifdef FIND_DETERMINISTIC
   for(z2=0;z2<=c->strat->sl;z2++)
     {
       if (c->modifiedS[z2])
@@ -1485,6 +1487,7 @@ static void go_on (calc_dat* c){
   c->modifiedS=NULL;
   omfree(c->expandS);
   c->expandS=NULL;
+#endif
   Print("%i]",i); 
  //  for(j=0;j<i;j++){
 //     if(buf[j].p==NULL) PrintS("\n ZERO ALERT \n");
@@ -2453,12 +2456,18 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     }
   else                     
     pNorm(clear_into);
+#ifdef FIND_DETERMINISTIC
     erg.reduce_by=j;
-    //resort later see diploma thesis, find_in_S must be deterministic during multireduction 
-    //   if (new_pos<j){ 
-    //  move_forward_in_S(j,new_pos,c->strat,c->is_char0);
-    // erg.reduce_by=new_pos;
-    //}
+    //resort later see diploma thesis, find_in_S must be deterministic
+    //during multireduction if spolys are only in the span of the
+    //input polys
+#else
+    
+      if (new_pos<j){ 
+      move_forward_in_S(j,new_pos,c->strat,c->is_char0);
+     erg.reduce_by=new_pos;
+      }
+#endif
   }
 }
 static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int startf,find_erg & erg){
@@ -2678,13 +2687,17 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     //  qsort(los,losl,sizeof(red_object),red_object_better_gen);
     if(erg.expand)
       {
+#ifdef FIND_DETERMINISTIC
 	int i;
 	for(i=0;c->expandS[i];i++);
 	c->expandS=(poly*) omrealloc(c->expandS,(i+2)*sizeof(poly));
 	c->expandS[i]=erg.expand;
 	c->expandS[i+1]=NULL;
+#else
+	add_to_reductors(c,erg.expand,erg.expand_length);
+#endif
       }
-      //      add_to_reductors(c,erg.expand,erg.expand_length);
+      
   }
   return;
 }
