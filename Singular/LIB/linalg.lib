@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.26 2002-03-06 16:38:54 mschulze Exp $";
+version="$Id: linalg.lib,v 1.27 2002-03-08 09:40:44 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1542,7 +1542,7 @@ EXAMPLE: example jordan; shows examples
 
   for(i=1;i<=ncols(e0);i++)
   {
-    N0=M-e0[i]*freemodule(ncols(M));
+    N0=M-e0[i]*matrix(freemodule(ncols(M)));
 
     N1=N0;
     K0=0;
@@ -1616,7 +1616,7 @@ EXAMPLE: example jordanbasis; shows examples
 
   for(int i=1;i<=ncols(e);i++)
   {
-    if(deg(e[i]>0))
+    if(deg(e[i])>0)
     {
       ERROR("eigenvalues in coefficient field expected");
       return(freemodule(ncols(M)));
@@ -1633,7 +1633,7 @@ EXAMPLE: example jordanbasis; shows examples
 
   for(i=1;i<=ncols(e);i++)
   {
-    N0=M-e[i]*freemodule(ncols(M));
+    N0=M-e[i]*matrix(freemodule(ncols(M)));
 
     N1=N0;
     K0=0;
