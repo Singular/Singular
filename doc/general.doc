@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.96 1998-05-20 11:50:51 pohl Exp $
+@comment $Id: general.doc,v 1.97 1998-05-20 12:53:55 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1797,107 +1797,6 @@ makes this procedure local to the library, i.e. accessible only for the other
 procedures in the same library, but not for the users. So there is no
 reason anymore to define a procedure within another one (it just makes
 debugging harder).
-
-@item Example of a procedure:
-@example
-@c example
-  //
-  // interactive definition of a procedure:
-  //
-  // The following procedure computes the Milnor number of a given
-  // polynomial p, i.e. of the hypersurface singularity defined by p
-  //
-  proc milnor_number (poly p)
-  "USAGE:    milnor_number(p);  p=poly
-   RETURN:   Milnor number of the hypersurface singularity defined by p,
-             resp. -1 if it is not isolated.
-   EXAMPLE:  example milnor_number; shows an example."
-  {
-  //-----------------------computations----------------------------------
-    ideal i= std(jacob(p));
-    int m_nr=vdim(i);
-  //-----------------------error message---------------------------------
-    if (m_nr<0) { "// not an isolated singularity";}
-  //-----------------------result----------------------------------------
-    return(m_nr);         // the value of m_nr is returned
-  }
-  example
-  {
-    "EXAMPLE:"; echo=2;
-    ring r=0,(x,y),ds;
-    poly p=x^2+y^4;
-    milnor_number(p);
-  };
-  //
-  // Use of this procedure
-  //
-  ring r1=0,(x,y,z),ds;
-  poly p=x^2+y^2+z^5;
-  milnor_number(p);
-  //
-  // help section is ignored, since the procedure was defined
-  // interactively
-  //
-  help milnor_number;
-  //
-  // example section is ignored for the same reason
-  //
-  example milnor_number;
-@c example
-@end example
-
-@item Example of a static library procedure:
-@example
-@c include sample.lib
-@end example
-@example
-@c example
-  //
-  // load the library sample.lib
-  //
-  LIB "sample.lib";
-  //
-  // show an example
-  //
-  example tab;
-  //
-  // use the procedure tab
-  //
-  "*"+tab(3)+"*";
-  //
-  // the static procedure internal_tab is not accessible
-  //
-  "*"+internal_tab(3)+"*";
-  //
-  // show the help section for tab
-  //
-  help tab;
-@c example
-@c    " for(int n=0; n<=5; n=n+1)";
-@c    " { tab(5-n)+\"*\"+tab(n)+\"+\"+tab(n)+\"*\"; }";
-@end example
-
-A convenient and recommended way to define procedures is to prepare a file
-and read this file with the @code{LIB} command.
-The differences between procedures from libraries and
-other procedures are that the help and example part are ignored in
-interactive definitions and that static can only be specified in libraries.
-
-@item Guidelines for the help section of a procedure:
-@* The help text of a procedure should contain information about the usage,
-   purpose, return values and generated objects. Particular assumptions or
-   limitations should be listed. If global objects are generated, this should
-   be mentioned, too.
-
-@*The libraries contained in the @sc{Singular} distribution use the following
-format for the help text:
-@example
-USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
-[CREATE:  <description of created objects which are not returned>]
-RETURN:   <description of the purpose and return value>
-[NOTE:    <paritcular assumptions or limitations, hints>]
-EXAMPLE:  example <proc_name>; shows an example
-@end example
 @end table
 
 @menu
@@ -1908,6 +1807,60 @@ EXAMPLE:  example <proc_name>; shows an example
 * Control structures::
 * return::
 @end menu
+
+@subsubheading Example of an interactive procedure definition
+@example
+@c example
+  ring r1 = 0,(x,y,z),dp;
+  poly f =  x3+y3+(x-y)*x2y2+z2;
+  proc Milnor(poly h)
+  {
+    return(vdim(std(jacob(h))));
+  }
+  Milnor(f);
+@c example
+@end example
+
+@subsubheading Example of a procedure definition in a library
+First, the library definition:
+@example
+@c include sample.lib
+@end example
+
+Now, we load the library and execute the procedures defined there:
+@example
+@c example
+  LIB "sample.lib";        // load the library sample.lib
+  example tab;             // show an example
+  "*"+tab(3)+"*";          // use the procedure tab
+  // the static procedure internal_tab is not accessible
+  "*"+internal_tab(3)+"*";
+  // show the help section for tab
+  help tab;
+@c example
+@end example
+
+A convenient and recommended way to define procedures is to prepare a
+file and read this file with the @code{LIB} command.  The differences
+between procedures from libraries and other procedures are that the help
+and example part are ignored in interactive definitions and that static
+can only be specified in libraries.
+
+@subsubheading Guidelines for the help section of a procedure
+The help text of a procedure should contain information about the usage,
+purpose, return values and generated objects. Particular assumptions or
+limitations should be listed. If global objects are generated, this should
+be mentioned, too.
+
+The libraries contained in the @sc{Singular} distribution use the following
+format for the help text:
+@example
+USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
+[CREATE:  <description of created objects which are not returned>]
+RETURN:   <description of the purpose and return value>
+[NOTE:    <paritcular assumptions or limitations, hints>]
+EXAMPLE:  example <proc_name>; shows an example
+@end example
 
 @c ---------------------------------------
 @node Names in procedures, Parameter list, Procedure definition, Procedures
@@ -2088,9 +2041,9 @@ is read during the first call of this proc. This minimizes
 the memory consumption by unused procedures.
 @item @strong{Example:}
 @example
-LIB "general.lib"; // the names of the procedures in the
-                   // library "general.lib" are now known
-                   // to SINGULAR
+LIB "general.lib";
+// the names of the procedures in the
+// library "general.lib" are now known to SINGULAR
 @end example
 @end table
 @menu
@@ -2463,25 +2416,13 @@ and comments, i.e // and @code{/* ... */} are allowed).
 @end itemize
 Its output lists all procedures that have been parsed successfully:
 
-@strong{Example:}
-@* $ @code{libparse general.lib}
 @example
-  Library        function     line,start-eod   line,body-eob    line,example-eoe
-Version:(1.5,1998/04/03);
-g general.lib         A_Z line  31, 1449-1474    37, 1774-2835    75, 2837-2996
-g general.lib    binomial line  86, 3079-3115    94, 3560-4047   112, 4049-4195
-g general.lib   factorial line 121, 4278-4308   127, 4566-4864   141, 4866-4982
-g general.lib   fibonacci line 149, 5065-5095   156, 5436-5778   170, 5780-5886
-g general.lib     kmemory line 178, 5969-5984   182, 6116-6225   186, 6227-6273
-g general.lib     killall line 192, 6356-6369   203, 6935-7797   242, 7799-8219
-g general.lib    number_e line 256, 8302-8323   264, 8665-9192   288, 9194-9297
-g general.lib   number_pi line 297, 9380-9402   305, 9768-10976  358,10978-11083
-g general.lib      primes line 367,11166-11192  373,11494-11729  380,11731-11814
-g general.lib     product line 387,11897-11922  395,12379-12980  415,12982-13285
-g general.lib ringweights line 432,13368-13388  441,13888-13999  446,14001-14204
-g general.lib        sort line 457,14287-14309  490,16379-18246  562,18248-18812
-g general.lib         sum line 581,18895-18916  589,19375-19966  608,19968-20299
-g general.lib       which line 626,20382-20402  632,20644-21198  659,21200-21256
+$ libparse sample.lib
+Checking library 'sample.lib'
+  Library         function      line,start-eod line,body-eob  line,example-eoe
+Version:0.0.0;
+g libparse             tab line    9,  149-165   13,  271-298   14,  300-402  
+l libparse    internal_tab line   24,  450-475   25,  476-496    0,    0-496  
 @end example
 
 where the following abbreviations are used:
@@ -2501,28 +2442,12 @@ each of the following is the position of the byte in the library.
 @end itemize
 
 The following example shows the result of a missing close-barcket @} in
-line 129 of the library @code{general.lib}.
+line 26 of the library @code{sample.lib}.
 
 @example
-> LIB"./general.lib";
-// ** loading ./general.lib... (1.5,1998/04/03)...done.
-   ? Library ./general.lib: ERROR occured: in line 664, 21337.
-   ? missing close bracket '@}' at end of library in line 664.
-   ? Cannot load library,... aborting.
-   ? error occurred in STDIN line 1: `LIB"./general.lib";`
->
+LIB "sample.lib";
+@expansion{}    ? Library sample.lib: ERROR occured: in line 26, 497.
+@expansion{}    ? missing close bracket '@}' at end of library in line 26.
+@expansion{}    ? Cannot load library,... aborting.
+@expansion{}    ? error occurred in STDIN line 1: `LIB "newdoc/sample.lib";`
 @end example
-
-@c Searching for the end of the
-@c procedure @code{factorial} gives us line 146, but the parser is checking
-@c everything until the bracketcounter @{-@} is zero. So every help-section
-@c is checked. One of those as (,) in it.
-
-@c The error is in line 129
-@c @*@code{line 129:   if ( typeof(#[1])=="string" ) @{ number r=1; }
-@c should be
-@c @*@code{line 129:   if ( typeof(#[1])=="string" ) @{ number r=1; @}}
-The error message specifies a missing @} in line 664. But the output of
-libparse shows that the last properly recognized proc was
-@code{binomial} starting at line 86. So the error must be in the next
-proc  @code{factorial}.
