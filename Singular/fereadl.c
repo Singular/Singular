@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.6 1999-12-06 18:29:51 Singular Exp $ */
+/* $Id: fereadl.c,v 1.7 1999-12-08 16:58:13 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -22,6 +22,10 @@
  #ifdef MSDOS
   #include <pc.h>
  #else
+  #ifdef SunOS_5
+  /* solaris special, found with v 5.7 */
+  #define _XOPEN_SOURCE_EXTENDED
+  #endif
   #ifdef HAVE_TERM_H
   #include <term.h>
   #elif HAVE_TERMCAP_H
