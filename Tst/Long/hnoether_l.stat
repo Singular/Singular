@@ -1,11 +1,79 @@
 Status Output of tst_status.out
-init >> USER    :lamm
+init >> USER    :hannes
 init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
 init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
-init >> date    :Fri Aug 13 18:40:10 GMT 1999
-init >> version :1303
+init >> date    :Tue Jan 18 15:24:52 MET 2000
+init >> version :1307
 init >> ticks   :100
-1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:332180
-1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:9183608
-1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:16793600
-1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:18173
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:155636
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:225328
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:184320
+1 >> tst_timer :: nepomuck.mathematik.uni-kl.de:20
+2 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:155664
+2 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:225328
+2 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:184320
+2 >> tst_timer :: nepomuck.mathematik.uni-kl.de:13
+3 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:155676
+3 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:229420
+3 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:229376
+3 >> tst_timer :: nepomuck.mathematik.uni-kl.de:16
+4 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:203556
+4 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:3337184
+4 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:3670016
+4 >> tst_timer :: nepomuck.mathematik.uni-kl.de:934
+5 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:235588
+5 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6799016
+5 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7409664
+5 >> tst_timer :: nepomuck.mathematik.uni-kl.de:2861
+6 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:262704
+6 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6803108
+6 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7409664
+6 >> tst_timer :: nepomuck.mathematik.uni-kl.de:2108
+7 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:282864
+7 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:6995432
+7 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7409664
+7 >> tst_timer :: nepomuck.mathematik.uni-kl.de:515
+8 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:301876
+8 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7073180
+8 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7409664
+8 >> tst_timer :: nepomuck.mathematik.uni-kl.de:648
+9 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:340036
+9 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7167296
+9 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7409664
+9 >> tst_timer :: nepomuck.mathematik.uni-kl.de:555
+10 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:386648
+10 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7686980
+10 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7761920
+10 >> tst_timer :: nepomuck.mathematik.uni-kl.de:1092
+11 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:389652
+11 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7686980
+11 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7733248
+11 >> tst_timer :: nepomuck.mathematik.uni-kl.de:81
+12 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:414276
+12 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7686980
+12 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7733248
+12 >> tst_timer :: nepomuck.mathematik.uni-kl.de:287
+13 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:435148
+13 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7686980
+13 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7733248
+13 >> tst_timer :: nepomuck.mathematik.uni-kl.de:225
+14 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:458816
+14 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:7686980
+14 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:7733248
+14 >> tst_timer :: nepomuck.mathematik.uni-kl.de:269
+15 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:490568
+15 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:8038892
+15 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8327168
+15 >> tst_timer :: nepomuck.mathematik.uni-kl.de:725
+16 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:505584
+16 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:8055260
+16 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8327168
+16 >> tst_timer :: nepomuck.mathematik.uni-kl.de:1057
+17 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:524628
+17 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:8067536
+17 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:8327168
+17 >> tst_timer :: nepomuck.mathematik.uni-kl.de:1324
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:418920
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:23644736
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:33615872
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:19897
