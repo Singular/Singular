@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.36 1998-05-11 10:05:05 wichmann Exp $
+@comment $Id: reference.doc,v 1.37 1998-05-11 13:09:43 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -589,7 +589,7 @@ monomials, the second (i.e. the 4th argument)  the corresponding coefficients of
   print(coef(f,xy));
   vector v=[f,zy+77+xy];
   print(v);
-  matrix mc;matrix mm;
+  matrix mc; matrix mm;
   coef(v,y,mc,mm);
   print(mc);
   print(mm);
@@ -5126,10 +5126,12 @@ See @ref{read}, @ref{link}, @ref{Data types};
 A sequence of commands surrounded by curly brackets (@code{@{} and
 @code{@}}) is a so called block. Blocks are used in @sc{Singular} in
 order to define procedures and to collect commands belonging to
-@code{if}, @code{else}, and @code{while} statements. Variables which are
-defined inside a block are local to that block. Use @code{export} to
-make them globally available. Note that there is no ending semicolon at
-the and of the block.
+@code{if}, @code{else}, and @code{while} statements. Even if the block
+of those statements consists of only a single command it has to be
+surrounded by curly brackets! Variables which are defined inside a block
+are local to that block. Use @code{export} to make them globally
+available. Note that there is no ending semicolon at the end of the
+block.
 @table @code
 @item @strong{Example:}
 @example
