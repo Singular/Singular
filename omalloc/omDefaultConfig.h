@@ -3,7 +3,7 @@
  *  Purpose: default declaration of of configurable stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDefaultConfig.h,v 1.5 2000-09-25 12:27:42 obachman Exp $
+ *  Version: $Id: omDefaultConfig.h,v 1.6 2001-03-12 19:14:28 obachman Exp $
  *******************************************************************/
 
 /********************************************************************
@@ -58,7 +58,7 @@
    by that many blocks: Initalizes omOpts.Keep 
    Setting this to LONG_MAX never frees memory */
 #ifndef OM_DEFAULT_KEEP
-#define OM_DEFAULT_KEEP 0
+#define OM_DEFAULT_KEEP 100
 #endif
 
 /* If this is set to 
