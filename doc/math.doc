@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.61 2001-01-11 17:18:03 Singular Exp $
+@comment $Id: math.doc,v 1.62 2001-01-22 12:05:09 mschulze Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -30,7 +30,7 @@ some articles or text books (see @ref{References}).
 * Hilbert function::
 * Syzygies and resolutions::
 * Characteristic sets::
-* The spectrum::
+* The Gauss-Manin connection::
 * Toric ideals and integer programming::
 * References::
 @end menu
@@ -82,7 +82,7 @@ that such a function is not unique).
 @item ideal membership:
 @cindex Ideal membership
 @tex
-For a standart basis $G$ of $I$ the following holds: 
+For a standard basis $G$ of $I$ the following holds: 
 $f \in I$ if and only if $\hbox{NF}(f,G) = 0$.
 @end tex
 @ifinfo
@@ -91,9 +91,9 @@ f in I if and only if NF(f,G) = 0.
 @end ifinfo
 @item Hilbert function:
 @tex
-Let \hbox{$I \subseteq K[\underline{x}]^r$} be a homogeneous ideal, then the Hilbert function
+Let \hbox{$I \subseteq K[\underline{x}]^r$} be a homogeneous module, then the Hilbert function
 $H_I$ of $I$ (see below)
-and the Hilbert function $H_{L(I)}$ of the leading ideal $L(I)$
+and the Hilbert function $H_{L(I)}$ of the leading module $L(I)$
 coincide, i.e.,
 $H_I=H_{L(I)}$.
 @end tex
@@ -198,8 +198,14 @@ $(k-1)$-st
 @end ifinfo
 syzygy module.
 
-Note, that the syzygy modules of @math{I} are uniquely defined up to direct
-summands.
+@tex
+Note, that the syzygy modules of $I$ depend on a choice of generators $g_1, ..., g_s$.
+But one can show that they depend on $I$ uniquely up to direct summands.
+@end tex
+@ifinfo
+Note, that the syzygy modules of I depend on a choice of generators g_1, ..., g_s.
+But one can show that they depend on I uniquely up to direct summands.
+@end ifinfo
 
 @table @code
 @item @strong{Example:}
@@ -322,7 +328,7 @@ deg(e(a,j)) <= s+j-1    for all j.
 @end smallexample
 @end table
 @c ---------------------------------------------------------------------------
-@node Characteristic sets, The spectrum, Syzygies and resolutions, Mathematical background
+@node Characteristic sets, The Gauss-Manin connection, Syzygies and resolutions, Mathematical background
 @section Characteristic sets
 @cindex Characteristic sets
 
@@ -412,54 +418,93 @@ characteristic series} of the ideal (G).
 @end smallexample
 @end table
 @c ---------------------------------------------------------------------------
-@node The spectrum, Toric ideals and integer programming, Characteristic sets, Mathematical background
-@section The spectrum
-@cindex The spectrum
+@node The Gauss-Manin connection, Toric ideals and integer programming, Characteristic sets, Mathematical background
+@section The Gauss-Manin connection
+@cindex The Gauss-Manin connection
 
 @c the following text contain too much math code, so there are
 @c tex and info versions of it. It end just before the introducing text
 @c to the first example.
 
 @tex
-Let $f\colon(C^{n+1},0)\rightarrow(C,0)$ be an isolated
-hypersurface singularity given by a polynomial which we also
-denote by $f$. Let $O=C[x_0,\ldots,x_n]_{(x_0,\ldots,x_n)}$
-be the local ring at the origin and $J_f$ the Jacobian ideal of $f$.
-If the coefficients of $f$ are algebraic numbers,
-{\sc Singular} can be used to compute invariants of $f$ such as
-the Milnor number $\mu(f)=\dim_CO/J_f$ and
-the Tjurina number $\tau(f)=\dim_CO/(J_f,f)$.
+Let $f\colon(C^{n+1},0)\rightarrow(C,0)$ be an isolated hypersurface singularity given by a polynomial with algebraic coefficients which we also denote by $f$.
+Let $O=C[x_0,\ldots,x_n]_{(x_0,\ldots,x_n)}$ be the local ring at the origin and $J_f$ the Jacobian ideal of $f$.
 
-The {\bf Gauss-Manin connection} $G$ of $f$ at 0 is a regular $C\{t\}[\partial_t]$-module and a $\mu$-dimensional vector space over $C(t):=C\{t\}[t^{-1}]$ and $C\{\!\{\partial_t^{-1}\}\!\}[\partial_t]$ where $C\{\!\{\partial_t^{-1}\}\!\}$ is the ring of {\bf microdifferential operators} with constant coefficients.
-The {\bf V-filtration} $V$ on $G$ is defined by $V^\alpha:=\sum_{\alpha\le\beta}C C_\beta$, $V^{>\alpha}:=\sum_{\alpha<\beta}C C_\beta$, where $C_\alpha:=\ker(t\partial_t-\alpha)^{n+1}$ for $\alpha\in Q$.
-The {\bf Hodge filtration} $F$ on $G$ is defined by the {\bf Brieskorn lattice} $H''\subset G$ via $F_k:=\partial_t^kH''$.
-Note that $F_0=H''$ and $F_{-1}=H'$.
-The {\bf spectrum} $S$ defined by $S(\alpha):=\dim_CGr_V^\alpha Gr^F_0G$ reflects the embedding of $H''$ in $G$ and fulfills $S(n-1-\alpha)=S(\alpha)$ and $S(\alpha)=0$ for $\alpha\le-1$ or $\alpha\ge n$.
-The {\bf spectral numbers} are those $\alpha$ with $S(\alpha)>0$ and $S(\alpha)$ is the multiplicity of the spectral number $\alpha$.
-$V^\alpha$, $V^{>\alpha}$, and $F_k$ are free modules of rank $\mu$ over $C\{t\}$ and $C\{\!\{\partial_t^{-1}\}\!\}$.
-This fact is used in {\tt gaussman.lib} to compute the {\bf monodromy}, the V-fitration on $H''/H'$, and the spectrum.
+A {\bf Milnor representative} of $f$ defines a real analytic fibre bundle over the punctured disc with fibres of homotopy type of $\mu$ $n$-spheres.
+The $n$-th cohomology bundle is a flat vector bundle of dimension $n$ and carries a natural flat connection with covariant derivative $\partial_t$.
+The {\bf monodromy operator} is the action of a positively oriented generator of the fundamental group of the puctured disc on the Milnor fibre.
+The germ $G$ at $0$ is a regular $D=C\{t\}[\partial_t]$-module, the {\bf Gauss-Manin connection}.
+
+By integrating along flat multivalued families of cycles, one can consider fibre wise global holomorphic differential forms as elements of $G$.
+This factors through an inclusion of the {\bf Brieskorn lattice} $H''$ in $G$.
+
+The $D$-module structure defines the {\bf V-filtration} $V$ on $G$ and $H''$ defines the {\bf Hodge filtration} $F$ on $G$ by $F_k=\partial_t^kH''$ which comes from the {\bf mixed Hodge structure} on the Milnor fibre.
+Note that $F_{-1}=H'$.
+
+The induced V-filtration on the Brieskorn lattice determines the {\bf singularity spectrum} $Sp$ by $Sp(\alpha):=\dim_CGr_V^\alpha Gr^F_0G$.
+The spectrum consists of $\mu$ rational numbers $\alpha_1,\dots,\alpha_\mu$ such that $e^{2\pi i\alpha_1},\dots,e^{2\pi i\alpha_\mu}$ are the eigenvalues of monodromy.
+These {\bf spectral numbers} lie in the open interval $(-1,n)$, symmetric about the midpoint $(n-1)/2$.
+
+The spectrum is constant under $\mu$-constant deformations and has the following semicontinuity property:
+The number of spectral numbers in an interval $(a,a+1]$ of a small deformation of $f$ is greater or equal to that of f in this interval.
+For semiquasihomogeneous singularities, this also holds for intervals of the form $(a,a+1)$.
+
+Two given isolated singularities $f$ and $g$ determine two spectra and from these spectra we get an integer.
+This integer is the maximal positive integer $k$ such that the semicontinuity holds for the spectrum of $f$ and $k$ times the spectrum of $g$.
+These numbers give bounds for the maximal number of isolated singularties of a specific type on a hypersurface $X\subset{P}^n$ of degree $d$: 
+such a surface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
+The cone itself being a $\mu$-constant deformation of $x_0^d+\dots+x_n^d=0$, the singularities are bounded by the spectrum of $x_0^d+\dots+x_n^d$.
+
+Using the library {\tt gaussman.lib} one can compute the {\bf monodromy}, the V-fitration on $H''/H'$, and the spectrum.
 @end tex
 
 @ifinfo
-Let f:(C^(n+1),0) -> (C,0) be an isolated
-hypersurface singularity given by a polynomial wich we also
-denote by f. Let O = C[x_0, @dots{}, x_n]_(x_0, @dots{}, x_n)
-be the local ring at the origin and J_f the jacobian ideal of f.
-If the coefficients of f are algebraic numbers,
-@sc{Singular} can be used to compute invariants of f such as
-the Milnor number mu(f) = dim_C ( O/J_f ) and
-the Tjurina number tau(f) = dim_C ( O/(J_f,f) ).
+Let f:(C^(n+1),0)--->(C,0) be an isolated hypersurface singularity given by a polynomial with algebraic coefficients which we also denote by f.
+Let O=C[x_0,...,x_n]_(x_0,...,x_n) be the local ring at the origin and J_f the Jacobian ideal of f.
+
+A @strong{Milnor representative} of f defines a real analytic fibre bundle over the punctured disc with fibres of homotopy type of mu n-spheres.
+The n-th cohomology bundle is a flat vector bundle of dimension n and carries a natural flat connection with covariant derivative d_t.
+The @strong{monodromy operator} is the action of a positively oriented generator of the fundamental group of the puctured disc on the Milnor fibre.
+The germ G at 0 is a regular D=C@{t@}[d_t]-module, the \@strong{Gauss-Manin connection}.
+
+By integrating along flat multivalued families of cycles, one can consider fibre wise global holomorphic differential forms as elements of G.
+This factors through an inclusion of the @strong{Brieskorn lattice} H'' in G.
+
+The D-module structure defines the @strong{V-filtration} V on G and H'' defines the @strong{Hodge filtration} F on G by F_k=d_t^kH'' which comes from the @strong{mixed Hodge structure} on the Milnor fibre.
+Note that F_(-1)=H'.
+
+The induced V-filtration on the Brieskorn lattice determines the @strong{singularity spectrum} Sp by Sp(a):=dim_CGr_V^a Gr^F_0G.
+The spectrum consists of mu rational numbers a_1,...,a_mu such that exp(2*pi*i*a_1),...,exp(2*pi*i*a_mu) are the eigenvalues of monodromy.
+These @strong{spectral numbers} lie in the open interval (-1,n), symmetric about the midpoint (n-1)/2.
+
+The spectrum is constant under mu-constant deformations and has the following semicontinuity property:
+The number of spectral numbers in an interval (a,a+1] of a small deformation of f is greater or equal to that of f in this interval.
+For semiquasihomogeneous singularities, this also holds for intervals of the form (a,a+1).
+
+Two given isolated singularities f and g determine two spectra and from these spectra we get an integer.
+This integer is the maximal positive integer k such that the semicontinuity holds for the spectrum of f and k times the spectrum of g.
+These numbers give bounds for the maximal number of isolated singularties of a specific type on a hypersurface X in P^n of degree d: 
+such a surface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
+The cone itself being a mu-constant deformation of x_0^d+...+x_n^d=0, the singularities are bounded by the spectrum of x_0^d+...+x_n^d.
+
+Using the library @code{gaussman.lib} one can compute the @strong{monodromy}, the V-fitration on H''/H', and the spectrum.
 @end ifinfo
 
 Let us consider as an example @math{f=x^5+x^2y^2+y^5}.
-First, we compute a matrix @math{M} such that @math{\exp(-2\pi iM)} is a monodromy matrix of @math{f} and the Jordan normal form of @math{M}:
+First, we compute a matrix @math{M} such that
+@tex
+\exp(2\pi iM)
+@end tex
+@ifinfo
+exp(-2*pi*i*M)
+@end ifinfo
+is a monodromy matrix of @math{f} and the Jordan normal form of @math{M}:
 @smallexample
 @c example
   LIB "gaussman.lib";
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
   matrix M=monodromy(f);
-  print(M);
   print(jordanform(M));
 @c example
 @end smallexample
@@ -471,104 +516,33 @@ Now, we compute the V-fitration on @math{H''/H'} and the spectrum:
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
   list l=vfiltration(f);
-  l;
+  print(l[1]);
+  print(l[2]);
+  print(l[3]);
+  print(l[4]);
 @c example
 @end smallexample
-Here @code{l[1]} contains the spectral numbers, @code{l[2]} the corresponding multiplicities, @code{l[3]} a @math{C}-basis of the V-filtration on @math{H''/H'} in terms of the monomial basis of @math{O/J_f\cong H''/H'} in @code{l[4]}, and @code{l[5]} a standart basis of @math{J_f}.
+Here @code{l[1]} contains the spectral numbers, @code{l[2]} the corresponding multiplicities, @code{l[3]} a @math{C}-basis of the V-filtration on @math{H''/H'} in terms of the monomial basis of
+@tex
+O/J_f\cong H''/H'
+@end tex
+@ifinfo
+O/J_f~=H''/H' 
+@end ifinfo
+in @code{l[4]}.
 
 @tex
-If the principal part of $f$ is $C$-nondegenerate, one can compute the spectrum using {\tt spectrum.lib}.
+If the principal part of $f$ is $C$-nondegenerate, one can compute the spectrum using the library {\tt spectrum.lib}.
 In this case, the V-filtration on $H''$ coincides with the Newton-filtration on $H''$ which allows to compute the spectrum more efficiently.
-
-The spectrum of $f$ consists of $\mu(f)$ rational numbers
-{\tt spectrum}$(f)=[\alpha_1,\ldots,\alpha_{\mu}]$ such that
-$e^{2\pi i\alpha_1},\ldots,e^{2\pi i\alpha_\mu}$ are the eigenvalues
-of the monodromy of $f$. These numbers are logarithms of the eigenvalues
-determined by the mixed Hodge Structure on the cohomology of
-the Milnor fibre of $f$. The spectrum numbers lie in the open interval
-$(-1,n)$, symmetric about the midpoint $(n-1)/2$. It is very interesting
-how the spectrum behaves under deformations. To start with, it
-is constant under $\mu$-constant deformations.
-
-Then there is the so called semicontinuity.
-If $F(x,t)$ is a deformation of $f$
-(i.e.~$F(x,0)=f(x)$), then every half open
-interval of length one $I=(a,a+1]$ is a semicontinuity domain
-in the following sense: the number of spectrum numbers of $f$
-in $I$ is greater or equal the number of spectrum numbers 
-of a small deformation $F(\ ,\varepsilon)$ in $I$:
-
-$|{\tt spectrum}(f)\cap I| \geq \sum_{P\in Sing(F(\ ,\epsilon))}
-    |{\tt spectrum}_P(F(\ ,\epsilon))\cap I| $
-
-Note that on the right hand side we sum over all
-singularities of the small deformation $F(\ ,\varepsilon)$.
-Furthermore if $f$ is
-semiquasihomogeneous, then also every open interval of length
-one $I=(a,a+1)$ is a semicontinuity domain as above.
-
-Two given isolated singularities $f$ and $g$ determine two spectra and from
-these spectra we get an integer. This integer is the maximal number
-$k\in{N}_0$
-such that the semicontinuity holds for the spectrum of $f$ and
-$k$ times the spectrum of $g$.
-These numbers give bounds for the maximal number of isolated
-singularties of a specific type on a hypersurface
-$X\subset{P}^n$ of degree $d$: such a surface has a
-smooth hyperplane section, and the complement is a small deformation
-of a cone over this hyperplane section.
-The cone itself being a $\mu$-constant deformation of
-$x_0^d+\ldots+x_n^d=0$, the singularities are bounded
-by the spectrum of $x_0^d+\ldots+x_n^d$.
 @end tex
 
 @ifinfo
-If in addition the principal part of f is C-nondegenerate,
-then also the spectrum of f and the geometric genus p_g(f)
-can be computed.
-
-The spectrum of f consists of mu(f) rational numbers
-spectrum(f) = [alpha_1, @dots{}, alpha_mu] such that
-e^(2*pi*i*alpha_1), @dots{}, e^(2*pi*i*alpha_mu) are the eigenvalues
-of the monodromy of f. These numbers are logarithms of the eigenvalues
-determined by the mixed Hodge Structure on the cohomology of
-the Milnor fibre of f. The spectrum numbers lie in the open interval
-(0,n), symmetric about the midpoint n/2. It is very interesting
-how the spectrum behaves under deformations. To start with, it
-is constant under mu-constant deformations.
-
-Then there is the so called semicontinuity.
-If F(x,t) is a deformation of f
-(i.e. F(x,0) = f(x)), then every half open
-interval of length one I = (a,a+1] is a semicontinuity domain
-in the following sense: the number of spectrum numbers of f
-in I is greater or equal the number of spectrum numbers
-of a small deformation F( ,epsilon) in I:
-
-| spectrum(f) intersect I | >= sum | spectrum_P (F( ,epsilon)) intersect I |
-over all P in Sing(F( ,epsilon))
-
-Note that on the right hand side we sum over all
-singularities of the small deformation F( ,epsilon).
-Furthermore if f is
-semiquasihomogeneous, then also every open interval of length
-one I=(a,a+1) is a semicontinuity domain as above.
-
-Two given isolated singularities f and g determine two spectra and from
-these spectra we get an integer. This integer is the maximal number
-k in N such that the semicontinuity holds for the spectrum of f and
-k times the spectrum of g.
-These numbers give bounds for the maximal number of isolated
-singularties of a specific type on a hypersurface X in P^n of degree d:
-such a surface has a smooth hyperplane section,
-and the complement is a small deformation of a cone over this hyperplane
-section. The cone itself being a mu-constant deformation of
-x_0^d+@dots{}+x_n^d=0, the singularities are bounded
-by the spectrum of x_0^d+@dots{}+x_n^d.
+If the principal part of f is C-nondegenerate, one can compute the spectrum using the library @code{spectrum.lib}.
+In this case, the V-filtration on H'' coincides with the Newton-filtration on H'' which allows to compute the spectrum more efficiently.
 @end ifinfo
 
-Let us calculate one specific example, the maximal number of
-triple points of type
+Let us calculate one specific example, the maximal number 
+of triple points of type
 @tex
 $\tilde{E}_6$ on a surface $X\subset{P}^3$
 @end tex
@@ -586,12 +560,12 @@ negative degree lexicographical ordering which is denoted
 ring r=0,(x,y,z),ds;
 LIB "spectrum.lib";
 poly f=x^7+y^7+z^7;
-list s1=spectrum( f );
+list s1=spectrumnd( f );
 s1;
 @c example
 @end smallexample
 
-The command @code{spectrum(f)} computes the spectrum of @math{f} and
+The command @code{spectrumnd(f)} computes the spectrum of @math{f} and
 returns a list with six entries:
 The Milnor number
 @tex
@@ -647,7 +621,7 @@ $x^3+y^3+z^3$.
 
 @smallexample
 poly g=x^3+y^3+z^3;
-list s2=spectrum(g);
+list s2=spectrumnd(g);
 s2;
 @expansion{} [1]:
 @expansion{}    8
@@ -664,7 +638,7 @@ s2;
 @end smallexample
 Evaluating semicontinuity is very easy:
 @smallexample
-semic(s1,s2);
+semicont(s1,s2);
 @expansion{} 18
 @end smallexample
 
@@ -679,7 +653,7 @@ is semiquasihomogeneous (sqh), so we can also apply the stronger
 form of semicontinuity:
 
 @smallexample
-semicsqh(s1,s2);
+semicontsqh(s1,s2);
 @expansion{} 17
 @end smallexample
 
@@ -691,15 +665,15 @@ $\tilde{E}_6$.
 E~_6.
 @end ifinfo
 
-Note that @code{spectrum(f)} works only if @math{f} has nondegenerate
-principal part. In fact @code{spectrum} will detect a degenerate
+Note that @code{spectrumnd(f)} works only if @math{f} has nondegenerate
+principal part. In fact @code{spectrumnd} will detect a degenerate
 principal part in many cases and print out an error message.
 However if it is known in advance that @math{f} has nondegenerate
 principal part, then the spectrum may be computed much faster
-using @code{spectrum(f,1)}.
+using @code{spectrumnd(f,1)}.
 
 @c ---------------------------------------------------------------------------
-@node Toric ideals and integer programming, References, The spectrum, Mathematical background
+@node Toric ideals and integer programming, References, The Gauss-Manin connection, Mathematical background
 @section Toric ideals and integer programming
 @cindex Toric ideals and integer programming
 
