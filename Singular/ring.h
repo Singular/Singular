@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.50 2000-09-07 16:22:02 Singular Exp $ */
+/* $Id: ring.h,v 1.51 2000-09-19 15:22:25 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -165,9 +165,7 @@ typedef enum rRingOrder_t
   ringorder_Ds,
   ringorder_ws,
   ringorder_Ws,
-  #ifdef HAVE_SHIFTED_EXPONENTS
   ringorder_L,
-  #endif
   ringorder_unspec
 } rRingOrder_t;
 
@@ -223,16 +221,13 @@ extern BOOLEAN rDBTest(ring r, char* fn, int l);
 #define rTest(r)
 #endif
 
-#ifdef HAVE_SHIFTED_EXPONENTS
 unsigned long rGetExpSize(unsigned long bitmask, int & bits);
+unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N);
 ring rModifyRing(ring r, BOOLEAN omit_degree,
                          BOOLEAN omit_comp,
                          unsigned long exp_limit);
 void rKillModifiedRing(ring r);
-#endif
 
 void rDebugPrint(ring r);
 void pDebugPrint(poly p);
-
 #endif
-

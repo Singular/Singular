@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.68 2000-09-19 12:43:32 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.69 2000-09-19 15:22:25 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1108,7 +1108,7 @@ void * sleftv::Data()
         r[0]='\0';
       }
       tmp.data=r;
-      if (rtyp==IDHDL)
+      if ((rtyp==IDHDL)||(rtyp==STRING_CMD))
       {
         tmp.next=next; next=NULL;
         data=NULL; d=NULL;

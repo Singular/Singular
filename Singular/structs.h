@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.36 2000-09-12 16:01:17 obachman Exp $ */
+/* $Id: structs.h,v 1.37 2000-09-19 15:22:25 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -113,7 +113,7 @@ typedef namerec *          namehdl;
 typedef kBucket*           kBucket_pt;
 typedef struct p_Procs_s p_Procs_s;
 
-// for hdegree.cc   
+// for hdegree.cc
 typedef struct sindlist indlist;
 typedef indlist * indset;
 struct sindlist
@@ -131,7 +131,7 @@ struct snaIdeal
 typedef struct snaIdeal * naIdeal;
 
 
-// for sparsemat.cc 
+// for sparsemat.cc
 typedef struct smprec sm_prec;
 typedef sm_prec * smpoly;
 struct smprec
@@ -255,12 +255,8 @@ struct sip_sring
 
   int      *VarOffset;
   /* mapping exp. of var(i) -> p->exp */
-#ifdef HAVE_SHIFTED_EXPONENTS
   /* mapping exp. of var(i) ->
   p->exp[(VarOffset[i] & 0xffffff)] >> (VarOffset[i] >> 24) & bitmask */
-#else
-  /* mapping exp. of var(i) -> p->exp.e[VarOffset[i]] */
-#endif
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
   short      ch;     /* characteristic */

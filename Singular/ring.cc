@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.117 2000-09-18 09:19:31 obachman Exp $ */
+/* $Id: ring.cc,v 1.118 2000-09-19 15:22:23 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2289,6 +2289,38 @@ unsigned long rGetExpSize(unsigned long bitmask, int & bits)
   }
 #endif
   return bitmask;
+}
+
+/*2
+* optimize rGetExpSize for a block of N variables, exp <=bitmask
+*/
+unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
+{
+#if SIZEOF_LONG == 8
+#define BITS_FOR_EXPS 64
+#else
+// SIZEOF_LONG ==4, 32 bits
+#define BITS_FOR_EXPS 32
+#endif
+  bitmask =rGetExpSize(bitmask, &bits);
+  int vars_per_long=BITS_FOR_EXPS/bits;
+  int bits1;
+  loop
+  {
+    unsigned long bitmask1 =rGetExpSize(bitmask+1, &bits1);
+    int vars_per_long1=BITS_FOR_EXPS/bits1;
+    if (((N+vars_per_long-1)/vars_per_long)
+    == ((N+vars_per_long1-1)/vars_per_long1))
+    {
+      vars_per_long=vars_per_long1;
+      bits=bits1;
+      bitmask=bitmask1;
+    }
+    else
+    {
+      return bitmask; /* and bits */
+    }
+  }
 }
 
 /*2
