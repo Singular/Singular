@@ -3056,6 +3056,14 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         WerrorS("Dynamic modules are not supported by this version of Singular");
 #endif /* HAVE_DYNAMIC_LOADING */
         break;
+
+      case LT_HPUX:
+#ifdef HAVE_DYNAMIC_LOADING
+        result = load_modules(s, libnamebuf, autoexport);
+#else /* HAVE_DYNAMIC_LOADING */
+        WerrorS("Dynamic modules are not supported by this version of Singular");
+#endif /* HAVE_DYNAMIC_LOADING */
+        break;
   }
   return result;
 }
