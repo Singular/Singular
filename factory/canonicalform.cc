@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.8 1997-07-01 12:48:00 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.9 1997-07-14 12:45:07 schmidt Exp $ */
 
 #include <config.h>
 
@@ -226,6 +226,14 @@ CanonicalForm::LC( const Variable & v ) const
     }
 }
 
+//{{{ int CanonicalForm::degree() const
+//{{{ docu
+//
+// degree() - return degree in main variable.
+//
+// Returns -1 for the zero polynomial.
+//
+//}}}
 int
 CanonicalForm::degree() const
 {
@@ -236,7 +244,20 @@ CanonicalForm::degree() const
     else
 	return value->degree();
 }
+//}}}
 
+//{{{ int CanonicalForm::degree( const Variable & v ) const
+//{{{ docu
+//
+// degree() - return degree in variable v.
+//
+// Returns -1 for the zero polynomial.
+//
+// Note: If v is less than the main variable of CO we have to swap
+// variables which may be quite expensive.  Calculating the degree in
+// respect to an algebraic variable may fail.
+//
+//}}}
 int
 CanonicalForm::degree( const Variable & v ) const
 {
@@ -249,15 +270,20 @@ CanonicalForm::degree( const Variable & v ) const
     else  if ( v == mvar() )
 	return value->degree();
     else  if ( v > mvar() )
+	// relatively to v, f is in a coefficient ring
 	return 0;
     else {
+	// v < mvar(), make v main variable
 	CanonicalForm f = swapvar( *this, v, mvar() );
- 	if ( f.mvar() == mvar() )
- 	    return f.value->degree();
- 	else
+	if ( f.mvar() == mvar() )
+	    return f.value->degree();
+	else
+	    // in this case, we lost our main variable because
+	    // v did not occur in CO
 	    return 0;
     }
 }
+//}}}
 
 int
 CanonicalForm::taildegree() const
@@ -1136,6 +1162,7 @@ initCanonicalForm( void )
 	Off( SW_FAC_USE_BIG_PRIMES );
 	Off( SW_FAC_QUADRATICLIFT );
 	Off( SW_USE_EZGCD );
+	Off( SW_USE_SPARSEMOD );
 
 	(void)initializeCharacteristic();
 	(void)initializeGMP();
