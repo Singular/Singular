@@ -212,7 +212,7 @@ mmutil.inc: mmutil.c mmprivat.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} \
 	       -DGENERATE_INDEX_TABLE -DHAVE_INDEX_TABLE mmutil.c -o mmutil
 	./mmutil > mmutil.inc
-	rm -rf mmutil
+	rm -f mmutil
 
 mmutil.o mmutil.d: mmutil.inc
 
@@ -299,13 +299,13 @@ unistallinfo:
 mostlyclean: clean
 
 clean:
-	-rm -rf Singular* *.o *.og core *.d *.dd *~ \#* /tmp/mp* \
+	-rm -f Singular* *.o *.og core *.d *.dd *~ \#* /tmp/mp* \
 	        *.got *dump* *.diff *.dir *.pag
 	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
-	-rm -rf depend iparith.inc mpsr_Tok.inc 
-	-rm -rf ${DISTNAME} ${testdir}/out stamp-h
+	-rm -f depend iparith.inc mpsr_Tok.inc 
+	-rm -f ${DISTNAME} ${testdir}/out stamp-h
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
 	cd ${docdir}; ${MAKE} distclean
 
@@ -356,12 +356,12 @@ dbmcheck: Singular ${testdir}/comparecheck ${testdir}/dbm_test.in \
 ##
 
 dist:
-	rm -rf ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}*
+	rm -f ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}*
 	mkdir ${TEMPDIR}/${DISTNAME}
 	- cp -pR . ${TEMPDIR}/${DISTNAME}
 	cd ${TEMPDIR}/${DISTNAME}; ${MAKE} distclean; 
 	cd ${TEMPDIR}; tar cf ${DISTNAME}.tar ${DISTNAME} 
-	rm -rf ${TEMPDIR}/${DISTNAME}
+	rm -f ${TEMPDIR}/${DISTNAME}
 	- gzip -9 ${TEMPDIR}/${DISTNAME}.tar
 	- mv ${TEMPDIR}/${DISTNAME}.tar.gz .
 
