@@ -58,28 +58,6 @@ extern "C" {
 #include <MP_Config.h>
 #endif
 
-/* init bins from structs.h */
-
-omBin MP_INT_bin = omGetSpecBin(sizeof(MP_INT));
-omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr));
-omBin ideal_bin = omGetSpecBin(sizeof(ideal));
-omBin int_bin = omGetSpecBin(sizeof(int));
-omBin poly_bin = omGetSpecBin(sizeof(poly));
-omBin void_ptr_bin = omGetSpecBin(sizeof(void_ptr));
-omBin indlist_bin = omGetSpecBin(sizeof(indlist));
-omBin naIdeal_bin = omGetSpecBin(sizeof(naIdeal));
-omBin snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
-omBin sm_prec_bin = omGetSpecBin(sizeof(sm_prec));
-omBin smprec_bin = omGetSpecBin(sizeof(smprec));
-omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
-omBin sip_smap_bin = omGetSpecBin(sizeof(sip_smap));
-omBin sip_sring_bin = omGetSpecBin(sizeof(sip_sring));
-omBin ip_sideal_bin = omGetSpecBin(sizeof(ip_sideal));
-omBin ip_smap_bin = omGetSpecBin(sizeof(ip_smap));
-omBin ip_sring_bin = omGetSpecBin(sizeof(ip_sring));
-
-/*0 implementation*/
-
 /*2
 * initialize components of Singular
 */
@@ -110,54 +88,6 @@ int inits(void)
 }
 
 /*2
-* the global exit routine of Singular
-*/
-extern "C" {
-void m2_end(short i)
-{
-  fe_reset_input_mode();
-  #ifdef PAGE_TEST
-  mmEndStat();
-  #endif
-  #ifdef HAVE_TCL
-  if (tclmode)
-  {
-    PrintTCL('Q',0,NULL);
-  }
-  #endif
-  fe_reset_input_mode();
-  if (i<=0)
-  {
-    #ifdef HAVE_TCL
-    if (!tclmode)
-    #endif
-      if (BVERBOSE(0))
-      {
-        if (i==0)
-          printf("Auf Wiedersehen.\n");
-        else
-          printf("\n$Bye.\n");
-      }
-    #ifdef sun
-      #ifndef __svr4__
-        _cleanup();
-        _exit(0);
-      #endif
-    #endif
-    exit(0);
-  }
-  else
-  {
-    #ifdef HAVE_TCL
-    if (!tclmode)
-    #endif
-      printf("\nhalt %d\n",i);
-  }
-  exit(i);
-}
-}
-
-/*2
 * the renice routine for very large jobs
 * works only on unix machines,
 * testet on : linux, HP 9.0
@@ -181,47 +111,6 @@ void m2_end(short i)
 *void very_nice(){}
 *#endif
 */
-
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-#ifdef buildin_rand
-/*
- *
- *  A prime modulus multiplicative linear congruential
- *  generator (PMMLCG), or "Lehmer generator".
- *  Implementation directly derived from the article:
- *
- *        S. K. Park and K. W. Miller
- *        Random Number Generators: Good Ones are Hard to Find
- *        CACM vol 31, #10. Oct. 1988. pp 1192-1201.
- *
- *  Using the following multiplier and modulus, we obtain a
- *  generator which:
- *
- *        1)  Has a full period: 1 to 2^31 - 2.
- *        2)  Is testably "random" (see the article).
- *        3)  Has a known implementation by E. L. Schrage.
- */
-
-
-#define  A        16807L        /*  A "good" multiplier          */
-#define  M   2147483647L        /*  Modulus: 2^31 - 1          */
-#define  Q       127773L        /*  M / A                  */
-#define  R         2836L        /*  M % A                  */
-
-
-int siSeed = 1L;
-
-
-int siRand()
-{
-  siSeed = A * (siSeed % Q) - R * (siSeed / Q);
-
-  if ( siSeed < 0 )
-    siSeed += M;
-
-  return( siSeed );
-}
-#endif
 
 void singular_example(char *str)
 {
@@ -351,7 +240,8 @@ struct soptionStruct verboseStruct[]=
   {"Imap",     Sy_bit(V_IMAP),      ~Sy_bit(V_IMAP)       },
   {"prompt",   Sy_bit(V_PROMPT),    ~Sy_bit(V_PROMPT)     },
   {"notWarnSB",Sy_bit(V_NSB),       ~Sy_bit(V_NSB)        },
-  {"contentSB",Sy_bit(V_CONTENTSB), ~Sy_bit(V_CONTENTSB)        },
+  {"contentSB",Sy_bit(V_CONTENTSB), ~Sy_bit(V_CONTENTSB)  },
+  {"cancelunit",Sy_bit(V_CANCELUNIT),~Sy_bit(V_CANCELUNIT)},
 /*special for "none" and also end marker for showOption:*/
   {"ne",         0,          0 }
 };
