@@ -1633,7 +1633,7 @@ if test "$with_MP" != no; then
   else
     if test "$ac_cv_lib_gmp_mpz_init"=yes; then
       echo $ac_n "checking for -lMP""... $ac_c" 1>&6
-ac_lib_var=`echo MP_MP_OpenLink | tr '.-/+' '___p'`
+ac_lib_var=`echo MP_IMP_PutGmpInt | tr '.-/+' '___p'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1643,11 +1643,11 @@ cat > conftest.$ac_ext <<EOF
 #line 1644 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
-char MP_OpenLink();
+char IMP_PutGmpInt();
 
 int main() { return 0; }
 int t() {
-MP_OpenLink()
+IMP_PutGmpInt()
 ; return 0; }
 EOF
 if { (eval echo configure:1654: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
