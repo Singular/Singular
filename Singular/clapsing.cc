@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.45 1999-01-21 15:00:05 Singular Exp $
+// $Id: clapsing.cc,v 1.46 1999-03-08 14:10:22 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -820,7 +820,8 @@ matrix singclap_irrCharSeries ( ideal I)
     setCharacteristic( nGetChar() );
     for(i=0;i<IDELEMS(I);i++)
     {
-      L.append(convSingPClapP(I->m[i]));
+      if (I->m[i]!=NULL)
+        L.append(convSingPClapP(I->m[i]));
     }
   }
   // and over Q(a) / Fp(a)
@@ -831,7 +832,8 @@ matrix singclap_irrCharSeries ( ideal I)
     else               setCharacteristic( -nGetChar() );
     for(i=0;i<IDELEMS(I);i++)
     {
-      L.append(convSingTrPClapP(I->m[i]));
+      if (I->m[i]!=NULL)
+        L.append(convSingTrPClapP(I->m[i]));
     }
   }
   else
@@ -849,12 +851,14 @@ matrix singclap_irrCharSeries ( ideal I)
   {
     n = max(LLi.getItem().length(),n);
   }
-  res=mpNew(m,n);
   if ((m==0) || (n==0))
   {
     Warn("char_series returns %d x %d matrix from %d input polys (%d)\n",m,n,IDELEMS(I)+1,LL.length());
     iiWriteMatrix((matrix)I,"I",2,0);
+    m=max(m,1);
+    n=max(n,1);
   }
+  res=mpNew(m,n);
   for ( m=1, LLi = LL; LLi.hasItem(); LLi++, m++ )
   {
     for (n=1, Li = LLi.getItem(); Li.hasItem(); Li++, n++)
