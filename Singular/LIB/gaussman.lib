@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.83 2002-07-08 07:10:34 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.84 2002-07-16 14:35:09 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -583,8 +583,18 @@ EXAMPLE:  example bernstein; shows examples
   def A0,r,H,H0,k0=saturate();
   e,m,A0,r=eigenval(A0,r,H,k0);
 
+  ideal e0;
+  for(int i,j=1,1;i<=ncols(e);i++)
+  {
+    if(e[i]!=1)
+    {
+      e0[j]=e[i];
+      j++;
+    }
+  }
+
   setring(R);
-  ideal r=-imap(G,e);
+  ideal r=-imap(G,e0);
   kill G,gmsmaxdeg;
 
   return(r);
