@@ -11,7 +11,7 @@ bug_13
 bug_14
 bug_15
 bug_16
-; CHECK: bug_17
+bug_17
 bug_18
 bug_19
 bug_20
