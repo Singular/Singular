@@ -70,7 +70,6 @@ example
   resolutiongraph(f1*f2*f3);
 }
 
-
 proc totalmultiplicities (def INPUT, list #)
 "USAGE:  totalmultiplicities(INPUT); INPUT poly or list
 ASSUME:  INPUT is either a REDUCED bivariate polynomial defining a plane curve singularity,
@@ -108,6 +107,18 @@ SEE ALSO: develop, hnexpansion, alexanderpolynomial, resolutiongraph
 EXAMPLE: example totalmultiplicities;  shows an example
 "
 {
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  /// The algorithm described in [JP] DeJong, Pfister, Local Analytic Geometry, Vieweg 2000,
+  /// is used for the implementation -- the missing case is included by appropriate sorting.
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  /// If # is empty, then an additional sorting of the branches will be made, so that 
+  /// the branches can be split with split_graph in order to get the graphs of the curves
+  /// separated on the first exceptional divisor. Otherwise split_graph should not be applied!
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  /// If #[1]="tau", then totalmultiplicities is called for the use in tau_es - thus it returns
+  /// the prolonged resolutiongraphs of the branches, their multiplicity sequences and their 
+  /// contact matrix - sorted appropriately.
+  ///////////////////////////////////////////////////////////////////////////////////////////////
   int i,j,s,e,ii;
   intmat helpmati,helpmatii;
   intvec helpvec;
@@ -265,6 +276,39 @@ EXAMPLE: example totalmultiplicities;  shows an example
     totmult[i]=tm;
     multipl[i]=mt;
   }
+  ///////////////////////////////////////////////////////////////////////////////
+  // Check, if the procedure is called from inside tau_es.
+  int check_tau;  
+  if (size(#)==1)
+  {
+    if (#[1]=="tau")
+    {
+      check_tau=1;
+    }
+  } 
+  /////////////////////////////////////////////////////////////////////////////////
+  // The procedure tau_es expects the branches to be ordered according to their 
+  // contact during the resolution process.
+  /////////////////////////////////////////////////////////////////////////////////
+  if ((size(#)==0) or (check_tau==1))
+  {
+    list SORT;
+    for (i=1;i<=ncols(contact)-2;i++)
+    {
+      SORT=sort_branches(contact,graphs,totmult,multipl,i,ncols(contact));
+      contact=SORT[1];
+      graphs=SORT[2];
+      totmult=SORT[3];
+      multipl=SORT[4];
+    }
+  }
+  ///////////////////////////////////////////////////////////////////////////////////
+  /// If the procedure is called from inside tau_es, the output will be the prolonged 
+  /// resolutiongraphs of the branches, their multiplicity sequences and their contact matrix.
+  if (check_tau==1)
+  {
+    return(list(graphs,multipl,contact));
+  }
   /////////////////////////////////////////////////////////////////////////////////////
   // Sort the branches in such a way, that in the blowing up procedure whenever to branches
   // C_i and C_j have contact k (i.e. after k steps they are separated) and one of the following 
@@ -307,19 +351,6 @@ EXAMPLE: example totalmultiplicities;  shows an example
   //                                           contact also (C_j,C_t) cannot have bad contact.
   // This ensures that when we do the moving of the graphs, we do NOT create any new bad contacts.
   //////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////
-  ///// Note also that this solves the following problem which occured to be bad when we
-  ///// wanted to split the graphs afterwards:
-  ///// ---------------------------------------------------------------------------------
-  ///// In order to be able to split the graphs (e.g. in tau_es) again with the procedure
-  ///// split_graph, it is important, that once the graph C_i is connected to the graphs
-  ///// C_1,...,C_i-1 this connection point is not removed later on by gluing in another
-  ///// graph C_ii (to which C_i then would be connected instead). The latter would happen
-  ///// precisely, when both C_i and C_ii have the same contact k[i] with C_j (the graph they
-  ///// are actually glued to), they have a larger contact with each other and in the 
-  ///// blowing up procedure C_ii is longer connected to the exceptional divisor of weight
-  ///// k[i]=contact(C_j,C_i). But that would mean that (C_i,C_ii) has bad contact! 
-  //////////////////////////////////////////////////////////////////////////////////////////////
   i=1;
   j=2;
   intvec connections_i,connections_j;
@@ -538,6 +569,7 @@ example
   poly f3=y3-x2;
   totalmultiplicities(f1*f2*f3);
 }
+
 
 
 proc alexanderpolynomial (def INPUT)
@@ -1378,9 +1410,7 @@ ASSUME:  INPUT is either a REDUCED bivariate polynomial defining a plane curve s
          @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
          the contact matrix and a list of integer vectors with the characteristic exponents 
          of the branches of a plane curve singularity, or an integer vector containing the
-         characteristic exponents of an irreducible plane curve singularity, or
-         the output of @code{totalmultiplicities(f)}, or a list containing the resolution graph
-         and the (strict) multiplicities as in output of @code{totalmultiplicities(f)}.
+         characteristic exponents of an irreducible plane curve singularity.
 RETURN:  int, the equisingular Tjurina number of f, i. e. the codimension of the mu-constant
          stratum in the semiuniversal deformation of f, where mu is the Milnor number of f.
 NOTE:    The equisingular Tjurina number is calculated with the aid of a Hamburger-Noether
@@ -1399,8 +1429,8 @@ EXAMPLE: example tau_es;  shows an example
   // If the input is a weighted homogeneous polnomial, then use a direct algorithm to 
   // calculate the equisingular Tjurina number, by caluclating a K-basis of the
   // Tjurina algebra and omitting those elements with weighted degree at least the
-  // weighted degree of the polynomial. -- If an additional input # is given, 
-  // the procedure always uses the recursive algorithm.
+  // weighted degree of the polynomial. -- If an additional input # is given (which is
+  // not just the number 1 !!!), the procedure always uses the recursive algorithm.
   if ((typeof(INPUT)=="poly") and (size(#)==0))
   {
     if (qhweight(INPUT)[1]!=0)
@@ -1419,82 +1449,118 @@ EXAMPLE: example tau_es;  shows an example
   }
   // Else apply the recursive algorithm from Eugenii Shustin, On Manifolds of Singular 
   // Algebraic Curves, Selecta Math. Sov. Vol 10, No. 1 (1991), p. 31.
-  int i;                  // Laufvariable
-  int tau,multi,tau_i;    // Variable for es-Tjurina no., multiplicitiy, and es-Tjurina at blow ups 
-  intmat resgr, multseq;  // resolution graph and multiplicity sequence
+  int i,j,k;                  // Laufvariablen
+  int tau,tau_i;              // Variable for es-Tjurina no., multiplicitiy, and es-Tjurina at blow ups 
+  intmat contact;             // contact matrix  
+  list graphs, multipl;       // resolution graphs and multiplicity sequences
+  list graphs_ed, multipl_ed; // res.graphs and mult.seq. of one curve on 1st ex. div. 
+  intmat contact_ed;          // contact matrix of one curve on 1st exceptional divisor
+  int d_i;                    // correction term 
+  intvec connections;
+  intmat graph;
+  intvec multseq;
+  int s,e;
+  int multi;                  // multiplicity of the curve defined by the input.
   /////////////////////////////////////////////////////////
   // Check what type the input is, and act accordingly.
   if (typeof(INPUT)=="list") 
   {
     if (size(INPUT)==3)
     {
-      // If the INPUT is the output of totalmultiplicities
-      if ((typeof(INPUT[1])=="intmat") and (typeof(INPUT[2])=="intmat") and (typeof(INPUT[3])=="intmat"))
+      // If the INPUT is the output of totalmultiplicities(INPUT,"tau")
+      if ((typeof(INPUT[1])=="list") and (typeof(INPUT[2])=="list") and (typeof(INPUT[3])=="intmat"))
       { 
-        resgr=INPUT[1];
-        multseq=INPUT[3];
+        graphs=INPUT[1];
+        multipl=INPUT[2];
+        contact=INPUT[3];
       }
-      // Otherwise call the procedure with the output of totalmultiplicities(INPUT).
+      // Otherwise call the procedure with the output of totalmultiplicities(INPUT,"tau").
       else
       {
-        return(tau_es(totalmultiplicities(INPUT)));
+        return(tau_es(totalmultiplicities(INPUT,"tau")));
       }
     }
     else 
     {
-      if (size(INPUT)==2)
-      {
-        // If the INPUT is the resolution graph and the multiplicity sequences.
-        if ((typeof(INPUT[1])=="intmat") and (typeof(INPUT[2])=="intmat"))
-        {
-          resgr=INPUT[1];
-          multseq=INPUT[2];
-        }
-        // Otherwise call the procedure with the output of totalmultiplicities(INPUT).
-        else
-        {
-          return(tau_es(totalmultiplicities(INPUT)));
-        }
-      }
-      else
-      {
-        return(tau_es(totalmultiplicities(INPUT)));
-      }
+      return(tau_es(totalmultiplicities(INPUT,"tau")));
     }
   }
-  // Otherwise call the procedure with the output of totalmultiplicities(INPUT).
+  // Otherwise call the procedure with the output of totalmultiplicities(INPUT,"tau").
   else
   {
-    return(tau_es(totalmultiplicities(INPUT)));
+    return(tau_es(totalmultiplicities(INPUT,"tau")));
   }
   /// End of checking the input
   ///////////////////////////////////////////////////////  
   // If the singularity is smooth, the equisingular Tjurina number is zero.
-  if ((ncols(multseq)==1) and (multseq[1,1]<=1))
+  if ((ncols(contact)==1) and (multipl[1][1]<=1))
   {
     return(0);
   }
   // Otherwise calculate the multiplicity of the singularity.
-  for (i=1;i<=ncols(multseq);i++)
+  for (i=1;i<=size(multipl);i++)
   {
-    multi=multi+multseq[1,i];
+    multi=multi+multipl[i][1];
+  }
+  // Find the branches which stay together after blowing up once, and group them together.
+  k=0;
+  intvec curves_on_first_ex_div=k;  // If this is 0=i_0,i_1,...i_s=ncols(contact), then the branches
+  while (k<ncols(contact))          // (i_j)+1,...,i_(j+1) stay together after the first blowing up,
+  {                                 // and s is the number of infinitely near points of first order. 
+    k=find_last_non_one(intvec(contact[k+1,1..ncols(contact)]),k+2);
+    curves_on_first_ex_div=curves_on_first_ex_div,k;
   }
   // And then calculate the equisingular Tjurina numbers in the infinitely near points of
   // first order plus some correction term (= the number of blow ups needed to separate the
   // strict transform from the exceptional divisor in the corresponding infinitely near point)
   // and add them.
-  list graphs=split_graph(resgr,multseq);
-  for (i=1;i<=size(graphs);i++)
+  for (i=1;i<=size(curves_on_first_ex_div)-1;i++)
   {
-    // Calculate the equisingular Tjurina number of the i-th subgraph.
-    tau_i=tau_es(list(graphs[i][1],graphs[i][2]));
-
-    // If the branch was smooth, then the summand has to be reduced by 1.
+    s=curves_on_first_ex_div[i]+1;  
+    e=curves_on_first_ex_div[i+1];
+    graphs_ed=list(graphs[s..e]);
+    multipl_ed=list(multipl[s..e]);
+    contact_ed=intmat_minus_one(intmat(intvec(contact[s..e,s..e]),e-s+1,e-s+1));
+    connections=0;
+    // Adjust the graphs and multiplicity sequences by cutting the first level.
+    // And find in each graph the point to which the point 1 is connected = 1 + number of
+    // blow ups needed to separate the strict transform from the first exceptional divisor.
+    for (j=1;j<=size(graphs_ed);j++)
+    {
+      // Adjust the graphs and find the connection points.
+      graph=graphs_ed[j];
+      connections[j]=find_connection_point(intvec(graph[1,1..ncols(graph)]),1);
+      graph=delete_row(delete_col(graph,1),1);
+      graphs_ed[j]=graph;
+      // Adjust the multiplicity sequences.
+      multseq=multipl_ed[j];      
+      if (size(multseq)==1)  // If multseq has only one entry, then their is only
+      {                      // one branch left and it is smooth! So set multipl_ed[j]=1.
+        multipl_ed[j]=intvec(1);
+      }
+      else  // Otherwise just cut the first entry.
+      {
+        multipl_ed[j]=intvec(multseq[2..size(multseq)]);
+      }
+    }    
+    // Calculate the equisingular Tjurina number of the strict transform at the i-th 
+    // intersection point with the first exceptional divisor.
+    tau_i=tau_es(list(graphs_ed,multipl_ed,contact_ed));
+    // Calculate the number no. of blow ups needed to separate the strict transform of 
+    // the curve defined by the input from the first exceptional divisor at their i-th
+    // intersection point.
+    d_i=max_in_intvec(connections)-1;  
+    // If d_i is negative, then there was only one branch left and it was smooth, so d_i should be 1. 
+    if (d_i<0)
+    {
+      d_i=1;
+    }    
+    // If the curve defined by graphs_ed was smooth, then the summand has to be reduced by 1.
     if (tau_i==0)
     {
       tau_i=-1;
-    }  
-    tau=tau+tau_i+graphs[i][3];
+    }
+    tau=tau+tau_i+d_i;
   }
   // The equisingular Tjurina number is then calculated by adding the following term.
   tau=tau+((multi*(multi+1))/2)-2;
@@ -1512,8 +1578,6 @@ example
   tau_es(f2);
   tau_es(f1*f2*f3);
 }
-
-
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1968,144 +2032,14 @@ NOTE:     This procedure is only for internal use; it is called in multseq2chare
      }
    list L=dividendo,remain;//we put in a list all the dividens and all the remainders
    return(L);// and return the list
-}
+}  
 
-
-static proc split_graph (intmat resgr, intmat multseq)
-"USAGE:   split_graph(resgr,multseq), intmat resgr, multseq 
-RETURN:   list, each entry is a list which contains one subgraph connected to 
-          the point of weight one in the input graph, contains the multiplicity sequence
-          of this subgraph and the correction term (which is the number of blow ups
-          needed to separate the strict transform from the exceptional divisor in
-          this point)
-NOTE:     This procedure is only for internal use; it is called in tau_es.
-"
-{
-  int i,j,k;    // Laufvariablen
-  int anf=2;    // start point of subgraph to extract
-  int ende;     // end point of subgraph to extract
-  int anzahl;   // counter for number of branches in subgraph
-  int stelle=1; // no. of the first branch in the subgraph 
-  int start;    // one more than the position in the first subgraph connected to 1
-  list result;  // keeps the resolution graphs, multiplicities and correction terms of the subgraphs
-  intvec d;     // keeps the correction terms of the subgraphs
-  int l=1;      // number of next subgraph for which the correction term is to be calculated
-  // If the singularity is smooth, then the graph need not be split, and the correction term is zero.
-  // Actually this case will not occur, when called from inside tau_es.
-  if (ncols(resgr)==1)
-  {
-    result=list(list(resgr,multseq,0));
-    return(result);
-  }
-  // Find the position in the first subgraph that is connected to the point of weight 1.
-  j=2;
-  while (start==0)
-  {
-    if (resgr[1,j]!=0)
-    {
-      start=j+1;
-      // Calculate how many blow ups are needed, to separate the strict transform from
-      // the exceptional divisor - i.e. one less than the weight of the point connected 
-      // to the point of weight one, respectively one if the point is the strict transform,
-      // which then must be smooth.
-      if (resgr[j,j]>0)  
-      {
-        d[l]=resgr[j,j]-1;   
-      }
-      else
-      {
-        d[l]=1;
-      }
-    }
-    j++;
-  }
-  // If the graph had more than one subgraph connected to the point of weight 1,
-  // then start by finding the next one connected to it, and starting from this point
-  // backwards find the end point of the previous subgraph connected to the point
-  // of weight 1. That way we may extract it, and then go on. 
-  for (j=start;j<=ncols(resgr);j++)
-  {
-    if (resgr[1,j]!=0)
-    {
-      // Calculate how many blow ups are needed, to separate the strict transform from
-      // the exceptional divisor - i.e. one less than the weight of the point connected 
-      // to the point of weight one, respectively one if the point is the strict transform,
-      // which then must be smooth.
-      l++;  // no. of next subgraph for which the correction term d is to be calculated
-      if (resgr[j,j]>0)
-      {
-        d[l]=resgr[j,j]-1;   
-      }
-      else
-      {
-        d[l]=1;
-      }
-      // Find the end point of the previous graph
-      k=j;
-      while (ende<k)
-      {
-        k=k-1;
-        if (resgr[k,k]<=1)
-        {
-          ende=k;
-        }
-      }
-      // Find out, how many subgraphs belong to the previous subgraph.
-      for (i=anf;i<=ende;i++)
-      {
-        if (resgr[i,i]<0)
-        {
-          anzahl++;
-        }
-      }
-      // Extract the previous subgraph and its multiplicity sequence. 
-      result=insert(result,insert(extr_corr(resgr,multseq,anf,ende,stelle,stelle+anzahl-1,anzahl),d[l-1],2),size(result));
-      stelle=stelle+anzahl;
-      anf=ende+1;
-      anzahl=0;
-    }
-  }
-  // The last subgraph still has to be extracted. 
-  ende=ncols(resgr);
-  result=insert(result,insert(extr_corr(resgr,multseq,anf,ende,stelle,ncols(multseq),ncols(multseq)-stelle+1),d[l],2),size(result));
-  return(result);
-}
-
-  
-
-static proc extr_corr (intmat resgr, multseq, int anf, ende, stelle, endstelle, anzahl)
-"USAGE:   extr_corr(resgr,multseq), intmat resgr, multseq, int anf, ende, stelle, endstelle, anzahl
-RETURN:   list, containing two intmat, the resolution graph and the multiplicity sequence
-          which have been extracted and where the weights have been corrected
-NOTE:     This procedure is only for internal use; it is called in tau_es.
-"
-{
-  // Extract the subgraph and the corresponding multiplicity sequence.
-  intmat gr=intmat(intvec(resgr[anf..ende,anf..ende]),ende-anf+1,ende-anf+1);
-  intmat mt=intmat(intvec(multseq[anf..ende,stelle..endstelle]),ende-anf+1,anzahl);
-  // Correct the weights of the extracted subgraph by subtracting 1, and by
-  // renumbering the strict transforms.
-  anzahl=0;  // anzahl now used to count the number of total transforms in the subgraph
-  for (int i=1;i<=ncols(gr);i++)
-  {
-    if (gr[i,i]>0)     // correct weight of an exceptional divisor
-    {
-      gr[i,i]=gr[i,i]-1;
-    }
-    else               // correct weight=number of a strict transform
-    {
-      anzahl++;
-      gr[i,i]=-anzahl;          
-    }   
-  }
-  return(list(gr,mt));
-}
 
 
 static proc tau_es_qh (poly f)
 "USAGE:    tau_es_qh(f), poly f
 RETURN:   int, equisingular Tjurina number
-NOTE:     This procedure is only for internal use; it is called in tau_es.
+NOTE:     This procedure is only for internal use; it is called in Tau_es.
 "
 {
   intvec qh=qhweight(f);
@@ -2185,9 +2119,9 @@ NOTE:     This procedure is only for internal use; it is called in totalmultipli
 
 
 static proc delete_row (intmat M,int i)
-"USAGE:    remove_row(M,i); M intmat, i int
+"USAGE:    delete_row(M,i); M intmat, i int
 RETURN:   intmat, which is derived from M by removing the ith row
-NOTE:     This procedure is only for internal use; it is called in move_row.
+NOTE:     This procedure is only for internal use; it is called in move_row and tau_es.
 "
 {
   if ((i!=1) and (i!=nrows(M)))
@@ -2202,9 +2136,88 @@ NOTE:     This procedure is only for internal use; it is called in move_row.
   {
     return(intmat(intvec(M[1..nrows(M)-1,1..ncols(M)]),nrows(M)-1,ncols(M)));
   }
+}  
+
+static proc delete_col (intmat M, int i)
+"USAGE:    delete_col(M,i); M intmat, i int
+RETURN:   intmat, which is derived from M by removing the ith column
+NOTE:     This procedure is only for internal use; it is called in tau_es.
+"
+{
+  return(transpose(delete_row(transpose(M),i)));
 }
 
 
-  
 
+static proc sort_branches (intmat contact, list graphs, list totmult, list multpl, int k,l)
+"USAGE:    sort_branches(K,L,M,N,k,l); K intmat, L,M,N lists, k,l integers
+ASSUME:   K = contact matrix of the branches of a curve, L = their resolutiongraphs,
+          M = their totalmultiplicities, N = their multiplicities
+RETURN:   list LL, LL[1] transformed K, LL[2..4] transformed L,M,N.
+          The procedure sorts the branches from k+1 to l according to descending contact with 
+          with the branch k.
+NOTE:     This procedure is only for internal use; it is called in totalmultiplicities.
+"
+{
+  intvec max;
+  for (int i=k+1;i<=l;i++)
+  {
+    // Find the last graph max between i and l which has maximal contact with k.
+    max=max_in_intvec(intvec(contact[k,i..l]),1);
+    max[2]=max[2]+i-1;
+    if (i!=max[2])  // If max is not i, then move max to position i!
+    {
+      graphs=insert(graphs,graphs[max[2]],i-1);
+      graphs=delete(graphs,max[2]+1);
+      totmult=insert(totmult,totmult[max[2]],i-1);
+      totmult=delete(totmult,max[2]+1);
+      multpl=insert(multpl,multpl[max[2]],i-1);
+      multpl=delete(multpl,max[2]+1);
+      contact=move_row_col(contact,i,max[2]);
+    }
+  }
+  return(list(contact,graphs,totmult,multpl));
+}
+
+        
+static proc find_last_non_one (intvec v,int k)
+"USAGE:    find_last_non_one (v,k); intvec v, int k
+RETURN:   int i, the last index i>=k such that v[i]!=1, or k-1 if no such i exists.
+NOTE:     This procedure is only for internal use; it is called in tau_es.
+"
+{
+  int i=size(v);
+  while (i>=k)
+  {
+    if (v[i]!=1) 
+    {
+      return(i);
+    }
+    else
+    {
+      i--;
+    }
+  }
+  return(i);
+}
+
+static proc intmat_minus_one (intmat M)
+"USAGE:    intmat_minus_one(M);  intmat M
+RETURN:   intmat, all non-zero entries of M deminuished by 1.
+NOTE:     This procedure is only for internal use; it is called in tau_es.
+"
+{
+  int i,j;
+  for (i=1;i<=nrows(M);i++)
+  {
+    for (j=1;j<=ncols(M);j++)
+    {
+      if (M[i,j]!=0)
+      {
+        M[i,j]=M[i,j]-1;
+      }
+    }
+  }
+  return(M);
+}
 
