@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.9 2001-03-21 15:40:10 Singular Exp $
+@comment $Id: COPYING.texi,v 1.10 2001-03-22 16:54:52 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -28,7 +28,7 @@ the Free Software Foundation; either version 2 of the License, or
 following additional restrictions (which override any conflicting
 restrictions in the GPL):
 
-The following parts of @sc{Singular} have their own copyright: 
+The following software used with @sc{Singular} have their own copyright: 
 the omalloc library, the readline library,
 the Gnu Multiple Precision Library (GMP),
 the Multi Protocol library (MP), the
@@ -48,6 +48,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+(see @uref{http://www.gnu.org/copyleft/gpl.html,,GPL})
 
 Please send any comments or bug reports to
 @email{singular@@mathematik.uni-kl.de}.
