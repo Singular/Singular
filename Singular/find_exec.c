@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !defined(ESINGULAR) && !defined(XSINGULAR)
+#if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include "mmemory.h"
 #endif
 
