@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.66 1998-05-19 08:55:48 wichmann Exp $
+@comment $Id: reference.doc,v 1.67 1998-05-19 09:02:40 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4381,17 +4381,28 @@ keep only the first from identical generators/columns
 @item 8
 keep only the first from generators/columns which differ by a factor
 from the ground field
+@item 16
+keep only the first from generators/columns whose leading monomials
+differ
+@item 32 
+keep only the first from generators/columns whose leading monomials are
+not divisible.
 @end table
 @item @strong{Example:}
 @example
 @c example
-  ring r=0,(x,y,z),(c,dp);
-  simplify(2x,1);
-  simplify([4x,2y],1);
-  ideal i=x,0,2y,0,3z;
-  simplify(i,1+2);
-  matrix A[2][3]=x,0,2x,y,0,2y;
-  simplify(A,2+8); // by automatic conversion to module
+ring r = 0, (x,y,z), (c, dp);
+ideal i = 0, 2x, 2x, 4x, 3x + y, 5x2;
+simplify(i, 1);
+simplify(i, 2);
+simplify(i, 4);
+simplify(i, 8);
+simplify(i, 16);
+simplify(i, 32);
+simplify(i, 32 + 2 + 1);
+
+matrix A[2][3]=x,0,2x,y,0,2y;
+simplify(A,2+8); // by automatic conversion to module
 @c example
 @end example
 @end table

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.13 1998-04-24 16:39:25 Singular Exp $ */
+/* $Id: polys1.cc,v 1.14 1998-05-19 09:02:38 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1237,7 +1237,7 @@ BOOLEAN pEqualPolys(poly p1,poly p2)
   while ((p1 != NULL) && (p2 != NULL))
   {
     /* p1 and p2 are non-NULL, so we may use pComp0 instead of pComp */
-    if (pComp0(p1,p2) != 0)
+    if (! pEqual(p1, p2))
     {
        return FALSE;
     }
@@ -1265,18 +1265,10 @@ BOOLEAN pComparePolys(poly p1,poly p2)
   n=nDiv(pGetCoeff(p1),pGetCoeff(p2));
   while ((p1 != NULL) /*&& (p2 != NULL)*/)
   {
-    for (i=1; i<=pVariables; i++)
+    if ( ! pLmEqual(p1, p2))
     {
-      if (pGetExp(p1,i)!=pGetExp(p2,i))
-      {
         nDelete(&n);
         return FALSE;
-      }
-    }
-    if (pGetComp(p1) != pGetComp(p2))
-    {
-      nDelete(&n);
-      return FALSE;
     }
     if (!nEqual(pGetCoeff(p1),nn=nMult(pGetCoeff(p2),n)))
     {
@@ -1291,38 +1283,3 @@ BOOLEAN pComparePolys(poly p1,poly p2)
   nDelete(&n);
   return TRUE;
 }
-//{
-//  number m=NULL,n=NULL;
-//
-//  while ((p1 != NULL) && (p2 != NULL))
-//  {
-//    if (pComp(p1,p2) != 0)
-//    {
-//      if (n!=NULL) nDelete(&n);
-//      return FALSE;
-//    }
-//    if (n == NULL)
-//    {
-//      n=nDiv(pGetCoeff(p1),pGetCoeff(p2));
-//    }
-//    else
-//    {
-//      m=nDiv(pGetCoeff(p1),pGetCoeff(p2));
-//      if (! nEqual(m,n))
-//      {
-//        nDelete(&n);
-//        nDelete(&m);
-//        return FALSE;
-//      }
-//      nDelete(&m);
-//    }
-//    p1=pNext(p1);
-//    p2=pNext(p2);
-//  }
-//  nDelete(&n);
-//  //if (p1 != p2)
-//  //  return FALSE;
-//  //else
-//  //  return TRUE;
-//  return (p1==p2);
-//}

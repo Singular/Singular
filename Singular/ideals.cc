@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.26 1998-05-14 14:41:28 Singular Exp $ */
+/* $Id: ideals.cc,v 1.27 1998-05-19 09:02:35 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -235,6 +235,64 @@ void idDelEquals(ideal id)
     IDELEMS(id) = l;
   }
 }
+
+//
+// Delete id[j], if Lm(j) == Lm(i) and j > i
+//
+void idDelLmEquals(ideal id)
+{
+  int i, j, t;
+  int k = IDELEMS(id), l = k;
+  for (i=k-2; i>=0; i--)
+  {
+    for (j=l-1; j>i; j--)
+    {
+      if (pLmEqual(id->m[i], id->m[j]))
+      {
+        pDelete(&id->m[j]);
+        l--;
+        for(t=j; t<l; t++)
+        {
+          id->m[t] = id->m[t+1];
+        }
+      }
+    }
+  }
+  if (l != k)
+  {
+    pEnlargeSet(&id->m, k, l-k);
+    IDELEMS(id) = l;
+  }
+}
+          
+void idDelDiv(ideal id)
+{
+  int i, j, t;
+  int k = IDELEMS(id), l = k;
+  for (i=k-2; i>=0; i--)
+  {
+    for (j=l-1; j>i; j--)
+    {
+      
+      if (((id->m[j] != NULL) && pDivisibleBy(id->m[i], id->m[j])) ||
+          (id->m[i] == NULL && id->m[j] == NULL))
+      {
+        pDelete(&id->m[j]);
+        l--;
+        for(t=j; t<l; t++)
+        {
+          id->m[t] = id->m[t+1];
+        }
+      }
+    }
+  }
+  if (l != k)
+  {
+    pEnlargeSet(&id->m, k, l-k);
+    IDELEMS(id) = l;
+  }
+}
+  
 
 /*2
 * copy an ideal

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.6 1998-02-19 12:45:40 siebert Exp $ */
+/* $Id: ideals.h,v 1.7 1998-05-19 09:02:35 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -28,6 +28,8 @@ void idSkipZeroes (ideal ide);
 void idNorm(ideal id);
 void idDelMultiples(ideal id);
 void idDelEquals(ideal id);
+void idDelLmEquals(ideal id);
+void idDelDiv(ideal id);
 
 #ifdef PDEBUG
 void idDBTest(ideal h1,char *f,int l);

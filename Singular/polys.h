@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.12 1998-04-08 12:41:37 pohl Exp $ */
+/* $Id: polys.h,v 1.13 1998-05-19 09:02:38 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -206,16 +206,28 @@ void      pMultN(poly a, number c);
 poly      pMultCopyN(poly a, number c);
 poly      pPower(poly p, int i);
 
-// return TRUE, if exponent and component of p1 and p2 are equal,
-// FALSE otherwise
-#define pEqual(p1, p2) _pEqual(p1, p2)
+// return TRUE, if exponent and component of Lm(p1) and Lm(p2) are equal,
+// FALSE otherwise; 
+#define pEqual(p1, p2) _pEqual(p1, p2) // Assumes p1 != NULL & p2 != NULL
+inline BOOLEAN pLmEqual(poly p1, poly p2) // no assumptions
+{
+  if (p1 != NULL)
+  {
+    if (p2 != NULL)
+      return pEqual(p1, p2);
+    return FALSE;
+  }
+  if (p2 == NULL)
+    return TRUE;
+  return FALSE;
+}
 
 // returns TRUE, if leading monom of a divides leading monom of b
-// i.e., if there exists a expvector c > 0, s.t. b = a + c
+// i.e., if there exists a expvector c > 0, s.t. b = a + c; assumes b != NULL
 #define pDivisibleBy(a, b)  _pDivisibleBy(a,b)
 // like pDivisibleBy, except that it is assumed that a!=NULL
 #define pDivisibleBy1(a,b)   _pDivisibleBy1(a,b)
-// like pDivisibleBy, assumes a != NULL, does not check components
+// like pDivisibleBy1, does not check components
 #define pDivisibleBy2(a, b) _pDivisibleBy2(a,b)
 
 

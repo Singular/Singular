@@ -1735,6 +1735,8 @@ static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
   res->data = (char *)r;
   return (i==-1);
 }
+#define SIMPL_LMDIV 32
+#define SIMPL_LMEQ  16
 #define SIMPL_MULT 8
 #define SIMPL_EQU  4
 #define SIMPL_NULL 2
@@ -1743,6 +1745,14 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
 {
   int sw = (int)v->Data();
   ideal id = (ideal)u->CopyD();
+  if (sw & SIMPL_LMDIV)
+  {
+    idDelDiv(id);
+  }
+  if (sw & SIMPL_LMEQ)
+  {
+    idDelLmEquals(id);
+  }
   if (sw & SIMPL_NULL)
   {
     idSkipZeroes(id);
