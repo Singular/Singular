@@ -3,7 +3,7 @@
  *  Purpose: implementation of main lowl-level alloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocSystem.c,v 1.5 2000-08-24 13:51:23 obachman Exp $
+ *  Version: $Id: omAllocSystem.c,v 1.6 2000-11-06 11:21:16 pohl Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_SYSTEM_C
 #define OM_ALLOC_SYSTEM_C
@@ -14,10 +14,10 @@
 
 /* disable our malloc macros */
 #define OM_NO_MALLOC_MACROS
-#include "omAlloc.h"
+#include "omConfig.h"
 #include "omDefaultConfig.h"
 #include "omMalloc.h"
-
+#include "omAlloc.h"
 /* include after omMalloc.h */
 #include <string.h>
 

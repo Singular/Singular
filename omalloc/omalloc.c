@@ -4,7 +4,7 @@
  *           -- the real version
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omalloc.c,v 1.3 2000-08-14 12:26:50 obachman Exp $
+ *  Version: $Id: omalloc.c,v 1.4 2000-11-06 11:21:17 pohl Exp $
  *******************************************************************/
 
 #include <stdlib.h>
@@ -78,6 +78,8 @@ void* realloc(void* old_addr, size_t new_size)
   }
 }
 
+/* on some systems strdup is a macro -- replace it */
+#undef strdup
 char* strdup(const char* addr)
 {
   char* n_s;
