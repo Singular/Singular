@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.19 2001-01-16 13:48:42 Singular Exp $";
+version="$Id: solve.lib,v 1.20 2001-02-02 16:18:19 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -43,35 +43,35 @@ EXAMPLE: example ures_solve; shows an example
 
     if ( size(#) >= 1 )
     {
-	typ= #[1];
-	if ( typ < 0 || typ > 1 )
-	{
-	    ERROR("Valid values for second parameter k are:
+        typ= #[1];
+        if ( typ < 0 || typ > 1 )
+        {
+            ERROR("Valid values for second parameter k are:
                    0: use sparse Resultant (default)
                    1: use Macaulay Resultant");
-	}
+        }
     }
     if ( size(#) >= 2 )
     {
-	prec= #[2];
-	if ( prec == 0 ) { prec = 30; }
-	if ( prec < 0 )
-	{
-	    ERROR("Third parameter l must be positive!");
-	}    }
+        prec= #[2];
+        if ( prec == 0 ) { prec = 30; }
+        if ( prec < 0 )
+        {
+            ERROR("Third parameter l must be positive!");
+        }    }
     if ( size(#) >= 3 )
     {
-	polish= #[3];
-	if ( polish < 0 || polish > 2 )
-	{
-	    ERROR("Valid values for fourth parameter m are:
+        polish= #[3];
+        if ( polish < 0 || polish > 2 )
+        {
+            ERROR("Valid values for fourth parameter m are:
                    0,1,2: number of iterations for approximation of roots");
-	}
+        }
     }
 
     if ( size(#) > 3 )
     {
-	ERROR("only three parameters allowed!");
+        ERROR("only three parameters allowed!");
     }
 
     return(uressolve(gls,typ,prec,polish));
@@ -113,25 +113,25 @@ EXAMPLE: example laguerre_solve; shows an example
 
     if ( size(#) >= 1 )
     {
-	prec= #[1];
-	if ( prec == 0 ) { prec = 30; }
-	if ( prec < 0 )
-	{
-	    ERROR("Fisrt parameter must be positive!");
-	}
+        prec= #[1];
+        if ( prec == 0 ) { prec = 30; }
+        if ( prec < 0 )
+        {
+            ERROR("Fisrt parameter must be positive!");
+        }
     }
     if ( size(#) >= 2 )
     {
-	polish= #[2];
-	if ( polish < 0 || polish > 2 )
-	{
-	    ERROR("Valid values for third parameter are:
+        polish= #[2];
+        if ( polish < 0 || polish > 2 )
+        {
+            ERROR("Valid values for third parameter are:
                    0,1,2: number of iterations for approximation of roots");
-	}
+        }
     }
     if ( size(#) > 2 )
     {
-	ERROR("only two parameters allowed!");
+        ERROR("only two parameters allowed!");
     }
 
     return(laguerre(f,prec,polish));
@@ -173,17 +173,17 @@ EXAMPLE: example mp_res_mat; shows an example
 
     if ( size(#) == 1 )
     {
-	typ= #[1];
-	if ( typ < 0 || typ > 1 )
-	{
-	    ERROR("Valid values for third parameter are:
+        typ= #[1];
+        if ( typ < 0 || typ > 1 )
+        {
+            ERROR("Valid values for third parameter are:
                    0: sparse resultant (default)
                    1: Macaulay resultant");
-	}
+        }
     }
     if ( size(#) > 1 )
     {
-	ERROR("only two parameters allowed!");
+        ERROR("only two parameters allowed!");
     }
 
     return(mpresmat(i,typ));
@@ -263,7 +263,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc psubst( int d, int dd, int n, list res,
-		    ideal fi, int elem, int nv )
+                    ideal fi, int elem, int nv )
 {
     //   nv: number of ring variables         (fixed value)
     // elem: number of elements in ideal fi   (fixed value)
@@ -281,222 +281,222 @@ static proc psubst( int d, int dd, int n, list res,
 
     if ( dd <= elem )
     {
-	int loop = 1;
-	int k;
-	list lsr,lh;
-	poly ps;
-	int thedd;
+        int loop = 1;
+        int k;
+        list lsr,lh;
+        poly ps;
+        int thedd;
 
-	if ( pdebug>=1 )
-	{"// 1 dd = "+string(dd);}
+        if ( pdebug>=1 )
+        {"// 1 dd = "+string(dd);}
 
-	thedd=0;
-	while ( (dd+1 <= elem) && loop )
-	{
-	    ps= fi[dd+1];
+        thedd=0;
+        while ( (dd+1 <= elem) && loop )
+        {
+            ps= fi[dd+1];
 
-	    if ( n-1 > 0 )
-	    {
-		if ( pdebug>=2 )
-		{
-		    "// 2 ps=fi["+string(dd+1)+"]"+" size="
-			+string(size(coeffs(ps,var(n-1))))
-			+"  leadexp(ps)="+string(leadexp(ps));
-		}
-		if ( size(coeffs(ps,var(n-1))) == 1 )
-		{
-		    dd++;
-		    // hier Leading-Exponent puefen???
-		    // oder ist das Poly immer als letztes in der Liste?!?
-		    // leadexp(ps)
-		}
-		else
-		{
-		    loop=0;
-		}
-	    }
-	    else
-	    {
-		if ( pdebug>=2 )
-		{
-		    "// 2 ps=fi["+string(dd+1)+"]"+"  leadexp(ps)="
-			+string(leadexp(ps));
-		}
-		dd++;
-	    }
-	}
-	thedd=dd;
-	ps= fi[thedd];
+            if ( n-1 > 0 )
+            {
+                if ( pdebug>=2 )
+                {
+                    "// 2 ps=fi["+string(dd+1)+"]"+" size="
+                        +string(size(coeffs(ps,var(n-1))))
+                        +"  leadexp(ps)="+string(leadexp(ps));
+                }
+                if ( size(coeffs(ps,var(n-1))) == 1 )
+                {
+                    dd++;
+                    // hier Leading-Exponent puefen???
+                    // oder ist das Poly immer als letztes in der Liste?!?
+                    // leadexp(ps)
+                }
+                else
+                {
+                    loop=0;
+                }
+            }
+            else
+            {
+                if ( pdebug>=2 )
+                {
+                    "// 2 ps=fi["+string(dd+1)+"]"+"  leadexp(ps)="
+                        +string(leadexp(ps));
+                }
+                dd++;
+            }
+        }
+        thedd=dd;
+        ps= fi[thedd];
 
-	if ( pdebug>=1 )
-	{
-	    "// 3    fi["+string(thedd-1)+"]"+"  leadexp(fi[thedd-1])="
-		+string(leadexp(fi[thedd-1]));
-	    "// 3 ps=fi["+string(thedd)+"]"+"  leadexp(ps)="
-		+string(leadexp(ps));
-	}
+        if ( pdebug>=1 )
+        {
+            "// 3    fi["+string(thedd-1)+"]"+"  leadexp(fi[thedd-1])="
+                +string(leadexp(fi[thedd-1]));
+            "// 3 ps=fi["+string(thedd)+"]"+"  leadexp(ps)="
+                +string(leadexp(ps));
+        }
 
-	for ( k= nv; k > nv-d; k-- )
-	{
-	    if ( pdebug>=2 )
-	    {
-		"// 4 subst(fi["+string(thedd)+"],"
-		    +string(var(k))+","+string(res[k])+");";
-	    }
-	    ps = subst(ps,var(k),res[k]);
-	}
-	
-	if ( pdebug>=2 )
-	{ "// 5 substituted ps="+string(ps); }
+        for ( k= nv; k > nv-d; k-- )
+        {
+            if ( pdebug>=2 )
+            {
+                "// 4 subst(fi["+string(thedd)+"],"
+                    +string(var(k))+","+string(res[k])+");";
+            }
+            ps = subst(ps,var(k),res[k]);
+        }
 
-	if ( ps != 0 )
-	{
-	    lsr= laguerre_solve( ps );
-	}
-	else
-	{
-	    if ( pdebug>=1 )
-	    { "// 30 ps == 0, thats not cool..."; }
-	    lsr=@ln; // lsr=number(0);
-	}
+        if ( pdebug>=2 )
+        { "// 5 substituted ps="+string(ps); }
 
-	if ( pdebug>=1 )
-	{ "// 6 laguerre_solve found roots: lsr["+string(size(lsr))+"]"; }
-	
-	if ( size(lsr) > 1 )
-	{
-	    if ( pdebug>=1 )
-	    {
-		"// 10 checking roots found before, range "
-		    +string(dd-olddd)+" -- "+string(dd);
-		"// 10 thedd = "+string(thedd);
-	    }
-	
-	    int i,j,l;
-	    int ls=size(lsr);
-	    int lss;
-	    poly pss;
-	    list nares;
-	    int rroot;
-	    int nares_size;
+        if ( ps != 0 )
+        {
+            lsr= laguerre_solve( ps );
+        }
+        else
+        {
+            if ( pdebug>=1 )
+            { "// 30 ps == 0, thats not cool..."; }
+            lsr=@ln; // lsr=number(0);
+        }
 
-	
-	    for ( i = 1; i <= ls; i++ ) // lsr[1..ls]
-	    {
-		rroot=1;
+        if ( pdebug>=1 )
+        { "// 6 laguerre_solve found roots: lsr["+string(size(lsr))+"]"; }
 
-		if ( pdebug>=2 )
-		{"// 13 root lsr["+string(i)+"] = "+string(lsr[i]);}
-		for ( l = 0; l <= dd-olddd; l++ )
-		{
-		    if ( l+olddd != thedd )
-		    {
-			if ( pdebug>=2 )
-			{"// 11 checking ideal element "+string(l+olddd);}
-			ps=fi[l+olddd];
-			if ( pdebug>=3 )
-			{"// 14 ps=fi["+string(l+olddd)+"]";}
-			for ( k= nv; k > nv-d; k-- )
-			{
-			    if ( pdebug>=3 )
-			    {
-				"// 11 subst(fi["+string(olddd+l)+"],"
-				    +string(var(k))+","+string(res[k])+");";
-			    }
-			    ps = subst(ps,var(k),res[k]);
-			
-			}
-			
-			pss=subst(ps,var(k),lsr[i]); // k=nv-d
-			if ( pdebug>=3 )
-			{ "// 15 0 == "+string(pss); }
-			if ( pss != 0 )
-			{
-			    if ( system("complexNearZero",
-					leadcoef(pss),
-					myCompDigits) )
-			    {
-				if ( pdebug>=2 )
-				{ "// 16 root "+string(i)+" is a real root"; }
-			    }
-			    else
-			    {
-				if ( pdebug>=2 )
-				{ "// 17 0 == "+string(pss); }
-				rroot=0;
-			    }
-			}
-		
-		    }
-		}
-		
-		if ( rroot == 1 ) // add root to list ?
-		{
-		    if ( size(nares) > 0 )
-		    {
-			nares=nares[1..size(nares)],lsr[i];
-		    }
-		    else
-		    {
-			nares=lsr[i];
-		    }
-		    if ( pdebug>=2 )
-		    { "// 18 added root to list nares"; }
-		}
-	    }
+        if ( size(lsr) > 1 )
+        {
+            if ( pdebug>=1 )
+            {
+                "// 10 checking roots found before, range "
+                    +string(dd-olddd)+" -- "+string(dd);
+                "// 10 thedd = "+string(thedd);
+            }
 
-	    nares_size=size(nares);
-	    if ( nares_size == 0 )
-	    {
-		"Numerical problem: No root found...";
-		"Output may be incorrect!";
-		nares=@ln;
-	    }
-	
-	    if ( pdebug>=1 )
-	    { "// 20 found <"+string(size(nares))+"> roots"; }
+            int i,j,l;
+            int ls=size(lsr);
+            int lss;
+            poly pss;
+            list nares;
+            int rroot;
+            int nares_size;
 
-	    for ( i= 1; i <= nares_size; i++ )
-	    {
-		res[nv-d]= nares[i];
 
-		if ( dd < elem )
-		{
-		    if ( i > 1 )
-		    {
-			rn@++;
-		    }
-		    psubst( d+1, dd+1, n-1, res, fi, elem, nv );
-		}
-		else
-		{
-		    if ( pdebug>=1 )
-		    {"// 30_1 <"+string(rn@)+"> "+string(size(res))+" <-----";}
-		    if ( pdebug>=2 )
-		    { res; }
-		    rlist[rn@]=res;
-		}
-	    }
-	}
-	else
-	{
-	    if ( pdebug>=2 )
-	    { "// 21 found root to be: "+string(lsr[1]); }
-	    res[nv-d]= lsr[1];
+            for ( i = 1; i <= ls; i++ ) // lsr[1..ls]
+            {
+                rroot=1;
 
-	    if ( dd < elem )
-	    {
-		psubst( d+1, dd+1, n-1, res, fi, elem, nv );
-	    }
-	    else
-	    {
-		if ( pdebug>=1 )
-		{ "// 30_2 <"+string(rn@)+"> "+string(size(res))+" <-----";}
-		if ( pdebug>=2 )
-		{ res; }
-		rlist[rn@]=res;
-	    }
-	}
+                if ( pdebug>=2 )
+                {"// 13 root lsr["+string(i)+"] = "+string(lsr[i]);}
+                for ( l = 0; l <= dd-olddd; l++ )
+                {
+                    if ( l+olddd != thedd )
+                    {
+                        if ( pdebug>=2 )
+                        {"// 11 checking ideal element "+string(l+olddd);}
+                        ps=fi[l+olddd];
+                        if ( pdebug>=3 )
+                        {"// 14 ps=fi["+string(l+olddd)+"]";}
+                        for ( k= nv; k > nv-d; k-- )
+                        {
+                            if ( pdebug>=3 )
+                            {
+                                "// 11 subst(fi["+string(olddd+l)+"],"
+                                    +string(var(k))+","+string(res[k])+");";
+                            }
+                            ps = subst(ps,var(k),res[k]);
+
+                        }
+
+                        pss=subst(ps,var(k),lsr[i]); // k=nv-d
+                        if ( pdebug>=3 )
+                        { "// 15 0 == "+string(pss); }
+                        if ( pss != 0 )
+                        {
+                            if ( system("complexNearZero",
+                                        leadcoef(pss),
+                                        myCompDigits) )
+                            {
+                                if ( pdebug>=2 )
+                                { "// 16 root "+string(i)+" is a real root"; }
+                            }
+                            else
+                            {
+                                if ( pdebug>=2 )
+                                { "// 17 0 == "+string(pss); }
+                                rroot=0;
+                            }
+                        }
+
+                    }
+                }
+
+                if ( rroot == 1 ) // add root to list ?
+                {
+                    if ( size(nares) > 0 )
+                    {
+                        nares=nares[1..size(nares)],lsr[i];
+                    }
+                    else
+                    {
+                        nares=lsr[i];
+                    }
+                    if ( pdebug>=2 )
+                    { "// 18 added root to list nares"; }
+                }
+            }
+
+            nares_size=size(nares);
+            if ( nares_size == 0 )
+            {
+                "Numerical problem: No root found...";
+                "Output may be incorrect!";
+                nares=@ln;
+            }
+
+            if ( pdebug>=1 )
+            { "// 20 found <"+string(size(nares))+"> roots"; }
+
+            for ( i= 1; i <= nares_size; i++ )
+            {
+                res[nv-d]= nares[i];
+
+                if ( dd < elem )
+                {
+                    if ( i > 1 )
+                    {
+                        rn@++;
+                    }
+                    psubst( d+1, dd+1, n-1, res, fi, elem, nv );
+                }
+                else
+                {
+                    if ( pdebug>=1 )
+                    {"// 30_1 <"+string(rn@)+"> "+string(size(res))+" <-----";}
+                    if ( pdebug>=2 )
+                    { res; }
+                    rlist[rn@]=res;
+                }
+            }
+        }
+        else
+        {
+            if ( pdebug>=2 )
+            { "// 21 found root to be: "+string(lsr[1]); }
+            res[nv-d]= lsr[1];
+
+            if ( dd < elem )
+            {
+                psubst( d+1, dd+1, n-1, res, fi, elem, nv );
+            }
+            else
+            {
+                if ( pdebug>=1 )
+                { "// 30_2 <"+string(rn@)+"> "+string(size(res))+" <-----";}
+                if ( pdebug>=2 )
+                { res; }
+                rlist[rn@]=res;
+            }
+        }
     }
 }
 
@@ -517,7 +517,7 @@ EXAMPLE: example fglm_solve; shows an example
 
     if ( size(#)>=1  && typeof(#[1])=="int")
     {
-	prec=#[1];
+        prec=#[1];
     }
 
     lex_solve(stdfglm(fi),prec);
@@ -550,8 +550,8 @@ EXAMPLE: example lex_solve; shows an example
 {
     if ( !defined(pdebug) )
     {
-	int pdebug;
-	export pdebug;
+        int pdebug;
+        export pdebug;
     }
     pdebug=0;
 
@@ -560,7 +560,7 @@ EXAMPLE: example lex_solve; shows an example
 
     // change the ground field to complex numbers
     string nrings= "ring "+orings+"C=(real,"+string(prec)
-	+",I),("+varstr(basering)+"),lp;";
+        +",I),("+varstr(basering)+"),lp;";
     execute(nrings);
 
     if ( pdebug>=0 )
@@ -573,24 +573,24 @@ EXAMPLE: example lex_solve; shows an example
     number nn=0;
     if ( !defined(@ln) )
     {
-	list @ln;
-	export @ln;
+        list @ln;
+        export @ln;
     }
     @ln=nn;
 
     // set number of digits for zero-comparison of roots
     if ( !defined(myCompDigits) )
     {
-	int myCompDigits;
-	export  myCompDigits;
+        int myCompDigits;
+        export  myCompDigits;
     }
     if ( size(#)>=1  && typeof(#[1])=="int")
     {
-	myCompDigits=#[1];
+        myCompDigits=#[1];
     }
     else
     {
-	myCompDigits=(system("getPrecDigits")/2);
+        myCompDigits=(system("getPrecDigits")/2);
     }
 
     if ( pdebug>=1 )
@@ -603,14 +603,14 @@ EXAMPLE: example lex_solve; shows an example
 
     if ( !defined(rlist) )
     {
-	list rlist;
-	export rlist;
+        list rlist;
+        export rlist;
     }
 
     if ( !defined(rn@) )
     {
-	int rn@;
-	export rn@;
+        int rn@;
+        export rn@;
     }
     rn@=0;
 
@@ -622,11 +622,11 @@ EXAMPLE: example lex_solve; shows an example
 
     for ( j= 1; j <= lis; j++ )
     {
-	if ( pdebug>=1 )
-	{"// root "+string(j);}
-	rn@++;
-	res[nv]= li[j];
-	psubst( 1, 2, nv-1, res, fi, idelem, nv );
+        if ( pdebug>=1 )
+        {"// root "+string(j);}
+        rn@++;
+        res[nv]= li[j];
+        psubst( 1, 2, nv-1, res, fi, idelem, nv );
     }
 
     if ( pdebug>=0 )
@@ -664,7 +664,7 @@ EXAMPLE: example triangLf_solve; shows an example
 
     if ( size(#)>=1  && typeof(#[1])=="int")
     {
-	prec=#[1];
+        prec=#[1];
     }
 
     triang_solve(triangLfak(stdfglm(fi)),prec);
@@ -699,7 +699,7 @@ EXAMPLE: example triangM_solve; shows an example
 
     if ( size(#)>=1  && typeof(#[1])=="int")
     {
-	prec=#[1];
+        prec=#[1];
     }
 
     triang_solve(triangM(stdfglm(fi)),prec);
@@ -734,7 +734,7 @@ EXAMPLE: example triangL_solve; shows an example
 
     if ( size(#)>=1  && typeof(#[1])=="int")
     {
-	prec=#[1];
+        prec=#[1];
     }
 
     triang_solve(triangL(stdfglm(fi)),prec);
@@ -771,8 +771,8 @@ EXAMPLE: example triang_solve; shows an example
 {
     if ( !defined(pdebug) )
     {
-	int pdebug;
-	export pdebug;
+        int pdebug;
+        export pdebug;
     }
     pdebug=0;
 
@@ -781,7 +781,7 @@ EXAMPLE: example triang_solve; shows an example
 
     // change the ground field to complex numbers
     string nrings= "ring "+orings+"C=(real,"+string(prec)
-	+",I),("+varstr(basering)+"),lp;";
+        +",I),("+varstr(basering)+"),lp;";
     execute(nrings);
 
     if ( pdebug>=0 )
@@ -791,24 +791,24 @@ EXAMPLE: example triang_solve; shows an example
     number nn=0;
     if ( !defined(@ln) )
     {
-	list @ln;
-	export @ln;
+        list @ln;
+        export @ln;
     }
     @ln=nn;
 
     // set number of digits for zero-comparison of roots
     if ( !defined(myCompDigits) )
     {
-	int myCompDigits;
-	export  myCompDigits;
+        int myCompDigits;
+        export  myCompDigits;
     }
     if ( size(#)>=1  && typeof(#[1])=="int" )
     {
-	myCompDigits=#[1];
+        myCompDigits=#[1];
     }
     else
     {
-	myCompDigits=(system("getPrecDigits")/2);
+        myCompDigits=(system("getPrecDigits")/2);
     }
 
     if ( pdebug>=1 )
@@ -821,14 +821,14 @@ EXAMPLE: example triang_solve; shows an example
 
     if ( !defined(rlist) )
     {
-	list rlist;
-	export rlist;
+        list rlist;
+        export rlist;
     }
 
     if ( !defined(rn@) )
     {
-	int rn@;
-	export rn@;
+        int rn@;
+        export rn@;
     }
     rn@=0;
 
@@ -840,31 +840,30 @@ EXAMPLE: example triang_solve; shows an example
 
     for ( i= 1; i <= slfi; i++ )
     {
-	// map fi from old to new ring
-	fi= lfi[i]; //imap(oring,lfi[i]);
-	
-	idelem= size(fi);
+        // map fi from old to new ring
+        fi= lfi[i]; //imap(oring,lfi[i]);
 
-	// solve fi[1]
-	li= laguerre_solve(fi[1],myCompDigits,2);
-	lis= size(li);
+        idelem= size(fi);
 
-	if ( pdebug>=1 )
-	{"// laguerre found roots: "+string(size(li));}
-	
-	for ( j= 1; j <= lis; j++ )
-	{
-	    if ( pdebug>=1 )
-	    {"// root "+string(j);}
-	    rn@++;
-	    res[nv]= li[j];
-	    psubst( 1, 2, nv-1, res, fi, idelem, nv );
-	}
+        // solve fi[1]
+        li= laguerre_solve(fi[1],myCompDigits,2);
+        lis= size(li);
+
+        if ( pdebug>=1 )
+        {"// laguerre found roots: "+string(size(li));}
+
+        for ( j= 1; j <= lis; j++ )
+        {
+            if ( pdebug>=1 )
+            {"// root "+string(j);}
+            rn@++;
+            res[nv]= li[j];
+            psubst( 1, 2, nv-1, res, fi, idelem, nv );
+        }
     }
 
     if ( pdebug>=0 )
     {"// list of roots: "+nameof(rlist);}
-	
     // keep the ring and exit
     keepring basering;
 }
@@ -897,35 +896,35 @@ EXAMPLE: example pcheck; shows an example
 
     if ( size(#)>=1  && typeof(#[1])=="int" )
     {
-	cprec=#[1];
+        cprec=#[1];
     }
     if ( cprec <= 0 )
     {
-	cprec=system("getPrecDigits")/2;
+        cprec=system("getPrecDigits")/2;
     }
 
     nnrfound=1;
     for ( j= 1; j <= size(fi); j++ )
     {
-	for ( i= 1; i <= ss; i++ )
-	{
-	    ps= fi[j];
-	    for ( k= 1; k <= nv; k++ )
-	    {
-		ps = subst(ps,var(k),sols[i][k]);
-	    }
-	    //ps;
-	    nn= leadcoef(ps);
-	    if ( nn != 0 )
-	    {
-		if ( !system("complexNearZero",nn,cprec) )
-		{
-		    " no root: ideal["+string(j)+"]( root "
-			+string(i)+"): 0 != "+string(ps);
-		    nnrfound=0;
-		}
-	    }
-	}
+        for ( i= 1; i <= ss; i++ )
+        {
+            ps= fi[j];
+            for ( k= 1; k <= nv; k++ )
+            {
+                ps = subst(ps,var(k),sols[i][k]);
+            }
+            //ps;
+            nn= leadcoef(ps);
+            if ( nn != 0 )
+            {
+                if ( !system("complexNearZero",nn,cprec) )
+                {
+                    " no root: ideal["+string(j)+"]( root "
+                        +string(i)+"): 0 != "+string(ps);
+                    nnrfound=0;
+                }
+            }
+        }
     }
     return(nnrfound);
 }
@@ -937,7 +936,8 @@ example
     ideal s=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
     lex_solve(stdfglm(s),30);
     rlist;
-    pcheck(rlist);
+    ideal s=imap(r,s);
+    pcheck(s,rlist);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -985,11 +985,11 @@ EXAMPLE: example simplexOut; shows an example
     {
       if ( iposv[i-1] <= N+1 )
       {
-	"x"+string(i-1)+" = "+string(m[1][iposv[i-1]]);
+        "x"+string(i-1)+" = "+string(m[1][iposv[i-1]]);
       }
 //        else
 //        {
-//  	     "Y"; iposv[i-1]-N+1;
+//               "Y"; iposv[i-1]-N+1;
 //        }
     }
   }
@@ -1002,10 +1002,10 @@ example
     // suppose we have the
 
     matrix sm[5][5]=(  0, 1, 1, 3,-0.5,
-		     740,-1, 0,-2, 0,
-		       0, 0,-2, 0, 7,
-		     0.5, 0,-1, 1,-2,
-		       9,-1,-1,-1,-1);
+                     740,-1, 0,-2, 0,
+                       0, 0,-2, 0, 7,
+                     0.5, 0,-1, 1,-2,
+                       9,-1,-1,-1,-1);
 
     // simplex input:
     // 1: matrix
