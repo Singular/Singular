@@ -135,6 +135,18 @@ then
         echo ${prefix}-Unknown
         exit 1
     fi
+# Darwin/MacOS X ##############################################
+elif (echo $uname_a | $egrep "Power Macintosh" > $devnull)
+then
+    prefix="PowerMacintosh"
+    if( uname -s | $egrep "Darwin" > $devnull)
+    then
+        echo ${prefix}-darwin
+        exit 0
+    else
+        echo ${prefix}-Unknown
+        exit 1
+    fi
 else # Unknown ########################################################
     echo Unknown
     exit 2
