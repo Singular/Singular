@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.5 1999-07-02 12:47:47 greuel Exp $";
+version="$Id: solve.lib,v 1.6 1999-07-02 14:33:45 wenk Exp $";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
@@ -8,7 +8,7 @@ AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
  ures_solve(i,..);      find all roots of 0-dimensional ideal i with resultants
  mp_res_mat(i,..);      multipolynomial resultant matrix of ideal i
  laguerre_solve(p,..);  find all roots of univariate polynom p
- interpolate(i,j);      interpolate poly from evaluation points i and results j
+ interpolate(i,j,d);    interpolate poly from evaluation points i and results j
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
