@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.1.1.1 2003-10-06 12:15:55 Singular Exp $ */
+/* $Id: polys1.cc,v 1.2 2004-01-09 10:42:11 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -920,7 +920,17 @@ poly pPermPoly (poly p, int * perm, ring oldRing, nMapFunc nMap,
             else
             {
               lnumber c=(lnumber)pGetCoeff(qq);
-              napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
+              if (c->z->next==NULL)
+                napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
+              else /* more difficult: we have really to multiply: */
+              {
+                lnumber mmc=(lnumber)naInit(1);
+                napSetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
+                napSetm(mmc->z);
+                pGetCoeff(qq)=naMult((number)c,(number)mmc);
+                nDelete((number *)&c);
+                nDelete((number *)&mmc); 
+              }
               mapped_to_par=1;
             }
           }
