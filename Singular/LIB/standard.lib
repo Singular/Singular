@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.21 1998-06-18 17:32:13 Singular Exp $
+// $Id: standard.lib,v 1.22 1998-06-18 17:38:08 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.21 1998-06-18 17:32:13 Singular Exp $";
+version="$Id: standard.lib,v 1.22 1998-06-18 17:38:08 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -460,10 +460,10 @@ proc res(list #)
 }
 
 proc quotient (any m1,any m2,list L)
-USAGE:   quotient(m1, m2[, n]); m1, m2 two submodules of k^s,
+"USAGE:   quotient(m1, m2[, n]); m1, m2 two submodules of k^s,
          n (optional) integer (1<= n <=5)
 RETURN:  the quotient of m1 and m2
-EXAMPLE: example quot; shows an example
+EXAMPLE: example quot; shows an example"
 {
   if (((typeof(m1)!="ideal") and (typeof(m1)!="module"))
      or ((typeof(m2)!="ideal") and (typeof(m2)!="module")))
@@ -505,35 +505,35 @@ example
 }
 
 static proc quot1 (module m1, module m2,int n)
-USAGE:   quot1(m1, m2, n); m1, m2 two submodules of k^s, 
+"USAGE:   quot1(m1, m2, n); m1, m2 two submodules of k^s,
          n integer (1<= n <=5)
 RETURN:  the quotient of m1 and m2
-EXAMPLE: example quot; shows an example
+EXAMPLE: example quot; shows an example"
 {
   if (n==1)
   {
     return(quotient1(m1,m2));
   }
-  else 
-  {   
+  else
+  {
     if (n==2)
     {
       return(quotient2(m1,m2));
     }
-    else 
-    { 
+    else
+    {
       if (n==3)
       {
         return(quotient3(m1,m2));
       }
-      else 
-      { 
+      else
+      {
         if (n==4)
         {
           return(quotient4(m1,m2));
         }
-        else 
-        { 
+        else
+        {
           if (n==5)
           {
             return(quotient5(m1,m2));
@@ -545,7 +545,7 @@ EXAMPLE: example quot; shows an example
         }
       }
     }
-  } 
+  }
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -561,7 +561,7 @@ example
   id8;
 }
 
-static proc quotient0(module a,module b) 
+static proc quotient0(module a,module b)
 {
   module mm=b+a;
   resolution rs=system("LaScala",mm);
@@ -572,8 +572,8 @@ static proc quotient0(module a,module b)
   return (i);
 }
 proc quotient1(module a,module b)  //17sec
-USAGE:   quotient1(m1, m2); m1, m2 two submodules of k^s, 
-RETURN:  the quotient of m1 and m2
+"USAGE:   quotient1(m1, m2); m1, m2 two submodules of k^s,
+RETURN:  the quotient of m1 and m2"
 {
   int i;
   a=std(a);
@@ -584,11 +584,11 @@ RETURN:  the quotient of m1 and m2
   {
      re=intersect1(re,quot(a,module(B[i])));
   }
-  return(re);   
+  return(re);
 }
 proc quotient2(module a,module b)    //13sec
-USAGE:   quotient2(m1, m2); m1, m2 two submodules of k^s, 
-RETURN:  the quotient of m1 and m2
+"USAGE:   quotient2(m1, m2); m1, m2 two submodules of k^s,
+RETURN:  the quotient of m1 and m2"
 {
   a=std(a);
   module dummy;
@@ -618,12 +618,12 @@ RETURN:  the quotient of m1 and m2
     bb[i]=0;
     i = i-1;
   }
-  return(re);   
+  return(re);
 }
 proc quotient3(module a,module b)   //89sec
-USAGE:   quotient3(m1, m2); m1, m2 two submodules of k^s, 
+"USAGE:   quotient3(m1, m2); m1, m2 two submodules of k^s,
          only for global rings
-RETURN:  the quotient of m1 and m2
+RETURN:  the quotient of m1 and m2"
 {
   string s="ring @newr=("+charstr(basering)+
            "),("+varstr(basering)+",@t,@w),dp;";
@@ -641,12 +641,12 @@ RETURN:  the quotient of m1 and m2
   ideal re=quot(a,module(@b));
   setring @newP;
   ideal re=imap(@newr,re);
-  return(re);   
+  return(re);
 }
 proc quotient5(module a,module b)   //89sec
-USAGE:   quotient5(m1, m2); m1, m2 two submodules of k^s, 
+"USAGE:   quotient5(m1, m2); m1, m2 two submodules of k^s,
          only for global rings
-RETURN:  the quotient of m1 and m2
+RETURN:  the quotient of m1 and m2"
 {
   string s="ring @newr=("+charstr(basering)+
            "),("+varstr(basering)+",@t),dp;";
@@ -665,12 +665,12 @@ RETURN:  the quotient of m1 and m2
   ideal re=quot(a,module(@b));
   setring @newP;
   ideal re=imap(@newr,re);
-  return(re);   
+  return(re);
 }
 proc quotient4(module a,module b)   //95sec
-USAGE:   quotient4(m1, m2); m1, m2 two submodules of k^s, 
+"USAGE:   quotient4(m1, m2); m1, m2 two submodules of k^s,
          only for global rings
-RETURN:  the quotient of m1 and m2
+RETURN:  the quotient of m1 and m2"
 {
   string s="ring @newr=("+charstr(basering)+
            "),("+varstr(basering)+",@t),dp;";
@@ -688,7 +688,7 @@ RETURN:  the quotient of m1 and m2
   ideal re=sy;
   setring @newP;
   ideal re=imap(@newr,re);
-  return(re);   
+  return(re);
 }
 static proc intersect1(ideal i,ideal j)
 {
@@ -701,7 +701,7 @@ static proc intersect1(ideal i,ideal j)
   map phi=gnir,maxideal(1);
   return(phi(j));
 }
- 
+
 /*
 proc minres(list #)
 {
