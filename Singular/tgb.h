@@ -27,7 +27,7 @@
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
 #define PAR_N 100
-#define PAR_N_F4 1000
+#define PAR_N_F4 5000
 #define AC_NEW_MIN 2
 #define AC_FLATTEN 1
 //#define FIND_DETERMINISTIC
