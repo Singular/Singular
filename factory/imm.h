@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.14 1998-05-11 10:03:07 schmidt Exp $ */
+/* $Id: imm.h,v 1.15 1998-05-11 10:42:21 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -34,7 +34,7 @@ const INT64 MAXIMMEDIATELL = 268435454i64;
 const INT64 MINIMMEDIATELL = -268435454LL;
 const INT64 MAXIMMEDIATELL = 268435454LL;
 #endif
-#endif
+#endif /* __MWERKS__ */
 
 //{{{ conversion functions
 #ifdef HAS_ARITHMETIC_SHIFT
@@ -269,7 +269,8 @@ inline InternalCF * imm_sub_gf ( const InternalCF * const lhs, const InternalCF 
 #ifdef __MWERKS__
 InternalCF * imm_mul ( InternalCF * lhs, InternalCF * rhs );
 #else
-inline InternalCF * imm_mul ( InternalCF * lhs, InternalCF * rhs )
+inline InternalCF *
+imm_mul ( InternalCF * lhs, InternalCF * rhs )
 {
     INT64 result = (INT64)imm2int( lhs ) * imm2int( rhs );
     if ( ( result > MAXIMMEDIATELL ) || ( result < MINIMMEDIATELL ) ) {
