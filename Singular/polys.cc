@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.7 1997-08-13 13:51:40 Singular Exp $ */
+/* $Id: polys.cc,v 1.8 1997-10-20 10:52:01 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -2103,7 +2103,6 @@ poly pDivide(poly a, poly b)
   int i;
   poly result=pInit();
 
-  memset(result,0, pMonomSize);
   for(i=(int)pVariables; i>=0; i--)
     result->exp[i] = a->exp[i]-b->exp[i];
   pSetm(result);
@@ -2172,8 +2171,7 @@ poly pmInit(char *st, BOOLEAN &ok)
   int i,j;
   ok=FALSE;
   BOOLEAN b=FALSE;
-  poly rc = pNew();
-  memset(rc,0,pMonomSize);
+  poly rc = pInit();
   char *s = nRead(st,&(rc->coef));
   if (s==st)
   /* i.e. it does not start with a coeff: test if it is a ringvar*/

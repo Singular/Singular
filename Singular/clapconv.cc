@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.9 1997-10-13 15:38:58 Singular Exp $
+// $Id: clapconv.cc,v 1.10 1997-10-20 10:51:57 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -124,7 +124,7 @@ convRecPP ( const CanonicalForm & f, int * exp, poly & result )
   else
   {
     poly term = pNew();
-    pNext( term ) = 0;
+    pNext( term ) = NULL;
     for ( int i = 0; i <= pVariables; i++ )
       pGetExp( term, i ) = exp[i];
     if ( getCharacteristic() != 0 )
@@ -255,7 +255,7 @@ convRecPTr ( const CanonicalForm & f, int * exp, alg & result )
   else
   {
     alg term = napNew();
-    napNext( term ) = 0;
+    napNext( term ) = NULL;
     for ( int i = 1; i <= napVariables; i++ )
       napGetExp( term, i ) = exp[i];
     if ( getCharacteristic() != 0 )
@@ -360,7 +360,7 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
     if (z!=NULL)
     {
       poly term = pNew();
-      pNext( term ) = 0;
+      pNext( term ) = NULL;
       for ( int i = 0; i <= pVariables; i++ )
         pGetExp( term, i ) = exp[i];
       pGetCoeff(term)=(number)Alloc0(sizeof(rnumber));

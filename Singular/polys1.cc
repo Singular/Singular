@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.6 1997-09-18 14:08:22 Singular Exp $ */
+/* $Id: polys1.cc,v 1.7 1997-10-20 10:52:03 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -79,8 +79,7 @@ int pIsPurePower(poly p)
 */
 poly pOne(void)
 {
-  poly p=pNew();
-  memset(p,0, pMonomSize);
+  poly p=pInit();
   p->coef = nInit(1);
   return p;
 }
@@ -789,8 +788,7 @@ poly pISet(int i)
   poly rc = NULL;
   if (i!=0)
   {
-    rc = pNew();
-    memset(rc,0,pMonomSize);
+    rc = pInit();
     pSetCoeff0(rc,nInit(i));
     if (nIsZero(pGetCoeff(rc)))
       pDelete1(&rc);
@@ -999,8 +997,7 @@ poly pPermPoly (poly p, int * perm, int OldpVariables,
   {
     if (OldPar==0)
     {
-      qq = pNew();
-      memset(qq,0,pMonomSize);
+      qq = pInit();
       pGetCoeff(qq)=nMap(pGetCoeff(p));
     }
     else

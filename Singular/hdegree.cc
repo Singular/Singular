@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.7 1997-10-19 11:34:23 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.8 1997-10-20 10:51:59 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -1382,8 +1382,8 @@ extern ideal scKBase(int deg, ideal s, ideal Q)
   }
   stcmem = hCreate(pVariables - 1);
   hexist = hInit(s, Q, &hNexist);
-  p = last = pNew();
-  pNext(p) = NULL;
+  p = last = pInit();
+  /*pNext(p) = NULL;*/
   act = (scmon)Alloc((pVariables + 1) * sizeof(short));
   *act = 0;
   if (!hNexist)
