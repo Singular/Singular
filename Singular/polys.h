@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.21 1999-09-27 15:05:30 obachman Exp $ */
+/* $Id: polys.h,v 1.22 1999-09-28 09:31:55 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -387,8 +387,4 @@ BOOLEAN pDBTest(poly p,  memHeap tail_heap, memHeap lm_heap, char *f, int l);
 #define pTest(A)
 #define pDBTest(A,B,C)
 #endif
-
-
-void pAddCompVector(poly p,poly exp);
-void pAddCompVector(poly p,poly exp1, poly exp2);
 #endif

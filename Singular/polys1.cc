@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.26 1999-09-27 15:05:31 obachman Exp $ */
+/* $Id: polys1.cc,v 1.27 1999-09-28 09:31:55 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -299,7 +299,7 @@ static void pMonMult(poly p, poly q)
   //  pAddExp(p,i, pGetExp(q,i));
   //}
   //p->Order += q->Order;
-  pAddCompVector(p,q);
+  pMonAddFast(p,q);
 }
 
 /*3
@@ -310,17 +310,11 @@ static poly pMonMultC(poly p, poly q)
 {
   number x;
   int i;
-  poly r = pInit();
+  poly r = pHead0(p);
 
   x = nMult(pGetCoeff(p),pGetCoeff(q));
   pSetCoeff0(r,x);
-  pSetComp(r, pGetComp(p));
-  //for (i=pVariables; i!=0; i--)
-  //{
-  //  pSetExp(r,i, pGetExp(p,i) + pGetExp(q,i));
-  //}
-  //r->Order = p->Order + q->Order;
-  pAddCompVector(r,p,q);
+  pMonAddFast(r,q);
   return r;
 }
 
@@ -687,6 +681,7 @@ void pSetCompP(poly p, int i)
   while (p!=NULL)
   {
     pSetComp(p, (Exponent_t)i);
+    pSetmComp(p);
     pIter(p);
   }
 }

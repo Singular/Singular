@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.40 1999-09-27 15:05:30 obachman Exp $ */
+/* $Id: polys.cc,v 1.41 1999-09-28 09:31:56 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -925,7 +925,7 @@ poly pMultT(poly a, poly exp )
             return NULL /*FALSE*/;
           }
         }
-        pAddCompVector(a,exp);
+        pMonAddFast(a,exp);
       }
       prev=a;
       pIter(a);
@@ -1935,17 +1935,3 @@ int pWeight(int i)
   return firstwv[i-1];
 }
 
-void pAddCompVector(poly p,poly exp)
-{
-  // p+=exp
-  int i=currRing->ExpLSize-1;
-  for(;i>=0;i--)
-    p->exp.l[i]+=exp->exp.l[i];
-}
-void pAddCompVector(poly p,poly exp1, poly exp2)
-{
-  // p=exp1+exp2
-  int i=currRing->ExpLSize-1;
-  for(;i>=0;i--)
-    p->exp.l[i]=exp1->exp.l[i]+exp2->exp.l[i];
-}
