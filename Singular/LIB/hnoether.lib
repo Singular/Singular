@@ -1,48 +1,45 @@
-// $Id: hnoether.lib,v 1.25 2000-12-19 15:05:27 anne Exp $
-// last change:           31.08.00
+// last change, ML: 31.08.00
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-7 or newer
 
-version="$Id: hnoether.lib,v 1.25 2000-12-19 15:05:27 anne Exp $";
+version="$Id: hnoether.lib,v 1.26 2000-12-22 13:55:14 greuel Exp $";
 category="Singularities";
 info="
-LIBRARY:  hnoether.lib   Procedures for the Hamburger-Noether (Puiseux) development
-
+LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Development 
 AUTHOR:   Martin Lamm,   lamm@mathematik.uni-kl.de
 
 OVERVIEW:
-           A library for computing the Hamburger-Noether resp. Puiseux
-           development of a plane curve singularity following A. Campillo:
-           Algebroid curves in positive characteristic, Lecture Notes in Math.
-           813, Springer (1980).
-           The library contains also procedures for computing the (topological)
-           numerical invariants of plane curve singularities.
+ A library for computing the Hamburger-Noether resp. Puiseux development
+ of a plane curve singularity following A. Campillo: Algebroid curves
+ in positive characteristic, Lecture Notes in Math. 813, Springer (1980).
+ The library contains also procedures for computing the (topological)
+ numerical invariants of plane curve singularities.
 
 MAIN PROCEDURES:
- HNdevelop(f);       Hamburger-Noether development of f
- develop(f [,n]);    Hamburger-Noether development of irreducible curves
- reddevelop(f);      Hamburger-Noether development of reducible curves
- essdevelop(f);      Hamburger-Noether development of essential branches
- extdevelop(hne,n);  extension of the Hamburger-Noether development hne of f
- param(hne [,x]);    returns a parametrization of f (input=output(develop))
- displayHNE(hne);    display Hamburger-Noether development as an ideal
- invariants(hne);    invariants of f, e.g. the characteristic exponents
- displayInvariants(hne);  display invariants of f
- intersection(hne1,hne2); intersection multiplicity of two curves
- multsequence(hne);  sequence of multiplicities
+ HNdevelop(f);              Hamburger-Noether (H-N) development of f
+ develop(f [,n]);           H-N development of irreducible curves
+ reddevelop(f);             H-N development of reducible curves
+ essdevelop(f);             H-N development of essential branches
+ extdevelop(hne,n);         extension of the H-N development hne of f
+ param(hne [,x]);           a parametrization of f (input=output(develop))
+ displayHNE(hne);           display H-N development as an ideal
+ invariants(hne);           invariants of f, e.g. the characteristic exponents
+ multsequence(hne);         sequence of multiplicities
+ displayInvariants(hne);    display invariants of f
+ intersection(hne1,hne2);   intersection multiplicity of two curves
  displayMultsequence(hne);  display sequence of multiplicities
- stripHNE(hne);      reduce amount of memory consumed by hne
- is_irred(f);        test for irreducibility
+ stripHNE(hne);             reduce amount of memory consumed by hne
+ is_irred(f);               test for irreducibility
 
 AUXILIARY PROCEDURES:
- puiseux2generators(m,n); convert Puiseux pairs to generators of semigroup
- multiplicities(hne);     multiplicities of blowed up curves
- separateHNE(hne1,hne2);  number of quadratic transf. needed for separation
- squarefree(f);      returns a squarefree divisor of the poly f
- allsquarefree(f,l); returns the maximal squarefree divisor of the poly f
- further_hn_proc();  show further procedures useful for interactive use
+ puiseux2generators(m,n);   convert Puiseux pairs to generators of semigroup
+ multiplicities(hne);       multiplicities of blowed up curves
+ separateHNE(hne1,hne2);    number of quadratic transf. needed for separation
+ squarefree(f);             a squarefree divisor of the poly f
+ allsquarefree(f,l);        the maximal squarefree divisor of the poly f
+ further_hn_proc();         show further procedures useful for interactive use
 
-KEYWORDS: Hamburger-Noether expansion; curve singularities
+KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities
 ";
 ///////////////////////////////////////////////////////////////////////////////
 LIB "primitiv.lib";

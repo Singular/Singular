@@ -1,12 +1,10 @@
-// $Id: general.lib,v 1.29 2000-12-19 14:37:25 anne Exp $
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: general.lib,v 1.29 2000-12-19 14:37:25 anne Exp $";
+version="$Id: general.lib,v 1.30 2000-12-22 13:52:31 greuel Exp $";
 category="General purpose";
 info="
-LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
+LIBRARY:  general.lib   Elementary Computations of General Type
 
 PROCEDURES:
  A_Z(\"a\",n);          string a,b,... of n comma separated letters
@@ -1032,7 +1030,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc watchdog(int i, string cmd)
-"USAGE  : watchdog(i,cmd); i -- integer; cmd -- string
+"USAGE  : watchdog(i,cmd); i integer; cmd string
 RETURNS: Result of cmd, if the result can be computed in 
          i seconds. Otherwise the computation is interrupted after
          i seconds, the string "Killed" is returned and the global
@@ -1131,7 +1129,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc deleteSublist(intvec v,list l)
-"USAGE:   deleteSublist(v,l); -- intvec v; list l
+"USAGE:   deleteSublist(v,l); intvec v; list l
          where the entries of the integer vector v correspond to the
          positions of the elements to be deleted
 RETURN:  list without the deleted elements
