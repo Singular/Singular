@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.28 1998-04-28 17:57:52 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.29 1998-05-18 17:23:00 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -473,18 +473,32 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 }
 static BOOLEAN jiA_RING(leftv res, leftv a, Subexpr e)
 {
+  BOOLEAN have_id=TRUE;
   if ((e!=NULL)||(res->rtyp!=IDHDL))
   {
-    WerrorS("id expected");
-    return TRUE;
+    //WerrorS("id expected");
+    //return TRUE;
+    have_id=FALSE;
   }
   ring r=(ring)a->Data();
-  idhdl rl=(idhdl)res->data;
-  if (&IDRING(rl)!=NULL) rKill(rl);
+  if (have_id)
+  {
+    idhdl rl=(idhdl)res->data;
+    if (&IDRING(rl)!=NULL) rKill(rl);
+    IDRING(rl)=r;
+    if ((IDLEV((idhdl)a->data)!=myynest) && (r==currRing))
+      currRingHdl=(idhdl)res->data;
+  }
+  else
+  {
+    if (e==NULL) res->data=(char *)r;
+    else
+    {
+      WerrorS("id expected");
+      return TRUE;
+    }
+  }
   r->ref++;
-  IDRING(rl)=r;
-  if ((IDLEV((idhdl)a->data)!=myynest) && (r==currRing))
-    currRingHdl=(idhdl)res->data;
   return FALSE;
 }
 /*=================== table =================*/
