@@ -128,6 +128,12 @@ then reduced modulo p, and leading zeros stripped.
 *********************************************************************/
 
 
+NTL_SNS istream& operator>>(NTL_SNS istream& s, ZZ_pX& x);
+NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const ZZ_pX& a);
+
+
+
+
 /**********************************************************
 
                    Some utility routines
@@ -993,6 +999,10 @@ inline ZZ_pX interpolate(const vec_ZZ_p& a, const vec_ZZ_p& b)
 NTL_vector_decl(ZZ_pX,vec_ZZ_pX)
 
 NTL_eq_vector_decl(ZZ_pX,vec_ZZ_pX)
+
+NTL_io_vector_decl(ZZ_pX,vec_ZZ_pX)
+
+
 
 /**********************************************************
 

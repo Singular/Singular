@@ -8,6 +8,7 @@
 NTL_OPEN_NNS
 
 NTL_matrix_decl(zz_p,vec_zz_p,vec_vec_zz_p,mat_zz_p)
+NTL_io_matrix_decl(zz_p,vec_zz_p,vec_vec_zz_p,mat_zz_p)
 NTL_eq_matrix_decl(zz_p,vec_zz_p,vec_vec_zz_p,mat_zz_p)
 
 

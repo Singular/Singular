@@ -10,7 +10,7 @@ The class quad_float is used to represent quadruple precision numbers.
 Thus, with standard IEEE floating point, you should get the equivalent
 of about 106 bits of precision (but actually just a bit less).
 
-The interface allows you to treat quad_floats as if they were
+The interface allows you to treat quad_floats more or less as if they were
 "ordinary" floating point types.
 
 See below for more implementation details.
@@ -203,10 +203,18 @@ not really the equivalent of quadratic precision (despite the name).
 For example, the number 1 + 2^{-200} can be represented exactly as
 a quad_float.  Also, there is no real notion of "machine precision".
 
+Note that overflow/underflow for quad_floats does not follow any particularly
+useful rules, even if the underlying floating point arithmetic is IEEE
+compliant.  Generally, when an overflow/underflow occurs, the resulting value
+is unpredicatble, although typically when overflow occurs in computing a value
+x, the result is non-finite (i.e., IsFinite(&x) == 0).  Note, however, that
+some care is taken to ensure that the ZZ to quad_float conversion routine
+produces a non-finite value upon overflow.
+
 THE INTEL x86 PROBLEM
 
 Although just about every modern processor implements the IEEE
-floating point standard, there is still can be problems
+floating point standard, there still can be problems
 on processors that support IEEE extended double precision.
 The only processor I know of that supports this is the x86/Pentium.
 
@@ -222,6 +230,9 @@ whenever they want, which can effectively change the value
 of a floating point number even though at the C/C++ level,
 nothing has happened that should have changed the value.
 Is that sick, or what?
+Actually, the new C99 standard seems to outlaw such "spontaneous"
+value changes; however, this behavior is not necessarily
+universally implemented.
 
 This is a real headache, and if one is not just a bit careful,
 the quad_float code will break.  This breaking is not at all subtle,
@@ -251,7 +262,7 @@ On the one hand, this is not a general, portable solution,
 since it will only work if you use a GNU compiler, or at least one that
 supports GNU 'asm' syntax.  
 On the other hand, almost everybody who compiles C++ on x86/Linux
-platforms uses GNU compilers (although are some commercial
+platforms uses GNU compilers (although there are some commercial
 compilers out there that I don't know too much about).
 
 The third way to fix the problem is to 'force' all intermediate

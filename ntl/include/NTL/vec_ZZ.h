@@ -11,6 +11,8 @@ NTL_vector_decl(ZZ,vec_ZZ)
 
 NTL_eq_vector_decl(ZZ,vec_ZZ)
 
+NTL_io_vector_decl(ZZ,vec_ZZ)
+
 void mul(vec_ZZ& x, const vec_ZZ& a, const ZZ& b);
 inline void mul(vec_ZZ& x, const ZZ& a, const vec_ZZ& b)
    { mul(x, b, a); }

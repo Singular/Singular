@@ -28,14 +28,27 @@ void PrintTime(ostream& s, double t);
 void Error(const char *s);
 // print an error message and call abort
 
+long IsWhiteSpace(long c);
+// returns 1 if c is "wite space" (as defined by isspace is the
+// standard library...usually blanks, tabs, newlines), and 0 otherwise.
+
 long SkipWhiteSpace(istream& s);
-// skips white space (blanks, tabs, newlines).
+// skips white space (as defined by IsWhiteSpace).
 // Return value is 0 if end-of-file is reached; otherwise,
 // return value is 1.
 
 // This routine is useful in conjuction with input routines,
 // like NTL's, that raise an error if an input item is
 // ill-formed or missing.  
+
+
+long CharToIntVal(long c);
+// returns the hexidecimal value of c if c is '0'..'9', 'A'..'F', or 'a'..'f';
+// otherwise, the return value is -1.
+
+char IntValToChar(long x);
+// returns the hexadecimal digit '0'..'9', 'a'..'f' representing x;
+// an error is raised if x < 0 or x > 15.
 
 long IsFinite(double *p);
 // Returns 1 if *p is a "finite" floating point number.
@@ -83,4 +96,6 @@ void swap(int& a, int& b);
 
 #define NTL_EXT_DOUBLE         (...)  /* 1 if platform has "extended" doubles;
                                         0 otherwise */
+
+
 

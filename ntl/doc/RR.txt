@@ -16,8 +16,7 @@ The arithmetic operations always round their results to p bits, where
 p is the current precision.  The current precision can be changed
 using RR::SetPrecision(), and can be read using RR::precision().  
 
-The minimum precision that can be set is 53 bits (but see 
-IMPLEMENTATION NOTES below).
+The minimum precision that can be set is 53 bits.
 The maximum precision is limited only by the word size of the machine.
 
 All arithmetic operations are implemented so that the effect is as if the
@@ -108,6 +107,7 @@ SIZE INVARIANT: max(NumBits(x), |e|) < 2^(NTL_BITS_PER_LONG-4)
 
 
 
+
 #include <NTL/ZZ.h>
 #include <NTL/xdouble.h>
 #include <NTL/quad_float.h>
@@ -123,9 +123,7 @@ RR& operator=(const RR& a); // assignment operator
 
 // NOTE: the copy constructor and assignment operator
 // produce exact copies of their inputs, and do not round
-// to current precision.  This is a change in semantics
-// from versions 2.0 and earlier, in which the outputs were 
-// rounded to current precision.
+// to current precision.  
 
 RR& operator=(double a); // convert and assign
 
@@ -354,11 +352,6 @@ ZZ RoundToZZ(const RR& a);            // ties are rounded to an even integer
 \**************************************************************************/
 
 
-void RoundToPrecision(RR& z, const RR& a, long p);
-RR RoundToPrecision(const RR& a, long p);
-// z = (a rounded to p bits of precsion);
-// must have p > 0.
-
 void MakeRR(RR& z, const ZZ& a,  long e);
 RR MakeRR(const ZZ& a,  long e);
 // z = a*2^e, rounded to current precision
@@ -368,7 +361,6 @@ RR random_RR();
 // z = pseudo-random number in the range [0,1).
 // Note that the behaviour of this function is somewhat platform
 // dependent, because the underlying pseudo-ramdom generator is.
-
 
 
 void SqrRoot(RR& z, const RR& a); // z = sqrt(a);
@@ -418,37 +410,123 @@ The current value of p is returned by a call to RR::OutputPrecision().
 ostream& operator<<(ostream& s, const RR& a);
 istream& operator>>(istream& s, RR& x);
 
-
 /**************************************************************************\
 
-                        IMPLEMENTATION NOTES
 
-The current working precision is stored in a global variable
-called RR::prec.
-When you call RR::SetPrecision(p), then RR::prec is set
-to max(53, p).
+            Specialized routines with explicit precision parameter
 
-"Casual users" should only set RR::prec through the SetPrecision routine.
-At some point in time, I decided to make the routine SetPrecision enforce
-the invariant RR::prec >= 53, which seemed convenient for several reasons.
-I don't know if this is still a good idea, but it seems like an
-even worse idea to change the semantics now.
+These routines take an explicit precision parameter p.  The value of p may be
+any positive integer.  All results are computed to *precisely* p bits of
+precision, regardless of the current precision (as set by RR::SetPrecision).
 
-
-RR::prec can be set (with an assignment statement) to any value p
-such that
-    0 < p < (1L << (NTL_BITS_PER_LONG-4))
-and any of the basic functions, 
-including arithmetic (+,-,*,/), sqrt, input, conversion, rounding,
-will work correctly.
-Indeed, a number of routines in RR.c exploit this "feature".
-
-However, it is not necessarily safe to call any other routines
-when RR::prec is so small.
-A number of strange things can happening, and so it is best
-to simply avoid this.
-
+These routines are provided both for convenience and for situations where the
+computation must be done with a precision that may be less than 53.
 
 
 \**************************************************************************/
+
+
+
+
+void AddPrec(RR& z, const RR& a, const RR& b, long p); // z = a + b
+RR AddPrec(const RR& a, const RR& b, long p);
+
+void SubPrec(RR& z, const RR& a, const RR& b, long p); // z = a - b
+RR SubPrec(const RR& a, const RR& b, long p);
+
+void NegatePrec(RR& z, const RR& a, long p); // z = -a
+RR NegatePrec(const RR& a, long p);
+
+void AbsPrec(RR& z, const RR& a, long p); // z = |a|
+RR AbsPrec(const RR& a, long p);
+
+void MulPrec(RR& z, const RR& a, const RR& b, long p); // z = a*b
+RR MulPrec(const RR& a, const RR& b, long p);
+
+void SqrPrec(RR& z, const RR& a, long p); // z = a*a
+RR SqrPrec(const RR& a, long p);
+
+void DivPrec(RR& z, const RR& a, const RR& b, long p);  // z = a/b
+RR DivPrec(const RR& a, const RR& b, long p);
+
+void InvPrec(RR& z, const RR& a, long p);  // z = 1/a
+RR DivPrec(const RR& a, long p);
+
+void SqrRootPrec(RR& z, const RR& a, long p); // z = sqrt(a)
+RR SqrRootPrec(const RR& a, long p);
+
+void TruncPrec(RR& z, const RR& a, long p); // z = a, truncated to 0
+RR TruncPrec(const RR& a, long p);
+
+void FloorPrec(RR& z, const RR& a, long p); // z = a, truncated to -infinity
+RR FloorPrec(const RR& a, long p);
+
+void CeilPrec(RR& z, const RR& a, long p);  // z = a, truncated to +infinity
+RR CeilPrec(const RR& a, long p);
+
+void RoundPrec(RR& z, const RR& a, long p); // z = a, 
+                                            // truncated to nearest integer,
+                                            // ties are roundec to an even 
+                                            // integer
+RR RoundPrec(const RR& a, long p);
+
+void ConvPrec(RR& z, const RR& a, long p); // z = a
+RR ConvPrec(const RR& a, long p);
+
+void ConvPrec(RR& z, const ZZ& a, long p); // z = a
+RR ConvPrec(const ZZ& a, long p);
+
+void ConvPrec(RR& z, long a, long p); // z = a
+RR ConvPrec(long a, long p);
+
+void ConvPrec(RR& z, int a, long p); // z = a
+RR ConvPrec(int a, long p);
+
+void ConvPrec(RR& z, unsigned long a, long p); // z = a
+RR ConvPrec(unsigned long a, long p);
+
+void ConvPrec(RR& z, unsigned int a, long p); // z = a 
+RR ConvPrec(unsigned int a, long p);
+
+void ConvPrec(RR& z, double a, long p); // z = a
+RR ConvPrec(double a, long p);
+
+void ConvPrec(RR& z, const xdouble& a, long p); // z = a
+RR ConvPrec(const xdouble& a, long p);
+
+void ConvPrec(RR& z, const quad_float& a, long p); // z = a
+RR ConvPrec(const quad_float& a, long p);
+
+void ConvPrec(RR& z, const char *s, long p); // read z from s
+RR ConvPrec(const char *s, long p);
+
+void InputPrec(RR& z, istream& s, long p); // read z from s
+RR InputPrec(istream& s, long p);
+
+void MakeRRPrec(RR& z, const ZZ& a, long e, long p); // z = a*2^e
+RR MakeRRPrec(const ZZ& a, long e, long p);
+
+
+/**************************************************************************\
+
+COMPATABILITY NOTES: 
+
+ (1)  Prior to version 5.3, the documentation indicated that under certain
+      circumstances, the value of the current precision could be directly set
+      by setting the variable RR::prec.  Such usage is now considered
+      obsolete.  To perform computations using a precision of less than 53
+      bits, users should use the specialized routines AddPrec, SubPrec, etc.,
+      documented above.
+
+ (2)  The routine RoundToPrecision is obsolete, although for backward
+      compatability, it is still declared (in both procedural and function
+      forms), and is equivalent to ConvPrec.
+
+ (3)  In versions 2.0 and earlier, the assignment operator and copy
+      constructor for the class RR rounded their outputs to the current
+      precision.  This is no longer the case:  their outputs are now exact
+      copies of their inputs, regardless of the current precision.
+
+\**************************************************************************/
+
 

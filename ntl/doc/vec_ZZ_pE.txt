@@ -52,7 +52,7 @@ void InnerProduct(ZZ_pE& x, const vec_ZZ_pE& a, const vec_ZZ_pE& b);
 
 void InnerProduct(ZZ_pE& x, const vec_ZZ_pE& a, const vec_ZZ_pE& b,
                   long offset);
-// x = sum_{i=offset}^n a[i]*b[i-offset], where n = min(a.length(),
+// x = sum_{i=offset}^{n-1} a[i]*b[i-offset], where n = min(a.length(),
 // b.length()+offset)
 
 void VectorCopy(vec_ZZ_pE& x, const vec_ZZ_pE& a, long n);

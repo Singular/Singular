@@ -77,6 +77,11 @@ in a vector should be "relocatable"---that is, they shouldn't care
 what their actual address is, which may change over time.
 Most reasonable objects satisfy this constraint.
 
+v.allocated() is the number of elements which have been allocated,
+which may be more than the number elements initialized.
+Note that if n <= v.allocated(), then v.SetLength(n) is guaranteed
+not to cause any memory allocation, or movement of objects.
+
 \**************************************************************************/
 
 class vec_T {  
@@ -156,12 +161,27 @@ public:
    long MaxLength() const;
    // maximum length, i.e., number of allocated and initialized elements
 
+   long allocated() const;
+   // the number of objects for which space has been allocated, but not
+   // necessarily initialized;  this may be larger than MaxLength().
+
    T& RawGet(long i);
    const T& RawGet(long i) const;
    // indexing with no range checking
 
    long position(const T& a) const;
-   // returns position of a in the vector, or -1 if it is not there
+   // returns position of a in the vector, or -1 if it is not there.
+   // The search is conducted from position 0 to MaxAlloc()-1 of the vector, 
+   // and an error is raised if the object is found at position MaxLength()
+   // or higher (in which case a references an uninitialized object).
+   // Note that if NTL_CLEAN_PTR flag is set, this routine takes
+   // linear time, and otherwise, it takes constant time.
+
+   long position1(const T& a) const;
+   // returns position of a in the vector, or -1 if it is not there.
+   // The search is conducted from position 0 to length()-1 of the vector.
+   // Note that if NTL_CLEAN_PTR flag is set, this routine takes
+   // linear time, and otherwise, it takes constant time.
          
 };   
 

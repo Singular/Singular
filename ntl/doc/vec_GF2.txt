@@ -73,14 +73,25 @@ public:
    void SetLength(long n); // set length to n bits
    void SetMaxLength(long n); // allocate space for n bits
 
-   long length(); // bit length
-   long MaxLength(); // max allocated bit length
-   // SIZE INVARIANT: length() <= MaxLength() < 2^(NTL_BITS_PER_LONG-4)
+   long length() const; // current length, in bits
+
+   long MaxLength() const; // maximum length, i.e., the maximum
+                           // value passed to either SetLength or SetMaxLength
+                           // since creation or last kill
+
+   long allocated() const; // number of bits for which space is allocated;
+                           // if n <= v.allocated(), then v.SetLength(n)
+                           // will not result in any memory re-allocation.
+
+   // INVARIANT: 
+   //    length() <= MaxLength() <= allocated() < 2^(NTL_BITS_PER_LONG-4)
+
+   
 
    void FixLength(long n); // fix length to n bits
       // can only be applied after default initialization or kill
 
-   long fixed(); // test if length has been fixed
+   long fixed() const; // test if length has been fixed
 
    void kill(); // free space and make length 0
 

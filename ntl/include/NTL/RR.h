@@ -327,6 +327,10 @@ void ConvPrec(RR& z, const char *s, long p);
 inline RR ConvPrec(const char *s, long p)
    { RR z; ConvPrec(z, s, p); NTL_OPT_RETURN(RR, z); }
 
+void InputPrec(RR& z, NTL_SNS istream& s, long p);
+inline RR InputPrec(NTL_SNS istream& s, long p)
+   { RR z; InputPrec(z, s, p); NTL_OPT_RETURN(RR, z); }
+
 void MakeRRPrec(RR& z, const ZZ& a, long e, long p);
 inline RR MakeRRPrec(const ZZ& a, long e, long p)
    { RR z; MakeRRPrec(z, a, e, p); NTL_OPT_RETURN(RR, z); }
@@ -437,6 +441,9 @@ void power2(RR& z, long e);
 
 inline RR power2_RR(long e)
    { RR z; power2(z, e); NTL_OPT_RETURN(RR, z); }
+
+NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const RR& a);
+NTL_SNS istream& operator>>(NTL_SNS istream& s, RR& x);
 
 
 void SqrRoot(RR& x, const RR& a);

@@ -10,8 +10,8 @@ allocate a vector of ZZ's of a specified length, where the maximum
 size of each ZZ is also specified.  The size is measured in terms
 of the number of zzigits.
 
-These parameters can be specified once, either with a constructor, 
-or with SetSize.  It is an error to try to re-size a vector, 
+These parameters can be specified either with a constructor 
+or with SetSize.  It is an error to try to re-size a vector of non-zero length,
 or store a ZZ that doesn't fit.  The space can be released with "kill", 
 and then you are free to call SetSize again.  
 

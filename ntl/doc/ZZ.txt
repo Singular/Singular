@@ -47,6 +47,7 @@ public:
 // 2^(NTL_BITS_PER_LONG-4).
 
 
+
 /**************************************************************************\
 
                                  Comparison
@@ -389,7 +390,7 @@ long NumBits(long a);
 
 long bit(const ZZ& a, long k);
 long bit(long a, long k); 
-// returns bit k of a, position 0 being the low-order bit.
+// returns bit k of |a|, position 0 being the low-order bit.
 // If  k < 0 or k >= NumBits(a), returns 0.
 
 

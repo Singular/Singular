@@ -163,7 +163,7 @@ These flags can be useful on other platforms as well,
 especially on processors with slow int/float conversion.
 
 <li>
-The best thing is to experiment, and compile and run program <tt>Test</tt>
+The best thing is to experiment, and compile and run program <tt>QuickTest</tt>
 to see the impact on the running time of various basic operations.
 </ul>
 </dl>
@@ -251,7 +251,7 @@ While these steps seem to do the job,
 there may be other steps that work better.
 
 The following steps may be used to build the library,
-and to build and run program <tt>Test</tt>, as a simple
+and to build and run program <tt>QuickTest</tt>, as a simple
 <i>console application</i>, using the library.
 The instructions assume you have already 
 unzipped NTL into a directory <tt>c:\mystuff</tt>,
@@ -277,11 +277,11 @@ File -&gt; New -&gt; Projects
    Click on OK
 
 Project -&gt; Add to Project -&gt; Files
-   select all files in c:\mystuff\WinNTL-5_1a\src and click on OK.
+   select all files in c:\mystuff\WinNTL-xxx\src and click on OK.
 
 Project -&gt; Settings -&gt; C/C++ 
    Category: Preprocessor.
-   Additional include directories: c:\mystuff\WinNTL-5_1a\include.
+   Additional include directories: c:\mystuff\WinNTL-xxx\include.
    Click on OK.
 
 Build -&gt; build ntl.lib
@@ -296,7 +296,7 @@ File -&gt; New -&gt; Projects -&gt; Win32 Console Application
    Click on OK
 
 Project -&gt; Add to Project -&gt; Files
-   select the file c:\mystuff\WinNTL-5_1a\tests\Test.cpp
+   select the file c:\mystuff\WinNTL-xxx\tests\QuickTest.cpp
    Click on OK
 
 Project -&gt; Add to Project -&gt; Files
@@ -308,7 +308,7 @@ Project -&gt; Add to Project -&gt; Files
 
 Project -&gt; Settings -&gt; C/C++ 
    Category: Preprocessor.
-   Additional include directories: c:\mystuff\WinNTL-5_1a\include.
+   Additional include directories: c:\mystuff\WinNTL-xxx\include.
    Click on OK.
 
 Build -&gt; build test.exe

@@ -84,13 +84,20 @@ class mat_T {
    const T& operator()(long i, long j) const; 
    // access element (i, j), both indices starting at 1
 
-   friend const vec_vec_T& rep(const mat_T& a);
-   // read-only access to underlying representation
-
    long position(const vec_T& a) const;
-   // returns index of a in matrix, or -1 if not present
+   // returns index of a in matrix, or -1 if not present;
+   // equivalent to rep(*this).position(a).
+
+
+   long position1(const vec_T& a) const;
+   // returns index of a in matrix, or -1 if not present;
+   // equivalent to rep(*this).position1(a).
+
 
 };
+
+const vec_vec_T& rep(const mat_T& a);
+// read-only access to underlying representation
 
 void swap(mat_T& X, mat_T& Y);
 // swaps X and Y (by swapping pointers)

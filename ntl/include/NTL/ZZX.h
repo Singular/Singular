@@ -75,6 +75,29 @@ ZZX(ZZX& x, INIT_TRANS_TYPE) : rep(x.rep, INIT_TRANS) { }
 
 
 
+/********************************************************************
+
+                           input and output
+
+I/O format:
+
+   [a_0 a_1 ... a_n],
+
+represents the polynomial a_0 + a_1*X + ... + a_n*X^n.
+
+On output, all coefficients will be integers between 0 and p-1,
+amd a_n not zero (the zero polynomial is [ ]).
+Leading zeroes are stripped.
+
+*********************************************************************/
+
+
+NTL_SNS istream& operator>>(NTL_SNS istream& s, ZZX& x);
+NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const ZZX& a);
+
+
+
+
 /**********************************************************
 
                    Some utility routines
@@ -694,6 +717,8 @@ long CRT(ZZX& a, ZZ& prod, const ZZ_pX& A);
 NTL_vector_decl(ZZX,vec_ZZX)
 
 NTL_eq_vector_decl(ZZX,vec_ZZX)
+
+NTL_io_vector_decl(ZZX,vec_ZZX)
 
 NTL_CLOSE_NNS
 

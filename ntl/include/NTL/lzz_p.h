@@ -341,6 +341,13 @@ inline zz_p random_zz_p()
    { zz_p x; random(x); return x; }
 
 
+// ****** input/output
+
+NTL_SNS ostream& operator<<(NTL_SNS ostream& s, zz_p a);
+   
+NTL_SNS istream& operator>>(NTL_SNS istream& s, zz_p& x);
+
+
 NTL_CLOSE_NNS
 
 #endif

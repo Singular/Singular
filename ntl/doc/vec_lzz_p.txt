@@ -56,7 +56,7 @@ void InnerProduct(zz_p& x, const vec_zz_p& a, const vec_zz_p& b);
 
 void InnerProduct(zz_p& x, const vec_zz_p& a, const vec_zz_p& b,
                   long offset);
-// x = sum_{i=offset}^n a[i]*b[i-offset], where n = min(a.length(),
+// x = sum_{i=offset}^{n-1} a[i]*b[i-offset], where n = min(a.length(),
 // b.length()+offset)
 
 long CRT(vec_ZZ& a, ZZ& prod, const vec_zz_p& A);

@@ -77,7 +77,12 @@ public:
    const_subscript_GF2 operator()(long i, long j) const;
 
    long position(const vec_GF2& a) const;
-   // returns index of a in matrix, or -1 if not present
+   // returns index of a in matrix, or -1 if not present;
+   // equivalent to rep(*this).position(a);
+
+   long position1(const vec_GF2& a) const;
+   // returns index of a in matrix, or -1 if not present;
+   // equivalent to rep(*this).position1(a);
   
    void kill(); // free space and make 0 x 0.
 

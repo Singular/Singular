@@ -223,7 +223,7 @@ it copies the file into <tt>GetTime.c</tt>.
 
 <p>
 <li>
-The files "<tt>lip_gmp_aux.c</tt>" and "<tt>../include/NTL/gmp_aux.h</tt>"
+The files "<tt>lip_gmp_aux_impl.h</tt>" and "<tt>../include/NTL/gmp_aux.h</tt>"
 are generated for use with GMP.
 If not using GMP, these files are still created, but they are empty.
 
@@ -258,7 +258,8 @@ and then creates the library "<tt>ntl.a</tt>" in the current directory.
 </ol>
 
 <p>
-Note that for finer control  you can optionally  break up this process into the four
+Note that for finer control  you can optionally  break up this process 
+into the five
 component steps:
 <pre>
    % make setup1
@@ -318,7 +319,7 @@ Assuming you have installed NTL as above,
 to compile a program <tt>foo.c</tt> that uses NTL,
 execute
 <pre>
-   g++ -I&lt;prefix&gt;/include; -L&lt;prefix&gt;/lib foo.c -o foo -lntl -lm
+   g++ -I&lt;prefix&gt;/include -L&lt;prefix&gt;/lib foo.c -o foo -lntl -lm
 </pre>
 This compiles <tt>foo.c</tt> as a <tt>C++</tt> program
 and creates the binary <tt>foo</tt>.
@@ -341,60 +342,8 @@ If you <i>are</i> working in that directory, you can just execute
    make foo
 </pre>
 
-<p>
 
-<p>
-
-<p>
-<b>Known build problems.</b>
-
-<p>
-NTL should compile without errors.
-The only known problems on Unix systems are due to compiler bugs.
-In particular, some versions of <tt>g++</tt> on some platforms
-may cause the compiler to crash.
-
-<p>
-I have had reports that version 2.96 of <tt>g++</tt> has this
-problem on some platforms, although I have not been able to re-create
-the problem on any platform that I have access to (even with v2.96).
-
-<p>
-I also have reports that other versions of <tt>g++</tt> crash
-when compiling NTL on a DEC Alpha.
-
-<p>
-Hopefully, these and similar bugs in <tt>g++</tt> will eventually
-be fixed by the <tt>g++</tt> people.
-In the meantime, a very crude work-around is to compile the files
-that cause <tt>g++</tt> to crash without optimization.
-An easy way to do this is as follows:
-<ol>
-<li>
-if the build crashes compiling, say, <tt>foo.c</tt>,
-copy <tt>makefile</tt> to, say, <tt>mf2</tt>;
-edit file <tt>mf2</tt>, deleting the <tt>-O2</tt> from the <tt>CFLAGS</tt>
-definition;
-<li>
-run the command <tt>make -f mf2 foo.o</tt>;
-<li>
-assuming that worked OK, run the command <tt>make ntl.a</tt>;
-<li>
-if it crashes again, say on file <tt>bar.c</tt>,
-run the command <tt>make -f mf2 bar.o</tt>;
-<li>
-run the command <tt>make ntl.a</tt>, repeating steps 4 and 5 as necessary.
-</ol>
-
-<p>
-
-If you have build problems such as this,
-it would be quite useful to other NTL users if you
-could experiment with the code a bit,
-and try to find an equivalent way to write the problem code so that
-the compiler does not crash.
-I will then try to get these work-arounds into future NTL releases.
-
+<p> <p>
 <p> <p>
 
 <center>

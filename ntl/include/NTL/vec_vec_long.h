@@ -10,6 +10,8 @@ NTL_vector_decl(vec_long,vec_vec_long)
 
 NTL_eq_vector_decl(vec_long,vec_vec_long)
 
+NTL_io_vector_decl(vec_long,vec_vec_long)
+
 NTL_CLOSE_NNS
 
 

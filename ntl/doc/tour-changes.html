@@ -17,6 +17,82 @@ A Tour of NTL: Summary of Changes
 </p>
 </h1>
 
+<p> <hr> <p>
+<h3>
+Changes between NTL 5.3.1 and 5.3.2
+</h3>
+
+<ul>
+<li>
+Some bug fixes.
+
+<p>
+<li>
+Re-wrote <tt>SqrRootMod</tt> to make it run faster.
+
+</ul>
+
+
+
+<p> <hr> <p>
+<h3>
+Changes between NTL 5.3 and 5.3.1
+</h3>
+
+<ul>
+<li>
+Fixed a bug affecting the <tt>BuildIrred</tt> routines
+for <tt>ZZ_pEX</tt> and <tt>zz_pEX</tt>.
+</ul>
+
+<p> <hr> <p>
+<h3>
+Changes between NTL 5.2 and 5.3
+</h3>
+
+<ul>
+<li>
+Minimized and isolated constructs that do not adhere to <tt>C</tt>/<tt>C++</tt> 
+standards,
+and added flags <tt>NTL_CLEAN_INT</tt> and <tt>NTL_CLEAN_PTR</tt>
+which force stricter compliance with these standards 
+<a href="tour-impl.html">[more details]</a>.
+
+<p>
+<li>
+Added functions <tt>IsWhiteSpace</tt>, <tt>CharToIntVal</tt>,
+and <tt>IntValToChar</tt>  to the <tt>tools</tt> module
+<a href="tools.txt">[more details]</a>.
+
+<p>
+<li>
+Added methods <tt>allocated</tt>, <tt>position1</tt> to generic vector classes
+<a href="vector.txt">[more details]</a>.
+
+<p>
+<li>
+Added method <tt>allocated</tt> to the class <tt>vec_GF2</tt>
+<a href="vec_GF2.txt">[more details]</a>.
+
+<p>
+<li>
+Added conversion routines from unsigned int/long to int, long, float, and double
+<a href="conversions.txt">[more details]</a>.
+
+<p>
+<li>
+Added routines <tt>AddPrec</tt>, <tt>SubPrec</tt>, etc., to the <tt>RR</tt>
+module, and declared the practice of directly  assigning to the variable
+<tt>RR::prec</tt> obsolete
+<a href="RR.txt">[more details]</a>.
+
+<p>
+<li>
+Fixed a number of minor bugs.
+
+</ul>
+
+
 
 <p> <hr> <p>
 <h3>

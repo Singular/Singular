@@ -49,7 +49,6 @@ static long OutputPrecision();
 
 
 
-
 /**************************************************************************\
 
                              Arithmetic Operations

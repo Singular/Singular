@@ -51,7 +51,7 @@ void InnerProduct(GF2E& x, const vec_GF2E& a, const vec_GF2E& b);
 
 void InnerProduct(GF2E& x, const vec_GF2E& a, const vec_GF2E& b,
                   long offset);
-// x = sum_{i=offset}^n a[i]*b[i-offset], where n = min(a.length(),
+// x = sum_{i=offset}^{n-1} a[i]*b[i-offset], where n = min(a.length(),
 // b.length()+offset)
 
 void VectorCopy(vec_GF2E& x, const vec_GF2E& a, long n);

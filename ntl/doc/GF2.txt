@@ -183,9 +183,12 @@ istream& operator>>(istream& s, GF2& x);
 void clear(GF2& x); // x = 0
 void set(GF2& x); // x = 1
 
+void swap(GF2& x, GF2& y);
+// swap x and y 
+
 static GF2 GF2::zero();
 // GF2::zero() yields a read-only reference to zero
 
-void swap(GF2& x, GF2& y);
-// swap x and y 
+static long GF2::modulus();
+// GF2::modulus() returns the value 2
 

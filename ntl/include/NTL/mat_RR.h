@@ -8,6 +8,7 @@
 NTL_OPEN_NNS
 
 NTL_matrix_decl(RR,vec_RR,vec_vec_RR,mat_RR)
+NTL_io_matrix_decl(RR,vec_RR,vec_vec_RR,mat_RR)
 NTL_eq_matrix_decl(RR,vec_RR,vec_vec_RR,mat_RR)
 
 void add(mat_RR& X, const mat_RR& A, const mat_RR& B); 

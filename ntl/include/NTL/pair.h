@@ -22,6 +22,13 @@ inline pair_S_T cons(const S& l__x, const T& l__y) { return pair_S_T(l__x, l__y)
 
 
 
+#define NTL_pair_io_decl(S,T,pair_S_T) \
+NTL_SNS istream& operator>>(NTL_SNS istream&, pair_S_T&);  \
+  \
+NTL_SNS ostream& operator<<(NTL_SNS ostream&, const pair_S_T&);  \
+
+
+
 #define NTL_pair_eq_decl(S,T,pair_S_T)  \
 inline long operator==(const pair_S_T& l__x, const pair_S_T& l__y)  \
    { return l__x.a == l__y.a && l__x.b == l__y.b; }  \
@@ -32,6 +39,50 @@ inline long operator!=(const pair_S_T& l__x, const pair_S_T& l__y) \
 
 // For compatability...
 #define NTL_pair_impl(S,T,pair_S_T)
+
+
+#define NTL_pair_io_impl(S,T,pair_S_T)  \
+NTL_SNS istream& operator>>(NTL_SNS istream& l__s, pair_S_T& l__x)  \
+{  \
+   long l__c;  \
+  \
+   if (!l__s) NTL_NNS Error("bad pair input");  \
+  \
+   l__c = l__s.peek();  \
+   while (NTL_NNS IsWhiteSpace(l__c)) {  \
+      l__s.get();  \
+      l__c = l__s.peek();  \
+   }  \
+  \
+   if (l__c != '[')  \
+      NTL_NNS Error("bad pair input");  \
+  \
+   l__s.get();  \
+  \
+   if (!(l__s >> l__x.a))   \
+      NTL_NNS Error("bad pair input");  \
+   if (!(l__s >> l__x.b))  \
+      NTL_NNS Error("bad pair input");  \
+  \
+   l__c = l__s.peek();  \
+   while (NTL_NNS IsWhiteSpace(l__c)) {  \
+      l__s.get();  \
+      l__c = l__s.peek();  \
+   }  \
+  \
+   if (l__c != ']')  \
+      NTL_NNS Error("bad pair input");  \
+  \
+   l__s.get();  \
+  \
+   return l__s;  \
+}  \
+  \
+NTL_SNS ostream& operator<<(NTL_SNS ostream& l__s, const pair_S_T& l__x)  \
+{  \
+   return l__s << "[" << l__x.a << " " << l__x.b << "]";  \
+}  \
+
 
 
 // For compatability...

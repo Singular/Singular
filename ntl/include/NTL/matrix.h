@@ -63,6 +63,11 @@ long operator!=(const mat_T& l__a, const mat_T& l__b); \
 
 
 
+#define NTL_io_matrix_decl(T,vec_T,vec_vec_T,mat_T) \
+NTL_SNS istream& operator>>(NTL_SNS istream&, mat_T&); \
+NTL_SNS ostream& operator<<(NTL_SNS ostream&, const mat_T&);  \
+
+
 #define NTL_matrix_impl(T,vec_T,vec_vec_T,mat_T)  \
 mat_T::mat_T(const mat_T& l__a)  \
 {  \
@@ -166,6 +171,31 @@ long operator==(const mat_T& l__a, const mat_T& l__b)  \
 long operator!=(const mat_T& l__a, const mat_T& l__b)  \
 {  \
    return !(l__a == l__b);  \
+}  \
+
+
+
+
+#define NTL_io_matrix_impl(T,vec_T,vec_vec_T,mat_T)  \
+NTL_SNS istream& operator>>(NTL_SNS istream& l__s, mat_T& l__x)  \
+{  \
+   vec_vec_T l__buf;  \
+   l__s >> l__buf;  \
+   MakeMatrix(l__x, l__buf);  \
+   return l__s;  \
+}  \
+  \
+NTL_SNS ostream& operator<<(NTL_SNS ostream& l__s, const mat_T& l__a)  \
+{  \
+   long l__n = l__a.NumRows();  \
+   long l__i;  \
+   l__s << "[";  \
+   for (l__i = 0; l__i < l__n; l__i++) {  \
+      l__s << l__a[l__i]; \
+      l__s << "\n"; \
+   }  \
+   l__s << "]";  \
+   return l__s;  \
 }  \
 
 

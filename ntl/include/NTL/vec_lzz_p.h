@@ -9,6 +9,8 @@ NTL_OPEN_NNS
 
 NTL_vector_decl(zz_p,vec_zz_p)
 
+NTL_io_vector_decl(zz_p,vec_zz_p)
+
 NTL_eq_vector_decl(zz_p,vec_zz_p)
 
 void conv(vec_zz_p& x, const vec_ZZ& a);

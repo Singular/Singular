@@ -3,7 +3,6 @@
 #define NTL_vector__H
 
 #include <NTL/tools.h>
-#include <stdio.h>
 
 struct _ntl_VectorHeader {
    long length;
@@ -149,6 +148,12 @@ void append(vec_T& l__v, const T& l__a); \
 void append(vec_T& l__v, const vec_T& l__w); \
 
 
+
+
+#define NTL_io_vector_decl(T,vec_T)  \
+NTL_SNS istream& operator>>(NTL_SNS istream&, vec_T&);  \
+  \
+NTL_SNS ostream& operator<<(NTL_SNS ostream&, const vec_T&);  \
 
 
 #define NTL_eq_vector_decl(T,vec_T)  \
@@ -345,11 +350,12 @@ void vec_T::kill()  \
   \
 void vec_T::RangeError(long l__i) const  \
 {  \
-   printf( "index out of range in vector: %d", l__i );  \
+   NTL_SNS cerr << "index out of range in vector: ";  \
+   NTL_SNS cerr << l__i;  \
    if (!_vec__rep)  \
-      printf( "(0)\n");  \
+      NTL_SNS cerr << "(0)\n";  \
    else  \
-      printf( "(%d)\n" ,NTL_VEC_HEAD(_vec__rep)->length );  \
+      NTL_SNS cerr << "(" << NTL_VEC_HEAD(_vec__rep)->length << ")\n";  \
    abort();  \
 }  \
   \
@@ -398,6 +404,69 @@ void append(vec_T& l__v, const vec_T& l__w)  \
 
 
 
+
+#define NTL_io_vector_impl(T,vec_T)  \
+NTL_SNS istream & operator>>(NTL_SNS istream& l__s, vec_T& l__a)   \
+{   \
+   vec_T l__ibuf;  \
+   long l__c;   \
+   long l__n;   \
+   if (!l__s) NTL_NNS Error("bad vector input"); \
+   \
+   l__c = l__s.peek();  \
+   while (NTL_NNS IsWhiteSpace(l__c)) {  \
+      l__s.get();  \
+      l__c = l__s.peek();  \
+   }  \
+   if (l__c != '[') {  \
+      NTL_NNS Error("bad vector input");  \
+   }  \
+   \
+   l__n = 0;   \
+   l__ibuf.SetLength(0);  \
+      \
+   l__s.get();  \
+   l__c = l__s.peek();  \
+   while (NTL_NNS IsWhiteSpace(l__c)) {  \
+      l__s.get();  \
+      l__c = l__s.peek();  \
+   }  \
+   while (l__c != ']' && l__c != EOF) {   \
+      if (l__n % NTL_VectorInputBlock == 0) l__ibuf.SetMaxLength(l__n + NTL_VectorInputBlock); \
+      l__n++;   \
+      l__ibuf.SetLength(l__n);   \
+      if (!(l__s >> l__ibuf[l__n-1])) NTL_NNS Error("bad vector input");   \
+      l__c = l__s.peek();  \
+      while (NTL_NNS IsWhiteSpace(l__c)) {  \
+         l__s.get();  \
+         l__c = l__s.peek();  \
+      }  \
+   }   \
+   if (l__c == EOF) NTL_NNS Error("bad vector input");  \
+   l__s.get(); \
+   \
+   l__a = l__ibuf; \
+   return l__s;   \
+}    \
+   \
+   \
+NTL_SNS ostream& operator<<(NTL_SNS ostream& l__s, const vec_T& l__a)   \
+{   \
+   long l__i, l__n;   \
+  \
+   l__n = l__a.length();  \
+   \
+   l__s << '[';   \
+   \
+   for (l__i = 0; l__i < l__n; l__i++) {   \
+      l__s << l__a[l__i];   \
+      if (l__i < l__n-1) l__s << " ";   \
+   }   \
+   \
+   l__s << ']';   \
+      \
+   return l__s;   \
+}   \
 
 #define NTL_eq_vector_impl(T,vec_T) \
 long operator==(const vec_T& l__a, const vec_T& l__b) \
