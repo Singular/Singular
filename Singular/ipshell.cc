@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.44 1999-07-13 16:24:44 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.45 1999-08-12 12:36:09 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -537,7 +537,7 @@ int IsPrime(int p)  /* brute force !!!! */
   } while ( a<= e);
   if (p>j) return j;
   else     return cf_getSmallPrime(i-1);
-#else  
+#else
   for (j=p/2+1,i=3; i<p; i+=2)
   {
     if ((p%i) == 0) return IsPrime(p-2);
@@ -767,16 +767,16 @@ BOOLEAN jjBETTI(leftv res, leftv v)
 
 int iiRegularity(lists L)
 {
-  resolvente r;
   int len,reg,typ0;
-  intvec * dummy;
 
-  r=liFindRes(L,&len,&typ0);
-  if (r==NULL) return -2;
-  dummy=syBetti(r,len,&reg);
+  resolvente r=liFindRes(L,&len,&typ0);
+
+  if (r==NULL)
+    return -2;
+  intvec * dummy=syBetti(r,len,&reg);
   Free((ADDRESS)r,len*sizeof(ideal));
   delete dummy;
-  return reg-1;
+  return reg;
 }
 
 BOOLEAN iiDebugMarker=TRUE;

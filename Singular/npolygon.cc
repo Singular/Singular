@@ -29,45 +29,44 @@
 
 void    linearForm::copy_new( int k )
 {
-    if( k > 0 )
-    {
-        c = new Rational[k];
+  if( k > 0 )
+  {
+    c = new Rational[k];
 
-        #ifndef NBDEBUG
-        if( c == (Rational*)NULL )
-        {
-            #ifdef  NPOLYGON_PRINT
-            #ifdef  NPOLYGON_IOSTREAM
-                cerr << "void linearForm::copy_new( int k )";
-                cerr << ": no memory left ..." << endl;
-            #else
-                fprintf( stderr,"void linearForm::copy_new( int k )" );
-                fprintf( stderr,": no memory left ...\n" );
-            #endif
-            #endif
-
-            exit( 1 );
-        }
-        #endif
-    }
-    else if( k == 0 )
+    #ifndef NBDEBUG
+    if( c == (Rational*)NULL )
     {
-        c = (Rational*)NULL;
+      #ifdef  NPOLYGON_PRINT
+      #ifdef  NPOLYGON_IOSTREAM
+        cerr <<
+        "void linearForm::copy_new( int k ): no memory left ...\n" ;
+      #else
+        fprintf( stderr,
+        "void linearForm::copy_new( int k ): no memory left ...\n");
+      #endif
+      #endif
+      HALT();
     }
-    else if( k < 0 )
-    {
-        #ifdef  NPOLYGON_PRINT
-        #ifdef  NPOLYGON_IOSTREAM
-            cerr << "void linearForm::copy_new( int k )";
-            cerr << ": k < 0 ..." << endl;
-        #else
-            fprintf( stderr,"void linearForm::copy_new( int k )" );
-            fprintf( stderr,": k < 0 ...\n" );
-        #endif
-        #endif
+    #endif
+  }
+  else if( k == 0 )
+  {
+    c = (Rational*)NULL;
+  }
+  else if( k < 0 )
+  {
+    #ifdef  NPOLYGON_PRINT
+    #ifdef  NPOLYGON_IOSTREAM
+      cerr <<
+      "void linearForm::copy_new( int k ): k < 0 ...\n";
+    #else
+      fprintf( stderr,
+      "void linearForm::copy_new( int k ): k < 0 ...\n" );
+    #endif
+    #endif
 
-        exit( 1 );
-    }
+    HALT();
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -76,8 +75,9 @@ void    linearForm::copy_new( int k )
 
 void    linearForm::copy_delete( void )
 {
-    if( c != (Rational*)NULL && N > 0 ) delete [] c;
-    copy_zero( );
+  if( c != (Rational*)NULL && N > 0 )
+    delete [] c;
+  copy_zero( );
 }
 
 // ----------------------------------------------------------------------------
@@ -86,12 +86,12 @@ void    linearForm::copy_delete( void )
 
 void    linearForm::copy_deep( const linearForm &l )
 {
-    copy_new( l.N );
-    for( int i=0; i<l.N; i++ )
-    {
-        c[i] = l.c[i];
-    }
-    N = l.N;
+  copy_new( l.N );
+  for( int i=l.N-1; i>=0; i-- )
+  {
+    c[i] = l.c[i];
+  }
+  N = l.N;
 }
 
 // ----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ void    linearForm::copy_deep( const linearForm &l )
 
 linearForm::linearForm( const linearForm &l )
 {
-    copy_deep( l );
+  copy_deep( l );
 }
 
 // ----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ linearForm::linearForm( const linearForm &l )
 
 linearForm::~linearForm( )
 {
-    copy_delete( );
+  copy_delete( );
 }
 
 // ----------------------------------------------------------------------------
@@ -118,10 +118,10 @@ linearForm::~linearForm( )
 
 linearForm & linearForm::operator = ( const linearForm &l )
 {
-    copy_delete( );
-    copy_deep( l );
+  copy_delete( );
+  copy_deep( l );
 
-    return *this;
+  return *this;
 }
 
 // ----------------------------------------------------------------------------
@@ -132,29 +132,29 @@ linearForm & linearForm::operator = ( const linearForm &l )
 
 ostream & operator << ( ostream &s,const linearForm &l )
 {
-    for( int i=0; i<l.N; i++ )
+  for( int i=0; i<l.N; i++ )
+  {
+    if( l.c[i] != (Rational)0 )
     {
-        if( l.c[i] != (Rational)0 )
-        {
-            if( i > 0 && l.c[i] >= (Rational)0 )
-            {
-                #ifdef NPOLYGON_IOSTREAM
-                    s << "+";
-                #else
-                    fprintf( stdout,"+" );
-                #endif
-            }
+      if( i > 0 && l.c[i] >= (Rational)0 )
+      {
+        #ifdef NPOLYGON_IOSTREAM
+          s << "+";
+        #else
+          fprintf( stdout,"+" );
+        #endif
+      }
 
-            s << l.c[i];
+      s << l.c[i];
 
-            #ifdef NPOLYGON_IOSTREAM
-                s << "*x" << i+1;
-            #else
-                fprintf( stdout,"*x%d",i+1 );
-            #endif
-        }
+      #ifdef NPOLYGON_IOSTREAM
+        s << "*x" << i+1;
+      #else
+        fprintf( stdout,"*x%d",i+1 );
+      #endif
     }
-    return s;
+  }
+  return s;
 }
 
 #endif
@@ -165,20 +165,14 @@ ostream & operator << ( ostream &s,const linearForm &l )
 
 int     operator == ( const linearForm &l1,const linearForm &l2 )
 {
-    if( l1.N!=l2.N )
-    {
-        return  FALSE;
-    }
-
-    for( int i=0; i<l1.N; i++ )
-    {
-        if( l1.c[i]!=l2.c[i] )
-        {
-            return  FALSE;
-        }
-    }
-
-    return  TRUE;
+  if( l1.N!=l2.N )
+    return  FALSE;
+  for( int i=l1.N-1; i >=0 ; i-- )
+  {
+    if( l1.c[i]!=l2.c[i] )
+      return  FALSE;
+  }
+  return  TRUE;
 }
 
 
@@ -188,14 +182,14 @@ int     operator == ( const linearForm &l1,const linearForm &l2 )
 
 Rational linearForm::weight( poly m ) const
 {
-    Rational ret=(Rational)0;
+  Rational ret=(Rational)0;
 
-    for( int i=0,j=1; i<N; i++,j++ )
-    {
-        ret += c[i]*(Rational)pGetExp( m,j );
-    }
+  for( int i=0,j=1; i<N; i++,j++ )
+  {
+    ret += c[i]*(Rational)pGetExp( m,j );
+  }
 
-    return ret;
+  return ret;
 }
 
 // ----------------------------------------------------------------------------
@@ -204,25 +198,22 @@ Rational linearForm::weight( poly m ) const
 
 Rational linearForm::pweight( poly m ) const
 {
-    if( m==(poly)NULL )
+  if( m==(poly)NULL )
+    return  (Rational)0;
+
+  Rational    ret = weight( m );
+  Rational    tmp;
+
+  for( m=pNext(m); m!=(poly)NULL; pIter(m) )
+  {
+    tmp = weight( m );
+    if( tmp<ret )
     {
-        return  (Rational)0;
+      ret = tmp;
     }
+  }
 
-    Rational    ret = weight( m );
-    Rational    tmp;
-
-    for( m=m->next; m!=(poly)NULL; m=m->next )
-    {
-        tmp = weight( m );
-
-        if( tmp<ret )
-        {
-            ret = tmp;
-        }
-    }
-
-    return ret;
+  return ret;
 }
 
 // ----------------------------------------------------------------------------
@@ -231,14 +222,14 @@ Rational linearForm::pweight( poly m ) const
 
 Rational linearForm::weight_shift( poly m ) const
 {
-    Rational ret=(Rational)0;
+  Rational ret=(Rational)0;
 
-    for( int i=0,j=1; i<N; i++,j++ )
-    {
-        ret += c[i]*(Rational)( pGetExp( m,j ) + 1 );
-    }
+  for( int i=0,j=1; i<N; i++,j++ )
+  {
+    ret += c[i]*(Rational)( pGetExp( m,j ) + 1 );
+  }
 
-    return ret;
+  return ret;
 }
 
 // ----------------------------------------------------------------------------
@@ -247,14 +238,14 @@ Rational linearForm::weight_shift( poly m ) const
 
 Rational linearForm::weight1( poly m ) const
 {
-    Rational ret=(Rational)0;
+  Rational ret=(Rational)0;
 
-    for( int i=0,j=2; i<N; i++,j++ )
-    {
-        ret += c[i]*(Rational)pGetExp( m,j );
-    }
+  for( int i=0,j=2; i<N; i++,j++ )
+  {
+    ret += c[i]*(Rational)pGetExp( m,j );
+  }
 
-    return ret;
+  return ret;
 }
 
 // ----------------------------------------------------------------------------
@@ -264,14 +255,14 @@ Rational linearForm::weight1( poly m ) const
 
 Rational linearForm::weight_shift1( poly m ) const
 {
-    Rational ret=(Rational)0;
+  Rational ret=(Rational)0;
 
-    for( int i=0,j=2; i<N; i++,j++ )
-    {
-        ret += c[i]*(Rational)( pGetExp( m,j ) + 1 );
-    }
+  for( int i=0,j=2; i<N; i++,j++ )
+  {
+    ret += c[i]*(Rational)( pGetExp( m,j ) + 1 );
+  }
 
-    return ret;
+  return ret;
 }
 
 
@@ -281,14 +272,14 @@ Rational linearForm::weight_shift1( poly m ) const
 
 int linearForm::positive( void )
 {
-    for( int i=0; i<N; i++ )
+  for( int i=0; i<N; i++ )
+  {
+    if( c[i] <= (Rational)0 )
     {
-        if( c[i] <= (Rational)0 )
-        {
-            return FALSE;
-        }
+      return FALSE;
     }
-    return  TRUE;
+  }
+  return  TRUE;
 }
 
 
@@ -298,45 +289,44 @@ int linearForm::positive( void )
 
 void    newtonPolygon::copy_new( int k )
 {
-    if( k > 0 )
-    {
-        l = new linearForm[k];
+  if( k > 0 )
+  {
+    l = new linearForm[k];
 
-        #ifndef NDEBUG
-        if( l == (linearForm*)NULL )
-        {
-            #ifdef  NPOLYGON_PRINT
-            #ifdef  NPOLYGON_IOSTREAM
-                cerr << "void newtonPolygon::copy_new( int k )";
-                cerr << ": no memory left ..." << endl;
-            #else
-                fprintf( stderr,"void newtonPolygon::copy_new( int k )" );
-                fprintf( stderr,": no memory left ...\n" );
-            #endif
-            #endif
-
-            exit( 1 );
-        }
-        #endif
-    }
-    else if( k == 0 )
-    {
-        l = (linearForm*)NULL;
-    }
-    else if( k < 0 )
-    {
+    #ifndef NDEBUG
+      if( l == (linearForm*)NULL )
+      {
         #ifdef  NPOLYGON_PRINT
-        #ifdef  NPOLYGON_IOSTREAM
-            cerr << "void newtonPolygon::copy_new( int k )";
-            cerr << ": k < 0 ..." << endl;
-        #else
-            fprintf( stderr,"void newtonPolygon::copy_new( int k )" );
-            fprintf( stderr,": k < 0 ...\n" );
-        #endif
+          #ifdef  NPOLYGON_IOSTREAM
+            cerr <<
+            "void newtonPolygon::copy_new( int k ): no memory left ...\n";
+          #else
+            fprintf( stderr,
+            "void newtonPolygon::copy_new( int k ): no memory left ...\n" );
+          #endif
         #endif
 
-        exit( 1 );
-    }
+        HALT();
+      }
+    #endif
+  }
+  else if( k == 0 )
+  {
+    l = (linearForm*)NULL;
+  }
+  else if( k < 0 )
+  {
+    #ifdef  NPOLYGON_PRINT
+      #ifdef  NPOLYGON_IOSTREAM
+        cerr << "void newtonPolygon::copy_new( int k ): k < 0 ...\n";
+      #else
+        fprintf( stderr,
+        "void newtonPolygon::copy_new( int k ): k < 0 ...\n" );
+      #endif
+    #endif
+
+    HALT();
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -345,8 +335,9 @@ void    newtonPolygon::copy_new( int k )
 
 void    newtonPolygon::copy_delete( void )
 {
-    if( l != (linearForm*)NULL && N > 0 ) delete [] l;
-    copy_zero( );
+  if( l != (linearForm*)NULL && N > 0 )
+    delete [] l;
+  copy_zero( );
 }
 
 // ----------------------------------------------------------------------------
@@ -355,12 +346,12 @@ void    newtonPolygon::copy_delete( void )
 
 void    newtonPolygon::copy_deep( const newtonPolygon &np )
 {
-    copy_new( np.N );
-    for( int i=0; i<np.N; i++ )
-    {
-        l[i] = np.l[i];
-    }
-    N = np.N;
+  copy_new( np.N );
+  for( int i=0; i<np.N; i++ )
+  {
+    l[i] = np.l[i];
+  }
+  N = np.N;
 }
 
 // ----------------------------------------------------------------------------
@@ -369,7 +360,7 @@ void    newtonPolygon::copy_deep( const newtonPolygon &np )
 
 newtonPolygon::newtonPolygon( const newtonPolygon &np )
 {
-    copy_deep( np );
+  copy_deep( np );
 }
 
 // ----------------------------------------------------------------------------
@@ -378,7 +369,7 @@ newtonPolygon::newtonPolygon( const newtonPolygon &np )
 
 newtonPolygon::~newtonPolygon( )
 {
-    copy_delete( );
+  copy_delete( );
 }
 
 // ----------------------------------------------------------------------------
@@ -387,10 +378,10 @@ newtonPolygon::~newtonPolygon( )
 
 newtonPolygon & newtonPolygon::operator = ( const newtonPolygon &np )
 {
-    copy_delete( );
-    copy_deep( np );
+  copy_delete( );
+  copy_deep( np );
 
-    return *this;
+  return *this;
 }
 
 // ----------------------------------------------------------------------------
@@ -399,125 +390,124 @@ newtonPolygon & newtonPolygon::operator = ( const newtonPolygon &np )
 
 newtonPolygon::newtonPolygon( poly f )
 {
-    copy_zero( );
+  copy_zero( );
 
-    int *r=new int[pVariables];
-    poly *m=new poly[pVariables];
+  int *r=new int[pVariables];
+  poly *m=new poly[pVariables];
 
 
-    KMatrix<Rational> mat( pVariables,pVariables+1 );
+  KMatrix<Rational> mat( pVariables,pVariables+1 );
 
-    int i,j,stop=FALSE;
-    linearForm sol;
+  int i,j,stop=FALSE;
+  linearForm sol;
 
-    // ---------------
-    //  init counters
-    // ---------------
+  // ---------------
+  //  init counters
+  // ---------------
+
+  for( i=0; i<pVariables; i++ )
+  {
+    r[i] = i;
+  }
+
+  m[0] = f;
+
+  for( i=1; i<pVariables; i++ )
+  {
+    m[i] = pNext(m[i-1]);
+  }
+
+  // -----------------------------
+  //  find faces (= linear forms)
+  // -----------------------------
+
+  do
+  {
+    // ---------------------------------------------------
+    //  test if monomials p.m[r[0]]m,...,p.m[r[p.vars-1]]
+    //  are linearely independent
+    // ---------------------------------------------------
 
     for( i=0; i<pVariables; i++ )
     {
-        r[i] = i;
+      for( j=0; j<pVariables; j++ )
+      {
+        //    mat.set( i,j,pGetExp( m[r[i]],j+1 ) );
+        mat.set( i,j,pGetExp( m[i],j+1 ) );
+      }
+      mat.set( i,j,1 );
     }
 
-    m[0] = f;
-
-    for( i=1; i<pVariables; i++ )
+    if( mat.solve( &(sol.c),&(sol.N) ) == pVariables )
     {
-        m[i] = m[i-1]->next;
+      // ---------------------------------
+      //  check if linearForm is positive
+      //  check if linearForm is extremal
+      // ---------------------------------
+
+      if( sol.positive( ) && sol.pweight( f ) >= (Rational)1 )
+      {
+        // ----------------------------------
+        //  this is a face or the polyhedron
+        // ----------------------------------
+
+        add_linearForm( sol );
+        sol.c = (Rational*)NULL;
+        sol.N = 0;
+      }
     }
 
-    // -----------------------------
-    //  find faces (= linear forms)
-    // -----------------------------
+    // --------------------
+    //  increment counters
+    // --------------------
 
-        do
-        {
-            // ---------------------------------------------------
-              //  test if monomials p.m[r[0]]m,...,p.m[r[p.vars-1]]
-            //  are linearely independent
-            // ---------------------------------------------------
+    for( i=1; r[i-1] + 1 == r[i] && i < pVariables; i++ );
 
-            for( i=0; i<pVariables; i++ )
-            {
-                for( j=0; j<pVariables; j++ )
-                {
-                  //    mat.set( i,j,pGetExp( m[r[i]],j+1 ) );
-                    mat.set( i,j,pGetExp( m[i],j+1 ) );
-                }
-                mat.set( i,j,1 );
-            }
+    for( j=0; j<i-1; j++ )
+    {
+      r[j]=j;
+    }
 
-            if( mat.solve( &(sol.c),&(sol.N) ) == pVariables )
-            {
-                // ---------------------------------
-                //  check if linearForm is positive
-                //  check if linearForm is extremal
-                // ---------------------------------
+    if( i>1 )
+    {
+      m[0]=f;
+      for( j=1; j<i-1; j++ )
+      {
+        m[j]=pNext(m[j-1]);
+      }
+    }
+    r[i-1]++;
+    m[i-1]=pNext(m[i-1]);
 
-                if( sol.positive( ) && sol.pweight( f ) >= (Rational)1 )
-                {
-                    // ----------------------------------
-                    //  this is a face or the polyhedron
-                    // ----------------------------------
-
-                    add_linearForm( sol );
-                    sol.c = (Rational*)NULL;
-                    sol.N = 0;
-                }
-            }
-
-            // --------------------
-            //  increment counters
-            // --------------------
-
-            for( i=1; r[i-1] + 1 == r[i] && i < pVariables; i++ );
-
-            for( j=0; j<i-1; j++ )
-            {
-                r[j]=j;
-            }
-
-            if( i>1 )
-            {
-                m[0]=f;
-                for( j=1; j<i-1; j++ )
-                {
-                    m[j]=m[j-1]->next;
-                }
-            }
-            r[i-1]++;
-            m[i-1]=m[i-1]->next;
-
-            if( m[pVariables-1] == (poly)NULL )
-            {
-                stop = TRUE;
-            }
-        }
-        while( stop == FALSE );
+    if( m[pVariables-1] == (poly)NULL )
+    {
+      stop = TRUE;
+    }
+  } while( stop == FALSE );
 }
 
 #ifdef  NPOLYGON_PRINT
 
 ostream & operator << ( ostream &s,const newtonPolygon &a )
 {
+  #ifdef NPOLYGON_IOSTREAM
+    s << "Newton polygon:" << endl;
+  #else
+    fprintf( stdout,"Newton polygon:\n" );
+  #endif
+
+  for( int i=0; i<a.N; i++ )
+  {
+    s << a.l[i];
+
     #ifdef NPOLYGON_IOSTREAM
-        s << "Newton polygon:" << endl;
+      s << endl;
     #else
-        fprintf( stdout,"Newton polygon:\n" );
+      fprintf( stdout,"\n" );
     #endif
+  }
 
-    for( int i=0; i<a.N; i++ )
-    {
-        s << a.l[i];
-
-        #ifdef NPOLYGON_IOSTREAM
-           s << endl;
-        #else
-            fprintf( stdout,"\n" );
-        #endif
-    }
-
-    return s;
+  return s;
 }
 
 #endif
@@ -528,37 +518,37 @@ ostream & operator << ( ostream &s,const newtonPolygon &a )
 
 void    newtonPolygon::add_linearForm( const linearForm &l0 )
 {
-    int           i;
-    newtonPolygon np;
+  int           i;
+  newtonPolygon np;
 
-    // -------------------------------------
-    //  test if linear form is already here
-    // -------------------------------------
+  // -------------------------------------
+  //  test if linear form is already here
+  // -------------------------------------
 
-    for( i=0; i<N; i++ )
+  for( i=0; i<N; i++ )
+  {
+    if( l0==l[i] )
     {
-        if( l0==l[i] )
-        {
-            return;
-        }
+      return;
     }
+  }
 
-    np.copy_new( N+1 );
-    np.N = N+1;
+  np.copy_new( N+1 );
+  np.N = N+1;
 
-    for( i=0; i<N; i++ )
-    {
-        np.l[i].copy_shallow( l[i] );
-        l[i].copy_zero( );
-    }
+  for( i=0; i<N; i++ )
+  {
+    np.l[i].copy_shallow( l[i] );
+    l[i].copy_zero( );
+  }
 
-    np.l[N] = l0;
+  np.l[N] = l0;
 
-    copy_delete( );
-    copy_shallow( np );
-    np.copy_zero( );
+  copy_delete( );
+  copy_shallow( np );
+  np.copy_zero( );
 
-    return;
+  return;
 }
 
 // ----------------------------------------------------------------------------
@@ -567,19 +557,19 @@ void    newtonPolygon::add_linearForm( const linearForm &l0 )
 
 Rational  newtonPolygon::weight( poly m ) const
 {
-    Rational ret = l[0].weight( m );
-    Rational tmp;
+  Rational ret = l[0].weight( m );
+  Rational tmp;
 
-    for( int i=1; i<N; i++ )
+  for( int i=1; i<N; i++ )
+  {
+    tmp = l[i].weight( m );
+
+    if( tmp < ret )
     {
-        tmp = l[i].weight( m );
-
-        if( tmp < ret )
-        {
-            ret = tmp;
-        }
+      ret = tmp;
     }
-    return ret;
+  }
+  return ret;
 }
 
 // ----------------------------------------------------------------------------
@@ -588,19 +578,19 @@ Rational  newtonPolygon::weight( poly m ) const
 
 Rational  newtonPolygon::weight_shift( poly m ) const
 {
-    Rational ret = l[0].weight_shift( m );
-    Rational tmp;
+  Rational ret = l[0].weight_shift( m );
+  Rational tmp;
 
-    for( int i=1; i<N; i++ )
+  for( int i=1; i<N; i++ )
+  {
+    tmp = l[i].weight_shift( m );
+
+    if( tmp < ret )
     {
-        tmp = l[i].weight_shift( m );
-
-        if( tmp < ret )
-        {
-            ret = tmp;
-        }
+      ret = tmp;
     }
-    return ret;
+  }
+  return ret;
 }
 
 // ----------------------------------------------------------------------------
@@ -609,19 +599,19 @@ Rational  newtonPolygon::weight_shift( poly m ) const
 
 Rational  newtonPolygon::weight1( poly m ) const
 {
-    Rational ret = l[0].weight1( m );
-    Rational tmp;
+  Rational ret = l[0].weight1( m );
+  Rational tmp;
 
-    for( int i=1; i<N; i++ )
+  for( int i=1; i<N; i++ )
+  {
+    tmp = l[i].weight1( m );
+
+    if( tmp < ret )
     {
-        tmp = l[i].weight1( m );
-
-        if( tmp < ret )
-        {
-            ret = tmp;
-        }
+      ret = tmp;
     }
-    return ret;
+  }
+  return ret;
 }
 
 // ----------------------------------------------------------------------------
@@ -631,19 +621,19 @@ Rational  newtonPolygon::weight1( poly m ) const
 
 Rational  newtonPolygon::weight_shift1( poly m ) const
 {
-    Rational ret = l[0].weight_shift1( m );
-    Rational tmp;
+  Rational ret = l[0].weight_shift1( m );
+  Rational tmp;
 
-    for( int i=1; i<N; i++ )
+  for( int i=1; i<N; i++ )
+  {
+    tmp = l[i].weight_shift1( m );
+
+    if( tmp < ret )
     {
-        tmp = l[i].weight_shift1( m );
-
-        if( tmp < ret )
-        {
-            ret = tmp;
-        }
+      ret = tmp;
     }
-    return ret;
+  }
+  return ret;
 }
 
 /*
@@ -654,7 +644,7 @@ Rational  newtonPolygon::weight_shift1( poly m ) const
 
 int     newtonPolygon::is_sqh( void ) const
 {
-    return ( N==1 ? TRUE : FALSE );
+  return ( N==1 ? TRUE : FALSE );
 }
 
 // ----------------------------------------------------------------------------
@@ -664,12 +654,12 @@ int     newtonPolygon::is_sqh( void ) const
 
 Rational*   newtonPolygon::sqh_weights( void ) const
 {
-    return ( N==1 ? l[0].c : (Rational*)NULL );
+  return ( N==1 ? l[0].c : (Rational*)NULL );
 }
 
 int    newtonPolygon::sqh_N( void ) const
 {
-    return ( N==1 ? l[0].N : 0 );
+  return ( N==1 ? l[0].N : 0 );
 }
 */
 
