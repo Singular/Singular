@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.7 1998-04-27 15:52:04 krueger Exp $
+@comment $Id: singular.doc,v 1.8 1998-04-28 07:56:03 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -83,6 +83,7 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @chapter Introduction
 @cindex Introduction
 
+@include start.tex
 @c ----------------------------------------------------------------------------
 @node General concepts, Data types, Introduction, Top
 @chapter General concepts
