@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.31 1999-12-08 23:52:38 obachman Exp $
+# $Id: regress.cmd,v 1.32 2000-08-14 11:27:06 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -22,8 +22,10 @@ regress.cmd    -- regress test of Singular
   [-v num]          -- set verbosity to num (used range 0..3, default: 1)
   [-g]              -- generate result (*.res.gz.uu) files, only
   [-r [crit%[val]]] -- report if status differences [of crit] > val (in %)
+  [-c regexp]       -- when comparing results, version must match this regexp
   [-e [crit%[val]]] -- throw error if status difference [of crit] > val (in %)
-  [-m [crit]]       -- merge status results [of crit] into result file
+  [-a [crit]]       -- add status results [of crit] to result file
+  [-m]              -- add status result for current version to result file
   [-t]              -- compute and call mtrack at the end, no diffs
   [file.lst]        -- read tst files from file.lst
   [file.tst]        -- test Singular script file.tst
@@ -113,7 +115,7 @@ if ( (! (-e $singular)) || (! (-x $singular)))
   $singular = $curr_dir."/../Singular$ext";
 }
 # sed scripts which are applied to res files before they are diff'ed
-$sed_scripts = "-e '/used time:/d' -e '/tst_ignore:/d' -e '/Id:/d' -e '/error occurred in/d'";
+$sed_scripts = "-e '/used time:/d' -e '/tst_ignore:/d' -e '/Id:/d' -e '/error occurred in/d' -e '/tst_status/d' -e'/init >>/d'";
 # default value (in %) above which differences are reported on -r
 $report_val = 5;
 # default value (in %) above which differences cause an error on -e
@@ -127,6 +129,21 @@ chop $hostname;
 #
 # auxiallary routines
 #
+
+sub GetSingularVersionDate
+{
+  &mysystem("$singular -t -v --execute=\"exit;\"> SingularVersionDate");
+  open(FD, "<SingularVersionDate");
+  while (<FD>)
+  {
+    $singular_uname = (/for\s+([^\s]*)\s+/ ? $1 : "uname");
+    $singular_version = (/version\s+([^\s]*)\s+/ ? $1 : "0-0-0");
+    $singular_date = (/\((.*)\)/ ? $1 : "1970010100");
+    $this_time = time;
+    last;
+  }
+  close(FD);
+}
 
 sub Set_withMP
 {
@@ -205,7 +222,7 @@ sub tst_status_check
   local($root) = $_[0];
   local($line,$new_line,$prefix,$crit,$res,$new_res);
   local($res_diff,$res_diff_pc,$res_diff_line);
-  local($exit_status, $reported) = (0, 0);
+  my($exit_status, $reported) = (0, 0);
   local($error_cause) = "";
 
   open(RES_FILE, "<$root.stat") ||
@@ -215,50 +232,63 @@ sub tst_status_check
   open(STATUS_DIFF_FILE, ">$root.stat.sdiff") ||
     return (1, "Can not open $root.stat.sdiff \n");
 
-  $new_line = <NEW_RES_FILE>;
-  $line = <RES_FILE>;
-
-  while ($line && $new_line)
+  while (1)
   {
-    if ($line =~ /(\d+) >> (\w+) ::.*$hostname:(\d+)/ && $checks{$2})
+    while ($new_line = <NEW_RES_FILE>)
     {
-      $prefix = $1;
-      $crit = $2;
-      $res = $3;
-      if ($res > $mintime_val &&
-          $new_line =~ /$prefix >> $crit ::.*$hostname:(\d+)/)
-      {
-        $new_res = $1;
-        $res_diff = $new_res - $res;
-        $res_diff_pc = int((($new_res / $res) - 1)*100);
-        $res_diff_line =
-          "$prefix >> $crit :: new:$new_res old:$res diff:$res_diff %:$res_diff_pc";
-        if ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc))
-              ||
-            (defined($report{$crit}) && $report{$crit}<abs($res_diff_pc)))
-        {
-          $reported = 1;
-          print (STATUS_DIFF_FILE "$res_diff_line\n");
-          print "$res_diff_line\n" if ($verbosity > 0);
-        }
+      last if $new_line =~ /(\d+) >> (\w+) ::.*$hostname:(\d+)/ && $checks{$2};
+    }
+    last unless $new_line =~ /(\d+) >> (\w+) ::.*$hostname:(\d+)/;
+    $prefix = $1;
+    $crit = $2;
+    $new_res = $3;
+    next unless $new_res > $mintime_val;
+    
+    while ($line = <RES_FILE>)
+    {
+      last if $line =~ /$prefix >> $crit ::.*?$hostname:(\d+)/;
+    }
+    last unless $line =~ /$prefix >> $crit ::.*?$hostname:(\d+)/;
+    my $res_version;
+    $res = 0;
 
-        if ($exit_status == 0)
-        {
-          $exit_status = (defined($error{$crit})
-                          && $error{$crit} < abs($res_diff_pc));
-          $error_cause = "Status error for $crit at $prefix\n"
-            if ($exit_status);
-        }
+    # search for smallest
+    while ($line =~ /([^\s]*)$hostname:(\d+)/g)
+    {
+      my $this_res = $2;
+      my $this_res_version = $1;
+      if ((!$res || $this_res <= $res) && (!$status_check_regexp  || $this_res_version =~ /$status_check_regexp/))
+      {
+	$res = $this_res;
+	$res_version = $this_res_version;
       }
     }
-    $new_line = <NEW_RES_FILE>;
-    $line = <RES_FILE>;
+    next unless $res;
+    $res_diff = $new_res - $res;
+    $res_diff_pc = int((($new_res / $res) - 1)*100);
+    $res_diff_line = 
+      "$prefix >> $crit :: new:$new_res old:$res_version$res diff:$res_diff %:$res_diff_pc\n";
+    print STATUS_DIFF_FILE $res_diff_line;
+    
+    if ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc))
+	||
+	(defined($report{$crit}) && $report{$crit}<abs($res_diff_pc)))
+    {
+      print "$prefix >> $crit :: new:$new_res old:$res diff:$res_diff %:$res_diff_pc\n"
+	if ($verbosity > 0);
+    }
+    
+    if ($exit_status == 0)
+    {
+      $exit_status = (defined($error{$crit})
+		      && $error{$crit} < abs($res_diff_pc));
+      $error_cause = "Status error for $crit at $prefix\n"
+	if ($exit_status);
+    }
   }
   close(RES_FILE);
   close(NEW_RES_FILE);
   close(STATUS_DIFF_FILE);
-  mysystem("rm -f $root.stat.sdiff")
-    if ($reported == 0 &&  $exit_status == 0 && $keep ne "yes");
   return ($exit_status, $error_cause);
 }
 
@@ -267,6 +297,29 @@ sub tst_status_merge
   local($root) = $_[0];
   local($line, $new_line, $crit, $res);
 
+  GetSingularVersionDate()
+    unless $singular_version;
+
+  if (! -e "$root.stat")
+  {
+    open(RES_FILE, ">$root.stat") ||
+      return (1, "Can not open $root.stat \n");
+    open(NEW_RES_FILE, "<$root.new.stat") ||
+      return (1, "Can not open $root.new.stat \n");
+
+    while (<NEW_RES_FILE>)
+    {
+      if (/(\d+) >> (\w+) :: /)
+      {
+	s/$hostname:(\d+)/$this_time:$singular_date:$singular_version:$singular_uname:$hostname:$1/g;
+	print RES_FILE $_;
+      }
+    }
+    close(RES_FILE);
+    close(NEW_RES_FILE);
+    return;
+  }
+
   open(RES_FILE, "<$root.stat") ||
     return (1, "Can not open $root.stat \n");
   open(NEW_RES_FILE, "<$root.new.stat") ||
@@ -274,46 +327,42 @@ sub tst_status_merge
   open(TEMP_FILE, ">$root.tmp.stat") ||
     return (1, "Can not open $root.tmp.stat \n");
 
-  $new_line = <NEW_RES_FILE>;
-  $line = <RES_FILE>;
-  while ($line)
+  while (1)
   {
-    if ($new_line =~ /(\d+) >> (\w+) ::.*$hostname:(\d+)/ && $merge{$2})
+    while (($new_line = <NEW_RES_FILE>) && $new_line !~ /(\d+) >> (\w+) ::/){}
+    last unless $new_line =~ /(\d+) >> (\w+) ::.*$hostname:(\d+)/;
+    my $prefix = $1;
+    my $crit = $2;
+    my $new_res = "$this_time:$singular_date:$singular_version:$singular_uname:$hostname:$3";
+    while (($line = <RES_FILE>) && $line !~ /$prefix >> $crit ::/){}
+    unless ($line)
     {
-      $prefix = $1;
-      $crit = $2;
-      $new_res = $3;
-      if ($line =~ /$prefix >> $crit ::(.*)$hostname:(\d+)/)
-      {
-        $line =~ s/$hostname:$2/$hostname:$new_res/;
-        print(TEMP_FILE $line);
-      }
-      elsif ($line =~ /$prefix >> $crit ::(.*)/)
-      {
-        print(TEMP_FILE
-              "$prefix >> $crit :: $hostname:$new_res $1\n");
-      }
-      else
-      {
-        close(RES_FILE);
-        close(NEW_RES_FILE);
-        close(TEMP_FILE);
-        &mysystem("$rm $root.tmp.stat");
-        return (1, "Generate before doing a merge\n");
-      }
+      close(RES_FILE);
+      close(NEW_RES_FILE);
+      close(TEMP_FILE);
+      &mysystem("$rm $root.tmp.stat");
+      return (1, "Can not find '$prefix >> $crit' in $root.stat\n");
+    }
+    if ($merge_version)
+    {
+      $line =~ s/[^ ]*:$singular_version:$singular_uname:$hostname:\d+//g;
+      chop $line;
+      $line .= " $new_res\n";
     }
     else
     {
-      print(TEMP_FILE $line);
+      chop $line;
+      $line .= " $new_res\n";
     }
-    $new_line = <NEW_RES_FILE>;
-    $line = <RES_FILE>;
+    print TEMP_FILE $line;
   }
+  
   close(RES_FILE);
   close(NEW_RES_FILE);
   close(TEMP_FILE);
   &mysystem("$mv -f $root.tmp.stat $root.stat");
-  &mysystem("$rm -f $root.new.stat $root.stat.sdiff");
+  &mysystem("$rm -f $root.new.stat $root.stat.sdiff") unless $keep eq "yes";
+  return ;
 }
 
 sub tst_check
@@ -355,10 +404,10 @@ sub tst_check
     }
   }
 
-  &mysystem("$rm -f tst_status.out");
   my $resfile = "$root.new.res";
   $resfile = "$root.mtrack.res" if ($mtrack);
-  
+  my $statfile = "$root.new.stat";
+  &mysystem("$rm -f $statfile");
   if ($mtrack)
   {
     $system_call = "$cat $root.tst | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");system(\"mtrack\", \"$root.mtrack.unused\"); \\\$/' | $singular $singularOptions ";
@@ -368,14 +417,15 @@ sub tst_check
   }
   else
   {
+    
     # prepare Singular run
     if ($verbosity > 2 && !$WINNT)
     {
-      $system_call = "$cat $root.tst | $singular $singularOptions | $tee $resfile";
+      $system_call = "$cat $root.tst | $singular --execute 'string tst_status_file=\"$statfile\";' $singularOptions | $tee $resfile";
     }
     else
     {
-      $system_call = "$cat $root.tst | $singular $singularOptions > $resfile 2>&1";
+      $system_call = "$cat $root.tst | $singular --execute 'string tst_status_file=\"$statfile\";' $singularOptions > $resfile 2>&1";
     }
   }
   # Go Singular, Go!
@@ -417,17 +467,19 @@ sub tst_check
     }
   }
 
+  mysystem("mv tst_status.out $statfile")
+    if (! -e $statfile && -e "tst_status.out");
+
   if (%checks && ! $exit_status && $generate ne "yes" && ! $mtrack)
   {
-    if (-e "tst_status.out")
+    if (-e "$statfile")
     {
-      & mysystem("$cp tst_status.out $root.new.stat");
       # do status checks
       ($exit_status, $error_cause) = & tst_status_check($root);
     }
     else
     {
-      print "Warning: no file tst_status.out\n";
+      print "Warning: no file $statfile\n";
     }
   }
 
@@ -444,7 +496,8 @@ sub tst_check
       #clean up
       if ($generate eq "yes")
       {
-	& mysystem("$cp tst_status.out $root.stat");
+	mysystem("$rm -f $root.stat") unless %merge;
+	($exit_status, $error_cause) = tst_status_merge($root);
 	if (! $WINNT)
 	{
 	  &mysystem("$gzip -cf $root.res | $uuencode $root.res.gz > $root.res.gz.uu");
@@ -454,22 +507,13 @@ sub tst_check
 	  # uuencode is broken under windows
 	  print "Warning: Can not generate $root.res.gz.uu under Windows\n";
 	}
-	
       }
       elsif (%merge)
       {
-	if (! -r "$root.stat")
-	{
-	  & mysystem("$cp tst_status.out $root.stat");
-	}
-	else
-	{
-	  & mysystem("$cp tst_status.out $root.new.stat");
-	  ($exit_status, $error_cause) = & tst_status_merge($root);
+	($exit_status, $error_cause) = & tst_status_merge($root);
 	  
-	  print (STDERR "Warning: Merge Problems: $error_cause\n")
-	    if ($verbosity > 0 && $exit_status);
-	}
+	print (STDERR "Warning: Merge Problems: $error_cause\n")
+	  if ($verbosity > 0 && $exit_status);
       }
     }
     if ($keep ne "yes")
@@ -579,8 +623,9 @@ while ($ARGV[0] =~ /^-/)
       $checks{$crit} = 1;
     }
   }
-  elsif(/^-m$/)
+  elsif(/^-a/ || /^-m/)
   {
+    $merge_version = 1 if /^-m/;
     if ($ARGV[0] &&
         $ARGV[0] !~ /^-/ && $ARGV[0] !~ /.*\.tst/ && $ARGV[0] !~ /.*\.lst/)
     {
@@ -595,6 +640,10 @@ while ($ARGV[0] =~ /^-/)
       $merge{"tst_timer"} =  1;
       $merge{"tst_timer_1"} =  1;
     }
+  }
+  elsif (/^-c/)
+  {
+    $status_check_regexp = shift;
   }
   else
   {
