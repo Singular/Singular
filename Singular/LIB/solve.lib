@@ -1,0 +1,268 @@
+///////////////////////////////////////////////////////////////////////////////
+
+version="$Id: solve.lib,v 1.1 1999-06-28 13:35:06 wenk Exp $";
+info="
+LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
+AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
+
+ ures_solve(i,..);      find all roots of 0-dimensional ideal i with resultants
+ mp_res_mat(i,..);      multipolynomial resultant matrix of ideal i
+ laguerre_solve(p,..);  find all roots of univariate polynom p
+ interpolate(i,j,d);    interpolate poly from evaluation points i and results j
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc ures_solve( ideal gls, list # )
+"USAGE:   ures_solve(i[,k,l,m]); i ideal, k,l,m integers
+         k=0: use sparse resultant matrix of Gelfand, Kapranov and Zelevinsky
+         k=1: use resultant matrix of Macaulay (k=0 is default)
+         l>0: defines precision of fractional part if groundfield is Q
+         m=0,1,2: number of iterations for approximation of roots (default=2)
+ASSUME:  i is a zerodimensional ideal with 
+         nvars(basering) = ncols(i) = number of vars actually occuring in i 
+RETURN:  list of all (complex) roots of the polynomial system i = 0,
+         of type number if the groundfield is the complex numbers,
+         of type string if the groundfield is the rational or real numbers
+EXAMPLE: example ures_solve; shows an example
+"
+{
+  int typ=2;
+  int polish=2;
+  int prec=30;
+
+  if ( size(#) >= 1 ) 
+    {
+      typ= #[1];
+      if ( typ < 0 || typ > 1 ) 
+	{
+	  ERROR("// Valid values for second parameter are:
+	  // 0: use sparse Resultant (default)
+	  // 1: use Macaulay Resultant");
+	}
+    }
+  if ( size(#) >= 2 ) 
+    {
+      prec= #[2];
+      if ( prec == 0 ) { prec = 30; }
+      if ( prec < 0 ) 
+	{
+	  "// Fourth parameter must be positive!";
+	  return();
+	}
+    }
+  if ( size(#) >= 3 ) 
+    {
+      polish= #[3];
+      if ( polish < 0 || polish > 3 ) 
+	{
+	  "// Valid values for third parameter are: ";
+	  "// 0,1,2: number of iterations for approximation of roots";
+	  return();
+	}
+      if ( polish == 0 ) { polish = 3; }
+    }
+
+  if ( size(#) > 3 ) 
+    {
+      // Error
+      "// only three parameters allowed!";
+      return();
+    }
+
+  int digits= system("setFloatDigits",prec);
+
+  return(uressolve(gls,typ,polish));
+  
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  // compute the intersection points of two curves
+  ring rsq = 0,(x,y),lp;
+  ideal gls=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
+  ures_solve(gls);
+  // result is a list (x,y)-coordinates as strings
+
+  pause;
+  // now with complex coefficient field, precision is 10 digits 
+  ring rsc= (real,10,I),(x,y),lp;
+  ideal i = x2 + y2 - 8,x2 + xy + 2y2;
+  ures_solve(i);
+  // result is a list of (x,y)-coordinates of complex numbers
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc laguerre_solve( poly f, list # )
+"USAGE:   laguerre_solve( p[,l,m]); f poly, l,m integers
+         l>0: defines precision of fractional part if groundfield is Q
+         m=0,1,2: number of iterations for approximation of roots (default=2)
+ASSUME:  p is an univariate polynom
+RETURN:  list of all (complex) roots of the polynomial p
+EXAMPLE: example laguerre_solve; shows an example
+"
+{
+  int polish=3;
+  int prec=30;
+
+  if ( size(#) >= 1 ) 
+    {
+      prec= #[1];
+      if ( prec == 0 ) { prec = 30; }
+      if ( prec < 0 ) 
+	{
+	  "// Fisrt parameter must be positive!";
+	  return();
+	}
+    }
+  if ( size(#) >= 2 ) 
+    {
+      polish= #[2];
+      if ( polish == 0 ) { polish = 3; }
+      if ( polish < 0 || polish > 2 ) 
+	{
+	  "// Valid values for third parameter are: ";
+	  "// 0,1,2: number of iterations for approximation of roots";
+	  return();
+	}
+    }
+  if ( size(#) > 2 ) 
+    {
+      "// only two parameters allowed!";
+      return();
+    }
+
+  int digits= system("setFloatDigits",prec);
+
+  return(laguerre(f,polish));
+  
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  // Find all roots of an univariate polynomial using Laguerre's method:
+  ring rs1= 0,(x1,x2),lp;
+  poly f = 15*x1^5 + x1^3 + x1^2 - 10;
+  laguerre_solve(f);
+
+  pause;
+  // Now with 10 digits precision:
+  laguerre_solve(f,10);
+
+  pause;
+  // Now with complex coefficients, precision is 20 digits:
+  ring rsc= (real,20,I),(x1,x2),lp;
+  poly f = (15+I*5)*x1^5 + (2+I*2)*x1^3 + x1^2 - 10*I;
+  laguerre_solve(f);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc mp_res_mat( ideal gls, list # )
+"USAGE:   mp_res_mat(i[,k]); i ideal, k integer
+         k=0: sparse resultant matrix of Gelfand, Kapranov and Zelevinsky
+         k=1: resultant matrix of Macaulay (k=0 is default)
+ASSUME:  nvars(basering) = ncols(i)-1 = number of vars actually occuring in i,
+         for k=1 i must be homogeneous 
+RETURN:  module representing the multipolynomial resultant matrix 
+EXAMPLE: example mp_res_mat; shows an example
+"
+{
+  int typ=2;
+
+  if ( size(#) == 1 ) 
+    {
+      typ= #[1];
+      if ( typ == 0 ) { typ = 2; }
+      if ( typ < 0 || typ > 2 ) 
+	{
+	  "// Valid values for third parameter are: ";
+	  "// 0: sparse resultant (default)";
+	  "// 1: Macaulay resultant";
+	  return();
+	}
+    }
+  if ( size(#) > 1 ) 
+    {
+      "// only two parameters allowed!";
+      return();
+    }
+
+  return(mpresmat(gls,typ));
+  
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  // compute resultant matrix in ring with parameters (sparse resultant matrix)
+  ring rsq= (0,u0,u1,u2),(x1,x2),lp;
+  ideal gls= u0+u1*x1+u2*x2,x1^2 + x2^2 - 10,x1^2 + x1*x2 + 2*x2^2 - 16;
+  module m = mp_res_mat(gls);
+  print(m);
+  // computing sparse resultant
+  det(m);
+
+  pause;
+  // compute resultant matrix (Macaulay resultant matrix)
+  ring rdq= (0,u0,u1,u2),(x0,x1,x2),lp;
+  ideal hgls=  homog(imap(rsq,gls),x0);
+  hgls;
+  module m = mp_res_mat(hgls,1);
+  print(m);
+  // computing Macaulay resultant (should be the same as above!)
+  det(m);
+
+  pause;
+  // compute numerical sparse resultant matrix
+  setring rsq;
+  ideal glsr= 15+2*x1+5*x2,x1^2 + x2^2 - 10,x1^2 + x1*x2 + 2*x2^2 - 16;
+  module mn = mp_res_mat(glsr);
+  print(mn);
+  // computing sparse resultant
+  det(mn);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc interpolate( ideal p, ideal w )
+"USAGE:   interpolate(p,v); p,v ideals
+ASSUME:  ground field K is the rational or real or complex numbers,
+         p and v consist of numbers of the ground filed K, p must have
+         n elements, v must have N=(d+1)^n elements where n=nvars(basering) 
+         and d=deg(f) (f is the unknown polynomial in K[x1,...,xn]) 
+COMPUTE: polynomial f with values given by v at points p1,..,pN derived from p;
+         more precisely: consider p as point in K^n and v as N elements in K,
+         let p1,..,pN be the points in K^n obtained by evaluating all monomials
+         of degree <= d at p in lexicographical order,
+         then the procedure computes the polynomial f satisfying f(pi) = v[i]
+RETURN:  polynomial f of degree d
+NOTE:    mainly useful for n=1, with f satisfying f(p^(i-1)) = v[i], i=1..d+1
+EXAMPLE: example interpolate; shows an example
+"
+{
+  return(vandermonde(p,w));
+}
+example
+{
+  "EXAMPLE:";  echo=2;
+  ring r1 = 0,(x),lp;
+  // First example:
+  // deg(f) = 4, 
+  // v = values of f at points 3^0, 3^1, 3^2, 3^3, 3^4
+  ideal v=16,0,11376,1046880,85949136;
+  interpolate( 3, v );
+
+  ring r2 = 0,(x,y),dp;
+  // Second example: 
+  // deg(f) = 3
+  // valuation point (2,3)
+  // v = values at 16 points
+  ideal p = 2,3;
+  ideal v= 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16;
+  interpolate( p,v );
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
