@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.10 1997-10-20 10:51:57 Singular Exp $
+// $Id: clapconv.cc,v 1.11 1997-10-20 15:27:22 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -85,9 +85,9 @@ convSingPClapP( poly p )
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = pGetExp( p, i )) != 0 )
-         term = term * power( Variable( i ), e );
+         term *= power( Variable( i ), e );
     }
-    result = result + term;
+    result += term;
     p = pNext( p );
   }
   return result;
@@ -100,8 +100,8 @@ convClapPSingP ( const CanonicalForm & f )
   int n = pVariables+1;
   /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
   int * exp = new int[n];
-  for ( int i = 0; i < n; i++ )
-    exp[i] = 0;
+  //for ( int i = 0; i < n; i++ ) exp[i] = 0;
+  memset(exp,0,n*sizeof(int));
   poly result = NULL;
   convRecPP( f, exp, result );
   delete [] exp;
@@ -193,9 +193,6 @@ convSingTrClapP( alg p )
         {
           MP_INT num, den;
           On(SW_RATIONAL);
-          #ifdef LDEBUG
-            PrintS("switch to rational\n");
-          #endif
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
           term = make_cf( num, den, false );
@@ -204,9 +201,6 @@ convSingTrClapP( alg p )
         { // assume s == 0
           MP_INT num, den;
           On(SW_RATIONAL);
-          #ifdef LDEBUG
-            PrintS("switch to rational ?1\n");
-          #endif
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
           term = make_cf( num, den, true );
@@ -216,9 +210,9 @@ convSingTrClapP( alg p )
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = napGetExp( p, i )) != 0 )
-        term = term * power( Variable( i ), e );
+        term *= power( Variable( i ), e );
     }
-    result = result + term;
+    result += term;
     p = napNext( p );
   }
   return result;
@@ -231,8 +225,8 @@ convClapPSingTr ( const CanonicalForm & f )
   int n = napVariables+1;
   /* ASSERT( level( f ) <= napVariables, "illegal number of variables" ); */
   int * exp = new int[n];
-  for ( int i = 0; i < n; i++ )
-    exp[i] = 0;
+  // for ( int i = 0; i < n; i++ ) exp[i] = 0;
+  memset(exp,0,n*sizeof(int));
   alg result = NULL;
   convRecPTr( f, exp, result );
   delete [] exp;
@@ -255,7 +249,7 @@ convRecPTr ( const CanonicalForm & f, int * exp, alg & result )
   else
   {
     alg term = napNew();
-    napNext( term ) = NULL;
+    // napNext( term ) = NULL; //already done by napNew
     for ( int i = 1; i <= napVariables; i++ )
       napGetExp( term, i ) = exp[i];
     if ( getCharacteristic() != 0 )
@@ -320,9 +314,9 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = pGetExp( p, i )) != 0 )
-        term = term * power( Variable( i ), e );
+        term *= power( Variable( i ), e );
     }
-    result = result + term;
+    result += term;
     p = pNext( p );
   }
   return result;
@@ -333,8 +327,8 @@ poly convClapAPSingAP ( const CanonicalForm & f )
   int n = pVariables+1;
   /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
   int * exp = new int[n];
-  for ( int i = 0; i < n; i++ )
-    exp[i] = 0;
+  // for ( int i = 0; i < n; i++ ) exp[i] = 0;
+  memset(exp,0,n*sizeof(int));
   poly result = NULL;
   convRecAP( f, exp, result );
   delete [] exp;
@@ -405,9 +399,6 @@ CanonicalForm convSingAClapA ( alg p , const Variable & a )
         {
           MP_INT num, den;
           On(SW_RATIONAL);
-          #ifdef LDEBUG
-            PrintS("switch to rational\n");
-          #endif  
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
           term = make_cf( num, den, false );
@@ -416,9 +407,6 @@ CanonicalForm convSingAClapA ( alg p , const Variable & a )
         { // assume s == 0
           MP_INT num, den;
           On(SW_RATIONAL);
-          #ifdef LDEBUG
-            PrintS("switch to rational ?2\n");
-          #endif  
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
           term = make_cf( num, den, true );
@@ -426,8 +414,8 @@ CanonicalForm convSingAClapA ( alg p , const Variable & a )
       }
     }
     if ( (e = napGetExp( p, 1 )) != 0 )
-      term = term * power( a , e );
-    result = result + term;
+      term *= power( a , e );
+    result += term;
     p = napNext( p );
   }
   return result;
@@ -454,7 +442,6 @@ static number convClapNSingAN( const CanonicalForm &f)
       z->s = 0;
     }
     #ifdef LDEBUG
-    z->debug=123456;
     nlDBTest(z,__FILE__,__LINE__);
     #endif
     return z;
@@ -468,7 +455,7 @@ alg convClapASingA ( const CanonicalForm & f )
   for( CFIterator i=f; i.hasTerms(); i++)
   {
     t=napNew();
-    napNext( t ) = NULL;
+    // napNext( t ) = NULL; //already done by napNew
     napGetCoeff(t)=convClapNSingAN( i.coeff() );
     if (nacIsZero(napGetCoeff(t)))
     {
@@ -498,7 +485,7 @@ CanonicalForm convSingTrPClapP ( poly p )
       if ( (e = pGetExp( p, i )) != 0 )
         term = term * power( Variable( i + offs ), e );
     }
-    result = result + term;
+    result += term;
     p = pNext( p );
   }
   return result;
@@ -509,8 +496,8 @@ poly convClapPSingTrP ( const CanonicalForm & f )
   int n = pVariables+1;
   /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
   int * exp = new int[n];
-  for ( int i = 0; i < n; i++ )
-    exp[i] = 0;
+  // for ( int i = 0; i < n; i++ ) exp[i] = 0;
+  memset(exp,0,n*sizeof(int));
   poly result = NULL;
   convRecTrP( f, exp, result , rPar(currRing) );
   delete [] exp;

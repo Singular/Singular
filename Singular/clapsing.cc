@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.15 1997-10-15 16:40:06 hannes Exp $
+// $Id: clapsing.cc,v 1.16 1997-10-20 15:27:25 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -336,8 +336,7 @@ void singclap_divide_content ( poly f )
         lnumber c=(lnumber)pGetCoeff(p);
         napDelete(&c->z);
         #ifdef LDEBUG
-        number nt=nInit(1);
-        memset(nt,0,sizeof(slnumber));
+        number nt=(number)Alloc0(sizeof(rnumber));
         lnumber nnt=(lnumber)nt;
         nnt->z=convClapPSingTr( i.getItem());
         nTest(nt);
@@ -391,8 +390,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
           number nn=nDiv(N,pGetCoeff(f));
           nDelete(&N);
           N=nn;
-        }  
-      }  
+        }
+      }
     }
     CanonicalForm F( convSingPClapP( f ) );
     if (nGetChar()==0) /* Q */
@@ -479,11 +478,11 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
           res->m[j] = convClapAPSingAP( J.getItem().factor() );
       }
     }
-    if (N!=NULL) 
+    if (N!=NULL)
     {
       pMultN(res->m[0],N);
       nDelete(&N);
-    }  
+    }
     // delete constants
     if ((with_exps!=0) && (res!=NULL))
     {
@@ -692,9 +691,9 @@ poly singclap_det( const matrix m )
     setCharacteristic( nGetChar() );
     CFMatrix M(r,r);
     int i,j;
-    for(i=1;i<=r;i++)
+    for(i=r;i>0;i--)
     {
-      for(j=1;j<=r;j++)
+      for(j=r;j>0;j--)
       {
         M(i,j)=convSingPClapP(MATELEM(m,i,j));
       }
@@ -714,9 +713,9 @@ poly singclap_det( const matrix m )
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       int i,j;
-      for(i=1;i<=r;i++)
+      for(i=r;i>0;i--)
       {
-        for(j=1;j<=r;j++)
+        for(j=r;j>0;j--)
         {
           M(i,j)=convSingAPClapAP(MATELEM(m,i,j),a);
         }
@@ -726,9 +725,9 @@ poly singclap_det( const matrix m )
     else
     {
       int i,j;
-      for(i=1;i<=r;i++)
+      for(i=r;i>0;i--)
       {
-        for(j=1;j<=r;j++)
+        for(j=r;j>0;j--)
         {
           M(i,j)=convSingTrPClapP(MATELEM(m,i,j));
         }
@@ -747,9 +746,9 @@ int singclap_det_i( intvec * m )
   setCharacteristic( 0 );
   CFMatrix M(m->rows(),m->cols());
   int i,j;
-  for(i=1;i<=m->rows();i++)
+  for(i=m->rows();i>0;i--)
   {
-    for(j=1;j<=m->cols();j++)
+    for(j=m->cols();j>0;j--)
     {
       M(i,j)=IMATELEM(*m,i,j);
     }
@@ -873,7 +872,7 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
    {
      ff= convClapASingA( F/ GCD );
      gg= convClapASingA( G/ GCD );
-   }  
+   }
  }
  else
  {
@@ -883,7 +882,7 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
    {
      ff= convClapPSingTr( F/ GCD );
      gg= convClapPSingTr( G/ GCD );
-   }  
+   }
  }
  Off(SW_RATIONAL);
 }
