@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.26 1998-10-06 08:24:26 Singular Exp $ */
+/* $Id: longalg.cc,v 1.27 1999-01-21 15:00:07 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -701,6 +701,40 @@ static int  napDeg(alg p)
 }
 
 /*3
+* the max degree of an alg poly (used for test of "simple" et al.)
+*/
+static int  napMaxDeg(alg p)
+{
+  int  d = 0;
+  mmTestP(p,napMonomSize);
+  while(p!=NULL)
+  {
+    d=max(d,napDeg(p));
+    p=p->ne;
+  }
+  return d;
+}
+
+/*3
+* the max degree of an alg poly (used for test of "simple" et al.)
+*/
+static int  napMaxDegLen(alg p, int &l)
+{
+  int  d = 0;
+  int ll=0;
+  mmTestP(p,napMonomSize);
+  while(p!=NULL)
+  {
+    d=max(d,napDeg(p));
+    p=p->ne;
+    ll++;
+  }
+  l=ll;
+  return d;
+}
+
+
+/*3
 *writes a polynomial number
 */
 void napWrite(alg p)
@@ -1178,6 +1212,23 @@ int     naParDeg(number n)     /* i := deg(n) */
   lnumber l = (lnumber)n;
   if (l==NULL) return -1;
   return napDeg(l->z);
+}
+
+//int     naParDeg(number n)     /* i := deg(n) */
+//{
+//  lnumber l = (lnumber)n;
+//  if (l==NULL) return -1;
+//  return napMaxDeg(l->z)+napMaxDeg(l->n);
+//}
+
+int     naSize(number n)     /* size desc. */
+{
+  lnumber l = (lnumber)n;
+  if (l==NULL) return -1;
+  int len_z;
+  int len_n;
+  int o=napMaxDegLen(l->z,len_z)+napMaxDegLen(l->n,len_n);
+  return (len_z+len_n)+o;
 }
 
 /*2
@@ -1897,11 +1948,11 @@ void naNormalize(number &pp)
 #if FEHLER1
   if (naMinimalPoly == NULL)
   {
-    alg xx=x;
-    alg yy=y;
     int i;
     for (i=naNumbOfPar-1; i>=0; i--)
     {
+      alg xx=x;
+      alg yy=y;
       int m = napExpi(i, yy, xx);
       if (m != 0)          // in this case xx!=NULL!=yy
       {

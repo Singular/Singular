@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.6 1998-04-21 10:59:26 obachman Exp $ */
+/* $Id: longalg.h,v 1.7 1999-01-21 15:00:07 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -52,6 +52,7 @@ void    naDelete (number *p);
 number  naInit(int i);                              /* z := i */
 number  naPar(int i);                               /* z := par(i) */
 int     naParDeg(number n);                         /* i := deg(n) */
+int     naSize(number n);                           /* size desc. */
 int     naInt(number &n);
 void    naNumberToInt(number n, int *i);
 void    naNew(number *z);

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.7 1997-08-12 17:14:42 Singular Exp $ */
+/* $Id: numbers.cc,v 1.8 1999-01-21 15:00:08 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -144,7 +144,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
       nLcm  = naLcm;
       nSetMap = naSetMap;
       nName= naName;
-      nSize  = naParDeg;
+      nSize  = naSize;
 #ifdef LDEBUG
       nDBTest=naDBTest;
 #endif

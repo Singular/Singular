@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.44 1999-01-07 12:21:50 Singular Exp $
+// $Id: clapsing.cc,v 1.45 1999-01-21 15:00:05 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -509,16 +509,42 @@ void singclap_divide_content ( poly f )
     CanonicalForm g, h;
     poly p = pNext(f);
 
-    // first attemp: find smallest g:
+    // first attemp: find 2 smallest g:
 
-    number gg=pGetCoeff(f);
+    number g1=pGetCoeff(f);
+    number g2=pGetCoeff(p); // p==pNext(f);
+    pIter(p);
+    int sz1=nSize(g1);
+    int sz2=nSize(g2);
+    if (sz1>sz2)
+    {
+      number gg=g1;
+      g1=g2; g2=gg;
+      int sz=sz1;
+      sz1=sz2; sz2=sz;
+    }
     while (p!=NULL)
     {
-      if (nGreater(gg,pGetCoeff(p))) gg=pGetCoeff(p);
+      int n_sz=nSize(pGetCoeff(p));
+      if (n_sz<sz1)
+      {
+        sz2=sz1;
+        g2=g1;
+        g1=pGetCoeff(p);
+        sz1=n_sz;
+        if (sz1<=3) break;
+      }
+      else if(n_sz<sz2)
+      {
+        sz2=n_sz;
+        g2=pGetCoeff(p);
+        sz2=n_sz;
+      }
       pIter(p);
     }
-    FACTORY_ALGOUT( "G", ((lnumber)gg)->z );
-    g = convSingTrClapP( ((lnumber)gg)->z );
+    FACTORY_ALGOUT( "G", ((lnumber)g1)->z );
+    g = convSingTrClapP( ((lnumber)g1)->z );
+    g = gcd( g, convSingTrClapP( ((lnumber)g2)->z ));
 
     // second run: gcd's
 
