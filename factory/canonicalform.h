@@ -1,11 +1,16 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: canonicalform.h,v 1.1 1996-06-24 11:26:36 stobbe Exp $
+// $Id: canonicalform.h,v 1.2 1996-07-15 08:32:46 stobbe Exp $
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/06/24 11:26:36  stobbe
+"new function determinant.
+new template class Matrix<CanonicalForm>
+"
+
 Revision 1.0  1996/05/17 10:59:37  stobbe
 Initial revision
 
@@ -290,6 +295,8 @@ CFFList factorize( const CanonicalForm & f, bool issqrfree = false );
 CFFList factorize( const CanonicalForm & f, const Variable & alpha );
 
 // calculate the determinant of the n'th minor of M
+
+bool linearSystemSolve( CFMatrix & M );
 
 CanonicalForm determinant( const CFMatrix & M, int n );
 
