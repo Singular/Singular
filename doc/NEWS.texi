@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.20 2000-10-24 09:39:39 Singular Exp $
+@comment $Id: NEWS.texi,v 1.21 2000-10-30 17:35:25 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -98,7 +98,7 @@ procedures for decomposing zero-dimensional ideals
 procedures for solving polynomial systems
 @item @nref{surf_lib}
 visualization of curves and surfaces with @code{surf}
-@item{reesclos_lib}
+@item @nref{reesclos_lib}
 Rees Algebra and integral closure of an ideal
 @end table
 
