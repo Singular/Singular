@@ -1,84 +1,15 @@
-\input texinfo    @c -*-texinfo-*-
-@comment $Id: plural.doc,v 1.2 2002-12-20 14:11:25 levandov Exp $
-@comment this file contains the main structure of the manual
-
-
-@c ------------------------
-@c %**start of header
-@c ------------------------
-@setfilename plural.hlp
-@settitle Singular:Plural Manual
-@c @setchapternewpage odd
-@paragraphindent 0
-@c ------------------------
-@c %**end of header
-@c ------------------------
-
-@c --------------------- general settings --------------------
-@iftex
-@afourpaper
-@finalout
-@pagesizes 23cm, 16.5cm
-@end iftex
-
-@set singularmanual 1
-@set namespaces 1
-@include version.texi
-@include uname.texi
-@c --------------------- end general setting --------------------
-
-
-@c --------------------- invisible Info header ------------------------
-@ifinfo
-This is the texinfo file describing Singular:Plural (version @value{VERSION})
-@end ifinfo
-@c --------------------- end Info invisible header --------------------
-
-
-@c --------------------- tex titlepage --------------------
-@titlepage
-@sp 2
-@center @titlefont{Singular:Plural}
-@sp 2
-@center A Computer Algebra System for Polynomial Computations
-@c@sp 5
-@center @titlefont{Manual}
-@center Version @value{VERSION}
-@sp 2
-@center Singular:Plural is created and its development is directed and coordinated by
-@center V. Levandovskyy and H. Sch@"onemann
-@sp 2
-@center with contributions by
-@center L. Bodnarchuk and O. Khomenko
-@sp 2
-@author Fachbereich Mathematik
-@author Zentrum f@"ur Computeralgebra
-@author Universit@"at Kaiserslautern
-@author D-67653 Kaiserslautern
-@end titlepage
-
-@c print short table of contents in tex right after titlepage
-@c Detailed ToC is printed at the end of the manual
-@shortcontents
-
+@ifclear singularmanual
 @c -----------------------Top node-----------------------------------
-@node Top, Data types, (dir), (dir)
-
-@ifnothtml
-@ifinfo
-@center @strong{SINGULAR:PLURAL}
-@center A Computer Algebra System for Polynomial Computations
-@center User Manual for @sc{Singular:Plural} Version @value{VERSION}
-@center @uref{http://www.singular.uni-kl.de}
-@end ifinfo
-@end ifnothtml
+@node Top, PLURAL functions, (dir) ,(dir)
+@c @chapter PLURAL
+@c @cindex PLURAL
 
 @ifhtml
 @html
 <CENTER>
 <A HREF="http://www.singular.uni-kl.de">
 <IMG SRC="singular.jpg"></A><br>
-<h3> A Computer Algebra System for Polynomial Computations </h3>
+<h3> A Computer Algebra System for Noncommutative Polynomial Algebras </h3>
 <p></p>
 <h4>HTML User Manual for Singular:Plural Version
 @end html
@@ -93,19 +24,21 @@ This is the texinfo file describing Singular:Plural (version @value{VERSION})
 @end html
 @end ifhtml
 
+@end ifclear
+
 @menu
 @c * Preface::
 @c * Introduction::
 @c * General concepts::
-* Data types::
-* Functions and system variables::
+@c * Data types::
+* PLURAL functions::
 @c * Tricks and pitfalls::
 @c * Examples::
 @c * Polynomial data::
-* Mathematical background::
+@c * Mathematical background::
 @c * SINGULAR libraries::
 @c * Release Notes::
-* Index::
+* PLURAL Index::
 @end menu
 
 @c @c ----------------------------------------------------------------------------
@@ -127,15 +60,15 @@ This is the texinfo file describing Singular:Plural (version @value{VERSION})
 @c @include general.tex
 
 @c ----------------------------------------------------------------------------
-@node Data types, Functions and system variables , Top, Top
-@chapter Data types
-@cindex Data types
-@include plutypes.tex
+@c @node Data types, Functions and system variables , Top, Top
+@c @chapter Data types
+@c @cindex Data types
+@c @include plutypes.tex
 
 @c ----------------------------------------------------------------------------
-@node Functions and system variables, Mathematical background,Data types, Top
-@chapter Functions and system variables
-@cindex Commands
+@node PLURAL functions, PLURAL Index, Top, Top
+@section Plural functions and system variables
+@cindex Plural commands
 @include plureference.tex
 
 @c @c ----------------------------------------------------------------------------
@@ -157,10 +90,10 @@ This is the texinfo file describing Singular:Plural (version @value{VERSION})
 @c @include pdata.tex
 
 @c ----------------------------------------------------------------------------
-@node Mathematical background, Index, Data types, Top
-@appendix Mathematical background
-@cindex Mathematical background
-@include plumath.tex
+@c @node Mathematical background, Index, Data types, Top
+@c @appendix Mathematical background
+@c @cindex Mathematical background
+@c @include plumath.tex
 
 @c @c ----------------------------------------------------------------------------
 @c @node SINGULAR libraries, Release Notes, Mathematical background, Top
@@ -174,335 +107,8 @@ This is the texinfo file describing Singular:Plural (version @value{VERSION})
 @c Use the @ref{LIB} command for loading of single libraries, and the
 @c command @code{LIB "all.lib";} for loading all libraries.
 
-@c @menu
-@c * standard_lib:: extensions of Singular kernel
-@c * General purpose::
-@c * Linear algebra::
-@c * Commutative algebra::
-@c * Singularities::
-@c * Invariant theory::
-@c * Symbolic-numerical solving::
-@c * Visualization::
-@c * Coding theory::
-@c @end menu
-@c @c ----------------------------------------------------------
-@c @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
-@c @section standard_lib
-
-@c The library @code{standard.lib} provides extensions to the
-@c set of built-in commands and is automatically loaded
-@c during the start of @sc{Singular}, unless @sc{Singular} is started up
-@c with the @code{--no-stdlib} command line option (see
-@c @ref{Command line options}).
-
-@c @c lib standard.lib:LibInfo lib_fun lib_ex section
-
-@c @c ----------------------------------------------------------------------------
-@c @node General purpose, Linear algebra, standard_lib, SINGULAR libraries
-@c @section General purpose
-@c @cindex General purpose
-
-@c @menu
-@c * all_lib:: load all other libraries
-@c * general_lib:: procedures of general type
-@c * inout_lib:: procedures for manipulating in- and output
-@c * poly_lib:: procedures for manipulating polynomials and ideals
-@c * random_lib:: procedures of random/sparse  matrix and poly operations
-@c * ring_lib:: procedures for manipulating rings and maps
-@c @end menu
-
-@c @c ----------------------------------------------------------
-@c @node all_lib, general_lib, General purpose, General purpose
-@c @subsection all_lib
-@c @cindex all_lib
-@c @cindex all.lib
-
-@c The library @code{all.lib} provides a convenient way to load all
-@c libraries of the @sc{Singular} distribution.
-
-@c @strong{Example:}
-@c @smallexample
-@c @c example
-@c option(loadLib);
-@c LIB "all.lib";
-@c @c example
-@c @end smallexample
-@c @c ----------------------------------------------------------
-@c @node general_lib, inout_lib, all_lib, General purpose
-@c @subsection general_lib
-@c @c lib  general.lib no_ex
-@c @c ----------------------------------------------------------
-@c @node inout_lib, poly_lib, general_lib, General purpose
-@c @subsection inout_lib
-@c @c lib inout.lib
-@c @c ----------------------------------------------------------
-@c @node poly_lib, random_lib, inout_lib, General purpose
-@c @subsection poly_lib
-@c @c lib poly.lib
-@c @c ----------------------------------------------------------
-@c @node random_lib, ring_lib, poly_lib, General purpose
-@c @subsection random_lib
-@c @c lib random.lib
-@c @c ----------------------------------------------------------
-@c @node ring_lib, , random_lib, General purpose
-@c @subsection ring_lib
-@c @c lib ring.lib
-@c @c ----------------------------------------------------------------------------
-@c @node Linear algebra, Commutative algebra, General purpose, SINGULAR libraries
-@c @section Linear algebra
-@c @cindex Linear algebra
-
-@c @menu
-@c * matrix_lib:: procedures for matrix operations
-@c * linalg_lib:: procedures for algorithmic linear algebra
-@c @end menu
-
-@c @c ----------------------------------------------------------
-@c @node matrix_lib, linalg_lib,  Linear algebra, Linear algebra
-@c @subsection matrix_lib
-@c @c lib matrix.lib
-@c @c ---------------------------------------------------------
-@c @node linalg_lib, , matrix_lib, Linear algebra
-@c @subsection linalg_lib
-@c @c lib linalg.lib no_ex
-@c @c ----------------------------------------------------------------------------
-@c @node Commutative algebra, Singularities, Linear algebra, SINGULAR libraries
-@c @section Commutative algebra
-@c @cindex Commutative algebra
-
-@c @menu
-@c * algebra_lib:: procedures for computing with algebras and maps
-@c * elim_lib:: procedures for elimination, saturation and blowing up
-@c * homolog_lib:: procedures for homological algebra
-@c * mprimdec_lib:: procedures for primary decomposition of modules
-@c * mregular_lib:: procedures for Castelnuovo-Mumford regularity
-@c * normal_lib:: procedure for normalization
-@c * primdec_lib:: procedures for primary decomposition
-@c * primitiv_lib:: procedures for finding a primitive element
-@c * reesclos_lib:: Rees Algebra and integral closure of an ideal
-@c * intprog_lib:: Integer Programming
-@c * toric_lib:: toric ideals
-@c @end menu
-
-@c @c ---------------------------------------------------------
-@c @node algebra_lib, elim_lib, Commutative algebra, Commutative algebra
-@c @subsection algebra_lib
-@c @c lib algebra.lib
-@c @c ----------------------------------------------------------
-@c @node elim_lib, homolog_lib, algebra_lib, Commutative algebra
-@c @subsection elim_lib
-@c @c lib elim.lib
-@c @c ----------------------------------------------------------
-@c @node homolog_lib, mprimdec_lib, elim_lib, Commutative algebra
-@c @subsection homolog_lib
-@c @c lib homolog.lib
-@c @c ----------------------------------------------------------
-@c @node mprimdec_lib, mregular_lib, homolog_lib, Commutative algebra
-@c @subsection mprimdec_lib
-@c @c lib mprimdec.lib
-@c @c ----------------------------------------------------------
-@c @node mregular_lib, normal_lib, mprimdec_lib, Commutative algebra
-@c @subsection mregular_lib
-@c @c lib mregular.lib
-@c @c ---------------------------------------------------------
-@c @node normal_lib, primdec_lib, mregular_lib, Commutative algebra
-@c @subsection normal_lib
-@c @c lib normal.lib
-@c @c ----------------------------------------------------------
-@c @node primdec_lib, primitiv_lib, normal_lib, Commutative algebra
-@c @subsection primdec_lib
-@c @c lib primdec.lib
-@c @c ---------------------------------------------------------
-@c @node primitiv_lib, reesclos_lib, primdec_lib, Commutative algebra
-@c @subsection primitiv_lib
-@c @c lib primitiv.lib
-@c @c ---------------------------------------------------------
-@c @node reesclos_lib, intprog_lib, primitiv_lib, Commutative algebra
-@c @subsection reesclos_lib
-@c @c lib reesclos.lib
-@c @c ---------------------------------------------------------
-@c @node intprog_lib, toric_lib, reesclos_lib, Commutative algebra
-@c @subsection intprog_lib
-@c @c lib intprog.lib
-@c @c ---------------------------------------------------------
-@c @node toric_lib, ,intprog_lib, Commutative algebra
-@c @subsection toric_lib
-@c @c lib toric.lib
-@c @c ----------------------------------------------------------------------------
-@c @node Singularities, Invariant theory, Commutative algebra, SINGULAR libraries
-@c @section Singularities
-@c @cindex Singularities
-
-@c @menu
-@c * classify_lib:: procedures for the Arnold-classifier of singularities
-@c * deform_lib:: procedures for computing miniversal deformation
-@c * equising_lib:: procedures for equisingularity strata
-@c * gaussman_lib:: procedures for gauss-manin connection of a singularity
-@c * hnoether_lib:: procedures for the Hamburger-Noether (Puiseux) development
-@c * mondromy_lib:: procedures to compute the monodromy of a singularity
-@c * qhmoduli_lib:: procedures for moduli spaces of sqh-singularities
-@c * sing_lib:: procedures for computing invariants of singularities
-@c * spcurve_lib:: procedures for cm codimension 2 singularities
-@c * spectrum_lib:: procedures for computing singularity spectra
-@c @end menu
-
-@c @c ---------------------------------------------------------
-@c @node classify_lib, deform_lib, Singularities, Singularities
-@c @subsection classify_lib
-@c @c lib classify.lib unix_only
-@c @c ----------------------------------------------------------
-@c @node deform_lib, equising_lib, classify_lib, Singularities
-@c @subsection deform_lib
-@c @c lib deform.lib
-@c @c ----------------------------------------------------------
-@c @node equising_lib, gaussman_lib, deform_lib, Singularities
-@c @subsection equising_lib
-@c @c lib equising.lib
-@c @c ----------------------------------------------------------
-@c @node gaussman_lib, hnoether_lib, equising_lib, Singularities
-@c @subsection gaussman_lib
-@c @c lib gaussman.lib no_ex
-@c @c ---------------------------------------------------------
-@c @node hnoether_lib, mondromy_lib, gaussman_lib, Singularities
-@c @subsection hnoether_lib
-@c @c lib hnoether.lib
-@c @c ---------------------------------------------------------
-@c @node mondromy_lib, qhmoduli_lib, hnoether_lib, Singularities
-@c @subsection mondromy_lib
-@c @c lib mondromy.lib no_ex
-@c @c ---------------------------------------------------------
-@c @node qhmoduli_lib, sing_lib, mondromy_lib, Singularities
-@c @subsection qhmoduli_lib
-@c @c lib qhmoduli.lib no_ex
-@c @c ----------------------------------------------------------
-@c @node sing_lib, spcurve_lib, qhmoduli_lib, Singularities
-@c @subsection sing_lib
-@c @c lib sing.lib
-@c @c ---------------------------------------------------------
-@c @node spcurve_lib, spectrum_lib, sing_lib, Singularities
-@c @subsection spcurve_lib
-@c @c lib spcurve.lib
-@c @c ---------------------------------------------------------
-@c @node spectrum_lib, , spcurve_lib, Singularities
-@c @subsection spectrum_lib
-@c @c lib spectrum.lib
-@c @c ----------------------------------------------------------------------------
-@c @node Invariant theory, Symbolic-numerical solving, Singularities, SINGULAR libraries
-@c @section Invariant theory
-@c @cindex Invariant theory
-
-@c @menu
-@c * finvar_lib:: procedures to compute invariant rings of finite groups
-@c * ainvar_lib:: procedures to compute invariants rings of the additive group
-@c * rinvar_lib:: procedures to compute invariants ring of reductive groups
-@c * stratify_lib:: algorithmic stratification by the Greuel-Pfister algorithm
-@c @end menu
-
-@c @c ----------------------------------------------------------
-@c @node finvar_lib, ainvar_lib, Invariant theory, Invariant theory
-@c @subsection finvar_lib
-@c @c lib finvar.lib no_ex
-@c @c ----------------------------------------------------------
-@c @node ainvar_lib, rinvar_lib, finvar_lib, Invariant theory
-@c @subsection ainvar_lib
-@c @c lib ainvar.lib
-@c @c ----------------------------------------------------------
-@c @node rinvar_lib, stratify_lib, ainvar_lib, Invariant theory
-@c @subsection rinvar_lib
-@c @c lib rinvar.lib
-@c @c ----------------------------------------------------------
-@c @node stratify_lib, ,rinvar_lib, Invariant theory
-@c @subsection stratify_lib
-@c @c lib stratify.lib no_ex
-@c @c ----------------------------------------------------------------------------
-@c @node Symbolic-numerical solving, Visualization, Invariant theory, SINGULAR libraries
-@c @section Symbolic-numerical solving
-@c @cindex Symbolic-numerical solving
-
-@c @menu
-@c * presolve_lib:: procedures for pre-solving polynomial equations
-@c * solve_lib:: procedures to solve polynomial systems
-@c * triang_lib:: procedures for decomposing zero-dimensional ideals
-@c * ntsolve_lib:: one real solution of polynomial systems (Newton iteration)
-@c * zeroset_lib:: procedures for roots and factorization
-@c @end menu
-
-@c @c ---------------------------------------------------------
-@c @node presolve_lib, solve_lib, Symbolic-numerical solving, Symbolic-numerical solving
-@c @subsection presolve_lib
-@c @c lib presolve.lib
-@c @c ---------------------------------------------------------
-@c @node solve_lib, triang_lib, presolve_lib, Symbolic-numerical solving
-@c @subsection solve_lib
-@c @c lib solve.lib
-@c @c ---------------------------------------------------------
-@c @node triang_lib, ntsolve_lib,  solve_lib, Symbolic-numerical solving
-@c @subsection triang_lib
-@c @c lib triang.lib no_ex
-@c @c ---------------------------------------------------------
-@c @node ntsolve_lib, zeroset_lib, triang_lib, Symbolic-numerical solving
-@c @subsection ntsolve_lib
-@c @c lib ntsolve.lib
-@c @c ---------------------------------------------------------
-@c @node zeroset_lib, , ntsolve_lib, Symbolic-numerical solving
-@c @subsection zeroset_lib
-@c @c lib zeroset.lib
-
-@c @c ----------------------------------------------------------------------------
-@c @node Visualization, Coding theory, Symbolic-numerical solving, SINGULAR libraries
-@c @section Visualization
-@c @cindex Visualization
-
-@c @menu
-@c * graphics_lib:: procedures to draw  with Mathematica
-@c * latex_lib:: procedures for typesetting in TeX
-@c * paramet_lib:: procedures for parametrizations
-@c * surf_lib:: interface to the surf programm::
-@c @end menu
-
-@c @c ---------------------------------------------------------
-@c @node graphics_lib, latex_lib, Visualization, Visualization
-@c @subsection graphics_lib
-@c @c lib graphics.lib no_ex
-@c @c ---------------------------------------------------------
-@c @node latex_lib, paramet_lib, graphics_lib, Visualization
-@c @subsection latex_lib
-@c @c lib latex.lib
-@c @c ---------------------------------------------------------
-@c @node paramet_lib, surf_lib, latex_lib, Visualization
-@c @subsection paramet_lib
-@c @c lib paramet.lib
-@c @c ---------------------------------------------------------
-@c @node surf_lib,, paramet_lib, Visualization
-@c @subsection surf_lib
-@c @c lib surf.lib no_ex
-
-@c @c ----------------------------------------------------------------------------
-@c @node Coding theory, , Visualization, SINGULAR libraries
-@c @section Coding theory
-@c @cindex Coding theory
-
-@c @menu
-@c * brnoeth_lib:: Brill-Noether algorithm, Weierstrass semigroups and AG codes
-@c @end menu
-
-@c @c ---------------------------------------------------------
-@c @node brnoeth_lib, , , Coding theory
-@c @subsection brnoeth_lib
-@c @c lib brnoeth.lib no_ex
-@c @c ----------------------------------------------------------
-@c @node Release Notes, Index, SINGULAR libraries, Top
-@c @chapter Release Notes
-@c @cindex Release Notes
-@c @include platform.tex
-
 @c ----------------------------------------------------------
-@node Index,  , Mathematical background, Top
-@chapter Index
-@cindex Index
+@node PLURAL Index,  , PLURAL functions
+@section Plural Index
+@cindex PLural Index
 @printindex cp
-@c ---------------------------------------------------------
-
-@c generate table of content and short table of content
-@contents
-@bye

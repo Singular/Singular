@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.114 2001-08-27 16:25:48 Singular Exp $
+@comment $Id: singular.doc,v 1.115 2003-02-06 19:33:16 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -22,6 +22,7 @@
 @end iftex
 
 @set singularmanual 1
+@set withplural 1
 @c @set namespaces 1
 @include version.texi
 @include uname.texi
@@ -103,6 +104,9 @@ This is the texinfo file describing Singular (version @value{VERSION})
 * Data types::
 * Functions and system variables::
 * Tricks and pitfalls::
+@ifset withplural
+* PLURAL::
+@end ifset
 * Examples::
 * Polynomial data::
 * Mathematical background::
@@ -142,19 +146,37 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @include reference.tex
 
 @c ----------------------------------------------------------------------------
+@ifset withplural
+@node Tricks and pitfalls, PLURAL, Functions and system variables, Top
+@end ifset
+@ifclear withplural
 @node Tricks and pitfalls, Examples, Functions and system variables, Top
+@end ifclear
 @chapter Tricks and pitfalls
 @cindex Tricks and pitfalls
 @include tricks.tex
 
 @c ----------------------------------------------------------------------------
+@ifset withplural
+@node PLURAL, Examples, Tricks and pitfalls, Top
+@chapter PLURAL
+@cindex PLURAL
+@include plural.tex
+@end ifset
+
+@c ----------------------------------------------------------------------------
+@ifset withplural
+@node Examples, Polynomial data, PLURAL, Top
+@end ifset
+@ifclear withplural
 @node Examples, Polynomial data, Tricks and pitfalls, Top
+@end ifclear
 @appendix Examples
 @cindex Examples
 @include examples.tex
 
 @c ----------------------------------------------------------------------------
-@node Polynomial data,Mathematical background, Examples, Top
+@node Polynomial data, Mathematical background, Examples, Top
 @appendix Polynomial data
 @cindex Polynomial data
 @include pdata.tex

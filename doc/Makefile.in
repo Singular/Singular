@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.83 2002-12-20 14:11:27 levandov Exp $
+### $Id: Makefile.in,v 1.84 2003-02-06 19:33:15 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -103,7 +103,7 @@ DOC2TEX_FILES	= \
 		start.tex types.tex pdata.tex tricks.tex platform.tex
 
 PLU_DOC2TEX_FILES	= \
-		plumath.tex plureference.tex plutypes.tex
+		plural.tex plumath.tex plureference.tex plutypes.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 
@@ -133,11 +133,11 @@ all: info dvi html singular.idx
 # info stuff
 info: singular.hlp
 
-singular.hlp: ${MANUAL_FILES} singular.tex
+singular.hlp: ${MANUAL_FILES} singular.tex ${PLU_MANUAL_FILES}
 	- ${MAKEINFO} --no-split singular.tex
 
-plural.hlp:	${PLU_MANUAL_FILES} plural.tex
-	- ${MAKEINFO} --no-split plural.tex
+plural.hlp:  ${PLU_MANUAL_FILES} pluralmain.tex
+	- ${MAKEINFO} --no-split -o plural.hlp pluralmain.tex
 
 # dvi stuff
 dvi: manual.dvi usercard.dvi
@@ -169,11 +169,11 @@ usercard.ps: usercard.dvi
 manual.tex:  ${MANUAL_FILES} doc2tex.pl ${SINGULAR} singular.doc $(STANDALONE_TEXI_FILES)
 	${DOC2TEX} -no_fun -o manual.tex singular.doc
 
-singular.tex: ${MANUAL_FILES} doc2tex.pl ${LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} singular.doc $(STANDALONE_TEXI_FILES)
+singular.tex: ${MANUAL_FILES} doc2tex.pl ${LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} singular.doc $(STANDALONE_TEXI_FILES) ${PLU_MANUAL_FILES}
 	${DOC2TEX} -o singular.tex singular.doc
 
-plural.tex: ${PLU_MANUAL_FILES} doc2tex.pl ${PLU_LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} plural.doc $(STANDALONE_TEXI_FILES)
-	${DOC2TEX} -o plural.tex plural.doc
+pluralmain.tex: ${PLU_MANUAL_FILES} doc2tex.pl ${PLU_LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} pluralmain.doc $(STANDALONE_TEXI_FILES)
+	${DOC2TEX} -o pluralmain.tex pluralmain.doc
 
 #pattern rule for tex files
 %_noEx.tex : %.doc doc2tex.pl ${SINGULAR}
@@ -260,10 +260,10 @@ ${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex
 	${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
-plu_html: ${TMP_DIR} ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} ${PLU_IMAGES_HTML}
+plu_html: ${PLU_MANUAL_FILES} ${TMP_DIR} ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} ${PLU_IMAGES_HTML} 
 ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} plural.tex
 	${PERL} ${TEXI2HTML} ${PLU_TEXI2HTML_OPTS} -prefix ${PLU_HTML_MANUAL_PREFIX} \
-        -top_file ${HTML_MANUAL_TOP} plural.tex
+        -top_file ${HTML_MANUAL_TOP} pluralmain.tex
 
 # html stuff
 html_tutor: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_TUTOR_TOP} ${IMAGES_HTML}
@@ -293,8 +293,6 @@ ${IMAGES_HTML} : ${IMAGES_SRC}
 ${PLU_IMAGES_HTML} : ${IMAGES_SRC}
 	test -d ${PLU_HTML_SUBDIR} || mkdir ${PLU_HTML_SUBDIR}
 	cp ${IMAGES_SRC} ${PLU_HTML_SUBDIR}
-
-
 
 
 

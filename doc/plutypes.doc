@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.4 2003-02-06 15:51:39 levandov Exp $
+@comment $Id: plutypes.doc,v 1.5 2003-02-06 19:37:14 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -12,12 +12,12 @@
 %**start
 \input texinfo.tex
 @setfilename plutypes.info
-@node Top, Data types
+@node Top, Data types, (dir), (dir)
 @menu
 * Data types::
 @end menu
 
-@node Data types, Functions and system variables, General concepts, Top
+@node Data types,  , Top, Top
 @chapter Data types
 %**end
 @end ignore
@@ -221,7 +221,7 @@ generator.
 
 @c ------------------------------
 
-@node list, map,  ideal, Data types
+@node list, map, ideal, Data types
 @c link, Data types
 @section list
 @cindex list
@@ -350,7 +350,7 @@ a type cast to list
 
 @c ---------------------------------------
 
-@node map, module, list,  Data types
+@node map, module, list, Data types
 @section map
 @cindex map
 
@@ -600,17 +600,9 @@ is a map entry (the image of the corresponding variable)
 @c example
 @end smallexample
 
-
-
-
-
-
-
-
-
 @c ---------------------------------------
 
-@node module, poly, map,  Data types
+@node module, qring, map, Data types
 @section module
 @cindex module
 
@@ -768,21 +760,17 @@ is a vector, where the index indicates the column
 
 @c ------------------------------
 
-@node module related functions, , module operations, module
+@node module related functions, poly declarations, module operations, module
 @subsection module related functions
 @cindex module related functions
-
-
-
-
 
 @c ---------------------------------------
 
 @ifset namespaces
-@node poly,qring, module, Data types
+@node poly, qring, module, Data types
 @end ifset
 @ifclear namespaces
-@node poly, proc, number, Data types
+@node poly, qring, module, Data types
 @end ifclear
 @section poly
 @cindex poly
@@ -812,7 +800,7 @@ type, the names of the indeterminants and the monomial ordering.
 
 @c ------------------------------
 
-@node poly declarations, poly expressions, poly, poly
+@node poly declarations, poly expressions, module related functions, module
 @subsection poly declarations
 @cindex poly declarations
 
@@ -846,7 +834,7 @@ defines a polynomial.
 
 @c ----------------------------
 
-@node poly expressions, poly operations, poly declarations, poly
+@node poly expressions, poly operations, poly declarations, module
 @subsection poly expressions
 @cindex poly expressions
 
@@ -916,7 +904,7 @@ y*x;     // correct input
 
 @c ------------------------------
 
-@node poly operations, poly related functions, poly expressions, poly
+@node poly operations, poly related functions, poly expressions, module
 @subsection poly operations
 @cindex poly operations
 
@@ -946,14 +934,14 @@ the monomial at the indicated place w.r.t.@: the monomial ordering
 
 @c ------------------------------
 
-@node poly related functions, , poly operations, poly
+@node poly related functions,  , poly operations, module
 @subsection poly related functions
 @cindex poly related functions
 
 
 @c ---------------------------------------
 
-@node qring, resolution, poly, Data types
+@node qring, resolution, module, Data types
 @section qring
 @cindex qring
 
@@ -1140,7 +1128,7 @@ omitted.
 
 @c ---------------------------------------
 
-@node ring operations, , ring related functions, ring
+@node ring operations,  , ring related functions, ring
 @subsection ring operations
 @cindex ring operations
 @table @asis
