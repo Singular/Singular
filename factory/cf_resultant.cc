@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_resultant.cc,v 1.3 1997-09-04 14:49:29 schmidt Exp $ */
+/* $Id: cf_resultant.cc,v 1.4 1997-09-04 14:54:08 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -131,7 +131,7 @@ subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable &
 }
 //}}}
 
-//{{{ static CanonicalForm trivialResultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+//{{{ static CanonicalForm trivialResultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
 //
 // trivialResultant - calculate trivial resultants.
@@ -141,7 +141,7 @@ subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable &
 //
 //}}}
 static CanonicalForm
-trivialResultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+trivialResultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
     // f or g in R
     if ( degree( f, x ) == 0 )
@@ -154,7 +154,7 @@ trivialResultant( const CanonicalForm & f, const CanonicalForm & g, const Variab
 }
 //}}}
 
-//{{{ CanonicalForm resultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+//{{{ CanonicalForm resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
 //
 // resultant() - return resultant of f and g with respect to x.
@@ -170,7 +170,7 @@ trivialResultant( const CanonicalForm & f, const CanonicalForm & g, const Variab
 //
 //}}}
 CanonicalForm
-resultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
     ASSERT( x.level() > 0, "cannot calculate resultant with respect to algebraic variables" );
 
