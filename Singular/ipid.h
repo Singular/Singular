@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.22 1998-12-07 11:39:16 krueger Exp $ */
+/* $Id: ipid.h,v 1.23 1998-12-10 13:14:23 krueger Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -184,7 +184,7 @@ extern idhdl      currRingHdl;
 extern ideal      currQuotient;
 
 char *idhdl2id(idhdl pck, idhdl h);
-void  iiname2hdl(char *name, idhdl *pck, idhdl *id);
+void  iiname2hdl(const char *name, idhdl *pck, idhdl *id);
 idhdl enterid(char * a, int lev, idtyp t, idhdl* root, BOOLEAN init=TRUE);
 idhdl ggetid(const char *n, BOOLEAN local = FALSE);
 idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl);

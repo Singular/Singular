@@ -645,8 +645,11 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
   {
       case PACKAGE_CMD:
         packhdl = (idhdl)u->data;
-        if(!IDPACKAGE(packhdl)->loaded) iiReLoadLib(packhdl);
-        if(v->packhdl != NULL) {
+        if(!IDPACKAGE(packhdl)->loaded) {
+          //if(iiReLoadLib(packhdl))
+          //  Werror("unable to reload package '%s'", IDID(packhdl));
+        }
+        if(v->rtyp == IDHDL) {
           v->name = mstrdup(v->name);
         }
         namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
@@ -656,11 +659,11 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         namespaceroot->pop();
         break;
       case 0:
-        Print("%s of type 'ANY'. Trying load.\n", v->name);
+        //Print("%s of type 'ANY'. Trying load.\n", v->name);
         if(!iiTryLoadLib(u, u->name)) {
           syMake(u, u->name);
           packhdl = (idhdl)u->data;
-          if(v->packhdl != NULL) {
+          if(v->rtyp == IDHDL) {
             v->name = mstrdup(v->name);
           }
           namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
@@ -676,6 +679,8 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
       default:
         Werror("<package>::<id> expected");
   }
+#else /* HAVE_NAMESPACES */
+  Werror("package are not supported in this version");
 #endif /* HAVE_NAMESPACES */
   return FALSE;
 }
@@ -4579,7 +4584,7 @@ static BOOLEAN jjEXPORTTO(leftv res, leftv v)
   {
     namehdl ns = (namehdl)(u->data);
     idhdl h = namespaceroot->root->get(ns->name, 0, TRUE);
-    Print("Export to '%s', lev %d\n", ns->name, ns->myynest);
+    //Print("Export to '%s', lev %d\n", ns->name, ns->myynest);
     while(v->next!=NULL)
     {
       nok = iiInternalExport(v->next, ns->myynest, h);
@@ -4591,7 +4596,7 @@ static BOOLEAN jjEXPORTTO(leftv res, leftv v)
   }
   if(u->Typ()==PACKAGE_CMD)
   {
-    PrintS("export to package\n");
+    //PrintS("export to package\n");
     while(v->next!=NULL)
     {
       nok = iiInternalExport(v->next, 0, u->data);

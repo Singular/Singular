@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.46 1998-12-10 08:50:34 krueger Exp $ */
+/* $Id: iplib.cc,v 1.47 1998-12-10 13:14:24 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -611,9 +611,9 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
   for(i=0; suffix[i] != NULL; i++) {
     sprintf(libname, "%s%s", id, suffix[i]);
     *libname = mytolower(*libname);
-    Print("Trying to load '%s'\n", libname);
+    //Print("Trying to load '%s'\n", libname);
     if((LT = type_of_LIB(libname, libnamebuf)) != LT_NONE) {
-      Print("    Found lib'%s'\n", libnamebuf);
+      //Print("    Found lib'%s'\n", libnamebuf);
       if(!(LoadResult = iiLibCmd(mstrdup(libname), FALSE))) {
         v->name = iiConvName(libname);
         break;
@@ -632,6 +632,8 @@ BOOLEAN iiReLoadLib(idhdl packhdl)
 #ifdef HAVE_NAMESPACES
   char libnamebuf[128];
   package pack = IDPACKAGE(packhdl);
+  
+  if(pack->language == LANG_NONE) return FALSE;
   
   FILE * fp = feFopen( pack->libname, "r", libnamebuf, FALSE);
   if (fp==NULL)
@@ -1157,7 +1159,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     newlib = mstrdup(libnamebuf);
     goto lib_type_end;
   }
-  if(isprint(buf[0])) { LT = LT_SINGULAR; goto lib_type_end; }
+  if(isprint(buf[0]) || buf[0]=='\n') { LT = LT_SINGULAR; goto lib_type_end; }
   
   lib_type_end:
   fclose(fp);

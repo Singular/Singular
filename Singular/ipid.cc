@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.28 1998-12-03 11:02:36 obachman Exp $ */
+/* $Id: ipid.cc,v 1.29 1998-12-10 13:14:23 krueger Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -193,6 +193,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
     else if (t == PACKAGE_CMD)
     {
       IDPACKAGE(h)->language=LANG_NONE;
+      IDPACKAGE(h)->loaded = FALSE;
     }
 
   }
@@ -761,7 +762,7 @@ char *idhdl2id(idhdl pck, idhdl h)
   return(name);
 }
 
-void iiname2hdl(char *name, idhdl *pck, idhdl *h)
+void iiname2hdl(const char *name, idhdl *pck, idhdl *h)
 {
   char *q = strchr(name, ':');
   char *p, *i;
