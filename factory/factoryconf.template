@@ -1,14 +1,19 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: factoryconf.template,v 1.3 1997-06-23 10:45:20 schmidt Exp $ */
+/* $Id: factoryconf.template,v 1.4 1997-06-23 15:40:28 schmidt Exp $ */
 
 #ifndef INCL_FACTORYCONF_H
 #define INCL_FACTORYCONF_H
 
 /* {{{ docu
  *
- * factoryconf.template - template to generate factoryconf.h which
- *   serves as a configuration file for the installed source files
- *   (templates/factory.h).
+ * factoryconf.template - template to generate factoryconf.h.
+ * 
+ * factoryconf.h serves as a configuration file for the installed
+ * source files (templates/factory.h) the same way as config.h
+ * serves as a configuration file for the source files from which
+ * the library is build.  Additionally, we paste a copy of our
+ * assert.h into this file which is necessary for the templates
+ * to translate.
  *
  */
 /* }}} */
