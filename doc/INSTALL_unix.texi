@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.12 2000-03-31 10:59:21 obachman Exp $
+@comment $Id: INSTALL_unix.texi,v 1.13 2000-07-27 13:52:59 obachman Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on  Unix 
 @c
@@ -120,7 +120,7 @@ to figure out where its @sc{Singular} libraries and on-line
 documentation files are.  These constraints on the local directory layout
 are necessary to avoid having to hard-code pathnames into the
 executables, or require that environment variables be set before
-running the executable. In particular, you should not move or copy
+running the executable. In particular, you @strong{must not move or copy}
 the @sc{Singular} executables to another place, but use soft-links
 instead. 
 @end enumerate 
@@ -275,6 +275,26 @@ You can inspect the found library and @code{info}/@code{html}
 directories by starting up @sc{Singular} with the
 @code{--version} option, or by issuing the @sc{Singular} command
 @code{system("--version");}.
+
+@item Under SuSE-Linux, @sc{ESingular} does not display a prompt:
+@cindex SuSE, ESingular bug
+@cindex ESingular, no prompt
+@cindex bug, ESingular
+This is due to the very restrictive access rights of @code{/dev/pty*} of 
+the standard @uref{http:/www.suse.de,SuSE} distribution (starting from
+version 6.3 on). As root, do one of the following: Either
+@example
+chmod 666 /dev/pty*
+@end example
+or,
+@example
+chmod g+s $(which emacs)
+chgrp tty $(which emacs)
+chmod g+s $(which xemacs)
+chgrp tty $(which xemacs)
+@end example
+See also @uref{http://sdb.suse.de/sdb/de/html/ke_devpts-63.html} for
+details.
 
 @item For @code{HPUX} systems:
 @*The /etc/termcap files which are pre-installed on these systems are

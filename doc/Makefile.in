@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.73 2000-07-07 12:53:55 obachman Exp $
+### $Id: Makefile.in,v 1.74 2000-07-27 13:53:00 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -64,9 +64,9 @@ TMP_DIR		= @TMP_DIR@
 HTML_SUBDIR     = html
 TEXI2HTML_INIT  = t2h_singular.init
 ifeq ($(VERBOSE),0)
-T2H_VERBOSE	= -no_verbose
+T2H_VERBOSE	= 
 else
-T2H_VERBOSE     = -verbose
+T2H_VERBOSE     = -Verbose
 endif
 TEXI2HTML_OPTS  = -init_file ${TEXI2HTML_INIT} @TEXI2HTML_OPTS@ \
 	          -short_ext -l2h_tmp ${TMP_DIR} -subdir ${HTML_SUBDIR} \
@@ -196,10 +196,10 @@ endif
 	${MAKEINFO} --no-header --paragraph-indent none -o $@ $<
 
 %.${SINGUNAME}.html : %.texi
-	${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -verbose -split none -out_file $@ $<
+	${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -split none -out_file $@ $<
 
 %.html : %.texi
-	${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -verbose -split none -out_file $@ $<
+	${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -split none -out_file $@ $<
 
 % : %.txt
 	cp $< $@
