@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.69 1998-05-19 10:23:10 anne Exp $
+@comment $Id: reference.doc,v 1.70 1998-05-19 13:38:39 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -225,25 +225,27 @@ Only the reserved attributes are used by the kernel of @sc{Singular}.
 @sp 1
 @item @strong{Reserved attributes:}
 (not all are used at the moment)
-@table @asis
-@item @code{isSB}
+@table @code
+@item isSB
 standard basis - set by @code{std}, used by @code{lift}, @code{dim},
 @code{degree}, @code{mult}, @code{hilb}, @code{vdim}, @code{kbase}
-@item @code{isHomog}
+@item isHomog
 the weight vector for homogeneous or quasihomogeneous ideals/modules
-@item @code{isCI}
+@item isCI
 complete intersection
-@item @code{isCM}
+@item isCM
 Cohen-Macaulay  module
-@item @code{withSB}
+@item rank
+set the rank of a module (see @ref{nrows})
+@item withSB
 value of type ideal resp. module is std
-@item @code{withHilb}
+@item withHilb
 value of type intvec is hilb(_,1) (see @ref{hilb})
-@item @code{withRes}
+@item withRes
 value of type list is a free resolution
-@item @code{withDim}
+@item withDim
 value of type int is the dimension (see @ref{dim})
-@item @code{withMult}
+@item withMult
 value of type int is the multiplicity (see @ref{mult})
 @c @item @code{D}
 @c object is an differential operator, if set to 1;
