@@ -1,19 +1,20 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.6 1998-03-12 10:26:14 schmidt Exp $ */
+/* $Id: cf_algorithm.cc,v 1.7 1998-06-30 16:36:05 schmidt Exp $ */
 
 //{{{ docu
 //
 // cf_algorithm.cc - simple mathematical algorithms.
 //
-// A 'mathematical' algorithm is an algorithm which calculates
-// some mathematical function in contrast to a 'structural'
+// Hierarchy: mathematical algorithms on canonical forms
+//
+// Developers note:
+// ----------------
+// A "mathematical" algorithm is an algorithm which calculates
+// some mathematical function in contrast to a "structural"
 // algorithm which gives structural information on polynomials.
 //
-// Compare these functions to the functions in cf_ops.cc, which are
-// structural algorithms.
-//
-// Used by: cf_gcd.cc, cf_resultant.cc, fac_distrib.cc,
-//   fac_ezgcd.cc, fac_util.cc, sm_sparsemod.cc
+// Compare these functions to the functions in `cf_ops.cc', which
+// are structural algorithms.
 //
 //}}}
 
@@ -21,71 +22,135 @@
 
 #include "assert.h"
 
+#include "cf_factory.h"
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "cf_algorithm.h"
 #include "variable.h"
 #include "cf_iter.h"
+#include "ftmpl_functions.h"
 
 //{{{ CanonicalForm psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
 //
-// psr() - calculate pseudo remainder of `f' and `g' with respect
+// psr() - return pseudo remainder of `f' and `g' with respect
 //   to `x'.
 //
-// `x' should be a polynomial variable, `g' must not equal zero.
+// `g' must not equal zero.
 //
-// For f and g in R[x], R an integral domain, g != 0, there is a
-// unique representation
+// For f and g in R[x], R an arbitrary ring, g != 0, there is a
+// representation
 //
-//   lc(g)^s*f = g*q + r
+//   LC(g)^s*f = g*q + r
 //
 // with r = 0 or deg(r) < deg(g) and s = 0 if f = 0 or
 // s = max( 0, deg(f)-deg(g)+1 ) otherwise.
-// Then r = psr(f, g) and q = psq(f, g) are called pseudo
-// remainder and pseudo quotient, resp.
+// r = psr(f, g) and q = psq(f, g) are called "pseudo remainder"
+// and "pseudo quotient", resp.  They are uniquely determined if
+// LC(g) is not a zero divisor in R.
 //
-// See H.-J. Reiffen/G. Scheja/U. Vetter - 'Algebra', 2nd ed.,
-// par. 15 for a reference.
+// See H.-J. Reiffen/G. Scheja/U. Vetter - "Algebra", 2nd ed.,
+// par. 15, for a reference.
+//
+// Type info:
+// ----------
+// f, g: Current
+// x: Polynomial
+//
+// Polynomials over prime power domains are admissible if
+// lc(LC(`g',`x')) is not a zero divisor.  This is a slightly
+// stronger precondition than mathematically necessary since
+// pseudo remainder and quotient are well-defined if LC(`g',`x')
+// is not a zero divisor.
+//
+// For example, psr(y^2, (13*x+1)*y) is well-defined in
+// (Z/13^2[x])[y] since (13*x+1) is not a zero divisor.  But
+// calculating it with Factory would fail since 13 is a zero
+// divisor in Z/13^2.
+//
+// Due to this inconsistency with mathematical notion, we decided
+// not to declare type `CurrentPP' for `f' and `g'.
+//
+// Developers note:
+// ----------------
+// This is not an optimal implementation.  Better would have been
+// an implementation in `InternalPoly' avoiding the
+// exponentiation of the leading coefficient of `g'.  In contrast
+// to `psq()' and `psqr()' it definitely seems worth to implement
+// the pseudo remainder on the internal level.  Should be done
+// soon.
 //
 //}}}
 CanonicalForm
 psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
-    ASSERT( x.level() > 0, "illegal variable" );
-    ASSERT( g != 0, "division by zero" );
+    ASSERT( x.level() > 0, "type error: polynomial variable expected" );
+    ASSERT( ! g.isZero(), "math error: division by zero" );
 
-    int m = degree( f, x );
-    int n = degree( g, x );
-    if ( m < 0 || m < n )
+    // swap variables such that x's level is larger or equal
+    // than both f's and g's levels.
+    Variable X = tmax( tmax( f.mvar(), g.mvar() ), x );
+    CanonicalForm F = swapvar( f, x, X );
+    CanonicalForm G = swapvar( g, x, X );
+
+    // now, we have to calculate the pseudo remainder of F and G
+    // w.r.t. X
+    int fDegree = degree( F, X );
+    int gDegree = degree( G, X );
+    if ( fDegree < 0 || fDegree < gDegree )
 	return f;
-    else
-	return ( power( LC( g, x ), m-n+1 ) * f ) % g;
+    else {
+	CanonicalForm result = (power( LC( G, X ), fDegree-gDegree+1 ) * F) % G;
+	return swapvar( result, x, X );
+    }
 }
 //}}}
 
 //{{{ CanonicalForm psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
 //
-// psq() - calculate pseudo quotient of `f' and `g' with respect
+// psq() - return pseudo quotient of `f' and `g' with respect
 //   to `x'.
 //
-// `x' should be a polynomial variable, `g' must not equal zero.
+// `g' must not equal zero.
+//
 // See `psr()' for more detailed information.
+//
+// Type info:
+// ----------
+// f, g: Current
+// x: Polynomial
+//
+// Developers note:
+// ----------------
+// This is not an optimal implementation.  Better would have been
+// an implementation in `InternalPoly' avoiding the
+// exponentiation of the leading coefficient of `g'.  It seemed
+// not worth to do so.
 //
 //}}}
 CanonicalForm
 psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
-    ASSERT( x.level() > 0, "illegal variable" );
-    ASSERT( g != 0, "division by zero" );
+    ASSERT( x.level() > 0, "type error: polynomial variable expected" );
+    ASSERT( ! g.isZero(), "math error: division by zero" );
 
-    int m = degree( f, x );
-    int n = degree( g, x );
-    if ( m < 0 || m < n )
+    // swap variables such that x's level is larger or equal
+    // than both f's and g's levels.
+    Variable X = tmax( tmax( f.mvar(), g.mvar() ), x );
+    CanonicalForm F = swapvar( f, x, X );
+    CanonicalForm G = swapvar( g, x, X );
+
+    // now, we have to calculate the pseudo remainder of F and G
+    // w.r.t. X
+    int fDegree = degree( F, X );
+    int gDegree = degree( G, X );
+    if ( fDegree < 0 || fDegree < gDegree )
 	return 0;
-    else
-	return ( power( LC( g, x ), m-n+1 ) * f ) / g;
+    else {
+	CanonicalForm result = (power( LC( G, X ), fDegree-gDegree+1 ) * F) / G;
+	return swapvar( result, x, X );
+    }
 }
 //}}}
 
@@ -95,23 +160,48 @@ psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 // psqr() - calculate pseudo quotient and remainder of `f' and
 //   `g' with respect to `x'.
 //
-// `x' should be a polynomial variable, `g' must not equal zero.
+// Returns the pseudo quotient of `f' and `g' in `q', the pseudo
+// remainder in `r'.  `g' must not equal zero.
+//
 // See `psr()' for more detailed information.
+//
+// Type info:
+// ----------
+// f, g: Current
+// q, r: Anything
+// x: Polynomial
+//
+// Developers note:
+// ----------------
+// This is not an optimal implementation.  Better would have been
+// an implementation in `InternalPoly' avoiding the
+// exponentiation of the leading coefficient of `g'.  It seemed
+// not worth to do so.
 //
 //}}}
 void
 psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const Variable& x )
 {
-    ASSERT( x.level() > 0, "illegal variable" );
-    ASSERT( g != 0, "division by zero" );
+    ASSERT( x.level() > 0, "type error: polynomial variable expected" );
+    ASSERT( ! g.isZero(), "math error: division by zero" );
 
-    int m = degree( f, x );
-    int n = degree( g, x );
-    if ( m < 0 || m < n ) {
+    // swap variables such that x's level is larger or equal
+    // than both f's and g's levels.
+    Variable X = tmax( tmax( f.mvar(), g.mvar() ), x );
+    CanonicalForm F = swapvar( f, x, X );
+    CanonicalForm G = swapvar( g, x, X );
+
+    // now, we have to calculate the pseudo remainder of F and G
+    // w.r.t. X
+    int fDegree = degree( F, X );
+    int gDegree = degree( G, X );
+    if ( fDegree < 0 || fDegree < gDegree ) {
 	q = 0; r = f;
+    } else {
+	divrem( power( LC( G, X ), fDegree-gDegree+1 ) * F, G, q, r );
+	q = swapvar( q, x, X );
+	r = swapvar( r, x, X );
     }
-    else
-	divrem( power( LC( g, x ), m-n+1 ) * f, g, q, r );
 }
 //}}}
 
@@ -122,6 +212,11 @@ psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, Cano
 //   common denominator of coefficients of `f'.
 //
 // Used by: bCommonDen()
+//
+// Type info:
+// ----------
+// f: Poly( Q )
+// Switches: isOff( SW_RATIONAL )
 //
 //}}}
 static CanonicalForm
@@ -147,10 +242,13 @@ internalBCommonDen ( const CanonicalForm & f )
 // The common denominator is calculated with respect to all
 // coefficients of `f' which are in a base domain.  In other
 // words, common_den( `f' ) * `f' is guaranteed to have integer
-// coefficients only.  The common denominator of zero equals is
-// one.
+// coefficients only.  The common denominator of zero is one.
 //
 // Returns something non-trivial iff the current domain is Q.
+//
+// Type info:
+// ----------
+// f: CurrentPP
 //
 //}}}
 CanonicalForm
@@ -172,24 +270,75 @@ bCommonDen ( const CanonicalForm & f )
 //
 // divides() - check whether `f' divides `g'.
 //
-// Uses some extra checks to avoid polynomial division.
+// Returns true iff `f' divides `g'.  Uses some extra heuristic
+// to avoid polynomial division.  Without the heuristic, the test
+// essentialy looks like `divremt(g, f, q, r) && r.isZero()'.
+//
+// Type info:
+// ----------
+// f, g: Current
+//
+// Elements from prime power domains (or polynomials over such
+// domains) are admissible if `f' (or lc(`f'), resp.) is not a
+// zero divisor.  This is a slightly stronger precondition than
+// mathematically necessary since divisibility is a well-defined
+// notion in arbitrary rings.  Hence, we decided not to declare
+// the weaker type `CurrentPP'.
+//
+// Developers note:
+// ----------------
+// One may consider the the test `divides( f.LC(), g.LC() )' in
+// the main `if'-test superfluous since `divremt()' in the
+// `if'-body repeats the test.  However, `divremt()' does not use
+// any heuristic to do so.
+//
+// It seems not reasonable to call `divides()' from `divremt()'
+// to check divisibility of leading coefficients.  `divides()' is
+// on a relatively high level compared to `divremt()'.
 //
 //}}}
 bool
 divides ( const CanonicalForm & f, const CanonicalForm & g )
 {
-    if ( g.level() > 0 && g.level() == f.level() )
-	if ( divides( f.tailcoeff(), g.tailcoeff() ) && divides( f.LC(), g.LC() ) ) {
+    // trivial cases
+    if ( g.isZero() )
+	return true;
+    else if ( f.isZero() )
+	return false;
+
+    if ( (f.inCoeffDomain() || g.inCoeffDomain())
+	 && ((getCharacteristic() == 0 && isOn( SW_RATIONAL ))
+	     || (getCharacteristic() > 0 && CFFactory::gettype() != PrimePowerDomain)) )
+	// if we are in a field all elements not equal to zero are units
+	if ( f.inCoeffDomain() )
+	    return true;
+	else
+	    // g.inCoeffDomain()
+	    return false;
+
+    // we may assume now that both levels either equal LEVELBASE
+    // or are greater zero
+    int fLevel = f.level();
+    int gLevel = g.level();
+    if ( gLevel > 0 && fLevel == gLevel )
+	// f and g are polynomials in the same main variable
+	if ( degree( f ) <= degree( g )
+	     && divides( f.tailcoeff(), g.tailcoeff() )
+	     && divides( f.LC(), g.LC() ) ) {
 	    CanonicalForm q, r;
-	    bool ok = divremt( g, f, q, r );
-	    return ok && r.isZero();
+	    return divremt( g, f, q, r ) && r.isZero();
 	}
 	else
 	    return false;
+    else if ( gLevel < fLevel )
+	// g is a coefficient w.r.t. f
+	return false;
     else {
+	// either f is a coefficient w.r.t. polynomial g or both
+	// f and g are from a base domain (should be Z or Z/p^n,
+	// then)
 	CanonicalForm q, r;
-	bool ok = divremt( g, f, q, r );
-	return ok && r.isZero();
+	return divremt( g, f, q, r ) && r.isZero();
     }
 }
 //}}}
@@ -197,13 +346,17 @@ divides ( const CanonicalForm & f, const CanonicalForm & g )
 //{{{ CanonicalForm maxNorm ( const CanonicalForm & f )
 //{{{ docu
 //
-// maxNorm() - get maximum norm of `f'.
+// maxNorm() - return maximum norm of `f'.
 //
 // That is, the base coefficient of `f' with the largest absolute
 // value.
 //
 // Valid for arbitrary polynomials over arbitrary domains, but
 // most useful for multivariate polynomials over Z.
+//
+// Type info:
+// ----------
+// f: CurrentPP
 //
 //}}}
 CanonicalForm
@@ -226,18 +379,21 @@ maxNorm ( const CanonicalForm & f )
 //{{{ CanonicalForm euclideanNorm ( const CanonicalForm & f )
 //{{{ docu
 //
-// euclideanNorm() - get euclidean norm of `f'.
+// euclideanNorm() - return Euclidean norm of `f'.
 //
-// That is, returns the largest integer smaller or equal
-// norm(`f') = sqrt(sum( `f'[i]^2 )).  `f' should be an
-// univariate polynomial over Z.
+// Returns the largest integer smaller or equal norm(`f') =
+// sqrt(sum( `f'[i]^2 )).
+//
+// Type info:
+// ----------
+// f: UVPoly( Z )
 //
 //}}}
 CanonicalForm
 euclideanNorm ( const CanonicalForm & f )
 {
     ASSERT( (f.inBaseDomain() || f.isUnivariate()) && f.LC().inZ(),
-	    "illegal polynomial" );
+	    "type error: univariate poly over Z expected" );
 
     CanonicalForm result = 0;
     for ( CFIterator i = f; i.hasTerms(); i++ ) {
