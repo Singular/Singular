@@ -309,12 +309,25 @@ install: all installbin
 
 installbin: ${DL_LIBS} ${DL_LIBSG}
 	${MKINSTALLDIRS} ${bindir}
+	ranlib libkernel.a
+	ranlib libkernel-g.a
+ifeq (,${DL_LIBS})
+else
+
+ifeq (,${DL_LIBSG})
+else
 	-${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ${bindir}
 	-${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ../Singular
+endif
+endif
+
 
 install-bindist: ${DL_LIBS} libkernel.a
 	${MKINSTALLDIRS} ${bindir}
+ifeq (,${DL_LIBS})
+else
 	-${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
+endif
 
 ##
 ## clean targest
