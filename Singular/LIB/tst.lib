@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.17 1999-10-19 17:01:22 obachman Exp $
+// $Id: tst.lib,v 1.18 1999-10-19 17:17:17 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.17 1999-10-19 17:01:22 obachman Exp $";
+version="$Id: tst.lib,v 1.18 1999-10-19 17:17:17 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -443,8 +443,6 @@ PURPOSE:   Tests sres, lres, hres, mres with betti commands and conversions
 EXAMPLE:  example tst_test_res shows an example"
 {
   int ret = 1;
-  basering;
-  print(i);
   
   if (! homog(i))
   {
@@ -453,21 +451,21 @@ EXAMPLE:  example tst_test_res shows an example"
   
   if (size(#) == 0)
   {
-    resolution rs = sres(std(i), 0);rs;
-    resolution rm = mres(i,0);rm;
+    resolution rs = sres(std(i), 0);
+    resolution rm = mres(i,0);
   }
   
-  resolution rh = hres(i,0);rh;
-  resolution rl = lres(i, 0);rl;
+  resolution rh = hres(i,0);
+  resolution rl = lres(i, 0);
   
   if (size(#) == 0)
   {
-    intmat is = betti(rs);is;
-    intmat im = betti(rm);im;
+    intmat is = betti(rs);
+    intmat im = betti(rm);
   }
   
-  intmat ih = betti(rh);ih;
-  intmat il = betti(rl);il;
+  intmat ih = betti(rh);
+  intmat il = betti(rl);
 
   if (size(ih) != size(il)){"ERROR: size(ih) != size(il)";ret=0;}
   if (size(#) == 0)
@@ -485,19 +483,19 @@ EXAMPLE:  example tst_test_res shows an example"
 
   if (size(#) == 0)
   {
-    list ls = list(rs);ls;
-    list lm = list(rm);lm;
+    list ls = list(rs);
+    list lm = list(rm);
   }
-  list lh = list(rh);lh;
-  list ll = list(rl);ll;
+  list lh = list(rh);
+  list ll = list(rl);
 
   if (size(#) == 0)
   {
-    intmat is_1 = betti(ls);is_1;
-    intmat im_1 = betti(lm);im_1;
+    intmat is_1 = betti(ls);
+    intmat im_1 = betti(lm);
   }
-  intmat ih_1 = betti(lh);ih_1;
-  intmat il_1 = betti(ll);il_1;
+  intmat ih_1 = betti(lh);
+  intmat il_1 = betti(ll);
 
   if (size(ih_1) != size(il_1)){"ERROR: size(ih_1) != size(il_1)";ret=0;}
   if (size(#) == 0)
