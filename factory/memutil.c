@@ -1,15 +1,19 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: memutil.c,v 1.0 1996-05-17 10:59:47 stobbe Exp $ */
+/* $Id: memutil.c,v 1.1 1997-03-27 10:13:31 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:47  stobbe
+Initial revision
+
 */
 
 #define _POSIX_SOURCE 1
 
 #include <stdlib.h>
-#include <stdio.h>
+
 #include "assert.h"
+
 #include "memutil.h"
 
 
