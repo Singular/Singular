@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.12 2003-05-23 11:26:19 levandov Exp $
+@comment $Id: plumath.doc,v 1.13 2003-07-29 17:50:02 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -633,8 +633,7 @@ Graduate Studies in Mathematics. 30. Providence, RI: American Mathematical Socie
   Havlicek, M. and Klimyk, A. and Posta, S. 
    Central elements of the algebras
 @tex
- $U'_q({\rm so}_m)$ and $U'_q({\rm
-  iso}_m)$}.
+ $U'_q({\rm so}_m)$ and $U'_q({\rm iso}_m)$.
   {\em {arXiv. math. QA/9911130}}, (1999)
 @end tex
 

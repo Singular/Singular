@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.88 2003-07-25 18:23:50 levandov Exp $
+### $Id: Makefile.in,v 1.89 2003-07-29 17:50:01 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -361,7 +361,7 @@ install-sharedist: singular.hlp html singular.idx \
 	/bin/rm -f ${install_prefix}/examples/*.inc
 	chmod -R +rX ${install_prefix}/
 
-install-sharedist-plural: plural.hlp ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} plural.idx \
+install-sharedist-plural: plural.hlp plu_html plural.idx \
                    ${PLU_STANDALONE_HTML_FILES} ${PLU_STANDALONE_TXT_FILES}
 	${MKINSTALLDIRS} ${install_prefix}
 	${MKINSTALLDIRS} ${install_infodir}
