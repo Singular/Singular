@@ -2,7 +2,7 @@
 //	last modified: 
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: linalg.lib,v 1.1 1999-08-18 12:07:02 siebert Exp $";
+version="$Id: linalg.lib,v 1.2 1999-10-22 09:07:07 obachman Exp $";
 info="
 LIBRARY:  linalg.lib	PROCEDURES FOR ALGORITHMIC LINEAR ALGEBRA
 AUTHOR:	  Ivor Saynisch (ivs@math.tu-cottbus.de)
@@ -15,7 +15,7 @@ PROCEDURES:
  orthogonalize(A);  Gram-Schmidt orthogonalization
  diag_test(A);
  busadj(A);         coefficients of Adj(E*t-A) and coefficients of det(E*t-A)
- charpoly(A,v);     characteristic polynom of A. ( using busadj(A) ) 
+ charpoly(A,v);     characteristic polynomial of A. ( using busadj(A) ) 
  adj(A);            ( using busadj(A) )
  det_B(A);          determinant of A. ( uses busadj(A) )
  gaussred(A);       gaussian reduction: P*A=U*S, S is a row reduced form of A
@@ -352,11 +352,11 @@ matrix A[4][4]=6,0,0,0,0,0,6,0,0,6,0,0,0,0,0,6;
 proc busadj(matrix A)
 "USAGE:   busadj(A);  A =  square matrix
 RETURN:  list L; 
-         L[1] contains the (n+1)coefficients of the characteristic polynom of A
+         L[1] contains the (n+1)coefficients of the characteristic polynomial of A
               X=L[1][1]+..+L[1][k]*t^(k-1)+..+(L[1][n+1]=1)*t^n
          L[2] contains the n matrices Hk of type nxn with
               bA=(Hn-1)*t^(n-1)+...+H0   ,( Hk=L[2][k+1] ) 
-              this matrix polynom forms the busadjunkte bA=adj(E*t-A)
+              this matrix polynomial forms the busadjoint bA=adj(E*t-A)
 EXAMPLE: example busadj; shows an example"
 {
   int k;
@@ -409,7 +409,7 @@ print(bA*(t*unitmat(2)-A));
 proc charpoly(matrix A,string v)
 "USAGE:   charpoly(A,v); A = square matrix, v = name of a ringvariable
 NOTE:    A must be constant in the variable v. The computation uses busadj(A).
-RETURN:  poly, characteristic polynom det(E*v-A)
+RETURN:  poly, characteristic polynomial det(E*v-A)
 EXAMPLE: example charpoly; shows an example"
 {
   int n=nrows(A);
@@ -479,7 +479,7 @@ matrix A[3][3]=1,x2,x,x2,6,4,x,4,1;
 proc adj(matrix A)
 "USAGE:    adj(A);  A = square matrix
 NOTE:     computation uses busadj(A)
-RETURN:   englisch(Adjunkte?) 
+RETURN:   adjoint 
 EXAMPLE:  example adj; shows an example"
 {
   int n=nrows(A);
@@ -513,7 +513,7 @@ proc inverse_B(matrix A)
 "USAGE:     inverse_B(A);  A = square matrix
 RETURN:    list Inv with Inv[1]=matrix I and Inv[2]=poly p 
            and I*A = unitmat(n)*p; 
-NOTE:      p=1 if 1/det(A) is computeable and  p=det(A) if not
+NOTE:      p=1 if 1/det(A) is computable and  p=det(A) if not
 EXAMPLE:   example inverse_B; shows an example"
 {
   int i;
@@ -584,7 +584,7 @@ proc inverse_L(matrix A)
 "USAGE:     inverse_L(A);  A = square matrix
 RETURN:    list Inv with Inv[1]=matrix I and Inv[2]=poly p 
            and I*A = unitmat(n)*p; 
-NOTE:      p=1 if 1/det(A) is computeable and  p=det(A) if not
+NOTE:      p=1 if 1/det(A) is computable and  p=det(A) if not
 EXAMPLE:   example inverse_L; shows an example"
 {
   int n=nrows(A);
@@ -634,11 +634,9 @@ matrix A[3][3]=x,y,1,1,x2,y,x+y,6,7;
 //////////////////////////////////////////////////////////////////////////////
 proc gaussred(matrix A)
 "USAGE:     gaussred(A);   any constant matrix A
-RETURN:    list Z:  Z[1]=P , Z[2]=U , Z[3]=S , Z[4]=rank(ENGLISCH?)
-           gives an row reduced matrix S, a permutation matrix P and a
-           normalized (untere Dreiecksmatrix->ENGLISCH?) U , with
-
-                    P*A=U*S            
+RETURN:    list Z:  Z[1]=P , Z[2]=U , Z[3]=S , Z[4]=rank(A)
+           gives a row reduced matrix S, a permutation matrix P and a
+           normalized lower triangular matrix U , with P*A=U*S            
 EXAMPLE:   example gaussred; shows an example"
 {
   int i;
@@ -717,9 +715,7 @@ EXAMPLE:   example gaussred; shows an example"
 example{
 "EXAMPLE";echo=2;
 ring r=0,(x),dp;
-int n=random(1,10);
-int m=random(1,10);
-matrix A[n][m]=random(10,n,m);
+matrix A[5][4]=1,3,-1,4,2,5,-1,3,1,3,-1,4,0,4,-3,1,-3,1,-5,-2;
 print(A);
 list Z=gaussred(A);
 "P=";print(Z[1]);
@@ -733,10 +729,9 @@ list Z=gaussred(A);
 //////////////////////////////////////////////////////////////////////////////
 proc gaussred_pivot(matrix A)
 "USAGE:     gaussred(A);   any constant matrix A
-RETURN:    list Z:  Z[1]=P , Z[2]=U , Z[3]=S , Z[4]=rank(ENGLISCH?)
-           gives an row reduced matrix S, a permutation matrix P and a
-           normalized (untere Dreiecksmatrix->ENGLISCH?) U , with
-
+RETURN:    list Z:  Z[1]=P , Z[2]=U , Z[3]=S , Z[4]=rank(A)
+           gives n row reduced matrix S, a permutation matrix P and a
+           normalized lower triangular matrix U , with
                     P*A=U*S
 NOTE:      with row pivoting            
 EXAMPLE:   example gaussred; shows an example"
@@ -815,9 +810,7 @@ EXAMPLE:   example gaussred; shows an example"
 example{
 "EXAMPLE";echo=2;
 ring r=0,(x),dp;
-int n=random(1,10);
-int m=random(1,10);
-matrix A[n][m]=random(10,n,m);
+matrix A[5][4]=1,3,-1,4,2,5,-1,3,1,3,-1,4,0,4,-3,1,-3,1,-5,-2;
 print(A);
 list Z=gaussred(A);
 "P=";print(Z[1]);
@@ -875,11 +868,10 @@ rk(A);
 proc UDO(matrix A)
 "USAGE:     gaussred(A);   constant invertible matrix A
 RETURN:    list Z:  Z[1]=P , Z[2]=U , Z[3]=D , Z[4]=O
-           gives an row reduced matrix S, a permutation matrix P and a
-           normalized (untere Dreiecksmatrix->ENGLISCH?) U , with
-
-                    P*A=U*D*O
-           D diagonal matrix, O normalized (obere Dreiecksmatrix->ENGLISCH)
+           gives a permutation matrix P, a
+           normalized lower triangular matrix U ,
+           a diagonal matrix D, and a normalized upper triangular matrix O
+           withP*A=U*D*O
 NOTE:      Z[1]=-1 means A is not regular
 EXAMPLE:   example gaussred; shows an example"
 {

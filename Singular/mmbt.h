@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.h,v 1.4 1999-09-29 17:03:35 obachman Exp $ */
+/* $Id: mmbt.h,v 1.5 1999-10-22 09:07:04 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -25,11 +25,11 @@ void mmTrack (unsigned long *bt_stack); /* store the current stack into bt_stack
 
 void mmP2cNameInit(); /* init. of PC -> Name resolution */
 char * mmP2cName(unsigned long p); /* PC -> Name resolution */
-void mmPrintStack(unsigned long *stack, int mm);
-void mmDBPrintStack(void* memblock, int mm);
-void mmDBPrintStackFrames(void* memblock, int start, int end);
-void mmPrintStackFrames(unsigned long *bt_stack, int start, int end, int mm); 
-void mmDBPrintThisStack(void* memblock, int all, int free);
+void mmPrintStack(FILE *fd, unsigned long *stack, int mm);
+void mmDBPrintStack(FILE *fd, void* memblock, int mm);
+void mmDBPrintStackFrames(FILE *fd, void* memblock, int start, int end);
+void mmPrintStackFrames(FILE *fd, unsigned long *bt_stack, int start, int end, int mm); 
+void mmDBPrintThisStack(FILE *fd, void* memblock, int all, int free);
 #endif /* linux, i386 */
 #endif /* not optimize */
 #endif /* MTRACK */

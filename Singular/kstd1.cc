@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.42 1999-10-20 07:33:40 siebert Exp $ */
+/* $Id: kstd1.cc,v 1.43 1999-10-22 09:07:02 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1424,6 +1424,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
   }
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+  idTest(strat->Shdl);
   return (strat->Shdl);
 }
 

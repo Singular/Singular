@@ -1,8 +1,8 @@
-// $Id: general.lib,v 1.21 1999-09-27 17:54:57 Singular Exp $
+// $Id: general.lib,v 1.22 1999-10-22 09:07:07 obachman Exp $
 //GMG, last modified 18.6.99
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.21 1999-09-27 17:54:57 Singular Exp $";
+version="$Id: general.lib,v 1.22 1999-10-22 09:07:07 obachman Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -412,48 +412,79 @@ COMPUTE: killall(); kills all user-defined variables but not loaded procedures
          of type \"type_name\"
          killall(\"not\", \"type_name\"); kills all user-defined variables,
          except those of type \"type_name\" and except loaded procedures
+         killall(\"not\", \"name_1\", \"name_2\", ...); 
+         kills all user-defined variables, except those of name \"name_i\" 
+         and except loaded procedures
 RETURN:  no return value
 NOTE:    killall should never be used inside a procedure
 EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
 "
 {
-   list L=names(); int joni=size(L);
-   if( size(#)==0 )
-   {
-      for ( ; joni>0; joni-- )
+  list L=names(); int joni=size(L);
+  int no_kill, j;
+  for (j=1; j<=size(#); j++)
+  {
+    if (typeof(#[j]) != "string")
+    {
+      ERROR("Need string as " + string(j) + "th argument");
+    }
+  }
+  
+  // kills all user-defined variables but not loaded procedures
+  if( size(#)==0 )
+  {
+    for ( ; joni>0; joni-- )
+    {
+      if( L[joni]!="LIB" and typeof(`L[joni]`)!="proc" ) { kill `L[joni]`; }
+    }
+  }
+  else
+  {
+    // kills all user-defined variables
+    if( size(#)==1 )
+    {
+      // of type proc
+      if( #[1] == "proc" )
       {
-         if( L[joni]!="LIB" and typeof(`L[joni]`)!="proc" ) { kill `L[joni]`; }
-      }
-   }
-   else
-   {
-     if( size(#)==1 )
-     {
-       if( #[1] == "proc" )
-       {
-          for ( joni=size(L); joni>0; joni-- )
-          {
-             if((L[joni]!="killall") and (L[joni]=="LIB" or typeof(`L[joni]`)=="proc"))
-               { kill `L[joni]`; }
-          }
-       }
-       else
-       {
-          for ( ; joni>2; joni-- )
-          {
-            if(typeof(`L[joni]`)==#[1] and L[joni]!="LIB" and typeof(`L[joni]`)!="proc") { kill `L[joni]`; }
-          }
+        for ( joni=size(L); joni>0; joni-- )
+        {
+          if((L[joni]!="killall") and (L[joni]=="LIB" or typeof(`L[joni]`)=="proc"))
+          { kill `L[joni]`; }
         }
-     }
-     else
-     {
+      }
+      else
+      {  
+        // other types
         for ( ; joni>2; joni-- )
         {
-          if(typeof(`L[joni]`)!=#[2] and L[joni]!="LIB" and typeof(`L[joni]`)!="proc") { kill `L[joni]`; }
+          if(typeof(`L[joni]`)==#[1] and L[joni]!="LIB" and typeof(`L[joni]`)!="proc") { kill `L[joni]`; }
         }
-     }
+      }
+    }
+    else
+    {
+      // kills all user-defined variables whose name or type is not #i 
+      for ( ; joni>2; joni-- )
+      {
+        if ( L[joni] != "LIB" && typeof(`L[joni]`) != "proc")
+        {
+          no_kill = 0;
+          for (j=2; j<= size(#); j++)
+          {
+            if (typeof(`L[joni]`)==#[j] or L[joni] == #[j])
+            {
+              no_kill = 1;
+              break;
+            }
+          }
+          if (! no_kill)
+          {
+            kill `L[joni]`;
+          }
+        }
+      }
+    }
   }
-  return();
 }
 example
 { "EXAMPLE:"; echo = 2;

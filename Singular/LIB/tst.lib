@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.18 1999-10-19 17:17:17 obachman Exp $
+// $Id: tst.lib,v 1.19 1999-10-22 09:07:08 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.18 1999-10-19 17:17:17 obachman Exp $";
+version="$Id: tst.lib,v 1.19 1999-10-22 09:07:08 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -21,7 +21,6 @@ PROCEDURES:
 ";
 
 /////////////////////////////////////////////////////////////////////////////
-
 proc tst_system(string s, list #)
 "USAGE:    tst_system(s); s string
 RETURN:   string which is stdout and stderr of system(\"sh\", s)

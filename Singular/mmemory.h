@@ -3,11 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.26 1999-10-19 14:55:39 obachman Exp $ */
+/* $Id: mmemory.h,v 1.27 1999-10-22 09:07:05 obachman Exp $ */
 /*
 * ABSTRACT
 */
 #include <stdlib.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -171,7 +172,7 @@ void mmMarkCurrentUsageStop();
 void mmPrintUnMarkedBlocks();
 void mmStartReferenceWatch();
 void mmStopReferenceWatch();
-void mmTestList (int all);
+void mmTestList(FILE *fd, int all);
 
 #else
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.12 1999-10-14 14:27:18 obachman Exp $ */
+/* $Id: mmbt.c,v 1.13 1999-10-22 09:07:03 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -70,7 +70,7 @@ void mmTrack (unsigned long *bt_stack)
   if (mm_lowpc==0) mmTrackInit();
 
   while ((fp!=NULL) && ((unsigned long)fp>4095)  
-/*  && ((unsigned long)fp < ((unsigned long)0x80000000)) */
+  && ((unsigned long)fp < ((unsigned long)0xf0000000))
   && *fp && (pc = getpc (fp)) 
   && !entrypc (pc) && (i<BT_MAXSTACK))
   {
@@ -158,37 +158,37 @@ char * mmP2cName(unsigned long p)
 #endif
 }
 
-void mmPrintStack(unsigned long *stack, int all)
+void mmPrintStack(FILE *fd, unsigned long *stack, int all)
 {
-  mmPrintStackFrames(stack, 0, BT_MAXSTACK, all);
+  mmPrintStackFrames(fd, stack, 0, BT_MAXSTACK, all);
 }
 
-void mmDBPrintThisStack(void* memblock, int all, int free)
+void mmDBPrintThisStack(FILE *fd, void* memblock, int all, int free)
 {
 #ifdef MTRACK_FREE
   if (free)
-    mmPrintStackFrames(((DBMCB*) memblock)->bt_freed_stack, 0, BT_MAXSTACK, all);
+    mmPrintStackFrames(fd, ((DBMCB*) memblock)->bt_freed_stack, 0, BT_MAXSTACK, all);
   else
 #endif
-    mmPrintStackFrames(((DBMCB*) memblock)->bt_allocated_stack, 0, BT_MAXSTACK, all);
+    mmPrintStackFrames(fd, ((DBMCB*) memblock)->bt_allocated_stack, 0, BT_MAXSTACK, all);
 }
     
-void mmDBPrintStack(void* memblock, int all)
+void mmDBPrintStack(FILE *fd, void* memblock, int all)
 {
-  mmPrintStackFrames(((DBMCB*) memblock)->bt_allocated_stack, 0, BT_MAXSTACK, all);
+  mmPrintStackFrames(fd, ((DBMCB*) memblock)->bt_allocated_stack, 0, BT_MAXSTACK, all);
 }
 
-void mmDBPrintStackFrames(void* memblock, int start, int end)
+void mmDBPrintStackFrames(FILE *fd, void* memblock, int start, int end)
 {
-  mmPrintStackFrames(((DBMCB*) memblock)->bt_allocated_stack, start, end, 
+  mmPrintStackFrames(fd, ((DBMCB*) memblock)->bt_allocated_stack, start, end, 
                      MM_PRINT_ALL_STACK);
 }
 
 /* print stack */
-void mmPrintStackFrames(unsigned long *bt_stack, int start, int end, int mm) 
+void mmPrintStackFrames(FILE *fd, unsigned long *bt_stack, int start, int end, int mm) 
 {
   int i=start;
-  PrintS(" ");
+  fprintf( fd," ");
   do
   {
     char *s;
@@ -196,14 +196,14 @@ void mmPrintStackFrames(unsigned long *bt_stack, int start, int end, int mm)
     if (s!=NULL && strcmp(s, "??"))
     {
       if ((mm & MM_PRINT_ALL_STACK) || strncmp(s, "mm", 2) !=0)
-        fprintf( stderr,":%s",s);
+        fprintf( fd,":%s",s);
       if (strcmp(s, "main") == 0) break;
     }
     else
-      fprintf( stderr,":%lx",(long)bt_stack[i]);
+      fprintf( fd,":%lx",(long)bt_stack[i]);
     i++;
   } while ((i<end) && (bt_stack[i]!=0));
-  fprintf( stderr,"\n");
+  fprintf( fd,"\n");
 }
 #endif /* linux, i386 */
 #endif /* not optimize */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.182 1999-10-20 13:30:01 obachman Exp $ */
+/* $Id: iparith.cc,v 1.183 1999-10-22 09:07:01 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1851,6 +1851,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   intvec **weights=NULL;
   int wmaxl=maxl;
   ideal u_id=(ideal)u->Data();
+  
   maxl--;
   if ((maxl==-1) && (iiOp!=MRES_CMD))
     maxl = pVariables-1;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.18 1999-10-19 14:55:39 obachman Exp $ */
+/* $Id: mmisc.c,v 1.19 1999-10-22 09:07:05 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -363,20 +363,20 @@ void mmPrintStat()
 }
 
 #ifdef MLIST
-void mmTestList (int all)
+void mmTestList (FILE *fd, int all)
 {
   DBMCB * what=mm_theDBused.next;
-  fprintf(stderr,"list of used blocks:\n");
+  fprintf(fd,"list of used blocks:\n");
   while (what!=NULL)
   {
     if ((all & MM_PRINT_ALL_ADDR) || ! (what->flags & MM_INITFLAG))
     {
-      fprintf( stderr, "%d bytes at %p allocated in: %s:%d",
+      fprintf( fd, "%d bytes at %p allocated in: %s:%d",
                (int)what->size, what, what->allocated_fname, what->allocated_lineno);
 #ifdef MTRACK
-      mmDBPrintStack(what, all);
+      mmDBPrintStack(fd, what, all);
 #else
-      fprintf( stderr, "\n");
+      fprintf( fd, "\n");
 #endif
     }
     what=what->next;

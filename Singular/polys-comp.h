@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.15 1999-10-19 12:42:46 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.16 1999-10-22 09:07:05 obachman Exp $ */
 
 /***************************************************************
  *
@@ -13,7 +13,9 @@
  ***************************************************************/
 
 #include "polys-impl.h"
-#include "syz.h"
+
+// need to undefine this, since longs might be negative
+#define unsigned
 
 #ifdef WORDS_BIGENDIAN
 
@@ -92,6 +94,8 @@ inline int rComp0(poly p1, poly p2)
 {
   _pMonCmp(p1, p2, return 0, return 1, return -1);
 }
+
+#define unsigned unsigned
 
 #endif // POLYS_COMP_H
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.13 1999-10-19 14:55:38 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.14 1999-10-22 09:07:04 obachman Exp $ */
 
 /*
 * ABSTRACT: several checking routines to help debugging the memory subsystem
@@ -128,7 +128,7 @@ static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
                  &(what->data),
                  what->allocated_fname, what->freed_lineno );
 #ifdef MTRACK
-  mmDBPrintThisStack(what, MM_PRINT_ALL_STACK, 0);
+  mmDBPrintThisStack(stderr, what, MM_PRINT_ALL_STACK, 0);
 #endif
 
   if ((what->flags & MM_FREEFLAG) && what->freed_fname != NULL)

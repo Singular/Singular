@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.110 1999-10-14 14:27:02 obachman Exp $ */
+/* $Id: extra.cc,v 1.111 1999-10-22 09:07:00 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -578,6 +578,27 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 #endif /* HAVE_DYNAMIC_LOADING */
+
+/*==================== mtrack ==================================*/
+    if(strcmp(sys_cmd,"mtrack")==0)
+    {
+#ifdef MLIST
+      FILE *fd = NULL; 
+      if ((h!=NULL) &&(h->Typ()==STRING_CMD))
+      {
+        fd = fopen((char*) h->Data(), "w");
+        if (fd == NULL)
+          Warn("Can not open %s for writing og mtrack. Using stdout");
+      }
+      mmTestList((fd == NULL ? stdout: fd), 0);
+      if (fd != NULL) fclose(fd);
+      return FALSE;
+#else
+     WerrorS("mtrack not supported without MLIST"); 
+     return TRUE;
+#endif     
+    }
+    else
 /*==================== naIdeal ==================================*/
     if(strcmp(sys_cmd,"naIdeal")==0)
     {
