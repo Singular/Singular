@@ -1,4 +1,37 @@
+Tue Oct 28 18:16:54 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* gcd.fex (univ0RanD, univ0RanC): new monster examples
+
+	* ftest_io.cc (ftestGetCanonicalForm): reads canonical forms from
+	 stdin when given `<-' as input specifier
+
+	* runfex (collection): (almost) reads `collectionName'
+
+	* runfex: case labels fixed
+
+	* runfex: table format slightly changed
+
+Wed Oct 22 16:03:02 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.cc (ftestWriteSeed): calls `factoryrandom( 0 )'
+	  instead of `factoryrandom()'
+
 Wed Oct 15 10:50:07 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.m4 (ftestOutVar): `int's are initialized to 0 on
+	  definition 
+
+	* ftest_io.cc (ftestPrintResult(CFFList)): new function.
+	  Declaration added.
+
+	* ftest_util.m4 (ftestPreprocInit): call to `changecom()' macro
+	  moved from root level to `ftestPreprocInit()'
+
+	* ftest_util.m4 (ftestInVar): `int's are initialized to 0 on
+	  definition
+
+	* ftest_util.m4 (ftestRun): calls to `TIMING_START()' and
+	  `TIMING_END()' macros moved outside while loop
 
 	* degree.m4, randomgcd.m4: new files
 
