@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.22 1998-05-04 17:41:08 Singular Exp $
+@comment $Id: reference.doc,v 1.23 1998-05-05 12:09:46 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -533,7 +533,7 @@ all denominators from its coefficients and then divide it by its content.
 @cindex close
 @table @code
 @item @strong{Syntax:}
-@code{close (} link_expression @code{)}
+@code{close (} link_expression @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -1029,7 +1029,7 @@ See @ref{ideal}; @ref{std}; @ref{degree}; @ref{vdim}; @ref{mult}.
 @cindex dump
 @table @code
 @item @strong{Syntax:}
-@code{dump (} link @code{);}
+@code{dump (} link_expression @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -1579,7 +1579,7 @@ See @ref{int expressions}; @ref{vector}.
 @cindex getdump
 @table @code
 @item @strong{Syntax:}
-@code{getdump (} link @code{);}
+@code{getdump (} link_expression @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -3164,7 +3164,7 @@ See @ref{ring}.
 @cindex open
 @table @code
 @item @strong{Syntax:}
-open ( link_expression )
+@code{open (} link_expression @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -3792,8 +3792,10 @@ See @ref{int expressions}; @ref{intmat expressions}.
 @cindex read
 @table @code
 @item @strong{Syntax:}
-@code{read (} link @code{)}
-@*@code{read (}  link@code{,} string_expression @code{)} // DBM links, only
+@code{read (} link_expression @code{)}
+@*for DBM links:
+@*@code{read (} link_expression @code{)}
+@*@code{read (}  link_expression@code{,} string_expression @code{)} 
 @item @strong{Type:}
 any
 @item @strong{Purpose:}
@@ -5013,10 +5015,10 @@ See @ref{ideal expressions}; @ref{intvec expressions}; @ref{qhweight}.
 @cindex write
 @table @code
 @item @strong{Syntax:}
-@code{write (} link@code{,} expression_list @code{);}
+@code{write (} link_expression@code{,} expression_list @code{);}
 @*for DBM links:
-@*@code{write( } link@code{,} string_expression@code{,} string_expression @code{);}
-@*@code{write( } link@code{,} string_expression @code{);}
+@*@code{write(} link@code{,} string_expression@code{,} string_expression @code{);}
+@*@code{write(} link@code{,} string_expression @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
