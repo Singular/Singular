@@ -1,3 +1,27 @@
+Tue Dec  9 10:03:07 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* winnt/factory.h:  automatically created from `factory.template'
+	  using `makeheader'
+
+	* winnt/factoryconf.h: automatically created from
+	  `factoryconf.template' using `makeheader'
+
+	* GNUmakefile.in (dist): dependencies `$(srcdir)/winnt/factory.h'
+	  and `$(srcdir)/winnt/factoryconf.h' added
+	  ($(srcdir)/winnt/factory.h): new target
+	  ($(srcdir)/winnt/factoryconf.h): new target
+
+	* GNUmakefile.in (distntfile): new variable
+	  (distfiles): `$distntfiles' added to distribution
+	  (dist): creates directory `winnt/'
+	  (distfiles): `bin/makeheader.pl' added to distribution
+
+	* config.h.in (INT64): new define
+
+	* bin/makeheader.pl: new file
+
+	* int_poly.cc (comparecoeff): unused argument `acoeff' removed
+
 Mon Dec  8 18:56:39 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* INSTALL, README: doc fixes for the Windows NT port
