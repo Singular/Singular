@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.5 1999-12-13 16:28:33 obachman Exp $
+@comment $Id: NEWS.texi,v 1.6 1999-12-14 15:55:48 obachman Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -134,7 +134,7 @@ can be called with argument, must be called with parenthesis.
 @table @asis
 @item @nref{ainvar_lib}
 renamed @code{invar.lib} to @code{ainvar.lib}
-@item @nref{defoem_lib}
+@item @nref{deform_lib}
 renamed procedures @code{Y1, T2, T12} to @code{T_1, T_2, T_12}.
 @end table
 
