@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.51 1998-05-12 13:41:47 obachman Exp $
+@comment $Id: general.doc,v 1.52 1998-05-12 13:54:42 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2410,6 +2410,9 @@ execute read("test.ascii");
 i;
 @c example
 @end example
+ASCII links should primarily be used for storing small amounts of data,
+especially if it might become necessary to manually inspect or
+manipulate the data.
 
 @item MPfile links (see @ref{MPfile links}): 
 data is stored in the binary MP format: read and write access is very
@@ -2428,6 +2431,10 @@ def p = read("MPfile:r test.mp");
 typeof(p); p;
 @c example
 @end example
+MPfile links should primarily be used for storing large amounts of data
+(like dumping the contents of an entire @sc{Singular} session, and if
+the data to be stored can not be (easily) converted from/to a string
+(like rings, or maps).
 
 @item MPtcp links (see @ref{MPtcp links}):
 data is communicated with other processes (e.g., @sc{Singular}
@@ -2447,7 +2454,9 @@ typeof(p); p;
 close(l); // shuts down Singular server
 @c example
 @end example
-
+MPtcp links should primarily be used for communications with other
+programs or for parallel computations (see, for example,
+@ref{Parallelization with MPtcp links}). 
 
 @item DBM links (see @ref{DBM links})
 data is stored in and accessed from a data base. Writing is accomplished 
@@ -2460,10 +2469,14 @@ the specfied data base. Reading is accomplished w.r.t. a key
 ring r;
 // associate "x+y" with "mykey"
 write("DBM:w test.dbm", "mykey", string(x+y));
-// get from data base waht is stored und "mykey"
+// get from data base what is stored under "mykey"
 execute read("DBM: test.dbm", "mykey");
 @c example
 @end example
+DBM links should primarily be used when data needs to be accessed not in a
+sequential way (like with files) but in an associative way (like with
+data bases).
+
 @end table
 
 Besides the usual I/O commands @code{write} (see @ref{write}) and
