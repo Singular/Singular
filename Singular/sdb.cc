@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.7 1999-06-08 12:38:46 Singular Exp $ */
+/* $Id: sdb.cc,v 1.8 1999-06-10 15:12:04 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -60,13 +60,6 @@ void sdb_edit(procinfo *pi)
       editor="vi";
     editor=mstrdup(editor);
 
-    // remove arguments...
-    if (strchr(editor,' ')!=NULL)
-    {
-      char *p=strchr(editor,' ');
-      *p='\0';
-    }
-
     if (pi->data.s.body==NULL)
     {
       iiGetLibProcBuffer(pi);
@@ -90,8 +83,17 @@ void sdb_edit(procinfo *pi)
     }
     else if(pid==0)
     {
-      execlp(editor,editor,filename,NULL);
-      Print("cannot exec %s\n",editor);
+      if (strchr(editor,' ')==NULL)
+      {
+        execlp(editor,editor,filename,NULL);
+        Print("cannot exec %s\n",editor);
+      }
+      else
+      {
+        char *p=(char *)Alloc(strlen(editor)+strlen(filename)+2);
+        sprintf(s,"%s %s",editor,filename);
+        system(s);
+      }
       exit(0);
     }
     else
