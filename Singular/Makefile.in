@@ -493,7 +493,7 @@ $(OBJB2) gmalloc.ob: %.ob: %.c
 Singularb: scanner.cc gmalloc.ob $(OBJB) iparith.ob mpsr_Tok.ob tesths.cc version.h 
 	$(CXXP) ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -o Singularb \
 	tesths.cc iparith.ob mpsr_Tok.ob $(OBJB)  $(BPROFOBJ) \
-        ${LDFLAGSB} ${LIBS} gmalloc.ob
+        ${LDFLAGSB} ${LD_DYN_FLAGS} ${LIBS} gmalloc.ob
 
 iparith.ob: iparith.inc iparith.cc
 	$(CXXP)  ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -c iparith.cc -o iparith.ob
