@@ -10,14 +10,14 @@
 
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
-int pSLength(poly p) {
-  return pLength(p); }
+int pSLength(poly p, int l) {
+  return l; }
 int kSBucketLength(kBucket* bucket) {return bucket_guess(bucket);}
 #endif
 
 #ifdef LEN_VAR2
 // 2. Variante: Laenge: Platz fuer die Koeff.
-int pSLength(poly p)
+int pSLength(poly p,int l)
 {
   int s=0;
   while (p!=NULL) { s+=nSize(pGetCoeff(p));pIter(p); }
@@ -29,7 +29,7 @@ int kSBucketLength(kBucket* b)
   int i;
   for (i=MAX_BUCKET;i>=0;i--)
   {
-    s+=pSLength(b->buckets[i]);
+    s+=pSLength(b->buckets[i],0);
   }
   return s;
 }
@@ -37,10 +37,10 @@ int kSBucketLength(kBucket* b)
 
 #ifdef LEN_VAR3
 // 3.Variante: Laenge: Platz fuer Leitk * Monomanzahl
-int pSLength(poly p)
+int pSLength(poly p,int l)
 {
   int c=nSize(pGetCoeff(p))+1;
-  return c*pLength(p);
+  return c*l /*pLength(p)*/;
 }
 int kSBucketLength(kBucket* b)
 {
@@ -49,7 +49,7 @@ int kSBucketLength(kBucket* b)
   int i;
   for (i=MAX_BUCKET;i>0;i--)
   {
-    s+=pLength(b->buckets[i]);
+    s+=b->buckets_length[i] /*pLength(b->buckets[i])*/;
   }
   return s*c;
 }
@@ -57,7 +57,7 @@ int kSBucketLength(kBucket* b)
 
 #ifdef LEN_VAR4
 // 4.Variante: Laenge: Platz fuer Leitk * (1+Platz fuer andere Koeff.)
-int pSLength(poly p)
+int pSLength(poly p, int l)
 {
   int s=1;
   int c=nSize(pGetCoeff(p));
@@ -73,7 +73,7 @@ int kSBucketLength(kBucket* b)
   for (i=MAX_BUCKET;i>0;i--)
   {
     if(b->buckets[i]==NULL) continue;
-    s+=pSLength(b->buckets[i]);
+    s+=pSLength(b->buckets[i],0);
   }
   return s*c;
 }
@@ -299,7 +299,7 @@ static void add_to_reductors(calc_dat* c, poly h, int len){
  
   int i;
   if (c->is_char0)
-       i=simple_posInS(c->strat,h,pSLength(h),c->is_char0);
+       i=simple_posInS(c->strat,h,pSLength(h,len),c->is_char0);
   else
     i=simple_posInS(c->strat,h,len,c->is_char0);
   
@@ -320,7 +320,7 @@ static void add_to_reductors(calc_dat* c, poly h, int len){
   c->strat->lenS[i]=len;
  
   if(c->strat->lenSw)
-    c->strat->lenSw[i]=pSLength(P.p);
+    c->strat->lenSw[i]=pSLength(P.p,len);
  
  
 }
@@ -1382,7 +1382,9 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
           len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
           int new_pos;
 	  if(c->is_char0)
-	    new_pos=simple_posInS(c->strat,sec_copy,pSLength(sec_copy),c->is_char0);//hac
+	    new_pos=simple_posInS(c->strat,sec_copy,
+	                          pSLength(sec_copy,new_length),
+				  c->is_char0);//hac
 	  else
 	    new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
 	  assume(new_pos<=j);
@@ -1426,7 +1428,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 
               c->strat->lenS[old_pos]=new_length;
 	      if(c->strat->lenSw)
-		c->strat->lenS[old_pos]=pSLength(sec_copy);
+		c->strat->lenS[old_pos]=pSLength(sec_copy,new_length);
               int i=0;
               for(i=new_pos;i<old_pos;i++){
                 if (strat->lenS[i]<=new_length)
@@ -1603,7 +1605,9 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
 
 	            int new_pos;
 	  if(c->is_char0)
-	    new_pos=simple_posInS(c->strat,sec_copy,pSLength(sec_copy),c->is_char0);//hac
+	    new_pos=simple_posInS(c->strat,sec_copy,
+	                          pSLength(sec_copy,new_length),
+				  c->is_char0);//hac
 	  else
 	    new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
 //          p=NULL;
@@ -1637,7 +1641,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
               assume(new_pos<=old_pos);
               c->strat->lenS[old_pos]=new_length;
 	      if(c->strat->lenSw)
-		c->strat->lenS[old_pos]=pSLength(sec_copy);
+		c->strat->lenS[old_pos]=pSLength(sec_copy,new_length);
               int i=0;
               for(i=new_pos;i<old_pos;i++){
                 if (strat->lenS[i]<=new_length)
@@ -1912,7 +1916,7 @@ static BOOLEAN fillup(calc_dat* c){
   sorted_pair_node* p;
   while (n<PAR_N) {
     if
-      (p=find_next_pair2(c, TRUE)) //the = is wanted
+      ((p=find_next_pair2(c, TRUE))!=NULL) //the = is wanted
     {
       if(p->i<0){
         init_red_input_element(c,p->lcm_of_lm,n);
@@ -2229,7 +2233,7 @@ static void shorten_tails(calc_dat* c, poly monom)
     {
       int new_pos;
       if (c->is_char0) 
-	simple_posInS(c->strat,c->S->m[i],pSLength(c->S->m[i]),c->is_char0);
+	simple_posInS(c->strat,c->S->m[i],pSLength(c->S->m[i],c->lengths[i]),c->is_char0);
       else	
 	simple_posInS(c->strat,c->S->m[i],c->lengths[i],c->is_char0);
       int old_pos=-1;
@@ -2256,7 +2260,7 @@ static void shorten_tails(calc_dat* c, poly monom)
       assume(pLength(c->strat->S[old_pos])==c->lengths[i]);
       c->strat->lenS[old_pos]=c->lengths[i];
       if (c->strat->lenSw)
-	c->strat->lenSw[old_pos]=pSLength(c->S->m[i]);
+	c->strat->lenSw[old_pos]=pSLength(c->S->m[i],c->lengths[i]);
 
       if (new_pos<old_pos)
         move_forward_in_S(old_pos,new_pos,c->strat, c->is_char0);
