@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.4 2001-02-02 11:34:53 mschulze Exp $ */
+/* $Id: units.cc,v 1.5 2001-02-07 12:48:27 Singular Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
@@ -19,9 +19,10 @@
 
 BOOLEAN isunit(poly u)
 {
-  if(u==NULL||pTotaldegree(u)>0)
-    return FALSE;
-  return TRUE;
+  return (u!=NULL) && pIsConstant(u);
+//  if(u==NULL||pTotaldegree(u)>0)
+//    return FALSE;
+//  return TRUE;
 }
 
 BOOLEAN isunit(matrix U)
@@ -66,7 +67,7 @@ BOOLEAN invunit(leftv res,leftv h)
         res->data=(void*)invunit(n,mpCopy(U));
         return FALSE;
       }
-    } 
+    }
  }
   WerrorS("<int>,[<poly>|<matrix>] expected");
   return TRUE;
@@ -84,8 +85,7 @@ poly invunit(int n,poly u)
   if(n<0)
     return NULL;
   number u0=nInvers(pGetCoeff(u));
-  poly v=pOne();
-  pSetCoeff(v,u0);
+  poly v=pNSet(u0);
   if(n==0)
     return v;
   poly u1=pjet(n,pSub(pOne(),pMult_nn(u,u0)));
@@ -105,6 +105,7 @@ poly invunit(int n,poly u)
 
 matrix invunit(int n,matrix U)
 {
+  assume(MATCOLS(u)==MATROWS(U));
   for(int i=MATCOLS(U);i>=1;i--)
     MATELEM(U,i,i)=invunit(n,MATELEM(U,i,i));
   return U;
@@ -124,11 +125,11 @@ BOOLEAN series(leftv res,leftv h)
         poly p=(poly)h->Data();
         h=h->next;
         if(h==NULL)
-	{
+        {
           res->rtyp=typ;
           res->data=(void*)series(n,pCopy(p));
           return FALSE;
-	}
+        }
         if(h->Typ()==POLY_CMD)
         {
           poly u=(poly)h->Data();
@@ -263,7 +264,7 @@ BOOLEAN rednf(leftv res,leftv h)
           res->rtyp=typ;
           res->data=(void*)rednf(idCopy(N),pCopy(p),pCopy(u));
           return FALSE;
-	}
+        }
       }
     }
   }
@@ -318,9 +319,10 @@ poly rednf(ideal N,poly p,poly u=NULL)
     M0=rednf(N,M);
   else
   {
-    matrix U=mpInitI(1,1,NULL);
+    matrix U=mpNew(1,1);
     MATELEM(U,1,1)=u;
     M0=rednf(N,M,U);
+    idDelete((ideal*)&U);
   }
   poly p0=M0->m[0];
   M0->m[0]=NULL;
