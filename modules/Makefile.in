@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.3 2000-03-29 14:13:33 krueger Exp $
+### $Id: Makefile.in,v 1.4 2000-03-30 06:39:43 krueger Exp $
 ###
 #################################################################
 
@@ -62,7 +62,7 @@ CFLAGS		+= ${DEFS}
 MOD_INCLUDES	= mod2.h utils.h structs.h mmemory.h tok.h ipid.h \
 	subexpr.h febase.h modules.h grammar.h numbers.h polys.h \
 	ideals.h intvec.h polys-impl.h lists.h matpol.h ipconv.h \
-	lists.h matpol.h mmpage.h mmheap.h
+	lists.h matpol.h mmpage.h mmheap.h polys-comp.h
 
 ##
 ##
