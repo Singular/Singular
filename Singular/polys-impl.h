@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.12 1998-01-16 08:24:03 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.13 1998-01-17 17:49:25 obachman Exp $ */
 
 /***************************************************************
  *
@@ -122,7 +122,7 @@ extern int pMonomSize;
 // size of a monom in units of sizeof(void*) -- i.e. in words
 extern int pMonomSizeW;
 #ifdef COMP_FAST
-// Ceiling((pVariables+1) / sizeof(void*))
+// Ceiling((pVariables+1) / sizeof(void*)) == length of exp-vector in words
 extern int pVariables1W;
 // Ceiling((pVariables) / sizeof(void*))
 extern int pVariablesW;
@@ -143,22 +143,22 @@ extern int pVarHighIndex;
 // There are the following four possibilities:
 //
 //
-// BIG_ENDIAN -- lex order
+// BIGENDIAN -- lex order
 // e_1, e_2, ... , e_n,..,comp : pVarOffset = -1,
 //                               pCompIndex = pVariables + #(..)
 //                               pVarLowIndex = 0,
 //                               pVarHighIndex = pVariables-1
-// BIG_ENDIAN -- rev lex order
+// BIGENDIAN -- rev lex order
 // e_n, ... , e_2, e_1,..,comp : pVarOffset = pVariables,
 //                               pCompIndex = pVariables + #(..)
 //                               pVarLowIndex = 0,
 //                               pVarHighIndex = pVariables-1
-// LITTLE_ENDIAN -- rev lex order
+// LITTLEENDIAN -- rev lex order
 // comp,.., e_1, e_2, ... , e_n : pVarOffset = #(..),
 //                                pCompIndex = 0,
 //                                pVarLowIndex = 1 + #(..),
 //                                pVarHighIndex = #(..) + pVariables
-// LITTLE_ENDIAN -- lex order
+// LITTLEENDIAN -- lex order
 // comp,..,e_n, .... , e_2, e_1 : pVarOffset = pVariables + 1 + #(..)
 //                                pCompIndex = 0
 //                                pVarLowIndex = 1 + #(..)
@@ -502,6 +502,7 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
 {
   p1->next = p2->next;
   p1->coef = p2->coef;
+//  memset(p1, 0, pMonomSize);
 
 #ifndef COMP_NO_EXP_VECTOR_OPS
   unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
@@ -513,9 +514,9 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   const Exponent_t* s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
   const Exponent_t* s3 = (Exponent_t*) &(p3->exp[pVarLowIndex]);
   const Exponent_t* const ub = s3 + pVariables;
-// need to zero the "fill in" slots (i.e., empty exponents)
-#ifdef  WORDS_BIG_ENDIAN
-  *((unsigned long*) p1 + pMonomSize -1) = 0;
+// need to zero the "fill in" slots (i.e., empty exponents)  
+#ifdef  WORDS_BIGENDIAN
+  *((unsigned long *) ((unsigned long*) p1) + pMonomSizeW -1) = 0;
 #else
   *((unsigned long *) p1->exp) = 0;
 #endif
@@ -548,9 +549,6 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
   DECLARE(void, _pCopyAddFast1(poly p1, poly p2, poly p3))
 #endif // defined(PDEBUG) && PDEBUG == 1
 {
-  p1->next = p2->next;
-  p1->coef = p2->coef;
-
 #ifndef COMP_NO_EXP_VECTOR_OPS
   unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
   const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
@@ -561,8 +559,8 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
   const Exponent_t* s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
   const Exponent_t* s3 = (Exponent_t*) &(p3->exp[pVarLowIndex]);
   const Exponent_t* const ub = s3 + pVariables;
-#ifdef  WORDS_BIG_ENDIAN
-  *((unsigned long*) p1 + pMonomSize -1) = 0;
+#ifdef  WORDS_BIGENDIAN
+  *((unsigned long *) ((unsigned long*) p1) + pMonomSizeW -1) = 0;
 #else
   *((unsigned long *) p1->exp) = 0;
 #endif

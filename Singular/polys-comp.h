@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.3 1998-01-15 16:15:26 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.4 1998-01-17 17:49:24 obachman Exp $ */
 
 /***************************************************************
  *
@@ -19,7 +19,6 @@
   
 
 #ifdef WORDS_BIGENDIAN
-
 #ifndef COMP_NO_EXP_VECTOR_OPS
 #define _pMonCmp_1(p1, p2, d, actionD, actionE)              \
 do                                                          \
