@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.58 2000-05-17 10:54:10 obachman Exp $
+;; $Id: singular.el,v 1.59 2000-05-17 13:07:26 obachman Exp $
 
 ;;; Commentary:
 
@@ -3948,7 +3948,7 @@ Returns BUFFER."
 	    (if process (delete-process process)))
 
 	  ;; create new process
-	  (singular-debug 'interactive (message "Starting new Singular"))
+	  (singular-debug 'interactive (message "Starting new Singular: %s %s" executable switches))
 	  (let ((process (comint-exec-1 name buffer executable switches)))
 
 	    ;; set process filter and sentinel
@@ -4182,7 +4182,6 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 						      switch nil nil 
 						      singular-switches-history)
 				" "))
-     
      ;; Generate new buffer name
      (let (done)
        (while (not done)
