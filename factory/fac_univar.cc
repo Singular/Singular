@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.11 1997-07-31 13:31:29 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.12 1997-07-31 13:36:22 schmidt Exp $ */
 
 #include <config.h>
 
@@ -180,6 +180,11 @@ norm ( const CanonicalForm & f )
 // The bound is returned as an integer k such that p^k is larger
 // than all coefficients of all possible factors of f.  f should
 // be an univariate polynomial over Z.
+//
+// For a discussion of the formula, see the article Mignotte -
+// 'Some Usefull Bounds' in Buchberger, Collins, Loos (eds.) -
+// 'Computer Algebra: Symbolic and Algebraic Computation', 2nd
+// ed.
 //
 //}}}
 static int
