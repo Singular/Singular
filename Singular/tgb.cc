@@ -2235,7 +2235,7 @@ void tgb_sparse_matrix::free_row(int row, BOOLEAN free_non_zeros){
 }
 //transfers ownership of m to mat
 void init_with_mac_poly(tgb_sparse_matrix* mat, int row, mac_poly m){
-  assume(mat->mp[z]==NULL);
+  assume(mat->mp[row]==NULL);
   mat->mp[row]=m;
 }
 poly free_row_to_poly(tgb_sparse_matrix* mat, int row, poly* monoms, int monom_index){
