@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.17 1998-05-07 16:38:56 Singular Exp $
+@comment $Id: singular.doc,v 1.18 1998-05-08 07:52:41 wichmann Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -118,7 +118,7 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @cindex Limitations
 
 @sc{Singular} has the following limitations:
-@table @bullet
+@itemize @bullet
 @item
 the characteristic of a prime field must be less than 32004
 @item
@@ -141,7 +141,7 @@ the length of an identifier is unlimited but @code{listvar}
 displays only the first 20 characters
 @c @item
 @c the interpretation of text between a closing @code{@}} and the end of the line is undefined. (Therefore do not put anything but spaces between @code{@}} and the end of the line.)
-@end table
+@end itemize
 
 @c -------------------------------------------------------------------------
 @node Major differences to the C programming language,Miscellaneous oddities,Limitations,Tricks and pitfalls
