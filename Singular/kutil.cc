@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.112 2002-07-23 12:22:40 Singular Exp $ */
+/* $Id: kutil.cc,v 1.113 2002-12-11 15:23:39 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -188,7 +188,10 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
             assume(L->p != NULL && p == L->t_p);
             pNext(L->p) = NULL;
           }
+          L->max  = NULL;
         }
+        else if (fromNext)
+          L->max  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
         if (L->pLength != 0) L->pLength = l;
         // Hmmm when called from updateT, then only
         // reset ecart when cut
@@ -346,7 +349,7 @@ static inline void enlargeT (TSet &T, TObject** &R, unsigned long* &sevT,
   assume(sevT!=NULL);
   assume(R!=NULL);
   assume((length+incr) > 0);
-   
+
   int i;
   T = (TSet)omRealloc0Size(T, length*sizeof(TObject),
                            (length+incr)*sizeof(TObject));
@@ -818,14 +821,14 @@ void deleteInS (int i,kStrategy strat)
     strat->sevS[j] = strat->sevS[j+1];
     strat->S_2_R[j] = strat->S_2_R[j+1];
   }
-#endif  
+#endif
   if (strat->lenS!=NULL)
   {
 #ifdef ENTER_USE_MEMMOVE
     memmove(&(strat->lenS[i]),&(strat->lenS[i+1]),(strat->sl - i)*sizeof(int));
 #else
     for (j=i; j<strat->sl; j++) strat->lenS[j] = strat->lenS[j+1];
-#endif  
+#endif
   }
   if (strat->fromQ!=NULL)
   {
@@ -836,7 +839,7 @@ void deleteInS (int i,kStrategy strat)
     {
       strat->fromQ[j] = strat->fromQ[j+1];
     }
-#endif  
+#endif
   }
   strat->S[strat->sl] = NULL;
   strat->sl--;
@@ -1050,7 +1053,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   else /*sugarcrit*/
   {
 #ifdef HAVE_PLURAL
-    if (currRing->nc==NULL) 
+    if (currRing->nc==NULL)
     {
     // if currRing->nc_type!=quasi (or skew)
 #endif
@@ -1128,13 +1131,13 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   else
   {
 #ifdef HAVE_PLURAL
-    if (currRing->nc!=NULL) 
+    if (currRing->nc!=NULL)
     {
-      if ((currRing->nc->type==nc_lie) && (pHasNotCF(p,strat->S[i]))) 
-	/* generalized prod-crit for lie-type */
+      if ((currRing->nc->type==nc_lie) && (pHasNotCF(p,strat->S[i])))
+        /* generalized prod-crit for lie-type */
       {
-	  strat->cp++;
-	  //	  Lp.p=nc_p_Bracket_qq(pCopy(p),strat->S[i]);
+          strat->cp++;
+          //          Lp.p=nc_p_Bracket_qq(pCopy(p),strat->S[i]);
       }
       Lp.p = nc_spGSpolyCreate(strat->S[i],p,NULL,currRing);
     }
@@ -3683,7 +3686,7 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
     strat->ecartS = (intset)omReallocSize(strat->ecartS,
                                           IDELEMS(strat->Shdl)*sizeof(int),
                                           (IDELEMS(strat->Shdl)+setmaxTinc)
-					          *sizeof(int));
+                                                  *sizeof(int));
     strat->S_2_R = (int*) omRealloc0Size(strat->S_2_R,
                                          IDELEMS(strat->Shdl)*sizeof(int),
                                          (IDELEMS(strat->Shdl)+setmaxTinc)
