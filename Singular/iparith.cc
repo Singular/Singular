@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.15 1997-04-07 15:22:14 Singular Exp $ */
+/* $Id: iparith.cc,v 1.16 1997-04-08 08:43:16 obachman Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -257,6 +257,7 @@ cmdnames cmds[] =
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
   { "sres",        0, SRES_CMD ,          CMD_23},
+  { "status",      0, STATUS_CMD,         CMD_23},
   { "std",         0, STD_CMD ,           CMD_12},
   { "string",      0, STRING_CMD ,        ROOT_DECL_LIST},
   { "subst",       0, SUBST_CMD ,         CMD_3},
@@ -1728,6 +1729,11 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   res->data = (char * )id;
   return FALSE;
 }
+static BOOLEAN jjSTATUS2(leftv res, leftv u, leftv v)
+{
+  res->data = mstrdup(slStatus((si_link) u->Data(), (char *) v->Data()));
+  return FALSE;
+}
 static BOOLEAN jjSIMPL_P(leftv res, leftv u, leftv v)
 {
   int sw = (int)v->Data();
@@ -2038,6 +2044,7 @@ struct sValCmd2 dArith2[]=
 ,{jjREDUCE_ID, REDUCE_CMD,     MODUL_CMD,      MODUL_CMD,  IDEAL_CMD }
 ,{jjRES,       RES_CMD,        LIST_CMD,       IDEAL_CMD,  INT_CMD }
 ,{jjRES,       RES_CMD,        LIST_CMD,       MODUL_CMD,  INT_CMD }
+,{jjSTATUS2,   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD}
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD }
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD }
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD }
@@ -2491,7 +2498,7 @@ static BOOLEAN jjNVARS(leftv res, leftv v)
 static BOOLEAN jjOpenClose(leftv res, leftv v)
 {
   si_link l=(si_link)v->Data();
-  if (iiOp==OPEN_CMD) return slOpenWrite(l);
+  if (iiOp==OPEN_CMD) return slOpen(l, SI_LINK_OPEN);
   else                return slClose(l);
 }
 static BOOLEAN jjORD(leftv res, leftv v)
@@ -3590,6 +3597,16 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
   return TRUE;
 #endif
 }
+static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
+{
+  int yes;
+  jjSTATUS2(res, u, v);
+  yes = (strcmp((char *) res->data, (char *) w->Data()) == 0);
+  FreeL((ADDRESS) res->data);
+  res->data = (void *) yes;
+  return FALSE;
+}
+
 /*=================== operations with 3 args.: table =================*/
 struct sValCmd3 dArith3[]=
 {
@@ -3646,6 +3663,7 @@ struct sValCmd3 dArith3[]=
 #endif
 ,{jjRES3,           SRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           SRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
+,{jjSTATUS3,        STATUS_CMD, INT_CMD,    LINK_CMD,   STRING_CMD, STRING_CMD}
 ,{jjSUBST_P,        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD }
 ,{jjSUBST_P,        SUBST_CMD,  VECTOR_CMD, VECTOR_CMD, POLY_CMD,   POLY_CMD }
 ,{jjSUBST_Id,       SUBST_CMD,  IDEAL_CMD,  IDEAL_CMD,  POLY_CMD,   POLY_CMD }

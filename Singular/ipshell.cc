@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.4 1997-04-02 15:07:13 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.5 1997-04-08 08:43:21 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -447,6 +447,12 @@ BOOLEAN iiWRITE(leftv res,leftv v)
     return TRUE;
   }
   si_link l=(si_link)vf.Data();
+  if (vf.next == NULL)
+  {
+    Werror("write: need at least two arguments");
+    return TRUE;
+  }
+
   BOOLEAN b=slWrite(l,vf.next); /* iiConvert preserves next */
   if (b)
   {

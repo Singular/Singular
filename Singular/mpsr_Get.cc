@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.6 1997-04-02 15:07:37 Singular Exp $ */
+/* $Id: mpsr_Get.cc,v 1.7 1997-04-08 08:43:24 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -265,8 +265,7 @@ inline mpsr_Status_t mpsr_GetIdentifierLeftv(MPT_Node_pt node, mpsr_leftv mlv,
   
   InitIdentifierLeftv(mlv, id, quote);
 
-  if (proc_annot != NULL)
-    mlv->lv->rtyp = PROC_CMD;
+  if (proc_annot != NULL) mlv->lv->rtyp = PROC_CMD;
     
   return mpsr_Success;
 }

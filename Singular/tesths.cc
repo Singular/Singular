@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.5 1997-04-02 15:07:58 Singular Exp $ */
+/* $Id: tesths.cc,v 1.6 1997-04-08 08:43:34 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -31,14 +31,13 @@
 #include "timer.h"
 
 /*0 implementation*/
-
 int sVERSION=VERSION;
 int sS_SUBVERSION=S_SUBVERSION;
 int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
     char** argv)   /* parameter array */
 {
-  /*. initialize components */
+  /* initialize components */
   siRandomStart=inits();
 #ifdef INIT_BUG
   jjInitTab1();
@@ -243,12 +242,16 @@ int main(          /* main entry to Singular */
     iiPStart(NULL,argv[1],NULL);
   }
   /* start shell */
-#ifdef HAVE_MPSR
   if (feBatch)
   {
+#ifdef HAVE_MPSR
+    extern int Batch_do(int argc, char **argv);
     return Batch_do(argc,argv);
+#else
+    fprintf(stderr, "Option -b not supported in this version");
+    return 1;
+#endif // HAVE_MPSR
   }
-#endif
 #ifndef macintosh
 #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
   fe_set_input_mode();

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.10 1997-04-02 15:07:55 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.11 1997-04-08 08:43:32 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -143,28 +143,19 @@ void sleftv::Print(leftv store, int spaces)
        case LINK_CMD:
           {
             si_link l=(si_link)d;
-            const char *n=sNoName;
-            if ((l->m!=NULL) && (l->m->name!=NULL))
-              n=l->m->name;
-            ::Print("%-*.*slink name:%s, type:%s(%d), argc:%d\n",
-               spaces,spaces," ",
-               l->name,n,l->linkType,l->argc);
-            ::Print("%-*.*s%s",spaces,spaces," ","flags:");
-            if (l->flags &SI_LINK_OPEN) PrintS("open ");
-            if (l->flags &SI_LINK_READ) PrintS("read ");
-            if (l->flags &SI_LINK_WRITE) PrintS("write ");
-            ::Print("other %x\n",l->flags>>3);
-            if (l->argc>0)
-            {
-              int i=0;
-              while (i<l->argc)
-              {
-                ::Print("%-*.*s",spaces,spaces," ");
-                ::Print("arg %d:%s\n",i+1,l->argv[i]);
-                i++;
-              }
-            }
-            break;
+            ::Print("%-*.*s// type : %s\n",spaces,spaces," ",
+                    slStatus(l, "type"));
+            ::Print("%-*.*s// mode : %s\n",spaces,spaces," ",
+                    slStatus(l, "mode"));
+            ::Print("%-*.*s// name : %s\n",spaces,spaces," ",
+                    slStatus(l, "name"));
+            ::Print("%-*.*s// open : %s\n",spaces,spaces," ",
+                    slStatus(l, "open"));
+            ::Print("%-*.*s// read : %s\n",spaces,spaces," ",
+                    slStatus(l, "read"));
+            ::Print("%-*.*s// write: %s",spaces,spaces," ",
+                    slStatus(l, "write"));
+          break;
           }
         case NUMBER_CMD:
           s=String(d);
@@ -1240,6 +1231,7 @@ int sleftv::Eval()
         nok=d->arg2.Eval();
         if (!nok)
         {
+          int save_typ=d->arg1.rtyp;
           mmTestLP(n);
           syMake(&d->arg1,n); //assume  type of arg1==DEF_CMD
           mmTestLP(d->arg1.name);
@@ -1250,13 +1242,14 @@ int sleftv::Eval()
             d->arg1.data=NULL;
             d->arg1.name=n;
           }
-          d->arg1.rtyp=DEF_CMD;
+          //d->arg1.rtyp=DEF_CMD;
           sleftv t;
+          if(save_typ!=PROC_CMD) save_typ=d->arg2.rtyp;
           if ((BEGIN_RING<d->arg2.rtyp)&&(d->arg2.rtyp<END_RING)
           /*&&(QRING_CMD!=d->arg2.rtyp)*/)
-            nok=iiDeclCommand(&t,&d->arg1,0,d->arg2.rtyp,&currRing->idroot);
+            nok=iiDeclCommand(&t,&d->arg1,0,save_typ,&currRing->idroot);
           else
-            nok=iiDeclCommand(&t,&d->arg1,0,d->arg2.rtyp,&idroot);
+            nok=iiDeclCommand(&t,&d->arg1,0,save_typ,&idroot);
           memcpy(&d->arg1,&t,sizeof(sleftv));
           mmTestLP(d->arg1.name);
           nok=nok||iiAssign(&d->arg1,&d->arg2);

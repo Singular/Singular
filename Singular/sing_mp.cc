@@ -1,23 +1,76 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.6 1997-04-02 15:07:52 Singular Exp $ */
+/* $Id: sing_mp.cc,v 1.7 1997-04-08 08:43:30 obachman Exp $ */
 
 /*
 * ABSTRACT
 */
+/* $Log: not supported by cvs2svn $
+// Revision 1.5  1997/03/28  21:44:38  obachman
+// Fri Mar 28 14:12:05 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* Added routines dump(link) and getdump(link) for ascii and MP
+// 	  links
+//
+// 	* ipconv.cc (dConvertTypes): added int->module conversion so that
+// 	  'module m = 0' works
+//
+// 	* iparith.cc (jjVAR1): added LINK_CMD to list of typeof(...)
+//
+// Revision 1.4  1997/03/26  14:58:05  obachman
+// Wed Mar 26 14:02:15 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* added reference counter to links, updated slKill, slCopy, slInit
+// 	* various small bug fixes for Batch mode
+//
+// Revision 1.2  1997/03/20  16:59:58  obachman
+// Various minor bug-fixes in mpsr interface
+//
+// Thu Mar 20 11:57:00 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* sing_mp.cc (slInitBatchLink): initialized silink such that
+// 	  l->argv[0] == "MP:connect" (otherwise, slInitMP failed)
+//
+// Wed Mar 19 15:38:08 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* hannes fixed maFindPerm to reflect new names <->parameter scheme
+//
+// 	* sing_mp.cc (mpsr_IsMPLink): fixed it
+//
+// 	* Makefile (tags): added target tags
+//
+// Revision 1.1.1.1  1997/03/19  13:18:41  obachman
+// Imported Singular sources
+//
+*/
+
+#include "mod2.h"
+
+#ifdef HAVE_MPSR
 
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "mod2.h"
 #include "tok.h"
 #include "mmemory.h"
 #include "febase.h"
 #include "subexpr.h"
 #include "ipid.h"
 #include "silink.h"
+#include"mpsr.h"
 
+#ifdef MPSR_DEBUG
+#define MP_SET_LINK_OPTIONS(link) \
+  if (link != NULL) \
+     MP_SetLinkOption(link,MP_LINK_LOG_MASK_OPT,MP_LOG_ALL_EVENTS)
+#else
+#define MP_SET_LINK_OPTIONS(link) ((void *) 0)
+#endif
+
+MP_Env_pt mp_Env = NULL;
 
 /* =============== general utilities ====================================== */
 void FreeCmdArgs(int argc, char** argv)
@@ -28,349 +81,242 @@ void FreeCmdArgs(int argc, char** argv)
 
   Free(argv, argc*sizeof(char *));
 }
-/*-------------------------------------------------------------------*/
-#ifdef HAVE_MPSR
-/***************************************************************
- *
- * MP stuff
- *
- ***************************************************************/
-#include"mpsr.h"
 
-#ifdef MPSR_DEBUG
-#define MP_SET_LINK_OPTIONS(link) \
-if (link != NULL) MP_SetLinkOption(link,MP_LINK_LOG_MASK_OPT,MP_LOG_ALL_EVENTS)
-#else
-#define MP_SET_LINK_OPTIONS(link) ((void *) 0)
-#endif
-
-MP_Env_pt mp_Env = NULL;
-
-void slInitBatchLink(si_link l, int argc, char** argv)
+void GetCmdArgs(int *argc, char ***argv, char *str)
 {
-  int i;
-  idhdl id;
-  l->argv = (char **) Alloc0((argc +1) * sizeof(char *));
-  l->argv[0] = mstrdup("MP:connect");
-  for (i=1; i<=argc; i++)
-    l->argv[i] = mstrdup(argv[i]);
-  l->argc = argc + 1;
-  l->name = mstrdup("MP:connect");
-  slInit(l,NULL);
-  id = enterid(mstrdup("mp_ll"), 0, LINK_CMD, &idroot, FALSE);
-  IDLINK(id) = l;
-}
-
-BOOLEAN slOpenWriteMPFile(si_link l)
-{
-  char **argv;
-  int argc;
-
-  GetCmdArgs(&argc, &argv, "-MPtransp FILE -MPmode write -MPfile /tmp/mpout");
-  MP_Link_pt link = NULL;
-  short mode = 0; // 0 -- write, 1 -- append, 2 -- read
-  BOOLEAN status = TRUE;
-  
-  if (l->argc > 2)
+  if (str == NULL || str[0] == '\0')
   {
-    if (strcmp(l->argv[2], "mode:a") == 0)
-    {
-      mode = 1;
-      FreeL(argv[3]);
-      argv[3] = mstrdup("append");
-    }
-    else if (strcmp(l->argv[2], "mode:r") == 0)
-    {
-      mode = 2;
-      FreeL(argv[3]);
-      argv[3] = mstrdup("read");
-    }
-  }
-        
-  if (mode < 2 && SI_LINK_R_OPEN_P(l))
-  {
-    Werror("can not open an MP write link to file %s as read link also",
-           l->name);
-    status = FALSE;
-  }
-  else if (mode == 2 && SI_LINK_W_OPEN_P(l))
-  {
-   Werror("can not open an MP read link to file %s as write link also",
-           l->name);
-   status = FALSE;
-  }
-
-  if (status)
-  {
-    if (l->name != NULL)
-    {
-      FreeL(argv[5]);
-      argv[5] = mstrdup(l->name);
-    }
-
-    if (mp_Env == NULL)
-      mp_Env = MP_InitializeEnv(MP_AllocateEnv());
-
-    if (mp_Env == NULL)
-    {
-      Werror("Initialization of MP Environment");
-      status = FALSE;
-    }
-    else
-    {
-      if ((link = MP_OpenLink(mp_Env, argc, argv)) == NULL)
-      {
-        Werror("Opening of MP Write to file %s", l->name);
-        status = FALSE;
-      }
-      else
-        MP_SET_LINK_OPTIONS(link);
-    }
-  }
-  
-  FreeCmdArgs(argc, argv);
-  if (status)
-  {
-    if (mode < 2) 
-      SI_LINK_SET_W_OPEN_P(l);
-    else
-      SI_LINK_SET_R_OPEN_P(l);
-    
-    l->data = (void *) link;
-    return FALSE;
+    *argc = 0;
+    *argv = NULL;
   }
   else
-    return TRUE;
+  {
+    int i = 0, sl = strlen(str)+1, j;
+    char *s2=mstrdup(str);
+
+    char *appl = strstr(s2, "-MPapplication");
+    if (appl != NULL)
+    {
+      if (appl != s2) *(appl-1) = '\0';
+      i = 2;
+    }
+
+    if (appl != s2)
+    {
+      if (strtok(s2, " ") != NULL)
+      {
+        i++;
+        while (strtok(NULL," ") != NULL) i++;
+      }
+    }
+    
+    *argc = i;
+    if (i>0)
+    {
+      *argv = (char **) Alloc0(i*sizeof(char *));
+      if (appl != NULL) i -= 2;
+      if (i>0)
+      {
+        strcpy(s2,str);
+        *argv[0] = mstrdup(strtok(s2, " "));
+        for(j = 1; j <i; j++)
+          (*argv)[j] = mstrdup(strtok(NULL, " "));
+      }
+    }
+    else
+      *argv = NULL;
+
+    if (appl != NULL)
+    {
+      (*argv)[*argc -2] = mstrdup("-MPapplication");
+      (*argv)[*argc -1] = mstrdup(&(appl[15]));
+    }
+
+    FreeL(s2);
+  }
+  
 }
 
-  
-BOOLEAN slOpenReadMPFile(si_link l)
+/***************************************************************
+ *
+ * MPfile  specific stuff
+ *
+ ***************************************************************/
+BOOLEAN slOpenMPFile(si_link l, short flag)
 {
-  if (SI_LINK_W_OPEN_P(l))
-  {
-    Werror("can not open an MP write link to file %s as read link also",
-           l->name);
-    return TRUE;
-  }
-
-  char argvstr[] = "-MPtransp FILE -MPmode read  -MPfile /tmp/mpout";
-  char **argv;
-  int argc;
+  char *argv[] = {"-MPtransp", "FILE", "-MPmode", "append",
+                  "-MPfile", "/tmp/mpout"};
+  char *mode;
+  
   MP_Link_pt link = NULL;
-
-  GetCmdArgs(&argc, &argv, argvstr);
-  if (l->name != NULL)
+  
+  if (flag == SI_LINK_OPEN)
   {
-    FreeL(argv[5]);
-    argv[5] = mstrdup(l->name);
+   if (l->mode[0] != '\0' && (strcmp(l->mode, "r") == 0))
+      flag = SI_LINK_READ;
+    else flag = SI_LINK_WRITE;
   }
+
+  if (l->name[0] != '\0') argv[5] = l->name;
+  else l->name = mstrdup(argv[5]);
+    
+
+  if (flag == SI_LINK_READ)
+  {
+    argv[3] = "read";
+    mode = "r";
+  }
+  else if (strcmp(l->mode, "w") == 0)
+  {
+    argv[3] = "write";
+    mode = "w";
+  }
+  else
+  {
+    mode = "a";
+  }
+
   if (mp_Env == NULL)
     mp_Env = MP_InitializeEnv(MP_AllocateEnv());
 
   if (mp_Env == NULL)
   {
-    Werror("Initialization of MP Environment");
+    Werror("Open: Error in initialization of MP environment");
     return TRUE;
   }
 
   if ((link = MP_OpenLink(mp_Env, 6, argv)) == NULL)
-  {
-    Werror("Opening of MP Read to file %s", l->name);
-    FreeCmdArgs(argc, argv);
     return TRUE;
-  }
-  MP_SET_LINK_OPTIONS(link);
 
-  FreeCmdArgs(argc, argv);
-  SI_LINK_SET_R_OPEN_P(l);
+  MP_SET_LINK_OPTIONS(link);
   l->data = (void *) link;
+  SI_LINK_SET_OPEN_P(l, flag);
+  FreeL(l->mode);
+  l->mode = mstrdup(mode);
   return FALSE;
 }
 
-MP_Link_pt slOpenMPConnect(si_link l)
-{
-  char argvstr[] = "-MPtransp TCP -MPmode connect -MPport 1025 -MPhost localhost";
-  char *port = IMP_GetCmdlineArg(l->argc, l->argv, "-MPport");
-  char *host = IMP_GetCmdlineArg(l->argc, l->argv, "-MPhost");
-  char **argv;
-  int argc;
-  MP_Link_pt link = NULL;
+/***************************************************************
+ *
+ * MPtcp  specific stuff
+ *
+ ***************************************************************/
 
-  GetCmdArgs(&argc, &argv, argvstr);
+static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
+{
+  char *argv[] = {"-MPtransp", "TCP", "-MPmode", "connect", "-MPport",
+                  "1025",  "-MPhost", "localhost"};
+  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "-MPport");
+  char *host = IMP_GetCmdlineArg(n_argc, n_argv, "-MPhost");
+
 
   if (port == NULL)
-    Warn("No port number specified for MP:connect; We try 1025");
-  else
-  {
-    FreeL(argv[5]);
-    argv[5] = mstrdup(port);
-  }
+    Warn("No port number specified for MPtcp:connect; Used %s", argv[5]);
+  else argv[5] = port;
 
   if (host == NULL)
   {
-    char *hn = (char *) AllocL(64*sizeof(char*));
-    FreeL(argv[7]);
-    gethostname(hn, 64);
-    argv[7] = hn;
-    Warn("No host specified for MP:connect; We try %s", hn);
+    Warn("No host specified for MPtcp:connect; Used %s", mp_Env->thishost);
+    argv[7] = mp_Env->thishost;
   }
   else
-  {
-    FreeL(argv[7]);
-    argv[7] = mstrdup(host);
-  }
+    argv[7] = host;
 
-  link = MP_OpenLink(mp_Env, 8, argv);
-  MP_SET_LINK_OPTIONS(link);
-
-  FreeCmdArgs(argc, argv);
-
-  return link;
+  return MP_OpenLink(mp_Env, 8, argv);
 }
 
-MP_Link_pt slOpenMPListen(si_link l)
+static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
 {
-  char argvstr[] = "-MPtransp TCP -MPmode listen -MPport 1025";
-  char *port = IMP_GetCmdlineArg(l->argc, l->argv, "-MPport");
-  char **argv;
-  int argc;
-  MP_Link_pt link;
-
-  GetCmdArgs(&argc, &argv, argvstr);
+  char *argv[] = {"-MPtransp", "TCP", "-MPmode", "listen", "-MPport", "1025"};
+  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "-MPport");
 
   if (port == NULL)
-    Warn("No port number specified for MP:listen; We try 1025");
-  else
-  {
-    FreeL(argv[5]);
-    argv[5] = mstrdup(port);
-  }
-  link = MP_OpenLink(mp_Env, 6, argv);
-  MP_SET_LINK_OPTIONS(link);
+    Warn("No port number specified for MPtcp:listen; Used %s", argv[5]);
+  else argv[5] = port;
 
-  FreeCmdArgs(argc, argv);
-  return link;
+  return MP_OpenLink(mp_Env, 6, argv);
 }
 
-MP_Link_pt slOpenMPLaunch(si_link l)
+static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
 {
-  char *host = IMP_GetCmdlineArg(l->argc, l->argv, "-MPhost");
-  char *app  = IMP_GetCmdlineArg(l->argc, l->argv, "-MPapplication");
-  char *appargs = NULL;
-  char **argv;
-  int argc;
-  MP_Link_pt link=NULL;
+  char *argv[] = {"-MPtransp", "TCP", "-MPmode", "launch",
+                  "-MPhost", "localhost", "-MPapplication", "Singular -b"};
+  char *appl = IMP_GetCmdlineArg(n_argc, n_argv, "-MPapplication");
+  char *host = IMP_GetCmdlineArg(n_argc, n_argv, "-MPhost");
 
-  GetCmdArgs(&argc, &argv,
-             "-MPtransp TCP -MPmode launch -MPhost localhost -MPapplication s");
 
-  FreeL(argv[5]);
+  if (appl == NULL)
+    Warn("No application specified for MPtcp:launch; Used %s", argv[7]);
+  else argv[7] = appl;
+
   if (host == NULL)
   {
-    char *hn = (char *) AllocL(64*sizeof(char*));
-    FreeL(argv[5]);
-    gethostname(hn, 64);
-    argv[5] = hn;
-    Warn("No host specified for MP:connect; We try %s", hn);
+    Warn("No host specified for MPtcp:launch; Used %s", mp_Env->thishost);
+    argv[5] = mp_Env->thishost;
   }
   else
-  {
-    argv[5] = mstrdup(host);
-  }
+    argv[5] = host;
 
-  if (app  == NULL)
-  {
-    Warn("No application specified for MP:launch; We try: Singular -b");
-    FreeL(argv[7]);
-    argv[7] = mstrdup("Singular -b");
-  }
-  else
-  {
-    FreeL(argv[7]);
-    argv[7] = mstrdup(app);
-  }
-
-  link = MP_OpenLink(mp_Env, 8, argv);
-  MP_SET_LINK_OPTIONS(link);
-
-  FreeCmdArgs(argc, argv);
-  return link;
+  return MP_OpenLink(mp_Env, 8, argv);
 }
 
-BOOLEAN slOpenMPTcp(si_link l)
+BOOLEAN slOpenMPTcp(si_link l, short flag)
 {
   MP_Link_pt link = NULL;
-
-  if (l->argc < 1)
-    return TRUE;
-
+  char **argv;
+  int argc;
+  
+  GetCmdArgs(&argc, &argv, l->name);
+  
   if (mp_Env == NULL)
     mp_Env = MP_InitializeEnv(MP_AllocateEnv());
 
   if (mp_Env == NULL)
   {
-    Werror("Initialization of MP Environment");
+    Werror("Open: Error in initialization of MP environment");
     return TRUE;
   }
 
-  if (strcmp(l->name, "MP:launch") == 0)
-    link = slOpenMPLaunch(l);
-  else if (strcmp(l->name, "MP:connect") == 0)
-    link = slOpenMPConnect(l);
-  else if (strcmp(l->name, "MP:listen") == 0)
-    link = slOpenMPListen(l);
+  if (strcmp(l->mode, "connect") == 0) link = slOpenMPConnect(argc, argv);
+  else if (strcmp(l->mode, "listen") == 0) link = slOpenMPListen(argc, argv);
   else
   {
-    Werror("link is not MP:launch, MP:connect or MP:listen");
-    return TRUE;
+    link = slOpenMPLaunch(argc, argv);
+    if (link != NULL && (strcmp(l->mode, "launch") != 0))
+    {
+      FreeL(l->mode);
+      l->mode = mstrdup("launch");
+    }
   }
 
-  if (link == NULL)
+  FreeCmdArgs(argc, argv);
+  
+  if (link != NULL)
   {
-    Werror("Could not open link %s",l->name);
-    return TRUE;
+    MP_SET_LINK_OPTIONS(link);
+    SI_LINK_SET_RW_OPEN_P(l);
+    l->data = (void *) link;
+    return FALSE;
   }
-  SI_LINK_SET_RW_OPEN_P(l);
-  l->data = (void *) link;
-  return FALSE;
+  else return TRUE;
 }
+
+/***************************************************************
+ *
+ * MP general stuff
+ *
+ ***************************************************************/
 
 BOOLEAN slWriteMP(si_link l, leftv v)
 {
   mpsr_ClearError();
   if (mpsr_PutMsg((MP_Link_pt) l->data, v) != mpsr_Success)
   {
-    mpsr_PrintError();
+    mpsr_PrintError((MP_Link_pt) l->data);
     return TRUE;
   }
   else
     return FALSE;
-}
-
-void SentQuitMsg(si_link l)
-{
-  leftv v = (leftv) Alloc0(sizeof(sleftv));
-
-  v->rtyp = STRING_CMD;
-  v->data = (void *) mstrdup("MP:Quit");
-  slWriteMP(l, v);
-  FreeL(v->data);
-  Free(v, sizeof(sleftv));
-}
-
-BOOLEAN slCloseMP(si_link l)
-{
-  if (l->data != NULL)
-  {
-    if (strcmp(l->name, "MP:launch") == 0)
-      SentQuitMsg(l);
-    MP_CloseLink((MP_Link_pt) l->data);
-    l->data = NULL;
-    SI_LINK_SET_CLOSE_P(l);
-    return FALSE;
-  }
-  else
-    return TRUE;
 }
 
 leftv slReadMP(si_link l)
@@ -385,14 +331,27 @@ leftv slReadMP(si_link l)
   else
     return v;
 }
-BOOLEAN slInitMP(si_link l,si_link_extension s)
+
+static void SentQuitMsg(si_link l)
 {
-  if (strncmp(l->argv[0], s->name,3) == 0)
-  {
-    return FALSE;
-  }
-  return TRUE;
+  leftv v = (leftv) Alloc0(sizeof(sleftv));
+
+  v->rtyp = STRING_CMD;
+  v->data = "MP:Quit";
+  slWriteMP(l, v);
+  Free(v, sizeof(sleftv));
 }
+
+BOOLEAN slCloseMP(si_link l)
+{
+  if ((strcmp(l->mode, "launch") == 0) &&
+      (MP_GetLinkStatus((MP_Link_pt)l->data,MP_LinkReadyWriting) == MP_TRUE))
+    SentQuitMsg(l);
+  MP_CloseLink((MP_Link_pt) l->data);
+  SI_LINK_SET_CLOSE_P(l);
+  return FALSE;
+}
+
 
 BOOLEAN slDumpMP(si_link l)
 {
@@ -418,62 +377,80 @@ BOOLEAN slGetDumpMP(si_link l)
     return FALSE;
 }
 
-si_link_extension slInitMPFile()
+char* slStatusMP(si_link l, char* request)
 {
-  si_link_extension s=(si_link_extension)Alloc0(sizeof(*s));
-  s->Init=slInitALink;
-  s->OpenRead=slOpenReadMPFile;
-  s->OpenWrite=slOpenWriteMPFile;
-  s->Close=slCloseMP;
-  s->Read=slReadMP;
-  //s->Read2=NULL;
-  s->Dump=slDumpMP;
-  s->GetDump=slGetDumpMP;
-  s->Write=slWriteMP;
-  s->name="MP:file";
-  return s;
-}
-si_link_extension slInitMPTcp()
-{
-  si_link_extension s=(si_link_extension)Alloc0(sizeof(*s));
-  s->Init=slInitMP;
-  s->OpenRead=slOpenMPTcp;
-  s->OpenWrite=slOpenMPTcp;
-  s->Close=slCloseMP;
-  s->Read=slReadMP;
-  //s->Read2=NULL;
-  s->Dump=slDumpMP;
-  s->GetDump=slGetDumpMP;
-  s->Write=slWriteMP;
-  s->name="MP:tcp";
-  return s;
+  if (strcmp(request, "read") == 0)
+  {
+    if (SI_LINK_R_OPEN_P(l) &&
+        (MP_GetLinkStatus((MP_Link_pt)l->data,MP_LinkReadyReading) == MP_TRUE))
+        return "ready";
+    else return "not ready";
+  }
+  else if (strcmp(request, "write") == 0)
+  {
+    if (SI_LINK_W_OPEN_P(l) &&
+        (MP_GetLinkStatus((MP_Link_pt)l->data,MP_LinkReadyWriting) == MP_TRUE))
+        return "ready";
+    else return "not ready";
+  }
+  else return "unknown status request";
 }
 
-BOOLEAN mpsr_IsMPLink(si_link l)
-{
-  return strcmp(l->name, "MP") > 0;
-}
-#endif
+/***************************************************************
+ *
+ * MP batch stuff
+ *
+ ***************************************************************/
 
+// #define MPSR_BATCH_DEBUG
 #ifdef MPSR_BATCH_DEBUG
 static BOOLEAN stop = 1;
 #endif
 
 int Batch_do(int argc, char **argv)
 {
-#ifdef HAVE_MPSR
-  si_link silink = (si_link) Alloc0(sizeof(sip_link));
-  leftv v = NULL;
-
 #ifdef MPSR_BATCH_DEBUG
   fprintf(stderr, "Was started with pid %d\n", getpid());
   while (stop){};
 #endif
-  
-  // connect to a listening application
-  slInitBatchLink(silink, argc, argv);
-  if (slOpenMPTcp(silink))
+  si_link silink = (si_link) Alloc0(sizeof(sip_link));
+  leftv v = NULL;
+  char *port = IMP_GetCmdlineArg(argc, argv, "-MPport");
+  char *host = IMP_GetCmdlineArg(argc, argv, "-MPhost");
+  char *istr;
+  idhdl id;
+
+  // parse argv to get port and host
+  if (port == NULL)
+  {
+    fprintf(stderr,
+            "Need '-MPport portnumber' command line argument in batch modus\n");
     return 1;
+  }
+  if (host == NULL)
+  {
+    fprintf(stderr,
+            "Need '-MPhost hostname' command line argument in batch modus\n");
+    return 1;
+  }
+
+  // initialize si_link
+  istr = (char *) AllocL((strlen(port) + strlen(host) + 40)*sizeof(char));
+  sprintf(istr, "MPtcp:connect -MPport %s -MPhost %s", port, host);
+  slInit(silink, istr);
+  FreeL(istr);
+
+  // open link
+  if (slOpen(silink, SI_LINK_OPEN))
+  {
+    fprintf(stderr, "Batch side could not connect on port %s and host %s\n",
+            port, host);
+    return 1;
+  }
+
+  // establish top-level identifier for link
+  id = enterid(mstrdup("mp_ll"), 0, LINK_CMD, &idroot, FALSE);
+  IDLINK(id) = silink;
 
   // the main read-eval-write loop
   while(1)
@@ -504,8 +481,39 @@ int Batch_do(int argc, char **argv)
   }
   // should never get here
   return 1;
-#else
-  printf("Option -b not supported in this version\n");
-  return 0;
-#endif
 }
+
+/***************************************************************
+ *
+ * MP link Extension inits
+ *
+ ***************************************************************/
+
+void slInitMPFileExtension(si_link_extension s)
+{
+  s->Open=slOpenMPFile;
+  s->Close=slCloseMP;
+  s->Read=slReadMP;
+  //s->Read2=NULL;
+  s->Dump=slDumpMP;
+  s->GetDump=slGetDumpMP;
+  s->Write=slWriteMP;
+  s->Status=slStatusMP;
+  s->type="MPfile";
+}
+
+void slInitMPTcpExtension(si_link_extension s)
+{
+  s->Open=slOpenMPTcp;
+  s->Close=slCloseMP;
+  s->Read=slReadMP;
+  //s->Read2=NULL;
+  s->Dump=slDumpMP;
+  s->GetDump=slGetDumpMP;
+  s->Write=slWriteMP;
+  s->Status=slStatusMP;
+  s->type="MPtcp";
+}
+
+#endif
+

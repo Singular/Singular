@@ -6,19 +6,14 @@
 /*
 * ABSTRACT
 */
-/* $Id: sing_mp.h,v 1.3 1997-03-28 21:44:39 obachman Exp $ */
-
-#include "subexpr.h"
-#include "silink.h"
+/* $Id: sing_mp.h,v 1.4 1997-04-08 08:43:31 obachman Exp $ */
 
 
-void FreeCmdArgs(int argc, char** argv);
 #ifdef HAVE_MPSR
-void slInitBatchLink(si_link l, int argc, char** argv);
-si_link_extension slInitMPFile();
-si_link_extension slInitMPTcp();
-extern BOOLEAN mpsr_IsMPLink(si_link l);
-#endif
-
+#include "silink.h"
+si_link_extension slInitMPFileExtension(si_link_extension s);
+si_link_extension slInitMPTcpExtension(si_link_extension s);
 int Batch_do(int argc, char **argv);
-#endif
+#endif // HAVE_MPSR
+
+#endif // SING_MP_H

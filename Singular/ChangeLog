@@ -1,3 +1,9 @@
+Sat Mar 29 16:01:39 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* silink.cc (DumpQring): Takes care of dumping a Qring
+	(slInit): enable ascii link specification of the form "filename
+	mode:w"
+
 Fri Mar 28 14:12:05 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* Added routines dump(link) and getdump(link) for ascii and MP

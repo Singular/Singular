@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.6 1997-04-02 15:07:43 Singular Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.7 1997-04-08 08:43:26 obachman Exp $ */
 
 /***************************************************************
  *
@@ -257,7 +257,8 @@ short sr_cmds[] =
   QRING_CMD,
   FGLM_CMD,
   DUMP_CMD,
-  GETDUMP_CMD
+  GETDUMP_CMD,
+  STATUS_CMD
 };
 
 // struct used for specifying the cmd <-> cop relations

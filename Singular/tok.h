@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: tok.h,v 1.5 1997-03-28 21:44:40 obachman Exp $ */
+/* $Id: tok.h,v 1.6 1997-04-08 08:43:35 obachman Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -95,6 +95,7 @@ enum {
   RESERVEDNAME_CMD,
   RESULTANT_CMD,
   ROWS_CMD,
+  STATUS_CMD,
   SQR_FREE_DEC_CMD,
   STRING_CMD,
   SYSTEM_CMD,
@@ -105,7 +106,6 @@ enum {
   VARSTR_CMD,
   VERBOSE_CMD,
   WRITE_CMD,
-
   /* start system var section: VECHO */
   VECHO,
   VPAGELENGTH,

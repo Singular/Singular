@@ -1,10 +1,40 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.6 1997-04-02 15:07:50 Singular Exp $ */
+/* $Id: silink.cc,v 1.7 1997-04-08 08:43:27 obachman Exp $ */
 
 /*
 * ABSTRACT
+*/
+/* $Log: not supported by cvs2svn $
+// Revision 1.5  1997/03/29  15:02:38  obachman
+// Sat Mar 29 16:01:39 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* silink.cc (DumpQring): Takes care of dumping a Qring
+//
+// Revision 1.4  1997/03/28  21:44:36  obachman
+// Fri Mar 28 14:12:05 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* Added routines dump(link) and getdump(link) for ascii and MP
+// 	  links
+//
+// 	* ipconv.cc (dConvertTypes): added int->module conversion so that
+// 	  'module m = 0' works
+//
+// 	* iparith.cc (jjVAR1): added LINK_CMD to list of typeof(...)
+//
+// Revision 1.3  1997/03/26  14:58:02  obachman
+// Wed Mar 26 14:02:15 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* added reference counter to links, updated slKill, slCopy, slInit
+// 	* various small bug fixes for Batch mode
+//
+// Revision 1.1.1.1  1997/03/19  13:18:42  obachman
+// Imported Singular sources
+//
 */
 
 #include <stdio.h>
@@ -21,6 +51,7 @@
 #include "lists.h"
 #include "ideals.h"
 #include "numbers.h"
+#include "intvec.h"
 
 /* declarations */
 static BOOLEAN DumpAscii(FILE *fd, idhdl h);
@@ -28,347 +59,349 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h);
 static char* GetIdString(idhdl h);
 static int DumpRhs(FILE *fd, idhdl h);
 static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str);
+static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl);
 
-/* =============== general utilities ====================================== */
-void GetCmdArgs(int *argc, char ***argv, char *str)
-{
-  int i = 0, sl = strlen(str)+1, j;
-  char *s2=mstrdup(str);
-
-#ifdef HAVE_MPSR
-  char *appl = strstr(s2, "-MPapplication");
-  if (appl != NULL)
-  {
-    *(appl-1) = '\0';
-    i = 2;
-  }
-#endif
-
-  if (strtok(s2, " ") != NULL)
-  {
-    i++;
-    while (strtok(NULL," ") != NULL) i++;
-  }
-  *argc = i;
-  if (i>0)
-  {
-    *argv = (char **) Alloc0(i*sizeof(char *));
-#ifdef HAVE_MPSR
-    if (appl != NULL) i -= 2;
-#endif
-    if (i>0)
-    {
-      strcpy(s2,str);
-      *argv[0] = mstrdup(strtok(s2, " "));
-      for(j = 1; j <i; j++)
-        (*argv)[j] = mstrdup(strtok(NULL, " "));
-    }
-  }
-  else
-    *argv = NULL;
-
-#ifdef HAVE_MPSR
-  if (appl != NULL)
-  {
-    (*argv)[*argc -2] = mstrdup("-MPapplication");
-    (*argv)[*argc -1] = mstrdup(&(appl[14]));
-  }
-#endif
-
-  FreeL(s2);
-}
 /* ====================================================================== */
 si_link_extension si_link_root=NULL;
+
 BOOLEAN slInit(si_link l, char *istr)
 {
-  char **argv;
-  int argc;
-
-  if (istr!=NULL)
+  char *type = NULL, *mode = NULL, *name = NULL;
+  int i = 0, j;
+  
+  // set mode and type
+  if (istr != NULL)
   {
-    GetCmdArgs(&argc, &argv, istr);
-    // let's parse the results
-    if ( argc <2 )
+    // find the first colon char in istr
+    i = 0;
+    while (istr[i] != ':' && istr[i] != '\0') i++;
+    if (istr[i] == ':')
     {
-      if (argc == 0)
+      // if found, set type
+      if (i > 0)
       {
-        argv = (char **) Alloc(2*sizeof(char *));
-        argv[0]=mstrdup("");
+        istr[i] = '\0';
+        type = mstrdup(istr);
+        istr[i] = ':';
       }
-      else if (argc == 1)
+      // and check for mode
+      j = ++i;
+      while (istr[j] != ' ' && istr[j] != '\0') j++;
+      if (j > i)
       {
-        char *n=argv[0];
-        Free((ADDRESS)argv,sizeof(char *));
-        argv = (char **) Alloc(2*sizeof(char *));
-        argv[0]=n;
+        mode = mstrdup(&(istr[i]));
+        mode[j - i] = '\0';
       }
-      argv[1]=mstrdup("ascii");
-      argc=2;
+      // and for the name
+      while (istr[j] == ' '&& istr[j] != '\0') j++;
+      if (istr[j] != '\0') name = mstrdup(&(istr[j]));
     }
-    l->argc = argc;
-    l->argv = argv;
+    else // no colon find -- string is entire name
+    {
+      j=0;
+      while (istr[j] == ' '&& istr[j] != '\0') j++;
+      if (istr[j] != '\0') name = mstrdup(&(istr[j]));
+    }
   }
-  if (l->name==NULL)
-    l->name = mstrdup(argv[0]);
 
-  l->ref = 0;
-
-  BOOLEAN not_found=TRUE;
-  si_link_extension s=si_link_root;
-  while (s!=NULL)
+  // set the link extension
+  if (type != NULL)
   {
-    if (!(not_found=s->Init(l,s)))
+    si_link_extension s = si_link_root;
+    
+    while (s != NULL && (strcmp(s->type, type) != 0)) s = s->next;
+
+    if (s != NULL)
+      l->m = s;
+    else
     {
-      l->m=s;
-      l->linkType=s->index;
-      break;
+      Warn("Found unknown link type: %s", type);
+      Warn("Use default link type: %s", si_link_root->type);
+      l->m = si_link_root;
     }
-    s=s->next;
+    FreeL(type);
   }
-  if (not_found) Werror("unknown link type `%s`",argv[1]);
-  return not_found;
+  else
+    l->m = si_link_root;
+
+  l->name = (name != NULL ? name : mstrdup(""));
+  l->mode = (mode != NULL ? mode : mstrdup(""));
+  l->ref = 1;
+  return FALSE;
 }
 
 void slCleanUp(si_link l)
 {
   (l->ref)--;
-  if (l->ref < 0)
+  if (l->ref == 0)
   {
     if (SI_LINK_OPEN_P(l)) slClose(l);
-    if (l->name != NULL) FreeL((ADDRESS)l->name);
-    l->name=NULL;
-    if (l->argc!=0 && l->argv != NULL)
-    {
-      int i=l->argc-1;
-      while(i>=0)
-      {
-        if (l->argv[i] != NULL) FreeL((ADDRESS)l->argv[i]);
-        i--;
-      }
-      Free((ADDRESS)l->argv,l->argc*sizeof(char *));
-    }
-    l->argv=NULL;
-    l->argc=0;
-    l->ref=0;
+    FreeL((ADDRESS)l->name);
+    FreeL((ADDRESS)l->mode);
+    memset((void *) l, 0, sizeof(ip_link));
   }
 }
 
-  
 void slKill(si_link l)
 {
+  slCleanUp(l);
   if (l->ref == 0)
-  {
-    slCleanUp(l);
     Free((ADDRESS)l, sizeof(ip_link));
+}
+
+char* slStatus(si_link l, char *request)
+{
+  if (l == NULL) return "empty link";
+  else if (l->m == NULL) return "unknown link type";
+  else if (strcmp(request, "type") == 0) return l->m->type;
+  else if (strcmp(request, "mode") == 0) return l->mode;
+  else if (strcmp(request, "name") == 0) return l->name;
+  else if (strcmp(request, "open") == 0)
+  {
+    if (SI_LINK_OPEN_P(l)) return "yes";
+    else return "no";
   }
-  else
-   slCleanUp(l); 
+  else if (strcmp(request, "openread") == 0)
+  {
+    if (SI_LINK_R_OPEN_P(l)) return "yes";
+    else return "no";
+  }
+  else if (strcmp(request, "openwrite") == 0)
+  {
+    if (SI_LINK_W_OPEN_P(l)) return "yes";
+    else return "no";
+  }
+  else if (l->m->Status == NULL) return "unknown status request";
+  else return l->m->Status(l, request);
 }
 
 //--------------------------------------------------------------------------
-BOOLEAN slOpenRead(si_link l)
+BOOLEAN slOpen(si_link l, short flag)
 {
-  if(SI_LINK_R_OPEN_P(l)) return FALSE; // already open r
-  si_link_extension s=si_link_root;
-  while ((s!=NULL) && (s->index!=l->linkType)) s=s->next;
-  if ((s==NULL)||(s->OpenRead==NULL))
-     return TRUE;
-  l->m=s;   
-  return  s->OpenRead(l);   
-}
+  BOOLEAN res;
+  
+  if (l->m == NULL) slInit(l, "");
 
-BOOLEAN slOpenWrite(si_link l)
-{
-  if(SI_LINK_W_OPEN_P(l)) return FALSE; // already open w
-  si_link_extension s=si_link_root;
-  while ((s!=NULL) && (s->index!=l->linkType)) s=s->next;
-  if ((s==NULL)||(s->OpenWrite==NULL))
-     return TRUE;
-  l->m=s;   
-  return  s->OpenWrite(l);   
+  if (SI_LINK_OPEN_P(l))
+  {
+    Warn("open: link of type: %s, mode: %s, name: %s is already open",
+         l->m->type, l->mode, l->name);
+    return FALSE;
+  }
+  else if (l->m->Open != NULL) res = l->m->Open(l, flag);
+  else res = TRUE;
+
+  if (res)
+    Werror("open: Error for link of type: %s, mode: %s, name: %s",
+           l->m->type, l->mode, l->name);
+  return res;
 }
 
 BOOLEAN slClose(si_link l)
 {
-  if(! SI_LINK_OPEN_P(l)) return FALSE; // already closed
-  si_link_extension s=l->m;
-  if (s==NULL)
-  {
-    s=si_link_root;
-    while ((s!=NULL) && (s->index!=l->linkType)) s=s->next;
-  }  
-  if ((s==NULL)||(s->Close==NULL))
-    return TRUE;
-  return  s->Close(l);   
+  BOOLEAN res;
+
+  if(! SI_LINK_OPEN_P(l)) return FALSE;
+  else if (l->m->Close != NULL) return res = l->m->Close(l);
+  else res = TRUE;
+  
+  if (res)
+    Werror("close: Error for link of type: %s, mode: %s, name: %s",
+           l->m->type, l->mode, l->name);
+  return res;
 }
 
-leftv slRead(si_link l,leftv a)
+leftv slRead(si_link l, leftv a)
 {
   leftv v = NULL;
   if( ! SI_LINK_R_OPEN_P(l)) // open r ?
   {
-    if (slOpenRead(l)) return NULL;
+    if (slOpen(l, SI_LINK_READ)) return NULL;
   }
-  if ((SI_LINK_R_OPEN_P(l))&&(l->m!=NULL))
+
+  if (SI_LINK_R_OPEN_P(l))
   { // open r
     if (a==NULL)
     {
-      if (l->m->Read!=NULL)
-        v=l->m->Read(l);
+      if (l->m->Read != NULL) v = l->m->Read(l);
     }
     else
     {
-      if (l->m->Read2!=NULL)
-        v=l->m->Read2(l,a);
+      if (l->m->Read2 != NULL) v = l->m->Read2(l,a);
     }
   }
-  // here comes the eval:
-  if (v != NULL) 
+  else
   {
-    v->Eval();
+    Werror("read: Error to open link of type %s, mode: %s, name: %s for reading",
+           l->m->type, l->mode, l->name);
+    return NULL;
   }
+  
+  // here comes the eval:
+  if (v != NULL) v->Eval();
+  else
+    Werror("read: Error for link of type %s, mode: %s, name: %s",
+           l->m->type, l->mode, l->name);
   return v;
 }
 
 BOOLEAN slWrite(si_link l, leftv v)
 {
+  BOOLEAN res;
+  
   if(! SI_LINK_W_OPEN_P(l)) // open w ?
   {
-    if (slOpenWrite(l)) return TRUE;
+    if (slOpen(l, SI_LINK_WRITE)) return TRUE;
   }
-  if((SI_LINK_W_OPEN_P(l))&&(l->m!=NULL))
+
+  if(SI_LINK_W_OPEN_P(l))
   { // now open w
-    if (l->m->Write!=NULL)
-      return l->m->Write(l,v);
+    if (l->m->Write != NULL) res = l->m->Write(l,v);
+    else res = TRUE;
+
+    if (res)
+      Werror("write: Error for link of type %s, mode: %s, name: %s",
+             l->m->type, l->mode, l->name);
+    return res;
   }
-  return TRUE;
+  else
+  {
+    Werror("write: Error to open link of type %s, mode: %s, name: %s for writing",
+           l->m->type, l->mode, l->name);
+    return TRUE;
+  }
 }
 
 BOOLEAN slDump(si_link l)
 {
+  BOOLEAN res;
+
   if(! SI_LINK_W_OPEN_P(l)) // open w ?
   {
-    if (slOpenWrite(l)) return TRUE;
+    if (slOpen(l, SI_LINK_WRITE)) return TRUE;
   }
-  if((SI_LINK_W_OPEN_P(l))&&(l->m!=NULL))
+
+  if(SI_LINK_W_OPEN_P(l))
   { // now open w
-    if (l->m->Dump!=NULL)
-      return l->m->Dump(l);
+    if (l->m->Dump != NULL) res = l->m->Dump(l);
+    else res = TRUE;
+
+    if (res)
+      Werror("dump: Error for link of type %s, mode: %s, name: %s",
+             l->m->type, l->mode, l->name);
+    return res;
   }
-  return TRUE;
+  else
+  {
+    Werror("dump: Error to open link of type %s, mode: %s, name: %s for writing",
+           l->m->type, l->mode, l->name);
+    return TRUE;
+  }
 }
 
 BOOLEAN slGetDump(si_link l)
 {
-  if(! SI_LINK_R_OPEN_P(l)) // open w ?
-  {
-    if (slOpenRead(l)) return TRUE;
-  }
-  if((SI_LINK_R_OPEN_P(l))&&(l->m!=NULL))
-  { // now open w
-    if (l->m->GetDump!=NULL)
-      return l->m->GetDump(l);
-  }
-  return TRUE;
-}
+  BOOLEAN res;
 
-/* =============== ASCII ============================================= */
-BOOLEAN slOpenWriteAscii(si_link l)
-{
-  if(SI_LINK_R_OPEN_P(l)&&(l->name[0]!='\0'))
+  if(! SI_LINK_R_OPEN_P(l)) // open r ?
   {
-    Werror("cannot open input file %s as output file",l->name);
-    return TRUE; // already open r
+    if (slOpen(l, SI_LINK_READ)) return TRUE;
   }
-  FILE *outfile;
-  char *mode="a";
-  char *filename=l->name;
-  if(filename[0]=='\0')
-  {
-    SI_LINK_SET_W_OPEN_P(l); /*open, write */
-    l->data=(void *)stdout;
-    return FALSE;
+
+  if(SI_LINK_R_OPEN_P(l))
+  { // now open r
+    if (l->m->GetDump != NULL) res = l->m->GetDump(l);
+    else res = TRUE;
+
+    if (res)
+      Werror("getdump: Error for link of type %s, mode: %s, name: %s",
+             l->m->type, l->mode, l->name);
+    return res;
   }
-  else if(filename[0]=='>')
+  else
   {
-    if (filename[1]=='>')
-      filename+=2;
-    else
-    {
-      filename++;
-      mode="w";
-    }
-  }
-  int i=2;
-  while (i<l->argc)
-  {
-    if(strncmp(l->argv[i],"mode:",5)==0)
-      mode=l->argv[i]+5;
-    else if(strcmp(l->argv[i],"showPath")!=0)
-      Warn("ignore link property %s",l->argv[i]);
-    i++;
-  }
-  outfile=fopen(filename,mode);
-  if (outfile!=NULL)
-  {
-    SI_LINK_SET_W_OPEN_P(l); /*open, write */
-    l->data=(void *)outfile;
-    return FALSE;
-  }
-  return TRUE;
-}
-BOOLEAN slOpenReadAscii(si_link l)
-{
-  if(SI_LINK_W_OPEN_P(l))
-  {
-    Werror("cannot open output file %s as input file",l->name);
-    return TRUE; // already open w
-  }
-  if (l->name[0]!='\0')
-  {
-    char *where=NULL;
-    int i=2;
-    while (i<l->argc)
-    {
-      if(strcmp(l->argv[i],"showPath")==0)
-        where=(char *)Alloc(120);
-      else if(strncmp(l->argv[i],"mode:",5)!=0)
-        Warn("ignore link property %s",l->argv[i]);
-      i++;
-    }
-    FILE *rfile=feFopen(l->name,"r",where);
-    if (where!=NULL)
-    {
-      Print("open %s, success:%d\n",where,rfile!=NULL);
-      Free((ADDRESS)where,120);
-    }
-    if (rfile!=NULL)
-    {
-      l->data=(void *)rfile;
-      SI_LINK_SET_R_OPEN_P(l);
-      return FALSE;
-    }
-    Werror("cannot open %s",l->name);
-    l->data=NULL;
+    Werror("dump: Error open link of type %s, mode: %s, name: %s for reading",
+           l->m->type, l->mode, l->name);
     return TRUE;
   }
-  SI_LINK_SET_R_OPEN_P(l);
+}
+
+
+/* =============== ASCII ============================================= */
+BOOLEAN slOpenAscii(si_link l, short flag)
+{
+  char *mode;
+  if (flag == SI_LINK_OPEN)
+  {
+    if (l->mode[0] != '\0' && (strcmp(l->mode, "r") == 0))
+      flag = SI_LINK_READ;
+    else flag = SI_LINK_WRITE;
+  }
+
+  if (flag == SI_LINK_READ) mode = "r";
+  else if (strcmp(l->mode, "w") == 0) mode = "w";
+  else mode = "a";
+    
+        
+  if (l->name[0] == '\0')
+  {
+    // stdin or stdout
+    if (flag == SI_LINK_READ)
+    {
+      l->data = (void *) stdin;
+      mode = "r";
+    }
+    else
+    {
+      l->data = (void *) stdout;
+      mode = "a";
+    }
+  }
+  else
+  {
+    // normal ascii link to a file
+    FILE *outfile;
+    char *filename=l->name;
+
+    if(filename[0]=='>')
+    {
+      if (filename[1]=='>')
+      {
+        filename+=2;
+        mode = "a";
+      }
+      else
+      {
+        filename++;
+        mode="w";
+      }
+    }
+    outfile=fopen(filename,mode);
+    if (outfile!=NULL) l->data = (void *) outfile;
+    else return TRUE;
+  }
+
+  FreeL(l->mode);
+  l->mode = mstrdup(mode);
+  SI_LINK_SET_OPEN_P(l, flag);
   return FALSE;
 }
+
 BOOLEAN slCloseAscii(si_link l)
 {
   SI_LINK_SET_CLOSE_P(l);
-  if (l->name[0]!='\0')
+  if (l->name[0] != '\0')
   {
     return (fclose((FILE *)l->data)!=0);
   }
   return FALSE;
 }
+
 leftv slReadAscii(si_link l)
 {
   FILE * fp=(FILE *)l->data;
   char * buf=NULL;
-  if (fp!=NULL)
+  if (fp!=NULL && l->name[0] != '\0')
   {
     fseek(fp,0L,SEEK_END);
     long len=ftell(fp);
@@ -414,20 +447,30 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
   return err;
 }
 
-BOOLEAN slInitALink(si_link l,si_link_extension s)
+char* slStatusAscii(si_link l, char* request)
 {
-  if (strcmp(l->argv[1], s->name) == 0)
+  if (strcmp(request, "read") == 0)
   {
-    return FALSE;
+    if (SI_LINK_R_OPEN_P(l)) return "ready";
+    else return "not ready";
   }
-  return TRUE;
+  else if (strcmp(request, "write") == 0)
+  {
+    if (SI_LINK_W_OPEN_P(l)) return "ready";
+    else return "not ready";
+  }
+  else return "unknown status request";
 }
+
+/*------------------ Dumping in Ascii format -----------------------*/
 
 BOOLEAN slDumpAscii(si_link l)
 {
   FILE *fd = (FILE *) l->data;
   idhdl h = idroot, rh = currRingHdl;
   BOOLEAN status = DumpAscii(fd, h);
+
+  if (! status ) status = DumpAsciiMaps(fd, h, NULL);
 
   if (currRingHdl != rh) rSetHdl(rh, TRUE);
   fflush(fd);
@@ -443,7 +486,7 @@ static BOOLEAN DumpAscii(FILE *fd, idhdl h)
 
   if (DumpAscii(fd, IDNEXT(h))) return TRUE;
 
-  // need to set the ring before writing it, othersie we get in
+  // need to set the ring before writing it, otherwise we get in
   // trouble with minpoly
   if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
     rSetHdl(h, TRUE);
@@ -451,14 +494,40 @@ static BOOLEAN DumpAscii(FILE *fd, idhdl h)
   if (DumpAsciiIdhdl(fd, h)) return TRUE;
 
   if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
-  {
-    rSetHdl(h, TRUE);
     return DumpAscii(fd, IDRING(h)->idroot);
-  }
   else
     return FALSE;
 }
 
+static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
+{
+  if (h == NULL) return FALSE;
+  if (DumpAsciiMaps(fd, IDNEXT(h), rhdl)) return TRUE;
+
+  if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+    return DumpAsciiMaps(fd, IDRING(h)->idroot, h);
+  else if (IDTYP(h) == MAP_CMD)
+  {
+    char *rhs;
+    rSetHdl(rhdl, TRUE);
+    rhs = ((leftv) h)->String();
+    
+    if (fprintf(fd, "setring %s;\n", IDID(rhdl)) == EOF) return TRUE;
+    if (fprintf(fd, "%s %s = %s, %s;\n", Tok2Cmdname(MAP_CMD), IDID(h),
+                IDMAP(h)->preimage, rhs) == EOF)
+    {
+      FreeL(rhs);
+      return TRUE;
+    }
+    else
+    {
+      FreeL(rhs);
+      return FALSE;
+    }
+  }
+  else return FALSE;
+}
+  
 static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
 {
   char *type_str = GetIdString(h);
@@ -479,15 +548,16 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
     ideal id = IDIDEAL(h);
     if (fprintf(fd, "[%d][%d]", id->nrows, id->ncols)== EOF) return TRUE;
   }
-
-  // check for empty list;
-  if ( ! (type_id == LIST_CMD && IDLIST(h)->nr < 0))
+  else if (type_id == INTMAT_CMD)
   {
-    // write the equal sign
-    if (fprintf(fd, " = ") == EOF) return TRUE;
-    // and the right hand side
-    if (DumpRhs(fd, h) == EOF) return TRUE;
+    if (fprintf(fd, "[%d][%d]", IDINTVEC(h)->rows(), IDINTVEC(h)->cols())
+        == EOF) return TRUE;
   }
+  // write the equal sign
+  if (fprintf(fd, " = ") == EOF) return TRUE;
+
+  // and the right hand side
+  if (DumpRhs(fd, h) == EOF) return TRUE;
   
   // semicolon und tschuess
   if (fprintf(fd, ";\n") == EOF) return TRUE;
@@ -523,30 +593,35 @@ static char* GetIdString(idhdl h)
       case VECTOR_CMD:
       case MODUL_CMD:
       case MATRIX_CMD:
-      case MAP_CMD:
         return Tok2Cmdname(type);
         
+      case MAP_CMD:
       case LINK_CMD:
         return NULL;
 
       default:
-       Warn("Can not dump data of type %s", Tok2Cmdname(IDTYP(h)));
+       Warn("Error dump data of type %s", Tok2Cmdname(IDTYP(h)));
        return NULL;
   }
 }
 
 static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str)
 {
-  char *ideal_str = iiStringMatrix((matrix) IDRING(h)->qideal, 1);
-
-  if (ideal_str == NULL) return TRUE;
-  if (fprintf(fd, "%s temp_ideal = %s;\n", Tok2Cmdname(IDEAL_CMD), ideal_str)
+  char *ring_str = ((leftv) h)->String();
+  if (fprintf(fd, "%s temp_ring = %s;\n", Tok2Cmdname(RING_CMD), ring_str)
+              == EOF) return TRUE;
+  if (fprintf(fd, "%s temp_ideal = %s;\n", Tok2Cmdname(IDEAL_CMD),
+              iiStringMatrix((matrix) IDRING(h)->qideal, 1))
       == EOF) return TRUE;
   if (fprintf(fd, "attrib(temp_ideal, \"isSB\", 1);\n") == EOF) return TRUE;
   if (fprintf(fd, "%s %s = temp_ideal;\n", type_str, IDID(h)) == EOF)
     return TRUE;
+  if (fprintf(fd, "kill temp_ring;\n") == EOF) return TRUE;
   else
+  {
+    FreeL(ring_str);
     return FALSE;
+  }
 }
 
   
@@ -558,25 +633,21 @@ static int DumpRhs(FILE *fd, idhdl h)
   {
     lists l = IDLIST(h);
     int i, nl = l->nr;
-    idhdl h2;
 
+    fprintf(fd, "list(");
+    
     for (i=0; i<nl; i++)
     {
-      h2 = (idhdl) &(l->m[i]);
-      
-      if ( ! (IDTYP(h2) == LIST_CMD && IDLIST(h2)->nr < 0))
-      {
-        if (DumpRhs(fd, h2) == EOF) return EOF;
-        fprintf(fd,", ");
-      }
+      if (DumpRhs(fd, (idhdl) &(l->m[i])) == EOF) return EOF;
+      fprintf(fd, ",");
     }
-    h2 = (idhdl) &(l->m[i]);
-    if ( ! (IDTYP(h2) == LIST_CMD && IDLIST(h2)->nr < 0))
-    { 
-      if (DumpRhs(fd, h2) == EOF) return EOF;
+    if (nl > 0)
+    {
+      if (DumpRhs(fd, (idhdl) &(l->m[nl])) == EOF) return EOF;
     }
+    fprintf(fd, ")");
   }
-  else  if (type_id == PROC_CMD)
+  else  if (type_id == PROC_CMD || type_id == STRING_CMD)
   {
     char *pstr = IDSTRING(h), c;
     fputc('"', fd);
@@ -594,13 +665,11 @@ static int DumpRhs(FILE *fd, idhdl h)
 
     if (rhs == NULL) return EOF;
 
-    if (type_id == STRING_CMD) fprintf(fd,"\"");
-    if (type_id == MAP_CMD) fprintf(fd, "%s,", IDMAP(h)->preimage);
+    if (type_id == INTVEC_CMD) fprintf(fd, "intvec(");
 
     if (fprintf(fd, "%s", rhs) == EOF) return EOF;
     FreeL(rhs);
 
-    if (type_id == STRING_CMD) fprintf(fd,"\"");
     if ((type_id == RING_CMD || type_id == QRING_CMD) &&
         IDRING(h)->minpoly != NULL)
     {
@@ -609,6 +678,7 @@ static int DumpRhs(FILE *fd, idhdl h)
       rhs = StringAppend("");
       if (fprintf(fd, "; minpoly = %s", rhs) == EOF) return EOF;
     }
+    else if (type_id == INTVEC_CMD) fprintf(fd, ")");
   }
   return 1;
 }
@@ -617,7 +687,7 @@ BOOLEAN slGetDumpAscii(si_link l)
 {
   if (l->name[0] == '\0')
   {
-    Werror("Can not get dump from stdin");
+    Werror("getdump: Can not get dump from stdin");
     return TRUE;
   }
   else
@@ -628,7 +698,7 @@ BOOLEAN slGetDumpAscii(si_link l)
       return TRUE;
     else
     {
-      // lets reset the file pointer to the beginning to reflect that
+      // lets reset the file pointer to the end to reflect that
       // we are finished with reading
       FILE *f = (FILE *) l->data;
       fseek(f, 0L, SEEK_END);
@@ -636,14 +706,9 @@ BOOLEAN slGetDumpAscii(si_link l)
     }
   }
 }
-
-/*-------------------------------------------------------------------*/
-void slExtensionInit(si_link_extension s)
-{
-  s->index=si_link_root->index+10;
-  s->next=si_link_root;
-  si_link_root=s;
-}
+      
+  
+/*------------Initialization at Start-up time------------------------*/
 
 #ifdef HAVE_DBM
 #include "sing_dbm.h"
@@ -655,25 +720,30 @@ void slExtensionInit(si_link_extension s)
 
 void slStandardInit()
 {
+  si_link_extension s;
   si_link_root=(si_link_extension)Alloc0(sizeof(*si_link_root));
-  si_link_root->Init=slInitALink;
-  si_link_root->OpenRead=slOpenReadAscii;
-  si_link_root->OpenWrite=slOpenWriteAscii;
+  si_link_root->Open=slOpenAscii;
   si_link_root->Close=slCloseAscii;
   si_link_root->Read=slReadAscii;
-  //si_link_root->Read2=NULL;
   si_link_root->Write=slWriteAscii;
   si_link_root->Dump=slDumpAscii;
   si_link_root->GetDump=slGetDumpAscii;
-  si_link_root->name="ascii";
-  si_link_root->index=1;
+  si_link_root->Status=slStatusAscii;
+  si_link_root->type="ascii";
+  s = si_link_root;
 #ifdef HAVE_DBM
 #ifndef HAVE_MODULE_DBM
-  slExtensionInit(dbInit());
+  s->next = (si_link_extension)Alloc0(sizeof(*si_link_root));
+  s = s->next;
+  slInitDBMExtension(s);
 #endif
 #endif
 #ifdef HAVE_MPSR
-  slExtensionInit(slInitMPFile());
-  slExtensionInit(slInitMPTcp());
+  s->next = (si_link_extension)Alloc0(sizeof(*si_link_root));
+  s = s->next;
+  slInitMPFileExtension(s);
+  s->next = (si_link_extension)Alloc0(sizeof(*si_link_root));
+  s = s->next;
+  slInitMPTcpExtension(s);
 #endif  
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.6 1997-04-02 15:07:09 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.7 1997-04-08 08:43:19 obachman Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -356,20 +356,24 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr e)
 {
-  int i = 0, argc = 0;
-  char **argv;
-
   si_link l=(si_link)res->data;
-  if (SI_LINK_OPEN_P(l))
-  {
-    Werror("cannot change open link");
-    return TRUE;
-  }
+
   if (l!=NULL) slCleanUp(l);
-  // let's read in all args into argc and argv
+
   if (a->Typ() == STRING_CMD)
   {
+    if (l == NULL)
+    {
+      l = (si_link) Alloc0(sizeof(sip_link));
+      res->data = (void *) l;
+    }
     return slInit(l, (char *) a->Data());
+  }
+  else if (a->Typ() == LINK_CMD)
+  {
+    if (l != NULL) Free(l, sizeof(sip_link));
+    res->data = slCopy((si_link)a->Data());
+    return FALSE;
   }
   return TRUE;
 }
@@ -455,12 +459,14 @@ struct sValAssign dAssign[]=
 ,{jiA_RING,     RING_CMD,       RING_CMD }
 ,{jiA_RING,     QRING_CMD,      QRING_CMD }
 ,{jiA_STRING,   STRING_CMD,     STRING_CMD }
+,{jiA_STRING,   PROC_CMD,       STRING_CMD }
 ,{jiA_POLY,     VECTOR_CMD,     VECTOR_CMD }
 ,{jiA_INTVEC,   INTVEC_CMD,     INTVEC_CMD }
 ,{jiA_INTVEC,   INTMAT_CMD,     INTMAT_CMD }
 ,{jiA_NUMBER,   NUMBER_CMD,     NUMBER_CMD }
 ,{jiA_LIST,     LIST_CMD,       LIST_CMD }
 ,{jiA_LINK,     LINK_CMD,       STRING_CMD }
+,{jiA_LINK,     LINK_CMD,       LINK_CMD }
 ,{jiA_STRING,   BINARY_CMD,     STRING_CMD }
 ,{NULL,         0,              0 }
 };
