@@ -105,7 +105,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     pShallowCopyDelete.cc 
 
 # normal C source files
-CSOURCES=weight0.c fegetopt.c fereadl.c page.c feOpenWinntUrl.c dError.c
+CSOURCES=weight0.c fegetopt.c fereadl.c page.c feOpenWinntUrl.c dError.c mmstd.c
 
 # special source files (need extra compiling and/or linking)
 ESOURCES=iparith.cc tesths.cc mpsr_Tok.cc claptmpl.cc
