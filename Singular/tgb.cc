@@ -2025,10 +2025,10 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
             break;
           }
       } /* end loop current mon */
-      poly tmp=pHead(h /*kBucketGetLm(P.bucket)*/);
-      act->next=tmp;pIter(act);
-
-      h = kBucketExtractLm(P.bucket);
+      //   poly tmp=pHead(h /*kBucketGetLm(P.bucket)*/);
+      //act->next=tmp;pIter(act);
+      act->next=kBucketExtractLm(P.bucket);pIter(act);
+      h = kBucketGetLm(P.bucket);
       if (h==NULL)
       {
 #ifdef REDTAIL_PROT
