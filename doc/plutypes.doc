@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.8 2003-03-13 18:13:24 levandov Exp $
+@comment $Id: plutypes.doc,v 1.9 2003-03-20 15:16:57 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -135,25 +135,25 @@ a type cast to ideal
 @*@strong{Example:}
 @smallexample
 @c example
-  ring r=0,(x,y,z),dp;
-  system ("PLURAL",-1,0); 
-  ideal m = maxideal(1);
-  m;
-  poly f = x2;
-  poly g = y3;
-  ideal i = x*y*z , f-g, g*(x-y) + f^4 ,0, 2x-z2y;
-  ideal M = i + maxideal(10);
-  timer =0;
-  i = M*M;
-  timer;
-  ncols(i);
-  timer =0;
-  i = M^2;
-  ncols(i);
-  timer;
-  i[ncols(i)];
-  vector v = [x,y-z,x2,y-x,x2yz2-y];
-  ideal j = ideal(v);
+ring r=0,(x,y,z),dp;
+system ("PLURAL",-1,0); 
+ideal m = maxideal(1);
+m;
+poly f = x2;
+poly g = y3;
+ideal i = x*y*z , f-g, g*(x-y) + f^4 ,0, 2x-z2y;
+ideal M = i + maxideal(10);
+timer =0;
+i = M*M;
+timer;
+ncols(i);
+timer =0;
+i = M^2;
+ncols(i);
+timer;
+i[ncols(i)];
+vector v = [x,y-z,x2,y-x,x2yz2-y];
+ideal j = ideal(v);
 @c example
 @end smallexample
 
@@ -188,30 +188,28 @@ generator.
 @strong{Note:} For simplification of an ideal, see also @emph{simplify} in @sc{Singular}.
 @end ifclear  
 
-
-
 @*@strong{Example:}
 @smallexample
 @c example
-  ring r=0,(x,y,z),dp;
-  matrix D[3][3];
-  D[1,2]=-z;
-  D[1,3]=y;
-  D[2,3]=x;
-  system("PLURAL",1,D); 
-  ideal I = 0,x,0,1;
-  I;
-  I + 0;    // simplification
-  ideal J = I,0,x,x-z;
-  J;
-  I * J;   //  multiplication with simplification
-  I*x;
-  vector V = [x,y,z];
-  print(V*I);
-  ideal m = maxideal(1);
-  m^2;
-  ideal II = I[2..4];
-  II;
+ring r=0,(x,y,z),dp;
+matrix D[3][3];
+D[1,2]=-z;
+D[1,3]=y;
+D[2,3]=x;
+system("PLURAL",1,D); 
+ideal I = 0,x,0,1;
+I;
+I + 0;    // simplification
+ideal J = I,0,x,x-z;
+J;
+I * J;   //  multiplication with simplification
+I*x;
+vector V = [x,y,z];
+print(V*I);
+ideal m = maxideal(1);
+m^2;
+ideal II = I[2..4];
+II;
 @c example
 @end smallexample
 @end table
@@ -234,22 +232,14 @@ computes a free resolution of an ideal resp.@: module M which is
 minimized from the second module on
 (see @ref{nres@value{PSUFFIX}})          
 @item reduce
-normalform with respect to a standard basis (see @ref{reduce@value{PSUFFIX}})
+normal form with respect to a Groebner basis (see @ref{reduce@value{PSUFFIX}})
 @c@item res
 @c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res@value{PSUFFIX}})
 @item std
-standard basis computation (see @ref{std@value{PSUFFIX}})
+Groebner basis computation (see @ref{std@value{PSUFFIX}})
 @item twostd
-two-sided standard basis computation (see @ref{twostd})
+two-sided Groebner basis computation (see @ref{twostd})
 @end table
-
-
-
-        
-
-
-
-
 
 
 @c ---------------------------------------
@@ -347,20 +337,22 @@ defines a left  module.
 @item Example:
 @smallexample
 @c example
-  ring r=0,(x,y,z),(c,dp);
-  matrix D[3][3];
-  D[1,2]=-z;
-  D[1,3]=y;
-  D[2,3]=x;
-  system("PLURAL",1,D); 
-  vector s1 = [x2,y3,z];
-  vector s2 = [xy,1,0];
-  vector s3 = [0,x2-y2,z];
-  poly   f  = xyz;
-  module m = s1, s2-s1,f*(s3-s1);
-  m;
-  // show m in matrix format (columns generate m)
-  print(m);
+ring r=0,(x,y,z),(c,dp);
+matrix D[3][3];
+D[1,2]=-z;
+D[1,3]=y;
+D[2,3]=x;
+system("PLURAL",1,D); 
+// it is U(so_3)
+vector s1 = [x2,y3,z];
+vector s2 = [xy,1,0];
+vector s3 = [0,x2-y2,z];
+poly   f  = xyz;
+module m = s1, s2-s1,f*(s3-s1);
+m;
+// show m in matrix format (columns generate m)
+print(m);
+
 @c example
 @end smallexample
 @end table
@@ -416,11 +408,16 @@ is a vector, where the index indicates the column
 @*@strong{Example:}
 @smallexample
 @c example
+ring A=0,(x,y,z),Dp;
+matrix d[3][3];
+d[1,2]=-z;
+d[1,3]=2x;
+d[2,3]=-2y;
+system("PLURAL",1,d);
+module m=[x,y],[0,0,x*z];
+print((x+y)*m);
 @c example
 @end smallexample
-
-
-
 
 
 @c ------------------------------
@@ -440,9 +437,9 @@ computes a free resolution of an ideal resp.@: module M which is
 minimized from the second module on
 (see @ref{nres@value{PSUFFIX}})          
 @item reduce
-normalform with respect to a standard basis (see @ref{reduce@value{PSUFFIX}})
+normal form with respect to a Groebner basis (see @ref{reduce@value{PSUFFIX}})
 @item std
-standard basis computation (see @ref{std@value{PSUFFIX}})
+Groebner basis computation (see @ref{std@value{PSUFFIX}})
 @item syz
 computation of the first syzygy module (see @ref{syz@value{PSUFFIX}})
 @end table
@@ -505,16 +502,19 @@ defines a polynomial.
 @item Example:
 @smallexample
 @c example
-  ring r = 32003,(x,y,z),dp;
-  system("PLURAL",-1,1);  
-  poly s1  = x3y2+151x5y+186xy6+169y9;
-  poly s2  = 1*x^2*y^2*z^2+3z8;
-  poly s3  = 5/4x4y2+4/5*x*y^5+2x2y2z3+y7+11x10;
-  int a,b,c,t=37,5,4,1;
-  poly f=3*x^a+x*y^(b+c)+t*x^a*y^b*z^c;
-  f;
-  short = 0;
-  f;
+ring r = 32003,(x,y,z),dp;
+system("PLURAL",-1,1);
+r;
+// ring of some differential-like operators 
+poly s1  = x3y2+151x5y+186xy6+169y9;
+poly s2  = 1*x^2*y^2*z^2+3z8;
+poly s3  = 5/4x4y2+4/5*x*y^5+2x2y2z3+y7+11x10;
+int a,b,c,t=37,5,4,1;
+poly f=3*x^a+x*y^(b+c)+t*x^a*y^b*z^c;
+f;
+short = 0;
+f;
+ 
 @c example
 @end smallexample
 @end table
@@ -557,16 +557,16 @@ a type cast to poly
         // but not equal to 2x^3 which will be interpreted as (2x)^3
         // since 2x is a monomial
 @c example
-  ring r=0,(x,y),dp;
-  poly f = 10x2y3 +2x2y2-2xy+y -x+2;
-  lead(f);
-  leadmonom(f);
-  simplify(f,1);     // normalize leading coefficient
-  poly g = 1/2x2 + 1/3y;
-  cleardenom(g);
-  int i = 102;
-  poly(i);
-  typeof(_);
+ ring r=0,(x,y),dp;
+poly f = 10x2y3 +2x2y2-2xy+y -x+2;
+lead(f);
+leadmonom(f);
+simplify(f,1);     // normalize leading coefficient
+poly g = 1/2x2 + 1/3y;
+cleardenom(g);
+int i = 102;
+poly(i);
+typeof(_); 
 @c example
 @end smallexample
 
@@ -577,7 +577,7 @@ a type cast to poly
 @c example
 ring r=0,(x,y),dp;
 system("PLURAL",1,1);
-          // it is a Weyl algebra 
+// it is a Weyl algebra 
 r;
 yx;      // not correct input
 y*x;     // correct input
@@ -637,7 +637,7 @@ Computes the Lie bracket of two polinomials
 
 @sc{Plural} offers the opportunity to calculate in 
 factor rings  modulo a two-sided ideal.  The ideal has to be given
-as a standard basis.  For a detailed description of the concept
+as a Groebner basis.  For a detailed description of the concept
 of rings and quotient rings see
 @ifset singularmanual 
 @ref{Rings and orderings}.
@@ -655,6 +655,36 @@ in @sc{Singular} manual section Rings and orderings.
 @node qring declaration@value{PSUFFIX},  , qring@value{PSUFFIX}, qring@value{PSUFFIX}
 @subsection qring declaration@value{PSUFFIX}
 @cindex qring declaration@value{PSUFFIX}
+
+
+@table @strong
+@item Syntax:
+@code{qring} name @code{=} ideal_expression @code{;}
+@item Default:
+none
+@item Purpose:
+declares a quotient ring as the basering modulo ideal_expression.  Sets
+it as current basering.
+@item Example:
+@smallexample
+@c example
+ring r=0,(x,y,z,u,v,w),dp;
+system("PLURAL",-1,0);
+// anticommutative algebra
+option(redSB);
+option(redTail);
+ideal i=x^2,y^2,z^2,u^2,v^2,w^2;
+qring q=system("twostd",i);
+// now it is an exterior algebra
+q;
+poly k=(x+y)*(y-u)*(zv+u-w);
+k;
+poly ek=reduce(k,0);
+ek;
+@c example
+@end smallexample
+@end table
+
 
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file general.doc,
@@ -706,12 +736,15 @@ none
 @item Example:
 @smallexample
 @c example
-  ring R;
-  ideal i=z2,x;
-  resolution re=nres(i,0);
-  re;
-  list l = re;
-  l;
+ring r=0,(x,y,z),dp;
+matrix D[3][3];
+D[1,2]=z;
+system("PLURAL",1,D); // it is Heisenberg algebra
+ideal i=z2+z,x+y;
+resolution re=nres(i,0);
+re;
+list l = re;
+l;
 @c example
 @end smallexample
 @end table
@@ -836,6 +869,7 @@ If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
 
+In order to set the non-commutative extantion, see @ref{plural}.  
 
 
 @c ---------------------------------------

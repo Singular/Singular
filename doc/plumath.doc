@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.5 2003-03-06 11:42:56 levandov Exp $
+@comment $Id: plumath.doc,v 1.6 2003-03-20 15:16:56 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -209,7 +209,7 @@ respect to $G$} if no monomial of $f$ is contained in $L(G)$.
 @item normal form:
 @cindex Normal form
 @tex
-A map $\hbox{NF} : A^r \times \{G \mid G\ \hbox{ a standard
+A map $\hbox{NF} : A^r \times \{G \mid G\ \hbox{ a Groebner
 basis}\} \to A^r, (f|G) \mapsto \hbox{NF}(f|G)$, is called a {\bf normal
 form} on $A^r$ if for any $f \in A^r$ and any  Groebner basis $G$ the following
 holds: 
@@ -227,8 +227,9 @@ respect to} $G$ (note that such a function is not unique).
 
 @ifinfo
 A function NF : A^r x @{G | G a Groebner basis@} -> A^r, (f,G) ->
-NF(f|G), is called a @strong{normal form} if for any p in R^r and any
-standard basis G the following holds: if NF(f|G) <> 0 then L(g) does not
+NF(f|G), is called a @strong{normal form} if for any p in R^r and any 
+Groebner
+ basis G the following holds: if NF(f|G) <> 0 then L(g) does not
 divide L(NF(p|G)) for all g in G.
 @*NF(f|G) is called a @strong{normal form} of p with respect to G (note
 that such a function is not unique).
@@ -244,7 +245,7 @@ With respect to the definitionf of @code{ideal} and @code{module} (see @ref{PLUR
 @item ideal membership:
 @cindex Ideal membership
 @tex
-For a standard basis $G$ of $I$ the following holds: 
+For a Groebner basis $G$ of $I$ the following holds: 
 $f \in I$ if and only if $\hbox{NF}(f|G) = 0$.
 @end tex
 
@@ -343,8 +344,7 @@ manual.
 
 @subheading Syzygies
 @tex
-Let $K$ be a field and $>$ a well ordering on $A^r$. A {\bf left (resp.
-right) syzygy}
+Let $K$ be a field and $>$ a well ordering on $A^r$. A {\bf left syzygy}
 between $k$ elements $f_1,\dots,f_k \in A^r =\oplus_{i=1}^{r}Ae_i $ is
 $k$-tuple $(g_1,\dots ,g_k)\in A^k$ satisfying 
 $$\sum_{i=1}^{k}g_i f_i =0  $$
@@ -409,85 +409,26 @@ there exists a  resolution of length smaller or equal than n.
 @item @strong{Example:}
 @smallexample
 @c example
-  ring R=0,(x,y,z),dp;
-  matrix d[3][3];
-  d[1,2]=-z;
-  d[1,3]=2x;
-  d[2,3]=-2y;
-  system("PLURAL",1,d); //U(sl_2)
-  ideal I=x3,y3,z3-z;
-  I=std(I);
-  resolution resI = mres(I,0); 
-  resI;
-  // The matrix A_1 is given by
-  print(matrix(resI[1]));
-  // We see that the columns of A_1 generate I.
-  // The matrix A_2 is given by
-  print(matrix(resI[3]));
+ ring R=0,(x,y,z),dp;
+matrix d[3][3];
+d[1,2]=-z;
+d[1,3]=2x;
+d[2,3]=-2y;
+system("PLURAL",1,d); //U(sl_2)
+ideal I=x3,y3,z3-z;
+I=std(I);
+I;
+resolution resI = mres(I,0); 
+resI;
+// The matrix A_1 is given by
+print(matrix(resI[1]));
+// We see that the columns of A_1 generate I.
+// The matrix A_2 is given by
+print(matrix(resI[2]));
+
 @c example
 @end smallexample
 @end table
-
-@c @subheading Betti numbers and regularity
-@c @cindex Betti number
-@c @cindex regularity
-@c @tex
-@c Let $R$ be a graded ring (e.g., $R = \hbox{Loc}_< K[\underline{x}]$) and
-@c let $I \subset R^r$ be a graded submodule. Let
-@c $$
-@c   R^r = \bigoplus_a R\cdot e_{a,0} \buildrel A_1 \over \longleftarrow
-@c         \bigoplus_a R\cdot e_{a,1} \longleftarrow \ldots \longleftarrow
-@c         \bigoplus_a R\cdot e_{a,n} \longleftarrow 0
-@c $$
-@c be a minimal free resolution of $R^n/I$ considered with homogeneous maps
-@c of degree 0. Then the {\bf graded Betti number} $b_{i,j}$ of $R^r/I$ is
-@c the minimal number of generators $e_{a,j}$ in degree $i+j$ of the $j$-th
-@c syzygy module of $R^r/I$ (i.e., the $(j-1)$-st syzygy module of
-@c $I$). Note, that by definition the $0$-th syzygy module of $R^r/I$ is $R^r$
-@c and the 1st syzygy module of $R^r/I$ is $I$.
-@c @end tex
-@c @ifinfo
-@c Let R be a graded ring (e.g., R = K[x]) and let I in R^r be a graded
-@c submodule. Let
-@c @display
-@c R^r = (+) K[x]e(a,0) <--- (+) K[x]e(a,1)
-@c             <--- @dots{} <--- (+) K[x]e(a,n) <--- 0
-@c @end display
-@c be a minimal free resolution of R^n/I considered with homogeneous maps
-@c of degree 0. Then the @strong{graded Betti number} b_i,j of R^r/I is the
-@c minimal number of generators e_a,j in degree i+j of the j-th syzygy
-@c module of R^r/I (i.e., the (j-1)-st syzygy module of I). Note, that by
-@c definition the 0th syzygy module of R^r/I is R^r and the 1st syzygy module
-@c of R^r/I is I.
-@c @end ifinfo
-@c 
-@c The @strong{regularity} of @math{I} is the smallest integer @math{s}
-@c such that
-@c @tex
-@c $$
-@c     \hbox{deg}(e_{a,j}) \le s+j-1 \quad \hbox{for all $j$.}
-@c $$
-@c @end tex
-@c @ifinfo
-@c @display
-@c deg(e(a,j)) <= s+j-1    for all j.
-@c @end display
-@c @end ifinfo
-
-@c @table @code
-@c @item @strong{Example:}
-@c @smallexample
-@c @c example
-@c   ring R= 0,(u,v,x,y,z),dp;
-@c   ideal I = ux, vx, uy, vy;
-@c   resolution resI = mres(I,0); resI;
-@c   // the betti number:
-@c   print(betti(resI), "betti");
-@c   // the regularity:
-@c   regularity(resI);
-@c @c example
-@c @end smallexample
-@c @end table
 
 
 
@@ -589,12 +530,12 @@ Informatik, 1994
 @item
 Grassmann, H.; Greuel, G.-M.; Martin, B.; Neumann,
 W.; Pfister, G.; Pohl, W.; Sch@"onemann, H.; Siebert, T.:  On an
-implementation of standard bases and syzygies in  @sc{Singular}.
+implementation of Groebner bases and syzygies in  @sc{Singular}.
 Proceedings of the Workshop  Computational Methods in Lie theory in AAECC (1995)
 
 @item
 Greuel, G.-M.; Pfister, G.:
-Advances and improvements in the theory of standard bases and
+Advances and improvements in the theory of Standart bases and
 syzygies. Arch. d. Math. 63(1995)
 
 @item

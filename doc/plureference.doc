@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.7 2003-03-13 18:13:23 levandov Exp $
+@comment $Id: plureference.doc,v 1.8 2003-03-20 15:16:56 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -41,7 +41,7 @@ commands).
 
 The general syntax of a function is
 @format
-+                   [target =] function_name (<arguments>);
+                   [target =] function_name (<arguments>);
 @end format
 
 
@@ -54,7 +54,6 @@ The general syntax of a function is
 * option@value{PSUFFIX}::
 * plural::
 * reduce@value{PSUFFIX}::
-* res@value{PSUFFIX}::
 * std@value{PSUFFIX}::
 * syz@value{PSUFFIX}:: 
 * twostd::
@@ -96,8 +95,9 @@ poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
 p=p^3;
 p;
 poly q=(x+Q*y+Q^2*z)^4;
+// it is big noncentral element
 q;
-system("bracket",p,q);
+system("bracket",p,q); 
 @c example
 @end smallexample 
 @end table
@@ -120,7 +120,7 @@ returns statistics concerning the memory management:
 @item @code{memory(1)} is the number of bytes allocated from the
 operating system,
 @item @code{memory(2)} is the maximal number of bytes ever allocated from the
-operating system during the current @sc{Singular} session.
+operating system during the current @sc{Plural} session.
 @end itemize
 @item @strong{Note:}
 To monitor the memory usage during ongoing computations the option
@@ -131,21 +131,21 @@ see also @ref{option}).
 @item @strong{Example:}
 @smallexample
 @c example
-  ring r=0,(x(1..500)),dp;
-  poly p=(x(1)+x(500))^50;
-  proc ReportMemoryUsage()
-  {  "Memory currently used by SINGULAR     :",memory(0),"Byte (",
-     memory(0)/1023, "KByte)" +newline+
-     "Memory currently allocated from system:",memory(1), "Byte (",
-     memory(1)/1023, "KByte)";
-     "Maximal memory allocated from system  :",memory(2), "Byte (",
-     memory(2)/1023, "KByte)";
-  }
-  ReportMemoryUsage();
-  kill p;
-  ReportMemoryUsage(); // less memory used: p killed
-  kill r;
-  ReportMemoryUsage(); // even less memory: r killed
+ring r=0,(x(1..500)),dp;
+system("PLURAL",-1,0);
+poly p=(x(1)+x(500))^50;
+proc ReportMemoryUsage()
+{  "Memory currently used by SINGULAR     :",memory(0),"Byte (",
+   memory(0)/1023, "KByte)" +newline+
+   "Memory currently allocated from system:",memory(1), "Byte (",
+   memory(1)/1023, "KByte)";
+   "Maximal memory allocated from system  :",memory(2), "Byte (",
+   memory(2)/1023, "KByte)";
+}
+ReportMemoryUsage();
+kill p;
+ReportMemoryUsage(); // less memory used: p killed
+kill r; 
 @c example
 @end smallexample
 @end table
@@ -154,7 +154,7 @@ see also @ref{option}).
 @c ref
 
 
-c ---------------------------------------
+@c ---------------------------------------
 @node  minres@value{PSUFFIX}, mres@value{PSUFFIX}, memory@value{PSUFFIX}, Functions@value{PSUFFIX}
 @subsection minres@value{PSUFFIX}
 @cindex minres@value{PSUFFIX}
@@ -175,7 +175,7 @@ given by the list_expression, resp.@: resolution_expression.
 
 @smallexample
 @c example
- ring A=0,(x,y,z),Dp;
+ring A=0,(x,y,z),Dp;
 matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
@@ -185,10 +185,19 @@ ideal i=x,y,z;
 i=std(i);
 resolution F=nres(i,0);
 F;
+int a;
+for (a=1;a<=size(list(F));a++)
+{
+printf("Module: %s",a);
+print(matrix(F[a]));
+}
 resolution MF=minres(F);
 MF;
-print(MF);
-
+for (a=1;a<=size(list(MF));a++)
+{
+printf("Module: %s",a);
+print(matrix(MF[a]));
+}
 @c example
 @end smallexample
 @end table
@@ -277,9 +286,12 @@ ideal i=x,y,z;
 i=std(i);
 resolution M=mres(i,0);
 M;
-print(matrix(M[1]));
-print(matrix(M[2]));
-print(matrix(M[3]));
+for (int a=1;a<=size(list(M));a++)
+{ 
+printf("Module: %s",a);
+print(matrix(M[a]));
+}
+
 @c example
 @end smallexample
 @end table
@@ -305,8 +317,8 @@ print(matrix(M[3]));
 @item @strong{Type:}
 resolution
 @item @strong{Purpose:}
-@c computes a free resolution of an ideal or module M which is minimized from
-@c the second module on (by the standard basis method).
+computes a free resolution of an ideal or module M which is minimized
+from  the second module on (by the Groebner basis method).
 
 @c More precisely, let
 @c @tex
@@ -366,10 +378,13 @@ d[2,3]=-2y;
 system("PLURAL",1,d);
 ideal i=x,y,z;
 i=std(i);
-resolution F=nres(i,0);
-F;
-for (int a=1;a<=size(list(F));a++)
-{print(matrix(F[a]));}
+resolution M=mres(i,0);
+M;
+for (int a=1;a<=size(list(M));a++)
+{ 
+printf("Module: %s",a);
+print(matrix(M[a]));
+}
 @c example
 @end smallexample
 @end table
@@ -468,11 +483,15 @@ non-zero value assigned, the command @code{option()} prints the option.
 @*
 The last set of options controls the output of @sc{Plural}:
 @table @asis
-@item @code{mem}
+
+@item  @code{mem}
 @cindex mem, option
 @ifset  singularmanual 
 shows memory usage in square brackets (see @ref{memory}).
 @end ifset
+@ifclear singularmanual
+shows memory usage in square brackets (see @ref{memory@value{PSUFFIX}}).
+@end ifclear  
 
 @c @smallexample
 @c @c example
@@ -564,7 +583,8 @@ D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
 D[2,3]=-Q*x; 
 system("PLURAL",C,D);
-// it is Quantum deformation of U(so_3).
+// it is quantum deformation U'_q(so_3)
+// specialized at the 3rd root of q=Q^2
 r1;
 kill r1;
 ring r2=0,(Xa,Xb,Xc,Ya,Yb,Yc,Ha,Hb),dp;
@@ -585,7 +605,7 @@ matrix c[4][4];
 c[1,2]=1; c[1,3]=3; c[1,4]=-2;
 c[2,3]=-1; c[2,4]=-3; c[3,4]=1;
 system("PLURAL",c,0);
-// it  is some quasi--commutative algebra
+// it is some quasi--commutative algebra
 r3;
 kill r3;
 ring r4=0,(t,u,v,w),dp;
@@ -593,6 +613,7 @@ system("PLURAL",-1,0);
 // it is anticommutative algebra
 r4;
 kill r4;
+
 @c example
 @end smallexample
 @end table
@@ -600,7 +621,7 @@ kill r4;
 
 
 @c ---------------------------------------
-@node reduce@value{PSUFFIX}, res@value{PSUFFIX}, plural, Functions@value{PSUFFIX}
+@node reduce@value{PSUFFIX}, std@value{PSUFFIX}, plural, Functions@value{PSUFFIX}
 @subsection reduce@value{PSUFFIX}
 @cindex reduce@value{PSUFFIX}
 @cindex NF
@@ -647,15 +668,17 @@ d[1,2]=-h;
 d[1,3]=2e;
 d[2,3]=-2f;
 system("PLURAL",1,d);
+// it is parametric U(sl_2)
 ideal I=e2,f2,h2-1;
 I=std(I);
 ideal J=e,h-a;
 J=std(J);
 poly z=4*e*f+h^2-2*h;
-poly C=NF(z,I);
-C;
-C=NF(z,J);
-C;
+// z is the central element
+// the central character of I:
+NF(z,I);
+// the central character of J:
+NF(z,J);
 @c example
 @end smallexample
 @end table
@@ -674,17 +697,12 @@ C;
 @c see also @code{vector} in @sc{Singular} manual.
 @c @end ifclear   
 
-@c -----------------------------
-@node  res@value{PSUFFIX}, std@value{PSUFFIX}, reduce@value{PSUFFIX}, Functions@value{PSUFFIX}
-@subsection res@value{PSUFFIX} 
-@cindex res@value{PSUFFIX}
-
 
 
 
 
 @c ---------------------------------------
-@node std@value{PSUFFIX}, syz@value{PSUFFIX}, res@value{PSUFFIX}, Functions@value{PSUFFIX}
+@node std@value{PSUFFIX}, syz@value{PSUFFIX}, reduce@value{PSUFFIX}, Functions@value{PSUFFIX}
 @subsection std@value{PSUFFIX}
 @cindex std@value{PSUFFIX}
 @table @code
@@ -721,12 +739,11 @@ d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
 system("PLURAL",1,d); //U(sl_2)
-option(prot);
 ideal I=x3,y3,z3-z;
 I=std(I);
 I;
 kill R;
-ring Rq3=(0,Q),(x,y,z),dp; //U_q(so_3)
+ring Rq3=(0,Q),(x,y,z),dp; //U'_q(so_3)
 minpoly=Q^4+Q^2+1; // at the 3rd root of unity
 matrix C[3][3];
 matrix D[3][3];
@@ -741,7 +758,6 @@ option(prot);
 ideal J=x3,y3,z3-z;
 J=std(J);
 J;
-
 
 @c example
 @end smallexample
@@ -794,11 +810,6 @@ ideal I=Cq,C1,C2,C3;
 I=std(I);
 module a=syz(I);
 print(a);
-minpoly=Q^2+1; // specialize q at the second root of unity
-ideal J=std(I);
-module aq=syz(J);
-print(aq);
-
 @c example
 @end smallexample
 @end table
@@ -858,6 +869,7 @@ ideal I=std(i);
 I;
 ideal J=system("twostd",i);
 J;
+
 @c example
 @end smallexample
 @item @strong{Remark:}
@@ -884,11 +896,22 @@ this is the same as the vector space dimension of the ring, resp.@:
 free module, modulo the ideal, resp.@: module.
 @*If the ideal, resp.@: module, is not zero-dimensional, -1 is returned.
 
-@c @item @strong{Example:}
-@c @smallexample
+@item @strong{Example:}
+@smallexample
 @c example
+ring R=0,(x,y,z),dp;
+matrix d[3][3];
+d[1,2]=-z;
+d[1,3]=2x;
+d[2,3]=-2y;
+system("PLURAL",1,d); //U(sl_2)
+ideal I=x3,y3,z3-z;
+I=std(I);
+I;
+vdim(I);
+
 @c example
-@c end smallexample
+@end smallexample
 @end table
 @c @c ref
 @c See
@@ -918,8 +941,6 @@ See SINGULAR Manual
 @ifset singularmanual
 (@ref{Control structures})
 @end ifset
-.
-
 
 @c ---------------------------------------
 @node System variables@value{PSUFFIX},  , Control structures@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}
@@ -927,6 +948,7 @@ See SINGULAR Manual
 @cindex System variables@value{PSUFFIX}
 
 See SINGULAR Manual
+
 
 @ifset singularmanual
 (@pxref{System variables})

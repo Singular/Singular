@@ -107,7 +107,7 @@
 @include plureference.tex
 
 @c @c ----------------------------------------------------------------------------
-@c @node Tricks and pitfalls, Examples, Functions and system variables, Top
+@c @node Tricks and pitfalls, Examples, Functions and system variables,Top
 @c @chapter Tricks and pitfalls
 @c @cindex Tricks and pitfalls
 @c @include tricks.tex
@@ -134,7 +134,6 @@ variables@value{PSUFFIX}, PLURAL
 
 @ifclear singularmanual
 @node Mathematical background@value{PSUFFIX}, Index, Functions and system variables@value{PSUFFIX}, Top
-variables@value{PSUFFIX}, Top
 @appendix Mathematical background@value{PSUFFIX}
 @end ifclear
 
@@ -142,7 +141,7 @@ variables@value{PSUFFIX}, Top
 @cindex Mathematical background@value{PSUFFIX}
 @include plumath.tex
 
-@c @c ----------------------------------------------------------------------------
+@c --------------------------------------------------------------------
 @c @node SINGULAR libraries, Release Notes, Mathematical background, Top
 @c @appendix SINGULAR libraries
 @c @cindex SINGULAR libraries
