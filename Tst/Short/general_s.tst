@@ -16,7 +16,31 @@ example product;
 example ringweights;
 example sort;
 example sum;
-example watchdog;
-example which;
+
+ring r=0,(x,y,z),dp;
+poly f=x^30+y^30;
+def l = watchdog(1,"factorize(eval("+string(f)+"))");
+
+if (typeof(l) == "string")
+{
+  if (l == "Killed")
+  {
+    1;
+  }
+}
+else
+{
+  poly pp = x16+x14y2-x10y6-x8y8-x6y10+x2y14+y16;
+  if (typeof(l) == list)
+  {
+    if (l[1][5] == p)    
+    {
+	1;
+    }
+  }
+}
+watchdog(100,"factorize(eval("+string(f)+"))");
+
+    
 
 tst_status(1);$
