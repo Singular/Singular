@@ -1862,7 +1862,7 @@ ideal t_rep_gb(ring r,ideal arg_I, ideal arg_debug_Ideal){
 	  break;
 	}
       }
-      PrintS("R_delete");
+//      PrintS("R_delete");
       pDelete(&c->S->m[i]);
     }
   }
@@ -2822,68 +2822,7 @@ simple_reducer::~simple_reducer(){
 void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   static int id=0;
   id++;
-//   if(id==0)
-//     PrintS("warning: integer overflow");
-//   BOOLEAN join=FALSE;
-//   int i;
-//   int sum;
-//   for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
-//     if(!r[i].sum) sum++;
-//     if (sum>=AC_NEW_MIN) {join=TRUE;break;}
-//   }
-//   simple_reducer* pointer;
-//   poly p;
 
-//   if (erg.fromS){
-    
-//     p=c->strat->S[erg.reduce_by];
-//     if ((!join)||(p->next==NULL)){
-      
-//       pointer=new simple_reducer(p,c->strat->lenS[erg.reduce_by]);
-    
-//     }
-//     else{
-//       join_simple_reducer* jp;
-//       pointer= jp=new join_simple_reducer(p,c->strat->lenS[erg.reduce_by],r[erg.to_reduce_l].p);
-
-
-     
-//     }
-   
-//     pointer->fill_back=NULL;
-//   }
-//   else
-//   {
-//     if(r[erg.reduce_by].sum)
-//       kbTest(r[erg.reduce_by].sum->ac->bucket);
-//     r[erg.reduce_by].flatten();
-//     int len;
-//     kBucket_pt bucket=r[erg.reduce_by].bucket;
-//     kBucketClear(bucket,&p,&len);
-//     if(c->is_char0)
-// 	 pContent(p);
-//     pTest(p);
-//     if ((!join)||(p->next==NULL))
-//       pointer=new simple_reducer(p,len);
-//     else
-//     {
-//       join_simple_reducer* jp;
-//       pointer=jp=new join_simple_reducer(p,len,r[erg.to_reduce_l].p);
-
-
-
-//     }
-    
-//     pointer->p=p;
-//     pointer->p_len=len;
-//     pointer->fill_back=bucket;
- 
-//   }
-
-//   pointer->reduction_id=id;
-//   pointer->c=c;
- 
-//   return pointer;
   int rn=erg.reduce_by;
   poly red;
   int red_len;
@@ -2892,13 +2831,41 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   if(erg.fromS){
     red=c->strat->S[rn];
     red_len=c->strat->lenS[rn];
+    
   }
   else
   {
     r[rn].flatten();
     kBucketClear(r[rn].bucket,&red,&red_len);
   }
+  if (erg.to_reduce_u-erg.to_reduce_l>5){
+    woc=TRUE;
+    poly m=pOne();
+    for(int i=1;i<=pVariables;i++)
+      pSetExp(m,i,(pGetExp(r[erg.to_reduce_l].p, i)-pGetExp(red,i)));
+    pSetm(m);
+    poly red_cp=ppMult_mm(red,m);
+    
+    if(!erg.fromS){
+      kBucketInit(r[rn].bucket,red,red_len);
+    }
+    //now reduce the copy
+    //static poly redNF2 (poly h,calc_dat* c , int &len, number&  m,int n)
+    redTailShort(red_cp,c->strat);
+    //number mul;
+    // red_len--;
+//     red_cp->next=redNF2(red_cp->next,c,red_len,mul,c->average_length);
+//     pSetCoeff(red_cp,nMult(red_cp->coef,mul));
+//     nDelete(&mul);
+//     red_len++;
+    red=red_cp;
+    red_len=pLength(red);
+    pDelete(&m);
+    
+  }
   int i;
+
+
   int red_c=0;
   if(red_len>2*c->average_length){
     for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
