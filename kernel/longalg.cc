@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.4 2004-05-14 16:45:33 levandov Exp $ */
+/* $Id: longalg.cc,v 1.5 2004-09-28 09:36:48 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -575,7 +575,7 @@ static napoly napMult(napoly p1, napoly p2)
 /*3
 *  division with rest; f = g*q + r, returns r and destroy f
 */
-static napoly napRemainder(napoly f, const napoly  g)
+napoly napRemainder(napoly f, const napoly  g)
 {
   napoly a, h, qq;
 
