@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.5 1997-04-12 16:04:33 Singular Exp $ */
+/* $Id: attrib.cc,v 1.6 1997-05-22 16:05:04 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -110,11 +110,14 @@ attr sattr::set(char * s, void * data, int t)
      h = (attr)Alloc0(sizeof(sattr));
      h->name = s;
      h->next = this;
+     h->data = data;
+     h->atyp = t;
+     return  h;
   }
   //::Print("set attr >>%s<< of type %d\n",h->name,t);
   h->data = data;
   h->atyp = t;
-  return  h;
+  return  this;
 }
 
 attr sattr::get(char * s)
