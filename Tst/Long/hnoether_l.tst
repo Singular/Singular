@@ -243,8 +243,18 @@ kill r;
 ring r=(49,i),(x,y),ls;
 list hne=develop((x2+iy3)^7+x15);
 show(extdevelop(hne,8));
-// ------------ test of HNdevelop: --------------------
 kill hne;
+// ------------ test of essdevelop: -------------------
+setring F3;
+list hne=essdevelop((x3-xy2+y3)*(x2+y2)*(x4-x3y+xy3+y4));
+displayHNE(hne);
+setring F3;
+kill HNEring;
+list hne=essdevelop(x2+y3+xy4);
+displayHNE(hne);
+setring r;
+kill HNEring;
+// ------------ test of HNdevelop: --------------------
 // list hne=HNdevelop((x2+iy3)^7+x15);  // laeuft derzeit (27.5.99) wegen einem
 // show(extdevelop(hne[1],8));          // Fehler in factorize endlos!
 list hne=HNdevelop((x2+iy3)^6+x15);     // Als Ersatz fuer die Zwischenzeit
@@ -267,6 +277,10 @@ param(develop(x2+y3+y4));
 param(develop((x-2y3)^2+x3));
 param(develop(y+x2-y3));
 param(develop((y-2x3)^2+x7));
+param(develop((y-2x3)^2+x7),0);
+param(develop(x+y2-y3),0);
+param(develop(x2+y3+y4),"Fritz");
+param(develop(y2+x3+x4),x);
 z=timer;
 param(develop((y-2x3)^2+y5));
 tst_ignore(timer-z,"time");
@@ -329,5 +343,4 @@ squarefree(y3);
 squarefree((x2+y)^3*(x-y)^2*(x+y));
 
 example allsquarefree;
-list L=list(poly(x-y),ideal(x,y));
 tst_status(1);$

@@ -57,9 +57,15 @@ extdevelop(hne,2);
 extdevelop(hne,4);
 extdevelop(hne,10);
 kill hne;
+// ------------ test of essdevelop:  ------------------
+setring R;
+essdevelop(x6+y4);
+kill HNEring;
+setring r;
 // ------------ test of param: ------------------------
 param(develop(x2+y3));
 param(develop(y2+x3+x4));
+param(develop(y2+x3+x4),0);
 // ------------ test of displayHNE: -------------------
 example displayHNE;
 // ----------------------------------------------------------------------------
