@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.53 2001-08-27 16:25:32 Singular Exp $";
+version="$Id: gaussman.lib,v 1.54 2001-08-31 18:18:08 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -18,6 +18,7 @@ PROCEDURES:
  spectrum(t);               spectrum of t
  sppnormalize(a,w[,m]);     normalize spectral pairs
  sppairs(t);                spectral pairs of t
+ saito(t);                  matrix A0+A1*s of t on H''
  vfilt(t[,opt]);            V-filtration on H''/H' or spectrum of t
  endfilt(t,V);              endomorphism filtration of V-filtration V
  spprint(Sp);               print spectrum Sp
@@ -25,7 +26,7 @@ PROCEDURES:
  spadd(Sp1,Sp2);            sum of spectra Sp1 and Sp2
  spsub(Sp1,Sp2);            difference of spectra Sp1 and Sp2
  spmul(Sp,k);               product of spectrum Sp and integer k
-                            linear combination of spectra Sp with coeffs k
+ spmul(Sp,k);               linear combination of spectra Sp with coeffs k
  spissemicont(Sp[,opt]);    test spectrum Sp for semicontinuity
  spsemicont(Sp0,Sp[,opt]);  semicontinuity of spectra Sp0 and Sp
  spmilnor(Sp);              milnor number of spectrum Sp
@@ -110,7 +111,7 @@ ASSUME:   basering with characteristic 0 and local degree ordering,
           t with isolated citical point 0
 RETURN:
 @format
-ring G: C@{@{s@}@}*basering,
+ring G: C{{s}}*basering,
   poly gmspoly: image of t
   ideal gmsjacob: image of Jacobian ideal
   ideal gmsstd: image of standard basis of Jacobian ideal
@@ -149,7 +150,7 @@ EXAMPLE:  example gms; shows examples
     {
       ERROR("isolated citical point 0 expected");
     }
-  }
+  }  
   matrix a=l[2];
   ideal m=kbase(g);
 
@@ -216,7 +217,7 @@ ASSUME:   basering constructed by gmsring, K<=Kmax
 RETURN:
 @format
 list l:
-  ideal l[1]: projection of p to H''=C@{@{s@}@}*gmsbasis mod s^@{K+1@}
+  ideal l[1]: projection of p to H''=C{{s}}*gmsbasis mod s^{K+1}
   ideal l[2]: p=l[1]+l[2] mod s^(Kmax+1)
 @end format
 NOTE:     by setting p=l[2] the computation can be continued up to order
@@ -319,10 +320,10 @@ ASSUME:   basering constructed by gmsring, K<=Kmax
 RETURN:
 @format
 list l:
-  matrix l[1]: projection of p to H''=C@{@{s@}@}*gmsbasis=C@{@{s@}@}^mu mod s^(K+1)
+  matrix l[1]: projection of p to H''=C{{s}}*gmsbasis=C{{s}}^mu mod s^(K+1)
   ideal l[2]: p=matrix(gmsbasis)*l[1]+l[2] mod s^(Kmax+1)
 @end format
-NOTE:     by setting p=l[2] the computation can be continued up to order
+NOTE:     by setting p=l[2] the computation can be continued up to order 
           at most Kmax, by default Kmax=infinity
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmscoeffs; shows examples
@@ -472,11 +473,10 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
     while(e1>=e0+1)
     {
       dbprint(printlevel-voice+2,"// transform to separate eigenvalues");
-      A0=jet(A,0);
       U=0;
-      for(i=ncols(e);i>=1;i--)
+      for(i=1;i<=ncols(e);i++)
       {
-        U=U+syz(power(A0-e[i],m[i]));
+        U=U+syz(power(jet(A,0)-e[i],m[i]));
       }
       V=inverse(U);
       A=V*A*U;
@@ -491,23 +491,23 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
           {
             for(j1=1;j1<=m[j0];j1,j=j1+1,j+1)
             {
-              if(e[i0]<e0+1&&e[j0]>=e0+1)
+              if(number(e[i0])<e0+1&&number(e[j0])>=e0+1)
               {
                 A[i,j]=A[i,j]/s;
               }
-              if(e[i0]>=e0+1&&e[j0]<e0+1)
+              if(number(e[i0])>=e0+1&&number(e[j0])<e0+1)
               {
                 A[i,j]=A[i,j]*s;
               }
             }
-          }
+	  }
         }
       }
 
       H0=transpose(H0);
       for(i0,i=1,1;i0<=ncols(e);i0++)
       {
-        if(e[i0]>=e0+1)
+        if(number(e[i0])>=e0+1)
         {
           for(i1=1;i1<=m[i0];i1,i=i1+1,i+1)
           {
@@ -515,6 +515,10 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
             H0[i]=H0[i]*s;
           }
           e[i0]=e[i0]-1;
+        }
+        else
+        {
+          i=i+m[i0];
         }
       }
       H0=transpose(H0);
@@ -561,7 +565,7 @@ EXAMPLE:  example monodromy; shows examples
   matrix A=imap(G,A);
   ideal e=imap(G,e);
 
-  return(jordan(A,e,m));
+  return(jordan(A));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -652,7 +656,7 @@ EXAMPLE:  example sppnormalize; shows examples
       for(j=i-1;j>=1;j--)
       {
         if(m[j]!=0)
-        {
+	{
           if(number(a[i])>number(a[j])||
             (number(a[i])==number(a[j])&&w[i]<w[j]))
           {
@@ -688,8 +692,9 @@ proc sppairs(poly t)
 "USAGE:    sppairs(t); poly t
 ASSUME:   basering with characteristic 0 and local degree ordering,
           t with isolated citical point 0
-RETURN: list Spp:
+RETURN:
 @format
+list Spp:
   ideal Spp[1]: spectral numbers in increasing order
   intvec Spp[2]: weight filtration indices in decreasing order
   intvec Spp[3]:
@@ -718,28 +723,26 @@ EXAMPLE:  example sppairs; shows examples
   dbprint(printlevel-voice+2,"// compute weight filtration basis");
   list l=jordanbasis(A,e,m);
   def U,v=l[1..2];
-  module V=inverse(U);
-  A0=V*A*U;
-  vector u;
-  int i,j,k;
-  for(i=ncols(A0);i>=2;i--)
+  vector u0;
+  int v0;
+  int i,j,k,k0;
+  for(k,k0=1,1;k0<=ncols(e);k,k0=k+m[k0],k0+1)
   {
-    for(j=i-1;j>=1;j--)
+    for(i=k+m[k0]-1;i>=k+1;i--)
     {
-      if(A0[i,i]==A0[j,j]&&v[i]>v[j])
+      for(j=i-1;j>=k;j--)
       {
-        k=v[i];
-        v[i]=v[j];
-        v[i]=k;
-        u=U[i];
-        U[i]=U[j];
-        U[j]=u;
+        if(v[i]>v[j])
+        {
+          v0=v[i];v[i]=v[j];v[j]=v0;
+          u0=U[i];U[i]=U[j];U[j]=u0;
+        }
       }
     }
   }
 
   dbprint(printlevel-voice+2,"// transform to weight filtration basis");
-  V=inverse(U);
+  matrix V=inverse(U);
   A=V*A*U;
   dbprint(printlevel-voice+2,"// compute normal form of H''");
   H0=std(V*H0);
@@ -763,6 +766,144 @@ example
   ring R=0,(x,y),ds;
   poly t=x5+x2y2+y5;
   sppprint(sppairs(t));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc grmat(matrix A,int k)
+{
+  int i,j;
+  for(i=1;i<=ncols(A);i++)
+  {
+    for(j=1;j<=nrows(A);j++)
+    {
+      A[i,j]=jet(A[i,j]/var(1)^k,0);
+    }
+  }
+  return(A);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc saito(poly t,list #)
+"USAGE:    saito(t); poly t
+ASSUME:   basering with characteristic 0 and local degree ordering,
+          t with isolated citical point 0
+RETURN:   list A: matrix A[1]+A[2]*s of t on H''
+SEE ALSO: spectrum_lib
+KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+          monodromy; spectrum; spectral pairs
+EXAMPLE:  example saito; shows examples
+"
+{
+  def R=basering;
+  int n=nvars(R)-1;
+  def G=gmsring(t,"s");
+  setring(G);
+
+  int mu=ncols(gmsbasis);
+  matrix A;
+  ideal e;
+  intvec m;
+
+  def A0,r,H,H0=saturate(2*n+mu+1);
+  e,m,A0,r=eigenvals(A0,r,H,n+1);
+  int d0,d1=maxdeg1(H),int(max(e)-min(e));
+  e,m,A,A0,r,H0=transform(e,m,A,A0,r,H,H0,d0+d1+1,d0+d1+1);
+  d0=maxdeg1(H0);
+
+  dbprint(printlevel-voice+2,"// transform to Jordan basis");
+  module U=jordanbasis(A,e,m)[1];
+  module V=inverse(U);
+  A=V*A*U;
+  H=V*H0;
+
+  dbprint(printlevel-voice+2,"// compute splitting of V filtration");
+  int i,j,k;
+  U=freemodule(mu);
+  matrix U0[mu][mu];
+  matrix u0[mu^2][1];
+  A0=commutator(jet(A,0));
+  for(k=1;k<=d0+1;k++)
+  {
+    V=0;
+    for(j=0;j<k;j++)
+    {
+      U0=matrix(U0)-grmat(A,k-j)*grmat(U,j);
+    }
+    u0=U0[1..mu,1..mu];
+    u0=inverse(A0+k)*u0;
+    U0=u0[1..mu^2,1];
+    U=matrix(U)+s^k*U0;
+  }
+
+  dbprint(printlevel-voice+2,"// transform to splitting basis");
+  A=jet(A,0);
+  H=std(jet(division(U,H)[1],d0));
+
+  dbprint(printlevel-voice+2,"// compute N");
+  matrix N=A;
+  for(i=1;i<=ncols(N);i++)
+  {
+    N[i,i]=0;
+  }
+
+  dbprint(printlevel-voice+2,"// compute N splitting of Hodge filtration");
+  module F;
+  matrix K[mu][1];
+  U=0;
+  i=1;
+  for(k=1;k<=ncols(e);k++)
+  {
+    j=0;
+    K=matrix(0,mu,0);
+    while(j<m[k])
+    {
+      K=K+gen(i);
+      i++;
+      j++;
+    }
+    j=0;
+    F=grmat(H,0);
+    V=intersect(F,K);
+    while(size(V)==0)
+    {
+      j++;
+      V=V+grmat(H,j);
+      V=intersect(F,K)
+    }
+    while(size(V)>0)
+    {
+      U=U+V;
+      V=N*V;
+    }
+  }
+
+  dbprint(printlevel-voice+2,"// transform to N splitting basis");
+  V=inverse(U);
+  A=V*A*U;
+  H=V*H*U;
+
+  dbprint(printlevel-voice+2,"// compute matrix A0+sA1 of t");
+//  degBound=d0;
+//  option("redSB");
+//  H=std(H);
+H=simplify(lead(std(H)),1);
+//  degBound=0;
+  list l=division(H,s*A*H+s^2*diff(matrix(H),s));
+  A=jet(l[1],l[2],d0+1);
+  A0=grmat(A,0);
+  A=grmat(A,1);
+
+  setring(R);
+
+  return(list(imap(G,A0),imap(G,A)));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly t=x5+x2y2+y5;
+  list A=saito(t);
+  print(A[1]);
+  print(A[2]);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -901,7 +1042,7 @@ EXAMPLE:  example vfilt; shows examples
   }
 
   dbprint(printlevel-voice+2,"// compute eigenvalues eA of A");
-  ideal eA=eigenvals(jet(A,0))[1];
+  ideal eA=eigenvalues(jet(A,0))[1];
   dbprint(printlevel-voice+2,"// eA="+string(eA));
 
   dbprint(printlevel-voice+2,"// compute eigenvalues eM of M");
@@ -1459,7 +1600,7 @@ proc spsemicont(list Sp0,list Sp,list #)
 RETURN:  list of intvecs l:
          spissemicont(sub(Sp0,spmul(Sp,k)),opt)==1 iff k<=l[i] for some i
 NOTE:    if the spectra Sp occur with multiplicities k in a deformation
-         of the [quasihomogeneous] spectrum Sp0 then
+         of the [quasihomogeneous] spectrum Sp0 then 
          spissemicont(sub(Sp0,spmul(Sp,k))[,1])==1
 EXAMPLE: example spsemicont; shows examples
 "
@@ -1474,26 +1615,26 @@ EXAMPLE: example spsemicont; shows examples
       for(i=1;i<=size(l0);i++)
       {
         if(size(l)>0)
-        {
+	{
           j=1;
           while(j<size(l)&&l[j]!=l0[i])
-          {
+	  {
             j++;
           }
           if(l[j]==l0[i])
-          {
+	  {
             l[j][size(Sp)]=k;
           }
           else
-          {
+	  {
             l0[i][size(Sp)]=k;
             l=l+list(l0[i]);
           }
-        }
+	}
         else
-        {
+	{
           l=l0;
-        }
+	}
       }
     }
     Sp0=spsub(Sp0,Sp[size(Sp)]);
