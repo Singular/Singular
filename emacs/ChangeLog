@@ -1,3 +1,24 @@
+1999-08-30  T. Wichmann  <wichmann@itwm.uni-kl.de>
+
+	* singular.el (singular, singular-restart, singular-other): Doc
+	  strings rewritten
+
+1999-08-25  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
+
+	* singular.el (singular-other) now has 4 arguments
+	  
+	* Added "-t" to singular-switches-magic
+
+1999-08-23  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
+
+	* singular.el (singular-interactive-mode-menu-init): Any menu
+          installed by comint-mode is removed
+	  
+	* (singular-exit-sentinel): remove libraries menu only if buffer is
+	  existent
+	  
+	* Added a "*" to some variables` doc string
+
 1999-08-27  Jens Schmidt  <schmidt@de.oracle.com>
 
 	* .bashrc (STARTUP): load `cmpl-hlp.el' now
