@@ -3,14 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.4 2005-02-17 09:42:22 Singular Exp $ */
+/* $Id: structs.h,v 1.5 2005-02-25 17:07:26 Singular Exp $ */
 /*
 * ABSTRACT
 */
 
 #include <string.h> /* for memset */
 
-#define LONGALGNEW
 /* standard types */
 typedef unsigned char  uchar ;
 typedef unsigned short CARDINAL;
@@ -106,9 +105,6 @@ struct snumber;
 struct sip_command;
 struct sip_package;
 struct s_si_link_extension;
-#ifndef LONGALGNEW
-struct reca;
-#endif /* not LONGALGNEW */
 
 typedef struct  n_Procs_s  n_Procs_s;
 
@@ -144,11 +140,7 @@ typedef ideal *            resolvente;
 typedef union uutypes      utypes;
 typedef ip_command *       command;
 typedef struct s_si_link_extension *si_link_extension;
-#ifndef LONGALGNEW
-typedef struct reca *      napoly;
-#else /* LONGALGNEW */
 typedef polyrec *   napoly;
-#endif /* LONGALGNEW */
 
 #ifdef __cplusplus
 typedef idrec *            idhdl;

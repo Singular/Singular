@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.8 2005-02-17 09:42:22 Singular Exp $ */
+/* $Id: polys1.cc,v 1.9 2005-02-25 17:07:26 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -485,6 +485,7 @@ void pEnlargeSet(polyset *p, int l, int increment)
 }
 
 number pInitContent(poly ph);
+number pInitContent_a(poly ph);
 
 void pContent(poly ph)
 {
@@ -503,6 +504,11 @@ void pContent(poly ph)
     if (rField_is_Q())
     {
       h=pInitContent(ph);
+      p=ph;
+    }
+    else if (rField_is_Extension())
+    {
+      h=pInitContent_a(ph);
       p=ph;
     }
     else
@@ -608,6 +614,7 @@ void pSimpleContent(poly ph,int smax)
 }
 
 number pInitContent(poly ph)
+// only for coefficients in Q
 #if 0
 {
   assume(!TEST_OPT_CONTENTSB);
@@ -690,6 +697,35 @@ number pInitContent(poly ph)
   return nlGcd(d,d2,currRing);
 }
 #endif
+
+number pInitContent_a(poly ph)
+// only for coefficients in K(a) anf K(a,...)
+{
+  number d=pGetCoeff(ph);
+  int s=naParDeg(d);
+  if (s /* naParDeg(d)*/ ==0) return naCopy(d);
+  int s2=-1;
+  number d2;
+  int ss;
+  loop
+  {
+    pIter(ph);
+    if(ph==NULL)
+    {
+      if (s2==-1) return naCopy(d);
+      break;
+    }
+    if ((ss=naParDeg(pGetCoeff(ph)))<s)
+    {
+      s2=s;
+      d2=d;
+      s=ss;
+      d=pGetCoeff(ph);
+      if (s2==0) break;
+    }
+  }
+  return naGcd(d,d2,currRing);
+}
 
 
 //void pContent(poly ph)
