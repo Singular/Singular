@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.37 1998-05-11 13:09:43 wichmann Exp $
+@comment $Id: reference.doc,v 1.38 1998-05-12 13:30:46 anne Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5121,6 +5121,7 @@ See @ref{read}, @ref{link}, @ref{Data types};
 * quit::
 * return::
 * while::
+* ~::
 @end menu
 
 A sequence of commands surrounded by curly brackets (@code{@{} and
@@ -5399,7 +5400,7 @@ returns the result(s) of a procedure.
 See @ref{Data types}; @ref{proc}.
 @c ref
 @c ---------------------------------------
-@node while,  , return, Control structures
+@node while, ~ , return, Control structures
 @subsection while
 @cindex while
 @table @code
@@ -5429,6 +5430,25 @@ construct.
 @end table
 @c ref
 See @ref{Control structures}; @ref{boolean expressions}; @ref{break}.
+@c ref
+
+@c ---------------------------------------
+@node ~, , while, Control structures
+@subsection ~
+@cindex ~
+@table @code
+@item @strong{Syntax:}
+@code{~;}
+@item @strong{Purpose:}
+sets a breakpoint. Whenever @sc{Singular} reaches the command @code{~;}
+in a sequence of commands it prompts for input. The user may now input 
+lines of @sc{Singular} commands. The line length can not exceed 80 
+characters.
+@sc{Singular} proceeds with the execution of the command following @code{~;}
+as soon as it receives an empty line.
+@end table
+@c ref
+See @ref{Break points}.
 @c ref
 
 @c ---------------------------------------
