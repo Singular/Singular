@@ -56,10 +56,10 @@
  ***************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Env.c,v 1.7 2005-01-21 11:58:19 bricken Exp $";
+static char vcid[] = "@(#) $Id: MP_Env.c,v 1.8 2005-01-25 10:48:21 Singular Exp $";
 #endif /*lint */
 
-#include "../values.h"  /* to figure out if we use IEEE or not */
+#include <values.h>  /* to figure out if we use IEEE or not */
 #include "MP.h"
 
 #include <string.h>
