@@ -47,7 +47,8 @@ matrix mat = matrix(fetch(r,ires(2)));
 matrix imat = transpose(mat);
 matrix jac = fetch(r, jaco);
 
-res(module(imat),3,imatres);
+list ll = nres(module(imat),3);
+def imatres(1..3) = ll[1..3];
 
 matrix T = lift(imatres(2), module(jac));
 T;
