@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.257 2001-02-14 12:31:07 Singular Exp $ */
+/* $Id: iparith.cc,v 1.258 2001-02-27 18:11:57 mschulze Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4433,7 +4433,7 @@ static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
   }
-  res->data = (char *)rednf((ideal)v->CopyD(),(poly)u->CopyD(),
+  res->data = (char *)redNF((ideal)v->CopyD(),(poly)u->CopyD(),
     (poly)w->CopyD());
   return FALSE;
 }
@@ -4445,7 +4445,7 @@ static BOOLEAN jjREDUCE3_CID(leftv res, leftv u, leftv v, leftv w)
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
   }
-  res->data = (char *)rednf((ideal)v->CopyD(),(ideal)u->CopyD(),
+  res->data = (char *)redNF((ideal)v->CopyD(),(ideal)u->CopyD(),
     (matrix)w->CopyD());
   return FALSE;
 }
@@ -4973,6 +4973,49 @@ static BOOLEAN jjREDUCE4(leftv res, leftv v)
   v->next->next=u3;
   return r;
 }
+static BOOLEAN jjREDUCE5(leftv res, leftv v)
+{
+  leftv u1=v;
+  leftv u2=v->next;
+  leftv u3=u2->next;
+  leftv u4=u3->next;
+  leftv u5=u4->next;
+  if((u1->Typ()==IDEAL_CMD)&&(u2->Typ()==IDEAL_CMD)&&(u3->Typ()==MATRIX_CMD)&&
+     (u4->Typ()==INT_CMD)&&(u5->Typ()==INTVEC_CMD))
+  {
+    if(!mpIsDiagUnit((matrix)u3->Data()))
+    {
+      Werror("3rd argument must be a diagonal matrix of units");
+      return FALSE;
+    }
+    res->rtyp=IDEAL_CMD;
+    res->data=(char*)redNF(idCopy((ideal)u2->Data()),idCopy((ideal)u1->Data()),
+                           mpCopy((matrix)u3->Data()),
+                           (int)u4->Data(),(intvec*)u5->Data());
+    return FALSE;
+  }
+  else
+  if((u1->Typ()==POLY_CMD)&&(u2->Typ()==IDEAL_CMD)&&(u3->Typ()==POLY_CMD)&&
+     (u4->Typ()==INT_CMD)&&(u5->Typ()==INTVEC_CMD))
+  {
+    if(!pIsUnit((poly)u3->Data()))
+    {
+      Werror("3rd argument must be a unit");
+      return FALSE;
+    }
+    res->rtyp=POLY_CMD;
+    res->data=(char*)redNF(idCopy((ideal)u2->Data()),pCopy((poly)u1->Data()),
+                           pCopy((poly)u3->Data()),
+                           (int)u4->Data(),(intvec*)u5->Data());
+    return FALSE;
+  }
+  else
+  {
+    Werror("%s(`ideal`,`ideal`,`matrix`,`int`,`intvec`) exppected",
+           Tok2Cmdname(iiOp));
+    return TRUE;
+  }
+}
 static BOOLEAN jjRESERVED0(leftv res, leftv v)
 {
   int i=1;
@@ -5212,6 +5255,7 @@ struct sValCmdM dArithM[]=
 ,{jjCALL2ARG,  REDUCE_CMD,      IDEAL_CMD/*or set by p*/,          2  }
 ,{jjCALL3ARG,  REDUCE_CMD,      IDEAL_CMD/*or set by p*/,          3  }
 ,{jjREDUCE4,   REDUCE_CMD,      IDEAL_CMD/*or set by p*/,          4  }
+,{jjREDUCE5,   REDUCE_CMD,      IDEAL_CMD/*or set by p*/,          5  }
 ,{jjCALL1ARG,  RESERVEDNAME_CMD, INT_CMD,            1 }
 ,{jjRESERVED0, RESERVEDNAME_CMD, NONE,               0 }
 ,{jjSTRING_PL, STRING_CMD,      STRING_CMD,         -1 }
