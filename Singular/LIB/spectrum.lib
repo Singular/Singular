@@ -1,18 +1,14 @@
-// $Id: spectrum.lib,v 1.8 2000-12-19 15:05:37 anne Exp $
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: spectrum.lib,v 1.8 2000-12-19 15:05:37 anne Exp $";
+version="$Id: spectrum.lib,v 1.9 2000-12-22 14:51:06 greuel Exp $";
 category="Singularities";
 info="
-LIBRARY:  spectrum.lib   PROCEDURES FOR COMPUTING SINGULARITY SPECTRA
+LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities
+AUTHOR:   S. Endrass
 
 PROCEDURES:
- spectrum(poly[,1]);    spectrum of a isolated singularity (with/without tests)
- semic(s1,s2[,1]);      tests if s2 is semicontinous for s1 using
-                        half open intervalls
-                        (and open intervalls for a 3rd paramater 1)
- semicqh(s1,s2[,1]);    tests if s2 is semicontinous for s1 using
-                        open and half open intervalls
+ spectrum(poly[,1]);    spectrum of a nondegenerate isolated singularity 
+ semic(s1,s2[,1]);      tests if s2 is semicontinous for s1 (open intervall)
+ semicqh(s1,s2[,1]);    semicontinuity test with open and half open intervalls
  spadd(s1,s2);          sum of two spectra s1 and s2
  spmul(s,k);            multiplies the spectrum s with the int k
           (parameters in square brackets [] are optional)
@@ -22,6 +18,7 @@ PROCEDURES:
 
 proc spectrum (poly f, list #)
 "USAGE:  spectrum(f[,1]);  f polynomial
+ASSUME:  f has nondegenerate principal part
          computes the spectrum of f
 	 if a second argument 1 is given, 
 	 no test for a degenerate principal part will be done

@@ -1,18 +1,14 @@
-// $Id: stratify.lib,v 1.4 2000-12-20 16:49:37 Singular Exp $
 // (anne, last modified 23.5.00)
 /////////////////////////////////////////////////////////////////////////////
-// LIBRARY HEADER
-/////////////////////////////////////////////////////////////////////////////
-
-version="$Id: stratify.lib,v 1.4 2000-12-20 16:49:37 Singular Exp $";
+version="$Id: stratify.lib,v 1.5 2000-12-22 14:53:34 greuel Exp $";
 category="Invariant theory";
 info="
-LIBRARY: stratify.lib     ALGORITHMIC STRATIFICATION BY THE
-                          Greuel-Pfister ALGORITHM
-AUTHOR:  Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de
+LIBRARY: stratify.lib   Algorithmic Stratification for Unipotent Group-Actions
+AUTHOR:  Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de 
+last modified: 12.12.2000
 
-PROCEDURES:
-  prepMat(M,wr,ws,step);  list of submatrices corresp. to the given filtration
+Procedures:
+  prepMat(M,wr,ws,step);  list of submatrices corresp. to given filtration
   stratify(M,wr,ws,step); algorithmic stratifcation (main procedure)
 ";
 ////////////////////////////////////////////////////////////////////////////

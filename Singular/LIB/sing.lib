@@ -1,11 +1,10 @@
-// $Id: sing.lib,v 1.21 2000-12-19 15:05:34 anne Exp $
+// $Id: sing.lib,v 1.22 2000-12-22 14:45:41 greuel Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: sing.lib,v 1.21 2000-12-19 15:05:34 anne Exp $";
+version="$Id: sing.lib,v 1.22 2000-12-22 14:45:41 greuel Exp $";
 category="Singularities";
 info="
-LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
+LIBRARY:  sing.lib      Invariants of Singularities
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de
           Bernd Martin, email: martin@math.tu-cottbus.de
 

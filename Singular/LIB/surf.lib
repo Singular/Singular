@@ -1,23 +1,19 @@
-// $Id: surf.lib,v 1.14 2000-12-20 11:15:50 obachman Exp $
-//
-// author : Hans Schoenemann
-//
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.14 2000-12-20 11:15:50 obachman Exp $";
+version="$Id: surf.lib,v 1.15 2000-12-22 14:54:43 greuel Exp $";
 category="Visualization";
 info="
-LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF
-
-AUTHOR: surf is written by Stefan Endrass
+LIBRARY: surf.lib    Procedures for Graphics with Surf
+AUTHOR: Hans Schoenemann, 
+        the program surf is written by Stefan Endrass
 
 NOTE:
-@texinfo
-To use this library requires the program @code{surf} to be installed.
-@code{surf} is only available for Linux PCs and Sun workstations.
-You can download @code{surf} either from
- @uref{http://sourceforge.net/projects/surf}
- or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
-@end texinfo
+ @texinfo
+ To use this library requires the program @code{surf} to be installed.
+ @code{surf} is only available for Linux PCs and Sun workstations.
+ You can download @code{surf} either from
+  @uref{http://sourceforge.net/projects/surf}
+  or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
+ @end texinfo
 
 PROCEDURES:
  plot(I);  plots curves and surfaces
@@ -45,8 +41,6 @@ proc  plot(ideal I)
 "USAGE:   plot(I);  I ideal
 RETURN: nothing
 NOTE: requires the external program 'surf' to be installed
-      @*If the (string) variable extra_surf_opts is defined, the the value of
-      this 
 EXAMPLE: example plot; shows an example
 "
 {

@@ -1,10 +1,8 @@
-// $Id: standard.lib,v 1.51 2000-12-19 18:31:47 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
-
-version="$Id: standard.lib,v 1.51 2000-12-19 18:31:47 obachman Exp $";
+version="$Id: standard.lib,v 1.52 2000-12-22 14:52:32 greuel Exp $";
 category="Miscellaneous";
 info="
-LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
+LIBRARY: standard.lib   Procedures which are always loaded at Start-up
 
 PROCEDURES:
  stdfglm(ideal[,ord])   standard basis of ideal via fglm [and ordering ord]
@@ -12,9 +10,9 @@ PROCEDURES:
  groebner(ideal/module) standard basis using a heuristically chosen method
  quot(any,any[,n])      quotient using heuristically chosen method
  res(ideal/module,[i])  free resolution of ideal or module
- sprintf(fmt,...)     returns fomatted string
- fprintf(link,fmt,..) writes formatted string to link
- printf(fmt,...)      displays formatted string
+ sprintf(fmt,...)       returns fomatted string
+ fprintf(link,fmt,..)   writes formatted string to link
+ printf(fmt,...)        displays formatted string
 ";
 
 //////////////////////////////////////////////////////////////////////////////
