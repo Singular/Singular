@@ -1581,7 +1581,7 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjMINOR(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)idMinors1((matrix)u->Data(),(int)v->Data());
+  res->data = (char *)idMinors((matrix)u->Data(),(int)v->Data());
   return FALSE;
 }
 static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
