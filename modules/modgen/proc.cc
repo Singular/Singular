@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.6 2000-02-14 21:44:40 krueger Exp $
+ * $Id: proc.cc,v 1.7 2000-02-18 13:33:48 krueger Exp $
  */
 
 #include <stdio.h>
@@ -50,18 +50,25 @@ void setup_proc(
           }
         }
   
-        printf("iiAddCproc %s is C\n", proc->procname);
         /* write call to add procname to list */
         fprintf(module->modfp, "  iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
                 module->name, proc->procname, 
                 proc->is_static ? "TRUE" : "FALSE",
                 proc->procname);
+        
         if(proc->help_string!=NULL) {
-          fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(helphdl) ,");
-          fprintf(module->modfp, " IDID(helphdl));\n");
-          fprintf(module->modfp, "  enter_id(\"%s\",", proc->procname);
-          fprintf(module->modfp, " \"%s\", STRING_CMD);\n", proc->help_string);
-          fprintf(module->modfp, "  namespaceroot->push();\n");
+          printf("WRITE HELP\n");
+//          fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(helphdl) ,");
+//          fprintf(module->modfp, " IDID(helphdl));\n");
+          fprintf(module->fmtfp2, "  enter_id(\"%s\",", proc->procname);
+          fprintf(module->fmtfp2, " \"%s\", STRING_CMD);\n", proc->help_string);
+//          fprintf(module->modfp, "  namespaceroot->push();\n");
+        }
+        if(proc->example_string!=NULL) {
+          printf("WRITE EXAMPLE\n");
+          fprintf(module->fmtfp3, "  enter_id(\"%s\",", proc->procname);
+          fprintf(module->fmtfp3, " \"%s\", STRING_CMD);\n",
+                  proc->example_string);
         }
         fprintf(module->modfp, "\n");
 
@@ -72,7 +79,7 @@ void setup_proc(
         
       case LANG_SINGULAR:
         fprintf(module->modfp,
-                "  h = add_singular_proc(%s, %d, %ld, %ld, %s);\n",
+                "  h = add_singular_proc(\"%s\", %d, %ld, %ld, %s);\n",
                 proc->procname, proc->lineno,
                 proc->sing_start, proc->sing_end,
                 proc->is_static ? "TRUE" : "FALSE");
@@ -82,23 +89,6 @@ void setup_proc(
   //  printf(" done\n");
 }
 
-/*========================================================================*/
-void write_example(
-  moddefv module,
-  procdefv proc
-  )
-{
-  /* if proc is NULL, just return */
-  if( proc == NULL ) return;
-
-  if(proc->example_string!=NULL) {
-    fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(examplehdl) ,");
-    fprintf(module->modfp, " IDID(examplehdl));\n");
-    fprintf(module->modfp, "  enter_id(\"%s\",", proc->procname);
-    fprintf(module->modfp, " \"%s\", STRING_CMD);\n", proc->example_string);
-    fprintf(module->modfp, "  namespaceroot->push();\n");
-  }
-}
 /*========================================================================*/
 /*
  * write declaration of function to file pointed by 'fp', usualy the
@@ -264,10 +254,18 @@ void write_finish_functions(
 {
   fprintf(module->modfp, "  return 0;\n}\n\n");
   fflush(module->modfp);
-  
+
+  fprintf(module->modfp, "#if 0 /* Help section */\n");
+  mod_copy_tmp(module->modfp, module->fmtfp2);
+  fprintf(module->modfp, "#endif /* End of Help section */\n\n");
+  fprintf(module->modfp, "#if 0 /* Example section */\n");
+  mod_copy_tmp(module->modfp, module->fmtfp3);
+  fprintf(module->modfp, "#endif /* End of Example section */\n\n");
   mod_copy_tmp(module->modfp, module->fmtfp);
   printf("  done.\n");fflush(stdout);
   fclose(module->fmtfp);
+  fclose(module->fmtfp2);
+  fclose(module->fmtfp3);
   return;
 }
 
@@ -401,7 +399,48 @@ void write_function_errorhandling(
         fprintf(module->modfp, "  }\n");
         break;
   }
+}
+
+/*========================================================================*/
+void write_help(
+  moddefv module,
+  procdefv pi
+  )
+{
+  if(pi->help_string!=NULL) {
+    fprintf(module->fmtfp2, "#line %d \"%s\"\n", pi->lineno_other,
+            module->filename);
+//     fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(helphdl) ,");
+//     fprintf(module->modfp, " IDID(helphdl));\n");
+    fprintf(module->fmtfp2, "  enter_id(\"%s\",", pi->procname);
+    fprintf(module->fmtfp2, " \"%s\", STRING_CMD);\n\n", pi->help_string);
+//     fprintf(module->modfp, "  namespaceroot->push();\n");
+  }
+}
+
+/*========================================================================*/
+void write_example(
+  moddefv module,
+  procdefv pi
+  )
+{
+  /* if proc is NULL, just return */
+  if( pi == NULL ) return;
+
+  if(pi->example_string!=NULL) {
+    fprintf(module->fmtfp3, "#line %d \"%s\"\n", pi->lineno_other,
+            module->filename);
+    fprintf(module->fmtfp3, "  enter_id(\"%s\",\n", pi->procname);
+    fprintf(module->fmtfp3, " \"%s\", STRING_CMD);\n\n", pi->example_string);
+  }
   
+#if 0
+    fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(examplehdl) ,");
+    fprintf(module->modfp, " IDID(examplehdl));\n");
+    fprintf(module->modfp, "  enter_id(\"%s\",", proc->procname);
+    fprintf(module->modfp, " \"%s\", STRING_CMD);\n", proc->example_string);
+    fprintf(module->modfp, "  namespaceroot->push();\n");
+#endif
 }
 
 /*========================================================================*/

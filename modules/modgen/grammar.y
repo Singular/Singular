@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.6 2000-02-14 21:41:59 krueger Exp $
+ * $Id: grammar.y,v 1.7 2000-02-18 13:33:47 krueger Exp $
  */
 
 %{
@@ -87,8 +87,11 @@ goal: part1 sect2 sect2end code
 
 part1: initmod sect1 sect1end
         {
-         if(write_intro(&module_def))
-           myyyerror("Error while creating files\n");
+          mod_create_makefile(&module_def);
+          if(write_intro(&module_def)) {
+            myyyerror("Error while creating files\n");
+            return 1;
+          }
         };
 
 initmod:
@@ -150,6 +153,7 @@ expr:   NAME '=' MSTRINGTOK
                             idtyp t, void *arg1 = NULL, void *arg2 = NULL);
           switch(sectnum) {
               case 1: /* pass 1: */
+                Add2files(&module_def, $3);
                 break;
               case 2: /* pass 2: procedure declaration */
                 if( (vt=checkvar($1, VAR_FILE, &write_cmd)) ) {
@@ -230,6 +234,8 @@ expr:   NAME '=' MSTRINGTOK
 files:  FILENAME ',' FILENAME
         {
           printf(">>>>>>>>files '%s' , '%s'\n", $1, $3);
+          Add2files(&module_def, $1);
+          Add2files(&module_def, $3);
           free($1);
           free($3);
         }
@@ -292,10 +298,12 @@ procdecl2: procdecl1 '(' sgtypelist ')'
         | procdecl1
          {
            write_singular_parameter(&module_def, yylineno, "list", "#");
+           procedure_decl.lineno_other = yylineno;
          }
         | procdecl1 '(' ')'
          {
            write_singular_parameter(&module_def, yylineno, "list", "#");
+           procedure_decl.lineno_other = yylineno;
          }
         ;
 
@@ -330,7 +338,8 @@ funcdecl1: NAME
 procdeclhelp: MSTRINGTOK
         {
           procedure_decl.help_string = $1;
-          printf("\t\thelp=%p, %d\n", procedure_decl.help_string, strlen($1));
+          printf("\t\thelp at %d\n", yylineno);
+          write_help(&module_def, &procedure_decl);
         }
         ;
 
@@ -352,43 +361,44 @@ proccodeline: CODEPART
         {
         };
 
-procdeclexample: EXAMPLETOK '{' examplecodeline MCODETOK
+procdeclexample: examplestart '{' examplecodeline MCODETOK
         {
-          printf("Example\n");
-          if(procedure_decl.procname != NULL) {
-            //write_example(&module_def, &procedure_decl);
-          } else {
-            myyyerror("example without proc-declaration at line %d\n",
-                     yylineno);
-          }
+          write_example(&module_def, &procedure_decl);
         }
         ;
 
+examplestart: EXAMPLETOK
+        {
+          if(procedure_decl.procname == NULL) {
+            myyyerror("example without proc-declaration at line %d\n",
+                     yylineno);
+          }
+          printf("Example at %d\n", yylineno);
+          procedure_decl.lineno_other = yylineno;
+        };
+  
 examplecodeline: CODEPART
         {
-          printf(">>1\n");
-          procedure_decl.example_len = strlen($1);
-          procedure_decl.example_string = (char *)malloc(strlen($1)+1);
-          memset(procedure_decl.example_string, 0, strlen($1)+1);
-          memcpy(procedure_decl.example_string, $1, strlen($1));
+          int len = strlen($1);
+          procedure_decl.example_len = len;
+          procedure_decl.example_string = (char *)malloc(len+1);
+          memset(procedure_decl.example_string, 0, len+1);
+          memcpy(procedure_decl.example_string, $1, len);
         }
         | examplecodeline CODEPART
         {
-          long newlen = procedure_decl.example_len + strlen($2);
-          //procedure_decl.example_len += strlen($2);
-          printf(">>2 (%d+%d) %p\n", procedure_decl.example_len, strlen($2),
-                 procedure_decl.example_string);
-          procedure_decl.example_string =
-            (char *)realloc((void *)procedure_decl.example_string, newlen);
-          printf(">>2 (%d)\n", procedure_decl.example_len);
-          memset(procedure_decl.example_string+procedure_decl.example_len,
-                 0, strlen($2));
-          memcpy(procedure_decl.example_string+procedure_decl.example_len,
-                 $2, strlen($2));
+          long len = strlen($2);
+          long newlen = procedure_decl.example_len + len;
           
+          procedure_decl.example_string =
+            (char *)realloc((void *)procedure_decl.example_string, newlen+1);
+          memset(procedure_decl.example_string+procedure_decl.example_len,
+                 0, len+1);
+          memcpy(procedure_decl.example_string+procedure_decl.example_len,
+                 $2, len);
+          procedure_decl.example_len = newlen;
           //strncat(procedure_decl.example_string, $2, strlen($2));
           //procedure_decl.example_string[procedure_decl.example_len] = '\0';
-          printf(">>2b\n");
         };
 
 proccmd: '%' NAME ';'

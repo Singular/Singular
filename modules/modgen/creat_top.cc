@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.5 2000-02-14 21:44:39 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.6 2000-02-18 13:33:47 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -31,16 +31,16 @@ void  mod_copy_tmp(
 /*========================================================================*/
 void write_enter_id(FILE *fp)
 {
-  fprintf(fp, "idhdl enter_id(char *name, char *value, idtyp t)\n");
+  fprintf(fp, "\nidhdl enter_id(char *name, char *value, idtyp t)\n");
   fprintf(fp, "{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "\n");
   fprintf(fp, "  h=enterid(mstrdup(name),0, t, &IDROOT, FALSE);\n");
   fprintf(fp, "  if(h!=NULL) {\n");
   fprintf(fp, "     switch(t) {\n");
-  fprintf(fp, "       case STRING_CMD: IDSTRING(h) = mstrdup(value);break\n");
-  fprintf(fp, "       case PACKAGE_CMD: break;\n");
-  fprintf(fp, "       case PROC_CMD: break;\n");
+  fprintf(fp, "         case STRING_CMD: IDSTRING(h) = mstrdup(value);break;\n");
+  fprintf(fp, "         case PACKAGE_CMD: break;\n");
+  fprintf(fp, "         case PROC_CMD: break;\n");
   fprintf(fp, "     }\n");
   fprintf(fp, "  }\n");
   fprintf(fp, "  return(h);\n");
@@ -50,12 +50,12 @@ void write_enter_id(FILE *fp)
 /*========================================================================*/
 void write_add_singular_proc(FILE *fp)
 {
-  fprintf(fp, "idhdl add_singular_proc(char *procname, int line,\n");
+  fprintf(fp, "\nidhdl add_singular_proc(char *procname, int line,\n");
   fprintf(fp, "                       long pos, long end, BOOLEAN pstatic)\n");
   fprintf(fp, "{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "  procinfov pi;\n\n");
-  fprintf(fp, "  h = enter_id(name, NULL, PROC_CMD);\n");
+  fprintf(fp, "  h = enter_id(procname, NULL, PROC_CMD);\n");
   fprintf(fp, "  if(h == NULL) return NULL;\n");
   fprintf(fp, "\n");
 //  fprintf(fp, "  pi->libname = mstrdup(libname);\n");
@@ -116,7 +116,13 @@ int write_intro(
   printf("  done.\n");fflush(stdout);
   fclose(module->fmtfp);
   if(create_tmpfile(module)) return -1;
-
+  if(create_tmpfile(module, 1)) return -1;
+  if(create_tmpfile(module, 2)) return -1;
+  if(module->fmtfp2 == NULL) { printf("Cannot write HELP\n"); return -1; }
+  if(module->fmtfp3 == NULL) { printf("Cannot write EXAMPLE\n"); return -1; }
+  printf("%p %p %p\n", module->fmtfp, module->fmtfp2, module->fmtfp3);
+  
+  
   sprintf(filename, "tmp/%s.h", module->name);
   if( (module->modfp_h = fopen(filename, "w")) == NULL) {
     free(filename);
@@ -127,4 +133,5 @@ int write_intro(
 
   free(filename);
 //  write_enter_id(module->modfp);
+  return 0;
 }

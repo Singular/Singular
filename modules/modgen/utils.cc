@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.4 2000-01-27 12:40:53 krueger Exp $
+ * $Id: utils.cc,v 1.5 2000-02-18 13:33:49 krueger Exp $
  */
 
 #include <stdio.h>
@@ -45,26 +45,40 @@ int init_modgen(
 
 /*========================================================================*/
 int create_tmpfile(
-  moddefv module_def
+  moddefv module_def,
+  int which
 )
 {
   char tmpfile[64];
-
+  FILE *fp;
+  
   memset(tmpfile, '\0', sizeof(tmpfile));
   snprintf(tmpfile, sizeof(tmpfile), "tmp/modgen.tmpXXXXXX");
   mktemp(tmpfile);
 
+  printf("create_tmpfile (%d\n", which );
+  
   if (close(creat(tmpfile, 0600)) < 0) {
     (void) unlink (tmpfile);        /*  Blow it away!!  */
     return -1;
-  } else if ((module_def->fmtfp = fopen(tmpfile, "a+")) == NULL) {
+  } else if ((fp = fopen(tmpfile, "a+")) == NULL) {
     (void) unlink (tmpfile);        /*  Blow it away!!  */
     return -1;
   } else {
     (void) unlink (tmpfile); /* delete now to avoid turds... */
   }
-  return 0;
+
+  printf("2)create_tmpfile (%d\n", which );
+  switch(which) {
+      case 0: module_def->fmtfp  = fp; break;
+      case 1: module_def->fmtfp2 = fp; break;
+      case 2: module_def->fmtfp3 = fp; break;
+      default:
+        fclose(fp);
+        return -1;
+  }
   
+  return 0;
 }
 
 /*========================================================================*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.1 1999-11-23 21:30:21 krueger Exp $ */
+/* $Id: makefile.cc,v 1.2 2000-02-18 13:33:48 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -21,32 +21,40 @@
 #include "typmap.h"
 #include "pathnames.h"
 
-void build_head_section(FILE *fp, moddefv module);
-void build_compile_section(FILE *fp, moddefv module);
-void build_clean_section(FILE *fp, moddefv module);
-void build_install_section(FILE *fp, moddefv module);
+extern void mod_create_makefile(moddefv module);
+extern void build_head_section(FILE *fp, moddefv module);
+extern void build_clean_section(FILE *fp, moddefv module);
+extern void build_install_section(FILE *fp, moddefv module);
+extern void build_compile_section(FILE *fp, moddefv module);
+
 static char *object_name(char *p);
+/*========================================================================*/
+/*
+  run mod_create_makefile();
+   
+ */
+/*========================================================================*/
 
 
 /*========================================================================*/
 void mod_create_makefile(moddefv module)
 {
   FILE *fp;
-  fp = fopen("Makefile", "w");
+  fp = fopen("tmp/Makefile", "w");
   cfilesv cf = module->files;
   int i;
   
   printf("Creating Makefile  ...");fflush(stdout);
   write_header(fp, module->name, "#");
   build_head_section(fp, module);
-  fprintf(fp, "SRCS\t= ");
+  fprintf(fp, "SRCS\t= %s.cc", module->name);
   
   for(i=0; i<module->filecnt; i++)
-    fprintf(fp, "%s ", cf[i].filename);
+    fprintf(fp, " %s", cf[i].filename);
 
-  fprintf(fp, "\nOBJS\t= ");
+  fprintf(fp, "\nOBJS\t= %s.o", module->name);
   for(i=0; i<module->filecnt; i++)
-    fprintf(fp, "%s ", object_name(cf[i].filename));
+    fprintf(fp, " %s", object_name(cf[i].filename));
 
   fprintf(fp, "\n\n");
   build_compile_section(fp, module);
@@ -68,7 +76,7 @@ void build_head_section(
 {
   fprintf(fp, "CC\t= gcc\n");
   fprintf(fp, "CXX\t= gcc\n");
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I../include\n");
+  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I../../include\n");
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "libdir          = %s\n", LIBDIR);
@@ -162,7 +170,7 @@ void build_compile_section(
 #endif /* HPUX_9  or HPUX_10 */
 
 /*========================================================================*/
-#  ifdef 68k_MPW
+#  ifdef m68k_MPW
 void build_compile_section(
   FILE *fp,
   moddefv module

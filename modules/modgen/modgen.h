@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.6 2000-02-14 21:43:32 krueger Exp $
+ *  $Id: modgen.h,v 1.7 2000-02-18 13:33:48 krueger Exp $
  *
  */
 
@@ -51,6 +51,7 @@ class procdef {
   char       * funcname;
   language_defs language;
   int          lineno;
+  int          lineno_other;
   int          is_static;
   paramdef     return_val;
   paramdefv    param;
@@ -75,6 +76,8 @@ class moddef {
   FILE * modfp;           /* module file */
   FILE * modfp_h;         /* header file */
   FILE * fmtfp;           /* temporary file */
+  FILE * fmtfp2;          /* temporary file */
+  FILE * fmtfp3;          /* temporary file */
   FILE * binfp;           /* include singular procedures are stored
                              in an extra file */
   char * filename;        /* inputfile to parse */
@@ -137,20 +140,29 @@ void proc_set_default_var(var_type type, var_token varid, char *varname,
 void write_finish_functions(moddefv module, procdefv proc);
 void AddParam(procdefv p, paramdefv vnew, char *name = NULL);
 
-extern int create_tmpfile(moddefv module_def);
+/* from makefile.cc */
+extern void mod_create_makefile(moddefv module);
+extern void build_head_section(FILE *fp, moddefv module);
+extern void build_clean_section(FILE *fp, moddefv module);
+extern void build_install_section(FILE *fp, moddefv module);
+static char *object_name(char *p);
+extern void build_compile_section(FILE *fp, moddefv module);
+
+/* from utils.cc */
+extern int create_tmpfile(moddefv module_def, int which = 0);
 
 /* from proc_setup.cc */
 extern int check_reseverd(char *name);
 
 /* from proc.cc */
-extern void write_example(moddefv module, procdefv proc);
-
 extern void write_procedure_typecheck(moddefv module, procdefv pi, FILE *fmtfp);
 extern void write_procedure_return(moddefv module, procdefv pi, FILE *fmtfp);
 extern void write_function_declaration(moddefv module, procdefv pi, void *arg = NULL);
 extern void write_function_typecheck(moddefv module, procdefv pi, void *arg = NULL);
 extern void write_function_return(moddefv module, procdefv pi, void *arg = NULL);
 extern void write_function_errorhandling(moddefv module, procdefv pi);
+extern void write_help(moddefv module, procdefv pi);
+extern void write_example(moddefv module, procdefv pi);
 extern int  write_singular_procedures(moddefv module, procdefv proc);
 extern void write_singular_parameter(moddefv module,int lineno,
                                      char *typname, char *varname);

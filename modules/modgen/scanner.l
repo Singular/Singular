@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.6 2000-02-14 21:47:10 krueger Exp $ */
+/* $Id: scanner.l,v 1.7 2000-02-18 13:33:49 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #include "stype.h"
 #include "grammar.h"
 
-#define DEBUG 3
+/* #define DEBUG 3 */
  
 #  define YYLP_ERR_NONE    0
 #  define YYLP_DEF_BR2     1
@@ -48,7 +48,7 @@
   int current_pos(int i);
   int read_string(char **buffer, long *start, long end);
   int libread(FILE* f, char* buf, int max_size);
-  add_action(char *new_text);
+  void add_action(char *new_text);
  
   void push_state(int state, int new_state, char *name);
   void switch_state(int state, int new_state, char *name);
@@ -230,8 +230,8 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 	}
 
 <COMMENT>{
-        "*/"            /*ACTION_ECHO;*/ pop_state(); yymore();
-        "*"             /*ACTION_ECHO;*/ yymore();
+        "*/"            ACTION_ECHO; pop_state(); yymore();
+        "*"             ACTION_ECHO; yymore();
         {NL}          { yylineno++; yymore(); }
         .             { yymore(); }
 	  }
@@ -260,7 +260,9 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		  return PROCDECLTOK;
                 }
         example {
+#if DEBUG > 1
 	          printf(">>>EXAMPLE\n");
+#endif
                   brace1 = 0; /* { */
                   brace2 = 0; /* ( */
                   brace3 = 0; /* [ */
@@ -388,7 +390,6 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		     return MCODETOK;
                    } else {
                      yymore();
-                     /*yylineno++;*/
 		   }
                  }
          {NL}    { yylineno++; lvalp->name = yytext; return CODEPART; }
@@ -483,8 +484,18 @@ void pop_state()
   if(state_level<0) state_level = -1;
 }
 
-add_action(char *new_text)
+void add_action(char *new_text)
 {
-
-   printf("%s", new_text);
+  return;
+  switch(sectnum) {
+    case 1:
+      printf("1>%s", new_text);
+      break;
+    case 2:
+      printf("2>%s", new_text);
+      break;
+    case 3:
+      printf("3>%s", new_text);
+      break;
+  }
 }
