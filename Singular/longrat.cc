@@ -1,12 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.21 1999-09-16 12:33:58 Singular Exp $ */
+/* $Id: longrat.cc,v 1.22 1999-09-24 12:24:15 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
 
 #include <string.h>
+#include <float.h>
 #include "mod2.h"
 #include "tok.h"
 #include "mmemory.h"
@@ -14,6 +15,8 @@
 #include "numbers.h"
 #include "modulop.h"
 #include "ring.h"
+#include "shortfl.h"
+#include "mpr_complex.h"
 #include "longrat.h"
 
 #ifndef BYTES_PER_MP_LIMB
@@ -35,6 +38,9 @@ static number nlMapP(number from)
   return to;
 }
 
+//static number nlMapLongR(number from);
+static number nlMapR(number from);
+
 BOOLEAN nlSetMap(ring r)
 {
   if (rField_is_Q(r))
@@ -48,6 +54,16 @@ BOOLEAN nlSetMap(ring r)
     nMap = nlMapP; /* Z/p -> Q */
     return TRUE;
   }
+  if (rField_is_R(r))
+  {
+    nMap = nlMapR; /* short R -> Q */
+    return TRUE;
+  }
+//  if (rField_is_long_R(r))
+//  {
+//    nMap = nlMapLongR; /* long R -> Q */
+//    return TRUE;
+//  }
   return FALSE;
 }
 
@@ -262,6 +278,98 @@ number nlInit (number u)
   }
   return u;
 }
+
+static number nlMapR(number from)
+{
+  double f=nrFloat(from);
+  if (f==0.0) return nlInit(0);
+  int f_sign=1;
+  if (f<0.0)
+  {
+    f_sign=-1;
+    f=-f;
+  }
+  int i=0;
+  mpz_t h1;
+  mpz_init_set_ui(h1,1);
+  while((FLT_RADIX*f) < DBL_MAX && i<DBL_MANT_DIG)
+  {
+    f*=FLT_RADIX;
+    mpz_mul_ui(h1,h1,FLT_RADIX);
+    i++;
+  }
+  number r=nlRInit(1);
+  mpz_set_d(&(r->z),f);
+  memcpy(&(r->n),&h1,sizeof(h1));
+  r->s=0; /* not normalized */
+  nlNormalize(r);
+  return r;
+}
+
+//static number nlMapLongR(number from)
+//{
+//  gmp_float *ff=(gmp_float*)from;
+//  const mpf_t *f=ff->mpfp();
+//  int f_size=ABS((*f)[0]._mp_size);
+//  if (f_size==0)
+//    return nlInit(0);
+//  int f_sign=1;
+//  number work=ngcCopy(from);
+//  if (!ngcGreaterZero(work))
+//  {
+//    f_sign=-1;
+//    work=ngcNeg(work);
+//  }
+//  int i=0;
+//  mpz_t h1;
+//  mpz_init_set_ui(h1,1);
+//  while((FLT_RADIX*f) < DBL_MAX && i<DBL_MANT_DIG)
+//  {
+//    f*=FLT_RADIX;
+//    mpz_mul_ui(h1,h1,FLT_RADIX);
+//    i++;
+//  }
+//  number r=nlRInit(1);
+//  mpz_set_d(&(r->z),f);
+//  memcpy(&(r->n),&h1,sizeof(h1));
+//  r->s=0; /* not normalized */
+//  nlNormalize(r);
+//  return r;
+//
+//
+//  number r=nlRInit(1);
+//  int f_shift=f_size+(*f)[0]._mp_exp;
+//  if ( f_shift > 0)
+//  {
+//    r->s=0;
+//    mpz_init(&r->n);
+//    mpz_setbit(&r->n,f_shift*BYTES_PER_MP_LIMB*8);
+//    mpz_setbit(&r->z,f_size*BYTES_PER_MP_LIMB*8-1);
+//    // now r->z has enough space
+//    memcpy(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
+//    nlNormalize(r);
+//  }
+//  else
+//  {
+//    r->s=3;
+//    if (f_shift==0)
+//    {
+//      mpz_setbit(&r->z,f_size*BYTES_PER_MP_LIMB*8-1);
+//      // now r->z has enough space
+//      memcpy(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
+//    }
+//    else /* f_shift < 0 */
+//    {
+//      mpz_setbit(&r->z,(f_size-f_shift)*BYTES_PER_MP_LIMB*8-1);
+//      // now r->z has enough space
+//      memcpy(mpz_limb_d(&r->z)-f_shift,((*f)[0]._mp_d),
+//        f_size*BYTES_PER_MP_LIMB);
+//    }
+//  }
+//  if ((*f)[0]._mp_size<0);
+//    r=nlNeg(r);
+//  return r;
+//}
 
 int nlSize(number a)
 {
