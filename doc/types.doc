@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.63 1998-05-20 12:13:12 pohl Exp $
+@comment $Id: types.doc,v 1.64 1998-05-20 12:26:32 pohl Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3228,6 +3228,8 @@ is a expression list of characters from the string
 @table @code
 @item charstr
 description of the coeffinet field of a ring (see @ref{charstr})
+@item execute
+interpret string as command (see @ref{execute})
 @item find
 position of a substring in a string (see @ref{find})
 @item names
