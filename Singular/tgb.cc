@@ -2275,7 +2275,10 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     {
       //bucket aufloesen reduzieren, neu füllen
       
-      kBucketClear(los[erg.reduce_by].bucket,&reductor,&len);
+   
+      int bn=kBucketCanonicalize(los[erg.reduce_by].bucket);
+      reductor=los[erg.reduce_by].bucket->buckets[bn];
+      len=los[erg.reduce_by].bucket->buckets_length[bn];
       if(c->is_char0)
 	pContent(reductor);
  
@@ -2297,8 +2300,7 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 	   los[i].sev=pGetShortExpVector(los[i].p);
        //better would be first sorting before sev
     }
-    if(!erg.fromS)
-      kBucketInit(los[erg.reduce_by].bucket,reductor,len);
+ 
 		 
     int deleted=multi_reduction_clear_zeroes(los, losl, erg.to_reduce_l, erg.to_reduce_u);
     curr_pos=erg.to_reduce_u;
