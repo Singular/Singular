@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.99 1999-08-06 14:06:37 obachman Exp $ */
+/* $Id: extra.cc,v 1.100 1999-08-13 08:10:01 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -301,25 +301,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #endif      
     }
     else
-/*==================== tty ==================================*/
-    #ifndef __MWERKS__
-    #ifndef MSDOS
-    #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
-    if (strcmp(sys_cmd,"tty")==0)
-    {
-      #if defined(HAVE_READLINE) || defined(HAVE_FEREAD)
-      system("stty sane");
-      #endif
-      if ((h!=NULL)&&(h->Typ()==INT_CMD))
-      {
-        fe_use_fgets=(int)h->Data();
-      }
-      return FALSE;
-    }
-    else
-    #endif
-    #endif
-    #endif
 /*==================== Singular ==================================*/
     if (strcmp(sys_cmd, "Singular") == 0)
     {
