@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.191 2001-01-19 10:37:48 keilen Exp $
+@comment $Id: general.doc,v 1.192 2001-02-28 08:25:42 pohl Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1472,6 +1472,11 @@ ordering has to be chosen such that the unit-elements of the
 ring are precisely those elements with leading monomial 1.  For more
 information, see @ref{Monomial orderings}.
 
+Every floating point number in a ring consists of two parts, wich may be
+choosen from the user. The leading part represents the number and the rest
+is for the numerical stability. Two numbers with a difference only in the
+rest are equal.
+
 @itemize @bullet
 @item
 the ring @math{Z/32003[x,y,z]} with degree reverse lexicographical
@@ -1547,9 +1552,9 @@ For ascending component order, the component ordering @code{C} has to be
 used.
 
 @item
-the ring @math{K[x,y,z]}, where @math{K=Z/7(a,b,c)} denotes the
-transcendental extension of @math{Z/7} by @math{a}, @math{b}, and
-@math{c}, with degree lexicographical ordering:
+the ring @math{K[x,y,z]}, where @math{K=Z/7(a,b,c)} denotes the transcendental
+extension of @math{Z/7} by @math{a}, @math{b} and @math{c} with degree
+lexicographical ordering:
 
 @smallexample
 ring r = (7,a,b,c),(x,y,z),Dp;
@@ -1557,9 +1562,9 @@ ring r = (7,a,b,c),(x,y,z),Dp;
 
 @item
 the ring @math{K[x,y,z]}, where @math{K=Z/7[a]} denotes the algebraic extension of
-degree 2 of @math{Z/7} by @math{a}. In other words, @math{K} is the finite field with
-49 elements.  In the first case, @math{a} denotes an algebraic element over
-@math{Z/7} with minimal polynomial
+degree 2 of @math{Z/7} by @math{a.} In other words, @math{K} is the finite field with
+49 elements.  In the first case, @math{a} denotes an algebraic
+element over @math{Z/7} with minimal polynomial
 @tex
 $\mu_a=a^2+a+3$,
 @end tex
@@ -1575,36 +1580,45 @@ ring r = (7^2,a),(x,y,z),dp;
 @end smallexample
 
 @item
-the ring @math{R'[x,y,z]}, where @math{R'} denotes the field of real
-numbers represented by simple precision floating point numbers
-(i.e. with 3 valid decimal digits):
+the ring @math{R[x,y,z]}, where @math{R} denotes the field of real
+numbers represented by simple precision floating point numbers. This is
+a special case:
 
 @smallexample
 ring r = real,(x,y,z),dp;
 @end smallexample
 
 @item
-the ring @math{R''[x,y,z]}, where @math{R''} denotes the field of real
+the ring @math{R[x,y,z]}, where @math{R} denotes the field of real
 numbers represented by floating point numbers of 50 valid decimal digits
-(the maximal precision is 32767):
+and the same number of digits for the rest:
 
 @smallexample
 ring r = (real,50),(x,y,z),dp;
 @end smallexample
 
 @item
-the ring @math{R''(j)[x,y,z]}, where @math{R''} denotes the field of real
-numbers represented by floating point numbers of 50 valid decimal digits
-and @math{j} denotes the imaginary unit.
+the ring @math{R[x,y,z]}, where @math{R} denotes the field of real
+numbers represented by floating point numbers of 10 valid decimal digits
+and with 50 digits for the rest:
 
 @smallexample
-ring r = (complex,50,j),(x,y,z),dp;
+ring r = (real,10,50),(x,y,z),dp;
 @end smallexample
 
 @item
-the ring @math{R'(i)[x,y,z]}, where @math{R'} denotes the field of real
-numbers represented by floating point numbers of 3 valid decimal digits
-and @math{i} denotes the imaginary unit.
+the ring @math{R(j)[x,y,z]}, where @math{R} denotes the field of real
+numbers represented by floating point numbers of 30 valid decimal digits
+and the same number for the rest. @math{j} denotes the imaginary unit.
+
+@smallexample
+ring r = (complex,30,j),(x,y,z),dp;
+@end smallexample
+
+@item
+the ring @math{R(i)[x,y,z]}, where @math{R} denotes the field of real
+numbers represented by floating point numbers of 6 valid decimal digits
+and the same number for the rest. @math{i} is the default for the imaginary unit.
 
 @smallexample
 ring r = complex,(x,y,z),dp;
@@ -1683,23 +1697,23 @@ are faster than arithmetic operations in algebraic extensions as
 described above.
 
 @item
-the name @code{real},
-optionally followed by an int giving the precision in decimal digits.
-@* This specifies the field of real numbers represented as floating point
-numbers.
+an expression_list of the name @code{real} and two optional int_expression
+giving the precision in decimal digits and
+the size for the stabilizing rest. The default for the rest is the same size
+as for the representation.
+An exeption is the name @code{real} without any integers.
 These numbers are implemented as machine floating point numbers
-of single precision (for omitted precision or a precision smaller than 4).
-Note that computations over this field are not exact.
+of single precision.
+Note that computations over all these fields are not exact.
 
 @item
 an expression_list of the name @code{complex},
-an optional int_expression and a name.
-@* This specifies the field of complex numbers represented with floating point
-numbers with a precision given by the int expression (default: 3).
-@*The name of the imaginary unit is given by the last parameter.
-@*These numbers are implemented with machine floating point numbers
-of single precision (for a precision smaller than 4).
-Note that computations over this field are not exact.
+two optional int_expression and a name.
+This specifies the field of complex numbers represented with floating point
+numbers with a precision similar to @code{real}. An expression_list
+without int_expression defines a precision and rest with length 6.
+The name of the imaginary unit is given by the last parameter.
+Note that computations over these fields are not exact.
 @end enumerate
 
 'names_of_ring_variables' is a list of names or indexed names.
