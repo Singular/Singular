@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.35 2001-08-27 14:40:03 Singular Exp $
+@comment $Id: NEWS.texi,v 1.36 2002-11-11 18:48:31 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -51,6 +51,10 @@ Linux.
 @item  @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/cyclic_8.sing,,cyclic_8} @tab std @tab 32003,x(1..8),dp @tab >47800 @tab 478 @tab >100
 @end multitable
 
+@heading Factorizing algorithms revisited
+Starting with version 2-0-4, we use NTL (of Victor Shoup) for factoring
+univariate polynomials. The multivariate factoring code in libfac/factory
+does now also work over algebraic extension fields.
 
 @heading General Changes
 @table @asis

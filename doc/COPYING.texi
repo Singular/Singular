@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.13 2001-08-27 14:40:01 Singular Exp $
+@comment $Id: COPYING.texi,v 1.14 2002-11-11 18:48:32 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -17,13 +17,13 @@
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
 @center Authors: @uref{http://www.mathematik.uni-kl.de/~wwwagag/E/Greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~wwwagag/E/Pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
-@center Copyright @copyright{} 1986-2001
+@center Copyright @copyright{} 1986-2002
 @sp 2
 @center @strong{NOTICE}
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation (version 2 of the License)
+the Free Software Foundation ( version 2 of the License );
 with the following additional restrictions (which override any conflicting
 restrictions in the GPL):
 
@@ -32,8 +32,7 @@ the omalloc library, the readline library,
 the Gnu Multiple Precision Library (GMP),
 the Multi Protocol library (MP), the
 Singular-Factory library, the Singular-libfac library, and,
-for the Windows 9X/NT
-distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
+for the Windows distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
 
 Their copyrights and licences can be found in the accompanying files
@@ -81,6 +80,9 @@ anonymous ftp through the following addresses:
 @item MP
 @copyright{} Gray/Kajler/Wang, Kent State University
 @* @uref{http://www.symbolicnet.org/areas/protocols/mp.html}
+@item NTL
+@copyright{} Victor Shoup
+@* @uref{ftp://www.shoup.net}
 @item Singular-Factory
 @copyright{} Greuel/Stobbe, University of Kaiserslautern:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
