@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.20 1997-10-29 16:17:09 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.21 1997-11-05 15:46:22 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -309,6 +309,7 @@ ftestm4src :=	\
 		feval.m4 \
 		gcd.m4 \
 		insert.m4 \
+		resultant.m4 \
 		size.m4 \
 		totaldegree.m4
 export ftestm4src
@@ -416,10 +417,20 @@ factoryconf.h:	config.h
 TAGS:
 		etags $(addprefix $(srcdir)/, $(distsrc) $(distincl))
 
+# check configuration before building executables
+conftest:
+		@if test -z "$(filter mem,$(alltargets))" \
+		  || test -z "$(filter readcf.y,$(factorysrc))" \
+		  || test -n "$(filter singext.cc,$(factorysrc))"; then \
+		  echo "To make this target you have to configure"; \
+		  echo "\`--without-Singular --with-memman --enable-streamio'."; \
+		  exit 1; \
+		fi
+
 #
 # - Factory Test Environment.
 #
-$(ftestexec):	factory.h libcf.a libcfmem.a ftmpl_inst.o
+$(ftestexec):	conftest factory.h libcf.a libcfmem.a ftmpl_inst.o
 		cd ftest && $(MAKE) $@
 		@if test -r "$@"; then \
 		  :; \
@@ -433,17 +444,10 @@ $(ftestexec):	factory.h libcf.a libcfmem.a ftmpl_inst.o
 #
 
 # these are not all dependencies, but the most important ones
-gengftables.o:	gengftables.cc factory.h gf_tabutil.h \
-		factoryconf.h config.h
-		@if test -z "$(filter mem,$(alltargets))" \
-		  || test -z "$(filter readcf.y,$(factorysrc))"; then \
-		  echo "You have to configure --with-memman --enable-streamio"; \
-		  echo "to make gengftables."; \
-		  exit 1; \
-		fi
+gengftables.o:	gengftables.cc conftest factory.h gf_tabutil.h
 		$(CXX) -c $< $(TESTCXXFLAGS) -o $@
 
-gengftables:	gengftables.o ftmpl_inst.o $(libfactory) libcfmem.a
+gengftables:	gengftables.o libcf.a libcfmem.a ftmpl_inst.o
 		$(CXX) $^ $(TESTLDFLAGS) -o $@
 
 gftables:	gengftables
@@ -570,7 +574,8 @@ clean:		ftestclean
 		  $(ftestexec) gengftables test_install \
 		  factoryconf.h factory.h *.o *.d
 
-ftestclean:	-cd ftest && $(MAKE) clean
+ftestclean:
+		-cd ftest && $(MAKE) clean
 
 # remove gftables only if we built them
 mostlyclean:	clean
@@ -584,7 +589,8 @@ distclean:	ftestdistclean mostlyclean
 		  config.cache config.log config.status config.h
 		-rm -rf $(distname)
 
-ftestdistclean:	-cd ftest && $(MAKE) distclean
+ftestdistclean:
+		-cd ftest && $(MAKE) distclean
 		-rmdir ftest
 
 maintainer-clean: distclean
