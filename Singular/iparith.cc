@@ -640,16 +640,18 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
   BOOLEAN iiReLoadLib(idhdl packhdl);
   BOOLEAN iiTryLoadLib(leftv v, char *id);
   idhdl packhdl;
-  
+
   switch(u->Typ())
   {
       case PACKAGE_CMD:
         packhdl = (idhdl)u->data;
-        if(!IDPACKAGE(packhdl)->loaded) {
+        if(!IDPACKAGE(packhdl)->loaded)
+        {
           //if(iiReLoadLib(packhdl))
           //  Werror("unable to reload package '%s'", IDID(packhdl));
         }
-        if(v->rtyp == IDHDL) {
+        if(v->rtyp == IDHDL)
+        {
           v->name = mstrdup(v->name);
         }
         namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
@@ -660,10 +662,12 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         break;
       case 0:
         //Print("%s of type 'ANY'. Trying load.\n", v->name);
-        if(!iiTryLoadLib(u, u->name)) {
+        if(!iiTryLoadLib(u, u->name))
+        {
           syMake(u, u->name);
           packhdl = (idhdl)u->data;
-          if(v->rtyp == IDHDL) {
+          if(v->rtyp == IDHDL)
+          {
             v->name = mstrdup(v->name);
           }
           namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
@@ -671,7 +675,8 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
           memcpy(res, v, sizeof(sleftv));
           memset(v, 0, sizeof(sleftv));
           namespaceroot->pop();
-        } else
+        }
+        else
           Werror("'%s' no such package", u->name);
         break;
       case DEF_CMD:
@@ -2672,7 +2677,7 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
     break;
 #endif
   default:
-#ifndef MAKE_DISRIBUTION    
+#ifndef MAKE_DISRIBUTION
     mmPrintStat();
 #endif
     res->data = (char *)0;
@@ -4083,10 +4088,10 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
   }
   result=kStd((ideal)(u->Data()),
               currQuotient,
-	      hom,
-	      &ww,                  // module weights
-	      (intvec *)v->Data(),  // hilbert series
-	      0,0,                  // syzComp, newIdeal
+              hom,
+              &ww,                  // module weights
+              (intvec *)v->Data(),  // hilbert series
+              0,0,                  // syzComp, newIdeal
               (intvec *)w->Data()); // weights of vars
   idSkipZeroes(result);
   res->data = (char *)result;
