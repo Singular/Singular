@@ -7,7 +7,7 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs_Generate.cc,v 1.6 2002-01-30 14:33:05 Singular Exp $
+ *  Version: $Id: p_Procs_Generate.cc,v 1.7 2003-01-31 09:24:51 Singular Exp $
  *******************************************************************/
 
 
@@ -65,7 +65,7 @@ inline int AlreadyHaveProc(p_Proc proc, p_Field field, p_Length length, p_Ord or
   return (generated_p_procs[proc])[index(proc, field, length, ord)] != 0;
 }
 
-const char* macros_field[] = {"n_Copy","n_Delete", "n_Mult", "n_Add", "n_Sub", "n_IsZero", "n_Equal" , "n_Neg", NULL};
+const char* macros_field[] = {"n_Copy","n_Delete", "n_Mult", "n_Add", "n_Sub", "n_IsZero", "n_Equal" , "n_Neg", "n_InpMult", NULL};
 
 const char* macros_length[] =
 {"p_MemCopy", "p_MemAdd", "p_MemSum", "p_MemDiff", NULL};

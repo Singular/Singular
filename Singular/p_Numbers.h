@@ -6,7 +6,7 @@
  *  Purpose: macros/inline functions for number oerations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Numbers.h,v 1.7 2001-03-22 19:11:08 Singular Exp $
+ *  Version: $Id: p_Numbers.h,v 1.8 2003-01-31 09:21:00 Singular Exp $
  *******************************************************************/
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H
@@ -20,6 +20,8 @@
 #define n_Equal_FieldGeneral(n1, n2, r)     (r)->cf->nEqual(n1, n2)
 #define n_Neg_FieldGeneral(n, r)            (r)->cf->nNeg(n)
 #define n_Sub_FieldGeneral(n1, n2, r)       (r)->cf->nSub(n1, n2)
+//#define n_InpMult_FieldGeneral(n1, n2, r)   (r)->cf->nInpMult(n1, n2, r)
+#define n_InpMult_FieldGeneral(n1, n2, r)   ndInpMult(n1, n2, r)
 
 #include "modulop.h"
 #define n_Copy_FieldZp(n, r)        n
@@ -30,6 +32,7 @@
 #define n_Equal_FieldZp(n1, n2, r)  npEqualM(n1, n2)
 #define n_Neg_FieldZp(n, r)         npNegM(n)
 #define n_Sub_FieldZp(n1, n2, r)    npSubM(n1, n2)
+#define n_InpMult_FieldZp(n1, n2, r) n1=npMultM(n1, n2)
 
 #define DO_LINLINE
 #include "longrat.cc"
@@ -41,4 +44,5 @@
 #define n_Equal_FieldQ(n1, n2, r)  nlEqual(n1, n2)
 #define n_Neg_FieldQ(n, r)         nlNeg(n)
 #define n_Sub_FieldQ(n1, n2, r)    nlSub(n1, n2)
+#define n_InpMult_FieldQ(n1, n2, r) nlInpMult(n1, n2, r)
 #endif
