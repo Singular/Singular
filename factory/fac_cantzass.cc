@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_cantzass.cc,v 1.6 2003-02-14 15:53:27 Singular Exp $ */
+/* $Id: fac_cantzass.cc,v 1.7 2004-10-11 10:49:20 Singular Exp $ */
 
 #include <config.h>
 
@@ -83,10 +83,14 @@ CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int num
             G = distinctDegreeFactorFFGF( i.getItem().factor(), q );
         for ( j = G; j.hasItem(); ++j ) {
             if ( numext > 0 ) {
-                if ( numext == 1 )
-                    HH = CantorZassenhausFactorExt( j.getItem().factor(), j.getItem().exp(), &qq, AlgExtRandomF( alpha ) );
-                else
-                    HH = CantorZassenhausFactorExt( j.getItem().factor(), j.getItem().exp(), &qq, AlgExtRandomF( alpha, beta ) );
+             if ( numext == 1 ) {
+                   AlgExtRandomF tmpalpha( alpha );
+                    HH = CantorZassenhausFactorExt( j.getItem().factor(), j.getItem().exp(), &qq, tmpalpha );
+             }
+             else {
+                   AlgExtRandomF tmpalphabeta( alpha, beta );
+                    HH = CantorZassenhausFactorExt( j.getItem().factor(), j.getItem().exp(), &qq, tmpalphabeta );
+             }
             }
             else  if ( galoisfield )
                 HH = CantorZassenhausFactorFFGF( j.getItem().factor(), j.getItem().exp(), q, GFRandom() );
