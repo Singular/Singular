@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.24 2000-06-27 12:10:29 pohl Exp $ */
+/* $Id: mpr_complex.cc,v 1.25 2000-06-30 11:27:21 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -36,67 +36,41 @@
 
 #define EXTRABYTES 4
 
+#define DEFPREC        20         // minimum number of digits (output operations)
 size_t gmp_output_digits= DEFPREC;
 
 int dummy=mmInit();
-static const gmp_float  gmpOne= 1;
-static const gmp_float gmpMOne= -1;
-static gmp_float gmpRel=0;
-static gmp_float diff=0;
+static gmp_float gmpRel(0.0);
+static gmp_float diff(0.0);
 
 
-//-> setGMPFloat*
-/** Set size of mantissa to <bytes> bytes and guess the number of
- * output digits.
- *
- * Set internal gmp floating point precision to (bytes+EXTRABYTES)*8 bits and
- * set external precision (i.e. any number smaller than this is treated as ZERO)
- * to bytes*8 bits.
- * The precision in bytes is the size of the mantissa!
- * Guesses the number of digits <-> precision
+/** Set size of mantissa
+ *  digits - the number of output digits (basis 10)
+ *  the size of mantissa consists of two parts:
+ *    the "output" part and the "zero" part.
+ *  According to the GMP-precision digits is 
+ *  recomputed to bits (basis 2).
+ *  Two numbers a, b are equal if
+ *    | a - b | < | a | * 0.1^digits .
+ *  In this case we have a - b = 0 .
  */
-void setGMPFloatPrecBytes( unsigned long int bytes )
-{
-  unsigned long int bits= bytes * 8;
-  gmp_float::setPrecision( (bytes+EXTRABYTES)*8 );
-  gmp_float::setEqualBits( bits );
-  // guess the maximal number of digits for this precision
-  gmp_output_digits=  -10 + (size_t)
-    ( (((bits>64?bits:64)+2*mp_bits_per_limb-1)/mp_bits_per_limb)
-      * mp_bits_per_limb * (log(2)/log(10)));
-}
-
-unsigned long int getGMPFloatPrecBytes()
-{
-  return gmp_float::getEqualBits()/8;
-}
-// Sets the lenght of the mantissa to <digits> digits
 void setGMPFloatDigits( size_t digits )
 {
   size_t bits = 1 + (size_t) ((float)digits * 3.5);
   size_t db = bits+bits;
   bits= bits>64?bits:64;
-  gmp_float::setPrecision( db );
-  gmp_float::setEqualBits( bits );
   gmp_output_digits= digits;
   mpf_set_default_prec( db );
   mpf_set_prec(*diff.mpfp(),32);
   mpf_set_prec(*gmpRel.mpfp(),32);
   mpf_set_d(*gmpRel.mpfp(),0.1);
   mpf_pow_ui(*gmpRel.mpfp(),*gmpRel.mpfp(),digits);
-  mpf_set_prec(*gmpOne.mpfp(),db);
-  mpf_set_prec(*gmpMOne.mpfp(),db);
 }
 
 size_t getGMPFloatDigits()
 {
   return gmp_output_digits;
 }
-//<-
-
-//-> gmp_float::*
-unsigned long int gmp_float::gmp_default_prec_bits= GMP_DEFAULT_PREC_BITS;
-unsigned long int gmp_float::gmp_needequal_bits= GMP_NEEDEQUAL_BITS;
 
 void gmp_float::setFromStr( char * in )
 {
@@ -163,7 +137,7 @@ gmp_float & gmp_float::operator += ( const gmp_float & a )
   mpf_set_prec(diff.t, 32);
   mpf_div(diff.t, diff.t, a.t);
   mpf_abs(diff.t, diff.t);
-  if(diff < gmpRel)
+  if(mpf_cmp(diff.t, gmpRel.t) < 0)
     mpf_set_d( t, 0.0);
   return *this;
 }
@@ -184,7 +158,7 @@ gmp_float & gmp_float::operator -= ( const gmp_float & a )
   mpf_set_prec(diff.t, 32);
   mpf_div(diff.t, diff.t, a.t);
   mpf_abs(diff.t, diff.t);
-  if(diff < gmpRel)
+  if(mpf_cmp(diff.t, gmpRel.t) < 0)
     mpf_set_d( t, 0.0);
   return *this;
 }
@@ -199,7 +173,7 @@ bool operator == ( const gmp_float & a, const gmp_float & b )
   mpf_sub(diff.t, a.t, b.t);
   mpf_div(diff.t, diff.t, a.t);
   mpf_abs(diff.t, diff.t);
-  if(diff < gmpRel)
+  if(mpf_cmp(diff.t, gmpRel.t) < 0)
     return true;
   else
     return false;
@@ -217,9 +191,9 @@ bool gmp_float::isOne()
 #else
   if (mpf_sgn(t) <= 0)
     return false;
-  mpf_sub(diff.t, t, gmpOne.t);
+  mpf_sub_ui(diff.t, t, 1);
   mpf_abs(diff.t, diff.t);
-  if(diff < gmpRel)
+  if(mpf_cmp(diff.t, gmpRel.t) < 0)
     return true;
   else
     return false;
@@ -233,9 +207,9 @@ bool gmp_float::isMOne()
 #else
   if (mpf_sgn(t) >= 0)
     return false;
-  mpf_sub(diff.t, t, gmpMOne.t);
+  mpf_add_ui(diff.t, t, 1);
   mpf_abs(diff.t, diff.t);
-  if(diff < gmpRel)
+  if(mpf_cmp(diff.t, gmpRel.t) < 0)
     return true;
   else
     return false;
