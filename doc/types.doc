@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.108 2000-04-27 10:07:26 obachman Exp $
+@comment $Id: types.doc,v 1.109 2000-05-15 12:59:55 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1373,7 +1373,7 @@ written.
   close(l);                    // link is closed
   write("example.txt","int j=5;");// data is appended to file
   read("example.txt");         // data is returned as string
-  execute read(l);             // read string is executed
+  execute(read(l));            // read string is executed
   close(l);                    // link is closed
 @c example
 @c  // dump vars overwriting previous file content:

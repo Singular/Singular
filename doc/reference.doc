@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.186 2000-04-27 10:07:23 obachman Exp $
+@comment $Id: reference.doc,v 1.187 2000-05-15 12:59:52 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -44,7 +44,7 @@ The general syntax of a function is
 @* [target =] function_name (<arguments>);
 @* If no target is specified, the result is printed.
 
-In some cases (e.g., @code{execute, export, keepring, kill, setring,
+In some cases (e.g., @code{export, keepring, kill, setring,
 type}) the brackets are optional. For the commands
 @code{help}, @code{break}, @code{quit}, @code{exit} and @code{LIB} no
 brackets are allowed.
@@ -1443,9 +1443,9 @@ none
 @item @strong{Purpose:}
 executes a string containing a sequence of @sc{Singular} commands.
 @item @strong{Note:}
-The string is inserted into the input stream at the next line break,
-@emph{NOT} after the @code{;} !  Hence, @code{execute} should be the
-only command on a line. @code{execute} should be avoided in procedures
+The command @code{return} can not appear in the string.
+@item @strong{Note:}
+@code{execute} should be avoided in procedures
 whenever possible since it may give rise to name conflicts.  Moreover,
 such procedures cannot be precompiled (a feature which @sc{Singular} will
 provide in the future).
@@ -1746,7 +1746,7 @@ See
 none
 @item @strong{Purpose:}
 input comes from the file @file{filename}. This is a shorthand for
-@code{execute read(filename)}.
+@code{execute(read(filename))}.
 @item @strong{Example:}
 @smallexample
 < "example"; //read in the file example and execute it
@@ -1930,7 +1930,7 @@ none
 @item @strong{Purpose:}
 reads the contents of the entire file, resp.@: link, and restores all variables
 from it. For ASCII links, @code{getdump} is equivalent to an
-@code{execute read (} link @code{);} command. For MP links,
+@code{execute(read (} link @code{));} command. For MP links,
 @code{getdump} should only be used on data which were previously
 @code{dump}'ed.
 @item @strong{Example:}
@@ -4877,7 +4877,7 @@ base.
   // create an ideal k equal to the content
   // of the file save_i
   string s="ideal k="+read("save_i")+";";
-  execute s;
+  execute(s);
   k;
 @c example
 @end smallexample
@@ -6211,9 +6211,9 @@ ideal i=x+y,z3+22y;
 write(":w save_i",i);// this writes x+y,z3+22y to the file save_i
 
 ring r=32003,(x,y,z),dp;
-string s=read("save_i");  //creates the string x+y,z3+22y
-execute "ideal k="+s+";"; // this defines an ideal k which
-                          // is equal to i.
+string s=read("save_i");   //creates the string x+y,z3+22y
+execute("ideal k="+s+";"); // this defines an ideal k which
+                           // is equal to i.
 @end smallexample
 @end table
 @c ref
