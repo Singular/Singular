@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.21 1998-10-22 12:26:14 krueger Exp $ */
+/* $Id: ipid.cc,v 1.22 1998-10-26 11:11:16 krueger Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -37,7 +37,9 @@ ideal currQuotient = NULL;
 char* iiNoName="_";
 
 void paCleanUp(package pack);
+#ifdef HAVE_NAMESPACES
 BOOLEAN paKill(package pack, BOOLEAN force_top=FALSE);
+#endif
 
 /*0 implementation*/
 
@@ -708,6 +710,7 @@ void paCleanUp(package pack)
   }
 }
 
+#ifdef HAVE_NAMESPACES
 BOOLEAN paKill(package pack, BOOLEAN force_top)
 {
   if (pack->ref <= 0 || force_top) {
@@ -730,6 +733,7 @@ BOOLEAN paKill(package pack, BOOLEAN force_top)
   } else paCleanUp(pack);
   return TRUE;
 }
+#endif /* HAVE_NAMESPACES */
 
 char *idhdl2id(idhdl pck, idhdl h)
 {
