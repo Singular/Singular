@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.4 1997-04-02 15:07:01 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.5 1997-10-15 07:58:51 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -15,6 +15,7 @@
 #include "ideals.h"
 #include "polys.h"
 #include "intvec.h"
+#include "numbers.h"
 #include "hutil.h"
 #include "stairc.h"
 
@@ -1091,78 +1092,342 @@ void scComputeHC(ideal S, int ak, poly &hEdge)
 
 //  kbase
 
-static polyset Kbase;
-static int  count;
+static poly last;
+static scmon act;
 
-static void scInKbase( poly p, int  start)
+static void scElKbase()
 {
-  int  i, j;
-  poly q;
-  scmon x;
-  for (i = 0; i < hNstc; i++)
+  poly q = pNew();
+  pSetCoeff0(q,nInit(1));
+  pSetExpV(q,act);
+  pSetm(q);
+  pNext(q) = NULL;
+  last = pNext(last) = q;
+}
+
+static short scMax( int i, scfmon stc, int Nvar)
+{
+  short x, y=stc[0][Nvar];
+  for (; i;)
   {
-    x = hstc[i];
-    j = pVariables;
+    i--;
+    x = stc[i][Nvar];
+    if (x > y) y = x;
+  }
+  return y;
+}
+
+static short scMin( int i, scfmon stc, int Nvar)
+{
+  short x, y=stc[0][Nvar];
+  for (; i;)
+  {
+    i--;
+    x = stc[i][Nvar];
+    if (x < y) y = x;
+  }
+  return y;
+}
+
+static short scRestrict( int &Nstc, scfmon stc, int Nvar)
+{
+  unsigned short x, y;
+  int i, j, Istc = Nstc;
+
+  y = 0XFFFF;
+  for (i=Nstc-1; i>=0; i--)
+  {
+    j = Nvar-1;
     loop
     {
-      if (x[j] > p->exp[j])
-        break;
+      if(stc[i][j] != 0) break;
       j--;
-      if (j==0)
+      if (j == 0)
       {
-        pDelete1(&p);
-        return;
+        Istc--;
+        x = stc[i][Nvar];
+        if (x < y) y = x;
+        stc[i] = NULL;
+        break;
       }
     }
   }
-  pSetm(p);
-  Kbase[count] = p;
-  count++;
-  for (i = start; i <= pVariables; i++)
+  if (Istc < Nstc)
   {
-    q = pCopy(p);
-    q->exp[i]++;
-    scInKbase(q, i);
+    j = 0;
+    while (stc[j]) j++;
+    i = j+1;
+    for(; i<Nstc; i++)
+    {
+      if (stc[i])
+      {
+        stc[j] = stc[i];
+        j++;
+      }
+    }
+    Nstc = Istc;
+    return y;
+  }
+  else
+    return -1;
+}
+
+static void scAll( int Nvar, short deg)
+{
+  int i;
+  short d = deg;
+  if (d == 0)
+  {
+    for (i=Nvar; i; i--) act[i] = 0;
+    scElKbase();
+    return;
+  }
+  if (Nvar == 1)
+  {
+    act[1] = d;
+    scElKbase();
+    return;
+  }
+  do
+  {
+    act[Nvar] = d;
+    scAll(Nvar-1, deg-d);
+    d--;
+  } while (d >= 0);
+}
+
+static void scAllKbase( int Nvar, short ideg, short deg)
+{
+  do
+  {
+    act[Nvar] = ideg;
+    scAll(Nvar-1, deg-ideg);
+    ideg--;
+  } while (ideg >= 0);
+}
+
+static void scDegKbase( scfmon stc, int Nstc, int Nvar, short deg)
+{
+  int  Ivar, Istc, i, j;
+  scfmon sn;
+  short x, ideg;
+
+  if (deg == 0)
+  {
+    for (i=Nvar; i; i--) act[i] = 0;
+    scElKbase();
+    return;
+  }
+  if (Nvar == 1)
+  {
+    for (i=Nstc-1; i>=0; i--) if(deg >= stc[i][1]) return;
+    act[1] = deg;
+    scElKbase();
+    return;
+  }
+  Ivar = Nvar-1;
+  sn = hGetmem(Nstc, stc, stcmem[Ivar]);
+  x = scRestrict(Nstc, sn, Nvar);
+  if (x < 0) ideg = deg;
+  else
+  {
+    if (Nstc == 0)
+    {
+      if (deg >= x) return;
+      act[Nvar] = deg;
+      for (i=Ivar; i; i--) act[i] = 0;
+      scElKbase();
+      return;
+    }
+    if (deg < x) ideg = deg;
+    else ideg = x-1;
+  }
+  loop
+  {
+    x = scMax(Nstc, sn, Nvar);
+    while (ideg >= x)
+    {
+      act[Nvar] = ideg;
+      scDegKbase(sn, Nstc, Ivar, deg-ideg);
+      ideg--;
+    }
+    if (ideg < 0) return;
+    Istc = Nstc;
+    for (i=Nstc-1; i>=0; i--)
+    {
+      if (ideg < sn[i][Nvar])
+      {
+        Istc--;
+	sn[i] = NULL;
+      }
+    }
+    if (Istc == 0)
+    {
+      scAllKbase(Nvar, ideg, deg);
+      return;
+    }
+    j = 0;
+    while (sn[j]) j++;
+    i = j+1;
+    for (; i<Nstc; i++)
+    {
+      if (sn[i])
+      {
+	sn[j] = sn[i];
+	j++;
+      }
+    }
+    Nstc = Istc;
   }
 }
 
-
-extern ideal scKBase(ideal s, ideal Q)
+static void scInKbase( scfmon stc, int Nstc, int Nvar)
 {
-  int  i, a;
-  poly p;
+  int  Ivar, Istc, i, j;
+  scfmon sn;
+  short x, ideg;
+
+  if (Nvar == 1)
+  {
+    ideg = scMin(Nstc, stc, 1);
+    while (ideg > 0)
+    {
+      ideg--;
+      act[1] = ideg;
+      scElKbase();
+    }
+    return;
+  }
+  Ivar = Nvar-1;
+  sn = hGetmem(Nstc, stc, stcmem[Ivar]);
+  x = scRestrict(Nstc, sn, Nvar);
+  if (Nstc == 0)
+  {
+    if (x == 0) return;
+    for (i=Ivar; i; i--) act[i] = 0;
+    do
+    {
+      x--;
+      act[Nvar] = x;
+      scElKbase();
+    } while(x > 0);
+    return;
+  }
+  ideg = x-1;
+  loop
+  {
+    x = scMax(Nstc, sn, Nvar);
+    while (ideg >= x)
+    {
+      act[Nvar] = ideg;
+      scInKbase(sn, Nstc, Ivar);
+      ideg--;
+    }
+    if (ideg < 0) return;
+    Istc = Nstc;
+    for (i=Nstc-1; i>=0; i--)
+    {
+      if (ideg < sn[i][Nvar])
+      {
+        Istc--;
+	sn[i] = NULL;
+      }
+    }
+    j = 0;
+    while (sn[j]) j++;
+    i = j+1;
+    for (; i<Nstc; i++)
+    {
+      if (sn[i])
+      {
+	sn[j] = sn[i];
+	j++;
+      }
+    }
+    Nstc = Istc;
+  }
+}
+
+static ideal scIdKbase()
+{
+  polyset mm;
   ideal res;
-  a = scMult0Int(s, Q);
-  if (a <= 0)
-    return idInit(1,s->rank);
-  res = idInit(a,s->rank);
-  Kbase = res->m;
+  poly p, q = last;
+  int i = pLength(q);
+  res = idInit(i,1);
+  mm = res->m;
+  i = 0;
+  do
+  {
+    mm[i] = q;
+    i++;
+    p = pNext(q);
+    pNext(q) = NULL;
+    q = p;
+  } while (q);
+  return res;
+}
+
+extern ideal scKBase(int deg, ideal s, ideal Q)
+{
+  int  i, di;
+  poly p;
+
+  if (deg < 0)
+  {
+    di = scDimInt(s, Q);
+    if (di != 0)
+    {
+      Werror("KBase not finite");
+      return idInit(1,0);
+    }
+  }
+  stcmem = hCreate(pVariables - 1);
   hexist = hInit(s, Q, &hNexist);
-  count = 0;
+  p = last = pNew();
+  pNext(p) = NULL;
+  act = (scmon)Alloc((pVariables + 1) * sizeof(short));
+  *act = 0;
+  if (!hNexist)
+  {
+    scAll(pVariables, deg);
+    goto ende;
+  }
   if (!hisModule)
   {
-    hstc = hexist;
-    hNstc = hNexist;
-    p = pOne();
-    scInKbase(p, 1);
+    if (deg < 0) scInKbase(hexist, hNexist, pVariables);
+    else scDegKbase(hexist, hNexist, pVariables, deg);
   }
   else
   {
     hstc = (scfmon)Alloc(hNexist * sizeof(scmon));
     for (i = 1; i <= hisModule; i++)
     {
+      *act = i;
       hComp(hexist, hNexist, i, hstc, &hNstc);
       if (hNstc)
       {
-        p = pOne();
-        p->exp[0] = i;
-        scInKbase(p, 1);
+        if (deg < 0) scInKbase(hstc, hNstc, pVariables);
+        else scDegKbase(hstc, hNstc, pVariables, deg);
       }
+      else
+        scAll(pVariables, deg);
     }
     Free((ADDRESS)hstc, hNexist * sizeof(scmon));
   }
+ende:
   Free((ADDRESS)hexist, hNexist * sizeof(scmon));
-  return res;
+  Free((ADDRESS)act, (pVariables + 1) * sizeof(short));
+  hKill(stcmem, pVariables - 1);
+  pDelete1(&p);
+  if (p == NULL)
+    return idInit(1,0);
+  else
+  {
+    last = p;
+    return scIdKbase();
+  }
 }
+
 
 

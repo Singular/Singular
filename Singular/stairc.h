@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stairc.h,v 1.3 1997-04-09 12:20:13 Singular Exp $ */
+/* $Id: stairc.h,v 1.4 1997-10-15 07:58:54 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -19,7 +19,7 @@ int scMultInt(ideal  s,ideal Q=NULL);
 int scMult0Int(ideal  s,ideal Q=NULL);
 void scDegree(ideal  s,ideal Q=NULL);
 
-ideal scKBase(ideal  s, ideal Q=NULL);
+ideal scKBase(int deg, ideal  s, ideal Q=NULL);
 //void scHilbertPoly(ideal  s,ideal Q=NULL);
 //intvec *scHilbert(ideal  s,ideal Q=NULL);
 
@@ -33,4 +33,5 @@ void hPrintHilb(intvec *hseries);
 void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL);
 
 #endif
+
 

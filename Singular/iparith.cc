@@ -183,7 +183,7 @@ cmdnames cmds[] =
   { "intvec",      0, INTVEC_CMD ,        ROOT_DECL_LIST},
   { "jacob",       0, JACOB_CMD ,         CMD_1},
   { "jet",         0, JET_CMD ,           CMD_23},
-  { "kbase",       0, KBASE_CMD ,         CMD_1},
+  { "kbase",       0, KBASE_CMD ,         CMD_12},
   { "keepring",    0, KEEPRING_CMD ,      KEEPRING_CMD},
   { "kill",        0, KILL_CMD ,          KILL_CMD},
   { "killattrib",  0, KILLATTR_CMD ,      CMD_12},
@@ -1539,6 +1539,13 @@ static BOOLEAN jjJET_ID(leftv res, leftv u, leftv v)
   res->data = (char *)idJet((ideal)u->Data(),(int)v->Data());
   return FALSE;
 }
+static BOOLEAN jjKBASE2(leftv res, leftv u, leftv v)
+{
+  assumeStdFlag(u);
+  res->data = (char *)scKBase((int)v->Data(),
+                              (ideal)(u->Data()),currQuotient);
+  return FALSE;
+}
 static BOOLEAN jjKoszul(leftv res, leftv u, leftv v)
 {
   return mpKoszul(res, u,v);
@@ -2038,6 +2045,8 @@ struct sValCmd2 dArith2[]=
 ,{jjJET_ID,    JET_CMD,        IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjJET_P,     JET_CMD,        VECTOR_CMD,     VECTOR_CMD, INT_CMD PROFILER}
 ,{jjJET_ID,    JET_CMD,        MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
+,{jjKBASE2,    KBASE_CMD,      IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
+,{jjKBASE2,    KBASE_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
 ,{atKILLATTR2, KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD PROFILER}
 ,{jjKoszul,    KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    INT_CMD PROFILER}
 ,{jjKoszul_Id, KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    IDEAL_CMD PROFILER}
@@ -2448,7 +2457,7 @@ static BOOLEAN jjJACOB_P(leftv res, leftv v)
 static BOOLEAN jjKBASE(leftv res, leftv v)
 {
   assumeStdFlag(v);
-  res->data = (char *)scKBase((ideal)(v->Data()),currQuotient);
+  res->data = (char *)scKBase(-1,(ideal)(v->Data()),currQuotient);
   return FALSE;
 }
 static BOOLEAN jjKLAMMER_LIB(leftv res, leftv u)
