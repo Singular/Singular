@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.7 1999-07-28 08:22:16 wenk Exp $ */
+/* $Id: mpr_complex.h,v 1.8 1999-09-24 16:39:47 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -142,9 +142,9 @@ private:
   mpf_t t;
 };
 
-static const gmp_float  gmpOne= 1;
-static const gmp_float gmpMOne= -1;
-static const gmp_float gmpZero= 0;
+extern const gmp_float  gmpOne;
+extern const gmp_float gmpMOne;
+extern const gmp_float gmpZero;
 
 // <gmp_float> operator <gmp_float>
 inline gmp_float & gmp_float::operator += ( const gmp_float & a )

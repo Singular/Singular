@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.15 1999-07-28 08:22:15 wenk Exp $ */
+/* $Id: mpr_complex.cc,v 1.16 1999-09-24 16:39:47 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -37,6 +37,12 @@
 #define EXTRABYTES 4
 
 size_t gmp_output_digits= DEFPREC;
+
+int dummy=mmInit();
+const gmp_float  gmpOne= 1;
+const gmp_float gmpMOne= -1;
+const gmp_float gmpZero= 0;
+
 
 //-> setGMPFloat*
 /** Set size of mantissa to <bytes> bytes and guess the number of

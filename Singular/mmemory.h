@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.20 1999-08-18 09:18:44 obachman Exp $ */
+/* $Id: mmemory.h,v 1.21 1999-09-24 16:39:46 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -383,6 +383,7 @@ while(0)
 
 #ifdef __cplusplus
 }
+int mmInit();
 #endif
 
 
