@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.30 1998-05-06 14:44:57 schmidt Exp $
+@comment $Id: reference.doc,v 1.31 1998-05-08 07:48:12 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5173,10 +5173,9 @@ conditional execution of a block, only valid after an `if`.
   @}
   else
   @{
-    @dots{}
     "i is smaller than 6";
   @}
-  @expansion{} i is bigger than 5
+  @expansion{} i is smaller than 6
 @end example
 @end table
 @menu
@@ -5229,10 +5228,10 @@ converts a local variable to a global one.
 @item @strong{Purpose:}
 repetitive, conditional execution of a command block.
 @*The command init is executed first. Then boolean_expression is
-evaluated. If its value is TRUE the block is executed, otherwise the for
+evaluated. If its value is TRUE the block is executed, otherwise the @code{for}
 statement is complete. After each execution of the block, the command
 iterate is executed and boolean_expression is evaluated.
-@* @code{break;} leaves the innermost for construct.
+@* @code{break;} leaves the innermost @code{for} construct.
 @item @strong{Example:}
 @example
   // sum of 1 to 10:
