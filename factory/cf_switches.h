@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_switches.h,v 1.5 1997-09-08 10:43:01 schmidt Exp $ */
+/* $Id: cf_switches.h,v 1.6 1998-01-16 18:08:44 schmidt Exp $ */
 
 #ifndef INCL_CF_SWITCHES_H
 #define INCL_CF_SWITCHES_H
@@ -40,8 +40,8 @@ const int CFSwitchesMax = 10;
 //
 // void On ( int s )
 // void Off ( int s )
-// bool isOn ( int s )
-// bool isOff ( int s )
+// bool isOn ( int s ) const
+// bool isOff ( int s ) const
 //
 // On(), Off() - switch s on or off, resp.
 //
