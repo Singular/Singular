@@ -138,7 +138,7 @@
  */
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Link.c,v 1.2 1997-06-28 13:30:26 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Link.c,v 1.3 1998-10-14 10:18:11 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -289,7 +289,7 @@ MP_Link_pt MP_OpenLink(env, argc, argv)
     transp_dev = transp_to_num(transp);
 
     if ((tp_ops = IMP_GetTranspByName(env, transp_dev)) == NULL) {
-	msg = IMP_RawMemAllocFnc(strlen(transp) + 28);
+	msg = (char*) IMP_RawMemAllocFnc(strlen(transp) + 28);
         sprintf(msg, "Unknown transport device %s", transp);
         MP_LogEvent(link, MP_ERROR_EVENT, msg);
 	IMP_RawMemFreeFnc(msg);
@@ -297,7 +297,7 @@ MP_Link_pt MP_OpenLink(env, argc, argv)
     }
 
     if (tp_ops->transp_ops.open_transp(link, argc, argv) != MP_Success) {
-	msg = IMP_RawMemAllocFnc(strlen(transp) + 46);
+	msg = (char*) IMP_RawMemAllocFnc(strlen(transp) + 46);
         sprintf(msg, "MP_OpenLink: Couldn't open %s transport device",
                 transp);
         MP_LogEvent(link, MP_ERROR_EVENT, msg);
@@ -307,7 +307,7 @@ MP_Link_pt MP_OpenLink(env, argc, argv)
 
 #ifndef NO_LOGGING
     fprintf(env->logfd, "L%d: Application: %s\n", link->link_id, argv[0]);
-    msg = IMP_RawMemAllocFnc(strlen(transp) + 46);
+    msg = (char*) IMP_RawMemAllocFnc(strlen(transp) + 46);
     sprintf(msg, "MP_OpenLink: opened link for transport %s",
             transp);
     MP_LogEvent(link, MP_INIT_EVENT, msg);
@@ -385,6 +385,63 @@ void MP_CloseLink(link)
 
     return;
 }
+
+#ifdef __STDC__
+void MP_KillLink(MP_Link_pt link)
+#else
+void MP_KillLink(link)
+    MP_Link_pt link;
+#endif
+{
+    buffer_handle_pt cur_buff, old_buff;
+
+#ifdef MP_DEBUG
+    fprintf(stderr, "MP_KillLink: entering for link %d\n", link->link_id);
+#endif
+
+    if (link != NULL) {
+        if ((cur_buff = link->o_buff) == NULL)
+            return;
+
+      /* Check just in case the environment was released first. */
+      /* It shouldn't have been, but you never know.            */
+      if (link->env == NULL) {
+        fprintf(stderr, "MP_KillLink: NULL environment pointer!!\n");
+        return;
+      }
+
+
+        while (cur_buff != NULL) {
+            old_buff = cur_buff;
+            cur_buff = old_buff->next;
+            free_buffer(link->env->buff_pool, old_buff);
+        }
+
+        if ((cur_buff = link->i_buff) == NULL)
+            return;
+
+        while (cur_buff != NULL) {
+            old_buff = cur_buff;
+            cur_buff = old_buff->next;
+            free_buffer(link->env->buff_pool, old_buff);
+        }
+        link->transp.transp_ops->kill_transp(link);
+
+#ifndef NO_LOGGING
+        if (link->logmask & MP_LOG_INIT_EVENTS)
+            MP_LogEvent(link, MP_INIT_EVENT, "MP_KillLink: closed link\n");
+#endif
+
+        IMP_MemFreeFnc(link, sizeof(MP_Link_t));
+    }
+
+#ifdef MP_DEBUG
+    fprintf(stderr, "MP_KillLink: exiting\n");
+#endif
+
+    return;
+}
+
 
 
 /********************************************************************

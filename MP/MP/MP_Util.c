@@ -37,7 +37,7 @@
  **********************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Util.c,v 1.2 1998-04-16 16:17:06 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Util.c,v 1.3 1998-10-14 10:18:20 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -51,6 +51,23 @@ static char vcid[] = "@(#) $Id: MP_Util.c,v 1.2 1998-04-16 16:17:06 obachman Exp
 /* these are used in a bunch of places */
 char fix_log_msg[log_msg_len];
 char AnnotFlagsStr[32];
+
+#ifdef __STDC__
+char* IMP_StrDup(char* s)
+#else
+void IMP_StrDup(s)
+  char* s;
+#endif
+{
+  char* d = NULL;
+  
+  if (s != NULL)
+  {
+    d = (char*) IMP_RawMemAllocFnc(strlen(s) + 1);
+    strcpy(d, s);
+  }
+  return d;
+}
 
 #ifdef __STDC__
 void MP_LogEvent(MP_Link_pt link,

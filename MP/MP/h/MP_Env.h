@@ -52,6 +52,7 @@ typedef struct  {
     MP_Boolean_t (*get_status)VARARGS;      /* check status of the link    */
     MP_Status_t  (*open_transp)VARARGS;     /* open the transport device   */
     MP_Status_t  (*close_transp)VARARGS;    /* close the transport device  */
+    MP_Status_t  (*kill_transp)VARARGS;    /* kill the transport device  */
 } MP_TranspOps_t;
 
 

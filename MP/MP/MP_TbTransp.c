@@ -44,7 +44,7 @@
  *
  ***************************************************************************/
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_TbTransp.c,v 1.1.1.1 1997-05-25 20:31:47 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_TbTransp.c,v 1.2 1998-10-14 10:18:16 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -75,6 +75,7 @@ static MP_TranspOps_t tb_ops = {
   mp_tb_flush,
   mp_tb_get_status,
   mp_tb_open_connection,
+  mp_tb_close_connection,
   mp_tb_close_connection
 };
 

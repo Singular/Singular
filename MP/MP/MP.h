@@ -696,6 +696,7 @@ typedef struct  {
     MP_Boolean_t (*get_status)VARARGS;      /* check status of the link    */
     MP_Status_t  (*open_transp)VARARGS;     /* open the transport device   */
     MP_Status_t  (*close_transp)VARARGS;    /* close the transport device  */
+    MP_Status_t  (*kill_transp)VARARGS;    /* kill the transport device  */
 } MP_TranspOps_t;
 
 
@@ -861,6 +862,8 @@ EXTERN MP_Link_pt MP_OpenLink _ANSI_ARGS_((MP_Env_pt env, int argc,
 
 EXTERN void MP_CloseLink _ANSI_ARGS_((MP_Link_pt link));
 
+EXTERN void MP_KillLink _ANSI_ARGS_((MP_Link_pt link));
+
 EXTERN MP_Status_t MP_PeekHeader _ANSI_ARGS_((MP_Link_pt link,
                                               MP_NodeType_t *ntype,
                                               MP_DictTag_t *dtag,
@@ -967,12 +970,14 @@ EXTERN MP_Status_t reset_i_buff       _ANSI_ARGS_((MP_Link_pt link));
 
 #define log_msg_len 128
 
+EXTERN char *IMP_StrDup  _ANSI_ARGS_((char* s));
+
 EXTERN void MP_LogEvent _ANSI_ARGS_((MP_Link_pt link, char *event, char *msg));
 
 EXTERN MP_Status_t MP_SetError _ANSI_ARGS_((MP_Link_pt link, 
                                             MP_Status_t the_err));
 
-#define MP_ClearError(link) (link)->errno = MP_Success
+#define MP_ClearError(link) ((MP_Status_t) (link)->errno = MP_Success)
 
 EXTERN void MP_PrintError _ANSI_ARGS_((MP_Link_pt link));
 
@@ -1443,6 +1448,7 @@ MP_Boolean_t tcp_get_status _ANSI_ARGS_((MP_Link_pt, MP_LinkStatus_t));
 MP_Status_t tcp_init_transport _ANSI_ARGS_((MP_Link_pt));
 MP_Status_t tcp_open_connection _ANSI_ARGS_((MP_Link_pt, int, char**));
 MP_Status_t tcp_close_connection _ANSI_ARGS_((MP_Link_pt));
+MP_Status_t tcp_kill_connection _ANSI_ARGS_((MP_Link_pt));
 MP_Status_t open_tcp_connect_mode _ANSI_ARGS_((MP_Link_pt, int, char**));
 MP_Status_t open_tcp_listen_mode _ANSI_ARGS_((MP_Link_pt, int, char**));
 MP_Status_t open_tcp_launch_mode _ANSI_ARGS_((MP_Link_pt, int, char**));
@@ -1458,6 +1464,9 @@ typedef struct{
     char    *peerhost;
     char    *myhost;
     MP_LinkStatus_t status;
+    pid_t   peerpid;
+  char *rsh;
+  int mode;
 } MP_TCP_t;
 
 #endif

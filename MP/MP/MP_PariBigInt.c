@@ -113,7 +113,8 @@ long IMP_PariBigIntAsciiSize(MP_ApInt_t mp_number)
 
 char * IMP_PariBigIntToStr(MP_ApInt_t mp_number, char *buffer)
 {
-  return gitoascii((GEN) mp_number, buffer);
+//  return gitoascii((GEN) mp_number, buffer);
+  return "Can not print";
 }
 
 /* We do not really need any conversion functions. However, let's

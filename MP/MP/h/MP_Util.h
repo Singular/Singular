@@ -36,12 +36,14 @@
 
 #define log_msg_len 128
 
+EXTERN char *IMP_StrDup  _ANSI_ARGS_((char* s));
+
 EXTERN void MP_LogEvent _ANSI_ARGS_((MP_Link_pt link, char *event, char *msg));
 
 EXTERN MP_Status_t MP_SetError _ANSI_ARGS_((MP_Link_pt link, 
                                             MP_Status_t the_err));
 
-#define MP_ClearError(link) (link)->errno = MP_Success
+#define MP_ClearError(link) ((MP_Status_t) (link)->errno = MP_Success)
 
 EXTERN void MP_PrintError _ANSI_ARGS_((MP_Link_pt link));
 

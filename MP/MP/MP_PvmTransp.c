@@ -53,7 +53,7 @@
  ****************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_PvmTransp.c,v 1.1.1.1 1997-05-25 20:31:47 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_PvmTransp.c,v 1.2 1998-10-14 10:18:15 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -85,6 +85,7 @@ MP_TranspOps_t pvm_ops = {
   mp_pvm_flush,
   mp_pvm_get_status,
   mp_pvm_open_connection,
+  mp_pvm_close_connection,
   mp_pvm_close_connection
 };
 

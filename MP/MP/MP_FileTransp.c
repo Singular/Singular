@@ -45,7 +45,7 @@
 
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_FileTransp.c,v 1.1.1.1 1997-05-25 20:31:46 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_FileTransp.c,v 1.2 1998-10-14 10:18:10 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -89,6 +89,7 @@ MP_TranspOps_t file_ops = {
     file_flush,
     file_get_status,
     file_open_connection,
+    file_close_connection,
     file_close_connection
 };
 

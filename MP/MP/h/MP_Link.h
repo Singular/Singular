@@ -94,6 +94,8 @@ EXTERN MP_Link_pt MP_OpenLink _ANSI_ARGS_((MP_Env_pt env, int argc,
 
 EXTERN void MP_CloseLink _ANSI_ARGS_((MP_Link_pt link));
 
+EXTERN void MP_KillLink _ANSI_ARGS_((MP_Link_pt link));
+
 EXTERN MP_Status_t MP_PeekHeader _ANSI_ARGS_((MP_Link_pt link,
                                               MP_NodeType_t *ntype,
                                               MP_DictTag_t *dtag,

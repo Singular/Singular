@@ -80,6 +80,7 @@ ay Exp $";
 #include "MP.h"
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #ifdef __WIN32__
 
@@ -103,6 +104,7 @@ static char log_msg[log_msg_len];  /* for event logging */
 static MP_Status_t tcp_negotiate_word_order _ANSI_ARGS_((MP_Link_pt));
 static MP_Status_t tcp_negotiate_fp_format _ANSI_ARGS_((MP_Link_pt));
 static MP_Status_t tcp_negotiate_bigint_format _ANSI_ARGS_((MP_Link_pt));
+static MP_Status_t tcp_exchange_pids _ANSI_ARGS_((MP_Link_pt));
 static int get_tcp_mode _ANSI_ARGS_((int, char**));
 
 #ifdef __WIN32__
@@ -116,7 +118,8 @@ MP_TranspOps_t tcp_ops = {
     tcp_flush,
     tcp_get_status,
     tcp_open_connection,
-    tcp_close_connection
+    tcp_close_connection,
+    tcp_kill_connection
 };
 
 
@@ -212,7 +215,7 @@ static char* strdup_replace(str, replace_this, replace_by_that)
       (sub = strstr(str, replace_this)) != NULL &&
       replace_by_that != NULL)
   {
-    ret = IMP_RawMemAllocFnc((strlen(str)  
+    ret = (char*) IMP_RawMemAllocFnc((strlen(str)  
                               + strlen(replace_by_that) - strlen(replace_this)
                               + 1)*sizeof(char));
     strcpy(ret, str);
@@ -456,6 +459,8 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
     rsh_argv[0] = IMP_GetCmdlineArg(argc, argv, "-MPrsh");
     if (rsh_argv[0] == NULL)
       rsh_argv[0] = MP_RSH_COMMAND;
+    tcp_rec->rsh = IMP_StrDup(rsh_argv[0]);
+
     rsh_argv[1] = IMP_GetCmdlineArg(argc, argv, "-MPhost");
     rsh_argv[2] = "-n";
     /* Let's not be too strict, and allow an empty -MPhost argument */
@@ -535,6 +540,8 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
 
     rsh_argv[3] = appstr;
     rsh_argv[4] = NULL;
+    if (tcp_rec->peerhost == NULL) 
+      tcp_rec->peerhost = IMP_StrDup(rsh_argv[1]);
 
     if ((rsh_pid = vfork()) == -1) {
         MP_LogEvent(link, MP_ERROR_EVENT,
@@ -1314,6 +1321,7 @@ MP_Status_t tcp_init_transport(link)
     tcp_rec->myhost   = NULL;
     tcp_rec->peerhost = NULL;
     tcp_rec->status   = MP_UnknownStatus;
+    tcp_rec->rsh      = NULL;
 
     link->transp.private1 = (char *)tcp_rec;
 
@@ -1360,6 +1368,8 @@ MP_Status_t tcp_close_connection(link)
         IMP_RawMemFreeFnc(tcp_rec->myhost);
     if (tcp_rec->peerhost != NULL)
         IMP_RawMemFreeFnc(tcp_rec->peerhost);
+    if (tcp_rec->rsh != NULL)
+        IMP_RawMemFreeFnc(tcp_rec->rsh);
     IMP_MemFreeFnc(tcp_rec, sizeof(MP_TCP_t));
     link->transp.private1 = NULL;
 
@@ -1371,8 +1381,59 @@ MP_Status_t tcp_close_connection(link)
     RETURN_OK(link);
 }
 
+#ifdef __STDC__
+MP_Status_t tcp_kill_connection(MP_Link_pt link)
+#else
+MP_Status_t tcp_kill_connection(link)
+    MP_Link_pt link;
+#endif
+{
+    MP_TCP_t *tcp_rec;
+    char *rsh_argv[4];
+    char rsh_kill[20];
+    int fork_pid = -1;
+    
+#ifdef MP_DEBUG
+    fprintf(stderr, "tcp_kill_connection: entering\n");
+    fflush(stderr);
+#endif /* MP_DEBUG */
 
+    TEST_LINK_NULL(link);
+    if (link->transp.private1 == NULL)
+        return MP_SetError(link, MP_NullTransport);
+    tcp_rec = (MP_TCP_t*)link->transp.private1;
+    
+    if (tcp_rec->mode == MP_LAUNCH_MODE)
+    {
+      rsh_argv[0] = tcp_rec->rsh;
+      rsh_argv[1] = tcp_rec->peerhost;
+      rsh_argv[2] = "-n";
+      sprintf(rsh_kill, "kill -9 %d", tcp_rec->peerpid);
+      rsh_argv[3] = rsh_kill;
+      rsh_argv[4] = NULL;
 
+      if ((fork_pid = vfork()) == -1)
+      {
+        MP_LogEvent(link, MP_ERROR_EVENT,
+                    "MP_OpenLink: can't fork to kill application");
+        return MP_SetError(link, MP_Failure);
+      }
+
+      if (! fork_pid)
+      {
+        execvp(rsh_argv[0], rsh_argv);
+        fputs("tcp_kill_connectione: execvp failed - bailing out\n", stderr);
+        fflush(stderr);
+        _exit(1);
+      }
+    }
+    else if (tcp_rec->mode == MP_FORK_MODE)
+    {
+      kill(tcp_rec->peerpid, SIGKILL);
+    }
+    
+    return tcp_close_connection(link);
+}
 
 /***********************************************************************
  * FUNCTION:  tcp_open_connection
@@ -1411,7 +1472,9 @@ MP_Status_t tcp_open_connection(link, argc, argv)
     if (tcp_init_transport(link) != MP_Success)
         return MP_Failure;
 
-    switch (get_tcp_mode(argc, argv)) {
+    ((MP_TCP_t *)link->transp.private1)->mode = get_tcp_mode(argc, argv);
+    switch (((MP_TCP_t *)link->transp.private1)->mode)
+    {
     case MP_LISTEN_MODE:
         status = open_tcp_listen_mode(link, argc, argv);
         if (status != MP_Success)
@@ -1459,6 +1522,7 @@ MP_Status_t tcp_open_connection(link, argc, argv)
     ERR_CHK(tcp_negotiate_word_order(link));
     ERR_CHK(tcp_negotiate_fp_format(link));
     ERR_CHK(tcp_negotiate_bigint_format(link));
+    ERR_CHK(tcp_exchange_pids(link));
 
 #ifdef MP_DEBUG
     fprintf(stderr, "tcp_open_connection: exiting\n");
@@ -1469,7 +1533,26 @@ MP_Status_t tcp_open_connection(link, argc, argv)
 }
 
 
+#ifdef __STDC__
+static MP_Status_t tcp_exchange_pids(MP_Link_pt link)
+#else
+static MP_Status_t tcp_exchange_pids(link)
+    MP_Link_pt link;
+#endif
+{
+  MP_Uint32_t peerpid;
+  MP_NumAnnot_t na;
 
+  /* Hmm... should communicate pid_t -- could be 64 bit !! */
+  ERR_CHK(MP_PutUint32Packet(link, (MP_Uint32_t) getpid(), 0));
+  MP_EndMsgReset(link);
+  
+  ERR_CHK(MP_SkipMsg(link));
+  ERR_CHK(MP_GetUint32Packet(link, &peerpid, &na));
+  ((MP_TCP_t *)link->transp.private1)->peerpid = peerpid;
+
+  return MP_Success;
+}
 
 /*
  * Currently this is a canned routine.  There is little parsing.  It

@@ -80,6 +80,7 @@ MP_Boolean_t tcp_get_status _ANSI_ARGS_((MP_Link_pt, MP_LinkStatus_t));
 MP_Status_t tcp_init_transport _ANSI_ARGS_((MP_Link_pt));
 MP_Status_t tcp_open_connection _ANSI_ARGS_((MP_Link_pt, int, char**));
 MP_Status_t tcp_close_connection _ANSI_ARGS_((MP_Link_pt));
+MP_Status_t tcp_kill_connection _ANSI_ARGS_((MP_Link_pt));
 MP_Status_t open_tcp_connect_mode _ANSI_ARGS_((MP_Link_pt, int, char**));
 MP_Status_t open_tcp_listen_mode _ANSI_ARGS_((MP_Link_pt, int, char**));
 MP_Status_t open_tcp_launch_mode _ANSI_ARGS_((MP_Link_pt, int, char**));
@@ -95,6 +96,9 @@ typedef struct{
     char    *peerhost;
     char    *myhost;
     MP_LinkStatus_t status;
+    pid_t   peerpid;
+  char *rsh;
+  int mode;
 } MP_TCP_t;
 
 #endif
