@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.11 1997-11-13 08:31:24 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.12 1997-11-21 10:40:16 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -97,7 +97,7 @@ int ftestPrintResultFlag = 0;
 //   `ftestPrintResultFlag' to be external.
 // ftestExecName, ftestAlgorithmName: set by ftestSetName(), read
 //   by output routines.  Name of executable and algorithm.
-// ftestUsage: set by ftestSetName(), read by ftestUsage().
+// ftestUsage: set by ftestSetName(), read by ftestUsagePrint().
 //   Algorithm-specific usage information.
 // ftestEnv: factory environment specification.  Set by
 //   ftestGetEnv(), read by ftestPrintEnv() function.  This
@@ -597,6 +597,8 @@ ftestSkipBlancs ( const char * string )
 //
 // Prints error message consisting of formatString and following
 // arguments, some additional information, and exits with errno.
+// In case of an `CheckError', does not exit but returns to the
+// caller.
 //
 //}}}
 void
@@ -604,7 +606,10 @@ ftestError ( const ftestErrorT errno, const char * format ... )
 {
     // print error message
     if ( format ) {
-	fprintf( stderr, "%s: ", ftestExecName );
+	if ( errno != CheckError )
+	    fprintf( stderr, "%s: ", ftestExecName );
+	else
+	    fprintf( stderr, "%s(CheckError): ", ftestExecName );
 	va_list ap;
 	va_start( ap, format );
 	vfprintf( stderr, format, ap );
@@ -615,9 +620,12 @@ ftestError ( const ftestErrorT errno, const char * format ... )
     case CommandlineError:
     case EnvSyntaxError: 
     case CanFormSpecError:
-    case FileError:
-	// ftestUsage();
+	ftestUsagePrint();
 	break;
+    case FileError:
+	break;
+    case CheckError:
+	return;
     case TimeoutError:
 	if ( ftestPrintTimingFlag )
 	    ftestPrint( "time  : > %.2f\n", "> %.2f\n", (float)ftestAlarm );
@@ -631,6 +639,31 @@ ftestError ( const ftestErrorT errno, const char * format ... )
 	    ftestPrint( "check : Sig.%0.2d\n", "Sig.%0.2d\n", (int)errno-(int)SignalError );
     }
     exit( errno );
+}
+//}}}
+
+//{{{ void ftestUsagePrint ( const char * additionalUsage )
+//{{{ docu
+//
+// ftestUsagePrint() - print usage message to stderr.
+//
+// We use the static variable `ftestUsage' to do so.  If
+// `additionalUsage' is non-zero, we print it after
+// `ftestUsage', otherwise some short reference where to find
+// more information.
+//
+//}}}
+void
+ftestUsagePrint ( const char * additionalUsage )
+{
+    cerr << ftestUsage << flush;
+    if ( ! additionalUsage )
+	cerr << "
+For a descriptions of the features common to all programs of the
+Factory Test Environment, call `feval -?' (exactly in this way).
+" << endl;
+    else
+	cerr << additionalUsage << endl;
 }
 //}}}
 
