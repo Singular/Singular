@@ -182,6 +182,7 @@ typedef enum MPT_Errors
   MPT_WrongUnionDiscriminator,
   MPT_ViolatedAssumption,
   MPT_NotExternalData,
+  MPT_WrongApIntFormat,
   MPT_MaxError
 } MPT_Errors;
 
@@ -202,7 +203,7 @@ extern char* MPT_LinkErrorStr(MP_Link_pt link, MPT_Status_t error);
 /* For Debugging, it is more convenient to have the following defined
    as functions. This way, we can easily set a breakpoints there. */
 extern MPT_Status_t MPT_SetError(MPT_Status_t error);
-extern void MPT_ClearError();
+extern MPT_Status_t MPT_ClearError();
 extern void MPT_Assume(MP_Boolean_t value);
 #else
 #define MPT_SetError(error) MPT_errno = (error)
@@ -266,24 +267,86 @@ extern MPT_Status_t MPT_PutTypespecedArg(MP_Link_pt link, MPT_Arg_t arg,
  * 
  ***************************************************************/
 
-extern void MPT_InitCpyApInt(MPT_Arg_t *dest, MPT_Arg_t src);
-extern void MPT_InitCpyApReal(MPT_Arg_t *dest, MPT_Arg_t src);
-extern void MPT_DeleteApInt(MPT_Arg_t arg);
-extern void MPT_DeleteApReal(MPT_Arg_t arg);
-extern MPT_Status_t MPT_GetApInt(MP_Link_pt link, MPT_Arg_t *arg);
-extern MPT_Status_t MPT_GetApReal(MP_Link_pt link, MPT_Arg_t *arg);
-extern MPT_Status_t MPT_PutApInt(MP_Link_pt link, MPT_Arg_t arg);
-extern MPT_Status_t MPT_PutApReal(MP_Link_pt link, MPT_Arg_t arg);
+extern MPT_Status_t MPT_Init(MP_Env_pt env);
+extern int  MPT_GetApIntFormat();
+extern void (*MPT_InitCopyApInt)(MPT_Arg_t *dest, MPT_Arg_t src);
+extern void (*MPT_DeleteApInt)(MPT_Arg_t apint);
+extern void MPT_InitCopyApReal(MPT_Arg_t *dest, MPT_Arg_t src);
+extern void MPT_DeleteApReal(MPT_Arg_t apreal);
+MPT_Status_t MPT_GetApInt(MP_Link_pt link, MPT_Arg_t *arg);
+MPT_Status_t MPT_PutApInt(MP_Link_pt link, MPT_Arg_t arg);
+MPT_Status_t MPT_GetApReal(MP_Link_pt link, MPT_Arg_t *apreal);
+MPT_Status_t MPT_PutApReal(MP_Link_pt link, MPT_Arg_t arg);
 
 /*************************************************************** 
  * 
  * From MPT_Misc.c
  * 
  ***************************************************************/
+inline MP_Boolean_t MPT_IsNode(MPT_Node_pt node,
+                               MP_NodeType_t type,
+                               MP_DictTag_t dict)
+{
+  return (node->type == type && node->dict == dict);
+}
 
-extern MPT_Annot_pt MPT_FindAnnot(MPT_Node_pt node, MP_DictTag_t dict,
-                                  MP_AnnotType_t atype);
-extern MPT_Tree_pt MPT_GetProtoTypespec(MPT_Node_pt node);
+inline MP_Boolean_t MPT_IsNode(MPT_Node_pt node,
+                               MP_NodeType_t type,
+                               MP_DictTag_t dict,
+                               MP_Common_t  cvalue)
+{
+  return (node->type == type && node->dict == dict &&
+          MP_COMMON_T(node->nvalue) == cvalue);
+}
+
+inline MP_Boolean_t MPT_IsNode(MPT_Node_pt node,
+                               MP_NodeType_t type,
+                               MP_DictTag_t dict,
+                               MP_Common_t  cvalue,
+                               MP_NumChild_t nc)
+{
+  return (node->type == type && node->dict == dict &&
+           MP_COMMON_T(node->nvalue) == cvalue && node->numchild == nc);
+}
+
+inline MPT_Annot_pt MPT_Annot(MPT_Node_pt node, MP_DictTag_t dict,
+                              MP_AnnotType_t atype)
+/* Searches for annot of type atype and dicionary tag dict in annots
+   attached to node. If one is found, then the first one is
+   returned, otherwise, NULL is returned */
+{
+  MP_NumAnnot_t numannot;
+  MP_Uint32_t i;
+  MPT_Annot_pt *annots, an;
+
+  MPT_Assume(node != NULL);
+
+  numannot = node->numannot;
+  if (numannot == 0) return NULL;
+
+  annots = node->annots;
+  MPT_Assume(annots != NULL);
+
+  for (i=0; i<numannot; i++)
+  {
+    an = annots[i];
+    if (an->type == atype && an->dict == dict) return an;
+  }
+
+  return NULL;
+}
+
+inline MPT_Tree_pt MPT_AnnotValue(MPT_Node_pt node, MP_DictTag_t dict,
+                                  MP_AnnotType_t atype)
+{
+  MPT_Annot_pt annot = MPT_Annot(node, dict, atype);
+  if (annot != NULL && annot->value != NULL)
+    return annot->value;
+  return NULL;
+}
+
+#define MPT_ProtoAnnotValue(node) \
+  MPT_AnnotValue(node, MP_ProtoDict, MP_AnnotProtoPrototype)
 
 extern void MPT_MoveAnnots(MPT_Node_pt from, MPT_Node_pt to);
 extern void MPT_RemoveAnnot(MPT_Node_pt node,

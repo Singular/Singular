@@ -45,21 +45,28 @@ DEFS		= @DEFS@
 ## file sets
 ##
 
-SRCS = MPT_Tree.c MPT_Error.c MPT_ExternalData.c MPT_Misc.c \
-       MPT_ApNumber.c MPT_Get.c MPT_Put.c MPT_TreeManips.c \
-       MPT_PolyManips.c MPT_PutPoly.c MPT_GetPoly.c
+SRCS = MPT_Tree.cc MPT_Error.cc MPT_ExternalData.cc MPT_Misc.cc \
+       MPT_ApNumber.cc MPT_Get.cc MPT_Put.cc MPT_TreeManips.cc \
+       MPT_PolyManips.cc MPT_PutPoly.cc MPT_GetPoly.cc \
+       GP_IsOk.cc MPT_GP.cc
+
 OBJS = MPT_Tree.o MPT_Error.o MPT_ExternalData.o MPT_Misc.o \
        MPT_ApNumber.o MPT_Get.o MPT_Put.o MPT_TreeManips.o \
-       MPT_PolyManips.o MPT_PutPoly.o MPT_GetPoly.o 
+       MPT_PolyManips.o MPT_PutPoly.o MPT_GetPoly.o \
+       GP_IsOk.o MPT_GP.o
 
-DISTFILES = ${SRCS} MPT.h Makefile.in
+DISTFILES = ${SRCS} MPT.h Makefile.in GP.h MPT_GP.h
 
 .SUFFIXES:
-.SUFFIXES: .c .o 
-.c.o: ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h
+.SUFFIXES: .cc .o 
+
+.cc.o: ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h MPT.h 
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $<
 
+
 all: libMPT.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h Makefile
+
+GP_IsOk.o MPT_GP.o: MPT_GP.h GP.h
 
 libMPT.a:  $(OBJS) ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h MPT.h Makefile
 	rm -f $@
@@ -98,7 +105,7 @@ Makefile: Makefile.in
 	cd ..; rm -f Makefile; ${MAKE} Makefile
 
 TAGS:
-	etags *.c *.h
+	etags *.cc *.h
 
 dist:
 	rm -f MPT.tar*
@@ -108,5 +115,5 @@ dist:
 depend:	
 	$(CC) -MM $(CPPFLAGS) $(DEFS) $(SRCS) >> Makefile
 
-test: test.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) test.c -o test -L$(libdir) -lMPT -lMP -lgmp
+test: test.cc
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) test.cc -o test -L$(libdir) -lMPT -lMP -lgmp
