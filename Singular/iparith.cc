@@ -2183,11 +2183,6 @@ static BOOLEAN jjBAREISS_IM(leftv res, leftv v)
   res->data = (char *)m;
   return FALSE;
 }
-//static BOOLEAN jjBETTI_R(leftv res, leftv v)
-//{
-//  res->data=(char *)syBettiOfComputation((syStrategy)v->Data());
-//  return FALSE;
-//}
 static BOOLEAN jjCALL1MANY(leftv res, leftv u)
 {
   return iiExprArithM(res,u,iiOp);
@@ -2236,11 +2231,6 @@ static BOOLEAN jjCOUNT_IV(leftv res, leftv v)
   res->data = (char *)((intvec*)(v->Data()))->length();
   return FALSE;
 }
-//static BOOLEAN jjCOUNT_R(leftv res, leftv v)
-//{
-//  res->data=(char *)syLength((syStrategy)v->Data());
-//  return FALSE;
-//}
 static BOOLEAN jjDEG(leftv res, leftv v)
 {
   int dummy;
@@ -2312,11 +2302,6 @@ static BOOLEAN jjDIM(leftv res, leftv v)
   res->data = (char *)scDimInt((ideal)(v->Data()),currQuotient);
   return FALSE;
 }
-//static BOOLEAN jjDIM_R(leftv res, leftv v)
-//{
-//  res->data = (char *)syDim((syStrategy)v->Data());
-//  return FALSE;
-//}
 static BOOLEAN jjDUMP(leftv res, leftv v)
 {
   si_link l = (si_link)v->Data();
@@ -2526,11 +2511,6 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   return FALSE;
 #endif
 }
-//static BOOLEAN jjMINRES_R(leftv res, leftv v)
-//{
-//  res->data=(char *)syMinimize((syStrategy)v->Data());
-//  return FALSE;
-//}
 static BOOLEAN jjMONITOR1(leftv res, leftv v)
 {
   monitor((char *)(v->Data()),PROT_I);
@@ -2989,22 +2969,22 @@ static BOOLEAN jjidMinEmbedding(leftv res, leftv v)
 }
 static BOOLEAN jjBETTI_R(leftv res, leftv v)
 {
-  res->data = (char *)BETTI_R((resolvente)v->Data());
+  res->data=(char *)syBettiOfComputation((syStrategy)v->Data());
   return FALSE;
 }
 static BOOLEAN jjCOUNT_R(leftv res, leftv v)
 {
-  res->data = (char *)COUNT_R((resolvente)v->Data());
+  res->data=(char *)syLength((syStrategy)v->Data());
   return FALSE;
 }
 static BOOLEAN jjDIM_R(leftv res, leftv v)
 {
-  res->data = (char *)DIM_R((resolvente)v->Data());
+  res->data = (char *)syDim((syStrategy)v->Data());
   return FALSE;
 }
 static BOOLEAN jjMINRES_R(leftv res, leftv v)
 {
-  res->data = (char *)MINRES_R((resolvente)v->Data());
+  res->data=(char *)syMinimize((syStrategy)v->Data());
   return FALSE;
 }
 #else
