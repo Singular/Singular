@@ -1108,11 +1108,13 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
 	  c->misses[j_pos]--;
         }
         for(int z=0;z<j;z++){
+	  if(c->rep[z]!=z) continue;
           if (c->states[j][z]==UNCALCULATED){
             c->states[j][z]=UNIMPORTANT;
           }
         }
         for(int z=j+1;z<i;z++){
+	  if(c->rep[z]!=z) continue;
           if (c->states[z][j]==UNCALCULATED){
             c->states[z][j]=UNIMPORTANT;
           }
@@ -1316,6 +1318,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 	  {
 	    PrintS("b");
 	    sec_copy=kBucketClear(P.bucket);
+	    sec_copy=redTailShort(sec_copy, strat);
 	    kBucketInit(P.bucket,pCopy(sec_copy),pLength(sec_copy));
 	  }
 	  else
@@ -1458,7 +1461,17 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 }
 
 
-
+static poly redTailShort(poly h, kStrategy strat){
+  
+  int sl=strat->sl;
+  int i;
+  int len;
+  for(i=0;i<=strat->sl;i++){
+    if(strat->lenS[i]>2)
+      break;
+  }
+  return(redNFTail(h,i-1,strat, len));
+}
 
 
 

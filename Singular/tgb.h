@@ -122,4 +122,5 @@ static BOOLEAN state_is(calc_state state, const int & i, const int & j, calc_dat
 static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, calc_dat* c);
 static void sort_pair_in(int i, int j,calc_dat* c);
 static int pair_better_gen(const void* ap,const void* bp);
+static poly redTailShort(poly h, kStrategy strat);
 #endif
