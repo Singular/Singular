@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.45 1998-05-13 12:59:59 wichmann Exp $
+@comment $Id: reference.doc,v 1.46 1998-05-14 13:28:16 anne Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -33,6 +33,14 @@
 @node Functions, Control structures, Functions and system variables, Functions and system variables
 @section Functions
 @cindex Functions
+
+The general syntax of a function is
+@* [target =] function_name (<arguments>);
+@* If no target is specified, the result is printed.
+
+In some cases (e.g. @code{execute, export, keepring, setring, type})
+the brackets are optional. In the syntax of the commands @code{help},
+@code{LIB} and @code{kill} no brackets are allowed. 
 
 @ifinfo
 @*List of all supported functions.
@@ -167,7 +175,7 @@
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-displays the attribute list of the @emph{name}.
+displays the attribute list of the object called @emph{name}.
 @item @strong{Example:}
 @example
 @c example
@@ -247,7 +255,7 @@ value of type int is the multiplicity (see @ref{mult})
 @c * Expressions::
 @c @end menu
 @c @iftex
-@c See @ref{Expressions}.
+@c See @ref{Expressions}, @ref{killattrib}.
 @c @end iftex
 @c ---------------------------------------
 @node bareiss, betti, attrib, Functions
@@ -262,7 +270,8 @@ matrix
 @item @strong{Purpose:}
 applies Bareiss' algorithm to a matrix.
 
-Result is a lower triangular matrix.
+Result is a lower triangular matrix. The first entry in the diagonal is 
+also the determinant of the matrix.
 @item @strong{Example:}
 @example
 @c example
@@ -280,7 +289,7 @@ Result is a lower triangular matrix.
 * matrix expressions::
 @end menu
 @iftex
-See @ref{matrix}; @ref{matrix expressions}.
+See @ref{det}; @ref{matrix}; @ref{matrix expressions}.
 @end iftex
 @c ---------------------------------------
 @node betti, char, bareiss, Functions
@@ -345,13 +354,15 @@ of the graded Betti numbers.)
 @end table
 @menu
 * res::
+* lres::
 * mres::
 * sres::
 * print::
 * list expressions::
+* resolution::
 @end menu
 @iftex
-See @ref{res}; @ref{mres}; @ref{sres}; @ref{print}; @ref{list expressions}.
+See @ref{res}; @ref{lres}; @ref{mres}; @ref{sres}; @ref{print}; @ref{list expressions}; @ref{resolution}.
 @end iftex
 @c ---------------------------------------
 @node char, char_series, betti, Functions
@@ -372,6 +383,13 @@ returns the characteristic of the coefficient field of a ring.
   char(r);
   ring s= 0,(x,y),dp;
   char(s);
+  ring rp=(49,a),(x,y),dp;
+  char(rp);
+  ring rr=real,x,dp;
+  char(rr);
+  ring ra=(5,a),(x,y),dp;
+  minpoly=a^2+1;
+  char(ra);  
 @c example
 @end example
 @end table
@@ -494,6 +512,9 @@ returns the description of the coefficient field of a ring.
   ring r= (32003,a),(x,y),dp;
   char(r);
   charstr(r);
+  ring s=real,x,dp;
+  char(r);
+  charstr(r);
 @c example
 @end example
 @end table
@@ -520,6 +541,8 @@ same as the input type
 @item @strong{Purpose:}
 multiplies a polynomial/vector by a suitable constant to cancel
 all denominators from its coefficients and then divide it by its content.
+@item @strong{Note:}
+
 @item @strong{Example:}
 @example
 @c example
@@ -549,7 +572,6 @@ none
 closes a link.
 @item @strong{Example:}
 @example
-  LIB "general.lib";
   link l="MPtcp:launch";
   open(l); // start SINGULAR "server" on localhost in batchmode
   close(l); // shut down SINGULAR server
@@ -561,7 +583,7 @@ closes a link.
 * open::
 @end menu
 @iftex
-See @ref{link}, @ref{link}; @ref{open}.
+See @ref{link}, @ref{open}.
 @end iftex
 @c ---------------------------------------
 @node coef, coeffs, close, Functions
@@ -571,10 +593,12 @@ See @ref{link}, @ref{link}; @ref{open}.
 @table @code
 @item @strong{Syntax:}
 @code{coef (} poly_expression@code{,} product_of_ringvars @code{)}
-@*@code{coef (} vector_expression@code{,} product_of_ringvars@code{,} matrix_name@code{,} matrix_name @code{)}
 @item @strong{Type:}
-matrix in the first case
-@*none in the second case
+matrix 
+@item @strong{Syntax:}
+@code{coef (} vector_expression@code{,} product_of_ringvars@code{,} matrix_name@code{,} matrix_name @code{)}
+@item @strong{Type:}
+none 
 @item @strong{Purpose:}
 determines the monomials in f occurring in m, where f is the first argument
 and m the second argument.
@@ -738,7 +762,7 @@ where A and B are the multiexponents of the ring variables represented by x.
 * ideal expressions::
 @end menu
 @iftex
-See @ref{diff}; @ref{ideal expressions}.
+See @ref{diff}; @ref{ideal expressions}; @ref{matrix}.
 @end iftex
 @c ---------------------------------------
 @node dbprint, defined, contract, Functions
@@ -966,10 +990,12 @@ See @ref{matrix expressions}.
 @*@code{diff (} ideal_expression@code{,} ring_variable @code{)}
 @*@code{diff (} module_expression@code{,} ring_variable @code{)}
 @*@code{diff (} matrix_expression@code{,} ring_variable @code{)}
-@*@code{diff (} ideal_expression@code{,} ideal_expression @code{)}
 @item @strong{Type:}
 the same as the type of the first argument
-respective matrix for diff (ideal_expression, ideal_expression )
+@item @strong{Syntax:}
+@code{diff (} ideal_expression@code{,} ideal_expression @code{)}
+@item @strong{Type:}
+matrix 
 @item @strong{Purpose:}
 computes the partial derivative of a polynomial object by a ring variable
 (first forms)
