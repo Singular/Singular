@@ -356,7 +356,7 @@ fi
 if test "$ac_cv_sizeof_double" != 8; then
   AC_MSG_ERROR(need double to b 8 bytes long)
 fi
-if test "$ac_cv_sizeof_voidp" != 4 && "$ac_cv_sizeof_voidp" != 8; then
+if test "$ac_cv_sizeof_voidp" != 4 && test "$ac_cv_sizeof_voidp" != 8; then
   AC_MSG_ERROR(need void* to be 4 or 8 bytes long)
 fi
 
