@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.12 1999-06-21 16:46:35 Singular Exp $ */
+/* $Id: algmap.cc,v 1.13 1999-08-10 12:15:46 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -116,6 +116,7 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
     }
     if (s==0)
     {
+      pGetCoeff(q0)=(number)Alloc0(sizeof(rnumber));
       naGetNom0(pGetCoeff(q0)) = b0;
       return pAdd(res, q0);
     }
