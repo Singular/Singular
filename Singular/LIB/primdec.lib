@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.28 1998-10-26 16:21:36 obachman Exp $
+// $Id: primdec.lib,v 1.29 1998-11-04 14:39:44 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.28 1998-10-26 16:21:36 obachman Exp $";
+version="$Id: primdec.lib,v 1.29 1998-11-04 14:39:44 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -682,7 +682,6 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
 }
 example
 { "EXAMPLE:"; echo=2;
-   LIB "primdec.lib";
    ring  r = 32003,(x,y,z),lp;
    ideal i1=x*(x+1),yz,(z+1)*(z-1);
    ideal i2=xy,yz,(x-2)*(x+3);
@@ -1308,7 +1307,6 @@ EXAMPLE: example clearSB; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   LIB "primdec.lib";
    ring  r = (0,a,b),(x,y,z),dp;
    ideal i=ax2+y,a2x+y,bx;
    list l=1,2,1;
@@ -1657,7 +1655,6 @@ example
    poly  p = z2+1;
    poly  q = z4+2;
    ideal i = p^2*q^3,(y-z3)^3,(x-yz+z4)^4;
-   LIB "primdec.lib";
    list pr= minAssPrimes(i);
    pr;
    pr= minAssPrimes(i,1);
@@ -2499,7 +2496,6 @@ example
    poly  p = z2+1;
    poly  q = z4+2;
    ideal i = p^2*q^3,(y-z3)^3,(x-yz+z4)^4;
-   LIB "primdec.lib";
    list pr= decomp(i);
    pr;
    testPrimary( pr, i);
