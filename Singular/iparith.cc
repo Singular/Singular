@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.217 2000-07-06 13:30:02 pohl Exp $ */
+/* $Id: iparith.cc,v 1.218 2000-07-11 12:28:44 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1458,6 +1458,20 @@ static BOOLEAN jjCOEFFS_Id(leftv res, leftv u, leftv v)
   res->data=(char *)mpCoeffs((ideal)u->CopyD(),i);
   return FALSE;
 }
+static BOOLEAN jjCOEFFS2_KB(leftv res, leftv u, leftv v)
+{
+  poly p = pInit();
+  int i;
+  
+  for (i=1; i<=pVariables; i++)
+  {
+    pSetExp(p, i, 1);
+  }
+  res->data = (void*)idCoeffOfKBase((ideal)(u->Data()),
+                                    (ideal)(v->Data()), p);
+  pDelete(&p);
+  return FALSE;
+}
 static BOOLEAN jjCONTRACT(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idDiffOp((ideal)u->Data(),(ideal)v->Data(),FALSE);
@@ -2281,6 +2295,8 @@ struct sValCmd2 dArith2[]=
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD PROFILER}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD PROFILER}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD PROFILER}
+,{jjCOEFFS2_KB,COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD, PROFILER}
+,{jjCOEFFS2_KB,COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  MODUL_CMD, PROFILER}
 ,{jjCONTRACT,  CONTRACT_CMD,   MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjDEG_IV,    DEG_CMD,        INT_CMD,        POLY_CMD,   INTVEC_CMD PROFILER}
 ,{lDelete,     DELETE_CMD,     LIST_CMD,       LIST_CMD,   INT_CMD PROFILER}
