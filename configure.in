@@ -58,7 +58,8 @@ test "x$bindir" = 'x${exec_prefix}/bin' && \
    ac_configure_args="$ac_configure_args --bindir=${bindir}"
 
 # construct name of installed Singular executable
-export SINGULAR=${bindir}/Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}
+SINGULAR=${bindir}/Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}
+export SINGULAR
 AC_SUBST(SINGULAR)
 
 # expand libdir
