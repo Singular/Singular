@@ -53,8 +53,6 @@ clean distclean mostlyclean maintainer-clean: uninstall
 
 ##############################################################
 # some extra targets for the specific packages
-${SINGULAR} :
-	${MAKE} install
 
 Singular factory libfac MP gmp:
 	cd $@; ${MAKE} all
