@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.66 2001-09-25 16:07:29 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.67 2001-09-27 13:13:03 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -983,7 +983,6 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
 #ifdef HAVE_NAMESPACES
 BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
 {
-  list_cmd(0,"all","// ",TRUE);
   idhdl h=(idhdl)v->data;
   if(h==NULL)
   {
@@ -991,7 +990,7 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
     return FALSE;
   }
   package rootpack = IDPACKAGE(roothdl);
-  Print("iiInternalExport('%s',%d,%s) typ:%d\n", v->name, toLev, IDID(roothdl),v->Typ());
+  //Print("iiInternalExport('%s',%d,%s) typ:%d\n", v->name, toLev, IDID(roothdl),v->Typ());
 #if 0
   if( (IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
   {
@@ -1039,15 +1038,14 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
       else
       {
         PrintS("not found:\n");
-        list_cmd(0,"all","// ",TRUE);
+        //list_cmd(0,"all","// ",TRUE);
         return TRUE;
-      }       
+      }
     }
     h->next=rootpack->idroot;
     rootpack->idroot=h;
   }
   IDLEV(h)=toLev;
-        list_cmd(0,"all","// ",TRUE);
   return FALSE;
 }
 #endif /* HAVE_NAMESAPCES */
@@ -1083,7 +1081,7 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
       else
       {
         return TRUE;
-      }       
+      }
     }
     h->next=rootpack->idroot;
     rootpack->idroot=h;

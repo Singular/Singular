@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.90 2001-09-25 16:07:28 Singular Exp $ */
+/* $Id: iplib.cc,v 1.91 2001-09-27 13:13:03 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -421,6 +421,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     namespaceroot->push(namespaceroot->root->pack, "Top", myynest+1);
     //printf("iiMake_proc: staying in TOP-LEVEL\n");
   }
+  procstack->push(currRing,currRingHdl,pi->procname);
 #else /* HAVE_NAMESPACES */
   omFree((ADDRESS)plib);
   if(pi->is_static && myynest==0)
@@ -579,6 +580,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 #ifdef HAVE_NAMESPACES
   if(ns != NULL)  namespaceroot->push(IDPACKAGE(ns), IDID(ns), myynest+1);
   else            namespaceroot->push(namespaceroot->root->pack, "Top", myynest+1);
+  procstack->push(currRing,currRingHdl,example);
 #else /* HAVE_NAMESPACES */
   procstack->push(currRing,currRingHdl,example);
 #endif /* HAVE_NAMESPACES */
