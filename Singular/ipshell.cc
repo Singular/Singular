@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.95 2005-01-24 15:04:39 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.96 2005-02-03 17:52:26 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1447,19 +1447,173 @@ idhdl rFindHdl(ring r, idhdl n, idhdl w)
   return NULL;
 }
 
+void rDecomposeCF(leftv h,const ring r,const ring R)
+{
+  lists L=(lists)omAlloc0Bin(slists_bin);
+  L->Init(4);
+  h->rtyp=LIST_CMD;
+  h->data=(void *)L;
+  // 0: char/ cf - ring
+  // 1: list (var)
+  // 2: list (ord)
+  // 3: qideal
+  // ----------------------------------------
+  // 0: char/ cf - ring
+  L->m[0].rtyp=INT_CMD;
+  L->m[0].data=(void *)r->ch;
+  // ----------------------------------------
+  // 1: list (var)
+  lists LL=(lists)omAlloc0Bin(slists_bin);
+  LL->Init(r->N);
+  int i;
+  for(i=0; i<r->N; i++)
+  {
+    LL->m[i].rtyp=STRING_CMD;
+    LL->m[i].data=(void *)omStrDup(r->names[i]);
+  }
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
+  // ----------------------------------------
+  // 2: list (ord)
+  LL=(lists)omAlloc0Bin(slists_bin);
+  i=rBlocks(r)-1;
+  LL->Init(i);
+  i--;
+  lists LLL;
+  for(; i>=0; i--)
+  {
+    intvec *iv;
+    int j;
+    LL->m[i].rtyp=LIST_CMD;
+    LLL=(lists)omAlloc0Bin(slists_bin);
+    LLL->Init(2);
+    LLL->m[0].rtyp=STRING_CMD;
+    LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
+    if (r->block1[i]-r->block0[i] >=0 )
+    {
+      j=r->block1[i]-r->block0[i];
+      iv=new intvec(j+1);
+      if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
+      {
+        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j];
+      }
+      else switch (r->order[i])
+      {
+        case ringorder_dp:
+        case ringorder_Dp:
+        case ringorder_ds:
+        case ringorder_Ds:
+        case ringorder_lp:
+          for(;j>=0; j--) (*iv)[j]=1;
+          break;
+        default: /* do nothing */;
+      }
+    }
+    else
+    {
+      iv=new intvec(1);
+    }
+    LLL->m[1].rtyp=INTVEC_CMD;
+    LLL->m[1].data=(void *)iv;
+    LL->m[i].data=(void *)LLL;
+  }
+  L->m[2].rtyp=LIST_CMD;
+  L->m[2].data=(void *)LL;
+  // ----------------------------------------
+  // 3: qideal
+  L->m[3].rtyp=IDEAL_CMD;
+  if (R->minpoly==NULL)
+    L->m[3].data=(void *)idInit(1,1);
+  else
+  {
+    ideal I=idInit(1,1);
+    L->m[3].data=(void *)I;
+    I->m[0]=pOne();
+    pSetCoeff(I->m[0],R->minpoly);
+  }
+  // ----------------------------------------
+}
+void rDecomposeC(leftv h,const ring R)
+{
+  lists L=(lists)omAlloc0Bin(slists_bin);
+  L->Init(4);
+  h->rtyp=LIST_CMD;
+  h->data=(void *)L;
+  // 0: char/ cf - ring
+  // 1: list (var)
+  // 2: list (ord)
+  // 3: qideal
+  // ----------------------------------------
+  // 0: char/ cf - ring
+  L->m[0].rtyp=INT_CMD;
+  L->m[0].data=(void *)R->ch;
+  // ----------------------------------------
+  // 1: list (var)
+  lists LL=(lists)omAlloc0Bin(slists_bin);
+  LL->Init(1);
+    LL->m[0].rtyp=STRING_CMD;
+    LL->m[0].data=(void *)omStrDup(R->parameter[0]);
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
+  // ----------------------------------------
+  // 2: list (ord)
+  LL=(lists)omAlloc0Bin(slists_bin);
+  LL->Init(1);
+  lists LLL;
+  {
+    intvec *iv;
+    int j;
+    LL->m[0].rtyp=LIST_CMD;
+    LLL=(lists)omAlloc0Bin(slists_bin);
+    LLL->Init(2);
+    LLL->m[0].rtyp=STRING_CMD;
+    LLL->m[0].data=(void *)omStrDup("lp");
+    {
+      iv=new intvec(1);
+      for(;j>=0; j--) (*iv)[0]=1;
+    }
+    LLL->m[1].rtyp=INTVEC_CMD;
+    LLL->m[1].data=(void *)iv;
+    LL->m[0].data=(void *)LLL;
+  }
+  L->m[2].rtyp=LIST_CMD;
+  L->m[2].data=(void *)LL;
+  // ----------------------------------------
+  // 3: qideal
+  L->m[3].rtyp=IDEAL_CMD;
+  {
+    ideal I=idInit(1,1);
+    L->m[3].data=(void *)I;
+    //I->m[0]=pOne();
+    //pSetCoeff(I->m[0],R->minpoly);
+  }
+  // ----------------------------------------
+}
+
 lists rDecompose(ring r)
 {
   // 0: char/ cf - ring
   // 1: list (var)
   // 2: list (ord)
   // 3: qideal
+  // possibly:
+  // 4: C
+  // 5: D
   lists L=(lists)omAlloc0Bin(slists_bin);
-  L->Init(4);
+  if (rIsPluralRing(r))
+    L->Init(6);
+  else
+    L->Init(4);
   // ----------------------------------------
   // 0: char/ cf - ring
-  #if 0 /* TODO */
+  #if 1 /* TODO */
   if (rIsExtension(r))
-    rDecomposeCF(&(L->m[0]),r);
+  {
+    if (rField_is_long_C(r))
+      rDecomposeC(&(L->m[0]),r);
+    else
+      rDecomposeCF(&(L->m[0]),r->algring,r);
+  }
   else
   #endif
   {
@@ -1532,16 +1686,33 @@ lists rDecompose(ring r)
   else
     L->m[3].data=(void *)idCopy(r->qideal);
   // ----------------------------------------
+  #ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+    L->m[4].rtyp=MATRIX_CMD;
+    L->m[4].data=(void *)mpCopy(r->nc->C);
+    L->m[5].rtyp=MATRIX_CMD;
+    L->m[5].data=(void *)mpCopy(r->nc->D);
+  }
+  #endif
   return L;
 }
 
 ring rCompose(lists  L)
 {
-  if (L->nr!=3) return NULL;
+  if ((L->nr!=3)
+#ifdef HAVE_PLURAL
+  &&(L->nr!=5)
+#endif
+  )
+    return NULL;
   // 0: char/ cf - ring
   // 1: list (var)
   // 2: list (ord)
   // 3: qideal
+  // possibly:
+  // 4: C
+  // 5: D
   ring R=(ring) omAlloc0Bin(sip_sring_bin);
   if (L->m[0].Typ()==INT_CMD)
   {
@@ -1722,6 +1893,16 @@ ring rCompose(lists  L)
 
   // todo
   rComplete(R);
+
+  // ---------------------------------------------------------------
+  #ifdef HAVE_PLURAL
+  if (L->nr==5)
+  {
+    if (nc_CallPlural((matrix)L->m[4].Data(),(matrix)L->m[5].Data(),
+        NULL,NULL,R))
+      goto rCompose_err;
+  }
+  #endif
   return R;
 
 rCompose_err:
