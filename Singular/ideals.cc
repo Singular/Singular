@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.103 2000-09-18 09:19:01 obachman Exp $ */
+/* $Id: ideals.cc,v 1.104 2000-09-20 13:00:10 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1386,7 +1386,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     {
       if (s_h3->m[j] != NULL)
       {
-        if (pMinComp(s_h3->m[j],syz_ring) > k)
+        if (p_MinComp(s_h3->m[j],syz_ring) > k)
           pShift(&s_h3->m[j], -k);
         else
           pDelete(&s_h3->m[j]);
@@ -1407,7 +1407,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   {
     if (s_h3->m[j] != NULL)
     {
-      if (pMinComp(s_h3->m[j],syz_ring) <= k)
+      if (p_MinComp(s_h3->m[j],syz_ring) <= k)
       {
         e->m[j] = s_h3->m[j];
         isMonomial=isMonomial && (pNext(s_h3->m[j])==NULL);
@@ -1539,7 +1539,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   i = 0;
   for (j=0; j<IDELEMS(s_h3); j++)
   {
-    if ((s_h3->m[j] != NULL) && (pMinComp(s_h3->m[j],syz_ring) <= k))
+    if ((s_h3->m[j] != NULL) && (p_MinComp(s_h3->m[j],syz_ring) <= k))
     {
       i++;
       q = s_h3->m[j];
