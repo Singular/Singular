@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.2 2000-02-18 13:33:48 krueger Exp $ */
+/* $Id: makefile.cc,v 1.3 2000-03-28 07:14:25 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -55,6 +55,9 @@ void mod_create_makefile(moddefv module)
   fprintf(fp, "\nOBJS\t= %s.o", module->name);
   for(i=0; i<module->filecnt; i++)
     fprintf(fp, " %s", object_name(cf[i].filename));
+  fprintf(fp, "\nDOBJS\t= %s.og", module->name);
+  for(i=0; i<module->filecnt; i++)
+    fprintf(fp, " %s", object_name(cf[i].filename));
 
   fprintf(fp, "\n\n");
   build_compile_section(fp, module);
@@ -77,6 +80,7 @@ void build_head_section(
   fprintf(fp, "CC\t= gcc\n");
   fprintf(fp, "CXX\t= gcc\n");
   fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I../../include\n");
+  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I../../include\n");
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "libdir          = %s\n", LIBDIR);
@@ -92,7 +96,7 @@ void build_clean_section(
   )
 {
   fprintf(fp, "clean:\n");
-  fprintf(fp, "\trm -f *.o *.lo *.so* *.sl *.la *~ core\n\n");
+  fprintf(fp, "\trm -f *.o *.og *.lo *.so* *.sl *.la *~ core\n\n");
   
   fprintf(fp, "distclean: clean\n");
   fprintf(fp, "\trm -f %s.cc %s.h Makefile\n\n", module->name, module->name);
@@ -132,10 +136,13 @@ void build_compile_section(
   moddefv module
   )
 {
-  fprintf(fp, "all:\t%s.so\n", module->name);
+  fprintf(fp, "all:\t%s.so %s_g.so \n", module->name, module->name);
   fprintf(fp, "\n");
   fprintf(fp, "%%.o: %%.cc Makefile\n");
   fprintf(fp, "\t${CC} ${CFLAGS} -c -fPIC -DPIC $< -o $*.o\n");
+  fprintf(fp, "\n");
+  fprintf(fp, "%%.og: %%.cc Makefile\n");
+  fprintf(fp, "\t${CC} ${DCFLAGS} -c -fPIC -DPIC $< -o $*.og\n");
   fprintf(fp, "\n");
   
   fprintf(fp, "%s.so: ${OBJS}\n", module->name);
@@ -146,6 +153,16 @@ void build_compile_section(
   fprintf(fp, "\trm -f %s.so\n", module->name);
   fprintf(fp, "\tln -s %s.so.%d.%d.%d %s.so\n", module->name, module->major,
           module->minor, module->level, module->name);
+  fprintf(fp, "\n");
+
+  fprintf(fp, "%s_g.so: ${DOBJS}\n", module->name);
+  fprintf(fp, "\t${CC} ${DCFLAGS} -shared -Wl,-soname -Wl,%s_g.so.%d \\\n",
+          module->name, module->major);
+  fprintf(fp, "\t\t-o %s_g.so.%d.%d.%d ${DOBJS}\n", module->name,
+          module->major, module->minor, module->level);
+  fprintf(fp, "\trm -f %s_g.so\n", module->name);
+  fprintf(fp, "\tln -s %s_g.so.%d.%d.%d %s_g.so\n", module->name, 
+          module->major, module->minor, module->level, module->name);
   fprintf(fp, "\n");
 }
 #endif /* ix86_Linux */
