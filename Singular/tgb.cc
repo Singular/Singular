@@ -1979,7 +1979,7 @@ void tgb_matrix::mult_row(int row,number factor){
 void tgb_matrix::free_row(int row, BOOLEAN free_non_zeros){
   int i;
   for(i=0;i<columns;i++)
-    if((free_non_zeros)||(nIsZero(n[row][i])))
+    if((free_non_zeros)||(!(nIsZero(n[row][i]))))
       nDelete(&(n[row][i]));
   omfree(n[row]);
   n[row]=NULL;
@@ -2272,13 +2272,18 @@ static void go_on_F4 (calc_dat* c){
 
   qsort(done, done_index,sizeof(poly),pLmCmp_func);
   pos=0;
+  //Print("Done_index:%i",done_index);
+  if(done_index>0)
+    pTest(done[0]);
   for(i=1;i<done_index;i++)
   {
+    pTest(done[i]);
     if((!(pLmEqual(done[i],done[pos]))))
       done[++pos]=done[i];
     else pDelete(&(done[i]));
   }
-  done_index=pos+1;
+  if(done_index>0)
+    done_index=pos+1;
 #ifdef TGB_DEBUG
   for(i=0;i<done_index;i++)
     pTest(done[i]);
@@ -2319,7 +2324,8 @@ static void go_on_F4 (calc_dat* c){
 	m[++pos]=m[i];
       else pDelete(&(m[i]));
     }
-    m_index=pos;
+    if(m_index>1)
+      m_index=pos+1;
     if(done_size<done_index+m_index)
     {
       done_size=done_index+2*m_index;
@@ -2340,6 +2346,15 @@ static void go_on_F4 (calc_dat* c){
     for(i=0;i<m_index;i++)
     {
       BOOLEAN in_done=FALSE;
+      pTest(m[i]);
+#ifdef TGB_DEBUG
+      int j;
+      for(j=0;j<done_index;j++)
+      {
+	Print("%i %i\n",j,i);
+	pTest(done[j]);
+      }
+#endif
       pos=posInPolys (done, done_index, m[i],c);
       if(((done_index>pos)&&(pLmEqual(m[i],done[pos]))) ||(pos>0) &&(pLmEqual(m[i],done[pos-1])))
 	in_done=TRUE;
@@ -2397,6 +2412,12 @@ static void go_on_F4 (calc_dat* c){
       }
     }
     qsort(done, done_index,sizeof(poly),pLmCmp_func);
+#ifdef TGB_DEBUG
+    for(i=0;i<done_index;i++)
+    {
+      pTest(done[i]);
+    }
+#endif
   }
   omfree(m);
   omfree(q);
