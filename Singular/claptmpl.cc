@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.12 1998-01-27 14:05:56 pohl Exp $
+// $Id: claptmpl.cc,v 1.13 1998-04-06 12:24:19 schmidt Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -66,6 +66,7 @@
 
       template int tmax ( const int&, const int& );
       template int tmin ( const int&, const int& );
+      template int tabs ( const int& );
     #endif
 
   #endif
