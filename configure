@@ -2168,11 +2168,16 @@ if test -d textutils; then
 fi
 if test -d emacs; then
   SUBDIRS="$SUBDIRS emacs"
+  BUILD_SUBDIRS="$BUILD_SUBDIRS emacs"
+fi
+if test -d Texi2html; then
+  SUBDIRS="$SUBDIRS Texi2html"
+  BUILD_SUBDIRS="$BUILD_SUBDIRS Texi2html"
 fi
   
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:2176: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:2181: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2197,6 +2202,7 @@ else
   echo "$ac_t""no" 1>&6
   SET_MAKE="MAKE=${MAKE-make}"
 fi
+
 
 
 
@@ -2383,6 +2389,7 @@ s%@MAKEINFO@%$MAKEINFO%g
 s%@TEXINDEX@%$TEXINDEX%g
 s%@SET_MAKE@%$SET_MAKE%g
 s%@SUBDIRS@%$SUBDIRS%g
+s%@BUILD_SUBDIRS@%$BUILD_SUBDIRS%g
 s%@CONFIG_SUBDIRS@%$CONFIG_SUBDIRS%g
 s%@subdirs@%$subdirs%g
 

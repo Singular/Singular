@@ -664,6 +664,11 @@ if test -d textutils; then
 fi
 if test -d emacs; then
   SUBDIRS="$SUBDIRS emacs"
+  BUILD_SUBDIRS="$BUILD_SUBDIRS emacs"
+fi
+if test -d Texi2html; then
+  SUBDIRS="$SUBDIRS Texi2html"
+  BUILD_SUBDIRS="$BUILD_SUBDIRS Texi2html"
 fi
   
 
@@ -672,6 +677,7 @@ dnl Enough -- wrap it up
 dnl
 AC_PROG_MAKE_SET
 AC_SUBST(SUBDIRS)
+AC_SUBST(BUILD_SUBDIRS)
 AC_SUBST(CONFIG_SUBDIRS)
 AC_CONFIG_SUBDIRS($CONFIG_SUBDIRS) 
 
