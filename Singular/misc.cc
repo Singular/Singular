@@ -26,6 +26,12 @@
 #include "timer.h"
 #include "intvec.h"
 #include "ring.h"
+
+#include "static.h"
+#ifdef HAVE_STATIC
+#undef HAVE_DYN_RL
+#endif
+
 #define SI_DONT_HAVE_GLOBAL_VARS
 
 //#ifdef HAVE_LIBPARSER
@@ -579,6 +585,8 @@ char * versionString()
   #else
     #ifdef HAVE_FEREAD
               StringAppendS("emulated readline,");
+    #else
+              StringAppendS("fgets,");
     #endif
   #endif
 #endif
