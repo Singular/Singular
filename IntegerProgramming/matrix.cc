@@ -182,7 +182,7 @@ matrix::matrix(const matrix& A)
   {
     H=new BigIntP[_kernel_dimension];
     for(short k=0;k<_kernel_dimension;k++)
-      H[k]=new (BigInt)[columns];
+      H[k]=new BigInt[columns];
     for(short k=0;k<_kernel_dimension;k++)
       for(short j=0;j<columns;j++)
         H[k][j]=(A.H)[k][j];
