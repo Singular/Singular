@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.20 2002-01-19 18:13:14 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.21 2002-01-19 18:39:03 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -131,6 +131,7 @@ static omBin macoeffBin = omGetSpecBin(sizeof(macoeff_s));
 mapoly maMonomial_Create(poly p, ring r_p, sBucket_pt bucket = NULL)
 {
   mapoly mp = (mapoly) omAlloc0Bin(mapolyBin);
+  //p_wrp(p,r_p);printf(" (%x) created\n",mp);
   mp->src = p;
   p->next = NULL;
 
@@ -164,8 +165,8 @@ void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r = NULL)
         assume(dest_r != NULL);
         p_Delete(&(mp->dest), dest_r);
       }
-      omFreeBin(mp, mapolyBin);
     }
+    omFreeBin(mp, mapolyBin);
   }
 }
 
@@ -187,7 +188,6 @@ mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r)
   Top:
   p_LmCmpAction(iter->src, what->src, src_r, goto Equal, goto Greater, goto Smaller);
   
-
   Greater:
   if (iter->next == NULL)
   {
