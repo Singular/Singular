@@ -1,7 +1,7 @@
-# $Id: Makefile.in,v 1.1.1.1 1997-05-02 17:00:43 Singular Exp $
+# $Id: Makefile.in,v 1.2 1997-05-05 13:44:19 obachman Exp $
 #################################################
 SHELL		= /bin/sh
-RM		= -rm -f
+RM		= rm -f
 #################################################
 TARGETNAME		= @targetname@
 LIBFACVERSION		= @libfacversion@
@@ -19,6 +19,7 @@ prefix 		= @prefix@
 exec_prefix	= @exec_prefix@
 libdir 		= @libdir@
 includedir	= @includedir@
+templatedir	= ${includedir}/templates
 
 ## 
 ## various programs
@@ -36,7 +37,7 @@ MKINSTALLDIRS	= @MKINSTALLDIRS@
 ##
 CXXFLAGS	= @CXXFLAGS@
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
-CPPFLAGS	= @CPPFLAGS@ -I${srcdir}
+CPPFLAGS	= -I${srcdir} @CPPFLAGS@ 
 DEFS		= @DEFS@ 
 LDFLAGS		= @LDFLAGS@
 LIBS		= @LIBS@
@@ -58,6 +59,8 @@ CHARSETSRC = 	$(CHARSETSRC1)
 FACTORINCL =	factor/Factor.h factor/MVMultiHensel.h factor/Truefactor.h \
 		factor/tmpl_inst.h factor/SqrFree.h factor/helpstuff.h \
 		factor/debug.h factor/timing.h factor/homogfactor.h
+FACTORTEMPL =	factor/class.h factor/class.cc factor/tmpl_inst.h
+
 CHARSETINCL =	charset/csutil.h charset/charset.h charset/reorder.h
 
 OPTFACTOROBJ1 =	OPTOBJ/SqrFree.o OPTOBJ/Factor.o OPTOBJ/MVMultiHensel.o \
@@ -136,14 +139,20 @@ libsingfac-g.a:	$(DEBFACTOROBJ1) $(DEBCHARSETOBJ)
 install:	all
 	${MKINSTALLDIRS} ${includedir}
 	${MKINSTALLDIRS} ${libdir}
+	${MKINSTALLDIRS} ${templatedir}
 	${INSTALL_DATA} ${LIBFACINCLUDE} ${includedir}
 	${INSTALL_PROGRAM} ${TARGETNAME}.a ${libdir}
-
+	for TEMPL in ${FACTORTEMPL}; do \
+		${INSTALL_DATA} $${TEMPL} ${templatedir}; \
+	done
 
 uninstall: 
 	$(RM) ${includedir}/${LIBFACINCLUDE}
 	$(RM) ${libdir}/${LIBFACNAME}.a
 	$(RM) ${libdir}/${SINGLIBFACNAME}.a
+	for TEMPL in ${FACTORTEMPL}; do \
+		$(RM) ${templatedir}/$${TEMPL}; \
+	done
 
 mostlyclean:
 	$(RM)	test ${LIBFACNAME}.a ${SINGLIBFACNAME}.a \
