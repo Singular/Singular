@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $ */
+/* $Id: ring.h,v 1.2 2003-12-10 16:56:54 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -280,4 +280,12 @@ void rSetWeightVec(ring r, int *);
 
 lists rDecompose(ring r);
 ring rCompose(lists  L);
+/////////////////////////////
+// Auxillary functions
+//
+
+BOOLEAN rCheckIV(intvec *iv);
+int rTypeOfMatrixOrder(intvec * order);
+void rDelete(ring r);
+
 #endif

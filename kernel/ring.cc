@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.2 2003-12-10 16:28:03 Singular Exp $ */
+/* $Id: ring.cc,v 1.3 2003-12-10 16:56:54 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -62,7 +62,7 @@ const char * rSimpleOrdStr(int ord)
 }
 
 // unconditionally deletes fields in r
-static void rDelete(ring r);
+void rDelete(ring r);
 // set r->VarL_Size, r->VarL_Offset, r->VarL_LowIndex
 static void rSetVarL(ring r);
 // get r->divmask depending on bits per exponent
@@ -148,7 +148,7 @@ ring rDefault(int ch, int N, char **n)
 //
 
 // check intvec, describing the ordering
-static BOOLEAN rCheckIV(intvec *iv)
+BOOLEAN rCheckIV(intvec *iv)
 {
   if ((iv->length()!=2)&&(iv->length()!=3))
   {
@@ -158,7 +158,7 @@ static BOOLEAN rCheckIV(intvec *iv)
   return FALSE;
 }
 
-static int rTypeOfMatrixOrder(intvec * order)
+int rTypeOfMatrixOrder(intvec * order)
 {
   int i=0,j,typ=1;
   int sz = (int)sqrt((double)(order->length()-2));
@@ -360,7 +360,7 @@ void rWrite(ring r)
   }
 }
 
-static void rDelete(ring r)
+void rDelete(ring r)
 {
   int i, j;
 
