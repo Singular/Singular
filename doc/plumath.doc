@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.16 2004-03-12 17:10:08 levandov Exp $
+@comment $Id: plumath.doc,v 1.17 2004-03-12 17:20:15 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -602,6 +602,12 @@ Y. Drozd and V. Kirichenko.
      A SINGULAR Introduction to Commutative Algebra.
    Springer, 2002
 
+@item 
+@c BGV
+ Bueso, J.; Gomez Torrecillas, J.; Verschoren, A.
+   Algorithmic methods in non-commutative algebra. Applications to quantum groups.
+   Kluwer Academic Publishers, 2003
+
 @item
 @c Kr  Book
  Kredel, H. 
@@ -652,8 +658,8 @@ J. Apel.
 @c{BachS:98} InCollection
 O. Bachmann and H. Sch@"onemann.
    Monomial operations for computations of Gr@"obner bases.
-  In   Reports On Computer Algebra 18. Centre for Computer Algebra,
-Preprint 18,in Reports on Computer Algebra,  University of Kaiserslautern, January (1998)
+  In   Reports On Computer Algebra 18. Centre for Computer Algebra, 
+University of Kaiserslautern (1998)
  
 
 @item
