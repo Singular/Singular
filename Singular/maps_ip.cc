@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps_ip.cc,v 1.4 2004-04-06 15:14:26 Singular Exp $ */
+/* $Id: maps_ip.cc,v 1.5 2004-04-08 21:12:25 levandov Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -267,7 +267,6 @@ poly pSubstPoly(poly p, int var, poly image)
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
-    WarnS("not implemented: only substitution only by a monomial");
     return pSubst(pCopy(p),var,image);
   }
 #endif
@@ -306,7 +305,6 @@ ideal  idSubstPoly(ideal id, int n, poly e)
     int k=MATROWS((matrix)id)*MATCOLS((matrix)id);
     ideal res=(ideal)mpNew(MATROWS((matrix)id),MATCOLS((matrix)id));
     res->rank = id->rank;
-    WarnS("not implemented: only substitution only by a monomial");
     for(k--;k>=0;k--)
     {
       res->m[k]=pSubst(pCopy(id->m[k]),n,e);
