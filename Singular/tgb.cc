@@ -2279,6 +2279,8 @@ void tgb_matrix::add_lambda_times_row(int add_to,int summand,number factor){
   }
 }
 void tgb_matrix::mult_row(int row,number factor){
+  if (nIsOne(factor))
+    return;
   int i;
   for(i=0;i<columns;i++){
     if(!(nIsZero(n[row][i])))
