@@ -1,11 +1,14 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: canonicalform.h,v 1.3 1997-03-26 16:28:31 schmidt Exp $
+// $Id: canonicalform.h,v 1.4 1997-04-07 14:54:53 schmidt Exp $
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/03/26 16:28:31  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.2  1996/07/15 08:32:46  stobbe
 "new function linearSystemSolve
 "
@@ -20,12 +23,13 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif /* NOSTREAMIO */
 
 #include "cf_defs.h"
-
 #include "variable.h"
 #include "templates/list.h"
 #include "templates/array.h"

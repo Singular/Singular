@@ -1,14 +1,21 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_chinese.cc,v 1.1 1996-12-05 18:24:52 schmidt Exp $
+// $Id: cf_chinese.cc,v 1.2 1997-04-07 14:57:58 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/12/05 18:24:52  schmidt
+``Unconditional'' check-in.
+Now it is my turn to develop factory.
+
 Revision 1.0  1996/05/17 10:59:43  stobbe
 Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "canonicalform.h"
 
@@ -42,10 +49,3 @@ void chineseRemainder( const CFArray & x, const CFArray & q, CanonicalForm & xne
     xnew = X[x.min()];
     qnew = Q[q.min()];
 }
-
-
-
-
-
-
-

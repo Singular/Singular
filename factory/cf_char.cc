@@ -1,8 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_char.cc,v 1.4 1996-07-08 08:12:23 stobbe Exp $
+// $Id: cf_char.cc,v 1.5 1997-04-07 14:57:12 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1996/07/08 08:12:23  stobbe
+"setCharacteristic: Now resets the pascal triangle in the case that the
+                   characteristic changes
+"
+
 Revision 1.3  1996/06/24 11:25:45  stobbe
 "setCharacteristic: minor bug fix, index correction
 "
@@ -20,7 +25,10 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "imm.h"
