@@ -202,6 +202,7 @@ displayHNE(hne);
 displayHNE(hne[3],1);
 kill displayring;
 kill HNEring;
+kill i;
 setring F3;
 reddevelop((x3-xy4+y6)*(x2+y2)*(x4-x3y+xy3+y4));
 setring F3;
@@ -235,16 +236,29 @@ kill HNEring;
 // ------------ test of extdevelop: -------------------
 setring r;
 list hne=develop(x2+y3+y4-y5,-1);
-extdevelop(hne,2);
-extdevelop(hne,4);
-extdevelop(hne,10);
+show(extdevelop(hne,2));
+show(extdevelop(hne,4));
+show(extdevelop(hne,10));
 kill r;
 ring r=(49,i),(x,y),ls;
 list hne=develop((x2+iy3)^7+x15);
-extdevelop(hne,8);
+show(extdevelop(hne,8));
+// ------------ test of HNdevelop: --------------------
+kill hne;
+// list hne=HNdevelop((x2+iy3)^7+x15);  // laeuft derzeit (27.5.99) wegen einem
+// show(extdevelop(hne[1],8));          // Fehler in factorize endlos!
+list hne=HNdevelop((x2+iy3)^6+x15);     // Als Ersatz fuer die Zwischenzeit
+show(hne);
 kill r;
-// ------------ test of param: ------------------------
+ring r=(0,i),(a,b),dp;
+minpoly=i2+1;
+list hne=HNdevelop(a2+ib3-ia3b);
+show(hne);
+kill r;
 ring r=0,(x,y),dp;
+show(HNdevelop((x3+3x2y-xy4+y10)*(x3-x2y+y8)));
+// ------------ test of param: ------------------------
+setring r;
 param(develop(x+1+y2));
 param(develop(x2+y3));
 param(develop(y2+x3));
@@ -280,6 +294,14 @@ displayInvariants(hne[1]);
 displayInvariants(hne[2]);
 displayInvariants(hne);
 kill HNEring;
+// ------------ test of is_irred: ---------------------
+setring r;
+is_irred(x);
+is_irred(x2);
+is_irred((x+y)*(1+x+y));  // one HNE
+is_irred((x+y)*(x+y+xy)); // one of two HNEs found
+is_irred(x2+y2);          // no HNE found
+is_irred(1+x+y);          // not a curve
 // ----------------------------------------------------------------------------
 // ------- test of invariants, intersection, stripHNE, puiseux2generators,  ---
 // -------         multiplicities, newtonpoly                               ---
@@ -293,7 +315,7 @@ setring r;
 multiplicities(develop(x5+y7));
 example newtonpoly;
 // ------- test of getnm, T_Transform, T1_Transform, T2_Transform, koeff, -----
-// -------  redleit, squarefree, allsquarefree, set_list, referencepoly   -----
+// ------------  redleit, squarefree, allsquarefree, referencepoly   ----------
 example getnm;
 T_Transform(y2+x3,1,2);
 T1_Transform(y-x2+x3,1,2);
@@ -308,5 +330,4 @@ squarefree((x2+y)^3*(x-y)^2*(x+y));
 
 example allsquarefree;
 list L=list(poly(x-y),ideal(x,y));
-set_list(L,intvec(2,1),x2+y7);
 tst_status(1);$
