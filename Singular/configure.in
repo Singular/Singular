@@ -316,6 +316,7 @@ AC_SUBST(SFLAGS)
 AC_SUBST(SLDFLAGS)
 LIBS=${SAVE_LIBS}
 
+
 # heder file checks
 AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
@@ -336,7 +337,9 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd vsnprintf readlink sleep usleep setenv getpwnam popen)
+AC_SEARCH_LIBS(setenv, bsd)
+AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd vsnprintf readlink sleep usleep getpwnam popen setenv)
+
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Find out more about particularity of the system
