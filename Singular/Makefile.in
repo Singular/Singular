@@ -217,7 +217,7 @@ SLIBS = COPYING \
         poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
         random.lib   reesclos.lib  ring.lib      rinvar.lib     sing.lib \
         solve.lib    spcurve.lib   spectrum.lib  standard.lib   stratify.lib \
-        surf.lib     toric.lib     triang.lib    zeroset.lib    help.cnf \
+        surf.lib     toric.lib     triang.lib    zeroset.lib    help.cnf 
  
 
 PLIBS = ncalg.lib ncdecomp.lib nctools.lib gkdim.lib qmatrix.lib
