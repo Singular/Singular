@@ -1,32 +1,34 @@
-version="$Id: control.lib,v 1.7 2004-08-08 21:40:19 plural Exp $";
-category="System and Control Theory";
+version="$Id: control.lib,v 1.8 2004-08-09 12:57:20 levandov Exp $";
+category="Miscellaneous";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
 AUTHORS:  Oleksandr Iena  yena@mathematik.uni-kl.de
 @*        Markus Becker   mbecker@mathematik.uni-kl.de
 
-SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis'
+SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
+and V. Levandovskyy), Uni Kaiserslautern
 
+NOTE: This library provides algebraic analysis tools for System and Control Theory
 
 PROCEDURES:
-declare(string NameOfRing, string Variables[,string  Parameters, string Ordering]);
-Defining the ring, optional parametes are a string of parameters and a sting of ordering.
- 
-Print();                      Well-formatted output of lists, modules and matrixes
-control(module R);            Computes everthing related to controllability
-autonom(module R);            Computes everything related to autonomy(using Exts) 
-autonom2(module R);           Computes everything related to autonomy(using dim) 
-LeftKernel(module R);         Computing the left kernel of R
-RightKernel(module R);        Computing the right kernel of R
-LeftInverse(module R)         Computes left inverse of matrix(module)
+control(module R);            analysis of controllability-related properties of R,
+autonom(module R);            analysis of autonomy-related properties of R (using Ext modules),
+autonom2(module R);           analysis of autonomy-related properties of R (using dimension),
+LeftKernel(module R);         a left kernel of R,
+RightKernel(module R);        a right kernel of R,
+LeftInverse(module R)         a left inverse of matrix (module).
 
-static Ext_Our(...)                  Copy of Ext_R from 'homolog.lib' in commutative case;
-static is_zero_Our(module R)         Copy of is_zero from 'OBpoly.lib';
-static space(int n)           Procedure used inside the procedure 'Print' to have a better formatted output
-static control_output();      Generating the output for the procedure 'control'
-static autonom_output();      Generating the output for the procedure 'autonom' and 'autonom2'
-
+AUXILIARY PROCEDURES:
+declare(string NameOfRing, string Variables[,string  Parameters, string Ordering]);     defines the ring, optional parametes are a string of parameters and a sting of ordering,
+view();                      Well-formatted output of lists, modules and matrixes
 ";
+
+// NOTE: static things should not be shown for end-user
+// static Ext_Our(...)                  Copy of Ext_R from 'homolog.lib' in commutative case;
+// static is_zero_Our(module R)         Copy of is_zero from 'OBpoly.lib';
+//  static space(int n)           Procedure used inside the procedure 'Print' to have a better formatted output
+// static control_output();      Generating the output for the procedure 'control'
+// static autonom_output();      Generating the output for the procedure 'autonom' and 'autonom2'
 
 LIB "homolog.lib"; 
 LIB "poly.lib";
@@ -66,7 +68,7 @@ EXAMPLE:  example declare; shows an example
     };
   };
   keepring(basering);
-};
+}
 example
 {"EXAMPLE:";echo = 2;
   string v="x,y,z";
@@ -191,7 +193,7 @@ EXAMPLE:  example view; shows an example
   };
   print(M);
   return();
-};
+}
 example
 {"EXAMPLE:";echo = 2;
   ring r;
@@ -204,12 +206,12 @@ proc RightKernel(matrix M)
 "USAGE:  RightKernel(M);
            M:  matrix
 RETURN:  right kernel of matrix M, i.e., the module of all elements v such that Mv=0
-NOTE:  in commutative case it is really a left  module, in noncommutative(to be implemented later) it will be right module   
+NOTE:  in commutative case it is a left  module, in noncommutative (will be implemented later) it is a right module   
 EXAMPLE:  example RightKernel; shows an example
 "
 { 
   return(syz(M));
-}; 
+}
 example
 {"EXAMPLE:";echo = 2;
   ring r;
@@ -227,7 +229,7 @@ EXAMPLE:  example LeftKernel; shows an example
 "
 {
   return( transpose( syz( transpose(M) ) ) );
-};
+}
 example
 {"EXAMPLE:";echo = 2;
   ring r;
@@ -249,7 +251,7 @@ EXAMPLE:  example LeftInverse; shows an example
   I=I+1;
   module Id=I;
   return( transpose( lift( module(M),Id ) )  );
-};
+}
 example
 {"EXAMPLE:";echo =2;
   ring r;
@@ -269,7 +271,7 @@ static proc Ext_Our(int i, module R,list #)
   {
     return( Ext_R(i,R,#[1]) );
   };
-};
+}
 //------------------------------------------------------------------------
 static proc is_zero_Our(module R)
 //just a copy of 'is_zero' from "poly.lib"
@@ -377,7 +379,7 @@ EXAMPLE:  example control; shows an example
   };
   
   return( control_output( i, NVars, R, Ext_1 ) );
-};
+}
 example
 {"EXAMPLE:";echo = 2; 
   //-------------------------------
@@ -394,6 +396,7 @@ example
   Rc=transpose(Rc);	    
   view( Rc );
   view( control(Rc) );
+  kill r;
   //----------------------------------
   //reflector antenna
   ring A = (0, K1, K2, Te, Kp, Kc),(Dt, delta), dp;
@@ -407,6 +410,7 @@ example
   R=transpose(R);
   view(R);
   view(control(R));
+  kill A;
   //----------------------------------
   //Flexible Rod
   ring A = 0,(D1, delta), dp;
@@ -416,6 +420,7 @@ example
   R=transpose(R);
   view(R);
   view(control(R));
+  kill A;
   //-------------------------------------
   //TwoPendula
   ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
@@ -426,6 +431,7 @@ example
   R=transpose(R);
   view(R);
   view(control(R));
+  kill r;
   //----------------------------------------
   //Wind Tunnel
   ring A = (0,a, omega, zeta, k),(D1, delta),dp;
@@ -525,7 +531,7 @@ EXAMPLE:  example autonom2; shows an example
   R=transpose(R);
   d=dim( std( Ann(R) ) );
   return( autonom_output(NVars-d,NVars) );
-};
+}
 example
 {"EXAMPLE:"; echo = 2;
   ring r=0,(s1,s2,s3),dp;
@@ -541,6 +547,7 @@ example
   Rc=transpose(Rc);	    
   view( Rc );
   view( autonom2(Rc) );
+  kill r;
   //-----------------------------------
   ring r=0,(s1,s2),dp;
   module R= [s1,-s2],
@@ -548,7 +555,8 @@ example
   R=transpose(R);
   view( R );
   view( autonom2(R) );
-  
+  kill r;
+  //-----------------------------------
   ring r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
             [s2, s1],
@@ -557,6 +565,7 @@ example
   R=transpose(R);
   view( R );
   view( autonom2(R) );
+  kill r;
   //----------------------------------------
   ring r=0,(d1,d2),dp;
   module R=[d1^2-d2],
@@ -575,26 +584,19 @@ EXAMPLE:  example autonom; shows an example
 "
 //"Computes the autonomy of a behaviour represented by the matrix R"
 {
-  int i;
   int NVars=nvars(basering);
-  int ExtIsZero;
-    
-  
+  int ExtIsZero;    
   R=transpose(R); 
-  
-  
   ExtIsZero=is_zero_Our(Ext_Our(0,R)); 
-  
-  i=0;
+  int i=0;
   while( (ExtIsZero)&&(i<=NVars) )
   {
     i++;
     ExtIsZero = is_zero_Our(Ext_Our(i,R));
   };
-  
-  return(autonom_output(i,NVars));
-     
-};
+
+  return(autonom_output(i,NVars));     
+}
 example
 {"EXAMPLE:"; echo = 2;
   ring r=0,(s1,s2,s3),dp;
@@ -610,6 +612,7 @@ example
   Rc=transpose(Rc);	    
   view( Rc );
   view( autonom(Rc) );
+  kill r;
   //-----------------------------------
   ring r=0,(s1,s2),dp;
   module R= [s1,-s2],
@@ -617,7 +620,8 @@ example
   R=transpose(R);
   view( R );
   view( autonom(R) );
-  
+  kill r;
+ //-----------------------------------
   ring r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
             [s2, s1],
@@ -626,6 +630,7 @@ example
   R=transpose(R);
   view( R );
   view( autonom(R) );
+  kill r;
   //----------------------------------------
   ring r=0,(d1,d2),dp;
   module R=[d1^2-d2],
@@ -633,6 +638,5 @@ example
   R=transpose(R);
   view(R);
   view(autonom(R));	   
-  
 };  
 //---------------------------------------------------------------------------
