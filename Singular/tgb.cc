@@ -303,7 +303,7 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,calc_dat* c){
       {
 	if (pGetExp(p1, i)+ pGetExp(p2, i) > pGetExp(bound,i))   return FALSE;
 	if (i == pVariables){
-	  PrintS("trivial");
+	  //PrintS("trivial");
 	  return TRUE;
 	}
 	i++;
@@ -316,7 +316,7 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,calc_dat* c){
 	if (pGetExp(p1, i)-pGetExp(m,i) + pGetExp(p2, i) > pGetExp(bound,i))   return FALSE;
 	if (i == pVariables){
 	  pDelete(&m);
-	  PrintS("trivial");
+	  //PrintS("trivial");
 	  return TRUE;
 	}
 	i++;
@@ -444,7 +444,8 @@ BOOLEAN lenS_correct(kStrategy strat){
 }
 
 static void notice_miss(int i, int j, calc_dat* c){
-  PrintS("-");
+  if (TEST_OPT_PROT)
+    PrintS("-");
  
 }
 
@@ -871,7 +872,9 @@ static inline void clearS (poly p, unsigned long p_sev,int l, int* at, int* k,
   assume(p_sev == pGetShortExpVector(p));
   if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
   if (l>=strat->lenS[*at]) return;
-  PrintS("!");mflush();
+  if (TEST_OPT_PROT)
+    PrintS("!");
+  mflush();
   //pDelete(&strat->S[*at]);
   deleteInS((*at),strat);
   (*at)--;
@@ -943,8 +946,9 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
       //lies I[i] under I[j] ?
       if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
         c->rep[j]=i;
-	
-        PrintS("R"); R_found=TRUE;
+	if (TEST_OPT_PROT)
+	  PrintS("R"); 
+	R_found=TRUE;
 
         c->Rcounter++;
         if((i_pos>=0) && (j_pos>=0)){
@@ -1059,6 +1063,7 @@ static poly redNF (poly h,kStrategy strat)
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
         {
+	  
           PrintS("red:");
           wrp(h);
           PrintS(" with ");
@@ -1550,7 +1555,8 @@ static void go_on (calc_dat* c){
   omfree(p);
   qsort(buf,i,sizeof(red_object),red_object_better_gen);
 //    Print("\ncurr_deg:%i\n",curr_deg);
-  Print("M[%i, ",i);
+  if (TEST_OPT_PROT)
+    Print("M[%i, ",i);
 #ifdef FIND_DETERMINISTIC
   c->modifiedS=(BOOLEAN*) omalloc((c->strat->sl+1)*sizeof(BOOLEAN));
   c->expandS=(poly*) omalloc((1)*sizeof(poly));
@@ -1589,7 +1595,8 @@ static void go_on (calc_dat* c){
   omfree(c->expandS);
   c->expandS=NULL;
 #endif
-  Print("%i]",i); 
+  if (TEST_OPT_PROT)
+      Print("%i]",i); 
  //  for(j=0;j<i;j++){
 //     if(buf[j].p==NULL) PrintS("\n ZERO ALERT \n");
 //     int z;
@@ -2702,7 +2709,8 @@ static void go_on_F4 (calc_dat* c){
 
   }
   c->normal_forms+=nfs;
-  Print("M[%i, ",nfs);
+  if (TEST_OPT_PROT)
+      Print("M[%i, ",nfs);
   //next Step, simplify all pairs
   for(i=0;i<chosen_index;i++)
   {
@@ -2991,7 +2999,8 @@ static void go_on_F4 (calc_dat* c){
 #endif
   omfree(m);
   omfree(q);
-  Print("%i, ",chosen_index);
+  if (TEST_OPT_PROT)
+    Print("Mat[%i x %i], ",chosen_index, done_index);
   //next Step build matrix
   #ifdef TGB_DEBUG
   for(i=0;i<done_index;i++)
@@ -3077,7 +3086,8 @@ static void go_on_F4 (calc_dat* c){
   //uncomment the following line
   //  qsort(F_minus, F_minus_index,sizeof(poly),pLmCmp_func);
   assume((F_plus_index+F_minus_index)==m_index);
-  Print("%i]", F_plus_index);
+  if (TEST_OPT_PROT)
+    Print("%i]", F_plus_index);
   for(i=0;i<p_index;i++) 
     pDelete(&p[i]);
   omfree(p);
@@ -3177,8 +3187,9 @@ static int poly_crit(const void* ap1, const void* ap2){
 }
 
 ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
-  if (F4_mode)
-    PrintS("F4 Modus \n");
+  if (TEST_OPT_PROT)
+    if (F4_mode)
+      PrintS("F4 Modus \n");
     
      
   //debug_Ideal=arg_debug_Ideal;
@@ -3216,11 +3227,12 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   c->apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*c->max_pairs);
   c->pair_top=-1;
   int n=I->idelems();
-  for (i=0;i<n;i++){
-    wrp(I->m[i]);
-    PrintS("\n");
-  }
-    i=0;
+  if (TEST_OPT_PROT)
+    for (i=0;i<n;i++){
+      wrp(I->m[i]);
+      PrintS("\n");
+    }
+  i=0;
   c->n=0;
   c->T_deg=(int*) omalloc(n*sizeof(int));
  
@@ -3355,8 +3367,11 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   omfree(c->gcd_of_terms);
 
   omfree(c->apairs);
-  printf("calculated %d NFs\n",c->normal_forms);
-  printf("applied %i product crit, %i extended_product crit \n", c->easy_product_crit, c->extended_product_crit);
+  if (TEST_OPT_PROT)
+  {
+    Print("calculated %d NFs\n",c->normal_forms);
+    Print("applied %i product crit, %i extended_product crit \n", c->easy_product_crit, c->extended_product_crit);
+  }
   int deleted_form_c_s=0;
 
   for(i=0;i<c->n;i++){
@@ -3824,7 +3839,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 	    kBucketClear(los[erg.to_reduce_u].bucket,&clear_into,&erg.expand_length);
 	    erg.expand=pCopy(clear_into);
 	    kBucketInit(los[erg.to_reduce_u].bucket,clear_into,erg.expand_length);
-	    PrintS("e");
+	    if (TEST_OPT_PROT)
+	      PrintS("e");
 	    
 	  }
 	}
@@ -3879,7 +3895,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
   }
   if(swap_roles)
   {
-    PrintS("b");
+    if (TEST_OPT_PROT)
+      PrintS("b");
     poly clear_into;
     int dummy_len;
     int new_length;
