@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.h,v 1.4 1999-11-15 17:20:30 obachman Exp $ */
+/* $Id: mpr_base.h,v 1.5 1999-12-02 23:03:50 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -93,6 +93,8 @@ private:
   resMatrixBase *resMat; // pointer to base resultant matrix class
 };
 //<-
+
+ideal loNewtonPolytope( const ideal id );
 //%e
 #endif MPR_BASE_H
 

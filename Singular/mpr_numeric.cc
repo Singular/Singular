@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.6 1999-11-15 17:20:31 obachman Exp $ */
+/* $Id: mpr_numeric.cc,v 1.7 1999-12-02 23:03:51 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -23,6 +23,7 @@
 #include "ideals.h"
 #include "intvec.h"
 #include "longalg.h"
+#include "matpol.h"
 #include "ring.h"
 //#include "longrat.h"
 #include "lists.h"
@@ -748,7 +749,7 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
   int count= roots[0]->getAnzRoots(); // number of roots
   int elem= roots[0]->getAnzElems();  // number of koordinates per root
 
-  lists listofroots= (lists)AllocSizeOf( slists ); // must be done this way!
+  lists listofroots= (lists)Alloc( sizeof(slists) ); // must be done this way!
 
   if ( found_roots )
   {
@@ -756,7 +757,7 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
 
     for (i=0; i < count; i++)
     {
-      lists onepoint= (lists)AllocSizeOf(slists); // must be done this way!
+      lists onepoint= (lists)Alloc(sizeof(slists)); // must be done this way!
       onepoint->Init(elem);
       for ( j= 0; j < elem; j++ )
       {
@@ -790,29 +791,155 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
 //<-
 
 //-----------------------------------------------------------------------------
-//-------------- ludcmp/lubksb ------------------------------------------------
+//-------------- simplex ----- ------------------------------------------------
 //-----------------------------------------------------------------------------
 
-//#define error(a) a
-#define error(a)
+//  #ifdef mprDEBUG_PROT
+//  #define error(a) a
+//  #else
+//  #define error(a)
+//  #endif
 
-//-> simplex
+#define error(a) a
+
+#define MAXPOINTS      1000
+
+//-> simplex::*
 //
-void simp1( mprfloat **a, int mm, int ll[], int nll, int iabf, int *kp, mprfloat *bmax );
-void simp2( mprfloat **a, int n, int l2[], int nl2, int *ip, int kp, mprfloat *q1 );
-void simp3( mprfloat **a, int i1, int k1, int ip, int kp );
+simplex::simplex( int rows, int cols )
+   : LiPM_cols(cols), LiPM_rows(rows)
+{
+  int i;
 
-void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int izrov[], int iposv[] )
+  LiPM_rows=LiPM_rows+3;
+  LiPM_cols=LiPM_cols+2;
+
+  LiPM = (mprfloat **)Alloc( LiPM_rows * sizeof(mprfloat *) );  // LP matrix
+  for( i= 0; i < LiPM_rows; i++ )
+  {
+    // Mem must be allocated aligned, also for type double!
+    LiPM[i] = (mprfloat *)AllocAligned0( LiPM_cols * sizeof(mprfloat) );
+  }
+
+  iposv = (int *)Alloc0( 2*LiPM_rows*sizeof(int) );
+  izrov = (int *)Alloc0( 2*LiPM_rows*sizeof(int) );
+
+  m=n=m1=m2=m3=icase=0;
+
+#ifdef mprDEBUG_ALL
+  Print("LiPM size: %d, %d\n",LiPM_rows,LiPM_cols);
+#endif
+}
+
+simplex::~simplex()
+{
+  // clean up
+  int i;
+  for( i= 0; i < LiPM_rows; i++ )
+  {
+    FreeAligned( (ADDRESS) LiPM[i], LiPM_cols * sizeof(mprfloat) );
+  }
+  Free( (ADDRESS) LiPM, LiPM_rows * sizeof(mprfloat *) );
+
+  Free( (ADDRESS) iposv, 2*LiPM_rows*sizeof(int) );
+  Free( (ADDRESS) izrov, 2*LiPM_rows*sizeof(int) );
+}
+
+BOOLEAN simplex::mapFromMatrix( matrix m )
+{
+  int i,j;
+//    if ( MATROWS( m ) > LiPM_rows ||  MATCOLS( m ) > LiPM_cols ) {
+//      WerrorS("");
+//      return FALSE;
+//    }
+
+  number coef;
+  for ( i= 1; i <= MATROWS( m ); i++ )
+  {
+     for ( j= 1; j <= MATCOLS( m ); j++ ) 
+     {
+	if ( MATELEM(m,i,j) != NULL ) 
+	{
+	   coef= pGetCoeff( MATELEM(m,i,j) );
+	   if ( coef != NULL && !nIsZero(coef) )
+	      LiPM[i][j]= (double)(*(gmp_float*)coef);
+	   //#ifdef mpr_DEBUG_PROT
+	   //Print("%f ",LiPM[i][j]);
+	   //#endif
+	}
+     }
+     //     PrintLn();
+  }
+
+  return TRUE;
+}
+
+matrix simplex::mapToMatrix( matrix m )
+{
+  int i,j;
+//    if ( MATROWS( m ) < LiPM_rows-3 ||  MATCOLS( m ) < LiPM_cols-2 ) {
+//      WerrorS("");
+//      return NULL;
+//    }
+
+//Print(" %d x %d\n",MATROWS( m ),MATCOLS( m ));
+
+  number coef;
+  gmp_float * bla;
+  for ( i= 1; i <= MATROWS( m ); i++ )
+  {
+    for ( j= 1; j <= MATCOLS( m ); j++ )
+    {
+       pDelete( &(MATELEM(m,i,j)) );
+       MATELEM(m,i,j)= NULL;
+//Print(" %3.0f ",LiPM[i][j]);
+       if ( LiPM[i][j] != 0.0 ) 
+       {
+	  bla= new gmp_float(LiPM[i][j]);
+	  coef= (number)bla;
+	  MATELEM(m,i,j)= pOne();
+	  pSetCoeff( MATELEM(m,i,j), coef );
+       }
+    }
+//PrintLn();
+  }
+  
+  return m;
+}
+
+intvec * simplex::posvToIV()
+{
+   int i;
+   intvec * iv = new intvec( m );
+   for ( i= 1; i <= m; i++ )
+   {
+      IMATELEM(*iv,i,1)= iposv[i];
+   }
+   return iv;
+}
+
+intvec * simplex::zrovToIV()
+{
+   int i;
+   intvec * iv = new intvec( n );
+   for ( i= 1; i <= n; i++ )
+   {
+      IMATELEM(*iv,i,1)= izrov[i];
+   }
+   return iv; 
+}
+
+void simplex::compute()
 {
   int i,ip,ir,is,k,kh,kp,m12,nl1,nl2;
   int *l1,*l2,*l3;
   mprfloat q1, bmax;
 
-  if ( m != (m1+m2+m3))
+  if ( m != (m1+m2+m3) )
   {
     // error: bad input
-    error(WerrorS(" bad input constraint counts in simplex ");)
-    *icase=-2;
+    error(WerrorS("simplex::compute: Bad input constraint counts!");)
+    icase=-2;
     return;
   }
 
@@ -825,11 +952,12 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
   nl2=m;
   for ( i=1; i<=m; i++ )
   {
-    if ( a[i+1][1] < 0.0 )
+    if ( LiPM[i+1][1] < 0.0 )
     {
       // error: bad input
-      error(WerrorS(" bad input tableau in simplex ");)
-      *icase=-2;
+      error(WerrorS("simplex::compute: Bad input tableau!");)
+      error(Werror("simplex::compute: in input Matrix row %d, column 1, value %f",i+1,LiPM[i+1][1]);)
+      icase=-2;
       // free mem l1,l2,l3;
       Free( (ADDRESS) l3, (m+1) * sizeof(int) );
       Free( (ADDRESS) l2, (m+1) * sizeof(int) );
@@ -847,23 +975,23 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
     for ( k=1; k <= (n+1); k++ )
     {
       q1=0.0;
-      for ( i=m1+1; i <= m; i++ ) q1+= a[i+1][k];
-      a[m+2][k]= -q1;
+      for ( i=m1+1; i <= m; i++ ) q1+= LiPM[i+1][k];
+      LiPM[m+2][k]= -q1;
     }
 
     do
     {
-      simp1(a,m+1,l1,nl1,0,&kp,&bmax);
-      if ( bmax <= SIMPLEX_EPS && a[m+2][1] < -SIMPLEX_EPS )
+      simp1(LiPM,m+1,l1,nl1,0,&kp,&bmax);
+      if ( bmax <= SIMPLEX_EPS && LiPM[m+2][1] < -SIMPLEX_EPS )
       {
-        *icase= -1; // no solution found
+        icase= -1; // no solution found
         // free mem l1,l2,l3;
         Free( (ADDRESS) l3, (m+1) * sizeof(int) );
         Free( (ADDRESS) l2, (m+1) * sizeof(int) );
         Free( (ADDRESS) l1, (n+1) * sizeof(int) );
         return;
       }
-      else if ( bmax <= SIMPLEX_EPS && a[m+2][1] <= SIMPLEX_EPS )
+      else if ( bmax <= SIMPLEX_EPS && LiPM[m+2][1] <= SIMPLEX_EPS )
       {
         m12= m1+m2+1;
         if ( m12 <= m )
@@ -872,7 +1000,7 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
           {
             if ( iposv[ip] == (ip+n) )
             {
-              simp1(a,ip,l1,nl1,1,&kp,&bmax);
+              simp1(LiPM,ip,l1,nl1,1,&kp,&bmax);
               if ( fabs(bmax) >= SIMPLEX_EPS)
                 goto one;
             }
@@ -884,34 +1012,34 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
           for ( i=m1+1; i <= m12; i++ )
             if ( l3[i-m1] == 1 )
               for ( k=1; k <= n+1; k++ )
-                a[i+1][k] = -a[i+1][k];
+                LiPM[i+1][k] = -(LiPM[i+1][k]);
         break;
       }
       //#if DEBUG
       //print_bmat( a, m+2, n+3);
       //#endif
-      simp2(a,n,l2,nl2,&ip,kp,&q1);
+      simp2(LiPM,n,l2,nl2,&ip,kp,&q1);
       if ( ip == 0 )
       {
-        *icase = -1; // no solution found
+        icase = -1; // no solution found
         // free mem l1,l2,l3;
         Free( (ADDRESS) l3, (m+1) * sizeof(int) );
         Free( (ADDRESS) l2, (m+1) * sizeof(int) );
         Free( (ADDRESS) l1, (n+1) * sizeof(int) );
         return;
       }
-    one: simp3(a,m+1,n,ip,kp);
+    one: simp3(LiPM,m+1,n,ip,kp);
       // #if DEBUG
       // print_bmat(a,m+2,n+3);
       // #endif
       if ( iposv[ip] >= (n+m1+m2+1))
       {
-        for ( k=1; k<= nl1; k++ )
+        for ( k= 1; k <= nl1; k++ )
           if ( l1[k] == kp ) break;
         --nl1;
         for ( is=k; is <= nl1; is++ ) l1[is]= l1[is+1];
-        ++a[m+2][kp+1];
-        for ( i= 1; i <= m+2; i++ ) a[i][kp+1] = -a[i][kp+1];
+        ++(LiPM[m+2][kp+1]);
+        for ( i= 1; i <= m+2; i++ ) LiPM[i][kp+1] = -(LiPM[i][kp+1]);
       }
       else
       {
@@ -921,9 +1049,9 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
           if ( l3[kh] )
           {
             l3[kh]= 0;
-            ++a[m+2][kp+1];
+            ++(LiPM[m+2][kp+1]);
             for ( i=1; i<= m+2; i++ )
-              a[i][kp+1] = -a[i][kp+1];
+              LiPM[i][kp+1] = -(LiPM[i][kp+1]);
           }
         }
       }
@@ -938,38 +1066,38 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
     // #if DEBUG
     // print_bmat( a, m+1, n+5);
     // #endif
-    simp1(a,0,l1,nl1,0,&kp,&bmax);
+    simp1(LiPM,0,l1,nl1,0,&kp,&bmax);
     if (bmax <= /*SIMPLEX_EPS*/0.0)
     {
-      *icase=0; // finite solution found
+      icase=0; // finite solution found
       // free mem l1,l2,l3
       Free( (ADDRESS) l3, (m+1) * sizeof(int) );
       Free( (ADDRESS) l2, (m+1) * sizeof(int) );
       Free( (ADDRESS) l1, (n+1) * sizeof(int) );
       return;
     }
-    simp2(a,n,l2,nl2,&ip,kp,&q1);
+    simp2(LiPM,n,l2,nl2,&ip,kp,&q1);
     if (ip == 0)
     {
       //printf("Unbounded:");
       // #if DEBUG
       //       print_bmat( a, m+1, n+1);
       // #endif
-      *icase=1;                /* unbounded */
+      icase=1;                /* unbounded */
       // free mem
       Free( (ADDRESS) l3, (m+1) * sizeof(int) );
       Free( (ADDRESS) l2, (m+1) * sizeof(int) );
       Free( (ADDRESS) l1, (n+1) * sizeof(int) );
       return;
     }
-    simp3(a,m,n,ip,kp);
+    simp3(LiPM,m,n,ip,kp);
     is= izrov[kp];
     izrov[kp]= iposv[ip];
     iposv[ip]= is;
   }/*for ;;*/
 }
 
-void simp1( mprfloat **a, int mm, int ll[], int nll, int iabf, int *kp, mprfloat *bmax )
+void simplex::simp1( mprfloat **a, int mm, int ll[], int nll, int iabf, int *kp, mprfloat *bmax )
 {
   int k;
   mprfloat test;
@@ -1004,7 +1132,7 @@ void simp1( mprfloat **a, int mm, int ll[], int nll, int iabf, int *kp, mprfloat
   }
 }
 
-void simp2( mprfloat **a, int n, int l2[], int nl2, int *ip, int kp, mprfloat *q1 )
+void simplex::simp2( mprfloat **a, int n, int l2[], int nl2, int *ip, int kp, mprfloat *q1 )
 {
   int k,ii,i;
   mprfloat qp,q0,q;
@@ -1043,7 +1171,7 @@ void simp2( mprfloat **a, int n, int l2[], int nl2, int *ip, int kp, mprfloat *q
   }
 }
 
-void simp3( mprfloat **a, int i1, int k1, int ip, int kp )
+void simplex::simp3( mprfloat **a, int i1, int k1, int ip, int kp )
 {
   int kk,ii;
   mprfloat piv;

@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.h,v 1.4 1999-11-15 17:20:31 obachman Exp $ */
+/* $Id: mpr_numeric.h,v 1.5 1999-12-02 23:03:52 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -161,7 +161,51 @@ private:
 //   (used by sparse matrix construction)
 #define SIMPLEX_EPS 1.0e-12
 
-void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int izrov[], int iposv[] );
+/** Linear Programming / Linear Optimization using Simplex - Algorithm
+ *
+ * On output, the tableau LiPM is indexed by two arrays of integers.
+ * ipsov[j] contains, for j=1..m, the number i whose original variable
+ * is now represented by row j+1 of LiPM. (left-handed vars in solution)
+ * (first row is the one with the objective function)
+ * izrov[j] contains, for j=1..n, the number i whose original variable
+ * x_i is now a right-handed variable, rep. by column j+1 of LiPM.
+ * These vars are all zero in the solution. The meaning of n<i<n+m1+m2
+ * is the same as above.
+ */
+class simplex
+{
+public:
+  
+  int m;         // number of constraints, make sure m == m1 + m2 + m3 !!
+  int n;         // # of independent variables
+  int m1,m2,m3;  // constraints <=, >= and ==
+  int icase;     // == 0: finite solution found; 
+                 // == +1 objective funtion unbound; == -1: no solution
+  int *izrov,*iposv;    
+
+  mprfloat **LiPM; // the matrix (of size [m+2, n+1])
+
+  /** #rows should be >= m+2, #cols >= n+1 
+   */
+  simplex( int rows, int cols );
+  ~simplex();
+
+  BOOLEAN mapFromMatrix( matrix m );
+  matrix mapToMatrix( matrix m );
+  intvec * posvToIV();
+  intvec * zrovToIV();
+
+  void compute();
+
+private:
+  simplex( const simplex & );
+  void simp1( mprfloat **a, int mm, int ll[], int nll, int iabf, int *kp, mprfloat *bmax );
+  void simp2( mprfloat **a, int n, int l2[], int nl2, int *ip, int kp, mprfloat *q1 );
+  void simp3( mprfloat **a, int i1, int k1, int ip, int kp );
+
+  int LiPM_cols,LiPM_rows;
+};
+
 //<-
 
 #endif MPR_NUMERIC_H

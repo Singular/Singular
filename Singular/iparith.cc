@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.193 1999-12-01 13:22:52 Singular Exp $ */
+/* $Id: iparith.cc,v 1.194 1999-12-02 23:03:48 wenk Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -137,6 +137,7 @@ cmdnames cmds[] =
   { "coeffs",      0, COEFFS_CMD ,        CMD_23},
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
+  { "convhull",    0, NEWTONPOLY_CMD,     CMD_1},
   { "dbprint",     0, DBPRINT_CMD ,       CMD_M},
   { "def",         0, DEF_CMD ,           ROOT_DECL},
   { "defined",     0, DEFINED_CMD ,       CMD_1},
@@ -277,6 +278,7 @@ cmdnames cmds[] =
   { "ring",        0, RING_CMD ,          RING_CMD},
   { "rvar",        0, IS_RINGVAR ,        CMD_1},
   { "setring",     0, SETRING_CMD ,       SETRING_CMD},
+  { "simplex",     0, SIMPLEX_CMD,        CMD_M},
   { "simplify",    0, SIMPLIFY_CMD ,      CMD_2},
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
@@ -3611,6 +3613,7 @@ struct sValCmd1 dArith1[]=
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     IDEAL_CMD }
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     MODUL_CMD }
 ,{jjLOAD1,      LOAD_CMD,        NONE,           STRING_CMD }
+,{loNewtonP,    NEWTONPOLY_CMD,  IDEAL_CMD,      IDEAL_CMD}
 ,{NULL,         0,               0,              0}
 };
 #undef s
@@ -4912,6 +4915,7 @@ struct sValCmdM dArithM[]=
 ,{jjEXPORTTO,  EXPORTTO_CMD,    NONE,               -2 }
 ,{jjUNLOAD,    UNLOAD_CMD,      NONE,               -2 }
 #endif /* HAVE_NAMESPACES */
+,{loSimplex,   SIMPLEX_CMD,     LIST_CMD,            6 }
 ,{nuUResSolve, URSOLVE_CMD,     LIST_CMD,            4 }
 ,{NULL,        0,               0,                   0 }
 };

@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.h,v 1.5 1999-11-15 17:20:31 obachman Exp $ */
+/* $Id: mpr_inout.h,v 1.6 1999-12-02 23:03:51 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - interface to Singular
@@ -56,6 +56,15 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 );
  * RETURN:  polynomial f of degree d
  */
 BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3 );
+
+/** compute Newton Polytopes of input polynomials
+ */
+BOOLEAN loNewtonP( leftv res, leftv arg1 );
+
+/** Implementation of the Simplex Algorithm.
+ * For args, see class simplex.
+ */
+BOOLEAN loSimplex( leftv res, leftv args );
 
 #endif
 

@@ -1,15 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.15 1999-11-23 17:58:47 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.16 1999-12-02 23:03:49 wenk Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
  *            ( sparse, dense, u-resultant solver )
  */
 
-#include <limits.h>
 #include <math.h>
+#include <limits.h>
 
 #include "mod2.h"
 
@@ -25,7 +25,6 @@
 #include "matpol.h"
 #include "numbers.h"
 #include "longalg.h"
-#include "tok.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #else
@@ -42,7 +41,6 @@
 #define AllocSizeOf(X) Alloc(sizeof(X))
 #define FreeSizeOf(X,Y) Free(X,sizeof(Y))
 #endif
-
 //<-
 
 extern void nPrint(number n);  // for debugging output
@@ -69,20 +67,10 @@ extern void nPrint(number n);  // for debugging output
 
 //-> sparse resultant matrix
 
-//-> typedefs and structs
-
 /* set of points */
 class pointSet;
 
-/* Linear Program stuff */
-struct linProg
-{
-  mprfloat **LiPM;
-  int *izrov, *iposv;
-  int LiPM_cols,LiPM_rows;
-};
 
-typedef linProg *linProgP;
 
 /* sparse resultant matrix class */
 class resMatrixSparse : virtual public resMatrixBase
@@ -143,10 +131,12 @@ private:
 
   ideal rmat;        // sparse matrix representation
 
-  linProg LP;
+  simplex * LP;      // linear programming stuff
 };
 //<-
 
+//-> typedefs and structs
+poly monomAt( poly p, int i );
 
 typedef unsigned int Coord_t;
 
@@ -269,14 +259,15 @@ private:
 class convexHull
 {
 public:
-  convexHull( linProgP _pLP ) : pLP(_pLP) {}
+  convexHull( simplex * _pLP ) : pLP(_pLP) {}
   ~convexHull() {}
 
   /** Computes the point sets of the convex hulls of the supports given
    * by the polynoms in gls.
    * Returns Q[].
    */
-   pointSet ** newtonPolytopes( ideal gls );
+  pointSet ** newtonPolytopesP( const ideal gls );
+  ideal newtonPolytopesI( const ideal gls );
 
 private:
   /** Returns true iff the support of poly pointPoly is inside the
@@ -287,7 +278,7 @@ private:
 private:
   pointSet **Q;
   int n;
-  linProgP pLP;
+  simplex * pLP;
 };
 //<-
 
@@ -296,7 +287,7 @@ private:
 class mayanPyramidAlg
 {
 public:
-  mayanPyramidAlg( linProgP _pLP ) : n(pVariables), pLP(_pLP) {}
+  mayanPyramidAlg( simplex * _pLP ) : n(pVariables), pLP(_pLP) {}
   ~mayanPyramidAlg() {}
 
   /** Drive Mayan Pyramid Algorithm.
@@ -341,13 +332,11 @@ private:
 
   Coord_t acoords[MAXVARS+2];
 
-  linProgP pLP;
+  simplex * pLP;
 };
-
-poly monomAt( poly p, int i );
+//<-
 
 #ifndef ASO_GENERATE
-//<-
 
 //-> debug output stuff
 #if defined(mprDEBUG_PROT) || defined(mprDEBUG_ALL)
@@ -440,7 +429,7 @@ pointSet::pointSet( const int _dim, const int _index, const int count )
   points = (onePointP *)Alloc( (count+1) * sizeof(onePointP) );
   for ( i= 0; i <= max; i++ )
   {
-    points[i]= (onePointP)AllocSizeOf( onePoint );
+    points[i]= (onePointP)Alloc( sizeof(onePoint) );
     points[i]->point= (Coord_t *)Alloc0( (dim+2) * sizeof(Coord_t) );
   }
   lifted= false;
@@ -453,7 +442,7 @@ pointSet::~pointSet()
   for ( i= 0; i <= max; i++ )
   {
     Free( (ADDRESS) points[i]->point, fdim * sizeof(Coord_t) );
-    FreeSizeOf( (ADDRESS) points[i], onePoint );
+    Free( (ADDRESS) points[i], sizeof(onePoint) );
   }
   Free( (ADDRESS) points, (max+1) * sizeof(onePointP) );
 }
@@ -475,7 +464,7 @@ inline bool pointSet::checkMem()
                                  (2*max + 1) * sizeof(onePointP) );
     for ( i= max+1; i <= max*2; i++ )
     {
-      points[i]= (onePointP)AllocSizeOf( onePoint );
+      points[i]= (onePointP)Alloc( sizeof(struct onePoint) );
       points[i]->point= (Coord_t *)Alloc0( fdim * sizeof(Coord_t) );
     }
     max*= 2;
@@ -719,7 +708,7 @@ void pointSet::lift( int l[] )
     points[j]->point[dim]= sum;
   }
 
-#ifdef mprDEBUG_PROT
+#ifdef mprDEBUG_ALL
   Print(" lift vector: ");
   for ( j=1; j < dim; j++ ) Print(" %d ",l[j] );
   PrintLn();
@@ -753,20 +742,20 @@ poly monomAt( poly p, int i )
 //-> convexHull::*
 bool convexHull::inHull(poly p, poly pointPoly, int m, int site)
 {
-  int i, j, col, icase;
-  int numcons;                // num of constraints
-  int numpts;                // num of pts in defining support
-  int numcols;                // tot number of cols
+  int i, j, col;
 
-  numcons = n+1;
-  numpts = m-1;
-  numcols = numpts+1;                // this includes col of cts
+  pLP->m = n+1;
+  pLP->n = m;                // this includes col of cts
 
-  pLP->LiPM[1][1] = +0.0;  pLP->LiPM[1][2] = +1.0;        // optimize (arbitrary) var
-  pLP->LiPM[2][1] = +1.0;  pLP->LiPM[2][2] = -1.0;         // lambda vars sum up to 1
-  for ( j=3; j<=numcols; j++)
+  pLP->LiPM[1][1] = +0.0;  
+  pLP->LiPM[1][2] = +1.0;        // optimize (arbitrary) var
+  pLP->LiPM[2][1] = +1.0;  
+  pLP->LiPM[2][2] = -1.0;         // lambda vars sum up to 1
+
+  for ( j=3; j <= pLP->n; j++)
   {
-    pLP->LiPM[1][j] = +0.0; pLP->LiPM[2][j] = -1.0;
+    pLP->LiPM[1][j] = +0.0; 
+    pLP->LiPM[2][j] = -1.0;
   }
 
   for( i= 1; i <= n; i++) {        // each row constraints one coor
@@ -784,24 +773,20 @@ bool convexHull::inHull(poly p, poly pointPoly, int m, int site)
 
 #ifdef mprDEBUG_ALL
   Print("Matrix of Linear Programming\n");
-  print_mat( pLP->LiPM, numcons+1, numcols);
-#endif
-#if 1
-  if ( numcons + 1 > pLP->LiPM_rows )
-    WerrorS("convexHull::inHull: #rows > #pLP->LiPM_rows!");
-  if ( numcols + 1 > pLP->LiPM_cols )
-    WerrorS("convexHull::inHull: #cols > #pLP->LiPM_cols!");
+  print_mat( pLP->LiPM, pLP->m+1,pLP->n);
 #endif
 
-  simplx( pLP->LiPM, numcons, numcols-1, 0, 0, numcons, &icase, pLP->izrov, pLP->iposv);
+  pLP->m3= pLP->m;
 
-  return (icase == 0);
+  pLP->compute();
+
+  return (pLP->icase == 0);
 }
 
 // mprSTICKYPROT:
 // ST_SPARSE_VADD: new vertex of convex hull added
 // ST_SPARSE_VREJ: point rejected (-> inside hull)
-pointSet ** convexHull::newtonPolytopes( ideal gls )
+pointSet ** convexHull::newtonPolytopesP( const ideal gls )
 {
   int i, j, k;
   int m;  // Anzahl der Exponentvektoren im i-ten Polynom (gls->m)[i] des Ideals gls
@@ -855,6 +840,62 @@ pointSet ** convexHull::newtonPolytopes( ideal gls )
 
   return Q;
 }
+
+// mprSTICKYPROT:
+// ST_SPARSE_VADD: new vertex of convex hull added
+// ST_SPARSE_VREJ: point rejected (-> inside hull)
+ideal convexHull::newtonPolytopesI( const ideal gls )
+{
+  int i, j;
+  int m;  // Anzahl der Exponentvektoren im i-ten Polynom (gls->m)[i] des Ideals gls
+  int idelem= IDELEMS(gls);
+  ideal id;
+  poly p,pid,pd;
+  Exponent_t * vert;
+
+  n= pVariables;
+  vert= (Exponent_t *)Alloc( (idelem+1) * sizeof(Exponent_t) );
+  id= idInit( idelem, 1 );
+
+  for( i= 0; i < idelem; i++ )
+  {
+    m = pLength( (gls->m)[i] );
+
+    p= (gls->m)[i];
+    for( j= 1; j <= m; j++) {  // für jeden Exponentvektor
+      if( !inHull( (gls->m)[i], p, m, j ) )
+      {
+	if ( (id->m)[i] == NULL ) {
+	  (id->m)[i]= pCopy(p);
+	  pNext((id->m)[i])= NULL;
+	  pid=(id->m)[i];
+	} else {
+	  pNext(pid)= pCopy(p);
+	  pIter(pid);
+	  pNext(pid)= NULL;
+	}
+        mprSTICKYPROT(ST_SPARSE_VADD);
+      }
+      else
+      {
+        mprSTICKYPROT(ST_SPARSE_VREJ);
+      }
+      pIter( p );
+    } // j
+    mprSTICKYPROT("\n");
+  } // i
+
+  Free( (ADDRESS) vert, (idelem+1) * sizeof(Exponent_t) );
+
+#ifdef mprDEBUG_PROT
+  PrintLn();
+  for( i= 0; i < idelem; i++ )
+  {
+  }
+#endif
+
+  return id;
+}
 //<-
 
 //-> mayanPyramidAlg::*
@@ -879,7 +920,7 @@ pointSet * mayanPyramidAlg::getInnerPoints( pointSet **_Qi, mprfloat _shift[] )
 mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
 {
   int i, ii, j, k, col, r;
-  int icase, constr, numverts, cols;
+  int numverts, cols;
 
   numverts = 0;
   for( i=0; i<=n; i++)
@@ -923,37 +964,33 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
   if( col != cols)
     Werror("mayanPyramidAlg::vDistance:"
            "setting up matrix for udist: col %d != cols %d",col,cols);
-  constr = n+dim+1;
+
+  pLP->m = n+dim+1;
+  pLP->m3= pLP->m;
+  pLP->n=cols-1;
 
 #ifdef mprDEBUG_ALL
-  Print("vDistance LP, known koords dim=%d, constr %d, cols %d, acoords= ",dim,constr,cols);
+  Print("vDistance LP, known koords dim=%d, constr %d, cols %d, acoords= ",dim,pLP->m,cols);
   for( i= 0; i < dim; i++ ) Print(" %d",acoords[i]);
   PrintLn();
-  print_mat( pLP->LiPM, constr+1, cols);
+  print_mat( pLP->LiPM, pLP->m+1, cols);
 #endif
-
-#if 1
-  if ( constr + 1 > pLP->LiPM_rows )
-    WerrorS("mayanPyramidAlg::vDistance: #rows > #pLP->LiPM_rows!");
-  if ( cols + 1 > pLP->LiPM_cols )
-    WerrorS("mayanPyramidAlg::vDistance: #cols > #pLP->LiPM_cols!");
-#endif
-
-  // 3rd arg is #columns excluding column of constants
-  //            M       N       m1  m2  m3,   M= m1+m2+m3
-  simplx( pLP->LiPM, constr, cols-1,  0,  0, constr, &icase, pLP->izrov, pLP->iposv);
+  
+  pLP->compute();
 
 #ifdef mprDEBUG_ALL
   Print("LP returns matrix\n");
-  print_bmat( pLP->LiPM, constr+1, cols+1-constr, cols, pLP->iposv);
+  print_bmat( pLP->LiPM, pLP->m+1, cols+1-pLP->m, cols, pLP->iposv);
 #endif
 
-  if( icase != 0 ) {  // check for errors
+  if( pLP->icase != 0 ) {  // check for errors
     WerrorS("mayanPyramidAlg::vDistance:");
-    if( icase == 1 )
-      WerrorS(" vDistance: Unbounded v-distance: probably 1st v-coor=0");
-    if( icase == -1 )
-      WerrorS(" vDistance: Infeasible v-distance");
+    if( pLP->icase == 1 )
+      WerrorS(" Unbounded v-distance: probably 1st v-coor=0");
+    else if( pLP->icase == -1 )
+      WerrorS(" Infeasible v-distance");
+    else
+      WerrorS(" Unknown error");
     return -1.0;
   }
 
@@ -963,7 +1000,7 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
 void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR )
 {
   int i, j, k, cols, cons;
-  int icase, la_cons_row;
+  int la_cons_row;
 
   cons = n+dim+2;
 
@@ -1011,20 +1048,17 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
   print_mat( pLP->LiPM, cons+1, cols);
 #endif
 
-#if 1
-  if ( cons + 1 > pLP->LiPM_rows )
-    WerrorS(" mn_mx_MinkowskiSum: #rows > #pLP->LiPM_rows!");
-  if ( cols + 1 > pLP->LiPM_cols )
-    WerrorS(" mn_mx_MinkowskiSum: #cols > #pLP->LiPM_cols!");
-#endif
-
   // simplx finds MIN for obj.fnc, puts it in [1,1]
-  simplx(pLP->LiPM, cons, cols-1, 0, 0, cons, &icase, pLP->izrov, pLP->iposv);
+  pLP->m= cons;
+  pLP->n= cols-1;
+  pLP->m3= cons;
 
-  if ( icase != 0 ) { // check for errors
-    if( icase < 0)
+  pLP->compute();
+
+  if ( pLP->icase != 0 ) { // check for errors
+    if( pLP->icase < 0)
       WerrorS(" mn_mx_MinkowskiSum: LinearProgram: minR: infeasible");
-    else if( icase > 0)
+    else if( pLP->icase > 0)
       WerrorS(" mn_mx_MinkowskiSum: LinearProgram: minR: unbounded");
   }
 
@@ -1070,21 +1104,18 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
   print_mat( pLP->LiPM, cons+1, cols);
 #endif
 
-#if 1
-  if ( cons + 1 > pLP->LiPM_rows )
-    WerrorS(" mn_mx_MinkowskiSum: #rows > #pLP->LiPM_rows!");
-  if ( cols + 1 > pLP->LiPM_cols )
-    WerrorS(" mn_mx_MinkowskiSum: #cols > #pLP->LiPM_cols!");
-#endif
+  pLP->m= cons;
+  pLP->n= cols-1;
+  pLP->m3= cons;
 
   // simplx finds MAX for obj.fnc, puts it in [1,1]
-  simplx(pLP->LiPM, cons, cols-1, 0, 0, cons, &icase, pLP->izrov, pLP->iposv);
+  pLP->compute();
 
-  if ( icase != 0 )
+  if ( pLP->icase != 0 )
   {
-    if( icase < 0)
+    if( pLP->icase < 0)
       WerrorS(" mn_mx_MinkowskiSum: LinearProgram: maxR: infeasible");
-    else if( icase > 0)
+    else if( pLP->icase > 0)
       WerrorS(" mn_mx_MinkowskiSum: LinearProgram: maxR: unbounded");
   }
 
@@ -1197,15 +1228,15 @@ bool resMatrixSparse::remapXiToPoint( const int indx, pointSet **pQ, int *set, i
 int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] )
 {
   int i, j, k,c ;
-  int ncols, size, icase, NumCons;
+  int size;
   bool found= true;
   mprfloat cd;
   int set,pnt,onum;
   int bucket[MAXVARS+2];
   setID *optSum;
 
-  ncols = 1;
-  NumCons = n + n + 1;   // number of constrains
+  LP->n = 1;
+  LP->m = n + n + 1;   // number of constrains
 
   // fill in LP matrix
   for ( i= 0; i <= n; i++ )
@@ -1213,64 +1244,58 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
     size= pQ[i]->num;
     for ( k= 1; k <= size; k++ )
     {
-      ncols++;
+      LP->n++;
 
       // objective funtion, minimize
-      LP.LiPM[1][ncols] = - ( (mprfloat) (*pQ[i])[k]->point[pQ[i]->dim] / SCALEDOWN );
+      LP->LiPM[1][LP->n] = - ( (mprfloat) (*pQ[i])[k]->point[pQ[i]->dim] / SCALEDOWN );
 
       // lambdas sum up to 1
       for ( j = 0; j <= n; j++ )
         if ( i==j )
-          LP.LiPM[j+2][ncols] = -1.0;
+          LP->LiPM[j+2][LP->n] = -1.0;
         else
-          LP.LiPM[j+2][ncols] = 0.0;
+          LP->LiPM[j+2][LP->n] = 0.0;
 
       // the points
       for ( j = 1; j <= n; j++ )
       {
-        LP.LiPM[j+n+2][ncols] =  - ( (mprfloat) (*pQ[i])[k]->point[j] );
+        LP->LiPM[j+n+2][LP->n] =  - ( (mprfloat) (*pQ[i])[k]->point[j] );
       }
     }
   }
 
-  for ( j = 0; j <= n; j++ ) LP.LiPM[j+2][1] = 1.0;
+  for ( j = 0; j <= n; j++ ) LP->LiPM[j+2][1] = 1.0;
   for ( j= 1; j <= n; j++ )
   {
-    LP.LiPM[j+n+2][1]= (mprfloat)(*E)[vert]->point[j] - shift[j];
+    LP->LiPM[j+n+2][1]= (mprfloat)(*E)[vert]->point[j] - shift[j];
   }
-  ncols--;
+  LP->n--;
 
-  LP.LiPM[1][1] = 0.0;
+  LP->LiPM[1][1] = 0.0;
 
 #ifdef mprDEBUG_ALL
   PrintLn();
-  Print(" n= %d, NumCons=M= %d, ncols=N= %d\n",n,NumCons,ncols);
-  print_mat(LP.LiPM, NumCons+1, ncols+1);
+  Print(" n= %d, LP->m=M= %d, LP->n=N= %d\n",n,LP->m,LP->n);
+  print_mat(LP->LiPM, LP->m+1, LP->n+1);
 #endif
 
-#if 1
-  if ( NumCons + 1 > LP.LiPM_rows )
-    WerrorS("resMatrixSparse::RC: #rows > #LP.LiPM_rows!");
-  if ( ncols + 1 > LP.LiPM_cols )
-    WerrorS("resMatrixSparse::RC: #cols > #LP.LiPM_cols!");
-#endif
+  LP->m3= LP->m;
 
-  //           M        N      m1  m2  m3,   M= m1+m2+m3
-  simplx(LP.LiPM, NumCons, ncols,  0,  0, NumCons, &icase, LP.izrov, LP.iposv);
+  LP->compute();
 
-  if (icase < 0)
+  if ( LP->icase < 0 )
   {
     // infeasibility: the point does not lie in a cell -> remove it
     return -1;
   }
 
   // store result
-  (*E)[vert]->point[E->dim]= (int)(-LP.LiPM[1][1] * SCALEDOWN);
+  (*E)[vert]->point[E->dim]= (int)(-LP->LiPM[1][1] * SCALEDOWN);
 
 #ifdef mprDEBUG_ALL
-  Print(" simplx returned %d, Objective value = %f\n", icase, LP.LiPM[1][1]);
-  //print_bmat(LP.LiPM, NumCons + 1, ncols+1-NumCons, ncols+1, LP.iposv); // ( rows= M+1, cols= N+1-m3 )
-  //print_mat(LP.LiPM, NumCons+1, ncols);
+  Print(" simplx returned %d, Objective value = %f\n", LP->icase, LP->LiPM[1][1]);
+  //print_bmat(LP->LiPM, NumCons + 1, LP->n+1-NumCons, LP->n+1, LP->iposv); // ( rows= M+1, cols= N+1-m3 )
+  //print_mat(LP->LiPM, NumCons+1, LP->n);
 #endif
 
 #if 1
@@ -1278,18 +1303,18 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   while (found)
   {
     found=false;
-    for ( i= 1; i < NumCons; i++ )
+    for ( i= 1; i < LP->m; i++ )
     {
-      if ( LP.iposv[i] > LP.iposv[i+1] )
+      if ( LP->iposv[i] > LP->iposv[i+1] )
       {
 
-        c= LP.iposv[i];
-        LP.iposv[i]=LP.iposv[i+1];
-        LP.iposv[i+1]=c;
+        c= LP->iposv[i];
+        LP->iposv[i]=LP->iposv[i+1];
+        LP->iposv[i+1]=c;
 
-        cd=LP.LiPM[i+1][1];
-        LP.LiPM[i+1][1]=LP.LiPM[i+2][1];
-        LP.LiPM[i+2][1]=cd;
+        cd=LP->LiPM[i+1][1];
+        LP->LiPM[i+1][1]=LP->LiPM[i+2][1];
+        LP->LiPM[i+2][1]=cd;
 
         found= true;
       }
@@ -1298,7 +1323,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
 #endif
 
 #ifdef mprDEBUG_ALL
-  print_bmat(LP.LiPM, NumCons + 1, ncols+1-NumCons, ncols+1, LP.iposv);
+  print_bmat(LP->LiPM, LP->m + 1, LP->n+1-LP->m, LP->n+1, LP->iposv);
   Print(" now split into sets\n");
 #endif
 
@@ -1307,15 +1332,15 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   for ( i= 0; i <= E->dim; i++ ) bucket[i]= 0;
   // remap results of LP to sets Qi
   c=0;
-  optSum= (setID*)Alloc( (NumCons) * sizeof(struct setID) );
-  for ( i= 0; i < NumCons; i++ )
+  optSum= (setID*)Alloc( (LP->m) * sizeof(struct setID) );
+  for ( i= 0; i < LP->m; i++ )
   {
-    //Print("% .15f\n",LP.LiPM[i+2][1]);
-    if ( LP.LiPM[i+2][1] > 1e-12 )
+    //Print("% .15f\n",LP->LiPM[i+2][1]);
+    if ( LP->LiPM[i+2][1] > 1e-12 )
     {
-      if ( !remapXiToPoint( LP.iposv[i+1], pQ, &(optSum[c].set), &(optSum[c].pnt) ) )
+      if ( !remapXiToPoint( LP->iposv[i+1], pQ, &(optSum[c].set), &(optSum[c].pnt) ) )
       {
-        Werror(" resMatrixSparse::RC: Found bad solution in LP: %d!",LP.iposv[i+1]);
+        Werror(" resMatrixSparse::RC: Found bad solution in LP: %d!",LP->iposv[i+1]);
         WerrorS(" resMatrixSparse::RC: remapXiToPoint faild!");
         return -1;
       }
@@ -1347,14 +1372,14 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   // count
   if ( (*E)[vert]->rc.set == linPolyS ) numSet0++;
 
-#ifdef mprDEBUG_ALL
+#ifdef mprDEBUG_PROT
   Print("\n Point E[%d] was <",vert);print_exp((*E)[vert],E->dim-1);Print(">, bucket={");
   for ( j= 0; j < E->dim; j++ )
   {
     Print(" %d",bucket[j]);
   }
   Print(" }\n optimal Sum: Qi ");
-  for ( j= 0; j < NumCons; j++ )
+  for ( j= 0; j < LP->m; j++ )
   {
     Print(" [ %d, %d ]",optSum[j].set,optSum[j].pnt);
   }
@@ -1362,11 +1387,11 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
 #endif
 
   // clean up
-  Free( (ADDRESS) optSum, (NumCons) * sizeof(struct setID) );
+  Free( (ADDRESS) optSum, (LP->m) * sizeof(struct setID) );
 
   mprSTICKYPROT(ST_SPARSE_RC);
 
-  return (int)(-LP.LiPM[1][1] * SCALEDOWN);
+  return (int)(-LP->LiPM[1][1] * SCALEDOWN);
 }
 
 // create coeff matrix
@@ -1464,15 +1489,8 @@ void resMatrixSparse::randomVector( const int dim, mprfloat shift[] )
 {
   int i,j;
   i= 1;
-  /*
-  shift[1]= (mprfloat) (RVMULT*(siRand()%MAXRVVAL)/(mprfloat)MAXRVVAL);
-  i++;
-  while ( i <= dim )
-  {
-    shift[i]=shift[1];
-    i++;
-  }
-  */
+  time_t *tp = NULL;
+
   while ( i <= dim )
   {
     shift[i]= (mprfloat) (RVMULT*(siRand()%MAXRVVAL)/(mprfloat)MAXRVVAL);
@@ -1486,7 +1504,6 @@ void resMatrixSparse::randomVector( const int dim, mprfloat shift[] )
       }
     }
   }
-
 }
 
 pointSet * resMatrixSparse::minkSumTwo( pointSet *Q1, pointSet *Q2, int dim )
@@ -1566,28 +1583,11 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   n= pVariables;
   idelem= IDELEMS(gls);  // should be n+1
 
-  // prepare matrix LP.LiPM for Linear Programming
+  // prepare matrix LP->LiPM for Linear Programming
   totverts = 0;
   for( i=0; i < idelem; i++) totverts += pLength( (gls->m)[i] );
 
-  LP.LiPM_rows= idelem+totverts*2+5;  // very approximal
-  LP.LiPM_cols= totverts+5;
-
-#ifdef mprDEBUG_ALL
-  Print("LP.LiPM size: %d, %d\n",LP.LiPM_rows,LP.LiPM_cols);
-#endif
-
-  // need AllocAligned since we allocate mem for type double
-  LP.LiPM = (mprfloat **)Alloc( LP.LiPM_rows * sizeof(mprfloat *) );  // LP matrix
-  for( i= 0; i < LP.LiPM_rows; i++ )
-  {
-    // Mem must be allocated aligned, also for type double!
-    LP.LiPM[i] = (mprfloat *)AllocAligned0( LP.LiPM_cols * sizeof(mprfloat) );
-    // LP.LiPM[i] = (mprfloat *)Alloc0( LP.LiPM_cols * sizeof(mprfloat) );
-  }
-
-  LP.iposv = (int *)Alloc0( (idelem * MAXPOINTS) * sizeof(int) );
-  LP.izrov = (int *)Alloc0( (idelem * MAXPOINTS) * sizeof(int) );
+  LP = new simplex( idelem+totverts*2+5, totverts+5 ); // rows, cols
 
   // get shift vector
 #ifdef mprTEST
@@ -1603,18 +1603,18 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 #endif
 
   // evaluate convex hull for supports of gls
-  convexHull chnp( &LP );
-  Qi= chnp.newtonPolytopes( gls );
+  convexHull chnp( LP );
+  Qi= chnp.newtonPolytopesP( gls );
 
 #ifdef mprMINKSUM
   E= minkSumAll( Qi, n+1, n);
 #else
   // get inner points
-  mayanPyramidAlg mpa( &LP );
+  mayanPyramidAlg mpa( LP );
   E= mpa.getInnerPoints( Qi, shift );
 #endif
 
-#ifdef mprDEBUG_ALL
+#ifdef mprDEBUG_PROT
 #ifdef mprMINKSUM
   Print("(MinkSum)");
 #endif
@@ -1674,7 +1674,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   E->unlift();
   E->sort();
 
-#ifdef mprDEBUG_ALL
+#ifdef mprDEBUG_PROT
   Print(" points with a[ij] (%d):\n",E->num);
   for ( pnt= 1; pnt <= E->num; pnt++ )
   {
@@ -1705,15 +1705,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 
   delete E;
 
-  for( i= 0; i < LP.LiPM_rows; i++ )
-  {
-    FreeAligned( (ADDRESS) LP.LiPM[i], LP.LiPM_cols * sizeof(mprfloat) );
-    //    Free( (ADDRESS) LP.LiPM[i], LP.LiPM_cols * sizeof(mprfloat) );
-  }
-  Free( (ADDRESS) LP.LiPM, LP.LiPM_rows * sizeof(mprfloat *) );
-
-  Free( (ADDRESS) LP.iposv, (idelem * MAXPOINTS) * sizeof(int) );
-  Free( (ADDRESS) LP.izrov, (idelem * MAXPOINTS) * sizeof(int) );
+  delete LP;
 }
 
 //----------------------------------------------------------------------------------------
@@ -2533,11 +2525,7 @@ const number resMatrixDense::getDetAt( const number* evpoint )
   mprSTICKYPROT(ST__DET);
 
   // evaluate determinant of matrix m using factory singclap_det
-  #ifdef HAVE_FACTORY
   poly res= singclap_det( m );
-  #else
-  poly res= mpDetBareiss( m );
-  #endif
 
   // avoid errors for det==0
   number numres;
@@ -2597,11 +2585,7 @@ const number resMatrixDense::getSubDet()
     j++;
   }
 
-  #ifdef HAVE_FACTORY
   poly res= singclap_det( mat );
-  #else
-  poly res= mpDetBareiss( mat );
-  #endif
 
   number numres;
   if ( res && pGetCoeff( res ) )
@@ -2622,6 +2606,7 @@ const number resMatrixDense::getSubDet()
 //-----------------------------------------------------------------------------
 
 #define MAXEVPOINT 1000000 // 0x7fffffff
+//#define MPR_MASI
 
 //-> unsigned long over(unsigned long n,unsigned long d)
 // Calculates (n+d \over d) using gmp functionality
@@ -2937,7 +2922,7 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
         }
         else if ( i <= uvar + 2 )
         {
-          pevpoint[i]=nInit(1+(siRand() % MAXEVPOINT));
+	  pevpoint[i]=nInit(1+siRand()%MAXEVPOINT);
           //pevpoint[i]=nInit(383);
         }
         else
@@ -3057,7 +3042,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
         nDelete( &pevpoint[i] );
         if ( i <= uvar + 2 )
         {
-          pevpoint[i]=nInit(1+(siRand() % MAXEVPOINT));
+	  pevpoint[i]=nInit(1+siRand()%MAXEVPOINT);
           //pevpoint[i]=nInit(383);
         } else pevpoint[i]=nInit(0);
         mprPROTNnl(" ",pevpoint[i]);
@@ -3079,9 +3064,10 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
 
     number *ncpoly= (number *)Alloc( (tdg+1) * sizeof(number) );
 
-#ifdef MPR_TIMING
-       BOOLEAN masi=true;
+#ifdef MPR_MASI
+    BOOLEAN masi=true;
 #endif
+
     piter= pures;
     for ( i= tdg; i >= 0; i-- )
     {
@@ -3090,8 +3076,8 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
       {
         ncpoly[i]= nCopy( pGetCoeff( piter ) );
         pIter( piter );
-#ifdef MPR_TIMING
-       masi=false;
+#ifdef MPR_MASI
+	masi=false;
 #endif
       }
       else
@@ -3100,9 +3086,8 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
       }
       mprPROTNnl("", ncpoly[i] );
     }
-
-#ifdef MPR_TIMING
-     if ( masi ) Print("MASI MASI MASI\n");
+#ifdef MPR_MASI
+    if ( masi ) mprSTICKYPROT("MASI");
 #endif
 
     mprSTICKYPROT(ST_BASE_EV); // .
@@ -3148,6 +3133,35 @@ int uResultant::nextPrime( int i )
   return j;
 }
 //<-
+
+//-----------------------------------------------------------------------------
+
+//-> loNewtonPolytope(...)
+ideal loNewtonPolytope( const ideal id )
+{
+  simplex * LP;
+  int i;
+  int n,totverts,idelem;
+  ideal idr;
+
+  n= pVariables;
+  idelem= IDELEMS(id);  // should be n+1
+
+  totverts = 0;
+  for( i=0; i < idelem; i++) totverts += pLength( (id->m)[i] );
+
+  LP = new simplex( idelem+totverts*2+5, totverts+5 ); // rows, cols
+
+  // evaluate convex hull for supports of id
+  convexHull chnp( LP );
+  idr = chnp.newtonPolytopesI( id );
+
+  delete LP;
+
+  return idr;
+}
+//<-
+
 //%e
 
 //-----------------------------------------------------------------------------
@@ -3163,4 +3177,3 @@ int uResultant::nextPrime( int i )
 // in folding: C-c x
 // leave fold: C-c y
 //   foldmode: F10
-

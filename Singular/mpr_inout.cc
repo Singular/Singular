@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.6 1999-11-15 17:20:30 obachman Exp $ */
+/* $Id: mpr_inout.cc,v 1.7 1999-12-02 23:03:51 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -24,6 +24,7 @@
 #include "mmemory.h"
 #include "numbers.h"
 #include "lists.h"
+#include "matpol.h"
 
 #include <math.h>
 
@@ -35,6 +36,7 @@
 // to get detailed timigs, define MPR_TIMING
 #ifdef MPR_TIMING
 #define TIMING
+#endif
 #include "../factory/timing.h"
 TIMING_DEFINE_PRINT(mpr_overall)
 TIMING_DEFINE_PRINT(mpr_check)
@@ -43,12 +45,8 @@ TIMING_DEFINE_PRINT(mpr_ures)
 TIMING_DEFINE_PRINT(mpr_mures)
 TIMING_DEFINE_PRINT(mpr_arrange)
 TIMING_DEFINE_PRINT(mpr_solver)
-#define TIMING_EPR(t,msg) TIMING_END_AND_PRINT(t,msg);TIMING_RESET(t);
-#else
-#define TIMING_START(x)
-#define TIMING_EPR(x,y)
-#endif
 
+#define TIMING_EPR(t,msg) TIMING_END_AND_PRINT(t,msg);TIMING_RESET(t);
 
 enum mprState
 {
@@ -180,7 +178,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   // get ideal
   if ( v->Typ() != IDEAL_CMD )
     return TRUE;
-  else gls= (ideal)(args->Data());
+  else gls= (ideal)(v->Data());
   v= v->next;
 
   // get resultant matrix type to use (0,1)
@@ -210,7 +208,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   number smv= NULL;
   BOOLEAN interpolate_det= (mtype==uResultant::denseResMat)?TRUE:FALSE;
 
-  //emptylist= (lists)AllocSizeOf( slists );
+  //emptylist= (lists)Alloc( sizeof(slists) );
   //emptylist->Init( 0 );
 
   //res->rtyp = LIST_CMD;
@@ -313,7 +311,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   res->data= (void *)listofroots;
 
   //emptylist->Clean();
-  //  FreeSizeOf( (ADDRESS) emptylist, slists );
+  //  Free( (ADDRESS) emptylist, sizeof(slists) );
 
   TIMING_EPR(mpr_overall,"overall time\t\t")
 
@@ -355,9 +353,24 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   gls= (poly)(arg1->Data());
   int howclean= (int)arg3->Data();
 
+  if ( !(rField_is_R() ||
+         rField_is_Q() ||
+         rField_is_long_R() ||
+         rField_is_long_C()) )
+  {
+    WerrorS("Ground field not implemented!");
+    return TRUE;
+  }
+  
   if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) ) 
   {
     setGMPFloatDigits( (unsigned long int)arg2->Data() );
+  }
+
+  if ( gls == NULL || pIsConstant( gls ) )
+  {
+    WerrorS("Input polynomial is constant!");
+    return TRUE;
   }
 
   int deg= pTotaldegree( gls );
@@ -368,17 +381,8 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   lists elist;
   lists rlist;
 
-  elist= (lists)AllocSizeOf( slists );
+  elist= (lists)Alloc( sizeof(slists) );
   elist->Init( 0 );
-
-  if ( !(rField_is_R() ||
-         rField_is_Q() ||
-         rField_is_long_R() ||
-         rField_is_long_C()) )
-         {
-    WerrorS("Ground field not implemented!");
-    return TRUE;
-  }
 
   if ( pVariables > 1 )
   {
@@ -394,7 +398,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
       for ( i= 1; i <= pVariables; i++ )
         if ( (vpos != i) && (pGetExp( piter, i ) != 0) )
         {
-          Werror("The polynomial %s must be univariate!",arg1->Name());
+          WerrorS("The input polynomial must be univariate!");
           return TRUE;
         }
       pIter( piter );
@@ -437,7 +441,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   char *dummy;
   int j;
 
-  rlist= (lists)AllocSizeOf( slists );
+  rlist= (lists)Alloc( sizeof(slists) );
   rlist->Init( elem );
 
   if (rField_is_long_C())
@@ -460,7 +464,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   }
 
   elist->Clean();
-  //FreeSizeOf( (ADDRESS) elist, slists );
+  //Free( (ADDRESS) elist, sizeof(slists) );
 
   for ( i= deg; i >= 0; i-- ) nDelete( &pcoeffs[i] );
   Free( (ADDRESS) pcoeffs, (deg+1) * sizeof( number ) );
@@ -625,6 +629,102 @@ poly u_resultant_det( ideal gls, int imtype )
   TIMING_EPR(mpr_overall,"overall");
 
   return ( resdet );
+}
+//<-
+
+//-> BOOLEAN loNewtonP( leftv res, leftv arg1 )
+BOOLEAN loNewtonP( leftv res, leftv arg1 )
+{
+  res->data= (void*)loNewtonPolytope( (ideal)arg1->Data() );
+  return FALSE;
+}
+//<-
+
+//-> BOOLEAN loSimplex( leftv res, leftv args )
+BOOLEAN loSimplex( leftv res, leftv args )
+{
+  if ( !(rField_is_long_R()) )
+  {
+    WerrorS("Ground field not implemented!");
+    return TRUE;
+  }
+
+  simplex * LP;
+  matrix m;
+
+  leftv v= args;
+  if ( v->Typ() != MATRIX_CMD ) // 1: matrix
+    return TRUE;
+  else 
+    m= (matrix)(v->Data());
+  
+  LP = new simplex(MATROWS(m),MATCOLS(m));
+  LP->mapFromMatrix(m);
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 2: m = number of constraints
+    return TRUE;
+  else 
+    LP->m= (int)(v->Data());
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 3: n = number of variables 
+    return TRUE;
+  else 
+    LP->n= (int)(v->Data());
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 4: m1 = number of <= constraints
+    return TRUE;
+  else 
+    LP->m1= (int)(v->Data());
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 5: m2 = number of >= constraints
+    return TRUE;
+  else 
+    LP->m2= (int)(v->Data());
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 6: m3 = number of == constraints
+    return TRUE;
+  else 
+    LP->m3= (int)(v->Data());
+
+#ifdef mprDEBUG_PROT
+  Print("m (constraints) %d\n",LP->m);
+  Print("n (columns) %d\n",LP->n);
+  Print("m1 (<=) %d\n",LP->m1);
+  Print("m2 (>=) %d\n",LP->m2);
+  Print("m3 (==) %d\n",LP->m3);
+#endif
+
+  LP->compute();
+
+  lists lres= (lists)Alloc( sizeof(slists) );
+  lres->Init( 6 );
+
+  lres->m[0].rtyp= MATRIX_CMD; // output matrix
+  lres->m[0].data=(void*)LP->mapToMatrix(m);
+
+  lres->m[1].rtyp= INT_CMD;   // found a solution?
+  lres->m[1].data=(void*)LP->icase;
+
+  lres->m[2].rtyp= INTVEC_CMD;
+  lres->m[2].data=(void*)LP->posvToIV();
+ 
+  lres->m[3].rtyp= INTVEC_CMD;
+  lres->m[3].data=(void*)LP->zrovToIV();
+
+  lres->m[4].rtyp= INT_CMD;
+  lres->m[4].data=(void*)LP->m;
+
+  lres->m[5].rtyp= INT_CMD;
+  lres->m[5].data=(void*)LP->n;
+
+  res->data= (void*)lres;
+
+  return FALSE;
 }
 //<-
 
