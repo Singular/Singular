@@ -3,10 +3,10 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.9 2000-09-14 15:36:39 obachman Exp $
+dnl Version: $Id: configure.in,v 1.10 2000-12-15 08:44:28 obachman Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
-AC_INIT(omAlloc.c)
+AC_INIT(om_Alloc.c)
 
 VERSION=0.9.5
 AC_SUBST(VERSION)
