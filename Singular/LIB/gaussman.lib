@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.72 2002-02-26 09:01:38 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.73 2002-03-05 13:49:50 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -513,7 +513,7 @@ proc monodromy(poly t)
 "USAGE:    monodromy(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
-RETURN:   list l;  Jordan data jordan(M) of monodromy matrix exp(-2*pi*i*M)
+RETURN:   list l=jordan(M);  Jordan data of monodromy matrix exp(-2*pi*i*M)
 SEE ALSO: mondromy_lib, linalg.lib
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; monodromy
 EXAMPLE:  example monodromy; shows examples
