@@ -1243,6 +1243,12 @@ int mac_length(mac_poly p){
   }
   return l;
 }
+BOOLEAN is_valid_ro(red_object & ro){
+  red_object r2=ro;
+  ro.validate();
+  if ((r2.p!=ro.p)||(r2.sev!=ro.sev)||(r2.sum!=ro.sum)) return FALSE;
+  return TRUE;
+}
 void pre_comp(poly* p,int & pn,calc_dat* c){
   if(!(pn))
     return;
@@ -1378,7 +1384,12 @@ static void go_on (calc_dat* c){
   //set limit of 1000 for multireductions, at the moment for
   //programming reasons
   int i=0;
-
+  c->average_length=0;
+  for(i=0;i<c->n;i++){
+    c->average_length+=c->lengths[i];
+  }
+  c->average_length=c->average_length/c->n;
+  i=0;
   poly* p=(poly*) omalloc((PAR_N+1)*sizeof(poly));//nullterminated
 
   int curr_deg=-1;
@@ -2413,6 +2424,7 @@ static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int start
   int j;
   while(i>=0){
     assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)<=0));
+    assume(is_valid_ro(los[i]));
     j=kFindDivisibleByInS_easy(strat,los[i]);
     if(j>=0){
      
@@ -2424,6 +2436,7 @@ static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int start
 	if(!pLmEqual(los[i].p,los[i2].p))
 	  break;
       }
+      
       erg.to_reduce_l=i2+1;
       assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
       return;
@@ -2545,6 +2558,7 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 //  nicht reduzierbare einträge in ergebnisliste schreiben
   // nullen loeschen
   while(curr_pos>=0){
+    
     find_erg erg;
     multi_reduction_find(los, losl,c,curr_pos,erg);//last argument should be curr_pos
    //  PrintS("\n erg:\n");
@@ -2558,7 +2572,8 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 
     erg.expand=NULL;
     int d=erg.to_reduce_u-erg.to_reduce_l+1;
-    if ((!erg.fromS)&&(d>100)){
+    //if ((!erg.fromS)&&(d>100)){
+    if (0){
       PrintS("L");
       if(!erg.fromS){
 	erg.to_reduce_u=MAX(erg.to_reduce_u,erg.reduce_by);
@@ -2746,13 +2761,25 @@ void simple_reducer::target_is_a_sum_reduce(red_object & ro){
     poly lm=kBucketGetLm(ro.sum->ac->bucket);
     if (lm)
       ro.sum->ac->sev=pGetShortExpVector(lm);
+    ro.sum->ac->last_reduction_id=reduction_id;
   }
   ro.sev=ro.sum->ac->sev;
+  ro.p=kBucketGetLm(ro.sum->ac->bucket);
 }
 void simple_reducer::reduce(red_object* r, int l, int u){
   this->pre_reduce(r,l,u);
   int i;
+//debug start
+  int im;
+//  for(im=l;im<=u;im++)
+  //  assume(is_valid_ro(r[im]));
+  
+
+//debug end
+
   for(i=l;i<=u;i++){
+  
+
     if(r[i].sum==NULL)
       this->target_is_no_sum_reduce(r[i]);
 
@@ -2769,6 +2796,10 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   }
   for(i=l;i<=u;i++){
     r[i].validate();
+    #ifdef TGB_DEBUG
+    if (r[i].sum) r[i].sev=r[i].sum->ac->sev;
+
+    #endif
       }
 }
 reduction_step::~reduction_step(){}
@@ -2777,9 +2808,17 @@ simple_reducer::~simple_reducer(){
   {
     kBucketInit(fill_back,p,p_len);
   }
+  fill_back=NULL;
     
 }
-
+ join_simple_reducer::~join_simple_reducer(){
+   if(fill_back!=NULL)
+   {
+     kBucketInit(fill_back,p,p_len);
+   }
+   fill_back=NULL;
+    
+}
 void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   static int id=0;
   id++;
@@ -2856,38 +2895,28 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   }
   else
   {
+    r[rn].flatten();
     kBucketClear(r[rn].bucket,&red,&red_len);
   }
-  #ifdef HANS_IDEA
-  if(erg.to_reduce_u-erg.to_reduce_l>5){
-    poly my=pOne();
-    int ol=red_len;
-    for(int i=1;i<=pVariables;i++)
-      pSetExp(my,i,(pGetExp(r[erg.to_reduce_u].p, i)-pGetExp(red,i)));
-    
-    pSetm(my);
-    number m;
-    poly a=ppMult_mm(red,my);
-    woc=TRUE;
-    red_len--;
-
-//    a->next=redNF2(a->next,c,red_len, m,2);
-    redTailShort(a,c->strat);
-//    pSetCoeff(a,nMult(a->coef,m));
-    red_len++;
-    red_len=pLength(a);
-    assume(red_len==pLength(a));
-    if(!erg.fromS) kBucketInit(r[rn].bucket,red, ol);
-    red=a;
-    red_len=pLength(a);
+  int i;
+  int red_c=0;
+  if(red_len>3*c->average_length){
+    for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
+      if((r[i].sum==NULL) ||(r[i].sum->ac->counter<=AC_FLATTEN)) red_c++;
+    }
   }
-  #endif
-  pointer=new simple_reducer(red,red_len,c);
+  if (red_c>=AC_NEW_MIN)
+    pointer=new join_simple_reducer(red,red_len,r[erg.to_reduce_l].p);
+  else
+    pointer=new simple_reducer(red,red_len,c);
 
   if ((!woc) && (!erg.fromS))
     pointer->fill_back=r[rn].bucket;
   else
     pointer->fill_back=NULL;
+  pointer->reduction_id=id;
+  pointer->c=c;
+
   pointer->reduce(r,erg.to_reduce_l, erg.to_reduce_u);
   if(woc) pDelete(&pointer->p);
   delete pointer;
@@ -2956,7 +2985,7 @@ void join_simple_reducer:: pre_reduce(red_object* r, int l, int u){
   for(int i=l;i<=u;i++)
     {
       if (r[i].sum){
-	if(r[i].sum->ac->counter<=15) r[i].flatten();
+	if(r[i].sum->ac->counter<=AC_FLATTEN) r[i].flatten();
 	
       }
     }

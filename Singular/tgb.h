@@ -17,15 +17,16 @@
 #include "kInline.cc"
 #include "kstd1.h"
 #include "kbuckets.h"
-
+//#define TGB_DEBUG
 #define FULLREDUCTIONS
 #define HANS_IDEA
 //#define HALFREDUCTIONS
 //#define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
-#define PAR_N 100
-#define AC_NEW_MIN 70
+#define PAR_N 150
+#define AC_NEW_MIN 15
+#define AC_FLATTEN 2
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 struct sorted_pair_node{
@@ -106,6 +107,7 @@ struct calc_dat
   int pair_top;
   int easy_product_crit;
   int extended_product_crit;
+  int average_length;
   BOOLEAN is_char0;
 };
 class red_object{
@@ -202,6 +204,7 @@ class join_simple_reducer:public simple_reducer{
    
     
   }
+    ~join_simple_reducer();
    void pre_reduce(red_object* r, int l, int u);
   void target_is_no_sum_reduce(red_object & ro);
   reduction_accumulator* ac;
