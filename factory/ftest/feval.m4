@@ -1,11 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: feval.m4,v 1.6 1998-07-03 10:04:29 schmidt Exp $ */
+/* $Id: feval.m4,v 1.7 1998-07-03 10:20:46 schmidt Exp $ */
 
 ftestSetNameOfGame( feval, `"
 Usage: feval [<options>] [<envSpec>] [expand=<n>] <f>
   evaluates canonical form <f>.
+
   In contrast to the other programs of the Factory Test
-  Environment, f may span more than one argument.  More
+  Environment, <f> may span more than one argument.  More
   precisely, all arguments are textually pasted together and are
   then evaluated as one canonical form.  If there are not any
   arguments (except options), neither time nor status nor result
@@ -31,7 +32,9 @@ dnl // are for font-lock only (another font-lock-trick)
 //
 //}}}
 
+// necessary to paste the arguments together
 #include <string.h>
+
 ftestPreprocInit();
 
 ftestGlobalInit();
