@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.6 2000-12-22 13:38:23 greuel Exp $";
+version="$Id: brnoeth.lib,v 1.7 2001-01-10 15:18:34 hannes Exp $";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
 AUTHORS:   Jose Ignacio Farran Martin, ignfar@eis.uva.es
@@ -806,15 +806,44 @@ static proc subfield (sf)
       }
       else
       {
-        list Fq;
-        ideal facs=factorize(x^(q-1)-1,1);
-        for (i=1;i<=q-1;i=i+1)
+        // list all the elements of the finite field F_q
+        int p=char(basering);
+        list FF1,FF2;
+        for (i=0;i<p;i=i+1)
         {
-          Fq[i]=number(subst(facs[i],x,0));
+          FF1[i+1]=number(i);
         }
+        int s,j,k;
+        for (i=1;i<r;i=i+1)
+        {
+          s=size(FF1);
+          for (j=1;j<=s;j=j+1)
+          {
+            FF1[j]=FF1[j]*a;
+          }
+          FF2=FF1;
+          for (k=1;k<p;k=k+1)
+          {
+            for (j=1;j<=s;j=j+1)
+            {
+              FF1[j]=FF1[j]+number(1);
+            }
+            FF2=FF2+FF1;
+          }
+          FF1=FF2;
+          FF2=list();
+        }
+        kill(FF2);
+//        list Fp;
+//        ideal facs=factorize(x^(q-1)-1,1);
+//        for (i=1;i<=q-1;i=i+1)
+//        {
+//          Fq[i]=number(subst(facs[i],x,0));
+//        }
         for (i=1;i<=q-1;i=i+1)
         {
-          b=Fq[i];
+//          b=Fq[i];
+          b=FF1[i];
           if (subst(mpol,x,b)==0)
           {
             answer=string(b);
@@ -822,6 +851,7 @@ static proc subfield (sf)
           }
         }
       }
+      kill(FF1);
       return(answer);
     }
     else
@@ -1169,8 +1199,8 @@ static proc place (intvec Pp,int sing,list CURVE)
       }      
       if (check==0)
       {
-        ring S(1)=char(basering),(x,y,t),ls;
         intvec dgs_points(1);
+        ring S(1)=char(basering),(x,y,t),ls;
         list BRANCHES=list();
         list POINTS=list();
         list LOC_EQS=list();
@@ -1182,10 +1212,12 @@ static proc place (intvec Pp,int sing,list CURVE)
       }
       else
       {
-        def S(1)=update_CURVE[5][1][1];
-        def dgs_points(1)=update_CURVE[5][1][2];
+        intvec dgs_points(1)=update_CURVE[5][1][2];
+        def S1=update_CURVE[5][1][1];
+        execute("ring S(1)="+string(update_CURVE[5][1][1])+";");
+        fetchall(S1);
+        kill(S1);
       }
-      setring S(1);
       N_branches=size(BRANCHES);
       for (i=1;i<=n_branches;i=i+1)
       {
@@ -1313,10 +1345,17 @@ static proc place (intvec Pp,int sing,list CURVE)
         }
         else
         {
-          def S(ext_0)=update_CURVE[5][ext_0][1];
-          def dgs_points(ext_0)=update_CURVE[5][ext_0][2];
+          intvec dgs_points(ext_0)=update_CURVE[5][ext_0][2];
+          def Sext_0=update_CURVE[5][ext_0][1];
+          setring Sext_0;
+          string SM=string(minpoly);
+          string SR=string(update_CURVE[5][ext_0][1]);
+          execute("ring S("+string(ext_0)+")="+SR+";");
+          execute("minpoly="+SM+";");
+          kill(SM,SR);
+          fetchall(Sext_0);
+          kill(Sext_0);
         }
-        setring S(ext_0);
         N_branches=size(BRANCHES);
         dgs_points(ext_0)[N_branches+1]=1;
         POINTS[N_branches+1]=list();
@@ -1440,10 +1479,17 @@ static proc place (intvec Pp,int sing,list CURVE)
       }
       else
       {
-        def S(ext2)=update_CURVE[5][ext2][1];
-        def dgs_points(ext2)=update_CURVE[5][ext2][2];
+        intvec dgs_points(ext2)=update_CURVE[5][ext2][2];
+        def Sext2=update_CURVE[5][ext2][1];
+        setring Sext2;
+        string SM=string(minpoly);
+        string SR=string(update_CURVE[5][ext2][1]);
+        execute("ring S("+string(ext2)+")="+SR+";");
+        execute("minpoly="+SM+";");
+        kill(SM,SR);
+        fetchall(Sext2);
+        kill(Sext2);
       }
-      setring S(ext2);
       N_branches=size(BRANCHES);
       for (i=1;i<=n_branches;i=i+1)
       {
@@ -1592,10 +1638,17 @@ static proc place (intvec Pp,int sing,list CURVE)
         }
         else
         {
-          def S(ext_0)=update_CURVE[5][ext_0][1];
-          def dgs_points(ext_0)=update_CURVE[5][ext_0][2];
+          intvec dgs_points(ext_0)=update_CURVE[5][ext_0][2];
+          def Sext_0=update_CURVE[5][ext_0][1];
+          setring Sext_0;
+          string SM=string(minpoly);
+          string SR=string(update_CURVE[5][ext_0][1]);
+          execute("ring S("+string(ext_0)+")="+SR+";");
+          execute("minpoly="+SM+";");
+          kill(SM,SR);
+          fetchall(badring);
+          kill(badring);
         }
-        setring S(ext_0);
         N_branches=size(BRANCHES);
         // now fetch all the data into the new local ring
         olda=subfield(local_aux);
@@ -2133,16 +2186,19 @@ EXAMPLE:  example NSplaces; shows an example
   {
     dbprint(printlevel+1,"Computing non-singular affine places of degree "
                            +string(i)+" ... ");
-    list Aff_Points(i)=closed_points_deg(CHI,i,Aff_SLocus);
-    s=size(Aff_Points(i));
-    if (s>0)
+    if (defined(Aff_Points(i))==0)
     {
-      export(Aff_Points(i));
-      pP[2]=i;
-      for (j=1;j<=s;j=j+1)
+      list Aff_Points(i)=closed_points_deg(CHI,i,Aff_SLocus);
+      s=size(Aff_Points(i));
+      if (s>0)
       {
-        pP[3]=j;
-        update_CURVE=place(pP,0,update_CURVE);
+        export(Aff_Points(i));
+        pP[2]=i;
+        for (j=1;j<=s;j=j+1)
+        {
+          pP[3]=j;
+          update_CURVE=place(pP,0,update_CURVE);
+        }
       }
     }
   }
