@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.5 1999-03-18 16:30:52 Singular Exp $ */
+/* $Id: mmbt.c,v 1.6 1999-03-18 17:00:15 Singular Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -93,7 +93,7 @@ void mmP2cNameInit()
   FILE *f;
   int i,j;
   char n[128];
-  system("mprnm -p Singularg >nm.log");
+  system("./mprnm -p Singularg >nm.log");
   f=fopen("nm.log","r");
   i=0;
   loop

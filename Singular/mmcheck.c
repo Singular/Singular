@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.3 1999-01-26 14:41:38 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.4 1999-03-18 17:00:15 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -167,6 +167,9 @@ void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
 
   memset(what->front_pattern, MM_FRONT_PATTERN, MM_NUMBER_OF_FRONT_PATTERNS);
   memset((char*) addr + size, MM_BACK_PATTERN, DebugOffsetBack);
+  #ifdef MTRACK
+  mmTrack(what->bt_stack);
+  #endif
 }
 
 /**********************************************************************
