@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.92 1998-05-19 20:38:13 schmidt Exp $
+@comment $Id: general.doc,v 1.93 1998-05-19 21:11:25 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1407,7 +1407,7 @@ Possible type casts are:
 @item
 @   3. @tab to @code{int} @tab    from @code{number}, @code{poly}
 @item
-@   4. @tab to @code{intvec} @tab from expression lists of @code{int}
+@   4. @tab to @code{intvec} @tab from expression lists of @code{int}, @code{intmat}
 @item
 @   5. @tab to @code{list} @tab   from expression lists of any type
 @item
