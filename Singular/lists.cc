@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.24 2002-05-16 17:52:02 Singular Exp $ */
+/* $Id: lists.cc,v 1.25 2004-09-13 15:41:58 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -326,7 +326,7 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
       break;
     }
     r[i]=(ideal)L->m[i].data;
-    tw=(intvec*)atGet((idhdl)&L->m[i],"isHomog");
+    tw=(intvec*)atGet((idhdl)&L->m[i],"isHomog",INTVEC_CMD);
     if (tw!=NULL)
     {
       w[i]=ivCopy(tw);
