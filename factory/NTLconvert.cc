@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.7 2003-02-14 15:53:26 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.8 2003-04-01 15:26:08 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -26,6 +26,17 @@
 #include <NTL/GF2EXFactoring.h>
 #include "NTLconvert.h"
 
+#ifdef HAVE_OMALLOC
+#define Alloc(L) omAlloc(L)
+#define Free(A,L) omFreeSize(A,L)
+#elif defined(USE_MEMUTIL)
+#include "memutil.h"
+#define Alloc(L) getBlock(L)
+#define Free(A,L) freeBlock(A,L)
+#else
+#define Alloc(L) malloc(L)
+#define Free(A,L) free(A)
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 // NAME: convertFacCF2NTLZZpX                                                 //
 //                                                                            //
@@ -427,8 +438,8 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
   //CanonicalForm tmp=0;
   if (cf_stringtemp_l==0)
   {
-    cf_stringtemp=(char *)omAlloc(1023);
-    cf_stringtemp2=(char *)omAlloc(1023);
+    cf_stringtemp=(char *)Alloc(1023);
+    cf_stringtemp2=(char *)Alloc(1023);
     cf_stringtemp[0]='\0';
     cf_stringtemp2[0]='\0';
     cf_stringtemp_l=1023;
@@ -472,13 +483,13 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
       l++;
       if (l>=cf_stringtemp_l-2)
       {
-        omFree(cf_stringtemp2);
-        char *p=(char *)omAlloc(cf_stringtemp_l*2);
+        Free(cf_stringtemp2,cf_stringtemp_l);
+        char *p=(char *)Alloc(cf_stringtemp_l*2);
         memcpy(p,cf_stringtemp,cf_stringtemp_l);
+        Free(cf_stringtemp,cf_stringtemp_l);
         cf_stringtemp_l*=2;
-        omFree(cf_stringtemp);
         cf_stringtemp=p;
-        cf_stringtemp2=(char *)omAlloc(cf_stringtemp_l);
+        cf_stringtemp2=(char *)Alloc(cf_stringtemp_l);
       }
       cf_stringtemp[l-1]=dummy[0];
       cf_stringtemp[l]='\0';
@@ -557,10 +568,10 @@ ZZX convertFacCF2NTLZZX(CanonicalForm f)
 
         gmp_val[0]=getmpi(i.coeff().getval());
         int l=mpz_sizeinbase(gmp_val,10)+2;
-        stringtemp=(char*)omAlloc(l);
+        stringtemp=(char*)Alloc(l);
         stringtemp=mpz_get_str(stringtemp,10,gmp_val);
         conv(temp,stringtemp);
-        omFreeSize(stringtemp,l);
+        Free(stringtemp,l);
 
         //set the computed coefficient
         SetCoeff(ntl_poly,NTLcurrentExp,temp);
