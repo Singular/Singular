@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.3 2004-08-13 18:29:03 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.4 2004-11-09 14:54:59 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -16,7 +16,7 @@
 #include "kstd1.h"
 #include "khstd.h"
 //#include "spolys.h"
-#include "cntrlc.h"
+//#include "cntrlc.h"
 #include "weight.h"
 #include "intvec.h"
 #include "structs.h"

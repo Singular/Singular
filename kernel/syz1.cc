@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.9 2004-07-16 08:43:01 Singular Exp $ */
+/* $Id: syz1.cc,v 1.10 2004-11-09 14:55:01 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -15,7 +15,7 @@
 #include "kstd1.h"
 #include "kutil.h"
 #include "stairc.h"
-#include "cntrlc.h"
+//#include "cntrlc.h"
 #include "intvec.h"
 #include "numbers.h"
 #include "modulop.h"

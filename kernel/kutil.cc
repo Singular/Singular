@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.4 2004-08-13 18:29:03 levandov Exp $ */
+/* $Id: kutil.cc,v 1.5 2004-11-09 14:55:00 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -42,7 +42,7 @@
 #include "ring.h"
 #include "ideals.h"
 #include "timer.h"
-#include "cntrlc.h"
+//#include "cntrlc.h"
 #include "stairc.h"
 #include "kstd1.h"
 #include "pShallowCopyDelete.h"
