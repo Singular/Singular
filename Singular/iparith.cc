@@ -12,9 +12,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#ifndef macintosh
 #include <unistd.h>
-#endif
 
 #include "mod2.h"
 #include "tok.h"

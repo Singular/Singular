@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.8 1997-06-09 12:23:58 Singular Exp $ */
+/* $Id: attrib.cc,v 1.9 1998-04-08 13:07:49 pohl Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -11,10 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-
-#ifndef macintosh
 #include <unistd.h>
-#endif
 
 #include "mod2.h"
 #include "tok.h"
