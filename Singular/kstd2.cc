@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.36 1999-10-18 11:19:27 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.37 1999-10-19 12:42:44 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -39,294 +39,6 @@ static poly kFromInput(poly p,kStrategy strat)
     return pHead(q);
   return NULL;
 }
-
-/*2
-*  reduction procedure for the syz
-*  and TEST_OPT_MINRES: special minimizing during computations
-*  assumes homogeneous case and degree-ordering
-*/
-#if 0
-static int redSyz (LObject* h,kStrategy strat)
-{
-  int j = 0,i=0,pos;
-  BOOLEAN exchanged=pDivisibleBy((*h).p2,(*h).p1);
-  poly p,q;
-  unsigned long not_sev;
-
-  if (exchanged)
-  {
-    q = kFromInput((*h).p1,strat);
-    if (q==NULL)
-    {
-      exchanged = FALSE;
-    }
-    else
-    {
-      while (i<=strat->Ll)
-      {
-        if ((strat->L[i].p1==strat->P.p1) || (strat->L[i].p2==strat->P.p1))
-        {
-          deleteInL(strat->L,&strat->Ll,i,strat);
-        }
-        else
-          i++;
-      }
-      i = 0;
-    }
-  }
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("red:");
-    wrp(h->p);
-  }
-  loop
-  {
-    i = 0;
-    j = strat->sl + 1;
-    not_sev = ~ PGetShortExpVector(h->p);
-    while (i <= strat->tl)
-    {
-      if (pShortDivisibleBy(strat->T[i], strat->T[i].sev, h->p, not_sev))
-      {
-        if ((!exchanged) && (pEqual((*h).p,strat->T[i].p)))
-        {
-          j = 0;
-          while (j<=strat->sl)
-          {
-            if (strat->S[j] == strat->T[i].p) break;
-          }
-          if (j <= strat->sl) break;
-        }
-        else
-        {
-          break;
-        }
-      }
-      i++;
-    }
-
-    if (i > strat->tl)
-    {
-      // nothing to reduce with
-      if (exchanged)
-      {
-        assume(q!= NULL);
-        if (pGetComp((*h).p) > strat->syzComp)
-        {
-          pDelete(&((*h).p));
-          pDelete(&q);
-          return;
-        }
-        else
-        {
-          if (!TEST_OPT_INTSTRATEGY)
-          {
-            pos = posInS(strat->S,strat->sl,(*h).p);
-            pNorm((*h).p);
-            (*h).p = redtailSyz((*h).p,pos-1,strat);
-          }
-          p = (*h).p;
-          while ((pNext(p)!=NULL) && (pGetComp(pNext(p))<=strat->syzComp))
-            pIter(p);
-          pDelete(&pNext(p));
-          pNext(p) = q;
-          q = NULL;
-        }
-      }
-      else if (!TEST_OPT_INTSTRATEGY)
-      {
-        pos = posInS(strat->S,strat->sl,(*h).p);
-        pNorm((*h).p);
-        (*h).p = redtailSyz((*h).p,pos-1,strat);
-      }
-      if (q != NULL) pDelete(&q);
-      enterTBba((*h),strat->tl+1,strat);
-      return;
-    }
-
-    // found one to reduce
-    if (j <= strat->sl)
-    {
-      // might have found a better one ?
-      q = kFromInput(strat->S[j],strat);
-      if (q!=NULL)
-      {
-        exchanged = TRUE;
-        p = strat->S[j];
-        if (!TEST_OPT_INTSTRATEGY)
-          pNorm((*h).p);
-        else
-        {
-          //pContent((*h).p);
-          pCleardenom((*h).p);// also does a pContent
-        }
-        strat->S[j] = (*h).p;
-        (*h).p = p;
-         strat->T[i].p = strat->S[j];
-        for (i=0;i<=strat->Ll;i++)
-        {
-          if (strat->L[i].p1==p) strat->L[i].p1=strat->S[j];
-          if (strat->L[i].p2==p) strat->L[i].p2=strat->S[j];
-        }
-      }
-    }
-
-    if (TEST_OPT_DEBUG)
-    {
-      PrintS(" with ");
-      wrp(strat->T[i].p);
-    }
-    kbReducePoly(h, &(strat->T[i]), strat->kNoether);
-    if (TEST_OPT_DEBUG)
-    {
-      PrintS("\nto "); wrp((*h).p);PrintLn();
-    }
-    if ((*h).p == NULL)
-    {
-      if (h->lcm!=NULL) pFree1((*h).lcm);
-#ifdef KDEBUG
-      (*h).lcm=NULL;
-#endif
-      if (q != NULL) pDelete(&q);
-      return;
-    }
-  }
-}
-
-#else
-
-static int redSyz (LObject* h,kStrategy strat)
-{
-  int j = 0,i=0,pos;
-  BOOLEAN exchanged=pDivisibleBy((*h).p2,(*h).p1);
-  poly p,q;
-  unsigned long not_sev;
-
-  if (exchanged)
-  {
-    q = kFromInput((*h).p1,strat);
-    if (q==NULL)
-    {
-      exchanged = FALSE;
-    }
-    else
-    {
-      while (i<=strat->Ll)
-      {
-        if ((strat->L[i].p1==strat->P.p1) || (strat->L[i].p2==strat->P.p1))
-        {
-          deleteInL(strat->L,&strat->Ll,i,strat);
-        }
-        else
-          i++;
-      }
-      i = 0;
-    }
-  }
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("red:");
-    wrp(h->p);
-  }
-  h->sev = pGetShortExpVector(h->p);
-  not_sev = ~ h->sev;
-  loop
-  {
-    if (pShortDivisibleBy(strat->S[j], strat->sevS[j], h->p, not_sev))
-    {
-      if ((!exchanged) && (pEqual((*h).p,strat->S[j])))
-      {
-        q = kFromInput(strat->S[j],strat);
-        if (q!=NULL)
-        {
-          exchanged = TRUE;
-          p = strat->S[j];
-          if (!TEST_OPT_INTSTRATEGY)
-            pNorm((*h).p);
-          else
-          {
-            //pContent((*h).p);
-            pCleardenom((*h).p);// also does a pContent
-          }
-          strat->S[j] = (*h).p;
-          strat->sevS[j] = ~ not_sev;
-          (*h).p = p;
-          h->sev = strat->sevS[j];
-          while ((i<=strat->tl) && (strat->T[i].p!=p)) i++;
-          if (i<=strat->tl) strat->T[i].SetP(strat->S[j]);
-          for (i=0;i<=strat->Ll;i++)
-          {
-            if (strat->L[i].p1==p) strat->L[i].p1=strat->S[j];
-            if (strat->L[i].p2==p) strat->L[i].p2=strat->S[j];
-          }
-        }
-      }
-      //if (strat->interpt) test_int_std(strat->kIdeal);
-      /*- compute the s-polynomial -*/
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS(" with ");
-        wrp(strat->S[j]);
-      }
-      (*h).p = ksOldSpolyRed(strat->S[j],(*h).p,strat->kNoether);
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("\nto "); wrp((*h).p);PrintLn();
-      }
-      if ((*h).p == NULL)
-      {
-        if (h->lcm!=NULL) pFree1((*h).lcm);
-#ifdef KDEBUG
-        (*h).lcm=NULL;
-#endif
-        return 0;
-      }
-/*- try to reduce the s-polynomial -*/
-      j = 0;
-      h->sev = pGetShortExpVector(h->p);
-      not_sev = ~ h->sev;
-    }
-    else
-    {
-      if (j >= strat->sl)
-      {
-        if (exchanged)
-        {
-          if (pGetComp((*h).p) > strat->syzComp)
-          {
-            pDelete(&((*h).p));
-            return 0;
-          }
-          else
-          {
-            if (!TEST_OPT_INTSTRATEGY)
-            {
-              pos = posInS(strat->S,strat->sl,(*h).p);
-              pNorm((*h).p);
-              (*h).p = redtailSyz((*h).p,pos-1,strat);
-            }
-            p = (*h).p;
-            while ((pNext(p)!=NULL) && (pGetComp(pNext(p))<=strat->syzComp))
-               pIter(p);
-            pDelete(&pNext(p));
-            pNext(p) = q;
-          }
-        }
-        else if (!TEST_OPT_INTSTRATEGY)
-        {
-          pos = posInS(strat->S,strat->sl,(*h).p);
-          pNorm((*h).p);
-          (*h).p = redtailSyz((*h).p,pos-1,strat);
-        }
-        enterTBba((*h),strat->tl+1,strat);
-        return 1;
-      }
-      j++;
-    }
-  }
-}
-
-#endif
 
 /*2
 *  reduction procedure for the homogeneous case
@@ -804,12 +516,6 @@ void initBba(ideal F,kStrategy strat)
     strat->red = redLazy;
   else
     strat->red = redHomog;
-  if (TEST_OPT_MINRES && strat->homog && (strat->syzComp >0))
-  {
-    strat->red = redSyz;
-    strat->posInT = posInT0;
-  }
-
   if (pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
   else
@@ -925,19 +631,13 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         if (TEST_OPT_INTSTRATEGY)
         {
           pCleardenom(strat->P.p);
-          if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
-          {
-            strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-            pCleardenom(strat->P.p);
-          }
+          strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+          pCleardenom(strat->P.p);
         }
         else
         {
           pNorm(strat->P.p);
-          if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
-          {
-            strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-          }
+          strat->P.p = redtailBba(strat->P.p,pos-1,strat);
         }
 
         if (TEST_OPT_DEBUG){PrintS("new s:");wrp(strat->P.p);PrintLn();}
@@ -961,8 +661,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         enterTBba(strat->P, strat->posInT(strat->T,strat->tl,strat->P), 
                   strat);
         enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
-        // do we really need to recompute posInS
-        strat->enterS(strat->P,posInS(strat->S,strat->sl,strat->P.p), strat);
+        // posInS only depends only onthe leading term
+        strat->enterS(strat->P, pos, strat);
         if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }
       if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);

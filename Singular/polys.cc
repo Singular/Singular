@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.49 1999-10-19 09:50:41 Singular Exp $ */
+/* $Id: polys.cc,v 1.50 1999-10-19 12:42:47 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -140,9 +140,9 @@ void rSetm(poly p)
         case ro_syz:
         {
           int c=pGetComp(p);
-	  if (c > o->data.syz.limit)
+          if (c > o->data.syz.limit)
             p->exp.l[o->data.syz.place]= 1;
-	  else
+          else
             p->exp.l[o->data.syz.place]= 0;
           break;
         }
@@ -251,11 +251,6 @@ int pComp(poly p1, poly p2)
   return pComp0(p1,p2);
 }
 
-
-int rComp0(poly p1, poly p2)
-{
-  _pMonCmp(p1, p2, return 0, return 1, return -1);
-}
 
 /*----------pComp handling for syzygies---------------------*/
 static void newHeadsB(polyset actHeads,int length)

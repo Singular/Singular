@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.14 1999-10-01 19:34:20 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.15 1999-10-19 12:42:46 obachman Exp $ */
 
 /***************************************************************
  *
@@ -87,6 +87,11 @@ while (0)
 
 
 #endif // WORDS_BIGENDIAN
+
+inline int rComp0(poly p1, poly p2)
+{
+  _pMonCmp(p1, p2, return 0, return 1, return -1);
+}
 
 #endif // POLYS_COMP_H
 

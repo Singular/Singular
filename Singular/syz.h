@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.19 1999-10-14 14:27:34 obachman Exp $ */
+/* $Id: syz.h,v 1.20 1999-10-19 12:42:49 obachman Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -12,6 +12,11 @@
 #include "syz.aso"
 #endif
 
+// Logarithm of estimate of maximal number of new components
+#define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8
+// Logarithm of "distance" between a new component and prev component
+#define SYZ_SHIFT_BASE_LOG (BIT_SIZEOF_LONG - 1 - SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE)
+#define SYZ_SHIFT_BASE (1 << SYZ_SHIFT_BASE_LOG)
 struct sSObject{
                  poly  p;
                  poly  p1,p2; /*- the pair p comes from -*/
@@ -46,6 +51,7 @@ class ssyStrategy{
   intvec * Tl;
   intvec * resolution;
   intvec * cw;
+  intvec * betti;
   short list_length;
   short references;
   kBucket_pt bucket;
@@ -71,8 +77,6 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
                         intvec *** weights, BOOLEAN minim);
 
 syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim);
-
-resolvente syMinRes(ideal arg, int maxlength, int * length, BOOLEAN minim);
 
 void syMinimizeResolvente(resolvente res, int length, int first);
 
@@ -105,8 +109,27 @@ syStrategy syConvList(lists li,BOOLEAN toDel=FALSE);
 syStrategy syForceMin(lists li);
 syStrategy syMinimize(syStrategy syzstr);
 void syKillEmptyEntres(resolvente res,int length);
+#ifdef PDEBUG
+int syzcomp2dpc(poly p1, poly p2);
+#else
+#define syzcomp2dpc rComp0
+#endif
 
 extern int *  currcomponents;
 extern long *  currShiftedComponents;
+
+int syzcomp1dpc(poly p1, poly p2);
+void syDeletePair(SObject * so);
+void syInitializePair(SObject * so);
+void syCopyPair(SObject * argso, SObject * imso);
+void syCompactifyPairSet(SSet sPairs, int sPlength, int first);
+void syCompactify1(SSet sPairs, int* sPlength, int first);
+SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw=NULL);
+void syResetShiftedComponents(syStrategy syzstr, int index,int hilb=0);
+void syEnlargeFields(syStrategy syzstr,int index);
+void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int index);
+SSet syChosePairs(syStrategy syzstr, int *index, int *howmuch, int * actdeg);
+int syInitSyzMod(syStrategy syzstr, int index, int init=17);
+long syReorderShiftedComponents(long * sc, int n);
 
 #endif

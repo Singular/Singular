@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.42 1999-10-14 14:27:34 obachman Exp $ */
+/* $Id: syz1.cc,v 1.43 1999-10-19 12:42:49 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -28,6 +28,7 @@
 #include "lists.h"
 #include "syz.h"
 #include "kbuckets.h"
+#include "polys-comp.h"
 #include <limits.h>
 
 extern void rSetmS(poly p, int* Components, long* ShiftedComponents);
@@ -37,34 +38,17 @@ extern void rSetmS(poly p, int* Components, long* ShiftedComponents);
 int *  currcomponents=NULL;
 long *  currShiftedComponents=NULL;
 
-// Logarithm of estimate of maximal number of new components
-#define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8
-// Logarithm of "distance" between a new component and prev component
-#define SYZ_SHIFT_BASE_LOG (BIT_SIZEOF_LONG - 1 - SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE)
-#define SYZ_SHIFT_BASE (1 << SYZ_SHIFT_BASE_LOG)
-
 
 /*---head-term-polynomials for the reduction------------*/
 static poly redpol=NULL;
 /*---counts number of applications of GM-criteria-------*/
 //static int crit;
-//static int zeroRed;
-//static int dsim;
-//static int simple;
-static int euler;
-/*---controls the ordering------------------------------*/
-static intvec * orderedcomp;
-static int *binomials;
-static int highdeg;
-static int highdeg_1;
-
-// uncomment to play around with new spolys for syzygies
-// #include "syzvector.cc"
+//static int euler;
 
 /*3
 * deletes all entres of a pair
 */
-static void syDeletePair(SObject * so)
+void syDeletePair(SObject * so)
 {
   pDelete(&(*so).p);
   pDelete(&(*so).lcm);
@@ -77,12 +61,13 @@ static void syDeletePair(SObject * so)
   (*so).order = 0;
   (*so).isNotMinimal = NULL;
   (*so).length = -1;
+  (*so).reference = -1;
 }
 
 /*3
 * initializes all entres of a pair
 */
-static void syInitializePair(SObject * so)
+void syInitializePair(SObject * so)
 {
   (*so).p = NULL;
   (*so).lcm = NULL;
@@ -95,12 +80,13 @@ static void syInitializePair(SObject * so)
   (*so).order = 0;
   (*so).isNotMinimal = NULL;
   (*so).length = -1;
+  (*so).reference = -1;
 }
 
 /*3
 * puts all entres of a pair to another
 */
-static void syCopyPair(SObject * argso, SObject * imso)
+void syCopyPair(SObject * argso, SObject * imso)
 {
   *imso=*argso;
   (*argso).p = NULL;
@@ -114,6 +100,7 @@ static void syCopyPair(SObject * argso, SObject * imso)
   (*argso).order = 0;
   (*argso).isNotMinimal = NULL;
   (*argso).length = -1;
+  (*argso).reference = -1;
 }
 
 /*3
@@ -121,7 +108,7 @@ static void syCopyPair(SObject * argso, SObject * imso)
 * pair first
 * assumes a pair to be empty if .lcm does so
 */
-static void syCompactifyPairSet(SSet sPairs, int sPlength, int first)
+void syCompactifyPairSet(SSet sPairs, int sPlength, int first)
 {
   int k=first,kk=0;
 
@@ -149,7 +136,7 @@ static void syCompactifyPairSet(SSet sPairs, int sPlength, int first)
 * pair first
 * assumes a pair to be empty if .lcm does so
 */
-static void syCompactify1(SSet sPairs, int* sPlength, int first)
+void syCompactify1(SSet sPairs, int* sPlength, int first)
 {
   int k=first,kk=0;
 
@@ -173,6 +160,7 @@ static void syCompactify1(SSet sPairs, int* sPlength, int first)
   *sPlength -= kk;
 }
 
+static pCompProc syOldComp1;
 /*3
 * replaces comp1dpc during homogeneous syzygy-computations
 * compares with components of currcomponents instead of the
@@ -207,7 +195,7 @@ static int syzcomp0dpc(poly p1, poly p2)
 * compares with components of currcomponents instead of the
 * exp[0]
 */
-static int syzcomp1dpc(poly p1, poly p2)
+int syzcomp1dpc(poly p1, poly p2)
 {
   int i = pVariables;
   while ((i>1) && (pGetExp(p1,i)==pGetExp(p2,i)))
@@ -231,10 +219,7 @@ static int syzcomp1dpc(poly p1, poly p2)
 * exp[0]
 */
 
-extern int rComp0(poly p1, poly p2);
-#ifdef NDEBUG
-#define syzcomp2dpc rComp0
-#else
+#ifdef PDEBUG
 static int syzcomp2dpc_test(poly p1, poly p2)
 {
   long c1, c2, cc1, cc2, ccc1, ccc2, ec1, ec2;
@@ -293,7 +278,7 @@ static int syzcomp2dpc_test(poly p1, poly p2)
   if (currcomponents[o1]>currcomponents[o2]) return 1;
   return -1;
 }
-static int syzcomp2dpc(poly p1, poly p2)
+int syzcomp2dpc(poly p1, poly p2)
 {
   int test = syzcomp2dpc_test(p1, p2);
   int rc = rComp0(p1, p2);
@@ -305,7 +290,7 @@ static int syzcomp2dpc(poly p1, poly p2)
   }
   return test;
 }
-#endif // NDEBUG
+#endif // PDEBUG
 
 /*3
 * compares only the monomial without component
@@ -418,7 +403,7 @@ static int syChMin(intvec * iv)
 * zeroth entre, length must be > 0
 * assumes that the basering is degree-compatible
 */
-static SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw=NULL)
+SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw)
 {
   if (idIs0(arg)) return NULL;
   SRes resPairs = (SRes)Alloc0(*length*sizeof(SSet));
@@ -459,7 +444,7 @@ static SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw=NULL)
 }
 
 // rearrange shifted components
-static long syReorderShiftedComponents(long * sc, int n)
+long syReorderShiftedComponents(long * sc, int n)
 {
   long holes = 0;
   int i;
@@ -537,7 +522,7 @@ static void pResetSetm(poly p)
 #endif
 }
 
-static void syResetShiftedComponents(syStrategy syzstr, int index)
+void syResetShiftedComponents(syStrategy syzstr, int index,int hilb)
 {
   assume(index > 0);
   int i;
@@ -552,10 +537,32 @@ static void syResetShiftedComponents(syStrategy syzstr, int index)
     rChangeSComps(currcomponents,
                   currShiftedComponents,
                   IDELEMS(syzstr->res[index-1]));
-    ideal id = syzstr->res[index];
-    for (i=0; i<IDELEMS(id); i++)
+    if (hilb==0)
     {
-      pResetSetm(id->m[i]);
+      ideal id = syzstr->res[index];
+      for (i=0; i<IDELEMS(id); i++)
+      {
+        pResetSetm(id->m[i]);
+      }
+    }
+    else if (hilb==1)
+    {
+      assume (index>1);
+      assume (syzstr->resPairs[index-1]!=NULL);
+      SSet Pairs=syzstr->resPairs[index-1];
+      SSet Pairs1=syzstr->resPairs[index]; 
+      int till=(*syzstr->Tl)[index-1];
+      for (i=0;i<till;i++)
+      {
+        if (Pairs[i].syz!=NULL)
+          pResetSetm(Pairs[i].syz);
+      }
+      till=(*syzstr->Tl)[index];
+      for (i=0;i<till;i++)
+      {
+        if (Pairs1[i].p!=NULL)
+          pResetSetm(Pairs1[i].p);
+      }
     }
     currcomponents  = prev_c;
     currShiftedComponents = prev_s;
@@ -842,7 +849,7 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
 }
 #endif
 
-static void syEnlargeFields(syStrategy syzstr,int index)
+void syEnlargeFields(syStrategy syzstr,int index)
 {
   pEnlargeSet(&(syzstr->res[index]->m),IDELEMS(syzstr->res[index]),16);
   syzstr->truecomponents[index]=(int*)ReAlloc0((ADDRESS)syzstr->truecomponents[index],
@@ -911,11 +918,11 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
       pSetCoeff(p,nDiv(pGetCoeff(tso.p1),coefgcd));
       pGetCoeff(p) = nNeg(pGetCoeff(p));
       pSetComp(p,tso.ind2+1);
-      rSetmS(p, Components, ShiftedComponents); // actuelleler index
+      rSetmS(p, Components, ShiftedComponents); // actueller index
       pNext(p) = pHead(tso.lcm);
       pIter(p);
       pSetComp(p,tso.ind1+1);
-      rSetmS(p, Components, ShiftedComponents); // actuaeller index
+      rSetmS(p, Components, ShiftedComponents); // actueller index
       pSetCoeff(p,nDiv(pGetCoeff(tso.p2),coefgcd));
       nDelete(&coefgcd);
       if (tso.p != NULL)
@@ -1140,7 +1147,7 @@ static void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int index)
   syCopyPair(so,&sPairs[ll]);
   (*sPlength)++;
 }
-static void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int index)
+void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int index)
 {
   int ll;
 
@@ -1160,6 +1167,7 @@ static void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int inde
       temp[ll].order = (syzstr->resPairs[index])[ll].order;
       temp[ll].isNotMinimal = (syzstr->resPairs[index])[ll].isNotMinimal;
       temp[ll].length = (syzstr->resPairs[index])[ll].length;
+      temp[ll].reference = (syzstr->resPairs[index])[ll].reference;
     }
     Free((ADDRESS)syzstr->resPairs[index],(*syzstr->Tl)[index]*sizeof(SObject));
     (*syzstr->Tl)[index] += 16;
@@ -1392,8 +1400,7 @@ static SSet syChosePairsPutIn(syStrategy syzstr, int *index,
 * returns a pointer to the first pair and the number of them in the given module
 * works with slanted degree (i.e. deg=realdeg-index)
 */
-static SSet syChosePairs(syStrategy syzstr, int *index,
-               int *howmuch, int * actdeg)
+SSet syChosePairs(syStrategy syzstr, int *index, int *howmuch, int * actdeg)
 {
   return syChosePairsPutIn(syzsts,index,howmuch,actdeg,0,syzstr->length);
 }
@@ -1559,7 +1566,7 @@ static void syStatistics(resolvente res,int length)
 /*3
 * initialize a module
 */
-static int syInitSyzMod(syStrategy syzstr, int index, int init=17)
+int syInitSyzMod(syStrategy syzstr, int index, int init)
 {
   int result;
 
@@ -1710,6 +1717,8 @@ void syKillComputation(syStrategy syzstr)
     }
     if (syzstr->cw!=NULL)
       delete syzstr->cw;
+    if (syzstr->betti!=NULL)
+      delete syzstr->betti;
     if (syzstr->resolution!=NULL)
       delete syzstr->resolution;
     if (syzstr->syRing != NULL)
@@ -1728,6 +1737,11 @@ void syKillComputation(syStrategy syzstr)
 intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
 {
   int dummy;
+  if (syzstr->betti!=NULL)
+  {
+    return ivCopy(syzstr->betti);
+  }
+  intvec *result;
   if (syzstr->resPairs!=NULL)
   {
     int i,j=-1,jj=-1,l,sh=0;
@@ -1757,7 +1771,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
     }
     j = j+sh;
     jj = jj+2;
-    intvec *result=new intvec(j,jj-sh,0);
+    result=new intvec(j,jj-sh,0);
     IMATELEM(*result,1,1) = max(1,idRankFreeModule(syzstr->res[1]));
     for (i=sh;i<jj;i++)
     {
@@ -1770,12 +1784,13 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
         j++;
       }
     }
-    return result;
+    syzstr->betti = result;
   }
   else if (syzstr->fullres!=NULL)
-    return syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim);
+    syzstr->betti = syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim);
   else
-    return syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim);
+    syzstr->betti = syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim);
+  return ivCopy(syzstr->betti);
 }
 
 /*2
@@ -2558,6 +2573,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
     }
   }
 /*--- changes to the original ring------------------*/
+  kBucketDestroy(&syzstr->bucket);
   if (syzstr->syRing != NULL)
   {
     rChangeCurrRing(origR,TRUE);
@@ -2571,7 +2587,6 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
   }
   tres = syReorder(tres,syzstr->length,syzstr,FALSE,syzstr->res);
   syKillEmptyEntres(tres,syzstr->length);
-  kBucketDestroy(&syzstr->bucket);
   idSkipZeroes(tres[0]);
   return tres;
 }
@@ -2592,7 +2607,6 @@ syStrategy syMinimize(syStrategy syzstr)
       else
       {
         syzstr->minres = syReorder(syzstr->orderedRes,syzstr->length,syzstr);
-        syKillEmptyEntres(syzstr->minres,syzstr->length);
       }
     }
     else if (syzstr->fullres!=NULL)
@@ -2761,7 +2775,3 @@ syStrategy syLaScala3(ideal arg,int * length)
   return syzstr;
 }
 
-#define HAVE_HILB_SYZ
-#ifdef HAVE_HILB_SYZ
-#include "syz2.cc"
-#endif

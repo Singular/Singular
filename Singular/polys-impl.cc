@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.29 1999-10-19 12:04:29 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.30 1999-10-19 12:42:47 obachman Exp $ */
 
 /***************************************************************
  *
@@ -1100,6 +1100,24 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
       wrp(old);
       Print(") in %s:%d (pComp=%d)\n",f,l,pComp(old,p));
       return FALSE;
+    }
+    if (p != NULL)
+    {
+      if (pGetComp(old) == pGetComp(p))
+      {
+        i = pVariables;
+        for (i=pVariables;i; i--)
+        {
+          if (pGetExp(old, i) != pGetExp(p, i)) break;
+        }
+        if (i == 0)
+        {
+          Warn("different Compare, but same exponent vector for");
+          wrp(old);
+          Print(" in %s%d\n", f, l);
+          return FALSE;
+        }
+      }
     }
   }
   return TRUE;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.75 1999-10-19 12:04:29 Singular Exp $ */
+/* $Id: ring.cc,v 1.76 1999-10-19 12:42:48 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -777,7 +777,7 @@ void rWrite(ring r)
         Print("%s ",r->names[i]);
       }
     }
-#ifndeg NDEBUG
+#ifndef NDEBUG
     else if (r->order[l] == ringorder_s)
     {
       Print("  syzcomp at %d",r->typ[l].data.syz.limit);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.42 1999-10-18 16:05:24 obachman Exp $ */
+/* $Id: kutil.cc,v 1.43 1999-10-19 12:42:45 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1270,6 +1270,8 @@ void reorderS (int* suc,kStrategy strat)
 *looks up the position of p in set
 *set[0] is the smallest with respect to the ordering-procedure
 *pComp
+* Assumption: posInS only depends on the leading term
+*             otherwise, bba has to be changed
 */
 int posInS (polyset set,int length,poly p)
 {

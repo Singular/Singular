@@ -81,7 +81,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
     sing_dld.cc sing_dbm.cc kspoly.cc \
-    subexpr.cc syz.cc syz0.cc syz1.cc\
+    subexpr.cc syz.cc syz0.cc syz1.cc syz2.cc\
     timer.cc weight.cc \
     mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
@@ -509,11 +509,11 @@ check_aso:
 %.aso.dd: %.aso.cc mod2.h aso.h
 	$(CXXM) ${CPPFLAGS} ${DEFS} $< >> $@
 
-%.dd: %.cc mod2.h $(ASO_OBJS)
+%.dd: %.cc mod2.h 
 	echo $(@:.dd=.og) $(@:.dd=.op) $(@:.dd=.ob) " " \\ > $@
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
 
-%.d: %.c mod2.h $(ASO_OBJS)
+%.d: %.c mod2.h 
 	echo $(@:.d=.og) $(@:.d=.op) $(@:.d=.ob) " " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.11 1998-11-12 14:44:36 siebert Exp $ */
+/* $Id: ideals.h,v 1.12 1999-10-19 12:42:42 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -81,8 +81,6 @@ ideal   idMultSect(resolvente arg, int length);
 
 ideal   idSyzygies (ideal h1,ideal quot, tHomog h,intvec **w);
 ideal   idSyzygies (ideal h1,ideal quot, tHomog h,intvec **w,
-           BOOLEAN setRegularity, int &deg);
-ideal idSyzMin (ideal h1,ideal  quot, tHomog h,intvec **w,
            BOOLEAN setRegularity, int &deg);
 ideal   idLiftStd  (ideal h1, ideal quot, matrix *m, tHomog h=testHomog);
 

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.27 1999-08-16 15:43:57 Singular Exp $ */
+/* $Id: tok.h,v 1.28 1999-10-19 12:42:51 obachman Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -69,6 +69,7 @@ enum {
   GCD_CMD,
   GETDUMP_CMD,
   HIGHCORNER_CMD,
+  HRES_CMD,
   INSERT_CMD,
   INT_CMD,
   INTVEC_CMD,
@@ -182,7 +183,6 @@ enum {
 #define OPT_DEGBOUND      24
 #define OPT_REDTAIL       25
 #define OPT_INTSTRATEGY   26
-#define OPT_MINRES        28
 #define OPT_SB_1          29
 #define OPT_NOTREGULARITY 30
 #define OPT_WEIGHTM       31
@@ -202,7 +202,6 @@ enum {
 #define TEST_OPT_MULTBOUND         BTEST1(OPT_MULTBOUND)
 #define TEST_OPT_STAIRCASEBOUND    BTEST1(OPT_STAIRCASEBOUND)
 #define TEST_OPT_REDTAIL           BTEST1(OPT_REDTAIL)
-#define TEST_OPT_MINRES            BTEST1(OPT_MINRES)
 #define TEST_OPT_SB_1              BTEST1(OPT_SB_1)
 #define TEST_OPT_NOTREGULARITY     BTEST1(OPT_NOTREGULARITY)
 #define TEST_OPT_WEIGHTM           BTEST1(OPT_WEIGHTM)

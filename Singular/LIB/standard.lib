@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.46 1999-09-20 20:00:35 obachman Exp $
+// $Id: standard.lib,v 1.47 1999-10-19 12:42:51 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.46 1999-09-20 20:00:35 obachman Exp $";
+version="$Id: standard.lib,v 1.47 1999-10-19 12:42:51 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -468,6 +468,7 @@ See also
 @ref{mres};
 @ref{nres};
 @ref{lres};
+@ref{hres};
 @ref{sres}.
 @ref{resolution}
 @c ref

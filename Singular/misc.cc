@@ -265,8 +265,6 @@ struct soptionStruct optionStruct[]=
   /* 25 no redTail(p)/redTail(s) */
   {"redTail",      Sy_bit(OPT_REDTAIL),        ~Sy_bit(OPT_REDTAIL)  },
   {"intStrategy",  Sy_bit(OPT_INTSTRATEGY),    ~Sy_bit(OPT_INTSTRATEGY)  },
-  /* 27 stop at HC (finiteDeterminacyTest) */
-  {"minRes",       Sy_bit(OPT_MINRES),         ~Sy_bit(OPT_MINRES)  },
   /* 30: use not regularity for syz */
   {"notRegularity",Sy_bit(OPT_NOTREGULARITY),  ~Sy_bit(OPT_NOTREGULARITY)  },
   {"weightM",      Sy_bit(OPT_WEIGHTM),        ~Sy_bit(OPT_WEIGHTM)  },

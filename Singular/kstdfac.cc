@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.26 1999-10-18 11:19:27 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.27 1999-10-19 12:42:45 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -287,19 +287,13 @@ static void completeReduceFac (kStrategy strat, lists FL)
       else pos=posInS(n->S,n->sl,n->P.p);
       if (TEST_OPT_INTSTRATEGY)
       {
-        if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
-        {
-          n->P.p = redtailBba(n->P.p,pos-1,n);
-          pCleardenom(n->P.p);
-        }
+        n->P.p = redtailBba(n->P.p,pos-1,n);
+        pCleardenom(n->P.p);
       }
       else
       {
         pNorm(n->P.p);
-        if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
-        {
-          n->P.p = redtailBba(n->P.p,pos-1,n);
-        }
+        n->P.p = redtailBba(n->P.p,pos-1,n);
       }
       if (TEST_OPT_DEBUG)
       {
@@ -497,19 +491,13 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
-          {
-            strat->P.p = redtailBba(strat->P.p,strat->sl,strat);
-            if (strat->redTailChange) pCleardenom(strat->P.p);
-          }
+          strat->P.p = redtailBba(strat->P.p,strat->sl,strat);
+          if (strat->redTailChange) pCleardenom(strat->P.p);
         }
         else
         {
           pNorm(strat->P.p);
-          if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
-          {
-            strat->P.p = redtailBba(strat->P.p,strat->sl,strat);
-          }
+          strat->P.p = redtailBba(strat->P.p,strat->sl,strat);
         }
         if (strat->redTailChange)
         {
@@ -533,28 +521,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
       }
       if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
       int i;
-//      for(i=0;i<IDELEMS(fac);i++)
-//      {
-//        int pos;
-//        if (strat->sl==-1) pos=0;
-//        else pos=posInS(strat->S,strat->sl,fac->m[i]);
-//        if (TEST_OPT_INTSTRATEGY)
-//        {
-//          if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
-//          {
-//            fac->m[i] = redtailBba(fac->m[i],pos-1,strat);
-//            pCleardenom(fac->m[i]);
-//          }
-//        }
-//        else
-//        {
-//          pNorm(fac->m[i]);
-//          if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
-//          {
-//            fac->m[i] = redtailBba(fac->m[i],pos-1,strat);
-//          }
-//        }
-//      }
 
       for(i=IDELEMS(fac)-1;i>=0;i--)
       {
@@ -578,19 +544,13 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         // we have already reduced all elements from fac....
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
-          {
-            n->P.p = redtailBba(n->P.p,pos-1,n);
-            if (n->redTailChange) pCleardenom(n->P.p);
-          }
+          n->P.p = redtailBba(n->P.p,pos-1,n);
+          if (n->redTailChange) pCleardenom(n->P.p);
         }
         else
         {
           pNorm(n->P.p);
-          if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
-          {
-            n->P.p = redtailBba(n->P.p,pos-1,n);
-          }
+          n->P.p = redtailBba(n->P.p,pos-1,n);
         }
 
         //if (n->redTailChange)

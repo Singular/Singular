@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.179 1999-10-14 14:27:06 obachman Exp $ */
+/* $Id: iparith.cc,v 1.180 1999-10-19 12:42:43 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -179,6 +179,7 @@ cmdnames cmds[] =
   { "hilb",        0, HILBERT_CMD ,       CMD_12},
   { "highcorner",  0, HIGHCORNER_CMD,     CMD_1},
   { "homog",       0, HOMOG_CMD ,         CMD_12},
+  { "hres",        0, HRES_CMD ,          CMD_2},
   { "ideal",       0, IDEAL_CMD ,         IDEAL_CMD},
   { "if",          0, IF_CMD ,            IF_CMD},
   { "imap",        0, IMAP_CMD ,          CMD_2},
@@ -1855,20 +1856,13 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     maxl = pVariables-1;
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
-    //if (BTEST1(28))
-    //{
-    //  r=syMinRes(u_id,maxl,&l, iiOp==MRES_CMD);
-    //}
-    //else
-    {
-      intvec * iv=(intvec*)atGet(u,"isHomog");
-      r=syResolution(u_id,maxl, iv, iiOp==MRES_CMD);
-    }
+    intvec * iv=(intvec*)atGet(u,"isHomog");
+    r=syResolution(u_id,maxl, iv, iiOp==MRES_CMD);
   }
   else if (iiOp==SRES_CMD)
   //  r=sySchreyerResolvente(u_id,maxl+1,&l);
     r=sySchreyer(u_id,maxl+1);
-  else /* LRES */
+  else if (iiOp == LRES_CMD)
   {
     int dummy;
     if((currQuotient!=NULL)||
@@ -1879,6 +1873,18 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
        return TRUE;
     }
     r=syLaScala3(u_id,&dummy);
+  }
+  else
+  {
+    int dummy;
+    if((currQuotient!=NULL)||
+    (!idHomIdeal (u_id,NULL)))
+    {
+       WerrorS
+       ("`hres` not implemented for inhomogeneous input or qring");
+       return TRUE;
+    }
+    r=syHilb(u_id,&dummy);
   }
   if (r==NULL) return TRUE;
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
@@ -2227,6 +2233,7 @@ struct sValCmd2 dArith2[]=
 ,{jjHOMOG_P,   HOMOG_CMD,      VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
 ,{jjHOMOG_ID,  HOMOG_CMD,      IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
 ,{jjHOMOG_ID,  HOMOG_CMD,      MODUL_CMD,      MODUL_CMD,  POLY_CMD PROFILER}
+,{jjRES,       HRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjCALL2MANY, IDEAL_CMD,      IDEAL_CMD,      DEF_CMD,    DEF_CMD PROFILER}
 ,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE PROFILER}
 ,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE PROFILER}
@@ -4210,21 +4217,14 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
     maxl = pVariables-1;
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
-    if (BTEST1(28))
+    intvec * iv=(intvec*)atGet(u,"isHomog");
+    if (iv!=NULL)
     {
-      r=syMinRes((ideal)u->Data(),maxl,&l,iiOp==MRES_CMD);
+      weights = (intvec**)Alloc0SizeOf(void_ptr);
+      weights[0] = ivCopy(iv);
+      l=1;
     }
-    else
-    {
-      intvec * iv=(intvec*)atGet(u,"isHomog");
-      if (iv!=NULL)
-      {
-        weights = (intvec**)Alloc0SizeOf(void_ptr);
-        weights[0] = ivCopy(iv);
-        l=1;
-      }
-      r=syResolvente((ideal)u->Data(),maxl,&l, &weights, iiOp==MRES_CMD);
-    }
+    r=syResolvente((ideal)u->Data(),maxl,&l, &weights, iiOp==MRES_CMD);
   }
   else
     r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
