@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.13 1998-01-16 14:29:56 krueger Exp $ */
+/* $Id: silink.cc,v 1.14 1998-02-27 14:06:25 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -458,6 +458,7 @@ BOOLEAN slDumpAscii(si_link l)
   if (! status ) status = DumpAsciiMaps(fd, h, NULL);
 
   if (currRingHdl != rh) rSetHdl(rh, TRUE);
+  fwrite("RETURN();\n",1,10,fd);
   fflush(fd);
   
   return status;
@@ -698,7 +699,10 @@ BOOLEAN slGetDumpAscii(si_link l)
   }
   else
   {
-    BOOLEAN status = iiPStart(NULL, l->name, NULL);
+    BOOLEAN status = newFile(l->name);
+    if (status)
+      return TRUE;
+    status=yyparse();
 
     if (status)
       return TRUE;

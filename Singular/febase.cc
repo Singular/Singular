@@ -1,13 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.24 1998-01-27 14:10:15 pohl Exp $ */
+/* $Id: febase.cc,v 1.25 1998-02-27 14:06:10 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
 
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
 #include <limits.h>
 #include <stdarg.h>
@@ -467,6 +466,11 @@ void PrintS(char *s)
 #endif
 }
 
+void PrintLn()
+{
+  PrintS("\n");
+}
+
 void Print(char *fmt, ...)
 {
   va_list ap;
@@ -510,11 +514,6 @@ void Print(char *fmt, ...)
   va_end(ap);
 }
 
-void PrintLn()
-{
-  PrintS("\n");
-}
-
 void fePause()
 {
   uchar c;
@@ -528,50 +527,6 @@ void fePause()
   if (((c == '\003') || (c == 'C')) || (c == 'c'))
   {
     m2_end(1);
-  }
-}
-
-/*2
-* print input lines (si_echo or TRACE), set prompt_char
-*/
-void showInput(void)
-{
-  if ((inputswitch <= 0) || (traceit&TRACE_SHOW_LINE)
-  || (traceit&TRACE_SHOW_LINE1))
-  {
-    if ((si_echo > voice) || (inputswitch == 0) || (traceit&TRACE_SHOW_LINE)
-    || (traceit&TRACE_SHOW_LINE1))
-    {
-#ifdef HAVE_TCL
-      if (tclmode)
-      {
-         PrintTCL('P',(prompt_char=='>')? 0 : 1,NULL);
-      }
-      else
-#endif
-      if ((BVERBOSE(V_PROMPT))&&(!feBatch))
-      {
-        if (inputswitch == 0)
-        {
-          fe_promptstr[0]=prompt_char;
-#ifndef HAVE_READLINE
-          PrintS(fe_promptstr);
-#endif
-        }
-        else
-        {
-          if (currentVoice->filename==NULL)
-            Print("(none) %3d%c ",yylineno,prompt_char);
-          else
-            Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
-        }
-        prompt_char = '.';
-        mflush();
-      }
-#ifdef macintosh
-      cols = 0;
-#endif
-    }
   }
 }
 

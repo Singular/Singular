@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.8 1997-09-12 08:27:11 Singular Exp $ */
+/* $Id: scanner.l,v 1.9 1998-02-27 14:06:24 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -15,24 +15,14 @@
 #include "mmemory.h"
 #include "febase.h"
 
-int mmread(FILE* f, char* b, int l);
+int feReadLine(char* b, int l);
 #define ALLOC(a) Alloc((a))
 int yylineno  = 0;
-static int noeof = 0;
-enum
-{
-  noeof_brace = 1,
-  noeof_asstring,
-  noeof_block,
-  noeof_string,
-  noeof_bracket,
-  noeof_procname
-};
+int noeof = 0;
 static int blocknest = 0;
 extern char * yytext;
 //extern unsigned char * yytext;
 extern int yyleng;
-extern int inputswitch;
 extern BOOLEAN noringvars;
 extern int inerror;
 
@@ -65,16 +55,18 @@ static char * dupyytextNL()
   #define YY_DECL int yylex(YYSTYPE* lvalp)
 
   #undef yywrap
+  extern "C" {
   int yywrap() { return exitVoice(); }
+  }
 
   #undef YY_INPUT
   #define YY_INPUT(buf,result,max_size) \
-          if ( (result = mmread( (yyin), (char *) buf, max_size )) < 0 ) \
-              YY_FATAL_ERROR( "read() in flex scanner failed" );
+          result = feReadLine( (char *) (buf), (max_size) )
 
   #undef YY_USER_ACTION
   #define YY_USER_ACTION \
-          if (inerror==1) { Print("   skipping text from `%s`",yytext);inerror=2; }
+          if ((inerror==1)&&(*yytext>=' '))\
+          { Print("   skipping text from `%s`",yytext);inerror=2; }
 
 %}
 
@@ -112,6 +104,7 @@ for                      { blocknest = 0; noeof = noeof_brace; BEGIN(brace);
                          }
 
 example[ \t\n]*          { noeof = noeof_asstring;
+                           IsCmd("example",lvalp->i);
                            BEGIN(asstring);
                            return EXAMPLE_CMD;
                          }
@@ -232,6 +225,7 @@ proc[ \t]+{name}[ \t]*\( {
 
 [ \t\r\n]                /* skip whitespace */
 ".."                     { return DOTDOT; }
+"::"                     { return COLONCOLON; }
 "--"                     { return MINUSMINUS; }
 "++"                     { return PLUSPLUS  ; }
 "=="                     { return EQUAL_EQUAL; }
@@ -263,18 +257,28 @@ newline                  {
                            lvalp->name = mstrdup((char *)yytext);
                            return RINGVAR;
                          }
-\$[\.;]?                 {
+\$                       {
                            #ifdef HAVE_TCL
                            if (tclmode)
                              PrintTCL('Q',0,NULL);
                            else
                            #endif
                            { if (BVERBOSE(0)) printf("\n$Bye.\n"); }
+                           #ifndef macintosh
+                             #ifdef HAVE_FEREAD
+                               #ifdef HAVE_ATEXIT
+                                 fe_reset_input_mode();
+                               #else
+                                 fe_reset_input_mode(0,NULL);
+                               #endif
+			     #else
+			       #ifdef HAVE_READLINE
+                                 fe_reset_input_mode();
+			       #endif
+                             #endif
+                           #endif
                            #ifdef sun
                            #ifndef __svr4__
-			   #ifdef HAVE_FEREAD
-                           fe_reset_input_mode(0,NULL);
-			   #endif
                            _cleanup();
                            _exit(0);
                            #endif
@@ -291,16 +295,20 @@ newline                  {
                            mmStat(-500);
                            #endif
                            { if (BVERBOSE(0)) printf("\nAuf Wiedersehen.\n"); }
-                           #ifdef MDEBUG
-                             #ifndef macintosh
-			       #ifdef HAVE_FEREAD
-                                 #ifdef HAVE_ATEXIT
-                                   fe_reset_input_mode();
-                                 #else
-                                   fe_reset_input_mode(0,NULL);
-                                 #endif
+                           #ifndef macintosh
+                             #ifdef HAVE_FEREAD
+                               #ifdef HAVE_ATEXIT
+                                 fe_reset_input_mode();
+                               #else
+                                 fe_reset_input_mode(0,NULL);
                                #endif
+			     #else
+			       #ifdef HAVE_READLINE
+                                 fe_reset_input_mode();
+			       #endif
                              #endif
+                           #endif
+                           #ifdef MDEBUG
                              #ifdef MLIST
                              mmTestList();
                              #endif
@@ -335,109 +343,17 @@ newline                  {
                            return UNKNOWN_IDENT;
                          }
 
-.                        {
+.                       {
                            /*if (*yytext == '\n') REJECT;*/
                            lvalp->i = *yytext;   /* token has own value */
                            return *yytext;
                          }
 %%
 
-
-int mmread(FILE* f, char* b, int l)
-{
-  int rc;
-  b[0] = '\0';
-  if (inputswitch <=0)
-  {
-    char* s;
-    int offset=0;
-    showInput();
-NewRead:
-    if (f==stdin)
-      s = fe_fgets_stdin(b+offset,l-offset);
-    else
-      s = fgets(b+offset,l-offset,f);
-    if (s==NULL)
-    {
-      if (noeof)
-      {
-        switch (noeof)
-        {
-          case noeof_brace:
-          case noeof_block:
-            WerrorS("premature end of file while reading {...}");
-            break;
-          case noeof_asstring:
-            WerrorS("premature end of file while reading till `.`");
-            break;
-          case noeof_string:
-            WerrorS("premature end of file while reading string");
-            break;
-          case noeof_bracket:
-            WerrorS("premature end of file while reading (...)");
-            break;
-          case noeof_procname:
-            WerrorS("premature end of file while reading proc");
-            break;
-        }
-        exit(1);
-      }
-      return 0;
-    }
-    /*else*/
-    {
-      rc=strlen(s)-2;
-      if (s[rc]=='\\')
-      {
-        s[rc]='\0';
-        offset+=rc;
-        if (offset<l) goto NewRead;
-      }
-    }
-    if (feProt&PROT_I)
-    {
-      fputs(s,feProtFile);
-    }
-    rc=strlen(b);
-  }
-  else
-  {
-    rc=readbuf(b,l);
-  }
-  yylineno++;
-  //if ((rc != strlen(b)) printf("++funny error found! (scanner:rc=%d, len=%d)\n",
-  //  rc,(int)strlen(b));
-  if (rc>1)
-  {
-    strncpy(my_yylinebuf,b,rc-1);
-    if (my_yylinebuf[rc-2] == '\n') my_yylinebuf[rc-2] = '\0';
-    my_yylinebuf[rc-1] = '\0';
-    if (((si_echo>voice) && (strncmp(b,";RETURN();",10)!=0))
-    || (traceit&TRACE_SHOW_LINE)
-    || (traceit&TRACE_SHOW_LINE1))
-    {
-      printf("%s",b);
-      mflush();
-      if (traceit&TRACE_SHOW_LINE)
-      {
-        while(fgetc(stdin)!='\n');
-      }
-    }
-    else if (traceit&TRACE_SHOW_LINENO)
-    {
-      printf("{%d}",yylineno);
-      mflush();
-    }
-  }
-  else
-    my_yylinebuf[0] = '\0';
-  return rc;
-}
-
 void * myynewbuffer()
 {
   void * oldb = yy_current_buffer;
-  yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
+  yy_switch_to_buffer(yy_create_buffer(NULL, YY_BUF_SIZE));
   return oldb;
 }
 
@@ -445,4 +361,5 @@ void myyoldbuffer(void * oldb)
 {
   yy_delete_buffer(yy_current_buffer);
   yy_switch_to_buffer((YY_BUFFER_STATE)oldb);
+  //yy_flush_buffer((YY_BUFFER_STATE)oldb);
 }

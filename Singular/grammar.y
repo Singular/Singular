@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.21 1998-01-27 15:06:05 pohl Exp $ */
+/* $Id: grammar.y,v 1.22 1998-02-27 14:06:16 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -52,7 +52,7 @@ procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname,
 extern int   yylineno;
 extern FILE* yyin;
 
-char       my_yylinebuf[YY_READ_BUF_SIZE];
+char       my_yylinebuf[80];
 char *     currid;
 BOOLEAN    noringvars=FALSE;
 BOOLEAN    expected_parms;
@@ -84,7 +84,7 @@ void yyerror(char * fmt)
   if(!oldInError)
   {
     Werror( "error occurred in %s line %d: `%s`"
-           ,VoiceName(), yylineno-1, my_yylinebuf);
+           ,VoiceName(), yylineno, my_yylinebuf);
     if (cmdtok!=0)
     {
       char *s=Tok2Cmdname(cmdtok);
@@ -104,7 +104,9 @@ void yyerror(char * fmt)
   }
   else
     inerror=oldInError;
-  if ((voice>0)&&(myynest>0))
+  if ((currentVoice!=NULL)
+  && (currentVoice->prev!=NULL)
+  &&(myynest>0))
   {
     Werror("leaving %s",VoiceName());
     exitBuffer(BT_proc);
@@ -122,12 +124,11 @@ void yyerror(char * fmt)
 %token GE
 %token LE
 %token INTDIV
-/*%token MINUSEQUAL*/
 %token MINUSMINUS
 %token NOT
 %token NOTEQUAL
-/*%token PLUSEQUAL*/
 %token PLUSPLUS
+%token COLONCOLON
 
 /* types, part 1 (ring indep.)*/
 %token <i> DRING_CMD
@@ -252,7 +253,7 @@ void yyerror(char * fmt)
 %token <i> SYS_BREAK
 %token <i> WHILE_CMD
 %token <i> RETURN
-%token <i> END_PROC
+%token <i> END_GRAMMAR
 %token <i> PARAMETER
 
 /* system variables */
@@ -270,11 +271,11 @@ void yyerror(char * fmt)
 %type <i>    ringcmd1
 
 %type <i>    '=' '<' '>' '+' '-'
-%type <i>    '*' '/' '[' ']' '.' '^' ',' ';'
+%type <i>    '*' '/' '[' ']' '^' ',' ';'
 
 
 /*%nonassoc '=' PLUSEQUAL DOTDOT*/
-%nonassoc '=' DOTDOT
+%nonassoc '=' DOTDOT COLONCOLON
 %left '|' '&'
 %left EQUAL_EQUAL NOTEQUAL
 %left '<' '>' GE LE
@@ -310,7 +311,7 @@ lines:
             {
               siCntrlc=FALSE;
               MYYERROR("abort...");
-            }  
+            }
             if (errorreported)
             {
               yyerror("");
@@ -327,32 +328,27 @@ lines:
 pprompt:
         flowctrl                       /* if, while, for, proc */
         | command ';'                  /* commands returning no value */
-          {ifswitch[voice]=0;}
-        | assign  ';'                  /* general assignment */
-          {ifswitch[voice]=0;}
-        | parametercmd ';'             /* proc parameter assignments */
-          {yylineno--;ifswitch[voice]=0;}
+          {currentVoice->ifsw=0;}
         | declare_ip_variable ';'      /* default initialization */
-          { $1.CleanUp(); ifswitch[voice]=0;}
-        | filecmd ';'
-          {ifswitch[voice]=0;}
+          { $1.CleanUp(); currentVoice->ifsw=0;}
         | returncmd
           {
             YYACCEPT;
           }
         | SYS_BREAK
           {
-            ifswitch[voice]=0;
+            currentVoice->ifsw=0;
             iiDebug();
           }
         | ';'                    /* ignore empty statements */
-          {ifswitch[voice]=0;}
+          {currentVoice->ifsw=0;}
         | error ';'
           {
+            feBufferTypes t=currentVoice->Typ();
             #ifdef SIQ
             siq=0;
             #endif
-            ifswitch[voice]=0;
+            currentVoice->ifsw=0;
             if (inerror&&($1.i<UMINUS) && ($1.i>' '))
             {
               // 1: yyerror called
@@ -366,13 +362,22 @@ pprompt:
             yyerrok;
             if (myynest>0)
             {
-              //WerrorS("leaving yyparse");
-              YYABORT;
+              //PrintS("leaving yyparse\n");
+              if (t==BT_example)
+              {
+                errorreported = inerror = cmdtok = 0;
+                lastreserved=NULL;
+                expected_parms=FALSE;
+                inerror = 0;
+                yyerrok;
+                YYACCEPT;
+              }
+              else
+                YYABORT;
             }
-            else if (voice>0)
+            else if (currentVoice->prev!=NULL)
             {
-              //WerrorS("leaving voice");
-              exitBuffer(BT_break);
+              exitVoice();
             }
             errorreported = FALSE;
             lastreserved=NULL;
@@ -383,11 +388,21 @@ flowctrl: ifcmd
           | whilecmd
           | forcmd
           | proccmd
-            {ifswitch[voice]=0;}
+          | filecmd
+          | helpcmd
+            {currentVoice->ifsw=0;}
         ;
 
-command: executecmd | helpcmd | killcmd | exportcmd | listcmd
-         | ringcmd | scriptcmd | setringcmd | typecmd
+command: assign
+         | executecmd
+         | exportcmd
+         | killcmd
+         | listcmd
+         | parametercmd
+         | ringcmd
+         | scriptcmd
+         | setringcmd
+         | typecmd
          ;
 
 assign: left_value exprlist
@@ -414,7 +429,7 @@ elemexpr:
           {
             if ($1.rtyp==LIB_CMD)
             {
-              if(iiExprArith1(&$$,&$3,LIB_CMD)) YYERROR; 
+              if(iiExprArith1(&$$,&$3,LIB_CMD)) YYERROR;
             }
             else
             {
@@ -423,10 +438,10 @@ elemexpr:
               if(iiExprArithM(&$$,&$1,'(')) YYERROR;
             }
           }
-        | elemexpr '.' extendedid
+        | elemexpr COLONCOLON extendedid
           {
             idhdl r=idroot;
-            if ($1.Typ()!=PACKAGE_CMD) MYYERROR("<package>.<id> expected");
+            if ($1.Typ()!=PACKAGE_CMD) MYYERROR("<package>::<id> expected");
             idroot=IDPACKAGE((idhdl)$1.data)->idroot;
             syMake(&$$,$3);
             idroot=r;
@@ -451,7 +466,8 @@ elemexpr:
                 }
                 else if (v->Typ() == POLY_CMD)
                 {
-                  $$.data = (void *)pAdd((poly)$$.data,pMult(p, (poly)(v->CopyD())) );
+                  $$.data = (void *)pAdd((poly)$$.data,
+                                         pMult(p,(poly)(v->CopyD())) );
                 }
                 else
                   MYYERROR("expected '[poly,...'");
@@ -484,7 +500,7 @@ elemexpr:
                   Werror("`%s` greater than %d(max. integer representation)"
                          ,$1,INT_MAX);
                   YYERROR;
-                }  
+                }
                 char *t1=mstrdup($1);
                 syMake(&$$,t1);
               }
@@ -775,14 +791,14 @@ expr_arithmetic:
 
 left_value:
         declare_ip_variable cmdeq  { $$ = $1; }
-        | exprlist '=' 
-          { 
+        | exprlist '='
+          {
             if ($1.rtyp==0)
-            { 
-              Werror("`%s` is undefined",$1.Name()); 
-              YYERROR; 
+            {
+              Werror("`%s` is undefined",$1.Name());
+              YYERROR;
             }
-            $$ = $1; 
+            $$ = $1;
           }
         ;
 
@@ -1022,31 +1038,32 @@ executecmd:
               MYYERROR("string expected");
             }
           }
+        | EXAMPLE_CMD STRINGTOK
+          {
+            singular_help($2,TRUE);
+            FreeL((ADDRESS)$2);
+          }
         ;
 
 filecmd:
-        '<' stringexpr 
-          { if (iiPStart(NULL,$2,NULL)) YYERROR; }
+        '<' stringexpr
+          { if((feFilePending=feFopen($2,"r",NULL,TRUE))==NULL) YYERROR; }
+        ';'
+          { newFile($2,feFilePending); }
         ;
 
 helpcmd:
-        HELP_CMD STRINGTOK
+        HELP_CMD STRINGTOK ';'
           {
             singular_help($2,FALSE);
             FreeL((ADDRESS)$2);
           }
-        | HELP_CMD
+        | HELP_CMD ';'
           {
             char *s=(char *)Alloc(10);
             strcpy(s,"index");
             singular_help(s,FALSE);
             Free((ADDRESS)s,10);
-          }
-        | EXAMPLE_CMD STRINGTOK
-          {
-            singular_help($2,TRUE);
-            FreeL((ADDRESS)$2);
-            if (inerror) YYERROR;
           }
         ;
 
@@ -1317,25 +1334,23 @@ ifcmd: IF_CMD '(' expr ')' BLOCKTOK
             if (i!=0)
             {
               newBuffer( $5, BT_if);
-              //printf("if:new level %d\n",voice);
             }
             else
             {
               FreeL((ADDRESS)$5);
-              ifswitch[voice]=1;
-              //printf("if:(0):set ifsw=1 in voice %d\n",voice);
+              currentVoice->ifsw=1;
             }
           }
         | ELSE_CMD BLOCKTOK
           {
-            if (ifswitch[voice]==1)
+            if (currentVoice->ifsw==1)
             {
-              ifswitch[voice]=0;
+              currentVoice->ifsw=0;
               newBuffer( $2, BT_else);
             }
             else
             {
-              if (ifswitch[voice]!=2)
+              if (currentVoice->ifsw!=2)
               {
                 char *s=$2+strlen($2)-1;
                 while ((*s=='\0')||(*s=='\n')) s--;
@@ -1344,7 +1359,7 @@ ifcmd: IF_CMD '(' expr ')' BLOCKTOK
               }
               FreeL((ADDRESS)$2);
             }
-            ifswitch[voice]=0;
+            currentVoice->ifsw=0;
           }
         | IF_CMD '(' expr ')' BREAK_CMD
           {
@@ -1353,17 +1368,17 @@ ifcmd: IF_CMD '(' expr ')' BLOCKTOK
             {
               if (exitBuffer(BT_break)) YYERROR;
             }
-            ifswitch[voice]=0;
+            currentVoice->ifsw=0;
           }
         | BREAK_CMD
           {
             if (exitBuffer(BT_break)) YYERROR;
-            ifswitch[voice]=0;
+            currentVoice->ifsw=0;
           }
         | CONTINUE_CMD
           {
-            contBuffer(BT_break);
-            ifswitch[voice]=0;
+            if (contBuffer(BT_break)) YYERROR;
+            currentVoice->ifsw=0;
           }
       ;
 
@@ -1401,16 +1416,16 @@ forcmd:
 proccmd:
         PROC_CMD extendedid BLOCKTOK
           {
-	    procinfov pi;
+            procinfov pi;
             idhdl h = enterid($2,myynest,PROC_CMD,&idroot,FALSE);
             if (h==NULL) {FreeL((ADDRESS)$3); YYERROR;}
-	    iiInitSingularProcinfo(IDPROC(h),"", $2, 0, 0);
-	    IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+31);;
-	    sprintf(IDPROC(h)->data.s.body,"parameter list #;\n%s;return();\n\n",$3);
+            iiInitSingularProcinfo(IDPROC(h),"", $2, 0, 0);
+            IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+31);;
+            sprintf(IDPROC(h)->data.s.body,"parameter list #;\n%s;return();\n\n",$3);
             FreeL((ADDRESS)$3);
           }
         | PROC_DEF STRINGTOK BLOCKTOK
-          { 
+          {
             idhdl h = enterid($1,myynest,PROC_CMD,&idroot,FALSE);
             if (h==NULL)
             {
@@ -1420,10 +1435,10 @@ proccmd:
             }
             char *args=iiProcArgs($2,FALSE);
             procinfov pi;
-	    FreeL((ADDRESS)$2);
-	    iiInitSingularProcinfo(IDPROC(h),"", $1, 0, 0);
-	    IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+strlen(args)+14);;
-	    sprintf(IDPROC(h)->data.s.body,"%s\n%s;RETURN();\n\n",args,$3);
+            FreeL((ADDRESS)$2);
+            iiInitSingularProcinfo(IDPROC(h),"", $1, 0, 0);
+            IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+strlen(args)+14);;
+            sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,$3);
             FreeL((ADDRESS)args);
             FreeL((ADDRESS)$3);
             //Print(">>%s<<\n",IDPROC(h)->data.s.body);
@@ -1434,13 +1449,14 @@ parametercmd:
         PARAMETER declare_ip_variable
           {
             //Print("par:%s, %d\n",$2.Name(),$2.Typ());
-            yylineno--;
+            //yylineno--;
             if (iiParameter(&$2)) YYERROR;
           }
         | PARAMETER expr
           {
             //Print("par:%s, %d\n",$2.Name(),$2.Typ());
             sleftv tmp_expr;
+            //yylineno--;
             if ((iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&idroot))
             || (iiParameter(&tmp_expr)))
               YYERROR;
@@ -1450,15 +1466,19 @@ parametercmd:
 returncmd:
         RETURN '(' exprlist ')'
           {
+            if(iiRETURNEXPR==NULL) YYERROR;
             iiRETURNEXPR[myynest].Copy(&$3);
             $3.CleanUp();
             if (exitBuffer(BT_proc)) YYERROR;
           }
         | RETURN '(' ')'
           {
-            iiRETURNEXPR[myynest].Init();
-            iiRETURNEXPR[myynest].rtyp=NONE;
-            if (exitBuffer(BT_proc)&&($1!=END_PROC)) YYERROR;
-            if ($1==END_PROC) YYACCEPT;
+            if ($1==RETURN)
+            {
+              if(iiRETURNEXPR==NULL) YYERROR;
+              iiRETURNEXPR[myynest].Init();
+              iiRETURNEXPR[myynest].rtyp=NONE;
+              if (exitBuffer(BT_proc)) YYERROR;
+            }
           }
         ;

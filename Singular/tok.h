@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.12 1998-01-23 14:20:46 obachman Exp $ */
+/* $Id: tok.h,v 1.13 1998-02-27 14:06:27 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -15,13 +15,8 @@
 #include "grammar.h"
 #endif
 
-#ifndef YY_READ_BUF_SIZE
-#define YY_READ_BUF_SIZE 8192
-/*#define YY_READ_BUF_SIZE 16384*/
-#endif
-
 extern int      yylineno;
-extern char     my_yylinebuf[YY_READ_BUF_SIZE];
+extern char     my_yylinebuf[80];
 
 #if defined(__cplusplus)
 extern int  yyparse(void);

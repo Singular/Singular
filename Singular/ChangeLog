@@ -1,3 +1,7 @@
+Fri Feb 27 15:02:10 MET 1998 hannes
+   * new input scheme: many modifications to febase.h, febase.inc,
+     febase.cc, scanner.l, grammar.y, iplib.cc
+
 Tue Feb 17 18:43:11 MET 1998 hannes
 	* added additional factorization check after redTail
 	  (kstdfac.cc)
@@ -10,7 +14,6 @@ Tue Feb 17 18:43:11 MET 1998 hannes
 	* clapsing.cc (singclap_algdividecontent): inserted
 	FACTORY_DEBUG_OUT
 	
-
 Mon Feb 16 10:43:38 MET 1998 hannes
    * added HAVE_TCL to ring.cc
 

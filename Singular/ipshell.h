@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.10 1998-01-16 14:29:54 krueger Exp $ */
+/* $Id: ipshell.h,v 1.11 1998-02-27 14:06:21 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -29,8 +29,8 @@ extern cmdnames cmds[];
 extern char *lastreserved;
 
 int     IsCmd(char *n, int & tok);
-BOOLEAN iiPStart(idhdl pn, char *filename, sleftv * sl);
-BOOLEAN iiEStart(char* example);
+BOOLEAN iiPStart(idhdl pn, sleftv * sl);
+BOOLEAN iiEStart(char* example, procinfo *pi);
 void    type_cmd(idhdl h);
 void    test_cmd(int i);
 void    list_cmd(int typ, const char* what, char * prefix, BOOLEAN iterate);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.7 1998-01-16 14:29:57 krueger Exp $ */
+/* $Id: structs.h,v 1.8 1998-02-27 14:06:26 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -23,6 +23,16 @@ enum tHomog
    isHomog    = TRUE,
    testHomog
 };
+enum noeof_t
+{
+  noeof_brace = 1,
+  noeof_asstring,
+  noeof_block,
+  noeof_string,
+  noeof_bracket,
+  noeof_procname
+};
+
 /* C++-part */
 #ifdef __cplusplus
 class ip_smatrix;

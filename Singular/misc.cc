@@ -72,7 +72,6 @@ int inits(void)
   factoryseed(t);
 #endif
 /*4 private data of other modules*/
-  I_FEbase();
   memset(&sLastPrinted,0,sizeof(sleftv));
   sLastPrinted.rtyp=NONE;
 #ifdef HAVE_MPSR
@@ -226,13 +225,14 @@ static int show(unsigned long offset,FILE *help, char *close)
   while( !feof(help)
         && *fgets(buffer, BUF_LEN, help) != EOF
         && buffer[0] != FIN_INDEX)
-  { (void)printf("%s", buffer);
+  {
+    printf("%s", buffer);
     if(lines++> MAX_LINES)
-    { printf(
+    {
 #ifdef macintosh
-      "\n Press <RETURN> to continue or x and <RETURN> to exit help.\n");
+      printf("\n Press <RETURN> to continue or x and <RETURN> to exit help.\n");
 #else
-      "\n Press <RETURN> to continue or x to exit help.\n");
+      printf("\n Press <RETURN> to continue or x to exit help.\n");
 #endif
       fflush(stdout);
       *close = (char)getchar();
@@ -246,11 +246,10 @@ static int show(unsigned long offset,FILE *help, char *close)
   }
   if(*close!='x')
   {
-    printf(
 #ifdef macintosh
-      "\nEnd of part. Press <RETURN> to continue or x and <RETURN> to exit help.\n");
+    printf("\nEnd of part. Press <RETURN> to continue or x and <RETURN> to exit help.\n");
 #else
-      "\nEnd of part. Press <RETURN> to continue or x to exit help.\n");
+    printf("\nEnd of part. Press <RETURN> to continue or x to exit help.\n");
 #endif
     fflush(stdout);
     *close = (char)getchar();
@@ -340,15 +339,18 @@ void singular_help(char *str,BOOLEAN example)
     {
       Print("from lib %s\n",lib);
       s=iiGetLibProcBuffer(IDPROC(h), example ? 2 : 0);
-      if (!example) {
-	PrintS(s);
-	FreeL((ADDRESS)s);
+      if (!example)
+      {
+        PrintS(s);
+        FreeL((ADDRESS)s);
       }
-      else {
-	if (s!=NULL) {
-	  if (strlen(s)>5) iiEStart(s); /*newBuffer(s,BT_execute);*/
-	  else FreeL((ADDRESS)s);
-	}
+      else
+      {
+        if (s!=NULL)
+        {
+          if (strlen(s)>5) iiEStart(s,IDPROC(h));
+          else FreeL((ADDRESS)s);
+        }
       }
     }
   }
@@ -437,7 +439,7 @@ struct soptionStruct optionStruct[]=
   {"notSugar",     Sy_bit(OPT_NOT_SUGAR),      ~Sy_bit(OPT_NOT_SUGAR)   },
   {"interrupt",    Sy_bit(OPT_INTERRUPT),      ~Sy_bit(OPT_INTERRUPT)   },
   {"sugarCrit",    Sy_bit(OPT_SUGARCRIT),      ~Sy_bit(OPT_SUGARCRIT)   },
-  {"teach",     Sy_bit(OPT_DEBUG),          ~Sy_bit(OPT_DEBUG)  }, 
+  {"teach",     Sy_bit(OPT_DEBUG),          ~Sy_bit(OPT_DEBUG)  },
   /* 7 cancel unit */
   {"morePairs",    Sy_bit(OPT_MOREPAIRS),      ~Sy_bit(OPT_MOREPAIRS)   },
   /* 9 return SB in syz, quotient, intersect */

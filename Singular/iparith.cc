@@ -246,11 +246,7 @@ cmdnames cmds[] =
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
   { "return",      0, RETURN ,            RETURN},
-#if 0
-  { "RETURN",      0, END_PROC ,          RETURN},
-#else
-  { "RETURN",      1, RETURN ,            RETURN},
-#endif
+  { "RETURN",      0, END_GRAMMAR ,       RETURN},
   { "ring",        0, RING_CMD ,          RING_CMD},
   { "rvar",        0, IS_RINGVAR ,        CMD_1},
   { "setring",     0, SETRING_CMD ,       SETRING_CMD},
@@ -301,6 +297,7 @@ cmdnames cmds[] =
   { "rtimer",      0, VRTIMER,            SYSVAR},
   { "TRACE",       0, TRACE ,             SYSVAR},
   { "voice",       0, VOICE ,             SYSVAR},
+
 
 /* other reserved words:scanner.l */
   { "pause",       0, -1 ,             0},

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.29 1998-01-16 14:29:59 krueger Exp $ */
+/* $Id: tesths.cc,v 1.30 1998-02-27 14:06:26 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -164,8 +164,10 @@ int main(          /* main entry to Singular */
                 factoryseed(siRandomStart);
               #endif
               break;
+#ifdef HAVE_TCL	      
             case 'x': tclmode=TRUE;
               break;
+#endif	      
 #ifdef HAVE_MPSR
             case 'b': feBatch=TRUE;
 #endif
@@ -219,15 +221,6 @@ int main(          /* main entry to Singular */
   if (load_std_lib)
   {
     iiLibCmd(mstrdup("standard.lib"),TRUE);
-    //idhdl h=idroot->get("init",0);
-    //if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
-    //{
-    //  IDSTRING(h)=iiGetLibProcBuffer( IDPROC(h)));
-    //  newBuffer( mstrdup(IDSTRING(h)), BT_execute, IDID(h) );
-      //leftv r=iiMake_proc(h,NULL);
-      //r->CleanUp();
-      //iiPStart(h,NULL,NULL);
-    //}
   }  
   errorreported = 0;
 #ifndef macintosh
@@ -236,22 +229,27 @@ int main(          /* main entry to Singular */
 #endif
 #endif
   setjmp(si_start_jmpbuf);
+  /* if script is given */
+  if ((argc > 1)&&(argv[1][0]!='-'))
+  {
+    /* read and run the Script */
+    argc=1;
+    newFile(argv[1]);
+  }
+  else
+  {
+    currentVoice=feInitStdin();
+  }
+  // set up voice for .singularc
   {
     char * where=(char *)AllocL(256);
     FILE * rc=feFopen(".singularrc","r",where,FALSE);
     if (rc!=NULL)
     {
       fclose(rc);
-      iiPStart(NULL,where,NULL);
+      newFile(where);
     }
     FreeL((ADDRESS)where);
-  }
-  /* if script is given */
-  if ((argc > 1)&&(argv[1][0]!='-'))
-  {
-    /* read and run the Script */
-    argc=1;
-    iiPStart(NULL,argv[1],NULL);
   }
   /* start shell */
   if (feBatch)
@@ -267,5 +265,7 @@ int main(          /* main entry to Singular */
   setjmp(si_start_jmpbuf);
   yyparse();
 #endif
+  //Print("at very end\n");
+  m2_end(0);
   return 0;
 }

@@ -3,28 +3,29 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.5 1997-11-18 16:30:57 Singular Exp $ */
+/* $Id: febase.h,v 1.6 1998-02-27 14:06:11 Singular Exp $ */
 /*
 * ABSTRACT
 */
 #include <stdio.h>
+#include <string.h>
 #include "structs.h"
 
+extern char*  feErrors;
+extern FILE*  feProtFile;
+extern FILE*  feFilePending; /*temp. storage for grammar.y */
+extern char   fe_promptstr[];
 extern int    si_echo, printlevel;
 extern int    pagelength, colmax;
-extern int    voice;
-extern int    fileVoice;
-extern char   prompt_char;
-extern BOOLEAN tclmode;
 extern int    blocklineno;
+extern char   prompt_char;
+#ifdef HAVE_TCL
+extern BOOLEAN tclmode;
+#endif
 extern BOOLEAN errorreported;
-extern short*  ifswitch;
 extern BOOLEAN fe_use_fgets;
 extern BOOLEAN feBatch;
-extern char*   feErrors;
 extern BOOLEAN feProt;
-extern FILE*   feProtFile;
-extern char    fe_promptstr[];
 
 #define PROT_NONE 0
 #define PROT_I    1
@@ -43,7 +44,7 @@ void   WerrorS(char *s);
 }
 /* the C++-part: */
 
-enum   /* BufferTypes */
+enum   feBufferTypes 
 {
   BT_break = 1,  // while, for
   BT_proc,       // proc, script
@@ -54,13 +55,19 @@ enum   /* BufferTypes */
   BT_else        // else
 };
 
-void   I_FEbase(void);
-FILE * feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
-void   fePause(void);
-void   Print(char* fmt, ...);
-void   PrintS(char* s);
-void   PrintLn();
-void   PrintTCLS(char c, char * s);
+enum   feBufferInputs 
+{
+  BI_stdin = 1,
+  BI_buffer,
+  BI_file
+};
+
+FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
+void    fePause(void);
+void    Print(char* fmt, ...);
+void    PrintS(char* s);
+void     PrintLn();
+void    PrintTCLS(char c, char * s);
 #ifndef macintosh
 inline void PrintTCL(char c, int l,char *s)
 {
@@ -72,27 +79,59 @@ inline void PrintTCL(char c, int l,char *s)
 }
 #endif
 
-char * StringAppend(char *fmt, ...);
-char * StringAppendS(char *s);
-char * StringSet(char *fmt, ...);
-char * StringSetS(char* s);
+char *  StringAppend(char *fmt, ...);
+char *  StringAppendS(char *s);
+char *  StringSet(char *fmt, ...);
+char *  StringSetS(char* s);
 const  char * VoiceName();
-const  char * VoiceName(int v);
-int    VoiceType();
-void   WarnS(char *s);
-void   Warn(char *fmt, ...);
-int    contBuffer(int typ);
-char * eati(char *s, int *i);
-int    exitBuffer(int typ);
-int    exitVoice(void);
+void    VoiceBackTrack();
+void    WarnS(char *s);
+void    Warn(char *fmt, ...);
+BOOLEAN contBuffer(feBufferTypes typ);
+char *  eati(char *s, int *i);
+BOOLEAN exitBuffer(feBufferTypes typ);
+BOOLEAN exitVoice();
 #define mflush() fflush(stdout)
-void   monitor(char* s,int mode);
-void   newBuffer(char* s, int t, char *pname = NULL);
-int    newVoice(char* fn);
-int    readbuf(char* b, int l);
-void   showInput(void);
-void * myynewbuffer();
-void   myyoldbuffer(void * oldb);
+void    monitor(char* s,int mode);
+BOOLEAN newFile(char* fname, FILE *f=NULL);
+void    newBuffer(char* s, feBufferTypes t, procinfo *pname = NULL, int start_lineno = 0);
+void *  myynewbuffer();
+void    myyoldbuffer(void * oldb);
+
+
+class Voice
+{
+  public:
+    Voice  * next;
+    Voice  * prev;
+    char   * filename;    // file name or proc name
+    procinfo * pi;        // proc info
+    void   * oldb;        // internal scanner buffer
+    int    start_lineno;  // lineno, to restore in recursion
+    int    curr_lineno;   // current lineno
+    feBufferInputs   sw;  // BI_stdin: read from STDIN
+                          // BI_buffer: buffer
+                          // BI_file: files
+    char   ifsw;          // if-switch:
+            /*1 ifsw==0: no if statement, else is invalid
+            *       ==1: if (0) processed, execute else
+            *       ==2: if (1) processed, else allowed but not executed
+            */
+    feBufferTypes   typ;  // buffer type: see BT_..
+    // for files only:
+    FILE * files;         // file handle
+    // for buffers only:
+    char * buffer;        // buffer pointer
+    long   fptr;          // current position in buffer
+
+  Voice() { memset(this,0,sizeof(*this));}
+  feBufferTypes Typ();
+  void Next();
+} ;
+
+extern Voice  *currentVoice;
+
+Voice * feInitStdin();
 
 /* feread.cc: */
 #ifdef HAVE_FEREAD
@@ -112,6 +151,7 @@ void   myyoldbuffer(void * oldb);
 #else
   #ifdef HAVE_READLINE
     void fe_set_input_mode (void);
+    void fe_reset_input_mode (void);
     char * fe_fgets_stdin_rl(char *pr,char *s, int size);
     #define fe_fgets_stdin(A,B) fe_fgets_stdin_rl(fe_promptstr,A,B)
   #else

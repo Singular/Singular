@@ -1,230 +1,219 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.1 1997-09-09 09:15:03 Singular Exp $ */
+/* $Id: febase.inc,v 1.2 1998-02-27 14:06:11 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
 
-class Voices
-{
-  private:
-    void Init()
-    {
-      memset(this,0,sizeof(*this));
-      v_lineno = 1;
-    }
-  public:
-    int    v_lineno;        // lineno, to restore in recursion
-    int    v_oldlineno;     // lineno, to restore at exit
-    int    typ;             // buffer type: see BT_..
-    int    v_echo;          // echo, to restore in recursion
-    int    v_fileVoice;     // to be restored in recursion
-    int    v_inputswitch;   // ??
-    FILE * files;           // file handle
-    long   fptr;            // file | buffer seek
-    char*  filename;        // file name
-    char * buffer;          // buffer pointer
+extern int noeof;
+int blocklineno;     // to get the lineno of the block start from scanner
+Voice  *currentVoice = NULL;
+FILE *feFilePending; /*temp. storage for grammar.y */
 
-  void Next();
-  Voices() { Init(); }
-  Voices * VFile(char* fname);
-  Voices * Buffer(char* buf, int t);
-  int Exit();
-} ;
-
-
-extern FILE* yyin;
-
-#define START_LEVMAX 32
-int     levmax       = START_LEVMAX;
-Voices *currentVoice = NULL;
-Voices *FileAttribs  =(Voices *)Alloc0(START_LEVMAX*sizeof(Voices));
-short  *ifswitch     =(short *)Alloc0(START_LEVMAX*sizeof(short));
-        /*1 ifswitch==0: no if statement, else is invalid
-        *           ==1: if (0) processed, execute else
-        *           ==2: if (1) processed, else allowed but not executed
-        */
-int     fileVoice = 0;
-int     voice = 0;
-int     inputswitch = 0;
-int     blocklineno = 0;
-
+static char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
+                       "BT_file","BT_execute","BT_if","BT_else"};
 /*2
-* the name of the current 'voice': the procname (or filename)
+* the name of the current 'Voice': the procname (or filename)
 */
 const char * VoiceName()
 {
-  if (FileAttribs[fileVoice].filename!=NULL)
-    return FileAttribs[fileVoice].filename;
+  if ((currentVoice!=NULL)
+  && (currentVoice->filename!=NULL))
+    return currentVoice->filename;
   return sNoName;
 }
 
 /*2
-* the name of the 'voice' number 'i': the procname (or filename)
+* the calling chain of Voices
 */
-const char * VoiceName(int i)
+void VoiceBackTrack()
 {
-  if (FileAttribs[i].filename!=NULL)
-    return FileAttribs[i].filename;
-  return sNoName;
-}
-
-/*2
-* the type of the current voice:BT_proc, BT_example, BT_file
-*/
-int VoiceType()
-{
-  int i=fileVoice;
-  while ((FileAttribs[i].typ!=BT_proc)
-  &&(FileAttribs[i].typ!=BT_example)
-  &&(FileAttribs[i].typ!=BT_file)
-  &&(i>0))
-    i--;
-  return FileAttribs[i].typ;
-}
-/*2
-* start the file 'fname' (STDIN is stdin) in the current voice (cf.newVoice)
-*/
-Voices * Voices::VFile(char* fname)
-{
-  if (strcmp(fname,"STDIN") == 0)
+  Voice *p=currentVoice;
+  while (p->prev!=NULL)
   {
-    yyin = stdin;
-    v_inputswitch = 0;
-  }
-  else
-  {
-    yyin = feFopen(fname,"r",NULL,TRUE);
-    v_inputswitch = -1;
-  }
-  files      = yyin;
-  filename   = mstrdup(fname);
-  v_echo     = si_echo;
-  fileVoice  = voice;
-  yylineno   = 1;
-  if (files==NULL)
-  {
-    inputswitch = 0;
-    exitVoice();
-    return NULL;
-  }
-  inputswitch= v_inputswitch;
-  return this;
-}
-
-/*3
-* increment voice counter, allocate new memory
-*/
-static inline void inc_voice()
-{
-  voice++;
-  if (voice >= levmax)
-  {
-    FileAttribs=(Voices *)ReAlloc(FileAttribs,
-                          levmax*sizeof(Voices),
-                          (levmax+16)*sizeof(Voices));
-    memset(&FileAttribs[levmax],0,16*sizeof(Voices));
-    ifswitch=(short *)ReAlloc(ifswitch,
-                          levmax*sizeof(short),
-                          (levmax+16)*sizeof(short));
-    memset(&ifswitch[levmax],0,16*sizeof(short));
-    levmax+=16;
+    p=p->prev;
+    char *s=p->filename;
+    if (s==NULL)
+      PrintS("-- called from ? --\n");
+    else
+      Print("-- called from %s --\n",s);
   }
 }
 
 /*2
 * init a new voice similiar to the current
 */
-void Voices::Next()
+void Voice::Next()
 {
-  v_oldlineno = yylineno;
-  v_echo      = si_echo;
-  v_fileVoice = fileVoice;
-  inc_voice();
+  Voice *p=new Voice;
+  if (currentVoice != NULL)
+  {
+    currentVoice->curr_lineno=yylineno;
+    currentVoice->next=p;
+  }
+  p->prev=currentVoice;
+  currentVoice=p;
+  //Print("Next:");
+}
 
-  currentVoice = &FileAttribs[voice];
-  currentVoice->Init();
+feBufferTypes Voice::Typ()
+{
+  switch(typ)
+  {
+    case BT_proc:
+    case BT_example:
+    case BT_file:
+      return typ;
+    default:
+      if (prev==NULL) return (feBufferTypes)0;
+      return prev->Typ();
+  }
 }
 
 /*2
 * start the file 'fname' (STDIN is stdin) as a new voice (cf.VFile)
+* return FALSE on success, TRUE if an error occurs (file cannot be opened)
 */
-int newVoice(char* s)
+BOOLEAN newFile(char *fname,FILE* f)
 {
   currentVoice->Next();
-  return (int)currentVoice->VFile((char *)s);
+  //Print(":File%d(%s):%s(%x)\n",
+  //  currentVoice->typ,BT_name[currentVoice->typ],fname,currentVoice);
+  currentVoice->filename   = mstrdup(fname);
+  if (strcmp(fname,"STDIN") == 0)
+  {
+    currentVoice->files = stdin;
+    currentVoice->sw = BI_stdin;
+    currentVoice->start_lineno = 1;
+  }
+  else
+  {
+    currentVoice->sw = BI_file; /* needed by exitVoice below */
+    if (f!=NULL)
+      currentVoice->files = f;
+    else
+    {
+      currentVoice->files = feFopen(fname,"r",NULL,TRUE);
+      if (currentVoice->files==NULL)
+      {
+        exitVoice();
+        return TRUE;
+      }
+    }
+    currentVoice->start_lineno = 0;
+  }
+  yylineno=currentVoice->start_lineno;
+  //Voice *p=currentVoice;
+  //Print("-----------------\ncurr:");
+  //do
+  //{
+  //Print("voice fn:%s\n",p->filename);
+  //p=p->prev;
+  //}
+  //while (p!=NULL);
+  //Print("----------------\n");
+  return FALSE;
 }
 
-void newBuffer(char* s, int t, char* pname)
+void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
 {
   currentVoice->Next();
-  currentVoice->Buffer(s,t);
-  if (pname) currentVoice->filename = mstrdup(pname);
-  //printf("start buffer %d typ %d\n",voice,t);
-}
-
-Voices * Voices::Buffer(char* buf, int t)
-{
-  inputswitch = v_inputswitch = t;
-  buffer      = buf;
-  typ         = t;
-  //si_echo        = 0;
+  //Print(":Buffer%d(%s):%s(%x)\n",
+  //  t,BT_name[t],pname,currentVoice);
+  if (pi!=NULL)
+  {
+    int l=strlen(pi->procname);
+    if (pi->libname!=NULL) l+=strlen(pi->libname);
+    currentVoice->filename = (char *)AllocL(l+3);
+    *currentVoice->filename='\0';
+    if (pi->libname!=NULL) strcat(currentVoice->filename,pi->libname);
+    strcat(currentVoice->filename,"::");
+    strcat(currentVoice->filename,pi->procname);
+    currentVoice->pi       = pi;
+  }
+  else
+  {
+    currentVoice->filename = mstrdup(currentVoice->prev->filename);
+    currentVoice->pi       = currentVoice->prev->pi;
+  }
+  currentVoice->buffer   = s;
+  currentVoice->sw       = BI_buffer;
+  currentVoice->typ      = t;
   switch (t)
   {
+    case BT_execute:
+                     yylineno-=2;
+                     break;
+    case BT_proc:
     case BT_example:
-    case BT_proc:    v_lineno = yylineno; ::yylineno = 3;     break;
-    case BT_file:    v_lineno = yylineno; ::yylineno = 1;     break;
+                     currentVoice->oldb=myynewbuffer();
+                     yylineno = lineno+1;
+                     break;
+    case BT_file:
+                     yylineno = 1;
+                     break;
     case BT_if:
-    case BT_else:    ::yylineno = v_lineno = blocklineno - 1; break;
-    case BT_break:   ::yylineno = v_lineno = blocklineno - 2; break;
+    case BT_else:
+                     yylineno = blocklineno;
+                     break;
+    case BT_break:
+                     yylineno = blocklineno-1;
+                     break;
   }
-  return this;
-}
-
-/*2
-* after leaving a voice:
-* setup everything from the this level
-*/
-int Voices::Exit()
-{
-  if (voice >= 0)
-  {
-    si_echo          = v_echo;
-    fileVoice     = v_fileVoice;
-    yyin          = files;
-    yylineno      = v_oldlineno;
-    inputswitch   = v_inputswitch;
-    return 0;
-  }
-  //Print("Exit:%d\n",voice);
-  return 1;
+  //Print("start body (%s) at line %d\n",BT_name[t],yylineno);
+  currentVoice->start_lineno = yylineno;
+  //printf("start buffer typ %d\n",t);
+  //Voice *p=currentVoice;
+  //Print("-----------------\ncurr:");
+  //do
+  //{
+  //Print("voice fn:%s\n",p->filename);
+  //p=p->prev;
+  //}
+  //while (p!=NULL);
+  //Print("----------------\n");
 }
 
 /*2
 * exit Buffer of type 'typ':
 * returns 1 if buffer type could not be found
 */
-int exitBuffer(int typ)
+BOOLEAN exitBuffer(feBufferTypes typ)
 {
-  //printf("exitBuffer: %d\n",typ);
+  //printf("exitBuffer: %d(%s),(%x)\n",
+  //  typ,BT_name[typ], currentVoice);
+  //Voice *p=currentVoice;
+  //Print("-----------------\ncurr:");
+  //do
+  //{
+  //Print("voice fn:%s\n",p->filename);
+  //p=p->prev;
+  //}
+  //while (p!=NULL);
+  //Print("----------------\n");
   if (typ == BT_break)  // valid inside for, while. may skip if, else
   {
     /*4 first check for valid buffer type, skip if/else*/
-    for (int i=voice; i>0; i--)
+    Voice *p=currentVoice;
+    loop
     {
-      if ((FileAttribs[i].typ == BT_if)
-        ||(FileAttribs[i].typ == BT_else)) continue;
-      if (FileAttribs[i].typ == BT_break /*typ*/)
+      if ((p->typ != BT_if)
+      &&(p->typ != BT_else))
       {
-        while ((/*typ*/ BT_break != currentVoice->typ)
-        && (voice > 0))
+        if (p->typ == BT_break /*typ*/)
         {
+          while (p != currentVoice)
+          {
+            exitVoice();
+          }
           exitVoice();
+          return FALSE;
         }
-        return exitVoice();
+        else return TRUE;
       }
-      else return 1;
+      if (p->prev==NULL) break;
+      p=p->prev;
     }
     /*4 break not inside a for/while: return an error*/
     if (/*typ*/ BT_break != currentVoice->typ) return 1;
@@ -234,173 +223,337 @@ int exitBuffer(int typ)
   if ((typ == BT_proc)
   || (typ == BT_example))
   {
-    for (int i=voice; i>0; i--)
+    Voice *p=currentVoice;
+    loop
     {
-      if (FileAttribs[i].typ == 0) break;
-      if ((FileAttribs[i].typ == BT_proc)
-      || (FileAttribs[i].typ == BT_example))
+      if ((p->typ == BT_proc)
+      || (p->typ == BT_example))
       {
-        while ((BT_proc != currentVoice->typ)
-          && (BT_example != currentVoice->typ)
-        && (voice > 0))
+        while (p != currentVoice)
         {
           exitVoice();
         }
-        return exitVoice();
+        exitVoice();
+        return FALSE;
       }
+      if (p->prev==NULL) break;
+      p=p->prev;
     }
   }
   /*4 return not inside a proc: return an error*/
-  return 1;
+  return TRUE;
 }
 
 /*2
 * jump to the beginning of a buffer
 */
-int contBuffer(int typ)
+BOOLEAN contBuffer(feBufferTypes typ)
 {
+  //printf("contBuffer: %d(%s),(%x)\n",
+  //  typ,BT_name[typ], currentVoice);
   if (typ == BT_break)  // valid inside for, while. may skip if, else
   {
     // first check for valid buffer type
-    for (int i=voice; i>0; i--)
+    Voice *p=currentVoice;
+    loop
     {
-      if ((FileAttribs[i].typ == BT_if)
-        ||(FileAttribs[i].typ == BT_else)) continue;
-      if (FileAttribs[i].typ == BT_break /*typ*/)
+      if ((p->typ != BT_if)
+        &&(p->typ != BT_else))
       {
-        while (/*typ*/ BT_break != currentVoice->typ && (voice > i))
+        if (p->typ == BT_break /*typ*/)
         {
-          exitVoice();
+          while (p != currentVoice)
+          {
+            exitVoice();
+          }
+          yylineno = currentVoice->start_lineno;
+          currentVoice->fptr=0;
+          return FALSE;
         }
-        currentVoice->fptr = 0L;
-        yylineno = currentVoice->v_lineno;
-        return 0;
+        else return TRUE;
       }
-      else return 1;
+      if (p->prev==NULL) break;
+      p=p->prev;
     }
   }
-  return 1;
+  return TRUE;
 }
 
 /*2
 * leave a voice: kill local variables
-* setup everything from the previous level (via Exit)
+* setup everything from the previous level
+* return 1 if leaving the top level, 0 otherwise
 */
-int exitVoice()
+BOOLEAN exitVoice()
 {
-  if (voice <= 0)   
+  //printf("exitVoice: %d(%s),(%x)\n",
+  //  currentVoice->typ,BT_name[currentVoice->typ], currentVoice);
+  //{
+  //Voice *p=currentVoice;
+  //Print("-----------------\ncurr:");
+  //do
+  //{
+  //Print("voice fn:%s\n",p->filename);
+  //p=p->prev;
+  //}
+  //while (p!=NULL);
+  //Print("----------------\n");
+  //}
+  if (currentVoice->oldb!=NULL)
   {
-    if (feBatch) return 1;
-    else m2_end(0);
-  }  
-  //printf("exitVoice %d, typ %d\n",voice,FileAttribs[voice].typ);
-  if (FileAttribs[voice].typ==BT_if)
+    myyoldbuffer(currentVoice->oldb);
+    currentVoice->oldb=NULL;
+  }
+  if ((currentVoice->prev==NULL)&&(currentVoice->sw==BI_file))
   {
-    ifswitch[voice-1]=2;
+    currentVoice->prev=feInitStdin();
+  }
+  if (currentVoice->prev!=NULL)
+  {
+    //printf("exitVoice typ %d(%s)\n",
+    //  currentVoice->typ,BT_name[currentVoice->typ]);
+    if (currentVoice->typ==BT_if)
+    {
+      currentVoice->prev->ifsw=2;
+    }
+    else
+    {
+      currentVoice->prev->ifsw=BI_stdin;
+    }
+    if ((currentVoice->sw == BI_file)
+    && (currentVoice->files!=NULL))
+    {
+      fclose(currentVoice->files);
+    }
+    if (currentVoice->filename!=NULL)
+    {
+      FreeL((ADDRESS)currentVoice->filename);
+      currentVoice->filename=NULL;
+    }
+    if (currentVoice->buffer!=NULL)
+    {
+      FreeL((ADDRESS)currentVoice->buffer);
+      currentVoice->buffer=NULL;
+    }
+    yylineno=currentVoice->prev->curr_lineno;
+  }
+  Voice *p=currentVoice->prev;
+  delete currentVoice;
+  currentVoice=p;
+  return currentVoice==0;
+}
+
+/*2
+* print prompt (si_echo or TRACE), set prompt_char
+*/
+static void feShowPrompt(void)
+{
+  if ((traceit&TRACE_SHOW_LINE)
+  || (traceit&TRACE_SHOW_LINE1)
+  || (currentVoice->Typ() != BT_example))
+  {
+    if ((si_echo > myynest) || (currentVoice->sw == BI_stdin) || (traceit&TRACE_SHOW_LINE)
+    || (traceit&TRACE_SHOW_LINE1))
+    {
+#ifdef HAVE_TCL
+      if (tclmode)
+      {
+         PrintTCL('P',(prompt_char=='>')? 0 : 1,NULL);
+      }
+      else
+#endif
+      if ((BVERBOSE(V_PROMPT))&&(!feBatch))
+      {
+        if (currentVoice->sw == BI_stdin)
+        {
+          fe_promptstr[0]=prompt_char;
+#ifndef HAVE_READLINE
+          PrintS(fe_promptstr);
+#endif
+        }
+        else
+        {
+          if (currentVoice->filename==NULL)
+            Print("(none) %3d%c ",yylineno,prompt_char);
+          else
+            Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
+        }
+        prompt_char = '.';
+        mflush();
+      }
+#ifdef macintosh
+      cols = 0;
+#endif
+    }
+  }
+}
+
+/*2
+* print echo (si_echo or TRACE), set my_yylinebuf
+*/
+static int fePrintEcho(char *anf)
+{
+  char *ss=strchr(anf,'\n');
+  int len_s;
+  if (ss==NULL)
+  {
+    len_s=strlen(anf);
   }
   else
   {
-    ifswitch[voice-1]=0;
-    //if ((FileAttribs[voice].typ==BT_proc)
-    //||(FileAttribs[voice].typ==BT_example)
-    //||(FileAttribs[voice].typ==0))
-    //{
-    //  killlocals(myynest);
-    //  printf("killlocals %d\n",myynest);
-    //}
+    len_s=ss-anf+1;
   }
-  if (inputswitch == -1)
+  // my_yylinebuf:
+  int mrc=min(len_s,80)-1;
+  strcpy(my_yylinebuf,anf+(len_s-1)-mrc);
+  if (my_yylinebuf[mrc] == '\n') my_yylinebuf[mrc] = '\0';
+  mrc--;
+  // handle echo:
+  if (((si_echo>myynest)
+    && (currentVoice->typ!=BT_break)
+    && (currentVoice->typ!=BT_execute)
+    && (strncmp(anf,";return();",10)!=0)
+  )
+  || (traceit&TRACE_SHOW_LINE)
+  || (traceit&TRACE_SHOW_LINE1))
   {
-    fclose(yyin);
-  }
-  else if (inputswitch > 0)
-  {
-    if (FileAttribs[voice].filename!=NULL)
+    fwrite(anf,1,len_s,stdout);
+    mflush();
+    if (traceit&TRACE_SHOW_LINE)
     {
-      FreeL((ADDRESS)FileAttribs[voice].filename);
-      FileAttribs[voice].filename=NULL;
-    }
-    if (FileAttribs[voice].buffer!=NULL)
-    {
-      FreeL((ADDRESS)FileAttribs[voice].buffer);
-      FileAttribs[voice].buffer=NULL;
+      while(fgetc(stdin)!='\n');
     }
   }
-  currentVoice = &FileAttribs[--voice];
-  return currentVoice->Exit();
+  else if (traceit&TRACE_SHOW_LINENO)
+  {
+    printf("{%d}",yylineno);
+    mflush();
+  }
+  return len_s;
 }
 
-int readbuf(char* buf, int l)
+int feReadLine(char* b, int l)
 {
-  char *s;
-  char * t = buf;
-  int i = 0;
-  long fl = currentVoice->fptr;
-  if (fl == -1L)
+  // try to read from the buffer:
+  b[1] = '\0';
+  if ((currentVoice->buffer!=NULL)
+  && (currentVoice->buffer[currentVoice->fptr]!='\0'))
   {
-    t[0] = '\0';
-    exitVoice();
+NewBuff:
+    b[0]=currentVoice->buffer[currentVoice->fptr];
+    if (currentVoice->sw==BI_buffer)
+    {
+      if (currentVoice->fptr==0)
+      {
+        char *anf=currentVoice->buffer;
+        char *ss=strchr(anf,'\n');
+        int len;
+        if (ss==NULL) len=strlen(anf);
+        else          len=ss-anf;
+        char *s=(char *)AllocL(len+2);
+        strncpy(s,anf,len+2);
+        s[len+1]='\0';
+        feShowPrompt();
+        fePrintEcho(s);
+        FreeL((ADDRESS)s);
+      }
+      else if (/*(currentVoice->fptr>0) &&*/
+      (currentVoice->buffer[currentVoice->fptr-1]=='\n'))
+      {
+        char *anf=currentVoice->buffer+currentVoice->fptr;
+        char *ss=strchr(anf,'\n');
+        int len;
+        if (ss==NULL) len=strlen(anf);
+        else          len=ss-anf;
+        char *s=(char *)AllocL(len+2);
+        strncpy(s,anf,len+2);
+        s[len+1]='\0';
+        yylineno++;
+        feShowPrompt();
+        fePrintEcho(s);
+        FreeL((ADDRESS)s);
+      }
+    }
+    currentVoice->fptr++;
+    return 1;
+  }
+  // no buffer there or e-o-buffer or eoln:
+  if (currentVoice->sw!=BI_buffer)
+  {
+    currentVoice->fptr=0;
+    if (currentVoice->buffer==NULL)
+      currentVoice->buffer=(char *)AllocL(4096-sizeof(ADDRESS));
+  }
+  char *s;
+  int offset=0;
+NewRead:
+  yylineno++;
+  feShowPrompt();
+  if (currentVoice->sw==BI_stdin)
+    s=fe_fgets_stdin(currentVoice->buffer+offset,(4096-sizeof(ADDRESS))-offset);
+  else if (currentVoice->sw==BI_file)
+    s=fgets(currentVoice->buffer+offset,(4096-sizeof(ADDRESS))-offset,
+            currentVoice->files);
+  else /* BI_buffer */
+  {
     return 0;
   }
-
-  s = currentVoice->buffer + fl;
-  while (l > 0)
+  if (s!=NULL)
   {
-    fl++;
-    i++;
-    l--;
-    *t++ = *s;
-    if (*s == '\n')
+    // handle prot:
+    if (feProt&PROT_I)
     {
-      *t = '\0';
-      if ((si_echo > voice) || (inputswitch == 0) || (traceit&TRACE_SHOW_LINE)
-      || (traceit&TRACE_SHOW_LINE1))
-      {
-        if (currentVoice->filename==NULL)
-          Print("(none) %3d%c ",yylineno,prompt_char);
-        else if (VoiceType()!=BT_example)
-          Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
-        prompt_char = '.';
-      }
-      if (*(s+1) == '\0')
-      {
-        currentVoice->fptr = -1;
-        FreeL((ADDRESS)(currentVoice->buffer));
-        currentVoice->buffer=NULL;
-        FileAttribs[voice].buffer = NULL;
-        exitVoice();
-      }
-      else
-        currentVoice->fptr = fl;
-      return i;
+      fputs(s,feProtFile);
     }
-    else if (*s == '\0')
+    int rc=fePrintEcho(s)-2;
+    // handel \\ :
+    if ((s[rc]=='\\')&&(currentVoice->sw!=BI_buffer))
     {
-      if ((si_echo > voice) || (inputswitch == 0) || (traceit&TRACE_SHOW_LINE)
-      || (traceit&TRACE_SHOW_LINE1))
-      {
-        if (currentVoice->filename==NULL)
-          Print("(none) %3d%c ",yylineno,prompt_char);
-        else
-          Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
-        prompt_char = '.';
-      }
-      currentVoice->fptr = -1;
-      FreeL((ADDRESS)(currentVoice->buffer));
-      currentVoice->buffer = NULL;
-      exitVoice();
-      return i-1;
+      s[rc]='\0';
+      offset+=rc;
+      if (offset<(int)mmSizeL(currentVoice->buffer)) goto NewRead;
     }
-    s++;
+    goto NewBuff;
   }
-  currentVoice->fptr = fl;
-  return i;
+  /* else if (s==NULL) */
+  {
+    switch(noeof)
+    {
+      case 0:
+        return 0;
+      case noeof_brace:
+      case noeof_block:
+        WerrorS("premature end of file while reading {...}");
+        break;
+      case noeof_asstring:
+        WerrorS("premature end of file while reading till `.`");
+        break;
+      case noeof_string:
+        WerrorS("premature end of file while reading string");
+        break;
+      case noeof_bracket:
+        WerrorS("premature end of file while reading (...)");
+        break;
+      case noeof_procname:
+        WerrorS("premature end of file while reading proc");
+        break;
+    }
+    return 0;
+  }
 }
 
 /*2
 * init all data structures
 */
-void I_FEbase(void)
+#ifndef STDIN_FILENO
+#define STDIN_FILENO 0
+#endif
+Voice * feInitStdin()
 {
-  currentVoice = FileAttribs[0].VFile("STDIN");
+  Voice *p = new Voice;
+  p->files = stdin;
+  p->sw = isatty(STDIN_FILENO) ? BI_stdin : BI_file;
+  p->filename   = mstrdup("STDIN");
+  p->start_lineno   = 1;
+  return p;
 }

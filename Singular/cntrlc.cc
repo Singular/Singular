@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.16 1997-12-03 16:58:31 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.17 1998-02-27 14:06:04 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -194,12 +194,27 @@ void init_signals()
   setitimer(ITIMER_VIRTUAL,&t,&o);
   signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 #else
-  signal(SIGSEGV,(si_hdl_typ)sigsegv_handler);
+  if (SIG_ERR==signal(SIGSEGV,(si_hdl_typ)sigsegv_handler))
+  {
+    PrintS("cannot set signal handler for SEGV\n");
+  }
 #endif
-  signal(SIGFPE, (si_hdl_typ)sigsegv_handler);
-  signal(SIGILL, (si_hdl_typ)sigsegv_handler);
-  signal(SIGIOT, (si_hdl_typ)sigsegv_handler);
-  signal(SIGINT ,sigint_handler);
+  if (SIG_ERR==signal(SIGFPE, (si_hdl_typ)sigsegv_handler))
+  {
+    PrintS("cannot set signal handler for FPE\n");
+  }
+  if (SIG_ERR==signal(SIGILL, (si_hdl_typ)sigsegv_handler))
+  {
+    PrintS("cannot set signal handler for ILL\n");
+  }
+  if (SIG_ERR==signal(SIGIOT, (si_hdl_typ)sigsegv_handler))
+  {
+    PrintS("cannot set signal handler for IOT\n");
+  }
+  if (SIG_ERR==signal(SIGINT ,sigint_handler))
+  {
+    PrintS("cannot set signal handler for INT\n");
+  }
 }
 
 #else

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.15 1997-12-15 22:46:29 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.16 1998-02-27 14:06:20 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -88,6 +88,7 @@ char * iiTwoOps(int t)
   }
   switch (t)
   {
+    case COLONCOLON:  return "::";
     case DOTDOT:      return "..";
     //case PLUSEQUAL:   return "+=";
     //case MINUSEQUAL:  return "-=";
@@ -649,14 +650,7 @@ BOOLEAN iiDebugMarker=TRUE;
 void iiDebug()
 {
   Print("\n-- break point in %s --\n",VoiceName());
-  int i=voice-1;
-  if (iiDebugMarker)
-  {
-    for(;i>=0;i--)
-    {
-      Print("-- %d: called from %s --\n",i,VoiceName(i));
-    }
-  }
+  if (iiDebugMarker) VoiceBackTrack();
   char * s;
   iiDebugMarker=FALSE;
   s = (char *)AllocL(84);
