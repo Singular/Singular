@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.90 2000-02-03 12:29:21 siebert Exp $ */
+/* $Id: ideals.cc,v 1.91 2000-02-07 17:24:17 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1754,7 +1754,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
     *rest = s_rest;
   else
     idDelete(&s_rest);
-idPrint(s_result);
+//idPrint(s_result);
   if (unit!=NULL)
   {
     *unit=mpNew(comps_to_add,comps_to_add);
@@ -1795,7 +1795,9 @@ idPrint(s_result);
 }
 
 /*2
-*computes the quotient of h1,h2
+*computes the quotient of h1,h2 : interanl routine for idQuot
+*BEWARE: the returned ideals may contain incorrected orderd polys !
+* 
 */
 static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
                                BOOLEAN *addOnlyOne, int *kkmax)
@@ -1898,7 +1900,6 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
     test |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
-  idTest(h4);
   return h4;
 }
 /*2
