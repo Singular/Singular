@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.182 2002-04-30 13:35:09 levandov Exp $ */
+/* $Id: extra.cc,v 1.183 2002-05-13 09:16:38 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -250,9 +250,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #endif
         #ifdef TEST_MAC_ORDER
           TEST_FOR("MAC_ORDER");
-        #endif
-        #ifdef HAVE_NAMESPACES
-          TEST_FOR("Namespaces");
         #endif
         #ifdef HAVE_NS
           TEST_FOR("namespaces");
@@ -1089,7 +1086,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#if !defined(HAVE_NAMESPACES) && !defined(HAVE_NS)
+#if !defined(HAVE_NS)
 /*==================== lib ==================================*/
     if(strcmp(sys_cmd,"LIB")==0)
     {
@@ -1107,39 +1104,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#ifdef HAVE_NAMESPACES
-/*==================== nspush ===================================*/
-    if(strcmp(sys_cmd,"nspush")==0)
-    {
-      if (h->Typ()==PACKAGE_CMD)
-      {
-        idhdl hh=(idhdl)h->data;
-        namespaceroot = namespaceroot->push(IDPACKAGE(hh), IDID(hh));
-        return FALSE;
-      }
-      else
-        Warn("argument 2 is not a package");
-    }
-    else
-/*==================== nspop ====================================*/
-    if(strcmp(sys_cmd,"nspop")==0)
-    {
-      namespaceroot->pop();
-      return FALSE;
-    }
-    else
-/*==================== nsstack ===================================*/
-    if(strcmp(sys_cmd,"nsstack")==0)
-    {
-      namehdl nshdl = namespaceroot;
-      for( ; nshdl->isroot != TRUE; nshdl = nshdl->next) {
-        Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
-      }
-      Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
-      return FALSE;
-    }
-    else
-#endif /* HAVE_NAMESPACES */
 /*==================== listall ===================================*/
     if(strcmp(sys_cmd,"listall")==0)
     {
