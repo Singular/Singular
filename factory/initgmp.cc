@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: initgmp.cc,v 1.3 1997-06-19 12:22:52 schmidt Exp $ */
+/* $Id: initgmp.cc,v 1.4 1998-06-14 13:23:18 Singular Exp $ */
 
 #include <config.h>
 
@@ -37,11 +37,12 @@ void * mgReallocBlock( void* a, size_t t1, size_t t2)
 
 int initializeGMP()
 {
+#ifdef USE_MEMUTIL
   static int initialized = 0;
 
-  if ( ! initialized ) {
+  if ( ! initialized )
+  {
     initialized = 1;
-#ifdef USE_MEMUTIL
 #ifdef USE_OLD_MEMMAN
     mp_set_memory_functions( getBlock, reallocBlock, freeBlock );
 #else
@@ -51,7 +52,7 @@ int initializeGMP()
     mp_set_memory_functions( mmAllocBlock, mmReallocBlock, mmFreeBlock );
 #endif
 #endif
-#endif
   }
+#endif
   return 1;
 }
