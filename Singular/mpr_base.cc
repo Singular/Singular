@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.18 2000-02-29 17:13:41 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.19 2000-02-29 18:15:54 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -364,8 +364,8 @@ void print_bmat(mprfloat **a, int nrows, int ncols, int N, int *iposv)
     printf(" ]");
   } printf("\n");
   fflush(stdout);
-
 }
+
 void print_exp( const onePointP vert, int n )
 {
   int i;
@@ -386,35 +386,34 @@ void print_matrix( matrix omat )
   {
     for ( j= 1; j <= MATCOLS( omat ); j++ )
     {
-      if ( MATELEM( omat, i, j) && pGetCoeff( MATELEM( omat, i, j) ) )
+      if ( (MATELEM( omat, i, j)!=NULL)
+      && (!nIsZero(pGetCoeff( MATELEM( omat, i, j)) ) )
       {
         val= nInt(pGetCoeff( MATELEM( omat, i, j) ));
         if ( i==MATROWS(omat) && j==MATCOLS(omat) )
         {
-          if ( !val ) Print(" 0 ");
-          else Print("%d ",val);
+          Print("%d ",val);
         }
         else
         {
-          if ( !val ) Print(" 0, ");
-          else Print("%d, ",val);
+          Print("%d, ",val);
         }
       }
       else
       {
         if ( i==MATROWS(omat) && j==MATCOLS(omat) )
         {
-          Print("  0");
+          PrintS("  0");
         }
         else
         {
-          Print("  0, ");
+          PrintS("  0, ");
         }
       }
     }
-    Print("\n");
+    PrintLn();
   }
-  Print(");\n");
+  PrintS(");\n");
 }
 #endif
 //<-
@@ -658,7 +657,7 @@ inline bool pointSet::larger( int a, int b )
 void pointSet::sort()
 {
   int i,j;
-  bool found= true;;
+  bool found= true;
   onePointP tmp;
 
   while ( found )
@@ -745,14 +744,14 @@ bool convexHull::inHull(poly p, poly pointPoly, int m, int site)
   pLP->m = n+1;
   pLP->n = m;                // this includes col of cts
 
-  pLP->LiPM[1][1] = +0.0;  
+  pLP->LiPM[1][1] = +0.0;
   pLP->LiPM[1][2] = +1.0;        // optimize (arbitrary) var
-  pLP->LiPM[2][1] = +1.0;  
+  pLP->LiPM[2][1] = +1.0;
   pLP->LiPM[2][2] = -1.0;         // lambda vars sum up to 1
 
   for ( j=3; j <= pLP->n; j++)
   {
-    pLP->LiPM[1][j] = +0.0; 
+    pLP->LiPM[1][j] = +0.0;
     pLP->LiPM[2][j] = -1.0;
   }
 
@@ -770,7 +769,7 @@ bool convexHull::inHull(poly p, poly pointPoly, int m, int site)
   }
 
 #ifdef mprDEBUG_ALL
-  Print("Matrix of Linear Programming\n");
+  PrintS("Matrix of Linear Programming\n");
   print_mat( pLP->LiPM, pLP->m+1,pLP->n);
 #endif
 
@@ -830,7 +829,7 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
     Print(" \\Conv(Qi[%d]): #%d\n", i,Q[i]->num );
     for ( j=1; j <= Q[i]->num; j++ )
     {
-      Print("%d: <",j);print_exp( (*Q[i])[j] , pVariables );Print(">\n");
+      Print("%d: <",j);print_exp( (*Q[i])[j] , pVariables );PrintS(">\n");
     }
     PrintLn();
   }
@@ -863,15 +862,17 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
     for( j= 1; j <= m; j++) {  // für jeden Exponentvektor
       if( !inHull( (gls->m)[i], p, m, j ) )
       {
-	if ( (id->m)[i] == NULL ) {
-	  (id->m)[i]= pCopy(p);
-	  pNext((id->m)[i])= NULL;
-	  pid=(id->m)[i];
-	} else {
-	  pNext(pid)= pCopy(p);
-	  pIter(pid);
-	  pNext(pid)= NULL;
-	}
+        if ( (id->m)[i] == NULL )
+        {
+          (id->m)[i]= pHead(p);
+          pid=(id->m)[i];
+        }
+        else
+        {
+          pNext(pid)= pHead(p);
+          pIter(pid);
+          pNext(pid)= NULL;
+        }
         mprSTICKYPROT(ST_SPARSE_VADD);
       }
       else
@@ -934,18 +935,21 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
   pLP->LiPM[1][2] = 1.0;        // maximize
   for( j=3; j<=cols; j++) pLP->LiPM[1][j] = 0.0;
 
-  for( i=0; i <= n; i++ ) {
+  for( i=0; i <= n; i++ )
+  {
     pLP->LiPM[i+2][1] = 1.0;
     pLP->LiPM[i+2][2] = 0.0;
   }
-  for( i=1; i<=dim; i++) {
+  for( i=1; i<=dim; i++)
+  {
     pLP->LiPM[n+2+i][1] = (mprfloat)(acoords[i-1]);
     pLP->LiPM[n+2+i][2] = -shift[i];
   }
 
   ii = -1;
   col = 2;
-  for ( i= 0; i <= n; i++ ) {
+  for ( i= 0; i <= n; i++ )
+  {
     ii++;
     for( k= 1; k <= Qi[ii]->num; k++ )
     {
@@ -955,7 +959,8 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
         if ( r == i ) pLP->LiPM[r+2][col] = -1.0;
         else pLP->LiPM[r+2][col] = 0.0;
       }
-      for( r= 1; r <= dim; r++ ) pLP->LiPM[r+n+2][col] = -(mprfloat)((*Qi[ii])[k]->point[r]);
+      for( r= 1; r <= dim; r++ )
+        pLP->LiPM[r+n+2][col] = -(mprfloat)((*Qi[ii])[k]->point[r]);
     }
   }
 
@@ -968,12 +973,14 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
   pLP->n=cols-1;
 
 #ifdef mprDEBUG_ALL
-  Print("vDistance LP, known koords dim=%d, constr %d, cols %d, acoords= ",dim,pLP->m,cols);
-  for( i= 0; i < dim; i++ ) Print(" %d",acoords[i]);
+  Print("vDistance LP, known koords dim=%d, constr %d, cols %d, acoords= ",
+        dim,pLP->m,cols);
+  for( i= 0; i < dim; i++ )
+    Print(" %d",acoords[i]);
   PrintLn();
   print_mat( pLP->LiPM, pLP->m+1, cols);
 #endif
-  
+
   pLP->compute();
 
 #ifdef mprDEBUG_ALL
@@ -981,7 +988,8 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
   print_bmat( pLP->LiPM, pLP->m+1, cols+1-pLP->m, cols, pLP->iposv);
 #endif
 
-  if( pLP->icase != 0 ) {  // check for errors
+  if( pLP->icase != 0 )
+  {  // check for errors
     WerrorS("mayanPyramidAlg::vDistance:");
     if( pLP->icase == 1 )
       WerrorS(" Unbounded v-distance: probably 1st v-coor=0");
@@ -1007,7 +1015,8 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
 
   // common part of the matrix
   pLP->LiPM[1][1] = 0.0;
-  for( i=2; i<=n+2; i++) {
+  for( i=2; i<=n+2; i++)
+  {
     pLP->LiPM[i][1] = 1.0;        // 1st col
     pLP->LiPM[i][2] = 0.0;        // 2nd col
   }
@@ -1021,15 +1030,18 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
     {
       cols++;
       pLP->LiPM[1][cols] = 0.0;        // set 1st row 0
-      for( k=2; k<=n+2; k++) {  // lambdas sum up to 1
+      for( k=2; k<=n+2; k++)
+      {  // lambdas sum up to 1
         if( k != la_cons_row) pLP->LiPM[k][cols] = 0.0;
         else pLP->LiPM[k][cols] = -1.0;
       }
-      for( k=1; k<=n; k++) pLP->LiPM[k+n+2][cols] = -(mprfloat)((*Qi[i])[j]->point[k]);
+      for( k=1; k<=n; k++)
+        pLP->LiPM[k+n+2][cols] = -(mprfloat)((*Qi[i])[j]->point[k]);
     } // j
   } // i
 
-  for( i= 0; i < dim; i++ ) {                // fixed coords
+  for( i= 0; i < dim; i++ )
+  {                // fixed coords
     pLP->LiPM[i+n+3][1] = acoords[i];
     pLP->LiPM[i+n+3][2] = 0.0;
   }
@@ -1041,7 +1053,8 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
 
 #ifdef mprDEBUG_ALL
   Print("\nThats the matrix for minR, dim= %d, acoords= ",dim);
-  for( i= 0; i < dim; i++ ) Print(" %d",acoords[i]);
+  for( i= 0; i < dim; i++ )
+    Print(" %d",acoords[i]);
   PrintLn();
   print_mat( pLP->LiPM, cons+1, cols);
 #endif
@@ -1053,7 +1066,8 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
 
   pLP->compute();
 
-  if ( pLP->icase != 0 ) { // check for errors
+  if ( pLP->icase != 0 )
+  { // check for errors
     if( pLP->icase < 0)
       WerrorS(" mn_mx_MinkowskiSum: LinearProgram: minR: infeasible");
     else if( pLP->icase > 0)
@@ -1067,7 +1081,8 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
 
   // common part of the matrix again
   pLP->LiPM[1][1] = 0.0;
-  for( i=2; i<=n+2; i++) {
+  for( i=2; i<=n+2; i++)
+  {
     pLP->LiPM[i][1] = 1.0;
     pLP->LiPM[i][2] = 0.0;
   }
@@ -1080,21 +1095,24 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
     {
       cols++;
       pLP->LiPM[1][cols] = 0.0;
-      for( k=2; k<=n+2; k++) {
+      for( k=2; k<=n+2; k++)
+      {
         if( k != la_cons_row) pLP->LiPM[k][cols] = 0.0;
         else pLP->LiPM[k][cols] = -1.0;
       }
-      for( k=1; k<=n; k++) pLP->LiPM[k+n+2][cols] = -(mprfloat)((*Qi[i])[j]->point[k]);
+      for( k=1; k<=n; k++)
+        pLP->LiPM[k+n+2][cols] = -(mprfloat)((*Qi[i])[j]->point[k]);
     } // j
   }  // i
 
-  for( i= 0; i < dim; i++ ) {                // fixed coords
+  for( i= 0; i < dim; i++ )
+  {                // fixed coords
     pLP->LiPM[i+n+3][1] = acoords[i];
     pLP->LiPM[i+n+3][2] = 0.0;
   }
   pLP->LiPM[dim+n+3][1] = 0.0;
 
-  pLP->LiPM[1][2] = 1.0;                        // maximize
+  pLP->LiPM[1][2] = 1.0;                      // maximize
   pLP->LiPM[dim+n+3][2] = 1.0;                // var = sum of pnt coords
 
 #ifdef mprDEBUG_ALL
@@ -1166,13 +1184,15 @@ void mayanPyramidAlg::runMayanPyramid( int dim )
 #endif
 
   // step 5 -> terminate
-  if( dim == n-1 ) {
+  if( dim == n-1 )
+  {
     int lastKilled = 0;
     // insert points
     acoords[dim] = minR;
     while( acoords[dim] <= maxR )
     {
-      if( !storeMinkowskiSumPoint() ) lastKilled++;
+      if( !storeMinkowskiSumPoint() )
+        lastKilled++;
       acoords[dim]++;
     }
     mprSTICKYPROT(ST_SPARSE_MPEND);
@@ -1183,10 +1203,13 @@ void mayanPyramidAlg::runMayanPyramid( int dim )
   acoords[dim] = minR;
   while ( acoords[dim] <= maxR )
   {
-    if ( (acoords[dim] > minR) && (acoords[dim] <= maxR) ) {     // acoords[dim] >= minR  ??
+    if ( (acoords[dim] > minR) && (acoords[dim] <= maxR) )
+    {     // acoords[dim] >= minR  ??
       mprSTICKYPROT(ST_SPARSE_MREC1);
       runMayanPyramid( dim + 1 );         // recurse with higer dimension
-    } else {
+    }
+    else
+    {
       // get v-distance of pt
       dist= vDistance( &(acoords[0]), dim + 1 );// dim+1 == known coordinates
 
@@ -1198,8 +1221,6 @@ void mayanPyramidAlg::runMayanPyramid( int dim )
     }
     acoords[dim]++;
   } // while
-
-  return;
 }
 //<-
 
@@ -1249,10 +1270,12 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
 
       // lambdas sum up to 1
       for ( j = 0; j <= n; j++ )
+      {
         if ( i==j )
           LP->LiPM[j+2][LP->n] = -1.0;
         else
           LP->LiPM[j+2][LP->n] = 0.0;
+      }
 
       // the points
       for ( j = 1; j <= n; j++ )
@@ -1322,7 +1345,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
 
 #ifdef mprDEBUG_ALL
   print_bmat(LP->LiPM, LP->m + 1, LP->n+1-LP->m, LP->n+1, LP->iposv);
-  Print(" now split into sets\n");
+  PrintS(" now split into sets\n");
 #endif
 
 
@@ -1376,7 +1399,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   {
     Print(" %d",bucket[j]);
   }
-  Print(" }\n optimal Sum: Qi ");
+  PrintS(" }\n optimal Sum: Qi ");
   for ( j= 0; j < LP->m; j++ )
   {
     Print(" [ %d, %d ]",optSum[j].set,optSum[j].pnt);
@@ -1424,7 +1447,8 @@ int resMatrixSparse::createMatrix( pointSet *E )
   rp= 1;
   rowp= NULL;
   epp= pOne();
-  for ( i= 1; i <= E->num; i++ ) {       // for every row
+  for ( i= 1; i <= E->num; i++ )
+  {       // for every row
     E->getRowMP( i, epp_mon );           // compute (p-a[ij]), (i,j) = RC(p)
     pSetExpV( epp, epp_mon );
 
@@ -1434,7 +1458,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
     cp= 2;
     // get column for every monomial in rowp and store it
     iterp= rowp;
-    while ( iterp )
+    while ( iterp!=NULL )
     {
       epos= E->getExpPos( iterp );
       if ( epos == 0 )
@@ -1448,13 +1472,15 @@ int resMatrixSparse::createMatrix( pointSet *E )
       pSetExpV(iterp,eexp);
       pSetComp(iterp, epos );
       pSetm(iterp);
-      if ( (*E)[i]->rc.set == linPolyS ) { // store coeff positions
+      if ( (*E)[i]->rc.set == linPolyS )
+      { // store coeff positions
         IMATELEM(*uRPos,rp,cp)= epos;
         cp++;
       }
       pIter( iterp );
     } // while
-    if ( (*E)[i]->rc.set == linPolyS ) {   // store row
+    if ( (*E)[i]->rc.set == linPolyS )
+    {   // store row
       IMATELEM(*uRPos,rp,1)= i-1;
       rp++;
     }
@@ -1475,7 +1501,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
   {
     Print(" row  %d contains coeffs of f_%d\n",IMATELEM(*uRPos,i,1),linPolyS);
   }
-  Print(" Sparse Matrix done\n");
+  PrintS(" Sparse Matrix done\n");
 #endif
 
   return E->num;
@@ -1615,7 +1641,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 #ifdef mprMINKSUM
   Print("(MinkSum)");
 #endif
-  Print("\n E = (Q_0 + ... + Q_n) \\cap \\N :\n");
+  PrintS("\n E = (Q_0 + ... + Q_n) \\cap \\N :\n");
   for ( pnt= 1; pnt <= E->num; pnt++ )
   {
     Print("%d: <",pnt);print_exp( (*E)[pnt], E->dim );Print(">\n");
@@ -1658,7 +1684,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   mprSTICKYPROT("\n");
 
 #ifdef mprDEBUG_PROT
-  Print(" points which lie in a cell:\n");
+  PrintS(" points which lie in a cell:\n");
   for ( pnt= 1; pnt <= E->num; pnt++ )
   {
     Print("%d: <",pnt);print_exp( (*E)[pnt], E->dim );Print(">\n");
@@ -1736,12 +1762,13 @@ const ideal resMatrixSparse::getMatrix()
 
     // u_1,..,u_k
     cp=2;
-    while ( pNext(pgls) )
+    while ( pNext(pgls)!=NULL )
     {
       phelp= pOne();
       pSetCoeff( phelp, nCopy(pGetCoeff(pgls)) );
       pSetComp( phelp, IMATELEM(*uRPos,i,cp) );
-      if ( piter )
+      pSetmComp( phelp );
+      if ( piter!=NULL )
       {
         pNext(piter)= phelp;
         piter= phelp;
@@ -1759,6 +1786,7 @@ const ideal resMatrixSparse::getMatrix()
     pSetCoeff( phelp, nCopy(pGetCoeff(pgls)) );
     //pSetComp( phelp, IMATELEM(*uRPos,i,idelem+1) );
     pSetComp( phelp, IMATELEM(*uRPos,i,pLength((gls->m)[0])+1) );
+    pSetmComp( phelp );
     pNext(piter)= phelp;
     (rmat_out->m)[IMATELEM(*uRPos,i,1)]= pp;
   }
@@ -1793,6 +1821,7 @@ const number resMatrixSparse::getDetAt( const number* evpoint )
         phelp= pOne();
         pSetCoeff( phelp, nCopy(evpoint[cp-1]) );
         pSetComp( phelp, IMATELEM(*uRPos,i,cp) );
+        pSetmComp( phelp );
         if ( piter )
         {
           pNext(piter)= phelp;
@@ -1809,6 +1838,7 @@ const number resMatrixSparse::getDetAt( const number* evpoint )
     phelp= pOne();
     pSetCoeff( phelp, nCopy(evpoint[0]) );
     pSetComp( phelp, IMATELEM(*uRPos,i,idelem+1) );
+    pSetmComp( phelp );
     pNext(piter)= phelp;
     (rmat->m)[IMATELEM(*uRPos,i,1)]= pp;
   }
@@ -1840,16 +1870,17 @@ const poly resMatrixSparse::getUDet( const number* evpoint )
   {
     pp= (rmat->m)[IMATELEM(*uRPos,i,1)];
     pDelete( &pp );
-    pp= NULL;
-    phelp= pp;
+    phelp= NULL;
     piter= NULL;
-    for ( cp= 2; cp <= idelem; cp++ ) { // u1 .. un
+    for ( cp= 2; cp <= idelem; cp++ )
+    { // u1 .. un
       if ( !nIsZero(evpoint[cp-1]) )
       {
         phelp= pOne();
         pSetCoeff( phelp, nCopy(evpoint[cp-1]) );
         pSetComp( phelp, IMATELEM(*uRPos,i,cp) );
-        if ( piter )
+        pSetmComp( phelp );
+        if ( piter!=NULL )
         {
           pNext(piter)= phelp;
           piter= phelp;
@@ -1865,6 +1896,7 @@ const poly resMatrixSparse::getUDet( const number* evpoint )
     phelp= pOne();
     pSetExp(phelp,1,1);
     pSetComp( phelp, IMATELEM(*uRPos,i,idelem+1) );
+    pSetm( phelp );
     pNext(piter)= phelp;
     (rmat->m)[IMATELEM(*uRPos,i,1)]= pp;
   }
@@ -2108,17 +2140,20 @@ void resMatrixDense::createMatrix()
       mprSTICKYPROT(ST_DENSE_NR);
       vecp= getMVector(k);
       for ( i= 0; i < numVectors; i++)
+      {
         if ( !nIsZero( vecp->getElemNum(i) ) )
         {
           MATELEM(m,numVectors - k,i + 1)= pInit();
           pSetCoeff0( MATELEM(m,numVectors - k,i + 1), nCopy(vecp->getElemNum(i)) );
         }
+      }
     }
   } // for
   mprSTICKYPROT("\n");
 
 #ifdef mprDEBUG_ALL
   for ( k= numVectors - 1; k >= 0; k-- )
+  {
     if ( linPolyS == getMVector(k)->elementOfS )
     {
       for ( i=0; i < pVariables; i++ )
@@ -2127,11 +2162,12 @@ void resMatrixDense::createMatrix()
       }
       PrintLn();
     }
+  }
   for (i=1; i <= numVectors; i++)
   {
     for (j=1; j <= numVectors; j++ )
     {
-      pWrite0(MATELEM(m,i,j));Print("  ");
+      pWrite0(MATELEM(m,i,j));PrintS("  ");
     }
     PrintLn();
   }
@@ -2143,7 +2179,8 @@ void resMatrixDense::createMatrix()
 // ST_DENSE_NMON: new monom added
 void resMatrixDense::generateMonoms( poly m, int var, int deg )
 {
-  if ( !deg ) { // deg == 0
+  if ( deg == 0 )
+  {
     poly mon = pCopy( m );
 
     if ( numVectors == veclistmax )
@@ -2282,14 +2319,14 @@ void resMatrixDense::generateMonomData( int deg, intvec* polyDegs , intvec* iVO 
 
 #ifdef mprDEBUG_ALL
   // Print a list of monoms and their properties
-  Print("// \n");
+  PrintS("// \n");
   for ( j= numVectors - 1; j >= 0; j-- )
   {
     Print("// %s, S(%d),  db ",
           resVectorList[j].isReduced?"reduced":"nonreduced",
           resVectorList[j].elementOfS);
     pWrite0(resVectorList[j].dividedBy);
-    Print("  monom ");
+    PrintS("  monom ");
     pWrite(resVectorList[j].mon);
   }
   Print("// size: %d, subSize: %d\n",numVectors,subSize);
@@ -2357,7 +2394,7 @@ void resMatrixDense::generateBaseData()
       pi= pDivideM( pCopy( pi ), pCopy( resVectorList[k].dividedBy ) );
 
       // fill in "matrix"
-      while ( pi )
+      while ( pi != NULL )
       {
         matEntry= nCopy(pGetCoeff(pi));
         pmatchPos= pHead0( pi );
@@ -2383,16 +2420,16 @@ void resMatrixDense::generateBaseData()
       //mprPROTInl(" setup of numColParNr ",k);
       resVectorList[k].numColVectorSize= 0;
       resVectorList[k].numColVector= NULL;
-      resVectorList[k].numColParNr= (int *)Alloc( (pVariables+1) * sizeof(int) );
-      for ( i= 0; i < pVariables; i++ ) resVectorList[k].numColParNr[i]= 0;
+      resVectorList[k].numColParNr= (int *)Alloc0( (pVariables+1) * sizeof(int) );
 
       pi= (gls->m)[ resVectorList[k].elementOfS ];
       factor= pDivideM( pCopy( resVectorList[k].mon ), pCopy( resVectorList[k].dividedBy ) );
 
       j=0;
-      while ( pi ) { // fill in "matrix"
-        pmp= pMult( pHead( pi ), pCopy( factor ) );
-        pTest( pi );
+      while ( pi  != NULL )
+      { // fill in "matrix"
+        pmp= pMult( pCopy( factor ), pHead( pi ) );
+        pTest( pmp );
 
         for ( i= 0; i < numVectors; i++)
           if ( pEqual( pmp, resVectorList[i].mon ) )
@@ -2431,7 +2468,8 @@ const ideal resMatrixDense::getMatrix()
   {
     for (j=1; j <= numVectors; j++ )
     {
-      if ( MATELEM(m,i,j) && pGetCoeff(MATELEM(m,i,j)) )
+      if ( (MATELEM(m,i,j)!=NULL)
+      && (!nIsZero(pGetCoeff(MATELEM(m,i,j)))) )
       {
         MATELEM(resmat,i,j)= pCopy( MATELEM(m,i,j) );
       }
@@ -2443,7 +2481,8 @@ const ideal resMatrixDense::getMatrix()
     {
       for (j=1; j <= pVariables; j++ )
       {
-        if ( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]) )
+        if ( MATELEM(resmat,numVectors-i,
+                     numVectors-resVectorList[i].numColParNr[j-1])!=NULL )
           pDelete( &MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]) );
         MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1])= pOne();
         // FIX ME
@@ -2454,6 +2493,7 @@ const ideal resMatrixDense::getMatrix()
         else
         {
           pSetExp( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]), j, 1 );
+          pSetm(MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]));
         }
       }
     }
@@ -2524,7 +2564,7 @@ const number resMatrixDense::getDetAt( const number* evpoint )
 
   // avoid errors for det==0
   number numres;
-  if ( res && pGetCoeff( res ) )
+  if ( (res!=NULL)  && (!nIsZero(pGetCoeff( res ))) )
   {
     numres= nCopy( pGetCoeff( res ) );
   }
@@ -2587,15 +2627,15 @@ const number resMatrixDense::getSubDet()
 #endif
 
   number numres;
-  if ( res && pGetCoeff( res ) )
+  if ((res != NULL) && (!nIsZero(pGetCoeff( res ))) )
   {
     numres= nCopy(pGetCoeff( res ));
-    pDelete( &res );
   }
   else
   {
     numres= nInit(0);
   }
+  pDelete( &res );
   return numres;
 }
 //<--
@@ -2644,7 +2684,8 @@ uResultant::uResultant( const ideal _gls, const resMatType _rmt, BOOLEAN extIdea
     // extend given ideal by linear poly F0=u0x0 + u1x1 +...+ unxn
     gls= extendIdeal( _gls, linearPoly( rmt ), rmt );
     n= IDELEMS( gls );
-  } else
+  }
+  else
     gls= idCopy( _gls );
 
   switch ( rmt )
@@ -2791,22 +2832,23 @@ poly uResultant::interpolateDense( const number subDetVal )
     ncpoly= vm.interpolateDense( presults );
   }
 
-  if ( subDetVal != NULL ) {   // divide by common factor
-      number detdiv;
-      for ( i= 0; i <= mdg; i++ )
-      {
-        detdiv= nDiv( ncpoly[i], subDetVal );
-        nNormalize( detdiv );
-        nDelete( &ncpoly[i] );
-        ncpoly[i]= detdiv;
-      }
+  if ( subDetVal != NULL )
+  {   // divide by common factor
+    number detdiv;
+    for ( i= 0; i <= mdg; i++ )
+    {
+      detdiv= nDiv( ncpoly[i], subDetVal );
+      nNormalize( detdiv );
+      nDelete( &ncpoly[i] );
+      ncpoly[i]= detdiv;
     }
+  }
 
 #ifdef mprDEBUG_ALL
   PrintLn();
   for ( i=0; i < mdg; i++ )
   {
-    nPrint(ncpoly[i]); Print(" --- ");
+    nPrint(ncpoly[i]); PrintS(" --- ");
   }
   PrintLn();
 #endif
@@ -2920,7 +2962,7 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
         }
         else if ( i <= uvar + 2 )
         {
-	  pevpoint[i]=nInit(1+siRand()%MAXEVPOINT);
+          pevpoint[i]=nInit(1+siRand()%MAXEVPOINT);
           //pevpoint[i]=nInit(383);
         }
         else
@@ -2940,8 +2982,10 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
           pevpoint[i]=nInit( p );
         }
         else
+        {
           if ( i == (uvar + 1) ) pevpoint[i]= nInit(-1);
           else pevpoint[i]= nInit(0);
+        }
         mprPROTNnl(" ",pevpoint[i]);
       }
     }
@@ -2972,7 +3016,8 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
     vandermonde vm( tdg + 1, 1, tdg, pevpoint, FALSE );
     number *ncpoly= vm.interpolateDense( presults );
 
-    if ( subDetVal != NULL ) {  // divide by common factor
+    if ( subDetVal != NULL )
+    {  // divide by common factor
       number detdiv;
       for ( i= 0; i <= tdg; i++ )
       {
@@ -2987,7 +3032,7 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
     PrintLn();
     for ( i=0; i <= tdg; i++ )
     {
-      nPrint(ncpoly[i]); Print(" --- ");
+      nPrint(ncpoly[i]); PrintS(" --- ");
     }
     PrintLn();
 #endif
@@ -3040,7 +3085,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
         nDelete( &pevpoint[i] );
         if ( i <= uvar + 2 )
         {
-	  pevpoint[i]=nInit(1+siRand()%MAXEVPOINT);
+          pevpoint[i]=nInit(1+siRand()%MAXEVPOINT);
           //pevpoint[i]=nInit(383);
         } else pevpoint[i]=nInit(0);
         mprPROTNnl(" ",pevpoint[i]);
@@ -3075,7 +3120,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
         ncpoly[i]= nCopy( pGetCoeff( piter ) );
         pIter( piter );
 #ifdef MPR_MASI
-	masi=false;
+        masi=false;
 #endif
       }
       else
