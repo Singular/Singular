@@ -1389,8 +1389,6 @@ MP_Status_t tcp_kill_connection(link)
 #endif
 {
     MP_TCP_t *tcp_rec;
-    char *rsh_argv[4];
-    char rsh_kill[20];
     int fork_pid = -1;
     
 #ifdef MP_DEBUG
@@ -1405,6 +1403,8 @@ MP_Status_t tcp_kill_connection(link)
     
     if (tcp_rec->mode == MP_LAUNCH_MODE)
     {
+      char  *rsh_argv[5];
+      char  rsh_kill[20];
       rsh_argv[0] = tcp_rec->rsh;
       rsh_argv[1] = tcp_rec->peerhost;
       rsh_argv[2] = "-n";
@@ -1422,7 +1422,7 @@ MP_Status_t tcp_kill_connection(link)
       if (! fork_pid)
       {
         execvp(rsh_argv[0], rsh_argv);
-        fputs("tcp_kill_connectione: execvp failed - bailing out\n", stderr);
+        fputs("tcp_kill_connection: execvp failed - bailing out\n", stderr);
         fflush(stderr);
         _exit(1);
       }
