@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.13 1997-07-31 13:10:10 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.14 1997-08-04 14:57:41 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1252,8 +1252,8 @@ CanonicalForm::isFFinGF() const
 // largest integer less or equal sqrt(CO).
 //
 // In the immediate case, we use the newton method to find the
-// root.  The algorithm is from H. Cohen - A Course in
-// Computational Algebraic Number Theory, ch. 1.7.1.
+// root.  The algorithm is from H. Cohen - 'A Course in
+// Computational Algebraic Number Theory', ch. 1.7.1.
 //
 //}}}
 CanonicalForm
