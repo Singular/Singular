@@ -146,6 +146,7 @@ cmdnames cmds[] =
   { "det",         0, DET_CMD ,           CMD_1},
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_1},
+  { "div",         0, INTDIV ,            INTDIV},
 #ifdef DRING
   { "dring",       0, DRING_CMD ,         DRING_CMD},
 #endif
@@ -327,7 +328,7 @@ static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
     case '+': (*aa) += bb; break;
     case '-': (*aa) -= bb; break;
     case '*': (*aa) *= bb; break;
-    case '/': (*aa) /= bb; break;
+    case INTDIV: (*aa) /= bb; break;
     case '%': (*aa) %= bb; break;
   }
   res->data=(char *)aa;
@@ -1883,12 +1884,12 @@ struct sValCmd2 dArith2[]=
 ,{jjOP_I_IV,   '*',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD PROFILER}
 ,{jjTIMES_IV,  '*',            INTVEC_CMD,     INTMAT_CMD, INTVEC_CMD PROFILER}
 ,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD PROFILER}
-,{jjDIV_I,     '/',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
 ,{jjDIV_N,     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD PROFILER}
 ,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 ,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
-,{jjOP_IV_I,   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
-,{jjOP_IV_I,   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
+,{jjDIV_I,     INTDIV,         INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjOP_IV_I,   INTDIV,         INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
+,{jjOP_IV_I,   INTDIV,         INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
 ,{jjMOD_I,     '%',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
 ,{jjOP_IV_I,   '%',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
 ,{jjOP_IV_I,   '%',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}

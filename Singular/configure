@@ -535,8 +535,8 @@ fi
 
 SINGULAR_MAJOR_VERSION=1
 SINGULAR_MINOR_VERSION=1
-SINGULAR_SUB_VERSION=1
-VERSION_DATE="July 1997"
+SINGULAR_SUB_VERSION=2
+VERSION_DATE="August 1997"
 
 
 
@@ -1860,7 +1860,7 @@ if test "$with_apint" != buildin; then
     if test "$ac_smallgmp_ok" = yes; then
       ac_will_have_gmp=yes
       ac_will have_smallgmp=yes
-    elif test "$enable_gmp" = yes; then
+    elif test "$enable_smallgmp" = yes; then
       ac_will_have_gmp=yes
       ac_will_have_smallgmp=yes
       echo "configure: warning: install smallgmp before making Singular" 1>&2

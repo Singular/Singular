@@ -1,3 +1,7 @@
+Fri Aug  8 12:56:44 MET DST 1997
+        * hannes: introduced "div" for integer division
+          grammar.*, iparith.cc, singular.doc
+        * changed version to 1.1.2/August
 Wed Jul 16 12:57:22 MET DST 1997: hannes
         * introduced '.singularrc', modified loading of satndard.lib 
           (tesths.cc)

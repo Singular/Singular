@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.16 1997-07-09 15:53:56 Singular Exp $ */
+/* $Id: grammar.y,v 1.17 1997-08-08 10:58:07 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -114,6 +114,7 @@ void yyerror(char * fmt)
 %token EQUAL_EQUAL
 %token GE
 %token LE
+%token INTDIV
 /*%token MINUSEQUAL*/
 %token MINUSMINUS
 %token NOT
@@ -271,7 +272,7 @@ void yyerror(char * fmt)
 %left EQUAL_EQUAL NOTEQUAL
 %left '<' '>' GE LE
 %left '+' '-'
-%left '*' '/' '%'
+%left '*' '/' '%' INTDIV
 %left UMINUS
 %left  '^'
 %left '[' ']'
@@ -549,7 +550,7 @@ expr:   expr_arithmetic
             /*if ($1.typ == eunknown) YYERROR;*/
             $$ = $1;
           }
-        | elemexpr        { $$ = $1; }
+        | elemexpr       { $$ = $1; }
         | '(' expr ')'    { $$ = $2; }
         | expr '[' expr ',' expr ']'
           {
@@ -699,67 +700,71 @@ quote_end: ')'
           ;
 
 expr_arithmetic:
-          expr  PLUSPLUS     %prec PLUSPLUS
+          expr PLUSPLUS     %prec PLUSPLUS
           {
             if(iiExprArith1(&$$,&$1,PLUSPLUS)) YYERROR;
           }
-        | expr  MINUSMINUS   %prec MINUSMINUS
+        | expr MINUSMINUS   %prec MINUSMINUS
           {
             if(iiExprArith1(&$$,&$1,MINUSMINUS)) YYERROR;
           }
-        | expr  '+' expr
+        | expr '+' expr
           {
             if(iiExprArith2(&$$,&$1,'+',&$3)) YYERROR;
           }
-        | expr  '-' expr
+        | expr '-' expr
           {
             if(iiExprArith2(&$$,&$1,'-',&$3)) YYERROR;
           }
-        | expr  '*' expr
+        | expr '*' expr
           {
             if(iiExprArith2(&$$,&$1,'*',&$3)) YYERROR;
           }
-        | expr  '/' expr
+        | expr '/' expr
           {
             if(iiExprArith2(&$$,&$1,'/',&$3)) YYERROR;
           }
-        | expr  '^' expr
+        | expr INTDIV expr
+          {
+            if(iiExprArith2(&$$,&$1,INTDIV,&$3)) YYERROR;
+          }
+        | expr '^' expr
           {
             if(iiExprArith2(&$$,&$1,'^',&$3)) YYERROR;
           }
-        | expr  '%' expr
+        | expr '%' expr
           {
             if(iiExprArith2(&$$,&$1,'%',&$3)) YYERROR;
           }
-        | expr  '>' expr
+        | expr '>' expr
           {
             if(iiExprArith2(&$$,&$1,'>',&$3)) YYERROR;
           }
-        | expr  '<' expr
+        | expr '<' expr
           {
             if(iiExprArith2(&$$,&$1,'<',&$3)) YYERROR;
           }
-        | expr  '&' expr
+        | expr '&' expr
           {
             if(iiExprArith2(&$$,&$1,'&',&$3)) YYERROR;
           }
-        | expr  '|' expr
+        | expr '|' expr
           {
             if(iiExprArith2(&$$,&$1,'|',&$3)) YYERROR;
           }
-        | expr  NOTEQUAL expr
+        | expr NOTEQUAL expr
           {
             if(iiExprArith2(&$$,&$1,NOTEQUAL,&$3)) YYERROR;
           }
-        | expr  EQUAL_EQUAL expr
+        | expr EQUAL_EQUAL expr
           {
             if(iiExprArith2(&$$,&$1,EQUAL_EQUAL,&$3)) YYERROR;
           }
-        | expr  GE  expr
+        | expr GE  expr
           {
             if(iiExprArith2(&$$,&$1,GE,&$3)) YYERROR;
           }
-        | expr  LE expr
+        | expr LE expr
           {
             if(iiExprArith2(&$$,&$1,LE,&$3)) YYERROR;
           }
