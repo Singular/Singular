@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.2 2004-06-02 16:03:14 Singular Exp $ */
+/* $Id: syz0.cc,v 1.3 2004-06-03 12:27:07 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1023,28 +1023,31 @@ syStrategy sySchreyer(ideal arg, int maxlength)
   {
     for (int i=0; i<rl; i++)
     {
-      ideal t=kNF(currQuotient,NULL,result->fullres[i]);
-      idDelete(&result->fullres[i]);
-      result->fullres[i]=t;
-      if (i<rl-1)
+      if (result->fullres[i]!=NULL)
       {
-        for(int j=IDELEMS(t)-1;j>=0; j--)
+        ideal t=kNF(currQuotient,NULL,result->fullres[i]);
+        idDelete(&result->fullres[i]);
+        result->fullres[i]=t;
+        if (i<rl-1)
         {
-          if ((t->m[j]==NULL) && (result->fullres[i+1]!=NULL))
+          for(int j=IDELEMS(t)-1;j>=0; j--)
           {
-            for(int k=IDELEMS(result->fullres[i+1])-1;k>=0; k--)
+            if ((t->m[j]==NULL) && (result->fullres[i+1]!=NULL))
             {
-              if (result->fullres[i+1]->m[k]!=NULL)
+              for(int k=IDELEMS(result->fullres[i+1])-1;k>=0; k--)
               {
-                pDeleteComp(&(result->fullres[i+1]->m[k]),j+1);
+                if (result->fullres[i+1]->m[k]!=NULL)
+                {
+                  pDeleteComp(&(result->fullres[i+1]->m[k]),j+1);
+                }
               }
             }
           }
         }
-       }
-      idSkipZeroes(result->fullres[i]);
+        idSkipZeroes(result->fullres[i]);
+      }
     }
-    if (rl>maxlength)
+    if ((rl>maxlength) && (result->fullres[rl-1]!=NULL))
     {
       idDelete(&result->fullres[rl-1]);
     }
