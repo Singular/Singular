@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.17 1998-08-26 15:57:52 Singular Exp $ */
+/* $Id: matpol.cc,v 1.18 1998-09-04 16:06:30 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -407,6 +407,7 @@ matrix mpOneStepBareiss (matrix a, poly *H, int *r, int *c)
     *c = *r = 0;
   }
   Bareiss->mpSaveArray();
+  idTest((ideal)re);
   delete Bareiss;
   return re;
 }
@@ -503,7 +504,6 @@ poly mpDet (matrix m)
   for (i=2; i<=n; i++)
   {
     p = pCopy(MATELEM(s,1,i));
-    pTest(p);
     for (j=i-1; j>=1; j--)
     {
       q = pMult(pCopy(MATELEM(s,1,j)), pCopy(MATELEM(a,1,i-j)));
@@ -1051,7 +1051,7 @@ void mp_permmatrix::mpElimBareiss(poly div)
         {
           q2 = pMult(q1, pCopy(piv));
         }
-        if (q2 && div)
+        if ((q2!=NULL) && div)
           q2 = mpDivide(q2, div);
         a[jj] = q2;
       }
@@ -1409,10 +1409,11 @@ static poly mpDivide(poly a, poly b)
           pSubExp(r,i,  pGetExp(b,i));
         pSetm(r);
       }
-      y = nIntDiv(pGetCoeff(r),x);
+      y = nDiv(pGetCoeff(r),x);
       pSetCoeff(r,y);
       pIter(r);
     } while (r != NULL);
+    //pTest(a);
     return a;
   }
   h0 = pInit();
@@ -1443,6 +1444,7 @@ static poly mpDivide(poly a, poly b)
     r = pNext(r) = pAdd(pNext(r),pNext(h0));
   } while (r!=NULL);
   pFree1(h0);
+  //pTest(a);
   return a;
 }
 
