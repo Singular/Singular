@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_chinese.cc,v 1.8 1997-11-19 17:42:15 schmidt Exp $ */
+/* $Id: cf_chinese.cc,v 1.9 1998-02-02 08:57:29 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -14,6 +14,7 @@
 #include <config.h>
 
 #include "assert.h"
+#include "debug.h"
 
 #include "canonicalform.h"
 
@@ -29,20 +30,61 @@
 // coefficients, the result is guaranteed to have positive
 // coefficients, too.
 //
-// This is a standard algorithm.  See, for example,
-// Geddes/Czapor/Labahn - 'Alogorithms for Computer Algebra',
-// par. 5.6 and 5.8.
+// Note: This algorithm is optimized for the case q1>>q2.
 //
-// Note: be sure you are calculating in Z, and not in Q!
+// This is a standard algorithm.  See, for example,
+// Geddes/Czapor/Labahn - 'Algorithms for Computer Algebra',
+// par. 5.6 and 5.8, or the article of M. Lauer - 'Computing by
+// Homomorphic Images' in B. Buchberger - 'Computer Algebra -
+// Symbolic and Algebraic Computation'.
+//
+// Note: Be sure you are calculating in Z, and not in Q!
 //
 //}}}
 void
 chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
 {
-    CanonicalForm a1, a2;
-    (void)iextgcd( q1, q2, a1, a2 );
+    DEBINCLEVEL( cerr, "chineseRemainder" );
+
+    DEBOUTLN( cerr, "log(q1) = " << q1.ilog2() );
+    DEBOUTLN( cerr, "log(q2) = " << q2.ilog2() );
+
+    // We calculate xnew as follows:
+    //     xnew = v1 + v2 * q1
+    // where
+    //     v1 = x1 (mod q1)
+    //     v2 = (x2-v1)/q1 (mod q2)  (*)
+    //
+    // We do one extra test to check whether x2-v1 vanishes (mod
+    // q2) in (*) since it is not costly and may save us
+    // from calculating the inverse of q1 (mod q2).
+    //
+    // u: v1 (mod q2)
+    // d: x2-v1 (mod q2)
+    // s: 1/q1 (mod q2)
+    //
+    CanonicalForm v2, v1;
+    CanonicalForm u, d, s, dummy;
+
+    v1 = mod( x1, q1 );
+    u = mod( v1, q2 );
+    d = mod( x2-u, q2 );
+    if ( d.isZero() ) {
+	xnew = v1;
+	qnew = q1 * q2;
+	return;
+    }
+    (void)bextgcd( q1, q2, s, dummy );
+    v2 = mod( d*s, q2 );
+    xnew = v1 + v2*q1;
+
+    // After all, calculate new modulus.  It is important that
+    // this is done at the very end of the algorithm, since q1
+    // and qnew may refer to the same object (same is true for x1
+    // and xnew).
     qnew = q1 * q2;
-    xnew = mod( q1*a1*x2 + q2*a2*x1, qnew );
+
+    DEBDECLEVEL( cerr, "chineseRemainder" );
 }
 //}}}
 
@@ -62,30 +104,46 @@ chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const Can
 // use a divide-and-conquer method instead of a linear approach
 // to calculate the remainder.
 //
-// Note: be sure you are calculating in Z, and not in Q!
+// Note: Be sure you are calculating in Z, and not in Q!
 //
 //}}}
 void
 chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew )
 {
+    DEBINCLEVEL( cerr, "chineseRemainder( ... CFArray ... )" );
+
     ASSERT( x.min() == q.min() && x.size() == q.size(), "incompatible arrays" );
     CFArray X(x), Q(q);
-    int i, j, n = x.size();
+    int i, j, n = x.size(), start = x.min();
+
+    DEBOUTLN( cerr, "array size = " << n );
 
     while ( n != 1 ) {
-	i = j = x.min();
-	while ( i < x.min() + n - 1 ) {
+	i = j = start;
+	while ( i < start + n - 1 ) {
+	    // This is a little bit dangerous: X[i] and X[j] (and
+	    // Q[i] and Q[j]) may refer to the same object.  But
+	    // xnew and qnew in the above function are modified
+	    // at the very end of the function, so we do not
+	    // modify x1 and q1, resp., by accident.
 	    chineseRemainder( X[i], Q[i], X[i+1], Q[i+1], X[j], Q[j] );
 	    i += 2;
 	    j++;
 	}
+
 	if ( n & 1 ) {
 	    X[j] = X[i];
 	    Q[j] = Q[i];
 	}
+	// Maybe we would get some memory back at this point if
+	// we would set X[j+1, ..., n] and Q[j+1, ..., n] to zero
+	// at this point?
+
 	n = ( n + 1) / 2;
     }
-    xnew = X[x.min()];
+    xnew = X[start];
     qnew = Q[q.min()];
+
+    DEBDECLEVEL( cerr, "chineseRemainder( ... CFArray ... )" );
 }
 //}}}
