@@ -239,6 +239,68 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,calc_dat* c){
   
 }
 
+///returns position sets w as weight
+int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
+
+  int sz=u-l+1;
+  int n=sz/10+1;
+  int filled=0;
+  int* indizes=(int*) omalloc(n*sizeof(int));
+  int* weight=(int*) omalloc(n*sizeof(int));
+  int worst=-1;
+  int i;  
+  for(i=l;i<=u;i++){
+    int q=r[i].guess_quality(c);
+    if ((filled<n)||(q<worst)){
+      if(filled<n){
+	worst=max(q,worst);
+	indizes[filled]=i;
+	weight[filled]=q;
+	filled++;
+      }
+    }
+    else{
+      int j;
+      for(j=0;j<filled;j++){
+	if (worst==weight[j]){
+	  weight[j]=q;
+	  indizes[j]=i;
+	}
+      }
+      worst=-1;
+      for(j=0;j<filled;j++){
+	if (worst<weight[j]){
+	  worst=weight[j];
+	}
+      }
+    }
+  }
+  assume(filled==n);
+  int pos=0;
+
+  for(i=0;i<filled;i++){  
+    r[indizes[i]].canonicalize();
+    weight[i]=r[indizes[i]].guess_quality(c);
+    if(weight[i]<weight[pos]) pos=i;
+  }
+  w=weight[pos];
+  pos=indizes[pos];
+
+  omfree(indizes);
+  omfree(weight);
+
+  assume(w==r[pos].guess_quality(c));
+  assume(l<=pos);
+  assume(u>=pos);
+  return pos;
+  
+}
+void red_object::canonicalize(){
+  kBucketCanonicalize(bucket);
+  if(sum)
+    kBucketCanonicalize(sum->ac->bucket);
+  
+}
 BOOLEAN good_has_t_rep(int i, int j,calc_dat* c){
   assume(i>=0);
     assume(j>=0);
@@ -907,7 +969,7 @@ static poly redNF (poly h,kStrategy strat)
 }
 #else
 
-static poly redNF2 (poly h,calc_dat* c , int &len, number&  m)
+static poly redNF2 (poly h,calc_dat* c , int &len, number&  m,int n)
 {
   m=nInit(1);
   if (h==NULL) return NULL;
@@ -930,7 +992,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len, number&  m)
     {
 
       j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
-      if (j>=0)
+      if ((j>=0) && ((!n)||(strat->lenS[j]<=n)))
       {
 
 	
@@ -1857,6 +1919,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       int i;
       int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
       int best=erg.to_reduce_u+1;
+/*
       for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
 	int qc=los[i].guess_quality(c);
 	if (qc<quality_a){
@@ -1864,7 +1927,11 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 	  quality_a=qc;
 	}
       }
-      if(best!=erg.to_reduce_u+1){
+      if(best!=erg.to_reduce_u+1){*/
+      int qc;
+      best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
+      assume(qc==los[best].guess_quality(c));
+      if(qc<quality_a){
 	red_object h=los[erg.to_reduce_u];
 	los[erg.to_reduce_u]=los[best];
 	los[best]=h;
@@ -1883,14 +1950,11 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 	int i;
 	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
 	int best=erg.to_reduce_u+1;
-	for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
-	  int qc=los[i].guess_quality(c);
-	  if (qc<quality_a){
-	    best=i;
-	    quality_a=qc;
-	  }
-	}
-	if(best!=erg.to_reduce_u+1){
+	int qc;
+	best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
+	assume(qc==los[best].guess_quality(c));
+	if(qc<quality_a){
+	  //(best!=erg.to_reduce_u+1){
 	  red_object h=los[erg.to_reduce_l];
 	  los[erg.to_reduce_l]=los[best];
 	  los[best]=h;
@@ -1941,15 +2005,11 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       assume(erg.reduce_by==erg.to_reduce_u+1);
       int best=erg.reduce_by;
       int quality_a=los[erg.reduce_by].guess_quality(c);
+      int qc;
+      best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
+      
       int i;
-	for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
-	  int qc=los[i].guess_quality(c);
-	  if (qc<quality_a){
-	    best=i;
-	    quality_a=qc;
-	  }
-	}
-	if(best!=erg.reduce_by){
+      if(qc<quality_a){
 	  red_object h=los[erg.reduce_by];
 	  los[erg.reduce_by]=los[best];
 	  los[best]=h;
@@ -2445,7 +2505,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
     kBucketClear(r[rn].bucket,&red,&red_len);
   }
   #ifdef HANS_IDEA
-  if(erg.to_reduce_u-erg.to_reduce_l>100){
+  if(erg.to_reduce_u-erg.to_reduce_l>5){
     poly my=pOne();
     int ol=red_len;
     for(int i=1;i<=pVariables;i++)
@@ -2457,9 +2517,11 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
     woc=TRUE;
     red_len--;
 
-    a->next=redNF2(a->next,c,red_len, m);
-    pSetCoeff(a,nMult(a->coef,m));
+//    a->next=redNF2(a->next,c,red_len, m,2);
+    redTailShort(a,c->strat);
+//    pSetCoeff(a,nMult(a->coef,m));
     red_len++;
+    red_len=pLength(a);
     assume(red_len==pLength(a));
     if(!erg.fromS) kBucketInit(r[rn].bucket,red, ol);
     red=a;

@@ -19,12 +19,12 @@
 #include "kbuckets.h"
 
 #define FULLREDUCTIONS
-//#define HANS_IDEA
+#define HANS_IDEA
 //#define HALFREDUCTIONS
 //#define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
-#define PAR_N 1000
+#define PAR_N 100
 #define AC_NEW_MIN 70
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
@@ -119,6 +119,7 @@ class red_object{
   void adjust_coefs(number c_r, number c_ac_r);
   int guess_quality(calc_dat* c);
   int clear_to_poly();
+  void canonicalize();
 };
 
 
@@ -133,7 +134,7 @@ enum calc_state
 static int add_to_reductors(calc_dat* c, poly h, int len);
 static int bucket_guess(kBucket* bucket);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
-
+static poly redNF2 (poly h,calc_dat* c , int &len, number&  m,int n=0);
 static void free_sorted_pair_node(sorted_pair_node* s, ring r);
 static void shorten_tails(calc_dat* c, poly monom);
 static void replace_pair(int & i, int & j, calc_dat* c);
