@@ -106,7 +106,7 @@ decl.inc: ../../Singular/grammar.h ../../Singular/tok.h
 		echo Error: no bison given, could not rebuilt grammar.cc;\
                 exit 1; \
 	fi
-	${BISON} -d -t -o grammar.cc $<
+	${BISON} -v -d -t -o grammar.cc $<
 	mv grammar.cc.h grammar.h
 
 makefile.cc:	pathnames.h

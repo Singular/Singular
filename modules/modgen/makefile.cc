@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.7 2000-12-05 15:26:59 obachman Exp $ */
+/* $Id: makefile.cc,v 1.8 2001-02-01 13:05:03 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -260,6 +260,27 @@ void build_compile_section(
   moddefv module
   )
 {
+  fprintf(fp, "all:\t%s.dll %s_g.dll \n", module->name, module->name);
+  fprintf(fp, "\n");
+  fprintf(fp, "%%.o: %%.cc Makefile\n");
+  fprintf(fp, "\t${CC} ${CFLAGS} -c $< -o $*.o\n");
+  fprintf(fp, "\n");
+  fprintf(fp, "%%.og: %%.cc Makefile\n");
+  fprintf(fp, "\t${CC} ${DCFLAGS} -c $< -o $*.og\n");
+  fprintf(fp, "\n");
+
+  fprintf(fp, "%s.dll: ${OBJS}\n", module->name);
+  fprintf(fp, "\t${CC} ${CFLAGS} -Wl,--out-implib,lib%s.import.a -shared \\\n",
+          module->name);
+  fprintf(fp, "\t\t-o %s.dll ${OBJS}\n", module->name);
+  fprintf(fp, "\n");
+
+  fprintf(fp, "%s_g.so: ${DOBJS}\n", module->name);
+  fprintf(fp, "\t${CC} ${DCFLAGS} -Wl,--out-implib,lib%s_g.import.a -shared \\\n",
+          module->name);
+  fprintf(fp, "\t\t-o %s_g.dll ${DOBJS}\n", module->name);
+  fprintf(fp, "\n");
+
   fprintf(fp, "all:\t\n");
   fprintf(fp, "\techo \"don't know how to build library\"\n");
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.15 2000-11-09 21:58:14 krueger Exp $
+ * $Id: proc.cc,v 1.16 2001-02-01 13:05:03 krueger Exp $
  */
 
 #include <stdio.h>
@@ -307,6 +307,11 @@ static void  write_procedure_header(
   if(trace)printf("\n\t\theader..."); fflush(stdout);
   
   fprintf(fmtfp, "#line %d \"%s\"\n", pi->lineno, module->filename);
+#ifdef ix86_win
+  fprintf(module->modfp,
+          "  __declspec(dllexport) BOOLEAN mod_%s", pi->procname);
+  fprintf("(leftv __res, leftv __h);\n");
+#endif /* ix86_win */
   fprintf(fmtfp, "BOOLEAN mod_%s(leftv __res, leftv __h)\n{\n", pi->procname);
 }
 
