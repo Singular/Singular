@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.16 1998-08-05 14:09:44 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.17 1998-09-08 07:46:34 Singular Exp $ */
 
 /***************************************************************
  *
@@ -598,7 +598,8 @@ void mpsr_ttGen()
 #ifndef macintosh
   system("touch mpsr_Tok.inc");
 #else
-  FILE fd = myfopen("mpsr_Tok.inc", "w");
+  // simulate touch on a macintosh
+  FILE *fd = fopen("mpsr_Tok.inc", "w"); 
   close(fd);
 #endif
 }
