@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.120 2001-01-30 08:55:47 pohl Exp $ */
+/* $Id: ideals.cc,v 1.121 2001-02-08 13:12:59 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1981,7 +1981,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   intvec * weights1;
 
   ideal s_h4 = idInitializeQuot (h1,h2,h1IsStb,&addOnlyOne,&kmax);
-  
+
   hom = (tHomog)idHomModule(s_h4,currQuotient,&weights1);
 
   ring orig_ring=currRing;
@@ -2285,7 +2285,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   memset(wv[0],0,(pVariables+1)*sizeof(int));
   for (j=0;j<pVariables;j++)
     if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
-  // use this special ordering: like ringorder_a, except that pFDeg, pWeights 
+  // use this special ordering: like ringorder_a, except that pFDeg, pWeights
   // ignore it
   ord[0] = ringorder_aa;
 
@@ -2464,24 +2464,6 @@ ideal idMinors(matrix a, int ar, ideal R)
   return result;
 }
 #endif
-
-/*2
-*returns TRUE if p is a unit element in the current ring
-*/
-BOOLEAN pIsUnit(poly p)
-{
-  int i;
-
-  if (p == NULL) return FALSE;
-  i = 1;
-  while (i<=pVariables && pGetExp(p,i) == 0) i++;
-  if (i > pVariables && (pGetComp(p) == 0))
-  {
-    if (currRing->OrdSgn == 1 && pNext(p) !=NULL) return FALSE;
-    return TRUE;
-  }
-  return FALSE;
-}
 
 /*2
 *skips all zeroes and double elements, searches also for units
@@ -2671,7 +2653,7 @@ ideal idMatrix2Module(matrix mat)
     }
     sBucketClearMerge(bucket, &(result->m[j]), &l);
   }
-  
+
   // obachman: need to clean this up
   idDelete((ideal*) &mat);
   return result;
@@ -2897,7 +2879,7 @@ ideal idJet(ideal i,int d)
   int k;
   for(k=(i->nrows)*(i->ncols)-1;k>=0; k--)
   {
-    r->m[k]=pJet(i->m[k],d);
+    r->m[k]=ppJet(i->m[k],d);
   }
   return r;
 }
@@ -2915,11 +2897,28 @@ ideal idJetW(ideal i,int d, intvec * iv)
     int k;
     for(k=0; k<IDELEMS(i); k++)
     {
-      r->m[k]=pJetW(i->m[k],d,w);
+      r->m[k]=ppJetW(i->m[k],d,w);
     }
     omFreeSize((ADDRESS)w,(pVariables+1)*sizeof(short));
   }
   return r;
+}
+
+ideal idSeries(int n,ideal M,matrix U=NULL)
+{
+  for(int i=IDELEMS(M)-1;i>=0;i--)
+  {
+    if(U==NULL)
+      M->m[i]=pSeries(n,M->m[i]);
+    else
+    {
+      M->m[i]=pSeries(n,M->m[i],MATELEM(U,i+1,i+1));
+      MATELEM(U,i+1,i+1)=NULL;
+    }
+  }
+  if(U!=NULL)
+    idDelete((ideal*)&U);
+  return M;
 }
 
 matrix idDiff(matrix i, int k)
@@ -3431,3 +3430,21 @@ intvec * idQHomWeight(ideal id)
   return result;
 }
 
+BOOLEAN idIsZeroDim(ideal I)
+{
+  BOOLEAN *UsedAxis=(BOOLEAN *)omAlloc0(pVariables*sizeof(BOOLEAN));
+  int i,n;
+  poly po;
+  BOOLEAN res=TRUE;
+  for(i=IDELEMS(I)-1;i>=0;i--)
+  {
+    po=I->m[i];
+    if ((po!=NULL) &&((n=pIsPurePower(po))!=0)) UsedAxis[n-1]=TRUE;
+  }
+  for(i=pVariables-1;i>=0;i--)
+  {
+    if(UsedAxis[i]==FALSE) {res=FALSE; break;} // not zero-dim.
+  }
+  omFreeSize(UsedAxis,pVariables*sizeof(BOOLEAN));
+  return res;
+}

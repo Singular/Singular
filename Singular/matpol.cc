@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.38 2001-01-12 12:30:32 Singular Exp $ */
+/* $Id: matpol.cc,v 1.39 2001-02-08 13:13:03 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -1870,3 +1870,22 @@ static void mpElimBar(matrix a0, matrix re, poly div, int lr, int lc)
     }
   }
 }
+
+BOOLEAN mpIsDiagUnit(matrix U)
+{
+  if(MATROWS(U)!=MATCOLS(U))
+    return FALSE;
+  for(int i=MATCOLS(U);i>=1;i--)
+  {
+    for(int j=MATCOLS(U); j>=1; j--)
+    {
+      if (i==j)
+      {
+        if (!pIsUnit(MATELEM(U,i,i))) return FALSE;
+      }
+      else if (MATELEM(U,i,j)!=NULL) return FALSE;
+    }  
+  }
+  return TRUE;
+}
+

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.h,v 1.13 2000-08-14 12:56:38 obachman Exp $ */
+/* $Id: matpol.h,v 1.14 2001-02-08 13:13:03 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -67,6 +67,8 @@ void mpCoef2(poly v, poly vars, matrix *c, matrix *m);
 /* for minors with Bareiss */
 void mpRecMin(int, ideal, int &, matrix, int, int, poly, ideal);
 void mpMinorToResult(ideal, int &, matrix, int, int, ideal);
+
+BOOLEAN mpIsDiagUnit(matrix U);
 
 extern omBin ip_smatrix_bin;
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.62 2001-01-09 15:40:13 Singular Exp $ */
+/* $Id: polys1.cc,v 1.63 2001-02-08 13:13:04 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1105,7 +1105,7 @@ poly p_PermPoly (poly p, int * perm, ring oldRing,
 }
 #endif
 
-poly pJet(poly p, int m)
+poly ppJet(poly p, int m)
 {
   poly r=NULL;
   poly t=NULL;
@@ -1133,7 +1133,31 @@ poly pJet(poly p, int m)
   return r;
 }
 
-poly pJetW(poly p, int m, short *w)
+poly pJet(poly p, int m)
+{
+  poly r=p;
+  poly t=NULL;
+
+  while (p!=NULL)
+  {
+    if (pTotaldegree(p)>m)
+    {
+      if (p==r) 
+      { 
+        pLmDelete(&p);
+	r=p;
+      }
+      else
+      {
+        pLmDelete(&p);
+      }
+    }
+    pIter(p);
+  }
+  return r;
+}
+
+poly ppJetW(poly p, int m, short *w)
 {
   poly r=NULL;
   poly t=NULL;
@@ -1163,6 +1187,42 @@ poly pJetW(poly p, int m, short *w)
   }
   ecartWeights=wsave;
   return r;
+}
+
+poly pSeries(int n,poly p,poly u=NULL)
+{
+  if(p!=NULL)
+  {
+    if(u==NULL)
+      p=pJet(p,n);
+    else
+      p=pJet(pMult(p,pInvers(n-pTotaldegree(p),u)),n);
+  }
+  return p;
+}
+
+poly pInvers(int n,poly u)
+{
+  if(n<0)
+    return NULL;
+  number u0=nInvers(pGetCoeff(u));
+  poly v=pNSet(u0);
+  if(n==0)
+    return v;
+  /* u0 is pGetCoeff(v) */  
+  poly u1=pJet(pSub(pOne(),pMult_nn(u,u0)),n);
+  if(u1==NULL)
+    return v;
+  poly v1=pMult_nn(pCopy(u1),u0);
+  v=pAdd(v,pCopy(v1));
+  for(int i=n/pTotaldegree(u1);i>1;i--)
+  {
+    v1=pJet(pMult(v1,pCopy(u1)),n);
+    v=pAdd(v,pCopy(v1));
+  }
+  pDelete(&u1);
+  pDelete(&v1);
+  return v;
 }
 
 int pDegW(poly p, short *w)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.253 2001-02-06 13:16:20 Singular Exp $ */
+/* $Id: iparith.cc,v 1.254 2001-02-08 13:13:01 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -43,6 +43,7 @@
 #include "silink.h"
 #include "sparsmat.h"
 #include "algmap.h"
+#include "units.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
@@ -1804,7 +1805,7 @@ static BOOLEAN jjINTERSECT(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjJET_P(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)pJet((poly)u->Data(),(int)v->Data());
+  res->data = (char *)pJet((poly)u->CopyD(), (int)v->Data());
   return FALSE;
 }
 static BOOLEAN jjJET_ID(leftv res, leftv u, leftv v)
@@ -4153,14 +4154,37 @@ static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)
 {
   short *iw=iv2array((intvec *)w->Data());
-  res->data = (char *)pJetW((poly)u->Data(),(int)v->Data(),iw);
+  res->data = (char *)ppJetW((poly)u->Data(),(int)v->Data(),iw);
   omFreeSize((ADDRESS)iw,(pVariables+1)*sizeof(short));
+  return FALSE;
+}
+static BOOLEAN jjJET_P_P(leftv res, leftv u, leftv v, leftv w)
+{
+  poly ww=(poly)w->Data();
+  if (!pIsUnit(ww))
+  {
+    WerrorS("3rd argument must be a unit");
+    return TRUE;
+  }
+  res->data = (char *)pSeries((int)v->Data(),(poly)u->CopyD(),(poly)w->CopyD());
   return FALSE;
 }
 static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
 {
   res->data = (char *)idJetW((ideal)u->Data(),(int)v->Data(),
                              (intvec *)w->Data());
+  return FALSE;
+}
+static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
+{
+  matrix ww=(matrix)w->Data();
+  if (!mpIsDiagUnit(ww))
+  {
+    WerrorS("3rd argument must be a diagonal matrix of units");
+    return TRUE;
+  }
+  res->data = (char *)idSeries((int)v->Data(),(ideal)u->CopyD(),
+                               (matrix)w->CopyD());
   return FALSE;
 }
 static BOOLEAN jjMINOR3(leftv res, leftv u, leftv v, leftv w)
@@ -4401,6 +4425,30 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
   test=save_test;
   return FALSE;
 }
+static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
+{
+  assumeStdFlag(v);
+  if (!idIsZeroDim((ideal)v->Data()))
+  {
+    Werror("`%s` must be 0-dimensional",v->Name());
+    return TRUE;
+  }  
+  res->data = (char *)rednf((ideal)v->CopyD(),(poly)u->CopyD(),
+    (poly)w->CopyD());
+  return FALSE;
+}
+static BOOLEAN jjREDUCE3_CID(leftv res, leftv u, leftv v, leftv w)
+{
+  assumeStdFlag(v);
+  if (!idIsZeroDim((ideal)v->Data()))
+  {
+    Werror("`%s` must be 0-dimensional",v->Name());
+    return TRUE;
+  }  
+  res->data = (char *)rednf((ideal)v->CopyD(),(ideal)u->CopyD(),
+    (matrix)w->CopyD());
+  return FALSE;
+}
 static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
@@ -4520,6 +4568,10 @@ struct sValCmd3 dArith3[]=
 ,{jjJET_ID_IV,      JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD,    INTVEC_CMD }
 ,{jjJET_P_IV,       JET_CMD,    VECTOR_CMD, VECTOR_CMD, INT_CMD,    INTVEC_CMD }
 ,{jjJET_ID_IV,      JET_CMD,    MODUL_CMD,  MODUL_CMD,  INT_CMD,    INTVEC_CMD }
+,{jjJET_P_P,        JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    POLY_CMD }
+,{jjJET_P_P,        JET_CMD,    VECTOR_CMD, VECTOR_CMD, INT_CMD,    POLY_CMD }
+,{jjJET_ID_M,       JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD,    MATRIX_CMD }
+,{jjJET_ID_M,       JET_CMD,    MODUL_CMD,  MODUL_CMD,  INT_CMD,    MATRIX_CMD }
 ,{mpKoszul,         KOSZUL_CMD, MATRIX_CMD, INT_CMD,    INT_CMD,    IDEAL_CMD }
 ,{jjCALL3MANY,      LIST_CMD,   LIST_CMD,   DEF_CMD,    DEF_CMD,    DEF_CMD }
 ,{jjMATRIX_Id,      MATRIX_CMD, MATRIX_CMD, IDEAL_CMD,  INT_CMD,    INT_CMD }
@@ -4542,6 +4594,10 @@ struct sValCmd3 dArith3[]=
 ,{jjREDUCE3_ID,     REDUCE_CMD, IDEAL_CMD,  IDEAL_CMD,  IDEAL_CMD,  INT_CMD }
 ,{jjREDUCE3_ID,     REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  MODUL_CMD,  INT_CMD }
 ,{jjREDUCE3_ID,     REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  IDEAL_CMD,  INT_CMD }
+,{jjREDUCE3_CP,     REDUCE_CMD, POLY_CMD,   POLY_CMD,   IDEAL_CMD,  POLY_CMD }
+,{jjREDUCE3_CP,     REDUCE_CMD, VECTOR_CMD, VECTOR_CMD, MODUL_CMD,  POLY_CMD }
+,{jjREDUCE3_CID,    REDUCE_CMD, IDEAL_CMD,  IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD }
+,{jjREDUCE3_CID,    REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  MODUL_CMD,  MATRIX_CMD }
 #ifdef OLD_RES
 ,{jjRES3,           RES_CMD,    NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           RES_CMD,    NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }

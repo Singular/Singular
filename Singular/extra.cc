@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.157 2001-02-02 14:40:13 Singular Exp $ */
+/* $Id: extra.cc,v 1.158 2001-02-08 13:12:58 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -97,11 +97,6 @@ extern "C"
 #include "pcv.h"
 #endif
 #endif /* not HAVE_DYNAMIC_LOADING */
-
-// procedures to compute with units
-#ifdef HAVE_UNITS
-#include "units.h"
-#endif
 
 // see clapsing.cc for a description of the `FACTORY_*' options
 
@@ -1161,24 +1156,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-#ifdef HAVE_UNITS
-/*==================== units ==================================*/
-    if(strcmp(sys_cmd,"invunit")==0)
-    {
-      return invunit(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"series")==0)
-    {
-      return series(res,h);
-    }
-    else
-    if(strcmp(sys_cmd,"rednf")==0)
-    {
-      return rednf(res,h);
-    }
-    else
-#endif
 #ifdef HAVE_PLURAL
 /*==================== PLURAL =================*/
     if (strcmp(sys_cmd, "PLURAL") == 0)

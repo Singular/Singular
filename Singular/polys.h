@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.53 2001-02-07 12:45:14 Singular Exp $ */
+/* $Id: polys.h,v 1.54 2001-02-08 13:13:04 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -236,6 +236,8 @@ extern poly pHeadProc(poly p);
 #define   pIsConstantComp(p)        p_IsConstantComp(p, currRing)
 // like above, except that Comp might be != 0
 #define   pIsConstant(p)            p_IsConstant(p,currRing)
+// return true if the Lm is a constant <>0
+#define   pIsUnit(p)            p_IsUnit(p,currRing)
 // like above, except that p must be != NULL
 #define   pLmIsConstantComp(p)      p_LmIsConstantComp(p, currRing)
 #define   pLmIsConstant(p)          p_LmIsConstant(p,currRing)
@@ -397,8 +399,11 @@ void      pSetPolyComp(poly p, int comp);
 void      pDeleteComp(poly * p,int k);
 void      pNorm(poly p);
 poly      pSubst(poly p, int n, poly e);
+poly      ppJet(poly p, int m);
 poly      pJet(poly p, int m);
-poly      pJetW(poly p, int m, short * iv);
+poly      ppJetW(poly p, int m, short * iv);
+poly      pSeries(int n,poly p,poly u=NULL);
+poly      pInvers(int n, poly p);
 // maximum weigthed degree of all monomials of p, w is indexed from
 // 1..pVariables
 int       pDegW(poly p, short *w);

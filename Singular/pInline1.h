@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.16 2001-02-07 12:37:51 Singular Exp $
+ *  Version: $Id: pInline1.h,v 1.17 2001-02-08 13:13:03 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -511,6 +511,12 @@ PINLINE1 BOOLEAN p_IsConstant(const poly p, const ring r)
 {
   if (p == NULL) return TRUE;
   return (pNext(p)==NULL) && p_LmIsConstant(p, r);
+}
+
+PINLINE1 BOOLEAN p_IsUnit(const poly p, const ring r)
+{
+  if (p == NULL) return FALSE;
+  return p_LmIsConstant(p, r);
 }
 
 PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2,

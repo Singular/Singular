@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.61 2001-01-18 16:21:17 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.62 2001-02-08 13:13:02 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1120,19 +1120,9 @@ BOOLEAN iiCheckRing(int i)
 
 poly    iiHighCorner(ideal I, int ak)
 {
-  BOOLEAN *UsedAxis=(BOOLEAN *)omAlloc0(pVariables*sizeof(BOOLEAN));
-  int i,n;
-  poly po;
-  for(i=IDELEMS(I)-1;i>=0;i--)
-  {
-    po=I->m[i];
-    if ((po!=NULL) &&((n=pIsPurePower(po))!=0)) UsedAxis[n-1]=TRUE;
-  }
-  for(i=pVariables-1;i>=0;i--)
-  {
-    if(UsedAxis[i]==FALSE) return NULL; // not zero-dim.
-  }
-  po=NULL;
+  int i;
+  if(!idIsZeroDim(I)) return NULL; // not zero-dim.
+  poly po=NULL;
   if (currRing->OrdSgn== -1)
   {
     scComputeHC(I,currQuotient,ak,po);
