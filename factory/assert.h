@@ -1,8 +1,14 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: assert.h,v 1.2 1997-03-26 16:20:48 schmidt Exp $ */
+/* $Id: assert.h,v 1.3 1997-05-14 15:58:11 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/03/26 16:20:48  schmidt
+NDEBUG renamed to NOASSERT
+ASSERT1 added
+DEBUGOUTPUT-functionality moved to debug.h
+WARN- and PVIRT-functionality added
+
 Revision 1.1  1996/12/05 18:19:31  schmidt
 ``Unconditional'' check-in.
 Now it is my turn to develop factory.
@@ -12,7 +18,7 @@ Initial revision
 
 */
 
-/* This is for backward compatibility only */
+/* This is for compatibility with standard assert.h */
 #if defined (NDEBUG) && ! defined (NOASSERT)
 #define NOASSERT
 #endif
