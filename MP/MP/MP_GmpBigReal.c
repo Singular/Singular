@@ -23,7 +23,7 @@
 #endif
 
 EXTERN void* (*_mp_allocate_func) (size_t size);
-EXTERN void* (*_mp_free_func) (void* ptr, size_t size);
+EXTERN void (*_mp_free_func) (void* ptr, size_t size);
 
 MP_BigRealOps_t imp_gmp_bigreal_ops = {
     IMP_PutGmpReal,
