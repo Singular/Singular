@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.171 1999-12-07 16:54:40 Singular Exp $
+@comment $Id: reference.doc,v 1.172 1999-12-13 13:46:11 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7020,7 +7020,7 @@ sets the debug level for @code{dbprint}.
 If @code{printlevel} >= @code{voice} then @code{dbprint} is equivalent to
 @code{print}, otherwise nothing is printed.
 @item @strong{Note:}
-@xref{Guidelines for writing a library}, for an small example how this
+@xref{Procedures in a library}, for a small example about how this
 is used for the display of comments while procedures are executed.
 @item @strong{Example:}
 @smallexample

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.170 1999-12-10 16:41:48 obachman Exp $
+@comment $Id: general.doc,v 1.171 1999-12-13 13:46:09 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3478,7 +3478,7 @@ behaves in this respect like a procedure (i.e., the value of @code{voice}
 is 1). Therefore, the command @code{printlevel=1;} is necessary for
 @samp{comment1} to be displayed on @code{ example Test;}. However,
 since printlevel is a global variable, it should be reset to the old
-value after at the end of the example part.
+value at the end of the example part.
 
 @smallexample
 proc Test
