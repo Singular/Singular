@@ -171,7 +171,7 @@ if test "${with_lex+set}" != set; then
   AC_CACHE_VAL(ac_cv_prog_flex,
   if (flex --version >/dev/null 2>&1)
   then
-    if (flex --version | egrep "[2-9]\.[4-9]\." >/dev/null 2>&1) 
+    if (flex --version | egrep "[2-9]\.[4-9]" >/dev/null 2>&1) 
     then
       ac_cv_prog_flex=flex
     fi
@@ -183,7 +183,7 @@ if test "${with_lex+set}" != set; then
     LEX=flex
     AC_SUBST(LEX)
   else
-    AC_MSG_ERROR(can not find flex with version greater 2.5)
+    AC_MSG_ERROR(can not find flex with version greater 2.4)
   fi
 elif test "${with_lex}" = no; then
   AC_MSG_WARN(building without lex -- make might fail)
