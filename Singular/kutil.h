@@ -3,10 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.14 1999-05-26 16:23:56 obachman Exp $ */
+/* $Id: kutil.h,v 1.15 1999-09-27 14:57:12 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
+#include "mod2.h"
 #include "structs.h"
 #include "mmemory.h"
 #include "ring.h"
@@ -14,20 +15,38 @@
 
 #define setmax 16
 
+// define to enable divisiblity tests bawsed on short exponent vectors
+// #define HAVE_SHORT_EVECTORS
+// define to enable debugging of this business (needs PDEBUG, as well)
+// #define DEBUG_SHORT_EVECTORS
+
 typedef int* intset;
 
-struct sTObject{
-                 poly  p;
-                 int ecart,length;
-               };
-struct sLObject{
-                 poly  p;
-                 poly  p1,p2; /*- the pair p comes from -*/
-                 poly  lcm;   /*- the lcm of p1,p2 -*/
-                 int ecart,length;
-               };
-typedef struct sTObject TObject;
-typedef struct sLObject LObject;
+class sTObject
+{
+public:
+  poly  p;
+  int ecart,length, pLength;
+  memHeap heap;
+#ifdef HAVE_SHORT_EVECTORS
+  unsigned long sev;
+#endif
+  sTObject() { memset((void*) this, 0, sizeof(sTObject));}
+};
+
+class sLObject
+{
+public:
+  poly  p;
+  poly  p1,p2; /*- the pair p comes from -*/
+  poly  lcm;   /*- the lcm of p1,p2 -*/
+  int ecart,length, pLength;
+  memHeap heap;
+  sLObject() { memset((void*) this, 0, sizeof(sLObject));}
+};
+
+typedef class sTObject TObject;
+typedef class sLObject LObject;
 typedef TObject * TSet;
 typedef LObject * LSet;
 
@@ -157,10 +176,41 @@ rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp);
 extern int spCheckCoeff(number *a, number *b);
 
 inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
+
 #ifdef KDEBUG
 #define kTest(A) K_Test(__FILE__,__LINE__,A)
-void K_Test(char *f, int i,kStrategy strat);
+#define kTest_TS(A) K_Test(__FILE__,__LINE__,A)
+#define kTest_T(T) K_Test_T(__FILE__,__LINE__,T)
+#define kTest_L(L) K_Test_L(__FILE__,__LINE__,L)
+BOOLEAN K_Test(char *f, int l,kStrategy strat);
+BOOLEAN K_Test_TS(char *f, int l,kStrategy strat);
+BOOLEAN K_Test_T(char *f, int l, TObject* T, int tpos = -1);
+BOOLEAN K_Test_L(char* f, int l, LObject* L, 
+                 BOOLEAN testp = FALSE, int lpos = -1, 
+                 TSet T = NULL, int tlength = -1);
 #else
-#define kTest(A)
+#define kTest(A)    (TRUE)
+#define kTest_TS(A) (TRUE)
+#define kTest_T(T)  (TRUE)
+#define kTest_L(T)  (TRUE)
 #endif
 #endif
+
+
+#ifdef HAVE_SHORT_EVECTORS
+
+#define K_INIT_SHORT_EVECTOR(p) unsigned long __sev = ~ pGetShortExpVector(p);
+
+#if defined(DEBUG_SHORT_EVECTORS) && defined(PDEBUG)
+#define K_DIVISIBLE_BY(T, p2) \
+  (pDBShortDivisibleBy(T.p, T.sev, p2, __sev, __FILE__, __LINE__))
+#else
+#define K_DIVISIBLE_BY(T, p2) \
+  (pShortDivisibleBy(T.p, T.sev, p2, __sev))
+#endif
+
+#else
+#define K_INIT_SHORT_EVECTOR(p)
+#define K_DIVISIBLE_BY(T, p2) pDivisibleBy(T.p, p2)
+#endif // HAVE_SHORT_EVECTORS
+

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.20 1999-08-26 12:50:13 siebert Exp $ */
+/* $Id: syz.cc,v 1.21 1999-09-27 15:00:30 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -17,7 +17,7 @@
 #include "kutil.h"
 #include "spolys.h"
 #include "stairc.h"
-#include "ipid.h"
+//#include "ipid.h"
 #include "cntrlc.h"
 #include "ipid.h"
 #include "intvec.h"
@@ -27,6 +27,17 @@
 #include "intvec.h"
 #include "ring.h"
 #include "syz.h"
+
+void syDeleteRes(resolvente * res,int length)
+{
+  for (int i=0;i<length;i++)
+  {
+    if (!idIs0((*res)[i]))
+      idDelete(&((*res)[i]));
+  }
+  Free((ADDRESS)res,length*sizeof(ideal));
+  *res = NULL;
+}
 
 static intvec * syPrepareModComp(ideal arg,intvec ** w)
 {
@@ -221,20 +232,22 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
 */
 static void syGaussForOne(ideal syz, int elnum, int ModComp)
 {
-  int k,j,i;
+  int k,j,i,lu;
   poly unit1,unit2;
   poly actWith=syz->m[elnum];
 
   syz->m[elnum] = NULL;
   if (!rField_has_simple_inverse()) pCleardenom(actWith);
 /*--makes Gauss alg. for the column ModComp--*/
-  unit1 = pTakeOutComp1(&(actWith), ModComp);
+  //unit1 = pTakeOutComp1(&(actWith), ModComp);
+  pTakeOutComp(&(actWith), ModComp, &unit1, &lu);
   k=0;
   while (k<IDELEMS(syz))
   {
     if (syz->m[k]!=NULL)
     {
-      unit2 = pTakeOutComp1(&(syz->m[k]), ModComp);
+      //unit2 = pTakeOutComp1(&(syz->m[k]), ModComp);
+      pTakeOutComp(&(syz->m[k]), ModComp, &unit2, &lu);
       syz->m[k] = pMult(syz->m[k],pCopy(unit1));
       syz->m[k] = pSub(syz->m[k],
         pMult(pCopy(actWith),unit2));
@@ -770,14 +783,16 @@ int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
     }
     ModComp = pGetComp(p);
 //Print("Element %d: ",j);pWrite(p);
-    Unit1 = pTakeOutComp1(&p,ModComp);
+    //Unit1 = pTakeOutComp1(&p,ModComp);
+    pTakeOutComp(&p,ModComp, &Unit1, &lu);
     pSetComp(Unit1,0);
     for (k=j+1;k<i;k++)
     {
       if (temp->m[k]!=NULL)
       {
 //Print("erst %d: ",k);pWrite(temp->m[k]);
-        Unit2 = pTakeOutComp1(&(temp->m[k]),ModComp);
+        //Unit2 = pTakeOutComp1(&(temp->m[k]),ModComp);
+        pTakeOutComp(&(temp->m[k]),ModComp,&Unit2,&lu);
         if (Unit2!=NULL)
         {
           number tmp=nCopy(pGetCoeff(Unit2));
@@ -912,7 +927,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   rows -= mr;
   result = new intvec(rows,cols,0);
   (*result)[(-mr)*cols] = /*idRankFreeModule(res[0])*/ rkl;
-  if ((!idIs0(res[0])) && ((*result)[(-mr)*cols]==0)) 
+  if ((!idIs0(res[0])) && ((*result)[(-mr)*cols]==0))
     (*result)[(-mr)*cols] = 1;
   tocancel = (int*)Alloc0((rows+1)*sizeof(int));
   memset(temp2,0,l*sizeof(int));

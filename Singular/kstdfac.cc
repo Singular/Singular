@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.22 1999-04-29 11:38:47 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.23 1999-09-27 15:04:58 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -19,7 +19,7 @@
 #include "spolys.h"
 #include "cntrlc.h"
 #include "weight.h"
-#include "ipid.h"
+//#include "ipid.h"
 #include "ipshell.h"
 #include "intvec.h"
 #ifdef HAVE_FACTORY
@@ -39,7 +39,7 @@ static void copyT (kStrategy o,kStrategy n)
 {
   int i,j;
   poly  p;
-  TSet t=(TSet)Alloc(o->tmax*sizeof(TObject));
+  TSet t=(TSet)Alloc0(o->tmax*sizeof(TObject));
 
   for (j=0; j<=o->tl; j++)
   {

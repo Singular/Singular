@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.105 1999-09-21 16:40:13 obachman Exp $ */
+/* $Id: extra.cc,v 1.106 1999-09-27 14:52:13 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -72,6 +72,7 @@
 #include "mpsr.h"
 #include "MPT_GP.h"
 #endif
+#include "walk.h"
 
 /*
  *   New function/system-calls that will be included as dynamic module
@@ -471,6 +472,69 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
+/*==================== poly ==================================*/
+    if(strcmp(sys_cmd,"p")==0)
+    {
+      poly p=(poly)h->Data();
+      int i;
+      pWrite(p);
+      while(p!=NULL)
+      {
+        Print("exp.e[0..%d]\n",currRing->ExpESize-1);
+        for(i=0;i<currRing->ExpESize;i++)
+          Print("%d ",p->exp.e[i]);
+        Print("\nexp.l[0..%d]\n",currRing->ExpLSize-1);
+        for(i=0;i<currRing->ExpLSize;i++)
+          Print("%d ",p->exp.l[i]);
+        PrintLn();pIter(p);
+      }
+      return FALSE;
+    }
+    else
+/*==================== ring ==================================*/
+    if(strcmp(sys_cmd,"r")==0)
+    {
+      ring r=(ring)h->Data();
+      int j;
+      PrintS("varoffset:\n");
+      for(j=0;j<=r->N;j++) Print("  v%d at pos %d\n",j,r->VarOffset[j]);
+      PrintS("ordsgn:\n");
+      for(j=0;j<r->pCompLSize;j++)
+        Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j);
+      Print("OrdSgn:%d\n",r->OrdSgn);
+      PrintS("ordrec:\n");
+      for(j=0;j<r->OrdSize;j++)
+      {
+        char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp","ro_none"};
+        Print("  typ %s",TYP[r->typ[j].ord_typ]);
+        Print("  place %d",r->typ[j].data.dp.place);
+        if (r->typ[j].ord_typ!=ro_syzcomp)
+        {
+          Print("  start %d",r->typ[j].data.dp.start);
+          Print("  end %d",r->typ[j].data.dp.end);
+          if (r->typ[j].ord_typ==ro_wp)
+          {
+            Print(" w:");
+            int l;
+            for(l=r->typ[j].data.wp.start;l<=r->typ[j].data.wp.end;l++)
+              Print(" %d",r->typ[j].data.wp.weights[l-r->typ[j].data.wp.start]);
+          }
+	}
+        PrintLn();
+      }
+      Print("pVarLowIndex:%d ",r->pVarLowIndex);
+      Print("pVarHighIndex:%d\n",r->pVarHighIndex);
+      Print("pDivLow:%d ",r->pDivLow);
+      Print("pDivHigh:%d\n",r->pDivHigh);
+      Print("pCompLowIndex:%d ",r->pCompLowIndex);
+      Print("pCompHighIndex:%d\n",r->pCompHighIndex);
+      Print("pOrdIndex:%d pCompIndex:%d\n", r->pOrdIndex, r->pCompIndex);
+      Print("ExpESize:%d ",r->ExpESize);
+      Print("ExpLSize:%d ",r->ExpLSize);
+      Print("OrdSize:%d\n",r->OrdSize);
+      return FALSE;
+    }
+    else
 /*==================== pcv ==================================*/
 #ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV
@@ -924,7 +988,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 /*==================== gp =================*/
 #ifdef HAVE_MPSR
-     if (strcmp(sys_cmd, "gp") == 0)
+    if (strcmp(sys_cmd, "gp") == 0)
     {
       if (h->Typ() != LINK_CMD)
       {
@@ -1033,7 +1097,51 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*============================================================*/
+/*==================== walk stuff =================*/
+    if (strcmp(sys_cmd, "walkNextWeight") == 0)
+    {
+      if (h == NULL || h->Typ() != INTVEC_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != IDEAL_CMD)
+      {
+        Werror("system(\"walkNextWeight\", intvec, intvec, ideal) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->Data())->length() != currRing->N ||
+          ((intvec*) h->next->Data())->length() != currRing->N)
+      {
+        Werror("system(\"walkNextWeight\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      res->data = (void*) walkNextWeight(((intvec*) h->Data()),
+                                         ((intvec*) h->next->Data()),
+                                         (ideal) h->next->next->Data());
+      if (res->data == (void*) 0 || res->data == (void*) 1)
+      {
+        res->rtyp = INT_CMD;
+      }
+      else
+      {
+        res->rtyp = INTVEC_CMD;
+      }
+      return FALSE;
+    }
+    else if (strcmp(sys_cmd, "walkInitials") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD)
+      {
+        WerrorS("system(\"walkInitials\", ideal) expected");
+        return TRUE;
+      }
+
+      res->data = (void*) walkInitials((ideal) h->Data());
+      res->rtyp = IDEAL_CMD;
+      return FALSE;
+    }
+    else
+/*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
   return TRUE;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.35 1999-09-27 13:51:31 obachman Exp $ */
+/* $Id: kutil.cc,v 1.36 1999-09-27 14:57:11 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -312,22 +312,24 @@ BOOLEAN isInPairsetB(poly q,int*  k,kStrategy strat)
 }
 
 #ifdef KDEBUG
-static void L_Test(LObject *L, BOOLEAN testp, int lpos, TSet T, int tlength,
-                   char *f , int l)
+BOOLEAN K_Test_L(char *f , int l, LObject *L,
+                 BOOLEAN testp, int lpos, TSet T, int tlength)
 {
-  if (testp) pDBTest(L->p, L->heap, f, l);
+  BOOLEAN ret = TRUE;
+  
+  if (testp) ret &= pDBTest(L->p, L->heap, f, l);
   if (L->pLength != 0 && L->pLength != pLength(L->p))
   {
     Print("L[%d] length error: has %d, specified to have %d\n",
           lpos, pLength(L->p), L->pLength);
-    assume(0);
+    ret = FALSE;
   }
   if (L->p1 == NULL)
   {
     // L->p2 either NULL or poly from global heap
-    pDBTest(L->p2, f, l);
+    ret &= pDBTest(L->p2, f, l);
   }
-  else if (tlength > 0)
+  else if (tlength > 0 && T != NULL)
   {
     // now p1 and p2 must be != NULL and must be contained in T
     int i;
@@ -336,26 +338,27 @@ static void L_Test(LObject *L, BOOLEAN testp, int lpos, TSet T, int tlength,
     if (i>=tlength)
     {
       Print("L[%d].p1 not in T \n",lpos);
-      assume(0);
+      ret = FALSE;
     }
     for (i=0; i<tlength; i++)
       if (L->p2 == T[i].p) break;
     if (i>=tlength)
     {
       Print("L[%d].p2 not in T \n",lpos);
-      assume(0);
+      ret &= FALSE;
     }
   }
+  return ret;
 }
 
-void K_Test (char *f, int l, kStrategy strat)
+BOOLEAN K_Test (char *f, int l, kStrategy strat)
 {
   int i;
-
+  BOOLEAN ret;
   // test P
-  L_Test(&(strat->P),
-         (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
-         -1, strat->T, strat->tl+1, f, l);
+  ret = K_Test_L(f, l, &(strat->P),
+                 (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
+                 -1, strat->T, strat->tl+1);
 
   // test L
   if (strat->L != NULL)
@@ -365,10 +368,11 @@ void K_Test (char *f, int l, kStrategy strat)
       if (strat->L[i].p == NULL)
       {
         Print("L[%d].p is NULL\n", i);
-        assume(0);
+        ret = FALSE;
       }
-      L_Test(&(strat->L[i]), (pNext(strat->L[i].p) != strat->tail), i,
-             strat->T, strat->tl + 1, f, l);
+      ret &= K_Test_L(f, l, &(strat->L[i]), 
+                      (pNext(strat->L[i].p) != strat->tail), i,
+                      strat->T, strat->tl + 1);
     }
   }
 
@@ -377,22 +381,39 @@ void K_Test (char *f, int l, kStrategy strat)
   {
     for (i=0; i<=strat->tl; i++)
     {
-      pDBTest(strat->T[i].p, strat->T[i].heap, f, l);
-      if (strat->T[i].pLength != 0 &&
-          strat->T[i].pLength != pLength(strat->T[i].p))
-      {
-        Print("T[%d] length error: has %d, specified to have %d\n",
-              i , pLength(strat->T[i].p), strat->T[i].pLength);
-        assume(0);
-      }
+      ret &= K_Test_T(f, l, &(strat->T[i]), i);
     }
   }
+  return ret;
 }
 
-void K_Test_TS(char *f, int l, kStrategy strat)
+BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
+{
+  BOOLEAN ret = pDBTest(T->p, T->heap, f, l);
+  if (T->pLength != 0 &&
+      T->pLength != pLength(T->p))
+  {
+    Print("T[%d] length error: has %d, specified to have %d in %s:%d\n",
+          i , pLength(T->p), T->pLength,f, l);
+    ret = FALSE;
+  }
+#ifdef HAVE_SHORT_EVECTORS
+  if (T->sev != 0 && pGetShortExpVector(T->p) != T->sev)
+  {
+    Print("T[%d] wrong sev: has %o, specified to have %o in %s:%d\n",
+          i , pGetShortExpVector(T->p), T->sev,f, l);
+    ret = FALSE;
+  }
+#endif
+  return ret;
+}
+  
+  
+
+BOOLEAN K_Test_TS(char *f, int l, kStrategy strat)
 {
   int i, j;
-
+  BOOLEAN ret = TRUE;
   K_Test(f, l, strat);
 
   // test S
@@ -405,10 +426,11 @@ void K_Test_TS(char *f, int l, kStrategy strat)
       if (j > strat->tl)
       {
         Print("S[%d] not in T\n", i);
-        assume(0);
+        ret = FALSE;
       }
     }
   }
+  return ret;
 }
 
 #endif
@@ -2305,48 +2327,46 @@ int posInL17_c (const LSet set, const int length,
 */
 poly redtail (poly p, int pos, kStrategy strat)
 {
+  poly h, hn;
+  int j, e, l;
+  int op;
 
-  if ((!strat->noTailReduction)
-  && (pNext(p)!=NULL))
+  if (strat->noTailReduction)
   {
-    int j, e, l;
-    poly h = p;
-    poly hn = pNext(h); // !=NULL
-    int op = pFDeg(hn);
-    BOOLEAN save_HE=strat->kHEdgeFound;
-    strat->kHEdgeFound |= ((Kstd1_deg>0) && (op<=Kstd1_deg));
-    loop
+    return p;
+  }
+  h = p;
+  hn = pNext(h);
+  while(hn != NULL)
+  {
+    op = pFDeg(hn);
+    e = pLDeg(hn,&l)-op;
+    j = 0;
+    while (j <= pos)
     {
-      e = pLDeg(hn,&l)-op;
-      j = 0;
-      while (j <= pos)
+      if (pDivisibleBy(strat->S[j], hn)
+      && ((e >= strat->ecartS[j])
+        || strat->kHEdgeFound
+        || ((Kstd1_deg>0)&&(op<=Kstd1_deg)))
+      )
       {
-        if (pDivisibleBy(strat->S[j], hn)
-        && ((e >= strat->ecartS[j])
-          || strat->kHEdgeFound)
-        )
+        spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
+        hn = pNext(h);
+        if (hn == NULL)
         {
-          spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
-          hn = pNext(h);
-          if (hn == NULL) goto all_done;
-          op = pFDeg(hn);
-          if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
-          e = pLDeg(hn,&l)-op;
-          j = 0;
+          return p;
         }
-        else
-        {
-          j++;
-        }
-      } /* while (j <= pos) */
-      h = hn; /* better for: pIter(h); */
-      hn = pNext(h);
-      if (hn==NULL) break;
-      op = pFDeg(hn);
-      if ((Kstd1_deg>0)&&(op>Kstd1_deg)) break;
+        op = pFDeg(hn);
+        e = pLDeg(hn,&l)-op;
+        j = 0;
+      }
+      else
+      {
+        j++;
+      }
     }
-all_done:
-    strat->kHEdgeFound = save_HE;
+    h = hn;
+    hn = pNext(h);
   }
   return p;
 }
@@ -3461,7 +3481,9 @@ void enterT (LObject p,kStrategy strat)
   strat->T[atT].length = p.length;
   strat->T[atT].pLength = p.pLength;
   strat->T[atT].heap = p.heap;
+#ifdef HAVE_SHORT_EVECTORS
   strat->T[atT].sev = pGetShortExpVector(p.p);
+#endif
   strat->tl++;
 }
 
@@ -3487,7 +3509,9 @@ void enterTBba (LObject p, int atT,kStrategy strat)
 
   strat->T[atT].heap = p.heap;
   strat->T[atT].pLength = p.pLength;
+#ifdef HAVE_SHORT_EVECTORS
   strat->T[atT].sev = pGetShortExpVector(p.p);
+#endif
 
   strat->tl++;
 }
