@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.232 2000-11-17 14:07:09 Singular Exp $ */
+/* $Id: iparith.cc,v 1.233 2000-11-20 20:17:04 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2948,10 +2948,6 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
   }
   return FALSE;
 }
-static BOOLEAN jjLIB(leftv res, leftv v)
-{
-  return iiLibCmd((char *)v->CopyD(STRING_CMD));
-}
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
   omUpdateInfo();
@@ -3266,10 +3262,9 @@ static BOOLEAN jjLOAD1(leftv res, leftv v)
 
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 {
-  char * s=omStrDup((char *)v->Data());
+  char * s=(char *)v->CopyD();
   char libnamebuf[256];
   lib_types LT = type_of_LIB(s, libnamebuf);
-  BOOLEAN result = TRUE;
 #ifdef HAVE_DYNAMIC_LOADING
   extern BOOLEAN load_modules(char *newlib, char *fullpath, BOOLEAN tellerror);
 #endif /* HAVE_DYNAMIC_LOADING */
@@ -3283,29 +3278,21 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 
       case LT_SINGULAR:
 #ifdef HAVE_NAMESPACES
-        result = iiLibCmd(s, autoexport);
+        return iiLibCmd(s, autoexport);
 #else
-        result = iiLibCmd(s);
+        return iiLibCmd(s);
 #endif
-        break;
 
       case LT_ELF:
-#ifdef HAVE_DYNAMIC_LOADING
-        result = load_modules(s, libnamebuf, autoexport);
-#else /* HAVE_DYNAMIC_LOADING */
-        WerrorS("Dynamic modules are not supported by this version of Singular");
-#endif /* HAVE_DYNAMIC_LOADING */
-        break;
-
       case LT_HPUX:
 #ifdef HAVE_DYNAMIC_LOADING
-        result = load_modules(s, libnamebuf, autoexport);
+        return load_modules(s, libnamebuf, autoexport);
 #else /* HAVE_DYNAMIC_LOADING */
         WerrorS("Dynamic modules are not supported by this version of Singular");
-#endif /* HAVE_DYNAMIC_LOADING */
         break;
+#endif /* HAVE_DYNAMIC_LOADING */
   }
-  return result;
+  return TRUE;
 }
 
 /*=================== operations with 1 arg.: table =================*/
@@ -3547,7 +3534,7 @@ struct sValCmd1 dArith1[]=
 ,{jjUMINUS_IV,  '-',             INTVEC_CMD,     INTVEC_CMD }
 ,{jjUMINUS_IV,  '-',             INTMAT_CMD,     INTMAT_CMD }
 ,{jjPROC1,      '(',             ANY_TYPE/*set by p*/,PROC_CMD }
-,{jjLIB,        '(',             NONE,           STRING_CMD }
+,{jjLOAD1,      '(',             NONE,           STRING_CMD }
 // and the procedures with 1 argument:
 ,{atATTRIB1,    ATTRIB_CMD,      NONE,           DEF_CMD }
 ,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
@@ -3671,7 +3658,7 @@ struct sValCmd1 dArith1[]=
 ,{jjLEADEXP,    LEADEXP_CMD,     INTVEC_CMD,     VECTOR_CMD }
 ,{jjLEADMONOM,  LEADMONOM_CMD,   POLY_CMD,       POLY_CMD }
 ,{jjLEADMONOM,  LEADMONOM_CMD,   VECTOR_CMD,     VECTOR_CMD }
-,{jjLIB,        LIB_CMD,         NONE,           STRING_CMD }
+,{jjLOAD1,      LIB_CMD,         NONE,           STRING_CMD }
 ,{jjDUMMY,      LINK_CMD,        LINK_CMD,       LINK_CMD}
 ,{jjCALL1MANY,  LIST_CMD,        LIST_CMD,       DEF_CMD }
 ,{jjWRONG,      MAP_CMD,         0,              ANY_TYPE}

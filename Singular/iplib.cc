@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.75 2000-09-18 09:19:05 obachman Exp $ */
+/* $Id: iplib.cc,v 1.76 2000-11-20 20:17:03 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -1054,7 +1054,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
 
   if((IDPACKAGE(pl)->handle=dynl_open(FullName))==(void *)NULL)
   {
-    WerrorS("dynl_open failed");
+    Werror("dynl_open failed:%s", dynl_error());
     Werror("%s not found", newlib);
     goto load_modules_end;
   }
