@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.8 1997-04-30 15:25:27 Singular Exp $ */
+/* $Id: grammar.y,v 1.9 1997-04-30 17:44:37 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -239,7 +239,6 @@ void yyerror(char * fmt)
 %token <i> ELSE_CMD
 %token <i> EVAL
 %token <i> QUOTE
-%token <i> EXIT_CMD
 %token <i> FOR_CMD
 %token <i> IF_CMD
 %token <i> SYS_BREAK
@@ -338,12 +337,6 @@ pprompt:
             if (!sic)
             #endif
             YYACCEPT;
-          }
-        | EXIT_CMD
-          {
-            ifswitch[voice]=0;
-            exitFile();
-            /* Print("exit found\n"); */
           }
         | SYS_BREAK
           {

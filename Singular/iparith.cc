@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.25 1997-04-30 15:25:30 Singular Exp $ */
+/* $Id: iparith.cc,v 1.26 1997-04-30 17:44:39 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -156,7 +156,6 @@ cmdnames cmds[] =
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
   { "eval",        0, EVAL ,              EVAL},
   { "execute",     0, EXECUTE_CMD ,       EXECUTE_CMD},
-  { "exit",        0, EXIT_CMD ,          EXIT_CMD},
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
   { "factorize",   0, FAC_CMD ,           CMD_12},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
@@ -311,7 +310,7 @@ cmdnames cmds[] =
   { "help",        0, -1 ,             0},
   { "example",     0, -1 ,             0},
   { "newline",     0, -1 ,             0},
-  { "exitall",     0, -1 ,             0},
+  { "exit",        0, -1 ,             0},
   { "quit",        0, -1 ,             0},
 /* end of list marker */
   { NULL, 0, 0, 0}

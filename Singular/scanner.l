@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.4 1997-04-09 12:20:07 Singular Exp $ */
+/* $Id: scanner.l,v 1.5 1997-04-30 17:44:41 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -281,7 +281,7 @@ newline                  {
                            #endif
                            exit(0);
                          }
-(quit|exitall)[ \t\n]*[\.;]?       {
+(quit|exit)[ \t\n]*[\.;]?  {
                            #ifdef HAVE_TCL
                              if (tclmode)
                                PrintTCL('Q',0,NULL);

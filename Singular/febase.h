@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.3 1997-04-09 12:19:42 Singular Exp $ */
+/* $Id: febase.h,v 1.4 1997-04-30 17:44:36 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -84,7 +84,6 @@ void   Warn(char *fmt, ...);
 int    contBuffer(int typ);
 char * eati(char *s, int *i);
 int    exitBuffer(int typ);
-int    exitFile(void);
 int    exitVoice(void);
 #define mflush() fflush(stdout)
 void   monitor(char* s,int mode);

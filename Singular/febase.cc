@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.13 1997-04-30 17:08:40 Singular Exp $ */
+/* $Id: febase.cc,v 1.14 1997-04-30 17:44:35 Singular Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -456,32 +456,6 @@ int contBuffer(int typ)
     }
   }
   return 1;
-}
-
-/*2
-* leave a file voice
-*/
-int exitFile()
-{
-  int oldswitch;
-
-  while ((voice > 0) && (inputswitch > 0))
-  {
-    exitVoice();
-  }
-  // now we have left all if-, else-, while-, for-, proc-levels
-  // inside this file;
-  // if the file is the terminal (inputswitch == 0) and
-  // voice >0, so return 1 else return 0
-  // (used for EXIT_CMD in CNTRLC-C-handling)
-  oldswitch = inputswitch;
-  exitVoice();
-  #ifdef SIC
-  return 1;
-  #else
-  if ((oldswitch)||(myynest<0)) return 0;
-  else return 1;
-  #endif
 }
 
 /*2
