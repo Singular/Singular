@@ -1044,7 +1044,7 @@ else
 fi
 
 echo $ac_n "checking for -lsingcf""... $ac_c" 1>&6
-ac_lib_var=`echo singcf_initCanonicalForm | tr '.-/+' '___p'`
+ac_lib_var=`echo singcf_atof | tr '.-/+' '___p'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1054,11 +1054,11 @@ cat > conftest.$ac_ext <<EOF
 #line 1055 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
-char initCanonicalForm();
+char atof();
 
 int main() { return 0; }
 int t() {
-initCanonicalForm()
+atof()
 ; return 0; }
 EOF
 if { (eval echo configure:1065: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
@@ -1086,7 +1086,7 @@ else
 fi
 
 echo $ac_n "checking for -lsingfac""... $ac_c" 1>&6
-ac_lib_var=`echo singfac_IrrCharSeries | tr '.-/+' '___p'`
+ac_lib_var=`echo singfac_atof | tr '.-/+' '___p'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1096,11 +1096,11 @@ cat > conftest.$ac_ext <<EOF
 #line 1097 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
-char IrrCharSeries();
+char atof();
 
 int main() { return 0; }
 int t() {
-IrrCharSeries()
+atof()
 ; return 0; }
 EOF
 if { (eval echo configure:1107: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
@@ -1368,7 +1368,7 @@ if test "$with_gmp" != no; then
   else
     ac_with_gmp=yes
   fi
-  if test "$ac_with_gmp"=yes; then
+  if test "$ac_with_gmp" = yes; then
     if test "$with_gmp" != yes; then
       with_gmp=yes
       ac_configure_args="$ac_configure_args --with-gmp"
@@ -1403,7 +1403,7 @@ if test "$with_MP" != no; then
   else
     ac_with_MP=yes
   fi
-  if test "$ac_with_MP"=yes; then
+  if test "$ac_with_MP" = yes; then
     if test "$with_MP" != yes; then
       with_MP=yes
       ac_configure_args="$ac_configure_args --with-MP"
@@ -1438,7 +1438,7 @@ if test "$with_factory" != no; then
   else
     ac_with_factory=yes
   fi
-  if test "$ac_with_factory"=yes; then
+  if test "$ac_with_factory" = yes; then
     if test "$with_factory" != yes; then
       with_factory=yes
       ac_configure_args="$ac_configure_args --with-factory"
@@ -1473,7 +1473,7 @@ if test "$with_libfac" != no; then
   else
     ac_with_libfac=yes
   fi
-  if test "$ac_with_libfac"=yes; then
+  if test "$ac_with_libfac" = yes; then
     if test "$with_libfac" != yes; then
       with_libfac=yes
       ac_configure_args="$ac_configure_args --with-libfac"
@@ -1499,7 +1499,7 @@ if test "$with_Singular" != no; then
   else
     ac_with_Singular=no
   fi
-  if test "$ac_with_Singular"=yes; then
+  if test "$ac_with_Singular" = yes; then
     if test "$with_Singular" != yes; then
       with_Singular=yes
       ac_configure_args="$ac_configure_args --with-Singular"
