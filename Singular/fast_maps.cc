@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.30 2002-05-29 09:42:50 mschulze Exp $
+ *  Version: $Id: fast_maps.cc,v 1.31 2003-03-05 11:07:53 bricken Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -92,7 +92,7 @@ static Exponent_t maGetMaxExp(ideal pi_id, ring pi_r, ideal map_id, ring map_r)
 *F  debugging stuff
 */
 #ifndef NDEBUG
-void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r = NULL)
+void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r)
 {
   p_wrp(monomial->src, src_r);
   printf(" ref:%d", monomial->ref);
@@ -111,7 +111,7 @@ void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r = NULL)
   fflush(stdout);
 }
 
-void maPoly_Out(mapoly mpoly, ring src_r, ring dest_r = NULL)
+void maPoly_Out(mapoly mpoly, ring src_r, ring dest_r)
 {
   while (mpoly != NULL)
   {
