@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.80 2000-12-06 11:03:16 Singular Exp $ */
+/* $Id: iplib.cc,v 1.81 2001-03-26 18:11:53 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -684,6 +684,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
 {
   idhdl hl;
 
+#ifndef HAVE_NAMESPACES
   hl = IDROOT->get("LIB", 0);
   if (hl == NULL || strstr(IDSTRING(hl), lib) == NULL) return FALSE;
 
@@ -705,6 +706,14 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
     strcpy(where, tok);
     omFree(tmp);
   }
+#else
+  char *plib = iiConvName(lib);
+  hl = namespaceroot->get(plib,0, TRUE);
+  if((hl==NULL) ||(IDTYP(hl)!=PACKAGE_CMD))
+    return FALSE;
+  strcpy(where,IDPACKAGE(hl)->libname);
+  omFree(plib);
+#endif
   return TRUE;
 }
 
@@ -716,10 +725,12 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 {
   char buf[256];
   char libnamebuf[128];
-  idhdl h,hl;
+  idhdl h;
   BOOLEAN LoadResult = TRUE;
 #ifdef HAVE_NAMESPACES
   idhdl pl;
+#else
+  idhdl hl;
 #endif /* HAVE_NAMESPACES */
   int lines = 1;
   long pos = 0L;
@@ -741,18 +752,11 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     fclose(fp);
     return TRUE;
   }
-  hl = namespaceroot->get("LIB",0, TRUE);
 #else /* HAVE_NAMESPACES */
   hl = idroot->get("LIB",0);
-#endif /* HAVE_NAMESPACES */
   if (hl==NULL)
   {
-#ifdef HAVE_NAMESPACES
-    hl = enterid( omStrDup("LIB"),0, STRING_CMD,
-                  &NSROOT(namespaceroot->root), FALSE );
-#else /* HAVE_NAMESPACES */
     hl = enterid( omStrDup("LIB"),0, STRING_CMD, &idroot, FALSE );
-#endif /* HAVE_NAMESPACES */
     IDSTRING(hl) = omStrDup(newlib);
   }
   else
@@ -799,6 +803,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     }
 #endif
   }
+#endif /* HAVE_NAMESPACES */
 #ifdef HAVE_TCL
   if (tclmode)
   {
@@ -1052,12 +1057,20 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
     Werror("'%s' is resered identifier\n", plib);
     goto load_modules_end;
   }
-
+#ifdef HAVE_NAMESPACES
   pl = namespaceroot->get(plib,0, TRUE);
+#else
+  pl = IDROOT->get(plib,0);
+#endif
   if (pl==NULL)
   {
+#ifdef HAVE_NAMESPACES
     pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
                   &NSROOT(namespaceroot->root), TRUE );
+#else
+    pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
+                  TRUE );
+#endif
     IDPACKAGE(pl)->language = LANG_C;
     IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
@@ -1200,15 +1213,16 @@ void piShowProcList()
 #ifdef HAVE_LIBPARSER
 void libstack::push(char *p, char *libname)
 {
-#  ifdef HAVE_NAMESPACES
-  idhdl hl = namespaceroot->get("LIB",0, TRUE);
-#  else /* HAVE_NAMESPACES */
-  idhdl hl = idroot->get("LIB",0);
-#  endif /* HAVE_NAMESPACES */
   libstackv lp;
+#ifndef HAVE_NAMESPACES
+  idhdl hl = idroot->get("LIB",0);
   char *f = NULL;
   if(hl!=NULL) f = strstr(IDSTRING(hl),libname);
   if( (hl==NULL) || (f == NULL))
+#else
+  char dummy[128];
+  if (!iiLocateLib(libname, dummy))
+#endif
   {
     for(lp = this;lp!=NULL;lp=lp->next)
     {
