@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_switches.h,v 1.6 1998-01-16 18:08:44 schmidt Exp $ */
+/* $Id: cf_switches.h,v 1.7 1998-02-10 09:51:02 schmidt Exp $ */
 
 #ifndef INCL_CF_SWITCHES_H
 #define INCL_CF_SWITCHES_H
@@ -26,10 +26,11 @@ const int CFSwitchesMax = 10;
 //
 // class CFSwitches - manages boolean switches.
 //
-// An object of type CFSwitches is simply an array of booleans
-// with some comfortable access methods (On, Off).  Each object
-// may contain CFSwitchesMax switches.  When a new object of type
-// CFSwitches is created, all its switches are turned off.
+// An object of class `CFSwitches' is simply an array of booleans
+// with some comfortable access methods (`On()', `isOn()', etc.).
+// Each object may contain `CFSwitchesMax' switches.  When a new
+// object of type `CFSwitches' is created, all its switches are
+// turned off.
 //
 // Note: No range checking is done when accessing switches.
 //
@@ -43,19 +44,22 @@ const int CFSwitchesMax = 10;
 // bool isOn ( int s ) const
 // bool isOff ( int s ) const
 //
-// On(), Off() - switch s on or off, resp.
+// On(), Off() - switch `s' on or off, resp.
 //
-// isOn(), isOff() - return true iff s is on or off, resp.
+// isOn(), isOff() - return true iff `s' is on or off, resp.
 //
 //}}}
 class CFSwitches
 {
 private:
     bool switches [CFSwitchesMax];
+
 public:
+    // constructors, destructors
     CFSwitches ();
     ~CFSwitches () {}
 
+    // selectors
     void On ( int s ) { switches[s] = true; }
     void Off ( int s ) { switches[s] = false; }
     bool isOn ( int s ) const { return switches[s]; }
