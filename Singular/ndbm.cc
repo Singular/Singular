@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.4 1997-08-15 09:49:13 krueger Exp $
+// $Id: ndbm.cc,v 1.5 1997-10-09 13:04:07 obachman Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -38,9 +38,6 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #   define L_SET SEEK_SET
 #   define EPERM 1
 #   define ENOSPC 28
-#   define bcopy(a,b,c) memcpy(b,a,c)
-#   define bzero(a,b)   memset(a,0,b)
-#   define bcmp(a,b,c)  memcmp(a,b,c)
 #else /* not macintosh */
 #   include <sys/types.h>
 #   include <sys/stat.h>
@@ -49,7 +46,11 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #   include <stdlib.h>
 #   include <string.h>
 #   include <unistd.h>
+#   include <fcntl.h>
 #endif /* macintosh */
+#   define bcopy(a,b,c) memcpy(b,a,c)
+#   define bzero(a,b)   memset(a,0,b)
+#   define bcmp(a,b,c)  memcmp(a,b,c)
 #include "ndbm.h"
 
 #define BYTESIZ 8

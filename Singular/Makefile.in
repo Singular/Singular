@@ -48,6 +48,7 @@ CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir} @CPPFLAGS@ 
 DEFS		= @DEFS@ -DNDEBUG
 LDFLAGS		= @LDFLAGS@
+STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 LIBS		= @NEED_LIBS@
 
 ##
@@ -166,6 +167,12 @@ Singular: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
 						mpsr_Tok.o tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o Singular \
 	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS}
+
+Singular-static: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
+						mpsr_Tok.o tesths.cc
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o Singular-static \
+	tesths.cc iparith.o mpsr_Tok.o \
+	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS}
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 

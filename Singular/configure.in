@@ -174,6 +174,7 @@ AC_CHECK_LIB(m, atof)
 AC_CHECK_LIB(bsd, socket)
 AC_CHECK_LIB(socket, listen)
 AC_CHECK_LIB(nsl, gethostbyname)
+AC_CHECK_LIB(ucb, index)
 
 dnl Check -lreadline
 if test "$with_readline" != no; then
@@ -203,6 +204,9 @@ fi
 NEED_LIBS=$LIBS
 
 AC_CHECK_LIB(gmp, mpq_init)
+if test "ac_cv_lib_gmp_mpq_init" = yes && test "$with-apint" = smallgmp; then
+  LIBS=NEED_LIBS
+fi
 AC_CHECK_LIB(smallgmp, mpz_init)
 AC_CHECK_LIB(MP, IMP_PutGmpInt)
 AC_CHECK_LIB(MPT, MPT_GetTree)
@@ -253,7 +257,7 @@ if test "$with_apint" != buildin; then
   elif test "$with_apint" = smallgmp; then
     if test "$ac_smallgmp_ok" = yes; then
       ac_will_have_gmp=yes
-      ac_will have_smallgmp=yes
+      ac_will_have_smallgmp=yes
     elif test "$enable_smallgmp" = yes; then
       ac_will_have_gmp=yes
       ac_will_have_smallgmp=yes
@@ -373,7 +377,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
-AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h)
+AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h)
 
 dnl Check dbm
 WITH_DBM=no
@@ -515,12 +519,15 @@ if test ${GXX} = yes; then
   else
     CXXNOOPTFLAGS=$CXXFLAGS
   fi
+  STATIC_LDFLAGS="-Xlinker -Bstatic"
 else
   CXXTEMPFLAGS=""
   CXXNOOPTFLAGS=$CXXFLAGS
+  STATIC_LDFLAGS=""
 fi
 AC_SUBST(CXXTEMPLFLAGS)
 AC_SUBST(CXXNOOPTFLAGS)
+AC_SUBST(STATIC_LDFLAGS)
 
 if test ${GCC} = yes && test "$ac_cflags_set" = no ; then
   CFLAGS="-O3 -w -fomit-frame-pointer"

@@ -1,3 +1,12 @@
+Wed Oct  8 12:22:47 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* increased version number to 1.1.3
+
+	* ndbm.cc: Solaris compatibility: #define bcopy bzero, bcmp;
+		  #include <fcntl.h> 
+	* configure.in: added check for fcntl.h sys/types.h sys/stat.h, ucblib
+	  ensured that either lgmp or lsmallgmp is in $LIBS
+
 Tue Sep 16 15:45:44 MET DST 1997
         * hannes: changed/corrected/clean naNormalize, naLcm, pCleardenom, pContent
             (polys1.cc, longalg.cc)
