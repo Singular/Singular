@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.30 1999-06-08 07:50:58 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.31 1999-08-23 13:15:58 Singular Exp $ */
 
 /***************************************************************
  *
@@ -397,18 +397,23 @@ inline void __pCopyAddFastHomog(poly p1, poly p2, poly p3, Order_t Order)
 
 #if SIZEOF_EXPONENT == 1
 #define P_DIV_MASK 0x80808080
+#define EXPONENT_MAX     0x7f
 #else // SIZEOF_EXPONENT == 2
 #define P_DIV_MASK 0x80008000
+#define EXPONENT_MAX   0x7fff
 #endif
 
 #else // SIZEOF_LONG == 8
 
 #if SIZEOF_EXPONENT == 1
 #define P_DIV_MASK 0x8080808080808080
+#define EXPONENT_MAX             0x7f
 #elif  SIZEOF_EXPONENT == 2
 #define P_DIV_MASK 0x8000800080008000
+#define EXPONENT_MAX           0x7fff
 #else // SIZEOF_EXPONENT == 4
 #define P_DIV_MASK 0x8000000080000000
+#define EXPONENT_MAX       0x7fffffff
 #endif
 
 #endif

@@ -1,9 +1,9 @@
-// $Id: general.lib,v 1.16 1999-07-09 14:06:52 obachman Exp $
+// $Id: general.lib,v 1.17 1999-08-23 13:15:59 Singular Exp $
 //system("random",787422842);
 //GMG, last modified 18.6.99
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.16 1999-07-09 14:06:52 obachman Exp $";
+version="$Id: general.lib,v 1.17 1999-08-23 13:15:59 Singular Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -89,30 +89,24 @@ proc ASCII (list #)
 RETURN:   printable ASCII characters (no native language support)
           ASCII():    string of  all ASCII characters with its numbers,
                       no return value
-          ASCII(n):   string, n-th ASCII charakter
+          ASCII(n):   string, n-th ASCII character
           ASCII(n,m): list, n-th up to m-th ASCII character (inclusive)
 EXAMPLE: example ASCII; shows an example
 "
 {
   string s1 =
- "     !    \"    #    $    %    &    '    (    )    *    +    ,    -    .
+ "     !    \"    #    $       &    '    (    )    *    +    ,    -    .
 32   33   34   35   36   37   38   39   40   41   42   43   44   45   46
-
 /    0    1    2    3    4    5    6    7    8    9    :    ;    <    =
 47   48   49   50   51   52   53   54   55   56   57   58   59   60   61
-
 >    ?    @    A    B    C    D    E    F    G    H    I    J    K    L
 62   63   64   65   66   67   68   69   70   71   72   73   74   75   76
-
 M    N    O    P    Q    R    S    T    U    V    W    X    Y    Z    [
 77   78   79   80   81   82   83   84   85   86   87   88   89   90   91
-
 \\    ]    ^    _    `    a    b    c    d    e    f    g    h    i    j
 92   93   94   95   96   97   98   99  100  101  102  103  104  105  10
-
 k    l    m    n    o    p    q    r    s    t    u    v    w    x    y
 107  108  109  110  111  112  113  114  115  116  117  118  119  120  121
-
 z    {    |    }    ~
 122  123  124  125  126 ";
 
@@ -140,93 +134,233 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc binomial (def n, int k, list #)
+proc binomial (int n, int k, list #)
 "USAGE:   binomial(n,k[,p]); n,k,p integers
 RETURN:  binomial(n,k); binomial coefficient n choose k,
-         of type number if n is of type number (computed in char(basering)),
-         of type int if n is of type int (machine integer, limited size!)
-         binomial(n,k,p);  n choose k in char p, of type string
+         - of type string (computed in characteristic 0)
+         binomial(n,k,p); n choose k, computed in characteristic prime(p)
+         - of type number if a basering is present and prime(p)=char(basering)
+         - of type string else
+NOTE:    In any characteristic, binomial(n,k) = coefficient of x^k in (1+x)^n
 EXAMPLE: example binomial; shows an example
 "
 {
-   if ( size(#)==0 )
-   {
-      if ( typeof(n)=="number" ) { number rr=1; }
-      else { int rr=1; }
+   int str,p;
+//---------------------------- initialization -------------------------------
+   if ( size(#) == 0 )
+   {  str = 1;
+      ring bin = 0,x,dp;
+      number r=1;
    }
-   if ( typeof(#[1])=="int") { ring bin = #[1],x,dp; number rr=1; }
-   if ( size(#)==0 or typeof(#[1])=="int" )
+   if ( size(#) > 0 )
    {
-      def r = rr;
-      if ( k<=0 or k>n ) { return((k==0)*r); }
-      if ( k>n-k ) { k = n-k; }
-      int l;
-      for (l=1; l<=k; l=l+1 )
+      p = (#[1]!=0)*prime(#[1]);
+      if ( defined(basering) )
       {
-         r=r*(n+1-l)/l;
+         if ( p == char(basering) )
+         {  number r=1;
+         }
+         else
+         {  str = 1;
+            ring bin = p,x,dp;
+            number r=1;
+         }
       }
-      if ( typeof(#[1])=="int" ) { return(string(r)); }
-      return(r);
+      else
+      {  str = 1;
+         ring bin = p,x,dp;
+         number r=1;
+      }
    }
-}
+//-------------------------------- char 0 -----------------------------------
+   if ( p==0 )
+   {
+      r = binom0(n,k);
+   }
+//-------------------------------- char p -----------------------------------
+   else
+   {
+      r = binomp(n,k,p);
+   }
+//-------------------------------- return -----------------------------------
+   if ( str==1 ) { return(string(r)); }
+   else { return(r); }
+ }
 example
 { "EXAMPLE:"; echo = 2;
-   int b1 = binomial(10,7); b1;
-   binomial(137,17,0);
-   ring t = 0,x,dp;
-   number b2 = binomial(number(137),17); b2;
+   binomial(200,100);"";                   //type string, computed in char 0
+   binomial(200,100,3);"";                 //type string, computed in char 3
+   int n,k = 200,100;
+   ring r = 0,x,dp;
+   number b1 = binomial(n,k,0);            //type number, computed in ring r
+   poly b2 = coeffs((x+1)^n,x)[k+1,1];     //coefficient of x^k in (x+1)^n
+   b1-b2;                                  //b1 and b2 should coincide
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc factorial (def n)
-"USAGE:   factorial(n);  n = integer
-RETURN:  factorial(n); n! in char 0, of type string if n is of type int
-         n! of type number, computed in char(basering) if n is of type number
+static proc binom0 (int n, int k)
+ //computes binomial coefficient n choose k in basering, assume 0<k<=n
+ //and char(basering) = 0 or n < char(basering)
+{
+   int l;
+   number r=1;
+   if ( k > n-k )
+   { k = n-k;
+   }
+   if ( k<=0 or k>n )               //trivial cases
+   { r = (k==0)*r;
+   }
+   for (l=1; l<=k; l++ )
+   {
+      r=r*(n+1-l)/l;
+   }
+   return(r);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc binomp (int n, int k, int p)
+ //computes binomial coefficient n choose k in basering of char p > 0
+ //binomial(n,k) = coefficient of x^k in (1+x)^n.
+ //Let n=q*p^j, gcd(q,p)=1, then (1+x)^n = (1 + x^(p^j))^q. We have
+ //binomial(n,k)=0 if k!=l*p^j and binomial(n,l*p^j) = binomial(q,l).
+ //Do this reduction first. Then, in denominator and numerator
+ //of defining formula for binomial coefficient, reduce those factors
+ //mod p which are not divisible by p and cancel common factors p. Hence,
+ //if n = h*p+r, k=l*p+s, r,s<p, binomial(n,k) = binomial(r,s)*binomial(h,l)
+{
+   int l,q,i= 1,n,1;
+   number r=1;
+   if ( k > n-k )
+   { k = n-k;
+   }
+   if ( k<=0 or k>n)               //trivial cases
+   { r = (k==0)*r;
+   }
+   else
+   {
+      while ( q mod p == 0 )
+      {  l = l*p;
+         q = q div p;
+      }                            //we have now n=q*l, l=p^j, gcd(q,p)=1;
+      if (k mod l != 0 )
+      { r = 0;
+      }
+      else
+      {  l = k div l;
+         n = q mod p;
+         k = l mod p;              //now 0<= k,n <p, use binom0 for n,k
+         q = q div p;              //recursion for q,l
+         l = l div p;              //use binomp for q,l
+         r = binom0(n,k)*binomp(q,l,p);
+      }
+   }
+   return(r);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc factorial (int n, list #)
+"USAGE:   factorial(n[,p]);  n,p integers
+RETURN:  factorial(n):   n! (computed in characteristic 0), of type string
+         factorial(n,p): n! computed in characteristic prime(p)
+         - of type number if a basering is present and prime(p)=char(basering)
+         - of type string else
 EXAMPLE: example factorial; shows an example
 "
-{
-   int t,l;
-   if ( typeof(n)=="number" ) { number r=1; }
-   else { ring R = 0,x,dp; number r=1; t=1; }
-   for (l=2; l<=n; l=l+1)
+{   int str,l,p;
+//---------------------------- initialization -------------------------------
+   if ( size(#) == 0 )
+   {  str = 1;
+      ring bin = 0,x,dp;
+      number r=1;
+   }
+   if ( size(#) > 0 )
+   {
+      p = (#[1]!=0)*prime(#[1]);
+      if ( defined(basering) )
+      {
+         if ( p == char(basering) )
+         {  number r=1;
+         }
+         else
+         {  str = 1;
+            ring bin = p,x,dp;
+            number r=1;
+         }
+      }
+      else
+      {  str = 1;
+         ring bin = p,x,dp;
+         number r=1;
+      }
+   }
+//------------------------------ computation --------------------------------
+   for (l=2; l<=n; l++)
    {
       r=r*l;
    }
-   if ( t==1 ) { return(string(r)); }
-   return(r);
+   if ( str==1 ) { return(string(r)); }
+   else { return(r); }
 }
 example
 { "EXAMPLE:"; echo = 2;
-   factorial(37);
-   ring r1 = 32003,(x,y,z),ds;
-   number p = factorial(number(37)); p;
+   factorial(37);"";                   //37! of type string (as long integer)
+   ring r1 = 0,x,dp;
+   number p = factorial(37,0);         //37! of type number, computed in r
+   p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc fibonacci (def n)
-"USAGE:   fibonacci(n);  (n integer)
-RETURN:  fibonacci(n); nth Fibonacci number,
-            f(0)=f(1)=1, f(i+1)=f(i-1)+f(i)
-         of type string if n is of type int
+proc fibonacci (int n, list #)
+"USAGE:   fibonacci(n);  n,p integers
+RETURN:  fibonacci(n): nth Fibonacci number, f(0)=f(1)=1, f(i+1)=f(i-1)+f(i)
+         - computed in characteristic 0, of type string
          of type number computed in char(basering) if n is of type number
+         fibonacci(n,p): f(n) computed in characteristic prime(p)
+         - of type number if a basering is present and prime(p)=char(basering)
+         - of type string else
 EXAMPLE: example fibonacci; shows an example
 "
-{
-   int ii,t;
-   if ( typeof(n)=="number" ) { number f,g,h=1,1,1; }
-   else { ring fibo = 0,x,dp; number f,g,h=1,1,1; t=1; }
+{   int str,ii,p;
+//---------------------------- initialization -------------------------------
+   if ( size(#) == 0 )
+   {  str = 1;
+      ring bin = 0,x,dp;
+      number f,g,h=1,1,1;
+   }
+   if ( size(#) > 0 )
+   {
+      p = (#[1]!=0)*prime(#[1]);
+      if ( defined(basering) )
+      {
+         if ( p == char(basering) )
+         {  number f,g,h=1,1,1;
+         }
+         else
+         {  str = 1;
+            ring bin = p,x,dp;
+            number f,g,h=1,1,1;
+         }
+      }
+      else
+      {  str = 1;
+         ring bin = p,x,dp;
+         number f,g,h=1,1,1;
+      }
+   }
+//------------------------------ computation --------------------------------
    for (ii=3; ii<=n; ii=ii+1)
    {
       h = f+g; f = g; g = h;
     }
-   if ( t==1 ) { return(string(h)); }
-   return(h);
+   if ( str==1 ) { return(string(h)); }
+   else { return(h); }
 }
 example
 { "EXAMPLE:"; echo = 2;
-   fibonacci(37);
+   fibonacci(333); "";              //f(333) of type string (as long integer)
    ring r = 17,x,dp;
-   number b = fibonacci(number(37)); b;
+   number b = fibonacci(333,17);    //f(333) of type number, computed in r
+   b;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -275,9 +409,10 @@ proc killall
          killall(\"type_name\");
          killall(\"not\", \"type_name\");
 COMPUTE: killall(); kills all user-defined variables but not loaded procedures
-         killall(\"type_name\"); kills all user-defined variables, of type \"type_name\"
-         killall(\"not\", \"type_name\"); kills all user-defined
-         variables, except those of type \"type_name\" and except loaded procedures
+         killall(\"type_name\"); kills all user-defined variables,
+         of type \"type_name\"
+         killall(\"not\", \"type_name\"); kills all user-defined variables,
+         except those of type \"type_name\" and except loaded procedures
 RETURN:  no return value
 NOTE:    killall should never be used inside a procedure
 EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
@@ -323,15 +458,15 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring rtest; ideal i=x,y,z; number n=37; string str="hi"; int j = 3;
-   export rtest,i,n,str,j;     //this makes the local variables global
-   listvar(all);
-   killall("string"); // kills all string variables
-   listvar(all);
-   killall("not", "int"); // kills all variables except int's (and procs)
-   listvar(all);
-   killall(); // kills all vars except loaded procs
-   listvar(all);
+   ring rtest; ideal i=x,y,z; string str="hi"; int j = 3;
+   export rtest,i,str,j;       //this makes the local variables global
+   listvar();
+   killall("ring");            // kills all rings
+   listvar();
+   killall("not", "int");      // kills all variables except int's (and procs)
+   listvar();
+   killall();                  // kills all vars except loaded procs
+   listvar();
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -340,8 +475,8 @@ proc number_e (int n)
 COMPUTE: Euler number e=exp(1) up to n decimal digits (no rounding)
          by A.H.J. Sale's algorithm
 RETURN:  - string of exp(1) if no basering of char 0 is defined;
-         - exp(1), of type number, if a basering of char 0 is defined and
-         display its decimal format
+         - exp(1), type number, if a basering of char 0 is defined, display its
+         decimal format if printlevel >= voice (default:printlevel=voice-1 )
 EXAMPLE: example number_e; shows an example
 "
 {
@@ -365,14 +500,17 @@ EXAMPLE: example number_e; shows an example
       result = result+string(u[1]);
       if( t==1 ) { r = r+number(u[1])/number(10)^i; }
    }
-   if( t==1 ) { "//",result[1,n+1]; return(r); }
+   if( t==1 )
+   { dbprint(printlevel-voice+2,"// "+result[1,n+1]);
+     return(r);
+   }
    return(result[1,n+1]);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   number_e(15);
+   number_e(30);"";
    ring R = 0,t,lp;
-   number e = number_e(10);
+   number e = number_e(30);
    e;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -382,8 +520,8 @@ proc number_pi (int n)
 COMPUTE: pi (area of unit circle) up to n decimal digits (no rounding)
          by algorithm of S. Rabinowitz
 RETURN:  - string of pi if no basering of char 0 is defined,
-         - pi, of type number, if a basering of char 0 is defined and display
-         its decimal format
+         - pi, of type number, if a basering of char 0 is defined, display its
+         decimal format if printlevel >= voice (default:printlevel=voice-1 )
 EXAMPLE: example number_pi; shows an example
 "
 {
@@ -436,15 +574,17 @@ EXAMPLE: example number_pi; shows an example
    }
    result = result,prelim[1];
    result = "3."+result[2,n-1];
-   if( t==1 ) { "//",result; return(pi); }
+   if( t==1 )
+   { dbprint(printlevel-voice+2,"// "+result);
+     return(pi);
+   }
    return(result);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   number_pi(5);
-   ring r = 0,t,lp;
-   number pi = number_pi(6);
-   pi;
+   number_pi(11);"";
+   ring r = (real,10),t,dp;
+   number pi = number_pi(11); pi;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -464,45 +604,78 @@ EXAMPLE: example primes; shows an example
 }
 example
 {  "EXAMPLE:"; echo = 2;
-   primes(50,100);
-   intvec v = primes(37,1); v;
+    primes(50,100);"";
+    intvec v = primes(37,1); v;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc product (id, list #)
-"USAGE:    product(id[,v]); id=ideal/vector/module/matrix
-          resp.id=intvec/intmat, v=intvec (e.g. v=1..n, n=integer)
-RETURN:   poly resp. int which is the product of all entries of id, with index
-          given by v (default: v=1..number of entries of id)
-NOTE:     id is treated as a list of polys resp. integers. A module m is
+"USAGE:    product(id[,v]); id ideal/vector/module/matrix/intvec/intmat/list,
+          v intvec  (default: v=1.. number of entries of id)
+RETURN:   - if id is not a list: poly resp. int, the product of all entries of
+          id with index given by v.
+          id is treated as a list of polys resp. integers. A module m is
           identified with corresponding matrix M (columns of M generate m)
+          - if id is a list: product of list entries, with index given by v.
+          Assume that list members can be multiplied
 EXAMPLE:  example product; shows an example
 "
 {
-   int n,j;
-   if( typeof(id)=="poly" or typeof(id)=="ideal" or typeof(id)=="vector"
-       or typeof(id)=="module" or typeof(id)=="matrix" )
+   int n,j,tt;
+   string ty;
+   list l;
+   int s = size(#);
+   if( s!=0 )
+   {  if ( typeof(#[s])=="intvec" )
+      {  intvec v = #[s];
+         tt=1; s=s-1;
+         if ( s>0 ) { # = #[1..s]; }
+      }
+   }
+   if ( s>0 )
+   {
+     l = list(id)+#;
+     kill id;
+     list id = l;
+     ty = "list";
+   }
+   else
+   { ty = typeof(id);
+   }
+   if( ty=="list" )
+   { n = size(id);
+     def f(1) = id[1];
+     for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)*id[j]; }
+     return(f(n));
+   }
+   if( ty=="poly" or ty=="ideal" or ty=="vector"
+       or ty=="module" or ty=="matrix" )
    {
       ideal i = ideal(matrix(id));
-      if( size(#)!=0 ) { i = i[#[1]]; }
-      n = ncols(i); poly f=1;
+      kill id;
+      ideal id = i;
+      if( tt!=0 ) { id = id[v]; }
+      n = ncols(id); poly f(1)=id[1];
    }
-   if( typeof(id)=="int" or typeof(id)=="intvec" or typeof(id)=="intmat" )
+   if( ty=="int" or ty=="intvec" or ty=="intmat" )
    {
-      if ( typeof(id) == "int" ) { intmat S =id; }
+      if ( ty == "int" ) { intmat S =id; }
       else { intmat S = intmat(id); }
       intvec i = S[1..nrows(S),1..ncols(S)];
-      if( size(#)!=0 ) { i = i[#[1]]; }
-      n = size(i); int f=1;
+      kill id;
+      intvec id = i;
+      if( tt!=0 ) { id = id[v]; }
+      n = size(id); int f(1)=id[1];
    }
-   for( j=1; j<=n; j=j+1 ) { f=f*i[j]; }
-   return(f);
+   for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)*id[j]; }
+   return(f(n));
 }
 example
 {  "EXAMPLE:"; echo = 2;
    ring r= 0,(x,y,z),dp;
    ideal m = maxideal(1);
    product(m);
+   product(m[2..3]);
    matrix M[2][3] = 1,x,2,y,3,z;
    product(M);
    intvec v=2,4,6;
@@ -576,8 +749,7 @@ NOTE:    If v is given id may be any simply indexed object (e.g. any list or
          Zero generators of ideal/module are deleted
 EXAMPLE: example sort; shows an example
 "
-{
-   int ii,jj,s,n = 0,0,1,0;
+{  int ii,jj,s,n = 0,0,1,0;
    intvec v;
    if ( defined(basering) ) { def P = basering; }
    if ( size(#)==0 and (typeof(id)=="ideal" or typeof(id)=="module") )
@@ -658,19 +830,14 @@ EXAMPLE: example sort; shows an example
 }
 example
 {  "EXAMPLE:"; echo = 2;
-   ring r0 = 0,(x,y,z),lp;
-   ideal i = x3,y3,z3,x2z,x2y,y2z,y2x,z2y,z2x,xyz;
-   show(sort(i));"";
-   show(sort(i,"wp(1,2,3)"));"";
-   intvec v=10..1;
-   show(sort(i,v));"";
-   show(sort(i,v,1));"";   // should be the identity
-   ring r1  = 0,t,ls;
-   ideal j = t14,t6,t28,t20,t12,t34,t26,t18,t40,t32,t24,t38,t30,t36;
-   show(sort(j)[1]);"";
-   show(sort(j,"lp")[1]);"";
-   list L =1,5..8,10,2,8..5,8,3..10;
-   sort(L)[1];"";          // sort L lexicographically
+   ring r0 = 0,(x,y,z,t),lp;
+   ideal i = x3,z3,xyz;
+   sort(i);                // sort w.r.t. lex ordering
+   sort(i,3..1);
+   sort(i,"ls")[1];        // sort w.r.t. negative lex ordering
+   pause ("press return key to continue");
+   list L =1,8..5,3..10;
+   sort(L)[1];             // sort L lexicographically
    sort(L,"Dp",1)[1];      // sort L w.r.t (total sum, reverse lex)
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -702,22 +869,18 @@ EXAMPLE:  example sum; shows an example
    }
    intvec v; v[ncols(Z)]=0; v=v+1;
    return((Z*v)[1,1]);
-}
+ }
 example
 {  "EXAMPLE:"; echo = 2;
    ring r= 0,(x,y,z),dp;
    vector pv = [xy,xz,yz,x2,y2,z2];
    sum(pv);
-   //sum(pv,2..5);
-   //matrix M[2][3] = 1,x,2,y,3,z;
-   //sum(M);
-   //intvec w=2,4,6;
-   //sum(M,w);
-   //intvec iv = 1,2,3,4,5,6,7,8,9;
-   //w=1..5,7,9;
-   //sum(iv,w);
-   //intmat m[2][3] = 1,1,1,2,2,2;
-   //sum(m,3..4);
+   sum(pv,2..5);
+   matrix M[2][3] = 1,x,2,y,3,z;
+   intvec w=2,4,6;
+   sum(M,w);
+   intvec iv = 1,2,3,4,5,6,7,8,9;
+   sum(iv,2..4);
 }
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.24 1999-08-13 17:12:21 Singular Exp $ */
+/* $Id: polys1.cc,v 1.25 1999-08-23 13:15:58 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -426,6 +426,11 @@ poly pPower(poly p, int i)
 
   if(p!=NULL)
   {
+    if (i > EXPONENT_MAX)
+    {
+      Werror("exponent is too large, max. is %d",EXPONENT_MAX);
+      return NULL;
+    }
     switch (i)
     {
       case 0:
