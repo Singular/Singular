@@ -4,7 +4,7 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocPrivate.h,v 1.6 2001-04-30 09:02:01 Singular Exp $
+ *  Version: $Id: omAllocPrivate.h,v 1.7 2003-06-20 16:40:58 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_PRIVATE_H
 #define OM_ALLOC_PRIVATE_H
@@ -63,13 +63,13 @@ extern  omBin       om_Size2Bin[];
  *
  *******************************************************************/
 #define omGetTopBinOfPage(page) \
-  ((omBin) ( ((unsigned long) ((page)->bin_sticky)) & ~(SIZEOF_VOIDP - 1)))
+  ((omBin) ( ((unsigned long) ((page)->bin_sticky)) & ~((unsigned long)SIZEOF_VOIDP - 1)))
 #define omGetStickyOfPage(page) \
-  (((unsigned long) ((page)->bin_sticky)) & (SIZEOF_VOIDP-1))
+  (((unsigned long) ((page)->bin_sticky)) & ((unsigned long)SIZEOF_VOIDP-1))
 #define omSetTopBinOfPage(page, bin) \
   (page)->bin_sticky= (void*)((unsigned long)bin + omGetStickyOfPage(page))
 #define omSetStickyOfPage(page, sticky) \
-  (page)->bin_sticky = (void*)(((unsigned long)sticky & (SIZEOF_VOIDP-1)) + \
+  (page)->bin_sticky = (void*)(((unsigned long)sticky & ((unsigned long)SIZEOF_VOIDP-1)) + \
                                 (unsigned long)omGetTopBinOfPage(page))
 #define omSetTopBinAndStickyOfPage(page, bin, sticky) \
   (page)->bin_sticky= (void*)(((unsigned long)sticky & (SIZEOF_VOIDP-1)) \
