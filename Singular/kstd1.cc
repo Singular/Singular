@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.18 1998-04-06 17:59:29 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.19 1998-04-07 17:54:20 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1225,11 +1225,13 @@ void enterSMora (LObject p,int atS,kStrategy strat)
   if (strat->sl == IDELEMS(strat->Shdl)-1)
   {
     pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
-    strat->ecartS = (intset) ReAlloc(strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int),
+    strat->ecartS = (intset) ReAlloc(strat->ecartS,
+                                     IDELEMS(strat->Shdl)*sizeof(int),
                                      (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
     if (strat->fromQ)
     {
-      strat->fromQ = (intset)ReAlloc(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int),
+      strat->fromQ = (intset)ReAlloc(strat->fromQ,
+                                    IDELEMS(strat->Shdl)*sizeof(int),
                                     (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
     }
     IDELEMS(strat->Shdl) += setmax;
@@ -1309,8 +1311,9 @@ void enterSMoraNF (LObject p, int atS,kStrategy strat)
   if (strat->sl == IDELEMS(strat->Shdl)-1)
   {
     pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
-    strat->ecartS = (intset) ReAlloc(strat->ecartS,IDELEMS(strat->Shdl)*sizeof(intset),
-                                     (IDELEMS(strat->Shdl)+setmax)*sizeof(intset));
+    strat->ecartS=(intset)ReAlloc(strat->ecartS,
+                                  IDELEMS(strat->Shdl)*sizeof(intset),
+                                  (IDELEMS(strat->Shdl)+setmax)*sizeof(intset));
     IDELEMS(strat->Shdl) += setmax;
     strat->Shdl->m=strat->S;
   }
@@ -1335,7 +1338,7 @@ void initMora(ideal F,kStrategy strat)
   idhdl h;
 
   strat->NotUsedAxis = (BOOLEAN *)Alloc((pVariables+1)*sizeof(BOOLEAN));
-  for (j=1; j<=pVariables; j++) strat->NotUsedAxis[j] = TRUE;
+  for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
   strat->enterS = enterSMora;
   strat->initEcartPair = initEcartPairMora; /*- ecart approximation -*/
   strat->posInLOld = strat->posInL;
@@ -2203,7 +2206,7 @@ ideal kInterRed (ideal F, ideal Q)
   spSet(currRing);
   initBuchMoraCrit(strat);
   strat->NotUsedAxis = (BOOLEAN *)Alloc((pVariables+1)*sizeof(BOOLEAN));
-  for (j=1; j<=pVariables; j++) strat->NotUsedAxis[j] = TRUE;
+  for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
   strat->enterS      = enterSBba;
   strat->posInT      = posInT0;
   strat->initEcart   = initEcartNormal;
