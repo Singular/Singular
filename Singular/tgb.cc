@@ -35,7 +35,7 @@ static inline poly pOne_Special(const ring r=currRing)
 // erste Variante: Laenge: Anzahl der Monome
 inline int pSLength(poly p, int l) {
   return l; }
-inline int kSBucketLength(kBucket* bucket) {return bucket_guess(bucket);}
+inline int kSBucketLength(kBucket* bucket, poly lm) {return bucket_guess(bucket);}
 #endif
 
 #ifdef LEN_VAR2
@@ -106,6 +106,93 @@ int kSBucketLength(kBucket* b)
   return s*c;
 }
 #endif
+static int do_pELength(poly p, calc_dat* c, int dlm=-1){
+  if(p==NULL) return 0;
+  int s=0;
+  poly pi=p;
+  if(dlm<0){
+    dlm=pTotaldegree(p,c->r);
+    s=1;
+    pi=p->next;
+  }
+  
+  while(pi){
+    int d=pTotaldegree(pi,c->r);
+    if(d>dlm)
+      s+=1+d-dlm;
+    else
+      ++s;
+    pi=pi->next;
+  }
+  return s;
+}
+int kEBucketLength(kBucket* b, poly lm,calc_dat* ca)
+{
+  int s=0;
+  if(lm==NULL){
+    lm=kBucketGetLm(b);
+  }
+  if(lm==NULL) return 0;
+  int d=pTotaldegree(lm,ca->r);
+  int i;
+  for (i=b->buckets_used;i>=0;i--)
+  {
+    if(b->buckets[i]==NULL) continue;
+    s+=do_pELength(b->buckets[i],ca,d);
+  }
+  return s;
+}
+
+static inline int pELength(poly p, calc_dat* c,int l){
+  if (p==NULL) return 0;
+  return do_pELength(p,c);
+}
+// static int quality(poly p, int len, calc_dat* c){
+//   if (c->is_char0) return pSLength(p,len);
+//   return pLength(p);
+// }
+static inline int pQuality(poly p, calc_dat* c, int l=-1){
+  
+  if(l<0)
+    l=pLength(p);
+  if(c->is_char0) return pSLength(p,l);
+  if((pLexOrder) &&(!c->is_homog)) return pELength(p,c,l);
+  return l;
+}
+
+
+int red_object::guess_quality(calc_dat* c){
+    //works at the moment only for lenvar 1, because in different
+    //case, you have to look on coefs
+    int s=0;
+    if (c->is_char0)
+      s=kSBucketLength(bucket,this->p);
+    else 
+    {
+      if((pLexOrder) &&(!c->is_homog)) 
+	s=kEBucketLength(this->bucket,this->p,c);
+      else s=bucket_guess(bucket);
+    }
+    if (sum!=NULL){
+      if (c->is_char0)
+	s+=kSBucketLength(sum->ac->bucket);
+      else
+      {
+	if((pLexOrder) &&(!c->is_homog)) 
+	  s=kEBucketLength(sum->ac->bucket,this->p,c);
+	else
+	  s+=bucket_guess(sum->ac->bucket);
+      }
+    }
+    return s;
+}
+// static int guess_quality(const red_object & p, calc_dat* c){
+//   //looks only on bucket
+//   if (c->is_char0) return kSBucketLength(p.bucket,p.p);
+//   if((pLexOrder) &&(!c->is_homog)) return kEBucketLength(p.bucket,p.p,c);
+//   return (bucket_guess(p.bucket));
+// }
+
 static void finalize_reduction_step(reduction_step* r){
   delete r;
 }
@@ -518,11 +605,11 @@ static int add_to_reductors(calc_dat* c, poly h, int len){
   assume(lenS_correct(c->strat));
  
   int i;
-  if (c->is_char0)
-       i=simple_posInS(c->strat,h,pSLength(h,len),c->is_char0);
-  else
-    i=simple_posInS(c->strat,h,len,c->is_char0);
-  
+//   if (c->is_char0)
+//        i=simple_posInS(c->strat,h,pSLength(h,len),c->is_char0);
+//   else
+//     i=simple_posInS(c->strat,h,len,c->is_char0);
+
   LObject P; memset(&P,0,sizeof(P));
   P.tailRing=c->r;
   P.p=h; /*p_Copy(h,c->r);*/
@@ -536,7 +623,8 @@ static int add_to_reductors(calc_dat* c, poly h, int len){
   else                     
     pNorm(P.p);
   pNormalize(P.p);
-
+  int pq=pQuality(h,c,len);
+  i=simple_posInS(c->strat,h,pq);
   c->strat->enterS(P,i,c->strat);
  
  
@@ -544,7 +632,7 @@ static int add_to_reductors(calc_dat* c, poly h, int len){
   c->strat->lenS[i]=len;
  
   if(c->strat->lenSw)
-    c->strat->lenSw[i]=pSLength(P.p,len);
+    c->strat->lenSw[i]=pq;
   return i;
  
 }
@@ -573,7 +661,7 @@ static sorted_pair_node* find_next_pair2(calc_dat* c, BOOLEAN go_higher){
   return s;
 }
 
-static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat, BOOLEAN is_char0)
+static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
 {
   assume(old_pos>=new_pos);
   poly p=strat->S[old_pos];
@@ -582,7 +670,7 @@ static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat, BOOLEAN 
   int s_2_r=strat->S_2_R[old_pos];
   int length=strat->lenS[old_pos];
   int length_w;
-  if(is_char0)
+  if(strat->lenSw)
     length_w=strat->lenSw[old_pos];
   int i;
   for (i=old_pos; i>new_pos; i--)
@@ -604,7 +692,7 @@ static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat, BOOLEAN 
   strat->sevS[new_pos]=sev;
   strat->S_2_R[new_pos]=s_2_r;
   strat->lenS[new_pos]=length;
-  if(is_char0)
+  if(strat->lenSw)
     strat->lenSw[new_pos]=length_w;
   //assume(lenS_correct(strat));
 }
@@ -855,14 +943,14 @@ static inline poly p_MoveHead(poly p, omBin b)
 
 
 //len should be weighted length in char 0
-static int simple_posInS (kStrategy strat, poly p,int len, BOOLEAN is_char0)
+static int simple_posInS (kStrategy strat, poly p,int len)
 {
 
 
   if(strat->sl==-1) return 0;
   polyset set=strat->S;
   intset setL=strat->lenS;
-  if (is_char0) setL=strat->lenSw;
+  if (strat->lenSw) setL=strat->lenSw;
   int length=strat->sl;
   int i;
   int an = 0;
@@ -1865,10 +1953,10 @@ static void go_on (calc_dat* c){
 	qal=c->strat->lenSw[z2];
       else
 	qal=c->strat->lenS[z2];
-      int new_pos=simple_posInS(c->strat,c->strat->S[z2],qal,c->is_char0);
+      int new_pos=simple_posInS(c->strat,c->strat->S[z2],qal);
       if (new_pos<z2)
       { 
-	move_forward_in_S(z2,new_pos,c->strat,c->is_char0);
+	move_forward_in_S(z2,new_pos,c->strat);
       }
     }
   }
@@ -3778,7 +3866,13 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   c->to_destroy=NULL;
   c->easy_product_crit=0;
   c->extended_product_crit=0;
-  c->is_char0=(rChar()==0);
+  if (rField_is_Zp(c->r))
+    c->is_char0=FALSE;
+  else
+    c->is_char0=TRUE;
+  //not fully correct
+
+//(rChar()==0);
   c->F4_mode=F4_mode;
   c->reduction_steps=0;
   c->last_index=-1;
@@ -3844,7 +3938,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   c->strat->Shdl=idInit(1,1);
   c->strat->S=c->strat->Shdl->m;
   c->strat->lenS=(int*)omAlloc0(i*sizeof(int));
-  if(c->is_char0)
+  if((c->is_char0)||((pLexOrder) &&(!c->is_homog)))
     c->strat->lenSw=(int*)omAlloc0(i*sizeof(int));
   else
     c->strat->lenSw=NULL;
@@ -4122,8 +4216,8 @@ static void shorten_tails(calc_dat* c, poly monom)
     {
       int new_pos;
       int q;
-      q=quality(c->S->m[i],c->lengths[i],c);
-      new_pos=simple_posInS(c->strat,c->S->m[i],q,c->is_char0);
+      q=pQuality(c->S->m[i],c,c->lengths[i]);
+      new_pos=simple_posInS(c->strat,c->S->m[i],q);
 
       int old_pos=-1;
       //assume new_pos<old_pos
@@ -4152,7 +4246,7 @@ static void shorten_tails(calc_dat* c, poly monom)
         c->strat->lenSw[old_pos]=q;
 
       if (new_pos<old_pos)
-        move_forward_in_S(old_pos,new_pos,c->strat, c->is_char0);
+        move_forward_in_S(old_pos,new_pos,c->strat);
 
       length_one_crit(c,i,c->lengths[i]);
     }
@@ -4364,23 +4458,12 @@ static poly kBucketGcd(kBucket* b, ring r)
 
 
 
-static int guess_quality(const red_object & p, calc_dat* c){
-  //looks only on bucket
-  if (c->is_char0) return kSBucketLength(p.bucket,p.p);
-  return (bucket_guess(p.bucket));
-}
-static int pQuality(poly p, calc_dat* c){
-  if(c->is_char0) return pSLength(p,pLength(p));
-  return pLength(p);
-}
-static int quality_of_pos_in_strat_S(int pos, calc_dat* c){
-  if (c->is_char0) return c->strat->lenSw[pos];
+
+static inline int quality_of_pos_in_strat_S(int pos, calc_dat* c){
+  if (c->strat->lenSw!=NULL) return c->strat->lenSw[pos];
   return c->strat->lenS[pos];
 }
-static int quality(poly p, int len, calc_dat* c){
-  if (c->is_char0) return pSLength(p,len);
-  return pLength(p);
-}
+
 static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find_erg & erg){
   erg.expand=NULL;
   BOOLEAN swap_roles; //from reduce_by, to_reduce_u if fromS
@@ -4543,11 +4626,11 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     int old_length=c->strat->lenS[j];// in view of S
     los[bp].p=p;
     kBucketInit(los[bp].bucket,p,old_length);
-    int qal=quality(clear_into,new_length,c);
+    int qal=pQuality(clear_into,c,new_length);
     int pos_in_c=-1;    
     int z;
     int new_pos;
-    new_pos=simple_posInS(c->strat,clear_into,qal,c->is_char0);
+    new_pos=simple_posInS(c->strat,clear_into,qal);
     assume(new_pos<=j);
     for (z=c->n;z;z--)
     {
@@ -4583,7 +4666,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     
     if (new_pos<j)
     { 
-      move_forward_in_S(j,new_pos,c->strat,c->is_char0);
+      move_forward_in_S(j,new_pos,c->strat);
       erg.reduce_by=new_pos;
     }
 #endif
@@ -4976,22 +5059,7 @@ void red_object::adjust_coefs(number c_r, number c_ac_r){
   
 
 }
-int red_object::guess_quality(calc_dat* c){
-    //works at the moment only for lenvar 1, because in different
-    //case, you have to look on coefs
-    int s=0;
-    if (c->is_char0)
-      s=kSBucketLength(bucket);
-    else 
-      s=bucket_guess(bucket);
-    if (sum!=NULL){
-      if (c->is_char0)
-      s+=kSBucketLength(sum->ac->bucket);
-    else 
-      s+=bucket_guess(sum->ac->bucket);
-    }
-    return s;
-}
+
 void reduction_step::reduce(red_object* r, int l, int u){}
 void simple_reducer::target_is_no_sum_reduce(red_object & ro){
   kBucketPolyRed(ro.bucket,p,

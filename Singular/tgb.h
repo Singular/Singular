@@ -255,7 +255,7 @@ static int* make_connections(int from, int to, poly bound, calc_dat* c);
 static void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 static void soon_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 static int pLcmDeg(poly a, poly b);
-static int simple_posInS (kStrategy strat, poly p,int len, BOOLEAN is_char0);
+static int simple_posInS (kStrategy strat, poly p,int len);
 static BOOLEAN find_next_pair(calc_dat* c, BOOLEAN go_higher=TRUE);
 
 static sorted_pair_node* pop_pair(calc_dat* c);
@@ -272,7 +272,7 @@ static poly kBucketGcd(kBucket* b, ring r);
 static void multi_reduction(red_object* los, int & losl, calc_dat* c);
 static sorted_pair_node* quick_pop_pair(calc_dat* c);
 static sorted_pair_node* top_pair(calc_dat* c);
-static int quality(poly p, int len, calc_dat* c);
+//static int quality(poly p, int len, calc_dat* c);
 /**
    makes on each red_object in a region a single_step
  **/
