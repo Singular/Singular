@@ -564,7 +564,6 @@ dnl
 AC_CHECK_HEADERS(termcap.h)
 AC_CHECK_HEADERS(termios.h)
 AC_CHECK_HEADERS(term.h)
-AC_CHECK_HEADERS(sys/termbits.h)
 
 # readline
 if test "$with_readline" != no; then
