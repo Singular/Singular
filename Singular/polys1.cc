@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.48 2000-10-19 15:00:20 obachman Exp $ */
+/* $Id: polys1.cc,v 1.49 2000-10-19 15:26:24 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -979,7 +979,6 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
         nNormalize(n);
         pGetCoeff(qq)=n;
       }
-      pTest(qq);
     }
     pIter(p);
 #if 1
@@ -1277,7 +1276,7 @@ BOOLEAN pComparePolys(poly p1,poly p2)
   number n,nn;
   int i;
   pAssume(p1 != NULL && p2 != NULL);
-  
+
   if (!pLmEqual(p1,p2)) //compare leading mons
       return FALSE;
   if ((pNext(p1)==NULL) && (pNext(p2)!=NULL))
