@@ -32,7 +32,7 @@ void spSpolyLoop_General
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                        // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = nNeg(nCopy(tm)), // - (coefficient of monom)
@@ -41,6 +41,7 @@ void spSpolyLoop_General
   
   if (a2==NULL) goto Finish; // we are done if a2 is 0
 
+  b = pNew();
   pCopyAddFast0(b, a1, monom);  // now a2 != NULL -- set up b
 
   // MAIN LOOP:
@@ -65,7 +66,7 @@ void spSpolyLoop_General
     }
     nDelete(&tb);
     pIter(a1);
-    if (a2 == NULL || a1 == NULL) goto Finish; // are we done ?
+    if (a1 == NULL || a2 == NULL) goto Finish; // are we done ?
     pCopyAddFast0(b, a1, monom); // No! So, get new b = a1*monom
     goto Top;
 
@@ -82,8 +83,12 @@ void spSpolyLoop_General
       pSetCoeff0(b,nMult(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL) // are we done?
+      {
+        b = NULL;
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -94,7 +99,7 @@ void spSpolyLoop_General
    else  // append (- a1*monom) to result 
      spGMultCopyX(a1, monom, a, tneg, spNoether);
    nDelete(&tneg);
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 
 

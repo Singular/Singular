@@ -6,7 +6,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwEVEN
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -14,6 +14,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwEVEN
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -66,8 +67,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwEVEN
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -79,13 +84,13 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwEVEN
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwODD
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -93,6 +98,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwODD
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -145,8 +151,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwODD
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -158,13 +168,13 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwODD
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwONE
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -172,6 +182,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwONE
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -224,8 +235,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwONE
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -237,13 +252,13 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwONE
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwTWO
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -251,6 +266,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwTWO
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -303,8 +319,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwTWO
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -316,13 +336,13 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwTWO
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -330,6 +350,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -380,8 +401,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -393,13 +418,13 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -407,6 +432,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -457,8 +483,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -470,13 +500,13 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -484,6 +514,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -534,8 +565,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -547,13 +582,13 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -561,6 +596,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -611,8 +647,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -624,13 +664,13 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwEVEN
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -638,6 +678,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwEVEN
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -688,8 +729,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwEVEN
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -701,13 +746,13 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwEVEN
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwODD
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -715,6 +760,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwODD
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -765,8 +811,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwODD
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -778,13 +828,13 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwODD
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwONE
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -792,6 +842,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwONE
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -842,8 +893,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwONE
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -855,13 +910,13 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwONE
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwTWO
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -869,6 +924,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwTWO
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -919,8 +975,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwTWO
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -932,13 +992,13 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwTWO
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -946,6 +1006,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -994,8 +1055,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1007,13 +1072,13 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1021,6 +1086,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -1069,8 +1135,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1082,13 +1152,13 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1096,6 +1166,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -1144,8 +1215,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1157,13 +1232,13 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1171,6 +1246,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -1219,8 +1295,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1232,13 +1312,13 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXP_homGEN_nwEVEN
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1246,6 +1326,7 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwEVEN
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -1296,8 +1377,12 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwEVEN
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1309,13 +1394,13 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwEVEN
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXP_homGEN_nwODD
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1323,6 +1408,7 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwODD
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -1373,8 +1459,12 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwODD
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1386,13 +1476,13 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwODD
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXP_homGEN_nwONE
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1400,6 +1490,7 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwONE
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -1450,8 +1541,12 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwONE
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1463,13 +1558,13 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwONE
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1477,6 +1572,7 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   ;              // inits order for homog case
   
@@ -1527,8 +1623,12 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1540,13 +1640,13 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1554,6 +1654,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -1602,8 +1703,12 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1615,13 +1720,13 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1629,6 +1734,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -1677,8 +1783,12 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1690,13 +1800,13 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1704,6 +1814,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -1752,8 +1863,12 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1765,13 +1880,13 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
@@ -1779,6 +1894,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   order = a2->Order;              // inits order for homog case
   
@@ -1827,8 +1943,12 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       pCopyAddFastHomog(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -1840,7 +1960,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
    else  // append (- a1*monom) to result 
      spMultCopyX(a1, monom, a, tneg, spNoether);
    ;
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 static spSpolyLoopProc spGetSpolyLoop(Characteristics ch,OrderingTypes ot,Homogs hom,NumWords nw)
 {

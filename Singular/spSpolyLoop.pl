@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 ###########################################################################
-# $Id: spSpolyLoop.pl,v 1.6 1998-04-06 17:59:36 obachman Exp $
+# $Id: spSpolyLoop.pl,v 1.7 1998-04-30 15:27:25 obachman Exp $
 
 ###########################################################################
 ##
@@ -249,7 +249,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
   poly a = monom,                         // collects the result
-       b = pNew(),                        // stores a1*monom
+       b = NULL,                          // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = CALL_NCOPYNEG(tm),        // - (coefficient of monom)
@@ -257,6 +257,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
+  b = pNew();   
 
   CALL_INITORDER(order, a2);              // inits order for homog case
   
@@ -305,8 +306,12 @@ $spSpolyLoopBodyTemplate = <<_EOT_
       pSetCoeff0(b,CALL_NMULT("pGetCoeff(a1)",tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
+      if (a1 == NULL)         // are we done?
+      {
+        b = pNew();
+        goto Finish; 
+      }
       b = pNew();
-      if (a1 == NULL) goto Finish; // are we done?
       CALL_PCOPYADDFAST(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
@@ -318,7 +323,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
    else  // append (- a1*monom) to result 
      CALL_MULTCOPYX(a1, monom, a, tneg, spNoether);
    CALL_NDELETE("&tneg");
-   pFree1(b);
+   if (b != NULL) pFree1(b);
 } 
 
 _EOT_
@@ -426,17 +431,20 @@ sub COMPARE
       $res = $res."$d = pGetOrder($p1) - pGetOrder($p2);\n";
       $res = $res."NonZeroTestA($d, pOrdSgn, goto NotEqual);\n";
     }
-    $nw = &GetNumWords($argv);
-    $rargv =  $rargv."_".$nw;
-    $res = join("_", $res, pMonComp, $ot, $nw);
-    if ($nw eq "nwONE" || $nw eq "nwTWO")
-    {
-      $res = $res."($p1, $p2, $d, NonZeroA($d, pLexSgn, goto NotEqual ), goto Equal);" 
-    }
-    else
-    {
-      $res = $res."($p1, $p2, pVariables1W, $d, NonZeroA($d, pLexSgn, goto NotEqual ), goto Equal);";
-    }
+#     $rargv =  $rargv."_nwGEN";
+#     $res = join("_", $res, pMonComp, $ot, "nwGEN");
+#     $res = $res."($p1, $p2, pVariables1W, $d, NonZeroA($d, pLexSgn, goto NotEqual ), goto Equal);";
+     $nw = &GetNumWords($argv);
+     $rargv =  $rargv."_".$nw;
+     $res = join("_", $res, pMonComp, $ot, $nw);
+     if ($nw eq "nwONE" || $nw eq "nwTWO")
+     {
+       $res = $res."($p1, $p2, $d, NonZeroA($d, pLexSgn, goto NotEqual ), goto Equal);" 
+     }
+     else
+     {
+       $res = $res."($p1, $p2, pVariables1W, $d, NonZeroA($d, pLexSgn, goto NotEqual ), goto Equal);";
+     }
     return $res;
   }
   else
