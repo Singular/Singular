@@ -5022,6 +5022,13 @@ void red_object::flatten(){
  
     if(kBucketGetLm(sum->ac->bucket)!=NULL){
       number mult_my=n_Mult(sum->c_my,sum->ac->multiplied,currRing);
+      number mult_my_h=mult_my;
+      number ac_h=sum->c_ac;
+      ksCheckCoeff(&mult_my_h, &ac_h);
+      nDelete(&sum->c_ac);
+      nDelete(&mult_my);
+      mult_my=mult_my_h;
+      sum->c_ac=ac_h;
       poly add_this;
       if(!nIsOne(mult_my))
 	kBucket_Mult_n(bucket,mult_my);
