@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.65 2004-04-23 14:12:24 Singular Exp $";
+version="$Id: standard.lib,v 1.66 2004-07-15 16:33:46 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -108,7 +108,7 @@ EXAMPLE: example stdhilb;  shows an example"
 
    int k,j;
    poly m;
-   int c=size(i);
+   int c=ncols(i);
 
    for(j=1;j<c;j++)
    {
@@ -734,7 +734,7 @@ RETURN:  the quotient of m1 and m2"
   module dummy;
   module B=NF(b,a)+dummy;
   ideal re=quotient(a,module(B[1]));
-  for(i=2;i<=size(B);i++)
+  for(i=2;i<=ncols(B);i++)
   {
      re=intersect1(re,quotient(a,module(B[i])));
   }
@@ -747,7 +747,7 @@ RETURN:  the quotient of m1 and m2"
   a=std(a);
   module dummy;
   module bb=NF(b,a)+dummy;
-  int i=size(bb);
+  int i=ncols(bb);
   ideal re=quotient(a,module(bb[i]));
   bb[i]=0;
   module temp;
@@ -786,7 +786,7 @@ RETURN:  the quotient of m1 and m2"
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
-  int j=size(b);
+  int j=ncols(b);
   vector @b;
   for(i=1;i<=j;i++)
   {
@@ -809,7 +809,7 @@ RETURN:  the quotient of m1 and m2"
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
-  int j=size(b);
+  int j=ncols(b);
   vector @b;
   for(i=1;i<=j;i++)
   {
@@ -834,7 +834,7 @@ RETURN:  the quotient of m1 and m2"
   module a=imap(@newP,a);
   int i;
   vector @b=b[1];
-  for(i=2;i<=size(b);i++)
+  for(i=2;i<=ncols(b);i++)
   {
      @b=@b+@t^(i-1)*b[i];
   }
