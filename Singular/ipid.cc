@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.67 2003-05-22 17:55:27 Singular Exp $ */
+/* $Id: ipid.cc,v 1.68 2003-07-25 14:04:09 levandov Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "mod2.h"
+#include "static.h"
 #include "omalloc.h"
 #include "tok.h"
 #include "ipshell.h"
@@ -861,6 +862,7 @@ void paCleanUp(package pack)
   (pack->ref)--;
   if (pack->ref < 0)
   {
+#ifndef HAVE_STATIC
     if( pack->language == LANG_C)
     {
       Print("//dlclose(%s)\n",pack->libname);
@@ -868,6 +870,7 @@ void paCleanUp(package pack)
       dynl_close (pack->handle);
 #endif /* HAVE_DYNAMIC_LOADING */
     }
+#endif /* HAVE_STATIC */
     omfree((ADDRESS)pack->libname);
     memset((void *) pack, 0, sizeof(sip_package));
     pack->language=LANG_NONE;

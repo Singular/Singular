@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.102 2002-12-19 11:22:52 Singular Exp $ */
+/* $Id: iplib.cc,v 1.103 2003-07-25 14:04:08 levandov Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 
 #include "mod2.h"
+#include "static.h"
 #include "tok.h"
 #include "ipid.h"
 #include "omalloc.h"
@@ -1020,6 +1021,10 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
 {
+#ifdef HAVE_STATIC
+  WerrorS("mod_init: static version can not load modules");
+  return TRUE;
+#else
   int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
                  BOOLEAN(*func)(leftv res, leftv v));
   typedef int (*fktn_t)(int(*iiAddCproc)(char *libname, char *procname,
@@ -1085,6 +1090,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
 
   load_modules_end:
   return RET;
+#endif /*STATIC */  
 }
 #endif /* HAVE_DYNAMIC_LOADING */
 
