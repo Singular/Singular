@@ -89,7 +89,7 @@ endif
 ###
 
 # normal C++ source files
-CXXSOURCES=algmap.cc clapconv.cc \
+CXXSOURCES=clapconv.cc \
     clapsing.cc mminit.cc\
     febase.cc feread.cc feResource.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
@@ -143,7 +143,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} \
 	kInline.cc \
 	claptmpl.cc 
 
-HEADERS=algmap.h hutil.h stairc.h ideals.h \
+HEADERS=hutil.h stairc.h ideals.h \
 	longalg.h structs.h intvec.h longrat.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h \
 	clapsing.h matpol.h polys.h p_polys.h syz.h \
