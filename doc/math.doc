@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.14 1998-05-14 17:55:37 Singular Exp $
+@comment $Id: math.doc,v 1.15 1998-05-14 18:15:51 Singular Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -552,11 +552,12 @@ M$_1*a = $M$_1*b, \ldots, $M$_{i-1}*a = $M$_{i-1}*b$ and M$_i*a < $M$_i*b$.
 Thus,
 @ifinfo
 x^a < x^b
+if and only if M*a is smaller than M*b
 @end ifinfo
 @tex
 $x^a < x^b$
+if and only if $M*a$ is smaller than $M*b$
 @end tex
-if and only if M*a is smaller than M*b
 with respect to the lexicographical ordering.
 
 The following matrices represent (for 3 variables) the global and
@@ -922,7 +923,7 @@ f_1, @dots{}, f_s in I is called a @strong{standard basis} of I if
 @end ifinfo
 @subheading Properties
 @table @asis
-@item Normalform:
+@item Normal form:
 @cindex Normal form
 @tex
 A function $NF : K[\underline{x}]^r \times \{G | G\  standard basis\} \to K[\underline{x}]^r, (p,G) \mapsto NF(p|G)$, is called a {\bf normal form}
@@ -1176,10 +1177,22 @@ where I_i=@{ini(f), f in T_i @}.
 @section References
 @cindex References
 
+@subheading Text books on computational algebraic geometry
 @table @bullet
 @item
-For a description of the basic algorithms, together with many examples
-and comparisons, cf. Grassmann, H.; Greuel, G.-M.; Martin, B.; Neumann,
+Becker; Weisspfennig
+@item
+Cox; Little; O'Shea
+@item
+Eisenbud
+@item
+Mishra, B.: Algorithmic Algebra, Texts and Monographs in Computer Science,
+Springer, 1993
+@end table
+@subheading Description of algorithms
+@table @bullet
+@item
+Grassmann, H.; Greuel, G.-M.; Martin, B.; Neumann,
 W.; Pfister, G.; Pohl, W.;
 @tex
 Sch\"onemann,
@@ -1191,8 +1204,7 @@ Sch\"onemann,
 implementation of standard bases and syzygies in  @sc{Singular},
 Proceedings of the Workshop  Computational Methods in Lie theory in AAECC (1995).
 @item
-For a mathematical background, in particular for general (global, local
-or mixed) orderings and resolutions, cf. Greuel, G.-M.; Pfister, G.:
+Greuel, G.-M.; Pfister, G.:
 Advances and improvements in the theory of standard bases and
 syzygies, Arch. d. Math. 63(1995)
 
@@ -1206,7 +1218,5 @@ Algorithmic Algebra and Number Theory, Springer Verlag, Heidelberg, (1998).
 W. Decker; G.-M. Greuel; G. Pfister; T. de Jong:
 The normalisation: a new algorithm,
 implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998. 
-
-@item
 
 @end table
