@@ -1,15 +1,15 @@
-// $Id: tst.lib,v 1.9 1998-06-30 14:48:21 obachman Exp $
+// $Id: tst.lib,v 1.10 1998-07-01 10:39:10 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.9 1998-06-30 14:48:21 obachman Exp $";
+version="$Id: tst.lib,v 1.10 1998-07-01 10:39:10 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
 
  tst_system(s)          returns string which is stdout of system(\"sh\", s)
  tst_ignore(any,[keyword], [link]) writes string(any) to link (or stdout),
-                                   prepending prefix \"// ignore:\"
+                                   prepending prefix \"// tst_ignore:\"
  tst_init()             writes some identification data to stdout
                         with tst_ignore
  tst_status([any])      writes status info to stdout with tst_ignore()
@@ -42,6 +42,12 @@ example
   "The following is what the system call wrote to stdout: " + s;
 }
 
+proc GetHostName
+{
+  string tst_hostname = tst_system("hostname");
+  tst_hostname = tst_hostname[1..size(tst_hostname)-1];
+  return (tst_hostname);
+}
 
 proc tst_ignore
 "USAGE:    tst_ignore(any,[keyword], [link])
@@ -49,8 +55,8 @@ proc tst_ignore
             keyword -- an arbitrary string 
             link    -- a link which can be written to
 RETURN:   none; writes string(any) to link (or stdout, if no link given),
-          prepending prefix \"// ignore:\", or 
-                            \"// ignore:keyword hostname:\",
+          prepending prefix \"// tst_ignore:\", or 
+                            \"// tst_ignore:keyword hostname:\",
                             if keyword was given.
           Should be used in tst files to output system dependent data
           (like date, pathnames).
@@ -112,18 +118,11 @@ EXAMPLE:  example tst_ignore; shows examples
   // ready -- do the actual work
   if (keyword != "")
   {
-    if (! defined(tst_hostname))
-    {
-      string tst_hostname = tst_system("hostname");
-      tst_hostname = tst_hostname[1..size(tst_hostname)-1];
-      export tst_hostname;
-    }
-
-    write(outlink, "// ignore:" + keyword + " " + tst_hostname + ":" + s);
+    write(outlink,"// tst_ignore:" + keyword + " " + GetHostName() + ":" + s);
   }
   else
   {
-    write(outlink, "// ignore: " + s);
+    write(outlink, "// tst_ignore: " + s);
   }
 }
 example
@@ -137,6 +136,26 @@ example
   int t1 = timer;
   tst_ignore(t1, "time");
   tst_ignore(memory(1), "memory");
+}
+
+static proc Get_tst_timer
+{
+  if (! defined (tst_timer))
+  {
+    string tst_timer = "// tst_ignore:0";
+    export tst_timer;
+    return (0);
+  }
+  else
+  {
+    execute "int tst_int_timer = " + tst_timer[15,size(tst_timer)] + ";";
+    return (tst_int_timer);
+  }
+}
+
+static proc Set_tst_timer (int this_time)
+{
+  tst_timer = tst_timer[1,14] + string(this_time);
 }
 
 proc tst_status (list #)
@@ -158,13 +177,8 @@ EXAMPLE: example tst_status; shows example
   }
   else
   {
-    if (! defined(tst_timer))
-    {
-      int tst_timer = 0;
-      export tst_timer;
-    }
-    tst_ignore(timer - tst_timer, "tst_timer");
-    tst_timer = timer;
+    tst_ignore(timer - Get_tst_timer(), "tst_timer");
+    Set_tst_timer(timer);
   }
 }
 example
