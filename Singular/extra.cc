@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.204 2004-04-23 14:10:50 Singular Exp $ */
+/* $Id: extra.cc,v 1.205 2004-04-29 17:11:22 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -655,6 +655,21 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    else
    #endif
 #ifdef HAVE_PLURAL
+/*==================== Approx_Step  =================*/
+      if (strcmp(sys_cmd, "astep") == 0)
+      {
+        ideal I;
+        if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+        {
+          I=(ideal)h->CopyD();
+          res->rtyp=IDEAL_CMD;
+          if (rIsPluralRing(currRing)) res->data=Approx_Step(I);
+          else res->data=I;
+          setFlag(res,FLAG_STD);
+        }
+        else return TRUE;
+        return FALSE;
+      }
 /*==================== PrintMat  =================*/
       if (strcmp(sys_cmd, "PrintMat") == 0)
       {
