@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.10 2001-01-11 12:04:26 pfister Exp $");
+tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.11 2004-02-23 19:06:14 Singular Exp $");
 
 LIB "mondromy.lib";
 
@@ -15,7 +15,7 @@ list unimodal=
 "E[13]","x,y","x3+xy5+y8",
 "E[14]","x,y","x3+y8+xy6",
 "Z[11]","x,y","x3y+y5+xy4",
-"Z[12]","x,y","x3y+xy4+x2y32",
+"Z[12]","x,y","x3y+xy4+x2y3",
 "Z[13]","x,y","x3y+y6+xy5",
 "W[12]","x,y","x4+y5+x2y3",
 "W[13]","x,y","x4+xy4+y6",

@@ -2,9 +2,9 @@ allres_l
 bardet_probl_l
 bug_4
 bug_res
-; TODO brnoeth_l
+brnoeth_l
 classify_l
-; TODO deform_l
+deform_l
 det_minor
 eliminate_2
 eliminate_6
@@ -13,7 +13,7 @@ fetch_l
 fglm1_l
 fglmquot1_l
 finvar_l
-; TODO gaussm_l
+gaussm_l
 gcd0_l
 gcdp_l
 hnoether_l
@@ -24,7 +24,7 @@ lres_l
 makedbm_l
 minor_l
 modulo_l
-; TODO monodromy_l
+monodromy_l
 mora_1
 mora_2
 mora_3
@@ -44,17 +44,16 @@ pMult0L_l
 pMult0_l
 pMultL_l
 pMult_l
-; TODO primdec_l
+primdec_l
 primitiv_l
 res_l
 resultantp_l
-; TODO rinvar
+rinvar
 sing_l
 solve_l
 sres_l
 std_l
 triang_l
 tst_l
-zeroset
 zeroset1
 
