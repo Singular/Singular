@@ -1,0 +1,13 @@
+29.11.02
+	qring q=system("twostd",i); is introduced and tested
+	file: exterior1.tst
+	todo: forbid the use of non-twosided ideals
+
+6.12.02
+	option(redTail) is implemented and tested
+	file: exterior2.tst
+	todo: in twostd, running from qring should be
+	done another std() in order to get reduced result
+	todo: buckets in multiplication (p_Mult_mm, mm_Mult_p)
+	todo: syz(i) withthe canonical method, think about
+	Schreyer and LaScala (double homogenization)
