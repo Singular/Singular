@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: cmpl.pl,v 1.7 1999-12-06 16:06:59 obachman Exp $
+# $Id: cmpl.pl,v 1.8 2001-02-14 12:32:58 Singular Exp $
 ###################################################################
 #
 # FILE:    cmpl.pl
@@ -89,7 +89,7 @@ elsif ($cmpl eq 'hlp')
 elsif ($cmpl eq 'ex')
 {
   @strings = <$ex_dir/*.sing>;
-  map {$_ =~ s|.*/(.*?).sing|(\"$1\")|;} @strings;
+  map {$_ =~ s|.*/(.*?)\.sing$|(\"$1\")|;} @strings;
 }
 else
 {
