@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.15 1998-04-16 16:10:23 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.16 1998-05-12 10:35:24 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -226,7 +226,7 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
     {
       nappl = (char*) Alloc(MAXPATHLEN + 24);
       strcpy(nappl, appl);
-      strcat(nappl, " -bq --no-stdlib --no-rc");
+      strcat(nappl, " -bq");
       appl = nappl;
     }
   }
