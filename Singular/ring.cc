@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.8 1997-04-18 15:49:40 Singular Exp $ */
+/* $Id: ring.cc,v 1.9 1997-04-30 15:25:33 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -287,13 +287,23 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     if (pn!=NULL)
     {
       while ((ch!=fftable[l]) && (fftable[l])) l++;
-      if (fftable[l]==0) ch = IsPrime(ch);
+      if (fftable[l]==0)
+      {
+        ch = IsPrime(ch);
+      }  
       else
       {
         char *m[1]={(char *)sNoName};
         nfSetChar(ch,m);
-        if(errorreported) ch=IsPrime(ch);
-        else ffChar=TRUE;
+        if(errorreported)
+        {
+           errorreported=0;
+           ch=IsPrime(ch);
+        }
+        else
+        {
+          ffChar=TRUE;
+        }  
       }
     }
     else
@@ -318,8 +328,11 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       if (ffChar) hs=pn->next; 
       else hs=pn;
       hs->CleanUp();
-      Free((ADDRESS)hs,sizeof(sleftv));
-      if (ffChar) pn->next=NULL;
+      if (ffChar) 
+      {
+        pn->next=NULL;
+        Free((ADDRESS)hs,sizeof(sleftv));
+      }  
       else pn=NULL;
     }
   }

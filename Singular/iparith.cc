@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.24 1997-04-28 09:57:54 Singular Exp $ */
+/* $Id: iparith.cc,v 1.25 1997-04-30 15:25:30 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -1175,6 +1175,7 @@ static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
 {
+  if(u->name==NULL) return TRUE;
   char * n = (char *)AllocL(strlen(u->name) + 6);
   sprintf(n,"%s(%d)",u->name,(int)v->Data());
   FreeL((ADDRESS)u->name);
@@ -4221,7 +4222,7 @@ void ttGen1()
     }
   }
   fprintf(outfile,"/*---------------------------------------------*/\n");
-  char ops[]="=><+*/[.^,%(";
+  char ops[]="=><+*/[.^,%(;";
   for(i=0;ops[i]!='\0';i++)
     fprintf(outfile,"// token %d : %c\n", (int)ops[i], ops[i]);
   for (i=257;i<=MAX_TOK;i++)

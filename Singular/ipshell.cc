@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.7 1997-04-28 17:47:15 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.8 1997-04-30 15:25:32 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -639,16 +639,6 @@ BOOLEAN jjBETTI(leftv res, leftv v)
   r=liFindRes((lists)v->Data(),&len,&typ0);
   if (r==NULL) return TRUE;
   res->data=(char *)syBetti(r,len,&reg);
-// int i,j;
-//  for(i=0;i<betti->rows();i++)
-//  {
-//    Print("%2d:",i);
-//    for(j=1;j<=betti->cols();j++)
-//    {
-//      Print(" %5d",IMATELEM(*betti,i+1,j));
-//    }
-//    PrintLn();
-//  }
   Free((ADDRESS)r,(len)*sizeof(ideal));
   return FALSE;
 }

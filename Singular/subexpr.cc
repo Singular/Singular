@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.15 1997-04-22 14:50:28 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.16 1997-04-30 15:25:34 Singular Exp $ */
 
 /*
 * ABSTRACT: handling of leftv
@@ -115,7 +115,7 @@ void sleftv::Print(leftv store, int spaces)
           return;
         case INTVEC_CMD:
         case INTMAT_CMD:
-          ((intvec *)d)->show(spaces);
+          ((intvec *)d)->show(t,spaces);
           break;
         case RING_CMD:
         case QRING_CMD:
@@ -663,11 +663,11 @@ char *  sleftv::String(void *d)
       {
         return rString((ring)d);
       }  
-  #ifdef TEST
       default:
+        #ifdef TEST
         ::Print("String:unknown type %s(%d)", Tok2Cmdname(Typ()),Typ());
+        #endif
         return NULL;
-  #endif
     } /* end switch: (Typ()) */
     return mstrdup(s);
   }

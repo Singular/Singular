@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.5 1997-04-12 16:04:37 Singular Exp $ */
+/* $Id: intvec.cc,v 1.6 1997-04-30 15:25:28 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -76,10 +76,10 @@ intvec::intvec(int r, int c, int init)
   }
 }
 
-char * intvec::ivString()
+char * intvec::ivString(int mat,int spaces)
 {
   StringSetS("");
-  if (col == 1)
+  if ((col == 1)&&(mat!=INTMAT_CMD))
   {
     for (int i=0; i<row; i++)
     {
@@ -104,7 +104,11 @@ char * intvec::ivString()
           StringAppend("%d%c",v[j*col+i],i<col-1 ? ',' : ' ');
         }
       }
-      if (j+1<row) StringAppend("\n");
+      if (j+1<row) 
+      {
+        StringAppend("\n");
+        if (spaces>0) StringAppend("%-*.*s",spaces,spaces," ");
+      }  
     }
   }
   return StringAppend("");
@@ -115,12 +119,12 @@ char * intvec::String()
   return mstrdup(ivString());
 }
 
-void intvec::show(int spaces)
+void intvec::show(int mat,int spaces)
 {
   if (spaces>0)
-    Print("%-*.*s%s",spaces,spaces," ",ivString());
+    Print("%-*.*s%s",spaces,spaces," ",ivString(mat,spaces));
   else
-    PrintS(ivString());
+    PrintS(ivString(mat,0));
 }
 
 void intvec::operator+=(int intop)

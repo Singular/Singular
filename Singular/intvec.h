@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.3 1997-04-09 12:19:45 Singular Exp $ */
+/* $Id: intvec.h,v 1.4 1997-04-30 15:25:29 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -50,12 +50,12 @@ class intvec
     int  cols() const { return col; }
     int  rows() const { return row; }
     void length(int l) { row = l; col = 1; }
-    void show(int spaces=0);
+    void show(int mat=0,int spaces=0);
     void makeVector() { row*=col;col=1; }
     // keiner (ausser obachman) darf das folgenden benutzen !!!
     int * ivGetVec() { return v; }
     char * String();
-    char * ivString();
+    char * ivString(int mat=0,int spaces=0);
     ~intvec()
        {
 #ifdef MDEBUG

@@ -164,7 +164,7 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 
 mod2.h: config.status config.cache mod2.h.in Makefile.in
 	./config.status
-	touch -r mod2.h configure configure.in Makefile.in
+	touch -r mod2.h configure configure.in Makefile Makefile.in
 
 config.status config.cache : configure
 	./configure ${CONFIGURE_INPUT} --no-create

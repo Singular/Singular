@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.11 1997-04-29 19:54:48 obachman Exp $ */
+/* $Id: febase.cc,v 1.12 1997-04-30 15:25:27 Singular Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -36,12 +36,6 @@ char fe_promptstr[]
 
 class Voices
 {
-  private:
-    void Init()
-    {
-      memset(this,0,sizeof(*this));
-      v_lineno = 1;
-    }
   public:
     int    v_lineno;        // lineno, to restore in recursion
     int    v_oldlineno;     // lineno, to restore at exit
@@ -55,7 +49,7 @@ class Voices
     char * buffer;          // buffer pointer
 
   void Next();
-  Voices() { Init(); }
+  Voices() { v_lineno = 1; }
   Voices * VFile(char* fname);
   Voices * Buffer(char* buf, int t);
   int Exit();
@@ -71,7 +65,7 @@ static char * feBuffer=(char *)Alloc(INITIAL_PRINT_BUFFER);
 #define START_LEVMAX 32
 int     levmax       = START_LEVMAX;
 Voices *currentVoice = NULL;
-Voices *FileAttribs  =(Voices *)Alloc(START_LEVMAX*sizeof(Voices));
+Voices *FileAttribs  =(Voices *)Alloc0(START_LEVMAX*sizeof(Voices));
 short  *ifswitch     =(short *)Alloc0(START_LEVMAX*sizeof(short));
         /*1 ifswitch==0: no if statement, else is invalid
         *           ==1: if (0) processed, execute else
@@ -276,7 +270,7 @@ Voices * Voices::VFile(char* fname)
   filename   = mstrdup(fname);
   v_echo     = si_echo;
   fileVoice  = voice;
-  yylineno   = 1;
+  yylineno   = v_lineno   = 1;
   if (files==NULL)
   {
     inputswitch = 0;
@@ -298,6 +292,7 @@ static inline void inc_voice()
     FileAttribs=(Voices *)ReAlloc(FileAttribs,
                           levmax*sizeof(Voices),
                           (levmax+16)*sizeof(Voices));
+    memset(&FileAttribs[levmax],0,16*sizeof(Voices));
     ifswitch=(short *)ReAlloc(ifswitch,
                           levmax*sizeof(short),
                           (levmax+16)*sizeof(short));
@@ -317,7 +312,6 @@ void Voices::Next()
   inc_voice();
 
   currentVoice = &FileAttribs[voice];
-  currentVoice->Init();
 }
 
 /*2
@@ -460,25 +454,20 @@ int contBuffer(int typ)
 */
 int exitFile()
 {
-  int oldswitch;
-
-  while ((voice > 0) && (inputswitch > 0))
+  /*4 first check for valid buffer type*/
+  for (int i=voice; i>0; i--)
   {
-    exitVoice();
+    if (FileAttribs[i].typ == 0) break;
+    if (FileAttribs[i].typ == BT_file)
+    {
+      while ((BT_file != currentVoice->typ)
+      && (voice > 0))
+      {
+        exitVoice();
+      }
+      exitVoice();
+    }
   }
-  // now we have left all if-, else-, while-, for-, proc-levels
-  // inside this file;
-  // if the file is the terminal (inputswitch == 0) and
-  // voice >0, so return 1 else return 0
-  // (used for EXIT_CMD in CNTRLC-C-handling)
-  oldswitch = inputswitch;
-  exitVoice();
-  #ifdef SIC
-  return 1;
-  #else
-  if ((oldswitch)||(myynest<0)) return 0;
-  else return 1;
-  #endif
 }
 
 /*2
@@ -597,10 +586,11 @@ int readbuf(char* buf, int l)
 */
 void I_FEbase(void)
 {
-  FileAttribs[0].files       = yyin = stdin;
-  FileAttribs[0].filename    = mstrdup("STDIN");
-  yylineno = 1;
-  currentVoice = &FileAttribs[0];
+  currentVoice=FileAttribs[0].VFile("STDIN");
+  //FileAttribs[0].files       = yyin = stdin;
+  //FileAttribs[0].filename    = mstrdup("STDIN");
+  //yylineno = 1;
+  //currentVoice = &FileAttribs[0];
 }
 
 static char * feBufferStart;
