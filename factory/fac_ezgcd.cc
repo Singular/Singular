@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.11 1998-03-12 14:30:50 schmidt Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.12 1998-09-23 17:07:45 schmidt Exp $ */
 
 #include <config.h>
 
@@ -158,10 +158,22 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
     /// ---> S1
     DEBOUTLN( cerr, "ezgcdspec: (S1)" );
     Ft = ezgcd( F, F.deriv( x ) );
+    if ( Ft.isOne() ) {
+	// In this case F is squarefree and we came here by bad chance
+	// (means: bad evaluation point).  Try again with another
+	// evaluation point.  Bug fix (?) by JS.  The bad example was
+        // gcd.debug -ocr /+USE_EZGCD/@12/CB \
+	//     '(16*B^8-208*B^6*C+927*B^4*C^2-1512*B^2*C^3+432*C^4)' \
+        //     '(4*B^7*C^2-50*B^5*C^3+208*B^3*C^4-288*B*C^5)'
+	b.nextpoint();
+	return ezgcd( F, G, b, true );
+    }
+	    
     DEBOUTLN( cerr, "ezgcdspec: (S1) done, Ft = " << Ft );
     L = F / Ft;
     /// ---> S2
     DEBOUTLN( cerr, "ezgcdspec: (S2)" );
+
     L = ezgcd( L, G, b, true );
     DEBOUTLN( cerr, "ezgcdspec: (S2) done, Ds = " << Ds );
     Gt = G / L;
