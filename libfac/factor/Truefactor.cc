@@ -1,13 +1,19 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.2 1997-06-09 15:56:04 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.3 1997-09-12 07:19:52 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "helpstuff.h"
+// some CC's need this:
+#include "Truefactor.h"
+
+#ifdef SINGULAR
+#  define HAVE_SINGULAR
+#endif
 
 #ifdef TRUEFACTORDEBUG
 #  define DEBUGOUTPUT
@@ -18,9 +24,6 @@
 #include "debug.h"
 #include "timing.h"
 
-#ifdef HAVE_SINGULAR
-extern void WerrorS(char *);
-#endif
 ///////////////////////////////////////////////////////////////
 // generate all different k-subsets of the set with n        //
 // elements and return them in returnlist.                   //
@@ -232,7 +235,7 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
 ///////////////////////////////////////////////////////////////
 // Check if poly f is in Fp (returns true) or in Fp(a)       //
 ///////////////////////////////////////////////////////////////
-bool 
+static bool 
 is_in_Fp( const CanonicalForm & f ){
   if ( f.inCoeffDomain() )
     return f.inBaseDomain() ;
@@ -277,6 +280,7 @@ TakeNorms(const CFFList & PiList){
     int n=2;
     if ( PossibleFactors.length() < n ) { // a little check
 #ifdef HAVE_SINGULAR
+      extern void WerrorS(char *);
       WerrorS("libfac: ERROR: TakeNorms less then two items remaining!");
 #else
       cerr << "libfac: ERROR: TakeNorms less then two items remaining! " 
@@ -319,6 +323,7 @@ TakeNorms(const CFFList & PiList){
       }
       else{ 
 #ifdef HAVE_SINGULAR
+        extern void WerrorS(char *);
 	WerrorS("libfac: TakeNorms: somethings wrong with remaining factors!");
 #else
 	cerr << "libfac: TakeNorms: somethings wrong with remaining factors!" 

@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.7 1997-06-09 15:55:47 Singular Exp $
+# $Id: Makefile.in,v 1.8 1997-09-12 07:19:31 Singular Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= -rm -f
@@ -62,23 +62,26 @@ FACTORINCL =	factor/Factor.h factor/MVMultiHensel.h factor/Truefactor.h \
 		factor/tmpl_inst.h factor/SqrFree.h factor/helpstuff.h \
 		factor/debug.h factor/timing.h factor/homogfactor.h \
                 factor/interrupt.h
-CHARSETINCL =	charset/csutil.h charset/charset.h charset/reorder.h
+CHARSETINCL =	charset/csutil.h charset/charset.h charset/reorder.h \
+		charset/alg_factor.h charset/algfactor.h
 
 OPTFACTOROBJ1 =	OPTOBJ/SqrFree.o OPTOBJ/Factor.o OPTOBJ/MVMultiHensel.o \
 		OPTOBJ/Truefactor.o OPTOBJ/helpstuff.o OPTOBJ/version.o \
-		OPTOBJ/homogfactor.o
+		OPTOBJ/homogfactor.o OPTOBJ/debug.o
 OPTFACTOROBJ2 =	OPTOBJ/tmpl_inst.o
 OPTFACTOROBJ =	$(OPTFACTOROBJ2) $(OPTFACTOROBJ1)
 
-OPTCHARSETOBJ =	OPTOBJ/csutil.o OPTOBJ/charset.o OPTOBJ/reorder.o
+OPTCHARSETOBJ =	OPTOBJ/csutil.o OPTOBJ/charset.o OPTOBJ/reorder.o \
+		OPTOBJ/alg_factor.o OPTOBJ/algfactor.o
 
 DEBFACTOROBJ1 =	DEBOBJ/SqrFree.o DEBOBJ/Factor.o DEBOBJ/MVMultiHensel.o \
 		DEBOBJ/Truefactor.o DEBOBJ/helpstuff.o DEBOBJ/version.o \
-		DEBOBJ/homogfactor.o
+		DEBOBJ/homogfactor.o DEBOBJ/debug.o
 DEBFACTOROBJ2 =	DEBOBJ/tmpl_inst.o
 DEBFACTOROBJ = 	$(DEBFACTOROBJ2) $(DEBFACTOROBJ1)
 
-DEBCHARSETOBJ =	DEBOBJ/csutil.o DEBOBJ/charset.o DEBOBJ/reorder.o
+DEBCHARSETOBJ =	DEBOBJ/csutil.o DEBOBJ/charset.o DEBOBJ/reorder.o \
+		DEBOBJ/alg_factor.o DEBOBJ/algfactor.o
 
 ##
 ## Primary targets
@@ -86,7 +89,13 @@ DEBCHARSETOBJ =	DEBOBJ/csutil.o DEBOBJ/charset.o DEBOBJ/reorder.o
 
 .SUFFIXES:      .cc .h .o
 
-all: ${TARGETNAME}
+all: OPTOBJ DEBOBJ ${TARGETNAME}
+
+OPTOBJ:
+	${MKINSTALLDIRS} OPTOBJ
+
+DEBOBJ:
+	${MKINSTALLDIRS} DEBOBJ
 
 OPTOBJ/%.o: %.cc 
 	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
@@ -150,11 +159,10 @@ uninstall:
 	$(RM) ${libdir}/${SINGLIBFACNAME}.a
 
 mostlyclean:
-	$(RM)	test ${LIBFACNAME}.a ${SINGLIBFACNAME}.a \
+	$(RM)	test testcs ${LIBFACNAME}.a ${SINGLIBFACNAME}.a \
 		${LIBFACNAME-G}.a ${SINGLIBFACNAME-G}.a
 
 clean:	mostlyclean
-	$(RM) charset/DEBOBJ/* OPTOBJ/*
 	$(RM) OPTOBJ/optdepend DEBOBJ/debdepend  \
 	      DEBOBJ/*.o OPTOBJ/*.o
 
@@ -173,6 +181,12 @@ factest:	libfac OPTOBJ/test.o
 
 factests:	factest
 		(cd tests ; factortest )
+
+charsettest:	libfac	OPTOBJ/testcs.o
+		$(CXX) -o testcs $(LDFLAGS) OPTOBJ/testcs.o $(LIBS)
+
+#charsettests:	charsettest
+#		(cd tests ; charsettest )
 
 tests:		factests
 

@@ -1,4 +1,4 @@
-This is the file 00README.libfac for version 0.2.4 of libfac.
+This is the file 00README.libfac for version prae 0.3.0 of libfac.
 
 ######### What is libfac?
 libfac is an extension to factory (see the factory documentation for details
@@ -94,40 +94,16 @@ this will produce libfac.a or libsingfac.a (depending on --with-Singular).
 The only difference between libfac.a and libsingfac.a is: we don't instantiate
 any templates for libsingfac.a.
 
-B) Using Makefile.dist (this is not recommended; maybe you have to edit a lot 
-to reflect your systems configuration.)
-copy Makefile.dist to Makefile
-Edit the factoryversion and the path to the factory library in the top Makefile
-(in this directory).
-currently: factoryversion=1.2b
-(I have tested with factoryversion 1.1 & 1.2beta & 1.2c; earlier versions 
-*don't* work)
+If you want to produce a test file, type:
+  configure [--with-debug] [--libdir=path-to-libcf.a] [--includedir=path-to-factory.h]
+  make tests
+this will produce libfac.a and a binary called test. "test" is then used to 
+test some examples for factorization.
 
-type:
-   make
-to generate a testprogram (test). You'll get a non-interactive debugging 
-version of test, which is half as fast as an optimized version. 
-You get an optimized version of test by typing:
-   make opttest
-
-If you type
-   make tests
-
-a program (test) will be generated and a bunch of test-examples will
-be tested. 
-
-If you only need the library ( it will be produced anyway) just type
-   make libfac
-for the optimized version (libfac.a) or
-   make libfac-g
-for the debugging version (libfac-g.a).
-
-The include file for the libraries is called "factor.h" and is shipped
-with this version. 
-If you have perl you can generate "factor.h" with:
-   ./bin/makeheader header.tpl factor.h
-in the top directory (Perhaps you have to edit the path to perl in 
-./bin/makeheader).
+B) Using Makefile.dist  
+**** Since version 0.3.0 this is no longer supported ****
+**** Get an earlier version and patch Makefile.dist for your needs, ****
+**** or, better, use configure.
 
 
  If you have found a bug (beside the KNOWN BUGS, see KNOWN BUGS section later),
@@ -160,6 +136,7 @@ o The  irreducible characteristic series stuff doesn't work for some problems.
   if this program needs factorization over an algebraic function field, which
   is not yet implemented (but I'm working on it).
   Don't trust the result you'll get in such a case!!!!!!
+Since version 0.3.0 this problem is gone. (or should be :-) )
 
 o The performance of the irreducible characteristic series stuff heavily
   depends on the ordering of the variables in some cases. No (nearly) optimal
@@ -259,3 +236,21 @@ V0.2.4	o Changed factor/SqrFree.cc (SqrFreed): Have to interchange variables
           generator?
 	o released May 30 1997
 
+V0.3.0a	o changed configure.in: will not override CFLAGS or CXXFLAGS if set in
+	  the environment
+	o added new functionality in charset/algfacor.{cc/h} :
+          now we should be able to factorize over any field needed for the
+	  charset-algorithm. (Internal note: perhaps there are still problems
+	  for the char=0 case because of the factory implementation vs. gmp)
+	o for this,  changed charset/csutil.{cc/h} and charset/charset.{cc/h}
+	o include #include <file.h> in file.cc for some CC's
+	o Internal note: need more interrupt handles enabled;
+			 set up test examples for char=0 and char>0;
+	o released Jun 25 1997
+
+V0.3.0b o implemented Tragers algorithm; this is now the default used in 
+          charsets (file: charsets/alg_factor.cc)
+        o for char=0 case there are some problems with factory;
+          for char=p there seems to be an internal factory memory-problem in
+          some cases
+        o released Sep 11 1997

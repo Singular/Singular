@@ -11,14 +11,17 @@
 // computing time for your example!
 /////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: reorder.cc,v 1.2 1997-06-09 15:55:56 Singular Exp $";
+static char * rcsid = "$Id: reorder.cc,v 1.3 1997-09-12 07:19:44 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
 // Factor - Includes
 #include <tmpl_inst.h>
-// Charset - Includes
 #include "homogfactor.h"
+// Charset - Includes
+
+// some CC's need this:
+#include "reorder.h"
 
 #ifdef REORDERDEBUG
 #  define DEBUGOUTPUT
@@ -348,12 +351,39 @@ swapvar( const CFList & PS, const Variable & x, const Variable & y){
   return ps;
 }
 
+static CFFList
+swapvar( const CFFList & PS, const Variable & x, const Variable & y){
+  CFFList ps;
+
+  for (CFFListIterator i= PS; i.hasItem(); i++)
+    ps.append(CFFactor(swapvar(i.getItem().factor(),x,y),i.getItem().exp()));
+  return ps;
+}
+
 // a library function: we reorganize the global variable ordering
 CFList
 reorder( const Varlist & betterorder, const CFList & PS){
   int i=1, n = betterorder.length();
   Intarray v(1,n);
   CFList ps=PS;
+
+  //initalize:
+  for (VarlistIterator j = betterorder; j.hasItem(); j++){
+    v[i]= level(j.getItem()); i++;
+  }
+  DEBOUTLN(cout, "reorder: Original ps=  ", ps);
+  // reorder:
+  for (i=1; i <= n; i++)
+    ps=swapvar(ps,Variable(v[i]),Variable(n+i));
+  DEBOUTLN(cout, "reorder: Reorganized ps= ", ps); 
+  return ps;
+}
+
+CFFList
+reorder( const Varlist & betterorder, const CFFList & PS){
+  int i=1, n = betterorder.length();
+  Intarray v(1,n);
+  CFFList ps=PS;
 
   //initalize:
   for (VarlistIterator j = betterorder; j.hasItem(); j++){

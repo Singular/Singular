@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: charset.h,v 1.2 1997-06-09 15:55:53 Singular Exp $
+// $Id: charset.h,v 1.3 1997-09-12 07:19:41 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_CHARSET_H
@@ -12,9 +12,11 @@
 
 CFList     BasicSet( const CFList &PS );
 CFList     CharSet( const CFList &PS );
+CFList     mcharset( const CFList &PS, PremForm & Remembern );
+int        checkok( const CFList & PS, CFList & FS2);
 /*BEGINPUBLIC*/
 CFList     MCharSetN( const CFList &PS, PremForm & Remembern );
-ListCFList IrrCharSeries( const CFList &PS );
+ListCFList IrrCharSeries( const CFList &PS, int opt=0 );
 /*ENDPUBLIC*/
 
 #endif /* INCL_CHARSET_H */

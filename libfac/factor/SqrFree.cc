@@ -1,14 +1,20 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.2 1997-06-09 15:56:02 Singular Exp $";
-static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
+static char * rcsid = "$Id: SqrFree.cc,v 1.3 1997-09-12 07:19:50 Singular Exp $";
+static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include<factory.h>
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "helpstuff.h"
+// some CC's need this:
+#include "SqrFree.h"
+
+#ifdef SINGULAR
+#  define HAVE_SINGULAR
+#endif
 
 #ifdef SQRFREEDEBUG
 # define DEBUGOUTPUT
@@ -21,13 +27,6 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 TIMING_DEFINE_PRINT(squarefree_time);
 TIMING_DEFINE_PRINT(gcd_time);
 
-#ifdef HAVE_SINGULAR
-extern void WerrorS(char *);
-#endif  
-
-// forward declaration:
-CFFList SqrFree( const CanonicalForm & r );
-CFFList InternalSqrFree( const CanonicalForm & r );
 
 static inline CFFactor 
 Powerup( const CFFactor & F , int exp=1){ 
@@ -51,7 +50,7 @@ Powerup( const CFFList & Inputlist , int exp=1 ){
 static CanonicalForm 
 PthRoot( const CanonicalForm & f ){
   CanonicalForm RES, R = f;
-  int n= getNumVars(R), p= getCharacteristic();
+  int n= max(level(R),getNumVars(R)), p= getCharacteristic();
   
   if (n==0){ // constant
     if (R.inExtension()) // not in prime field; f over |F(q=p^k)
@@ -77,7 +76,7 @@ PthRoot( const CanonicalForm & f ){
 //  uni/multivariate gcd's and/or gcdtest's                  //
 ///////////////////////////////////////////////////////////////
 int
-SqrFreeTest( const CanonicalForm & r, int opt=1){
+SqrFreeTest( const CanonicalForm & r, int opt){
   CanonicalForm f=r, g;
   int n=level(f);
 
@@ -125,6 +124,7 @@ SqrFreeTest( const CanonicalForm & r, int opt=1){
     else return 0 ;
   }
 #ifdef HAVE_SINGULAR
+  extern void WerrorS(char *);
   WerrorS("libfac: ERROR: SqrFreeTest: we should never fall trough here!");
 #else
   cerr << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n" 
@@ -196,7 +196,7 @@ SqrFreed( const CanonicalForm & r ){
     for (int k=1; k<=n; k++) {
       g=swapvar(f,k,n) ; g = g.deriv();
       if ( ! g.isZero() ){ // can`t be Pth root
-	CFFList Outputlist2= SqrFreed(swapvar(f,k,n));
+	CFFList Outputlist2= SqrFreed(swapvar(f,k,n)); 
 	for (CFFListIterator inter=Outputlist2; inter.hasItem(); inter++){
 	  Outputlist= myappend(Outputlist, CFFactor(swapvar(inter.getItem().factor(),k,n), inter.getItem().exp()));
 	}
@@ -251,6 +251,7 @@ SqrFreed( const CanonicalForm & r ){
     return Outputlist ;
   }
 #ifdef HAVE_SINGULAR
+  extern void WerrorS(char *);
   WerrorS("libfac: ERROR: SqrFreed: we should never fall trough here!");
 #else
   cerr << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n" 

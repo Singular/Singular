@@ -1,17 +1,16 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: SqrFree.h,v 1.2 1997-06-09 15:56:03 Singular Exp $
+// $Id: SqrFree.h,v 1.3 1997-09-12 07:19:51 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef SQRFREE_H
 #define SQRFREE_H
 
 /*BEGINPUBLIC*/
-// int SqrFreeTest( const CanonicalForm & r, int opt=1) ;
 // CFFList SqrFree( const CanonicalForm & f ) ;
-CFFList InternalSqrFree( const CanonicalForm & f ) ;
 /*ENDPUBLIC*/
-int SqrFreeTest( const CanonicalForm & r, int opt=1) ;
+CFFList InternalSqrFree( const CanonicalForm & f ) ;
+int     SqrFreeTest( const CanonicalForm & r, int opt=1) ;
 CFFList SqrFree( const CanonicalForm & f ) ;
 #endif /* SQRFREE_H */
 

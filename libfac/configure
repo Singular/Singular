@@ -520,9 +520,9 @@ fi
 
 libfac_name="\"Factorization and characteristic sets library\""
 
-libfac_version="0.2.4"
+libfac_version="0.3.0"
 
-libfac_date="\"May 30 1997\""
+libfac_date="\"Sep 11 1997\""
 
 libfac_author="\"M. Messollen\""
 
@@ -555,7 +555,11 @@ fi
 
 if test "$with_Singular" = yes; then
   cat >> confdefs.h <<\EOF
-#define HAVE_SINGULAR 1
+#define SINGULAR 1
+EOF
+
+  cat >> confdefs.h <<\EOF
+#define NOSTREAMIO 1
 EOF
 
   if test "$with_debug" = yes; then
@@ -585,14 +589,17 @@ if (test "x${prefix} != xNONE && test "${prefix} != "/usr/local") || \
 fi
 LDFLAGS="-L. ${LDFLAGS}"
 
-if test "$with_debug" = yes; then
-  CXXFLAGS="-g"
-else
-  CXXFLAGS="-O"
-  cat >> confdefs.h <<\EOF
+if test "${CXXFLAGS+set}" != set; then
+  ac_cxxflags_set=no
+  if test "$with_debug" = yes; then
+    CXXFLAGS="-g"
+  else
+    CXXFLAGS="-O"
+    cat >> confdefs.h <<\EOF
 #define NDEBUG 1
 EOF
-  
+
+  fi  
 fi
 
 ac_ext=C
@@ -644,7 +651,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CXX-g++} -E conftest.C'; { (eval echo configure:648: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CXX-g++} -E conftest.C'; { (eval echo configure:655: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gxx=yes
 else
   ac_cv_prog_gxx=no
@@ -693,12 +700,12 @@ ac_compile='${CXX-g++} -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
 ac_link='${CXX-g++} -o conftest $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
   CXXCPP="${CXX-g++} -E"
   cat > conftest.$ac_ext <<EOF
-#line 697 "configure"
+#line 704 "configure"
 #include "confdefs.h"
 #include <stdlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:702: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:709: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   :
@@ -807,12 +814,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 811 "configure"
+#line 818 "configure"
 #include "confdefs.h"
 #include <factory.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:816: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:823: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -840,7 +847,7 @@ if eval "test \"`echo '$''{'ac_cv_c_const'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 844 "configure"
+#line 851 "configure"
 #include "confdefs.h"
 
 int main() { return 0; }
@@ -890,7 +897,7 @@ ccp = (char const *const *) p;
 
 ; return 0; }
 EOF
-if { (eval echo configure:894: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:901: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_const=yes
 else
@@ -916,7 +923,7 @@ else
   ac_cv_c_inline=no
 for ac_kw in inline __inline__ __inline; do
   cat > conftest.$ac_ext <<EOF
-#line 920 "configure"
+#line 927 "configure"
 #include "confdefs.h"
 
 int main() { return 0; }
@@ -924,7 +931,7 @@ int t() {
 } $ac_kw foo() {
 ; return 0; }
 EOF
-if { (eval echo configure:928: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:935: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_inline=$ac_kw; break
 fi
@@ -949,10 +956,12 @@ esac
 
 
 if test ${GXX} = yes; then
-  if test "$with_debug" = yes; then
-     CXXFLAGS="-O -g"
-  else
-     CXXFLAGS="-O3 "
+  if test "$ac_cxxflags_set" = no; then
+    if test "$with_debug" = yes; then
+       CXXFLAGS="-O -g"
+    else
+       CXXFLAGS="-O3 "
+    fi
   fi
   CXXTEMPLFLAGS="-fno-implicit-templates"
 else

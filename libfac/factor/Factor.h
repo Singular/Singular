@@ -1,10 +1,11 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: Factor.h,v 1.2 1997-06-09 15:55:59 Singular Exp $
+// $Id: Factor.h,v 1.3 1997-09-12 07:19:47 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef FACTOR_H
 #define FACTOR_H
+CanonicalForm generate_mipo( int degree_of_Extension , const Variable & Extension );
 CFFList Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar=0);
 /*BEGINPUBLIC*/
 CFFList Factorize( const CanonicalForm & F, int is_SqrFree=0 ) ;

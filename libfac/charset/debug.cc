@@ -1,6 +1,6 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: debug.cc,v 1.1.1.1 1997-09-11 10:58:22 Singular Exp $ ";
+// static char * rcsid = "$Id: debug.cc,v 1.2 1997-09-12 07:19:43 Singular Exp $ ";
 ////////////////////////////////////////////////////////////
 static int deb_level;
 char * deb_level_msg = 0;

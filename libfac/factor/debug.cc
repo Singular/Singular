@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: debug.cc,v 1.2 1997-06-09 15:56:07 Singular Exp $ ";
+// static char * rcsid = "$Id: debug.cc,v 1.3 1997-09-12 07:19:55 Singular Exp $ ";
 ////////////////////////////////////////////////////////////
 static int deb_level;
 char * deb_level_msg = 0;

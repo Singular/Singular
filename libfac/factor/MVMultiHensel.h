@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: MVMultiHensel.h,v 1.2 1997-06-09 15:56:00 Singular Exp $
+// $Id: MVMultiHensel.h,v 1.3 1997-09-12 07:19:48 Singular Exp $
 /////////////////////////////////////////////////////////////
 #ifndef MULTIHENSEL_H
 #define MULTIHENSEL_H

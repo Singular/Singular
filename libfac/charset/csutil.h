@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: csutil.h,v 1.2 1997-06-09 15:55:55 Singular Exp $
+// $Id: csutil.h,v 1.3 1997-09-12 07:19:42 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_CSUTIL_H
@@ -53,6 +53,8 @@ CanonicalForm  Prem( const CanonicalForm &f, const CanonicalForm &g );
 CanonicalForm  Prem( const CanonicalForm &f, const CFList &L );
 CFList         Prem( const CFList &AS, const CFList &L );
 /*ENDPUBLIC*/
+CanonicalForm  divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as);
+CFList         remsetb( const CFList & ps, const CFList & as);
 CanonicalForm  lowestRank( const CFList & F );
 
 CFList         removecontent ( const CFList & PS, PremForm & Remembern );
@@ -63,13 +65,14 @@ CFList         initalset1(const CFList & CS);
 CFList         initalset2(const CFList & CS, const CanonicalForm & reducible);
 int            irreducible( const CFList & AS);
 CFList         select( const ListCFList & PS);
-void select( const ListCFList & ppi, int length, ListCFList & ppi1, ListCFList & ppi2);
-bool same( const CFList &A, const CFList &B );
-bool member( const CFList & cs, const ListCFList & pi );
+void           select( const ListCFList & ppi, int length, ListCFList & ppi1, 
+		       ListCFList & ppi2);
+bool           same( const CFList &A, const CFList &B );
+bool           member( const CFList & cs, const ListCFList & pi );
 bool           subset( const CFList &PS, const CFList &CS );
-ListCFList MyUnion( const ListCFList & a, const ListCFList &b );
-ListCFList MyDifference( const ListCFList & a, const CFList &b);
-ListCFList Minus( const ListCFList & a, const ListCFList &b);
+ListCFList     MyUnion( const ListCFList & a, const ListCFList &b );
+ListCFList     MyDifference( const ListCFList & a, const CFList &b);
+ListCFList     Minus( const ListCFList & a, const ListCFList &b);
 #endif /* INCL_CSUTIL_H */
 
 ////////////////////////////////////////////////////////////

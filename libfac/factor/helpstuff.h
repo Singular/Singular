@@ -1,11 +1,12 @@
 /** Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: helpstuff.h,v 1.2 1997-06-09 15:56:09 Singular Exp $
+// $Id: helpstuff.h,v 1.3 1997-09-12 07:19:57 Singular Exp $
 ////////////////////////////////////////////////////////////
 #ifndef HELPSTUFF_H
 #define HELPSTUFF_H
 bool mydivremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
+void mydivrem( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b );
 ///////////////////////////////////////////////////////////////
 // Now some procedures used in MVMultiHensel and in Truefactors
 ///////////////////////////////////////////////////////////////

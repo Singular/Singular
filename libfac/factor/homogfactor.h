@@ -1,13 +1,13 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: homogfactor.h,v 1.2 1997-06-09 15:56:10 Singular Exp $
+// $Id: homogfactor.h,v 1.3 1997-09-12 07:19:58 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef HFACTOR_H
 #define HFACTOR_H
-CFList get_Terms( const CanonicalForm & f );
-bool is_homogeneous( const CanonicalForm & f);
-CFFList  HomogFactor( const CanonicalForm & g, const Variable  & minpoly, const int Mainvar );
+CFList  get_Terms( const CanonicalForm & f );
+bool    is_homogeneous( const CanonicalForm & f);
+CFFList HomogFactor( const CanonicalForm & g, const Variable  & minpoly, const int Mainvar );
 #endif /* HFACTOR_H */
 
 ////////////////////////////////////////////////////////////

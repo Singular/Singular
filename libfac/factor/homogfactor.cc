@@ -1,12 +1,14 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: homogfactor.cc,v 1.2 1997-06-09 15:56:10 Singular Exp $ ";
+// static char * rcsid = "$Id: homogfactor.cc,v 1.3 1997-09-12 07:19:57 Singular Exp $ ";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "Factor.h"
+// some CC's need it:
+#include "homogfactor.h"
 
 #ifdef HFACTORDEBUG
 #  define DEBUGOUTPUT

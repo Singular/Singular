@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: algfactor.cc,v 1.1.1.1 1997-09-11 10:58:22 Singular Exp $";
+static char * rcsid = "$Id: algfactor.cc,v 1.2 1997-09-12 07:19:38 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>

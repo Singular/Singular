@@ -19,9 +19,7 @@ extern char * libfac_author;
 CFFList Factorize( const CanonicalForm & F, int is_SqrFree=0 ) ;
 
 //// Note: InternalSqrFree does only the work needed for factorization.
-// int SqrFreeTest( const CanonicalForm & r, int opt=1) ;
 // CFFList SqrFree( const CanonicalForm & f ) ;
-CFFList InternalSqrFree( const CanonicalForm & f ) ;
 
 typedef List<CFList> ListCFList;
 typedef List<int> IntList ;
@@ -49,7 +47,7 @@ CanonicalForm  Prem( const CanonicalForm &f, const CanonicalForm &g );
 CanonicalForm  Prem( const CanonicalForm &f, const CFList &L );
 CFList         Prem( const CFList &AS, const CFList &L );
 CFList     MCharSetN( const CFList &PS, PremForm & Remembern );
-ListCFList IrrCharSeries( const CFList &PS );
+ListCFList IrrCharSeries( const CFList &PS, int opt=0 );
 
 // the next three give you a heuristically optimal reorderd list of the
 // variables. For internal and external (e.g. Singular/Macaulay2) library use.
@@ -78,6 +76,8 @@ IntList  neworderint(const CFList & PolyList );
 // Q= reorder(betterorder,Q);   // revert ordering to oldorder
 // 
 CFList reorder( const Varlist & betterorder, const CFList & PS);
+CFFList reorder( const Varlist & betterorder, const CFFList & PS);
 ListCFList reorder(const Varlist & betterorder, const ListCFList & Q);
+
 
 #endif /* FACTOR_H */

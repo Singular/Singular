@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: tmpl_inst.h,v 1.2 1997-06-09 15:56:14 Singular Exp $
+// $Id: tmpl_inst.h,v 1.3 1997-09-12 07:20:01 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef TMPL_INST_H
 #define TMPL_INST_H
@@ -36,8 +36,13 @@ typedef ListIterator<Variable> VarlistIterator;
 
 typedef Array<int> Intarray;
 
-typedef Array<CFArray> CCFArray ;
-typedef Array<CCFArray> CCCFArray ;
+#ifdef HAVE_DATABASE
+typedef List<CFFList> ListCFFList;
+typedef ListIterator<CFFList> ListCFFListIterator;
+#endif
+
+//typedef Array<CFArray> CCFArray ;
+//typedef Array<CCFArray> CCCFArray ;
 
 #endif /* TMPL_INST_H */
 

@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: debug.h,v 1.2 1997-06-09 15:56:08 Singular Exp $" ;
+// static char * rcsid = "$Id: debug.h,v 1.3 1997-09-12 07:19:55 Singular Exp $" ;
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of FACDEBUG and/or DEBUGOUTPUT
@@ -44,7 +44,7 @@ extern char * deb_level_msg;
 #define DEBOUTSL(stream) \
 (stream << deb_level_msg, stream.flush())
 #define DEBOUT(stream,msg,object) \
-(stream << msg << object, stream.flush())
+(stream << deb_level_msg << msg << object, stream.flush())
 #define DEBOUTLN(stream,msg,object) \
 (stream << deb_level_msg << msg << object << endl)
 #define DEBOUTMSG(stream,msg) \

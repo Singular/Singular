@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: tmpl_inst.cc,v 1.2 1997-06-09 15:56:12 Singular Exp $
+// $Id: tmpl_inst.cc,v 1.3 1997-09-12 07:20:00 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 
@@ -81,6 +81,11 @@ template ostream & operator << ( ostream &, const Array<int> & );
 template class Array<int>;
 template class Array<Variable>;
 
+// for database
+#ifdef HAVE_DATABASE
+template class List<CFFList>;
+template class ListIterator<CFFList>;
+#endif /* HAVE_DATABASE */
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $

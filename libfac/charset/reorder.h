@@ -1,7 +1,7 @@
 /** Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: reorder.h,v 1.2 1997-06-09 15:55:56 Singular Exp $
+// $Id: reorder.h,v 1.3 1997-09-12 07:19:45 Singular Exp $
 ////////////////////////////////////////////////////////////
 #ifndef INCL_REORDER_H
 #define INCL_REORDER_H
@@ -37,6 +37,7 @@ IntList  neworderint(const CFList & PolyList );
 // Q= reorder(betterorder,Q);   // revert ordering to oldorder
 // 
 CFList reorder( const Varlist & betterorder, const CFList & PS);
+CFFList reorder( const Varlist & betterorder, const CFFList & PS);
 ListCFList reorder(const Varlist & betterorder, const ListCFList & Q);
 /*ENDPUBLIC*/
 

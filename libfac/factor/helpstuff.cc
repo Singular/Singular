@@ -1,12 +1,14 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: helpstuff.cc,v 1.2 1997-06-09 15:56:08 Singular Exp $";
+// static char * rcsid = "$Id: helpstuff.cc,v 1.3 1997-09-12 07:19:56 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
 // Factor - Includes
 #include "tmpl_inst.h"
+// some CC's need this:
+#include "helpstuff.h"
 
 bool 
 mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b ){
@@ -17,6 +19,16 @@ mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, Ca
   if ( aa==bb ) { b=bb; }
   else { b=aa; }
   return retvalue;
+}
+
+void
+mydivrem( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b ){
+  bool retvalue;
+  CanonicalForm aa,bb;
+  retvalue = divremt(f,g,a,bb);
+  aa= f-g*a;
+  if ( aa==bb ) { b=bb; }
+  else { b=aa; }
 }
 
 // Now some procedures used in SqrFree and in Factor
@@ -59,7 +71,7 @@ myUnion(const CFFList & Inputlist1,const CFFList & Inputlist2){
 }
 
 int
-Powerup( const int base , const int exp=1){
+Powerup( const int base , const int exp){
   int retvalue=1;
   if ( exp == 0 )  return retvalue ; 
   else for ( int i=1 ; i <= exp; i++ ) retvalue *= base ;

@@ -25,6 +25,9 @@ extern char * libfac_author;
 
 .INCLUDE factor/helpstuff.h
 .INCLUDE factor/tmpl_inst.h
+.INCLUDE factor/homogfactor.h
+.INCLUDE factor/debug.h
+.INCLUDE factor/timing.h
 
 ////////////////////////////////////////
 /// from charsets:
@@ -32,5 +35,7 @@ extern char * libfac_author;
 .INCLUDE charset/charset.h
 
 .INCLUDE charset/reorder.h
+
+.INCLUDE charset/algfactor.h
 
 #endif /* FACTOR_H */

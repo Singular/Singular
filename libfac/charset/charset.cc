@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.2 1997-06-09 15:55:53 Singular Exp $";
+static char * rcsid = "$Id: charset.cc,v 1.3 1997-09-12 07:19:40 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -11,6 +11,10 @@ static char * rcsid = "$Id: charset.cc,v 1.2 1997-06-09 15:55:53 Singular Exp $"
 #include <interrupt.h>
 // Charset - Includes
 #include "csutil.h"
+#include "algfactor.h"
+#include "alg_factor.h"
+// Some CC's need this:
+#include "charset.h"
 
 #ifdef BASICSETDEBUG
 #  define DEBUGOUTPUT
@@ -46,6 +50,8 @@ BasicSet( const CFList &PS )
     while ( ! QS.isEmpty() ) {
 	b = lowestRank( QS );
 	cb = rank( b );
+	DEBOUTLN(cout, "BasicSet: choose b  = ", b);
+	DEBOUTLN(cout, "BasicSet: it's rank = ", cb);
 	BS=Union(CFList(b),BS);//BS.append( b );
 	if ( rank( b ) == 0 )
 	    return Union(PS, CFList(b)) ; // b should be the first elem!
@@ -64,21 +70,21 @@ BasicSet( const CFList &PS )
     return BS;
 }
 
- int
- checkok( const CFList & PS, CFList & FS2){
-   CanonicalForm elem;
+int
+checkok( const CFList & PS, CFList & FS2){
+  CanonicalForm elem;
 
-   for ( CFListIterator i=PS; i.hasItem(); i++){
-     elem= i.getItem();
-     for (CFListIterator j=FS2; j.hasItem(); j++){
-       if (elem == j.getItem()){
+  for ( CFListIterator i=PS; i.hasItem(); i++){
+    elem= i.getItem();
+    for (CFListIterator j=FS2; j.hasItem(); j++){
+      if (elem == j.getItem()){
  	//	FS2= Difference(FS2,CFList(elem));
  	return 0;
-       }
-     }
-   }
-   return 1;
- }
+      }
+    }
+  }
+  return 1;
+}
 
 #ifdef MCHARSETNDEBUG
 #  define DEBUGOUTPUT
@@ -144,6 +150,19 @@ MCharSetN( const CFList &PS, PremForm & Remembern ){
   DEBOUTLN(cout, "MCharSetN: Remembern.FS1: ", Remembern.FS1);
 
   return CS;
+}
+
+
+CFList
+mcharset( const CFList &PS, PremForm & Remembern ){
+  CFList cs= MCharSetN(PS, Remembern );
+  CFList rs= remsetb(Difference(PS,cs),cs);
+
+  DEBOUTLN(cout, "mcharset: cs= ", cs);
+  DEBOUTLN(cout, "mcharset: rs= ", rs);
+  if ( rs.length() > 0 )
+    cs= mcharset(Union(PS,Union(cs,rs)), Remembern);
+  return cs;
 }
 
 // the "original" extended characteristic set
@@ -310,6 +329,14 @@ getItemNr( int nr, const ListCFList & copy){
   return elem;
 }
 
+static int
+choosefrom(){
+int choice;
+    cout << "choose from qhi! ->";
+    cin >> choice;
+return choice;
+}
+
 static ListCFList
 msort( const ListCFList & list_to_sort ){
   int nr, number = list_to_sort.length();
@@ -332,20 +359,35 @@ msort( const ListCFList & list_to_sort ){
 #include "debug.h"
 
 ListCFList
-IrrCharSeries( const CFList &PS ){
+IrrCharSeries( const CFList &PS, int opt ){
   CanonicalForm reducible,reducible2;
   CFList qs,cs,factorset,is,ts;
   ListCFList pi,ppi,qqi,qsi,iss,qhi= ListCFList(PS);
-  int nr_of_iteration=0,ts2,highestlevel=0;
+  int nr_of_iteration=0,ts2,highestlevel=0; 
+#ifdef EXPERIMENTAL
+  int choice=1;;
+#endif
 
   DEBOUTMSG(cout, rcsid);
+//  cout << getCharacteristic() << endl;
   for ( CFListIterator Ps=PS; Ps.hasItem(); Ps++ )
     if ( level(Ps.getItem() ) > highestlevel ) highestlevel = level(Ps.getItem()) ;
-
+//  for ( int xx=1; xx <= highestlevel; xx++)
+//   cout << Variable(xx) ;
+//  cout << endl;
+//  for ( CFListIterator Ps=PS; Ps.hasItem(); Ps++ )
+//    cout << Ps.getItem() << ", " ;//<< endl;
+//  cout <<  endl;
   while ( ! qhi.isEmpty() ) {
     qhi=sort(qhi);
     DEBOUTLN(cout, "qhi is: ", qhi);
+#ifdef EXPERIMENTAL
+    choice=choosefrom();
+    cout <<"/n Choose " << choice << endl;
+    qs= getItemNr(choice, qhi);
+#else
     qs=qhi.getFirst();
+#endif
     DEBOUTLN(cout, "qs  is: ", qs);
     DEBOUTLN(cout, "ppi is: ", ppi);
     ListCFList ppi1,ppi2;
@@ -453,7 +495,11 @@ IrrCharSeries( const CFList &PS ){
     DEBOUTLN(cout, "iss is: ", iss);
   }
   if ( ! qsi.isEmpty() ){ 
-    return contract( qsi ); 
+    DEBOUTLN(cout, "qsi before contract= ", qsi);
+    if ( opt == 0 ){
+       return contract( qsi ); 
+    }
+    else { return qsi; }
   }
   else{ return ListCFList() ; }
 }  
@@ -473,43 +519,65 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
   CFFList qs;
   CFList ts,as;
   CanonicalForm elem;
-  int ind=1,nr=0;
+  int ind=1,nr=0, success=-1;
+  CFListIterator i;
 
   ja = 0;
   DEBOUTLN(cout, "irras: called with: AS= ", AS);
-  for ( CFListIterator i=AS; i.hasItem(); i++ ){
+  for ( i=AS; i.hasItem(); i++ ){
     elem = i.getItem();
     nr += 1;
     DEBOUT(cout, "irras: factoring: ", elem);
-    qs = Factorize(elem);
-
+    if ( degree(elem) > 1 ) // linear poly's are irreduzible
+      qs = Factorize(elem);
+    else{
+      qs=(CFFactor(elem,1));
+      qs.insert(CFFactor(CanonicalForm(1),1));
+    }
+    DEBOUTLN(cout, "  = ", qs);
     // INTERRUPTHANDLER
     if ( interrupt_handle() ) return CFList() ;
     // INTERRUPTHANDLER
-
     qs.removeFirst();
-    DEBOUTLN(cout, "  = ", qs);
-    //    if ( num(qs.getFirst().factor() / LC(qs.getFirst().factor())) !=
-    //         num(elem / LC(elem))){
     if ( (qs.length() >= 2 ) || (qs.getFirst().exp() > 1)){
       DEBOUTLN(cout, "irras: Setting ind=0, ja= ", nr);
       ja=nr; ind=0; reducible= elem; 
-      // return(qs); // ist das nicht genauso gut?
       break;
     }
-    else{ as.append(elem) ; }
+    //    else{ as.append(elem) ; }
   }
-  AS=as; // warum das?
-  if ( (ind == 1) && ( AS.length() > 1) ){
-    if ( irreducible(AS) ) ja = 0;
+  //  cout << "ind= " << ind << endl;
+  if ( (ind == 1) ){ //&& ( as.length() > 1) ){
+    if ( irreducible(AS) ){ // as quasilinear? => irreducible!
+      ja = 0; 
+      DEBOUTLN(cout, "as is irreducible. as= ", AS);
+    }
     else {
-#ifdef HAVE_SINGULAR
-      extern void WerrorS(char *);
-      WerrorS("libfac: Factorization over algebraic function field required!");
-#else 
-      cerr << "Factorization over algebraic function field required!" << endl;
-#endif
-      ja = -1;
+//#ifdef HAVE_SINGULAR
+//      extern void WerrorS(char *);
+//      WerrorS("libfac: Factoring over algebraic function field!");
+//#else 
+//      cerr << "libfac: Factoring over algebraic function field!" << endl;
+//#endif
+      i=AS;
+      for ( nr=1; nr< AS.length(); nr++){
+	as.append(i.getItem());
+	i++;
+	if ( degree(i.getItem()) > 1 ){// search for a non linear elem
+	  elem=i.getItem();
+//	  cout << "f=  " << elem << endl;
+//        cout << "as= " << as << endl;
+	  qs= newfactoras(elem,as,success);
+//	  cout << "irras:newfactoras    qs= " << qs << endl;
+//	  qs= factoras(elem,as,success);
+//	  cout << "irras:factoras qs= " << qs << endl;
+	  if ( qs.length() > 1 || qs.getFirst().exp() > 1 ){ //found elem is reducible
+	    reducible=elem;
+	    ja=nr+1;
+	    break;
+	  }
+	}
+      }
     }
   }
   for ( CFFListIterator k=qs; k.hasItem();k++)

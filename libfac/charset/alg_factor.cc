@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.1.1.1 1997-09-11 10:58:22 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.2 1997-09-12 07:19:37 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -154,7 +154,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     if ( getCharacteristic() == 0 ){
       temp= gcd(R, R.deriv(vf)); 
       DEBOUTLN(cout, "sqrf_norm_sub: temp= ", temp);
-      if (degree(temp) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
+      if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
       else { sqfreetest= 1; }
       DEBOUTLN(cout, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
@@ -335,7 +335,7 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
   DEBOUTLN(cout, "alg_factor: s= ", s);
   DEBOUTLN(cout, "alg_factor: R= ", R);
   Off(SW_RATIONAL);
-  Factorlist = Factorize(R,1); 
+  Factorlist = Factorize(R); 
   On(SW_RATIONAL);
   DEBOUTLN(cout, "alg_factor: Factorize(R)= ", Factorlist);
   if ( Factorlist.length() == 2 && Factorlist.getLast().exp()== 1){ // irreduzibel (first entry is a constant)
@@ -409,7 +409,7 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
       for (ii=i; ii.hasItem(); ii++){
 	if ( x != 0 ){
 	  divrem(ii.getItem(), gg, q,r);
-	  cout << ii.getItem() << " divided by " << gg << endl;
+//	  cout << ii.getItem() << " divided by " << gg << endl;
 	  DEBOUTLN(cout, "q= ", q); DEBOUTLN(cout, "r= ", r);
 	  ii.append(ii.getItem()+q*g); ii.remove(1);
 	  DEBOUTLN(cout, "as= ", as);
@@ -613,3 +613,4 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 /*
 $Log: not supported by cvs2svn $
 */
+

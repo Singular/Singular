@@ -1,13 +1,19 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.2 1997-06-09 15:56:00 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.3 1997-09-12 07:19:48 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "helpstuff.h"
+// some CC's need this:
+#include "MVMultiHensel.h"
+
+#ifdef SINGULAR
+#  define HAVE_SINGULAR
+#endif
 
 #ifdef HENSELDEBUG
 #  define DEBUGOUTPUT

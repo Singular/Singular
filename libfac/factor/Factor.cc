@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.2 1997-06-09 15:55:58 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.3 1997-09-12 07:19:46 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -13,6 +13,12 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 #include "Truefactor.h"
 #include "homogfactor.h"
 #include "interrupt.h"
+// some CC's need this:
+#include "Factor.h"
+
+#ifdef SINGULAR
+#  define HAVE_SINGULAR
+#endif
 
 #ifdef FACTORDEBUG
 #  define DEBUGOUTPUT
@@ -29,10 +35,6 @@ TIMING_DEFINE_PRINT(evaluate_time);
 TIMING_DEFINE_PRINT(hensel_time);
 TIMING_DEFINE_PRINT(truefactor_time);
 
-extern int libfac_interruptflag;
-#ifdef HAVE_SINGULAR
-extern void WerrorS(char *);
-#endif
 
 ///////////////////////////////////////////////////////////////
 // Choose a main variable if the user didn`t wish a          //
@@ -138,7 +140,7 @@ lt_is_product( const CanonicalForm & lt ){
 // Reverse the make_monic transformation.                    //
 // Return the list of factors.                               //
 ///////////////////////////////////////////////////////////////
-CFFList 
+static CFFList 
 not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalForm & F, int levelF){
   CFFList Returnlist,IntermediateList;
   CFFListIterator i;
@@ -209,6 +211,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
 	  }
 	  else { 
 #ifdef HAVE_SINGULAR
+	    extern void WerrorS(char *);
 	    WerrorS("libfac: ERROR: not_monic1: case lt is a sum.");
 #else 
 	    cerr << "libfac: ERROR: not_monic1: case lt is a sum.\n" 
@@ -226,6 +229,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
 	  Returnlist= myUnion( CFFList(CFFactor(1/a,1)),Returnlist) ;
 	else {
 #ifdef HAVE_SINGULAR
+	  extern void WerrorS(char *);
 	  WerrorS("libfac: ERROR: not_monic2: case lt is a sum.");
 #else 
 	  cerr << "libfac: ERROR: not_monic2: case lt is a sum.\n" 
@@ -307,7 +311,7 @@ specialize_variable( CanonicalForm & f, int deg, SFormList & Substitutionlist, i
 // generate a minpoly of degree degree_of_Extension in the   //
 // field getCharacteristik()^Extension.                      //
 ///////////////////////////////////////////////////////////////
-static CanonicalForm
+CanonicalForm
 generate_mipo( int degree_of_Extension , const Variable & Extension ){
   FFRandom gen; 
   if ( degree(Extension) > 0 ) GFRandom gen; 
@@ -315,6 +319,7 @@ generate_mipo( int degree_of_Extension , const Variable & Extension ){
     if ( degree(Extension) == 0 ) FFRandom gen;
     else { 
 #ifdef HAVE_SINGULAR
+    extern void WerrorS(char *);
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else 
     cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !" 
@@ -386,6 +391,7 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
     }
     else {
 #ifdef HAVE_SINGULAR
+      extern void WerrorS(char *);
       WerrorS("libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!");
 #else 
       cerr << "libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!\n" 
@@ -420,6 +426,7 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
   else { if ( degree(Extension) == 0 ) FFRandom gen;
   else { 
 #ifdef HAVE_SINGULAR
+    extern void WerrorS(char *);
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else
     cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !" 
@@ -427,8 +434,9 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
 #endif
     FFRandom gen; }}
   REvaluation k(1,n,gen);
+  k.nextpoint();
   for ( int i=1; i<=maxtries ; i++){
-    //    k.nextpoint();
+    // k.nextpoint();
     SFormList Substitutionlist;
     for ( int j=1; j<=n; j++ )
      Substitutionlist.insert(SForm(Variable(j),k[j])); 
@@ -495,7 +503,7 @@ find_evaluation(int maxtries, int sametries, int failtries, const CanonicalForm 
 // Returns the list of factors.                              //
 ///////////////////////////////////////////////////////////////
 CFFList 
-Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar=0){
+Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
   CanonicalForm f,lt,ff,ffuni;
   Variable Extension=alpha;
   CFFList Outputlist,UnivariateFactorlist,Outputlist2;
@@ -598,6 +606,7 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar=0){
     DEBOUTLN(cout,  "Returned from specializePoly: success: ", success);
     if (success == 0 ){ // No spezialisation could be found
 #ifdef HAVE_SINGULAR
+      extern void WerrorS(char *);
       WerrorS("libfac: Factorize: ERROR: Not able to find a valid specialization!");    
 #else
       cerr << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n" 
@@ -683,7 +692,7 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar=0){
 //           * ensuring poly is sqrfree (n.y.i.)             //
 ///////////////////////////////////////////////////////////////
 CFFList 
-Factorize( const CanonicalForm & F, int is_SqrFree=0  ){
+Factorize( const CanonicalForm & F, int is_SqrFree ){
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
   CanonicalForm g=1,unit=1,r=1; 
@@ -699,8 +708,8 @@ Factorize( const CanonicalForm & F, int is_SqrFree=0  ){
   DEBOUTMSG(cout, rcsid);
   if ( getCharacteristic() == 0 ) { // char == 0
     TIMING_START(factorize_time);
+    //cout << "Factoring in char=0 of " << F << " = " << Outputlist << endl;
     Outputlist= factorize(F);
-    //  cout << "Factoring in char=0 of " << F << " = " << Outputlist << endl;
     // Factorization in char=0 doesn't sometimes return at least two elements!!!
     if ( getNumVars(Outputlist.getFirst().factor()) != 0 ) 
       Outputlist.insert(CFFactor(1,1));

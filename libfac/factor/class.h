@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: class.h,v 1.3 1997-08-01 10:51:28 Singular Exp $
+// $Id: class.h,v 1.4 1997-09-12 07:19:54 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef INCL_CLASS_H
 #define INCL_CLASS_H
@@ -11,7 +11,6 @@
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif
-
 
 template <class T>
 class Substitution {
@@ -40,7 +39,7 @@ public:
 	f.print( os );
 	return os;
     }
-#endif    
+#endif
 };
 
 // #ifdef IMPL_CLASS_H
@@ -52,9 +51,6 @@ public:
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
-Revision 1.2  1997/06/09 15:56:06  Singular
-* hannes/michael: libfac 0.2.4
-
 Revision 1.2  1997/04/25 22:21:26  michael
 Version for libfac-0.2.1
 
