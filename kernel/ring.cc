@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.15 2004-08-09 16:55:54 Singular Exp $ */
+/* $Id: ring.cc,v 1.16 2004-08-10 13:09:13 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3547,6 +3547,8 @@ ring rOpp(ring src)
   r->block0[0]=1;
   r->block1[0]=rVar(r);
   r->order[1]=0;
+#ifdef RDEBUG
   rDebugPrint(r);
+#endif
   return r;
 }
