@@ -628,6 +628,8 @@ static long heKeyChksum(char* key)
  *
  *****************************************************************/
 
+static BOOLEAN feHelpCalled = FALSE;
+
 static void heBrowserHelp(heEntry hentry)
 {
   // check checksums of procs
@@ -636,13 +638,14 @@ static void heBrowserHelp(heEntry hentry)
   if (kchksum  && kchksum != hentry->chksum && heOnlineHelp(hentry->key))
     return;
 
-  if (heCurrentHelpBrowser == NULL) 
+  if (heCurrentHelpBrowser == NULL) feHelpBrowser();
+  assume(heCurrentHelpBrowser != NULL);
+  if (! feHelpCalled)
   {
-    feHelpBrowser();
-    assume(heCurrentHelpBrowser != NULL);
     Warn("Displaying help in browser '%s'.", heCurrentHelpBrowser->browser);
     Warn("Use 'system(\"--browser\", \"<browser>\");' to change browser");
     Warn("Use 'system(\"browsers\");'               for available browsers");
+    feHelpCalled = TRUE;
   }
   heCurrentHelpBrowser->help_proc(hentry);
 }
