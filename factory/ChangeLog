@@ -1,4 +1,51 @@
-Ruediger kann jetzt auch CVS benutzen
+Thu Nov  6 16:43:17 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in: check for `libg++.a' commented out
+
+Wed Nov  5 14:48:46 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (conftest): new target
+	  ($(ftestexec), gengftables.o): dependency `conftest' added
+
+	* GNUmakefile.in (gengftables.o): some dependencies removed
+	  (gengftables): dependencies slightly changed
+
+	* configure.in: exits with error on absence of libgmp.a or libm.a
+
+	* configure.in: check for `unistd.h' added
+
+	* configure.in: check for `libg++.a' added
+
+Wed Oct 29 12:41:04 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in: check for `ln -s' added
+
+	* configure.in: checks for header files necessary for the FTE
+	  added
+
+	* GNUmakefile.in (LN_S): new variable
+
+	* GNUmakefile.in ($(ftestexec)): new target
+
+	* GNUmakefile.in (ftestsrc, ftestincl, ftestm4src, ftestdistfiles,
+	  ftestexec): new variables
+	  (distsrc, distincl, distfiles, dist): FTE added to distribution
+	  (ftestclean, ftestdistclean): new targets
+	  (clean, distclean): dependencies ftestclean and ftestdistclean,
+	  resp., added
+
+	* GNUmakefile.in (ftest/GNUmakefile): new target
+
+	* GNUmakefile.in (gengftables): rule slightly simplified
+
+	* test_install.cc (main): calls to `operator<<()' replaced by
+	  calls to `printf()'
+
+	* configure.in (M4FLAGS): new output variable
+	* configure.in (M4): check for `m4' added
+
+	* configure.in: creates `ftest/GNUmakefile'
+
 Tue Oct 28 14:46:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 
