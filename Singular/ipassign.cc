@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.46 1999-03-08 18:11:45 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.47 1999-03-16 10:34:21 hannes Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1387,7 +1387,6 @@ BOOLEAN iiAssign(leftv l, leftv r)
       char *pr=((map)olm)->preimage;
       BOOLEAN module_assign=(/*l->Typ()*/ lt==MODUL_CMD);
       matrix lm ;
-      matrix rm;
       int  num;
       int j,k;
       int i=0;
@@ -1418,6 +1417,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
           break;
         else
         {
+	  matrix rm;
           ht=hh->Typ();
           if ((j=iiTestConvert(ht,etyp))!=0)
           {
