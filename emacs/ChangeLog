@@ -1,3 +1,61 @@
+1998-08-14  T. Wichmann  <wichmann@itwm.uni-kl.de>
+
+	* singular.el : commented code for singular-logo on startup in
+	XEmacs. This code needs some rethinking...
+
+1998-08-10  T. Wichmann  <wichmann@itwm.uni-kl.de>
+
+	* singular.el (singular-toggle-truncate-lines): Added (recenter)
+	according to function definition in XEmacs.
+	(singular-other): Added check on unique buffer name.
+	Added comments to functions and variables.
+
+1998-08-07  T. Wichmann  <wichmann@itwm.uni-kl.de>
+	*singular (singular-send-or-copy-input): Print message if demo
+	mode is active
+	Added variable singular-demo-mode-print-messages
+
+	* singular.el (singular-demo-mode): changed message text
+	(singular-other): if singular options are read from minibuffer, do 
+	not display the "-t" option. Add it automatically.
+	(singular-other): Changed minibuffer text
+	(singular-exit-singular): Added (kill-buffer)
+
+	* singular.el (singular-do-folding): Added (recenter) to prevent 
+	error in subst-char-in-region. Temporary?
+
+	* singular.el (singular-other): Added
+
+1998-08-06  T. Wichmann  <wichmann@itwm.uni-kl.de>
+
+        * singular.el: added key-bindings
+	Introduced new variable singular-start-menu (temporary)
+	Updated submenu "load library"
+	
+        * singular.el: set-face for new font-lock faces now uses argument
+	'append for XEmacs
+	Changed (get-buffer-process (cur...)) to (singular-process)
+	(singular-demo-mode): added message on enter
+
+	* singular.el (singular-emacs-simple-sec-start-at): Removed error: 
+       	(point) was used instead of pos
+	(singular-emacs-simple-sec-end-at): Removed error: (point) was
+	used instead of pos
+
+	* singular.el (singular-interactive-mode-syntax-table): Added
+	additional entries 
+
+	* singular.el (singular-font-lock-keywords-1): Added new regexps 
+	(font-lock-singular-error-face): Added new face
+	(font-lock-singular-warn-face): Added new face
+	(font-lock-singular-prompt-face): Added new face
+
+	*singular.el: set-face for section faces put in comments
+
+	* singular.el (singular-xemacs-simple-sec-in): Written
+	(singular-section-in): Written
+	(singular-do-folding): Finished
+
 Thu Jul 30 11:45:28 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* singular.el (singular-process): new macro
@@ -29,6 +87,14 @@ Thu Jul 30 11:45:28 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	  information not up-to-date leads to a corrupt undo list.
 	  (singular-demo-show-next-chunk): ditto
 	  (singular-exit-sentinel): switches off demo mode on exit
+
+1998-07-31  T. Wichmann  <wichmann@itwm.uni-kl.de>
+
+	* singular.el: simple-secs for XEmacs, second version
+
+1998-07-29  T. Wichmann  <wichmann@itwm.uni-kl.de>
+
+	* singular.el : simple-secs for XEmacs partially implemented 
 
 Wed Jul 29 10:50:47 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
