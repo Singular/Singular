@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.58 1998-06-14 13:46:03 Singular Exp $ */
+/* $Id: extra.cc,v 1.59 1998-06-15 15:47:56 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -281,6 +281,42 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     {
       res->rtyp=STRING_CMD;
       char *r=feGetExpandedExecutable();
+      if (r != NULL)
+        res->data = (void*) mstrdup( r );
+      else
+        res->data = (void*) mstrdup("");
+      return FALSE;
+    }
+    else
+/*==================== SearchPath ==================================*/
+    if (strcmp((char*)(h->data), "SearchPath") == 0)
+    {
+      res->rtyp=STRING_CMD;
+      char *r=feGetSearchPath();
+      if (r != NULL)
+        res->data = (void*) mstrdup( r );
+      else
+        res->data = (void*) mstrdup("");
+      return FALSE;
+    }
+    else
+/*==================== InfoFile ==================================*/
+    if (strcmp((char*)(h->data), "InfoFile") == 0)
+    {
+      res->rtyp=STRING_CMD;
+      char *r=feGetInfoFile();
+      if (r != NULL)
+        res->data = (void*) mstrdup( r );
+      else
+        res->data = (void*) mstrdup("");
+      return FALSE;
+    }
+    else
+/*==================== InfoProgram ==================================*/
+    if (strcmp((char*)(h->data), "InfoProgram") == 0)
+    {
+      res->rtyp=STRING_CMD;
+      char *r=feGetInfoProgram();
       if (r != NULL)
         res->data = (void*) mstrdup( r );
       else

@@ -11,7 +11,7 @@ IMPORTANT:
 ==========
 (1) See the COPYING file contained in this distribution
     for license information for the Singular.
-(2) See the README file contained in this distribution for general
+(2) See the README.general file contained in this distribution for general
     information on Singular.
 
 ABOUT THIS DISTRIBUTION
@@ -23,9 +23,9 @@ This distribution contains the following files and subdirectories
   ./Singular/gftables                           Singular gftables
   ./Singular/doc/<x.y.z>/			documentation (ps, dvi, info)
   ./Singular/html/<x.y.z>/			documentation (html)
-  ./COPYING					licence information
-  ./README.general                              general Singular info
-  ./README.share				this file
+  ./Singular/COPYING				licence information
+  ./Singular/README.general                     general Singular info
+  ./Singular/README.share			this file
 
 where <x.y.z> stands for the Singular version number (e.g., 1.2.0).
   	
@@ -37,7 +37,8 @@ You can get the Singular executables from
 by downloading the appropriate 
   Singular-<x.y.z>-<uname description>.tar.gz 
 file. To install Singular, follow the instructions found in the
-INSTALL which comes with the executable(s).
+INSTALL which you can find at ./Singular/INSTALL after unpacking the
+Singular executables.
 
 
 More information about Singular: Comments, Questions, Bug Reports

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.19 1998-06-03 10:04:21 obachman Exp $ */
+/* $Id: febase.h,v 1.20 1998-06-15 15:47:58 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -88,6 +88,8 @@ char*   feGetSearchPath();
 char*   feGetExpandedExecutable();
 char*   feGetBinDir();
 char*   feGetInfoCall(const char* index);
+char*   feGetInfoProgram();
+char*   feGetInfoFile();
 
 FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
 void    fePause(void);

@@ -32,8 +32,9 @@ You need at least the following two files:
       Singular-1.2.0-share.tar.gz 
       Singular-1.2.0-<uname description>.tar.gz
 where <uname description> is a description of the processor and operating
-system for which Singular is compiled (e.g, ix86-Linux) -- you should
-pick the description which is closest to your local machine. 
+system for which Singular is compiled (e.g, ix86-Linux). Please
+contact us if you can not find an appropriate architecture-dependent
+tar file. 
 
 Simply cd to the directory in which you wish to install SINGULAR,
 and then unpack the architecture independent tar file, followed by
@@ -44,8 +45,9 @@ the architecture-dependent files for those architectures you use:
   gzip -dc Singular-<x.y.z>-<uname description> | tar -pxf -
 
 You may replace `/usr/local/' with what you like, but refer to the
-INSTALL file contained in the executable distribution for more
-detailed info on how to install Singular.
+INSTALL which is contained in the architecture-dependent tar file (and which
+you can find at ./Singular/INSTALL after unpacking) for 
+detailed information on how to install Singular.
 
 To download Singular for Windows 95 or Windows NT platform:
 ==========================================================

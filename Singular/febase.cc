@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.52 1998-06-15 12:58:59 pohl Exp $ */
+/* $Id: febase.cc,v 1.53 1998-06-15 15:47:57 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -242,9 +242,11 @@ static void mystrcpy(char* d, char* s)
 // Return location of file singular.hlp. Search for it as follows:
 // bindir/../doc/singular.hlp
 // bindir/../info/singular.hlp
-// bindir/../../doc/singular.hlp
+// bindir/../../Singular/doc/$version/singular.hlp
+// bindir/../../Singular/doc/singular.hlp
 // bindir/../../info/singular.hlp
-// ROOTDIR/doc/singular.hlp
+// ROOTDIR/Singular/doc/$version/singular.hlp
+// ROOTDIR/Singular/doc/singular.hlp
 // ROOTDIR/info/singular.hlp
 #ifdef WINNT
 static char * feFixFileName(char *hlpdir)
@@ -273,36 +275,56 @@ static char* feGetInfoFile(const char* bindir)
 
   if (bindir != NULL)
   {
+    // bindir/../doc/singular.hlp
     sprintf(hlpfile,"%s/../doc/singular.hlp", bindir);
 #ifdef PATH_DEBUG
     Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
+    // bindir/../info/singular.hlp
     sprintf(hlpfile,"%s/../info/singular.hlp", bindir);
 #ifdef PATH_DEBUG
     Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
-    sprintf(hlpfile,"%s/../../doc/singular.hlp", bindir);
+    // bindir/../../Singular/doc/$version/singular.hlp
+    sprintf(hlpfile,"%s/../../Singular/doc/%s/singular.hlp",bindir,S_VERSION1);
 #ifdef PATH_DEBUG
     Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
+    // bindir/../../Singular/doc/singular.hlp
+    sprintf(hlpfile,"%s/../../Singular/doc/singular.hlp", bindir);
+#ifdef PATH_DEBUG
+    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+#endif
+    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+
+    // bindir/../../info/singular.hlp
     sprintf(hlpfile,"%s/../../info/singular.hlp", bindir);
 #ifdef PATH_DEBUG
     Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
-    sprintf(hlpfile,"%s/doc/singular.hlp", SINGULAR_ROOT_DIR);
+    // ROOTDIR/Singular/doc/$version/singular.hlp
+    sprintf(hlpfile,"%s/Singular/doc/%s/singular.hlp", SINGULAR_ROOT_DIR, S_VERSION1);
 #ifdef PATH_DEBUG
     Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
+    // ROOTDIR/Singular/doc/singular.hlp
+    sprintf(hlpfile,"%s/Singular/doc/singular.hlp", SINGULAR_ROOT_DIR);
+#ifdef PATH_DEBUG
+    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+#endif
+    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+
+    // ROOTDIR/info/singular.hlp
     sprintf(hlpfile,"%s/info/singular.hlp", SINGULAR_ROOT_DIR);
  #ifdef PATH_DEBUG
     Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));

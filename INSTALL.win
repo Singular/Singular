@@ -4,8 +4,10 @@
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
 		  (C) 1986-1998 All Rights Reserved
 
-	     UNIX INSTALLATION INSTRUCTIONS FOR SINGULAR
-	     ============================================
+	     WINDOWS 95/NT INSTALLATION INSTRUCTIONS FOR SINGULAR
+	     =====================================================
+
+TBC 
 
 To install Singular on a Unix platform, you need at least the
 following two files: 
@@ -29,7 +31,7 @@ and then unpack the architecture independent tar file, followed by
 the architecture-dependent files for those architectures you use.
 
   cd /usr/local/	# or wherever you install 3rd-party software
-  gzip -dc Singular-<x.y.z>-share.tar.gz | tar -pxf -
+  gzip -dc Singular-<x.y.z>-share.tar.gz .tar.gz | tar -pxf -
   gzip -dc Singular-<x.y.z>-<uname description> | tar -pxf -
 
 Replace `/usr/local/' with what you like, but it probably ought not
@@ -59,7 +61,7 @@ the Singular executables to another place, but use soft-links
 instead. For example, to install Singular on your system, use
 something like:
  ln -s `pwd`./<uname description>/bin/Singular-<x.y.z> /usr/local/bin/Singular
-See also the `TROUBLES' section below, if you run into any problems.
+
 
 TO INSTALL THE ON-LINE DOCUMENTATION
 =====================================
@@ -69,7 +71,7 @@ obtain it from
 ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/
 by downloading the respective info-<uname description>.tar.gz file.
 
-If you have the `info' program on your system, no further actions To install, simply cd to the directory where you unpacked the other
+To install, simply cd to the directory where you unpacked the other
 tar files and then unpack the info tar file.
 
   cd /usr/local/      # i.e., wherever you have unpacked Singular tar files

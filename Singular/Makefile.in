@@ -161,20 +161,6 @@ Singular-static: mod2.h si_paths.h Makefile version.h scanner.cc ${OBJS} \
 	tesths.cc iparith.o mpsr_Tok.o \
 	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS}
 
-Singular-bindist: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
-                  mpsr_Tok.o tesths.cc libparse.cc depend
-	rm -f si_paths.h
-	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" Singular
-	mv Singular Singular-bindist
-	rm -f si_paths.h
-
-Singular-static-bindist: mod2.h Makefile version.h scanner.cc ${OBJS} \
-                         iparith.o mpsr_Tok.o tesths.cc libparse.cc depend
-	rm -f si_paths.h
-	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" Singular-static
-	mv Singular-static Singular-static-bindist
-	rm -f si_paths.h
-
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
 claptmpl.o: claptmpl.cc mod2.h
@@ -224,13 +210,10 @@ libparse.cc: libparse.l
 
 src: scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
 
-mod2.h : stamp-h
+mod2.h si_paths.h: stamp-h
 
-stamp-h : config.status mod2.h.in  
-	CONFIG_FILES= CONFIG_HEADERS="mod2.h" ./config.status
-
-si_paths.h: config.status si_paths.h.in
-	CONFIG_FILES= CONFIG_HEADERS="si_paths.h" ./config.status
+stamp-h : config.status mod2.h.in  si_paths.h.in
+	CONFIG_FILES= CONFIG_HEADERS="mod2.h si_paths.h" ./config.status
 
 Makefile: Makefile.in config.status 
 	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./config.status
@@ -295,15 +278,20 @@ maintainer-clean: distclean srcclean
 ## miscellanous targets
 ##
 
-dist:
-	rm -f ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}*
-	mkdir ${TEMPDIR}/${DISTNAME}
-	- cp -pR . ${TEMPDIR}/${DISTNAME}
-	cd ${TEMPDIR}/${DISTNAME}; ${MAKE} distclean; 
-	cd ${TEMPDIR}; tar cf ${DISTNAME}.tar ${DISTNAME} 
-	rm -f ${TEMPDIR}/${DISTNAME}
-	- gzip -9 ${TEMPDIR}/${DISTNAME}.tar
-	- mv ${TEMPDIR}/${DISTNAME}.tar.gz .
+Singular-bindist: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
+                  mpsr_Tok.o tesths.cc libparse.cc si_paths.h depend
+	touch si_paths.h
+	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" Singular
+	strip Singular
+	mv Singular Singular-bindist
+
+Singular-static-bindist: mod2.h Makefile version.h scanner.cc si_paths.h \
+                         ${OBJS} iparith.o mpsr_Tok.o tesths.cc \
+                         libparse.cc depend
+	touch si_paths.h
+	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" Singular-static
+	strip Singular-static
+	mv Singular-static Singular-static-bindist
 
 tar:
 	tar cf ${DISTNAME}.tar ${DISTFILES}
