@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.11 1997-08-11 15:53:20 Singular Exp $ */
+/* $Id: ring.cc,v 1.12 1997-12-15 22:46:39 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -196,6 +196,11 @@ idhdl rDefault(char *s)
     currRing->block1[2] = 0;
   /*polynomial ring*/
     currRing->OrdSgn    = 1;
+
+    /* complete ring intializations */
+#ifdef COMP_FAST    
+    rComplete(currRing);
+#endif    
   rSetHdl(tmp,TRUE);
   return currRingHdl;
 }
@@ -616,6 +621,10 @@ ord_mismatch:
     }
   }
   tmpR.OrdSgn = typ;
+#ifdef COMP_FAST  
+  // Complete the initialization
+  rComplete(&tmpR);
+#endif  
 /* try to enter the ring into the name list*/
   if ((tmp = enterid(s, myynest, RING_CMD, &idroot))==NULL)
   {
@@ -631,6 +640,20 @@ ord_mismatch:
 
   return currRingHdl;
 }
+
+#ifdef COMP_FAST
+// set those fields of the ring, which can be computed from other fields:
+// More particularly, set:
+// r->VarOffset
+// r->CompIndex
+void rComplete(ring r)
+{
+  int dummy, VarOffset, CompIndex;
+  pGetVarIndicies(r, VarOffset, CompIndex, dummy, dummy);
+  r->VarOffset = (short) VarOffset;
+  r->CompIndex = (short) CompIndex;
+}
+#endif
 
 /*2
 * set a new ring from the data:
@@ -1558,6 +1581,9 @@ int rSum(ring r1, ring r2, ring &sum)
   }
   sum=(ring)Alloc(sizeof(ip_sring));
   memcpy(sum,&tmpR,sizeof(ip_sring));
+#ifdef COMP_FAST  
+  rComplete(sum);
+#endif  
   return 1;
 }
 

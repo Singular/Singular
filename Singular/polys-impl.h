@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.2 1997-12-03 17:05:49 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.3 1997-12-15 22:46:35 obachman Exp $ */
 
 /***************************************************************
  *
@@ -124,48 +124,44 @@ extern int pVarHighIndex;
  ***************************************************************/
 // And here is how we determine the way exponents are stored:
 // There are the following four possibilities:
+// LITTLE_ENDIAN -- rev lex order, assume no empty exponents
 // comp, e_1, e_2, ... , e_n : pVarOffset = 0,
 //                             pCompIndex = 0,
 //                             pVarLowIndex = 1, pVarHighIndex = pVariables
-// e_1, e_2, ... , e_n, comp : pVarOffset = -1,
-//                             pCompIndex = pVariables
-//                             pVarLowIndex = 0, pVarHighIndex = pVariables-1
+// LITTLE_ENDIAN -- lex order, assume no empty exponents
 // comp, e_n, .... , e_2, e_1: pVarOffset = pVariables + 1,
 //                             pCompIndex = 0
 //                             pVarLowIndex = 1, pVarHighIndex = pVariables
+// BIG_ENDIAN -- lex order
+// e_1, e_2, ... , e_n, comp : pVarOffset = -1,
+//                             pCompIndex = pVariables
+//                             pVarLowIndex = 0, pVarHighIndex = pVariables-1
+// BIG_ENDIAN -- rev lex order
 // e_n, ... , e_2, e_1, comp : pVarOffset = pVariables,
 //                             pCompIndex = pVariables
 //                             pVarLowIndex = 0, pVarHighIndex = pVariables-1
-// Furthermore, the last field is always at an anignment border, and
-// there might be "empty" fields between comp and e_1 (resp. e_n).
-// Which one of these variants is used depends on the byte ordering of
-// the machine and on the choosen variable ordering (see below).
+
+// Furthermore, the size of the exponent vector is always a multiple
+// of the word size -- "empty exponents" are filled in between comp
+// and first/last exponent -- i.e. comp and first/last exponent might
+// not be next to each other
 
 #ifdef COMP_FAST
 
 #ifdef WORDS_BIGENDIAN
-#define _pReverseExp    (pVarOffset == -1)
+#define _pHasReverseExp    (pVarOffset != -1)
 #define _pExpIndex(i)                           \
   (pVarOffset == -1 ? (i) - 1 : pVarOffset - (i))
-#else
-#define _pReverseExp    (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1)
-#define _pExpIndex(i) \
-  (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ? pVarOffset - (i) : pVarOffset + (i))
+#define _pRingExpIndex(r, i)                           \
+  ((r)->VarOffset == -1 ? (i) - 1 : (r)->VarOffset - (i))   
+
+#else // ! WORDS_BIGENDIAN
+#define _pHasReverseExp    (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1)
+#define _pRingExpIndex(r, i)                                   \
+  ((r)->VarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
+   (r)->VarOffset - (i) : (r)->VarOffset + (i))
 #endif
     
-// The default settings:
-inline void pGetVarIndicies(int nvars,
-                            int &VarOffset, int &VarCompIndex,
-                            int &VarLowIndex, int &VarHighIndex)
-{   
-  VarOffset    = 0;
-  VarCompIndex = 0;
-  VarLowIndex  = 1;
-  VarHighIndex = nvars;
-}
-#define pSetVarIndicies(nvars) \
-  pGetVarIndicies(nvars, pVarOffset, pCompIndex, pVarLowIndex, pVarHighIndex)
-
 // For (Lex, Comp) Comparisons
 inline void pGetVarIndicies_Lex(int nvars,
                                 int &VarOffset, int &VarCompIndex,
@@ -212,15 +208,33 @@ inline void pGetVarIndicies_RevLex(int nvars,
   // comp, ..., e_1, e_2, ... , e_n
   VarHighIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
   VarCompIndex = 0;
-  VarLowIndex  = pVarHighIndex - nvars + 1;
+  VarLowIndex  = VarHighIndex - nvars + 1;
   VarOffset    = VarLowIndex - 1;
 #endif // WORDS_BIGENDIAN
 }
 #define pSetVarIndicies_RevLex(nvars) \
   pGetVarIndicies_RevLex(nvars, pVarOffset, pCompIndex, pVarLowIndex, pVarHighIndex)
 
+// The default settings:
+inline void pGetVarIndicies(int nvars, 
+                            int &VarOffset, int &VarCompIndex,
+                            int &VarLowIndex, int &VarHighIndex)
+{   
+  pGetVarIndicies_Lex(nvars,VarOffset,VarCompIndex,VarLowIndex,VarHighIndex);
+}
+
+// gets var indicies w.r.t. the ring r
+extern void pGetVarIndicies(ring r,
+                            int &VarOffset, int &VarCompIndex,
+                            int &VarLowIndex, int &VarHighIndex);
+
+#define pSetVarIndicies(nvars) \
+  pGetVarIndicies(nvars, pVarOffset, pCompIndex, pVarLowIndex, pVarHighIndex)
+
+    
 #else  // ! COMP_FAST
 #define _pExpIndex(i)       (i)
+#define _pRingExpIndex(r,i) (i)    
 #endif // COMP_FAST
 
 /***************************************************************
@@ -246,6 +260,9 @@ extern Exponent_t pPDAddExp(poly p, int v, Exponent_t e, char* f, int l);
 extern Exponent_t pPDMultExp(poly p, int v, Exponent_t e, char* f, int l);
 extern Exponent_t pPDSubExp(poly p, int v, Exponent_t e, char* f, int l);
 
+extern Exponent_t pPDRingSetExp(ring r,poly p,int v,Exponent_t e,char* f,int l);
+extern Exponent_t pPDRingGetExp(ring r,poly p, int v, char* f, int l);
+
 #define _pSetExp(p,v,e)     pPDSetExp(p,v,e,__FILE__,__LINE__)
 #define _pGetExp(p,v)       pPDGetExp(p,v,__FILE__,__LINE__)
 #define _pIncrExp(p,v)      pPDIncrExp(p,v,__FILE__,__LINE__)
@@ -253,6 +270,9 @@ extern Exponent_t pPDSubExp(poly p, int v, Exponent_t e, char* f, int l);
 #define _pAddExp(p,i,v)     pPDAddExp(p,i,v,__FILE__,__LINE__)
 #define _pSubExp(p,i,v)     pPDSubExp(p,i,v,__FILE__,__LINE__)
 #define _pMultExp(p,i,v)    pPDMultExp(p,i,v,__FILE__,__LINE__)
+
+#define _pRingSetExp(r,p,v,e)     pPDRingSetExp(r,p,v,e,__FILE__,__LINE__)
+#define _pRingGetExp(r,p,v)       pPDRingGetExp(r,p,v,__FILE__,__LINE__)
 
 #else  // ! (defined(PDEBUG) && PDEBUG != 0)
 
@@ -264,17 +284,20 @@ extern Exponent_t pPDSubExp(poly p, int v, Exponent_t e, char* f, int l);
 #define _pSubExp(p,i,v)     ((p)->exp[_pExpIndex(i)]) -= (v)
 #define _pMultExp(p,i,v)    ((p)->exp[_pExpIndex(i)]) *= (v)
 
+#define _pRingSetExp(r,p,v,e)     (p)->exp[_pRingExpIndex(r,v)]=(e)
+#define _pRingGetExp(r,p,v)       (p)->exp[_pRingExpIndex(r,v)]
+
 #endif // defined(PDEBUG) && PDEBUG != 0
 
 inline Exponent_t _pGetExpSum(poly p1, poly p2, int i)
 {
   int index = _pExpIndex(i);
-  return (long) p1->exp[index] + (long) p2->exp[index];
+  return p1->exp[index] + p2->exp[index];
 }
 inline Exponent_t _pGetExpDiff(poly p1, poly p2, int i)
 {
   int index = _pExpIndex(i);
-  return (long) p1->exp[index] - (long) p2->exp[index];
+  return p1->exp[index] - p2->exp[index];
 }
 
 #define _pSetComp(p,k)      (p)->exp[pCompIndex] = (k)
@@ -283,6 +306,15 @@ inline Exponent_t _pGetExpDiff(poly p1, poly p2, int i)
 #define _pDecrComp(p)       (p)->exp[pCompIndex]--
 #define _pAddComp(p,v)      (p)->exp[pCompIndex] += (v)
 #define _pSubComp(p,v)      (p)->exp[pCompIndex] -= (v)
+
+#ifdef COMP_FAST
+#define _pRingSetComp(r,p,k)      (p)->exp[(r)->CompIndex] = (k)
+#define _pRingGetComp(r,p)        (p)->exp[(r)->CompIndex]
+#else
+#define _pRingSetComp(r,p,k)      _pSetComp(p,k)
+#define _pRingGetComp(r,p)        _pGetComp(p)
+#endif
+
 
 /***************************************************************
  *
@@ -302,7 +334,7 @@ poly    pDBCopy(poly a, char *f, int l);
 poly    pDBCopy1(poly a, char *f, int l);
 poly    pDBHead(poly a, char *f, int l);
 poly    pDBHead0(poly a, char *f, int l);
-
+poly    pDBFetchCopy(ring r, poly a, char *f, int l);
 
 void    pDBDelete(poly * a, char * f, int l);
 void    pDBDelete1(poly * a, char * f, int l);
@@ -325,12 +357,23 @@ while(0)
 #define _pCopy1(A)      pDBCopy1(A, __FILE__,__LINE__)
 #define _pHead(A)       pDBHead(A,__FILE__,__LINE__)
 #define _pHead0(A)      pDBHead0(A, __FILE__,__LINE__)
-
+#ifdef COMP_FAST  
+#define _pFetchCopy(r,A)    pDBFetchCopy(r, A,__FILE__,__LINE__)
+#else
+#define _pFetchCopy(r,p)    pOrdPolyInsertSetm(pCopy(p))
+#endif
+  
 #else // ! MDEBUG
 
 #define _pNew()         (poly) mmAllocSpecialized()
-
-poly    _pInit(void);
+// #define _pNew() _pInit()
+  
+inline poly    _pInit(void)
+{
+  poly p=(poly)mmAllocSpecialized();
+  memset(p,0, pMonomSize);
+  return p;
+}
 
 extern void    _pDelete(poly * a);
 extern void    _pDelete1(poly * a);
@@ -340,6 +383,11 @@ extern poly    _pCopy(poly a);
 extern poly    _pCopy1(poly a);
 extern poly    _pHead(poly a);
 extern poly    _pHead0(poly a);
+#ifdef COMP_FAST
+extern poly    _pFetchCopy(ring r,poly a);
+#else
+#define _pFetchCopy(r,p)  pOrdPolyInsertSetm(pCopy(p))
+#endif
 
 #endif // MDEBUG
 
@@ -554,19 +602,19 @@ inline BOOLEAN _pDivisibleBy_orig(poly a, poly b)
 }
 
 #if defined(PDEBUG) && PDEBUG == 1
-#define _pDivisibleBy1(a,b)   pDBDivisibleBy(a, b, __FILE__, __LINE__)
-extern  BOOLEAN pDBDivisibleBy(poly p1, poly p2, char* f, int l);
+#define _pDivisibleBy1(a,b)   pDBDivisibleBy1(a, b, __FILE__, __LINE__)
+extern  BOOLEAN pDBDivisibleBy1(poly p1, poly p2, char* f, int l);
 inline BOOLEAN _pDivisibleBy1_orig(poly a, poly b)
 #else
   DECLARE(BOOLEAN, _pDivisibleBy1(poly a, poly b))
 #endif // defined(PDEBUG) && PDEBUG == 1
 {
-  if (_pGetComp(a) == _pGetComp(b)) return __pDivisibleBy(a,b);
+  if (_pGetComp(a) == 0 || _pGetComp(a) == _pGetComp(b)) return __pDivisibleBy(a,b);
   return FALSE;
 }
 #if defined(PDEBUG) && PDEBUG == 1
-#define _pDivisibleBy2(a,b)   pDBDivisibleBy(a, b, __FILE__, __LINE__)
-extern  BOOLEAN pDBDivisibleBy(poly p1, poly p2, char* f, int l);
+#define _pDivisibleBy2(a,b)   pDBDivisibleBy2(a, b, __FILE__, __LINE__)
+extern  BOOLEAN pDBDivisibleBy2(poly p1, poly p2, char* f, int l);
 #else
 #define _pDivisibleBy2(a,b) __pDivisibleBy(a,b)
 #endif // defined(PDEBUG) && PDEBUG == 1
@@ -589,26 +637,26 @@ DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
 
 inline void _pGetExpV(poly p, Exponent_t *ev)
 {
-  if (_pReverseExp)
+  if (_pHasReverseExp)
   {
     for (int i = pVarLowIndex, j = pVariables; j; i++, j--)
       ev[j] = p->exp[i];
   }
   else
-    memcpy(ev, &(p->exp[pVarLowIndex]), pVariables*sizeof(Exponent_t));
+    memcpy(&ev[1], &(p->exp[pVarLowIndex]), pVariables*sizeof(Exponent_t));
   ev[0] = _pGetComp(p);
 }
 
 extern pSetmProc pSetm;
 inline void _pSetExpV(poly p, Exponent_t *ev)
 {
-  if (_pReverseExp)
+  if (_pHasReverseExp)
   {
     for (int i = pVarLowIndex, j = pVariables; j; i++, j--)
       p->exp[i] = ev[j];
   }
   else
-    memcpy(&(p->exp[pVarLowIndex]), ev, pVariables*sizeof(Exponent_t));
+    memcpy(&(p->exp[pVarLowIndex]), &ev[1], pVariables*sizeof(Exponent_t));
   _pSetComp(p, ev[0]);
   pSetm(p);
 }
@@ -690,6 +738,6 @@ DECLARE(int, __pExpQuerSum2(poly p, int from, int to))
 #define _pExpQuerSum1(p, to)        __pExpQuerSum2(p, 1, to)
 #define _pExpQuerSum2(p, from, to)  __pExpQuerSum2(p, from, to)
 #endif
-
+           
 #endif // POLYS_IMPL_H
 

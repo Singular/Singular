@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.8 1997-12-03 16:59:00 obachman Exp $ */
+/* $Id: polys1.cc,v 1.9 1997-12-15 22:46:37 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -22,6 +22,7 @@
 #include "ring.h"
 #include "ideals.h"
 #include "polys.h"
+#include "ipid.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #endif
@@ -313,7 +314,7 @@ static poly pMonMultC(poly p, poly q)
 {
   number x;
   int i;
-  poly r = pNew();
+  poly r = pInit();
 
   x = nMult(pGetCoeff(p),pGetCoeff(q));
   pSetCoeff0(r,x);
@@ -875,10 +876,37 @@ BOOLEAN pIsHomogeneous (poly p)
   return TRUE;
 }
 
-/*2
-*re-orders a polynomial
-*/
-poly pOrdPoly (poly p)
+// orders monoms of poly using merge sort (ususally faster than
+// insertion sort). ASSUMES that pSetm was performed on monoms
+// (i.e. that Order field is set correctly)
+poly pOrdPolyMerge(poly p)
+{
+  poly qq,pp,result=NULL;
+
+  if (p == NULL) return NULL;
+
+  for (;;)
+  {
+    qq = p;
+    for (;;)
+    {
+      if (pNext(p) == NULL) return pAdd(result, qq);
+      if (pComp(p,pNext(p)) != 1)
+      {
+        pp = p;
+        pIter(p);
+        pNext(pp) = NULL;
+        result = pAdd(result, qq);
+        break;
+      }
+      pIter(p);
+    }
+  }
+}
+
+// orders monoms of poly using insertion sort, performs pSetm on each
+// monom (i.e. sets Order field)
+poly pOrdPolyInsertSetm(poly p)
 {
   poly qq,result = NULL;
 
@@ -896,9 +924,10 @@ poly pOrdPoly (poly p)
 /*2
 *returns a re-ordered copy of a polynomial, with permutation of the variables
 */
-poly pPermPoly (poly p, int * perm, int OldpVariables,
+poly pPermPoly (poly p, int * perm, ring oldRing,
    int *par_perm, int OldPar)
 {
+  int OldpVariables = oldRing->N;
   poly result = NULL;
   poly aq=NULL;
   poly qq;
@@ -917,7 +946,7 @@ poly pPermPoly (poly p, int * perm, int OldpVariables,
       aq=naPermNumber(pGetCoeff(p),par_perm,OldPar);
       pTest(aq);
     }
-    pSetComp(qq, pGetComp(p));
+    pSetComp(qq, pRingGetComp(oldRing,p));
     if (nIsZero(pGetCoeff(qq)))
     {
       pDelete1(&qq);
@@ -926,18 +955,18 @@ poly pPermPoly (poly p, int * perm, int OldpVariables,
     {
       for(i=1; i<=OldpVariables; i++)
       {
-        if (pGetExp(p,i)!=0)
+        if (pRingGetExp(oldRing,p,i)!=0)
         {
           if (perm==NULL)
           {
-            pSetExp(qq,i, pGetExp(p,i));
+            pSetExp(qq,i, pRingGetExp(oldRing,p,i));
           }
           else if (perm[i]>0)
-            pAddExp(qq,perm[i], pGetExp(p,i));
+            pAddExp(qq,perm[i], pRingGetExp(oldRing, p,i));
           else if (perm[i]<0)
           {
             lnumber c=(lnumber)pGetCoeff(qq);
-            c->z->e[-perm[i]-1]+=pGetExp(p,i);
+            c->z->e[-perm[i]-1]+=pRingGetExp(oldRing, p,i);
           }
           else
           {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.16 1997-12-03 16:59:08 obachman Exp $ */
+/* $Id: syz1.cc,v 1.17 1997-12-15 22:46:42 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -532,7 +532,7 @@ static inline poly syAdd(poly m1,poly m2)
 
 poly syOrdPolySchreyer(poly p)
 {
-  return pOrdPolySchreyer(p);
+  return pOrdPolyMerge(p);
 }
 
 static poly sySPAdd(poly m1,poly m2,poly m)
@@ -2139,7 +2139,7 @@ static resolvente syReorder(resolvente res,int length,
         else
           fullres[i-1] = res[i];
         for (j=IDELEMS(res[i])-1;j>=0;j--)
-          fullres[i-1]->m[j] = pOrdPoly(fullres[i-1]->m[j]);
+          fullres[i-1]->m[j] = pOrdPolyInsertSetm(fullres[i-1]->m[j]);
       }
     }
   }
@@ -2254,7 +2254,7 @@ static poly syMinimizeP(poly toMin,syStrategy syzstr,int pNum,int index,
         {
           if (pGetComp(p)==tc)
           {
-            tq = pNew();
+            tq = pInit();
             for(j=pVariables; j>0; j--)
               pSetExp(tq,j, pGetExp(p,j)-pGetExp(pisN,j));
             pSetComp(tq, 0);
@@ -2492,7 +2492,7 @@ resolvente syLaScala1(ideal arg,int * length)
   //simple = 0;
   //dsim = 0;
   euler = -1;
-  redpol = pNew();
+  redpol = pInit();
   //orderingdepth = new intvec(pVariables+1);
   if (*length<=0) *length = pVariables+2;
   syzstr->length = *length;
@@ -2520,7 +2520,7 @@ resolvente syLaScala1(ideal arg,int * length)
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
-    temp->m[i] = pOrdPoly(pCopy(arg->m[i]));
+    temp->m[i] = pOrdPolyInsertSetm(pCopy(arg->m[i]));
     if (temp->m[i]!=NULL) 
     {
       j = pTotaldegree(temp->m[i]);
@@ -2669,7 +2669,7 @@ resolvente syLaScala1(ideal arg,int * length)
         {
           for (j=IDELEMS(syzstr->res[i])-1;j>=0;j--)
           {
-            rsi[j] = pOrdPoly(rsi[j]);
+            rsi[j] = pOrdPolyInsertSetm(rsi[j]);
           }
         }
         else
@@ -2739,7 +2739,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   //simple = 0;
   //dsim = 0;
   euler = -1;
-  redpol = pNew();
+  redpol = pInit();
   //orderingdepth = new intvec(pVariables+1);
   syzstr->length = *length = pVariables+2;
   if (idIs0(arg)) return NULL;
@@ -2766,7 +2766,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
-    temp->m[i] = pOrdPoly(pCopy(arg->m[i]));
+    temp->m[i] = pOrdPolyInsertSetm(pCopy(arg->m[i]));
     if (temp->m[i]!=NULL) 
     {
       j = pTotaldegree(temp->m[i]);
@@ -2901,7 +2901,7 @@ syStrategy syLaScala3(ideal arg,int * length)
 *  temp = idInit(IDELEMS(arg),arg->rank);
 *  for (i=0;i<IDELEMS(arg);i++)
 *  {
-*    temp->m[i] = pOrdPoly(pCopy(arg->m[i]));
+*    temp->m[i] = pOrdPolyInsertSetm(pCopy(arg->m[i]));
 *    if (temp->m[i]!=NULL) 
 *    {
 *      j = pTotaldegree(temp->m[i]);

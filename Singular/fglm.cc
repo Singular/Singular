@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.10 1997-08-15 08:09:15 Singular Exp $ 
+// $Id: fglm.cc,v 1.11 1997-12-15 22:46:22 obachman Exp $ 
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -164,7 +164,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
 	nSetMap( sring->ch, sring->parameter, npar, sring->minpoly );
 	ideal sqind = idInit( IDELEMS( sring->qideal ), 1 );
 	for ( k= IDELEMS( sring->qideal )-1; k >= 0; k-- )
-	    (sqind->m)[k]= pPermPoly( (sring->qideal->m)[k], vperm, nvar );
+	    (sqind->m)[k]= pPermPoly( (sring->qideal->m)[k], vperm, sring);
 	ideal sqindred = kNF( dring->qideal, NULL, sqind );
 	if ( ! idIs0( sqindred ) ) {
 	    WerrorS( "the quotients do not agree" );
@@ -180,7 +180,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
 	nSetMap( dring->ch, dring->parameter, npar, dring->minpoly );
 	ideal dqins = idInit( IDELEMS( dring->qideal ), 1 );
 	for ( k= IDELEMS( dring->qideal )-1; k >= 0; k-- ) 
-	    (dqins->m)[k]= pPermPoly( (dring->qideal->m)[k], dsvperm, nvar );
+	    (dqins->m)[k]= pPermPoly( (dring->qideal->m)[k], dsvperm, sring);
 	ideal dqinsred = kNF( sring->qideal, NULL, dqins );
 	if ( ! idIs0( dqinsred ) ) {
 	    WerrorS( "the quotients do not agree" );

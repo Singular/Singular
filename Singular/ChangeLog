@@ -1,3 +1,18 @@
+Mon Dec 15 23:31:56 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* polys-impl.h: Various small bug - fixes and changes in
+	  preparation of COMP_FAST merge: hilbert series, maps are 
+	  ok; sres and syz are still buggy; small things still need to be
+	  checked;
+
+Fri Dec 12 15:38:19 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* mmallocb.c (mmDBFreeBlock): introduced UNREG_MEM_PATTERN which,
+	  when defined, inserts unregular memory pattern in
+	  allocated/freed memory 
+
+	* all: changed dangerous pNew calls to pInit's
+
 Fri Dec  5 18:43:47 MET 1997
         * hannes: fix to ideals.cc: avoid pGetExp(p,0)
 

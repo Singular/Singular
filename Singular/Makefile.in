@@ -404,6 +404,7 @@ CFLAGSP		= -pg -O3 -pipe
 CXXFLAGSP	= -pg -O3 -pipe 
 CXXTEMPLFLAGSP	= -fno-implicit-templates
 DEFSP		= @DEFS@ -DNDEBUG -DDO_PROFIL
+LDFLAGSP	= -static @LDFLAGS@
 
 ##
 ## .op files for 
@@ -444,7 +445,7 @@ $(OBJP2): %.op: %.c
 
 Singularp: scanner.cc $(OBJP) iparith.op mpsr_Tok.op tesths.cc version.h 
 	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp \
-	tesths.cc iparith.op mpsr_Tok.op $(OBJP) ${LDFLAGS} ${LIBS}
+	tesths.cc iparith.op mpsr_Tok.op $(OBJP) ${LDFLAGSP} ${LIBS}
 
 iparith.op: iparith.inc iparith.cc
 	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c iparith.cc -o iparith.op

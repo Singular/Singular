@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.16 1997-12-03 16:58:50 obachman Exp $ */
+/* $Id: longalg.cc,v 1.17 1997-12-15 22:46:30 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2391,7 +2391,7 @@ poly naPermNumber(number z, int * par_perm, int P)
   napoly za=((lnumber)z)->z;
   do
   {
-    p=pNew();
+    p=pInit();
     pNext(p)=NULL;
     nNew(&pGetCoeff(p));
     int i;

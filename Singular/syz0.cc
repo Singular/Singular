@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.10 1997-12-03 16:59:07 obachman Exp $ */
+/* $Id: syz0.cc,v 1.11 1997-12-15 22:46:41 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -842,7 +842,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     for (i=0;i<IDELEMS(res[syzIndex]);i++)
     {
       if (res[syzIndex]->m[i])
-        res[syzIndex]->m[i] = pOrdPolySchreyer(res[syzIndex]->m[i]);
+        res[syzIndex]->m[i] = pOrdPolyMerge(res[syzIndex]->m[i]);
     }
     syzIndex++;
   }

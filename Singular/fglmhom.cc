@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.4 1997-12-03 16:58:36 obachman Exp $
+// $Id: fglmhom.cc,v 1.5 1997-12-15 22:46:23 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -184,7 +184,10 @@ mapMonoms( ring oldRing, homogData & dat )
     nSetMap( oldRing->ch, oldRing->parameter, oldRing->P, oldRing->minpoly );
     int s;
     for ( s= dat.numMonoms - 1; s >= 0; s-- ) {
-	dat.monlist[s].mon.sm= pPermPoly( dat.monlist[s].mon.dm, vperm, currRing->N, NULL, 0 );
+//	dat.monlist[s].mon.sm= pPermPoly( dat.monlist[s].mon.dm, vperm, currRing->N, NULL, 0 );
+      // obachman: changed the folowing to reflect the new calling interface of
+      // pPermPoly -- Tim please check whether this is correct!
+	dat.monlist[s].mon.sm= pPermPoly( dat.monlist[s].mon.dm, vperm, oldRing, NULL, 0 );      
     }
 }
 
@@ -325,7 +328,7 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
     maFindPerm( sourceRing->names, sourceRing->N, NULL, 0, currRing->names, currRing->N, NULL, 0, vperm, NULL );
     nSetMap( sourceRing->ch, sourceRing->parameter, sourceRing->P, sourceRing->minpoly );
     for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- ) {
-	dat.sourceHeads[s].dm= pPermPoly( dat.sourceHeads[s].sm, vperm, sourceRing->N, NULL, 0 );
+	dat.sourceHeads[s].dm= pPermPoly( dat.sourceHeads[s].sm, vperm, sourceRing, NULL, 0 );
     }
 
     dat.destIdeal= idInit( groebnerBS, 1 );

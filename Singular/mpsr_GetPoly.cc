@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.10 1997-12-03 16:58:55 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.11 1997-12-15 22:46:34 obachman Exp $ */
 
 /***************************************************************
  *
@@ -384,7 +384,7 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
     return mpsr_Success;
   }
   
-  pp = pNew();
+  pp = pInit();
   p = pp;
   failr(GetCoeff(link, &(pp->coef)));
   if (gNvars > 1)
@@ -397,7 +397,7 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
 
     for (j=1; j<nmon; j++)
     {
-      pp->next = pNew();
+      pp->next = pInit();
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32Vector(link, &gTa, gNvars));
@@ -416,7 +416,7 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
     
     for (j=1; j<nmon; j++)
     {
-      pp->next = pNew();
+      pp->next = pInit();
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32(link, &i));
@@ -450,7 +450,7 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
     return mpsr_Success;
   }
   
-  pp = pNew();
+  pp = pInit();
   p = pp;
   failr(GetCoeff(link, &(pp->coef)));
   if (gNvars > 1)
@@ -463,7 +463,7 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
 
     for (j=1; j<nmon; j++)
     {
-      pp->next = pNew();
+      pp->next = pInit();
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32Vector(link, &gTa, n1));
@@ -483,7 +483,7 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
     
     for (j=1; j<nmon; j++)
     {
-      pp->next = pNew();
+      pp->next = pInit();
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
       mp_failr(IMP_GetSint32(link, &i));
@@ -561,7 +561,11 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r, BOOLEAN &mv)
     }
     rKill(subring);
   }
-    
+
+#ifdef COMP_FAST
+  // complete ring constructions
+  rComplete(r);
+#endif  
   return mpsr_Success;
 }
 

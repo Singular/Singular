@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.4 1997-12-03 16:58:45 obachman Exp $ */
+/* $Id: ipid.h,v 1.5 1997-12-15 22:46:28 obachman Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -33,7 +33,8 @@ struct sip_sring
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
   short      ref;
 #ifdef COMP_FAST
-  short     Offset; // if != 0, then exponents are stored in reverse order
+  short     VarOffset; /* controls indexing of exponents */
+  short     CompIndex; /* index of component in exponent vector */
 #endif    
 #ifdef RDEBUG
   short      no;

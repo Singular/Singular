@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.14 1997-08-14 09:07:43 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.15 1997-12-15 22:46:29 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -487,7 +487,7 @@ leftv iiMap(map theMap, char * what)
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp=IDTYP(w);
       tmpW.data=IDDATA(w);
-      if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,NULL,IDRING(r)->N,NULL,0))
+      if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0))
       {
         Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
         Free((ADDRESS)v,sizeof(*v));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.6 1997-11-25 15:29:21 pohl Exp $ */
+/* $Id: hilb.cc,v 1.7 1997-12-15 22:46:24 obachman Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -124,7 +124,7 @@ static void hHilbStep(scmon pure, scfmon stc, int Nstc, varset var,
  int Nvar, int *pol, int Lpol)
 {
   int  iv = Nvar -1, ln, a, a0, a1, b, i;
-  short  x, x0;
+  Exponent_t  x, x0;
   scmon pn;
   scfmon sn;
   int  *pon;
@@ -192,7 +192,7 @@ static void hHilbStep(scmon pure, scfmon stc, int Nstc, varset var,
 static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
 {
   intvec *work, *hseries1=NULL;
-  short  mc;
+  Exponent_t  mc;
   int  *p0;
   int  i, j, k, l, ii, mw;
   hexist = hInit(S, Q, &hNexist);
@@ -207,7 +207,7 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
   *p0 = 1;
   hwork = (scfmon)Alloc(hNexist * sizeof(scmon));
   hvar = (varset)Alloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)Alloc((1 + (pVariables * pVariables)) * sizeof(short));
+  hpure = (scmon)Alloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
   stcmem = hCreate(pVariables - 1);
   Qpol = (int **)Alloc((pVariables + 1) * sizeof(int *));
   Ql = (int *)Alloc0((pVariables + 1) * sizeof(int));
@@ -247,7 +247,7 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
         if ((hNvar > 2) && (hNstc > 10))
           hOrdSupp(hstc, hNstc, hvar, hNvar);
         hHilbEst(hstc, hNstc, hvar, hNvar);
-        memset(hpure, 0, (pVariables + 1) * sizeof(short));
+        memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
         hPure(hstc, 0, &hNstc, hvar, hNvar, hpure, &hNpure);
         hLexS(hstc, hNstc, hvar, hNvar);
         Q0[hNvar] = 0;
@@ -323,10 +323,10 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
   Free((ADDRESS)Ql, (pVariables + 1) * sizeof(int));
   Free((ADDRESS)Qpol, (pVariables + 1) * sizeof(int *));
   hKill(stcmem, pVariables - 1);
-  Free((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(short));
+  Free((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
   Free((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   Free((ADDRESS)hwork, hNexist * sizeof(scmon));
-  Free((ADDRESS)hexist, hNexist * sizeof(scmon));
+  hDelete(hexist, hNexist);
   Free((ADDRESS)p0, sizeof(int));
   if (hisModule!=0)
     Free((ADDRESS)hstc, hNexist * sizeof(scmon));

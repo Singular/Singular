@@ -1435,7 +1435,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     memset(&tmpW,0,sizeof(sleftv));
     tmpW.rtyp=IDTYP(w);
     tmpW.data=IDDATA(w);
-    if ((bo=maApplyFetch(iiOp,NULL,res,&tmpW,perm,r->N,par_perm,par_perm_size)))
+    if ((bo=maApplyFetch(iiOp,NULL,res,&tmpW, r, perm,par_perm,par_perm_size)))
     {
       Werror("cannot map %s of type %s(%d)",v->name, Tok2Cmdname(w->typ),w->typ);
     }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.4 1997-09-04 07:31:57 pohl Exp $ */
+/* $Id: hutil.cc,v 1.5 1997-12-15 22:46:24 obachman Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -19,9 +19,16 @@ scfmon hexist, hstc, hrad, hwork;
 scmon hpure, hpur0;
 varset hvar, hsel;
 int  hNexist, hNstc, hNrad, hNvar, hNpure;
-short  hisModule;
+Exponent_t hisModule;
 monf stcmem, radmem;
 
+// Making a global "security" copy of the allocated exponent vectors
+// is a dirty fix for cerrect memory disallocation: It would be
+// better, if either the fields of heist are never touched
+// (i.e. changed) except in hInit, or, if hInit would return the
+// "security" copy as well. But then, all the relevant data is held in
+// global variables, so we might do that here, as well.
+static Exponent_t **hsecure= NULL;
 
 scfmon hInit(ideal S, ideal Q, int *Nexist)
 {
@@ -74,11 +81,13 @@ scfmon hInit(ideal S, ideal Q, int *Nexist)
   if (!k)
     return NULL;
   ek = ex = (scfmon)Alloc(k * sizeof(scmon));
+  hsecure = (Exponent_t**) Alloc(k * sizeof(scmon));
   for (i = sl; i; i--)
   {
     if (*si)
     {
-      *ek = (scmon)((*si)->exp);
+      *ek = (Exponent_t*) Alloc((pVariables+1)*sizeof(Exponent_t));
+      pGetExpV(*si, *ek);
       ek++;
     }
     si++;
@@ -87,16 +96,28 @@ scfmon hInit(ideal S, ideal Q, int *Nexist)
   {
     if (*qi)
     {
-      *ek = (scmon)((*qi)->exp);
+      *ek = (Exponent_t*) Alloc((pVariables+1)*sizeof(Exponent_t));
+      pGetExpV(*qi, *ek);
       ek++;
     }
     qi++;
   }
+  memcpy(hsecure, ex, k * sizeof(scmon));
   return ex;
 }
 
+void hDelete(scfmon ev, int ev_length)
+{
+  int i;
 
-void hComp(scfmon exist, int Nexist, short ak, scfmon stc, int *Nstc)
+  for (i=0;i<ev_length;i++)
+    Free(hsecure[i],(pVariables+1)*sizeof(Exponent_t));
+  Free(hsecure, ev_length*sizeof(scmon));
+  Free(ev,  ev_length*sizeof(scmon));
+}
+
+  
+void hComp(scfmon exist, int Nexist, Exponent_t ak, scfmon stc, int *Nstc)
 {
   int  i = Nexist, k = 0;
   scfmon ex = exist, co = stc;
@@ -145,13 +166,13 @@ void hSupp(scfmon stc, int Nstc, varset var, int *Nvar)
 void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
 {
   int  i, i1, j, jj, k, l;
-  short  x;
+  Exponent_t  x;
   scmon temp, count;
   float o, h, g, *v1;
 
   v1 = (float *)Alloc(Nvar * sizeof(float));
-  temp = (short *)Alloc(Nstc * sizeof(short));
-  count = (short *)Alloc(Nstc * sizeof(short));
+  temp = (Exponent_t *)Alloc(Nstc * sizeof(Exponent_t));
+  count = (Exponent_t *)Alloc(Nstc * sizeof(Exponent_t));
   for (i = 1; i <= Nvar; i++)
   {
     i1 = var[i];
@@ -208,8 +229,8 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
     }
     v1[i-1] = h * (float)jj;
   }
-  Free((ADDRESS)count, Nstc * sizeof(short));
-  Free((ADDRESS)temp, Nstc * sizeof(short));
+  Free((ADDRESS)count, Nstc * sizeof(Exponent_t));
+  Free((ADDRESS)temp, Nstc * sizeof(Exponent_t));
   for (i = 1; i < Nvar; i++)
   {
     i1 = var[i+1];
@@ -883,10 +904,10 @@ void hLex2R(scfmon rad, int e1, int a2, int e2, varset var,
 }
 
 
-void hStepS(scfmon stc, int Nstc, varset var, int Nvar, int *a, short *x)
+void hStepS(scfmon stc, int Nstc, varset var, int Nvar, int *a, Exponent_t *x)
 {
   int  k1, i;
-  short  y;
+  Exponent_t  y;
   k1 = var[Nvar];
   y = *x;
   i = *a;
@@ -977,7 +998,7 @@ scmon hGetpure(scmon p)
   scmon p1, pn;
   p1 = p + 1;
   pn = p1 + pVariables;
-  memcpy(pn, p1, pVariables * sizeof(short));
+  memcpy(pn, p1, pVariables * sizeof(Exponent_t));
   return pn - 1;
 }
 

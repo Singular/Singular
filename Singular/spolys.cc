@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys.cc,v 1.4 1997-12-03 16:59:03 obachman Exp $ */
+/* $Id: spolys.cc,v 1.5 1997-12-15 22:46:40 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction for char p
@@ -472,8 +472,8 @@ static poly spPSpolyCreate(poly p1, poly p2,poly spNoether)
       pSetCompP(p2,pGetComp(p1));
     }
   }
-  b = pNew();
-  m = pNew();
+  b = pInit();
+  m = pInit();
   for (int i = pVariables; i; i--)
   {
     c = pGetExpDiff(p1, p2,i);
@@ -646,8 +646,8 @@ static poly spPSpolyShortBba(poly p1, poly p2)
     }
   }
   //------------------------------------------------------------
-  poly b = pNew(); /* the result */
-  poly lcm=pNew();
+  poly b = pInit(); /* the result */
+  poly lcm=pInit();
   pLcm(p1,p2,lcm);
   pSetComp(b,pGetComp(p1));
   loop

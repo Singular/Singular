@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.14 1997-12-12 16:55:21 Singular Exp $ */
+/* $Id: ideals.cc,v 1.15 1997-12-15 22:46:26 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -706,12 +706,12 @@ static poly pMultWithT (poly p,BOOLEAN cas)
     i = 0;
     if (result == NULL)
     {/*first monomial*/
-      result = pNew();
+      result = pInit();
       qresult = result;
     }
     else
     {
-      qresult->next = pNew();
+      qresult->next = pInit();
       pIter(qresult);
     }
     for (j=pVariables-1; j>0; j--)
@@ -774,13 +774,13 @@ static poly pDivByT (poly * p,int size)
     i = 0;
     if (result == NULL)
     {/*the first monomial*/
-      result = pNew();
+      result = pInit();
       resultp = result;
       resultp->next = NULL;
     }
     else
     {
-      resultp->next = pNew();
+      resultp->next = pInit();
       pIter(resultp);
       resultp->next = NULL;
     }
@@ -1430,7 +1430,7 @@ ideal idSyzMin (ideal h1,ideal  quot, tHomog h,intvec **w,
         pSetComp(p,(*reord)[j]);
         pIter(p);
       }
-      e->m[i-1] = pOrdPolySchreyer(e->m[i-1]);
+      e->m[i-1] = pOrdPolyMerge(e->m[i-1]);
     }
   }
   idSkipZeroes(e);
@@ -2101,6 +2101,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   short  **wv;
   tHomog hom;
   intvec * w;
+  sip_sring tmpR;
 
   if (delVar==NULL)
   {
@@ -2135,26 +2136,43 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   }
   block0[0] = 1;
   block1[0] = pVariables;
-  wv=(short**) Alloc(ordersize*sizeof(short**));
+  wv=(short**) Alloc0(ordersize*sizeof(short**));
   memcpy4(wv+1,currRing->wvhdl,(ordersize-1)*sizeof(short**));
   wv[0]=(short*)Alloc0((pVariables+1)*sizeof(short));
-  for (j=0;j<=pVariables;j++)
+  for (j=0;j<pVariables;j++)
     if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
   ord[0] = ringorder_a;
+
+  // fill in tmp ring to get back the data later on
+  memset(&tmpR, 0, sizeof(sip_sring));
+  tmpR.N = pVariables;
+  tmpR.OrdSgn = currRing->OrdSgn;
+  tmpR.order = ord;
+  tmpR.block0 = block0;
+  tmpR.block1 = block1;
+  tmpR.wvhdl = wv;
+  rComplete(&tmpR);
+
+  // change into the new ring
   pChangeRing(pVariables,currRing->OrdSgn,ord,block0,block1,wv);
   h = idInit(IDELEMS(h1),1);
-  for (k=0;k<IDELEMS(h1);k++) h->m[k] = pOrdPoly(pCopy(h1->m[k]));
+  // fetch data from the old ring
+  for (k=0;k<IDELEMS(h1);k++) h->m[k] = pFetchCopy(currRing, pCopy(h1->m[k]));
+  // compute std
   hh = std(h,NULL,hom,&w,hilb);
   idDelete(&h);
+
+  // go back to the original ring
   pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
     currRing->block0,currRing->block1,currRing->wvhdl);
   i = IDELEMS(hh)-1;
   while ((i >= 0) && (hh->m[i] == NULL)) i--;
   j = -1;
+  // fetch data from temp ring
   for (k=0; k<=i; k++)
   {
     l=pVariables;
-    while ((l>0) && (pGetExp(hh->m[k],l)*pGetExp(delVar,l)==0)) l--;
+    while ((l>0) && (pRingGetExp(&tmpR, hh->m[k],l)*pGetExp(delVar,l)==0)) l--;
     if (l==0)
     {
       j++;
@@ -2164,8 +2182,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
         IDELEMS(h3) += 16;
       }
 //pWrite(hh->m[k]);
-      h3->m[j] = pOrdPoly(hh->m[k]);
-      hh->m[k] = NULL;
+      h3->m[j] = pFetchCopy(&tmpR, hh->m[k]);
 //pWrite(h3->m[j]);
 //PrintLn();
     }
@@ -2260,42 +2277,17 @@ ideal idMinors(matrix a, int ar)
 */
 BOOLEAN pIsUnit(poly p)
 {
-  poly q=p;
-  int i,j;
-  BOOLEAN b;
+  int i;
 
   if (p == NULL) return FALSE;
-  if (currRing->OrdSgn == 1)
+  i = 1;
+  while (i<=pVariables && pGetExp(p,i) == 0) i++;
+  if (i > pVariables && (pGetComp(p) == 0))
   {
-    for (i=1;i<=pVariables;i++)
-    {
-      j = pGetExp(p,i);
-      if (j != 0) return FALSE;
-    }
-    if (pGetComp(p) != 0) return FALSE;
-    if (pNext(p) !=NULL) return FALSE;
+    if (currRing->OrdSgn == 1 && pNext(p) !=NULL) return FALSE;
+    return TRUE;
   }
-  else
-  {
-    b = FALSE;
-    while ((! b) && (q != NULL))
-    {
-      if (pGetComp(p) == 0)
-      {
-        i = 0;
-	do
-        {
-          i++;
-          j = pGetExp(p,i);
-        }
-        while ((i<=pVariables) && (j == 0));
-        if (i>pVariables) b = TRUE;
-      }
-      q = pNext(q);
-    }
-    return b;
-  }
-  return TRUE;
+  return FALSE;
 }
 
 /*2

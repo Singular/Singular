@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.1 1997-12-03 16:58:57 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.2 1997-12-15 22:46:35 obachman Exp $ */
 
 /***************************************************************
  *
@@ -26,7 +26,7 @@
 #include "polys.h"
 #include "ring.h"
 #include "ipid.h"
-
+  
 /***************************************************************
  *
  * definition of global variables
@@ -46,6 +46,170 @@ int pVarLowIndex;
 int pVarHighIndex;
 #endif
 int pLexSgn;
+
+/***************************************************************
+ *
+ * Low - level routines for which deal with var indicies
+ *
+ ***************************************************************/
+#ifdef COMP_FAST
+// gets var indicies w.r.t. the ring r
+void pGetVarIndicies(ring r,
+                     int &VarOffset, int &VarCompIndex,
+                     int &VarLowIndex, int &VarHighIndex)
+{
+  // at the moment, non-default var indicies are only used for simple orderings
+  if ((r->order[0] == ringorder_unspec)  ||
+      (r->order[2] == 0 &&
+       r->order[0] != ringorder_M && r->order[1] != ringorder_M))
+  {
+    short s_order;
+    if (r->order[0] == ringorder_c || r->order[0] == ringorder_C)
+      s_order = r->order[1];
+    else
+      s_order = r->order[0];
+
+    switch(s_order)
+    {
+        case ringorder_dp:
+        case ringorder_wp:
+        case ringorder_ds:
+        case ringorder_ws:
+        case ringorder_unspec:
+          pGetVarIndicies_RevLex(r->N, VarOffset, VarCompIndex,
+                                 VarLowIndex, VarHighIndex);
+          break;
+
+#ifdef PDEBUG
+        case ringorder_lp:
+        case ringorder_Dp:
+        case ringorder_Wp:
+        case ringorder_Ds:
+        case ringorder_Ws:
+        case ringorder_ls:
+#else
+        default:
+#endif          
+          pGetVarIndicies_Lex(r->N, VarOffset, VarCompIndex,
+                                 VarLowIndex, VarHighIndex);
+#ifdef PDEBUG
+          break;
+        default:
+          Werror("wrong internal ordering:%d at %s, l:%d\n",
+                 s_order,__FILE__,__LINE__);
+#endif
+    }
+  }
+  else
+    // default var indicies are used
+    pGetVarIndicies(r->N, VarOffset, VarCompIndex, VarLowIndex, VarHighIndex);
+}
+
+
+// assumes that pVarOffset != src_r->VarOffset
+inline void RingCopy2ExpV(poly dest, poly src, ring src_r)
+{
+#if 0  
+  if (_pHasReverseExp)
+  {
+#ifdef WORDS_BIGENDIAN
+    for (int i=0, offset = src_r->VarOffset - 1; i<pVariables; i++)
+      dest->exp[i] = src->exp[offset - i];
+#else
+#endif
+  }
+  
+#endif
+  for (int i=pVariables; i; i--)
+    pSetExp(dest, i, pRingGetExp(src_r, src, i));
+  pSetComp(dest, pRingGetComp(src_r, src));
+}
+    
+// Returns a converted copy (in the sense that the returned poly is 
+// poly of currRing) of poly p which is from ring r -- assumes that
+// currRing and r have the same number of variables, i.e. that polys
+// from r can be "fetched" into currRing
+#ifdef MDEBUG
+poly pDBFetchCopy(ring r, poly p,char *f,int l)
+#else
+poly _pFetchCopy(ring r, poly p)
+#endif
+{
+  poly res;
+  poly a;
+  if (p==NULL) return NULL;
+#ifdef MDEBUG
+    res = a = pDBNew(f,l);
+#else
+    res = a = pNew();
+#endif
+  if (r->VarOffset == pVarOffset)
+  {
+    memcpy(a,p,pMonomSize);
+    a->coef=nCopy(p->coef);
+    pSetm(a);
+    if (pNext(p)!=NULL)
+    {
+      pIter(p);
+      do
+      {
+#ifdef MDEBUG
+        a = pNext(a) = pDBNew(f,l);
+#else
+        a = pNext(a) = pNew();
+#endif
+        memcpy(a,p,pMonomSize);
+        a->coef=nCopy(p->coef);
+        pSetm(a);
+        pIter(p);
+      }
+      while (p!=NULL);
+    }
+    pNext(a) = NULL;
+  }
+  else
+  {
+#ifdef MDEBUG
+    a = res = pDBInit(f,l);
+#else
+    a = res = pInit();
+#endif
+    res->coef = nCopy(p->coef);
+    RingCopy2ExpV(res, p, r);
+    pSetm(res);
+    if (pNext(p) != NULL)
+    {
+      pIter(p);
+      do
+      {
+        // the VarOffset's are different: Hence we 
+        // convert betweeen a lex order and a revlex order -- to speed
+        // up the sorting, we assemble new poly in inverse order
+#ifdef MDEBUG
+        res = pDBInit(f,l);
+#else
+        res = pInit();
+#endif
+        pNext(res) = a;
+        a = res;
+        res->coef = nCopy(p->coef);
+        RingCopy2ExpV(res, p, r);
+        pSetm(res);
+        pIter(p);
+      }
+      while (p != NULL);
+    }
+  }
+#ifdef PDEBUG
+  res = pOrdPolyMerge(res);
+  pTest(res);
+  return res;
+#else
+  return pOrdPolyMerge(res);
+#endif  
+}
+#endif // COMP_FAST
+
 
 /***************************************************************
  *
@@ -69,15 +233,8 @@ poly pDBNew(char *f, int l)
 poly pDBInit(char * f, int l)
 {
   poly p=pDBNew(f,l);
-  //memset(p,0, pMonomSize);
-  nNew(&(p->coef));
-  return p;
-}
-#else
-poly _pInit(void)
-{
-  poly p=(poly)mmAllocSpecialized();
   memset(p,0, pMonomSize);
+  nNew(&(p->coef));
   return p;
 }
 #endif
@@ -325,6 +482,32 @@ Exponent_t pPDGetExp(poly p, int v, char* f, int l)
   return (p)->exp[_pExpIndex(v)];
 }
 
+Exponent_t pPDRingSetExp(ring r, poly p, int v, Exponent_t e, char* f, int l)
+{
+  if (v == 0)
+  {
+    Print("zero index to exponent in %s:%d\n", f, l);
+  }
+  if (v > r->N)
+  {
+    Print("index %d to exponent too large in %s:%d\n", v, f, l);
+  }
+  return (p)->exp[_pRingExpIndex(r, v)]=(e);
+}
+
+Exponent_t pPDRingGetExp(ring r, poly p, int v, char* f, int l)
+{
+  if (v == 0)
+  {
+    Print("zero index to exponent in %s:%d\n", f, l);
+  }
+  if (v > r->N)
+  {
+    Print("index %d to exponent too large in %s:%d\n", v, f, l);
+  }
+  return (p)->exp[_pRingExpIndex(r,v)];
+}
+
 Exponent_t pPDIncrExp(poly p, int v, char* f, int l)
 {
   if (v == 0)
@@ -391,6 +574,9 @@ Exponent_t pPDMultExp(poly p, int v, Exponent_t e, char* f, int l)
 }
 
 #ifdef COMP_FAST
+
+  
+
 // checks whether fast monom add did not overflow
 void pDBMonAddFast(poly p1, poly p2, char* f, int l)
 {
@@ -424,26 +610,54 @@ void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
   pFree1(ptemp);
 }
   
-BOOLEAN pDBDivisibleBy(poly a, poly b, char* f, int l)
-{
-  BOOLEAN istrue = TRUE;
-  BOOLEAN f_istrue = _pDivisibleBy_orig(a, b);
 
+static BOOLEAN OldpDivisibleBy(poly a, poly b)
+{
   if ((a!=NULL)&&((pGetComp(a)==0) || (pGetComp(a) == pGetComp(b))))
   {
     for (int i = 1; i<=pVariables; i++)
-      if (pGetExp(a, i) > pGetExp(b,i))
-      {
-        istrue = FALSE;
-        break;
-      }
+      if (pGetExp(a, i) > pGetExp(b,i)) return FALSE;
+    return TRUE;
   }
-  else istrue = FALSE;
-  
+  return FALSE;
+}
+
+
+BOOLEAN pDBDivisibleBy(poly a, poly b, char* f, int l)
+{
+  BOOLEAN istrue = OldpDivisibleBy(a,b);
+  BOOLEAN f_istrue = _pDivisibleBy_orig(a, b);
+
   if (istrue != f_istrue)
   {
     Print("Error in pDivisibleBy in %s:%d\n", f, l);
     _pDivisibleBy_orig(a, b);
+  }
+  return f_istrue;
+}
+
+BOOLEAN pDBDivisibleBy1(poly a, poly b, char* f, int l)
+{
+  BOOLEAN istrue = OldpDivisibleBy(a,b);
+  BOOLEAN f_istrue = _pDivisibleBy1_orig(a, b);
+
+  if (istrue != f_istrue)
+  {
+    Print("Error in pDivisibleBy1 in %s:%d\n", f, l);
+    _pDivisibleBy1_orig(a, b);
+  }
+  return f_istrue;
+}
+
+BOOLEAN pDBDivisibleBy2(poly a, poly b, char* f, int l)
+{
+  BOOLEAN istrue = OldpDivisibleBy(a,b);
+  BOOLEAN f_istrue = __pDivisibleBy(a, b);
+  
+  if (istrue != f_istrue)
+  {
+    Print("Error in pDivisibleBy2 in %s:%d\n", f, l);
+    __pDivisibleBy(a, b);
   }
   return f_istrue;
 }

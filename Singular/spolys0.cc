@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.6 1997-12-03 16:59:04 obachman Exp $ */
+/* $Id: spolys0.cc,v 1.7 1997-12-15 22:46:41 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -619,8 +619,8 @@ poly spGSpolyCreate(poly p1, poly p2,poly spNoether)
       pSetCompP(p2,pGetComp(p1));
     }
   }
-  b = pNew();
-  m = pNew();
+  b = pInit();
+  m = pInit();
   for (int i = pVariables; i; i--)
   {
     x = pGetExp(p1,i) - pGetExp(p2,i);

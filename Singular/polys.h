@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.5 1997-12-03 16:58:59 obachman Exp $ */
+/* $Id: polys.h,v 1.6 1997-12-15 22:46:37 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -37,7 +37,7 @@ extern int pComponentOrder;
 #define pdY(i)  (pdN*2+i+1)
 // a monomial m belongs to a D-module M iff pdDFlag(m)==0
 // a monomial m belongs to an ideal in the Weyl-Algebra D iff pdDFlag(m)==1
-#define pdDFlag(m) ((m)->exp[pdN*2+1])
+#define pdDFlag(m) pGetExp(m,pdN*2+1)
 
 extern int      pdN;
 extern int      pdK;
@@ -76,7 +76,7 @@ extern BOOLEAN pSDRING;
 
 #define pGetOrder(p)        _pGetOrder(p)
 
-// Gets/Sets Component field
+// Gets/Sets Component field w.r.t. of polys of global ring
 #define pSetComp(p,k)       _pSetComp(p,k)    
 #define pGetComp(p)         _pGetComp(p)
 #define pIncrComp(p)        _pIncrComp(p)
@@ -84,9 +84,17 @@ extern BOOLEAN pSDRING;
 #define pAddComp(p,v)       _pAddComp(p,v)
 #define pSubComp(p,v)       _pSubComp(p,v)
 
-// Gets/Sets ith exponent
+// Gets/Sets Component field w.r.t. of polys of ring r
+#define pRingSetComp(r,p,k)       _pRingSetComp(r,p,k)    
+#define pRingGetComp(r,p)         _pRingGetComp(r,p)
+
+// Gets/Sets ith exponent poly of global ring
 #define pGetExp(p,i)        _pGetExp(p,i)
 #define pSetExp(p,i,v)      _pSetExp(p,i,v)
+
+// Gets/Sets ith exponent of poly of ring r
+#define pRingGetExp(r,p,i)        _pRingGetExp(r,p,i)
+#define pRingSetExp(r,p,i,v)      _pRingSetExp(r,p,i,v)
 
 // Increments/decrements ith exponent by one
 #define pIncrExp(p,i)       _pIncrExp(p,i)   
@@ -169,6 +177,12 @@ int  pModuleOrder();
 extern  poly pHeadProc(poly p);
 // Returns copy of the whole polynomial
 #define pCopy(p)        _pCopy(p)
+// Returns a converted copy (in the sense that returned poly is in
+// poly of currRing) of poly p which is from ring r -- assumes that
+// currRing and r have the same number of variables, i.e. that polys
+// from r can be "fetched" into currRing
+#define pFetchCopy(r,p)     _pFetchCopy(r,p)
+
 
 // Is equivalent to pCopy2(p1, p2);pMonAddFast(p1, p3);
 #define pCopyAddFast(p1, p2, p3)    _pCopyAddFast(p1, p2, p3)
@@ -236,23 +250,33 @@ poly      pISet(int i);
 void      pContent(poly p);
 void      pCleardenom(poly p);
 
+// homogenizes p by multiplying certain powers of the varnum-th variable 
 poly      pHomogen (poly p, int varnum);
-  /*- homogenizes p by multiplying certain powers of the varnum-th variable -*/
+  
+// replaces the maximal powers of the leading monomial of p2 in p1 by
+// the same powers of n, utility for dehomogenization
 poly      pDehomogen (poly p1,poly p2,number n);
-  /*replaces the maximal powers of the leading monomial of p2 in p1 by
-  * the same powers of n, utility for dehomogenization*/
 BOOLEAN   pIsHomogeneous (poly p);
+
+// returns the leading monomial of p1 divided by the maximal power of
+// that of p2
 poly      pDivByMonom (poly p1,poly p2);
-  /*returns the leading monomial of p1 divided by the maximal power of that
-  *of p2*/
+
+// Returns as i-th entry of P the coefficient of the (i-1) power of
+// the leading monomial of p2 in p1
 void      pCancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet);
-  /*Returns as i-th entry of P the coefficient of the (i-1) power of
-  * the leading monomial of p2 in p1*/
-poly      pOrdPoly (poly p);
-poly      pPermPoly (poly p, int * perm, int OldPvariables,
-  int *par_perm=NULL, int OldPar=0);
-poly      pOrdPolySchreyer(poly p);
-  /*- re-orders a polynomial -*/
+
+// orders monoms of poly using insertion sort, performs pSetm on each
+// monom (i.e. sets Order field)
+poly      pOrdPolyInsertSetm(poly p);
+
+// orders monoms of poly using merge sort (ususally faster than
+// insertion sort). ASSUMES that pSetm was performed on monoms
+// (i.e. that Order field is set correctly)
+poly      pOrdPolyMerge(poly p);
+
+poly      pPermPoly (poly p, int * perm, ring OldRing,
+                     int *par_perm=NULL, int OldPar=0);
 void      pSetSyzComp(int k);
 
 /*BOOLEAN   pVectorHasUnitM(poly p, int * k);*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.5 1997-04-02 15:07:24 Singular Exp $ */
+/* $Id: maps.cc,v 1.6 1997-12-15 22:46:31 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -36,11 +36,12 @@ map maCopy(map theMap)
   return m;
 }
 
-poly maEval(map theMap, poly p,int varnum,matrix s)
+poly maEval(map theMap, poly p,ring preimage_r,matrix s)
 {
   poly result = NULL,q,pp;
   int i,modulComp;
-
+  int varnum = preimage_r->N;
+  
 //  for(i=1; i<=varnum; i++)
 //  {
 //    pTest(theMap->m[i-1]);
@@ -52,12 +53,12 @@ poly maEval(map theMap, poly p,int varnum,matrix s)
 
     for(i=1; i<=varnum; i++)
     {
-      if (pGetExp(p,i)!=0)
+      int pExp=pRingGetExp(preimage_r, p,i);
+      if (pExp != 0)
       {
         if (theMap->m[i-1]!=NULL)
         {
           poly p1=theMap->m[i-1];
-          int pExp=pGetExp(p,i);
           if((s!=NULL)&&(pExp<(MAX_MAP_DEG*2)))
           {
             int e=min(pExp,MAX_MAP_DEG);
@@ -86,7 +87,7 @@ poly maEval(map theMap, poly p,int varnum,matrix s)
               }
               pp=pCopy(p0/*MATELEM(s,i,e)*/);
             }
-            while(e!=pExp/*pGetExp(p,i)*/)
+            while(e!=pExp/*pRingGetExp(preimage_r, p,i)*/)
             {
               // e is the current exponent,
               // MAX_MAP_DEG the max exponent in the table
@@ -97,7 +98,7 @@ poly maEval(map theMap, poly p,int varnum,matrix s)
           }
           else
           {
-            pp = pPower(pCopy(p1/*theMap->m[i-1]*/),pExp/*pGetExp(p,i)*/);
+            pp = pPower(pCopy(p1/*theMap->m[i-1]*/),pExp/*pRingGetExp(preimage_r, p,i)*/);
           }
           q = pMult(q,pp);
         }
@@ -108,7 +109,7 @@ poly maEval(map theMap, poly p,int varnum,matrix s)
         }
       }
     }
-    modulComp = pGetComp(p);
+    modulComp = pRingGetComp(preimage_r, p);
     if (q!=NULL) pSetCompP(q,modulComp);
     result = pAdd(result,q);
     pIter(p);
@@ -119,11 +120,11 @@ poly maEval(map theMap, poly p,int varnum,matrix s)
 }
 
 /*2
-*shifts the variables between minvar and maxvar of p to the
+*shifts the variables between minvar and maxvar of p  \in p_ring to the
 *first maxvar-minvar+1 variables in the actual ring
 *be carefull: there is no range check for the variables of p
 */
-static poly pChangeSizeOfPoly(poly p,int minvar,int maxvar)
+static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar)
 {
   int i;
   poly result = NULL,resultWorkP;
@@ -135,8 +136,8 @@ static poly pChangeSizeOfPoly(poly p,int minvar,int maxvar)
   while (p!=NULL)
   {
     for (i=minvar;i<=maxvar;i++)
-      pSetExp(resultWorkP,i-minvar+1,pGetExp(p,i));
-    pSetComp(resultWorkP,pGetComp(p));
+      pSetExp(resultWorkP,i-minvar+1,pRingGetExp(p_ring,p,i));
+    pSetComp(resultWorkP,pRingGetComp(p_ring,p));
     n=nCopy(pGetCoeff(p));
     pSetCoeff(resultWorkP,n);
     pSetm(resultWorkP);
@@ -168,6 +169,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   int imagepvariables = theImageRing->N;
   ring sourcering = currRing;
   int N = pVariables+imagepvariables;
+  sip_sring tmpR;
 
 //  pChangeRing(theImageRing->N,theImageRing->OrdSgn,theImageRing->order,theImageRing->blocks,theImageRing->wvhdl);
   memset(block0, 0,sizeof(block0));
@@ -200,6 +202,15 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   wv = (short **) Alloc(ordersize * sizeof(short **));
   memset(wv,0,ordersize * sizeof(short **));
   for (i--;i!=0 ;i--) wv[i+1] = sourcering->wvhdl[i];
+  memset(&tmpR, 0, sizeof(sip_sring));
+  tmpR.N = N;
+  tmpR.OrdSgn = currRing->OrdSgn;
+  tmpR.order = orders;
+  tmpR.block0 = block0;
+  tmpR.block1 = block1;
+  tmpR.wvhdl = wv;
+  rComplete(&tmpR);
+  
   pChangeRing(N,currRing->OrdSgn,orders,block0,block1, wv);
   sizeofpoly = pMonomSize; /*POLYSIZE+sizeof(monomial);*/
   if (id==NULL)
@@ -211,7 +222,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   {
     if ((i<IDELEMS(theMap)) && (theMap->m[i]!=NULL))
     {
-      p = pChangeSizeOfPoly(theMap->m[i],1,imagepvariables);
+      p = pChangeSizeOfPoly(theImageRing, theMap->m[i],1,imagepvariables);
       q = p;
       while (pNext(q)) pIter(q);
       pNext(q) = pOne();
@@ -226,7 +237,8 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   }
   for (i=sourcering->N;i<sourcering->N+j;i++)
   {
-    temp1->m[i] = pChangeSizeOfPoly(id->m[i-sourcering->N],1,imagepvariables);
+    temp1->m[i] = pChangeSizeOfPoly(theImageRing,
+                                    id->m[i-sourcering->N],1,imagepvariables);
   }
   // we ignore here homogenity - may be changed later:
   temp2 = std(temp1,NULL,isNotHomog,NULL);
@@ -245,7 +257,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
     temp2->m[i]=NULL;
     if (p!=NULL)
     {
-      q = pChangeSizeOfPoly(p,imagepvariables+1,N);
+      q = pChangeSizeOfPoly(&tmpR, p,imagepvariables+1,N);
       if (j>=IDELEMS(temp1))
       {
         pEnlargeSet(&(temp1->m),IDELEMS(temp1),5);
@@ -345,7 +357,7 @@ poly maIMap(ring r, poly p)
   maFindPerm(r->names,r->N, r->parameter, r->P,
              currRing->names,currRing->N,currRing->parameter, currRing->P,
              perm,NULL/*par_perm*/);
-  poly res=pPermPoly(p,perm,r->N/*,par_perm,rPar(r)*/);
+  poly res=pPermPoly(p,perm,r/*,par_perm,rPar(r)*/);
   Free((ADDRESS)perm,(r->N+1)*sizeof(int));
   //Free((ADDRESS)par_perm,rPar(r)*sizeof(int));
   return res;
@@ -354,9 +366,10 @@ poly maIMap(ring r, poly p)
 /*3
 * find the max. degree in one variable, but not larger than MAX_MAP_DEG
 */
-static int maMaxDeg_Ma(ideal a,int N)
+static int maMaxDeg_Ma(ideal a,ring preimage_r)
 {
   int i,j;
+  int N = preimage_r->N;
   poly p;
   int *m=(int *)Alloc0(N*sizeof(int));
 
@@ -368,7 +381,7 @@ static int maMaxDeg_Ma(ideal a,int N)
     {
       for(j=N-1;j>=0;j--)
       {
-        m[j]=max(m[j],pGetExp(p,j+1));
+        m[j]=max(m[j],pRingGetExp(preimage_r, p,j+1));
         if (m[j]>=MAX_MAP_DEG)
         {
           i=MAX_MAP_DEG;
@@ -391,9 +404,10 @@ max_deg_fertig_id:
 /*3
 * find the max. degree in one variable, but not larger than MAX_MAP_DEG
 */
-static int maMaxDeg_P(poly p,int N)
+static int maMaxDeg_P(poly p,ring preimage_r)
 {
   int i,j;
+  int N = preimage_r->N;
   int *m=(int *)Alloc0(N*sizeof(int));
 
   pTest(p);
@@ -401,7 +415,7 @@ static int maMaxDeg_P(poly p,int N)
   {
     for(j=N-1;j>=0;j--)
     {
-      m[j]=max(m[j],pGetExp(p,j+1));
+      m[j]=max(m[j],pRingGetExp(preimage_r,p,j+1));
       if (m[j]>=MAX_MAP_DEG)
       {
         i=MAX_MAP_DEG;
@@ -428,11 +442,11 @@ max_deg_fertig_p:
 *              default: map only poly-structures,
 *                       use perm and par_perm, N and P,
 */
-BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w,
-                     int *perm,int N,
-                     int *par_perm, int P)
+BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
+                     int *perm, int *par_perm, int P)
 {
   int i;
+  int N = preimage_r->N;
   //Print("N=%d ",N);
   //if (perm!=NULL) for(i=1;i<=N;i++) Print("%d -> %d ",i,perm[i]);
   //PrintS("\n");
@@ -468,13 +482,13 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w,
     case POLY_CMD:
     case VECTOR_CMD:
       if (what==FETCH_CMD)
-        res->data=(void *)pOrdPoly(pCopy((poly)data));
+        res->data=(void *)pFetchCopy(preimage_r, (poly)data);
       else if (what==IMAP_CMD)
-        res->data=(void *)pPermPoly((poly)data,perm,N,par_perm,P);
+        res->data=(void *)pPermPoly((poly)data,perm,preimage_r,par_perm,P);
       else /*if (what==MAP_CMD)*/
       {
-        matrix s=mpNew(N,maMaxDeg_P((poly)data,N));
-        res->data=(void *)maEval(theMap,(poly)data,N,s);
+        matrix s=mpNew(N,maMaxDeg_P((poly)data, preimage_r));
+        res->data=(void *)maEval(theMap,(poly)data,preimage_r,s);
         idDelete((ideal *)&s);
       }
       if (currRing->minpoly!=NULL)
@@ -501,7 +515,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w,
       {
         for (i=R*C-1;i>=0;i--)
         {
-          m->m[i]=pOrdPoly(pCopy(((ideal)data)->m[i]));
+          m->m[i]=pFetchCopy(preimage_r,((ideal)data)->m[i]);
           pTest(m->m[i]);
         }
       }
@@ -509,16 +523,16 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w,
       {
         for (i=R*C-1;i>=0;i--)
         {
-          m->m[i]=pPermPoly(((ideal)data)->m[i],perm,N,par_perm,P);
+          m->m[i]=pPermPoly(((ideal)data)->m[i],perm,preimage_r,par_perm,P);
           pTest(m->m[i]);
         }
       }
       else /* if(what==MAP_CMD) */
       {
-        matrix s=mpNew(N,maMaxDeg_Ma((ideal)data,N));
+        matrix s=mpNew(N,maMaxDeg_Ma((ideal)data,preimage_r));
         for (i=R*C-1;i>=0;i--)
         {
-          m->m[i]=maEval(theMap,((ideal)data)->m[i],N,s);
+          m->m[i]=maEval(theMap,((ideal)data)->m[i],preimage_r,s);
           pTest(m->m[i]);
         }
         idDelete((ideal *)&s);
@@ -553,7 +567,8 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w,
         if (((l->m[i].rtyp>BEGIN_RING)&&(l->m[i].rtyp<END_RING))
         ||(l->m[i].rtyp==LIST_CMD))
         {
-          if (maApplyFetch(what,theMap,&ml->m[i],&l->m[i],perm,N,par_perm,P))
+          if (maApplyFetch(what,theMap,&ml->m[i],&l->m[i],
+                           preimage_r,perm,par_perm,P))
           {
             ml->Clean();
             Free((ADDRESS)ml,sizeof(slists));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.5 1997-12-03 16:59:09 obachman Exp $ */
+/* $Id: weight.cc,v 1.6 1997-12-15 22:46:43 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -76,12 +76,12 @@ static void wInit(polyset s, int sl, int mons, int *A)
 {
   int  n, a, i, j, *B, *C;
   poly p, q;
-  short  *pl;
+  Exponent_t *pl;
 
   B = A;
   n = pVariables;
-  a = (n + 1) * sizeof(short);
-  pl = (short * )Alloc(a);
+  a = (n + 1) * sizeof(Exponent_t);
+  pl = (Exponent_t * )Alloc(a);
   for (i = 0; i <= sl; i++)
   {
     p = s[i];

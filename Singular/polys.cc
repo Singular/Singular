@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.9 1997-12-03 16:58:58 obachman Exp $ */
+/* $Id: polys.cc,v 1.10 1997-12-15 22:46:36 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1933,6 +1933,9 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
   pAltVars=n+1;
 #endif
   t_pComp0 = NULL;
+#ifdef COMP_FAST
+  f_pComp0 = NULL;
+#endif  
   pVariables = n;
 
   // set the various size parameters and initialize memory
@@ -2055,6 +2058,11 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
 #ifdef COMP_TRADITIONAL  
   if (t_pComp0 == NULL)
     t_pComp0 = pComp0;
+#endif
+
+#ifdef COMP_FAST
+  if (f_pComp0 == NULL)
+    f_pComp0 = pComp0;
 #endif
   
 #ifdef DIV_COUNT
@@ -2487,26 +2495,11 @@ poly pHomogen (poly p, int varnum)
       }
       pIter(q);
     }
-    q = pOrdPoly(res);
+    q = pOrdPolyInsertSetm(res);
   }
   return q;
 }
 
-/*2
-*re-orders a polynomial
-*/
-poly pOrdPolySchreyer(poly p)
-{
-  poly qq,result=p;
-
-  if (p == NULL) return NULL;
-  while ((pNext(p) != NULL) && (pComp(p,pNext(p))==1)) pIter(p);
-  if (pNext(p)==NULL) return result;
-  qq = pNext(p);
-  pNext(p) = NULL;
-  qq = pOrdPolySchreyer(qq);
-  return pAdd(result,qq);
-}
 
 /*2
 *replaces the maximal powers of the leading monomial of p2 in p1 by
@@ -2610,7 +2603,7 @@ poly pDivByMonom (poly p1,poly p2)
   else
   {
     number n;
-    poly p = pNew();
+    poly p = pInit();
 
     p->next = NULL;
     for (i=1; i<=pVariables; i++)
@@ -3011,11 +3004,12 @@ poly pSubst(poly p, int n, poly e)
 
   int exponent,i;
   poly h, res, m;
-  poly ee;
+  short *me,*ee;
   number nu,nu1;
 
-  ee= pNew();
-  if (e!=NULL) pCopy2(ee,e);
+  me=(Exponent_t *)Alloc((pVariables+1)*sizeof(Exponent_t));
+  ee=(Exponent_t *)Alloc((pVariables+1)*sizeof(Exponent_t));
+  if (e!=NULL) pGetExpV(e,ee);
   res=NULL;
   h=p;
   while (h!=NULL)
@@ -3023,11 +3017,12 @@ poly pSubst(poly p, int n, poly e)
     if ((e!=NULL) || (pGetExp(h,n)==0))
     {
       m=pHead(h);
-      exponent=pGetExp(m,n);
-      pSetExp(m,n,0);
+      pGetExpV(m,me);
+      exponent=me[n];
+      me[n]=0;
       for(i=1;i<=pVariables;i++)
-        pAddExp(m, i, exponent*pGetExp(ee,i));
-      pSetm(m);
+        me[i]+=exponent*ee[i];
+      pSetExpV(m,me);
       if (e!=NULL)
       {
         nPower(pGetCoeff(e),exponent,&nu);
@@ -3039,7 +3034,8 @@ poly pSubst(poly p, int n, poly e)
     }
     pDelete1(&h);
   }
-  pFree1(ee);
+  Free((ADDRESS)me,(pVariables+1)*sizeof(Exponent_t));
+  Free((ADDRESS)ee,(pVariables+1)*sizeof(Exponent_t));
   return res;
 }
 
@@ -3114,6 +3110,7 @@ static int debug_comp(poly p1, poly p2)
   if (t_d != f_d)
   {
     fprintf(stderr, "Error in comp1lpc\n");
+    t_pComp0(p1, p2);
     f_pComp0(p1, p2);
   }
   return t_d;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.6 1997-12-03 16:58:51 obachman Exp $ */
+/* $Id: matpol.cc,v 1.7 1997-12-15 22:46:32 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -33,8 +33,8 @@ static int nextperm(perm * z, int max);
 static poly mpLeibnitz(matrix a);
 static poly minuscopy (poly p);
 static poly pInsert(poly p1, poly p2);
-static poly select (poly fro, monomial what);
-static poly exdiv ( poly m, monomial d);
+static poly select (poly fro, poly what);
+static poly exdiv ( poly m, poly d);
 
 /*2
 * create a r x c zero-matrix
@@ -743,7 +743,7 @@ matrix mpCoeffProc (poly f, poly vars)
     MATELEM(co,2,1) = NULL;
     return co;
   }
-  sel = select(f, vars->exp);
+  sel = select(f, vars);
   l = pLength(sel);
   co = mpNew(2, l);
   if (pOrdSgn==-1)
@@ -771,7 +771,7 @@ matrix mpCoeffProc (poly f, poly vars)
     i = 1;
     loop
     {
-      h = exdiv(f, MATELEM(co,1,i)->exp);
+      h = exdiv(f, MATELEM(co,1,i));
       if (h!=NULL)
       {
         MATELEM(co,2,i) = pAdd(MATELEM(co,2,i), h);
@@ -793,7 +793,7 @@ void mpCoef2(poly v, poly mon, matrix *c, matrix *m)
   poly p;
   int sl,i,j;
   int l=0;
-  poly sel=select(v,mon->exp);
+  poly sel=select(v,mon);
 
   pVec2Polys(sel,&s,&sl);
   for (i=0; i<sl; i++)
@@ -829,7 +829,7 @@ void mpCoef2(poly v, poly mon, matrix *c, matrix *m)
     j = pGetComp(v);
     loop
     {
-      h = exdiv(v, MATELEM(*m,j,i)->exp);
+      h = exdiv(v, MATELEM(*m,j,i));
       if (h!=NULL)
       {
         pSetComp(h,0);
@@ -1288,7 +1288,7 @@ static poly mpDivide(poly a, poly b)
     } while (r != NULL);
     return a;
   }
-  h0 = pNew();
+  h0 = pInit();
   do
   {
     if (deg != 0)
@@ -1304,7 +1304,7 @@ static poly mpDivide(poly a, poly b)
     h = h0;
     do
     {
-      h = pNext(h) = pNew();
+      h = pNext(h) = pInit();
       for (i=pVariables; i>0; i--)
         pSetExp(h,i, pGetExp(r,i)+pGetExp(t,i));
       pSetm(h);
@@ -1524,7 +1524,7 @@ static poly pInsert(poly p1, poly p2)
 *if what == xy the result is the list of all different power products
 *    x^i*y^j (i, j >= 0) that appear in fro
 */
-static poly select (poly fro, monomial what)
+static poly select (poly fro, poly what)
 {
   int i;
   poly h, res;
@@ -1533,7 +1533,7 @@ static poly select (poly fro, monomial what)
   {
     h = pOne();
     for (i=1; i<=pVariables; i++)
-      pSetExp(h,i, pGetExp(fro,i) * what[i]);
+      pSetExp(h,i, pGetExp(fro,i) * pGetExp(what, i));
     pSetComp(h, pGetComp(fro));
     pSetm(h);
     res = pInsert(h, res);
@@ -1546,15 +1546,15 @@ static poly select (poly fro, monomial what)
 *exact divisor: let d  == x^i*y^j, m is thought to have only one term;
 *    return m/d iff d divides m, and no x^k*y^l (k>i or l>j) divides m
 */
-static poly exdiv ( poly m, monomial d)
+static poly exdiv ( poly m, poly d)
 {
   int i;
   poly h = pHead(m);
   for (i=1; i<=pVariables; i++)
   {
-    if (d[i] > 0)
+    if (pGetExp(d,i) > 0)
     {
-      if (d[i] != pGetExp(h,i))
+      if (pGetExp(d,i) != pGetExp(h,i))
       {
         pDelete(&h);
         return NULL;

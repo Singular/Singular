@@ -171,6 +171,14 @@ char *strstr(const char *haystack, const char *needle);
 #endif
 #endif
 
+#if SIZEOF_EXPONENT == 1
+#define MAX_EXPONENT 0x7f
+#elif SIZEOF_EXPONENT == 2
+#define MAX_EXPONENT 0x7fff
+#else // SIZEOF_EXPONENT == 4
+#define MAX_EXPONENT 0x7fffffff
+#endif
+
 /*******************************************************************
  * Miscellanous Defines 
  ******************************************************************/

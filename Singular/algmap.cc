@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.5 1997-12-03 16:58:29 obachman Exp $ */
+/* $Id: algmap.cc,v 1.6 1997-12-15 22:46:21 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -311,7 +311,7 @@ poly maAlgpolyMap(ring R, poly preimage, ideal F, ideal G)
   {
     poly pr=pNext(p0);
     p0->next=NULL;
-    monpart = maEval((map)G, p0, m);
+    monpart = maEval((map)G, p0, R);
     result = maLongalgMap(result, p0, s, t, &nom, monpart, F);
     if (nom)
     {
