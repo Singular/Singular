@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.86 2002-01-30 14:33:01 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.87 2002-04-30 13:35:11 levandov Exp $ */
 /*
 * ABSTRACT:
 */
@@ -30,6 +30,7 @@
 #include "ipid.h"
 #include "timer.h"
 #include "lists.h"
+#include "ring.h"
 
 //#include "ipprint.h"
 
@@ -1605,7 +1606,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #ifdef KDEBUG
   idTest(F);
 #endif
-#ifdef PLURAL
+#ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
     r=gr_bba(F,Q,strat);

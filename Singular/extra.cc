@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.181 2002-04-24 13:34:52 anne Exp $ */
+/* $Id: extra.cc,v 1.182 2002-04-30 13:35:09 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1385,26 +1385,27 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         for(j=i+1;j<=nv;j++)
         {
-          if (MATELEM(D,i,j)==NULL)
+          if (MATELEM(D,i,j)==NULL) /* quasicommutative case */
           {
-            currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=0;
+	    currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=1; 
+	    /* 1x1 mult.matrix */
+            currRing->nc->MT[UPMATELEM(i,j,currRing->N)]=mpNew(1,1);
           }
-          else
+          else /* pure noncommutative case*/
           {
             MATELEM(COM,i,j)=NULL;
             currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=DefMTsize; /* default sizes */
             currRing->nc->MT[UPMATELEM(i,j,currRing->N)]=mpNew(DefMTsize,DefMTsize);
-            p=pOne();
-            pSetCoeff(p,nCopy(pGetCoeff(MATELEM(currRing->nc->C,i,j))));
-            pSetExp(p,i,1);
-            pSetExp(p,j,1);
-            pSetm(p);
-            p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
-            MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=p;
-          }
-
-          /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
-        }
+	  }
+	  p=pOne();
+	  pSetCoeff(p,nCopy(pGetCoeff(MATELEM(currRing->nc->C,i,j))));
+	  pSetExp(p,i,1);
+	  pSetExp(p,j,1);
+	  pSetm(p);
+	  p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
+	  MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=p;
+	}
+	/* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
       }
 
       currRing->nc->COM=COM;

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.71 2002-01-20 10:01:50 Singular Exp $ */
+/* $Id: ring.h,v 1.72 2002-04-30 13:35:13 levandov Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -248,6 +248,8 @@ inline BOOLEAN rIsPluralRing(ring r)
 {
   return r->nc != NULL;
 }
+#else
+#define rIsPluralRing(r)  (0)
 #endif
 
 #ifdef RDEBUG

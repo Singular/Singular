@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.189 2002-02-26 11:38:04 Singular Exp $ */
+/* $Id: ring.cc,v 1.190 2002-04-30 13:35:12 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -28,6 +28,10 @@
 #include "ring.h"
 #include "prCopy.h"
 #include "p_Procs.h"
+#ifdef HAVE_PLURAL
+#include "gring.h"
+#include "matpol.h"
+#endif
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
 
@@ -680,7 +684,15 @@ void rWrite(ring r)
   omCheckAddrSize(r->block1,nblocks*sizeof(int));
   omCheckAddrSize(r->wvhdl,nblocks*sizeof(int_ptr));
   omCheckAddrSize(r->names,r->N*sizeof(char_ptr));
-
+#ifdef HAVE_PLURAL
+  if (r->nc!=NULL)
+  {
+    int nNC=r->N*(r->N-1)/2;
+    // omCheckAddrSize(r->nc,sizeof(nc_struct));
+//     omCheckAddrSize(r->nc->MT,nNC*sizeof(matrix));
+    //    omCheckAddrSize(r->nc->MTsize,nNC*sizeof(int));
+  }
+#endif     
 
   nblocks--;
 
@@ -784,6 +796,25 @@ void rWrite(ring r)
       }
     }
   }
+#ifdef HAVE_PLURAL
+  if ((r->nc!=NULL) && (r==currRing))
+  {
+    poly pl=NULL;
+    PrintS("\n//   noncommutative relations:");
+    for (int i = 1; i<r->N; i++)
+    {
+      for (int j = i+1; j<=r->N; j++)
+      {
+	if (MATELEM(r->nc->COM,i,j)==NULL)
+	{
+	  Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
+	  pl=MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1);
+	  pWrite0(pl);
+	}
+      }
+    }
+  }
+#endif
   if (r->qideal!=NULL)
   {
     PrintS("\n// quotient ring from ideal");

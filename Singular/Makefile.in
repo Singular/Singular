@@ -94,7 +94,7 @@ endif
 
 # normal C++ source files
 CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
-    clapsing.cc mminit.cc\
+    clapsing.cc mminit.cc eigenval.cc\
     extra.cc febase.cc feread.cc fehelp.cc feResource.cc feOpt.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     gring.cc gr_kstd2.cc\
