@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.16 1999-01-22 18:23:21 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.17 1999-08-23 16:01:15 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -180,18 +180,19 @@ static void * iiS2Link(void *data)
   return (void *)l;
 }
 
-#if defined(INIT_BUG) || defined(PROC_BUG)
 static void * iiR2L(void * data)
 {
-  return (void *)syConvRes((syStrategy)data,TRUE);
+  syStrategy tmp=syMinimize((syStrategy)data);
+  (tmp->references)--;
+  return (void *)syConvRes(tmp,TRUE);
 }
 
+#if defined(INIT_BUG) || defined(PROC_BUG)
 static void * iiL2R(void * data)
 {
   return (void *)syConvList((lists)data,TRUE);
 }
 #else
-#define iiR2L (iiConvertProc)syConvRes
 #define iiL2R (iiConvertProc)syConvList
 #endif
 
