@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.7 2004-04-29 17:10:19 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.8 2004-04-29 17:21:30 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -2144,7 +2144,7 @@ ideal Approx_Step(ideal L)
       s_h2=idCopy(s_h3);
       idDelete(&s_h3);
       Print("...computing Syz");
-      s_h3 = kStd(s_h2, currQuotient,FALSE,NULL,NULL,syzcomp,idI);
+      s_h3 = kStd(s_h2, currQuotient,(tHomog)FALSE,NULL,NULL,syzcomp,idI);
       test=save_test;
       idShow(s_h3);
       if (orig_ring != syz_ring)
@@ -2168,7 +2168,7 @@ ideal Approx_Step(ideal L)
 	rKill(syz_ring);
       }
       idTest(s_h3);
-      S[syzcnt]=kStd(s_h3,currQuotient,FALSE,NULL,NULL);
+      S[syzcnt]=kStd(s_h3,currQuotient,(tHomog)FALSE,NULL,NULL);
       syzcnt++;
       idDelete(&s_h3);
     } /* end if flag >0 */
