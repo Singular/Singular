@@ -111,7 +111,7 @@ CXXSOURCES=clapconv.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
-    pShallowCopyDelete.cc 
+    pShallowCopyDelete.cc fast_mult.cc 
 
 # normal C source files
 CSOURCES=weight0.c fegetopt.c fereadl.c dError.c mmstd.c 
