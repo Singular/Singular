@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.67 1998-05-19 09:02:40 obachman Exp $
+@comment $Id: reference.doc,v 1.68 1998-05-19 09:25:43 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -80,6 +80,7 @@ the brackets are optional. In the syntax of the commands @code{help} and
 * gcd::
 * gen::
 * getdump::
+* groebner::
 * help::
 * hilb::
 * homog::
@@ -1699,7 +1700,7 @@ returns the i-th free generator of a free module.
 See @ref{freemodule}; @ref{int expressions}; @ref{vector}.
 @c ref
 @c ---------------------------------------
-@node getdump, help, gen, Functions
+@node getdump, groebner, gen, Functions
 @subsection getdump
 @cindex getdump
 @table @code
@@ -1736,7 +1737,26 @@ to @code{stdin} (standard input).
 See @ref{link}, @ref{dump}, @ref{read}.
 @end iftex
 @c ---------------------------------------
-@node help, hilb, getdump, Functions
+@node groebner, help, getdump, Functions
+@subsection groebner
+@cindex groebner
+@table @code
+@item @strong{Syntax:}
+@code{groebner (}  @code{) ;}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@item @strong{Example:}
+@example
+@c example
+@c example
+@end example
+@end table
+@c ref
+See
+@ref{std}.
+@c ref
+@c ---------------------------------------
+@node help, hilb, groebner, Functions
 @subsection help
 @cindex help
 @table @code
