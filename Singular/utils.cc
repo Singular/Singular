@@ -153,7 +153,7 @@ static void PrintOut(FILE *fd, int pos_start, int pos_end)
   while (pos_start++ <= pos_end) 
   {
     c = fgetc(fd);
-    if (c == '@' || c == '$') putchar('\\');
+    if (c == '@' || c == '$' || c == '\\') putchar('\\');
     if (c != '\r') putchar(c);
   }
 }

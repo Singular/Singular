@@ -24,6 +24,8 @@ libdir 		= @libdir@
 bindir		= @bindir@
 # includes are taken from here
 includedir	= @includedir@
+slibdir		= ${prefix}/LIB
+
 
 ## 
 ## various programs
@@ -250,7 +252,7 @@ configure: configure.in
 ##
 ## install targets
 ##
-install: all installbin 
+install: all installbin installslib
 
 installbin: Singular libparse
 	${MKINSTALLDIRS} ${bindir}
@@ -263,6 +265,8 @@ installbin: Singular libparse
 		${LN_S} Singular-${SINGULAR_VERSION} ${SINGULAR};\
 	fi
 
+installslib: LIB
+	test -L ${slibdir} || (rm -rf ${slibdir}; ln -s  `pwd`/LIB ${slibdir})
 
 
 uninstall: uninstallbin 

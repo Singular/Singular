@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.66 1999-07-16 13:44:27 obachman Exp $
+@comment $Id: singular.doc,v 1.67 1999-07-19 12:06:17 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -88,7 +88,6 @@ This is the texinfo file describing Singular (version @value{VERSION})
 </center>
 <CENTER><A HREF="http://www.uni-kl.de/"><I>University of Kaiserslautern</I></A></CENTER>
 <CENTER><A HREF="http://www.mathematik.uni-kl.de/"><I>Department of Mathematics</I></A></CENTER>
-<CENTER>and</CENTER>
 <CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/">
 <I>Centre for Computer Algebra</I></A></CENTER><p></p>
 @end html
@@ -358,7 +357,7 @@ LIB "all.lib";
 @c lib solve.lib no_ex
 
 @c ---------------------------------------------------------
-@node spcurve_lib, ,solve_lib, SINGULAR libraries
+@node spcurve_lib,, solve_lib, SINGULAR libraries
 @section spcurve_lib
 @cindex spcurve_lib
 @c lib spcurve.lib

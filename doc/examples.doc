@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.46 1999-07-09 14:12:48 obachman Exp $
+@comment $Id: examples.doc,v 1.47 1999-07-19 12:06:14 obachman Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -2108,10 +2108,10 @@ the factor rings of the rings in the list divided out by the ideals
   ring R1=0,(x,y,z),dp;
   ideal I=(x-y)*(x-z)*(y-z);
   list qr=normal(I);
-  def S1=qr[1]; def S2=qr[2]; def S3=qr[3];
+  def S1=qr[1]; def S2=qr[2]; //def S3=qr[3];
   setring S1; norid;
   setring S2; norid;
-  setring S3; norid;
+//  setring S3; norid;
 @c example
 @end smallexample
 @end ifset

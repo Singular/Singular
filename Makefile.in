@@ -50,6 +50,9 @@ all install uninstall:
           fi;); \
 	done
 
+install-doc:
+	cd doc; make install
+
 ##############################################################
 # cleaning up
 .PHONY: local-clean local-distclean local-maintainer-clean \

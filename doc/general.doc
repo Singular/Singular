@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.127 1999-07-17 14:49:11 obachman Exp $
+@comment $Id: general.doc,v 1.128 1999-07-19 12:06:16 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -29,13 +29,9 @@
 * Procedures::
 * Libraries::
 * Debugging tools::
-@ifset namespaces
-* Namespaces::
-@end ifset
 @end menu
 
 
-@c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
 @node Interactive use, Rings and orderings, General concepts, General concepts
 @section Interactive use
@@ -1188,12 +1184,7 @@ semantics.
 
 In the following, the basic language concepts such as commands,
 expressions, names, objects, etc., are discussed.  @xref{Procedures},
-@ifset namespaces
-@ref{Libraries}, and @ref{Namespaces},
-@end ifset
-@ifclear namespaces
 and @ref{Libraries},
-@end ifclear
 for the concepts of procedures
 and libraries.
 
@@ -1459,11 +1450,6 @@ breakpoint in procedures
 @item @code{#}
 @cindex #
 list of parameters in procedures without explicit parameter list
-@ifset namespaces
-@item @code{::}
-@cindex ::
-delimiter between package name and identifier
-@end ifset
 @item @code{$}
 @cindex $
 terminates @sc{Singular}
@@ -1547,22 +1533,6 @@ This feature is referred to as name substitution.
   `bar+"(1)"`;
 @c example
 @end smallexample
-
-@ifset namespaces
-Names are grouped into namespaces (= packages) @xref{Namespaces}.
-Defined variables cannot interfere with names in other
-packages.
-
-@smallexample
-@c example error
-  package packa;
-  package packb;
-  int packa::i=4;
-  string packb::i="some other var";
-  listvar(all);
-@c example
-@end smallexample
-@end ifset
 
 @c ------------------------------------------------------------
 @node Objects, Type conversion and casting, Names, The SINGULAR language
@@ -1799,12 +1769,7 @@ overview of the usage of links and of the different link types is given.
 
 Even though library loading may be considered an I/O operation, too,
 this section does not treat loading of libraries
-@ifset namespaces
-(@pxref{load}).
-@end ifset
-@ifclear namespaces
 (@pxref{LIB}).
-@end ifclear
 
 @subheading Monitoring
 A special form of I/O is monitoring.  When monitoring is enabled,
@@ -1968,25 +1933,14 @@ data bases).
 
 
 @c ---------------------------------------------------------------------------
-@c ---------------------------------------------------------------------------
-@ifset namespaces
-@node Procedures, Namespaces, Input and output, General concepts
-@end ifset
-@ifclear namespaces
 @node Procedures, Libraries, Input and output, General concepts
-@end ifclear
 @section Procedures
 @cindex Procedures
 
 Procedures contain sequences of @sc{Singular}.  They are used to extend
 the set of commands with user defined commands.  Procedures are defined
 by either typing them in on the command line or by loading them from a
-@ifset namespaces
-so-called library file with the @ref{load} command.  Procedures are
-@end ifset
-@ifclear namespaces
 so-called library file with the @ref{LIB} command.  Procedures are
-@end ifclear
 invoked like normal built-in commands, i.e., by typing their name
 followed by the list of arguments in parentheses. The invocation then
 executes the sequence of commands stored in the specified procedure. All
@@ -2098,8 +2052,10 @@ USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
 [CREATE:  <description of created objects which are not returned>]
 RETURN:   <description of the purpose and return value>
 [NOTE:    <particular assumptions or limitations, details>]
+[SEE ALSO: <comma-seprated names of related procedures>]
 EXAMPLE:  example <proc_name>; shows an example
 @end smallexample
+For more information, see also @ref{Typesetting of help strings}.
 
 @c ---------------------------------------
 @node Names in procedures, Parameter list, Procedure definition, Procedures
@@ -2122,50 +2078,10 @@ with @code{keepring} (see @ref{keepring}). All variables living in that
 ring are moved together with that ring.
 
 To keep local variables after leaving the procedure, they have to be
-exported (i.e. made known) to some higher level by
-@ifset namespaces
-@code{exportto}
-(see @ref{exportto}). There are three possibilities to do so:
-@table @bullet
-@item accessible in the calling procedure
-i.e. down by one nesting level.
-@item accessible in the whole package
-i.e. in the current namespace
-@item accessible everywhere
-@end table
+exported (i.e. made known) to some higher level by the @code{export}
+command (@pxref{export}).
 
-In the last two cases names are not deleted automatically.
-Ring dependent variables  resp. global names in packages are stored
-together with the ring resp. package and deleted
-when the object they live in is deleted.
-
-@smallexample
-@c example error
-proc xxx
-{
-  int k=4;        //defines a local variable k
-  int result=k+2;
-  exportto(Top,result);  //defines the global variable "result".
-}
-xxx();
-listvar(all);
-@c example
-@end smallexample
-@end ifset
-@ifclear namespaces
-@code{export}
-(see @ref{export}). There are three possibilities to do so:
-@table @bullet
-@item accessible in the calling procedure
-i.e. down by one nesting level.
-@item accessible everywhere
-@end table
-
-In the last case names are not deleted automatically.
-Ring dependent variables  are stored
-together with the ring and deleted
-when the object they live in is deleted.
-
+@strong{Example:}
 @smallexample
 @c example
 proc xxx
@@ -2178,7 +2094,6 @@ xxx();
 listvar(all);
 @c example
 @end smallexample
-@end ifclear
 Note that the variable @code{result} became a global variable after the
 execution of @code{xxx}.
 
@@ -2260,69 +2175,14 @@ See
 @c ref
 
 @c ----------------------------------------------------------------------
-@ifset namespaces
-@c ----------------------------------------------------------------------
-@node Namespaces, Libraries, Procedures, General concepts
-@section Namespaces
-@cindex Namespaces
-@cindex package
-
-Namespaces are subsets of the set of all defined names. The set of all
-namespaces and all names not belonging to one of those subsets is called
-top-level package (@code{Top}).
-
-Each time a library @ref{Libraries} is loaded, the corresponding namespace is
-created, if it does not already exist.
-
-All defined namespaces are displayed by the @code{listvar(package)}
-command. Usually the list of all package is equivalent to the list of
-all loaded libraries, but a namespace can also be created by a user:@*
-@code{package} package_name@code{;} @ref{package}.
-
-@smallexample
-@c example 
-  option(loadLib);   // show loading of libraries;
-                     // standard.lib is loaded
-  listvar(package);
-                     // the names of the procedures of inout.lib
-  load("inout.lib"); // are now known to Singular
-  listvar(package);
-@c example
-@end smallexample
-
-Namespaces are not supported in versions of @sc{Singular} prior to 1.3.
-For a @sc{Singular} binary supporting namespaces, the command
-@code{system("with","Namespaces");} should return 1.
-
-@smallexample
-@c example
-  system("with","Namespaces");
-@c example
-@end smallexample
-
-@end ifset
-@c ----------------------------------------------------------------------
-@c ----------------------------------------------------------------------
-@ifset namespaces
-@node Libraries, Debugging tools, Namespaces, General concepts
-@end ifset
-@ifclear namespaces
 @node Libraries, Debugging tools, Procedures, General concepts
-@end ifclear
 @section Libraries
 @cindex Libraries
 
-A library @ref{Singular library} / dynamic module @ref{dynamic module}
-is a collection of @sc{Singular} resp. C /C++
-procedures in a file.
+A library is a collection of @sc{Singular}
+procedures in a file. 
 @*@sc{Singular} reads a library with the command
-@ifset namespaces
-@code{load},
-@end ifset
-@ifclear namespaces
-@code{LIB},
-@end ifclear
-general information about the library is displayed by the command
+@code{LIB}. General information about the library is displayed by the command
 @code{help lib_name}. After loading the library, its procedures can be used
 like the built-in @sc{Singular} functions. To have the full functionality
 of a built-in function (like checking of the type of parameters, automatic
@@ -2331,23 +2191,20 @@ comply with the syntax rules described below.
 
 @menu
 * Loading of a library::
-* Singular library::
-* dynamic module::
+* Format of a library::
+* Guidelines for writing a library::
+* Typesetting of help strings::
+* template_lib::
 @end menu
 
 @c ---------------------------------------
-@node Loading of a library, Singular library, Libraries, Libraries
+@node Loading of a library, Format of a library,, Libraries
 @subsection Loading of a library
 @cindex Loading of a library
 @cindex path
 @cindex SINGULARPATH
 
-@ifset namespaces
-Libraries can be loaded with the @code{load} command:
-@end ifset
-@ifclear namespaces
 Libraries can be loaded with the @code{LIB} command:
-@end ifclear
 
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file reference.doc,
@@ -2357,12 +2214,7 @@ Libraries can be loaded with the @code{LIB} command:
 @c ------------------------------------------------------------
 @table @code
 @item @strong{Syntax:}
-@ifset namespaces
-@code{load(} string_expression [@code{,"with"}]@code{);}
-@end ifset
-@ifclear namespaces
 @code{LIB} string_expression @code{;}
-@end ifclear
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -2382,7 +2234,14 @@ Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
 @end table
 
-@ifclear namespaces
+Only the names of the procedures in the library are loaded, the body of
+the procedures is read during the first call of this procedure. This minimizes
+memory consumption by unused procedures.  When @sc{Singular} is started
+with the @code{-q} or @code{--quiet} option, no message about the
+loading of a library is displayed.  More exactly, option @code{-q} (and
+likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
+monitoring of library loading (@pxref{option}).
+
 All loaded libraries are displayed by the @code{LIB;}
 command:
 @smallexample
@@ -2395,47 +2254,6 @@ command:
   LIB;
 @c example
 @end smallexample
-@end ifclear
-
-@ifset namespaces
-All loaded libraries are displayed by the @code{listvar(package);}
-command:
-@smallexample
-@c example error
-  option(loadLib);   // show loading of libraries;
-                     // standard.lib is loaded
-  listvar(package);
-                     // the names of the procedures of inout.lib
-  load("inout.lib"); // are now known to Singular
-  listvar(package);
-@c example
-@end smallexample
-Each time a library @ref{Singular library} / dynamic module @ref{dynamic
-module} is loaded, the corresponding namespace is created, if it does
-not already exist.
-
-The name of this namespace corresponding to a Singular library is
-derived from the name of the library file. The first letter is
-capitalized and everything to right of the left-most dot is
-dropped.
-For a dynamic module the packagename is hard-coded in the binary file.
-
-@sc{Singular} also supports autoloading of packages.
-To use this features, just specify the identifier by its full name:
-
-@smallexample
-@c example error
-  listvar(package);
-  Inout::version;     // full name of a variable in the package Inout
-  listvar(package);   // the package Inout has been autoloaded
-@c example
-@end smallexample
-
-For autoloading the base of the filename is generated by converting the
-packagename to lowercase letters. The search is done in the standard
-@sc{Singular} search path, first looking for a file of this name, and then
-appending to the base @code{.lib}, @code{.so}, @code{.sl} (in this order).
-@end ifset
 
 @c ref
 See
@@ -2450,26 +2268,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node Singular library, dynamic module, Loading of a library, Libraries
-@subsection Singular library
-@cindex Singular library
-
-Only the names of the procedures in the library are loaded, the body of
-the procedures is read during the first call of this procedure. This minimizes
-memory consumption by unused procedures.  When @sc{Singular} is started
-with the @code{-q} or @code{--quiet} option, no message about the
-loading of a library is displayed.  More exactly, option @code{-q} (and
-likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
-monitoring of library loading (@pxref{option}).
-
-@c ---------------------------------------
-@menu
-* Format of a library::
-* Guidelines for writing a library::
-* Template for writing a library::
-@end menu
-@c ---------------------------------------
-@node Format of a library, Guidelines for writing a library, Singular library, Singular library
+@node Format of a library, Guidelines for writing a library, Loading of a library, Libraries
 @subsection Format of a library
 @cindex Format of a library
 
@@ -2480,7 +2279,6 @@ i.e., the following keywords are allowed:
 @code{info},
 @code{version},
 @code{LIB},
-@code{require},
 @code{/* ... */},
 @code{//},
 @code{[static] proc}.
@@ -2521,7 +2319,7 @@ defines the version number for the library. It is displayed when the
 library is loaded.
 @item @strong{Example:}
 @smallexample
-version="$I@comment
+version="$I@comment 
 @comment !! Do not erase the @comment at the end of the previous line !!
 @comment !! It prevents cvs to substitute the id string                !!
 d: sample.lib,v 1.2 1998/05/07 singular Exp $";
@@ -2537,7 +2335,7 @@ It is common practice to simply define the version string to be
 
 
 @c ---------------------------------------
-@node Guidelines for writing a library, Template for writing a library, Format of a library, Singular library
+@node Guidelines for writing a library, Typesetting of help strings, Format of a library, Libraries
 @subsection Guidelines for writing a library
 @cindex Guidelines for writing a library
 @cindex library
@@ -2556,20 +2354,21 @@ library, before procedure definitions.
 The info-string should have the following format:
 @smallexample
 info="
-      LIBRARY: <library_name> <one line description of the content>
-      AUTHOR:  <name, affiliation, and email address of author>
-      last modified: < date of last modification>
-
-      <procedure1>;     <one line description of the purpose>
-      .
-      .
-      <procedureN>;     <one line description of the purpose>";
+LIBRARY: <library_name> <one line description of the content>
+AUTHOR:  <name, and email address of author>
+      
+PROCEDURES:
+  <procedure1>;     <one line description of the purpose>
+   .
+   .
+  <procedureN>;     <one line description of the purpose>
+";
 @end smallexample
 The purpose of the one line procedure descriptions is not to give a short help
 for the procedure, but to help the user decide what procedure might be
 the right one for the job. Details can then be found in the help section
 of each procedure. Therefore parameters may be omitted or abbreviated if
-necessary.
+necessary. For more information, see also @ref{Typesetting of help strings}.
 
 @item
 Each procedure which is not declared @code{static} should have a
@@ -2640,33 +2439,82 @@ example
 @c @end table
 
 @c ----------------------------------------
-@node Template for writing a library,, Guidelines for writing a library, Singular library
-@subsection Template for writing a library
+@node Typesetting of help strings, template_lib, Guidelines for writing a library, Libraries
+@subsection Typesetting of help strings
+@cindex Typesetting of help strings
+The help and info strings of libraries which are included in the
+distribution of @sc{Singular} are parsed and automatically converted
+into the texinfo format (the typesetting language in which the
+documentation  of @sc{Singular} is written. 
+
+For optimal typesetting results, the guidelines for writing libraries
+and procedures should be followed, and the following points should be
+kept in mind:
+
+@itemize @bullet
+@item 
+If a help string starts with a @code{@@} sign, then no parsing is done,
+and the info string is assumed to be already in the texinfo format.
+@item
+help strings are typeset within a @code{@@table @@asis} environment
+(which is similar to a latex @code{description} environment).
+@item
+If a line starts with a character and contains a colon, then the text up 
+to the colon is taken to be the description-string of an item and the
+text following the colon is taken to be the content of the item.
+@item 
+Descritptio
+@item 
+If the description-string of an item matches @code{SEE ALSO}, then the
+content of the item is assumed to be comma-separted words which are
+valid references to other texinfo nodes of the manual. (e.g., all
+procedure and command names are also texinfo nodes). 
+@item 
+If the description-string of an item matches @code{PROCEDURES}, then the 
+content of the item is assumed to be a summary description of the
+procedures contained in the library. Separate texinfo nodes (subsections 
+in printed documents) are
+@strong{only} created out of the help strings of such procedures which
+appear in the summary description of a library. 
+@item 
+The content-string of an item is typeset as follows:
+@itemize 
+@item 
+The texinfo commands @code{@@*}, @code{@@code@{..@}},
+@code{@@math@{..@}} may be used to enforce linebreaks, and typesetting
+in typewriter font resp. math mode.
+
+@item 
+Words which are followed by matching round parenthesis (i.e., by
+@code{()}) are typeset using a typewriter font (like @code{myfunc()}).
+
+@item
+A linebreak is inserted in front of a line, if (1) the previous line is
+shorter than 60 characters and does not contain @code{@@code@{..@}}  and 
+@code{@@math@{..@}} constructs, or (2) if the first word of a line is
+followed by matching round parenthesis (like @code{myfunc()}), or (3) if 
+the previous line does only consist of a word followed by matching
+parehtesis.
+@end itemize
+@end itemize
+
+See @ref{template_lib} for an examples of the automatic typesetting.
+
+@c ----------------------------------------
+@node template_lib,, Typesetting of help strings, Libraries
+@subsection template_lib
+@cindex template_lib
 @cindex Template for writing a library
-@cindex library
-TBC
 
-@c ---------------------------------------
-@node dynamic module, , Singular library, Libraries
-@subsection dynamic module
-@cindex dynamic module
-
-Dynamic modules are similar to Libraries but they are not written
-in @sc{Singular} but in C++ and compiled into a shared library.
-
-Within a dynamic module it is possible to access nearly all
-@sc{Singular} internal functions and data structures.
-
-Dynamic module are not supported on all platforms and in versions of
-@sc{Singular} prior to 1.3.
-For a @sc{Singular} binary supporting dynamic modules, the command
-@code{system("with","DynamicLoading");} should return 1.
-
+First, we show the source-code of a template library:
 @smallexample
-@c example
-  system("with","DynamicLoading");
-@c example
+@c include template.lib 
 @end smallexample
+
+After typesetting, the library appears in the document as follows (with
+one subsection for each procedure):
+
+@c lib template.lib  lib_fun lib_ex subsubsection
 
 @c ----------------------------------------------------------------------
 @node Debugging tools,  , Libraries, General concepts

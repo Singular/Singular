@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.32 1999-07-01 12:49:48 obachman Exp $ */
+/* $Id: libparse.l,v 1.33 1999-07-19 12:06:08 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -253,7 +253,17 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                make_version(yytext,1);
 #ifdef STANDALONE_PARSER
                if (texinfo_out) 
-                 printf("$version = \"%s\";\n", libnamebuf);
+               {
+                 char *c = libnamebuf;
+                 printf("$version = \"");
+                 while (*c != '\0')
+                 {
+                    if (*c  == '$' || *c  == '@' || *c == '\\') putchar('\\');
+                    putchar(*c);
+                    c++;
+                 }
+                 printf("\";\n");
+               }
                else
                  printf("Version:%s;\n", libnamebuf);
 #else

@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.8 1999-07-17 14:49:10 obachman Exp $
+# $Id: doc2tex.pl,v 1.9 1999-07-19 12:06:13 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -318,6 +318,7 @@ sub HandleExample
 sub HandleInclude
 {
   s/^\@c\s*include\s+([^\s]+)\s/$1/;
+  s/\s*$//;
   unless (&Open(*INC, "<$_"))
   {
     warn "$WARNING HandleInclude: can't open $_ for reading\n";
@@ -406,7 +407,7 @@ sub HandleRef
 
 sub HandleLib
 {
-  local($lib, $lib_name, $ltex_file, $l_ex, $l_fun);
+  local($lib, $lib_name, $ltex_file, $l_ex, $l_fun, $no_node, $section);
   my ($func);
 
   if (/^\@c\s*lib\s+([^\.]+)\.lib(.*)/)
@@ -425,7 +426,14 @@ sub HandleLib
   $func = $1 if (/^:(.*?) /);
   $l_fun = 1 if (($lib_fun || (/lib_fun/)) && !/no_fun/);
   $l_ex = 1 if (($lib_ex || /lib_ex/) && !/no_ex/ && $l_fun);
-
+  if (/(\w+)section/)
+  {
+    $section = $1. 'section';
+  }
+  else
+  {
+    $section = "subsection";
+  }
   $ltex_file = "$doc_subdir/$lib"."_lib";
   unless ($l_ex)
   {
@@ -554,17 +562,24 @@ sub GenerateLibDoc
 	print LDOC ",";
 	print LDOC " ".$procs[$i-1] if ($i > 0);
 	print LDOC ", " . $lib ."_lib\n";
-	print LDOC "\@subsection " . $procs[$i] . "\n";
+	print LDOC "\@$section " . $procs[$i] . "\n";
 	print LDOC "\@cindex ". $procs[$i] . "\n";
 
 	print LDOC "\@c ---content $procs[$i]---\n";
 	print LDOC "Procedure from library \@code{$lib.lib} (\@pxref{${lib}_lib}).\n\n";
-	print LDOC "\@table \@asis\n";
-	$table_is_open = 1;
-	# print help
-	$ref = OutInfo(\*LDOC, $help{$procs[$i]});
-	print LDOC "\@end table\n";
-	$table_is_open = 0;
+	if ($help{$procs[$i]} =~ /^\@/)
+	{
+	  print LDOC $help{$procs[$i]};
+	  $ref = '';
+	}
+	else
+	{
+	  print LDOC "\@table \@asis\n";
+	  $table_is_open = 1;
+	  # print help
+	  $ref = OutInfo(\*LDOC, $help{$procs[$i]});
+	  print LDOC "\@end table\n";
+	}
 	# print example 
 	if ($example = &CleanUpExample($lib, $example{$procs[$i]}))
 	{
@@ -599,6 +614,11 @@ sub OutLibInfo
 {
   my ($FH, $info, $l_fun) = @_;
   print $FH "\@c ---content LibInfo---\n";
+    if ($info =~ /^\@/)
+  {
+    print $FH $info;
+    return;
+  }
   print $FH "\@table \@asis\n";
   $table_is_open = 1;
   
@@ -613,6 +633,11 @@ sub OutLibInfo
 sub OutInfo
 {
   my ($FH, $info, $l_fun) = @_;
+  if ($info =~ /^\@/)
+  {
+    print $FH $info;
+    return;
+  }
   $info =~ s/^\s*//;
   $info =~ s/\s*$//;
   $info .= "\n";
@@ -653,9 +678,19 @@ sub FormatInfoText
     while ($ptext =~ /(.*)\n/g)
     {
       $line = $1;
+      # break line if
       $text .= '@*' 
-	if ($line =~ /\w/ && $pline =~ /\w/ && 
-	    ((length($pline) < 60) || $line =~ /^\s*\w*\(.*?\)/));
+	if ($line =~ /\w/ && $pline =~ /\w/ # line and prev line are not empty
+	    && $line !~ /^\s*\@\*/  # line does not start with @*
+	    && $pline !~ /\@\*\s*/  # prev line does not end with @*
+	    &&
+	    ((length($pline) < 60  && # prev line is shorter than 60 chars
+	      $pline !~ /\@code{.*?}/ # and does not contain @code, @math
+	      && $pline !~ /\@math{.*?}/) 
+	     ||
+	     $line =~ /^\s*\w*\(.*?\)/ # $line starts with \w*(..)
+	     ||
+	     $pline =~ /^\s*\w*\(.*?\)[\s;:]*$/)); # prev line is only \w(..)
       $line =~ s/\s*$//;
       $text .= "$line\n";
       $pline = $line;
@@ -666,10 +701,14 @@ sub FormatInfoText
   s/\n +/\n/g;
   s/\s*$//g;
   s/ +/ /g;  # replace double whitespaces by one
+  s/(\w+\(.*?\))/\@code{$1}/g;
   s/\@\*\s*/\@\*/g;
   s/(\@[^\*])/\@$1/g; # escape @ signs, except @*
-  s/{/\@{/g;
+  s/{/\@{/g; # escape {}
   s/}/\@}/g;
+  # unprotect @@math@{@}, @code@{@}
+  s/\@\@math\@{(.*?)\@}/\@math{$1}/g;
+  s/\@\@code\@{(.*?)\@}/\@code{$1}/g;
 }
 
 sub OutInfoItem
@@ -752,10 +791,6 @@ sub OutInfoItem
   {
     # just print the text
     FormatInfoText(length($item) + 1);
-    # if functions are in text, then make it in code
-    s/(\w+\(.*?\))/\@code{$1}/g
-      if ($item =~ /usage/i || $item =~ /Return/i);
-
     print $FH "$_\n";
   }
   return '';
@@ -786,7 +821,8 @@ sub OutRef
   my ($FH, $refs) = @_;
   $refs =~ s/^\s*//;
   $refs =~ s/\s*$//;
-  my @refs = split (/[\s,]+/, $refs);
+  $refs =~ s/\n/,/g;
+  my @refs = split (/[,;\.]+/, $refs);
   my $ref;
 
   print $FH "\@c ref\nSee\n";
@@ -794,7 +830,9 @@ sub OutRef
   print $FH "\@ref{$ref}";
   for $ref (@refs)
   {
-    print $FH ", \@ref{$ref}";
+    $ref =~ s/^\s*//;
+    $ref =~ s/\s*$//;
+    print $FH ", \@ref{$ref}"  if ($ref =~ /\w/);
   }
   print $FH "\n\@c ref\n";
 }
