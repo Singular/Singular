@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.3 2003-12-16 18:30:31 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.4 2003-12-17 19:40:41 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1686,12 +1686,16 @@ int nc_CheckSubalgebra(poly PolyVar, ring r)
 //   return(TRUE);
 // }
 
-BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r)
+BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   /* returns TRUE if there were errors */
   /* analyze inputs, check them for consistency */
   /* detect nc_type, DO NOT initialize multiplication */
   /* check the ordering condition and evtl. NDC */
 {
+  matrix CC = NULL; 
+  matrix DD = NULL;
+  poly CN = NULL;
+  poly DN = NULL;
   matrix C;
   matrix D;
   number nN,pN,qN;
@@ -1713,7 +1717,47 @@ BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r)
   r->nc->ref = 1;
   r->nc->basering = r;
   r->nc->type = nc_undef;
+
   /* initialition of the matrix C */
+  /* check the correctness of arguments */
+
+  if ((CCC != NULL) && ( (MATCOLS(CCC)==1) || MATROWS(CCC)==1 ) )
+  {
+    CN = MATELEM(CCC,1,1);
+  }
+  else 
+  {
+    if ((CCC != NULL) && ( (MATCOLS(CCC)!=r->N) || (MATROWS(CCC)!=r->N) ))
+    {
+      Werror("Square %d x %d  matrix expected",r->N,r->N);
+      ncCleanUp(r);
+      return TRUE;
+    }
+  }
+  if (( CCC != NULL) && (CC == NULL)) CC = mpCopy(CCC);
+  if (( CCN != NULL) && (CN == NULL)) CN = CCN;
+
+  /* initialition of the matrix D */
+  /* check the correctness of arguments */
+
+  if ((DDD != NULL) && ( (MATCOLS(DDD)==1) || MATROWS(DDD)==1 ) )
+  {
+    DN = MATELEM(DDD,1,1);
+  }
+  else 
+  {
+    if ((DDD != NULL) && ( (MATCOLS(DDD)!=r->N) || (MATROWS(DDD)!=r->N) ))
+    {
+      Werror("Square %d x %d  matrix expected",r->N,r->N);
+      ncCleanUp(r);
+      return TRUE;
+    }
+  }
+  if (( DDD != NULL) && (DD == NULL)) DD = mpCopy(DDD);
+  if (( DDN != NULL) && (DN == NULL)) DN = DDN;
+
+  /* further checks */
+
   if (CN != NULL)       /* create matrix C = CN * Id */
   {
     nN = p_GetCoeff(CN,r);
@@ -1741,9 +1785,8 @@ BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r)
       }
     }
   }
-  if (CC != NULL) /* copy matrix C */
+  if ( (CN == NULL) && (CC != NULL) ) /* copy matrix C */
   {
-    assume( CN==NULL );
     C = mpCopy(CC);
     /* analyze C */
     pN = p_GetCoeff(MATELEM(C,1,2),r);
@@ -1774,7 +1817,8 @@ BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r)
   }
 
   /* initialition of the matrix D */
-  if (DD == NULL)     /* we treat DN only (it could also be NULL) */
+  if ( DD == NULL ) 
+    /* we treat DN only (it could also be NULL) */
   {
     D = mpNew(r->N,r->N);
     if (DN  == NULL)
@@ -1801,7 +1845,6 @@ BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r)
   }
   else /* DD != NULL */
   { 
-    assume( DN==NULL );
     D = mpCopy(DD); 
   }
   /* analyze D */ 
