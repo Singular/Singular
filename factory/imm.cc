@@ -1,20 +1,25 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.cc,v 1.3 1998-05-11 10:38:23 schmidt Exp $ */
+/* $Id: imm.cc,v 1.4 1998-05-11 10:52:15 schmidt Exp $ */
 
 //{{{ docu
 //
 // imm.cc - some special implementations of immediate functions
 //   for some special platforms.
 //
+// Hierarchy: basic, arithmetic
+//
 //}}}
 
 #include <config.h>
 
+#ifdef __MWERKS__
 #include <stuff_64.h>
+#endif
 
 #include "imm.h"
 
-//{{{ InternalCF * imm_mul (InternalCF * lhs, InternalCF * rhs )
+#ifdef __MWERKS__
+//{{{ InternalCF * imm_mul ( InternalCF * lhs, InternalCF * rhs )
 //{{{ docu
 //
 // imm_mul() - multiplication of two immediate integers.
@@ -26,7 +31,7 @@
 //
 //}}}
 InternalCF *
-imm_mul (InternalCF * lhs, InternalCF * rhs )
+imm_mul ( InternalCF * lhs, InternalCF * rhs )
 {
     int li = imm2int( lhs ), ri = imm2int( rhs );    
     Int_64 pr;
@@ -61,3 +66,4 @@ imm_mul (InternalCF * lhs, InternalCF * rhs )
     }
 }
 //}}}
+#endif /* __MWERKS__ */
