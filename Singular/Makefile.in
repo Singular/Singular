@@ -384,13 +384,15 @@ maintainer-clean: distclean srcclean
 Singular-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	${MAKE} Singular ESingular TSingular
-	${INSTALL_PROGRAM} 
+	${MKINSTALLDIRS} ${install_bindir} 
+	${INSTALL_PROGRAM} -s  Singular ESingular TSingular ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
 Singular-static-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	${MAKE} Singular-static ESingular TSingular
-	${INSTALL_PROGRAM} -s Singular-static Singular
+	${MKINSTALLDIRS} ${install_bindir} 
+	${INSTALL_PROGRAM} -s Singular-static Singular ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
 install-bindist: libparse ${RUN_SINGULARS} Singular-bindist 
