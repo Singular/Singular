@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.38 2001-05-23 16:57:10 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.39 2001-05-25 09:38:10 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -11,6 +11,9 @@ OVERVIEW: A library to compute invariants related to the Gauss-Manin connection
           of a an isolated hypersurface singularity
 
 PROCEDURES:
+ gms(f,s);                  Brieskorn lattice in the Gauss-Manin system
+ gmsnf(p,K,Kmax);           Gauss-Manin system normal form
+ gmscoeffs(p,K,Kmax);       Gauss-Manin system basis representation
  monodromy(f[,opt]);        monodromy matrix, spectrum of monodromy of f
  vfiltration(f[,opt]);      V-filtration on H''/H', singularity spectrum of f
  spectrum(f);               singularity spectrum of f
@@ -36,7 +39,29 @@ LIB "linalg.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc gms(poly t,string d)
+proc gms(poly t,string s)
+"USAGE:    gms(f,s); poly f, string s;
+ASSUME:   basering has characteristic 0 and local degree ordering,
+          f has isolated singularity at 0
+RETURN:
+@format
+ring G:
+  G=C{{s}}*basering,
+  s is the inverse of the Gauss-Manin connection of f,
+  G contains:
+    poly @t: image of f
+    ideal @dt: image of Jacobian ideal df of f
+    ideal @g: image of standard basis of df
+    matrix @a: matrix(@dt)*s=matrix(@g)
+    ideal @m: image of monomial vector space basis of Jacobian algebra of f
+    int @wmax: maximal weight of variables of basering
+  G projects to H''=C{{s}}*@m
+@end format
+NOTE:     do not modify @t, @dt, @g, @a, @m, or @wmax if you want to use 
+          gms procedures
+KEYWORDS: singularities; Gauss-Manin connection
+EXAMPLE:  example gms; shows examples
+"
 {
   def R=basering;
   if(charstr(R)!="0")
@@ -54,10 +79,6 @@ proc gms(poly t,string d)
   int @wmax;
   for(i=nvars(R);i>=1;i--)
   {
-    if(deg(var(i))==0)
-    {
-      ERROR("degree ordering expected");
-    }
     if(deg(var(i))>@wmax)
     {
       @wmax=deg(var(i));
@@ -84,9 +105,9 @@ proc gms(poly t,string d)
   attrib(g,"isSB",1);
   ideal m=kbase(g);
 
-  string s="ring G="+string(charstr(R))+",("+d+","+varstr(R)+
+  string G="ring @G="+string(charstr(R))+",("+s+","+varstr(R)+
     "),(ws("+string(deg(highcorner(g))+@wmax)+"),",ordstr(R),");";
-  execute(s);
+  execute(G);
 
   poly @t=imap(R,t);
   ideal @dt=imap(R,dt);
@@ -97,27 +118,60 @@ proc gms(poly t,string d)
   attrib(@g,"isSB",1);
   export @t,@dt,@g,@a,@m,@wmax;
 
-  return(G);
+  return(@G);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  def G=gms(f,"s");
+  setring(G);
+  @t;
+  print(@dt);
+  print(@g);
+  print(@a);
+  @wmax;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc gmsnf(ideal p,int K,list #)
+"USAGE:    gmsnf(p,K[,Kmax]); poly p, int K[, int Kmax];
+ASSUME:   basering was constructed by gms, K<=Kmax
+RETURN:
+@format
+list l:
+  ideal l[1]: projection of p to H''=C{{s}}*@m mod s^{K+1}
+  ideal l[2]: p=l[1]+l[2] mod s^(Kmax+1)
+@end format
+NOTE:     by setting p=l[2] the computation can be continued up to order
+          at most Kmax, by default Kmax=infinity
+KEYWORDS: singularities; Gauss-Manin connection
+EXAMPLE:  example gmsnf; shows examples
+"
 {
   int Kmax=-1;
   if(size(#)>0)
   {
-    if(typeof(l[1])=="int")
+    if(typeof(#[1])=="int")
     {
-      Kmax=l[1];
+      Kmax=#[1];
+      if(K>Kmax)
+      {
+        Kmax=K;
+      }
     }
   }
 
   intvec v=1;
   v[nvars(basering)]=0;
 
+  int k;
   if(Kmax>=0)
   {
-    p=jet(jet(p,K,v),(Kmax+1)*deg(var(1))-@wmax);
+    for(k=ncols(p);k>=1;k--)
+    {
+      p[k]=jet(jet(p[k],K,v),(Kmax+1)*deg(var(1))-@wmax);
+    }
   }
 
   ideal r,q;
@@ -125,8 +179,8 @@ proc gmsnf(ideal p,int K,list #)
   q[ncols(p)]=0;
 
   poly s;
-  int i,j,k;
-  for(k=1;k<=ncols(p);k++)
+  int i,j;
+  for(k=ncols(p);k>=1;k--)
   {
     while(p[k]!=0&&deg(lead(p[k]),v)<=K)
     {
@@ -145,7 +199,7 @@ proc gmsnf(ideal p,int K,list #)
           if(Kmax>=0)
           {
             p[k]=p[k]+
-              jet(jet(diff(s*@a[j,i],var(j+1))*var(1),K,v),
+              jet(jet(diff(s*@a[j,i],var(j+1))*var(1),Kmax,v),
                 (Kmax+1)*deg(var(1))-@wmax);
           }
           else
@@ -169,13 +223,40 @@ proc gmsnf(ideal p,int K,list #)
     q[k]=q[k]+p[k];
   }
 
-  return(r,q);
+  return(list(r,q));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  def G=gms(f,"s");
+  setring(G);
+  list l0=gmsnf(@t,0);
+  print(l0[1]);
+  list l1=gmsnf(@t,1);
+  print(l1[1]);
+  list l=gmsnf(l0[2],1);
+  print(l[1]);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc gmsmat(ideal p,int K)
+proc gmscoeffs(ideal p,int K,list #)
+"USAGE:    gmscoeffs(p,K[,Kmax]); poly p, int K[, int Kmax];
+ASSUME:   basering was constructed by gms, K<=Kmax
+RETURN:
+@format
+list l:
+  matrix l[1]: projection of p to H''=C{{s}}*@m=C{{s}}^mu mod s^(K+1)
+  ideal l[2]: p=matrix(@m)*l[1]+l[2] mod s^(Kmax+1)
+@end format
+NOTE:     by setting p=l[2] the computation can be continued up to order 
+          at most Kmax, by default Kmax=infinity
+KEYWORDS: singularities; Gauss-Manin connection
+EXAMPLE:  example gmscoeffs; shows examples
+"
 {
-  def r,q=gmsnf(p,K);
+  list l=gmsnf(p,K,#);
+  ideal r,q=l[1..2];
   poly v=1;
   for(int i=2;i<=nvars(basering);i++)
   {
@@ -183,6 +264,19 @@ proc gmsmat(ideal p,int K)
   }
   matrix C=coeffs(r,@m,v);
   return(C,q);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  def G=gms(f,"s");
+  setring(G);
+  list l0=gmscoeffs(@t,0);
+  print(l0[1]);
+  list l1=gmscoeffs(@t,1);
+  print(l1[1]);
+  list l=gmscoeffs(l0[2],1);
+  print(l[1]);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -239,7 +333,7 @@ static proc maxorddif(matrix H)
 
 proc monodromy(poly f,list #)
 "USAGE:    monodromy(f[,opt]); poly f, int opt
-ASSUME:   basering has characteristic 0 and local ordering,
+ASSUME:   basering has characteristic 0 and local degree ordering,
           f has isolated singularity at 0
 RETURN:
 @format
@@ -264,12 +358,13 @@ EXAMPLE:  example monodromy; shows examples
   }
 
   def R=basering;
-  def G=gms(f,"D");
+  def G=gms(f,"s");
   setring G;
 
   int n=nvars(R)-1;
   int mu,modm=ncols(@m),maxorddif(@m);
   ideal w=@t*@m;
+  list l;
   matrix U=freemodule(mu);
   matrix A0[mu][mu],A,C;
   module H,dH=freemodule(mu),freemodule(mu);
@@ -285,42 +380,44 @@ EXAMPLE:  example monodromy; shows examples
     dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
     if(opt==0)
     {
-      C,w=gmsmat(w,k,mu);
+      l=gmscoeffs(w,k,mu);
     }
     else
     {
-      C,w=gmsmat(w,k,mu+n);
+      l=gmscoeffs(w,k,mu+n);
     }
+    C,w=l[1..2];
     A0=A0+C;
 
     H0=H;
     dbprint(printlevel-voice+2,"//gaussman::monodromy: compute dH");
-    dH=jet(module(A0*dH+D^2*diff(matrix(dH),D)),k);
-    H=H*D+dH;
+    dH=jet(module(A0*dH+s^2*diff(matrix(dH),s)),k);
+    H=H*s+dH;
 
     dbprint(printlevel-voice+2,"//gaussman::monodromy: test dH==0");
-    sdH=size(reduce(H,std(H0*D)));
+    sdH=size(reduce(H,std(H0*s)));
   }
 
-  A0=A0-D^k;
+  A0=A0-s^k;
 
   dbprint(printlevel-voice+2,
     "//gaussman::monodromy: compute basis of saturation");
   H=minbase(H0);
-  int modH=maxorddif(H)/deg(D);
+  int modH=maxorddif(H)/deg(s);
   if(opt==0)
   {
-    C,w=gmsmat(w,modH+1,modH+1);
+    l=gmscoeffs(w,modH+1,modH+1);
   }
   else
   {
-    C,w=gmsmat(w,modH+1,modH+1+n);
+    l=gmscoeffs(w,modH+1,modH+1+n);
   }
+  C,w=l[1..2];
   A0=A0+C;
 
   dbprint(printlevel-voice+2,
     "//gaussman::monodromy: compute A on saturation");
-  list l=division(H*D,A0*H+D^2*diff(matrix(H),D));
+  l=division(H*s,A0*H+s^2*diff(matrix(H),s));
   A=jet(l[1],l[2],0);
 
   dbprint(printlevel-voice+2,
@@ -343,7 +440,8 @@ EXAMPLE:  example monodromy; shows examples
 
   if(mide>0)
   {
-    C,w=gmsmat(w,modH+1+mide,modH+1+mide);
+    l=gmscoeffs(w,modH+1+mide,modH+1+mide);
+    C,w=l[1..2];
     A0=A0+C;
 
     intvec ide;
@@ -437,7 +535,7 @@ example
 
 proc vfiltration(poly f,list #)
 "USAGE:    vfiltration(f[,opt]); poly f, int opt
-ASSUME:   basering has characteristic 0 and local ordering,
+ASSUME:   basering has characteristic 0 and local degree ordering,
           f has isolated singularity at 0
 RETURN:
 @format
@@ -471,12 +569,13 @@ EXAMPLE:  example vfiltration; shows examples
   }
 
   def R=basering;
-  def G=gms(f,"D");
+  def G=gms(f,"s");
   setring G;
 
   int n=nvars(R)-1;
   int mu,modm=ncols(@m),maxorddif(@m);
   ideal w=@t*@m;
+  list l;
   matrix U=freemodule(mu);
   matrix A[mu][mu],C;
   module H,dH=freemodule(mu),freemodule(mu);
@@ -491,30 +590,32 @@ EXAMPLE:  example vfiltration; shows examples
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute C");
-    C,w=gmsmat(w,k);
+    l=gmscoeffs(w,k);
+    C,w=l[1..2];
     A=A+C;
 
     H0=H;
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute dH");
-    dH=jet(module(A*dH+D^2*diff(matrix(dH),D)),k);
-    H=H*D+dH;
+    dH=jet(module(A*dH+s^2*diff(matrix(dH),s)),k);
+    H=H*s+dH;
 
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: test dH==0");
-    sdH=size(reduce(H,std(H0*D)));
+    sdH=size(reduce(H,std(H0*s)));
   }
 
-  A=A-D^k;
+  A=A-s^k;
 
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: compute basis of saturation");
   H=minbase(H0);
-  int modH=maxorddif(H)/deg(D);
-  C,w=gmsmat(w,N+modH,N+modH);
+  int modH=maxorddif(H)/deg(s);
+  l=gmscoeffs(w,N+modH,N+modH);
+  C,w=l[1..2];
   A=A+C;
 
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: transform H0 to saturation");
-  list l=division(H,freemodule(mu)*D^k);
+  l=division(H,freemodule(mu)*s^k);
   H0=jet(l[1],l[2],N-1);
 
   dbprint(printlevel-voice+2,
@@ -549,7 +650,7 @@ EXAMPLE:  example vfiltration; shows examples
 
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: compute A on saturation");
-  l=division(H*D,A*H+D^2*diff(matrix(H),D));
+  l=division(H*s,A*H+s^2*diff(matrix(H),s));
   A=jet(l[1],l[2],N-1);
 
   dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute matrix M of A");
@@ -618,7 +719,7 @@ EXAMPLE:  example vfiltration; shows examples
   k=0;
   list V;
   matrix Me;
-  V[ncols(eM)+1]=std(V1);
+  V[ncols(eM)+1]=interred(V1);
   intvec d;
   if(opt==0)
   {
@@ -633,7 +734,7 @@ EXAMPLE:  example vfiltration; shows examples
       dbprint(printlevel-voice+2,
         "//gaussman::vfiltration: compute V["+string(i)+"]");
       V1=module(V1)+syz(Me);
-      V[i]=std(intersect(V1,V0));
+      V[i]=interred(intersect(V1,V0));
 
       if(size(V[i])>size(V[i+1]))
       {
@@ -658,7 +759,7 @@ EXAMPLE:  example vfiltration; shows examples
       dbprint(printlevel-voice+2,
         "//gaussman::vfiltration: compute V["+string(i)+"]");
       V1=module(V1)+syz(Me);
-      V[i]=std(intersect(V1,V0));
+      V[i]=interred(intersect(V1,V0));
 
       if(size(V[i])>size(V[i+1]))
       {
@@ -697,7 +798,7 @@ EXAMPLE:  example vfiltration; shows examples
       dbprint(printlevel-voice+2,
         "//gaussman::vfiltration: compute V["+string(i)+"]");
       V1=module(V1)+syz(Me);
-      V[i]=std(intersect(V1,V0));
+      V[i]=interred(intersect(V1,V0));
 
       if(size(V[i])>size(V[i+1]))
       {
@@ -736,13 +837,12 @@ EXAMPLE:  example vfiltration; shows examples
 
     dbprint(printlevel-voice+2,
       "//gaussman::vfiltration: compute graded parts");
-    option(redSB);
     for(k=1;k<size(v);k++)
     {
-      v[k]=std(reduce(v[k],std(v[k+1])));
+      v[k]=interred(reduce(v[k],std(v[k+1])));
       d[k]=size(v[k]);
     }
-    v[k]=std(v[k]);
+    v[k]=interred(v[k]);
     d[k]=size(v[k]);
 
     setring(R);
@@ -762,7 +862,7 @@ example
 
 proc spectrum(poly f)
 "USAGE:    spectrum(f); poly f
-ASSUME:   basering has characteristic 0 and local ordering,
+ASSUME:   basering has characteristic 0 and local degree ordering,
           f has isolated singularity at 0
 RETURN:
 @format
@@ -788,7 +888,7 @@ example
 
 proc endfilt(poly f,list V)
 "USAGE:   endfilt(f,V); poly f, list V
-ASSUME:  basering has characteristic 0 and local ordering,
+ASSUME:  basering has characteristic 0 and local degree ordering,
          f has isolated singularity at 0
 RETURN:
 @format
