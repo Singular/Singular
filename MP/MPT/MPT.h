@@ -118,6 +118,7 @@ struct MPT_Annot_t
 #define MP_APINT_T(arg)        ((MP_ApInt_t) (arg))
 #define MP_APREAL_T(arg)       ((MP_ApReal_t) (arg))
 #define MP_STRING_T(arg)       ((char *)   (arg))
+#define MPT_ARG_T(arg)         ((MPT_Arg_t) (arg))
 
 /* Now we come to "structured" or composite types */
 /* For ProtoD:Union */
@@ -282,12 +283,44 @@ extern MPT_Status_t MPT_PutApReal(MP_Link_pt link, MPT_Arg_t arg);
 extern MPT_Annot_pt MPT_FindAnnot(MPT_Node_pt node, MP_DictTag_t dict,
                                   MP_AnnotType_t atype);
 extern MPT_Tree_pt MPT_GetProtoTypespec(MPT_Node_pt node);
+
+extern void MPT_MoveAnnots(MPT_Node_pt from, MPT_Node_pt to);
+extern MP_Boolean_t MPT_IsTrueProtoTypeSpec(MPT_Tree_pt typespec);
+
+extern void*       IMP_MemAlloc0Fnc(size_t size);
+extern MPT_Tree_pt MPT_InitTree(MP_Common_t type,
+                                MP_DictTag_t dict,
+                                MPT_Arg_t nvalue,
+                                MP_NumAnnot_t num_annot,
+                                MP_NumChild_t num_child);
+#define MPT_InitBasicTree(type, arg) MPT_InitTree(type, 0, arg, 0, 0)
+
 extern void MPT_PushRecStruct(MPT_Tree_pt tree);
 extern void MPT_PopRecStruct();
 extern void MPT_PushRecUnion(MPT_Tree_pt tree);
 extern void MPT_PopRecUnion();
 extern MPT_Tree_pt MPT_RecStructTree;
 extern MPT_Tree_pt MPT_RecUnionTree;
+
+/*************************************************************** 
+ * 
+ * From MPT_TreeManips.c
+ * 
+ ***************************************************************/
+extern MPT_Tree_pt MPT_UntypespecTree(MPT_Tree_pt tree);
+extern MPT_Arg_pt MPT_UntypespecArgs(MPT_Arg_pt args,
+                                     MP_NumChild_t nc,
+                                     MPT_Tree_pt typespec);
+extern MPT_Tree_pt MPT_UntypespecArg(MPT_Arg_t arg, MPT_Tree_pt typespec);
+
+/*************************************************************** 
+ * 
+ * From MPT_PolyManips.c
+ * 
+ ***************************************************************/
+extern MPT_Tree_pt MPT_DDP_2_ExpTree(MPT_Tree_pt tree);
+extern MP_Boolean_t MPT_IsExpVectorTypespec(MPT_Tree_pt typespec,
+                                            MP_NumChild_t *num_vars);
 
 /*************************************************************** 
  * 
@@ -303,9 +336,115 @@ extern MPT_Status_t (*MPT_GetExternalData)(MP_Link_pt link,
                                            MPT_Node_pt node);
 extern MPT_Status_t (*MPT_PutExternalData)(MP_Link_pt link,
                                            MPT_Arg_t data);
+extern void MPT_DefaultDeleteExternalData(MPT_Arg_t edata);
+extern void MPT_DefaultCpyExternalData(MPT_Arg_t *src,
+                                       MPT_Arg_t dest);
+extern MPT_Status_t MPT_DefaultGetExternalData(MP_Link_pt link,
+                                               MPT_Arg_t *data,
+                                               MPT_Node_pt node);
+extern MPT_Status_t MPT_DefaultPutExternalData(MP_Link_pt link,
+                                               MPT_Arg_t data);
+
+/*************************************************************** 
+ * 
+ * from MPT_PutPoly.c
+ * 
+ ***************************************************************/
+typedef void* MPT_ExternalPoly_t;
+typedef void* MPT_ExternalMonomial_t;
+typedef void* MPT_ExternalCoeff_t;
+typedef void* MPT_ExternalIdeal_t;
+typedef void* MPT_External2DMatrix_t;
+typedef void* MPT_External2DPolyMatrix_t;
+
+
+typedef struct MPT_PutPolyFncs_t
+{
+  MP_Sint32_t (*GetCharacteristic) (MPT_ExternalPoly_t poly);
+  MP_Uint32_t (*GetNumberOfVariables) (MPT_ExternalPoly_t poly);
+  char *      (*GetVarName) (MPT_ExternalPoly_t poly, MP_Uint32_t varnumber);
+  MP_Common_t (*GetMonomialOrdering) (MPT_ExternalPoly_t poly);
+  MP_Uint32_t (*GetNumberOfMonomials) (MPT_ExternalPoly_t poly);
+  MP_Status_t (*PutCoeffFillExpVector) (MP_Link_pt link,
+                                        MPT_ExternalPoly_t poly,
+                                        MP_Uint32_t monomial,
+                                        MP_Uint32_t varnumber,
+                                        MP_Sint32_t *ex_pvector);
+} MPT_PutPolyFncs_t;
+typedef MPT_PutPolyFncs_t* MPT_PutPolyFncs_pt;
+
+typedef struct MPT_PutIdealFncs_t
+{
+  MP_Uint32_t (*GetNumberOfPolys) (MPT_ExternalIdeal_t ideal);
+  MPT_ExternalPoly_t (*GetPoly) (MPT_ExternalIdeal_t ideal,
+                                 MP_Uint32_t polynumber);
+  MPT_PutPolyFncs_pt polyfncs;
+} MPT_PutIdealFncs_t;
+typedef MPT_PutIdealFncs_t * MPT_PutIdealFncs_pt;
+
+typedef struct MPT_Put2DMatrixFncs_t
+{
+  void (*GetDimension) (MPT_External2DMatrix_t matrix,
+                        MP_Uint32_t *m,
+                        MP_Uint32_t *n);
+  MP_Status_t   (*PutElType) (MP_Link_pt link, MPT_External2DMatrix_t matrix);
+  MP_Status_t (*PutEl) (MP_Link_pt link,
+                        MPT_External2DMatrix_t matrix,
+                        MP_Uint32_t m,
+                        MP_Uint32_t n);
+} MPT_Put2DMatrixFncs_t;
+typedef MPT_Put2DMatrixFncs_t*  MPT_Put2DMatrixFncs_pt;
+
+typedef struct MPT_Put2DPolyMatrixFncs_t
+{
+  void (*GetDimension) (MPT_External2DPolyMatrix_t matrix,
+                        MP_Uint32_t *m,
+                        MP_Uint32_t *n);
+  MPT_ExternalPoly_t (*GetPoly)   (MPT_External2DPolyMatrix_t matrix,
+                                   MP_Uint32_t m,
+                                   MP_Uint32_t n);
+  MPT_PutPolyFncs_pt polyfncs;
+} MPT_Put2DPolyMatrixFncs_t;
+typedef MPT_Put2DPolyMatrixFncs_t*  MPT_Put2DPolyMatrixFncs_pt;
 
 
 
+extern MP_Status_t MPT_PutDDPoly(MP_Link_pt link,
+                                 MPT_ExternalPoly_t poly,
+                                 MPT_PutPolyFncs_pt polyfncs);
+extern MP_Status_t MPT_PutPolyAnnots(MP_Link_pt link,
+                                     MPT_ExternalPoly_t poly,
+                                     MPT_PutPolyFncs_pt polyfncs);
+extern MP_Status_t MPT_PutPolyData(MP_Link_pt link,
+                                   MPT_ExternalPoly_t poly,
+                                   MP_Uint32_t nummonimials,
+                                   MPT_PutPolyFncs_pt polyfncs);
+extern MP_Status_t MPT_PutDDPIdeal(MP_Link_pt link,
+                                   MPT_ExternalIdeal_t ideal,
+                                   MPT_PutIdealFncs_pt polyfncs);
+extern MP_Status_t MPT_PutDense2DMatrix(MP_Link_pt link,
+                                        MPT_External2DMatrix_t matrix,
+                                        MPT_Put2DMatrixFncs_pt matrixfncs);
+extern MP_Status_t MPT_Put2DPolyMatrix(MP_Link_pt link,
+                                       MPT_External2DPolyMatrix_t matrix,
+                                       MPT_Put2DPolyMatrixFncs_pt mfncts);
+
+/*************************************************************** 
+ * 
+ * from MPT_GetPoly.c
+ * 
+ ***************************************************************/
+extern MP_Boolean_t MPT_IsDDPTree(MPT_Tree_pt tree,
+                                  MP_Sint32_t *characteristic,
+                                  MPT_Tree_pt *var_tree,
+                                  MP_Common_t *ordering);
+extern MPT_Tree_pt MPT_GetVarNamesTree(MPT_Node_pt node,
+                                       MP_NumChild_t num_vars);
+extern MP_Boolean_t MPT_IsIdealTree(MPT_Tree_pt tree,
+                                    MP_Sint32_t *characteristic,
+                                    MPT_Tree_pt *var_tree,
+                                    MP_Common_t *ordering);
+  
 /*************************************************************** 
  * 
  * Useful Macros
@@ -331,6 +470,21 @@ do                                                                  \
   else return MPT_Success;                                          \
 }                                                                   \
 while (0)
+
+#define failr(cond)                                              \
+do                                                                  \
+{                                                                   \
+  if ((cond) != MP_Success) return MP_Failure;                    \
+} while (0)
+
+/******************************************************************
+ *
+ * some handy defines
+ *
+ ******************************************************************/
+#define MP_AnnotReqValTree  (MP_AnnotRequired | MP_AnnotValuated | MP_AnnotTreeScope)
+
+#define MP_AnnotReqValNode  (MP_AnnotRequired | MP_AnnotValuated)
 
 #endif /* _MPT_H_ */
 

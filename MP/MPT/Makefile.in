@@ -46,9 +46,11 @@ DEFS		= @DEFS@
 ##
 
 SRCS = MPT_Tree.c MPT_Error.c MPT_ExternalData.c MPT_Misc.c \
-       MPT_ApNumber.c MPT_Get.c MPT_Put.c
+       MPT_ApNumber.c MPT_Get.c MPT_Put.c MPT_TreeManips.c \
+       MPT_PolyManips.c MPT_PutPoly.c MPT_GetPoly.c
 OBJS = MPT_Tree.o MPT_Error.o MPT_ExternalData.o MPT_Misc.o \
-       MPT_ApNumber.o MPT_Get.o MPT_Put.o
+       MPT_ApNumber.o MPT_Get.o MPT_Put.o MPT_TreeManips.o \
+       MPT_PolyManips.o MPT_PutPoly.o MPT_GetPoly.o 
 
 DISTFILES = ${SRCS} MPT.h Makefile.in
 
@@ -65,6 +67,8 @@ libMPT.a:  $(OBJS) ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h MPT.h Makefile
 	$(RANLIB) $@
 
 install: libMPT.a 
+	$(MKINSTALLDIRS) $(libdir)
+	$(MKINSTALLDIRS) $(includedir)
 	$(INSTALL_DATA) libMPT.a $(libdir)
 	$(RANLIB) $(libdir)/libMPT.a
 	$(INSTALL_DATA) MPT.h $(includedir)
@@ -103,3 +107,6 @@ dist:
 
 depend:	
 	$(CC) -MM $(CPPFLAGS) $(DEFS) $(SRCS) >> Makefile
+
+test: test.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) test.c -o test -L$(libdir) -lMPT -lMP -lgmp

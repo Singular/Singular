@@ -1,3 +1,12 @@
+Sat Jun 28 15:27:59 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Many Changes to MPT lib while working with Andi
+
+Tue Jun 24 12:17:39 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MPT_Tree.c (MPT_DeleteTypespecedArg): changed un names to mun to
+	  avoid conflicts with pari
+
 Tue May 20 18:57:50 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* MPT_ApNumber.c: Move MPT_DeleteApReal to the proper place
