@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmtables.c,v 1.3 1999-10-14 14:27:21 obachman Exp $ */
+/* $Id: mmtables.c,v 1.4 1999-10-18 11:19:30 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -22,18 +22,34 @@
 
 #define MAX_INDEX ((MAX_BLOCK_SIZE - 1) >> 2)
 #define HALF_MAX_BLOCK_SIZE (((MAX_BLOCK_SIZE) / 8)*4)
+#define QUARTER_MAX_BLOCK_SIZE (((MAX_BLOCK_SIZE) / 16)*4)
+#define EIGHTS_MAX_BLOCK_SIZE (((MAX_BLOCK_SIZE) / 32)*4)
 
-const size_t mm_mcbSizesAlign8 [] = {   8,  16,  24,  32,
-                                       40,  48,  56,  64,
-                                       80,  96, 112, 128,
-                                      160, 192, 224, 256,
-                                      HALF_MAX_BLOCK_SIZE, MAX_BLOCK_SIZE};
-const size_t mm_mcbSizesAlign4 [] = {   8,  12,  16,  20,
-                                       24,  28,  32,
-                                       40,  48,  56,  64,
-                                       80,  96, 112, 128,
-                                      160, 192, 224, 256,
-                                      HALF_MAX_BLOCK_SIZE, MAX_BLOCK_SIZE};
+const size_t mm_mcbSizesAlign8 [] = 
+{   8,  16,  24,  32,
+    40,  48,  56,  64,
+    80,  96, 112, 128,
+    160, 192, 224, 
+    QUARTER_MAX_BLOCK_SIZE,
+    QUARTER_MAX_BLOCK_SIZE + EIGHTS_MAX_BLOCK_SIZE,
+    HALF_MAX_BLOCK_SIZE, 
+    HALF_MAX_BLOCK_SIZE + EIGHTS_MAX_BLOCK_SIZE,
+    HALF_MAX_BLOCK_SIZE + QUARTER_MAX_BLOCK_SIZE,
+    HALF_MAX_BLOCK_SIZE + QUARTER_MAX_BLOCK_SIZE + EIGHTS_MAX_BLOCK_SIZE,
+    MAX_BLOCK_SIZE};
+const size_t mm_mcbSizesAlign4 [] = 
+{   8,  12,  16,  20,
+    24,  28,  32,
+    40,  48,  56,  64,
+    80,  96, 112, 128,
+    160, 192, 224, 
+    QUARTER_MAX_BLOCK_SIZE,
+    QUARTER_MAX_BLOCK_SIZE + EIGHTS_MAX_BLOCK_SIZE,
+    HALF_MAX_BLOCK_SIZE, 
+    HALF_MAX_BLOCK_SIZE + EIGHTS_MAX_BLOCK_SIZE,
+    HALF_MAX_BLOCK_SIZE + QUARTER_MAX_BLOCK_SIZE,
+    HALF_MAX_BLOCK_SIZE + QUARTER_MAX_BLOCK_SIZE + EIGHTS_MAX_BLOCK_SIZE,
+    MAX_BLOCK_SIZE};
 
 char mm_IndiciesAlign8[MAX_INDEX + 1];
 char mm_IndiciesAlign4[MAX_INDEX + 1];
@@ -316,10 +332,17 @@ void OutputSizeTable( const size_t *mm_mcbSizes)
   
 int main()
 {
+#if 0
   mmInitIndexTable(mm_IndiciesAlign8, mm_mcbSizesAlign8,
                    mmGetBinaryIndexAlign8);
   mmInitIndexTable(mm_IndiciesAlign4, mm_mcbSizesAlign4,
                    mmGetBinaryIndex);
+#else
+  mmInitIndexTable(mm_IndiciesAlign8, mm_mcbSizesAlign8,
+                   NULL);
+  mmInitIndexTable(mm_IndiciesAlign4, mm_mcbSizesAlign4,
+                   NULL);
+#endif
 
   printf("#ifndef MM_TABLES_INC\n#define MM_TABLES_INC\n");
   printf("

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.24 1999-10-14 14:27:19 obachman Exp $ */
+/* $Id: mmemory.h,v 1.25 1999-10-18 11:19:29 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -200,18 +200,19 @@ void mmTestList (int all);
  *
  **********************************/
 /* creates and initializes a temporary heap */
-extern memHeap mmCreateTempHeap(size_t size);
+extern memHeap mmGetTempHeap(size_t size);
 #ifndef HEAP_DEBUG
-/* UNCONDITIONALLY clears and destoys temporary heap */
-extern void mmDestroyTempHeap(memHeap *heap_p);
+/* UNCONDITIONALLY clears and destroys temporary heap */
+extern void mmUnGetTempHeap(memHeap *heap_p);
 #else
-#define mmDestroyTempHeap(h) mmDebugDestroyTempHeap(h)
-extern void mmDebugDestroyTempHeap(memHeap *heap);
+#define mmUnGetTempHeap(h) mmDebugDestroyTempHeap(h)
+extern void mmUnGetTempHeap(memHeap *heap);
 #endif /* HEAP_DEBUG */
 
 /* removes chunks in freelist which fill one page */
 /* if strict & 1, does it even if free ptr  has not changed w.r.t. last gc */
 /* if strict & 2, also releases free pages */
+/* if strict & 4, gc also of temp heaps */
 extern void mmGarbageCollectHeaps(int strict);
 extern void mmGarbageCollectHeap(memHeap heap, int strict);
 

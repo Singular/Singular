@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.35 1999-10-15 16:07:06 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.36 1999-10-18 11:19:27 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -46,7 +46,7 @@ static poly kFromInput(poly p,kStrategy strat)
 *  assumes homogeneous case and degree-ordering
 */
 #if 0
-static void redSyz (LObject* h,kStrategy strat)
+static int redSyz (LObject* h,kStrategy strat)
 {
   int j = 0,i=0,pos;
   BOOLEAN exchanged=pDivisibleBy((*h).p2,(*h).p1);
@@ -195,7 +195,7 @@ static void redSyz (LObject* h,kStrategy strat)
 
 #else
 
-static void redSyz (LObject* h,kStrategy strat)
+static int redSyz (LObject* h,kStrategy strat)
 {
   int j = 0,i=0,pos;
   BOOLEAN exchanged=pDivisibleBy((*h).p2,(*h).p1);
@@ -279,7 +279,7 @@ static void redSyz (LObject* h,kStrategy strat)
 #ifdef KDEBUG
         (*h).lcm=NULL;
 #endif
-        return;
+        return 0;
       }
 /*- try to reduce the s-polynomial -*/
       j = 0;
@@ -295,7 +295,7 @@ static void redSyz (LObject* h,kStrategy strat)
           if (pGetComp((*h).p) > strat->syzComp)
           {
             pDelete(&((*h).p));
-            return;
+            return 0;
           }
           else
           {
@@ -319,7 +319,7 @@ static void redSyz (LObject* h,kStrategy strat)
           (*h).p = redtailSyz((*h).p,pos-1,strat);
         }
         enterTBba((*h),strat->tl+1,strat);
-        return;
+        return 1;
       }
       j++;
     }
@@ -332,14 +332,9 @@ static void redSyz (LObject* h,kStrategy strat)
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
 */
-static void redHomog (LObject* h,kStrategy strat)
+static int redHomog (LObject* h,kStrategy strat)
 {
-  if (strat->tl<0)
-  {
-    if (TEST_OPT_INTSTRATEGY) pCleardenom(h->p);
-    enterTBba((*h),0,strat);
-    return;
-  }
+  if (strat->tl<0) return 1;
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -362,17 +357,7 @@ static void redHomog (LObject* h,kStrategy strat)
       j++;
     }
 
-    if (j > strat->tl)
-    {
-      if (TEST_OPT_INTSTRATEGY)
-      {
-        pCleardenom(h->p);
-        enterTBba((*h), strat->posInT(strat->T,strat->tl,(*h)), strat);
-      }
-      else
-        enterTBba((*h),strat->tl+1,strat);
-      return;
-    }
+    if (j > strat->tl) return 1;
 
     // now we found one which is divisible
     ksReducePoly(h, &(strat->T[j]), strat->kNoether);
@@ -390,7 +375,7 @@ static void redHomog (LObject* h,kStrategy strat)
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
-      return;
+      return 0;
     }
   }
 }
@@ -400,14 +385,9 @@ static void redHomog (LObject* h,kStrategy strat)
 *  reduction procedure for the inhomogeneous case
 *  and not a degree-ordering
 */
-static void redLazy (LObject* h,kStrategy strat)
+static int redLazy (LObject* h,kStrategy strat)
 {
-  if (strat->tl<0)
-  {
-    enterTBba((*h),0,strat);
-    return;
-  }
-
+  if (strat->tl<0) return 1;
   int at,d,i;
   int j = 0;
   int pass = 0;
@@ -427,15 +407,7 @@ static void redLazy (LObject* h,kStrategy strat)
       j++;
     }
 
-    if (j>strat->tl)
-    {
-      if (TEST_OPT_INTSTRATEGY)
-      {
-        pCleardenom(h->p);// also does a pContent
-      }
-      enterTBba((*h),strat->tl+1,strat);
-      return;
-    }
+    if (j>strat->tl) return 1;
 
     if (TEST_OPT_DEBUG)
     {
@@ -444,20 +416,23 @@ static void redLazy (LObject* h,kStrategy strat)
       PrintS(" with ");
       wrp(strat->T[j].p);
     }
+
     ksReducePoly(h, &(strat->T[j]), strat->kNoether);
+
     if (TEST_OPT_DEBUG)
     {
       PrintS("\nto ");
       wrp(h->p);
       PrintLn();
     }
+
     if ((*h).p == NULL)
     {
       if (h->lcm!=NULL) pFree1((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
-      return;
+      return 0;
     }
     h->sev = pGetShortExpVector(h->p);
     not_sev = ~ h->sev;
@@ -473,18 +448,14 @@ static void redLazy (LObject* h,kStrategy strat)
         do
         {
           i--;
-          if (i<0)
-          {
-            enterTBba((*h),strat->tl+1,strat);
-            return;
-          }
+          if (i<0) return 1;
         }
         while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
                                   h->p, not_sev));
         if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
         (*h).p = NULL;
-        return;
+        return -1;
       }
     }
     else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d != reddeg))
@@ -500,13 +471,9 @@ static void redLazy (LObject* h,kStrategy strat)
 * reduces h with elements from T choosing first possible
 * element in T with respect to the given ecart
 */
-static void redHoney (LObject*  h,kStrategy strat)
+static int redHoney (LObject*  h,kStrategy strat)
 {
-  if (strat->tl<0)
-  {
-    enterTBba((*h),0,strat);
-    return;
-  }
+  if (strat->tl<0) return 1;
 
   poly pi;
   int i,j,at,reddeg,d,pass,ei, ii;
@@ -529,13 +496,7 @@ static void redHoney (LObject*  h,kStrategy strat)
     if (j > strat->tl)
     {
       h->sev = ~ not_sev;
-      if (TEST_OPT_INTSTRATEGY)
-      {
-        pCleardenom(h->p);// also does a pContent
-      }
-      at=strat->posInT(strat->T,strat->tl,(*h));
-      enterTBba((*h),at,strat);
-      return;
+      return 1;
     }
 
     pi = strat->T[j].p;
@@ -586,7 +547,7 @@ static void redHoney (LObject*  h,kStrategy strat)
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" ecart too big: -> L%d\n",at);
           (*h).p = NULL;
-          return;
+          return -1;
         }
       }
       if (TEST_OPT_MOREPAIRS)
@@ -622,7 +583,7 @@ static void redHoney (LObject*  h,kStrategy strat)
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
-      return;
+      return 0;
     }
     h->sev = pGetShortExpVector(h->p);
     not_sev = ~ h->sev;
@@ -649,19 +610,14 @@ static void redHoney (LObject*  h,kStrategy strat)
         do
         {
           i--;
-          if (i<0)
-          {
-            at=strat->posInT(strat->T,strat->tl,(*h));
-            enterTBba((*h),at,strat);
-            return;
-          }
+          if (i<0) return 1;
         } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
                                     h->p, not_sev));
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
         if (TEST_OPT_DEBUG)
           Print(" degree jumped: -> L%d\n",at);
         (*h).p = NULL;
-        return;
+        return -1;
       }
     }
     else if (TEST_OPT_PROT && (strat->Ll < 0) && (d > reddeg))
@@ -676,14 +632,9 @@ static void redHoney (LObject*  h,kStrategy strat)
 *  reduction procedure for tests only
 *  reduces with elements from T and chooses the best possible
 */
-static void redBest (LObject*  h,kStrategy strat)
+static int redBest (LObject*  h,kStrategy strat)
 {
-  if (strat->tl<0)
-  {
-    enterTBba((*h),0,strat);
-    return;
-  }
-
+  if (strat->tl<0) return 1;
   int j,jbest,at,reddeg,d,pass;
   poly     p,ph;
   pass = j = 0;
@@ -723,7 +674,7 @@ static void redBest (LObject*  h,kStrategy strat)
 #ifdef KDEBUG
                 (*h).lcm=NULL;
 #endif
-                return;
+                return 0;
               }
               else if (pComp0(ph,p) == -1)
               {
@@ -748,7 +699,7 @@ static void redBest (LObject*  h,kStrategy strat)
         (*h).lcm=NULL;
 #endif
         (*h).p = NULL;
-        return;
+        return 0;
       }
       if (strat->honey && pLexOrder)
         strat->initEcart(h);
@@ -765,7 +716,7 @@ static void redBest (LObject*  h,kStrategy strat)
           {
             enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
             (*h).p = NULL;
-            return;
+            return -1;
           }
         }
         else if (TEST_OPT_PROT && (strat->Ll < 0) && (d != reddeg))
@@ -779,16 +730,7 @@ static void redBest (LObject*  h,kStrategy strat)
     }
     else
     {
-      if (j >= strat->tl)
-      {
-        if (TEST_OPT_INTSTRATEGY)
-        {
-          pCleardenom(h->p);// also does a pContent
-        }
-        at=strat->posInT(strat->T,strat->tl,(*h));
-        enterTBba((*h),at,strat);
-        return;
-      }
+      if (j >= strat->tl) return 1;
       j++;
     }
   }
@@ -863,7 +805,10 @@ void initBba(ideal F,kStrategy strat)
   else
     strat->red = redHomog;
   if (TEST_OPT_MINRES && strat->homog && (strat->syzComp >0))
+  {
     strat->red = redSyz;
+    strat->posInT = posInT0;
+  }
 
   if (pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
@@ -902,10 +847,21 @@ void initBba(ideal F,kStrategy strat)
   }
 }
 
+void kinitBbaHeaps(kStrategy heap)
+{
+#if 0
+  // use extra heap for monoms of T, if not syzcomp
+  if (!strat->red == redSyz)
+  {
+    strat->THeap = mmCreateTempHeap();
+  }
+#endif
+}
+
 
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
-  int   srmax,lrmax;
+  int   srmax,lrmax, red_result;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
 
@@ -915,10 +871,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   initBuchMoraPos(strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
-  if (strat->minim>0)
-  {
-    strat->M=idInit(IDELEMS(F),F->rank);
-  }
+  if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
+  kinitBbaHeaps(strat);
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
   /* compute------------------------------------------------------- */
@@ -926,7 +880,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     if (TEST_OPT_DEBUG) messageSets(strat);
-    //test_int_std(strat->kIdeal);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
         && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
@@ -943,7 +896,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
-    kTest_TS(strat);
+
     if (pNext(strat->P.p) == strat->tail)
     {
       /* deletes the short spoly and computes */
@@ -952,68 +905,64 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       ksCreateSpoly(&(strat->P),
                     strat->kNoether);
     }
-    if((strat->P.p1==NULL) && (strat->minim>0))
-      strat->P.p2=pCopy(strat->P.p);
-    if (strat->honey)
-    {
-      if (TEST_OPT_PROT) message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
-    }
-    else
-    {
-      if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
-    }
+    if((strat->P.p1==NULL) && (strat->minim>0)) strat->P.p2=pCopy(strat->P.p);
+
+    if (TEST_OPT_PROT)
+      message((strat->honey ? strat->P.ecart : 0) + pFDeg(strat->P.p),
+              &olddeg,&reduc,strat);
+
     /* reduction of the element choosen from L */
-    strat->red(&strat->P,strat);
-    if (strat->P.p != NULL)
+    red_result = strat->red(&strat->P,strat);
+
+    // reduktion to non-zero new poly
+    if (red_result == 1)
     {
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
       /* enter P.p into s and L */
       {
         int pos=posInS(strat->S,strat->sl,strat->P.p);
+        if (TEST_OPT_INTSTRATEGY)
         {
-          if (TEST_OPT_INTSTRATEGY)
+          pCleardenom(strat->P.p);
+          if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
           {
-            if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
-            {
-              strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-              // if (strat->redTailChange)
-              pCleardenom(strat->P.p);
-            }
+            strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+            pCleardenom(strat->P.p);
+          }
+        }
+        else
+        {
+          pNorm(strat->P.p);
+          if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
+          {
+            strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+          }
+        }
+
+        if (TEST_OPT_DEBUG){PrintS("new s:");wrp(strat->P.p);PrintLn();}
+
+        if ((strat->P.p1==NULL) && (strat->minim>0))
+        {
+          if (strat->minim==1)
+          {
+            strat->M->m[minimcnt]=pCopy(strat->P.p);
+            pDelete(&strat->P.p2);
           }
           else
           {
-            pNorm(strat->P.p);
-            if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
-            {
-              strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-            }
+            strat->M->m[minimcnt]=strat->P.p2;
+            strat->P.p2=NULL;
           }
-          if (TEST_OPT_DEBUG)
-          {
-            PrintS("new s:");
-            wrp(strat->P.p);
-            PrintLn();
-          }
-          if((strat->P.p1==NULL) && (strat->minim>0))
-          {
-            if (strat->minim==1)
-            {
-              strat->M->m[minimcnt]=pCopy(strat->P.p);
-              pDelete(&strat->P.p2);
-            }
-            else
-            {
-              strat->M->m[minimcnt]=strat->P.p2;
-              strat->P.p2=NULL;
-            }
-            minimcnt++;
-          }
-          enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
-          if (strat->sl==-1) pos=0;
-          else pos=posInS(strat->S,strat->sl,strat->P.p);
-          strat->enterS(strat->P,pos,strat);
+          minimcnt++;
         }
+
+        // put stuff into T-Set
+        enterTBba(strat->P, strat->posInT(strat->T,strat->tl,strat->P), 
+                  strat);
+        enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
+        // do we really need to recompute posInS
+        strat->enterS(strat->P,posInS(strat->S,strat->sl,strat->P.p), strat);
         if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }
       if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
@@ -1221,7 +1170,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
     pFDeg = pOldFDeg;
   }
   pLexOrder = b;
-  FreeSizeOf((ADDRESS)strat,skStrategy);
+  kFreeStrat(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   idSkipZeroes(r);
   return r;

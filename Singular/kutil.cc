@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.40 1999-10-15 16:07:07 obachman Exp $ */
+/* $Id: kutil.cc,v 1.41 1999-10-18 11:19:28 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3587,6 +3587,16 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
   }
   pFree1(newNoether);
   return FALSE;
+}
+
+void kFreeStrat(kStrategy strat)
+{
+  if (strat->THeap != NULL)
+  {
+    mmMergeHeap(mm_specHeap, strat->THeap);
+    mmUnGetTempHeap(&(strat->THeap));
+  }
+  FreeSizeOf(strat, skStrategy);
 }
 
 rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp)

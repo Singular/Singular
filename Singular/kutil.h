@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.18 1999-10-14 14:27:14 obachman Exp $ */
+/* $Id: kutil.h,v 1.19 1999-10-18 11:19:28 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -27,7 +27,7 @@ public:
   int ecart,length, pLength;
   memHeap heap;
   unsigned long sev;
-  sTObject() { memset((void*) this, 0, sizeof(sTObject));}
+  sTObject() { memset((void*) this, 0, sizeof(sTObject)); heap = mm_specHeap;}
   inline poly SetP(poly p_new);
 };
 
@@ -54,61 +54,63 @@ class skStrategy;
 typedef skStrategy * kStrategy;
 class skStrategy
 {
-  public:
-    kStrategy next;
-    void (*red)(LObject * L,kStrategy strat);
-    void (*initEcart)(LObject * L);
-    int (*posInT)(const TSet T,const int tl,const LObject &h);
-    int (*posInL)(const LSet set, const int length,
-                  const LObject &L,const kStrategy strat);
-    void (*enterS)(LObject h, int pos,kStrategy strat);
-    void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
-    int (*posInLOld)(const LSet Ls,const int Ll,
-                     const LObject &Lo,const kStrategy strat);
-    pFDegProc pOldFDeg;
-    ideal Shdl;
-    ideal D; /*V(S) is in D(D)*/
-    ideal M; /*set of minimal generators*/
-    polyset S;
-    intset ecartS;
-    intset fromQ;
-    unsigned long* sevS;
-    TSet T;
-    LSet L;
-    LSet    B;
-    poly    kHEdge;
-    poly    kNoether;
-    BOOLEAN * NotUsedAxis;
-    LObject P;
-    poly tail;
-    leftv kIdeal;
-    intvec * kModW;
-    intvec * kHomW;
-    BOOLEAN *pairtest;/*used for enterOnePair*/
-    int cp,c3;
-    int sl,mu;
-    int tl,tmax;
-    int Ll,Lmax;
-    int Bl,Bmax;
-    int ak,LazyDegree,LazyPass;
-    int syzComp;
-    int HCord;
-    int lastAxis;
-    int newIdeal;
-    int minim;
-    BOOLEAN interpt;
-    BOOLEAN homog;
-    BOOLEAN kHEdgeFound;
-    BOOLEAN honey,sugarCrit;
-    BOOLEAN Gebauer,noTailReduction;
-    BOOLEAN fromT;
-    BOOLEAN noetherSet;
-    BOOLEAN update;
-    BOOLEAN posInLOldFlag;
-           /*FALSE, if posInL == posInL10*/
-    char    redTailChange;
-    char    news;
-    char    newt;/*used for messageSets*/
+public:
+  kStrategy next;
+  int (*red)(LObject * L,kStrategy strat);
+  void (*initEcart)(LObject * L);
+  int (*posInT)(const TSet T,const int tl,const LObject &h);
+  int (*posInL)(const LSet set, const int length,
+                const LObject &L,const kStrategy strat);
+  void (*enterS)(LObject h, int pos,kStrategy strat);
+  void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
+  int (*posInLOld)(const LSet Ls,const int Ll,
+                   const LObject &Lo,const kStrategy strat);
+  pFDegProc pOldFDeg;
+  ideal Shdl;
+  ideal D; /*V(S) is in D(D)*/
+  ideal M; /*set of minimal generators*/
+  polyset S;
+  intset ecartS;
+  intset fromQ;
+  unsigned long* sevS;
+  TSet T;
+  LSet L;
+  LSet    B;
+  poly    kHEdge;
+  poly    kNoether;
+  BOOLEAN * NotUsedAxis;
+  LObject P;
+  poly tail;
+  leftv kIdeal;
+  intvec * kModW;
+  intvec * kHomW;
+  memHeap THeap;       // if != NULL, heap for monoms of T
+  BOOLEAN use_redheap; // if TRUE, use extra heap for reductions
+  BOOLEAN *pairtest;/*used for enterOnePair*/
+  int cp,c3;
+  int sl,mu;
+  int tl,tmax;
+  int Ll,Lmax;
+  int Bl,Bmax;
+  int ak,LazyDegree,LazyPass;
+  int syzComp;
+  int HCord;
+  int lastAxis;
+  int newIdeal;
+  int minim;
+  BOOLEAN interpt;
+  BOOLEAN homog;
+  BOOLEAN kHEdgeFound;
+  BOOLEAN honey,sugarCrit;
+  BOOLEAN Gebauer,noTailReduction;
+  BOOLEAN fromT;
+  BOOLEAN noetherSet;
+  BOOLEAN update;
+  BOOLEAN posInLOldFlag;
+  /*FALSE, if posInL == posInL10*/
+  char    redTailChange;
+  char    news;
+  char    newt;/*used for messageSets*/
 };
 
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
@@ -167,6 +169,7 @@ void initBuchMora (ideal F, ideal Q,kStrategy strat);
 void exitBuchMora (kStrategy strat);
 void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat);
+void kFreeStrat(kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
 

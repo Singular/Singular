@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.c,v 1.11 1999-10-14 14:27:19 obachman Exp $ */
+/* $Id: mmheap.c,v 1.12 1999-10-18 11:19:30 obachman Exp $ */
 #include <stdio.h>
 #include "mod2.h"
 #include "structs.h"
@@ -228,8 +228,10 @@ void mmGarbageCollectHeap(memHeap heap, int strict)
     }
     heap->current = NULL;
     heap->last_gc = NULL;
+    return;
   }
-  else if (! strict && heap->current == heap->last_gc)
+
+  if (! strict && heap->current == heap->last_gc)
   {
     return;
   }

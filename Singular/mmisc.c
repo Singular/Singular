@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.15 1999-10-15 16:07:09 obachman Exp $ */
+/* $Id: mmisc.c,v 1.16 1999-10-18 11:19:30 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -165,12 +165,13 @@ void mmGarbageCollectHeaps(int strict)
     fflush(stdout);
     verbose &= ~Sy_bit(V_SHOW_MEM);
   }
+  
   while (s_heap != NULL)
   {
     mmGarbageCollectHeap(s_heap->heap, s_strict);
     s_heap = s_heap->next;
   }
-  if (strict)
+  if (strict & 4)
   {
     s_heap = mm_TempHeaps;
     while (s_heap != NULL)
@@ -257,6 +258,7 @@ void mmCheckPrint( void )
 {
   int mm_bytesAlloc = mm_bytesValloc + mm_bytesMalloc;
 
+#if 0
   if ( ABS(mm_bytesAlloc - mm_printMark)>(100*1024) )
   {
     int i=(mm_bytesAlloc+1023)/1024;
@@ -264,6 +266,13 @@ void mmCheckPrint( void )
     fflush( stdout );
     mm_printMark=mm_bytesAlloc;
   }
+#else
+  if ( ABS(mm_bytesAlloc - mm_printMark)>(1000*1024) )
+  {
+    mmPrintStat();
+    mm_printMark=mm_bytesAlloc;
+  }
+#endif
 }
 
 extern memHeap mm_specHeap;

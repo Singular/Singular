@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.16 1999-10-14 14:27:18 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.17 1999-10-18 11:19:29 obachman Exp $ */
 
 /*
 * ABSTRACT: implementation of alloc/free routines
@@ -582,7 +582,7 @@ void* mmMallocFromSystem(size_t size)
   ptr = malloc(size);
   if (ptr == NULL)
   {
-    mmGarbageCollectHeaps(3);
+    mmGarbageCollectHeaps(4);
     ptr = malloc(size);
     if (ptr == NULL)
     {
@@ -608,7 +608,7 @@ void* mmReallocFromSystem(void* addr, size_t newsize, size_t oldsize)
   res = realloc(addr, newsize);
   if (res == NULL)
   {
-    mmGarbageCollectHeaps(3);
+    mmGarbageCollectHeaps(4);
     /* Can do a realloc again: manpage reads:
        "If realloc() fails the original block is left untouched - 
        it is not freed or moved." */
@@ -641,7 +641,7 @@ void* mmAllocPageFromSystem()
   void* page = PALLOC(SIZE_OF_PAGE);
   if (page == NULL)
   {
-    mmGarbageCollectHeaps(3);
+    mmGarbageCollectHeaps(4);
     page = PALLOC(SIZE_OF_PAGE);
     if (page == NULL)
     {
