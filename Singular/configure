@@ -1826,7 +1826,7 @@ EOF
 
 fi
 
-for ac_hdr in limits.h unistd.h
+for ac_hdr in limits.h unistd.h math.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -1863,7 +1863,7 @@ EOF
  
 else
   echo "$ac_t""no" 1>&6
-{ echo "configure: error: Can not compile without limits.h unistd.h" 1>&2; exit 1; }
+{ echo "configure: error: Can not compile without limits.h unistd.h math.h" 1>&2; exit 1; }
 fi
 done
 
