@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.38 2000-03-22 17:07:25 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.39 2000-03-22 17:14:56 Singular Exp $ */
 
 /***************************************************************
  *
@@ -1003,7 +1003,8 @@ int rComp0(poly p1, poly p2)
   int n=rBlocks(currRing)-1;
   int i,j;
   // check fur syzcomp - special case, not visible in currRing->order
-  if ((currRing->typ[0].ord_typ==ro_syz)
+  if ((currRing->typ!=NULL)
+  && (currRing->typ[0].ord_typ==ro_syz)
   && (pGetComp(p1)!=pGetComp(p2)))
   {
     i=pGetComp(p1);
@@ -1086,7 +1087,7 @@ int rComp0(poly p1, poly p2)
       case ringorder_Dp:
         r=rComp_deg(p1,p2,i);
         if (r!=0) { assume(r==rr);return rr;}
-	r=rComp_lex(p1,p2,i);
+        r=rComp_lex(p1,p2,i);
         if (r!=0) { assume(r==rr);return rr;}
         break;
 
@@ -1100,7 +1101,7 @@ int rComp0(poly p1, poly p2)
       case ringorder_Ds:
         r= -rComp_deg(p1,p2,i);
         if (r!=0) { assume(r==rr);return rr;}
-	r=rComp_lex(p1,p2,i);
+        r=rComp_lex(p1,p2,i);
         if (r!=0) { assume(r==rr);return rr;}
         break;
 
@@ -1114,7 +1115,7 @@ int rComp0(poly p1, poly p2)
       case ringorder_Wp:
         r=rComp_a(p1,p2,i);
         if (r!=0) { assume(r==rr);return rr;}
-	r=rComp_lex(p1,p2,i);
+        r=rComp_lex(p1,p2,i);
         if (r!=0) { assume(r==rr);return rr;}
         break;
 
@@ -1128,7 +1129,7 @@ int rComp0(poly p1, poly p2)
       case ringorder_Ws:
         r= -rComp_a(p1,p2,i);
         if (r!=0) { assume(r==rr);return rr;}
-	r=rComp_lex(p1,p2,i);
+        r=rComp_lex(p1,p2,i);
         if (r!=0) { assume(r==rr);return rr;}
         break;
 
@@ -1138,15 +1139,15 @@ int rComp0(poly p1, poly p2)
 
       case ringorder_s:
         /*  ro_syz */
-	// shall not appear:
-	assume(0);
-	#if 0
-	if ((pGetComp(p1) > pDBsyzComp) && (pGetComp(p2) > pDBsyzComp)) break;
-	if ((pGetComp(p1) <= pDBsyzComp) && (pGetComp(p2) <= pDBsyzComp)) break;
-	if (pGetComp(p1) <= pDBsyzComp) { assume(rr==1); return rr;}
-	/* if (pGetComp(p2) <= pDBsyzComp) */ { assume (rr== -1); return rr; }
-	#endif
-	return rr;
+        // shall not appear:
+        assume(0);
+        #if 0
+        if ((pGetComp(p1) > pDBsyzComp) && (pGetComp(p2) > pDBsyzComp)) break;
+        if ((pGetComp(p1) <= pDBsyzComp) && (pGetComp(p2) <= pDBsyzComp)) break;
+        if (pGetComp(p1) <= pDBsyzComp) { assume(rr==1); return rr;}
+        /* if (pGetComp(p2) <= pDBsyzComp) */ { assume (rr== -1); return rr; }
+        #endif
+        return rr;
 
       case ringorder_unspec:
       case ringorder_no:
