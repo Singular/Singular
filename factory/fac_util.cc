@@ -1,8 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_util.cc,v 1.2 1996-07-08 08:22:02 stobbe Exp $
+// $Id: fac_util.cc,v 1.3 1996-07-16 12:26:05 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1996/07/08 08:22:02  stobbe
+"New organization of the factorization stuff. Some functions moved from
+fac_diophand.cc which no longer exists.
+"
+
 Revision 1.1  1996/06/27 11:34:24  stobbe
 "New function dviremainder.
 "
@@ -212,3 +217,52 @@ extgcd ( const CanonicalForm & a, const CanonicalForm & b, CanonicalForm & S, Ca
     S = s; T = t;
 }
 
+CanonicalForm
+sum ( const CFArray & a, int f, int l )
+{
+    if ( f < a.min() ) f = a.min();
+    if ( l > a.max() ) l = a.max();
+    CanonicalForm s = 0;
+    for ( int i = f; i <= l; i++ )
+	s += a[i];
+    return s;
+}
+
+CanonicalForm
+prod ( const CFArray & a, int f, int l )
+{
+    if ( f < a.min() ) f = a.min();
+    if ( l > a.max() ) l = a.max();
+    CanonicalForm p = 1;
+    for ( int i = f; i <= l; i++ )
+	p *= a[i];
+    return p;
+}
+
+CanonicalForm
+sum ( const CFArray & a )
+{
+    return sum( a, a.min(), a.max() );
+}
+
+CanonicalForm
+prod ( const CFArray & a )
+{
+    return prod( a, a.min(), a.max() );
+}
+
+CanonicalForm
+crossprod ( const CFArray & a, const CFArray & b )
+{
+    if ( a.size() != b.size() ) {
+	cerr << "warning: array size mismatch." << endl;
+	return 0;
+    }
+    CanonicalForm s = 0;
+    int fa = a.min();
+    int fb = b.min();
+    int n = a.max();
+    for ( ; fa <= n; fa++, fb++ )
+	s += a[fa] * b[fb];
+    return s;
+}

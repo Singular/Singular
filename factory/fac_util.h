@@ -1,11 +1,16 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_util.h,v 1.2 1996-07-08 08:22:02 stobbe Exp $
+// $Id: fac_util.h,v 1.3 1996-07-16 12:26:05 stobbe Exp $
 
 #ifndef INCL_FAC_UTIL_H
 #define INCL_FAC_UTIL_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1996/07/08 08:22:02  stobbe
+"New organization of the factorization stuff. Some functions moved from
+fac_diophand.cc which no longer exists.
+"
+
 Revision 1.1  1996/06/27 11:34:25  stobbe
 "New function dviremainder.
 "
@@ -50,6 +55,18 @@ void divremainder( const CanonicalForm & f, const CanonicalForm & g, CanonicalFo
 CanonicalForm maxCoeff( const CanonicalForm & f );
 
 bool Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const modpk & bound, const Variable & x );
+
+/* some special array functions */
+
+CanonicalForm sum ( const CFArray & a, int f, int l );
+
+CanonicalForm prod ( const CFArray & a, int f, int l );
+
+CanonicalForm sum ( const CFArray & a );
+
+CanonicalForm prod ( const CFArray & a );
+
+CanonicalForm crossprod ( const CFArray & a, const CFArray & b );
 
 /*ENDPUBLIC*/
 
