@@ -1235,21 +1235,15 @@ int exp_number_builder::get_n(poly p){
   (*node)->p=pLmInit(p);
   return (*node)->n;
 }
-class mac_poly_r{
-public:
-  number coef;
-  mac_poly_r* next;
-  int exp;
-  mac_poly_r():next(NULL){}
-};
+
 //mac_polys exp are smaller iff they are greater by monomial ordering
 //corresponding to solving linear equations notation
 struct int_poly_pair{
   poly p;
   int n;
 };
-typedef mac_poly_r* mac_poly;
-  void t2ippa_rec(poly* ip,int* ia, poly_tree_node* k, int &offset){
+
+void t2ippa_rec(poly* ip,int* ia, poly_tree_node* k, int &offset){
     if(!k) return;
     t2ippa_rec(ip,ia,k->l,offset);
     ip[offset]=k->p;

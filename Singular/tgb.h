@@ -122,6 +122,41 @@ class tgb_matrix{
   void add_lambda_times_row(int add_to,int summand,number factor);
   int non_zero_entries(int row);
 };
+class mac_poly_r{
+public:
+  number coef;
+  mac_poly_r* next;
+  int exp;
+  mac_poly_r():next(NULL){}
+};
+//mac_polys exp are smaller iff they are greater by monomial ordering
+//corresponding to solving linear equations notation
+
+typedef mac_poly_r* mac_poly;
+class tgb_sparse_matrix{
+ private:
+  mac_poly* mp;
+  int columns;
+  int rows;
+  BOOLEAN free_numbers;
+ public:
+  tgb_sparse_matrix(int i, int j);
+  ~tgb_sparse_matrix();
+  int get_rows();
+  int get_columns();
+  void print();
+  void perm_rows(int i, int j);
+  void set(int i, int j, number n);
+  number get(int i, int j);
+  BOOLEAN is_zero_entry(int i, int j);
+  void free_row(int row, BOOLEAN free_non_zeros=TRUE);
+  int min_col_not_zero_in_row(int row);
+  int next_col_not_zero(int row,int pre);
+  BOOLEAN zero_row(int row);
+  void mult_row(int row,number factor);
+  void add_lambda_times_row(int add_to,int summand,number factor);
+  int non_zero_entries(int row);
+};
 struct poly_array_list{
   poly* p;
   int size;
