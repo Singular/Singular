@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.17 1998-12-01 17:23:31 Singular Exp $ */
+/* $Id: polys.h,v 1.18 1998-12-02 13:57:41 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -151,28 +151,27 @@ void pSetSchreyerOrdM(polyset nextorder, int length, int comps);
 int  pModuleOrder();
 
 /*-------------storage management:-------------------*/
-// allocates the space for a new monomial
+// allocates the space for a new monomial -- no initialization !!!
 #define pNew()      _pNew()
 // allocates a new monomial and initializes everything to 0
 #define pInit()     _pInit()
-
-// frees the space of the monomial m
+// frees the space of the monomial m (coef is not freed)
 #define pFree1(m)       _pFree1(m)
 // frees the space of monoial and frees coefficient
 #define pDelete1(m)     _pDelete1(m)
 // deletes the whole polynomial p
 #define pDelete(p)      _pDelete(p)
 
-// makes a simple memcopy of m2 into m1 -- does _not_ allocate memory for m1
+// makes a simple memcpy of m2 into m1 -- does _not_ allocate memory for m1
 #define pCopy2(m1, m2)  _pCopy2(m1, m2)
 // Returns a newly allocated copy of the monomial m, initializes coefficient
-// and sets the next-fieled to NULL
+// and sets the next-field to NULL
 #define pCopy1(m)       _pCopy1(m)
 // Returns a newly allocated copy of the monomial m, sets the coefficient to 0,
-// and sets the next-fieled to NULL
+// and sets the next-field to NULL
 #define pHead0(p)       _pHead0(p)
-// Returns a newly allocated copy of the monomial m, copy includes copy of ceoff
-// and sets the next-fieled to NULL
+// Returns a newly allocated copy of the monomial, copy includes copy of coeff
+// sets the next-field to NULL
 #define pHead(p)        _pHead(p)
 extern  poly pHeadProc(poly p);
 // Returns copy of the whole polynomial
@@ -322,9 +321,15 @@ BOOLEAN pComparePolys(poly p1,poly p2);
 
 
 #ifdef PDEBUG
-#define pTest(A) pDBTest(A,__FILE__,__LINE__)
+#define pHeapTest(A,B)  pDBTest(A, B, __FILE__,__LINE__)
+#define pHeapHeapTest(p, THeap, LmHeap) pDBTest(p, THeap, LmHeap, __FILE__, __LINE__)
+#define pTest(A) pDBTest(A, mm_specHeap, __FILE__,__LINE__)
 BOOLEAN pDBTest(poly p, char *f, int l);
+BOOLEAN pDBTest(poly p, memHeap tail_heap, char *f, int l);
+BOOLEAN pDBTest(poly p,  memHeap tail_heap, memHeap lm_heap, char *f, int l);
 #else
+#define pHeapHeapTest(p,a,b)
+#define pHeapTest(A,B)
 #define pTest(A)
 #define pDBTest(A,B,C)
 #endif

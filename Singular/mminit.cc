@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.14 1998-11-12 13:08:00 Singular Exp $ */
+/* $Id: mminit.cc,v 1.15 1998-12-02 13:57:33 obachman Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -19,114 +19,10 @@
 #endif
 #include "mod2.h"
 #include "mmemory.h"
-#include "mmprivat.h"
+#include "mmprivate.h"
 extern "C" { /* begin of "C" */
 #include <gmp.h>
-
-#ifdef ALIGN_8
-mcb mm_normList[MAXLIST]=
-{ NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL};
-;
-mcb mm_tmpList[MAXLIST]=
-{ NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL};
-#ifdef MM_STAT
-int mm_active[MAXLIST+1]=
-{ 0,0,0,0,
-  0,0,0,0,
-  0,0,0,0,
-  0,0,0,0,
-  0,0,0};
-int mm_max[MAXLIST+2]=
-{ 0,0,0,0,
-  0,0,0,0,
-  0,0,0,0,
-  0,0,0,0,
-  0,0,0,0};
-#endif
-#else
-mcb mm_normList[MAXLIST]=
-{ NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL};
-mcb mm_tmpList[MAXLIST]=
-{ NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL,NULL,NULL,
-  NULL,NULL};
-#ifdef MM_STAT
-int mm_active[MAXLIST+1]=
-{ 0,0,0,0,
-  0,0,0,
-  0,0,0,0,
-  0,0,0,0,
-  0,0,0,0,
-  0,0,0};
-int mm_max[MAXLIST+2]=
-{ 0,0,0,0,
-  0,0,0,
-  0,0,0,0,
-  0,0,0,0,
-  0,0,0,0,
-  0,0,0,0};
-#endif
-#endif
-
-
-mcb *mm_theList=mm_normList;
-
-#ifdef MPOLYPART
-void * mm_maxAddr=NULL;
-void * mm_minAddr=NULL;
-mcb mm_spec=NULL;
-void *mm_spec_part=NULL;
-#endif
-
-#ifdef MDEBUG
-
-#ifdef MTRACK
-DBMCB mm_theDBused={NULL,NULL,0,0,NULL,{0},0,0,NULL};
-DBMCB mm_theDBfree={NULL,NULL,0,0,NULL,{0},0,0,NULL};
-DBMCB mm_tmpDBused={NULL,NULL,0,0,NULL,{0},0,0,NULL};
-DBMCB mm_tmpDBfree={NULL,NULL,0,0,NULL,{0},0,0,NULL};
-DBMCB mm_normDBused={NULL,NULL,0,0,NULL,{0},0,0,NULL};
-DBMCB mm_normDBfree={NULL,NULL,0,0,NULL,{0},0,0,NULL};
-#else
-DBMCB mm_theDBused={NULL,NULL,0,0,NULL,0,0,NULL};
-DBMCB mm_theDBfree={NULL,NULL,0,0,NULL,0,0,NULL};
-DBMCB mm_tmpDBused={NULL,NULL,0,0,NULL,0,0,NULL};
-DBMCB mm_tmpDBfree={NULL,NULL,0,0,NULL,0,0,NULL};
-DBMCB mm_normDBused={NULL,NULL,0,0,NULL,0,0,NULL};
-DBMCB mm_normDBfree={NULL,NULL,0,0,NULL,0,0,NULL};
-#endif
-void * mm_maxAddr=NULL;
-void * mm_minAddr=NULL;
-
-#endif /* MDEBUG */
-
-status_t mm_status = MM_NORMAL;
-
-int mm_bytesUsed=0;
-int mm_bytesReal=0;
-int mm_bytesTmp=0;
-int mm_bytesNorm=0;
-
-int mm_specIndex=0;
-size_t mm_specSize = mm_mcbSizes[0];
-
-int mm_printMark=102400;
+memHeap mm_specHeap = NULL;
 } /* end of "C" */
 
 void* operator new ( size_t size )

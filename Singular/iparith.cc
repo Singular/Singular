@@ -2604,7 +2604,7 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
     res->data = (char *)mmMemUsed();
     break;
   case 1:
-    res->data = (char *)mmMemReal();
+    res->data = (char *)mmMemAlloc();
     break;
 #ifdef HAVE_SBRK
   case 2:
@@ -2612,8 +2612,8 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
     break;
 #endif
   default:
-#ifdef MM_STAT
-    mmStat((int)v->Data());
+#ifndef MAKE_DISRIBUTION    
+    mmPrintStat();
 #endif
     res->data = (char *)0;
   }

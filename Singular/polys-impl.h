@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.25 1998-11-04 15:55:32 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.26 1998-12-02 13:57:40 obachman Exp $ */
 
 /***************************************************************
  *
@@ -15,8 +15,10 @@
  * encapsulations in polys.h should be used, instead.
  *
  ***************************************************************/
+#include "mod2.h"
 #include "structs.h"
 #include "mmemory.h"
+#include "mmheap.h"
 
 /***************************************************************
  *
@@ -39,8 +41,8 @@ typedef Exponent_t* Exponent_pt;
 typedef long Order_t;
 struct  spolyrec
 {
-  poly      next;
-  number    coef;
+  poly      next; // next needs to be the first field
+  number    coef; // and coef the second --- do not change this !!!
   Order_t   Order;
   monomial  exp; // make sure that exp is aligned
 };
@@ -190,15 +192,9 @@ inline void _pSetExpV(poly p, Exponent_t *ev)
  * Storage Managament Routines
  *
  ***************************************************************/
-#ifdef PDEBUG
+#ifdef MDEBUG
 
-poly    pDBNew(char *f, int l);
-poly    pDBInit(char * f,int l);
-
-void    pDBDelete(poly * a, char * f, int l);
-void    pDBDelete1(poly * a, char * f, int l);
-void    pDBFree1(poly a, char * f, int l);
-
+poly    pDBInit(char *f, int l);
 poly    pDBCopy(poly a, char *f, int l);
 poly    pDBCopy1(poly a, char *f, int l);
 poly    pDBHead(poly a, char *f, int l);
@@ -207,20 +203,15 @@ poly    pDBFetchCopy(ring r, poly a, char *f, int l);
 
 void    pDBDelete(poly * a, char * f, int l);
 void    pDBDelete1(poly * a, char * f, int l);
-void    pDBFree1(poly a, char * f, int l);
 
-#define _pNew()         pDBNew(__FILE__,__LINE__)
-#define _pInit()        pDBInit(__FILE__,__LINE__)
+#define pDBNew(f,l)  (poly) mmDBAllocHeap(mm_specHeap, f,l)
+#define _pNew()      (poly) mmDBAllocHeap(mm_specHeap, __FILE__, __LINE__)
+#define _pInit()     (poly) pDBInit(__FILE__,__LINE__)
+
+#define pDBFree1(a,f,l) mmDBFreeHeap((void*)a, mm_specHeap, f, l)
 
 #define _pDelete(a)     pDBDelete((a),__FILE__,__LINE__)
 #define _pDelete1(a)    pDBDelete1((a),__FILE__,__LINE__)
-#define _pFree1(a)                              \
-do                                              \
-{                                               \
-  pDBFree1((a),__FILE__,__LINE__);              \
-  (a)=NULL;                                     \
-}                                               \
-while(0)
 
 #define _pCopy(A)       pDBCopy(A,__FILE__,__LINE__)
 #define _pCopy1(A)      pDBCopy1(A, __FILE__,__LINE__)
@@ -228,42 +219,34 @@ while(0)
 #define _pHead0(A)      pDBHead0(A, __FILE__,__LINE__)
 #define _pFetchCopy(r,A)    pDBFetchCopy(r, A,__FILE__,__LINE__)
 
-#else // ! PDEBUG
+#else // ! MDEBUG
 
-#ifdef MDEBUG
-#define _pNew()         (poly) mmDBAllocSpecialized(__FILE__,__LINE__)
-#else
-#define _pNew()         (poly) mmAllocSpecialized()
-#endif
+inline poly _pNew()
+{
+  poly p;
+  AllocHeap(p, mm_specHeap);
+  return p;
+}
 
-#include <string.h>
 inline poly    _pInit(void)
 {
-#ifdef MDEBUG
-  poly p=(poly)mmDBAllocSpecialized(__FILE__,__LINE__);
-#else
-  poly p=(poly)mmAllocSpecialized();
-#endif
-  memset(p,0, pMonomSize);
+  poly p = _pNew();
+  memsetW((long*)p,0, pMonomSizeW);
   return p;
 }
 
 extern void    _pDelete(poly * a);
 extern void    _pDelete1(poly * a);
-#ifdef MDEBUG
-#define _pFree1(a)       mmDBFreeSpecialized((ADDRESS)a,__FILE__,__LINE__)
-#else
-#define _pFree1(a)       mmFreeSpecialized((ADDRESS)a)
-#endif
 
 extern poly    _pCopy(poly a);
 extern poly    _pCopy1(poly a);
 extern poly    _pHead(poly a);
 extern poly    _pHead0(poly a);
 extern poly    _pFetchCopy(ring r,poly a);
-#endif // PDEBUG
+#endif // MDEBUG
 
 #define _pCopy2(p1, p2)     memcpyW(p1, p2, pMonomSizeW)
+#define _pFree1(a)          FreeHeap(a, mm_specHeap)
 
 /***************************************************************
  *

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.15 1998-10-15 14:08:41 krueger Exp $ */
+/* $Id: structs.h,v 1.16 1998-12-02 13:57:41 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -33,6 +33,10 @@ enum noeof_t
   noeof_procname,
   noeof_string
 };
+
+struct sip_memHeap;
+typedef struct sip_memHeap ip_memHeap;
+typedef ip_memHeap *       memHeap;
 
 /* C++-part */
 #ifdef __cplusplus

@@ -83,7 +83,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ndbm.cc spSpolyLoop.cc libparse.cc mod-${SINGUNAME}.cc\
 	pcv.cc
 
-CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c  mmspec.c mmutil.c \
+CSOURCES=gmalloc.c mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
     mmbt.c weight0.c find_exec.c getopt.c fereadl.c
 
 SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l spSpolyLoop.pl
@@ -93,7 +93,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
 	cntrlc.h ipprint.h mmemory.h ring.h timer.h \
-	febase.h ipshell.h mmprivat.h shortfl.h tok.h \
+	febase.h ipshell.h mmprivate.h shortfl.h tok.h \
 	ffields.h khstd.h silink.h \
 	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
@@ -121,8 +121,8 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      longalg.o spolys0.o syz.o syz0.o syz1.o weight.o weight0.o \
      ipid.o ipshell.o iplib.o ipassign.o ipconv.o ipprint.o\
      polys.o polys0.o polys1.o polys-impl.o extra.o\
-     mminit.o mmutil.o mmalloc.o mmallocb.o mmallocs.o \
-     mmspec.o mmblock.o mmbt.o sing_dld.o sing_dbm.o silink.o \
+     mminit.o mmtables.o mmalloc.o mmheap.o mmpage.o \
+     mmisc.o mmcheck.o mmbt.o sing_dld.o sing_dbm.o silink.o \
      sing_mp.o fglm.o fglmzero.o fglmvec.o fglmhom.o fglmgauss.o cntrlc.o \
      algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
@@ -156,16 +156,16 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 all:	Singular
 
 Singular: mod2.h si_paths.h Makefile version.h scanner.cc ${OBJS} iparith.o \
-	  mpsr_Tok.o tesths.cc libparse.cc
+	  mpsr_Tok.o tesths.cc libparse.cc gmalloc.o
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -o Singular \
-	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS}
+	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o
 
 Singular-static: mod2.h si_paths.h Makefile version.h scanner.cc ${OBJS} \
                  iparith.o mpsr_Tok.o tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	-o Singular-static \
 	tesths.cc iparith.o mpsr_Tok.o \
-	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS}
+	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS} gmalloc.o
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
@@ -175,18 +175,18 @@ claptmpl.o: claptmpl.cc mod2.h
 iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
 	     -o gentable iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS}
+	     ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o
 	./gentable
 	/bin/rm -f gentable gentable.exe
 
 
-mmutil.inc: mmutil.c mmprivat.h
+mmtables.inc: mmtables.c mmprivate.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} \
-	       -DGENERATE_INDEX_TABLE -DHAVE_INDEX_TABLE mmutil.c -o mmutil
-	./mmutil > mmutil.inc
-	rm -f mmutil mmutil.exe
+	       -DGENERATE_INDEX_TABLE -DHAVE_INDEX_TABLE mmtables.c -o mmtables
+	./mmtables > mmtables.inc
+	rm -f mmtables mmtables.exe
 
-mmutil.o mmutil.d: mmutil.inc
+mmtables.o mmtables.d: mmtables.inc
 
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in si_paths.h.in \
            configure.in
@@ -345,11 +345,11 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      ndbm.og spSpolyLoop.og libparse.og  mod-${SINGUNAME}.og \
 	pcv.og
 
-OBJG2= mmalloc.og mmallocb.og mmallocs.og mmblock.og mmbt.og \
-     mmspec.og mmutil.og weight0.og find_exec.og getopt.og fereadl.og
+OBJG2= mmalloc.og mmheap.og mmpage.og mmcheck.og mmbt.og \
+     mmisc.og mmtables.og weight0.og find_exec.og getopt.og fereadl.og
 
 
-OBJG=$(OBJG1) $(OBJG2) claptmpl.og
+OBJG=$(OBJG1) $(OBJG2) claptmpl.og 
 
 ##
 ## Debug Targets
@@ -360,12 +360,12 @@ claptmpl.og: claptmpl.cc mod2.h
 $(OBJG1): %.og: %.cc
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-$(OBJG2): %.og: %.c
+$(OBJG2) gmalloc.og: %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-Singularg: scanner.cc $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h 
+Singularg: scanner.cc $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h gmalloc.og
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
-	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS}
+	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS} gmalloc.og
 
 iparith.og: iparith.inc iparith.cc
 	$(CXXG)  ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og
@@ -420,8 +420,8 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op\
      ndbm.op spSpolyLoop.op libparse.op  mod-${SINGUNAME}.op \
 	pcv.op
 
-OBJP2= mmalloc.op mmallocb.op mmallocs.op mmblock.op mmbt.op \
-     mmspec.op mmutil.op weight0.op find_exec.op getopt.op fereadl.op
+OBJP2= mmalloc.op mmheap.op mmpage.op mmcheck.op mmbt.op \
+     mmisc.op mmtables.op weight0.op find_exec.op getopt.op fereadl.op
 
 OBJP=$(OBJP1) $(OBJP2) claptmpl.op
 
@@ -446,8 +446,8 @@ OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      ndbm.ob spSpolyLoop.ob libparse.ob mod-${SINGUNAME}.ob \
 	pcv.ob
 
-OBJB2= mmalloc.ob mmallocb.ob mmallocs.ob mmblock.ob mmbt.ob \
-     mmspec.ob mmutil.ob weight0.ob find_exec.ob getopt.ob fereadl.ob
+OBJB2= mmalloc.ob mmheap.ob mmpage.ob mmcheck.ob mmbt.ob \
+     mmisc.ob mmtables.ob weight0.ob find_exec.ob getopt.ob fereadl.ob
 
 OBJB=$(OBJB1) $(OBJB2) claptmpl.ob
 
@@ -462,12 +462,12 @@ claptmpl.op: claptmpl.cc mod2.h
 $(OBJP1): %.op: %.cc
 	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
-$(OBJP2): %.op: %.c
+$(OBJP2) gmalloc.op: %.op: %.c
 	$(CCP)  ${CFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
-Singularp: scanner.cc $(OBJP) iparith.op mpsr_Tok.op tesths.cc version.h 
+Singularp: scanner.cc $(OBJP) iparith.op mpsr_Tok.op tesths.cc version.h gmalloc.op
 	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp \
-	tesths.cc iparith.op mpsr_Tok.op $(OBJP) ${LDFLAGSP} ${LIBS}
+	tesths.cc iparith.op mpsr_Tok.op $(OBJP) ${LDFLAGSP} ${LIBS} gmalloc.op
 
 iparith.op: iparith.inc iparith.cc
 	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c iparith.cc -o iparith.op
@@ -482,13 +482,13 @@ claptmpl.ob: claptmpl.cc mod2.h
 $(OBJB1): %.ob: %.cc
 	$(CXXP) ${CXXFLAGSB} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFSB} -c $< -o $@
 
-$(OBJB2): %.ob: %.c
+$(OBJB2) gmalloc.ob: %.ob: %.c
 	$(CCP)  ${CFLAGSB} ${CPPFLAGS} ${DEFSB} -c $< -o $@
 
-Singularb: scanner.cc $(OBJB) iparith.ob mpsr_Tok.ob tesths.cc version.h 
+Singularb: scanner.cc $(OBJB) iparith.ob mpsr_Tok.ob tesths.cc version.h gmalloc.ob
 	$(CXXP) ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -o Singularb \
 	tesths.cc iparith.ob mpsr_Tok.ob $(OBJB)  $(BPROFOBJ) \
-        ${LDFLAGSB} ${LIBS}
+        ${LDFLAGSB} ${LIBS} gmalloc.ob
 
 iparith.ob: iparith.inc iparith.cc
 	$(CXXP)  ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -c iparith.cc -o iparith.ob

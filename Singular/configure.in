@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(matpol.h)
+AC_INIT(gmalloc.c)
 AC_CONFIG_HEADER(mod2.h si_paths.h)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -297,7 +297,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
-AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h)
+AC_CHECK_HEADERS(malloc.h sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h)
 
 # typedefs, structures
 AC_C_CONST
@@ -312,7 +312,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd sbrk readlink sleep usleep)
+AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd sbrk readlink sleep usleep valloc getpagesize)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Find out more about particularity of the system
@@ -391,10 +391,129 @@ if test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
   AC_MSG_ERROR(need equal sizes for long and void*)
 fi
 
+dnl
+dnl
+dnl figure out the page size of your system
+dnl
+dnl
+AC_MSG_CHECKING(size of system page)
+AC_CACHE_VAL(ac_cv_pagesize, 
+AC_TRY_RUN([#include <stdio.h>
+#define HAVE_GMALLOC
+#include "gmalloc.c"
 
+main()
+{
+  FILE *f=fopen("conftestval", "w");
+  if (!f) exit(1);
+  fprintf(f, "%d\n", getpagesize());
+  exit(0);
+}], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
+AC_MSG_RESULT($ac_cv_pagesize)
+if test "$ac_cv_pagesize" != 0; then
+  AC_DEFINE_UNQUOTED(SIZE_OF_SYSTEM_PAGE, $ac_cv_pagesize)
+fi
+
+dnl
+dnl figure out what to do w.r.t. valloc
+dnl
+
+AC_MSG_CHECKING(for page aligned valloc)
+AC_CACHE_VAL(ac_cv_have_page_alignment,
+
+cat > _pagetest.c << EOF
+#include <stdio.h>
+#ifndef ADJUSTMENT
+#define ADJUSTMENT 0
+#endif
+#define REPEAT 1000
+main()
+{
+  long i;
+  unsigned long p1 = (unsigned long) valloc(SIZE_OF_SYSTEM_PAGE - ADJUSTMENT);
+  unsigned long p2;
+  unsigned long diffs = 0;
+  
+  if ((p1 == 0) || (p1 & (SIZE_OF_SYSTEM_PAGE - 1))) exit(1);
+  
+  for (i = 0; i<REPEAT; i++)
+  {
+    p2 = (unsigned long) valloc(SIZE_OF_SYSTEM_PAGE - ADJUSTMENT);
+    if ((p2 == 0) || (p2 & (SIZE_OF_SYSTEM_PAGE - 1))) exit(1);
+    diffs += (p2 - p1);
+    p1 = p2;
+  }
+  
+  if ( ((double) diffs)/((double)REPEAT) < ((double) SIZE_OF_SYSTEM_PAGE)*1.05 )
+  {
+    FILE *f=fopen("conftestval", "w");
+    if (!f) exit(1);
+    fprintf(f, "%d\n", SIZE_OF_SYSTEM_PAGE - ADJUSTMENT);
+    exit(0);
+  }
+  exit(1);
+}
+EOF
+
+ac_cv_have_page_alignment=no
+if test "$with_gmalloc" != yes && \
+   test "$ac_cv_func_valloc" = yes && \
+   test "$ac_cv_pagesize" != 0; then
+AC_TRY_RUN([
+#define ADJUSTMENT 0
+#include "_pagetest.c"
+], ac_cv_have_page_alignment="ac_cv_usable_pagesize="`cat  conftestval`,
+ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
+  if test "$ac_cv_have_page_alignment" = no; then
+AC_TRY_RUN([
+#define ADJUSTMENT SIZEOF_VOIDP
+#include "_pagetest.c"
+], ac_cv_have_page_alignment="ac_cv_usable_pagesize="`cat  conftestval`,
+ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
+  fi
+fi
+
+if test "$ac_cv_have_page_alignment" = no && test "$ac_cv_pagesize" != 0; then
+AC_TRY_RUN([
+#define ADJUSTMENT 0
+#define HAVE_GMALLOC
+#include "gmalloc.c"
+#include "_pagetest.c"
+], ac_cv_have_page_alignment="ac_cv_have_gmalloc=yes; ac_cv_usable_pagesize="`cat  conftestval`,
+ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
+  if test "$ac_cv_have_page_alignment" = no; then
+AC_TRY_RUN([
+#define ADJUSTMENT SIZEOF_VOIDP
+#define HAVE_GMALLOC
+#include "gmalloc.c"
+#include "_pagetest.c"
+], ac_cv_have_page_alignment="ac_cv_have_gmalloc=yes; ac_cv_usable_pagesize="`cat  conftestval`,
+ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
+  fi
+fi
+rm -rf conftesteval _pagetest.c
+
+)
+
+if test "$ac_cv_have_page_alignment" != no; then
+  eval $ac_cv_have_page_alignment
+  AC_DEFINE(HAVE_PAGE_ALIGNMENT)
+  AC_DEFINE_UNQUOTED(PALLOC, valloc)
+  AC_DEFINE_UNQUOTED(PFREE, free)
+  if test "$ac_cv_have_gmalloc" = yes; then
+    AC_DEFINE(HAVE_GMALLOC)
+    AC_MSG_RESULT(from gmalloc)
+  else
+    AC_MSG_RESULT(from system)
+  fi
+  AC_DEFINE_UNQUOTED(SIZE_OF_PAGE, $ac_cv_usable_pagesize)
+else
+  AC_MSG_RESULT(no)
+  AC_MSG_WARN(Advanced memory management disabled)
+fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl helpf for configure
+dnl help for configure
 dnl
 AC_ARG_WITH(
   rootdir,
@@ -431,15 +550,16 @@ AC_ARG_WITH(
   dl,
   [  --with-dl               do use dl (no dynamic linking)])
 AC_ARG_WITH(apint, 
-  [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
-                             where PACKAGE can be gmp, smallgmp])
+  [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic])
 AC_ARG_WITH(
   exp_type,
   [  --with-exp_type=TYPE    uses TYPE as type of exponents in polynomials 
                              -- default type is short 
 			     -- possible other types are char and int])
-
-
+AC_ARG_WITH(
+  gmalloc,
+  [  --with-gmalloc          use our own gmalloc routines, instead of the ones
+                             provided by the system])
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for packages we need
@@ -721,7 +841,7 @@ dnl
 dnl figure out Exponent_t and Order_t
 dnl make sure that 2*sizeof(Exponent_t) + sizeof(Order_t) is aligned
 dnl
-AC_MSG_CHECKING(which exponent types to use)
+AC_MSG_CHECKING(which exponent type to use)
 if test "$with_exp_type" = "char"; then
   AC_MSG_RESULT(char)
   AC_DEFINE(EXPONENT_TYPE, char)
@@ -736,6 +856,8 @@ else
   AC_DEFINE(SIZEOF_TYPE, SIZEOF_SHORT)
 fi
 
+
+ 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.20 1998-11-10 17:25:32 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.21 1998-12-02 13:57:39 obachman Exp $ */
 
 /***************************************************************
  *
@@ -21,7 +21,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "structs.h"
-#include "mmprivat.h"
+#include "mmprivate.h"
 #include "mmemory.h"
 #include "febase.h"
 #include "numbers.h"
@@ -183,7 +183,7 @@ inline void RingCopy2ExpV(poly dest, poly src, ring src_r)
 // poly of currRing) of poly p which is from ring r -- assumes that
 // currRing and r have the same number of variables, i.e. that polys
 // from r can be "fetched" into currRing
-#ifdef PDEBUG
+#ifdef MDEBUG
 poly pDBFetchCopy(ring r, poly p,char *f,int l)
 #else
 poly _pFetchCopy(ring r, poly p)
@@ -194,7 +194,7 @@ poly _pFetchCopy(ring r, poly p)
   if (p==NULL) return NULL;
   if (r->VarOffset == pVarOffset)
   {
-#ifdef PDEBUG
+#ifdef MDEBUG
     res = a = pDBNew(f,l);
 #else
     res = a = pNew();
@@ -205,7 +205,7 @@ poly _pFetchCopy(ring r, poly p)
     pIter(p);
     while (p!=NULL)
     {
-#ifdef PDEBUG
+#ifdef MDEBUG
       a = pNext(a) = pDBNew(f,l);
 #else
       a = pNext(a) = pNew();
@@ -219,7 +219,7 @@ poly _pFetchCopy(ring r, poly p)
   }
   else
   {
-#ifdef PDEBUG
+#ifdef MDEBUG
     a = res = pDBInit(f,l);
 #else
     a = res = pInit();
@@ -233,7 +233,7 @@ poly _pFetchCopy(ring r, poly p)
       // the VarOffset's are different: Hence we
       // convert betweeen a lex order and a revlex order -- to speed
       // up the sorting, we assemble new poly in inverse order
-#ifdef PDEBUG
+#ifdef MDEBUG
       res = pDBInit(f,l);
 #else
       res = pInit();
@@ -262,23 +262,11 @@ poly _pFetchCopy(ring r, poly p)
  *
  ***************************************************************/
 
-#ifdef PDEBUG
-poly pDBNew(char *f, int l)
-{
-#ifdef MDEBUG
-  poly p = (poly) mmDBAllocSpecialized(f,l);
-#else
-  poly p = (poly) mmAllocSpecialized();
-#endif
-  memset(p,0,pMonomSize);
-  return p;
-}
-#endif
 
 /*2
 * create a new monomial and init
 */
-#ifdef PDEBUG
+#ifdef MDEBUG
 poly pDBInit(char * f, int l)
 {
   poly p=pDBNew(f,l);
@@ -292,7 +280,7 @@ poly pDBInit(char * f, int l)
 * delete a poly, resets pointer
 * put the monomials in the freelist
 */
-#ifdef PDEBUG
+#ifdef MDEBUG
 void pDBDelete(poly * p, char * f, int l)
 {
   poly h = *p;
@@ -306,9 +294,9 @@ void pDBDelete(poly * p, char * f, int l)
 #endif
     pIter(h);
 #ifdef MDEBUG
-    mmDBFreeSpecialized((ADDRESS)*p,f,l);
+    pDBFree1((ADDRESS)*p,f,l);
 #else
-    mmFreeSpecialized((ADDRESS)*p);
+    pFree1((ADDRESS)*p);
 #endif
     *p=h;
     if (l>0) l= -l;
@@ -326,7 +314,7 @@ void _pDelete(poly* p)
     nDelete(&(h->coef));
     pp=h;
     pIter(h);
-    mmFreeSpecialized((ADDRESS)pp);
+    pFree1((ADDRESS)pp);
   }
   *p = NULL;
 }
@@ -335,7 +323,7 @@ void _pDelete(poly* p)
 /*2
 * remove first monom
 */
-#ifdef PDEBUG
+#ifdef MDEBUG
 void pDBDelete1(poly * p, char * f, int l)
 {
   poly h = *p;
@@ -344,9 +332,9 @@ void pDBDelete1(poly * p, char * f, int l)
   nDelete(&(h->coef));
   *p = pNext(h);
 #ifdef MDEBUG
-  mmDBFreeSpecialized((ADDRESS)h,f,l);
+  pDBFree1((ADDRESS)h,f,l);
 #else
-  mmFreeSpecialized((ADDRESS)h);
+  pFree1((ADDRESS)h);
 #endif
 }
 #else
@@ -357,7 +345,7 @@ void _pDelete1(poly* p)
   if (h==NULL) return;
   nDelete(&(h->coef));
   *p = pNext(h);
-  mmFreeSpecialized((ADDRESS)h);
+  pFree1((ADDRESS)h);
 }
 #endif
 
@@ -370,27 +358,9 @@ void ppDelete(poly* p, ring rg)
 }
 
 /*2
-* remove first monom
-*/
-#ifdef PDEBUG
-void pDBFree1(poly p, char * f, int l)
-{
-  if (p!=NULL)
-  {
-    p->coef=NULL;//nDelete(&(p->coef));
-#ifdef MDEBUG
-    mmDBFreeSpecialized((ADDRESS)p,f,l);
-#else
-    mmFreeSpecialized((ADDRESS)p);
-#endif
-  }
-}
-#endif
-
-/*2
 * creates a copy of p
 */
-#ifdef PDEBUG
+#ifdef MDEBUG
 poly pDBCopy(poly p,char *f,int l)
 #else
 poly _pCopy(poly p)
@@ -400,7 +370,7 @@ poly _pCopy(poly p)
 
   if (p==NULL) return NULL;
   pDBTest(p,f,l);
-#ifdef PDEBUG
+#ifdef MDEBUG
   w = a = pDBNew(f,l);
 #else
   w = a = pNew();
@@ -412,7 +382,7 @@ poly _pCopy(poly p)
     pIter(p);
     do
     {
-#ifdef PDEBUG
+#ifdef MDEBUG
       a = pNext(a) = pDBNew(f,l);
 #else
       a = pNext(a) = pNew();
@@ -432,14 +402,14 @@ poly _pCopy(poly p)
 * creates a copy of the initial monomial of p
 * sets the coeff of the copy to a defined value
 */
-#ifdef PDEBUG
+#ifdef MDEBUG
 poly pDBCopy1(poly p,char *f,int l)
 #else
 poly _pCopy1(poly p)
 #endif
 {
   poly w;
-#ifdef PDEBUG
+#ifdef MDEBUG
   w = pDBNew(f,l);
 #else
   w = pNew();
@@ -453,7 +423,7 @@ poly _pCopy1(poly p)
 /*2
 * returns (a copy of) the head term of a
 */
-#ifdef PDEBUG
+#ifdef MDEBUG
 poly pDBHead(poly p,char *f, int l)
 #else
 poly _pHead(poly p)
@@ -463,7 +433,7 @@ poly _pHead(poly p)
 
   if (p!=NULL)
   {
-#ifdef PDEBUG
+#ifdef MDEBUG
     w = pDBNew(f,l);
 #else
     w = pNew();
@@ -483,7 +453,7 @@ poly pHeadProc(poly p)
 /*2
 * returns (a copy of) the head term of a without the coef
 */
-#ifdef PDEBUG
+#ifdef MDEBUG
 poly pDBHead0(poly p,char *f, int l)
 #else
 poly _pHead0(poly p)
@@ -734,16 +704,40 @@ BOOLEAN pDBDivisibleBy2(poly a, poly b, char* f, int l)
 
 #endif // PDEBUG != 0
 
-
 BOOLEAN pDBTest(poly p, char *f, int l)
+{
+  return pDBTest(p, mm_specHeap, f,l);
+}
+
+BOOLEAN pDBTest(poly p, memHeap tail_heap, memHeap lm_heap, char *f, int l)
+{
+  if (tail_heap != lm_heap && lm_heap != NULL)
+  {
+    poly pn = pNext(p);
+    BOOLEAN ret;
+    pNext(p) = NULL;
+    ret = pDBTest(pn, tail_heap, f, l) && pDBTest(p, lm_heap, f, l);
+    pNext(p) = pn;
+    return ret;
+  }
+  else
+  {
+    return pDBTest(p, tail_heap, f, l);
+  }
+}
+
+BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
 {
   poly old=NULL;
   BOOLEAN ismod=FALSE;
   while (p!=NULL)
   {
 #ifdef MDEBUG
-    if (!mmDBTestBlock(p,mm_specSize,f,l))
+    if (!mmDBTestHeapBlock(p, heap, f,l))
       return FALSE;
+#elif defined(HEAP_DEBUG)
+      if (! mmDebugCheckHeapAddr(p, heap, MM_HEAP_ADDR_USED_FLAG, f, l))
+        return FALSE;
 #endif
 #ifdef LDEBUG
     if (!nDBTest(p->coef,f,l))
@@ -817,5 +811,49 @@ BOOLEAN pDBTest(poly p, char *f, int l)
 }
 #endif // PDEBUG
 
+#define BIT_SIZEOF_LONG 8*SIZEOF_LONG
+unsigned long GetBitFields(Exponent_t e, 
+                           unsigned int s, unsigned int n)
+{
+  unsigned int i = 0, ev = 0;
+  assume(n > 0 && s < BIT_SIZEOF_LONG);
+  do
+  {
+    assume(s+i < BIT_SIZEOF_LONG);
+    if (e > (Exponent_t) i) ev |= Sy_bit(s+i);
+    else break;
+    i++;
+  }
+  while (i < n);
+  return ev;
+}
+
+unsigned long pGetShortExpVector(poly p)
+{
+  unsigned long ev = 0; // short exponent vector
+  unsigned int n = BIT_SIZEOF_LONG / pVariables; // number of bits per exp
+  unsigned int m1; // highest bit which is filled with (n+1)
+  unsigned int i = 0, j=0;
+  
+  if (n == 0) 
+  {
+    n = 1;
+    m1 = 0;
+  }
+  else
+  {
+    m1 = (n+1)*(BIT_SIZEOF_LONG - n*pVariables);
+  }
+  
+  n++;
+  while (i<m1)
+  {
+    ev |= GetBitFields(p->exp[pVarLowIndex + j], i, n);
+    i += n;
+    j++;
+  }
+
+  return ev;
+}
 
 #endif // POLYS_IMPL_CC

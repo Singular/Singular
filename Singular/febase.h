@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.24 1998-10-29 13:15:13 Singular Exp $ */
+/* $Id: febase.h,v 1.25 1998-12-02 13:57:26 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -138,23 +138,6 @@ BOOLEAN newFile(char* fname, FILE *f=NULL);
 void    newBuffer(char* s, feBufferTypes t, procinfo *pname = NULL, int start_lineno = 0);
 void *  myynewbuffer();
 void    myyoldbuffer(void * oldb);
-
-/* assume(x) -- a handy macro for assumptions */
-#ifdef NDEBUG
-/* empty macro, if NDEBUG */
-#define assume(x) ((void*) 0)
-#else /* ! NDEBUG */
-#define assume(x) _assume(x, __FILE__, __LINE__)
-#define _assume(x, f, l)                                        \
-do                                                              \
-{                                                               \
-  if (! (x))                                                    \
-  {                                                             \
-    Warn("Internal assume violation: file %s line %d\n", f, l); \
-  }                                                             \
-}                                                               \
-while (0)
-#endif /* NDEBUG */
 
 class Voice
 {

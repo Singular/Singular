@@ -55,6 +55,10 @@
 #undef HAVE_ALLOCA_H
 /* Define if you have pwd.h */
 #undef HAVE_PWD_H
+/* Define if you have unistd.h */
+#undef HAVE_UNISTD_H
+/* define if you have malloc.h n */
+#undef HAVE_MALLOC_H
 /* Define if you have alloca */
 #undef HAVE_ALLOCA
 /* Define if you have getpagesize */
@@ -112,6 +116,17 @@
 #define S_VERSION2 ""
 /* Define uname identifier as a string */
 #define S_UNAME ""
+/* Define if our gmalloc is to be used */
+#undef HAVE_GMALLOC
+/* Define pagesize of your system */
+#define SIZE_OF_SYSTEM_PAGE 4096
+/* size of page as we can use it */
+#define SIZE_OF_PAGE SIZE_OF_SYSTEM_PAGE 
+/* valloc routine which returns chunk of SIZE_OF_PAGE */
+#define PALLOC malloc
+#define PFREE  free
+/* define if result of PALLOC is aligned on SIZE_OF_SYSTEM_PAGE */
+#undef HAVE_PAGE_ALIGNMENT
 
 /*******************************************************************
  * Defines which are not set by configure
@@ -258,26 +273,61 @@ extern int pShortOut;
 #undef DO_DEEP_PROFILE
 #endif
 
+#define buildin_rand 1
+
+/* define to enable assume */
+#ifndef HAVE_ASSUME
+#undef HAVE_ASSUME
+#endif
+
 /*******************************************************************
  * DEBUG OPTIONS
  * -- only significant for for compiling without -DNDEBUG
  * -- you better know what your are doing, if you touch this
  ******************************************************************/
-#define buildin_rand 1
 #ifndef NDEBUG
 
-/* define MDEBUG 0 for checking Alloc/Free */
+/* undefine to disable assume -- should normally be defined for NDEBUG */
+#define HAVE_ASSUME
+
+
+/* undefine to disable assume -- should normally be defined for NDEBUG */
+#define HAVE_ASSUME
+
+/* undef MDEBUG to disable memory checks
+ * 
+ * define MDEBUG to 
+ * 0 to enable basic memory checks (at least on each alloc/free)
+ * 1 for addtl. containment checks in free/alloc list for each memory check
+ * 2 for addtl. checks of entire free/alloc list at each memory check
+ * 3 for addtl. checks of all heaps at each memory check
+ * NOTE: For MDEBUG > 1, it gets very slow
+ * You can control MDEBUG at run-time by setting the value of the
+ * variable mm_MDEBUG (defined in mmcheck.c) to the appropriate value.
+ */
 #define MDEBUG 0
-/* define MDEBUG 1 for allowing to keep track of Alloc/Free */
-/* undefine MMDEBUG otherwise */
-/*#define MDEBUG 0 */
+
+/* undef HEAP_DEBUG to disable heap checks
+ * 
+ * define HEAP_DEBUG to 
+ * 0 to enable basic heap addr checks (at least on each alloc/free)
+ * 1 for addtl. containment checks in free/alloc list of heap
+ * 2 for addtl. check of entire  heap at each heap addr check
+ * NOTE: For HEAP_DEBUG > 1 on, it gets very slow
+ * You can control HEAP_DEBUG at run-time by setting the value of the
+ * variable mm_HEAP_DEBUG (defined in mmheap.c) to the appropriate value. 
+ */
+#define HEAP_DEBUG 0
+
+/* define PAGE_DEBUG for page accesses -- never re-uses freed pages */
+#ifndef PAGE_DEBUG
+#undef PAGE_DEBUG
+#endif
+
+
 /* define MTRACK for allowing to keep track of Alloc/Free with a backtrace */
 /* #define MTRACK */
-/* define MLIST for listing used blocks at programm end */
-/* undefine otherwise */
-/*#define MLIST */
-/* define MM_BEFORE for also printing the previous block while debugging */
-/*#define MM_BEFORE 1 */
+
 /* define PDEBUG checking polys, undefine otherwise */
 /* define PDEBUG 1 for additionally checking access to polys  -- vewry slow !*/
 #define PDEBUG 1
@@ -353,4 +403,51 @@ extern int pShortOut;
 #ifdef HAVE_NAMESPACES
 #  undef USE_IILOCALRING
 #endif
+
+/*******************************************************************
+ *
+ * assume(x) -- a handy macro for assumptions 
+ *
+ ******************************************************************/
+
+#ifndef HAVE_ASSUME
+#define assume(x) ((void*) 0)
+#define r_assume(x) ((void*) 0)
+#else /* ! HAVE_ASSUME */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+/* Set a breakpoint on this function */
+extern void assume_violation(char* file, int line);
+#ifdef __cplusplus
+}
+#endif
+
+
+#define assume(x)   _assume(x, __FILE__, __LINE__)
+#define r_assume(x) _r_assume(x, __FILE__, __LINE__)
+
+#define _assume(x, f, l)                        \
+do                                              \
+{                                               \
+  if (! (x))                                    \
+  {                                             \
+    assume_violation(f, l);                     \
+  }                                             \
+}                                               \
+while (0)
+
+#define _r_assume(x, f, l)                      \
+do                                              \
+{                                               \
+  if (! (x))                                    \
+  {                                             \
+    assume_violation(f, l);                     \
+    return 0;                                   \
+  }                                             \
+}                                               \
+while (0)
+#endif /* HAVE_ASSUME */
+
 #endif /* MOD2_H  */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.69 1998-10-29 13:15:15 Singular Exp $ */
+/* $Id: febase.cc,v 1.70 1998-12-02 13:57:25 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -961,6 +961,13 @@ void Warn(const char *fmt, ...)
   WarnS(s);
   Free(s,256);
   va_end(ap);
+}
+
+extern "C" {
+void assume_violation(char* file, int line)
+{
+  fprintf(stderr, "Internal assume violation: file %s line %d\n", file, line);
+}
 }
 
 #ifdef macintosh
