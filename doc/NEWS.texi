@@ -1,14 +1,14 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.2 1999-12-02 14:14:40 obachman Exp $
+@comment $Id: NEWS.texi,v 1.3 1999-12-03 11:20:44 obachman Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
 @include version.texi
 @end ifclear
 
-@ifclear singularmanual 
 @majorheading NEWS in SINGULAR @value{VERSION}
 
+@ifclear singularmanual 
 @macro nref{what}
 \what\
 @end macro
@@ -25,14 +25,15 @@ new release version 2-0 (should be there at the beginning of
 2000). Items labeled with "TBC" in this news file are features which
 still have to be implemented and/or documented.
 
-It is to be expected that the current version @value{VERSION} is not as
-stable as the 1.2 version(s), since major changes were done to the
-@sc{Singular} kernel (although, there are no known bugs in the current
-version). Therefore, it is important to us, that users try out this
-new version. 
+Although there are no known bugs, it is to be
+expected that the current version @value{VERSION} is not as stable as
+the 1.2 version(s), since major changes were done to the @sc{Singular}
+kernel. Therefore, it is important to us, that users try out this new
+version.
 
 Furthermore, the current version is generally not yet as fast as version 
-1.2. But this is going to change dramatically in the upcoming version(s).
+1.2. But this is going to change dramatically in the upcoming release
+version(s). 
 
 Thank you very much for your support!
 
@@ -43,20 +44,21 @@ Thank you very much for your support!
 the recommended interface for using @sc{Singular}
 @item @nref{The online help system}
 choose in which browser the on-line help is displayed; 
-@*wildcard expansion on help topics
-@*new layout of html manual
+@*wildcard expansion of help topics
+@*new layout of html manual pages
 @item @nref{Source code debugger}
 interactive debugging of procedures written in the @sc{Singular}
 language
 @item file/directory layout of distribution
-@item
-
+@code{Singular/<version>/}
+@item http://singular.uni-kl.de ftp://singular.uni-kl.de
+TBC: New WWW and FTP home-site of @sc{Singular}
 @end table
 
 @heading Extension of ring concept
 
 @table @asis
-@item new coefficient domains
+@item new coefficient domains: arbitrary long real and complex numbers
 The current syntax is going to change slightly in the final version 2.0. 
 @item no restriction on number of ring variables
 @item TBC: DegBound on exponent values
@@ -70,8 +72,8 @@ The current syntax is going to change slightly in the final version 2.0.
 @table @asis
 @item @nref{mondromy_lib}
 procedures for computing the monodromy of a singularity
-@item @nref{spectrum_lib}
-TBC: doCu, examples, tests
+@item @code{spectrum_lib}
+TBC: docu, examples, tests
 @item @nref{spcurve_lib}
 procedures for cm codimension 2 singularities 
 @item @nref{triang_lib}
@@ -88,8 +90,8 @@ visualization of curves and surfaces with @code{surf}
 @table @asis
 @item @nref{breakpoint}
 sets a debugger breakpoint
-@item @nref{int operations}
-@code{div} added: integer division omitting remainder
+@item @code{div}
+integer division omitting remainder
 @item @nref{ERROR}
 interrupts computation in current procedure and returns with error
 message to top-level

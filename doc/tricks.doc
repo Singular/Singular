@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.4 1999-10-14 14:42:25 obachman Exp $
+@comment $Id: tricks.doc,v 1.5 1999-12-03 11:20:50 obachman Exp $
 @comment this file contains the "Tricks and pittfals" sections
 
 @c The following directives are necessary for proper compilation
@@ -447,6 +447,7 @@ returned as an expression list of strings.
 @c example
 @end smallexample
 
+@ifset namespaces
 @item packages and indexed variables
 
 See example
@@ -462,6 +463,8 @@ listvar();
 listvar(K);
 @c example
 @end smallexample
+@end ifset
+
 @end enumerate
 
 @c ----------------------------------------------

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.167 1999-12-02 13:52:52 obachman Exp $
+@comment $Id: reference.doc,v 1.168 1999-12-03 11:20:48 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1380,7 +1380,7 @@ provide in the future).
 @c example
   ring r=32003,(x,y,z),dp;
   ideal i=x+y,z3+22y;
-  write("save_i",i);
+  write(":w save_i",i);
   ring r0=0,(x,y,z),Dp;
   string s="ideal k="+read("save_i")+";";
   s;

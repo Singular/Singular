@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.45 1999-12-02 13:52:49 obachman Exp $
+### $Id: Makefile.in,v 1.46 1999-12-03 11:20:43 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -73,7 +73,7 @@ HTML_TUTOR_TOP     = tutor.htm
 ###########################################################
 # File sets
 #
-STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi
+STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi
 
 DOC2TEX_FILES	= \
 		examples.tex general.tex math.tex reference.tex \
@@ -240,7 +240,9 @@ uninstall:
 	rm -f ${infodir}/singular.hlp
 	- rmdir ${infodir}
 
-install-sharedist: singular.hlp html/index.htm singular.idx
+install-sharedist: singular.hlp html/index.htm singular.idx \
+                   COPYING.txt COPYING.html NEWS.txt NEWS.html 
+	${MKINSTALLDIRS} ${install_prefix}
 	${MKINSTALLDIRS} ${install_infodir}
 	${INSTALL_DATA} singular.hlp ${install_infodir}
 	${MKINSTALLDIRS} ${install_htmldir} 
@@ -248,6 +250,10 @@ install-sharedist: singular.hlp html/index.htm singular.idx
 	chmod 644 ${htmldir}/*
 	${MKINSTALLDIRS} ${install_docdir}
 	${INSTALL_DATA} singular.idx ${install_docdir}
+	${INSTALL_DATA} COPYING.txt ${install_prefix}/COPYING
+	${INSTALL_DATA} COPYING.html ${install_prefix}
+	${INSTALL_DATA} NEWS.txt ${install_prefix}/NEWS
+	${INSTALL_DATA} NEWS.html ${install_prefix}
 
 install-bindist: INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
 	${MKINSTALLDIRS} ${install_prefix}

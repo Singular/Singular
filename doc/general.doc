@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.164 1999-12-02 13:52:50 obachman Exp $
+@comment $Id: general.doc,v 1.165 1999-12-03 11:20:45 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -369,7 +369,9 @@ the current line and prompts for further action.  The following choices
 are available:
 @table @code
 @item a
-returns to the top level after finishing the current command
+returns to the top level after finishing the current (kernel) command. Notice
+that commands of the @sc{Singular} kernel (like @code{std}) can not be
+aborted, i.e. (@code{a})bort only happens whenever the interpreter is active.
 @item c
 continues
 @item q
@@ -974,19 +976,19 @@ there are the following options which are special to @code{ESingular}:
 @item @code{--emacs=EMACS}
 @tab Use @code{EMACS} as Emacs program to run the @sc{Singular} Emacs
 interface.
-@tab EMACS
+@tab ESINGULAR_EMACS
 
 @item @code{--emacs-dir=DIR}
 @tab Set the singular-emacs-home-directory to @code{DIR}.
-@tab SINGULAR_EMACS_DIR
+@tab ESINGULAR_EMACS_DIR
 
 @item @code{--emacs-load=FILE}
 @tab Load @code{FILE} on Emacs start-up, instead of the default load file.
-@tab SINGULAR_EMACS_LOAD
+@tab ESINGULAR_EMACS_LOAD
 
 @item @code{--singular=PROG}
 @tab Start @code{PROG} as @sc{Singular} program within Emacs
-@tab SINGULAR
+@tab ESINGULAR_SINGULAR
 
 @end multitable
 
@@ -1070,7 +1072,7 @@ interface}.
 @item @code{singular-exit-singular} (bound to @code{C-c $} or menu
 @code{Singular}, item @code{Exit})
 
-interrupts and kills the running @sc{Singular} process of the current
+kills the running @sc{Singular} process of the current
 buffer (but does not kill the buffer). Once you have killed a
 @sc{Singular} process you can start a new one in the same buffer with
 the command @code{singular} (or select the item @code{Start default} of
@@ -1083,10 +1085,13 @@ kills the running @sc{Singular} process of the current buffer and starts
 a new process in the same buffer with exactly the same command line
 arguments as before.
 
-@end itemize
+@item @code{singular-control-c} (bound to @code{C-c C-c} or menu @code{Singular}, item @code{Interrupt})
 
-An important difference of the Emacs interface is that @code{C-c} does
-not interrupt @sc{Singular}. TBC !!!!
+Interrupt the Singular process running in the current buffer. Asks
+whether to (@code{a})bort the current @sc{Singular} command,
+(@code{q})uit or (@code{r})estart the current @sc{Singular} process, or
+(@code{c})ontinue without doing anything (default).
+@end itemize
 
 Whenever a @sc{Singular} process is started within the Emacs interface,
 the contents of a special startup file (by default

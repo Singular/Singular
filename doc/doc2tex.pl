@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.20 1999-11-29 12:56:07 obachman Exp $
+# $Id: doc2tex.pl,v 1.21 1999-12-03 11:20:44 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -246,7 +246,7 @@ sub HandleExample
   {
     $line++;
     last if (/^\@c\s*example\s*$/);
-    s/^\s*//; # remove preceeding white spaces
+#    s/^\s*//; # remove preceeding white spaces
     if ($no_ex || $no_comp)
     {
       &protect_texi;
