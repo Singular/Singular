@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.2 2001-02-01 15:14:21 mschulze Exp $ */
+/* $Id: units.cc,v 1.3 2001-02-01 15:54:45 mschulze Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
@@ -36,55 +36,50 @@ BOOLEAN isunit(matrix U)
 
 BOOLEAN invunit(leftv res,leftv h)
 {
-  if(h!=NULL)
+  if(h!=NULL&&h->Typ()==INT_CMD)
   {
-    if(h->Typ()==POLY_CMD)
+    int n=(int)h->Data();
+    h=h->next;
+    if(h!=NULL)
     {
-      poly u=(poly)h->Data();
-      if(!isunit(u))
+      if(h->Typ()==POLY_CMD)
       {
-        WerrorS("unit expected");
-        return TRUE;
-      }
-      h=h->next;
-      if(h!=NULL&&h->Typ()==INT_CMD)
-      {
-        int n=(int)h->Data();
+        poly u=(poly)h->Data();
+        if(!isunit(u))
+        {
+          WerrorS("unit expected");
+          return TRUE;
+        }
         res->rtyp=POLY_CMD;
-        res->data=(void*)invunit(pCopy(u),n);
+        res->data=(void*)invunit(n,pCopy(u));
         return FALSE;
       }
-    }
-    if(h->Typ()==MATRIX_CMD)
-    {
-      matrix U=(matrix)h->Data();
-      if(!isunit(U))
+      if(h->Typ()==MATRIX_CMD)
       {
-        WerrorS("diagonal matrix of units expected");
-        return TRUE;
-      }
-      h=h->next;
-      if(h!=NULL&&h->Typ()==INT_CMD)
-      {
-        int n=(int)h->Data();
+        matrix U=(matrix)h->Data();
+        if(!isunit(U))
+        {
+          WerrorS("diagonal matrix of units expected");
+          return TRUE;
+        }
         res->rtyp=MATRIX_CMD;
-        res->data=(void*)invunit(mpCopy(U),n);
+        res->data=(void*)invunit(n,mpCopy(U));
         return FALSE;
       }
-    }
-  }
-  WerrorS("[<poly>|<matrix>],<int> expected");
+    } 
+ }
+  WerrorS("<int>,[<poly>|<matrix>] expected");
   return TRUE;
 }
 
-poly pjet(poly p,int n)
+poly pjet(int n,poly p)
 {
   poly p0=pJet(p,n);
   pDelete(&p);
   return p0;
 }
 
-poly invunit(poly u, int n)
+poly invunit(int n,poly u)
 {
   if(n<0)
     return NULL;
@@ -93,14 +88,14 @@ poly invunit(poly u, int n)
   pSetCoeff(v,u0);
   if(n==0)
     return v;
-  poly u1=pjet(pSub(pOne(),pMult_nn(u,u0)),n);
+  poly u1=pjet(n,pSub(pOne(),pMult_nn(u,u0)));
   if(u1==NULL)
     return v;
   poly v1=pMult_nn(pCopy(u1),u0);
   v=pAdd(v,pCopy(v1));
   for(int i=n/pTotaldegree(u1);i>1;i--)
   {
-    v1=pjet(pMult(v1,pCopy(u1)),n);
+    v1=pjet(n,pMult(v1,pCopy(u1)));
     v=pAdd(v,pCopy(v1));
   }
   pDelete(&u1);
@@ -108,85 +103,102 @@ poly invunit(poly u, int n)
   return v;
 }
 
-matrix invunit(matrix U,int n)
+matrix invunit(int n,matrix U)
 {
   for(int i=MATCOLS(U);i>=1;i--)
-    MATELEM(U,i,i)=invunit(MATELEM(U,i,i),n);
+    MATELEM(U,i,i)=invunit(n,MATELEM(U,i,i));
   return U;
 }
 
 BOOLEAN series(leftv res,leftv h)
 {
-  if(h!=NULL)
+  if(h!=NULL&&h->Typ()==INT_CMD)
   {
-    if(h->Typ()==POLY_CMD||h->Typ()==VECTOR_CMD)
+    int n=(int)h->Data();
+    h=h->next;
+    if(h!=NULL)
     {
-      int typ=h->Typ();
-      poly p=(poly)h->Data();
-      h=h->next;
-      if(h!=NULL&&h->Typ()==POLY_CMD)
+      if(h->Typ()==POLY_CMD||h->Typ()==VECTOR_CMD)
       {
-        poly u=(poly)h->Data();
-        if(!isunit(u))
-        {
-          WerrorS("unit expected");
-          return TRUE;
-        }
+        int typ=h->Typ();
+        poly p=(poly)h->Data();
         h=h->next;
-        if(h!=NULL&&h->Typ()==INT_CMD)
-        {
-          int n=(int)h->Data();
+        if(h==NULL)
+	{
           res->rtyp=typ;
-          res->data=(void*)series(pCopy(p),pCopy(u),n);
+          res->data=(void*)series(n,pCopy(p));
+          return FALSE;
+	}
+        if(h->Typ()==POLY_CMD)
+        {
+          poly u=(poly)h->Data();
+          if(!isunit(u))
+          {
+            WerrorS("unit expected");
+            return TRUE;
+          }
+          res->rtyp=typ;
+          res->data=(void*)series(n,pCopy(p),pCopy(u));
           return FALSE;
         }
       }
-    }
-    if(h->Typ()==IDEAL_CMD||h->Typ()==MODUL_CMD)
-    {
-      int typ=h->Typ();
-      ideal M=(ideal)h->Data();
-      h=h->next;
-      if(h!=NULL&&h->Typ()==MATRIX_CMD)
+      if(h->Typ()==IDEAL_CMD||h->Typ()==MODUL_CMD)
       {
-        matrix U=(matrix)h->Data();
-        if(!isunit(U))
-        {
-          WerrorS("diagonal matrix of units expected");
-          return TRUE;
-        }
-        if(IDELEMS(M)!=MATROWS(U))
-        {
-          WerrorS("incompatible matrix size");
-          return TRUE;
-        }
+        int typ=h->Typ();
+        ideal M=(ideal)h->Data();
         h=h->next;
-        if(h!=NULL&&h->Typ()==INT_CMD)
+        if(h==NULL)
         {
-          int n=(int)h->Data();
           res->rtyp=typ;
-          res->data=(void*)series(idCopy(M),mpCopy(U),n);
+          res->data=(void*)series(n,idCopy(M));
+          return FALSE;
+        }
+        if(h->Typ()==MATRIX_CMD)
+        {
+          matrix U=(matrix)h->Data();
+          if(!isunit(U))
+          {
+            WerrorS("diagonal matrix of units expected");
+            return TRUE;
+          }
+          if(IDELEMS(M)!=MATROWS(U))
+          {
+            WerrorS("incompatible matrix size");
+            return TRUE;
+          }
+          res->rtyp=typ;
+          res->data=(void*)series(n,idCopy(M),mpCopy(U));
           return FALSE;
         }
       }
     }
   }
-  WerrorS("[<poly>,<poly>|<ideal>,<matrix>],<int> expected");
+  WerrorS("<int>,[<poly>[,<poly>]|<ideal>[,<matrix>]] expected");
   return TRUE;
 }
 
-poly series(poly p,poly u,int n)
+poly series(int n,poly p,poly u=NULL)
 {
   if(p!=NULL)
-    p=pjet(pMult(p,invunit(u,n-pTotaldegree(p))),n);
+    if(u==NULL)
+      p=pjet(n,p);
+    else
+      p=pjet(n,pMult(p,invunit(n-pTotaldegree(p),u)));
   return p;
 }
 
-ideal series(ideal M,matrix U,int n)
+ideal series(int n,ideal M,matrix U=NULL)
 {
   for(int i=IDELEMS(M)-1;i>=0;i--)
-    M->m[i]=series(M->m[i],pCopy(MATELEM(U,i+1,i+1)),n);
-  idDelete((ideal*)&U);
+    if(U==NULL)
+      M->m[i]=series(n,M->m[i]);
+    else
+    {
+      M->m[i]=series(n,M->m[i],MATELEM(U,i+1,i+1));
+      MATELEM(U,i+1,i+1)=NULL;
+    }
+  if(U!=NULL)
+    idDelete((ideal*)&U);
   return M;
 }
 
@@ -254,7 +266,7 @@ BOOLEAN rednf(leftv res,leftv h)
       }
     }
   }
-  WerrorS("<ideal>,[<ideal>|<poly>][,<matrix>] expected");
+  WerrorS("<ideal>,[<ideal>[,<matrix>]|<poly>[,<poly>]] expected");
   return TRUE;
 }
 
