@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.274 2002-02-06 08:52:21 Singular Exp $ */
+/* $Id: iparith.cc,v 1.275 2002-02-25 18:13:45 mschulze Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4813,6 +4813,104 @@ static BOOLEAN jjCOEF_M(leftv res, leftv v)
     (matrix *)&(c->data.umatrix),(matrix *)&(m->data.umatrix));
   return FALSE;
 }
+
+static BOOLEAN jjDIVISION4(leftv res, leftv v)
+{
+  int typ=v->Typ();
+  if(v->Typ()!=MODUL_CMD&&v->Typ()!=IDEAL_CMD)
+  {
+    Warn("1st argument must be an ideal or module!");
+    return TRUE;
+  }
+  ideal P=(ideal)v->Data();
+  v=v->next;
+  if(v->Typ()!=typ)
+  {
+    Warn("2nd argument must be an ideal or module!");
+    return TRUE;
+  }
+  assumeStdFlag(v);
+  ideal Q=(ideal)v->Data();
+  v=v->next;
+  if(v->Typ()!=INT_CMD)
+  {
+    Warn("3rd argument must be an int!");
+    return TRUE;
+  }
+  int n=(int)v->Data();
+  v=v->next;
+  if(v->Typ()!=INTVEC_CMD)
+  {
+    Warn("4th argument must be an intvec!");
+    return TRUE;
+  }
+  short *w=iv2array((intvec *)v->Data());
+
+  int N=0;
+  for(int i=IDELEMS(Q)-1;i>=0;i--)
+    N=max(N,pDegW(Q->m[i],w));
+  N+=n;
+
+  matrix T=mpNew(IDELEMS(Q),IDELEMS(P));
+  ideal R=idInit(IDELEMS(P),P->rank);
+  matrix U=mpNew(P->rank,P->rank);
+  for(int i=MATROWS(U);i>=1;i--)
+    MATELEM(U,i,i)=pOne();
+
+  for(int i=IDELEMS(P)-1;i>=0;i--)
+  {
+    poly p=ppJetW(P->m[i],N,w);
+
+    int j=IDELEMS(Q)-1;
+    while(p!=NULL)
+    {
+      if(pDivisibleBy(Q->m[j],p))
+      {
+        poly p0=pDivideM(pHead(p),pHead(Q->m[j]));
+        if(pDegW(p0,w)>n)
+          pDelete(&p0);
+	else
+          MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
+        p0=ksOldSpolyRed(Q->m[j],p,0);
+        p=ppJetW(p0,N,w);
+        pDelete(&p0);
+        j=IDELEMS(Q)-1;
+      }
+      else
+      {
+        if(j==0)
+        {
+	  poly p0=p;
+	  pIter(p);
+          pNext(p0)=NULL;
+	  if(pDegW(p0,w)>n)
+            pDelete(&p0);
+	  else
+            R->m[i]=pAdd(R->m[i],p0);
+          j=IDELEMS(Q)-1;
+        }
+        else
+          j--;
+      }
+    }
+  }
+
+  omFree(w);
+
+  lists L=(lists)omAllocBin(slists_bin);
+  L->Init(3);
+  L->m[0].rtyp=MATRIX_CMD;
+  L->m[0].data=(void *)T;
+  L->m[1].rtyp=MATRIX_CMD;
+  L->m[1].data=(void *)U;
+  L->m[2].rtyp=typ;
+  L->m[2].data=(void *)R;
+  res->data=L;
+  res->rtyp=LIST_CMD;
+
+  return FALSE;
+}
+
 static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
 {
   int s=1;
