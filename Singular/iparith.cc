@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.149 1999-06-04 13:07:30 pohl Exp $ */
+/* $Id: iparith.cc,v 1.150 1999-06-07 15:46:05 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2697,7 +2697,10 @@ static BOOLEAN jjpHead(leftv res, leftv v)
 static BOOLEAN jjL2R(leftv res, leftv v)
 {
   res->data=(char *)syConvList((lists)v->Data());
-  return FALSE;
+  if (res->data != NULL)
+    return FALSE;
+  else
+    return TRUE;
 }
 static BOOLEAN jjLEADCOEF(leftv res, leftv v)
 {

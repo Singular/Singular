@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.36 1998-11-21 13:55:43 siebert Exp $ */
+/* $Id: syz1.cc,v 1.37 1999-06-07 15:46:02 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2439,14 +2439,23 @@ syStrategy syConvList(lists li,BOOLEAN toDel)
   syStrategy result=(syStrategy)Alloc0(sizeof(ssyStrategy));
 
   resolvente fr = liFindRes(li,&(result->length),&typ0,&(result->weights));
-  result->fullres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
-  for (int i=result->length-1;i>=0;i--)
+  if (fr != NULL)
   {
-    if (fr[i]!=NULL)
-      result->fullres[i] = idCopy(fr[i]);
+    
+    result->fullres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
+    for (int i=result->length-1;i>=0;i--)
+    {
+      if (fr[i]!=NULL)
+        result->fullres[i] = idCopy(fr[i]);
+    }
+    result->list_length=result->length;
+    Free((ADDRESS)fr,(result->length)*sizeof(ideal));
   }
-  result->list_length=result->length;
-  Free((ADDRESS)fr,(result->length)*sizeof(ideal));
+  else
+  {
+    Free (result, sizeof(ssyStrategy));
+    result = NULL;
+  }
   if (toDel) li->Clean();
   return result;
 }
