@@ -6,18 +6,11 @@
 # AUTHOR:  hannes
 # CREATED: May 2003
 #
-###########################################################################
-
-egrep="egrep"
-uname_a=`uname -a`
-devnull='/dev/null'
-file=file
-binary='/bin/ls'
-ldd='ldd'
+#####################################################
 
 if test x$CC = x
 then
-CC=cc
+  CC=cc
 fi
 cat >tmp.c <<EOF
 int main() {
@@ -32,5 +25,12 @@ printf("unknown\n");
 exit(0); }
 EOF
 $CC tmp.c
-./a.out
-/bin/rm -f a.out tmp.c
+if test -e ./a.out; then
+  ./a.out
+  /bin/rm -f a.out tmp.c
+elif test -e a.exe; then
+  ./a.exe
+  /bin/rm -f tmp.c a.exe
+else
+  echo run_unknown
+fi
