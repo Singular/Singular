@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.32 2001-08-27 14:46:57 Singular Exp $ */
+/* $Id: feResource.cc,v 1.33 2002-01-29 17:26:47 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -11,6 +11,10 @@
 #include <string.h>
 
 #include "mod2.h"
+#ifdef AIX_4
+#define HAVE_PUTENV 1
+#endif
+
 #include "distrib.h"
 #include "dError.h"
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
@@ -189,12 +193,19 @@ void feInitResources(char* argv0)
   // don't complain about stuff when initializing SingularPath
   feResource('s',0);
 
-#ifdef HAVE_SETENV
+#if defined(HAVE_SETENV) || defined(HAVE_PUTENV)
   char* path = feResource('p');
 #ifdef RESOURCE_DEBUG
   printf("feInitResources: setting path with argv0=%s=\n", path);
 #endif
+#ifdef HAVE_PUTENV
+  if (path != NULL) { char *s=(char *)omAlloc0(strlen(path)+6);
+                      sprintf(s,"PATH=%s",path);
+                      putenv(s);
+                    }
+#else
   if (path != NULL) setenv("PATH", path, 1);
+#endif
 #endif
 }
 
