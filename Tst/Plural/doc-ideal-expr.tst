@@ -10,13 +10,14 @@ ideal i = x*y*z , f-g, g*(x-y) + f^4 ,0, 2x-z2y;
 ideal M = i + maxideal(10);
 timer =0;
 i = M*M;
-timer;
+tst_ignore(timer, "time");
 ncols(i);
 timer =0;
 i = M^2;
 ncols(i);
-timer;
+tst_ignore(timer, "time");
 i[ncols(i)];
 vector v = [x,y-z,x2,y-x,x2yz2-y];
 ideal j = ideal(v);
+j;
 tst_status(1);$
