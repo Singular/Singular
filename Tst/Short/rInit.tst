@@ -37,5 +37,5 @@ ring r = 0, (a, var(1), b, var(2)), dp; r; maxideal(1);
 ring r = 0, (a, var(1), b, var(2), "c"), dp; r; maxideal(1);
 kill r; kill i;
 tst_status(1);
-exit;
+$
 
