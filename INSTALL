@@ -1,4 +1,4 @@
-			 Singular version 1.2
+			 Singular version <x.y.z>
 		     University of Kaiserslautern
      Department of Mathematics   Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
@@ -17,10 +17,9 @@ Singular-<x.y.z>-share.tar.gz
 Singular-<x.y.z>-<uname description>.tar.gz
    -- contains architecture dependent executables, like the Singular program
 
-where <x.y.z> is the version number of Singular (e.g., 1.2.0) and 
-<uname description> is a description of the processor and operating
-system for which Singular is compiled (e.g, ix86-Linux). 
-You can obtain these files from  
+where <uname description> is a description of the processor and
+operating system for which Singular is compiled (e.g, ix86-Linux).
+You can obtain these files from
 ftp://www.mathematik.uni-kl.de/pub/Math/Singular/.
 
 IMPORTANT
@@ -39,7 +38,7 @@ the architecture-dependent files for those architectures you use.
 
   cd /usr/local/	# or wherever you install 3rd-party software
   gzip -dc Singular-<x.y.z>-share.tar.gz | tar -pxf -
-  gzip -dc Singular-<x.y.z>-<uname description> | tar -pxf -
+  gzip -dc Singular-<x.y.z>-<uname description>.tar.gz | tar -pxf -
 
 Replace `/usr/local/' with what you like, but it probably ought not
 have `Singular' or a version number in it - that directory is expected
@@ -137,9 +136,8 @@ TROUBLES
   (2) Check whether the directories containing the libraries and
       info-file can be found by Singular: If $bindir denotes the
       directory where the Singular executable resides, then Singular
-      looks for library files as follows (<x.y.z> stands for the
-      actual version):
-      1.) In all paths specified by the environment variable SINGULARPATH
+      looks for library files as follows:
+      1.) In all dirs specified by the environment variable SINGULARPATH
       2.) $bindir/LIB
       3.) $bindir/LIB/<x.y.z>
       4.) $bindir/../../Singular/LIB
@@ -148,14 +146,14 @@ TROUBLES
       7.) /usr/local/Singular/LIB/<x.y.z>
       The info-file, i.e., the file singular.hlp is looked for at the
       following places: 
-      1.) $bindir/../doc/singular.hlp
-      2.) $bindir/../info/singular.hlp
-      3.) $bindir/../../Singular/doc/<x.y.z>/singular.hlp
-      4.) $bindir/../../Singular/doc/singular.hlp
-      5.) $bindir/../../info/singular.hlp
-      6.) /usr/local/Singular/doc/<x.y.z>/singular.hlp
-      7.) /usr/local/Singular/doc/singular.hlp
-      8.) /usr/local/info/singular.hlp
+      1.) $bindir/../doc/
+      2.) $bindir/../info/
+      3.) $bindir/../../Singular/doc/<x.y.z>/
+      4.) $bindir/../../Singular/doc/
+      5.) $bindir/../../info/
+      6.) /usr/local/Singular/doc/<x.y.z>/
+      7.) /usr/local/Singular/doc/
+      8.) /usr/local/info/
       9.) In all directories contained in the Singular SearchPath.
   (3) As a last resort, you can set the environment variable
       SINGULARPATH, so that the directories containing the Singular
@@ -163,7 +161,9 @@ TROUBLES
       SINGULARPATH. 
   You can inspect the used SearchPath and info-file by starting up
   Singular with the `-v' option, or  by issuing the command
-  `system("with")'. 
+  `system("with")'. Use colons (i.e., `:') for directory separators
+  within the SINGULARPATH.
+
       
 * General: Singular can not find the `info' program:
   Install the info program on your system -- see the section 

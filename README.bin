@@ -1,11 +1,11 @@
-			 Singular version 1.2
+		       Singular version <x.y.z>
 		     University of Kaiserslautern
      Department of Mathematics        Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
 		  (C) 1986-1998 All Rights Reserved
 
-      README FILE FOR THE SINGULAR EXECUTABLE DISTRIBUTION
-      ====================================================
+	 README FILE FOR THE SINGULAR EXECUTABLE DISTRIBUTION
+	 ====================================================
 
 IMPORTANT: 
 ==========
@@ -29,9 +29,9 @@ This distribution contains the following files and subdirectories
   ./Singular/README.general			general Singular info 
   ./Singular/README.bin				this file
 
-where <x.y.z> stands for the Singular version number (e.g., 1.2.0) and 
-<uname description> is a description of the processor and operating
-system for which the Singular executable is compiled (e.g, ix86-Linux).
+where <uname description> is a description of the processor and
+operating system for which the Singular executable is compiled (e.g,
+ix86-Linux).
 
 Note that this distribution does not contain architecture-independent
 data files (like the Singular libraries or documentation files) which 

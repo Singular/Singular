@@ -1,14 +1,11 @@
-			 Singular version 1.2
+			 Singular version <
 		     University of Kaiserslautern
      Department of Mathematics        Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
 		  (C) 1986-1998 All Rights Reserved
 
-      README FILE FOR THE SINGULAR WINDOWS 95/NT DISTRIBUTION
-      ========================================================
-
-TBC
-
+       README FILE FOR THE SINGULAR WINDOWS 95/NT DISTRIBUTION
+       ========================================================
 
 IMPORTANT: 
 ==========
@@ -24,28 +21,16 @@ ABOUT THIS DISTRIBUTION
 =======================
 This distribution contains the following files and subdirectories
 
-  ./<uname description>/bin/Singular-<x.y.z>	Singular executable
-  ./<uname description>/bin/Singular            soft link to executable
-  ./<uname description>/bin/libparse            parser for Singular libraries
-  ./Singular/INSTALL				installation instructions
-  ./Singular/COPYING				licence information
-  ./Singular/README.general			general Singular info 
-  ./Singular/README.bin				this file
-
-where <x.y.z> stands for the Singular version number (e.g., 1.2.0) and 
-<uname description> is a description of the processor and operating
-system for which the Singular executable is compiled (e.g, ix86-Linux).
-
-Note that this distribution does not contain architecture-independent
-data files (like the Singular libraries or documentation files) which 
-you need to successfully install Singular.
-
-You can get the architecture-independent data files from
-    ftp://www.mathematik.uni-kl.de/pub/Math/Singular
-by downloading the file
-    Singular-<x.y.z>-share.tar.gz
-See the INSTALL file contained in this distribution for instructions
-on how to install Singular.
+  ./Singular/<x.y.z>/Singular.exe	Singular executable
+  ./Singular/<x.y.z>/libparse.exe       parser for Singular libraries
+  ./Singular/LIB/<x.y.z>/		Singular libraries
+  ./Singular/gftables/                  Singular gftables
+  ./Singular/doc/<x.y.z>/		documentation (ps, dvi, info)
+  ./Singular/html/<x.y.z>/		documentation (html)
+  ./Singular/INSTALL			installation instructions
+  ./Singular/COPYING			licence information
+  ./Singular/README.general		general Singular info 
+  ./Singular/README			this file
 
 More information about Singular: Comments, Questions, Bug Reports
 =================================================================

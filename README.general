@@ -1,15 +1,15 @@
-			 Singular version 1.2
+		       Singular version <x.y.z>
 		     University of Kaiserslautern
      Department of Mathematics        Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
 		  (C) 1986-1998 All Rights Reserved
 
-      GENERAL README FILE FOR THE SINGULAR DISTRIBUTION
-      =================================================
+	  GENERAL README FILE FOR THE SINGULAR DISTRIBUTION
+	  =================================================
 
 DOWNLOADING, INSTALLATION, LICENSING:
 =====================================
-You can downloadS the Singular executable by public ftp from
+You can download the Singular as executables program by public ftp from
    ftp://www.mathematik.uni-kl.de/pub/Math/Singular
 or, by http from
    http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/

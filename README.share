@@ -1,4 +1,4 @@
-			 Singular version 1.2
+		       Singular version <x.y.z>
 		     University of Kaiserslautern
      Department of Mathematics        Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
@@ -27,8 +27,6 @@ This distribution contains the following files and subdirectories
   ./Singular/README.general                     general Singular info
   ./Singular/README.share			this file
 
-where <x.y.z> stands for the Singular version number (e.g., 1.2.0).
-  	
 Note that this distribution does not contain the Singular
 executables. Instead, it contains only architecture-independent data.
 

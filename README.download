@@ -41,17 +41,18 @@ and then unpack the architecture independent tar file, followed by
 the architecture-dependent files for those architectures you use:
 
   cd /usr/local/	# or wherever you install 3rd-party software
-  gzip -dc Singular-<x.y.z>-share.tar.gz | tar -pxf -
-  gzip -dc Singular-<x.y.z>-<uname description> | tar -pxf -
+  gzip -dc Singular-1.2.0-share.tar.gz | tar -pxf -
+  gzip -dc Singular-1.2.0-<uname description>.tar.gz | tar -pxf -
 
 You may replace `/usr/local/' with what you like, but refer to the
-INSTALL which is contained in the architecture-dependent tar file (and which
-you can find at ./Singular/INSTALL after unpacking) for 
+INSTALL file which is contained in the architecture-dependent tar file
+(and which you can find at ./Singular/INSTALL after unpacking) for
 detailed information on how to install Singular.
 
-To download Singular for Windows 95 or Windows NT platform:
-==========================================================
-TBC
+To download Singular for Windows 95/NT 
+======================================
+
+
 
 To download Singular for the Macintosh:
 =======================================

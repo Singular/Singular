@@ -1,50 +1,50 @@
 			 Singular version 1.2
 		     University of Kaiserslautern
-     Department of Mathematics   Centre for Computer Algebra
+       Department of Mathematics   Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
 		  (C) 1986-1998 All Rights Reserved
 
-	     WINDOWS 95/NT INSTALLATION INSTRUCTIONS FOR SINGULAR
-	     =====================================================
+	 WINDOWS 95/NT INSTALLATION INSTRUCTIONS FOR SINGULAR
+	=====================================================
 
-TBC 
-
-To install Singular on a Unix platform, you need at least the
-following two files: 
-
-Singular-<x.y.z>-share.tar.gz 
-   -- contains architecture-independent data like documentation or libraries
-
-Singular-<x.y.z>-<uname description>.tar.gz
-   -- contains architecture dependent executables, like the Singular program
-
-where <x.y.z> is the version number of Singular (e.g., 1.2.0) and 
-<uname description> is a description of the processor and operating
-system for which Singular is compiled (e.g, ix86-Linux). 
-You can obtain these files from  
-ftp://www.mathematik.uni-kl.de/pub/Math/Singular/.
+To install Singular on for Windows 95/NT, you need the file
+		    Singular-<x-y-z>-ix86-Win.zip
+which you can obtain by public ftp from
+      ftp://www.mathematik.uni-kl.de/pub/Math/Singular/.
 
 TO INSTALL SINGULAR
 ===================
-Simply cd to the directory in which you wish to install SINGULAR,
-and then unpack the architecture independent tar file, followed by
-the architecture-dependent files for those architectures you use.
+If you have a Windows unzip utility program (like WinZip) installed
+on your system then simply double-click on the file
+`Singular-<x-y-z>-ix86-Win.zip' and extract the content of the archive 
+at a directory in which you usually install 3rd-party software.
 
-  cd /usr/local/	# or wherever you install 3rd-party software
-  gzip -dc Singular-<x.y.z>-share.tar.gz .tar.gz | tar -pxf -
-  gzip -dc Singular-<x.y.z>-<uname description> | tar -pxf -
+Otherwise, download the file `unzip.exe' from
+   ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils 
+start an MS-DOS shell, move the Singular archive and unzip program to
+a place in which you usually install 3rd-party software and extract
+(unpack) the archive with the command:
+  unzip Singular-<x-y-z>-ix86-Win.zip
 
-Replace `/usr/local/' with what you like, but it probably ought not
-have `Singular' or a version number in it - that directory is expected
+For both extraction methods, it is VERY IMPORTANT that the path
+leading to the directory where you extract the Singular archive does
+not contain names which are longer than 8 characters and/or
+which contain dots or white spaces (i.e., the names must conform with
+MS-DOS filename conventions). Otherwise, the on-line help system will
+not work.
+
+The directory where you extract the Singular archive is expected
 to be the common prefix for installed software, and Singular-specific
 subdirectories of it will be created.  The directories are arranged
 in such a way that multiple versions of Singular can peaceably coexist
-under the same `/usr/local/' tree.
+under the same root.  
 
 After unpacking, you will have a directory structure like:
 
-  ./<uname description>/bin/Singular-<x.y.z>	executable(s)
-  ./info/singular.hlp				info file
+  ./Singular/<x.y.z>/Singular.exe		Singular executable
+  ./Singular/<x.y.z>/cygwinb19.dll		CYGWIN DLL Library
+  ./Singular/<x.y.z>/info.exe                   info program
+  ./Singular/<x.y.z>/sh.exe                     sh program
   ./Singular/LIB/<x.y.z>/			Singular libraries
   ./Singular/doc/<x.y.z>/			documentation (ps, dvi, info)
   ./Singular/html/<x.y.z>/			documentation (html)
@@ -57,70 +57,102 @@ documentation are.  These constraints on the local directory layout
 are necessary to avoid having to hardcode pathnames into the
 executables, or require that environment variables be set before
 running the executable. In particular, you should not move or copy
-the Singular executables to another place, but use soft-links
-instead. For example, to install Singular on your system, use
-something like:
- ln -s `pwd`./<uname description>/bin/Singular-<x.y.z> /usr/local/bin/Singular
+the Singular executables to another place.
 
+RUNNING SINGULAR
+=================
+The easiest way to start-up Singular is to double-click on the
+`Singular.exe' file from your desktop. 
 
-TO INSTALL THE ON-LINE DOCUMENTATION
-=====================================
-Singular needs the `info' program for its on-line documentation. If
-you do not have the `info' program installed on your system, you may
-obtain it from
-ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/
-by downloading the respective info-<uname description>.tar.gz file.
+You can also start-up Singular from an MS-DOS or Bash/Sh
+shell. However, for the latter case, you need to add the directory 
+where the file `Singular.exe' resides to your PATH variable (unless
+you cd to that directory each time before you start Singular). Use the 
+following commands: For the MS-DOS shell
+  set PATH=%PATH%;<place where you extracted Singular>\Singular\<x.y.z>
+or, for the Bash/Sh shell
+  export PATH=$PATH:<place where you extracted Singular>/Singular/<x.y.z>
+You also might want to adjust your personal start-up files accordingly, 
+so that the PATH variable is set automatically each time you login.
 
-To install, simply cd to the directory where you unpacked the other
-tar files and then unpack the info tar file.
+Alternatively, you can copy the DLL library
+`./Singular/<x.y.z>/cygwinb19.dll' to a standard place on your system
+(like /WIN32), so that it is automatically when Singular is started
+up.
 
-  cd /usr/local/      # i.e., wherever you have unpacked Singular tar files
-  gzip -dc info-<uname description>.tar.gz | tar -pxf -
-
-This adds
-  ./<uname description>/bin/info		info program
-to the above directory structure and ensures that the `info' program
-is found at run-time.
+Furthermore, you might want to check the settings of your I/O
+window(s), and adjust them, if necessary, so that cutting and pasting
+of is enabled.
 
 
 TROUBLES
 =========
 
-* For HPUX systems: 
-  The /etc/termcap files which are pre-installed on these systems are
-  broken which leads to messages like
+* Singular complains that it can not find `cygwinb19.dll':
+  Make sure that the DLL library `cygwinb19.dll' which is included in
+  the distribution at `./Singular/<x.y.z>/' was either copied to a
+  standard place on your system (like /WIN32), or that your PATH
+  variable contains the directory where this library resides. See
+  above for more details.
 
-   Name collision between 9826 9836
+* Singular can not find its Singular libraries :
+  (1) Start up Singular, and issue the command `system("Singular");'.
+      If this does not return the correct and expanded location of the 
+      Singular executable, then you found a bug in Singular, which we
+      ask you to report (see below).
+  (2) Check whether the directory containing the libraries can be
+      found by Singular: If $bindir denotes the directory where the
+      Singular executable resides, then Singular looks for library
+      files as follows:
+      1.) In all dirs specified by the environment variable SINGULARPATH
+      2.) $bindir/LIB
+      3.) $bindir/LIB/<x.y.z>
+      4.) $bindir/../../Singular/LIB
+      5.) $bindir/../../Singular/LIB/<x.y.z>
+      6.) /Singular/LIB/
+      7.) /Singular/LIB/<x.y.z>
+      If one of these directories exists, then it is appended to the
+      Singular SearchPath (in that order) and libraries are looked for 
+      in all directories contained in the Singular SearchPath. You can 
+      inspect the used SearchPath by starting up Singular with the -v
+      option, or by issuing the command `system("with")'. 
+  (3) As a last resort, you can set the environment variable
+      SINGULARPATH, so that the directories containing the Singular
+      libraries and info-files are contained in the value of
+      SINGULARPATH. Use semicolons (i.e., `;') for directory
+      separators within the SINGULARPATH.
 
-  when Singular is started. To fix this, you can get fixed termcap
-  files from 
-  ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils
-  by downloading the files termcap-<uname-description> and either
-  replace your /etc/termcap file by the file found there, or view, and 
-  redo the respective changes by diff'ing the downloaded and the
-  original file.
-
-* For Linux systems:
-  Due to some incompatibilities of shared libraries, the start-up of
-  Singular might fail with messages like 
-    
-   Can not find shared library ....
-
-  To fix this, download and install
-   
-   Singular-<x.y.z>-<uname description>-static.tar.gz 
- 
-  which contains statically linked executables.
-
-* For AIX systems:
-  The default 'info' program of the system is not GNU's hypertext
-  system which we need to display the on-line documentation. Therefore,
-  the distribution of the AIX executable already contains the 'info'
-  program we need. If you remove this program, make sure that the GNU
-  info program is executed if you call 'info' from your shell.
+* Singular can not display its on-line help.
+  (1) Make sure Singular can find its Singular libraries.
+  (2) Check whether the `info.exe' program contained in the
+      distribution resides at the same place as the `Singular.exe'
+      file.
+  (3) Issue the command `system("with")' and verify that the reported
+      "InfoProgram" exists and can be executed.
+  (4) Check whether the directory containing the file `singular.hlp'
+      can be found by Singular: If $bindir denotes the directory where
+      the Singular executable resides, then Singular looks for the
+      file 'singular.hlp' at the following places (in the specified
+      order): 
+      1.) $bindir/../doc/
+      2.) $bindir/../info/
+      3.) $bindir/../../Singular/doc/<x.y.z>/
+      4.) $bindir/../../Singular/doc/
+      5.) $bindir/../../info/
+      6.) /Singular/doc/<x.y.z>/
+      7.) /Singular/doc/
+      8.) /info/
+      9.) In all directories contained in the Singular SearchPath.
+  (5) Make sure that the path leading $bindir does not contain names
+      which are longer than 8 characters and/or which contain dots or
+      white spaces (i.e., the names must conform with MS-DOS filename
+      conventions). 
 
 * For any other troubles, please send mail to
-   singular@mathematik.uni-kl.de
+        singular@mathematik.uni-kl.de 
+  and include the header which is displayed by starting up Singular
+  with the `-v' option.
+
 
 More information about Singular: Comments, Questions, Bug Reports
 =================================================================
