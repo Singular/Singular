@@ -108,7 +108,7 @@ clean:
 	cd ${hdir}; ${CLEAN}
 
 uninstall: 
-	rm -f $(libdir)/libMP.a $(includedir)/MP.h
+	rm -f $(libdir)/libMP.a $(includedir)/MP.h $(includedir)/MP_Config.h
 	- rmdir $(libdir) $(includedir)
 
 distclean: clean  
@@ -118,7 +118,7 @@ maintainer-clean: distclean
 	@echo "This command is intendended for maintainers"
 	@echo "You need perl to rebuild the deleted file"
 	rm -f MP.h 
-	
+
 MP.h: ${HEADERS}
 	perl ./makeheader.pl -I${hdir} ${hdir}/MP.h MP.h
 
