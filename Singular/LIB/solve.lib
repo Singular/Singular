@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.14 1999-12-02 23:03:52 wenk Exp $";
+version="$Id: solve.lib,v 1.15 2000-05-12 12:17:18 krueger Exp $";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
@@ -564,7 +564,7 @@ EXAMPLE: example lex_solve; shows an example
     // change the ground field to complex numbers  
     string nrings= "ring "+orings+"C=(real,"+string(prec)
 	+",I),("+varstr(basering)+"),lp;";
-    execute nrings;
+    execute(nrings);
 
     if ( pdebug>=0 )
     { "// name of new ring: "+string(nameof(basering));}
@@ -785,7 +785,7 @@ EXAMPLE: example triang_solve; shows an example
     // change the ground field to complex numbers  
     string nrings= "ring "+orings+"C=(real,"+string(prec)
 	+",I),("+varstr(basering)+"),lp;";
-    execute nrings;
+    execute(nrings);
 
     if ( pdebug>=0 )
     { "// name of new ring: "+string(nameof(basering));}

@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.47 1999-10-19 12:42:51 obachman Exp $
+// $Id: standard.lib,v 1.48 2000-05-12 12:17:18 krueger Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.47 1999-10-19 12:42:51 obachman Exp $";
+version="$Id: standard.lib,v 1.48 2000-05-12 12:17:18 krueger Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -45,7 +45,7 @@ EXAMPLE: example stdfglm; shows an example"
      }
    }
    else { os = #[1]; }
-   execute "ring sr=("+charstr(dr)+"),("+varstr(dr)+"),"+os+";";
+   execute("ring sr=("+charstr(dr)+"),("+varstr(dr)+"),"+os+";");
    ideal i= fetch(dr,i);
    intvec opt= option(get);
    option(redSB);
@@ -87,10 +87,10 @@ EXAMPLE: example stdhilb;  shows an example"
       return(std(i));
    }
 
-   execute "ring S = ("+charstr(R)+"),("+varstr(R)+",@t),dp;";
+   execute("ring S = ("+charstr(R)+"),("+varstr(R)+",@t),dp;");
    ideal i=homog(imap(R,i),@t);
    intvec v=hilb(std(i),1);
-   execute "ring T = ("+charstr(R)+"),("+varstr(R)+",@t),("+ordstr(R)+");";
+   execute("ring T = ("+charstr(R)+"),("+varstr(R)+",@t),("+ordstr(R)+");");
    ideal i=fetch(S,i);
    ideal a=std(i,v);
    setring R;
@@ -769,7 +769,7 @@ RETURN:  the quotient of m1 and m2"
   string s="ring @newr=("+charstr(basering)+
            "),("+varstr(basering)+",@t,@w),dp;";
   def @newP=basering;
-  execute s;
+  execute(s);
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
@@ -792,7 +792,7 @@ RETURN:  the quotient of m1 and m2"
   string s="ring @newr=("+charstr(basering)+
            "),("+varstr(basering)+",@t),dp;";
   def @newP=basering;
-  execute s;
+  execute(s);
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
@@ -816,7 +816,7 @@ RETURN:  the quotient of m1 and m2"
   string s="ring @newr=("+charstr(basering)+
            "),("+varstr(basering)+",@t),dp;";
   def @newP=basering;
-  execute s;
+  execute(s);
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
@@ -834,8 +834,8 @@ RETURN:  the quotient of m1 and m2"
 static proc intersect1(ideal i,ideal j)
 {
   def R=basering;
-  execute "ring gnir = ("+charstr(basering)+"),
-                       ("+varstr(basering)+",@t),(C,dp);";
+  execute("ring gnir = ("+charstr(basering)+"),
+                       ("+varstr(basering)+",@t),(C,dp);");
   ideal i=var(nvars(basering))*imap(R,i)+(var(nvars(basering))-1)*imap(R,j);
   ideal j=eliminate(i,var(nvars(basering)));
   setring R;

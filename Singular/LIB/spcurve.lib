@@ -1,8 +1,8 @@
-// $Id: spcurve.lib,v 1.8 1999-07-21 10:10:36 Singular Exp $
+// $Id: spcurve.lib,v 1.9 2000-05-12 12:17:18 krueger Exp $
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: spcurve.lib,v 1.8 1999-07-21 10:10:36 Singular Exp $";
+version="$Id: spcurve.lib,v 1.9 2000-05-12 12:17:18 krueger Exp $";
 info="
 LIBRARY:  spcurve.lib    PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
 AUTHOR:   Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de
@@ -816,7 +816,7 @@ EXAMPLE:   @code{example KSpencerKernel}; shows an example
     return("ERROR");
   }
   string ringre=" ring r=" + charstr(rt) + ",(x,y,z), Ws(" + string(wl[1]) + ");";
-  execute ringre;
+  execute(ringre);
   matrix M=imap(rt,M);
   int ne=size(M);
   if (defined(desiredorder)>1)
@@ -873,7 +873,7 @@ EXAMPLE:   @code{example KSpencerKernel}; shows an example
                         + "),Ws(" + string((-1)*intvec(wl[2])) + ","
                         + string(wl[1]) + ");";
   }
-  execute ringre;
+  execute(ringre);
   module temp=imap(r,t1qh);
   ideal t1qh=mod2id(temp,iv);
   if (defined(watchProgress))
@@ -1286,7 +1286,7 @@ EXAMPLE:  @code{example subrInterred}; shows an example
 //----------------------------------------------------------------------
 // do the interreduction and convert back
 //----------------------------------------------------------------------
-  execute tempstr;
+  execute(tempstr);
   def motemp=imap(r,motemp);
   motemp=interred(motemp);
   setring r;

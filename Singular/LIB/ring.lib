@@ -1,8 +1,8 @@
-// $Id: ring.lib,v 1.10 1999-07-07 16:38:27 obachman Exp $
+// $Id: ring.lib,v 1.11 2000-05-12 12:17:17 krueger Exp $
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: ring.lib,v 1.10 1999-07-07 16:38:27 obachman Exp $";
+version="$Id: ring.lib,v 1.11 2000-05-12 12:17:17 krueger Exp $";
 info="
 LIBRARY:  ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
 
@@ -69,7 +69,11 @@ example
    changechar("R1","32003",R); R1;
    kill R,R1;
    if(system("with","Namespaces")) {
-      kill Top::R,Top::R1;
+      if( nameof(Current) == "Ring" ) {
+        kill Top::R,Top::R1;
+      } else {
+        kill Ring::R,Ring::R1;
+      }
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,7 +123,11 @@ example
    changeord("Q'","lp",Q); Q';
    kill R,Q,Q';
    if(system("with","Namespaces")) {
-      kill Top::R,Top::Q';
+      if( nameof(Current) == "Ring" ) {
+        kill Top::R,Top::Q';
+      } else {
+        kill Ring::R,Ring::Q';
+      }
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -180,7 +188,11 @@ example
    changevar("Q'","a,b,c,d",Q); Q';
    kill R,Q,Q';
    if(system("with","Namespaces")) {
-      kill Top::R,Top::Q';
+      if( nameof(Current) == "Ring" ) {
+        kill Top::R,Top::Q';
+      } else {
+        kill Ring::R,Ring::Q';
+      }
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,7 +229,11 @@ example
    defring("R","2,A",10,"x(","dp(3),ws(1,2,3),ds"); R;
    kill r,R;
    if(system("with","Namespaces")) {
-      kill Top::r,Top::R;
+      if( nameof(Current) == "Ring" ) {
+        kill Top::r,Top::R;
+      } else {
+        kill Ring::r,Ring::R;
+      }
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -253,7 +269,11 @@ example
    defrings(30); S30;
    kill S5, S30;
    if(system("with","Namespaces")) {
-      kill Top::S5,Top::S30;
+      if( nameof(Current) == "Ring" ) {
+        kill Top::S5,Top::S30;
+      } else {
+        kill Ring::S5,Ring::S30;
+      }
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -290,7 +310,11 @@ example
    defringp(30); P30;
    kill P5, P30;
    if(system("with","Namespaces")) {
-      kill Top::P5,Top::P30;
+      if( nameof(Current) == "Ring" ) {
+        kill Top::P5,Top::P30;
+      } else {
+        kill Ring::P5,Ring::P30;
+      }
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -447,7 +471,11 @@ example
    show(R4);
    kill r,R1,R2,R3,R4;
    if(system("with","Namespaces")) {
-      kill Top::R1,Top::R2,Top::R3,Top::R4;
+      if( nameof(Current) == "Ring" ) {
+        kill Top::R1,Top::R2,Top::R3,Top::R4;
+      } else {
+        kill Ring::R1,Ring::R2,Ring::R3,Ring::R4;
+      }
    }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -678,7 +706,11 @@ example
    type Q;
    kill R,Q,S,T;
    if(system("with","Namespaces")) {
-      kill Top::R,Top::Q,Top::S,Top::T;
+      if( nameof(Current) == "Ring" ) {
+        kill Top::R,Top::Q,Top::S,Top::T;
+      } else {
+        kill Ring::R,Ring::Q,Ring::S,Ring::T;
+      }
    }
 }
 ///////////////////////////////////////////////////////////////////////////////

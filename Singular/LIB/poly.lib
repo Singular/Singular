@@ -1,9 +1,9 @@
-// $Id: poly.lib,v 1.25 2000-03-15 17:17:09 siebert Exp $
+// $Id: poly.lib,v 1.26 2000-05-12 12:17:16 krueger Exp $
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.25 2000-03-15 17:17:09 siebert Exp $";
+version="$Id: poly.lib,v 1.26 2000-05-12 12:17:16 krueger Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -579,8 +579,8 @@ proc rad_con (poly g,ideal I)
   int dB=degBound;
   degBound=0;
   string mp=string(minpoly);
-  execute "ring R=("+charstr(br)+"),(x(1..n),z),dp;";
-  execute "minpoly=number("+mp+");";
+  execute("ring R=("+charstr(br)+"),(x(1..n),z),dp;");
+  execute("minpoly=number("+mp+");");
   ideal irrel=x(1..n);
   map f=br,irrel;
   poly p=f(g);
