@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.3 1997-04-02 15:07:22 Singular Exp $ */
+/* $Id: longrat.cc,v 1.4 1997-04-21 16:05:31 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -393,7 +393,7 @@ number nlNeg (number a)
   if(SR_HDL(a) &SR_INT)
   {
     int r=SR_TO_INT(a);
-    if (r==-268435456) a=nlRInit(268435456);
+    if (r==(-(1<<28))) a=nlRInit(1<<28);
     else               a=INT_TO_SR(-r);
   }
   else
