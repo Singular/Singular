@@ -3,6 +3,7 @@ proc tab (int n)
 "USAGE:    tab(n);  (n integer)
 RETURNS:  string of n space tabs
 EXAMPLE:  example tab; shows an example
+"
 { return(internal_tab(n)); }
 example
 {

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.10 1999-07-01 12:48:07 obachman Exp $
+@comment $Id: pdata.doc,v 1.11 1999-07-01 16:12:28 obachman Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -57,7 +57,7 @@ $[f_1,...,f_n]$ or $f_1*gen(1)+...+f_n*gen(n)$, where $gen(i)$
 [f_1,...,f_n] or f_1*gen(1)+...+f_n*gen(n), where gen(i)
 @end ifinfo
 denotes the i-th canonical generator of a free module (with 1 at place i and
-0 everywhere else)
+0 everywhere else).
 Both forms are equivalent. A vector is internally represented in
 the second form with the
 @tex
@@ -234,6 +234,59 @@ computes a normal form of a polynomial f in a quotient ring (cf.@:
 @node Monomial orderings,,Representation of mathematical objects,Polynomial data
 @section Monomial orderings
 @cindex Monomial orderings
+
+@menu
+* Introduction to orderings::
+* General definitions for orderings::
+* Global orderings::
+* Local orderings::
+* Module orderings::
+* Matrix orderings::
+* Product orderings::
+* Extra weight vector::
+@end menu
+
+@c --------------------------------------------------------------------------
+@node Introduction to orderings, General definitions for orderings, , Monomial orderings
+@subsection Introduction to orderings
+@cindex orderings, monomial orderings, term orderings
+
+@sc{Singular} offers a great variety of monomial orderings which provide
+an enourmous functionality, if used diligently. However, this
+flexibility might also be confusing for the novice user.  Therefore, we
+recommend to those not familiar with monomial orderings to generally use
+the ordering @code{dp} for computations in the polynomial ring
+@tex
+$K[x_1,\ldots,x_n]$, 
+@end tex
+@ifinfo
+K[x1,...,xn], 
+@end ifinfo
+resp.  @code{ds} for computations in the localization 
+@tex
+$\hbox{Loc}_{(x)}K[x_1,\ldots,x_n])$.
+@end tex
+@ifinfo
+Loc_(x)K[x1,...,xn]).
+@end ifinfo
+
+For inhomogenous input ideals,  standard (resp. groebner) bases
+computations  are generally faster 
+with the orderings Wp(w_1, @dots{}, w_n) (resp. Ws(w_1, @dots{}, w_n))
+if the input is quasihomogenous w.r.t. the weights w_1, @dots{}, w_n of
+x_1, @dots{}, x_n. 
+
+If the output needs to be "triangular" (resp. "block-triangular"), the
+lexicographical ordering @code{lp} (resp. lexicographical
+block-orderings) need to be used. However, these orderings usually
+result in much less efficient computations.
+
+
+@c --------------------------------------------------------------------------
+@node General definitions for orderings, Global orderings, Introduction to orderings, Monomial orderings
+@subsection General definitions for orderings
+@cindex orderings, monomial orderings, term orderings
+
 @tex
 A monomial ordering (term ordering) on $K[x_1, \ldots, x_n]$ is
 a total ordering $<$ on the
@@ -296,17 +349,9 @@ monomial ordering (see
 @ref{Rings and orderings}). @sc{Singular} offers the monomial orderings
 described in the following sections. 
 
-@menu
-* Global orderings::
-* Local orderings::
-* Module orderings::
-* Matrix orderings::
-* Product orderings::
-* Extra weight vector::
-@end menu
 
 @c --------------------------------------------------------------------------
-@node Global orderings, Local orderings, Monomial orderings, Monomial orderings
+@node Global orderings, Local orderings, General definitions for orderings, Monomial orderings
 @subsection Global orderings
 @cindex Global orderings
 

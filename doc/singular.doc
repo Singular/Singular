@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.55 1999-07-01 12:48:10 obachman Exp $
+@comment $Id: singular.doc,v 1.56 1999-07-01 16:12:31 obachman Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -149,6 +149,7 @@ the exponent of a ring variable must be smaller than 32768
 @item
 a ring must have 505 variables or less
 @*(501 on a DEC Alpha)
+@c TBC -- number of parameters
 @item
 integers (of type @code{int}) have the limited range
 from -2147483647 to 2147483647
@@ -603,6 +604,10 @@ have the same name(s) as ring variables.
 
 @sc{Singular} comes with a set of standard libraries. Their content is
 described in the following subsections.
+
+Use the function @ref{LIB} for loading of single libraries, and the
+command @code{LIB "all.lib";} for loading all libraries.
+
 @menu
 * standard_lib:: extensions of singular kernel
 * all_lib:: load all other libraries

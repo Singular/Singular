@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.115 1999-07-01 15:34:30 pohl Exp $
+@comment $Id: reference.doc,v 1.116 1999-07-01 16:12:29 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1392,19 +1392,21 @@ See
 @item @strong{Type:}
 list of ideals
 @item @strong{Purpose:}
-returns a list of Groebner bases by the factorizing Groebner basis algorithm.
+returns a list of ideals computed by the factorizing Groebner basis algorithm.
 @*The intersection of these ideals has the same zero-set as the input,
 i.e., the radical of the intersection coincides with the radical of the input
 ideal.
 In many cases (but not all!) this is already a decomposition of the radical
-of the ideal. (Note however, that, in general, no inclusion holds.)
+of the ideal. (Note however, that, in general, no inclusion between the
+input and output ideals holds.)
 @*The second, optional argument gives a list of polynomials which define
 non-zero constraints. Hence, the intersection of the output ideals
 has a zero-set which is the (closure of the) complement of the zero-set
 of the second argument in the zero-set of the first argument.
 @item @strong{Note:}
-Not implemented for basering real, galoisfields with gftables and algebraic
-extensions over the rational numbers.
+Not implemented for basering over real ground fields, galois fields and
+over algebraic extensions over the rational numbers (that is, only
+implemented for ground fields for which @ref{factorize} is implemented).
 @item @strong{Example:}
 @example
 @c example
