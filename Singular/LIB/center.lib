@@ -1,13 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.11 2004-12-07 16:02:02 plural Exp $";
+version="$Id: center.lib,v 1.12 2004-12-15 19:02:33 plural Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  center.lib      computation of central elements of G-algebras and Q-algebras.
-AUTHORS:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
+AUTHOR:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 OVERVIEW:
  This is a library for computing the central elements and centralisators of elements in various noncommutative algebras. 
  Implementation is mainly based on algorithms, written in the frame of the diploma thesis by Oleksandr Motsak (advisor: Prof. S.A. Ovsienko, using the definitions from diploma thesis by V.Levandovskyy), at Kyiv Taras Shevchenko University:  'An algorithm for the computation of the center of noncommutative polynomial algebra'.
- @* The last version of this library can be found via internet.
+ @* The last version of this library can be found via internet at author's home page.
 
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis'
 
@@ -22,283 +22,208 @@ KEYWORDS:  inCenter; inCentralizer; center; centralizer
 ";
 
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 // stuff
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc myValue ( def s, list # )
-" 
+  " 
 	return s or (typeof(s))(#)
 "
 {
-	def @p = s;
-	if ( size(#) > 0 )
+  def @p = s;
+  if ( size(#) > 0 )
+    {
+      if ( typeof( #[1] ) == typeof(s) )
 	{
-		if ( typeof( #[1] ) == typeof(s) )
-		{
-	    		@p = #[1];
-		};
+	  @p = #[1];
 	};
-	return (@p);
+    };
+  return (@p);
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc myInt ( list # )
-"
+  "
 	return 0 or int(#)
 "
 {
-	int @p = 0;
-	return (myValue ( @p, # ));
+  int @p = 0;
+  return (myValue ( @p, # ));
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc myPoly ( list # )
-"
+  "
 	return 0 or poly(#)
 "
 {
-	poly @p = 0;
-	return (myValue( @p, # ));
+  poly @p = 0;
+  return (myValue( @p, # ));
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc myRing ( list # )
-"
+  "
 	return basring or ring(#)
 "
 {
-	def @p = basering;
-	return (myValue ( @p, # ));
+  def @p = basering;
+  return (myValue ( @p, # ));
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc myString ( list # )
-"
+  "
 	return basring or ring(#)
 "
 {
-	string @p = "";
-	return (myValue ( @p, # ));
+  string @p = "";
+  return (myValue ( @p, # ));
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc myIdeal ( list # )
-"
+  "
 	return 0 or ideal(#)
 "
 {
-	ideal @p;
-	return (myValue ( @p, # ));
+  ideal @p;
+  return (myValue ( @p, # ));
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// for debug
+/******************************************************/
+// for debug
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc toprint()
 {
-    return (0);
+  return (0);
 };
 
-///////////////////////////////////////////////////////////////////////////////
-static proc Print( def a )
+/******************************************************/
+static proc Print( list # )
 {
-	if ( toprint() )
-	{
-		print (a);
-	};
+  if ( toprint() )
+    {
+      print (#);
+    };
 };   
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc BCall(string Name, list #)
 {
-	if( toprint() )
-	{
-		"CALL: ", Name, "( ", string(#), " )";
-	};
+  if( toprint() )
+    {
+      "CALL: ", Name, "( ", string(#), " )";
+    };
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc ECall(string Name, list #)
 {
-   if( toprint() )
-   {
-		"RET: ", Name, "(...)={ ", string(#), " }";
-   };
+  if( toprint() )
+    {
+      "RET : ", Name, "(...)={ ", string(#), " }";
+    };
 };
 
 
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
+/******************************************************/
 // "my" degres functions and lie procedures...
 
-////////////////////////////////////////////////////////////////////
-static proc maxDeg( proc givendeg, def z )
-"
+/******************************************************/
+static proc maxDeg( def z )
+  "
 	returns: int : max of givendeg( z_i ), among all z_i \in z
 		returns -1 if z is empty or contain only 0 polynomial
 "
 {
-	int max = -1; int d;
+  int max = -1; 
+  int d;
 
-	for(int i=size(z); i>0; i-- )
+  for(int i=size(z); i>0; i-- )
+    {
+      d = deg(z[i]);
+      if( d > max ) 
 	{
-		d = givendeg(z[i]);
-		if( d > max ) 
-		{
-			max = d;
-		};
+	  max = d;
 	};
+    };
 
-	return(max);
+  return(max);
 };
 
-////////////////////////////////////////////////////////////////////
-static proc minDeg( proc givendeg, def z )
-"
-	returns: int : min of givendeg( z_i ), among all z_i \in z
-		returns -1 if z is empty or contain only 0 polynomial
-"
-{
-	if( size(z) == 0 )
-	{
-	    return(-1);
-	};
+/******************************************************/
+// some bisiness for my_var
 
-	int min = -2; int d;
-
-	for(int i = size(z); i>0; i-- )
-	{
-		d = givendeg(z[i]);
-		if( (min == -2) or (d < min) ) 
-		{
-			min = d;
-		};
-
-	};
-	
-	return(min);
-};
-
-////////////////////////////////////////////////////////////////////
-static proc myMonomDeg( poly p)
-"
-	input: poly p
-	return: just number of veriables in lead monomial of p!
-	Note: for use by maxList and minList
-"
-{
-	if( p == 0 )
-	{
-	    return (-1);
-	};
-	
-	intvec e = leadexp(p);
-	int    d = 0;
-	
-	for ( int i = size(e); i>0; i-- )
-	{
-		d = d + e[i];
-	};
-
-	return (d);
-};
-
-////////////////////////////////////////////////////////////////////
-static proc stdDeg ( poly p)
-"
-	input: poly p
-	return: degree of p
-	Note: just in order to have it as 'proc' (for use by maxList)
-"
-{
-	return (deg(p));
-};
-
-////////////////////////////////////////////////////////////////////
-static proc myDeg ( poly p)
-"
-	input: poly p
-	return: 'my degree' of p
-	no real use... just for testing...
-"
-{
-	return( maxDeg(myMonomDeg,p) );
-};
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// some bisiness for my_var and lie_rank
-
-////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc myCoeff ( poly f, poly m )
-"
+  "
 	input: poly f,
 	return: coeff at m
 "
 {
-	m = leadmonom(m);
+  m = leadmonom(m);
 
-	int i = size(f);
+  int i = size(f);
 	
-	while ( (i>0) and (leadmonom(f[i])<m) )
-	{
-	    i--;
-	};
-	if( i == 0 )
-	{
-	    return ( 0 );	    
-	};
+  while ( (i>0) and (leadmonom(f[i])<m) )
+    {
+      i--;
+    };
+  if( i == 0 )
+    {
+      return ( 0 );	    
+    };
 
-	if(leadmonom(f[i]) == m)
-	{
-	    return ( leadcoef(f[i]) );
-	};
+  if(leadmonom(f[i]) == m)
+    {
+      return ( leadcoef(f[i]) );
+    };
 	
-	return ( 0 );
+  return ( 0 );
 };
 
-
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc my_vars ()
 {
-	int  N = nvars( basering );
-	list V = list();
+  int  N = nvars( basering );
+  list V = list();
 
-	for ( int k = 1; k <= N; k++ )
-	{
-		V[k] = var(k);
-	};
+  for ( int k = 1; k <= N; k++ )
+    {
+      V[k] = var(k);
+    };
 	
-	return (V);
+  return (V);
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc my_commutators ()
 {
-	list V = my_vars();
-	int  N = size( V );
+  list V = my_vars();
+  int  N = size( V );
 
-	matrix M[N][N] = 0;
+  matrix M[N][N] = 0;
 
-	poly v, d; int i;
+  poly v, d; int i;
 	
-	for ( int k = 2; k <= N; k++ )
+  for ( int k = 2; k <= N; k++ )
+    {
+      v = V[k];
+      for ( i = 1; i < k; i++ )
 	{
-		v = V[k];
-		for ( i = 1; i < k; i++ )
-		{
-			d = V[i];
-			M[k,i] =  v*d - d*v;	// [var(k),var(i)]
-			M[i,k] = -M[k,i];	// [var(i),var(k)] ==  -[var(k),var(i)]
-		};
+	  d = V[i];
+	  M[k,i] =  v*d - d*v;	// [var(k),var(i)]
+	  M[i,k] = -M[k,i];	// [var(i),var(k)] ==  -[var(k),var(i)]
 	};
+    };
 
-	return (M);
+  return (M);
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc my_associated ()
 "
     return list of records:
@@ -307,65 +232,66 @@ static proc my_associated ()
      [3] - matrix: associated matrix (basering should be compatible)
 "
 {
-	int i, j; poly a; poly d;
+  int i, j; poly a; poly d;
 
-	int N 	 = nvars( basering );
-	list V	 = my_vars();
-	matrix M = my_commutators();
+  int N 	 = nvars( basering );
+  list V	 = my_vars();
+  matrix M = my_commutators();
 
-	matrix A[N][N];
+  matrix A[N][N];
 
-	int cartan;
+  int cartan;
 	
-	list RESULT = list();
-	int  r_begin = 1;
-	int  r_end   = N;
+  list RESULT = list();
+  int  r_begin = 1;
+  int  r_end   = N;
 	
 
-	for ( int k = 1; k <= N; k++ )
+  for ( int k = 1; k <= N; k++ )
+    {
+      A = 0;
+      cartan = 1;
+      for ( i = 1; i <= N; i++ )
 	{
-		A = 0;
-		cartan = 1;
-		for ( i = 1; i <= N; i++ )
-		{
-			d = M[k,i];
-			for ( j = 1; j <= N; j++ )
-			{
-				a = myCoeff( d, V[j] );	A[i,j] =  a;
+	  d = M[k,i];
+	  for ( j = 1; j <= N; j++ )
+	    {
+	      a = myCoeff( d, V[j] );	
+	      A[i,j] =  a;
 
-				if( (i!=j) and (a!=0) )
-				{
-				    cartan = 0;
-				};					
-			};
-		};
-		
-		if ( cartan )
-		{	
-		    RESULT[r_begin] = list( V[k], cartan, A );
-		    r_begin++;
-		} else
+	      if( (i!=j) and (a!=0) )
 		{
-		    RESULT[r_end] = list( V[k], cartan, A );
-		    r_end--;		
-		};
-				
+		  cartan = 0;
+		};					
+	    };
 	};
+
+      if ( cartan )
+	{	
+	  RESULT[r_begin] = list( V[k], cartan, A );
+	  r_begin++;
+	} else
+	  {
+	    RESULT[r_end] = list( V[k], cartan, A );
+	    r_end--;		
+	  };
+				
+    };
 	
-	return (RESULT);
+  return (RESULT);
 
 };
 
-/******************************************************************************/
+/******************************************************/
 static proc my_var_init()
 "
   must be called once before using my_var!!!
 "
 {
   if( defined( @@@SORTEDVARARRAY ) )
-  {
-	kill ( @@@SORTEDVARARRAY );
-  };
+    {
+      kill ( @@@SORTEDVARARRAY );
+    };
   
   list @@@SORTEDVARARRAY;
   list V = my_associated();
@@ -373,130 +299,123 @@ static proc my_var_init()
   // cartans - first then others...
   
   for ( int i = 1; i<= size(V); i++ )
-  {
+    {
       @@@SORTEDVARARRAY[i] = V[i][1];
-  };
+    };
   
   Print( "@@@SORTEDVARARRAY: " + string(@@@SORTEDVARARRAY) );
     
   export(@@@SORTEDVARARRAY);   
 };
 
-/******************************************************************************/ 
+/******************************************************/
 static proc my_var(int @number )
-"
+  "
   'my' var (with my order of variables),
   before use call my_var_init()
 "
 {
   if( defined( @@@SORTEDVARARRAY ) )
-  {
-  	return( @@@SORTEDVARARRAY[@number] );
-  };
+    {
+      return( @@@SORTEDVARARRAY[@number] );
+    };
 
   Print( "Error: my_var_init() was not called before this..." );
   return( var(@number) );
     
 };
 
-/******************************************************************************/ 
+/******************************************************/
 static proc my_var_done()
-"
+  "
   this procedure should be called after finishing using my_var in order to clean up.
 "
 {
   if( defined( @@@SORTEDVARARRAY ) )
-  {
-	kill ( @@@SORTEDVARARRAY );
-  };
+    {
+      kill ( @@@SORTEDVARARRAY );
+    };
 };
 
 
+/******************************************************/
+// QNF stuff
 
-///////////////////////////////////////////////////////////////////////////////
-static proc index( int i )
-"
-  i need indexing of arrays from 0 => ARRAY[ index(i) ] - everywhere...
-"
-{
-	return (i + 1);
-};
-
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc myBitParam( int param, int n )
-"
+  "
     return: string: param in bin within no less then n digits (adding zeroes)
 "
 {
-	string s = "";	
+  string s = "";	
 	
-	while ( param != 0 )
-	{
-	    s = string ( param % 2 ) + s;
-	    param = param / 2;
-	    n --;	
-	};
-        while ( n > 0 )
-        {
-	    s = "0" + s;
-	    n --;
-	};
-	return ( s );
+  while ( param != 0 )
+    {
+      s = string ( param % 2 ) + s;
+      param = param / 2;
+      n --;	
+    };
+  while ( n > 0 )
+    {
+      s = "0" + s;
+      n --;
+    };
+  return ( s );
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc QNF_init(list #)
 {
-    if( defined(@@@MY_QIDEAL) )
+  if( defined(@@@MY_QIDEAL) )
     {
-		kill (@@@MY_QIDEAL);
+      kill (@@@MY_QIDEAL);
     };
 
-    if( typeof(basering) == "qring" )
+  if( typeof(basering) == "qring" )
     {
-		ideal @@@MY_QIDEAL = twostd(myIdeal(#));
-		/// setup redSB, redTail options
-		export(@@@MY_QIDEAL);
-	
-		option(redSB);
-		option(redTail);
-
+      ideal @@@MY_QIDEAL = twostd(myIdeal(#));
+      // setup redSB, redTail options
+      export(@@@MY_QIDEAL);
+      
+      option(redSB);
+      option(redTail);
+      
     };
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc QNF_done()
 {
-    if( defined(@@@MY_QIDEAL) )
+  if( defined(@@@MY_QIDEAL) )
     {
-		kill (@@@MY_QIDEAL);
+      kill (@@@MY_QIDEAL);
     };
 };
 
-///////////////////////////////////////////////////////////////////////////////
-static proc QNF_poly ( poly p, list # ) )
+/******************************************************/
+static proc QNF_poly ( poly p, list # )
 {
-    if( defined(@@@MY_QIDEAL) )
+  if( defined(@@@MY_QIDEAL) )
     {
-/*
+      /*
 	int param = 1 ; // by def: reduce both 1st and 2nd entries
 	param = myValue(param, #); 
 	string bits = myBitParam( param, 8 );
-*/
-  	BCall( "QNF_poly", p );
+      */
+      BCall( "QNF_poly", p );
+      
+      p = NF( p, @@@MY_QIDEAL );
+      
+      ECall( "QNF_poly", p );
+    }; // QRing
 
-	p = NF( p, @@@MY_QIDEAL );
-
-  	ECall( "QNF_poly", p );
-    }; /// QRing
-
-    return(p);
+  return(p);
 };
 
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc QNF_list ( list l, list # )
-"
+  "
     expects list of records with two polynomial entries
     and in case of Qring allpies NF( * , std(0) ) to entries (depends on parameter)
 
@@ -515,677 +434,682 @@ static proc QNF_list ( list l, list # )
 "
 {
 
-    if( defined(@@@MY_QIDEAL) )
+  if( defined(@@@MY_QIDEAL) )
     {
 
-	int param = 1 + 2; // by def: reduce both 1st and 2nd entries
-	param = myValue(param, #); 
+      int param = 1 + 2; // by def: reduce both 1st and 2nd entries
+      param = myValue(param, #); 
 	
-	string bits = myBitParam( param, 8 );
+      string bits = myBitParam( param, 8 );
 
-  	BCall( "QNF_list", "list, " + bits );
+      BCall( "QNF_list", "list, " + bits );
 
-	poly temp;
+      poly temp;
 	
-	for ( int i = size(l); i>0 ; i -- )
+      for ( int i = size(l); i>0 ; i -- )
 	{
 
-	    if ( typeof( l[i] ) == "poly" )
+	  if ( typeof( l[i] ) == "poly" )
 	    {
 
-		    if ( (bits[8] == "1") or (bits[6] == "1") )
-		    {
-			    temp = NF( l[i], @@@MY_QIDEAL );
+	      if ( (bits[8] == "1") or (bits[6] == "1") )
+		{
+		  temp = NF( l[i], @@@MY_QIDEAL );
 			    
-			    if ( bits[6] == "1" ) 
-			    {/// for PBW in qrings: kill out pbw entries where pbw monom was reduced
+		  if ( bits[6] == "1" ) 
+		    {// for PBW in qrings: kill out pbw entries where pbw monom was reduced
 			    
-				if( temp != l[i] ) 
-				{
-				    l = delete( l, i );
-				    i --;
-				    continue;
-				};
-			    };
-			    
-			    if ( bits[8] == "1" ) 
-			    {
-			    	l[i] = temp;
-			    };
+		      if( temp != l[i] ) 
+			{
+			  l = delete( l, i );
+			  i --;
+			  continue;
+			};
 		    };
+			    
+		  if ( bits[8] == "1" ) 
+		    {
+		      l[i] = temp;
+		    };
+		};
 	    };
 
-	    if ( typeof( l[i] ) == "list" )
+	  if ( typeof( l[i] ) == "list" )
 	    {	
-		/// 1st 
-
-	        if ( size(l[i])>0 )
+	      // 1st 
+	      
+	      if ( size(l[i])>0 )
 	        {		
-		    if ( (bits[8] == "1") or (bits[6] == "1") )
+		  if ( (bits[8] == "1") or (bits[6] == "1") )
 		    {
-			if( typeof( l[i][1] ) == "poly" )
+		      if( typeof( l[i][1] ) == "poly" )
 			{
-
-			    temp = NF( l[i][1], @@@MY_QIDEAL );
 			    
-			    if ( bits[6] == "1" ) 
-			    {/// for PBW in qrings: kill out pbw entries where pbw monom was reduced
+			  temp = NF( l[i][1], @@@MY_QIDEAL );
 			    
-				if( temp != l[i][1] ) 
+			  if ( bits[6] == "1" ) 
+			    {// for PBW in qrings: kill out pbw entries where pbw monom was reduced
+				
+			      if( temp != l[i][1] ) 
 				{
-				    l = delete( l, i );
-				    i --;
-				    continue;
+				  l = delete( l, i );
+				  i --;
+				  continue;
 				};
 			    };
 			    
-			    if ( bits[8] == "1" ) 
+			  if ( bits[8] == "1" ) 
 			    {
-			    	l[i][1] = temp;
+			      l[i][1] = temp;
 			    };
-
+			    
 			};
 		    };
 		};
-
-	        // 2nd
+	      
+	      // 2nd
 		
-		if ( size(l[i])>1 )
+	      if ( size(l[i])>1 )
 	        {		
-		    if ( bits[7] == "1" )
+		  if ( bits[7] == "1" )
 		    {
-			if( typeof( l[i][2] ) == "poly" )
+		      if( typeof( l[i][2] ) == "poly" )
 			{
-			    temp = NF( l[i][2], @@@MY_QIDEAL );
-			    
-			    l[i][2] = temp; 
+			  temp = NF( l[i][2], @@@MY_QIDEAL );
+			  
+			  l[i][2] = temp; 
 			};
 		    };
 		};
 	    };
 	};
-
-  	ECall( "QNF_list", "list" );
-
+	
+      ECall( "QNF_list", "list" );
+	
     }; // Qring
     
-    return ( l );
+  return ( l );
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// things for zCommon
+/******************************************************/
+// things for zCommon
 
-/******************************************************************************/ 
-static proc uni_poly( poly p )
+/******************************************************/
+static proc index( int i )
+  "
+  i need indexing of arrays from 0 => ARRAY[ index(i) ] - everywhere...
 "
+{
+  return (i + 1);
+};
+
+/******************************************************/
+static proc uni_poly( poly p )
+  "
 	returns polynomial with the same monomials but without coefficients.
 "
 {
-	poly @tt = poly(0);    
-	for ( int @k = size(p); @k > 0; @k -- )
-	{
-	  	@tt = @tt + leadmonom(p[@k]);
-	};    
-	return (@tt);	
+  poly @tt = poly(0);    
+  for ( int @k = size(p); @k > 0; @k -- )
+    {
+      @tt = @tt + leadmonom(p[@k]);
+    };    
+  return (@tt);	
 };
 
-/******************************************************************************/ 
+/******************************************************/
 static proc get_max ( poly @t, number @def )
 {
-    int @n = size( @t );
-    
-    if ( @n == 0 )
+  int @n = size( @t );
+  
+  if ( @n == 0 )
     {
-	return (@def);
+      return (@def);
     };
     
-    number @max = leadcoef(@t[1]);
-    number @mm;
-    
-    if ( @n > 1) 
+  number @max = leadcoef(@t[1]);
+  number @mm;
+  
+  if ( @n > 1) 
     {
-	for ( int @i = 2; @i <= @n ;@i ++ )
+      for ( int @i = 2; @i <= @n ;@i ++ )
 	{
-	    @mm = leadcoef ( @t[@i] );
-	    if ( @mm < 0 ) 
+	  @mm = leadcoef ( @t[@i] );
+	  if ( @mm < 0 ) 
 	    {
-		@mm = -@mm;
+	      @mm = -@mm;
 	    };
-	    
-    	    if( @mm > @max ) 
+	  
+	  if( @mm > @max ) 
 	    {
-		@max = @mm;
+	      @max = @mm;
 	    };
 	};
     };
-
-    @max = @max + 1;
-    if ( @max == 0 ) 
+  
+  @max = @max + 1;
+  if ( @max == 0 ) 
     {
-	@max = @max + 1;
+      @max = @max + 1;
     };
-    return ( 1/@max );
+  return ( 1/@max );
 };
 
 
-/******************************************************************************/ 
+/******************************************************/
 static proc get_uni_sum(list @given, int @num)
 {
-    int @l, @k;
+  int @l, @k;
+  
+  poly @t, @tt;
 
-    poly @t, @tt;
-
-    @l = size (@given);
-
-    @t = poly(0);
-    for ( @k = @l; @k > 0; @k -- )
+  @l = size (@given);
+  
+  @t = poly(0);
+  for ( @k = @l; @k > 0; @k -- )
     {
-	if (@num == 1)
+      if (@num == 1)
 	{
-	    @tt = @given[@k];
+	  @tt = @given[@k];
 	} else
-	{
+	  {
 	    @tt = @given[@k][2];	
-	};
-	
-	@t = @t + uni_poly( @tt );
+	  };
+      
+      @t = @t + uni_poly( @tt );
     };
-
-    return ( uni_poly(@t) );
+  
+  return ( uni_poly(@t) );
 };
 
 
 
-////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc LM ( intvec exp )
-"
+  "
 	input : given exponent
 	return: monom with this exponent...
 "
 {
-	poly @f = 1; int @deg;
-	for( int @i = 1; @i <= size(exp); @i ++ )
+  poly @f = 1; int @deg;
+  for( int @i = 1; @i <= size(exp); @i ++ )
+    {
+      @deg = exp[@i];
+      if ( @deg > 0 )
 	{
-		@deg = exp[@i];
-		if ( @deg > 0 )
-		{
-			@f = @f * (var(@i)^(@deg));
-		};
+	  @f = @f * (var(@i)^(@deg));
 	};
+    };
 
-	return (@f);
+  return (@f);
 };
 
+/******************************************************/
+// reduced centers - computation of "minimal" set of generators
 
+LIB "general.lib"; // for sort
 
-
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-/// reduced centers - computation of "minimal" set of generators
-
-LIB "general.lib"; /// for sort
-
-//////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc zSort ( list @z )
-"
+  "
 	Sort elements of a list of polynoms, 
 	and normalize
 "
 {
-	int n = size(@z);
-	if ( n < 1 )
-	{// empty list
-		return( @z );
-	};
+  int n = size(@z);
+  if ( n < 1 )
+    {// empty list
+      return( @z );
+    };
 
-	if ( n == 1 )
+  if ( n == 1 )
+    {
+      if ( @z[1] == 0 ) // if zero => empty list
 	{
-		if ( @z[1] == 0 ) // if zero => empty list
-		{
-		    return(list());
-		};	    
+	  return(list());
+	};	    
 
-		@z[1] =  @z[1] * ( 1/leadcoef(@z[1]) ) ;
+      @z[1] =  @z[1] * ( 1/leadcoef(@z[1]) ) ;
 
-		return( @z );
-	};
+      return( @z );
+    };
 
-	int i = 1;
+  int i = 1;
 	
-	while ( i<=n )
+  while ( i<=n )
+    {
+      if (size( @z[i] ) != 0) 
 	{
-	    if (size( @z[i] ) != 0) 
-	    {
-		break;
-	    };
-	    i++;
+	  break;
 	};
+      i++;
+    };
 	
-	if ( i > n )
-	{ /// all zeroes
-	    return(list());
-	};
+  if ( i > n )
+    { // all zeroes
+      return(list());
+    };
 	
-	ideal id = @z[i];
-	i++;
+  ideal id = @z[i];
+  i++;
 	
-	while ( i<= n )
+  while ( i<= n )
+    {
+      if( @z[i] != 0 )
 	{
-	    if( @z[i] != 0 )
-	    {
-		id=@z[i],id;
-	    };
-	    i++;
+	  id=@z[i],id;
 	};
+      i++;
+    };
 
-	// can sort only ideal generators:-(
-	list srt = sort(id);
+  // can sort only ideal generators:-(
+  list srt = sort(id);
 
-	poly p;
-	// convert srt[1]:ideal to result:list.
-	list result = list();
-	for ( i = size(srt[1]); i>0; i-- )
+  poly p;
+  // convert srt[1]:ideal to result:list.
+  list result = list();
+  for ( i = size(srt[1]); i>0; i-- )
+    {
+      p = srt[1][i];
+      if ( p == 0 )
 	{
-		p = srt[1][i];
-		if ( p == 0 )
-		{
-		    i --;
-		    continue;
-		};
-		p = p* (1/leadcoef(p));		/// normalize
-		result = list(p) + result;
+	  i --;
+	  continue;
 	};
+      p = p* (1/leadcoef(p));		// normalize
+      result = list(p) + result;
+    };
 
-//	"OUT SORT::";
-//	result;
+  //	"OUT SORT::";
+  //	result;
 	
-	return ( result );
+  return ( result );
 };
 
 
 
-//////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc zRefine ( list @z )
-"
+  "
 	kill terms by leading monomials...
 	Note: based on myCoeff	
 "
 {
-	BCall("zRefine", "list");
+  BCall("zRefine", "list");
 
-	int @i, @j;
+  int @i, @j;
 
-	poly @f  = 0; // leadmonom
+  poly @f  = 0; // leadmonom
 
-	poly @ff = 0; // polyes
-	poly @gg = 0;
-	number @nf, @ng;
+  poly @ff = 0; // polyes
+  poly @gg = 0;
+  number @nf, @ng;
 
-	int flag = 1;
+  int flag = 1;
 
-	while ( flag == 1 ) 
+  while ( flag == 1 ) 
+    {
+      flag = 0;
+
+      @z = zSort(@z); // sort out, < ...
+
+      if( size(@z) < 2 ) 
 	{
-		flag = 0;
-
-		@z = zSort(@z); // sort out, < ...
-
-		if( size(@z) < 2 ) 
-		{
-			return (@z);
-		};
-
-		for ( @i = size(@z); @i > 0; @i -- ) // at 1st the biggest ... then smallest...
-		{
-
-			@ff    = @z[@i];
-
-			if( size(@ff) == 0 )
-			{
-				@z = delete ( @z , @i );
-				@i --;
-				continue;
-			};
-
-			@ff    = @ff*(1/leadcoef(@ff));
-			@z[@i] = @ff;
-			@f 	= leadmonom(@ff);
-
-			for ( @j = (@i-1); (@j>0); @j --  )
-			{
-				@gg = @z[@j];
-				@ng = myCoeff(@gg, @f); /// leads?
-				if( @ng!=0 )
-				{
-					@z[@j] = @gg - @ng * @ff; 
-					flag = 1;
-				};		
-			};
-			for ( @j = (@i+1); (@j<=size(@z)); @j ++ )
-			{
-				@gg = @z[@j];
-				@ng = myCoeff(@gg, @f); 
-				if( @ng!=0 )
-				{
-					@z[@j] = @gg - @ng * @ff; 
-					flag = 1;
-				};		
-			};
-
-		};
+	  return (@z);
 	};
 
-	ECall("zRefine", "list");
+      for ( @i = size(@z); @i > 0; @i -- ) // at 1st the biggest ... then smallest...
+	{
 
-	return 	( @z );
+	  @ff    = @z[@i];
+
+	  if( size(@ff) == 0 )
+	    {
+	      @z = delete ( @z , @i );
+	      @i --;
+	      continue;
+	    };
+
+	  @ff    = @ff*(1/leadcoef(@ff));
+	  @z[@i] = @ff;
+	  @f 	= leadmonom(@ff);
+
+	  for ( @j = (@i-1); (@j>0); @j --  )
+	    {
+	      @gg = @z[@j];
+	      @ng = myCoeff(@gg, @f); // leads?
+	      if( @ng!=0 )
+		{
+		  @z[@j] = @gg - @ng * @ff; 
+		  flag = 1;
+		};		
+	    };
+	  for ( @j = (@i+1); (@j<=size(@z)); @j ++ )
+	    {
+	      @gg = @z[@j];
+	      @ng = myCoeff(@gg, @f); 
+	      if( @ng!=0 )
+		{
+		  @z[@j] = @gg - @ng * @ff; 
+		  flag = 1;
+		};		
+	    };
+
+	};
+    };
+
+  ECall("zRefine", "list");
+
+  return 	( @z );
 
 };
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// procedures for building "bad leadmonomials" set 
+/******************************************************/
+// procedures for building "bad leadmonomials" set 
 
 
-////////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc checkPolyUniq( list l, poly p )
-"
+  "
 	check wheather p sits already in l, assume l to be size-sorted <
 	return: -1 if present
 		 1 if we need to add
 "
 {
-	BCall( "checkPolyUniq", "{ " + string(l) + " }, " + string(p) );
-	int n = size(l);
-	int i = 1;
+  BCall( "checkPolyUniq", "{ " + string(l) + " }, " + string(p) );
+  int n = size(l);
+  int i = 1;
 
-	int s = size(p);
+  int s = size(p);
 	
-	while( i<= n )
-	{ 
-	    if ( size(l[i]) >= s )
-	    {
-		break;
-	    };
+  while( i<= n )
+    { 
+      if ( size(l[i]) >= s )
+	{
+	  break;
+	};
 	    
-	    i ++; 
-	};
+      i ++; 
+    };
 
-	/// now: size(l[i]) >= s
-	while( i<= n )
-	{ 
-	    if ( size(l[i]) == s )
-	    {
-    		break;
+  // now: size(l[i]) >= s
+  while( i<= n )
+    { 
+      if ( size(l[i]) == s )
+	{
+	  break;
 		
-	    };
-	    if ( l[i] == p ) 
-	    {
-		ECall( "checkPolyUniq", -1 );
-		return (-1);
-	    };
-	    i ++; 
 	};
+      if ( l[i] == p ) 
+	{
+	  ECall( "checkPolyUniq", -1 );
+	  return (-1);
+	};
+      i ++; 
+    };
 
-	ECall( "checkPolyUniq", 1 );
-	return ( 1 );
+  ECall( "checkPolyUniq", 1 );
+  return ( 1 );
 
 };
 
-////////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc addPolyUniq( list l, poly p )
-"
+  "
 	add p into l uniquely, and keep l size-sorted <
 "
 {
-	BCall( "addPolyUniq", " { " + string(l) + " }, " + string(p) );
+  BCall( "addPolyUniq", " { " + string(l) + " }, " + string(p) );
 	
-	int n = size(l);
+  int n = size(l);
 
-	if ( n == 0 )
-	{
-		l = list(p);
+  if ( n == 0 )
+    {
+      l = list(p);
 		
-		ECall( "addPolyUniq", l );
+      ECall( "addPolyUniq", l );
 		
-		return (l);
-	};
+      return (l);
+    };
 
-	int s = size(p);
+  int s = size(p);
 	
-	int i = 1;
-	while( i<= n )
+  int i = 1;
+  while( i<= n )
+    {
+      if( size(l[i]) > s )
 	{
-		if( size(l[i]) > s )
-		{
-			l = insert( l, p, i-1 ) ;
-			break;
-		};
-		
-		if( size(l[i]) == s )
-		{
-			if ( l[i] == p )
-			{
-				break;
-			};
-		};
-		
-		i++;
+	  l = insert( l, p, i-1 ) ;
+	  break;
 	};
-	
-	if( i > n )
+		
+      if( size(l[i]) == s )
 	{
-	    l = l + list(p);
+	  if ( l[i] == p )
+	    {
+	      break;
+	    };
 	};
+		
+      i++;
+    };
 	
-	ECall( "addPolyUniq", l );
-	return(l);
+  if( i > n )
+    {
+      l = l + list(p);
+    };
+	
+  ECall( "addPolyUniq", l );
+  return(l);
 };
 
 
-////////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc mergePolysUniq( list a, list b )
-"
+  "
 	merge lists uniq
 "
 {
-	BCall( "mergePolysUniq", "{ " + string(a) + " }, { " + string(b) + "} " );
+  BCall( "mergePolysUniq", "{ " + string(a) + " }, { " + string(b) + "} " );
 	
-	for( int i = 1; i <= size(b); i ++ )
-	{
-		a = addPolyUniq(a, b[i]);
-	};
+  for( int i = 1; i <= size(b); i ++ )
+    {
+      a = addPolyUniq(a, b[i]);
+    };
 	
-	ECall( "mergePolysUniq", a );
+  ECall( "mergePolysUniq", a );
 	
-	return (a);
+  return (a);
 };
 
 
-////////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc sortPolysUniq( list a )
-"
+  "
 	sort list uniq
 "
 {
-	BCall( "sortPolysUniq", a );
+  BCall( "sortPolysUniq", a );
 	
-	if( size(a) < 2 )
-	{
-		ECall( "sortPolysUniq", a );
-		return(a);
-	};
+  if( size(a) < 2 )
+    {
+      ECall( "sortPolysUniq", a );
+      return(a);
+    };
 	
-	list b = list(a[1]);
+  list b = list(a[1]);
 	
-	for( int i = 2; i <= size(a); i ++ )
-	{
-		b = addPolyUniq(b, a[i]);
-	};
+  for( int i = 2; i <= size(a); i ++ )
+    {
+      b = addPolyUniq(b, a[i]);
+    };
 	
-	ECall( "sortPolysUniq", b );
+  ECall( "sortPolysUniq", b );
 	
-	return (b);
+  return (b);
 };
 
-////////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc addRecordUniq ( list leadD, list newD, intvec texp, poly tm, int kind, list prs ) 
-"
+  "
 	if kind = 0 => for PBW - no products
 	if kind = 1 => with products
 "
 {
-	BCall ("addRecordUniq", "{old leads}, {new lead}, [" + string(texp) + "], " + string(tm) + ", " + string(kind) + ", {" + string(prs) + "}");
+  BCall ("addRecordUniq", "{old leads}, {new lead}, [" + string(texp) + "], " + string(tm) + ", " + string(kind) + ", {" + string(prs) + "}");
 
-	int i;
-	int f_add = 0;
+  int i;
+  int f_add = 0;
 
-	prs = sortPolysUniq(prs);
+  prs = sortPolysUniq(prs);
 	
-	/// trick:
-	///  check for presens of a monomial @tm in current index poly of @leads (=> in list @leads)
-	///  if char = 0 then new_size > (if not present) or =  (if already present)
-	///  if char > 0 then new_size > (if not present) or =< (if already present) 
-	/// !!!!!
-	if( size(tm + leadD[2]) > size(leadD[2]) ) 
+  // trick:
+  //  check for presens of a monomial @tm in current index poly of @leads (=> in list @leads)
+  //  if char = 0 then new_size > (if not present) or =  (if already present)
+  //  if char > 0 then new_size > (if not present) or =< (if already present) 
+  // !!!!!
+  if( size(tm + leadD[2]) > size(leadD[2]) ) 
+    {
+      f_add = 1;
+    } else
+      {
+	if ( kind != 0 )
+	  {
+	    for ( i = 1; i<= size(leadD[1]); i++ )
+	      {
+		if ( leadD[1][i][2] == tm )
+		  {
+		    for ( i = size(prs); i>0; i-- )
+		      {
+			f_add = checkPolyUniq( leadD[1][i][3], prs[i] );
+			if( f_add == -1 )
+			  {
+			    prs = delete(prs, i);
+			  };
+		      };
+
+		    break;
+		  };
+	      };			
+	  };
+      };
+
+  if ( f_add == 1 )
+    {
+
+      list newlist ;
+      if ( kind != 0 )
 	{
-		f_add = 1;
+	  newlist =  list ( list ( texp, tm, prs ) );
 	} else
+	  {
+	    newlist =  list ( list ( texp, tm ) );
+	  };
+
+
+      if ( size(newD[1]) == 0 )
 	{
-		if ( kind != 0 )
+	  newD[1] =  newlist; 
+	  newD[2] =  tm;
+	} else
+	  {
+
+	    if( size(tm + newD[2]) > size(newD[2]) )
+	      {
+		newD[1] = newD[1] + newlist;
+		newD[2] = newD[2] + tm;
+	      } else
 		{
-			for ( i = 1; i<= size(leadD[1]); i++ )
+		  if ( kind != 0 )
+		    {
+		      for ( i = 1; i<= size(newD[1]); i++ )
 			{
-				if ( leadD[1][i][2] == tm )
-				{
-					for ( i = size(prs); i>0; i-- )
-					{
-						f_add = checkPolyUniq( leadD[1][i][3], prs[i] );
-						if( f_add == -1 )
-						{
-							prs = delete(prs, i);
-						};
-					};
-
-					break;
-				};
-			};			
-		};
-	};
-
-	if ( f_add == 1 )
-	{
-
-		list newlist ;
-		if ( kind != 0 )
-		{
-			newlist =  list ( list ( texp, tm, prs ) );
-		} else
-		{
-			newlist =  list ( list ( texp, tm ) );
-		};
-
-
-		if ( size(newD[1]) == 0 )
-		{
-			newD[1] =  newlist; 
-			newD[2] =  tm;
-		} else
-		{
-
-			if( size(tm + newD[2]) > size(newD[2]) )
-			{
-				newD[1] = newD[1] + newlist;
-				newD[2] = newD[2] + tm;
-			} else
-			{
-				if ( kind != 0 )
-				{
-					for ( i = 1; i<= size(newD[1]); i++ )
-					{
-						if ( newD[1][i][2] == tm )
-						{
-							newD[1][i][3] = mergePolysUniq( newD[1][i][3], prs );
-							break;
-						};
-					};
-				};
+			  if ( newD[1][i][2] == tm )
+			    {
+			      newD[1][i][3] = mergePolysUniq( newD[1][i][3], prs );
+			      break;
+			    };
 			};
+		    };
 		};
-	};
+	  };
+    };
 
-	ECall("addRecordUniq", "{new leads}");
-	return (newD);
+  ECall("addRecordUniq", "{new leads}");
+  return (newD);
 };
 
 
-////////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc mergeRecordsUniq ( list old, list new, int kind )
 {
-	BCall ("mergeRecordsUniq", "{old leads}, {new leads}, " + string(kind) );
+  BCall ("mergeRecordsUniq", "{old leads}, {new leads}, " + string(kind) );
 	
-	if(  size(new[1]) > 0 )
+  if(  size(new[1]) > 0 )
+    {
+      if ( size (old[1]) == 0 )
 	{
-		if ( size (old[1]) == 0 )
-		{
-			old = new;
-		} else
-		{
-			if ( kind != 0 )
-			{	
-				int io;
-				for ( int in = 1; in <= size( new[1] ); in ++ )
-				{
-					if( size( new[1][in][2] + old[2] ) > size( old[2] ) )
-					{
-						old[1] = old[1] + list(new[1][in]);
-						old[2] = old[2] + new[1][in][2];
-					} else
-					{
-						for( io = 1; io <= size( old[1] ); io ++ )
-						{
-							if( old[1][io][2] == new[1][in][2] )
-							{
-								old[1][io][3] = mergePolysUniq( old[1][io][3], new[1][in][3] );
-								break;
-							};
-						};						
-					};
-				};
-			} else
+	  old = new;
+	} else
+	  {
+	    if ( kind != 0 )
+	      {	
+		int io;
+		for ( int in = 1; in <= size( new[1] ); in ++ )
+		  {
+		    if( size( new[1][in][2] + old[2] ) > size( old[2] ) )
+		      {
+			old[1] = old[1] + list(new[1][in]);
+			old[2] = old[2] + new[1][in][2];
+		      } else
 			{
-				old[1] = old[1] + new[1];
-				old[2] = old[2] + new[2];
+			  for( io = 1; io <= size( old[1] ); io ++ )
+			    {
+			      if( old[1][io][2] == new[1][in][2] )
+				{
+				  old[1][io][3] = mergePolysUniq( old[1][io][3], new[1][in][3] );
+				  break;
+				};
+			    };						
 			};
+		  };
+	      } else
+		{
+		  old[1] = old[1] + new[1];
+		  old[2] = old[2] + new[2];
 		};
-	};
+	  };
+    };
 
-	ECall ("mergeRecordsUniq", "{new leads}");
-	return (old);
+  ECall ("mergeRecordsUniq", "{new leads}");
+  return (old);
 };
 
 
 
-//////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc init_bads(int @deg)
 "
     initialistion of an empty 'badleads' list
 "
 {
-	list @l = list();
-	for( int @i = 0; @i <= @deg; @i ++ )
-	{
-  		@l[index(@i)] 	= list( list() , 0);
-			/// new items: 
-			/// { 
-			///	list of leads,    - empty list
-			///	sum poly "index", - poly(0)
-			/// }
-	};
-	return (@l);
+  list @l = list();
+  for( int @i = 0; @i <= @deg; @i ++ )
+    {
+      @l[index(@i)] 	= list( list() , 0);
+      // new items: 
+      // { 
+      //	list of leads,    - empty list
+      //	sum poly "index", - poly(0)
+      // }
+    };
+  return (@l);
 };
 
-//////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc zAddBad ( list @leads, list @newz, int @maxDeg, int kind )
-"
+  "
 	input: 
 		@leads: graded by deg list of 
 			rec:
@@ -1210,335 +1134,337 @@ static proc zAddBad ( list @leads, list @newz, int @maxDeg, int kind )
 
 "
 {
-	BCall ("zAddBad", "{old leads}, { " + string(@newz) + " }, " + string(@maxDeg) + ", " + string(kind) + "");
+  BCall ("zAddBad", "{old leads}, { " + string(@newz) + " }, " + string(@maxDeg) + ", " + string(kind) + "");
 
-	int @newSize = size(@newz);
-	if ( @newSize < 1 ) 
-	{
-		return (@leads);
-	};
+  int @newSize = size(@newz);
+  if ( @newSize < 1 ) 
+    {
+      return (@leads);
+    };
 
-	int @i, @j, @k, @dd, @deg;
+  int @i, @j, @k, @dd, @deg;
 
 
-	poly 	@m, @tm, @ttm;
-	intvec @exp, @texp, @ttexp;
+  poly 	@m, @tm, @ttm;
+  intvec @exp, @texp, @ttexp;
 
-	list @newzz;
-	int @size, @newdeg, @mydeg;
+  list @newzz;
+  int @size, @newdeg, @mydeg;
 
-	poly @sum_old, @sum_new;
+  poly @sum_old, @sum_new;
 	
-	poly a, b, @temp;
+  poly a, b, @temp;
 
-/*
-	if kind = 0 => for PBW - no products
-	if kind = 1 => for zReduce - with products
-*/
+  /*
+    if kind = 0 => for PBW - no products
+    if kind = 1 => for zReduce - with products
+  */
 
-	poly pr = 0; int pri; list prs;
+  poly pr = 0; int pri; list prs;
 
-	for ( @i = @newSize; @i > 0; @i -- )
-	{// for every new poly (@newz[@i]) do 
+  for ( @i = @newSize; @i > 0; @i -- )
+    {// for every new poly (@newz[@i]) do 
 
-		@m   = leadmonom( @newz[@i] ); 
-		@deg = deg(@m);
-		@exp = leadexp(@m);
+      @m   = leadmonom( @newz[@i] ); 
+      @deg = deg(@m);
+      @exp = leadexp(@m);
 
-		//// newzz void new list
-		@newzz = init_bads(@maxDeg );
+      // newzz void new list
+      @newzz = init_bads(@maxDeg );
 
-		for( @mydeg = @deg; @mydeg <= @maxDeg;  @mydeg = @mydeg + @deg )
-		{/// adding all possiblities for @newz[@i]^@j;
+      for( @mydeg = @deg; @mydeg <= @maxDeg;  @mydeg = @mydeg + @deg )
+	{// adding all possiblities for @newz[@i]^@j;
 
-			if ( @mydeg > @deg ) 
-			{
-				@texp 	= @texp + @exp;
-				@tm 	= LM ( @texp );
-				if ( kind != 0)
-				{
-					pr = QNF_poly( pr * @newz[@i] ); /// degrees must be there!!!
-				};
-			} else
-			{
-				@texp 	= @exp;
-				@tm 	= @m;
-				if ( kind != 0)
-				{
-					pr = @newz[@i];
-				};
-			};
+	  if ( @mydeg > @deg ) 
+	    {
+	      @texp 	= @texp + @exp;
+	      @tm 	= LM ( @texp );
+	      if ( kind != 0)
+		{
+		  pr = QNF_poly( pr * @newz[@i] ); // degrees must be there!!!
+		};
+	    } else
+	      {
+		@texp 	= @exp;
+		@tm 	= @m;
+		if ( kind != 0)
+		  {
+		    pr = @newz[@i];
+		  };
+	      };
 
-			@temp =  QNF_poly(@tm);
-			if( @temp != @tm )
-			{
-				break;
-			};
+	  @temp =  QNF_poly(@tm);
+	  if( @temp != @tm )
+	    {
+	      break;
+	    };
 
-/*!!*/			@newzz[index(@mydeg)] = 
-/*!!*/	addRecordUniq( @leads[index(@mydeg)], @newzz[index(@mydeg)], @texp, @tm, kind, list(pr) );
+	  /*!!*/			@newzz[index(@mydeg)] = 
+					  /*!!*/	addRecordUniq( @leads[index(@mydeg)], @newzz[index(@mydeg)], @texp, @tm, kind, list(pr) );
 
-			for ( @dd = 1; (@dd <= @maxDeg) and ((@dd + @mydeg) <= @maxDeg ); @dd ++ )
-			{ //// for every good "deg" 
+	  for ( @dd = 1; (@dd <= @maxDeg) and ((@dd + @mydeg) <= @maxDeg ); @dd ++ )
+	    { // for every good "deg" 
 				
-				@newdeg = @dd + @mydeg; /// any deg should be additive!!!
+	      @newdeg = @dd + @mydeg; // any deg should be additive!!!
 				
-				for ( @k = size(@leads[index(@dd)][1]); @k > 0; @k -- )
-				{
+	      for ( @k = size(@leads[index(@dd)][1]); @k > 0; @k -- )
+		{
 
-					@ttexp 	= (@leads[index(@dd)][1][@k][1]) + @texp;
-					@ttm 	= LM (@ttexp);
+		  @ttexp 	= (@leads[index(@dd)][1][@k][1]) + @texp;
+		  @ttm 	= LM (@ttexp);
 					
-					if ( kind != 0 )
-					{
-						prs = list();
+		  if ( kind != 0 )
+		    {
+		      prs = list();
 
-						for( pri = 1; pri <= size(@leads[index(@dd)][1][@k][3]); pri++)
-						{
-							/// to do products into list and add one list !!!
-							a = QNF_poly( pr*@leads[index(@dd)][1][@k][3][pri]);
-							b = QNF_poly( @leads[index(@dd)][1][@k][3][pri]*pr);
-
-							prs= prs + list(a);
-
-							if ( a!=b )
-							{
-							    prs= prs + list(b);
-							};
-						};
-
-					} else
-					{
-						prs = list(pr);
-					};
-
-					@temp =  QNF_poly(@ttm);
-					if( @temp == @ttm )
-					{
-
-/*!!*/						@newzz[index(@newdeg)] = 
-/*!!*/	addRecordUniq( @leads[index(@newdeg)], @newzz[index(@newdeg)], @ttexp, @ttm, kind, prs );
-					};
-
-
-				};				
-			}; /// for
-
-			if ( @deg == 0 ) 
+		      for( pri = 1; pri <= size(@leads[index(@dd)][1][@k][3]); pri++)
 			{
-				break;
+			  // to do products into list and add one list !!!
+			  a = QNF_poly( pr*@leads[index(@dd)][1][@k][3][pri]);
+			  b = QNF_poly( @leads[index(@dd)][1][@k][3][pri]*pr);
+
+			  prs= prs + list(a);
+
+			  if ( a!=b )
+			    {
+			      prs= prs + list(b);
+			    };
 			};
-		};
 
-		for ( @mydeg = 0; @mydeg <= @maxDeg; @mydeg ++ )
-		{ /// adding currently generated to result
-			@leads[index(@mydeg)] = mergeRecordsUniq ( @leads[index(@mydeg)], @newzz[index(@mydeg)], kind );
-		};
+		    } else
+		      {
+			prs = list(pr);
+		      };
 
+		  @temp =  QNF_poly(@ttm);
+		  if( @temp == @ttm )
+		    {
+
+		      /*!!*/						@newzz[index(@newdeg)] = 
+									  /*!!*/	addRecordUniq( @leads[index(@newdeg)], @newzz[index(@newdeg)], @ttexp, @ttm, kind, prs );
+		    };
+
+
+		};				
+	    }; // for
+
+	  if ( @deg == 0 ) 
+	    {
+	      break;
+	    };
 	};
 
-	ECall ("zAddBad", "{new leads}");
+      for ( @mydeg = 0; @mydeg <= @maxDeg; @mydeg ++ )
+	{ // adding currently generated to result
+	  @leads[index(@mydeg)] = mergeRecordsUniq ( @leads[index(@mydeg)], @newzz[index(@mydeg)], kind );
+	};
 
-	return (@leads);
+    };
+
+  ECall ("zAddBad", "{new leads}");
+
+  return (@leads);
 };
 
 
-//////////////////////////////////////////////////////////////////////////
-/// procedure for reducing a given poly wrt already calculated "badleadings"
-//////////////////////////////////////////////////////////////////////////
+/******************************************************/
+// procedure for reducing a given poly wrt already calculated "badleadings"
 
-
-//////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc zReducePoly ( list leads, poly new, poly anfang )
-"
+  "
 	reduce poly new wrt found leads,
 	return: list of all possible reductions... 
 "
 {
-	poly temp = new;
-	poly rest = anfang;
+  poly temp = new;
+  poly rest = anfang;
 
-	poly   lm;
-	number lc;
+  poly   lm;
+  number lc;
 
-	list LEADS;
+  list LEADS;
 
-	int i, n; 
-	list prs;
+  int i, n; 
+  list prs;
 
-	while ( size(temp) > 0 )
-	{
-		// do for every term... beginning with leading... 'till smallest
-		lm = leadmonom( temp );
+  while ( size(temp) > 0 )
+    {
+      // do for every term... beginning with leading... 'till smallest
+      lm = leadmonom( temp );
 
-		LEADS = leads[index(deg( lm ))]; // currently users bad leading products...
+      LEADS = leads[index(deg( lm ))]; // currently users bad leading products...
 
-		if( size(LEADS[2] + lm ) <=  size(LEADS[2]) )
-		{ // need to reduce, since leacmonom already in LEADS
+      if( size(LEADS[2] + lm ) <=  size(LEADS[2]) )
+	{ // need to reduce, since leacmonom already in LEADS
 		    
-			for ( i = 1; i <= size(LEADS[1]); i++ )
-			{
-				if( LEADS[1][i][2] == lm )
-				{
+	  for ( i = 1; i <= size(LEADS[1]); i++ )
+	    {
+	      if( LEADS[1][i][2] == lm )
+		{
 				
-					lc = leadcoef( temp ); // no need be the unit
+		  lc = leadcoef( temp ); // no need be the unit
 
-					prs = LEADS[1][i][3]; // shouldbe generated by zAddBad with kind == 1
-					n = size(prs) ;
+		  prs = LEADS[1][i][3]; // shouldbe generated by zAddBad with kind == 1
+		  n = size(prs) ;
 
-					if ( n == 1 )
-					{ // no recursion
+		  if ( n == 1 )
+		    { // no recursion
 
-						temp = leadcoef(prs[1]) * temp - lc * prs[1]; // leadmonom goes down
+		      temp = leadcoef(prs[1]) * temp - lc * prs[1]; // leadmonom goes down
 
-					} else 
-					{ // do recursion
+		    } else 
+		      { // do recursion
 
-						list result = list();
-						poly newnew;
-						int f_addrest = 0;
+			list result = list();
+			poly newnew;
+			int f_addrest = 0;
 						
-						for( int pri = 1; pri <= n ; pri ++ )
-						{	
-							newnew = leadcoef(prs[pri]) * temp - lc * prs[pri]; // leadmonom goes down
+			for( int pri = 1; pri <= n ; pri ++ )
+			  {	
+			    newnew = leadcoef(prs[pri]) * temp - lc * prs[pri]; // leadmonom goes down
 							
-							if( size( newnew ) > 0 )
-							{
-							    result = result + zReducePoly(leads, newnew, rest);
-							} else
-							{
-							    f_addrest = 1;
-							};
-						};
-
-						if ( f_addrest == 1 )
-						{
-						    result = result + list(rest);
-						};
-						return ( result );
-
-					};
-					break;
+			    if( size( newnew ) > 0 )
+			      {
+				result = result + zReducePoly(leads, newnew, rest);
+			      } else
+				{
+				  f_addrest = 1;
 				};
-			};
+			  };
 
-		} else
-		{ // no such leadmonom in leads
-	
-			rest = rest + lead ( temp );
-			temp = temp - lead ( temp ); // leadcoeff goes down
+			if ( f_addrest == 1 )
+			  {
+			    result = result + list(rest);
+			  };
+			return ( result );
+
+		      };
+		  break;
 		};
-	};
+	    };
 
-	return (list(rest));
+	} else
+	  { // no such leadmonom in leads
+	
+	    rest = rest + lead ( temp );
+	    temp = temp - lead ( temp ); // leadcoeff goes down
+	  };
+    };
+
+  return (list(rest));
 
 };
 
 
-//////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc zCancel ( list @tt, list @leads )
-"
+  "
 	just kill entries of plane PBW base with leading monomials in @leads...
 "
 {
-	int @i;
+  int @i;
 
-	if ( (size(@tt) == 0) )
+  if ( (size(@tt) == 0) )
+    {
+      return (@tt);
+    };
+
+  list result = list();
+  poly g, f;
+
+  for ( @i = size(@tt); @i > 0 ; @i -- ) 
+    // for all PBW entries:
+    {
+      g = leadmonom(@tt[@i][1]);    // pbw entry
+      f = @leads[index(deg(g))][2]; // 'index' poly from @leads
+
+      if ( size(f + g) > size(f) ) // if g not in @leads (works only for monomials)
 	{
-		return (@tt);
+	  result = list( @tt[@i] ) + result;
 	};
+    };
 
-	list result = list();
-	poly g, f;
-
-	for ( @i = size(@tt); @i > 0 ; @i -- ) 
-	/// for all PBW entries:
-	{
-		g = leadmonom(@tt[@i][1]);    /// pbw entry
-		f = @leads[index(deg(g))][2]; /// 'index' poly from @leads
-
-		if ( size(f + g) > size(f) ) /// if g not in @leads (works only for monomials)
-		{
-			result = list( @tt[@i] ) + result;
-		};
-	};
-
-	return (result);
+  return (result);
 
 };
 
-//////////////////////////////////////////////////////////////////////////
-/// procedure for computing "minimal" set of generators...
-//////////////////////////////////////////////////////////////////////////
+/******************************************************/
+// procedure for computing "minimal" set of generators...
 
-//////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc zReduce( list @z )
-"
+  "
 	reduce a set @z - base of Center as V.S.
 	into a minimal set!!
 "
 {
-	BCall( "zReduce", @z );
+  BCall( "zReduce", @z );
 	
-	@z = zRefine ( @z );
-	int n = size( @z );
+  @z = zRefine ( @z );
+  int n = size( @z );
 
-	if ( n < 2 )
-	{
-		return (@z);
-	};
+  if ( n < 2 )
+    {
+      return (@z);
+    };
 
-	int d = maxDeg( stdDeg, @z ); 
+  int d = maxDeg( @z ); 
 
-	list leads = init_bads( d );
+  if( d== -1 )
+    {
+      return (@z);
+    };
 
-	list @red;
+  list leads = init_bads( d );
 
-	int f_add; int j;
+  list @red;
 
-	list result = list();
+  int f_add; int j;
 
-	poly p;
+  list result = list();
+
+  poly p;
 	
-	for ( int i = 1; i <= n ; i++ )
-	{// in this order... from least to maximal...
+  for ( int i = 1; i <= n ; i++ )
+    {// in this order... from least to maximal...
 
-		p = @z[i];
+      p = @z[i];
 
-		@red = zReducePoly ( leads, p, 0 );
+      @red = zReducePoly ( leads, p, 0 );
 
-		f_add = 1;
+      f_add = 1;
 		
-		for( j = 1; j <= size(@red); j++ )
-		{
-			if ( @red[j] == 0 )
-			{
-				f_add = 0; 
-				break; // nothing new....
-			};
-		};
-
-		@red = zRefine( @red ); /// there will be no zeroes after ???
-
-		if( size(@red) > 0 )
-		{ 		    
-		    leads = zAddBad( leads, @red, d, 1); 
-		};
-
-		if ( f_add == 1 )
-		{// we got something new....
-			result = result + list(@red); // ??? which one to add? => trying to add all 
-		};
+      for( j = 1; j <= size(@red); j++ )
+	{
+	  if ( @red[j] == 0 )
+	    {
+	      f_add = 0; 
+	      break; // nothing new....
+	    };
 	};
+      
+      @red = zRefine( @red ); // there will be no zeroes after ???
+
+      if( size(@red) > 0 )
+	{ 		    
+	  leads = zAddBad( leads, @red, d, 1); 
+	};
+      
+      if ( f_add == 1 )
+	{
+	  // we got something new....
+	  result = result + list(@red); // ??? which one to add? => trying to add all 
+	};
+    };
 	
-	ECall( "zReduce", result );
+  ECall( "zReduce", result );
 	
-	return (result);
+  return (result);
 };
 
 
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 // PBW procedures ....
 
 /*
@@ -1546,10 +1472,9 @@ static proc zReduce( list @z )
   PBW term: list of 2 polynoms: [1] = PBW monom, [2] = Ad_p( [1] ), [3] = last variable in [1] (for speed)
 */
 
-
-/////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc PBW_init()
-"
+  "
 PBW[ index(0) ] = PBW part of degree 0:
 record:
 	[1] : 1		// var(0) ;-)	
@@ -1557,14 +1482,14 @@ record:
 	[3] : 1
 "
 {
-	BCall( "PBW_init" );
-	return (list(list(1, 0, 1))); 
+  BCall( "PBW_init" );
+  return (list(list(1, 0, 1))); 
 };
 
 
-/////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc PBW_sys(list VARS, poly p)
-"
+  "
 	calculate the array [1..NVARS] of records: 
 record[i] = 
 		[1] = var(i) 		// i^{th} variable
@@ -1575,597 +1500,465 @@ record[i] =
 "
 {
 
-	BCall( "PBW_sys" );
+  BCall( "PBW_sys" );
 
-	poly t; 
-	for (int v = size(VARS); v>0; v -- )
-	{
-		t    	= VARS[v];
-		VARS[v] = list( t, QNF_poly( p*t - t*p ), deg(t) ) ;
-	};
+  poly t; 
+  for (int v = size(VARS); v>0; v -- )
+    {
+      t    	= VARS[v];
+      VARS[v] = list( t, QNF_poly( p*t - t*p ), deg(t) ) ;
+    };
 		
-	return (VARS);
+  return (VARS);
 };
 
-/////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc PBW_done( list PBW )
-"
+  "
 	collects all together, from graded lists into plane list.	
 	
 	Note: also the last vars... 
 "
 {
-	BCall( "PBW_done" );
+  BCall( "PBW_done" );
 
-	list result = list();
+  list result = list();
 
-	int n = size(PBW);
-	for ( int i = 1; i <= n; i++)
-	{
-		result = result + PBW[i];
-	};
+  int n = size(PBW);
+  for ( int i = 1; i <= n; i++)
+    {
+      result = result + PBW[i];
+    };
 
-	return (result);
+  return (result);
 };
 
-/////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc PBW_next ( list PBW, int k, list sys)
 {
-	BCall( "PBW_next", k );
+  BCall( "PBW_next", k );
 
-	list temp;
-	int kk, nn, ii;
-	list result = list(); // PBW[ index(k) ] ought to be empty ??
-	int N = size(sys);
+  list temp;
+  int kk, nn, ii;
+  list result = list(); // PBW[ index(k) ] ought to be empty ??
+  int N = size(sys);
 	
-	for ( int i = 1; i <= N; i ++ ) // for all vars
+  for ( int i = 1; i <= N; i ++ ) // for all vars
+    {
+      kk = (k - sys[i][3]);   // any deg should be additive function wrt multiplication
+      if ( kk >= 0 )
 	{
-		kk = (k - sys[i][3]);   // any deg should be additive function wrt multiplication
-		if ( kk >= 0 )
+	  nn = size( PBW[ index(kk) ] );
+	  for ( ii = 1; ii <= nn; ii ++ )
+	    {
+	      temp = PBW[ index(kk) ][ii];
+
+	      if ( temp[3] <= i ) 
 		{
-			nn = size( PBW[ index(kk) ] );
-			for ( ii = 1; ii <= nn; ii ++ )
-			{
-				temp = PBW[ index(kk) ][ii];
-
-				if ( temp[3] <= i ) 
-				{
-					temp[2] = temp[2]*sys[i][1] + temp[1]*sys[i][2]; // recursive [,]
-					temp[1] = temp[1]*sys[i][1];
-					temp[3] = i;
+		  temp[2] = temp[2]*sys[i][1] + temp[1]*sys[i][2]; // recursive [,]
+		  temp[1] = temp[1]*sys[i][1];
+		  temp[3] = i;
 					
-					result = result + list ( temp );
-				};
-			};
+		  result = result + list ( temp );
 		};
+	    };
 	};
+    };
 
-	result = QNF_list( result, 2 + 4);
-	ECall( "PBW_next", "list result" );
-	return (result);
+  result = QNF_list( result, 2 + 4);
+  ECall( "PBW_next", "list result" );
+  return (result);
 	
 };
 
-/////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc PBW_base( int MaxDeg, poly p )
 {
-	BCall( "PBW_base", MaxDeg, p );
+  BCall( "PBW_base", MaxDeg, p );
 
-	list PBW = list();
-	list SYS = PBW_sys( my_vars(), p );
+  list PBW = list();
+  list SYS = PBW_sys( my_vars(), p );
 
-	PBW[index(0)] = PBW_init();
+  PBW[index(0)] = PBW_init();
 	
-	for (int k = 1; k <= MaxDeg; k ++ )
-	{		
-		PBW[index(k)] = PBW_next( PBW, k, SYS );
-	};
+  for (int k = 1; k <= MaxDeg; k ++ )
+    {		
+      PBW[index(k)] = PBW_next( PBW, k, SYS );
+    };
 
-	return (PBW_done( PBW ));
+  return (PBW_done( PBW ));
 }; 
 
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-// standard center procedures... "zCommon"
+/******************************************************/
+// standard center procedures...
 
-
-/******************************************************************************/ 
-static proc my_calc (list @given, poly @BASE_POLY, list #) 
+/******************************************************/
+static proc FSS (list @given, poly @BASE_POLY) 
 "
     Gauss with computation of kernel v.s basis
+    to be optimizes
 "
 {
-    list @nums = list ();
-    intvec @ones;
-    int @j, @k, 
-	@n, @v,
-	@a, @nn;
+  BCall( "FSS", "list", "basepoly: ", @BASE_POLY);
+
+  list @nums = list ();
+  intvec @ones;
+  int @j, @k, 
+    @n, @v,
+    @a, @nn;
     
-    @n = size( @BASE_POLY );
-    @v = size( @given );
+  @n = size( @BASE_POLY );
+  @v = size( @given );
     
-    if ( @v == 0 )
+  if ( (@v == 0) or (@n == 0) )
     {    
-	return ( list() );
+      return (@given);
     };
 
-    if ( size(#)>0 )
+  matrix MD[@n][@v];
+
+  number @max;
+  poly @test;
+  poly @t;
+
+  list LM = list(); // rec: { exp, poly }
+
+  for( @k = @v; @k > 0; @k -- )
     {
-	poly @Next_Ad_var;
-	if ( typeof(#[1]) == "int") 
-	{
-	    int @z_next = #[1];
-	    @Next_Ad_var = var (@z_next);
-	};
-	
-	if ( typeof(#[1]) == "poly") 
-	{
-	    @Next_Ad_var = #[1];
-	};
+      LM[@k] = list();
+      @t =  @given[@k][2];
+      LM[@k][2]= @t;
+      LM[@k][1]= leadexp( @t );
     };
-    
-    poly @t;
-    
-    if ( @n == 0 )
-    {    
-	if (defined(@Next_Ad_var))
+
+
+  intvec @w;
+  for ( @a = 1 ; @a <= @n ; @a ++ )
+    {
+      @w = leadexp(@BASE_POLY[@a]);
+      for( @k = @v; @k > 0; @k -- )
 	{
-	    for ( @k = @v; @k > 0; @k --)
+	  if( @w == LM[@k][1] )
 	    {
-		@t = @given[@k][1];
-		@given[@k][2] = @Next_Ad_var * @t - @t * @Next_Ad_var;
+	      @t = LM[@k][2];
+	      MD[@a, @k] = leadcoef( @t );
+	      @t = @t - lead ( @t );
+	      LM[@k][2]  = @t;
+
+	      LM[@k][1]  = leadexp(@t);
 	    };
 	};
-	return (@given);
+
     };
+
+  int @x, @y;
+  number @min;
+
+  number @div;
+  //    @nums = list();
     
+  // Gauss
+//  print("Before Gauss, Matrix: ");
+//  print( MD );
 
-    matrix MD[@n][@v];
-
-    number @max;
-    poly @test;
-
-    list LM = list(); /// rec: { exp, poly }
-
-
-
-
-    for( @k = @v; @k > 0; @k -- )
-    {
-	  LM[@k] = list();
-	  @t =  @given[@k][2];
-	  LM[@k][2]= @t;
-	  LM[@k][1]= leadexp( @t );
-    };
-
-
-    intvec @w;
-    for ( @a = 1 ; @a <= @n ; @a ++ )
-    {
-	  @w = leadexp(@BASE_POLY[@a]);
-	  for( @k = @v; @k > 0; @k -- )
-    	{
-		  if( @w == LM[@k][1] )
-		  {
-		    @t = LM[@k][2];
-			MD[@a, @k] = leadcoef( @t );
-			@t = @t - lead ( @t );
-			LM[@k][2]  = @t;
-
-			LM[@k][1]  = leadexp(@t);
-		  };
-    	};
-
-    };
-
-    int @x, @y;
-    number @min;
-
-    number @div;
-///    @nums = list();
-
-    /// Gauss
-
-    @x = 1;
-    @y = 1;
-    while ( (@y <= @n) && (@x <= @v))
+    
+  @x = 1;
+  @y = 1;
+  while ( (@y <= @n) && (@x <= @v))
     // main Gauss loop...
     {
-	@min =  leadcoef( MD[@y, @x] ); /// curr diag.
-
-	if ( @min == 0 ) 
+      @min =  leadcoef( MD[@y, @x] ); // curr diag.
+	
+      if ( @min == 0 ) 
 	// if zero on diag...
 	{
-	    @j = 0;
-
-	    /// let's find the minimal
-	    for ( @k = @y+1; @k <= @n; @k ++ )
+	  @j = 0;
+		
+	  // let's find the minimal
+	  for ( @k = @y+1; @k <= @n; @k ++ )
 	    {
-		@max = leadcoef( MD[ @k, @x ] );
-		if ( @max != 0 )
+	      @max = leadcoef( MD[ @k, @x ] );
+	      if ( @max != 0 )
 		{
-		    @j = @k;			
-		    @min = @max;
-//////		    @k ++;
-		    break; //// this pure for
-		    /// continue; // for find min
+		  @j = @k;			
+		  @min = @max;
+		  //		    @k ++;
+		  break; // this pure for
+		  // continue; 
+		  // for find min
 		};
-	    }; /// for (@k) // found minimal
-	
-	    if ( @j == 0 ) 
+	    }; // for (@k) // found minimal
+		
+	  if ( @j == 0 ) 
 	    {	    
-		/// das ist gut! ///		
-		@nums = @nums + list ( list ( @x, @y ) );
-		@x ++;
-		continue; // while
+	      // das ist gut! //		
+	      @nums = @nums + list ( list ( @x, @y ) );
+	      @x ++;
+	      continue; // while
 	    } ;
 	    
-	    for ( @k = @x ; @k <= @v ; @k ++ )
+	  for ( @k = @x ; @k <= @v ; @k ++ )
 	    {
-		@t =  MD[ @j, @k ];
-		MD[ @j, @k ] = MD[ @y, @k ];
-		MD[ @y, @k ] = @t;
+	      @t =  MD[ @j, @k ];
+	      MD[ @j, @k ] = MD[ @y, @k ];
+	      MD[ @y, @k ] = @t;
 	    };
+		
+	}; // if diag === zero.
+      @ones[@y] = @x;
 	    
-	}; /// if diag === zero.
-	@ones[@y] = @x;
-	
-	if ( @min == 0 ) 
+      if ( @min == 0 ) 
 	{
-//	    write_latex_str ( " ******************* ERROR ******************* " );
-	    quit;
+	  //	    write_latex_str ( " ******************* ERROR ******************* " );
+	  quit;
 	};
-
-    
-	if ( @min != 1) /// let's norm the row... to make the '1' !
+	    
+	    
+      if ( @min != 1) // let's norm the row... to make the '1' !
 	{
-	    @min = 1 / @min;
-	    for ( @k = @x; @k <= @v; @k++ )
+	  @min = 1 / @min;
+	  for ( @k = @x; @k <= @v; @k++ )
 	    {
-		@max = leadcoef( MD[@y, @k] );
-
-		if ( @max == 0)
+	      @max = leadcoef( MD[@y, @k] );
+		    
+	      if ( @max == 0)
 		{
-		    @k ++ ;
-	    	    continue; /// for : norming the row...
+		  @k ++ ;
+		  continue; // for : norming the row...
 		};
-	    
-		MD[@y, @k] = @max * @min;  ////here must be Field ...
+		    
+	      MD[@y, @k] = @max * @min;  // here must be Field ...
 	    };
-	
-////	    @min = 1;
-
+		
+	  //	    @min = 1;
+		
 	};
-	
-	//// here must be @min != 0;
-	for ( @k = 1; @k <= @n; @k++ )
-	{
-	    @max = leadcoef( MD[@k, @x] );
-
-	    if ( ( @k == @y) || (@max == 0) )
-	    {
-		@k ++ ;
-	    	continue; 
-	    };
-
-	    for ( @j = @x; @j <= @v ; @j ++ )
-	    {
-		MD[ @k, @j ] = MD[ @k, @j ] - @max * MD[ @y, @j ];
-	    };	     	    
 	    
-	}; ///killing
-	
-	@x ++;
-	@y ++;
-    }; //////main while.
-//////////////////////////////////////////////////////
-
-
-    /// computation of kernel's basis
-
-    
-    if ( @x <= @v ) 
-    {
-	for ( @k = @x; @k <= @v ; @k ++ )
+      // here must be @min != 0;
+      for ( @k = 1; @k <= @n; @k++ )
 	{
-	    @nums = @nums + list ( list ( @k, @n+1 ) );	
+	  @max = leadcoef( MD[@k, @x] );
+		
+	  if ( ( @k == @y) || (@max == 0) )
+	    {
+	      @k ++ ;
+	      continue; 
+	    };
+		
+	  for ( @j = @x; @j <= @v ; @j ++ )
+	    {
+	      MD[ @k, @j ] = MD[ @k, @j ] - @max * MD[ @y, @j ];
+	    };	     	    
+	  
+	}; //killing
+	    
+      @x ++;
+      @y ++;
+    }; //main while.
+  /******************************************************/
+    
+//  print("Gaussed Matrix: ");
+//  print( MD );
+
+  // computation of kernel's basis
+
+  if ( @x <= @v ) 
+    {
+      for ( @k = @x; @k <= @v ; @k ++ )
+	{
+	  @nums = @nums + list ( list ( @k, @n+1 ) );	
 	}
     }
     
-    if ( @y <= @n )
-    {
-	@n = @y - 1;
-    };
+//  print("Nums: " );
+//  print (@nums);
     
-
-    list result = list();
+  list result = list();
     
-/// real calculations of the Base of a Ker as V.S.
+  // real calculations of the Base of a Ker as V.S.
 
-    for ( @k = 1; @k <= size(@nums) ; @k ++ )
+  for ( @k = 1; @k <= size(@nums) ; @k ++ )
     {
-	@x = @nums[@k][1]; 
-	@j  = @nums[@k][2]; 
-	
-	@t = @given[@x][1];
-	
-	for ( @y = 1; @y < @j ; @y ++ )
-	/// for every "@x" column
+      @x = @nums[@k][1]; 
+      @j  = @nums[@k][2]; 
+	    
+      @t = @given[@x][1];
+	    
+      for ( @y = 1; @y < @j ; @y ++ )
+	// for every "@x" column
 	{
-	    @max = leadcoef( MD[@y, @x] );
-	    if ( (@max != 0) )
+	  @max = leadcoef( MD[@y, @x] );
+	  if ( (@max != 0) )
 	    {
-		@a = @ones[@y];
-		@t = @t - @max * @given[@a][1];
+	      @a = @ones[@y];
+	      @t = @t - @max * @given[@a][1];
+	    };
+	};
+      
+      result[@k] = @t;
+    };
+
+  ECall( "FSS", "list" );
+  return ( result );
+};
+
+/******************************************************/
+static proc reduce_one_per_row(list @given)
+{
+  BCall( "reduce_one_per_row" );
+	
+  int @k;
+  int @l = size (@given);
+	
+  if( @l == 0 )
+    {
+      return (@given);
+    };
+	
+  int @char = char(basering);
+	
+  intvec @marks;
+
+  if ( @char == 0 )
+    {
+      poly @t = poly(0);
+    };
+
+  list @unis = list ();
+  poly p;
+	
+  for ( @k = @l; @k > 0; @k -- )
+    {
+      p = uni_poly( @given[@k][2] );
+      @unis[@k] = p;
+
+      if( p == 0 )
+	{
+	  @marks[@k] = 2;
+	} else
+	  {
+	    @marks[@k] = 1;
+	    if ( @char == 0 )
+	      {
+		@t = @t + p;
+	      };
+	  };
+    };
+	
+  if ( @char != 0 )
+    {
+      def save = basering;
+      execute( "ring NewRingWithGoodField = (0), (" + varstr(save) + "), (" + ordstr(save) + "); ");
+      poly @t = 0;
+		
+      if(! defined (@unis) )
+	{
+	  list @unis = imap( save, @unis );
+	};
+		
+      for ( @k = @l; @k > 0; @k -- )
+	{
+	  if( @marks[@k] == 1 )
+	    {
+	      @t = @t + @unis[@k];
+	    };
+	};
+    };
+		
+  int @loop_size = size(@t);
+  poly @for_delete, @tt;
+  int @ll;
+	
+  while( @loop_size > 0 )
+    {
+      @for_delete = poly(0);
+      @ll = size(@t);    
+		
+      for ( @k = @ll; @k > 0; @k -- )
+	{
+	  if ( leadcoef(@t[@k]) == 1 )
+	    {
+	      @for_delete = @for_delete + @t[@k];
 	    };
 	};
 
-	if ( defined(@Next_Ad_var) )
+      @loop_size = size( @for_delete );
+
+      if ( @loop_size>0 )
 	{
-	    result[@k] = list ( @t, @Next_Ad_var * @t - @t * @Next_Ad_var ) ;
-	} else
-	{
-	    result[@k] = @t;
-	}
+	  for( @k = @l ; @k > 0 ; @k -- )
+	    {	    
+	      if ( @marks[@k] == 1) 
+		{
+		  @tt = @unis[@k];
+
+		  if( size( @for_delete + @tt ) != ( size( @for_delete )  + size( @tt ) ) ) 
+		    {
+		      @t = @t - @tt;
+		      @marks[@k] = 0;
+		    };
+		};
+	    };		
+	};		
+    };
+	
+  if ( @char != 0 )
+    {
+      setring(save);
+      kill(NewRingWithGoodField);
     };
 
-    return ( result );
-};
-
-
-/******************************************************************************/ 
-/*
-static proc add2list( poly l, poly q )
-"
-	l is a sorted list of monomials (polynom with coefs: 0 or 1)
-	adding monomials from q, checking also for presence
+  list @reduced = list();
 	
-	?? NEED DEBUG ??
-"
-{
-	BCall( "add2list", "{" + string(l) + "} , " + string(q) );
-
-	poly t;
-	for( int i = size(q); i>0; i-- )
+  for ( @k = @l ; @k>0 ; @k --)
+    {
+      if (@marks[@k]==2)
 	{
-
-	/// trick:
-	///  check for presens of a monomial q[i] in l
-	///  if char = 0 then new_size > (if not present) or =  (if already present)
-	///  if char > 0 then new_size > (if not present) or =< (if already present) 
-		t = l + leadmonom(q[i]);
-		if ( size(t) > size(l) )
-		{
-			l = t;
-		};	
-	};
-	
-	ECall( "add2list", "{" + string(l) + "}" );
-	return (l);
-};
-*/
-
-/******************************************************************************/ 
-/*
-static proc rm4list( poly l, poly q )
-"
-	l is a sorted list of monomials (polynom with coefs: 0 or 1)
-	removing from l monomials occuring in q
-	
-	?? NEED DEBUG ??
-"
-{
-	BCall( "rm4list", "{" + string(l) + "} , " + string(q) );
-	poly t;
-	for( int i = size(q); i>0; i-- )
-	{
-
-	/// trick:
-	///  check for presens of a monomial q[i] in l
-	///  if char = 0 then new_size > (if not present) or =  (if already present)
-	///  if char > 0 then new_size > (if not present) or =< (if already present) 
-		t = leadmonom(q[i]);
-		if ( size(l+t) <= size(l) )
-		{
-			l = t - t;
-			if( size(l) == 0 )
-			{
-				break;
-			};
-		};	
-	};
-	
-	ECall( "rm4list", "{" + string(l) + "}" );
-	return (l);
-};
-*/
-
-/******************************************************************************/ 
-static proc reduce_one_per_row(list @given)
-{
-	BCall( "reduce_one_per_row" );
-	
-	int @k;
-	int @l = size (@given);
-	
-	if( @l == 0 )
-	{
-		return (@given);
-	};
-	
-	int @char = char(basering);
-	
-	intvec @marks;
-
-	if ( @char == 0 )
-	{
-		poly @t = poly(0);
-	};
-
-	list @unis = list ();
-	poly p;
-	
-	for ( @k = @l; @k > 0; @k -- )
-	{
-		p = uni_poly( @given[@k][2] );
-		@unis[@k] = p;
-
-		if( p == 0 )
-		{
-			@marks[@k] = 2;
-		} else
-		{
-			@marks[@k] = 1;
-			if ( @char == 0 )
-			{
-				@t = @t + p;
-			};
-		};
-	};
-	
-	if ( @char != 0 )
-	{
-		def save = basering;
-		execute( "ring NewRingWithGoodField = (0), (" + varstr(save) + "), (" + ordstr(save) + "); ");
-		poly @t = 0;
-		
-		if(! defined (@unis) )
-		{
-			list @unis = imap( save, @unis );
-		};
-		
-		for ( @k = @l; @k > 0; @k -- )
-		{
-			if( @marks[@k] == 1 )
-			{
-				@t = @t + @unis[@k];
-			};
-		};
-	};
-		
-	int @loop_size = size(@t);
-	poly @for_delete, @tt;
-	int @ll;
-	
-	while( @loop_size > 0 )
-	{
-		@for_delete = poly(0);
-		@ll = size(@t);    
-		
-		for ( @k = @ll; @k > 0; @k -- )
-		{
-			if ( leadcoef(@t[@k]) == 1 )
-			{
-				@for_delete = @for_delete + @t[@k];
-			};
-		};
-
-		@loop_size = size( @for_delete );
-
-		if ( @loop_size>0 )
-		{
-			for( @k = @l ; @k > 0 ; @k -- )
-			{	    
-				if ( @marks[@k] == 1) 
-				{
-					@tt = @unis[@k];
-
-					if( size( @for_delete + @tt ) != ( size( @for_delete )  + size( @tt ) ) ) 
-					{
-						@t = @t - @tt;
-						@marks[@k] = 0;
-					};
-				};
-			};		
-		};		
-	};
-	
-	if ( @char != 0 )
-	{
-		setring(save);
-		kill(NewRingWithGoodField);
-	};
-
-	list @reduced = list();
-	
-	for ( @k = @l ; @k>0 ; @k --)
-	{
-		if (@marks[@k]==2)
-		{
-			@reduced = list ( @given[@k] ) + @reduced ;
-		} else
-		{
-			if (@marks[@k]==1)
-			{
-				@reduced = @reduced + list ( @given[@k] );
-			};
-		};
-	};
+	  @reduced = list ( @given[@k] ) + @reduced ;
+	} else
+	  {
+	    if (@marks[@k]==1)
+	      {
+		@reduced = @reduced + list ( @given[@k] );
+	      };
+	  };
+    };
     
-	ECall( "reduce_one_per_row", "{...l...}" );
-	return (@reduced);
+  ECall( "reduce_one_per_row", "structured list" );
+  return (@reduced);
 };
 
 
 
-/******************************************************************************/ 
-static proc calc_base (list @AD_GIVEN, list #)
-"
+/******************************************************/
+static proc calc_base (list @AD_GIVEN)
+  "
     sort out given 'pbw' into groups due to common monoms in images = ([2])s
 "
 {
-	BCall( "calc_base" );
+  BCall( "calc_base" );
 
-    if ( (size(#)>0) )
+  list @AD_CALC = list();
+  int @ll, @k, @j, @loop_size;
+
+  poly @t = poly(0);
+  poly @tt, @for_delete;
+
+  int @t_size;
+
+  list @GR, @GR_TEMP;
+
+  int @number = size(@AD_GIVEN);
+
+  while ( @number > 0 )
     {
-	int @z_next; 
-	poly @z_nextp;
-	
-	if ( typeof(#[1]) == "int") 
+      @tt = @AD_GIVEN[@number][2];
+      if ( size (@tt) == 0)
 	{
-	    @z_next = #[1];
-	    @z_nextp = var(@z_next);    
-	};
-	
-	if ( typeof(#[1]) == "poly") 
-	{
-	    @z_nextp = #[1];
-	};
-    
-    };
-    
-
-    list @AD_CALC = list();
-    int @ll, @k, @j, @loop_size;
-
-    poly @t = poly(0);
-    poly @tt, @for_delete;
-
-    int @t_size;
-
-
-    list @GR, @GR_TEMP;
-
-    int @number = size(@AD_GIVEN);
-
-    while ( @number > 0 )
-    {
-	@tt = @AD_GIVEN[@number][2];
-	if ( size (@tt) == 0)
-	{
-	    @t = @AD_GIVEN[@number][1];
-	    if (defined(@z_nextp))
-	    {
-		@tt = @z_nextp * @t - @t * @z_nextp; /// right? (-?)
-		@AD_CALC = @AD_CALC + list ( list ( @t, @tt ) );
-	    } else
-	    {
-		@AD_CALC = @AD_CALC + list ( @t );	    
-	    };
-	    
+	  @AD_CALC = @AD_CALC + list ( @AD_GIVEN[@number][1] );
 	} else
-	{
+	  {
 	    @t = uni_poly( @tt );
 	    @t_size = size(@t);
 	
@@ -2175,339 +1968,378 @@ static proc calc_base (list @AD_GIVEN, list #)
 
 	    @loop_size = size(@GR);
 	    if ( @loop_size == 0 )
-	    {
+	      {
 		@GR = list(@GR_TEMP);
-	    } else
-	    {
-		for ( @k = @loop_size; @k > 0 ; @k -- )
+	      } else
 		{
-		    @tt = @GR[@k][1];
-		    if ( size( @t + @tt ) != ( @t_size + size(@tt) ) ) 
-		    // whether @tt and @i intersencts? ( will not work in char == 2 !!!)
+		  for ( @k = @loop_size; @k > 0 ; @k -- )
 		    {
+		      @tt = @GR[@k][1];
+		      if ( size( @t + @tt ) != ( @t_size + size(@tt) ) ) 
+			// whether @tt and @i intersencts? ( will not work in char == 2 !!!)
+			{
 
-			if ( char(basering) == 0 )
-			{
-			    @GR_TEMP[1] = @GR_TEMP[1] + @tt;
-			} else
-			{
-			    @GR_TEMP[1] = uni_poly( @GR_TEMP[1] + @tt );
-			};
+			  if ( char(basering) == 0 )
+			    {
+			      @GR_TEMP[1] = @GR_TEMP[1] + @tt;
+			    } else
+			      {
+				@GR_TEMP[1] = uni_poly( @GR_TEMP[1] + @tt );
+			      };
 			
-		        @GR_TEMP[2] = @GR_TEMP[2] + @GR[@k][2];
-		        @GR = delete ( @GR, @k );
+			  @GR_TEMP[2] = @GR_TEMP[2] + @GR[@k][2];
+			  @GR = delete ( @GR, @k );
+			};
 		    };
+		  @GR = @GR + list(@GR_TEMP);
 		};
-		@GR = @GR + list(@GR_TEMP);
-	    };
-	};
-	@number --;
-    }; ///  main while
+	  };
+      @number --;
+    }; //  main while
     
-    list @res;
+  list @res;
 
-    for ( @k = size(@GR); @k > 0 ; @k -- )
+  for ( @k = size(@GR); @k > 0 ; @k -- )
     {
-	if ( size (@GR[@k][2]) > 1 ) /// ! zeroes in AD_CALC so here must be non zero
+      if ( size (@GR[@k][2]) > 1 ) // ! zeroes in AD_CALC so here must be non zero
 	{
-	    if(defined(@z_nextp))
+	  @res = FSS ( @GR[@k][2], uni_poly(@GR[@k][1]));
+	  
+	  if ( size (@res) > 0 )
 	    {
-		  @res = my_calc ( @GR[@k][2], uni_poly(@GR[@k][1]), @z_nextp);
-	    } else
-	    {
-		  @res = my_calc ( @GR[@k][2], uni_poly(@GR[@k][1]));	
-	    }
-	    if ( size (@res) > 0 )
-	    {
-		  @AD_CALC = @AD_CALC + @res;
+	      @AD_CALC = @AD_CALC + @res;
 	    };
 	};
     };    
 
-	ECall( "calc_base" );
-	return (@AD_CALC);
+  ECall( "calc_base" );
+  return (@AD_CALC);
 
 };
 
-/******************************************************************************/ 
-static proc calc_k_base (list l, list #)
+
+/******************************************************/
+static proc ApplyAd( list l, list # )
 "
-  calculation of Ker as Vector Space
+  Apply Ad_{#} to every element of a list of polynomils
 "
 {
-	BCall( "calc_k_base", "list, " + string(#) );
+  BCall( "ApplyAd", l, # );
 
-	list t = reduce_one_per_row( l, 0); /// optimization (a1)
-	return( QNF_list ( calc_base(t, #), 2) );          /// calculation of groupps (a2) + gauss.
+  if( (size(l) == 0) or (size(#) == 0) )
+    {
+      return (l);
+    };
 
+  poly f, t;
+  
+  if ( typeof(#[1]) == "int") 
+    {
+      int next = #[1];
+      f = my_var (next);
+    } else
+      {
+	if ( typeof(#[1]) == "poly") 
+	  {
+	    f = #[1];
+	  } else
+	    {
+	      print("Error: cannot differentiate with '" + string(#)+"'");
+	      return ();
+	    };
+      };
+
+  for ( int k = size(l); k > 0; k --)
+    {
+      t = l[k];
+      l[k] = list( t, f * t - t * f );
+    };
+
+  ECall("ApplyAd", l );
+  return (l);
 };
 
-/******************************************************************************/ 
 
-///////////////////////////////////////////////////////////////////////////////
-static proc makeIdeal ( list l )
+/******************************************************/
+static proc calc_k_base (list l, list #)
+  "
+     calculation of Kernel of an Ad operator as a K-Vector Space
 "
+{
+  BCall( "calc_k_base", "list, " + string(#) );
+
+  list t = reduce_one_per_row( l, 0); // optimization (a1)
+  return( QNF_list ( ApplyAd( calc_base(t), # ), 2) );          // calculation of groupps (a2) + gauss.
+    
+};
+
+LIB "poly.lib"; // for content in proc makeIdeal
+
+/******************************************************/
+static proc makeIdeal ( list l )
+  "
 	return: ideal: where the generators are polynomials from list, without 1 and zeroes
 "
 {
-	ideal I; poly p;
+  ideal I; poly p;
 
-	for( int i = 1; i <= size(l); i++ )
+  for( int i = 1; i <= size(l); i++ )
+    {
+      if ( typeof( l[i] ) == "list" )
 	{
-		if ( typeof( l[i] ) == "list" )
-		{
-			p = l[i][1]; /// just take the 1st polynom...
-		} else
-		{
-			p = l[i];
-		};
+	  p = l[i][1]; // just take the 1st polynom...
+	} else
+	  {
+	    p = l[i];
+	  };
 		
-		if ( (p != 1) and (p != 0) )
-		{
-			I = I, p;
-		};
+      p = cleardenom( p* (1/content(p)) );
+      if ( (p != 1) and (p != 0) )
+	{
+	  I = I, p;
 	};
+    };
 	
-	I = simplify ( I, 2 ); /// no zeroes
+  I = simplify ( I, 2 ); // no zeroes
 	
-	return(I);
+  return(I);
 };
 
-/******************************************************************************/ 
+/******************************************************/
 static proc inCenter_poly( poly p )
-"
+  "
   if p in center => return 1
       otherwise     return 0
 "
 {
-    poly t;
-    for (int k = nvars(basering); k>0; k-- )
+  poly t;
+  for (int k = nvars(basering); k>0; k-- )
     {
-	t = var(k);
-        if ( QNF_poly(t * p - p * t) != 0 )
+      t = var(k);
+      if ( QNF_poly(t * p - p * t) != 0 )
 	{
-		  if( toprint() ) 
-		  {
-			"POLY: ", string (p), " is NOT in center";
-		  };
-		  return (0);
+	  if( toprint() ) 
+	    {
+	      "POLY: ", string (p), " is NOT in center";
+	    };
+	  return (0);
 	};
     };
 
-    if( toprint() ) 
+  if( toprint() ) 
     {
-	  "POLY: ", string (p), " is in center";
+      "POLY: ", string (p), " is in center";
     };
-    return (1);
+  return (1);
 };
 
-/******************************************************************************/ 
+/******************************************************/
 static proc inCenter_list(def l)
 {
-    for ( int @i = 1; @i <= size(l); @i++ )
+  for ( int @i = 1; @i <= size(l); @i++ )
     {
-	if ( typeof(l[@i])=="poly" ) 
+      if ( typeof(l[@i])=="poly" ) 
 	{
-	    if (! inCenter_poly(l[@i]) )
+	  if (! inCenter_poly(l[@i]) )
 	    {
-		return(0);
+	      return(0);
 	    };
 		
 	} else
-	{
+	  {
 	    if ( (typeof(l[@i])=="list") or (typeof(l[@i])=="ideal") ) 
-	    {
-		  if (! inCenter_list(l[@i]) )
+	      {
+		if (! inCenter_list(l[@i]) )
 		  {
-			return(0);
+		    return(0);
 		  };
-	    };
-	};
+	      };
+	  };
     };
-    return(1);
+  return(1);
 };
 
-/******************************************************************************/ 
+/******************************************************/
 static proc inCentralizer_poly( poly p, poly f )
-"
+  "
   if p in centralizer(f) => return 1
       otherwise     return 0
 "
 {
-    if ( QNF_poly(f * p - p * f) != 0 )
+  if ( QNF_poly(f * p - p * f) != 0 )
     {	  
-	  if( toprint() ) 
-	  {
-		"POLY: ", string (p), " is NOT in centralizer(f)";
-	  };
-	  return (0);
+      if( toprint() ) 
+	{
+	  "POLY: ", string (p), " is NOT in centralizer(f)";
+	};
+      return (0);
     };
 	
-    if( toprint() ) 
+  if( toprint() ) 
     {
-	"POLY: ", string (p), " is in centralizer(f)";
+      "POLY: ", string (p), " is in centralizer(f)";
     };
-	return (1);
+  return (1);
 };
 
-/******************************************************************************/ 
+/******************************************************/
 static proc inCentralizer_list( def l, poly f )
 {
   for ( int @i = 1; @i <= size(l); @i++ )
-  {
-	if ( typeof(l[@i])=="poly" ) 
+    {
+      if ( typeof(l[@i])=="poly" ) 
 	{
-	    if (! inCentralizer_poly(l[@i], f) )
-		{
-		  return(0);
-		};
+	  if (! inCentralizer_poly(l[@i], f) )
+	    {
+	      return(0);
+	    };
 		
 	} else
-	{
+	  {
 	    if ( (typeof(l[@i])=="list") or (typeof(l[@i])=="ideal") ) 
-	    {
-		  if (! inCentralizer_list(l[@i], f) )
+	      {
+		if (! inCentralizer_list(l[@i], f) )
 		  {
-			return(0);
+		    return(0);
 		  };
-	    };
-	};
-  };
+	      };
+	  };
+    };
   return(1);
 };
 
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-/// main algorithms
+/******************************************************/
+/******************************************************/
+// main algorithms
 
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-/// center's computation
+/******************************************************/
+/******************************************************/
+// center's computation
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 /* static */ proc center_min_iterative( int MaxDeg, list # )
-"
+  "
 	computes the 'minimal' set of central elements (of deg <= MaxDeg) in iterative way
 	Note: based on calc_k_base, zAddBad, zRefine, zCancel, PBW_*
 "
 {
-	BCall("center_min_iterative", MaxDeg, #);
+  BCall("center_min_iterative", MaxDeg, #);
 	
-	int n = myInt(#);
-	int m = ( MaxDeg < 0 ); /// no bound on Degree
+  int n = myInt(#);
+  int m = ( MaxDeg < 0 ); // no bound on Degree
 	
-	int MinDeg = 6; /// starting guess for MaxDeg
-	int Delta  = 4; /// increment of MaxDeg
+  int MinDeg = 6; // starting guess for MaxDeg
+  int Delta  = 4; // increment of MaxDeg
 	
-	if( m )
-	{	
-		// minimal guess
-		MaxDeg = MinDeg;		
-	};
+  if( m )
+    {	
+      // minimal guess
+      MaxDeg = MinDeg;		
+    };
 	
-	list @q; int @i; int N = nvars(basering);
+  list @q; int @i; int N = nvars(basering);
 
-	my_var_init(); // setup for my_var(n)
-	QNF_init();
+  my_var_init(); // setup for my_var(n)
+  QNF_init();
 
-	list PBW = list();
-	list PBW_PLAIN = list();
+  list PBW = list();
+  list PBW_PLAIN = list();
 
-	PBW[ index(0) ] = PBW_init();
+  PBW[ index(0) ] = PBW_init();
 
-	list SYS = PBW_sys( my_vars(), my_var(1) );
+  list SYS = PBW_sys( my_vars(), my_var(1) );
 
 	
-	list @z = list (); 					/// center list
-	list @l = init_bads( MaxDeg ); 	/// verbotten loeadexps...
+  list @z = list (); 					// center list
+  list @l = init_bads( MaxDeg ); 	// verbotten loeadexps...
 	
-	@q = PBW[ index(0) ];
+  @q = PBW[ index(0) ];
 
-	int k = 1;
-	while( k <= ( MaxDeg+1 ) )
+  int k = 1;
+  while( k <= ( MaxDeg+1 ) )
+    {
+      for ( @i = 2; @i <= N; @i ++ )
 	{
-		for ( @i = 2; @i <= N; @i ++ )
-		{
-			@q = calc_k_base (@q, my_var(@i));
-		};
-
-		@q = zRefine (calc_k_base(@q)); /// new center!
-
-
-		if ( size(@q) > 0 ) 
-		{
-			@z = @z + @q; /// computed central elements
-			
-			if( (n > 0) and (size(@z) > n) )
-			{ 
-				break; // found all central elements			
-			};
-		};
-
-		if( k == ( MaxDeg+1 ) )
-		{
-			if( (n == 0) and ( !m ) )
-			{
-				break; /// that's all
-			};
-			
-			MaxDeg = MaxDeg + Delta;
-			
-			// renew bad list
-			@l = init_bads( MaxDeg );			
-			@l = zAddBad( @l, @z, MaxDeg, 0 );
-			
-		} else
-		{
-		
-			if ( size(@q) > 0 ) 
-			{
-				@l = zAddBad( @l, @q, MaxDeg, 0 ); /// add all possible 'leadexps' !
-			};
-			
-		};
-
-		PBW[index(k)] = PBW_next( PBW, k, SYS );
-
-		PBW_PLAIN = PBW_PLAIN + zCancel( PBW[index(k-1)] , @l );
-
-		@q = PBW_PLAIN + zCancel( PBW[index(k)] , @l ); /// kill from @tt all entries with leadexp in @l[@d]
-
-		k ++;
+	  @q = calc_k_base (@q, my_var(@i));
 	};
 
-	QNF_done();
-	my_var_done();
+      @q = zRefine (calc_k_base(@q)); // new center!
 
-	return (makeIdeal(@z));
+
+      if ( size(@q) > 0 ) 
+	{
+	  @z = @z + @q; // computed central elements
+			
+	  if( (n > 0) and (size(@z) > n) )
+	    { 
+	      break; // found all central elements			
+	    };
+	};
+
+      if( k == ( MaxDeg+1 ) )
+	{
+	  if( (n == 0) and ( !m ) )
+	    {
+	      break; // that's all
+	    };
+			
+	  MaxDeg = MaxDeg + Delta;
+			
+	  // renew bad list
+	  @l = init_bads( MaxDeg );			
+	  @l = zAddBad( @l, @z, MaxDeg, 0 );
+			
+	} else
+	  {
+		
+	    if ( size(@q) > 0 ) 
+	      {
+		@l = zAddBad( @l, @q, MaxDeg, 0 ); // add all possible 'leadexps' !
+	      };
+			
+	  };
+
+      PBW[index(k)] = PBW_next( PBW, k, SYS );
+
+      PBW_PLAIN = PBW_PLAIN + zCancel( PBW[index(k-1)] , @l );
+
+      @q = PBW_PLAIN + zCancel( PBW[index(k)] , @l ); // kill from @tt all entries with leadexp in @l[@d]
+
+      k ++;
+    };
+
+  QNF_done();
+  my_var_done();
+
+  return (makeIdeal(@z));
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc center_vectorspace( int MaxDeg )
-"
+  "
 	pure calculation of center as a finitely dimmensional Vector Space (deg <= MaxDeg )
 "
 {
-	my_var_init();
+  my_var_init();
 	
-	int  N = nvars( basering );
-	list P = PBW_base( MaxDeg, my_var(1) ); 
+  int  N = nvars( basering );
+  list P = PBW_base( MaxDeg, my_var(1) ); 
 	
-	for( int v = 2; v <= N; v++ )
-	{
-		P = calc_k_base( P, my_var(v) );
-	};
+  for( int v = 2; v <= N; v++ )
+    {
+      P = calc_k_base( P, my_var(v) );
+    };
 
-	my_var_done();
+  my_var_done();
 	
-	return( calc_k_base ( P ) );
+  return( calc_k_base ( P ) );
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 /* static */ proc center_min_vectorspace( int MaxDeg )
-"
+  "
     computes the 'minimal' set of central elements (of deg <= MaxDeg) 
     by reducing the set of it's generators as vector space
     
@@ -2516,38 +2348,38 @@ static proc center_vectorspace( int MaxDeg )
 "
 {
 
-	QNF_init();
-	ideal res = makeIdeal( zReduce( center_vectorspace( MaxDeg)));
-	QNF_done();
+  QNF_init();
+  ideal res = makeIdeal( zReduce( center_vectorspace( MaxDeg)));
+  QNF_done();
 
-	return( res );
+  return( res );
 };
 
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-/// centralizer's computations
+/******************************************************/
+/******************************************************/
+// centralizer's computations
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 static proc centralizer_vectorspace( poly p, int MaxDeg )
 {
-	return( calc_k_base( PBW_base( MaxDeg, p )));
+  return( calc_k_base( PBW_base( MaxDeg, p )));
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 /* static */ proc centralizer_min_vectorspace( poly p, int MaxDeg )
 {
 
-	QNF_init();
-	ideal res = makeIdeal( zReduce( centralizer_vectorspace( p, MaxDeg)));
-	QNF_done();
+  QNF_init();
+  ideal res = makeIdeal( zReduce( centralizer_vectorspace( p, MaxDeg)));
+  QNF_done();
 
-	return( res );
+  return( res );
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 /* static */ proc centralizer_min_iterative( poly p, int MaxDeg, list # )
-"
+  "
   computes the 'minimal' set of elements (of deg <= MaxDeg) generating centralizer of p in iterative way
   Note: based on calc_k_base
   
@@ -2555,112 +2387,112 @@ static proc centralizer_vectorspace( poly p, int MaxDeg )
   Note: no proof that it is really centralizer and moreover 'minimal' centralizer
 "
 {
-	QNF_init();
+  QNF_init();
 
-	int n = myInt(#);
-	int m = (MaxDeg < 0);
+  int n = myInt(#);
+  int m = (MaxDeg < 0);
 	
-	int MinDeg = 6; /// starting guess for MaxDeg
-	int Delta  = 4; /// increment of MaxDeg
+  int MinDeg = 6; // starting guess for MaxDeg
+  int Delta  = 4; // increment of MaxDeg
 	
-	if( m )
+  if( m )
+    {
+      // minimal guess
+      MaxDeg = MinDeg;
+    };
+
+  list @q;
+
+  list PBW = list();
+  list PBW_PLAIN = list();
+
+  PBW[ index(0) ] = PBW_init();
+
+  list SYS = PBW_sys( my_vars(), p );
+
+  list @z  = list ();             // result list
+  list @l  = init_bads( MaxDeg ); // verbotten loeadexps...
+	
+  @q = PBW[ index(0) ];
+
+  for (int k = 1; k <= ( MaxDeg+1 ); k ++ )
+    {
+      @q = zRefine( calc_k_base(@q), 1 ); 
+
+      if ( size(@q) > 0 ) 
 	{
-		// minimal guess
-		MaxDeg = MinDeg;
+	  @z = @z + @q; // computed desired elements
+		  
+	  if( (n > 0) and (size(@z) > n) )
+	    {
+	      break; // found needed elements
+	    };
 	};
 
-	list @q;
-
-	list PBW = list();
-	list PBW_PLAIN = list();
-
-	PBW[ index(0) ] = PBW_init();
-
-	list SYS = PBW_sys( my_vars(), p );
-
-	list @z  = list ();             // result list
-	list @l  = init_bads( MaxDeg ); // verbotten loeadexps...
-	
-	@q = PBW[ index(0) ];
-
-	for (int k = 1; k <= ( MaxDeg+1 ); k ++ )
+      if( k == ( MaxDeg+1 ) )
 	{
-		@q = zRefine( calc_k_base(@q), 1 ); 
-
-		if ( size(@q) > 0 ) 
-		{
-			@z = @z + @q; /// computed desired elements
-			
-			if( (n > 0) and (size(@z) > n) )
-			{
-				break; // found needed elements
-			};
-		};
-
-		if( k == ( MaxDeg+1 ) )
-		{
-			if( (n == 0) or ( !m ) )
-			{
-				break; /// that's all
-			};			
-			
-			MaxDeg = MaxDeg + Delta;
-			
-			// renew bad list
-			@l = init_bads( MaxDeg );			
-			@l = zAddBad( @l, @z, MaxDeg, 0 );
-			
-		} else
-		{
+	  if( (n == 0) or ( !m ) )
+	    {
+	      break; // that's all
+	    };			
+		  
+	  MaxDeg = MaxDeg + Delta;
+		  
+	  // renew bad list
+	  @l = init_bads( MaxDeg );			
+	  @l = zAddBad( @l, @z, MaxDeg, 0 );
+		  
+	} else
+	  {
+		    
+	    if ( size(@q) > 0 ) 
+	      {
+		@l = zAddBad( @l, @q, MaxDeg, 0 ); // add all possible 'leadexps' !
+	      };
+		    
+	  };
 		
-			if ( size(@q) > 0 ) 
-			{
-				@l = zAddBad( @l, @q, MaxDeg, 0 ); /// add all possible 'leadexps' !
-			};
-			
-		};
+      PBW[index(k)] = PBW_next( PBW, k, SYS );
+      PBW_PLAIN = PBW_PLAIN + zCancel( PBW[index(k-1)] , @l );
+      @q = PBW_PLAIN + zCancel( PBW[index(k)] , @l );  // kill from @tt all entries with leadexp in @l[@d]
 
-		PBW[index(k)] = PBW_next( PBW, k, SYS );
-		PBW_PLAIN = PBW_PLAIN + zCancel( PBW[index(k-1)] , @l );
-		@q = PBW_PLAIN + zCancel( PBW[index(k)] , @l );  // kill from @tt all entries with leadexp in @l[@d]
+    };
 
-	};
-
-	QNF_done();
-	return (makeIdeal(@z));
+  QNF_done();
+  return (makeIdeal(@z));
 };
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
+/******************************************************/
 // main aliases
 
-/******************************************************************************/ 
+/******************************************************/
 proc inCenter( def a )
-"USAGE:   inCenter(a); a poly/list/ideal
+  "USAGE:   inCenter(a); a poly/list/ideal
 RETURN:  integer (1 if a in center, 0 otherwise)
 EXAMPLE: example inCenter; shows examples"
 {
-	QNF_init();
-	def res;
+  QNF_init();
+  def res;
 	
-	if ( typeof(a) == "poly" )
-	{
-		res = inCenter_poly(a);
-	} else
-	{
-		if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
-		{
-			res = inCenter_list(a);
-		} else 
-		{
-			res = a;
-		};
-	};
+  if ( typeof(a) == "poly" )
+    {
+      res = inCenter_poly(a);
+    } else
+      {
+	if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
+	  {
+	    res = inCenter_list(a);
+	  } else 
+	    {
+	      res = a;
+	    };
+      };
 	
-	QNF_done();
-	return (res);
+  QNF_done();
+  return (res);
 }
 example
 {
@@ -2684,29 +2516,29 @@ example
 
 /******************************************************************************/ 
 proc inCentralizer( def a, poly f )
-"USAGE:   inCentralizer(a, f); a poly/list/ideal, f poly
+  "USAGE:   inCentralizer(a, f); a poly/list/ideal, f poly
 RETURN:  integer (1 if a in centralizer(f), 0 otherwise)
 EXAMPLE: example inCentralizer; shows examples"
 {
-	QNF_init();
-	def res;
+  QNF_init();
+  def res;
 
-	if ( typeof(a) == "poly" )
-	{
-		res = inCentralizer_poly(a, f); 
-	} else
-	{
-	  	if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
-	  	{
-			res = inCentralizer_list(a, f); 
-  		} else
-		{
-			res = a;
-		};
-	};
+  if ( typeof(a) == "poly" )
+    {
+      res = inCentralizer_poly(a, f); 
+    } else
+      {
+	if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
+	  {
+	    res = inCentralizer_list(a, f); 
+	  } else
+	    {
+	      res = a;
+	    };
+      };
 
-	QNF_done();
-	return (res);
+  QNF_done();
+  return (res);
 }
 example
 {
@@ -2718,7 +2550,7 @@ example
   D[2,3]=0;
   ncalgebra(1,D); // this is U(sl_2)
   poly f = x^2;
-  poly a = z; /// lies in center
+  poly a = z; // lies in center
   poly b = y^2;
   inCentralizer(a, f);
   inCentralizer(b, f);
@@ -2730,9 +2562,9 @@ example
 
 
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 proc center(int MaxDeg, list # )
-"USAGE:      center(MaxDeg[, N]); int MaxDeg, int N
+  "USAGE:      center(MaxDeg[, N]); int MaxDeg, int N
 RETURN:     ideal generated by found elements
 NOTE:       computes the 'minimal' set of central elements.
             Since in general algorithms knows nothing about the number and degrees of
@@ -2743,41 +2575,41 @@ SEE ALSO:   centralizer; inCenter
 EXAMPLE:    example center; shows an example"
 {
 
-	if ( myInt(#) > 0 ) /// given a number of central elements to compute
-	{
-		return ( center_min_iterative( MaxDeg, # ) );
-	};
+  if ( myInt(#) > 0 ) // given a number of central elements to compute
+    {
+      return ( center_min_iterative( MaxDeg, # ) );
+    };
 
-	if( MaxDeg >= 0 ) /// standard computation - the fastest one (often)
-	{
-//		return ( center_min_iterative( MaxDeg, # ) );
-		return ( center_min_vectorspace ( MaxDeg ) );
-	};
+  if( MaxDeg >= 0 ) // standard computation - the fastest one (often)
+    {
+      // return ( center_min_iterative( MaxDeg, # ) );
+      return ( center_min_vectorspace ( MaxDeg ) );
+    };
 
-	print( "Error: wrong arguments." );
-	return();
+  print( "Error: wrong arguments." );
+  return();
 	
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring a=0,(x,y,z),dp;
-   matrix D[3][3]=0;
-   D[1,2]=-z;
-   D[1,3]=2*x;
-   D[2,3]=-2*y;
-   ncalgebra(1,D); // this is U(sl_2)
-   ideal Z = center(2); /// find all central elements of degree <= 2
-   Z;
-   inCenter(Z); 
-   ideal ZZ = center(-1, 1 ); /// find the first non trivial central element
-   ZZ;
-   inCenter(ZZ);
+ ring a=0,(x,y,z),dp;
+ matrix D[3][3]=0;
+ D[1,2]=-z;
+ D[1,3]=2*x;
+ D[2,3]=-2*y;
+ ncalgebra(1,D); // this is U(sl_2)
+ ideal Z = center(2); // find all central elements of degree <= 2
+ Z;
+ inCenter(Z); 
+ ideal ZZ = center(-1, 1 ); // find the first non trivial central element
+ ZZ; "";
+ inCenter(ZZ);
 };
 
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************/
 proc centralizer( poly p, int MaxDeg, list # )
-"USAGE:      centralizer(F, MaxDeg[, N]); poly F, int MaxDeg, int N
+  "USAGE:      centralizer(F, MaxDeg[, N]); poly F, int MaxDeg, int N
 RETURN:     ideal generated by found elements
 NOTE:       computes the 'minimal' set of elements of centralizer(F).
             Since in general algorithms knows nothing about the number and degrees of
@@ -2788,48 +2620,43 @@ SEE ALSO:   center; inCentralizer
 EXAMPLE:    example centralizer; shows an example"
 {
 	
-	if( myInt(#) > 0 )
-	{
-		return( centralizer_min_iterative( p, MaxDeg, # ) );
-	};
+  if( myInt(#) > 0 )
+    {
+      return( centralizer_min_iterative( p, MaxDeg, # ) );
+    };
 	
-	if( MaxDeg >= 0 )
-	{
-//		return( centralizer_min_iterative( p, MaxDeg, # ) );
-		return( centralizer_min_vectorspace( p, MaxDeg ) );
-	};
+  if( MaxDeg >= 0 )
+    {
+      // return( centralizer_min_iterative( p, MaxDeg, # ) );
+      return( centralizer_min_vectorspace( p, MaxDeg ) );
+    };
 	
-	print( "Error: wrong arguments." );
-	return();
+  print( "Error: wrong arguments." );
+  return();
 
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring a=0,(x,y,z),dp;
-   matrix D[3][3]=0;
-   D[1,2]=-z;
-   D[1,3]=2*x;
-   D[2,3]=-2*y;
-   ncalgebra(1,D); // this is U(sl_2)
-   poly f = 4*x*y+z^2-2*z; /// central polynomial
-   f;
-   ideal c = centralizer(f, 2); /// find all elements of degree <= 2 which lies in centralizer of f
-   c;
-   inCentralizer(c, f); 
-   ideal cc = centralizer(f, -1, 2 ); /// find at least first two non trivial elements of the centralizer of f
-   cc;
-   inCentralizer(cc, f); 
-   poly g = z^2-2*z; /// any polynomial
-   g;
-   c = centralizer(g, 2); /// find all elements of degree <= 2 which lies in centralizer of g
-   c;
-   inCentralizer(c, g); 
-   cc = centralizer(g, -1, 2 ); /// find at least first two non trivial elements of the centralizer of g
-   cc;
-   inCentralizer(cc, g); 
+ ring a=0,(x,y,z),dp;
+ matrix D[3][3]=0;
+ D[1,2]=-z;
+ D[1,3]=2*x;
+ D[2,3]=-2*y;
+ ncalgebra(1,D); // this is U(sl_2)
+ poly f = 4*x*y+z^2-2*z; // central polynomial
+ f;
+ ideal c = centralizer(f, 2); // find all elements of degree <= 2 which lies in centralizer of f
+ c;
+ inCentralizer(c, f); 
+ ideal cc = centralizer(f, -1, 2 ); // find at least first two non trivial elements of the centralizer of f
+ cc;
+ inCentralizer(cc, f); 
+ poly g = z^2-2*z; // any polynomial
+ g; "";
+ c = centralizer(g, 2); // find all elements of degree <= 2 which lies in centralizer of g
+ c; "";
+ inCentralizer(c, g); 
+ cc = centralizer(g, -1, 2 ); // find at least first two non trivial elements of the centralizer of g
+ cc; "";
+ inCentralizer(cc, g); 
 };
-
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
