@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.19 1998-03-23 22:51:04 obachman Exp $ */
+/* $Id: polys.cc,v 1.20 1998-03-31 12:18:45 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -236,24 +236,7 @@ static int pComp_otEXPCOMP_nwTWO(poly p1, poly p2)
   register long d = pGetOrder(p1) - pGetOrder(p2);
 
   if (d) Mreturn(d, pOrdSgn);
-//   _pMonComp_otEXPCOMP_nwTWO(p1, p2, d, goto NotEqual, return 0);
-
-do                                                              
-{                                                               
-  const long* s1 = (long*) &(p1->exp[0]);                       
-  const long* s2 = (long*) &(p2->exp[0]);                       
-  d = *s1 - *s2;                                                
-  if (d) goto NotEqual;
-  d = *(s1 + 1) - *(s2 + 1);                                    
-  if (d)                                                        
-  {                                                             
-    if (((long) (pGetComp(p1) - pGetComp(p2))) == d)            
-      d = -d;                                                   
-    goto NotEqual;                                                    
-  }                                                             
-  return 0;                                                      
-}                                                               
- while(0);
+  _pMonComp_otEXPCOMP_nwTWO(p1, p2, d, goto NotEqual, return 0);
  
   NotEqual:
   Mreturn(d, pLexSgn);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.19 1998-03-23 22:51:06 obachman Exp $ */
+/* $Id: ring.cc,v 1.20 1998-03-31 12:18:46 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1676,11 +1676,11 @@ rOrderType_t rGetOrderType(ring r)
             return rOrderType_Exp;
        
           default:
-            assume(r->order[1] == ringorder_lp ||
-                   r->order[1] == ringorder_Dp ||
-                   r->order[1] == ringorder_Wp ||
-                   r->order[1] == ringorder_Ds ||
-                   r->order[1] == ringorder_Ws);
+            assume(r->order[0] == ringorder_lp ||
+                   r->order[0] == ringorder_Dp ||
+                   r->order[0] == ringorder_Wp ||
+                   r->order[0] == ringorder_Ds ||
+                   r->order[0] == ringorder_Ws);
             
             if (r->order[1] == ringorder_c) return rOrderType_ExpComp;
             return rOrderType_Exp;
