@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.26 1999-11-18 18:43:57 siebert Exp $ */
+/* $Id: syz0.cc,v 1.27 1999-11-25 13:12:26 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -30,17 +30,18 @@
 
 static kBucket_pt sy0buck;
 
-static polyset syInitSort(polyset oldF,int rkF,int Fmax,
-         int syComponentOrder,intvec **modcomp)
+static void syInitSort(ideal arg,intvec **modcomp)
 {
   int i,j,k,kk,kkk,jj;
-  polyset F;
-  int Fl=Fmax;
+  polyset F,oldF=arg->m;
+  int Fl=IDELEMS(arg);
+  int rkF=idRankFreeModule(arg);
+  int syComponentOrder=pModuleOrder();
 
   while ((Fl!=0) && (oldF[Fl-1]==NULL)) Fl--;
   if (*modcomp!=NULL) delete modcomp;
   *modcomp = NewIntvec1(rkF+2);
-  F=(polyset)Alloc0(Fmax*sizeof(poly));
+  F=(polyset)Alloc0(IDELEMS(arg)*sizeof(poly));
   j=0;
   for(i=0;i<=rkF;i++)
   {
@@ -69,7 +70,12 @@ static polyset syInitSort(polyset oldF,int rkF,int Fmax,
     }
   }
   (**modcomp)[rkF+1] = Fl;
-  return F;
+  arg->m = F;
+  Free((ADDRESS)oldF,IDELEMS(arg)*sizeof(poly));
+#ifndef __OPTIMIZE__
+//Print("Neue Anordnung: ");
+//idPrint(arg);
+#endif
 }
 
 static void syCreatePairs(polyset F,int lini,int wend,int k,int j,int i,
@@ -163,28 +169,30 @@ static poly syRedtail2(poly p, polyset redWith, intvec *modcomp)
 
 /*2
 * computes the Schreyer syzygies in the local case
-* input: F, Fmax,  noSort: F is already ordered by: Schreyer-order
-*              (only allocated: Shdl, Smax)
+* input: arg   (only allocated: Shdl, Smax)
 * output: Shdl, Smax
 */
-void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
-  BOOLEAN noSort)
+static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
 {
-  int Fl=Fmax;
-  while ((Fl!=0) && (F[Fl-1]==NULL)) Fl--;
-  if (Fl==0) return;
+  int Fl=IDELEMS(arg);
+  while ((Fl!=0) && (arg->m[Fl-1]==NULL)) Fl--;
+  ideal result=idInit(16,arg->rank+Fl);
+  polyset F=arg->m,*Shdl=&(result->m);
+  if (Fl==0) return result;
 
-  int i,j,l,k,totalToRed,ecartToRed,kk,bestEcart,totalmax,rkF,
-    Sl=0,smax,tmax,tl;
+  int i,j,l,k,totalToRed,ecartToRed,kk,kkk;
+  int bestEcart,totalmax,rkF,Sl=0,smax,tmax,tl;
   int *ecartS, *ecartT, *totalS,
     *totalT=NULL, *temp=NULL;
-  intvec * modcomp=NULL;
   polyset pairs,S,T,ST,oldF;
   poly p,q,toRed;
   BOOLEAN notFound = FALSE;
+  intvec * newmodcomp = NewIntvec1(Fl+2);
+  intvec * tempcomp;
 
+//Print("Naechster Modul\n");
+//idPrint(arg);
 /*-------------initializing the sets--------------------*/
-  ideal idF=(ideal)Alloc0SizeOf(ip_sideal);
   ST=(polyset)Alloc0(Fl*sizeof(poly));
   S=(polyset)Alloc0(Fl*sizeof(poly));
   ecartS=(int*)Alloc(Fl*sizeof(int));
@@ -196,24 +204,21 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
 
   smax = Fl;
   tmax = 2*Fl;
-  idF->m=F;IDELEMS(idF)=Fmax;
-  idF->nrows=1;
-  rkF=idRankFreeModule(idF);
-/*-------------sorting of F for index handling------------*/
-  if (noSort)
+  for (j=1;j<IDELEMS(arg);j++)
   {
-    oldF = F;
-    F=syInitSort(F,rkF,Fmax,1,&modcomp);
+    if (arg->m[j] != NULL)
+    {
+      assume (arg->m[j-1] != NULL);
+      assume (pGetComp(arg->m[j-1])-pGetComp(arg->m[j])<=0);
+    }
   }
-#ifndef __OPTIMIZE__
-Print("Neue Anordnung: ");
-idF->m=F;IDELEMS(idF)=Fmax;
-idF->nrows=1;
-idPrint(idF);
-FreeSizeOf((ADDRESS)idF,ip_sideal);
-#endif
+  rkF=idRankFreeModule(arg);
 /*----------------construction of the new ordering----------*/
-  pSetSchreyerOrdM(F,Fl,rkF);
+  //pSetSchreyerOrdM(F,Fl,rkF);
+  if (rkF>0)
+    rSetSyzComp(rkF);
+  else 
+    rSetSyzComp(1);
 /*----------------creating S--------------------------------*/
   for(j=0;j<Fl;j++)
   {
@@ -230,6 +235,7 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
       pSetComp(p,j+2);
     else
       pSetComp(p,rkF+j+1);
+    pSetmComp(p);
   }
 //PrintLn();
   if (rkF==0) rkF = 1;
@@ -266,9 +272,11 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
 /*---------------computing---------------------------------*/
   for(j=0;j<smax;j++)
   {
+    (*newmodcomp)[j+1] = Sl;
     i = pGetComp(S[j]);
+//#define OLD_PAIR_CONSTRUCTION
+#ifdef OLD_PAIR_CONSTRUCTION
     k=j+1;
-/*----------------constructing all pairs with S[j]---------*/
     if (TEST_OPT_PROT)
     {
       Print("(%d)",Fl-j);
@@ -277,6 +285,28 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
     syCreatePairs(S,j+1,Fl,k,j,i,pairs);
 /*--------------computing the syzygies----------------------*/
     for (k=j+1;k<Fl;k++)
+#else
+    int syComponentOrder=pModuleOrder();
+    int lini,wend;
+    if (syComponentOrder==1)
+    {
+      lini=k=j+1;
+      wend=Fl;
+    }
+    else
+    {
+      lini=k=0;
+      while ((k<j) && (pGetComp(S[k]) != i)) k++;
+      wend=j;
+    }
+    if (TEST_OPT_PROT)
+    {
+      Print("(%d)",Fl-j);
+      mflush();
+    }
+    syCreatePairs(S,lini,wend,k,j,i,pairs);
+    for (k=lini;k<wend;k++)
+#endif
     {
       if (pairs[k]!=NULL)
       {
@@ -288,6 +318,7 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
           T[l] = ST[l];
         }
         tl = smax;
+        tempcomp = ivCopy(*modcomp);
 /*--------------begin to reduce-----------------------------*/
         toRed = ksOldCreateSpoly(S[j],S[k]);
         ecartToRed = 1;
@@ -301,6 +332,10 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
            PrintS(".");
            mflush();
         }
+//Print("Reduziere Paar %d,%d (ecart %d): \n",j,k,ecartToRed);
+//Print("Poly %d: ",j);pWrite(S[j]);
+//Print("Poly %d: ",k);pWrite(S[k]);
+//Print("Spoly: ");pWrite(toRed);
         while (pGetComp(toRed)<=rkF)
         {
           if (BTEST1(6))
@@ -316,12 +351,21 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
 /*
 *         }
 */
+//Print("toRed now (neuer ecart %d): ",ecartToRed);pWrite(toRed);
           notFound = TRUE;
-          l=0;
           bestEcart = 32000;  //a very large integer
           p = NULL;
+          int l=0;
+#define OLD_SEARCH
+#ifdef OLD_SEARCH
           while ((l<tl) && (pGetComp(T[l])<pGetComp(toRed))) l++;
+          //assume (l==(**modcomp)[pGetComp(toRed)]);
           while ((l<tl) && (notFound))
+#else
+          l = (**modcomp)[pGetComp(toRed)];
+          kkk = (**modcomp)[pGetComp(toRed)+1];
+          while ((l<kkk) && (notFound))
+#endif
           {
             if ((ecartT[l]<bestEcart) && (pDivisibleBy(T[l],toRed)))
             {
@@ -344,17 +388,12 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
             Free((ADDRESS)totalT,tmax*sizeof(int));
             Free((ADDRESS)ecartS,Fl*sizeof(int));
             Free((ADDRESS)totalS,Fl*sizeof(int));
-            if (noSort)
-            {
-              Free((ADDRESS)F,Fl*sizeof(poly));
-              F = oldF;
-            }
-            for(k=0;k<*Smax;k++) pDelete(&((*Shdl)[k]));
-            return;
+            for(k=0;k<IDELEMS(result);k++) pDelete(&((*Shdl)[k]));
+            return result;
           }
           else
           {
-//PrintS("reduced with: ");pWrite(p);PrintLn();
+//Print("reduced with (ecart %d): ",bestEcart);wrp(p);PrintLn();
             if (notFound)
             {
               if (tl>=tmax)
@@ -369,8 +408,14 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
                 ecartT = temp;
               }
 //PrintS("t");
+              int comptR=pGetComp(toRed);
+              for (l=tempcomp->length()-1;l>comptR;l--)
+              {
+                if ((*tempcomp)[l]>0)
+                  (*tempcomp)[l]++;
+              }
               l=0;
-              while ((l<tl) && (pGetComp(toRed)>pGetComp(T[l]))) l++;
+              while ((l<tl) && (comptR>pGetComp(T[l]))) l++;
               while ((l<tl) && (totalT[l]<=totalToRed)) l++;
               for (kk=tl;kk>l;kk--)
               {
@@ -385,19 +430,19 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
               ecartT[l] = ecartToRed;
               tl++;
             }
-
             toRed = ksOldSpolyRed(p,toRed);
           }
         }
+//Print("toRed finally (neuer ecart %d): ",ecartToRed);pWrite(toRed);
 //PrintS("s");
         if (pGetComp(toRed)>rkF)
         {
-          if (Sl>=*Smax)
+          if (Sl>=IDELEMS(result))
           {
-            pEnlargeSet(Shdl,*Smax,16);
-            *Smax += 16;
+            pEnlargeSet(Shdl,IDELEMS(result),16);
+            IDELEMS(result) += 16;
           }
-          pShift(&toRed,-rkF);
+          //pShift(&toRed,-rkF);
           pNorm(toRed);
           (*Shdl)[Sl] = toRed;
           Sl++;
@@ -413,10 +458,12 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
 //Print ("#");
           }
         }
+        delete tempcomp;
       }
     }
-    for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
+    for(k=lini;k<wend;k++) pDelete(&(pairs[k]));
   }
+  (*newmodcomp)[Fl+1] = Sl;
   Free((ADDRESS)pairs,Fl*sizeof(poly));
   Free((ADDRESS)ST,Fl*sizeof(poly));
   Free((ADDRESS)S,Fl*sizeof(poly));
@@ -425,12 +472,9 @@ FreeSizeOf((ADDRESS)idF,ip_sideal);
   Free((ADDRESS)totalT,tmax*sizeof(int));
   Free((ADDRESS)ecartS,Fl*sizeof(int));
   Free((ADDRESS)totalS,Fl*sizeof(int));
-  if (noSort)
-  {
-    if (modcomp!=NULL) delete modcomp;
-    Free((ADDRESS)F,Fl*sizeof(poly));
-    F = oldF;
-  }
+  delete *modcomp;
+  *modcomp = newmodcomp;
+  return result;
 }
 
 /*3
@@ -475,44 +519,44 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL)
 
 /*2
 * computes the Schreyer syzygies in the global case
-* input: F, Fmax,  noSort: F is already ordered by: Schreyer-order
-*              (only allocated: Shdl, Smax)
+* input: F
 * output: Shdl, Smax
-* modcomp, length stores the start position of the module comp. in FF
+* modcomp, length stores the start position of the module comp. in arg
 */
-void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
-   BOOLEAN noSort,intvec ** modcomp, int * length,ideal mW)
+static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN redTail=TRUE)
 {
-  int i,j,l,k,kkk,rkF,Sl=0,Fl=Fmax,syComponentOrder=pModuleOrder();
-  int fstart,wend,lini,ltR;
+  int Fl=IDELEMS(arg);
+  while ((Fl!=0) && (arg->m[Fl-1]==NULL)) Fl--;
+  ideal result=idInit(16,Fl);
+  int i,j,l,k,kkk,rkF,Sl=0,syComponentOrder=pModuleOrder();
+  int fstart,wend,lini,ltR,gencQ=0;
   intvec *newmodcomp;
   int *Flength;
-  polyset pairs,oldF,F=*FF;
+  polyset pairs,F=arg->m,*Shdl=&(result->m);
   poly p,q,toRed,syz,lastmonom,multWith;
-  ideal idF=(ideal)AllocSizeOf(sip_sideal),null;
+  ideal null;
   BOOLEAN isNotReduced=TRUE;
 
-  while ((Fl!=0) && (F[Fl-1]==NULL)) Fl--;
+//#define WRITE_BUCKETS
+#ifdef WRITE_BUCKETS
+Print("Input: \n");
+ideal twr=idHead(arg);
+idPrint(arg);
+idDelete(&twr);
+if (modcomp!=NULL) (*modcomp)->show(0,0);
+#endif
   newmodcomp = NewIntvec1(Fl+2);
 //for (j=0;j<Fl;j++) pWrite(F[j]);
 //PrintLn();
   if (currQuotient==NULL)
     pairs=(polyset)Alloc0(Fl*sizeof(poly));
   else
-    pairs=(polyset)Alloc0((Fl+IDELEMS(currQuotient))*sizeof(poly));
-  idF->m=F;IDELEMS(idF)=Fmax;
-  rkF=idRankFreeModule(idF);
+  {
+    gencQ = IDELEMS(currQuotient);
+    pairs=(polyset)Alloc0((Fl+gencQ)*sizeof(poly));
+  }
+  rkF=idRankFreeModule(arg);
   null = idInit(1,rkF);
-  FreeSizeOf((ADDRESS)idF,sip_sideal);
-  if (noSort)
-  {
-    oldF = *FF;
-    F=syInitSort(*FF,rkF,Fmax,syComponentOrder,modcomp);
-  }
-  else
-  {
-    F = *FF;
-  }
   Flength = (int*)Alloc0(Fl*sizeof(int));
   for(j=0;j<Fl;j++)
   {
@@ -539,7 +583,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
       wend=j;
     }
     syCreatePairs(F,lini,wend,k,j,i,pairs,Fl,mW);
-    if (currQuotient!=NULL) wend = Fl+IDELEMS(currQuotient);
+    if (currQuotient!=NULL) wend = Fl+gencQ;
     for (k=lini;k<wend;k++)
     {
       if (pairs[k]!=NULL)
@@ -612,7 +656,6 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           l = (**modcomp)[pGetComp(toRed)+1]-1;
           kkk = (**modcomp)[pGetComp(toRed)];
           while ((l>=kkk) && (!pDivisibleBy(F[l],toRed))) l--;
-//#define WRITE_BUCKETS
 #ifdef WRITE_BUCKETS
           kBucketClear(sy0buck,&toRed,&ltR);
           printf("toRed in Pair[%d, %d]:", j, k);
@@ -641,14 +684,9 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
               pDelete(&toRed);
               pDelete(&syz);
               for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
-              Free((ADDRESS)pairs,(Fl + IDELEMS(currQuotient))*sizeof(poly));
-              if (noSort)
-              {
-                Free((ADDRESS)F,Fl*sizeof(poly));
-                F = oldF;
-              }
-              for(k=0;k<*Smax;k++) pDelete(&((*Shdl)[k]));
-              return;
+              Free((ADDRESS)pairs,(Fl + gencQ)*sizeof(poly));
+              for(k=0;k<IDELEMS(result);k++) pDelete(&((*Shdl)[k]));
+              return result;
             }
           }
           else
@@ -685,13 +723,13 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
 //PrintLn();
         if (syz!=NULL)
         {
-          if (Sl>=*Smax)
+          if (Sl>=IDELEMS(result))
           {
-            pEnlargeSet(Shdl,*Smax,16);
-            *Smax += 16;
+            pEnlargeSet(Shdl,IDELEMS(result),16);
+            IDELEMS(result) += 16;
           }
           pNorm(syz);
-          if (BTEST1(OPT_REDTAIL))
+          if (BTEST1(OPT_REDTAIL) && redTail)
           {
             (*newmodcomp)[j+2] = Sl;
             (*Shdl)[Sl] = syRedtail2(syz,*Shdl,newmodcomp);
@@ -710,15 +748,10 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
     Free((ADDRESS)pairs,Fl*sizeof(poly));
   else
     Free((ADDRESS)pairs,(Fl+IDELEMS(currQuotient))*sizeof(poly));
-  if (noSort)
-  {
-    Free((ADDRESS)oldF,Fmax*sizeof(poly));
-    *FF = F;
-  }
   Free((ADDRESS)Flength,Fl*sizeof(int));
   delete *modcomp;
-  *length = Fl+2;
   *modcomp = newmodcomp;
+  return result;
 }
 
 void syReOrderResolventFB(resolvente res,int length, int initial)
@@ -821,17 +854,37 @@ BOOLEAN syTestOrder(ideal M)
   return FALSE;
 }
 
+static void idShift(ideal arg,int index)
+{
+  int i,j=rGetMaxSyzComp(index);
+  for (i=0;i<IDELEMS(arg);i++)
+  {
+    if (arg->m[i]!=NULL)
+      pShift(&arg->m[i],-j);
+  }
+}
+
+static void syPrintResolution(resolvente res,int start,int length)
+{
+  while ((start < length) && (res[start]))
+  {
+    Print("Syz(%d): \n",start);
+    idTest(res[start]);
+    //idPrint(res[start]);
+    start++;
+  }  
+}
+
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
                                 BOOLEAN isMonomial, BOOLEAN notReplace)
 {
   ideal mW=NULL;
-  int i,syzIndex = 0,j=0,lgth,*ord=NULL,*bl0=NULL,*bl1=NULL;
+  int i,syzIndex = 0,j=0;
   intvec * modcomp=NULL,*w=NULL;
   int ** wv=NULL;
-  BOOLEAN sort = TRUE;
   tHomog hom=(tHomog)idHomModule(arg,NULL,&w);
   ring origR = currRing;
-  sip_sring tmpR;
+  ring syRing=NULL;
 
   if ((!isMonomial) && syTestOrder(arg))
   {
@@ -855,73 +908,35 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       *length += 4;
       res=newres;
     }
-    res[syzIndex+1] = idInit(16,1);
-    if ((currRing->OrdSgn == 1) || (hom==isHomog))
+    if ((origR->OrdSgn == 1) || (hom==isHomog))
     {
-      sySchreyersSyzygiesFB(&(res[syzIndex]->m),i,&(res[syzIndex+1]->m),
-        &(IDELEMS(res[syzIndex+1])),sort,&modcomp,&lgth,mW);
+      if (syzIndex==0) syInitSort(res[0],&modcomp);
+      if ((syzIndex==0) && !rRing_has_CompLastBlock(currRing))
+        res[syzIndex+1] = sySchreyersSyzygiesFB(res[syzIndex],&modcomp,mW,FALSE);
+      else
+        res[syzIndex+1] = sySchreyersSyzygiesFB(res[syzIndex],&modcomp,mW);
       mW = res[syzIndex];
     }
 //idPrint(res[syzIndex+1]);
 
-// #define THOMAS_THOUGHT_ABOUT_IT
-#ifdef THOMAS_THOUGHT_ABOUT_IT
-    if ((syzIndex==0) && (currRing->OrdSgn==1))
-#else
     if ((syzIndex==0))
-#endif
     {
-      j = 0;
-      // Thomas: I do not understand why you change the ring here
-      // (after the first Syzygies computation)
-      while ((currRing->order[j]!=ringorder_c)
-              && (currRing->order[j]!=ringorder_C))
-        j++;
-      if ((!notReplace) && (currRing->order[j]!=0))
+      if ((origR->OrdSgn == 1) || (hom==isHomog))
       {
-        while (currRing->order[j]!=0) j++;
-        ord = (int*)Alloc0((j+1)*sizeof(int));
-        wv = (int**)Alloc0((j+1)*sizeof(int*));
-        bl0 = (int*)Alloc0((j+1)*sizeof(int));
-        bl1 = (int*)Alloc0((j+1)*sizeof(int));
-        j = 0;
-        while ((currRing->order[j]!=ringorder_c)
-                && (currRing->order[j]!=ringorder_C))
+        syRing = rCurrRingAssure_CompLastBlock();
+        if (syRing != origR)
         {
-          ord[j] = currRing->order[j];
-          bl0[j] = currRing->block0[j];
-          bl1[j] = currRing->block1[j];
-          wv[j] = currRing->wvhdl[j];
-          j++;
-        }
-        int m_order=j;
-        while (currRing->order[j+1]!=0)
-        {
-          ord[j] = currRing->order[j+1];
-          bl0[j] = currRing->block0[j+1];
-          bl1[j] = currRing->block1[j+1];
-          wv[j] = currRing->wvhdl[j+1];
-          j++;
-        }
-        ord[j] = currRing->order[m_order];
-        bl0[j] = currRing->block0[m_order];
-        bl1[j] = currRing->block1[m_order];
-        wv[j] = currRing->wvhdl[m_order];
-        tmpR = *currRing;
-        tmpR.order = ord;
-        tmpR.block0 = bl0;
-        tmpR.block1 = bl1;
-        tmpR.wvhdl = wv;
-        rComplete(&tmpR, 1);
-        rChangeCurrRing(&tmpR, TRUE);
-        if ((currRing->OrdSgn != 1) && (hom!=isHomog))
-        {
-          for (i=0; i<IDELEMS(res[0]); i++)
+          for (i=0; i<IDELEMS(res[1]); i++)
           {
-            res[0]->m[i] = prMoveR( res[0]->m[i], origR);
+            res[1]->m[i] = prMoveR( res[1]->m[i], origR);
           }
         }
-        else
+        idTest(res[1]);
+      }
+      else
+      {
+        syRing = rCurrRingAssure_SyzComp_CompLastBlock();
+        if (syRing != origR)
         {
           for (i=0; i<IDELEMS(res[0]); i++)
           {
@@ -931,19 +946,31 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         idTest(res[0]);
       }
     }
-    if ((currRing->OrdSgn != 1) && (hom!=isHomog))
-      sySchreyersSyzygiesFM(res[syzIndex]->m,i,&(res[syzIndex+1]->m),
-      &(IDELEMS(res[syzIndex+1])),sort);
-    if (sort) sort=FALSE;
+    if ((origR->OrdSgn != 1) && (hom!=isHomog))
+    {
+      if (syzIndex==0) syInitSort(res[0],&modcomp);
+      res[syzIndex+1] = sySchreyersSyzygiesFM(res[syzIndex],&modcomp);
+    }
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);
     kBucketDestroy(&(sy0buck));
   }
-  syReOrderResolventFB(res,*length);
-  if (currRing->OrdSgn == -1)
-    pSetSchreyerOrdM(NULL,0,0);
-  syzIndex = 1;
-  if (/*ringOrderChanged:*/ ord!=NULL)
+  //syPrintResolution(res,1,*length);
+  if ((origR->OrdSgn != 1) && (hom!=isHomog))
+  {
+    syzIndex = 1;
+    while ((syzIndex < *length) && (!idIs0(res[syzIndex])))
+    {
+      idShift(res[syzIndex],syzIndex);
+      syzIndex++;
+    }
+  }
+  if ((origR->OrdSgn == 1) || (hom==isHomog))
+    syzIndex = 1;
+  else
+    syzIndex = 0;
+  syReOrderResolventFB(res,*length,syzIndex+1);
+  if (/*ringOrderChanged:*/ origR!=syRing)
   {
     rChangeCurrRing(origR, TRUE);
     // Thomas: Here I assume that all (!) polys of res live in tmpR
@@ -953,17 +980,13 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       {
         if (res[syzIndex]->m[i])
         {
-          res[syzIndex]->m[i] = prMoveR( res[syzIndex]->m[i], &tmpR);
+          res[syzIndex]->m[i] = prMoveR( res[syzIndex]->m[i], syRing);
         }
       }
       syzIndex++;
     }
     j = 0;
     while (currRing->order[j]!=0) j++;
-    Free((ADDRESS)ord,(j+1)*sizeof(int));
-    Free((ADDRESS)bl0,(j+1)*sizeof(int));
-    Free((ADDRESS)bl1,(j+1)*sizeof(int));
-    Free((ADDRESS)wv,(j+1)*sizeof(int*));
   }
   else
   {
@@ -978,6 +1001,19 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       syzIndex++;
     }
   }
+  if ((origR->OrdSgn == 1) || (hom==isHomog))
+  {
+    if (res[1]!=NULL)
+    {
+      syReOrderResolventFB(res,2,1);
+      for (i=0;i<IDELEMS(res[1]);i++)
+      {
+        if (res[1]->m[i])
+          res[1]->m[i] = pOrdPolyMerge(res[1]->m[i]);
+      }
+    }
+  }
+  //syPrintResolution(res,0,*length);
 
   //syMergeSortResolventFB(res,*length);
   if (modcomp!=NULL) delete modcomp;

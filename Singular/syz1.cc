@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.50 1999-11-20 10:17:23 siebert Exp $ */
+/* $Id: syz1.cc,v 1.51 1999-11-25 13:12:27 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1775,7 +1775,17 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
     j = j+sh;
     jj = jj+2;
     result=NewIntvec3(j,jj-sh,0);
-    IMATELEM(*result,1,1) = max(1,idRankFreeModule(syzstr->res[1]));
+    if ((syzstr->syRing!=NULL) && (syzstr->syRing!=currRing))
+    {
+      ring origR=currRing;
+      rChangeCurrRing(syzstr->syRing, TRUE);
+      IMATELEM(*result,1,1) = max(1,idRankFreeModule(syzstr->res[1]));
+      rChangeCurrRing(origR,TRUE);
+    }
+    else
+    {
+      IMATELEM(*result,1,1) = max(1,idRankFreeModule(syzstr->res[1]));
+    }
     for (i=sh;i<jj;i++)
     {
       j = 0;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.78 1999-11-24 14:07:21 obachman Exp $ */
+/* $Id: ideals.cc,v 1.79 1999-11-25 13:12:24 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1352,13 +1352,23 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   poly  p;
   int   i, j, k, length=0,reg;
   BOOLEAN isMonomial=TRUE;
+  int ii;
 
 #ifdef PDEBUG
-  int ii;
   for(ii=0;ii<IDELEMS(h1);ii++) pTest(h1->m[ii]);
 #endif
   if (idIs0(h1))
-    return idFreeModule(IDELEMS(h1));
+  {
+    ideal result=idFreeModule(IDELEMS(h1));
+    int curr_syz_limit=rGetCurrSyzLimit();
+    if (curr_syz_limit>0)
+    for (ii=0;ii<IDELEMS(h1);ii++) 
+    {
+      if (h1->m[ii]!=NULL)
+        pShift(&h1->m[ii],curr_syz_limit);
+    }
+    return result;
+  }
   k=max(1,idRankFreeModule(h1));
 
   assume(currRing != NULL);
@@ -1455,6 +1465,12 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     idDelete(&e);
   }
   idTest(s_h3);
+  if (currQuotient != NULL)
+  {
+    ideal ts_h3=kStd(s_h3,currQuotient,h,w);
+    idDelete(&s_h3);
+    s_h3 = ts_h3;
+  }
   return s_h3;
 }
 
@@ -3242,7 +3258,7 @@ static void idDeleteComp(ideal arg,int red_comp)
 
 /*2
 * returns the presentation of an isomorphic, minimally
-* embedded  module
+* embedded  module (arg represents the quotient!)
 */
 ideal idMinEmbedding(ideal arg,BOOLEAN inPlace)
 {

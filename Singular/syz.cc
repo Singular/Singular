@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.32 1999-11-24 14:07:23 obachman Exp $ */
+/* $Id: syz.cc,v 1.33 1999-11-25 13:12:26 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -381,7 +381,7 @@ void syMinimizeResolvente(resolvente res, int length, int first)
   if (res[syzIndex]!=NULL)
     syMinStep(res[syzIndex-1],res[syzIndex]);
   if (!idIs0(res[0]))
-    idMinEmbedding(res[0], TRUE);
+    idMinEmbedding(res[0],TRUE);
 }
 
 /*2
