@@ -54,7 +54,7 @@ TEXI2HTML_OPTS  = @TEXI2HTML_OPTS@ -l2h_tmp ${TMP_DIR}
 TEX_FILES	= copyright.tex
 DOC2TEX_FILES	= \
 		examples.tex general.tex math.tex reference.tex \
-		start.tex types.tex pdata.tex
+		start.tex types.tex pdata.tex tricks.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 TUTOR_FILES	= \
@@ -98,8 +98,8 @@ usercard.ps: usercard.dvi
 	${DVIPS} $< -o $@
 
 # html stuff
-html: html/singular.html
-html/singular.html: ${MANUAL_FILES} t2h_singular.init t2h.init singular.tex
+html: html/index.htm
+html/index.htm: ${MANUAL_FILES} t2h_singular.init t2h.init singular.tex ${TEXI2HTML}
 	${PERL5} ${TEXI2HTML} -init_file t2h_singular.init ${TEXI2HTML_OPTS} -subdir html singular.tex
 
 # html stuff

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.125 1999-07-09 14:12:49 obachman Exp $
+@comment $Id: general.doc,v 1.126 1999-07-14 15:50:01 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -955,7 +955,7 @@ resultant and gcd computations.
 @end itemize
 
 @c ----------------------------------------------------------------------
-@unnumberedsubsec Commands to compute standard bases
+@subheading Commands to compute standard bases
 @table @code
 @item facstd
 @ref{facstd}
@@ -999,7 +999,7 @@ and a @code{std} computation guided by the Hilbert series.
 @end table
 
 @c ----------------------------------------------------------------------
-@unnumberedsubsec Further processing of standard bases
+@subheading Further processing of standard bases
 The next commands require the input to be a standard basis.
 
 @table @code
@@ -1041,7 +1041,7 @@ modulo an ideal (resp.@: module).
 @end table
 
 @c ----------------------------------------------------------------------
-@unnumberedsubsec Commands to compute resolutions
+@subheading Commands to compute resolutions
 @table @code
 @item res
 @ref{res}@*
@@ -1075,7 +1075,7 @@ given generators).
 @end table
 
 @c ----------------------------------------------------------------------
-@unnumberedsubsec Further processing of resolutions
+@subheading Further processing of resolutions
 @table @code
 @item betti
 @ref{betti}@*
@@ -1086,7 +1086,7 @@ minimizes a free resolution of an ideal or module.
 @end table
 
 @c ----------------------------------------------------------------------
-@unnumberedsubsec Processing of polynomials
+@subheading Processing of polynomials
 @table @code
 @item char_series
 @ref{char_series}@*
@@ -1133,7 +1133,7 @@ main variable to be specified by the user.
 @end table
 
 @c ----------------------------------------------------------------------
-@unnumberedsubsec Matrix computations
+@subheading Matrix computations
 @table @code
 @item bareiss
 @ref{bareiss}@*
@@ -1151,21 +1151,21 @@ computes all minors (=subdeterminants) of a given size for a matrix.
 @end table
 
 @c ----------------------------------------------------------------------
-@unnumberedsubsec Numeric computations
+@subheading Numeric computations
 @table @code
 @item laguerre
-@ref{laguerre}@*
+@c @ref{laguerre}@*
 computes ... TBC
 @item uressolve
-@ref{uressolve}@*
+@c @ref{uressolve}@*
 implements ... TBC
-@item vandermonde
-@ref{vandermonde}@*
-computes ... TBC
+@c @item vandermonde
+@c @ref{vandermonde}@*
+@c computes ... TBC
 @end table
 
 @c ----------------------------------------------------------------------
-@unnumberedsubsec Controlling computations
+@subheading Controlling computations
 @table @code
 @item option
 @ref{option}@*
@@ -1806,7 +1806,7 @@ this section does not treat loading of libraries
 (@pxref{LIB}).
 @end ifclear
 
-@unnumberedsubsec Monitoring
+@subheading Monitoring
 A special form of I/O is monitoring.  When monitoring is enabled,
 @sc{Singular} makes a typescript of everything printed on your terminal
 to a file.  It is useful for students who need a hardcopy record of an
@@ -1815,7 +1815,7 @@ useful to create a protocol of a @sc{Singular} session.  The
 @code{monitor} command enables and disables this feature
 (@pxref{monitor}).
 
-@unnumberedsubsec How to use links
+@subheading How to use links
 Besides the usual I/O functions @code{write} and @code{read}, there are
 also the functions @code{dump} and @code{getdump} which store resp.@:
 retrieve the content of an entire @sc{Singular} session to resp.@: from
@@ -1858,7 +1858,7 @@ Links have various properties which can be checked for using the
 @c example
 @end smallexample
 
-@unnumberedsubsec ASCII links
+@subheading ASCII links
 Data that can be converted to a string can be written into files for
 storage or communication with other programs. The data is written in
 plain ASCII format. Reading from an ASCII link returns a string ---
@@ -1884,7 +1884,7 @@ manipulate the data.
 @c example
 @end smallexample
 
-@unnumberedsubsec MPfile links
+@subheading MPfile links
 Data is stored in the binary MP format.  Read and write access is very
 fast compared to ASCII links.  All data (including such data that cannot
 be converted to a string) can be written to an MPfile link.  Reading
@@ -1912,7 +1912,7 @@ MPfile links are implemented on Unix-like operating systems only.
 @c example
 @end smallexample
 
-@unnumberedsubsec MPtcp links
+@subheading MPtcp links
 Data is communicated with other processes (e.g., @sc{Singular}
 processes) which may run on the same or on different computers.  Data
 exchange is accomplished using TCP/IP links in the binary MP format.
@@ -1941,7 +1941,7 @@ MPtcp links are implemented on Unix-like operating systems only.
 @c example
 @end smallexample
 
-@unnumberedsubsec DBM links
+@subheading DBM links
 Data is stored in and accessed from a data base.  Writing is
 accomplished by a key and a value and associates the value with the key
 in the specified data base.  Reading is accomplished w.r.t.@: a key,

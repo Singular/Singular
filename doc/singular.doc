@@ -1,6 +1,8 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.62 1999-07-09 14:12:57 obachman Exp $
+@comment $Id: singular.doc,v 1.63 1999-07-14 15:50:02 obachman Exp $
 @comment this file contains the main structure of the manual
+
+
 @c ------------------------
 @c %**start of header
 @c ------------------------
@@ -12,7 +14,7 @@
 @c %**end of header
 @c ------------------------
 
-@c --------------------- general stting --------------------
+@c --------------------- general settings --------------------
 @iftex
 @afourpaper
 @finalout
@@ -22,14 +24,14 @@
 @set singularmanual 1
 @c @set namespaces 1
 @include version.texi
+@c --------------------- end general setting --------------------
 
-@c --------------------- end general stting --------------------
 
-@c --------------------- Info header --------------------
+@c --------------------- invisible Info header ------------------------
 @ifinfo
 This is the texinfo file describing Singular (version @value{VERSION})
 @end ifinfo
-@c --------------------- end Info header --------------------
+@c --------------------- end Info invisible header --------------------
 
 
 @c --------------------- tex titlepage --------------------
@@ -54,9 +56,12 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @author Universitaet Kaiserslautern
 @author D-67653 Kaiserslautern
 @end titlepage
+
+@c print short table of contents in tex right after titlepage
+@c Detailed ToC is printed at the end of the manual 
 @shortcontents
 
-@c ----------------------------------------------------------------------------
+@c -----------------------Top node-----------------------------------
 @node Top, Preface, (dir), (dir)
 
 @ifnottex
@@ -114,467 +119,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @node Tricks and pitfalls, Examples, Functions and system variables, Top
 @chapter Tricks and pitfalls
 @cindex Tricks and pitfalls
-
-@menu
-* Limitations::
-* Major differences to the C programming language::
-* Miscellaneous oddities::
-* Identifier resolution::
-@end menu
-@c -------------------------------------------------------------------------
-@node Limitations,Major differences to the C programming language,,Tricks and pitfalls
-@section Limitations
-@cindex Limitations
-
-@sc{Singular} has the following limitations:
-@itemize @bullet
-@item
-the characteristic of a prime field must be less than 32004
-@item
-the (weighted) degree of a monomial must be smaller than 2147483648
-@item
-the exponent of a ring variable and the rank of any free module
-must be smaller than 32768
-@item
-a ring must have 505 variables or less
-@*(501 on a DEC Alpha)
-@c TBC -- number of parameters
-@item
-the precision of long floating point numbers (for ground field real)
-must be smaller than 32768
-@item
-integers (of type @code{int}) have the limited range
-from -2147483647 to 2147483647
-@item
-floating point numbers (type @code{number} from field @code{real})
-have the limited range (machine dependent, usually -1.0e-38 to 1.0e+38).
-The string representation of overflow and underflow varies also.
-(Linux: Inf, HPUX: +.+00e+00, @dots{})
-@c @item
-@c a token (in the input) must have 16383 characters or less.
-@c @*(Tokens are strings, blocks of statements, numbers)
-@c @*This does not apply to proc in libraries but to blocks
-@c within a procedure
-@item
-the length of an identifier is unlimited but @code{listvar}
-displays only the first 20 characters
-@c @item
-@c the interpretation of text between a closing @code{@}} and the end of
-@c the line is undefined. (Therefore do not put anything but spaces between
-@c @code{@}} and the end of the line.)
-@end itemize
-
-@c -------------------------------------------------------------------------
-@node Major differences to the C programming language,Miscellaneous oddities,Limitations,Tricks and pitfalls
-@section Major differences to the C programming language
-@cindex C programming language
-
-Although many constructs from @sc{Singular}'s programming language are similar
-to those from the C programming language, there are some subtle
-differences. Most notably:
-
-@menu
-* No rvalue of increments and assignments::
-* Evaluation of logical expressions::
-* No case or switch statement::
-* Usage of commas::
-* Usage of brackets::
-* Behavior of continue::
-* Return type of procedures::
-@end menu
-@c ---------------------------------------
-@node No rvalue of increments and assignments, Evaluation of logical expressions,,Major differences to the C programming language
-@subsection No rvalue of increments and assignments
-@cindex rvalue
-
-The increment @code{++} (resp.@: decrement operator @code{--}) has no
-rvalue, i.e., cannot be used on the right-hand sides of assignments.
-So, instead of
-
-@smallexample
-j = i++;  // WRONG!!!
-@end smallexample
-
-@noindent (which results in an error), it must be written
-
-@smallexample
-i++; j = i;
-@end smallexample
-
-Likewise, an assignment expression does not have a result.  Therefore,
-compound assignments like @code{i = j = k;} are not allowed and result
-in an error.
-
-@c ---------------------------------------
-@node Evaluation of logical expressions, No case or switch statement, No rvalue of increments and assignments, Major differences to the C programming language
-@subsection Evaluation of logical expressions
-@cindex Evaluation of logical expressions
-@cindex and
-@cindex or
-
-@c ------------------------------------------------------------
-@c   This piece of text partially exists also in the file types.doc,
-@c   chapter "boolean expressions".
-@c   If you change something here, change it there, too!
-@c ------------------------------------------------------------
-@strong{All} arguments of a logical expression are first evaluated and
-then the value of the logical expression is determined. For example, the
-logical expressions @code{(a || b)} is evaluated by first evaluating
-@code{a} @emph{and} @code{b}, even though the value of @code{b} has no
-influence on the value of @code{(a || b)}, if @code{a} evaluates to
-true. Therefore, the following results in a syntax error
-
-@smallexample
-if (defined(i) && i > 0) @{@} // WRONG!!!
-@end smallexample
-
-@noindent if the variable @code{i} is undefined. This must be written
-instead as
-
-@smallexample
-if (defined(i))
-@{
-  if (i > 0) @{@}
-@}
-@end smallexample
-
-Note that this evaluation is different from the left-to-right, conditional
-evaluation of logical expressions (as found in most programming
-languages). For example, in these other languages, the value of @code{(1
-|| b)} is determined without ever evaluating @code{b}.
-@c ------------------------------------------------------------
-@c end of duplicate text
-@c ------------------------------------------------------------
-
-However, there are several short work-arounds for this problem:
-@enumerate
-@item
-If a variable (say, @code{i}) is only to be used as a boolean flag, then
-define (value is true) and undefine (value is false) @code{i} instead of
-assigning a value. Using this scheme, it is sufficient to simply write
-
-@smallexample
-if (defined(i))
-@end smallexample
-
-in order to check whether @code{i} is true. Use the command @code{kill}
-to undefine a variable (@pxref{kill}).
-@item
-If a variable  can have more than two values, then
-define it, if necessary, before it is used for the first time.
-For example, if the following is used within a procedure
-
-@smallexample
-if (! defined(DEBUG)) @{ int DEBUG = 1;@}
-@dots{}
-if (DEBUG == 3)  @{@dots{}@}
-if (DEBUG == 2)  @{@dots{}@}
-@dots{}
-@end smallexample
-
-then a user of this procedure does not need to care about the existence
-of the @code{DEBUG} variable -- this remains hidden from the
-user. However, if @code{DEBUG} exists globally, then its local default
-value is overwritten by its global one.
-@end enumerate
-
-@c ---------------------------------------
-@node No case or switch statement,  Usage of commas, Evaluation of logical expressions, Major differences to the C programming language
-@subsection No case or switch statement
-@cindex case
-@cindex switch
-
-@sc{Singular} does not offer a @code{case} (or @code{switch})
-statement. However, it can be imitated in the following way:
-
-@smallexample
-while (1)
-@{
-   if (choice == choice_1) @{ @dots{}; break;@}
-   @dots{}
-   if (choice == choice_n) @{ @dots{}; break;@}
-   // default case
-   @dots{}; break;
-@}
-@end smallexample
-
-@c ---------------------------------------
-@node Usage of commas, Usage of brackets, No case or switch statement, Major differences to the C programming language
-@subsection Usage of commas
-@cindex comma
-
-In @sc{Singular}, a comma separates list elements and the value of a comma
-expression is a list.
-Hence, commas can not be used to combine several expressions into
-a single expression. For example, instead of writing
-
-@smallexample
-for (i=1, j=5; i<5 || j<10; i++, j++) @{@dots{}@} // WRONG!!!!!!
-@end smallexample
-
-@noindent one has to write
-
-@smallexample
-for (i,j = 1,5; i<5 || j<10; i++, j++) @{@dots{}@}
-@end smallexample
-
-@c ---------------------------------------
-@node Usage of brackets, Behavior of continue, Usage of commas, Major differences to the C programming language
-@subsection Usage of brackets
-@cindex bracket
-
-In @sc{Singular}, curly brackets (@code{@{} @code{@}}) @strong{must
-always} be used to enclose the statement body following such constructs
-like @code{if}, @code{else}, @code{for}, @code{while}, even if this
-block consists of only a single statement. Similarly, in the return
-statement of a procedure parentheses (@code{(} @code{)}) @strong{must
-always} be used to enclose the return value.  Even if there is no value
-to return, parentheses have to be used after a return statement
-(i.e., @code{return();}).  For example,
-
-@smallexample
-if (i == 1) return i;    // WRONG!!!!!
-@end smallexample
-
-@noindent results in a errors. Instead, it must be written as
-
-@smallexample
-if (i == 1) @{ return (i); @}
-@end smallexample
-
-@c ---------------------------------------
-@node  Behavior of continue, Return type of procedures, Usage of brackets, Major differences to the C programming language
-@subsection Behavior of continue
-@cindex continue
-@sc{Singular}'s @code{continue} construct is only valid inside the body
-of a @code{for} or @code{while} construct. It skips the rest of the
-loop-body and jumps to the beginning of the block. Unlike the
-C-construct @sc{Singular}'s @code{continue} @strong{does not execute the
-increment statement}. For example,
-
-@smallexample
-for (int i = 1 ; i<=10; i=i+1)
-@{
-   @dots{}
-   if (i==3) @{ i=8;continue; @}
-     // skip the rest if i is 3 and
-     // continue with the next i: 8
-   i;
-@}
-@expansion{} 1
-@expansion{} 2
-@expansion{} 8
-@expansion{} 9
-@expansion{} 10
-@end smallexample
-@c ---------------------------------------
-@node Return type of procedures,,Behavior of continue, Major differences to the C programming language
-@subsection Return type of procedures
-@cindex return type of procedures
-
-Although the @sc{Singular} language is a strongly typed programming
-language, the type of the
-return value of a procedure does not need to be specified. As a
-consequence, the return type of a procedure may vary, i.e., may, for
-example, depend on the input. However, the return value
-of such a procedure may then only be assigned to a variable of type
-@code{def}.
-
-@smallexample
-@c example
-proc type_return (int i)
-{
-  if (i > 0) {return (i);}
-  else {return (list(i));}
-}
-def t1 = type_return(1);
-def t2 = type_return(-1);
-typeof(t1); typeof(t2);
-@c example
-@end smallexample
-
-Furthermore, it is mandatory to assign the return value of a procedure
-to a variable of type def, if a procedure changes the current ring using
-the @code{keepring} command (@pxref{keepring}) and returns a
-ring-dependent value (like a polynomial or module).
-
-@smallexample
-@c example
-proc def_return
-{
-  ring r=0,(x,y),dp;
-  poly p = x;
-  keepring r;
-  return (x);
-}
-def p = def_return();
-// poly p = def_return(); would be WRONG!!!
-typeof(p);
-@c example
-@end smallexample
-
-On the other hand, more than one value can be returned by a single
-@code{return} statement. For example,
-
-@smallexample
-proc tworeturn () @{ return (1,2); @}
-int i,j = tworeturn();
-@end smallexample
-
-
-@c -------------------------------------------------------------------------
-@node Miscellaneous oddities, Identifier resolution, Major differences to the C programming language, Tricks and pitfalls
-@section Miscellaneous oddities
-
-@enumerate
-@item integer division
-@cindex integer division
-@cindex div
-
-A sequence of digits and @code{/} without spaces is of type number.
-With spaces it is an expression of type int
-(and @code{/} is the integer division).
-To avoid confusion use the operand @code{div}.
-@smallexample
-@c example error
-  ring r=32002,x,dp;
-  3/2;
-  3 / 2;
-  3 div 2;
-  number(3) / number(2);
-  number a=3;
-  number b=2;
-  a / b;
-  a div b;
-@c example
-@end smallexample
-
-
-@item monomials and precedence
-@cindex monomials and precedence
-
-The computation of a monomial has precedence over all operators:
-@smallexample
-@c example
-  ring r=0,(x,y),dp;
-  2xy^2 == (2*x*y)^2;
-  2xy^2 == 2x*y^2;
-  2x*y^2 == 2*x * (y^2);
-@c example
-@end smallexample
-
-@item meaning of mult
-@cindex mult
-@cindex degree
-
-For an arbitrary ideal or module i, mult(i) returns the multiplicity
-of the ideal generated by the leading monomials of the given generators
-of i, hence depends on the monomial ordering!
-
-A standard mistake is to interpret @code{degree(i)} or @code{mult(i)}
-for an inhomogeneous ideal @code{i} as the degree of the homogenization
-or as something like the 'degree of the affine part'. For the ordering
-dp (degree reverse lexicographical) the converse is true: if @code{i} is
-given by a standard basis, @code{mult(i)} is the degree of the
-homogeneous ideal obtained by homogenization of @code{i} and then
-putting the homogenizing variable to 0, hence it is the degree of the
-part at infinity (this can also be checked by looking at the initial
-ideal).
-
-@item size of ideals
-@cindex ideals
-@cindex size
-
-@code{size} counts the non-zero entries of an ideal (resp.@:
-module). Use @code{ncols} to determine the actual number of entries in
-the ideal (resp.@: module).
-
-@item computations in qrings
-
-@sc{Singular} computes in a quotient ring as long as possible with the
-given representative of a polynomial, say, @code{f}.  I.e., it usually
-does not reduce @code{f} w.r.t. the quotient ideal.  This is only done
-when necessary
-during standard bases computations or by an explicit reduction using
-the command @code{reduce(f, std(0))} (@pxref{reduce}).
-
-@item substring selection
-
-Two comma - separated @code{int}s in square brackets after a string select a
-substring. An @code{intvec} in square brackets after a string selects
-the respective single characters of the string and returns them as an
-expression list of two strings.
-In particular,
-
-@smallexample
-@c example
-  string s = "one-word";
-  s[2,6];     // a substring starting at the second char
-  size(_);
-  intvec v = 2,6;
-  s[v];      // the second and the sixth char
-  string st = s[v];  // stick together by an assignment
-  st;
-  size(_);
-  v = 2,6,8;
-  s[v];
-@c example
-@end smallexample
-
-@item packages and indexed variables
-
-See example
-@smallexample
-@c example error
-package K;
-string K::varok;
-string K::donotwork(1);
-int K::i(1..3);
-// Toplevel does not contain i(1..3)
-listvar();
-// i(1..3) are stored in Package 'K'
-listvar(K);
-@c example
-@end smallexample
-@end enumerate
-
-@c ----------------------------------------------
-@node Identifier resolution,, Miscellaneous oddities, Tricks and pitfalls
-@section Identifier resolution
-@cindex identifier
-
-In @sc{Singular}, an identifier (i.e., a "word") is resolved in the
-following way and order: It is checked for
-@enumerate
-@item
-a reserved name,
-@item
-a local  variable (w.r.t. a procedure),
-@item
-a local ring variable (w.r.t. a ring locally set in a procedure),
-@item
-a global variable,
-@item
-a monomial consisting of local ring variables written without operators,
-@item
-a monomial consisting of global ring variables written without operators.
-@end enumerate
-
-Consequently, it is allowed to have general variables with the same name
-as ring  variables. However, the above identifier resolution order must
-be kept in mind. Otherwise, surprising results may come up.
-
-@smallexample
-@c example
-ring r=0,(x,y),dp;
-int x;
-x*y; // resolved product int*poly, i.e., 0*y
-xy; // "xy" is one identifier and resolved to monomial xy
-@c example
-@end smallexample
-
-For these reasons, we strongly recommend not to use variables which
-have the same name(s) as ring variables.
+@include tricks.tex
 
 @c ----------------------------------------------------------------------------
 @node Examples, Polynomial data, Tricks and pitfalls, Top
@@ -633,6 +178,8 @@ command @code{LIB "all.lib";} for loading all libraries.
 * solve_lib:: procedures to solve polynomial systems
 * spcurve_lib:: procedures for cm codimension 2 singularities
 @end menu
+
+
 @c ----------------------------------------------------------
 @node standard_lib, all_lib, SINGULAR libraries, SINGULAR libraries
 @section standard_lib
@@ -786,7 +333,7 @@ LIB "all.lib";
 @node solve_lib, spcurve_lib, presolve_lib, SINGULAR libraries
 @section solve_lib
 @cindex solve_lib
-@c lib solve.lib
+@c lib solve.lib no_ex
 
 @c ---------------------------------------------------------
 @node spcurve_lib, ,solve_lib, SINGULAR libraries

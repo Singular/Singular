@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.91 1999-07-09 14:12:59 obachman Exp $
+@comment $Id: types.doc,v 1.92 1999-07-14 15:50:04 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2015,7 +2015,7 @@ map expressions combined by composition using parentheses (@code{(}, @code{)})
 @table @asis
 @item @code{( )}
 composition of maps. If, for example, @code{f} and @code{g} are maps,
-then @code{f(g)} is an map expression giving the composition of @code{f}
+then @code{f(g)} is a map expression giving the composition of @code{f}
 and @code{g}.
 
 @item map_expression @code{[} int_expressions @code{]}
