@@ -156,13 +156,13 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 
 all:	Singular
 
-Singular: mod2.h si_paths.h Makefile version.h scanner.cc ${OBJS} iparith.o \
-	  mpsr_Tok.o tesths.cc libparse.cc gmalloc.o
+Singular: mod2.h si_paths.h Makefile version.h scanner.cc gmalloc.o \
+          ${OBJS} iparith.o mpsr_Tok.o tesths.cc libparse.cc 
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -o Singular \
 	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o
 
-Singular-static: mod2.h si_paths.h Makefile version.h scanner.cc ${OBJS} \
-                 iparith.o mpsr_Tok.o tesths.cc
+Singular-static: mod2.h si_paths.h Makefile version.h scanner.cc  gmalloc.o \
+	        ${OBJS} iparith.o mpsr_Tok.o tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	-o Singular-static \
 	tesths.cc iparith.o mpsr_Tok.o \
@@ -176,7 +176,7 @@ claptmpl.o: claptmpl.cc mod2.h
 iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
 	     -o gentable iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o
+	     ${OBJS} ${LDFLAGS} ${LIBS} 
 	./gentable
 	/bin/rm -f gentable gentable.exe
 
@@ -364,7 +364,7 @@ $(OBJG1): %.og: %.cc
 $(OBJG2) gmalloc.og: %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-Singularg: scanner.cc $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h gmalloc.og
+Singularg: scanner.cc gmalloc.og $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
 	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS} gmalloc.og
 
@@ -466,7 +466,7 @@ $(OBJP1): %.op: %.cc
 $(OBJP2) gmalloc.op: %.op: %.c
 	$(CCP)  ${CFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
-Singularp: scanner.cc $(OBJP) iparith.op mpsr_Tok.op tesths.cc version.h gmalloc.op
+Singularp: scanner.cc  gmalloc.op $(OBJP) iparith.op mpsr_Tok.op tesths.cc version.h
 	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp \
 	tesths.cc iparith.op mpsr_Tok.op $(OBJP) ${LDFLAGSP} ${LIBS} gmalloc.op
 
@@ -486,7 +486,7 @@ $(OBJB1): %.ob: %.cc
 $(OBJB2) gmalloc.ob: %.ob: %.c
 	$(CCP)  ${CFLAGSB} ${CPPFLAGS} ${DEFSB} -c $< -o $@
 
-Singularb: scanner.cc $(OBJB) iparith.ob mpsr_Tok.ob tesths.cc version.h gmalloc.ob
+Singularb: scanner.cc gmalloc.ob $(OBJB) iparith.ob mpsr_Tok.ob tesths.cc version.h 
 	$(CXXP) ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -o Singularb \
 	tesths.cc iparith.ob mpsr_Tok.ob $(OBJB)  $(BPROFOBJ) \
         ${LDFLAGSB} ${LIBS} gmalloc.ob
