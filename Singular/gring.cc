@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.3 2001-02-22 18:59:40 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.4 2001-02-22 19:14:27 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "gring.h"
@@ -627,7 +627,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
         for (m=1;m<=r->N;m++)
         {
            MATELEM(tmp,k,m) = MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m);
-           MATELEM(r->nc->MT[UPMATELEM(j,i)],k,m)=NULL;
+           MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m)=NULL;
         }
      }
      id_Delete((ideal *)&(r->nc->MT[UPMATELEM(j,i,r->N)]),r);
