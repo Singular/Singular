@@ -1,4 +1,4 @@
-// $Id: tex.lib,v 1.2 1997-07-03 15:49:56 Singular Exp $   
+// $Id: tex.lib,v 1.3 1998-02-13 15:49:02 obachman Exp $   
 //
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 // created ....18.4.97 (lastchange 13.6.97)
@@ -606,7 +606,7 @@ EXAMPLE: example texobj; shows an example
         { s = s + "\\begin{array}{rcl}" + newline;
           for(j=1;j<=size(obj);j++)
           { h = absterm(obj[j]);
-            ineq = attrib(I[j],"ineq");
+            ineq = attrib(obj[j],"ineq");
             if(!(size(ineq))) { ineq = "=" ; }
             l = texpoly("",obj[j]-h) + " & " + ineq + " & " + texpoly("",-h);
             if(j<size(obj)) { l = l + " \\\\";}
