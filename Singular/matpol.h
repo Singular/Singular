@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.h,v 1.7 1998-07-16 06:44:29 obachman Exp $ */
+/* $Id: matpol.h,v 1.8 1999-08-19 08:31:10 pohl Exp $ */
 /*
 * ABSTRACT
 */
@@ -45,8 +45,6 @@ BOOLEAN mpEqual(matrix a, matrix b);
 poly mpTrace ( matrix a);
 poly TraceOfProd ( matrix a, matrix b, int n);
 
-lists mpBareiss (matrix a, BOOLEAN diagonal);
-matrix mpOneStepBareiss (matrix a, poly *H, int *r, int *c);
 poly mpDet (matrix m);
 matrix mpWedge(matrix a, int ar);
 BOOLEAN mpJacobi(leftv res,leftv a);
@@ -69,5 +67,8 @@ are written to the first row of the matrix co.
 the second row of co contains the respective factors in f.
 Thus f = sum co[1,i]*co[2,i], i = 1..cols, rows equals 2. */
 void mpCoef2(poly v, poly vars, matrix *c, matrix *m);
+/* for minors with Bareiss */
+void mpRecMin(int, ideal, int &, matrix, int, int, poly);
+void mpMinorToResult(ideal, int &, matrix, int, int);
 
 #endif
