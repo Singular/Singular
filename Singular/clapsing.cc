@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.42 1998-10-09 12:29:37 Singular Exp $
+// $Id: clapsing.cc,v 1.43 1998-12-11 16:41:08 schmidt Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -24,27 +24,91 @@
 #endif
 #include "ring.h"
 
-// FACTORY_GCD_TEST: use new gcd instead of old one.
+//
+// FACTORY_GCD_TEST: use new gcd instead of old one.  Does not work
+//   without new gcd-implementation which is not publicly available.
+//
 // FACTORY_GCD_STAT: print statistics on polynomials.  Works only
-//   with the file `gcd_stat.cc' and `gcd_stat.h'.
+//   with the file `gcd_stat.cc' and `gcd_stat.h which may be found
+//   in the repository, module `factory-devel'.
+//   Overall statistics may printed using `system("gcdstat");'.
+//
 // FACTORY_GCD_TIMING: accumulate time used for gcd calculations.
 //   Time may be printed (and reset) with `system("gcdtime");'.
-//   For tis define, `timing.h' from the factory source directory
-//   has to be copied to the Singualr source directory.
+//   For this define, `timing.h' from the factory source directory
+//   has to be copied to the Singular source directory.
 //   Note: for better readability, the macros `TIMING_START()' and
 //   `TIMING_END()' are used in any case.  However, they expand to
 //   nothing if `FACTORY_GCD_TIMING' is off.
+//
 // FACTORY_GCD_DEBOUT: print polynomials involved in gcd calculations.
 //   The polynomials are printed by means of the macros
-//   `FACTORY_*OUT' which are defined to be empty if
+//   `FACTORY_*OUT_POLY' which are defined to be empty if
 //   `FACTORY_GCD_DEBOUT' is off.
+//
+// FACTORY_GCD_DEBOUT_PATTERN: print degree patterns of polynomials
+//   involved in gcd calculations.
+//   The patterns are printed by means of the macros
+//   `FACTORY_*OUT_PAT' which are defined to be empty if
+//   `FACTORY_GCD_DEBOUT_PATTERN' is off.
+//
+//   A degree pattern looks like this:
+//
+//   totDeg  size    deg(v1) deg(v2) ...
+//
+//   where "totDeg" means total degree, "size" the number of terms,
+//   and "deg(vi)" is the degree with respect to variable i.
+//   In univariate case, the "deg(vi)" are missing.  For this feature
+//   you need the files `gcd_stat.cc' and `gcd_stat.h'.
+//
+//
+// And here is what the functions print if `FACTORY_GCD_DEBOUT' (1),
+// `FACTORY_GCD_STAT' (2), or `FACTORY_GCD_DEBOUT_PATTERN' (3) is on:
+//
+// sinclap_divide_content:
+// (1)	G = <firstCoeff>
+// (3)	G#= <firstCoeff, pattern>
+// (1)	h = <nextCoeff>
+// (3)	h#= <nextCoeff, pattern>
+// (2)	gcnt: <statistics on gcd as explained above>
+// (1)	g = <intermediateResult>
+// (3)	g#= <intermediateResult, pattern>
+// (1)	h = <nextCoeff>
+// (3)	h#= <nextCoeff, pattern>
+// (2)	gcnt: <statistics on gcd as explained above>
+//	...
+// (1)	h = <lastCoeff>
+// (3)	h#= <lastCoeff, pattern>
+// (1)	g = <finalResult>
+// (3)	g#= <finalResult, pattern>
+// (2)	gcnt: <statistics on gcd as explained above>
+// (2)	cont: <statistics on content as explained above>
+//   
+// singclap_alglcm:
+// (1)  f = <inputPolyF>
+// (3)  f#= <inputPolyF, pattern>
+// (1)  g = <inputPolyG>
+// (3)  g#= <inputPolyG, pattern>
+// (1)  d = <its gcd>
+// (3)  d#= <its gcd, pattern>
+// (2)  alcm: <statistics as explained above>
+// 
+// singclap_algdividecontent:
+// (1)  f = <inputPolyF>
+// (3)  f#= <inputPolyF, pattern>
+// (1)  g = <inputPolyG>
+// (3)  g#= <inputPolyG, pattern>
+// (1)  d = <its gcd>
+// (3)  d#= <its gcd, pattern>
+// (2)  acnt: <statistics as explained above>
+//
 
 #ifdef FACTORY_GCD_STAT
 #include "gcd_stat.h"
 #define FACTORY_GCDSTAT( tag, f, g, d ) \
-  printGcdStat( tag, f, g, d, rPar( currRing ) == 1 )
+  printGcdStat( tag, f, g, d )
 #define FACTORY_CONTSTAT( tag, f ) \
-  printContStat( tag, f, rPar( currRing ) == 1 )
+  printContStat( tag, f )
 #else
 #define FACTORY_GCDSTAT( tag, f, g, d )
 #define FACTORY_CONTSTAT( tag, f )
@@ -65,12 +129,12 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 #include "longalg.h"
 #include "febase.h"
 // alg f
-#define FACTORY_ALGOUT( tag, f ) \
+#define FACTORY_ALGOUT_POLY( tag, f ) \
   StringSetS( tag ); \
   napWrite( f ); \
   PrintS(StringAppend("\n"));
 // CanonicalForm f, represents transcendent extension
-#define FACTORY_CFTROUT( tag, f ) \
+#define FACTORY_CFTROUT_POLY( tag, f ) \
   { \
     alg F=convClapPSingTr( f ); \
     StringSetS( tag ); \
@@ -79,7 +143,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
     napDelete( &F ); \
   }
 // CanonicalForm f, represents algebraic extension
-#define FACTORY_CFAOUT( tag, f ) \
+#define FACTORY_CFAOUT_POLY( tag, f ) \
   { \
     alg F=convClapASingA( f ); \
     StringSetS( tag ); \
@@ -87,11 +151,49 @@ TIMING_DEFINE_PRINT( algLcmTimer );
     PrintS(StringAppend("\n")); \
     napDelete( &F ); \
   }
-#else
-#define FACTORY_ALGOUT( tag, f )
-#define FACTORY_CFTROUT( tag, f )
-#define FACTORY_CFAOUT( tag, f )
-#endif
+#else /* ! FACTORY_GCD_DEBOUT */
+#define FACTORY_ALGOUT_POLY( tag, f )
+#define FACTORY_CFTROUT_POLY( tag, f )
+#define FACTORY_CFAOUT_POLY( tag, f )
+#endif /* ! FACTORY_GCD_DEBOUT */
+
+#ifdef FACTORY_GCD_DEBOUT_PATTERN
+// alg f
+#define FACTORY_ALGOUT_PAT( tag, f ) \
+  if (currRing->minpoly!=NULL) \
+  { \
+    CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z); \
+    Variable a=rootOf(mipo); \
+    printPolyPattern( tag, convSingAClapA( f,a ), rPar( currRing ) ); \
+  } \
+  else \
+  { \
+    printPolyPattern( tag, convSingTrClapP( f ), rPar( currRing ) ); \
+  }
+// CanonicalForm f, represents transcendent extension
+#define FACTORY_CFTROUT_PAT( tag, f ) printPolyPattern( tag, f, rPar( currRing ) )
+// CanonicalForm f, represents algebraic extension
+#define FACTORY_CFAOUT_PAT( tag, f ) printPolyPattern( tag, f, rPar( currRing ) )
+#else /* ! FACTORY_GCD_DEBOUT_PATTERN */
+#define FACTORY_ALGOUT_PAT( tag, f )
+#define FACTORY_CFTROUT_PAT( tag, f )
+#define FACTORY_CFAOUT_PAT( tag, f )
+#endif /* ! FACTORY_GCD_DEBOUT_PATTERN */
+
+// these macors combine both print macros
+#define FACTORY_ALGOUT( tag, f ) \
+  FACTORY_ALGOUT_POLY( tag " = ", f ); \
+  FACTORY_ALGOUT_PAT( tag "#= ", f )
+#define FACTORY_CFTROUT( tag, f ) \
+  FACTORY_CFTROUT_POLY( tag " = ", f ); \
+  FACTORY_CFTROUT_PAT( tag "#= ", f )
+#define FACTORY_CFAOUT( tag, f ) \
+  FACTORY_CFAOUT_POLY( tag " = ", f ); \
+  FACTORY_CFAOUT_PAT( tag "#= ", f )
+  
+
+
+
 
 poly singclap_gcd ( poly f, poly g )
 {
@@ -407,14 +509,14 @@ void singclap_divide_content ( poly f )
     CanonicalForm g, h;
     poly p = pNext(f);
     //nTest(pGetCoeff(f));
-    FACTORY_ALGOUT( "G = ", (((lnumber)pGetCoeff(f))->z) );
+    FACTORY_ALGOUT( "G", (((lnumber)pGetCoeff(f))->z) );
     g = convSingTrClapP( ((lnumber)pGetCoeff(f))->z );
     L.append( g );
     TIMING_START( contentTimer );
     while ( (p != NULL) && (g != 1) )
     {
       //nTest(pGetCoeff(p));
-      FACTORY_ALGOUT( "h = ", (((lnumber)pGetCoeff(p))->z) );
+      FACTORY_ALGOUT( "h", (((lnumber)pGetCoeff(p))->z) );
       h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
       p = pNext( p );
 #ifdef FACTORY_GCD_STAT
@@ -428,13 +530,12 @@ void singclap_divide_content ( poly f )
       g = gcd( g, h );
 #endif
 
-      FACTORY_GCDSTAT( "cont", gOld, h, g );
-      FACTORY_CFTROUT( "g = ", g );
+      FACTORY_GCDSTAT( "gcnt:", gOld, h, g );
+      FACTORY_CFTROUT( "g", g );
       L.append( h );
     }
     TIMING_END( contentTimer );
-    FACTORY_CFTROUT( "C = ", g );
-    FACTORY_CONTSTAT( "CONT", g );
+    FACTORY_CONTSTAT( "cont:", g );
     if ( g == 1 )
     {
       pTest(f);
@@ -1033,8 +1134,8 @@ BOOLEAN jjCHARSERIES(leftv res, leftv u)
 
 alg singclap_alglcm ( alg f, alg g )
 {
- FACTORY_ALGOUT( "f = ", f );
- FACTORY_ALGOUT( "g = ", g );
+ FACTORY_ALGOUT( "f", f );
+ FACTORY_ALGOUT( "g", g );
 
  // over Q(a) / Fp(a)
  if (nGetChar()==1) setCharacteristic( 0 );
@@ -1057,7 +1158,8 @@ alg singclap_alglcm ( alg f, alg g )
 #endif
    TIMING_END( algLcmTimer );
 
-   FACTORY_CFAOUT( "gcd = ", GCD );
+   FACTORY_CFAOUT( "d", GCD );
+   FACTORY_GCDSTAT( "alcm:", F, G, GCD );
 
    // calculate lcm
    res= convClapASingA( (F/GCD)*G );
@@ -1075,7 +1177,8 @@ alg singclap_alglcm ( alg f, alg g )
 #endif
    TIMING_END( algLcmTimer );
 
-   FACTORY_CFTROUT( "gcd = ", GCD );
+   FACTORY_CFTROUT( "d", GCD );
+   FACTORY_GCDSTAT( "alcm:", F, G, GCD );
 
    // calculate lcm
    res= convClapPSingTr( (F/GCD)*G );
@@ -1087,8 +1190,8 @@ alg singclap_alglcm ( alg f, alg g )
 
 void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
 {
- FACTORY_ALGOUT( "f = ", f );
- FACTORY_ALGOUT( "g = ", g );
+ FACTORY_ALGOUT( "f", f );
+ FACTORY_ALGOUT( "g", g );
 
  // over Q(a) / Fp(a)
  if (nGetChar()==1) setCharacteristic( 0 );
@@ -1110,7 +1213,8 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
 #endif
    TIMING_END( algContentTimer );
 
-   FACTORY_CFAOUT( "gcd = ", GCD );
+   FACTORY_CFAOUT( "d", GCD );
+   FACTORY_GCDSTAT( "acnt:", F, G, GCD );
 
    if (GCD!=1)
    {
@@ -1131,7 +1235,8 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
 #endif
    TIMING_END( algContentTimer );
 
-   FACTORY_CFTROUT( "gcd = ", GCD );
+   FACTORY_CFTROUT( "d", GCD );
+   FACTORY_GCDSTAT( "acnt:", F, G, GCD );
 
    if (GCD!=1)
    {
