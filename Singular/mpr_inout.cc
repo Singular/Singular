@@ -1,7 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_inout.cc,v 1.2 1999-06-28 16:06:28 Singular Exp $ */
+
+/* $Id: mpr_inout.cc,v 1.3 1999-06-29 09:03:45 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant

@@ -1,7 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_numeric.cc,v 1.2 1999-06-28 16:06:29 Singular Exp $ */
+
+/* $Id: mpr_numeric.cc,v 1.3 1999-06-29 09:03:46 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -482,7 +483,7 @@ bool rootContainer::solver( const int polishmode )
     }
     break;
   default:
-    Werror("rootContainer::solver: Unsupported polish mode %d! Valid are [1,2,3].",polishmode);
+    Werror("rootContainer::solver: Unsupported polish mode %d! Valid are [0,1,2].",polishmode);
     found_roots= false;
   } // switch
 

@@ -3,7 +3,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_numeric.h,v 1.2 1999-06-28 16:06:30 Singular Exp $ */
+
+/* $Id: mpr_numeric.h,v 1.3 1999-06-29 09:03:46 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -16,9 +17,9 @@
 #include "mpr_complex.h"
 
 // define polish mode when finding roots
-#define PM_NONE    1
-#define PM_POLISH  2
-#define PM_CORRUPT 3
+#define PM_NONE    0 
+#define PM_POLISH  1
+#define PM_CORRUPT 2
 //<-
 
 //-> vandermonde system solver

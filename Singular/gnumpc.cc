@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.2 1999-06-23 08:26:04 wenk Exp $ */
+/* $Id: gnumpc.cc,v 1.3 1999-06-29 09:03:42 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -351,6 +351,10 @@ char * ngcRead (char * s, number * a)
     s+=strlen(currRing->parameter[0]);
     gmp_complex *aa=new gmp_complex((long)0,(long)1);
     *a=(number)aa;
+  }
+  else 
+  {
+    *a=(number) new gmp_complex((long)1);
   }
   return s;
 }
