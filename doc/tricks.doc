@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.7 2000-07-04 17:16:49 obachman Exp $
+@comment $Id: tricks.doc,v 1.8 2003-02-18 16:14:24 Singular Exp $
 @comment this file contains the "Tricks and pittfals" sections
 
 @c The following directives are necessary for proper compilation
@@ -35,7 +35,7 @@
 @sc{Singular} has the following limitations:
 @itemize @bullet
 @item
-the characteristic of a prime field must be less than 32004
+the characteristic of a prime field must be less than 2147483629
 @item
 the (weighted) degree of a monomial must be smaller than 2147483648
 @item

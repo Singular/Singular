@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.195 2001-08-27 14:40:04 Singular Exp $
+@comment $Id: general.doc,v 1.196 2003-02-18 16:13:10 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1414,10 +1414,10 @@ The coefficient field of the rings may be
 the field of rational numbers @math{Q},
 @item
 @tex
-finite fields $Z/p$, $p$ a prime $\le 32003$,
+finite fields $Z/p$, $p$ a prime $\le 2147483629$,
 @end tex
 @ifinfo
-finite fields Z/p, p a prime <= 32003,
+finite fields Z/p, p a prime <= 2147483629,
 @end ifinfo
 @item
 @tex

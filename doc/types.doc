@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.118 2002-01-16 13:58:46 Singular Exp $
+@comment $Id: types.doc,v 1.119 2003-02-18 16:12:17 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3432,7 +3432,7 @@ declares a ring and sets it as the actual basering.
 The coefficient_field is given by one of the following:
 @enumerate
 @item
-a non-negative int_expression less or equal 32003.
+a non-negative int_expression less or equal 2147483629.
 @item
 an expression_list of an int_expression and one or more names.
 @item
