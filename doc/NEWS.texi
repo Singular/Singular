@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.30 2001-02-23 17:37:29 obachman Exp $
+@comment $Id: NEWS.texi,v 1.31 2001-02-26 11:29:46 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -28,7 +28,7 @@ Singular version 2 is generally much faster than any previous
 version of Singular, due to a rewrite of major parts of the Singular
 kernel (e.g., the kernel has a new memory manager and a new polynomial
 arithmetic) and due to new and better implemented algorithms (e.g., for
-comuting resolutions and determinants). 
+computing resolutions and determinants). 
 
 Besides theses internal changes, Singular version 2 offers many new
 features and functionlities (which were partly already incorporated in
