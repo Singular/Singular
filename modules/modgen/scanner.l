@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.5 2000-01-27 12:40:55 krueger Exp $ */
+/* $Id: scanner.l,v 1.6 2000-02-14 21:47:10 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -124,6 +124,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 %x SECT2
 %x SECT3
 %x PROCDECL
+%x EXAMPLE
 
 %x pdef
 %x procopt
@@ -258,17 +259,50 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 	          push_state(YYSTATE, PROCDECL, "PROCDECL");
 		  return PROCDECLTOK;
                 }
-        example+{WSNL}+"{" {
+        example {
 	          printf(">>>EXAMPLE\n");
-                  brace1 = 1; /* { */
+                  brace1 = 0; /* { */
                   brace2 = 0; /* ( */
                   brace3 = 0; /* [ */
-	          push_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
+	          push_state(YYSTATE, EXAMPLE, "EXAMPLE");
 		  return EXAMPLETOK;
                 }
+	static  { return STATICTOK; }
+	{NAME}  { 
+	           int i,tok;
+#if DEBUG > 1
+	           printf("(%d) VAR: %s\n", yylineno, yytext);
+#endif
+		   i = IsCmd(yytext, tok);
+#if DEBUG > 1
+		   printf("Res=%d, %d => %s\n", i, tok,
+			  i ? "VARTYPETOK" : "NAME");
+#endif
+		   if(i) {
+		     lvalp->tp.name = strdup(yytext);
+		     lvalp->tp.typ = tok;
+		     push_state(YYSTATE, PROCDECL, "PROCDECL");
+		     return VARTYPETOK;
+		   }
+		   else {
+		     //do_return++;
+		     lvalp->name = strdup(yytext);
+		     push_state(YYSTATE, PROCDECL, "PROCDECL");
+		     return NAME;
+		   }
+                 }
         .       { printf("<<<'%s' ", yytext); }
-
        }
+
+<EXAMPLE>{
+        {NL}    { yylineno++; }
+        {WS}    /* ignore */
+        "{"     { brace1++;
+		  switch_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
+		  return '{';
+		}
+        .       { printf("ERROR <<<'%s' ", yytext); }
+}
 
 <SECT3>{
         {NL}    { yylineno++; }
@@ -320,6 +354,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 	 "("     { return '('; }
 	 ")"     { return ')'; }
 	 ","     { return ','; }
+	 "#"     { return '#'; }
 	 "="     { return '='; }
 	 ";"     { return ';'; }
          .       { }
@@ -364,10 +399,13 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
 <PROCCMDBLOCK>{
        {col}  { pop_state(); return ';'; }
-	"("     { return '('; }
-	")"     { return ')'; }
-       {WS}    /* ignore */
+	"("   { return '('; }
+	")"   { return ')'; }
+	","   { return ','; }
+       {WS}   /* ignore */
        {NAME} { lvalp->name = strdup(yytext); return NAME; }
+       {NL}   { yylineno++; }
+       "::"   { return MCOLONCOLON; }
        .      { printf("PCB: '%s'\n", yytext); }
        }
 
