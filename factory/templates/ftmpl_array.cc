@@ -1,10 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_array.cc,v 1.7 1997-06-30 15:43:19 schmidt Exp $ */
+/* $Id: ftmpl_array.cc,v 1.8 1998-03-10 14:51:21 schmidt Exp $ */
 
 #include <factoryconf.h>
 
 #ifdef macintosh
-#include <::templates:ftmpl_array.h>
+#include <:templates:ftmpl_array.h>
 #else
 #include <templates/ftmpl_array.h>
 #endif

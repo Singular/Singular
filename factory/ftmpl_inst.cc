@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_inst.cc,v 1.5 1997-12-08 18:47:03 schmidt Exp $ */
+/* $Id: ftmpl_inst.cc,v 1.6 1998-03-10 14:51:14 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -14,11 +14,11 @@
 #include <factoryconf.h>
 
 #ifdef macintosh
-#include <::templates:ftmpl_array.cc>
-#include <::templates:ftmpl_factor.cc>
-#include <::templates:ftmpl_list.cc>
-#include <::templates:ftmpl_functions.h>
-#include <::templates:ftmpl_matrix.cc>
+#include <:templates:ftmpl_array.cc>
+#include <:templates:ftmpl_factor.cc>
+#include <:templates:ftmpl_list.cc>
+#include <:templates:ftmpl_functions.h>
+#include <:templates:ftmpl_matrix.cc>
 #else
 #include <templates/ftmpl_array.cc>
 #include <templates/ftmpl_factor.cc>

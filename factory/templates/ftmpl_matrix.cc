@@ -1,10 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.cc,v 1.8 1997-06-30 15:46:03 schmidt Exp $ */
+/* $Id: ftmpl_matrix.cc,v 1.9 1998-03-10 14:51:38 schmidt Exp $ */
 
 #include <factoryconf.h>
 
 #ifdef macintosh
-#include <::templates:ftmpl_matrix.h>
+#include <:templates:ftmpl_matrix.h>
 #else
 #include <templates/ftmpl_matrix.h>
 #endif
