@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.19 2000-11-16 17:01:33 Singular Exp $ */
+/* $Id: modulop.cc,v 1.20 2000-11-17 14:07:11 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -247,6 +247,7 @@ void npSetChar(int c, ring r)
       npExpTable[1] = 1;
       npGen=1;
     }
+    // if (npGen != npExpTable[1]) Print("npGen wrong:%d, %d\n",npGen, npExpTable[1]);
   }
   else
   {
@@ -262,6 +263,10 @@ void npInitChar(int c, ring r)
 
   if ((c>1) || (c<(-1)))
   {
+    // if (r->cf->npExpTable!=NULL)
+    //   Print("npExpTable!=NULL\n");
+    // if (r->cf->npLogTable!=NULL)
+    //   Print("npLogTable!=NULL\n");
     if (c>1) r->cf->npPrimeM = c;
     else     r->cf->npPrimeM = -c;
     r->cf->npPminus1M = r->cf->npPrimeM - 1;

@@ -3,15 +3,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.17 2000-11-16 16:51:05 Singular Exp $ */
+/* $Id: numbers.h,v 1.18 2000-11-17 14:07:12 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
 #include "structs.h"
 
 #define n_Copy(n, r)          nCopy(n)
-//#define n_Delete(n, r)        (r)->cf->nDelete(n)
-#define n_Delete(n, r)        nDelete(n)
+#define n_Delete(n, r)        (r)->cf->nDelete(n)
+//#define n_Delete(n, r)        nDelete(n)
 #define n_Mult(n1, n2, r)     nMult(n1, n2)
 #define n_Add(n1, n2, r)      nAdd(n1, n2)
 #define n_IsZero(n, r)	      nIsZero(n)

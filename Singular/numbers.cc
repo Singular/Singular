@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.24 2000-11-16 17:55:25 Singular Exp $ */
+/* $Id: numbers.cc,v 1.25 2000-11-17 14:07:12 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -99,10 +99,6 @@ void nSetChar(ring r, BOOLEAN complete)
 {
   int c=rInternalChar(r);
 
-  if (nNULL!=NULL)
-  {
-    nDelete(&nNULL);nNULL=NULL;
-  }
   if (complete)
   {
     nChar=c;
@@ -112,14 +108,14 @@ void nSetChar(ring r, BOOLEAN complete)
     nGetDenom = ndGetDenom;
     nName = ndName;
   }
+#ifdef LDEBUG
+  nDBDelete= r->cf->nDBDelete;
+#else
+  nDelete= r->cf->nDelete;
+#endif
   if (rField_is_Extension(r))
   {
-    naSetChar(c,complete,r->parameter,rPar(r), r);
-#ifdef LDEBUG
-    nDBDelete= naDBDelete;
-#else
-    nDelete= naDelete;
-#endif
+    naSetChar(c,complete,r);
     if (complete)
     {
       test |= Sy_bit(OPT_INTSTRATEGY); /*intStrategy*/
@@ -162,11 +158,6 @@ void nSetChar(ring r, BOOLEAN complete)
   }
   else if (rField_is_Q(r))
   {
-#ifdef LDEBUG
-    nDBDelete= nlDBDelete;
-#else
-    nDelete= nlDelete;
-#endif
     if (complete)
     {
       test |= Sy_bit(OPT_INTSTRATEGY); /*26*/
@@ -206,11 +197,6 @@ void nSetChar(ring r, BOOLEAN complete)
   else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
-#ifdef LDEBUG
-    nDBDelete= nDBDummy1;
-#else
-    nDelete= nDummy1;
-#endif
     if (complete)
     {
       npSetChar(c, r);
@@ -251,11 +237,6 @@ void nSetChar(ring r, BOOLEAN complete)
   /* -------------- GF(p^m) -----------------------*/
   else if (rField_is_GF(r))
   {
-#ifdef LDEBUG
-    nDBDelete= nDBDummy1;
-#else
-    nDelete= nDummy1;
-#endif
     if (complete)
     {
       test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
@@ -299,11 +280,6 @@ void nSetChar(ring r, BOOLEAN complete)
   //if (c==(-1))
   else if (rField_is_R(r))
   {
-#ifdef LDEBUG
-    nDBDelete= nDBDummy1;
-#else
-    nDelete= nDummy1;
-#endif
     if (complete)
     {
       nNew=nDummy1;
@@ -343,11 +319,6 @@ void nSetChar(ring r, BOOLEAN complete)
   else if (rField_is_long_R(r))
   {
     setGMPFloatDigits(r->ch_flags);
-#ifdef LDEBUG
-    nDBDelete= ngfDBDelete;
-#else
-    nDelete= ngfDelete;
-#endif
     if (complete)
     {
       nNew=ngfNew;
@@ -387,11 +358,6 @@ void nSetChar(ring r, BOOLEAN complete)
   else if (rField_is_long_C(r))
   {
     setGMPFloatDigits(r->ch_flags);
-#ifdef LDEBUG
-    nDBDelete= ngcDBDelete;
-#else
-    nDelete= ngcDelete;
-#endif
     if (complete)
     {
       nNew=ngcNew;
@@ -433,7 +399,7 @@ void nSetChar(ring r, BOOLEAN complete)
     WerrorS("unknown field");
   }
 #endif
-  if (complete&&(!errorreported)) nNULL=nInit(0);
+  if (complete&&(!errorreported)) nNULL=r->cf->nNULL;
 }
 
 /*2
@@ -484,7 +450,7 @@ void nInitChar(ring r)
   r->cf->nName =  ndName;
   if (rField_is_Extension(r))
   {
-    //naSetChar(c,TRUE,r->parameter,rPar(r), r);
+    //naInitChar(c,TRUE,r);
 #ifdef LDEBUG
     r->cf->nDBDelete = naDBDelete;
 #else

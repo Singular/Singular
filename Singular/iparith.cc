@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.231 2000-11-16 17:55:23 Singular Exp $ */
+/* $Id: iparith.cc,v 1.232 2000-11-17 14:07:09 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1638,7 +1638,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       {
         par_perm_size=rPar(r);
         BITSET save_test=test;
-        naSetChar(rInternalChar(r),TRUE,r->parameter,rPar(r), r);
+        naSetChar(rInternalChar(r),TRUE, r);
         nSetChar(currRing,TRUE);
         test=save_test;
       }

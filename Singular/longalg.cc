@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.47 2000-11-16 17:55:25 Singular Exp $ */
+/* $Id: longalg.cc,v 1.48 2000-11-17 14:07:11 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -78,7 +78,7 @@ static number nadGcd( number a, number b) { return nacInit(1); }
 /*2
 *  sets the appropriate operators
 */
-void naSetChar(int i, BOOLEAN complete, char ** param, int pars, ring r)
+void naSetChar(int i, BOOLEAN complete, ring r)
 {
   if (naI!=NULL)
   {
@@ -91,8 +91,8 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars, ring r)
   }
   naMap = naCopy;
   naMinimalPoly = NULL;
-  naParNames=param;
-  naNumbOfPar=pars;
+  naParNames=r->parameter;
+  naNumbOfPar=rPar(r);
   napMonomSize = RECA_SIZE + naNumbOfPar*SIZEOF_PARAMETER;
   if (i == 1)
   {
@@ -160,7 +160,7 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars, ring r)
 #ifdef TEST
   else
   {
-    Print("naSetChar:c=%d compl=%d param=%d\n",i,complete,param);
+    Print("naSetChar:c=%d compl=%d param=%d\n",i,complete,rPar(r));
   }
 #endif
 }

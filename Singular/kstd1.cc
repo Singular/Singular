@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.63 2000-11-16 09:54:50 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.64 2000-11-17 14:07:10 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -129,7 +129,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
 #endif
   if (intoT)
   {
-    // need to do it exacly like this: otherwise 
+    // need to do it exacly like this: otherwise
     // we might get errors
     LObject L= *h;
     L.Copy();
@@ -139,7 +139,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
     {
       if (ret < 0) return ret;
       if (h->tailRing != strat->tailRing)
-        h->ShallowCopyDelete(strat->tailRing, 
+        h->ShallowCopyDelete(strat->tailRing,
                              pGetShallowCopyDeleteProc(h->tailRing,
                                                        strat->tailRing));
     }
@@ -349,7 +349,7 @@ int redEcart (LObject* h,kStrategy strat)
 //        i = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, i);
         if (i > strat->tl) break;
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
-                                        strat->T[i].length < li)) 
+                                        strat->T[i].length < li))
             &&
             pLmShortDivisibleBy(strat->T[i].p, strat->sevT[i], h->p, ~h->sev))
         {
@@ -361,7 +361,7 @@ int redEcart (LObject* h,kStrategy strat)
         }
       }
     }
-    
+
     // end of search: have to reduce with pi
     if (ei > h->ecart)
     {
@@ -389,7 +389,7 @@ int redEcart (LObject* h,kStrategy strat)
         }
       }
     }
-        
+
     // now we fianlly can reduce
     doRed(h,&(strat->T[ii]),strat->fromT,strat);
     strat->fromT=FALSE;
@@ -471,7 +471,7 @@ int redEcart (LObject* h,kStrategy strat)
 int redFirst (LObject* h,kStrategy strat)
 {
   if (h->IsNull()) return 0;
-  
+
   int at, reddeg,d;
   int pass = 0;
   int j = 0;
@@ -487,7 +487,7 @@ int redFirst (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0)
     {
-      if (! strat->homog) 
+      if (! strat->homog)
         h->SetDegStuffReturnLDeg();
       return 1;
     }
@@ -519,10 +519,10 @@ int redFirst (LObject* h,kStrategy strat)
       return 0;
     }
     h->SetShortExpVector();
-    
+
     if ((strat->syzComp!=0) && !strat->honey)
     {
-      if ((strat->syzComp>0) && 
+      if ((strat->syzComp>0) &&
           (h->MinComp() > strat->syzComp))
       {
 #ifdef KDEBUG
@@ -698,7 +698,7 @@ void reorderT(kStrategy strat)
   int i,j,at;
   TObject p;
   unsigned long sev;
-  
+
 
   for (i=1; i<=strat->tl; i++)
   {
@@ -916,7 +916,7 @@ void updateT(kStrategy strat)
     deleteHCs(&p,strat);
     /*- tries to cancel a unit: -*/
     cancelunit(&p);
-    if (p.p != strat->T[i].p) 
+    if (p.p != strat->T[i].p)
     {
       strat->sevT[i] = pGetShortExpVector(p.p);
       p.SetpFDeg();
@@ -1039,7 +1039,7 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
 void enterSMoraNF (LObject p, int atS,kStrategy strat, int atR = -1)
 {
   int i;
-  
+
   enterSBba(p, atS, strat, atR);
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
@@ -1361,7 +1361,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   omfree(strat->sevT);
   omfree(strat->S_2_R);
   omfree(strat->R);
-  
+
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
     i=((IDELEMS(Q)+IDELEMS(F)+15)/16)*16;
@@ -1822,7 +1822,7 @@ ideal kInterRed (ideal F, ideal Q)
   omfree(strat->sevT);
   omfree(strat->S_2_R);
   omfree(strat->R);
-  
+
   if (strat->fromQ)
   {
     for (j=0;j<IDELEMS(strat->Shdl);j++)

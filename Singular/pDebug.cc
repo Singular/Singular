@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.14 2000-11-14 16:04:59 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.15 2000-11-17 14:07:12 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -197,6 +197,8 @@ static poly p_DebugInit(poly p, ring src_ring, ring dest_ring)
 
 BOOLEAN _p_Test(poly p, ring r, int level)
 {
+  assume(r->cf !=NULL);
+
   if (PDEBUG > level) level = PDEBUG;
   if (level < 0 || p == NULL) return TRUE;
   
