@@ -10,7 +10,7 @@
 //       try to create spolys as formal sums
 
 #include "tgb.h"
-static const int bundle_size=50;
+static const int bundle_size=100;
 #if 1
 static omBin lm_bin=NULL;
 static inline poly p_Init_Special(const ring r)
@@ -2473,12 +2473,7 @@ BOOLEAN tgb_sparse_matrix::is_zero_entry(int i, int j){
   return FALSE;
   
 }
-void tgb_sparse_matrix::perm_rows(int i, int j){
-  mac_poly h;
-  h=mp[i];
-  mp[i]=mp[j];
-  mp[j]=h;
-}
+
 int tgb_sparse_matrix::min_col_not_zero_in_row(int row){
   if(mp[row]!=NULL)
   {
@@ -2580,6 +2575,7 @@ void simple_gauss(tgb_sparse_matrix* mat){
   int pn=mat->get_rows();
   int matcol=mat->get_columns();
   int* area=(int*) omalloc(sizeof(int)*((matcol-1)/bundle_size+1));
+  const int max_area_index=(matcol-1)/bundle_size;
     //rows are divided in areas 
   //if row begins with columns col, it is located in [area[col/bundle_size],area[col/bundle_size+1]-1]
   assume(pn>0);
@@ -2613,6 +2609,10 @@ void simple_gauss(tgb_sparse_matrix* mat){
       last_area=this_area;
     }
   }
+  for(i=last_area+1;i<=max_area_index;i++)
+  {
+    area[i]=pn;
+  }
   while(row<pn-1){
     //row is the row where pivot should be
     // row== pn-1 means we have only to act on one row so no red nec.
@@ -2621,6 +2621,15 @@ void simple_gauss(tgb_sparse_matrix* mat){
     //select column
    
     //col=mat->min_col_not_zero_in_row(row);
+    int max_in_area;
+    {
+      int tai=row_cache[row]/bundle_size;
+      assume(tai<=max_area_index);
+      if(tai==max_area_index)
+	max_in_area=pn-1;
+      else
+	max_in_area=area[tai+1]-1;
+    }
     assume(row_cache[row]==mat->min_col_not_zero_in_row(row));
     col=row_cache[row];
 
@@ -2630,7 +2639,7 @@ void simple_gauss(tgb_sparse_matrix* mat){
     
     found_in_row=row;
     assume(pn<=mat->get_rows());
-    for(i=row+1;i<pn;i++){
+    for(i=row+1;i<=max_in_area;i++){
       int first;//=mat->min_col_not_zero_in_row(i);
       assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
       first=row_cache[i];
@@ -2643,7 +2652,7 @@ void simple_gauss(tgb_sparse_matrix* mat){
     }
     //select pivot
     int act_l=mat->non_zero_entries(found_in_row);
-    for(i=found_in_row+1;i<pn;i++){
+    for(i=found_in_row+1;i<=max_in_area;i++){
       assume(mat->min_col_not_zero_in_row(i)>=col);
       int first;
       assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
@@ -2665,7 +2674,12 @@ void simple_gauss(tgb_sparse_matrix* mat){
     row_cache[found_in_row]=h;
 
     //reduction
-    for(i=row+1;i<pn;i++){
+
+    //for(i=row+1;i<pn;i++){
+    for(i=max_in_area;i>row;i--)
+    {
+      int col_area_index=col/bundle_size;
+      assume(col_area_index<=max_area_index);
       assume(mat->min_col_not_zero_in_row(i)>=col);
       int first;
       assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
@@ -2685,26 +2699,69 @@ void simple_gauss(tgb_sparse_matrix* mat){
 	mat->add_lambda_times_row(i,row,n1);
 	assume(mat->is_zero_entry(i,col));
 	row_cache[i]=mat->min_col_not_zero_in_row(i);
-
-      } 
-      assume(mat->min_col_not_zero_in_row(i)>col);
-    }
-
-    for(i=row+1;i<pn;i++)
-    {
-      assume(mat->min_col_not_zero_in_row(i)==row_cache[i]);
-      // if(mat->zero_row(i))
-      assume(matcol==mat->get_columns());
-      if(row_cache[i]==matcol)
-      {
-	assume(mat->zero_row(i));
-	mat->perm_rows(i,pn-1);
-	row_cache[i]=row_cache[pn-1];
-	row_cache[pn-1]=matcol;
-	pn--;
-	if(i!=pn){i--;}
+	assume(mat->min_col_not_zero_in_row(i)>col);
+	if(row_cache[i]==matcol)
+	{
+	  int index;
+	  index=i;
+	  int last_in_area;
+	  int this_cai=col_area_index;
+	  while(this_cai<max_area_index)
+	  {
+	    last_in_area=area[this_cai+1]-1;
+	    int h_c=row_cache[last_in_area];
+	    row_cache[last_in_area]=row_cache[index];
+	    row_cache[index]=h_c;
+	    mat->perm_rows(index,last_in_area);
+	    index=last_in_area;
+	    this_cai++;
+	    area[this_cai]--;
+	  }
+	  mat->perm_rows(index,pn-1);
+	  row_cache[index]=row_cache[pn-1];
+	  row_cache[pn-1]=matcol;
+	  pn--;
+	}
+	else 
+	{
+	  int index;
+	  index=i;
+	  int last_in_area;
+	  int this_cai=col_area_index;
+	  int final_cai=row_cache[index]/bundle_size;
+	  assume(final_cai<=max_area_index);
+	  while(this_cai<final_cai)
+	  {
+	    last_in_area=area[this_cai+1]-1;
+	    int h_c=row_cache[last_in_area];
+	    row_cache[last_in_area]=row_cache[index];
+	    row_cache[index]=h_c;
+	    mat->perm_rows(index,last_in_area);
+	    index=last_in_area;
+	    this_cai++;
+	    area[this_cai]--;
+	  }
+	}
       }
+      else
+	assume(mat->min_col_not_zero_in_row(i)>col);
     }
+
+//     for(i=row+1;i<pn;i++)
+//     {
+//       assume(mat->min_col_not_zero_in_row(i)==row_cache[i]);
+//       // if(mat->zero_row(i))
+//       assume(matcol==mat->get_columns());
+//       if(row_cache[i]==matcol)
+//       {
+// 	assume(mat->zero_row(i));
+// 	mat->perm_rows(i,pn-1);
+// 	row_cache[i]=row_cache[pn-1];
+// 	row_cache[pn-1]=matcol;
+// 	pn--;
+// 	if(i!=pn){i--;}
+//       }
+//     }
 #ifdef TGB_DEBUG
   {
   int last=-1;

@@ -148,7 +148,13 @@ class tgb_sparse_matrix{
   int get_rows();
   int get_columns();
   void print();
-  void perm_rows(int i, int j);
+  //  void perm_rows(int i, int j);
+  void perm_rows(int i, int j){
+  mac_poly h;
+  h=mp[i];
+  mp[i]=mp[j];
+  mp[j]=h;
+  }
   void set(int i, int j, number n);
   number get(int i, int j);
   BOOLEAN is_zero_entry(int i, int j);
