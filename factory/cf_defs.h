@@ -1,11 +1,14 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_defs.h,v 1.0 1996-05-17 10:59:38 stobbe Exp $
+// $Id: cf_defs.h,v 1.1 1996-07-02 11:18:57 stobbe Exp $
 
 #ifndef INCL_CF_DEFS_H
 #define incl_cf_defs_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:38  stobbe
+Initial revision
+
 */
 
 #include "conf.h"
@@ -30,6 +33,7 @@ $Log: not supported by cvs2svn $
 #define SW_BERLEKAMP 3
 #define SW_FAC_USE_BIG_PRIMES 4
 #define SW_FAC_QUADRATICLIFT 5
+#define SW_USE_EZGCD 6
 
 /*ENDPUBLIC*/
 
