@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.70 2000-12-20 11:15:44 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.71 2000-12-21 16:37:50 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -130,7 +130,7 @@ static int redHomog (LObject* h,kStrategy strat)
     }
     
     // now we found one which is divisible -- reduce it
-    ksReducePoly(h, &(strat->T[j]), strat->kNoether, NULL, strat);
+    ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -181,7 +181,7 @@ static int redLazy (LObject* h,kStrategy strat)
     }
 #endif
 
-    ksReducePoly(h, &(strat->T[j]), strat->kNoether, NULL, strat);
+    ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -318,7 +318,7 @@ static int redHoney (LObject* h, kStrategy strat)
 #endif
     assume(strat->fromT == FALSE);
 
-    ksReducePoly(h, &(strat->T[ii]), strat->kNoether, NULL, strat);
+    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -571,7 +571,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         kStratChangeTailRing(strat);
       }
       // create the real one
-      ksCreateSpoly(&(strat->P), strat->kNoether, strat->use_buckets, 
+      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets, 
                     strat->tailRing, m1, m2, strat->R);
     }
     else if (strat->P.p1 == NULL)

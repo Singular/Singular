@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.75 2000-12-20 11:15:43 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.76 2000-12-21 16:37:49 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -10,7 +10,7 @@
 #define MORA_USE_BUCKETS
 
 // define if tailrings should be used
-#define HAVE_TAIL_RING
+// #define HAVE_TAIL_RING
 
 #include "mod2.h"
 #include "tok.h"
@@ -133,7 +133,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
     L.Copy();
     h->GetP();
     h->SetLength(strat->length_pLength);
-    ret = ksReducePoly(&L, with, strat->kNoether, NULL, strat);
+    ret = ksReducePoly(&L, with, strat->kNoetherTail(), NULL, strat);
     if (ret)
     {
       if (ret < 0) return ret;
@@ -146,7 +146,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
     *h = L;
   }
   else
-    ret = ksReducePoly(h, with, strat->kNoether, NULL, strat);
+    ret = ksReducePoly(h, with, strat->kNoetherTail(), NULL, strat);
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -356,7 +356,7 @@ int redFirst (LObject* h,kStrategy strat)
       strat->T[j].wrp();
     }
 #endif
-    ksReducePoly(h, &(strat->T[j]), strat->kNoether, NULL, strat);
+    ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
@@ -526,7 +526,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       }
       /*- try to reduce the s-polynomial -*/
       o = H.SetpFDeg();
-      cancelunit(&H);
+      if (flag != 2) cancelunit(&H);
       H.ecart = pLDeg(H.p,&(H.length))-o;
       j = 0;
       H.sev = pGetShortExpVector(H.p);
@@ -748,7 +748,7 @@ void updateL(kStrategy strat)
           kStratChangeTailRing(strat);
         }
         /* create the real one */
-        ksCreateSpoly(&(strat->L[j]), strat->kNoether, FALSE, 
+        ksCreateSpoly(&(strat->L[j]), strat->kNoetherTail(), FALSE, 
                       strat->tailRing, m1, m2, strat->R);
 
         if (!strat->honey)
@@ -805,7 +805,7 @@ void updateLHC(kStrategy strat)
           kStratChangeTailRing(strat);
         }
         /* create the real one */
-        ksCreateSpoly(&(strat->L[i]), strat->kNoether, FALSE, 
+        ksCreateSpoly(&(strat->L[i]), strat->kNoetherTail(), FALSE, 
                       strat->tailRing, m1, m2, strat->R);
         if (! strat->L[i].IsNull())
         {
@@ -1097,7 +1097,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /*- compute-------------------------------------------*/
 
 #ifdef HAVE_TAIL_RING
-  if (strat->homog && strat->red == redFirst)
+//  if (strat->homog && strat->red == redFirst)
     kStratInitChangeTailRing(strat);
 #endif  
   
@@ -1149,7 +1149,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         kStratChangeTailRing(strat);
       }
       /* create the real one */
-      ksCreateSpoly(&(strat->P), strat->kNoether, strat->use_buckets, 
+      ksCreateSpoly(&(strat->P), strat->kNoetherTail(), strat->use_buckets, 
                     strat->tailRing, m1, m2, strat->R);
       if (!strat->use_buckets)
         strat->P.SetLength(strat->length_pLength);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.90 2000-12-20 17:20:00 obachman Exp $ */
+/* $Id: kutil.cc,v 1.91 2000-12-21 16:37:50 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -160,7 +160,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       L->last = NULL;
     }
 
-    if (!fromNext && p_Cmp(p,strat->kNoether, L->tailRing) == -1)
+    if (!fromNext && p_Cmp(p,strat->kNoetherTail(), L->tailRing) == -1)
     {
       L->Delete();
       L->Clear();
@@ -171,7 +171,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     p1 = p;
     while (pNext(p1)!=NULL)
     { 
-      if (p_LmCmp(pNext(p1), strat->kNoether, L->tailRing) == -1)
+      if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
       {
         L->last = p1;
         p_Delete(&pNext(p1), L->tailRing);
@@ -2665,7 +2665,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
         With = kFindDivisibleByInS(strat, pos, &Ln, &With_s, e);
       if (With == NULL) break;
       strat->redTailChange=TRUE;
-      if (ksReducePolyTail(L, With, h, strat->kNoether))
+      if (ksReducePolyTail(L, With, h, strat->kNoetherTail()))
       {
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
@@ -3245,7 +3245,7 @@ static poly redBba1 (poly h,int maxIndex,kStrategy strat)
   while (j <= maxIndex)
   {
     if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j],h, not_sev))
-       return ksOldSpolyRedNew(strat->S[j],h,strat->kNoether);
+       return ksOldSpolyRedNew(strat->S[j],h,strat->kNoetherTail());
     else j++;
   }
   return h;
@@ -3318,7 +3318,7 @@ static poly redQ (poly h, int j, kStrategy strat)
   {
     if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev))
     {
-      h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
+      h = ksOldSpolyRed(strat->S[j],h,strat->kNoetherTail());
       if (h==NULL) return NULL;
       j = start;
       not_sev = ~ pGetShortExpVector(h);
@@ -3341,7 +3341,7 @@ static poly redBba (poly h,int maxIndex,kStrategy strat)
   {
     if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev))
     {
-      h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
+      h = ksOldSpolyRed(strat->S[j],h,strat->kNoetherTail());
       if (h==NULL) return NULL;
       j = 0;
       not_sev = ~ pGetShortExpVector(h);    }
@@ -3374,7 +3374,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
           {PrintS("reduce ");wrp(h);Print(" with S[%d] (",j);wrp(strat->S[j]);}
         
 #endif          
-        h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
+        h = ksOldSpolyRed(strat->S[j],h,strat->kNoetherTail());
 #ifdef KDEBUG
         if(TEST_OPT_DEBUG)
           {PrintS(")\nto "); wrp(h); PrintLn();}
@@ -3865,7 +3865,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   if (pOrdSgn==-1)
   {
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
-    if (strat->kNoether!=NULL) pSetComp(strat->kNoether, strat->ak);
+    if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
   if(TEST_OPT_SB_1)
   {
@@ -4049,7 +4049,10 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
   int i,j;
   poly newNoether;
 
-  scComputeHC(strat->Shdl,ak,strat->kHEdge);
+  scComputeHC(strat->Shdl,ak,strat->kHEdge, strat->tailRing);
+  if (strat->t_kHEdge != NULL) p_LmFree(strat->t_kHEdge, strat->tailRing);
+  if (strat->tailRing != currRing)
+    strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
   /* compare old and new noether*/
   newNoether = pLmInit(strat->kHEdge);
   j = pFDeg(newNoether);
@@ -4077,6 +4080,10 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
   {
     pDelete(&strat->kNoether);
     strat->kNoether=newNoether;
+    if (strat->t_kNoether != NULL) p_LmFree(strat->t_kNoether, strat->tailRing);
+    if (strat->tailRing != currRing)
+      strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
+    
     return TRUE;
   }
   pLmFree(newNoether);
@@ -4185,6 +4192,21 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   strat->tailBin = new_tailBin;
   strat->p_shallow_copy_delete 
     = pGetShallowCopyDeleteProc(currRing, new_tailRing);
+
+  if (strat->kHEdge != NULL)
+  {
+    if (strat->t_kHEdge != NULL)
+      p_LmFree(strat->t_kHEdge, strat->tailRing);
+    strat->t_kHEdge=k_LmInit_currRing_2_tailRing(strat->kHEdge, new_tailRing);
+  }
+
+  if (strat->kNoether != NULL)
+  {
+    if (strat->t_kNoether != NULL)
+      p_LmFree(strat->t_kNoether, strat->tailRing);
+    strat->t_kNoether=k_LmInit_currRing_2_tailRing(strat->kNoether, 
+                                                   new_tailRing);
+  }
   kTest_TS(strat);
   if (TEST_OPT_PROT)
     PrintS("]");
@@ -4241,6 +4263,11 @@ skStrategy::~skStrategy()
     omMergeStickyBinIntoBin(tailBin, 
                             (tailRing != NULL ? tailRing->PolyBin:
                              currRing->PolyBin));
+  if (t_kHEdge != NULL)
+    p_LmFree(t_kHEdge, tailRing);
+  if (t_kNoether != NULL)
+    p_LmFree(t_kNoether, tailRing);
+
   if (currRing != tailRing)
     rKillModifiedRing(tailRing);
   pRestoreDegProcs(pOrigFDeg, pOrigLDeg);

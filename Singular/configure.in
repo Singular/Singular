@@ -310,6 +310,10 @@ case "$ac_cv_singuname" in
 	        ac_lib_dl=yes
 	  fi
 	;;
+        IRIX-6)
+          LD_DYN_FLAGS="-lc"
+	  ac_lib_dl=yes
+        ;;
 esac
 AC_SUBST(LD_DYN_FLAGS)
 AC_SUBST(SFLAGS)

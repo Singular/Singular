@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.21 2000-12-20 11:15:42 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.22 2000-12-21 16:37:49 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -49,6 +49,18 @@ KINLINE TObject* skStrategy::s_2_t(int i)
       return &(T[sri]);
   }
   return NULL;
+}
+
+KINLINE poly skStrategy::kNoetherTail()
+{
+  if (tailRing == currRing)
+    return kNoether;
+  else
+  {
+    assume((kNoether == NULL && t_kNoether == NULL) ||
+           (kNoether != NULL && t_kNoether != NULL));
+    return t_kNoether;
+  }
 }
 
 /***************************************************************

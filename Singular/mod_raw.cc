@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.11 2000-12-12 14:54:59 obachman Exp $ */
+/* $Id: mod_raw.cc,v 1.12 2000-12-21 16:37:52 obachman Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -223,7 +223,7 @@ const char *dynl_error()
  * SECTION IRIX-6                                                            *
  *****************************************************************************/
 #ifdef IRIX_6
-/* #    include <> */
+#include <dlfcn.h>
 
 void *dynl_open(char *filename)
 {

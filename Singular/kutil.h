@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.52 2000-12-20 11:15:46 obachman Exp $ */
+/* $Id: kutil.h,v 1.53 2000-12-21 16:37:51 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -233,6 +233,9 @@ public:
   LSet    B;
   poly    kHEdge;
   poly    kNoether;
+  poly    t_kHEdge; // same polys in tailring
+  KINLINE poly    kNoetherTail();
+  poly    t_kNoether;
   BOOLEAN * NotUsedAxis;
   LObject P;
   poly tail;
