@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.20 2000-12-06 11:03:26 Singular Exp $ */
+/* $Id: numbers.h,v 1.21 2000-12-06 12:34:20 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -20,6 +20,10 @@
 #define n_GetChar(r)          ((r)->cf->nChar)
 #define n_Init(i, r)          (r)->cf->nInit(i)
 #define n_IsOne(n, r)         (r)->cf->nIsOne(n)
+#define n_IsMOne(n, r)        (r)->cf->nIsMOne(n)
+#define n_GreaterZero(n, r)   (r)->cf->nGreaterZero(n)
+#define n_Write(n, r)         (r)->cf->nWrite(n)
+#define n_Normalize(n, r)     (r)->cf->nNormalize(n)
 
 /* variables */
 extern short fftable[];
