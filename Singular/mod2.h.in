@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.99 2001-02-02 11:32:27 mschulze Exp $
+ *  Version: $Id: mod2.h.in,v 1.100 2001-03-05 18:28:49 mschulze Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -169,6 +169,9 @@
 
 // procedures to compute with units
 #define HAVE_UNITS
+
+// eigenvalues of constant square matrices
+#define HAVE_EIGENVAL
 
 /* Define to use old mechanismen for saving currRing with procedures
  * Does not work with HAVE_NAMESPACES enabled

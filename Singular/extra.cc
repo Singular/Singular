@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.163 2001-02-26 15:08:42 levandov Exp $ */
+/* $Id: extra.cc,v 1.164 2001-03-05 18:28:49 mschulze Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -105,6 +105,11 @@ extern "C"
 #include "pcv.h"
 #endif
 #endif /* not HAVE_DYNAMIC_LOADING */
+
+// eigenvalues of constant square matrices
+#ifdef HAVE_EIGENVAL
+#include "eigenval.h"
+#endif
 
 // see clapsing.cc for a description of the `FACTORY_*' options
 
@@ -542,12 +547,23 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
 #endif
 #endif /* HAVE_DYNAMIC_LOADING */
+/*==================== eigenval =============================*/
+    if(strcmp(sys_cmd,"tridiag")==0)
+    {
+      return tridiag(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"eigenval")==0)
+    {
+      return eigenval(res,h);
+    }
+    else
 /*==================== contributors =============================*/
    if(strcmp(sys_cmd,"contributors") == 0)
    {
      res->rtyp=STRING_CMD;
      res->data=(void *)omStrDup(
-       "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Jens Schmidt, Thomas Siebert, Ruediger Stobbe, Moritz Wenk, Tim Wichmann");
+       "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Jens Schmidt, Mathias Schulze, Thomas Siebert, Ruediger Stobbe, Moritz Wenk, Tim Wichmann");
      return FALSE;
    }
    else

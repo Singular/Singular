@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.10 2001-01-11 17:12:59 Singular Exp $";
+version="$Id: linalg.lib,v 1.11 2001-03-05 18:28:45 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib        Algorithmic Linear Algebra
@@ -24,9 +24,10 @@ PROCEDURES:
  mat_rk(A);         rank of constant matrix A
  U_D_O(A);          P*A=U*D*O, P,D,U,O=permutaion,diag,lower-,upper-triang
  pos_def(A,i);      test symmetric matrix for positive definiteness
- jordan(M[,opt]);   eigenvalues, Jordan block sizes, transformation matrix
- jordanmatrix(l);   Jordan matrix with eigenvalues, Jordan block sizes
- jordanform(M);     Jordan normal form of constant square matrix M
+ jordan(M);         Jordan data of constant square matrix M
+ jordanbasis(M);    Jordan basis of constant square matrix M
+ jordanmatrix(e,b); Jordan matrix with eigenvalues e and Jordan block sizes b
+ jordanform(M);     Jordan matrix of constant square matrix M
 ";
 
 LIB "matrix.lib";
@@ -1232,380 +1233,79 @@ example
 //    AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc countblocks(matrix M)
-{
-  int b,r,r0;
-
-  int i=1;
-  while(i<=nrows(M))
-  {
-    b++;
-    r=nrows(M[i]);
-    r0=r;
-
-    dbprint(printlevel-voice+2,"//searching for block "+string(b)+"...");
-    while(i<r0&&i<nrows(M))
-    {
-      i++;
-      if(i<=nrows(M))
-      {
-        r=nrows(M[i]);
-        if(r>r0)
-        {
-          r0=r;
-        }
-      }
-    }
-    dbprint(printlevel-voice+2,"//...block "+string(b)+" found");
-
-    i++;
-  }
-
-  return(b);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-static proc getblock(matrix M,intvec v)
-{
-  matrix M0[size(v)][size(v)]=M[v,v];
-  return(M0);
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc jordan(matrix M,list #)
-"USAGE:   jordan(M[,opt]); M constant square matrix, opt integer
-ASSUME:  The eigenvalues of M are in the coefficient field.
-RETURN:  The procedure returns a list jd with 3 entries:
+"USAGE:   jordan(M); matrix M
+ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
+RETURN:
 @format
-         - jd[1] ideal, eigenvalues of M,
-         - jd[2] list of intvecs, jd[2][i][j] size of j-th Jordan block with
-           eigenvalue jd[1][i], and
-         - jd[3] a matrix, jd[3]^(-1)*M*jd[3] in Jordan normal form.
-         Depending on opt, only certain entries of jd are computed.
-           If opt=-1, jd[1] is computed,
-           if opt= 0, jd[1] and jd[2] are computed,
-           if opt= 1, jd[1], jd[2], and jd[3] are computed, and,
-           if opt= 2, jd[1] and jd[3] are computed.
-         By default, opt=0.
+<list> l:
+  <ideal> l[1]: eigenvalues of M
+  <list> l[2]:
+    <intvec> l[2][i]:
+       <int> l[2][i][j]: size of Jordan block j of M with eigenvalue l[1][i]
 @end format
-NOTE:    A non constant polynomial matrix M is replaced by its constant part.
-DISPLAY: The procedure displays comments if printlevel>=1.
-EXAMPLE: example jordan; shows an example.
+EXAMPLE: example jordan; shows an example
 "
 {
-  int n=nrows(M);
-  if(n==0)
+  if(nrows(M)==0)
   {
-    print("//empty matrix");
-    return(list());
+    ERROR("non empty expected");
   }
-  if(n!=ncols(M))
+  if(ncols(M)!=nrows(M))
   {
-    print("//no square matrix");
-    return(list());
+    ERROR("square matrix expected");
   }
 
   M=jet(M,0);
 
-  dbprint(printlevel-voice+2,"//counting blocks of matrix...");
-  int i=countblocks(M);
-  dbprint(printlevel-voice+2,"//...blocks of matrix counted");
-  if(i==1)
-  {
-    dbprint(printlevel-voice+2,"//matrix has 1 block");
-  }
-  else
-  {
-    dbprint(printlevel-voice+2,"//matrix has "+string(i)+" blocks");
-  }
+  list l=system("eigenval",M);
+  def e,m=l[1..2];
 
-  dbprint(printlevel-voice+2,"//counting blocks of transposed matrix...");
-  int j=countblocks(transpose(M));
-  dbprint(printlevel-voice+2,"//...blocks of transposed matrix counted");
-  if(j==1)
+  int i;
+  for(i=1;i<=ncols(e);i++)
   {
-    dbprint(printlevel-voice+2,"//transposed matrix has 1 block");
-  }
-  else
-  {
-    dbprint(printlevel-voice+2,"//transposed matrix has "+string(j)+" blocks");
-  }
-
-  if(i<j)
-  {
-    dbprint(printlevel-voice+2,"//transposing matrix...");
-    M=transpose(M);
-    dbprint(printlevel-voice+2,"//...matrix transposed");
-  }
-
-  list fd;
-  matrix M0;
-  poly cp;
-  ideal eM,eM0;
-  intvec mM,mM0;
-  intvec u;
-  int b,r,r0;
-
-  i=1;
-  while(i<=nrows(M))
-  {
-    b++;
-    u=i;
-    r=nrows(M[i]);
-    r0=r;
-
-    dbprint(printlevel-voice+2,"//searching for block "+string(b)+"...");
-    while(i<r0&&i<nrows(M))
+    if(deg(e[i]>0))
     {
-      i++;
-      if(i<=nrows(M))
-      {
-        u=u,i;
-        r=nrows(M[i]);
-        if(r>r0)
-        {
-          r0=r;
-        }
-      }
-    }
-    dbprint(printlevel-voice+2,"//...block "+string(b)+" found");
-
-    if(size(u)==1)
-    {
-      dbprint(printlevel-voice+2,"//1x1-block:");
-      dbprint(printlevel-voice+2,M[u[1]][u[1]]);
-
-      if(mM[1]==0)
-      {
-        eM=M[u[1]][u[1]];
-        mM=1;
-      }
-      else
-      {
-        eM=eM,ideal(M[u[1]][u[1]]);
-        mM=mM,1;
-      }
-    }
-    else
-    {
-      dbprint(printlevel-voice+2,
-        "//"+string(size(u))+"x"+string(size(u))+"-block:");
-      M0=getblock(M,u);
-      dbprint(printlevel-voice+2,M0);
-
-      dbprint(printlevel-voice+2,"//characteristic polynomial:");
-      cp=det(module(M0-var(1)*freemodule(size(u))));
-      dbprint(printlevel-voice+2,cp);
-
-      dbprint(printlevel-voice+2,"//factorizing characteristic polynomial...");
-      fd=factorize(cp,2);
-      dbprint(printlevel-voice+2,"//...characteristic polynomial factorized");
-
-      dbprint(printlevel-voice+2,"//computing eigenvalues...");
-      eM0,mM0=fd[1..2];
-      if(1<var(1))
-      {
-        for(j=ncols(eM0);j>=1;j--)
-        {
-          if(deg(eM0[j])>1)
-          {
-            print("//eigenvalues not in the coefficient field");
-            return(list());
-          }
-          if(eM0[j][1]==0)
-          {
-            eM0[j]=0;
-          }
-          else
-          {
-            eM0[j]=-eM0[j][2]/(eM0[j][1]/var(1));
-          }
-        }
-      }
-      else
-      {
-        for(j=ncols(eM0);j>=1;j--)
-        {
-          if(deg(eM0[j])>1)
-          {
-            print("//eigenvalues not in the coefficient field");
-            return(list());
-          }
-          if(eM0[j][2]==0)
-          {
-            eM0[j]=0;
-          }
-          else
-          {
-            eM0[j]=-eM0[j][1]/(eM0[j][2]/var(1));
-          }
-        }
-      }
-      dbprint(printlevel-voice+2,"//...eigenvalues computed");
-
-      if(mM[1]==0)
-      {
-        eM=eM0;
-        mM=mM0;
-      }
-      else
-      {
-        eM=eM,eM0;
-        mM=mM,mM0;
-      }
-    }
-
-    i++;
-  }
-
-  dbprint(printlevel-voice+2,"//sorting eigenvalues...");
-  poly e;
-  int m;
-  for(i=ncols(eM);i>=2;i--)
-  {
-    for(j=i-1;j>=1;j--)
-    {
-     if(eM[i]<eM[j])
-      {
-        e=eM[i];
-        eM[i]=eM[j];
-        eM[j]=e;
-        m=mM[i];
-        mM[i]=mM[j];
-        mM[j]=m;
-      }
+      ERROR("eigenvalues in coefficient field expected");
+      return(list());
     }
   }
-  dbprint(printlevel-voice+2,"//...eigenvalues sorted");
 
-  dbprint(printlevel-voice+2,"//removing multiple eigenvalues...");
-  i=1;
-  j=2;
-  while(j<=ncols(eM))
-  {
-    if(eM[i]==eM[j])
-    {
-      mM[i]=mM[i]+mM[j];
-    }
-    else
-    {
-      i++;
-      eM[i]=eM[j];
-      mM[i]=mM[j];
-    }
-    j++;
-  }
-  eM=eM[1..i];
-  mM=mM[1..i];
-  dbprint(printlevel-voice+2,"//...multiple eigenvalues removed");
-
-  dbprint(printlevel-voice+2,"//eigenvalues:");
-  dbprint(printlevel-voice+2,eM);
-  dbprint(printlevel-voice+2,"//multiplicities:");
-  dbprint(printlevel-voice+2,mM);
-
-  int opt=0;
-  if(size(#)>0)
-  {
-    if(typeof(#[1])=="int")
-    {
-      opt=#[1];
-    }
-  }
-  if(opt<0)
-  {
-    return(list(eM));
-  }
-  int k,l;
-  matrix I=freemodule(n);
-  matrix Mi,Ni;
-  module sNi;
+  int j,k;
+  matrix N,NN;
+  module K0;
   list K;
-  if(opt>=1)
-  {
-    module V,K1,K2;
-    matrix v[n][1];
-  }
-  if(opt<=1)
-  {
-    list bM;
-    intvec bMi;
-  }
+  intvec b0;
+  list b;
 
-  for(i=ncols(eM);i>=1;i--)
+  for(i=ncols(e);i>0;i--)
   {
-    Mi=M-eM[i]*I;
+    N=M-e[i]*freemodule(ncols(M));
 
-    dbprint(printlevel-voice+2,
-      "//computing kernels of powers of matrix minus eigenvalue "
-      +string(eM[i]));
-    K=list(module());
-    for(Ni,sNi=Mi,0;size(sNi)<mM[i];Ni=Ni*Mi)
+    K0=0;
+    NN=N;
+    K=module();
+    while(size(K0)<m[i])
     {
-      sNi=syz(Ni);
-      K=K+list(sNi);
-    }
-    dbprint(printlevel-voice+2,"//...kernels computed");
-
-    if(opt<=1)
-    {
-      dbprint(printlevel-voice+2,
-        "//computing Jordan block sizes for eigenvalue "
-        +string(eM[i])+"...");
-      bMi=0;
-      bMi[size(K[2])]=0;
-      for(j=size(K);j>=2;j--)
-      {
-        for(k=size(bMi);k>size(bMi)+size(K[j-1])-size(K[j]);k--)
-        {
-          bMi[k]=bMi[k]+1;
-        }
-      }
-      bM=list(bMi)+bM;
-      dbprint(printlevel-voice+2,"//...Jordan block sizes computed");
+      K0=syz(NN);
+      K=K+list(K0);
+      NN=NN*N;
     }
 
-    if(opt>=1)
+    b0=0;
+    b0[size(K[2])]=0;
+    for(j=size(K);j>1;j--)
     {
-      dbprint(printlevel-voice+2,
-        "//computing Jordan basis vectors for eigenvalue "
-        +string(eM[i])+"...");
-      if(size(K)>1)
+      for(k=size(b0);k>size(b0)+size(K[j-1])-size(K[j]);k--)
       {
-        for(j,K1=2,0;j<=size(K)-1;j++)
-        {
-          K2=K[j];
-          K[j]=interred(reduce(K[j],std(K1+module(Mi*K[j+1]))));
-          K1=K2;
-        }
-        K[j]=interred(reduce(K[j],std(K1)));
+        b0[k]=b0[k]+1;
       }
-      for(j=size(K);j>=2;j--)
-      {
-        for(k=size(K[j]);k>=1;k--)
-        {
-          v=K[j][k];
-          for(l=j;l>=1;l--)
-          {
-            V=module(v)+V;
-            v=Mi*v;
-          }
-        }
-      }
-      dbprint(printlevel-voice+2,"//...Jordan basis vectors computed");
     }
+    b=list(b0)+b;
   }
 
-  list jd=eM;
-  if(opt<=1)
-  {
-    jd[2]=bM;
-  }
-  if(opt>=1)
-  {
-    jd[3]=V;
-  }
-  return(jd);
+  l[2]=b;
+  return(l);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1616,57 +1316,118 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc jordanmatrix(list jd)
-"USAGE:   jordanmatrix(jd); jd list of ideal and list of intvecs
-RETURN:  The procedure returns the Jordan matrix J, satisfying:
-@*       - eigenvalues of J are given by jd[1]
-@*       - j-th Jordan block of J with eigenvalue jd[1][i] has size jd[2][i][j]
-DISPLAY: The procedure displays comments if printlevel>=1.
-EXAMPLE: example jordanmatrix; shows an example.
+proc jordanbasis(matrix M)
+"USAGE:   jordan(M); matrix M
+ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
+RETURN:  <matrix> U: inverse(U)*M*U Jordan normal form of M
+EXAMPLE: example jordanbasis; shows an example
 "
 {
-  if(size(jd)<2)
+  if(nrows(M)==0)
   {
-    print("//not enough entries in argument list");
-    matrix J[1][0];
-    return(J);
+    ERROR("non empty matrix expected");
   }
-  def eJ,bJ=jd[1..2];
-  if(typeof(eJ)!="ideal")
+  if(ncols(M)!=nrows(M))
   {
-    print("//first entry in argument list not an ideal");
-    matrix J[1][0];
-    return(J);
+    ERROR("square matrix expected");
   }
-  if(typeof(bJ)!="list")
+
+  M=jet(M,0);
+
+  list l=system("eigenval",M);
+  def e,m=l[1..2];
+  kill l;
+
+  int i;
+  for(i=1;i<=ncols(e);i++)
   {
-    print("//second entry in argument list not a list");
-    matrix J[1][0];
-    return(J);
+    if(deg(e[i]>0))
+    {
+      ERROR("eigenvalues in coefficient field expected");
+      return(freemodule(ncols(M)));
+    }
   }
-  if(size(eJ)<size(bJ))
+
+  int j,k,l;
+  matrix N,NN;
+  module K0,K1;
+  list K;
+  matrix u[ncols(M)][1];
+  module U;
+
+  for(i=ncols(e);i>0;i--)
   {
-    int s=size(eJ);
+    N=M-e[i]*freemodule(ncols(M));
+
+    K0=0;
+    NN=N;
+    K=module();
+    while(size(K0)<m[i])
+    {
+      K0=syz(NN);
+      K=K+list(K0);
+      NN=NN*N;
+    }
+
+    K1=0;
+    for(j=2;j<size(K);j++)
+    {
+      K0=K[j];
+      K[j]=interred(reduce(K[j],std(K1+module(N*K[j+1]))));
+      K1=K0;
+    }
+    K[j]=interred(reduce(K[j],std(K1)));
+
+    for(j=size(K);j>1;j--)
+    {
+      for(k=size(K[j]);k>0;k--)
+      {
+        u=K[j][k];
+        for(l=j;l>0;l--)
+        {
+          U=module(u)+U;
+          u=N*u;
+        }
+      }
+    }
   }
-  else
+
+  return(U);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,x,dp;
+  matrix M[3][3]=3,2,1,0,2,1,0,0,3;
+  print(M);
+  matrix U=jordanbasis(M);
+  print(U);
+  print(inverse(U)*M*U);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc jordanmatrix(ideal e,list b)
+"USAGE:   jordanmatrix(e,b); ideal e, list b
+RETURN:  <matrix> J: Jordan matrix with eigenvalues e and block sizes b
+EXAMPLE: example jordanmatrix; shows an example
+"
+{
+  if(size(e)!=size(b))
   {
-    int s=size(bJ);
+    ERROR("arguments of equal size expected");
   }
 
   int i,j,k,n;
-  for(i=s;i>=1;i--)
+  for(i=size(e);i>=1;i--)
   {
-    if(typeof(bJ[i])!="intvec")
+    if(typeof(b[i])!="intvec")
     {
-      print("//second entry in argument list not a list of intvecs");
-      matrix J[1][0];
-      return(J);
+      ERROR("second argument of type list of intvec expected");
     }
     else
     {
-      for(j=size(bJ[i]);j>=1;j--)
+      for(j=size(b[i]);j>=1;j--)
       {
-        k=bJ[i][j];
+        k=b[i][j];
         if(k>0)
         {
           n=n+k;
@@ -1674,23 +1435,24 @@ EXAMPLE: example jordanmatrix; shows an example.
       }
     }
   }
-
-  int l;
   matrix J[n][n];
-  for(i,l=1,1;i<=s;i++)
+
+  int l=1;
+  for(i=1;i<=size(e);i++)
   {
-    for(j=1;j<=size(bJ[i]);j++)
+    for(j=1;j<=size(b[i]);j++)
     {
-      k=bJ[i][j];
+      k=b[i][j];
       if(k>0)
       {
         while(k>=2)
         {
-          J[l,l]=eJ[i];
+          J[l,l]=e[i];
           J[l,l+1]=1;
-          k,l=k-1,l+1;
+          k--;
+          l++;
         }
-        J[l,l]=eJ[i];
+        J[l,l]=e[i];
         l++;
       }
     }
@@ -1701,23 +1463,21 @@ EXAMPLE: example jordanmatrix; shows an example.
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,x,dp;
-  list l;
-  l[1]=ideal(2,3);
-  l[2]=list(intvec(1),intvec(2));
-  print(jordanmatrix(l));
+  ideal e=ideal(2,3);
+  list b=list(intvec(1),intvec(2));
+  print(jordanmatrix(e,b));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordanform(matrix M)
-"USAGE:   jordanform(M); M constant square matrix
-ASSUME:  The eigenvalues of M are in the coefficient field.
-RETURN:  matrix, the Jordan normal form of M.
-NOTE:    A non constant polynomial matrix M is replaced by its constant part.
-DISPLAY: The procedure displays more comments for higher printlevel.
-EXAMPLE: example jordanform; shows an example.
+"USAGE:   jordanform(M); matrix M
+ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
+RETURN:  <matrix> J: Jordan normal form of M
+EXAMPLE: example jordanform; shows an example
 "
 {
-  return(jordanmatrix(jordan(M)));
+  list l=jordan(M);
+  return(jordanmatrix(l[1],l[2]));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1726,7 +1486,6 @@ example
   print(M);
   print(jordanform(M));
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 
 /*
