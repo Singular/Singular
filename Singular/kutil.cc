@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.51 2000-01-22 12:04:08 Singular Exp $ */
+/* $Id: kutil.cc,v 1.52 2000-03-31 13:18:22 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -261,6 +261,7 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
 {
   BOOLEAN ret = TRUE;
 
+  #ifdef PDEBUG
   if (testp)
   {
     if (! pDBTest(L->p, L->heap, f, l))
@@ -269,6 +270,7 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
       ret = FALSE;
     }
   }
+  #endif
 
   if (L->pLength != 0 && L->pLength != pLength(L->p))
   {
@@ -374,7 +376,11 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
 
 BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
 {
+  #ifdef PDEBUG
   BOOLEAN ret = pDBTest(T->p, T->heap, f, l);
+  #else
+  BOOLEAN ret=FALSE;
+  #endif
   if (ret == FALSE) Warn("for T[%d]", i);
   if (T->pLength != 0 &&
       T->pLength != pLength(T->p))
@@ -2560,7 +2566,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
   LObject h;
   int   i,pos;
 
-  h.ecart=0; h.length=0;
+  /* h.ecart=0; h.length=0;*/ memset(&h,0,sizeof(h));
   if (Q!=NULL) i=IDELEMS(Q);
   else i=0;
   i=((i+16)/16)*16;
