@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: mondromy.lib,v 1.20 2001-01-11 17:12:59 Singular Exp $";
+version="$Id: mondromy.lib,v 1.21 2001-01-11 18:00:06 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
@@ -27,7 +27,7 @@ SEE ALSO: gaussman_lib
 
 LIB "ring.lib";
 LIB "sing.lib";
-LIB "jordan.lib";
+LIB "linalg.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 

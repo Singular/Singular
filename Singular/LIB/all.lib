@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.32 2000-12-23 17:08:07 greuel Exp $
+// $Id: all.lib,v 1.33 2001-01-11 17:56:37 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.32 2000-12-23 17:08:07 greuel Exp $";
+version="$Id: all.lib,v 1.33 2001-01-11 17:56:37 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
@@ -14,7 +14,6 @@ General purpose
   ring_lib:        Manipulating Rings and Maps
 
 Linear algebra
-  jordan_lib:      Jordan Normal Form of a Matrix with rational Eigenvalues
   linalg_lib:      Algorithmic Linear Algebra
   matrix_lib:      Elementary Matrix Operations
 
@@ -84,7 +83,6 @@ LIB "random.lib";
 LIB "ring.lib";
 //Linear algebra
 LIB "matrix.lib";
-LIB "jordan.lib";
 LIB "linalg.lib";
 //Commutative algebra
 LIB "algebra.lib";
