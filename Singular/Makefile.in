@@ -219,7 +219,7 @@ endif
 #
 SLIBS = COPYING \
 	ainvar.lib   algebra.lib   all.lib       brnoeth.lib    classify.lib \
-        deform.lib   elim.lib      equising.lib  finvar.lib     gaussman.lib \
+        deform.lib   elim.lib      equising.lib  finvar.lib     gmssing.lib \
         general.lib  graphics.lib  hnoether.lib  homolog.lib    inout.lib \
         intprog.lib  latex.lib     linalg.lib    makedbm.lib    matrix.lib \
 	mprimdec.lib \
