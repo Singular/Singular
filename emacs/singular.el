@@ -1,19 +1,68 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.3 1998-07-22 15:09:34 schmidt Exp $
+;; $Id: singular.el,v 1.4 1998-07-23 08:38:08 schmidt Exp $
 
 ;;; Commentary:
 
 
 ;;; Code:
 
+;;{{{ Style and coding conventions
+
+;; Style and coding conventions:
+;;
+;; - "Singular" is written with an upper-case `S' in comments, doc
+;;   strings, and messages.  As part of symbols, it is written with
+;;   a lower-case `s'.
+;; - use a `fill-column' of 70 for doc strings and comments
+;; - use foldings to structure the source code but try not to exceed a
+;;   maximal depth of two folding (one folding in another folding which is
+;;   on top-level)
+;; - use lowercase folding titles except for first word
+;; - folding-marks are `;;{{{' and `;;}}}' resp., for sake of standard
+;;   conformity
+;;
+;; - use `singular' as prefix for all global symbols
+;; - use `singular-debug' as prefix for all global symbols concerning
+;;   debugging.
+;;
+;; - mark dependencies on Emacs flavor/version with a comment of the form
+;;   `;; Emacs[ version]' resp.  `;; XEmacs[ version]'
+;; - use a `cond' statement to execute Emacs flavor/version-dependent code,
+;;   not `if'.  This is to make such checks more extensible.
+;; - try to define different functions for different flavors/version
+;;   and use `singular-fset' at library-loading time to set the function
+;;   you really need.  If the function is named `singular-<basename>', the
+;;   flavor/version-dependent functions should be named
+;;   `singular-<flavor>[-<version>]-<basename>'.
+
+;; - use `singular-debug' for debugging output/actions
+;; - to switch between buffer and process names, use the functions
+;;   `singular-process-name-to-buffer-name' and
+;;   `singular-buffer-name-to-process-name'
+
+;;}}}
+
 (require 'comint)
 
-;;{{{ Code Common to Both Modes
-;;{{{ Debugging Stuff
+;;{{{ Code common to both modes
+;;{{{ Debugging stuff
 (defvar singular-debug nil
   "*List of modes to debug or `all' to debug all modes.
 Currently, only the mode `interactive' is supported.")
+
+(defun singular-debug-format (string)
+  "Return STRING in a nicer format."
+
+  ;; is there any better way to replace in strings??
+  (while (string-match "\n" string)
+    (setq string (concat (substring string 0 (match-beginning 0))
+			 "^J"
+			 (substring string (match-end 0)))))
+
+  (if (> (length string) 16)
+      (concat "<" (substring string 0 7) ">...<" (substring string -8) ">")
+    (concat "<" string ">")))
 
 (defmacro singular-debug (mode form)
   "Major debugging hook for singular.el.
@@ -23,17 +72,84 @@ is an element of `singular-debug'."
 	   (memq ,mode singular-debug))
        ,form))
 ;;}}}
+
+;;{{{ Determining version
+(defvar singular-emacs-flavor nil
+  "A symbol describing the current Emacs.
+Currently, only Emacs \(`emacs') and XEmacs are supported \(`xemacs').")
+
+(defvar singular-emacs-major-version nil
+  "An integer describing the major version of the current emacs.")
+
+(defvar singular-emacs-minor-version nil
+  "An integer describing the major version of the current emacs.")
+
+(defun singular-fset (real-function emacs-function xemacs-function
+				    &optional emacs-19-function)
+  "Set REAL-FUNCTION to one of the functions, in dependency on Emacs flavor and version.
+Sets REAL-FUNCTION to XEMACS-FUNCTION if `singular-emacs-flavor' is
+`xemacs'.  Sets REAL-FUNCTION to EMACS-FUNCTION if `singular-emacs-flavor'
+is `emacs' and `singular-emacs-major-version' is 20.  Otherwise, sets
+REAL-FUNCTION to EMACS-19-FUNCTION which defaults to EMACS-FUNCTION.
+
+This is not as common as would be desirable.  But it is sufficient so far."
+  (cond
+   ;; XEmacs
+   ((eq singular-emacs-flavor 'xemacs)
+    (fset real-function xemacs-function))
+   ;; Emacs 20
+   ((eq singular-emacs-major-version 20)
+    (fset real-function emacs-function))
+   ;; Emacs 19
+   (t
+    (fset real-function (or emacs-19-function emacs-function)))))
+
+(defun singular-set-version ()
+  "Determine flavor, major version, and minor version of current emacs.
+singular.el is guaranteed to run on Emacs 19.34, Emacs 20.2, and XEmacs
+20.2.  It should run on newer version and on slightly older ones, too."
+
+  ;; get major and minor versions first
+  (if (and (boundp 'emacs-major-version)
+	   (boundp 'emacs-minor-version))
+      (setq singular-emacs-major-version emacs-major-version
+	    singular-emacs-minor-version emacs-minor-version)
+    (with-output-to-temp-buffer "*singular warnings*"
+      (princ
+"You seem to have quite an old Emacs or XEmacs version.  Some of the
+features from singular.el will not work properly.  Consider upgrading to a
+more recent version of Emaxs or XEmacs.  singular.el is guaranteed to run
+on Emacs 19.34, Emacs 20.2, and XEmacs 20.2."))
+    ;; assume the oldest version we support
+    (setq singular-emacs-major-version 19
+	  singular-emacs-minor-version 34))
+
+  ;; get flavor
+  (if (string-match "XEmacs\\|Lucid" emacs-version)
+      (setq singular-emacs-flavor 'xemacs)
+    (setq singular-emacs-flavor 'emacs)))
+
+(singular-set-version)
+;;}}}
 ;;}}}
 
-;;{{{ Singular Interactive Mode
-;;{{{ Key Map
+;;{{{ Singular interactive mode
+;;{{{ Key map
 (defvar singular-interactive-mode-map ()
   "Key map to use in Singular interactive mode.")
 
-(if singular-interactive-mode-map
-    ()
-  (setq singular-interactive-mode-map
-	(nconc (make-sparse-keymap) comint-mode-map)))
+(if (not singular-interactive-mode-map)
+    (cond
+     ;; Emacs
+     ((eq singular-emacs-flavor 'emacs)
+      (setq singular-interactive-mode-map
+	    (nconc (make-sparse-keymap) comint-mode-map)))
+     ;; XEmacs
+     (t
+      (setq singular-interactive-mode-map (make-keymap))
+      (set-keymap-parents singular-interactive-mode-map (list comint-mode-map))
+      (set-keymap-name singular-interactive-mode-map
+		       'singular-interactive-mode-map))))
 ;;}}}
 
 ;;{{{ Miscellaneous
@@ -56,7 +172,7 @@ The buffer name is the process name with surrounding `*'."
   (concat "*" process-name "*"))
 ;;}}}
   
-;;{{{ Customization Variables of comint
+;;{{{ Customizing variables of comint
 
 ;; Note:
 ;;
@@ -116,7 +232,42 @@ This variable is used to initialize `comint-input-filter' when
 Singular interactive mode starts up.")
 ;;}}}
 
-;;{{{ Singular Interactive Mode
+;;{{{ Input and output filters
+(defconst singular-bogus-output-filter-calls
+  (cond
+   ;; XEmacs
+   ((eq singular-emacs-flavor 'xemacs) 2)
+   ;; Emacs
+   (t 1))
+  "Number of bogus runs of hooks on `comint-output-filter-functions'.")
+
+;; debugging filters
+(defvar singular-debug-bogus-output-filter-cnt 0
+  "Number of bogus runs of hooks on `comint-output-filter-functions' yet to do.
+This variable is set to `singular-bogus-output-filter-calls' in
+`singular-debug-input-filter' and decremented for each bogus run of
+`singular-debug-output-filter' until it becomes zero.")
+
+(defun singular-debug-input-filter (string)
+  "Echo STRING and reset `singular-debug-bogus-output-filter-cnt'."
+  (message "Input filter: %s" (singular-debug-format string))
+  (setq singular-debug-bogus-output-filter-cnt
+	singular-bogus-output-filter-calls))
+
+(defun singular-debug-output-filter (string)
+  "Echo STRING and `singular-debug-bogus-output-filter-cnt'.
+Decrement "
+  (if (zerop singular-debug-bogus-output-filter-cnt)
+      (message "Output filter (real): %s"
+	       (singular-debug-format string))
+    (message "Output filter (bogus %d): %s"
+	     singular-debug-bogus-output-filter-cnt
+	     (singular-debug-format string))
+    (setq singular-debug-bogus-output-filter-cnt
+	  (1- singular-debug-bogus-output-filter-cnt))))
+;;}}}
+
+;;{{{ Singular interactive mode
 
 ;; Note:
 ;;
@@ -192,10 +343,18 @@ NOT READY [much more to come.  See shell.el.]!"
 	  (equal (file-truename comint-input-ring-file-name) "/dev/null"))
       (setq comint-input-ring-file-name nil))
 
+  ;; marking of input and output
+  (singular-debug 'interactive-filter
+		  (add-hook 'comint-input-filter-functions
+			    'singular-debug-input-filter nil t))
+  (singular-debug 'interactive-filter
+		  (add-hook 'comint-output-filter-functions
+			    'singular-debug-output-filter nil t))
+
   (run-hooks 'singular-interactive-mode-hook))
 ;;}}}
 
-;;{{{ Starting Singular
+;;{{{ Starting singular
 (defvar singular-start-file "~/.emacs_singularrc"
   "Name of start-up file to pass to Singular.
 If the file named by this variable exists it is given as initial input
