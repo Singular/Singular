@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.7 1998-04-03 22:46:58 krueger Exp $
+// $Id: all.lib,v 1.8 1998-04-22 15:38:29 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.7 1998-04-03 22:46:58 krueger Exp $";
+version="$Id: all.lib,v 1.8 1998-04-22 15:38:29 Singular Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
           
@@ -27,7 +27,6 @@ LIBRARY:  all.lib   Load all libraries
   sing.lib      PROCEDURES FOR SINGULARITIES
   standard.lib  PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
   tex.lib       PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN TEX
-  tst.lib
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
