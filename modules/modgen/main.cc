@@ -8,11 +8,12 @@
 #include <stdarg.h>
 #include <string.h>
 #include <limits.h>
+#include <unistd.h>
+#include <getopt.h>
 
 #include "modgen.h"
 #include "stype.h"
 
-int trace=1;
 /*
  *    Syntax of a module file:
  *    %{
@@ -64,28 +65,69 @@ int init_modgen(
 
 extern int yyparse (void);
 extern void init_type_conv();
+int debug = 0;
+int trace = 0;
+int do_create_makefile = 1;
+
+static struct option long_options[] =
+{
+  {"debug", 0, 0, 'd'},
+  {"verbose", 0, 0, 'v'},
+  {"nocreate-makefile", 0, 0, 'm'},
+  {"help", 0, 0, '?'},
+  {0, 0, 0, 0}
+};
+
+void usage(char *name)
+{
+  int i;
+  printf("usage: %s [args] filename\n", name);
+  for(i=0; long_options[i].name != NULL; i++)
+    printf("\t-%c (--%s) %s\n", long_options[i].val,
+           long_options[i].name, "");
+  
+}
 
 main( int argc, char *argv[] )
 {
   int i;
-  
-  if ( argc > 1 )
-     yyin = fopen( argv[1], "rb" );
+  int c;
+  int option_index = 0;
+
+  while( (c=getopt_long (argc, argv, "dmv",
+                         long_options, &option_index))>=0) {
+    switch (c)
+    {
+        case 'd' : debug++; break;
+        case 'v' : trace=1; break;
+        case 'm' : do_create_makefile = 0; break;
+          
+        case '?' : usage(argv[0]);
+          return 0;
+          break;
+          
+        default:
+          printf ("?? getopt returned character code 0%o ??\n", c);
+    }
+  }
+
+  if (optind < argc) yyin = fopen( argv[optind], "rb" );
   else {
     printf("no filename given\n");
-    printf("usage: %s <filename>.mod\n", argv[0]);
+    usage(argv[0]);
     return 1;
   }
   
-  if(init_modgen(&module_def, argv[1])) return 1;
+  if(init_modgen(&module_def, argv[optind])) return 1;
   init_type_conv();
   do {
       i=yyparse();
-      if(i)printf("NEXT LOOP at line %d (%s) %d\n", yylineno, yytext, i);
-      else printf("FINISH? (%d)\n", i);
+      if(!i) printf("FINISH? (%d)\n", i);
+      else
+        if(debug)printf("NEXT LOOP at line %d (%s) %d\n", yylineno, yytext, i);
   }
   while (!i);
-  printf("ENDE\n");
+  if(trace)printf("files for module '%s' created.\n", argv[optind]);
   
   //fflush(module_def.fmtfp);
   //PrintProclist(&module_def);
