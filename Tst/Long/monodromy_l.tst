@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.9 1999-06-22 10:48:12 obachman Exp $");
+tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.10 2001-01-11 12:04:26 pfister Exp $");
 
 LIB "mondromy.lib";
 
@@ -84,7 +84,7 @@ proc tst_monodromy(list data)
     s="poly f="+data[i+2]+";";
     execute(s);
     typ;
-    jordan(monodromy(f));
+    jordan(monodromyB(f));
     tst_status();
     kill R;
   }

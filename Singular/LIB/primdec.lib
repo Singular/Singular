@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.88 2001-01-11 10:38:03 pfister Exp $";
+version="$Id: primdec.lib,v 1.89 2001-01-11 12:04:18 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -4495,7 +4495,7 @@ EXAMPLE: example radical; shows an example
    if(di==0)
    {
      i=zeroRad(k,i);
-     return(phi(i));
+     return(interred(phi(i)));
    }
    option(redSB);
    list pr=facstd(k);
