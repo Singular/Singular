@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.52 2000-12-31 15:14:41 obachman Exp $ */
+/* $Id: polys.h,v 1.53 2001-02-07 12:45:14 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -221,9 +221,9 @@ extern poly pHeadProc(poly p);
 #define pSortAdd(p)             p_SortAdd(p, currRing)
 
 
-// Assume: If considerd only as poly in any component of p 
-// (say, monomials of other components of p are set to 0), 
-// then p is already sorted correctly 
+// Assume: If considerd only as poly in any component of p
+// (say, monomials of other components of p are set to 0),
+// then p is already sorted correctly
 #define pSortCompCorrect(p) pSort(p)
 
 /***************************************************************
@@ -280,7 +280,7 @@ extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
 // on oredering and/or OrdIndex -- otherwise they might return wrong results
 // on strat->tailRing
 extern void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg = NULL);
-// restores pFDeg and pLDeg: 
+// restores pFDeg and pLDeg:
 extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg);
 
 /*-----------the ordering of monomials:-------------*/
@@ -351,6 +351,7 @@ inline void    wrp(poly p)        {p_wrp(p, currRing, currRing);}
 
 void      pEnlargeSet(polyset *p, int length, int increment);
 #define   pISet(i) p_ISet(i,currRing)
+#define   pNSet(n) p_NSet(n,currRing)
 #define   pOne()   pISet(1)
 
 void      pContent(poly p);
@@ -430,4 +431,3 @@ BOOLEAN pComparePolys(poly p1,poly p2);
 #endif
 
 #endif // POLYS_H
-
