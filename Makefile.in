@@ -50,6 +50,12 @@ dist:
 	gzip -9 ${TEMPDIR}/${DISTNAME}.tar
 	- mv ${TEMPDIR}/${DISTNAME}.tar.gz .
 
+Singular factory libfac MP gmp:
+	cd $@; ${MAKE} all
+
+check:
+	cd Singular; ${MAKE} check
+	
 Makefile : Makefile.in config.status
 	./config.status
 
