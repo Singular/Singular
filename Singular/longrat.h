@@ -3,13 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.8 1997-08-12 17:14:40 Singular Exp $ */
+/* $Id: longrat.h,v 1.9 1998-05-27 17:14:07 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
 #include "structs.h"
 
-#ifdef HAVE_GMP
 extern "C" {
 #include <gmp.h>
 }
@@ -36,12 +35,6 @@ typedef MP_INT lint;
 #define mpz_size1(A) (ABS((A)->_mp_size))
 #endif
 //#define mpz_size1(A) mpz_size(A)
-
-#else
-
-typedef unsigned short int16;
-typedef int16 * lint;
-#endif
 
 struct snumber;
 typedef struct snumber rnumber;
@@ -94,10 +87,6 @@ void     nlDelete(number *a);
 
 BOOLEAN nlSetMap(int c, char ** par, int nop, number minpol);
 
-// internal use (longrat0) only:
-#ifndef HAVE_GMP
-void nlDivMod(lint a, int16 al, int16 b, int16 * r);
-#endif
 #endif
 
 

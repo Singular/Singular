@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat0.cc,v 1.5 1997-06-04 19:45:21 obachman Exp $ */
+/* $Id: longrat0.cc,v 1.6 1998-05-27 17:14:08 Singular Exp $ */
 /*
 * ABSTRACT -
 * IO for long rational numbers (Hubert Grassmann)
@@ -14,8 +14,6 @@
 #include "mmemory.h"
 #include "febase.h"
 #include "longrat.h"
-
-#ifdef HAVE_GMP
 
 #define SR_HDL(A) ((long)(A))
 #define SR_INT    1
@@ -144,137 +142,4 @@ void nlWrite (number &a)
     Free((ADDRESS)s,l);
   }
 }
-
-#else
-#define NLLENGTH(a) ((int)(*(a)&0X7FFF))
-#define NUM_BASIS 10000
-#define NLISRAT(a)   ((a)->s)
-
-/*3
-* extracts a long integer from s, returns the rest
-*/
-static char * nlEatLong(char *s, number *i)
-{
-  number j, k, ten, n;
-  j = nlInit(0);
-  ten = nlInit(10);
-  while (*s >= '0' && *s <= '9')
-  {
-    k = nlMult(j, ten);
-    nlDelete(&j);
-    j = nlInit((int)*s-(int)'0');
-    s++;
-    n = nlAdd(j, k);
-    nlDelete(&j);
-    nlDelete(&k);
-    j = n;
-  }
-  nlDelete(&ten);
-  *i = j;
-  return s;
-}
-
-/*2
-* extracts the numberio a from s, returns the rest
-*/
-char * nlRead (char *s, number *a)
-{
-  number z, n;
-  BOOLEAN neg = (*s == '-');
-
-  if (*s == '+' || *s == '-')
-    s++;
-  if (*s<'0' || *s>'9')
-  {
-    if (neg)
-      *a = nlInit(-1);
-    else
-      *a = nlInit(1);
-    return s;
-  }
-  s = nlEatLong(s, &z);
-  if (neg)
-    nlNeg(z);
-  *a = z;
-  if (*s == '/')
-  {
-    s++;
-    s = nlEatLong(s, &n);
-    if (nlIsZero(n))
-    {
-      WerrorS("Zero Denominator");
-      nlDelete(&n);
-      nlDelete(a);
-      return s;
-    }
-    if (nlIsOne(n))
-      nlDelete(&n);
-    else
-    {
-      *a = nlDiv(z, n);
-      nlNormalize(*a);
-    }
-  }
-  return s;
-}
-
-/*3
-* write long integer, assume n!=NULL
-*/
-static void nlWriteLong(lint n)
-{
-  char save;
-  char *lonstr, *str1;
-  int i, k, j;
-  lint a;
-  int16 al, w;
-  al = NLLENGTH(n);
-  k = al+1;
-  i = k*sizeof(int16);
-  a = (lint)Alloc(i);
-  memcpy(a, n, i);
-  j = k*5*sizeof(char);
-  lonstr = (char *)Alloc(j);
-  str1 = lonstr+(k*5-1);
-  *str1 = '\0';
-  do
-  {
-    nlDivMod(a, al, NUM_BASIS, &w);
-    save = *str1;
-    str1 -= 4;
-    sprintf(str1, "%04u", w);
-    str1[4] = save;
-    if (a[al]==0)
-      al--;
-  } while (al!=0);
-  Free((ADDRESS)a,i);
-  while (*str1 == '0') str1++;
-  StringAppend(str1);
-  Free((ADDRESS)lonstr, j);
-}
-
-/*2
-* write a number
-*/
-void nlWrite (number &a)
-{
-  if (nlIsZero(a))
-  {
-    StringAppend("0");
-    return;
-  }
-  if (!nlGreaterZero(a))
-  {
-    StringAppend("-");
-  }
-  if (a->s<0)
-    nlNormalize(a);
-  nlWriteLong(a->z);
-  if (NLISRAT(a))
-  {
-    StringAppend("/");
-    nlWriteLong(a->n);
-  }
-}
-#endif
 

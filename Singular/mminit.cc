@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.11 1998-05-13 14:53:46 Singular Exp $ */
+/* $Id: mminit.cc,v 1.12 1998-05-27 17:14:09 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -17,9 +17,7 @@
 #include "mmemory.h"
 #include "mmprivat.h"
 extern "C" { /* begin of "C" */
-#ifdef HAVE_GMP
 #include <gmp.h>
-#endif
 
 #ifdef ALIGN_8
 mcb mm_normList[MAXLIST]=
@@ -136,7 +134,7 @@ void operator delete ( void* block )
 #endif
 }
 
-#ifdef HAVE_GMP
+#ifndef HAVE_SMALLGMP
 #ifdef MDEBUG
 void * mgAllocBlock( size_t t)
 {
@@ -163,7 +161,7 @@ static int mmIsInitialized=mmInit();
 
 int mmInit( void )
 {
-#ifdef HAVE_GMP
+#ifndef HAVE_SMALLGMP
   if(mmIsInitialized==0)
   {
 #ifndef MDEBUG

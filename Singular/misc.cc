@@ -41,11 +41,9 @@
   extern const char * libfac_version;
   extern const char * libfac_date;
 #endif
-#ifdef HAVE_GMP
 extern "C" {
 #include <gmp.h>
 }
-#endif
 #ifdef HAVE_MPSR
 #include <MP_Config.h>
 #endif
@@ -669,14 +667,12 @@ char * versionString()
 #ifdef HAVE_LIBFAC_P
               StringAppend("libfac(%s,%s),\n\t",libfac_version,libfac_date);
 #endif
-#ifdef HAVE_GMP
 #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
               StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
 #elif defined (HAVE_SMALLGMP)
               StringAppendS("SmallGMP(2.0.2.0),");
 #else
               StringAppendS("GMP(1.3),");
-#endif
 #endif
 #ifdef HAVE_MPSR
               StringAppend("MP(%s),",MP_VERSION);

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.50 1998-05-20 10:24:05 obachman Exp $ */
+/* $Id: extra.cc,v 1.51 1998-05-27 17:14:05 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -187,9 +187,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         #ifdef HAVE_DLD
           TEST_FOR("DLD")
         #endif
-        #ifdef HAVE_GMP
-          TEST_FOR("gmp")
-        #endif
         #ifdef HAVE_FACTORY
           TEST_FOR("factory")
         #endif
@@ -356,7 +353,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== contributors =============================*/ 
+/*==================== contributors =============================*/
    if(strcmp((char*)(h->Data()),"contributors") == 0)
    {
      res->rtyp=STRING_CMD;
