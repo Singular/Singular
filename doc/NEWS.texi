@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.7 1999-12-16 14:33:30 obachman Exp $
+@comment $Id: NEWS.texi,v 1.8 1999-12-17 16:40:41 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -8,7 +8,7 @@
 
 @majorheading NEWS in SINGULAR @value{VERSION}
 
-@ifclear singularmanual 
+@ifclear singularmanual
 @macro nref{what}
 \what\
 @end macro
@@ -31,9 +31,9 @@ the 1.2 version(s), since major changes were done to the @sc{Singular}
 kernel. Therefore, it is important to us, that users try out this new
 version.
 
-Furthermore, the current version is generally not yet as fast as version 
+Furthermore, the current version is generally not yet as fast as version
 1.2. But this is going to change dramatically in the upcoming release
-version(s). 
+version(s).
 
 Thank you very much for your support!
 
@@ -46,7 +46,7 @@ the recommended interface for using @sc{Singular}
 new program for an out-of-the-box, pre-customized Emacs which runs
 Singular
 @item @nref{The online help system}
-choose in which browser the on-line help is displayed; 
+choose in which browser the on-line help is displayed;
 @*wildcard expansion of help topics
 @*new layout of html manual pages
 @item @nref{Source code debugger}
@@ -64,7 +64,7 @@ TBC: New WWW and FTP home-site of @sc{Singular}
 
 @table @asis
 @item new coefficient domains: arbitrary long real and complex numbers
-The current syntax is going to change slightly in the final version 2.0. 
+The current syntax is going to change slightly in the final version 2.0.
 @item no restriction on number of ring variables
 @item TBC: DegBound on exponent values
 @item TBC: parameters over real/complex
@@ -80,7 +80,7 @@ procedures for computing the monodromy of a singularity
 @item @code{spectrum_lib}
 TBC: docu, examples, tests
 @item @nref{spcurve_lib}
-procedures for cm codimension 2 singularities 
+procedures for cm codimension 2 singularities
 @item @nref{triang_lib}
 procedures for solving triangular systems
 @item @nref{solve_lib}
@@ -110,12 +110,14 @@ returns the smallest monomial not contained in and ideal/module
 @item @nref{hres}
 calculate free resolution of homogenous ideal using Hilbert-driven
 algorithm.
+@item @nref{minor}
+with an optional third argument minors modulo a standard basis will be computed
 @item @nref{mpresmat}
 calculate module representing the multipolynomial resultant matrix
 @item @nref{uressolve}
 compute all complex roots of a zerodimensional ideal
 @item @nref{vandermonde}
-solve Vandermonde linear system 
+solve Vandermonde linear system
 @end table
 
 @heading @sc{Singular} functions whose syntax/semantics has changed
@@ -159,9 +161,9 @@ dynamically at run-time. If not found, @code{readline} is emulated.
 @heading Internal Changes
 @table @asis
 @item new data structures for monomials and polynomials
-Makes polynomial arithmetic significantly faster. Especially for block - 
+Makes polynomial arithmetic significantly faster. Especially for block -
 or weighted orderings. TBC: Faster polynomial arithmetic for orderings
-(like dp, or lp). TBC: Bucket representation of polynomials in std; TBC: 
+(like dp, or lp). TBC: Bucket representation of polynomials in std; TBC:
 DegBound during std computations.
 @item new memory management
 Results is less memory usage, faster memory allocation/free, less
@@ -172,11 +174,8 @@ fragmentation, much better locality of reference.
 
 @itemize
 @item 
-@code{libreadline} for other architectures than ix86-libc5
+@code{libreadline} for other architectures than ix86-libc5, 
+ix86-libc6,HPUX_9,HPUX_10
 @item
 @code{example} on examples from libraries
 @end itemize
-
-
-
-

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.173 1999-12-16 14:46:54 Singular Exp $
+@comment $Id: reference.doc,v 1.174 1999-12-17 16:40:41 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3341,10 +3341,13 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{minor (} matrix_expression@code{,} int_expression @code{)}
+@*@code{minor (} matrix_expression@code{,} int_expression@code{,} ideal_expression @code{)}
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
 returns the set of all minors (=subdeterminants) of the given size of a matrix.
+The optional third argument must be a standard basis.
+If a third argument is given, the computations will be performedf modulo that ideal.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3353,6 +3356,7 @@ returns the set of all minors (=subdeterminants) of the given size of a matrix.
   print(m);
   ideal j = minor(m, 2);
   j;
+  minor(m, 2,std(ideal(x(1))));
 @c example
 @end smallexample
 @end table
