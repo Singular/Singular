@@ -136,7 +136,7 @@ lists
 longalg
 lpowers
 palg
-algmap
+; algmap
 algnorm
 det
 map
