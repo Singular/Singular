@@ -1,18 +1,18 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.17 1997-10-21 11:29:17 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.18 1997-10-24 18:54:52 schmidt Exp $
 
 #
-# GNUmakefile.in - used by configure to create GNUmakefile, the
-#   top level makefile for factory.
+# GNUmakefile.in - used by `configure' to create `GNUmakefile', the
+#   top level makefile for Factory.
 #
-# In general, you should let configure guess the correct values
+# In general, you should let `configure' guess the correct values
 # for the variables below.  But if something seriously goes wrong
 # in configuring, please inform the authors and feel free to
 # edit the marked section.
 #
-# See the INSTALL file for information on how to build factory.
+# See the `INSTALL' file for information on how to build Factory.
 #
-# Note:	Use GNU make to make with this makefile.
+# Note:	Use GNU `make' (`gmake') to make with this makefile.
 #
 
 ############### START OF CONFIGURABLE SECTION ###############
@@ -104,9 +104,7 @@ LIBCXXFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
 		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
 
 # flags to translate ftmpl_inst.cc
-TMPLCXXFLAGS =	$(WARNFLAGS) \
-		-I. -I$(srcdir) \
-		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
+TMPLCXXFLAGS =	$(LIBCXXFLAGS)
 
 # flags to link test programs
 TESTCXXFLAGS =	$(LIBCXXFLAGS)
