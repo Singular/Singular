@@ -3,14 +3,22 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.3 2000-08-14 12:26:48 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.4 2000-08-16 12:06:11 obachman Exp $
  *******************************************************************/
 #include <stdio.h>
+#include <strings.h>
 
+#ifdef HAVE_CONFIG_H
 #include "omConfig.h"
+#endif
 
 #ifndef OM_NDEBUG
-#include "omAlloc.h"
+
+#include "omDerivedConfig.h"
+#include "omStructs.h"
+#include "omRet2Info.h"
+#include "omFindExec.h"
+#include "omGetBackTrace.h"
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
@@ -166,7 +174,7 @@ int omFilterRetInfo_i(omRetInfo info, int max, int i)
  *
  *************************************************************/
 
-int _omPrintBackTrace(void** bt, int max, FILE* fd, OM_FLR_DECL)
+int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
 {
   int i;
   
@@ -218,13 +226,13 @@ int _omPrintBackTrace(void** bt, int max, FILE* fd, OM_FLR_DECL)
     return omPrintRetInfo(info, i, fd, "\n  #%i at %L in %F ra=%p");
 }
 
-int _omPrintCurrentBackTrace(FILE* fd, OM_FLR_DECL)
+int _omPrintCurrentBackTrace(FILE* fd , OM_FLR_DECL)
 {
   int i;
   void* bt[OM_MAX_BACKTRACE_DEPTH];
   
   i = omGetBackTrace(bt, 1, OM_MAX_BACKTRACE_DEPTH);
-  return _omPrintBackTrace(bt, i, fd, OM_FLR_VAL);
+  return _omPrintBackTrace(bt, i, fd , OM_FLR_VAL);
 }
 
 #endif /* ! OM_NDEBUG */

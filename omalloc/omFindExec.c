@@ -3,10 +3,12 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.5 2000-08-14 12:26:44 obachman Exp $
+ *  Version: $Id: omFindExec.c,v 1.6 2000-08-16 12:06:11 obachman Exp $
  *******************************************************************/
 
+#ifdef HAVE_CONFIG_H
 #include "omConfig.h"
+#endif
 
 #if ! defined(__MWERKS__) && defined(HAVE_UNISTD_H) && defined(STDC_HEADERS)
 
@@ -15,6 +17,8 @@
 #endif
 #include <stdlib.h>
 #include <strings.h>
+
+#include "omFindExec.h"
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
@@ -248,9 +252,9 @@ char * omFindExec (const char *name, char* exec)
 
 #else
 
-char* omFindExec (const char *name)
+char* omFindExec (const char *name, char* exec)
 {
-  return NULL;
+  return name;
 }
 
 #endif /* ! defined(__MWERKS__) && defined(HAVE_UNISTD_H) && defined(STDC_HEADERS) */

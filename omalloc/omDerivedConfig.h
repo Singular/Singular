@@ -3,7 +3,7 @@
  *  Purpose: configuration which are derived from omConfig.h
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDerivedConfig.h,v 1.3 2000-08-14 12:26:43 obachman Exp $
+ *  Version: $Id: omDerivedConfig.h,v 1.4 2000-08-16 12:06:10 obachman Exp $
  *******************************************************************/
 #ifndef OM_DERIVED_CONFIG_H
 #define OM_DERIVED_CONFIG_H
@@ -91,6 +91,10 @@
 #define NULL ((void*)0)
 #endif
 
+#if !defined(OM_TRACK_FILE_LINE) && ! defined(OM_TRACK_RETURN)
+#define OM_TRACK_FILE_LINE
+#endif
+
 /* The following macros save a lot of typing */
 #ifdef OM_TRACK_FILE_LINE
 #define OM_FL_DECL      const char* f, const int l
@@ -126,7 +130,9 @@
 #else
 #define OM_FLR_ARG(f,l,r)   r      
 #endif
+
 #else
+
 #define OM_FLR_DECL OM_FL_DECL
 #define OM_FLR_VAL  OM_FL_VAL
 #define OM_FLR      OM_FL

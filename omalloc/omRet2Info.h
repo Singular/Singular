@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.h,v 1.3 2000-08-14 12:26:49 obachman Exp $
+ *  Version: $Id: omRet2Info.h,v 1.4 2000-08-16 12:06:11 obachman Exp $
  *******************************************************************/
 #ifndef OM_RET_2_INFO_H
 #define OM_RET_2_INFO_H
@@ -61,8 +61,8 @@ while (0)
 
 
 /*BEGINPRIVATE*/
-int _omPrintBackTrace(void** bt, int max, FILE* fd, OM_FLR_DECL);
-int _omPrintCurrentBackTrace(FILE* fd, OM_FLR_DECL);
+int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL);
+int _omPrintCurrentBackTrace(FILE* fd , OM_FLR_DECL);
 /*ENDPRIVATE*/
 
 #else /* OM_NDEBUG */

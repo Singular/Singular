@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.4 2000-08-14 12:08:42 obachman Exp $
+dnl Version: $Id: configure.in,v 1.5 2000-08-16 12:06:10 obachman Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(omAlloc.c)
@@ -490,8 +490,44 @@ if test "$ac_cv_get_backtrace_works" = yes; then
 AC_DEFINE(OM_GET_BACKTRACE_WORKS)
 fi
 
+AC_MSG_CHECKING(whether addr2line works)
+AC_CACHE_VAL(ac_cv_prog_addr2line_works,
+AC_TRY_RUN([
+#undef OM_GET_BACKTRACE_WORKS
+#include "omReturn.h"
+#include "omStructs.h"
+#include "omGetBackTrace.h"
+#include "omRet2Info.c"
+#include "omFindExec.c"
+
+
+int test_Ret_2_Info()
+{
+  void* bt;
+  int i;
+  struct omRetInfo_s info;
+  
+  GET_RET_ADDR(bt);
+  i = omBackTrace_2_RetInfo(&bt, &info, 1);
+  return i;
+}
+
+  
+int main(int argc, char** argv)
+{
+  int i;
+  omInitRet_2_Info(*argv);
+  i = test_Ret_2_Info();
+  if (i==1) exit(0);
+  else exit (i+10);
+}
+], ac_cv_prog_addr2line_works=yes,  
+   ac_cv_prog_addr2line_works=no,
+   ac_cv_prog_addr2line_works=no))
+AC_MSG_RESULT($ac_cv_prog_addr2line_works)
+  
 AC_MSG_CHECKING(whether to track return addresses)
-if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no; then
+if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works" != yes; then
   with_track_return=no
 else
   AC_DEFINE(OM_TRACK_RETURN)
@@ -516,7 +552,7 @@ if test "$with_track_fl" = yes; then
 fi
 
 AC_MSG_CHECKING(whether to track stack backtraces)
-if test "$with_track" != no && test "$ac_cv_get_backtrace_works" = yes && test "$with_track_backtrace" != no; then
+if test "$with_track" != no && test "$ac_cv_get_backtrace_works" = yes && test "$with_track_backtrace" != no && test "$ac_cv_prog_addr2line_works" = yes; then
   with_track_backtrace=yes
   AC_DEFINE(OM_TRACK_BACKTRACE)
 else
