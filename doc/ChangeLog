@@ -1,3 +1,7 @@
+Thu May  7 18:54:58 MET DST 1998 hannes
+        * change node "Control structures" in general.doc to "Flow control"
+	  (there is also "Control structures" in reference.doc),
+	  adjusted info-links
 Thu May  7 18:17:44 MET DST 1998 hannes
 	* first try: "Background" (start.doc)
         * "Interrupting Singular"

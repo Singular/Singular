@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.40 1998-05-07 11:12:38 Singular Exp $
+@comment $Id: general.doc,v 1.41 1998-05-07 16:56:23 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -939,7 +939,6 @@ minimizes a free resolution of an ideal or module
 
 
 @c ---------------------------------------------------------------------------
-@c ---------------------------------------------------------------------------
 @node The SINGULAR language, Procedures, Implemented algorithms, General concepts
 @section The SINGULAR language
 @cindex The SINGULAR language
@@ -958,9 +957,10 @@ See the section 'Writing procedures' of the tutorial.
 * Special characters::
 * Names and objects::
 * Type conversion and casting::
-* Control structures::
+* Flow control::
 @end menu
 
+@c ---------------------------------------------------------------------------
 @node General command syntax, Special characters, The SINGULAR language, The SINGULAR language
 @subsection General command syntax
 @cindex General command syntax
@@ -1102,8 +1102,8 @@ of the object (see @ref{Type conversion and casting}).
 When expression is missing some default value is assigned whenever
 possible.
 
-For a complete list of types, refer to the @code{typeof} command (@ref
-{typeof}).  To get information on the name and the object named by it, you
+For a complete list of types, refer to the @code{typeof} command
+(@ref{typeof}).  To get information on the name and the object named by it, you
 may use the @code{type} command (@ref{type}).
 
 It is possible to redefine or overwrite an already existing object
@@ -1352,7 +1352,7 @@ A list of indexed names can be built as a name followed by
 Hier fehlt noch was ueber die defs.
 
 @c ------------------------------------------------------------
-@node Type conversion and casting, Control structures, Names and objects, The SINGULAR language
+@node Type conversion and casting, Flow control, Names and objects, The SINGULAR language
 @subsection Type conversion and casting
 @cindex Type conversion
 Assignments convert the type of an expression to the type
@@ -1463,9 +1463,9 @@ to @code{list} from expression lists of any type. (The list may be empty)
 
 
 @c ------------------------------------------------------------
-@node Control structures,  , Type conversion and casting, The SINGULAR language
-@subsection Control structures
-@cindex Control structures
+@node Flow control, ,Type conversion and casting, The SINGULAR language
+@subsection Flow control
+@cindex Flow control
 @cindex block
 Hier fehlen noch die Verweise auf Kapitel 5.3 und Kapitel 6.
 
@@ -1478,17 +1478,23 @@ are used for proc, if, else, while and for statements.
   @}
 @end example
 @menu
+* break::
+* quit::
+* keepring::
+* export::
 * if::
+* else::
 * for::
 * while::
 * proc::
+* return::
+* continue::
 @end menu
 @iftex
 See @ref{if}; @ref{for}; @ref{while}; @ref{proc}
 @end iftex
 
 
-@c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
 @node Procedures, Libraries, The SINGULAR language, General concepts
 @section Procedures
