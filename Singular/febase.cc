@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.63 1998-08-03 16:39:04 Singular Exp $ */
+/* $Id: febase.cc,v 1.64 1998-08-04 16:54:07 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -1053,17 +1053,21 @@ void Print(char *fmt, ...)
 
 void fePause()
 {
-  uchar c;
-  mflush();
-#ifndef macintosh
-  fputs("pause>",stderr);
-#else
-  fputs("pause>\n",stderr);
+#ifdef HAVE_TCL
+  if(!tclmode)
 #endif
-  c = fgetc(stdin);
-  if (((c == '\003') || (c == 'C')) || (c == 'c'))
   {
-    m2_end(4);
+    mflush();
+#ifndef macintosh
+    fputs("pause>",stderr);
+#else
+    fputs("pause>\n",stderr);
+#endif
+    uchar c = fgetc(stdin);
+    if (((c == '\003') || (c == 'C')) || (c == 'c'))
+    {
+      m2_end(4);
+    }
   }
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.20 1998-06-13 12:44:47 krueger Exp $ */
+/* $Id: silink.cc,v 1.21 1998-08-04 16:54:08 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -38,7 +38,7 @@ BOOLEAN slInit(si_link l, char *istr)
 {
   char *type = NULL, *mode = NULL, *name = NULL;
   int i = 0, j;
-  
+
   // set mode and type
   if (istr != NULL)
   {
@@ -78,7 +78,7 @@ BOOLEAN slInit(si_link l, char *istr)
   if (type != NULL)
   {
     si_link_extension s = si_link_root;
-    
+
     while (s != NULL && (strcmp(s->type, type) != 0)) s = s->next;
 
     if (s != NULL)
@@ -149,7 +149,7 @@ char* slStatus(si_link l, char *request)
 BOOLEAN slOpen(si_link l, short flag)
 {
   BOOLEAN res;
-  
+
   if (l->m == NULL) slInit(l, "");
 
   if (SI_LINK_OPEN_P(l))
@@ -179,7 +179,7 @@ BOOLEAN slClose(si_link l)
     res = l->m->Close(l);
   else
     res = TRUE;
-  
+
   if (res)
     Werror("close: Error for link of type: %s, mode: %s, name: %s",
            l->m->type, l->mode, l->name);
@@ -211,7 +211,7 @@ leftv slRead(si_link l, leftv a)
            l->m->type, l->mode, l->name);
     return NULL;
   }
-  
+
   // here comes the eval:
   if (v != NULL)
     v->Eval();
@@ -224,7 +224,7 @@ leftv slRead(si_link l, leftv a)
 BOOLEAN slWrite(si_link l, leftv v)
 {
   BOOLEAN res;
-  
+
   if(! SI_LINK_W_OPEN_P(l)) // open w ?
   {
     if (slOpen(l, SI_LINK_WRITE)) return TRUE;
@@ -323,8 +323,8 @@ BOOLEAN slOpenAscii(si_link l, short flag)
   if (flag == SI_LINK_READ) mode = "r";
   else if (strcmp(l->mode, "w") == 0) mode = "w";
   else mode = "a";
-    
-        
+
+
   if (l->name[0] == '\0')
   {
     // stdin or stdout
@@ -398,9 +398,19 @@ leftv slReadAscii(si_link l)
   }
   else
   {
-    PrintS("? "); mflush();
-    buf=(char *)AllocL(80);
-    fe_fgets_stdin(buf,80);
+  #ifdef HAVE_TCL
+    if(tclmode)
+    {
+      WerrorS("reading from STDIN in TCL-mode not implemented");
+      buf=mstrdup("");
+    }
+    else
+  #endif
+    {
+      PrintS("? "); mflush();
+      buf=(char *)AllocL(80);
+      fe_fgets_stdin(buf,80);
+    }
   }
   leftv v=(leftv)Alloc0(sizeof(sleftv));
   v->rtyp=STRING_CMD;
@@ -460,11 +470,11 @@ BOOLEAN slDumpAscii(si_link l)
   if (currRingHdl != rh) rSetHdl(rh, TRUE);
   fprintf(fd, "RETURN();\n");
   fflush(fd);
-  
+
   return status;
 }
 
-// we do that recursively, to dump ids in the the order in which they 
+// we do that recursively, to dump ids in the the order in which they
 // were actually defined
 static BOOLEAN DumpAscii(FILE *fd, idhdl h)
 {
@@ -497,7 +507,7 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
     char *rhs;
     rSetHdl(rhdl, TRUE);
     rhs = ((leftv) h)->String();
-    
+
     if (fprintf(fd, "setring %s;\n", IDID(rhdl)) == EOF) return TRUE;
     if (fprintf(fd, "%s %s = %s, %s;\n", Tok2Cmdname(MAP_CMD), IDID(h),
                 IDMAP(h)->preimage, rhs) == EOF)
@@ -513,7 +523,7 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
   }
   else return FALSE;
 }
-  
+
 static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
 {
   char *type_str = GetIdString(h);
@@ -524,14 +534,14 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
 
   // handle qrings separately
   if (type_id == QRING_CMD) return DumpQring(fd, h, type_str);
-  
+
   // do not dump LIB string
   if (type_id == STRING_CMD && strcmp("LIB", IDID(h)) == 0)
   {
     return FALSE;
   }
-                                      
-  // put type and name 
+
+  // put type and name
   if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF) return TRUE;
 
   // for matricies, append the dimension
@@ -550,7 +560,7 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
 
   // and the right hand side
   if (DumpRhs(fd, h) == EOF) return TRUE;
-  
+
   // semicolon und tschuess
   if (fprintf(fd, ";\n") == EOF) return TRUE;
 
@@ -560,7 +570,7 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
 static char* GetIdString(idhdl h)
 {
   idtyp type = IDTYP(h);
-  
+
   switch(type)
   {
       case LIST_CMD:
@@ -586,7 +596,7 @@ static char* GetIdString(idhdl h)
       case MODUL_CMD:
       case MATRIX_CMD:
         return Tok2Cmdname(type);
-        
+
       case MAP_CMD:
       case LINK_CMD:
         return NULL;
@@ -616,7 +626,7 @@ static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str)
   }
 }
 
-  
+
 static int DumpRhs(FILE *fd, idhdl h)
 {
   idtyp type_id = IDTYP(h);
@@ -627,7 +637,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     int i, nl = l->nr;
 
     fprintf(fd, "list(");
-    
+
     for (i=0; i<nl; i++)
     {
       if (DumpRhs(fd, (idhdl) &(l->m[i])) == EOF) return EOF;
@@ -652,7 +662,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     fputc('"', fd);
   }
   else  if (type_id == PROC_CMD)
-  { 
+  {
     procinfov pi = IDPROC(h);
     if (pi->language == LANG_SINGULAR) {
       if( pi->data.s.body==NULL) iiGetLibProcBuffer(pi);
@@ -689,7 +699,7 @@ static int DumpRhs(FILE *fd, idhdl h)
   }
   return 1;
 }
-    
+
 BOOLEAN slGetDumpAscii(si_link l)
 {
   if (l->name[0] == '\0')
@@ -702,12 +712,12 @@ BOOLEAN slGetDumpAscii(si_link l)
     BOOLEAN status = newFile(l->name);
     if (status)
       return TRUE;
-      
+
     int old_echo=si_echo;
     si_echo=0;
 
     status=yyparse();
-    
+
     si_echo=old_echo;
 
     if (status)
@@ -722,8 +732,8 @@ BOOLEAN slGetDumpAscii(si_link l)
     }
   }
 }
-      
-  
+
+
 /*------------Initialization at Start-up time------------------------*/
 
 #ifdef HAVE_DBM
@@ -732,7 +742,7 @@ BOOLEAN slGetDumpAscii(si_link l)
 
 #ifdef HAVE_MPSR
 #include "sing_mp.h"
-#endif  
+#endif
 
 void slStandardInit()
 {
@@ -761,5 +771,5 @@ void slStandardInit()
   s->next = (si_link_extension)Alloc0(sizeof(*si_link_root));
   s = s->next;
   slInitMPTcpExtension(s);
-#endif  
+#endif
 }
