@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.290 2003-03-13 16:51:37 levandov Exp $ */
+/* $Id: iparith.cc,v 1.291 2003-03-14 16:57:49 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3802,8 +3802,8 @@ struct sValCmd1 dArith1[]=
 ,{jjidTransp,   TRANSPOSE_CMD,   XS(MODUL_CMD),  MODUL_CMD      ALLOW_PLURAL}
 ,{jjTYPEOF,     TYPEOF_CMD,      STRING_CMD,     ANY_TYPE       ALLOW_PLURAL}
 ,{jjDUMMY,      VECTOR_CMD,      VECTOR_CMD,     VECTOR_CMD     ALLOW_PLURAL}
-,{jjVDIM,       VDIM_CMD,        INT_CMD,        IDEAL_CMD      NO_PLURAL}
-,{jjVDIM,       VDIM_CMD,        INT_CMD,        MODUL_CMD      NO_PLURAL}
+,{jjVDIM,       VDIM_CMD,        INT_CMD,        IDEAL_CMD      ALLOW_PLURAL}
+,{jjVDIM,       VDIM_CMD,        INT_CMD,        MODUL_CMD      ALLOW_PLURAL}
 ,{jjVAR1,       VAR_CMD,         POLY_CMD,       INT_CMD        ALLOW_PLURAL}
 ,{jjVARSTR1,    VARSTR_CMD,      STRING_CMD,     INT_CMD        ALLOW_PLURAL}
 ,{jjrVarStr,    VARSTR_CMD,      XS(STRING_CMD), RING_CMD       ALLOW_PLURAL}
