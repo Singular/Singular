@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_linsys.cc,v 1.5 1997-04-07 16:01:47 schmidt Exp $
+// $Id: cf_linsys.cc,v 1.6 1997-04-15 11:06:40 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  1997/04/07 16:01:47  schmidt
+#include <config.h> added
+
 Revision 1.4  1997/03/26 16:46:46  schmidt
 debug output rewritten
 debug output changed to DEBOUT
@@ -141,7 +144,7 @@ linearSystemSolve( CFMatrix & M )
 
 	// calculate the bound for the result
 	B = bound( M );
-	DEBOUTLN( cerr, "bound = ",  B );
+	DEBOUTLN( cerr, "bound = " <<  B );
 
 	// find a first solution mod p
 	pno = 0;

@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_distrib.cc,v 1.3 1997-04-07 16:21:32 schmidt Exp $
+// $Id: fac_distrib.cc,v 1.4 1997-04-15 11:11:36 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  1997/04/07 16:21:32  schmidt
+ * #include <config.h> added
+ *
  * Revision 1.2  1997/03/27 09:39:51  schmidt
  * debug output rewritten
  *
@@ -80,15 +83,15 @@ distributeLeadingCoeffs ( CanonicalForm & U, CFArray & G, CFArray & lcG, const C
     for ( I = F, i = 1; I.hasItem(); I++, i++ ) {
 	ft = I.getItem().factor();
 	m = I.getItem().exp();
-	DEBOUTLN( cerr, "trying to distribute ", ft );
-	DEBOUTLN( cerr, "which is tested with ", D[i] );
-	DEBOUTLN( cerr, "and contained to the power of ", m );
+	DEBOUTLN( cerr, "trying to distribute " << ft );
+	DEBOUTLN( cerr, "which is tested with " << D[i] );
+	DEBOUTLN( cerr, "and contained to the power of " << m );
 	j = 1;
 	while ( m > 0 && j <= r ) {
 	    ut = lc( G[j] );
-	    DEBOUTLN( cerr, "checking with ", ut );
+	    DEBOUTLN( cerr, "checking with " << ut );
 	    while ( m > 0 && divides( D[i], ut ) ) {
-		DEBOUTLN( cerr, "match found", ' ' );
+		DEBOUTLN( cerr, "match found" );
 		m--; ut /= D[i];
 		lcG[j] *= ft;
 	    }
@@ -99,7 +102,7 @@ distributeLeadingCoeffs ( CanonicalForm & U, CFArray & G, CFArray & lcG, const C
 	    return false;
 	}
     }
-    DEBOUTLN( cerr, "the leading coeffs before omega and delta correction: ", lcG );
+    DEBOUTLN( cerr, "the leading coeffs before omega and delta correction: " << lcG );
     if ( omega != 1 ) {
 	for ( j = 1; j <= r; j++ ) {
 //	    G[j] *= omega;

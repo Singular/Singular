@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_berlekamp.cc,v 1.2 1997-04-07 16:17:28 schmidt Exp $
+// $Id: fac_berlekamp.cc,v 1.3 1997-04-15 11:09:01 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/04/07 16:17:28  schmidt
+#include <config.h> added
+
 Revision 1.1  1997/03/27 09:34:59  schmidt
 debug output changed to DEBOUT
 
@@ -244,12 +247,12 @@ CFFList BerlekampFactorFF ( const CanonicalForm & f )
 	Q[i] = new int[n];
     QmatFF( f, Q, p );
 #ifdef DEBUGOUTPUT
-    DEBOUTLN( cerr, "Q = ", ' ' );
+    DEBOUTLN( cerr, "Q = " );
     QprintFF( Q, n );
 #endif /* DEBUGOUTPUT */
     k = nullSpaceFF( Q, B, n );
 #ifdef DEBUGOUTPUT
-    DEBOUTLN( cerr, "Q = ", ' ' );
+    DEBOUTLN( cerr, "Q = " );
     QprintFF( Q, n );
 #endif /* DEBUGOUTPUT */
     F.insert( CFFactor( f, 1 ) );
@@ -295,12 +298,12 @@ CFFList BerlekampFactorGF ( const CanonicalForm & f )
 	Q[i] = new int[n];
     QmatGF( f, Q, gf_q );
 #ifdef DEBUGOUTPUT
-    DEBOUTLN( cerr, "Q = ", ' ' );
+    DEBOUTLN( cerr, "Q = " );
     QprintGF( Q, n );
 #endif /* DEBUGOUTPUT */
     k = nullSpaceGF( Q, B, n );
 #ifdef DEBUGOUTPUT
-    DEBOUTLN( cerr, "Q = ", ' ' );
+    DEBOUTLN( cerr, "Q = " );
     QprintFF( Q, n );
 #endif /* DEBUGOUTPUT */
     F.insert( CFFactor( f, 1 ) );
