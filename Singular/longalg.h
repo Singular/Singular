@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.29 2002-01-30 14:33:03 Singular Exp $ */
+/* $Id: longalg.h,v 1.30 2002-02-04 13:13:43 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -46,10 +46,8 @@ void naSetChar(int p, ring r);
 #define napAddExp(P,I,E)  ((P)->e[I-1]+=(E))
 #define napLength(p)      pLength((poly)p)
 napoly napNeg(napoly a);
-void    naDelete (number *p, const ring r);
-#else /* LONGALGNEW */
-void    naDelete (number *p, const ring r);
 #endif /* LONGALGNEW */
+void    naDelete (number *p, const ring r);
 number  naInit(int i);                              /* z := i */
 number  naPar(int i);                               /* z := par(i) */
 int     naParDeg(number n);                         /* i := deg(n) */

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.44 2002-01-30 14:33:04 Singular Exp $ */
+/* $Id: numbers.cc,v 1.45 2002-02-04 13:13:03 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -62,7 +62,7 @@ int    nChar;
 n_Procs_s *cf_root=NULL;
 
 void   nDummy1(number* d) { *d=NULL; }
-void   ndDelete(number* d, ring r) { *d=NULL; }
+void   ndDelete(number* d, const ring r) { *d=NULL; }
 
 #ifdef LDEBUG
 void   nDBDummy1(number* d,char *f, int l) { *d=NULL; }
