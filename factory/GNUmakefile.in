@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.7 1997-07-14 12:50:23 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.8 1997-07-19 08:42:05 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -164,6 +164,8 @@ basefactorysrc := \
 		int_poly.cc \
 		int_pp.cc \
 		int_rat.cc \
+		sm_sparsemod.cc \
+		sm_util.cc \
 		variable.cc
 singfactorysrc := \
 		singext.cc
@@ -222,6 +224,8 @@ basefactoryincl := \
 		int_poly.h \
 		int_pp.h \
 		int_rat.h \
+		sm_sparsemod.h \
+		sm_util.h \
 		timing.h \
 		variable.h
 singfactoryincl := \
@@ -443,7 +447,8 @@ uninstallmem:
 		-rmdir $(libdir)
 
 uninstallgftables:
-		-rm -rf $(gftabledir)
+		-rm -f $(gftabledir)/gftable.*.*
+		-rmdir $(gftabledir)
 
 #
 # - building a distribution.
