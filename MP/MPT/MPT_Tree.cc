@@ -9,6 +9,7 @@
  *     
  ******************************************************************/
 #include "MPT.h"
+#include <string.h>
 
 #ifndef __64_BIT__
 #define MPT_Delete64BitType(arg) IMP_MemFreeFnc(arg, sizeof(MP_Real64_t))

@@ -33,7 +33,6 @@ static void usage(char *progname)
 }
  
 static char* lib_file = NULL;
-extern "C" { int fe_getopt (); }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 void main_init(int argc, char *argv[])
