@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.20 1998-03-12 14:32:36 schmidt Exp $ */
+/* $Id: cf_gcd.cc,v 1.21 2001-01-30 13:41:12 Singular Exp $ */
 
 #include <config.h>
 
@@ -29,30 +29,30 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
     delete sample;
     CanonicalForm lcf, lcg;
     if ( swap ) {
-	lcf = swapvar( LC( f ), Variable(1), f.mvar() );
-	lcg = swapvar( LC( g ), Variable(1), f.mvar() );
+        lcf = swapvar( LC( f ), Variable(1), f.mvar() );
+        lcg = swapvar( LC( g ), Variable(1), f.mvar() );
     }
     else {
-	lcf = LC( f, Variable(1) );
-	lcg = LC( g, Variable(1) );
+        lcf = LC( f, Variable(1) );
+        lcg = LC( g, Variable(1) );
     }
     while ( ( e( lcf ).isZero() || e( lcg ).isZero() ) && count < 100 ) {
-	e.nextpoint();
-	count++;
+        e.nextpoint();
+        count++;
     }
     if ( count == 100 )
-	return false;
+        return false;
     CanonicalForm F, G;
     if ( swap ) {
-	F=swapvar( f, Variable(1), f.mvar() );
-	G=swapvar( g, Variable(1), g.mvar() );
+        F=swapvar( f, Variable(1), f.mvar() );
+        G=swapvar( g, Variable(1), g.mvar() );
     }
     else {
-	F = f;
-	G = g;
+        F = f;
+        G = g;
     }
     if ( e(F).taildegree() > 0 && e(G).taildegree() > 0 )
-	return false;
+        return false;
     return gcd( e( F ), e( G ) ).degree() < 1;
 }
 
@@ -76,11 +76,11 @@ balance ( const CanonicalForm & f, const CanonicalForm & q )
     CanonicalForm c;
     CFIterator i;
     for ( i = f; i.hasTerms(); i++ ) {
-	c = mod( i.coeff(), q );
-	if ( c > qh )
-	    result += power( x, i.exp() ) * (c - q);
-	else
-	    result += power( x, i.exp() ) * c;
+        c = mod( i.coeff(), q );
+        if ( c > qh )
+            result += power( x, i.exp() ) * (c - q);
+        else
+            result += power( x, i.exp() ) * c;
     }
     return result;
 }
@@ -99,12 +99,12 @@ static CanonicalForm
 icontent ( const CanonicalForm & f, const CanonicalForm & c )
 {
     if ( f.inCoeffDomain() )
-	return gcd( f, c );
+        return gcd( f, c );
     else {
-	CanonicalForm g = c;
-	for ( CFIterator i = f; i.hasTerms() && ! g.isOne(); i++ )
-	    g = icontent( i.coeff(), g );
-	return g;
+        CanonicalForm g = c;
+        for ( CFIterator i = f; i.hasTerms() && ! g.isOne(); i++ )
+            g = icontent( i.coeff(), g );
+        return g;
     }
 }
 //}}}
@@ -146,21 +146,21 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     CanonicalForm f0 = 1, f1 = 0, g0 = 0, g1 = 1, q, r;
 
     while ( ! p1.isZero() ) {
-	divrem( p0, p1, q, r );
-	p0 = p1; p1 = r;
-	r = g0 - g1 * q;
-	g0 = g1; g1 = r;
-	r = f0 - f1 * q;
-	f0 = f1; f1 = r;
+        divrem( p0, p1, q, r );
+        p0 = p1; p1 = r;
+        r = g0 - g1 * q;
+        g0 = g1; g1 = r;
+        r = f0 - f1 * q;
+        f0 = f1; f1 = r;
     }
     CanonicalForm contp0 = content( p0 );
     a = f0 / ( contf * contp0 );
     b = g0 / ( contg * contp0 );
     p0 /= contp0;
     if ( p0.sign() < 0 ) {
-	p0 = -p0;
-	a = -a;
-	b = -b;
+        p0 = -p0;
+        a = -a;
+        b = -b;
     }
     return p0;
 }
@@ -173,72 +173,72 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
     int p, i, n;
 
     if ( primitive ) {
-	f = F;
-	g = G;
-	c = 1;
+        f = F;
+        g = G;
+        c = 1;
     }
     else {
-	CanonicalForm cF = content( F ), cG = content( G );
-	f = F / cF;
-	g = G / cG;
-	c = bgcd( cF, cG );
+        CanonicalForm cF = content( F ), cG = content( G );
+        f = F / cF;
+        g = G / cG;
+        c = bgcd( cF, cG );
     }
     cg = gcd( f.lc(), g.lc() );
     cl = ( f.lc() / cg ) * g.lc();
 //     B = 2 * cg * tmin(
-// 	maxnorm(f)*power(CanonicalForm(2),f.degree())*isqrt(f.degree()+1),
-// 	maxnorm(g)*power(CanonicalForm(2),g.degree())*isqrt(g.degree()+1)
-// 	)+1;
+//         maxnorm(f)*power(CanonicalForm(2),f.degree())*isqrt(f.degree()+1),
+//         maxnorm(g)*power(CanonicalForm(2),g.degree())*isqrt(g.degree()+1)
+//         )+1;
     M = tmin( maxNorm(f), maxNorm(g) );
     BB = power(CanonicalForm(2),tmin(f.degree(),g.degree()))*M;
     q = 0;
     i = cf_getNumSmallPrimes() - 1;
     while ( true ) {
-	B = BB;
-	while ( i >= 0 && q < B ) {
-	    p = cf_getSmallPrime( i );
-	    i--;
-	    while ( i >= 0 && mod( cl, p ) == 0 ) {
-		p = cf_getSmallPrime( i );
-		i--;
-	    }
-	    setCharacteristic( p );
-	    Dp = gcd( mapinto( f ), mapinto( g ) );
-	    Dp = ( Dp / Dp.lc() ) * mapinto( cg );
-	    setCharacteristic( 0 );
-	    if ( Dp.degree() == 0 ) return c;
-	    if ( q.isZero() ) {
-		D = mapinto( Dp );
-		q = p;
-		B = power(CanonicalForm(2),D.degree())*M+1;
-	    }
-	    else {
-		if ( Dp.degree() == D.degree() ) {
-		    chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
-		    q = newq;
-		    D = newD;
-		}
-		else if ( Dp.degree() < D.degree() ) {
-		    // all previous p's are bad primes
-		    q = p;
-		    D = mapinto( Dp );
-		    B = power(CanonicalForm(2),D.degree())*M+1;
-		}
-		// else p is a bad prime
-	    }
-	}
-	if ( i >= 0 ) {
-	    // now balance D mod q
-	    D = pp( balance( D, q ) );
-	    if ( divides( D, f ) && divides( D, g ) )
-		return D * c;
-	    else
-		q = 0;
-	}
-	else {
-	    return gcd_poly( F, G, false );
-	}
-	DEBOUTLN( cerr, "another try ..." );
+        B = BB;
+        while ( i >= 0 && q < B ) {
+            p = cf_getSmallPrime( i );
+            i--;
+            while ( i >= 0 && mod( cl, p ) == 0 ) {
+                p = cf_getSmallPrime( i );
+                i--;
+            }
+            setCharacteristic( p );
+            Dp = gcd( mapinto( f ), mapinto( g ) );
+            Dp = ( Dp / Dp.lc() ) * mapinto( cg );
+            setCharacteristic( 0 );
+            if ( Dp.degree() == 0 ) return c;
+            if ( q.isZero() ) {
+                D = mapinto( Dp );
+                q = p;
+                B = power(CanonicalForm(2),D.degree())*M+1;
+            }
+            else {
+                if ( Dp.degree() == D.degree() ) {
+                    chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
+                    q = newq;
+                    D = newD;
+                }
+                else if ( Dp.degree() < D.degree() ) {
+                    // all previous p's are bad primes
+                    q = p;
+                    D = mapinto( Dp );
+                    B = power(CanonicalForm(2),D.degree())*M+1;
+                }
+                // else p is a bad prime
+            }
+        }
+        if ( i >= 0 ) {
+            // now balance D mod q
+            D = pp( balance( D, q ) );
+            if ( divides( D, f ) && divides( D, g ) )
+                return D * c;
+            else
+                q = 0;
+        }
+        else {
+            return gcd_poly( F, G, false );
+        }
+        DEBOUTLN( cerr, "another try ..." );
     }
 }
 
@@ -250,44 +250,44 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
     Variable v = f.mvar();
 
     if ( f.degree( v ) >= g.degree( v ) ) {
-	pi = f; pi1 = g;
+        pi = f; pi1 = g;
     }
     else {
-	pi = g; pi1 = f;
+        pi = g; pi1 = f;
     }
     Ci = content( pi ); Ci1 = content( pi1 );
     C = gcd( Ci, Ci1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
     if ( pi.isUnivariate() && pi1.isUnivariate() ) {
-	if ( modularflag )
-	    return gcd_poly_univar0( pi, pi1, true ) * C;
+        if ( modularflag )
+            return gcd_poly_univar0( pi, pi1, true ) * C;
     }
     else
-	if ( gcd_test_one( pi1, pi, true ) )
-	    return C;
+        if ( gcd_test_one( pi1, pi, true ) )
+            return C;
     delta = degree( pi, v ) - degree( pi1, v );
     Hi = power( LC( pi1, v ), delta );
     if ( (delta+1) % 2 )
-	bi = 1;
+        bi = 1;
     else
-	bi = -1;
+        bi = -1;
     while ( degree( pi1, v ) > 0 ) {
-	pi2 = psr( pi, pi1, v );
-	pi2 = pi2 / bi;
-	pi = pi1; pi1 = pi2;
-	if ( degree( pi1, v ) > 0 ) {
-	    delta = degree( pi, v ) - degree( pi1, v );
-	    if ( (delta+1) % 2 )
-		bi = LC( pi, v ) * power( Hi, delta );
-	    else
-		bi = -LC( pi, v ) * power( Hi, delta );
-	    Hi = power( LC( pi1, v ), delta ) / power( Hi, delta-1 );
-	}
+        pi2 = psr( pi, pi1, v );
+        pi2 = pi2 / bi;
+        pi = pi1; pi1 = pi2;
+        if ( degree( pi1, v ) > 0 ) {
+            delta = degree( pi, v ) - degree( pi1, v );
+            if ( (delta+1) % 2 )
+                bi = LC( pi, v ) * power( Hi, delta );
+            else
+                bi = -LC( pi, v ) * power( Hi, delta );
+            Hi = power( LC( pi1, v ), delta ) / power( Hi, delta-1 );
+        }
     }
     if ( degree( pi1, v ) == 0 )
-	return C;
+        return C;
     else {
-	return C * pp( pi );
+        return C * pp( pi );
     }
 }
 
@@ -310,18 +310,18 @@ static CanonicalForm
 gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 {
     if ( getCharacteristic() != 0 ) {
-	return gcd_poly1( f, g, false );
+        return gcd_poly1( f, g, false );
     }
     else if ( isOn( SW_USE_EZGCD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
-	CFMap M, N;
-	compress( f, g, M, N );
-	return N( ezgcd( M(f), M(g) ) );
+        CFMap M, N;
+        compress( f, g, M, N );
+        return N( ezgcd( M(f), M(g) ) );
     }
     else if ( isOn( SW_USE_SPARSEMOD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
-	return sparsemod( f, g );
+        return sparsemod( f, g );
     }
     else {
-	return gcd_poly1( f, g, modularflag );
+        return gcd_poly1( f, g, modularflag );
     }
 }
 //}}}
@@ -340,19 +340,19 @@ static CanonicalForm
 cf_content ( const CanonicalForm & f, const CanonicalForm & g )
 {
     if ( f.inPolyDomain() || ( f.inExtension() && ! getReduce( f.mvar() ) ) ) {
-	CFIterator i = f;
-	CanonicalForm result = g;
-	while ( i.hasTerms() && ! result.isOne() ) {
-	    result = gcd( result, i.coeff() );
-	    i++;
-	}
-	return result;
+        CFIterator i = f;
+        CanonicalForm result = g;
+        while ( i.hasTerms() && ! result.isOne() ) {
+            result = gcd( result, i.coeff() );
+            i++;
+        }
+        return result;
     }
     else
-	if ( f.sign() < 0 )
-	    return -f;
-	else
-	    return f;
+        if ( f.sign() < 0 )
+            return -f;
+        else
+            return f;
 }
 //}}}
 
@@ -386,11 +386,11 @@ content ( const CanonicalForm & f, const Variable & x )
     Variable y = f.mvar();
 
     if ( y == x )
-	return cf_content( f, 0 );
+        return cf_content( f, 0 );
     else  if ( y < x )
-	return f;
+        return f;
     else
-	return swapvar( content( swapvar( f, y, x ), y ), y, x );
+        return swapvar( content( swapvar( f, y, x ), y ), y, x );
 }
 //}}}
 
@@ -410,13 +410,13 @@ vcontent ( const CanonicalForm & f, const Variable & x )
     ASSERT( x.level() > 0, "cannot calculate vcontent with respect to algebraic variable" );
 
     if ( f.mvar() <= x )
-	return content( f, x );
+        return content( f, x );
     else {
-	CFIterator i;
-	CanonicalForm d = 0;
-	for ( i = f; i.hasTerms() && ! d.isOne(); i++ )
-	    d = gcd( d, vcontent( i.coeff(), x ) );
-	return d;
+        CFIterator i;
+        CanonicalForm d = 0;
+        for ( i = f; i.hasTerms() && ! d.isOne(); i++ )
+            d = gcd( d, vcontent( i.coeff(), x ) );
+        return d;
     }
 }
 //}}}
@@ -433,9 +433,9 @@ CanonicalForm
 pp ( const CanonicalForm & f )
 {
     if ( f.isZero() )
-	return f;
+        return f;
     else
-	return f / content( f );
+        return f / content( f );
 }
 //}}}
 
@@ -443,63 +443,63 @@ CanonicalForm
 gcd ( const CanonicalForm & f, const CanonicalForm & g )
 {
     if ( f.isZero() )
-	if ( g.lc().sign() < 0 )
-	    return -g;
-	else
-	    return g;
+        if ( g.lc().sign() < 0 )
+            return -g;
+        else
+            return g;
     else  if ( g.isZero() )
-	if ( f.lc().sign() < 0 )
-	    return -f;
-	else
-	    return f;
+        if ( f.lc().sign() < 0 )
+            return -f;
+        else
+            return f;
     else  if ( f.inBaseDomain() )
-	if ( g.inBaseDomain() )
-	    return bgcd( f, g );
-	else
-	    return cf_content( g, f );
+        if ( g.inBaseDomain() )
+            return bgcd( f, g );
+        else
+            return cf_content( g, f );
     else  if ( g.inBaseDomain() )
-	return cf_content( f, g );
+        return cf_content( f, g );
     else  if ( f.mvar() == g.mvar() )
-	if ( f.inExtension() && getReduce( f.mvar() ) )
-	    return 1;
-	else {
-	    if ( divides( f, g ) )
-		if ( f.lc().sign() < 0 )
-		    return -f;
-		else
-		    return f;
-	    else  if ( divides( g, f ) )
-		if ( g.lc().sign() < 0 )
-		    return -g;
-		else
-		    return g;
-	    if ( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) {
-		CanonicalForm cdF = bCommonDen( f );
-		CanonicalForm cdG = bCommonDen( g );
-		Off( SW_RATIONAL );
-		CanonicalForm l = lcm( cdF, cdG );
-		On( SW_RATIONAL );
-		CanonicalForm F = f * l, G = g * l;
-		Off( SW_RATIONAL );
-		l = gcd_poly( F, G, true );
-		On( SW_RATIONAL );
-		if ( l.lc().sign() < 0 )
-		    return -l;
-		else
-		    return l;
-	    }
-	    else {
-		CanonicalForm d = gcd_poly( f, g, getCharacteristic()==0 );
-		if ( d.lc().sign() < 0 )
-		    return -d;
-		else
-		    return d;
-	    }
-	}
+        if ( f.inExtension() && getReduce( f.mvar() ) )
+            return 1;
+        else {
+            if ( divides( f, g ) )
+                if ( f.lc().sign() < 0 )
+                    return -f;
+                else
+                    return f;
+            else  if ( divides( g, f ) )
+                if ( g.lc().sign() < 0 )
+                    return -g;
+                else
+                    return g;
+            if ( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) {
+                CanonicalForm cdF = bCommonDen( f );
+                CanonicalForm cdG = bCommonDen( g );
+                Off( SW_RATIONAL );
+                CanonicalForm l = lcm( cdF, cdG );
+                On( SW_RATIONAL );
+                CanonicalForm F = f * l, G = g * l;
+                Off( SW_RATIONAL );
+                l = gcd_poly( F, G, true );
+                On( SW_RATIONAL );
+                if ( l.lc().sign() < 0 )
+                    return -l;
+                else
+                    return l;
+            }
+            else {
+                CanonicalForm d = gcd_poly( f, g, getCharacteristic()==0 );
+                if ( d.lc().sign() < 0 )
+                    return -d;
+                else
+                    return d;
+            }
+        }
     else  if ( f.mvar() > g.mvar() )
-	return cf_content( f, g );
+        return cf_content( f, g );
     else
-	return cf_content( g, f );
+        return cf_content( g, f );
 }
 
 //{{{ CanonicalForm lcm ( const CanonicalForm & f, const CanonicalForm & g )
@@ -516,8 +516,8 @@ CanonicalForm
 lcm ( const CanonicalForm & f, const CanonicalForm & g )
 {
     if ( f.isZero() || g.isZero() )
-	return f;
+        return f;
     else
-	return ( f / gcd( f, g ) ) * g;
+        return ( f / gcd( f, g ) ) * g;
 }
 //}}}
