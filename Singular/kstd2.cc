@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.78 2002-05-22 14:37:34 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.79 2002-05-31 17:24:45 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -27,7 +27,9 @@
 #include "ipid.h"
 #include "ipshell.h"
 #include "intvec.h"
-
+#ifdef HAVE_PLURAL
+#include "gring.h"
+#endif
 // #include "timer.h"
 
 // return -1 if no divisor is found
@@ -411,9 +413,16 @@ static poly redNF (poly h,kStrategy strat)
         wrp(strat->S[j]);
       }
 #endif
-      number coef;
-      coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
-      nDelete(&coef);
+      if (rIsPluralRing(currRing))
+      {
+	nc_kBucketPolyRed(P.bucket,strat->S[j]);
+      }
+      else
+      {
+	number coef;
+	coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
+	nDelete(&coef);
+      }
       h = kBucketGetLm(P.bucket);
       if (h==NULL) return NULL;
       P.p=h;

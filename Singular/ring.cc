@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.191 2002-05-02 15:16:01 Singular Exp $ */
+/* $Id: ring.cc,v 1.192 2002-05-31 17:24:46 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -684,15 +684,6 @@ void rWrite(ring r)
   omCheckAddrSize(r->block1,nblocks*sizeof(int));
   omCheckAddrSize(r->wvhdl,nblocks*sizeof(int_ptr));
   omCheckAddrSize(r->names,r->N*sizeof(char_ptr));
-#ifdef HAVE_PLURAL
-  if (r->nc!=NULL)
-  {
-    int nNC=r->N*(r->N-1)/2;
-    // omCheckAddrSize(r->nc,sizeof(nc_struct));
-//     omCheckAddrSize(r->nc->MT,nNC*sizeof(matrix));
-    //    omCheckAddrSize(r->nc->MTsize,nNC*sizeof(int));
-  }
-#endif     
 
   nblocks--;
 

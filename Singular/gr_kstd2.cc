@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.4 2002-04-30 13:35:10 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.5 2002-05-31 17:24:44 levandov Exp $ */
 /* $Log: not supported by cvs2svn $
+/* Revision 1.4  2002/04/30 13:35:10  levandov
+/* Big Plural Update
+/*
 /* Revision 1.1.2.3  2001/09/25 15:39:01  Singular
 /* *hannes: PLURAL syntax fixes
 /*
@@ -754,12 +757,10 @@ static void gr_initBba(ideal F,kStrategy strat)
     strat->red = redHomog0;
   else
     strat->red = redHomog;
-#ifdef HAVE_PLURAL
-  if (currRing->nc!=NULL)
+  if (rIsPluralRing(currRing))
   {
     strat->red = redGrFirst;
   }
-#endif
   if (pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
   else
@@ -855,7 +856,10 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
     if (strat->P.p != NULL)
     {
           /* statistic */
-          if (TEST_OPT_PROT) PrintS("s");
+          if (TEST_OPT_PROT) 
+	  {
+	    PrintS("s");
+	  }
           /* enter P.p into s and L */
           {
             strat->P.sev=0;
@@ -865,7 +869,7 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
               {
                 if ((strat->syzComp==0)||(!strat->homog))
                 {
-                  strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+                  //strat->P.p = redtailBba(strat->P.p,pos-1,strat);
                   pCleardenom(strat->P.p);
                 }
               }
@@ -874,7 +878,7 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
                 pNorm(strat->P.p);
                 if ((strat->syzComp==0)||(!strat->homog))
                 {
-                  strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+                  //strat->P.p = redtailBba(strat->P.p,pos-1,strat);
                 }
               }
               if (TEST_OPT_DEBUG)

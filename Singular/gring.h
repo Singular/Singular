@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.10 2002-04-30 13:35:11 levandov Exp $ */
+/* $Id: gring.h,v 1.11 2002-05-31 17:24:45 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -28,6 +28,7 @@ poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r);
 poly nc_spGSpolyRedNew(poly p1, poly p2,poly spNoether, const ring r);
 void nc_spGSpolyRedTail(poly p1, poly q, poly q2, poly spNoether, const ring r);
 poly nc_spShort(poly p1, poly p2, const ring r=currRing);
+void nc_kBucketPolyRed(kBucket_pt b, poly p);
 
 ideal gr_bba (ideal F, ideal Q,kStrategy strat);
 #endif /* HAVE_PLURAL */
