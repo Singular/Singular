@@ -1,8 +1,9 @@
-// $Id: general.lib,v 1.27 2000-05-12 12:25:47 Singular Exp $
+// $Id: general.lib,v 1.28 2000-12-12 13:49:29 anne Exp $
 //GMG, last modified 18.6.99
+//anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.27 2000-05-12 12:25:47 Singular Exp $";
+version="$Id: general.lib,v 1.28 2000-12-12 13:49:29 anne Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -10,6 +11,7 @@ PROCEDURES:
  A_Z(\"a\",n);          string a,b,... of n comma separated letters
  ASCII([n,m]);          string of printable ASCII characters (number n to m)
  binomial(n,m[,../..]); n choose m (type int), [type string/type number]
+ deleteSublist(iv,l);   delete entries given by iv from list l
  factorial(n[,../..]);  n factorial (=n!) (type int), [type string/number]
  fibonacci(n[,p]);      nth Fibonacci number [char p]
  kmemory([n[,v]]);      active [allocated] memory in kilobyte
@@ -21,6 +23,7 @@ PROCEDURES:
  ringweights(r);        intvec of weights of ring variables of ring r
  sort(ideal/module);    sort generators according to monomial ordering
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
+ watchdog(i,cmd);       only wait for result of command cmd for i seconds
  which(command);        search for command and return absolute path, if found
            (parameters in square brackets [] are optional)
 ";
@@ -1024,5 +1027,140 @@ EXAMPLE:  example which; shows an example
 example
 {  "EXAMPLE:"; echo = 2;
     which("sh");
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc watchdog(int i, string cmd)
+"USAGE  : watchdog(i,cmd); i -- integer; cmd -- string
+RETURNS: Result of cmd, if the result can be computed in 
+         i seconds. Otherwise the computation is interrupted after
+         i seconds, the string "Killed" is returned and the global
+         variable 'watchdog_interrupt' is defined.
+NOTE:    * the MP package must be enabled 
+         * the current basering should not be watchdog_rneu
+         * if there are variable names of the structure x(i) all
+           polynomials have to be put into eval(...) in order to be
+           interpreted correctly
+         * a second Singular process is started by this procedure
+EXAMPLE: example watchdog; shows an example
+"
+{
+  string rname=nameof(basering);
+  if (defined(watchdog_rneu))
+  {
+    kill watchdog_rneu;
+  }
+// If we do not have MP-links, watchdog cannot be used
+  if (system("with","MP"))
+  {
+    if ( i > 0 )
+    {
+      int j=10;
+      int k=999999;
+// fork, get the pid of the child and send it the command   
+      link l_fork="MPtcp:fork";
+      open(l_fork);
+      write(l_fork,quote(system("pid")));
+      int pid=read(l_fork);
+      execute("write(l_fork,quote(" + cmd + "));");
+
+
+// sleep in small, but growing intervals for appr. 1 second
+      while(j < k)
+      {
+        if (status(l_fork, "read", "ready", j)) {break;}
+        j = j + j;
+      }
+
+// sleep in intervals of one second
+      j = 1;
+      if (!status(l_fork,"read","ready"))
+      {
+        while (j < i)
+        {
+          if (status(l_fork, "read", "ready", k)) {break;}
+          j = j + 1;
+        }
+      }
+// check, whether we have a result, and return it
+      if (status(l_fork, "read", "ready"))
+      {
+        def result = read(l_fork);
+        if (nameof(basering)!=rname)
+        {
+          def watchdog_rneu=basering;
+        }
+        if(defined(watchdog_interrupt))
+        {
+          kill (watchdog_interrupt);
+        }
+        close(l_fork);
+      }
+      else
+      {
+        string result="Killed";
+        if(!defined(watchdog_interrupt))
+        {
+          int watchdog_interrupt=1;
+          export watchdog_interrupt;
+        }
+        close(l_fork);
+        j = system("sh","kill " + string(pid));
+      }
+      if (defined(watchdog_rneu))
+      {
+        keepring watchdog_rneu;
+      }
+      return(result);
+    }
+    else
+    {
+      ERROR("First argument of watchdog has to be a positive integer.");
+    }
+    ERROR("MP-support is not enabled in this version of Singular.");
+  } 
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),dp;
+  poly f=x^30+y^30;
+  watchdog(1,"factorize(eval("+string(f)+"))");
+  watchdog(100,"factorize(eval("+string(f)+"))");
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc deleteSublist(intvec v,list l)
+"USAGE:   deleteSublist(v,l); -- intvec v; list l
+         where the entries of the integer vector v correspond to the
+         positions of the elements to be deleted
+RETURN:  list without the deleted elements
+EXAMPLE: example deleteSublist; shows an example"
+{
+  list k;
+  int i,j,skip;
+  j=1;
+  skip=0;
+  intvec vs=sort(v)[1];
+  for ( i=1 ; i <=size(vs) ; i++)
+  {
+    while ((j+skip) < vs[i])
+    {
+      k[j] = l[j+skip];
+      j++;
+    }
+    skip++;
+  }
+  if(vs[size(vs)]<size(l))
+  {
+    k=k+list(l[(vs[size(vs)]+1)..size(l)]);
+  }
+  return(k);
+}
+example
+{ "EXAMPLE:"; echo=2;
+   list l=1,2,3,4,5;
+   intvec v=1,3,4;
+   l=deleteSublist(v,l);
+   l;
 }
 ///////////////////////////////////////////////////////////////////////////////
