@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_globals.h,v 1.4 1997-09-09 09:21:02 schmidt Exp $ */
+/* $Id: cf_globals.h,v 1.5 1997-10-23 12:15:57 schmidt Exp $ */
 
 #ifndef INCL_CF_GLOBALS_H
 #define INCL_CF_GLOBALS_H
@@ -17,6 +17,7 @@
 /*BEGINPUBLIC*/
 
 extern const char factoryVersion[];
+extern const char factoryConfiguration[];
 
 /*ENDPUBLIC*/
 
