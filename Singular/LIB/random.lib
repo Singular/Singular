@@ -1,6 +1,6 @@
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: random.lib,v 1.13 2000-12-22 14:29:01 greuel Exp $";
+version="$Id: random.lib,v 1.14 2001-01-03 01:21:37 greuel Exp $";
 category="General purpose";
 info="
 LIBRARY:  random.lib    Creating Random and Sparse Matrices, Ideals, Polys
@@ -20,6 +20,7 @@ PROCEDURES:
 
 LIB "inout.lib";
 LIB "general.lib";
+LIB "matrix.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc genericid (id, list #)
@@ -113,7 +114,7 @@ example
 
 proc sparseid (int k, int u, list #)
 "USAGE:   sparseid(k,u[,o,p,b]);  k,u,o,p,b integers
-RETURN:  ideal having k generators in each degree d, u<=d<=o, p percent of
+RETURN:  ideal having k generators, each of degree d, u<=d<=o, p percent of
          terms in degree d are 0, the remaining have random coefficients
          in the interval [1,b], (default: o=u=d, p=75, b=30000)
 EXAMPLE: example sparseid; shows an example
@@ -125,19 +126,25 @@ EXAMPLE: example sparseid; shows an example
    if( size(#)==1 ) { int o=#[1]; int p=75; int b=30000; }
    if( size(#)==0 ) { int o=u; int p=75; int b=30000; }
 //------------------ use sparsemat for creation of sparseid -------------------
-   int ii; ideal i; intmat m;
+   int ii; matrix i[1][k]; intmat m; 
+   if( u <=0 )
+   {
+      m = sparsemat(1,k,p,b);
+      i = m;
+      u=1;
+   }
    for ( ii=u; ii<=o; ii=ii+1)
    {
        m = sparsemat(size(maxideal(ii)),k,p,b);
-       i = i+ideal(matrix(maxideal(ii))*m);
+       i = i+matrix(maxideal(ii))*m;
    }
-   return(i);
+   return(ideal(i));
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring r = 0,(a,b,c,d),ds;
-   sparseid(3,4);"";
-   sparseid(2,2,5,90,9);
+   sparseid(2,3);"";
+   sparseid(3,0,4,90,9);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -185,6 +192,48 @@ example
    sparsemat(5,5,95);"";
    sparsemat(5,5,5);"";
    sparsemat(5,5,50,100);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc sparsematrix (int n, int m, int o, list #)
+"USAGE:   sparsematrix(n,m,o[,u,pe,pp,b]);  n,m,o,u,pe,pp,b integers
+RETURN:  nxm matrix, about pe percent of the entries are 0, the remaining
+         are random polynomials of degree d, u<=d<=o, with  pp percent of
+         the terms being 0, the remaining have random coefficients 
+         in the interval [1,b] [default: (pe,u,pp,b) = (0,50,75,100)]
+EXAMPLE: example sparsematrix; shows an example
+"
+{
+   int ii,jj;
+   ideal id;
+   matrix M[n][m];
+//----------------------------- set defaults ----------------------------------
+   int pe=50;int u=0;int pp=75;int b=100;
+   if( size(#)==4 ) { u=#[1]; pe=#[2]; pp=#[3]; b=#[4]; }
+   if( size(#)==3 ) { u=#[1]; pe=#[2]; pp=#[3]; }
+   if( size(#)==2 ) { u=#[1]; pe=#[2]; }
+   if( size(#)==1 ) { u=#[1]; }
+//------------------- use sparsemat and sparseid  -----------------------------
+   intmat I = sparsemat(n,m,pe,1);
+   for(ii=1; ii<=n;ii++)
+   {
+     id = sparseid(m,u,o,pp,b);
+     for(jj=1; jj<=m; jj++)
+     {
+        if( I[ii,jj] !=0)
+        {
+          M[ii,jj]=id[jj];
+        }
+     }
+   }
+   return(M);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(a,b,c,d),dp;
+   // sparse matrix of sparse polys of degree <=2:
+   print(sparsematrix(3,4,2));"";       
+   // dense matrix of sparse linear forms:
+   print(sparsematrix(3,3,1,1,0,55,9)); 
 }
 ///////////////////////////////////////////////////////////////////////////////
 
