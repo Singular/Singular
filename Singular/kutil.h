@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.19 1999-10-18 11:19:28 obachman Exp $ */
+/* $Id: kutil.h,v 1.20 1999-10-27 15:07:30 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -181,7 +181,7 @@ inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
 #define kTest_T(T) K_Test_T(__FILE__,__LINE__,T)
 #define kTest_L(L) K_Test_L(__FILE__,__LINE__,L)
 #define kTest_S(strat) K_Test_S(__FILE__,__LINE__,strat)
-#define kTest_Pref(L) K_Test(__FILE__,__LINE__,L, 1)
+#define kTest_Pref(L) K_Test(__FILE__,__LINE__,L, 2)
 BOOLEAN K_Test(char *f, int l,kStrategy strat, int pref=0);
 BOOLEAN K_Test_TS(char *f, int l,kStrategy strat);
 BOOLEAN K_Test_T(char *f, int l, TObject* T, int tpos = -1);
