@@ -93,7 +93,7 @@ void sleftv::Print(leftv store, int spaces)
       return;
     if ((store!=NULL)&&(store!=this))
       store->CleanUp();
-
+    
     switch (t /*=Typ()*/)
       {
         case UNKNOWN:
@@ -127,7 +127,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case RESOLUTION_CMD:
           syPrint((syStrategy)d);
-          break;
+          break;  
         case STRING_CMD:
           ::Print("%-*.*s%s",spaces,spaces," ",(char *)d);
           break;
@@ -137,15 +137,15 @@ void sleftv::Print(leftv store, int spaces)
        case PROC_CMD:
          {
            procinfov pi=(procinfov)d;
-           ::Print("%-*.*s// libname  : %s\n",spaces,spaces," ",
-                   piProcinfo(pi, "libname"));
-           ::Print("%-*.*s// procname : %s\n",spaces,spaces," ",
-                   piProcinfo(pi, "procname"));
-           ::Print("%-*.*s// type     : %s",spaces,spaces," ",
-                   piProcinfo(pi, "type"));
-           //           ::Print("%-*.*s// ref      : %s",spaces,spaces," ",
-           //   piProcinfo(pi, "ref"));
-           break;
+	   ::Print("%-*.*s// libname  : %s\n",spaces,spaces," ",
+		   piProcinfo(pi, "libname"));
+	   ::Print("%-*.*s// procname : %s\n",spaces,spaces," ",
+		   piProcinfo(pi, "procname"));
+	   ::Print("%-*.*s// type     : %s",spaces,spaces," ",
+		   piProcinfo(pi, "type"));
+	   //	   ::Print("%-*.*s// ref      : %s",spaces,spaces," ",
+	   //   piProcinfo(pi, "ref"));
+	   break;
          }
        case POINTER_CMD:
          { package pack = (package)d;
@@ -212,7 +212,7 @@ void sleftv::Print(leftv store, int spaces)
   else if (t!=LIST_CMD)
   {
     PrintLn();
-  }
+  }  
 #ifdef SIQ
   if (rtyp!=COMMAND)
 #endif
@@ -242,7 +242,6 @@ void sleftv::CleanUp()
     FreeL((ADDRESS)name);
   }
   name=NULL;
-  packhdl = NULL;
   if (data!=NULL)
   {
     switch (rtyp)
@@ -278,8 +277,8 @@ void sleftv::CleanUp()
         rKill((ring)data);
         break;
       case PROC_CMD:
-        piKill((procinfov)data);
-        break;
+	piKill((procinfov)data);
+	break;
       case LINK_CMD:
         slKill((si_link)data);
         break;
@@ -313,7 +312,7 @@ void sleftv::CleanUp()
       case VTIMER:
 #ifdef HAVE_RTIMER
         case VRTIMER:
-#endif
+#endif          
       case VOICE:
       case VMAXDEG:
       case VMAXMULT:
@@ -327,7 +326,7 @@ void sleftv::CleanUp()
         break;
       default:
         ::Print("CleanUp: unknown type %d\n",rtyp);  /* DEBUG */
-#endif
+#endif          
     } /* end switch: (rtyp) */
     data=NULL;
   }
@@ -349,7 +348,7 @@ void sleftv::CleanUp()
       case VTIMER:
 #ifdef HAVE_RTIMER
       case VRTIMER:
-#endif
+#endif          
       case VOICE:
       case VMAXDEG:
       case VMAXMULT:
@@ -515,11 +514,11 @@ void sleftv::Copy(leftv source)
           ring r=(ring)d;
           r->ref++;
           data=d;
-        }
+        }  
         else
         {
           WerrorS("invalid ring description");
-        }
+        }  
         break;
       }
     case RESOLUTION_CMD:
@@ -581,7 +580,7 @@ attr sleftv::CopyA()
   attr *a=Attribute();
   if ((a!=NULL) && (*a!=NULL))
     return (*a)->Copy();
-  return NULL;
+  return NULL;  
 }
 
 char *  sleftv::String(void *d)
@@ -664,7 +663,7 @@ char *  sleftv::String(void *d)
       case QRING_CMD:
       {
         return rString((ring)d);
-      }
+      }  
       default:
         #ifdef TEST
         ::Print("String:unknown type %s(%d)", Tok2Cmdname(Typ()),Typ());
@@ -694,7 +693,7 @@ int  sleftv::Typ()
       case VTIMER:
 #ifdef HAVE_RTIMER
       case VRTIMER:
-#endif
+#endif          
       case VOICE:
       case VMAXDEG:
       case VMAXMULT:
@@ -702,7 +701,7 @@ int  sleftv::Typ()
       case VSHORTOUT:
         return INT_CMD;
       case LIB_CMD:
-        return STRING_CMD;
+        return STRING_CMD;  
       case VMINPOLY:
         return NUMBER_CMD;
       case VNOETHER:
@@ -823,7 +822,7 @@ void * sleftv::Data()
                          idhdl h = ggetid( "LIB" );
                          if(h==NULL) return (void *)sNoName;
                          return IDSTRING(h);
-                       }
+                       }  
       case IDHDL:
         return IDDATA((idhdl)data);
       case POINTER_CMD:
@@ -912,7 +911,7 @@ void * sleftv::Data()
       {
         if (!errorreported)
           Werror("wrong range[%d,%d] in intmat(%dx%d)",e->start,e->next->start,
-                                         MATROWS((matrix)d),MATCOLS((matrix)d));
+                                                     MATROWS((matrix)d),MATCOLS((matrix)d));
       }
       else
         r=(char *)MATELEM((matrix)d,e->start,e->next->start);
@@ -1015,7 +1014,7 @@ BOOLEAN assumeStdFlag(leftv h)
   if (!hasFlag(h,FLAG_STD))
   {
     if (!TEST_VERB_NSB)
-      Warn("%s is no standardbasis",h->Fullname());
+      Warn("%s is no standardbasis",h->Name());
     return FALSE;
   }
   return TRUE;
@@ -1027,7 +1026,7 @@ BOOLEAN assumeStdFlag(leftv h)
 * utility for grammar and iparith
 */
 extern BOOLEAN noringvars;
-void syMake(leftv v,char * id, idhdl packhdl)
+void syMake(leftv v,char * id)
 {
   /* resolv an identifier: (to DEF_CMD, if siq>0)
   * 1) reserved id: done by scanner
@@ -1050,14 +1049,6 @@ void syMake(leftv v,char * id, idhdl packhdl)
   }
 #endif
   memset(v,0,sizeof(sleftv));
-  v->packhdl = NULL;
-  if(packhdl != NULL)
-    v->req_packhdl = packhdl;
-#ifdef HAVE_NAMESPACES
-  else v->req_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
-#else /* HAVE_NAMESPACES */
-  else v->req_packhdl = NULL;
-#endif /* HAVE_NAMESPACES */
 #ifdef SIQ
   if (siq<=0)
 #endif
@@ -1082,21 +1073,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
           return; /* undefined */
         }
       }
-#ifdef HAVE_NAMESPACES
-      if (strcmp(id,"Current")==0)
-      {
-        h = namespaceroot->get(namespaceroot->name,0, TRUE);
-        if (id!=IDID(h)) FreeL((ADDRESS)id);
-        v->rtyp = IDHDL;
-        v->data = (char *)h;
-        v->flag = IDFLAG(h);
-        v->name = IDID(h);
-        v->attribute=IDATTR(h);
-        return;
-      }
-#endif /* HAVE_NAMESPACES */
-      h=ggetid(id, packhdl==NULL ? FALSE : TRUE, &(v->packhdl));
-      //if(h==NULL) Print("syMake: h is null\n");
+      h=ggetid(id);
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
@@ -1106,7 +1083,6 @@ void syMake(leftv v,char * id, idhdl packhdl)
         v->flag = IDFLAG(h);
         v->name = IDID(h);
         v->attribute=IDATTR(h);
-        //if(v->req_packhdl v->packhdl)
         return;
       }
     }
@@ -1170,10 +1146,8 @@ void syMake(leftv v,char * id, idhdl packhdl)
     /* 7. non-local ring: number/poly */
     {
       BOOLEAN ok=FALSE;
-      poly p = ((currRingHdl!=NULL)&&(!noringvars)
-                /* ring required */  /* not in decl */
-                &&(IDLEV(currRingHdl)!=myynest))
-                /* already in case 4/6 */
+      poly p = ((currRingHdl!=NULL)&&(!noringvars)&&(IDLEV(currRingHdl)!=myynest))
+               /* ring required */  /* not in decl */    /* already in case 4/6 */
                      ? pmInit(id,ok) : (poly)NULL;
       if (ok)
       {
@@ -1372,19 +1346,5 @@ int sleftv::Eval()
   if (nn!=NULL) nok=nok||nn->Eval();
   next=nn;
   return nok;
-}
-
-char *iiSleftv2name(leftv v)
-{
-  char *name;
-  if(v->packhdl != NULL) {
-    name = (char *)AllocL(strlen(v->name) + strlen(IDID(v->packhdl)) + 3);
-    sprintf(name, "%s::%s", IDID(v->packhdl), v->name);
-    return(name);
-  }
-  else
-  {
-    return(v->name);
-  }
 }
 
