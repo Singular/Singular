@@ -74,6 +74,8 @@
 #undef HAVE_GETWD
 /* Define if you have sbrk */
 #undef HAVE_SBRK
+/* Define if you have readlink */
+#undef HAVE_READLINK
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */
