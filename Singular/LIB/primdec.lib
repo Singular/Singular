@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.21 1998-05-29 15:02:00 Singular Exp $
+// $Id: primdec.lib,v 1.22 1998-06-29 09:08:34 obachman Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.21 1998-05-29 15:02:00 Singular Exp $";
+version="$Id: primdec.lib,v 1.22 1998-06-29 09:08:34 obachman Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -2507,21 +2507,6 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-proc intersect1(ideal i,ideal j)
-{
-   def R=basering;
-   execute "ring gnir = ("+charstr(basering)+"),
-                        ("+varstr(basering)+",@t),(C,dp);";
-   ideal i=var(nvars(basering))*imap(R,i)+(var(nvars(basering))-1)*imap(R,j);
-   ideal j=eliminate(i,var(nvars(basering)));
-   setring R;
-   map phi=gnir,maxideal(1);
-   return(phi(j));
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 proc radicalKL (list m,ideal ser,list #)
 {
    ideal i=m[2];
@@ -2925,21 +2910,6 @@ proc AnnExt_R(int n,list re)
   }
   return(ann);
 }
-///////////////////////////////////////////////////////////////////////////////
-
-proc quotient1(module a,module b)
-{
-   int i;
-   a=std(a);     //<== neue Zeile
-   ideal re=quotient(a,module(b[1]));
-   for(i=2;i<=size(b);i++)
-   {
-      re=intersect1(re,quotient(a,module(b[i])));
-   }
-   return(re);
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 
 proc analyze(list pr)
@@ -4013,24 +3983,6 @@ proc special_ideals_equal( ideal k1, ideal k2)
 }
 
 
-proc quotient2(module a,module b)
-{
-  string s="ring @newr=("+charstr(basering)+"),(@t,"+varstr(basering)+"),dp;";
-  def @newP=basering;
-  execute s;
-  module b=imap(@newP,b);
-  module a=imap(@newP,a);
- int i;
- vector @b=b[1];
- for(i=2;i<=size(b);i++)
- {
-    @b=@t^(i-1)*b[i];
- }
- ideal re=quotient(a,module(@b));
-  setring @newP;
- ideal re=imap(@newr,re);
- return(re);
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc convList(list l)
