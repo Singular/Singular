@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.33 1998-04-27 14:47:03 Singular Exp $ */
+/* $Id: febase.cc,v 1.34 1998-04-28 09:00:46 pohl Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -47,13 +47,14 @@ int     pagelength = -1;
 #endif
 int     colmax = 80;
 char    prompt_char = '>'; /*1 either '>' or '.'*/
+extern "C" {
 BITSET  verbose = 1
                   | Sy_bit(V_REDEFINE)
                   | Sy_bit(V_LOAD_LIB)
                   | Sy_bit(V_SHOW_USE)
                   | Sy_bit(V_PROMPT)
-//                  | Sy_bit(V_DEBUG_MEM)
-                  ;
+/*                  | Sy_bit(V_DEBUG_MEM) */
+;}
 BOOLEAN errorreported = FALSE;
 BOOLEAN feBatch;
 char *  feErrors=NULL;
@@ -212,7 +213,7 @@ char* feGetSearchPath(const char* argv0)
 FILE * feFopen(char *path, char *mode, char *where,int useWerror)
 {
   FILE * f=myfopen(path,mode);
-#ifdef macintosh
+#ifdef __MWERKS__
   if (f!=NULL)
   {
     if (where!=NULL) strcpy(where,path);
@@ -710,3 +711,6 @@ size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream)
   }
   return got;
 }
+
+
+      
