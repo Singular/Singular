@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.287 2003-02-24 16:29:32 Singular Exp $ */
+/* $Id: iparith.cc,v 1.288 2003-02-26 15:40:25 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2349,8 +2349,8 @@ struct sValCmd2 dArith2[]=
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD ALLOW_PLURAL}
-,{jjCOEFFS2_KB,COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL}
-,{jjCOEFFS2_KB,COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL}
+,{jjCOEFFS2_KB,COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
+,{jjCOEFFS2_KB,COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  MODUL_CMD ALLOW_PLURAL}
 ,{jjCONTRACT,  CONTRACT_CMD,   MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjDEG_IV,    DEG_CMD,        INT_CMD,        POLY_CMD,   INTVEC_CMD ALLOW_PLURAL}
 ,{jjDEG_IV,    DEG_CMD,        INT_CMD,        VECTOR_CMD, INTVEC_CMD ALLOW_PLURAL}

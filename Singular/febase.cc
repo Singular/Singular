@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.96 2002-11-26 13:34:21 Singular Exp $ */
+/* $Id: febase.cc,v 1.97 2003-02-26 15:40:24 levandov Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -724,7 +724,7 @@ Voice * feInitStdin(Voice *pp)
   if ((pp!=NULL) && (pp->files==stdin))
   {
     p->files=freopen("/dev/tty","r",stdin);
-    stdin=p->files;
+    //stdin=p->files;
     p->sw = BI_stdin;
   }
   p->filename   = omStrDup("STDIN");
