@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.1 2003-05-30 09:49:36 mschulze Exp $";
+version="$Id: gmssing.lib,v 1.2 2003-08-22 15:07:29 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -47,9 +47,9 @@ LIB "linalg.lib";
 
 static proc stdtrans(ideal I)
 {
-  def R=basering;
+  def @R=basering;
 
-  string os=ordstr(R);
+  string os=ordstr(@R);
   int j=find(os,",C");
   if(j==0)
   {
@@ -68,14 +68,14 @@ static proc stdtrans(ideal I)
     os[j..j+1]="  ";
   }
 
-  execute("ring S="+charstr(R)+",(gmspoly,"+varstr(R)+"),(c,dp,"+os+");");
+  execute("ring @S="+charstr(@R)+",(gmspoly,"+varstr(@R)+"),(c,dp,"+os+");");
 
-  ideal I=homog(imap(R,I),gmspoly);
+  ideal I=homog(imap(@R,I),gmspoly);
   module M=transpose(transpose(I)+freemodule(ncols(I)));
   M=std(M);
 
-  setring(R);
-  execute("map h=S,1,"+varstr(R)+";");
+  setring(@R);
+  execute("map h=@S,1,"+varstr(@R)+";");
   module M=h(M);
 
   for(int i=ncols(M);i>=1;i--)
@@ -125,12 +125,12 @@ KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmsring; shows examples
 "
 {
-  def R=basering;
-  if(charstr(R)!="0")
+  def @R=basering;
+  if(charstr(@R)!="0")
   {
     ERROR("characteristic 0 expected");
   }
-  for(int i=nvars(R);i>=1;i--)
+  for(int i=nvars(@R);i>=1;i--)
   {
     if(var(i)>1)
     {
@@ -156,7 +156,7 @@ EXAMPLE:  example gmsring; shows examples
   ideal m=kbase(g);
 
   int gmsmaxdeg;
-  for(i=nvars(R);i>=1;i--)
+  for(i=nvars(@R);i>=1;i--)
   {
     if(deg(var(i))>gmsmaxdeg)
     {
@@ -164,7 +164,7 @@ EXAMPLE:  example gmsring; shows examples
     }
   }
 
-  string os=ordstr(R);
+  string os=ordstr(@R);
   int j=find(os,",C");
   if(j==0)
   {
@@ -183,14 +183,14 @@ EXAMPLE:  example gmsring; shows examples
     os[j..j+1]="  ";
   }
 
-  execute("ring G="+string(charstr(R))+",("+s+","+varstr(R)+"),(ws("+
+  execute("ring G="+string(charstr(@R))+",("+s+","+varstr(@R)+"),(ws("+
     string(deg(highcorner(g))+2*gmsmaxdeg)+"),"+os+",c);");
 
-  poly gmspoly=imap(R,t);
-  ideal gmsjacob=imap(R,dt);
-  ideal gmsstd=imap(R,g);
-  matrix gmsmatrix=imap(R,B);
-  ideal gmsbasis=imap(R,m);
+  poly gmspoly=imap(@R,t);
+  ideal gmsjacob=imap(@R,dt);
+  ideal gmsstd=imap(@R,g);
+  matrix gmsmatrix=imap(@R,B);
+  ideal gmsbasis=imap(@R,m);
 
   attrib(gmsstd,"isSB",1);
   export gmspoly,gmsjacob,gmsstd,gmsmatrix,gmsbasis,gmsmaxdeg;
@@ -199,7 +199,7 @@ EXAMPLE:  example gmsring; shows examples
 }
 example
 { "EXAMPLE:"; echo=2;
-  ring R=0,(x,y),ds;
+  ring @R=0,(x,y),ds;
   poly t=x5+x2y2+y5;
   def G=gmsring(t,"s");
   setring(G);
@@ -314,7 +314,7 @@ EXAMPLE:  example gmscoeffs; shows examples
     v=v*var(i);
   }
   matrix C=coeffs(r,gmsbasis,v);
-  return(C,q);
+  return(list(C,q));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -588,8 +588,8 @@ KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
 EXAMPLE:  example bernstein; shows examples
 "
 {
-  def R=basering;
-  int n=nvars(R)-1;
+  def @R=basering;
+  int n=nvars(@R)-1;
   def @G=gmsring(t,"s");
   setring(@G);
 
@@ -612,7 +612,7 @@ EXAMPLE:  example bernstein; shows examples
     }
   }
 
-  setring(R);
+  setring(@R);
   ideal e=imap(@G,e);
   kill @G,gmsmaxdeg;
 
@@ -645,8 +645,8 @@ KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice; monodromy
 EXAMPLE:  example monodromy; shows examples
 "
 {
-  def R=basering;
-  int n=nvars(R)-1;
+  def @R=basering;
+  int n=nvars(@R)-1;
   def @G=gmsring(t,"s");
   setring(@G);
 
@@ -660,7 +660,7 @@ EXAMPLE:  example monodromy; shows examples
   A,A0,r,H,H0,e,m,K0=transform(A,A0,r,H,H0,e,m,K0,0,0);
 
   list l=jordan(A,e,m);
-  setring(R);
+  setring(@R);
   list l=imap(@G,l);
   kill @G,gmsmaxdeg;
 
@@ -793,8 +793,8 @@ KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
 EXAMPLE:  example vwfilt; shows examples
 "
 {
-  def R=basering;
-  int n=nvars(R)-1;
+  def @R=basering;
+  int n=nvars(@R)-1;
   def @G=gmsring(t,"s");
   setring(@G);
 
@@ -846,11 +846,11 @@ EXAMPLE:  example vwfilt; shows examples
     w[i]=v[j]+n;
   }
   H=H*H0;
-  H=simplify(jet(H/var(1)^(mindegree(H)/deg(s)),0),1);
+  H=simplify(jet(H/var(1)^(mindegree(H)/deg(var(1))),0),1);
 
   kill l;
   list l=sppnf(list(a,w,H))+list(gmsbasis,gmsstd);
-  setring(R);
+  setring(@R);
   list l=imap(@G,l);
   kill @G,gmsmaxdeg;
   attrib(l[5],"isSB",1);
@@ -865,7 +865,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc fsplit(ideal e0,intvec m0,matrix A,module H0)
+static proc fsplit(ideal e0,intvec m0,matrix A,module H,module H0)
 {
   int mu=ncols(gmsbasis);
 
@@ -949,14 +949,15 @@ static proc fsplit(ideal e0,intvec m0,matrix A,module H0)
   }
 
   dbprint(printlevel-voice+2,"// transform to Hodge splitting basis");
+  H=H*U;
   H0=lift(U,H0);
   A=lift(U,A*U);
 
-  return(e,A,H0);
+  return(e,A,H,H0);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc glift(ideal e,matrix A,module H0,int K)
+static proc glift(ideal e,matrix A,module H,module H0,int K)
 {
   poly s=var(1);
   int mu=ncols(gmsbasis);
@@ -1019,7 +1020,10 @@ static proc glift(ideal e,matrix A,module H0,int K)
     }
   }
 
-  return(A0);
+  H0=H*H0;
+  H0=H0/var(1)^(mindegree(H0)/deg(var(1)));
+
+  return(A0,H0);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1029,8 +1033,10 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:
 @format
-list l=A0,A1;
-  matrix A0,A1;  t=A0+s*A1+s^2*(d/ds) w.r.t. some C{{s}}-basis of H''
+list l=A0,A1,T,M;
+  matrix A0,A1;  t=A0+s*A1+s^2*(d/ds) on H'' w.r.t. C[[s]]-basis M*T
+  module T;  C-basis of C^mu
+  ideal M;  monomial C-basis of H''/sH''
 @end format
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration;
@@ -1038,8 +1044,8 @@ KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
 EXAMPLE:  example tmatrix; shows examples
 "
 {
-  def R=basering;
-  int n=nvars(R)-1;
+  def @R=basering;
+  int n=nvars(@R)-1;
   def @G=gmsring(t,"s");
   setring(@G);
 
@@ -1052,25 +1058,27 @@ EXAMPLE:  example tmatrix; shows examples
   def A0,r,H,H0,K0=saturate();
   e,m,A0,r=eigenval(A0,r,H,K0);
   A,A0,r,H,H0,e,m,K0=transform(A,A0,r,H,H0,e,m,K0,K0+int(e[ncols(e)]-e[1]),1);
-  A=glift(fsplit(e,m,A,H0),K0);
+  A,H0=glift(fsplit(e,m,A,H,H0),K0);
 
   A0=jet(A,0);
   A=jet(A/var(1),0);
 
-  setring(R);
-  matrix A0=imap(@G,A0);
-  matrix A=imap(@G,A);
+  list l=A0,A,H0,gmsbasis;
+  setring(@R);
+  list l=imap(@G,l);
   kill @G,gmsmaxdeg;
 
-  return(list(A0,A));
+  return(l);
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly t=x5+x2y2+y5;
-  list A=tmatrix(t);
-  print(A[1]);
-  print(A[2]);
+  list l=tmatrix(t);
+  print(l[1]);
+  print(l[2]);
+  print(l[3]);
+  print(l[4]);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
