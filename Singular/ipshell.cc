@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.92 2004-10-05 13:00:50 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.93 2004-11-08 16:00:51 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -706,7 +706,11 @@ leftv iiMap(map theMap, char * what)
       tmpW.rtyp=IDTYP(w);
       tmpW.data=IDDATA(w);
       #ifdef FAST_MAP
-      if ((tmpW.rtyp==IDEAL_CMD) && (nMap==nCopy))
+      if ((tmpW.rtyp==IDEAL_CMD) && (nMap==nCopy)
+      #ifdef HAVE_PLURAL
+      && (!rIsPluralRing(currRing))
+      #endif
+      )
       {
         v->rtyp=IDEAL_CMD;
         v->data=fast_map(IDIDEAL(w), IDRING(r), (ideal)theMap, currRing);
