@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.20 1998-05-04 15:01:50 Singular Exp $
+@comment $Id: reference.doc,v 1.21 1998-05-04 17:33:18 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7,7 +7,7 @@
 @c @setfilename reference.info
 @c @node Top, Functions and variables
 @c @menu
-@c * Functions and variables::     
+@c * Functions and variables:: 
 @c @end menu
 @c @node Functions and variables, Tricks and pitfalls, Data types, Top
 @c @chapter Functions and variables
@@ -15,9 +15,9 @@
 
 @c ---------------------------------------
 @menu
-* Functions::                   
-* Control structures::          
-* System variables::            
+* Functions:: 
+* Control structures::
+* System variables::  
 @end menu
 
 
@@ -30,123 +30,124 @@
 @*List of all supported functions.
 @end ifinfo
 @menu
-* attrib::                      
-* bareiss::                     
-* betti::                       
-* char::                        
-* char_series::                 
-* charstr::                     
-* cleardenom::                  
-* close::                       
-* coef::                        
-* coeffs::                      
-* contract::                    
-* dbprint::                     
-* defined::                     
-* deg::                         
-* degree::                      
-* delete::                      
-* det::                         
-* diff::                        
-* dim::                         
-* dump::                        
-* eliminate::                   
-* eval::                        
-* execute::                     
-* extgcd::                      
-* facstd::                      
-* factorize::                   
-* fetch::                       
-* fglm::                        
-* filecmd::                     
-* find::                        
-* finduni::                     
-* freemodule::                  
-* gcd::                         
-* gen::                         
-* getdump::                     
-* help::                        
-* hilb::                        
-* homog::                       
-* imap::                        
-* indepSet::                    
-* insert::                      
-* interred::                    
-* intersect::                   
-* jacob::                       
-* jet::                         
-* kbase::                       
-* kill::                        
-* killattrib::                  
-* koszul::                      
-* lead::                        
-* leadcoef::                    
-* leadexp::                     
-* LIB::                         
-* lift::                        
-* liftstd::                     
-* listvar::                     
-* maxideal::                    
-* memory::                      
-* minbase::                     
-* minor::                       
-* minres::                      
-* modulo::                      
-* monitor::                     
-* mres::                        
-* mstd::                        
-* mult::                        
-* nameof::                      
-* names::                       
-* ncols::                       
-* npars::                       
-* nrows::                       
-* nvars::                       
-* open::                        
-* option::                      
-* ord::                         
-* ordstr::                      
-* par::                         
-* pardeg::                      
-* parstr::                      
-* pause::                       
-* preimage::                    
-* prime::                       
-* print::                       
-* prune::                       
-* qhweight::                    
-* quote::                       
-* quotient::                    
-* random::                      
-* read::                        
-* reduce::                      
-* regularity::                  
-* res::                         
-* reservedName::                
-* resultant::                   
-* rvar::                        
-* setring::                     
-* simplify::                    
-* size::                        
-* sortvec::                     
-* sres::                        
-* status::                      
-* std::                         
-* stdfglm::                     
-* stdhilbert::                  
-* subst::                       
-* system::                      
-* syz::                         
-* trace::                       
-* transpose::                   
-* type::                        
-* typeof::                      
-* var::                         
-* varstr::                      
-* vdim::                        
-* wedge::                       
-* weight::                      
-* write::                       
+* attrib::
+* bareiss::   
+* betti:: 
+* char::  
+* char_series::   
+* charstr::   
+* cleardenom::
+* close:: 
+* coef::  
+* coeffs::
+* contract::  
+* dbprint::   
+* defined::   
+* deg::   
+* degree::
+* delete::
+* det::   
+* diff::  
+* dim::   
+* dump::  
+* eliminate:: 
+* eval::  
+* execute::   
+* extgcd::
+* facstd::
+* factorize:: 
+* fetch:: 
+* fglm::  
+* filecmd::   
+* find::  
+* finduni::   
+* freemodule::
+* gcd::   
+* gen::   
+* getdump::   
+* help::  
+* hilb::  
+* homog:: 
+* imap::  
+* indepSet::  
+* insert::
+* interred::  
+* intersect:: 
+* jacob:: 
+* jet::   
+* kbase:: 
+* kill::  
+* killattrib::
+* koszul::
+* lead::  
+* leadcoef::  
+* leadexp::   
+* LIB::   
+* lift::  
+* liftstd::   
+* listvar::   
+* lres::
+* maxideal::  
+* memory::
+* minbase::   
+* minor:: 
+* minres::
+* modulo::
+* monitor::   
+* mres::  
+* mstd::  
+* mult::  
+* nameof::
+* names:: 
+* ncols:: 
+* npars:: 
+* nrows:: 
+* nvars:: 
+* open::  
+* option::
+* ord::   
+* ordstr::
+* par::   
+* pardeg::
+* parstr::
+* pause:: 
+* preimage::  
+* prime:: 
+* print:: 
+* prune:: 
+* qhweight::  
+* quote:: 
+* quotient::  
+* random::
+* read::  
+* reduce::
+* regularity::
+* res::   
+* reservedName::  
+* resultant:: 
+* rvar::  
+* setring::   
+* simplify::  
+* size::  
+* sortvec::   
+* sres::  
+* status::
+* std::   
+* stdfglm::   
+* stdhilbert::
+* subst:: 
+* system::
+* syz::   
+* trace:: 
+* transpose:: 
+* type::  
+* typeof::
+* var::   
+* varstr::
+* vdim::  
+* wedge:: 
+* weight::
+* write:: 
 @end menu
 @c ---------------------------------------
 @node attrib, bareiss, Functions, Functions
@@ -321,12 +322,12 @@ of the graded Betti numbers.)
   ideal j=bc-ad,b3-a2c,c3-bd2,ac2-b2d;
   list T=mres(j,0); // 0 forces a full resolution
   // a minimal set of generators for j:
-  print(T[1]); 
-  // second syzygy module of r/j which is the first 
+  print(T[1]);
+  // second syzygy module of r/j which is the first
   // syzygy module of j (minimal generating set):
-  print(T[2]); 
+  print(T[2]);
   // the second syzygy module (minimal generating set):
-  print(T[3]); 
+  print(T[3]);
   print(T[4]);
   betti(T);
   // most useful for reading off the graded Betti numbers:
@@ -721,7 +722,7 @@ See @ref{diff}; @ref{ideal expressions}.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-applies the print command to each expression in the expression_list, if 
+applies the print command to each expression in the expression_list, if
 int_expression is positive.
 @code{dbprint} may also be used in procedures
 in order to print results subject to certain
@@ -959,7 +960,7 @@ ideal, producing a m x n matrix.
   // corresponds to differential operators
   // d2/dx2, d2/dx2+d2/dxdy, d3/dx/dy/dz:
   ideal i=x2,x2+yz,xyz;
-  ideal j=x2-yz,xyz;;  
+  ideal j=x2-yz,xyz;;
   print(diff(i,j));
 @c example
 @end example
@@ -1034,7 +1035,7 @@ none
 @item @strong{Purpose:}
 dumps (i.e. writes in one "message" or "block") the state of the @sc{Singular}
 session (i.e., all defined variables and their values) to the specified
-link (which must be either an ASCII or MP link). 
+link (which must be either an ASCII or MP link).
 @item @strong{Example:}
 @example
 @c example
@@ -1360,7 +1361,7 @@ See @ref{ring}; @ref{qring};
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-calculates for the given ideal ideal_name in the given ring ring_name 
+calculates for the given ideal ideal_name in the given ring ring_name
 a Groebner basis in the current ring.
 @*The ideal must be zero dimensional and given as a reduced Groebner
 basis in the given ring.
@@ -1586,7 +1587,7 @@ reads the contents of the entire file/link and restores all variables
 from it. For ASCII links, @code{getdump} is equivalent to a
 @code{execute read (} link @code{);} command. For MP links,
 @code{getdump} should only be used on data which was previously
-@code{dump}'ed. 
+@code{dump}'ed.
 @item @strong{Example:}
 @example
 @c example
@@ -1597,7 +1598,7 @@ from it. For ASCII links, @code{getdump} is equivalent to a
   i;
 @c example
 @end example
-@item @strong{Restrictions:} 
+@item @strong{Restrictions:}
 @code{getdump} is not supported for DBM links, or for a link connecting
 to @code{stdin} (standard input).
 @end table
@@ -1925,7 +1926,7 @@ L(gi) | L(gj)
 @tex
 $L(g_i) | L(g_j)$
 @end tex
-then 
+then
 @ifinfo
 ecart(gi) > ecart(gj)
 @end ifinfo
@@ -2349,7 +2350,7 @@ searched for the file: the current directory,
 the directories given in the environment variable
 @code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS},
 @code{usr/local/share/Singular}.
-Only the names of the procedures in the library are loaded, the body of 
+Only the names of the procedures in the library are loaded, the body of
 the proc
 is read during the first call of this proc. This minimizes
 the memory consumption by unused procedures.
@@ -2451,7 +2452,7 @@ and @code{sm=ideal(matrix(m)*T)} respectivly @code{sm=module(matrix(m)*T)}.
 See @ref{ideal}; @ref{ring}; @ref{option}; @ref{std}; @ref{matrix}.
 @end iftex
 @c ---------------------------------------
-@node listvar, maxideal, liftstd, Functions
+@node listvar, lres, liftstd, Functions
 @subsection listvar
 @cindex listvar
 @table @code
@@ -2517,7 +2518,78 @@ lists all (user-)defined names:
 @end example
 @end table
 @c ---------------------------------------
-@node maxideal, memory, listvar, Functions
+@node lres, maxideal, listvar, Functions
+@subsection lres
+@cindex lres
+@table @code
+@item @strong{Syntax:}
+@code{lres (} ideal_expression@code{,} int_expression @code{)}
+@*@code{lres (} module_expression@code{,} int_expression @code{)}
+@item @strong{Type:}
+resolution
+@item @strong{Purpose:}
+computes a free resolution of an ideal or module with LaScala's
+method.
+More precisely, let M be given by a a generating set and
+@tex
+$A_1=matrix(M)$.
+@end tex
+@ifinfo
+A1=matrix(M).
+@end ifinfo
+Then @code{lres}
+computes a minimal free resolution of
+@ifinfo
+M1=coker(A1)
+@*...--> F2 --A2-> F1 --A1-> F0-->M1-->0,
+@end ifinfo
+@tex
+$M_1=coker(A_1)$
+$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M_1\longrightarrow 0,$$
+@end tex
+The computation will stop after k steps, if the int expression k
+is not zero, and returns a list of modules
+@tex
+$M_i={\tt module}(A_i)$, i=1..k.
+@end tex
+@ifinfo
+Mi=module(Ai), i=1..k.
+@end ifinfo
+@*If k=0, @code{sres(M,0)}
+returns a list of n modules where n is the number of variables of the basering.
+
+Let @code{list l=lres(M,0);} then L[1] generates M,
+L[2] generates
+the first szyzgy
+module of L[1], etc.
+( L[i]
+@ifinfo
+=M_i
+@end ifinfo
+@tex
+$=M_i$
+@end tex
+ in the notations from above).
+@item @strong{Example:}
+@example
+@end example
+@end table
+@menu
+* ideal expressions::
+* module expressions::
+* int expressions::
+* mres::
+* res::
+* sres::
+* minres::
+* betti::
+@end menu
+@iftex
+See @ref{ideal expressions}; @ref{module expressions}; @ref{int expressions};
+@ref{mres}; @ref{res}; @ref{sres}; @ref{minres}; @ref{betti}.
+@end iftex
+@c ---------------------------------------
+@node maxideal, memory, lres, Functions
 @subsection maxideal
 @cindex maxideal
 @table @code
@@ -3149,7 +3221,7 @@ none
 restores the state of all options from an intvec (produced by @code{option(get)}).
 @sp 1
 @item @strong{Values:}
-The following options are used to manipulate the behaviour of 
+The following options are used to manipulate the behaviour of
 computations:
 @table @asis
 @item @code{none}
@@ -3177,7 +3249,7 @@ disables the sugar strategy
 shows protocol information indicating the
 progress during standard basis computation
 @item @code{redSB}
-computes a reduced standard basis in any standard basis computation 
+computes a reduced standard basis in any standard basis computation
 @item @code{redTail}
 reduction of the tails of polynomials during standard basis computations
 @item @code{sugarCrit}
@@ -3729,9 +3801,9 @@ reads data from a link.
 @*For ASCII links, the content of the entire
 file is returned as one string.
 @*For MP links, one expression is read
-from the link, and returned after an evaluation. 
+from the link, and returned after an evaluation.
 As long as there is no data to read from an MPtcp
-link the @code{read} command blocks (i.e. does not return). 
+link the @code{read} command blocks (i.e. does not return).
 The @code{status} command can be used to check whether or not
 there is data to read.
 @*For DBM links, a
@@ -4943,22 +5015,22 @@ See @ref{ideal expressions}; @ref{intvec expressions}; @ref{qhweight}.
 @item @strong{Syntax:}
 @code{write (} link@code{,} expression_list @code{);}
 @*for DBM links:
-@*@code{write( } link@code{,} string_expression@code{,} string_expression @code{);} 
-@*@code{write( } link@code{,} string_expression @code{);} 
+@*@code{write( } link@code{,} string_expression@code{,} string_expression @code{);}
+@*@code{write( } link@code{,} string_expression @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-writes data to a link. 
+writes data to a link.
 @*If the link is of type @code{ASCII}, all expressions are converted to
 strings  (and separated by a newline character) before they are
 written. As a consequence, only such values which can be converted to a
-string can be written to an  @code{ASCII} link. 
+string can be written to an  @code{ASCII} link.
 @*For MP links,
 ring-dependent expressions are written together with a ring
 description. To prevent an evaluation of the expression before it is
 written, the @code{quote} command (possibly together with @code{eval})
 can be used. A @code{write} blocks (i.e. does not return), as long as a
-MPtcp link is not ready for writing. 
+MPtcp link is not ready for writing.
 @*For DBM links, @code{write} with three arguments inserts the first
 string as key and the second string as value into the dbm data
 base. Called with two arguments it deletes the entry with the key
@@ -5006,16 +5078,16 @@ See @ref{read}, @ref{link}, @ref{Expressions}; @ref{expression list};
 @*List of all supported control structures.
 @end ifinfo
 @menu
-* break::                       
-* continue::                    
-* else::                        
-* export::                      
-* for::                         
-* if::                          
-* keepring::                    
-* quit::                        
-* return::                      
-* while::                       
+* break:: 
+* continue::  
+* else::  
+* export::
+* for::   
+* if::
+* keepring::  
+* quit::  
+* return::
+* while:: 
 @end menu
 @c ---------------------------------------
 @node break, continue, Control structures, Control structures
@@ -5148,11 +5220,11 @@ converts a local variable to a global one.
 @code{for (} init@code{;} boolean_expression@code{;} iterate@code{)} block
 @*
 @*init is a command, which is executed first.
-@*boolean_expression is evaluated. 
+@*boolean_expression is evaluated.
 @*iterate is a command, which is executed at the end of the block.
 @item @strong{Purpose:}
 repetitive, conditional execution of a command block.
-@*The command init is executed first. Then boolean_expression is 
+@*The command init is executed first. Then boolean_expression is
 evaluated. If its value is TRUE the block is executed, otherwise the for
 statement is complete. After each execution of the block, the command
 iterate is executed and boolean_expression is evaluated.
@@ -5225,7 +5297,7 @@ See @ref{block}; @ref{boolean expressions}.
 @code{keepring} name@code{;}
 @item @strong{Purpose:}
 moves the specified ring to the next (upper) level. @code{keepring} can only
-be used inside of procedures. There it provides the possibility to keep 
+be used inside of procedures. There it provides the possibility to keep
 a ring which is local to the procedure (and its objects) accessible after
 the procedure ended without making the ring global.
 @item @strong{Example:}
@@ -5339,16 +5411,16 @@ See @ref{block}; @ref{boolean expressions}; @ref{break}.
 @*List of all system variables.
 @end ifinfo
 @menu
-* degBound::                    
-* echo::                        
-* minpoly::                     
-* multBound::                   
-* noether::                     
-* printlevel::                  
-* short::                       
-* timer::                       
-* TRACE var::                   
-* voice::                       
+* degBound::  
+* echo::  
+* minpoly::   
+* multBound:: 
+* noether::   
+* printlevel::
+* short:: 
+* timer:: 
+* TRACE var:: 
+* voice:: 
 @end menu
 @c ---------------------------------------
 @c @node alternating, degBound, System variables, System variables
@@ -5459,7 +5531,7 @@ Setting the @code{minpoly} should be the first command after
 defining the ring.
 @item @strong{Note:}
 The minimal polynomial has to be specified in the syntax of a polynomial.
-Its variable is not one of the ring variables, but the algebraic element 
+Its variable is not one of the ring variables, but the algebraic element
 which is being adjoined to the field.
 @*@strong{Warning:} @sc{Singular} does not check whether the given
 polynomial is irreducible!
