@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_functions.h,v 1.4 1998-03-11 10:47:02 schmidt Exp $ */
+/* $Id: ftmpl_functions.h,v 1.5 1998-06-29 15:44:45 schmidt Exp $ */
 
 #ifndef INCL_FUNCTIONS_H
 #define INCL_FUNCTIONS_H
@@ -8,18 +8,21 @@
 //
 // ftmpl_functions.h - some useful template functions.
 //
+// Header file corresponds to: nothing
+//
+// Hierarchy: bottom, templates
+//
+// Developer note:
+// ---------------
 // Sooner or later you need them: functions to calculate the
 // minimum or maximum of two values or the absolute value.  Here
 // they are.  All of them are inlined, hence there is no source
 // file corresponding to `ftmpl_functions.h'.
 //
-// The functions are for internal use only (i.e. to build the
+// The functions are for internal use only (i.e., to build the
 // library), hence they should not be included from `factory.h'.
 // However, we have to install `ftmpl_functions.h' with the other
 // templates since the functions have to be instantiated.
-//
-// Used by: cf_gcd.cc, cf_map.cc, fac_ezgcd.cc, sm_sparsemod.cc,
-//   ftmpl_inst.cc
 //
 //}}}
 
@@ -30,6 +33,8 @@
 //
 // tmax() - return the maximum of `a' and `b'.
 //
+// Developers note:
+// ----------------
 // `T' should have an `operator >()'.
 //
 //}}}
@@ -45,6 +50,8 @@ inline T tmax ( const T & a, const T & b )
 //
 // tmin() - return the minimum of `a' and `b'.
 //
+// Developers note:
+// ----------------
 // `T' should have an `operator <()'.
 //
 //}}}
@@ -60,6 +67,10 @@ inline T tmin ( const T & a, const T & b )
 //
 // tabs() - return the absolute value of `a'.
 //
+// `a' is negated iff it is less or equal `T( 0 )'.
+//
+// Developers note:
+// ----------------
 // `T' should have an `operator >()', an `operator -()', and a
 // `T::T( int )' constructor.
 //
