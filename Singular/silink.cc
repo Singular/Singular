@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.28 1999-07-06 13:35:33 Singular Exp $ */
+/* $Id: silink.cc,v 1.29 1999-07-06 14:18:45 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -417,7 +417,7 @@ leftv slReadAscii2(si_link l, leftv pr)
       if (pr->Typ()==STRING_CMD)
       {
         buf=(char *)AllocL(80);
-        fe_fgets_stdin(pr->Data(),buf,80);
+        fe_fgets_stdin((char *)pr->Data(),buf,80);
       }
       else
       {
