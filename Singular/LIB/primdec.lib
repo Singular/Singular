@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.19 1998-05-15 16:25:48 obachman Exp $
+// $Id: primdec.lib,v 1.20 1998-05-20 13:03:56 schmidt Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,26 +10,24 @@
 // written by Wolfram Decker and Hans Schoenemann                             // 
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.19 1998-05-15 16:25:48 obachman Exp $";
+version="$Id: primdec.lib,v 1.20 1998-05-20 13:03:56 schmidt Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
-  minAssGTZ(I);     computes the minimal associated primes via Gianni,Trager,Zacharias
-
-  minAssChar(I);    computes the minimal associated primes using characteristic sets
-
-  primdecGTZ(I);    computes a complete primary decomposition via Gianni,Trager,Zacharias
-
-  primdecSY(I);     computes a complete primary decomposition via Shimoyama-Yokoyama
-
-  testPrimary(L,k); tests whether the result of the primary decomposition is correct
-
+  minAssGTZ(I);     computes the minimal associated primes
+                      via Gianni,Trager,Zacharias
+  minAssChar(I);    computes the minimal associated primes
+                      using characteristic sets
+  primdecGTZ(I);    computes a complete primary decomposition
+                      via Gianni,Trager,Zacharias
+  primdecSY(I);     computes a complete primary decomposition
+                      via Shimoyama-Yokoyama
+  testPrimary(L,k); tests whether the result of the primary
+                      decomposition is correct
   radical(I);       computes the radical of the ideal I
-
-  equiRadical(I);   computes the radical of the equidimensional part of the ideal I
-
+  equiRadical(I);   computes the radical of the equidimensional part
+                      of the ideal I
   prepareAss(I);    computes the radicals of the equidimensional parts of I
-
 ";
 
 LIB "general.lib";
