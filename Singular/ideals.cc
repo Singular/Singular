@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.61 1999-10-15 16:00:18 Singular Exp $ */
+/* $Id: ideals.cc,v 1.62 1999-10-18 17:56:20 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1421,12 +1421,15 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
         if (syz_ring==orig_ring)
         {
           p=s_h3->m[j];
-          s_h3->m[j]=NULL;
         }
         else
         {
           p = pPermPoly(s_h3->m[j],NULL,syz_ring,NULL,0);
+          rChangeCurrRing(syz_ring,FALSE);
+          pDelete(&(s_h3->m[j]));
+          rChangeCurrRing(orig_ring,TRUE);
         }
+        s_h3->m[j]=NULL;
         pShift(&p,-k);
         if (p!=NULL)
         {
