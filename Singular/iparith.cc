@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.331 2004-10-22 17:43:36 Singular Exp $ */
+/* $Id: iparith.cc,v 1.332 2004-11-04 19:57:12 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3604,7 +3604,7 @@ static BOOLEAN jjTRANSP_IV(leftv res, leftv v)
 static BOOLEAN jjOPPOSITE(leftv res, leftv a)
 {
   ring    r = (ring)a->Data();
-  if (rIsPluralRing(currRing))
+  if (rIsPluralRing(r))
   {  
     res->data = rOpposite(r);
   }
@@ -3615,7 +3615,7 @@ static BOOLEAN jjOPPOSITE(leftv res, leftv a)
 static BOOLEAN jjENVELOPE(leftv res, leftv a)
 {
   ring    r = (ring)a->Data();
-  if (rIsPluralRing(currRing))
+  if (rIsPluralRing(r))
   {  
     //    ideal   i;
 //     if (a->rtyp == QRING_CMD)
