@@ -3,10 +3,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_global.h,v 1.3 1999-06-28 12:48:14 wenk Exp $ */
+/* $Id: mpr_global.h,v 1.4 1999-06-28 16:06:27 Singular Exp $ */
 
-/* 
-* ABSTRACT - multipolynomial resultants - 
+/*
+* ABSTRACT - multipolynomial resultants -
 *                                global definitions and debugging stuff
 */
 
@@ -35,14 +35,14 @@ typedef double mprfloat;
 #ifdef mprDEBUG_PROT
 #define mprPROT(msg) Print("%s",msg)
 #define mprPROTnl(msg) Print("%s\n",msg)
-#define mprPROTP(msg,poly) Print("%s",msg);pWrite0(poly) 
-#define mprPROTPnl(msg,poly) Print("%s",msg);pWrite(poly) 
+#define mprPROTP(msg,poly) Print("%s",msg);pWrite0(poly)
+#define mprPROTPnl(msg,poly) Print("%s",msg);pWrite(poly)
 #define mprPROTI(msg,intval) Print("%s%d",msg,intval)
 #define mprPROTInl(msg,intval) Print("%s%d\n",msg,intval)
 #define mprPROTN(msg,nval) Print("%s",msg);nPrint(nval);
 #define mprPROTNnl(msg,nval) Print("%s",msg);nPrint(nval);PrintLn();
-#else 
-#define mprPROT(msg) 
+#else
+#define mprPROT(msg)
 #define mprPROTnl(msg)
 #define mprPROTP(msg,poly)
 #define mprPROTPnl(msg,poly)
@@ -92,7 +92,4 @@ typedef double mprfloat;
 // folded-file: t ***
 // compile-command-1: "make installg" ***
 // compile-command-2: "make install" ***
-// End: *** 
-
-
-
+// End: ***

@@ -3,17 +3,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.5 1999-06-28 12:48:13 wenk Exp $ */
+/* $Id: mpr_complex.h,v 1.6 1999-06-28 16:06:26 Singular Exp $ */
 
-/* 
+/*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
 *            and complex numbers based on pairs of real floating-point numbers
-*   
+*
 */
 
 //-> include & define stuff
 // must have gmp version >= 2
-extern "C" { 
+extern "C" {
 #include <gmp.h>
 }
 #include "numbers.h"
@@ -105,8 +105,8 @@ public:
   inline bool isMOne();  // t == -1 ?
 
   inline bool setFromStr( char * in );
-  
-  // access 
+
+  // access
   inline const mpf_t *mpfp() const;
 
   inline operator double();
@@ -116,18 +116,18 @@ public:
   inline operator int() const;
 
 public:
-  static void setPrecision( const unsigned long int prec ) { 
-    gmp_default_prec_bits= prec; 
+  static void setPrecision( const unsigned long int prec ) {
+    gmp_default_prec_bits= prec;
   }
-  static void setEqualBits( const unsigned long int prec ) { 
-    gmp_needequal_bits= prec; 
+  static void setEqualBits( const unsigned long int prec ) {
+    gmp_needequal_bits= prec;
   }
 
-  static const unsigned long int getPrecision() { 
-    return gmp_default_prec_bits; 
+  static const unsigned long int getPrecision() {
+    return gmp_default_prec_bits;
   }
-  static const unsigned long int getEqualBits() { 
-    return gmp_needequal_bits; 
+  static const unsigned long int getEqualBits() {
+    return gmp_needequal_bits;
   }
 
 private:
@@ -269,7 +269,7 @@ char *floatToStr( const gmp_float & r, const unsigned int oprec );
 
 //-> class gmp_complex
 /**
- * @short gmp_complex numbers based on 
+ * @short gmp_complex numbers based on
  */
 class gmp_complex
 {
@@ -305,7 +305,7 @@ public:
   friend gmp_complex operator / ( const gmp_complex & a, const gmp_complex & b );
 
   // gmp_complex <operator> real
-  inline friend gmp_complex operator + ( const gmp_complex & a, const gmp_float b_d );  
+  inline friend gmp_complex operator + ( const gmp_complex & a, const gmp_float b_d );
   inline friend gmp_complex operator - ( const gmp_complex & a, const gmp_float b_d );
   inline friend gmp_complex operator * ( const gmp_complex & a, const gmp_float b_d );
   inline friend gmp_complex operator / ( const gmp_complex & a, const gmp_float b_d );
@@ -387,9 +387,4 @@ char *complexToStr( const gmp_complex & c, const  unsigned int oprec );
 // folded-file: t ***
 // compile-command-1: "make installg" ***
 // compile-command-2: "make install" ***
-// End: *** 
-
-
-
-
-
+// End: ***

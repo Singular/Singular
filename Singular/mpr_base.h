@@ -3,9 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.h,v 1.1 1999-06-28 12:48:12 wenk Exp $ */
+/* $Id: mpr_base.h,v 1.2 1999-06-28 16:06:25 Singular Exp $ */
 
-/* 
+/*
 * ABSTRACT - multipolynomial resultants - resultant matrices
 *            ( sparse, dense, u-resultant solver )
 */
@@ -20,7 +20,8 @@
 /**
  * Base class for sparse and dense u-Resultant computation
  */
-class resMatrixBase {
+class resMatrixBase
+{
 public:
   /* state of the resultant */
   enum IStateType { none, ready, notInit, fatalError, sparseError };
@@ -36,9 +37,9 @@ public:
   virtual const number getDetAt( const number* evpoint ) { return NULL; }
   virtual const number getSubDet() { return NULL; }
 
-  virtual const long getDetDeg() const { return totDeg; } 
+  virtual const long getDetDeg() const { return totDeg; }
 
-  virtual const IStateType initState() const { return istate; }  
+  virtual const IStateType initState() const { return istate; }
 
 protected:
   IStateType istate;
@@ -48,7 +49,7 @@ protected:
   ring sourceRing;
 
   int totDeg;
-  
+
 private:
   /* disables the copy constructor */
   resMatrixBase( const resMatrixBase & );
@@ -59,7 +60,8 @@ private:
 /**
  * Base class for solving 0-dim poly systems using u-resultant
  */
-class uResultant {
+class uResultant
+{
 public:
   enum resMatType { none, sparseResMat, denseResMat };
 
@@ -74,12 +76,12 @@ public:
   /* Uses Bareiss */
   rootContainer ** specializeInU( BOOLEAN matchUp= false, const number subDetVal= NULL );
 
-  resMatrixBase * accessResMat() { return resMat; } 
+  resMatrixBase * accessResMat() { return resMat; }
 
 private:
   /* deactivated copy constructor */
   uResultant( const uResultant & );
-  
+
   ideal extendIdeal( const ideal gls, poly linPoly, const resMatType rmt );
   poly linearPoly( const resMatType rmt );
   int nextPrime( const int p );
@@ -98,13 +100,4 @@ private:
 // folded-file: t ***
 // compile-command-2: "make install" ***
 // compile-command: "make installg" ***
-// End: *** 
-
-
-
-
-
-
-
-
-
+// End: ***

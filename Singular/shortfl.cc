@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.8 1999-05-10 15:10:55 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.9 1999-06-28 16:06:31 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -338,7 +338,7 @@ static number nrMap0(number from)
   {
     if(i>4)
     {
-      Werror("float overflow");
+      WerrorS("float overflow");
       return nf(rr).N();
     }
     i--;
@@ -368,7 +368,7 @@ static number nrMap0(number from)
   if(t>4)
   {
     if(j==s)
-      Werror("float overflow");
+      WerrorS("float overflow");
     return nf(rr).N();
   }
   if(t>1)
@@ -381,7 +381,7 @@ static number nrMap0(number from)
     {
       MPZ_CLEAR(g);
       if(j==s)
-        Werror("float overflow");
+        WerrorS("float overflow");
       return nf(rr).N();
     }
     t--;

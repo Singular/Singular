@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.83 1999-06-21 19:45:36 Singular Exp $
+@comment $Id: types.doc,v 1.84 1999-06-28 16:06:34 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2656,7 +2656,7 @@ comparison
 
 @strong{Note:} quotient and exponentiation is only recognized as a
 number expression is if is already a number, see @ref{Miscellaneous
-oddities}. 
+oddities}.
 @* To access the denominator or nominator of a rational number see
 @ref{Tricks and pitfalls}.
 @* For the behavior of comparison operators in rings with
@@ -2710,7 +2710,7 @@ string form of ring parameter (see @ref{parstr})
 @cindex package
 @cindex ::
 
-Package are a collection of identifier. 
+Package are a collection of identifier.
 The set of all identifier is called toplevel package: @code{Top}.
 Other reserved package names are @code{Current} with denotes the current
 package name in use, and @code{Up} which will be the current package

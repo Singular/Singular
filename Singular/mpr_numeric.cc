@@ -1,11 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_numeric.cc,v 1.1 1999-06-28 12:48:16 wenk Exp $ */
+/* $Id: mpr_numeric.cc,v 1.2 1999-06-28 16:06:29 Singular Exp $ */
 
-/* 
+/*
 * ABSTRACT - multipolynomial resultants - numeric stuff
-*            ( root finder, vandermonde system solver, simplex )   
+*            ( root finder, vandermonde system solver, simplex )
 */
 
 #include "mod2.h"
@@ -39,8 +39,8 @@ extern void nPrint(number n);  // for debugging output
 //-----------------------------------------------------------------------------
 
 //-> vandermonde::*
-vandermonde::vandermonde( const long _cn, const long _n, const long _maxdeg, 
-			  number *_p, const bool _homog )
+vandermonde::vandermonde( const long _cn, const long _n, const long _maxdeg,
+                          number *_p, const bool _homog )
   : n(_n), cn(_cn), maxdeg(_maxdeg), p(_p), homog(_homog)
 {
   long j;
@@ -69,23 +69,28 @@ void vandermonde::init()
   intvec exp( n );
   for ( j= 0; j < n; j++ ) exp[j]=0;
 
-  for ( i= 0; i < l; i++ ) {
-    if ( !homog || (sum == maxdeg) ) {
-      for ( j= 0; j < n; j++ ) {
-	nPower( p[j], exp[j], &tmp );
-	tmp1 = nMult( tmp, x[c] );
-	x[c]= tmp1;
-	nDelete( &tmp );
+  for ( i= 0; i < l; i++ )
+  {
+    if ( !homog || (sum == maxdeg) )
+    {
+      for ( j= 0; j < n; j++ )
+      {
+        nPower( p[j], exp[j], &tmp );
+        tmp1 = nMult( tmp, x[c] );
+        x[c]= tmp1;
+        nDelete( &tmp );
       }
       c++;
     }
     exp[0]++;
     sum=0;
-    for ( j= 0; j < n - 1; j++ ) {
-      if ( exp[j] > maxdeg ) {
-	exp[j]= 0;
-	exp[j + 1]++;
-	}
+    for ( j= 0; j < n - 1; j++ )
+    {
+      if ( exp[j] > maxdeg )
+      {
+        exp[j]= 0;
+        exp[j + 1]++;
+        }
       sum+= exp[j];
     }
     sum+= exp[n - 1];
@@ -107,34 +112,41 @@ poly vandermonde::numvec2poly( const number * q )
 
   for ( j= 0; j < n+1; j++ ) exp[j]=0;
 
-  for ( i= 0; i < l; i++ ) {
-    if ( (!homog || (sum == maxdeg)) && q[i] && !nIsZero(q[i]) ) {
+  for ( i= 0; i < l; i++ )
+  {
+    if ( (!homog || (sum == maxdeg)) && q[i] && !nIsZero(q[i]) )
+    {
       pnew= pOne();
       pSetCoeff(pnew,q[i]);
       pSetExpV(pnew,exp);
-      if ( pit ) {
-	pNext(pnew)= pit;
-	pit= pnew;
-      } else {
-	pit= pnew;
-	pNext(pnew)= NULL;
-      } 
+      if ( pit )
+      {
+        pNext(pnew)= pit;
+        pit= pnew;
+      }
+      else
+      {
+        pit= pnew;
+        pNext(pnew)= NULL;
+      }
       pSetm(pit);
     }
     exp[1]++;
     sum=0;
-    for ( j= 1; j < n; j++ ) {
-      if ( exp[j] > maxdeg ) {
-	exp[j]= 0;
-	exp[j + 1]++;
-	}
+    for ( j= 1; j < n; j++ )
+    {
+      if ( exp[j] > maxdeg )
+      {
+        exp[j]= 0;
+        exp[j + 1]++;
+        }
       sum+= exp[j];
     }
     sum+= exp[n];
   }
 
   Free( (ADDRESS) exp, (n+1) * sizeof(Exponent_t) );
-  
+
   pOrdPolyMerge(pit);
   return pit;
 }
@@ -151,15 +163,19 @@ number * vandermonde::interpolateDense( const number * q )
 
   w= (number *)Alloc( cn * sizeof(number) );
   c= (number *)Alloc( cn * sizeof(number) );
-  for ( j= 0; j < cn; j++ ) {
+  for ( j= 0; j < cn; j++ )
+  {
     w[j]= nInit(0);
     c[j]= nInit(0);
   }
 
-  if ( cn == 1 ) {
+  if ( cn == 1 )
+  {
     nDelete( &w[0] );
     w[0]= nCopy(q[0]);
-  } else {
+  }
+  else
+  {
     nDelete( &c[cn-1] );
     c[cn-1]= nCopy(x[0]);
     c[cn-1]= nNeg(c[cn-1]);              // c[cn]= -x[1]
@@ -170,11 +186,11 @@ number * vandermonde::interpolateDense( const number * q )
       xx= nNeg(xx);               // xx= -x[i]
 
       for ( j= (cn-i-1); j <= (cn-2); j++) { // j=(cn+1-i); j <= (cn-1)
-	nDelete( &tmp1 );
-	tmp1= nMult( xx, c[j+1] );           // c[j]= c[j] + (xx * c[j+1])
-	newnum= nAdd( c[j], tmp1 );
-	nDelete( &c[j] );
-	c[j]= newnum;
+        nDelete( &tmp1 );
+        tmp1= nMult( xx, c[j+1] );           // c[j]= c[j] + (xx * c[j+1])
+        newnum= nAdd( c[j], tmp1 );
+        nDelete( &c[j] );
+        c[j]= newnum;
       }
 
       newnum= nAdd( xx, c[cn-1] );           // c[cn-1]= c[cn-1] + xx
@@ -186,30 +202,30 @@ number * vandermonde::interpolateDense( const number * q )
       nDelete( &xx );
       xx= nCopy(x[i]);                     // xx= x[i]
 
-      nDelete( &t );          
+      nDelete( &t );
       t= nInit( 1 );                         // t= b= 1
       nDelete( &b );
-      b= nInit( 1 );         
+      b= nInit( 1 );
       nDelete( &s );                         // s= q[cn-1]
       s= nCopy( q[cn-1] );
 
       for ( k= cn-1; k >= 1; k-- ) {         // k=cn; k >= 2
-	nDelete( &tmp1 );
-	tmp1= nMult( xx, b );                // b= c[k] + (xx * b)
-	nDelete( &b );
-	b= nAdd( c[k], tmp1 ); 
+        nDelete( &tmp1 );
+        tmp1= nMult( xx, b );                // b= c[k] + (xx * b)
+        nDelete( &b );
+        b= nAdd( c[k], tmp1 );
 
-	nDelete( &tmp1 );
-	tmp1= nMult( q[k-1], b );            // s= s + (q[k-1] * b)
-	newnum= nAdd( s, tmp1 );
-	nDelete( &s );
-	s= newnum;
+        nDelete( &tmp1 );
+        tmp1= nMult( q[k-1], b );            // s= s + (q[k-1] * b)
+        newnum= nAdd( s, tmp1 );
+        nDelete( &s );
+        s= newnum;
 
-	nDelete( &tmp1 );
-	tmp1= nMult( xx, t );                // t= (t * xx) + b
-	newnum= nAdd( tmp1, b );
-	nDelete( &t );
-	t= newnum;
+        nDelete( &tmp1 );
+        tmp1= nMult( xx, t );                // t= (t * xx) + b
+        newnum= nAdd( tmp1, b );
+        nDelete( &t );
+        t= newnum;
       }
 
       nDelete( &w[i] );                      // w[i]= s/t
@@ -244,14 +260,14 @@ number * vandermonde::interpolateDense( const number * q )
 
 //-> definitions
 #define MR       8        // never change this value
-#define MT      20       
+#define MT      20
 #define MAXIT   (MT*MR)   // max number of iterations in laguer root finder
 
 // set these values according to gmp_default_prec_bits and gmp_equalupto_bits!
 #define EPS     2.0e-34   // used by rootContainer::laguer_driver(), imag() == 0.0 ???
 //<-
 
-//-> rootContainer::rootContainer() 
+//-> rootContainer::rootContainer()
 rootContainer::rootContainer()
 {
   rt=none;
@@ -264,14 +280,15 @@ rootContainer::rootContainer()
 }
 //<-
 
-//-> rootContainer::~rootContainer() 
+//-> rootContainer::~rootContainer()
 rootContainer::~rootContainer()
 {
   int i;
   int n= pVariables;
 
   // free coeffs, ievpoint
-  if ( ievpoint != NULL ) {
+  if ( ievpoint != NULL )
+  {
     for ( i=0; i < anz+2; i++ ) nDelete( ievpoint + i );
     Free( (ADDRESS)ievpoint, (anz+2) * sizeof( number ) );
   }
@@ -282,15 +299,15 @@ rootContainer::~rootContainer()
   // theroots löschen
   for ( i=0; i < tdg; i++ ) delete theroots[i];
   Free( (ADDRESS) theroots, (tdg)*sizeof(gmp_complex*) );
-  
+
   mprPROTnl("~rootContainer()");
 }
 //<-
 
-//-> void rootContainer::fillContainer( ... ) 
-void rootContainer::fillContainer( number *_coeffs, number *_ievpoint, 
-				   const int _var, const int _tdg, 
-				   const rootType  _rt, const int _anz )
+//-> void rootContainer::fillContainer( ... )
+void rootContainer::fillContainer( number *_coeffs, number *_ievpoint,
+                                   const int _var, const int _tdg,
+                                   const rootType  _rt, const int _anz )
 {
   int i;
   number nn= nInit(0);
@@ -300,8 +317,10 @@ void rootContainer::fillContainer( number *_coeffs, number *_ievpoint,
   rt=_rt;
   anz=_anz;
 
-  for ( i=0; i <= tdg; i++ ) { 
-    if ( nEqual(coeffs[i],nn) ) { 
+  for ( i=0; i <= tdg; i++ )
+  {
+    if ( nEqual(coeffs[i],nn) )
+    {
       nDelete( &coeffs[i] );
       coeffs[i]=NULL;
     }
@@ -311,14 +330,14 @@ void rootContainer::fillContainer( number *_coeffs, number *_ievpoint,
   if ( rt == cspecialmu && _ievpoint ) { // copy ievpoint
     ievpoint= (number *)Alloc( (anz+2) * sizeof( number ) );
     for (i=0; i < anz+2; i++) ievpoint[i]= nCopy( _ievpoint[i] );
-  } 
+  }
 
   theroots= NULL;
   found_roots= false;
 }
 //<-
 
-//-> poly rootContainer::getPoly() 
+//-> poly rootContainer::getPoly()
 poly rootContainer::getPoly()
 {
   int i;
@@ -326,38 +345,45 @@ poly rootContainer::getPoly()
   poly result= NULL;
   poly ppos;
 
-  if ( (rt == cspecial) || ( rt == cspecialmu ) ) {
-    for ( i= tdg; i >= 0; i-- ) {
-      if ( coeffs[i] ) {
-	poly p= pOne();
-	//pSetExp( p, var+1, i);
-	pSetExp( p, 1, i);
-	pSetCoeff( p, nCopy( coeffs[i] ) );
-	pSetm( p );
-	if (result) {
-	  ppos->next=p;
-	  ppos=ppos->next;
-	} else {
-	  result=p;
-	  ppos=p;
-	}
-      
+  if ( (rt == cspecial) || ( rt == cspecialmu ) )
+  {
+    for ( i= tdg; i >= 0; i-- )
+    {
+      if ( coeffs[i] )
+      {
+        poly p= pOne();
+        //pSetExp( p, var+1, i);
+        pSetExp( p, 1, i);
+        pSetCoeff( p, nCopy( coeffs[i] ) );
+        pSetm( p );
+        if (result)
+        {
+          ppos->next=p;
+          ppos=ppos->next;
+        }
+        else
+        {
+          result=p;
+          ppos=p;
+        }
+
       }
     }
     pSetm( result );
-  } 
+  }
 
   return result;
 }
 //<-
 
-//-> const gmp_complex & rootContainer::opterator[] ( const int i ) 
+//-> const gmp_complex & rootContainer::opterator[] ( const int i )
 // this is now inline!
 //  gmp_complex & rootContainer::operator[] ( const int i )
 //  {
-//    if ( found_roots && ( i >= 0) && ( i < tdg ) ) {
+//    if ( found_roots && ( i >= 0) && ( i < tdg ) )
+//    {
 //      return *theroots[i];
-//    } 
+//    }
 //    // warning
 //    Werror("rootContainer::getRoot: Wrong index %d, found_roots %s",i,found_roots?"true":"false");
 //    gmp_complex *tmp= new gmp_complex();
@@ -365,24 +391,27 @@ poly rootContainer::getPoly()
 //  }
 //<-
 
-//-> gmp_complex & rootContainer::evPointCoord( int i ) 
+//-> gmp_complex & rootContainer::evPointCoord( int i )
 gmp_complex & rootContainer::evPointCoord( const int i )
 {
   if (! ((i >= 0) && (i < anz+2) ) )
-    Werror("rootContainer::evPointCoord: index out of range");
+    WerrorS("rootContainer::evPointCoord: index out of range");
   if (ievpoint == NULL)
-    Werror("rootContainer::evPointCoord: ievpoint == NULL");
+    WerrorS("rootContainer::evPointCoord: ievpoint == NULL");
 
   if ( (rt == cspecialmu) && found_roots ) {  // FIX ME
-    if ( ievpoint[i] != NULL ) {
+    if ( ievpoint[i] != NULL )
+    {
       gmp_complex *tmp= new gmp_complex();
       *tmp= numberToGmp_Complex(ievpoint[i]);
       return *tmp;
-    } else {
+    }
+    else
+    {
       Werror("rootContainer::evPointCoord: NULL index %d",i);
     }
   }
-   
+
   // warning
   Werror("rootContainer::evPointCoord: Wrong index %d, found_roots %s",i,found_roots?"true":"false");
   gmp_complex *tmp= new gmp_complex();
@@ -390,25 +419,27 @@ gmp_complex & rootContainer::evPointCoord( const int i )
 }
 //<-
 
-//-> bool rootContainer::changeRoots( int from, int to ) 
+//-> bool rootContainer::changeRoots( int from, int to )
 bool rootContainer::swapRoots( const int from, const int to )
 {
-  if ( found_roots && ( from >= 0) && ( from < tdg ) && ( to >= 0) && ( to < tdg ) ) {
-    if ( to != from ) {
+  if ( found_roots && ( from >= 0) && ( from < tdg ) && ( to >= 0) && ( to < tdg ) )
+  {
+    if ( to != from )
+    {
       gmp_complex tmp( *theroots[from] );
       *theroots[from]= *theroots[to];
       *theroots[to]= tmp;
     }
     return true;
-  } 
-    
+  }
+
   // warning
   Werror(" rootContainer::changeRoots: Wrong index %d, %d",from,to);
   return false;
 }
 //<-
 
-//-> void rootContainer::solver() 
+//-> void rootContainer::solver()
 bool rootContainer::solver( const int polishmode )
 {
   int i;
@@ -419,30 +450,34 @@ bool rootContainer::solver( const int polishmode )
 
   // copy the coefficients of type number to type gmp_complex
   gmp_complex **ad= (gmp_complex**)Alloc( (tdg+1)*sizeof(gmp_complex*) );
-  for ( i=0; i <= tdg; i++ ) {
+  for ( i=0; i <= tdg; i++ )
+  {
     ad[i]= new gmp_complex();
     if ( coeffs[i] ) *ad[i] = numberToGmp_Complex( coeffs[i] );
   }
 
   // now solve
-  switch (polishmode) {
+  switch (polishmode)
+  {
   case PM_NONE:
   case PM_POLISH:
     found_roots= laguer_driver( ad, theroots, polishmode == PM_POLISH );
-    if (!found_roots) {
-      Werror("rootContainer::solver: No roots found!");
+    if (!found_roots)
+    {
+      WerrorS("rootContainer::solver: No roots found!");
       goto solverend;
     }
     break;
   case PM_CORRUPT:
-    found_roots= laguer_driver( ad, theroots, false ); 
+    found_roots= laguer_driver( ad, theroots, false );
     // corrupt the roots
     for ( i= 0; i < tdg; i++ )
       *theroots[i]= *theroots[i] * (gmp_float)(1.0+0.01*(mprfloat)i);
-    // and interpolate again      
+    // and interpolate again
     found_roots= laguer_driver( ad, theroots, true );
-    if (!found_roots) {
-      Werror("rootContainer::solver: No roots found!");
+    if (!found_roots)
+    {
+      WerrorS("rootContainer::solver: No roots found!");
       goto solverend;
     }
     break;
@@ -459,7 +494,7 @@ bool rootContainer::solver( const int polishmode )
 }
 //<-
 
-//-> gmp_complex* rootContainer::laguer_driver( bool polish ) 
+//-> gmp_complex* rootContainer::laguer_driver( bool polish )
 bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool polish )
 {
   int i,j,jj;
@@ -470,7 +505,8 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
   gmp_complex ** ad= (gmp_complex**)Alloc( (tdg+1)*sizeof(gmp_complex*) );
   for ( i=0; i <= tdg; i++ ) ad[i]= new gmp_complex( *a[i] );
 
-  for ( j= tdg; j >= 1; j-- ) {
+  for ( j= tdg; j >= 1; j-- )
+  {
     x= gmp_complex();
 
     // run laguer alg
@@ -478,43 +514,50 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
 
     mprSTICKYPROT(ST_ROOTS_LGSTEP);
     if ( its > MAXIT ) {  // error
-      Werror("rootContainer::laguer_driver: To many iterations!");
+      WerrorS("rootContainer::laguer_driver: To many iterations!");
       ret= false;
       goto theend;
     }
-    if ( abs(x.imag()) <= (gmp_float)(2.0*EPS)*abs(x.real())) {
+    if ( abs(x.imag()) <= (gmp_float)(2.0*EPS)*abs(x.real()))
+    {
       x= gmp_complex( x.real() );
     }
     *roots[j-1]= x;
     b= *ad[j];
-    for ( jj= j-1; jj >= 0; jj-- ) {
+    for ( jj= j-1; jj >= 0; jj-- )
+    {
       c= *ad[jj];
       *ad[jj]= b;
       b= ( x * b ) + c;
     }
   }
 
-  if ( polish ) {
+  if ( polish )
+  {
     mprSTICKYPROT(ST_ROOTS_LGPOLISH);
     for ( i=0; i <= tdg; i++ ) *ad[i]=*a[i];
 
-    for ( j= 1; j <= tdg; j++ ) {
+    for ( j= 1; j <= tdg; j++ )
+    {
       // run laguer alg with corrupted roots
       laguer( ad, tdg, roots[j-1], &its );
 
       mprSTICKYPROT(ST_ROOTS_LGSTEP);
-      if ( its > MAXIT ) {  // error
-	Werror("rootContainer::laguer_driver: To many iterations!");
-	ret= false;
-	goto theend;
+      if ( its > MAXIT )
+      {  // error
+        WerrorS("rootContainer::laguer_driver: To many iterations!");
+        ret= false;
+        goto theend;
       }
     }
-    for ( j= 2; j <= tdg; j++ ) { 
+    for ( j= 2; j <= tdg; j++ )
+    {
       // sort root by their absolute real parts by straight insertion
       x= *roots[j-1];
-      for ( i= j-1; i >= 1; i-- ) {
-	if ( abs(roots[i-1]->real()) <= abs(x.real()) ) break;
-	*roots[i]= *roots[i-1];
+      for ( i= j-1; i >= 1; i-- )
+      {
+        if ( abs(roots[i-1]->real()) <= abs(x.real()) ) break;
+        *roots[i]= *roots[i-1];
       }
       *roots[i]= x;
     }
@@ -529,7 +572,7 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
 }
 //<-
 
-//-> void rootContainer::laguer(...) 
+//-> void rootContainer::laguer(...)
 void rootContainer::laguer(gmp_complex ** a, int m, gmp_complex *x, int *its)
 {
   int iter,j;
@@ -539,27 +582,29 @@ void rootContainer::laguer(gmp_complex ** a, int m, gmp_complex *x, int *its)
 
   gmp_float epss(1.0/pow(10.0,(int)(gmp_output_digits+gmp_output_digits/4)));
 
-  for ( iter= 1; iter <= MAXIT; iter++ ) {
+  for ( iter= 1; iter <= MAXIT; iter++ )
+  {
     mprSTICKYPROT(ST_ROOTS_LG);
 
     *its=iter;
 
     b= *a[m];
-    err_g= abs(b);  
+    err_g= abs(b);
     d= gmp_complex();
     f= gmp_complex();
-    abx_g= abs(*x);  
+    abx_g= abs(*x);
 
-    for ( j= m-1; j >= 0; j-- ) {
+    for ( j= m-1; j >= 0; j-- )
+    {
       f= ( *x * f ) + d;
       d= ( *x * d ) + b;
       b= ( *x * b ) + *a[j];
-      err_g= abs( b ) + ( abx_g * err_g ); 
+      err_g= abs( b ) + ( abx_g * err_g );
     }
 
     err_g *= epss; // EPSS;
 
-    if ( abs(b) <= err_g ) return;  
+    if ( abs(b) <= err_g ) return;
 
     g= d / b;
     g2 = g * g;
@@ -567,16 +612,16 @@ void rootContainer::laguer(gmp_complex ** a, int m, gmp_complex *x, int *its)
     sq= sqrt(( ( h * (gmp_float)m ) - g2 ) * (gmp_float)(m - 1));
     gp= g + sq;
     gm= g - sq;
-    abp_g= abs( gp );  
-    abm_g= abs( gm );  
+    abp_g= abs( gp );
+    abm_g= abs( gm );
 
     if ( abp_g < abm_g ) gp= gm;
 
-    dx = ( (max(abp_g,abm_g) > (gmp_float)0.0) 
-	   ? ( gmp_complex( (mprfloat)m ) / gp ) 
-	   : ( gmp_complex( cos((mprfloat)iter),sin((mprfloat)iter)) 
-	       * exp(log((gmp_float)1.0+abx_g))) );
-    
+    dx = ( (max(abp_g,abm_g) > (gmp_float)0.0)
+           ? ( gmp_complex( (mprfloat)m ) / gp )
+           : ( gmp_complex( cos((mprfloat)iter),sin((mprfloat)iter))
+               * exp(log((gmp_float)1.0+abx_g))) );
+
     x1= *x - dx;
 
     if ( (*x == x1) ) return;
@@ -595,10 +640,10 @@ void rootContainer::laguer(gmp_complex ** a, int m, gmp_complex *x, int *its)
 //-------------- rootArranger -------------------------------------------------
 //-----------------------------------------------------------------------------
 
-//-> rootArranger::rootArranger(...) 
-rootArranger::rootArranger( rootContainer ** _roots, 
-			    rootContainer ** _mu, 
-			    const int _howclean )
+//-> rootArranger::rootArranger(...)
+rootArranger::rootArranger( rootContainer ** _roots,
+                            rootContainer ** _mu,
+                            const int _howclean )
   : roots(_roots), mu(_mu), howclean(_howclean)
 {
   found_roots=false;
@@ -613,22 +658,24 @@ void rootArranger::solve_all()
 
   // find roots of polys given by coeffs in roots
   rc= roots[0]->getAnzElems();
-  for ( i= 0; i < rc; i++ ) 
-    if ( !roots[i]->solver( howclean ) ) {
+  for ( i= 0; i < rc; i++ )
+    if ( !roots[i]->solver( howclean ) )
+    {
       found_roots= false;
       return;
     }
   // find roots of polys given by coeffs in mu
   mc= mu[0]->getAnzElems();
-  for ( i= 0; i < mc; i++ ) 
-    if ( ! mu[i]->solver( howclean ) ) {
+  for ( i= 0; i < mc; i++ )
+    if ( ! mu[i]->solver( howclean ) )
+    {
       found_roots= false;
       return;
     }
 }
 //<-
 
-//-> void rootArranger::arrange() 
+//-> void rootArranger::arrange()
 void rootArranger::arrange()
 {
   gmp_complex tmp,zwerg;
@@ -640,44 +687,52 @@ void rootArranger::arrange()
   gmp_float mprec(1.0/pow(10.0,(int)(gmp_output_digits/3)));
 
   for ( xkoord= 0; xkoord < anzm; xkoord++ ) {    // für x1,x2, x1,x2,x3, x1,x2,...,xn
-    for ( r= 0; r < anzr; r++ ) {                 // für jede Nullstelle 
-      // (x1-koordinate) * evp[1] + (x2-koordinate) * evp[2] + 
+    for ( r= 0; r < anzr; r++ ) {                 // für jede Nullstelle
+      // (x1-koordinate) * evp[1] + (x2-koordinate) * evp[2] +
       //                                  ... + (xkoord-koordinate) * evp[xkoord]
       tmp= gmp_complex();
-      for ( xk =0; xk <= xkoord; xk++ ){ 
-	tmp -= (*roots[xk])[r] * mu[xkoord]->evPointCoord(xk+1); //xk+1
+      for ( xk =0; xk <= xkoord; xk++ )
+      {
+        tmp -= (*roots[xk])[r] * mu[xkoord]->evPointCoord(xk+1); //xk+1
       }
       found= false;
-      for ( rtest= r; rtest < anzr; rtest++ ) {   // für jede Nullstelle 
-	zwerg = tmp - (*roots[xk])[rtest] * mu[xkoord]->evPointCoord(xk+1); // xk+1, xkoord+2
-        for ( mtest= 0; mtest < anzr; mtest++ ) {
-	  //	  if ( tmp == (*mu[xkoord])[mtest] ) {
-	  if ( ((zwerg.real() <= (*mu[xkoord])[mtest].real() + mprec) && 
-		(zwerg.real() >= (*mu[xkoord])[mtest].real() - mprec)) &&
-	       ((zwerg.imag() <= (*mu[xkoord])[mtest].imag() + mprec) && 
-		(zwerg.imag() >= (*mu[xkoord])[mtest].imag() - mprec)) ) {
-	    roots[xk]->swapRoots( r, rtest );
-	    found= true;
-	    break;
-	  }
-	}
+      for ( rtest= r; rtest < anzr; rtest++ ) {   // für jede Nullstelle
+        zwerg = tmp - (*roots[xk])[rtest] * mu[xkoord]->evPointCoord(xk+1); // xk+1, xkoord+2
+        for ( mtest= 0; mtest < anzr; mtest++ )
+        {
+          //          if ( tmp == (*mu[xkoord])[mtest] )
+          //          {
+          if ( ((zwerg.real() <= (*mu[xkoord])[mtest].real() + mprec) &&
+                (zwerg.real() >= (*mu[xkoord])[mtest].real() - mprec)) &&
+               ((zwerg.imag() <= (*mu[xkoord])[mtest].imag() + mprec) &&
+                (zwerg.imag() >= (*mu[xkoord])[mtest].imag() - mprec)) )
+           {
+             roots[xk]->swapRoots( r, rtest );
+             found= true;
+             break;
+           }
+        }
       } // rtest
-      if ( !found ) {
-	Werror("rootArranger::arrange: No match? coord %d, root %d.",xkoord,r);
+      if ( !found )
+      {
+        Werror("rootArranger::arrange: No match? coord %d, root %d.",xkoord,r);
 #ifdef mprDEBUG_PROT
-	Werror("One of these ...");
-	for ( rtest= r; rtest < anzr; rtest++ ) { 
-	  tmp= gmp_complex();
-	  for ( xk =0; xk <= xkoord; xk++ ){ 
-	    tmp-= (*roots[xk])[r] * mu[xkoord]->evPointCoord(xk+1);
-	  }
-	  tmp-= (*roots[xk])[rtest] * mu[xkoord]->evPointCoord(xk+1); // xkoord+2
-	  Werror("  %s",complexToStr(tmp,gmp_output_digits+1),rtest);
-	}
-	Werror(" ... must match to one of these:");
-	for ( mtest= 0; mtest < anzr; mtest++ ) {
-	  Werror("                  %s",complexToStr((*mu[xkoord])[mtest],gmp_output_digits+1));
-	}
+        WerrorS("One of these ...");
+        for ( rtest= r; rtest < anzr; rtest++ )
+        {
+          tmp= gmp_complex();
+          for ( xk =0; xk <= xkoord; xk++ )
+          {
+            tmp-= (*roots[xk])[r] * mu[xkoord]->evPointCoord(xk+1);
+          }
+          tmp-= (*roots[xk])[rtest] * mu[xkoord]->evPointCoord(xk+1); // xkoord+2
+          Werror("  %s",complexToStr(tmp,gmp_output_digits+1),rtest);
+        }
+        WerrorS(" ... must match to one of these:");
+        for ( mtest= 0; mtest < anzr; mtest++ )
+        {
+          Werror("                  %s",complexToStr((*mu[xkoord])[mtest],gmp_output_digits+1));
+        }
 #endif
       }
     } // r
@@ -685,7 +740,7 @@ void rootArranger::arrange()
 }
 //<-
 
-//-> lists rootArranger::listOfRoots( int oprec ) 
+//-> lists rootArranger::listOfRoots( int oprec )
 lists rootArranger::listOfRoots( const unsigned int oprec )
 {
   int i,j,tr;
@@ -694,22 +749,28 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
 
   lists listofroots= (lists)Alloc( sizeof(slists) ); // must be done this way!
 
-  if ( found_roots ) {
+  if ( found_roots )
+  {
     listofroots->Init( count );
-    
-    for (i=0; i < count; i++) {
+
+    for (i=0; i < count; i++)
+    {
       lists onepoint= (lists)Alloc(sizeof(slists)); // must be done this way!
       onepoint->Init(elem);
-      for ( j= 0; j < elem; j++ ) {
-	if ( !rField_is_long_C() ) {
-	  onepoint->m[j].rtyp=STRING_CMD;
-	  onepoint->m[j].data=(void *)complexToStr((*roots[j])[i],oprec);
-	} else {
-	  onepoint->m[j].rtyp=NUMBER_CMD;
-	  onepoint->m[j].data=(void *)nCopy((number)(roots[j]->getRoot(i)));
-	}
-	onepoint->m[j].next= NULL;
-	onepoint->m[j].name= NULL;
+      for ( j= 0; j < elem; j++ )
+      {
+        if ( !rField_is_long_C() )
+        {
+          onepoint->m[j].rtyp=STRING_CMD;
+          onepoint->m[j].data=(void *)complexToStr((*roots[j])[i],oprec);
+        }
+        else
+        {
+          onepoint->m[j].rtyp=NUMBER_CMD;
+          onepoint->m[j].data=(void *)nCopy((number)(roots[j]->getRoot(i)));
+        }
+        onepoint->m[j].next= NULL;
+        onepoint->m[j].name= NULL;
       }
       listofroots->m[i].rtyp=LIST_CMD;
       listofroots->m[i].data=(void *)onepoint;
@@ -717,7 +778,9 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
       listofroots->m[j].name= NULL;
     }
 
-  } else {
+  }
+  else
+  {
     listofroots->Init( 0 );
   }
 
@@ -742,11 +805,12 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
 {
   int i,ip,ir,is,k,kh,kp,m12,nl1,nl2;
   int *l1,*l2,*l3;
-  mprfloat q1, bmax; 
+  mprfloat q1, bmax;
 
-  if ( m != (m1+m2+m3)) {
+  if ( m != (m1+m2+m3))
+  {
     // error: bad input
-    error(Werror(" bad input constraint counts in simplex ");)
+    error(WerrorS(" bad input constraint counts in simplex ");)
     *icase=-2;
     return;
   }
@@ -758,10 +822,12 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
   nl1= n;
   for ( k=1; k<=n; k++ ) l1[k]=izrov[k]=k;
   nl2=m;
-  for ( i=1; i<=m; i++ ) {
-    if ( a[i+1][1] < 0.0 ) {
+  for ( i=1; i<=m; i++ )
+  {
+    if ( a[i+1][1] < 0.0 )
+    {
       // error: bad input
-      error(Werror(" bad input tableau in simplex ");)
+      error(WerrorS(" bad input tableau in simplex ");)
       *icase=-2;
       // free mem l1,l2,l3;
       Free( (ADDRESS) l3, (m+1) * sizeof(int) );
@@ -774,76 +840,91 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
   }
   for ( i=1; i<=m2; i++) l3[i]= 1;
   ir= 0;
-  if (m2+m3) {
+  if (m2+m3)
+  {
     ir=1;
-    for ( k=1; k <= (n+1); k++ ) {
+    for ( k=1; k <= (n+1); k++ )
+    {
       q1=0.0;
       for ( i=m1+1; i <= m; i++ ) q1+= a[i+1][k];
       a[m+2][k]= -q1;
     }
 
-    do {
+    do
+    {
       simp1(a,m+1,l1,nl1,0,&kp,&bmax);
-      if ( bmax <= SIMPLEX_EPS && a[m+2][1] < -SIMPLEX_EPS ) {
-	*icase= -1; // no solution found
-	// free mem l1,l2,l3;
-	Free( (ADDRESS) l3, (m+1) * sizeof(int) );
-	Free( (ADDRESS) l2, (m+1) * sizeof(int) );
-	Free( (ADDRESS) l1, (n+1) * sizeof(int) );
-	return;
-      } else if ( bmax <= SIMPLEX_EPS && a[m+2][1] <= SIMPLEX_EPS ) {
-	m12= m1+m2+1;
-	if ( m12 <= m ) {
-	  for ( ip= m12; ip <= m; ip++ ) {
-	    if ( iposv[ip] == (ip+n) ) {
-	      simp1(a,ip,l1,nl1,1,&kp,&bmax);
-	      if ( fabs(bmax) >= SIMPLEX_EPS)
-		goto one;
-	    }
-	  }
-	}
-	ir= 0;
-	--m12;
-	if ( m1+1 <= m12 )
-	  for ( i=m1+1; i <= m12; i++ ) 
-	    if ( l3[i-m1] == 1 ) 
-	      for ( k=1; k <= n+1; k++ ) 
-		a[i+1][k] = -a[i+1][k];
-	break;
+      if ( bmax <= SIMPLEX_EPS && a[m+2][1] < -SIMPLEX_EPS )
+      {
+        *icase= -1; // no solution found
+        // free mem l1,l2,l3;
+        Free( (ADDRESS) l3, (m+1) * sizeof(int) );
+        Free( (ADDRESS) l2, (m+1) * sizeof(int) );
+        Free( (ADDRESS) l1, (n+1) * sizeof(int) );
+        return;
+      }
+      else if ( bmax <= SIMPLEX_EPS && a[m+2][1] <= SIMPLEX_EPS )
+      {
+        m12= m1+m2+1;
+        if ( m12 <= m )
+        {
+          for ( ip= m12; ip <= m; ip++ )
+          {
+            if ( iposv[ip] == (ip+n) )
+            {
+              simp1(a,ip,l1,nl1,1,&kp,&bmax);
+              if ( fabs(bmax) >= SIMPLEX_EPS)
+                goto one;
+            }
+          }
+        }
+        ir= 0;
+        --m12;
+        if ( m1+1 <= m12 )
+          for ( i=m1+1; i <= m12; i++ )
+            if ( l3[i-m1] == 1 )
+              for ( k=1; k <= n+1; k++ )
+                a[i+1][k] = -a[i+1][k];
+        break;
       }
       //#if DEBUG
       //print_bmat( a, m+2, n+3);
       //#endif
       simp2(a,n,l2,nl2,&ip,kp,&q1);
-      if ( ip == 0 ) {
-	*icase = -1; // no solution found
-	// free mem l1,l2,l3;
-	Free( (ADDRESS) l3, (m+1) * sizeof(int) );
-	Free( (ADDRESS) l2, (m+1) * sizeof(int) );
-	Free( (ADDRESS) l1, (n+1) * sizeof(int) );
-	return;
+      if ( ip == 0 )
+      {
+        *icase = -1; // no solution found
+        // free mem l1,l2,l3;
+        Free( (ADDRESS) l3, (m+1) * sizeof(int) );
+        Free( (ADDRESS) l2, (m+1) * sizeof(int) );
+        Free( (ADDRESS) l1, (n+1) * sizeof(int) );
+        return;
       }
     one: simp3(a,m+1,n,ip,kp);
       // #if DEBUG
       // print_bmat(a,m+2,n+3);
       // #endif
-      if ( iposv[ip] >= (n+m1+m2+1)) {
-	for ( k=1; k<= nl1; k++ ) 
-	  if ( l1[k] == kp ) break;
-	--nl1;
-	for ( is=k; is <= nl1; is++ ) l1[is]= l1[is+1];
-	++a[m+2][kp+1];
-	for ( i= 1; i <= m+2; i++ ) a[i][kp+1] = -a[i][kp+1];
-      } else {
-	if ( iposv[ip] >= (n+m1+1) ) {
-	  kh= iposv[ip]-m1-n;
-	  if ( l3[kh] ) {
-	    l3[kh]= 0;
-	    ++a[m+2][kp+1];
-	    for ( i=1; i<= m+2; i++ )
-	      a[i][kp+1] = -a[i][kp+1];
-	  }
-	}
+      if ( iposv[ip] >= (n+m1+m2+1))
+      {
+        for ( k=1; k<= nl1; k++ )
+          if ( l1[k] == kp ) break;
+        --nl1;
+        for ( is=k; is <= nl1; is++ ) l1[is]= l1[is+1];
+        ++a[m+2][kp+1];
+        for ( i= 1; i <= m+2; i++ ) a[i][kp+1] = -a[i][kp+1];
+      }
+      else
+      {
+        if ( iposv[ip] >= (n+m1+1) )
+        {
+          kh= iposv[ip]-m1-n;
+          if ( l3[kh] )
+          {
+            l3[kh]= 0;
+            ++a[m+2][kp+1];
+            for ( i=1; i<= m+2; i++ )
+              a[i][kp+1] = -a[i][kp+1];
+          }
+        }
       }
       is= izrov[kp];
       izrov[kp]= iposv[ip];
@@ -851,12 +932,14 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
     } while (ir);
   }
   /* end of phase 1, have feasible sol, now optimize it */
-  for (;;) {
+  loop
+  {
     // #if DEBUG
     // print_bmat( a, m+1, n+5);
     // #endif
     simp1(a,0,l1,nl1,0,&kp,&bmax);
-    if (bmax <= /*SIMPLEX_EPS*/0.0) {
+    if (bmax <= /*SIMPLEX_EPS*/0.0)
+    {
       *icase=0; // finite solution found
       // free mem l1,l2,l3
       Free( (ADDRESS) l3, (m+1) * sizeof(int) );
@@ -865,12 +948,13 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
       return;
     }
     simp2(a,n,l2,nl2,&ip,kp,&q1);
-    if (ip == 0) {
+    if (ip == 0)
+    {
       //printf("Unbounded:");
       // #if DEBUG
       //       print_bmat( a, m+1, n+1);
       // #endif
-      *icase=1;		/* unbounded */
+      *icase=1;                /* unbounded */
       // free mem
       Free( (ADDRESS) l3, (m+1) * sizeof(int) );
       Free( (ADDRESS) l2, (m+1) * sizeof(int) );
@@ -880,7 +964,7 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
     simp3(a,m,n,ip,kp);
     is= izrov[kp];
     izrov[kp]= iposv[ip];
-    iposv[ip]= is;	
+    iposv[ip]= is;
   }/*for ;;*/
 }
 
@@ -889,24 +973,31 @@ void simp1( mprfloat **a, int mm, int ll[], int nll, int iabf, int *kp, mprfloat
   int k;
   mprfloat test;
 
-  if( nll <= 0) {			/* init'tion: fixed */
+  if( nll <= 0)
+  {                        /* init'tion: fixed */
     *bmax = 0.0;
     return;
   }
   *kp=ll[1];
   *bmax=a[mm+1][*kp+1];
-  for (k=2;k<=nll;k++) {
-    if (iabf == 0) {
+  for (k=2;k<=nll;k++)
+  {
+    if (iabf == 0)
+    {
       test=a[mm+1][ll[k]+1]-(*bmax);
-      if (test > 0.0) {
-	*bmax=a[mm+1][ll[k]+1];
-	*kp=ll[k];
+      if (test > 0.0)
+      {
+        *bmax=a[mm+1][ll[k]+1];
+        *kp=ll[k];
       }
-    } else {			/* abs values: have fixed it */
+    }
+    else
+    {                        /* abs values: have fixed it */
       test=fabs(a[mm+1][ll[k]+1])-fabs(*bmax);
-      if (test > 0.0) {
-	*bmax=a[mm+1][ll[k]+1];
-	*kp=ll[k];
+      if (test > 0.0)
+      {
+        *bmax=a[mm+1][ll[k]+1];
+        *kp=ll[k];
       }
     }
   }
@@ -918,26 +1009,34 @@ void simp2( mprfloat **a, int n, int l2[], int nl2, int *ip, int kp, mprfloat *q
   mprfloat qp,q0,q;
 
   *ip= 0;
-  for ( i=1; i <= nl2; i++ ) {
-    if ( a[l2[i]+1][kp+1] < -SIMPLEX_EPS ) {
+  for ( i=1; i <= nl2; i++ )
+  {
+    if ( a[l2[i]+1][kp+1] < -SIMPLEX_EPS )
+    {
       *q1= -a[l2[i]+1][1] / a[l2[i]+1][kp+1];
       *ip= l2[i];
-      for ( i= i+1; i <= nl2; i++ ) {
-	ii= l2[i];
-	if (a[ii+1][kp+1] < -SIMPLEX_EPS) {
-	  q= -a[ii+1][1] / a[ii+1][kp+1];
-	  if (q - *q1 < -SIMPLEX_EPS) {
-	    *ip=ii;
-	    *q1=q;
-	  } else if (q - *q1 < SIMPLEX_EPS) {
-	    for ( k=1; k<= n; k++ ) {
-	      qp= -a[*ip+1][k+1]/a[*ip+1][kp+1];
-	      q0= -a[ii+1][k+1]/a[ii+1][kp+1];
-	      if ( q0 != qp ) break;
-	    }
-	    if ( q0 < qp ) *ip= ii;
-	  }
-	}
+      for ( i= i+1; i <= nl2; i++ )
+      {
+        ii= l2[i];
+        if (a[ii+1][kp+1] < -SIMPLEX_EPS)
+        {
+          q= -a[ii+1][1] / a[ii+1][kp+1];
+          if (q - *q1 < -SIMPLEX_EPS)
+          {
+            *ip=ii;
+            *q1=q;
+          }
+          else if (q - *q1 < SIMPLEX_EPS)
+          {
+            for ( k=1; k<= n; k++ )
+            {
+              qp= -a[*ip+1][k+1]/a[*ip+1][kp+1];
+              q0= -a[ii+1][k+1]/a[ii+1][kp+1];
+              if ( q0 != qp ) break;
+            }
+            if ( q0 < qp ) *ip= ii;
+          }
+        }
       }
     }
   }
@@ -949,14 +1048,17 @@ void simp3( mprfloat **a, int i1, int k1, int ip, int kp )
   mprfloat piv;
 
   piv= 1.0 / a[ip+1][kp+1];
-  for ( ii=1; ii <= i1+1; ii++ ) 
-    if ( ii -1 != ip ) {
+  for ( ii=1; ii <= i1+1; ii++ )
+  {
+    if ( ii -1 != ip )
+    {
       a[ii][kp+1] *= piv;
-      for ( kk=1; kk <= k1+1; kk++ )  
-	if ( kk-1 != kp ) 
-	  a[ii][kk] -= a[ip+1][kk] * a[ii][kp+1];
+      for ( kk=1; kk <= k1+1; kk++ )
+        if ( kk-1 != kp )
+          a[ii][kk] -= a[ip+1][kk] * a[ii][kp+1];
     }
-  for ( kk=1; kk<= k1+1; kk++ ) 
+  }
+  for ( kk=1; kk<= k1+1; kk++ )
     if ( kk-1 != kp ) a[ip+1][kk] *= -piv;
   a[ip+1][kp+1]= piv;
 }
@@ -971,6 +1073,3 @@ void simp3( mprfloat **a, int i1, int k1, int ip, int kp )
 // compile-command-1: "make installg" ***
 // compile-command-2: "make install" ***
 // End: ***
-
-
-

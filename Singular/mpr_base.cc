@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.1 1999-06-28 12:48:11 wenk Exp $ */
+/* $Id: mpr_base.cc,v 1.2 1999-06-28 16:06:24 Singular Exp $ */
 
-/* 
+/*
  * ABSTRACT - multipolynomial resultants - resultant matrices
  *            ( sparse, dense, u-resultant solver )
  */
@@ -52,7 +52,7 @@ extern void nPrint(number n);  // for debugging output
 #define MAXSEED        1024 //512
 #define MINVDIST       0.0
 #define RVMULT         0.00005 // 0.000000005
-#define MAXVARS        100           
+#define MAXVARS        100
 //<-
 
 //-> sparse resultant matrix
@@ -61,10 +61,11 @@ extern void nPrint(number n);  // for debugging output
 class pointSet;
 
 /* Linear Program stuff */
-struct linProg {          // Linear Program stuff
-  mprfloat **LiPM;            
-  int *izrov, *iposv;       
-  int LiPM_cols,LiPM_rows; 
+struct linProg
+{
+  mprfloat **LiPM;
+  int *izrov, *iposv;
+  int LiPM_cols,LiPM_rows;
 };
 
 typedef linProg *linProgP;
@@ -88,7 +89,7 @@ public:
   const number getDetAt( const number* evpoint );
 
   const poly getUDet( const number* evpoint );
-  
+
 private:
   resMatrixSparse( const resMatrixSparse & );
 
@@ -101,7 +102,7 @@ private:
   int RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] );
 
   /* Remaps a result of LP to the according point set Qi.
-   * Returns false iff remaping was not possible, otherwise true. 
+   * Returns false iff remaping was not possible, otherwise true.
    */
   bool remapXiToPoint( const int indx, pointSet **pQ, int *set, int *vtx );
 
@@ -119,15 +120,15 @@ private:
 
 private:
   ideal gls;
-  
+
   int n, idelem;     // number of variables, polynoms
   int numSet0;       // number of elements in S0
   int msize;         // size of matrix
-  
+
   intvec *uRPos;
 
   ideal rmat;        // sparse matrix representation
-  
+
   linProg LP;
 };
 //<-
@@ -137,12 +138,14 @@ poly monomAt( poly p, int i );
 
 typedef unsigned int Coord_t;
 
-struct setID {
+struct setID
+{
   int set;
   int pnt;
 };
 
-struct onePoint {
+struct onePoint
+{
   Coord_t * point;             // point[0] is unused, maxial dimension is MAXVARS+1
   setID rc;                    // filled in by Row Content Function
   struct onePoint * rcPnt;     // filled in by Row Content Function
@@ -150,8 +153,9 @@ struct onePoint {
 
 typedef struct onePoint * onePointP;
 
-/* sparse matrix entry */ 
-struct _entry {
+/* sparse matrix entry */
+struct _entry
+{
   number num;
   int col;
   struct _entry * next;
@@ -161,7 +165,8 @@ typedef struct _entry * entry;
 //<-
 
 //-> class pointSet
-class pointSet {
+class pointSet
+{
 private:
   onePointP *points;     // set of onePoint's, index [1..num], supports of monoms
   bool lifted;
@@ -217,7 +222,7 @@ public:
 
   /* Returns index of supp(LT(p)) in pointSet. */
   int getExpPos( const poly p );
-  
+
   /** sort lex
    */
   void sort();
@@ -251,7 +256,8 @@ private:
 
 //-> class convexHull
 /* Compute convex hull of given exponent set */
-class convexHull {
+class convexHull
+{
 public:
   convexHull( linProgP _pLP ) : pLP(_pLP) {}
   ~convexHull() {}
@@ -263,7 +269,7 @@ public:
    pointSet ** newtonPolytopes( ideal gls );
 
 private:
-  /** Returns true iff the support of poly pointPoly is inside the 
+  /** Returns true iff the support of poly pointPoly is inside the
    * convex hull of all points given by the  support of poly p.
    */
   bool inHull(poly p, poly pointPoly, int m, int site);
@@ -277,7 +283,8 @@ private:
 
 //-> class mayanPyramidAlg
 /* Compute all lattice points in a given convex hull */
-class mayanPyramidAlg {
+class mayanPyramidAlg
+{
 public:
   mayanPyramidAlg( linProgP _pLP ) : n(pVariables), pLP(_pLP) {}
   ~mayanPyramidAlg() {}
@@ -289,8 +296,8 @@ public:
 
 private:
 
-  /** Recursive Mayan Pyramid algorithm for directly computing MinkowskiSum 
-   * lattice points for (n+1)-fold MinkowskiSum of given point sets Qi[].		
+  /** Recursive Mayan Pyramid algorithm for directly computing MinkowskiSum
+   * lattice points for (n+1)-fold MinkowskiSum of given point sets Qi[].
    * Recursively for range of dim: dim in [0..n); acoords[0..var) fixed.
    * Stores only MinkowskiSum points of udist > 0: done by storeMinkowskiSumPoints.
    */
@@ -298,7 +305,7 @@ private:
 
   /**  Compute v-distance via Linear Programing
    * Linear Program finds the v-distance of the point in accords[].
-   * The v-distance is the distance along the direction v to boundary of 
+   * The v-distance is the distance along the direction v to boundary of
    * Minkowski Sum of Qi (here vector v is represented by shift[]).
    * Returns the v-distance or -1.0 if an error occured.
    */
@@ -306,7 +313,7 @@ private:
 
   /** LP for finding min/max coord in MinkowskiSum, given previous coors.
    * Assume MinkowskiSum in non-negative quadrants
-   * coor in [0,n); fixed coords in acoords[0..coor)			
+   * coor in [0,n); fixed coords in acoords[0..coor)
    */
   void mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR );
 
@@ -314,7 +321,7 @@ private:
    * Returns true iff point was stored, else flase
    */
   bool storeMinkowskiSumPoint();
-  
+
 private:
   pointSet **Qi;
   pointSet *E;
@@ -334,7 +341,8 @@ void print_mat(mprfloat **a, int maxrow, int maxcol)
 {
   int i, j;
 
-  for (i = 1; i <= maxrow; i++) {
+  for (i = 1; i <= maxrow; i++)
+  {
     Print("[");
     for (j = 1; j <= maxcol; j++) Print("% 7.2f, ", a[i][j]);
     Print("],\n");
@@ -345,7 +353,8 @@ void print_bmat(mprfloat **a, int nrows, int ncols, int N, int *iposv)
   int i, j;
 
   printf("Output matrix from LinProg");
-  for (i = 1; i <= nrows; i++) {
+  for (i = 1; i <= nrows; i++)
+  {
     printf("\n[ ");
     if (i == 1) printf("  ");
     else if (iposv[i-1] <= N) printf("X%d", iposv[i-1]);
@@ -359,7 +368,8 @@ void print_bmat(mprfloat **a, int nrows, int ncols, int N, int *iposv)
 void print_exp( const onePointP vert, int n )
 {
   int i;
-  for ( i= 1; i <= n; i++ ) {
+  for ( i= 1; i <= n; i++ )
+  {
     Print(" %d",vert->point[i] );
 #ifdef LONG_OUTPUT
     if ( i < n ) Print(", ");
@@ -371,29 +381,40 @@ void print_matrix( matrix omat )
   int i,j;
   int val;
   Print(" matrix m[%d][%d]=(\n",MATROWS( omat ),MATCOLS( omat ));
-  for ( i= 1; i <= MATROWS( omat ); i++ ) {
-    for ( j= 1; j <= MATCOLS( omat ); j++ ) {
-      if ( MATELEM( omat, i, j) && pGetCoeff( MATELEM( omat, i, j) ) ) {
-	val= nInt(pGetCoeff( MATELEM( omat, i, j) ));
-	if ( i==MATROWS(omat) && j==MATCOLS(omat) ) {
-	  if ( !val ) Print(" 0 ");
-	  else Print("%d ",val);
-	} else {
-	  if ( !val ) Print(" 0, ");
-	  else Print("%d, ",val);
-	}
-      } else {
-	if ( i==MATROWS(omat) && j==MATCOLS(omat) ) {
-	  Print("  0");
-	} else {
-	  Print("  0, ");
-	}
+  for ( i= 1; i <= MATROWS( omat ); i++ )
+  {
+    for ( j= 1; j <= MATCOLS( omat ); j++ )
+    {
+      if ( MATELEM( omat, i, j) && pGetCoeff( MATELEM( omat, i, j) ) )
+      {
+        val= nInt(pGetCoeff( MATELEM( omat, i, j) ));
+        if ( i==MATROWS(omat) && j==MATCOLS(omat) )
+        {
+          if ( !val ) Print(" 0 ");
+          else Print("%d ",val);
+        }
+        else
+        {
+          if ( !val ) Print(" 0, ");
+          else Print("%d, ",val);
+        }
+      }
+      else
+      {
+        if ( i==MATROWS(omat) && j==MATCOLS(omat) )
+        {
+          Print("  0");
+        }
+        else
+        {
+          Print("  0, ");
+        }
       }
     }
     Print("\n");
   }
   Print(");\n");
-}    
+}
 #endif
 //<-
 
@@ -403,7 +424,8 @@ pointSet::pointSet( const int _dim, const int _index, const int count )
 {
   int i;
   points = (onePointP *)Alloc( (count+1) * sizeof(onePointP) );
-  for ( i= 0; i <= max; i++ ) {
+  for ( i= 0; i <= max; i++ )
+  {
     points[i]= (onePointP)Alloc( sizeof(onePoint) );
     points[i]->point= (Coord_t *)Alloc0( (dim+2) * sizeof(Coord_t) );
   }
@@ -414,7 +436,8 @@ pointSet::~pointSet()
 {
   int i;
   int fdim= lifted ? dim+1 : dim+2;
-  for ( i= 0; i <= max; i++ ) {
+  for ( i= 0; i <= max; i++ )
+  {
     Free( (ADDRESS) points[i]->point, fdim * sizeof(Coord_t) );
     Free( (ADDRESS) points[i], sizeof(onePoint) );
   }
@@ -429,13 +452,15 @@ inline const onePointP pointSet::operator[] ( const int index )
 
 inline bool pointSet::checkMem()
 {
-  if ( num >= max ) {
+  if ( num >= max )
+  {
     int i;
     int fdim= lifted ? dim+1 : dim+2;
-    points= (onePointP*)ReAlloc( points, 
-				 (max+1) * sizeof(onePointP), 
-				 (2*max + 1) * sizeof(onePointP) );
-    for ( i= max+1; i <= max*2; i++ ) {
+    points= (onePointP*)ReAlloc( points,
+                                 (max+1) * sizeof(onePointP),
+                                 (2*max + 1) * sizeof(onePointP) );
+    for ( i= max+1; i <= max*2; i++ )
+    {
       points[i]= (onePointP)Alloc( sizeof(struct onePoint) );
       points[i]->point= (Coord_t *)Alloc0( fdim * sizeof(Coord_t) );
     }
@@ -482,7 +507,8 @@ bool pointSet::addPoint( const Coord_t * vert )
 bool pointSet::removePoint( const int indx )
 {
   assume( indx > 0 && indx <= num );
-  if ( indx != num ) {
+  if ( indx != num )
+  {
     onePointP tmp;
     tmp= points[indx];
     points[indx]= points[num];
@@ -497,13 +523,15 @@ bool pointSet::mergeWithExp( const onePointP vert )
 {
   int i,j;
 
-  for ( i= 1; i <= num; i++ ) {
+  for ( i= 1; i <= num; i++ )
+  {
     for ( j= 1; j <= dim; j++ )
       if ( points[i]->point[j] != vert->point[j] ) break;
     if ( j > dim ) break;
   }
-  
-  if ( i > num ) {
+
+  if ( i > num )
+  {
     addPoint( vert );
     return true;
   }
@@ -514,13 +542,15 @@ bool pointSet::mergeWithExp( const Exponent_t * vert )
 {
   int i,j;
 
-  for ( i= 1; i <= num; i++ ) {
+  for ( i= 1; i <= num; i++ )
+  {
     for ( j= 1; j <= dim; j++ )
       if ( points[i]->point[j] != (Coord_t) vert[j] ) break;
     if ( j > dim ) break;
   }
-  
-  if ( i > num ) {
+
+  if ( i > num )
+  {
     addPoint( vert );
     return true;
   }
@@ -534,16 +564,19 @@ void pointSet::mergeWithPoly( const poly p )
   Exponent_t * vert;
   vert= (Exponent_t *)Alloc( (dim+1) * sizeof(Exponent_t) );
 
-  while ( piter ) {
+  while ( piter )
+  {
     pGetExpV( piter, vert );
 
-    for ( i= 1; i <= num; i++ ) {
+    for ( i= 1; i <= num; i++ )
+    {
       for ( j= 1; j <= dim; j++ )
-	if ( points[i]->point[j] != (Coord_t) vert[j] ) break;
+        if ( points[i]->point[j] != (Coord_t) vert[j] ) break;
       if ( j > dim ) break;
     }
 
-    if ( i > num ) {
+    if ( i > num )
+    {
       addPoint( vert );
     }
 
@@ -561,7 +594,8 @@ int pointSet::getExpPos( const poly p )
   vert= (Exponent_t *)Alloc( (dim+1) * sizeof(Exponent_t) );
 
   pGetExpV( p, vert );
-  for ( i= 1; i <= num; i++ ) {
+  for ( i= 1; i <= num; i++ )
+  {
     for ( j= 1; j <= dim; j++ )
       if ( points[i]->point[j] != (Coord_t) vert[j] ) break;
     if ( j > dim ) break;
@@ -585,12 +619,15 @@ void pointSet::getRowMP( const int indx, Exponent_t * vert )
 inline bool pointSet::smaller( int a, int b )
 {
   int i;
-  
-  for ( i= 1; i <= dim; i++ ) {
-    if ( points[a]->point[i] > points[b]->point[i] ) {
+
+  for ( i= 1; i <= dim; i++ )
+  {
+    if ( points[a]->point[i] > points[b]->point[i] )
+    {
       return false;
     }
-    if ( points[a]->point[i] < points[b]->point[i] ) {
+    if ( points[a]->point[i] < points[b]->point[i] )
+    {
       return true;
     }
   }
@@ -601,12 +638,15 @@ inline bool pointSet::smaller( int a, int b )
 inline bool pointSet::larger( int a, int b )
 {
   int i;
-  
-  for ( i= 1; i <= dim; i++ ) {
-    if ( points[a]->point[i] < points[b]->point[i] ) {
+
+  for ( i= 1; i <= dim; i++ )
+  {
+    if ( points[a]->point[i] < points[b]->point[i] )
+    {
       return false;
     }
-    if ( points[a]->point[i] > points[b]->point[i] ) {
+    if ( points[a]->point[i] > points[b]->point[i] )
+    {
       return true;
     }
   }
@@ -620,15 +660,18 @@ void pointSet::sort()
   bool found= true;;
   onePointP tmp;
 
-  while ( found ) {
+  while ( found )
+  {
     found= false;
-    for ( i= 1; i < num; i++ ) {
-      if ( larger( i, i+1 ) ) {
-	tmp= points[i];
-	points[i]= points[i+1];
-	points[i+1]= tmp;
-	
-	found= true;
+    for ( i= 1; i < num; i++ )
+    {
+      if ( larger( i, i+1 ) )
+      {
+        tmp= points[i];
+        points[i]= points[i+1];
+        points[i+1]= tmp;
+
+        found= true;
       }
     }
   }
@@ -641,35 +684,40 @@ void pointSet::lift( int l[] )
   int sum;
 
   time_t *tp = NULL;
-  seed = ((int)time(tp) % MAXSEED) + index; // secs since 1/1/70 ->[1,MAXSEED] 
+  seed = ((int)time(tp) % MAXSEED) + index; // secs since 1/1/70 ->[1,MAXSEED]
   //seed= 100+index;
-  
+
   dim++;
 
-  if ( !l ) {
+  if ( l==NULL )
+  {
     outerL= false;
     l= (int *)Alloc( (dim+1) * sizeof(int) ); // [1..dim-1]
-    
+
     srand48( (long)(seed*(index+MAXSEED*18)) );  // index+MAXSEED*MAXVARS
-    for(i = 1; i < dim; i++) {
+    for(i = 1; i < dim; i++)
+    {
       l[i]= 1 + ((unsigned int) mrand48()) % LIFT_COOR;
     }
   }
-  for ( j=1; j <= num; j++ ) {
+  for ( j=1; j <= num; j++ )
+  {
     sum= 0;
-    for ( i=1; i < dim; i++ ) {
+    for ( i=1; i < dim; i++ )
+    {
       sum += (int)points[j]->point[i] * l[i];
     }
     points[j]->point[dim]= sum;
   }
-  
+
 #ifdef mprDEBUG_ALL
   Print(" lift vector: ");
   for ( j=1; j < dim; j++ ) Print(" %d ",l[j] );
   PrintLn();
 #ifdef mprDEBUG_ALL
   Print(" lifted points: \n");
-  for ( j=1; j <= num; j++ ) {
+  for ( j=1; j <= num; j++ )
+  {
     Print("%d: <",j);print_exp(points[j],dim);Print(">\n");
   }
   PrintLn();
@@ -697,25 +745,28 @@ poly monomAt( poly p, int i )
 bool convexHull::inHull(poly p, poly pointPoly, int m, int site)
 {
   int i, j, col, icase;
-  int numcons;		// num of constraints 
-  int numpts;		// num of pts in defining support 
-  int numcols;		// tot number of cols 
-  
-  numcons = n+1;	
-  numpts = m-1;	
-  numcols = numpts+1;		// this includes col of cts 
+  int numcons;                // num of constraints
+  int numpts;                // num of pts in defining support
+  int numcols;                // tot number of cols
 
-  pLP->LiPM[1][1] = +0.0;  pLP->LiPM[1][2] = +1.0;	// optimize (arbitrary) var 
-  pLP->LiPM[2][1] = +1.0;  pLP->LiPM[2][2] = -1.0; 	// lambda vars sum up to 1 
-  for ( j=3; j<=numcols; j++) {
+  numcons = n+1;
+  numpts = m-1;
+  numcols = numpts+1;                // this includes col of cts
+
+  pLP->LiPM[1][1] = +0.0;  pLP->LiPM[1][2] = +1.0;        // optimize (arbitrary) var
+  pLP->LiPM[2][1] = +1.0;  pLP->LiPM[2][2] = -1.0;         // lambda vars sum up to 1
+  for ( j=3; j<=numcols; j++)
+  {
     pLP->LiPM[1][j] = +0.0; pLP->LiPM[2][j] = -1.0;
   }
 
-  for( i= 1; i <= n; i++) {	// each row constraints one coor 
+  for( i= 1; i <= n; i++) {        // each row constraints one coor
     pLP->LiPM[i+2][1] = (mprfloat)pGetExp(pointPoly,i);
     col = 2;
-    for( j= 1; j <= m; j++ ) {
-      if( j != site ) {
+    for( j= 1; j <= m; j++ )
+    {
+      if( j != site )
+      {
         pLP->LiPM[i+2][col] = -(mprfloat)pGetExp( monomAt(p,j), i );
         col++;
       }
@@ -727,13 +778,15 @@ bool convexHull::inHull(poly p, poly pointPoly, int m, int site)
   print_mat( pLP->LiPM, numcons+1, numcols);
 #endif
 #if 1
-  if ( numcons + 1 > pLP->LiPM_rows ) Werror("convexHull::inHull: #rows > #pLP->LiPM_rows!");
-  if ( numcols + 1 > pLP->LiPM_cols ) Werror("convexHull::inHull: #cols > #pLP->LiPM_cols!");
+  if ( numcons + 1 > pLP->LiPM_rows )
+    WerrorS("convexHull::inHull: #rows > #pLP->LiPM_rows!");
+  if ( numcols + 1 > pLP->LiPM_cols )
+    WerrorS("convexHull::inHull: #cols > #pLP->LiPM_cols!");
 #endif
 
   simplx( pLP->LiPM, numcons, numcols-1, 0, 0, numcons, &icase, pLP->izrov, pLP->iposv);
 
-  return (icase == 0);	
+  return (icase == 0);
 }
 
 // mprSTICKYPROT:
@@ -746,26 +799,30 @@ pointSet ** convexHull::newtonPolytopes( ideal gls )
   int idelem= IDELEMS(gls);
   Exponent_t * vert;
 
-  n= pVariables;	
+  n= pVariables;
   vert= (Exponent_t *)Alloc( (idelem+1) * sizeof(Exponent_t) );
 
-  Q = (pointSet **)Alloc( idelem * sizeof(pointSet*) );	// support hulls 
+  Q = (pointSet **)Alloc( idelem * sizeof(pointSet*) );        // support hulls
   for ( i= 0; i < idelem; i++ )
     Q[i] = new pointSet( pVariables, i+1, pLength((gls->m)[i])+1 );
 
-  for( i= 0; i < idelem; i++ ) {
+  for( i= 0; i < idelem; i++ )
+  {
     k=1;
     m = pLength( (gls->m)[i] );
 
     poly p= (gls->m)[i];
-    for( j= 1; j <= m; j++) {  // für jeden Exponentvektor 
-      if( !inHull( (gls->m)[i], p, m, j ) ) {
-	pGetExpV( p, vert );
+    for( j= 1; j <= m; j++) {  // für jeden Exponentvektor
+      if( !inHull( (gls->m)[i], p, m, j ) )
+      {
+        pGetExpV( p, vert );
         Q[i]->addPoint( vert );
-	k++;
-	mprSTICKYPROT(ST_SPARSE_VADD);
-      } else {
-	mprSTICKYPROT(ST_SPARSE_VREJ);
+        k++;
+        mprSTICKYPROT(ST_SPARSE_VADD);
+      }
+      else
+      {
+        mprSTICKYPROT(ST_SPARSE_VREJ);
       }
       pIter( p );
     } // j
@@ -776,9 +833,11 @@ pointSet ** convexHull::newtonPolytopes( ideal gls )
 
 #ifdef mprDEBUG_PROT
   PrintLn();
-  for( i= 0; i < idelem; i++ ) {
+  for( i= 0; i < idelem; i++ )
+  {
     Print(" \\Conv(Qi[%d]): #%d\n", i,Q[i]->num );
-    for ( j=1; j <= Q[i]->num; j++ ) {
+    for ( j=1; j <= Q[i]->num; j++ )
+    {
       Print("%d: <",j);print_exp( (*Q[i])[j] , pVariables );Print(">\n");
     }
     PrintLn();
@@ -814,43 +873,48 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
   int icase, constr, numverts, cols;
 
   numverts = 0;
-  for( i=0; i<=n; i++) {
+  for( i=0; i<=n; i++)
+  {
     numverts += Qi[i]->num;
   }
-  cols = numverts + 2;  
+  cols = numverts + 2;
 
-  //if( dim < 1 || dim > n ) Werror("mayanPyramidAlg::vDistance: Known coords dim off range");
+  //if( dim < 1 || dim > n )
+  //  WerrorS("mayanPyramidAlg::vDistance: Known coords dim off range");
 
-  pLP->LiPM[1][1] = 0.0; 
-  pLP->LiPM[1][2] = 1.0;	// maximize	
+  pLP->LiPM[1][1] = 0.0;
+  pLP->LiPM[1][2] = 1.0;        // maximize
   for( j=3; j<=cols; j++) pLP->LiPM[1][j] = 0.0;
 
-  for( i=0; i <= n; i++ ) {			
+  for( i=0; i <= n; i++ ) {
     pLP->LiPM[i+2][1] = 1.0;
     pLP->LiPM[i+2][2] = 0.0;
   }
-  for( i=1; i<=dim; i++) {		
+  for( i=1; i<=dim; i++) {
     pLP->LiPM[n+2+i][1] = (mprfloat)(acoords[i-1]);
     pLP->LiPM[n+2+i][2] = -shift[i];
   }
 
   ii = -1;
   col = 2;
-  for ( i= 0; i <= n; i++ ) {			
+  for ( i= 0; i <= n; i++ ) {
     ii++;
-    for( k= 1; k <= Qi[ii]->num; k++ ) {
+    for( k= 1; k <= Qi[ii]->num; k++ )
+    {
       col++;
-      for ( r= 0; r <= n; r++ ) {
-	if ( r == i ) pLP->LiPM[r+2][col] = -1.0;
-	else pLP->LiPM[r+2][col] = 0.0;
+      for ( r= 0; r <= n; r++ )
+      {
+        if ( r == i ) pLP->LiPM[r+2][col] = -1.0;
+        else pLP->LiPM[r+2][col] = 0.0;
       }
       for( r= 1; r <= dim; r++ ) pLP->LiPM[r+n+2][col] = -(mprfloat)((*Qi[ii])[k]->point[r]);
     }
   }
 
-  if( col != cols) Werror("mayanPyramidAlg::vDistance:" 
-			  "setting up matrix for udist: col %d != cols %d",col,cols);
-  constr = n+dim+1;			
+  if( col != cols)
+    Werror("mayanPyramidAlg::vDistance:"
+           "setting up matrix for udist: col %d != cols %d",col,cols);
+  constr = n+dim+1;
 
 #ifdef mprDEBUG_ALL
   Print("vDistance LP, known koords dim=%d, constr %d, cols %d, acoords= ",dim,constr,cols);
@@ -860,8 +924,10 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
 #endif
 
 #if 1
-  if ( constr + 1 > pLP->LiPM_rows ) Werror("mayanPyramidAlg::vDistance: #rows > #pLP->LiPM_rows!");
-  if ( cols + 1 > pLP->LiPM_cols ) Werror("mayanPyramidAlg::vDistance: #cols > #pLP->LiPM_cols!");
+  if ( constr + 1 > pLP->LiPM_rows )
+    WerrorS("mayanPyramidAlg::vDistance: #rows > #pLP->LiPM_rows!");
+  if ( cols + 1 > pLP->LiPM_cols )
+    WerrorS("mayanPyramidAlg::vDistance: #cols > #pLP->LiPM_cols!");
 #endif
 
   // 3rd arg is #columns excluding column of constants
@@ -872,11 +938,13 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
   Print("LP returns matrix\n");
   print_bmat( pLP->LiPM, constr+1, cols+1-constr, cols, pLP->iposv);
 #endif
-   
+
   if( icase != 0 ) {  // check for errors
-    Werror("mayanPyramidAlg::vDistance: \n");
-    if( icase == 1 ) Werror(" vDistance: Unbounded v-distance: probably 1st v-coor=0");
-    if( icase == -1 ) Werror(" vDistance: Infeasible v-distance");
+    WerrorS("mayanPyramidAlg::vDistance:");
+    if( icase == 1 )
+      WerrorS(" vDistance: Unbounded v-distance: probably 1st v-coor=0");
+    if( icase == -1 )
+      WerrorS(" vDistance: Infeasible v-distance");
     return -1.0;
   }
 
@@ -894,35 +962,37 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
   //
 
   // common part of the matrix
-  pLP->LiPM[1][1] = 0.0;		
-  for( i=2; i<=n+2; i++) {	
-    pLP->LiPM[i][1] = 1.0;	// 1st col	
-    pLP->LiPM[i][2] = 0.0;	// 2nd col	
+  pLP->LiPM[1][1] = 0.0;
+  for( i=2; i<=n+2; i++) {
+    pLP->LiPM[i][1] = 1.0;        // 1st col
+    pLP->LiPM[i][2] = 0.0;        // 2nd col
   }
 
   la_cons_row = 1;
   cols = 2;
-  for( i=0; i<=n; i++) { 
+  for( i=0; i<=n; i++)
+  {
     la_cons_row++;
-    for( j=1; j<= Qi[i]->num; j++) {
+    for( j=1; j<= Qi[i]->num; j++)
+    {
       cols++;
-      pLP->LiPM[1][cols] = 0.0;	// set 1st row 0
+      pLP->LiPM[1][cols] = 0.0;        // set 1st row 0
       for( k=2; k<=n+2; k++) {  // lambdas sum up to 1
-	if( k != la_cons_row) pLP->LiPM[k][cols] = 0.0;
-	else pLP->LiPM[k][cols] = -1.0;
+        if( k != la_cons_row) pLP->LiPM[k][cols] = 0.0;
+        else pLP->LiPM[k][cols] = -1.0;
       }
       for( k=1; k<=n; k++) pLP->LiPM[k+n+2][cols] = -(mprfloat)((*Qi[i])[j]->point[k]);
     } // j
   } // i
 
-  for( i= 0; i < dim; i++ ) {		// fixed coords
+  for( i= 0; i < dim; i++ ) {                // fixed coords
     pLP->LiPM[i+n+3][1] = acoords[i];
     pLP->LiPM[i+n+3][2] = 0.0;
   }
   pLP->LiPM[dim+n+3][1] = 0.0;
 
-  
-  pLP->LiPM[1][2] = -1.0;	                // minimize
+
+  pLP->LiPM[1][2] = -1.0;                        // minimize
   pLP->LiPM[dim+n+3][2] = 1.0;
 
 #ifdef mprDEBUG_ALL
@@ -933,16 +1003,20 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
 #endif
 
 #if 1
-  if ( cons + 1 > pLP->LiPM_rows ) Werror(" mn_mx_MinkowskiSum: #rows > #pLP->LiPM_rows!");
-  if ( cols + 1 > pLP->LiPM_cols ) Werror(" mn_mx_MinkowskiSum: #cols > #pLP->LiPM_cols!");
+  if ( cons + 1 > pLP->LiPM_rows )
+    WerrorS(" mn_mx_MinkowskiSum: #rows > #pLP->LiPM_rows!");
+  if ( cols + 1 > pLP->LiPM_cols )
+    WerrorS(" mn_mx_MinkowskiSum: #cols > #pLP->LiPM_cols!");
 #endif
 
   // simplx finds MIN for obj.fnc, puts it in [1,1]
   simplx(pLP->LiPM, cons, cols-1, 0, 0, cons, &icase, pLP->izrov, pLP->iposv);
-  
+
   if ( icase != 0 ) { // check for errors
-    if( icase < 0) Werror(" mn_mx_MinkowskiSum: LinearProgram: minR: infeasible");
-    if( icase > 0) Werror(" mn_mx_MinkowskiSum: LinearProgram: minR: unbounded");
+    if( icase < 0)
+      WerrorS(" mn_mx_MinkowskiSum: LinearProgram: minR: infeasible");
+    else if( icase > 0)
+      WerrorS(" mn_mx_MinkowskiSum: LinearProgram: minR: unbounded");
   }
 
   *minR = (Coord_t)( -pLP->LiPM[1][1] + 1.0 - SIMPLEX_EPS );
@@ -951,34 +1025,36 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
   //
 
   // common part of the matrix again
-  pLP->LiPM[1][1] = 0.0;			
-  for( i=2; i<=n+2; i++) {		
-    pLP->LiPM[i][1] = 1.0;			
-    pLP->LiPM[i][2] = 0.0;			
+  pLP->LiPM[1][1] = 0.0;
+  for( i=2; i<=n+2; i++) {
+    pLP->LiPM[i][1] = 1.0;
+    pLP->LiPM[i][2] = 0.0;
   }
   la_cons_row = 1;
   cols = 2;
-  for( i=0; i<=n; i++) { 
+  for( i=0; i<=n; i++)
+  {
     la_cons_row++;
-    for( j=1; j<=Qi[i]->num; j++) {
+    for( j=1; j<=Qi[i]->num; j++)
+    {
       cols++;
-      pLP->LiPM[1][cols] = 0.0;		
-      for( k=2; k<=n+2; k++) {	
-	if( k != la_cons_row) pLP->LiPM[k][cols] = 0.0;
-	else pLP->LiPM[k][cols] = -1.0;
+      pLP->LiPM[1][cols] = 0.0;
+      for( k=2; k<=n+2; k++) {
+        if( k != la_cons_row) pLP->LiPM[k][cols] = 0.0;
+        else pLP->LiPM[k][cols] = -1.0;
       }
       for( k=1; k<=n; k++) pLP->LiPM[k+n+2][cols] = -(mprfloat)((*Qi[i])[j]->point[k]);
     } // j
   }  // i
 
-  for( i= 0; i < dim; i++ ) {		// fixed coords 
+  for( i= 0; i < dim; i++ ) {                // fixed coords
     pLP->LiPM[i+n+3][1] = acoords[i];
     pLP->LiPM[i+n+3][2] = 0.0;
   }
   pLP->LiPM[dim+n+3][1] = 0.0;
 
-  pLP->LiPM[1][2] = 1.0;			// maximize  
-  pLP->LiPM[dim+n+3][2] = 1.0;		// var = sum of pnt coords 
+  pLP->LiPM[1][2] = 1.0;                        // maximize
+  pLP->LiPM[dim+n+3][2] = 1.0;                // var = sum of pnt coords
 
 #ifdef mprDEBUG_ALL
   Print("\nThats the matrix for maxR, dim= %d\n",dim);
@@ -986,19 +1062,24 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
 #endif
 
 #if 1
-  if ( cons + 1 > pLP->LiPM_rows ) Werror(" mn_mx_MinkowskiSum: #rows > #pLP->LiPM_rows!");
-  if ( cols + 1 > pLP->LiPM_cols ) Werror(" mn_mx_MinkowskiSum: #cols > #pLP->LiPM_cols!");
+  if ( cons + 1 > pLP->LiPM_rows )
+    WerrorS(" mn_mx_MinkowskiSum: #rows > #pLP->LiPM_rows!");
+  if ( cols + 1 > pLP->LiPM_cols )
+    WerrorS(" mn_mx_MinkowskiSum: #cols > #pLP->LiPM_cols!");
 #endif
 
   // simplx finds MAX for obj.fnc, puts it in [1,1]
   simplx(pLP->LiPM, cons, cols-1, 0, 0, cons, &icase, pLP->izrov, pLP->iposv);
 
-  if ( icase != 0 ) {
-    if( icase < 0) Werror(" mn_mx_MinkowskiSum: LinearProgram: maxR: infeasible");
-    if( icase > 0) Werror(" mn_mx_MinkowskiSum: LinearProgram: maxR: unbounded");
+  if ( icase != 0 )
+  {
+    if( icase < 0)
+      WerrorS(" mn_mx_MinkowskiSum: LinearProgram: maxR: infeasible");
+    else if( icase > 0)
+      WerrorS(" mn_mx_MinkowskiSum: LinearProgram: maxR: unbounded");
   }
 
-  *maxR = (Coord_t)( pLP->LiPM[1][1] + SIMPLEX_EPS );	
+  *maxR = (Coord_t)( pLP->LiPM[1][1] + SIMPLEX_EPS );
 
 #ifdef mprDEBUG_ALL
   Print("  Range for dim=%d: [%d,%d]\n", dim, *minR, *maxR);
@@ -1006,8 +1087,8 @@ void  mayanPyramidAlg::mn_mx_MinkowskiSum( int dim, Coord_t *minR, Coord_t *maxR
 }
 
 // mprSTICKYPROT:
-// ST_SPARSE_VREJ: rejected point 
-// ST_SPARSE_VADD: added point to set 
+// ST_SPARSE_VREJ: rejected point
+// ST_SPARSE_VADD: added point to set
 bool mayanPyramidAlg::storeMinkowskiSumPoint()
 {
   mprfloat dist;
@@ -1015,16 +1096,17 @@ bool mayanPyramidAlg::storeMinkowskiSumPoint()
   // determine v-distance of point pt
   dist= vDistance( &(acoords[0]), n );
 
-  // store only points with v-distance > minVdist 
-  if( dist <= MINVDIST + SIMPLEX_EPS ) {
+  // store only points with v-distance > minVdist
+  if( dist <= MINVDIST + SIMPLEX_EPS )
+  {
     mprSTICKYPROT(ST_SPARSE_VREJ);
     return false;
   }
 
   E->addPoint( &(acoords[0]) );
   mprSTICKYPROT(ST_SPARSE_VADD);
-  
-  return true; 
+
+  return true;
 }
 
 // mprSTICKYPROT:
@@ -1046,11 +1128,12 @@ void mayanPyramidAlg::runMayanPyramid( int dim )
 #endif
 
   // step 5 -> terminate
-  if( dim == n-1 ) {	
-    int lastKilled = 0;			
+  if( dim == n-1 ) {
+    int lastKilled = 0;
     // insert points
     acoords[dim] = minR;
-    while( acoords[dim] <= maxR ) {
+    while( acoords[dim] <= maxR )
+    {
       if( !storeMinkowskiSumPoint() ) lastKilled++;
       acoords[dim]++;
     }
@@ -1059,18 +1142,20 @@ void mayanPyramidAlg::runMayanPyramid( int dim )
   }
 
   // step 4 -> recurse at step 3
-  acoords[dim] = minR;				
-  while ( acoords[dim] <= maxR ) {
+  acoords[dim] = minR;
+  while ( acoords[dim] <= maxR )
+  {
     if ( (acoords[dim] > minR) && (acoords[dim] <= maxR) ) {     // acoords[dim] >= minR  ??
       mprSTICKYPROT(ST_SPARSE_MREC1);
       runMayanPyramid( dim + 1 );         // recurse with higer dimension
-    } else {	
+    } else {
       // get v-distance of pt
       dist= vDistance( &(acoords[0]), dim + 1 );// dim+1 == known coordinates
 
-      if( dist >= SIMPLEX_EPS ) {  
-	mprSTICKYPROT(ST_SPARSE_MREC2);
-	runMayanPyramid( dim + 1 );       // recurse with higer dimension
+      if( dist >= SIMPLEX_EPS )
+      {
+        mprSTICKYPROT(ST_SPARSE_MREC2);
+        runMayanPyramid( dim + 1 );       // recurse with higer dimension
       }
     }
     acoords[dim]++;
@@ -1085,8 +1170,10 @@ bool resMatrixSparse::remapXiToPoint( const int indx, pointSet **pQ, int *set, i
 {
   int i,n= pVariables;
   int loffset= 0;
-  for ( i= 0; i <= n; i++ ) {
-    if ( (loffset < indx) && (indx <= pQ[i]->num + loffset) ) {
+  for ( i= 0; i <= n; i++ )
+  {
+    if ( (loffset < indx) && (indx <= pQ[i]->num + loffset) )
+    {
       *set= i;
       *pnt= indx-loffset;
       return true;
@@ -1112,30 +1199,34 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   NumCons = n + n + 1;   // number of constrains
 
   // fill in LP matrix
-  for ( i= 0; i <= n; i++ ) {
+  for ( i= 0; i <= n; i++ )
+  {
     size= pQ[i]->num;
-    for ( k= 1; k <= size; k++ ) {
+    for ( k= 1; k <= size; k++ )
+    {
       ncols++;
 
       // objective funtion, minimize
       LP.LiPM[1][ncols] = - ( (mprfloat) (*pQ[i])[k]->point[pQ[i]->dim] / SCALEDOWN );
-      
+
       // lambdas sum up to 1
-      for ( j = 0; j <= n; j++ ) 
-	if ( i==j )
-	  LP.LiPM[j+2][ncols] = -1.0;
-	else
-	  LP.LiPM[j+2][ncols] = 0.0;
+      for ( j = 0; j <= n; j++ )
+        if ( i==j )
+          LP.LiPM[j+2][ncols] = -1.0;
+        else
+          LP.LiPM[j+2][ncols] = 0.0;
 
       // the points
-      for ( j = 1; j <= n; j++ ) {
-	LP.LiPM[j+n+2][ncols] =  - ( (mprfloat) (*pQ[i])[k]->point[j] );
+      for ( j = 1; j <= n; j++ )
+      {
+        LP.LiPM[j+n+2][ncols] =  - ( (mprfloat) (*pQ[i])[k]->point[j] );
       }
     }
   }
-    
-  for ( j = 0; j <= n; j++ ) LP.LiPM[j+2][1] = 1.0;   
-  for ( j= 1; j <= n; j++ ) {
+
+  for ( j = 0; j <= n; j++ ) LP.LiPM[j+2][1] = 1.0;
+  for ( j= 1; j <= n; j++ )
+  {
     LP.LiPM[j+n+2][1]= (mprfloat)(*E)[vert]->point[j] - shift[j];
   }
   ncols--;
@@ -1145,18 +1236,21 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
 #ifdef mprDEBUG_ALL
   PrintLn();
   Print(" n= %d, NumCons=M= %d, ncols=N= %d\n",n,NumCons,ncols);
-  print_mat(LP.LiPM, NumCons+1, ncols+1);   
-#endif  
+  print_mat(LP.LiPM, NumCons+1, ncols+1);
+#endif
 
 #if 1
-  if ( NumCons + 1 > LP.LiPM_rows ) Werror("resMatrixSparse::RC: #rows > #LP.LiPM_rows!");
-  if ( ncols + 1 > LP.LiPM_cols ) Werror("resMatrixSparse::RC: #cols > #LP.LiPM_cols!");
+  if ( NumCons + 1 > LP.LiPM_rows )
+    WerrorS("resMatrixSparse::RC: #rows > #LP.LiPM_rows!");
+  if ( ncols + 1 > LP.LiPM_cols )
+    WerrorS("resMatrixSparse::RC: #cols > #LP.LiPM_cols!");
 #endif
 
   //           M        N      m1  m2  m3,   M= m1+m2+m3
   simplx(LP.LiPM, NumCons, ncols,  0,  0, NumCons, &icase, LP.izrov, LP.iposv);
 
-  if (icase < 0) {
+  if (icase < 0)
+  {
     // infeasibility: the point does not lie in a cell -> remove it
     return -1;
   }
@@ -1169,23 +1263,26 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   //print_bmat(LP.LiPM, NumCons + 1, ncols+1-NumCons, ncols+1, LP.iposv); // ( rows= M+1, cols= N+1-m3 )
   //print_mat(LP.LiPM, NumCons+1, ncols);
 #endif
-  
+
 #if 1
   // sort LP results
-  while (found) {
+  while (found)
+  {
     found=false;
-    for ( i= 1; i < NumCons; i++ ) {
-      if ( LP.iposv[i] > LP.iposv[i+1] ) {
+    for ( i= 1; i < NumCons; i++ )
+    {
+      if ( LP.iposv[i] > LP.iposv[i+1] )
+      {
 
-	c= LP.iposv[i];
-	LP.iposv[i]=LP.iposv[i+1];
-	LP.iposv[i+1]=c;
+        c= LP.iposv[i];
+        LP.iposv[i]=LP.iposv[i+1];
+        LP.iposv[i+1]=c;
 
-	cd=LP.LiPM[i+1][1];
-	LP.LiPM[i+1][1]=LP.LiPM[i+2][1];
-	LP.LiPM[i+2][1]=cd;
+        cd=LP.LiPM[i+1][1];
+        LP.LiPM[i+1][1]=LP.LiPM[i+2][1];
+        LP.LiPM[i+2][1]=cd;
 
-	found= true;
+        found= true;
       }
     }
   }
@@ -1202,13 +1299,16 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   // remap results of LP to sets Qi
   c=0;
   optSum= (setID*)Alloc( (NumCons) * sizeof(struct setID) );
-  for ( i= 0; i < NumCons; i++ ) {
+  for ( i= 0; i < NumCons; i++ )
+  {
     //Print("% .15f\n",LP.LiPM[i+2][1]);
-    if ( LP.LiPM[i+2][1] > 1e-12 ) {
-      if ( !remapXiToPoint( LP.iposv[i+1], pQ, &(optSum[c].set), &(optSum[c].pnt) ) ) {
-	Werror(" resMatrixSparse::RC: Found bad solution in LP: %d!",LP.iposv[i+1]);
-	Werror(" resMatrixSparse::RC: remapXiToPoint faild!");
-	return -1;
+    if ( LP.LiPM[i+2][1] > 1e-12 )
+    {
+      if ( !remapXiToPoint( LP.iposv[i+1], pQ, &(optSum[c].set), &(optSum[c].pnt) ) )
+      {
+        Werror(" resMatrixSparse::RC: Found bad solution in LP: %d!",LP.iposv[i+1]);
+        WerrorS(" resMatrixSparse::RC: remapXiToPoint faild!");
+        return -1;
       }
       bucket[optSum[c].set]++;
       c++;
@@ -1218,30 +1318,35 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   onum= c;
   // find last min in bucket[]: maximum i such that Fi is a point
   c= 0;
-  for ( i= 1; i < E->dim; i++ ) {
-    if ( bucket[c] >= bucket[i] ) {
+  for ( i= 1; i < E->dim; i++ )
+  {
+    if ( bucket[c] >= bucket[i] )
+    {
       c= i;
     }
   }
   // find matching point set
-  for ( i= onum - 1; i >= 0; i-- ) {
-    if ( optSum[i].set == c ) 
+  for ( i= onum - 1; i >= 0; i-- )
+  {
+    if ( optSum[i].set == c )
       break;
   }
   // store
   (*E)[vert]->rc.set= c;
   (*E)[vert]->rc.pnt= optSum[i].pnt;
   (*E)[vert]->rcPnt= (*pQ[c])[optSum[i].pnt];
-  // count 
+  // count
   if ( (*E)[vert]->rc.set == linPolyS ) numSet0++;
 
 #ifdef mprDEBUG_PROT
   Print("\n Point E[%d] was <",vert);print_exp((*E)[vert],E->dim-1);Print(">, bucket={");
-  for ( j= 0; j < E->dim; j++ ) {
+  for ( j= 0; j < E->dim; j++ )
+  {
     Print(" %d",bucket[j]);
   }
   Print(" }\n optimal Sum: Qi ");
-  for ( j= 0; j < NumCons; j++ ) {
+  for ( j= 0; j < NumCons; j++ )
+  {
     Print(" [ %d, %d ]",optSum[j].set,optSum[j].pnt);
   }
   Print(" -> i= %d, j = %d\n",(*E)[vert]->rc.set,optSum[i].pnt);
@@ -1252,7 +1357,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
 
   mprSTICKYPROT(ST_SPARSE_RC);
 
-  return (int)(-LP.LiPM[1][1] * SCALEDOWN);  
+  return (int)(-LP.LiPM[1][1] * SCALEDOWN);
 }
 
 // create coeff matrix
@@ -1289,29 +1394,31 @@ int resMatrixSparse::createMatrix( pointSet *E )
   epp= pOne();
   for ( i= 1; i <= E->num; i++ ) {       // for every row
     E->getRowMP( i, epp_mon );           // compute (p-a[ij]), (i,j) = RC(p)
-    pSetExpV( epp, epp_mon );           
+    pSetExpV( epp, epp_mon );
 
-    // 
+    //
     rowp= pMult( pCopy(epp), pCopy((gls->m)[(*E)[i]->rc.set]) );  // x^(p-a[ij]) * f(i)
     pSetm( rowp );
 
     cp= 2;
     // get column for every monomial in rowp and store it
     iterp= rowp;
-    while ( iterp ) {
+    while ( iterp )
+    {
       epos= E->getExpPos( iterp );
-      if ( epos == 0 ) {
-	// this can happen, if the shift vektor or the lift funktions 
-	// are not generically choosen.
-	Werror("resMatrixSparse::createMatrix: Found exponent not in E, id %d, set [%d, %d]!",
-	       i,(*E)[i]->rc.set,(*E)[i]->rc.pnt);
-	return i;
+      if ( epos == 0 )
+      {
+        // this can happen, if the shift vektor or the lift funktions
+        // are not generically choosen.
+        Werror("resMatrixSparse::createMatrix: Found exponent not in E, id %d, set [%d, %d]!",
+               i,(*E)[i]->rc.set,(*E)[i]->rc.pnt);
+        return i;
       }
       pSetExpV(iterp,eexp);
       pSetComp(iterp, epos );
       if ( (*E)[i]->rc.set == linPolyS ) { // store coeff positions
-	IMATELEM(*uRPos,rp,cp)= epos;
-	cp++;
+        IMATELEM(*uRPos,rp,cp)= epos;
+        cp++;
       }
       pIter( iterp );
     } // while
@@ -1328,11 +1435,13 @@ int resMatrixSparse::createMatrix( pointSet *E )
   Free( (ADDRESS) eexp, (pVariables+1)*sizeof(Exponent_t));
 
 #ifdef mprDEBUG_ALL
-  if ( E->num <= 40 ) {
+  if ( E->num <= 40 )
+  {
     matrix mout= idModule2Matrix( idCopy(rmat) );
     print_matrix(mout);
   }
-  for ( i= 1; i <= numSet0; i++ ) {
+  for ( i= 1; i <= numSet0; i++ )
+  {
     Print(" row  %d contains coeffs of f_%d\n",IMATELEM(*uRPos,i,1),linPolyS);
   }
   Print(" Sparse Matrix done\n");
@@ -1350,13 +1459,16 @@ void resMatrixSparse::randomVector( const int dim, mprfloat shift[] )
 
   srand((long)(((int)time(tp) % MAXSEED)+MAXSEED*18));
 
-  while ( i <= dim ) {
+  while ( i <= dim )
+  {
     shift[i]= (mprfloat) (RVMULT*rand()/(RAND_MAX+1.0));
     i++;
-    for ( j= 1; j < i-1; j++ ) {
-      if ( (shift[j] < shift[i-1] + SIMPLEX_EPS) && (shift[j] > shift[i-1] - SIMPLEX_EPS) ) {
-	i--;
-	break;
+    for ( j= 1; j < i-1; j++ )
+    {
+      if ( (shift[j] < shift[i-1] + SIMPLEX_EPS) && (shift[j] > shift[i-1] - SIMPLEX_EPS) )
+      {
+        i--;
+        break;
       }
     }
   }
@@ -1372,10 +1484,13 @@ pointSet * resMatrixSparse::minkSumTwo( pointSet *Q1, pointSet *Q2, int dim )
 
   vs= new pointSet( dim );
 
-  for ( j= 1; j <= Q1->num; j++ ) {
-    for ( k= 1; k <= Q2->num; k++ ) {
-      for ( l= 1; l <= dim; l++ ) {
-	vert.point[l]= (*Q1)[j]->point[l] + (*Q2)[k]->point[l];
+  for ( j= 1; j <= Q1->num; j++ )
+  {
+    for ( k= 1; k <= Q2->num; k++ )
+    {
+      for ( l= 1; l <= dim; l++ )
+      {
+        vert.point[l]= (*Q1)[j]->point[l] + (*Q2)[k]->point[l];
       }
       vs->mergeWithExp( &vert );
       //vs->addPoint( &vert );
@@ -1396,7 +1511,8 @@ pointSet * resMatrixSparse::minkSumAll( pointSet **pQ, int numq, int dim )
 
   for ( j= 1; j <= pQ[0]->num; j++ ) vs->addPoint( (*pQ[0])[j] );
 
-  for ( j= 1; j < numq; j++ ) {
+  for ( j= 1; j < numq; j++ )
+  {
     vs_old= vs;
     vs= minkSumTwo( vs_old, pQ[j], dim );
 
@@ -1418,8 +1534,9 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   int totverts;                // total number of exponent vectors in ideal gls
   mprfloat shift[MAXVARS+2];   // shiftvector delta, index [1..dim]
 
-  if ( pVariables > MAXVARS ) {
-    Werror("resMatrixSparse::resMatrixSparse: To many variables!");
+  if ( pVariables > MAXVARS )
+  {
+    WerrorS("resMatrixSparse::resMatrixSparse: To many variables!");
     return;
   }
 
@@ -1446,8 +1563,9 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 #endif
 
   // need AllocAligned since we allocate mem for type double
-  LP.LiPM = (mprfloat **)Alloc( LP.LiPM_rows * sizeof(mprfloat *) );  // LP matrix 
-  for( i= 0; i < LP.LiPM_rows; i++ ) {
+  LP.LiPM = (mprfloat **)Alloc( LP.LiPM_rows * sizeof(mprfloat *) );  // LP matrix
+  for( i= 0; i < LP.LiPM_rows; i++ )
+  {
     // Mem must be allocated aligned, also for type double!
     LP.LiPM[i] = (mprfloat *)AllocAligned0( LP.LiPM_cols * sizeof(mprfloat) );
     // LP.LiPM[i] = (mprfloat *)Alloc0( LP.LiPM_cols * sizeof(mprfloat) );
@@ -1474,7 +1592,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   Qi= chnp.newtonPolytopes( gls );
 
 #ifdef mprMINKSUM
-  E= minkSumAll( Qi, n+1, n);  
+  E= minkSumAll( Qi, n+1, n);
 #else
   // get inner points
   mayanPyramidAlg mpa( &LP );
@@ -1486,7 +1604,8 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   Print("(MinkSum)");
 #endif
   Print("\n E = (Q_0 + ... + Q_n) \\cap \\N :\n");
-  for ( pnt= 1; pnt <= E->num; pnt++ ) {
+  for ( pnt= 1; pnt <= E->num; pnt++ )
+  {
     Print("%d: <",pnt);print_exp( (*E)[pnt], E->dim );Print(">\n");
   }
   PrintLn();
@@ -1494,8 +1613,8 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 
 #ifdef mprTEST
   int lift[5][5];
-  lift[0][1]=3; lift[0][2]=4; lift[0][3]=8;  lift[0][4]=2; 
-  lift[1][1]=6; lift[1][2]=1; lift[1][3]=7;  lift[1][4]=4; 
+  lift[0][1]=3; lift[0][2]=4; lift[0][3]=8;  lift[0][4]=2;
+  lift[1][1]=6; lift[1][2]=1; lift[1][3]=7;  lift[1][4]=4;
   lift[2][1]=2; lift[2][2]=5; lift[2][3]=9;  lift[2][4]=6;
   lift[3][1]=2; lift[3][2]=1; lift[3][3]=9;  lift[3][4]=5;
   lift[4][1]=3; lift[4][2]=7; lift[4][3]=1;  lift[4][4]=5;
@@ -1509,14 +1628,17 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 #endif
 
   // run Row Content Function for every point in E
-  for ( pnt= 1; pnt <= E->num; pnt++ ) {
+  for ( pnt= 1; pnt <= E->num; pnt++ )
+  {
     RC( Qi, E, pnt, shift );
   }
 
   // remove points not in cells
   k= E->num;
-  for ( pnt= k; pnt > 0; pnt-- ) {
-    if ( (*E)[pnt]->rcPnt == NULL ) {
+  for ( pnt= k; pnt > 0; pnt-- )
+  {
+    if ( (*E)[pnt]->rcPnt == NULL )
+    {
       E->removePoint(pnt);
       mprSTICKYPROT(ST_SPARSE_RCRJ);
     }
@@ -1525,7 +1647,8 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 
 #ifdef mprDEBUG_PROT
   Print(" points which lie in a cell:\n");
-  for ( pnt= 1; pnt <= E->num; pnt++ ) {
+  for ( pnt= 1; pnt <= E->num; pnt++ )
+  {
     Print("%d: <",pnt);print_exp( (*E)[pnt], E->dim );Print(">\n");
   }
   PrintLn();
@@ -1538,7 +1661,8 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 
 #ifdef mprDEBUG_PROT
   Print(" points with a[ij] (%d):\n",E->num);
-  for ( pnt= 1; pnt <= E->num; pnt++ ) {
+  for ( pnt= 1; pnt <= E->num; pnt++ )
+  {
     Print("Punkt p \\in E[%d]: <",pnt);print_exp( (*E)[pnt], E->dim );
     Print(">, RC(p) = (i:%d, j:%d), a[i,j] = <",(*E)[pnt]->rc.set,(*E)[pnt]->rc.pnt);
     //print_exp( (Qi[(*E)[pnt]->rc.set])[(*E)[pnt]->rc.pnt], E->dim );Print("> = <");
@@ -1547,28 +1671,31 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 #endif
 
   // now create matrix
-  if ( createMatrix( E ) != E->num ) {
+  if ( createMatrix( E ) != E->num )
+  {
     // this can happen if the shiftvector shift is to large or not generic
     istate= resMatrixBase::fatalError;
-    Werror("resMatrixSparse::resMatrixSparse: Error in resMatrixSparse::createMatrix!");
+    WerrorS("resMatrixSparse::resMatrixSparse: Error in resMatrixSparse::createMatrix!");
     goto theEnd;
     //return;
   }
 
  theEnd:
   // clean up
-  for ( i= 0; i < idelem; i++ ) {
+  for ( i= 0; i < idelem; i++ )
+  {
     delete Qi[i];
   }
   Free( (ADDRESS) Qi, idelem * sizeof(pointSet*) );
 
   delete E;
 
-  for( i= 0; i < LP.LiPM_rows; i++ ) {
+  for( i= 0; i < LP.LiPM_rows; i++ )
+  {
     FreeAligned( (ADDRESS) LP.LiPM[i], LP.LiPM_cols * sizeof(mprfloat) );
     //    Free( (ADDRESS) LP.LiPM[i], LP.LiPM_cols * sizeof(mprfloat) );
   }
-  Free( (ADDRESS) LP.LiPM, LP.LiPM_rows * sizeof(mprfloat *) );	
+  Free( (ADDRESS) LP.LiPM, LP.LiPM_rows * sizeof(mprfloat *) );
 
   Free( (ADDRESS) LP.iposv, (idelem * MAXPOINTS) * sizeof(int) );
   Free( (ADDRESS) LP.izrov, (idelem * MAXPOINTS) * sizeof(int) );
@@ -1591,7 +1718,8 @@ const ideal resMatrixSparse::getMatrix()
   ideal rmat_out= idCopy(rmat);
 
   // now fill in coeffs of f0
-  for ( i= 1; i <= numSet0; i++ ) {
+  for ( i= 1; i <= numSet0; i++ )
+  {
 
     pgls= (gls->m)[0]; // f0
 
@@ -1604,16 +1732,20 @@ const ideal resMatrixSparse::getMatrix()
 
     // u_1,..,u_k
     cp=2;
-    while ( pNext(pgls) ) {
+    while ( pNext(pgls) )
+    {
       phelp= pOne();
       pSetCoeff( phelp, nCopy(pGetCoeff(pgls)) );
       pSetComp( phelp, IMATELEM(*uRPos,i,cp) );
-      if ( piter ) {
-	pNext(piter)= phelp;
-	piter= phelp;
-      } else {
-	pp= phelp;
-	piter= phelp;
+      if ( piter )
+      {
+        pNext(piter)= phelp;
+        piter= phelp;
+      }
+      else
+      {
+        pp= phelp;
+        piter= phelp;
       }
       cp++;
       pIter( pgls );
@@ -1642,25 +1774,31 @@ const number resMatrixSparse::getDetAt( const number* evpoint )
 
   mprPROTnl("smCallDet");
 
-  for ( i= 1; i <= numSet0; i++ ) {
+  for ( i= 1; i <= numSet0; i++ )
+  {
     pp= (rmat->m)[IMATELEM(*uRPos,i,1)];
     pDelete( &pp );
     pp= NULL;
     phelp= pp;
     piter= NULL;
     // u_1,..,u_n
-    for ( cp= 2; cp <= idelem; cp++ ) {
-      if ( !nIsZero(evpoint[cp-1]) ) {
-	phelp= pOne();
-	pSetCoeff( phelp, nCopy(evpoint[cp-1]) );
-	pSetComp( phelp, IMATELEM(*uRPos,i,cp) );
-	if ( piter ) {
-	  pNext(piter)= phelp;
-	  piter= phelp;
-	} else {
-	  pp= phelp;
-	  piter= phelp;
-	}
+    for ( cp= 2; cp <= idelem; cp++ )
+    {
+      if ( !nIsZero(evpoint[cp-1]) )
+      {
+        phelp= pOne();
+        pSetCoeff( phelp, nCopy(evpoint[cp-1]) );
+        pSetComp( phelp, IMATELEM(*uRPos,i,cp) );
+        if ( piter )
+        {
+          pNext(piter)= phelp;
+          piter= phelp;
+        }
+        else
+        {
+          pp= phelp;
+          piter= phelp;
+        }
       }
     }
     // u0
@@ -1694,24 +1832,29 @@ const poly resMatrixSparse::getUDet( const number* evpoint )
 
   mprPROTnl("smCallDet");
 
-  for ( i= 1; i <= numSet0; i++ ) {
+  for ( i= 1; i <= numSet0; i++ )
+  {
     pp= (rmat->m)[IMATELEM(*uRPos,i,1)];
     pDelete( &pp );
     pp= NULL;
     phelp= pp;
     piter= NULL;
     for ( cp= 2; cp <= idelem; cp++ ) { // u1 .. un
-      if ( !nIsZero(evpoint[cp-1]) ) {
-	phelp= pOne();
-	pSetCoeff( phelp, nCopy(evpoint[cp-1]) );
-	pSetComp( phelp, IMATELEM(*uRPos,i,cp) );
-	if ( piter ) {
-	  pNext(piter)= phelp;
-	  piter= phelp;
-	} else {
-	  pp= phelp;
-	  piter= phelp;
-	}
+      if ( !nIsZero(evpoint[cp-1]) )
+      {
+        phelp= pOne();
+        pSetCoeff( phelp, nCopy(evpoint[cp-1]) );
+        pSetComp( phelp, IMATELEM(*uRPos,i,cp) );
+        if ( piter )
+        {
+          pNext(piter)= phelp;
+          piter= phelp;
+        }
+        else
+        {
+          pp= phelp;
+          piter= phelp;
+        }
       }
     }
     // u0
@@ -1747,7 +1890,7 @@ public:
   /**
    * _gls: system of multivariate polynoms
    * special: -1 -> resMatrixDense is a symbolic matrix
-   *    0,1, ... -> resMatrixDense ist eine u-Resultante, wobei special das 
+   *    0,1, ... -> resMatrixDense ist eine u-Resultante, wobei special das
    *                        lineare u-Polynom angibt
    */
   resMatrixDense( const ideal _gls, const int special = SNONE );
@@ -1773,7 +1916,7 @@ public:
    * Uses singclap_det from fractory.
    */
   const number getSubDet();
-  
+
 private:
   /** deactivated copy constructor */
   resMatrixDense( const resMatrixDense & );
@@ -1788,7 +1931,7 @@ private:
    */
   void generateMonomData( int deg, intvec* polyDegs , intvec* iVO );
 
-  /** Recursively generate all homogeneous monoms of 
+  /** Recursively generate all homogeneous monoms of
    * pVariables variables of degree deg.
    */
   void generateMonoms( poly m, int var, int deg );
@@ -1811,24 +1954,26 @@ private:
 };
 //<-
 
-//-> struct resVector 
+//-> struct resVector
 /* Holds a row vector of the dense resultant matrix */
 struct resVector
 {
 public:
-  void init() {
+  void init()
+  {
     isReduced = FALSE;
-    elementOfS = SFREE; 
+    elementOfS = SFREE;
     mon = NULL;
   }
-  void init( const poly m ) {
+  void init( const poly m )
+  {
     isReduced = FALSE;
-    elementOfS = SFREE; 
-    mon = m; 
+    elementOfS = SFREE;
+    mon = m;
   }
 
   /** index von 0 ... numVectors-1 */
-  poly getElem( const int i ); 
+  poly getElem( const int i );
 
   /** index von 0 ... numVectors-1 */
   number getElemNum( const int i );
@@ -1841,16 +1986,16 @@ public:
   /** number of the set S mon is element of */
   int elementOfS;
 
-  /** holds the index of u0, u1, ..., un, if (elementOfS == linPolyS) 
-   *  the size is given by pVariables 
+  /** holds the index of u0, u1, ..., un, if (elementOfS == linPolyS)
+   *  the size is given by pVariables
    */
-  int *numColParNr;        
+  int *numColParNr;
 
   /** holds the column vector if (elementOfS != linPolyS) */
-  number *numColVector;   
+  number *numColVector;
 
   /** size of numColVector */
-  int numColVectorSize;   
+  int numColVectorSize;
 
   number *numColVecCopy;
 };
@@ -1858,37 +2003,38 @@ public:
 
 //-> resVector::*
 poly resVector::getElem( const int i ) // inline ???
-{ 
+{
   assume( 0 < i || i > numColVectorSize );
   poly out= pOne();
   pSetCoeff( out, numColVector[i] );
   pTest( out );
-  return( out ); 
+  return( out );
 }
 
 number resVector::getElemNum( const int i ) // inline ??
 {
   assume( i >= 0 && i < numColVectorSize );
-  return( numColVector[i] ); 
+  return( numColVector[i] );
 }
 //<-
 
 //-> resMatrixDense::*
 resMatrixDense::resMatrixDense( const ideal _gls, const int special )
   : resMatrixBase()
-{ 
+{
   int i;
-  
+
   sourceRing=currRing;
   gls= idCopy( _gls );
   linPolyS= special;
   m=NULL;
 
   // init all
-  generateBaseData(); 
+  generateBaseData();
 
   totDeg= 1;
-  for ( i= 0; i < IDELEMS(gls); i++ ) {
+  for ( i= 0; i < IDELEMS(gls); i++ )
+  {
     totDeg*=pTotaldegree( (gls->m)[i] );
   }
 
@@ -1896,28 +2042,30 @@ resMatrixDense::resMatrixDense( const ideal _gls, const int special )
 
   istate= resMatrixBase::ready;
 }
- 
+
 resMatrixDense::~resMatrixDense()
 {
   int i,j;
-  for (i=0; i < numVectors; i++) 
+  for (i=0; i < numVectors; i++)
+  {
+    pDelete( &resVectorList[i].mon );
+    pDelete( &resVectorList[i].dividedBy );
+    for ( j=0; j < resVectorList[i].numColVectorSize; j++ )
     {
-      pDelete( &resVectorList[i].mon );
-      pDelete( &resVectorList[i].dividedBy );
-      for ( j=0; j < resVectorList[i].numColVectorSize; j++ ) {
-	nDelete( resVectorList[i].numColVector+j );
-      }
-      Free( (ADDRESS)resVectorList[i].numColVector, numVectors*sizeof( number ) );
-      Free( (ADDRESS)resVectorList[i].numColParNr, (pVariables+1) * sizeof(int) );
+        nDelete( resVectorList[i].numColVector+j );
     }
-  
+    Free( (ADDRESS)resVectorList[i].numColVector, numVectors*sizeof( number ) );
+    Free( (ADDRESS)resVectorList[i].numColParNr, (pVariables+1) * sizeof(int) );
+  }
+
   Free( (ADDRESS)resVectorList, veclistmax*sizeof( resVector ) );
 
-  // free matrix m 
-  if ( m != NULL ) {
+  // free matrix m
+  if ( m != NULL )
+  {
     for ( i= 1; i <= numVectors; i++ )
       for ( j= 1; j <= numVectors; j++ )
-	pDelete( &MATELEM(m , i, j) );
+        pDelete( &MATELEM(m , i, j) );
     Free( (ADDRESS)m->m, numVectors * numVectors * sizeof(poly) );
     Free( (ADDRESS)m, sizeof(ip_smatrix) );
   }
@@ -1930,44 +2078,55 @@ void resMatrixDense::createMatrix()
 {
   int k,i,j;
   resVector *vecp;
-  
+
   m= mpNew( numVectors, numVectors );
-  
-  for ( i= 1; i <= MATROWS( m ); i++ ) 
-    for ( j= 1; j <= MATCOLS( m ); j++ ) {
+
+  for ( i= 1; i <= MATROWS( m ); i++ )
+    for ( j= 1; j <= MATCOLS( m ); j++ )
+    {
       MATELEM(m,i,j)= pInit();
       pSetCoeff0( MATELEM(m,i,j), nInit(0) );
     }
-  
 
-  for ( k= 0; k <= numVectors - 1; k++ ) {
-    if ( linPolyS == getMVector(k)->elementOfS ) {
+
+  for ( k= 0; k <= numVectors - 1; k++ )
+  {
+    if ( linPolyS == getMVector(k)->elementOfS )
+    {
       mprSTICKYPROT(ST_DENSE_FR);
-      for ( i= 0; i < pVariables; i++ ) {
-	MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i])= pInit();
+      for ( i= 0; i < pVariables; i++ )
+      {
+        MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i])= pInit();
       }
-    } else {
+    }
+    else
+    {
       mprSTICKYPROT(ST_DENSE_NR);
       vecp= getMVector(k);
-      for ( i= 0; i < numVectors; i++) 
-	if ( !nIsZero( vecp->getElemNum(i) ) ) {
-	  MATELEM(m,numVectors - k,i + 1)= pInit();
-	  pSetCoeff( MATELEM(m,numVectors - k,i + 1), nCopy(vecp->getElemNum(i)) );
-	}
+      for ( i= 0; i < numVectors; i++)
+        if ( !nIsZero( vecp->getElemNum(i) ) )
+        {
+          MATELEM(m,numVectors - k,i + 1)= pInit();
+          pSetCoeff( MATELEM(m,numVectors - k,i + 1), nCopy(vecp->getElemNum(i)) );
+        }
     }
   } // for
   mprSTICKYPROT("\n");
-  
+
 #ifdef mprDEBUG_ALL
-  for ( k= numVectors - 1; k >= 0; k-- ) 
-    if ( linPolyS == getMVector(k)->elementOfS ) {
-      for ( i=0; i < pVariables; i++ ) {
-	Print(" %d ",(getMVector(k)->numColParNr)[i]);
+  for ( k= numVectors - 1; k >= 0; k-- )
+    if ( linPolyS == getMVector(k)->elementOfS )
+    {
+      for ( i=0; i < pVariables; i++ )
+      {
+        Print(" %d ",(getMVector(k)->numColParNr)[i]);
       }
       PrintLn();
     }
-  for (i=1; i <= numVectors; i++) {
-    for (j=1; j <= numVectors; j++ ) {
+  for (i=1; i <= numVectors; i++)
+  {
+    for (j=1; j <= numVectors; j++ )
+    {
       pWrite0(MATELEM(m,i,j));Print("  ");
     }
     PrintLn();
@@ -1983,26 +2142,30 @@ void resMatrixDense::generateMonoms( poly m, int var, int deg )
   if ( !deg ) { // deg == 0
     poly mon = pCopy( m );
     pSetm( mon );
-	
-    if ( numVectors == veclistmax ) {
-      resVectorList= (resVector * )ReAlloc( resVectorList, 
-					    (veclistmax) * sizeof( resVector ),
-					    (veclistmax + veclistblock) * sizeof( resVector ) );
+
+    if ( numVectors == veclistmax )
+    {
+      resVectorList= (resVector * )ReAlloc( resVectorList,
+                                            (veclistmax) * sizeof( resVector ),
+                                            (veclistmax + veclistblock) * sizeof( resVector ) );
       int k;
-      for ( k= veclistmax; k < (veclistmax + veclistblock); k++ ) 
-	resVectorList[k].init();
+      for ( k= veclistmax; k < (veclistmax + veclistblock); k++ )
+        resVectorList[k].init();
       veclistmax+= veclistblock;
       mprSTICKYPROT(ST_DENSE_MEM);
 
     }
     resVectorList[numVectors].init( mon );
     numVectors++;
-    mprSTICKYPROT(ST_DENSE_NMON); 
+    mprSTICKYPROT(ST_DENSE_NMON);
     return;
-  } else {
+  }
+  else
+  {
     if ( var == pVariables+1 ) return;
     poly newm = pCopy( m );
-    while ( deg >= 0 ) {
+    while ( deg >= 0 )
+    {
       generateMonoms( newm, var+1, deg );
       pIncrExp( newm, var );
       pSetm( newm );
@@ -2010,7 +2173,7 @@ void resMatrixDense::generateMonoms( poly m, int var, int deg )
     }
     pDelete( & newm );
   }
-  
+
   return;
 }
 
@@ -2022,23 +2185,24 @@ void resMatrixDense::generateMonomData( int deg, intvec* polyDegs , intvec* iVO 
   veclistblock= 512;
   veclistmax= veclistblock;
   resVectorList= (resVector *)Alloc( veclistmax*sizeof( resVector ) );
-  
+
   // Init resVector()s
   for ( j= veclistmax - 1; j >= 0; j-- ) resVectorList[j].init();
   numVectors= 0;
 
-  // Generate all monoms of degree deg  
+  // Generate all monoms of degree deg
   poly start= pOne();
   generateMonoms( start, 1, deg );
   pDelete( & start );
 
   mprSTICKYPROT("\n");
-  
+
   // Check for reduced monoms
   // First generate polyDegs.rows() monoms
   //  x(k)^(polyDegs[k]),  0 <= k < polyDegs.rows()
   ideal pDegDiv= idInit( polyDegs->rows(), 1 );
-  for ( k= 0; k < polyDegs->rows(); k++ ) {
+  for ( k= 0; k < polyDegs->rows(); k++ )
+  {
     poly p= pOne();
     pSetExp( p, k + 1, (*polyDegs)[k] );
     pSetm( p );
@@ -2049,43 +2213,51 @@ void resMatrixDense::generateMonomData( int deg, intvec* polyDegs , intvec* iVO 
   // A monom monom is called reduced if there exists
   // exactly one x(k)^(polyDegs[k]) that divides the monom.
   int divCount;
-  for ( j= numVectors - 1; j >= 0; j-- ) {
+  for ( j= numVectors - 1; j >= 0; j-- )
+  {
     divCount= 0;
-    for ( k= 0; k < IDELEMS(pDegDiv); k++ ) 
-      if ( pDivisibleBy2( (pDegDiv->m)[k], resVectorList[j].mon ) ) 
-	divCount++;
+    for ( k= 0; k < IDELEMS(pDegDiv); k++ )
+      if ( pDivisibleBy2( (pDegDiv->m)[k], resVectorList[j].mon ) )
+        divCount++;
     resVectorList[j].isReduced= (divCount == 1);
   }
 
   // create the sets S(k)s
-  // a monom x(i)^deg, deg given, is element of the set S(i) 
+  // a monom x(i)^deg, deg given, is element of the set S(i)
   // if all x(0)^(polyDegs[0]) ... x(i-1)^(polyDegs[i-1]) DONT divide
   // x(i)^deg and only x(i)^(polyDegs[i]) divides x(i)^deg
   bool doInsert;
-  for ( k= 0; k < iVO->rows(); k++) {
+  for ( k= 0; k < iVO->rows(); k++)
+  {
     //mprPROTInl(" ------------ var:",(*iVO)[k]);
-    for ( j= numVectors - 1; j >= 0; j-- ) {
+    for ( j= numVectors - 1; j >= 0; j-- )
+    {
       //mprPROTPnl("testing monom",resVectorList[j].mon);
-      if ( resVectorList[j].elementOfS == SFREE ) {
-	//mprPROTnl("\tfree");
-	if ( pDivisibleBy2( (pDegDiv->m)[ (*iVO)[k] ], resVectorList[j].mon ) ) {
-	  //mprPROTPnl("\tdivisible by ",(pDegDiv->m)[ (*iVO)[k] ]);
-	  doInsert=TRUE;
-	  for ( i= 0; i < k; i++ ) {
-	    //mprPROTPnl("\tchecking db ",(pDegDiv->m)[ (*iVO)[i] ]);
-	    if ( pDivisibleBy2( (pDegDiv->m)[ (*iVO)[i] ], resVectorList[j].mon ) ) {
-	      //mprPROTPnl("\t and divisible by",(pDegDiv->m)[ (*iVO)[i] ]);
-	      doInsert=FALSE;
-	      break;
-	    } 
-	  }
-	  if ( doInsert ) {
-	    //mprPROTInl("\t------------------> S ",(*iVO)[k]);
-	    resVectorList[j].elementOfS= (*iVO)[k];
-	    resVectorList[j].dividedBy= pCopy( (pDegDiv->m)[ (*iVO)[i] ] );
-	    pSetm( resVectorList[j].dividedBy );
-	  }
-	}
+      if ( resVectorList[j].elementOfS == SFREE )
+      {
+        //mprPROTnl("\tfree");
+        if ( pDivisibleBy2( (pDegDiv->m)[ (*iVO)[k] ], resVectorList[j].mon ) )
+        {
+          //mprPROTPnl("\tdivisible by ",(pDegDiv->m)[ (*iVO)[k] ]);
+          doInsert=TRUE;
+          for ( i= 0; i < k; i++ )
+          {
+            //mprPROTPnl("\tchecking db ",(pDegDiv->m)[ (*iVO)[i] ]);
+            if ( pDivisibleBy2( (pDegDiv->m)[ (*iVO)[i] ], resVectorList[j].mon ) )
+            {
+              //mprPROTPnl("\t and divisible by",(pDegDiv->m)[ (*iVO)[i] ]);
+              doInsert=FALSE;
+              break;
+            }
+          }
+          if ( doInsert )
+          {
+            //mprPROTInl("\t------------------> S ",(*iVO)[k]);
+            resVectorList[j].elementOfS= (*iVO)[k];
+            resVectorList[j].dividedBy= pCopy( (pDegDiv->m)[ (*iVO)[i] ] );
+            pSetm( resVectorList[j].dividedBy );
+          }
+        }
       }
     }
   }
@@ -2094,9 +2266,10 @@ void resMatrixDense::generateMonomData( int deg, intvec* polyDegs , intvec* iVO 
   // (size of matrix M is equal to number of monoms=numVectors)
   subSize= 0;
   int sub;
-  for ( i= 0; i < polyDegs->rows(); i++ ) {
+  for ( i= 0; i < polyDegs->rows(); i++ )
+  {
     sub= 1;
-    for ( k= 0; k < polyDegs->rows(); k++ ) 
+    for ( k= 0; k < polyDegs->rows(); k++ )
       if ( i != k ) sub*= (*polyDegs)[k];
     subSize+= sub;
   }
@@ -2108,11 +2281,12 @@ void resMatrixDense::generateMonomData( int deg, intvec* polyDegs , intvec* iVO 
 #ifdef mprDEBUG_ALL
   // Print a list of monoms and their properties
   Print("// \n");
-  for ( j= numVectors - 1; j >= 0; j-- ) {
+  for ( j= numVectors - 1; j >= 0; j-- )
+  {
     Print("// %s, S(%d),  db ",
-	  resVectorList[j].isReduced?"reduced":"nonreduced",
-	  resVectorList[j].elementOfS);
-    pWrite0(resVectorList[j].dividedBy); 
+          resVectorList[j].isReduced?"reduced":"nonreduced",
+          resVectorList[j].elementOfS);
+    pWrite0(resVectorList[j].dividedBy);
     Print("  monom ");
     pWrite(resVectorList[j].mon);
   }
@@ -2135,18 +2309,23 @@ void resMatrixDense::generateBaseData()
   // the internal Variable Ordering
   // make sure that the homogenization variable goes last!
   intvec iVO( pVariables );
-  if ( linPolyS != SNONE ) {
+  if ( linPolyS != SNONE )
+  {
     iVO[pVariables - 1]= linPolyS;
     int p=0;
-    for ( k= pVariables - 1; k >= 0; k-- ) {
-      if ( k != linPolyS ) {
-	iVO[p]= k;
-	p++;
+    for ( k= pVariables - 1; k >= 0; k-- )
+    {
+      if ( k != linPolyS )
+      {
+        iVO[p]= k;
+        p++;
       }
     }
-  } else { 
+  }
+  else
+  {
     linPolyS= 0;
-    for ( k= 0; k < pVariables; k++ ) 
+    for ( k= 0; k < pVariables; k++ )
       iVO[k]= pVariables - k - 1;
   }
 
@@ -2160,8 +2339,10 @@ void resMatrixDense::generateBaseData()
   generateMonomData( sumDeg, &polyDegs, &iVO );
 
   // generate "matrix"
-  for ( k= numVectors - 1; k >= 0; k-- ) {
-    if ( resVectorList[k].elementOfS != linPolyS ) {
+  for ( k= numVectors - 1; k >= 0; k-- )
+  {
+    if ( resVectorList[k].elementOfS != linPolyS )
+    {
       // column k is a normal column with numerical or symbolic entries
       // init stuff
       resVectorList[k].numColParNr= NULL;
@@ -2176,25 +2357,28 @@ void resMatrixDense::generateBaseData()
       pSetm( pi );
 
       // fill in "matrix"
-      while ( pi ) {
-	matEntry= nCopy(pGetCoeff(pi));
-	pmatchPos= pHead0( pi );
-	pSetCoeff( pmatchPos, nInit(1) );
-	pSetm( pmatchPos );
+      while ( pi )
+      {
+        matEntry= nCopy(pGetCoeff(pi));
+        pmatchPos= pHead0( pi );
+        pSetCoeff( pmatchPos, nInit(1) );
+        pSetm( pmatchPos );
 
-	for ( i= 0; i < numVectors; i++) 
-	  if ( pEqual( pmatchPos, resVectorList[i].mon ) )
-	    break;
+        for ( i= 0; i < numVectors; i++)
+          if ( pEqual( pmatchPos, resVectorList[i].mon ) )
+            break;
 
-	resVectorList[k].numColVector[numVectors - i - 1] = nCopy(matEntry);
+        resVectorList[k].numColVector[numVectors - i - 1] = nCopy(matEntry);
 
-	pDelete( &pmatchPos );
-	nDelete( &matEntry );
+        pDelete( &pmatchPos );
+        nDelete( &matEntry );
 
-	pIter( pi );
+        pIter( pi );
       }
       pDelete( &pi );
-    } else {
+    }
+    else
+    {
       // column is a special column, i.e. is generated by S0 and F0
       // safe only the positions of the ui's in the column
       //mprPROTInl(" setup of numColParNr ",k);
@@ -2208,17 +2392,17 @@ void resMatrixDense::generateBaseData()
 
       j=0;
       while ( pi ) { // fill in "matrix"
-	pmp= pMult( pHead( pi ), pCopy( factor ) );
-	pSetm( pmp );pTest( pi );
+        pmp= pMult( pHead( pi ), pCopy( factor ) );
+        pSetm( pmp );pTest( pi );
 
-	for ( i= 0; i < numVectors; i++) 
-	  if ( pEqual( pmp, resVectorList[i].mon ) )
-	    break;
+        for ( i= 0; i < numVectors; i++)
+          if ( pEqual( pmp, resVectorList[i].mon ) )
+            break;
 
-	resVectorList[k].numColParNr[j]= i;
-	pDelete( &pmp );
-	pIter( pi );
-	j++;
+        resVectorList[k].numColParNr[j]= i;
+        pDelete( &pmp );
+        pIter( pi );
+        j++;
       }
       pDelete( &pi );
       pDelete( &factor );
@@ -2232,47 +2416,57 @@ void resMatrixDense::generateBaseData()
   createMatrix();
 }
 
-resVector *resMatrixDense::getMVector(int i) 
-{ 
+resVector *resMatrixDense::getMVector(int i)
+{
   assume( i >= 0 && i < numVectors );
-  return &resVectorList[i]; 
+  return &resVectorList[i];
 }
 
 const ideal resMatrixDense::getMatrix()
-{ 
+{
   int k,i,j;
 
   // copy matrix
   matrix resmat= mpNew(numVectors,numVectors);
-  for (i=1; i <= numVectors; i++) {
-    for (j=1; j <= numVectors; j++ ) {
-      if ( MATELEM(m,i,j) && pGetCoeff(MATELEM(m,i,j)) ) {
-	MATELEM(resmat,i,j)= pCopy( MATELEM(m,i,j) );
+  for (i=1; i <= numVectors; i++)
+  {
+    for (j=1; j <= numVectors; j++ )
+    {
+      if ( MATELEM(m,i,j) && pGetCoeff(MATELEM(m,i,j)) )
+      {
+        MATELEM(resmat,i,j)= pCopy( MATELEM(m,i,j) );
       }
     }
   }
-  for (i=0; i < numVectors; i++) {
-    if ( resVectorList[i].elementOfS == linPolyS ) {
-      for (j=1; j <= pVariables; j++ ) {
-	if ( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]) ) 
-	  pDelete( &MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]) );
-	MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1])= pOne();
-	// FIX ME
-	if ( true ) {
-	  pSetCoeff( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]), nPar(j) );
-	} else {
-	  pSetExp( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]), j, 1 );
-	}
+  for (i=0; i < numVectors; i++)
+  {
+    if ( resVectorList[i].elementOfS == linPolyS )
+    {
+      for (j=1; j <= pVariables; j++ )
+      {
+        if ( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]) )
+          pDelete( &MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]) );
+        MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1])= pOne();
+        // FIX ME
+        if ( true )
+        {
+          pSetCoeff( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]), nPar(j) );
+        }
+        else
+        {
+          pSetExp( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]), j, 1 );
+        }
       }
     }
   }
 
   ideal resmod= idMatrix2Module(resmat);
 
-  if ( resmat != NULL ) {
+  if ( resmat != NULL )
+  {
     for ( i= 1; i <= numVectors; i++ )
       for ( j= 1; j <= numVectors; j++ )
-	pDelete( &MATELEM(resmat , i, j) );
+        pDelete( &MATELEM(resmat , i, j) );
     Free( (ADDRESS)resmat->m, numVectors * numVectors * sizeof(poly) );
     Free( (ADDRESS)resmat, sizeof(ip_smatrix) );
   }
@@ -2289,27 +2483,31 @@ const ideal resMatrixDense::getSubMatrix()
   matrix resmat= mpNew( subSize, subSize );
 
   j=1;
-  for ( k= numVectors - 1; k >= 0; k-- ) {
+  for ( k= numVectors - 1; k >= 0; k-- )
+  {
     vecp= getMVector(k);
     if ( vecp->isReduced ) continue;
     l=1;
-    for ( i= numVectors - 1; i >= 0; i-- ) {
+    for ( i= numVectors - 1; i >= 0; i-- )
+    {
       if ( getMVector(i)->isReduced ) continue;
-      if ( !nIsZero(vecp->getElemNum(numVectors - i - 1)) ) {
-	MATELEM(resmat,j,l)= pInit();
-	MATELEM(resmat,j,l)= pCopy( vecp->getElem(numVectors-i-1) );
+      if ( !nIsZero(vecp->getElemNum(numVectors - i - 1)) )
+      {
+        MATELEM(resmat,j,l)= pInit();
+        MATELEM(resmat,j,l)= pCopy( vecp->getElem(numVectors-i-1) );
       }
       l++;
     }
     j++;
-  } 
+  }
 
   ideal resmod= idMatrix2Module(resmat);
 
-  if ( resmat != NULL ) {
+  if ( resmat != NULL )
+  {
     for ( i= 1; i <= numVectors; i++ )
       for ( j= 1; j <= numVectors; j++ )
-	pDelete( &MATELEM(resmat , i, j) );
+        pDelete( &MATELEM(resmat , i, j) );
     Free( (ADDRESS)resmat->m, numVectors * numVectors * sizeof(poly) );
     Free( (ADDRESS)resmat, sizeof(ip_smatrix) );
   }
@@ -2323,11 +2521,14 @@ const number resMatrixDense::getDetAt( const number* evpoint )
 
   // copy evaluation point into matrix
   // p0, p1, ..., pn replace u0, u1, ..., un
-  for ( k= numVectors - 1; k >= 0; k-- ) {
-    if ( linPolyS == getMVector(k)->elementOfS ) {
-      for ( i= 0; i < pVariables; i++ ) {
-	pSetCoeff( MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i]), 
-		   nCopy(evpoint[i]) );
+  for ( k= numVectors - 1; k >= 0; k-- )
+  {
+    if ( linPolyS == getMVector(k)->elementOfS )
+    {
+      for ( i= 0; i < pVariables; i++ )
+      {
+        pSetCoeff( MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i]),
+                   nCopy(evpoint[i]) );
       }
     }
   }
@@ -2339,13 +2540,16 @@ const number resMatrixDense::getDetAt( const number* evpoint )
 
   // avoid errors for det==0
   number numres;
-  if ( res && pGetCoeff( res ) ) {
+  if ( res && pGetCoeff( res ) )
+  {
     numres= nCopy( pGetCoeff( res ) );
-  } else {
+  }
+  else
+  {
     numres= nInit(0);
     mprPROT("0");
   }
-  pDelete( &res );  
+  pDelete( &res );
 
   mprSTICKYPROT(ST__DET);
 
@@ -2360,38 +2564,48 @@ const number resMatrixDense::getSubDet()
   // generate quadratic matrix mat of size subSize
   matrix mat= mpNew( subSize, subSize );
 
-  for ( i= 1; i <= MATROWS( mat ); i++ ) {
-    for ( j= 1; j <= MATCOLS( mat ); j++ ) {
+  for ( i= 1; i <= MATROWS( mat ); i++ )
+  {
+    for ( j= 1; j <= MATCOLS( mat ); j++ )
+    {
       MATELEM(mat,i,j)= pInit();
       pSetCoeff0( MATELEM(mat,i,j), nInit(0) );
     }
   }
   j=1;
-  for ( k= numVectors - 1; k >= 0; k-- ) {
+  for ( k= numVectors - 1; k >= 0; k-- )
+  {
     vecp= getMVector(k);
     if ( vecp->isReduced ) continue;
     l=1;
-    for ( i= numVectors - 1; i >= 0; i-- ) {
+    for ( i= numVectors - 1; i >= 0; i-- )
+    {
       if ( getMVector(i)->isReduced ) continue;
-      if ( vecp->getElemNum(numVectors - i - 1) && !nIsZero(vecp->getElemNum(numVectors - i - 1)) ) {
-	pSetCoeff(MATELEM(mat, j , l ), nCopy(vecp->getElemNum(numVectors - i - 1)));
-      } /* else {
-	   MATELEM(mat, j , l )= pOne();
-	   pSetCoeff(MATELEM(mat, j , l ), nInit(0) );
-	   }
-	*/
+      if ( vecp->getElemNum(numVectors - i - 1) && !nIsZero(vecp->getElemNum(numVectors - i - 1)) )
+      {
+        pSetCoeff(MATELEM(mat, j , l ), nCopy(vecp->getElemNum(numVectors - i - 1)));
+      }
+      /* else
+      {
+           MATELEM(mat, j , l )= pOne();
+           pSetCoeff(MATELEM(mat, j , l ), nInit(0) );
+      }
+      */
       l++;
     }
     j++;
-  } 
+  }
 
   poly res= singclap_det( mat );
 
   number numres;
-  if ( res && pGetCoeff( res ) ) {
+  if ( res && pGetCoeff( res ) )
+  {
     numres= nCopy(pGetCoeff( res ));
-    pDelete( &res );    
-  } else {
+    pDelete( &res );
+  }
+  else
+  {
     numres= nInit(0);
   }
   return numres;
@@ -2415,7 +2629,7 @@ unsigned long over( const unsigned long n , const unsigned long d )
   mpz_init(m);mpz_set_ui(m,1);
   mpz_init(md);mpz_set_ui(md,1);
   mpz_init(mn);mpz_set_ui(mn,1);
- 
+
   mpz_fac_ui(m,n+d);
   mpz_fac_ui(md,d);
   mpz_fac_ui(mn,n);
@@ -2435,15 +2649,17 @@ unsigned long over( const unsigned long n , const unsigned long d )
 //-> uResultant::*
 uResultant::uResultant( const ideal _gls, const resMatType _rmt, BOOLEAN extIdeal )
   : rmt( _rmt )
-{ 
-  if ( extIdeal ) {
+{
+  if ( extIdeal )
+  {
     // extend given ideal by linear poly F0=u0x0 + u1x1 +...+ unxn
     gls= extendIdeal( _gls, linearPoly( rmt ), rmt );
     n= IDELEMS( gls );
-  } else 
+  } else
     gls= idCopy( _gls );
 
-  switch ( rmt ) {
+  switch ( rmt )
+  {
   case sparseResMat:
     resMat= new resMatrixSparse( gls );
     break;
@@ -2451,7 +2667,7 @@ uResultant::uResultant( const ideal _gls, const resMatType _rmt, BOOLEAN extIdea
     resMat= new resMatrixDense( gls );
     break;
   default:
-    Werror("uResultant::uResultant: Unknown resultant matrix type choosen!");
+    WerrorS("uResultant::uResultant: Unknown resultant matrix type choosen!");
   }
 }
 
@@ -2463,26 +2679,28 @@ uResultant::~uResultant( )
 ideal uResultant::extendIdeal( const ideal gls, poly linPoly, const resMatType rmt )
 {
   ideal newGls= idCopy( gls );
-  newGls->m= (poly *)ReAlloc( newGls->m, 
-			      IDELEMS(gls) * sizeof(poly), 
-			      (IDELEMS(gls) + 1) * sizeof(poly) );
+  newGls->m= (poly *)ReAlloc( newGls->m,
+                              IDELEMS(gls) * sizeof(poly),
+                              (IDELEMS(gls) + 1) * sizeof(poly) );
   IDELEMS(newGls)++;
- 
-  switch ( rmt ) {
+
+  switch ( rmt )
+  {
   case sparseResMat:
   case denseResMat:
     {
       int i;
-      for ( i= IDELEMS(newGls)-1; i > 0; i-- ) {
-	newGls->m[i]= newGls->m[i-1];
+      for ( i= IDELEMS(newGls)-1; i > 0; i-- )
+      {
+        newGls->m[i]= newGls->m[i-1];
       }
       newGls->m[0]= linPoly;
     }
     break;
   default:
-    Werror("uResultant::extendIdeal: Unknown resultant matrix type choosen!");
+    WerrorS("uResultant::extendIdeal: Unknown resultant matrix type choosen!");
   }
-      
+
   return( newGls );
 }
 
@@ -2493,7 +2711,8 @@ poly uResultant::linearPoly( const resMatType rmt )
   poly newlp= pOne();
   poly actlp, rootlp= newlp;
 
-  for ( i= 1; i <= pVariables; i++ ) {
+  for ( i= 1; i <= pVariables; i++ )
+  {
     actlp= newlp;
     pSetExp( actlp, i, 1 );
     pSetm( actlp );
@@ -2503,7 +2722,8 @@ poly uResultant::linearPoly( const resMatType rmt )
   actlp->next= NULL;
   pDelete( &newlp );
 
-  if ( rmt == sparseResMat ) {
+  if ( rmt == sparseResMat )
+  {
     newlp= pOne();
     actlp->next= newlp;
     newlp->next= NULL;
@@ -2523,7 +2743,7 @@ poly uResultant::interpolateDense( const number subDetVal )
   // maximum number of terms in polynom D (homogeneous, of degree tdg)
   // long mdg= (facul(tdg+n-1) / facul( tdg )) / facul( n - 1 );
   long mdg= over( n-1, tdg );
-  
+
   // maxiaml number of terms in a polynom of degree tdg
   long l=(long)pow( tdg+1, n );
 
@@ -2533,7 +2753,7 @@ poly uResultant::interpolateDense( const number subDetVal )
   Print("// maximum number of terms in polynom of deg tdg: l %d\n",l);
 #endif
 
-  // we need mdg results of D(p0,p1,...,pn) 
+  // we need mdg results of D(p0,p1,...,pn)
   number *presults;
   presults= (number *)Alloc( mdg * sizeof( number ) );
   for (i=0; i < mdg; i++) presults[i]= nInit(0);
@@ -2545,8 +2765,9 @@ poly uResultant::interpolateDense( const number subDetVal )
   mprPROTnl("// initial evaluation point: ");
   // initial evaluatoin point
   p=1;
-  for (i=0; i < n; i++) {
-    // init pevpoint with primes 3,5,7,11, ... 
+  for (i=0; i < n; i++)
+  {
+    // init pevpoint with primes 3,5,7,11, ...
     p= nextPrime( p );
     pevpoint[i]=nInit( p );
     nTest(pevpoint[i]);
@@ -2555,8 +2776,10 @@ poly uResultant::interpolateDense( const number subDetVal )
 
   // evaluate the determinant in the points pev^0, pev^1, ..., pev^mdg
   mprPROTnl("// evaluating:");
-  for ( i=0; i < mdg; i++ ) {
-    for (j=0; j < n; j++) {
+  for ( i=0; i < mdg; i++ )
+  {
+    for (j=0; j < n; j++)
+    {
       nDelete( &pev[j] );
       nPower(pevpoint[j],i,&pev[j]);
       mprPROTN(" ",pev[j]);
@@ -2573,33 +2796,37 @@ poly uResultant::interpolateDense( const number subDetVal )
   // now interpolate using vandermode interpolation
   mprPROTnl("// interpolating:");
   number *ncpoly;
-  { 
+  {
     vandermonde vm( mdg, n, tdg, pevpoint );
     ncpoly= vm.interpolateDense( presults );
   }
 
   if ( subDetVal != NULL ) {   // divide by common factor
       number detdiv;
-      for ( i= 0; i <= mdg; i++ ) {
-	detdiv= nDiv( ncpoly[i], subDetVal );
-	nNormalize( detdiv );
-	nDelete( &ncpoly[i] );
-	ncpoly[i]= detdiv;
+      for ( i= 0; i <= mdg; i++ )
+      {
+        detdiv= nDiv( ncpoly[i], subDetVal );
+        nNormalize( detdiv );
+        nDelete( &ncpoly[i] );
+        ncpoly[i]= detdiv;
       }
     }
-  
+
 #ifdef mprDEBUG_ALL
   PrintLn();
-  for ( i=0; i < mdg; i++ ) { 
-    nPrint(ncpoly[i]); Print(" --- "); 
+  for ( i=0; i < mdg; i++ )
+  {
+    nPrint(ncpoly[i]); Print(" --- ");
   }
   PrintLn();
 #endif
 
   // prepare ncpoly for later use
   number nn=nInit(0);
-  for ( i=0; i < mdg; i++ ) { 
-    if ( nEqual(ncpoly[i],nn) ) { 
+  for ( i=0; i < mdg; i++ )
+  {
+    if ( nEqual(ncpoly[i],nn) )
+    {
       nDelete( &ncpoly[i] );
       ncpoly[i]=NULL;
     }
@@ -2615,38 +2842,46 @@ poly uResultant::interpolateDense( const number subDetVal )
   long sum=0;
   long c=0;
 
-  for ( i=0; i < l; i++ ) {
-    if ( sum == tdg ) {
-      if ( ncpoly[c] ) {
-	poly p= pOne();
-	if ( rmt == denseResMat ) {
-	  for ( j= 0; j < n; j++ ) pSetExp( p, j+1, exp[j] );
-	} else if ( rmt == sparseResMat ) {
-	  for ( j= 1; j < n; j++ ) pSetExp( p, j, exp[j] );
-	}
-	pSetCoeff( p, ncpoly[c] );
-	pSetm( p );
-	if (result) result= pAdd( pCopy(result), pCopy(p) );
-	else result= pCopy( p );
-	pDelete( &p );
+  for ( i=0; i < l; i++ )
+  {
+    if ( sum == tdg )
+    {
+      if ( ncpoly[c] )
+      {
+        poly p= pOne();
+        if ( rmt == denseResMat )
+        {
+          for ( j= 0; j < n; j++ ) pSetExp( p, j+1, exp[j] );
+        }
+        else if ( rmt == sparseResMat )
+        {
+          for ( j= 1; j < n; j++ ) pSetExp( p, j, exp[j] );
+        }
+        pSetCoeff( p, ncpoly[c] );
+        pSetm( p );
+        if (result) result= pAdd( pCopy(result), pCopy(p) );
+        else result= pCopy( p );
+        pDelete( &p );
       }
       c++;
     }
     sum=0;
     exp[0]++;
-    for ( j= 0; j < n - 1; j++ ) {
-      if ( exp[j] > tdg ) {
-	exp[j]= 0;
-	exp[j + 1]++;
+    for ( j= 0; j < n - 1; j++ )
+    {
+      if ( exp[j] > tdg )
+      {
+        exp[j]= 0;
+        exp[j + 1]++;
       }
       sum+=exp[j];
-    } 
+    }
     sum+=exp[n-1];
-  } 
-  
+  }
+
   pSetm( result );
   pTest( result );
-  
+
   return result;
 }
 
@@ -2661,7 +2896,7 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
   tdg= resMat->getDetDeg();
 
   // evaluate D in tdg+1 distinct points, so
-  // we need tdg+1 results of D(p0,1,0,...,0) = 
+  // we need tdg+1 results of D(p0,1,0,...,0) =
   //              c(0)*u0^tdg + c(1)*u0^tdg-1 + ... + c(tdg-1)*u0 + c(tdg)
   number *presults;
   presults= (number *)Alloc( (tdg + 1) * sizeof( number ) );
@@ -2681,44 +2916,57 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
   // or D(u0,k1,k2,0,...,0), D(u0,k1,k2,k3,0,...,0), ..., D(u0,k1,k2,k3,...,kn)
   // this gives us n-1 evaluations
   p=3;
-  for ( uvar= 0; uvar < loops; uvar++ ) { 
+  for ( uvar= 0; uvar < loops; uvar++ )
+  {
     // generate initial evaluation point
-    if ( matchUp ) {
-      for (i=0; i < n; i++) {
-	// prime(random number) between 1 and MAXEVPOINT
-	nDelete( &pevpoint[i] );
-	if ( i == 0 ) {
-	  //p= nextPrime( p );
-	  pevpoint[i]= nInit( p );
-	} else 
-	  if ( i <= uvar + 2 ) {
-	    pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*rand()/(RAND_MAX+1.0))));
-	    //pevpoint[i]=nInit(383);
-	  } else pevpoint[i]=nInit(0);
-	mprPROTNnl(" ",pevpoint[i]);
+    if ( matchUp )
+    {
+      for (i=0; i < n; i++)
+      {
+        // prime(random number) between 1 and MAXEVPOINT
+        nDelete( &pevpoint[i] );
+        if ( i == 0 )
+        {
+          //p= nextPrime( p );
+          pevpoint[i]= nInit( p );
+        }
+        else if ( i <= uvar + 2 )
+        {
+          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*rand()/(RAND_MAX+1.0))));
+          //pevpoint[i]=nInit(383);
+        }
+        else
+          pevpoint[i]=nInit(0);
+        mprPROTNnl(" ",pevpoint[i]);
       }
-    } else {
-      for (i=0; i < n; i++) {
-	// init pevpoint with  prime,0,...0,1,0,...,0
-	nDelete( &pevpoint[i] );
-	if ( i == 0 ) {
-	  //p=nextPrime( p );
-	  pevpoint[i]=nInit( p );
-	} 
-	else 
-	  if ( i == (uvar + 1) ) pevpoint[i]= nInit(-1);
-	  else pevpoint[i]= nInit(0);
-	mprPROTNnl(" ",pevpoint[i]);
+    }
+    else
+    {
+      for (i=0; i < n; i++)
+      {
+        // init pevpoint with  prime,0,...0,1,0,...,0
+        nDelete( &pevpoint[i] );
+        if ( i == 0 )
+        {
+          //p=nextPrime( p );
+          pevpoint[i]=nInit( p );
+        }
+        else
+          if ( i == (uvar + 1) ) pevpoint[i]= nInit(-1);
+          else pevpoint[i]= nInit(0);
+        mprPROTNnl(" ",pevpoint[i]);
       }
     }
 
     // prepare aktual evaluation point
-    for (i=0; i < n; i++) {
+    for (i=0; i < n; i++)
+    {
       nDelete( &pev[i] );
       pev[i]= nCopy( pevpoint[i] );
     }
     // evaluate the determinant in the points pev^0, pev^1, ..., pev^tdg
-    for ( i=0; i <= tdg; i++ ) {
+    for ( i=0; i <= tdg; i++ )
+    {
       nDelete( &pev[0] );
       nPower(pevpoint[0],i,&pev[0]);          // new evpoint
 
@@ -2732,32 +2980,34 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
     }
     mprSTICKYPROT("\n");
 
-    // now interpolate 
+    // now interpolate
     vandermonde vm( tdg + 1, 1, tdg, pevpoint, FALSE );
     number *ncpoly= vm.interpolateDense( presults );
 
     if ( subDetVal != NULL ) {  // divide by common factor
       number detdiv;
-      for ( i= 0; i <= tdg; i++ ) {
-	detdiv= nDiv( ncpoly[i], subDetVal );
-	nNormalize( detdiv );
-	nDelete( &ncpoly[i] );
-	ncpoly[i]= detdiv;
+      for ( i= 0; i <= tdg; i++ )
+      {
+        detdiv= nDiv( ncpoly[i], subDetVal );
+        nNormalize( detdiv );
+        nDelete( &ncpoly[i] );
+        ncpoly[i]= detdiv;
       }
     }
 
 #ifdef mprDEBUG_ALL
     PrintLn();
-    for ( i=0; i <= tdg; i++ ) { 
-      nPrint(ncpoly[i]); Print(" --- "); 
+    for ( i=0; i <= tdg; i++ )
+    {
+      nPrint(ncpoly[i]); Print(" --- ");
     }
     PrintLn();
 #endif
 
     // save results
-    roots[uvar]->fillContainer( ncpoly, pevpoint, uvar+1, tdg, 
-				(matchUp?rootContainer::cspecialmu:rootContainer::cspecial),
-				loops );
+    roots[uvar]->fillContainer( ncpoly, pevpoint, uvar+1, tdg,
+                                (matchUp?rootContainer::cspecialmu:rootContainer::cspecial),
+                                loops );
   }
 
   // free some stuff: pev, presult
@@ -2791,25 +3041,32 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
   // now we evaluate D(u0,-1,0,...0), D(u0,0,-1,0,...,0), ..., D(u0,0,..,0,-1)
   // or D(u0,k1,k2,0,...,0), D(u0,k1,k2,k3,0,...,0), ..., D(u0,k1,k2,k3,...,kn)
   p=3;
-  for ( uvar= 0; uvar < loops; uvar++ ) { 
+  for ( uvar= 0; uvar < loops; uvar++ )
+  {
     // generate initial evaluation point
-    if ( matchUp ) {
-      for (i=0; i < n; i++) {
-	// prime(random number) between 1 and MAXEVPOINT
-	nDelete( &pevpoint[i] );
-	if ( i <= uvar + 2 ) {
-	  pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*rand()/(RAND_MAX+1.0))));
-	  //pevpoint[i]=nInit(383);
-	} else pevpoint[i]=nInit(0);
-	mprPROTNnl(" ",pevpoint[i]);
+    if ( matchUp )
+    {
+      for (i=0; i < n; i++)
+      {
+        // prime(random number) between 1 and MAXEVPOINT
+        nDelete( &pevpoint[i] );
+        if ( i <= uvar + 2 )
+        {
+          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*rand()/(RAND_MAX+1.0))));
+          //pevpoint[i]=nInit(383);
+        } else pevpoint[i]=nInit(0);
+        mprPROTNnl(" ",pevpoint[i]);
       }
-    } else {
-      for (i=0; i < n; i++) {
-	// init pevpoint with  prime,0,...0,-1,0,...,0
-	nDelete( &(pevpoint[i]) );
-	if ( i == (uvar + 1) ) pevpoint[i]= nInit(-1);
-	else pevpoint[i]= nInit(0);
-	mprPROTNnl(" ",pevpoint[i]);
+    }
+    else
+    {
+      for (i=0; i < n; i++)
+      {
+        // init pevpoint with  prime,0,...0,-1,0,...,0
+        nDelete( &(pevpoint[i]) );
+        if ( i == (uvar + 1) ) pevpoint[i]= nInit(-1);
+        else pevpoint[i]= nInit(0);
+        mprPROTNnl(" ",pevpoint[i]);
       }
     }
 
@@ -2818,35 +3075,40 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
     number *ncpoly= (number *)Alloc( (tdg+1) * sizeof(number) );
 
     piter= pures;
-    for ( i= tdg; i >= 0; i-- ) {
+    for ( i= tdg; i >= 0; i-- )
+    {
       //if ( piter ) Print("deg %d, pDeg(piter) %d\n",i,pTotaldegree(piter));
-      if ( piter && pTotaldegree(piter) == i ) {
-	ncpoly[i]= nCopy( pGetCoeff( piter ) );
-	pIter( piter );
-      } else {
-	ncpoly[i]= nInit(0);
+      if ( piter && pTotaldegree(piter) == i )
+      {
+        ncpoly[i]= nCopy( pGetCoeff( piter ) );
+        pIter( piter );
+      }
+      else
+      {
+        ncpoly[i]= nInit(0);
       }
       mprPROTNnl("", ncpoly[i] );
-    }  
-    
+    }
+
     mprSTICKYPROT(ST_BASE_EV); // .
 
     if ( subDetVal != NULL ) {  // divide by common factor
       number detdiv;
-      for ( i= 0; i <= tdg; i++ ) {
-	detdiv= nDiv( ncpoly[i], subDetVal );
-	nNormalize( detdiv );
-	nDelete( &ncpoly[i] );
-	ncpoly[i]= detdiv;
+      for ( i= 0; i <= tdg; i++ )
+      {
+        detdiv= nDiv( ncpoly[i], subDetVal );
+        nNormalize( detdiv );
+        nDelete( &ncpoly[i] );
+        ncpoly[i]= detdiv;
       }
     }
 
     pDelete( &pures );
 
     // save results
-    roots[uvar]->fillContainer( ncpoly, pevpoint, uvar+1, tdg, 
-				(matchUp?rootContainer::cspecialmu:rootContainer::cspecial),
-				loops );
+    roots[uvar]->fillContainer( ncpoly, pevpoint, uvar+1, tdg,
+                                (matchUp?rootContainer::cspecialmu:rootContainer::cspecial),
+                                loops );
   }
 
   mprSTICKYPROT("\n");
@@ -2863,7 +3125,8 @@ int uResultant::nextPrime( int i )
   int init=i;
   i+=2;
   int j= IsPrime( i );
-  while ( j <= init ) {
+  while ( j <= init )
+  {
     i+=2;
     j= IsPrime( i );
   }
@@ -2878,7 +3141,7 @@ int uResultant::nextPrime( int i )
 // folded-file: t ***
 // compile-command-1: "make installg" ***
 // compile-command-2: "make install" ***
-// End: *** 
+// End: ***
 
 // in folding: C-c x
 // leave fold: C-c y

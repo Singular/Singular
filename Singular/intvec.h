@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.7 1999-04-16 07:53:34 obachman Exp $ */
+/* $Id: intvec.h,v 1.8 1999-06-28 16:06:23 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -31,12 +31,16 @@ class intvec
        { return ((i<row) && (i>=0) && (col==1)); }
     int range(int i, int j)
        { return ((i<row) && (i>=0) && (j<col) && (j>=0)); }
-    int& operator[](int i) {
+    int& operator[](int i)
+    {
+       #ifndef NDEBUG
        if((i<0)||(i>=row*col))
        {
           Werror("wrong intvec index:%d\n",i);
        }
-       return v[i];}
+       #endif
+       return v[i];
+    }
 #define IMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
     void operator+=(int intop);
     void operator-=(int intop);
@@ -66,6 +70,13 @@ class intvec
             Free((ADDRESS)v,sizeof(int)*row*col);
             v=NULL;
          }
+       }
+    void ivTEST()
+       {
+#ifdef MDEBUG
+         mmTestL(this);
+         mmTest((ADDRESS)v,sizeof(int)*row*col);
+#endif
        }
 };
 intvec * ivCopy(intvec * o);

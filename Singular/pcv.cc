@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.25 1999-06-11 17:13:40 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.26 1999-06-28 16:06:30 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -40,7 +40,7 @@ lists pcvLAddL(lists l1,lists l2)
       l0->m[i].rtyp=l1->m[i].rtyp;
       l0->m[i].data=pCopy((poly)l1->m[i].data);
       if(i<=l2->nr&&l2->m[i].rtyp==l1->m[i].rtyp)
-        l0->m[i].data=pAdd(l0->m[i].data,pCopy((poly)l2->m[i].data));
+        l0->m[i].data=pAdd((poly)l0->m[i].data,pCopy((poly)l2->m[i].data));
     }
     else
     if(i<=l2->nr&&(l2->m[i].rtyp==POLY_CMD||l2->m[i].rtyp==VECTOR_CMD))
@@ -230,7 +230,7 @@ poly pcvN2M(int n)
   for(i=pVariables-1;i>=0;i--)
   {
     k=j;
-    for(j=0;j<pcvMaxDegree&&pcvIndex[i][j]<=n;j++);
+    for(j=0; (j<pcvMaxDegree) && (pcvIndex[i][j]<=(unsigned)n); j++);
     j--;
     n-=pcvIndex[i][j];
     if(i<pVariables-1) pSetExp(m,i+2,k-j);

@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_inout.cc,v 1.1 1999-06-28 12:48:14 wenk Exp $ */
+/* $Id: mpr_inout.cc,v 1.2 1999-06-28 16:06:28 Singular Exp $ */
 
-/* 
+/*
 * ABSTRACT - multipolynomial resultant
 */
 
@@ -13,7 +13,7 @@
 //-> includes
 #include "tok.h"
 #include "structs.h"
-#include "subexpr.h"  
+#include "subexpr.h"
 #include "polys.h"
 #include "ideals.h"
 #include "ring.h"
@@ -46,10 +46,11 @@ TIMING_DEFINE_PRINT(mpr_solver)
 
 #define TIMING_EPR(t,msg) TIMING_END_AND_PRINT(t,msg);TIMING_RESET(t);
 
-enum mprState{ 
-    mprOk, 
+enum mprState
+{
+    mprOk,
     mprWrongRType,
-    mprHasOne, 
+    mprHasOne,
     mprInfNumOfVars,
     mprNotReduced,
     mprNotZeroDim,
@@ -60,7 +61,7 @@ enum mprState{
 extern size_t gmp_output_digits;
 //<-
 
-//-> nPrint(number n) 
+//-> nPrint(number n)
 void nPrint(number n)
 {
   poly o=pOne();
@@ -75,29 +76,30 @@ void nPrint(number n)
 //-> void mprPrintError( mprState state )
 void mprPrintError( mprState state, const char * name )
 {
-  switch (state) {
+  switch (state)
+  {
   case mprWrongRType:
-    Werror("Unknown resultant matrix type choosen!");
+    WerrorS("Unknown resultant matrix type choosen!");
     break;
   case mprHasOne:
     Werror("One element of the ideal %s is constant!",name);
     break;
   case mprInfNumOfVars:
     Werror("Numer of elements in given ideal %s must be equal to %d!",
-	   name,pVariables+1);
+           name,pVariables+1);
     break;
   case mprNotZeroDim:
     Werror("The given ideal %s must 0-dimensional!",name);
     break;
   case mprNotHomog:
     Werror("The given ideal %s has to be homogeneous in"
-	   " the first ring variable!",name);
+           " the first ring variable!",name);
     break;
   case mprNotReduced:
     Werror("The given ideal %s has to reduced!",name);
     break;
   case mprUnSupField:
-    Werror("Ground field not implemented!");
+    WerrorS("Ground field not implemented!");
     break;
   default:
     break;
@@ -106,37 +108,38 @@ void mprPrintError( mprState state, const char * name )
 //<-
 
 //-> mprState mprIdealCheck()
-mprState mprIdealCheck( const ideal theIdeal, 
-			const char * name, 
-			uResultant::resMatType mtype, 
-			BOOLEAN rmatrix= false )
+mprState mprIdealCheck( const ideal theIdeal,
+                        const char * name,
+                        uResultant::resMatType mtype,
+                        BOOLEAN rmatrix= false )
 {
   mprState state = mprOk;
   int power;
-  int k; 
+  int k;
 
   int numOfVars= mtype == uResultant::denseResMat?pVariables-1:pVariables;
   if ( rmatrix ) numOfVars++;
 
-  if ( mtype == uResultant::none ) 
+  if ( mtype == uResultant::none )
     state= mprWrongRType;
 
   if ( IDELEMS(theIdeal) != numOfVars )
     state= mprInfNumOfVars;
 
-  for ( k= IDELEMS(theIdeal) - 1; (state == mprOk) && (k >= 0); k-- ) {
+  for ( k= IDELEMS(theIdeal) - 1; (state == mprOk) && (k >= 0); k-- )
+  {
     poly p = (theIdeal->m)[k];
     if ( pIsConstant(p) ) state= mprHasOne;
-    else 
-    if ( (mtype == uResultant::denseResMat) && !pIsHomogeneous(p) ) 
+    else
+    if ( (mtype == uResultant::denseResMat) && !pIsHomogeneous(p) )
       state=mprNotHomog;
   }
 
   if ( !(rField_is_R()||
-	 rField_is_Q()||
-	 rField_is_long_R()||
-	 rField_is_long_C()||
-	 (rmatrix && rField_is_Q_a())) ) 
+         rField_is_Q()||
+         rField_is_long_R()||
+         rField_is_long_C()||
+         (rmatrix && rField_is_Q_a())) )
     state= mprUnSupField;
 
   if ( state != mprOk ) mprPrintError( state, "" /* name */ );
@@ -148,7 +151,8 @@ mprState mprIdealCheck( const ideal theIdeal,
 //-> uResultant::resMatType determineMType( int imtype )
 uResultant::resMatType determineMType( int imtype )
 {
-  switch ( imtype ) {
+  switch ( imtype )
+  {
   case MPR_DENSE:
     return uResultant::denseResMat;
   case 0:
@@ -180,11 +184,12 @@ BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 
   res->rtyp = LIST_CMD;
   res->data= (void *)emptylist;
-  
+
   TIMING_START(mpr_overall);
 
   // check input ideal ( = polynomial system )
-  if ( mprIdealCheck( gls, arg1->Name(), mtype ) != mprOk ) {
+  if ( mprIdealCheck( gls, arg1->Name(), mtype ) != mprOk )
+  {
     return TRUE;
   }
 
@@ -196,21 +201,24 @@ BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   // main task 1: setup of resultant matrix
   TIMING_START(mpr_constr);
   ures= new uResultant( gls, mtype );
-  if ( ures->accessResMat()->initState() != resMatrixBase::ready ) {
-    Werror("Error occurred during matrix setup!");
+  if ( ures->accessResMat()->initState() != resMatrixBase::ready )
+  {
+    WerrorS("Error occurred during matrix setup!");
     return TRUE;
   }
   TIMING_EPR(mpr_constr, "construction\t\t")
 
   // if dense resultant, check if minor nonsingular
   TIMING_START(mpr_check);
-  if ( mtype == uResultant::denseResMat ) {
+  if ( mtype == uResultant::denseResMat )
+  {
     smv= ures->accessResMat()->getSubDet();
 #ifdef mprDEBUG_PROT
     Print("// Determinant of submatrix: ");nPrint(smv);PrintLn();
 #endif
-    if ( nIsZero(smv) ) {
-      Werror("Unsuitable input ideal: Minor of resultant matrix is singular!");
+    if ( nIsZero(smv) )
+    {
+      WerrorS("Unsuitable input ideal: Minor of resultant matrix is singular!");
       return TRUE;
     }
   }
@@ -219,16 +227,16 @@ BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   // main task 2: Interpolate specialized resultant polynomials
   TIMING_START(mpr_ures);
   if ( interpolate_det )
-    iproots= ures->interpolateDenseSP( false, smv );  
-  else 
+    iproots= ures->interpolateDenseSP( false, smv );
+  else
     iproots= ures->specializeInU( false, smv );
   TIMING_EPR(mpr_ures,   "interpolation ures\t")
 
   // main task 3: Interpolate specialized resultant polynomials
   TIMING_START(mpr_mures);
-  if ( interpolate_det ) 
+  if ( interpolate_det )
     muiproots= ures->interpolateDenseSP( true, smv );
-  else 
+  else
     muiproots= ures->specializeInU( true, smv );
   TIMING_EPR(mpr_mures,  "interpolation mures\t")
 
@@ -244,15 +252,18 @@ BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   TIMING_START(mpr_solver);
   arranger->solve_all();
   TIMING_EPR(mpr_solver, "solver time\t\t");
-   
+
   // get list of roots
-  if ( arranger->success() ) {
+  if ( arranger->success() )
+  {
     TIMING_START(mpr_arrange);
     arranger->arrange();
     TIMING_EPR(mpr_arrange, "arrange time\t\t");
     listofroots= arranger->listOfRoots( gmp_output_digits );
-  } else {
-    Werror("Solver was unable to find any root!");
+  }
+  else
+  {
+    WerrorS("Solver was unable to find any root!");
     return TRUE;
   }
 
@@ -272,7 +283,7 @@ BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 
   emptylist->Clean();
   //Free( (ADDRESS) emptylist, sizeof(slists) );
-  
+
   TIMING_EPR(mpr_overall,"overall time\t\t")
 
   return FALSE;
@@ -289,7 +300,8 @@ BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
   uResultant::resMatType mtype= determineMType( imtype );
 
   // check input ideal ( = polynomial system )
-  if ( mprIdealCheck( gls, arg1->Name(), mtype, true ) != mprOk ) {
+  if ( mprIdealCheck( gls, arg1->Name(), mtype, true ) != mprOk )
+  {
     return TRUE;
   }
 
@@ -299,7 +311,7 @@ BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
   res->data= (void*)resMat->accessResMat()->getMatrix();
 
   delete resMat;
-  
+
   return FALSE;
 }
 //<-
@@ -311,7 +323,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2 )
   poly gls;
   gls= (poly)(arg1->Data());
   int howclean= (int)arg2->Data();
-  
+
   int deg= pTotaldegree( gls );
   //  int deg= pDeg( gls );
   int len= pLength( gls );
@@ -324,26 +336,31 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2 )
   elist->Init( 0 );
 
   if ( !(rField_is_R() ||
-	 rField_is_Q() ||
-	 rField_is_long_R() ||
-	 rField_is_long_C()) ) {
-    Werror("Ground field not implemented!\n");
+         rField_is_Q() ||
+         rField_is_long_R() ||
+         rField_is_long_C()) )
+         {
+    WerrorS("Ground field not implemented!");
     return TRUE;
   }
 
-  if ( pVariables > 1 ) {
+  if ( pVariables > 1 )
+  {
     piter= gls;
-    for ( i= 1; i <= pVariables; i++ ) 
-      if ( pGetExp( piter, i ) ) {
-	vpos= i;
-	break;
+    for ( i= 1; i <= pVariables; i++ )
+      if ( pGetExp( piter, i ) )
+      {
+        vpos= i;
+        break;
       }
-    while ( piter ) {
-      for ( i= 1; i <= pVariables; i++ ) 
-	if ( (vpos != i) && (pGetExp( piter, i ) != 0) ) {
-	  Werror("The polynomial %s must be univariate!",arg1->Name());
-	  return TRUE;
-	}
+    while ( piter )
+    {
+      for ( i= 1; i <= pVariables; i++ )
+        if ( (vpos != i) && (pGetExp( piter, i ) != 0) )
+        {
+          Werror("The polynomial %s must be univariate!",arg1->Name());
+          return TRUE;
+        }
       pIter( piter );
     }
   }
@@ -351,19 +368,24 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2 )
   rootContainer * roots= new rootContainer();
   number * pcoeffs= (number *)Alloc( (deg+1) * sizeof( number ) );
   piter= gls;
-  for ( i= deg; i >= 0; i-- ) {
+  for ( i= deg; i >= 0; i-- )
+  {
     //if ( piter ) Print("deg %d, pDeg(piter) %d\n",i,pTotaldegree(piter));
-    if ( piter && pTotaldegree(piter) == i ) {
+    if ( piter && pTotaldegree(piter) == i )
+    {
       pcoeffs[i]= nCopy( pGetCoeff( piter ) );
       //nPrint( pcoeffs[i] );Print("  ");
       pIter( piter );
-    } else {
+    }
+    else
+    {
       pcoeffs[i]= nInit(0);
     }
-  }  
+  }
 
 #ifdef mprDEBUG_PROT
-  for (i=deg; i >= 0; i--) {
+  for (i=deg; i >= 0; i--)
+  {
     nPrint( pcoeffs[i] );Print("  ");
   }
   PrintLn();
@@ -382,14 +404,19 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2 )
   rlist= (lists)Alloc( sizeof(slists) );
   rlist->Init( elem );
 
-  if (rField_is_long_C()) {
-    for ( j= 0; j < elem; j++ ) {
+  if (rField_is_long_C())
+  {
+    for ( j= 0; j < elem; j++ )
+    {
       rlist->m[j].rtyp=NUMBER_CMD;
       rlist->m[j].data=(void *)nCopy((number)(roots->getRoot(j)));
       //rlist->m[j].data=(void *)(number)(roots->getRoot(j));
     }
-  } else {
-    for ( j= 0; j < elem; j++ ) {
+  }
+  else
+  {
+    for ( j= 0; j < elem; j++ )
+    {
       dummy = complexToStr( (*roots)[j], gmp_output_digits );
       rlist->m[j].rtyp=STRING_CMD;
       rlist->m[j].data=(void *)dummy;
@@ -422,65 +449,78 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
   // ...
   // p can be a vector of numbers (multivariate polynom)
   //   or one number (univariate polynom)
-  // tdg = deg(f) 
+  // tdg = deg(f)
 
-  int n= IDELEMS( p ); 
+  int n= IDELEMS( p );
   int m= IDELEMS( w );
   int tdg= (int)arg3->Data();
 
   res->data= (void*)NULL;
-  
+
   // check the input
-  if ( tdg < 1 ) {
-    Werror("Last input parameter must be > 0!");
+  if ( tdg < 1 )
+  {
+    WerrorS("Last input parameter must be > 0!");
     return TRUE;
   }
-  if ( n != pVariables ) {
-    Werror("Size of first input ideal must be equal to %d!\n",pVariables);
+  if ( n != pVariables )
+  {
+    Werror("Size of first input ideal must be equal to %d!",pVariables);
     return TRUE;
   }
-  if ( m != (int)pow((double)tdg+1,(int)n) ) {
-    Werror("Size of second input ideal must be equal to %d!\n",(int)pow((double)tdg+1,(int)n));
+  if ( m != (int)pow((double)tdg+1,(int)n) )
+  {
+    Werror("Size of second input ideal must be equal to %d!",
+      (int)pow((double)tdg+1,(int)n));
     return TRUE;
   }
   if ( !(rField_is_Q() /* ||
-	 rField_is_R() || rField_is_long_R() ||
-	 rField_is_long_C()*/ ) ) {
-    Werror("Ground field not implemented!\n");
+         rField_is_R() || rField_is_long_R() ||
+         rField_is_long_C()*/ ) )
+         {
+    WerrorS("Ground field not implemented!");
     return TRUE;
   }
 
   number tmp;
   number *pevpoint= (number *)Alloc( n * sizeof( number ) );
-  for ( i= 0; i < n; i++ ) {
+  for ( i= 0; i < n; i++ )
+  {
     pevpoint[i]=nInit(0);
-    if (  (p->m)[i] ) {
+    if (  (p->m)[i] )
+    {
       tmp = pGetCoeff( (p->m)[i] );
-      if ( nIsZero(tmp) || nIsOne(tmp) || nIsMOne(tmp) ) {
-	Free( (ADDRESS)pevpoint, n * sizeof( number ) );
-	Werror("Elements of first input ideal must not be equal to -1, 0, 1!");
-	return TRUE;
+      if ( nIsZero(tmp) || nIsOne(tmp) || nIsMOne(tmp) )
+      {
+        Free( (ADDRESS)pevpoint, n * sizeof( number ) );
+        WerrorS("Elements of first input ideal must not be equal to -1, 0, 1!");
+        return TRUE;
       }
     } else tmp= NULL;
-    if ( !nIsZero(tmp) ) {
-      if ( !pIsConstant((p->m)[i])) {
-	Free( (ADDRESS)pevpoint, n * sizeof( number ) );
-	Werror("Elements of first input ideal must be numbers!");
-	return TRUE;
+    if ( !nIsZero(tmp) )
+    {
+      if ( !pIsConstant((p->m)[i]))
+      {
+        Free( (ADDRESS)pevpoint, n * sizeof( number ) );
+        WerrorS("Elements of first input ideal must be numbers!");
+        return TRUE;
       }
       pevpoint[i]= nCopy( tmp );
     }
   }
 
   number *wresults= (number *)Alloc( m * sizeof( number ) );
-  for ( i= 0; i < m; i++ ) {
+  for ( i= 0; i < m; i++ )
+  {
     wresults[i]= nInit(0);
-    if ( (w->m)[i] && !nIsZero(pGetCoeff((w->m)[i])) ) {
-      if ( !pIsConstant((w->m)[i])) {
-	Free( (ADDRESS)pevpoint, n * sizeof( number ) );
-	Free( (ADDRESS)wresults, m * sizeof( number ) );
-	Werror("Elements of second input ideal must be numbers!");
-	return TRUE;
+    if ( (w->m)[i] && !nIsZero(pGetCoeff((w->m)[i])) )
+    {
+      if ( !pIsConstant((w->m)[i]))
+      {
+        Free( (ADDRESS)pevpoint, n * sizeof( number ) );
+        Free( (ADDRESS)wresults, m * sizeof( number ) );
+        WerrorS("Elements of second input ideal must be numbers!");
+        return TRUE;
       }
       wresults[i]= nCopy(pGetCoeff((w->m)[i]));
     }
@@ -499,7 +539,7 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
 }
 //<-
 
-//-> function u_resultant_det 
+//-> function u_resultant_det
 poly u_resultant_det( ideal gls, int imtype )
 {
   uResultant::resMatType mtype= determineMType( imtype );
@@ -510,7 +550,8 @@ poly u_resultant_det( ideal gls, int imtype )
   TIMING_START(mpr_overall);
 
   // check input ideal ( = polynomial system )
-  if ( mprIdealCheck( gls, "", mtype ) != mprOk ) {
+  if ( mprIdealCheck( gls, "", mtype ) != mprOk )
+  {
     return emptypoly;
   }
 
@@ -522,13 +563,15 @@ poly u_resultant_det( ideal gls, int imtype )
   TIMING_EPR(mpr_constr,"construction");
 
   // if dense resultant, check if minor nonsingular
-  if ( mtype == uResultant::denseResMat ) {
+  if ( mtype == uResultant::denseResMat )
+  {
     smv= ures->accessResMat()->getSubDet();
 #ifdef mprDEBUG_PROT
     Print("// Determinant of submatrix: ");nPrint(smv); PrintLn();
 #endif
-    if ( nIsZero(smv) ) {
-      Werror("Unsuitable input ideal: Minor of resultant matrix is singular!");
+    if ( nIsZero(smv) )
+    {
+      WerrorS("Unsuitable input ideal: Minor of resultant matrix is singular!");
       return emptypoly;
     }
   }
@@ -557,7 +600,7 @@ poly u_resultant_det( ideal gls, int imtype )
 // folded-file: t ***
 // compile-command-1: "make installg" ***
 // compile-command-2: "make install" ***
-// End: *** 
+// End: ***
 
 // in folding: C-c x
 // leave fold: C-c y

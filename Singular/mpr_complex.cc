@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.7 1999-06-28 12:48:12 wenk Exp $ */
+/* $Id: mpr_complex.cc,v 1.8 1999-06-28 16:06:26 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -198,48 +198,55 @@ gmp_float numberToFloat( number num )
 {
   gmp_float r;
 
-  if ( rField_is_Q() ) {
+  if ( rField_is_Q() )
+  {
     if ( num != NULL )
+    {
+      if (SR_HDL(num) & SR_INT)
       {
-	if (SR_HDL(num) & SR_INT)
-	  {
-	    r= SR_TO_INT(num);
-	  }
-	else
-	  {
-	    if ( num->s == 0 )
-	      {
-		nlNormalize( num );
-	      }
-	    if (SR_HDL(num) & SR_INT)
-	      {
-		r= SR_TO_INT(num);
-	      }
-	    else
-	      {
-		if ( num->s != 3 )
-		  {
-		    r= &num->z;
-		    r/= (gmp_float)&num->n;
-		  }
-		else
-		  {
-		    r= &num->z;
-		  }
-	      }
-	  }
+        r= SR_TO_INT(num);
       }
+      else
+      {
+        if ( num->s == 0 )
+        {
+          nlNormalize( num );
+        }
+        if (SR_HDL(num) & SR_INT)
+        {
+          r= SR_TO_INT(num);
+        }
+        else
+        {
+          if ( num->s != 3 )
+          {
+            r= &num->z;
+            r/= (gmp_float)&num->n;
+          }
+          else
+          {
+            r= &num->z;
+          }
+        }
+      }
+    }
     else
-      {
-	r= 0.0;
-      }
-  } else if (rField_is_long_R() || rField_is_long_C()) {
+    {
+      r= 0.0;
+    }
+  }
+  else if (rField_is_long_R() || rField_is_long_C())
+  {
     r= *(gmp_float*)num;
-  } else if ( rField_is_R() ) {
+  }
+  else if ( rField_is_R() )
+  {
     // Add some code here :-)
-    Werror("Ground field not implemented!");
-  } else {
-    Werror("Ground field not implemented!");
+    WerrorS("Ground field not implemented!");
+  }
+  else
+  {
+    WerrorS("Ground field not implemented!");
   }
 
   return r;
@@ -498,11 +505,14 @@ char *complexToStr( const gmp_complex & c, const unsigned int oprec )
   {
     in_real=floatToStr( c.real(), oprec );         // get real part
     in_imag=floatToStr( abs(c.imag()), oprec );    // get imaginary part
-    
-    if (rField_is_long_C()) {
+
+    if (rField_is_long_C())
+    {
       out=(char*)AllocL((strlen(in_real)+strlen(in_imag)+5+strlen(currRing->parameter[0]))*sizeof(char));
       sprintf(out,"%s%s%s*%s",in_real,c.imag().sign()>=0?"+":"-",currRing->parameter[0],in_imag);
-    } else {
+    }
+    else
+    {
       out=(char*)AllocL( (strlen(in_real)+strlen(in_imag)+8) * sizeof(char));
       sprintf(out,"%s%s%s",in_real,c.imag().sign()>=0?" + I ":" - I ",in_imag);
     }

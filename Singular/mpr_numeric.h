@@ -3,11 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_numeric.h,v 1.1 1999-06-28 12:48:16 wenk Exp $ */
+/* $Id: mpr_numeric.h,v 1.2 1999-06-28 16:06:30 Singular Exp $ */
 
-/* 
+/*
 * ABSTRACT - multipolynomial resultants - numeric stuff
-*            ( root finder, vandermonde system solver, simplex )   
+*            ( root finder, vandermonde system solver, simplex )
 */
 
 //-> include & define stuff
@@ -16,7 +16,7 @@
 #include "mpr_complex.h"
 
 // define polish mode when finding roots
-#define PM_NONE    1 
+#define PM_NONE    1
 #define PM_POLISH  2
 #define PM_CORRUPT 3
 //<-
@@ -28,12 +28,12 @@
 class vandermonde
 {
 public:
-  vandermonde( const long _cn, const long _n, 
+  vandermonde( const long _cn, const long _n,
 	       const long _maxdeg, number *_p, const bool _homog = true );
   ~vandermonde();
-  
-  /** Solves the Vandermode linear system 
-   *    \sum_{i=1}^{n} x_i^k-1 w_i = q_k, k=1,..,n. 
+
+  /** Solves the Vandermode linear system
+   *    \sum_{i=1}^{n} x_i^k-1 w_i = q_k, k=1,..,n.
      * Any computations are done using type number to get high pecision results.
    * @param  q n-tuple of results (right hand of equations)
    * @return w n-tuple of coefficients of resulting polynomial, lowest deg first
@@ -70,8 +70,8 @@ public:
   rootContainer();
   ~rootContainer();
 
-  void fillContainer( number *_coeffs, number *_ievpoint, 
-		      const int _var, const int _tdg, 
+  void fillContainer( number *_coeffs, number *_ievpoint,
+		      const int _var, const int _tdg,
 		      const rootType _rt, const int _anz );
 
   bool solver( const int polishmode= PM_NONE );
@@ -97,9 +97,9 @@ public:
 private:
   rootContainer( const rootContainer & v );
 
-  /** Given the degree tdg and the tdg+1 complex coefficients ad[0..tdg] 
+  /** Given the degree tdg and the tdg+1 complex coefficients ad[0..tdg]
    * (generated from the number coefficients coeffs[0..tdg]) of the polynomial
-   * this routine successively calls "laguer" and finds all m complex roots in 
+   * this routine successively calls "laguer" and finds all m complex roots in
    * roots[0..tdg]. The bool var "polish" should be input as "true" if polishing
    * (also by "laguer") is desired, "false" if the roots will be subsequently
    * polished by other means.
@@ -113,7 +113,7 @@ private:
    * returned at its.
    */
   void laguer(gmp_complex ** a, int m, gmp_complex * x, int * its);
-  
+
   int var;
   int tdg;
 
@@ -122,18 +122,18 @@ private:
   rootType rt;
 
   gmp_complex ** theroots;
-  
+
   int anz;
   bool found_roots;
 };
 //<-
 
 //-> class rootArranger
-class rootArranger 
+class rootArranger
 {
-public: 
-  rootArranger( rootContainer ** _roots, 
-		rootContainer ** _mu, 
+public:
+  rootArranger( rootContainer ** _roots,
+		rootContainer ** _mu,
 		const int _howclean = PM_CORRUPT );
   ~rootArranger() {}
 
@@ -169,7 +169,4 @@ void simplx( mprfloat **a, int m, int n, int m1, int m2, int m3, int *icase, int
 // folded-file: t ***
 // compile-command-1: "make installg" ***
 // compile-command-2: "make install" ***
-// End: *** 
-
-
-
+// End: ***

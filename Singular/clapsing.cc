@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.52 1999-06-15 08:32:31 Singular Exp $
+// $Id: clapsing.cc,v 1.53 1999-06-28 16:06:22 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -638,7 +638,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     if (with_exps!=1)
     {
       (*v)=new intvec(1);
-      (*v)[1]=1;
+      (**v)[0]=1;
     }
     return res;
   }
@@ -1137,6 +1137,9 @@ BOOLEAN jjFAC_P(leftv res, leftv u)
   intvec *v=NULL;
   ideal f=singclap_factorize((poly)(u->Data()), &v, 0);
   if (f==NULL) return TRUE;
+  #ifdef MDEBUG
+  v->ivTEST();
+  #endif
   lists l=(lists)Alloc(sizeof(slists));
   l->Init(2);
   l->m[0].rtyp=IDEAL_CMD;
