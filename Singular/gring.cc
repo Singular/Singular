@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.27 2003-03-10 16:29:41 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.28 2003-03-10 16:30:38 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -266,21 +266,21 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
 
   if (r->nc->type==nc_skew)
   {
-    if (r->nc->IsSkewConstant==1) 
+    if (r->nc->IsSkewConstant==1)
     {
       int tpower=0;
       for(j=jG; j<=iG; j++)
       {
-	if (G[j]!=0)
-	{
-	  cpower = 0;
-	  for(i=iF; i>jG; i--)
-	  {
-	    cpower = cpower + F[i];
-	  }
-	  cpower = cpower*G[j];
-	  tpower = tpower + cpower;
-	}
+        if (G[j]!=0)
+        {
+          cpower = 0;
+          for(i=iF; i>jG; i--)
+          {
+            cpower = cpower + F[i];
+          }
+          cpower = cpower*G[j];
+          tpower = tpower + cpower;
+        }
       }
       cff = nCopy(p_GetCoeff(MATELEM(r->nc->COM,1,2),r));
       nPower(cff,tpower,&tmp_num);
@@ -292,23 +292,23 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
       number totcff=n_Init(1,r);
       for(j=jG; j<=iG; j++)
       {
-	if (G[j]!=0)
-	{
-	  cpower = 0;
-	  for(i=iF; i>jG ; i--)
-	  {
-	    if (F[i]!=0) 
-	    {
-	      cpower = F[i]*G[j];
-	      cff = nCopy(p_GetCoeff(MATELEM(r->nc->COM,j,i),r));
-	      nPower(cff,cpower,&tmp_num);
-	      cff = nMult(totcff,tmp_num);
-	      totcff = nCopy(cff);
-	      nDelete(&cff);
-	      nDelete(&tmp_num);
-	    } 
-	  } /* end 2nd for */
-	}
+        if (G[j]!=0)
+        {
+          cpower = 0;
+          for(i=iF; i>jG ; i--)
+          {
+            if (F[i]!=0)
+            {
+              cpower = F[i]*G[j];
+              cff = nCopy(p_GetCoeff(MATELEM(r->nc->COM,j,i),r));
+              nPower(cff,cpower,&tmp_num);
+              cff = nMult(totcff,tmp_num);
+              totcff = nCopy(cff);
+              nDelete(&cff);
+              nDelete(&tmp_num);
+            }
+          } /* end 2nd for */
+        }
       }
       cff=totcff;
     }
@@ -519,21 +519,21 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
 //   {
 //     if (MATELEM(LCOM,jG,i)!=NULL)
 //     {
-//       tmpcoef=pGetCoeff(MATELEM(LCOM,jG,i));  
+//       tmpcoef=pGetCoeff(MATELEM(LCOM,jG,i));
 //       tmpint=(int)F[i];
 //       nPower(tmpcoef,F[i],&tmpcoef);
 //       rescoef=nMult(rescoef,tmpcoef);
-//       i--; 
+//       i--;
 //     }
 //     else
 //     {
 //       if (F[i]!=0) break;
 //     }
 //   }
-//   if (iF==i) 
+//   if (iF==i)
 //   /* no action took place*/
 //   {
-    
+
 //   }
 //   else /* power the result up to bG */
 //   {
@@ -842,7 +842,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     r->nc->MT[UPMATELEM(j,i,rN)] = tmp;
     tmp=NULL;
     r->nc->MTsize[UPMATELEM(j,i,rN)] = newcMTsize;
-  }  
+  }
   /* The update of multiplication matrix is finished */
     pDelete(&out);
     out = nc_uu_Mult_ww_vert(i, a, j, b, r);
