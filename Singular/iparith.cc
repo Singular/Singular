@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: iparith.cc,v 1.10 1997-03-27 12:42:44 Singular Exp $";
+static char rcsid[] = "$Id: iparith.cc,v 1.11 1997-03-27 15:49:02 Singular Exp $";
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -4488,7 +4488,8 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
           while (dArith2[i].cmd==op)
           {
             if(((at==dArith2[i].arg1)||(bt==dArith2[i].arg2))
-            && (dArith2[i].res!=0))
+            && (dArith2[i].res!=0)
+            && (dArith2[i].p!=jjWRONG2))
             {
               if (proccall)
                 Werror("expected %s(`%s`,`%s`)"
@@ -4651,7 +4652,8 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         {
           while (dArith1[i].cmd==op)
           {
-            if (dArith1[i].res!=0)
+            if ((dArith1[i].res!=0)
+            && (dArith1[i].p!=jjWRONG))
               Werror("expected %s(`%s`)"
                 ,s,Tok2Cmdname(dArith1[i].arg));
             i++;
