@@ -1,6 +1,6 @@
 cmp
 barei
-bett
+; CYCLE bett
 ch
 col
 corner
@@ -72,7 +72,7 @@ m4ex
 ; CORE m5ex
 m7ex
 m8ex
-m9ex
+; BUG m9ex
 m10ex
 m11ex
 m13ex
@@ -109,7 +109,7 @@ err1
 err2
 err3
 err4
-err5
+; BUG err5
 err6
 err7
 sat
