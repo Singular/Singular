@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.6 1998-01-05 16:39:17 Singular Exp $
+// $Id: fglmcomb.cc,v 1.7 1998-01-27 14:16:14 pohl Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -30,10 +30,14 @@
 #include "fglmgauss.h"
 #include "kstd1.h"
 #include "fglm.h"
+#ifdef macintosh
+#include <:templates:ftmpl_list.h>
+#else
 #include <templates/ftmpl_list.h>
+#endif
 
 // nur fuer debug-Ausgaben:
-int
+static int
 pSize( poly p )
 {
     int count = 0;
@@ -44,7 +48,7 @@ pSize( poly p )
     return count;
 }
 
-void
+static void
 fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numMonoms )
 {
     poly temp = *pptr;
@@ -83,7 +87,7 @@ fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numM
     }
 }
 
-BOOLEAN
+static BOOLEAN
 fglmReductionStep( poly * pptr, ideal source, int * w )
 {
 // returns TRUE if the leading monomial was reduced
@@ -134,7 +138,7 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
     return ( (best > 0) );
 }
 
-void
+static void
 fglmReduce( poly * pptr, fglmVector & v, polyset m, int numMonoms, ideal source, int * w )
 {
     BOOLEAN reduced = FALSE;
@@ -160,7 +164,7 @@ fglmReduce( poly * pptr, fglmVector & v, polyset m, int numMonoms, ideal source,
     }
 }
 
-poly
+static poly
 fglmNewLinearCombination( ideal source, poly monset )
 {
     polyset m = NULL;
@@ -253,13 +257,22 @@ fglmNewLinearCombination( ideal source, poly monset )
             temp= pIter( temp );
         }
         nf[k]= current;
+#ifdef macintosh
+        mv[k].mac_constr( currV );
+#else
         mv[k].fglmVector( currV );
+#endif
         STICKYPROT( "\n" );
     }
     // get the vector representation
     for ( k= 0; k < numMonoms; k++ ) {
         STICKYPROT( "." );
+ 
+#ifdef macintosh
+        v[k].mac_constr_i( basisSize );
+#else
         v[k].fglmVector( basisSize );
+#endif
         poly mon= nf[k];
         while ( mon != NULL ) {
             BOOLEAN found = FALSE;
@@ -387,7 +400,7 @@ fglmNewLinearCombination( ideal source, poly monset )
 }
 
 
-poly
+static poly
 fglmLinearCombination( ideal source, poly monset )
 {
     int k;
@@ -456,7 +469,11 @@ fglmLinearCombination( ideal source, poly monset )
     // get the vector representation
     STICKYPROT2( "(%i)", basisSize );
     for ( k= 0; k < numMonoms; k++ ) {
+#ifdef macintosh
+        v[k].mac_constr_i( basisSize );
+#else
         v[k].fglmVector( basisSize );
+#endif
         STICKYPROT( "(+" );
         poly mon= nf[k];
         while ( mon != NULL ) {
