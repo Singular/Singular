@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.44 1999-10-20 11:52:03 obachman Exp $ */
+/* $Id: syz1.cc,v 1.45 1999-10-20 11:55:28 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1705,6 +1705,8 @@ void syKillComputation(syStrategy syzstr)
           }
           Free((ADDRESS)syzstr->weights,syzstr->length*sizeof(intvec*));
         }
+        if (syzstr->sev[i] != NULL)
+          Free((ADDRESS)syzstr->sev[i], (IDELEMS(syzstr->res[i])+1)*sizeof(unsigned long))
         idDelete(&(syzstr->res[i]));
         Free((ADDRESS)syzstr->resPairs[i],(*syzstr->Tl)[i]*sizeof(SObject));
       }
