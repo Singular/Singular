@@ -17,7 +17,7 @@ proc vcheckdump(link l, string vn)
     }
   }
 }
-  
+
 proc rcheckdump(link l, list nameslist)
 {
   int i;
@@ -32,8 +32,6 @@ proc checkdump(link l)
   rcheckdump(l, names());
 }
 
-
-  
 // data
 int i;
 int i1 = 1;
@@ -98,7 +96,7 @@ poly p2 = x*x*x - 2*x^3*x^4*x^5 + 3*x*x -4*x*x + 5*x^2 + p1;
 poly p3 = p2*p2;
 
 
-// First, make two (preserves order of variables) ASCII-dumps of everything 
+// First, make two (preserves order of variables) ASCII-dumps of everything
 dump(":w _dump.txt");
 killall();
 getdump("_dump.txt");
@@ -119,13 +117,13 @@ getdump("MPfile:r _dump.mp");
 // checkdump("MPfile: _dump.mp");
 
 // MPfork dump
-link ll = "MPtcp:fork"; 
+link ll = "MPtcp:fork";
 open(ll);
 if (status(ll, "openwrite", "yes"))
 {
   write(ll, quote(getdump(mp_ll))); dump(ll); read(ll);
   killall("not", "link");
-  write(ll, quote(dump(mp_ll))); getdump(ll); read(ll); 
+  write(ll, quote(dump(mp_ll))); getdump(ll); read(ll);
 
   checkdump(ll);
 }
@@ -139,7 +137,7 @@ if (size(sing))
 {
   // check whether rsh works and whether remote Singular can be executed
   if (system("sh","rsh `hostname` -n test -x "+sing+" 1>/dev/null 2>&1"))
-  { 
+  {
     if (system("sh","remsh `hostname` -n test -x "+sing+" 1>/dev/null 2>&1"))
     {
       if (system("sh","ssh `hostname` -f test -x "+sing+" 1>/dev/null 2>&1"))
@@ -151,14 +149,14 @@ if (size(sing))
 
   if (size(sing))
   {
-    link ll = "MPtcp:launch"; 
+    link ll = "MPtcp:launch";
     open(ll);
     if (status(ll, "openwrite", "yes"))
     {
       kill sing;
       write(ll, quote(getdump(mp_ll))); dump(ll); read(ll);
       killall("not", "link");
-      write(ll, quote(dump(mp_ll))); getdump(ll); read(ll); 
+      write(ll, quote(dump(mp_ll))); getdump(ll); read(ll);
 
       checkdump(ll);
     }
@@ -175,7 +173,3 @@ tst_ignore(system("sh", "rm -rf _dump.*"));
 killall("proc");
 dump("");
 LIB "tst.lib"; tst_status(1);$
-
-
-  
-

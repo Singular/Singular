@@ -1,11 +1,12 @@
 Status Output of tst_status.out
-init >> USER    :pohl
-init >> HOSTNAME:hasen.itwm.uni-kl.de
-init >> uname -a:Linux hasen.itwm.uni-kl.de 2.0.36 #3 Thu Apr 22 13:05:24 MET DST 1999 i486 unknown
-init >> date    :Thu Aug 19 09:46:49 MET DST 1999
-init >> version :1304
+init >> USER    :hannes
+init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
+init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
+init >> date    :Fri May 12 14:48:22 MET DST 2000
+init >> version :1308
 init >> ticks   :100
-1 >> tst_memory_0 :: hasen.itwm.uni-kl.de:599604
-1 >> tst_memory_1 :: hasen.itwm.uni-kl.de:3256384
-1 >> tst_memory_2 :: hasen.itwm.uni-kl.de:3514368
-1 >> tst_timer_1 :: hasen.itwm.uni-kl.de:5248
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:616837
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:3479101
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:3661824
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:1485
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:187212

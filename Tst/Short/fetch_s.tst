@@ -40,11 +40,11 @@ proc check_fetch(int n, list olist)
   
   for (j=1; j<=n; j = j + (j / 10) + 1)
   {
-    execute generate_ring_str(j, "r", olist[1]);
-    execute generate_polys_str(j);
+    execute(generate_ring_str(j, "r", olist[1]));
+    execute(generate_polys_str(j));
     for (i=1; i<=size(olist); i++)
     {
-      execute generate_ring_str(j, "r1", olist[i]);
+      execute(generate_ring_str(j, "r1", olist[i]));
       fetch(r, p);
       fetch(r, p1);
       fetch(r, p2);
@@ -60,6 +60,3 @@ proc check_fetch(int n, list olist)
 check_fetch(10, orderings);
 
 tst_status(1);$
-  
-  
-
