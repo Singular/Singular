@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.7 1998-04-29 07:05:29 siebert Exp $ */
+/* $Id: lists.cc,v 1.8 1998-05-12 10:01:08 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -327,7 +327,9 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
   if ((!hom_complex) || (weights==NULL))
   {
     for (j=0;j<i;j++)
+    {
       if (w[j]!=NULL) delete w[j];
+    }
     Free((ADDRESS)w,(*len)*sizeof(intvec*));
   }
   else

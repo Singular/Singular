@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.20 1998-04-22 07:48:59 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.21 1998-05-12 10:01:07 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -114,33 +114,34 @@ static void list1(char* s, idhdl h,BOOLEAN c)
   ipListFlag(h);
   switch(IDTYP(h))
   {
-    case INT_CMD:     Print(" %d",IDINT(h)); break;
-    case INTVEC_CMD:  Print(" (%d)",IDINTVEC(h)->length()); break;
-    case INTMAT_CMD:  Print(" %d x %d",IDINTVEC(h)->rows(),IDINTVEC(h)->cols());
-                   break;
+    case INT_CMD:   Print(" %d",IDINT(h)); break;
+    case INTVEC_CMD:Print(" (%d)",IDINTVEC(h)->length()); break;
+    case INTMAT_CMD:Print(" %d x %d",IDINTVEC(h)->rows(),IDINTVEC(h)->cols());
+                    break;
     case POLY_CMD:
-    case VECTOR_CMD:  if (c)
-                   {
-                     PrintS(" ");wrp(IDPOLY(h));
-                     if(IDPOLY(h) != NULL)
-                     {
-                       Print(", %d monomial(s)",pLength(IDPOLY(h)));
-                     }
-                   }
-                   break;
-    case MODUL_CMD:   Print(", rk %d", IDIDEAL(h)->rank);
-    case IDEAL_CMD:   Print(", %u generator(s)",
-                     IDELEMS(IDIDEAL(h)),IDIDEAL(h)->rank); break;
+    case VECTOR_CMD:if (c)
+                    {
+                      PrintS(" ");wrp(IDPOLY(h));
+                      if(IDPOLY(h) != NULL)
+                      {
+                        Print(", %d monomial(s)",pLength(IDPOLY(h)));
+                      }
+                    }
+                    break;
+    case MODUL_CMD: Print(", rk %d", IDIDEAL(h)->rank);
+    case IDEAL_CMD: Print(", %u generator(s)",
+                    IDELEMS(IDIDEAL(h)),IDIDEAL(h)->rank); break;
     case MAP_CMD:
-                   Print(" from %s",IDMAP(h)->preimage); break;
-    case MATRIX_CMD: Print(" %u x %u"
-                        ,MATROWS(IDMATRIX(h))
-                        ,MATCOLS(IDMATRIX(h))
-                        );
-                   break;
-    case PROC_CMD:  if(strlen(IDPROC(h)->libname)>0)
-                      Print(" from %s",IDPROC(h)->libname);
-                   if(IDPROC(h)->is_static) Print(" (static)");
+                    Print(" from %s",IDMAP(h)->preimage); break;
+    case MATRIX_CMD:Print(" %u x %u"
+                      ,MATROWS(IDMATRIX(h))
+                      ,MATCOLS(IDMATRIX(h))
+                    );
+                    break;
+    case PROC_CMD: if(strlen(IDPROC(h)->libname)>0)
+                     Print(" from %s",IDPROC(h)->libname);
+                   if(IDPROC(h)->is_static)
+		     Print(" (static)");
                    break;
     case STRING_CMD:
                    {
@@ -160,7 +161,7 @@ static void list1(char* s, idhdl h,BOOLEAN c)
                      }
                      break;
                    }
-    case LIST_CMD:   Print(", size: %d",IDLIST(h)->nr+1);
+    case LIST_CMD: Print(", size: %d",IDLIST(h)->nr+1);
                    break;
     case QRING_CMD:
     case RING_CMD:
@@ -201,11 +202,11 @@ static void killlocals0(int v, idhdl * localhdl)
     {
       if (vv < v)
       {
-        if (iiNoKeepRing) 
-	{
+        if (iiNoKeepRing)
+        {
           //PrintS(" break\n");
-	  return;
-	}  
+          return;
+        }
         h = IDNEXT(h);
         //PrintLn();
       }
@@ -270,15 +271,15 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
       h = ggetid(what);
       if (h!=NULL)
       {
-	if (iterate) list1(prefix,h,TRUE);
-	if ((IDTYP(h)==RING_CMD)
-	    || (IDTYP(h)==QRING_CMD)
-	    || (IDTYP(h)==PACKAGE_CMD))
-	  {
-	    h=IDRING(h)->idroot;
-	  }
-	else
-	  return;
+        if (iterate) list1(prefix,h,TRUE);
+        if ((IDTYP(h)==RING_CMD)
+            || (IDTYP(h)==QRING_CMD)
+            || (IDTYP(h)==PACKAGE_CMD))
+        {
+          h=IDRING(h)->idroot;
+        }
+        else
+          return;
       }
       else
       {
@@ -475,7 +476,10 @@ leftv iiMap(map theMap, char * what)
   r=idroot->get(theMap->preimage,myynest);
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
-    if (!nSetMap(IDRING(r)->ch,IDRING(r)->parameter,IDRING(r)->P, IDRING(r)->minpoly))
+    if (!nSetMap(IDRING(r)->ch,
+                 IDRING(r)->parameter,
+		 IDRING(r)->P,
+		 IDRING(r)->minpoly))
     {
       Werror("map from characteristic %d to %d not implemented",
         IDRING(r)->ch,currRing->ch);
@@ -483,8 +487,9 @@ leftv iiMap(map theMap, char * what)
     }
     if (IDELEMS(theMap)<IDRING(r)->N)
     {
-      theMap->m=(polyset)ReAlloc((ADDRESS)theMap->m,IDELEMS(theMap)*sizeof(poly),
-                                     (IDRING(r)->N)*sizeof(poly));
+      theMap->m=(polyset)ReAlloc((ADDRESS)theMap->m,
+                                 IDELEMS(theMap)*sizeof(poly),
+                                 (IDRING(r)->N)*sizeof(poly));
       for(i=IDELEMS(theMap);i<IDRING(r)->N;i++)
         theMap->m[i]=NULL;
       IDELEMS(theMap)=IDRING(r)->N;
@@ -509,10 +514,14 @@ leftv iiMap(map theMap, char * what)
       return v;
     }
     else
+    {
       Werror("%s undefined in %s",what,theMap->preimage);
+    }
   }
   else
+  {
     Werror("cannot find preimage %s",theMap->preimage);
+  }
   return NULL;
 }
 
@@ -651,7 +660,7 @@ int iiRegularity(lists L)
   intvec * dummy;
 
   r=liFindRes(L,&len,&typ0);
-  if (r==NULL) return -1;
+  if (r==NULL) return -2;
   dummy=syBetti(r,len,&reg);
   Free((ADDRESS)r,len*sizeof(ideal));
   delete dummy;

@@ -194,6 +194,7 @@ cmdnames cmds[] =
   { "link",        0, LINK_CMD ,          ROOT_DECL},
   { "listvar",     0, LISTVAR_CMD ,       LISTVAR_CMD},
   { "list",        0, LIST_CMD ,          ROOT_DECL_LIST},
+  { "lres",        0, LRES_CMD ,          CMD_2},
   { "map",         0, MAP_CMD ,           RING_DECL},
   { "matrix",      0, MATRIX_CMD ,        MATRIX_CMD},
   { "maxideal",    0, MAXID_CMD ,         CMD_1},
@@ -1713,9 +1714,14 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
       r=syResolution((ideal)u->Data(),maxl, iv, iiOp==MRES_CMD);
     }
   }
-  else
+  else if (iiOp==SRES_CMD)
   //  r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
     r=sySchreyer((ideal)u->Data(),maxl+1);
+  else
+  { 
+    int dummy;
+    r=syLaScala3((ideal)u->Data(),&dummy);
+  } 
   if (r==NULL) return TRUE;
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
   r->list_length=wmaxl;
@@ -2510,7 +2516,7 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
       case 2:
         res->data = (char *)mmMemPhysical();
         break;
-#endif        
+#endif       
   default:
 #ifdef MM_STAT
     mmStat((int)v->Data());
