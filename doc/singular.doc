@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.13 1998-05-04 17:41:09 Singular Exp $
+@comment $Id: singular.doc,v 1.14 1998-05-05 07:50:43 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -49,7 +49,7 @@ this is the texinfo file describing Singular (version @value{VERSION})
 @ifinfo
 q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @sp 1
-@center Singular - Reference Manual
+@center Singular - Manual
 @center Version @value{VERSION}
 @center A Computer Algebra System for Singularity Theory, Algebraic Geometry
 @center  and Commutative Algebra
