@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.9 1997-04-25 19:21:29 obachman Exp $ */
+/* $Id: febase.cc,v 1.10 1997-04-29 12:01:54 Singular Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -190,8 +190,11 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
       return f;
     }
   }
-  if (where!=NULL) strcpy(s/*where*/,path);
-  f=fopen(path,mode);
+  else
+  {
+    if (where!=NULL) strcpy(s/*where*/,path);
+    f=fopen(path,mode);
+  }
 #ifndef macintosh
   if (f==NULL)
   {
