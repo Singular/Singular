@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.34 1999-06-22 08:09:14 Singular Exp $ */
+/* $Id: longalg.cc,v 1.35 1999-09-16 12:33:58 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2376,40 +2376,29 @@ number naMapQaQb(number c)
   return (number)erg;
 }
 
-BOOLEAN naSetMap(int c, char ** par, int nop, number minpol)
+BOOLEAN naSetMap(ring r)
 {
   if (rField_is_Q_a()) /* -> Q(a) */
   {
-    if (c == 0)
+    if (rField_is_Q(r))
     {
       nMap = naMap00;   /*Q -> Q(a)*/
       return TRUE;
     }
-    if (c>1)
+    if (rField_is_Zp(r))
     {
-      if (par==NULL)
-      {
-        naPrimeM = c;
-        nMap = naMapP0;  /* Z/p -> Q(a)*/
-        return TRUE;
-      }
-      else
-      {
-        return FALSE;   /* GF(q) -> Q(a) */
-      }
+      naPrimeM = rChar(r);
+      nMap = naMapP0;  /* Z/p -> Q(a)*/
+      return TRUE;
     }
-    if (c<0)
-    {
-      return FALSE;   /* Z/p(a) -> Q(b)*/
-    }
-    if (c==1)
+    if (rField_is_Q_a(r))
     {
       int i;
       naParsToCopy=0;
-      for(i=0;i<nop;i++)
+      for(i=0;i<rPar(r);i++)
       {
         if ((i>=rPar(currRing))
-        ||(strcmp(par[i],currRing->parameter[i])!=0))
+        ||(strcmp(r->parameter[i],currRing->parameter[i])!=0))
            return FALSE;
         naParsToCopy++;
       }
@@ -2421,58 +2410,47 @@ BOOLEAN naSetMap(int c, char ** par, int nop, number minpol)
   /*-----------------------------------------------------*/
   if (rField_is_Zp_a()) /* -> Z/p(a) */
   {
-    if (c == 0)
+    if (rField_is_Q(r))
     {
       nMap = naMap0P;   /*Q -> Z/p(a)*/
       return TRUE;
     }
-    if (c>1)
+    if (rField_is_Zp(r))
     {
-      if (par==NULL)
+      int c=rChar(r);
+      if (c==npPrimeM)
       {
-        if (c==npPrimeM)
-        {
-          nMap = naMapPP;  /* Z/p -> Z/p(a)*/
-          return TRUE;
-        }
-        else
-        {
-          naPrimeM = c;
-          nMap = naMapPP1;  /* Z/p' -> Z/p(a)*/
-          return TRUE;
-        }
+        nMap = naMapPP;  /* Z/p -> Z/p(a)*/
       }
       else
       {
-        return FALSE;   /* GF(q) ->Z/p(a) */
+        naPrimeM = c;
+        nMap = naMapPP1;  /* Z/p' -> Z/p(a)*/
       }
+      return TRUE;
     }
-    if (c<0)
+    if (rField_is_Zp_a(r))
     {
-      if (c==rChar())
+      if (rChar(r)==rChar())
       {
         nacMap=nacCopy;
       }
       else
       {
-        npMapPrime=-c;
+        npMapPrime=rChar(r);
         nacMap = npMapP;
       }
       int i;
       naParsToCopy=0;
-      for(i=0;i<nop;i++)
+      for(i=0;i<rPar(r);i++)
       {
         if ((i>=rPar(currRing))
-        ||(strcmp(par[i],currRing->parameter[i])!=0))
+        ||(strcmp(r->parameter[i],currRing->parameter[i])!=0))
            return FALSE;
         naParsToCopy++;
       }
       nMap=naMapQaQb;
       return TRUE;   /* Z/p(a),Z/p'(a) -> Z/p(b)*/
-    }
-    if (c==1)
-    {
-      return FALSE;   /* Q(a) -> Z/p(b) */
     }
   }
   return FALSE;      /* default */

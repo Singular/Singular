@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.20 1999-06-22 08:09:18 Singular Exp $ */
+/* $Id: longrat.cc,v 1.21 1999-09-16 12:33:58 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -13,6 +13,7 @@
 #include "febase.h"
 #include "numbers.h"
 #include "modulop.h"
+#include "ring.h"
 #include "longrat.h"
 
 #ifndef BYTES_PER_MP_LIMB
@@ -34,28 +35,19 @@ static number nlMapP(number from)
   return to;
 }
 
-BOOLEAN nlSetMap(int c, char ** par, int nop, number minpol)
+BOOLEAN nlSetMap(ring r)
 {
-  if (c == 0)
+  if (rField_is_Q(r))
   {
     nMap = nlCopy;   /*Q -> Q*/
     return TRUE;
   }
-  if (c>1)
+  if (rField_is_Zp(r))
   {
-    if (par==NULL)
-    {
-      nlPrimeM=c;
-      nMap = nlMapP; /* Z/p -> Q */
-      return TRUE;
-    }
-    else
-     return FALSE;  /* GF(q) ->Q */
+    nlPrimeM=rChar(r);
+    nMap = nlMapP; /* Z/p -> Q */
+    return TRUE;
   }
-  else if (c<0)
-     return FALSE; /* Z/p(a) -> Q*/
-  else if (c==1)
-     return FALSE; /* Q(a) -> Q */
   return FALSE;
 }
 
@@ -2117,10 +2109,10 @@ number   nlGetDenom(number &n)
       if (n->s!=3)
       {
         number u=(number)Alloc(sizeof(rnumber));
-	u->s=3;
-	#ifdef LDEBUG
-	u->debug=123456;
-	#endif
+        u->s=3;
+        #ifdef LDEBUG
+        u->debug=123456;
+        #endif
 
         mpz_init_set(&u->z,&n->n);
         {

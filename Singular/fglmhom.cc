@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.13 1999-07-15 13:37:33 wichmann Exp $
+// $Id: fglmhom.cc,v 1.14 1999-09-16 12:33:54 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -216,7 +216,8 @@ mapMonoms( ring oldRing, homogData & dat )
 {
     int * vperm = (int *)Alloc( (currRing->N + 1)*sizeof(int) );
     maFindPerm( oldRing->names, oldRing->N, NULL, 0, currRing->names, currRing->N, NULL, 0, vperm, NULL );
-    nSetMap( oldRing->ch, oldRing->parameter, oldRing->P, oldRing->minpoly );
+    //nSetMap( oldRing->ch, oldRing->parameter, oldRing->P, oldRing->minpoly );
+    nSetMap( oldRing );
     int s;
     for ( s= dat.numMonoms - 1; s >= 0; s-- ) {
 //        dat.monlist[s].mon.sm= pPermPoly( dat.monlist[s].mon.dm, vperm, currRing->N, NULL, 0 );
@@ -267,7 +268,8 @@ getVectorRep( homogData & dat )
 void
 remapVectors( ring oldring, homogData & dat )
 {
-    nSetMap( oldring->ch, oldring->parameter, oldring->P, oldring->minpoly );
+    //nSetMap( oldring->ch, oldring->parameter, oldring->P, oldring->minpoly );
+    nSetMap( oldring );
     int s;
     for ( s= dat.numMonoms - 1; s >= 0; s-- ) {
         if ( dat.monlist[s].inDest == FALSE ) {
@@ -362,7 +364,8 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
     int * vperm = (int *)Alloc( (sourceRing->N + 1)*sizeof(int) );
     maFindPerm( sourceRing->names, sourceRing->N, NULL, 0, currRing->names, 
                 currRing->N, NULL, 0, vperm, NULL, currRing->ch);
-    nSetMap( sourceRing->ch, sourceRing->parameter, sourceRing->P, sourceRing->minpoly );
+    //nSetMap( sourceRing->ch, sourceRing->parameter, sourceRing->P, sourceRing->minpoly );
+    nSetMap( sourceRing );
     for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- ) {
         dat.sourceHeads[s].dm= pPermPoly( dat.sourceHeads[s].sm, vperm, sourceRing, NULL, 0 );
     }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.10 1999-09-03 15:06:42 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.11 1999-09-16 12:33:56 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -41,33 +41,23 @@ static number ngfMapQ(number from)
   return (number)res;
 }
 
-BOOLEAN ngfSetMap(int c, char ** par, int nop, number minpol)
+BOOLEAN ngfSetMap(ring r)
 {
-  if (c == 0)
-  {                      /* Q -> R      */
+  if (rField_is_Q(r))
+  {
     nMap = ngfMapQ;
     return TRUE;
   }
-  if (c>1)
+  else if (rField_is_Zp(r))
   {
-    if (par==NULL)
-    {                    /* Z/p -> R    */
-      nMap = ngfMapP;
-      return TRUE;
-    }
-    else
-    {                    /* GF(q) -> R  */
-      return FALSE;
-    }
+    nMap = ngfMapP;
+    return TRUE;
   }
-  else if (c== -1)      /* R, long R or long C */
+  else if (rField_is_long_R(r))
   {
-    return FALSE;
+    nMap = ngfCopy;
+    return TRUE;
   }
-  else if (c<0)
-     return FALSE;       /* Z/p(a) -> R */
-  else if (c==1)
-     return FALSE;       /* Q(a) -> R   */
   return FALSE;
 }
 

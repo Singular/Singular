@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.9 1999-06-22 08:09:16 Singular Exp $ */
+/* $Id: longalg.h,v 1.10 1999-09-16 12:33:58 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -79,7 +79,7 @@ number  naLcm(number a, number b);
 char *  naRead(char * s, number * p);
 void    naWrite(number &p);
 char *  naName(number n);
-BOOLEAN naSetMap(int c, char ** par, int nop, number minpol);
+BOOLEAN naSetMap(ring r);
 #ifdef LDEBUG
 BOOLEAN naDBTest(number a, char *f,int l);
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.11 1999-07-16 16:07:20 Singular Exp $ */
+/* $Id: modulop.cc,v 1.12 1999-09-16 12:34:00 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -14,6 +14,7 @@
 #include "mmemory.h"
 #include "numbers.h"
 #include "longrat.h"
+#include "ring.h"
 #include "modulop.h"
 
 int npPrimeM=0;
@@ -293,38 +294,26 @@ number npMapP(number from)
   return (number)i;
 }
 
-BOOLEAN npSetMap(int c, char ** par, int nop, number minpol)
+BOOLEAN npSetMap(ring r)
 {
-  if (c == 0)
+  if (rField_is_Q(r))
   {
     nMap = npMap0;   /*Q -> Z/p*/
     return TRUE;
   }
-  if (c == npPrimeM)
+  if ( rField_is_Zp(r) )
   {
-    nMap = npCopy;  /* Z/p -> Z/p*/
-    return TRUE;
-  }
-  if (c>1)
-  {
-    if (par==NULL)
+    if (rChar(r) == npPrimeM)
     {
-      npMapPrime=c;
-      nMap = npMapP; /* Z/p' -> Z/p */
+      nMap = npCopy;  /* Z/p -> Z/p*/
       return TRUE;
     }
     else
     {
-      return FALSE;   /* GF(q) ->Z/p */
+      npMapPrime=rChar(r);
+      nMap = npMapP; /* Z/p' -> Z/p */
+      return TRUE;
     }
-  }
-  if (c<0)
-  {
-    return FALSE;   /* Z/p'(a) -> Z/p*/
-  }
-  if (c==1)
-  {
-    return FALSE;   /* Q(a) -> Z/p */
   }
   return FALSE;      /* default */
 }

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.18 1999-08-17 16:58:15 Singular Exp $ */
+/* $Id: numbers.cc,v 1.19 1999-09-16 12:34:00 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -54,7 +54,7 @@ char *  (*nRead)(char *s,number *a);
 void    (*nPower)(number a, int i, number * result);
 number  (*nGetDenom)(number &n);
 numberfunc nGcd,nLcm;
-BOOLEAN (*nSetMap)(int c,char **par, int nop, number minpol);
+BOOLEAN (*nSetMap)(ring r);
 number (*nMap)(number from);
 char * (*nName)(number n);
 #ifdef LDEBUG

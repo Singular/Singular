@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.h,v 1.3 1999-07-08 10:18:08 wenk Exp $ */
+/* $Id: gnumpc.h,v 1.4 1999-09-16 12:33:55 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -38,7 +38,7 @@ void     ngcDBDelete(number *a, char *f, int l);
 void     ngcDelete(number *a);
 #endif
 
-BOOLEAN  ngcSetMap(int c, char ** par, int nop, number minpol);
+BOOLEAN  ngcSetMap(ring r);
 
 #endif
 

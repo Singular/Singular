@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.h,v 1.5 1999-05-10 15:10:48 Singular Exp $ */
+/* $Id: ffields.h,v 1.6 1999-09-16 12:33:53 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -35,7 +35,7 @@ BOOLEAN nfDBTest      (number a, char *f, int l);
 #endif
 void    nfSetChar     (int c, char ** param);
 
-BOOLEAN nfSetMap      (int c, char ** par, int nop, number minpol);
+BOOLEAN nfSetMap     (ring r);
 char *  nfName        (number n);
 extern  int nfMinPoly[];
 void    nfShowMipo();

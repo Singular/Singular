@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.17 1999-07-23 13:45:17 Singular Exp $ */
+/* $Id: maps.cc,v 1.18 1999-09-16 12:33:59 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -396,7 +396,8 @@ poly maIMap(ring r, poly p)
 {
   /* the simplest case:*/
   if(r==currRing) return pCopy(p);
-  nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly);
+  //nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly);
+  nSetMap(r);
   int *perm=(int *)Alloc0((r->N+1)*sizeof(int));
   //int *par_perm=(int *)Alloc0(rPar(r)*sizeof(int));
   maFindPerm(r->names,r->N, r->parameter, r->P,

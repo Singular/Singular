@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.10 1999-07-16 16:07:21 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.11 1999-09-16 12:34:01 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -14,7 +14,7 @@
 #include "febase.h"
 #include "numbers.h"
 #include "longrat.h"
-//#include "modulop.h"
+#include "ring.h"
 #include "shortfl.h"
 
 static float nrEps = 1.0e-3;
@@ -425,20 +425,22 @@ static number nrMapP(number from)
   return nf(r).N();
 }
 
-BOOLEAN nrSetMap(int c, char ** par, int nop, number minpol)
+BOOLEAN nrSetMap(ring r)
 {
-  if (c == 0)
-    nMap = nrMap0;   /*Q -> R*/
-  else if (c>1)
+  if (rField_is_R(r))
   {
-    if (par==NULL)
-      nMap = nrMapP; /* Z/p' -> R */
-    else
-     return FALSE;   /* GF(q) ->R */
+    nMap=nrCopy;
+    return TRUE;
   }
-  else if (c<0)
-     return FALSE;   /* Z/p'(a) -> R*/
-  else if (c==1)
-     return FALSE;   /* Q(a) -> R */
-  return TRUE;
+  if (rField_is_Q(r))
+  {
+    nMap = nrMap0;   /*Q -> R*/
+    return TRUE;
+  }
+  if(rField_is_Zp(r))
+  {
+    nMap = nrMapP; /* Z/p' -> R */
+    return TRUE;
+  }
+  return FALSE;
 }

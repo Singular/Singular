@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.174 1999-09-15 12:22:59 Singular Exp $ */
+/* $Id: iparith.cc,v 1.175 1999-09-16 12:33:56 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -280,7 +280,7 @@ cmdnames cmds[] =
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
   #ifdef HAVE_SPECTRUM
-  { "spectrum",    0, SPECTRUM_CMD ,      CMD_123},
+  { "Spectrum",    0, SPECTRUM_CMD ,      CMD_123},
   { "semic",       0, SEMIC_CMD ,         CMD_23},
   #endif
   #ifdef OLD_RES
@@ -1529,7 +1529,8 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     int *par_perm=NULL;
     int par_perm_size=0;
     BOOLEAN bo;
-    if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
+    //if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
+    if (!nSetMap(r))
     {
       if (rEqual(r,currRing))
       {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.47 1999-09-15 12:23:01 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.48 1999-09-16 12:33:57 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -589,12 +589,13 @@ leftv iiMap(map theMap, char * what)
 #endif /* HAVE_NAMESPACES */
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
-    if (!nSetMap(rInternalChar(IDRING(r)),
-                 IDRING(r)->parameter,
-                 rPar(IDRING(r)),
-                 IDRING(r)->minpoly))
+    //if (!nSetMap(rInternalChar(IDRING(r)),
+    //             IDRING(r)->parameter,
+    //             rPar(IDRING(r)),
+    //             IDRING(r)->minpoly))
+    if (!nSetMap(IDRING(r)))
     {
-      if (rEqual(r,currRing))
+      if (rEqual(IDRING(r),currRing))
       {
         nMap=nCopy;
       }

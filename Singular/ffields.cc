@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.20 1999-07-16 16:07:18 Singular Exp $ */
+/* $Id: ffields.cc,v 1.21 1999-09-16 12:33:53 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -13,6 +13,7 @@
 #include "febase.h"
 #include "mmemory.h"
 #include "numbers.h"
+#include "ring.h"
 #include "ffields.h"
 
 int nfCharQ=0;  /* the number of elemts: q*/
@@ -706,14 +707,14 @@ number nfMapP(number c)
 /*2
 * set map function nMap ... -> GF(p,n)
 */
-BOOLEAN nfSetMap(int c, char ** par, int nop, number minpol)
+BOOLEAN nfSetMap(ring r)
 {
-  if (c==nfCharQ)
+  if (rField_is_GF(r,nfCharQ))
   {
     nMap=nfCopy;   /* GF(p,n) -> GF(p,n) */
     return TRUE;
   }
-  if (c==nfCharP)
+  if (rField_is_Zp(r,nfCharP))
   {
     nMap=nfMapP;    /* Z/p -> GF(p,n) */
     return TRUE;

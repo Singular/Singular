@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.30 1999-07-09 14:06:51 obachman Exp $ */
+/* $Id: ring.h,v 1.31 1999-09-16 12:34:01 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -71,6 +71,8 @@ inline BOOLEAN rField_is_R(ring r=currRing)
 }
 inline BOOLEAN rField_is_GF(ring r=currRing)
 { return (r->ch > 1) && (r->parameter!=NULL); }
+inline BOOLEAN rField_is_GF(ring r, int q)
+{ return (r->ch == q); }
 inline BOOLEAN rField_is_Zp_a(ring r=currRing)
 { return (r->ch < -1); }
 inline BOOLEAN rField_is_Zp_a(ring r, int p)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.8 1999-06-22 08:09:20 Singular Exp $ */
+/* $Id: numbers.h,v 1.9 1999-09-16 12:34:01 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -53,7 +53,7 @@ extern void    (*nDBDelete)(number * a,char *f, int l);
 extern void    (*nDelete)(number * a);
 #endif
 
-extern BOOLEAN (*nSetMap)(int c, char **par, int nop, number minpol);
+extern BOOLEAN (*nSetMap)(ring r);
 extern number  (*nMap)(number from);
 extern char *  (*nName)(number n);
 

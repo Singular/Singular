@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.12 1999-06-22 08:09:18 Singular Exp $ */
+/* $Id: longrat.h,v 1.13 1999-09-16 12:33:59 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -86,7 +86,7 @@ void     nlDBDelete(number *a, char *f, int l);
 void     nlDelete(number *a);
 #endif
 
-BOOLEAN nlSetMap(int c, char ** par, int nop, number minpol);
+BOOLEAN nlSetMap(ring r);
 
 #endif
 

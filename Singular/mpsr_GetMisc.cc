@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.15 1999-07-09 14:06:48 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.16 1999-09-16 12:34:00 Singular Exp $ */
 
 /***************************************************************
  *
@@ -266,8 +266,9 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
         {
           number nn = (number) l->data;
           mpsr_SetCurrRing(to_ring, TRUE);
-          nSetMap(rInternalChar(from_ring), from_ring->parameter,
-            rPar(from_ring), from_ring->minpoly);
+          //nSetMap(rInternalChar(from_ring), from_ring->parameter,
+          //  rPar(from_ring), from_ring->minpoly);
+          nSetMap(from_ring);
           l->data = (void *) nMap(nn);
           mpsr_SetCurrRing(from_ring, FALSE);
           nDelete(&nn);
