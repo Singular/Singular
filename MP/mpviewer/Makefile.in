@@ -7,18 +7,22 @@ srcdir		= @srcdir@
 top_srcdir      = @top_srcdir@
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
-libdir		= $(exec_prefix)/lib
+libdir		= @libdir@
+bindir		= @bindir@
 includedir	= $(prefix)/include
 
 CC		= @CC@
 SHELL		= /bin/sh
 CFLAGS          = @CFLAGS@
+CPPFLAGS        = -I. @CPPFLAGS@
 
 INCLUDES	= -I$(includedir) 
 LIBS		= @LIBS@ -lMP -lgmp
 LIBDIR		= $(libdir)
 
 CLEAN           = @CLEAN@
+INSTALL         = ../install-sh -c
+INSTALL_PROGRAM = ${INSTALL}
 
 
 COMPILE = $(CC) $(DEFS) -L$(LIBDIR) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $@.c -o $@ $(LIBS)
@@ -27,7 +31,7 @@ COMPILE = $(CC) $(DEFS) -L$(LIBDIR) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $@.c -o $@
 .SUFFIXES: .c .o
 
 .c.o:
-	${CC} $(INCLUDES) ${CFLAGS} ${DEFS} -c $<
+	${CC} $(INCLUDES) ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
 HEADER =  label.h  leaf.h node.h  ${prefix}/include/MP.h
 
@@ -39,7 +43,12 @@ DISTFILES = ${SRC} ${HEADER} Makefile.in displaymp testall README
 
 all: mpview
 
-install: mpview
+install: mk-bindir mpview
+	${INSTALL_PROGRAM} mpview ${bindir}
+
+mk-bindir:
+	${top_srcdir}/mkinstalldirs ${bindir}
+
 
 mpview: ${OBJ}
 	${CC} -o $@ $(INCLUDES) ${CFLAGS} ${DEFS} -L$(LIBDIR) ${OBJ} $(LIBS)

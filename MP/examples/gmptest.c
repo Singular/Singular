@@ -7,7 +7,7 @@
 */
 
 #include <stdio.h>
-#include "MP.h"
+/*#include "MP.h"*/
 #include  "gmp.h" 
 
 #define RawFile "rawt"

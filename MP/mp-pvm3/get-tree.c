@@ -11,7 +11,6 @@
 #include <math.h>
 #include "pvm3.h"
 #include "MP.h"
-#include "MP_PvmTransp.h"
 
 EXTERN MP_TranspOps_t pvm_ops;
 

@@ -14,10 +14,24 @@ VERSION		= @VERSION@
 DISTNAME	= ${PRODUCT}-${VERSION}
 
 ## 
+## various paths
+##
+prefix 		= @prefix@
+exec_prefix 	= @exec_prefix@
+includedir	= @includedir@
+libdir 		= @libdir@
+
+## 
 ## various programs
 ##
 @SET_MAKE@
 CLEAN		= @CLEAN@
+RANLIB		= ranlib
+RANLIB_TEST = [ -f /usr/bin/ranlib -o -f /bin/ranlib ]
+INSTALL		= ./install-sh -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ./mkinstalldirs
 
 ## 
 ## subdirs
@@ -33,10 +47,18 @@ TEMPDIR		= /tmp
 all install uninstall: Makefile
 	for SUBDIR in ${BUILD_SUBDIRS}; \
 	do \
-		echo ${MAKE} $@ in $${SUBDIR}; \
-		cd $${SUBDIR}; \
-		${MAKE} $@; \
-		cd .. ;\
+		if test "$${SUBDIR}" = gmp && test "$@" != all; then \
+			if test "$@" = install; then \
+				${MAKE} installgmp; \
+			else \
+				${MAKE} uninstallgmp; \
+			fi; \
+		else \
+		       echo ${MAKE} $@ in $${SUBDIR}; \
+			cd $${SUBDIR}; \
+			${MAKE} $@; \
+			cd .. ;\
+		fi; \
 	done
 
 clean distclean mostlyclean maintainer-clean:
@@ -52,7 +74,7 @@ clean distclean mostlyclean maintainer-clean:
 	mostlyclean) ${CLEAN} ;;\
 	distclean) ${CLEAN}; \
                rm -rf Makefile config.status config.log config.cache TAGS* \
-                      *.gz *.tar *.tgz lib include info;;\
+                      *.gz *.tar *.tgz lib include info bin;;\
 	maintainer-clean) rm -f configure; ${CLEAN}; \
                rm -rf Makefile config.status config.log config.cache TAGS* \
                       *.gz *.tar *.tgz lib include info;;\
@@ -63,6 +85,20 @@ libMP.a MP: force
 
 libMPT.a MPT : force
 	cd MPT; $(MAKE) all
+
+gmp/libgmp.a :
+	cd gmp; $(MAKE) libgmp.a
+
+installgmp: gmp/libgmp.a 
+	${MKINSTALLDIRS} ${libdir}
+	${MKINSTALLDIRS} ${includedir}
+	$(INSTALL_DATA) gmp/libgmp.a ${libdir}
+	if $(RANLIB_TEST) ; then $(RANLIB) $(libdir)/libgmp.a; else true; fi
+	$(INSTALL_DATA) gmp/gmp.h $(includedir)
+
+uninstallgmp: force
+	rm -f $(libdir)/libgmp.a $(includedir)/gmp.h
+	- rmdir $(libdir) $(includedir)
 
 examples: force
 	cd examples; $(MAKE) all

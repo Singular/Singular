@@ -16,7 +16,6 @@
 #include <math.h>
 #include "pvm3.h"
 #include "MP.h"
-#include "MP_PvmTransp.h"
 
 #define ENCODING  PvmDataRaw
 #define SLAVENAME "slave"

@@ -42,24 +42,33 @@ The simplest way to install MP is:
      messages telling which features it is checking for.
 
   2. Type `make install' to compile and install the gmp, MP, and MPT
-     libraries and header files. You can customize what is built and
-     where the libraries and header files are installed by giving
-     'configure' appropriate options (see below). NOTE: If you do not
-     have the header file 'gmp.h' installed in a standard location on
-     your system, then a './configure' followed by a simple 'make'
-     command will fail. You need to do './configure --enable-gmp'
-     followed by 'make install'. 
+     libraries and header files. The libraries will be installed in 
+     ./lib/<ARCH> where <ARCH> is an architecture-specific identifier
+     (e.g., SUN4, SGI5).  Similarly, executables are installed in 
+     ./bin/<ARCH>.  You can customize what is built and where libraries, 
+     header files, and executables are installed by giving 'configure' 
+     appropriate options (see below). NOTE: If you do not have the header 
+     file 'gmp.h' installed in a standard location on your system, then 
+     a './configure' followed by a simple 'make' command will fail. You 
+     need to do './configure --enable-gmp' followed by 'make install'. 
 
   3. You can remove the program binaries and object files from the
      source code directory by typing `make clean'.  To also remove the
-     files that `configure' created (so you can compile the package
-     for a different architecture), type `make distclean'.  There is
-     also a `make maintainer-clean' target, but that is intended
-     mainly for the package's developers.  If you use it, you may have
-     to install all sorts of other programs in order to regenerate
-     files that came with the distribution.
+     files that `configure' created, type `make distclean'.  There is
+     a `make maintainer-clean' target, but that is intended mainly for 
+     the package's developers.  If you use it, you may have to install 
+     all sorts of other programs in order to regenerate files that came 
+     with the distribution.
 
-  4. Other make targets are:
+  4. To remake the library for a different architecture, login to the
+     target machine and change directories to the MP source directory.
+     You must remove the library object files and create new Makefiles.
+     To do this, simply do a `make clean' in the top-level MP directory,
+     followed by `rm config.cache' to remove the cache file created by
+     configure.  Finally, rerun configure with the same options you gave 
+     it on other machines followed by a `make' or `make install'.
+  
+  5. Other make targets are:
      'MP','libMP.a'   : Creates the MP library only.
      'MPT','libMPT.a' : Creates the MPT library only.
      'examples'       : Builds MP implementation examples.
@@ -127,32 +136,33 @@ MP's configure script pays attention to the following:
           installation of GMP, the files gmp.h and libgmp.a are
           installed in the specified directories.
 
+
 `--enable-PACKAGE' option where PACKAGE can be:
 
   'examples' : The distribution comes with some example implementations
-              contained in the directory 'examples'. By default, the
-              examples are not built when MP is built. Use this option
-              to build the examples together with MP. NOTE: Make sure
-              that MP is installed before the examples are built. See
-              also the README file contained in the 'examples'
-              directory. 
+               contained in the directory 'examples'. By default, the
+               examples are not built when MP is built. Use this option
+               to build the examples when MP is built. NOTE: Make sure
+               that MP is installed before the examples are built. Also
+     	       see the README file contained in the 'examples' directory. 
 
   'mpviewer': The distribution comes with an mpviewer implementation
               contained in the directory 'mpviewer'. By default, the
               mpviewer is not built when MP is built. Use this option
-              to build the mpviewer together with MP. NOTE: Make sure
-              that MP is installed before the mpviewer is built. See
-              also the README file contained in the 'mpviewer'
-              directory. 
+              to build the mpviewer when MP is built. NOTE: Make sure
+              that MP is installed before the mpviewer is built.  Also
+	      see the README file contained in the 'mpviewer' directory. 
 
-  'mppvm' : The distribution comes with some pvm example
-              implementations (demonstrating the use of the PVM
-              transport device) contained in the directory
-              'mp-pvm3'. By default, the pvm examples are not built
-              when MP is build. Use this option to build the pvm
-              examples together with MP. NOTE: Make sure that MP is
-              installed before the examples are built. See also the
-              README file contained in the 'mp-pvm3' directory.
+  'mppvm' : The distribution comes with some pvm example implementations 
+	    (demonstrating the use of the PVM transport device) contained 
+	    in the directory 'mp-pvm3'. By default, the pvm examples are 
+	    not built when MP is built. Use this option to build the pvm 
+	    examples when MP is built. NOTE: Make sure that MP is installed 
+	    before the examples are built. Also see the README file in the 
+	    'mp-pvm3' directory.  If the pvm include files and libraries are 
+	    not in standard places, you must be sure the PVM_ARCH and PVM_ROOT 
+	    are set.  Note also that if you use this option, you must also 
+	    use the `--with-pvm' option (see below).
 
 
 `--without-PACKAGE' option where PACKAGE can be:

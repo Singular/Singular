@@ -85,7 +85,7 @@ put-vec: put-vec.c
 	${COMPILE} $@.c -o $@ $(LIBS)
 	mv put-vec $(XDIR)
 
-master: master.c util
+master: master.c util.o
 	${COMPILE} util.o $@.c -o $@ $(LIBS)
 	mv master $(XDIR)
 
@@ -93,7 +93,7 @@ put-tree: put-tree.c
 	${COMPILE} $@.c -o $@ $(LIBS)
 	mv put-tree $(XDIR)
 
-get-tree: get-tree.c util
+get-tree: get-tree.c util.o
 	${COMPILE} util.o $@.c -o $@ $(LIBS)
 	mv get-tree $(XDIR)
 
@@ -101,7 +101,7 @@ mcast-put-tree: mcast-put-tree.c
 	${COMPILE} $@.c -o $@ $(LIBS)
 	mv mcast-put-tree $(XDIR)
 
-mcast-get-tree: mcast-get-tree.c  util
+mcast-get-tree: mcast-get-tree.c  util.o
 	${COMPILE} util.o $@.c -o $@ $(LIBS)
 	mv mcast-get-tree $(XDIR)
 
@@ -109,6 +109,6 @@ slave: slave.c
 	${COMPILE} $@.c -o $@ $(LIBS)
 	mv slave $(XDIR)
 
-util : util.c
-	${OBJCOMPILE} $(INCLUDES) $@.c
+util.o : 
+	${OBJCOMPILE} $(INCLUDES) util.c
 

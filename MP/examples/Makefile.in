@@ -10,21 +10,26 @@ VPATH		= @srcdir@
 top_srcdir      = @top_srcdir@
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
-libdir		= $(exec_prefix)/lib
+libdir		= @libdir@
 includedir	= $(prefix)/include
+bindir		= @bindir@
+# MP sources and MP.h reside here
+mp_srcdir	= ../MP
 BIGNUM_INCL     = $(prefix)/gmp
 
 CC		= @CC@
 SHELL		= /bin/sh
 CFLAGS          = @CFLAGS@
+CPPFLAGS	= -I. @CPPFLAGS@
 DEFS            = @DEFS@ 
 
 INCLUDES	= -I$(includedir) -I$(BIGNUM_INCL)
 LIBS		= @LIBS@ -lMP -lgmp
 LIBDIR		= $(libdir)
 
-CLEAN           = @CLEAN@  rm -f *.out
-
+CLEAN           = @CLEAN@  rm -f *.out *.o
+INSTALL         = ../install-sh -c
+INSTALL_PROGRAM = ${INSTALL}
 
 COMPILE = $(CC) $(DEFS) -L$(LIBDIR) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) 
 
@@ -36,9 +41,12 @@ OBJCOMPILE = $(CC) -c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
 PROGRAMS = gmptest client server imp-client imp-server send-tree recv-tree \
         send-vec recv-vec
 
-all:    mk-progs
+all:    mk-bindir mk-progs
 
-install: mk-progs
+install: mk-bindir mk-progs
+
+mk-bindir:
+	$(top_srcdir)/mkinstalldirs $(bindir)
 
 mk-progs: $(PROGRAMS)
 
@@ -49,35 +57,55 @@ clean:
 distclean: clean
 	rm -f Makefile
 
-gmptest : gmptest.c $(libdir)/libMP.a
-	${COMPILE} $@.c -o $@ $(LIBS)
 
-client : client.c $(libdir)/libMP.a
+gmptest : gmptest.c 
 	${COMPILE} $@.c -o $@ $(LIBS)
+	${INSTALL} $@ ${bindir}
 
-server : server.c util $(libdir)/libMP.a
+client : client.c ${mp_srcdir}/libMP.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h
+	${COMPILE} $@.c -o $@ $(LIBS)
+	${INSTALL} $@ ${bindir}
+
+server : server.c util.o ${mp_srcdir}/libMP.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h
 	${COMPILE} util.o $@.c -o $@ $(LIBS)
+	${INSTALL} $@ ${bindir}
 
-imp-client : imp-client.c $(libdir)/libMP.a
+imp-client : imp-client.c ${mp_srcdir}/libMP.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h
 	${COMPILE} $@.c -o $@ $(LIBS)
+	${INSTALL} $@ ${bindir}
 
-imp-server : imp-server.c util $(libdir)/libMP.a
+imp-server : imp-server.c util.o ${mp_srcdir}/libMP.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h
 	${COMPILE} util.o $@.c -o $@ $(LIBS)
+	${INSTALL} $@ ${bindir}
 
-send-tree : send-tree.c $(libdir)/libMP.a
+send-tree : send-tree.c ${mp_srcdir}/libMP.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h
 	${COMPILE} $@.c -o $@ $(LIBS)
+	${INSTALL} $@ ${bindir}
 
-recv-tree : recv-tree.c node util $(libdir)/libMP.a
+recv-tree : recv-tree.c node.o util.o ${mp_srcdir}/libMP.a ${mp_srcdir}/MP_Config.h ${mp_srcdir}/MP.h 
 	${COMPILE} node.o util.o $@.c -o $@ $(LIBS)
+	${INSTALL} $@ ${bindir}
 
-send-vec : send-vec.c $(libdir)/libMP.a
+send-vec : send-vec.c ${mp_srcdir}/libMP.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h
 	${COMPILE} $@.c -o $@ $(LIBS)
+	${INSTALL} $@ ${bindir}
 
-recv-vec : recv-vec.c $(libdir)/libMP.a
+recv-vec : recv-vec.c ${mp_srcdir}/libMP.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h
 	${COMPILE} $@.c -o $@ $(LIBS)
+	${INSTALL} $@ ${bindir}
 
-node : node.c
-	${OBJCOMPILE} $(INCLUDES) $@.c
+node.o : 
+	${OBJCOMPILE} $(INCLUDES) node.c
 
-util : util.c
-	${OBJCOMPILE} $(INCLUDES) $@.c
+util.o :
+	${OBJCOMPILE} $(INCLUDES)  util.c
+
+${mp_srcdir}/libMP.a:
+	cd ${mp_srcdir}; ${MAKE} install
+
+${mp_srcdir}/MP.h:
+	cd ${mp_srcdir}; ${MAKE} MP.h
+
+${mp_srcdir}/MP_Config.h:
+	cd ${mp_srcdir}; ${MAKE} MP_Config.h
+
