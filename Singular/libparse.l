@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.52 2003-12-16 11:25:35 Singular Exp $ */
+/* $Id: libparse.l,v 1.53 2004-05-13 16:52:02 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -982,7 +982,11 @@ main( int argc, char *argv[] )
             "function", "line", "start-eod", "line", "body-eob",
             "line", "example-eoe");
   }
+#ifdef HAVE_NS
   yylplex(argv[0], argv[0], &lib_style,NULL);
+#else
+  yylplex(argv[0], argv[0], &lib_style);
+#endif
   if(yylp_errno) {
     printf("ERROR occured: [%d] ", yylp_errno);
     printf(yylp_errlist[yylp_errno], yylplineno);
