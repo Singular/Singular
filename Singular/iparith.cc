@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.160 1999-07-12 18:24:57 Singular Exp $ */
+/* $Id: iparith.cc,v 1.161 1999-07-13 16:24:45 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5778,7 +5778,7 @@ int IsCmd(char *n, int & tok)
         i=an;
         break;
       }
-      else if (strcmp(n, cmds[en].name) == 0)
+      else if ((an!=en) && (strcmp(n, cmds[en].name) == 0))
       {
         i=en;
         break;
@@ -5791,22 +5791,22 @@ int IsCmd(char *n, int & tok)
     i=(an+en)/2;
     if (*n < *(cmds[i].name))
     {
-      en=i;
+      en=i-1;
     }
     else if (*n > *(cmds[i].name))
     {
-      an=i;
+      an=i+1;
     }
     else
     {
       v=strcmp(n,cmds[i].name);
       if(v<0)
       {
-        en=i;
+        en=i-1;
       }
       else if(v>0)
       {
-        an=i;
+        an=i+1;
       }
       else /*v==0*/
       {

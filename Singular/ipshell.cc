@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.43 1999-07-05 13:52:06 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.44 1999-07-13 16:24:44 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -32,6 +32,10 @@
 #include "silink.h"
 #include "stairc.h"
 #include "ipshell.h"
+#ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory.h>
+#endif
 
 leftv iiCurrArgs=NULL;
 int  traceit = 0;
@@ -520,12 +524,27 @@ int IsPrime(int p)  /* brute force !!!! */
   else if (p == 2) return p;
   else if (p <  0) return (-IsPrime(-p));
   else if (!(p & 1)) return IsPrime(p-1);
+#ifdef HAVE_FACTORY
+  int a=0;
+  int e=cf_getNumSmallPrimes();
+  i=e/2;
+  do
+  {
+    if (p==(j=cf_getSmallPrime(i))) return p;
+    if (p<j) e=i-1;
+    else     a=i+1;
+    i=a+(e-a)/2;
+  } while ( a<= e);
+  if (p>j) return j;
+  else     return cf_getSmallPrime(i-1);
+#else  
   for (j=p/2+1,i=3; i<p; i+=2)
   {
     if ((p%i) == 0) return IsPrime(p-2);
     if (j < i) return p;
   }
   return p;
+#endif
 }
 
 BOOLEAN iiWRITE(leftv res,leftv v)
