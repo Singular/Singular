@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.10 1998-03-12 10:27:41 schmidt Exp $ */
+/* $Id: cf_factor.cc,v 1.11 2001-08-22 14:20:47 Singular Exp $ */
 
 //{{{ docu
 //
@@ -36,27 +36,68 @@ static bool isUnivariateBaseDomain( const CanonicalForm & f )
     return ok;
 }
 
+void find_exp(const CanonicalForm & f, int * exp_f)
+{
+  if ( ! f.inCoeffDomain() )
+  {
+    int e=f.level();
+    CFIterator i = f;
+    if (i.exp() > exp_f[e]) exp_f[e]=i.exp();
+    for (; i.hasTerms(); i++ )
+    {
+      find_exp(i.coeff(), exp_f);
+    }
+  }
+}
+
+int find_mvar(const CanonicalForm & f)
+{
+  int mv=f.level();
+  int *exp_f=new int[mv+1];
+  int i;
+  for(i=mv;i>0;i--) exp_f[i]=0;
+  find_exp(f,exp_f);
+  for(i=mv;i>0;i--)
+  {
+    if ((exp_f[i]>0) && (exp_f[i]<exp_f[mv]))
+    {
+      mv=i;
+    }
+  }
+  delete[] exp_f;
+  return mv;
+}
+
 CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 {
     if ( f.inCoeffDomain() )
-	return CFFList( f );
+        return CFFList( f );
     if ( getCharacteristic() > 0 ) {
-	ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-	if ( isOn( SW_BERLEKAMP ) )
-	    return FpFactorizeUnivariateB( f, issqrfree );
-	else
-	    return FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
+        ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+        if ( isOn( SW_BERLEKAMP ) )
+            return FpFactorizeUnivariateB( f, issqrfree );
+        else
+            return FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
     }
     else {
+        int mv=f.level();
+        if (! f.isUnivariate() )
+        {
+          mv=find_mvar(f);
+          if (mv!=f.level())
+          {
+            swapvar(f,Variable(mv),f.mvar());
+          }
+        }
         CanonicalForm cd = bCommonDen( f );
         CanonicalForm fz = f * cd;
         CFFList F;
         bool on_rational = isOn(SW_RATIONAL);
         Off(SW_RATIONAL);
-	if ( f.isUnivariate() )
-	    F = ZFactorizeUnivariate( fz, issqrfree );
-	else
-	    F = ZFactorizeMultivariate( fz, issqrfree );
+        if ( f.isUnivariate() )
+            F = ZFactorizeUnivariate( fz, issqrfree );
+        else
+            F = ZFactorizeMultivariate( fz, issqrfree );
         if ( on_rational )
             On(SW_RATIONAL);
         if ( ! cd.isOne() ) {
@@ -68,6 +109,15 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
             else {
                 F.insert( CFFactor( 1/cd ) );
             }
+        }
+        if ((mv!=f.level()) && (! f.isUnivariate() ))
+        {
+          CFFListIterator J=F;
+          for ( ; J.hasItem(); J++)
+          {
+            swapvar(J.getItem().factor(),Variable(mv),f.mvar());
+          }
+          swapvar(f,Variable(mv),f.mvar());
         }
         return F;
     }
@@ -87,9 +137,9 @@ CFFList sqrFree ( const CanonicalForm & f, bool sort )
     CFFList result;
 
     if ( getCharacteristic() == 0 )
-	result = sqrFreeZ( f );
+        result = sqrFreeZ( f );
     else
-	result = sqrFreeFp( f );
+        result = sqrFreeFp( f );
 
     return ( sort ? sortCFFList( result ) : result );
 }
@@ -98,7 +148,7 @@ bool isSqrFree ( const CanonicalForm & f )
 {
 //    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
     if ( getCharacteristic() == 0 )
-	return isSqrFreeZ( f );
+        return isSqrFreeZ( f );
     else
-	return isSqrFreeFp( f );
+        return isSqrFreeFp( f );
 }
