@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fbinops.m4,v 1.1 1997-11-21 10:00:32 schmidt Exp $ */
+/* $Id: fbinops.m4,v 1.2 1997-11-21 11:21:45 schmidt Exp $ */
 
 ftestSetNameOfGame( fbinops, `"
 Usage: fbinops [<options>] [<envSpec>] <f> <operator> <g>
@@ -81,7 +81,7 @@ ftestBoolEquiv ( bool a, bool b )
 }
 
 static inline bool
-ftestCheckRelations ( const CanonicalForm & f, const CanonicalForm & g )
+ftestCheckImplementation ( const CanonicalForm & f, const CanonicalForm & g )
 {
     return ( ftestBoolEquiv( f == g, !(f != g) )
 	     && ftestBoolEquiv( f < g, g > f )
@@ -111,26 +111,40 @@ static ftestStatusT
 ftestRelOpTest ( const CanonicalForm & f, const CanonicalForm & g )
 {
     // check reflexivity
-    if ( ! ( f == f ) )
+    if ( ! ( f == f ) ) {
+	ftestError( CheckError, "reflexivity check (f) failed\n" );
 	return Failed;
+    }
     // check reflexivity
-    if ( ! ( g == g ) )
+    if ( ! ( g == g ) ) {
+	ftestError( CheckError, "reflexivity check (g) failed\n" );
 	return Failed;
+    }
     // check symmetry
-    if ( ! ftestBoolEquiv( f == g, g == f ) )
+    if ( ! ftestBoolEquiv( f == g, g == f ) ) {
+	ftestError( CheckError, "symmetry check failed\n" );
 	return Failed;
-    // check relations between operators
-    if ( ! ftestCheckRelations( f, g ) )
+    }
+    // check implementation of operators
+    if ( ! ftestCheckImplementation( f, g ) ) {
+	ftestError( CheckError, "implementation check (f, g) failed\n" );
 	return Failed;
-    // check relations between operators
-    if ( ! ftestCheckRelations( g, f ) )
+    }
+    // check implementation of operators
+    if ( ! ftestCheckImplementation( g, f ) ) {
+	ftestError( CheckError, "implementation check (g, f) failed\n" );
 	return Failed;
+    }
     // check trichotomy
-    if ( ! ftestCheckTrichotomy( f, g ) )
+    if ( ! ftestCheckTrichotomy( f, g ) ) {
+	ftestError( CheckError, "trichotomy check (f, g) failed\n" );
 	return Failed;
+    }
     // check trichotomy
-    if ( ! ftestCheckTrichotomy( g, f ) )
+    if ( ! ftestCheckTrichotomy( g, f ) ) {
+	ftestError( CheckError, "trichotomy check (g, f) failed\n" );
 	return Failed;
+    }
 
     return Passed;
 }
