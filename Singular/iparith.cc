@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.254 2001-02-08 13:13:01 Singular Exp $ */
+/* $Id: iparith.cc,v 1.255 2001-02-13 10:09:24 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4432,7 +4432,7 @@ static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
   {
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
-  }  
+  }
   res->data = (char *)rednf((ideal)v->CopyD(),(poly)u->CopyD(),
     (poly)w->CopyD());
   return FALSE;
@@ -4444,7 +4444,7 @@ static BOOLEAN jjREDUCE3_CID(leftv res, leftv u, leftv v, leftv w)
   {
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
-  }  
+  }
   res->data = (char *)rednf((ideal)v->CopyD(),(ideal)u->CopyD(),
     (matrix)w->CopyD());
   return FALSE;
@@ -4572,6 +4572,7 @@ struct sValCmd3 dArith3[]=
 ,{jjJET_P_P,        JET_CMD,    VECTOR_CMD, VECTOR_CMD, INT_CMD,    POLY_CMD }
 ,{jjJET_ID_M,       JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD,    MATRIX_CMD }
 ,{jjJET_ID_M,       JET_CMD,    MODUL_CMD,  MODUL_CMD,  INT_CMD,    MATRIX_CMD }
+,{jjWRONG3,         JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    INT_CMD }
 ,{mpKoszul,         KOSZUL_CMD, MATRIX_CMD, INT_CMD,    INT_CMD,    IDEAL_CMD }
 ,{jjCALL3MANY,      LIST_CMD,   LIST_CMD,   DEF_CMD,    DEF_CMD,    DEF_CMD }
 ,{jjMATRIX_Id,      MATRIX_CMD, MATRIX_CMD, IDEAL_CMD,  INT_CMD,    INT_CMD }
