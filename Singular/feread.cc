@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.44 2002-02-12 12:31:39 Singular Exp $ */
+/* $Id: feread.cc,v 1.45 2003-01-28 09:10:52 pohl Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -15,7 +15,7 @@
 #ifdef ix86_Win
 #define OM_NO_MALLOC_MACROS
 #endif
-#ifdef PowerMacintosh_darwin
+#ifdef ppcMac_darwin
 #define OM_NO_MALLOC_MACROS
 #endif
 #include "omalloc.h"

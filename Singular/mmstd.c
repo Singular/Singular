@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmstd.c,v 1.5 2002-02-12 12:31:39 Singular Exp $ */
+/* $Id: mmstd.c,v 1.6 2003-01-28 09:10:51 pohl Exp $ */
 /*
 * ABSTRACT: standard version of C-memory management alloc func 
 * i.e. (malloc/realloc/free)
@@ -13,7 +13,7 @@
 #ifdef ix86_Win
 #define OMALLOC_USES_MALLOC
 #endif
-#ifdef PowerMacintosh_darwin
+#ifdef ppcMac_darwin
 #define OMALLOC_USES_MALLOC
 #endif
 #include "omalloc.h"
