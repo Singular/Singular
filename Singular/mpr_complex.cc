@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.23 2000-06-26 08:11:10 pohl Exp $ */
+/* $Id: mpr_complex.cc,v 1.24 2000-06-27 12:10:29 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -587,29 +587,14 @@ gmp_complex operator - ( const gmp_complex & a, const gmp_complex & b )
 }
 gmp_complex operator * ( const gmp_complex & a, const gmp_complex & b )
 {
-  return gmp_complex( a.real() * b.real() - a.imag() * b.imag(),
-                  a.real() * b.imag() + a.imag() * b.real());
+  return gmp_complex( a.r * b.r - a.i * b.i,
+                  a.r * b.i + a.i * b.r);
 }
 gmp_complex operator / ( const gmp_complex & a, const gmp_complex & b )
 {
-  gmp_float ar = abs(b.real());
-  gmp_float ai = abs(b.imag());
-  gmp_float nr, ni, t, d;
-  if (ar <= ai)
-  {
-    t = b.real() / b.imag();
-    d = b.imag() * ((gmp_float)1 + t*t);
-    nr = (a.real() * t + a.imag()) / d;
-    ni = (a.imag() * t - a.real()) / d;
-  }
-  else
-  {
-    t = b.imag() / b.real();
-    d = b.real() * ((gmp_float)1 + t*t);
-    nr = (a.real() + a.imag() * t) / d;
-    ni = (a.imag() - a.real() * t) / d;
-  }
-  return gmp_complex( nr, ni );
+  gmp_float d = b.r*b.r + b.i*b.i;
+  return gmp_complex( (a.r * b.r + a.i * b.i) / d,
+                (a.i * b.r - a.r * b.i) / d);
 }
 
 // <gmp_complex> operator <gmp_complex>
@@ -635,25 +620,9 @@ gmp_complex & gmp_complex::operator *= ( const gmp_complex & b )
 }
 gmp_complex & gmp_complex::operator /= ( const gmp_complex & b )
 {
-  gmp_float ar = abs(b.r);
-  gmp_float ai = abs(b.i);
-  gmp_float nr, ni, t, d;
-  if (ar <= ai)
-  {
-    t = b.r / b.i;
-    d = b.i * ((gmp_float)1 + t*t);
-    nr = (r * t + i) / d;
-    ni = (i * t - r) / d;
-  }
-  else
-  {
-    t = b.i / b.r;
-    d = b.r * ((gmp_float)1 + t*t);
-    nr = (r + i * t) / d;
-    ni = (i - r * t) / d;
-  }
-  r = nr;
-  i = ni;
+  gmp_float d = b.r*b.r + b.i*b.i;
+  r = (r * b.r + i * b.i) / d;
+  i = (i * b.r - r * b.i) / d;
   return *this;
 }
 
@@ -687,10 +656,11 @@ gmp_complex sqrt( const gmp_complex & x )
 
 // converts a gmp_complex to a string ( <real part> + I * <imaginary part> )
 //
-char *complexToStr( const gmp_complex & c, const unsigned int oprec )
+char *complexToStr( gmp_complex & c, const unsigned int oprec )
 {
   char *out,*in_imag,*in_real;
 
+  c.SmallToZero();
   if ( !c.imag().isZero() )
   {
 
@@ -753,6 +723,27 @@ bool complexNearZero( gmp_complex * c, int digits )
     return (c->real() < eps && (c->imag() < eps && c->imag() > epsm));
   else // -
     return (c->real() > epsm && (c->imag() < eps && c->imag() > epsm));
+}
+
+void gmp_complex::SmallToZero()
+{
+  gmp_float ar=this->real();
+  gmp_float ai=this->imag();
+  if (ar.isZero() || ai.isZero()) return;
+  mpf_abs(*ar.mpfp(), *ar.mpfp());
+  mpf_abs(*ai.mpfp(), *ai.mpfp());
+  mpf_set_prec(*ar.mpfp(), 32);
+  mpf_set_prec(*ai.mpfp(), 32);
+  if (ar > ai)
+  {
+    mpf_div(*ai.mpfp(), *ai.mpfp(), *ar.mpfp());
+    if (ai < gmpRel) this->imag(0.0);
+  }
+  else
+  {
+    mpf_div(*ar.mpfp(), *ar.mpfp(), *ai.mpfp());
+    if (ar < gmpRel) this->real(0.0);
+  }
 }
 
 //%e
