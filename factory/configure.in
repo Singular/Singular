@@ -1,4 +1,4 @@
-dnl $Id: configure.in,v 1.7 1997-08-01 09:10:22 schmidt Exp $
+dnl $Id: configure.in,v 1.8 1997-09-10 13:50:44 schmidt Exp $
 
 dnl
 dnl configure.in - process this file with autoconf to generate
@@ -11,7 +11,7 @@ dnl
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.7 1997-08-01 09:10:22 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.8 1997-09-10 13:50:44 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -229,6 +229,10 @@ save_prefix="$prefix"
 test "x$prefix" = xNONE && prefix="$ac_default_prefix"
 expl_datadir=`eval echo "$datadir"`
 prefix="$save_prefix"
+# get absolute path of expl_datadir
+if echo "$expl_datadir" | grep -v '^/' > /dev/null 2> /dev/null; then
+  expl_datadir="`pwd`/$expl_datadir"
+fi
 
 if test "x$with_Singular" = xyes; then
   gftabledir='${datadir}/Singular/gftables'
