@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.24 1998-05-18 20:30:15 wichmann Exp $
+@comment $Id: math.doc,v 1.25 1998-05-19 08:31:34 pohl Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -1206,6 +1206,10 @@ Becker, T.; Weisspfenning, V.:
 Groebner Bases - A computational Approach to Commutative Algebra. Springer, 1993
 @end ifinfo
 @item
+Cohen, H.:
+A Course in Computational Algebraic Number Theory,
+Springer, 1995
+@item
 Cox, D.; Littlei, J.; O'Sheaa, D.:
 Ideals, Varieties and Algorithms. Springer, 1996
 @item
@@ -1219,6 +1223,10 @@ Vasconcelos, V.:
 
 @subheading Descriptions of algorithms
 @table @bullet
+@item
+Bareiss, E.:
+Sylvester's identity and multistep integer-preserving Gaussian elimination,
+Math. Comp. 22 (1968), 565-578.
 @item
 Decker, W.; G.-M. Greuel, G.-M.; Pfister, G.:
 Primary decomposition: algorithms and
