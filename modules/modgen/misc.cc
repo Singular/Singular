@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.2 1999-12-21 12:15:41 krueger Exp $ */
+/* $Id: misc.cc,v 1.3 2000-01-17 08:32:25 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -195,20 +195,29 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 #endif
 
 /*========================================================================*/
-char *valid_vars[] = {
-  "module",
-  "version",
-  "info",
-  NULL
+struct valid_vars_def {
+  char *name;
+  var_type type;
+  var_token id;
+} valid_vars[] = {
+  { "module",       VAR_STRING,  VAR_MODULE },
+  { "version",      VAR_STRING,  VAR_VERSION },
+  { "info",         VAR_STRING,  VAR_INFO },
+  { "help",         VAR_STRING,  VAR_HELP },
+  { "do_typecheck", VAR_BOOL,    VAR_TYPECHECK },
+  { "do_return",    VAR_BOOL,    VAR_RETURN },
+  { NULL,           VAR_UNKNOWN, VAR_NONE }
 };
 
 int checkvar(
-  char *varname
+  char *varname,
+  var_type type
   )
 {
   int i;
-  for(i=0; valid_vars[i]!=NULL; i++)
-    if(strcmp(valid_vars[i], varname)==0) return 1;
+  for(i=0; valid_vars[i].name!=NULL; i++)
+    if((strcmp(valid_vars[i].name, varname)==0) &&
+       (valid_vars[i].type == type) ) return valid_vars[i].id;
   return 0;
 }
 
@@ -412,108 +421,6 @@ void generate_mod(
 }
 
 
-void gen_func_param_check(
-  FILE *fp,
-  procdefv pi,
-  int i
-  )
-{
-  fprintf(fp, "  if(v==NULL) goto mod_%s_error;\n", pi->funcname);
-  fprintf(fp, "  tok = v->Typ();\n");
-  fprintf(fp, "  if((index=iiTestConvert(tok, %s))==0)\n",
-          pi->param[i].typname);
-  fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
-  fprintf(fp, "  v_save = v->next;\n");
-  fprintf(fp, "  v->next = NULL;\n");
-  fprintf(fp, "  if(iiConvert(tok, %s, index, v, res%d))\n",
-          pi->param[i].typname, i);
-  fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
-  fprintf(fp, "  v = v_save;\n");
-}
-
-void generate_function(procdefv pi, FILE *fp)
-{
-  int cnt = 0, i;
-  printf("%s has %d paramters\n", pi->funcname, pi->paramcnt);
-  
-  fprintf(fp, "BOOLEAN mod_%s(leftv res, leftv h)\n{\n", pi->funcname);
-  if(pi->paramcnt>0) {
-    if(pi->param[0].typ==SELF_CMD) {
-      if(pi->c_code != NULL) fprintf(fp, "%s\n", pi->c_code);
-  
-      fprintf(fp, "  return(%s(res,h));\n", pi->funcname);
-      fprintf(fp, "}\n\n");
-    }
-    else {
-      fprintf(fp, "  leftv v = h, v_save;\n");
-      fprintf(fp, "  int tok = NONE, index = 0;\n");
-      for (i=0;i<pi->paramcnt; i++)
-        fprintf(fp, "  leftv res%d = (leftv)Alloc0(sizeof(sleftv));\n", i);
-
-      fprintf(fp, "\n");
-    
-      if(pi->c_code != NULL) fprintf(fp, "%s\n", pi->c_code);
-  
-      for (i=0;i<pi->paramcnt; i++) gen_func_param_check(fp, pi, i);
-
-      fprintf(fp, "  if(v!=NULL) { tok = v->Typ(); goto mod_%s_error; }\n",
-              pi->funcname);
-
-      fprintf(fp, "\n");
-      switch( pi->return_val.typ) {
-          case SELF_CMD:
-            fprintf(fp, "    return(%s(res", pi->funcname);
-            for (i=0;i<pi->paramcnt; i++)
-              fprintf(fp, ", (%s) res%d->Data()",
-                      type_conv[pi->param[i].typ], i);
-            fprintf(fp, "));\n\n");
-           break;
-
-          default:
-            fprintf(fp, "  res->rtyp = %s;\n", pi->return_val.typname);
-            fprintf(fp, "  res->data = (void *)%s(", pi->funcname);
-            for (i=0;i<pi->paramcnt; i++) {
-              fprintf(fp, "(%s) res%d->Data()",
-                      type_conv[pi->param[i].typ], i);
-              if(i<pi->paramcnt-1) fprintf(fp, ", ");
-            }
-            fprintf(fp, ");\n  return FALSE;\n\n");
-      }
-      
-      fprintf(fp, "  mod_%s_error:\n", pi->funcname);
-      fprintf(fp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(tok));\n",
-              pi->procname);
-      fprintf(fp, "    Werror(\"expected %s(", pi->procname);
-      for (i=0;i<pi->paramcnt; i++) {
-        fprintf(fp, "'%s'", pi->param[i].name);
-        if(i!=pi->paramcnt-1) fprintf(fp, ",");
-      }
-      fprintf(fp, ")\");\n");
-      fprintf(fp, "    return TRUE;\n}\n\n");
-    }
-  } else {
-      switch( pi->return_val.typ) {
-          case SELF_CMD:
-            fprintf(fp, "  return(%s(res));\n}\n\n", pi->funcname);
-           break;
-
-          case NONE:
-            fprintf(fp, "  res->rtyp = %s;\n", pi->return_val.typname);
-            fprintf(fp, "  res->data = NULL;\n");
-            fprintf(fp, "  %s();\n", pi->funcname);
-            fprintf(fp, "  return FALSE;\n}\n\n");
-            break;
-            
-          default:
-            fprintf(fp, "  res->rtyp = %s;\n", pi->return_val.typname);
-            fprintf(fp, "  res->data = (void *)%s();\n", pi->funcname);
-            fprintf(fp, "  return FALSE;\n}\n\n");
-      }
-    
-  }
-      
-      
-}
 
 
 /*========================================================================*/
@@ -584,46 +491,9 @@ void  write_procedure_text(
   
 }
 
-/*========================================================================*/
-void  write_procedure_header(
-  moddefv module
-)
-{
-  int cnt = 0, i;
-  procdefv pi = &module->procs[module->proccnt-1];
-  
-  printf("%s has %d paramters\n", pi->funcname, pi->paramcnt);
-  
-  fprintf(module->fmtfp, "BOOLEAN mod_%s(leftv res, leftv h)\n{\n", pi->funcname);
-  if(pi->paramcnt>0) {
-    if(pi->param[0].typ!=SELF_CMD) {
-      fprintf(module->fmtfp, "  leftv v = h, v_save;\n");
-      fprintf(module->fmtfp, "  int tok = NONE, index = 0;\n");
-      for (i=0;i<pi->paramcnt; i++)
-        fprintf(module->fmtfp, "  leftv res%d = (leftv)Alloc0(sizeof(sleftv));\n", i);
-
-      fprintf(module->fmtfp, "\n");
-    
-      if(pi->c_code != NULL) fprintf(module->fmtfp, "%s\n", pi->c_code);
-  
-      for (i=0;i<pi->paramcnt; i++) gen_func_param_check(module->fmtfp, pi, i);
-
-      fprintf(module->fmtfp, "  if(v!=NULL) { tok = v->Typ(); goto mod_%s_error; }\n",
-              pi->funcname);
-
-      fprintf(module->fmtfp, "\n");
-    }
-  }
-  else {
-    if( pi->return_val.typ == NONE ) {
-          fprintf(module->fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
-          fprintf(module->fmtfp, "  res->data = NULL;\n");
-    }
-  }
-}
 
 /*========================================================================*/
-void  mod_write_header(FILE *fp, char *module)
+void  mod_write_header(FILE *fp, char *module, char what)
 {
 #if 0
   FILE *fp;
@@ -650,7 +520,7 @@ void  mod_write_header(FILE *fp, char *module)
   fprintf(fp, "%s\n", DYNAinclude[systyp]);
   fprintf(fp, "\n");
   fprintf(fp, "#include <locals.h>\n");
-  fprintf(fp, "#include \"%s.h\"\n", module);
+  if(what != 'h')  fprintf(fp, "#include \"%s.h\"\n", module);
   fprintf(fp, "\n");
 
   fprintf(fp, "void enter_id(char *name, char *value);\n");
@@ -674,9 +544,9 @@ void write_header(FILE *fp, char *module, char *comment)
 /*========================================================================*/
 void enter_id(FILE *fp, char *name, char *value, int lineno, char *file)
 {
-  fprintf(fp, "  enter_id(\"%s\",\"%s\");\n",name, value);
   if(lineno)
     fprintf(fp, "#line %d \"%s\"\n", lineno, file);
+  fprintf(fp, "  enter_id(\"%s\",\"%s\");\n",name, value);
 }
 
 /*========================================================================*/

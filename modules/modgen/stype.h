@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stype.h,v 1.2 1999-12-21 12:15:43 krueger Exp $ */
+/* $Id: stype.h,v 1.3 2000-01-17 08:32:27 krueger Exp $ */
 /*
 * ABSTRACT: flex/bison interface
 */
@@ -22,7 +22,5 @@ extern YYSTYPE  yylval;
 
 int yylex(MYYSTYPE *l);
 
-enum {
-};
 
 #endif

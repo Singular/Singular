@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.2 1999-12-21 12:15:41 krueger Exp $
+ *  $Id: modgen.h,v 1.3 2000-01-17 08:32:26 krueger Exp $
  *
  */
 
@@ -17,11 +17,19 @@ class paramdef;
 class procdef;
 class moddef;
 class cfiles;
+class procflags;
 
 typedef paramdef * paramdefv;
 typedef procdef * procdefv;
 typedef cfiles * cfilesv;
 typedef moddef * moddefv;
+typedef procflags *procflagsv;
+
+class procflags {
+  public:
+  char do_typecheck;
+  char do_return;
+};
 
 class paramdef {
  public:
@@ -39,7 +47,9 @@ class procdef {
   paramdef  return_val;
   paramdefv param;
   int       paramcnt;
+  procflags flags;
   char *c_code;
+  char *help_string;
 };
 
 class cfiles {
@@ -67,11 +77,22 @@ class moddef {
   int      filecnt;
 };
 
+typedef enum { VAR_UNKNOWN, VAR_BOOL, VAR_NUM, VAR_STRING,
+               VAR_FILE, VAR_FILES
+} var_type;
+
+typedef enum { VAR_NONE, VAR_MODULE, VAR_HELP, VAR_INFO, VAR_VERSION,
+               VAR_TYPECHECK, VAR_RETURN
+} var_token;
+
 /*
  *
  */
 extern int IsCmd(char *n, int & tok);
 extern char * decl2str(int n, char *name);
+
+extern void myyyerror(char *fmt, ...);
+
 
 extern void PrintProclist(moddefv module);
 extern void Add2proclist(moddefv module, char *name, char *ret_val,
@@ -82,15 +103,16 @@ extern void Add2files(moddefv module, char *buff);
 
 extern void generate_function(procdefv pi, FILE *fp);
 extern void  mod_copy_tmp(FILE *fp_out, FILE *fp_in);
-extern void mod_write_header(FILE *fp, char *module);
+extern void mod_write_header(FILE *fp, char *module, char what);
 extern void generate_header(procdefv pi, FILE *fp);
 extern void write_header(FILE *fp, char *module, char *comment="");
 extern void make_version(char *p, moddefv module);
 extern void write_procedure_text(moddefv module, int lineno);
-extern void write_procedure_header(moddefv module);
+/*extern void write_procedure_header(moddefv module);*/
 
 extern int init_proc(procdefv p, char *procname, paramdefv ret, int line);
 extern void setup_proc(moddefv module, procdefv p, char *code);
+extern void proc_set_var(procdefv p, var_type type, char *varname, void *varvalue);
 void write_finish_functions(moddefv module, procdefv proc);
 void AddParam(procdefv p, paramdefv vnew);
 

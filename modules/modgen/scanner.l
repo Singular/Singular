@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.2 1999-12-21 12:15:42 krueger Exp $ */
+/* $Id: scanner.l,v 1.3 2000-01-17 08:32:26 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #include "stype.h"
 #include "grammar.h"
 
-/* #define DEBUG 2 */
+/* #define DEBUG 3*/
  
 #  define YYLP_ERR_NONE    0
 #  define YYLP_DEF_BR2     1
@@ -108,6 +108,8 @@ EQ             (([{WS}]+=[{WS}]+)|=)
 
 NAME           ([[:alpha:]_][[:alnum:]_-]*)
 FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
+NUMBER         ({digit}*)
+BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
 /* %start START */
 
@@ -207,15 +209,15 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
                       {
                         if (*yytext == '\\') yytext++;
                         *s++ = *yytext++;
-                       }
-		       *s++ = *yytext++;
-		       do_return = 0;
-		       return MSTRINGTOK;
-                     } else {
-		       do_return = 0;
-                       yymore();
-                     }
-		   }
+                      }
+		      *s++ = *yytext++;
+		      do_return = 0;
+		      return MSTRINGTOK;
+                    } else {
+		      do_return = 0;
+                      yymore();
+                    }
+		  }
 	}
 
 <COMMENT>{
@@ -267,7 +269,16 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
 		   switch_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
 		   return '{';
 		 }
-         "\""    { do_return++; push_state(YYSTATE, STRING, "string"); yymore();}
+         "/*"       ACTION_ECHO; push_state(YYSTATE, COMMENT, "COMMENT");
+         "//".*{NL}  ++yylineno; ACTION_ECHO; 
+         "\""    { do_return++; push_state(YYSTATE, STRING, "string"); /*yymore();*/}
+	 {BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
+	           else {
+		     if(strcasecmp(yytext, "yes")==0) lvalp->i = 1;
+		     else lvalp->i = 0;
+                   }
+                   return BOOLTOK; }
+	 {NUMBER} { sscanf(yytext, "%d", &lvalp->i); return NUMTOK; }
 	 {NAME}  { 
 	           int i,tok;
 #if DEBUG > 1
@@ -284,6 +295,7 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
 		     return VARTYPETOK;
 		   }
 		   else {
+		     //do_return++;
 		     lvalp->name = strdup(yytext);
 		     return NAME;
 		   }
@@ -292,6 +304,8 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
 	 "("     { return '('; }
 	 ")"     { return ')'; }
 	 ","     { return ','; }
+	 "="     { return '='; }
+	 ";"     { return ';'; }
          .       { }
 
        }

@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.2 1999-12-21 12:15:40 krueger Exp $
+ * $Id: grammar.y,v 1.3 2000-01-17 08:32:25 krueger Exp $
  */
 
 %{
@@ -23,7 +23,7 @@ extern void write_intro(moddefv module);
 extern void write_mod_init(FILE *fp);
 extern void enter_id(FILE *fp, char *name, char *value,
                      int lineno, char *file);
-extern int checkvar(char *varname);
+extern int checkvar(char *varname, var_type type);
  
 procdef procedure_decl;
 
@@ -64,6 +64,8 @@ void yyerror(char * fmt)
 %token <name> MCODETOK
 %token <name> CODEPART
 %token  <tp> VARTYPETOK
+%token <i>    NUMTOK
+%token <i>    BOOLTOK
 
 %type <i>    '='
 
@@ -78,7 +80,7 @@ goal: part1 sect2 sect2end code
 
 part1: initmod sect1 sect1end
         {
-          write_intro(&module_def);
+         write_intro(&module_def);
         }
         ;
 
@@ -113,18 +115,82 @@ sect1end: SECTEND
 
 expr:   NAME '=' MSTRINGTOK
         {
-          if( checkvar($1) ) {
-            enter_id(module_def.fmtfp, $1, $3, yylineno, module_def.filename);
+          switch(sectnum) {
+              case 1: /* pass 1: */
+                if( checkvar($1, VAR_STRING) ) {
+                  enter_id(module_def.fmtfp, $1, $3, yylineno,
+                           module_def.filename);
+                }
+                else {
+                  myyyerror("Unknown variable '%s' in section %d\n", $1,
+                            sectnum);
+                }
+                
+                  // proc_set_var(&procedure_decl, VAR_STRING, $1, $3);
+                break;
+              case 2: /* pass 2: procedure declaration */
+                proc_set_var(&procedure_decl, VAR_FILE, $1, $3);
+                break;
+              default: break;
+                
           }
-          else printf(">>>>>>>>Test 1 '%s' = '%s'\n", $1, $3);
         }
         | NAME '=' FILENAME
         {
-          printf(">>>>>>>>Test 2 '%s' = '%s'\n", $1, $3);
+          switch(sectnum) {
+              case 1: /* pass 1: */
+                break;
+              case 2: /* pass 2: procedure declaration */
+                proc_set_var(&procedure_decl, VAR_FILE, $1, $3);
+                break;
+              default: break;
+                
+          }
         }
         | NAME '=' files
         {
-          printf(">>>>>>>>Test 3 '%s' = '%s'\n", $1, $3);
+          switch(sectnum) {
+              case 1: /* pass 1: */
+                break;
+              case 2: /* pass 2: procedure declaration */
+                proc_set_var(&procedure_decl, VAR_FILES, $1, &$3);
+                break;
+              default: break;
+                
+          }
+        }
+        | NAME '=' NUMTOK
+        {
+          switch(sectnum) {
+              case 1: /* pass 1: */
+                break;
+              case 2: /* pass 2: procedure declaration */
+                proc_set_var(&procedure_decl, VAR_NUM, $1, &$3);
+                break;
+              default: break;
+                
+          }
+        }
+        | NAME '=' BOOLTOK
+        {
+          printf("BOOL\n");
+          
+          switch(sectnum) {
+              case 1: /* pass 1: */
+                if( checkvar($1, VAR_BOOL) ) {
+                  
+                }
+                else {
+                  myyyerror("Unknown variable '%s' in section %d\n", $1,
+                            sectnum);
+                }
+                break;
+              case 2: /* pass 2: procedure declaration */
+                proc_set_var(&procedure_decl, VAR_BOOL, $1, &$3);
+                break;
+              default: break;
+                
+          }
         }
 ;
 
@@ -145,11 +211,11 @@ sect2end: SECT2END
         }
         ;
 
-procdecl: procdecl2 '{' MCODETOK
+procdecl: procdecl3 '{' MCODETOK 
         {
           setup_proc(&module_def, &procedure_decl, $3);
         }
-        | procdecl2 procdeclhelp '{' MCODETOK
+        | procdecl3 procdeclhelp '{' MCODETOK
         {
           setup_proc(&module_def, &procedure_decl, $4);
         }
@@ -169,9 +235,23 @@ procdecl2: procdecl1
         | procdecl1 '(' typelist ')'
         ;
 
+procdecl3: procdecl2
+        | procdecl2 procdeclflags
+        ;
+
 procdeclhelp: MSTRINGTOK
         {
-          printf("++++++++++Help section '%s'\n", $1);
+          procedure_decl.help_string = strdup($1);
+        }
+        ;
+
+procdeclflags: expr ';'
+        {
+          printf("expr-1\n");
+        }
+        | procdeclflags expr ';'
+        {
+          printf("expr-2\n");
         }
         ;
 

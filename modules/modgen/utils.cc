@@ -1,13 +1,15 @@
 /*
- * $Id: utils.cc,v 1.1 1999-11-23 21:30:23 krueger Exp $
+ * $Id: utils.cc,v 1.2 2000-01-17 08:32:27 krueger Exp $
  */
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <ctype.h>
 #include "modgen.h"
 
+/*========================================================================*/
 int init_modgen(
   moddefv module_def,
   char *filename
@@ -37,6 +39,7 @@ int init_modgen(
   return (create_tmpfile(module_def));
 }
 
+/*========================================================================*/
 int create_tmpfile(
   moddefv module_def
 )
@@ -58,4 +61,16 @@ int create_tmpfile(
   }
   return 0;
   
+}
+
+/*========================================================================*/
+void myyyerror(
+  char *fmt, ...
+  )
+{
+  va_list ap;
+  va_start(ap, fmt);
+printf("ERROR report\n");
+  vprintf(fmt, ap);
+  va_end(ap);
 }
