@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.1 1998-11-12 13:06:12 Singular Exp $ */
+/* $Id: pcv.cc,v 1.2 1998-11-12 13:30:48 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -290,4 +290,162 @@ ideal pcvBasisW(int d0,int d1,short w[])
     i=pcvDegBasisW(I,i,m,d,0,w);
   pDelete1(&m);
   return I;
+}
+
+/*2
+* interface to interpreter
+*/
+BOOLEAN iiPcvConv(leftv res, leftv h)
+{
+  if(h&&(h->Typ()==IDEAL_CMD||h->Typ()==MODUL_CMD))
+  {
+    leftv hh=h->next;
+    int i0=0,i1;
+    short* w=(short*)Alloc(currRing->N*sizeof(short));
+    BOOLEAN defi1=FALSE,defw=FALSE;
+    while(hh!=NULL)
+    {
+      if(hh->Typ()==INT_CMD)
+      {
+        if(defi1)
+        {
+          i0=i1;
+          i1=(int)hh->Data();
+        }
+        else
+        {
+          i1=(int)hh->Data();
+          defi1=TRUE;
+        }
+      }
+      else
+      if(hh->Typ()==INTVEC_CMD)
+      {
+        intvec *iv=(intvec*)hh->Data();
+        if(iv->rows()==currRing->N&&iv->cols()==1)
+        {
+          for(int i=0;i<currRing->N;i++) w[i]=(*iv)[i];
+          defw=TRUE;
+        }
+      }
+      hh=hh->next;
+    }
+    if(defi1)
+    {
+      if(!defw) for(int i=0;i<currRing->N;i++) w[i]=1;
+      if(h->Typ()==IDEAL_CMD)
+      {
+        // "pcvConv",<ideal>[,<int d0>],<int d1>[,<intvec w>]:
+        // convert ideal to module of coeff vectors
+        // considering monomials m with d0<=w-deg(m)<d1
+        res->rtyp=MODUL_CMD;
+        res->data=(void*)pcvId2Mod((ideal)h->Data(),i0,i1,w);
+        Free((ADDRESS)w,currRing->N*sizeof(short));
+        return FALSE;
+      }
+      else
+      {
+        // "pcvConv",<module>[,<int d0>],<int d1>[,<intvec w>]:
+        // convert module of coeff vectors to ideal
+        // considering monomials m with d0<=w-deg(m)<d1
+        res->rtyp=IDEAL_CMD;
+        res->data=(void*)pcvMod2Id((ideal)h->Data(),i0,i1,w);
+        Free((ADDRESS)w,currRing->N*sizeof(short));
+        return FALSE;
+      }
+    }
+    Free((ADDRESS)w,currRing->N*sizeof(short));
+  }
+  WerrorS("<ideal/module>[,<int>],<int>[,<intvec>] expected");
+  return TRUE;
+}
+
+/*2
+* interface to interpreter
+*/
+BOOLEAN iiPcvBasis(leftv res, leftv h)
+{
+  if(currRingHdl==NULL)
+  {
+    WerrorS("no ring active");
+    return TRUE;
+  }
+  int i0=0,i1;
+  short* w=(short*)Alloc(currRing->N*sizeof(short));
+  BOOLEAN defi1=FALSE,defw=FALSE;
+  while(h!=NULL)
+  {
+    if(h->Typ()==INT_CMD)
+    {
+      if(defi1)
+      {
+        i0=i1;
+        i1=(int)h->Data();
+      }
+      else
+      {
+        i1=(int)h->Data();
+        defi1=TRUE;
+      }
+    }
+    else
+    if(h->Typ()==INTVEC_CMD)
+    {
+      intvec *iv=(intvec*)h->Data();
+      if(iv->rows()==currRing->N&&iv->cols()==1)
+      {
+        for(int i=0;i<currRing->N;i++) w[i]=(*iv)[i];
+        defw=TRUE;
+      }
+    }
+    h=h->next;
+  }
+  if(defi1)
+  {
+    if(!defw) for(int i=0;i<currRing->N;i++) w[i]=1;
+    // "pcvDim"[,<int d0>],<int d1>[,<intvec w>]:
+    // number of monomials m with d0<=w-deg(m)<d1
+    res->rtyp=INT_CMD;
+    res->data=(void*)pcvDimW(i0,i1,w);
+    Free((ADDRESS)w,currRing->N*sizeof(short));
+    return FALSE;
+  }
+  Free((ADDRESS)w,currRing->N*sizeof(short));
+  WerrorS("[<int>],<int>[,<intvec>] expected");
+  return TRUE;
+}
+
+/*2
+* interface to interpreter
+*/
+BOOLEAN iiPcvOrd(leftv res, leftv h)
+{
+  if(h&&h->Typ()==POLY_CMD)
+  {
+    leftv hh=h->next;
+    short* w=(short*)Alloc(currRing->N*sizeof(short));
+    BOOLEAN defw=FALSE;
+    while(hh)
+    {
+      if(hh->Typ()==INTVEC_CMD)
+      {
+        intvec *iv=(intvec*)hh->Data();
+        if(iv->rows()==currRing->N&&iv->cols()==1)
+        {
+          for(int i=0;i<currRing->N;i++) w[i]=(*iv)[i];
+          defw=TRUE;
+        }
+      }
+      hh=hh->next;
+    }
+    if(!defw) for(int i=0;i<currRing->N;i++) w[i]=1;
+    // "pcvOrd",<poly p>[,<intvec w>]:
+    // min{w-deg(m)|m monomial of p}
+    res->rtyp=INT_CMD;
+    res->data=(void*)pcvOrdW((poly)h->Data(),w);
+    Free((ADDRESS)w,currRing->N*sizeof(short));
+    return FALSE;
+  }
+  WerrorS("<poly>[,<intvec>] expected");
+  return TRUE;
 }
