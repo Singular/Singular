@@ -12,7 +12,6 @@ SHELL		= /bin/sh
 SINGULAR_VERSION	= @SINGULAR_VERSION@
 SINGULAR		= @SINGULAR@
 SINGUNAME		= @SINGUNAME@
-EXEC_EXT		= @EXEC_EXT@
 ##
 ## various paths
 ##
@@ -73,12 +72,10 @@ DL_KERNEL	= @DL_KERNEL@
 
 ifdef LD_STATIC
 LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS} 
-SING_EXEC = Singular-static
 LIBS := ${MP_LIBS} ${LIBS} 
 DL_KERNEL =
 else
 LDFLAGS  := ${LD_DYN_FLAGS} ${LDFLAGS} 
-SING_EXEC = Singular
 endif
 
 # CXXFLAGS =  -g -Wall -Wno-unused
@@ -273,23 +270,10 @@ DL_LIBST=
 
 endif
 
-
-
 all:	libkernel.a libkernel-g.a ${DL_LIBS} ${DL_LIBSG}
-
-
-
-Singular-static: version.h
-	sleep 1
-	echo "#define HAVE_STATIC" > static.h
-	${MAKE} LD_STATIC=1 S_EXT="-static" Singular-static
-	echo "#undef HAVE_STATIC" > static.h
 
 libkernel.a: ${OBJS}
 	ar cr $@ $^
-
-%.static: version.h
-	${MAKE} DL_KERNEL=0 S_EXT=".static" $@
 
 p_Procs_Lib.o: p_Procs_Lib.inc
 
@@ -360,21 +344,6 @@ maintainer-clean: distclean srcclean
 ##
 ## miscellanous targets
 ##
-
-install-bindist: $(HEADERS) $(SOURCES) Makefile depend
-	echo "#define MAKE_DISTRIBUTION	" > distrib.h
-	sleep 1
-	${MKINSTALLDIRS} ${install_bindir} 
-	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
-	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ${DL_LIBS} ${install_bindir}
-	echo "#undef MAKE_DISTRIBUTION " > distrib.h
-
-tar:
-	tar cf Singular-${SINGULAR_VERSION}-src.tar ${DISTFILES}
-	gzip -f Singular-${SINGULAR_VERSION}-src.tar
-
-backup: tar
-	mcopy -o Singular-${SINGULAR_VERSION}-src.tar.gz a:
 
 TAGS:   ${SOURCES} ${ESOURCES} ${HEADERS} 
 	etags ${SOURCES} ${ESOURCES} ${HEADERS}
