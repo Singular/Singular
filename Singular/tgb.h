@@ -40,8 +40,8 @@ struct sorted_pair_node{
   poly lcm_of_lm;
 };
 
-ideal t_rep_gb(ring r,ideal arg_I, ideal arg_debug_Ideal=NULL);
-static ideal debug_Ideal;
+ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode=FALSE);
+//static ideal debug_Ideal;
 /** 
     reduction_accumulators are objects which are shared by several sums
  **/
@@ -83,6 +83,16 @@ struct int_pair_node{
   int a;
   int b;
 };
+class monom_poly{
+ public:
+  poly m;
+  poly f;
+};
+class mp_list{
+ public:
+  monom_poly mp;
+  mp_list* next;
+};
 struct calc_dat
 {
   int* rep;
@@ -98,6 +108,10 @@ struct calc_dat
   int_pair_node* soon_free;
   sorted_pair_node** apairs;
   BOOLEAN* modifiedS;
+  //for F4
+  mp_list* F;
+  mp_list* F_minus;
+  //end for F4
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
 #endif

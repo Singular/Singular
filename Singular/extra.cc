@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.210 2004-09-07 12:56:41 bricken Exp $ */
+/* $Id: extra.cc,v 1.211 2004-09-09 07:49:55 bricken Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1656,7 +1656,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       ring r = currRing;
       ideal i = (ideal)h->Data();
-      res->data=t_rep_gb(r,i);
+      h=h->next;
+      if(h)
+      {
+	
+	BOOLEAN b=(BOOLEAN) h->Data();
+	res->data=t_rep_gb(r,i,b);
+      }
+      else
+	res->data=t_rep_gb(r,i);
       res->rtyp=IDEAL_CMD;
       return(FALSE);
     }

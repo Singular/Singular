@@ -13,7 +13,7 @@
 
 #define LEN_VAR1
 #define degbound(p) assume(pTotaldegree(p)<10)
-#define inDebug(p) assume((debug_Ideal==NULL)||(kNF(debug_Ideal,NULL,p,0,0)==0))
+//#define inDebug(p) assume((debug_Ideal==NULL)||(kNF(debug_Ideal,NULL,p,0,0)==0))
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
 int pSLength(poly p, int l) {
@@ -389,7 +389,7 @@ static int bucket_guess(kBucket* bucket){
 
 
 static int add_to_reductors(calc_dat* c, poly h, int len){
-  inDebug(h);
+  //inDebug(h);
   assume(lenS_correct(c->strat));
  
   int i;
@@ -1765,13 +1765,17 @@ static int poly_crit(const void* ap1, const void* ap2){
   if (l1>l2) return 1;
   return 0;
 }
-ideal t_rep_gb(ring r,ideal arg_I, ideal arg_debug_Ideal){
-  debug_Ideal=arg_debug_Ideal;
-  if (debug_Ideal) PrintS("DebugIdeal received\n");
-   Print("Idelems %i \n----------\n",IDELEMS(arg_I));
+ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
+  if (F4_mode)
+    PrintS("F4 Modus \n");
+    
+     
+  //debug_Ideal=arg_debug_Ideal;
+  //if (debug_Ideal) PrintS("DebugIdeal received\n");
+  // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
   ideal I=idCompactify(arg_I);
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
-  Print("Idelems %i \n----------\n",IDELEMS(I));
+  //Print("Idelems %i \n----------\n",IDELEMS(I));
   calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
   c->r=currRing;
   void* h;
@@ -1783,7 +1787,8 @@ ideal t_rep_gb(ring r,ideal arg_I, ideal arg_debug_Ideal){
   c->reduction_steps=0;
   c->last_index=-1;
 
-
+  c->F=NULL;
+  c->F_minus=NULL;
 
   c->Rcounter=0;
 
