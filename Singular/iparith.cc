@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.323 2004-07-20 15:42:58 Singular Exp $ */
+/* $Id: iparith.cc,v 1.324 2004-07-21 16:44:33 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3127,7 +3127,6 @@ static BOOLEAN jjINTERRED(leftv res, leftv v)
 {
   ideal result=kInterRed((ideal)(v->Data()),currQuotient);
   //if (result==NULL) return TRUE;
-  idSkipZeroes(result);
   res->data = result;
   return FALSE;
 }
