@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.11 1999-07-01 12:26:53 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.12 1999-10-06 13:06:39 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1334,12 +1334,11 @@ void sparse_mat::smCopToRes()
       }
     }
   }
-  tored = crd+i; // the number or permuted rows
   for (j=act;j;j--) // renumber m_act
   {
     k = 1;
     a = m_act[j];
-    do
+    while ((a != NULL) && (a->pos <= tored))
     {
       if (perm[crd+k] == a->pos)
       {
@@ -1347,8 +1346,9 @@ void sparse_mat::smCopToRes()
         a = a->n;
       }
       k++;
-    } while (a != NULL);
+    }
   }
+  tored = crd+i;
   for(k=1;k<=i;k++) // clean this from m_row
   {
     j = perm[crd+k];
