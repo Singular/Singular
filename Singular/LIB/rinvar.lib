@@ -1,22 +1,5 @@
-// rinvar.lib
-// Invariants of reductive groups
-//
-// Implementation by : Thomas Bayer
-// Current Adress:
-// Institut fuer Informatik, Technische Universitaet Muenchen
-// www:    http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/
-// email : bayert@in.tum.de
-//
-// Last change 10.12.2000
-//
-// written in the frame of the diploma thesis (advisor: Prof. Gert-Martin Greuel)
-// "Computations of moduli spaces of semiquasihomogenous singularities and an
-//  implementation in Singular"
-// Arbeitsgruppe Algebraische Geometrie, Fachbereich Mathematik,
-// Universitaet Kaiserslautern
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: rinvar.lib,v 1.2 2000-12-11 13:15:38 Singular Exp $";
+version="Id: rinvar.lib,v 1.0 2000/12/10 17:32:15 Singular Exp $";
 info="
 LIBRARY:  rinvar.lib      PROCEDURES FOR INVARIANT RINGS OF REDUCTIVE GROUPS
 
@@ -40,6 +23,13 @@ PROCEDURES:
  TransferIdeal(R,name,nA)  transfer the ideal 'name' from R to basering
 ";
 
+// NOTE: This library has been written in the frame of the diploma thesis
+// 'Computing moduli spaces of semiquasihomogeneous singularites and an
+//  implementation in Singular', Arbeitsgruppe Algebraische Geometrie,
+// Fachbereich Mathematik, University Kaiserslautern,
+// Advisor: Prof. Gert-Martin Greuel
+
+
 LIB "presolve.lib";
 LIB "elim.lib";
 LIB "zeroset.lib";
@@ -48,7 +38,7 @@ LIB "zeroset.lib";
 
 proc EquationsOfEmbedding(ideal embedding, int nrs)
 "USAGE:   EquationsOfEmbedding(embedding, s); ideal embedding; int s;
-PUROPSE: compute the ideal of the variety parameterized by 'embedding' by
+PURPOSE: compute the ideal of the variety parameterized by 'embedding' by
          implicitation and change the variables to the old ones.
 RETURN:  ideal
 ASSUME:  nvars(basering) = n, size(embedding) = r and s = n - r.
@@ -78,7 +68,7 @@ example
 
 proc ImageGroup(ideal Grp, ideal Gaction)
 "USAGE:   ImageGroup(G, action); ideal G, action;
-PUROPSE: compute the ideal of the image of G in GL(m,K) induced by the linear
+PURPOSE: compute the ideal of the image of G in GL(m,K) induced by the linear
          action 'action', where G is an algebraic group and 'action' defines
          an action of G on K^m (size(action) = m).
 RETURN:  ring, a polynomial ring over the same ground field as the basering,
@@ -94,6 +84,7 @@ ASSUME:  basering K[s(1..r),t(1..m)] has r + m variables, G is the ideal of an
          f_1,...,f_m in basering, s.t. on the ring level we have
   K[t_1,...,t_m] --> K[s_1,...,s_r,t_1,...,t_m]/G
     t_i    --> f_i(s_1,...,s_r,t_1,...,t_m)
+
 EXAMPLE: example ImageGroup; shows an example
 "
 {
@@ -206,7 +197,7 @@ example
 
 proc HilbertWeights(ideal I, wt)
 "USAGE:   HilbertWeights(I, w); ideal I, intvec wt
-PUROPSE: compute the weights of the "slack" varaibles needed for the
+PURPOSE: compute the weights of the "slack" varaibles needed for the
          computation of the algebraic relations of the generators of 'I' s.t.
          the Hilbert driven 'std' can be used.
 RETURN: intvec
@@ -225,7 +216,7 @@ ASSUME: basering = K[t_1,...,t_m,...], 'I' is quasihomogenous w.r.t. 'w' and
 
 proc HilbertSeries(ideal I, wt)
 "USAGE:   HilbertSeries(I, w); ideal I, intvec wt
-PUROPSE: compute the polynomial p of the Hilbert Series,represented by p/q, of
+PURPOSE: compute the polynomial p of the Hilbert Series,represented by p/q, of
          the ring K[t_1,...,t_m,y_1,...,y_r]/I1 where 'w' are the weights of
          the variables, computed, e.g., by 'HilbertWeights', 'I1' is of the
          form I[1] - y_1,...,I[r] - y_r and is quasihomogenous w.r.t. 'w'
@@ -250,10 +241,11 @@ NOTE:    the leading 0 of the result does not belong to p, but is needed in
 
 proc HilbertSeries1(wt)
 "USAGE:   HilbertSeries1(wt); ideal I, intvec wt
-PUROPSE: compute the polynomial p of the Hilbert Series represented by p/q of
+PURPOSE: compute the polynomial p of the Hilbert Series represented by p/q of
          the ring K[t_1,...,t_m,y_1,...,y_r]/I where I is a complete inter-
          section and the generator I[i] has degree wt[i]
 RETURN:  poly
+EXAMPLE:
 "
 {
   int i, j;
@@ -279,7 +271,7 @@ RETURN:  poly
 
 proc ImageVariety(ideal I, F, list #)
 "USAGE:   ImageVariety(ideal I, F [, w]);ideal I; F is a list/ideal, intvec w.
-PUROPSE: compute the Zariski closure of the image of the variety of I under
+PURPOSE: compute the Zariski closure of the image of the variety of I under
          the morphism F.
 NOTE:    if 'I' and 'F' are quasihomogenous w.r.t. 'w' then the Hilbert-driven
          'std' is used.
@@ -365,13 +357,13 @@ example
 
 proc LinearizeAction(ideal Grp, Gaction, int nrs)
 "USAGE:   LinearizeAction(G,action,r); ideal G, action; int r
-PUROPSE: linearize the group action 'action' and find an equivariant embedding
-         of K^m where m = size(action).
+PURPOSE: linearize the group action 'action' and find an equivariant
+         embedding of K^m where m = size(action).
 ASSUME:  G contains only variables var(1..r) (r = nrs)
 basering = K[s(1..r),t(1..m)], K = Q or K = Q(a) and minpoly != 0.
-RETURN:  polynomial ring contianing the ideals 'actionid', 'embedid', 'groupid'
+RETURN:  polynomial ring contianing the ideals 'actionid','embedid','groupid'
          - 'actionid' is the ideal defining the linearized action of G
-         - 'embedid' is a parameterization of an equivariant embedding (closed)
+         - 'embedid' is a parameterization of an equivariant embedding
          - 'groupid' is the ideal of G in the new ring
 NOTE:    set printlevel > 0 to see a trace
 EXAMPLE: example LinearizeAction; shows an example
@@ -510,7 +502,7 @@ example
 
 proc LinearActionQ(Gaction, int nrs)
 "USAGE:   LinearActionQ(action,nrs,nrt); ideal action, int nrs
-PUROPSE: check if the action defined by 'action' is linear w.r.t. the variables
+PURPOSE: check if the action defined by 'action' is linear wrt. the variables
          var(nrs + 1...nvars(basering)).
 RETURN:  0 action not linear
          1 action is linear
@@ -525,11 +517,9 @@ EXAMPLE: example LinearActionQ; shows an example
   for(i = nrs + 1; i <= nrs + nrt; i++) { wt[i] = 1;}
   loop = 1;
   i = 1;
-  while(loop)
-  {
+  while(loop){
     if(deg(Gaction[i], wt) > 1) { loop = 0; }
-    else
-    {
+    else {
       i++;
       if(i > ncols(Gaction)) { loop = 0;}
     }
@@ -548,9 +538,9 @@ example
 
 proc LinearCombinationQ(ideal I, poly f)
 "USAGE:   LinearCombination(I, f); ideal I, poly f
-PUROPSE: test if f can be written as a linear combination of the generators of I.
-RETURN:  0 f is not a linear combination
-         1 f is a linear combination
+PURPOSE: test if f can be written as a linear combination of the gens. of I
+RETURN:  0 'f' is not a linear combination
+         1 'f' is a linear combination
 "
 {
   int i, loop, sizeJ;
@@ -566,19 +556,15 @@ RETURN:  0 f is not a linear combination
 
   loop = 1;
   i = 1;
-  while(loop)
-  { // look for a linear relation containing Y(nr)
-    if(deg(imageid[i]) == 1)
-    {
+  while(loop) {        // look for a linear relation containing Y(nr)
+    if(deg(imageid[i]) == 1) {
       coMx = coef(imageid[i], var(sizeJ));
-      if(coMx[1,1] == var(sizeJ))
-      {
+      if(coMx[1,1] == var(sizeJ)) {
         relation = imageid[i];
         loop = 0;
       }
     }
-    else
-    {
+    else {
       i++;
       if(i > ncols(imageid)) { loop = 0;}
     }
@@ -590,15 +576,15 @@ RETURN:  0 f is not a linear combination
 
 proc InvariantRing(ideal G, ideal action, list #)
 "USAGE:   InvariantRing(G, Gact [, opt]); ideal G, Gact; int opt
-PUROPSE: compute generators of the invariant ring of G w.r.t. the action 'Gact'
+PURPOSE: compute generators of the invariant ring of G wrt. the action 'Gact'
 ASSUME:  G is a finite group and 'Gact' is a linear action.
 RETURN:  polynomial ring over a simple extension of the groundfield of the
          basering (the extension might be trivial), containing the ideals
          'invars' and 'groupid' and the poly 'newA'
          - 'invars' contains the algebra-generators of the invariant ring
          - 'groupid' is the ideal of G in the new ring
-         - 'newA' if the minpoly changes this is the new representation of the
-           algebraic number, otherwise it is set to 'a'.
+         - 'newA' if the minpoly changes this is the new representation of
+           the algebraic number, otherwise it is set to 'a'.
 NOTE:    the delivered ring might have a different minimal polynomial
 EXAMPLE: example InvariantRing; shows an example
 "
@@ -648,6 +634,7 @@ EXAMPLE: example InvariantRing; shows an example
         setring RORN;
         export(RORN);
         ideal groupid = std(id);
+                                kill(id);
         attrib(groupid, "isSB", 1);
         ideal action = actionid;
         ideal invarsGens = TransferIdeal(RIRR, "invarsGens", newA);
@@ -712,7 +699,7 @@ example
 
 proc InvariantQ(poly f, ideal G, action)
 "USAGE:   InvariantQ(f, G, action); poly f; ideal G, action
-PUROPSE: check if the polynomial f is invariant w.r.t. G where G acts via
+PURPOSE: check if the polynomial f is invariant w.r.t. G where G acts via
          'action' on K^m.
 ASSUME:  basering = K[s_1,...,s_m,t_1,...,t_m] where K = Q of K = Q(a) and
          minpoly != 0, f contains only t_1,...,t_m, G is the ideal of an
@@ -737,9 +724,9 @@ EXAMPLE: example InvariantQ; shows an example
 
 proc MinimalDecomposition(poly f, int nrs, int nrt)
 "USAGE:   MinimalDecomposition(f,a,b); poly f; int a, b.
-PUROPSE: decompose f as a sum M[1,1]*M[2,1] + ... + M[1,r]*M[2,r] where M[1,i]
-         contains only s(1..a), M[2,i] contains only t(1...b) s.t. r is minimal
-ASSUME:  f polynomial in K[s(1..a),t(1..b)], K = Q or K = Q(a) and minpoly != 0
+PURPOSE: decompose f as a sum M[1,1]*M[2,1] + ... + M[1,r]*M[2,r] where M[1,i]
+         contains only s(1..a), M[2,i] contains only t(1...b) st. r is minimal
+ASSUME:  f polynomial in K[s(1..a),t(1..b)],K = Q or K = Q(a) and minpoly != 0
 RETURN:  2 x r matrix M s.t.  f = M[1,1]*M[2,1] + ... + M[1,r]*M[2,r]
 EXAMPLE: example MinimalDecomposition;
 "
@@ -833,13 +820,13 @@ example
 
 proc NullCone(ideal G, action)
 "USAGE:   NullCone(G, action); ideal G, action
-PUROPSE: compute the ideal of the nullcone of the linear action of G on K^n,
+PURPOSE: compute the ideal of the nullcone of the linear action of G on K^n,
          given by 'action', by means of Deksen's algorithm
 ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a) and minpoly != 0,
          G is an ideal of a reductive algebraic group in K[s(1..r)],
          'action' is a linear group action of G on K^n (n = ncols(action))
 RETURN:  ideal of the nullcone of G.
-NOTE:    the generators of the nullcone are homogenous, but i.g. not invariant
+NOTE:    the generators of the nullcone are homogenous, but ig. not invariant
 EXAMPLE: example NullCone; shows an example
 "
 {
@@ -908,7 +895,7 @@ example
 
 proc ReynoldsOperator(ideal Grp, ideal Gaction, list #)
 "USAGE:   ReynoldsOperator(G, action [, opt); ideal G, action; int opt
-PUROPSE: compute the Reynolds operator of the group G which act via 'action'
+PURPOSE: compute the Reynolds operator of the group G which act via 'action'
 RETURN:  polynomial ring R over a simple extension of the groundfield of the
          basering (the extension might be trivial), containing a list
          'ROelements', the ideals 'id', 'actionid' and the polynomial 'newA'.
@@ -919,7 +906,7 @@ RETURN:  polynomial ring R over a simple extension of the groundfield of the
          - 'newA' is the new representation of a' in terms of a. If the
            basering does not contain a parameter then 'newA' = 'a'.
 ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
-         G is the ideal of a finite group in K[s(1..r)], 'action' is a linear
+         G is the ideal of a finite group in K[s(1..r)],'action' is a linear
          group action of G
 EXAMPLE: example ReynoldsOperator; shows an example
 "
@@ -967,7 +954,7 @@ EXAMPLE: example ReynoldsOperator; shows an example
 
 proc ReynoldsImage(list reynoldsOp, poly f)
 "USAGE:   ReynoldsImage(RO, f); list RO, poly f
-PUROPSE: compute the Reynolds image of the polynomial f where RO represents
+PURPOSE: compute the Reynolds image of the polynomial f where RO represents
          the Reynolds operator
 RETURN:  poly
 "
@@ -986,7 +973,7 @@ RETURN:  poly
 
 static proc SimplifyCoefficientMatrix(matrix coefMatrix)
 "USAGE:   SimplifyCoefficientMatrix(M); M matrix coming from coef(...)
-PUROPSE: simplify the matrix, i.e. find linear dependencies among the columns
+PURPOSE: simplify the matrix, i.e. find linear dependencies among the columns
 RETURN:  matrix M, f = M[1,1]*M[2,1] + ... + M[1,n]*M[2,n]
 "
 {
@@ -1021,16 +1008,17 @@ RETURN:  matrix M, f = M[1,1]*M[2,1] + ... + M[1,n]*M[2,n]
 ///////////////////////////////////////////////////////////////////////////////
 
 proc SimplifyIdeal(ideal I, list #)
-"USAGE:   SimplifyIdeal(I [,m, name]); ideal I; int m, string name"
+"USAGE:   SimplifyIdeal(I [,m, name]); ideal I; int m, string name
 PURPOSE: simplify ideal I to the ideal I', do not change the names of the
          first m variables, new ideal I' might contain less variables.
          I' contains variables var(1..m)
 RETURN: list
   _[1] ideal I'
-  _[2] ideal representing a map phi to a ring with probably less vars. s.t.
-       phi(I) = I'
+  _[2] ideal representing a map phi to a ring with probably less
+             varsiables s.t. phi(I) = I'
   _[3] list of variables
   _[4] list from 'elimpart'
+NOTE:
 "
 {
   int i, k, m;
@@ -1042,17 +1030,14 @@ RETURN: list
   In = sList[1];
   mapId = sList[5];
 
-  if(size(#) > 0)
-  {
+  if(size(#) > 0) {
     m = #[1];
     nameCMD = #[2];
   }
   else { m = 0;} // nvars(basering);
   k = 0;
-  for(i = 1; i <= nvars(basering); i++)
-  {
-    if(sList[4][i] != 0)
-    {
+  for(i = 1; i <= nvars(basering); i++) {
+    if(sList[4][i] != 0) {
       k++;
       if(k <= m) { mId[i] = sList[4][i]; }
       else { execute("mId["+string(i) +"] = "+nameCMD+"("+string(k-m)+");");}
@@ -1071,10 +1056,10 @@ RETURN: list
 
 static proc TransferIdeal(R, string name, poly newA)
 " USAGE:  TransferIdeal(R, name, newA); ring R, string name, poly newA
-PUROPSE: Maps an ideal with name 'name' in R to the basering, s.t. all
+PURPOSE: Maps an ideal with name 'name' in R to the basering, s.t. all
          variables are fixed but par(1) is replaced by 'newA'.
 RETURN:  ideal
-NOTE:    this is used to transfor an ideal if the minimal polynomial has changed
+NOTE:    this is used to transfor ideals if the minimal polynomial has changed
 "
 {
   def RAB = basering;
@@ -1094,8 +1079,8 @@ static proc RingVarProduct(index)
 // list of indices
 {
   poly f = 1;
-  for(int i = 1; i <= size(index); i++)
-  {
+
+  for(int i = 1; i <= size(index); i++) {
     f = f * var(index[i]);
   }
   return(f);

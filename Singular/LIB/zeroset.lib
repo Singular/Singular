@@ -1,48 +1,31 @@
-// Zeroset.lib
-// Algorithms for finding the zero-set of a zero-dim. ideal in Q(a)[x_1,..x_n],
-// Roots and Factorization of univariate polynomials over Q(a)[t]
-// where a is an algebric number
-//
-// Implementation by : Thomas Bayer
-// Current Adress:
-// Institut fuer Informatik, Technische Universitaet Muenchen
-// www:    http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/
-// email : bayert@in.tum.de
-//
-// Last change 10.12.2000
-//
-// written in the frame of the diploma thesis (advisor: Prof. Gert-Martin Greuel)
-// "Computations of moduli spaces of semiquasihomogenous singularities and an
-//  implementation in Singular"
-// Arbeitsgruppe Algebraische Geometrie, Fachbereich Mathematik,
-// Universitaet Kaiserslautern
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: zeroset.lib,v 1.2 2000-12-11 13:15:38 Singular Exp $";
+version="Id: zeroset.lib,v 1.0 2000/05/19 12:32:15 Singular Exp $";
 info="
 LIBRARY:  zeroset.lib      PROCEDURES FOR ROOTS AND FACTORIZATION
 
-AUTHOR:   Thomas Bayer,    email: tbayer@mathematik.uni-kl.de
+AUTHOR:   Thomas Bayer,    email: bayert@in.tum.de
 
 PROCEDURES:
+
  EGCD(f, g)    gcd over an algebraic extension field of Q
  Factor(f)    factorization of f over an algebraic extension field
- InvertNumber(c)  inverts an element of an algenraic extension field
+ InvertNumber(c)  inverts an element of an algebraic extension field
  LinearZeroSet(I)  find the linear (partial) solution of I
  Quotient(f, g)    quotient q  of f w.r.t. g (in f = q*g + remainder)
  Remainder(f,g)    remainder of the division of f by g
  Roots(f)    computes all roots of f in an extension field of Q
- SQFRNorm(f)    norm of f (f must be squarefree)
+ SQFRNorm(f)    norm of f (f must be square-free)
  ZeroSet(I)    zero-set of the 0-dim. ideal I
 
- SUBPROCEDURES:
+SUB PROCEDURES:
+
  EGCDMain(f, g)    gcd over an algebraic extension field of Q
  FactorMain(f)    factorization of f over an algebraic extension field
- InvertNumberMain(c)  inverts an element of an algenraic extension field
+ InvertNumberMain(c)  inverts an element of an algebraic extension field
  QuotientMain(f, g)  quotient of f w.r.t. g
  RemainderMain(f,g)  remainder of the division of f by g
- RootsMain(f)    computes all roots of f, might extend the groundfield
- SQFRNormMain(f)  norm of f (f must be squarefree)
+ RootsMain(f)    computes all roots of f,might extend the groundfield
+ SQFRNormMain(f)  norm of f (f must be square-free)
  ContainedQ(data, f)  f in data ?
  SameQ(a, b)    a == b (list a,b)
  TransferRing()    create a new basering (to use ...Main())
@@ -59,43 +42,49 @@ PROCEDURES:
  basering is stored.
 ";
 
-LIB "primitiv.lib";
-LIB "primdec.lib";
+// NOTE: This library has been written in the frame of the diploma thesis
+// 'Computing moduli spaces of semiquasihomogeneous singularites and an
+//  implementation in Singular', Arbeitsgruppe Algebraische Geometrie,
+// Fachbereich Mathematik, University Kaiserslautern,
+// Advisor: Prof. Gert-Martin Greuel
 
 // note : return a ring : ring need not be exported !!!
 
-// Artihmetic in Q(a)[x] without built-in procedures
+// Arithmetic in Q(a)[x] without built-in procedures
 // assume basering = Q[x,a] and minpoly is represented by mpoly(a).
 // the algorithms are taken from "Polynomial Algorithms in Computer Algebra",
 // F. Winkler, Springer Verlag Wien, 1996.
 
 
 // To do :
-// squarefree factorization
+// square-free factorization
 // multiplicities
 
 // Improvement :
 // a main problem is the growth of the coefficients. Try Roots(x7 - 1)
-// retrurn ideal mpoly !
+// return ideal mpoly !
 // mpoly is not monic, comes from primitive_extra
 
-// IMPLEMENTATION
+// IMPLEMENTATION (last change: 10.12.2000)
 //
 // In procedures with name 'proc-name'Main a polynomial ring over a simple
 // extension field is represented as Q[x...,a] together with the ideal
 // 'mpoly' (attribute "isSB"). The arithmetic in the extension field is
 // implemented in the procedures in the procedures 'MultPolys' (multiplication)
-// and 'InvertNumber' (inversion). After addition and substraction one should
+// and 'InvertNumber' (inversion). After addition and subtraction one should
 // apply 'SimplifyPoly' to the result to reduce the result w.r.t. 'mpoly'.
-// This is done by reducing each coefficient seperately, which is more
+// This is done by reducing each coefficient separately, which is more
 // efficient for polynomials with many terms.
 
+
+LIB "primitiv.lib";
+LIB "primdec.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Roots(poly f)
 "USAGE:   Roots(f); poly f
-PUROPSE: compute all roots of f in a finite extension of the groundfield
+PURPOSE: compute all roots of f in a finite extension of the groundfield
          without multiplicities.
 RETURN:  ring, a polynomial ring over an extension field of the ground field,
          containing a list 'roots', poly 'newA', poly 'f':
@@ -173,16 +162,16 @@ example
 
 proc RootsMain(poly f)
 "USAGE:   RootsMain(f); poly f
-PUROPSE: compute all roots of f in a finite extension of the groundfield
+PURPOSE: compute all roots of f in a finite extension of the groundfield
          without multiplicities.
 RETURN:  list, all entries are polynomials
   _[1] = roots of f, each entry is a polynomial
-  _[2] = 'newA'  - if the groundfield is Q(a') and the extension field is Q(a), then
-         'newA' is the representation of a' in Q(a)
+  _[2] = 'newA'  - if the groundfield is Q(a') and the extension field
+               is Q(a), then 'newA' is the representation of a' in Q(a)
   _[3] = minpoly of the algebraic extension of the groundfield
 ASSUME:  basering = Q[x,a]
    ideal mpoly must be defined, it might be 0 !
-NOTE: might change teh ideal mpoly !!
+NOTE:    might change the ideal mpoly !!
 EXAMPLE: example  Roots; shows an example
 "
 {
@@ -314,7 +303,7 @@ EXAMPLE: example  Roots; shows an example
 
 proc ZeroSet(ideal I, list #)
 "USAGE:   ZeroSetMain(ideal I [, int opt]); ideal I, int opt
-PUROPSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
+PURPOSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
          of the groundfield.
 RETURN:  ring, a polynomial ring over an extension field of the ground field,
          containing a list 'zeroset', a polynomial 'newA', and an ideal 'id'.
@@ -326,12 +315,12 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
            'newA' = 'a'. If the basering does not contain a parameter then
            'newA' = 'a' (default).
    - 'id' is the ideal 'I'  in Q(a)[x_1,...] (a' substituted by 'newA')
-ASSUME:  dim(I) = 0, and ground field to be Q or a simple extension of Q given
-         by a minpoly.
+ASSUME:  dim(I) = 0, and ground field to be Q or a simple extension of Q
+         given by a minpoly.
 OPTIONS: opt = 0 no primary decomposition (default)
    opt > 0 primary decomposition
-NOTE:    If I contains an algebraic number (parameter) then 'I' must be transformed
-         w.r.t. 'newA' in the new ring.
+NOTE:    If I contains an algebraic number (parameter) then 'I' must be
+         transformed w.r.t. 'newA' in the new ring.
 EXAMPLE: example ZeroSet; shows an example
 "
 {
@@ -419,7 +408,7 @@ proc InvertNumberMain(poly f)
 PURPOSE: compute 1/f if f is a number in Q(a) i.e., f is represented by a
          polynomial in Q[a].
 RETURN:  poly 1/f
-ASSUME:  basering = Q[x_1,...,x_n,a], ideal 'mpoly' must be defined and != 0 !
+ASSUME:  basering = Q[x_1,...,x_n,a], ideal 'mpoly' must be defined and != 0
 "
 {
   if(diff(f, var(1)) != 0) { ERROR("number must not contain variable !");}
@@ -458,7 +447,7 @@ ASSUME:  basering = Q[x,a], ideal mpoly must be defined, it might be 0 !
 
 proc LeadTerm(poly f, int i)
 "USAGE:   LeadTerm(f); poly f, int i
-PUROPSE: compute the leading coef and term of f w.r.t var(i), where the last
+PURPOSE: compute the leading coef and term of f w.r.t var(i), where the last
          ring variable is treated as a parameter.
 RETURN:  list of polynomials
          _[1] = leading term
@@ -479,7 +468,7 @@ ASSUME:  basering = Q[x_1,...,x_n,a]
 
 proc Quotient(poly f, poly g)
 "USAGE:   Quotient(f, g); poly f, g;
-PUROPSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < g
+PURPOSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < g
 RETURN:  list of polynomials
          _[1] = quotient  q
          _[2] = remainder r
@@ -513,7 +502,7 @@ example
 
 proc QuotientMain(poly f, poly g)
 "USAGE:   QuotientMain(f, g); poly f, g
-PUROPSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < g
+PURPOSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < g
 RETURN:  list of polynomials
          _[1] = quotient  q
          _[2] = remainder r
@@ -537,7 +526,7 @@ EXAMPLE: example  Quotient; shows an example
 
 proc Remainder(poly f, poly g)
 "USAGE:   Remainder(f, g); poly f, g
-PUROPSE: compute the remainder of the division of f by g, i.e. a polynomial r
+PURPOSE: compute the remainder of the division of f by g, i.e. a polynomial r
          s.t. f = g*q + r, deg(r) < g.
 RETURN:  poly
 ASSUME:  basering = Q[x] or Q(a)[x]
@@ -567,7 +556,7 @@ example
 
 proc RemainderMain(poly f, poly g)
 "USAGE:   RemainderMain(f, g); poly f, g
-PUROPSE: compute the remainder r s.t. f = g*q + r, deg(r) < g
+PURPOSE: compute the remainder r s.t. f = g*q + r, deg(r) < g
 RETURN:  poly
 ASSUME:  basering = Q[x,a] and ideal 'mpoly' is defined (it might be 0),
          this represents the ring Q(a)[x] together with 'minpoly'.
@@ -589,8 +578,8 @@ ASSUME:  basering = Q[x,a] and ideal 'mpoly' is defined (it might be 0),
 
 proc EGCD(poly f, poly g)
 "USAGE:   EGCDMain(f, g); poly f, g
-PUROPSE: compute the polynomial gcd of f and g over Q(a)[x]
-RETURN:  poly h s.t. h is a greatest common divisor of f and g (not nec. monic)
+PURPOSE: compute the polynomial gcd of f and g over Q(a)[x]
+RETURN:  poly h st. h is a greatest common divisor of f and g (not nec. monic)
 ASSUME:  basering = Q(a)[t]
 EXAMPLE: example  EGCD; shows an example
 "
@@ -619,7 +608,7 @@ example
 
 proc EGCDMain(poly f, poly g)
 "USAGE:   EGCDMain(f, g); poly f, g
-PUROPSE: compute the polynomial gcd of f and g over Q(a)[x]
+PURPOSE: compute the polynomial gcd of f and g over Q(a)[x]
 RETURN:  poly
 ASSUME:  basering = Q[x,a] and ideal 'mpoly' is defined (it might be 0),
          this represents the ring Q(a)[x] together with 'minpoly'.
@@ -645,9 +634,9 @@ EXAMPLE: example EGCD; shows an example
 
 proc MEGCD(poly f, poly g, int varIndex)
 "USAGE:   MEGCD(f, g, i); poly f, g; int i
-PUROPSE: compute  the polynomial gcd of f and g in the i'th variable
+PURPOSE: compute  the polynomial gcd of f and g in the i'th variable
 RETURN:  poly
-ASSUME:  f, g are polynomials in var(i), last variable is the algebraic number
+ASSUME:  f, g are polynomials in var(i),last variable is the algebraic number
 EXAMPLE: example  MEGCD; shows an example
 "
 // might be extended to return s1, s2 s.t. f*s1 + g*s2 = gc
@@ -680,7 +669,7 @@ EXAMPLE: example  MEGCD; shows an example
 
 proc SQFRNorm(poly f)
 "USAGE:   SQFRNorm(f); poly f
-PUROPSE: compute the norm of the squarefree polynomial f in Q(a)[x].
+PURPOSE: compute the norm of the squarefree polynomial f in Q(a)[x].
 RETURN:  list
          _[1] = squarefree norm of g (poly)
          _[2] = g (= f(x - s*a)) (poly)
@@ -712,7 +701,7 @@ example
 
 proc SQFRNormMain(poly f)
 "USAGE:   SQFRNorm(f); poly f
-PUROPSE: compute the norm of the squarefree polynomial f in Q(a)[x].
+PURPOSE: compute the norm of the squarefree polynomial f in Q(a)[x].
 RETURN:  list
          _[1] = squarefree norm of g (poly)
          _[2] = g (= f(x - s*a)) (poly)
@@ -762,12 +751,13 @@ EXAMPLE: example  SqfrNorm; shows an example
 
 proc Factor(poly f)
 "USAGE:   Factor(f); poly f
-PUROPSE: compute the factorization of the squarefree poly f over Q(a)[t], minpoly  = p(a).
+PURPOSE: compute the factorization of the squarefree poly f over Q(a)[t],
+         where minpoly  = p(a).
 RETURN:  list
          _[1] = factors (monic), first entry is the leading coefficient
          _[2] = multiplicities (not yet)
-ASSUME:  basering must be the univariate polynomial ring over a field which is Q
-         or a simple extension of Q given by a minpoly.
+ASSUME:  basering must be the univariate polynomial ring over a field which
+         is Q or a simple extension of Q given by a minpoly.
 NOTE:    if basering = Q[t] then this is the built-in 'factorize'.
 EXAMPLE: example  Factor; shows an example
 "
@@ -798,7 +788,8 @@ example
 
 proc FactorMain(poly f)
 "USAGE:   FactorMain(f); poly f
-PUROPSE: compute the factorization of the squarefree poly f over Q(a)[t], minpoly  = p(a).
+PURPOSE: compute the factorization of the squarefree poly f over Q(a)[t],
+         where minpoly  = p(a).
 RETURN:  list
          _[1] = factors, first is a constant
          _[2] = multiplicities (not yet)
@@ -853,7 +844,7 @@ EXAMPLE: example  Factor; shows an example
 
 proc ZeroSetMain(ideal I, int primDecQ)
 "USAGE:   ZeroSetMain(ideal I, int opt); ideal I, int opt
-PUROPSE: compute the zero-set of the zero-dim. ideal I, in a simple extension
+PURPOSE: compute the zero-set of the zero-dim. ideal I, in a simple extension
          of the groundfield.
 RETURN:  list
    - 'f' is the polynomial f in  Q(a) (a' being substituted by newA)
@@ -864,8 +855,8 @@ RETURN:  list
                 If the basering contains a parameter 'a' and the minpoly
                 remains unchanged then 'newA' = 'a'. If the basering does not
                 contain a parameter then 'newA' = 'a' (default).
-         _[3] = 'mpoly' (ideal), the minimal polynomial of the simple extension
-                of the ground field.
+         _[3] = 'mpoly' (ideal), the minimal polynomial of the simple
+                extension of the ground field.
 ASSUME: basering = K[x_1,x_2,...,x_n] where K = Q or a simple extension of Q
         given by a minpoly.
   dim(I) = 0.
@@ -943,11 +934,11 @@ and keep track of the minimal polynomials ");
 
 proc ZeroSetMainWork(ideal id, intvec wt, int sVars)
 "USAGE:   ZeroSetMainWork(I, wt, sVars);
-PUROPSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
+PURPOSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
          of the groundfield (without multiplicities).
 RETURN:  list, all entries are polynomials
          _[1] = zeros, each entry is an ideal
-         _[2] = newA; if the groundfield is Q(a') this is the rep. of a' w.r.t. a
+         _[2] = newA; if the groundfield is Q(a') this is the rep. of a' wrt a
          _[3] = minpoly of the algebraic extension of the groundfield (ideal)
          _[4] = name of algebraic number (default = 'a')
 ASSUME:  basering = Q[x_1,x_2,...,x_n,a]
@@ -1107,7 +1098,7 @@ RETURN:  list
 
 proc NonLinearZeroSetMain(ideal I, intvec wt)
 "USAGE:   ZeroSetMainWork(I, wt, sVars);
-PUROPSE: solves the (nonlinear) univariate polynomials in I
+PURPOSE: solves the (nonlinear) univariate polynomials in I
          of the groundfield (without multiplicities).
 RETURN:  list, all entries are polynomials
          _[1] = list of solutions
@@ -1195,7 +1186,7 @@ NOTE:    might change 'mpoly' !!
 
 static proc ExtendSolutions(list solutions, list newSolutions)
 "USAGE:   ExtendSolutions(sols, newSols); list sols, newSols;
-PUROPSE: extend the entries of 'sols' by the entries of 'newSols',
+PURPOSE: extend the entries of 'sols' by the entries of 'newSols',
          each entry of 'newSols' is a number.
 RETURN:  list
 ASSUME:  basering = Q[x_1,...,x_n,a], ideal 'mpoly' must be defined,
@@ -1233,8 +1224,8 @@ static proc MergeSolutions(list sol1, list index1, list sol2, list index2)
 "USAGE:   MergeSolutions(sol1, index1, sol2, index2); all parameters are lists
 RETURN:  list
 PURPOSE: create a list of solutions of size n, each entry of 'sol2' must
-         have size n. 'sol1' is one partial solution (from 'LinearZeroSetMain')
-         'sol2' is a list of partial solutions (from 'NonLinearZeroSetMain')
+         have size n. 'sol1' is one partial solution (from LinearZeroSetMain)
+         'sol2' is a list of partial solutions (from NonLinearZeroSetMain)
 ASSUME:  'sol2' is not empty
 NOTE:   used by 'ZeroSetMainWork'
 {
@@ -1254,7 +1245,7 @@ NOTE:   used by 'ZeroSetMainWork'
 
 static proc SubsMapIdeal(list sol, list index, int opt)
 "USAGE:   SubsMapIdeal(sol,index,opt); list sol, index; int opt;
-PUROPSE: built an ideal I as follows.
+PURPOSE: built an ideal I as follows.
          if i is contained in 'index' then set I[i] = sol[i]
          if i is not contained in 'index' then
          - opt = 0: set I[i] = 0
@@ -1284,7 +1275,7 @@ ASSUME:  size(sol) = size(index) <= nvars(basering)
 
 proc SimplifyZeroset(data)
 "USAGE:   SimplifyZeroset(data); list data
-PUROPSE: reduce the entries of the elements of 'data' w.r.t. the ideal 'mpoly'
+PURPOSE: reduce the entries of the elements of 'data' w.r.t. the ideal 'mpoly'
          'data' is a list of ideals/lists.
 RETURN:  list
 ASSUME:  basering = Q[x_1,...,x_n,a], order = lp
@@ -1305,7 +1296,7 @@ ASSUME:  basering = Q[x_1,...,x_n,a], order = lp
 
 proc Variables(poly f, int n)
 "USAGE:   Variables(f,n); poly f; int n;
-PUROPSE: list of variables among var(1),...,var(n) which occur in f.
+PURPOSE: list of variables among var(1),...,var(n) which occur in f.
 RETURN:  list
 ASSUME:  n <= nvars(basering)
 "
@@ -1324,7 +1315,7 @@ ASSUME:  n <= nvars(basering)
 
 proc ContainedQ(data, f, list #)
 "USAGE:    ContainedQ(data, f [, opt]); list data; f is of any type, int opt
-PUROPSE:  test if 'f' is an element of 'data'.
+PURPOSE:  test if 'f' is an element of 'data'.
 RETURN:   int
           0 if 'f' not contained in 'data'
           1 if 'f' contained in 'data'
@@ -1355,7 +1346,7 @@ OPTIONS:  opt = 0 : use '==' for comparing f with elements from data
 
 proc SameQ(a, b)
 "USAGE:    SameQ(a, b); list/intvec a, b;
-PUROPSE:  test a == b elementwise, i.e., a[i] = b[i].
+PURPOSE:  test a == b elementwise, i.e., a[i] = b[i].
 RETURN:   int
           0 if a != b
           1 if a == b
@@ -1383,7 +1374,7 @@ RETURN:   int
 
 static proc SimplifyPoly(poly f)
 "USAGE:   SimplifyPoly(f); poly f
-PUROPSE: reduces the coefficients of f w.r.t. the ideal 'moly' if they contain
+PURPOSE: reduces the coefficients of f w.r.t. the ideal 'moly' if they contain
          the algebraic number 'a'.
 RETURN:  poly
 ASSUME:  basering = Q[x_1,...,x_n,a]
@@ -1408,8 +1399,8 @@ ASSUME:  basering = Q[x_1,...,x_n,a]
 
 static proc SimplifyData(data)
 "USAGE:   SimplifyData(data); ideal/list data;
-PUROPSE: reduces the entries of 'data' w.r.t. the ideal 'mpoly' if they contain
-         the algebraic number 'a'
+PURPOSE: reduces the entries of 'data' w.r.t. the ideal 'mpoly' if they
+         contain the algebraic number 'a'.
 RETURN:  ideal/list
 ASSUME:  basering = Q[x_1,...,x_n,a]
          ideal 'mpoly' must be defined, it might be 0 !
@@ -1432,11 +1423,11 @@ ASSUME:  basering = Q[x_1,...,x_n,a]
 
 static proc TransferRing(R)
 "USAGE:   TransferRing(R);
-PUROPSE: creates a new ring containing the same variables as R, but without
+PURPOSE: creates a new ring containing the same variables as R, but without
          parameters. If R contains a parameter then this parameter is added
-         as the last variable and 'minpoly' is represented by the ideal 'mpoly'
-         If the basering does not contain a parameter then 'a' is added and
-         'mpoly' = 0.
+         as the last variable and 'minpoly' is represented by the ideal
+         'mpoly'. If the basering does not contain a parameter then 'a' will
+         be added and 'mpoly' = 0.
 RETURN:  ring
 ASSUME:  R = K[x_1,...,x_n] where K = Q or K = Q(a).
 NOTE:    Creates the ring needed for all prodecures with name 'proc-name'Main
@@ -1466,7 +1457,7 @@ NOTE:    Creates the ring needed for all prodecures with name 'proc-name'Main
 
 static proc NewBaseRing()
 "USAGE:   NewBaseRing();
-PUROPSE: creates a new ring, the last variable is added as a parameter.
+PURPOSE: creates a new ring, the last variable is added as a parameter.
          minpoly is set to mpoly[1].
 RETURN:  ring
 ASSUME:  basering = Q[x_1,...,x_n, a], 'mpoly' must be defined
@@ -1507,26 +1498,29 @@ ASSUME:  basering = Q[x_1,...,x_n, a], 'mpoly' must be defined
 // order = 20;
 ring S1 = 0, (s(1..3)), lp;
 ideal I = s(2)*s(3), s(1)^2*s(2)+s(1)^2*s(3)-1, s(1)^2*s(3)^2-s(3), s(2)^4-s(3)^4+s(1)^2, s(1)^4+s(2)^3-s(3)^3, s(3)^5-s(1)^2*s(3);
-ideal mpoly = std(0);
 
 // order = 10
 ring S2 = 0, (s(1..5)), lp;
 ideal I = s(2)+s(3)-s(5), s(4)^2-s(5), s(1)*s(5)+s(3)*s(4)-s(4)*s(5), s(1)*s(4)+s(3)-s(5), s(3)^2-2*s(3)*s(5), s(1)*s(3)-s(1)*s(5)+s(4)*s(5), s(1)^2+s(4)^2-2*s(5), -s(1)+s(5)^3, s(3)*s(5)^2+s(4)-s(5)^3, s(1)*s(5)^2-1;
-ideal mpoly = std(0);
 
 //order = 126
 ring S3 =  0, (s(1..5)), lp;
 ideal I = s(3)*s(4), s(2)*s(4), s(1)*s(3), s(1)*s(2), s(3)^3+s(4)^3-1, s(2)^3+s(4)^3-1, s(1)^3-s(4)^3, s(4)^4-s(4), s(1)*s(4)^3-s(1), s(5)^7-1;
-ideal mpoly = std(0);
 
 // order = 192
 ring S4 = 0, (s(1..4)), lp;
 ideal I = s(2)*s(3)^2*s(4)+s(1)*s(3)*s(4)^2, s(2)^2*s(3)*s(4)+s(1)*s(2)*s(4)^2, s(1)*s(3)^3+s(2)*s(4)^3, s(1)*s(2)*s(3)^2+s(1)^2*s(3)*s(4), s(1)^2*s(3)^2-s(2)^2*s(4)^2, s(1)*s(2)^2*s(3)+s(1)^2*s(2)*s(4), s(1)^3*s(3)+s(2)^3*s(4), s(2)^4-s(3)^4, s(1)*s(2)^3+s(3)*s(4)^3, s(1)^2*s(2)^2-s(3)^2*s(4)^2, s(1)^3*s(2)+s(3)^3*s(4), s(1)^4-s(4)^4, s(3)^5*s(4)-s(3)*s(4)^5, s(3)^8+14*s(3)^4*s(4)^4+s(4)^8-1, 15*s(2)*s(3)*s(4)^7-s(1)*s(4)^8+s(1), 15*s(3)^4*s(4)^5+s(4)^9-s(4), 16*s(3)*s(4)^9-s(3)*s(4), 16*s(2)*s(4)^9-s(2)*s(4), 16*s(1)*s(3)*s(4)^8-s(1)*s(3), 16*s(1)*s(2)*s(4)^8-s(1)*s(2), 16*s(1)*s(4)^10-15*s(2)*s(3)*s(4)-16*s(1)*s(4)^2, 16*s(1)^2*s(4)^9-15*s(1)*s(2)*s(3)-16*s(1)^2*s(4), 16*s(4)^13+15*s(3)^4*s(4)-16*s(4)^5;
-ideal mpoly = std(0);
 
 ring R = (0,a), (x,y,z), lp;
 minpoly = a2 + 1;
 ideal I1 = x2 - 1/2, a*z - 1, y - 2;
 ideal I2 = x3 - 1/2, a*z2 - 3, y - 2*a;
-
 */
+
+
+
+
+
+
+
+
