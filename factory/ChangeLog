@@ -1,0 +1,45 @@
+Fri Jun  6 09:38:05 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in: removed some stupid warnings when 'dangerous'
+	  combinations of with's/enable's are specified
+	  some other fixes in configures messages
+	  doc fix
+	  (AC_ARG_ENABLE(memdebug)): removed code which sets
+	  enable_memdebug to 'normal' since this is really never tested
+	  (AC_ARG_WITH(gmp, builtingmp)): new command line options.  rest
+	  of configure.in adapted to the new scheme of specifying where
+	  gmp lives
+
+	* GNUmakefile.in (distsrc): gengftables added to the distribution
+	  (distfiles): ChangeLog added to the distribution
+	  (clean): gengftables added
+
+Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in: --with-Singular --enable-debugoutput is now
+	  possible.  so is --with-Singular --enable-timing
+
+	* GNUmakefile.in (gengftables.o): added check which makes make
+	  complain if factory was not configured in the right way
+
+	* configure.in: removed checks on sizeof(int) == sizeof(void *)
+	  == 4
+
+	* debug.h: removed dependency on NDEBUG
+
+	* factoryconf.template: doc fix
+
+	* config.h.in: config.h.in is now a real source file and not
+	  longer created from acconfig.h
+	  (INCL_CONFIG_H): added flag to prevent multiple inclusion of
+ 	  config.h
+
+	* GNUmakefile.in ($(srcdir)/configure): make will not complain
+	  about a missing autoconf any longer
+	  ($(srcdir)/config.h.in, $(srcdir)/stamp-h.in,
+ 	  realmaintainerclean, dist, distfiles): instead of creating
+ 	  config.h.in we will deliver it as a real source file
+
+	* canonicalform.cc (operator >>): returns 0 now when compiled with
+	  Singular and with stream IO enabled
+
