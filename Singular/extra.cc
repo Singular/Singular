@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.128 1999-12-08 16:47:04 obachman Exp $ */
+/* $Id: extra.cc,v 1.129 1999-12-08 16:49:06 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -51,6 +51,8 @@
 #include "feOpt.h"
 #include "distrib.h"
 #include "prCopy.h"
+#include "mpr_complex.h"
+
 #ifdef HAVE_SPECTRUM
 #include "spectrum.h"
 #endif
@@ -613,8 +615,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #include <hc_newton.h>
 #endif
 #include "mpsr.h"
-
-#include "mpr_complex.h"
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
