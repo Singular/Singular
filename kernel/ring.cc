@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.22 2004-10-12 16:16:37 Singular Exp $ */
+/* $Id: ring.cc,v 1.23 2004-10-13 10:50:37 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3527,26 +3527,27 @@ static void rOppWeight(int *w, int l)
     w[l-j]=t; 
   }
 }
+
 #define rOppVar(R,I) (rVar(R)+1-I)
 
 ring rOpposite(ring src)
   /* creates an opposite algebra of R */
   /* that is R^opp, where f (*^opp) g = g*f  */
 {
-  ring save=currRing;  
-  ring r=rCopy0(src);
+  ring save = currRing;  
+  ring    r = rCopy0(src);
   // change vars v1..vN -> vN..v1
   int i;
-  int i2=(rVar(r)-1)/2;
-  for(int i=i2; i>=0; i--)
+  int i2 = (rVar(r)-1)/2;
+  for(i=i2; i>=0; i--)
   {
     // index: 0..N-1
     //Print("ex var names: %d <-> %d\n",i,rOppVar(r,i));
     // exchange names
     char *p;
-    p=r->names[rVar(r)-1-i];
-    r->names[rVar(r)-1-i]=r->names[i];
-    r->names[i]=p;
+    p = r->names[rVar(r)-1-i];
+    r->names[rVar(r)-1-i] = r->names[i];
+    r->names[i] = p;
   }
 //  i2=(rVar(r)+1)/2;
 //  for(int i=i2; i>0; i--)
@@ -3563,8 +3564,8 @@ ring rOpposite(ring src)
   for (i=rVar(r)-1; i>=0; i--)
   {
     char *p=r->names[i];
-    if(isupper(*p)) *p=tolower(*p);
-    else            *p=toupper(*p);
+    if(isupper(*p)) *p = tolower(*p);
+    else            *p = toupper(*p);
   }
   // change ordering: listing
   // change ordering: compare
@@ -3608,7 +3609,7 @@ ring rOpposite(ring src)
 //       break;
 //    }
 //  }
-  // Change order/block structurea (needed for rPrint, rAdd etc.)
+  // Change order/block structures (needed for rPrint, rAdd etc.)
   int j=0;
   int l=rBlocks(src);
   for(i=0; src->order[i]!=0; i++)
@@ -3724,10 +3725,9 @@ ring rOpposite(ring src)
   } 
   rComplete(r);
 #ifdef RDEBUG
-   rDebugPrint(r);
+  //   rDebugPrint(r);
 #endif
   rTest(r);
-  /* DO NOT CALL: rComplete(r); - it is all done */
 #ifdef HAVE_PLURAL
   /* now, we initialize a non-comm structure on r */
   if (!rIsPluralRing(src))
@@ -3737,13 +3737,13 @@ ring rOpposite(ring src)
   {
   rChangeCurrRing(r);  
   /* basic nc constructions  */
-  r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
-  r->nc->ref = 1; /* in spite of Copy(src)? */
+  r->nc           = (nc_struct *)omAlloc0(sizeof(nc_struct));
+  r->nc->ref      = 1; /* in spite of rCopy(src)? */
   r->nc->basering = r;
-  r->nc->type =  src->nc->type;
-  int *perm = (int *)omAlloc0((rVar(r)+1)*sizeof(int));
-  int *par_perm = NULL;
-  nMapFunc nMap = nSetMap(src);
+  r->nc->type     =  src->nc->type;
+  int *perm       = (int *)omAlloc0((rVar(r)+1)*sizeof(int));
+  int *par_perm   = NULL;
+  nMapFunc nMap   = nSetMap(src);
   int j;
   int ni,nj;
   for(i=1; i<=r->N; i++)
@@ -3781,9 +3781,9 @@ ring rEnvelope(ring R)
   /* that is R^e = R \tensor_K R^opp */
 {
   ring Ropp = rOpposite(R);
-  ring Renv=NULL;
+  ring Renv = NULL;
   int stat = rSum(R, Ropp, Renv);
-  if (stat <=0)
+  if ( stat <=0 )
     WarnS("Error in rEnvelope at rSum");
   return Renv;
 }
