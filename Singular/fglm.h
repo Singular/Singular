@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.3 1997-03-27 16:11:40 Singular Exp $
+// $Id: fglm.h,v 1.4 1997-08-15 08:08:55 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -21,10 +21,8 @@
 
 #include "polys.h"
 #include "fglmvec.h"
-#ifndef NOSTREAMIO
-#include <iostream.h>
-#endif
 
+// internal Version: 1.10.1.4
 // Some data types needed by the fglm algorithm. claptmpl.cc has to know them.
 class fglmSelem
 {
@@ -38,9 +36,6 @@ public:
     BOOLEAN isBasisOrEdge() const { return ( (divisors[0] == numVars) ? TRUE : FALSE ); }
     void newDivisor( int var ) { divisors[ ++divisors[0] ]= var; }
 };
-#ifndef NOSTREAMIO
-ostream & operator << ( ostream &, const fglmSelem & );
-#endif
 
 class fglmDelem
 {
@@ -55,9 +50,6 @@ public:
     BOOLEAN isBasisOrEdge() const { return ( (insertions == 0) ? TRUE : FALSE ); }
     void newDivisor() { insertions--; }
 };
-#ifndef NOSTREAMIO
-ostream & operator << ( ostream &, const fglmDelem & );
-#endif
 
 // fglmzero(...):
 // The fglm algorithm for 0-dimensional ideals. ( fglmzero is defined in fglmzero.cc )

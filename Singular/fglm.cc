@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.9 1997-08-01 10:53:05 Singular Exp $ 
+// $Id: fglm.cc,v 1.10 1997-08-15 08:09:15 Singular Exp $ 
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -16,10 +16,6 @@
 
 #include "mod2.h"
 
-#ifndef NOSTREAMIO
-#include <iostream.h>
-#endif
-
 #ifdef HAVE_FGLM
 #include "tok.h"
 #include "structs.h"
@@ -34,6 +30,7 @@
 #include "kstd1.h"   
 #include "fglm.h"
 
+// internal Version: 1.18.1.6
 //     enumeration to handle the various errors to occour.
 enum FglmState{ 
     FglmOk, 
