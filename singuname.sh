@@ -80,7 +80,7 @@ then
 	exit 1
     fi
 # DecAlpha ########################################################
-elif (echo $uname_a | $egrep "Alpha" > $devnull)
+elif (echo $uname_a | $egrep "alpha" > $devnull)
 then
     prefix=DecAlpha
     if (echo $uname_a | $egrep "Linux" > $devnull)
