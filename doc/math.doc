@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.56 2000-07-04 17:16:48 obachman Exp $
+@comment $Id: math.doc,v 1.57 2000-08-24 12:11:00 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -579,7 +579,8 @@ x^7+y^7+z^7=0
 @end ifinfo
 has Milnor number 216 and geometrical
 genus 35. Its spectrum consists of the 16 different rationals
-@*@tex
+@*
+@tex
 ${3 \over 7}, {4 \over 7}, {5 \over 7}, {6 \over 7}, {1 \over 1},
 {8 \over 7}, {9 \over 7}, {10 \over 7}, {11 \over 7}, {12 \over 7},
 {13 \over 7}, {2 \over 1}, {15 \over 7}, {16 \over 7}, {17 \over 7},
