@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.197 1999-12-21 11:44:02 Singular Exp $ */
+/* $Id: iparith.cc,v 1.198 2000-01-11 17:51:15 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -122,7 +122,7 @@ int iiOp; /* the current operation*/
 cmdnames cmds[] =
 {  // name-string alias tokval          toktype
   { "$INVALID$",   0, -1,                 0},
-  { "and",         0, '&' ,               '&'},
+  { "and",         0, '&' ,               LOGIC_OP},
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
   { "bareiss",     0, BAREISS_CMD ,       CMD_123},
   { "betti",       0, BETTI_CMD ,         CMD_12},
@@ -147,7 +147,7 @@ cmdnames cmds[] =
   { "det",         0, DET_CMD ,           CMD_1},
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_1},
-  { "div",         0, INTDIV_CMD ,        '/'},
+  { "div",         0, INTDIV_CMD ,        MULDIV_OP},
 #ifdef DRING
   { "dring",       0, DRING_CMD ,         DRING_CMD},
 #endif
@@ -221,7 +221,7 @@ cmdnames cmds[] =
   { "minbase",     0, MINBASE_CMD ,       CMD_1},
   { "minor",       0, MINOR_CMD ,         CMD_23},
   { "minres",      0, MINRES_CMD ,        CMD_1},
-  { "mod",         0, INTMOD_CMD ,        '%'},
+  { "mod",         0, INTMOD_CMD ,        MULDIV_OP},
   { "module",      0, MODUL_CMD ,         MODUL_CMD},
   { "modulo",      0, MODULO_CMD ,        CMD_2},
   { "monitor",     0, MONITOR_CMD ,       CMD_12},
@@ -248,7 +248,7 @@ cmdnames cmds[] =
   { "nvars",       0, NVARS_CMD ,         CMD_1},
   { "open",        0, OPEN_CMD ,          CMD_1},
   { "option",      0, OPTION_CMD ,        CMD_M},
-  { "or",          0, '|' ,               '|'},
+  { "or",          0, '|' ,               LOGIC_OP},
   { "ord",         0, ORD_CMD ,           CMD_1},
   { "ordstr",      0, ORDSTR_CMD ,        CMD_1},
   { "package",     0, PACKAGE_CMD ,       ROOT_DECL},

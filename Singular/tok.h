@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.35 1999-12-21 11:44:01 Singular Exp $ */
+/* $Id: tok.h,v 1.36 2000-01-11 17:51:15 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -35,6 +35,13 @@ inline int min(const int a, const int b)  { return (a<b) ? a : b; }
 #define max(A,B) ((A) > (B) ? (A) : (B))
 #define min(A,B) ((A) < (B) ? (A) : (B))
 #endif
+
+/* the follwing defines for infix operators should not be changed: *
+*  grammar.y does not use the symbolic names                       *
+*  scanner.l uses the identies for some optimzations              */
+#define LOGIC_OP         '&'
+#define MULDIV_OP        '/'
+#define COMP_OP          '<'
 
 #define COMMAND           UMINUS+2 /* in tok.h */
 #define ANY_TYPE          UMINUS+3

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.77 1999-12-21 11:44:01 Singular Exp $ */
+/* $Id: grammar.y,v 1.78 2000-01-11 17:51:14 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -287,18 +287,18 @@ void yyerror(char * fmt)
 %type <i>    ringcmd1
 
 %type <i>    '=' '<' '>' '+' '-' COLONCOLON
-%type <i>    '*' '/' '[' ']' '^' ',' ';'
+%type <i>    '/' '[' ']' '^' ',' ';'
 
 
 /*%nonassoc '=' PLUSEQUAL DOTDOT*/
 /*%nonassoc '=' DOTDOT COLONCOLON*/
 %nonassoc '=' DOTDOT
 %left ','
-%left '|' '&'
+%left '&'
 %left EQUAL_EQUAL NOTEQUAL
-%left '<' '>' GE LE
+%left '<'
 %left '+' '-'
-%left '*' '/' '%'
+%left '/'
 %left UMINUS NOT
 %left  '^'
 %left '[' ']'
@@ -743,10 +743,6 @@ expr_arithmetic:
           {
             if(iiExprArith2(&$$,&$1,'-',&$3)) YYERROR;
           }
-        | expr '*' expr
-          {
-            if(iiExprArith2(&$$,&$1,'*',&$3)) YYERROR;
-          }
         | expr '/' expr
           {
             if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
@@ -755,25 +751,13 @@ expr_arithmetic:
           {
             if(iiExprArith2(&$$,&$1,'^',&$3)) YYERROR;
           }
-        | expr '%' expr
+        | expr '<' expr
           {
             if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
-        | expr '>' expr
-          {
-            if(iiExprArith2(&$$,&$1,'>',&$3)) YYERROR;
-          }
-        | expr '<' expr
-          {
-            if(iiExprArith2(&$$,&$1,'<',&$3)) YYERROR;
-          }
         | expr '&' expr
           {
-            if(iiExprArith2(&$$,&$1,'&',&$3)) YYERROR;
-          }
-        | expr '|' expr
-          {
-            if(iiExprArith2(&$$,&$1,'|',&$3)) YYERROR;
+            if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
         | expr NOTEQUAL expr
           {
@@ -782,14 +766,6 @@ expr_arithmetic:
         | expr EQUAL_EQUAL expr
           {
             if(iiExprArith2(&$$,&$1,EQUAL_EQUAL,&$3)) YYERROR;
-          }
-        | expr GE  expr
-          {
-            if(iiExprArith2(&$$,&$1,GE,&$3)) YYERROR;
-          }
-        | expr LE expr
-          {
-            if(iiExprArith2(&$$,&$1,LE,&$3)) YYERROR;
           }
         | expr DOTDOT expr
           {
@@ -1061,7 +1037,8 @@ executecmd:
 
 filecmd:
         '<' stringexpr
-          { if((feFilePending=feFopen($2,"r",NULL,TRUE))==NULL) YYERROR; }
+          { if ($<i>1 != '<') YYERROR;
+	    if((feFilePending=feFopen($2,"r",NULL,TRUE))==NULL) YYERROR; }
         ';'
           { newFile($2,feFilePending); }
         ;

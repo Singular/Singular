@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.25 1999-12-06 16:06:51 obachman Exp $ */
+/* $Id: scanner.l,v 1.26 2000-01-11 17:51:14 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -246,10 +246,10 @@ proc[ \t]+{name}[ \t]*\( {
 "--"                     { return MINUSMINUS; }
 "++"                     { return PLUSPLUS  ; }
 "=="                     { return EQUAL_EQUAL; }
-"&&"                     { return '&'; }
-"||"                     { return '|'; }
-"<="                     { return LE; }
-">="                     { return GE; }
+"&&"                     { lvalp->i='&'; return LOGIC_OP; }
+"||"                     { lvalp->i='|'; return LOGIC_OP; }
+"<="                     { lvalp->i=LE; return COMP_OP; }
+">="                     { lvalp->i=GE; return COMP_OP; }
 "!"                      { return NOT; }
 "!="                     { return NOTEQUAL; }
 "<>"                     { return NOTEQUAL; }
@@ -290,7 +290,7 @@ newline                  {
                            lvalp->name = (char *)yytext;
                            return RINGVAR;
                          }
-[0-9]+\."e"[+-][0-9]+    { 
+[0-9]+\."e"[+-][0-9]+    {
                            lvalp->name = (char *)yytext;
                            return RINGVAR;
                          }
@@ -298,7 +298,7 @@ newline                  {
                            lvalp->name = (char *)yytext;
                            return RINGVAR;
                          }
-       
+
 ({parname}|{name})       {
                            /* {name} */
                            int rc=0;
@@ -317,8 +317,24 @@ newline                  {
 
 .                       {
                            /*if (*yytext == '\n') REJECT;*/
-                           lvalp->i = *yytext;   /* token has own value */
-                           return *yytext;
+			   register char ch= *yytext;
+                           lvalp->i = ch;
+			   switch(ch)
+			   {
+			     /* case '&': */
+			     case '|':
+                               return LOGIC_OP;
+			     /* case '/': */
+			     case '%':
+			     case '*':
+                               return MULDIV_OP;
+			     /* case '<': */
+			     case '>':
+			       return COMP_OP;
+			     default:
+			       break;
+			    }
+                            return ch;
                          }
 %%
 
