@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.18 1998-05-18 19:12:43 wichmann Exp $
+@comment $Id: examples.doc,v 1.19 1998-05-18 20:28:30 wichmann Exp $
 @comment this file contains the examples
 
 @ifinfo
@@ -221,48 +221,48 @@ lists may be empty.)
 @end itemize
 
 @example
-  LIB "sing.lib";
-  // you should get the information that sing.lib has been loaded
-  // together with some other libraries which are needed by sing.lib
-  option(noprot);
-  ring r = 0,(x,y),ds;
-  poly f = x7+y7+(x-y)^2*x2y2;
-  milnor(f);
-  @expansion{} 28
-  tjurina(f);
-  @expansion{} 24
+LIB "sing.lib";
+// you should get the information that sing.lib has been loaded
+// together with some other libraries which are needed by sing.lib
+option(noprot);
+ring r = 0,(x,y),ds;
+poly f = x7+y7+(x-y)^2*x2y2;
+milnor(f);
+@expansion{} 28
+tjurina(f);
+@expansion{} 24
 
-  proc mil (poly g)
-  @{
-     "Milnor number:";
-     return(vdim(std(jacob(g))));
-  @}
-  mil(f);
-  @expansion{} Milnor number:
-  @expansion{} 28
+proc mil (poly g)
+@{
+   "Milnor number:";
+   return(vdim(std(jacob(g))));
+@}
+mil(f);
+@expansion{} Milnor number:
+@expansion{} 28
 
-  proc tjur
-  @{
-     "Tjurina number:";
-     return(vdim(std(jacob(#[1])+#[1])));
-  @}
-  tjur(f);
-  @expansion{} Tjurina number:
-  @expansion{} 24
+proc tjur
+@{
+   "Tjurina number:";
+   return(vdim(std(jacob(#[1])+#[1])));
+@}
+tjur(f);
+@expansion{} Tjurina number:
+@expansion{} 24
 
-  proc milrina (poly f)
-  @{
-     ideal j=jacob(f);
-     list L=vdim(std(j)),vdim(std(j+f));
-     return(L);
-  @}
-  milrina(f);     // a list containing Milnor and Tjurina number
-  @expansion{} [1]:
-  @expansion{}    28
-  @expansion{} [2]:
-  @expansion{}    24
-  milrina(f)[2];  // the second element of the list
-  @expansion{} 24
+proc milrina (poly f)
+@{
+   ideal j=jacob(f);
+   list L=vdim(std(j)),vdim(std(j+f));
+   return(L);
+@}
+milrina(f);     // a list containing Milnor and Tjurina number
+@expansion{} [1]:
+@expansion{}    28
+@expansion{} [2]:
+@expansion{}    24
+milrina(f)[2];  // the second element of the list
+@expansion{} 24
 @end example
 
 @c ----------------------------------------------------------------------------
@@ -432,77 +432,77 @@ the time needed for a standard basis computation is used in the
 computation of the coefficients (in char 0).
 
 @example
-  timer = 1;                              // activate the timer
-  option(prot);
-  ring R0 = 0,(x,y),lp;
-  poly f = x5+y11+xy9+x3y9;
-  ideal i = jacob(f);
-  ideal i1 = i,i[1]*i[2];                 // undeformed ideal
-  ideal i2 = i,i[1]*i[2]+1/1000000*x5y8;  // deformation of i1
-  i1; i2;
-  @expansion{} i1[1]=5x4+3x2y9+y9
-  @expansion{} i1[2]=9x3y8+9xy8+11y10
-  @expansion{} i1[3]=45x7y8+27x5y17+45x5y8+55x4y10+36x3y17+33x2y19+9xy17+11y19
-  @expansion{} i2[1]=5x4+3x2y9+y9
-  @expansion{} i2[2]=9x3y8+9xy8+11y10
-  @expansion{} i2[3]=45x7y8+27x5y17+45000001/1000000x5y8+55x4y10+36x3y17
-  @expansion{} +33x2y19+9xy17+11y19
-  ideal j = std(i1);
-  @expansion{} V19-s20.s21(1)s22(2)23-s27.s28.s29.s30.s31.s32.s33.s34.s35.s36
-  @expansion{} .s37.s38.s39.s40.s.70-
-  @expansion{} product criterion:1 chain criterion:30
-  @expansion{} //used time: 1.9 sec
-  j;
-  @expansion{} j[1]=264627y39+26244y35-1323135y30-131220y26+1715175y21
-  @expansion{} +164025y17+1830125y16
-  @expansion{} j[2]=-12103947791971846719838321886393392913750065060875xy8
-  @expansion{} +286391521141683198701331939250003266767738632875y38
-  @expansion{} +3195440220690902692676462287757356578554430672591y37
-  @expansion{} -57436621420822663849721381265738895282846320y36
-  @expansion{} -1657764214948799497573918210031067353932439400y35
-  @expansion{} -21301848158930819119567722389898682697001205500y34
-  @expansion{} -1822194158663066565585991976961565719648069806148y33
-  @expansion{} +4701709279892816135156972313196394005220175y32
-  @expansion{} +135187226968819226760078697600850686824231975y31
-  @expansion{} +3873063305929810816961516976025038053001141375y30
-  @expansion{} -1325886675843874047990382005421144061861290080000y29
-  @expansion{} -15977201954760631419467945895542406089526966887310y28
-  @expansion{} +262701813363090926606333480026253304267126525y27
-  @expansion{} +7586082690893335269027136248944859544727953125y26
-  @expansion{} +86785307410649464602285843351672148965395945625y25
-  @expansion{} +5545808143273594102173252331151835700278863924745y24
-  @expansion{} -19075563013460437364679153779038394895638325y23
-  @expansion{} -548562322715501761058348996776922561074021125y22
-  @expansion{} -15746545267764838607395746471568100780933983125y21
-  @expansion{} +1414279129721176222978654235817359505555191156250y20
-  @expansion{} +20711190069445893615213399650035715378169943423125y19
-  @expansion{} -272942733337472665573418092977905322984009750y18
-  @expansion{} -7890651158453345058018472946774133657209553750y17
-  @expansion{} -63554897038491686787729656061044724651089803125y16
-  @expansion{} +22099251729923906699732244761028266074350255961625y14
-  @expansion{} -14793713967965590435357948972258591339027857296625y10
-  @expansion{} j[3]=5x4+3x2y9+y9
+timer = 1;                              // activate the timer
+option(prot);
+ring R0 = 0,(x,y),lp;
+poly f = x5+y11+xy9+x3y9;
+ideal i = jacob(f);
+ideal i1 = i,i[1]*i[2];                 // undeformed ideal
+ideal i2 = i,i[1]*i[2]+1/1000000*x5y8;  // deformation of i1
+i1; i2;
+@expansion{} i1[1]=5x4+3x2y9+y9
+@expansion{} i1[2]=9x3y8+9xy8+11y10
+@expansion{} i1[3]=45x7y8+27x5y17+45x5y8+55x4y10+36x3y17+33x2y19+9xy17+11y19
+@expansion{} i2[1]=5x4+3x2y9+y9
+@expansion{} i2[2]=9x3y8+9xy8+11y10
+@expansion{} i2[3]=45x7y8+27x5y17+45000001/1000000x5y8+55x4y10+36x3y17
+@expansion{} +33x2y19+9xy17+11y19
+ideal j = std(i1);
+@expansion{} V19-s20.s21(1)s22(2)23-s27.s28.s29.s30.s31.s32.s33.s34.s35.s36
+@expansion{} .s37.s38.s39.s40.s.70-
+@expansion{} product criterion:1 chain criterion:30
+@expansion{} //used time: 1.9 sec
+j;
+@expansion{} j[1]=264627y39+26244y35-1323135y30-131220y26+1715175y21
+@expansion{} +164025y17+1830125y16
+@expansion{} j[2]=-12103947791971846719838321886393392913750065060875xy8
+@expansion{} +286391521141683198701331939250003266767738632875y38
+@expansion{} +3195440220690902692676462287757356578554430672591y37
+@expansion{} -57436621420822663849721381265738895282846320y36
+@expansion{} -1657764214948799497573918210031067353932439400y35
+@expansion{} -21301848158930819119567722389898682697001205500y34
+@expansion{} -1822194158663066565585991976961565719648069806148y33
+@expansion{} +4701709279892816135156972313196394005220175y32
+@expansion{} +135187226968819226760078697600850686824231975y31
+@expansion{} +3873063305929810816961516976025038053001141375y30
+@expansion{} -1325886675843874047990382005421144061861290080000y29
+@expansion{} -15977201954760631419467945895542406089526966887310y28
+@expansion{} +262701813363090926606333480026253304267126525y27
+@expansion{} +7586082690893335269027136248944859544727953125y26
+@expansion{} +86785307410649464602285843351672148965395945625y25
+@expansion{} +5545808143273594102173252331151835700278863924745y24
+@expansion{} -19075563013460437364679153779038394895638325y23
+@expansion{} -548562322715501761058348996776922561074021125y22
+@expansion{} -15746545267764838607395746471568100780933983125y21
+@expansion{} +1414279129721176222978654235817359505555191156250y20
+@expansion{} +20711190069445893615213399650035715378169943423125y19
+@expansion{} -272942733337472665573418092977905322984009750y18
+@expansion{} -7890651158453345058018472946774133657209553750y17
+@expansion{} -63554897038491686787729656061044724651089803125y16
+@expansion{} +22099251729923906699732244761028266074350255961625y14
+@expansion{} -14793713967965590435357948972258591339027857296625y10
+@expansion{} j[3]=5x4+3x2y9+y9
 
-  // Compute average coefficient length (=51) by
-  //   - converting j[2] to a string in order to compute the number
-  //   of characters
-  //   - divide this by the number of monomials:
-  size(string(j[2]))/size(j[2]);
-  @expansion{} 51
-  vdim(j);
-  @expansion{} 63
+// Compute average coefficient length (=51) by
+//   - converting j[2] to a string in order to compute the number
+//   of characters
+//   - divide this by the number of monomials:
+size(string(j[2]))/size(j[2]);
+@expansion{} 51
+vdim(j);
+@expansion{} 63
 
-  // Compute a standard basis for the deformed ideal:
-  j = std(i2);
-  @expansion{} v13.s14(2)s15.s16.19-s.s20.s21.23-
-  @expansion{} product criterion:3 chain criterion:7
-  j;
-  @expansion{} j[1]=y16
-  @expansion{} j[2]=-729xy8+1331y14-891y10
-  @expansion{} j[3]=5x4+3x2y9+y9
-  vdim(j);
-  @expansion{} 40
-  kill R0;
+// Compute a standard basis for the deformed ideal:
+j = std(i2);
+@expansion{} v13.s14(2)s15.s16.19-s.s20.s21.23-
+@expansion{} product criterion:3 chain criterion:7
+j;
+@expansion{} j[1]=y16
+@expansion{} j[2]=-729xy8+1331y14-891y10
+@expansion{} j[3]=5x4+3x2y9+y9
+vdim(j);
+@expansion{} 40
+kill R0;
 @end example
 
 @c ----------------------------------------------------------------------------
@@ -609,47 +609,47 @@ compute the dimension of T2
 @c example
 @end example
 @example
-  // In some cases it might be useful to have a polynomial in some ring
-  // encoding the Hilbert series. This polynomial can then be
-  // differentiated, evaluated etc. It can be done as follows:
-  ring H = 0,t,ls;
-  poly h1;
-  int ii;
-  for (ii=1; ii<=size(v1); ii=ii+1)
-  @{
-     h1=h1+v1[ii]*t^(ii-1);
-  @}
-  h1;                   // 1-st Hilbert series
-  @expansion{} 4-20t+40t2-40t3+20t4-4t5
-  diff(h1,t);           // differentiate  h1
-  @expansion{} -20+80t-120t2+80t3-20t4
-  subst(h1,t,1);        // substitute t by 1
-  @expansion{} 0
+// In some cases it might be useful to have a polynomial in some ring
+// encoding the Hilbert series. This polynomial can then be
+// differentiated, evaluated etc. It can be done as follows:
+ring H = 0,t,ls;
+poly h1;
+int ii;
+for (ii=1; ii<=size(v1); ii=ii+1)
+@{
+   h1=h1+v1[ii]*t^(ii-1);
+@}
+h1;                   // 1-st Hilbert series
+@expansion{} 4-20t+40t2-40t3+20t4-4t5
+diff(h1,t);           // differentiate  h1
+@expansion{} -20+80t-120t2+80t3-20t4
+subst(h1,t,1);        // substitute t by 1
+@expansion{} 0
 
-  // The procedures T1, T2, T12 may be called with two arguments and then
-  // they return a list with more information (type help T1; etc.)
-  // e.g. T12(i,<any>); returns a list with 9 nonempty objects where
-  // _[1] = std basis of T1-module, _[2] = std basis of T2-module,
-  // _[3]= vdim of T1, _[4]= vdim of T2
-  setring r1;           // make r1 again the basering
-  list L = T12(i,1);
-  @expansion{} // dim T1  =  4
-  @expansion{} // dim T2  =  3
-  kbase(L[1]);          // kbase of T1
-  @expansion{} _[1]=1*gen(2)
-  @expansion{} _[2]=1*gen(3)
-  @expansion{} _[3]=1*gen(6)
-  @expansion{} _[4]=1*gen(7)
-  kbase(L[2]);          // kbase of T2
-  @expansion{} _[1]=1*gen(6)
-  @expansion{} _[2]=1*gen(8)
-  @expansion{} _[3]=1*gen(9)
-  L[3];                 // vdim of T1
-  @expansion{} 4
-  L[4];                 // vdim of T2
-  @expansion{} 3
-  killall();            // a procedure from general.lib
-  @expansion{} // ** killing the basering for level 0
+// The procedures T1, T2, T12 may be called with two arguments and then
+// they return a list with more information (type help T1; etc.)
+// e.g. T12(i,<any>); returns a list with 9 nonempty objects where
+// _[1] = std basis of T1-module, _[2] = std basis of T2-module,
+// _[3]= vdim of T1, _[4]= vdim of T2
+setring r1;           // make r1 again the basering
+list L = T12(i,1);
+@expansion{} // dim T1  =  4
+@expansion{} // dim T2  =  3
+kbase(L[1]);          // kbase of T1
+@expansion{} _[1]=1*gen(2)
+@expansion{} _[2]=1*gen(3)
+@expansion{} _[3]=1*gen(6)
+@expansion{} _[4]=1*gen(7)
+kbase(L[2]);          // kbase of T2
+@expansion{} _[1]=1*gen(6)
+@expansion{} _[2]=1*gen(8)
+@expansion{} _[3]=1*gen(9)
+L[3];                 // vdim of T1
+@expansion{} 4
+L[4];                 // vdim of T2
+@expansion{} 3
+killall();            // a procedure from general.lib
+@expansion{} // ** killing the basering for level 0
 @end example
 
 @c ----------------------------------------------------------------------------
@@ -1469,56 +1469,56 @@ Then we compute a standard basis of this ideal and some numerical information.
 (This ideal is used as a classical benchmark for standard basis computations).
 
 @example
-  // We call the procedure 'cyclic':
-  proc cyclic (int n)
-  @{
-     string vs = varstr(basering)+varstr(basering);
-     int c=find(vs,",");
-     while ( c!=0 )
-     @{
-        vs=vs[1,c-1]+vs[c+1,size(vs)];
-        c=find(vs,",");
-     @}
-     string t,s;
-     int i,j;
-     for ( j=1; j<=n-1; j=j+1 )
-     @{
-        t="";
-        for ( i=1; i <=n; i=i+1 )
-        @{
-           t = t + vs[i,j] + "+";
-        @}
-        t = t[1,size(t)-1] + ","+newline;
-        s=s+t;
-     @}
-     s=s+vs[1,n]+"-1";
-     return (s);
-  @}
+// We call the procedure 'cyclic':
+proc cyclic (int n)
+@{
+   string vs = varstr(basering)+varstr(basering);
+   int c=find(vs,",");
+   while ( c!=0 )
+   @{
+      vs=vs[1,c-1]+vs[c+1,size(vs)];
+      c=find(vs,",");
+   @}
+   string t,s;
+   int i,j;
+   for ( j=1; j<=n-1; j=j+1 )
+   @{
+      t="";
+      for ( i=1; i <=n; i=i+1 )
+      @{
+         t = t + vs[i,j] + "+";
+      @}
+      t = t[1,size(t)-1] + ","+newline;
+      s=s+t;
+   @}
+   s=s+vs[1,n]+"-1";
+   return (s);
+@}
 
-  ring r=0,(a,b,c,d,e),lp;         // basering, char 0, lex ordering
-  string sc=cyclic(nvars(basering));
-  sc;                              // the string of the ideal
-  @expansion{} a+b+c+d+e,
-  @expansion{} ab+bc+cd+de+ea,
-  @expansion{} abc+bcd+cde+dea+eab,
-  @expansion{} abcd+bcde+cdea+deab+eabc,
-  @expansion{} abcde-1
-  execute("ideal i="+sc+";");      // this defines the ideal of cyclic roots
-  i;
-  @expansion{} i[1]=a+b+c+d+e
-  @expansion{} i[2]=ab+bc+cd+ae+de
-  @expansion{} i[3]=abc+bcd+abe+ade+cde
-  @expansion{} i[4]=abcd+abce+abde+acde+bcde
-  @expansion{} i[5]=abcde-1
-  timer=1;
-  ideal j=std(i);
-  @expansion{} //used time: 7.5 sec
-  size(j);                         // number of elements in the std basis
-  @expansion{} 11
-  degree(j);
-  @expansion{} // codimension = 5
-  @expansion{} // dimension   = 0
-  @expansion{} // degree      = 70
+ring r=0,(a,b,c,d,e),lp;         // basering, char 0, lex ordering
+string sc=cyclic(nvars(basering));
+sc;                              // the string of the ideal
+@expansion{} a+b+c+d+e,
+@expansion{} ab+bc+cd+de+ea,
+@expansion{} abc+bcd+cde+dea+eab,
+@expansion{} abcd+bcde+cdea+deab+eabc,
+@expansion{} abcde-1
+execute("ideal i="+sc+";");      // this defines the ideal of cyclic roots
+i;
+@expansion{} i[1]=a+b+c+d+e
+@expansion{} i[2]=ab+bc+cd+ae+de
+@expansion{} i[3]=abc+bcd+abe+ade+cde
+@expansion{} i[4]=abcd+abce+abde+acde+bcde
+@expansion{} i[5]=abcde-1
+timer=1;
+ideal j=std(i);
+@expansion{} //used time: 7.5 sec
+size(j);                         // number of elements in the std basis
+@expansion{} 11
+degree(j);
+@expansion{} // codimension = 5
+@expansion{} // dimension   = 0
+@expansion{} // degree      = 70
 @end example
 @c ----------------------------------------------------------------------------
 @node Fast lexicographical GB,G_a -Invariants,Cyclic roots,Examples

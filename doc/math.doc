@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.23 1998-05-18 19:10:39 wichmann Exp $
+@comment $Id: math.doc,v 1.24 1998-05-18 20:30:15 wichmann Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -896,10 +896,10 @@ to insert an extra line of weights into the ordering
 matrix.
 @*@strong{Example}:
 @example
-  ring r = 0, (x,y,z), (a(1,2,3),
-                       wp(4,5,2));
-  ring s = 0, (x,y,z), (a(1,2,3),dp);
-  ring q=  0, (a,b,c,d),(lp(1),a(1,2,3),ds);
+ring r = 0, (x,y,z), (a(1,2,3),
+                     wp(4,5,2));
+ring s = 0, (x,y,z), (a(1,2,3),dp);
+ring q=  0, (a,b,c,d),(lp(1),a(1,2,3),ds);
 @end example
 @c ---------------------------------------------------------------------------
 @node Standard bases, Hilbert function, Monomial orderings, Mathematical background

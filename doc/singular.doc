@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.30 1998-05-18 19:12:14 wichmann Exp $
+@comment $Id: singular.doc,v 1.31 1998-05-18 20:29:33 wichmann Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -244,14 +244,14 @@ value is overwritten by its global one.
 @sc{Singular} does not offer a @code{case} (or, @code{switch})
 statement. However, it can be imitated in the following way:
 @example
-  while (1)
-  @{
-     if (choice == choice_1) @{ @dots{}; break;@}
-     @dots{}
-     if (choice == choice_n) @{ @dots{}; break;@}
-     // default case
-     @dots{}; break;
-  @}
+while (1)
+@{
+   if (choice == choice_1) @{ @dots{}; break;@}
+   @dots{}
+   if (choice == choice_n) @{ @dots{}; break;@}
+   // default case
+   @dots{}; break;
+@}
 @end example
 
 @c ---------------------------------------
@@ -264,11 +264,11 @@ expression is a list.
 Hence, commas can not be used to combine several expressions into
 a single expression. For example, instead of writing
 @example
- for (i=1, j=5; i<j; i++, j++) @{@dots{}@} // WRONG!!!!!! 
+for (i=1, j=5; i<j; i++, j++) @{@dots{}@} // WRONG!!!!!! 
 @end example
 one has to write
 @example
- for (i,j = 1,5; i<j; i++, j++) @{@dots{}@}
+for (i,j = 1,5; i<j; i++, j++) @{@dots{}@}
 @end example
 
 @c ---------------------------------------
@@ -284,11 +284,11 @@ brackets (i.e. "@code{()}") @strong{must always} be used to enclose the
 return value.
 For example,
 @example
-  if (i == 1) return i;    // WRONG!!!!!
+if (i == 1) return i;    // WRONG!!!!!
 @end example
 results in a errors. Instead, it must be written as
 @example
-  if (i == 1) @{ return (i); @} 
+if (i == 1) @{ return (i); @} 
 @end example
 
 
@@ -302,19 +302,19 @@ to the beginning of the block. Unlike the C-construct @sc{Singular}'s
 @code{continue} @strong{does not execute the increment statement}. For
 example,
 @example
-  for (int i = 1 ; i<=10; i=i+1)
-  @{
-     @dots{}
-     if (i==3) @{ i=8;continue; @}
-       // skip the rest if i is 3 and
-       // continue with the next i: 8
-     i;
-  @}
-  @expansion{} 1
-  @expansion{} 2
-  @expansion{} 8
-  @expansion{} 9
-  @expansion{} 10
+for (int i = 1 ; i<=10; i=i+1)
+@{
+   @dots{}
+   if (i==3) @{ i=8;continue; @}
+     // skip the rest if i is 3 and
+     // continue with the next i: 8
+   i;
+@}
+@expansion{} 1
+@expansion{} 2
+@expansion{} 8
+@expansion{} 9
+@expansion{} 10
 @end example
 
 @c ---------------------------------------

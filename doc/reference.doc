@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.62 1998-05-18 19:46:58 obachman Exp $
+@comment $Id: reference.doc,v 1.63 1998-05-18 20:29:51 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -607,9 +607,9 @@ none
 closes a link.
 @item @strong{Example:}
 @example
-  link l="MPtcp:launch";
-  open(l); // start SINGULAR "server" on localhost in batchmode
-  close(l); // shut down SINGULAR server
+link l="MPtcp:launch";
+open(l); // start SINGULAR "server" on localhost in batchmode
+close(l); // shut down SINGULAR server
 @end example
 @end table
 @menu
@@ -932,19 +932,19 @@ of the ideal resp. module if the input is a standard basis with respect to a
 degree ordering.
 @item @strong{Example:}
 @example
-  ring r3=32003,(x,y,z),ds;
-  int a =11;
-  int b =10;
-  int c =3;
-  int t =1;
-  poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
-    +x^(c-2)*y^c*(y2+t*x)^2;
-  ideal i= jacob(f);
-  ideal i0=std(i);
-  degree(i0);
-  @expansion{} //codimension 3
-  @expansion{} //dimension 0
-  @expansion{} //multiplicity 314
+ring r3=32003,(x,y,z),ds;
+int a =11;
+int b =10;
+int c =3;
+int t =1;
+poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
+  +x^(c-2)*y^c*(y2+t*x)^2;
+ideal i= jacob(f);
+ideal i0=std(i);
+degree(i0);
+@expansion{} //codimension 3
+@expansion{} //dimension 0
+@expansion{} //multiplicity 314
 @end example
 @end table
 @menu
@@ -1528,7 +1528,7 @@ input comes from new file @file{filename}. This is shorthand
 @code{execute read(filename)}.
 @item @strong{Example:}
 @example
-  < "example"; //read in the file example and execute it
+< "example"; //read in the file example and execute it
 @end example
 @end table
 @c ref
@@ -1760,10 +1760,10 @@ the online help system.
 @code{?} may be used instead of @code{help}.
 @item @strong{Example:}
 @example
-  help;
-  help ring;
-  help Rings and orderings;
-  help all.lib;
+help;
+help ring;
+help Rings and orderings;
+help all.lib;
 @end example
 @end table
 @c ref
@@ -3310,9 +3310,9 @@ none
 opens a link.
 @item @strong{Example:}
 @example
-  link l="MPtcp:launch";
-  open(l); // start SINGULAR "server" on localhost in batchmode
-  close(l); // shut down SINGULAR server
+link l="MPtcp:launch";
+open(l); // start SINGULAR "server" on localhost in batchmode
+close(l); // shut down SINGULAR server
 @end example
 @end table
 @menu
@@ -3662,10 +3662,10 @@ none
 pauses the execution of a procedure until the return key is pressed.
 @item @strong{Example:}
 @example
-  // the procedure will continue if return is pressed:
-  "press the return key to continue"; pause;
-  @expansion{} press the return key to continue
-  @expansion{} pause>
+// the procedure will continue if return is pressed:
+"press the return key to continue"; pause;
+@expansion{} press the return key to continue
+@expansion{} pause>
 
 @end example
 @end table
@@ -3860,17 +3860,17 @@ quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
 effect of exactly one quote). Used with @code{write}.
 @item @strong{Example:}
 @example
-  link l="MPfile:w example.mp";
-  ring r=0,(x,y,z),ds;
-  ideal i=maxideal(3);
-  ideal j=x7,x2,z;
-  // compute i+j before writing, but not std
-  write (l, quote(std(eval(i+j))));
-  option(prot);
-  close(l);
-  // now read it in again and evaluate:
-  read(l);
-  close(l);
+link l="MPfile:w example.mp";
+ring r=0,(x,y,z),ds;
+ideal i=maxideal(3);
+ideal j=x7,x2,z;
+// compute i+j before writing, but not std
+write (l, quote(std(eval(i+j))));
+option(prot);
+close(l);
+// now read it in again and evaluate:
+read(l);
+close(l);
 @end example
 @end table
 @menu
@@ -4225,8 +4225,8 @@ prints a list of all reserved identifiers (first form) or tests
 whether the string is a reserved identifier.
 @item @strong{Example:}
 @example
-  reservedName();
-  @expansion{} ...
+reservedName();
+@expansion{} ...
 @c example
   reservedName("ring");
   reservedName("xyz");
@@ -4844,30 +4844,30 @@ int and either 1 or 0; for all other options, the return type is string.
 @end table
 @item @strong{Example for UNIX:}
 @example
-  // a listing of the current directory:
-  system("sh","ls");
-  // execute a shell, return to SINGULAR with exit
-  system("sh","sh");
-  string unique_name="/tmp/xx"+string(system("pid"));
-  unique_name;
-  @expansion{} /tmp/xx4711
-  system("getenv","PATH");
-  @expansion{} /bin:/usr/bin:/usr/local/bin
-  system("Singular");
-  @expansion{} /usr/local/bin/Singular
-  // report minimal display time
-  system("--min-time");
-  @expansion{} 0.5
+// a listing of the current directory:
+system("sh","ls");
+// execute a shell, return to SINGULAR with exit
+system("sh","sh");
+string unique_name="/tmp/xx"+string(system("pid"));
+unique_name;
+@expansion{} /tmp/xx4711
+system("getenv","PATH");
+@expansion{} /bin:/usr/bin:/usr/local/bin
+system("Singular");
+@expansion{} /usr/local/bin/Singular
+// report minimal display time
+system("--min-time");
+@expansion{} 0.5
 @end example
 @item @strong{Example for MSDOS:}
 @example
-  // a listing of the current directory:
-  system("sh","dir");
-  // execute a shell, return to SINGULAR with exit:
-  system("sh","command");
-  string unique_name="/tmp/xx"+string(system("pid"));
-  unique_name;
-  @expansion{} /tmp/xx0
+// a listing of the current directory:
+system("sh","dir");
+// execute a shell, return to SINGULAR with exit:
+system("sh","command");
+string unique_name="/tmp/xx"+string(system("pid"));
+unique_name;
+@expansion{} /tmp/xx0
 @end example
 @end table
 @c @menu
@@ -5257,22 +5257,22 @@ base. Called with two arguments it deletes the entry with the key
 specified by the string from the data base.
 @item @strong{Example:}
 @example
-  //write the lines with the values of the variables f and i
-  //then the value of m+a into the file "outfile"
-  write(":w outfile",f,i,m+a);
-  string filename=":a outfile";
-  //now append the string "that was f,i,m+a" (without the quotes)
-  // at the end of the file "outfile"
-  write(filename,"that was f,i,m+a");
-  // saving and retrieving data:
-  ring r=32003,(x,y,z),dp;
-  ideal i=x+y,z3+22y;
-  write(":w save_i",i);// this writes x+y,z3+22y to the file save_i
+//write the lines with the values of the variables f and i
+//then the value of m+a into the file "outfile"
+write(":w outfile",f,i,m+a);
+string filename=":a outfile";
+//now append the string "that was f,i,m+a" (without the quotes)
+// at the end of the file "outfile"
+write(filename,"that was f,i,m+a");
+// saving and retrieving data:
+ring r=32003,(x,y,z),dp;
+ideal i=x+y,z3+22y;
+write(":w save_i",i);// this writes x+y,z3+22y to the file save_i
 
-  ring r=32003,(x,y,z),dp;
-  string s=read("save_i");  //creates the string x+y,z3+22y
-  execute "ideal k="+s+";"; // this defines an ideal k which
-                            // is equal to i.
+ring r=32003,(x,y,z),dp;
+string s=read("save_i");  //creates the string x+y,z3+22y
+execute "ideal k="+s+";"; // this defines an ideal k which
+                          // is equal to i.
 @end example
 @end table
 @menu
@@ -5325,14 +5325,14 @@ block.
 @table @code
 @item @strong{Example:}
 @example
-  if ( i>j )
-  @{
-    // This is the block
-    int temp; // temp is a local variable
-    i=temp;
-    i=j;
-    j=temp;
-  @}
+if ( i>j )
+@{
+  // This is the block
+  int temp; // temp is a local variable
+  i=temp;
+  i=j;
+  j=temp;
+@}
 @end example
 @end table
 
@@ -5347,14 +5347,14 @@ block.
 leaves the innermost @code{for}- or @code{while}-block.
 @item @strong{Example:}
 @example
-  while (1)
-  @{
-    @dots{}
-    if ( @dots{} )  
-    @{  
-      break; // leave the while block
-    @}
+while (1)
+@{
+  @dots{}
+  if ( @dots{} )  
+  @{  
+    break; // leave the while block
   @}
+@}
 @end example
 @end table
 @c ref
@@ -5375,19 +5375,19 @@ Unlike the C-construct it @strong{does not execute the increment statement}.
 The command @code{continue} is mainly for internal use.
 @item @strong{Example:}
 @example
-  for (int i = 1 ; i<=10; i=i+1)
-  @{
-     @dots{}
-     if (i==3) @{ i=8;continue; @}
-       // skip the rest if i is 3 and
-       // continue with the next i: 8
-     i;
-  @}
-  @expansion{} 1
-  @expansion{} 2
-  @expansion{} 8
-  @expansion{} 9
-  @expansion{} 10
+for (int i = 1 ; i<=10; i=i+1)
+@{
+   @dots{}
+   if (i==3) @{ i=8;continue; @}
+     // skip the rest if i is 3 and
+     // continue with the next i: 8
+   i;
+@}
+@expansion{} 1
+@expansion{} 2
+@expansion{} 8
+@expansion{} 9
+@expansion{} 10
 @end example
 @end table
 @c ref 
@@ -5405,16 +5405,16 @@ is false. This command is only valid in combination with an @code{if}
 command. 
 @item @strong{Example:}
 @example
-  int i=3;
-  if (i > 5)
-  @{
-    "i is bigger than 5";
-  @}
-  else
-  @{
-    "i is smaller than 6";
-  @}
-  @expansion{} i is smaller than 6
+int i=3;
+if (i > 5)
+@{
+  "i is bigger than 5";
+@}
+else
+@{
+  "i is smaller than 6";
+@}
+@expansion{} i is smaller than 6
 @end example
 @end table
 @c ref
@@ -5432,21 +5432,21 @@ See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
 converts a local variable of a procedure to a global one.
 @item @strong{Example:}
 @example
-  proc p1
-  @{
-    int i,j;
-    export i;
-    intmat m;
-    listvar();
-    export m;
-  @}
-  p1();
-  @expansion{} // m                    [1]  intmat 1 x 1
-  @expansion{} // j                    [1]  int 0
-  @expansion{} // i                    [0]  int 0
+proc p1
+@{
+  int i,j;
+  export i;
+  intmat m;
   listvar();
-  @expansion{} // m                    [0]  intmat 1 x 1
-  @expansion{} // i                    [0]  int 0
+  export m;
+@}
+p1();
+@expansion{} // m                    [1]  intmat 1 x 1
+@expansion{} // j                    [1]  int 0
+@expansion{} // i                    [0]  int 0
+listvar();
+@expansion{} // m                    [0]  intmat 1 x 1
+@expansion{} // i                    [0]  int 0
 @end example
 @end table
 @c ---------------------------------------
@@ -5467,14 +5467,14 @@ iterate_command is executed and boolean_expression is evaluated.
 @*The command @code{break;} leaves the innermost @code{for} construct.
 @item @strong{Example:}
 @example
-  // sum of 1 to 10:
-  int s=0;
-  for (int i=1; i<=10; i=i+1)
-  @{
-     s=s+i;
-  @}
-  s;
-  @expansion{} 55
+// sum of 1 to 10:
+int s=0;
+for (int i=1; i<=10; i=i+1)
+@{
+   s=s+i;
+@}
+s;
+@expansion{} 55
 @end example
 @end table
 @c ref
@@ -5496,12 +5496,12 @@ statement is followed by an @code{else} statement and the boolean
 condition is false, then false_block is executed.
 @item @strong{Example:}
 @example
-  int i = 9;
-  matrix m [i][i];
-  if (i > 5 and typeof(m) == "matrix")
-  @{
-    m[i][i] = i;
-  @}
+int i = 9;
+matrix m [i][i];
+if (i > 5 and typeof(m) == "matrix")
+@{
+  m[i][i] = i;
+@}
 @end example
 @end table
 @c ref
@@ -5522,23 +5522,23 @@ a ring which is local to the procedure (and its objects) accessible after
 the procedure ended without making the ring global.
 @item @strong{Example:}
 @example
-  proc P1
-  @{
-    ring r=0,x,dp;
-    keepring r;
-  @}
-  proc P2
-  @{
-    "inside P2: " + nameof(basering);
-    P1();
-    "inside P2, after call of P1: " + nameof(basering);
-  @}
-  ring r1= 0,y,dp;
-  P2();
-  @expansion{} inside P2: r1
-  @expansion{} inside P2, after call of P1: r
-  "at top level: " + nameof(basering);
-  @expansion{} at top level: r1
+proc P1
+@{
+  ring r=0,x,dp;
+  keepring r;
+@}
+proc P2
+@{
+  "inside P2: " + nameof(basering);
+  P1();
+  "inside P2, after call of P1: " + nameof(basering);
+@}
+ring r1= 0,y,dp;
+P2();
+@expansion{} inside P2: r1
+@expansion{} inside P2, after call of P1: r
+"at top level: " + nameof(basering);
+@expansion{} at top level: r1
 @end example
 @end table
 @c ---------------------------------------
@@ -5571,28 +5571,28 @@ returns the result(s) of a procedure.
 @*Can only be used inside a procedure.
 @item @strong{Example:}
 @example
-  proc p2
+proc p2
+@{
+  int i,j;
+  for(i=1;i<=10;i++)
   @{
-    int i,j;
-    for(i=1;i<=10;i++)
-    @{
-      j=j+i;
-    @}
-    return(j);
+    j=j+i;
   @}
-  // can also return an expression list, i.e., more than value
-  proc tworeturn ()
-  @{ return (1,2); @}
-  int i,j = tworeturn();
-  // return type may even depend on the input
-  proc type_return (int i) 
-  @{ 
-    if (i > 0) @{return (i);@} 
-    else @{return (list(i));@} 
-  @}
-  // then we need def type (or list) to collect value
-  def t1 = type_return(1);
-  def t2 = type_return(-1);
+  return(j);
+@}
+// can also return an expression list, i.e., more than value
+proc tworeturn ()
+@{ return (1,2); @}
+int i,j = tworeturn();
+// return type may even depend on the input
+proc type_return (int i) 
+@{ 
+  if (i > 0) @{return (i);@} 
+  else @{return (list(i));@} 
+@}
+// then we need def type (or list) to collect value
+def t1 = type_return(1);
+def t2 = type_return(-1);
 @end example
 @end table
 @c ref
@@ -5613,20 +5613,20 @@ repetitive, conditional execution of block.
 construct.
 @item @strong{Example:}
 @example
-  int i = 9;
-  while (i>0)
-  @{
-     // @dots{} // do something for i=9, 8, ..., 1
-     i = i - 1;
-  @}
-  while (1)
-  @{
-     // @dots{}   // do something forever
-     if (i == -5) // but leave the loop if i is -5
-     @{
-       break;
-     @}
-  @}
+int i = 9;
+while (i>0)
+@{
+   // @dots{} // do something for i=9, 8, ..., 1
+   i = i - 1;
+@}
+while (1)
+@{
+   // @dots{}   // do something forever
+   if (i == -5) // but leave the loop if i is -5
+   @{
+     break;
+   @}
+@}
 @end example
 @end table
 @c ref
@@ -5723,13 +5723,13 @@ input.
 @*Reset this bound by setting @code{degBound} to 0.
 @item @strong{Example:}
 @example
-  degBound = 7;
-  option();
-  @expansion{} //options for 'std'-command: degBound
-  ideal j=std(i);
-  degBound;
-  @expansion{} 7
-  degBound = 0; //resets degree bound to infinity
+degBound = 7;
+option();
+@expansion{} //options for 'std'-command: degBound
+ideal j=std(i);
+degBound;
+@expansion{} 7
+degBound = 0; //resets degree bound to infinity
 @end example
 @end table
 @menu
@@ -5754,9 +5754,9 @@ input is echoed if @code{echo} >= @code{voice}.
 @item @strong{Example:}
 @c this example cannot be a computed one - echo interferes with -e
 @example
-  echo = 1;
-  int i = echo;
-  @expansion{} int i = echo;
+echo = 1;
+int i = echo;
+@expansion{} int i = echo;
 @end example
 @end table
 @menu
@@ -5820,13 +5820,13 @@ and its multiplicity (@code{mult}) is lower than @code{multBound}.
 @*Reset this bound by setting @code{multBound} to 0
 @item @strong{Example:}
 @example
-  multBound = 20;
-  option();
-  @expansion{} //options for 'std'-command: multBound
-  ideal j=std(i);
-  multBound;
-  @expansion{} 20
-  multBound = 0;//disbales multBound
+multBound = 20;
+option();
+@expansion{} //options for 'std'-command: multBound
+ideal j=std(i);
+multBound;
+@expansion{} 20
+multBound = 0;//disbales multBound
 @end example
 @end table
 @menu
@@ -6038,11 +6038,11 @@ nesting level of procedures.
 @c example
   voice;
 @c example
-  proc p
-  @{
-    voice;
-  @}
-  @expansion{} 2
+proc p
+@{
+  voice;
+@}
+@expansion{} 2
 @end example
 @end table
 @menu
