@@ -20,7 +20,7 @@ makedbm_l
 minor_l
 modulo_l
 monodromy_l
-mpsr_l
+;; mpsr_l
 mre
 mre_nonhom
 Mregular
