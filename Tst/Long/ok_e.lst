@@ -1,5 +1,6 @@
 ;; Tests which shoujld pass for shifted exponents
 allres_l
+bardet_probl_l
 ; bug_4 wrong order
 classify_l
 deform_l
