@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.29 1999-03-19 14:18:04 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.30 1999-06-08 07:50:58 Singular Exp $ */
 
 /***************************************************************
  *
@@ -221,9 +221,9 @@ void    pDBDelete1(poly * a, char * f, int l);
 
 inline poly _pNew()
 {
-  poly p;
+  void * p;
   AllocHeap(p, mm_specHeap);
-  return p;
+  return (poly)p;
 }
 
 inline poly    _pInit(void)
