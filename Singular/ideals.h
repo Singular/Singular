@@ -3,13 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.9 1998-08-27 12:32:40 Singular Exp $ */
+/* $Id: ideals.h,v 1.10 1998-09-30 14:34:28 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
 #include "structs.h"
 
-#ifdef MDEBUG
+#ifdef PDEBUG
 ideal idDBInit (int size, int rank, char *f, int l);
 #define idInit(A,B) idDBInit(A,B,__FILE__,__LINE__)
 void idDBDelete (ideal* h, char *f, int l);
@@ -38,7 +38,7 @@ void idDBTest(ideal h1,char *f,int l);
 #define idTest(A)
 #endif
 
-#ifdef MDEBUG
+#ifdef PDEBUG
 ideal idDBCopy(ideal h1,char *f,int l);
 #define idCopy(A) idDBCopy(A,__FILE__,__LINE__)
 #else
