@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.8 1998-04-30 17:17:36 Singular Exp $ */
+/* $Id: febase.inc,v 1.9 1998-05-05 18:07:21 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -431,8 +431,7 @@ static int fePrintEcho(char *anf)
 
 int feReadLine(char* b, int l)
 {
-  // try to read from the buffer:
-  // b[1] = '\0';
+  // try to read from the buffer into b, max l chars
   if ((currentVoice->buffer!=NULL)
   && (currentVoice->buffer[currentVoice->fptr]!='\0'))
   {
@@ -445,12 +444,24 @@ NewBuff:
       char c=
       b[i]=currentVoice->buffer[currentVoice->fptr];
       i++;
-      if ((c<' ')
-      || (c==';')
-      || (c==')')
-      || (c=='}')
-      || (c=='"')
-      || (c=='$')) break;
+      if (yy_noeof==noeof_block)
+      {
+        if (c<' ')  yylineno++;
+        else if (c=='}') break;
+      }
+      else if (yy_noeof==noeof_string) 
+      {
+        if (c<' ')  yylineno++;
+        else if (c=='"') break;
+      }
+      else
+      {
+        if ((c<' ') ||
+        (c==';') ||
+        (c==')')
+        )
+          break;
+      }          
       if (i>=l) break;
       currentVoice->fptr++;
       if(currentVoice->buffer[currentVoice->fptr]=='\0') break;
