@@ -1,25 +1,24 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.7 2004-07-22 20:14:01 plural Exp $";
+version="$Id: center.lib,v 1.8 2004-08-05 14:49:14 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  center.lib      computation of central elements of G-algebras.
 AUTHORS:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 OVERVIEW:
  This is a library for computing the central elements and centralisators of elements in various noncommutative algebras.
- Implementations are based on algorithms, written in the frame of the diploma thesis by Oleksandr Motsak
- (advisor: Prof. Ovsienko Sergiy Adamovich) at Kyiv Taras Shevchenko University: 
- 'An algorithm for the computation of the center of noncommutative polynomial algebra'.
+ Implementation is partially based on algorithms, written in the frame of the diploma thesis by Oleksandr Motsak (advisors: Prof. S.A. Ovsienko, V.Levandovskyy) at Kyiv Taras Shevchenko University:  'An algorithm for the computation of the center of noncommutative polynomial algebra'.
  @* The last version of this library can be found via internet.
-SUPPORT: Forschungsschwerpunkt
-PROCEDURES:
-	center(MaxDeg[,N]);             Computing of a Center of current algebra
-	centralizator(f, MaxDeg[,N]);   Computing of a Centralizator of f in current algebra
 
-	inCenter(l);                    Check for the commutativity of polynomials of list/ideal/poly l
-	inCentralizator(l, f);          Check for the commutativity of polynomials of list/ideal/poly l with polynomial f	
+SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis'
+
+PROCEDURES:
+	center(MaxDeg[,N]);             returns the center of basering,
+	centralizer(f, MaxDeg[,N]);     returns the centralizer of f in basering,
+	inCenter(l);                    checks the centrality of elements of list/ideal/poly l
+	inCentralizer(l, f);            checks the commutativity wrt polynomialf of polynomials of list/ideal/poly l
 
 SEE ALSO:  ncalg_lib, nctools_lib
-KEYWORDS:  inCenter; inCentralizator; center; centralizator
+KEYWORDS:  inCenter; inCentralizer; center; centralizer
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2392,9 +2391,9 @@ static proc inCenter_list(def l)
 };
 
 /******************************************************************************/ 
-static proc inCentralizator_poly( poly p, poly f )
+static proc inCentralizer_poly( poly p, poly f )
 "
-  if p in Centralizator(f) => return 1
+  if p in Centralizer(f) => return 1
       otherwise     return 0
 "
 {
@@ -2402,26 +2401,26 @@ static proc inCentralizator_poly( poly p, poly f )
     {	  
 	  if( toprint() ) 
 	  {
-		"POLY: ", string (p), " is NOT in Centralizator(f)";
+		"POLY: ", string (p), " is NOT in Centralizer(f)";
 	  };
 	  return (0);
     };
 	
     if( toprint() ) 
     {
-	"POLY: ", string (p), " is in Centralizator(f)";
+	"POLY: ", string (p), " is in Centralizer(f)";
     };
 	return (1);
 };
 
 /******************************************************************************/ 
-static proc inCentralizator_list( def l, poly f )
+static proc inCentralizer_list( def l, poly f )
 {
   for ( int @i = 1; @i <= size(l); @i++ )
   {
 	if ( typeof(l[@i])=="poly" ) 
 	{
-	    if (! inCentralizator_poly(l[@i], f) )
+	    if (! inCentralizer_poly(l[@i], f) )
 		{
 		  return(0);
 		};
@@ -2430,7 +2429,7 @@ static proc inCentralizator_list( def l, poly f )
 	{
 	    if ( (typeof(l[@i])=="list") or (typeof(l[@i])=="ideal") ) 
 	    {
-		  if (! inCentralizator_list(l[@i], f) )
+		  if (! inCentralizer_list(l[@i], f) )
 		  {
 			return(0);
 		  };
@@ -2583,28 +2582,28 @@ static proc inCentralizator_list( def l, poly f )
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-/// Centralizator's computations
+/// Centralizer's computations
 
 ///////////////////////////////////////////////////////////////////////////////
-/* static */ proc centralizator_vectorspace( poly p, int MaxDeg )
+/* static */ proc centralizer_vectorspace( poly p, int MaxDeg )
 {
 	return( calc_k_base( PBW_base( MaxDeg, p )));
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/* static */ proc centralizator_min_vectorspace( poly p, int MaxDeg )
+/* static */ proc centralizer_min_vectorspace( poly p, int MaxDeg )
 {
-	return( makeIdeal( zReduce( centralizator_vectorspace( p, MaxDeg))));
+	return( makeIdeal( zReduce( centralizer_vectorspace( p, MaxDeg))));
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/* static */ proc centralizator_min_iterative( poly p, int MaxDeg, list # )
+/* static */ proc centralizer_min_iterative( poly p, int MaxDeg, list # )
 "
-  computes the 'minimal' set of elements (of deg <= MaxDeg) generating centralizator of p in iterative way
+  computes the 'minimal' set of elements (of deg <= MaxDeg) generating centralizer of p in iterative way
   Note: based on calc_k_base
   
   !!! NEED DEBUG !!!
-  Note: no proof that it is really centralizator and moreover 'minimal' centralizator
+  Note: no proof that it is really centralizer and moreover 'minimal' centralizer
 "
 {
 	int n = myInt(#);
@@ -2722,19 +2721,19 @@ example
 
 
 /******************************************************************************/ 
-proc inCentralizator( def a, poly f )
-"USAGE:   inCentralizator(a, f); a poly/list/ideal, f poly
-RETURN:  integer (1 if a in centralizator(f), 0 otherwise)
-EXAMPLE: example inCentralizator; shows examples"
+proc inCentralizer( def a, poly f )
+"USAGE:   inCentralizer(a, f); a poly/list/ideal, f poly
+RETURN:  integer (1 if a in centralizer(f), 0 otherwise)
+EXAMPLE: example inCentralizer; shows examples"
 {
   if ( typeof(a) == "poly" )
   {
-	return (inCentralizator_poly(a, f));
+	return (inCentralizer_poly(a, f));
   };
 
   if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
   {
-	return (inCentralizator_list(a, f));
+	return (inCentralizer_list(a, f));
   };
 }
 example
@@ -2749,12 +2748,12 @@ example
   poly f = x^2;
   poly a = z; /// lies in center
   poly b = y^2;
-  inCentralizator(a, f);
-  inCentralizator(b, f);
+  inCentralizer(a, f);
+  inCentralizer(b, f);
   list  l = list(1, a);
-  inCentralizator(l, f);
+  inCentralizer(l, f);
   ideal I = a, b;
-  inCentralizator(I, f);
+  inCentralizer(I, f);
 };
 
 
@@ -2768,7 +2767,7 @@ NOTE:       computes the 'minimal' set of central elements.
             desired polynomials one have to specify any kind of termination condition:
             1. MaxDeg - maximal degree of desired elements or/and
             2. n - the minimal number of desired elements to find.
-SEE ALSO:   centralizator; inCenter
+SEE ALSO:   centralizer; inCenter
 EXAMPLE:    example center; shows an example"
 {
 
@@ -2805,27 +2804,27 @@ example
 
 
 ///////////////////////////////////////////////////////////////////////////////
-proc centralizator( poly p, int MaxDeg, list # )
-"USAGE:      centralizator(F, MaxDeg[, N]); poly F, int MaxDeg, int N
+proc centralizer( poly p, int MaxDeg, list # )
+"USAGE:      centralizer(F, MaxDeg[, N]); poly F, int MaxDeg, int N
 RETURN:     ideal generated by found elements
-NOTE:       computes the 'minimal' set of elements of centralizator(F).
+NOTE:       computes the 'minimal' set of elements of centralizer(F).
             Since in general algorithms knows nothing about the number and degrees of
             desired polynomials one have to specify any kind of termination condition:
             1. MaxDeg - maximal degree of desired elements or/and
             2. n - the minimal number of desired elements to find.
-SEE ALSO:   center; inCentralizator
-EXAMPLE:    example centralizator; shows an example"
+SEE ALSO:   center; inCentralizer
+EXAMPLE:    example centralizer; shows an example"
 {
 	
 	if( myInt(#) > 0 )
 	{
-		return( centralizator_min_iterative( p, MaxDeg, # ) );
+		return( centralizer_min_iterative( p, MaxDeg, # ) );
 	};
 	
 	if( MaxDeg >= 0 )
 	{
-//		return( centralizator_min_iterative( p, MaxDeg, # ) );
-		return( centralizator_min_vectorspace( p, MaxDeg ) );
+//		return( centralizer_min_iterative( p, MaxDeg, # ) );
+		return( centralizer_min_vectorspace( p, MaxDeg ) );
 	};
 	
 	print( "Error: wrong arguments." );
@@ -2842,20 +2841,20 @@ example
    ncalgebra(1,D); // this is U(sl_2)
    poly f = 4*x*y+z^2-2*z; /// central polynomial
    f;
-   ideal c = centralizator(f, 2); /// find all elements of degree <= 2 which lies in centralizator of f
+   ideal c = centralizer(f, 2); /// find all elements of degree <= 2 which lies in centralizer of f
    c;
-   inCentralizator(c, f); 
-   ideal cc = centralizator(f, -1, 2 ); /// find at least first two non trivial elements of the centralizator of f
+   inCentralizer(c, f); 
+   ideal cc = centralizer(f, -1, 2 ); /// find at least first two non trivial elements of the centralizer of f
    cc;
-   inCentralizator(cc, f); 
+   inCentralizer(cc, f); 
    poly g = z^2-2*z; /// any polynomial
    g;
-   c = centralizator(g, 2); /// find all elements of degree <= 2 which lies in centralizator of g
+   c = centralizer(g, 2); /// find all elements of degree <= 2 which lies in centralizer of g
    c;
-   inCentralizator(c, g); 
-   cc = centralizator(g, -1, 2 ); /// find at least first two non trivial elements of the centralizator of g
+   inCentralizer(c, g); 
+   cc = centralizer(g, -1, 2 ); /// find at least first two non trivial elements of the centralizer of g
    cc;
-   inCentralizator(cc, g); 
+   inCentralizer(cc, g); 
 };
 
 
