@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.11 1997-08-29 08:35:15 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.12 1997-08-29 11:30:01 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -306,12 +306,6 @@ typedef List<CanonicalForm> CFList;
 typedef ListIterator<CanonicalForm> CFListIterator;
 typedef Array<CanonicalForm> CFArray;
 typedef Matrix<CanonicalForm> CFMatrix;
-
-// calculate the determinant of the n'th minor of M
-
-bool linearSystemSolve( CFMatrix & M );
-
-CanonicalForm determinant( const CFMatrix & M, int n );
 
 void On( int );
 void Off( int );
