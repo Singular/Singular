@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.170 1999-12-06 16:34:04 obachman Exp $
+@comment $Id: reference.doc,v 1.171 1999-12-07 16:54:40 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1371,17 +1371,15 @@ within Emacs) Use @code{<TAB>} completion for a list of all available
 example @code{topic}'s.
 @item @strong{Example:}
 @smallexample
-@c example
 example prime;
-// TBC: example cyclic;
 example intvec_declarations;
-@c example
 @end smallexample
+@end table
 @c ref
 @ref{help}
 @c ref
 @c ---------------------------------------
-@node execute, exit, ERROR, Functions
+@node execute, exit, example, Functions
 @subsection execute
 @cindex execute
 @table @code
@@ -6234,7 +6232,7 @@ See
 @code{breakpoint(} proc_name @code{);}
 @*@code{breakpoint(} proc_name@code{,} line_no @code{);}
 @item @strong{Purpose:}
-sets a breakpoint at the beginning of the specified procedure or 
+sets a breakpoint at the beginning of the specified procedure or
 at the given line.
 @strong{Note:} Line number 1 is the first line of a libary (for
 procedures from libraries) resp. the line with the @code{@{}.
