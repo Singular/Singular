@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.69 2002-05-29 09:39:34 mschulze Exp $ */
+/* $Id: polys1.cc,v 1.70 2003-05-26 11:32:57 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1269,9 +1269,9 @@ poly pInvers(int n,poly u,intvec *w)
   return v;
 }
 
-int pDegW(poly p, short *w)
+long pDegW(poly p, short *w)
 {
-  int r=0;
+  long r=0;
 
   while (p!=NULL)
   {

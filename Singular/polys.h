@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.57 2003-01-30 14:59:58 Singular Exp $ */
+/* $Id: polys.h,v 1.58 2003-05-26 11:35:22 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -409,7 +409,7 @@ poly      pSeries(int n,poly p,poly u=NULL,intvec *w=NULL);
 poly      pInvers(int n, poly p,intvec *w=NULL);
 // maximum weigthed degree of all monomials of p, w is indexed from
 // 1..pVariables
-int       pDegW(poly p, short *w);
+long      pDegW(poly p, short *w);
 
 /*-----------type conversions ----------------------------*/
 poly  pPolys2Vec(polyset p, int len);
