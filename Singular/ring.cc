@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.180 2002-02-04 14:23:18 Singular Exp $ */
+/* $Id: ring.cc,v 1.181 2002-02-04 17:12:59 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2648,7 +2648,7 @@ ring rModifyRing_Wp(ring r, int* weights)
   res->order[2]  = 0;
   /*polynomial ring*/
   res->OrdSgn    = 1;
-  
+
   int tmpref=r->cf->ref;
   rComplete(res, 1);
   r->cf->ref=tmpref;
@@ -2663,7 +2663,7 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
   {
     WarnS("Hannes: you still need to implement this");
     // simple=FALSE; // sorting needed
-  }  
+  }
   return rModifyRing(r, ommit_degree, ommit_comp, exp_limit);
 }
 
@@ -2672,7 +2672,7 @@ void rKillModifiedRing_Simple(ring r)
   rKillModifiedRing(r);
 }
 
-  
+
 void rKillModifiedRing(ring r)
 {
   rUnComplete(r);
@@ -4041,11 +4041,20 @@ ring rCompose(lists  L)
     {
       if (v->m[i].Typ()==STRING_CMD)
         R->names[i]=omStrDup((char *)v->m[i].Data());
+      else if (v->m[i].Typ()==POLY_CMD)
+      {
+        poly p=(poly)v->m[i].Data();
+        int nr=pIsPurePower(p);
+        if (nr>0)
+          R->names[i]=omStrDup(currRing->names[nr-1]);
+        else
+        {
+          Werror("var name %d must be a string or a ring variable",i+1);
+          goto rCompose_err;
+        }
+      }
       else
       {
-        i--;
-        while (i>=0) { omFree(R->names[i]); i--; }
-        omFree(R->names);
         Werror("var name %d must be `string`",i+1);
         goto rCompose_err;
       }
@@ -4166,6 +4175,20 @@ ring rCompose(lists  L)
   return R;
 
 rCompose_err:
+  if (R->N>0)
+  {
+    int i;
+    if (R->names!=NULL)
+    {
+      i=R->N;
+      while (i>=0) { if (R->names[i]!=NULL) omFree(R->names[i]); i--; }
+      omFree(R->names);
+    }
+  }
+  if (R->order!=NULL) omFree(R->order);
+  if (R->block0!=NULL) omFree(R->block0);
+  if (R->block1!=NULL) omFree(R->block1);
+  if (R->wvhdl!=NULL) omFree(R->wvhdl);
   omFree(R);
   return NULL;
 }
