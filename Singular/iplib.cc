@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.11 1998-03-06 11:50:37 krueger Exp $ */
+/* $Id: iplib.cc,v 1.12 1998-03-16 16:21:55 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -22,7 +22,7 @@
 #include "lists.h"
 
 procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname, char *procname,
-				 int line, long pos, BOOLEAN pstatic=FALSE);
+                                 int line, long pos, BOOLEAN pstatic=FALSE);
 char *iiConvName(char *p);
 #ifdef HAVE_LIBPARSER
 int yylplex(char *libname, char *libfile);
@@ -248,7 +248,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   myynest--;
   si_echo=old_echo;
   //Print("PEnd <<%s>>\n",IDID(pn));
- 
+
   return err;
 }
 
@@ -497,25 +497,25 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   yylplex(newlib, libnamebuf);
   if(yylp_errno) {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
-	 current_pos(0));
+         current_pos(0));
     Werror(yylp_errlist[yylp_errno], yylplineno);
     Werror("Cannot load library,... aborting.");
     reinit_yylp();
     fclose( yylpin );
     FreeL((ADDRESS)newlib);
     return TRUE;
-  } 
+  }
   reinit_yylp();
   fclose( yylpin );
   {
     libstackv ls;
     for(ls = library_stack; (ls != NULL) && (ls != ls_start); ) {
-      if(ls->to_be_done) { 
-	//Print("// Processing id %d LIB:%s\n", ls->cnt, ls->get());
-	ls->to_be_done=FALSE;
-	iiLibCmd(ls->get());
-	ls = ls->pop(newlib);
-	//Print("Done\n");
+      if(ls->to_be_done) {
+        //Print("// Processing id %d LIB:%s\n", ls->cnt, ls->get());
+        ls->to_be_done=FALSE;
+        iiLibCmd(ls->get());
+        ls = ls->pop(newlib);
+        //Print("Done\n");
       }
     }
 #if 0
@@ -596,7 +596,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
           sprintf( buf, "LIB:%s", newlib);
 #if 0
           if(strcmp(proc, "_init")==0)
-	  {
+          {
             char *p =  iiConvName(newlib);
             Print("Init found:%s;\n", p);
             h = enterid( mstrdup(p), myynest, PROC_CMD, &idroot, FALSE );
@@ -638,7 +638,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
         if (buf[0]=='{')
         {
           if(inBlock==IN_HEADER)
-	  {
+          {
             IDPROC(h)->data.s.body_start = pos;
             IDPROC(h)->data.s.body_lineno = lines-offset;
             // Print("%s: %d-%d\n", pi->procname, lines, offset);
@@ -679,7 +679,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 }
 
 procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
-				 int line, long pos, BOOLEAN pstatic=FALSE)
+                                 int line, long pos, BOOLEAN pstatic)
 {
   pi->libname = mstrdup(libname);
 
@@ -783,7 +783,7 @@ void libstack::push(char *p, char *libname)
       ls->to_be_done = TRUE;
       if(this != NULL) ls->cnt = this->cnt+1; else ls->cnt = 0;
       library_stack = ls;
-    } 
+    }
   }
 }
 
