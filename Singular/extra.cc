@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.141 2000-09-07 13:39:43 sulandra Exp $ */
+/* $Id: extra.cc,v 1.142 2000-09-07 13:46:25 sulandra Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1179,23 +1179,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else return TRUE;
       res->rtyp=MODUL_CMD;
       res->data=idXXX(i1,i2);
-      return FALSE;
-    }
-    else
-/*==================== new walk stuff =================*/
-    if (strcmp(sys_cmd, "walkAddIntvec") == 0)
-    {
-      if (h == NULL || h->Typ() != INTVEC_CMD ||
-          h->next == NULL || h->next->Typ() != INTVEC_CMD)
-      {
-        Werror("walkAddIntvec: arguments are wrong");
-        return TRUE;
-      }
-      intvec* v1 = (intvec*) h->Data();
-      intvec* v2 = (intvec*) h->Data();
-      intvec* result = walkAddIntVec(v1, v2);
-      res->rtyp = INTVEC_CMD;
-      res->data = (void*) result;
       return FALSE;
     }
     else
