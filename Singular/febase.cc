@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.50 1998-06-13 14:34:28 obachman Exp $ */
+/* $Id: febase.cc,v 1.51 1998-06-14 11:02:58 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -346,7 +346,8 @@ static char* feGetInfoProgram(const char* bindir)
 extern "C" int cygwin32_posix_path_list_p (const char *path);
 #endif
 
-void feExpandPath(char *dir)
+#ifdef WINNT
+static void feExpandPath(char *dir)
 {
   char *path=getenv("PATH");
   char buf[MAXNAMLEN];
@@ -365,6 +366,8 @@ void feExpandPath(char *dir)
   }
   setenv("PATH",buf,1);
 }
+#endif
+
 //
 // public routines
 //
