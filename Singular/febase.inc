@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.16 1998-08-05 14:54:00 Singular Exp $ */
+/* $Id: febase.inc,v 1.17 1998-08-07 16:52:03 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -357,6 +357,7 @@ static void feShowPrompt(void)
   fe_promptstr[0]=prompt_char;
 #ifdef macintosh
   cols = 0;
+  printf(fe_promptstr);mflush();
 #endif
 }
 
