@@ -73,9 +73,10 @@ static BOOLEAN heBuiltinInit(int); static void heBuiltinHelp(heEntry hentry);
 static BOOLEAN heDummyInit(int);   static void heDummyHelp(heEntry hentry);
 static BOOLEAN heEmacsInit(int);   static void heEmacsHelp(heEntry hentry);
 
-#ifdef WINNT
+#ifdef ix86_Win
 static void heHtmlHelp(heEntry hentry);
-extern "C" void heOpenWinntUrl(const char* url, int local);
+static void heWinHelp(heEntry hentry);
+#include "sing_win.h"
 #endif
 
 static heBrowser heCurrentHelpBrowser = NULL;
@@ -91,6 +92,7 @@ static heBrowser_s heHelpBrowsers[] =
 {
 #ifdef WINNT
   { "html",     heDummyInit,    heHtmlHelp},
+  { "winhlp",   heDummyInit,    heWinHelp},
 #endif
 #if ! defined(macintosh)
   { "netscape", heNetscapeInit, heNetscapeHelp},
@@ -820,7 +822,7 @@ static void heNetscapeHelp(heEntry hentry)
   }
 }
 
-#ifdef WINNT
+#ifdef ix86_Win
 static void heHtmlHelp(heEntry hentry)
 {
   char url[MAXPATHLEN];
@@ -831,6 +833,18 @@ static void heHtmlHelp(heEntry hentry)
 
   heOpenWinntUrl(url, (html_dir != NULL ? 1 : 0));
 }
+
+static void heWinHelp(heEntry hentry)
+{
+  char keyw[MAX_HE_ENTRY_LENGTH];
+  strcat(keyw,hentry->key);
+  char* helppath = feResource('h' /*"HtmlDir"*/);
+  const char *filename="/Manual.hlp";
+  helppath = strcat(helppath,filename);
+
+  heOpenWinntHlp(keyw,helppath);
+}
+
 #endif
 
 static BOOLEAN heXinfoInit(int warn)

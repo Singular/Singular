@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.13 2001-02-01 13:12:09 krueger Exp $ */
+/* $Id: mod_raw.cc,v 1.14 2001-02-15 13:54:08 levandov Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -307,42 +307,9 @@ const char *dynl_error()
 #endif /* SunOS_4 or SunOS_5 */
 
 /*****************************************************************************
- * SECTION ix86-win                                                          *
+ * SECTION ix86-Win                                                          *
  *****************************************************************************/
-#ifdef ix86_win
-#    include <windows.h>
-
-void *dynl_open(char *filename)
-{
-  HINSTANCE hLibrary = LoadLibrary( TEXT (filename));;
-
-  return(hLibrary);
-}
-
-void *dynl_sym(void *handle, char *symbol)
-{
-  FARPROC f;
-  
-  if (handle == DYNL_KERNEL_HANDLE) 
-    handle = PROG_HANDLE;
-
-  f = GetProcAddress(handle , TEXT (symbol));
-  return(f);
-}
-
-int dynl_close (void *handle)
-{
-  FreeLibrary(handle);
-  return(0);
-}
-
-const char *dynl_error()
-{
-  static char errmsg[] = "support for dynamic loading not implemented";
-
-  return errmsg;
-}
-#endif /* ix86_win */
+// is defined externally in sing_win.cc
 
 /*****************************************************************************
  * SECTION ppc-MPW                                                           *
