@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.93 1999-11-22 16:30:01 Singular Exp $ */
+/* $Id: ring.cc,v 1.94 1999-11-23 15:25:37 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3229,8 +3229,9 @@ void rDebugPrint(ring r)
 
 void pDebugPrint(poly p)
 {
-  int i;
+  int i,j;
   pWrite(p);
+  j=10;
   while(p!=NULL)
   {
     Print("exp.e[0..%d]\n",currRing->ExpESize-1);
@@ -3239,7 +3240,13 @@ void pDebugPrint(poly p)
     Print("\nexp.l[0..%d]\n",currRing->ExpLSize-1);
     for(i=0;i<currRing->ExpLSize;i++)
       Print("%d ",p->exp.l[i]);
-    PrintLn();pIter(p);
+    PrintLn();
+    Print("v0:%d ",pGetComp(p));
+    for(i=1;i<=pVariables;i++) Print(" v%d:%d",i,pGetExp(p,i));
+    PrintLn();
+    pIter(p);
+    j--;
+    if (j==0) { PrintS("...\n"); break; }
   }
 }
 
