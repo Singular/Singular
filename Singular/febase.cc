@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.39 1998-06-03 12:58:35 obachman Exp $ */
+/* $Id: febase.cc,v 1.40 1998-06-03 18:15:48 pohl Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -242,30 +242,32 @@ static char* feGetInfoFile(const char* bindir)
   return hlpfile;
 }
 
+#ifdef WINNT
+#define INFOPROG "info.exe"
+#else
+#define INFOPROG "info"
+#endif
+
 // we first look into bindir, if nothing found there, we use HAVE_INFO
 static char* feGetInfoProgram(const char* bindir)
 {
-#ifdef HAVE_INFO
-  char* infoprog = (char* ) AllocL(max(strlen(HAVE_INFO), 
-                                       (bindir != NULL ? strlen(bindir) : 0)) 
-                                   + 10);
-#else
-  char* infoprog = (char*) AllocL((bindir != NULL ? strlen(bindir)) + 10);
-#endif
-  
+  char infoprog[MAXPATHLEN];
   if (bindir != NULL)
   {
-    sprintf(infoprog, "%s/info", bindir);
-    if (! access(infoprog, X_OK)) return infoprog;
+    sprintf(infoprog, "%s/%s", bindir, INFOPROG);
+    if (! access(infoprog, X_OK)) return mstrdup(infoprog);
   }
+
+  sprintf(infoprog, "%s/%s", SINGULAR_BIN_DIR, INFOPROG);
+  if (! access(infoprog, X_OK)) return mstrdup(infoprog);
   
 #ifdef HAVE_INFO
   sprintf(infoprog, "%s", HAVE_INFO);
-  if (! access(infoprog, X_OK)) return infoprog;
+  if (! access(infoprog, X_OK)) return mstrdup(infoprog);
 #endif
   // nothing found, let's try "info"
   sprintf(infoprog, "info");
-  return infoprog;
+  return mstrdup(infoprog);
 }
 
 //

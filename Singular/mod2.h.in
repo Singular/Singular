@@ -108,6 +108,8 @@
 #define S_VERSION2 ""
 /* Define the root directory from where Singular searches for libs and info */
 #define SINGULAR_ROOT_DIR "/usr/local/"
+/* Define the directory where binaries are found (resp. put) */
+#define SINGULAR_BIN_DIR "/usr/local/bin/"
 
 /*******************************************************************
  * Defines which are not set by configure
