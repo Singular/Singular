@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.75 2000-07-27 14:55:58 obachman Exp $
+### $Id: Makefile.in,v 1.76 2000-08-16 14:24:59 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -47,7 +47,8 @@ TEX		= tex
 MAKEINFO	= @MAKEINFO@ --force
 TEXI2DVI	= @TEXI2DVI@
 TEXINDEX	= @TEXINDEX@
-TEXI2HTML	= @TEXI2HTML@
+# use our local texi2html
+TEXI2HTML	= ./texi2html
 DVIPS		= dvips
 
 VERBOSE         = 1 # override this with make VERBOSE=2
