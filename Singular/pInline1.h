@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.15 2000-12-31 15:14:37 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.16 2001-02-07 12:37:51 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -59,7 +59,7 @@ BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, ring r);
 
 /***************************************************************
  *
- * Allocation/Initalization/Deletion 
+ * Allocation/Initalization/Deletion
  *
  ***************************************************************/
 // adjustments for negative weights
@@ -178,8 +178,8 @@ PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r)
   for (int i=1; i<=r->N; i++)
     pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
   pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
-#endif 
- 
+#endif
+
   p_MemAdd_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
   p_MemAdd_NegWeightAdjust(p1, r);
 }
@@ -193,11 +193,11 @@ PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
     pAssume1(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
   pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0 ||
           p_GetComp(p1, r) == p_GetComp(p2, r));
-#endif 
- 
+#endif
+
   p_MemSub_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
   p_MemSub_NegWeightAdjust(p1, r);
-  
+
 }
 // ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
 PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r)
@@ -208,11 +208,11 @@ PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r)
 #if PDEBUG >= 1
   for (int i=1; i<=r->N; i++)
     pAssume1(p_GetExp(p1, i, r) + p_GetExp(p2, i, r) >= p_GetExp(p3, i, r));
-  pAssume1(p_GetComp(p1, r) == 0 || 
+  pAssume1(p_GetComp(p1, r) == 0 ||
            (p_GetComp(p2, r) - p_GetComp(p3, r) == 0) ||
            (p_GetComp(p1, r) == p_GetComp(p2, r) - p_GetComp(p3, r)));
-#endif 
- 
+#endif
+
   p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpL_Size);
   // no need to adjust in case of NegWeights
 }
@@ -227,7 +227,7 @@ PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
   for (int i=1; i<=r->N; i++)
     pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
   pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
-#endif  
+#endif
 
   p_MemSum_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
   p_MemAdd_NegWeightAdjust(p1, r);
@@ -242,8 +242,8 @@ PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
   for (int i=1; i<=r->N; i++)
     pAssume1(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
   pAssume1(!rRing_has_Comp(r) || p_GetComp(p1, r) == p_GetComp(p2, r));
-#endif 
- 
+#endif
+
   p_MemDiff_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
   p_MemSub_NegWeightAdjust(p1, r);
 }
@@ -252,7 +252,7 @@ PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
 {
   p_LmCheckPolyRing1(p1, r);
   p_LmCheckPolyRing1(p2, r);
- 
+
   int i = r->ExpL_Size;
   unsigned long *ep = p1->exp;
   unsigned long *eq = p2->exp;
@@ -269,8 +269,8 @@ PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
 PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r)
 {
   p_LmCheckPolyRing1(p, r);
-  unsigned long s = p_GetTotalDegree(p->exp[r->VarL_Offset[0]], 
-                                     r, 
+  unsigned long s = p_GetTotalDegree(p->exp[r->VarL_Offset[0]],
+                                     r,
                                      r->MinExpPerLong);
   for (int i = 1; i<r->VarL_Size; i++)
   {
@@ -307,7 +307,7 @@ PINLINE1 int p_LmCmp(poly p, poly q, ring r)
   p_LmCheckPolyRing1(p, r);
   p_LmCheckPolyRing1(q, r);
 
-  p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->CmpL_Size, r->ordsgn, 
+  p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->CmpL_Size, r->ordsgn,
                                     return 0, return 1, return -1);
 }
 
@@ -321,7 +321,7 @@ PINLINE1 int p_LmCmp(poly p, poly q, ring r)
 //         TRUE, otherwise
 // (1) Consider long vars, instead of single exponents
 // (2) Clearly, if la > lb, then FALSE
-// (3) Suppose la <= lb, and consider first bits of single exponents in l: 
+// (3) Suppose la <= lb, and consider first bits of single exponents in l:
 //     if TRUE, then value of these bits is la ^ lb
 //     if FALSE, then la-lb causes an "overflow" into one of those bits, i.e.,
 //               la ^ lb != la - lb
@@ -330,7 +330,7 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
   int i=r->VarL_Size - 1;
   unsigned long divmask = r->divmask;
   unsigned long la, lb;
-  
+
   if (r->VarL_LowIndex >= 0)
   {
     i += r->VarL_LowIndex;
@@ -338,7 +338,7 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
     {
       la = a->exp[i];
       lb = b->exp[i];
-      if ((la > lb) || 
+      if ((la > lb) ||
           (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
       {
         pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == FALSE);
@@ -354,7 +354,7 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
     {
       la = a->exp[r->VarL_Offset[i]];
       lb = b->exp[r->VarL_Offset[i]];
-      if ((la > lb) || 
+      if ((la > lb) ||
           (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
       {
         pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == FALSE);
@@ -412,7 +412,7 @@ PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
 {
   pIfThen1(b!=NULL, p_LmCheckPolyRing1(b, r));
   pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r));
-  
+
   if (a != NULL && (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r)))
     return _p_LmDivisibleByNoComp(a,b,r);
   return FALSE;
@@ -430,7 +430,7 @@ PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b)
   p_LmCheckPolyRing(b, r_b);
   return _p_LmDivisibleBy(a, r_a, b, r_b);
 }
-PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, 
+PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
                                     poly b, unsigned long not_sev_b, ring r)
 {
   p_LmCheckPolyRing1(a, r);
@@ -438,8 +438,8 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
 #ifndef PDIV_DEBUG
   _pPolyAssume2(p_GetShortExpVector(a, r) == sev_a, a, r);
   _pPolyAssume2(p_GetShortExpVector(b, r) == ~ not_sev_b, b, r);
-  
-  if (sev_a & not_sev_b) 
+
+  if (sev_a & not_sev_b)
   {
     pAssume1(p_LmDivisibleByNoComp(a, b, r) == FALSE);
     return FALSE;
@@ -458,8 +458,8 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
 #ifndef PDIV_DEBUG
   _pPolyAssume2(p_GetShortExpVector(a, r_a) == sev_a, a, r_a);
   _pPolyAssume2(p_GetShortExpVector(b, r_b) == ~ not_sev_b, b, r_b);
-  
-  if (sev_a & not_sev_b) 
+
+  if (sev_a & not_sev_b)
   {
     pAssume1(_p_LmDivisibleByNoComp(a, r_a, b, r_b) == FALSE);
     return FALSE;
@@ -476,22 +476,22 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
  *
  ***************************************************************/
 // test if the monomial is a constant as a vector component
-// i.e., test if all exponents are zero 
+// i.e., test if all exponents are zero
 PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   int i = r->VarL_Size - 1;
-  
+
   do
   {
-    if (p->exp[r->VarL_Offset[i]] != 0) 
+    if (p->exp[r->VarL_Offset[i]] != 0)
       return FALSE;
     i--;
   }
   while (i >= 0);
   return TRUE;
 }
-// test if monomial is a constant, i.e. if all exponents and the component 
+// test if monomial is a constant, i.e. if all exponents and the component
 // is zero
 PINLINE1 BOOLEAN p_LmIsConstant(const poly p, const ring r)
 {
@@ -504,29 +504,29 @@ PINLINE1 BOOLEAN p_LmIsConstant(const poly p, const ring r)
 PINLINE1 BOOLEAN p_IsConstantComp(const poly p, const ring r)
 {
   if (p == NULL) return TRUE;
-  return p_LmIsConstantComp(p, r);
+  return (pNext(p)==NULL) && p_LmIsConstantComp(p, r);
 }
 
 PINLINE1 BOOLEAN p_IsConstant(const poly p, const ring r)
 {
   if (p == NULL) return TRUE;
-  return p_LmIsConstant(p, r);
+  return (pNext(p)==NULL) && p_LmIsConstant(p, r);
 }
 
-PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, 
+PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2,
                                       const ring r)
 {
   p_LmCheckPolyRing(p1, r);
   p_LmCheckPolyRing(p2, r);
   unsigned long l1, l2, divmask = r->divmask;
   int i;
-      
+
   for (i=0; i<r->VarL_Size; i++)
   {
     l1 = p1->exp[r->VarL_Offset[i]];
     l2 = p2->exp[r->VarL_Offset[i]];
     // do the divisiblity trick
-    if ( (l1 > ULONG_MAX - l2) || 
+    if ( (l1 > ULONG_MAX - l2) ||
          (((l1 & divmask) ^ (l2 & divmask)) != ((l1 + l2) & divmask)))
       return FALSE;
   }
