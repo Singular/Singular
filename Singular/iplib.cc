@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.105 2004-08-13 14:24:52 Singular Exp $ */
+/* $Id: iplib.cc,v 1.106 2005-01-18 15:41:59 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -350,11 +350,11 @@ static void iiShowLevRings()
 {
   int i;
 #ifdef USE_IILOCALRING
-  for (i=1;i<=myynest;i++)
+  for (i=0;i<=myynest;i++)
   {
     Print("lev %d:",i);
     if (iiLocalRing[i]==NULL) PrintS("NULL");
-    else                      Print("%d",iiLocalRing[i]);
+    else                      Print("%x",iiLocalRing[i]);
     PrintLn();
   }
 #endif
@@ -413,6 +413,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   iiCheckNest();
 #ifdef USE_IILOCALRING
   iiLocalRing[myynest]=currRing;
+  //Print("currRing(%d):%s(%x) in %s\n",myynest,IDID(currRingHdl),currRing,IDID(pn));
 #endif
   iiRETURNEXPR[myynest+1].Init();
   procstack->push(pi->procname);
@@ -466,6 +467,9 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     if (traceit&TRACE_SHOW_LINENO) PrintLn();
     Print("leaving %-*.*s %s (level %d)\n",myynest*2,myynest*2," ",IDID(pn),myynest);
   }
+  //char *n="NULL";
+  //if (currRingHdl!=NULL) n=IDID(currRingHdl);
+  //Print("currRing(%d):%s(%x) after %s\n",myynest,n,currRing,IDID(pn));
 #ifdef RDEBUG
   if (traceit&TRACE_SHOW_RINGS) iiShowLevRings();
 #endif
@@ -480,29 +484,36 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 #endif
   if (iiLocalRing[myynest] != currRing)
   {
-    if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
-      && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
-    || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
-      && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
-    {
-      //idhdl hn;
-      char *n;
-      char *o;
-      idhdl nh=NULL, oh=NULL;
-      if (iiLocalRing[myynest]!=NULL)
-        oh=rFindHdl(iiLocalRing[myynest],NULL, NULL);
-      if (oh!=NULL)          o=oh->id;
-      else                   o="none";
-      if (currRing!=NULL)
-        nh=rFindHdl(currRing,NULL, NULL);
-      if (nh!=NULL)          n=nh->id;
-      else                   n="none";
-      Werror("ring change during procedure call: %s -> %s",o,n);
-      iiRETURNEXPR[myynest+1].CleanUp();
-      err=TRUE;
+    if (currRing!=NULL)
+    {  
+      if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
+        && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
+      || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
+        && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
+      {
+        //idhdl hn;
+        char *n;
+        char *o;
+        idhdl nh=NULL, oh=NULL;
+        if (iiLocalRing[myynest]!=NULL)
+          oh=rFindHdl(iiLocalRing[myynest],NULL, NULL);
+        if (oh!=NULL)          o=oh->id;
+        else                   o="none";
+        if (currRing!=NULL)
+          nh=rFindHdl(currRing,NULL, NULL);
+        if (nh!=NULL)          n=nh->id;
+        else                   n="none";
+        Werror("ring change during procedure call: %s -> %s (level %d)",o,n,myynest);
+        iiRETURNEXPR[myynest+1].CleanUp();
+        err=TRUE;
+      }
     }
     currRing=iiLocalRing[myynest];
   }
+  if ((currRing==NULL)
+  && (currRingHdl!=NULL))
+    currRing=IDRING(currRingHdl);
+  else
   if ((currRing!=NULL) &&
     ((currRingHdl==NULL)||(IDRING(currRingHdl)!=currRing)
      ||(IDLEV(currRingHdl)>=myynest)))

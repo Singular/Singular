@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.88 2004-08-10 12:46:13 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.89 2005-01-18 15:42:03 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -279,7 +279,15 @@ void sleftv::CleanUp(ring r)
       case MATRIX_CMD:
       case MODUL_CMD:
       case IDEAL_CMD:
-        if (r!=NULL) id_Delete((ideal *)(&data),r);
+        if (((long)data) & 3==0)
+        {
+          if (r!=NULL) id_Delete((ideal *)(&data),r);
+        }
+        else
+        {
+          //printf("ptr err.\n");
+          data=NULL;
+        }
         break;
       case STRING_CMD:
           omFree((ADDRESS)data);

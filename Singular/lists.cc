@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.25 2004-09-13 15:41:58 Singular Exp $ */
+/* $Id: lists.cc,v 1.26 2005-01-18 15:42:00 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -183,7 +183,7 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
 */
 BOOLEAN lRingDependend(lists L)
 {
-  if (L==NULL) return TRUE;
+  if (L==NULL) return FALSE;
   int i=0;
   while (i<=L->nr)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.103 2004-09-23 10:03:30 Singular Exp $ */
+/* $Id: grammar.y,v 1.104 2005-01-18 15:41:58 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1415,6 +1415,7 @@ setringcmd:
                   if (IDLEV(h)!=0)
                   {
                     if (iiExport(&$2,myynest-1)) YYERROR;
+#if 1
                     //if (TEST_OPT_KEEPVARS)
                     //{
                       idhdl p=IDRING(h)->idroot;
@@ -1430,12 +1431,14 @@ setringcmd:
                             if (BVERBOSE(V_REDEFINE))
                               Warn("redefining %s",IDID(p));
                             killhdl2(old,&root,IDRING(h));
+                            IDRING(h)->idroot=root;
                           }
                           IDLEV(p)=prevlev;
                         }
                         p=IDNEXT(p);
                       }
-                      IDRING(h)->idroot=root;
+                      //IDRING(h)->idroot=root;
+#endif
                     //}
                   }
 #ifdef USE_IILOCALRING

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.93 2004-11-08 16:00:51 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.94 2005-01-18 15:41:59 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -205,6 +205,8 @@ static void list1(char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                    break;
     case QRING_CMD:
     case RING_CMD:
+                   if ((IDRING(h)==currRing) && (currRingHdl!=h))
+                     PrintS("(*)"); /* this is an alias to currRing */
 #ifdef RDEBUG
                    if (traceit &TRACE_SHOW_RINGS)
                      Print(" <%x>",IDRING(h));
@@ -407,7 +409,9 @@ void killlocals(int v)
   }
   if (changed)
   {
+    currRing=cr;
     currRingHdl=rFindHdl(cr,NULL,NULL);
+    if (currRingHdl==NULL) currRingHdl=sh;
   }
 
   if (myynest<=1) iiNoKeepRing=TRUE;
@@ -4287,16 +4291,26 @@ void rKill(idhdl h)
 
 idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL)
 {
+  //idhdl next_best=NULL;
   idhdl h=root;
   while (h!=NULL)
   {
     if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
     && (h!=n)
-    && (h->data.uring==r)
+    && (IDRING(h)==r)
     )
+    {
+   //   if (IDLEV(h)==myynest)
+   //     return h;
+   //   if ((IDLEV(h)==0) || (next_best==NULL))
+   //     next_best=h;
+   //   else if (IDLEV(next_best)<IDLEV(h))
+   //     next_best=h;
       return h;
+    }
     h=IDNEXT(h);
   }
+  //return next_best;
   return NULL;
 }
 

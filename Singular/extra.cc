@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.214 2004-10-18 18:57:43 levandov Exp $ */
+/* $Id: extra.cc,v 1.215 2005-01-18 15:41:57 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1416,7 +1416,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== listall ===================================*/
     if(strcmp(sys_cmd,"listall")==0)
     {
-      int showproc=1;
+      int showproc=0;
       if ((h!=NULL) && (h->Typ()==INT_CMD)) showproc=(int)h->Data();
 #ifdef HAVE_NS
       listall(showproc);

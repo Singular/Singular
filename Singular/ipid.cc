@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.69 2004-08-10 12:46:29 Singular Exp $ */
+/* $Id: ipid.cc,v 1.70 2005-01-18 15:41:58 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -651,6 +651,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   if (IDID(h)) // OB: ?????
     omFree((ADDRESS)IDID(h));
   IDID(h)=NULL;
+  IDDATA(h)=NULL;
   if (h == (*ih))
   {
     // h is at the beginning of the list
