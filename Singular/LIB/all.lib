@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.37 2001-08-27 14:47:46 Singular Exp $
+// $Id: all.lib,v 1.38 2003-02-25 17:15:38 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.37 2001-08-27 14:47:46 Singular Exp $";
+version="$Id: all.lib,v 1.38 2003-02-25 17:15:38 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
@@ -31,6 +31,7 @@ Commutative algebra
   toric_lib:       Standard Basis of Toric Ideals
 
 Singularities
+  alexpoly.lib:    Resolution Graph and Alexander Polynomial
   classify_lib:    Arnold Classifier of Singularities
   deform_lib:      Miniversal Deformation of Singularities and Modules
   equising_lib:    Equisingularity Stratum of a Family of Plane Curves
@@ -94,6 +95,7 @@ LIB "reesclos.lib";
 LIB "intprog.lib";
 LIB "toric.lib";
 //Singularities
+LIB "alexpoly.lib";
 LIB "classify.lib";
 LIB "deform.lib";
 LIB "equising.lib";
