@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.4 1997-03-26 17:07:17 Singular Exp $ 
+// $Id: fglm.cc,v 1.5 1997-03-27 10:32:36 Singular Exp $ 
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -25,7 +25,6 @@
 #include "ring.h"
 #include "ipid.h"
 #include "ipshell.h"
-#include "subexpr.h"
 #include "febase.h"
 #include "maps.h"
 #include "mmemory.h"
@@ -257,7 +256,7 @@ fglmProc( leftv result, leftv first, leftv second )
 
     if ( state == FglmOk ) {
 	idhdl ih = currRing->idroot->get( second->Name(), myynest );
-	if (( ih != NULL )&&(IDTYP(ih)==IDEAL_CMD)) {
+	if ( (ih != NULL) && (IDTYP(ih)==IDEAL_CMD) ) {
 	    ideal sourceIdeal;
 	    if ( currQuotient != NULL ) 
 		sourceIdeal= fglmUpdatesource( IDIDEAL( ih ) );
@@ -292,11 +291,11 @@ fglmProc( leftv result, leftv first, leftv second )
 	    destIdeal= idInit(0,0);
 	    break;
 	case FglmNotZeroDim:
-	    Werror( "The ideal %s has to be 0-dimensional", second->name );
+	    Werror( "The ideal %s has to be 0-dimensional", second->Name() );
 	    destIdeal= idInit(0,0);
 	    break;
 	case FglmNotReduced:
-	    Werror( "The ideal %s has to be reduced", second->name );
+	    Werror( "The ideal %s has to be reduced", second->Name() );
 	    destIdeal= idInit(0,0);
 	    break;
 	default:
