@@ -1,9 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: lieA.lib,v 1.2 2003-05-22 13:56:11 levandov Exp $";
+version="$Id: lieA.lib,v 1.3 2003-07-25 14:34:34 levandov Exp $";
 category="Plural: Lie Theory";
 info="
 LIBRARY:  lieA.lib      definitions of several enveloping algebras
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
+@*        Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de,
 @*        Oleksander Motsak
 
 PROCEDURES:
