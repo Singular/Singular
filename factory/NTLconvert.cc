@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.4 2002-10-10 17:43:38 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.5 2003-02-04 16:24:59 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -410,12 +410,21 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
 // OUTPUT: The converted Factory-integer of type canonicalform                //
 ////////////////////////////////////////////////////////////////////////////////
 
+static char *cf_stringtemp=NULL;
+static char *cf_stringtemp2=NULL;
+static int cf_stringtemp_l=0;
 CanonicalForm convertZZ2CF(ZZ coefficient)
 {
   long coeff_long;
   //CanonicalForm tmp=0;
-  char stringtemp[5000]="";
-  char stringtemp2[5000]="";
+  if (cf_stringtemp_l==0)
+  {
+    cf_stringtemp=(char *)omAlloc(1023);
+    cf_stringtemp2=(char *)omAlloc(1023);
+    cf_stringtemp[0]='\0';
+    cf_stringtemp2[0]='\0';
+    cf_stringtemp_l=1023;
+  }
   char dummy[2];
   int minusremainder=0;
 
@@ -443,6 +452,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
       coefficient=-coefficient;
     }
 
+    int l=0;
     while (coefficient>9)
     {
       ZZ quotient,remaind;
@@ -451,33 +461,46 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
       dummy[0]=(char)(to_long(remaind)+'0');
       //tmp*=10; tmp+=to_long(remaind);
 
-      strcat(stringtemp,dummy);
+      l++;
+      if (l>=cf_stringtemp_l-2)
+      {
+        omFree(cf_stringtemp2);
+        char *p=(char *)omAlloc(cf_stringtemp_l*2);
+        memcpy(p,cf_stringtemp,cf_stringtemp_l);
+        cf_stringtemp_l*=2;
+        omFree(cf_stringtemp);
+        cf_stringtemp=p;
+        cf_stringtemp2=(char *)omAlloc(cf_stringtemp_l);
+      }
+      cf_stringtemp[l-1]=dummy[0];
+      cf_stringtemp[l]='\0';
+      //strcat(stringtemp,dummy);
 
       coefficient=quotient;
     }
     //built up the string in dummy[0]
     dummy[0]=(char)(to_long(coefficient)+'0');
-    strcat(stringtemp,dummy);
+    strcat(cf_stringtemp,dummy);
     //tmp*=10; tmp+=to_long(coefficient);
 
     if (minusremainder==1)
     {
       //Check whether coefficient has been negative at the start of the procedure
-      stringtemp2[0]='-';
+      cf_stringtemp2[0]='-';
       //tmp*=(-1);
     }
 
     //reverse the list to obtain the correct string
-    int len=strlen(stringtemp);
+    int len=strlen(cf_stringtemp);
     for (int i=len-1;i>=0;i--)
     {
-      stringtemp2[len-i-1+minusremainder]=stringtemp[i];
+      cf_stringtemp2[len-i-1+minusremainder]=cf_stringtemp[i];
     }
-    stringtemp2[len+minusremainder]='\0';
+    cf_stringtemp2[len+minusremainder]='\0';
   }
 
   //convert the string to canonicalform using the char*-Constructor
-  return CanonicalForm(stringtemp2);
+  return CanonicalForm(cf_stringtemp2);
   //return tmp;
 }
 
