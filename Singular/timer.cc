@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.7 1997-04-25 15:04:08 obachman Exp $ */
+/* $Id: timer.cc,v 1.8 1997-04-25 18:35:11 obachman Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -42,14 +42,20 @@ void SetMinDisplayTime(double mtime)
 
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
-# include <sys/times.h>
+# ifdef HAVE_SYS_TIME_H
+#   include <sys/time.h>
+# endif
 #else
-# if HAVE_SYS_TIME_H
-#   include <sys/times.h>
+# ifdef HAVE_SYS_TIME_H
+#   include <sys/time.h>
 # else
 #   include <time.h>
 # endif
 #endif
+#ifdef HAVE_SYS_TIMES_H
+#include <sys/times.h>
+#endif
+
 
 // need to be adjusted on your machine: the number of ticks per second: HZ
 #ifndef HZ

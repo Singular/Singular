@@ -1,5 +1,7 @@
 Fri Apr 25 16:59:31 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
+	* fixed sys/times.h and sys/time.h confusion
+
 	* Various changes to reflect new configure (versions defined in
 	  configure.in, changed HAVE_LIBFACTORY into HAVE_FACTORY, data
 	  dir is pasted from configure into mod2.h and used from there in

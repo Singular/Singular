@@ -37,6 +37,8 @@
 #undef HAVE_SYS_IOCTL_H
 /* Define if you have sys/time.h */
 #undef HAVE_SYS_TIME_H
+/* Define if you have sys/times.h */
+#undef HAVE_SYS_TIMES_H
 /* Define if time.h and sys/time.h can be included at the same time */
 #undef TIME_WITH_SYS_TIME
 /* Define if you have alloca.h */

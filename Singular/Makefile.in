@@ -140,14 +140,12 @@ iparith.inc : ${OBJS} iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h
 	./gentable
 	/bin/rm gentable
 
-version.h: ${SOURCES} ${HEADERS} Makefile.in configure.in
+version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 	echo "#define VERSION_ID " `date '+%y%m%d%H'` >version.h
 
-mod2.h: configure mod2.h.in 
+mod2.h: configure mod2.h.in Makefile.in
 	./configure ${CONFIGURE_INPUT}
-
-Makefile: configure Makefile.in
-	./configure ${CONFIGURE_INPUT}
+	touch -r mod2.h configure configure.in
 
 configure: configure.in
 	autoconf configure.in > configure
@@ -188,7 +186,7 @@ clean:
 
 distclean: clean
 	-rm -f depend *.inc ${DIST_NAME}
-	-rm Singular* Makefile TAGS* config.status config.cache config.log
+	-rm mod2.h Makefile TAGS* config.status config.cache config.log
 
 maintainer-clean: distlean
 	@echo "This command is intended for maintainers to use;"

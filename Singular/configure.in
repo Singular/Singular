@@ -270,7 +270,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
-AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h)
+AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h)
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.

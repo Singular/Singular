@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.8 1997-04-25 15:03:54 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.9 1997-04-25 18:35:06 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -27,15 +27,20 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-#if TIME_WITH_SYS_TIME
+#ifdef TIME_WITH_SYS_TIME
 # include <time.h>
-# include <sys/times.h>
+# ifdef HAVE_SYS_TIME_H
+#   include <sys/time.h>
+# endif
 #else
-# if HAVE_SYS_TIME_H
-#   include <sys/times.h>
+# ifdef HAVE_SYS_TIME_H
+#   include <sys/time.h>
 # else
 #   include <time.h>
 # endif
+#endif
+#ifdef HAVE_SYS_TIMES_H
+#include <sys/times.h>
 #endif
 
 #define INTERACTIVE 0
