@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.42 1999-08-10 16:23:23 Singular Exp $
+@comment $Id: start.doc,v 1.43 1999-08-23 14:53:07 anne Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -1078,11 +1078,8 @@ R;
 ideal I = x4+x3y+x2yz,x2y2+xy2z+y2z2,x2z2+2xz3,2x2z2+xyz2;
 option(prot);
 resolution rs = res(I,0);
-@expansion{} v4(3)s-s.s.s5(3)s6-s.s-s7(2)s-s-s
-@expansion{} product criterion:0 chain criterion:8
-@expansion{} (6)(5).(4).(3)..(2)..(1).[1]
-@expansion{} (7)(6)(5)(4).(3)(2).(1)[2]
-@expansion{}  // .... rest of protocol omitted here
+@expansion{} using lres
+@expansion{} 4(m0)4(m1).5(m1)g.g6(m1)...6(m2)..
 @end smallexample
 
 @noindent Disable this protocol with
@@ -1104,12 +1101,12 @@ rs;
 print(betti(rs),"betti");
 @expansion{}            0     1     2     3
 @expansion{} ------------------------------
-@expansion{}     0:     1     0     0     0
-@expansion{}     1:     0     0     0     0
-@expansion{}     2:     0     0     0     0
-@expansion{}     3:     0     4     1     0
-@expansion{}     4:     0     0     1     0
-@expansion{}     5:     0     0     3     2
+@expansion{}     0:     1     -     -     -
+@expansion{}     1:     -     -     -     -
+@expansion{}     2:     -     -     -     -
+@expansion{}     3:     -     4     1     -
+@expansion{}     4:     -     -     1     -
+@expansion{}     5:     -     -     3     2
 @expansion{} ------------------------------
 @expansion{} total:     1     4     5     2
 @end smallexample
@@ -1120,11 +1117,11 @@ display a module in a more readable format:
 
 @smallexample
 print(rs[3]);
-@expansion{} y2z,  y3,
-@expansion{} -y2,  -y2,
-@expansion{} x+y-z,x+y-z,
-@expansion{} -2z,  x-y+4z,
-@expansion{} -z,   -y+3z
+@expansion{} z3,   -xyz-y2z-4xz2+16z3,
+@expansion{} 0,    -y2,
+@expansion{} -y+4z,48z, 
+@expansion{} x+2z, 48z, 
+@expansion{} 0,    x+y-z  
 @end smallexample
 
 In this case, the output is to be interpreted as follows: the 2nd syzygy
