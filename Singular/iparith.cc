@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.334 2005-02-03 16:41:07 Singular Exp $ */
+/* $Id: iparith.cc,v 1.335 2005-02-04 14:33:13 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1444,6 +1444,17 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 {
+  idrec tmp_proc;
+  BOOLEAN t=FALSE;
+  if (u->rtyp!=IDHDL) 
+  {
+    tmp_proc.id="_auto";
+    tmp_proc.typ=IDHDL;
+    tmp_proc.data.pinf=(procinfo *)u->data;  
+    tmp_proc.ref=1;
+    u->data=(void *)&tmp_proc;
+    t=TRUE;
+  }
 #ifdef HAVE_NS
   leftv sl;
   if (u->req_packhdl==currPack)
@@ -1453,6 +1464,11 @@ static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 #else /* HAVE_NS */
   leftv sl = iiMake_proc((idhdl)u->data,v);
 #endif /* HAVE_NS */
+  if (t)
+  {
+    u->rtyp=PROC_CMD;
+    u->data=(void *)tmp_proc.data.pinf;
+  }
   if (sl==NULL)
   {
     return TRUE;
@@ -2826,22 +2842,7 @@ static BOOLEAN jjUMINUS_IV(leftv res, leftv u)
 }
 static BOOLEAN jjPROC1(leftv res, leftv u)
 {
-  if ((u->rtyp!=IDHDL) || (u->e!=NULL))
-    return TRUE;
-#ifdef HAVE_NS
-  leftv sl = iiMake_proc((idhdl) u->data,u->req_packhdl,NULL);
-#else /* HAVE_NS */
-  leftv sl = iiMake_proc((idhdl) u->data,NULL);
-#endif /* HAVE_NS */
-  if (sl==NULL)
-  {
-    return TRUE;
-  }
-  else
-  {
-    memcpy(res,sl,sizeof(sleftv));
-  }
-  return FALSE;
+  return jjPROC(res,u,NULL);
 }
 static BOOLEAN jjBAREISS(leftv res, leftv v)
 {
