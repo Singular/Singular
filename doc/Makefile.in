@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.80 2002-12-11 17:06:23 levandov Exp $
+### $Id: Makefile.in,v 1.81 2002-12-11 17:37:43 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -116,6 +116,7 @@ IMAGES_UU	:= $(wildcard images/*.uu)
 IMAGES     := $(IMAGES_UU:images/%.uu=%)
 IMAGES_SRC := $(IMAGES:%=images/%)
 IMAGES_HTML := $(IMAGES:%=${HTML_SUBDIR}/%)
+PLU_IMAGES_HTML := $(IMAGES:%=${PLU_HTML_SUBDIR}/%)
 
 # prepend bindir to path so that programs from there are taken first
 export PATH := "${bindir}:${PATH}"
