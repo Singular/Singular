@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.8 2000-10-23 16:32:25 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.9 2000-10-26 06:39:29 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -15,6 +15,7 @@
 // define to enable debugging/statistics of pLmShortDivisibleBy
 #undef PDIV_DEBUG
 #endif
+#include <limits.h>
 
 #include "mod2.h"
 #include "structs.h"
@@ -452,6 +453,7 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
 // i.e., test if all exponents are zero 
 PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r)
 {
+  p_LmCheckPolyRing(p, r);
   int i = r->VarL_Size - 1;
   
   do
@@ -464,6 +466,40 @@ PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r)
   return TRUE;
 }
 
+PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, 
+                                      const ring r)
+{
+  p_LmCheckPolyRing(p1, r);
+  p_LmCheckPolyRing(p2, r);
+  unsigned long l1, l2, divmask = r->divmask;
+  int i;
+      
+  for (i=0; i<r->VarL_Size; i++)
+  {
+    l1 = p1->exp[r->VarL_Offset[i]];
+    l2 = p2->exp[r->VarL_Offset[i]];
+    // do the divisiblity trick
+    if ( (l1 > ULONG_MAX - l2) || 
+         (((l1 & divmask) ^ (l2 & divmask)) != ((l1 + l2) & divmask)))
+      return FALSE;
+  }
+  return TRUE;
+}
+
+PINLINE1 Exponent_t p_GetMaxExp(unsigned long l, ring r)
+{
+  long shift = (BIT_SIZEOF_LONG - r->BitsPerExp);
+  unsigned long max = 0;
+  Exponent_t e;
+  
+  for (;shift >= 0; shift -= r->BitsPerExp)
+  {
+    e = ((l >> shift) & r->bitmask);
+    if ((unsigned long) e > max) 
+      max = e;
+  }
+  return max;
+}
 
 #endif // !defined(NO_PINLINE1) || defined(PINLINE1_CC)
 #endif // PINLINE1_CC

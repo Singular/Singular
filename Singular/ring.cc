@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.129 2000-10-25 09:25:21 Singular Exp $ */
+/* $Id: ring.cc,v 1.130 2000-10-26 06:39:30 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2375,7 +2375,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   int bits;
 
   exp_limit=rGetExpSize(exp_limit, bits);
-  need_other_ring = (exp_limit==r->bitmask);
+  need_other_ring = (exp_limit != r->bitmask);
 
   int nblocks=rBlocks(r);
   int *order=(int*)omAlloc0((nblocks+1)*sizeof(int));
@@ -2461,7 +2461,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   res->block0=block0;
   res->block1=block1;
   res->bitmask=exp_limit;
-  rComplete(res);
+  rComplete(res, 1);
   return res;
 }
 
@@ -3100,13 +3100,13 @@ static void rSetVarL(ring r)
 // get r->divmask depending on bits per exponent
 static unsigned long rGetDivMask(int bits)
 {
-  unsigned long divmask = 1;
-  int i = bits;
-
-  while (i < BIT_SIZEOF_LONG)
+  unsigned long divmask = 0;
+  int i = BIT_SIZEOF_LONG - bits;
+  
+  while (i >= 0)
   {
     divmask |= (1 << (unsigned long) i);
-    i += bits;
+    i -= bits;
   }
   return divmask;
 }

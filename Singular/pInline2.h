@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.11 2000-10-24 11:03:59 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.12 2000-10-26 06:39:29 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -295,6 +295,11 @@ PINLINE2 int p_Cmp(poly p1, poly p2, ring r)
   if (p1==NULL)
     return -1;
   return p_LmCmp(p1,p2,r);
+}
+
+PINLINE2 Exponent_t p_GetMaxExp(poly p, ring r)
+{
+  return p_GetMaxExp(p_GetMaxExpL(p, r), r);
 }
 
 /***************************************************************

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.11 2000-09-25 12:26:31 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.12 2000-10-26 06:39:27 obachman Exp $ */
 #include "structs.h"
 
 /////////////////////////////////////////////////////////////////////////
@@ -17,7 +17,10 @@
 // Creation/Destruction of buckets
 //
 kBucket_pt kBucketCreate(ring r = currRing);
+// only free memory allocated for bucket
 void kBucketDestroy(kBucket_pt *bucket);
+// frees polys/monomials in bucket and destroys bucket
+void kBucketDeleteAndDestroy(kBucket_pt *bucket);
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -95,6 +98,14 @@ void kBucket_Mult_n(kBucket_pt bucket, number n);
 void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                             poly spNother = NULL);
 
+
+//////////////////////////////////////////////////////////////////////////
+///
+/// For changing the ring of the Bpoly to new_tailBin
+/// 
+void kBucketShallowCopyDelete(kBucket_pt bucket, 
+                              ring new_tailRing, omBin new_tailBin,
+                              pShallowCopyDeleteProc p_shallow_copy_delete);
 
 //////////////////////////////////////////////////////////////////////////
 ///

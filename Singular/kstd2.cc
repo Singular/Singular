@@ -1,18 +1,23 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.53 2000-10-23 16:32:23 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.54 2000-10-26 06:39:27 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
 
+// define to enable tailRings
+// #define HAVE_TAIL_RING
+
+// #define PDEBUG 2
+
 #include "mod2.h"
+#include "kutil.h"
 #include "tok.h"
 #include "omalloc.h"
 #include "polys.h"
 #include "ideals.h"
 #include "febase.h"
-#include "kutil.h"
 #include "kstd1.h"
 #include "khstd.h"
 #include "cntrlc.h"
@@ -20,6 +25,9 @@
 #include "ipid.h"
 #include "ipshell.h"
 #include "intvec.h"
+
+// redBest is broken, so, fix it and then define this
+// #define HAVE_RED_BEST
 
 // #include "timer.h"
 
@@ -104,22 +112,22 @@ static int redHomog (LObject* h,kStrategy strat)
     PrintS(" ");
   }
 #endif
-  ring tailRing = h->tailRing;
   int j;
   while (1)
   {
     // find a poly with which we can reduce
-    h->sev = p_GetShortExpVector(h->GetLmTailRing(), tailRing);
+    h->sev = p_GetShortExpVector(h->GetLmTailRing(), strat->tailRing);
     j = kFindDivisibleBy(strat->T, strat->tl, h);
     if (j < 0) return 1;
     
     // now we found one which is divisible
     ksReducePoly(h, &(strat->T[j]), strat->kNoether);
+
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       PrintS("\nto ");
-      wrp(h->GetLmTailRing(), tailRing);
+      wrp(h->GetLmTailRing(), strat->tailRing);
       PrintLn();
     }
 #endif
@@ -147,10 +155,9 @@ static int redLazy (LObject* h,kStrategy strat)
   int pass = 0;
   int reddeg = pFDeg((*h).p);
   int not_sev;
-  ring tailRing = h->tailRing;
   poly h_p;
 
-  h->sev = p_GetShortExpVector(h->GetLmTailRing(), tailRing);
+  h->sev = p_GetShortExpVector(h->GetLmTailRing(), strat->tailRing);
   while (1)
   {
     j = kFindDivisibleBy(strat->T, strat->tl, h);
@@ -186,8 +193,8 @@ static int redLazy (LObject* h,kStrategy strat)
 #endif
       return 0;
     }
-    h->sev = p_GetShortExpVector(h_p, tailRing);
-    d = pFDeg(h_p, tailRing);
+    h->sev = p_GetShortExpVector(h_p, strat->tailRing);
+    d = h->pFDeg();
     /*- try to reduce the s-polynomial -*/
     pass++;
     if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
@@ -228,11 +235,10 @@ static int redHoney (LObject* h, kStrategy strat)
   int i,j,at,reddeg,d,pass,ei, ii, h_d;
   unsigned long not_sev;
   poly h_p = h->GetLmTailRing();
-  ring tailRing = strat->tailRing;
 
   pass = j = 0;
-  d = reddeg = pFDeg(h_p, tailRing) + h->ecart;
-  h->sev = p_GetShortExpVector(h_p, tailRing);
+  d = reddeg = h->pFDeg() + h->ecart;
+  h->sev = p_GetShortExpVector(h_p, strat->tailRing);
   not_sev = ~ h->sev;
   loop
   {
@@ -257,7 +263,7 @@ static int redHoney (LObject* h, kStrategy strat)
         break;
       if ((strat->T[i].ecart < ei) && 
           p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->T[i].sev, 
-                              h_p, not_sev, tailRing))
+                              h_p, not_sev, strat->tailRing))
       {
         /*
          * the polynomial to reduce with is now;
@@ -315,7 +321,7 @@ static int redHoney (LObject* h, kStrategy strat)
     if (strat->fromT)
     {
       strat->fromT=FALSE;
-      h->p = p_Copy(h->p, currRing, tailRing);
+      h->p = p_Copy(h->p, currRing, strat->tailRing);
     }
 
     ksReducePoly(h, &(strat->T[ii]), strat->kNoether);
@@ -338,9 +344,9 @@ static int redHoney (LObject* h, kStrategy strat)
 #endif
       return 0;
     }
-    h->sev = p_GetShortExpVector(h_p, tailRing);
+    h->sev = p_GetShortExpVector(h_p, strat->tailRing);
     not_sev = ~ h->sev;
-    h_d = pFDeg(h_p, tailRing);
+    h_d = h->pFDeg();
     /* compute the ecart */
     if (ei <= (*h).ecart)
       (*h).ecart = d-h_d;
@@ -380,6 +386,7 @@ static int redHoney (LObject* h, kStrategy strat)
   }
 }
 
+#ifdef HAVE_RED_BEST
 /*2
 *  reduction procedure for tests only
 *  reduces with elements from T and chooses the best possible
@@ -487,7 +494,7 @@ static int redBest (LObject*  h,kStrategy strat)
     }
   }
 }
-
+#endif
 /*2
 *  reduction procedure for the normal form
 */
@@ -552,9 +559,12 @@ void initBba(ideal F,kStrategy strat)
   idhdl h;
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
+#ifdef HAVE_RED_BEST
   if ((TEST_OPT_REDBEST) && (!strat->honey))
     strat->red = redBest;
-  else if (strat->honey)
+  else 
+#endif
+    if (strat->honey)
     strat->red = redHoney;
   else if (pLexOrder && !strat->homog)
     strat->red = redLazy;
@@ -619,6 +629,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   kTest_TS(strat);
   
+#ifdef HAVE_TAIL_RING
+  kStratInitChangeTailRing(strat);
+#endif  
+  
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
@@ -645,18 +659,31 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
     if (pNext(strat->P.p) == strat->tail)
     {
+      poly m1 = NULL, m2 = NULL;
       /* deletes the short spoly and computes */
       pLmFree(strat->P.p);
-      /* the real one */
-      ksCreateSpoly(&(strat->P),
-                    strat->kNoether,
-                    strat->use_buckets, 
-                    strat->tailRing);
+      /* check that spoly creation is ok */
+      if (strat->tailRing != currRing && 
+          !kCheckSpolyCreation(strat, m1, m2))
+      {
+        assume(m1 == NULL && m2 == NULL);
+        // if not, change to a ring where exponents are at least
+        // twice as large as current ones -- should be enough to
+        // get through ksCreateSpoly correctly
+        kStratChangeTailRing(strat,
+                             rModifyRing(currRing, strat->homog, ! strat->ak,
+                                         strat->tailRing->bitmask << 1));
+      }
+      /* create the real one */
+      ksCreateSpoly(&(strat->P), strat->kNoether, strat->use_buckets, 
+                    strat->tailRing, m1, m2);
     }
-    if((strat->P.p1==NULL) && (strat->minim>0)) strat->P.p2=pCopy(strat->P.p);
+
+    if  ((strat->P.p1==NULL) && (strat->minim>0)) 
+      strat->P.p2=pCopy(strat->P.p);
 
     if (TEST_OPT_PROT)
-      message((strat->honey ? strat->P.ecart : 0) + pFDeg(strat->P.p),
+      message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
               &olddeg,&reduc,strat);
 
     /* reduction of the element choosen from L */

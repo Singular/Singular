@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.68 2000-10-23 16:32:24 obachman Exp $ */
+/* $Id: kutil.cc,v 1.69 2000-10-26 06:39:28 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -9,10 +9,13 @@
 #ifndef KUTIL_CC
 #define KUTIL_CC
 
+// #define PDEBUG 2
+
 #include <stdlib.h>
 #include <string.h>
 #include "mod2.h"
 #include "tok.h"
+#include "kutil.h"
 #include "febase.h"
 #include "omalloc.h"
 #include "numbers.h"
@@ -24,8 +27,13 @@
 #include "stairc.h"
 #include "subexpr.h"
 #include "kstd1.h"
-#include "kutil.h"
 #include "pShallowCopyDelete.h"
+
+#ifdef KDEBUG 
+#undef KDEBUG
+#define KDEBUG 2
+#endif
+
 
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
@@ -217,6 +225,8 @@ void cleanT (kStrategy strat)
   {
     p = strat->T[j].p;
     strat->T[j].p=NULL;
+    if (strat->T[j].max != NULL) 
+      p_LmFree(strat->T[j].max, strat->tailRing);
     i = -1;
     loop
     {
@@ -313,6 +323,17 @@ BOOLEAN isInPairsetB(poly q,int*  k,kStrategy strat)
   }
 }
 
+int kFindInT(poly p, TSet T, int tlength)
+{
+  int i;
+
+  for (i=0; i<=tlength; i++)
+  {
+    if (T[i].p == p) return i;
+  }
+  return -1;
+}
+
 #ifdef KDEBUG
 #define kFalseReturn(x) do { if (!x) return FALSE;} while (0)
 
@@ -365,9 +386,38 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
       p = T->t_p;
       r = T->tailRing;
     }
+    if (T->t_p != NULL && i >= 0 && TN == 'T')
+    {
+      if (pNext(T->t_p) == NULL)
+      {
+        if (T->max != NULL)
+          return dReportError("%c[%d].max is not NULL as it should be", TN, i);
+      }
+      else
+      {
+        if (T->max == NULL)
+          return dReportError("%c[%d].max is NULL", TN, i);
+        if (pNext(T->max) != NULL)
+          return dReportError("pNext(%c[%d].max) != NULL", TN, i);
+        
+        pFalseReturn(p_CheckPolyRing(T->max, tailRing));
+        omCheckBinAddrSize(T->max, (tailRing->PolyBin->sizeW)*SIZEOF_LONG);
+#if KDEBUG > 1
+        poly test_max = p_GetMaxExpP(pNext(T->t_p), tailRing);
+        p_Setm(T->max, tailRing);
+        p_Setm(test_max, tailRing);
+        BOOLEAN equal = p_ExpVectorEqual(T->max, test_max, tailRing);
+        if (! equal)
+          return dReportError("%c[%d].max out of sync", TN, i);
+        p_LmFree(test_max, tailRing);
+#endif
+      }
+    }
   }
   else
   {
+    if (T->max != NULL) 
+      return dReportError("%c[%d].max != NULL but tailRing == currRing",TN,i);
     if (T->t_p != NULL)
       return dReportError("%c[%d].t_p != NULL but tailRing == currRing",TN,i);
     if (T->p == NULL && i > 0)
@@ -401,7 +451,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     }
     kFalseReturn(kTest_T(L, strat_tailRing, lpos, 'L'));
   }
-
+  r_assume(L->max == NULL);
   if (L->p1 == NULL)
   {
     // L->p2 either NULL or "normal" poly
@@ -437,7 +487,6 @@ BOOLEAN kTest (kStrategy strat)
   {
     for (i=0; i<=strat->tl; i++)
       kFalseReturn(kTest_T(&(strat->T[i]), strat->tailRing, i, 'T'));
-      
   }
 
   // test L
@@ -448,6 +497,12 @@ BOOLEAN kTest (kStrategy strat)
       kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
                            (pNext(strat->L[i].p) != strat->tail), i,
                            strat->T, strat->tl + 1));
+      if (strat->use_buckets && pNext(strat->L[i].p) != strat->tail && 
+          strat->L[i].p1 != NULL)
+      {
+        assume(strat->L[i].bucket != NULL);
+      }
+
     }
   }
 
@@ -474,20 +529,6 @@ BOOLEAN kTest_S(kStrategy strat)
   return ret;
 }
 
-
-    
-
-
-int kFindInT(poly p, TSet T, int tlength)
-{
-  int i;
-
-  for (i=0; i<=tlength; i++)
-  {
-    if (T[i].p == p) return i;
-  }
-  return -1;
-}
 
 
 BOOLEAN kTest_TS(kStrategy strat)
@@ -568,7 +609,17 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
           else
           {
             /* not found : */
-            pDelete(&p);
+            if (set[j].t_p != NULL)
+            {
+              p_Delete(&(set[j].t_p), set[j].tailRing);
+              p_LmFree(p, currRing);
+            }
+            else
+            {
+              pDelete(&p);
+            }
+            if (set[j].bucket != NULL)
+              kBucketDeleteAndDestroy(&set[j].bucket);
             break;
           }
         }
@@ -635,7 +686,14 @@ void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 void initEcartNormal (LObject* h)
 {
   poly h_p = h->GetLmTailRing();
+  if (h->bucket != NULL)
+  {
+    assume(pNext(h_p) == NULL);
+    int i = kBucketCanonicalize(h->bucket);
+    pNext(h_p) = h->bucket->buckets[i];
+  }
   h->ecart = pLDeg(h_p,&(h->length), h->tailRing)-pFDeg(h_p, h->tailRing);
+  if (h->bucket != NULL) pNext(h_p) = NULL;
 }
 
 void initEcartBBA (LObject* h)
@@ -823,7 +881,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     Lp.p=NULL;
   else
   {
-    Lp.p = ksCreateShortSpoly(strat->S[i],p);
+    Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
   }
   if (Lp.p == NULL)
   {
@@ -895,7 +953,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
   }
   /*-  compute the short s-polynomial -*/
 
-  Lp.p = ksCreateShortSpoly(strat->S[i],p);
+  Lp.p = ksCreateShortSpoly(strat->S[i],p,strat->tailRing);
   if (Lp.p == NULL)
   {
      pLmFree(Lp.lcm);
@@ -2374,12 +2432,13 @@ all_done:
 *compute the normalform of the tail p->next of p
 *with respect to S
 */
-poly redtailBba (poly p, int pos, kStrategy strat)
+poly redtailBba (LObject* L, int pos, kStrategy strat)
 {
   poly h, hn;
   int j;
   unsigned long not_sev;
   strat->redTailChange=FALSE;
+  poly p = L->p;
 
   if (strat->noTailReduction)
   {
@@ -2390,20 +2449,44 @@ poly redtailBba (poly p, int pos, kStrategy strat)
   while(hn != NULL)
   {
     j = 0;
-    not_sev = ~ pGetShortExpVector(hn);
+    not_sev = ~ p_GetShortExpVector(hn, strat->tailRing);
     while (j <= pos)
     {
       if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev))
       {
         strat->redTailChange=TRUE;
         assume(p != strat->S[j]);
-        ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
+        if (strat->tailRing != currRing)
+        {
+          int i = kFindInT(strat->S[j], strat->T, strat->tl);
+          assume(i >= 0);
+          if (! ksReducePolyTail(L, &(strat->T[i]), h, strat->kNoether))
+          {
+            // reducing the tail violated exp bound
+            kStratChangeTailRing(strat,
+                                 rModifyRing(currRing, strat->homog, 
+                                             ! strat->ak,
+                                             strat->tailRing->bitmask << 1));
+            if (L->tailRing != strat->tailRing)
+            {
+              pShallowCopyDeleteProc 
+                pscd =pGetShallowCopyDeleteProc(L->tailRing,strat->tailRing);
+              L->ShallowCopyDelete(strat->tailRing, pscd);
+            }
+            return redtailBba(L, pos, strat);
+          }
+        }
+        else
+        {
+          TObject With(strat->S[j], currRing, strat->tailRing);
+          ksReducePolyTail(L, &With, h, strat->kNoether);
+        }
         hn = pNext(h);
         if (hn == NULL)
         {
           return p;
         }
-        not_sev = ~ pGetShortExpVector(hn);
+        not_sev = ~ p_GetShortExpVector(hn, strat->tailRing);
         j = 0;
       }
       else
@@ -2521,7 +2604,7 @@ void messageSets (kStrategy strat)
     for (i=0; i<=strat->tl; i++)
     {
       Print("\n  %d:",i);
-      wrp(strat->T[i].GetLm(strat->tailRing));
+      wrp(strat->T[i].GetLmTailRing());
       Print(" o:%d e:%d l:%d",
         pFDeg(strat->T[i].p),strat->T[i].ecart,strat->T[i].length);
     }
@@ -2536,7 +2619,7 @@ void messageSets (kStrategy strat)
     wrp(strat->L[i].p2, currRing, strat->tailRing);
     PrintS(" lcm: ");wrp(strat->L[i].lcm, currRing);
     PrintS("\n  p : ");
-    wrp(strat->L[i].GetLm(strat->tailRing), strat->tailRing);
+    wrp(strat->L[i].GetLmTailRing(), strat->tailRing);
     Print("  o:%d e:%d l:%d",
      pFDeg(strat->L[i].p),strat->L[i].ecart,strat->L[i].length);
   }
@@ -3337,7 +3420,8 @@ void enterTBba (LObject p, int atT,kStrategy strat)
 {
   int i;
 
-  pTest(p.p);
+  pp_Test(p.p, currRing, p.tailRing);
+  assume(strat->tailRing == p.tailRing);
   assume(p.pLength == 0 || pLength(p.p) == p.pLength);
 
   strat->newt = TRUE;
@@ -3345,7 +3429,7 @@ void enterTBba (LObject p, int atT,kStrategy strat)
   for (i=strat->tl+1; i>=atT+1; i--)
     strat->T[i] = strat->T[i-1];
 
-  strat->T[atT] = p;
+  strat->T[atT] = (TObject) p;
   if (strat->tailBin != NULL && (pNext(p.p) != NULL))
     pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
                                    (strat->tailRing != NULL ? 
@@ -3353,6 +3437,9 @@ void enterTBba (LObject p, int atT,kStrategy strat)
                                    strat->tailBin);
   if (strat->use_buckets && p.pLength <= 0)
     strat->T[atT].pLength = pLength(p.p);
+
+  if (strat->tailRing != currRing)
+    strat->T[atT].max = p_GetMaxExpP(pNext(p.p), strat->tailRing);
 
   if (p.sev == 0)
   {
@@ -3696,13 +3783,66 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
 
 /***************************************************************
  *
- * Routines related to ring changes during std computations
- * UNFINISHED !!!
+ * Routines related for ring changes during std computations
+ *
  ***************************************************************/
-#define  kBucketShallowCopyDelete(p, r, b, proc) ((void)0)
+BOOLEAN kCheckSpolyCreation(kStrategy strat, 
+                            poly &m1, poly &m2)
+{
+  assume(pNext(strat->P.p) == strat->tail);
+  assume(strat->P.p1 != NULL && strat->P.p2 != NULL);
+  assume(strat->tailRing != currRing && strat->tailRing == strat->P.tailRing);
+  
+  if (! k_GetLeadTerms(strat->P.p1, strat->P.p2, currRing,
+                       m1, m2, strat->tailRing))
+    return FALSE;
+  
+  int i =0;
+  BOOLEAN 
+    m1_ok = (pNext(strat->P.p1) == NULL), 
+    m2_ok = (pNext(strat->P.p2) == NULL);
+  
+  if (m1_ok && m2_ok) return TRUE;
+  
+  for (i=0; i<=strat->tl; i++)
+  {
+    if (!m1_ok)
+    {
+      if (strat->T[i].p == strat->P.p1)
+      {
+        // check that m1*tail(p1) is ok
+        if (! p_LmExpVectorAddIsOk(m1, strat->T[i].max, strat->tailRing))
+          goto false_return;
+        if (m2_ok) return TRUE;
+        m1_ok = TRUE;
+      }
+    }
+    if (!m2_ok)
+    {
+      if (strat->T[i].p == strat->P.p2)
+      {
+        // check that m2*tail(p2) is ok
+        if (! p_LmExpVectorAddIsOk(m2, strat->T[i].max, strat->tailRing))
+          goto false_return;
+        if (m1_ok) return TRUE;
+        m2_ok = TRUE;
+      }
+    }
+  }
+  // should never get here
+  dReportError("ksCheckSpolyCreation: p1 or p2 not in T");
+  return TRUE;
 
+  false_return:
+  p_LmFree(m1, strat->tailRing);
+  p_LmFree(m2, strat->tailRing);
+  return FALSE;
+}
+                       
 void kStratChangeTailRing(kStrategy strat, ring new_tailRing)
 {
+  if (TEST_OPT_PROT)
+    Print("[%d", (long) new_tailRing->bitmask);
   kTest_TS(strat);
   assume(new_tailRing != strat->tailRing);
   pShallowCopyDeleteProc p_shallow_copy_delete 
@@ -3713,121 +3853,52 @@ void kStratChangeTailRing(kStrategy strat, ring new_tailRing)
   int i;
   for (i=0; i<=strat->tl; i++)
   {
-    strat->T[i].t_p = p_shallow_copy_delete(strat->T[i].t_p, strat->tailRing,
-                                            new_tailRing, new_tailBin);
-    assume(strat->T[i].p != NULL);
-    pNext(strat->T[i].p) = pNext(strat->T[i].t_p);
+    strat->T[i].ShallowCopyDelete(new_tailRing, new_tailBin, 
+                                  p_shallow_copy_delete);
   }
-  for (i=0; i<=strat->sl; i++)
+  for (i=0; i<=strat->Ll; i++)
   {
-    if (strat->L[i].bucket == NULL)
-    {
-      strat->L[i].t_p = p_shallow_copy_delete(strat->L[i].t_p, strat->tailRing,
-                                              new_tailRing, new_tailBin);
-      assume(strat->L[i].p != NULL);
-      pNext(strat->L[i].p) = pNext(strat->L[i].t_p);
-    }
-    else
-    {
-      kBucketShallowCopyDelete(strat->L[i].bucket, new_tailRing, new_tailBin,
-                               p_shallow_copy_delete );
-    }
+    strat->L[i].ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
   }
-  if (strat->P.t_p != NULL)
-  {
-    if (strat->P.bucket == NULL)
-    {
-      strat->P.t_p = p_shallow_copy_delete(strat->P.t_p, strat->tailRing,
-                                              new_tailRing, new_tailBin);
-      if (strat->P.p != NULL)
-        pNext(strat->P.p) = pNext(strat->P.t_p);
-    }
-    else
-    {
-      kBucketShallowCopyDelete(strat->P.bucket, new_tailRing, new_tailBin,
-                               p_shallow_copy_delete );
-    }
-  }
+  strat->P.ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
   
   omMergeStickyBinIntoBin(strat->tailBin, strat->tailRing->PolyBin);
-  rKillModifiedRing(strat->tailRing);
+  if (strat->tailRing != currRing)
+    rKillModifiedRing(strat->tailRing);
   
   strat->tailRing = new_tailRing;
   strat->tailBin = new_tailBin;
   kTest_TS(strat);
+  if (TEST_OPT_PROT)
+    PrintS("]");
 }
 
-void kStratFirstChangeTailRing(kStrategy strat, ring new_tailRing)
+void kStratInitChangeTailRing(kStrategy strat)
 {
-  kTest_TS(strat);
-  assume(new_tailRing != strat->tailRing && strat->tailRing == currRing);
-  pShallowCopyDeleteProc p_shallow_copy_delete 
-    = pGetShallowCopyDeleteProc(currRing, new_tailRing);
-  
-  omBin new_tailBin = omGetStickyBinOfBin(new_tailRing->PolyBin);
-  
+  unsigned long l = 0;
   int i;
-  // strat->tl should be -1, but ok, let's be general
+  Exponent_t e;
+  ring new_tailRing;
+  
+  assume(strat->tailRing == currRing);
+
+  // for the time being, let's not do anything for syzComp and minim
+  if (strat->minim > 0 || strat->syzComp) return;
+  
+  for (i=0; i<= strat->Ll; i++)
+  {
+    l = p_GetMaxExpL(strat->L[i].p, currRing, l);
+  }
   for (i=0; i<=strat->tl; i++)
   {
-    assume(strat->T[i].p != NULL);
-    strat->T[i].t_p = k_LmInit_currRing_2_tailRing(strat->T[i].p, 
-                                                   new_tailRing,
-                                                   new_tailBin);
-    if (pNext(strat->T[i].p))
-    {
-      pNext(strat->T[i].t_p) 
-        = p_shallow_copy_delete(pNext(strat->T[i].t_p), currRing,
-                                new_tailRing, new_tailBin);
-      pNext(strat->T[i].p) = pNext(strat->T[i].t_p);
-    }
+    l = p_GetMaxExpL(strat->T[i].p, currRing, l);
   }
-  for (i=0; i<=strat->sl; i++)
-  {
-    // all buckets should be NULL as well
-    if (strat->L[i].bucket == NULL)
-    {
-      assume(strat->L[i].p != NULL);
-      strat->L[i].t_p = k_LmInit_currRing_2_tailRing(strat->L[i].p, 
-                                                     new_tailRing,
-                                                     new_tailBin);
-      if (pNext(strat->L[i].p))
-      {
-        pNext(strat->L[i].t_p) 
-          = p_shallow_copy_delete(pNext(strat->L[i].t_p), currRing,
-                                  new_tailRing, new_tailBin);
-        pNext(strat->L[i].p) = pNext(strat->L[i].t_p);
-      }
-    }
-    else
-    {
-      kBucketShallowCopyDelete(strat->L[i].bucket, new_tailRing, new_tailBin,
-                               p_shallow_copy_delete );
-    }
-  }
-  if (strat->P.t_p != NULL)
-  {
-    if (strat->P.bucket == NULL)
-    {
-      strat->P.t_p = p_shallow_copy_delete(strat->P.t_p, currRing,
-                                              new_tailRing, new_tailBin);
-      if (strat->P.p != NULL)
-        pNext(strat->P.p) = pNext(strat->P.t_p);
-    }
-    else
-    {
-      kBucketShallowCopyDelete(strat->P.bucket, new_tailRing, new_tailBin,
-                               p_shallow_copy_delete );
-    }
-  }
+  e = p_GetMaxExp(l, currRing);
+  if (e <= 1) e = 2;
   
-  omMergeStickyBinIntoBin(strat->tailBin, currRing->PolyBin);
-  rKillModifiedRing(strat->tailRing);
-  
-  strat->tailRing = new_tailRing;
-  strat->tailBin = new_tailBin;
-  kTest_TS(strat);
+  new_tailRing = rModifyRing(currRing, strat->homog, ! strat->ak, e);
+  if (new_tailRing != currRing)
+    kStratChangeTailRing(strat, new_tailRing);
 }
-  
 
 #endif // KUTIL_CC

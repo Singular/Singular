@@ -1,15 +1,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.14 2000-10-23 16:32:23 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.15 2000-10-26 06:39:27 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
-#define PDEBUG 2
+
+// #define PDEBUG 2
+
 #include "mod2.h"
 #include "kutil.h"
-#include "polys.h"
 #include "numbers.h"
+#include "p_polys.h"
 #include "p_Procs.h"
 
 // Define to enable tests in this file 
@@ -27,17 +29,18 @@
  * Assumes PR != NULL, PW != NULL, Lm(PR) divides Lm(PW)
  * 
  ***************************************************************/
-void ksReducePoly(LObject* PR,
-                  TObject* PW,
-                  poly spNoether,
-                  number *coef)
+BOOLEAN ksReducePoly(LObject* PR,
+                     TObject* PW,
+                     poly spNoether,
+                     number *coef,
+                     kStrategy strat)
 {
   ring tailRing = PR->tailRing;
   kTest_L(PR);
   kTest_T(PW);
   
-  poly p1 = PR->GetLm(tailRing);
-  poly p2 = PW->GetLm(tailRing);
+  poly p1 = PR->GetLmTailRing();
+  poly p2 = PW->GetLmTailRing();
   poly t2 = pNext(p2), lm = p1;
   assume(p1 != NULL && p2 != NULL);
   p_CheckPolyRing(p1, tailRing);
@@ -54,15 +57,51 @@ void ksReducePoly(LObject* PR,
   {
     PR->LmDeleteAndIter();
     if (coef != NULL) *coef = n_Init(1, tailRing);
-    return;
+    return TRUE;
   }
 
+  p_ExpVectorSub(lm, p2, tailRing);
+  
+  if (tailRing != currRing)
+  {
+    // check that reduction does not violate exp bound
+    if (! p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    {
+      // undo changes of lm
+      p_ExpVectorAdd(lm, p2, tailRing);
+      if (strat == NULL) return FALSE;
+      // change tailring
+      kStratChangeTailRing(strat, 
+                           rModifyRing(currRing, strat->homog, ! strat->ak,
+                                       strat->tailRing->bitmask << 1));
+
+      // adjust local variables
+      if (PR->tailRing != strat->tailRing || PW->tailRing != strat->tailRing)
+      {
+        pShallowCopyDeleteProc 
+          pscd =pGetShallowCopyDeleteProc(tailRing,strat->tailRing);
+        
+        if (PR->tailRing != strat->tailRing) 
+          PR->ShallowCopyDelete(strat->tailRing,pscd);
+        if (PW->tailRing != strat->tailRing)
+          PW->ShallowCopyDelete(strat->tailRing,strat->tailBin, pscd);
+      }
+      tailRing = strat->tailRing;
+      p1 = PR->GetLmTailRing();
+      p2 = PW->GetLmTailRing();
+      t2 = pNext(p2);
+      lm = p1;
+      p_ExpVectorAdd(lm, p2, tailRing);
+    }
+  }
+
+  // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing))
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn);
-    pSetCoeff(lm, bn);
+    p_SetCoeff(lm, bn,tailRing);
     if ((ct == 0) || (ct == 2)) 
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -73,13 +112,15 @@ void ksReducePoly(LObject* PR,
     if (coef != NULL) *coef = n_Init(1, tailRing);
   }
   
-  p_ExpVectorSub(lm, p2, tailRing);
-
+  
+  // may be we need the length?
   if (PR->bucket != NULL && PW->pLength <= 0)
     PW->pLength = pLength(p2);
     
+  // and finally, 
   PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->pLength-1, spNoether);
   PR->LmDeleteAndIter();
+  return TRUE;
 }
 
 /***************************************************************
@@ -88,8 +129,8 @@ void ksReducePoly(LObject* PR,
  * 
  *
  ***************************************************************/
-void ksCreateSpoly(LObject* Pair,poly spNoether, 
-                   int use_buckets, ring tailRing)
+void ksCreateSpoly(LObject* Pair,   poly spNoether, 
+                   int use_buckets, ring tailRing, poly m1, poly m2)
 {
   kTest_L(Pair);
   poly p1 = Pair->p1;
@@ -102,49 +143,33 @@ void ksCreateSpoly(LObject* Pair,poly spNoether,
 
   poly a1 = pNext(p1), a2 = pNext(p2);
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
-  poly m1, m2;
   int co=0, ct = ksCheckCoeff(&lc1, &lc2);
   int x, l1;
 
-  if (pGetComp(p1)!=pGetComp(p2))
+  if (p_GetComp(p1, currRing)!=p_GetComp(p2, currRing))
   {
-    if (pGetComp(p1)==0)
+    if (p_GetComp(p1, currRing)==0)
     {
       co=1;
-      p_SetCompP(p1,pGetComp(p2), currRing, tailRing);
+      p_SetCompP(p1,p_GetComp(p2, currRing), currRing, tailRing);
     }
     else
     {
       co=2;
-      p_SetCompP(p2, pGetComp(p1), currRing, tailRing);
+      p_SetCompP(p2, p_GetComp(p1, currRing), currRing, tailRing);
     }
   }
 
   // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
   //     m2 = LCM(LM(p1), LM(p2))/LM(p2)
-  m1 = p_Init(tailRing);
-  m2 = p_Init(tailRing);
-  for (int i = pVariables; i; i--)
-  {
-    x = pGetExpDiff(p1, p2, i);
-    if (x > 0)
-    {
-      p_SetExp(m2,i,x, tailRing);
-      p_SetExp(m1,i,0, tailRing);
-    }
-    else
-    {
-      p_SetExp(m1,i,-x, tailRing);
-      p_SetExp(m2,i,0, tailRing);
-    }
-  }
-  p_Setm(m1, tailRing);
-  p_Setm(m2, tailRing);           // now we have m1 * LM(p1) == m2 * LM(p2)
+  if (m1 == NULL)
+    k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
+    
   pSetCoeff0(m1, lc2);
-  pSetCoeff0(m2, lc1); // and now, m1 * LT(p1) == m2 * LT(p2)
+  pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
 
   // get m2 * a2
-  a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, spNoether, currRing);
+  a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, spNoether, tailRing);
   Pair->SetLmTail(m2, a2, use_buckets, tailRing);
 
   // get m2*a2 - m1*a1
@@ -173,31 +198,39 @@ void ksCreateSpoly(LObject* Pair,poly spNoether,
 //         Current->next != NULL, LM(PW) devides LM(Current->next)
 // Changes: PR
 // Const:   PW
-void ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
+BOOLEAN ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 {
+  BOOLEAN ret;
   poly Lp =     PR->GetLm();
   poly Save =   PW->GetLm();
   
+  kTest_L(PR);
+  kTest_T(PW);
+  pAssume(pIsMonomOf(Lp, Current));
+  
   assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);
   assume(PR->bucket == NULL);
-  pAssume(pIsMonomOf(Lp, Current));
 
   LObject Red(pNext(Current), PR->tailRing);
   TObject With(PW, Lp == Save);
   number coef;
 
-  ksReducePoly(&Red, &With, spNoether, &coef);
+  ret = ksReducePoly(&Red, &With, spNoether, &coef);
   
-  if (! n_IsOne(coef, currRing))
+  if (ret)
   {
-    pNext(Current) = NULL;
-    PR->Mult_nn(coef);
+    if (! n_IsOne(coef, currRing))
+    {
+      pNext(Current) = NULL;
+      PR->Mult_nn(coef);
+    }
+
+    n_Delete(&coef, currRing);
+    pNext(Current) = Red.GetLmTailRing();
   }
 
-  n_Delete(&coef, currRing);
-  pNext(Current) = Red.GetLm(PR->tailRing);
-
   if (Lp == Save) With.Delete();
+  return ret;
 }
 
 /***************************************************************
@@ -258,10 +291,10 @@ int ksCheckCoeff(number *a, number *b)
 *   2. pNext is undefined
 */
 //static void bbb() { int i=0; }
-poly ksCreateShortSpoly(poly p1, poly p2)
+poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
-  Exponent_t c1=pGetComp(p1),c2=pGetComp(p2);
+  Exponent_t c1=p_GetComp(p1, currRing),c2=p_GetComp(p2, currRing);
   Exponent_t c;
   poly m1,m2;
   number t1,t2;
@@ -272,29 +305,29 @@ poly ksCreateShortSpoly(poly p1, poly p2)
   {
     if(a2!=NULL)
     {
-      m2=pInit();
+      m2=p_Init(currRing);
 x2:
       for (i = pVariables; i; i--)
       {
-        c = pGetExpDiff(p1, p2,i);
+        c = p_GetExpDiff(p1, p2,i, currRing);
         if (c>0)
         {
-          pSetExp(m2,i,(c+pGetExp(a2,i)));
+          p_SetExp(m2,i,(c+p_GetExp(a2,i,tailRing)),currRing);
         }
         else
         {
-          pSetExp(m2,i,pGetExp(a2,i));
+          p_SetExp(m2,i,p_GetExp(a2,i,tailRing),currRing);
         }
       }
       if ((c1==c2)||(c2!=0))
       {
-        pSetComp(m2,pGetComp(a2));
+        p_SetComp(m2,p_GetComp(a2,tailRing), currRing);
       }
       else
       {
-        pSetComp(m2,c1);
+        p_SetComp(m2,c1,currRing);
       }
-      pSetm(m2);
+      p_Setm(m2, currRing);
       nNew(&(pGetCoeff(m2)));
       return m2;
     }
@@ -303,82 +336,82 @@ x2:
   }
   if (a2==NULL)
   {
-    m1=pInit();
+    m1=p_Init(currRing);
 x1:
     for (i = pVariables; i; i--)
     {
-      c = pGetExpDiff(p2, p1,i);
+      c = p_GetExpDiff(p2, p1,i,currRing);
       if (c>0)
       {
-        pSetExp(m1,i,(c+pGetExp(a1,i)));
+        p_SetExp(m1,i,(c+p_GetExp(a1,i, tailRing)),currRing);
       }
       else
       {
-        pSetExp(m1,i,pGetExp(a1,i));
+        p_SetExp(m1,i,p_GetExp(a1,i, tailRing), currRing);
       }
     }
     if ((c1==c2)||(c1!=0))
     {
-      pSetComp(m1,pGetComp(a1));
+      p_SetComp(m1,p_GetComp(a1,tailRing),currRing);
     }
     else
     {
-      pSetComp(m1,c2);
+      p_SetComp(m1,c2,currRing);
     }
-    pSetm(m1);
+    p_Setm(m1, currRing);
     nNew(&(pGetCoeff(m1)));
     return m1;
   }
-  m1 = pInit();
-  m2 = pInit();
+  m1 = p_Init(currRing);
+  m2 = p_Init(currRing);
   for(;;)
   {
     for (i = pVariables; i; i--)
     {
-      c = pGetExpDiff(p1, p2,i);
+      c = p_GetExpDiff(p1, p2,i,currRing);
       if (c > 0)
       {
-        pSetExp(m2,i,(c+pGetExp(a2,i)));
-        pSetExp(m1,i,pGetExp(a1,i));
+        p_SetExp(m2,i,(c+p_GetExp(a2,i,tailRing)), currRing);
+        p_SetExp(m1,i,p_GetExp(a1,i, tailRing), currRing);
       }
       else
       {
-        pSetExp(m1,i,(pGetExp(a1,i)-c));
-        pSetExp(m2,i,pGetExp(a2,i));
+        p_SetExp(m1,i,(p_GetExp(a1,i,tailRing)-c), currRing);
+        p_SetExp(m2,i,p_GetExp(a2,i, tailRing), currRing);
       }
     }
     if(c1==c2)
     {
-      pSetComp(m1,pGetComp(a1));
-      pSetComp(m2,pGetComp(a2));
+      p_SetComp(m1,p_GetComp(a1, tailRing), currRing);
+      p_SetComp(m2,p_GetComp(a2, tailRing), currRing);
     }
     else
     {
       if(c1!=0)
       {
-        pSetComp(m1,pGetComp(a1));
-        pSetComp(m2,c1);
+        p_SetComp(m1,p_GetComp(a1, tailRing), currRing);
+        p_SetComp(m2,c1, currRing);
       }
       else
       {
-        pSetComp(m2,pGetComp(a2));
-        pSetComp(m1,c2);
+        p_SetComp(m2,p_GetComp(a2, tailRing), currRing);
+        p_SetComp(m1,c2, currRing);
       }
     }
-    pSetm(m1);
-    pSetm(m2);
-    cm = pLmCmp(m1, m2);
+    p_Setm(m1,currRing);
+    p_Setm(m2,currRing);
+    cm = p_LmCmp(m1, m2,currRing);
     if (cm!=0)
     {
       if(cm==1)
       {
-        pLmFree(m2);
+        p_LmFree(m2,currRing);
         nNew(&(pGetCoeff(m1)));
         return m1;
       }
       else
       {
-        pLmFree(m1);
+        p_LmFree(m1,currRing);
         nNew(&(pGetCoeff(m2)));
         return m2;
       }
@@ -390,7 +423,7 @@ x1:
     nDelete(&t1);
     if (!equal)
     {
-      pLmFree(m2);
+      p_LmFree(m2,currRing);
       nNew(&(pGetCoeff(m1)));
       return m1;
     }
@@ -398,17 +431,17 @@ x1:
     pIter(a2);
     if (a2==NULL)
     {
-      pLmFree(m2);
+      p_LmFree(m2,currRing);
       if (a1==NULL)
       {
-        pLmFree(m1);
+        p_LmFree(m1,currRing);
         return NULL;
       }
       goto x1;
     }
     if (a1==NULL)
     {
-      pLmFree(m1);
+      p_LmFree(m1,currRing);
       goto x2;
     }
   }

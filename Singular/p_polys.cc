@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.4 2000-10-23 16:32:27 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.5 2000-10-26 06:39:30 obachman Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -325,3 +325,97 @@ int pLDeg1c(poly p,int *l, ring r)
   *l=ll;
   return max;
 }
+
+/***************************************************************
+ *
+ * Maximal Exponent business
+ *
+ ***************************************************************/
+
+static inline unsigned long 
+p_GetMaxExp(unsigned long l1, unsigned long l2, ring r)
+{
+  unsigned long mask = r->bitmask << (BIT_SIZEOF_LONG - r->BitsPerExp);
+  unsigned long max = 0, ml1, ml2;
+  
+  for (;mask > 0; mask = mask >> r->BitsPerExp)
+  {
+    ml1 = l1 & mask;
+    ml2 = l2 & mask;
+    max |= ((ml1 > ml2 ? ml1 : ml2) & mask);
+  }
+  return max;
+}
+
+poly p_GetMaxExpP(poly p, ring r)
+{
+  p_CheckPolyRing(p, r);
+  if (p == NULL) return p_Init(r);
+  poly max = p_LmInit(p, r);
+  pIter(p);
+  if (p == NULL) return max;
+  int i;
+  unsigned long l_p, l_max;
+  unsigned long divmask = r->divmask;
+  
+  if (r->VarL_LowIndex >= 0)
+  {
+    int VarL_HighIndex = r->VarL_LowIndex + r->VarL_Size;
+    do
+    {
+      for (i=r->VarL_LowIndex; i<VarL_HighIndex; i++)
+      {
+        l_p = p->exp[i];
+        l_max = max->exp[i];
+        // do the divisibility trick to find out whether l_p has an exponent
+        // which is larger than the one in l_max
+        if (l_p > l_max || 
+            (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
+          max->exp[i] = p_GetMaxExp(l_max, l_p, r);
+      }
+      pIter(p);
+    }
+    while (p != NULL);
+  }
+  else
+  {
+    do
+    {
+      for (i=0; i<r->VarL_Size; i++)
+      {
+        l_p = p->exp[r->VarL_Offset[i]];
+        l_max = max->exp[r->VarL_Offset[i]];
+        // do the divisibility trick to find out whether l has an exponent
+        if (l_p > l_max || 
+            (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
+          max->exp[r->VarL_Offset[i]] = p_GetMaxExp(l_max, l_p, r);
+      }
+      pIter(p);
+    }
+    while (p != NULL);
+  }
+  return max;
+}
+
+unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
+{
+  unsigned long l_p, divmask = r->divmask;
+  int i;
+  
+  while (p != NULL)
+  {
+    for (i=0; i<r->VarL_Size; i++)
+    {
+      l_p = p->exp[r->VarL_Offset[i]];
+      // do the divisibility trick to find out whether l has an exponent
+        if (l_p > l_max || 
+            (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
+          l_max = p_GetMaxExp(l_max, l_p, r);
+    }
+    pIter(p);
+  }
+  return l_max;
+}
+
+
+    

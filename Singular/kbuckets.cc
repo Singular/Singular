@@ -1,14 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.18 2000-09-25 12:26:31 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.19 2000-10-26 06:39:26 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
 #include "structs.h"
 #include "omalloc.h"
-#include "polys.h"
+#include "p_polys.h"
 #include "febase.h"
+#include "pShallowCopyDelete.h"
 #include "kbuckets.h"
 #include "numbers.h"
 #include "p_Procs.h"
@@ -72,7 +73,7 @@ BOOLEAN kbTest(kBucket_pt bucket)
   {
     if (!kbTest_i(bucket, i)) return FALSE;
     if (lm != NULL &&  bucket->buckets[i] != NULL
-        && pLmCmp(lm, bucket->buckets[i]) != 1)
+        && p_LmCmp(lm, bucket->buckets[i], bucket->bucket_ring) != 1)
     {
       dReportError("Bucket %d larger than lm", i);
       return FALSE;
@@ -110,11 +111,25 @@ kBucket_pt kBucketCreate(ring bucket_ring)
   bucket->bucket_ring = bucket_ring;
   return bucket;
 }
-
-void kBucketDestroy(kBucket_pt *bucket)
+void kBucketDestroy(kBucket_pt *bucket_pt)
 {
-  omFreeBin(*bucket, kBucket_bin);
-  *bucket = NULL;
+  omFreeBin(*bucket_pt, kBucket_bin);
+  *bucket_pt = NULL;
+}
+  
+
+void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
+{
+  kBucket_pt bucket = *bucket_pt;
+  kbTest(bucket);
+  int i;
+  for (i=0; i<= bucket->buckets_used; i++)
+  {
+    if (bucket->buckets[i] != NULL)
+      p_Delete(&(bucket->buckets[i]), bucket->bucket_ring);
+  }
+  omFreeBin(bucket, kBucket_bin);
+  *bucket_pt = NULL;
 }
 
 
@@ -372,6 +387,34 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
 }
 
 #endif // ! HAVE_PSEUDO_BUCKETS
+//////////////////////////////////////////////////////////////////////////
+///
+/// For changing the ring of the Bpoly to new_tailBin
+/// 
+void kBucketShallowCopyDelete(kBucket_pt bucket,
+                              ring new_tailRing, omBin new_tailBin,
+                              pShallowCopyDeleteProc p_shallow_copy_delete)
+{
+#ifndef HAVE_PSEUDO_BUCKETS
+  int i;
+  
+  kBucketCanonicalize(bucket);
+  for (i=0; i<= bucket->buckets_used; i++)
+    if (bucket->buckets[i] != NULL)
+      bucket->buckets[i] = p_shallow_copy_delete(bucket->buckets[i], 
+                                                 bucket->bucket_ring,
+                                                 new_tailRing,
+                                                 new_tailBin);
+#else
+  bucket->p = p_shallow_copy_delete(p,
+                                    bucket_ring,
+                                    new_tailRing,
+                                    new_tailBin);
+#endif
+  bucket->bucket_ring = new_tailRing;
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -465,6 +508,13 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 // Bpoly == Bpoly - (poly consisting of all monomials with component comp)
 // and components of monomials of *p are all 0
 //
+
+// Hmm... for now I'm too lazy to implement those independent of currRing
+// But better declare it extern than including polys.h
+extern void pTakeOutComp(poly *p, Exponent_t comp, poly *q, int *lq);
+void pDecrOrdTakeOutComp(poly *p, Exponent_t comp, Order_t order,
+                         poly *q, int *lq);
+
 void kBucketTakeOutComp(kBucket_pt bucket,
                         Exponent_t comp,
                         poly *r_p, int *l)
@@ -541,7 +591,7 @@ number kBucketPolyRed(kBucket_pt bucket,
                       poly spNoether)
 {
   assume(p1 != NULL &&
-         pDivisibleBy(p1,  kBucketGetLm(bucket)));
+         p_DivisibleBy(p1,  kBucketGetLm(bucket), bucket->bucket_ring));
   assume(pLength(p1) == (int) l1);
 
   poly a1 = pNext(p1), lm = kBucketExtractLm(bucket);
@@ -558,7 +608,7 @@ number kBucketPolyRed(kBucket_pt bucket,
   {
     number an = pGetCoeff(p1), bn = pGetCoeff(lm);
     int ct = ksCheckCoeff(&an, &bn);
-    pSetCoeff(lm, bn);
+    p_SetCoeff(lm, bn, bucket->bucket_ring);
     if ((ct == 0) || (ct == 2)) kBucket_Mult_n(bucket, an);
     rn = an;
   }
@@ -567,21 +617,21 @@ number kBucketPolyRed(kBucket_pt bucket,
     rn = nInit(1);
   }
 
-  if (pGetComp(p1) != pGetComp(lm))
+  if (p_GetComp(p1, bucket->bucket_ring) != p_GetComp(lm, bucket->bucket_ring))
   {
-    pSetCompP(a1, pGetComp(lm));
+    p_SetCompP(a1, p_GetComp(lm, bucket->bucket_ring), bucket->bucket_ring);
     reset_vec = TRUE;
-    pSetComp(lm, pGetComp(p1));
-    pSetm(lm);
+    p_SetComp(lm, p_GetComp(p1, bucket->bucket_ring), bucket->bucket_ring);
+    p_Setm(lm, bucket->bucket_ring);
   }
 
-  pExpVectorSub(lm,p1);
+  p_ExpVectorSub(lm,p1, bucket->bucket_ring);
   l1--;
 
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
 
   p_DeleteLm(&lm, bucket->bucket_ring);
-  if (reset_vec) pSetCompP(a1, 0);
+  if (reset_vec) p_SetCompP(a1, 0, bucket->bucket_ring);
   kbTest(bucket);
   return rn;
 }

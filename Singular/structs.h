@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.41 2000-10-23 15:21:16 Singular Exp $ */
+/* $Id: structs.h,v 1.42 2000-10-26 06:39:31 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -165,7 +165,7 @@ typedef enum
   ro_wp, // ordering is a weighted degree ordering
   ro_wp_neg, // ordering is a weighted degree ordering 
              // with possibly negative weights
-  ro_cp, // ordering duplicates variables
+  ro_cp,    // ordering duplicates variables
   ro_syzcomp, // ordering indicates "subset" of component number
   ro_syz, // ordering  with component number >syzcomp is lower
   ro_none

@@ -3,14 +3,19 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.36 2000-10-23 16:32:25 obachman Exp $ */
+/* $Id: kutil.h,v 1.37 2000-10-26 06:39:29 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
+
+
 #include <string.h>
+#include "mod2.h"
+
 #include "structs.h"
 #include "omalloc.h"
 #include "ring.h"
+#include "pShallowCopyDelete.h"
 
 #define setmax 16
 
@@ -31,7 +36,9 @@ public:
   poly t_p;     // t_p \in tailRing
   ring tailRing;
   int ecart, length, pLength;
+  poly max; // p_MaxExp(pNext(p))
   unsigned long sev;
+  
 
   // initialization
   KINLINE void Init(ring r = currRing);
@@ -57,15 +64,20 @@ public:
 
   // Iterations
   KINLINE void LmDeleteAndIter();
+  
+  KINLINE int pFDeg();
 
   // arithmetic
   KINLINE void Mult_nn(number n);
+  KINLINE void ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
+                                 pShallowCopyDeleteProc p_shallow_copy_delete);
 };
 
 class sLObject : public sTObject
 {
 public:
   poly  p1,p2; /*- the pair p comes from -*/
+  
   poly  lcm;   /*- the lcm of p1,p2 -*/
   kBucket_pt bucket;
 
@@ -84,6 +96,9 @@ public:
   KINLINE void Tail_Mult_nn(number n);
   KINLINE poly GetP(omBin lmBin = NULL);
   KINLINE void CanonicalizeP();
+
+  KINLINE void ShallowCopyDelete(ring new_tailRing,  
+                                 pShallowCopyDeleteProc p_shallow_copy_delete);
 };
 
 typedef class sTObject TObject;
@@ -189,7 +204,8 @@ int posInL15 (const LSet set, const int length,
              const LObject &L,const kStrategy strat);
 int posInL17 (const LSet set, const int length,
              const LObject &L,const kStrategy strat);
-poly redtailBba (poly p,int pos,kStrategy strat);
+KINLINE poly redtailBba (poly p,int pos,kStrategy strat);
+poly redtailBba (LObject *L, int pos,kStrategy strat);
 poly redtailSyz (poly p,int pos,kStrategy strat);
 poly redtail (poly p,int pos,kStrategy strat);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat);
@@ -238,6 +254,12 @@ KINLINE poly k_LmInit_tailRing_2_currRing(poly p, ring tailRing);
 KINLINE poly k_LmShallowCopyDelete_currRing_2_tailRing(poly p, ring tailRing);
 KINLINE poly k_LmShallowCopyDelete_tailRing_2_currRing(poly p, ring tailRing);
 
+// if exp bound is not violated, return TRUE and
+//                               get m1 = LCM(LM(p1), LM(p2))/LM(p1)
+//                                   m2 = LCM(LM(p1), LM(p2))/LM(p2)
+// return FALSE and m1 == NULL, m2 == NULL     , otherwise 
+KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r, 
+                               poly &m1, poly &m2, const ring m_r);
 #ifdef KDEBUG
 // test strat
 BOOLEAN kTest(kStrategy strat);
@@ -280,27 +302,29 @@ void initBba(ideal F,kStrategy strat);
 // Changes: PR
 // Const:   PW
 // If coef != NULL, then *coef is a/gcd(a,b), where a = LC(PR), b = LC(PW)
-void ksReducePoly(LObject* PR,
-                  TObject* PW,
-                  poly spNoether = NULL,
-                  number *coef = NULL);
+BOOLEAN ksReducePoly(LObject* PR,
+                     TObject* PW,
+                     poly spNoether = NULL,
+                     number *coef = NULL, 
+                     kStrategy strat = NULL);
 
 // Reduces PR at Current->next with PW
 // Assumes PR != NULL, Current contained in PR
 //         Current->next != NULL, LM(PW) devides LM(Current->next)
 // Changes: PR
 // Const:   PW
-void ksReducePolyTail(LObject* PR,
-                      TObject* PW,
-                      poly Current,
-                      poly spNoether = NULL);
+BOOLEAN ksReducePolyTail(LObject* PR,
+                         TObject* PW,
+                         poly Current,
+                         poly spNoether = NULL);
 
 // Creates S-Poly of Pair
 // Const:   Pair->p1, Pair->p2
 // Changes: Pair->p == S-Poly of p1, p2
 // Assume:  Pair->p1 != NULL && Pair->p2
 void ksCreateSpoly(LObject* Pair, poly spNoether = NULL, 
-                   int use_buckets=0, ring tailRing=currRing);
+                   int use_buckets=0, ring tailRing=currRing, 
+                   poly m1 = NULL, poly m2 = NULL);
 
 
 /*2
@@ -310,7 +334,7 @@ void ksCreateSpoly(LObject* Pair, poly spNoether = NULL,
 *   1. the coefficient is 0 (nNew)
 *   2. pNext is undefined
 */
-poly ksCreateShortSpoly(poly p1, poly p2);
+poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing);
 
 
 /*
@@ -331,6 +355,22 @@ KINLINE poly ksOldSpolyRed(poly p1, poly p2, poly spNoether = NULL);
 KINLINE poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether = NULL);
 KINLINE poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether = NULL, ring r = currRing);
 KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r = currRing);
+
+/***************************************************************
+ *
+ * Routines related for ring changes during std computations
+ *
+ ***************************************************************/
+// return TRUE and set m1, m2 to k_GetLcmTerms, 
+//             if spoly creation of strat->P does not violate 
+//             exponent bound of strat->tailRing
+//      FALSE, otherwise
+BOOLEAN kCheckSpolyCreation(kStrategy strat, poly &m1, poly &m2);
+// change the strat such that strat strat->tailRing == new_tailRing
+void kStratChangeTailRing(kStrategy strat, ring new_tailRing);
+// initiate a change of the tailRing of strat -- should be called
+// right before main loop in bba
+void kStratInitChangeTailRing(kStrategy strat);
 
 #include "kInline.cc"
 

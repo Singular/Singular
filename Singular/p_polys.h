@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.7 2000-10-23 16:32:27 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.8 2000-10-26 06:39:30 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -179,6 +179,25 @@ PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b);
 // test if the monomial is a constant as a vector component
 // i.e., test if all exponents are zero 
 PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r);
+// return TRUE, if p_LmExpVectorAdd stays within ExpBound of ring r,
+//       FALSE, otherwise
+PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, ring r);
+
+/***************************************************************
+ *
+ * Misc things on polys
+ *
+ ***************************************************************/
+// return monomial r such that GetExp(r,i) is maximum of all
+// monomials in p; coeff == 0, next == NULL, ord is not set
+poly p_GetMaxExpP(poly p, ring r);
+// suppose that l is a long var in r, return maximal exponent of l
+PINLINE1 Exponent_t p_GetMaxExp(unsigned long l, ring r);
+// return the maximal exponent of p
+PINLINE2 Exponent_t p_GetMaxExp(poly p, ring r);
+// return the maximal exponent of p in form of the maximal long var
+unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max = 0);
+
 
 /***************************************************************
  *

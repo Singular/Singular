@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.8 2000-10-23 16:32:23 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.9 2000-10-26 06:39:26 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -225,6 +225,55 @@ KINLINE void sTObject::Mult_nn(number n)
   }
 }
 
+KINLINE void 
+sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
+                            pShallowCopyDeleteProc p_shallow_copy_delete)
+{
+  if (new_tailBin == NULL) new_tailBin = new_tailRing->PolyBin;
+  if (t_p != NULL)
+  {
+    t_p = p_shallow_copy_delete(t_p, tailRing, new_tailRing, new_tailBin);
+    if (p != NULL) 
+      pNext(p) = pNext(t_p);
+    if (new_tailRing == currRing)
+    {
+      if (p == NULL) p = t_p;
+      else p_LmFree(t_p, tailRing);
+      t_p = NULL;
+    }
+  }
+  else if (p != NULL)
+  {
+    if (pNext(p) != NULL)
+    {
+      pNext(p) = p_shallow_copy_delete(pNext(p), 
+                                       tailRing, new_tailRing, new_tailBin);
+    }
+    if (new_tailRing != currRing)
+    {
+      t_p = k_LmInit_currRing_2_tailRing(p, new_tailRing);
+      pNext(t_p) = pNext(p);
+    }
+  }
+  if (max != NULL)
+  {
+    if (new_tailRing == currRing)
+    {
+      p_LmFree(max, tailRing);
+      max = NULL;
+    }
+    else
+      max = p_shallow_copy_delete(max,tailRing,new_tailRing,tailRing->PolyBin);
+  }
+  tailRing = new_tailRing;
+}
+  
+KINLINE int sTObject::pFDeg()
+{
+  if (p != NULL) return ::pFDeg(p, currRing);
+  return ::pFDeg(t_p, tailRing);
+}
+    
 /***************************************************************
  *
  * Operation on LObjects
@@ -344,6 +393,17 @@ KINLINE poly sLObject::GetP(omBin lmBin = NULL)
   return p;
 }
 
+KINLINE void 
+sLObject::ShallowCopyDelete(ring new_tailRing, 
+                            pShallowCopyDeleteProc p_shallow_copy_delete)
+{
+  if (bucket != NULL)
+    kBucketShallowCopyDelete(bucket, new_tailRing, new_tailRing->PolyBin,
+                             p_shallow_copy_delete);
+  sTObject::ShallowCopyDelete(new_tailRing, 
+                              new_tailRing->PolyBin,p_shallow_copy_delete);
+}
+
 /***************************************************************
  *
  * Conversion of polys
@@ -404,6 +464,52 @@ KINLINE poly k_LmShallowCopyDelete_tailRing_2_currRing(poly p, ring tailRing)
 
 /***************************************************************
  *
+ * Lcm business
+ *
+ ***************************************************************/
+// get m1 = LCM(LM(p1), LM(p2))/LM(p1)
+//     m2 = LCM(LM(p1), LM(p2))/LM(p2)
+KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r, 
+                               poly &m1, poly &m2, const ring m_r)
+{
+  p_LmCheckPolyRing(p1, p_r);
+  p_LmCheckPolyRing(p2, p_r);
+  
+  int i;
+  Exponent_t x;
+  m1 = p_Init(m_r);
+  m2 = p_Init(m_r);
+  
+  for (i = p_r->N; i; i--)
+  {
+    x = p_GetExpDiff(p1, p2, i, p_r);
+    if (x > 0)
+    {
+      if (x > (long) m_r->bitmask) goto false_return;
+      p_SetExp(m2,i,x, m_r);
+      p_SetExp(m1,i,0, m_r);
+    }
+    else
+    {
+      if (-x > (long) m_r->bitmask) goto false_return;
+      p_SetExp(m1,i,-x, m_r);
+      p_SetExp(m2,i,0, m_r);
+    }
+  }
+
+  p_Setm(m1, m_r);
+  p_Setm(m2, m_r);
+  return TRUE;
+  
+  false_return:
+  p_LmFree(m1, m_r);
+  p_LmFree(m2, m_r);
+  m1 = m2 = NULL;
+  return FALSE;
+}
+
+/***************************************************************
+ *
  * Routines for backwards-Compatibility
  * 
  * 
@@ -438,13 +544,20 @@ KINLINE poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether, ring r)
   return L.GetLm();
 }
 
-KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r)
+void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r)
 {
   LObject L(q,  currRing, r);
   TObject T(p1, currRing, r);
 
   ksReducePolyTail(&L, &T, q2, spNoether);
 }
+
+KINLINE poly redtailBba (poly p,int pos,kStrategy strat)
+{
+  LObject L(p, currRing, strat->tailRing);
+  return redtailBba(&L, pos, strat);
+}
+
 #endif // defined(KINLINE) || defined(KUTIL_CC)
 #endif // KINLINE_CC
 
