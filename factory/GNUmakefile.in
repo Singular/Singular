@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.18 1997-10-24 18:54:52 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.19 1997-10-28 14:43:10 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -307,6 +307,8 @@ distfiles :=	\
 		$(distsrc) $(distincl) $(hdrtemplsrc) \
 		GNUmakefile.in configure.in config.h.in configure \
 		ChangeLog README NEWS INSTALL \
+		examples/GNUmakefile examples/application.cc \
+		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
 		bin/install-sh bin/makeheader bin/mkinstalldirs
 
@@ -500,8 +502,9 @@ uninstallgftables:
 dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 		rm -f $(distname).tgz
 		rm -rf $(distname)
-		$(MKINSTALLDIRS) $(distname)/templates
 		$(MKINSTALLDIRS) $(distname)/bin
+		$(MKINSTALLDIRS) $(distname)/examples
+		$(MKINSTALLDIRS) $(distname)/templates
 		@echo "Copying files to distribution directory ..."
 		@for file in $(distfiles); do \
 		  ln $(srcdir)/$$file $(distname)/$$file; \
