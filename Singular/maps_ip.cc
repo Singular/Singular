@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps_ip.cc,v 1.5 2004-04-08 21:12:25 levandov Exp $ */
+/* $Id: maps_ip.cc,v 1.6 2004-09-23 07:39:27 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -221,7 +221,7 @@ poly pSubstPar(poly p, int par, poly image)
     tmpW.rtyp=POLY_CMD;
     lnumber n=(lnumber)pGetCoeff(p);
     tmpW.data=n->z;
-    if (n->n!=NULL) WarnS("ignoring parts...");
+    if (n->n!=NULL) WarnS("ignoring denominators of coefficients...");
     if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing->algring,NULL,NULL,0,nMap))
     {
       WerrorS("map failed");
