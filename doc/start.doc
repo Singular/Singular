@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.39 1999-07-21 11:41:24 obachman Exp $
+@comment $Id: start.doc,v 1.40 1999-07-22 14:50:10 pohl Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -195,7 +195,7 @@ notions and definitions used throughout this manual.  For example, if in
 doubt what exactly @sc{Singular} means by a ``negative degree reverse
 lexicographical ordering'' one should refer to this chapter.
 
-@ref{SINGULAR libraries} lists the
+@ref{SINGULAR libraries}, lists the
 libraries which come with @sc{Singular} and the functions contained in
 them, respectively.
 @end ifset
@@ -492,8 +492,8 @@ with degree reverse lexicographical ordering:
 
 @smallexample
 @c example
-ring r5;
-r5;
+ring r8;
+r8;
 @c example
 @end smallexample
 
