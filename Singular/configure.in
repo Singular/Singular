@@ -243,7 +243,7 @@ if test "$with_apint" != buildin; then
     if test "$ac_smallgmp_ok" = yes; then
       ac_will_have_gmp=yes
       ac_will have_smallgmp=yes
-    elif test "$enable_gmp" = yes; then
+    elif test "$enable_smallgmp" = yes; then
       ac_will_have_gmp=yes
       ac_will_have_smallgmp=yes
       AC_MSG_WARN(install smallgmp before making Singular)
