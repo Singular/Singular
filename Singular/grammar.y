@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.48 1998-09-14 13:59:28 Singular Exp $ */
+/* $Id: grammar.y,v 1.49 1998-10-15 14:08:29 krueger Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1284,7 +1284,11 @@ setringcmd:
                       }
                     //}
                   }
+#ifdef USE_IILOCALRING
                   iiLocalRing[myynest-1]=IDRING(h);
+#else
+                  namespaceroot->next->currRing=IDRING(h);
+#endif
                 }
                 else
                 {

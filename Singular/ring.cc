@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.31 1998-08-25 13:33:21 krueger Exp $ */
+/* $Id: ring.cc,v 1.32 1998-10-15 14:08:39 krueger Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -861,6 +861,7 @@ void rKill(ring r)
     int i=1;
     int j;
     int *pi=r->order;
+#ifdef USE_IILOCALRING
     for (j=0;j<iiRETURNEXPR_len;j++)
     {
       if (iiLocalRing[j]==r)
@@ -869,6 +870,30 @@ void rKill(ring r)
         iiLocalRing[j]=NULL;
       }
     }
+#else /* USE_IILOCALRING */
+    {
+      namehdl nshdl = namespaceroot;
+      
+      for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next) {
+        //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
+        if (nshdl->currRing==r)
+        {
+          if (nshdl->myynest<myynest)
+//            Warn("killing the basering for level %d/%d",nshdl->lev,nshdl->myynest);
+          Warn("killing the basering for level %d",nshdl->myynest);
+          nshdl->currRing=NULL;
+        }
+      }
+      if (nshdl->currRing==r)
+      {
+        //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
+        if (nshdl->myynest<myynest)
+//          Warn("killing the basering for level %d/%d",nshdl->lev,nshdl->myynest);
+          Warn("killing the basering for level %d",nshdl->myynest);
+        nshdl->currRing=NULL;
+      }
+    }
+#endif /* USE_IILOCALRING */
     if (pi!=NULL)
     {
       //while(*pi!=0) { pi++;i++; }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.33 1998-08-25 13:33:19 krueger Exp $ */
+/* $Id: iplib.cc,v 1.34 1998-10-15 14:08:34 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -27,6 +27,7 @@
                                     char *procname, int line, long pos,
                                     BOOLEAN pstatic = FALSE);
 #endif /* HAVE_LIBPARSER */
+#define NS_LRING namespaceroot->next->currRing
 
 char *iiConvName(char *p);
 #ifdef HAVE_LIBPARSER
@@ -270,11 +271,13 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   return err;
 }
 
+#ifdef USE_IILOCALRING
 ring    *iiLocalRing
 #ifdef TEST
                     =NULL
 #endif
                    ;
+#endif
 sleftv  *iiRETURNEXPR
 #ifdef TEST
                     =NULL
@@ -285,12 +288,27 @@ int     iiRETURNEXPR_len=0;
 #ifdef RDEBUG
 static void iiShowLevRings()
 {
+#ifdef USE_IILOCALRING
   int i;
   for (i=1;i<=myynest;i++)
   {
     Print("lev %d:",i);
     if (iiLocalRing[i]==NULL) PrintS("NULL");
     else                      Print("%d",iiLocalRing[i]);
+    Print("\n");
+  }
+#endif
+  {
+    namehdl nshdl;
+    for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next) {
+      Print("%d lev %d:",nshdl->lev, nshdl->myynest);
+      if (nshdl->currRing==NULL) PrintS("NULL");
+      else                       Print("%d",nshdl->currRing);
+      Print("\n");
+    }
+    Print("%d lev %d:",nshdl->lev, nshdl->myynest);
+    if (nshdl->currRing==NULL) PrintS("NULL");
+    else                       Print("%d",nshdl->currRing);
     Print("\n");
   }
   if (currRing==NULL) PrintS("curr:NULL\n");
@@ -305,9 +323,11 @@ static void iiCheckNest()
     iiRETURNEXPR=(sleftv *)ReAlloc(iiRETURNEXPR,
                                    iiRETURNEXPR_len*sizeof(sleftv),
                                    (iiRETURNEXPR_len+16)*sizeof(sleftv));
+#ifdef IILOCALRING
     iiLocalRing=(ring *)ReAlloc(iiLocalRing,
                                    iiRETURNEXPR_len*sizeof(ring),
                                    (iiRETURNEXPR_len+16)*sizeof(ring));
+#endif
     iiRETURNEXPR_len+=16;
   }
 }
@@ -315,9 +335,23 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 {
   int err;
   procinfov pi = IDPROC(pn);
-#ifdef HAVE_NAMESPACES
   char *plib = iiConvName(pi->libname);
+#ifdef HAVE_NAMESPACES
   idhdl ns = namespaceroot->get(plib,0, TRUE);
+  if(pi->is_static) {
+    if(ns==NULL) {
+      Werror("'%s::%s()' 1 is a local procedure and cannot be accessed by an user.",
+             plib, pi->procname);
+      FreeL(plib);
+      return NULL;
+    }
+    if(strcmp(plib, namespaceroot->name)!= 0) {
+      Werror("'%s::%s()' 2 is a local procedure and cannot be accessed by an user.",
+             plib, pi->procname);
+      FreeL(plib);
+      return NULL;
+    }
+  }
   FreeL(plib);
   if(ns != NULL)
   {
@@ -326,7 +360,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   }
   else
   {
-    namespaceroot->push(namespaceroot->root->pack, "toplevel");
+    namespaceroot->push(namespaceroot->root->pack, "Top");
     //printf("iiMake_proc: staying in TOP-LEVEL\n");
   }
 #else /* HAVE_NAMESPACES */
@@ -336,9 +370,12 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
            pi->libname, pi->procname);
     return NULL;
   }
+  namespaceroot->push(NULL, plib);
 #endif /* HAVE_NAMESPACES */
   iiCheckNest();
+#ifdef USE_IILOCALRING
   iiLocalRing[myynest]=currRing;
+#endif
   iiRETURNEXPR[myynest+1].Init();
   if (traceit&TRACE_SHOW_PROC)
   {
@@ -348,31 +385,22 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 #ifdef RDEBUG
   if (traceit&TRACE_SHOW_RINGS) iiShowLevRings();
 #endif
-#if 1
-  if(pi->language == LANG_SINGULAR)
-  {
-    err=iiPStart(pn,sl);
-  }
-  else if(pi->language == LANG_C)
-  {
-    leftv res = (leftv)Alloc0(sizeof(sleftv));
-    res->rtyp=NONE;
-    err = (pi->data.o.function)(res, sl);
-    iiRETURNEXPR[myynest+1].Copy(res);
-    Free((ADDRESS)res, sizeof(sleftv));
-  }
-#else
   switch (pi->language)
   {
-    case LANG_SINGULAR: err=iiPStart(pn,sl); break;
-    case LANG_C: leftv res = (leftv)Alloc0(sizeof(sleftv));
-      err = (pi->data.o.function)(res, sl);
-      iiRETURNEXPR[myynest+1].Copy(res);
-      Free((ADDRESS)res, sizeof(sleftv));
-      break;
-    default: err=TRUE;
+    case LANG_NONE:
+                 err=TRUE;
+                 break;
+               
+    case LANG_SINGULAR:
+                 err=iiPStart(pn,sl);
+                 break;
+    case LANG_C:
+                 leftv res = (leftv)Alloc0(sizeof(sleftv));
+                 err = (pi->data.o.function)(res, sl);
+                 iiRETURNEXPR[myynest+1].Copy(res);
+                 Free((ADDRESS)res, sizeof(sleftv));
+                 break;
   }
-#endif
   if (traceit&TRACE_SHOW_PROC)
   {
     if (traceit&TRACE_SHOW_LINENO) PrintLn();
@@ -386,6 +414,49 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     iiRETURNEXPR[myynest+1].CleanUp();
     iiRETURNEXPR[myynest+1].Init();
   }
+#ifdef HAVE_NAMESPACES
+  if (namespaceroot->next->currRing != currRing)
+  //if (iiLocalRing[myynest] != currRing)
+  {
+    //Print("RING changed?\n");
+    
+    if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
+      && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
+    || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
+      && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
+    {
+      //idhdl hn;
+      char *n;
+      char *o;
+      if (namespaceroot->next->currRing!=NULL) o=rFindHdl(namespaceroot->next->currRing,NULL, NULL)->id;
+      //namespaceroot->currRingHdl->id;
+      else                            o="none";
+      if (currRing!=NULL)             n=rFindHdl(currRing,NULL, NULL)->id; //currRingHdl->id;
+      else                            n="none";
+      Werror("ring change during procedure call: %s -> %s",o,n);
+      iiRETURNEXPR[myynest+1].CleanUp();
+      err=TRUE;
+    }
+    if (namespaceroot->next->currRing!=NULL)
+    {
+      rSetHdl(rFindHdl(namespaceroot->next->currRing,NULL, NULL),TRUE);
+      iiLocalRing[myynest]=NULL;
+      namespaceroot->next->currRing = NULL;
+    }
+    else
+    { currRingHdl=NULL; currRing=NULL; }
+  }
+  else
+  {
+    if(currRingHdl == NULL)
+    {
+      //printf("iplib.cc: currRingHdl is NULL\n");
+      //currRingHdl = namespaceroot->currRingHdl;
+    }
+  }
+#else /* HAVE_NAMESPACES */
+#ifdef USE_IILOCALRING
+  if(namespaceroot->next->currRing != iiLocalRing[myynest]) printf("iiMake_proc: 1 ring not saved\n");
   if (iiLocalRing[myynest] != currRing)
   {
     if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
@@ -408,10 +479,40 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     {
       rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL),TRUE);
       iiLocalRing[myynest]=NULL;
+      namespaceroot->next->currRing = NULL;
     }
     else
     { currRingHdl=NULL; currRing=NULL; }
   }
+#else /* USE_IILOCALRING */
+  if (NS_LRING != currRing)
+  {
+    if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
+      && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
+    || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
+      && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
+    {
+      //idhdl hn;
+      char *n;
+      char *o;
+      if (NS_LRING!=NULL) o=rFindHdl(NS_LRING,NULL, NULL)->id;
+      else                            o="none";
+      if (currRing!=NULL)             n=rFindHdl(currRing,NULL, NULL)->id;
+      else                            n="none";
+      Werror("ring change during procedure call: %s -> %s",o,n);
+      iiRETURNEXPR[myynest+1].CleanUp();
+      err=TRUE;
+    }
+    if (NS_LRING!=NULL)
+    {
+      rSetHdl(rFindHdl(NS_LRING,NULL, NULL),TRUE);
+      NS_LRING=NULL;
+    }
+    else
+    { currRingHdl=NULL; currRing=NULL; }
+  }
+#endif /* USE_IILOCALRING */
+#endif /* HAVE_NAMESPACES */
   if (iiCurrArgs!=NULL)
   {
     if (!err) Warn("too many arguments for %s",IDID(pn));
@@ -419,9 +520,9 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     Free((ADDRESS)iiCurrArgs,sizeof(sleftv));
     iiCurrArgs=NULL;
   }
-#ifdef HAVE_NAMESPACES
+// #ifdef HAVE_NAMESPACES
   namespaceroot->pop();
-#endif /* HAVE_NAMESPACES */
+// #endif /* HAVE_NAMESPACES */
   if (err)
     return NULL;
   return &iiRETURNEXPR[myynest+1];
@@ -438,7 +539,11 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 
   newBuffer( example, BT_example, pi, pi->data.s.example_lineno );
   iiCheckNest();
+  namespaceroot->push(NULL, "");
+  if(namespaceroot->next->currRing != currRing) printf("iiEStart: ring not saved\n");
+#ifdef USE_IILOCALRING
   iiLocalRing[myynest]=currRing;
+#endif
   if (traceit&TRACE_SHOW_PROC)
   {
     if (traceit&TRACE_SHOW_LINENO) printf("\n");
@@ -454,6 +559,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     if (traceit&TRACE_SHOW_LINENO) printf("\n");
     printf("leaving  -example- (level %d)\n",myynest);
   }
+#ifdef USE_IILOCALRING
   if (iiLocalRing[myynest] != currRing)
   {
     if (iiLocalRing[myynest]!=NULL)
@@ -467,6 +573,22 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
       currRing=NULL;
     }
   }
+#else /* USE_IILOCALRING */
+  if (NS_LRING != currRing)
+  {
+    if (NS_LRING!=NULL)
+    {
+      rSetHdl(rFindHdl(NS_LRING,NULL, NULL),TRUE);
+      NS_LRING=NULL;
+    }
+    else
+    {
+      currRingHdl=NULL;
+      currRing=NULL;
+    }
+  }
+#endif /* USE_IILOCALRING */
+  namespaceroot->pop();
   return err;
 }
 
@@ -491,6 +613,12 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     return TRUE;
   }
 #ifdef HAVE_NAMESPACES
+  int token;
+  
+  if(IsCmd(plib, &token)) {
+    Werror("'%s' is resered identifier\n", plib);
+    return TRUE;
+  }
   hl = namespaceroot->get("LIB",0, TRUE);
 #else /* HAVE_NAMESPACES */
   hl = idroot->get("LIB",0);
@@ -855,21 +983,36 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
 #endif /* HAVE_DYNAMIC_LOADING */
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+char mytoupper(char c)
+{
+  if(c>=97 && c<=(97+26)) c-=32;
+  return(c);
+}
+
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#if defined(WINNT)
+#  define  FS_SEP '\\'
+#elif defined(macintosh)
+#  define FS_SEP ','
+#else
+#  define FS_SEP '/'
+#endif
+
 char *iiConvName(char *libname)
 {
-  int l=strlen(libname)+7;
-  char *p = (char *)AllocL(l);
+  char *tmpname = mstrdup(libname);
+  char *p = strrchr(tmpname, FS_SEP);
   char *r;
-
-  memset(p,0,l);
-  //sprintf(p, "%s_init", libname);
-  sprintf(p, "%s", libname);
-  for(r=p; *r!='\0'; r++)
-  {
-    if(*r=='.') *r='_';
-    if(*r==':') *r='_';
-  }
-  return(p);
+  if(p==NULL) p = tmpname;
+  else p++;
+  r = strchr(p, '.');
+  if( r!= NULL) *r = '\0';
+  r = mstrdup(p);
+  *r = mytoupper(*r);
+  // printf("iiConvName: '%s' '%s' => '%s'\n", libname, tmpname, r);
+  FreeL(tmpname);
+  
+  return(r);
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/

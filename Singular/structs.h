@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.14 1998-09-09 13:08:38 Singular Exp $ */
+/* $Id: structs.h,v 1.15 1998-10-15 14:08:41 krueger Exp $ */
 /*
 * ABSTRACT
 */
@@ -45,9 +45,7 @@ class sattr;
 class skStrategy;
 class ssyStrategy;
 class procinfo;
-#ifdef HAVE_NAMESPACES
 class namerec;
-#endif
 #endif
 
 struct  sip_sring;
@@ -99,9 +97,7 @@ typedef skStrategy *       kStrategy;
 typedef ip_package *       package;
 typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
-#ifdef HAVE_NAMESPACES
 typedef namerec *          namehdl;
-#endif
 #endif
 
 struct _scmdnames

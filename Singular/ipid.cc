@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.17 1998-09-24 09:59:44 Singular Exp $ */
+/* $Id: ipid.cc,v 1.18 1998-10-15 14:08:31 krueger Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -26,10 +26,9 @@
 #include "syz.h"
 #include "ipid.h"
 
-#ifdef HAVE_NAMESPACES
 namehdl namespaceroot = NULL;
 #define TEST
-#else /* HAVE_NAMESPACES */
+#ifndef HAVE_NAMESPACES
 idhdl idroot = NULL;
 #endif /* HAVE_NAMESPACES */
 idhdl currRingHdl = NULL;
@@ -77,7 +76,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
   IDTYP(h)  = t;
   IDLEV(h)  = lev;
 #ifdef HAVE_NAMESPACES
-  h->ref    = 1;
+  h->ref    = 0;
 #endif /* HAVE_NAMESPACES */
   IDNEXT(h) = this;
   if (init)
@@ -286,6 +285,7 @@ void killhdl(idhdl h)
     killhdl(h,&currRing->idroot);
   else
   {
+    //if(t==PACKAGE_CMD) printf("Achtung\n");
     idhdl s=IDROOT;
     while ((s!=h) && (s!=NULL)) s=s->next;
     if (s==NULL) killhdl(h,&currRing->idroot);
@@ -314,7 +314,7 @@ void killhdl(idhdl h, idhdl * ih)
     ring  savecurrRing = currRing;
 
     // any objects defined for this ring ?
-    if (((IDTYP(h)==PACKAGE_CMD) || (IDRING(h)->ref<=0))
+    if (((IDTYP(h)==RING_CMD) && (IDRING(h)->ref<=0))
     &&  (IDRING(h)->idroot!=NULL))
     {
       idhdl * hd = &IDRING(h)->idroot;
@@ -649,6 +649,7 @@ void iiname2hdl(char *name, idhdl *pck, idhdl *h)
     sscanf(name, "%s", i);
 #ifdef HAVE_NAMESPACES
     *h = namespaceroot->get(i, myynest);
+    if(*h == NULL) { *h = namespaceroot->get(i, myynest, TRUE); }
 #else /* HAVE_NAMESPACES */
 #endif /* HAVE_NAMESPACES */
   }
@@ -684,7 +685,6 @@ void iiname2hdl(char *name, idhdl *pck, idhdl *h)
   FreeL(i);
 }
 
-#ifdef HAVE_NAMESPACES
 char *getnamelev()
 {
   char buf[256];
@@ -696,6 +696,7 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
 {
   //printf("PUSH: put entry (%s) on stack\n", name);
   namehdl ns = (namerec *)Alloc0(sizeof(namerec));
+  extern int myynest;
   ns->next   = this;
   if(this==NULL && !init)
   {
@@ -704,19 +705,32 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
   }
   if(init)
   {
-    ns->pack   = (ip_package *)Alloc0(sizeof(ip_package));
-    ns->isroot = TRUE;
-    ns->lev    = 1;
+    ns->next    = NULL;
+#ifdef HAVE_NAMESPACES
+    ns->pack    = (ip_package *)Alloc0(sizeof(ip_package));
+#endif /* HAVE_NAMESPACES */
+    ns->isroot  = TRUE;
+    ns->lev     = 1;
+    ns->myynest = 0;
   }
   else
   {
+    extern ring currRing;
+#ifdef HAVE_NAMESPACES
     ns->pack   = pack;
+#endif /* HAVE_NAMESPACES */
     ns->lev    = this->lev+1;
+    ns->myynest = myynest+1;
+    this->currRing = currRing;
+    //printf("Saving Ring %x, %x\n", this->currRing, currRing);
   }
-  ns->name   = mstrdup(name);
-
-
+  ns->name    = mstrdup(name);
+  
+  
   //if(ns->isroot) Print("PUSH: Add root NameSpace\n");
+  //ns->currRing = currRing;
+  //ns->currRingHdl = currRingHdl;
+  //printf("Test 1\n");
   if(ns->isroot) ns->root=ns; else ns->root = this->root;
   namespaceroot = ns;
 #if 0
@@ -729,6 +743,7 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
     }
   }
 #endif
+  //Print("NSPUSH: done\n");
   return(namespaceroot);
 }
 
@@ -748,6 +763,7 @@ namehdl namerec::pop()
   return(namespaceroot);
 }
 
+#ifdef HAVE_NAMESPACES
 idhdl namerec::get(const char * s, int lev, BOOLEAN root)
 {
   namehdl ns;

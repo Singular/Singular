@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.68 1998-10-15 11:45:51 obachman Exp $ */
+/* $Id: extra.cc,v 1.69 1998-10-15 14:08:28 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -778,18 +778,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif /* HAVE_NAMESPACES */
 /*==================== nsstack ===================================*/
     if(strcmp(sys_cmd,"nsstack")==0)
     {
       namehdl nshdl = namespaceroot;
       for( ; nshdl->isroot != TRUE; nshdl = nshdl->next) {
-        Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
+        Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
       }
-      Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
+      Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
       return FALSE;
     }
     else
-#endif /* HAVE_NAMESPACES */
 /*==================== proclist =================================*/
     if(strcmp(sys_cmd,"proclist")==0)
     {

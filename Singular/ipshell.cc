@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.24 1998-09-29 10:36:39 krueger Exp $ */
+/* $Id: ipshell.cc,v 1.25 1998-10-15 14:08:35 krueger Exp $ */
 /*
 * ABSTRACT:
 */
@@ -799,7 +799,12 @@ BOOLEAN iiExport (leftv v, int toLev)
           if (IDTYP(h)==v->Typ())
           {
             Warn("redefining %s",IDID(h));
+#ifdef USE_IILOCALRING
             if (iiLocalRing[0]==IDRING(h)) iiLocalRing[0]=NULL;
+#else
+            if (namespaceroot->root->currRing==IDRING(h))
+              namespaceroot->root->currRing=NULL;
+#endif
             killhdl(h,root);
           }
           else

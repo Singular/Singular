@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.16 1998-09-24 09:59:45 Singular Exp $ */
+/* $Id: ipid.h,v 1.17 1998-10-15 14:08:32 krueger Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -74,6 +74,7 @@ struct sip_command
 struct sip_package
 {
   idhdl      idroot; /* local objects */
+  short      ref;
 };
 
 union uutypes;
@@ -137,19 +138,20 @@ class idrec
 //  ~idrec();
 };
 
-#ifdef HAVE_NAMESPACES
 class namerec {
   public:
   namehdl    next;
   namehdl    root;
   package    pack;
-  idhdl      currRingHdl;
   char *     name;
   int        lev;
   BOOLEAN    isroot;
 #define NSROOT(a) ((a)->pack->idroot)
 #define NSPACK(a) ((a)->pack)
 
+  int        myynest;
+  idhdl      currRingHdl;
+  ring       currRing;
 
  namerec()  { memset(this,0,sizeof(*this)); }
   //namehdl    Set(idhdl root);
@@ -159,6 +161,7 @@ class namerec {
 };
 
 extern namehdl namespaceroot;
+#ifdef HAVE_NAMESPACES
 #  define IDROOT (NSROOT(namespaceroot))
 #else /* HAVE_NAMESPACES */
 extern idhdl      idroot;

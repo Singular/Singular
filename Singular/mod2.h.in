@@ -137,6 +137,11 @@
 #define INIT_BUG
 #endif
 
+/* Define to use old mechanismen for saving currRing with procedures
+ * Does not work with HAVE_NAMESPACES enabled 
+ */
+#undef USE_IILOCALRING
+
 /* Define to use new namespaces techniks */
 #undef HAVE_NAMESPACES
 
@@ -320,5 +325,7 @@ extern int pShortOut;
 
 #endif /* not NDEBUG */
 
-
+#ifdef HAVE_NAMESPACES
+#  undef USE_IILOCALRING
+#endif
 #endif /* MOD2_H  */

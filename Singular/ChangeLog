@@ -1,3 +1,10 @@
+Thu Oct 15 15:54:05 MEST 1998 <krueger@mathematik.uni-kl.de>
+	* extra.cc,grammar.y,ipid.cc,ipid.h,iplib.cc,ipshell.cc
+	* ipshell.h,ring.cc,structs.h,tesths.cc,mod2.h.in
+	  Replaced ring *iiLocalRing[] by a stack (class namerec)
+	  To use old method define USE_IILOCALRING in mod2.h
+	  Old method incompatible with HAVE_NAMESPACES!
+	
 1998-10-14  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* sing_mp.cc (slOpenMPLaunch): added slKill as link function

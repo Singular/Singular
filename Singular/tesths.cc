@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.53 1998-10-15 11:46:08 obachman Exp $ */
+/* $Id: tesths.cc,v 1.54 1998-10-15 14:08:43 krueger Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -484,9 +484,14 @@ int main(          /* main entry to Singular */
     }
   }
   /*. say hello */
+  {
+    idhdl h;
+    namespaceroot->push(NULL, "Top", TRUE);
 #ifdef HAVE_NAMESPACES
-  namespaceroot->push(NULL, "(ROOT)", TRUE);
+    h=enterid(mstrdup("Top"), 0, PACKAGE_CMD, &IDROOT, TRUE);
+    IDPACKAGE(h) = NSPACK(namespaceroot);
 #endif /* HAVE_NAMESPACES */
+  }
   if (BVERBOSE(0) && !feBatch)
   {
     printf(
