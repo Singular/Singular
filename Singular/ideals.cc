@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.25 1998-05-14 13:04:13 Singular Exp $ */
+/* $Id: ideals.cc,v 1.26 1998-05-14 14:41:28 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -297,13 +297,15 @@ void idDBTest(ideal h1,char *f,int l)
 static int pComp_RevLex(poly a, poly b)
 {
  int l=pVariables;
- while ((l>=0) && (pGetExp(a,l)==pGetExp(b,l))) l--;
- if (l<0)
-   return 0;
+ while ((l>0) && (pGetExp(a,l)==pGetExp(b,l))) l--;
+ if (l==0)
+ {
+   if (pGetComp(a)==pGetComp(b)) return 0;
+   if (pGetComp(a)>pGetComp(b)) return 1;
+ }
  else if (pGetExp(a,l)>pGetExp(b,l))
    return 1;
- else
-   return -1;
+ return -1;
 }
 
 /*2
@@ -2875,14 +2877,25 @@ int idIndexOfKBase(poly monom, ideal kbase)
   while ((j>0) && (kbase->m[j-1]==NULL)) j--;
   if (j==0) return -1;
   int i=pVariables;
-  while (i>=0)
+  while (i>0)
   {
-    while ((j>0) && (pGetExp(monom,i)<pGetExp(kbase->m[j-1],i))) j--;
-    if ((j==0) || (pGetExp(monom,i)>pGetExp(kbase->m[j-1],i))) return -1;
-    if (i==0)
-      return j-1;
-    else
-      i--;
+    loop
+    {
+      if (pGetExp(monom,i)>pGetExp(kbase->m[j-1],i)) return -1;
+      if (pGetExp(monom,i)==pGetExp(kbase->m[j-1],i)) break;
+      j--;
+      if (j==0) return -1;
+    }
+    if (i==1)
+    {
+      while(j>0)
+      {
+        if (pGetComp(monom)==pGetComp(kbase->m[j-1])) return j-1;
+        if (pGetComp(monom)>pGetComp(kbase->m[j-1])) return -1;
+        j--;
+      }
+    }
+    i--;
   }
   return -1;
 }
@@ -2957,7 +2970,7 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
       }
       else
         pDelete(&q);
-      p = pIter(p);
+      pIter(p);
     }
   }
   idDelete(&tempKbase);

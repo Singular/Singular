@@ -1,6 +1,8 @@
+Thu May 14 16:40:43 MET DST 1998 hannes
+* fixed bug in CoeffOfKBase (ideals.cc)
 Thu May 14 12:01:53 MET DST 1998 hannes
 * a ring with a coeff. field GF(p,n) cannot be constructed
-  without gftables
+  without gftables (ring.cc)
 Wed May 13 16:52:09 MET DST 1998 hannes
 	* changed syntax of NOT (does not require () any more)
 Tue May 12 16:58:13 MET DST 1998 hannes
