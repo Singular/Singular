@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stairc.h,v 1.6 1998-12-15 09:58:45 pohl Exp $ */
+/* $Id: stairc.h,v 1.7 1999-11-15 17:20:50 obachman Exp $ */
 /*
 * ABSTRACT
 */

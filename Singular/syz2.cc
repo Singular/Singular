@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.7 1999-10-22 11:14:19 obachman Exp $ */
+/* $Id: syz2.cc,v 1.8 1999-11-15 17:20:54 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -30,6 +30,7 @@
 #include "lists.h"
 #include "kbuckets.h"
 #include "polys-comp.h"
+#include "prCopy.h"
 
 //#define SHOW_PROT
 //#define SHOW_RED
@@ -1083,12 +1084,11 @@ static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
 */
 syStrategy syHilb(ideal arg,int * length)
 {
-  int i,j,*ord,*b0,*b1,actdeg=32000,index=0,reg=-1;
+  int i,j,actdeg=32000,index=0,reg=-1;
   int startdeg,howmuch,toSub=0;
   int maxindex=0,maxdeg=0;
   ideal temp=NULL;
   SSet nextPairs;
-  ring tmpR=NULL;
   ring origR = currRing;
   pSetmProc oldSetm=pSetm;
   pCompProc oldComp0=pComp0;
@@ -1101,36 +1101,12 @@ syStrategy syHilb(ideal arg,int * length)
     syzstr->minres[0] = idInit(1,arg->rank);
     return syzstr;
   }
-  tmpR = (ring) Alloc0SizeOf(sip_sring);
-  tmpR->wvhdl = (int **)Alloc0(3 * sizeof(int *));
-  ord = (int*)Alloc0(3*sizeof(int));
-  b0 = (int*)Alloc0(3*sizeof(int));
-  b1 = (int*)Alloc0(3*sizeof(int));
-  ord[0] = ringorder_dp;
-  ord[1] = ringorder_S;
-  b0[0] = 1;
-  b1[0] = currRing->N;
-  tmpR->OrdSgn = 1;
-  tmpR->N = currRing->N;
-  tmpR->ch = currRing->ch;
-  tmpR->order = ord;
-  tmpR->block0 = b0;
-  tmpR->block1 = b1;
-  tmpR->P = currRing->P;
-  if (currRing->parameter!=NULL)
-  {
-    tmpR->minpoly=nCopy(currRing->minpoly);
-    tmpR->parameter=(char **)Alloc(rPar(currRing)*sizeof(char *));
-    for(i=0;i<tmpR->P;i++)
-    {
-      tmpR->parameter[i]=mstrdup(currRing->parameter[i]);
-    }
-  }
-  tmpR->names   = (char **)Alloc(tmpR->N * sizeof(char *));
-  for (i=0; i<tmpR->N; i++)
-  {
-    tmpR->names[i] = mstrdup(currRing->names[i]);
-  }
+  
+  // Creare dp,S ring and change to it
+  syzstr->syRing = rCurrRingAssure_dp_S();
+  assume(syzstr->syRing != origR);
+
+  // set initial ShiftedComps
   currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));
   currShiftedComponents = (long*)Alloc0((arg->rank+1)*sizeof(long));
   for (i=0;i<=arg->rank;i++)
@@ -1138,10 +1114,8 @@ syStrategy syHilb(ideal arg,int * length)
     currShiftedComponents[i] = (i)*SYZ_SHIFT_BASE;
     currcomponents[i] = i;
   }
-  rComplete(tmpR, 1);
-  rChangeCurrRing(tmpR, TRUE);
   rChangeSComps(currcomponents, currShiftedComponents, arg->rank);
-  syzstr->syRing = tmpR;
+
 /*--- initializes the data structures---------------*/
 #ifdef SHOW_CRIT
   crit = 0;
@@ -1155,7 +1129,7 @@ syStrategy syHilb(ideal arg,int * length)
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
-    temp->m[i] = pFetchCopy(origR, arg->m[i]);
+    temp->m[i] = prCopyR( arg->m[i], origR);
     if (temp->m[i]!=NULL)
     {
       j = pTotaldegree(temp->m[i]);
@@ -1249,15 +1223,7 @@ crit_fails = 0;
   if (temp!=NULL) idDelete(&temp);
   kBucketDestroy(&(syzstr->bucket));
   kBucketDestroy(&(syzstr->syz_bucket));
-  if (ord!=NULL)
-  {
-    rChangeCurrRing(origR,TRUE);
-  }
-  else
-  {
-    pSetm=oldSetm;
-    pComp0=oldComp0;
-  }
+  rChangeCurrRing(origR,TRUE);
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.14 1999-10-14 14:26:56 obachman Exp $ */
+/* $Id: algmap.cc,v 1.15 1999-11-15 17:19:47 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers

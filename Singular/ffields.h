@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.h,v 1.7 1999-10-26 16:40:44 Singular Exp $ */
+/* $Id: ffields.h,v 1.8 1999-11-15 17:19:59 obachman Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */

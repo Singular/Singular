@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.11 1999-10-15 16:07:08 obachman Exp $ */
+/* $Id: lists.h,v 1.12 1999-11-15 17:20:19 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.12 1999-03-04 09:14:50 Singular Exp $ */
+/* $Id: timer.cc,v 1.13 1999-11-15 17:20:55 obachman Exp $ */
 
 /*
 *  ABSTRACT - get the computing time

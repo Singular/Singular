@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.5 1999-10-14 14:27:24 obachman Exp $ */
+/* $Id: mpr_numeric.cc,v 1.6 1999-11-15 17:20:31 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff

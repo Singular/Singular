@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.40 1999-11-02 15:19:09 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.41 1999-11-15 17:20:40 obachman Exp $ */
 
 /***************************************************************
  *
@@ -145,7 +145,7 @@ extern Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l);
 #define _pSubExp(p,i,v)     ((p)->exp.e[_pExpIndex(i)]) -= (v)
 #define _pMultExp(p,i,v)    ((p)->exp.e[_pExpIndex(i)]) *= (v)
 
-#define _pRingSetExp(r,p,v,e)     (p)->exp.e[_pRingExpIndex(r,v)]=(e)
+#define _pRingSetExp(r,p,e_i,e_v)     (p)->exp.e[_pRingExpIndex(r,e_i)]=(e_v)
 #define _pRingGetExp(r,p,v)       (p)->exp.e[_pRingExpIndex(r,v)]
 
 #define _pSetComp(p,k)      _pGetComp(p) = (k)
@@ -210,14 +210,6 @@ poly    pDBCopy(memHeap h, poly a, char *f, int l);
 poly    pDBCopy1(poly a, char *f, int l);
 poly    pDBHead(memHeap h, poly a, char *f, int l);
 poly    pDBHead0(poly a, char *f, int l);
-poly    pDBFetchCopy(ring r, poly a, char *f, int l);
-poly    pDBFetchCopyDelete(ring r, poly a, char *f, int l);
-poly    pDBFetchHead(ring r, poly a, char *f, int l);
-poly    pDBFetchHeadDelete(ring r, poly a, char *f, int l);
-poly    pDBShallowCopyDeleteHead(memHeap d_h,poly *s_p,memHeap s_h,
-                                 char *f,int l);
-poly    pDBShallowCopyDelete(memHeap d_h,poly *s_p,memHeap s_h, char *f,int l);
-
 
 void    pDBDelete(poly * a, memHeap h, char * f, int l);
 void    pDBDelete1(poly * a, memHeap h, char * f, int l);
@@ -235,18 +227,8 @@ void    pDBDelete1(poly * a, memHeap h, char * f, int l);
 #define _pShallowCopyDelete(dest_heap, source_p, source_heap) \
   pDBShallowCopyDelete(dest_heap, source_p, source_heap,__FILE__,__LINE__)
 
-#define _pFetchCopy(r,A)        pDBFetchCopy(r, A,__FILE__,__LINE__)
-#define _pFetchCopyDelete(r,A)  pDBFetchCopyDelete(r, A,__FILE__,__LINE__)
-#define _pFetchHead(r,A)        pDBFetchHead(r, A,__FILE__,__LINE__)
-#define _pFetchHeadDelete(r,A)  pDBFetchHeadDelete(r, A,__FILE__,__LINE__)
-
-#define _pRingDelete1(r, A)     pDBDelete1(A,r->mm_specHeap,__FILE__,__LINE__)
-#define _pRingDelete(r, A)      pDBDelete(A,r->mm_specHeap,__FILE__, __LINE__)
 
 #else // ! MDEBUG
-
-#define _pRingDelete1(r, A) _pDelete1(A, r->mm_specHeap)
-#define _pRingDelete(r, A)  _pDelete(A, r->mm_specHeap)
 
 extern void    _pDelete(poly * a, memHeap h);
 extern void    _pDelete1(poly * a, memHeap h);
@@ -258,11 +240,6 @@ extern poly    _pHead(memHeap h, poly a);
 extern poly    _pHead0(poly a);
 extern poly    _pShallowCopyDeleteHead(memHeap d_h, poly *s_p, memHeap s_h);
 extern poly    _pShallowCopyDelete(memHeap d_h, poly *s_p, memHeap s_h);
-
-extern poly    _pFetchCopy(ring r,poly a);
-extern poly    _pFetchCopyDelete(ring r,poly a);
-extern poly    _pFetchHead(ring r,poly a);
-extern poly    _pFetchHeadDelete(ring r,poly a);
 
 #endif // MDEBUG
 
@@ -339,17 +316,17 @@ inline void __pMonSubFrom(poly p1, poly p2)
 
 // Makes p1 a copy of p2 and adds on exponents of p3
 #if defined(PDEBUG) && PDEBUG > 1
-#define _pMonAdd(p1, p2, p3)  pDBMonAdd(p1, p2, p3, __FILE__, __LINE__)
-extern  void pDBMonAdd(poly p1, poly p2, poly p3, char* f, int l);
-inline void __pMonAdd(poly p1, poly p2, poly p3)
+#define _prMonAdd(p1, p2, p3)  pDBMonAdd(p1, p2, p3, __FILE__, __LINE__)
+extern  void prDBMonAdd(poly p1, poly p2, poly p3, char* f, int l);
+inline void __prMonAdd(poly p1, poly p2, poly p3)
 #else
-  DECLARE(void, _pMonAdd(poly p1, poly p2, poly p3))
+  DECLARE(void, _prMonAdd(poly p1, poly p2, poly p3, ring r))
 #endif // defined(PDEBUG) && PDEBUG > 1
 {
   unsigned long* s1 = &(p1->exp.l[0]);
   const unsigned long* s2 = &(p2->exp.l[0]);
   const unsigned long* s3 = &(p3->exp.l[0]);
-  const unsigned long* const ub = s3 + currRing->ExpLSize;
+  const unsigned long* const ub = s3 + r->ExpLSize;
 
   for (;;)
   {

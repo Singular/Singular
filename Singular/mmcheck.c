@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.16 1999-11-05 19:11:08 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.17 1999-11-15 17:20:23 obachman Exp $ */
 
 /*
 * ABSTRACT: several checking routines to help debugging the memory subsystem

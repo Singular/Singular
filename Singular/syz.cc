@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.27 1999-10-22 11:14:18 obachman Exp $ */
+/* $Id: syz.cc,v 1.28 1999-11-15 17:20:52 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -25,6 +25,8 @@
 #include "intvec.h"
 #include "ring.h"
 #include "syz.h"
+#include "prCopy.h"
+
 
 void syDeleteRes(resolvente * res,int length)
 {
@@ -130,6 +132,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
 /*--searches for syzygies coming from superfluous elements
 * in the module below--*/
   searchUnit = TRUE;
+  int curr_syz_limit = rGetCurrSyzLimit();
   while (searchUnit)
   {
     i=0;
@@ -210,8 +213,8 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
       pDelete(&actWith);
       pDelete(&Unit1);
 //--deletes superfluous elements from the module below---
-      pDelete(&(mod->m[ModComp-1]));
-      for (k=ModComp-1;k<IDELEMS(mod)-1;k++)
+      pDelete(&(mod->m[ModComp-1 - curr_syz_limit]));
+      for (k=ModComp-1 - curr_syz_limit;k<IDELEMS(mod)-1;k++)
         mod->m[k] = mod->m[k+1];
       mod->m[IDELEMS(mod)-1] = NULL;
     }
@@ -228,33 +231,28 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
 /*2
 * make Gauss for one element
 */
-static void syGaussForOne(ideal syz, int elnum, int ModComp)
+void syGaussForOne(ideal syz, int elnum, int ModComp,int from,int till)
 {
   int k,j,i,lu;
   poly unit1,unit2;
   poly actWith=syz->m[elnum];
 
+  if (from<0) from = 0;
+  if ((till<=0) || (till>IDELEMS(syz))) till = IDELEMS(syz);
   syz->m[elnum] = NULL;
   if (!rField_has_simple_inverse()) pCleardenom(actWith);
 /*--makes Gauss alg. for the column ModComp--*/
-  //unit1 = pTakeOutComp1(&(actWith), ModComp);
   pTakeOutComp(&(actWith), ModComp, &unit1, &lu);
-  k=0;
-  while (k<IDELEMS(syz))
+  while (from<till)
   {
-    if (syz->m[k]!=NULL)
+    if (syz->m[from]!=NULL)
     {
-      //unit2 = pTakeOutComp1(&(syz->m[k]), ModComp);
-      pTakeOutComp(&(syz->m[k]), ModComp, &unit2, &lu);
-      syz->m[k] = pMult(syz->m[k],pCopy(unit1));
-      syz->m[k] = pSub(syz->m[k],
+      pTakeOutComp(&(syz->m[from]), ModComp, &unit2, &lu);
+      syz->m[from] = pMult(syz->m[from],pCopy(unit1));
+      syz->m[from] = pSub(syz->m[from],
         pMult(pCopy(actWith),unit2));
-      if (syz->m[k]==NULL)
-      {
-        PrintS("Hier muss noch was gemacht werden\n");
-      }
     }
-    k++;
+    from++;
   }
   pDelete(&actWith);
   pDelete(&unit1);
@@ -382,6 +380,8 @@ void syMinimizeResolvente(resolvente res, int length, int first)
   }
   if (res[syzIndex]!=NULL)
     syMinStep(res[syzIndex-1],res[syzIndex]);
+  if (!idIs0(res[0]))
+    idMinEmbedding(res[0]);
 }
 
 /*2
@@ -402,8 +402,8 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   resolvente newres;
   tHomog hom=isNotHomog;
   ideal temp=NULL;
-  intvec *w,*w1=NULL,**tempW;
-  int i,k,syzIndex = 0,j;
+  intvec *w = NULL,**tempW;
+  int i,k,syzIndex = 0,j,rk_arg=max(1,idRankFreeModule(arg));
   int Kstd1_OldDeg=Kstd1_deg;
   BOOLEAN completeMinim;
   BOOLEAN oldDegBound=TEST_OPT_DEGBOUND;
@@ -419,7 +419,22 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     *weights=wtmp;
   }
   res = (resolvente)Alloc0((*length)*sizeof(ideal));
-  res[0] = idCopy(arg);
+
+/*--- initialize the syzygy-ring -----------------------------*/
+  ring origR = currRing;
+  ring syz_ring = rCurrRingAssureSyzComp();
+  rSetSyzComp(rk_arg);
+  
+  if (syz_ring != origR)
+  {
+    res[0] = idrCopyR_NoSort(arg, origR);
+  }
+  else
+  {
+    res[0] = idCopy(arg);
+  }
+  
+/*--- creating weights for the module components ---------------*/
   if ((weights==NULL) || (*weights==NULL) || ((*weights)[0]==NULL))
   {
     hom=(tHomog)idHomModule(res[0],currQuotient,&w);
@@ -439,13 +454,16 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   }
   if (hom==isHomog)
   {
-    w1 = syPrepareModComp(res[0],&w);
+    intvec *w1 = syPrepareModComp(res[0],&w);
     if (w!=NULL) { delete w;w=NULL; }
+    w = w1;
   }
+    
+/*--- the main loop --------------------------------------*/
   while ((!idIs0(res[syzIndex])) &&
          ((maxlength==-1) || (syzIndex<=maxlength)))
    // (syzIndex<maxlength+(int)minim)))
-  /*compute one step more for minimizing*/
+/*--- compute one step more for minimizing-----------------*/
   {
     if (Kstd1_deg!=0) Kstd1_deg++;
     if (syzIndex+1==*length)
@@ -464,22 +482,30 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       res=newres;
       *weights = tempW;
     }
+/*--- interreducing first -----------------------------------*/
     if (minim || (syzIndex!=0))
     {
+      if (syzIndex>0)
+      {
+        int rkI=idRankFreeModule(res[syzIndex]);
+        rSetSyzComp(rkI);
+      }
       temp = kInterRed(res[syzIndex],currQuotient);
       idDelete(&res[syzIndex]);
       idSkipZeroes(temp);
       res[syzIndex] = temp;
     }
     temp = NULL;
+/*--- computing the syzygy modules --------------------------------*/
     if ((currQuotient==NULL)&&(syzIndex==0)&& (!TEST_OPT_DEGBOUND))
     {
-      res[/*syzIndex+*/1] = idSyzygies(res[0/*syzIndex*/],
-        NULL/*currQuotient*/,hom,&w1,TRUE,Kstd1_deg);
+      res[/*syzIndex+*/1] = idSyzygies(res[0/*syzIndex*/],hom,&w,FALSE,TRUE,Kstd1_deg);
       if ((!TEST_OPT_NOTREGULARITY) && (Kstd1_deg>0)) test |= Sy_bit(OPT_DEGBOUND);
     }
     else
-      res[syzIndex+1] = idSyzygies(res[syzIndex],currQuotient,hom,&w1);
+    {
+        res[syzIndex+1] = idSyzygies(res[syzIndex],hom,&w,FALSE);
+    }
     completeMinim=(syzIndex!=maxlength) || (maxlength ==-1) || (hom!=isHomog);
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);
@@ -490,54 +516,68 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     {
       idDelete(&res[syzIndex]);
     }
+/*---creating the iterated weights for module components ---------*/
     if ((hom == isHomog) && (!idIs0(res[syzIndex])))
     {
 //Print("die %d Modulegewichte sind:\n",w1->length());
 //w1->show();
 //PrintLn();
-      k = idRankFreeModule(res[syzIndex]);
-      w = NewIntvec1(k+IDELEMS(res[syzIndex]));
+      int max_comp = idRankFreeModule(res[syzIndex]);
+      k = max_comp - rGetCurrSyzLimit();
+      assume(w != NULL);
+      if (w != NULL)
+        w->resize(max_comp+IDELEMS(res[syzIndex]));
+      else
+        w = NewIntvec1(max_comp+IDELEMS(res[syzIndex]));
       (*weights)[syzIndex] = NewIntvec1(k);
       for (i=0;i<k;i++)
       {
         if (res[syzIndex-1]->m[i]!=NULL) // hs
         {
-          (*w)[i] = pFDeg(res[syzIndex-1]->m[i]);
+          (*w)[i + rGetCurrSyzLimit()] = pFDeg(res[syzIndex-1]->m[i]);
           if (pGetComp(res[syzIndex-1]->m[i])>0)
-            (*w)[i] += (*w1)[pGetComp(res[syzIndex-1]->m[i])-1];
-          (*((*weights)[syzIndex]))[i] = (*w)[i];
+            (*w)[i + rGetCurrSyzLimit()] 
+              += (*w)[pGetComp(res[syzIndex-1]->m[i])-1];
+          (*((*weights)[syzIndex]))[i] = (*w)[i+rGetCurrSyzLimit()];
         }
       }
       for (i=k;i<k+IDELEMS(res[syzIndex]);i++)
       {
         if (res[syzIndex]->m[i-k]!=NULL)
-          (*w)[i] = pFDeg(res[syzIndex]->m[i-k])
+          (*w)[i+rGetCurrSyzLimit()] = pFDeg(res[syzIndex]->m[i-k])
                     +(*w)[pGetComp(res[syzIndex]->m[i-k])-1];
       }
-      delete w1;
-      w1 = w;
-      w = NULL;
     }
   }
+/*--- end of the main loop --------------------------------------*/
+/*--- deleting the temporare data structures --------------------*/
   if ((syzIndex!=0) && (res[syzIndex]!=NULL) && (idIs0(res[syzIndex])))
     idDelete(&res[syzIndex]);
-  if (w1!=NULL) delete w1;
-  //if ((maxlength!=-1) && (!minim))
-  //{
-  //  while (syzIndex<=maxlength)
-  //  {
-  //    res[syzIndex]=idInit(1,1);
-  //    syzIndex++;
-  //    if (syzIndex<=maxlength)
-  //    {
-  //      res[syzIndex]=idFreeModule(1);
-  //      syzIndex++;
-  //    }
-  //  }
-  //}
+  if (w !=NULL) delete w;
+
   Kstd1_deg=Kstd1_OldDeg;
   if (!oldDegBound)
     test &= ~Sy_bit(OPT_DEGBOUND);
+
+  for (i=1; i<=syzIndex; i++)
+  {
+    if (! idIs0(res[i]))
+    {
+      for (j=0; j<IDELEMS(res[i]); j++)
+      {
+        pShift(&res[i]->m[j], -rGetMaxSyzComp(i));
+      }
+    }
+  }
+/*--- going back to the original ring -------------------------*/
+  if (origR != syz_ring)
+  {
+    rChangeCurrRing(origR, TRUE);
+    for (i=0; i<=syzIndex; i++)
+    {
+      res[i] = idrMoveR_NoSort(res[i], syz_ring);
+    }
+  }
   return res;
 }
 
@@ -573,6 +613,28 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
   return result;
 }
 
+static poly sypCopyConstant(poly inp)
+{
+  poly outp=NULL,q;
+
+  while (inp!=NULL)
+  {
+    if (pIsConstantComp(inp))
+    {
+      if (outp==NULL)
+      {
+        q = outp = pHead(inp);
+      }
+      else
+      {
+        pNext(q) = pHead(inp);
+        pIter(q);
+      }
+    }
+    pIter(inp);
+  }
+  return outp;
+}
 int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
 {
   int i, j, k, ModComp,subFromRank=0, lu;
@@ -583,24 +645,7 @@ int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
   temp = idInit(IDELEMS(id),id->rank);
   for (i=0;i<IDELEMS(id);i++)
   {
-    p = id->m[i];
-    while (p!=NULL)
-    {
-      if (pIsConstantComp(p))
-      {
-        if (temp->m[i]==NULL)
-        {
-          temp->m[i] = pHead(p);
-          q = temp->m[i];
-        }
-        else
-        {
-          pNext(q) = pHead(p);
-          pIter(q);
-        }
-      }
-      pIter(p);
-    }
+    temp->m[i] = sypCopyConstant(id->m[i]);
   }
   i = IDELEMS(id);
   while ((i>0) && (temp->m[i-1]==NULL)) i--;
@@ -610,17 +655,9 @@ int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
     return 0;
   }
   j = 0;
+  p = NULL;
   while ((j<i) && (temp->m[j]==NULL)) j++;
-  if (j<i)
-  {
-    p = temp->m[j];
-    temp->m[j] = NULL;
-  }
-  else
-  {
-    p = NULL;
-  }
-  while (p!=NULL)
+  while (j<i)
   {
     if (homog)
     {
@@ -632,44 +669,9 @@ int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
     {
       tocancel[0]--;
     }
-    ModComp = pGetComp(p);
-//Print("Element %d: ",j);pWrite(p);
-    //Unit1 = pTakeOutComp1(&p,ModComp);
-    pTakeOutComp(&p,ModComp, &Unit1, &lu);
-    pSetComp(Unit1,0);
-    for (k=j+1;k<i;k++)
-    {
-      if (temp->m[k]!=NULL)
-      {
-//Print("erst %d: ",k);pWrite(temp->m[k]);
-        //Unit2 = pTakeOutComp1(&(temp->m[k]),ModComp);
-        pTakeOutComp(&(temp->m[k]),ModComp,&Unit2,&lu);
-        if (Unit2!=NULL)
-        {
-          number tmp=nCopy(pGetCoeff(Unit2));
-          tmp=nNeg(tmp);
-          qq = pCopy(p);
-          pMultN(qq,tmp);
-          nDelete(&tmp);
-          pMultN(temp->m[k],pGetCoeff(Unit1));
-          temp->m[k] = pAdd(temp->m[k],qq);
-//Print("dann %d: ",k);pWrite(temp->m[k]);
-          pDelete(&Unit2);
-        }
-      }
-    }
-//PrintLn();
-    pDelete(&Unit1);
-    pDelete(&p);
+    syGaussForOne(temp,j,pGetComp(temp->m[j]),j+1,i);
     j++;
     while ((j<i) && (temp->m[j]==NULL)) j++;
-    if (j>=i)
-    {
-      idDelete(&temp);
-      return  subFromRank;
-    }
-    p = temp->m[j];
-    temp->m[j] = NULL;
   }
   idDelete(&temp);
   return subFromRank;

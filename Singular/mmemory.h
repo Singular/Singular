@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.30 1999-10-26 15:06:11 obachman Exp $ */
+/* $Id: mmemory.h,v 1.31 1999-11-15 17:20:24 obachman Exp $ */
 /*
 * ABSTRACT
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.14 1998-03-23 22:50:54 obachman Exp $ */
+/* $Id: binom.cc,v 1.15 1999-11-15 17:19:49 obachman Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp

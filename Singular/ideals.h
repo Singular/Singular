@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.12 1999-10-19 12:42:42 obachman Exp $ */
+/* $Id: ideals.h,v 1.13 1999-11-15 17:20:07 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -20,6 +20,7 @@ ideal idInit (int size, int rank=1);
 void idDelete (ideal* h);
   /*- deletes an ideal -*/
 #endif
+void idPrint(ideal id);
   /*- initialise an ideal -*/
 ideal idMaxIdeal (int deg);
   /*- initialise the maximal ideal (at 0) -*/
@@ -79,10 +80,10 @@ ideal   idFreeModule (int i);
 ideal   idSect (ideal h1,ideal h2);
 ideal   idMultSect(resolvente arg, int length);
 
-ideal   idSyzygies (ideal h1,ideal quot, tHomog h,intvec **w);
-ideal   idSyzygies (ideal h1,ideal quot, tHomog h,intvec **w,
-           BOOLEAN setRegularity, int &deg);
-ideal   idLiftStd  (ideal h1, ideal quot, matrix *m, tHomog h=testHomog);
+//ideal   idSyzygies (ideal h1, tHomog h,intvec **w);
+ideal   idSyzygies (ideal h1, tHomog h,intvec **w, BOOLEAN setSyzComp=TRUE, 
+                    BOOLEAN setRegularity=FALSE, int &deg=0);
+ideal   idLiftStd  (ideal h1, matrix *m, tHomog h=testHomog);
 
 ideal   idLift (ideal mod, ideal sumod);
 ideal   idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape=FALSE);
@@ -101,7 +102,7 @@ ideal   idMinors(matrix a, int ar);
 
 ideal   idCompactify(ideal id);
 
-ideal   idMinEmbedding(ideal arg);
+ideal idMinEmbedding(ideal arg,BOOLEAN inPlace=FALSE);
 
 ideal   idHead(ideal h);
 

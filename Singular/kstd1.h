@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.10 1999-10-19 14:03:50 obachman Exp $ */
+/* $Id: kstd1.h,v 1.11 1999-11-15 17:20:15 obachman Exp $ */
 /*
 * ABSTRACT
 */

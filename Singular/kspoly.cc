@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.5 1999-11-05 19:11:07 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.6 1999-11-15 17:20:14 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
 #include "mod2.h"
 #include "kutil.h"
 #include "polys.h"
-#include "pProcs.h"
+#include "prProcs.h"
 #include "numbers.h"
 
 // Define to enable tests in this file 
@@ -60,7 +60,7 @@ void ksReducePoly(LObject* PR,
     int ct = ksCheckCoeff(&an, &bn);
     pSetCoeff(lm, bn);
     if ((ct == 0) || (ct == 2)) 
-      p1 = p_Mult_n(p1, an);
+      p1 = pr_Mult_n(p1, an);
     if (coef != NULL) *coef = an;
     else nDelete(&an);
   }
@@ -72,7 +72,7 @@ void ksReducePoly(LObject* PR,
   
   pMonSubFrom(lm, p2);
 
-  PR->p = p_Minus_m_Mult_q(p1, lm, a2, spNoether);
+  PR->p = pr_Minus_m_Mult_q(p1, lm, a2, spNoether);
 
   pDelete1(&lm);
 }
@@ -137,10 +137,10 @@ void ksCreateSpoly(LObject* Pair,
   pSetCoeff0(m2, lc1); // and now, m1 * LT(p1) == m2 * LT(p2)
 
   // get m2 * a2
-  a2 = p_Mult_m(a2, m2, spNoether);
+  a2 = pr_Mult_m(a2, m2, spNoether);
 
   // and, finally, the spoly
-  Pair->p = p_Minus_m_Mult_q(a2, m1, a1, spNoether);
+  Pair->p = pr_Minus_m_Mult_q(a2, m1, a1, spNoether);
   
   // Clean-up time
   pDelete1(&m1);
@@ -183,7 +183,7 @@ void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
   if (! nIsOne(coef))
   {
     pNext(Current) = NULL;
-    p_Mult_n(Lp, coef);
+    pr_Mult_n(Lp, coef);
   }
   nDelete(&coef);
   pNext(Current) = PR->p;

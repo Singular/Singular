@@ -3,7 +3,7 @@
  *
  *  aso.h:  Header file for generation of ALLOC_SIZE_OF_ macros
  *  
- *  Version: $Id: aso.h,v 1.2 1999-10-26 15:06:09 obachman Exp $
+ *  Version: $Id: aso.h,v 1.3 1999-11-15 17:19:48 obachman Exp $
  *******************************************************************/
 #ifndef ASO_H
 #define ASO_H

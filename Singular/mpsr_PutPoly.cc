@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.17 1999-10-14 14:27:26 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.18 1999-11-15 17:20:34 obachman Exp $ */
 
 /***************************************************************
  *

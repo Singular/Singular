@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.11 1999-10-22 11:14:09 obachman Exp $ */
+/* $Id: hilb.cc,v 1.12 1999-11-15 17:20:05 obachman Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: shortfl.h,v 1.6 1999-10-26 16:40:47 Singular Exp $ */
+/* $Id: shortfl.h,v 1.7 1999-11-15 17:20:47 obachman Exp $ */
 #include "structs.h"
 
 BOOLEAN nrGreaterZero (number k);

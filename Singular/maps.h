@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.h,v 1.7 1999-03-09 12:28:49 obachman Exp $ */
+/* $Id: maps.h,v 1.8 1999-11-15 17:20:21 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */

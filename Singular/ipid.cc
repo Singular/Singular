@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.38 1999-10-27 15:04:44 Singular Exp $ */
+/* $Id: ipid.cc,v 1.39 1999-11-15 17:20:10 obachman Exp $ */
 
 /*
 * ABSTRACT: identfier handling

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.26 1999-10-26 15:06:10 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.27 1999-11-15 17:19:52 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */

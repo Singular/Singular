@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.h,v 1.10 1998-12-16 18:43:39 Singular Exp $ */
+/* $Id: libparse.h,v 1.11 1999-11-15 17:20:17 obachman Exp $ */
 /*
 * ABSTRACT: lib parsing
 */

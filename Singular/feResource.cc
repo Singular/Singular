@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.15 1999-10-25 18:21:50 Singular Exp $ */
+/* $Id: feResource.cc,v 1.16 1999-11-15 17:19:57 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */

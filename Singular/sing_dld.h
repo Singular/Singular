@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_dld.h,v 1.1 1997-07-02 16:44:16 Singular Exp $ */
+/* $Id: sing_dld.h,v 1.2 1999-11-15 17:20:49 obachman Exp $ */
 /*
 * ABSTRACT: dynamic loader
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.48 1999-11-02 17:15:31 Singular Exp $ */
+/* $Id: kutil.cc,v 1.49 1999-11-15 17:20:16 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2445,7 +2445,7 @@ void messageSets (kStrategy strat)
     PrintS("\n  p : ");
     wrp(strat->L[i].p);
     Print("  o:%d e:%d l:%d",
-     pGetOrder(strat->L[i].p),strat->L[i].ecart,strat->L[i].length);
+     pFDeg(strat->L[i].p),strat->L[i].ecart,strat->L[i].length);
   }
   PrintLn();
 }

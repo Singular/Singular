@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.28 1999-10-22 11:14:16 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.29 1999-11-15 17:20:32 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc

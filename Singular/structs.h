@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.28 1999-10-14 14:27:32 obachman Exp $ */
+/* $Id: structs.h,v 1.29 1999-11-15 17:20:51 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -205,8 +205,10 @@ typedef struct sro_syzcomp sro_syzcomp;
 // ordering  with component number >syzcomp is lower
 struct sro_syz
 {
-  short place;  // where the index is stored (in L)
-  int limit;    // syzcomp
+  short place;       // where the index is stored (in L)
+  int limit;         // syzcomp
+  int* syz_index;    // mapping Component -> SyzIndex for Comp <= limit
+  int  curr_index;   // SyzIndex for Component > limit
 };
 
 typedef struct sro_syz sro_syz;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.h,v 1.3 1997-04-09 12:19:37 Singular Exp $ */
+/* $Id: algmap.h,v 1.4 1999-11-15 17:19:48 obachman Exp $ */
 /*
 * ABSTRACT:
 */

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.h,v 1.6 1999-10-22 11:14:14 obachman Exp $ */
+/* $Id: mmbt.h,v 1.7 1999-11-15 17:20:23 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC

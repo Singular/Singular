@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.15 1999-10-22 11:14:14 obachman Exp $ */
+/* $Id: mmprivate.h,v 1.16 1999-11-15 17:20:26 obachman Exp $ */
 /*
 * ABSTRACT
 */

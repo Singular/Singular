@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fegetopt.c,v 1.3 1999-09-22 15:42:13 Singular Exp $ */
+/* $Id: fegetopt.c,v 1.4 1999-11-15 17:19:58 obachman Exp $ */
 
 /* Getopt for GNU.
    NOTE: getopt is now part of the C library, so if you don't know what

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.46 1999-11-05 19:11:07 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.47 1999-11-15 17:20:14 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -92,8 +92,6 @@ void doRed (LObject* h,poly* with,BOOLEAN intoT,kStrategy strat)
   pTest((*h).p);
   //pTest(*with);
 #endif
-  assume(strat->syzComp == 0 || 
-         pGetComp(h->p) <= strat->syzComp);
   if (!TEST_OPT_INTSTRATEGY)
     pNorm(*with);
   if (TEST_OPT_DEBUG)
@@ -197,7 +195,7 @@ int redEcart19 (LObject* h,kStrategy strat)
       {
         if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
         {
-          if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
+          if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
           return -2;
         }
       }
@@ -253,9 +251,6 @@ int redEcart (LObject* h,kStrategy strat)
   int j = 0;
   int pass = 0;
   unsigned long not_sev;
-
-  assume(strat->syzComp == 0 || 
-         pGetComp(h->p) <= strat->syzComp);
 
   if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
@@ -358,10 +353,9 @@ int redEcart (LObject* h,kStrategy strat)
       {
         if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
         {
-          if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
+          if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
           return -2;
         }
-        assume(pGetComp(h->p) <= strat->syzComp);
 
       }
       /*- try to reduce the s-polynomial -*/
@@ -468,7 +462,7 @@ int redFirst (LObject* h,kStrategy strat)
       {
         if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
         {
-          if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
+          if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
           return -2;
         }
       }
@@ -625,7 +619,7 @@ int redMoraBest (LObject* h,kStrategy strat)
       {
         if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
         {
-          if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
+          if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
           return -2;
         }
       }

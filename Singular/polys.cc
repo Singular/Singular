@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.51 1999-10-20 11:52:02 obachman Exp $ */
+/* $Id: polys.cc,v 1.52 1999-11-15 17:20:40 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -61,8 +61,6 @@ poly      ppNoether = NULL;
 /* -------------- static variables --------------------------------------- */
 /*is the basic comparing procedure during a computation of syzygies*/
 static pCompProc pCompOld;
-/*for grouping module indicies during computations*/
-int pMaxBound = 0;
 
 /*contains the headterms for the Schreyer orderings*/
 static int* SchreyerOrd;
@@ -124,7 +122,6 @@ void rSetm(poly p)
         {
           int c=pGetComp(p);
           long sc = c;
-#if 1
           if (o->data.syzcomp.ShiftedComponents != NULL)
           {
             assume(o->data.syzcomp.Components != NULL);
@@ -134,16 +131,20 @@ void rSetm(poly p)
             assume(c == 0 || sc != 0);
           }
           p->exp.l[o->data.syzcomp.place]=sc;
-#endif
           break;
         }
         case ro_syz:
         {
           int c=pGetComp(p);
           if (c > o->data.syz.limit)
-            p->exp.l[o->data.syz.place]= 1;
+            p->exp.l[o->data.syz.place] = o->data.syz.curr_index;
+          else if (c > 0)
+            p->exp.l[o->data.syz.place]= o->data.syz.syz_index[c];
           else
+          {
+            assume(c == 0);
             p->exp.l[o->data.syz.place]= 0;
+          }
           break;
         }
         default:
@@ -390,20 +391,6 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
   }
 }
 
-void pSetSyzComp(int k)
-{
-  pMaxBound=k;
-  if((currRing->typ!=NULL) && (currRing->typ[0].ord_typ==ro_syz))
-  {
-    if (currRing->typ!=NULL)
-      currRing->typ[0].data.syz.limit=k;
-  }
-  else if ((currRing->order[0]!=ringorder_c) && (k!=0))
-  {
-    WarnS("syzcomp in incompatible ring");
-  }
-}
-
 /*2
 * the type of the module ordering: C: -1, c: 1
 */
@@ -527,7 +514,7 @@ static int ldeg0c(poly p,int *l)
   int o=pFDeg(p);
   int ll=1;
 
-  if (pMaxBound/*syzComp*/==0)
+  if (! rIsSyzIndexRing(currRing))
   {
     while ((p=pNext(p))!=NULL)
     {
@@ -537,9 +524,10 @@ static int ldeg0c(poly p,int *l)
   }
   else
   {
+    int curr_limit = rGetCurrSyzLimit();
     while ((p=pNext(p))!=NULL)
     {
-      if (pGetComp(p)<=pMaxBound/*syzComp*/)
+      if (pGetComp(p)<=curr_limit/*syzComp*/)
       {
         o=pFDeg(p);
         ll++;
@@ -607,7 +595,8 @@ static int ldeg1c(poly p,int *l)
   max=pFDeg(p);
   while ((p=pNext(p))!=NULL)
   {
-    if ((pMaxBound/*syzComp*/==0) || (pGetComp(p)<=pMaxBound/*syzComp*/))
+    if (! rIsSyzIndexRing(currRing) || 
+        (pGetComp(p)<=rGetCurrSyzLimit()))
     {
        if ((t=pFDeg(p))>max) max=t;
        ll++;
@@ -1045,6 +1034,7 @@ void pLcm(poly a, poly b, poly m)
     pSetExp(m,i, max( pGetExp(a,i), pGetExp(b,i)));
   }
   pSetComp(m, max(pGetComp(a), pGetComp(b)));
+  /* Don't do a pSetm here, otherwise hres/lres chockes */
 }
 
 /*2
@@ -1269,6 +1259,7 @@ poly pTakeOutComp(poly * p, int k)
     while ((q!=NULL) && (pGetComp(q)==k))
     {
       pSetComp(q,0);
+      pSetmComp(q);
       qq = q;
       pIter(q);
     }
@@ -1276,7 +1267,11 @@ poly pTakeOutComp(poly * p, int k)
     pNext(qq) = NULL;
   }
   if (q==NULL) return result;
-  if (pGetComp(q) > k) pDecrComp(q);
+  if (pGetComp(q) > k) 
+  {
+    pDecrComp(q);
+    pSetmComp(q);
+  }
   poly pNext_q;
   while ((pNext_q=pNext(q))!=NULL)
   {
@@ -1295,11 +1290,16 @@ poly pTakeOutComp(poly * p, int k)
       pNext(q) = pNext(pNext_q);
       pNext(qq) =NULL;
       pSetComp(qq,0);
+      pSetmComp(qq);
     }
     else
     {
       /*pIter(q);*/ q=pNext_q;
-      if (pGetComp(q) > k) pDecrComp(q);
+      if (pGetComp(q) > k) 
+      {
+        pDecrComp(q);
+        pSetmComp(q);
+      }
     }
   }
   return result;
@@ -1329,6 +1329,7 @@ void pTakeOutComp(poly *r_p, Exponent_t comp, poly *r_q, int *lq)
       pNext(q) = p;
       pIter(q);
       pSetComp(p, 0);
+      pSetmComp(p);
       pIter(p);
       l++;
       if (p == NULL)
@@ -1388,6 +1389,7 @@ void pDecrOrdTakeOutComp(poly *r_p, Exponent_t comp, Order_t order,
       pIter(q);
       pIter(p);
       pSetComp(p, 0);
+      pSetmComp(p);
       l++;
       if (p == NULL || pGetOrder(p) != order)
       {
@@ -1422,6 +1424,7 @@ poly pTakeOutComp1(poly * p, int k)
     while ((q!=NULL) && (pGetComp(q)==k))
     {
       pSetComp(q,0);
+      pSetmComp(q);
       qq = q;
       pIter(q);
     }
@@ -1447,6 +1450,7 @@ poly pTakeOutComp1(poly * p, int k)
       pNext(q) = pNext(pNext(q));
       pNext(qq) =NULL;
       pSetComp(qq,0);
+      pSetmComp(qq);
     }
     else
     {
@@ -1465,7 +1469,11 @@ void pDeleteComp(poly * p,int k)
   while ((*p!=NULL) && (pGetComp(*p)==k)) pDelete1(p);
   if (*p==NULL) return;
   q = *p;
-  if (pGetComp(q)>k) pDecrComp(q);
+  if (pGetComp(q)>k) 
+  {
+    pDecrComp(q);
+    pSetmComp(q);
+  }
   while (pNext(q)!=NULL)
   {
     if (pGetComp(pNext(q))==k)
@@ -1473,7 +1481,11 @@ void pDeleteComp(poly * p,int k)
     else
     {
       pIter(q);
-      if (pGetComp(q)>k) pDecrComp(q);
+      if (pGetComp(q)>k) 
+      {
+        pDecrComp(q);
+        pSetmComp(q);
+      }
     }
   }
 }

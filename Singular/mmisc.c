@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.21 1999-11-05 19:11:08 obachman Exp $ */
+/* $Id: mmisc.c,v 1.22 1999-11-15 17:20:25 obachman Exp $ */
 
 /*
 * ABSTRACT:

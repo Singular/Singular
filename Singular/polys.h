@@ -3,11 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.26 1999-10-15 16:07:10 obachman Exp $ */
+/* $Id: polys.h,v 1.27 1999-11-15 17:20:41 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
 #include "polys-impl.h"
+#define pFetchCopy(r,p)     _pFetchCopy(r,p)
+// Similar to pFetchCopy, except that poly p is deleted
+#define pFetchCopyDelete(r, p) _pFetchCopyDelete(r, p)
 
 typedef poly*   polyset;
 extern int      pVariables;
@@ -163,33 +166,13 @@ extern  poly pHeadProc(poly p);
   _pShallowCopyDelete(dest_heap, source_p, source_heap)
 
 
-// Returns a converted copy (in the sense that returned poly is in
-// poly of currRing) of poly p which is from ring r -- assumes that
-// currRing and r have the same number of variables, i.e. that polys
-// from r can be "fetched" into currRing
-#define pFetchCopy(r,p)     _pFetchCopy(r,p)
-// Similar to pFetchCopy, except that poly p is deleted
-#define pFetchCopyDelete(r, p) _pFetchCopyDelete(r, p)
-// Similar tp pFetchCopy resp. pHead, i.e., lead monomial of p which
-// lives in (fetchable) ring r is copied
-#define pFetchHead(r, p)    _pFetchHead(r, p)
-// similar to pFetchHead, except that lead monom of p is deleted
-#define pFetchHeadDelete(r, p) _pFetchHeadDelete(r, p)
-// Similar to pFree1, except that m lives in ring r
-#define pRingFree1(r, m)        _pRingFree1(r, m)
-// similar to pDelete1, except that m lives in ring r, which MUST be a
-// "fetchable" ring w.r.t. currRing
-#define pRingDelete1(r, m)        _pRingDelete1(r, m)
-// similar to pDelete, except that m lives in ring r, which MUST be a
-// "fetchable" ring w.r.t. currRing
-#define pRingDelete(r, m)        _pRingDelete(r, m)
-
 
 // Adds exponents of p2 to exponents of p1
 // assumes that exponents >= 0 and and one Component != 0
 #define pMonAddOn(p1, p2)   _pMonAddOn(p1, p2)
 // Similar to pMonAddOn, excpet that new exponents are written in p1
-#define pMonAdd(p1, p2, p3) _pMonAdd(p1, p2, p3)
+#define pMonAdd(p1, p2, p3) _prMonAdd(p1, p2, p3, currRing)
+#define prMonAdd(p1, p2, p3, r) _prMonAdd(p1, p2, p3, r)
 // Subtracts exponetns of p1 from p1, assumes both Components are Equal
 #define pMonSubFrom(p1, p2) _pMonSubFrom(p1, p2)
 
@@ -294,7 +277,6 @@ poly      pOrdPolyMerge(poly p);
 
 poly      pPermPoly (poly p, int * perm, ring OldRing,
                      int *par_perm=NULL, int OldPar=0);
-void      pSetSyzComp(int k);
 
 /*BOOLEAN   pVectorHasUnitM(poly p, int * k);*/
 BOOLEAN   pVectorHasUnitB(poly p, int * k);
@@ -346,10 +328,14 @@ unsigned long pGetShortExpVector(poly p);
 #ifdef PDEBUG
 #define pHeapTest(A,B)  pDBTest(A, B, __FILE__,__LINE__)
 #define pTest(A) pDBTest(A, mm_specHeap, __FILE__,__LINE__)
+#define prTest(p, r) prDBTest(p, r, __FILE__, __LINE__)
+
 BOOLEAN pDBTest(poly p, char *f, int l);
 BOOLEAN pDBTest(poly p, memHeap tail_heap, char *f, int l);
+BOOLEAN prDBTest(poly p, ring r, char *f, int l);
 BOOLEAN pDBTest(poly p,  memHeap tail_heap, memHeap lm_heap, char *f, int l);
 #else
+#define prTest(p, r)    (TRUE)
 #define pHeapTest(A,B)  (TRUE)
 #define pTest(A)        (TRUE)
 #define pDBTest(A,B,C)  (TRUE)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.h,v 1.9 1999-10-14 14:27:17 obachman Exp $ */
+/* $Id: matpol.h,v 1.10 1999-11-15 17:20:22 obachman Exp $ */
 /*
 * ABSTRACT
 */

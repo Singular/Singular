@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.h,v 1.4 1999-04-17 14:58:50 obachman Exp $ */
+/* $Id: ipprint.h,v 1.5 1999-11-15 17:20:11 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */

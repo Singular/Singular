@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.6 1999-10-14 14:27:11 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.7 1999-11-15 17:20:13 obachman Exp $ */
 #include "mod2.h"
 #include "structs.h"
 #if HAVE_ASO == 1

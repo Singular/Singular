@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.11 1999-10-26 15:06:13 obachman Exp $ */
+/* $Id: prProcs.cc,v 1.1 1999-11-15 17:20:44 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -9,11 +9,8 @@
 #include "mmemory.h"
 #include "polys.h"
 #include "polys-comp.h"
-#include "pProcs.h"
+#include "prProcs.h"
 #include "numbers.h"
-
-// Define to us COMP_MACROS
-#define HAVE_COMP_MACROS
 
 // #define HAVE_CHAR_P
 
@@ -37,27 +34,26 @@
 #define assume(x) 
 #endif
 
-#define pFree1AndAdvance(p, heap)               \
+#define prFree1AndAdvance(p, r)                  \
 do                                              \
 {                                               \
   poly __p = p;                                 \
   p = pNext(__p);                               \
-  FreeHeap(__p, heap);                          \
+  FreeHeap(__p, r->mm_specHeap);                \
 }                                               \
 while(0)
 /***************************************************************
  *
- * General:  p_Mult_n which always works
+ * General:  pr_Mult_n which always works
  * Returns:  p*n
  * Destroys: p
  * Const:    n
  *
  ***************************************************************/
 
-poly p_Mult_n_General(poly p, number n)
+poly pr_Mult_n_General(poly p, number n)
 {
   poly q = p;
-  assume(pHeapTest(p, MM_UNKNOWN_HEAP));
   while (p != NULL)
   {
     number nc = pGetCoeff(p);
@@ -71,7 +67,7 @@ poly p_Mult_n_General(poly p, number n)
 
 /***************************************************************
  *
- * General:  p_Add_q which always works
+ * General:  pr_Add_q which always works
  * Returns:  p + q, *lp == pLength(p+q), p+q are from heap
  * Destroys: p, q
  * Assume:   *lp == NULL || pLength(p) == *lp && pLength(q) == q
@@ -79,12 +75,11 @@ poly p_Mult_n_General(poly p, number n)
  * 
  ***************************************************************/
 
-poly p_Add_q_General(poly p, poly q, int *lp, int lq,
-                     memHeap heap)
+poly pr_Add_q_General(poly p, poly q, int *lp, int lq,
+                     const ring r)
 {
-  assume(heap != NULL && heap != MM_UNKNOWN_HEAP);
-  assume(pHeapTest(p, heap));
-  assume(pHeapTest(q, heap));
+  assume(prTest(p, r));
+  assume(prTest(q, r));
   assume(lp == NULL || pLength(p) == *lp);
   assume(lp == NULL || pLength(q) == lq);
 
@@ -104,23 +99,23 @@ poly p_Add_q_General(poly p, poly q, int *lp, int lq,
   if (lp != NULL) l = *lp + lq;
 
   Top:     // compare p and q w.r.t. monomial ordering
-  _pMonCmp(p, q, goto Equal, goto Greater , goto Smaller);
+  _prMonCmp(p, q, r, goto Equal, goto Greater , goto Smaller);
 
   Equal:
-  assume(pComp0(p, q) == 0);
+  assume(prComp0(p, q, r) == 0);
 
   n1 = pGetCoeff(p);
   n2 = pGetCoeff(q);
   t = nAdd(n1,n2);
   nDelete(&n1);
   nDelete(&n2);
-  pFree1AndAdvance(q, heap);
+  prFree1AndAdvance(q, r);
   
   if (nIsZero(t))
   {
     l -= 2;
     nDelete(&t);
-    pFree1AndAdvance(p, heap);
+    prFree1AndAdvance(p, r);
   }
   else
   {
@@ -134,14 +129,14 @@ poly p_Add_q_General(poly p, poly q, int *lp, int lq,
   goto Top;
      
   Greater:
-  assume(pComp0(p, q) == 1);
+  assume(prComp0(p, q, r) == 1);
   a = pNext(a) = p;
   pIter(p);
   if (p==NULL) { pNext(a) = q; goto Finish;}
   goto Top;
     
   Smaller:
-  assume(pComp0(p, q) == -1);
+  assume(prComp0(p, q, r) == -1);
   a = pNext(a) = q;
   pIter(q);
   if (q==NULL) { pNext(a) = p; goto Finish;}
@@ -151,7 +146,7 @@ poly p_Add_q_General(poly p, poly q, int *lp, int lq,
   Finish:
   if (lp != NULL) *lp = l;
 
-  assume(pHeapTest(pNext(&rp), heap));
+  assume(prTest(pNext(&rp), r));
   assume(lp == NULL || pLength(pNext(&rp)) == *lp);
   return pNext(&rp);
 }
@@ -159,21 +154,21 @@ poly p_Add_q_General(poly p, poly q, int *lp, int lq,
 
 /***************************************************************
  *
- * General: p_Mult_m which always works
- * Returns: m*a1, newly allocated from heap
+ * General: pr_Mult_m which always works
+ * Returns: m*a1, newly allocated from r
  *          if spNoether != NULL, then monoms whioch are smaller
  *          then spNoether are cut
  * Assume:  m is Monom 
  * Const: p, m
  *
  ***************************************************************/
-poly  p_Mult_m_General(poly p,
+poly  pr_Mult_m_General(poly p,
                        poly m, 
                        poly spNoether,
-                       memHeap heap)
+                       const ring ri)
 {
-  assume(heap != NULL && heap != MM_UNKNOWN_HEAP);
-  assume(pHeapTest(p, MM_UNKNOWN_HEAP));
+  assume(ri != NULL);
+  assume(prTest(p, ri));
   
   if (p == NULL) return NULL;
   spolyrec rp;
@@ -184,10 +179,10 @@ poly  p_Mult_m_General(poly p,
   {
     while (p != NULL)
     {
-      pNext(q) = AllocHeap(heap);
+      pNext(q) = AllocHeap(ri->mm_specHeap);
       q = pNext(q);
       pSetCoeff0(q, nMult(ln, pGetCoeff(p)));
-      pMonAdd(q, p, m);
+      prMonAdd(q, p, m, ri);
       p = pNext(p);
     }
   }
@@ -196,12 +191,12 @@ poly  p_Mult_m_General(poly p,
     poly r;
     while (p != NULL)
     {
-      r = AllocHeap(heap);
-      pMonAdd(r, p, m);
+      r = AllocHeap(ri->mm_specHeap);
+      prMonAdd(r, p, m, ri);
 
-      if (pComp0(r, spNoether) == -1)
+      if (prComp0(r, spNoether, ri) == -1)
       {
-        FreeHeap(r, heap);
+        FreeHeap(r, ri->mm_specHeap);
         break;
       }
       q = pNext(q) = r;
@@ -211,7 +206,7 @@ poly  p_Mult_m_General(poly p,
   }
   pNext(q) = NULL;
 
-  assume(pHeapTest(pNext(&rp), heap));
+  assume(prTest(pNext(&rp), ri));
 
   return pNext(&rp);
 }
@@ -220,7 +215,7 @@ poly  p_Mult_m_General(poly p,
 
 /***************************************************************
  *
- * General:  p_Minus_m_Mult_q which always works
+ * General:  pr_Minus_m_Mult_q which always works
  * Return :  p - m*q, allocated from heap
  * Assume:   p is from heap, m is Monom
  *           *lp == NULL || pLength(p) == *lp && pLenth(q) == lq
@@ -228,12 +223,12 @@ poly  p_Mult_m_General(poly p,
  * Const:    m, q
  *
  ***************************************************************/
-poly p_Minus_m_Mult_q_General (poly p, 
+poly pr_Minus_m_Mult_q_General (poly p, 
                                poly m,
                                poly q, 
                                poly spNoether,
                                int *lp,  int lq,
-                               memHeap heap)
+                               const ring r)
 {
 #ifdef TRACK_MEMORY
   mmMarkCurrentUsageState();
@@ -242,9 +237,8 @@ poly p_Minus_m_Mult_q_General (poly p,
   pDelete(&p);
   p = ptemp;
 #endif  
-  assume(heap != NULL && heap != MM_UNKNOWN_HEAP);
-  assume(pHeapTest(p, heap));
-  assume(pHeapTest(q, MM_UNKNOWN_HEAP));
+  assume(prTest(p, r));
+  assume(prTest(q, r));
   assume(lp == NULL || (pLength(p) == *lp && pLength(q) == lq));
 
   // we are done if q == NULL || m == NULL
@@ -267,16 +261,16 @@ poly p_Minus_m_Mult_q_General (poly p,
 
   if (p == NULL) goto Finish;       // we are done if p is 0
   
-  qm = AllocHeap(heap);
+  qm = AllocHeap(r->mm_specHeap);
   assume(pGetComp(q) == 0 || pGetComp(m) == 0);
-  pMonAdd(qm, q, m);
+  prMonAdd(qm, q, m, r);
   
   // MAIN LOOP:
   Top:     // compare qm = m*q and p w.r.t. monomial ordering
-  _pMonCmp(qm, p, goto Equal, goto Greater, goto Smaller);
+  _prMonCmp(qm, p, r, goto Equal, goto Greater, goto Smaller);
   
   Equal:   // qm equals p
-  assume(pComp0(qm, p) == 0);
+  assume(prComp0(qm, p,r) == 0);
     tb = nMult(pGetCoeff(q), tm);
     tc = pGetCoeff(p);
     if (!nEqual(tc, tb))
@@ -292,19 +286,19 @@ poly p_Minus_m_Mult_q_General (poly p,
     { // coeffs are equal, so their difference is 0: 
       l -= 2;
       nDelete(&tc);
-      pFree1AndAdvance(p, heap);
+      prFree1AndAdvance(p, r);
     }
     nDelete(&tb);
     pIter(q);
     if (q == NULL || p == NULL) goto Finish; // are we done ?
     // no, so update qm
     assume(pGetComp(q) == 0 || pGetComp(m) == 0);
-    pMonAdd(qm, q, m);
+    prMonAdd(qm, q, m, r);
     goto Top;
 
 
   Greater:
-  assume(pComp0(qm, p) == 1 && ! pEqual(qm, p));
+    assume(prComp0(qm, p,r) == 1);
       pSetCoeff0(qm,nMult(pGetCoeff(q), tneg));
       a = pNext(a) = qm;       // append qm to result and advance q
       pIter(q);
@@ -314,13 +308,13 @@ poly p_Minus_m_Mult_q_General (poly p,
         goto Finish; 
       }
       // construct new qm 
-      qm = AllocHeap(heap);
+      qm = AllocHeap(r->mm_specHeap);
       assume(pGetComp(q) == 0 || pGetComp(m) == 0);
-      pMonAdd(qm, q, m);
+      prMonAdd(qm, q, m, r);
       goto Top;
     
   Smaller:     
-  assume(pComp0(qm, p) == -1 && ! pEqual(qm, p));
+      assume(prComp0(qm, p,r) == -1);
       a = pNext(a) = p;// append p to result and advance p
       pIter(p);
       if (p == NULL) goto Finish;;
@@ -334,20 +328,20 @@ poly p_Minus_m_Mult_q_General (poly p,
    else  // append (- m*q) to result
    {
      pSetCoeff0(m, tneg);
-     pNext(a) = p_Mult_m(q, m, spNoether, heap);
+     pNext(a) = pr_Mult_m(q, m, spNoether, r);
      pSetCoeff0(m, tm);
    }
    
    nDelete(&tneg);
-   if (qm != NULL) FreeHeap(qm, heap);
+   if (qm != NULL) FreeHeap(qm, r->mm_specHeap);
    if (lp != NULL) *lp = l;
    
-   assume(pHeapTest(pNext(&rp), heap));
+   assume(prTest(pNext(&rp), r));
    assume(lp == NULL || pLength(pNext(&rp)) == l);
    
 #ifdef TRACK_MEMORY
    mmMarkCurrentUsageStart();
-   assume(pHeapTest(pNext(&rp), heap));
+   assume(prTest((pNext(&rp), heap));
    mmPrintUnMarkedBlocks();
    mmMarkCurrentUsageStop();
 #endif

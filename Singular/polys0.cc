@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.12 1999-09-29 10:59:37 obachman Exp $ */
+/* $Id: polys0.cc,v 1.13 1999-11-15 17:20:41 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings

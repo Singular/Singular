@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.22 1999-11-06 15:07:56 obachman Exp $ */
+/* $Id: ipshell.h,v 1.23 1999-11-15 17:20:12 obachman Exp $ */
 /*
 * ABSTRACT
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.81 1999-11-05 19:11:09 obachman Exp $ */
+/* $Id: ring.cc,v 1.82 1999-11-15 17:20:44 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -26,6 +26,7 @@
 #include "ideals.h"
 #include "lists.h"
 #include "ring.h"
+#include "prCopy.h"
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
 
@@ -71,13 +72,6 @@ static void rDelete(ring r);
 //  }
 //  return FALSE;
 //}
-
-int rBlocks(ring r)
-{
-  int i=0;
-  while (r->order[i]!=0) i++;
-  return i+1;
-}
 
 // internally changes the gloabl ring and resets the relevant
 // global variables:
@@ -1737,12 +1731,12 @@ int rSum(ring r1, ring r2, ring &sum)
  *        qring:        same nCopy, same idCopy as currRing)
  * DOES NOT CALL rComplete
  */
-ring rCopy0(ring r)
+static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE, 
+                   BOOLEAN copy_ordering = TRUE)
 {
   if (r == NULL) return NULL;
   rTest(r);
   int i,j;
-  int *pi;
   ring res=(ring)AllocSizeOf(ip_sring);
 
   memcpy4(res,r,sizeof(ip_sring));
@@ -1758,33 +1752,46 @@ ring rCopy0(ring r)
       res->parameter[i]=mstrdup(r->parameter[i]);
     }
   }
-  res->names   = (char **)Alloc(r->N * sizeof(char_ptr));
-  i=1;
-  pi=r->order;
-  while ((*pi)!=0) { i++;pi++; }
-  res->wvhdl   = (int **)Alloc(i * sizeof(int_ptr));
-  res->order   = (int *) Alloc(i * sizeof(int));
-  res->block0  = (int *) Alloc(i * sizeof(int));
-  res->block1  = (int *) Alloc(i * sizeof(int));
-  for (j=0; j<i; j++)
+  if (copy_ordering == TRUE)
   {
-    if (r->wvhdl[j]!=NULL)
+    i=rBlocks(r);
+    res->wvhdl   = (int **)Alloc(i * sizeof(int_ptr));
+    res->order   = (int *) Alloc(i * sizeof(int));
+    res->block0  = (int *) Alloc(i * sizeof(int));
+    res->block1  = (int *) Alloc(i * sizeof(int));
+    for (j=0; j<i; j++)
     {
-      res->wvhdl[j]=(int*)AllocL(mmSizeL((ADDRESS)r->wvhdl[j]));
-      memcpy(res->wvhdl[j],r->wvhdl[j],mmSizeL((ADDRESS)r->wvhdl[j]));
+      if (r->wvhdl[j]!=NULL)
+      {
+        res->wvhdl[j]=(int*)AllocL(mmSizeL((ADDRESS)r->wvhdl[j]));
+        memcpy(res->wvhdl[j],r->wvhdl[j],mmSizeL((ADDRESS)r->wvhdl[j]));
+      }
+      else
+        res->wvhdl[j]=NULL;
     }
-    else
-      res->wvhdl[j]=NULL;
+    memcpy4(res->order,r->order,i * sizeof(int));
+    memcpy4(res->block0,r->block0,i * sizeof(int));
+    memcpy4(res->block1,r->block1,i * sizeof(int));
   }
-  memcpy4(res->order,r->order,i * sizeof(int));
-  memcpy4(res->block0,r->block0,i * sizeof(int));
-  memcpy4(res->block1,r->block1,i * sizeof(int));
+  else
+  {
+    res->wvhdl = NULL;
+    res->order = NULL;
+    res->block0 = NULL;
+    res->block1 = NULL;
+  }
+
+  res->names   = (char **)Alloc(r->N * sizeof(char_ptr));
   for (i=0; i<res->N; i++)
   {
     res->names[i] = mstrdup(r->names[i]);
   }
   res->idroot = NULL;
-  if (r->qideal!=NULL) res->qideal= idCopy(r->qideal);
+  if (r->qideal!=NULL) 
+  {
+    if (copy_qideal) res->qideal= idCopy(r->qideal);
+    else res->qideal = NULL;
+  }
   return res;
 }
 
@@ -2225,6 +2232,8 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
   ord_struct.ord_typ=ro_syz;
   ord_struct.data.syz.place=place/(sizeof(long)/sizeof(Exponent_t));
   ord_struct.data.syz.limit=0;
+  ord_struct.data.syz.syz_index = NULL;
+  ord_struct.data.sys.curr_index = 1;
   o[place/(sizeof(long)/sizeof(Exponent_t))]= -1;
   prev_ord=-1;
   place++;
@@ -2592,11 +2601,12 @@ BOOLEAN rComplete(ring r, int force)
   r->pDivHigh=r->pVarHighIndex/(sizeof(long)/sizeof(Exponent_t));
   r->pCompIndex=r->VarOffset[0];
 #ifdef WORDS_BIGENDIAN
+  // HANNES--think of s,c,dp; s, dp, C,
   if(r->pCompIndex==0) r->pOrdIndex=1;
   else                 r->pOrdIndex=0;
 #else
-  if(r->pCompIndex==r->ExpESize-1) r->pOrdIndex=r->ExpLSize-2;
-  else                             r->pOrdIndex=r->ExpLSize-1;
+  if(r->pCompIndex <= r->ExpESize-1) r->pOrdIndex=r->ExpLSize-2;
+  else                               r->pOrdIndex=r->ExpLSize-1;
 #endif
   return FALSE;
 }
@@ -3053,12 +3063,22 @@ BOOLEAN rComplete(ring r, int force)
   r->pDivLow=r->pVarLowIndex/(sizeof(long)/sizeof(Exponent_t));
   r->pDivHigh=r->pVarHighIndex/(sizeof(long)/sizeof(Exponent_t));
   r->pCompIndex=r->VarOffset[0];
+  // HANNES--think of s,c,dp; s, dp, C,
 #ifdef WORDS_BIGENDIAN
   if(r->pCompIndex==0) r->pOrdIndex=1;
   else                 r->pOrdIndex=0;
 #else
-  if(r->pCompIndex==r->ExpESize-1) r->pOrdIndex=r->ExpLSize-2;
-  else                             r->pOrdIndex=r->ExpLSize-1;
+  if (r->order[0] == ringorder_s)
+  {
+    if (r->pCompIndex == r->ExpESize-3) 
+      r->pOrdIndex = r->ExpLSize-3;
+    else
+      r->pOrdIndex = r->ExpLSize-2;
+  }
+  else if (r->pCompIndex == r->ExpESize-1) 
+    r->pOrdIndex=r->ExpLSize-2;
+  else                               
+    r->pOrdIndex=r->ExpLSize-1;
 #endif
   return FALSE;
 }
@@ -3066,14 +3086,24 @@ BOOLEAN rComplete(ring r, int force)
 
 void rUnComplete(ring r)
 {
+  if (r == NULL) return;
   if (r->mm_specHeap != NULL)
     mmUnGetSpecHeap(&(r->mm_specHeap));
   Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
-  if (r->OrdSize!=0)
+  if (r->order != NULL)
+  {
+    if (r->order[0] == ringorder_s && r->typ[0].data.syz.limit > 0)
+    {
+      Free(r->typ[0].data.syz.syz_index, 
+           (r->typ[0].data.syz.limit +1)*sizeof(int));
+    }
+  }
+  if (r->OrdSize!=0 && r->typ != NULL)
   {
     Free((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord));
   }
-  Free((ADDRESS)r->ordsgn,r->pCompLSize*sizeof(long));
+  if (r->ordsgn != NULL && r->pCompLSize != 0)
+    Free((ADDRESS)r->ordsgn,r->pCompLSize*sizeof(long));
 }
 
 void rDebugPrint(ring r)
@@ -3254,7 +3284,6 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 // if necessary
 
 // for the time being, this is still here
-extern ideal idRingCopy(ideal id, ring r);
 static ring rAssureSyzComp(ring r);
 ring rCurrRingAssureSyzComp()
 {
@@ -3265,39 +3294,41 @@ ring rCurrRingAssureSyzComp()
     rChangeCurrRing(r, TRUE);
     if (old_ring->qideal != NULL) 
     {
-      r->qideal = idRingCopy(old_ring->qideal, old_ring);
+      r->qideal = idrCopyR_NoSort(old_ring->qideal, old_ring);
       assume(idRankFreeModule(r->qideal) == 0);
       currQuotient = r->qideal;
     }
   }
   return r;
 }
-    
+
 static ring rAssureSyzComp(ring r)
 {
-  if (r->order[0]==ringorder_c || r->order[0] == ringorder_s)
-    return r;
+  if (r->order[0] == ringorder_s) return r;
 
-  ring res=rCopy0(r);
+  ring res=rCopy0(r, FALSE, FALSE);
   int i=rBlocks(r);
   int j;
 
-  Free((ADDRESS)res->order,i*sizeof(int));
   res->order=(int *)Alloc0((i+1)*sizeof(int));
   for(j=i;j>0;j--) res->order[j]=r->order[j-1];
   res->order[0]=ringorder_s;
 
-  Free((ADDRESS)res->block0,i*sizeof(int));
   res->block0=(int *)Alloc0((i+1)*sizeof(int));
   for(j=i;j>0;j--) res->block0[j]=r->block0[j-1];
 
-  Free((ADDRESS)res->block1,i*sizeof(int));
   res->block1=(int *)Alloc0((i+1)*sizeof(int));
   for(j=i;j>0;j--) res->block1[j]=r->block1[j-1];
 
   int ** wvhdl =(int **)Alloc0((i+1)*sizeof(int**));
-  for(j=i;j>0;j--) wvhdl[j]=res->wvhdl[j-1];
-  Free((ADDRESS)res->wvhdl,i*sizeof(int*));
+  for(j=i;j>0;j--) 
+  {
+    if (r->wvhdl[j-1] != NULL)
+    {
+      wvhdl[j] = (int*) AllocL(mmSizeL((ADDRESS)r->wvhdl[j-1]));
+      memcpy(wvhdl[j], r->wvhdl[j-1],mmSizeL((ADDRESS)r->wvhdl[j-1]));
+    }
+  }
   res->wvhdl = wvhdl;
 
   rComplete(res,1);
@@ -3305,4 +3336,98 @@ static ring rAssureSyzComp(ring r)
 }
   
 
+// use this fro global ordering consisting of two blocks
+static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
+{
+  int r_blocks = rBlocks(currRing);
+  int i;
   
+  if (r_blocks == 2 && currRing->order[0] == b1 && currRing->order[2] == 0)
+    return currRing;
+  
+  ring res = rCopy0(currRing, FALSE, FALSE);
+  res->order = (int*)Alloc0(3*sizeof(int));
+  res->block0 = (int*)Alloc0(3*sizeof(int));
+  res->block1 = (int*)Alloc0(3*sizeof(int));
+  res->wvhdl = (int**)Alloc0(3*sizeof(int*));
+  res->order[0] = b1;
+  res->order[1] = b2;
+  res->block0[0] = 1;
+  res->block1[0] = currRing->N;
+  res->OrdSgn = 1;
+  rComplete(res, 1);
+  rChangeCurrRing(res, TRUE);
+  return res;
+}
+
+
+ring rCurrRingAssure_dp_S()
+{
+  return rCurrRingAssure_Global(ringorder_dp, ringorder_S);
+}
+
+ring rCurrRingAssure_dp_C()
+{
+  return rCurrRingAssure_Global(ringorder_dp, ringorder_C);
+}
+
+void rSetSyzComp(int k)
+{
+  if (TEST_OPT_PROT) Print("{%d}", k);
+  if ((currRing->typ!=NULL) && (currRing->typ[0].ord_typ==ro_syz))
+  {
+    assume(k > currRing->typ[0].data.syz.limit);
+    int i;
+    if (currRing->typ[0].data.syz.limit == 0)
+    {
+      currRing->typ[0].data.syz.syz_index = (int*) Alloc((k+1)*sizeof(int));
+      currRing->typ[0].data.syz.syz_index[0] = 0;
+      currRing->typ[0].data.syz.curr_index = 1;
+    }
+    else
+    {
+      currRing->typ[0].data.syz.syz_index = (int*)
+        ReAlloc(currRing->typ[0].data.syz.syz_index, 
+                (currRing->typ[0].data.syz.limit+1)*sizeof(int),
+                (k+1)*sizeof(int));
+    }
+    for (i=currRing->typ[0].data.syz.limit + 1; i<= k; i++)
+    {
+      currRing->typ[0].data.syz.syz_index[i] = 
+        currRing->typ[0].data.syz.curr_index;
+    }
+    currRing->typ[0].data.syz.limit = k;
+    currRing->typ[0].data.syz.curr_index++;
+  }
+  else if ((currRing->order[0]!=ringorder_c) && (k!=0))
+  {
+    WarnS("syzcomp in incompatible ring");
+  }
+}
+
+// return the max-comonent wchich has syzIndex i
+int rGetMaxSyzComp(int i)
+{
+  if ((currRing->typ!=NULL) && (currRing->typ[0].ord_typ==ro_syz) &&
+      currRing->typ[0].data.syz.limit > 0 && i > 0)
+  {
+    assume(i <= currRing->typ[0].data.syz.limit);
+    int j;
+    for (j=0; j<currRing->typ[0].data.syz.limit; j++)
+    {
+      if (currRing->typ[0].data.syz.syz_index[j] == i  &&
+          currRing->typ[0].data.syz.syz_index[j+1] != i)
+      {
+        assume(currRing->typ[0].data.syz.syz_index[j+1] == i+1);
+        return j;
+      }
+    }
+    return currRing->typ[0].data.syz.limit;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+    

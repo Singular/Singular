@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.15 1999-10-22 11:14:10 obachman Exp $ */
+/* $Id: intvec.cc,v 1.16 1999-11-15 17:20:07 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -72,6 +72,7 @@ intvec::intvec(char* file, int line, int r, int c, int init)
 }
 
 #endif // ! MDEBUG
+
 
 intvec::intvec(intvec* iv)
 {
@@ -162,6 +163,13 @@ char * intvec::ivString(int mat,int spaces, int dim)
     }
   }
   return StringAppendS("");
+}
+
+void intvec::resize(int new_length)
+{
+  assume(new_length > 0 && col == 1);
+  v = (int*) ReAlloc0(v, row*sizeof(int), new_length*sizeof(int));
+  row = new_length;
 }
 
 char * intvec::String(int dim)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.72 1999-11-05 19:11:06 obachman Exp $ */
+/* $Id: ideals.cc,v 1.73 1999-11-15 17:20:06 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -22,9 +22,11 @@
 #include "syz.h"
 #include "ideals.h"
 #include "lists.h"
+#include "prCopy.h"
 
 
 /* #define WITH_OLD_MINOR */
+#define pCopy_noCheck(p) pCopy(p)
 
 static poly * idpower;
 /*collects the monomials in makemonoms, must be allocated befor*/
@@ -66,6 +68,8 @@ ideal idInit(int idsize, int rank)
   return hh;
 }
 
+#ifndef __OPTIMIZE__
+// this is mainly for outputting an ideal within the debugger
 void idPrint(ideal id)
 {
   Print("Module of rank %d,real rank %d and %d generators.\n",
@@ -78,6 +82,7 @@ void idPrint(ideal id)
     }
   }
 }
+#endif
 
 /*2
 * initialise the maximal ideal (at 0)
@@ -349,23 +354,6 @@ ideal idCopy (ideal h1)
 #endif
   }
   return h2;
-}
-
-/*2
-* copy an ideal from ring r1 to currRing
-*/
-ideal idRingCopy(ideal id, ring r)
-{
-  if (id == NULL) return NULL;
-  ideal res;
-  
-  int i;
-  res = idInit(IDELEMS(id), id->rank);
-  for (i=IDELEMS(id)-1; i>=0; i--)
-  {
-    res->m[i] = pFetchCopy(r, id->m[i]);
-  }
-  return res;
 }
 
 #ifdef PDEBUG
@@ -1098,7 +1086,7 @@ ideal idSect (ideal h1,ideal h2)
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssureSyzComp();
-  pSetSyzComp(length);
+  rSetSyzComp(length);
 
   while ((j>0) && (first->m[j-1]==NULL)) j--;
   k = 0;
@@ -1109,7 +1097,7 @@ ideal idSect (ideal h1,ideal h2)
       if (syz_ring==orig_ring)
         temp->m[k] = pCopy(first->m[i]);
       else
-        temp->m[k] = pFetchCopy(orig_ring,first->m[i]);
+        temp->m[k] = prCopyR(first->m[i], orig_ring);
       q = pOne();
       pSetComp(q,i+1+length);
       pSetmComp(q);
@@ -1129,7 +1117,7 @@ ideal idSect (ideal h1,ideal h2)
       if (syz_ring==orig_ring)
         temp->m[k] = pCopy(second->m[i]);
       else
-        temp->m[k] = pFetchCopy(orig_ring,second->m[i]);
+        temp->m[k] = prCopyR(second->m[i], orig_ring);
       if (slength==0) pShift(&(temp->m[k]),1);
       k++;
     }
@@ -1140,7 +1128,6 @@ ideal idSect (ideal h1,ideal h2)
 
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring,TRUE);
-  pSetSyzComp(0);
 
   result = idInit(IDELEMS(temp1),rank);
   j = 0;
@@ -1152,7 +1139,7 @@ ideal idSect (ideal h1,ideal h2)
       if(syz_ring==orig_ring)
         p = pCopy(temp1->m[i]);
       else
-        p = pFetchCopy(syz_ring,temp1->m[i]);
+        p = prCopyR(temp1->m[i], syz_ring);
       while (p!=NULL)
       {
         q = pNext(p);
@@ -1223,7 +1210,7 @@ ideal idMultSect(resolvente arg, int length)
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssureSyzComp();
-  pSetSyzComp(syzComp);
+  rSetSyzComp(syzComp);
 
   bigmat = idInit(j,(k+1)*maxrk);
   /* create unit matrices ------------------------------------------*/
@@ -1251,7 +1238,7 @@ ideal idMultSect(resolvente arg, int length)
           if (syz_ring==orig_ring)
             bigmat->m[i] = pCopy(arg[j]->m[l]);
           else
-            bigmat->m[i] = pFetchCopy(orig_ring,arg[j]->m[l]);
+            bigmat->m[i] = prCopyR(arg[j]->m[l], orig_ring);
           pShift(&(bigmat->m[i]),k*maxrk+isIdeal);
           i++;
         }
@@ -1266,7 +1253,6 @@ ideal idMultSect(resolvente arg, int length)
 
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring,TRUE);
-  pSetSyzComp(0);
 
   /* interprete result ----------------------------------------*/
   result = idInit(8,maxrk);
@@ -1283,7 +1269,7 @@ ideal idMultSect(resolvente arg, int length)
       if (syz_ring==orig_ring)
         p = pCopy(tempstd->m[j]);
       else
-        p = pFetchCopy(syz_ring,tempstd->m[j]);
+        p = prCopyR(tempstd->m[j], syz_ring);
       pShift(&p,-syzComp-isIdeal);
       result->m[k] = p;
       k++;
@@ -1307,8 +1293,7 @@ ideal idMultSect(resolvente arg, int length)
 *if quot != NULL it computes in the quotient ring modulo "quot"
 *works always in a ring with ringorder_s
 */
-static ideal idPrepare (ideal  h1,ideal  quot, tHomog h,
-  int syzcomp, int *quotgen, int *quotdim, intvec **w)
+static ideal idPrepare (ideal  h1, tHomog h, int syzcomp, intvec **w)
 {
   ideal   h2, h3;
   int     i;
@@ -1328,7 +1313,7 @@ static ideal idPrepare (ideal  h1,ideal  quot, tHomog h,
   {
     Warn("syzcomp too low, should be %d instead of %d",k,syzcomp);
     syzcomp = k;
-    pSetSyzComp(k);
+    rSetSyzComp(k);
   }
   h2->rank = syzcomp+i+1;
   for (j=0; j<=i; j++)
@@ -1349,38 +1334,28 @@ static ideal idPrepare (ideal  h1,ideal  quot, tHomog h,
 #ifdef PDEBUG
   for(j=0;j<IDELEMS(h2);j++) pTest(h2->m[j]);
 #endif
-  h3=kStd(h2,quot,h,w,NULL,syzcomp);
+  h3=kStd(h2,currQuotient,h,w,NULL,syzcomp);
   idDelete(&h2);
   return h3;
-}
-
-ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w)
-{
-  int d;
-  return idSyzygies(h1,quot,h,w,FALSE,d);
 }
 
 /*2
 * compute the syzygies of h1 in R/quot,
 * weights of components are in w
 * if setRegularity, return the regularity in deg
-* do not change h1, quot, w
+* do not change h1,  w
 */
-ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
+ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
                   BOOLEAN setRegularity, int &deg)
 {
-  ideal e;
+  ideal s_h1;
   poly  p;
-  int   i, j, k, quotdim, quotgen,length=0,reg;
+  int   i, j, k, length=0,reg;
   BOOLEAN isMonomial=TRUE;
 
 #ifdef PDEBUG
   int ii;
   for(ii=0;ii<IDELEMS(h1);ii++) pTest(h1->m[ii]);
-  if (quot!=NULL)
-  {
-    for(ii=0;ii<IDELEMS(quot);ii++) pTest(quot->m[ii]);
-  }
 #endif
   if (idIs0(h1))
     return idFreeModule(IDELEMS(h1));
@@ -1390,79 +1365,75 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssureSyzComp();
 
-  pSetSyzComp(k);
+  if (setSyzComp)
+    rSetSyzComp(k);
 
-  ideal s_h1=idRingCopy(h1,orig_ring);
-  ideal s_quot=idRingCopy(quot,orig_ring);
+  if (orig_ring != syz_ring)
+  {
+    s_h1=idrCopyR_NoSort(h1,orig_ring);
+  }
+  else
+  {
+    s_h1 = h1;
+  }
 
-  ideal s_h3=idPrepare(s_h1,s_quot,h,k,&quotgen,&quotdim,w);
-  idDelete(&s_h1);
-  if(s_quot!=NULL) idDelete(&s_quot);
-
-  if (syz_ring!=orig_ring)
-    rChangeCurrRing(orig_ring,TRUE);
-  pSetSyzComp(0);
+  ideal s_h3=idPrepare(s_h1,h,k,w);
 
   if (s_h3==NULL)
   {
     return idFreeModule(IDELEMS(h1));
   }
-  i = -1;
-  e=idInit(16,s_h3->rank-k);
+
+  if (orig_ring != syz_ring)
+  {
+    idDelete(&s_h1);
+    for (j=0; j<IDELEMS(s_h3); j++)
+    {
+      if (s_h3->m[j] != NULL) 
+      {
+        if (pMinComp(s_h3->m[j],syz_ring) > k)
+          pShift(&s_h3->m[j], -k);
+        else
+          pDelete(&s_h3->m[j]);
+      }
+    }
+    idSkipZeroes(s_h3);
+    s_h3->rank -= k;
+    rChangeCurrRing(orig_ring, TRUE);
+    s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
+    rKill(syz_ring);
+    idTest(s_h3);
+    return s_h3;
+  }
+  
+  ideal e = idInit(IDELEMS(s_h3), s_h3->rank);
+
   for (j=0; j<IDELEMS(s_h3); j++)
   {
     if (s_h3->m[j] != NULL)
     {
-      if (pMinComp(s_h3->m[j],syz_ring) > k)
+      if (pMinComp(s_h3->m[j],syz_ring) <= k)
       {
-        if (syz_ring==orig_ring)
-        {
-          p=s_h3->m[j];
-        }
-        else
-        {
-          p = pFetchCopy(syz_ring,s_h3->m[j]);
-          rChangeCurrRing(syz_ring,FALSE);
-          pDelete(&(s_h3->m[j]));
-          rChangeCurrRing(orig_ring,TRUE);
-        }
-        s_h3->m[j]=NULL;
-        pShift(&p,-k);
-        if (p!=NULL)
-        {
-          i++;
-          if (i+1 >= IDELEMS(e))
-          {
-            pEnlargeSet(&(e->m),IDELEMS(e),16);
-            IDELEMS(e) += 16;
-          }
-          e->m[i] = p;
-        }
-      }
-      else
-      {
+        e->m[j] = s_h3->m[j];
         isMonomial=isMonomial && (pNext(s_h3->m[j])==NULL);
-        if(syz_ring!=orig_ring)
-        {
-          rChangeCurrRing(syz_ring,FALSE);
-          pDelete(&pNext(s_h3->m[j]));
-          rChangeCurrRing(orig_ring,TRUE);
-        }
-        else
-        {
-          pDelete(&pNext(s_h3->m[j]));
-        }
+        pDelete(&pNext(s_h3->m[j]));
+        s_h3->m[j] = NULL;
       }
     }
   }
+  
+  idSkipZeroes(s_h3);
+  idSkipZeroes(e);
+  
   if ((!isMonomial)
   && (!TEST_OPT_NOTREGULARITY)
   && (setRegularity)
   && (h==isHomog))
   {
-    idSkipZeroes(s_h3); // works ring independend
-    ideal h3=idRingCopy(s_h3,syz_ring);
-    resolvente res = sySchreyerResolvente(h3,-1,&length,TRUE, TRUE);
+    ring dp_C_ring = rCurrRingAssure_dp_C();
+    if (dp_C_ring != syz_ring)
+      e = idrMoveR_NoSort(e, syz_ring);
+    resolvente res = sySchreyerResolvente(e,-1,&length,TRUE, TRUE);
     intvec * dummy = syBetti(res,length,&reg, *w);
     deg = reg+2;
     delete dummy;
@@ -1471,33 +1442,28 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
       if (res[j]!=NULL) idDelete(&(res[j]));
     }
     Free((ADDRESS)res,length*sizeof(ideal));
-    idDelete(&h3);
-  }
-  if (syz_ring!=orig_ring)
-  {
-    rChangeCurrRing(syz_ring,FALSE);
-    idDelete(&s_h3);
-    rChangeCurrRing(orig_ring,TRUE);
-    rKill(syz_ring);
+    idDelete(&e);
+    if (dp_C_ring != syz_ring)
+    {
+      rChangeCurrRing(syz_ring, TRUE);
+      rKill(dp_C_ring);
+    }
   }
   else
-    idDelete(&s_h3);
-  idSkipZeroes(e);
-#ifdef PDEBUG
-  idTest(e);
-  idTest(h1);
-  if (quot!=NULL) idTest(quot);
-#endif
-  return e;
+  {
+    idDelete(&e);
+  }
+  idTest(s_h3);
+  return s_h3;
 }
 
 /*
 *computes a standard basis for h1 and stores the transformation matrix
 * in ma
 */
-ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
+ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 {
-  int   i, j, k, t, quotgen, inputIsIdeal=idRankFreeModule(h1);
+  int   i, j, k, t, inputIsIdeal=idRankFreeModule(h1);
   poly  p=NULL, q, qq;
   intvec *w=NULL;
 
@@ -1509,12 +1475,16 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssureSyzComp();
-  pSetSyzComp(k);
+  rSetSyzComp(k);
 
-  ideal s_h1=idRingCopy(h1,orig_ring);
-  ideal s_quot=idRingCopy(quot,orig_ring);
+  ideal s_h1=h1;
 
-  ideal s_h3=idPrepare(s_h1,s_quot,h,k,&quotgen,&i,&w);
+  if (orig_ring != syz_ring)
+    s_h1 = idrCopyR_NoSort(h1,orig_ring);
+  else
+    s_h1 = h1;
+
+  ideal s_h3=idPrepare(s_h1,h,k,&w);
   ideal s_h2 = idInit(IDELEMS(s_h3), s_h3->rank);
 
   if (w!=NULL) delete w;
@@ -1547,12 +1517,13 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
 
   idSkipZeroes(s_h3);
   j = IDELEMS(s_h1);
-  if (s_quot!=NULL) idDelete(&s_quot);
-  idDelete(&s_h1);
 
   if (syz_ring!=orig_ring)
+  {
+    idDelete(&s_h1);
     rChangeCurrRing(orig_ring,TRUE);
-  pSetSyzComp(0);
+  }
+  
   idDelete((ideal*)ma);
   *ma = mpNew(j,i);
 
@@ -1561,7 +1532,7 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
   {
     if (s_h2->m[j] != NULL)
     {
-      q = pFetchCopyDelete(syz_ring, s_h2->m[j]);
+      q = prMoveR( s_h2->m[j], syz_ring);
       s_h2->m[j] = NULL;
 
       while (q != NULL)
@@ -1581,7 +1552,7 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
 
   for (i=0; i<IDELEMS(s_h3); i++)
   {
-    s_h3->m[i] = pFetchCopyDelete(syz_ring, s_h3->m[i]);
+    s_h3->m[i] = prMoveR_NoSort(s_h3->m[i], syz_ring);
   }
 
   if (syz_ring!=orig_ring) rKill(syz_ring);
@@ -1594,7 +1565,7 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
 */
 ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
 {
-  int   lsmod =idRankFreeModule(submod), i, j, k, quotgen;
+  int   lsmod =idRankFreeModule(submod), i, j, k;
 
   if (idIs0(mod))
     return idInit(1,mod->rank);
@@ -1605,11 +1576,21 @@ ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssureSyzComp();
-  pSetSyzComp(k);
+  rSetSyzComp(k);
 
-  ideal s_mod=idRingCopy(mod,orig_ring);
+  ideal s_mod, s_temp;
+  if (orig_ring != syz_ring)
+  {
+    s_mod = idrCopyR_NoSort(mod,orig_ring);
+    s_temp = idrCopyR_NoSort(submod,orig_ring);
+  }
+  else
+  {
+    s_mod = mod;
+    s_temp = idCopy(submod);
+  }
 
-  ideal s_h3=idPrepare(s_mod,currQuotient,(tHomog)FALSE,k,&quotgen,&i,NULL);
+  ideal s_h3=idPrepare(s_mod,(tHomog)FALSE,k,NULL);
 
   if (!goodShape)
   {
@@ -1620,7 +1601,6 @@ ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
     }
   }
   idSkipZeroes(s_h3);
-  ideal s_temp = idRingCopy(submod,orig_ring);
   if (lsmod==0)
   {
     for (j=IDELEMS(s_temp);j>0;j--)
@@ -1654,20 +1634,13 @@ ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
   }
 
   if(syz_ring!=orig_ring)
-    rChangeCurrRing(orig_ring,TRUE);
-  pSetSyzComp(0);
-
-  if(syz_ring==orig_ring)
-    return s_result;
-  else
   {
-    ideal result=idRingCopy(s_result,syz_ring);
-    rChangeCurrRing(syz_ring,FALSE);
-    idDelete(&s_result);
+    idDelete(&s_mod);
     rChangeCurrRing(orig_ring,TRUE);
+    s_result = idrMoveR_NoSort(s_result, syz_ring);
     rKill(syz_ring);
-    return result;
   }
+  return s_result;
 }
 
 /*2
@@ -1688,10 +1661,20 @@ ideal  idLift (ideal  mod,ideal submod)
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssureSyzComp();
-  pSetSyzComp(max(k,1));
+  rSetSyzComp(max(k,1));
 
   ideal s_result=idInit(IDELEMS(submod),submod->rank);
-  ideal s_temp=idRingCopy(mod,orig_ring);
+  ideal s_temp;
+  
+  if (syz_ring != orig_ring)
+  {
+    s_temp = idrCopyR_NoSort(mod,orig_ring);
+  }
+  else
+  {
+    s_temp = idCopy(mod);
+  }
+  
   if (k == 0)
   {
     for (j=0; j<IDELEMS(s_temp); j++)
@@ -1721,7 +1704,7 @@ ideal  idLift (ideal  mod,ideal submod)
       if (syz_ring==orig_ring)
         p = pCopy(submod->m[j]);
       else
-        p=pFetchCopy(orig_ring,submod->m[j]);
+        p=prCopyR(submod->m[j], orig_ring);
       if (pGetComp(p)==0) pSetCompP(p,1);
       q = kNF(s_temp,currQuotient,p,k);
       pDelete(&p);
@@ -1750,35 +1733,42 @@ ideal  idLift (ideal  mod,ideal submod)
   if(syz_ring!=orig_ring)
   {
     rChangeCurrRing(orig_ring,TRUE);
-    ideal result=idRingCopy(s_result,syz_ring);
-    rChangeCurrRing(syz_ring,TRUE);
-    idDelete(&s_result);
-    rChangeCurrRing(orig_ring,TRUE);
+    s_result = idrMoveR_NoSort(s_result, syz_ring);
     rKill(syz_ring);
-    s_result=result;
   }
-  pSetSyzComp(0);
 
   return s_result;
 }
 
+
 /*2
 *computes the quotient of h1,h2
 */
-#ifdef OLD_QUOT
-// nicht angepasst an syzcomp
-ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsSB, BOOLEAN resultIsIdeal)
+static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
+                               BOOLEAN *addOnlyOne, int *kkmax)
 {
-  int i,j = 0,l,ll,k,kkk,k1,k2,kmax;
-  ideal h3,h4;
+  ideal temph1;
   poly     p,q = NULL;
-  BOOLEAN     b = FALSE;
+  int i,l,ll,k,kkk,kmax;
+  int j = 0;
+  int k1 = idRankFreeModule(h1);
+  int k2 = idRankFreeModule(h2);
+  tHomog   hom=isNotHomog;
 
-  k1 = idRankFreeModule(h1);
-  k2 = idRankFreeModule(h2);
   k=max(k1,k2);
-  if (k==0) { k = 1; b=TRUE; }
-  h4 = idInit(1,1);
+  if (k==0)
+    k = 1;
+  if ((k2==0) && (k>1)) *addOnlyOne = FALSE;
+
+  intvec * weights;
+  hom = (tHomog)idHomModule(h1,currQuotient,&weights);
+  if (addOnlyOne && (!h1IsStb))
+    temph1 = kStd(h1,currQuotient,hom,&weights,NULL);
+  else
+    temph1 = idCopy(h1);
+  if (weights!=NULL) delete weights;
+  idTest(temph1);
+/*--- making a single vector from h2 ---------------------*/
   for (i=0; i<IDELEMS(h2); i++)
   {
     if (h2->m[i] != NULL)
@@ -1792,12 +1782,16 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsSB, BOOLEAN resultIsIdeal)
       j++;
     }
   }
-  kmax = j*k+1;
-  pSetSyzComp(kmax-1);
-  p = pOne();
+  *kkmax = kmax = j*k+1;
+/*--- adding a monomial for the result (syzygy) ----------*/
+  p = q;
+  while (pNext(p)!=NULL) pIter(p);
+  pNext(p) = pOne();
+  pIter(p);
   pSetComp(p,kmax);
   pSetmComp(p);
-  q = pAdd(q,p);
+/*--- constructing the big matrix ------------------------*/
+  ideal h4 = idInit(16,kmax);
   h4->m[0] = q;
   if (k2 == 0)
   {
@@ -1808,21 +1802,22 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsSB, BOOLEAN resultIsIdeal)
     }
     for (i=1; i<k; i++)
     {
-      p = pCopy(h4->m[i-1]);
+      p = pCopy_noCheck(h4->m[i-1]);
       pShift(&p,1);
       h4->m[i] = p;
     }
   }
+
   kkk = IDELEMS(h4);
-  i = IDELEMS(h1);
-  while (h1->m[i-1] == NULL) i--;
+  i = IDELEMS(temph1);
+  while ((i>0) && (temph1->m[i-1]==NULL)) i--;
   for (l=0; l<i; l++)
   {
-    if(h1->m[l]!=NULL)
+    if(temph1->m[l]!=NULL)
     {
       for (ll=0; ll<j; ll++)
       {
-        p = pCopy(h1->m[l]);
+        p = pCopy(temph1->m[l]);
         if (k1 == 0)
           pShift(&p,ll*k+1);
         else
@@ -1837,30 +1832,25 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsSB, BOOLEAN resultIsIdeal)
       }
     }
   }
-  h3 = kStd(h4,currQuotient,(tHomog)FALSE,NULL,NULL,kmax-1);
-  pSetSyzComp(0);
-  idDelete(&h4);
-  for (i=0;i<IDELEMS(h3);i++)
+/*--- if h2 goes in as single vector - the h1-part is just SB ---*/
+  if (*addOnlyOne)
   {
-    if ((h3->m[i]!=NULL) && (pGetComp(h3->m[i])>=kmax))
+    p = h4->m[0];
+    for (i=0;i<IDELEMS(h4)-1;i++)
     {
-      if (b)
-        pShift(&h3->m[i],-kmax);
-      else
-        pShift(&h3->m[i],-kmax+1);
+      h4->m[i] = h4->m[i+1];
     }
-    else
-      pDelete(&h3->m[i]);
+    h4->m[IDELEMS(h4)-1] = p;
+    idSkipZeroes(h4);
+    test |= Sy_bit(OPT_SB_1);
   }
-  if (b)
-    h3->rank = 1;
-  else
-    h3->rank = h1->rank;
-  h4=idCompactify(h3);
-  idDelete(&h3);
+  idDelete(&temph1);
+  idTest(h4);
   return h4;
 }
-#else
+/*2
+*computes the quotient of h1,h2
+*/
 ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
 {
   // first check for special case h1:(0)
@@ -1876,124 +1866,21 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
       res = idFreeModule(h1->rank);
     return res;
   }
-
-  // the usual part:
-  ideal temph1;
   BITSET old_test=test;
   poly     p,q = NULL;
   int i,l,ll,k,kkk,kmax;
-  int j = 0;
-  int k1 = idRankFreeModule(h1);
-  int k2 = idRankFreeModule(h2);
   BOOLEAN  addOnlyOne=TRUE;
   tHomog   hom=isNotHomog;
+  intvec * weights1;
 
-  k=max(k1,k2);
-  if (k==0)
-  {
-    k = 1;
-    //resultIsIdeal=TRUE;
-  }
-  if ((k2==0) && (k>1)) addOnlyOne = FALSE;
-
-  intvec * weights;
-  hom = (tHomog)idHomModule(h1,currQuotient,&weights);
-  if (addOnlyOne && (!h1IsStb))
-    temph1 = kStd(h1,currQuotient,hom,&weights,NULL);
-  else
-    temph1 = h1;
-  if (weights!=NULL) delete weights;
-  idTest(temph1);
-
-  for (i=0; i<IDELEMS(h2); i++)
-  {
-    if (h2->m[i] != NULL)
-    {
-      p = pCopy(h2->m[i]);
-      if (k2 == 0)
-        pShift(&p,j*k+1);
-      else
-        pShift(&p,j*k);
-      q = pAdd(q,p);
-      j++;
-    }
-  }
-  kmax = j*k+1;
-
+  ideal s_h4 = idInitializeQuot (h1,h2,h1IsStb,&addOnlyOne,&kmax);
+  hom = (tHomog)idHomModule(s_h4,currQuotient,&weights1);
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssureSyzComp();
-  pSetSyzComp(kmax-1);
+  rSetSyzComp(kmax-1);
+  if (orig_ring!=syz_ring)
+    s_h4 = idrMoveR_NoSort(s_h4,syz_ring);
 
-  poly s_p = pOne();
-  pSetComp(s_p,kmax);
-  pSetmComp(s_p);
-
-  poly s_q;
-  if (syz_ring==orig_ring)
-    s_q=pCopy(q);
-  else
-    s_q=pFetchCopy(orig_ring,q);
-
-  ideal s_h4 = idInit(16,kmax);
-  s_q = pAdd(s_q,s_p);
-  s_h4->m[0] = s_q;
-  if (k2 == 0)
-  {
-    if (k > IDELEMS(s_h4))
-    {
-      pEnlargeSet(&(s_h4->m),IDELEMS(s_h4),k-IDELEMS(s_h4));
-      IDELEMS(s_h4) = k;
-    }
-    for (i=1; i<k; i++)
-    {
-      s_p = pCopy(s_h4->m[i-1]);
-      pShift(&s_p,1);
-      s_h4->m[i] = s_p;
-    }
-  }
-
-  kkk = IDELEMS(s_h4);
-  i = IDELEMS(temph1);
-  while ((i>0) && (temph1->m[i-1]==NULL)) i--;
-  for (l=0; l<i; l++)
-  {
-    if(temph1->m[l]!=NULL)
-    {
-      for (ll=0; ll<j; ll++)
-      {
-        if (syz_ring==orig_ring)
-          s_p = pCopy(temph1->m[l]);
-        else
-          s_p=pFetchCopy(orig_ring,temph1->m[l]);
-        if (k1 == 0)
-          pShift(&s_p,ll*k+1);
-        else
-          pShift(&s_p,ll*k);
-        if (kkk >= IDELEMS(s_h4))
-        {
-          pEnlargeSet(&(s_h4->m),IDELEMS(s_h4),16);
-          IDELEMS(s_h4) += 16;
-        }
-        s_h4->m[kkk] = s_p;
-        kkk++;
-      }
-    }
-  }
-
-  if (addOnlyOne)
-  {
-    s_p = s_h4->m[0];
-    for (i=0;i<IDELEMS(s_h4)-1;i++)
-    {
-      s_h4->m[i] = s_h4->m[i+1];
-    }
-    s_h4->m[IDELEMS(s_h4)-1] = s_p;
-    idSkipZeroes(s_h4);
-    test |= Sy_bit(OPT_SB_1);
-  }
-  idTest(s_h4);
-  intvec * weights1;
-  hom = (tHomog)idHomModule(s_h4,currQuotient,&weights1);
   ideal s_h3;
   if (addOnlyOne)
   {
@@ -2007,45 +1894,35 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   if (weights1!=NULL) delete weights1;
   idDelete(&s_h4);
 
-  pSetSyzComp(0);
-  if(syz_ring!=orig_ring)
-  {
-    rChangeCurrRing(orig_ring,TRUE);
-    pDelete(&q);
-  }
 
-  ideal h3=idRingCopy(s_h3,syz_ring);
-  for (i=0;i<IDELEMS(h3);i++)
+  for (i=0;i<IDELEMS(s_h3);i++)
   {
-    if ((h3->m[i]!=NULL) && (pRingGetComp(syz_ring,s_h3->m[i])>=kmax))
+    if ((s_h3->m[i]!=NULL) && (pGetComp(s_h3->m[i])>=kmax))
     {
       if (resultIsIdeal)
-        pShift(&h3->m[i],-kmax);
+        pShift(&s_h3->m[i],-kmax);
       else
-        pShift(&h3->m[i],-kmax+1);
+        pShift(&s_h3->m[i],-kmax+1);
     }
     else
-      pDelete(&h3->m[i]);
+      pDelete(&s_h3->m[i]);
   }
   if (resultIsIdeal)
-    h3->rank = 1;
+    s_h3->rank = 1;
   else
-    h3->rank = h1->rank;
+    s_h3->rank = h1->rank;
   if(syz_ring!=orig_ring)
   {
-    rChangeCurrRing(syz_ring,FALSE);
-    idDelete(&s_h3);
+//    pDelete(&q);
     rChangeCurrRing(orig_ring,TRUE);
+    s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
     rKill(syz_ring);
   }
-  idSkipZeroes(h3);
-  if ((addOnlyOne) && (!h1IsStb))
-    idDelete(&temph1);
+  idSkipZeroes(s_h3);
   test = old_test;
-  idTest(h3);
-  return h3;
+  idTest(s_h3);
+  return s_h3;
 }
-#endif
 
 /*2
 *computes recursively all monomials of a certain degree
@@ -2314,7 +2191,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   currRing = &tmpR;
   h = idInit(IDELEMS(h1),1);
   // fetch data from the old ring
-  for (k=0;k<IDELEMS(h1);k++) h->m[k] = pFetchCopy(origR, h1->m[k]);
+  for (k=0;k<IDELEMS(h1);k++) h->m[k] = prCopyR( h1->m[k], origR);
   // compute kStd
   hh = kStd(h,NULL,hom,&w,hilb);
   idDelete(&h);
@@ -2337,7 +2214,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
         pEnlargeSet(&(h3->m),IDELEMS(h3),16);
         IDELEMS(h3) += 16;
       }
-      h3->m[j] = pFetchCopy(&tmpR, hh->m[k]);
+      h3->m[j] = prCopyR( hh->m[k], &tmpR);
     }
   }
   rChangeCurrRing(&tmpR, FALSE);
@@ -2926,6 +2803,60 @@ matrix idDiffOp(ideal I, ideal J,BOOLEAN multiply)
   return r;
 }
 
+/*3
+*handles for some ideal operations the ring/syzcomp managment
+*returns all syzygies (componentwise-)shifted by -syzcomp
+*or -syzcomp-1 (in case of ideals as input)
+static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
+{
+  ring orig_ring=currRing;
+  ring syz_ring=rCurrRingAssureSyzComp();
+  rSetSyzComp(length);
+
+  ideal s_temp;
+  if (orig_ring!=syz_ring)
+    s_temp=idrMoveR_NoSort(arg,orig_ring);
+  else
+    s_temp=arg;
+
+  ideal s_temp1 = kStd(s_temp,currQuotient,testHomog,&w,NULL,length);
+  if (w!=NULL) delete w;
+
+  if (syz_ring!=orig_ring)
+  {
+    idDelete(&s_temp);
+    rChangeCurrRing(orig_ring,TRUE);
+  }
+
+  idDelete(&temp);
+  ideal temp1=idRingCopy(s_temp1,syz_ring);
+
+  if (syz_ring!=orig_ring)
+  {
+    rChangeCurrRing(syz_ring,FALSE);
+    idDelete(&s_temp1);
+    rChangeCurrRing(orig_ring,TRUE);
+    rKill(syz_ring);
+  }
+
+  for (i=0;i<IDELEMS(temp1);i++)
+  {
+    if ((temp1->m[i]!=NULL)
+    && (pGetComp(temp1->m[i])<=length))
+    {
+      pDelete(&(temp1->m[i]));
+    }
+    else
+    {
+      pShift(&(temp1->m[i]),-length);
+    }
+  }
+  temp1->rank = rk;
+  idSkipZeroes(temp1);
+
+  return temp1;
+}
+*/
 /*2
 * represents (h1+h2)/h2=h1/(h1 intersect h2)
 */
@@ -2980,47 +2911,44 @@ ideal idModulo (ideal h2,ideal h1)
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssureSyzComp();
-  pSetSyzComp(length);
-
-  ideal s_temp=idRingCopy(temp,orig_ring);
-
+  rSetSyzComp(length);
+  ideal s_temp;
+  
+  if (syz_ring != orig_ring)
+  {
+    s_temp = idrCopyR_NoSort(temp, orig_ring);
+  }
+  else
+  {
+    s_temp = temp;
+  }
+  
   ideal s_temp1 = kStd(s_temp,currQuotient,testHomog,&w,NULL,length);
-  idDelete(&s_temp);
   if (w!=NULL) delete w;
 
-  if (syz_ring!=orig_ring)
+  for (i=0;i<IDELEMS(s_temp1);i++)
   {
-    rChangeCurrRing(orig_ring,TRUE);
-  }
-  pSetSyzComp(0);
-
-  idDelete(&temp);
-  ideal temp1=idRingCopy(s_temp1,syz_ring);
-
-  if (syz_ring!=orig_ring)
-  {
-    rChangeCurrRing(syz_ring,FALSE);
-    idDelete(&s_temp1);
-    rChangeCurrRing(orig_ring,TRUE);
-    rKill(syz_ring);
-  }
-
-  for (i=0;i<IDELEMS(temp1);i++)
-  {
-    if ((temp1->m[i]!=NULL)
-    && (pGetComp(temp1->m[i])<=length))
+    if ((s_temp1->m[i]!=NULL)
+    && (pGetComp(s_temp1->m[i])<=length))
     {
-      pDelete(&(temp1->m[i]));
+      pDelete(&(s_temp1->m[i]));
     }
     else
     {
-      pShift(&(temp1->m[i]),-length);
+      pShift(&(s_temp1->m[i]),-length);
     }
   }
-  temp1->rank = rk;
-  idSkipZeroes(temp1);
+  s_temp1->rank = rk;
+  idSkipZeroes(s_temp1);
 
-  return temp1;
+  if (syz_ring!=orig_ring)
+  {
+    rChangeCurrRing(orig_ring,TRUE);
+    s_temp = idrMoveR_NoSort(s_temp, syz_ring);
+    idDelete(&temp);
+    rKill(syz_ring);
+  }
+  return s_temp1;
 }
 
 int idElem(ideal F)
@@ -3228,81 +3156,102 @@ intvec * idQHomWeights(ideal id)
   return result;
 }
 
+/*3
+* searches for units in the components of the module arg and
+* returns the first one
+*/
+static int idReadOutUnits(ideal arg,int* comp)
+{
+  if (idIs0(arg)) return -1;
+  int i=0,j,rk_arg=idRankFreeModule(arg),generator=-1;
+  intvec * componentIsUsed =new intvec(rk_arg+1);
+  poly p,q;
+
+  while ((i<IDELEMS(arg)) && (generator<0))
+  {
+    for (j=rk_arg;j>=0;j--) 
+      (*componentIsUsed)[j]=0;
+    p = arg->m[i];
+    while (p!=NULL)
+    { 
+      j = pGetComp(p);
+      if ((*componentIsUsed)[j]==0)
+      {
+        if (pIsConstantComp(p))
+        {
+          generator = i;
+          (*componentIsUsed)[j] = 1;
+        }
+        else
+        {
+          (*componentIsUsed)[j] = -1;
+        }
+      }
+      else if ((*componentIsUsed)[j]>0)
+      {
+        ((*componentIsUsed)[j])++;
+      }
+      pIter(p);
+    }
+    i++;
+  }
+  i = 0;
+  *comp = -1;
+  for (j=0;j<=rk_arg;j++)
+  {
+    if ((*componentIsUsed)[j]>0)
+    {
+      if ((*comp==-1) || ((*componentIsUsed)[j]<i))
+      {
+        *comp = j;
+        i= (*componentIsUsed)[j];
+      }
+    }
+  }
+  return generator;
+}
+
+static void idDeleteComp(ideal arg,int red_comp)
+{
+  int i,j;
+  poly p;
+
+  for (i=IDELEMS(arg)-1;i>=0;i--)
+  {
+    p = arg->m[i];
+    while (p!=NULL)
+    {
+      j = pGetComp(p);
+      if (j>red_comp)
+      {
+        pSetComp(p,j-1);
+        pSetm(p);
+      }
+      pIter(p);
+    }
+  }
+  (arg->rank)--;
+}
+
 /*2
 * returns the presentation of an isomorphic, minimally
 * embedded  module
 */
-ideal idMinEmbedding(ideal arg)
+ideal idMinEmbedding(ideal arg,BOOLEAN inPlace)
 {
   if (idIs0(arg)) return idInit(1,arg->rank);
+  int next_gen,next_comp;
+  ideal res=arg;
 
-  int i,j,k,pC;
-  poly p,q;
-  int rg=arg->rank;
-  ideal res = idCopy(arg);
-  intvec *indexMap=NewIntvec1(rg+1);
-  intvec *toKill=NewIntvec1(rg+1);
-
+  if (!inPlace) res = idCopy(arg);
   loop
   {
-    k = 0;
-    for (i=indexMap->length()-1;i>0;i--)
-    {
-      (*indexMap)[i] = i;
-      (*toKill)[i] = 0;
-    }
-    for (j=IDELEMS(res)-1;j>=0;j--)
-    {
-      if ((res->m[j]!=NULL) && (pIsConstantComp(res->m[j])) &&
-           (pNext(res->m[j])==NULL))
-      {
-        pC = pGetComp(res->m[j]);
-        if ((*toKill)[pC]==0)
-        {
-          rg--;
-          (*toKill)[pC] = 1;
-          for (i=indexMap->length()-1;i>=pC;i--)
-            (*indexMap)[i]--;
-        }
-        pDelete(&(res->m[j]));
-        k++;
-      }
-    }
-    idSkipZeroes(res);
-    if (k==0) break;
-    if (rg>0)
-    {
-      res->rank=rg;
-      for (j=IDELEMS(res)-1;j>=0;j--)
-      {
-        while ((res->m[j]!=NULL) && ((*toKill)[pGetComp(res->m[j])]==1))
-          pDelete1(&res->m[j]);
-        p = res->m[j];
-        while ((p!=NULL) && (pNext(p)!=NULL))
-        {
-          pSetComp(p,(*indexMap)[pGetComp(p)]);
-          pSetmComp(p);
-          while ((pNext(p)!=NULL) && ((*toKill)[pGetComp(pNext(p))]==1))
-            pDelete1(&pNext(p));
-          pIter(p);
-        }
-        if (p!=NULL)
-        {
-          pSetComp(p,(*indexMap)[pGetComp(p)]);
-          pSetmComp(p);
-        }
-      }
-      idSkipZeroes(res);
-    }
-    else
-    {
-      idDelete(&res);
-      res=idFreeModule(1);
-      break;
-    }
+    next_gen = idReadOutUnits(res,&next_comp);
+    if (next_gen<0) break;
+    syGaussForOne(res,next_gen,next_comp,0,IDELEMS(res));
+    idDeleteComp(res,next_comp);
   }
-  delete toKill;
-  delete indexMap;
+  idSkipZeroes(res);
   return res;
 }
 

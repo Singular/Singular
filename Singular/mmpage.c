@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmpage.c,v 1.4 1999-10-19 14:55:40 obachman Exp $ */
+/* $Id: mmpage.c,v 1.5 1999-11-15 17:20:25 obachman Exp $ */
 
 /*
 * ABSTRACT:

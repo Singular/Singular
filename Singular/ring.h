@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.39 1999-11-05 19:11:10 obachman Exp $ */
+/* $Id: ring.h,v 1.40 1999-11-15 17:20:45 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -27,8 +27,6 @@ void   rKill(ring r);
 ring   rCopy(ring r);
 
 
-// Ring Manipulations
-ring   rCurrRingAssureSyzComp();
 
 #ifdef PDEBUG
 #define rChangeSComps(c,s,l) rDBChangeSComps(c,s,l)
@@ -65,7 +63,6 @@ int    rSum(ring r1, ring r2, ring &sum);
 
 BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = 1);
 void   rUnComplete(ring r);
-int    rBlocks(ring r);
 
 #define  rInternalChar(r) ((r)->ch)
 #ifndef ABS
@@ -125,6 +122,7 @@ inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 
 inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
 { return (rField_is_Zp(r) || rField_is_GF(r) || rField_is_R(r)); }
+
 /* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
 
 inline BOOLEAN rField_is_Extension(ring r=currRing)
@@ -137,9 +135,14 @@ inline BOOLEAN rField_is_Extension(ring r=currRing)
 BOOLEAN rComplete(ring r, int force = 0);
 // use this to free fields created by rComplete
 void rUnComplete(ring r);
-int rBlocks(ring r);
+inline int rBlocks(ring r)
+{
+  int i=0;
+  while (r->order[i]!=0) i++;
+  return i+1;
+}
 
-enum
+typedef enum rRingOrder_t 
 {
   ringorder_no = 0,
   ringorder_a,
@@ -162,7 +165,7 @@ enum
   ringorder_L,
   #endif
   ringorder_unspec
-};
+} rRingOrder_t;
 
 typedef enum rOrderType_t
 {
@@ -179,6 +182,22 @@ typedef enum rOrderType_t
                           // not considered
 } rOrderType_t;
 
+inline BOOLEAN rIsSyzIndexRing(ring r)
+{ return r->order[0] == ringorder_s;}
+
+inline int rGetCurrSyzLimit()
+{ return (currRing->order[0] == ringorder_s ? 
+          currRing->typ[0].data.syz.limit : 0);}
+
+// Ring Manipulations
+ring   rCurrRingAssureSyzComp();
+void   rSetSyzComp(int k);
+ring   rCurrRingAssure_dp_S();
+ring   rCurrRingAssure_dp_C();
+// return the max-comonent wchich has syzIndex i
+// Assume: i<= syzIndex_limit
+int rGetMaxSyzComp(int i);
+  
 BOOLEAN rHasSimpleOrder(ring r);
 // returns TRUE, if simple lp or ls ordering
 BOOLEAN rHasSimpleLexOrder(ring r);

@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.h,v 1.4 1999-07-08 10:18:13 wenk Exp $ */
+/* $Id: mpr_inout.h,v 1.5 1999-11-15 17:20:31 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - interface to Singular

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.h,v 1.5 1997-04-09 12:20:11 Singular Exp $ */
+/* $Id: sing_mp.h,v 1.6 1999-11-15 17:20:49 obachman Exp $ */
 /*
 * ABSTRACT: interface to MP links
 */

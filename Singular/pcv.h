@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pcv.h,v 1.13 1999-06-11 17:13:33 mschulze Exp $ */
+/* $Id: pcv.h,v 1.14 1999-11-15 17:20:38 obachman Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */

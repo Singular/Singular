@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.3 1999-09-22 12:03:33 hannes Exp $ */
+/* $Id: mod_raw.cc,v 1.4 1999-11-15 17:20:28 obachman Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *

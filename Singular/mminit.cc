@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.16 1999-09-24 16:39:46 Singular Exp $ */
+/* $Id: mminit.cc,v 1.17 1999-11-15 17:20:25 obachman Exp $ */
 /*
 * ABSTRACT: init of memory management
 */

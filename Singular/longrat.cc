@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.24 1999-10-14 14:27:15 obachman Exp $ */
+/* $Id: longrat.cc,v 1.25 1999-11-15 17:20:20 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.h,v 1.4 1999-09-16 12:33:55 Singular Exp $ */
+/* $Id: gnumpc.h,v 1.5 1999-11-15 17:20:03 obachman Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */

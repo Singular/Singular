@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.11 1999-10-26 15:06:10 obachman Exp $ */
+/* $Id: intvec.h,v 1.12 1999-11-15 17:20:07 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -50,7 +50,8 @@ public:
   intvec(int s, int e);
   intvec(int r, int c, int init);
   intvec(intvec* iv);
-  
+
+  void resize(int new_length);
   int range(int i)
     { return ((i<row) && (i>=0) && (col==1)); }
   int range(int i, int j)

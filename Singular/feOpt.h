@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.h,v 1.2 1999-10-14 14:27:03 obachman Exp $ */
+/* $Id: feOpt.h,v 1.3 1999-11-15 17:19:56 obachman Exp $ */
 /*
 * ABSTRACT: Declarations for working with Options
 */

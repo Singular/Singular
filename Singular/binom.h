@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.h,v 1.11 1998-01-27 18:51:18 Singular Exp $ */
+/* $Id: binom.h,v 1.12 1999-11-15 17:19:49 obachman Exp $ */
 /*
 * ABSTRACT - set order (=number of monomial) for dp
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.185 1999-11-11 16:03:31 Singular Exp $ */
+/* $Id: iparith.cc,v 1.186 1999-11-15 17:20:08 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1747,8 +1747,8 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
   idhdl h=(idhdl)v->data;
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
-  res->data = (char *)idLiftStd((ideal)u->Data(), currQuotient,
-              &(h->data.umatrix),testHomog);
+  res->data = (char *)idLiftStd((ideal)u->Data(),
+                                &(h->data.umatrix),testHomog);
   setFlag(res,FLAG_STD);
   return FALSE;
 }
@@ -3034,7 +3034,7 @@ static BOOLEAN jjSort_Id(leftv res, leftv v)
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
   intvec *w=NULL;
-  res->data = (char *)idSyzygies((ideal)v->Data(),currQuotient,testHomog,&w);
+  res->data = (char *)idSyzygies((ideal)v->Data(),testHomog,&w);
   if (w!=NULL) delete w;
   return FALSE;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.19 1999-10-22 16:31:21 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.20 1999-11-15 17:20:22 obachman Exp $ */
 
 /*
 * ABSTRACT: implementation of alloc/free routines

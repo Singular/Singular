@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.21 1999-10-26 16:40:46 Singular Exp $ */
+/* $Id: numbers.cc,v 1.22 1999-11-15 17:20:36 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics

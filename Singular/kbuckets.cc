@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.11 1999-10-19 14:03:50 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.12 1999-11-15 17:20:12 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -9,7 +9,7 @@
 #include "mmemory.h"
 #include "polys.h"
 #include "febase.h"
-#include "pProcs.h"
+#include "prProcs.h"
 #include "kbuckets.h"
 #include "numbers.h"
 
@@ -292,9 +292,8 @@ static int kBucketCanonicalize(kBucket_pt bucket)
 
   for (i=2; i<=bucket->buckets_used; i++)
   {
-    p = p_Add_q(p, bucket->buckets[i],
-                &pl, bucket->buckets_length[i],
-                bucket->heap);
+    p = pr_Add_q(p, bucket->buckets[i],
+                 &pl, bucket->buckets_length[i]);
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
   }
@@ -422,9 +421,9 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 
   for (i=0; i<= bucket->buckets_used; i++)
     if (bucket->buckets[i] != NULL)
-      bucket->buckets[i] = p_Mult_n(bucket->buckets[i], n);
+      bucket->buckets[i] = pr_Mult_n(bucket->buckets[i], n);
 #else
-  bucket->p = p_Mult_n(bucket->p, n);
+  bucket->p = pr_Mult_n(bucket->p, n);
 #endif
 }
 
@@ -457,19 +456,17 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
   {
-    p1 = p_Minus_m_Mult_q(bucket->buckets[i], m, p1,
+    p1 = pr_Minus_m_Mult_q(bucket->buckets[i], m, p1,
                          spNoether,
-                         &(bucket->buckets_length[i]), l1,
-                         bucket->heap);
+                         &(bucket->buckets_length[i]), l1);
     l1 = bucket->buckets_length[i];
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
     i = pLogLength(l1);
     while (bucket->buckets[i] != NULL)
     {
-      p1 = p_Add_q(p1, bucket->buckets[i],
-                   &l1, bucket->buckets_length[i],
-                   bucket->heap);
+      p1 = pr_Add_q(p1, bucket->buckets[i],
+                   &l1, bucket->buckets_length[i]);
       bucket->buckets[i] = NULL;
       bucket->buckets_length[i] = 0;
       i = pLogLength(l1);
@@ -478,7 +475,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   else
   {
     pSetCoeff0(m, nNeg(pGetCoeff(m)));
-    p1 = p_Mult_m(p1, m, spNoether, bucket->heap);
+    p1 = pr_Mult_m(p1, m, spNoether);
     pSetCoeff0(m, nNeg(pGetCoeff(m)));
   }
 
@@ -489,9 +486,9 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   else
     kBucketAdjustBucketsUsed(bucket);
 #else // HAVE_PSEUDO_BUCKETS
-  bucket->p = p_Minus_m_Mult_q(bucket->p, m,  p,
+  bucket->p = pr_Minus_m_Mult_q(bucket->p, m,  p,
                                &(bucket->l), l1,
-                               spNoether, bucket->heap);
+                               spNoether);
 #endif
   kbTests(bucket);
 }
@@ -523,7 +520,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
         assume(pLength(q) == lq);
         bucket->buckets_length[i] -= lq;
         assume(pLength(bucket->buckets[i]) == bucket->buckets_length[i]);
-        p = p_Add_q(p, q, &lp, lq, bucket->heap);
+        p = pr_Add_q(p, q, &lp, lq);
       }
     }
   }
@@ -555,7 +552,7 @@ void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
       if (q != NULL)
       {
         bucket->buckets_length[i] -= lq;
-        p = p_Add_q(p, q, &lp, lq, bucket->heap);
+        p = pr_Add_q(p, q, &lp, lq);
       }
     }
   }

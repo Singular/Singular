@@ -1,11 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.47 1999-10-22 11:14:18 obachman Exp $ */
+/* $Id: syz1.cc,v 1.48 1999-11-15 17:20:53 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
 
+#include <limits.h>
 #include "mod2.h"
 #include "tok.h"
 #include "mmemory.h"
@@ -29,7 +30,7 @@
 #include "syz.h"
 #include "kbuckets.h"
 #include "polys-comp.h"
-#include <limits.h>
+#include "prCopy.h"
 
 extern void rSetmS(poly p, int* Components, long* ShiftedComponents);
 
@@ -317,11 +318,6 @@ static int syzcompmonomdp(poly p1, poly p2)
   }
   else if (pGetOrder(p1) > pGetOrder(p2)) return 1;
   return -1;
-}
-
-poly syOrdPolySchreyer(poly p)
-{
-  return pOrdPolyMerge(p);
 }
 
 static int syLength(poly p)
@@ -2061,7 +2057,7 @@ static resolvente syReorder(resolvente res,int length,
             if (toCopy)
             {
               if (origR!=NULL)
-                tq = pFetchHead(origR,p);
+                tq = prHeadR(p,origR);
               else
                 tq = pHead(p);
               pIter(p);
@@ -2074,7 +2070,7 @@ static resolvente syReorder(resolvente res,int length,
                 poly pp=p;
                 pIter(p);
                 pNext(pp)=NULL;
-                tq = pFetchCopyDelete(origR,pp);
+                tq = prMoveR(pp, origR);
               }
               else
               {
@@ -2083,6 +2079,8 @@ static resolvente syReorder(resolvente res,int length,
                 pNext(tq) = NULL;
               }
             }
+//            pWrite(tq);
+            pTest(tq);
             for (l=pVariables;l>0;l--)
             {
               if (origR!=NULL)
@@ -2091,7 +2089,9 @@ static resolvente syReorder(resolvente res,int length,
                 pSubExp(tq,l, pGetExp(ri1[pGetComp(tq)-1],l));
             }
             pSetm(tq);
+            pTest(tq);
             q = pAdd(q,tq);
+            pTest(q);
           }
           fullres[i-1]->m[j] = q;
         }
@@ -2104,10 +2104,10 @@ static resolvente syReorder(resolvente res,int length,
           for (j=IDELEMS(res[i])-1;j>=0;j--)
           {
             if (toCopy)
-              fullres[i-1]->m[j] = pFetchCopy(origR,res[i]->m[j]);
+              fullres[i-1]->m[j] = prCopyR(res[i]->m[j], origR);
             else
             {
-              fullres[i-1]->m[j] = pFetchCopyDelete(origR,res[i]->m[j]);
+              fullres[i-1]->m[j] = prMoveR(res[i]->m[j], origR);
               res[i]->m[j] = NULL;
             }
           }
@@ -2123,7 +2123,7 @@ static resolvente syReorder(resolvente res,int length,
           }
         }
         for (j=IDELEMS(fullres[i-1])-1;j>=0;j--)
-          fullres[i-1]->m[j] = pOrdPolyInsertSetm(fullres[i-1]->m[j]);
+          fullres[i-1]->m[j] = pSortCompCorrect(fullres[i-1]->m[j]);
       }
       if (!toCopy)
       {
@@ -2635,13 +2635,12 @@ syStrategy syMinimize(syStrategy syzstr)
 syStrategy syLaScala3(ideal arg,int * length)
 {
   BOOLEAN noPair=FALSE;
-  int i,j,* ord,*b0,*b1,actdeg=32000,index=0,reg=-1;
+  int i,j,actdeg=32000,index=0,reg=-1;
   int startdeg,howmuch;
   poly p;
   ideal temp;
   SSet nextPairs;
   syStrategy syzstr=(syStrategy)Alloc0SizeOf(ssyStrategy);
-  ring tmpR = NULL;
   ring origR = currRing;
 
   if ((idIs0(arg)) ||
@@ -2660,38 +2659,11 @@ syStrategy syLaScala3(ideal arg,int * length)
   redpol = pInit();
   syzstr->length = *length = pVariables+2;
 
-  // construct new ring
-  tmpR = (ring) Alloc0SizeOf(sip_sring);
-  tmpR->wvhdl = (int **)Alloc0(3 * sizeof(int *));
-  ord = (int*)Alloc0(3*sizeof(int));
-  b0 = (int*)Alloc0(3*sizeof(int));
-  b1 = (int*)Alloc0(3*sizeof(int));
-  ord[0] = ringorder_dp;
-  ord[1] = ringorder_S;
-  b0[0] = 1;
-  b1[0] = currRing->N;
-  tmpR->OrdSgn = 1;
-  tmpR->N = currRing->N;
-  tmpR->ch = currRing->ch;
-  tmpR->order = ord;
-  tmpR->block0 = b0;
-  tmpR->block1 = b1;
-  tmpR->P = currRing->P;
+  // Creare dp,S ring and change to it
+  syzstr->syRing = rCurrRingAssure_dp_S();
+  assume(syzstr->syRing != origR);
 
-  if (currRing->parameter!=NULL)
-  {
-    tmpR->minpoly=nCopy(currRing->minpoly);
-    tmpR->parameter=(char **)Alloc(rPar(currRing)*sizeof(char *));
-    for(i=0;i<tmpR->P;i++)
-    {
-      tmpR->parameter[i]=mstrdup(currRing->parameter[i]);
-    }
-  }
-  tmpR->names   = (char **)Alloc(tmpR->N * sizeof(char *));
-  for (i=0; i<tmpR->N; i++)
-  {
-    tmpR->names[i] = mstrdup(currRing->names[i]);
-  }
+  // set initial ShiftedComps
   currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));
   currShiftedComponents = (long*)Alloc0((arg->rank+1)*sizeof(long));
   for (i=0;i<=arg->rank;i++)
@@ -2699,17 +2671,14 @@ syStrategy syLaScala3(ideal arg,int * length)
     currShiftedComponents[i] = (i)*SYZ_SHIFT_BASE;
     currcomponents[i] = i;
   }
-  rComplete(tmpR, 1);
-  rChangeCurrRing(tmpR, TRUE);
   rChangeSComps(currcomponents, currShiftedComponents, arg->rank);
-  syzstr->syRing = tmpR;
   pComp0 = syzcomp2dpc;
 /*--- initializes the data structures---------------*/
   syzstr->Tl = NewIntvec1(*length);
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
-    temp->m[i] = pFetchCopy(origR, arg->m[i]);
+    temp->m[i] = prCopyR( arg->m[i], origR);
     if (temp->m[i]!=NULL)
     {
       j = pTotaldegree(temp->m[i]);
@@ -2769,15 +2738,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   }
   if (temp!=NULL) idDelete(&temp);
   kBucketDestroy(&(syzstr->bucket));
-  if (ord!=NULL)
-  {
-    rChangeCurrRing(origR,TRUE);
-  }
-  else
-  {
-    pSetm=oldSetm;
-    pComp0=oldComp0;
-  }
+  rChangeCurrRing(origR,TRUE);
   pDelete1(&redpol);
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.h,v 1.1 1999-09-27 15:05:35 obachman Exp $ */
+/* $Id: walk.h,v 1.2 1999-11-15 17:20:56 obachman Exp $ */
 /*
 * ABSTRACT: Declaration of the Groebner walk
 */

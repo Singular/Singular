@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.h,v 1.3 1997-04-09 12:19:49 Singular Exp $ */
+/* $Id: ipconv.h,v 1.4 1999-11-15 17:20:10 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: converting types
 */

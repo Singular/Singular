@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.74 1999-11-15 12:53:27 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.75 1999-11-15 17:20:26 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H

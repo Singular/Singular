@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.h,v 1.2 1999-09-22 12:01:09 Singular Exp $ */
+/* $Id: mod_raw.h,v 1.3 1999-11-15 17:20:28 obachman Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.28 1999-10-14 14:27:17 obachman Exp $ */
+/* $Id: matpol.cc,v 1.29 1999-11-15 17:20:22 obachman Exp $ */
 
 /*
 * ABSTRACT:

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.27 1999-10-14 14:27:09 obachman Exp $ */
+/* $Id: ipid.h,v 1.28 1999-11-15 17:20:10 obachman Exp $ */
 /*
 * ABSTRACT: identfier handling
 */

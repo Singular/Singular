@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.8 1999-10-26 16:40:46 Singular Exp $ */
+/* $Id: modulop.h,v 1.9 1999-11-15 17:20:29 obachman Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */

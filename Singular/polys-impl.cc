@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.32 1999-11-05 19:11:08 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.33 1999-11-15 17:20:39 obachman Exp $ */
 
 /***************************************************************
  *
@@ -28,220 +28,6 @@
 #include "polys.h"
 #include "ring.h"
 #include "polys-impl.h"
-
-/*3
-* copies all exponents (and the component number) from src (in src_r)
-* to dest (in currRing)
-* DOES NOT call pSetm
-*/
-inline void pRingCopy2ExpV(poly dest, poly src, ring src_r)
-{
-  for (int i=pVariables; i != 0; i--)
-  {
-    assume(pRingGetExp(src_r, src, i) >= 0);
-    pSetExp(dest, i, pRingGetExp(src_r, src, i));
-  }
-  assume( pRingGetComp(src_r, src) >= 0);
-  pSetComp(dest, pRingGetComp(src_r, src));
-}
-
-// Returns a converted copy (in the sense that the returned poly is
-// poly of currRing) of poly p which is from ring r -- assumes that
-// currRing and r have the same number of variables, i.e. that polys
-// from r can be "fetched" into currRing
-#ifdef MDEBUG
-poly pDBFetchCopy(ring r, poly p,char *f,int l)
-#else
-poly _pFetchCopy(ring r, poly p)
-#endif
-{
-  poly res, a, w;
-  int ii;
-
-  if (p==NULL) return NULL;
-  if ((r->N == pVariables)
-      && (0==memcmp(r->VarOffset,currRing->VarOffset,
-                    (pVariables+1)*sizeof(currRing->VarOffset[0])))
-      && r->ExpLSize == currRing->ExpLSize)
-  {
-    poly w;
-#ifdef MDEBUG
-    res = (poly) mmDBAllocHeap(mm_specHeap, f,l);
-#else
-    mmAllocHeap(res, mm_specHeap);
-#endif
-    pSetCoeff0(res, nCopy(p->coef));
-    memcpyW(&(res->exp.l[0]), &(p->exp.l[0]), currRing->ExpLSize);
-    a = res;
-    pSetm(res);
-    pIter(p);
-    while (p != NULL)
-    {
-#ifdef MDEBUG
-      w = (poly) mmDBAllocHeap(mm_specHeap, f,l);
-#else
-      mmAllocHeap(w , mm_specHeap);
-#endif
-      pSetCoeff0(w, nCopy(p->coef));
-      memcpyW(&(w->exp.l[0]), &(p->exp.l[0]), currRing->ExpLSize);
-      pSetm(w);
-      pNext(a) = w;
-      a = w;
-      pIter(p);
-    }
-    pNext(a) = NULL;
-  }
-  else
-  {
-#ifdef MDEBUG
-    a = res = pDBInit(mm_specHeap, f,l);
-#else
-    a = res = pInit();
-#endif
-    res->coef = nCopy(p->coef);
-    pRingCopy2ExpV(res, p, r);
-    pSetm(res);
-    pIter(p);
-    while (p != NULL)
-    {
-      // the VarOffset's are different: Hence we
-      // convert betweeen a lex order and a revlex order -- to speed
-      // up the sorting, we assemble new poly in inverse order
-#ifdef MDEBUG
-      w = pDBInit(mm_specHeap, f,l);
-#else
-      w = pInit();
-#endif
-      w->coef = nCopy(p->coef);
-      pRingCopy2ExpV(w, p, r);
-      pSetm(w);
-      pNext(a) = w;
-      a = w;
-      pIter(p);
-    }
-  }
-#ifdef PDEBUG
-  res = pOrdPolyMerge(res);
-  pTest(res);
-  return res;
-#else
-  return pOrdPolyMerge(res);
-#endif
-}
-
-#ifdef MDEBUG
-poly pDBFetchCopyDelete(ring r, poly p,char *f,int l)
-#else
-poly _pFetchCopyDelete(ring r, poly p)
-#endif
-{
-  poly res, tmp, a, w;
-  int ii;
-
-#ifdef PDEBUG
-  ring cring = currRing;
-  rChangeCurrRing(r);
-  assume(pTest(p));
-  rChangeCurrRing(cring);
-#endif
-  
-  
-  if (p==NULL) return NULL;
-
-  if ((r->N == pVariables)
-      && (0==memcmp(r->VarOffset,currRing->VarOffset,
-                    (pVariables+1)*sizeof(currRing->VarOffset[0])))
-      && r->ExpLSize == currRing->ExpLSize 
-      && r->pCompIndex == currRing->pCompIndex)
-  {
-#ifdef MDEBUG
-    res = (poly) mmDBAllocHeap(mm_specHeap, f,l);
-#else
-    mmAllocHeap(res, mm_specHeap);
-#endif
-    pCopy2(res, p);
-    a = res;
-    pSetm(res);
-    tmp = p;
-    pIter(p);
-#ifdef MDEBUG
-    mmDBFreeHeap(tmp, r->mm_specHeap, f, l);
-#else
-    mmFreeHeap(tmp, r->mm_specHeap);
-#endif
-
-    while (p != NULL)
-    {
-      tmp = p;
-
-#ifdef MDEBUG
-      w = (poly) mmDBAllocHeap(mm_specHeap, f,l);
-#else
-      mmAllocHeap(w, mm_specHeap);
-#endif
-      pCopy2(w, p);
-      pSetm(w);
-      pNext(a) = w;
-      a = w;
-      pIter(p);
-#ifdef MDEBUG
-      mmDBFreeHeap(tmp, r->mm_specHeap, f, l);
-#else
-      mmFreeHeap(tmp, r->mm_specHeap);
-#endif
-
-    }
-    pNext(a) = NULL;
-  }
-  else
-  {
-#ifdef MDEBUG
-    a = res = pDBInit(mm_specHeap, f,l);
-#else
-    a = res = pInit();
-#endif
-    res->coef = p->coef;
-    pRingCopy2ExpV(res, p, r);
-    pSetm(res);
-    tmp = p;
-    pIter(p);
-#ifdef MDEBUG
-    mmDBFreeHeap(tmp, r->mm_specHeap, f, l);
-#else
-    mmFreeHeap(tmp, r->mm_specHeap);
-#endif
-    while (p != NULL)
-    {
-      // the VarOffset's are different: Hence we
-      // convert betweeen a lex order and a revlex order -- to speed
-      // up the sorting, we assemble new poly in inverse order
-#ifdef MDEBUG
-      w = pDBInit(mm_specHeap, f,l);
-#else
-      w = pInit();
-#endif
-      w->coef = p->coef;
-      pRingCopy2ExpV(w, p, r);
-      pSetm(w);
-      pNext(a) = w;
-      a = w;
-      tmp = p;
-      pIter(p);
-#ifdef MDEBUG
-      mmDBFreeHeap(tmp, r->mm_specHeap, f, l);
-#else
-      mmFreeHeap(tmp, r->mm_specHeap);
-#endif
-    }
-  }
-#ifdef PDEBUG
-  res = pOrdPolyMerge(res);
-  pTest(res);
-  return res;
-#else
-  return pOrdPolyMerge(res);
-#endif
-}
 
 /***************************************************************
  *
@@ -578,62 +364,6 @@ poly _pShallowCopyDeleteHead(memHeap d_h, poly *s_p, memHeap s_h)
 }
 
 
-/*2
-* returns a fetched copy of the head term of a
-*/
-#ifdef MDEBUG
-poly pDBFetchHead(ring r, poly p,char *f, int l)
-#else
-poly _pFetchHead(ring r, poly p)
-#endif
-{
-  poly w=NULL;
-
-  if (p!=NULL)
-  {
-#ifdef MDEBUG
-    w = pDBInit(mm_specHeap, f,l);
-#else
-    w = pInit();
-#endif
-    pRingCopy2ExpV(w, p, r);
-    pSetm(w);
-    pSetCoeff0(w,nCopy(pGetCoeff(p)));
-    pNext(w) = NULL;
-  }
-  return w;
-}
-
-/*2
-* returns a fetched copy of the head term of a and deletes a
-*/
-#ifdef MDEBUG
-poly pDBFetchHeadDelete(ring r, poly p, char *f, int l)
-#else
-poly _pFetchHeadDelete(ring r, poly p)
-#endif
-{
-  poly w=NULL;
-
-  if (p!=NULL)
-  {
-#ifdef MDEBUG
-    w = pDBInit(mm_specHeap, f,l);
-#else
-    w = pInit();
-#endif
-    pRingCopy2ExpV(w, p, r);
-    pSetm(w);
-    pSetCoeff0(w, pGetCoeff(p));
-    pNext(w) = NULL;
-#ifdef MDEBUG
-    pDBFree1(p, r->mm_specHeap, f, l);
-#else
-    _pFree1(p, r->mm_specHeap);
-#endif
-  }
-  return w;
-}
 
 poly pHeadProc(poly p)
 {
@@ -919,37 +649,42 @@ void pDBMonSubFrom(poly p1, poly p2, char* f, int l)
   pFree1(ptemp);
 }
 
-void pDBMonAdd(poly p1, poly p2, poly p3, char* f, int l)
+void pDBMonAdd(poly p1, poly p2, poly p3, ring r, char* f, int l)
 {
-  if (pGetComp(p3) != 0 && pGetComp(p2) != 0)
+  if (r == currRing)
   {
-    Warn("Error in pMonAdd: both components %d:%d !=0 in %s:%d",
-         pGetComp(p3), pGetComp(p2), f, l);
-  }
-  if (p2 == p1 || p3 == p1)
-  {
-    Warn("Error in pMonAdd: Destination equals source in %s:%d", f, l);
-  }
-  __pMonAdd(p1, p2, p3);
-
-
-  poly ptemp = pInit();
-  for (int i=1; i<=pVariables; i++)
-  {
-    pSetExp(ptemp, i, pGetExp(p2, i) + pGetExp(p3, i));
-    if (pGetExp(ptemp, i) != pGetExp(p1, i))
+    if (pGetComp(p3) != 0 && pGetComp(p2) != 0)
     {
-      Warn("Error in pMonAdd: %th exponent: %d != (%d == %d + %d)",
-           i, pGetExp(p1, i), pGetExp(ptemp, i), pGetExp(p2, i),
-           pGetExp(p3, i));
+      Warn("Error in pMonAdd: both components %d:%d !=0 in %s:%d",
+           pGetComp(p3), pGetComp(p2), f, l);
+    }
+    if (p2 == p1 || p3 == p1)
+    {
+      Warn("Error in pMonAdd: Destination equals source in %s:%d", f, l);
     }
   }
-  pSetComp(ptemp, pGetComp(p2) + pGetComp(p3));
-  pSetm(ptemp);
+  __pMonAdd(p1, p2, p3, r);
 
-  if (! pEqual(ptemp, p1))
-    Warn("Error in pMonAdd in %s:%d", f, l);
-  pFree1(ptemp);
+  if (r == currRing)
+  {
+    poly ptemp = pInit();
+    for (int i=1; i<=pVariables; i++)
+    {
+      pSetExp(ptemp, i, pGetExp(p2, i) + pGetExp(p3, i));
+      if (pGetExp(ptemp, i) != pGetExp(p1, i))
+      {
+        Warn("Error in pMonAdd: %th exponent: %d != (%d == %d + %d)",
+             i, pGetExp(p1, i), pGetExp(ptemp, i), pGetExp(p2, i),
+             pGetExp(p3, i));
+      }
+    }
+    pSetComp(ptemp, pGetComp(p2) + pGetComp(p3));
+    pSetm(ptemp);
+
+    if (! pEqual(ptemp, p1))
+      Warn("Error in pMonAdd in %s:%d", f, l);
+    pFree1(ptemp);
+  }
 }
 
 static BOOLEAN OldpDivisibleBy(poly a, poly b)
@@ -1022,6 +757,25 @@ BOOLEAN mmDBEqual(poly p, poly q, char *f, int l)
   }
   return TRUE;
 }
+
+BOOLEAN prDBTest(poly p, ring r, char* f, int l)
+{
+  ring old_ring = NULL;
+  BOOLEAN res;
+  
+  if (r != currRing)
+  {
+    old_ring = currRing;
+    rChangeCurrRing(r);
+  }
+  res = pDBTest(p, currRing->mm_specHeap, f, l);
+  if (old_ring != NULL)
+  {
+    rChangeCurrRing(old_ring);
+  }
+  return res;
+}
+
 
 BOOLEAN pDBTest(poly p, char *f, int l)
 {
@@ -1123,11 +877,12 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
     }
     if (currRing->order[0] == ringorder_s)
     {
-      if (p->exp.l[currRing->typ[0].data.syz.place] != 0 &&
-          p->exp.l[currRing->typ[0].data.syz.place] != 1)
+      unsigned long syzindex = p->exp.l[currRing->typ[0].data.syz.place];
+      pSetm(p);
+      if (p->exp.l[currRing->typ[0].data.syz.place] != syzindex)
       {
-        Warn("Syzcomp wrong %d in %s:%d", 
-             p->exp.l[currRing->typ[0].data.syz.place], f, l);
+        Warn("Syzindex wrong: Was %dl but should be %d in %s:%d\n",
+             syzindex, p->exp.l[currRing->typ[0].data.syz.place], f, l);
       }
     }
     old=p;

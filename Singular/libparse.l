@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.35 1999-07-21 19:52:52 obachman Exp $ */
+/* $Id: libparse.l,v 1.36 1999-11-15 17:20:18 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

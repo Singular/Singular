@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.h,v 1.3 1997-04-09 12:19:52 Singular Exp $ */
+/* $Id: khstd.h,v 1.4 1999-11-15 17:20:13 obachman Exp $ */
 /*
 * ABSTRACT:hilbert driven std
 */

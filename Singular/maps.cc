@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.20 1999-10-14 14:27:16 obachman Exp $ */
+/* $Id: maps.cc,v 1.21 1999-11-15 17:20:21 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -20,6 +20,7 @@
 #include "lists.h"
 #include "longalg.h"
 #include "maps.h"
+#include "prCopy.h"
 
 /* debug output: Tok2Cmdname in maApplyFetch*/
 //#include "ipshell.h"
@@ -521,7 +522,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     case POLY_CMD:
     case VECTOR_CMD:
       if (what==FETCH_CMD)
-        res->data=(void *)pFetchCopy(preimage_r, (poly)data);
+        res->data=(void *)prCopyR( (poly)data, preimage_r);
       else
       if (what==IMAP_CMD)
         res->data=(void *)pPermPoly((poly)data,perm,preimage_r,par_perm,P);
@@ -555,7 +556,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       {
         for (i=R*C-1;i>=0;i--)
         {
-          m->m[i]=pFetchCopy(preimage_r,((ideal)data)->m[i]);
+          m->m[i]=prCopyR(((ideal)data)->m[i], preimage_r);
           pTest(m->m[i]);
         }
       }

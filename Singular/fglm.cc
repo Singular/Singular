@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.18 1999-09-16 12:33:54 Singular Exp $
+// $Id: fglm.cc,v 1.19 1999-11-15 17:19:59 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *

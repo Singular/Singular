@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.17 1999-11-02 15:19:11 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.18 1999-11-15 17:20:50 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -21,6 +21,7 @@
 #include "numbers.h"
 #include "longrat.h"
 #include "sparsmat.h"
+#include "prCopy.h"
 
 /* ----------------- macros ------------------ */
 /* #define OLD_DIV */
@@ -162,7 +163,7 @@ ideal smRingCopy(ideal I, ring *ri, sip_sring &tmpR)
     // fetch data from the old ring
     II=idInit(IDELEMS(I),I->rank);
     int k;
-    for (k=0;k<IDELEMS(I);k++) II->m[k] = pFetchCopy(origR, I->m[k]);
+    for (k=0;k<IDELEMS(I);k++) II->m[k] = prCopyR( I->m[k], origR);
   }
   else
   {
@@ -217,7 +218,7 @@ poly smCallDet(ideal I)
   {
     rChangeCurrRing(origR,TRUE);
     save = res;
-    res = pFetchCopy(&tmpR, save);
+    res = prCopyR( save, &tmpR);
     rChangeCurrRing(&tmpR,FALSE);
     pDelete(&save);
     smRingClean(origR,tmpR);
@@ -262,7 +263,7 @@ lists smCallBareiss(ideal I, int x, int y)
       rChangeCurrRing(origR,TRUE);
       mm=idInit(IDELEMS(m),m->rank);
       int k;
-      for (k=0;k<IDELEMS(m);k++) mm->m[k] = pFetchCopy(&tmpR, m->m[k]);
+      for (k=0;k<IDELEMS(m);k++) mm->m[k] = prCopyR( m->m[k], &tmpR);
       rChangeCurrRing(&tmpR,FALSE);
       idDelete(&m);
       smRingClean(origR,tmpR);
@@ -310,7 +311,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
       rChangeCurrRing(origR,TRUE);
       mm=idInit(IDELEMS(m),m->rank);
       int k;
-      for (k=0;k<IDELEMS(m);k++) mm->m[k] = pFetchCopy(&tmpR, m->m[k]);
+      for (k=0;k<IDELEMS(m);k++) mm->m[k] = prCopyR( m->m[k], &tmpR);
       rChangeCurrRing(&tmpR,FALSE);
       idDelete(&m);
       smRingClean(origR,tmpR);

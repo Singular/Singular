@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: sing_dld.cc,v 1.4 1997-07-02 16:44:16 Singular Exp $ */
+/* $Id: sing_dld.cc,v 1.5 1999-11-15 17:20:48 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to dynamic loading

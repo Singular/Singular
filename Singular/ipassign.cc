@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.51 1999-10-22 11:14:12 obachman Exp $ */
+/* $Id: ipassign.cc,v 1.52 1999-11-15 17:20:09 obachman Exp $ */
 
 /*
 * ABSTRACT: interpreter:

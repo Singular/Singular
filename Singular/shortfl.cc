@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.13 1999-10-26 16:40:47 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.14 1999-11-15 17:20:47 obachman Exp $ */
 
 /*
 * ABSTRACT:

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.14 1999-10-14 14:27:16 obachman Exp $ */
+/* $Id: longrat.h,v 1.15 1999-11-15 17:20:20 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */

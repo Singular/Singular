@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.28 1999-10-19 12:42:51 obachman Exp $ */
+/* $Id: tok.h,v 1.29 1999-11-15 17:20:56 obachman Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"

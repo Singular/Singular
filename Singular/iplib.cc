@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.67 1999-11-06 15:07:56 obachman Exp $ */
+/* $Id: iplib.cc,v 1.68 1999-11-15 17:20:11 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.23 1999-10-14 14:27:33 obachman Exp $ */
+/* $Id: subexpr.h,v 1.24 1999-11-15 17:20:52 obachman Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.51 1999-10-25 18:21:51 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.52 1999-11-15 17:20:12 obachman Exp $ */
 /*
 * ABSTRACT:
 */

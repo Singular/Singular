@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ndbm.h,v 1.1 1997-08-08 12:59:29 obachman Exp $ */
+/* $Id: ndbm.h,v 1.2 1999-11-15 17:20:36 obachman Exp $ */
 /*
 * ABSTRACT: DBM
 */

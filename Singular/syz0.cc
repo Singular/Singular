@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.24 1999-10-25 08:32:19 obachman Exp $ */
+/* $Id: syz0.cc,v 1.25 1999-11-15 17:20:53 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -26,6 +26,7 @@
 #include "ring.h"
 #include "syz.h"
 #include "kbuckets.h"
+#include "prCopy.h"
 
 static kBucket_pt sy0buck;
 
@@ -854,9 +855,6 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         &(IDELEMS(res[syzIndex+1])),sort,&modcomp,&lgth,mW);
       mW = res[syzIndex];
     }
-    else
-      sySchreyersSyzygiesFM(res[syzIndex]->m,i,&(res[syzIndex+1]->m),
-        &(IDELEMS(res[syzIndex+1])),sort);
 //idPrint(res[syzIndex+1]);
 
 // #define THOMAS_THOUGHT_ABOUT_IT
@@ -909,13 +907,26 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         tmpR.wvhdl = wv;
         rComplete(&tmpR, 1);
         rChangeCurrRing(&tmpR, TRUE);
-        for (i=0; i<IDELEMS(res[1]); i++)
+        if ((currRing->OrdSgn != 1) && (hom!=isHomog))
         {
-          res[1]->m[i] = pFetchCopyDelete(origR, res[1]->m[i]);
+          for (i=0; i<IDELEMS(res[1]); i++)
+          {
+            res[1]->m[i] = prMoveR( res[1]->m[i], origR);
+          }
+        }
+        else
+        {
+          for (i=0; i<IDELEMS(res[0]); i++)
+          {
+            res[0]->m[i] = prMoveR( res[0]->m[i], origR);
+          }
         }
         idTest(res[1]);
       }
     }
+    if ((currRing->OrdSgn != 1) && (hom!=isHomog))
+      sySchreyersSyzygiesFM(res[syzIndex]->m,i,&(res[syzIndex+1]->m),
+      &(IDELEMS(res[syzIndex+1])),sort);
     if (sort) sort=FALSE;
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);
@@ -935,7 +946,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       {
         if (res[syzIndex]->m[i])
         {
-          res[syzIndex]->m[i] = pFetchCopyDelete(&tmpR, res[syzIndex]->m[i]);
+          res[syzIndex]->m[i] = prMoveR( res[syzIndex]->m[i], &tmpR);
         }
       }
       syzIndex++;
@@ -955,7 +966,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       for (i=0;i<IDELEMS(res[syzIndex]);i++)
       {
         if (res[syzIndex]->m[i])
-          res[syzIndex]->m[i] = pOrdPolyMerge(res[syzIndex]->m[i]);
+          res[syzIndex]->m[i] = pSortCompCorrect(res[syzIndex]->m[i]);
       }
       syzIndex++;
     }

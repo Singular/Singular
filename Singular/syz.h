@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.21 1999-10-20 11:52:02 obachman Exp $ */
+/* $Id: syz.h,v 1.22 1999-11-15 17:20:53 obachman Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -132,5 +132,6 @@ void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int index);
 SSet syChosePairs(syStrategy syzstr, int *index, int *howmuch, int * actdeg);
 int syInitSyzMod(syStrategy syzstr, int index, int init=17);
 long syReorderShiftedComponents(long * sc, int n);
+void syGaussForOne(ideal arg,int gen,int ModComp,int from=-1,int till=0);
 
 #endif

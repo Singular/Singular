@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.c,v 1.15 1999-10-26 15:06:11 obachman Exp $ */
+/* $Id: mmheap.c,v 1.16 1999-11-15 17:20:24 obachman Exp $ */
 #include <stdio.h>
 #include "mod2.h"
 #include "structs.h"
@@ -98,13 +98,15 @@ void mmClearHeap(memHeap heap)
   memHeapPage page, next_page;
 
   page = heap->pages;
-  
+
+#if 0  
   while(page != NULL)
   {
     next_page = page->next;
     mmFreePage((void*) page);
     page = next_page;
   }
+#endif
   heap->current = NULL;
   heap->pages = NULL;
   heap->last_gc = NULL;
@@ -281,7 +283,7 @@ int mmNumberOfAllocatedHeapPages(memHeap heap)
 
 int mmNumberOfFreeHeapBlocks(memHeap heap)
 {
-  mmListLength(heap->current);
+  return mmListLength(heap->current);
 }
 
 #else /* HAVE_AUTOMATIC_GC */

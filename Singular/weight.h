@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: weight.h,v 1.2 1997-03-24 14:26:09 Singular Exp $ */
+/* $Id: weight.h,v 1.3 1999-11-15 17:20:57 obachman Exp $ */
 
 #include "structs.h"
 

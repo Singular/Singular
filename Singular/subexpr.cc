@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.54 1999-10-14 14:27:32 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.55 1999-11-15 17:20:51 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>

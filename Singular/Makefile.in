@@ -87,8 +87,9 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
     ndbm.cc  libparse.cc mod_raw.cc\
-    pcv.cc kbuckets.cc pProcs.cc \
-    mpr_inout.cc mpr_base.cc mpr_numeric.cc 
+    pcv.cc kbuckets.cc prProcs.cc \
+    mpr_inout.cc mpr_base.cc mpr_numeric.cc \
+    prCopy.cc
 
 
 # normal C source files
@@ -121,9 +122,10 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	kutil.h mpsr_Put.h sing_dld.h\
 	ndbm.h polys-impl.h polys-comp.h libparse.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
-	pcv.h mod_raw.h kbuckets.h pProcs.h \
+	pcv.h mod_raw.h kbuckets.h prProcs.h \
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
-	feOpt.h fegetopt.h distrib.h walk.h
+	feOpt.h fegetopt.h distrib.h walk.h \
+	prCopy.h
 
 INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc feOpt.inc
 
@@ -250,6 +252,11 @@ feOptES.inc: feOpt.cc
 	$(CXX) -DGENERATE_OPTION_INDEX  -DHAVE_ASO=0 -DESINGULAR feOpt.cc
 	./a.out
 	rm a.out
+
+prCopy.cc : prCopy.inc
+
+prCopy.inc : prCopyMacros.h prCopyTemplate.cc prCopy.pl
+	$(PERL5) prCopy.pl > prCopy.inc
 
 src: scanner.cc grammar.h grammar.cc libparse.cc 
 

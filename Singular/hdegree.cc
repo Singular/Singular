@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.18 1999-10-22 11:14:08 obachman Exp $ */
+/* $Id: hdegree.cc,v 1.19 1999-11-15 17:20:04 obachman Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */

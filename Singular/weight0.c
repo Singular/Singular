@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight0.c,v 1.4 1998-06-12 18:11:03 Singular Exp $ */
+/* $Id: weight0.c,v 1.5 1999-11-15 17:20:58 obachman Exp $ */
 
 /*
 * ABSTRACT:

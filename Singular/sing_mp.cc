@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.30 1999-10-14 14:27:31 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.31 1999-11-15 17:20:49 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links

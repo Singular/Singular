@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.16 1999-10-14 14:26:57 obachman Exp $ */
+/* $Id: attrib.cc,v 1.17 1999-11-15 17:19:48 obachman Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
