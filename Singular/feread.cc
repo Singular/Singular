@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.45 2003-01-28 09:10:52 pohl Exp $ */
+/* $Id: feread.cc,v 1.46 2003-03-04 16:29:51 bricken Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -103,6 +103,7 @@ extern "C" {
   extern char *rl_line_buffer;
   char *filename_completion_function();
   typedef char **CPPFunction ();
+
   extern char ** completion_matches ();
   extern CPPFunction * rl_attempted_completion_function;
   extern FILE * rl_outstream;
@@ -114,6 +115,8 @@ extern "C" {
   extern int history_total_bytes();
  #endif /* READLINE_READLINE_H_OK */
  typedef char * (*PROC)();
+   typedef char * (*RL_PROC)(const char*,int);
+  typedef char **RL_CPPFunction (const char*, int,int);
 }
 
 
@@ -133,8 +136,8 @@ char ** singular_completion (char *text, int start, int end)
      to complete.  Otherwise it may be the name of a file in the current
      directory. */
   if (rl_line_buffer[start-1]=='"')
-    return completion_matches (text, (PROC)filename_completion_function);
-  char **m=completion_matches (text, (PROC)command_generator);
+    return rl_completion_matches (text, (RL_PROC)rl_filename_completion_function);
+  char **m=rl_completion_matches (text, (RL_PROC)command_generator);
   if (m==NULL)
   {
     m=(char **)malloc(2*sizeof(char*));
@@ -365,7 +368,7 @@ static char * fe_fgets_stdin_init(char *pr,char *s, int size)
   /* Allow conditional parsing of the ~/.inputrc file. */
   rl_readline_name = "Singular";
   /* Tell the completer that we want a crack first. */
-  rl_attempted_completion_function = (CPPFunction *)singular_completion;
+  rl_attempted_completion_function = (RL_CPPFunction *)singular_completion;
 
   /* set the output stream */
   if(!isatty(STDOUT_FILENO))
