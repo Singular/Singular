@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.14 2000-05-08 15:29:33 obachman Exp $ */
+/* $Id: emacs.cc,v 1.15 2000-05-08 15:35:09 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -9,9 +9,12 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#ifdef WINNT
+#include <windows.h>
+#endif
 #include "mod2.h"
 #include "version.h"
-#include <stdarg.h>
 
 #if !defined(TSINGULAR) && !defined(ESINGULAR)
 #define ESINGULAR
@@ -48,7 +51,6 @@ void error(const char *fmt, ...)
   fprintf(stderr, fmt, ap);
 }
 #else
-#include <windows.h>
 void error(char* fmt, ...)
 {
    char buf[4096];
