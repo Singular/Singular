@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.18 2002-01-19 14:48:17 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.19 2003-02-06 15:52:00 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -14,6 +14,7 @@
 #include "tok.h"
 #include "p_polys.h"
 #include "ring.h"
+#include "febase.h"
 
 /***************************************************************
  *
@@ -242,6 +243,7 @@ long pWTotaldegree(poly p, ring r)
         break;
       case ringorder_M:
       case ringorder_lp:
+      case ringorder_ls:
       case ringorder_dp:
       case ringorder_ds:
       case ringorder_Dp:
@@ -264,6 +266,11 @@ long pWTotaldegree(poly p, ring r)
           j+= p_GetExp(p,k, r)*r->wvhdl[i][ k- r->block0[i]];
         }
         return j;
+#ifndef NDEBUG
+      default:
+        Print("missing order %d in pWTotaldegree\n",r->order[i]);
+	break;
+#endif
     }
   }
   return  j;
