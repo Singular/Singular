@@ -1,6 +1,6 @@
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.17 2001-01-02 13:10:59 greuel Exp $";
+version="$Id: matrix.lib,v 1.18 2001-01-03 01:28:48 greuel Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -504,9 +504,9 @@ example
 proc gauss_col (matrix A, list #)
 "USAGE:   gauss_col(A[,e]); A matrix, e any type
 RETURN:  - a matrix B, if called with one argument; B is the complete column-
-           reduced upper-triangular normal form of A if A is constant, resp.
-           as far as this is possible if A is a polynomial matrix 
-           (no division by polynomials).
+           reduced upper-triangular normal form of A if A is constant, 
+           (resp. as far as this is possible if A is a polynomial matrix;
+           no division by polynomials).
 @*       - a list L of two matrices, if called with two arguments;  
            L satidfies L[1] = A * L[2] with L[1] the column-reduced form of A
            and L[2] the transformation matrix.
@@ -533,6 +533,16 @@ EXAMPLE: example gauss_col; shows an example
    }
    option(redSB);
    M = simplify(interred(M),1);
+ /*
+   if (#[1] == 0)
+   {
+     M = simplify(std(M),1);
+   }
+   if (#[1] == 1)
+   {
+     M = simplify(interred(M),1);
+   }
+ /*
    if (size(#) != 0)
    {
     module N = lift(A,M);
@@ -587,9 +597,9 @@ example
 proc gauss_row (matrix A, list #)
 "USAGE:  gauss_row(A); A matrix, e any type
 RETURN: - a matrix B, if called with one argument; B is the complete row-
-          reduced lower-triangular normal form of A if A is constant, resp.
-          as far as this is possible if A is a polynomial matrix 
-          (no division by polynomials).
+          reduced lower-triangular normal form of A if A is constant,
+          (resp. as far as this is possible if A is a polynomial matrix;
+          no division by polynomials).
 @*      - a list L of two matrices, if called with two arguments; 
           L satidfies L[1] = L[2] * A with L[1] the row-reduced form of A 
           and L[2] the transformation matrix.
@@ -748,9 +758,10 @@ example
 
 proc rowred (matrix A,list #)
 "USAGE:   rowred(A[,e]);  A matrix, e any type
-RETURN:  - a matrix B, being the row reduced form of A, as far as this
-           is possible over the polynomial ring (no division by polynomials)
-           (if rowred is called with one argument).
+RETURN:  - a matrix B, being the row reduced form of A, if rowred is called 
+           with one argument.
+           (as far as this is possible over the polynomial ring; no division 
+           by polynomials)
 @*       - a list L of two matrices, such that L[1] = L[2] * A with L[1]
            the row-reduced form of A and L[2] the transformation matrix
            (if rowred is called with two arguments).
@@ -758,7 +769,7 @@ NOTE:    * This procedure is designed for teaching purposes only.
 @*       * The straight forward Gaussian algorithm is implemented in the 
            library (no standard basis computation), hence it is not very 
            efficient. The transformation matrix is obtained by concatenating
-           a unit matrix to A.
+           a unit matrix to A, proc gauss_red should be faster.
 @*       * It should only be used with exact coefficient field (there is no
            pivoting) over the polynomial ring (ordering lp or dp).
 @*       * Parameters are allowed. Hence, if the entries of A are parameters
@@ -831,15 +842,16 @@ example
 
 proc colred (matrix A,list #)
 "USAGE:   colred(A[,e]);  A matrix, e any type
-RETURN:  - a matrix B, being the column reduced form of A, as far as this
-           is possible over the polynomial ring (no division by polynomials)
-           (if colred is called with one argument).
+RETURN:  - a matrix B, being the column reduced form of A, if colred is 
+           called with one argument.
+           (as far as this is possible over the polynomial ring; 
+           no division by polynomials)
 @*       - a list L of two matrices, such that L[1] = A * L[2] with L[1]
            the column-reduced form of A and L[2] the transformation matrix
            (if colred is called with two arguments).
 NOTE:    * This procedure is designed for teaching purposes only.
 @*       * It applies rowred to the transposed matrix, hence it is not very 
-           efficient (cf. rowred).
+           efficient (cf. rowred); proc gauss_col should be faster.
 @*       * It should only be used with exact coefficient field (there is no
            pivoting) over the polynomial ring (ordering lp or dp).
 @*       * Parameters are allowed. Hence, if the entries of A are parameters
