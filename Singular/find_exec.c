@@ -81,7 +81,7 @@ char * find_executable_link (const char *name)
 /* for winnt under msdos, cwd is implictly in the path */
 #ifdef WINNT
     p = getenv("SHELL");
-    if (p == NULL || strlen(p < 2))
+    if (p == NULL || strlen(p) < 2)
     {
       /* we are under msdos display */
       extra = (char*) AllocL((search != NULL ? strlen(search) : 0) + 3);
