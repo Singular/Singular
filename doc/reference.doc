@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.211 2001-08-27 14:40:06 Singular Exp $
+@comment $Id: reference.doc,v 1.212 2001-11-27 09:00:38 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1003,12 +1003,16 @@ See
 @item @strong{Syntax:}
 @code{deg (} poly_expression @code{)}
 @*@code{deg (} vector_expression @code{)}
+@*@code{deg (} poly_expression @code{,} intvec_expression @code{)}
+@*@code{deg (} vector_expression @code{,} intvec_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
 returns the maximal (weighted) degree of
 the terms of a polynomial or a vector;
 @*deg(0) is -1.
+@*The optional second argument gives the weight vector,
+the default weights of the base ring will be used otherwise.
 @item @strong{Example:}
 @smallexample
 @c example
