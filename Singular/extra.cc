@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.83 1998-12-15 11:23:16 krueger Exp $ */
+/* $Id: extra.cc,v 1.84 1998-12-16 12:08:36 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -403,12 +403,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
-/*===================ring -optimierung ======================*/
-   if(strcmp(sys_cmd,"opt")==0)
-   {
-     rOptimizeOrder((ring)h->Data());
-     return FALSE;
-   }
 /*==================== pcv ==================================*/
 #ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV
