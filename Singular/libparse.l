@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.11 1998-04-27 10:55:55 Singular Exp $ */
+/* $Id: libparse.l,v 1.12 1998-04-27 12:34:18 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -570,7 +570,7 @@ int libread(FILE* f, char* buf, int max_size)
 { int rc;
 
   offset = ftell(f);
-  rc  = fread( buf, 1, max_size, f );
+  rc  = myfread( buf, 1, max_size, f );
 #if YYLPDEBUG >2
   printf("fread: %d of %d\n", rc, max_size);
 #endif
@@ -633,7 +633,7 @@ void copy_string(lp_modes mode)
     fseek(yylpin, string_start, SEEK_SET);
     text_buffer = (char *)AllocL(len+1);
     text_buffer[len]='\0';
-    fread(text_buffer, len, 1, yylpin);
+    myfread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
   }
 #  endif /* STANDALONE_PARSER */
@@ -662,7 +662,7 @@ main( int argc, char *argv[] )
   lib_style_types lib_style;
   ++argv, --argc;  /* skip over program name */
   if ( argc > 0 )
-     yyin = fopen( argv[0], "rb" );
+     yyin = myfopen( argv[0], "rb" );
   else
      yyin = stdin;
 

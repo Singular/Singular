@@ -43,7 +43,7 @@ pi_clear(procinfov pi)
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 printpi(procinfov pi)
 {
-  FILE *fp = fopen( pi->libname, "rb");
+  FILE *fp = mfopen( pi->libname, "rb");
   char *buf, name[256];
   int len1, len2;
 
@@ -66,10 +66,10 @@ printpi(procinfov pi)
     else len2 = pi->data.s.body_end - pi->data.s.body_start;
     buf = (char *)malloc(len1 + len2 + 1);
     fseek(fp, pi->data.s.proc_start, SEEK_SET);
-    fread( buf, len1, 1, fp);
+    mfread( buf, len1, 1, fp);
     *(buf+len1) = '\n';
     fseek(fp, pi->data.s.body_start, SEEK_SET);
-    fread( buf+len1+1, len2, 1, fp);
+    mfread( buf+len1+1, len2, 1, fp);
     *(buf+len1+len2+1)='\0';
     printf("##BODY:'%s'##\n", buf);
     free(buf);
@@ -79,7 +79,7 @@ printpi(procinfov pi)
     printf("len1=%d;\n", len1);
     buf = (char *)malloc(len1+1);
     fseek(fp, pi->data.s.proc_start, SEEK_SET);
-    fread( buf, len1, 1, fp);
+    mfread( buf, len1, 1, fp);
     *(buf+len1)='\0';
     printf("##HELP:'%s'##\n", buf);
     free(buf);

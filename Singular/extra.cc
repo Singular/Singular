@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.40 1998-04-24 17:19:04 schmidt Exp $ */
+/* $Id: extra.cc,v 1.41 1998-04-27 12:34:11 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -279,7 +279,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       if (mainGetSingOptionValue(&((char*)(h->data))[2], &val))
       {
         res->data = (void*) val;
-        if ((int) val > 1)
+        if ((unsigned int) val > 1)
         {
           res->rtyp=STRING_CMD;
           res->data = (void*) mstrdup((char*) res->data);
@@ -436,46 +436,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== writemat ==================================*/
-//    if(strcmp((char*)(h->Data()),"writemat")==0)
-//    {
-//      if (h->next!=NULL)
-//      {
-//        leftv v=h->next;
-//        if (v->Typ() == STRING_CMD)
-//        {
-//          char *filename = (char *)v->Data();
-//          v = v->next;
-//          if (v->Typ()==MATRIX_CMD)
-//          {
-//            FILE *outfile = fopen(filename,"a");
-//            if (outfile==NULL)
-//            {
-//              Werror("cannot write to file %s",filename);
-//              return TRUE;
-//            }
-//            matrix m=(matrix)v->Data();
-//            fprintf(outfile,"%d\n%d\n",MATROWS(m),MATCOLS(m));
-//            char *s = iiStringMatrix(m,2);
-//            fprintf(outfile,"%s\n",s);
-//            FreeL((ADDRESS)s);
-//            fclose(outfile);
-//            return FALSE;
-//          }
-//          else
-//          {
-//            WerrorS("matrix expected");
-//          }
-//        }
-//        else
-//        {
-//          WerrorS("string expected");
-//        }
-//      }
-//      else
-//        WerrorS("matrix expected");
-//    }
-//    else
 #ifdef HAVE_FACTORY
 /*==================== pdivide ====================*/
     if (strcmp((char*)(h->Data()),"pdivide")==0)

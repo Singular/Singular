@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.19 1998-04-22 10:37:44 krueger Exp $ */
+/* $Id: iplib.cc,v 1.20 1998-04-27 12:34:16 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -143,7 +143,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
     //    pi->data.s.proc_start, procbuflen);
     s = (char *)AllocL(procbuflen);
-    fread(s, procbuflen, 1, fp);
+    myfread(s, procbuflen, 1, fp);
     s[procbuflen] = '\0';
     return(s);
   }
@@ -151,7 +151,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
   { // load proc part
     procbuflen = pi->data.s.def_end - pi->data.s.proc_start;
     //fgets(buf, sizeof(buf), fp);
-    fread( buf, procbuflen, 1, fp);
+    myfread( buf, procbuflen, 1, fp);
     char ct;
     char *e;
     s=iiProcName(buf,ct,e);
@@ -170,7 +170,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     }
     fseek(fp, pi->data.s.body_start, SEEK_SET);
     strcpy(pi->data.s.body,argstr);
-    fread( pi->data.s.body+strlen(argstr), procbuflen, 1, fp);
+    myfread( pi->data.s.body+strlen(argstr), procbuflen, 1, fp);
     procbuflen+=strlen(argstr);
     FreeL(argstr);
     fclose( fp );
@@ -189,7 +189,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     //Print("Example=%ld-%ld=%d\n", pi->data.s.proc_end,
     //  pi->data.s.example_start, procbuflen);
     s = (char *)AllocL(procbuflen+14);
-    fread(s, procbuflen, 1, fp);
+    myfread(s, procbuflen, 1, fp);
     s[procbuflen] = '\0';
     strcat(s+procbuflen-3, "\n;return();\n\n" );
     p=strchr(s,'{');

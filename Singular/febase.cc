@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.31 1998-04-23 18:52:48 Singular Exp $ */
+/* $Id: febase.cc,v 1.32 1998-04-27 12:34:12 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -22,6 +22,7 @@
 #include "mmemory.h"
 #include "subexpr.h"
 #include "ipshell.h"
+
 
 #define fePutChar(c) fputc((uchar)(c),stdout)
 /*0 implementation */
@@ -210,7 +211,7 @@ char* feGetSearchPath(const char* argv0)
 
 FILE * feFopen(char *path, char *mode, char *where,int useWerror)
 {
-  FILE * f=fopen(path,mode);
+  FILE * f=myfopen(path,mode);
 #ifdef macintosh
   if (f!=NULL)
   {
@@ -239,14 +240,14 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
     memcpy(res,env,ienv);
     memcpy(res+ienv,path,ipath);
     res[ienv+ipath]='\0';
-    f=fopen(res,mode);
+    f=myfopen(res,mode);
   }
   if ((f==NULL)&&(idat!=0))
   {
     memcpy(res,SINGULAR_DATADIR,idat);
     memcpy(res+idat,path,ipath);
     res[idat+ipath]='\0';
-    f=fopen(res,mode);
+    f=myfopen(res,mode);
   }
   if (f==NULL)
   {
@@ -282,7 +283,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
         #ifndef macintosh
           if(!access(s, R_OK)) { found++; break; }
         #else
-          f=fopen(s,mode);
+          f=myfopen(s,mode);
           if (f!=NULL)  { found++; fclose(f); break; }
         #endif
         p = q+1;
@@ -293,7 +294,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
         strcat(s, DIR_SEPP);
         strcat(s, path);
       }
-      f=fopen(s,mode);
+      f=myfopen(s,mode);
       if (f!=NULL)
       {
         if (where==NULL) FreeL((ADDRESS)s);
@@ -303,7 +304,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
     else
     {
       if (where!=NULL) strcpy(s/*where*/,path);
-      f=fopen(path,mode);
+      f=myfopen(path,mode);
     }
     if (where==NULL) FreeL((ADDRESS)s);
   }
@@ -630,7 +631,7 @@ void monitor(char* s, int mode)
   }
   if ((s!=NULL) && (*s!='\0'))
   {
-    feProtFile = fopen(s,"w");
+    feProtFile = myfopen(s,"w");
     if (feProtFile==NULL)
     {
       Werror("cannot open %s",s);
@@ -666,3 +667,49 @@ char* eati(char *s, int *i)
   return s;
 }
 
+#ifndef unix
+// Make sure that mode contains binary option
+FILE *myfopen(char *path, char *mode)
+{
+  char mmode[4];
+  int i;
+  BOOLEAN done = FALSE;
+  
+  for (i=0;;i++)
+  {
+    mmode[i] = mode[i];
+    if (mode[i] == '\0') break;
+    if (mode[i] == 'b') done = TRUE;
+  }
+  
+  if (! done)
+  {
+    mmode[i] = 'b';
+    mmode[i+1] = '\0';
+  }
+  return fopen(path, mmode);
+}
+#endif
+
+// replace "\r\n" by " \n" and "\r" by "\n"
+
+size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+  size_t got = fread(ptr, size, nmemb, stream) * size;
+  size_t i;
+
+  for (i=0; i<got; i++)
+  {
+    if ( ((char*) ptr)[i] == '\r')
+    {
+      if (i+1 < got && ((char*) ptr)[i+1] == '\n')
+        ((char*) ptr)[i] = ' ';
+      else
+        ((char*) ptr)[i] = '\n';
+    }
+  }
+  return got;
+}
+
+
+      

@@ -4289,7 +4289,7 @@ struct sValCmdTab dArithTab2[]={ {0,0}};
 #define JJTAB2LEN 0
 void ttGen1()
 {
-  FILE *outfile = fopen("iparith.inc","w");
+  FILE *outfile = myfopen("iparith.inc","w");
   int i,j,l1=0,l2=0;
   currRing=(ring)Alloc(sizeof(*currRing));
   fprintf(outfile,
@@ -4447,7 +4447,7 @@ void ttGen1()
 /*-------------------------------------------------------------------*/
 void ttGen2()
 {
-  FILE *outfile = fopen("iparith.inc","a");
+  FILE *outfile = myfopen("iparith.inc","a");
   fprintf(outfile,
   "/****************************************\n"
   "*  Computer Algebra System SINGULAR     *\n"
@@ -4575,7 +4575,7 @@ void ttGen2()
 #if 0
 void ttGen3()
 {
-  FILE *outfile = fopen("mpsr_tok.inc","w");
+  FILE *outfile = myfopen("mpsr_tok.inc","w");
   fprintf(outfile,
   "/****************************************\n"
   "*  Computer Algebra System SINGULAR     *\n"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.9 1998-03-31 09:00:40 Singular Exp $ */
+/* $Id: feread.cc,v 1.10 1998-04-27 12:34:14 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -225,9 +225,9 @@ void fe_set_input_mode (void)
     {
       fe_stdout_is_tty=0;
       #ifdef atarist
-        fe_echo = fopen( "/dev/tty", "w" );
+        fe_echo = myfopen( "/dev/tty", "w" );
       #else
-        fe_echo = fopen( ttyname(fileno(stdin)), "w" );
+        fe_echo = myfopen( ttyname(fileno(stdin)), "w" );
       #endif
     }
 
@@ -660,9 +660,9 @@ void fe_set_input_mode(void)
     if(!isatty(STDOUT_FILENO))
     {
       #ifdef atarist
-        rl_outstream = fopen( "/dev/tty", "w" );
+        rl_outstream = myfopen( "/dev/tty", "w" );
       #else
-        rl_outstream = fopen( ttyname(fileno(stdin)), "w" );
+        rl_outstream = myfopen( ttyname(fileno(stdin)), "w" );
       #endif
     }
 

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.11 1998-04-01 18:56:30 Singular Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.12 1998-04-27 12:34:19 obachman Exp $ */
 
 /***************************************************************
  *
@@ -513,7 +513,7 @@ void mpsr_ttGen()
   }
 
   // Generate the template file
-  outfile = fopen("mpsr_Tok.inc", "w");
+  outfile = myfopen("mpsr_Tok.inc", "w");
   if (outfile == NULL)
   {
     fprintf(stderr, "Error: mpsr_ttGen: Cannot open file mpsr_Tok.inc\n");
@@ -581,7 +581,7 @@ void mpsr_ttGen()
 #ifndef macintosh
   system("touch mpsr_Tok.inc");
 #else
-  FILE fd = fopen("mpsr_Tok.inc", "w");
+  FILE fd = myfopen("mpsr_Tok.inc", "w");
   close(fd);
 #endif
 }
