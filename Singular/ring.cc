@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.109 2000-08-30 16:04:39 Singular Exp $ */
+/* $Id: ring.cc,v 1.110 2000-09-04 14:38:02 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2397,6 +2397,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, int exp_limit)
   rComplete(res);
   return res;
 }
+#endif
 
 BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
 {

@@ -114,7 +114,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} mmalloc.cc\
         p_Copy__Template.cc p_Mult_nn__Template.cc  pp_Mult_nn__Template.cc \
         pp_Mult_mm__Template.cc p_Mult_mm__Template.cc \
         p_Minus_mm_Mult_qq__Template.cc p_Add_q__Template.cc \
-	p_Neg__Template.cc p_ReverseNeg__Template.cc \
+	p_Neg__Template.cc \
 	pInline.cc p_Inline.cc
 
 
@@ -278,6 +278,7 @@ p_Procs.inc: p_Procs.cc p_Procs.h mod2.h
 	$(CXX) -g -Wall -DGENERATE_P_PROCS p_Procs.cc -o p_Procs
 	./p_Procs > p_Procs.inc
 
+p_Procs.o: p_Procs.inc
 
 src: scanner.cc grammar.h grammar.cc libparse.cc 
 
