@@ -1,8 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.3 1997-04-02 15:07:57 Singular Exp $ */
-
+/* $Id: syz0.cc,v 1.4 1997-04-03 12:16:50 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -118,6 +117,69 @@ static void syCreatePairs(polyset F,int lini,int wend,int k,int j,int i,
       pDelete(&p);
     k++;
   }
+}
+
+inline BOOLEAN syDivisibleBy2(poly a, poly b)
+{
+  //if (a->exp[0]==b->exp[0])
+  {
+    int i=pVariables-1;
+    short *e1=&(a->exp[1]);
+    short *e2=&(b->exp[1]);
+    if ((*e1) > (*e2)) return FALSE;
+    do
+    {
+      i--;
+      e1++;
+      e2++;
+      if ((*e1) > (*e2)) return FALSE;
+    } while (i>0);
+    return TRUE;
+  }
+  //else 
+  //{
+    //Print("Fehler");
+    //return FALSE;
+  //}
+}
+
+static poly syRedtail2(poly p, polyset redWith, intvec *modcomp)
+{
+  poly h, hn;
+  int hncomp,nxt;
+  int j;
+
+  h = p;
+  hn = pNext(h);
+  while(hn != NULL)
+  {
+    hncomp = pGetComp(hn);
+    j = (*modcomp)[hncomp];
+    nxt = (*modcomp)[hncomp+1];
+    while (j < nxt)
+    {
+      if (syDivisibleBy2(redWith[j], hn))
+      {
+        //if (TEST_OPT_PROT) Print("r");
+        hn = spSpolyRed(redWith[j],hn,NULL);
+        if (hn == NULL)
+        {
+          pNext(h) = NULL;
+          return p;
+        }
+        hncomp = pGetComp(hn);
+        j = (*modcomp)[hncomp];
+        nxt = (*modcomp)[hncomp+1];
+      }
+      else
+      {
+        j++;
+      }
+    }
+    h = pNext(h) = hn;
+    hn = pNext(h);
+  }
+  return p;
 }
 
 /*2
@@ -245,7 +307,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
         toRed = spSpolyCreate(S[j],S[k],NULL);
         ecartToRed = 1;
         bestEcart = 1;
-        if (TEST_OPT_DEBUG)
+        if (BTEST1(6))
         {
           PrintS("pair: ");pWrite0(S[j]);PrintS(" ");pWrite(S[k]);
         }
@@ -256,7 +318,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
         }
         while (pGetComp(toRed)<=rkF)
         {
-          if (TEST_OPT_DEBUG)
+          if (BTEST1(6))
           {
             PrintS("toRed: ");pWrite(toRed);
           }
@@ -393,7 +455,7 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL)
 {
   int j,i=0;
   poly p;
-
+  
   if (toNorm==NULL) return NULL;
   p = pHead(toNorm);
   if (mW!=NULL)
@@ -407,7 +469,7 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL)
     {
       //pNorm(toNorm);
       toNorm = spSpolyRed(currQuotient->m[i],toNorm,NULL);
-      pDelete(&p);
+      pDelete(&p); 
       if (toNorm==NULL) return NULL;
       p = pHead(toNorm);
       if (mW!=NULL)
@@ -519,7 +581,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
         pairs[k] = NULL;
         //the next term of the syzygy
         //constructs the spoly
-        if (TEST_OPT_DEBUG)
+        if (BTEST1(6))
         {
           if (k<Fl)
           {
@@ -541,7 +603,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
         isNotReduced = TRUE;
         while (toRed!=NULL)
         {
-          if (TEST_OPT_DEBUG)
+          if (BTEST1(6))
           {
             PrintS("toRed: ");pWrite(toRed);
           }
@@ -579,7 +641,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           {
             //the next monom of the syzygy
             isNotReduced = TRUE;
-            if (TEST_OPT_DEBUG)
+            if (BTEST1(6))
             {
               PrintS("reduced with: ");pWrite(F[l]);
             }
@@ -611,7 +673,14 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
             *Smax += 16;
           }
           pNorm(syz);
-          (*Shdl)[Sl] = syz;
+          if (BTEST1(OPT_REDTAIL))
+          {
+            (*newmodcomp)[j+2] = Sl;
+            (*Shdl)[Sl] = syRedtail2(syz,*Shdl,newmodcomp);
+            (*newmodcomp)[j+2] = 0;
+          }
+          else
+            (*Shdl)[Sl] = syz;
           Sl++;
         }
       }
@@ -633,13 +702,13 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
   *modcomp = newmodcomp;
 }
 
-void syReOrderResolventFB(resolvente res,int length)
+void syReOrderResolventFB(resolvente res,int length, int initial)
 {
   int syzIndex=length-1,i,j;
   poly p;
 
   while ((syzIndex!=0) && (res[syzIndex]==NULL)) syzIndex--;
-  while (syzIndex!=0)
+  while (syzIndex>=initial)
   {
     for(i=0;i<IDELEMS(res[syzIndex]);i++)
     {
@@ -679,7 +748,7 @@ BOOLEAN syTestOrder(ideal M)
 }
 
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
-  BOOLEAN isMonomial)
+  BOOLEAN isMonomial,BOOLEAN notReplace)
 {
   ideal mW=NULL;
   int i,syzIndex = 0,j=0,lgth,*ord=NULL,*bl0=NULL,*bl1=NULL;
@@ -726,7 +795,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       while ((currRing->order[j]!=ringorder_c)
               && (currRing->order[j]!=ringorder_C))
         j++;
-      if (currRing->order[j]!=0)
+      if ((!notReplace) && (currRing->order[j]!=0))
       {
         while (currRing->order[j]!=0) j++;
         ord = (int*)Alloc0((j+2)*sizeof(int));
