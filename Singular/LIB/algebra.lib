@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.3 1999-08-03 11:43:04 obachman Exp $";
+version="$Id: algebra.lib,v 1.4 1999-08-05 10:53:29 obachman Exp $";
 info="
 LIBRARY:  algebra.lib   PROCEDURES FOR COMPUTING WITH ALGBRAS AND MAPS
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
@@ -234,9 +234,6 @@ EXAMPLE: example inSubring; shows an example
   //with the ring k[y(0),...,y(n)] is computed, the result is ker
    execute ("ring r1= ("+charstr(basering)+"),(x(1..n),y(0..z)),dp;");
  //  execute ("ring r1= ("+charstr(basering)+"),(y(0..z),x(1..n)),dp;");
-  r1;
-  pause;
-  
   execute ("minpoly=number("+mp+");");
   ideal va = x(1..n);
   map emb = gnir,va;
