@@ -198,7 +198,7 @@ else
 ifndef LD_STATIC
 LIBS := $(MP_LIBS) $(LIBS)
 endif
-OBJS := $(OBJS) $(STATIC_SOURCES:.cc=.o) $(COMMON_SOURCES:.c=.o)
+OBJS := $(OBJS) $(STATIC_SOURCES:.cc=.o) $(COMMON_SOURCES:.cc=.o)
 DL_LIBS=
 endif
 
