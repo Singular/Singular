@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.9 1998-06-03 14:25:40 pohl Exp $
+// $Id: fglmhom.cc,v 1.10 1998-06-15 14:30:06 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -9,12 +9,12 @@
 *   Calculates via the hilbert-function a groebner basis.
 */
 
-#ifndef NOSTREAMIO
-#include <iostream.h>
-#endif
 
 #include "mod2.h"
 #ifdef HAVE_FGLM_HOM
+#ifndef NOSTREAMIO
+#include <iostream.h>
+#endif
 #include "tok.h"
 #include "structs.h"
 #include "subexpr.h"  
