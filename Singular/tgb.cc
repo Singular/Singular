@@ -4024,7 +4024,7 @@ static poly gcd_of_terms(poly p, ring r){
   pDelete(&m);
   return NULL;
 }
-static BOOLEAN pHasNotCFExtended(poly p1, poly p2, poly m)
+static inline BOOLEAN pHasNotCFExtended(poly p1, poly p2, poly m)
 {
 
   if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
@@ -4040,7 +4040,7 @@ static BOOLEAN pHasNotCFExtended(poly p1, poly p2, poly m)
 
 
 //for impl reasons may return false if the the normal product criterion matches
-static BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, calc_dat* c){
+static inline BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, calc_dat* c){
   if(gcd1==NULL) return FALSE;
         if(gcd2==NULL) return FALSE;
         gcd1->next=gcd2; //may ordered incorrect
