@@ -1,0 +1,22 @@
+// $Id: all.lib,v 1.1 1997-05-01 17:50:40 Singular Exp $
+///////////////////////////////////////////////////////////////////////////////
+
+LIBRARY:  all.lib   Load all libraries
+
+///////////////////////////////////////////////////////////////////////////////
+
+LIB "cs.lib";
+LIB "deform.lib";
+LIB "elim.lib";
+LIB "factor.lib";
+LIB "finvar.lib";
+LIB "general.lib";
+LIB "homolog.lib";
+LIB "inout.lib";
+LIB "matrix.lib";
+LIB "poly.lib";
+LIB "primdec.lib";
+LIB "prim_dec.lib";
+LIB "random.lib";
+LIB "ring.lib";
+LIB "sing.lib";

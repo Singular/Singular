@@ -1,0 +1,645 @@
+// $Id: invar.lib,v 1.1 1997-05-01 17:50:42 Singular Exp $
+///////////////////////////////////////////////////////
+// invar.lib
+// algorithm for computing the ring of invariants under
+// the action of the additive group
+// written by Gerhard Pfister
+//////////////////////////////////////////////////////
+
+LIBRARY: invar.lib PROCEDURE FOR COMPUTING INVARIANTS UNDER C+-ACTIONS
+
+  invariantRing(matrix m,poly p,poly q,int choose)
+  // ring of invariants of the action of the additive group
+  // defined by the vectorfield corresponding to the matrix m
+  // (m[i,1] are the coefficients of d/dx(i))
+  // the polys p and q are assumed to be variables x(i) and x(j)
+  // such that m[j,1]=0 and m[i,1]=x(j)
+  // if choose=0 the computation stops if generators of the ring
+  // of invariants are computed (to be used only if you know that
+  // the ring of invariants is finitey generated)
+  // if choose<>0 it computes invariants up to degree choose
+    
+  actionIsProper(matrix m)
+  // returns 1 if the action of the additive group defined by the
+  // matrix m as above i proper and 0 if not.
+
+///////////////////////////////////////////////////////////////////////////////
+
+LIB "inout.lib";
+LIB "general.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc sortier(ideal id)
+{
+  if(size(id)==0)
+  {
+     return(id);
+  }
+  intvec i=sortvec(id);
+  int j;
+  ideal m;
+  for (j=1;j<=size(i);j++)
+  {
+    m[j] = id[i[j]];
+  }
+  return(m);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring q=0,(x,y,z,u,v,w),dp;
+   ideal i=w,x,z,y,v;
+   ideal j=sortier(i);
+   j;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc der (matrix m, poly f)
+USAGE:   der(m,f);  m matrix, f poly
+RETURN:  poly= application of the vectorfield m befined by the matrix m 
+         (m[i,1] are the coefficients of d/dx(i)) to f
+NOTE:    
+EXAMPLE: example der; shows an example
+{
+  matrix mh=matrix(jacob(f))*m;
+  return(mh[1,1]);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring q=0,(x,y,z,u,v,w),dp;
+   poly f=2xz-y2;
+   matrix m[6][1];
+   m[2,1]=x;
+   m[3,1]=y;
+   m[5,1]=u;
+   m[6,1]=v;
+   der(m,f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc actionIsProper(matrix m)
+USAGE:   actionIsProper(m); m matrix
+RETURN:  int= 1 if is proper, 0 else
+NOTE:    
+EXAMPLE: example actionIsProper; shows an example
+{
+  int i;
+  ideal id=maxideal(1);
+  def bsr=basering;
+
+  //changes the basering bsr to bsr[@t]
+  execute "ring s="+charstr(basering)+",("+varstr(basering)+",@t),dp;";
+  poly inv,delta,tee,j;
+  ideal id=imap(bsr,id);
+  matrix @m[size(id)+1][1];
+  @m=imap(bsr,m),0;
+
+  //computes the exp(@t*m)(var(i)) for all i
+  for(i=1;i<=nvars(basering)-1;i++)
+  {
+     inv=var(i);
+     delta=der(@m,inv);
+     j=1;
+     tee=@t;
+     while(delta!=0)
+     {
+        inv=inv+1/j*delta*tee;
+        j=j*(j+1);
+        tee=tee*@t;
+        delta=der(@m,delta);
+     }
+     id=id+ideal(inv);   
+  }
+  i=inSubring(@t,id)[1];
+  setring(bsr);
+  return(i);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+
+  ring rf=0,(x(1..7)),dp;
+  matrix m[7][1];
+  m[4,1]=x(1)^3;
+  m[5,1]=x(2)^3;
+  m[6,1]=x(3)^3;
+  m[7,1]=(x(1)*x(2)*x(3))^2;
+  actionIsProper(m);
+
+  ring rd=0,(x(1..5)),dp;
+  matrix m[5][1];
+  m[3,1]=x(1);
+  m[4,1]=x(2);
+  m[5,1]=1+x(1)*x(4)^2
+  actionIsProper(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc reduction(poly p, ideal mod, list #)
+USAGE:   reduction(p,mod,q); p poly, mod ideal, q (optional) monomial
+RETURN:  poly= (p-H(f1,...,fr))/q^a, if Lt(p)=H(Lt(f1),...,Lt(fr)) for 
+               some polynomial H in r variables over the base field,
+               a maximal such that q^a devides p-H(f1,...,fr),
+               mod =(f1,...,fr)
+NOTE:    
+EXAMPLE: example reduction; shows an example
+{
+  int i;
+  int z=size(mod);
+  def bsr=basering;
+ 
+  //arranges the monomial v for elimination
+  poly v=var(1);
+  for (i=2;i<=nvars(basering);i=i+1)
+  {
+    v=v*var(i);
+  }
+
+  //changes the basering bsr to bsr[@(0),...,@(z)]
+  execute "ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;";
+  
+  //costructes the ideal mod=(p-@(0),mod[1]-@(1),...,mod[z]-@(z))
+  ideal mod=imap(bsr,mod);
+  for (i=1;i<=z;i++)
+  {
+    mod[i]=lead(mod[i])-var(nvars(bsr)+i+1);
+  }
+  mod=lead(imap(bsr,p))-@(0),mod;
+ 
+  //eliminates the variables of the basering bsr
+  //i.e. computes mod intersected with K[@(0),...,@(z)]
+  ideal kern=eliminate(mod,imap(bsr,v));
+
+  // test wether @(0)-h(@(1),...,@(z)) is in ker for some poly h
+  poly h;
+  z=size(kern);
+  for (i=1;i<=z;i++)
+  {
+     h=kern[i]/@(0);
+     if (deg(h)==0)
+     {
+        h=(1/h)*kern[i];
+        // defines the map psi : s ---> bsr defined by @(i) ---> p,mod[i]
+        setring bsr;
+        map psi=s,maxideal(1),p,mod;
+        poly re=psi(h);
+
+        // devides by the maximal power of #[1] 
+        if (size(#)>0)
+        {
+           while ((re!=0) && (re!=#[1]) &&(subst(re,#[1],0)==0))
+           {
+             re=re/#[1];
+           }
+        }
+
+        return(re); 
+     }
+  }
+  setring bsr;
+  return(p);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring q=0,(x,y,z,u,v,w),dp;
+   poly p=x2yz-x2v;
+   ideal mod =x-w,u2w+1,yz-v;
+   reduction(p,mod);
+   reduction(p,mod,w);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc completeReduction(poly p, ideal mod, list #)
+USAGE:   completeReduction(p,mod,q); p poly, mod ideal, 
+                                     q (optional) monomial
+RETURN:  poly= the polynomial p reduced with mod via the procedure
+               reduction as long as possible
+NOTE:    
+EXAMPLE: example completeReduction; shows an example
+{
+  poly p1=p;
+  poly p2=reduction(p,mod,#);
+  while (p1!=p2)
+  {
+    p1=p2;
+    p2=reduction(p1,mod,#);
+  }
+  return(p2);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring q=0,(x,y,z,u,v,w),dp;
+   poly p=x2yz-x2v;
+   ideal mod =x-w,u2w+1,yz-v;
+   completeReduction(p,mod);
+   completeReduction(p,mod,w);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc inSubring(poly p, ideal mod)
+USAGE:   inSubring(p,mod); p poly, mod ideal
+RETURN:  list= 1,string(@(0)-h(@(1),...,@(size(mod)))) :if p = h(mod[1],...,mod[size(mod)])
+              0,string(h(@(0),...,@(size(mod)))) :if there is only a nonlinear relation
+              h(p,mod[1],...,mod[size(mod)])=0.
+NOTE:    
+EXAMPLE: example inSubring; shows an example
+{
+  int z=size(mod);
+  int i;
+  def gnir=basering;
+  list l;
+  poly mile=var(1);
+  for (i=2;i<=nvars(basering);i++)
+  {
+    mile=mile*var(i);
+  }
+  string eli=string(mile);
+  // the intersection of ideal nett=(p-@(0),mod[1]-@(1),...)
+  // with the ring k[@(0),...,@(n)] is computed, the result is ker
+  execute "ring r1="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;";
+  ideal nett=imap(gnir,mod);
+  poly p;
+  for (i=1;i<=z;i++)
+  {
+    execute "p=@("+string(i)+");";
+    nett[i]=nett[i]-p;
+  }
+  nett=imap(gnir,p)-@(0),nett;
+  execute "ideal ker=eliminate(nett,"+eli+");";
+  // test wether @(0)-h(@(1),...,@(z)) is in ker
+  l[1]=0;
+  l[2]="";
+  for (i=1;i<=size(ker);i++)
+  {
+     if (deg(ker[i]/@(0))==0)
+     {
+        string str=string(ker[i]);
+        setring gnir;
+        l[1]=1;
+        l[2]=str;
+        return(l);
+     }
+     if (deg(ker[i]/@(0))>0)
+     {
+        l[2]=l[2]+string(ker[i]);
+     }
+  }
+  setring gnir;
+  return(l);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring q=0,(x,y,z,u,v,w),dp;
+   poly p=xyzu2w-1yzu2w2+u4w2-1xu2vw+u2vw2+xyz-1yzw+2u2w-1xv+vw+2;
+   ideal mod =x-w,u2w+1,yz-v;
+   inSubring(p,mod);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc localInvar(matrix m, poly p, poly q, poly h)
+USAGE:   localInvar(m,p,q,h); m matrix, p,q,h poly
+RETURN:  poly= the invariant of the vectorfield m=Sum m[i,1]*d/dx(i) with respect
+               to p,q,h, i.e.
+               Sum (-1)^v*(1/v!)*m^v(p)*(q/m(q))^v)*m(q)^N, m^N(q)=0, m^(N-1)(q)<>0
+               it is assumed that m(q) and h are invariant
+               the sum above is divided by h as much as possible
+NOTE:    
+EXAMPLE: example localInvar; shows an example
+{
+  if ((der(m,h) !=0) || (der(m,der(m,q)) !=0))
+  {
+    "the last variable defines not an invariant function ";
+    return(q);
+  }
+  poly inv=p;
+  poly dif= der(m,inv);
+  poly a=der(m,q);
+  poly sgn=-1;
+  poly coeff=sgn*q;
+  int k=1;
+  if (dif==0)
+  {
+    return(inv);
+  }
+  while (dif!=0) 
+  {
+    inv=(a*inv)+(coeff*dif);
+    dif=der(m,dif);
+    k=k+1;
+    coeff=q*coeff*sgn/k;
+  }
+  while ((inv!=0) && (inv!=h) &&(subst(inv,h,0)==0))
+ {
+   inv=inv/h;
+  }
+  return(inv);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring q=0,(x,y,z),dp;
+   matrix m[3][1];
+   m[2,1]=x;
+   m[3,1]=y;
+   poly in=localInvar(m,z,y,x);
+   in;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+proc furtherInvar(matrix m, ideal id, ideal karl, poly q)
+USAGE:   furtherInvar(m,id,karl,q); m matrix, id,karl ideal,q poly
+RETURN:  ideal= further invariants of the vectorfield m=Sum m[i,1]*d/dx(i) with respect
+               to id,p,q, i.e.
+               the ideal id contains invariants of m and we are looking for elements
+               in the subring generated by id which are divisible by q
+               it is assumed that m(p) and q are invariant
+               the elements mentioned  above are computed and divided by q 
+               as much as possible
+               the ideal karl contains all invariants computed yet
+NOTE:    
+EXAMPLE: example furtherInvar; shows an example
+{
+  int i;
+  ideal null;
+  int z=size(id);
+  intvec v;
+  def @r=basering;
+  ideal su;
+  for (i=1;i<=z;i++)
+  {
+    su[i]=subst(id[i],q,0);
+  }
+  // defines the map phi : r1 ---> @r defined by
+  // y(i) ---> id[i](q=0)
+  execute "ring r1="+charstr(basering)+",(y(1..z)),dp";
+  setring @r;
+  map phi=r1,su;
+  setring r1;  
+  // computes the kernel of phi
+  execute "ideal ker=preimage(@r,phi,null)"; 
+  // defines the map psi : r1 ---> @r defined by y(i) ---> id[i]
+  setring @r;
+  map psi=r1,id;
+  // computes psi(ker(phi))
+  ideal rel=psi(ker);
+  // devides by the maximal power of q
+  // and tests wether we really obtain invariants
+  for (i=1;i<=size(rel);i++)
+  {
+    while ((rel[i]!=0) && (rel[i]!=q) &&(subst(rel[i],q,0)==0))
+    {
+      rel[i]=rel[i]/q;
+      if (der(m,rel[i])!=0)
+      {
+         "error in furtherInvar, function not invariant";
+         rel[i];
+      }
+    }
+    rel[i]=simplify(rel[i],1);
+  }
+  // test whether some variables occur linearly
+  // and deletes the corresponding invariant function
+  setring r1;
+  int j;
+  for (i=1;i<=size(ker);i=i+1)
+  {
+     for (j=1;j<=z;j++)
+     {
+        if (deg(ker[i]/y(j))==0)
+        {
+           setring @r;
+           rel[i]= completeReduction(rel[i],karl,q);
+           if(rel[i]!=0)
+           {
+              karl[j+1]=rel[i];
+              rel[i]=0;
+           }
+           setring r1;
+        }
+     }
+    
+  }
+  setring @r;
+  list l=rel+null,karl;
+  return(l);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z,u),dp;
+   matrix m[4][1];
+   m[2,1]=x;
+   m[3,1]=y;
+   m[4,1]=z;
+   ideal id=localInvar(m,z,y,x),localInvar(m,u,y,x);
+   ideal karl=id,x;
+   list in=furtherInvar(m,id,karl,x);
+   in;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+proc invariantRing(matrix m, poly p, poly q,list #)
+USAGE:   invariantRing(m,p,q); m matrix, p,q poly
+RETURN:  ideal= the invariants of the vectorfield m=Sum m[i,1]*d/dx(i) 
+                p,q variables with m(p)=q invariant
+NOTE:
+EXAMPLE: example furtherInvar; shows an example
+{
+  ideal j;
+  int i,it;
+  int bou=-1;
+  if(size(#)>0)
+  {
+     bou=#[1];
+  }
+  int z;  
+  ideal karl;
+  ideal k1=1;
+  list k2;
+  // computation of local invariants
+  for (i=1;i<=nvars(basering);i++)
+  {
+    karl=karl+localInvar(m,var(i),p,q);
+  }
+  if(bou==0)
+  {
+     "                     ";
+     "the local invariants:";
+     "                     ";
+     karl;
+     pause;
+     "                     ";
+  }
+  // computation of further invariants
+  it=0;
+  while (size(k1)!=0)
+ {
+    // test if the new invariants are already in the ring generated 
+    // by the invariants we constructed already
+    it++;
+    karl=sortier(karl);
+    j=q;
+    for (i=1;i<=size(karl);i++)
+    {
+       j=j+ simplify(completeReduction(karl[i],j,q),1);
+    }
+    karl=j;
+    j[1]=0;
+    j=simplify(j,2);
+    k2=furtherInvar(m,j,karl,q);
+    k1=k2[1];
+    karl=k2[2];
+    k1=sortier(k1);
+    z=size(k1);    
+    for (i=1;i<=z;i++)
+    {
+      k1[i]= completeReduction(k1[i],karl,q);
+      if (k1[i]!=0)
+      {
+        karl=karl+simplify(k1[i],1);
+      }
+    }
+    if(bou==0)
+    {
+       "                                  ";
+       "the invariants after the iteration";
+       it;
+       "                                  ";
+       karl;
+       pause;
+       "                                  ";
+    }
+    if((bou>0) && (size(k1)>0))
+    {
+      if(deg(k1[size(k1)])>bou)
+      {
+         return(karl);
+      }
+    }
+  }
+  return(karl);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+
+  //Winkelmann: free action but Spec k[x(1),...,x(5)]---> Spec In-
+  //variantring is not surjective
+  
+  ring rw=0,(x(1..5)),dp;
+  matrix m[5][1];
+  m[3,1]=x(1);
+  m[4,1]=x(2);
+  m[5,1]=1+x(1)*x(4)+x(2)*x(3);
+  ideal in=invariantRing(m,x(3),x(1),0);
+  in;
+  
+  //Deveney/Finston: The ring of invariants is not finitely generated
+  
+  ring rf=0,(x(1..7)),dp;
+  matrix m[7][1];
+  m[4,1]=x(1)^3;
+  m[5,1]=x(2)^3;
+  m[6,1]=x(3)^3;
+  m[7,1]=(x(1)*x(2)*x(3))^2;
+  ideal in=invariantRing(m,x(4),x(1),6);
+  in;
+  
+  
+  //Deveney/Finston:Proper Ga-action which is not locally trivial
+  //r[x(1),...,x(5)] is not flat over the ring of invariants
+  
+  ring rd=0,(x(1..5)),dp;
+  matrix m[5][1];
+  m[3,1]=x(1);
+  m[4,1]=x(2);
+  m[5,1]=1+x(1)*x(4)^2;
+  ideal in=invariantRing(m,x(3),x(1));
+  in;
+  
+  actionIsProper(m);
+  
+  //computes the relations between the invariants
+  int z=size(in);
+  ideal null;
+  ring r1=0,(y(1..z)),dp;
+  setring rd;
+  map phi=r1,in;
+  setring r1;  
+  ideal ker=preimage(rd,phi,null); 
+  ker;
+  
+  //the discriminant
+  
+  ring r=0,(x(1..2),y(1..2),z,t),dp;
+  poly p=z+(1+x(1)*y(2)^2)*t+x(1)*y(1)*y(2)*t^2+(1/3)*x(1)*y(1)^2*t^3;
+  
+  matrix m[5][5];
+  m[1,1]=z;
+  m[1,2]=x(1)*y(2)^2+1;
+  m[1,3]=x(1)*y(1)*y(2);
+  m[1,4]=1/3*x(1)*y(1)^2;
+  m[1,5]=0;
+  m[2,1]=0;
+  m[2,2]=z;
+  m[2,3]=x(1)*y(2)^2+1;
+  m[2,4]=x(1)*y(1)*y(2);
+  m[2,5]=1/3*x(1)*y(1)^2;
+  m[3,1]=x(1)*y(2)^2+1;
+  m[3,2]=2*x(1)*y(1)*y(2);
+  m[3,3]=x(1)*y(1)^2;
+  m[3,4]=0;
+  m[3,5]=0;
+  m[4,1]=0;
+  m[4,2]=x(1)*y(2)^2+1;
+  m[4,3]=2*x(1)*y(1)*y(2);
+  m[4,4]=x(1)*y(1)^2;
+  m[4,5]=0;
+  m[5,1]=0;
+  m[5,2]=0;
+  m[5,3]=x(1)*y(2)^2+1;
+  m[5,4]=2*x(1)*y(1)*y(2);
+  m[5,5]=x(1)*y(1)^2;
+  
+  poly disc=9*det(m)/(x(1)^2*y(1)^4);
+  
+  LIB "invar.lib";
+  matrix n[6][1];
+  n[2,1]=x(1);
+  n[4,1]=y(1);
+  n[5,1]=1+x(1)*y(2)^2;
+  
+  der(n,disc);
+  
+  //x(1)^3*y(2)^6-6*x(1)^2*y(1)*y(2)^3*z+6*x(1)^2*y(2)^4+9*x(1)*y(1)^2*z^2-18*x(1)*y(1)*y(2)*z+9*x(1)*y(2)^2+4
+  
+  
+  //constructive approach to Weizenbcks theorem
+  
+  int n=5;
+  
+  ring w=0,(x(1..n)),wp(1..n);
+  
+  // definition of the vectorfield m=sum m[i]*d/dx(i)
+  matrix m[n][1];
+  int i;
+  for (i=1;i<=n-1;i=i+1)
+  {
+    m[i+1,1]=x(i);
+  }
+  ideal in=invariantRing(m,x(2),x(1),0);
+  in;
+  
+  
+  
+}
+///////////////////////////////////////////////////////////////////////////////
