@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.27 1998-05-19 09:02:35 obachman Exp $ */
+/* $Id: ideals.cc,v 1.28 1998-05-19 17:24:15 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -555,7 +555,7 @@ ideal  idMult (ideal h1,ideal  h2)
     ideal tmp = idCompactify(hh);
     idDelete(&hh);
     return tmp;
-    return hh;
+    //return hh;
   }
 }
 
@@ -2138,8 +2138,9 @@ ideal idPower(ideal given,int exp)
   idNextPotence(temp,result,0,IDELEMS(temp)-1,exp,exp,p1);
   pDelete(&p1);
   idDelete(&temp);
-  idSkipZeroes(result);
   result->nrows = 1;
+  idSkipZeroes(result);
+  idDelEquals(result);
   return result;
 }
 
