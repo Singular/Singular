@@ -1,11 +1,14 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.4 1997-11-18 16:39:06 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.5 2001-08-08 11:59:13 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include<factory.h>
+#ifndef NOSTREAMIO
+#include <iostream.h>
+#endif
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "helpstuff.h"
@@ -29,12 +32,12 @@ TIMING_DEFINE_PRINT(squarefree_time);
 TIMING_DEFINE_PRINT(gcd_time);
 
 
-static inline CFFactor 
-Powerup( const CFFactor & F , int exp=1){ 
-  return CFFactor(F.factor(), exp*F.exp()) ; 
+static inline CFFactor
+Powerup( const CFFactor & F , int exp=1){
+  return CFFactor(F.factor(), exp*F.exp()) ;
 }
 
-static CFFList 
+static CFFList
 Powerup( const CFFList & Inputlist , int exp=1 ){
   CFFList Outputlist;
 
@@ -48,11 +51,11 @@ Powerup( const CFFList & Inputlist , int exp=1 ){
 // f must be a polynomial which we can take the Pth root of. //
 // Domain is q=p^m , f a uni/multivariate polynomial         //
 ///////////////////////////////////////////////////////////////
-static CanonicalForm 
+static CanonicalForm
 PthRoot( const CanonicalForm & f ){
   CanonicalForm RES, R = f;
   int n= max(level(R),getNumVars(R)), p= getCharacteristic();
-  
+
   if (n==0){ // constant
     if (R.inExtension()) // not in prime field; f over |F(q=p^k)
       R = power(R,Powerup(p,getGFDegree() - 1)) ;
@@ -89,7 +92,7 @@ SqrFreeTest( const CanonicalForm & r, int opt){
     // 0 iff gcdtest(f,g) == 1 or a constant ( for real Polynomials )
     g = mygcd(f,g);
     if ( g.isOne() || (-g).isOne() ) return 1;
-    else 
+    else
       if ( getNumVars(g) == 0 ) return 1;// <- totaldegree!!!
       else return 0 ;
   }
@@ -98,24 +101,24 @@ SqrFreeTest( const CanonicalForm & r, int opt){
       g = swapvar(f,k,n); g = content(g);
       // g = 1 || -1 : sqr-free, g poly : not sqr-free, g number : opt helps
       if ( ! (g.isOne() || (-g).isOne() || getNumVars(g)==0 ) ) {
-	if ( opt==0 ) return 0;
-	else {
-	  if ( SqrFreeTest(g,1) == 0 ) return 0;
-	  g = swapvar(g,k,n);
-	  f /=g ;
-	}
+        if ( opt==0 ) return 0;
+        else {
+          if ( SqrFreeTest(g,1) == 0 ) return 0;
+          g = swapvar(g,k,n);
+          f /=g ;
+        }
       }
     }
     // Now f is primitive
     n = level(f); // maybe less indeterminants
     //    if ( totaldegree(f) <= 1 ) return 1;
-    
+
     // Let`s look if it is a Pth root
     if ( getCharacteristic() > 0 )
       for (int k=1; k<=n; k++ ) {
-	g=swapvar(f,k,n); g=g.deriv();
-	if ( ! g.isZero() ) break ;
-	else if ( k==n) return 0 ; // really is Pth root
+        g=swapvar(f,k,n); g=g.deriv();
+        if ( ! g.isZero() ) break ;
+        else if ( k==n) return 0 ; // really is Pth root
       }
     g = f.deriv() ;
     // Next: it would be best to have a *multivariate* gcd-test which returns
@@ -127,7 +130,7 @@ SqrFreeTest( const CanonicalForm & r, int opt){
 #ifdef HAVE_SINGULAR
   WerrorS("libfac: ERROR: SqrFreeTest: we should never fall trough here!");
 #else
-  cerr << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n" 
+  cerr << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n"
        << rcsid << errmsg << endl;
 #endif
   return 0;
@@ -140,7 +143,7 @@ SqrFreeTest( const CanonicalForm & r, int opt){
 // returns a list of polys each of sqrfree, but gcd(f_i,f_j) //
 // needs not to be 1 !!!!!                                   //
 ///////////////////////////////////////////////////////////////
-static CFFList 
+static CFFList
 SqrFreed( const CanonicalForm & r ){
   CanonicalForm h, g, f = r;
   CFFList Outputlist;
@@ -153,14 +156,14 @@ SqrFreed( const CanonicalForm & r ){
     return Outputlist ;
   }
 
-// We look if we do have a content; if so, SqrFreed the content 
+// We look if we do have a content; if so, SqrFreed the content
 // and continue computations with pp(f)
   for (int k=1; k<=n; k++) {
     g = swapvar(f,k,n); g = content(g);
     if ( ! (g.isOne() || (-g).isOne() || degree(g)==0 )) {
       g = swapvar(g,k,n);
       DEBOUTLN(cout, "We have a content: ", g);
-      Outputlist = myUnion(InternalSqrFree(g),Outputlist); // should we add a 
+      Outputlist = myUnion(InternalSqrFree(g),Outputlist); // should we add a
                                                 // SqrFreeTest(g) first ?
       DEBOUTLN(cout, "Outputlist is now: ", Outputlist);
       f /=g;
@@ -176,7 +179,7 @@ SqrFreed( const CanonicalForm & r ){
       Outputlist= myappend(Outputlist,CFFactor(g,1)) ;
       f /= g;
     }
-    Outputlist = Union(sqrFree(f),Outputlist) ; 
+    Outputlist = Union(sqrFree(f),Outputlist) ;
     DEBOUTLN(cout, "Outputlist after univ. sqrFree(f) = ", Outputlist);
     DEBDECLEVEL(cout, "SqrFreed");
     return Outputlist ;
@@ -196,24 +199,24 @@ SqrFreed( const CanonicalForm & r ){
     for (int k=1; k<=n; k++) {
       g=swapvar(f,k,n) ; g = g.deriv();
       if ( ! g.isZero() ){ // can`t be Pth root
-	CFFList Outputlist2= SqrFreed(swapvar(f,k,n)); 
-	for (CFFListIterator inter=Outputlist2; inter.hasItem(); inter++){
-	  Outputlist= myappend(Outputlist, CFFactor(swapvar(inter.getItem().factor(),k,n), inter.getItem().exp()));
-	}
-	return Outputlist;
+        CFFList Outputlist2= SqrFreed(swapvar(f,k,n));
+        for (CFFListIterator inter=Outputlist2; inter.hasItem(); inter++){
+          Outputlist= myappend(Outputlist, CFFactor(swapvar(inter.getItem().factor(),k,n), inter.getItem().exp()));
+        }
+        return Outputlist;
       }
-      else 
-	if ( k==n ) { // really is Pth power
+      else
+        if ( k==n ) { // really is Pth power
           DEBOUTLN(cout, "f is a p'th root: ", f);
-	  CFMap m;
+          CFMap m;
           g = compress(f,m);
-	  f = m(PthRoot(g));
+          f = m(PthRoot(g));
           DEBOUTLN(cout, "  that is       : ", f);
-	  // now : Outputlist union ( SqrFreed(f) )^getCharacteristic()
-	  Outputlist=myUnion(Powerup(InternalSqrFree(f),getCharacteristic()),Outputlist);
-	  DEBDECLEVEL(cout, "SqrFreed");
-	  return Outputlist ;
-	}
+          // now : Outputlist union ( SqrFreed(f) )^getCharacteristic()
+          Outputlist=myUnion(Powerup(InternalSqrFree(f),getCharacteristic()),Outputlist);
+          DEBDECLEVEL(cout, "SqrFreed");
+          return Outputlist ;
+        }
     }
   }
   g = f.deriv();
@@ -253,7 +256,7 @@ SqrFreed( const CanonicalForm & r ){
 #ifdef HAVE_SINGULAR
   WerrorS("libfac: ERROR: SqrFreed: we should never fall trough here!");
 #else
-  cerr << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n" 
+  cerr << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n"
        << rcsid << errmsg << endl;
 #endif
   DEBDECLEVEL(cout, "SqrFreed");
@@ -264,7 +267,7 @@ SqrFreed( const CanonicalForm & r ){
 // The user front-end for the SqrFreed routine.              //
 // Input can have a constant as content                      //
 ///////////////////////////////////////////////////////////////
-CFFList 
+CFFList
 InternalSqrFree( const CanonicalForm & r ){
   CanonicalForm g=icontent(r), f = r;
   CFFList Outputlist, Outputlist2;
@@ -284,7 +287,7 @@ InternalSqrFree( const CanonicalForm & r ){
       if ( ! g.isOne() ) Outputlist= myappend(Outputlist,CFFactor(g,1)) ;
       f /= g;
       if ( getNumVars(f) != 0 ) // a real polynomial
-	Outputlist=myUnion(SqrFreed(f),Outputlist) ;
+        Outputlist=myUnion(SqrFreed(f),Outputlist) ;
   }
   DEBOUTLN(cout,"Outputlist = ", Outputlist);
   for ( CFFListIterator i=Outputlist; i.hasItem(); i++ )
@@ -330,6 +333,10 @@ SqrFree(const CanonicalForm & r ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/11/18 16:39:06  Singular
+* hannes: moved WerrorS from C++ to C
+     (Factor.cc MVMultiHensel.cc SqrFree.cc Truefactor.cc)
+
 Revision 1.3  1997/09/12 07:19:50  Singular
 * hannes/michael: libfac-0.3.0
 

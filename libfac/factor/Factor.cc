@@ -1,10 +1,13 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.8 2001-08-06 08:32:54 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.9 2001-08-08 11:59:12 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
+#ifndef NOSTREAMIO
+#include <iostream.h>
+#endif
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "SqrFree.h"
@@ -323,8 +326,10 @@ generate_mipo( int degree_of_Extension , const Variable & Extension ){
 #ifdef HAVE_SINGULAR
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else
+#ifndef NOSTREAMIO
     cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
          << endl;
+#endif
 #endif
     FFRandom gen;
     }
@@ -533,7 +538,7 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
       CanonicalForm mipo=getMipo(Extension,X);
       CFList as(mipo);
       Outputlist = newfactoras( F, as, 1);
-     #endif 
+     #endif
       TIMING_END(evaluate_time);
       return Outputlist;
     }
@@ -643,7 +648,7 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
       CanonicalForm mipo=getMipo(Extension,X);
       CFList as(mipo);
       UnivariateFactorlist = newfactoras( ffuni, as, 1);
-     #endif 
+     #endif
     }
   }
   else{
@@ -822,6 +827,9 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2001/08/06 08:32:54  Singular
+* hannes: code cleanup
+
 Revision 1.7  2001/06/21 14:57:05  Singular
 *hannes/GP: Factorize, newfactoras, ...
 

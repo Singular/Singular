@@ -1,10 +1,13 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.4 1997-11-18 16:39:05 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.5 2001-08-08 11:59:12 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
+#ifndef NOSTREAMIO
+#include <iostream.h>
+#endif
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "helpstuff.h"
@@ -47,7 +50,7 @@ typedef bool Boolean;
 class RememberForm {
 public:
   inline RememberForm operator=( CanonicalForm & value ){
-    this->calculated = true; 
+    this->calculated = true;
     this->poly = value;
     return *this;
   }
@@ -55,8 +58,8 @@ public:
   CanonicalForm poly;
 };
 
-// Array to remember already calculated values; used for the diophantine 
-// equation s*f + t*g = x^i 
+// Array to remember already calculated values; used for the diophantine
+// equation s*f + t*g = x^i
 class RememberArray {
 public:
 // operations performed on arrays
@@ -86,7 +89,7 @@ protected:
 //            s*F1 + t*F2 = (mainvar)^i                      //
 // Returns s and t.                                          //
 ///////////////////////////////////////////////////////////////
-static DiophantForm 
+static DiophantForm
 diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int i , RememberArray & A, RememberArray & B ) {
   DiophantForm Retvalue;
   CanonicalForm s,t,q,r;
@@ -95,10 +98,10 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
   DEBOUT(cout, "diophant: called with: ", F1);
   DEBOUT(cout, "  ", F2); DEBOUTLN(cout, "  ", i);
 
-  // Did we solve the diophantine equation yet? 
+  // Did we solve the diophantine equation yet?
   // If so, return the calculated values
   if ( A[i].calculated && B[i].calculated ){
-    Retvalue.One=A[i].poly; 
+    Retvalue.One=A[i].poly;
     Retvalue.Two=B[i].poly;
     return Retvalue;
   }
@@ -108,8 +111,8 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
 #ifdef HAVE_SINGULAR
     WerrorS("libfac: diophant ERROR: degree too large!  ");
 #else
-    cerr << "libfac: diophant ERROR: degree too large!  " 
-	 << (degree(F1,levelU) + degree(F2,levelU) ) <<endl;
+    cerr << "libfac: diophant ERROR: degree too large!  "
+         << (degree(F1,levelU) + degree(F2,levelU) ) <<endl;
 #endif
     Retvalue.One=F1;Retvalue.Two=F2;
     return Retvalue;
@@ -117,13 +120,18 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
 
   if ( i == 0 ) { // call the extended gcd
     r=extgcd(F1,F2,s,t);
-    // check if gcd(F1,F2) <> 1 , i.e. F1 and F2 are not relatively prime 
-    if ( ! r.isOne() ){ 
+    // check if gcd(F1,F2) <> 1 , i.e. F1 and F2 are not relatively prime
+    if ( ! r.isOne() ){
 #ifdef HAVE_SINGULAR
       WerrorS("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
 #else
-      cerr << "libfac: diophant ERROR: " << F1 << "  and  " << F2 
-	   << "  are not relatively prime!" << endl;
+#ifndef NOSTREAMIO
+      cerr << "libfac: diophant ERROR: " << F1 << "  and  " << F2
+           << "  are not relatively prime!" << endl;
+#else
+     cerr << "libfac: diophant ERROR: F1 and F2 are not relatively prime!"
+          << endl;
+#endif
 #endif
       Retvalue.One=F1;Retvalue.Two=F2;
       return Retvalue;
@@ -131,7 +139,7 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     Retvalue.One = s; Retvalue.Two = t;
   }
   else { // recursively call diophant
-    Retvalue=diophant(levelU,F1,F2,i-1,A,B); 
+    Retvalue=diophant(levelU,F1,F2,i-1,A,B);
     Retvalue.One *= x; // createVar(levelU,1);
     Retvalue.Two *= x; // createVar(levelU,1);
     // Check degrees.
@@ -143,14 +151,14 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     }
     else {
       if ( degree(Retvalue.Two,levelU) >= degree(F1,levelU) ){
-	// Make degree(Retvalue.Two,mainvar) <= degree(F1,mainvar)
-	divrem(Retvalue.Two,F1,q,r);
-	Retvalue.One += F2*q; Retvalue.Two = r;
+        // Make degree(Retvalue.Two,mainvar) <= degree(F1,mainvar)
+        divrem(Retvalue.Two,F1,q,r);
+        Retvalue.One += F2*q; Retvalue.Two = r;
       }
     }
 
   }
-  A[i].poly = Retvalue.One ; 
+  A[i].poly = Retvalue.One ;
   B[i].poly = Retvalue.Two ;
   A[i].calculated = true ; B[i].calculated = true ;
 
@@ -164,10 +172,10 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
 // A more efficient way to solve s*F1 + t*F2 = W             //
 // as in Wang and Rothschild [Wang&Roth75].                  //
 ///////////////////////////////////////////////////////////////
-static CanonicalForm 
-make_delta( int levelU, const CanonicalForm & W, 
-	    const CanonicalForm & F1, const CanonicalForm & F2, 
-	    RememberArray & A, RememberArray & B){
+static CanonicalForm
+make_delta( int levelU, const CanonicalForm & W,
+            const CanonicalForm & F1, const CanonicalForm & F2,
+            RememberArray & A, RememberArray & B){
   CanonicalForm Retvalue;
   DiophantForm intermediate;
 
@@ -188,10 +196,10 @@ make_delta( int levelU, const CanonicalForm & W,
   return Retvalue;
 }
 
-static CanonicalForm 
-make_square( int levelU, const CanonicalForm & W, 
-	     const CanonicalForm & F1, const CanonicalForm & F2, 
-	     RememberArray & A, RememberArray & B){
+static CanonicalForm
+make_square( int levelU, const CanonicalForm & W,
+             const CanonicalForm & F1, const CanonicalForm & F2,
+             RememberArray & A, RememberArray & B){
   CanonicalForm Retvalue;
   DiophantForm intermediate;
 
@@ -221,9 +229,9 @@ make_square( int levelU, const CanonicalForm & W,
 // equation. This is suggested by Joel Moses [Moses71] .     //
 // Return the fully lifted factors.                          //
 ///////////////////////////////////////////////////////////////
-static DiophantForm 
-mvhensel( const CanonicalForm & U , const CanonicalForm & F , 
-	  const CanonicalForm & G , const SFormList & Substitutionlist){
+static DiophantForm
+mvhensel( const CanonicalForm & U , const CanonicalForm & F ,
+          const CanonicalForm & G , const SFormList & Substitutionlist){
   CanonicalForm V,Fk=F,Gk=G,Rk,W,D,S;
   int  levelU=level(U), degU=subvardegree(U,levelU); // degree(U,{x_1,..,x_(level(U)-1)})
   DiophantForm Retvalue;
@@ -283,9 +291,9 @@ mvhensel( const CanonicalForm & U , const CanonicalForm & F ,
 ///////////////////////////////////////////////////////////////
 // Recursive Version of MultiHensel.                         //
 ///////////////////////////////////////////////////////////////
-CFFList 
-multihensel( const CanonicalForm & mF, const CFFList & Factorlist, 
-	     const SFormList & Substitutionlist){
+CFFList
+multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
+             const SFormList & Substitutionlist){
   CFFList Returnlist,factorlist=Factorlist;
   DiophantForm intermediat;
   CanonicalForm Pl,Pr;
@@ -297,11 +305,11 @@ multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
   if ( n == 1 ) {
     Returnlist.append(CFFactor(mF,1));
   }
-  else { 
+  else {
     if ( n == 2 ){
-      intermediat= mvhensel(mF, factorlist.getFirst().factor(), 
-			    Factorlist.getLast().factor(), 
-			    Substitutionlist);
+      intermediat= mvhensel(mF, factorlist.getFirst().factor(),
+                            Factorlist.getLast().factor(),
+                            Substitutionlist);
       Returnlist.append(CFFactor(intermediat.One,1));
       Returnlist.append(CFFactor(intermediat.Two,1));
     }
@@ -312,10 +320,10 @@ multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
       Pl=factorlist.getFirst().factor(); factorlist.removeFirst();
       Pr=Pl.genOne();
       for ( ListIterator<CFFactor> i=factorlist; i.hasItem(); i++ )
-	Pr *=  i.getItem().factor() ; 
+        Pr *=  i.getItem().factor() ;
 #ifdef HENSELDEBUG2
-      cout << "multihensel: Pl,Pr, factorlist: " << Pl << "  " << Pr 
-	   << "  " << factorlist << endl;
+      cout << "multihensel: Pl,Pr, factorlist: " << Pl << "  " << Pr
+           << "  " << factorlist << endl;
 #endif
       intermediat= mvhensel(mF,Pl,Pr,Substitutionlist);
       Returnlist.append(CFFactor(intermediat.One,1));
@@ -333,9 +341,9 @@ multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
 // <x_1+a_1, .. , x_r+a_r>, where r=level(mF)-1 .            //
 // Returns the list of fully lifted factors.                 //
 ///////////////////////////////////////////////////////////////
-CFFList 
-MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist, 
-	     const SFormList & Substitutionlist){
+CFFList
+MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
+             const SFormList & Substitutionlist){
   CFFList Returnlist,Retlistinter,factorlist=Factorlist,Ll;
   CFFListIterator i;
   DiophantForm intermediat;
@@ -350,18 +358,18 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
   if ( n == 1 ) {
     Returnlist.append(CFFactor(mF,1));
   }
-  else { 
+  else {
     if ( n == 2 ){
-      intermediat= mvhensel(mF, factorlist.getFirst().factor(), 
-			    Factorlist.getLast().factor(), 
-			    Substitutionlist);
+      intermediat= mvhensel(mF, factorlist.getFirst().factor(),
+                            Factorlist.getLast().factor(),
+                            Substitutionlist);
       Returnlist.append(CFFactor(intermediat.One,1));
       Returnlist.append(CFFactor(intermediat.Two,1));
     }
     else { // more then two factors
       for ( k=1 ; k<=h; k++){
-	Ll.append(factorlist.getFirst());
-	factorlist.removeFirst();
+        Ll.append(factorlist.getFirst());
+        factorlist.removeFirst();
       }
 
       DEBOUTLN(cout, "MultiHensel: Ll= ", Ll);
@@ -369,19 +377,19 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
       Pl = 1; Pr = 1;
       for ( i = Ll; i.hasItem(); i++)
-	Pl *= i.getItem().factor();
+        Pl *= i.getItem().factor();
       DEBOUTLN(cout, "MultiHensel: Pl= ", Pl);
       for ( i = factorlist; i.hasItem(); i++)
-	Pr *= i.getItem().factor();
+        Pr *= i.getItem().factor();
       DEBOUTLN(cout, "MultiHensel: Pr= ", Pr);
       intermediat = mvhensel(mF,Pl,Pr,Substitutionlist);
       // divison test for intermediat.One and intermediat.Two ?
       CanonicalForm a,b;
       // we add a division test now for intermediat.One and intermediat.Two
       if ( mydivremt (mF,intermediat.One,a,b) && b == mF.genZero() )
-	Retlistinter.append(CFFactor(intermediat.One,1) );
+        Retlistinter.append(CFFactor(intermediat.One,1) );
       if ( mydivremt (mF,intermediat.Two,a,b) && b == mF.genZero() )
-	Retlistinter.append(CFFactor(intermediat.Two,1)  );
+        Retlistinter.append(CFFactor(intermediat.Two,1)  );
 
       Ll = MultiHensel(intermediat.One, Ll, Substitutionlist);
       Returnlist = MultiHensel(intermediat.Two, factorlist, Substitutionlist);
@@ -396,6 +404,10 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/11/18 16:39:05  Singular
+* hannes: moved WerrorS from C++ to C
+     (Factor.cc MVMultiHensel.cc SqrFree.cc Truefactor.cc)
+
 Revision 1.3  1997/09/12 07:19:48  Singular
 * hannes/michael: libfac-0.3.0
 

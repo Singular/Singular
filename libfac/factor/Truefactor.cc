@@ -1,10 +1,13 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.7 2001-08-06 08:32:54 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.8 2001-08-08 11:59:13 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
+#ifndef NOSTREAMIO
+#include <iostream.h>
+#endif
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "helpstuff.h"
@@ -409,6 +412,9 @@ TakeNorms(const CFFList & PiList){
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2001/08/06 08:32:54  Singular
+* hannes: code cleanup
+
 Revision 1.6  2001/06/27 13:58:06  Singular
 *hannes/GP: debug newfactoras, char_series, ...
 

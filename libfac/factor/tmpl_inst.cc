@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: tmpl_inst.cc,v 1.4 1998-02-27 10:34:02 schmidt Exp $
+// $Id: tmpl_inst.cc,v 1.5 2001-08-08 11:59:13 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 
@@ -24,12 +24,14 @@ template class ListIterator<MapPair>;
 template class Matrix<CanonicalForm>;
 template class SubMatrix<CanonicalForm>;
 
+#ifndef NOSTREAMIO
 template ostream & operator << ( ostream &, const List<CanonicalForm> & );
 template ostream & operator << ( ostream &, const List<CFFactor> & );
 template ostream & operator << ( ostream &, const List<MapPair> & );
 template ostream & operator << ( ostream &, const Array<CanonicalForm> & );
 template ostream & operator << ( ostream &, const Factor<CanonicalForm> & );
 //template ostream & operator << ( ostream &, const Matrix<CanonicalForm> & );
+#endif
 
 template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
 
@@ -61,8 +63,10 @@ template class ListIterator<SForm>;
 template List<CanonicalForm> Union ( const List<CanonicalForm>&, const List<CanonicalForm>& );
 template List<CanonicalForm> Difference ( const List<CanonicalForm>&, const List<CanonicalForm>& );
 
+#ifndef NOSTREAMIO
 template ostream & operator << ( ostream &, const List<int> & );
 template ostream & operator << ( ostream &, const List<IntList> & );
+#endif
 
 // for charsets:
 template class List<CFList>;
@@ -73,10 +77,12 @@ template class ListIterator<Variable> ;
 template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
 template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
 
+#ifndef NOSTREAMIO
 template ostream & operator << ( ostream &, const List<CFList> & );
 template ostream & operator << ( ostream &, const List<Variable> & );
 template ostream & operator << ( ostream &, const List<int> & );
 template ostream & operator << ( ostream &, const Array<int> & );
+#endif
 
 template class Array<int>;
 template class Array<Variable>;
@@ -89,6 +95,10 @@ template class ListIterator<CFFList>;
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1998/02/27 10:34:02  schmidt
+        * factor/tmpl_inst.cc: template names adapted (`*.cc' ->
+          `ftmpl_*.cc')
+
 Revision 1.3  1997/09/12 07:20:00  Singular
 * hannes/michael: libfac-0.3.0
 
