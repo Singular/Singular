@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.42 2004-08-13 12:54:32 Singular Exp $";
+version="$Id: hnoether.lib,v 1.43 2005-01-13 09:42:03 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Development
@@ -2264,8 +2264,8 @@ if (size(#) == 0) {
  }
 if (size(#) != 0) {
    "// basering is now 'displayring' containing ideal 'HNE'";
-   keepring(displayring);
    export(HNE);
+   keepring(displayring);
    return(HNE);
  }
 }
@@ -2933,6 +2933,7 @@ SEE ALSO: hnexpansion, develop, extdevelop, param, displayHNE
      dbprint(printlevel-voice+2,"// note: basering has changed to HNEring");
    }
  }
+ export hne;
  keepring basering;
  return(hne);
 }
@@ -3051,6 +3052,7 @@ SEE ALSO: hnexpansion, develop, extdevelop, param, displayHNE
  }
  // -----
  
+ export Ergebnis;
  keepring basering;
  return(Ergebnis);
 }
@@ -3392,7 +3394,7 @@ static proc pre_HN (poly f, int essential)
  //------------------- Loesche globale, nicht mehr benoetigte Objekte: --------
  if (EXTHNEnumber>0) {
   if(system("with","Namespaces")) { kill Top::HNEring; }
-  kill HNEring;
+  if (defined(HNEring)) { kill HNEring; }
   def HNEring=EXTHNEring(EXTHNEnumber);
   setring HNEring;
   export HNEring;
@@ -3400,6 +3402,7 @@ static proc pre_HN (poly f, int essential)
  }
  kill HNE_noparam;
  kill EXTHNEnumber;
+ export Ergebnis;
  keepring basering;
 
  return(Ergebnis);
@@ -3449,6 +3452,7 @@ SEE ALSO: hnexpansion, develop, extdevelop, param
  }
  dbprint(printlevel-voice+2,
     "// basering has changed to HNEring");
+ export Ergebnis;
  keepring basering;
  return(Ergebnis);
 }
@@ -3941,13 +3945,15 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
    }                        // end(for j) (Behandlung der einzelnen delta_i)
 
   }
+  export HNEs;
   keepring basering;
-  if (defined(transfproc)) { return(list(HNEs,transfproc)); }
+  if (defined(transfproc)) { export transfproc;return(list(HNEs,transfproc)); }
   else                     { return(list(HNEs,poly(-1))); }
  // -1 als 2. Rueckgabewert zeigt an, dass kein Ringwechsel stattgefunden hat -
  }
  else {
   HNEs[1]=list(hqs)+azeilen+list(f); // f ist das transform. Poly oder Null
+  export HNEs;
   keepring basering;
   return(list(HNEs,poly(-1)));
  //-- in dieser proc trat keine Verzweigung auf, also auch kein Ringwechsel ---

@@ -1,6 +1,6 @@
 // last change:           17.01.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: paramet.lib,v 1.13 2004-08-05 15:59:22 Singular Exp $";
+version="$Id: paramet.lib,v 1.14 2005-01-13 09:42:04 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: paramet.lib   Parametrization of Varieties
@@ -201,7 +201,7 @@ EXAMPLE:  example parametrizesing; shows an example"
     hn = reddevelop(f);
     for (int ii=1; ii<=size(hn); ii++)
     {
-      para[ii]=@param(hn[ii]);
+      para[ii]=param(hn[ii]);
     }
   }
   else
