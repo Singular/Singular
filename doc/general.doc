@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.117 1999-06-21 17:38:19 Singular Exp $
+@comment $Id: general.doc,v 1.118 1999-06-21 19:45:32 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -27,7 +27,9 @@
 * The SINGULAR language::
 * Input and output::
 * Procedures::
+@ifset namespaces
 * Namespaces::
+@end ifset
 * Libraries::
 * Debugging tools::
 @end menu
@@ -281,7 +283,7 @@ this library is loaded on start-up.  @xref{Startup sequence}.
 Do not display warning messages.
 
 @item @code{--no-out}
-Suppress display of all output. 
+Suppress display of all output.
 
 @item @code{-t}, @code{--no-tty}
 Do not redefine the terminal characteristics.  This option should be
@@ -1107,7 +1109,13 @@ semantics.
 
 In the following, the basic language concepts such as commands,
 expressions, names, objects, etc., are discussed.  @xref{Procedures},
-, @ref{Libraries} and @ref{Namespaces}, for the concepts of procedures
+@ifset namespaces
+@ref{Libraries}, and @ref{Namespaces},
+@end ifset
+@ifclear namespaces
+and @ref{Libraries},
+@end ifclear
+for the concepts of procedures
 and libraries.
 
 In many aspects, the @sc{Singular} language is similar to the C
@@ -1340,8 +1348,10 @@ value of expression last displayed
 breakpoint in procedures
 @item @code{#}
 list of parameters in procedures without explicit parameter list
+@ifset namespaces
 @item @code{::}
 delimiter between package name and identifier
+@end ifset
 @item @code{$}
 terminates @sc{Singular}
 @end table
@@ -1428,7 +1438,7 @@ This feature is referred to as name substitution.
 @ifset namespaces
 Names are grouped into namespaces (= packages) @xref{Namespaces}.
 Defined variables cannot interfere with names in other
-packages. 
+packages.
 
 @example
 @c example
@@ -1675,7 +1685,13 @@ Links are the communication channels of @sc{Singular}, i.e., something
 overview of the usage of links and of the different link types is given.
 
 Even though library loading may be considered an I/O operation, too,
-this section does not treat loading of libraries (@pxref{load}).
+this section does not treat loading of libraries
+@ifset namespaces
+(@pxref{load}).
+@end ifset
+@ifclear namespaces
+(@pxref{LIB}).
+@end ifclear
 
 @unnumberedsubsec Monitoring
 A special form of I/O is monitoring.  When monitoring is enabled,
@@ -1840,14 +1856,24 @@ data bases).
 
 @c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
+@ifset namespaces
 @node Procedures, Namespaces, Input and output, General concepts
+@end ifset
+@ifclear namespaces
+@node Procedures, Libraries, Input and output, General concepts
+@end ifclear
 @section Procedures
 @cindex Procedures
 
 Procedures contain sequences of @sc{Singular}.  They are used to extend
 the set of commands with user defined commands.  Procedures are defined
 by either typing them in on the command line or by loading them from a
+@ifset namespaces
 so-called library file with the @ref{load} command.  Procedures are
+@end ifset
+@ifclear namespaces
+so-called library file with the @ref{LIB} command.  Procedures are
+@end ifclear
 invoked like normal built-in commands, i.e., by typing their name
 followed by the list of arguments in parentheses. The invocation then
 executes the sequence of commands stored in the specified procedure. All
@@ -1895,7 +1921,12 @@ which is executed by @code{example proc_name;}.
 @* The help_text, the parameter_list, and the example section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined
+@ifset namesapces
 interactively, i.e., if it was not loaded from a file by a @ref{load} command.
+@end ifset
+@ifclear namesapces
+interactively, i.e., if it was not loaded from a file by a @ref{LIB} command.
+@end ifclear
 @* Specifying @code{static} in front of the proc-definition (in a library file)
 makes this procedure local to the library, i.e., accessible only for the other
 procedures in the same library, but not for the users. So there is no
@@ -1978,7 +2009,9 @@ with @code{keepring} (see @ref{keepring}). All variables living in that
 ring are moved together with that ring.
 
 To keep local variables after leaving the procedure, they have to be
-exported (i.e. made known) to some higher level by @code{exportto}
+exported (i.e. made known) to some higher level by
+@ifset namespaces
+@code{exportto}
 (see @ref{exportto}). There are three possibilities to do so:
 @table @bullet
 @item accessible in the calling procedure
@@ -2005,6 +2038,34 @@ xxx();
 listvar(all);
 @c example
 @end example
+@end ifset
+@ifclear namespaces
+@code{export}
+(see @ref{export}). There are three possibilities to do so:
+@table @bullet
+@item accessible in the calling procedure
+i.e. down by one nesting level.
+@item accessible everywhere
+@end table
+
+In the last case names are not deleted automatically.
+Ring dependent variables  are stored
+together with the ring and deleted
+when the object they live in is deleted.
+
+@example
+@c example
+proc xxx
+{
+  int k=4;        //defines a local variable k
+  int result=k+2;
+  export(result);  //defines the global variable "result".
+}
+xxx();
+listvar(all);
+@c example
+@end example
+@end ifclear
 Note that the variable @code{result} became a global variable after the
 execution of @code{xxx}.
 
@@ -2086,6 +2147,7 @@ See
 @c ref
 
 @c ----------------------------------------------------------------------
+@ifset namespaces
 @c ----------------------------------------------------------------------
 @node Namespaces, Libraries, Procedures, General concepts
 @section Namespaces
@@ -2125,16 +2187,29 @@ For a @sc{Singular} binary supporting namespaces, the command
 @c example
 @end example
 
+@end ifset
 @c ----------------------------------------------------------------------
 @c ----------------------------------------------------------------------
+@ifset namespaces
 @node Libraries, Debugging tools, Namespaces, General concepts
+@end ifset
+@ifclear namespaces
+@node Libraries, Debugging tools, Procedures, General concepts
+@end ifclear
 @section Libraries
 @cindex Libraries
 
 A library @ref{Singular library} / dynamic module @ref{dynamic module}
 is a collection of @sc{Singular} resp. C /C++
-procedures in a file. @*@sc{Singular} reads a library with the command
-@code{load}, general information about the library is displayed by the command
+procedures in a file.
+@*@sc{Singular} reads a library with the command
+@ifset namespaces
+@code{load},
+@end ifset
+@ifclear namespaces
+@code{LIB},
+@end ifclear
+general information about the library is displayed by the command
 @code{help lib_name}. After loading the library, its procedures can be used
 like the built-in @sc{Singular} functions. To have the full functionality
 of a built-in function (like checking of the type of parameters, automatic
@@ -2151,7 +2226,12 @@ comply with the syntax rules described below.
 @node Loading of a library, Singular library, Libraries, Libraries
 @cindex Loading of a library
 
+@ifset namespaces
 Libraries can be loaded with the @code{load} command:
+@end ifset
+@ifclear namespaces
+Libraries can be loaded with the @code{LIB} command:
+@end ifclear
 
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file reference.doc,
@@ -2161,7 +2241,12 @@ Libraries can be loaded with the @code{load} command:
 @c ------------------------------------------------------------
 @table @code
 @item @strong{Syntax:}
+@ifset namespaces
 @code{load(} string_expression [@code{,"with"}]@code{);}
+@end ifset
+@ifclear namespaces
+@code{LIB} string_expression @code{);}
+@end ifclear
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -2172,13 +2257,32 @@ the environment variable @code{SINGULARPATH}, some default directories
 relative to the location of the @sc{Singular} executable program, and
 finally some default absolute directories. You can view the search path
 which @sc{Singular} uses to locate its libraries, by starting up
-@sc{Singular} with the option @code{-v}, or by issuing the command
-@code{system("with");"}.
+@sc{Singular} with the option @code{-v}
+@ifset namespaces
+, or by issuing the command @code{system("with");"}
+@end ifset
+.
 
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
 @end table
 
+@ifclear namespaces
+All loaded libraries are displayed by the @code{LIB;}
+command:
+@example
+@c example
+  option(loadLib);   // show loading of libraries;
+                     // standard.lib is loaded
+  LIB;
+                     // the names of the procedures of inout.lib
+  LIB "inout.lib"; // are now known to Singular
+  LIB;
+@c example
+@end example
+@end ifclear
+
+@ifset namespaces
 All loaded libraries are displayed by the @code{listvar(package);}
 command:
 @example
@@ -2191,15 +2295,14 @@ command:
   listvar(package);
 @c example
 @end example
-
 Each time a library @ref{Singular library} / dynamic module @ref{dynamic
 module} is loaded, the corresponding namespace is created, if it does
-not already exist. 
+not already exist.
 
 The name of this namespace corresponding to a Singular library is
 derived from the name of the library file. The first letter is
 capitalized and everything to right of the left-most dot is
-dropped. 
+dropped.
 For a dynamic module the packagename is hard-coded in the binary file.
 
 @sc{Singular} also supports autoloading of packages.
@@ -2217,6 +2320,7 @@ For autoloading the base of the filename is generated by converting the
 packagename to lowercase letters. The search is done in the standard
 @sc{Singular} search path, first looking for a file of this name, and then
 appending to the base @code{.lib}, @code{.so}, @code{.sl} (in this order).
+@end ifset
 
 @c ref
 See
@@ -2421,14 +2525,14 @@ example
 @subsection dynamic module
 @cindex dynamic module
 
-Dynamic modules are similar to Libraries but they are not written 
+Dynamic modules are similar to Libraries but they are not written
 in @sc{Singular} but in C++ and compiled into a shared library.
 
 Within a dynamic module it is possible to access nearly all
 @sc{Singular} internal functions and data structures.
 
 Dynamic module are not supported on all platforms and in versions of
-@sc{Singular} prior to 1.3. 
+@sc{Singular} prior to 1.3.
 For a @sc{Singular} binary supporting dynamic modules, the command
 @code{system("with","DynamicLoading");} should return 1.
 
@@ -2536,7 +2640,12 @@ See @ref{dbprint}; @ref{voice}.
 distribution (at the place where the @sc{Singular} executable program
 resides), which cannot be called inside of @sc{Singular}. It is a
 debugging tool for libraries which performs exactly the same checks as
+@ifset namespaces
 the @code{load} command in @sc{Singular}, but generates more output during
+@end ifset
+@ifclear namespaces
+the @code{LIB} command in @sc{Singular}, but generates more output during
+@end ifclear
 parsing.  @code{libparse} is useful if an error
 occurs while loading the library, but the whole block around the line
 specified seems to be correct. In these situations the real error might

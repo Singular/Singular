@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.111 1999-05-29 11:57:03 Singular Exp $
+@comment $Id: reference.doc,v 1.112 1999-06-21 19:45:34 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2530,7 +2530,7 @@ See
 @item @strong{Type:}
 the same as the input type
 @item @strong{Purpose:}
-returns the leading monomial of a polynomial or a vector as a polynomial 
+returns the leading monomial of a polynomial or a vector as a polynomial
 or vector whose coefficient is one.
 @item @strong{Example:}
 @example
@@ -2584,6 +2584,22 @@ shows all loaded libraries written in Singular.
 @c example
 @end example
 @end table
+@ifset namespaces
+@c ref
+See
+@ref{Command line options};
+@ref{Procedures and libraries};
+@ref{SINGULAR libraries};
+@ref{Namespaces};
+@ref{proc};
+@ref{standard_lib};
+@ref{string};
+@ref{load};
+@ref{package};
+@ref{system}.
+@c ref
+@end ifset
+@ifclear namespaces
 @c ref
 See
 @ref{Command line options};
@@ -2592,11 +2608,9 @@ See
 @ref{proc};
 @ref{standard_lib};
 @ref{string};
-@ref{load};
-@ref{Namespaces};
-@ref{package};
 @ref{system}.
 @c ref
+@end ifclear
 @c -------------------------------------------------
 @node lift, liftstd, LIB, Functions
 @subsection lift
@@ -2684,11 +2698,20 @@ See @ref{ideal}; @ref{ring}; @ref{option}; @ref{std}; @ref{matrix}.
 @cindex listvar
 @table @code
 @item @strong{Syntax:}
+@ifset namespaces
 @code{listvar(}[package]@code{);}
 @*@code{listvar(}[package @code{,}] type @code{);}
 @*@code{listvar(}[package @code{,}] ring_name @code{);}
 @*@code{listvar(}[package @code{,}] name @code{);}
 @*@code{listvar(}[package @code{,}] @code{all );}
+@end ifset
+@ifclear namespaces
+@code{listvar(}[package]@code{);}
+@*@code{listvar(}[package @code{,}] type @code{);}
+@*@code{listvar(}[package @code{,}] ring_name @code{);}
+@*@code{listvar(}[package @code{,}] name @code{);}
+@*@code{listvar(}[package @code{,}] @code{all );}
+@end ifclear
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -2701,6 +2724,7 @@ lists all (user-)defined names in the current namespace:
 @*The current basering is marked with a @code{*}.  The nesting level of
 variables in procedures is shown in square brackets.
 
+@ifset namespaces
 package can be @code{Current}, @code{Up}, @code{Top} or any other
 identifier of type package.
 @item @strong{Example:}
@@ -2722,17 +2746,50 @@ identifier of type package.
   listvar(Standard, proc);
 @c example
 @end example
+@end ifset
+@ifclear namespaces
+@item @strong{Example:}
+@example
+@c example
+  proc t1 { }
+  proc t2 { }
+  ring s;
+  poly ss;
+  ring r;
+  poly f=x+y+z;
+  int i=7;
+  ideal I=f,x,y;
+  listvar(all);
+  listvar();
+  listvar(r);
+  listvar(t1);
+  listvar(proc);
+@c example
+@end example
+@end ifclear
 @end table
+@ifset namespaces
 @c ref
 See
 @ref{Names in procedures};
 @ref{Names};
-@ref{Namespaces};
 @ref{defined};
 @ref{names};
+@ref{Namespaces};
 @ref{package};
 @ref{type}.
 @c ref
+@end ifset
+@ifclear namespaces
+@c ref
+See
+@ref{Names in procedures};
+@ref{Names};
+@ref{defined};
+@ref{names};
+@ref{type}.
+@c ref
+@end ifclear
 @c ---------------------------------------
 @node lres, maxideal, listvar, Functions
 @subsection lres
@@ -3270,7 +3327,9 @@ See
 @item @strong{Syntax:}
 @code{names ( )}
 @*@code{names (} ring_name @code{)}
+@ifset namespaces
 @*@code{names (} package_name @code{)}
+@end ifset
 @item @strong{Type:}
 list of strings
 @item @strong{Purpose:}
@@ -3278,6 +3337,7 @@ returns the names of all user defined variables which are ring independent
 (this includes the names of  procedures) or, in the second case, belong to
 the given ring.
 
+@ifset namespaces
 package_name can be @code{Current}, @code{Up}, @code{Top} or any other
 identifier of type package.
 @item @strong{Example:}
@@ -3297,6 +3357,21 @@ identifier of type package.
   names(p::q);
 @c example
 @end example
+@end ifset
+@ifclear namespaces
+@item @strong{Example:}
+@example
+@c example
+  int i = 9;
+  ring r;
+  poly f;
+  poly g;
+  setring r;
+  names();
+  names(r);
+@c example
+@end example
+@end ifclear
 @end table
 @c ref
 See
@@ -5663,10 +5738,12 @@ See
 * continue::
 * else::
 * export::
+@ifset namespaces
 * exportto::
 * importfrom::
 * load::
 * unload::
+@end ifset
 * for::
 * if::
 * keepring::
@@ -5789,7 +5866,12 @@ else
 See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
 @c ref
 @c ---------------------------------------
+@ifset namespaces
 @node export, exportto, else, Control structures
+@end ifset
+@ifclear namespaces
+@node export, for, else, Control structures
+@end ifclear
 @subsection export
 @cindex export
 @table @code
@@ -5798,12 +5880,23 @@ See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
 @*@code{export} list_of_names @code{;}
 @item @strong{Purpose:}
 converts a local variable of a procedure to a global one.
+@ifset namespaces
 @item @strong{Note:} obsoleted by @code{exportto}.
+@end ifset
 @end table
 
+@ifset namespaces
 @c ref
-See @ref{exportto}, @ref{keepring}
+See @ref{exportto}; @ref{keepring}.
 @c ref
+@end ifset
+@ifclear namespaces
+@c ref
+See @ref{keepring}.
+@c ref
+@end ifclear
+@c ---------------------------------------
+@ifset namespaces
 @c ---------------------------------------
 @node exportto, importfrom, export, Control structures
 @subsection exportto
@@ -5902,12 +5995,12 @@ command:
 
 Each time a library @ref{Singular library} / dynamic module @ref{dynamic
 module} is loaded, the corresponding namespace is created, if it does
-not already exist. 
+not already exist.
 
 The name of this namespace corresponding to a Singular library is
 derived from the name of the library file. The first letter is
 capitalized and everything to right of the left-most dot is
-dropped. 
+dropped.
 For a dynamic module the packagename is hard-coded in the binary file.
 
 @sc{Singular} also supports autoloading of packages.
@@ -5928,14 +6021,14 @@ appending to the base @code{.lib}, @code{.so}, @code{.sl} (in this order).
 
 
 An identifier of type @code{package} is created and all procedures are
-stored in that package. 
+stored in that package.
 Before loading the type of the file is checking. For an Singular
 library, the package is set as filename until the first '.' in the name
 with an uppercase first letter. If the library to load is an binary file
 with procedures written in an higher language (e.g. C, C++, ...) the
 package name s hard-code in the library.
 
- 
+
 The second argument @code{"with"} will automatically export all none
 static procedures to the toplevel.
 
@@ -5984,9 +6077,15 @@ See
 @item @strong{Syntax:}
 @code{unload(}@code{);}
 @end table
-
 @c ---------------------------------------
+@end ifset
+@c ---------------------------------------
+@ifset namespaces
 @node for, if, unload, Control structures
+@end ifset
+@ifclear namespaces
+@node for, if, export, Control structures
+@end ifclear
 @subsection for
 @cindex for
 @table @code

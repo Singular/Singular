@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.82 1999-06-21 17:39:32 Singular Exp $
+@comment $Id: types.doc,v 1.83 1999-06-21 19:45:36 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -45,7 +45,9 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * matrix::
 * module::
 * number::
+@ifset namespaces
 * package::
+@end ifset
 * poly::
 * proc::
 * qring::
@@ -2527,7 +2529,7 @@ of leading terms (see @ref{vdim})
 @node number, package, module, Data types
 @end ifset
 @ifclear namespaces
-@node number, package, module, Data types
+@node number, poly, module, Data types
 @end ifclear
 @section number
 @cindex number
