@@ -626,8 +626,7 @@ else
 fi
 
 AC_MSG_CHECKING(whether to build Plural)
-if test "$enable_Plural" != no && test -d "Plural"; then
-   BUILD_SUBDIRS="$BUILD_SUBDIRS Plural"
+if test "$enable_Plural" != no || test "$with_Plural" != no; then
    AC_MSG_RESULT(yes)
    if test "$enable_Plural" != yes; then
      ac_configure_args="$ac_configure_args --enable-Plural"

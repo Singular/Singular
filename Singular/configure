@@ -40,7 +40,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic"
 ac_help="$ac_help
-  --with-plural           do compile with Plural support"
+  --with-Plural           do compile with Plural support"
 ac_help="$ac_help
   --with-NTL              build for use with NTL."
 
@@ -3646,9 +3646,9 @@ if test "${with_apint+set}" = set; then
   :
 fi
 
-# Check whether --with-plural or --without-plural was given.
-if test "${with_plural+set}" = set; then
-  withval="$with_plural"
+# Check whether --with-Plural or --without-Plural was given.
+if test "${with_Plural+set}" = set; then
+  withval="$with_Plural"
   :
 fi
 
@@ -4812,7 +4812,7 @@ fi
 
 echo $ac_n "checking whether to have Plural""... $ac_c" 1>&6
 echo "configure:4815: checking whether to have Plural" >&5
-if test "$with_plural" != yes; then
+if test "$with_Plural" != yes && test "$enable_Plural" != yes; then
   echo "$ac_t""no" 1>&6
 else
   cat >> confdefs.h <<\EOF
