@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.30 2000-05-02 16:30:43 Singular Exp $ */
+/* $Id: polys.h,v 1.31 2000-07-06 13:24:21 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -81,6 +81,7 @@ extern int pComponentOrder;
 
 /*-------------predicate on polys ----------------------*/
 BOOLEAN   pIsConstant(const poly p);
+BOOLEAN   pIsConstantPoly(poly p);
 BOOLEAN   pIsConstantComp(const poly p);
 int       pIsPurePower(const poly p);
 #define   pIsVector(p)     (pGetComp(p)!=0)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.22 2000-03-20 16:44:30 Singular Exp $ */
+/* $Id: ideals.h,v 1.23 2000-07-06 13:24:20 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -31,6 +31,7 @@ void idDelMultiples(ideal id);
 void idDelEquals(ideal id);
 void idDelLmEquals(ideal id);
 void idDelDiv(ideal id);
+BOOLEAN idIsConstant(ideal id);
 
 #ifdef PDEBUG
 void idDBTest(ideal h1,char *f,int l);

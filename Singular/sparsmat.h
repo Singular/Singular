@@ -7,7 +7,7 @@
  *          (bareis, ...)
  *
  *******************************************************************/
-/* $Id: sparsmat.h,v 1.7 2000-06-21 07:32:20 pohl Exp $ */
+/* $Id: sparsmat.h,v 1.8 2000-07-06 13:24:21 pohl Exp $ */
 
 
 poly smMult(poly, poly);
@@ -28,6 +28,6 @@ void smSpecialPolyDiv(poly, poly);
 poly smCallDet(ideal I);
 lists smCallBareiss(ideal smat, int x, int y);
 lists smCallNewBareiss(ideal smat, int x, int y);
-ideal smCallSolv(ideal I);
+lists smCallSolv(ideal I);
 
 #endif
