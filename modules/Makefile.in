@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.7 2000-12-05 15:26:57 obachman Exp $
+### $Id: Makefile.in,v 1.8 2002-06-27 14:02:34 anne Exp $
 ###
 #################################################################
 
@@ -20,16 +20,14 @@ libdir 		= @libdir@
 bindir		= @bindir@
 # Singular libs go here
 includedir	= @includedir@
-MOD_DEST	= ./include
-INC_SRC		= $(topsrcdir)/Singular
-MODDIRS		= pcv kernel
+INC_SRC		= ${topsrcdir}/Singular
 
 ## 
 ## various programs
 ##
 CC		= @CC@
 CXX		= @CXX@
-LEXP		= @LEXP@
+#LEXP		= @LEXP@
 PERL		= @PERL@
 BISON		= bison
 @SET_MAKE@
@@ -37,15 +35,15 @@ INSTALL		= ./install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ./mkinstalldirs
-MODGEN		= ${bindir}/modgen
+MODGEN		= ${srcdir}/modgen/modgen
 
 ##
 ## compiler and linker options
 ##
-CFLAGS		= @CFLAGS@ -pipe -Iinclude -I../Singular
+CFLAGS		= @CFLAGS@ -pipe -I${srcdir} -I${INC_SRC}
 CXXFLAGS	= @CXXFLAGS@ -pipe 
 #CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
-CPPFLAGS	= -I${srcdir} @CPPFLAGS@
+CPPFLAGS	= -I${srcdir} @CPPFLAGS@ -I${includedir} -I${INC_SRC}
 DEFS		= @DEFS@ -DNDEBUG
 LDFLAGS		= @LDFLAGS@ # @LD_DYNAMIC@
 #STATIC_LDFLAGS	= @STATIC_LDFLAGS@
@@ -59,52 +57,70 @@ LDFLAGS		= @LDFLAGS@ # @LD_DYNAMIC@
 ##
 CFLAGS		+= ${DEFS}
 
-MOD_INCLUDES	= mod2.h utils.h structs.h tok.h ipid.h \
-	subexpr.h febase.h grammar.h numbers.h polys.h \
-	ideals.h intvec.h polys-impl.h lists.h matpol.h ipconv.h \
-	lists.h matpol.h pInline1.h pInline2.h p_polys.h
+MOD_FILES = loctriv pcv
+MOD_DIRS = kernel
 
 ##
 ##
 ##
 
-all: mod_install modgen modules
+all: modgen mod_prepare modules
 
-mod_install:
-	for file in ${MOD_INCLUDES}; do \
-		if test -f ${MOD_DEST}/$${file}; then \
-			rm -f ${MOD_DEST}/$${file}; \
+mod_prepare: modgen 
+	for file in ${MOD_FILES}; do \
+		if test -d $${file}; then \
+	  	  echo Directory $${file} exists! Ignoring $${file}; \
+		  echo Use make mod_clean or remove directory by hand; \
 		fi; \
-		cp ${INC_SRC}/$${file} ${MOD_DEST}/$${file}; \
-		chmod 444 ${MOD_DEST}/$${file}; \
+		${MODGEN} -i ${bindir} $${file}.mod ;\
 	done
 
 modgen:
 	cd modgen; make install
 
-modules:
-	for SUBDIR in ${MODDIRS}; \
+modules: mod_prepare
+	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
-		echo ${MAKE} $@ in $${SUBDIR}; \
-		( cd $${SUBDIR} && ${MODGEN} $${SUBDIR}.mod ;); \
-		( cd $${SUBDIR}/$${SUBDIR} && ${MAKE} ;) \
+		if test -d $${SUBDIR}; then \
+		   echo ${MAKE} $@ in $${SUBDIR}; \
+		   ( cd $${SUBDIR} && ${MAKE} ;) \
+                fi;\
+		if test !-d $${SUBDIR}; then \
+		   echo directory $${SUBDIR} does not exist!; \
+                fi;\
 	done
 
 clean:
 	rm -f *.o *.lo *.so* *.la *~ core
-	for file in ${MOD_INCLUDES}; do \
-		rm -f ${MOD_DEST}/$${file}; \
-	done
 	( cd modgen && make $@; )
-	for SUBDIR in ${MODDIRS}; \
+	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
-		echo ${MAKE} $@ in $${SUBDIR}; \
-		( cd $${SUBDIR} && ${MAKE} $@; ) \
+	        if test -d $${SUBDIR}; then \
+		   echo ${MAKE} $@ in $${SUBDIR}; \
+		   ( cd $${SUBDIR} && ${MAKE} $@; ) \
+	        fi; \
 	done
 
-distclean: clean
+mod_clean:
+        for SUBDIR in ${MOD_FILES}; \
+	do \
+		if test -d $${SUBDIR}; then \
+                   echo removing $${SUBDIR};\
+		   rm -rf $${SUBDIR}; \
+		fi; \
+        done 
+
+        for SUBDIR in ${MOD_DIRS}; \
+	do \
+		if test -d $${SUBDIR}; then \
+	           echo ${MAKE} clean in $${SUBDIR}; \
+		   ( cd $${SUBDIR} && ${MAKE} clean; )\
+		fi; \
+	done
+
+distclean: clean mod_clean
 	( cd modgen && make clean )
-	for SUBDIR in ${MODDIRS}; \
+	for SUBDIR in ${MOD_DIRS}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
 		( cd $${SUBDIR} && ${MAKE} $@ ;) \
@@ -113,7 +129,7 @@ distclean: clean
 
 install: all
 	cd modgen; make install
-	for SUBDIR in ${MODDIRS}; \
+	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
 		( cd $${SUBDIR} && ${MAKE} $@;) \
