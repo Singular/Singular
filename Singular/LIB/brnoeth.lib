@@ -1,23 +1,16 @@
-version="$Id: brnoeth.lib,v 1.5 2000-12-19 15:05:16 anne Exp $";
-category="Coding theory";
+version="$Id: brnoeth.lib,v 1.6 2000-12-22 13:38:23 greuel Exp $";
 info="
-LIBRARY:   brnoeth.lib  PROCEDURES FOR THE BRILL-NOETHER ALGORITHM
-           
-AUTHORS:   Jose Ignacio Farran Martin,    ignfar@eis.uva.es
-           Christoph Lossen,              lossen@mathematik.uni-kl.de
+LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
+AUTHORS:   Jose Ignacio Farran Martin, ignfar@eis.uva.es
+           Christoph Lossen,           lossen@mathematik.uni-kl.de
 
-SEE ALSO:  hnoether_lib, triang_lib
-
-KEYWORDS:  Weierstrass semigroup; Algebraic Geometry codes; 
-           Brill-Noether algorithm
-
-OVERVIEW:  Implementation of the Brill-Noether algorithm for solving the
-           Riemann-Roch problem and applications in Algebraic Geometry codes.
-           The computation of Weierstrass semigroups is also implemented.@*
-           The procedures are intended only for plane (singular) curves 
-           defined over a prime field of positive charateristic.@* 
-           You can get more information about the library just
-           by reading the end of the file brnoeth.lib.
+OVERVIEW:  
+ Implementation of the Brill-Noether algorithm for solving the
+ Riemann-Roch problem and applications in Algebraic Geometry codes.
+ The computation of Weierstrass semigroups is also implemented.@*
+ The procedures are intended only for plane (singular) curves defined over
+ a prime field of positive charateristic.@* 
+ For more information about the library see the end of the file brnoeth.lib.
 
 MAIN PROCEDURES:
  Adj_div(f);            computes the conductor of a curve 
@@ -25,10 +18,8 @@ MAIN PROCEDURES:
  BrillNoether(D,C);     computes a vector space basis of the linear system L(D)
  Weierstrass(P,m,C);    computes the Weierstrass semigroup of C at P up to m
  extcurve(d,C);         extends the curve C to an extension of degree d
- AGcode_L(G,D,E);       computes the evaluation AG code with given divisors 
-                        G and D
- AGcode_Omega(G,D,E);   computes the residual AG code with given divisors 
-                        G and D
+ AGcode_L(G,D,E);       computes the evaluation AG code with divisors G and D
+ AGcode_Omega(G,D,E);   computes the residual AG code with divisors G and D
  prepSV(G,D,F,E);       preprocessing for the basic decoding algorithm
  decodeSV(y,K);         decoding of a word with the basic decoding algorithm
 
@@ -37,40 +28,32 @@ AUXILIARY PROCEDURES:
  dual_code(C);          computes the dual code
  sys_code(C);           computes an equivalent systematic code
  permute_L(L,P);        applies a permutation to a list
+
+SEE ALSO:  hnoether_lib, triang_lib
+
+KEYWORDS:  Weierstrass semigroup; Algebraic Geometry codes; 
+           Brill-Noether algorithm
 ";
-
-
-// ===========================================================================
-
 
 LIB "matrix.lib";
 LIB "triang.lib";
 LIB "hnoether.lib";
-// -> LIB "general.lib","ring.lib";
-// maybe useful : LIB "linalg.lib","primdec.lib","normal.lib";
 
-
-// ===========================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 // **********************************************************
 // * POINTS, PLACES AND DIVISORS OF (SINGULAR) PLANE CURVES *
 // **********************************************************
 
-
 proc closed_points (ideal I)
-"USAGE:     closed_points(I), where I is an ideal
-
-RETURN:     list of prime ideals (std), corresponding to the (distinct affine 
-            closed) points of V(I).
-
+"USAGE:     closed_points(I); I an ideal
+RETURN:     list of prime ideals (each a Groebner basis), corresponding to 
+            the (distinct affine closed) points of V(I)
 NOTE:       The ideal must have dimension 0, the basering must have 2 
             variables, the ordering must be lp, and the base field must 
             be finite and prime.@*
             The option(redSB) is convenient to be set in advance.
-
 SEE ALSO:   triang_lib
-
 EXAMPLE:    example closed_points; shows an example
 "
 {
@@ -120,7 +103,7 @@ example
   // and here you have all the points :
   L;
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 static proc pd2 (poly g1,poly g2)
 {
@@ -177,8 +160,7 @@ static proc pd2 (poly g1,poly g2)
   }
   return(L);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc isPinL (ideal P,list L)
 {
   // checks if a (plane) point P is in a list of (plane) points L
@@ -201,8 +183,7 @@ static proc isPinL (ideal P,list L)
   }
   return(0);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc s_locus (poly f)
 {
   // computes : ideal of affine singular locus
@@ -221,14 +202,13 @@ static proc s_locus (poly f)
     return(I);
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc curve (poly f)
-"USAGE:      curve(f), where f is a polynomial (affine of projective)
-CREATE:     poly CHI in both ring aff_r=p,(x,y),lp and ring Proj_R=p,(x,y,z),lp
+"USAGE:      curve(f), where f is a polynomial (affine or projective)
+CREATE:     poly CHI in both rings aff_r=p,(x,y),lp and Proj_R=p,(x,y,z),lp
             also ideal (std) Aff_SLocus of affine singular locus in the ring 
             aff_r
-RETURN:     list (size 3) with aff_r,Proj_R and deg(f)
+RETURN:     list (size 3) with two rings aff_r,Proj_R and an integer deg(f)
 NOTE:       f must be absolutely irreducible, but this is not checked
             it is not implemented yet for extensions of prime fields
 "
@@ -281,8 +261,7 @@ NOTE:       f must be absolutely irreducible, but this is not checked
   }
   ERROR("basering must have 2 or 3 variables");
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc Aff_SL (ideal ISL)
 {
   // computes : affine singular (closed) points as a list of lists of
@@ -309,8 +288,7 @@ static proc Aff_SL (ideal ISL)
   }
   return(SL);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc inf_P (poly f)
 {
   // computes : all (closed) points at infinity as homogeneous polynomials
@@ -421,8 +399,7 @@ static proc inf_P (poly f)
   }
   return(list(IP_S,IP_NS));
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc closed_points_ext (poly f,int d,ideal SL)
 {
   // computes : (closed affine non-singular) points over an extension of 
@@ -463,8 +440,7 @@ static proc closed_points_ext (poly f,int d,ideal SL)
   }
   return(LP);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc degree_P (list P)
 "USAGE:      degree_P(P), where P is either a polynomial or an ideal
 RETURN:     integer with the degree of the closed point given by P
@@ -508,8 +484,7 @@ NOTE:       If P is a (homogeneous irreducible) polynomial the point is at
     }
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc closed_points_deg (poly f,int d,ideal SL)
 {
   // computes : (closed affine non-singular) points of degree d 
@@ -529,8 +504,7 @@ static proc closed_points_deg (poly f,int d,ideal SL)
   }
   return(LP);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc subset (ideal I,ideal J)
 {
   // checks wether I is contained in J and returns a boolean
@@ -546,8 +520,7 @@ static proc subset (ideal I,ideal J)
   }
   return(1);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc belongs (list P,ideal I)
 {
   // checks if affine point P is contained in V(I) and returns a boolean
@@ -561,8 +534,7 @@ static proc belongs (list P,ideal I)
     ERROR("first argument must be an affine point");
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc equals (ideal I,ideal J)
 {
   // checks if I is equal to J and returns a boolean
@@ -577,8 +549,7 @@ static proc equals (ideal I,ideal J)
   }
   return(answer);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc isInLP (ideal P,list LP)
 {
   // checks if affine point P is a list LP and returns either its position or 
@@ -602,8 +573,7 @@ static proc isInLP (ideal P,list LP)
   }
   return(0);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc res_deg ()
 {
   // computes the residual degree of the basering with respect to its prime 
@@ -623,8 +593,7 @@ static proc res_deg ()
   }
   return(ext);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc Frobenius (etwas,int r)
 {
   // applies the Frobenius map over F_{p^r} to an object defined over an 
@@ -693,8 +662,7 @@ static proc Frobenius (etwas,int r)
   }
   return(etwas);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc conj_b (list L,int r)
 {
   // applies the Frobenius map over F_{p^r} to a list of type HNE defined over
@@ -739,8 +707,7 @@ static proc conj_b (list L,int r)
   LL[4]=f;
   return(LL);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc grad_b (list L,int r)
 {
   // computes the degree of a list of type HNE which is actually defined over
@@ -763,8 +730,7 @@ static proc grad_b (list L,int r)
   }
   return(gr);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc conj_bs (list L,int r)
 {
   // computes all the conjugates over F_{p^r} of a list of type HNE defined 
@@ -794,8 +760,7 @@ static proc conj_bs (list L,int r)
   }
   return(branches);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc subfield (sf)
 {
   // writes the generator "a" of a subfield of the coefficients field of 
@@ -867,8 +832,7 @@ static proc subfield (sf)
     }
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc importdatum (sf,string datum,string rel)
 {
   // fetchs a poly with name "datum" to the current basering from the ring sf
@@ -900,8 +864,7 @@ static proc importdatum (sf,string datum,string rel)
     return(pdatum);
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc rationalize (lf,string datum,string rel)
 {
   // fetchs a poly with name "datum" to the current basering from the ring lf
@@ -939,8 +902,7 @@ static proc rationalize (lf,string datum,string rel)
     return(newdatum);
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc place (intvec Pp,int sing,list CURVE)
 {
   // computes the "rational" places which are defined over a (closed) point
@@ -1727,8 +1689,7 @@ static proc place (intvec Pp,int sing,list CURVE)
   kill(HNEring);
   return(update_CURVE);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc local_conductor (int k,SS)
 {
   // computes the degree of the local conductor at a place of a plane curve
@@ -1853,8 +1814,7 @@ static proc local_conductor (int k,SS)
   setring b_ring;
   return(Cq);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc max_D (intvec D1,intvec D2)
 {
   // computes the maximum of two divisors (intvec)
@@ -1898,8 +1858,7 @@ static proc max_D (intvec D1,intvec D2)
     return(D2);
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc deg_D (intvec D,list PP)
 {
   // computes the degree of a divisor (intvec or list of integers)
@@ -1912,30 +1871,27 @@ static proc deg_D (intvec D,list PP)
   }
   return(d);
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // ============================================================================
 // *******  MAIN PROCEDURES for the "preprocessing" of Brill-Noether   ********
 // ============================================================================
 
-
 proc Adj_div (poly f,list #)
-"USAGE:      Adj_div( f [,#] ), where f is a poly, [ # a list ]
-
-RETURN:      list L with the computed data:
+"USAGE:    Adj_div( f [,l] ); f a poly, [l a list]
+RETURN:   list L with the computed data:
   @format 
-  L[1] is a list of rings: L[1][1]=aff_r (affine), L[1][2]=Proj_R (projective),
-  L[2] is an intvec with 2 entries (degree, genus),
-  L[3] is a list of intvec (closed places),
-  L[4] is an intvec (conductor),
-  L[5] is a list of lists: 
-         L[5][d][1] is a (local) ring over an extension of degree d, 
-         L[5][d][2] is an intvec (degrees of base points of places of degree d)
+  L[1] a list of rings: L[1][1]=aff_r (affine), L[1][2]=Proj_R (projective),
+  L[2] an intvec with 2 entries (degree, genus),
+  L[3] a list of intvec (closed places),
+  L[4] an intvec (conductor),
+  L[5] a list of lists: 
+     L[5][d][1] a (local) ring over an extension of degree d, 
+     L[5][d][2] an intvec (degrees of base points of places of degree d)
   @end format
-
-NOTE:       @code{Adj_div(f);} computes and stores the fundamental data of the
-            plane curve defined by f as needed for AG codes.  
-            In the affine ring you can find the following data: 
+NOTE:     @code{Adj_div(f);} computes and stores the fundamental data of the
+          plane curve defined by f as needed for AG codes.  
+          In the affine ring you can find the following data: 
    @format 
    poly CHI:  affine equation of the curve,
    ideal Aff_SLocus:  affine singular locus (std),
@@ -1944,39 +1900,36 @@ NOTE:       @code{Adj_div(f);} computes and stores the fundamental data of the
             Inf_Points[2]:  non-singular points,
    list Aff_SPoints:  affine singular points (if not empty). 
    @end format
-            In the projective ring you can find the projective equation 
-            CHI of the curve (poly). 
-            In the local rings L[5][d][1] you find:
+          In the projective ring you can find the projective equation 
+          CHI of the curve (poly). 
+          In the local rings L[5][d][1] you find:
    @format
    list POINTS:  base points of the places of degree d,
    list LOC_EQS:  local equations of the curve at the base points, 
    list BRANCHES:  Hamburger-Noether developments of the places,
    list PARAMETRIZATIONS:  local parametrizations of the places,
    @end format 
-            Each entry of the list L[3] corresponds to one closed place (i.e., 
-            a place and all its conjugates) which is represented by an intvec 
-            of size two, the first entry is the degree of the place (in 
-            particular, it tells the local ring where to find the data 
-            describing one representative of the closed place), and the 
-            second one is the position of those data in the lists POINTS, etc.,
-            inside this local ring.@*
-            In the intvec L[4] (conductor) the i-th entry corresponds to the 
-            i-th entry in the list of places L[3].@*
+          Each entry of the list L[3] corresponds to one closed place (i.e., 
+          a place and all its conjugates) which is represented by an intvec 
+          of size two, the first entry is the degree of the place (in 
+          particular, it tells the local ring where to find the data 
+          describing one representative of the closed place), and the 
+          second one is the position of those data in the lists POINTS, etc.,
+          inside this local ring.@*
+          In the intvec L[4] (conductor) the i-th entry corresponds to the 
+          i-th entry in the list of places L[3].@*
      
-            With no optional arguments, the conductor is computed by
-            local invariants of the singularities; otherwise it is computed 
-            by the Dedekind formula. @*
-            An affine point is represented by a list P where P[1] is std 
-            of a prime ideal and P[2] is an intvec containing the position 
-            of the places above P in the list of closed places L[3]. @*
-            If the point is at infinity, P[1] is a homogeneous irreducible 
-            polynomial in two variables.
-
-KEYWORDS:   Hamburger-Noether expansions; adjunction divisor
-
-SEE ALSO:   closed_points, NSplaces
-
-EXAMPLE:    example Adj_div; shows an example
+          With no optional arguments, the conductor is computed by
+          local invariants of the singularities; otherwise it is computed 
+          by the Dedekind formula. @*
+          An affine point is represented by a list P where P[1] is std 
+          of a prime ideal and P[2] is an intvec containing the position 
+          of the places above P in the list of closed places L[3]. @*
+          If the point is at infinity, P[1] is a homogeneous irreducible 
+          polynomial in two variables.
+KEYWORDS: Hamburger-Noether expansions; adjunction divisor
+SEE ALSO: closed_points, NSplaces
+EXAMPLE:  example Adj_div; shows an example
 "
 {
   // computes the adjunction divisor and the genus of a (singular) plane curve
@@ -2137,30 +2090,23 @@ example
   BRANCHES;
   printlevel=plevel;
 }
-
-
-// ============================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 proc NSplaces (int h,list CURVE)
-"USAGE:    NSplaces( h, CURVE ), where h is an integer and CURVE is a list
-
-RETURN:    list L with updated data of CURVE after computing all 
-           points up to degree H+h (H the maximum degree of the previously 
-           computed places: @*
+"USAGE:   NSplaces( h, CURVE ), where h is an integer and CURVE is a list
+RETURN:   list L with updated data of CURVE after computing all 
+          points up to degree H+h (H the maximum degree of the previously 
+          computed places): @*
    @format 
-   in affine ring L[1][1]: 
-       lists Aff_Points(d) with affine non-singular points of degree d 
-                                       (if non-empty)
-   in L[3]:  the newly computed closed places are added,
-   in L[5]:  local rings created/updated to store (represent. of) new places.
+   in L[1][1]: (affine ring) lists Aff_Points(d) with affine non-singular 
+               points of degree d (if non-empty)
+   in L[3]:    the newly computed closed places are added,
+   in L[5]:    local rings created/updated to store (repres. of) new places.
    @end format
-           See @ref{Adj_div} for a description of the entries in L.
-
-NOTE:      The list_expression should be the output of the procedure Adj_div.@*
-
-SEE ALSO:  closed_points, Adj_div
-EXAMPLE:   example NSplaces; shows an example
+          See @ref{Adj_div} for a description of the entries in L.
+NOTE:     The list_expression should be the output of the procedure Adj_div.@*
+SEE ALSO: closed_points, Adj_div
+EXAMPLE:  example NSplaces; shows an example
 "
 {
   // computes all the non-singular closed places with degree up to a certain 
@@ -2226,10 +2172,9 @@ example
   POINTS;
   printlevel=plevel;
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // ** SPECIAL PROCEDURES FOR LINEAR ALGEBRA **
-
 
 static proc Ker (matrix A)
 {
@@ -2240,15 +2185,13 @@ static proc Ker (matrix A)
   option(set,opgt);
   return(M);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc get_NZsol (matrix A)
 {
   matrix sol=Ker(A);
   return(submat(sol,1..1,1..ncols(sol)));
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc supplement (matrix W,matrix V)
 "USAGE:     supplement(W,V), where W,V are matrices of numbers such that the 
             vector space generated by the rows of W is contained in that 
@@ -2280,8 +2223,7 @@ NOTE:       W,V must be given with maximal rank
   H=supplem(H);
   return(H*V);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc supplem (matrix M)
 "USAGE:      suplement(M), where M is a matrix of numbers with maximal rank
 RETURN:     matrix whose rows generate a supplementary vector space of <M> in 
@@ -2320,8 +2262,7 @@ NOTE:       The rank r is assumed to be 1<r<n.
   supl=transpose(compress(transpose(supl)));
   return(supl);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc mat_rank (matrix A)
 {
   // warning : "lp" ordering is necessary
@@ -2331,12 +2272,11 @@ static proc mat_rank (matrix A)
   option(set,opgt);
   return(r);
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // ***************************************************************
 // * PROCEDURES FOR INTERPOLATION, INTERSECTION AND EXTRA PLACES *
 // ***************************************************************
-
 
 static proc estim_n (intvec Dplus,int dgX,list PL)
 {
@@ -2350,8 +2290,7 @@ static proc estim_n (intvec Dplus,int dgX,list PL)
   }
   return(estim);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc nforms (int n)
 {
   // computes the list of all homogeneous monomials of degree n>=0
@@ -2385,8 +2324,7 @@ static proc nforms (int n)
   }
   return(N-1);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc nmultiples (int n,int dgX,poly f)
 {
   // computes a basis of the space of forms of degree n which are multiple of 
@@ -2417,8 +2355,7 @@ static proc nmultiples (int n,int dgX,poly f)
   }
   return(transpose(lift(nFORMS(n),nmults)));
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc interpolating_forms (intvec D,int n,list CURVE)
 {
   // computes a vector basis of the space of forms of degree n whose 
@@ -2719,8 +2656,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
   }
   return(Ker(totalM));
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc local_IN (poly h,int m)
 {
   // computes the intersection number of h and the curve CHI at a certain place
@@ -2789,8 +2725,7 @@ static proc local_IN (poly h,int m)
   answer[2]=AA;
   return(answer);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc extra_place (ideal P)
 {
   // computes the "rational" place which is defined over a (closed) "extra" 
@@ -2898,8 +2833,7 @@ static proc extra_place (ideal P)
   answer[2]=ext;
   return(answer);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc intersection_div (poly H,list CURVE)
 "USAGE:     intersection_div(H,CURVE), where H is a homogeneous polynomial 
             in ring Proj_R=p,(x,y,z),lp and CURVE is the list of data for 
@@ -3175,8 +3109,7 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
   option(set,opgt);
   return(answer);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc local_eq (poly H,SS,int m)
 {
   // computes a local equation of poly H in the ring SS related to the place 
@@ -3218,8 +3151,7 @@ static proc local_eq (poly H,SS,int m)
   setring BRing;
   return(str_h);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc min_wt_rmat (matrix M)
 {
   // finds the row of M with minimum non-zero entries, i.e. minimum 
@@ -3255,31 +3187,26 @@ static proc min_wt_rmat (matrix M)
   }
   return(k);
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // ============================================================================
 // *******    MAIN PROCEDURE : the Brill-Noether algorithm             ********
 // ============================================================================
 
-
 proc BrillNoether (intvec G,list CURVE)
-"USAGE:     BrillNoether(G,CURVE), where G is an intvec and CURVE is a list
-
-RETURN:     list of ideals (each of them with two homogeneous generators, 
-            which represent the nominator, resp. denominator, of a rational 
-            function).@*
-            The corresponding rational functions form a vector basis of the 
-            linear system L(G), G a rational divisor over a non-singular curve.
-
-NOTE:       The procedure must be called from the ring CURVE[1][2], where 
-            CURVE is the output of the procedure @code{NSplaces}. @* 
-            The intvec G represents a rational divisor supported on the closed 
-            places of CURVE[3] (e.g. @code{G=2,0,-1;} means 2 times the closed 
-            place 1 minus 1 times the closed place 3). 
-
-SEE ALSO:   Adj_div, NSplaces, Weierstrass
-
-EXAMPLE:    example BrillNoether; shows an example
+"USAGE:    BrillNoether(G,CURVE); G an intvec, CURVE a list
+RETURN:   list of ideals (each of them with two homogeneous generators, 
+          which represent the nominator, resp. denominator, of a rational 
+          function).@*
+          The corresponding rational functions form a vector basis of the 
+          linear system L(G), G a rational divisor over a non-singular curve.
+NOTE:     The procedure must be called from the ring CURVE[1][2], where 
+          CURVE is the output of the procedure @code{NSplaces}. @* 
+          The intvec G represents a rational divisor supported on the closed 
+          places of CURVE[3] (e.g. @code{G=2,0,-1;} means 2 times the closed 
+          place 1 minus 1 times the closed place 3). 
+SEE ALSO: Adj_div, NSplaces, Weierstrass
+EXAMPLE:  example BrillNoether; shows an example
 "
 {
   // computes a vector basis for the space L(G),
@@ -3385,12 +3312,11 @@ example
   LG;
   printlevel=plevel;
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // *** procedures for dealing with "RATIONAL FUNCTIONS" over a plane curve ***
 // a rational function F may be given by (homogeneous) ideal or (affine) poly 
 // (or number)
-
 
 static proc polytoRF (F)
 {
@@ -3401,8 +3327,7 @@ static proc polytoRF (F)
   RF[2]=z^(deg(F));
   return(RF);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc simplifyRF (ideal F)
 {
   // simplifies a rational function f/g extracting the gcd(f,g)
@@ -3411,8 +3336,7 @@ static proc simplifyRF (ideal F)
   poly auxp=gcd(F[1],F[2]);
   return(ideal(division(auxp,F)[1]));
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc sumRF (F,G)
 {
   // sum of two "rational functions" F,G given by either a pair 
@@ -3451,8 +3375,7 @@ static proc sumRF (F,G)
     }
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc negRF (F)
 {
   // returns -F as rational function
@@ -3467,8 +3390,7 @@ static proc negRF (F)
     return(-F);
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc escprodRF (l,F)
 {
   // computes l*F as rational function
@@ -3484,23 +3406,21 @@ static proc escprodRF (l,F)
     return(l*F);
   }
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // ******** procedures to compute Weierstrass semigroups ********
 
-
 static proc orderRF (ideal F,SS,int m)
-"USAGE:     orderRF(F,SS,m), where F is an ideal, SS is a ring and m is an 
-            integer
-RETURN:     list with the order (int) and the leading coefficient (number)
-NOTE:       F represents a rational function, thus the procedure must be 
-            called from R or R(d).
-            SS contains the name of a local ring where rational places are 
-            stored, and then we take that which is in position m in the 
-            corresponding lists of data.
-            The order of F at the place given by SS,m is returned together 
-            with the coefficient of minimum degree in the corresponding power 
-            series.
+"USAGE:  orderRF(F,SS,m); F an ideal, SS a ring and m an integer
+RETURN: list with the order (int) and the leading coefficient (number)
+NOTE:   F represents a rational function, thus the procedure must be
+        called from global ring R or R(d).
+        SS contains the name of a local ring where rational places are
+        stored, and then we take that which is in position m in the
+        corresponding lists of data.
+        The order of F at the place given by SS,m is returned together
+        with the coefficient of minimum degree in the corresponding power
+        series.
 "
 {
   // computes the order of a rational function F at a RATIONAL place given by
@@ -3524,35 +3444,24 @@ NOTE:       F represents a rational function, thus the procedure must be
   number LC=number(imap(SS,lc));
   return(list(oo,LC));
 }
-
-
-// ============================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 proc Weierstrass (int P,int m,list CURVE)
-"USAGE:     Weierstrass( i, m, CURVE ), where i,m are integers and CURVE a list
-
-RETURN:     list WS of two lists:
+"USAGE:    Weierstrass( i, m, CURVE );  i,m integers and CURVE a list
+RETURN:   list WS of two lists:
   @format 
-  WS[1] is a list of integers (the Weierstrass semigroup of the curve 
-                                                      at the place i up to m)
-  WS[2] is a list of ideals (the associated rational functions)
+  WS[1] list of integers (Weierstr. semigroup of the curve at place i up to m)
+  WS[2] list of ideals (the associated rational functions)
   @end format
-
-
-NOTE:       The procedure must be called from the ring CURVE[1][2], 
-            where CURVE is the output of the procedure @code{NSplaces}. 
-            i represents the place CURVE[3][i]. 
-
-            WARNING: the place must be rational, i.e., necessarily 
-            CURVE[3][P][1]=1.
-            
-            Rational functions are represented by nominator/denominator
-            in form of ideals with two homogeneous generators.
-
-SEE ALSO:   Adj_div, NSplaces, BrillNoether
-
-EXAMPLE:    example Weierstrass; shows an example
+NOTE:     The procedure must be called from the ring CURVE[1][2], 
+          where CURVE is the output of the procedure @code{NSplaces}. 
+          i represents the place CURVE[3][i]. 
+          WARNING: the place must be rational, i.e., necessarily 
+          CURVE[3][P][1]=1.            
+          Rational functions are represented by nominator/denominator
+          in form of ideals with two homogeneous generators.
+SEE ALSO: Adj_div, NSplaces, BrillNoether
+EXAMPLE:  example Weierstrass; shows an example
 "
 {
   // computes the Weierstrass semigroup at a RATIONAL place P up to a bound "m"
@@ -3659,24 +3568,16 @@ example
   WS[2];
   printlevel=plevel;
 }
-
-
-// ============================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 // axiliary procedure for permuting a list or intvec
 
-
 proc permute_L (L,P)
-"USAGE:     permute_L( L, P ), where L,P are either intvecs or lists
-
-RETURN:     list obtained from L by applying the permutation given by P.
-
-NOTE:       If P is a list, all entries must be integers.
-
-SEE ALSO:   sys_code, AGcode_Omega, prepSV
-
-EXAMPLE:    example permute_L; shows an example
+"USAGE:    permute_L( L, P ); L,P either intvecs or lists
+RETURN:   list obtained from L by applying the permutation given by P.
+NOTE:     If P is a list, all entries must be integers.
+SEE ALSO: sys_code, AGcode_Omega, prepSV
+EXAMPLE:  example permute_L; shows an example
 "
 {
   // permutes the list L according to the permutation P (both intvecs or 
@@ -3711,8 +3612,7 @@ example
   // the list L is permuted according to P :
   permute_L(L,P);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc evalRF (ideal F,SS,int m)
 "USAGE:     evalRF(F,SS,m), where F is an ideal, SS is a ring and m is an 
             integer
@@ -3745,13 +3645,14 @@ NOTE:       F represents a rational function, thus the procedure must be
     }
   }
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
+//
 // ******** procedures for constructing AG codes ********
-
+//
+///////////////////////////////////////////////////////////////////////////////
 
 static proc gen_mat (list LF,intvec LP,RP)
-"USAGE:      gen_mat(LF,LP,RP), LF list of rational functions,
+"USAGE:      gen_mat(LF,LP,RP); LF list of rational functions,
             LP intvec of rational places and RP a local ring
 RETURN:     a generator matrix of the evaluation code given by LF and LP
 SEE ALSO:   extcurve
@@ -3776,23 +3677,15 @@ NOTE:       Rational places are searched in local ring RP
   }
   return(GM);
 }
-
-
-// ============================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 proc dual_code (matrix G)
-"USAGE:     dual_code(G), where G is a matrix of numbers
-
-RETURN:     a generator matrix of the dual code generated by G.
- 
-NOTE:       The input should be a matrix G of numbers. @* 
-            The output is also a parity check matrix for the code defined 
-            by G.
-
-KEYWORDS:   linear code, dual
-
-EXAMPLE:    example dual_code; shows an example
+"USAGE:   dual_code(G); G a matrix of numbers
+RETURN:   a generator matrix of the dual code generated by G 
+NOTE:     The input should be a matrix G of numbers. @* 
+          The output is also a parity check matrix for the code defined by G
+KEYWORDS: linear code, dual
+EXAMPLE:  example dual_code; shows an example
 "
 {
   // computes the dual code of C given by a generator matrix G
@@ -3810,12 +3703,11 @@ example
   matrix H=dual_code(G);
   print(H);
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // ======================================================================
 // *********** initial test for disjointness ***************
 // ======================================================================
-
 
 static proc disj_divs (intvec H,intvec P,list EC)
 {
@@ -3890,36 +3782,26 @@ static proc disj_divs (intvec H,intvec P,list EC)
   }
   return(1);
 }
-
-
-
-
-// ============================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 proc AGcode_L (intvec G,intvec D,list EC)
-"USAGE:      AGcode_L( G, D, EC ), where G,D are intvec and EC is a list
-
-RETURN:     a generator matrix for the evaluation AG code defined by the 
-            divisors G and D. 
-
-NOTE:       The procedure must be called within the ring EC[1][4], 
-            where EC is the output of @code{extcurve(d)} (or within 
-            the ring EC[1][2] if d=1). @*
-            The entry i in the intvec D refers to the i-th rational 
-            place in EC[1][5] (i.e., to POINTS[i], etc., see @ref{extcurve}).@*
-            The intvec G represents a rational divisor (see @ref{BrillNoether}
-            for more details).@*
-            The code evaluates the vector basis of L(G) at the rational 
-            places given by D. 
-
-WARNINGS:   G should satisfy @math{ 2*genus-2 < deg(G) < size(D) }, which is 
-            not checked by the algorithm.
-            G and D should have disjoint supports (checked by the algorithm).
-
-SEE ALSO:   Adj_div, BrillNoether, extcurve, AGcode_Omega
-
-EXAMPLE:    example AGcode_L; shows an example
+"USAGE:    AGcode_L( G, D, EC );  G,D intvec, EC a list
+RETURN:   a generator matrix for the evaluation AG code defined by the 
+          divisors G and D. 
+NOTE:     The procedure must be called within the ring EC[1][4], 
+          where EC is the output of @code{extcurve(d)} (or within 
+          the ring EC[1][2] if d=1). @*
+          The entry i in the intvec D refers to the i-th rational 
+          place in EC[1][5] (i.e., to POINTS[i], etc., see @ref{extcurve}).@*
+          The intvec G represents a rational divisor (see @ref{BrillNoether}
+          for more details).@*
+          The code evaluates the vector basis of L(G) at the rational 
+          places given by D. 
+WARNINGS: G should satisfy @math{ 2*genus-2 < deg(G) < size(D) }, which is 
+          not checked by the algorithm.
+          G and D should have disjoint supports (checked by the algorithm).
+SEE ALSO: Adj_div, BrillNoether, extcurve, AGcode_Omega
+EXAMPLE:  example AGcode_L; shows an example
 "
 {
   // returns a generator matrix for the evaluation AG code given by G and D
@@ -3975,34 +3857,26 @@ example
   print(C);
   printlevel=plevel;
 }
-
-
-// =============================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 proc AGcode_Omega (intvec G,intvec D,list EC)
-"USAGE:      AGcode_Omega( G, D, EC ), where G,D are intvec and EC is a list
-
-RETURN:     a generator matrix for the residual AG code defined by the 
-            divisors G and D. 
-
-NOTE:       The procedure must be called within the ring EC[1][4], 
-            where EC is the output of @code{extcurve(d)} (or within 
-            the ring EC[1][2] if d=1). @*
-            The entry i in the intvec D refers to the i-th rational 
-            place in EC[1][5] (i.e., to POINTS[i], etc., see @ref{extcurve}).@*
-            The intvec G represents a rational divisor (see @ref{BrillNoether}
-            for more details).@*
-            The code computes the residues of a vector space basis of 
-            @math{\Omega(G-D)} at the rational places given by D. 
-
-WARNINGS:   G should satisfy @math{ 2*genus-2 < deg(G) < size(D) }, which is 
-            not checked by the algorithm.
-            G and D should have disjoint supports (checked by the algorithm).
-
-SEE ALSO:   Adj_div, BrillNoether, extcurve, AGcode_L
-
-EXAMPLE:    example AGcode_Omega; shows an example
+"USAGE:    AGcode_Omega( G, D, EC ); G,D intvec, EC a list
+RETURN:   a generator matrix for the residual AG code defined by the 
+          divisors G and D. 
+NOTE:     The procedure must be called within the ring EC[1][4], 
+          where EC is the output of @code{extcurve(d)} (or within 
+          the ring EC[1][2] if d=1). @*
+          The entry i in the intvec D refers to the i-th rational 
+          place in EC[1][5] (i.e., to POINTS[i], etc., see @ref{extcurve}).@*
+          The intvec G represents a rational divisor (see @ref{BrillNoether}
+          for more details).@*
+          The code computes the residues of a vector space basis of 
+          @math{\Omega(G-D)} at the rational places given by D. 
+WARNINGS: G should satisfy @math{ 2*genus-2 < deg(G) < size(D) }, which is 
+          not checked by the algorithm.
+          G and D should have disjoint supports (checked by the algorithm).
+SEE ALSO: Adj_div, BrillNoether, extcurve, AGcode_L
+EXAMPLE:  example AGcode_Omega; shows an example
 "
 {
   // returns a generator matrix for the residual AG code given by G and D
@@ -4031,48 +3905,41 @@ example
   print(C);
   printlevel=plevel;
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // ============================================================================
 // *******   auxiliary procedure to define AG codes over extensions    ********
 // ============================================================================
 
-
 proc extcurve (int d,list CURVE)
-"USAGE:      extcurve( d, CURVE ), where d is an integer and CURVE is a list
-
-RETURN:     list L which is the update of the list CURVE with additional 
-            entries 
+"USAGE:    extcurve( d, CURVE ); d an integer, CURVE a list
+RETURN:   list L which is the update of the list CURVE with additional entries
    @format 
-   L[1][3]:   ring (p,a),(x,y),lp (affine),
-   L[1][4]:   ring (p,a),(x,y,z),lp (projective), 
-   L[1][5]:   ring (p,a),(x,y,t),ls (local),
-   L[2][3]:   int  (the number of rational places),
+   L[1][3]: ring (p,a),(x,y),lp (affine),
+   L[1][4]: ring (p,a),(x,y,z),lp (projective), 
+   L[1][5]: ring (p,a),(x,y,t),ls (local),
+   L[2][3]: int  (the number of rational places),
    @end format
-            the rings being defined over a field extension of degree d. 
-
-            If d<2 then @code{extcurve(d,CURVE);} creates a list L which
-            is the update of the list CURVE with additional entries
+          the rings being defined over a field extension of degree d. 
+          If d<2 then @code{extcurve(d,CURVE);} creates a list L which
+          is the update of the list CURVE with additional entries
    @format 
-   L[1][5]:   ring p,(x,y,t),ls,
-   L[2][3]:   int  (the number of places over the base field).
+   L[1][5]: ring p,(x,y,t),ls,
+   L[2][3]: int  (the number of places over the base field).
    @end format
-            In both cases, in the ring L[1][5] lists with the data for all the 
-            rational places (after a field extension of degree d) are 
-            created (see @ref{Adj_div}):
+          In both cases, in the ring L[1][5] lists with the data for all the 
+          rational places (after a field extension of degree d) are 
+          created (see @ref{Adj_div}):
    @format 
    lists POINTS, LOC_EQS, BRANCHES, PARAMETRIZATIONS.
    @end format
-
-NOTE:       The list CURVE should be the output of @code{NSplaces} and has 
-            to contain (at least) all places up to degree d. @*
-            This procedure must be executed before constructing AG codes,
-            even if no extension is needed. The ring L[1][4] must be active 
-            when constructing codes over the field extension.@*
-
-SEE ALSO:   closed_points, Adj_div, NSplaces, AGcode_L, AGcode_Omega
-
-EXAMPLE:    example extcurve; shows an example
+NOTE:     The list CURVE should be the output of @code{NSplaces} and has 
+          to contain (at least) all places up to degree d. @*
+          This procedure must be executed before constructing AG codes,
+          even if no extension is needed. The ring L[1][4] must be active 
+          when constructing codes over the field extension.@*
+SEE ALSO: closed_points, Adj_div, NSplaces, AGcode_L, AGcode_Omega
+EXAMPLE:  example extcurve; shows an example
 "
 {
   // extends the underlying curve and all its associated objects to a larger 
@@ -4277,10 +4144,9 @@ example
   C=extcurve(4,C);
   printlevel=plevel;
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // specific procedures for linear/AG codes
-
 
 static proc Hamming_wt (matrix A)
 "USAGE:     Hamming_wt(A), where A is any matrix
@@ -4307,60 +4173,49 @@ RETURN:     the Hamming weight (number of non-zero entries) of the matrix A
   }
   return(w);
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 // Basic Algorithm of Skorobogatov and Vladut for decoding AG codes 
 // warning : the user must choose carefully the parameters for the code and 
 //     the decoding since they will never be checked by the procedures 
 
-
-// ============================================================================
-
-
 proc prepSV (intvec G,intvec D,intvec F,list EC)
-"USAGE:     prepSV( G, D, F, EC ), where G,D,F are intvec and EC is a list
-
-RETURN:     list E of size n+3, where n=size(D). All its entries but E[n+3] 
-            are matrices:
+"USAGE:    prepSV( G, D, F, EC ); G,D,F intvecs and EC a list
+RETURN:   list E of size n+3, where n=size(D). All its entries but E[n+3] 
+          are matrices:
    @format 
    E[1]:  parity check matrix for the current AG code
    E[2] ... E[n+2]:  matrices used in the procedure decodeSV
    E[n+3]:  intvec with
-       E[n+3][1]:  correction capacity @math{\epsilon} of the algorithm
-       E[n+3][2]:  designed Goppa distance @math{\delta} of the current AG code
+       E[n+3][1]: correction capacity @math{\epsilon} of the algorithm
+       E[n+3][2]: designed Goppa distance @math{\delta} of the current AG code
    @end format
-
-NOTE:       Computes the preprocessing for the basic (Skorobogatov-Vladut) 
-            decoding algorithm.@* 
-            The procedure must be called within the ring EC[1][4], 
-            where EC is the output of @code{extcurve(d)} (or within 
-            the ring EC[1][2] if d=1). @*
-            The intvec G and F represent rational divisors   (see 
-            @ref{BrillNoether} for more details).@*
-            The intvec D refers to rational places (see @ref{AGcode_Omega}
-            for more details.). 
-            The current AG code is @code{AGcode_Omega(G,D,EC)}.@*
-            If you know the exact minimum distance d and you want to use it in 
-            @code{decodeSV} instead of @math{\delta}, you can change the value
-            of E[n+3][2] to d before applying decodeSV.
-            If you have a systematic encoding for the current code and want to 
-            keep it during the decoding, you must previously permute D (using 
-            @code{permute_L(D,P);}), e.g., according to the permutation 
-            P=L[3], L being the output of @code{sys_code}.
-
-WARNINGS:   F must be a divisor with support disjoint to the support of D and 
-            with degree @math{\epsilon + genus}, where 
-            @math{\epsilon:=[(deg(G)-3*genus+1)/2]}.@* 
-            G should satisfy @math{ 2*genus-2 < deg(G) < size(D) }, which is 
-            not checked by the algorithm.
-            G and D should also have disjoint supports (checked by the 
-            algorithm).
-
-KEYWORDS:   SV-decoding algorithm, preprocessing
-
-SEE ALSO:   extcurve, AGcode_Omega, decodeSV, sys_code, permute_L
-
-EXAMPLE:    example prepSV; shows an example
+NOTE:     Computes the preprocessing for the basic (Skorobogatov-Vladut) 
+          decoding algorithm.@* 
+          The procedure must be called within the ring EC[1][4], where EC is
+          the output of @code{extcurve(d)} (or in the ring EC[1][2] if d=1) @* 
+          The intvec G and F represent rational divisors (see 
+          @ref{BrillNoether} for more details).@*
+          The intvec D refers to rational places (see @ref{AGcode_Omega}
+          for more details.). 
+          The current AG code is @code{AGcode_Omega(G,D,EC)}.@*
+          If you know the exact minimum distance d and you want to use it in 
+          @code{decodeSV} instead of @math{\delta}, you can change the value
+          of E[n+3][2] to d before applying decodeSV.
+          If you have a systematic encoding for the current code and want to 
+          keep it during the decoding, you must previously permute D (using 
+          @code{permute_L(D,P);}), e.g., according to the permutation 
+          P=L[3], L being the output of @code{sys_code}.
+WARNINGS: F must be a divisor with support disjoint to the support of D and 
+          with degree @math{\epsilon + genus}, where 
+          @math{\epsilon:=[(deg(G)-3*genus+1)/2]}.@* 
+          G should satisfy @math{ 2*genus-2 < deg(G) < size(D) }, which is 
+          not checked by the algorithm.
+          G and D should also have disjoint supports (checked by the 
+          algorithm).
+KEYWORDS: SV-decoding algorithm, preprocessing
+SEE ALSO: extcurve, AGcode_Omega, decodeSV, sys_code, permute_L
+EXAMPLE:  example prepSV; shows an example
 "
 {
   if (disj_divs(F,D,EC)==0)
@@ -4436,30 +4291,22 @@ example
   epsilon;
   printlevel=plevel; 
 }
-
-
-// ============================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 proc decodeSV (matrix y,list K)
-"USAGE:     decodeSV( y, K ), where y is a row-matrix and K is a list
-
+"USAGE:     decodeSV( y, K ); y a row-matrix and K a list
 RETURN:     a codeword (row-matrix) if possible, resp. the 0-matrix (of size 
             1) if decoding is impossible.
             For decoding the basic (Skorobogatov-Vladut) decoding algorithm
             is applied.
-
 NOTE:       The list_expression should be the output K of the procedure 
             @code{prepSV}.@* 
             The matrix_expression should be a (1 x n)-matrix,  where 
             n = ncols(K[1]).@*
             The decoding may fail if the number of errors is greater than
             the correction capacity of the algorithm.
-
 KEYWORDS:   SV-decoding algorithm
-
 SEE ALSO:   extcurve, AGcode_Omega, prepSV
-
 EXAMPLE:    example decodeSV; shows an example
 "
 {
@@ -4595,35 +4442,27 @@ example
   print(decodeSV(y,SV));
   printlevel=plevel;
 }
-
-
-// ============================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 proc sys_code (matrix C)
-"USAGE:     sys_code(C) where C is a matrix of constants
-
-RETURN:     list L with:
+"USAGE:    sys_code(C); C is a matrix of constants
+RETURN:   list L with:
    @format 
    L[1] is the generator matrix in standard form of an equivalent code,
    L[2] is the parity check matrix in standard form of such code,
    L[3] is an intvec which represents the needed permutation.
    @end format
-
-NOTE:       Computes a systematic code which is equivalent to the given one.@*
-            The input should be a matrix of numbers.@*
-            The output has to be interpreted as follows: if the input was 
-            the generator matrix of an AG code then one should apply the 
-            permutation L[3] to the divisor D of rational points by means 
-            of @code{permute_L(D,L[3]);} before continuing to work with the 
-            code (for instance, if you want to use the systematic encoding 
-            together with a decoding algorithm).
-
-KEYWORDS:   linear code, systematic
-
-SEE ALSO:   permute_L, AGcode_Omega, prepSV
-
-EXAMPLE:    example sys_code; shows an example
+NOTE:     Computes a systematic code which is equivalent to the given one.@*
+          The input should be a matrix of numbers.@*
+          The output has to be interpreted as follows: if the input was 
+          the generator matrix of an AG code then one should apply the 
+          permutation L[3] to the divisor D of rational points by means 
+          of @code{permute_L(D,L[3]);} before continuing to work with the 
+          code (for instance, if you want to use the systematic encoding 
+          together with a decoding algorithm).
+KEYWORDS: linear code, systematic
+SEE ALSO: permute_L, AGcode_Omega, prepSV
+EXAMPLE:  example sys_code; shows an example
 "
 {
   // computes a systematic code which is equivalent to that given by C
@@ -4759,19 +4598,15 @@ example
   // we can check that both codes are dual each other
   print(L[1]*transpose(L[2]));
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 /* 
-
-
 // ============================================================================
 // *******       ADDITIONAL INFORMATION ABOUT THE LIBRARY              ********
 // ============================================================================
 
-
 A SINGULAR library for plane curves, Weierstrass semigroups and AG codes
 Also available via http://wmatem.eis.uva.es/~ignfar/singular/
-
 
 PREVIOUS WARNINGS : 
 
@@ -4786,7 +4621,6 @@ PREVIOUS WARNINGS :
            with the exception of that consisting of "rational points"
    (3) The curve must be absolutely irreducible (but it is not checked)
    (4) Only (algebraic projective) plane curves are considered
-
 
 GENERAL CONCEPTS : 
 
@@ -4807,7 +4641,6 @@ GENERAL CONCEPTS :
        position i means the coefficient of the i-th place in the divisor
    (4) Rational functions are represented by numerator/denominator
        in form of ideals with two homogeneous generators
-
 
 OUTLINE/EXAMPLE OF THE USE OF THE LIBRARY : 
 
@@ -4938,7 +4771,6 @@ proc Suzuki ()
   return(SUZUKI);
 }
 
-
 // **** Other interesting examples : 
 
 // A hyperelliptic curve with 33 rational points over F_16
@@ -4953,8 +4785,5 @@ list CURVE=Adj_div(y9+y8+xy6+x2y3+y2+x3);
 CURVE=NSplaces(4,CURVE);
 CURVE=extcurve(6,CURVE);
 
-
 */
-
-
 ;

@@ -1,13 +1,12 @@
-// $Id: deform.lib,v 1.22 2000-12-19 15:05:19 anne Exp $
+// $Id: deform.lib,v 1.23 2000-12-22 13:41:22 greuel Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.22 2000-12-19 15:05:19 anne Exp $";
+version="$Id: deform.lib,v 1.23 2000-12-22 13:41:22 greuel Exp $";
 category="Singularities";
 info="
-LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
-
-AUTHOR: Bernd Martin, email: martin@math.tu-cottbus.de
+LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
+AUTHOR:   Bernd Martin, email: martin@math.tu-cottbus.de
 
 PROCEDURES:
  versal(Fo[,d,any])        miniversal deformation of isolated singularity Fo
@@ -16,13 +15,14 @@ PROCEDURES:
  lift_rel_kb(N,M[,kbM,p])  relative lifting N into a kbase of M
  kill_rings([\"prefix\"])  kills the exported rings from above
 ";
-///////////////////////////////////////////////////////////////////////////////
+
 LIB "inout.lib";
 LIB "general.lib";
 LIB "matrix.lib";
 LIB "homolog.lib";
 LIB "sing.lib";
 ///////////////////////////////////////////////////////////////////////////////
+
 proc versal (ideal Fo,list #)
 "USAGE:   versal(Fo[,d,any]); Fo=ideal, d=int, any=list
 COMUPTE: miniversal deformation of Fo up to degree d (default d=100),
@@ -178,7 +178,7 @@ setring  Po;
        Cup = matrix(reduce(ideal(Cup),m_J),@colR,1);
        Cup = jet(Cup,@d,@jv);
      }
-//------- express obstructions in kbase of T_2  --------------------------------
+//------- express obstructions in kbase of T_2  -------------------------------
      if ( @noObstr==0 )
      {  Cup' = reduce(Cup,PreO');
         tid  = simplify(ideal(Cup'),10);
@@ -293,9 +293,9 @@ example
    Fs;"";
 }
 ///////////////////////////////////////////////////////////////////////////////
+
 proc mod_versal(matrix Mo, ideal I, list #)
-"
-USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list
+"USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list
 COMUPTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
 CREATE:  Ringsr (exported):
          'my'Px  = extending the basering by new variables (deformation 
@@ -544,7 +544,6 @@ example
   }
   kill Px,Qx,So;
 }
-//=============================================================================
 ///////////////////////////////////////////////////////////////////////////////
 proc kill_rings(list #)
 "USAGE: kill_rings([string]);
@@ -640,7 +639,7 @@ Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
    list   L' = ex2,kb2,C,Co,D,Do;
    return(iv,M1,kb1,lift1,L');
 }
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 proc get_rings(ideal Io,int e1,int switch, list #)
 "
 Sub-procedure: creating ring-extensions
@@ -677,7 +676,7 @@ Sub-procedure: creating ring-extensions
   defring(my_So,charstr(Po),e1,my_var,my_ord);
   return();
 }
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 proc get_inf_def(list #)
 "
 Sub-procedure: compute infinitesimal family of a module and its syzygies
@@ -704,13 +703,12 @@ Sub-procedure: compute infinitesimal family of a module and its syzygies
 }
 //////////////////////////////////////////////////////////////////////////////
 proc lift_rel_kb (module N, module M, list #)
-"
-USAGE:   lift_rel_kb(N,M[,kbaseM,p]);
+"USAGE:   lift_rel_kb(N,M[,kbaseM,p]);
 ASSUME:  [p a monomial ] or the product of all variables
-         N, M modules of same rank,
-         M depending only on variables not in p and vdim(M) finite in this ring,
+         N, M modules of same rank, M depending only on variables not in p 
+         and vdim(M) is finite in this ring,
          [ kbaseM the kbase of M in the subring given by variables not in p ]
-         warning: check that these assumtions are fulfilled!
+         warning: these assumtions are not checked by the procedure
 RETURN:  matrix A, whose j-th columnes present the coeff's of N[j] in kbaseM,
          i.e. kbaseM*A = reduce(N,std(M))
 EXAMPLE: example lift_rel_kb;  shows examples
@@ -881,7 +879,7 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
   kill nr;
   return(degA);
 }
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 proc homog_test(intvec w_vec, matrix Mo, matrix A)
 "
 Sub proc: return relative weight string of columnes of A with respect
@@ -919,7 +917,7 @@ Sub proc: return relative weight string of columnes of A with respect
   @nv = @nv[1..size(@nv)-1];
   return(@nv);
 }
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 proc homog_t(intvec d_vec, matrix Fo, matrix A)
 "
 Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
@@ -950,4 +948,4 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    kill nr;
    return(dv);
 }
-
+///////////////////////////////////////////////////////////////////////////////

@@ -1,18 +1,14 @@
-e// $Id: classify.lib,v 1.44 2000-12-19 15:05:17 anne Exp $
-// KK, last modified: 04.04.1998
+// KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-
-version  = "$Id: classify.lib,v 1.44 2000-12-19 15:05:17 anne Exp $";
+version  = "$Id: classify.lib,v 1.45 2000-12-22 13:39:53 greuel Exp $";
 category="Singularities";
 info="
-LIBRARY:  classify.lib  Procedures for the Arnold-Classifier of Singularities
+LIBRARY:  classify.lib  Arnold Classifier of Singularties
+AUTHOR:   Kai Krueger, krueger@mathematik.uni-kl.de
 
 OVERVIEW:
    A library for classifying isolated hypersurface singularities w.r.t. right
    equivalence, based on the determinator of singularities by V.I. Arnold.
-
-AUTHOR:
-   Kai Krueger, krueger@mathematik.uni-kl.de
 
 PROCEDURES:
 basicinvariants(f);  computes Milnor number, determinacy-bound and corank of f

@@ -1,11 +1,10 @@
-// $Id: elim.lib,v 1.10 2000-12-19 14:41:42 anne Exp $
+// $Id: elim.lib,v 1.11 2000-12-22 13:42:34 greuel Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: elim.lib,v 1.10 2000-12-19 14:41:42 anne Exp $";
+version="$Id: elim.lib,v 1.11 2000-12-22 13:42:34 greuel Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
+LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
 
 PROCEDURES:
  blowup0(j[,s1,s2]);    create presentation of blownup ring of ideal j
@@ -141,7 +140,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc elim1 (id, poly vars)
-"USAGE:   elim1(id,poly); id ideal/module, poly=product of vars to be eliminated
+"USAGE:   elim1(id,p); id ideal/module, p product of vars to be eliminated
 RETURN:  ideal/module obtained from id by eliminating vars occuring in poly
 NOTE:    no special monomial ordering is required, result is a SB with
          respect to ordering dp (resp. ls) if the first var not to be

@@ -1,23 +1,19 @@
-// $Id: equising.lib,v 1.3 2000-12-19 15:05:20 anne Exp $
+version="$Id: equising.lib,v 1.4 2000-12-22 13:43:10 greuel Exp $";
 category="Singularities";
 info="
-LIBRARY:  Equising.lib PROCEDURES FOR EQUISINGULARITY STRATA
-
+LIBRARY:  equising.lib  EQUISINGULARITY STRATUM OF A FAMILY OF PLANE CURVES
 AUTHOR:   Andrea Mindnich, e-mail:mindnich@mathematik.uni-kl.de
+
 PROCEDURES:
  esStratum   computes the equisingularity stratum of a deformation
- isEquising  tests, if a given deformation is equisingular
+ isEquising  tests, whether a given deformation is equisingular
 "
 
 LIB "poly.lib";
 LIB "elim.lib";
 LIB "hnoether.lib";
 
-
 ///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-
 // COMPUTES  a weight vector. x and y get weight 1 and all other
 //           variables get weight 0.
 static proc xyVector()
@@ -28,11 +24,7 @@ static proc xyVector()
   iv[rvar(y)] =1;
   return (iv);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // exchanges the variables x and y in the polynomial p_f
 static proc swapXY(poly f)
 {
@@ -44,11 +36,7 @@ static proc swapXY(poly f)
   f=phi(f);
   return (f);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // ASSUME:   p_mon is a monomial
 //            and p_g is the product of the variables in p_mon.
 // COMPUTES the coefficient of p_mon in p_h.
@@ -69,11 +57,7 @@ static proc coefficient(poly p_h, poly p_mon, poly p_g)
   }
   return (p_c);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // in p_F the variable p_vari is substituted by the polynomial p_g.
 static proc eSubst(poly p_F, poly p_vari, poly p_g)
 {
@@ -90,11 +74,7 @@ static proc eSubst(poly p_F, poly p_vari, poly p_g)
   }
   return (p_F);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // All ring variables of p_F which occur in (the set of generators of) the
 // ideal  Id, are substituted by 0
 static proc SimplifyF(poly p_F, ideal Id)
@@ -130,10 +110,7 @@ static proc checkBasering ()
   error = checkQIdeal(ideal(basering));
   return(error);
 }
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 static  proc getInput (list #)
 {
   def r_base = basering;
@@ -155,11 +132,7 @@ static  proc getInput (list #)
 
   return(maxStep);
 }
-
-
 //////////////////////////////////////////////////////////////////////////////
-
-
 // RETURNS: 0, if the ideal cond only depends on the deformation parameters
 //          1, otherwise.
 static proc checkQIdeal (ideal cond)
@@ -185,8 +158,6 @@ static proc checkQIdeal (ideal cond)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // COMPUTES string(minpoly) and substitutes the parameter by newParName
 static proc makeMinPolyString (string newParName)
 {
@@ -217,8 +188,6 @@ static proc makeMinPolyString (string newParName)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // Defines a new ring without deformation-parameters.
 static proc createHNERing()
 {
@@ -233,11 +202,7 @@ static proc createHNERing()
 
   keepring(HNERing);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // RETURNS: 1, if p_f = 0 or char(basering) divides the order of p_f
 //             or p_f is not squarefree.
 //          0, otherwise
@@ -270,11 +235,7 @@ static proc checkPoly (poly p_f)
 
   return(0);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // COMPUTES  the multiplicity sequence of p_f
 static proc calcMultSequence (poly p_f)
 {
@@ -320,11 +281,7 @@ static proc calcMultSequence (poly p_f)
   multSeq = multsequence (hneList);
   return(multSeq, xNotTransversal, fIrreducible);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // ASSUME:  The basering is no qring and has at least 3 variables
 // DEFINES: A new basering, "myRing",
 //          with new names for the parameters and variables.
@@ -405,12 +362,9 @@ static proc createMyRing(poly p_F, string ordStr )
   keepring(myRing);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 /////////// procedures to compute the equisingularity stratum /////////////////
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // DEFINES a new basering, myRing,  which has one variable
 //         more than the old ring.
 //         The name for the new variable is "H(nhelpV)".
@@ -462,11 +416,7 @@ static proc extendRing (poly p_F,  ideal ES, int nHelpV, ideal HCond)
 
   keepring(myRing);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // COMPUTES an ideal equimultCond, such that F_(n-1) mod equimultCond =0,
 //          where F_(n-1) is the (nNew-1)-jet of p_F with respect to x,y.
 static proc calcEquimultCond(poly p_F, int nNew)
@@ -493,11 +443,7 @@ static proc calcEquimultCond(poly p_F, int nNew)
 
   return(equimultCond, p_F);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // COMPUTES smallest integer >= nNew/nOld -1
 static proc calcNZeroSteps (int nOld,int nNew)
 {
@@ -515,11 +461,7 @@ static proc calcNZeroSteps (int nOld,int nNew)
 
  return(nZeroSteps);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // ASSUME: ord_(X,Y)(F)=nNew
 // COMPUTES an ideal I such that (p_F mod I)_nNew  = p_c*y^nNew.
 static proc purePowerOfY (poly p_F, int nNew)
@@ -549,11 +491,7 @@ static proc purePowerOfY (poly p_F, int nNew)
 
   return(id_help, p_F, p_c);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // ASSUME: ord_(X,Y)(F)=nNew
 // COMPUTES an ideal I such that p_Fn mod I = p_c*(y-p_a*x)^nNew,
 //          where p_Fn is the homogeneous part of p_F of order nNew.
@@ -631,11 +569,7 @@ static proc purePowerOfLin (poly p_F, ideal HCond, int nNew, int nHelpV)
 
   return(id_help, HCond, p_F, p_c, p_a);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // eliminates the variables H(1),..,H(nHelpV) from the ideal ES + HCond
 static proc helpVarElim(ideal ES, ideal HCond, int nHelpV)
 {
@@ -645,11 +579,7 @@ static proc helpVarElim(ideal ES, ideal HCond, int nHelpV)
 
   return(ES);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // ASSUME:   ord(F)=nNew and p_c(y-p_a*x)^n is the nNew-jet of F with respect
 //           to X,Y
 // COMPUTES  F(x,yx+a*x)/x^n
@@ -673,11 +603,7 @@ static proc formalBlowUp(poly p_F, poly p_c, poly p_a, int nNew)
 
   return (p_F);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // ASSUME:  p_F in K[t(1)..t(s),x,y]
 // COMPUTES the minimal ideal ES, such that the deformation p_F mod ES is
 //          equisingular.
@@ -821,9 +747,9 @@ static proc calcEsCond(poly p_F, intvec multSeq, int maxStep)
   return(ES);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
+//                           main procedure
+///////////////////////////////////////////////////////////////////////////////
 
 proc esStratum (poly p_F, list #)
 "USAGE:   esStratum(F[,m]); F a polynomial, m an integer
@@ -932,10 +858,8 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//////////////////// procedures for equisingularity test///////////////////////
+//                  procedures for equisingularity test
 ///////////////////////////////////////////////////////////////////////////////
-
-
 
 // DEFINES a new basering, myRing,  which has one variable
 //         more than the old ring.
@@ -982,11 +906,7 @@ static proc T_extendRing(poly p_F, int nHelpV, ideal HCond)
 
   keepring(myRing);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // tests, if ord p_F = nNew.
 static proc equimultTest (poly p_F, int nHelpV, int nNew, ideal HCond)
 {
@@ -1017,11 +937,7 @@ static proc equimultTest (poly p_F, int nHelpV, int nNew, ideal HCond)
 
   return(1, p_F);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // ASSUME: ord(p_F)=nNew
 // tests, if p_F =  p_c*y^nNew for some p_c.
 static proc pPOfYTest (poly p_F, int nHelpV, int nNew, ideal HCond)
@@ -1054,11 +970,7 @@ static proc pPOfYTest (poly p_F, int nHelpV, int nNew, ideal HCond)
 
   return(1, p_c);
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // ASSUME: ord(p_F)=nNew
 // tests, if p_F =  p_c*(y - p_a*x)^nNew for some p_a, p_c.
 static proc pPOfLinTest(poly p_F, int nNew, int nHelpV, ideal HCond)
@@ -1105,11 +1017,7 @@ static proc pPOfLinTest(poly p_F, int nNew, int nHelpV, ideal HCond)
 
   return(1, p_F, p_c, p_a, HCond);
 }
-
-
 //////////////////////////////////////////////////////////////////////////////
-
-
 // eliminates the variables H(1),..,H(nHelpV) from the ideal ES + HCond
 static proc T_helpVarElim(ideal ES, ideal HCond, int nHelpV)
 {
@@ -1161,8 +1069,6 @@ static proc T_helpVarElim(ideal ES, ideal HCond, int nHelpV)
   return(ES);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // ASSUME:  F in K[t(1)..t(s),x,y],
 //          the ringordering is ds
 // RETURNS: list l, such that
@@ -1250,9 +1156,7 @@ static proc equisingTest (poly p_F, intvec multSeq, int maxStep)
 
   return(1);
 }
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 proc isEquising (poly p_F, list #)
 "USAGE:   esStratum(F[,m]); F a polynomial, m an integer
@@ -1348,4 +1252,7 @@ example
    poly F = imap(r,F);
    isEquising(F,2);
 }
-
+///////////////////////////////////////////////////////////////////////////////
+/*
+  Weiter Beispiele aus Dipl. von A. Mindnich einfuegen
+*/

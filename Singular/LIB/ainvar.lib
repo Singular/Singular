@@ -1,10 +1,9 @@
-// $Id: ainvar.lib,v 1.3 2000-12-19 15:05:15 anne Exp $
+// $Id: ainvar.lib,v 1.4 2000-12-22 13:32:17 greuel Exp $
 /////////////////////////////////////////////////////////////////////////////
-
-version="$Id: ainvar.lib,v 1.3 2000-12-19 15:05:15 anne Exp $";
+version="$Id: ainvar.lib,v 1.4 2000-12-22 13:32:17 greuel Exp $";
 category="Invariant theory";
 info="
-LIBRARY: ainvar.lib   PROCEDURES FOR COMPUTING INVARIANTS RINGS OF THE ADDITIVE GROUP
+LIBRARY: ainvar.lib    Invariant Rings of the Additive Group
 AUTHORS: Gerhard Pfister,  email: pfister@mathematik.uni-kl.de
          Gert-Martin Greuel,  email: greuel@mathematik.uni-kl.de
 

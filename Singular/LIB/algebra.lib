@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.6 2000-12-19 14:41:41 anne Exp $";
+version="$Id: algebra.lib,v 1.7 2000-12-22 13:34:59 greuel Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY:  algebra.lib   PROCEDURES FOR COMPUTING WITH ALGBRAS AND MAPS
-AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
-          Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de,
-          Gerhard Pfister, email: pfister@mathematik.uni-kl.de
+LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
+AUTHORS:  Gert-Martin Greuel,     greuel@mathematik.uni-kl.de,
+          Agnes Eileen Heydtmann, agnes@math.uni-sb.de,
+          Gerhard Pfister,        pfister@mathematik.uni-kl.de
 
 PROCEDURES:
  algebra_containment(); query of algebra containment
