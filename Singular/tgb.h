@@ -20,7 +20,7 @@
 
 #define FULLREDUCTIONS
 //#define HALFREDUCTIONS
-#define HEAD_BIN
+//#define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
 #define PAR_N 1
@@ -32,6 +32,11 @@ struct int_pair_node{
   int_pair_node* next;
   int a;
   int b;
+};
+struct red_object{
+  kBucket_pt bucket;
+  poly p;
+  unsigned long sev;
 };
 struct sorted_pair_node{
   //criterium, which is stable 0. small lcm 1. small i 2. small j
@@ -74,17 +79,14 @@ struct calc_dat
   kStrategy strat;
   int** deg;
   int* T_deg;
-  int* misses;
-	poly* gcd_of_terms;
+  poly* gcd_of_terms;
   int_pair_node* soon_free;
-  sorted_pair_node* pairs;
   sorted_pair_node** apairs;
   redNF_inf* work_on;
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
 #endif
   unsigned int reduction_steps;
-  int max_misses;
   int found_i;
   int found_j;
   int continue_i;
@@ -94,8 +96,6 @@ struct calc_dat
   int normal_forms;
   int skipped_pairs;
   int current_degree;
-  int misses_counter;
-  int misses_series;
   int Rcounter;
   int last_index;
   int max_pairs;
@@ -126,13 +126,15 @@ static void soon_free_them(redNF_inf* inf, calc_dat* c);
 static sorted_pair_node* pop_pair(calc_dat* c);
 static BOOLEAN no_pairs(calc_dat* c);
 static void clean_top_of_pair_list(calc_dat* c);
+static void super_clean_top_of_pair_list(calc_dat* c);
 static BOOLEAN state_is(calc_state state, const int & i, const int & j, calc_dat* c);
 static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, calc_dat* c);
-static void sort_pair_in(int i, int j,calc_dat* c);
 static int pair_better_gen(const void* ap,const void* bp);
 static poly redTailShort(poly h, kStrategy strat);
 poly gcd_of_terms(poly p, ring r);
 BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, calc_dat* c);
 static poly kBucketGcd(kBucket* b, ring r);
-static void multi_reduction(LObject** los, int & losl, calc_dat* c);
+static void multi_reduction(red_object* los, int & losl, calc_dat* c);
+static sorted_pair_node* quick_pop_pair(calc_dat* c);
+static sorted_pair_node* top_pair(calc_dat* c);
 #endif

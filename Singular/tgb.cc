@@ -2,7 +2,13 @@
 // #define OM_CHECK 3
 // #define OM_TRACK 5
 // #define OM_KEEP  1
-
+// TODO: Reduktionen gegeneinander
+//       deg -> poly_crit
+//       LObject loswerden
+//       Normierung
+//       code cleaning
+//       semi tail reductions
+//       add_to_basis modifizieren
 #include "tgb.h"
 #define OM_KEEP 0
 #define LEN_VAR1
@@ -78,6 +84,31 @@ int kSBucketLength(kBucket* b)
 }
 #endif
 
+static int LObject_better_gen(const void* ap, const void* bp)
+{
+  LObject* a=*(LObject**)ap;
+  LObject* b=*(LObject**)bp;
+  return(pLmCmp(a->p,b->p));
+}
+static int red_object_better_gen(const void* ap, const void* bp)
+{
+
+
+  return(pLmCmp(((red_object*) ap)->p,((red_object*) bp)->p));
+}
+static int pair_better_gen2(const void* ap,const void* bp){
+  return(-pair_better_gen(ap,bp));
+}
+static int kFindDivisibleByInS_easy(kStrategy strat,const red_object & obj){
+  int i;
+  long not_sev=~obj.sev;
+  poly p=obj.p;
+  for(i=0;i<=strat->sl;i++){
+    if (pLmShortDivisibleBy(strat->S[i],strat->sevS[i],p,not_sev))
+      return i;
+  }
+  return -1;
+}
 static int posInPairs (sorted_pair_node**  p, int pn, sorted_pair_node* qe,calc_dat* c,int an=0)
 {
   if(pn==0) return 0;
@@ -113,7 +144,21 @@ static BOOLEAN  ascending(int* i,int top){
 sorted_pair_node**  merge(sorted_pair_node** p, int pn,sorted_pair_node **q, int qn,calc_dat* c){
   int i;
   int* a= (int*) omalloc(qn*sizeof(int));
+//   int mc;
+//   PrintS("Debug\n");
+//   for(mc=0;mc<qn;mc++)
+// {
 
+//     wrp(q[mc]->lcm_of_lm);
+//     PrintS("\n");
+// }
+//    PrintS("Debug they are in\n");
+//   for(mc=0;mc<pn;mc++)
+// {
+
+//     wrp(p[mc]->lcm_of_lm);
+//     PrintS("\n");
+// }
   int lastpos=0;
   for(i=0;i<qn;i++){
     lastpos=posInPairs(p,pn,q[i],c, max(lastpos-1,0));
@@ -194,6 +239,7 @@ BOOLEAN good_has_t_rep(int i, int j,calc_dat* c){
 
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
+  assume(lm!=NULL);
   int deciding_deg= pTotaldegree(lm);
   int* i_con =make_connections(i,j,lm,c);
   p_Delete(&lm,c->r);
@@ -222,12 +268,7 @@ BOOLEAN lenS_correct(kStrategy strat){
 
 static void notice_miss(int i, int j, calc_dat* c){
   PrintS("-");
-  c->misses_counter++;
-  if(i>=0)
-    c->misses[i]++;
-  if (j>=0)
-    c->misses[j]++;
-  c->misses_series++;
+ 
 }
 static void soon_trep_them(redNF_inf* inf, calc_dat* c){
   int_pair_node* hf=inf->soon_free;
@@ -471,12 +512,8 @@ static void replace_pair(int & i, int & j, calc_dat* c)
 #endif
       int comp_deg(pTotaldegree(short_s));
       p_Delete(&short_s,c->r);
-      if ((comp_deg<curr_deg)
-          ||
-          ((comp_deg==curr_deg) &&
-           (c->misses[i]+c->misses[j]
-            <=
-            c->misses[i_con[m]]+c->misses[j_con[n]])))
+      if ((comp_deg<curr_deg))
+         
       {
         curr_deg=comp_deg;
         i=i_con[m];
@@ -610,12 +647,8 @@ static void replace_pair(redNF_inf* inf, calc_dat* c)
 #endif
       int comp_deg(pTotaldegree(short_s));
       p_Delete(&short_s,c->r);
-      if ((comp_deg<curr_deg)
-          ||
-          ((comp_deg==curr_deg) &&
-           (c->misses[i]+c->misses[j]
-            <=
-            c->misses[i_con[m]]+c->misses[j_con[n]])))
+      if ((comp_deg<curr_deg))
+          
         //       if ((comp_deg<curr_deg)
         //           ||
         //           ((comp_deg==curr_deg) &&
@@ -861,15 +894,15 @@ static void initial_data(calc_dat* c, ideal I){
     c->work_on[counter].P=NULL;
   }
   c->Rcounter=0;
-  c->misses_series=0;
+
   c->soon_free=NULL;
-  c->misses_counter=0;
-  c->max_misses=0;
+
+
   c->normal_forms=0;
   c->current_degree=1;
   c->skipped_pairs=0;
   c->max_pairs=5*I->idelems();
-  c->pairs=NULL;
+ 
   c->apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*c->max_pairs);
   c->pair_top=-1;
   int n=I->idelems();
@@ -889,7 +922,7 @@ static void initial_data(calc_dat* c, ideal I){
   /* omUnGetSpecBin(&(c->HeadBin)); */
   h=omalloc(n*sizeof(char*));
   c->states=(char**) h;
-  c->misses=(int*) omalloc(n*sizeof(int));
+  
   c->deg=(int **) omalloc(n*sizeof(int*));
   h=omalloc(n*sizeof(int));
   c->lengths=(int*) h;
@@ -938,7 +971,8 @@ static void initial_data(calc_dat* c, ideal I){
       si->lcm_of_lm=I->m[i];
       si->next=NULL;
       PrintS("ho");
-      c->apairs[n-1-i]=si;
+//      c->apairs[n-1-i]=si;
+      c->apairs[n-i-1]=si;
       ++(c->pair_top);
    }
 }
@@ -997,6 +1031,7 @@ static inline void clearS (poly p, unsigned long p_sev,int l, int* at, int* k,
 }
 static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
 {
+  assume(h!=NULL);
 //  BOOLEAN corr=lenS_correct(c->strat);
   BOOLEAN R_found=FALSE;
   void* hp;
@@ -1023,8 +1058,6 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
   } else {
     exit(1);
   }
-  c->misses=(int*) omrealloc(c->misses,c->n*sizeof(int));
-  c->misses[i]=0;
   c->lengths[i]=pLength(h);
   hp=omrealloc(c->states, c->n * sizeof(char*));
  
@@ -1058,11 +1091,16 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
       //lies I[i] under I[j] ?
       if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
         c->rep[j]=i;
+	
         PrintS("R"); R_found=TRUE;
+	PrintS("\n Old lm:");
+	wrp(c->S->m[j]);
+	PrintS("\n new lm:");
+	wrp(c->S->m[i]);
+	PrintS("\n");
         c->Rcounter++;
         if((i_pos>=0) && (j_pos>=0)){
-          c->misses[i_pos]--;
-          c->misses[j_pos]--;
+       
         }
         for(int z=0;z<j;z++){
           if(c->rep[z]!=z) continue;
@@ -1093,7 +1131,7 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
                                         //PrintS("E");
                         }
     if (c->states[i][j]==UNCALCULATED){
-//      sort_pair_in(i,j,c);
+
       
       poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
       if (short_s)
@@ -1129,13 +1167,6 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
 
   if (c->lengths[c->n-1]==1)
     shorten_tails(c,c->S->m[c->n-1]);
-  // if (corr){
-
-//     corr=lenS_correct(c->strat);
-//     if(!corr){
-//       PrintS("korupted in shorten tails");
-//     }
-//     }
   //you should really update c->lengths, c->strat->lenS, and the oder of polys in strat if you sort after lengths
 
   //for(i=c->strat->sl; i>0;i--)
@@ -1144,43 +1175,13 @@ static void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
     c->Rcounter=0;
     cleanS(c->strat);
   }
-  qsort(nodes,spc,sizeof(sorted_pair_node*),pair_better_gen);
+  qsort(nodes,spc,sizeof(sorted_pair_node*),pair_better_gen2);
+  int mc=0;
+  
   c->apairs=merge(c->apairs,c->pair_top+1,nodes,spc,c);
   c->pair_top+=spc;
   clean_top_of_pair_list(c);
 
-
-//   if(spc>0){
-//     if (!c->pairs)
-//     {
-//       --spc;
-//       c->pairs=nodes[spc];
-//       c->pairs->next=NULL;
-//       last=c->pairs;
-//     }
-//     while(spc>0){
-//       --spc;
-//       sorted_pair_node* h=last->next;
-
-//       while((h!=NULL)&&(pair_better(h,nodes[spc],c)))
-//       {
-//         if ((h->i>=0) && (!state_is(UNCALCULATED,h->j, h->i,c))){
-//           last->next=h->next;
-
-//           free_sorted_pair_node(h,c->r);
-//           h=last->next;
-//           if(!h) break;
-//         }
-//         last=h;
-
-//         h=h->next;
-//         assume((h==NULL)||(h->lcm_of_lm!=NULL));
-//       }
-//       last->next=nodes[spc];
-//       nodes[spc]->next=h;
-//       last=nodes[spc];
-//     }
-//   }
 
   omfree(nodes);
 
@@ -1479,13 +1480,16 @@ static void c_S_element_changed_hook(int pos, calc_dat* c){
 
 static BOOLEAN redNF2_pseudo (redNF_inf* obj,calc_dat* c, int n){
   if(obj->P->p==NULL) {obj->h=NULL; return TRUE;}
-  LObject** P= (LObject**) omalloc(sizeof(LObject*));
-  P[0]=obj->P;
+  red_object* P= (red_object*) omalloc(sizeof(red_object));
+  P[0].p=obj->P->p;
+  P[0].bucket=obj->P->bucket;
+  P[0].sev=pGetShortExpVector(obj->P->p);
   int nonzero=1;
   multi_reduction(P, nonzero, c);
+  //breaks these routine
   if(nonzero) {
     int len;
-    kBucketClear(P[0]->bucket,&(obj->h), & len);
+    kBucketClear(P[0].bucket,&(obj->h), & len);
 } else 
  {
    obj->h=NULL;
@@ -1494,240 +1498,71 @@ static BOOLEAN redNF2_pseudo (redNF_inf* obj,calc_dat* c, int n){
   omfree(P);
   return TRUE;
 }
-static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
-{
-
-  obj->P->SetShortExpVector();
-  poly h;
-  if (obj->is_free){
-    return TRUE;}
-  int len;
-  int wlen_upper;
-  int j;
-  kStrategy strat=c->strat;
-
-  if (0 > strat->sl)
-  {
-
-    kBucketClear(obj->P->bucket,&(obj->P->p),&len);
-    kBucketDestroy(&obj->P->bucket);
-    pNormalize(obj->P->p);
-    obj->h=obj->P->p;
-    obj->is_free=TRUE;
-    return TRUE;
-
-  }
-  kBucketCanonicalize(obj->P->bucket);
-  loop
-    {
-
-
-      if (n<=0){
-
-        return FALSE;
-      }
-
-      int compare_bound;
-      compare_bound=bucket_guess(obj->P->bucket);
-      obj->len_upper_bound=min(compare_bound,obj->len_upper_bound);
-      
-      j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,obj->P);
-      if (j>=0)
-      {
-        poly sec_copy=NULL;
-        if (c->is_char0) wlen_upper=kSBucketLength(obj->P->bucket);
-        BOOLEAN must_expand=FALSE;
-        BOOLEAN must_replace_in_basis;
-        if(c->is_char0)
-          must_replace_in_basis=(wlen_upper<strat->lenSw[j]);//first test
-        else
-          must_replace_in_basis=(obj->len_upper_bound<strat->lenS[j]);//first test
-        if (must_replace_in_basis)
-        {
-          //second test
-          if (pLmEqual(obj->P->p,strat->S[j]))
-          {
-            int dummy_len;
-            PrintS("b");
-            kBucketClear(obj->P->bucket,&sec_copy,&dummy_len);
-            kBucketInit(obj->P->bucket,pCopy(sec_copy),dummy_len
-                                                         /*pLength(sec_copy)*/);
-          }
-          else
-          {
-            must_replace_in_basis=FALSE;
-            if ((obj->len_upper_bound==1)
-                ||(obj->len_upper_bound==2)
-                ||(obj->len_upper_bound<strat->lenS[j]/2)
-                ||
-                (c->is_char0 && (wlen_upper<strat->lenSw[j]/100))
-)
-            {
-              int dummy_len;
-              PrintS("e");
-              kBucketClear(obj->P->bucket,&sec_copy,&dummy_len);
-              kBucketInit(obj->P->bucket,pCopy(sec_copy),dummy_len 
-                                                         /*pLength(sec_copy)*/);
-              must_expand=TRUE;
-            }
-          }
-        }
-
-        nNormalize(pGetCoeff(obj->P->p));
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("red:");
-          wrp(h);
-          PrintS(" with ");
-          wrp(strat->S[j]);
-        }
-#endif
-	if ((!must_replace_in_basis) && (pLmEqual(obj->P->p,c->strat->S[j]))){
-	  obj->need_std_rep=TRUE;
-	  int is;
-	  for(is=0;is<c->n;is++)
-	    if(c->S->m[is]==c->strat->S[j])
-	      break;
-	  if (is!=c->n){
-	    if (c->gcd_of_terms[is]==NULL) {
-	      poly m=kBucketGcd(obj->P->bucket,c->r);
-	      if (m!=NULL){
-	      pDelete(&m);
-	      kBucketCanonicalize(obj->P->bucket);
-	      m=kBucketGcd(obj->P->bucket,c->r);
-	      c->gcd_of_terms[is]=m;
-	      line_of_extended_prod(is,c);
-	      PrintS("C");
-	      }
-	      
-	    }
-	  }
-	}
-
-        obj->len_upper_bound=obj->len_upper_bound+strat->lenS[j]-2;
-        number coef=kBucketPolyRed(obj->P->bucket,strat->S[j],
-                                   strat->lenS[j]/*pLength(strat->S[j])*/,
-                                   strat->kNoether);
-        nDelete(&coef);
-        h = kBucketGetLm(obj->P->bucket);
-		    
-      
-        if (must_replace_in_basis){
-          obj->need_std_rep=TRUE;
-          int pos_in_c=-1;
-          poly p=strat->S[j];
-          int z;
-
-          int new_length=pLength(sec_copy);
-          Print("%i",strat->lenS[j]-new_length);
-          obj->len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
-
-                    int new_pos;
-          if(c->is_char0)
-            new_pos=simple_posInS(c->strat,sec_copy,
-                                  pSLength(sec_copy,new_length),
-                                  c->is_char0);//hac
-          else
-            new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
-//          p=NULL;
-          assume(new_pos<=j);
-          for (z=c->n;z;z--)
-          {
-            if(p==c->S->m[z-1])
-            {
-              pos_in_c=z-1;
-              break;
-            }
-          }
-          if (z<=0){
-            //not in c->S
-            //LEAVE
-            deleteInS(j,c->strat);
-            add_to_reductors(c,sec_copy,pLength(sec_copy));
-            pDelete(&p);
-          }
-          else {
-//shorten_tails may alter position (not the length, even not by recursion in GLOBAL case)
-            strat->S[j]=sec_copy;
-            c->strat->lenS[j]=new_length;
-            pDelete(&p);
-
-            //        replace_quietly(c,j,sec_copy);
-            // have to do many additional things for consistency
-            {
-	        if (!rField_is_Zp(c->r)){ 
-		  pCleardenom(sec_copy);
-		  pContent(sec_copy); 
-		}
-		
-		else                     
-		  pNorm(sec_copy);
- 
-              int old_pos=j;
-              new_pos=min(old_pos, new_pos);
-              assume(new_pos<=old_pos);
-              c->strat->lenS[old_pos]=new_length;
-              if(c->strat->lenSw)
-                c->strat->lenSw[old_pos]=pSLength(sec_copy,new_length);
-              int i=0;
-              for(i=new_pos;i<old_pos;i++){
-                if (strat->lenS[i]<=new_length)
-                  new_pos++;
-                else
-                  break;
-              }
-              assume(new_pos<=old_pos);
-              if (new_pos<old_pos)
-                move_forward_in_S(old_pos,new_pos,c->strat,c->is_char0);
-              assume(0<=pos_in_c);
-              assume(c->n>pos_in_c);
-              c->S->m[pos_in_c]=sec_copy;
-
-              c->lengths[pos_in_c]=new_length;
-              c_S_element_changed_hook(pos_in_c,c);
-              
-
-            }
-          }
-        }
-        if(must_expand){
-          obj->need_std_rep=TRUE;
-          add_to_reductors(c,sec_copy,pLength(sec_copy));
-        }
-        if (h==NULL) {
-          obj->h=NULL;
-          obj->is_free=TRUE;
-          return TRUE;
-        }
-        obj->P->p=h;
-        obj->P->t_p=NULL;
-        obj->P->SetShortExpVector();
-
-      }
-      else
-      {
-        kBucketClear(obj->P->bucket,&(obj->P->p),&len);
-        kBucketDestroy(&obj->P->bucket);
-        pNormalize(obj->P->p);
-        obj->h=obj->P->p;
-        obj->is_free=TRUE;
-        return TRUE;
-      }
-      n--;
-      c->reduction_steps++;
+static void go_on (calc_dat* c){
+  //set limit of 1000 for multireductions, at the moment for
+  //programming reasons
+  int i=0;
+  red_object* buf=(red_object*) omalloc(100*sizeof(red_object));
+  int curr_deg=-1;
+  while(i<100){
+    sorted_pair_node* s=top_pair(c);
+    if (!s) break;
+    if(curr_deg>=0){
+      if (s->deg >curr_deg) break;
     }
+
+    else curr_deg=s->deg;
+    quick_pop_pair(c);
+    if(s->i>=0){
+    replace_pair(s->i,s->j,c);
+    if(s->i==s->j) {
+      free_sorted_pair_node(s,c->r);
+      continue;
+	}
+    }
+    poly h;
+    if(s->i>=0)
+      h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
+    else
+      h=s->lcm_of_lm;
+    if(s->i>=0)
+      now_t_rep(s->j,s->i,c);
+    free_sorted_pair_node(s,c->r);
+    if(!h) continue;
+    int len=pLength(h);
+    buf[i].p=h;
+    buf[i].sev=pGetShortExpVector(h);
+    buf[i].bucket = kBucketCreate(currRing);
+    kBucketInit(buf[i].bucket,buf[i].p,len);
+    i++;
+  }
+    qsort(buf,i,sizeof(red_object),red_object_better_gen);
+//    Print("\ncurr_deg:%i\n",curr_deg);
+  multi_reduction(buf, i, c);
+  int j;
+ //  for(j=0;j<i;j++){
+//     if(buf[j].p==NULL) PrintS("\n ZERO ALERT \n");
+//     int z;
+//      for(z=0;z<j;z++){
+//       if (pLmEqual(buf[z].p, buf[j].p))
+// 	PrintS("\n Critical Warning!!!! \n");
+      
+//     }
+//   }
+  
+  for(j=0;j<i;j++){
+ 
+ 
+    int len;
+    poly p;
+    kBucketClear(buf[j].bucket,&p, &len);
+    // delete buf[j];
+    //remember to free res here
+    add_to_basis(p,-1,-1,c);
+  }
+  omfree(buf);
+  return;
 }
-
-
-
-
-
-
-
-
-
-
 
 static poly redNF (poly h,kStrategy strat, int &len)
 {
@@ -1925,7 +1760,7 @@ static void do_this_spoly_stuff(int i,int j,calc_dat* c){
   }
   else
   {
-    c->misses_series=0;
+
 #ifdef HEAD_BIN
     hr=p_MoveHead(hr,c->HeadBin);
 #endif
@@ -2028,7 +1863,7 @@ static BOOLEAN compute(calc_dat* c){
           }
           else
           {
-            c->misses_series=0;
+
             if(c->is_char0)
               pContent(hr);
 #ifdef HEAD_BIN
@@ -2054,12 +1889,11 @@ static BOOLEAN compute(calc_dat* c){
         }
         c->work_on[i].soon_free=NULL;
         PrintS("-");
-        c->misses_counter++;
+ 
         if(c->work_on[i].i>=0){
-        c->misses[c->work_on[i].i]++;
-        c->misses[c->work_on[i].j]++;
+
         }
-        c->misses_series++;
+
       }
       c->last_index=i;
       return suc;
@@ -2077,7 +1911,7 @@ static int poly_crit(const void* ap1, const void* ap2){
   p2=*((poly*)ap2);
 
   int c=pLmCmp(p1,p2);
-  if (c /*pLmCmp(p1,p2)*/!=0) return c /*pLmCmp(p1,p2)*/;
+  if (c !=0) return c;
   int l1=pLength(p1);
   int l2=pLength(p2);
   if (l1<l2) return -1;
@@ -2127,12 +1961,16 @@ ideal t_rep_gb(ring r,ideal arg_I){
 
   }
 #endif
+  #if 0
   BOOLEAN SUC=TRUE;
   while((!SUC)||fillup(c)){
     if (is_empty(c)) break;
     SUC=compute(c);
   }
-  omfree(c->rep);
+#endif
+  while(c->pair_top>=0)
+    go_on(c);
+   omfree(c->rep);
   for(int z=0;z<c->n;z++){
     omfree(c->states[z]);
   }
@@ -2281,11 +2119,17 @@ static void shorten_tails(calc_dat* c, poly monom)
 }
 static sorted_pair_node* pop_pair(calc_dat* c){
   clean_top_of_pair_list(c);
-//   if(c->pairs==NULL) return NULL;
-//   sorted_pair_node* h=c->pairs;
-//   c->pairs=c->pairs->next;
-//   return h;
-//  if ((c->pair_top %100)==0) Print("(%d,sl=%d)",c->pair_top,c->strat->sl);
+
+  if(c->pair_top<0) return NULL;
+  else return (c->apairs[c->pair_top--]);
+}
+static sorted_pair_node* top_pair(calc_dat* c){
+  super_clean_top_of_pair_list(c);//yeah, I know, it's odd that I use a different proc here
+
+  if(c->pair_top<0) return NULL;
+  else return (c->apairs[c->pair_top]);
+}
+static sorted_pair_node* quick_pop_pair(calc_dat* c){
   if(c->pair_top<0) return NULL;
   else return (c->apairs[c->pair_top--]);
 }
@@ -2294,10 +2138,18 @@ static BOOLEAN no_pairs(calc_dat* c){
   return (c->pair_top==-1);
 }
 
+
+static void super_clean_top_of_pair_list(calc_dat* c){
+  while((c->pair_top>=0) && (c->apairs[c->pair_top]->i>=0) && (good_has_t_rep(c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c))){
+
+    free_sorted_pair_node(c->apairs[c->pair_top],c->r);
+    c->pair_top--;
+
+  }
+}
 static void clean_top_of_pair_list(calc_dat* c){
   while((c->pair_top>0) && (c->apairs[c->pair_top]->i>=0) && (!state_is(UNCALCULATED,c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c))){
- //    sorted_pair_node* s=c->pairs;
-//     c->pairs=c->pairs->next;
+
     free_sorted_pair_node(c->apairs[c->pair_top],c->r);
     c->pair_top--;
 
@@ -2343,49 +2195,22 @@ static int pair_better_gen(const void* ap,const void* bp){
   sorted_pair_node* b=*((sorted_pair_node**)bp);
   assume(a->i>a->j);
   assume(b->i>b->j);
-  if (a->deg<b->deg) return TRUE;
-  if (a->deg>b->deg) return FALSE;
+  if (a->deg<b->deg) return -1;
+  if (a->deg>b->deg) return 1;
 
 
-  if (a->expected_length<b->expected_length) return TRUE;
-   if (a->expected_length>b->expected_length) return FALSE;
+  if (a->expected_length<b->expected_length) return -1;
+  if (a->expected_length>b->expected_length) return 1;
  int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
-  if ((comp==0)&& (((a->i==b->i) && (a->j==b->j))||((a->j==b->i)&&(a->i==b->j))))
-    return 0;
-  if (comp==1) return -1;
-  if (-1==comp) return 1;
-  if (a->i<b->i) return 1;
-  if (a->j<b->j) return 1;
-  return 1;
+  
+  if (comp==1) return 1;
+  if (-1==comp) return -1;
+  if (a->i<b->i) return -1;
+  if (a->j<b->j) return -1;
+  return 0;
 }
-static void sort_pair_in(int i, int j,calc_dat* c){
-  assume(0<=i);
-  assume(0<=j);
-  assume(i<c->n);
-  assume(j<c->n);
-  assume(i!=j);
-  sorted_pair_node* s=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
-  s->i=max(i,j);
-  s->j=min(i,j);
-  poly lm=pOne();
 
-  pLcm(c->S->m[i], c->S->m[j], lm);
-  pSetm(lm);
-  s->lcm_of_lm=lm;
 
-  sorted_pair_node* last=c->pairs;
-  if (!c->pairs) {c->pairs=s;s->next=NULL;}
-  else
-  {
-    sorted_pair_node* h=c->pairs->next;
-    while((h!=NULL)&&(pair_better(h,s,c))){
-      last=h;
-      h=h->next;
-    }
-    last->next=s;
-    s->next=h;
-  }
-}
 poly gcd_of_terms(poly p, ring r){
   int max_g_0=0;
   assume(p!=NULL);
@@ -2495,10 +2320,10 @@ struct find_erg{
   BOOLEAN fromS;//else from los
   BOOLEAN swap_roles; //from reduce_by, to_reduce_u if fromS
 };
-static int guess_quality(LObject* p, calc_dat* c){
+static int guess_quality(const red_object & p, calc_dat* c){
   //looks only on bucket
-  if (c->is_char0) return kSBucketLength(p->bucket);
-  return (bucket_guess(p->bucket));
+  if (c->is_char0) return kSBucketLength(p.bucket);
+  return (bucket_guess(p.bucket));
 }
 static int quality_of_pos_in_strat_S(int pos, calc_dat* c){
   if (c->is_char0) return c->strat->lenSw[pos];
@@ -2508,9 +2333,9 @@ static int quality(poly p, int len, calc_dat* c){
   if (c->is_char0) return pSLength(p,len);
   return pLength(p);
 }
-static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_erg & erg){
+static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find_erg & erg){
   if(erg.fromS){
-    if(pLmEqual(c->strat->S[erg.reduce_by],los[erg.to_reduce_u]->p))
+    if(pLmEqual(c->strat->S[erg.reduce_by],los[erg.to_reduce_u].p))
     {
       int i;
       int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
@@ -2523,7 +2348,7 @@ static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_e
 	}
       }
       if(best!=erg.to_reduce_u+1){
-	LObject* h=los[erg.to_reduce_u];
+	red_object h=los[erg.to_reduce_u];
 	los[erg.to_reduce_u]=los[best];
 	los[best]=h;
 	erg.swap_roles=TRUE;
@@ -2548,7 +2373,7 @@ static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_e
 	  }
 	}
 	if(best!=erg.to_reduce_u+1){
-	  LObject* h=los[erg.to_reduce_l];
+	  red_object h=los[erg.to_reduce_l];
 	  los[erg.to_reduce_l]=los[best];
 	  los[best]=h;
 	  erg.reduce_by=erg.to_reduce_l;
@@ -2577,7 +2402,7 @@ static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_e
 	  }
 	}
 	if(best!=erg.reduce_by){
-	  LObject* h=los[erg.reduce_by];
+	  red_object h=los[erg.reduce_by];
 	  los[erg.reduce_by]=los[best];
 	  los[best]=h;
 	}
@@ -2588,13 +2413,13 @@ static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_e
     }
     else
     {
-      assume(!pLmEqual(los[erg.reduce_by]->p,los[erg.to_reduce_l]->p));
+      assume(!pLmEqual(los[erg.reduce_by].p,los[erg.to_reduce_l].p));
       //further assume, that reduce_by is the above all other polys
       //with same leading term
       int il=erg.reduce_by;
       int quality_a =guess_quality(los[erg.reduce_by],c);
       int qc;
-      while((il>0) && pLmEqual(los[il-1]->p,los[il]->p)){
+      while((il>0) && pLmEqual(los[il-1].p,los[il].p)){
 	il--;
 	qc=guess_quality(los[il],c);
 	if (qc<quality_a){
@@ -2612,12 +2437,12 @@ static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_e
     int dummy_len;
     int new_length;
     int bp=erg.to_reduce_u;//bucket_positon
-    kBucketClear(los[bp]->bucket,&clear_into,&new_length);
+    kBucketClear(los[bp].bucket,&clear_into,&new_length);
     poly p=c->strat->S[erg.reduce_by];
     int j=erg.reduce_by;
     int old_length=c->strat->lenS[j];// in view of S
-    los[bp]->p=p;
-    kBucketInit(los[bp]->bucket,p,old_length);
+    los[bp].p=p;
+    kBucketInit(los[bp].bucket,p,old_length);
     int qal=quality(clear_into,new_length,c);
     int pos_in_c=-1;    
     int z;
@@ -2655,35 +2480,36 @@ static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_e
     }
   }
 }
-static find_erg multi_reduction_find(LObject** los, int losl,calc_dat* c,int startf){
+static find_erg multi_reduction_find(red_object* los, int losl,calc_dat* c,int startf){
   kStrategy strat=c->strat;
   assume(startf<=losl);
   int i=startf;
   find_erg erg;
   int j;
   while(i>=0){
-    j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,los[i]);
+    j=kFindDivisibleByInS_easy(strat,los[i]);
     if(j>=0){
      
-      erg.to_reduce_u=startf;
+      erg.to_reduce_u=i;
       erg.reduce_by=j;
       erg.fromS=TRUE;
       int i2;
       for(i2=i-1;i2>=0;i2--){
-	if(!pLmEqual(los[i]->p,los[i2]->p))
+	if(!pLmEqual(los[i].p,los[i2].p))
 	  break;
       }
       erg.to_reduce_l=i2+1;
       return erg;
     }
     if (j<0){
+      
       //not reduceable, try to use this for reducing higher terms
       int i2;
       for (i2=i+1;i2<losl;i2++){
-	if (p_LmShortDivisibleBy(los[i]->p,los[i]->sev,los[i2]->p,los[i2]->sev,
+	if (p_LmShortDivisibleBy(los[i].p,los[i].sev,los[i2].p,~los[i2].sev,
 				c->r)){
 	  int i3=i2;
-	  while((i3+1<losl) && (pLmEqual(los[i2]->p, los[i3+1]->p)))
+	  while((i3+1<losl) && (pLmEqual(los[i2].p, los[i3+1].p)))
 	    i3++;
 	  erg.to_reduce_u=i3;
 	  erg.to_reduce_l=i2;
@@ -2691,9 +2517,10 @@ static find_erg multi_reduction_find(LObject** los, int losl,calc_dat* c,int sta
 	  erg.fromS=FALSE;
 	  return erg;
 	}
+//	else {assume(!p_LmDivisibleBy(los[i].p, los[i2].p,c->r));}
       }
       i2=i;
-      while((i2>0)&&(pLmEqual(los[i]->p,los[i2-1]->p)))
+      while((i2>0)&&(pLmEqual(los[i].p,los[i2-1].p)))
 	i2--;
       if(i2!=i){
 	
@@ -2715,47 +2542,76 @@ static find_erg multi_reduction_find(LObject** los, int losl,calc_dat* c,int sta
 //   nullen loeschen
 //   while(finde_groessten leitterm reduzierbar(c,erg)){
   
-static int multi_reduction_clear_zeroes(LObject** los, int  losl)
+static int multi_reduction_clear_zeroes(red_object* los, int  losl, int l, int u)
 {
+//   int deleted=0;
+//   int  i=0;
+//   while(i<losl-deleted)
+//   {
+//     if(los[i].p==NULL){
+//      delete los[i];//here we assume los are constructed with new
+//       //double delete, now leave it, later we have to fix this problem
+//       int j;
+//       for(j=i+1;j<losl-deleted;j++)
+//       {
+// 	los[j-1]=los[j];
+//       }
+//       deleted++;
+//     }
+//     else
+//       i++;
+//   }
+//   return deleted;
+
   int deleted=0;
-  int  i=0;
-  while(i<losl)
+  int  i=l;
+  int last=-1;
+  while(i<=u)
   {
-    if(los[i]->p==NULL){
-      delete los[i];//here we assume los are constructed with new
-      int j;
-      for(j=i+1;j<losl-deleted;j++)
-      {
-	los[j-1]=los[j];
-      }
-      deleted++;
+    
+    if(los[i].p==NULL){
+//      delete los[i];//here we assume los are constructed with new
+      //destroy resources, must be added here   
+     if (last>=0)
+     {
+       memmove(los+(int)(last+1-deleted),los+(last+1),sizeof(red_object)*(i-1-last));
+     }
+     last=i;
+     deleted++;
     }
-    else
-      i++;
+    i++;
   }
+  if((last>=0)&&(last!=losl-1))
+      memmove(los+(int)(last+1-deleted),los+last+1,sizeof(red_object)*(losl-1-last));
   return deleted;
+  
 }
 
-static void sort_region_down(LObject** los, int l, int u, calc_dat* c)
+static void sort_region_down(red_object* los, int l, int u, calc_dat* c)
 {
+  qsort(los+l,u-l+1,sizeof(red_object),red_object_better_gen);
   int i;
+
   for(i=l;i<=u;i++)
   {
+    BOOLEAN moved=FALSE;
     int j;
     for(j=i;j;j--)
     {
-      if(pLmCmp(los[j]->p,los[j-1]->p)==1){
-	LObject* h=los[j];
+      if(pLmCmp(los[j].p,los[j-1].p)==-1){
+	red_object h=los[j];
 	los[j]=los[j-1];
 	los[j-1]=h;
+	moved=TRUE;
       }
       else break;
     }
+    if(!moved) return;
   }
 }
 
 //assume that los is ordered ascending by leading term, all non zero
-static void multi_reduction(LObject** los, int & losl, calc_dat* c)
+static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 {
   
   //initialize;
@@ -2763,8 +2619,9 @@ static void multi_reduction(LObject** los, int & losl, calc_dat* c)
   assume(losl>0);
   int i;
   for(i=0;i<losl;i++){
-    los[i]->SetShortExpVector();
-    los[i]->p=kBucketGetLm(los[i]->bucket);
+    los[i].sev=pGetShortExpVector(los[i].p);
+//SetShortExpVector();
+    los[i].p=kBucketGetLm(los[i].bucket);
   }
 
   kStrategy strat=c->strat;
@@ -2774,7 +2631,12 @@ static void multi_reduction(LObject** los, int & losl, calc_dat* c)
 //  nicht reduzierbare einträge in ergebnisliste schreiben
   // nullen loeschen
   while(curr_pos>=0){
-    find_erg erg=multi_reduction_find(los, losl,c,curr_pos);
+    find_erg erg=multi_reduction_find(los, losl,c,curr_pos);//last argument should be curr_pos
+   //  PrintS("\n erg:\n");
+//     Print("upper:%i\n",erg.to_reduce_u);
+//     Print("lower:%i\n",erg.to_reduce_l);
+//     Print("reduce_by:%i\n",erg.reduce_by);
+//     Print("fromS:%i\n",erg.fromS);
     if(erg.reduce_by<0) break;
     multi_reduction_lls_trick(los,losl,c,erg);
     //erweitern? muß noch implementiert werden
@@ -2790,7 +2652,7 @@ static void multi_reduction(LObject** los, int & losl, calc_dat* c)
     {
       //bucket aufloesen reduzieren, neu füllen
       
-      kBucketClear(los[erg.reduce_by]->bucket,&reductor,&len);
+      kBucketClear(los[erg.reduce_by].bucket,&reductor,&len);
  
  
     }
@@ -2799,21 +2661,26 @@ static void multi_reduction(LObject** los, int & losl, calc_dat* c)
     
       assume((erg.fromS)||(i!=erg.reduce_by));
       assume(reductor!=NULL);
-       number coef=kBucketPolyRed(los[i]->bucket,reductor,
+       number coef=kBucketPolyRed(los[i].bucket,reductor,
                                   len,
 				  strat->kNoether);
        nDelete(&coef);
-       los[i]->p = kBucketGetLm(los[i]->bucket);
-       if(los[i]->p!=NULL)
-	 los[i]->SetShortExpVector();
+       los[i].p = kBucketGetLm(los[i].bucket);
+       if(los[i].p!=NULL)
+	 los[i].sev=pGetShortExpVector(los[i].p);
     }
     if(!erg.fromS)
-      kBucketInit(los[erg.reduce_by]->bucket,reductor,len);
+      kBucketInit(los[erg.reduce_by].bucket,reductor,len);
 		 
-    int deleted=multi_reduction_clear_zeroes(los, losl);
+    int deleted=multi_reduction_clear_zeroes(los, losl, erg.to_reduce_l, erg.to_reduce_u);
+    curr_pos=erg.to_reduce_u;
     losl -= deleted;
     curr_pos -= deleted;
-    sort_region_down(los, erg.to_reduce_l, erg.to_reduce_u-deleted, c);
+
+    //Print("deleted %i \n",deleted);
+    //sort_region_down(los, erg.to_reduce_l, erg.to_reduce_u-deleted, c);
+//   sort_region_down(los, 0, losl-1, c);
+    //qsort(los,losl,sizeof(red_object),red_object_better_gen);
   }
   return;
 }
