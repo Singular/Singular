@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.24 1999-11-15 17:20:35 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.25 1999-11-24 14:03:49 wichmann Exp $ */
 
 /***************************************************************
  *
@@ -235,6 +235,7 @@ short sr_cmds[] =
   WRITE_CMD,
   QRING_CMD,
   FGLM_CMD,
+  FGLMQUOT_CMD,
   DUMP_CMD,
   GETDUMP_CMD,
   STATUS_CMD,
