@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.18 2001-02-08 16:35:05 lossen Exp $";
+version="$Id: latex.lib,v 1.19 2001-02-09 10:19:33 lossen Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -24,8 +24,8 @@ PROCEDURES:
 GLOBAL VARIABLES:
   TeXwidth, TeXnofrac, TeXbrack, TeXproj, TeXaligned, TeXreplace, NoDollars
   are used to control the typesetting.
-  Call @code{example texdemo;} to become familiar with the features of 
-  @code{latex.lib}.
+  Call @code{texdemo();} to obtain a LaTeX2e file @code{texlibdemo.tex}
+  explaining the features of @code{latex.lib} and its global variables.
 @format
   @code{TeXwidth} (int) -1, 0, 1..9, >9:  controls breaking of long polynomials
   @code{TeXnofrac} (int) flag:  write 1/2 instead of \\frac@{1@}@{2@}
