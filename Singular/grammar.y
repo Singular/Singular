@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.12 1997-06-17 09:44:20 Singular Exp $ */
+/* $Id: grammar.y,v 1.13 1997-06-17 11:43:43 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -13,6 +13,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include <limits.h>
+#ifdef macintosh
+#include <alloca.h>
+#endif
 
 #include "mod2.h"
 #include "tok.h"
@@ -100,10 +103,6 @@ void yyerror(char * fmt)
     exitBuffer(BT_proc);
   }
 }
-
-#ifndef alloca
-#define alloca malloc
-#endif
 
 %}
 
