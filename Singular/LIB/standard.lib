@@ -1,12 +1,14 @@
-// $Id: standard.lib,v 1.11 1998-05-18 13:24:50 Singular Exp $
+// $Id: standard.lib,v 1.12 1998-05-24 15:50:27 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.11 1998-05-18 13:24:50 Singular Exp $";
+version="$Id: standard.lib,v 1.12 1998-05-24 15:50:27 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
  stdfglm(ideal[,ord])   standard basis of the ideal via fglm [and ordering ord]
  stdhilb(ideal)         standard basis of the ideal using the Hilbert function
+ groebner(ideal/module) standard basis of ideal or module using a 
+                        heuristically choosen method 
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,4 +122,235 @@ example
    ideal i2=stdhilb(i,v);
 }
 ///////////////////////////////////////////////////////////////////////////////
+
+proc groebner(def i, list #)
+"USAGE: groebner(i) i ideal/module
+RETURNS: standard basis of ideal or module which is computed using a 
+         heuristically choosen method: 
+         If the ordering of the current ring is a lokal ordering, or
+         if it is a non-block ordering and the current ring has no
+         parameters, then std(i) is returned.  
+         Otherwise, i is mapped into a ring with no parameters and
+         ordering dp, where its Hilbert series is computed. This is
+         followed by a Hilbert-series based std computation in the
+         original ring.
+EXAMPLE: example groebner; shows an example"
+{
+  def P=basering;
+  if (size(#) > 0)
+  {
+    if (system("with", "MP"))
+    {
+      if (typeof(#[1]) == "int")
+      {
+        int wait = #[1];
+        int j, pid;
+        string bs = nameof(basering);
+        link l_fork = "MPtcp:fork";
+        open(l_fork);
+        write(l_fork, quote(system("pid")));
+        pid = read(l_fork);
+        write(l_fork, quote(groebner(eval(i))));
+        
+        for (j=0; j<wait; j++)
+        {
+          if (status(l_fork, "read", "ready", 1)) {break;}
+        }
+        
+        if (status(l_fork, "read", "ready"))
+        {
+          def result = read(l_fork);
+          if (bs != nameof(basering))
+          {
+            def PP = basering;
+            setring P;
+            def result = imap(PP, result);
+            kill PP;
+          }
+          kill (l_fork);
+        }
+        else
+        {
+          ideal result;
+          if (! defined(groebner_error))
+          {
+            int groebner_error;
+            export groebner_error;
+          }
+          groebner_error = 1;
+          "// ** groebner did not finish";
+          j = system("sh", "kill " + string(pid));
+        }
+        return (result);
+      }
+      else
+      {
+        "// ** groebner needs int as 2nd arg";
+      }
+    }
+    else
+    {
+      "// ** groebner with two args not supported in this configuration";
+    }
+  }
+   string ordstr_P = ordstr(P);
+
+   if (find(ordstr_P,"s") > 0)
+   {
+     //spaeter den lokalen fall ueber lp oder aehnlich behandeln
+      return(std(i));
+   }
+   
+   int IsSimple_P;
+   if (system("nblocks") <= 2)
+   {
+     if (find(ordstr_P, "M") <= 0)
+     {
+       IsSimple_P = 1;
+     }
+   }
+   int npars_P = npars(P);
+
+   // return std if no parameters and (dp or wp)
+   if ((npars_P == 0) && IsSimple_P)
+   {
+     if (find(ordstr_P, "d") > 0)
+     {
+       return (std(i));
+     }
+     if (find(ordstr_P,"w") > 0)
+     {
+       return (std(i));
+     }
+   }
+
+   // reset options
+   intvec opt=option(get);
+   int p_opt;
+   string s_opt = option();
+   option(none);
+   // turn on option(prot) and/or option(mem), if previously set
+   if (find(s_opt, "prot"))
+   {
+     option(prot);
+     p_opt = 1;
+   }
+   if (find(s_opt, "mem"))
+   {
+     option(mem);
+   }
+   
+   // construct ring in which first std computation is done
+   string varstr_P = varstr(P);
+   string parstr_P = parstr(P);
+   int is_homog = (homog(i) && (npars_P == 0)); 
+   
+   string ri = "ring Phelp =" + string(char(P)) + ",(" + varstr_P;
+   // parameters are converted to ring variables
+   if (npars_P > 0)
+   {
+     ri = ri + "," + parstr_P;
+   }
+   // a homogenizing variable is added, if necessary
+   if (! is_homog)
+   {
+     ri = ri + ",@t";
+   }
+   // ordering is set to (dp, C)
+   ri = ri + "),(dp,C);";
+
+   // change the ring
+   execute(ri);
+   
+   // get ideal from previous ring
+   if (is_homog)
+   {
+     ideal qh = imap(P, i);
+   }
+   else
+   {
+     // and homogenize
+     ideal qh=homog(imap(P,i),@t);
+   }
+   
+   // compute std and hilbert series
+   if (p_opt)
+   {
+     "std in " + ri[13, size(ri) - 13];
+   }
+   ideal qh1=std(qh);
+   intvec hi=hilb(qh1,1);
+
+   if (is_homog && (npars_P == 0))
+   {
+     // no additional variables were introduced
+     setring P; // can immediately change to original ring
+     // simply compute std with hilbert series in original ring
+     if (p_opt)
+     {
+       "std with hilb in basering";
+       i = std(i, hi);
+     }
+   }
+   else
+   {
+     // additional variables were introduced
+     // need another intermediate ring
+     ri = "ring Phelp1 =" + string(char(P)) 
+       + ",(" + varstr(Phelp) + "),(" + ordstr_P;
+     
+     // for lp without parameters, we do not need a block ordering
+     if ( ! (IsSimple_P && (npars_P + is_homog < 2) && find(ordstr_P, "l")))
+     {
+       // need block ordering
+       ri = ri + ", dp(" + string(npars_P + is_homog) + ")";
+     }
+     ri = ri + ");";
+     
+     // change to intermediate ring
+     execute(ri);
+     ideal qh = imap(Phelp, qh);
+     kill Phelp;
+     if (p_opt)
+     {
+       "std with hilb in " + ri[14,size(ri)-14];
+     }
+     // compute std with Hilbert series
+     qh = std(qh, hi);
+     // subst 1 for homogenizing var
+     if (!is_homog)
+     {
+       qh = subst(qh, @t, 1);
+     }
+     
+     // go back to original ring
+     setring P;
+     // get ideal, delete zeros and clean SB
+     i = imap(Phelp1,qh);
+     i = simplify(i, 34);
+     kill Phelp1;
+   }
+
+   // clean-up time
+   option(set, opt);
+   if (find(s_opt, "redSB") > 0)
+   {
+     i=interred(i);
+   }
+   attrib(i, "isSB", 1);
+   return (i);
+}
+example
+{
+  "EXAMPLE: "; echo = 2;
+  ring r = 0, (a,b,c,d), lp;
+  option(prot); 
+  ideal i = a+b+c+d, ab+ad+bc+cd, abc+abd+acd+bcd, abcd-1; // cyclic 4
+  groebner(i);
+  ring rp = (0, a, b), (c,d), lp;
+  ideal i = imap(r, i);
+  ideal j = groebner(i);
+  option(noprot);
+  j; simplify(j, 1); std(i);
+}
 

@@ -4318,11 +4318,25 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
       (v->next->next->next->Typ() != INT_CMD))
     return TRUE;
   jjSTATUS3(res, v, v->next, v->next->next);
-#ifdef HAVE_SLEEP
+#if defined(HAVE_USLEEP)
   if (((int) res->data) == 0)
   {
-    sleep((int) v->next->next->next->Data());
-    jjSTATUS3(res, v, v->next, v->next->next);
+    int i_s = (int) v->next->next->next->Data();
+    if (i_s > 0)
+    {
+      usleep((int) v->next->next->next->Data());
+      jjSTATUS3(res, v, v->next, v->next->next);
+    }
+  }
+#elif defined(HAVE_SLEEP)
+  if (((int) res->data) == 0)
+  {
+    int i_s = (int) v->next->next->next->Data();
+    if (i_s > 0)
+    {
+      sleep((is - 1)/1000000 + 1);
+      jjSTATUS3(res, v, v->next, v->next->next);
+    }
   }
 #endif
   return FALSE;

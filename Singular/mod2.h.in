@@ -74,6 +74,8 @@
 #undef HAVE_SBRK
 /* Define if you have readlink */
 #undef HAVE_READLINK
+/* Define if you have usleep */
+#undef HAVE_USLEEP
 /* Define if you have sleep */
 #undef HAVE_SLEEP
 /* Define sizeof(char) */

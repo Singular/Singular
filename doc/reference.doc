@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.76 1998-05-24 12:09:23 obachman Exp $
+@comment $Id: reference.doc,v 1.77 1998-05-24 15:50:29 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4683,11 +4683,12 @@ string is returned:
 fourth integer argument (say, @code{i}) is given and if
 @code{status(l,s1,s2)} yields @code{0}, then the execution of the
 current process is  suspended (the process is put to "sleep") for
-appr. @code{i} seconds, and afterwards the result of another call to
+appr. @code{i} microseconds, and afterwards the result of another call to
 @code{status(l,s1,s2)} is returned. The latter is useful for
 "polling" the @code{read} status of @code{MPtcp} links such that busy
 loops are avoided (see @ref{Parallelization with MPtcp links} for an
-example). 
+example). Not that on some systems, the minimium time a process is put
+to sleep is  one second. 
 @table @code
 @item @code{"name"}
 the name string given by the definition of the link (usually the filename)

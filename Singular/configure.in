@@ -428,7 +428,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd sbrk readlink sleep)
+AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd sbrk readlink sleep usleep)
 
 dnl
 dnl System specific tests

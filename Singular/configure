@@ -3418,7 +3418,7 @@ fi
 
 fi
 
-for ac_func in gettimeofday atexit bcopy getcwd getwd sbrk readlink sleep
+for ac_func in gettimeofday atexit bcopy getcwd getwd sbrk readlink sleep usleep
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:3425: checking for $ac_func" >&5
