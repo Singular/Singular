@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: kstdfac.cc,v 1.3 1997-03-26 14:37:15 Singular Exp $";
+/* $Id: kstdfac.cc,v 1.4 1997-04-02 15:07:17 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */

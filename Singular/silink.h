@@ -3,20 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: silink.h,v 1.5 1997-04-02 15:07:51 Singular Exp $ */
 /*
 * ABSTRACT
-*/
-/* $Log: not supported by cvs2svn $
- * Revision 1.3  1997/03/26  14:58:03  obachman
- * Wed Mar 26 14:02:15 1997  Olaf Bachmann
- * <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
- *
- * 	* added reference counter to links, updated slKill, slCopy, slInit
- * 	* various small bug fixes for Batch mode
- *
- * Revision 1.1.1.1  1997/03/19  13:18:41  obachman
- * Imported Singular sources
- *
 */
 
 #include "structs.h"

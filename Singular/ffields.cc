@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: ffields.cc,v 1.4 1997-03-26 16:31:48 obachman Exp $";
+/* $Id: ffields.cc,v 1.5 1997-04-02 15:07:00 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */

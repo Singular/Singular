@@ -1,7 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: tesths.cc,v 1.4 1997-03-27 20:26:04 obachman Exp $";
+/* $Id: tesths.cc,v 1.5 1997-04-02 15:07:58 Singular Exp $ */
+
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
@@ -17,6 +18,7 @@ static char rcsid[] = "$Id: tesths.cc,v 1.4 1997-03-27 20:26:04 obachman Exp $";
 #include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
+#include <errno.h>
 
 #include "mod2.h"
 #include "tok.h"

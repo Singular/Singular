@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-static char rcsid[] = "$Id: intvec.cc,v 1.3 1997-03-24 14:24:48 Singular Exp $";
+/* $Id: intvec.cc,v 1.4 1997-04-02 15:07:05 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */

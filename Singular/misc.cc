@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: misc.cc,v 1.3 1997-03-27 20:23:42 obachman Exp $";
+/* $Id: misc.cc,v 1.4 1997-04-02 15:07:27 Singular Exp $ */
 /*
 * ABSTRACT:
 */

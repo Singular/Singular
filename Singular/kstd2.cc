@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: kstd2.cc,v 1.2 1997-03-24 14:25:05 Singular Exp $";
+/* $Id: kstd2.cc,v 1.3 1997-04-02 15:07:16 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */

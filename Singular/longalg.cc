@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: longalg.cc,v 1.2 1997-03-24 14:25:13 Singular Exp $";
+/* $Id: longalg.cc,v 1.3 1997-04-02 15:07:21 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */

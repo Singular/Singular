@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: febase.cc,v 1.5 1997-03-26 17:07:16 Singular Exp $";
+/* $Id: febase.cc,v 1.6 1997-04-02 15:06:58 Singular Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */

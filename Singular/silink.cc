@@ -1,32 +1,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: silink.cc,v 1.6 1997-04-02 15:07:50 Singular Exp $ */
+
 /*
 * ABSTRACT
-*/
-/* $Log: not supported by cvs2svn $
-// Revision 1.4  1997/03/28  21:44:36  obachman
-// Fri Mar 28 14:12:05 1997  Olaf Bachmann
-// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
-//
-// 	* Added routines dump(link) and getdump(link) for ascii and MP
-// 	  links
-//
-// 	* ipconv.cc (dConvertTypes): added int->module conversion so that
-// 	  'module m = 0' works
-//
-// 	* iparith.cc (jjVAR1): added LINK_CMD to list of typeof(...)
-//
-// Revision 1.3  1997/03/26  14:58:02  obachman
-// Wed Mar 26 14:02:15 1997  Olaf Bachmann
-// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
-//
-// 	* added reference counter to links, updated slKill, slCopy, slInit
-// 	* various small bug fixes for Batch mode
-//
-// Revision 1.1.1.1  1997/03/19  13:18:42  obachman
-// Imported Singular sources
-//
 */
 
 #include <stdio.h>

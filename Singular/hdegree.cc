@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char  rcsid[] = "$Id: hdegree.cc,v 1.3 1997-03-24 14:24:42 Singular Exp $";
+/* $Id: hdegree.cc,v 1.4 1997-04-02 15:07:01 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */

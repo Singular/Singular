@@ -2,6 +2,8 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
+/* $Id: mpsr_Timer.cc,v 1.3 1997-04-02 15:07:42 Singular Exp $ */
+
 /***************************************************************
  *
  * File:       mpsr_Timer.cc

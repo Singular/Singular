@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: hutil.cc,v 1.2 1997-03-24 14:24:44 Singular Exp $";
+/* $Id: hutil.cc,v 1.3 1997-04-02 15:07:03 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */

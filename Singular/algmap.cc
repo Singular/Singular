@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: algmap.cc,v 1.2 1997-03-24 14:24:27 Singular Exp $";
+/* $Id: algmap.cc,v 1.3 1997-04-02 15:06:53 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers

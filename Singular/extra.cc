@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-static char rcsid[] = "$Id: extra.cc,v 1.5 1997-03-28 21:44:26 obachman Exp $";
+/* $Id: extra.cc,v 1.6 1997-04-02 15:06:57 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */

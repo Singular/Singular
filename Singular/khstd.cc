@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: khstd.cc,v 1.3 1997-03-27 12:42:46 Singular Exp $";
+/* $Id: khstd.cc,v 1.4 1997-04-02 15:07:14 Singular Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven std
 */

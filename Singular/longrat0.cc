@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: longrat0.cc,v 1.2 1997-03-24 14:25:18 Singular Exp $";
+/* $Id: longrat0.cc,v 1.3 1997-04-02 15:07:23 Singular Exp $ */
 /*
 * ABSTRACT -
 * IO for long rational numbers (Hubert Grassmann)

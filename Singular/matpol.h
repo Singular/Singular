@@ -19,8 +19,6 @@ class ip_smatrix
 
   inline int& rows() { return nrows; }
   inline int& cols() { return ncols; }
-  inline poly& elem(int i, int j) { return m[cols() * i + j]; }
-//  friend matrix operator +(ip_smatrix * a, ip_smatrix * b);
 
   #define MATROWS(i) ((i)->nrows)
   #define MATCOLS(i) ((i)->ncols)

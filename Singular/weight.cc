@@ -1,7 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: weight.cc,v 1.2 1997-03-24 14:26:08 Singular Exp $";
+/* $Id: weight.cc,v 1.3 1997-04-02 15:08:00 Singular Exp $ */
+
 /*
 * ABSTRACT:
 */

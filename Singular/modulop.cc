@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: modulop.cc,v 1.2 1997-03-24 14:25:26 Singular Exp $";
+/* $Id: modulop.cc,v 1.3 1997-04-02 15:07:35 Singular Exp $ */
 /*
 * ABSTRACT:
 */

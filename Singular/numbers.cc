@@ -1,7 +1,8 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-static char rcsid[] = "$Id: numbers.cc,v 1.2 1997-03-24 14:25:34 Singular Exp $";
+/* $Id: numbers.cc,v 1.3 1997-04-02 15:07:43 Singular Exp $ */
+
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */

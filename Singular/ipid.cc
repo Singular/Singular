@@ -1,12 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipid.cc,v 1.3 1997-03-26 14:57:57 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-// Revision 1.1.1.1  1997/03/19  13:18:42  obachman
-// Imported Singular sources
-//
-*/
+/* $Id: ipid.cc,v 1.4 1997-04-02 15:07:10 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling

@@ -1,13 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: matpol.cc,v 1.2 1997-03-24 14:25:20 Singular Exp $";
+/* $Id: matpol.cc,v 1.3 1997-04-02 15:07:25 Singular Exp $ */
+
 /*
 * ABSTRACT:
 */
 
 #include <stdio.h>
 #include <limits.h>
+#include <math.h>
 
 #include "mod2.h"
 #include "tok.h"
@@ -18,9 +20,21 @@ static char rcsid[] = "$Id: matpol.cc,v 1.2 1997-03-24 14:25:20 Singular Exp $";
 #include "ideals.h"
 #include "ipid.h"
 #include "subexpr.h"
+#include "intvec.h"
 #include "matpol.h"
 
 /*0 implementation*/
+
+typedef int perm[100];
+static poly mpDivide(poly a, poly b);
+static void mpReplace(int j, int n, int &sign, int *perm);
+static float mpPolyWeight(poly p);
+static int nextperm(perm * z, int max);
+static poly mpLeibnitz(matrix a);
+static poly minuscopy (poly p);
+static poly pInsert(poly p1, poly p2);
+static poly select (poly fro, monomial what);
+static poly exdiv ( poly m, monomial d);
 
 /*2
 * create a r x c zero-matrix
@@ -67,25 +81,20 @@ matrix mpNew(int r, int c)
 */
 matrix mpCopy (matrix a)
 {
-  int i,j;
-  matrix b;
-  int m=MATROWS(a);
-  int n=MATCOLS(a);
+  poly t;
+  int i, m=MATROWS(a), n=MATCOLS(a);
+  matrix b = mpNew(m, n);
 
-  b = mpNew(m, n);
-  for (i=1; i<=m; i++)
+  for (i=m*n-1; i>=0; i--)
   {
-    for (j=1; j<=n; j++)
-    {
-      poly t=MATELEM(a,i,j);
-      pNormalize(t);
+    t = a->m[i];
+    pNormalize(t);
 #ifdef MDEBUG
-//      MATELEM(b,i,j) = pDBCopy(t,f,l) ;
-      MATELEM(b,i,j) = pCopy(t) ;
+//    b->m[i] = pDBCopy(t,f,l);
+    b->m[i] = pCopy(t);
 #else
-      MATELEM(b,i,j) = pCopy(t) ;
+    b->m[i] = pCopy(t);
 #endif
-    }
   }
   b->rank=a->rank;
   return b;
@@ -97,13 +106,13 @@ matrix mpCopy (matrix a)
 matrix mpInitP(int r, int c, poly p)
 {
   matrix rc = mpNew(r,c);
-  int i=min(r,c);
+  int i=min(r,c), n = c*(i-1)+i-1, inc = c+1;
 
   pNormalize(p);
-  while (i>1)
+  while (n>0)
   {
-    MATELEM(rc,i,i)=pCopy(p);
-    i--;
+    rc->m[n] = pCopy(p);
+    n -= inc;
   }
   rc->m[0]=p;
   return rc;
@@ -122,19 +131,13 @@ matrix mpInitI(int r, int c, int v)
 */
 matrix mpMultI(matrix a, int f)
 {
-  int    i, j, k = 0, n = a->rows(), m = a->cols();
+  int k, n = a->nrows, m = a->ncols;
   poly p = pISet(f);
   matrix c = mpNew(n,m);
 
-  for (i=0; i<n; i++)
-  {
-    for (j=0; j<m; j++)
-    {
-      c->m[k] = pMult(pCopy(a->m[k]), pCopy(p));
-      k++;
-    }
-  }
-  pDelete(&p);
+  for (k=m*n-1; k>0; k--)
+    c->m[k] = pMult(pCopy(a->m[k]), pCopy(p));
+  c->m[0] = pMult(pCopy(a->m[0]), p);
   return c;
 }
 
@@ -143,25 +146,19 @@ matrix mpMultI(matrix a, int f)
 */
 matrix mpMultP(matrix a, poly p)
 {
-  int    i, j, k = 0, n = a->rows(), m = a->cols();
+  int k, n = a->nrows, m = a->ncols;
 
   pNormalize(p);
-  for (i=0; i<n; i++)
-  {
-    for (j=0; j<m; j++)
-    {
-      a->m[k] = pMult(a->m[k], pCopy(p));
-      k++;
-    }
-  }
-  pDelete(&p);
+  for (k=m*n-1; k>0; k--)
+    a->m[k] = pMult(a->m[k], pCopy(p));
+  a->m[0] = pMult(a->m[0], p);
   return a;
 }
 
 matrix mpAdd(matrix a, matrix b)
 {
-  int    i, j, k = 0, n = a->rows(), m = a->cols();
-  if ((n != b->rows()) || (m != b->cols()))
+  int k, n = a->nrows, m = a->ncols;
+  if ((n != b->nrows) || (m != b->ncols))
   {
 /*
 *    Werror("cannot add %dx%d matrix and %dx%d matrix",
@@ -170,21 +167,15 @@ matrix mpAdd(matrix a, matrix b)
     return NULL;
   }
   matrix c = mpNew(n,m);
-  for (i=0; i<n; i++)
-  {
-    for (j=0; j<m; j++)
-    {
-      c->m[k] = pAdd(pCopy(a->m[k]), pCopy(b->m[k]));
-      k++;
-    }
-  }
+  for (k=m*n-1; k>=0; k--)
+    c->m[k] = pAdd(pCopy(a->m[k]), pCopy(b->m[k]));
   return c;
 }
 
 matrix mpSub(matrix a, matrix b)
 {
-  int    i, j, k = 0, n = a->rows(), m = a->cols();
-  if ((n != b->rows()) || (m != b->cols()))
+  int k, n = a->nrows, m = a->ncols;
+  if ((n != b->nrows) || (m != b->ncols))
   {
 /*
 *    Werror("cannot sub %dx%d matrix and %dx%d matrix",
@@ -193,14 +184,8 @@ matrix mpSub(matrix a, matrix b)
     return NULL;
   }
   matrix c = mpNew(n,m);
-  for (i=0; i<n; i++)
-  {
-    for (j=0; j<m; j++)
-    {
-      c->m[k] = pSub(pCopy(a->m[k]), pCopy(b->m[k]));
-      k++;
-    }
-  }
+  for (k=m*n-1; k>=0; k--)
+    c->m[k] = pSub(pCopy(a->m[k]), pCopy(b->m[k]));
   return c;
 }
 
@@ -291,450 +276,99 @@ poly TraceOfProd ( matrix a, matrix b, int n)
   return t;
 }
 
-/*2
-* res:= a / b;  a destroyed, b NOT destroyed
+/*
+* C++ classes for Bareiss algorithm
 */
-static poly mpDivide(poly a, poly b)
+class row_col_weight
 {
-  int i, k;
-  number x;
-  poly res, tail, t, h, h0;
-
-  res = a;
-  tail = pNext(b);
-  if (tail == NULL)
-  {
-    k = pTotaldegree(b);
-    do
-    {
-      if (k!=0)
-      {
-        for (i=pVariables; i>0; i--)
-          pGetExp(a,i) -= pGetExp(b,i);
-        pSetm(a);
-      }
-      x = nDiv(pGetCoeff(a), pGetCoeff(b));
-      nNormalize(x);
-      pSetCoeff(a,x);
-      pIter(a);
-    } while (a != NULL);
-    return res;
-  }
-  do
-  {
-    for (i=pVariables; i>0; i--)
-      pGetExp(a,i) -= pGetExp(b,i);
-    pSetm(a);
-    x = nDiv(pGetCoeff(a), pGetCoeff(b));
-    nNormalize(x);
-    pSetCoeff(a,x);
-    t = tail;
-    h = NULL;
-    do
-    {
-      if (h == NULL)
-        h = h0 = pNew();
-      else
-        h = pNext(h) = pNew();
-      for (i=pVariables; i>0; i--)
-        pSetExp(h,i, pGetExp(a,i)+pGetExp(t,i));
-      pSetm(h);
-      x = nMult(pGetCoeff(a), pGetCoeff(t));
-      pSetCoeff0(h,nNeg(x));
-      pIter(t);
-    } while (t != NULL);
-    pNext(h) = NULL;
-    pNext(a) = pAdd(pNext(a),h0);
-    pIter(a);
-  } while (a != NULL);
-  return res;
-}
+  private:
+  int ym, yn;
+  public:
+  float *wrow, *wcol;
+  row_col_weight() : ym(0) {}
+  row_col_weight(int, int);
+  ~row_col_weight();
+};
 
 /*2
-* pivot strategy for Bareiss algorithm
-* search at all positions (qr[i],qc[j]) with
-*   1 <= j <= m, 1 <= i <= n and ((z[j] == 0)&&(f[i] == 0))
-* looks in the polynomials for
-*   1. minimal length
-*   2. minimal degree
-* (qr[k],qc[k]) will be the optimal position of a nonzero element
-* if all element are zero -> *r = 0
+*  a submatrix M of a matrix X[m,n]:
+*    0 <= i < s_m <= a_m
+*    0 <= j < s_n <= a_n
+*    M = ( Xarray[qrow[i],qcol[j]] )
+*    if a_m = a_n and s_m = s_n
+*      det(X) = sign*div^(s_m-1)*det(M)
+*    resticted pivot for elimination
+*      0 <= j < piv_s
 */
-static void mpPivot(matrix a, int k, int *r, int *qr, int *qc)
+class mp_permmatrix
 {
-  int i, ii, j, iopt, jopt, l, lopt, d, dopt;
-  poly p;
-  int n = MATCOLS(a), m = MATROWS(a);
-
-  lopt = INT_MAX;
-  for(i=k; i<=m; i++)
-  {
-    ii = qr[i];
-    for(j=k; j<=n; j++)
-    {
-      p = MATELEM(a,ii,qc[j]);
-      if (p != NULL)
-      {
-        l = pLength(p);
-        if (l<lopt)
-        {
-          iopt = i;
-          jopt = j;
-          lopt = l;
-          dopt = pTotaldegree(p);
-        }
-        else if (l == lopt)
-        {
-          d = pTotaldegree(p);
-          if (d < dopt)
-          {
-            iopt = i;
-            jopt = j;
-            dopt = d;
-          }
-        }
-      }
-    }
-  }
-  if (lopt < INT_MAX)
-  {
-    ii = qr[k];
-    qr[k] = qr[iopt];
-    qr[iopt] = ii;
-    ii = qc[k];
-    qc[k] = qc[jopt];
-    qc[jopt] = ii;
-    *r = 1;
-  }
-  else
-    *r = 0;
-}
+  private:
+  int       a_m, a_n, s_m, s_n, sign, piv_s;
+  int       *qrow, *qcol;
+  poly      *Xarray;
+  void mpInitMat();
+  poly * mpRowAdr(int);
+  poly * mpColAdr(int);
+  void mpRowWeight(float *);
+  void mpColWeight(float *);
+  void mpRowSwap(int, int);
+  void mpColSwap(int, int);
+  public:
+  mp_permmatrix() : a_m(0) {}
+  mp_permmatrix(matrix);
+  mp_permmatrix(mp_permmatrix *);
+  ~mp_permmatrix();
+  int mpGetRdim();
+  int mpGetCdim();
+  int mpGetSign();
+  void mpSetSearch(int s);
+  void mpSaveArray();
+  poly mpGetElem(int, int);
+  void mpSetElem(poly, int, int);
+  void mpDelElem(int, int);
+  void mpElimBareiss(poly);
+  int mpPivotBareiss(row_col_weight *);
+  void mpToIntvec(intvec *);
+  void mpRowReorder();
+  void mpColReorder();
+};
 
 /*2
-* Bareiss' algorithm is applied for backward elimination in mpBar
-*/
-static matrix mpBarBack(matrix res, int *qr, int *qc, int mn)
-{
-  int i, ii, i1, j, jj, j1, k;
-  poly p1, p2, q1, q2, t, c;
-  int n = MATCOLS(res);
-
-  /* backward elimination, clean upper triangular nonzeros */
-  c = NULL;
-  for(k=mn; k>1; k--)
-  {
-    ii = qr[k];
-    jj = qc[k];
-    p1 = MATELEM(res,ii,jj);
-    for (i=1; i<k; i++)
-    {
-      i1 = qr[i];
-      p2 = pNeg(MATELEM(res,i1,jj));
-      for (j=n; j>mn; j--)
-      {
-        j1 = qc[j];
-        q1 = pMult(pCopy(p1),MATELEM(res,i1,j1));
-        q2 = pMult(pCopy(MATELEM(res,ii,j1)),pCopy(p2));
-        t = pAdd(q1, q2);
-        if ((c != NULL) &&(t != NULL))
-          t = mpDivide(t, c);
-        MATELEM(res,i1,j1) = t;
-      }
-      for (j=1; j<k; j++)
-      {
-        j1 = qc[j];
-        q1 = pMult(pCopy(p1),MATELEM(res,i1,j1));
-        q2 = pMult(pCopy(MATELEM(res,ii,j1)),pCopy(p2));
-        t = pAdd(q1, q2);
-        if ((c != NULL) &&(t != NULL))
-          t = mpDivide(t, c);
-        MATELEM(res,i1,j1) = t;
-      }
-      pDelete(&(MATELEM(res,i1,jj)));
-    }
-    c = p1;
-  }
-  return res;
-}
-
-/*2
-*Bareiss' algorithm is applied to the mxn matrix a
-*/
-static matrix mpBar(matrix a, int *qr, int *qc, int *ra, BOOLEAN sw)
-{
-  int i, ii, i1, j, jj, j1;
-  poly p1, p2, q1, q2, t, c;
-  int n = MATCOLS(a),
-      m = MATROWS(a),
-      mn = min(m, n), k = 2;
-  matrix res = mpCopy(a);
-
-  if (mn < 2)
-    return res;
-  /* elimination, upper triangular structure */
-  mpPivot(res,1,&ii,qr,qc);
-  if (ii==0)
-  {
-    *ra = 0;
-    return res;
-  }
-  ii = qr[1];
-  jj = qc[1];
-  p1 = MATELEM(res,ii,jj);
-  for(i=m; i>1; i--)
-  {
-    i1 = qr[i];
-    p2 = pNeg(MATELEM(res,i1,jj));
-    for (j=n; j>1; j--)
-    {
-      j1 = qc[j];
-      q1 = pMult(pCopy(p1),MATELEM(res,i1,j1));
-      q2 = pMult(pCopy(MATELEM(res,ii,j1)),pCopy(p2));
-      MATELEM(res,i1,j1) = pAdd(q1, q2);
-    }
-    pDelete(&(MATELEM(res,i1,jj)));
-  }
-  c = p1;
-  loop
-  {
-    mpPivot(res,k,&ii,qr,qc);
-    if (ii==0)
-    {
-      k--;
-      break;
-    }
-    ii = qr[k];
-    jj = qc[k];
-    p1 = MATELEM(res,ii,jj);
-    for(i=m; i>k; i--)
-    {
-      i1 = qr[i];
-      p2 = pNeg(MATELEM(res,i1,jj));
-      for (j=n; j>k; j--)
-      {
-        j1 = qc[j];
-        q1 = pMult(pCopy(p1),MATELEM(res,i1,j1));
-        q2 = pMult(pCopy(MATELEM(res,ii,j1)),pCopy(p2));
-        t = pAdd(q1, q2);
-        if (t != NULL)
-          t = mpDivide(t, c);
-        MATELEM(res,i1,j1) = t;
-      }
-      pDelete(&(MATELEM(res,i1,jj)));
-    }
-    if (k == mn)
-      break;
-    c = p1;
-    k++;
-  }
-  *ra = k;
-  /* backward elimination, clean upper triangular nonzeros */
-  if (sw)
-  {
-    mpBarBack(res, qr, qc, k);
-  }
-  return res;
-}
-
-/*2
-*  caller of 'Bareiss' algorithm,
-*  the position of the 'pivots' is as follows:
-*  (qc[i], qr[i]) for i=1,..,r (r the rank of a)
-*  the switch sw:
-*    TRUE -> full elimination
-*    FALSE -> only upper 'tridiagonal'
+*  caller of 'Bareiss' algorithm
+*  return an list of ...
 */
 matrix mpBareiss (matrix a, BOOLEAN sw)
 {
-  matrix res;
-  int *qc, *qr, r;
-  int n = MATCOLS(a), m = MATROWS(a);
+  poly div;
+  matrix c = mpCopy(a);
+  mp_permmatrix *Bareiss = new mp_permmatrix(c);
+  row_col_weight w(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+  intvec *v = new intvec(Bareiss->mpGetCdim());
+//  lists res=(lists)Alloc(sizeof(slists));
 
-  qr = (int *)Alloc((m+1)*sizeof(int));
-  qc = (int *)Alloc((n+1)*sizeof(int));
-  for (r=m; r>0; r--)
-    qr[r] = r;
-  for (r=n; r>0; r--)
-    qc[r] = r;
-  res = mpBar(a, qr, qc, &r, sw);
-  Free((ADDRESS)qc, (n+1)*sizeof(int));
-  Free((ADDRESS)qr, (m+1)*sizeof(int));
+  if (sw) PrintS("not implemented");
+  /* Bareiss */
+  div = NULL;
+  while(Bareiss->mpPivotBareiss(&w))
+  {
+    Bareiss->mpElimBareiss(div);
+    div = Bareiss->mpGetElem(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+  }
+  Bareiss->mpToIntvec(v);
+  Bareiss->mpRowReorder();
+  Bareiss->mpColReorder();
+  Bareiss->mpSaveArray();
+  delete Bareiss;
+/*
+  res->Init(2);
+  res->m[0].rtyp=MATRIX_CMD;
+  res->m[0].data=(void *)c;
+  res->m[1].rtyp=INTVEC_CMD;
+  res->m[1].data=(void *)v;
   return res;
-}
-
-typedef int perm[100];
-
-static int nextperm(perm * z, int max)
-{
-  int s, i, k, t;
-  s = max;
-  do
-  {
-    s--;
-  }
-  while ((s > 0) && ((*z)[s] >= (*z)[s+1]));
-  if (s==0)
-    return 0;
-  do
-  {
-    (*z)[s]++;
-    k = 0;
-    do
-    {
-      k++;
-    }
-    while (((*z)[k] != (*z)[s]) && (k!=s));
-  }
-  while (k < s);
-  for (i=s+1; i <= max; i++)
-  {
-    (*z)[i]=0;
-    do
-    {
-      (*z)[i]++;
-      k=0;
-      do
-      {
-        k++;
-      }
-      while (((*z)[k] != (*z)[i]) && (k != i));
-    }
-    while (k < i);
-  }
-  s = max+1;
-  do
-  {
-    s--;
-  }
-  while ((s > 0) && ((*z)[s] > (*z)[s+1]));
-  t = 1;
-  for (i=1; i<max; i++)
-    for (k=i+1; k<=max; k++)
-      if ((*z)[k] < (*z)[i])
-        t = -t;
-  (*z)[0] = t;
-  return s;
-}
-
-static poly mpLeibnitz(matrix a)
-{
-  int i, e, n;
-  poly p, d;
-  perm z;
-
-  n = MATROWS(a);
-  memset(&z,0,(n+2)*sizeof(int));
-  p = pOne();
-  for (i=1; i <= n; i++)
-    p = pMult(p, pCopy(MATELEM(a, i, i)));
-  d = p;
-  for (i=1; i<= n; i++)
-    z[i] = i;
-  z[0]=1;
-  e = 1;
-  if (n!=1)
-  {
-    while (e)
-    {
-      e = nextperm((perm *)&z, n);
-      p = pOne();
-      for (i = 1; i <= n; i++)
-        p = pMult(p, pCopy(MATELEM(a, i, z[i])));
-      if (z[0] > 0)
-        d = pAdd(d, p);
-      else
-        d = pSub(d, p);
-    }
-  }
-  return d;
-}
-
-/*2
-* compute sign for determinat in Bareiss method
 */
-/*
-*static int mpSign(int *qc, int n)
-*{
-*  int i, j, s=1;
-*
-*  for (i=1; i<n; i++)
-*  {
-*    if (i != qc[i])
-*    {
-*      s = -s;
-*      j = i;
-*      loop
-*      {
-*        j++;
-*        if (i == qc[j])
-*       {
-*          qc[j] = qc[i];
-*          qc[i] = i;
-*        }
-*      }
-*    }
-*  }
-*  return s;
-*}
-*/
-
-/*2
-* returns the determinant of the n X n matrix m;
-* uses Bareiss method:
-* if m is regular, then for the matrix a (the result of mpBar)
-* the determinant equals up to sign the last 'pivot'
-*/
-/*
-*poly mpDet (matrix m)
-*{
-*  int *qc, *qr, r, s;
-*  int n = MATCOLS(m);
-*  matrix b;
-*  number e;
-*  poly res;
-*
-*  if (n != MATROWS(m))
-*  {
-*    Werror("det of %d x %d matrix",n,MATCOLS(m));
-*    return NULL;
-*  }
-*#ifdef SRING
-*  if(pSRING)
-*    return mpLeibnitz(m);
-*#endif
-*  qc = (int *)Alloc0((n+1)*sizeof(int));
-*  qr = (int *)Alloc0((n+1)*sizeof(int));
-*  b = mpBar(m, qc, qr, &r, FALSE);
-*  if (r<n)
-*    res = NULL;
-*  else
-*  {
-*    res = MATELEM(b,qr[n],qc[n]);
-*    MATELEM(b,qr[n],qc[n]) = NULL;
-*  }
-*  s = mpSign(qc, n);
-*  if (s < 0)
-*  {
-*    e = nInit(s);
-*    pMultN(res, e);
-*    nDelete(&e);
-*  }
-*  Free((ADDRESS)qc, (n+1)*sizeof(int));
-*  Free((ADDRESS)qr, (n+1)*sizeof(int));
-*  idDelete((ideal *)&b);
-*  return res;
-*}
-*/
-
-static poly minuscopy (poly p)
-{
-  poly w;
-  number  e;
-  e = nInit(-1);
-  w = pCopy(p);
-  pMultN(w, e);
-  nDelete(&e);
-  return w;
+  delete v;
+  return c;
 }
 
 /*2
@@ -835,19 +469,19 @@ matrix mpWedge(matrix a, int ar)
   matrix tmp;
   poly p;
 
-  i = binom(a->rows(),ar);
-  j = binom(a->cols(),ar);
+  i = binom(a->nrows,ar);
+  j = binom(a->ncols,ar);
 
   rowchoise=(int *)Alloc(ar*sizeof(int));
   colchoise=(int *)Alloc(ar*sizeof(int));
   result =mpNew(i,j);
   tmp=mpNew(ar,ar);
   l = 1; /* k,l:the index in result*/
-  idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
+  idInitChoise(ar,1,a->nrows,&rowch,rowchoise);
   while (!rowch)
   {
     k=1;
-    idInitChoise(ar,1,a->cols(),&colch,colchoise);
+    idInitChoise(ar,1,a->ncols,&colch,colchoise);
     while (!colch)
     {
       for (i=1; i<=ar; i++)
@@ -861,9 +495,9 @@ matrix mpWedge(matrix a, int ar)
       if ((k+l) & 1) p=pNeg(p);
       MATELEM(result,l,k) = p;
       k++;
-      idGetNextChoise(ar,a->cols(),&colch,colchoise);
+      idGetNextChoise(ar,a->ncols,&colch,colchoise);
     }
-    idGetNextChoise(ar,a->rows(),&rowch,rowchoise);
+    idGetNextChoise(ar,a->nrows,&rowch,rowchoise);
     l++;
   }
   /*delete the matrix tmp*/
@@ -1059,110 +693,6 @@ void   mpMonomials(matrix c, int r, int var, matrix m)
   pDelete(&h);
 }
 
-/*2
-* insert a monomial into a list, avoid duplicates
-* arguments are destroyed
-*/
-static poly pInsert(poly p1, poly p2)
-{
-  static poly a1, p, a2, a;
-  int c;
-
-  if (p1==NULL) return p2;
-  if (p2==NULL) return p1;
-  a1 = p1;
-  a2 = p2;
-  a = p  = pOne();
-  loop
-  {
-    c = pComp(a1, a2);
-    if (c == 1)
-    {
-      a = pNext(a) = a1;
-      pIter(a1);
-      if (a1==NULL)
-      {
-        pNext(a) = a2;
-        break;
-      }
-    }
-    else if (c == -1)
-    {
-      a = pNext(a) = a2;
-      pIter(a2);
-      if (a2==NULL)
-      {
-        pNext(a) = a1;
-        break;
-      }
-    }
-    else
-    {
-      pDelete1(&a2);
-      a = pNext(a) = a1;
-      pIter(a1);
-      if (a1==NULL)
-      {
-        pNext(a) = a2;
-        break;
-      }
-      else if (a2==NULL)
-      {
-        pNext(a) = a1;
-        break;
-      }
-    }
-  }
-  pDelete1(&p);
-  return p;
-}
-
-/*2
-*if what == xy the result is the list of all different power products
-*    x^i*y^j (i, j >= 0) that appear in fro
-*/
-static poly select (poly fro, monomial what)
-{
-  int i;
-  poly h, res;
-  res = NULL;
-  while (fro!=NULL)
-  {
-    h = pOne();
-    for (i=1; i<=pVariables; i++)
-      pSetExp(h,i, pGetExp(fro,i) * what[i]);
-    pGetComp(h)=pGetComp(fro);
-    pSetm(h);
-    res = pInsert(h, res);
-    fro = fro->next;
-  }
-  return res;
-}
-
-/*2
-*exact divisor: let d  == x^i*y^j, m is thought to have only one term;
-*    return m/d iff d divides m, and no x^k*y^l (k>i or l>j) divides m
-*/
-static poly exdiv ( poly m, monomial d)
-{
-  int i;
-  poly h = pHead(m);
-  for (i=1; i<=pVariables; i++)
-  {
-    if (d[i] > 0)
-    {
-      if (d[i] != pGetExp(h,i))
-      {
-        pDelete(&h);
-        return NULL;
-      }
-      pSetExp(h,i,0);
-    }
-  }
-  pSetm(h);
-  return h;
-}
-
 matrix mpCoeffProc (poly f, poly vars)
 {
   poly sel, h;
@@ -1301,3 +831,666 @@ BOOLEAN mpEqual(matrix a, matrix b)
   }
   return TRUE;
 }
+
+/* --------------- internal stuff ------------------- */
+
+row_col_weight::row_col_weight(int i, int j)
+{
+  ym = i;
+  yn = j;
+  wrow = (float *)Alloc(i*sizeof(float));
+  wcol = (float *)Alloc(j*sizeof(float));
+}
+
+row_col_weight::~row_col_weight()
+{
+  if (ym)
+  {
+    Free((ADDRESS)wcol, yn*sizeof(float));
+    Free((ADDRESS)wrow, ym*sizeof(float));
+  }
+}
+
+mp_permmatrix::mp_permmatrix(matrix A) : sign(1)
+{
+  a_m = A->nrows;
+  a_n = A->ncols;
+  this->mpInitMat();
+  Xarray = A->m;
+}
+
+mp_permmatrix::mp_permmatrix(mp_permmatrix *M)
+{
+  poly p, *athis, *aM;
+  int i, j;
+
+  a_m = M->s_m;
+  a_n = M->s_n;
+  sign = M->sign;
+  this->mpInitMat();
+  Xarray = (poly *)Alloc0(a_m*a_n*sizeof(poly));
+  for (i=a_m-1; i>=0; i--)
+  {
+    athis = this->mpRowAdr(i);
+    aM = M->mpRowAdr(i);
+    for (j=a_n-1; j>=0; j--)
+    {
+      p = aM[M->qcol[j]];
+      if (p)
+      {
+        athis[j] = pCopy(p);
+      }
+    }
+  }
+}
+
+mp_permmatrix::~mp_permmatrix()
+{
+  int k;
+
+  if (a_m != 0)
+  {
+    Free((ADDRESS)qrow,a_m*sizeof(int));
+    Free((ADDRESS)qcol,a_n*sizeof(int));
+    if (Xarray != NULL)
+    {
+      for (k=a_m*a_n-1; k>=0; k--)
+        pDelete(&Xarray[k]);
+      Free((ADDRESS)Xarray,a_m*a_n*sizeof(poly));
+    }
+  }
+}
+
+int mp_permmatrix::mpGetRdim() { return s_m; }
+
+int mp_permmatrix::mpGetCdim() { return s_n; }
+
+int mp_permmatrix::mpGetSign() { return sign; }
+
+void mp_permmatrix::mpSetSearch(int s) { piv_s = s; }
+
+void mp_permmatrix::mpSaveArray() { Xarray = NULL; }
+
+poly mp_permmatrix::mpGetElem(int r, int c)
+{
+  return Xarray[a_n*qrow[r]+qcol[c]];
+}
+
+void mp_permmatrix::mpSetElem(poly p, int r, int c)
+{
+  Xarray[a_n*qrow[r]+qcol[c]] = p;
+}
+
+void mp_permmatrix::mpDelElem(int r, int c)
+{
+  pDelete(&Xarray[a_n*qrow[r]+qcol[c]]);
+}
+
+/*
+* the Bareiss-type elimination with division by div (div != NULL)
+*/
+void mp_permmatrix::mpElimBareiss(poly div)
+{
+  poly piv, elim, q1, q2, *ap, *a;
+  int i, j, jj;
+
+  ap = this->mpRowAdr(s_m);
+  piv = ap[qcol[s_n]];
+  for(i=s_m-1; i>=0; i--)
+  {
+    a = this->mpRowAdr(i);
+    elim = a[qcol[s_n]];
+    if (elim != NULL)
+    {
+      for (j=s_n-1; j>=0; j--)
+      {
+        q2 = NULL;
+        jj = qcol[j];
+        q1 = a[jj];
+        if (ap[jj] != NULL)
+        {
+          q2 = pNeg(pCopy(ap[jj]));
+          q2 = pMult(q2, pCopy(elim));
+          if (q1 != NULL)
+          {
+            q1 = pMult(q1,pCopy(piv));
+            q2 = pAdd(q2, q1);
+          }
+        }
+        else if (q1 != NULL)
+        {
+          q2 = pMult(q1, pCopy(piv));
+        }
+        if (q2 && div)
+          q2 = mpDivide(q2, div);
+        a[jj] = q2;
+      }
+      pDelete(&a[qcol[s_n]]);
+    }
+    else
+    {
+      for (j=s_n-1; j>=0; j--)
+      {
+        jj = qcol[j];
+        q1 = a[jj];
+        if (q1 != NULL)
+        {
+          q1 = pMult(q1, pCopy(piv));
+          if (div)
+            q1 = mpDivide(q1, div);
+          a[jj] = q1;
+        }
+      }
+    }
+  }
+}
+
+/*2
+* pivot strategy for Bareiss algorithm
+*/
+int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
+{
+  poly p, *a;
+  int i, j, iopt, jopt;
+  float f, fo, r, ro, lp;
+  float *dr = C->wrow, *dc = C->wcol;
+
+  fo = 1.0e20;
+  ro = 0.0;
+  iopt = jopt = -1;
+  
+  s_n--;
+  s_m--;
+  if (s_m == 0)
+    return 0;
+  if (s_n == 0)
+  {
+    for(i=s_m; i>=0; i--)
+    {
+      p = this->mpRowAdr(i)[qcol[0]];
+      if (p)
+      {
+        f = mpPolyWeight(p);
+        if (f < fo)
+        {
+          fo = f;
+          if (iopt >= 0)
+            pDelete(&(this->mpRowAdr(iopt)[qcol[0]]));
+          iopt = i;
+        }
+        else
+          pDelete(&(this->mpRowAdr(i)[qcol[0]]));
+      }
+    }
+    if (iopt >= 0)
+      mpReplace(iopt, s_m, sign, qrow);
+    return 0;
+  }
+  this->mpRowWeight(dr);
+  this->mpColWeight(dc);
+  for(i=s_m; i>=0; i--)
+  {
+    r = dr[i];
+    a = this->mpRowAdr(i);
+    for(j=s_n; j>=0; j--)
+    {
+      p = a[qcol[j]];
+      if (p)
+      {
+        lp = mpPolyWeight(p);
+        f = (dc[j]-lp) * (r-lp);
+        f = sqrt(f) * lp;
+        if (f < fo)
+        {
+          fo = f;
+          ro = r;
+          iopt = i;
+          jopt = j;
+        }
+        else if ((f == fo) && (r > ro))
+        {
+          ro = r;
+          iopt = i;
+          jopt = j;
+        }
+      }
+    }
+  }
+  if (iopt < 0)
+    return 0;
+  mpReplace(iopt, s_m, sign, qrow);
+  mpReplace(jopt, s_n, sign, qcol);
+  return 1;
+}
+
+void mp_permmatrix::mpToIntvec(intvec *v)
+{
+  int i;
+
+  for (i=v->rows()-1; i>=0; i--)
+    (*v)[i] = qcol[i]; 
+}
+
+void mp_permmatrix::mpRowReorder()
+{
+  int k, i, i1, i2;
+
+  if (a_m > a_n)
+    k = a_m - a_n;
+  else
+    k = 0;
+  for (i=a_m-1; i>=k; i--)
+  {
+    i1 = qrow[i];
+    if (i1 != i)
+    {
+      this->mpRowSwap(i1, i);
+      i2 = 0;
+      while (qrow[i2] != i) i2++;
+      qrow[i2] = i1;
+    }
+  }
+}
+
+void mp_permmatrix::mpColReorder()
+{
+  int k, j, j1, j2;
+
+  if (a_n > a_m)
+    k = a_n - a_m;
+  else
+    k = 0;
+  for (j=a_n-1; j>=k; j--)
+  {
+    j1 = qcol[j];
+    if (j1 != j)
+    {
+      this->mpColSwap(j1, j);
+      j2 = 0;
+      while (qcol[j2] != j) j2++;
+      qcol[j2] = j1;
+    }
+  }
+}
+
+// private
+void mp_permmatrix::mpInitMat()
+{
+  int k;
+
+  s_m = a_m;
+  s_n = a_n;
+  piv_s = 0;
+  qrow = (int *)Alloc(a_m*sizeof(int));
+  qcol = (int *)Alloc(a_n*sizeof(int));
+  for (k=a_m-1; k>=0; k--) qrow[k] = k;
+  for (k=a_n-1; k>=0; k--) qcol[k] = k;
+}
+
+poly * mp_permmatrix::mpRowAdr(int r)
+{
+  return &(Xarray[a_n*qrow[r]]);
+}
+
+poly * mp_permmatrix::mpColAdr(int c)
+{
+  return &(Xarray[qcol[c]]);
+}
+
+void mp_permmatrix::mpRowWeight(float *wrow)
+{
+  poly p, *a;
+  int i, j;
+  float count;
+
+  for (i=s_m; i>=0; i--)
+  {
+    a = this->mpRowAdr(i);
+    count = 0.0;
+    for(j=s_n; j>=0; j--)
+    {
+      p = a[qcol[j]];
+      if (p)
+        count += mpPolyWeight(p);
+    }
+    wrow[i] = count;
+  }
+}
+
+void mp_permmatrix::mpColWeight(float *wcol)
+{
+  poly p, *a;
+  int i, j;
+  float count;
+
+  for (j=s_n; j>=0; j--)
+  {
+    a = this->mpColAdr(j);
+    count = 0.0;
+    for(i=s_m; i>=0; i--)
+    {
+      p = a[a_n*qrow[i]];
+      if (p)
+        count += mpPolyWeight(p);
+    }
+    wcol[j] = count;
+  }
+}
+
+void mp_permmatrix::mpRowSwap(int i1, int i2)
+{
+   poly p, *a1, *a2;
+   int j;
+
+   a1 = &(Xarray[a_n*i1]);
+   a2 = &(Xarray[a_n*i2]);
+   for (j=a_n-1; j>= 0; j--)
+   {
+     p = a1[j];
+     a1[j] = a2[j];
+     a2[j] = p;
+   }
+}
+
+void mp_permmatrix::mpColSwap(int j1, int j2)
+{
+   poly p, *a1, *a2;
+   int i, k = a_n*a_m;
+
+   a1 = &(Xarray[j1]);
+   a2 = &(Xarray[j2]);
+   for (i=0; i< k; i+=a_n)
+   {
+     p = a1[i];
+     a1[i] = a2[i];
+     a2[i] = p;
+   }
+}
+
+/*2
+* exact division a/b, used in Bareiss algorithm
+* a destroyed, b NOT destroyed
+*/
+static poly mpDivide(poly a, poly b)
+{
+  number x, y, z;
+  poly r, tail, t, h, h0;
+  int i, deg;
+
+  r = a;
+  x = pGetCoeff(b);
+  deg = pTotaldegree(b);
+  tail = pNext(b);
+  if (tail == NULL)
+  {
+    do
+    {
+      if (deg != 0)
+      {
+        for (i=pVariables; i!=0; i--)
+          pGetExp(r,i) -= pGetExp(b,i);
+        pSetm(r);
+      }
+      y = nIntDiv(pGetCoeff(r),x);
+      pSetCoeff(r,y);
+      pIter(r);
+    } while (r != NULL);
+    return a;
+  }
+  h0 = pNew();
+  do
+  {
+    if (deg != 0)
+    {
+      for (i=pVariables; i>0; i--)
+        pGetExp(r,i) -= pGetExp(b,i);
+      pSetm(r);
+    }
+    y = nDiv(pGetCoeff(r), x);
+    nNormalize(y);
+    pSetCoeff(r,y);
+    t = tail;
+    h = h0;
+    do
+    {
+      h = pNext(h) = pNew();
+      for (i=pVariables; i>0; i--)
+        pSetExp(h,i, pGetExp(r,i)+pGetExp(t,i));
+      pSetm(h);
+      z = nMult(y, pGetCoeff(t));
+      pSetCoeff0(h,nNeg(z));
+      pIter(t);
+    } while (t != NULL);
+    pNext(h) = NULL;
+    r = pNext(r) = pAdd(pNext(r),pNext(h0));
+  } while (r!=NULL);
+  pFree1(h0);
+  return a;
+}
+
+/*
+* perform replacement for pivot strategy in Bareiss algorithm
+* change sign of determinant
+*/
+static void mpReplace(int j, int n, int &sign, int *perm)
+{
+  int k;
+
+  if (j != n)
+  {
+    k = perm[n];
+    perm[n] = perm[j];
+    perm[j] = k;
+    sign = -sign;
+  }
+}
+
+/*
+* weigth of a polynomial, for pivot strategy
+* modify this for characteristic 0 !!!
+*/
+static float mpPolyWeight(poly p)
+{
+  return (float)pLength(p);
+}
+
+static int nextperm(perm * z, int max)
+{
+  int s, i, k, t;
+  s = max;
+  do
+  {
+    s--;
+  }
+  while ((s > 0) && ((*z)[s] >= (*z)[s+1]));
+  if (s==0)
+    return 0;
+  do
+  {
+    (*z)[s]++;
+    k = 0;
+    do
+    {
+      k++;
+    }
+    while (((*z)[k] != (*z)[s]) && (k!=s));
+  }
+  while (k < s);
+  for (i=s+1; i <= max; i++)
+  {
+    (*z)[i]=0;
+    do
+    {
+      (*z)[i]++;
+      k=0;
+      do
+      {
+        k++;
+      }
+      while (((*z)[k] != (*z)[i]) && (k != i));
+    }
+    while (k < i);
+  }
+  s = max+1;
+  do
+  {
+    s--;
+  }
+  while ((s > 0) && ((*z)[s] > (*z)[s+1]));
+  t = 1;
+  for (i=1; i<max; i++)
+    for (k=i+1; k<=max; k++)
+      if ((*z)[k] < (*z)[i])
+        t = -t;
+  (*z)[0] = t;
+  return s;
+}
+
+static poly mpLeibnitz(matrix a)
+{
+  int i, e, n;
+  poly p, d;
+  perm z;
+
+  n = MATROWS(a);
+  memset(&z,0,(n+2)*sizeof(int));
+  p = pOne();
+  for (i=1; i <= n; i++)
+    p = pMult(p, pCopy(MATELEM(a, i, i)));
+  d = p;
+  for (i=1; i<= n; i++)
+    z[i] = i;
+  z[0]=1;
+  e = 1;
+  if (n!=1)
+  {
+    while (e)
+    {
+      e = nextperm((perm *)&z, n);
+      p = pOne();
+      for (i = 1; i <= n; i++)
+        p = pMult(p, pCopy(MATELEM(a, i, z[i])));
+      if (z[0] > 0)
+        d = pAdd(d, p);
+      else
+        d = pSub(d, p);
+    }
+  }
+  return d;
+}
+
+static poly minuscopy (poly p)
+{
+  poly w;
+  number  e;
+  e = nInit(-1);
+  w = pCopy(p);
+  pMultN(w, e);
+  nDelete(&e);
+  return w;
+}
+
+/*2
+* insert a monomial into a list, avoid duplicates
+* arguments are destroyed
+*/
+static poly pInsert(poly p1, poly p2)
+{
+  poly a1, p, a2, a;
+  int c;
+
+  if (p1==NULL) return p2;
+  if (p2==NULL) return p1;
+  a1 = p1;
+  a2 = p2;
+  a = p  = pOne();
+  loop
+  {
+    c = pComp(a1, a2);
+    if (c == 1)
+    {
+      a = pNext(a) = a1;
+      pIter(a1);
+      if (a1==NULL)
+      {
+        pNext(a) = a2;
+        break;
+      }
+    }
+    else if (c == -1)
+    {
+      a = pNext(a) = a2;
+      pIter(a2);
+      if (a2==NULL)
+      {
+        pNext(a) = a1;
+        break;
+      }
+    }
+    else
+    {
+      pDelete1(&a2);
+      a = pNext(a) = a1;
+      pIter(a1);
+      if (a1==NULL)
+      {
+        pNext(a) = a2;
+        break;
+      }
+      else if (a2==NULL)
+      {
+        pNext(a) = a1;
+        break;
+      }
+    }
+  }
+  pDelete1(&p);
+  return p;
+}
+
+/*2
+*if what == xy the result is the list of all different power products
+*    x^i*y^j (i, j >= 0) that appear in fro
+*/
+static poly select (poly fro, monomial what)
+{
+  int i;
+  poly h, res;
+  res = NULL;
+  while (fro!=NULL)
+  {
+    h = pOne();
+    for (i=1; i<=pVariables; i++)
+      pSetExp(h,i, pGetExp(fro,i) * what[i]);
+    pGetComp(h)=pGetComp(fro);
+    pSetm(h);
+    res = pInsert(h, res);
+    fro = fro->next;
+  }
+  return res;
+}
+
+/*2
+*exact divisor: let d  == x^i*y^j, m is thought to have only one term;
+*    return m/d iff d divides m, and no x^k*y^l (k>i or l>j) divides m
+*/
+static poly exdiv ( poly m, monomial d)
+{
+  int i;
+  poly h = pHead(m);
+  for (i=1; i<=pVariables; i++)
+  {
+    if (d[i] > 0)
+    {
+      if (d[i] != pGetExp(h,i))
+      {
+        pDelete(&h);
+        return NULL;
+      }
+      pSetExp(h,i,0);
+    }
+  }
+  pSetm(h);
+  return h;
+}
+

@@ -1,7 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char  rcsid[] = "$Id: spolys0.cc,v 1.2 1997-03-24 14:25:54 Singular Exp $";
+/* $Id: spolys0.cc,v 1.3 1997-04-02 15:07:54 Singular Exp $ */
+
 /*
 * ABSTRACT - s-polynomials and reduction in general
 */

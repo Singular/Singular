@@ -1,9 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/mmalloc.c,v 1.1.1.1 1997-03-19 13:18:57 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: mmalloc.c,v 1.2 1997-04-02 15:07:28 Singular Exp $ */
 
 /*
 * ABSTRACT:

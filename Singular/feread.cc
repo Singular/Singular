@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: feread.cc,v 1.2 1997-03-24 14:24:38 Singular Exp $";
+/* $Id: feread.cc,v 1.3 1997-04-02 15:06:59 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */

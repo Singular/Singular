@@ -1,7 +1,8 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-static char rcsid[] = "$Id: sing_dld.cc,v 1.2 1997-03-24 14:25:48 Singular Exp $";
+/* $Id: sing_dld.cc,v 1.3 1997-04-02 15:07:51 Singular Exp $ */
+
 /*
 * ABSTRACT: interface to dynamic loading
 */

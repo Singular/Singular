@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: ideals.cc,v 1.2 1997-03-24 14:24:46 Singular Exp $";
+/* $Id: ideals.cc,v 1.3 1997-04-02 15:07:04 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: iparith.cc,v 1.13 1997-03-28 21:44:28 obachman Exp $";
+/* $Id: iparith.cc,v 1.14 1997-04-02 15:07:07 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */

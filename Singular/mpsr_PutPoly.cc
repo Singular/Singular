@@ -2,6 +2,8 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
+/* $Id: mpsr_PutPoly.cc,v 1.4 1997-04-02 15:07:41 Singular Exp $ */
+
 /***************************************************************
  *
  * File:       mpsr_PutPoly.cc

@@ -1,7 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: polys0.cc,v 1.2 1997-03-24 14:25:38 Singular Exp $";
+/* $Id: polys0.cc,v 1.3 1997-04-02 15:07:45 Singular Exp $ */
+
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
 */

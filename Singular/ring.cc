@@ -1,7 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: ring.cc,v 1.3 1997-03-27 12:42:48 Singular Exp $";
+/* $Id: ring.cc,v 1.4 1997-04-02 15:07:48 Singular Exp $ */
+
 /*
 * ABSTRACT - the interpreter related ring operations
 */

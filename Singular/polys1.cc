@@ -1,7 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: polys1.cc,v 1.2 1997-03-24 14:25:39 Singular Exp $";
+/* $Id: polys1.cc,v 1.3 1997-04-02 15:07:46 Singular Exp $ */
+
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
 * independent of representation

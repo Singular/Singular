@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: maps.cc,v 1.4 1997-03-25 15:40:19 Singular Exp $";
+/* $Id: maps.cc,v 1.5 1997-04-02 15:07:24 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */

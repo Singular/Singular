@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: cntrlc.cc,v 1.4 1997-03-24 14:24:33 Singular Exp $";
+/* $Id: cntrlc.cc,v 1.5 1997-04-02 15:06:56 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */

@@ -1,33 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.9 1997-03-27 20:26:03 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-// Revision 1.8  1997/03/27  12:42:50  Singular
-// * hannes: added rString, sleftv->String for RING_CMD, QRING_CMD,
-//             string(ring), string(qring) in iparith.cc
-//             TEST_OPT_PROT for hilbert driven std
-//
-// Revision 1.7  1997/03/26  17:07:27  Singular
-// * hannes/wichmann: added fglm
-//
-// Revision 1.6  1997/03/26  14:58:06  obachman
-// Wed Mar 26 14:02:15 1997  Olaf Bachmann
-// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
-//
-// 	* added reference counter to links, updated slKill, slCopy, slInit
-// 	* various small bug fixes for Batch mode
-//
-// Revision 1.4  1997/03/21  14:58:56  obachman
-// Fixed little bugs in sleftv::Eval and mpsr_GetMisc
-//
-// Revision 1.3  1997/03/21  14:06:52  Singular
-// * hannes: changed return value for Eval(assignment) to 'nothing'
-//
-// Revision 1.2  1997/03/21  13:19:05  Singular
-// fixed assignment of lists, det(constants), comparision of intmats
-//
-*/
+/* $Id: subexpr.cc,v 1.10 1997-04-02 15:07:55 Singular Exp $ */
 
 /*
 * ABSTRACT:

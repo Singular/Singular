@@ -1,9 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/mmheap.c,v 1.1.1.1 1997-03-19 13:18:58 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: mmheap.c,v 1.2 1997-04-02 15:07:32 Singular Exp $ */
 
 /*
 * ABSTRACT:

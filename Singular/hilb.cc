@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char  rcsid[] = "$Id: hilb.cc,v 1.3 1997-03-24 14:24:43 Singular Exp $";
+/* $Id: hilb.cc,v 1.4 1997-04-02 15:07:02 Singular Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */

@@ -1,7 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: timer.cc,v 1.5 1997-03-28 21:44:40 obachman Exp $";
+/* $Id: timer.cc,v 1.6 1997-04-02 15:07:59 Singular Exp $ */
+
 /*
 *  ABSTRACT - get the computing time
 */

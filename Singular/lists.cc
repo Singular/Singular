@@ -1,10 +1,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: lists.cc,v 1.3 1997-04-02 15:07:20 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
-/* $Id: lists.cc,v 1.2 1997-03-24 14:25:11 Singular Exp $ */
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"

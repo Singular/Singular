@@ -1,6 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: binom.cc,v 1.3 1997-04-02 15:06:55 Singular Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -16,7 +17,7 @@
 #include "binom.h"
 
 #ifdef TEST_MAC_ORDER
-static char rcsid[] = "$Id: binom.cc,v 1.2 1997-03-24 14:24:32 Singular Exp $";
+static char rcsid[] = "$Id: binom.cc,v 1.3 1997-04-02 15:06:55 Singular Exp $";
 
 extern int  pComponentOrder;
 /* ----------- global variables, set by bBinomSet --------------------- */

@@ -1,36 +1,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: sing_mp.cc,v 1.6 1997-04-02 15:07:52 Singular Exp $ */
+
 /*
 * ABSTRACT
-*/
-/* $Log: not supported by cvs2svn $
-// Revision 1.4  1997/03/26  14:58:05  obachman
-// Wed Mar 26 14:02:15 1997  Olaf Bachmann
-// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
-//
-// 	* added reference counter to links, updated slKill, slCopy, slInit
-// 	* various small bug fixes for Batch mode
-//
-// Revision 1.2  1997/03/20  16:59:58  obachman
-// Various minor bug-fixes in mpsr interface
-//
-// Thu Mar 20 11:57:00 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
-//
-// 	* sing_mp.cc (slInitBatchLink): initialized silink such that
-// 	  l->argv[0] == "MP:connect" (otherwise, slInitMP failed)
-//
-// Wed Mar 19 15:38:08 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
-//
-// 	* hannes fixed maFindPerm to reflect new names <->parameter scheme
-//
-// 	* sing_mp.cc (mpsr_IsMPLink): fixed it
-//
-// 	* Makefile (tags): added target tags
-//
-// Revision 1.1.1.1  1997/03/19  13:18:41  obachman
-// Imported Singular sources
-//
 */
 
 #include <stdio.h>
