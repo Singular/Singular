@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: jordan.lib,v 1.8 1999-02-11 11:47:45 mschulze Exp $";
+version="$Id: jordan.lib,v 1.9 1999-02-18 19:29:01 mschulze Exp $";
 info="
 LIBRARY: jordan.lib  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -12,11 +12,6 @@ AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 ";
 
 LIB "ring.lib";
-///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
-// PROCEDURE: jordan  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM           //
-// AUTHOR:    Mathias Schulze, email: mschulze@mathematik.uni-kl.de          //
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordan(matrix M,list #)
@@ -207,9 +202,7 @@ EXAMPLE: example jordan; shows an example
   return(l);
 }
 example
-{
-  "EXAMPLE:";
-  echo=2;
+{ "EXAMPLE:"; echo=2;
   ring R=0,x,dp;
   matrix M[3][3]=3,2,1,0,2,1,0,0,3;
   print(M);
@@ -217,14 +210,9 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// PROCEDURE: jordanmatrix  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM     //
-// AUTHOR:    Mathias Schulze, email: mschulze@mathematik.uni-kl.de          //
-///////////////////////////////////////////////////////////////////////////////
-
 proc jordanmatrix(list l)
 "USAGE:   jordanmatrix(l); l list of ideal and list of intvecs
-RETURN:  the Jordan matrix J with
+RETURN:  the Jordan matrix J defined by l:
            l[1]       : eigenvalues of J
            l[2][i][j] : size of j-th Jordan block with eigenvalue l[1][i]
 EXAMPLE: example jordanmatrix; shows an example
@@ -304,17 +292,13 @@ EXAMPLE: example jordanmatrix; shows an example
   return(J);
 }
 example
-{
-  "EXAMPLE:";
-  echo=2;
+{ "EXAMPLE:"; echo=2;
   ring R=0,x,dp;
-  print(jordanmatrix(list(ideal(2,3),list(intvec(1),intvec(2)))));
+  list l;
+  l[1]=ideal(2,3);
+  l[2]=list(intvec(1),intvec(2));
+  print(jordanmatrix(l));
 }
-///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
-// PROCEDURE: jordanform  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM       //
-// AUTHOR:    Mathias Schulze, email: mschulze@mathematik.uni-kl.de          //
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordanform(matrix M)
@@ -328,19 +312,12 @@ EXAMPLE: example jordanform; shows an example
   return(jordanmatrix(jordan(M)));
 }
 example
-{
-  "EXAMPLE:";
-  echo=2;
+{ "EXAMPLE:"; echo=2;
   ring R=0,x,dp;
   matrix M[3][3]=3,2,1,0,2,1,0,0,3;
   print(M);
   print(jordanform(M));
 }
-///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
-// PROCEDURE: inversemat  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM       //
-// AUTHOR:    Mathias Schulze, email: mschulze@mathematik.uni-kl.de          //
 ///////////////////////////////////////////////////////////////////////////////
 
 proc inversemat(matrix M)
@@ -368,12 +345,11 @@ EXAMPLE: example inversemat; shows an example
   return(lift(M,freemodule(n)));
 }
 example
-{
-  "EXAMPLE:";
-  echo=2;
+{ "EXAMPLE:"; echo=2;
   ring R=0,x,dp;
   matrix M[3][3]=3,2,1,0,2,1,0,0,3;
   print(M);
   print(inversemat(M));
 }
 ///////////////////////////////////////////////////////////////////////////////
+
