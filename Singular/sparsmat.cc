@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.5 1999-03-15 16:55:42 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.6 1999-06-02 14:09:34 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -114,18 +114,106 @@ private:
   void smHElim();
   void smMultCol();
   poly smMultPoly(smpoly);
+  void smActDel();
+  void smColDel();
+  void smPivDel();
+  void smSign();
 public:
   sparse_mat(ideal);
   ~sparse_mat();
+  int smGetSign() { return sign; }
   smpoly * smGetAct() { return m_act; }
   int smGetRed() { return tored; }
   ideal smRes2Mod();
+  poly smDet();
   void smBareiss(int, int);
   void smNewBareiss(int, int);
   void smToIntvec(intvec *);
 };
 
+/* ----------------- ops with rings ------------------ */
+ideal smRingCopy(ideal I, ring *ri, sip_sring &tmpR)
+{
+  ring origR =NULL;
+  ideal II;
+  if (currRing->order[0]!=ringorder_c)
+  {
+    origR =currRing;
+    tmpR=*origR;
+    int *ord=(int*)Alloc0(3*sizeof(int));
+    int *block0=(int*)Alloc(3*sizeof(int));
+    int *block1=(int*)Alloc(3*sizeof(int));
+    ord[0]=ringorder_c;
+    ord[1]=ringorder_dp;
+    tmpR.order=ord;
+    block0[1]=1;
+    tmpR.block0=block0;
+    block1[1]=tmpR.N;
+    tmpR.block1=block1;
+    rComplete(&tmpR,1);
+    rChangeCurrRing(&tmpR,TRUE);
+    // fetch data from the old ring
+    II=idInit(IDELEMS(I),I->rank);
+    int k;
+    for (k=0;k<IDELEMS(I);k++) II->m[k] = pFetchCopy(origR, I->m[k]);
+  }
+  else
+  {
+    II=idCopy(I);
+  }
+  *ri = origR;
+  return II;
+}
+
+void smRingClean(ring origR, ip_sring &tmpR)
+{
+  rChangeCurrRing(origR,TRUE);
+  rUnComplete(&tmpR);
+  Free((ADDRESS)tmpR.order,3*sizeof(int));
+  Free((ADDRESS)tmpR.block0,3*sizeof(int));
+  Free((ADDRESS)tmpR.block1,3*sizeof(int));
+}
+
 /* ----------------- basics (used from 'C') ------------------ */
+/*2
+*returns the determinant of the module I;
+*uses Bareiss algorithm
+*/
+poly smCallDet(ideal I)
+{
+  int r=idRankFreeModule(I);
+  if (I->ncols != r)
+  {
+    Werror("det of %d x %d module (matrix)",r,I->ncols);
+    return NULL;
+  }
+  poly res,save;
+  ring origR;
+  sip_sring tmpR;
+  ideal II=smRingCopy(I,&origR,tmpR);
+  sparse_mat *det = new sparse_mat(II);
+
+  idDelete(&II);
+  if (det->smGetAct() == NULL)
+  {
+    delete det;
+    if (origR!=NULL) smRingClean(origR,tmpR);
+    return NULL;
+  }
+  res=det->smDet();
+  if(det->smGetSign()<0) res=pNeg(res);
+  delete det;
+  if (origR!=NULL)
+  {
+    rChangeCurrRing(origR,TRUE);
+    save = res;
+    res = pFetchCopy(&tmpR, save);
+    rChangeCurrRing(&tmpR,FALSE);
+    pDelete(&save);
+    smRingClean(origR,tmpR);
+  }
+  return res;
+}
 
 lists smCallBareiss(ideal I, int x, int y)
 {
@@ -156,35 +244,10 @@ lists smCallBareiss(ideal I, int x, int y)
 
 lists smCallNewBareiss(ideal I, int x, int y)
 {
-  lists res=(lists)Alloc(sizeof(slists));
-  ring origR =NULL;
+  ring origR;
   sip_sring tmpR;
-  ideal II;
-  if (currRing->order[0]!=ringorder_c)
-  {
-    origR =currRing;
-    tmpR=*origR;
-    int *ord=(int*)Alloc0(3*sizeof(int));
-    int *block0=(int*)Alloc(3*sizeof(int));
-    int *block1=(int*)Alloc(3*sizeof(int));
-    ord[0]=ringorder_c;
-    ord[1]=ringorder_dp;
-    tmpR.order=ord;
-    block0[1]=1;
-    tmpR.block0=block0;
-    block1[1]=tmpR.N;
-    tmpR.block1=block1;
-    rComplete(&tmpR,1);
-    rChangeCurrRing(&tmpR,TRUE);
-    // fetch data from the old ring
-    II=idInit(IDELEMS(I),I->rank);
-    int k;
-    for (k=0;k<IDELEMS(I);k++) II->m[k] = pFetchCopy(origR, I->m[k]);
-  }
-  else
-  {
-    II=idCopy(I);
-  }
+  lists res=(lists)Alloc(sizeof(slists));
+  ideal II=smRingCopy(I,&origR,tmpR);
   sparse_mat *bareiss = new sparse_mat(II);
   ideal mm=II;
   intvec *v;
@@ -193,14 +256,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
   if (bareiss->smGetAct() == NULL)
   {
     delete bareiss;
-    if (origR!=NULL)
-    {
-      rChangeCurrRing(origR,TRUE);
-      rUnComplete(&tmpR);
-      Free((ADDRESS)tmpR.order,3*sizeof(int));
-      Free((ADDRESS)tmpR.block0,3*sizeof(int));
-      Free((ADDRESS)tmpR.block1,3*sizeof(int));
-    }
+    if (origR!=NULL) smRingClean(origR,tmpR);
     v=new intvec(1,pVariables);
   }
   else
@@ -216,14 +272,10 @@ lists smCallNewBareiss(ideal I, int x, int y)
       rChangeCurrRing(origR,TRUE);
       mm=idInit(IDELEMS(m),m->rank);
       int k;
-      for (k=0;k<IDELEMS(m);k++) mm->m[k] = pFetchCopy(origR, m->m[k]);
+      for (k=0;k<IDELEMS(m);k++) mm->m[k] = pFetchCopy(&tmpR, m->m[k]);
       rChangeCurrRing(&tmpR,FALSE);
       idDelete(&m);
-      rChangeCurrRing(origR,TRUE);
-      rUnComplete(&tmpR);
-      Free((ADDRESS)tmpR.order,3*sizeof(int));
-      Free((ADDRESS)tmpR.block0,3*sizeof(int));
-      Free((ADDRESS)tmpR.block1,3*sizeof(int));
+      smRingClean(origR,tmpR);
     }
     else
     {
@@ -258,7 +310,8 @@ sparse_mat::sparse_mat(ideal smat)
   crd = 0;
   tored = nrows; // without border
   i = tored+1;
-  perm = (unsigned short *)Alloc(sizeof(unsigned short)*i);
+  perm = (unsigned short *)Alloc(sizeof(unsigned short)*(i+1));
+  perm[i] = 0;
   m_row = (smpoly *)Alloc0(sizeof(smpoly)*i);
   wrw = (float *)Alloc(sizeof(float)*i);
   i = ncols+1;
@@ -294,7 +347,7 @@ sparse_mat::~sparse_mat()
   i = nrows+1;
   Free((ADDRESS)wrw, sizeof(float)*i);
   Free((ADDRESS)m_row, sizeof(smpoly)*i);
-  Free((ADDRESS)perm, sizeof(unsigned short)*i);
+  Free((ADDRESS)perm, sizeof(unsigned short)*(i+1));
 }
 
 /*
@@ -321,6 +374,73 @@ void sparse_mat::smToIntvec(intvec *v)
     (*v)[i] = perm[i+1];
 }
 
+/* ---------------- the algorithm's ------------------ */
+/*
+* the determinant (up to sign), uses new Bareiss elimination
+*/
+poly sparse_mat::smDet()
+{
+  int y;
+  poly res = NULL;
+
+  if (sign == 0)
+  {
+    this->smActDel();
+    return NULL;
+  }
+  if (act < 2)
+  {
+    if (act != 0) res = m_act[1]->m;
+    Free((void *)m_act[1], sizeof(smprec));
+    return res;
+  }
+  this->smPivot();
+  this->smSign();
+  this->smSelectPR();
+  this->sm1Elim();
+  crd++;
+  this->smColDel();
+  act--;
+  this->smZeroElim();
+  if (sign == 0)
+  {
+    this->smActDel();
+    return NULL;
+  }
+  if (act < 2)
+  {
+    if (act != 0) res = m_act[1]->m;
+    Free((void *)m_act[1], sizeof(smprec));
+    return res;
+  }
+  loop
+  {
+    m_res[crd] = piv;
+    this->smNewPivot();
+    this->smSign();
+    this->smSelectPR();
+    this->smMultCol();
+    this->smHElim();
+    crd++;
+    this->smColDel();
+    act--;
+    this->smZeroElim();
+    if (sign == 0)
+    {
+      this->smPivDel();
+      this->smActDel();
+      return NULL;
+    }
+    if (act < 2)
+    {
+      this->smPivDel();
+      if (act != 0) res = m_act[1]->m;
+      Free((void *)m_act[1], sizeof(smprec));    
+      return res;
+    }
+  }
+}
+
 /*
 * the Bareiss elimination:
 *   - with x unreduced last rows, pivots from here are not allowed
@@ -338,7 +458,6 @@ void sparse_mat::smBareiss(int x, int y)
   {
     if (act != 0)
     {
-      oldpiv = NULL;
       this->smCopToRes();
     }
     return;
@@ -401,7 +520,6 @@ void sparse_mat::smNewBareiss(int x, int y)
   {
     if (act != 0)
     {
-      oldpiv = NULL;
       this->smCopToRes();
     }
     return;
@@ -1301,6 +1419,73 @@ poly sparse_mat::smMultPoly(smpoly a)
     return NULL;
 }
 
+/*
+* delete the m_act finaly
+*/
+void sparse_mat::smActDel()
+{
+  smpoly a;
+  int i;
+
+  for (i=act; i; i--)
+  {
+    a = m_act[i];
+    do
+    {
+      smElemDelete(&a);
+    } while (a != NULL);
+  }
+}
+
+/*
+* delete the pivotcol
+*/
+void sparse_mat::smColDel()
+{
+  smpoly a = m_act[act];
+
+  while (a != NULL)
+  {
+    smElemDelete(&a);
+  }
+}
+
+/*
+* delete pivot elements
+*/
+void sparse_mat::smPivDel()
+{
+  int i=crd-1;
+
+  while (i != 0)
+  {
+    smElemDelete(&m_res[i]);
+    i--;
+  }
+}
+
+/*
+* the sign of the determinant
+*/
+void sparse_mat::smSign()
+{
+  int j,i=1;
+  if (cpiv!=act) sign=-sign;
+  if ((act%2)==0) sign=-sign;
+  j=perm[1];
+  while(j<rpiv)
+  {
+    sign=-sign;
+    i++;
+    j=perm[i];
+  }
+  while(perm[i]!=0)
+  {
+    perm[i]=perm[i+1];
+    i++;
+  }
+}
+
 /* ----------------- arithmetic ------------------ */
 
 /*
@@ -1485,7 +1670,7 @@ poly smMultDiv(poly a, poly b, const poly c)
   return res;
 }
 
-/*2
+/*n
 * exact division a/b
 * a is a result of smMultDiv
 * a destroyed, b NOT destroyed
