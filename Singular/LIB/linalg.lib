@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000 
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.8 2001-01-03 01:24:49 greuel Exp $";
+version="$Id: linalg.lib,v 1.9 2001-01-07 02:06:39 greuel Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib	Algorithmic Linear Algebra
@@ -8,7 +8,7 @@ AUTHORS:  Ivor Saynisch (ivs@math.tu-cottbus.de)
 @*        Mathias Schulze (mschulze@mathematik.uni-kl.de)
 
 PROCEDURES:
- inverse(A);	    matrix, the inverse of A (for constant matrices)
+ inverse(A);	    matrix, the inverse of A
  inverse_B(A);      list(matrix Inv,poly p),Inv*A=p*En ( using busadj(A) )
  inverse_L(A);      list(matrix Inv,poly p),Inv*A=p*En ( using lift )
  sym_gauss(A);      symmetric gaussian algorithm
@@ -102,80 +102,133 @@ proc inner_product(vector v1,vector v2)
 /////////////////////////////////////////////////////////////////////////////
 
 proc inverse(matrix A, list #)
-"USAGE:    inverse(A);  A = constant, square matrix
-RETURN:   matrix, the inverse matrix of A
-NOTE:     parameters and minpoly are allowed. The procedure applies std with 
-          ordering (c,dp) to A-enlarged-by-unit-matrix
-EXAMPLE:  example inverse; shows an example"
+"USAGE:    inverse(A [,opt]);  A a square matrix, opt integer
+RETURN:  
+@format   
+          a matrix:
+          - the inverse matrix of A, if A is invertible;
+          - the 1x1 0-matrix if A is not invertible (in the polynomial ring!).
+          There are the following options:
+          - opt=0 or not given: heuristically best option from below 
+          - opt=1 : apply std to (transpose(E,A)), ordering (C,dp).
+          - opt=2 : apply interred (transpose(E,A)), ordering (C,dp).
+          - opt=3 : apply lift(A,E), ordering (C,dp). 
+@end format
+NOTE:     parameters and minpoly are allowed; opt=2 is only correct for
+          matrices with entries in a field
+SEE ALSO: inverse_B, inverse_L
+EXAMPLE:  example inverse; shows an example
+"
 {
-  //erlaubt Parameterringe und minpoly
+//--------------------------- initialization and check ------------------------
+   int ii,u,i,opt;
+   matrix invA;                     
+   int db = printlevel-voice+3;      //used for comments
+   def R=basering;
+   string mp = string(minpoly);
+   int n = nrows(A);
+   module M = A;
+   intvec v = option(get);           //get options to reset it later
+   if ( ncols(A)!=n )
+   {
+     ERROR("// ** no square matrix");
+   }
+//----------------------- choose heurisitically best option ------------------
+// This may change later, depending on improvements of the implemantation
+// at the monent we use if opt=0 or opt not given:
+// opt = 1 (std) for everything
+// opt = 2 (interred) for nothing, NOTE: interred is ok for constant matricea
+// opt = 3 (lift) for nothing
+// NOTE: interred is ok for constant matrices only (Beispiele am Ende der lib)
+   if(size(#) != 0) {opt = #[1];}
+   if(opt == 0)
+   {
+      if(npars(R) == 0)                       //no parameters
+      {
+         if( size(ideal(A-jet(A,0))) == 0 )   //constant matrix
+         {opt = 1;}
+         else
+         {opt = 1;}                          
+      }
+      else {opt = 1;}
+   }
+//------------------------- change ring if necessary -------------------------
+   if( ordstr(R) != "C,dp(nvars(R))" )
+   {
+     u=1;
+     changeord("@R","C,dp",R);
+     module M = fetch(R,M);
+     execute("minpoly="+mp+";");
+   }
+//----------------------------- opt=3: use lift ------------------------------
+   if( opt==3 )
+   {
+      module D2;
+      D2 = lift(M,freemodule(n));
+      if (size(ideal(D2))==0)
+      {                                               //catch error in lift
+         dbprint(db,"// ** matrix is not invertible");
+         setring R;
+         if (u==1) { kill @R;}
+         return(invA);
+      }
+   }
+//-------------- opt = 1 resp. opt = 2: use std resp. interred --------------
+   if( opt==1 or opt==2 )
+   {
+      option(redSB);  
+      module B = freemodule(n),M;
+      if(opt == 2)
+      {
+         module D = interred(transpose(B));
+         D = transpose(simplify(D,1));
+      }
+      if(opt == 1)
+      {
+         module D = std(transpose(B)); 
+         D = transpose(simplify(D,1));
+      }
+      module D2 = D[1..n];
+      module D1 = D[n+1..2*n];
+//----------------------- check if matrix is invertible ----------------------
+      for (ii=1; ii<=n; ii++) 
+      {  
+         if ( D1[ii] != gen(ii) )
+         {
+            dbprint(db,"// ** matrix is not invertible");
+            i = 1;
+            break;
+         }
+      }
+   }
+   option(set,v);
+//------------------ return to basering and return result ---------------------
+   if ( u==1 )
+   {
+      setring R;
+      module D2 = fetch(@R,D2);
+      if( opt==1 or opt==2 )
+      { module D1 = fetch(@R,D1);}
+      kill @R;
+   }
+   if( i==1 ) { return(invA); }     //matrix not invetible
+   else { return(matrix(D2)); }     //matrix invertible with inverse D2
 
-  int i;
-  int n=nrows(A);
-  string mp=string(minpoly);
-
-  if (ncols(A)!=n){
-    "// ** input is not a square matrix";
-    matrix invmat;
-    return(invmat);
-  }
-  if(!const_mat(A)){
-    "// ** input is not a constant matrix";
-    matrix invmat;
-    return(invmat);
-  }
-	  
-  def BR=basering;
-  changeord("@R","c,dp",BR);
-  execute("minpoly="+mp+";");
-  matrix A=fetch(BR,A);
-  
-  matrix B=transpose(concat(A,unitmat(n)));
-  matrix D=transpose(std(B));
-
-//option(intStrategy);
-//option(nointStrategy);
-//if (#[1]==1) {matrix D=transpose(interred(B));}
-
-  matrix D1=submat(D,1..n,1..n);
-  matrix D2=submat(D,1..n,(n+1)..2*n);
-  B=transpose(concat(D2,D1));
-
-  changeord("@@R","C,dp",@R);
-  execute("minpoly="+mp+";");
-  matrix B=imap(@R,B);
- 
-  for(i=1;i<=n/2;i=i+1){
-    B=permcol(B,i,n-i+1);
-  }
-  B=std(B);
-  module C=module(B);
-  
-  for (i=1;i<=n;i=i+1){
-    if (deg(B[n+i,i])<0){
-      "// ** matrix is not invertible";
-      setring BR;
-      kill @R;kill @@R;
-      matrix invmat;
-      return(invmat);
-    }
-    else{ C[i] = C[i]/B[n+i,i];}
-  }
-  
-  B=transpose(matrix(C));	
-  matrix invmat[n][n]=B[1..n,1..n];
-  setring BR;
-  matrix invmat=fetch(@@R,invmat);
-  kill @R;kill @@R;	
-  return(invmat);
 }
 example
 { "EXAMPLE:"; echo = 2;
-  ring r=0,(x),lp;
-  matrix A[4][4]=5,7,3,8,4,6,9,2,3,7,5,7,2,5,6,12;
-  print(A);
-  print(inverse(A));
-  print(inverse(A)*A);         //test for correctness
+  ring r=0,(x,y,z),lp;
+  matrix A[3][3]=
+   1,4,3,
+   1,5,7,
+   0,4,17;
+  print(inverse(A));"";
+  matrix B[3][3]=
+   y+1,  x+y,    y,   
+   z,    z+1,    z,   
+   y+z+2,x+y+z+2,y+z+1;
+  print(inverse(B));
+  print(B*inverse(B));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -258,7 +311,7 @@ example
 proc diag_test(matrix A)
 "USAGE:	  diag_test(A); A = const square matrix
 RETURN:   int,  1 if A is diagonalisable, 0 if not
-               -1 no statement possible, since A does not split.
+               -1 no statement is possible, since A does not split.
 NOTE:     The test works only for split matrices, i.e if eigenvalues of A
           are in the ground field.
           Does not work with parameters (uses factorize,gcd).
@@ -587,6 +640,7 @@ RETURN:   list Inv with
           such that I*A = unitmat(n)*p; 
 NOTE:     p=1 if 1/det(A) is computable and  p=det(A) if not;
           the computation uses busadj.
+SEE ALSO: inverse, inverse_L
 EXAMPLE:  example inverse_B; shows an example"
 {
   int i;
@@ -654,9 +708,10 @@ proc inverse_L(matrix A)
 RETURN:    list Inv representing a left inverse of A, i.e
            - Inv[1] = matrix I and 
            - Inv[2] = poly p
-           such tha I*A = unitmat(n)*p; 
+           such that I*A = unitmat(n)*p; 
 NOTE:      p=1 if 1/det(A) is computable and p=det(A) if not;
-           the computation uses lift
+           the computation computes first det(A) and then uses lift
+SEE ALSO:  inverse, inverse_B_
 EXAMPLE:   example inverse_L; shows an example"
 {
   int n=nrows(A);
@@ -1671,4 +1726,141 @@ example
   print(M);
   print(jordanform(M));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
+
+/*
+///////////////////////////////////////////////////////////////////////////////
+//          Auskommentierte zusaetzliche Beispiele
+//
+///////////////////////////////////////////////////////////////////////////////
+// Singular for ix86-Linux version 1-3-10  (2000121517)  Dec 15 2000 17:55:12
+// Rechnungen auf AMD700 mit 632 MB
+
+ LIB "linalg.lib";
+
+1. Sparse integer Matrizen
+--------------------------
+ring r1=0,(x),dp;
+system("--random", 12345678);
+int n = 70;
+matrix m = sparsemat(n,n,50,100);     
+option(prot,mem);
+
+int t=timer;
+matrix im = inverse(m,1)[1]; 
+timer-t;
+print(im*m);
+//list l0 = watchdog(100,"inverse("+"m"+",3)");   
+//bricht bei 100 sec ab und gibt l0[1]: string Killed zurueck
+
+//inverse(m,1): std       5sec 5,5 MB 
+//inverse(m,2): interred  12sec
+//inverse(m,2): lift      nach 180 sec 13MB abgebrochen
+//n=60: linalgorig: 3  linalg: 5
+//n=70: linalgorig: 6,7 linalg: 11,12 
+// aber linalgorig rechnet falsch! 
+
+2. Sparse poly Matrizen
+-----------------------
+ring r=(0),(a,b,c),dp;
+system("--random", 12345678);
+int n=6;
+matrix m = sparsematrix(n,n,2,0,50,50,9); //matrix of polys of deg <=2
+option(prot,mem);
+
+int t=timer;
+matrix im = inverse(m); 
+timer-t;
+print(im*m);
+//inverse(m,1): std       0sec 1MB
+//inverse(m,2): interred  0sec 1MB
+//inverse(m,2): lift      nach 2000 sec 33MB abgebrochen
+
+3. Sparse Matrizen mit Parametern
+---------------------------------
+//liborig rechnet hier falsch!
+ring r=(0),(a,b),dp;
+system("--random", 12345678);
+int n=7;
+matrix m = sparsematrix(n,n,1,0,40,50,9);
+ring r1 = (0,a,b),(x),dp;
+matrix m = imap(r,m);
+option(prot,mem);
+
+int t=timer;
+matrix im = inverse(m); 
+timer-t;
+print(im*m);
+//inverse(m)=inverse(m,3):15 sec inverse(m,1)=1sec inverse(m,2):>120sec
+//Bei Parametern vergeht die Zeit beim Normieren!
+
+3. Sparse Matrizen mit Variablen und Parametern
+-----------------------------------------------
+ring r=(0),(a,b),dp;
+system("--random", 12345678);
+int n=6;
+matrix m = sparsematrix(n,n,1,0,35,50,9);
+ring r1 = (0,a),(b),dp;
+matrix m = imap(r,m);
+option(prot,mem);
+
+int t=timer;
+matrix im = inverse(m,3); 
+timer-t;
+print(im*m);
+//n=7: inverse(m,3):lange sec inverse(m,1)=1sec inverse(m,2):1sec
+
+4. Ueber Polynomring invertierbare Matrizen
+-------------------------------------------
+LIB"random.lib"; LIB"linalg.lib";
+system("--random", 12345678);
+int n =3;
+ring r= 0,(x,y,z),(C,dp);
+matrix A=triagmatrix(n,n,1,0,0,50,2);   
+intmat B=sparsetriag(n,n,20,1);         
+matrix M = A*transpose(B);
+M=M*transpose(M);
+M[1,1..ncols(M)]=M[1,1..n]+xyz*M[n,1..ncols(M)];
+print(M);
+//M hat det=1 nach Konstruktion
+
+int t=timer;
+matrix iM=inverse(M);
+timer-t;
+print(iM*M);                      //test
+
+//ACHTUNG: Interred liefert i.A. keine Inverse, Gegenbeispiel z.B.
+//mit n=3
+//eifacheres Gegenbeispiel:
+matrix M =
+9yz+3y+3z+2,             9y2+6y+1,           
+9xyz+3xy+3xz-9z2+2x-6z-1,9xy2+6xy-9yz+x-3y-3z
+//det M=1, inverse(M,2); ->// ** matrix is not invertible
+//lead(M); 9xyz*gen(2) 9xy2*gen(2) nicht teilbar!
+
+5. charpoly:
+-----------
+//ring rp=(0,A,B,C),(x),dp; 
+ring r=0,(A,B,C,x),dp;     
+matrix m[12][12]=
+AC,BC,-3BC,0,-A2+B2,-3AC+1,B2,   B2,  1,   0, -C2+1,0,  
+1, 1, 2C,  0,0,     B,     -A,   -4C, 2A+1,0, 0,    0,  
+0, 0, 0,   1,0,     2C+1,  -4C+1,-A,  B+1, 0, B+1,  3B, 
+AB,B2,0,   1,0,     1,     0,    1,   A,   0, 1,    B+1,
+1, 0, 1,   0,0,     1,     0,    -C2, 0,   1, 0,    1,  
+0, 0, 2,   1,2A,    1,     0,    0,   0,   0, 1,    1,  
+0, 1, 0,   1,1,     2,     A,    3B+1,1,   B2,1,    1,  
+0, 1, 0,   1,1,     1,     1,    1,   2,   0, 0,    0,  
+1, 0, 1,   0,0,     0,     1,    0,   1,   1, 0,    3,  
+1, 3B,B2+1,0,0,     1,     0,    1,   0,   0, 1,    0,  
+0, 0, 1,   0,0,     0,     0,    1,   0,   0, 0,    0,  
+0, 1, 0,   1,1,     3,     3B+1, 0,   1,   1, 1,    0; 
+option(prot,mem);
+
+int t=timer;
+poly q=charpoly(m,"x");         //1sec, charpoly_B 1sec, 16MB
+timer-t;
+//1sec, charpoly_B 1sec, 16MB  (gleich in r und rp)
+
+*/
