@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.10 1998-01-14 19:21:10 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.11 1998-01-15 16:16:23 obachman Exp $ */
 
 /***************************************************************
  *
@@ -69,9 +69,9 @@ struct  spolyrec
     Like COMP_FAST, except that it turns off "vector techniques" of
     monomial operations, i.e. does everything exponent-wise. 
  ***************************************************************/
-#define COMP_FAST
+// #define COMP_FAST
 // #define COMP_DEBUG
-#define COMP_NO_EXP_VECTOR_OPS
+// #define COMP_NO_EXP_VECTOR_OPS
 #define COMP_TRADITIONAL
 
 #if defined(COMP_NO_EXP_VECTOR_OPS) && ! defined(COMP_FAST)
@@ -720,8 +720,8 @@ DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
   const long *s2 = (long*) &(p2->exp[0]);
   const long* const lb = s1 + pVariables1W;
 #else
-  const Exponent_t *s1 = (Exponent_t*) &(p1->exp[0]);
-  const Exponent_t *s2 = (Exponent_t*) &(p2->exp[0]);
+  const Exponent_t *s1 = (Exponent_t*) &(p1->exp[pVarLowIndex]);
+  const Exponent_t *s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
   const Exponent_t* const lb = s1 + pVariables;
   if (_pGetComp(p1) != _pGetComp(p2)) return FALSE;
 #endif  
