@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.256 2001-02-13 10:15:31 Singular Exp $ */
+/* $Id: iparith.cc,v 1.257 2001-02-14 12:31:07 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1959,7 +1959,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
 
   maxl--;
   if ((maxl==-1) /*&& (iiOp!=MRES_CMD)*/)
-    maxl = pVariables-1;
+    maxl = pVariables-1+2*(iiOp==MRES_CMD);
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
     intvec * iv=(intvec*)atGet(u,"isHomog");
