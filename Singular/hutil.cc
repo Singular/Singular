@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.5 1997-12-15 22:46:24 obachman Exp $ */
+/* $Id: hutil.cc,v 1.6 1998-04-07 17:51:02 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -82,9 +82,9 @@ scfmon hInit(ideal S, ideal Q, int *Nexist)
     return NULL;
   ek = ex = (scfmon)Alloc(k * sizeof(scmon));
   hsecure = (Exponent_t**) Alloc(k * sizeof(scmon));
-  for (i = sl; i; i--)
+  for (i = sl; i>0; i--)
   {
-    if (*si)
+    if (*si!=NULL)
     {
       *ek = (Exponent_t*) Alloc((pVariables+1)*sizeof(Exponent_t));
       pGetExpV(*si, *ek);
@@ -956,7 +956,7 @@ monf hCreate(int Nvar)
   monf xmem;
   int  i;
   xmem = (monf)Alloc((Nvar + 1) * sizeof(monp));
-  for (i = Nvar; i; i--)
+  for (i = Nvar; i>0; i--)
   {
     xmem[i] = (monp)Alloc(LEN_MON);
     xmem[i]->mo = NULL;
