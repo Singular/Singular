@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.221 2003-08-11 10:02:33 Singular Exp $
+@comment $Id: reference.doc,v 1.222 2004-04-23 14:14:48 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2612,7 +2612,7 @@ See
 @ref{option}.
 @c ref
 @c ---------------------------------------
-@node jacob, jet, intersect, Functions
+@node jacob, janet, intersect, Functions
 @subsection jacob
 @cindex jacob
 @table @code
@@ -2644,7 +2644,37 @@ See
 @ref{nvars}.
 @c ref
 @c ---------------------------------------
-@node jet, kbase, jacob, Functions
+@node janet, jet, jacob, Functions
+@subsection janet
+@cindex janet
+@table @code
+@item @strong{Syntax:}
+@code{janet (} ideal_expression @code{)}
+@*@code{janet (} ideal_expression @code{,} int_expression @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+computes the Janet basis of the given ideal, resp.@:  the standard basis
+if 1 is given as the second argument.
+@item @strong{Remark:}
+it works only with global orderings.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),dp;
+  ideal i=x*y*z-1,x+y+z,x*y+x*z+y*z; // cyclic 3
+  janet(i);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal};
+@ref{groebner};
+@ref{std}.
+@c ref
+@c ---------------------------------------
+@node jet, kbase, janet, Functions
 @subsection jet
 @cindex jet
 @table @code

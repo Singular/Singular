@@ -1,17 +1,15 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.64 2003-10-17 16:03:18 levandov Exp $";
+version="$Id: standard.lib,v 1.65 2004-04-23 14:12:24 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
 
 PROCEDURES:
- stdjanet(ideal/module)	Groebner basis using Janet basis computation
  stdfglm(ideal[,ord])   standard basis of ideal via fglm [and ordering ord]
  stdhilb(ideal[,h])     standard basis of ideal using the Hilbert function
  groebner(ideal/module) standard basis using a heuristically chosen method
  quot(any,any[,n])      quotient using heuristically chosen method
  res(ideal/module,[i])  free resolution of ideal or module
- janet(ideal/module)	Janet basis of the ideal/module
  sprintf(fmt,...)       returns fomatted string
  fprintf(link,fmt,..)   writes formatted string to link
  printf(fmt,...)        displays formatted string
@@ -1108,7 +1106,8 @@ example
    poly p=((x2+y3)^2+xy6)*((x3+y2)^2+x10y);
    p=p^2;
    timeFactorize(p,2);
-   timeFactorize(p,20);
+   "ERROR: will not run currently:";
+   //timeFactorize(p,20);
 }
 
 proc timeStd(ideal i,list #)
@@ -1227,54 +1226,6 @@ example
   //factorize(p);  //slow
   system("random",992851262);
   factorH(p);
-}
-
-proc janet(def @i)
-"SYNTAX: @code{janet (} ideal_expression @code{)} @*
-         @code{janet (} module_expression @code{)}
-TYPE:    type of the first argument
-PURPOSE: computes the Janet basis of the argument @code{I}
-         (ideal or module).
-ASSUME: well-ordering on current ring. Computations with modules 
-are still under development
-NOTE:  Janet basis is an involutive basis with respect to
-the involutive Janet division. It is indeed a non-reduced Groebner basis.
-SEE ALSO: stdjanet, std
-KEYWORDS: involutive basis computations
-EXAMPLE: example janet;  shows an example"
-{
-  return(system("janet",@i,1));
-}
-example
-{ "EXAMPLE: "; echo=2;
-  ring r=0,(x,y,z),dp;
-  ideal i=x*y*z-1,x+y+z,x*y+x*z+y*z; // cyclic 3
-  janet(i);
-}
-//////////////////////////////////////////////////////////////////////////
-
-proc stdjanet(def @i)
-"SYNTAX: @code{groebner (} ideal_expression @code{)} @*
-         @code{groebner (} module_expression @code{)}
-TYPE:    type of the first argument
-PURPOSE: computes the reduced Groebner basis of the argument @code{I} (ideal or module) via the computation of Janet basis and interreduction.
-ASSUME: well-ordering on current ring. Computations with modules are
-still under development.
-NOTE: In order to compare the result with the one, produced by @code{std},
-be sure that @code{option(prot)} is activated in the latter computation.
-SEE ALSO: janet, std
-KEYWORDS: involutive basis computations, groebner basis computations
-EXAMPLE: example stdjanet;  shows an example"
-{
-  return(system("janet",@i,0));
-}
-example
-{ "EXAMPLE: "; echo=2;
-  ring r=0,(x,y,z),dp;
-  ideal i=x*y*z-1,x+y+z,x*y+x*z+y*z; // cyclic 3
-  stdjanet(i);
-  option(redSB);
-  std(i);
 }
 //////////////////////////////////////////////////////////////////////////
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.316 2004-04-19 10:40:40 Singular Exp $ */
+/* $Id: iparith.cc,v 1.317 2004-04-23 14:10:13 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -44,6 +44,7 @@
 #include "sparsmat.h"
 #include "algmap.h"
 #include "units.h"
+#include "janet.h"
 #include "../kernel/GMPrat.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
@@ -219,6 +220,7 @@ cmdnames cmds[] =
   { "intmat",      0, INTMAT_CMD ,        INTMAT_CMD},
   { "intvec",      0, INTVEC_CMD ,        ROOT_DECL_LIST},
   { "jacob",       0, JACOB_CMD ,         CMD_1},
+  { "janet",       0, JANET_CMD ,         CMD_12},
   { "jet",         0, JET_CMD ,           CMD_M},
   { "kbase",       0, KBASE_CMD ,         CMD_12},
   { "keepring",    0, KEEPRING_CMD ,      KEEPRING_CMD},
@@ -1896,6 +1898,10 @@ static BOOLEAN jjINTERSECT(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD);
   return FALSE;
 }
+static BOOLEAN jjJanetBasis2(leftv res, leftv u, leftv v)
+{
+  return jjStdJanetBasis(res,u,(int)v->Data());
+}
 static BOOLEAN jjJET_P(leftv res, leftv u, leftv v)
 {
   res->data = (char *)pJet((poly)u->CopyD(), (int)v->Data());
@@ -2574,6 +2580,7 @@ struct sValCmd2 dArith2[]=
 ,{lInsert,     INSERT_CMD,     LIST_CMD,       LIST_CMD,   DEF_CMD ALLOW_PLURAL}
 ,{jjINTERSECT, INTERSECT_CMD,  IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjINTERSECT, INTERSECT_CMD,  MODUL_CMD,      MODUL_CMD,  MODUL_CMD ALLOW_PLURAL}
+,{jjJanetBasis2, JANET_CMD,    IDEAL_CMD,      IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjJET_P,     JET_CMD,        POLY_CMD,       POLY_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjJET_ID,    JET_CMD,        IDEAL_CMD,      IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjJET_P,     JET_CMD,        VECTOR_CMD,     VECTOR_CMD, INT_CMD ALLOW_PLURAL}
@@ -3935,6 +3942,7 @@ struct sValCmd1 dArith1[]=
 ,{jjIS_RINGVAR0,IS_RINGVAR,      INT_CMD,        ANY_TYPE       ALLOW_PLURAL}
 ,{jjJACOB_P,    JACOB_CMD,       IDEAL_CMD,      POLY_CMD       ALLOW_PLURAL}
 ,{mpJacobi,     JACOB_CMD,       MATRIX_CMD,     IDEAL_CMD      ALLOW_PLURAL}
+,{jjJanetBasis, JANET_CMD,       IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 ,{jjKBASE,      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 ,{jjKBASE,      KBASE_CMD,       MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
 ,{atKILLATTR1,  KILLATTR_CMD,    NONE,           IDHDL          ALLOW_PLURAL}
@@ -4863,8 +4871,8 @@ struct sValCmd3 dArith3[]=
 ,{jjHILBERT3,       HILBERT_CMD,INTVEC_CMD, IDEAL_CMD,  INT_CMD,    INTVEC_CMD NO_PLURAL}
 ,{jjHILBERT3,       HILBERT_CMD,INTVEC_CMD, MODUL_CMD,  INT_CMD,    INTVEC_CMD NO_PLURAL}
 ,{jjCALL3MANY,      IDEAL_CMD,  IDEAL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD ALLOW_PLURAL}
-//,{jjCALL3MANY,      INTERSECT_CMD,  NONE,   DEF_CMD,    DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{lInsert3,         INSERT_CMD, LIST_CMD,   LIST_CMD,   DEF_CMD,    INT_CMD ALLOW_PLURAL}
+//,{jjCALL3MANY,      INTERSECT_CMD,  NONE,   DEF_CMD,    DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjINTMAT3,        INTMAT_CMD, INTMAT_CMD, INTMAT_CMD, INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjCALL3MANY,      INTVEC_CMD, INTVEC_CMD, DEF_CMD,    DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjJET_P_IV,       JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    INTVEC_CMD ALLOW_PLURAL}

@@ -1,7 +1,12 @@
+#include <string.h>
 #include "mod2.h"
-#include "janet.h"
+#include "febase.h"
+#include "polys.h"
 #include "kstd1.h"
-#include "ipid.h"
+#include "subexpr.h"
+#include "ideals.h"
+#include "ring.h"
+#include "janet.h"
 
 #define pow_(x) pTotaldegree((x))
 
@@ -9,94 +14,129 @@
 extern int ComputeBasis(jList *,jList *);
 extern void Initialization(char *);
 
+BOOLEAN jInitBasis(ideal v, jList **TT,jList **QQ)
+{
+  if (pOrdSgn==-1)
+  {
+    WerrorS("janet only for well-orderings");
+    return TRUE;
+  }
+
+  Initialization(rOrdStr(currRing));
+
+  jList *Q=(jList *)GCM(sizeof(jList));
+  Q->root=NULL;
+
+  jList *T=(jList *)GCM(sizeof(jList));
+  T->root=NULL;
+
+  for (int i=0; i < v->idelems(); i++)
+  {
+    if (v->m[i]!=NULL)
+    {
+      Poly *beg=NewPoly(pCopy(v->m[i]));
+
+      InitHistory(beg);
+      InitProl(beg);
+      InitLead(beg);
+
+      InsertInCount(Q,beg);
+    }
+  }
+
+  BOOLEAN r= !(ComputeBasis(T,Q));
+  *TT=T;
+  *QQ=Q;
+  return r;
+}
+
+BOOLEAN jjStdJanetBasis(leftv res, leftv v, int flag)
+{
+  ideal result;
+  int dpO;
+
+  jList *T;
+  jList *Q;
+  ideal I=(ideal)v->Data();
+  BOOLEAN is_zero=TRUE;
+  for (int i=0; i < I->idelems(); i++)
+  {
+    if ((I->m[i]!=NULL)&& (pIsConstant(I->m[i])))
+    {
+      goto zero;
+    }
+    else
+     is_zero=FALSE;
+  }
+  if (is_zero)
+    goto zero;
+  if (!jInitBasis(I,&T,&Q))
+  {
+    dpO=(strstr(rOrdStr(currRing),"dp")!=NULL);
+    int ideal_length;
+    if (flag==1)
+      ideal_length= dpO ? GB_length() : CountList(T);
+    else
+      ideal_length=CountList(T);
+
+    result=idInit(ideal_length,1);
+
+    int ideal_index=0;
+
+    LCI iT=T->root;
+
+    while(iT)
+    {
+      pTest(iT->info->root);
+      if ((flag==1) && dpO)
+      {
+        //if (pow_(iT->info->lead) == pow_(iT->info->history))
+        if (pDeg(iT->info->lead) == pDeg(iT->info->history))
+        {
+          result->m[ideal_length-ideal_index-1]=pCopy(iT->info->root);
+          if (!nGreaterZero(pGetCoeff(iT->info->root)))
+            result->m[ideal_length-ideal_index-1]
+                                  =pNeg(result->m[ideal_length-ideal_index-1]);
+
+          ideal_index++;
+        }
+      }
+      else
+      {
+        result->m[ideal_length-ideal_index-1]=pCopy(iT->info->root);
+        if (!nGreaterZero(pGetCoeff(iT->info->root)))
+          result->m[ideal_length-ideal_index-1]
+                                  =pNeg(result->m[ideal_length-ideal_index-1]);
+
+        ideal_index++;
+      }
+      iT=iT->next;
+    }
+  }
+
+  if ((flag==1) && (!dpO))
+  {
+    //Print ("interred\n");
+    result=kInterRed(result);
+    idSkipZeroes(result);
+  }
+  res->data = (char *)result;
+  res->rtyp = IDEAL_CMD;
+
+  DestroyList(Q);
+  DestroyList(T);
+
+  return FALSE;
+
+zero:
+  result=idInit(1,1);
+  if (!is_zero) result->m[0]=pOne();
+  res->data = (char *)result;
+  res->rtyp = IDEAL_CMD;
+  return FALSE;
+}
+
 BOOLEAN jjJanetBasis(leftv res, leftv v)
 {
-        Initialization(rOrdStr(currRing));
-
-          jList *Q=(jList *)GCM(sizeof(jList));
-        Q->root=NULL;
-                
-        jList *T=(jList *)GCM(sizeof(jList));
-        T->root=NULL;
-
-        ideal input = (ideal)(v->Data());
-        /* the second arg is an integer, defining what to return:
-         0 (default case) = Groebner basis,
-         1                = Janet basis.
-        */
-        int doJanet;
-        if ((v->next!=NULL) && (v->next->Typ() == INT_CMD))
-        {
-          doJanet = (int)v->next->CopyD();
-          //          Print("doJanet:%d\n",doJanet);
-        }               
-        else 
-        {
-          doJanet = 0;
-        }
-        ideal result;
-        int dpO = !doJanet; /* compatibility */
-
-        for (int i=0; i < input->idelems(); i++)        
-        {
-          /* nonzero constant check */
-          if (pIsConstant(input->m[i])) { goto zero; }
-          Poly *beg=NewPoly(pCopy(input->m[i]));
-          InitHistory(beg);
-          InitProl(beg);
-          InitLead(beg);
-          InsertInCount(Q,beg);
-        }
-
-        if (ComputeBasis(T,Q))
-        {
-          //                dpO=(strstr(rOrdStr(currRing),"dp")!=NULL);
-          int ideal_length= dpO ? GB_length() : CountList(T);
-          result=idInit(ideal_length,1);
-          int ideal_index=0;
-          
-          LCI iT=T->root;
-          
-          while (iT) 
-          {
-#ifdef PDEBUG                 
-            pTest(iT->info->root);
-#endif
-            if (!(dpO && (pow_(iT->info->lead) != pow_(iT->info->history)))) 
-            {
-              result->m[ideal_length-ideal_index-1]=pCopy(iT->info->root);
-              if (!nGreaterZero(pGetCoeff(iT->info->root)))
-              {
-                result->m[ideal_length-ideal_index-1]=pNeg(result->m[ideal_length-ideal_index-1]); 
-              }
-              ideal_index++;
-            }    
-            iT=iT->next; 
-          }
-        }
-        else
-        {
-zero:
-          result=idInit(1,1);
-          result->m[0]=pOne();        
-        }
-        
-        /* now we make the basis shorter... getting Groebner */
-        if (!doJanet) /* if (!dpO) */ 
-        {
-          if (TEST_OPT_PROT)
-          {
-            Print ("interred\n");
-          }
-          result=kInterRed(result);
-          idSkipZeroes(result);
-        }
-        res->data = (char *)result;
-        res->rtyp = v->Typ();
-        if (!doJanet) setFlag(res,FLAG_STD);
-
-        DestroyList(Q);
-        DestroyList(T);
-        
-        return FALSE;
+  return jjStdJanetBasis(res,v,0);
 }
