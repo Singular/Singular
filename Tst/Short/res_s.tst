@@ -88,5 +88,7 @@ print(betti(jmin2),"betti");
 kill r;
 //--------------------------------------------------------------
 
+example res;
+
 tst_status(1);$
 
