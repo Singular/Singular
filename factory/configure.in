@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.19 1998-04-20 15:07:27 schmidt Exp $
+dnl # $Id: configure.in,v 1.20 1998-06-03 12:04:33 obachman Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.19 1998-04-20 15:07:27 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.20 1998-06-03 12:04:33 obachman Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -159,8 +159,12 @@ AC_CHECK_PROG(BISON, bison, bison, where-is-your-bison)
 # avoid some nasty problems with our own development environment.
 unset ac_cv_path_FACTORY_MKINSTALLDIRS
 unset ac_cv_path_FACTORY_MAKEHEADER
-AC_PATH_PROG(FACTORY_MKINSTALLDIRS, mkinstalldirs, -mkdir, $PATH:$srcdir/bin)
-AC_PATH_PROG(FACTORY_MAKEHEADER, makeheader, , $srcdir/bin:$PATH)
+ac_save_path="$PATH"
+PATH="$PATH:$srcdir/bin"
+AC_PATH_PROG(FACTORY_MKINSTALLDIRS, mkinstalldirs, -mkdir)
+PATH="$srcdir/bin:$ac_save_path"
+AC_PATH_PROG(FACTORY_MAKEHEADER, makeheader)
+PATH="$ac_save_path"
 
 #
 # - check for libraries.
