@@ -5297,7 +5297,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
     // error handling
     if (!errorreported)
     {
-      if ((a->rtyp==0) && (a->Name()!=sNoName))
+      if ((args>0) && (a->rtyp==0) && (a->Name()!=sNoName))
       {
         Werror("`%s` is not defined",a->Name());
       }
