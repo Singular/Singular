@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.8 1997-11-19 17:42:11 schmidt Exp $ */
+/* $Id: cf_algorithm.h,v 1.9 1998-01-16 08:56:34 schmidt Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -34,6 +34,8 @@ CanonicalForm psq ( const CanonicalForm & f, const CanonicalForm & g, const Vari
 void psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const Variable & x );
 
 CanonicalForm common_den ( const CanonicalForm & f );
+
+bool divides ( const CanonicalForm & f, const CanonicalForm & g );
 //}}}
 
 //{{{ function declarations from cf_chinese.cc
