@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.17 1998-04-27 12:34:21 obachman Exp $ */
+/* $Id: silink.cc,v 1.18 1998-04-30 12:04:03 obachman Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -745,7 +745,7 @@ void slStandardInit()
   si_link_root->Dump=slDumpAscii;
   si_link_root->GetDump=slGetDumpAscii;
   si_link_root->Status=slStatusAscii;
-  si_link_root->type="Ascii";
+  si_link_root->type="ASCII";
   s = si_link_root;
 #ifdef HAVE_DBM
 #ifndef HAVE_MODULE_DBM
