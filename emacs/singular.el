@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.36 1999-08-30 19:07:22 wichmann Exp $
+;; $Id: singular.el,v 1.37 1999-08-30 19:08:18 wichmann Exp $
 
 ;;; Commentary:
 
@@ -13,7 +13,7 @@
 ;;
 ;; - "Singular" is written with an upper-case `S' in comments, doc
 ;;   strings, and messages.  As part of symbols, it is written with
-;;   a lower-case `s'.
+;;   a lower-case `s'. 
 ;; - When referring to the Singular interactive mode, do it in that
 ;;   wording.  Use the notation `singular-interactive-mode' only when
 ;;   really referring to the lisp object.
