@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.8 1997-10-28 17:20:53 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.9 1997-11-13 08:36:17 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -31,7 +31,6 @@
 CanonicalForm
 ftestGetCanonicalForm ( const char * canFormSpec )
 {
-    // get string to read canonical form from
     const char * stringF = canFormSpec;
     stringF = ftestSkipBlancs( stringF );
     if ( *stringF == '<' ) {
@@ -47,6 +46,7 @@ ftestGetCanonicalForm ( const char * canFormSpec )
 			stringF );
 	return f;
     } else {
+	// get string to read canonical form from
 	if ( *stringF == '$' ) {
 	    const char * tokenCursor = ftestSkipBlancs( stringF+1 );
 	    // read canonical form from environment
@@ -73,10 +73,9 @@ ftestGetCanonicalForm ( const char * canFormSpec )
 	*stringCursor++ = ';';
 	*stringCursor = '\0';
 
-	// read f
+	// read f and return it
 	CanonicalForm f;
 	istrstream( terminatedStringF ) >> f;
-
 	delete [] terminatedStringF;
 	return f;
     }
@@ -151,11 +150,10 @@ void
 ftestPrintResult ( const char * resultName, const CanonicalForm & result )
 {
     if ( ftestPrintResultFlag ) {
-	ftestPrint( "result: %s\n", "@@%s\n", resultName );
+	cout << "Result: " << resultName << ":" << endl;
 	cout << result << endl;
-	ftestPrint( (char *)0, "@@\n" );
     } else if ( ! ftestPrintFlag )
-	cout << result << endl;
+	cout << "(" << result << ")" << endl;
 }
 //}}}
 
@@ -171,13 +169,12 @@ ftestPrintResult ( const char * resultName, const CFFList & result )
     CFFListIterator I;
 
     if ( ftestPrintResultFlag ) {
-	ftestPrint( "result: %s\n", "@@%s\n", resultName );
+	cout << "Result: " << resultName << ":" << endl;
 	for ( I = result; I.hasItem(); I++ )
 	    cout << I.getItem() << endl;
-	ftestPrint( (char *)0, "@@\n" );
     } else if ( ! ftestPrintFlag )
 	for ( I = result; I.hasItem(); I++ )
-	    cout << I.getItem() << endl;
+	    cout << "(" << I.getItem() << ")" << endl;
 }
 //}}}
 
@@ -190,11 +187,9 @@ ftestPrintResult ( const char * resultName, const CFFList & result )
 void
 ftestPrintResult ( const char * resultName, const int result )
 {
-    if ( ftestPrintResultFlag ) {
-	ftestPrint( "result: %s\n", "@@%s\n", resultName );
-	cout << result << endl;
-	ftestPrint( (char *)0, "@@\n" );
-    } else if ( ! ftestPrintFlag )
+    if ( ftestPrintResultFlag )
+	cout << "Result: " << resultName << ": " << result << endl;
+    else if ( ! ftestPrintFlag )
 	cout << result << endl;
 }
 //}}}
