@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.cc,v 1.8 1998-04-14 15:17:16 pohl Exp $ */
+/* $Id: ffops.cc,v 1.9 2000-08-04 11:10:15 obachman Exp $ */
 
 #include <config.h>
 
@@ -10,8 +10,8 @@
 #include "cf_defs.h"
 #include "ffops.h"
 
-int ff_prime = 31991;
-int ff_halfprime = 31991 / 2;
+int ff_prime = 0;
+int ff_halfprime = 0;
 bool ff_big = false;
 short * ff_invtab = new short [32767];
 
