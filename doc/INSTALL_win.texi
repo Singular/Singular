@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.4 2000-05-30 07:38:39 obachman Exp $
+@comment $Id: INSTALL_win.texi,v 1.5 2000-06-05 13:39:31 obachman Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -74,7 +74,7 @@ When asked for the installation folder, you should simply choose a drive
 make sure that the folder you choose is mounted to the root of your
 (Cygwin) file system.
 @* Among others, the folowing subfolders will be created:
-@itemize @code
+@table @code
 @item bin
 contains the basic cygwin DLLs and tools
 @item etc
@@ -85,7 +85,7 @@ for temporary files
 @item usr
 contains subfolders which contain the @sc{Singular} and XEmacs program and
 documentation.
-@end itemize
+@end table
 @item
 When asked for the Setup Type, choose @code{Typical}, unless you know
 what you are doing. 
@@ -113,13 +113,11 @@ At the end, you @emph{should} reboot your computer. Otherwise, some
 
 @heading Troubleshooting
 
-@itemize @bullet
-@item For any other troubles: 
-@*Please send an email to @email{singular@@mathematik.uni-kl.de}
+For any other troubles,
+please send an email to @email{singular@@mathematik.uni-kl.de}
 and include the header which is displayed by starting up @sc{Singular}
 with the @code{-v} option, and a description of your machine (issue the
 command @code{uname -a} on your shell) in your report.
-@end itemize
 
 
 @heading More information about @sc{Singular}: Comments, Questions, Bug Reports
