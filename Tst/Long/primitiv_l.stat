@@ -2,6 +2,6 @@ Status Output of tst_status.out
 init >> USER    :hannes
 init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
 init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
-init >> date    :Mon Jun 21 21:10:11 MET DST 1999
+init >> date    :Mon Jul  5 17:16:45 MET DST 1999
 init >> version :1303
 init >> ticks   :100
