@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.10 1998-09-29 21:14:46 siebert Exp $ */
+/* $Id: syz.cc,v 1.11 1998-10-06 14:37:54 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -222,19 +222,21 @@ void syMinimizeResolvente(resolvente res, int length, int first)
   intvec * dummy;
 
   if (syzIndex<1) syzIndex=1;
-  if ((syzIndex==1) && (idHomModule(res[0],currQuotient,&dummy)))
-  {
-    delete dummy;
-    resolvente res1=syFastMin(res,length);
-    int i;
-    for (i=0;i<length;i++)
-    {
-      idDelete(&res[i]);
-      res[i] = res1[i];
-    }
-    Free((ADDRESS)res1,length*sizeof(ideal));
-    return;
-  }
+/*                            Noch zu testen!!
+*  if ((syzIndex==1) && (idHomModule(res[0],currQuotient,&dummy)))
+*  {
+*    delete dummy;
+*    resolvente res1=syFastMin(res,length);
+*    int i;
+*    for (i=0;i<length;i++)
+*    {
+*      idDelete(&res[i]);
+*      res[i] = res1[i];
+*    }
+*    Free((ADDRESS)res1,length*sizeof(ideal));
+*    return;
+*  }
+*/
   while ((syzIndex<length-1) && (res[syzIndex]!=NULL) && (res[syzIndex+1]!=NULL))
   {
     syMinStep(res[syzIndex-1],res[syzIndex],FALSE,res[syzIndex+1]);
