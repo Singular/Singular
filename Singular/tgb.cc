@@ -16,6 +16,7 @@
 #include "kbuckets.h"
 
 #define FULLREDUCTIONS
+#define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 //#define QUICK_SPOLY_TEST
 //#define DIAGONAL_GOING
@@ -52,6 +53,9 @@ struct calc_dat
   int* T_deg;
   int* misses;
   int_pair_node* soon_free;
+  #ifdef HEAD_BIN
+  struct omBin_s*   HeadBin;
+  #endif
   int max_misses;
   int found_i;
   int found_j;
@@ -429,6 +433,16 @@ int* make_connections(int from, int to, poly bound, calc_dat* c)
   omfree(cans);
   return connected;
 }
+#ifdef HEAD_BIN
+static inline poly p_MoveHead(poly p, omBin b)
+{
+  poly np;
+  omTypeAllocBin(poly, np, b);
+  memmove(np, p, b->sizeW*sizeof(long));
+  omFreeBinAddr(p);
+  return np;
+}
+#endif
 void initial_data(calc_dat* c){
   void* h;
   int i,j;
@@ -445,29 +459,34 @@ void initial_data(calc_dat* c){
   c->continue_i=0;
   c->continue_j=0;
   c->skipped_i=-1;
+  #ifdef HEAD_BIN
+  c->HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
+  #endif
+  /* omUnGetSpecBin(&(c->HeadBin)); */
   h=omalloc(n*sizeof(char*));
-  if (h!=NULL){
+  if (h!=NULL)
     c->states=(char**) h;
-  } else {
+  else
     exit(1);
-  }
   c->misses=(int*) omalloc(n*sizeof(int));
   c->deg=(int **) omalloc(n*sizeof(int*));
   h=omalloc(n*sizeof(int));
-  if (h!=NULL){
+  if (h!=NULL)
     c->lengths=(int*) h;
-  } else{
+  else
     exit(1);
-  }
 
   h=omalloc(n*sizeof(int));
-  if (h!=NULL){
+  if (h!=NULL)
     c->rep=(int*) h;
-  } else {
+  else
     exit(1);
-  }
   c->short_Exps=(long*) omalloc(n*sizeof(long));
-  for (i=0;i<n;i++){
+  for (i=0;i<n;i++)
+  {
+  #ifdef HEAD_BIN
+    c->S->m[i]=p_MoveHead(c->S->m[i],c->HeadBin);
+  #endif  
     c->T_deg[i]=pFDeg(c->S->m[i]);
     c->lengths[i]=pLength(c->S->m[i]);
     c->misses[i]=0;
@@ -842,6 +861,9 @@ void do_this_spoly_stuff(int i,int j,calc_dat* c){
     c->misses_series++;
   } else {
     c->misses_series=0;
+  #ifdef HEAD_BIN
+    hr=p_MoveHead(hr,c->HeadBin);
+  #endif  
     add_to_basis(hr, i,j,c);
   }
 }
