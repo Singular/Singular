@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.82 2002-05-16 11:16:30 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.83 2002-07-08 07:10:34 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -14,6 +14,7 @@ PROCEDURES:
  gmsring(t,s);              Gauss-Manin system of t with variable s
  gmsnf(p,K);                Gauss-Manin normal form of p
  gmscoeffs(p,K);            Gauss-Manin basis representation of p
+ bernstein(t);              roots of the Bernstein polynomial of t
  monodromy(t);              Jordan data of complex monodromy of t
  spectrum(t);               singularity spectrum of t
  sppairs(t);                spectral pairs of t
@@ -555,6 +556,44 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intv
   }
 
   return(A,A0,r,H0,U0,e,m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc bernstein(poly t)
+"USAGE:    bernstein(t); poly t
+ASSUME:   characteristic 0; local degree ordering;
+          isolated critical point 0 of t
+RETURN:   ideal r;  roots of the Bernstein polynomial b excluding the root -1
+NOTE:     the roots of b are negative rational numbers and -1 is a root of b
+KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; 
+          Bernstein polynomial
+EXAMPLE:  example bernstein; shows examples
+"
+{
+  def R=basering;
+  int n=nvars(R)-1;
+  def G=gmsring(t,"s");
+  setring(G);
+
+  matrix A;
+  module U0;
+  ideal e;
+  intvec m;
+
+  def A0,r,H,H0,k0=saturate();
+  e,m,A0,r=eigenval(A0,r,H,k0);
+
+  setring(R);
+  ideal r=-imap(G,e);
+  kill G,gmsmaxdeg;
+
+  return(r);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly t=x5+x2y2+y5;
+  bernstein(t);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
