@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 'di ';
 'ig 00 ';
-# $Id: texi2html,v 1.4 1998-06-18 09:21:40 krueger Exp $
+# $Id: texi2html,v 1.5 1998-06-18 13:26:19 krueger Exp $
 # Description: Program to transform most Texinfo documents to HTML.
 # The plan is for the next version of makeinfo to support HTML output
 # directly, but until then ...
@@ -48,11 +48,13 @@ $IMG_FIRST_ACTIVE  = "";
 $IMG_FIRST_PASSIVE = "";
 $IMG_LAST_ACTIVE   = "";
 $IMG_LAST_PASSIVE  = "";
-$IMG_NEXT_ACTIVE   = "<IMG SRC=\"next_motif.gif\">";
-$IMG_NEXT_PASSIVE  = "<IMG SRC=\"next_motif_gr.gif\">";
-$IMG_PREV_ACTIVE   = "<IMG SRC=\"previous_motif.gif\">";
-$IMG_PREV_PASSIVE  = "<IMG SRC=\"previous_motif_gr.gif\">";
-$IMG_TOC           = "<IMG SRC=\"contents_motif.gif\">";
+$IMG_NEXT_ACTIVE   = "<IMG SRC=\"images/next_motif.gif\">";
+$IMG_NEXT_PASSIVE  = "<IMG SRC=\"images/next_motif_gr.gif\">";
+$IMG_PREV_ACTIVE   = "<IMG SRC=\"images/previous_motif.gif\">";
+$IMG_PREV_PASSIVE  = "<IMG SRC=\"images/previous_motif_gr.gif\">";
+$IMG_TOC           = "<IMG SRC=\"images/contents_motif.gif\">";
+$IMG_LEFT          = "images/bg_left.gif";
+$IMG_RIGHT         = "images/bg_right.gif";
 
 $BIBRE = '\[[\w\/]+\]';			# RE for a bibliography reference
 $FILERE = '[\/\w.+-]+';			# RE for a file name
@@ -160,6 +162,7 @@ $html2_doctype = '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0 Strict Level 2//E
 	       "\t", " ",
 	       "-", "&#173;",	# soft hyphen
 	       'tab', '<TD>',
+	       '-', '',
 	       );
 
 #
@@ -445,7 +448,7 @@ if ($expandinfo) {
     $to_skip{'iftex'}++;
     $to_skip{'end iftex'}++;
 }
-$invisible_mark = '<IMG SRC="invisible.xbm" ALT="">' if $invisible_mark eq 'xbm';
+$invisible_mark = '<IMG SRC="images/invisible.xbm" ALT="">' if $invisible_mark eq 'xbm';
 die $usage unless @ARGV == 1;
 $docu = shift(@ARGV);
 if ($docu =~ /.*\//) {
@@ -957,9 +960,14 @@ while ($_ = &next_line) {
 		$name = $1;
 		$name =~ s/\s+$//;
 		$level = $sec2level{$tag};
-		$name = &update_sec_num($tag, $level) . "  $name"
-		    if $number_sections && $tag !~ /^unnumbered/;
-		push(@left_index, $name);
+#		print "+++==>$tag<\n";
+		if ($number_sections && $tag !~ /heading$/) {
+		    $name = &update_sec_num($tag, $level) . "  $name";
+		    push(@left_index, $name);
+		}
+#		$name = &update_sec_num($tag, $level) . "  $name"
+#		    if $number_sections && $tag !~ /heading$/;
+#		    if $number_sections && $tag !~ /^unnumbered/;
 		if ($tag =~ /heading$/) {
 		    push(@lines, &html_debug("\n", __LINE__));
 		    if ($html_element ne 'body') {
@@ -1297,6 +1305,7 @@ while (@lines) {
 	# note: Texinfo may accept other characters
 	($type, $nodes, $full) = ($1, $2, $3);
 	($before, $after) = ($`, $');
+	$ref_where = "Section";
 	if (! $full && $after) {
 	    warn "$ERROR Bad xref (no ending } on line): $_";
 	    $_ = "$before$;0${type}ref\{$nodes$after";
@@ -1339,17 +1348,21 @@ while (@lines) {
 	$node = $args[0]; # the node is always the first arg
 	&normalise_node($node);
 	$sec = $node2sec{$node};
+	$_ = $sec;
+	if (/^[A-Z]/) {
+	    $ref_where = "Appendix";
+	}
 	if (@args == 5) { # reference to another manual
 	    $sec = $args[2] || $node;
 	    $man = $args[4] || $args[3];
-	    $_ = "${before}${type}section `$sec' in \@cite{$man}$after";
+	    $_ = "${before}${type}$ref_where `$sec' in \@cite{$man}$after";
 	} elsif ($type =~ /Info/) { # inforef
 	    warn "$ERROR Wrong number of arguments: $_" unless @args == 3;
 	    ($nn, $_, $in) = @args;
 	    $_ = "${before}${type} file `$in', node `$nn'$after";
 	} elsif ($sec) {
 	    $href = $node2href{$node};
-	    $_ = "${before}${type}section " . &anchor('', $href, '', $sec) . $after;
+	    $_ = "${before}${type}" . &anchor('', $href, '', "$ref_where $sec") . $after;
 	} else {
 	    warn "$ERROR Undefined node ($node): $_";
 	    $_ = "$before$;0xref{$nodes}$after";
@@ -1537,8 +1550,9 @@ while (@lines3) {
 }
 print "# end of pass 4\n" if $verbose;
 
-push(@menu_lines, "<BODY BACKGROUND=\"/rock.gif\">\n");
-push(@menu_lines, "<IMG SRC=\"singular-small.jpg\"><P>\n");
+push(@menu_lines, "<BODY BACKGROUND=\"$IMG_LEFT\">\n");
+push(@menu_lines, "<A HREF=\"http://www.mathematik.uni-kl.de/~zca/Singular\" TARGET=\"_parent\">");
+push(@menu_lines, "<IMG SRC=\"images/singular-small.jpg\"></A><P>\n");
 #push(@menu_lines, "<BODY BACKGROUND=\"/rock.gif\" TEXT=\"yellow\"");
 #push(@menu_lines, " LINK=#FFFFFF ALINK=#FF00FF VLINK=\"#00FF00\">\n");
 #push(@menu_lines, "<NOBR>\n");
@@ -1936,6 +1950,7 @@ sub left_menu_entry {
 	$descr =~ s/^\s+//;
 	$descr = ": $descr" if $descr;
 	push(@menu_lines, "$oltype VALUE=$value>" . &anchor('', $href, "Main", $entry) . "$descr\n");
+	push(@menu_lines, "<P>\n");
     } else {
 	warn "$ERROR Undefined node ($node): $_";
     }
@@ -1993,7 +2008,7 @@ sub do_url {
     $text =~ s/(^\s+)|(\s+$)//;	# trim leading and trailing white space
     $text = $address unless $text;
     $address =~ s/&#173;//g;
-    &anchor('', "${address}", '', "<TT>${text}</TT>")
+    &anchor('', "${address}", '_parent', "<TT>${text}</TT>")
 }
 
 sub do_ctrl { "^$_[0]" }
@@ -2160,7 +2175,7 @@ $header
 $links
 </HEAD>
 EOT
-    if(!$is_frame) { print FILE "<BODY background=\"/rock.gif\">\n"; }
+    if(!$is_frame) { print FILE "<BODY background=\"$IMG_RIGHT\">\n"; }
 }
 
 sub print_toplevel_header {
@@ -2198,9 +2213,9 @@ EOT
 sub print_toplevel_footer {
     &print_ruler;
     print FILE <<EOT;
-This document was generated on $TODAY using the
-<A HREF=\"$HOMEPAGE\">texi2html</A>
-translator version 1.51a.</P>
+<H6>This document was generated on $TODAY using the
+<A HREF=\"$HOMEPAGE\" TARGET=\"_parent\">texi2html</A>
+translator version 1.51a.</H6>
 EOT
     &print_footer;
 }

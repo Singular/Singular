@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.42 1998-06-17 13:07:58 krueger Exp $
+@comment $Id: singular.doc,v 1.43 1998-06-18 13:26:18 krueger Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -20,8 +20,8 @@
 @c ------------------------
 @c <CENTER><IMG SRC="Singular2.gif"></CENTER><BR>
 @html
-<CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/" TARGET="_parent">
-<IMG SRC="singular.jpg"></A></CENTER><BR>
+<CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/Singular" TARGET="_parent">
+<IMG SRC="images/singular.jpg"></A></CENTER><BR>
 @end html
 @ifinfo
 this is the texinfo file describing Singular (version @value{VERSION})
