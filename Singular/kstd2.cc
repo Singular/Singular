@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.5 1997-06-09 12:21:25 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.6 1997-07-31 14:58:31 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -343,13 +343,12 @@ static void redLazy (LObject* h,kStrategy strat)
   }
   loop
   {
-    if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy(strat->S[j],(*h).p))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       if (TEST_OPT_DEBUG)
       {
-        PrintS("+\nwith ");
+        Print("\nwith S[%d] ",j);
         wrp(strat->S[j]);
       }
       /*- compute the s-polynomial -*/
@@ -413,7 +412,6 @@ static void redLazy (LObject* h,kStrategy strat)
     }
     else
     {
-      if (TEST_OPT_DEBUG) PrintS("-");
       if (j >= strat->sl)
       {
         if (TEST_OPT_DEBUG) PrintLn();
@@ -455,10 +453,9 @@ static void redHoney (LObject*  h,kStrategy strat)
   }
   loop
   {
-    if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy(strat->T[j].p,(*h).p))
     {
-      if (TEST_OPT_DEBUG) PrintS("+");
+      if (TEST_OPT_DEBUG) Print(" T[%d]",j);
       pi = strat->T[j].p;
       ei = strat->T[j].ecart;
       /*
@@ -474,17 +471,15 @@ static void redHoney (LObject*  h,kStrategy strat)
           break;
         if ((!BTEST1(20)) && (ei <= (*h).ecart))
           break;
-        if (TEST_OPT_DEBUG) Print("%d",i);
         if ((strat->T[i].ecart < ei) && pDivisibleBy(strat->T[i].p,(*h).p))
         {
-          if (TEST_OPT_DEBUG) PrintS("+");
+          if (TEST_OPT_DEBUG) Print(" T[%d]",i);
           /*
           * the polynomial to reduce with is now;
           */
           pi = strat->T[i].p;
           ei = strat->T[i].ecart;
         }
-        else if (TEST_OPT_DEBUG) PrintS("-");
       }
 
       /*
@@ -601,7 +596,6 @@ static void redHoney (LObject*  h,kStrategy strat)
     }
     else
     {
-      if (TEST_OPT_DEBUG) PrintS("-");
       if (j >= strat->tl)
       {
         if (TEST_OPT_DEBUG) PrintLn();
