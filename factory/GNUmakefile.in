@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.24 1997-12-09 11:59:08 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.25 1997-12-09 16:36:48 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -366,6 +366,10 @@ distfiles :=	\
 		install installcf installmem installgftables installtest \
 		uninstall uninstallcf uninstallmem uninstallgftables \
 		ftestall ftestclean ftestdistclean
+
+# we make these targets phony to make sure that they are
+# up to date when a new distribution is built
+.PHONY:		$(srcdir)/winnt/factory.h $(srcdir)/winnt/factoryconf.h
 
 #
 # - pattern rules.
