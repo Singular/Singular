@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.16 1998-12-21 10:54:53 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.17 1999-03-19 11:09:42 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -94,11 +94,12 @@ void pcvInit(int d)
   pcvTable=(unsigned*)Alloc0(pcvTableSize);
   pcvIndexSize=pVariables*sizeof(unsigned*);
   pcvIndex=(unsigned**)Alloc(pcvIndexSize);
-  for(int i=0;i<pVariables;i++)
+  int i;
+  for(i=0;i<pVariables;i++)
     pcvIndex[i]=pcvTable+i*pcvDegBound;
-  for(int i=0;i<pcvDegBound;i++)
+  for(i=0;i<pcvDegBound;i++)
     pcvIndex[0][i]=i;
-  for(int i=1;i<pVariables;i++)
+  for(i=1;i<pVariables;i++)
   {
     unsigned x=0;
     for(int j=0;j<pcvDegBound;j++)
