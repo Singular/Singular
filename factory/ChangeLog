@@ -1,4 +1,44 @@
+Wed Dec 17 09:56:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* canonicalform.cc (operator ==, operator !=): rewritten and
+	  speeded up
+	  (operator >): slightly speeded up
+
+	* int_cf.h (class InternalCF): `sign()' declared as const
+
+	* int_poly.cc (comparesame): doc and assertion fix
+
+	* int_int.cc (sqrt, ilog2): assertion fixes
+
+	* int_pp.cc (comparecoeff): assertion fix
+
+	* int_rat.cc (comparesame): doc fix
+
+	* int_cf.cc (InternalCF::sign): method made pure virtual.
+	  Declaration adapted.
+
+	* int_cf.cc (taildegree): bug fix.  Did not check whether CO is
+	  zero.
+
+	* imm.h (imm_cmp): doc fix
+
+	* canonicalform.cc (CanonicalForm::gcd): method removed.
+	  Declaration adapted.
+
+	* canonicalform.cc (degree, taildegree): one more time slightly
+	  speeded up.  Hopefully for the last time.
+
+Fri Dec 12 10:06:33 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* imm.h (imm_cmp_p, imm_cmp_gf): comparisons fulfill law of
+	  trichitomy
+
+	* readcf.y (yylex): parser reads generator from GF(q) correctly
+
 Tue Dec  9 10:03:07 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (.PHONY): dependencies `$(srcdir)/winnt/factory.h'
+	  and `$(srcdir)/winnt/factoryconf.h' added
 
 	* winnt/factory.h:  automatically created from `factory.template'
 	  using `makeheader'
@@ -104,7 +144,7 @@ Thu Nov 27 21:00:00 1997  Ruediger Stobbe  <rstobbe@de.oracle.com>
 
 Fri Nov 21 15:25:27 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* canonicalform.h (class CanonicalForm): inline function hasGcd()
+	* canonicalform.h (class CanonicalForm): inline method hasGcd()
 	  removed.
 
 	* int_poly.cc (coeff): explicit cast to CanonicalForm added
@@ -112,7 +152,7 @@ Fri Nov 21 15:25:27 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* int_rat.cc (comparecoeff): bug fix.  Did not calculate dummy
 	  correctly.
-	  (comparecoeff): assertion moved into if branch
+	  (comparecoeff): assertion moved into `if' branch
 
 	* int_pp.cc (comparesame): assertion added
 
@@ -371,7 +411,7 @@ Fri Sep 26 12:54:41 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 Thu Sep 25 13:51:01 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* cf_gcd.cc (chinesePoly): function removed
-	(gcd_poly_univar0): slightly speeded up
+	  (gcd_poly_univar0): slightly speeded up
 
 	* cf_gcd.cc (lcm): bug fix.  Returns zero now if f or g equals
 	  zero.

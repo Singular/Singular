@@ -1,3 +1,11 @@
+Wed Dec 17 13:14:30 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.m4 (ftestOutVar): `bool's are initialized to `false'
+	  on definition 
+
+	* fbinops.m4 (main): initializations for `operatorName' and
+	  `operatorTag' added
+
 Fri Nov 21 11:34:36 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* ftest_util.cc (CFSwitchesMax): const replaced by `#include
