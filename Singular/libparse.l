@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.21 1998-05-09 14:34:31 krueger Exp $ */
+/* $Id: libparse.l,v 1.22 1998-05-18 09:32:07 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -450,6 +450,8 @@ LIB[ \t]+"\"" { quote++;
                 BEGIN(phead);
               }
             }
+<pdef>({comment}[^\n]*)  { }
+<pdef>\/\/*      { old_state = YYSTATE; BEGIN(comment); }
 <pdef>.    {
              if(brace2<=0) {
                BEGIN(phead);
@@ -737,6 +739,7 @@ void copy_string(lp_modes mode)
 #  ifndef STANDALONE_PARSER
   if((last_cmd == LP_INFO)&&(mode == GET_INFO))
   {
+    int i, offset=0;
     long current_location = ftell(yylpin);
     int len = (int)(current_pos(0) - string_start);
     fseek(yylpin, string_start, SEEK_SET);
@@ -744,6 +747,16 @@ void copy_string(lp_modes mode)
     myfread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
     text_buffer[len]='\0';
+    offset=0;
+    for(i=0;i<=len; i++) {
+      if(text_buffer[i]=='\\' &&
+         (text_buffer[i+1]=='"' || text_buffer[i+1]=='{' ||
+          text_buffer[i+1]=='}' || text_buffer[i+1]=='\\')) {
+        i++;
+        offset++;
+      }
+      if(offset>0) text_buffer[i-offset] = text_buffer[i];
+    }
   }
 #  endif /* STANDALONE_PARSER */
 }

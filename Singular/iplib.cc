@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.25 1998-05-13 14:53:45 Singular Exp $ */
+/* $Id: iplib.cc,v 1.26 1998-05-18 09:32:07 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -129,7 +129,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
 {
   char buf[256], *s = NULL, *p;
   long procbuflen;
-
+  
   FILE * fp = feFopen( pi->libname, "rb", NULL, TRUE );
   if (fp==NULL)
   {
@@ -139,6 +139,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
   fseek(fp, pi->data.s.proc_start, SEEK_SET);
   if(part==0)
   { // load help string
+    int i, offset=0;
     long head = pi->data.s.def_end - pi->data.s.proc_start;
     procbuflen = pi->data.s.help_end - pi->data.s.help_start;
     //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
@@ -150,6 +151,15 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     myfread(s+head+1, procbuflen, 1, fp);
     s[procbuflen+head+1] = '\n';
     s[procbuflen+head+2] = '\0';
+    offset=0;
+    for(i=0;i<=procbuflen+head+2; i++) {
+      if(s[i]=='\\' &&
+         (s[i+1]=='"' || s[i+1]=='{' || s[i+1]=='}' || s[i+1]=='\\')) {
+        i++;
+        offset++;
+      }
+      if(offset>0) s[i-offset] = s[i];
+    }
     return(s);
   }
   if(part==1)
