@@ -202,7 +202,7 @@ char * find_executable (const char *name)
     
     if (buf[0] != '/')
     {
-      executable = (char*) AllocL(strlen(link) + ret);
+      executable = (char*) AllocL(strlen(link) + ret + 1);
       strcpy(executable, link);
       strcat(executable, buf);
     }
@@ -214,6 +214,7 @@ char * find_executable (const char *name)
     FreeL(link);
     return executable;
   }
+
   return link;
 }
 #endif /* HAVE_READLINK */
