@@ -1,7 +1,7 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.18 2002-03-08 15:32:52 mschulze Exp $
+@comment $Id: INSTALL_unix.texi,v 1.19 2002-04-23 14:23:01 westenb Exp $
 @c FILE: INSTALL_unix.texi
-@c PURPOSE: Installation instruction for Singular on  Unix
+@c PURPOSE: Installation instruction for Singular on Unix
 @c
 
 @ifclear VERSION
@@ -59,9 +59,12 @@ these steps.
 @enumerate
 @item
 Simply change to the directory in which you wish to install
-@sc{Singular} (usually wherever you install 3rd-party software):
+@sc{Singular} (usually wherever you install 3rd-party software), for example:
 @smallexample
 cd /usr/local
+or
+mkdir install;cd install 
+(you do not need root privileges in this case)
 @end smallexample
 
 @sc{Singular} specific subdirectories will be created in such a way
@@ -69,12 +72,11 @@ that multiple versions and multiple architecture dependent files
 of @sc{Singular} can peaceably coexist under the same @code{/usr/local}
 tree.
 
-
 @item
 Unpack the archives:
 @smallexample
-gzip -dc Singular-@value{VERSION}-@value{_UNAME}.tar.gz | tar -pxf -
-gzip -dc Singular-@value{VERSION}-share.tar.gz | tar -pxf -
+gzip -dc <path_to>/Singular-@value{VERSION}-@value{_UNAME}.tar.gz | tar -pxf -
+gzip -dc <path_to>/Singular-@value{VERSION}-share.tar.gz | tar -pxf -
 @end smallexample
 @c version 2-0-x does not have *-share.zip:
 @c If you have downloaded @code{Singular-@value{VERSION}-share.zip},
@@ -83,30 +85,30 @@ gzip -dc Singular-@value{VERSION}-share.tar.gz | tar -pxf -
 @c unzip -u Singular-@value{VERSION}-share.zip
 @c @end smallexample
 
-This creates the following
+This creates the the directory Singular/@value{VERSION} with 
 @multitable @columnfractions .36 .64
 @item (sub)directories
 @tab  which contain
-@item @code{Singular/@value{VERSION}/@value{_UNAME}}
-@tab @code{Singular} and @code{ESingular} programs
-@item @code{Singular/@value{VERSION}/LIB}
+@item @code{@value{_UNAME}}
+@tab @code{Singular} and @code{ESingular} executables
+@item @code{LIB}
 @tab @sc{Singular} libraries (@code{*.lib} files)
-@item @code{Singular/@value{VERSION}/emacs}
+@item @code{emacs}
 @tab files for the @sc{Singular} Emacs user interface
-@item @code{Singular/@value{VERSION}/info}
+@item @code{info}
 @tab info files of @sc{Singular} manual
-@item @code{Singular/@value{VERSION}/html}
+@item @code{html}
 @tab html files of @sc{Singular} manual
-@item @code{Singular/@value{VERSION}/doc}
+@item @code{doc}
 @tab miscellaneous documentation files
-@item @code{Singular/@value{VERSION}/examples}
+@item @code{examples}
 @tab @sc{Singular} examples (@code{*.sing} files)
 @end multitable
 
 For the executable to work, the directory layout must look pretty much
 like this; the executable looks for "sibling" directories at run-time
 to figure out where its @sc{Singular} libraries and on-line
-documentation files are.  These constraints on the local directory layout
+documentation files are. These constraints on the local directory layout
 are necessary to avoid having to hard-code pathnames into the
 executables, or require that environment variables be set before
 running the executable. In particular, you @strong{must not move or copy}
@@ -128,7 +130,7 @@ ln -s `pwd`/Singular/@value{VERSION}/@value{_UNAME}/ESingular  /usr/local/bin/ES
 ln -s /usr/local/bin/Singular-@value{VERSION} /usr/local/bin/Singular
 ln -s /usr/local/bin/ESingular-@value{VERSION} /usr/local/bin/ESingular
 @end smallexample
-
+	
 Otherwise, append the directory
 @code{`pwd`/Singular/@value{VERSION}/@value{_UNAME}/} to your @code{$PATH}
 environment variable. For the @code{csh} (or, @code{tcsh}) shell do:
@@ -157,9 +159,11 @@ If you wish to use any of following features of
 @item @strong{Feature} @tab @strong{Requires}
 @item running @code{ESingular}, or @code{Singular} within Emacs
 @tab @uref{http://www.fsf.org/software/emacs/emacs.html,,Emacs} version
-20 or higher, or, @uref{http://www.xemacs.org,,Xemacs} version 20 or
-higher
-
+20 or higher, or, @uref{http://www.xemacs.org,,XEmacs} version 20.3 or
+higher (ESingular is only included in the Linux distribution,
+on other Unix platforms you can download the
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/,,
+Singular emacs lisp files} but we give no warranties for specific platforms).
 @item on-line @code{html} help
 @tab @uref{http://www.netscape.com,,netscape} browser
 @item on-line @code{info} help
@@ -224,6 +228,7 @@ to the directory of your @code{dir} file.
 @*This assures that the
 @sc{Singular} manual can be  accessed from stand-alone texinfo
 browser programs such as @code{info} or @code{Emacs}.
+(It is not necessary for the use of the help system from within @code{Singular}.)
 @end itemize
 
 @heading Troubleshooting
@@ -232,12 +237,12 @@ browser programs such as @code{info} or @code{Emacs}.
 @item General: @sc{Singular} can not find its libraries or on-line help
 @enumerate
 @item
-Make sure that you have read and/or excute permission the files and
+Make sure that you have read and/or execute permission the files and
 directories of the Singular distribution. If in doubt, @code{cd} to the
 directory where you unpacked @sc{Singular}, and do (as root, if
 necessary):
 @smallexample
-chmod +rX Singular
+chmod -R a+rX Singular
 @end smallexample
 
 @item
@@ -304,7 +309,10 @@ original file.
 @example
   Can not find shared library ...
 @end example
-To fix this, download and install
+For DEBIAN systems, try to do
+@code{ln -s /usr/lib/libncurses.so /usr/lib/libncurses.so.4}.
+@*If this fails (and on other systems)
+download and install
 @code{Singular-@value{VERSION}-ix86-Linux-static.tar.gz}.
 
 @item For @code{AIX} systems:
