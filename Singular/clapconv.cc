@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.31 2000-12-08 13:42:08 Singular Exp $
+// $Id: clapconv.cc,v 1.32 2000-12-08 17:26:22 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -27,6 +27,7 @@ static void convRec( const CanonicalForm & f, int * exp, poly & result );
 static void convRecAlg( const CanonicalForm & f, int * exp, napoly & result );
 
 static void convRecPP ( const CanonicalForm & f, int * exp, poly & result );
+static void conv_RecPP ( const CanonicalForm & f, int * exp, poly & result, ring r );
 
 static void convRecPTr ( const CanonicalForm & f, int * exp, napoly & result );
 
@@ -105,12 +106,11 @@ convClapNSingN( const CanonicalForm & n)
   }
 }
 
-CanonicalForm
-convSingPClapP( poly p )
+CanonicalForm conv_SingPClapP( poly p, ring r )
 {
   CanonicalForm result = 0;
-  int e, n = pVariables;
-  assume( rPar(currRing)==0);
+  int e, n = r->N;
+  assume( rPar(r)==0);
 
   while ( p != NULL )
   {
@@ -154,7 +154,7 @@ convSingPClapP( poly p )
     }
     for ( int i = 1; i <= n; i++ )
     {
-      if ( (e = pGetExp( p, i )) != 0 )
+      if ( (e = p_GetExp( p, i, r )) != 0 )
          term *= power( Variable( i ), e );
     }
     result += term;
@@ -163,8 +163,7 @@ convSingPClapP( poly p )
   return result;
 }
 
-poly
-convClapPSingP ( const CanonicalForm & f )
+poly convClapPSingP ( const CanonicalForm & f )
 {
 //    cerr << " f = " << f << endl;
   int n = pVariables+1;
@@ -178,8 +177,7 @@ convClapPSingP ( const CanonicalForm & f )
   return result;
 }
 
-static void
-convRecPP ( const CanonicalForm & f, int * exp, poly & result )
+static void convRecPP ( const CanonicalForm & f, int * exp, poly & result )
 {
   if (f == 0)
     return;
@@ -233,6 +231,79 @@ convRecPP ( const CanonicalForm & f, int * exp, poly & result )
     else
     {
       result = pAdd( result, term );
+    }
+  }
+}
+
+poly conv_ClapPSingP ( const CanonicalForm & f, ring r )
+{
+//    cerr << " f = " << f << endl;
+  int n = r->N+1;
+  /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
+  int * exp = new int[n];
+  //for ( int i = 0; i < n; i++ ) exp[i] = 0;
+  memset(exp,0,n*sizeof(int));
+  poly result = NULL;
+  conv_RecPP( f, exp, result, r );
+  delete [] exp;
+  return result;
+}
+
+static void
+conv_RecPP ( const CanonicalForm & f, int * exp, poly & result, ring r )
+{
+  if (f == 0)
+    return;
+  if ( ! f.inCoeffDomain() )
+  {
+    int l = f.level();
+    for ( CFIterator i = f; i.hasTerms(); i++ )
+    {
+      exp[l] = i.exp();
+      conv_RecPP( i.coeff(), exp, result, r );
+    }
+    exp[l] = 0;
+  }
+  else
+  {
+    poly term = p_Init(r);
+    pNext( term ) = NULL;
+    for ( int i = 1; i <= r->N; i++ )
+      p_SetExp( term, i, exp[i], r);
+    if (rRing_has_Comp(r)) p_SetComp(term, 0, r);
+    if ( getCharacteristic() != 0 )
+    {
+      pGetCoeff( term ) = n_Init( f.intval(), r );
+    }
+    else
+    {
+      if ( f.isImm() )
+        pGetCoeff( term ) = n_Init( f.intval(), r );
+      else
+      {
+        number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
+        z->debug=123456;
+#endif
+        z->z = gmp_numerator( f );
+        if ( f.den() == 1 )
+          z->s = 3;
+        else
+        {
+          z->n = gmp_denominator( f );
+          z->s = 0;
+        }
+        pGetCoeff( term ) = z;
+      }
+    }
+    p_Setm( term, r );
+    if ( n_IsZero(pGetCoeff(term), r) )
+    {
+      p_Delete(&term,r);
+    }
+    else
+    {
+      result = p_Add_q( result, term, r );
     }
   }
 }
