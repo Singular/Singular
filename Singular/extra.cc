@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.189 2002-07-12 13:48:26 levandov Exp $ */
+/* $Id: extra.cc,v 1.190 2002-11-21 13:36:21 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -256,7 +256,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           TEST_FOR("MAC_ORDER");
         #endif
         #ifdef HAVE_NS
-          TEST_FOR("namespaces");
+          TEST_FOR("Namespaces");
         #endif
         #ifdef HAVE_DYNAMIC_LOADING
           TEST_FOR("DynamicLoading");
@@ -1324,6 +1324,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	  res->rtyp=IDEAL_CMD;
 	  if (rIsPluralRing(currRing)) res->data=twostd(I);
 	  else res->data=I;  
+	  setFlag(FLAG_TWOSTD);
 	}
 	else return TRUE;
 	return FALSE;
