@@ -1,16 +1,16 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.25 1998-10-27 17:31:13 obachman Exp $
-# FILE:    regress.cmd 
+# $Id: regress.cmd,v 1.26 1999-08-19 14:16:51 hannes Exp $
+# FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
 # AUTHOR:  obachman@mathematik.uni-kl.de
 
 #################################################################
-# 
+#
 # usage
-# 
+#
 sub Usage
 {
   print <<_EOM_
@@ -25,12 +25,12 @@ regress.cmd    -- regress test of Singular
   [-e [crit%[val]]] -- throw error if status difference [of crit] > val (in %)
   [-m [crit]]       -- merge status results [of crit] into result file
   [file.lst]        -- read tst files from file.lst
-  [file.tst]        -- test Singular script file.tst 
+  [file.tst]        -- test Singular script file.tst
 _EOM_
 }
 
 #################################################################
-# 
+#
 # used programs
 #
 $sh="/bin/sh";
@@ -64,7 +64,7 @@ sub mysystem_catch
 
   $call = "$call > catch_$$";
   & mysystem($call);
-  
+
   open(CATCH_FILE, "<catch_$$");
   while (<CATCH_FILE>)
   {
@@ -87,7 +87,7 @@ else
 }
 
 #################################################################
-# 
+#
 # the default settings
 #
 $singularOptions = "--ticks-per-sec=100 -teqr12345678";
@@ -115,9 +115,9 @@ $hostname = &mysystem_catch("hostname");
 chop $hostname;
 
 #################################################################
-# 
+#
 # auxiallary routines
-# 
+#
 
 sub Set_withMP
 {
@@ -137,12 +137,12 @@ sub Set_withMP
     &mysystem("$rm -f withMPtest MPTest");
   }
 }
-    
-    
+
+
 sub MPok
 {
   local($root) = $_[0];
-  
+
   if (! open(TST_FILE, "<$root.tst"))
   {
     print (STDERR "Can not open $root.tst for reading\n");
@@ -163,34 +163,34 @@ sub Diff
 {
   local($root) = $_[0];
   local($exit_status);
-  
-  # prepare the result files: 
+
+  # prepare the result files:
   &mysystem("$cat $root.res | $tr -d '\\013' | $sed $sed_scripts > $root.res.cleaned");
   &mysystem("$cat $root.new.res | $tr -d '\\013' | $sed $sed_scripts > $root.new.res.cleaned");
 
   # doo the diff call
   if ($verbosity > 0 && ! $WINNT)
   {
-    $exit_status = &mysystem("$diff -w -B $root.res.cleaned $root.new.res.cleaned | $tee $root.diff");
+    $exit_status = &mysystem("$diff -w -b $root.res.cleaned $root.new.res.cleaned | $tee $root.diff");
   }
   else
   {
-    $exit_status = &mysystem("$diff -w -B $root.res.cleaned $root.new.res.cleaned > $root.diff 2>&1");
+    $exit_status = &mysystem("$diff -w -b $root.res.cleaned $root.new.res.cleaned > $root.diff 2>&1");
   }
-  
+
   # clean up time
   &mysystem("$rm -f $root.res.cleaned $root.new.res.cleaned");
-  
+
   # there seems to be a bug here somewhere: even if diff reported
   # differenceses and exited with status != 0, then system still
   # returns exit status 0. Hence we manually need to find out whether
-  # or not differences were reported: 
+  # or not differences were reported:
   # iff diff-file exists and has non-zero size
   $exit_status = $exit_status || (-e "$root.diff" && -s "$root.diff");
 
   return($exit_status);
 }
-  
+
 sub tst_status_check
 {
   local($root) = $_[0];
@@ -198,8 +198,8 @@ sub tst_status_check
   local($res_diff,$res_diff_pc,$res_diff_line);
   local($exit_status, $reported) = (0, 0);
   local($error_cause) = "";
-  
-  open(RES_FILE, "<$root.stat") || 
+
+  open(RES_FILE, "<$root.stat") ||
     return (1, "Can not open $root.stat \n");
   open(NEW_RES_FILE, "<$root.new.stat") ||
     return (1, "Can not open $root.new.stat \n");
@@ -208,7 +208,7 @@ sub tst_status_check
 
   $new_line = <NEW_RES_FILE>;
   $line = <RES_FILE>;
-  
+
   while ($line && $new_line)
   {
     if ($line =~ /(\d+) >> (\w+) ::.*$hostname:(\d+)/ && $checks{$2})
@@ -217,29 +217,29 @@ sub tst_status_check
       $crit = $2;
       $res = $3;
       if ($res > $mintime_val &&
-	  $new_line =~ /$prefix >> $crit ::.*$hostname:(\d+)/)
+          $new_line =~ /$prefix >> $crit ::.*$hostname:(\d+)/)
       {
-	$new_res = $1;
-	$res_diff = $new_res - $res;
-	$res_diff_pc = int((($new_res / $res) - 1)*100);
-	$res_diff_line =
-	  "$prefix >> $crit :: new:$new_res old:$res diff:$res_diff %:$res_diff_pc";
-	if ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc)) 
-	      || 
-	    (defined($report{$crit}) && $report{$crit}<abs($res_diff_pc)))
-	{
-	  $reported = 1;
-	  print (STATUS_DIFF_FILE "$res_diff_line\n");
-	  print "$res_diff_line\n" if ($verbosity > 0);
-	}
+        $new_res = $1;
+        $res_diff = $new_res - $res;
+        $res_diff_pc = int((($new_res / $res) - 1)*100);
+        $res_diff_line =
+          "$prefix >> $crit :: new:$new_res old:$res diff:$res_diff %:$res_diff_pc";
+        if ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc))
+              ||
+            (defined($report{$crit}) && $report{$crit}<abs($res_diff_pc)))
+        {
+          $reported = 1;
+          print (STATUS_DIFF_FILE "$res_diff_line\n");
+          print "$res_diff_line\n" if ($verbosity > 0);
+        }
 
-	if ($exit_status == 0)
-	{
-	  $exit_status = (defined($error{$crit})  
-			  && $error{$crit} < abs($res_diff_pc));
-	  $error_cause = "Status error for $crit at $prefix\n"
-	    if ($exit_status);
-	}
+        if ($exit_status == 0)
+        {
+          $exit_status = (defined($error{$crit})
+                          && $error{$crit} < abs($res_diff_pc));
+          $error_cause = "Status error for $crit at $prefix\n"
+            if ($exit_status);
+        }
       }
     }
     $new_line = <NEW_RES_FILE>;
@@ -257,14 +257,14 @@ sub tst_status_merge
 {
   local($root) = $_[0];
   local($line, $new_line, $crit, $res);
-  
-  open(RES_FILE, "<$root.stat") || 
+
+  open(RES_FILE, "<$root.stat") ||
     return (1, "Can not open $root.stat \n");
   open(NEW_RES_FILE, "<$root.new.stat") ||
     return (1, "Can not open $root.new.stat \n");
   open(TEMP_FILE, ">$root.tmp.stat") ||
     return (1, "Can not open $root.tmp.stat \n");
-  
+
   $new_line = <NEW_RES_FILE>;
   $line = <RES_FILE>;
   while ($line)
@@ -276,26 +276,26 @@ sub tst_status_merge
       $new_res = $3;
       if ($line =~ /$prefix >> $crit ::(.*)$hostname:(\d+)/)
       {
-	$line =~ s/$hostname:$2/$hostname:$new_res/;
-	print(TEMP_FILE $line);
+        $line =~ s/$hostname:$2/$hostname:$new_res/;
+        print(TEMP_FILE $line);
       }
       elsif ($line =~ /$prefix >> $crit ::(.*)/)
       {
-	print(TEMP_FILE
-	      "$prefix >> $crit :: $hostname:$new_res $1\n");
+        print(TEMP_FILE
+              "$prefix >> $crit :: $hostname:$new_res $1\n");
       }
       else
       {
-	close(RES_FILE);
-	close(NEW_RES_FILE);
-	close(TEMP_FILE);
-	&mysystem("$rm $root.tmp.stat");
-	return (1, "Generate before doing a merge\n");
+        close(RES_FILE);
+        close(NEW_RES_FILE);
+        close(TEMP_FILE);
+        &mysystem("$rm $root.tmp.stat");
+        return (1, "Generate before doing a merge\n");
       }
     }
     else
     {
-      print(TEMP_FILE $line);	
+      print(TEMP_FILE $line);
     }
     $new_line = <NEW_RES_FILE>;
     $line = <RES_FILE>;
@@ -311,7 +311,7 @@ sub tst_check
 {
   local($root) = $_[0];
   local($system_call, $exit_status, $ignore_pattern, $error_cause);
-  
+
   print "--- $root\n" unless ($verbosity == 0);
   # check for existence/readablity of tst and res file
   if (! (-r "$root.tst"))
@@ -319,14 +319,14 @@ sub tst_check
     print (STDERR "Can not read $root.tst\n");
     return (1);
   }
-  
+
   # ignore MP stuff, if this singular does not have MP
   if (! &MPok($root))
   {
     print "Warning: $root not tested: needs MP\n";
     return (0);
   }
-  
+
   # generate $root.res
   if ($generate ne "yes")
   {
@@ -335,8 +335,8 @@ sub tst_check
       $exit_status = &mysystem("$uudecode $root.res.gz.uu > /dev/null 2>&1; $gunzip -f $root.res.gz");
       if ($exit_status)
       {
-	print (STDERR "Can not decode $root.res.gz.uu\n");
-	return ($exit_status);
+        print (STDERR "Can not decode $root.res.gz.uu\n");
+        return ($exit_status);
       }
     }
     elsif (! (-r "$root.res") || ( -z "$root.res"))
@@ -358,7 +358,7 @@ sub tst_check
   }
   # Go Singular, Go!
   $exit_status = &mysystem($system_call);
-  
+
   if ($exit_status != 0)
   {
     $error_cause = "Singular call exited with status != 0";
@@ -367,7 +367,7 @@ sub tst_check
   {
     # check for Segment fault in res file
     $exit_status = ! (&mysystem("$grep \"Segment fault\" $root.new.res > /dev/null 2>&1"));
-    
+
     if ($exit_status)
     {
       $error_cause = "Segment fault";
@@ -377,32 +377,32 @@ sub tst_check
       &mysystem("$rm -f $root.diff");
       if ($generate eq "yes")
       {
-	&mysystem("$cp $root.new.res $root.res");
+        &mysystem("$cp $root.new.res $root.res");
       }
-      else 
+      else
       {
-	# call Diff
-	$exit_status = &Diff($root);
-	if ($exit_status)
-	{
-	  $error_cause = "Differences in res files";
-	}
-	else
-	{
-	  &mysystem("$rm -f $root.diff");
-	}
+        # call Diff
+        $exit_status = &Diff($root);
+        if ($exit_status)
+        {
+          $error_cause = "Differences in res files";
+        }
+        else
+        {
+          &mysystem("$rm -f $root.diff");
+        }
       }
     }
   }
 
   if (%checks && ! $exit_status && $generate ne "yes")
   {
-    & mysystem("$cp -f tst_status.out $root.new.stat");
+    & mysystem("$cp tst_status.out $root.new.stat");
     # do status checks
     ($exit_status, $error_cause) = & tst_status_check($root);
   }
-  
-  
+
+
   # complain even if verbosity == 0
   if ($exit_status)
   {
@@ -410,53 +410,53 @@ sub tst_check
   }
   else
   {
-    
+
     #clean up
-    if ($generate eq "yes") 
+    if ($generate eq "yes")
     {
-      & mysystem("$cp -f tst_status.out $root.stat");
+      & mysystem("$cp tst_status.out $root.stat");
       if (! $WINNT)
       {
-	&mysystem("$gzip -cf $root.res | $uuencode $root.res.gz > $root.res.gz.uu");
+        &mysystem("$gzip -cf $root.res | $uuencode $root.res.gz > $root.res.gz.uu");
       }
       else
       {
-	# uuencode is broken under windows
-	print "Warning: Can not generate $root.res.gz.uu under Windows\n";
+        # uuencode is broken under windows
+        print "Warning: Can not generate $root.res.gz.uu under Windows\n";
       }
-      
+
     }
     elsif (%merge)
     {
       if (! -r "$root.stat")
       {
-	& mysystem("$cp -f tst_status.out $root.stat");
+        & mysystem("$cp tst_status.out $root.stat");
       }
       else
       {
-	& mysystem("$cp -f tst_status.out $root.new.stat");
-	($exit_status, $error_cause) = & tst_status_merge($root);
+        & mysystem("$cp tst_status.out $root.new.stat");
+        ($exit_status, $error_cause) = & tst_status_merge($root);
 
-	print (STDERR "Warning: Merge Problems: $error_cause\n")
-	  if ($verbosity > 0 && $exit_status);
+        print (STDERR "Warning: Merge Problems: $error_cause\n")
+          if ($verbosity > 0 && $exit_status);
       }
     }
 
     if ($keep ne "yes")
     {
       &mysystem("$rm -f tst_status.out $root.new.res $root.res $root.diff $root.new.stat");
-    } 
+    }
   }
-  
+
   # und tschuess
   return ($exit_status);
 }
 
 
 #################################################################
-# 
+#
 # Main program
-# 
+#
 
 # process switches
 while ($ARGV[0] =~ /^-/)
@@ -490,8 +490,8 @@ while ($ARGV[0] =~ /^-/)
     {
       ($crit, $val) = split(/%/, shift);
     }
-    elsif ($ARGV[0] && 
-	   $ARGV[0] !~ /^-/ && $ARGV[0] !~ /.*\.tst/ && $ARGV[0] !~ /.*\.lst/)
+    elsif ($ARGV[0] &&
+           $ARGV[0] !~ /^-/ && $ARGV[0] !~ /.*\.tst/ && $ARGV[0] !~ /.*\.lst/)
     {
       $crit = shift;
     }
@@ -502,11 +502,11 @@ while ($ARGV[0] =~ /^-/)
       $report{"tst_memory_2"} = $val;
       $report{"tst_timer"} = $val;
       $report{"tst_timer_1"} = $val;
-      $checks{"tst_memory_0"} = 1; 
+      $checks{"tst_memory_0"} = 1;
       $checks{"tst_memory_1"} = 1;
-      $checks{"tst_memory_2"} =  1; 
-      $checks{"tst_timer"} =  1; 
-      $checks{"tst_timer_1"} =  1; 
+      $checks{"tst_memory_2"} =  1;
+      $checks{"tst_timer"} =  1;
+      $checks{"tst_timer_1"} =  1;
     }
     else
     {
@@ -522,8 +522,8 @@ while ($ARGV[0] =~ /^-/)
     {
       ($crit, $val) = split(/%/, shift);
     }
-    elsif ($ARGV[0] && 
-	    $ARGV[0] !~ /^-/ && $ARGV[0] !~ /.*\.tst/ && $ARGV[0] !~ /.*\.lst/)
+    elsif ($ARGV[0] &&
+            $ARGV[0] !~ /^-/ && $ARGV[0] !~ /.*\.tst/ && $ARGV[0] !~ /.*\.lst/)
     {
       $crit = shift;
     }
@@ -534,11 +534,11 @@ while ($ARGV[0] =~ /^-/)
       $error{"tst_memory_2"} = $val;
       $error{"tst_timer"} = $val;
       $error{"tst_timer_1"} = $val;
-      $checks{"tst_memory_0"} = 1; 
+      $checks{"tst_memory_0"} = 1;
       $checks{"tst_memory_1"} = 1;
-      $checks{"tst_memory_2"} =  1; 
-      $checks{"tst_timer"} =  1; 
-      $checks{"tst_timer_1"} =  1; 
+      $checks{"tst_memory_2"} =  1;
+      $checks{"tst_timer"} =  1;
+      $checks{"tst_timer_1"} =  1;
     }
     else
     {
@@ -548,22 +548,22 @@ while ($ARGV[0] =~ /^-/)
   }
   elsif(/^-m$/)
   {
-    if ($ARGV[0] && 
-	$ARGV[0] !~ /^-/ && $ARGV[0] !~ /.*\.tst/ && $ARGV[0] !~ /.*\.lst/)
+    if ($ARGV[0] &&
+        $ARGV[0] !~ /^-/ && $ARGV[0] !~ /.*\.tst/ && $ARGV[0] !~ /.*\.lst/)
     {
       $crit = shift;
       $merge{$crit} = 1;
     }
     else
     {
-      $merge{"tst_memory_0"} = 1; 
+      $merge{"tst_memory_0"} = 1;
       $merge{"tst_memory_1"} = 1;
-      $merge{"tst_memory_2"} =  1; 
-      $merge{"tst_timer"} =  1; 
-      $merge{"tst_timer_1"} =  1; 
+      $merge{"tst_memory_2"} =  1;
+      $merge{"tst_timer"} =  1;
+      $merge{"tst_timer_1"} =  1;
     }
   }
-  else 
+  else
   {
     print (STDERR "Unrecognised option: $_\n") && &Usage && die;
   }
@@ -602,27 +602,27 @@ if (-d $singular)
 foreach (@ARGV)
 {
 
-  if ( /^(.*)\.([^\.\/]*)$/ ) 
+  if ( /^(.*)\.([^\.\/]*)$/ )
   {
     $_ = $1;
     $extension = $2;
   }
 
-  if ( /^(.*)\/([^\/]*)$/ ) 
+  if ( /^(.*)\/([^\/]*)$/ )
   {
     $path = $1;
     $base = $2;
     chdir($path);
     print "cd $path\n" if ($verbosity > 1);
-  } 
-  else 
+  }
+  else
   {
     $path = "";
     $base = $_;
   }
   $file = "$base.$extension";
   chop ($tst_curr_dir = `pwd`);
-  
+
   if ($extension eq "tst")
   {
     $exit_code = &tst_check($base) || $exit_code;
@@ -639,32 +639,32 @@ foreach (@ARGV)
     {
       if (/^;/)          # ignore lines starting with ;
       {
-	print unless ($verbosity == 0);
-	next;
+        print unless ($verbosity == 0);
+        next;
       }
       next if (/^\s*$/); #ignore whitespaced lines
       chop if (/\n$/);   #chop of \n
-      
+
       $_ = $1 if (/^(.*)\.([^\.\/]*)$/ ); # chop of extension
-      if ( /^(.*)\/([^\/]*)$/ ) 
+      if ( /^(.*)\/([^\/]*)$/ )
       {
-	$tst_path = $1;
-	$tst_base = $2;
+        $tst_path = $1;
+        $tst_base = $2;
         chdir($tst_path);
-	print "cd $tst_path\n" if ($verbosity > 1);
-      } 
-      else 
+        print "cd $tst_path\n" if ($verbosity > 1);
+      }
+      else
       {
-	$tst_path = "";
-	$tst_base = $_;
+        $tst_path = "";
+        $tst_base = $_;
       }
 
       $exit_code = &tst_check($tst_base) || $exit_code;
 
       if ($tst_path ne "")
       {
-	chdir($tst_curr_dir);
-	print "cd $tst_curr_dir\n" if ($verbosity > 1);
+        chdir($tst_curr_dir);
+        print "cd $tst_curr_dir\n" if ($verbosity > 1);
       }
     }
     close (LST_FILE);
@@ -677,7 +677,7 @@ foreach (@ARGV)
   if ($path ne "")
   {
     chdir($curr_dir);
-    print "cd $curr_dir\n" if ($verbosity > 1);    
+    print "cd $curr_dir\n" if ($verbosity > 1);
   }
 }
 
