@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.312 2004-02-11 11:37:11 bricken Exp $ */
+/* $Id: iparith.cc,v 1.313 2004-03-19 16:47:19 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2558,12 +2558,6 @@ struct sValCmd2 dArith2[]=
 ,{jjLIFT,      LIFT_CMD,       MATRIX_CMD,     MODUL_CMD,  MODUL_CMD NO_PLURAL}
 ,{jjLIFTSTD,   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD NO_PLURAL}
 ,{jjLIFTSTD,   LIFTSTD_CMD,    MODUL_CMD,      MODUL_CMD,  MATRIX_CMD NO_PLURAL}
-#ifdef HAVE_PLURAL
-,{jjPlural_num_poly, NCALGEBRA_CMD,  NONE,  POLY_CMD,   POLY_CMD   NO_PLURAL}
-,{jjPlural_num_mat,  NCALGEBRA_CMD,  NONE,  POLY_CMD,   MATRIX_CMD NO_PLURAL}
-,{jjPlural_mat_poly, NCALGEBRA_CMD,  NONE,  MATRIX_CMD, POLY_CMD   NO_PLURAL}
-,{jjPlural_mat_mat,  NCALGEBRA_CMD,  NONE,  MATRIX_CMD, MATRIX_CMD NO_PLURAL}
-#endif
 ,{jjCALL2MANY, LIST_CMD,       LIST_CMD,       DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjRES,       LRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{jjMINOR,     MINOR_CMD,      IDEAL_CMD,      MATRIX_CMD, INT_CMD NO_PLURAL}
@@ -2575,6 +2569,12 @@ struct sValCmd2 dArith2[]=
 //,{jjRES,       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD NO_PLURAL}
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD ALLOW_PLURAL}
+#ifdef HAVE_PLURAL
+,{jjPlural_num_poly, NCALGEBRA_CMD,  NONE,  POLY_CMD,   POLY_CMD   NO_PLURAL}
+,{jjPlural_num_mat,  NCALGEBRA_CMD,  NONE,  POLY_CMD,   MATRIX_CMD NO_PLURAL}
+,{jjPlural_mat_poly, NCALGEBRA_CMD,  NONE,  MATRIX_CMD, POLY_CMD   NO_PLURAL}
+,{jjPlural_mat_mat,  NCALGEBRA_CMD,  NONE,  MATRIX_CMD, MATRIX_CMD NO_PLURAL}
+#endif
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjPRINT_FORMAT, PRINT_CMD,   ANY_TYPE,       DEF_CMD,    STRING_CMD ALLOW_PLURAL}
