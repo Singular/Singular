@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.15 1998-07-15 15:45:00 Singular Exp $ */
+/* $Id: matpol.cc,v 1.16 1998-08-07 16:17:35 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -34,7 +34,7 @@ static int nextperm(perm * z, int max);
 static poly mpLeibnitz(matrix a);
 static poly minuscopy (poly p);
 static poly pInsert(poly p1, poly p2);
-static poly select (poly fro, poly what);
+static poly mpSelect (poly fro, poly what);
 static poly exdiv ( poly m, poly d);
 
 /*2
@@ -791,7 +791,7 @@ matrix mpCoeffProc (poly f, poly vars)
     MATELEM(co,2,1) = NULL;
     return co;
   }
-  sel = select(f, vars);
+  sel = mpSelect(f, vars);
   l = pLength(sel);
   co = mpNew(2, l);
   if (pOrdSgn==-1)
@@ -841,7 +841,7 @@ void mpCoef2(poly v, poly mon, matrix *c, matrix *m)
   poly p;
   int sl,i,j;
   int l=0;
-  poly sel=select(v,mon);
+  poly sel=mpSelect(v,mon);
 
   pVec2Polys(sel,&s,&sl);
   for (i=0; i<sl; i++)
@@ -1647,7 +1647,7 @@ static poly pInsert(poly p1, poly p2)
 *if what == xy the result is the list of all different power products
 *    x^i*y^j (i, j >= 0) that appear in fro
 */
-static poly select (poly fro, poly what)
+static poly mpSelect (poly fro, poly what)
 {
   int i;
   poly h, res;
