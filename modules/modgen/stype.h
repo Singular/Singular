@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stype.h,v 1.3 2000-01-17 08:32:27 krueger Exp $ */
+/* $Id: stype.h,v 1.4 2000-03-29 09:31:43 krueger Exp $ */
 /*
 * ABSTRACT: flex/bison interface
 */
@@ -15,6 +15,7 @@ typedef union
   int       i;
   char    * name;
   moddefv    lv;
+  stringdef sv;
   paramdef  tp;
 } MYYSTYPE;
 #define YYSTYPE MYYSTYPE

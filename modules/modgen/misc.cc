@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.7 2000-03-22 10:23:57 krueger Exp $ */
+/* $Id: misc.cc,v 1.8 2000-03-29 09:31:41 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -209,6 +209,7 @@ struct valid_cmds_def
 } valid_cmds[] = {
   { "declaration",  write_function_declaration, CMD_DECL,   CMDT_SINGLE, 0 },
   { "typecheck",    write_function_typecheck,   CMD_CHECK,  CMDT_SINGLE, 0 },
+  { "return",       write_function_result,      CMD_RETURN, CMDT_EQ,     0 },
   { "return",       write_function_return,      CMD_RETURN, CMDT_SINGLE, 1 },
   { "return",       write_function_return,      CMD_RETURN, CMDT_0,     1 },
   { "return",       write_function_return,      CMD_RETURN, CMDT_ANY,   1 },
@@ -478,6 +479,7 @@ void  mod_write_header(FILE *fp, char *module, char what)
 {
 
   write_header(fp, module);
+  fprintf(fp, "#line %d \"%s.cc\"\n", modlineno++, module);
   fprintf(fp, "#include <stdlib.h>\n");
   fprintf(fp, "#include <stdio.h>\n");
   fprintf(fp, "#include <string.h>\n");
@@ -487,12 +489,21 @@ void  mod_write_header(FILE *fp, char *module, char what)
   fprintf(fp, "#include <locals.h>\n");
   if(what != 'h') {
     fprintf(fp, "#include \"%s.h\"\n", module);
+    modlineno+=8;
+    
+    fprintf(fp, "#line %d \"%s.cc\"\n", modlineno++, module);
     write_enter_id(fp);
-    fprintf(fp, "\n");
+    fprintf(fp, "\n");    modlineno+=1;
+    fprintf(fp, "#line %d \"%s.cc\"\n", modlineno++, module);
     write_add_singular_proc(fp);
     fprintf(fp, "\n");
+    
+    fprintf(fp, "void fill_help_package(idhdl pl);\n");
+    fprintf(fp, "void fill_example_package(idhdl pl);\n");
+    modlineno+=3;
   }
   fprintf(fp, "\n");
+  
 }
 
 /*========================================================================*/
@@ -505,7 +516,7 @@ void write_header(FILE *fp, char *module, char *comment)
   fprintf(fp, "%s * Don't edit this file\n%s */\n", comment, comment);
   fprintf(fp, "%s\n", comment);
   fprintf(fp, "%s\n", comment);
-  
+  if(strlen(comment)==1)modlineno+=10;
 }
 
 /*========================================================================*/

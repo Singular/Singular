@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.8 2000-03-22 10:23:56 krueger Exp $
+ * $Id: grammar.y,v 1.9 2000-03-29 09:31:42 krueger Exp $
  */
 
 %{
@@ -23,7 +23,7 @@ extern int yylineno;
  
 extern int init_modgen(moddef *module_def, char *filename);
 extern int write_intro(moddefv module);
-extern void write_mod_init(FILE *fp);
+extern void write_mod_init(moddefv module, FILE *fp);
 extern void enter_id(FILE *fp, char *name, char *value,
                      int lineno, char *file);
  
@@ -40,6 +40,7 @@ void yyerror(char * fmt)
 %pure_parser
 
 %token MCOLONCOLON
+%token MEQUAL
 
 /* special symbols */
 %token <i> MMODULE_CMD
@@ -63,13 +64,14 @@ void yyerror(char * fmt)
 
 %token VARNAMETOK
 /*%token MSTRINGTOK */
-%token <name> MSTRINGTOK
+%token <sv>   MSTRINGTOK
 %token <name> NAME
 %token <name> FILENAME
 %token <name> MCCODETOK
 %token <name> MCODETOK
 %token <name> CODEPART
 %token <name> PROCCMD
+%token <name> ANYTOK
 %token  <tp> VARTYPETOK
 %token <i>    NUMTOK
 %token <i>    BOOLTOK
@@ -102,7 +104,7 @@ initmod:
           fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
 					  yylineno, module_def.filename);
           free($1);
-          write_mod_init(module_def.fmtfp);
+          write_mod_init(&module_def, module_def.fmtfp);
         }
 
 sect1: expr ';'
@@ -126,7 +128,7 @@ expr:   NAME '=' MSTRINGTOK
               case 1: /* pass 1: */
                 if( (vt=checkvar($1, VAR_STRING, &write_cmd)) ) {
                   if(write_cmd!=0)
-                    write_cmd(&module_def, vt, STRING_CMD, $1, $3);
+                    write_cmd(&module_def, vt, STRING_CMD, $1, $3.string);
                 }
                 else {
                   myyyerror("Line %d: Unknown variable '%s' in section %d\n",
@@ -135,7 +137,7 @@ expr:   NAME '=' MSTRINGTOK
                 break;
               case 2: /* pass 2: procedure declaration */
                 if( (vt=checkvar($1, VAR_STRING, &write_cmd)) ) {
-                  proc_set_var(&procedure_decl, VAR_STRING, vt, $1, $3);
+                  proc_set_var(&procedure_decl, VAR_STRING, vt, $1, $3.string);
                 }
                 else {
                   myyyerror("Line %d: Unknown variable '%s' in section %d\n",
@@ -146,7 +148,7 @@ expr:   NAME '=' MSTRINGTOK
                 
           }
           free($1);
-          free($3);
+          free($3.string);
         }
         | NAME '=' FILENAME
         { var_token vt;
@@ -338,7 +340,8 @@ funcdecl1: NAME
   
 procdeclhelp: MSTRINGTOK
         {
-          procedure_decl.help_string = $1;
+          procedure_decl.help_string = $1.string;
+          procedure_decl.lineno_other = $1.lineno;
           printf("\t\thelp at %d\n", yylineno);
           write_help(&module_def, &procedure_decl);
         }
@@ -465,6 +468,25 @@ proccmd: '%' NAME ';'
           void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_ANY, 1)) {
+              case CMD_NONE:
+                myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              case CMD_BADSYNTAX:
+                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              default:
+                write_cmd(&module_def, &procedure_decl, $4);
+          }
+          free($2);
+        }
+        | '%' NAME MEQUAL ANYTOK
+        {
+          cmd_token vt;
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+          
+          switch(vt=checkcmd($2, &write_cmd, CMDT_EQ, 0)) {
               case CMD_NONE:
                 myyyerror("Line %d: Unknown command '%s' in section %d\n",
                           yylineno, $2, sectnum);

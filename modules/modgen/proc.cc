@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.9 2000-03-28 07:15:13 krueger Exp $
+ * $Id: proc.cc,v 1.10 2000-03-29 09:31:42 krueger Exp $
  */
 
 #include <stdio.h>
@@ -40,6 +40,7 @@ void setup_proc(
 
   if(trace) printf("\tcreating '%s'...", proc->procname); fflush(stdout);
   fprintf(module->modfp, "#line %d \"%s\"\n", proc->lineno, module->filename);
+  modlineno+=1;
 
   switch(proc->language) {
       case LANG_C:
@@ -55,22 +56,23 @@ void setup_proc(
                 module->name, proc->procname, 
                 proc->is_static ? "TRUE" : "FALSE",
                 proc->procname);
+        modlineno+=1;
         
+#if 0
         if(proc->help_string!=NULL) {
           printf("WRITE HELP\n");
-//          fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(helphdl) ,");
-//          fprintf(module->modfp, " IDID(helphdl));\n");
-          fprintf(module->fmtfp2, "  enter_id(\"%s\",", proc->procname);
+          fprintf(module->fmtfp2, "  1-enter_id(\"%s\",", proc->procname);
           fprintf(module->fmtfp2, " \"%s\", STRING_CMD);\n", proc->help_string);
-//          fprintf(module->modfp, "  namespaceroot->push();\n");
         }
         if(proc->example_string!=NULL) {
           printf("WRITE EXAMPLE\n");
-          fprintf(module->fmtfp3, "  enter_id(\"%s\",", proc->procname);
+          fprintf(module->fmtfp3, "  1-enter_id(\"%s\",", proc->procname);
           fprintf(module->fmtfp3, " \"%s\", STRING_CMD);\n",
                   proc->example_string);
         }
+#endif
         fprintf(module->modfp, "\n");
+        modlineno+=1;
 
         write_procedure_header(module, proc, module->fmtfp);
         fprintf(module->modfp_h,
@@ -83,6 +85,7 @@ void setup_proc(
                 proc->procname, proc->lineno,
                 proc->sing_start, proc->sing_end,
                 proc->is_static ? "TRUE" : "FALSE");
+        modlineno+=1;
         break;
   }
   
@@ -128,6 +131,7 @@ void write_function_declaration(
   int i;
   if(pi->paramcnt>0) {
     fprintf(module->fmtfp, "#line %d \"%s\"\n", yylineno, module->filename);
+    fprintf(module->fmtfp, "#line @d \"%s.cc\"\n", module->name);
     fprintf(module->fmtfp, "  leftv v = h, v_save;\n");
     fprintf(module->fmtfp, "  int tok = NONE, index = 0;\n");
     for (i=0;i<pi->paramcnt; i++)
@@ -148,9 +152,21 @@ void write_function_typecheck(
   )
 {
   fprintf(module->fmtfp, "#line %d \"%s\"\n", yylineno, module->filename);
+  fprintf(module->fmtfp, "#line @d \"%s.cc\"\n", module->name);
   write_procedure_typecheck(module, pi, module->fmtfp);
   fprintf(module->fmtfp, "#line %d \"%s\"\n", yylineno, module->filename);
   pi->flags.typecheck_done = 1;
+}
+
+void write_function_result(
+  moddefv module,
+  procdefv pi,
+  void *arg
+  )
+{
+  fprintf(module->fmtfp, "  res->data =%s\n", arg);
+  pi->flags.result_done = 1;
+  write_procedure_return(module, pi, module->fmtfp);
 }
 
 void write_function_return(
@@ -198,6 +214,7 @@ void write_function_singularcmd(
   int i;
   
   printf("\nWriting return-block\n");
+  fprintf(module->fmtfp, "#line @d \"%s.cc\"\n", module->name);
   fprintf(module->fmtfp, "/* code for running singular commands */\n");
   fprintf(module->fmtfp, "/*\n");
   fprintf(module->fmtfp, " * #line %d \"%s\"\n", yylineno, module->filename);
@@ -279,14 +296,31 @@ void write_finish_functions(
 {
   fprintf(module->modfp, "  return 0;\n}\n\n");
   fflush(module->modfp);
-
-  fprintf(module->modfp, "#if 0 /* Help section */\n");
+  modlineno+=3;
+  
+  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
+  fprintf(module->modfp, "/* Help section */\n");
+  fprintf(module->modfp, "void fill_help_package(idhdl pl) {\n");
+  fprintf(module->modfp, "  namespaceroot->push(IDPACKAGE(pl), IDID(pl));\n");
+  modlineno+=3;
   mod_copy_tmp(module->modfp, module->fmtfp2);
-  fprintf(module->modfp, "#endif /* End of Help section */\n\n");
-  fprintf(module->modfp, "#if 0 /* Example section */\n");
+  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
+  fprintf(module->modfp, "  namespaceroot->pop();\n");
+  fprintf(module->modfp, "}  /* End of Help section */\n\n");
+  modlineno+=3;
+
+  fprintf(module->modfp, "/* Example section */\n");
+  fprintf(module->modfp, "void fill_example_package(idhdl pl) {\n");
+  fprintf(module->modfp, "  namespaceroot->push(IDPACKAGE(pl), IDID(pl));\n");
+  modlineno+=3;
   mod_copy_tmp(module->modfp, module->fmtfp3);
-  fprintf(module->modfp, "#endif /* End of Example section */\n\n");
+  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
+  fprintf(module->modfp, "  namespaceroot->pop();\n");
+  fprintf(module->modfp, "} /* End of Example section */\n\n");
+  modlineno+=2;
+
   mod_copy_tmp(module->modfp, module->fmtfp);
+  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
   printf("  done.\n");fflush(stdout);
   fclose(module->fmtfp);
   fclose(module->fmtfp2);
@@ -336,9 +370,10 @@ void write_procedure_return(
     
   printf("### RETURN: '%s' '%s' '%d'\n", pi->return_val.name,
          pi->return_val.typname, pi->return_val.typ);
+  fprintf(module->fmtfp, "#line @d \"%s.cc\"\n", module->name);
   if(pi->funcname == NULL) {
+    if(!pi->flags.result_done) fprintf(fmtfp, "  res->data = NULL;\n");
     fprintf(fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
-    fprintf(fmtfp, "  res->data = NULL;\n");
     //fprintf(fmtfp, "  res->rtyp = NONE;\n");
     //fprintf(fmtfp, "  res->data = NULL;\n");
     fprintf(fmtfp, "  return FALSE;\n");
@@ -354,8 +389,8 @@ void write_procedure_return(
           break;
 
         case NONE:
+          if(!pi->flags.result_done) fprintf(fmtfp, "  res->data = NULL;\n");
           fprintf(fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
-          fprintf(fmtfp, "  res->data = NULL;\n");
           fprintf(fmtfp, "  return(%s(", pi->funcname);
           for (i=0;i<pi->paramcnt; i++) {
             fprintf(fmtfp, "(%s) %s->Data()",
@@ -439,11 +474,8 @@ void write_help(
   if(pi->help_string!=NULL) {
     fprintf(module->fmtfp2, "#line %d \"%s\"\n", pi->lineno_other,
             module->filename);
-//     fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(helphdl) ,");
-//     fprintf(module->modfp, " IDID(helphdl));\n");
     fprintf(module->fmtfp2, "  enter_id(\"%s\",", pi->procname);
     fprintf(module->fmtfp2, " \"%s\", STRING_CMD);\n\n", pi->help_string);
-//     fprintf(module->modfp, "  namespaceroot->push();\n");
   }
 }
 
@@ -462,14 +494,6 @@ void write_example(
     fprintf(module->fmtfp3, "  enter_id(\"%s\",\n", pi->procname);
     fprintf(module->fmtfp3, " \"%s\", STRING_CMD);\n\n", pi->example_string);
   }
-  
-#if 0
-    fprintf(module->modfp, "  namespaceroot->push( IDPACKAGE(examplehdl) ,");
-    fprintf(module->modfp, " IDID(examplehdl));\n");
-    fprintf(module->modfp, "  enter_id(\"%s\",", proc->procname);
-    fprintf(module->modfp, " \"%s\", STRING_CMD);\n", proc->example_string);
-    fprintf(module->modfp, "  namespaceroot->push();\n");
-#endif
 }
 
 /*========================================================================*/
@@ -529,9 +553,11 @@ void write_codeline(
         fprintf(module->binfp, "%s", line); break;
 
       case LANG_C: 
-        if(lineno>=0)
+        if(lineno>=0) {
           fprintf(module->fmtfp, "#line %d \"%s\"\n",
-					  lineno, module->filename);
+                  lineno, module->filename);
+          fprintf(module->fmtfp, "#line @d \"%s.cc\"\n", module->name);
+        }
         fprintf(module->fmtfp, "%s", line); break;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.5 2000-02-18 13:33:49 krueger Exp $
+ * $Id: utils.cc,v 1.6 2000-03-29 09:31:42 krueger Exp $
  */
 
 #include <stdio.h>
@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
+
+int modlineno;    /* lineno within module */
+
 #include "modgen.h"
 
 void init_system_type();
@@ -19,6 +22,8 @@ int init_modgen(
 {
   char tmpfile[64];
   char *p, *q;
+  
+  modlineno = 0;
   
   if(module_def == NULL) return -1;
   memset(module_def, '\0', sizeof(moddef));

@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.8 2000-03-22 10:23:57 krueger Exp $
+ *  $Id: modgen.h,v 1.9 2000-03-29 09:31:43 krueger Exp $
  *
  */
 
@@ -21,12 +21,14 @@ class procdef;
 class moddef;
 class cfiles;
 class procflags;
+class stringdef;
 
 typedef paramdef * paramdefv;
 typedef procdef * procdefv;
 typedef cfiles * cfilesv;
 typedef moddef * moddefv;
 typedef procflags *procflagsv;
+typedef stringdef *stringdefv;
 
 class procflags {
   public:
@@ -35,6 +37,7 @@ class procflags {
   
   char do_typecheck;
   char do_return;
+  char result_done;
 };
 
 class paramdef {
@@ -94,6 +97,13 @@ class moddef {
   int      filecnt;
 };
 
+class stringdef 
+{
+  public:
+  char *string;
+  int lineno;
+};
+
 typedef enum { VAR_UNKNOWN, VAR_BOOL, VAR_NUM, VAR_STRING,
                VAR_FILE, VAR_FILES
 } var_type;
@@ -102,7 +112,7 @@ typedef enum { CMD_NONE, CMD_BADSYNTAX, CMD_DECL, CMD_CHECK, CMD_RETURN,
                CMD_SINGULAR
 } cmd_token;
 
-typedef enum { CMDT_SINGLE, CMDT_0, CMDT_ANY
+typedef enum { CMDT_SINGLE, CMDT_0, CMDT_ANY, CMDT_EQ
 } cmd_type;
 
 
@@ -113,7 +123,7 @@ typedef enum { VAR_NONE, VAR_MODULE, VAR_HELP, VAR_INFO, VAR_VERSION,
 /*
  *
  */
-
+extern int modlineno;    /* lineno within module */
 
 extern int IsCmd(char *n, int & tok);
 extern char * decl2str(int n, char *name);
@@ -163,6 +173,7 @@ extern void write_procedure_typecheck(moddefv module, procdefv pi, FILE *fmtfp);
 extern void write_procedure_return(moddefv module, procdefv pi, FILE *fmtfp);
 extern void write_function_declaration(moddefv module, procdefv pi, void *arg = NULL);
 extern void write_function_typecheck(moddefv module, procdefv pi, void *arg = NULL);
+extern void write_function_result(moddefv module, procdefv pi, void *arg = NULL);
 extern void write_function_return(moddefv module, procdefv pi, void *arg = NULL);
 extern void write_function_singularcmd(moddefv module, procdefv pi, void *arg = NULL);
 extern void write_function_errorhandling(moddefv module, procdefv pi);

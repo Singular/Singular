@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.7 2000-03-28 07:13:18 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.8 2000-03-29 09:31:41 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -9,6 +9,7 @@
 #include <mod2.h>
 
 #include "modgen.h"
+extern int yylineno;
 
 void enter_id(FILE *fp, char *name, char *value);
 /*========================================================================*/
@@ -22,8 +23,16 @@ void  mod_copy_tmp(
   
   fseek(fp_in, 0L, 0);
   do {
-    nread = fread (buf, sizeof (char), sizeof(buf)-1, fp_in);
-    fwrite(buf, sizeof(char), nread, fp_out);
+    memset(buf, 0, sizeof(buf));
+    fgets(buf, sizeof(buf), fp_in);
+    modlineno++;
+    //nread = fread (buf, sizeof (char), sizeof(buf)-1, fp_in);
+    if(strncmp(buf, "#line @d ", 8)==0) {
+      buf[6]='%';
+      fprintf(fp_out, buf, modlineno);
+    }
+    else
+      fwrite(buf, sizeof(char), strlen(buf)/*nread*/, fp_out);
   } while(!feof(fp_in));
   fputs("\n", fp_out);
 }
@@ -46,6 +55,7 @@ void write_enter_id(FILE *fp)
   fprintf(fp, "      Warn(\"Cannot create '%%s'\\n\", name);\n");
   fprintf(fp, "  return(h);\n");
   fprintf(fp, "}\n");
+  modlineno+=16;
 }
 
 /*========================================================================*/
@@ -80,19 +90,30 @@ void write_add_singular_proc(FILE *fp)
   fprintf(fp, "  \n");
   fprintf(fp, "  return(h);\n");
   fprintf(fp, "}\n");
+  modlineno+=30;
 }
 
 /*========================================================================*/
 void write_mod_init(
+  moddefv module,
   FILE *fp
   )
 {
   fprintf(fp, "\n\n");
+  fprintf(fp, "#line @d \"%s.cc\"\n", module->name);
   fprintf(fp, "extern \"C\"\n");
   fprintf(fp, "int mod_init(int(*iiAddCproc)())\n{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "  idhdl helphdl = enter_id(\"Help\", NULL, PACKAGE_CMD);\n");
   fprintf(fp, "  idhdl examplehdl = enter_id(\"Example\", NULL, PACKAGE_CMD);\n\n");
+  fprintf(fp, "  \n");
+  fprintf(fp, "   if( helphdl == NULL)\n");
+  fprintf(fp, "     Warn(\"Cannot create help-package\\n\");\n");
+  fprintf(fp, "   else fill_help_package(helphdl);\n");
+  fprintf(fp, "  \n");
+  fprintf(fp, "   if( examplehdl == NULL)\n");
+  fprintf(fp, "     Warn(\"Cannot create example-package\\n\");\n");
+  fprintf(fp, "   else fill_example_package(examplehdl);\n");
 }
 
 /*========================================================================*/

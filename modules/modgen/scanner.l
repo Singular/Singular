@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.8 2000-03-22 10:23:58 krueger Exp $ */
+/* $Id: scanner.l,v 1.9 2000-03-29 09:31:43 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -125,6 +125,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 %x SECT3
 %x PROCDECL
 %x EXAMPLE
+%x ANYLINE
 
 %x pdef
 %x procopt
@@ -166,7 +167,10 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         ";"     { return ';'; }
         ","     { return ','; }
 
-        "\""    { do_return++; push_state(YYSTATE, STRING, "string"); }
+        "\""    { do_return++; 
+                  lvalp->sv.lineno = yylineno;
+                  push_state(YYSTATE, STRING, "string");
+                }
         ^"%%".* { 
 		  sectnum = 2;
 #if DEBUG
@@ -213,7 +217,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                     char * s, *t;
                     pop_state();
 	            if(do_return) {
-                      s = t = lvalp->name = dupyytext();
+                      s = t = lvalp->sv.string = dupyytext();
                       while (*yytext)
                       {
                         if (*yytext == '\\') yytext++;
@@ -323,7 +327,10 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		 }
          "/*"       push_state(YYSTATE, COMMENT, "COMMENT");yymore();
          "//".*{NL}  ++yylineno; ACTION_ECHO; 
-         "\""    { do_return++; push_state(YYSTATE, STRING, "string"); /*yymore();*/}
+         "\""    { do_return++; 
+	           lvalp->sv.lineno = yylineno;
+                   push_state(YYSTATE, STRING, "string"); 
+                 }
 	 {BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
 	           else {
 		     if(strcasecmp(yytext, "yes")==0) lvalp->i = 1;
@@ -366,7 +373,9 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 <CODEBLOCK2>{
          "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
          "//".*{NL} { yylineno++; lvalp->name = yytext; return CODEPART; }
-         "\""    { push_state(YYSTATE, STRING, "string"); yymore();}
+         "\""    { 
+	           lvalp->sv.lineno = yylineno;
+                   push_state(YYSTATE, STRING, "string"); yymore();}
          "{"     { brace1++; yymore();}
          "}"     { brace1--;
                    if(brace1<=0) {
@@ -407,8 +416,17 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
        {NAME} { lvalp->name = strdup(yytext); return NAME; }
        {NL}   { yylineno++; }
        "::"   { return MCOLONCOLON; }
+       "="    { switch_state(YYSTATE, ANYLINE, "ANYLINE"); return MEQUAL; }
        .      { printf("PCB: '%s'\n", yytext); }
        }
+
+<ANYLINE>{
+       {col}  { lvalp->name = yytext; 
+                pop_state();
+                return ANYTOK; }
+       {NL}   { yylineno++; }
+       .       { yymore(); }
+}
 
 %%
 /*
