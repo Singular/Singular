@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.25 1999-04-29 16:57:15 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.26 1999-05-29 11:59:16 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -869,6 +869,7 @@ static poly redNF (poly h,kStrategy strat)
       {
         PrintS("\nto:");
         wrp(h);
+	PrintLn();
       }
       if (h == NULL) return NULL;
       z++;
