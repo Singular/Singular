@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.h,v 1.4 1998-04-20 10:05:53 krueger Exp $ */
+/* $Id: libparse.h,v 1.5 1998-05-03 11:41:26 obachman Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -21,6 +21,11 @@ int yylplex(char *libname, char *libfile, lib_style_types *lib_style,
 void reinit_yylp();
 
 extern char * text_buffer;
+
+#ifdef STANDALONE_PARSER
+#define myfread fread
+#define myfopen fopen
+#endif
 
 #endif /* LIBPARSE_H */ 
 
