@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.31 2000-09-18 09:19:28 obachman Exp $ */
+/* $Id: pcv.cc,v 1.32 2001-02-13 13:10:38 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -256,9 +256,8 @@ poly pcvP2CV(poly p,int d0,int d1)
     int d=pcvDeg(p);
     if(d0<=d&&d<d1)
     {
-      poly c=pOne();
+      poly c=pNSet(nCopy(pGetCoeff(p)));
       pSetComp(c,pcvM2N(p));
-      pSetCoeff(c,nCopy(pGetCoeff(p)));
       cv=pAdd(cv,c);
     }
     pIter(p);
