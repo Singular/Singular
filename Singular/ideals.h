@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.18 2000-01-13 14:18:57 siebert Exp $ */
+/* $Id: ideals.h,v 1.19 2000-01-13 14:40:23 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -88,9 +88,11 @@ ideal   idSyzygies (ideal h1, tHomog h,intvec **w, BOOLEAN setSyzComp=TRUE,
 ideal   idLiftStd  (ideal h1, matrix *m, tHomog h=testHomog);
 
 ideal   idLift (ideal mod, ideal sumod,ideal * rest=NULL,
-             BOOLEAN goodShape=FALSE, BOOLEAN isSB=TRUE,BOOLEAN divide=FALSE);
+             BOOLEAN goodShape=FALSE, BOOLEAN isSB=TRUE,BOOLEAN divide=FALSE,
+             BOOLEAN lift1=FALSE);
 ideal   idLiftNonStB (ideal  mod, ideal submod,ideal * rest=NULL,
-             BOOLEAN goodShape=FALSE,BOOLEAN divide=FALSE);
+             BOOLEAN goodShape=FALSE,BOOLEAN divide=FALSE,
+             BOOLEAN lift1=FALSE);
 
 intvec * idMWLift(ideal mod,intvec * weights);
 

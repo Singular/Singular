@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.82 2000-01-13 14:18:58 siebert Exp $ */
+/* $Id: ideals.cc,v 1.83 2000-01-13 14:40:24 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1608,18 +1608,17 @@ static void idPrepareStd(ideal s_temp, int k)
 *computes a representation of the generators of submod with respect to those
 * of mod
 */
-ideal   idLiftNonStB (ideal  mod, ideal submod,ideal * rest,
-             BOOLEAN goodShape,BOOLEAN divide)
+ideal   idLiftNonStB (ideal  mod, ideal submod,ideal * rest, BOOLEAN goodShape,
+                    BOOLEAN divide,BOOLEAN lift1)
 {
   return idLift(mod, submod, rest, goodShape, FALSE);
 }
 
 
-ideal   idLift (ideal mod, ideal submod,ideal * rest,
-             BOOLEAN goodShape, BOOLEAN isSB,BOOLEAN divide)
+ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape, 
+               BOOLEAN isSB,BOOLEAN divide,BOOLEAN lift1)
 {
   int   lsmod =idRankFreeModule(submod), i, j, k;
-  int ordSgn=currRing->OrdSgn;
   int comps_to_add=0;
   poly p;
 
@@ -1635,7 +1634,7 @@ Print("The submodule is:\n");
 idPrint(submod);
 #endif
 #ifdef NEW_LIFT
-  if (ordSgn==-1)
+  if (lift1)
   {
     comps_to_add = IDELEMS(submod);
     while ((comps_to_add>0) && (submod->m[comps_to_add-1]==NULL)) 
@@ -1689,7 +1688,7 @@ idPrint(submod);
     }
   }
 #ifdef NEW_LIFT
-  if (ordSgn==-1)
+  if (lift1)
   {
     for(j = 0;j<comps_to_add;j++)
     {
