@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gkdim.lib,v 1.4 2004-08-13 12:39:35 levandov Exp $";
+version="$Id: gkdim.lib,v 1.5 2004-12-14 21:00:06 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: GKdim.lib     Procedures for calculating the Gelfand-Kirillov dimension
@@ -33,10 +33,13 @@ static proc idGKdim(ideal I)
   string newringstring="ring newring=("+charstr(basering)+"),("+varstr(basering)+"),("+ordstr(basering)+")";
   execute (newringstring);
   setring newring;
-  ideal J=imap(oldring,I);
-  int d=dim(std(J));
+  ideal J  = imap(oldring,I);
+  ideal sJ = std(J);
+  int d    = dim(sJ);
   setring oldring;
-  if (d==-1) {d++;} // The GK-dimension of a finite dimensional module is zero
+  //  if (d==-1) {d++;} // The GK-dimension of a finite dimensional module is zero
+  // levandov: but for consistency, GKdim(std(1)) == -1,
+  //           mimicking the behaviour of dim() procedure.
   return (d);
 }
 
@@ -47,23 +50,32 @@ proc GKdim(list L)
 RETURN:  int, the Gelfand-Kirillov dimension of R^n/L
 EXAMPLE: example GKdim; shows examples
 "{
-  def M=L[1];
+  def M = L[1];
   if (typeof(M)=="ideal") 
   {
     int d=idGKdim(M);
   } 
   else 
   {
+    if (typeof(M)=="matrix") 
+    {
+      module N = module(M);
+      kill M;
+      module M = N;
+    }
     if (typeof(M)=="module") 
     {
-      M=std(M);
-      int d=0;
-      int n=ncols(M); // Num of vectors defining M
-      int m=nrows(M); // The rank of the free module where M is imbedded
+      if (attrib(M,"isSB")<>1)
+      {
+	M=std(M);
+      }
+      int d = -1;
+      int n = ncols(M); // Num of vectors defining M
+      int m = nrows(M); // The rank of the free module where M is imbedded
       int i,j;
       for (j=1; j<=n; j++)
       {
-	M[j]=leadmonom(M[j]); // Only consider the leader monomial of each vector
+	M[j] = leadmonom(M[j]); // Only consider the leader monomial of each vector
       }
       intmat v[1][m]; // v will be the dimension of each stable subset
       ideal I;
@@ -71,11 +83,11 @@ EXAMPLE: example GKdim; shows examples
       {
 	I=0;
 	for (j=1; j<=n; j++)
-	{ // Extract each row like an ideal
-	  I=I,M[i,j];
+	{ // Extract each row like an ideal .LV: ????
+	  I=I, M[i,j];
 	}
-	v[1,i]=idGKdim(I);
-	if (v[1,i]>d) {d=v[1,i];}
+	v[1,i] = idGKdim(I);
+	if (v[1,i]>d) { d = v[1,i]; }
       }
     } 
     else 
@@ -99,6 +111,10 @@ example
   GKdim(J);
   module M=[x2,y,1],[x,y2,0];
   GKdim(M);
+  ideal A = x,y,z;
+  GKdim(A);
+  ideal B = 1;
+  GKdim(B);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
