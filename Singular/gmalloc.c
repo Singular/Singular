@@ -1312,9 +1312,11 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #endif
 
 #ifdef __GNU_LIBRARY__
+#ifndef __GLIBC__
 /* It is best not to declare this and cast its result on foreign operating
    systems with potentially hostile include files.  */
 extern __ptr_t __sbrk __P ((int increment));
+#endif
 #endif
 
 #ifndef NULL
