@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.10 1998-01-22 10:54:28 schmidt Exp $ */
+/* $Id: int_rat.cc,v 1.11 1998-06-26 16:16:03 schmidt Exp $ */
 
 #include <config.h>
 
@@ -107,16 +107,6 @@ void InternalRational::print( ostream & os, char * c )
 }
 #endif /* NOSTREAMIO */
 
-bool InternalRational::isZero() const
-{
-    return mpz_cmp_si( &_num, 0 ) == 0;
-}
-
-bool InternalRational::isOne() const
-{
-    return mpz_cmp_si( &_den, 1 ) == 0 && mpz_cmp_si( &_num, 1 ) == 0;
-}
-
 bool InternalRational::is_imm() const
 {
     return mpz_cmp_si( &_den, 1 ) == 0 && mpz_is_imm( &_num );
@@ -167,7 +157,10 @@ InternalCF * InternalRational::den ()
 }
 //}}}
 
-InternalCF* InternalRational::neg()
+//{{{ InternalCF * InternalRational::neg ()
+// docu: see CanonicalForm::operator -()
+InternalCF *
+InternalRational::neg ()
 {
     if ( getRefCount() > 1 ) {
 	decRefCount();
@@ -177,12 +170,12 @@ InternalCF* InternalRational::neg()
 	mpz_init_set( &dummy_den, &_den );
 	mpz_neg( &dummy_num, &dummy_num );
 	return new InternalRational( dummy_num, dummy_den );
-    }
-    else {
+    } else {
 	mpz_neg( &_num, &_num );
 	return this;
     }
 }
+//}}}
 
 InternalCF* InternalRational::addsame( InternalCF * c )
 {

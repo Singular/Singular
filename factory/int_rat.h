@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.h,v 1.5 1998-01-22 10:54:34 schmidt Exp $ */
+/* $Id: int_rat.h,v 1.6 1998-06-26 16:16:08 schmidt Exp $ */
 
 #ifndef INCL_INT_RAT_H
 #define INCL_INT_RAT_H
@@ -44,8 +44,6 @@ public:
 #ifndef NOSTREAMIO
     void print( ostream&, char* );
 #endif /* NOSTREAMIO */
-    bool isZero() const;
-    bool isOne() const;
     InternalCF* genZero();
     InternalCF* genOne();
 
