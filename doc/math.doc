@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.17 1998-05-14 19:31:56 Singular Exp $
+@comment $Id: math.doc,v 1.18 1998-05-16 18:28:21 gorzel Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -1097,7 +1097,7 @@ The regularity is the smallest number $s$ with the property deg($e_{a,i})
  \leq s+i$ for all $i$.
 @end tex
 @c ---------------------------------------------------------------------------
-@node Characteritic sets,References,Syzygies and resolutions,Mathematical background
+@node Characteristic sets,References,Syzygies and resolutions,Mathematical background
 @section Characteritic sets
 @cindex Characteritic sets
 
@@ -1158,7 +1158,7 @@ the property:
 (T,U) is irreducible if T is irreducible.
 
 Let G=@{g_1,...,g_s@} then there are irreducible triangular sets T_1,...,T_l
-such that Zero(G)=Union(i=1..l: Zero(T_i\I_i))
+such that Zero(G)=Union(i=1,...,l: Zero(T_i\I_i))
 where I_i=@{ini(f), f in T_i @}.
 @end ifinfo
 
@@ -1178,8 +1178,8 @@ where I_i=@{ini(f), f in T_i @}.
 @cindex References
 
 The Centre for Computer Algebra Kaiserslautern publishes a series of preprint
-which are electronically available
-(@code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca}).
+which are electronically available at
+@code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca}.
 Other sources to check are @code{http://symbolicnet.mcs.kent.edu/},
 @code{http://www.can.nl/},... and the following book list:
 
@@ -1202,6 +1202,7 @@ Eisenbud
 @item
 Mishra, B.: Algorithmic Algebra, Texts and Monographs in Computer Science,
 Springer, 1993
+@item Vasconcelos, V.:
 @end table
 
 @subheading Descriptions of algorithms
