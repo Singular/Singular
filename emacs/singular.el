@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.15 1998-07-31 08:18:30 schmidt Exp $
+;; $Id: singular.el,v 1.16 1998-07-31 21:05:53 schmidt Exp $
 
 ;;; Commentary:
 
@@ -72,9 +72,9 @@ Currently, there are the modes `interactive', `interactive-filter',
 
 (defmacro singular-debug (mode form &optional else-form)
   "Major debugging hook for singular.el.
-Evaluates FORM if `singular-debug' equals `all' or if MODE is an
-element of `singular-debug', othwerwise ELSE-FORM"
-  `(if (or (eq singular-debug 'all)
+Evaluates FORM if `singular-debug' equals t or if MODE is an element
+of `singular-debug', othwerwise ELSE-FORM."
+  `(if (or (eq singular-debug t)
 	   (memq ,mode singular-debug))
        ,form
      ,else-form))
@@ -212,6 +212,18 @@ off."
 The buffer name is the process name with surrounding `*'."
   (concat "*" process-name "*"))
 
+(defun singular-run-hook-with-arg-and-value (hook value)
+  "Call functions on HOOK.
+Provides argument VALUE.  If a function returns a non-nil value it
+replaces VALUE as new argument to the functions.  Returns final
+VALUE."
+  (let (result)
+    (while hook
+      (setq result (funcall (car hook) value))
+      (and result (setq value result))
+      (setq hook (cdr hook)))
+    value))
+
 (defmacro singular-process ()
   "Return process of current buffer."
   (get-buffer-process (current-buffer)))
@@ -303,7 +315,7 @@ non-nil."
 	 (setq end (match-beginning 0)))
     (substring string beg end)))
 
-(defconst singular-extended-prompt-regexp "\\([>.] \\)"
+(defconst singular-extended-prompt-regexp "\\([?>.] \\)"
   "Matches one Singular prompt.
 Should not be anchored neither to start nor to end!")
 
@@ -325,25 +337,22 @@ May or may not return STRING or a modified copy of it."
 
 (defun singular-remove-prompt (beg end)
   "Remove all superfluous prompts from region between BEG and END.
-More precisely, removes prompts from first beginning of line before
-BEG to END.
 Removes all but the last prompt of a sequence if that sequence ends at
 END.
-The region between BEG and END should be accessible."
-  (save-excursion
-    (let ((end (copy-marker end))
-	  prompt-end)
-      (goto-char beg)
-      (beginning-of-line)
-      (while (and (setq prompt-end
-			(re-search-forward singular-remove-prompt-regexp end t))
-		  (not (= end prompt-end)))
-	(delete-region (match-beginning 0) prompt-end))
+The region between BEG and END should be accessible.
+Leaves point after the last prompt found."
+  (let ((end (copy-marker end))
+	prompt-end)
+    (goto-char beg)
+    (while (and (setq prompt-end
+		      (re-search-forward singular-remove-prompt-regexp end t))
+		(not (= end prompt-end)))
+      (delete-region (match-beginning 0) prompt-end))
 
-      ;; check for trailing prompt
-      (if prompt-end
-	  (delete-region (match-beginning 0)  (match-beginning 2)))
-      (set-marker end nil))))
+    ;; check for trailing prompt
+    (if prompt-end
+	(delete-region (match-beginning 0)  (match-beginning 2)))
+    (set-marker end nil)))
 
 (defconst singular-skip-prompt-forward-regexp
   (concat singular-extended-prompt-regexp "*")
@@ -353,6 +362,10 @@ The region between BEG and END should be accessible."
   "Skip forward over prompts."
   (looking-at singular-skip-prompt-forward-regexp)
   (goto-char (match-end 0)))
+
+(defun singular-skip-prompt-backward ()
+  "Skip backward over prompts."
+  (while (re-search-backward singular-extended-prompt-regexp (- (point) 2) t)))
 ;;}}}
 
 ;;{{{ Simple section stuff for both Emacs and XEmacs
@@ -414,8 +427,7 @@ This variable is buffer-local.")
 Creates the buffer-local marker `singular-simple-sec-last-end' and
 initializes it to POS."
   (make-local-variable 'singular-simple-sec-last-end)
-  (if (not (and (boundp 'singular-simple-sec-last-end)
-		singular-simple-sec-last-end))
+  (if (not (markerp singular-simple-sec-last-end))
       (setq singular-simple-sec-last-end (make-marker)))
   (set-marker singular-simple-sec-last-end pos))
 
@@ -783,6 +795,59 @@ RAW is non-nil."
 	 (singular-strip-white-space string t))))))
 ;;}}}
 
+;;{{{ Last input and output section
+(defun singular-last-input-section (&optional no-error)
+  "Return last input section.
+Returns nil if optional argument NO-ERROR is non-nil and there is no
+last input section defined, throws an error otherwise."
+  (let ((last-input-start (marker-position singular-last-input-section-start))
+	(last-input-end (marker-position singular-current-output-section-start)))
+    (cond ((and last-input-start last-input-end)
+	   (vector (singular-simple-sec-at last-input-start) 'input
+		   last-input-start last-input-end))
+	  (no-error nil)
+	  (t (error "No last input section defined")))))
+
+(defun singular-current-output-section (&optional no-error)
+  "Return current output section.
+Returns nil if optional argument NO-ERROR is non-nil and there is no
+current output section defined, throws an error otherwise."
+  (let ((current-output-start (marker-position singular-current-output-section-start))
+	(current-output-end (save-excursion
+			      (goto-char (singular-process-mark))
+			      (singular-skip-prompt-backward)
+			      (and (bolp) (point)))))
+    (cond ((and current-output-start current-output-end)
+	   (vector (singular-simple-sec-at current-output-start) 'output
+		   current-output-start current-output-end))
+	  (no-error nil)
+	  (t (error "No current output section defined")))))
+
+(defun singular-last-output-section (&optional no-error)
+  "Return last output section.
+Returns nil if optional argument NO-ERROR is non-nil and there is no
+last output section defined, throws an error otherwise."
+  (let ((last-output-start (marker-position singular-last-output-section-start))
+	(last-output-end (marker-position singular-last-input-section-start)))
+    (cond ((and last-output-start last-output-end)
+	   (vector (singular-simple-sec-at last-output-start) 'output
+		   last-output-start last-output-end))
+	  (no-error nil)
+	  (t (error "No last output section defined")))))
+
+(defun singular-latest-output-section (&optional no-error)
+  "Return latest output section.
+This is the current output section if it is defined, otherwise the
+last output section.
+Returns nil if optional argument NO-ERROR is non-nil and there is no
+latest output section defined, throws an error otherwise."
+  (or (singular-current-output-section t)
+      (singular-last-output-section t)
+      (if no-error
+	  nil
+	(error "No latest output section defined"))))
+;;}}}
+
 ;;{{{ Folding sections
 (defvar singular-folding-ellipsis "Singular I/O ..."
   "Ellipsis to show for folded input or output.")
@@ -806,8 +871,8 @@ Assumes that there is no narrowing in effect."
   (eq (char-after (singular-section-start section)) ?\r))
 
 (defun singular-fold-section (section)
-  "(Un)fold SECTION.
-(Un)folds section at point and goes to beginning of section if called
+  "\(Un)fold SECTION.
+\(Un)folds section at point and goes to beginning of section if called
 interactively.
 Unfolds folded sections and folds unfolded sections."
   (interactive (list (singular-section-at (point))))
@@ -826,6 +891,7 @@ Unfolds folded sections and folds unfolded sections."
 	  (widen)
 	  (singular-fold-internal start (singular-section-end section)
 				  (not (singular-section-foldedp section))))
+      ;; this is unwide-protected
       (narrow-to-region old-point-min old-point-max)
       (set-marker old-point-max nil))
     (if (interactive-p) (goto-char (max start (point-min))))))
@@ -834,23 +900,59 @@ Unfolds folded sections and folds unfolded sections."
 ;;{{{ Input and output filters
 
 ;; debugging filters
-(defun singular-debug-input-filter (string)
-  "Echo STRING in mini-buffer."
+(defun singular-debug-pre-input-filter (string)
+  "Display STRING and some markers in mini-buffer."
   (singular-debug 'interactive-filter
-		  (message "Input filter: %s"
-			   (singular-debug-format string))))
+		  (message "Pre-input filter: %s"
+			   (singular-debug-format string)))
+  (singular-debug 'interactive-filter
+		  (message "Pre-input filter: (li %S ci %S lo %S co %S)"
+			   (marker-position singular-last-input-section-start)
+			   (marker-position singular-current-input-section-start)
+			   (marker-position singular-last-output-section-start)
+			   (marker-position singular-current-output-section-start)))
+  nil)
 
-(defun singular-debug-output-filter (string)
-  "Echo STRING in mini-buffer."
+(defun singular-debug-post-input-filter (beg end)
+  "Display BEG, END, and some markers in mini-buffer."
   (singular-debug 'interactive-filter
-		  (message "Output filter: %s"
-			   (singular-debug-format string))))
+		  (message "Post-input filter: (beg %S end %S)" beg end))
+  (singular-debug 'interactive-filter
+		  (message "Post-input filter: (li %S ci %S lo %S co %S)"
+			   (marker-position singular-last-input-section-start)
+			   (marker-position singular-current-input-section-start)
+			   (marker-position singular-last-output-section-start)
+			   (marker-position singular-current-output-section-start))))
+
+(defun singular-debug-pre-output-filter (string)
+  "Display STRING and some markers in mini-buffer."
+  (singular-debug 'interactive-filter
+		  (message "Pre-output filter: %s"
+			   (singular-debug-format string)))
+  (singular-debug 'interactive-filter
+		  (message "Pre-output filter: (li %S ci %S lo %S co %S)"
+			   (marker-position singular-last-input-section-start)
+			   (marker-position singular-current-input-section-start)
+			   (marker-position singular-last-output-section-start)
+			   (marker-position singular-current-output-section-start)))
+  nil)
+
+(defun singular-debug-post-output-filter (beg end simple-sec-start)
+  "Display BEG, END, SIMPLE-SEC-START, and some markers in mini-buffer."
+  (singular-debug 'interactive-filter
+		  (message "Post-output filter: (beg %S end %S sss %S)"
+			   beg end simple-sec-start))
+  (singular-debug 'interactive-filter
+		  (message "Post-output filter: (li %S ci %S lo %S co %S)"
+			   (marker-position singular-last-input-section-start)
+			   (marker-position singular-current-input-section-start)
+			   (marker-position singular-last-output-section-start)
+			   (marker-position singular-current-output-section-start))))
 
 ;; stripping prompts
-(defun singular-remove-prompt-filter (&optional string)
+(defun singular-remove-prompt-filter (beg end simple-sec-start)
   "Strip prompts from last simple section."
-  (singular-remove-prompt comint-last-output-start
-			  (singular-process-mark)))
+  (if simple-sec-start (singular-remove-prompt simple-sec-start end)))
 ;;}}}
 
 ;;{{{ Demo mode
@@ -997,89 +1099,164 @@ Moves point to end of buffer and inserts contents of DEMO-FILE there."
     (singular-demo-mode 'enter)))
 ;;}}}
       
-;;{{{ Sending input and receiving output
+;;{{{ Some lengthy notes on input and output
 
-;;{{{ Some lengthy notes on filters
-
-;; Note:
-;;
-;; The filters and other functions have access to four important markers,
-;; `comint-last-input-start', `comint-last-input-end',
-;; `comint-last-output-start', and the buffers process mark.  They are
-;; initialized to nil (except process mark, which is initialized to
-;; `(point-max)') when Singular is called in `singular'.  These markers are
-;; modified by `comint-send-input' and `comint-output-filter' but not in a
-;; quite reliable way.  Here are some valid invariants and pre-/post-
-;; conditions.
-;;
-;; Output filters:
-;; ---------------
-;; The output filters may be sure that they are run in the process buffer
-;; and that the process buffer is still alive.  `comint-output-filter'
-;; ensures this.  But `comint-output-filter' does neither catch changes in
-;; match data done by the filters nor does it protect against non-local
-;; exits of itself or of one of the filters.  As a result, the current
-;; buffer may be changed in `comint-output-filter'!
-;;
-;; `comint-output-filter' is called also from `comint-send-input' (dunno
-;; why).  The following holds only for executions of `comint-output-filter'
-;; as a result of Singular output being processed.
-;;
-;; We have the following preconditions for any output filters (up to
-;; changes through other filter functions):
-;; - The argument STRING is what has been inserted in the buffer.  Not
-;;   really reliable.
-;; - `comint-last-input-end' <= `comint-last-output-start' <= process mark
-;;   if all of them are defined
-;; - The text between `comint-last-output-start' and process mark is the
-;;   one which has been inserted immediately before.
-;; - The text between `comint-last-input-end' (if it is defined) and
-;;   process mark is the one which has been inserted into buffer since last
-;;   user input.
-;; - It seems to be a reasonable assumption that the text between process
-;;   mark and `(point-max)' is user input.
-;;
-;; The standard filters which come with comint.el do not change the markers
-;; in the preconditions described above.  But they may change the text
-;; (e.g., `comint-strip-ctrl-m').
-;;
-;; Post-conditions for `comint-output-filter':
-;; - `comint-last-output-start' <= process mark.  The region between them
-;;   is the text which has been inserted immediately before.
-;; - `comint-last-input-start' and `comint-last-input-end' are unchanged.
-;;
-;; Input filters:
-;; --------------
-;; `comint-send-input' ensures that the process is still alive.  Further
-;; preconditions for any input filter (up to changes through filter
-;; functions):
-;; - The (CR-terminated) argument STRING is what will be sent to the
-;;   process (up to slight differences between XEmacs and Emacs).  Not
-;;   really reliable.
-;; - process mark <= `(point)'
-;; - The (CR-terminated) text between process mark and `(point)' is what
-;;   has been inserted by the user.
-;;
-;; Post-conditions for `comint-send-input':
-;; - `comint-last-input-start' <= `comint-last-input-end'
-;;                              = `comint-last-output-start' (!)
-;;                              = process mark = `(point)'.
-;;   The region between the first of them is what has been inserted by the
-;;   user.
-;;
-;; Invariants which always hold outside `comint-send-input' and
-;; `comint-output-filter':
-;; ------------------------------------------------------------
-;; - `comint-last-input-start' <= `comint-last-input-end' <= process mark
-;;   if all of them are defined.  The region between the first of them is
-;;   the last input entered by the user, the region between the latter of
-;;   them is the text from Singular printed since the last input.
-;; - `comint-last-output-start' <= process mark if both are defined.
-;; - It is a reasonable assumption that the text from process mark up to
-;;   `(point-max)' is user input.
+;; NOT READY[so sorry]!
 
 ;;}}}
 
+;;{{{ Sending input
+(defvar singular-pre-input-filter-functions nil
+  "Functions to call before input is sent to process.
+These functions get one argument, a string containing the text which
+is to be sent to process.  The functions should return either nil
+or a string.  In the latter case the returned string replaces the
+string to be sent to process.
+
+This is a buffer-local variable, not a buffer-local hook!
+
+`singular-run-hook-with-arg-and-value' is used to run the functions in
+the list.")
+
+(defvar singular-post-input-filter-functions nil
+  "Functions to call after input is sent to process.
+These functions get two arguments BEG and END.
+If `singular-input-filter' has been called with a string as argument
+BEG and END gives the position of this string after insertion into the
+buffer.
+If `singular-input-filter' has been called with a position as argument
+BEG and END equal process mark and that position, resp.
+The functions may assume that no narrowing is in effect and may change
+point at will.
+
+This hook is buffer-local.")
+
+(defvar singular-current-input-section-start nil
+  "Marker to the start of the current input section.
+This marker points nowhere on startup or if there is no current input
+section.
+
+This variable is buffer-local.")
+
+(defvar singular-last-input-section-start nil
+  "Marker to the start of the last input section.
+This marker points nowhere on startup.
+
+This variable is buffer-local.")
+
+(defun singular-input-filter-init (pos)
+  "Initialize all variables concerning input.
+POS is the position of the process mark."
+  ;; localize variables not yet localized in `singular-interactive-mode'
+  (make-local-variable 'singular-current-input-section-start)
+  (make-local-variable 'singular-last-input-section-start)
+
+  ;; initialize markers
+  (if (not (markerp singular-current-input-section-start))
+      (setq singular-current-input-section-start (make-marker)))
+  (if (not (markerp singular-last-input-section-start))
+      (setq singular-last-input-section-start (make-marker))))
+
+(defun singular-send-string (process string)
+  "Send newline terminated STRING to to process PROCESS.
+Runs the hooks on `singular-pre-input-filter-functions' in the buffer
+associated to PROCESS.  The functions get the non-terminated string."
+  (let ((process-buffer (process-buffer process)))
+
+    ;; check whether buffer is still alive
+    (if (and process-buffer (buffer-name process-buffer))
+	(save-excursion
+	  (set-buffer process-buffer)
+	  (send-string
+	   process
+	   (concat (singular-run-hook-with-arg-and-value
+		    singular-pre-input-filter-functions string)
+		   "\n"))))))
+
+(defun singular-input-filter (process string-or-pos)
+  "Insert/update input from user in buffer associated to PROCESS.
+Inserts STRING-OR-POS followed by a newline at process mark if it is a
+string.
+Assumes that the input is already inserted and that it is placed
+between process mark and STRING-OR-POS if the latter is a position.
+Inserts a newline after STRING-OR-POS.
+
+Takes care off:
+- current buffer as well as point and restriction in buffer associated
+  with process, even against non-local exits.
+Updates:
+- process mark;
+- current and last sections;
+- simple sections;
+- mode line.
+
+Runs the hooks on `singular-pre-input-filter-functions' and
+`singular-post-input-filter-functions'.
+
+For a more detailed descriptions of the input filter, the markers it
+sets, and input filter functions refer to the section \"Some lengthy
+notes on input and output\" in singular.el."
+  (let ((process-buffer (process-buffer process)))
+
+    ;; check whether buffer is still alive
+    (if (and process-buffer (buffer-name process-buffer))
+	(let ((old-buffer (current-buffer))
+	      (old-pmark (marker-position (process-mark process)))
+	      old-point old-point-min old-point-max)
+	  (unwind-protect
+	      (let (simple-sec-start)
+		(set-buffer process-buffer)
+		;; the following lines are not protected since the
+		;; unwind-forms refer the variables being set here
+		(setq old-point (point-marker)
+		      old-point-min (point-min-marker)
+		      old-point-max (point-max-marker)
+
+		;; get end of last simple section (equals start of
+		;; current)
+		      simple-sec-start (marker-position singular-simple-sec-last-end))
+
+		;; prepare for insertion
+		(widen)
+		(set-marker-insertion-type old-point t)
+		(set-marker-insertion-type old-point-max t)
+
+		;; insert string at process mark and advance process
+		;; mark after insertion.  If it not a string simply
+		;; jump to desired position and insrt a newline.
+		(if (stringp string-or-pos)
+		    (progn
+		      (goto-char old-pmark)
+		      (insert string-or-pos))
+		  (goto-char string-or-pos))
+		(insert ?\n)
+		(set-marker (process-mark process) (point))
+
+		;; create new simple section and update section markers
+		(cond
+		 ((eq (singular-simple-sec-create 'input (point)) 'empty)
+		  nil)
+		 ;; a new simple section has been created ...
+		 ((null (marker-position singular-current-input-section-start))
+		  ;; ... and even a new input section has been created!
+		  (set-marker singular-current-input-section-start
+			      simple-sec-start)
+		  (set-marker singular-last-output-section-start
+			      singular-current-output-section-start)
+		  (set-marker singular-current-output-section-start nil)))
+
+		;; run post-output hooks and force mode-line update
+		(run-hook-with-args 'singular-post-input-filter-functions
+				    old-pmark (point)))
+
+	    ;; restore buffer, restrictions and point
+	    (narrow-to-region old-point-min old-point-max)
+	    (set-marker old-point-min nil)
+	    (set-marker old-point-max nil)
+	    (goto-char old-point)
+	    (set-marker old-point nil)
+	    (set-buffer old-buffer))))))
+	    
 (defun singular-get-old-input (get-section)
   "Retrieve old input.
 Retrivies from beginning of current section to point if GET-SECTION is
@@ -1099,7 +1276,9 @@ non-nil, otherwise on a per-line base."
 	(buffer-substring old-point (point))))))
 
 (defun singular-send-or-copy-input (send-full-section)
-  "NOT READY!!"
+  "Send input from current buffer to associated process.
+NOT READY[old input copying, demo mode,
+	  eol-on-send, history, SEND-FULL-SECTION]!"
   (interactive "P")
 
   (let ((process (get-buffer-process (current-buffer)))
@@ -1118,115 +1297,165 @@ non-nil, otherwise on a per-line base."
      (;; get old input
       (< (point) pmark)
       (let ((old-input (singular-get-old-input send-full-section)))
-	(goto-char (point-max))
+	(goto-char pmark)
 	(insert old-input)))
 
-     (;; send input from pmark to point
+     (;; send input from pmark to point after doing history expansion
       t
-      ;; note that the input string does not include its terminal newline
-      (let* ((raw-input (buffer-substring pmark (point)))
-	     (input raw-input)
-	     (history raw-input))
+      ;; go to desired position
+      (if comint-eol-on-send (end-of-line))
+      (if send-full-section (goto-char (point-max)))
 
-	;; insert newline into buffer
-	(insert ?\n)
+      ;; do history expansion
+      (if (eq comint-input-autoexpand 'input)
+	  (comint-replace-by-expanded-history t))
+      (let* ((input (buffer-substring pmark (point))))
 
 	;; insert input into history
-	(if (and (funcall comint-input-filter history)
+	(if (and (funcall comint-input-filter input)
 		 (or (null comint-input-ignoredups)
 		     (not (ring-p comint-input-ring))
 		     (ring-empty-p comint-input-ring)
-		     (not (string-equal (ring-ref comint-input-ring 0) history))))
-	    (ring-insert comint-input-ring history))
-
-	;; run hooks and reset index into history
-	(run-hook-with-args 'comint-input-filter-functions (concat input "\n"))
+		     (not (string-equal (ring-ref comint-input-ring 0) input))))
+	    (ring-insert comint-input-ring input))
 	(setq comint-input-ring-index nil)
 
-	;; update markers and create a new simple section
-	(set-marker comint-last-input-start pmark)
-	(set-marker comint-last-input-end (point))
-	(set-marker (process-mark process) (point))
-	(singular-debug 'interactive-simple-secs
-			(message "Simple input section: %S"
-				 (singular-simple-sec-create 'input (point)))
-			(singular-simple-sec-create 'input (point)))
+	;; send string to process ...
+	(singular-send-string process input)
+	;; ... and insert it into buffer ...
+	(singular-input-filter process (point)))))))
+;;}}}
 
-	;; do it !!
-	(send-string process input)
-	(send-string process "\n"))))))
+;;{{{ Receiving output
+(defvar singular-pre-output-filter-functions nil
+  "Functions to call before output is inserted into the buffer.
+These functions get one argument, a string containing the text sent
+from process.  The functions should return either nil or a string.
+In the latter case the returned string replaces the string sent from
+process.
+
+This is a buffer-local variable, not a buffer-local hook!
+
+`singular-run-hook-with-arg-and-value' is used to run the functions in
+this list.")
+
+(defvar singular-post-output-filter-functions nil
+  "Functions to call after output is inserted into the buffer.
+These functions get three arguments BEG, END, and SIMPLE-SEC-START.
+The region between BEG and END is what has been inserted into the
+buffer.
+SIMPLE-SEC-START is the start of the simple section which has been
+created on insertion or nil if no simple section has been created.
+The functions may assume that no narrowing is in effect and may change
+point at will.
+
+This hook is buffer-local.")
+
+(defvar singular-current-output-section-start nil
+  "Marker to the start of the current output section.
+This marker points nowhere on startup or if there is no current output
+section.
+
+This variable is buffer-local.")
+
+(defvar singular-last-output-section-start nil
+  "Marker to the start of the last output section.
+This marker points nowhere on startup.
+
+This variable is buffer-local.")
+
+(defun singular-output-filter-init (pos)
+  "Initialize all variables concerning output including process mark.
+Set process mark to POS."
+
+  ;; localize variables not yet localized in `singular-interactive-mode'
+  (make-local-variable 'singular-current-output-section-start)
+  (make-local-variable 'singular-last-output-section-start)
+
+  ;; initialize markers
+  (if (not (markerp singular-current-output-section-start))
+      (setq singular-current-output-section-start (make-marker)))
+  (if (not (markerp singular-last-output-section-start))
+      (setq singular-last-output-section-start (make-marker)))
+  (set-marker (singular-process-mark) pos))
 
 (defun singular-output-filter (process string)
   "Insert STRING containing output from PROCESS into its associated buffer.
-
 Takes care off:
-- current buffer, even in case of non-local exits;
-- point and restriction in buffer associated with process;
-- markers which should not be advanced when inserting output.
+- current buffer as well as point and restriction in buffer associated
+  with process, even against non-local exits.
 Updates:
 - process mark;
-- `comint-last-output-start';
+- current and last sections;
 - simple sections;
 - mode line.
-Runs the hooks on `comint-output-filter-functions'.
+Runs the hooks on `singular-pre-output-filter-functions' and
+`singular-post-output-filter-functions'.
 
 For a more detailed descriptions of the output filter, the markers it
 sets, and output filter functions refer to the section \"Some lengthy
-notes on filters\" in singular.el."
-  (let ((process-buffer (process-buffer process))
-	(old-buffer (current-buffer)))
+notes on input and output\" in singular.el."
+  (let ((process-buffer (process-buffer process)))
 
     ;; check whether buffer is still alive
     (if (and process-buffer (buffer-name process-buffer))
-	(unwind-protect
-	    (progn
-	      (set-buffer process-buffer)
-	      (let ((old-point (point))
-		    (old-point-min (point-min))
-		    (old-point-max (point-max))
-		    (old-pmark (marker-position (process-mark process)))
-		    (n (length string)))
+	(let ((old-buffer (current-buffer))
+	      (old-pmark (marker-position (process-mark process)))
+	      old-point old-point-min old-point-max)
+	  (unwind-protect
+	      (let (simple-sec-start)
+		(set-buffer process-buffer)
+		;; the following lines are not protected since the
+		;; unwind-forms refer the variables being set here
+		(setq old-point (point-marker)
+		      old-point-min (point-min-marker)
+		      old-point-max (point-max-marker)
+
+		;; get end of last simple section (equals start of
+		;; current)
+		      simple-sec-start (marker-position singular-simple-sec-last-end)
+
+		;; get string to insert
+		      string (singular-run-hook-with-arg-and-value
+			      singular-pre-output-filter-functions
+			      string))
+
+		;; prepare for insertion
 		(widen)
+		(set-marker-insertion-type old-point t)
+		(set-marker-insertion-type old-point-max t)
+
+		;; insert string at process mark and advance process
+		;; mark after insertion
 		(goto-char old-pmark)
+		(insert string)
+		(set-marker (process-mark process) (point))
 
-		;; adjust point and narrowed region borders
-		(if (<= (point) old-point) (setq old-point (+ old-point n)))
-		(if (< (point) old-point-min) (setq old-point-min (+ old-point-min n)))
-		(if (<= (point) old-point-max) (setq old-point-max (+ old-point-max n)))
+		;; create new simple section and update section markers
+		(cond
+		 ((eq (singular-simple-sec-create 'output (point)) 'empty)
+		  (setq simple-sec-start nil))
+		 ;; a new simple section has been created ...
+		 ((null (marker-position singular-current-output-section-start))
+		  ;; ... and even a new output section has been created!
+		  (set-marker singular-current-output-section-start
+			      simple-sec-start)
+		  (set-marker singular-last-input-section-start
+			      singular-current-input-section-start)
+		  (set-marker singular-current-input-section-start nil)))
 
-		;; do it !!
-		(insert-before-markers string)
+		;; run post-output hooks and force mode-line update
+		(run-hook-with-args 'singular-post-output-filter-functions
+				    old-pmark (point) simple-sec-start)
+		(force-mode-line-update))
 
-		;; reset markers and simple sections which may have
-		;; been advanced by above insertion.  We rely on the
-		;; fact that `set-marker' always returns some non-nil
-		;; value.  Looks nicer this way.
-		(and (= comint-last-input-end (point))
-		     (set-marker comint-last-input-end old-pmark)
-		     ;; this may happen only on startup and only if
-		     ;; `comint-last-input-end' has been modified,
-		     ;; too.  Hence, we check for it after the first
-		     ;; test.
-		     (= comint-last-input-start (point))
-		     (set-marker comint-last-input-start old-pmark))
-		(and (= singular-simple-sec-last-end (point))
-		     (singular-simple-sec-reset-last old-pmark))
-
-		;; set new markers and create/extend new simple section
-		(set-marker comint-last-output-start old-pmark)
-		(singular-debug 'interactive-simple-secs
-				(message "Simple output section: %S"
-					 (singular-simple-sec-create 'output (point)))
-				(singular-simple-sec-create 'output (point)))
-
-		;; restore old values, run hooks, and force mode line update
-		(narrow-to-region old-point-min old-point-max)
-		(goto-char old-point)
-		(run-hook-with-args 'comint-output-filter-functions string)
-		(force-mode-line-update)))
-
-	  ;; this is unwind-protected
-	  (set-buffer old-buffer)))))
+	    ;; restore buffer, restrictions and point
+	    (narrow-to-region old-point-min old-point-max)
+	    (set-marker old-point-min nil)
+	    (set-marker old-point-max nil)
+	    (goto-char old-point)
+	    (set-marker old-point nil)
+	    (set-buffer old-buffer))))))
 ;;}}}
 
 ;;{{{ Singular interactive mode
@@ -1236,12 +1465,6 @@ notes on filters\" in singular.el."
 NOT READY [how to send input]!
 
 NOT READY [multiple Singulars]!
-
-Singular buffers are automatically limited in length \(by default, to
-2048 lines).  This limit may be adjusted by setting
-`singular-buffer-maximum-size' before Singular interactive mode starts
-up or by setting `comint-buffer-maximum-size' while Singular
-interactive mode is running.
 
 \\{singular-interactive-mode-map}
 Customization: Entry to this mode runs the hooks on `comint-mode-hook'
@@ -1267,13 +1490,6 @@ NOT READY [much more to come.  See shell.el.]!"
   (setq comint-buffer-maximum-size singular-buffer-maximum-size)
   (setq comint-input-ring-size singular-input-ring-size)
   (setq comint-input-filter singular-history-filter)
-  ;; do not add `comint-truncate-buffer' if it already has been added
-  ;; globally.  This is sort of a bug in `add-hook'.
-  (and (default-boundp 'comint-output-filter-functions)
-       (not (memq 'comint-truncate-buffer
-		  (default-value 'comint-output-filter-functions)))
-       (add-hook 'comint-output-filter-functions
-		 'comint-truncate-buffer nil t))
 
   ;; get name of history file (if any)
   (setq comint-input-ring-file-name (getenv "SINGULARHIST"))
@@ -1282,8 +1498,12 @@ NOT READY [much more to come.  See shell.el.]!"
 	  (equal (file-truename comint-input-ring-file-name) "/dev/null"))
       (setq comint-input-ring-file-name nil))
 
-  ;; initialize singular demo mode
+  ;; initialize singular demo mode, input and output filters
   (singular-demo-mode 'init)
+  (make-local-variable 'singular-pre-input-filter-functions)
+  (make-local-hook 'singular-post-input-filter-functions)
+  (make-local-variable 'singular-pre-output-filter-functions)
+  (make-local-hook 'singular-post-output-filter-functions)
 
   ;; selective display
   (setq selective-display t)
@@ -1299,14 +1519,22 @@ NOT READY [much more to come.  See shell.el.]!"
    (t
     (set-glyph-image invisible-text-glyph singular-folding-ellipsis (current-buffer))))
 
-  ;; input and output filters
+  ;; debugging filters
   (singular-debug 'interactive-filter
-		  (add-hook 'comint-input-filter-functions
-			    'singular-debug-input-filter nil t))
+		  (add-hook 'singular-pre-input-filter-functions
+			    'singular-debug-pre-input-filter nil t))
   (singular-debug 'interactive-filter
-		  (add-hook 'comint-output-filter-functions
-			    'singular-debug-output-filter nil t))
-  (add-hook 'comint-output-filter-functions
+		  (add-hook 'singular-post-input-filter-functions
+			    'singular-debug-post-input-filter nil t))
+  (singular-debug 'interactive-filter
+		  (add-hook 'singular-pre-output-filter-functions
+			    'singular-debug-pre-output-filter nil t))
+  (singular-debug 'interactive-filter
+		  (add-hook 'singular-post-output-filter-functions
+			    'singular-debug-post-output-filter nil t))
+
+  ;; other input or output filters
+  (add-hook 'singular-post-output-filter-functions
 	    'singular-remove-prompt-filter nil t)
 
   (run-hooks 'singular-interactive-mode-hook))
@@ -1380,13 +1608,11 @@ Returns BUFFER."
 	    (make-local-variable 'comint-ptyp)
 	    (setq comint-ptyp process-connection-type) ; T if pty, NIL if pipe.
 
-	    ;; go to the end of the buffer, set up markers, and
-	    ;; initialize simple sections
+	    ;; go to the end of the buffer, initialize I/O and simple
+	    ;; sections
 	    (goto-char (point-max))
-	    (set-marker comint-last-input-start (point))
-	    (set-marker comint-last-input-end (point))
-	    (set-marker comint-last-output-start (point))
-	    (set-marker (process-mark process) (point))
+	    (singular-input-filter-init (point))
+	    (singular-output-filter-init (point))
 	    (singular-simple-sec-init (point))
 
 	    ;; feed process with start file and read input ring.  Take
