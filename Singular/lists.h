@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.18 2002-05-16 17:51:52 Singular Exp $ */
+/* $Id: lists.h,v 1.19 2004-10-05 13:01:15 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -18,6 +18,7 @@
 #define INLINE_THIS inline
 #endif
 
+extern omBin slists_bin;
 class slists
 {
   public:
@@ -35,7 +36,8 @@ class slists
           omFreeSize((ADDRESS)m, (nr+1)*sizeof(sleftv));
           nr=-1;
         }
-        omFreeSize((ADDRESS)this, sizeof(slists));
+        //omFreeSize((ADDRESS)this, sizeof(slists));
+        omFreeBin((ADDRESS)this,slists_bin);
       }
     }
   INLINE_THIS void Init(int l=0);
@@ -64,7 +66,6 @@ INLINE_THIS void slists::Init(int l)
       }
 #endif
 
-extern omBin slists_bin;
 #undef INLINE_THIS
 
 #endif
