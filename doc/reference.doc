@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.207 2001-02-22 09:39:33 Singular Exp $
+@comment $Id: reference.doc,v 1.208 2001-02-22 16:01:05 westenb Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2151,21 +2151,20 @@ See
 none (if called with one argument)
 @*intvec (if called with two or three arguments)
 @item @strong{Purpose:}
-computes the Hilbert series of the ideal, resp.@: module,
-defined by the leading terms of the generators
-of the given ideal, resp.@: module. If weights w are given as 3rd argument,
-the Hilbert series is computed w.r.t.@: these weights w.
-In the other cases all weights are one. If the input is
-homogeneous w.r.t.@: the weights and a standard basis,
-the result is the (weighted) Hilbert series of the original
-ideal, resp.@: module.
+computes the (weighted) Hilbert series of the ideal, resp.@: module,
+defined by the leading terms of the generators of the given ideal, resp.@: module.@*
+If @code{hilb} is called with one argument, then the 1-st and 2-nd Hilbert series
+together with some additional information are displayed.@*
+If @code{hilb} is called with two arguments, then the n-th Hilbert series is returned
+as an intvec, where n=1,2 is the second argument.@*
+If a weight vector w is a given as 3-rd argument, then the Hilbert series is computed
+w.r.t.@: these weights w (by default all weights are set to 1).
+@item @strong{Caution:}
+The last entry of the returned intvec is not part of the actual Hilbert series,
+but is used in the Hilbert driven standard basis computation (see @ref{stdhilb}).
 @item @strong{Note:}
-Prints first and second Hilbert series when called with one argument,
-returns the n-th Hilbert series as intvec when called with two or three
-arguments (the second argument is n (n=1,2),
-the optional third argument is the weight vector w).
-The last entry of the returned intvec is not part of the Hilbert series,
-it is used in the Hilbert driven standard basis computation.
+If the input is homogeneous w.r.t.@: the weights and a standard basis, the result is
+the (weighted) Hilbert series of the original ideal, resp.@: module.@*
 @item @strong{Example:}
 @smallexample
 @c example
