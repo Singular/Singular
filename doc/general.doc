@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.33 1998-05-06 15:02:19 wichmann Exp $
+@comment $Id: general.doc,v 1.34 1998-05-07 08:12:21 anne Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1505,29 +1505,6 @@ are used for proc, if, else, while and for statements.
 @iftex
 See @ref{if}; @ref{for}; @ref{while}; @ref{proc}
 @end iftex
-
-
-@c ---------------------------------------------------------------------------
-@*----------------------------------------------------------------------------
-@*@strong{Wohin damit????}
-Procedures are user-defined functions containing sequences of @sc{Singular}
-commands. Several procedures can be stored in a file which is then
-called a library. Procedures and libraries have to comply with special
-syntax-rules described in this chapter.
-
-The @sc{Singular} distribution contains sevaral libraries.
-@c @ifset singularmanual
-(See @ref{SINGULAR libraries} for a complete list of available libraries.)
-@c @end ifset
-Further libraries are in preparation.
-The user may add other procedures/libraries.
-@c @ifset singularmanual
-@c (see @ref{procedures}; @ref{Procedures and LIB}).
-@c @end ifset
-@ifclear singularmanual
-(see 'procedures'; 'Procedures and LIB' of the @sc{Singular Manual}).
-@end ifclear
-@*----------------------------------------------------------------------------
 
 
 @c ---------------------------------------------------------------------------
