@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.1 1998-12-17 14:01:39 mschulze Exp $");
+tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.2 1998-12-17 14:26:18 mschulze Exp $");
 
 LIB "monodromy.lib";
 
@@ -72,30 +72,32 @@ list bimodal=
 "S[17]",x2z+yz2+y6+zy4,
 "U[16]",x3+xz2+y5+x2y2;
 
-proc monodromytest(string t,poly f)
+proc tst_monodromy(string s,poly p)
 {
   map m=basering,x,y,0;
-  if(f==m(f))
+  if(p==m(p))
   {
     def R=basering;
     ring r=0,(x,y),ds;
     export r;
-    poly f=imap(R,f);
+    poly p=imap(R,p);
   }
-  "**************** "+t+" ****************";
-  print(monodromy(f));
+
+  "**************** "+s+" ****************";
+  print(monodromy(p));
   tst_status();
+
   if(nvars(basering)==2)
   {
     kill r;
   }
 }
 
-list l=unimodal;
 int i;
+list l=unimodal;
 for(i=1;i<=size(l);i=i+2)
 {
-  monodromytest(l[i],l[i+1]);
+  tst_monodromy(l[i],l[i+1]);
 }
 
 tst_status(1); $
