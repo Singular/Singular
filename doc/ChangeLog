@@ -1,8 +1,20 @@
+Mon May  4 12:23:12 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* start.doc (How to use this manual): new chapter.  Needs to be
+	  rewritten.
+
 Thu Apr 30 19:36:54 MET DST 1998 hannes:
   added type resolution (types.doc)
+
 Tue Apr 28 20:12:03 MET DST 1998 hannes:
   changed Rings and Ordering/Available rings (general.doc)
+
+Tue Apr 28 14:46:50 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* reference.doc (Other commands, Proc commands): subnodes sorted
+	  into nodes `Functions' and `Control structures', resp.
+	  (Command): renamed to to `Functions and variables'
+
 Mon Apr 27 18:35:25 MET DST 1998 hannes: 
   added map and sub-sections to types.doc
   removed dring
-
