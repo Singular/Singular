@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $ */
+/* $Id: feread.cc,v 1.2 2005-01-13 15:13:32 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -392,3 +392,62 @@ char * fe_fgets_dummy(char *pr,char *s, int size)
   return NULL;
 }
 
+/* ===================================================================*/
+/* avoid using myynewbuffer (scanner.cc) with febase.cc               */
+void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
+{
+  currentVoice->Next();
+  //Print(":Buffer%d(%s):%s(%x)\n",
+  //  t,BT_name[t],pname,currentVoice);
+  if (pi!=NULL)
+  {
+    int l=strlen(pi->procname);
+    if (pi->libname!=NULL) l+=strlen(pi->libname);
+    currentVoice->filename = (char *)omAlloc(l+3);
+    *currentVoice->filename='\0';
+    if (pi->libname!=NULL) strcat(currentVoice->filename,pi->libname);
+    strcat(currentVoice->filename,"::");
+    strcat(currentVoice->filename,pi->procname);
+    currentVoice->pi       = pi;
+  }
+  else
+  {
+    currentVoice->filename = omStrDup(currentVoice->prev->filename);
+    currentVoice->pi       = currentVoice->prev->pi;
+  }
+  currentVoice->buffer   = s;
+  currentVoice->sw       = BI_buffer;
+  currentVoice->typ      = t;
+  switch (t)
+  {
+    case BT_execute:
+                     yylineno-=2;
+                     break;
+    case BT_proc:
+    case BT_example:
+                     currentVoice->oldb=myynewbuffer();
+                     yylineno = lineno+1;
+                     break;
+    case BT_if:
+    case BT_else:
+    case BT_break:
+                     yylineno = yy_blocklineno-1;
+                     break;
+    //case BT_file:
+    default:
+                     yylineno = 1;
+                     break;
+  }
+  //Print("start body (%s) at line %d\n",BT_name[t],yylineno);
+  currentVoice->start_lineno = yylineno;
+  //printf("start buffer typ %d\n",t);
+  //Voice *p=currentVoice;
+  //Print("-----------------\ncurr:");
+  //do
+  //{
+  //Print("voice fn:%s\n",p->filename);
+  //p=p->prev;
+  //}
+  //while (p!=NULL);
+  //Print("----------------\n");
+}
