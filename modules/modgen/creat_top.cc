@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.6 2000-02-18 13:33:47 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.7 2000-03-28 07:13:18 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -35,14 +35,15 @@ void write_enter_id(FILE *fp)
   fprintf(fp, "{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "\n");
-  fprintf(fp, "  h=enterid(mstrdup(name),0, t, &IDROOT, FALSE);\n");
+  fprintf(fp, "  h=enterid(mstrdup(name),0, t, &IDROOT, TRUE/*FALSE*/);\n");
   fprintf(fp, "  if(h!=NULL) {\n");
   fprintf(fp, "     switch(t) {\n");
   fprintf(fp, "         case STRING_CMD: IDSTRING(h) = mstrdup(value);break;\n");
   fprintf(fp, "         case PACKAGE_CMD: break;\n");
   fprintf(fp, "         case PROC_CMD: break;\n");
   fprintf(fp, "     }\n");
-  fprintf(fp, "  }\n");
+  fprintf(fp, "  } else \n");
+  fprintf(fp, "      Warn(\"Cannot create '%%s'\\n\", name);\n");
   fprintf(fp, "  return(h);\n");
   fprintf(fp, "}\n");
 }
@@ -90,8 +91,8 @@ void write_mod_init(
   fprintf(fp, "extern \"C\"\n");
   fprintf(fp, "int mod_init(int(*iiAddCproc)())\n{\n");
   fprintf(fp, "  idhdl h;\n");
-  fprintf(fp, "  idhdl helphdl = enter_id(\"help\", NULL, PACKAGE_CMD);\n");
-  fprintf(fp, "  idhdl examplehdl = enter_id(\"example\", NULL, PACKAGE_CMD);\n\n");
+  fprintf(fp, "  idhdl helphdl = enter_id(\"Help\", NULL, PACKAGE_CMD);\n");
+  fprintf(fp, "  idhdl examplehdl = enter_id(\"Example\", NULL, PACKAGE_CMD);\n\n");
 }
 
 /*========================================================================*/
