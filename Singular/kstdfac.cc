@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.31 1999-11-17 12:09:25 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.32 1999-11-18 13:07:53 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -318,13 +318,7 @@ static void completeReduceFac (kStrategy strat, lists FL)
       }
       enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
       n->enterS(n->P,pos,n);
-
-      /* enter P.p into T */
-      if ((IDELEMS(fac)>1)||(facdeg!=pFDeg(fac->m[0])))
-      {
-        int pos=n->posInT(n->T,n->tl,n->P);
-        enterTBba(n->P,pos,n);
-      }
+      enterTBba(n->P,n->posInT(n->T,n->tl,n->P),n);
 
       /* construct D */
       if (IDELEMS(fac)>1)
@@ -504,7 +498,9 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
     }
     /* reduction of the element choosen from L */
+    kTest_TS(strat);
     strat->red(&strat->P,strat);
+    kTest_TS(strat);
     if (strat->P.p != NULL)
     {
       int facdeg=pFDeg(strat->P.p);
@@ -599,30 +595,16 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
           n->P.p = redtailBba(n->P.p,pos-1,n);
         }
 
-        //if (n->redTailChange)
-        //{
-        //  int pos = n->posInL(n->L,n->Ll,n->P,n);
-        //  enterL(&n->L,&n->Ll,&n->Lmax,n->P,pos);
-        //}
-        //else
+        if (TEST_OPT_DEBUG)
         {
-          if (TEST_OPT_DEBUG)
-          {
-            PrintS("new s:");
-            wrp(n->P.p);
-            PrintLn();
-          }
-          enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
-          n->enterS(n->P,pos,n);
-          if (n->sl>srmax) srmax = n->sl;
-
-          /* enter P.p into T */
-          if ((IDELEMS(fac)>1)||(facdeg!=pFDeg(fac->m[0])))
-          {
-            int pos=n->posInT(n->T,n->tl,n->P);
-            enterTBba(n->P,pos,n);
-          }
+          PrintS("new s:");
+          wrp(n->P.p);
+          PrintLn();
         }
+        enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
+        n->enterS(n->P,pos,n);
+        if (n->sl>srmax) srmax = n->sl;
+        enterTBba(n->P,n->posInT(n->T,n->tl,n->P),n);
 
         /* construct D */
         if (IDELEMS(fac)>1)

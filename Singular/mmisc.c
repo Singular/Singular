@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.22 1999-11-15 17:20:25 obachman Exp $ */
+/* $Id: mmisc.c,v 1.23 1999-11-18 13:07:54 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -87,7 +87,7 @@ void mmUnGetSpecHeap(memHeap *heap_p)
 #ifdef MDEBUG
       fprintf(stderr, "Warning: mmUngetSpecHeap: heap not previously gotten with mmGetSpecHeap\n");
 #else
-      feReportBug("SpecHeap memory managment");
+//      feReportBug("SpecHeap memory managment");
 #endif
       return;
     }
