@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.67 2000-05-19 10:07:06 pfister Exp $
+// $Id: primdec.lib,v 1.68 2000-05-19 10:24:33 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.67 2000-05-19 10:07:06 pfister Exp $";
+version="$Id: primdec.lib,v 1.68 2000-05-19 10:24:33 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -4591,18 +4591,18 @@ proc zerodec(ideal I)
 {
    def R=basering;
    poly q;
-   poly va=var(1);
    int j;
-   ideal J=groebner(I);
-   int d=vdim(J);
-   ideal ba=kbase(J);
-   ideal jmap=randomLast(100);
-   poly p=jmap[size(jmap)]+random(-50,50);
    matrix m;
-   matrix n[d][d];
    list re;
+   poly va=var(1);
+   ideal J=groebner(I);
+   ideal ba=kbase(J);
+   int d=vdim(J);
+   int e=nvars(basering);
+   poly p=randomLast(100)[e]+random(-50,50);
+   matrix n[d][d];
 
-   for(j=2;j<=nvars(basering);j++)
+   for(j=2;j<=e;j++)
    {
       va=va*var(j);
    }
@@ -4623,7 +4623,6 @@ proc zerodec(ideal I)
      setring R;
      map psi=P,p;
      list rfac=psi(fac);
-     list re;
 
      option(redSB);
      for(j=2;j<=size(rfac[1]);j++)
@@ -4639,7 +4638,6 @@ proc zerodec(ideal I)
     return(zerodec(I));
   }
 }
-
 example
 { "EXAMPLE:";  echo = 2;
    ring r=0,(x,y),dp;
