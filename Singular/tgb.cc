@@ -10,7 +10,7 @@
 //       try to create spolys as formal sums
 
 #include "tgb.h"
-#define OM_KEEP 1
+
 #define LEN_VAR1
 #define degbound(p) assume(pTotaldegree(p)<10)
 #define inDebug(p) assume((debug_Ideal==NULL)||(kNF(debug_Ideal,NULL,p,0,0)==0))
@@ -907,19 +907,19 @@ static poly redNF (poly h,kStrategy strat)
 }
 #else
 
-static poly redNF2 (poly h,calc_dat* c , int &len)
+static poly redNF2 (poly h,calc_dat* c , int &len, number&  m)
 {
-  len=0;
+  m=nInit(1);
   if (h==NULL) return NULL;
 
-  len=pLength(h);
+  assume(len==pLength(h));
   kStrategy strat=c->strat;
   if (0 > strat->sl)
   {
     return h;
   }
   int j;
-  int len_upper_bound=len;
+ 
   LObject P(h);
   P.SetShortExpVector();
   P.bucket = kBucketCreate(currRing);
@@ -928,51 +928,12 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
   //int max_pos=simple_posInS(strat,P.p);
   loop
     {
-//       if (corr){
 
-//      corr=lenS_correct(strat);
-//      if(!corr){
-//        PrintS("korupt");
-//      }
-//       }
-      int compare_bound;
-      compare_bound=bucket_guess(P.bucket);
-      len_upper_bound=min(compare_bound,len_upper_bound);
       j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
       if (j>=0)
       {
-        poly sec_copy=NULL;
-        //pseudo code
-        BOOLEAN must_expand=FALSE;
-        BOOLEAN must_replace_in_basis=(len_upper_bound<strat->lenS[j]);//first test
-        if (must_replace_in_basis)
-        {
-          //second test
-          if (pLmEqual(P.p,strat->S[j]))
-          {
-            PrintS("b");
-            sec_copy=kBucketClear(P.bucket);
-            sec_copy=redTailShort(sec_copy, strat);
-            kBucketInit(P.bucket,pCopy(sec_copy),pLength(sec_copy));
-          }
-          else
-          {
-            must_replace_in_basis=FALSE;
-            if ((len_upper_bound==1)
-                ||(len_upper_bound==2)
-                ||(len_upper_bound<strat->lenS[j]/2))
-            {
-              PrintS("e");
-              int dummy_len;
-              kBucketClear(P.bucket,&sec_copy,&dummy_len);
-              kBucketInit(P.bucket,pCopy(sec_copy),dummy_len
-                                                  /*pLength(sec_copy)*/);
-              must_expand=TRUE;
-            }
-          }
-        }
-//        must_expand=FALSE;
-//        must_replace_in_basis=FALSE;
+
+	
         nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -983,105 +944,20 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
           wrp(strat->S[j]);
         }
 #endif
-        len_upper_bound=len_upper_bound+strat->lenS[j]-2;
+       
         number coef=kBucketPolyRed(P.bucket,strat->S[j],
                                    strat->lenS[j]/*pLength(strat->S[j])*/,
                                    strat->kNoether);
+	number m2=nMult(m,coef);
+	nDelete(&m);
+	m=m2;
         nDelete(&coef);
         h = kBucketGetLm(P.bucket);
-
-        if (must_replace_in_basis){
-          int pos_in_c=-1;
-          poly p=strat->S[j];
-          int z;
-
-          int new_length=pLength(sec_copy);
-          Print("%i",strat->lenS[j]-new_length);
-          len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
-          int new_pos;
-          if(c->is_char0)
-            new_pos=simple_posInS(c->strat,sec_copy,
-                                  pSLength(sec_copy,new_length),
-                                  c->is_char0);//hac
-          else
-            new_pos=simple_posInS(c->strat,sec_copy,new_length,c->is_char0);//hack
-          assume(new_pos<=j);
-//          p=NULL;
-          for (z=c->n;z;z--)
-          {
-            if(p==c->S->m[z-1])
-            {
-
-
-              pos_in_c=z-1;
-
-              break;
-            }
-          }
-          if (z<=0){
-            //not in c->S
-            //LEAVE
-            deleteInS(j,c->strat);
-
-            add_to_reductors(c,sec_copy,pLength(sec_copy));
-          }
-          else {
-//shorten_tails may alter position (not the length, even not by recursion in GLOBAL case)
-
-            strat->S[j]=sec_copy;
-            c->strat->lenS[j]=new_length;
-            pDelete(&p);
-
-            //        replace_quietly(c,j,sec_copy);
-            // have to do many additional things for consistency
-            {
-
-
-
-
-              int old_pos=j;
-              new_pos=min(old_pos, new_pos);
-              assume(new_pos<=old_pos);
-
-
-              c->strat->lenS[old_pos]=new_length;
-              if(c->strat->lenSw)
-                c->strat->lenSw[old_pos]=pSLength(sec_copy,new_length);
-              int i=0;
-              for(i=new_pos;i<old_pos;i++){
-                if (strat->lenS[i]<=new_length)
-                  new_pos++;
-                else
-                  break;
-              }
-              if (new_pos<old_pos)
-                move_forward_in_S(old_pos,new_pos,c->strat, c->is_char0);
-
-              c->S->m[pos_in_c]=sec_copy;
-
-              c->lengths[pos_in_c]=new_length;
-              if (new_length==1)
-              {
-                int i;
-                for ( i=0;i<pos_in_c;i++)
-                {
-                  if (c->lengths[i]==1)
-                    c->states[pos_in_c][i]=HASTREP;
-                }
-                for ( i=z;i<c->n;i++){
-                  if (c->lengths[i]==1)
-                    c->states[i][pos_in_c]=HASTREP;
-                }
-                shorten_tails(c,sec_copy);
-              }
-            }
-          }
-        }
-        if(must_expand){
-
-          add_to_reductors(c,sec_copy,pLength(sec_copy));
-        }
-        if (h==NULL) return NULL;
+	
+	if (h==NULL) {
+	  len=0;
+	  return 
+	  NULL;}
         P.p=h;
         P.t_p=NULL;
         P.SetShortExpVector();
@@ -1099,6 +975,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
         kBucketClear(P.bucket,&(P.p),&len);
         kBucketDestroy(&P.bucket);
         pNormalize(P.p);
+	assume(len==(pLength(P.p)));
         return P.p;
       }
     }
@@ -1407,7 +1284,7 @@ static void do_this_spoly_stuff(int i,int j,calc_dat* c){
   {
     int len;
 
-    hr=redNF2(h,c,len);
+//    hr=redNF2(h,c,len);
 //      hr=redNF(h,c->strat,len);
 
     if (hr!=NULL)
@@ -1422,7 +1299,7 @@ static void do_this_spoly_stuff(int i,int j,calc_dat* c){
   if (h!=NULL)
   {
     int len;
-    hr=redNF2(h,c,len);
+//    hr=redNF2(h,c,len);
   }
 #endif
   c->normal_forms++;
@@ -2309,10 +2186,10 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     
     int i;
     int len;
-
-    reduction_step *rs=create_reduction_step(erg, los, c);
-    rs->reduce(los,erg.to_reduce_l,erg.to_reduce_u);
-    finalize_reduction_step(rs);
+    multi_reduce_step(erg,los,c);
+//     reduction_step *rs=create_reduction_step(erg, los, c);
+//     rs->reduce(los,erg.to_reduce_l,erg.to_reduce_u);
+//     finalize_reduction_step(rs);
 		 
     int deleted=multi_reduction_clear_zeroes(los, losl, erg.to_reduce_l, erg.to_reduce_u);
     curr_pos=erg.to_reduce_u;
@@ -2489,71 +2366,114 @@ simple_reducer::~simple_reducer(){
     
 }
 
-reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c){
+void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   static int id=0;
   id++;
-  if(id==0)
-    PrintS("warning: integer overflow");
-  BOOLEAN join=FALSE;
-  int i;
-  int sum;
-  for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
-    if(!r[i].sum) sum++;
-    if (sum>=AC_NEW_MIN) {join=TRUE;break;}
-  }
-  simple_reducer* pointer;
-  poly p;
+//   if(id==0)
+//     PrintS("warning: integer overflow");
+//   BOOLEAN join=FALSE;
+//   int i;
+//   int sum;
+//   for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
+//     if(!r[i].sum) sum++;
+//     if (sum>=AC_NEW_MIN) {join=TRUE;break;}
+//   }
+//   simple_reducer* pointer;
+//   poly p;
 
-  if (erg.fromS){
+//   if (erg.fromS){
     
-    p=c->strat->S[erg.reduce_by];
-    if ((!join)||(p->next==NULL)){
+//     p=c->strat->S[erg.reduce_by];
+//     if ((!join)||(p->next==NULL)){
       
-      pointer=new simple_reducer(p,c->strat->lenS[erg.reduce_by]);
+//       pointer=new simple_reducer(p,c->strat->lenS[erg.reduce_by]);
     
-    }
-    else{
-      join_simple_reducer* jp;
-      pointer= jp=new join_simple_reducer(p,c->strat->lenS[erg.reduce_by],r[erg.to_reduce_l].p);
+//     }
+//     else{
+//       join_simple_reducer* jp;
+//       pointer= jp=new join_simple_reducer(p,c->strat->lenS[erg.reduce_by],r[erg.to_reduce_l].p);
 
 
      
-    }
+//     }
    
-    pointer->fill_back=NULL;
+//     pointer->fill_back=NULL;
+//   }
+//   else
+//   {
+//     if(r[erg.reduce_by].sum)
+//       kbTest(r[erg.reduce_by].sum->ac->bucket);
+//     r[erg.reduce_by].flatten();
+//     int len;
+//     kBucket_pt bucket=r[erg.reduce_by].bucket;
+//     kBucketClear(bucket,&p,&len);
+//     if(c->is_char0)
+// 	 pContent(p);
+//     pTest(p);
+//     if ((!join)||(p->next==NULL))
+//       pointer=new simple_reducer(p,len);
+//     else
+//     {
+//       join_simple_reducer* jp;
+//       pointer=jp=new join_simple_reducer(p,len,r[erg.to_reduce_l].p);
+
+
+
+//     }
+    
+//     pointer->p=p;
+//     pointer->p_len=len;
+//     pointer->fill_back=bucket;
+ 
+//   }
+
+//   pointer->reduction_id=id;
+//   pointer->c=c;
+ 
+//   return pointer;
+  int rn=erg.reduce_by;
+  poly red;
+  int red_len;
+  simple_reducer* pointer;
+  BOOLEAN woc=FALSE;
+  if(erg.fromS){
+    red=c->strat->S[rn];
+    red_len=c->strat->lenS[rn];
   }
   else
   {
-    if(r[erg.reduce_by].sum)
-      kbTest(r[erg.reduce_by].sum->ac->bucket);
-    r[erg.reduce_by].flatten();
-    int len;
-    kBucket_pt bucket=r[erg.reduce_by].bucket;
-    kBucketClear(bucket,&p,&len);
-    if(c->is_char0)
-	 pContent(p);
-    pTest(p);
-    if ((!join)||(p->next==NULL))
-      pointer=new simple_reducer(p,len);
-    else
-    {
-      join_simple_reducer* jp;
-      pointer=jp=new join_simple_reducer(p,len,r[erg.to_reduce_l].p);
-
-
-
-    }
-    
-    pointer->p=p;
-    pointer->p_len=len;
-    pointer->fill_back=bucket;
- 
+    kBucketClear(r[rn].bucket,&red,&red_len);
   }
+  if(erg.to_reduce_u-erg.to_reduce_l>100){
+    poly my=pOne();
+    int ol=red_len;
+    for(int i=1;i<=pVariables;i++)
+      pSetExp(my,i,(pGetExp(r[erg.to_reduce_u].p, i)-pGetExp(red,i)));
+    
+    pSetm(my);
+    number m;
+    poly a=ppMult_mm(red,my);
+    woc=TRUE;
+    red_len--;
 
-  pointer->reduction_id=id;
-  pointer->c=c;
- 
-  return pointer;
+    a->next=redNF2(a->next,c,red_len, m);
+    pSetCoeff(a,nMult(a->coef,m));
+    red_len++;
+    assume(red_len==pLength(a));
+    if(!erg.fromS) kBucketInit(r[rn].bucket,red, ol);
+    red=a;
+    red_len=pLength(a);
+  }
+  pointer=new simple_reducer(red,red_len,c);
+
+  if ((!woc) && (!erg.fromS))
+    pointer->fill_back=r[rn].bucket;
+  else
+    pointer->fill_back=NULL;
+  pointer->reduce(r,erg.to_reduce_l, erg.to_reduce_u);
+  if(woc) pDelete(&pointer->p);
+  delete pointer;
+  
 };
 
 void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
@@ -2591,6 +2511,7 @@ void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
 
   reduction_accumulator::reduction_accumulator(poly p, int p_len, poly high_to){
     //sev needs to be removed from interfaces,makes no sense
+    
     degbound(p);
     degbound(p->next);
     degbound(high_to);
@@ -2617,7 +2538,7 @@ void join_simple_reducer:: pre_reduce(red_object* r, int l, int u){
   for(int i=l;i<=u;i++)
     {
       if (r[i].sum){
-	if(r[i].sum->ac->counter<=2) r[i].flatten();
+	if(r[i].sum->ac->counter<=15) r[i].flatten();
 	
       }
     }

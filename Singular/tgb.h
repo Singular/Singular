@@ -24,7 +24,7 @@
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
 #define PAR_N 1000
-#define AC_NEW_MIN 5
+#define AC_NEW_MIN 70
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 struct sorted_pair_node{
@@ -132,7 +132,7 @@ enum calc_state
 static int add_to_reductors(calc_dat* c, poly h, int len);
 static int bucket_guess(kBucket* bucket);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
-static poly redNF2 (poly h,calc_dat* c , int &len);
+
 static void free_sorted_pair_node(sorted_pair_node* s, ring r);
 static void shorten_tails(calc_dat* c, poly monom);
 static void replace_pair(int & i, int & j, calc_dat* c);
@@ -181,9 +181,10 @@ class simple_reducer:public reduction_step{
   poly p;
   kBucket_pt fill_back;
   int p_len;
-  simple_reducer(poly p, int p_len){
+  simple_reducer(poly p, int p_len, calc_dat* c =NULL){
     this->p=p;
     this->p_len=p_len;
+    this->c=c;
   }
   virtual void pre_reduce(red_object* r, int l, int u);
   virtual void reduce(red_object* r, int l, int u);
@@ -216,7 +217,7 @@ struct find_erg{
 
 };
 
-reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c);
+static void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c);
 void finalize_reduction_step(reduction_step* r){
   delete r;
 }
