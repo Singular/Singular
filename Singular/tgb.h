@@ -184,6 +184,7 @@ struct calc_dat
   //for F4
   mp_array_list* F;
   poly_array_list* F_minus;
+
   //end for F4
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
@@ -200,6 +201,7 @@ struct calc_dat
   int extended_product_crit;
   int average_length;
   BOOLEAN is_char0;
+  BOOLEAN is_homog;
   BOOLEAN F4_mode;
 };
 class red_object{
