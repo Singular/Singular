@@ -1,7 +1,7 @@
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.31 2000-12-29 01:52:42 greuel Exp $";
+version="$Id: general.lib,v 1.32 2000-12-29 02:19:24 greuel Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -307,9 +307,9 @@ EXAMPLE:  example factorial; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   factorial(37);"";                   //37! of type string (as long integer)
+   factorial(37);"";                 //37! of type string (as long integer)
    ring r1 = 0,x,dp;
-   number p = factorial(37,0);         //37! of type number, computed in r
+   number p = factorial(37,0);       //37! of type number, computed in r
    p;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -928,16 +928,16 @@ example
 {  "EXAMPLE:"; echo = 2;
    ring r0 = 0,(x,y,z,t),lp;
    ideal i = x3,z3,xyz;
-   sort(i);               //sorts using lex ordering,smaller polys come first
+   sort(i);            //sorts using lex ordering, smaller polys come first
  
    sort(i,3..1);
 
-   sort(i,"ls")[1];        //sort w.r.t. negative lex ordering
+   sort(i,"ls")[1];     //sort w.r.t. negative lex ordering
 
    intvec v =1,10..5,2..4;v;
-   sort(v)[1];             // sort v lexicographically
+   sort(v)[1];          // sort v lexicographically
 
-   sort(v,"Dp",1)[1];      // sort v w.r.t (total sum, reverse lex)
+   sort(v,"Dp",1)[1];   // sort v w.r.t (total sum, reverse lex)
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc sum (id, list #)
