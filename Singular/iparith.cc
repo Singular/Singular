@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.196 1999-12-20 16:38:22 krueger Exp $ */
+/* $Id: iparith.cc,v 1.197 1999-12-21 11:44:02 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -147,7 +147,7 @@ cmdnames cmds[] =
   { "det",         0, DET_CMD ,           CMD_1},
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_1},
-  { "div",         0, INTDIV ,            INTDIV},
+  { "div",         0, INTDIV_CMD ,        '/'},
 #ifdef DRING
   { "dring",       0, DRING_CMD ,         DRING_CMD},
 #endif
@@ -221,7 +221,7 @@ cmdnames cmds[] =
   { "minbase",     0, MINBASE_CMD ,       CMD_1},
   { "minor",       0, MINOR_CMD ,         CMD_23},
   { "minres",      0, MINRES_CMD ,        CMD_1},
-  { "mod",         0, '%',                '%'},
+  { "mod",         0, INTMOD_CMD ,        '%'},
   { "module",      0, MODUL_CMD ,         MODUL_CMD},
   { "modulo",      0, MODULO_CMD ,        CMD_2},
   { "monitor",     0, MONITOR_CMD ,       CMD_12},
@@ -364,8 +364,9 @@ static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
     case '-': (*aa) -= bb; break;
     case '*': (*aa) *= bb; break;
     case '/':
-    case INTDIV: (*aa) /= bb; break;
-    case '%': (*aa) %= bb; break;
+    case INTDIV_CMD: (*aa) /= bb; break;
+    case '%':
+    case INTMOD_CMD: (*aa) %= bb; break;
   }
   res->data=(char *)aa;
   return FALSE;
@@ -1002,7 +1003,7 @@ static BOOLEAN jjLT_N(leftv res, leftv u, leftv v)
   nDelete(&h);
   return FALSE;
 }
-static BOOLEAN jjDIV_I(leftv res, leftv u, leftv v)
+static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
 {
   int a= (int) u->Data();
   int b= (int) v->Data();
@@ -1014,8 +1015,19 @@ static BOOLEAN jjDIV_I(leftv res, leftv u, leftv v)
   int bb=ABS(b);
   int c=a%bb;
   if(c<0) c+=bb;
-  //res->data = (char *)((a-c) / b);
-  res->data = (char *)(a / b);
+  int r=0;
+  switch (iiOp)
+  {
+    case INTMOD_CMD:
+        r=c;            break;
+    case '%':
+        r= (a % b);     break;
+    case INTDIV_CMD:
+        r=((a-c) /b);   break;
+    case '/':
+        r= (a / b);     break;
+  }
+  res->data=(void *)r;
   return FALSE;
 }
 static BOOLEAN jjDIV_N(leftv res, leftv u, leftv v)
@@ -1053,21 +1065,6 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   {
     res->data = (char *)pDivideM((poly)u->CopyD(POLY_CMD),pHead(q));
   }
-  return FALSE;
-}
-static BOOLEAN jjMOD_I(leftv res, leftv u, leftv v)
-{
-  int a=(int)u->Data();
-  int b=ABS((int)v->Data());
-  if (errorreported) return TRUE;
-  if (b==0)
-  {
-    WerrorS("div. by 0");
-    return TRUE;
-  }
-  int c=a%b;
-  if(c<0) c+=b;
-  res->data = (char *)c;
   return FALSE;
 }
 static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
@@ -2097,15 +2094,18 @@ struct sValCmd2 dArith2[]=
 ,{jjDIV_N,     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD PROFILER}
 ,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 ,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
-,{jjDIV_I,     '/',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjDIVMOD_I,  '/',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
 ,{jjOP_IV_I,   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
 ,{jjOP_IV_I,   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
-,{jjDIV_I,     INTDIV,         INT_CMD,        INT_CMD,    INT_CMD PROFILER}
-,{jjOP_IV_I,   INTDIV,         INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
-,{jjOP_IV_I,   INTDIV,         INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
-,{jjMOD_I,     '%',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjDIVMOD_I,  INTDIV_CMD,     INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjOP_IV_I,   INTDIV_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
+,{jjOP_IV_I,   INTDIV_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
+,{jjDIVMOD_I,  '%',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
 ,{jjOP_IV_I,   '%',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
 ,{jjOP_IV_I,   '%',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
+,{jjDIVMOD_I,  INTMOD_CMD,     INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjOP_IV_I,   INTMOD_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
+,{jjOP_IV_I,   INTMOD_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
 ,{jjPOWER_I,   '^',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
 ,{jjPOWER_N,   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD PROFILER}
 ,{jjPOWER_P,   '^',            POLY_CMD,       POLY_CMD,   INT_CMD PROFILER}

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.76 1999-12-06 16:06:44 obachman Exp $ */
+/* $Id: grammar.y,v 1.77 1999-12-21 11:44:01 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -138,7 +138,6 @@ void yyerror(char * fmt)
 %token EQUAL_EQUAL
 %token GE
 %token LE
-%token INTDIV
 %token MINUSMINUS
 %token NOT
 %token NOTEQUAL
@@ -299,7 +298,7 @@ void yyerror(char * fmt)
 %left EQUAL_EQUAL NOTEQUAL
 %left '<' '>' GE LE
 %left '+' '-'
-%left '*' '/' '%' INTDIV
+%left '*' '/' '%'
 %left UMINUS NOT
 %left  '^'
 %left '[' ']'
@@ -750,11 +749,7 @@ expr_arithmetic:
           }
         | expr '/' expr
           {
-            if(iiExprArith2(&$$,&$1,'/',&$3)) YYERROR;
-          }
-        | expr INTDIV expr
-          {
-            if(iiExprArith2(&$$,&$1,INTDIV,&$3)) YYERROR;
+            if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
         | expr '^' expr
           {
@@ -762,7 +757,7 @@ expr_arithmetic:
           }
         | expr '%' expr
           {
-            if(iiExprArith2(&$$,&$1,'%',&$3)) YYERROR;
+            if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
         | expr '>' expr
           {

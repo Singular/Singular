@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.105 1999-10-14 14:42:26 obachman Exp $
+@comment $Id: types.doc,v 1.106 1999-12-21 11:44:03 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -549,10 +549,14 @@ addition
 negation or subtraction
 @item @code{*}
 multiplication
-@item @code{div}, @code{/}
-integer division (omitting the remainder)
-@item @code{%}, @code{mod}
-integer modulo (the remainder of the division)
+@item @code{/}
+integer division (omitting the remainder), rounding toward 0
+@item @code{div}
+integer division (omitting the remainder >= 0)
+@item @code{%}
+integer modulo (the remainder of the division @code{/})
+@item @code{mod}
+integer modulo (the remainder of the division @code{div}), always non-negative
 @item @code{^}, @code{**}
 exponentiation (exponent must be non-negative)
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
@@ -563,7 +567,7 @@ comparison
 in particular it does not change
 the value of @code{j}, see @ref{Limitations}.
 
-@strong{Note:} @code{/} might no longer be available in the future.
+@c @strong{Note:} @code{/} might no longer be available in the future.
 
 @*@strong{Example:}
 @smallexample
@@ -577,6 +581,7 @@ the value of @code{j}, see @ref{Limitations}.
   j; i;
   i+2, 2-i, 5^2;
   5 div 2, 8%3;
+  -5 div 2, -5 / 2, -5 mod 2, -5 % 2;
   1<2, 2<=2;
 @c example
 @end smallexample

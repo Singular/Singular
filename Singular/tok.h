@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.34 1999-12-02 23:03:52 wenk Exp $ */
+/* $Id: tok.h,v 1.35 1999-12-21 11:44:01 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -74,6 +74,8 @@ enum {
   HRES_CMD,
   INSERT_CMD,
   INT_CMD,
+  INTDIV_CMD,
+  INTMOD_CMD,
   INTVEC_CMD,
   IS_RINGVAR,
   KILLATTR_CMD,
