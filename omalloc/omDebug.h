@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.11 2000-10-04 13:12:29 obachman Exp $
+ *  Version: $Id: omDebug.h,v 1.12 2000-10-27 15:28:51 obachman Exp $
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H
@@ -88,7 +88,7 @@ void* omGetCustomOfTrackAddr(void* addr);
 #if defined(OM_NDEBUG) || ! defined(OM_HAVE_TRACK)
 #define omGetUsedBlocksOfPage(page)     (page->used_blocks)
 #else
-#define omGetUsedBlocksOfPage(page)     (page->used_blocks & ~(1 << (BIT_SIZEOF_LONG -1)))
+#define omGetUsedBlocksOfPage(page)     (page->used_blocks & ~(((unsigned long) 1) << (BIT_SIZEOF_LONG -1)))
 #endif
 
 #ifndef OM_NDEBUG
@@ -143,9 +143,9 @@ void omPrintTrackAddrInfo(FILE* fd, void* addr, int max_frames);
 omBin omGetOrigSpecBinOfTrackAddr(void* addr);
 size_t omOutSizeOfTrackAddr(void* addr);
 extern int omIsStaticTrackAddr(void* addr);
-#define omSetTrackOfUsedBlocks(ub)      (ub |= (1 << (BIT_SIZEOF_LONG -1)))
-#define omUnsetTrackOfUsedBlocks(ub)    (ub &= ~(1 << (BIT_SIZEOF_LONG -1)))
-#define omIsSetTrackOfUsedBlocks(ub)    (ub & (1 << (BIT_SIZEOF_LONG -1)))
+#define omSetTrackOfUsedBlocks(ub)      (ub |= (((unsigned long) 1) << (BIT_SIZEOF_LONG -1)))
+#define omUnsetTrackOfUsedBlocks(ub)    (ub &= ~(((unsigned long) 1) << (BIT_SIZEOF_LONG -1)))
+#define omIsSetTrackOfUsedBlocks(ub)    (ub & (((unsigned long) 1) << (BIT_SIZEOF_LONG -1)))
 #else
 #define omIsStaticTrackAddr(addr)   0
 #endif
@@ -170,7 +170,7 @@ int omIsAddrOnFreeBinPage(void* addr);
 #define omCheckReturn(cond) \
   do {omError_t _status = cond; if (_status) return _status;} while (0)
 #define omCheckReturnError(cond, error) \
-  do {void* _status = (void*) (cond); if (_status) return omReportError(error, report, OM_FLR_VAL, "");} while (0)
+  do {if (cond) return omReportError(error, report, OM_FLR_VAL, "");} while (0)
 #define omCheckReturnCorrupted(cond) \
   omCheckReturnError(cond, omError_MemoryCorrupted)
 #define omAddrCheckReturn(cond)                                               \
@@ -184,7 +184,7 @@ do                                                                            \
   }                                                                           \
 } while (0)
 #define omAddrCheckReturnError(cond, error) \
-  do {void* _status = (void*) (cond); if (_status) return omReportAddrError(error, report, addr, bin_size, flags, OM_FLR_VAL, "");} while (0)
+  do {if (cond) return omReportAddrError(error, report, addr, bin_size, flags, OM_FLR_VAL, "");} while (0)
 #define omAddrCheckReturnCorrupted(cond) \
   omAddrCheckReturnError(cond, omError_MemoryCorrupted)
 

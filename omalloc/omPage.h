@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines for primitve page managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omPage.h,v 1.6 2000-08-14 12:26:48 obachman Exp $
+ *  Version: $Id: omPage.h,v 1.7 2000-10-27 15:28:52 obachman Exp $
  *******************************************************************/
 #ifndef OM_PAGE_H
 #define OM_PAGE_H
@@ -43,8 +43,8 @@
   (((unsigned long) addr) >> (LOG_BIT_SIZEOF_LONG + LOG_BIT_SIZEOF_SYSTEM_PAGE))
 
 #define omIsPageAddr(addr) \
-   (omPageIndicies[omGetPageIndexOfAddr(addr) - omMinPageIndex] & \
-    (1 << omGetPageShiftOfAddr(addr)))
+   ((omPageIndicies[omGetPageIndexOfAddr(addr) - omMinPageIndex] & \
+    (((unsigned long)1) << omGetPageShiftOfAddr(addr))) != 0)
 
 extern void omPageIndexFault(unsigned long page_index);
 extern unsigned long omMaxPageIndex;
@@ -67,7 +67,7 @@ do                                                          \
   unsigned long _omPageIndex = omGetPageIndexOfAddr(addr);  \
   omRegisterPageIndex(_omPageIndex);                        \
   omPageIndicies[_omPageIndex - omMinPageIndex] &=          \
-    ~ (1 << omGetPageShiftOfAddr(addr));                    \
+    ~ (((unsigned long) 1) << omGetPageShiftOfAddr(addr));  \
 }                                                           \
 while (0)
 
@@ -77,7 +77,7 @@ do                                                          \
   unsigned long _omPageIndex = omGetPageIndexOfAddr(addr);  \
   omRegisterPageIndex(_omPageIndex);                        \
   omPageIndicies[_omPageIndex - omMinPageIndex] |=          \
-      (1 << omGetPageShiftOfAddr(addr));                    \
+      (((unsigned long) 1) << omGetPageShiftOfAddr(addr));  \
 }                                                           \
 while (0)
 

@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omalloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAlloc.c,v 1.9 2000-10-04 13:12:28 obachman Exp $
+ *  Version: $Id: omAlloc.c,v 1.10 2000-10-27 15:28:49 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
@@ -127,7 +127,7 @@ void* omAllocBinFromFullPage(omBin bin)
     /* Set this to zero, but preserve the first bit,
        so that tracking works */
 #ifdef OM_HAVE_TRACK
-    bin->current_page->used_blocks &= (1 << (BIT_SIZEOF_LONG -1));
+    bin->current_page->used_blocks &= (((unsigned long) 1) << (BIT_SIZEOF_LONG -1));
 #else    
     bin->current_page->used_blocks = 0;
 #endif

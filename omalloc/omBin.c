@@ -3,7 +3,7 @@
  *  Purpose: definitions of routines for working with bins
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBin.c,v 1.4 2000-10-04 13:12:28 obachman Exp $
+ *  Version: $Id: omBin.c,v 1.5 2000-10-27 15:28:50 obachman Exp $
  *******************************************************************/
 
 #include "omAlloc.h"
@@ -396,7 +396,6 @@ omBin omGetStickyBinOfBin(omBin bin)
 
 void omMergeStickyBinIntoBin(omBin sticky_bin, omBin into_bin)
 {
-  omSpecBin s_bin;
   if (! omIsOnGList(om_StickyBins, next, sticky_bin) || 
       !sticky_bin->sticky ||
       sticky_bin->max_blocks != into_bin->max_blocks ||
@@ -668,7 +667,7 @@ static void omPrintBinStat(FILE * fd, omBin bin, int track, int* pages, int* use
   }
   else
   {
-    fprintf(fd, "%s%u\t%ld\t", (omIsStaticNormalBin(bin) ? " " : 
+    fprintf(fd, "%s%ld\t%ld\t", (omIsStaticNormalBin(bin) ? " " : 
                                 (omIsStickyBin(bin) ? "S" : 
                                  (omIsTrackBin(bin) ? "T" : "*"))),
             bin->sizeW, bin->max_blocks);

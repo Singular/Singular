@@ -3,7 +3,7 @@
  *  Purpose: alloc function to be included in omMain.c
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omtTestAlloc.c,v 1.8 2000-10-04 13:12:32 obachman Exp $
+ *  Version: $Id: omtTestAlloc.c,v 1.9 2000-10-27 15:28:53 obachman Exp $
  *******************************************************************/
 #include "omtTest.h"
 
@@ -32,7 +32,7 @@
 
 void omtTestAlloc(omMemCell cell, unsigned long spec)
 {
-  int size = GET_SIZE(spec);
+  size_t size = GET_SIZE(spec);
   void* addr;
   omBin bin = NULL;
   omBin orig_bin = NULL;
@@ -180,7 +180,7 @@ void omtTestFree(omMemCell cell)
 void omtTestRealloc(omMemCell cell, unsigned long new_spec)
 {
   void* old_addr = cell->addr;
-  int old_spec = cell->spec;
+  unsigned long old_spec = cell->spec;
   omBin old_bin = cell->bin;
   omBin old_orig_bin = cell->orig_bin;
   size_t old_size = GET_SIZE(old_spec);

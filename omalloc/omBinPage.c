@@ -3,7 +3,7 @@
  *  Purpose: implementation of routines for primitve BinPage managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBinPage.c,v 1.4 2000-09-12 16:02:17 obachman Exp $
+ *  Version: $Id: omBinPage.c,v 1.5 2000-10-27 15:28:50 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omAlloc.h"
@@ -21,12 +21,12 @@
 struct omBinPageRegion_s
 {
   void* current;        /* linked list of free pages */
-  int   used_pages;     /* number of used pages */
   omBinPageRegion next; /* nex/prev pointer in ring of regions */
   omBinPageRegion prev;
   void* init_addr;      /* pointer portion of inital chunk which is still free */
-  int   init_pages;   /* number of pages still available in init_chunk */  
   void* addr;         /* addr returned by alloc */
+  int   init_pages;   /* number of pages still available in init_chunk */  
+  int   used_pages;     /* number of used pages */
   int pages;          /* total size of region */
 };
 
@@ -400,7 +400,7 @@ static void omRegisterBinPages(void* low_addr, int pages)
     }
     else
     {
-      om_BinPageIndicies[low_index-om_MinBinPageIndex] |= ~ (( 1<< shift) - 1);
+      om_BinPageIndicies[low_index-om_MinBinPageIndex] |= ~ ((((unsigned long) 1) << shift) - 1);
     }
     for (shift = low_index+1; shift < high_index; shift++)
     {
@@ -413,7 +413,7 @@ static void omRegisterBinPages(void* low_addr, int pages)
     }
     else
     {
-      om_BinPageIndicies[high_index-om_MinBinPageIndex] |= ((1 << (shift + 1)) - 1);
+      om_BinPageIndicies[high_index-om_MinBinPageIndex] |= ((((unsigned long) 1) << (shift + 1)) - 1);
     }
   }
   else
@@ -421,10 +421,10 @@ static void omRegisterBinPages(void* low_addr, int pages)
     high_index = omGetPageShiftOfAddr(high_addr);
     while (high_index > shift)
     {
-      om_BinPageIndicies[low_index-om_MinBinPageIndex] |= (1 << high_index);
+      om_BinPageIndicies[low_index-om_MinBinPageIndex] |= (((unsigned long) 1) << high_index);
       high_index--;
     }
-    om_BinPageIndicies[low_index-om_MinBinPageIndex] |= (1 << shift);
+    om_BinPageIndicies[low_index-om_MinBinPageIndex] |= (((unsigned long) 1) << shift);
   }
 }
 
@@ -444,7 +444,7 @@ static void omUnregisterBinPages(void* low_addr, int pages)
     }
     else
     {
-      om_BinPageIndicies[low_index-om_MinBinPageIndex] &= (( 1<< shift) - 1);
+      om_BinPageIndicies[low_index-om_MinBinPageIndex] &= ((((unsigned long) 1) << shift) - 1);
     }
     for (shift = low_index+1; shift < high_index; shift++)
     {
@@ -457,7 +457,7 @@ static void omUnregisterBinPages(void* low_addr, int pages)
     }
     else
     {
-      om_BinPageIndicies[high_index-om_MinBinPageIndex] &= ~ ((1 << (shift + 1)) - 1);
+      om_BinPageIndicies[high_index-om_MinBinPageIndex] &= ~ ((((unsigned long) 1) << (shift + 1)) - 1);
     }
   }
   else
@@ -465,10 +465,10 @@ static void omUnregisterBinPages(void* low_addr, int pages)
      high_index = omGetPageShiftOfAddr(high_addr);
      while (high_index > shift)
      {
-       om_BinPageIndicies[low_index-om_MinBinPageIndex] &= ~(1 << high_index);
+       om_BinPageIndicies[low_index-om_MinBinPageIndex] &= ~(((unsigned long) 1) << high_index);
        high_index--;
      }
-     om_BinPageIndicies[low_index-om_MinBinPageIndex] &= ~(1 << shift);
+     om_BinPageIndicies[low_index-om_MinBinPageIndex] &= ~(((unsigned long) 1) << shift);
   }
 }
    

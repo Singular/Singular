@@ -12,7 +12,9 @@ int missed_errors = 0;
 int used_regions = 0;
 int seed;
 
-#if defined (__hpux) || defined (__alpha)  || defined (__svr4__) || defined (__SVR4)
+#if defined (__hpux) || defined (__alpha)  || defined (__svr4__) || defined (__SVR4) 
+/* SF1 cosimo.medicis.polytechnique.fr V4.0 1229 alpha works */ 
+#if defined (__hpux) || defined (__svr4__) || defined (__SVR4)
 /* HPUX lacks random().  DEC OSF/1 1.2 random() returns a double.  */
 long mrand48 ();
 void srand48();
@@ -25,6 +27,7 @@ static void srandom(long seed)
 {
   srand48(seed);
 }
+#endif
 #endif
 
 #if CHECK_LEVEL > 0

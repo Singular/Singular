@@ -3,10 +3,10 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.8 2000-10-04 13:12:31 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.9 2000-10-27 15:28:52 obachman Exp $
  *******************************************************************/
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 
 #ifdef HAVE_CONFIG_H
 #include "omConfig.h"
@@ -197,11 +197,13 @@ int omFilterRetInfo_i(omRetInfo info, int max, int i)
 
 int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
 {
-  int i;
+  int i = 0;
   
   omRetInfo_t info[OM_MAX_BACKTRACE_DEPTH];
   if (max > OM_MAX_BACKTRACE_DEPTH) max = OM_MAX_BACKTRACE_DEPTH;
-  for (i=0; i<max; i++)
+  if (bt != NULL)
+  {
+  for (; i<max; i++)
   {
     if (bt[i] == NULL)
     {
@@ -210,6 +212,7 @@ int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
     }
   }
   i = omBackTrace_2_RetInfo(bt, info, max);
+  }
 #ifdef OM_TRACK_RETURN
   if (i == 0)
     i = omBackTrace_2_RetInfo(&r,info, 1);

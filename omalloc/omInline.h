@@ -4,12 +4,14 @@
  *           be inlined
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omInline.h,v 1.5 2000-10-04 13:12:31 obachman Exp $
+ *  Version: $Id: omInline.h,v 1.6 2000-10-27 15:28:51 obachman Exp $
  *******************************************************************/
 #if defined(OM_INLINE) || defined(OM_ALLOC_C)
 
 #ifndef OM_INLINE_H
 #define OM_INLINE_H
+
+#include <string.h>
 
 OM_INLINE_IMPL omBin omGetBinOfPage(omBinPage page)
 {
@@ -32,7 +34,7 @@ OM_INLINE_IMPL int _omIsBinPageAddr(void* addr)
   if (index >= om_MinBinPageIndex && index <= om_MaxBinPageIndex)
   {
     unsigned long shift = omGetPageShiftOfAddr(addr);
-    return om_BinPageIndicies[index - om_MinBinPageIndex] & (1 << shift);
+    return ((om_BinPageIndicies[index - om_MinBinPageIndex] & (((unsigned long) 1) << shift)) != 0);
   }
   return 0;
 }
@@ -151,14 +153,14 @@ OM_INLINE_IMPL void* _omMemDupAligned(void* addr)
 
 OM_INLINE_IMPL char* _omStrDup(const char* s)
 {
-  char* r;
-  int i=0;
+  void* r;
+  size_t i=0;
   
   while (s[i]) i++;
   i++;
-  __omTypeAlloc(char*, r, i);
-  memcpy(r, s, i);
-  return r;
+  __omTypeAlloc(void*, r, i);
+  memcpy(r, (void*) s, i);
+  return (char*) r;
 }
 
 OM_INLINE_IMPL void* _omMemDup(void* addr)

@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.9 2000-10-04 13:12:30 obachman Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.10 2000-10-27 15:28:51 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <stdarg.h>
@@ -422,13 +422,13 @@ void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omT
 {
   if (! omCheckPtr(addr, omError_MaxError, OM_FLR))
   {
-    fprintf(fd, "%s addr:%p size:%d", s, addr, omSizeOfAddr(addr));
+    fprintf(fd, "%s addr:%p size:%ld", s, addr, omSizeOfAddr(addr));
   
   if (error == omError_WrongSize && (flags & OM_FSIZE))
-    fprintf(fd, " specified size:%d", (size_t) bin_size);
+    fprintf(fd, " specified size:%ld", (size_t) bin_size);
   
   if (error == omError_WrongBin && (flags & OM_FBIN))
-    fprintf(fd, " specified bin is of size:%d", ((omBin) bin_size)->sizeW << LOG_SIZEOF_LONG);
+    fprintf(fd, " specified bin is of size:%ld", ((omBin) bin_size)->sizeW << LOG_SIZEOF_LONG);
   
   if (omIsTrackAddr(addr)) 
     omPrintTrackAddrInfo(fd, addr, frames);
@@ -535,7 +535,7 @@ void omIterateTroughAddrs(int normal, int track, void (*CallBackUsed)(void*), vo
 
 static FILE* om_print_used_addr_fd;
 static size_t om_total_used_size;
-static unsigned int om_total_used_blocks;
+static unsigned long om_total_used_blocks;
 static int om_print_frames;
 
 static void _omPrintUsedAddr(void* addr)
@@ -559,7 +559,7 @@ void omPrintUsedAddrs(FILE* fd, int max)
   om_print_used_addr_fd = (fd == NULL ? stdout : fd);
   om_print_frames = max;
   omIterateTroughAddrs(1, 1, _omPrintUsedAddr, NULL);
-  fprintf(fd, "UsedAddrs Summary: UsedBlocks:%d  TotalSize:%d\n", 
+  fprintf(fd, "UsedAddrs Summary: UsedBlocks:%ld  TotalSize:%ld\n", 
           om_total_used_blocks, om_total_used_size);
 }
 
@@ -570,7 +570,7 @@ void omPrintUsedTrackAddrs(FILE* fd, int max)
   om_print_used_addr_fd = (fd == NULL ? stdout : fd);
   om_print_frames = max;
   omIterateTroughAddrs(0, 1 ,  _omPrintUsedAddr, NULL);
-  fprintf(fd, "UsedTrackAddrs Summary: UsedBlocks:%d  TotalSize:%d\n", 
+  fprintf(fd, "UsedTrackAddrs Summary: UsedBlocks:%ld  TotalSize:%ld\n", 
           om_total_used_blocks, om_total_used_size);
 }
 

@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines for primitve BinPage managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBinPage.h,v 1.3 2000-08-14 12:26:41 obachman Exp $
+ *  Version: $Id: omBinPage.h,v 1.4 2000-10-27 15:28:51 obachman Exp $
  *******************************************************************/
 #ifndef OM_BIN_PAGE_H
 #define OM_BIN_PAGE_H
@@ -56,7 +56,7 @@ extern unsigned long om_MaxBinPageIndex;
 extern unsigned long om_MinBinPageIndex;
 extern unsigned long *om_BinPageIndicies;
 
-#define OM_SIZEOF_INDEX_PAGE (SIZEOF_SYSTEM_PAGE << LOG_BIT_SIZEOF_LONG)
+#define OM_SIZEOF_INDEX_PAGE (((unsigned long) SIZEOF_SYSTEM_PAGE) << LOG_BIT_SIZEOF_LONG)
 
 #define omGetPageShiftOfAddr(addr) \
   ((((unsigned long) addr) & (OM_SIZEOF_INDEX_PAGE -1)) >> LOG_BIT_SIZEOF_SYSTEM_PAGE)
@@ -72,8 +72,8 @@ extern unsigned long *om_BinPageIndicies;
 #define omIsBinPageAddr(addr)                                               \
   ((omGetPageIndexOfAddr(addr) >= om_MinBinPageIndex) &&                    \
    (omGetPageIndexOfAddr(addr) <= om_MaxBinPageIndex) &&                    \
-   (om_BinPageIndicies[omGetPageIndexOfAddr(addr) - om_MinBinPageIndex] &   \
-    (1 << omGetPageShiftOfAddr(addr))))
+   ((om_BinPageIndicies[omGetPageIndexOfAddr(addr) - om_MinBinPageIndex] &   \
+     (((unsigned long) 1) << omGetPageShiftOfAddr(addr))) != 0))
 #endif
 
 /*BEGINPRIVATE*/

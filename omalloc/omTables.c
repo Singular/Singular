@@ -3,7 +3,7 @@
  *  Purpose: program which generates omTables.inc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omTables.c,v 1.5 2000-08-14 12:26:50 obachman Exp $
+ *  Version: $Id: omTables.c,v 1.6 2000-10-27 15:28:52 obachman Exp $
  *******************************************************************/
 
 #ifndef MH_TABLE_C
@@ -65,36 +65,36 @@ size_t om_BinSize [SIZEOF_OM_BIN_PAGE / MIN_BIN_BLOCKS] =
 
 void OutputSize2Bin(size_t *binSize, size_t max_block_size, int track)
 {
-  int i, j;
-  printf("omBin om_Size2%sBin[/*%d*/] = {\n",
+  long i, j;
+  printf("omBin om_Size2%sBin[/*%ld*/] = {\n",
          (track? "Track" : ""), max_block_size / SIZEOF_OM_ALIGNMENT);
   i=0;
   j=SIZEOF_OM_ALIGNMENT;
   while (j < max_block_size)
   {
-    printf("&om_Static%sBin[%d], /* %d */ \n", (track? "Track" : ""), i, j);
+    printf("&om_Static%sBin[%ld], /* %ld */ \n", (track? "Track" : ""), i, j);
     if (binSize[i] == j) i++;
     j += SIZEOF_OM_ALIGNMENT;
   }
-  printf("&om_Static%sBin[%d] /* %d */};\n\n", (track? "Track" : ""), i, j);
+  printf("&om_Static%sBin[%ld] /* %ld */};\n\n", (track? "Track" : ""), i, j);
 }
 
 void OutputSize2AlignedBin(size_t *binSize, size_t max_block_size, int track)
 {
-  int i, j;
+  long i, j;
   if (OM_MAX_BLOCK_SIZE % 8 != 0)
   {
     fprintf(stderr, "OM_MAX_BLOCK_SIZE == %d not divisible by 8\n", OM_MAX_BLOCK_SIZE);fflush(stdout);
     _exit(1);
   }
-  printf("omBin om_Size2%sBin[/*%d*/] = {\n",
+  printf("omBin om_Size2%sBin[/*%ld*/] = {\n",
          (track ? "Track" : "Aligned"), max_block_size / SIZEOF_OM_ALIGNMENT);
   i=0;
   while (binSize[i] % SIZEOF_STRICT_ALIGNMENT != 0) i++;
   j=SIZEOF_OM_ALIGNMENT;
   while (j < max_block_size)
   {
-    printf("&om_Static%sBin[%d], /* %d */ \n", (track ? "Track" : ""), i, j);
+    printf("&om_Static%sBin[%ld], /* %ld */ \n", (track ? "Track" : ""), i, j);
     if (binSize[i] == j)
     {
       i++;
@@ -102,21 +102,21 @@ void OutputSize2AlignedBin(size_t *binSize, size_t max_block_size, int track)
     }
     j += SIZEOF_OM_ALIGNMENT;
   }
-  printf("&om_Static%sBin[%d] /* %d */};\n\n", (track ? "Track" : ""), i, j);
+  printf("&om_Static%sBin[%ld] /* %ld */};\n\n", (track ? "Track" : ""), i, j);
 }
 
 void OutputStaticBin(size_t *binSize, int max_bin_index, int track)
 {
-  int i;
+  long i;
   printf("omBin_t om_Static%sBin[/*%d*/] = {\n", (track ? "Track" : ""), max_bin_index+1);
 
   for (i=0;  i< max_bin_index; i++)
   {
-    printf("{om_ZeroPage, NULL, NULL, %d, %d, 0},\n", 
+    printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0},\n", 
            binSize[i] / SIZEOF_LONG, 
            SIZEOF_OM_BIN_PAGE/binSize[i]);
   }
-  printf("{om_ZeroPage, NULL, NULL, %d, %d, 0}\n};\n\n", 
+  printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0}\n};\n\n", 
          binSize[i] / SIZEOF_LONG, 
          SIZEOF_OM_BIN_PAGE/binSize[i]);
 }
