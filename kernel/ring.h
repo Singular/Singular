@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.5 2004-08-13 18:26:03 levandov Exp $ */
+/* $Id: ring.h,v 1.6 2004-11-04 19:56:12 levandov Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -249,7 +249,7 @@ inline BOOLEAN rOrd_is_Comp_dp(ring r)
 #ifdef HAVE_PLURAL
 inline BOOLEAN rIsPluralRing(ring r)
 {
-  return r->nc != NULL;
+  return ((r != NULL) && (r->nc != NULL));
 }
 #else
 #define rIsPluralRing(r)  (0)
