@@ -486,6 +486,8 @@ enum MP_Errors { MP_Failure,
                  MP_NotCommonIdentifier,
 		 MP_WrongBasicVectorType,
                  MP_DummyBigNum,
+                 MP_CantSkipMsg,
+                 MP_CantInitMsg,
                  MP_MaxError };
 
 typedef enum MP_Errors  MP_Status_t;
@@ -982,6 +984,8 @@ EXTERN MP_Status_t MP_SetError _ANSI_ARGS_((MP_Link_pt link,
 EXTERN void MP_PrintError _ANSI_ARGS_((MP_Link_pt link));
 
 EXTERN char* MP_ErrorStr _ANSI_ARGS_((MP_Link_pt link));
+
+EXTERN char* MP_StatusErrorStr _ANSI_ARGS_((MP_Link_pt link, MP_Status_t status));
 
 EXTERN char *IMP_GetCmdlineArg _ANSI_ARGS_((int argc, char **argv, char *cmd));
 

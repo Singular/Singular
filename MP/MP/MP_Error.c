@@ -46,41 +46,43 @@
  ***************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Error.c,v 1.1.1.1 1997-05-25 20:31:46 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Error.c,v 1.2 1998-10-14 16:44:38 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
 
 char *MP_errlist[]={
-        "MP_Failure",
-        "MP_Success",
-        "Unknown type",
-        "Unknown annotation",
-        "Unknown required annotation",
-        "Null link",   
-        "Null transport device",
-        "Can't open file link",
-        "Can't make connection",
-        "Can't allocate memory", 
-        "Can't convert", 
-        "Value is out of the legal range for this type",
-        "Can't put node header",  
-        "Can't put the requested node packet",
-        "Can't put data packet",
-        "Can't put annotation ", 
+        "MP: MP_Failure",
+        "MP: MP_Success",
+        "MP: Unknown type",
+        "MP: Unknown annotation",
+        "MP: Unknown required annotation",
+        "MP: Null link",   
+        "MP: Null transport device",
+        "MP: Can't open file link",
+        "MP: Can't make connection",
+        "MP: Can't allocate memory", 
+        "MP: Can't convert", 
+        "MP: Value is out of the legal range for this type",
+        "MP: Can't put node header",  
+        "MP: Can't put the requested node packet",
+        "MP: Can't put data packet",
+        "MP: Can't put annotation ", 
 
-        "Can't get node header",  
-        "Can't get node packet",
-        "Can't get data packet",
-        "Can't get annotation ", 
+        "MP: Can't get node header",  
+        "MP: Can't get node packet",
+        "MP: Can't get data packet",
+        "MP: Can't get annotation ", 
 
-        "Packet type not of the type requested",
-        "Can't convert, bad string",
-        "Can't write link",
-        "Can't read link",
-        "Identifier is not common (longer than one character)",
-        "Illegal element type for a Basic Vector",
-        "Can't put/get dummy bignum"
+        "MP: Packet type not of the type requested",
+        "MP: Can't convert, bad string",
+        "MP: Can't write link",
+        "MP: Can't read link",
+        "MP: Identifier is not common (longer than one character)",
+        "MP: Illegal element type for a Basic Vector",
+        "MP: Can't put/get dummy bignum",
+        "MP: Can't skip message (end of stream)",
+        "MP: Can't init message (end of stream)"
         };
 
 

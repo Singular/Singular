@@ -1,4 +1,6 @@
 1998-10-14  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+	* MP_Error.c: Added prefix MP: to error strings, added skip & init 
+	message errors, added procedure MP_StatusErrorStr
 
 	* MP_PariBigInt.[c,h]: Added memory management functions for Pari
 	Bigints 

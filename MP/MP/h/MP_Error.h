@@ -54,6 +54,8 @@ enum MP_Errors { MP_Failure,
                  MP_NotCommonIdentifier,
 		 MP_WrongBasicVectorType,
                  MP_DummyBigNum,
+                 MP_CantSkipMsg,
+                 MP_CantInitMsg,
                  MP_MaxError };
 
 typedef enum MP_Errors  MP_Status_t;

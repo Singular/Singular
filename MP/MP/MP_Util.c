@@ -37,7 +37,7 @@
  **********************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Util.c,v 1.3 1998-10-14 10:18:20 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Util.c,v 1.4 1998-10-14 16:44:39 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -166,6 +166,31 @@ char* MP_ErrorStr(link)
     return "MP: Unknown error number";
 
 }
+
+#ifdef __STDC__
+char* MP_StatusErrorStr(MP_Link_pt link, MP_Status_t status)
+#else
+char* MP_ErrorStr(link, status)
+  MP_Link_pt link;
+  MP_Status_t status;
+#endif
+{
+  if (link->errno != MP_Success && link->errno != MP_Failure 
+      && link->errno < MP_MaxError && link->errno >= 0)
+    return MP_ErrorStr(link);
+  if (status != MP_Success && status != MP_Failure && 
+      status < MP_MaxError && status >= 0)
+    return MP_errlist[status];
+  
+  if (status == MP_Failure || link->errno == MP_Failure)
+    return MP_errlist[MP_Failure];
+
+  if (status == MP_Success && link->errno == MP_Success)
+    return MP_errlist[MP_Success];
+  
+  return "MP: Unknown Error number";
+}
+
 
 
 

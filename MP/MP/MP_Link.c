@@ -138,7 +138,7 @@
  */
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Link.c,v 1.3 1998-10-14 10:18:11 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Link.c,v 1.4 1998-10-14 16:44:38 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -958,9 +958,10 @@ MP_Status_t MP_InitMsg(link)
 #endif
     if (link->fbtbc > 0 || link->last_frag)
 	ERR_CHK(MP_SkipMsg(link)); 
-    ERR_CHK(set_input_fragment(link));
+    if(!set_input_fragment(link))
+      return MP_SetError(link, MP_CantInitMsg);
 
-    return MP_Success;
+    return MP_ClearError(link);
 }
 
 
@@ -986,14 +987,14 @@ MP_Status_t MP_SkipMsg(link)
     }
 #endif
 
-    if (link == NULL || link->env == NULL) return MP_Failure;
+    if (link == NULL || link->env == NULL) return MP_NullLink;
     while (link->fbtbc > 0 || !link->last_frag) {
         if (!skip_input_bytes(link, link->fbtbc))
-            return MP_Failure;
+            return MP_SetError(link, MP_CantSkipMsg);
 
         link->fbtbc = 0;
         if (!link->last_frag && !set_input_fragment(link))
-            return MP_Failure;
+            return MP_SetError(link, MP_CantSkipMsg);
     }
 
     link->last_frag  = MP_FALSE;
@@ -1006,7 +1007,7 @@ MP_Status_t MP_SkipMsg(link)
             link->fbtbc, link->last_frag);
 #endif
 
-    return MP_Success;
+    return MP_ClearError(link);
 }
 
 
