@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.7 2002-06-06 16:02:10 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.8 2002-06-11 14:57:41 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -88,6 +88,10 @@ int redGrFirst (LObject* h,kStrategy strat)
       {
         if (h->lcm!=NULL) p_LmFree((*h).lcm, currRing);
         return 0;
+      }
+      if (TEST_OPT_INTSTRATEGY)
+      {
+	pCleardenom((*h).p);
       }
       /*computes the ecart*/
       d = pLDeg((*h).p,&((*h).length));
