@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.39 2000-02-02 14:25:44 Singular Exp $ */
+/* $Id: longalg.cc,v 1.40 2000-02-10 16:46:54 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1925,7 +1925,7 @@ number naGcd(number a, number b)
 void naNormalize(number &pp)
 {
 
-  naTest(pp);
+  //naTest(pp); // input may not be "normal"
   lnumber p = (lnumber)pp;
 
   if ((p==NULL) /*|| (p->s==2)*/)
@@ -1941,6 +1941,13 @@ void naNormalize(number &pp)
     x = napRemainder(x, naMinimalPoly);
     p->z = x;
     p->n = y = NULL;
+  }
+  /* check for degree of x too high: */
+  if ((x!=NULL) && (naMinimalPoly!=NULL) && (x!=naMinimalPoly) 
+  && (x->e[0]>naMinimalPoly->e[0])) // DO NOT REDUCE naMinimalPoly with itself
+  {
+    x = napRemainder(x, naMinimalPoly);
+    p->z = x;
   }
   /* normalize all coefficients in n and z (if in Q) */
   if (naIsChar0)
@@ -2014,6 +2021,7 @@ void naNormalize(number &pp)
     {
       napDelete1(&y);
       p->n = NULL;
+      naTest(pp);
       return;
     }
     number h1 = nacInvers(y->ko);
@@ -2022,6 +2030,7 @@ void naNormalize(number &pp)
     nacDelete(&h1);
     napDelete1(&y);
     p->n = NULL;
+    naTest(pp);
     return;
   }
 #ifndef FACTORY_GCD_TEST
@@ -2088,6 +2097,7 @@ void naNormalize(number &pp)
           napDelete1(&y);
           p->n = NULL;
         }
+        naTest(pp);
         return;
       }
     }
@@ -2126,6 +2136,7 @@ void naNormalize(number &pp)
     {
       nacDelete(&g);
       nacDelete(&d);
+      naTest(pp);
       return;
     }
     nacDelete(&g);
@@ -2139,6 +2150,7 @@ void naNormalize(number &pp)
     {
       nacDelete(&g);
       nacDelete(&d);
+      naTest(pp);
       return;
     }
     nacDelete(&g);
@@ -2160,6 +2172,7 @@ void naNormalize(number &pp)
     napIter(y);
   }
   nacDelete(&g);
+  naTest(pp);
 }
 
 /*2
@@ -2376,7 +2389,7 @@ number naMapQaQb(number c)
       {
         number t_erg=(number)erg;
         naDelete(&t_erg);
-	return (number)NULL;
+        return (number)NULL;
       }
     }
     if (erg->n!=NULL)
@@ -2504,7 +2517,16 @@ poly naPermNumber(number z, int * par_perm, int P)
     {
       if(za->e[i]!=0)
       {
-        if(par_perm[i]>0)
+        if(par_perm==NULL)
+        {
+          if ((rPar(currRing)>=i) && (pa!=NULL)) pa->e[i]=za->e[i];
+          else
+          {
+            pDelete(&p);
+            break;
+          }
+        }
+        else if(par_perm[i]>0)
           pSetExp(p,par_perm[i],za->e[i]);
         else if((par_perm[i]<0)&&(pa!=NULL))
           pa->e[-par_perm[i]-1]=za->e[i];

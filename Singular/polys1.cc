@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.32 2000-02-02 18:04:06 Singular Exp $ */
+/* $Id: polys1.cc,v 1.33 2000-02-10 16:46:55 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -972,7 +972,7 @@ poly pOrdPolyMerge(poly p)
       if (pNext(p) == NULL)
       {
         result=pAdd(result, qq);
-	pTest(result);
+        pTest(result);
         return result;
       }
       if (pComp0(p,pNext(p)) != 1)
@@ -1043,12 +1043,29 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
     if (OldPar==0)
     {
       qq = pInit();
-      pGetCoeff(qq)=nMap(pGetCoeff(p));
+      number n=nMap(pGetCoeff(p));
+      if ((currRing->minpoly!=NULL)
+      && ((rField_is_Zp_a()) || (rField_is_Q_a())))
+        nNormalize(n);
+      pGetCoeff(qq)=n;
+      pTest(qq);
     }
     else
     {
       qq=pOne();
       aq=naPermNumber(pGetCoeff(p),par_perm,OldPar);
+      if ((currRing->minpoly!=NULL)
+      && ((rField_is_Zp_a()) || (rField_is_Q_a())))
+      {
+        poly tmp=aq;
+        while (tmp!=NULL)
+        {
+          number n=pGetCoeff(tmp);
+          nNormalize(n);
+          pGetCoeff(tmp)=n;
+          pIter(tmp);
+        }
+      }
       pTest(aq);
     }
     pSetComp(qq, pRingGetComp(oldRing,p));
@@ -1059,6 +1076,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
     else
     {
       int i;
+      int mapped_to_par=0;
       for(i=1; i<=OldpVariables; i++)
       {
         int e=pRingGetExp(oldRing,p,i);
@@ -1074,6 +1092,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
           {
             lnumber c=(lnumber)pGetCoeff(qq);
             c->z->e[-perm[i]-1]+=e/*pRingGetExp(oldRing, p,i)*/;
+            mapped_to_par=1;
           }
           else
           {
@@ -1083,14 +1102,22 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
           }
         }
       }
+      if (mapped_to_par
+      && (currRing->minpoly!=NULL))
+      {
+        number n=pGetCoeff(qq);
+        nNormalize(n);
+        pGetCoeff(qq)=n;
+      }
+      pTest(qq);
     }
     pIter(p);
 #if 1
     if (qq!=NULL)
     {
       pSetm(qq);
-      pTest(qq);
       pTest(aq);
+      pTest(qq);
       if (aq!=NULL) qq=pMult(aq,qq);
       aq = qq;
       while (pNext(aq) != NULL) pIter(aq);

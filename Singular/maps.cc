@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.21 1999-11-15 17:20:21 obachman Exp $ */
+/* $Id: maps.cc,v 1.22 2000-02-10 16:46:54 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -503,6 +503,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         res->rtyp=POLY_CMD;
         if (currRing->minpoly!=NULL)
           res->data=(void *)pMult((poly)res->data,pOne());
+	pTest((poly) res->data);
       }
       else
       {
@@ -510,21 +511,18 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         if (currRing->minpoly!=NULL)
         {
           number a=(number)res->data;
-          number b=nInit(1);
-          number c=nMult(a,b);
-          nDelete(&a);
-          nDelete(&b);
-          res->data=(void *)c;
+	  nNormalize(a);
+          res->data=(void *)a;
         }
+        nTest((number) res->data);
       }
-      nTest((number) res->data);
       break;
     case POLY_CMD:
     case VECTOR_CMD:
-      if (what==FETCH_CMD)
+      if ((what==FETCH_CMD)&& (nMap==nCopy))
         res->data=(void *)prCopyR( (poly)data, preimage_r);
       else
-      if (what==IMAP_CMD)
+      if ((what==IMAP_CMD) || ((what==FETCH_CMD) /* && (nMap!=nCopy)*/))
         res->data=(void *)pPermPoly((poly)data,perm,preimage_r,par_perm,P);
       else /*if (what==MAP_CMD)*/
       {
