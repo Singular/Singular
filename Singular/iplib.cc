@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.47 1998-12-10 13:14:24 krueger Exp $ */
+/* $Id: iplib.cc,v 1.48 1998-12-15 08:39:14 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -611,9 +611,7 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
   for(i=0; suffix[i] != NULL; i++) {
     sprintf(libname, "%s%s", id, suffix[i]);
     *libname = mytolower(*libname);
-    //Print("Trying to load '%s'\n", libname);
     if((LT = type_of_LIB(libname, libnamebuf)) != LT_NONE) {
-      //Print("    Found lib'%s'\n", libnamebuf);
       if(!(LoadResult = iiLibCmd(mstrdup(libname), FALSE))) {
         v->name = iiConvName(libname);
         break;
@@ -680,6 +678,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   if(IsCmd(plib, &token))
   {
     Werror("'%s' is resered identifier\n", plib);
+    fclose(fp);
     return TRUE;
   }
   hl = namespaceroot->get("LIB",0, TRUE);
@@ -760,6 +759,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     if(IDTYP(pl)!=PACKAGE_CMD)
     {
       Warn("not of typ package.");
+      fclose(fp);
       return TRUE;
     }
   }
@@ -771,15 +771,14 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   
 #ifdef HAVE_NAMESPACES
   if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
-  fclose(fp);
   namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
 
   FreeL((ADDRESS)newlib);
 #ifdef HAVE_NAMESPACES
-   FreeL((ADDRESS)plib);
+  FreeL((ADDRESS)plib);
 #endif /* HAVE_LIBPARSER */
-  return LoadResult;
+ return LoadResult;
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
@@ -792,16 +791,16 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
   lib_style_types lib_style;
 
   yylpin = fp;
-# if YYLPDEBUG > 1
+#if YYLPDEBUG > 1
   print_init();
-#  endif
+#endif
   extern int lpverbose;
   if (BVERBOSE(V_DEBUG_LIB)) lpverbose=1; else lpverbose=0;
-# ifdef HAVE_NAMESPACES
+#ifdef HAVE_NAMESPACES
    yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
-# else /* HAVE_NAMESPACES */
+#else /* HAVE_NAMESPACES */
   yylplex(newlib, libnamebuf, &lib_style);
-# endif /* HAVE_NAMESPACES */
+#endif /* HAVE_NAMESPACES */
   if(yylp_errno)
   {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
@@ -816,11 +815,20 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     Werror("Cannot load library,... aborting.");
     reinit_yylp();
     fclose( yylpin );
-    FreeL((ADDRESS)newlib);
     return TRUE;
   }
+#ifdef HAVE_NAMESPACES
+  if (BVERBOSE(V_LOAD_LIB)) {
+    idhdl versionhdl  = namespaceroot->get("version",0);
+    if(versionhdl != NULL)
+      Print( "// ** loaded %s %s\n", libnamebuf, IDSTRING(versionhdl));
+    else
+      Print( "// ** loaded %s\n", libnamebuf);
+  }
+#else /* HAVE_NAMESPACES */
   if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s %s\n", libnamebuf,
                                    text_buffer);
+#endif /* HAVE_NAMESPACES */
   if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
   {
     Warn( "library %s has old format. This format is still accepted,", newlib);
@@ -838,7 +846,6 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     {
       if(ls->to_be_done)
       {
-        //Print("// Processing id %d LIB:%s\n", ls->cnt, ls->get());
         ls->to_be_done=FALSE;
 #ifdef HAVE_NAMESPACES
         iiLibCmd(ls->get(), autoexport);
@@ -846,7 +853,6 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
         iiLibCmd(ls->get());
 #endif /* HAVE_NAMESPACES */
         ls = ls->pop(newlib);
-        //Print("Done\n");
       }
     }
 #if 0
@@ -859,6 +865,8 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     PrintS("--------------------\n");
 #endif
   }
+
+  fclose(fp);
   return FALSE;
 }
 
