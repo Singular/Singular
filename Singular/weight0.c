@@ -1,17 +1,30 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight0.c,v 1.2 1997-07-07 15:22:28 Singular Exp $ */
+/* $Id: weight0.c,v 1.3 1998-01-27 15:40:48 pohl Exp $ */
 
 /*
 * ABSTRACT:
 */
 
 #include <math.h>
+#include <string.h>
 #include "mod2.h"
 #include "tok.h"
 #include "mmemory.h"
 
+double wFunctionalMora(int *degw, int *lpol, int npol,
+       double *rel, double wx);
+double wFunctionalBuch(int *degw, int *lpol, int npol,
+       double *rel, double wx);
+double * wDouble(void *adr);       
+void wAdd(int *A, int mons, int kn, int xx);
+void wNorm(int *degw, int *lpol, int npol, double *rel);
+void wFirstSearch(int *A, int *x, int mons,
+        int *lpol, int npol, double *rel, double *fopt);
+void wSecondSearch(int *A, int *x, int *lpol,
+        int npol, int mons, double *rel, double *fk);
+void wGcd(int *x, int n);        
 /*0 implementation*/
 
 short * ecartWeights=NULL;
