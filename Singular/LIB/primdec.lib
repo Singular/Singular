@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.89 2001-01-11 12:04:18 pfister Exp $";
+version="$Id: primdec.lib,v 1.90 2001-01-11 13:24:34 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2850,7 +2850,7 @@ static proc radicalKL (ideal i,ideal ser,list #)
    }
 
    list indep,fett;
-   intvec @w,@hilb;
+   intvec @w,@hilb,op;
    int @wr,@n,@m,lauf,di;
    ideal fac,@h,collectrad,lsau;
    poly @q;
@@ -2859,7 +2859,6 @@ static proc radicalKL (ideal i,ideal ser,list #)
    def  @P = basering;
    int jdim=dim(i);
    int  homo=homog(i);
-   intvec op=option(get);
    ideal rad=ideal(1);
    ideal te=ser;
    if(size(#)>0)
@@ -2982,11 +2981,12 @@ static proc radicalKL (ideal i,ideal ser,list #)
          {
             @h[@n]=leadcoef(@j[@n]);
          }
-     
+         op=option(get);     
          option(redSB);
          @j=interred(@j);  //to obtain a reduced standardbasis
          attrib(@j,"isSB",1);
          option(set,op);
+
          ideal zero_rad= zeroRad(@j);
       }
       else
@@ -3043,11 +3043,13 @@ static proc radicalKL (ideal i,ideal ser,list #)
          {
             @q=@q*fac[lauf];
          }
+         op=option(get);
          option(returnSB);
          option(redSB);
          i=quotient(i+ideal(@q),rad);
          attrib(i,"isSB",1);
          option(set,op);
+
       }
       if((deg(rad[1])>0)&&(deg(collectrad[1])>0))
       {
@@ -4509,7 +4511,7 @@ EXAMPLE: example radical; shows an example
          re=intersect(re,radicalKL(pr[s+1-j],re,il));
       }
    }
-   return(phi(re));
+   return(interred(phi(re)));
 }
 example
 { "EXAMPLE:";  echo = 2;
