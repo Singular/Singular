@@ -1,9 +1,9 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.8 1998-11-23 08:40:37 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.9 1998-11-24 15:12:33 mschulze Exp $ */
 /*
-* ABSTRACT: conversion between polys and coef vectors
+* ABSTRACT: conversion between polys and coeff vectors
 */
 
 #include "mod2.h"
@@ -151,7 +151,7 @@ poly pcvN2M(int n)
   }
 }
 
-poly pcvP2CV(poly p,int d0,int d1)
+poly pcvP2cv(poly p,int d0,int d1)
 {
   poly cv=NULL;
   while(p)
@@ -169,7 +169,7 @@ poly pcvP2CV(poly p,int d0,int d1)
   return cv;
 }
 
-poly pcvCV2P(poly cv,int d0,int d1)
+poly pcvCv2p(poly cv,int d0,int d1)
 {
   poly p=NULL;
   while(cv)
@@ -189,7 +189,7 @@ poly pcvCV2P(poly cv,int d0,int d1)
   return p;
 }
 
-lists pcvP2CV(lists pl,int d0,int d1)
+lists pcvP2cv(lists pl,int d0,int d1)
 {
   lists cvl=(lists)Alloc(sizeof(slists));
   cvl->Init(pl->nr+1);
@@ -199,14 +199,14 @@ lists pcvP2CV(lists pl,int d0,int d1)
     if(pl->m[i].rtyp==POLY_CMD)
     {
       cvl->m[i].rtyp=VECTOR_CMD;
-      cvl->m[i].data=pcvP2CV((poly)pl->m[i].data,d0,d1);
+      cvl->m[i].data=pcvP2cv((poly)pl->m[i].data,d0,d1);
     }
   }
   pcvClean();
   return cvl;
 }
 
-lists pcvCV2P(lists cvl,int d0,int d1)
+lists pcvCv2p(lists cvl,int d0,int d1)
 {
   lists pl=(lists)Alloc(sizeof(slists));
   pl->Init(cvl->nr+1);
@@ -216,14 +216,14 @@ lists pcvCV2P(lists cvl,int d0,int d1)
     if(cvl->m[i].rtyp==VECTOR_CMD)
     {
       pl->m[i].rtyp=POLY_CMD;
-      pl->m[i].data=pcvCV2P((poly)cvl->m[i].data,d0,d1);
+      pl->m[i].data=pcvCv2p((poly)cvl->m[i].data,d0,d1);
     }
   }
   pcvClean();
   return pl;
 }
 
-BOOLEAN pcvP2CV(leftv res,leftv h)
+BOOLEAN pcvP2cv(leftv res,leftv h)
 {
   if(currRingHdl)
   {
@@ -239,7 +239,7 @@ BOOLEAN pcvP2CV(leftv res,leftv h)
         {
           int d1=(int)h->Data();
           res->rtyp=LIST_CMD;
-          res->data=pcvP2CV(pl,d0,d1);
+          res->data=pcvP2cv(pl,d0,d1);
           return FALSE;
         }
       }
@@ -251,7 +251,7 @@ BOOLEAN pcvP2CV(leftv res,leftv h)
   return TRUE;
 }
 
-BOOLEAN pcvCV2P(leftv res,leftv h)
+BOOLEAN pcvCv2p(leftv res,leftv h)
 {
   if(currRingHdl)
   {
@@ -267,7 +267,7 @@ BOOLEAN pcvCV2P(leftv res,leftv h)
         {
           int d1=(int)h->Data();
           res->rtyp=LIST_CMD;
-          res->data=pcvCV2P(pl,d0,d1);
+          res->data=pcvCv2p(pl,d0,d1);
           return FALSE;
         }
       }
