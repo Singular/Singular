@@ -1,0 +1,16 @@
+@ifclear singularmanual
+@strong{Important:} Please see
+@ifhtml
+@uref{COPYING.html, COPYING}
+@end ifhtml
+@ifnothtml
+the file COPYING contained in the distribution
+@end ifnothtml
+for license information on @sc{Singular}. Please register yourself as a
+@sc{Singular} user by using the registration form on the @sc{Singular}
+homepage @uref{http://www.singular.uni-kl.de}.
+If for some reason you cannot access the registration form, you can also
+register by sending an email to @email{singular@@mathematik.uni-kl.de}
+with subject line @code{register} and body containing the following data:
+your name, email address, organisation, country and platform(s).
+@end ifclear
