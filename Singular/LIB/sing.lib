@@ -1,8 +1,8 @@
-// $Id: sing.lib,v 1.17 1999-09-21 17:32:18 Singular Exp $
+// $Id: sing.lib,v 1.18 1999-11-11 16:03:33 Singular Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.17 1999-09-21 17:32:18 Singular Exp $";
+version="$Id: sing.lib,v 1.18 1999-11-11 16:03:33 Singular Exp $";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de
@@ -20,7 +20,7 @@ PROCEDURES:
  milnor(i);             milnor number of ideal i; (assume i is ICIS in nf)
  nf_icis(i);            generic combinations of generators; get ICIS in nf
  slocus(i);             ideal of singular locus of ideal i
- spectrum(f,w);         spectrum numbers of w-homogeneous polynomial f
+ qhspectrum(f,w);       spectrum numbers of w-homogeneous polynomial f
  Tjurina(i);            SB of Tjurina module of ideal i (assume i is ICIS)
  tjurina(i);            Tjurina number of ideal i (assume i is ICIS)
  T1(i);                 T1-module of ideal i
@@ -377,8 +377,8 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc spectrum (poly f, intvec w)
-"USAGE:   spectrum(f,w);  f=poly, w=intvec;
+proc qhspectrum (poly f, intvec w)
+"USAGE:   qhspectrum(f,w);  f=poly, w=intvec;
 ASSUME:  f is a weighted homogeneous isolated singularity w.r.t. the weights
          given by w; w must consist of as many positive integers as there
          are variables of the basering
@@ -388,7 +388,7 @@ RETURN:  intvec  d,s1,...,su  where:
          d = w-degree(f)  and  si/d = ith spectral-number(f)
          No return value if basering has parameters or if f is no isolated
          singularity, displays a warning in this case
-EXAMPLE: example spectrum; shows an example
+EXAMPLE: example qhspectrum; shows an example
 "
 {
    int i,d,W;
@@ -424,7 +424,7 @@ example
    ring r;
    poly f=x3+y5+z2;
    intvec w=10,6,15;
-   spectrum(f,w);
+   qhspectrum(f,w);
    // the spectrum numbers are:
    // 1/30,7/30,11/30,13/30,17/30,19/30,23/30,29/30
 }

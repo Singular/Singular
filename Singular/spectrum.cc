@@ -1288,14 +1288,14 @@ BOOLEAN    spectrumOp3  ( leftv res, leftv u, leftv v, leftv w )
 BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
 {
   semicState  state;
-  BOOLEAN qh=((int)w->Data())==1);
+  BOOLEAN qh=(((int)w->Data())==1);
 
   // -----------------
   //  check arguments
   // -----------------
 
-  lists l1 = (lists)first->Data( );
-  lists l2 = (lists)second->Data( );
+  lists l1 = (lists)u->Data( );
+  lists l2 = (lists)v->Data( );
 
   if( (state=list_is_spectrum( l1 ))!=semicOK )
   {
@@ -1312,11 +1312,11 @@ BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
     spectrum s1( l1 );
     spectrum s2( l2 );
 
-    result->rtyp = INT_CMD;
+    res->rtyp = INT_CMD;
     if (qh)
-      result->data = (void*)(s1.mult_spectrumh( s2 ));
+      res->data = (void*)(s1.mult_spectrumh( s2 ));
     else
-      result->data = (void*)(s1.mult_spectrum( s2 ));
+      res->data = (void*)(s1.mult_spectrum( s2 ));
   }
 
   // -----------------
@@ -1327,8 +1327,8 @@ BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
 }
 BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
 {
-  sleft tmp;
-  memset(&tmp,0,sizeof(tmp);
+  sleftv tmp;
+  memset(&tmp,0,sizeof(tmp));
   tmp.rtyp=INT_CMD;
   /* tmp.data = (void *)0;  -- done by memset */
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.184 1999-10-22 11:14:10 obachman Exp $ */
+/* $Id: iparith.cc,v 1.185 1999-11-11 16:03:31 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -281,7 +281,7 @@ cmdnames cmds[] =
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
   #ifdef HAVE_SPECTRUM
-  { "Spectrum",    0, SPECTRUM_CMD ,      CMD_123},
+  { "spectrum",    0, SPECTRUM_CMD ,      CMD_123},
   { "semic",       0, SEMIC_CMD ,         CMD_23},
   #endif
   #ifdef OLD_RES
@@ -1851,7 +1851,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   intvec **weights=NULL;
   int wmaxl=maxl;
   ideal u_id=(ideal)u->Data();
-  
+
   maxl--;
   if ((maxl==-1) && (iiOp!=MRES_CMD))
     maxl = pVariables-1;
