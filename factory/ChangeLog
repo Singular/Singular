@@ -1,8 +1,35 @@
+Mon Jul 21 12:58:04 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (distfiles): NEWS and INSTALL added to
+	  distribution
+
+	* configure.in (factory_version): version number incremented
+	* INSTALL: version number incremented
+	* README: version number incremented
+
+	* configure.in: doc fix
+
+	* GNUmakefile.in (dist): changed suffix of distribution suffix
+	  (distclean): changed suffix of distribution suffix
+
+	* NEWS: doc fix
+
+	* INSTALL: doc fix
+
+	* INSTALL: new file
+
+	* README: doc fix
+
+	* GNUmakefile.in (installgftables): bug fixes undone
+	(installgftables): completely rewritten
+
 Sat Jul 19 08:57:34 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* cf_gcd.cc (gcd_poly): call to sparsemod() added
+	* GNUmakefile.in (installgftables): bug fix
 
-	* cf_chinese.cc (chineseRemainder): doc fix
+	* GNUmakefile.in (dist): output is more beautyful now
+
+	* cf_gcd.cc (gcd_poly): call to sparsemod() added
 
 	* cf_ops.cc (resultant): assertion added
 	(resultant): new variable flipFactor
@@ -20,6 +47,9 @@ Sat Jul 19 08:57:34 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Thu Jul 17 11:05:04 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
+	* sm_util.cc: doc fix
+	(interpol): doc fix
+
 	* sm_util.h (REArray): bug fix
 
 	* sm_sparsemod.cc: new file
@@ -32,13 +62,15 @@ Thu Jul 17 11:05:04 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Wed Jul 16 11:35:06 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* cf_chinese.cc: doc fix
-
 	* cf_chinese.cc: doc checked
 
-	* cf_chinese.h: doc fix
+	* cf_chinese.cc: doc fix
+
+	* cf_chinese.cc (chineseRemainder): doc fix
 
 	* cf_chinese.h: doc checked
+
+	* cf_chinese.h: doc fix
 
 	* .cvsignore (config.cache): new entry
 
@@ -59,9 +91,9 @@ Tue Jul 15 14:47:53 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* sm_util.h: doc checked
 
-	* sm_sparsemod.h: new file
-
 	* sm_sparsemod.h: doc checked
+
+	* sm_sparsemod.h: new file
 
 Mon Jul 14 10:00:59 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
