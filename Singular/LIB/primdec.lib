@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.91 2001-01-11 15:52:32 pfister Exp $";
+version="$Id: primdec.lib,v 1.92 2001-01-12 13:08:26 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2097,7 +2097,6 @@ EXAMPLE: example decomp; shows an example
        return(imap(gnir,pr));
     }
   }
-
   //----------------------------------------------------------------
   //j is the ring
   //----------------------------------------------------------------
@@ -2168,7 +2167,6 @@ EXAMPLE: example decomp; shows an example
   //j intersected with K[var(indep[3]+1),...,var(nvar] is zero,
   //indep[1] is the new varstring and indep[2] the string for block-ordering
   //------------------------------------------------------------------
-
   if(@wr!=1)
   {
      allindep=independSet(@j);
@@ -2359,7 +2357,6 @@ EXAMPLE: example decomp; shows an example
      @h=imap(quring,@h);
 
      kill quring;
-
 
      @n2=size(quprimary);
      @n3=@n2;
@@ -2580,11 +2577,11 @@ EXAMPLE: example decomp; shows an example
               @h[@n]=leadcoef(@j[@n]);
            }
            //the primary decomposition of j*K(var(nnp+1),..,var(nva))[..rest..]
-           op=option(redSB);
+
+           op=option(get);
            option(redSB);
            list uprimary= zero_decomp(@j,ser,@wr);
            option(set,op);
-
 
            //we need the intersection of the ideals in the list quprimary with 
            //the polynomialring, i.e. let q=(f1,...,fr) in the quotientring
@@ -2849,16 +2846,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 static proc radicalKL (ideal i,ideal ser,list #)
 {
-  attrib(i,"isSB",1);   // i needs to be a reduced standard basis
-  //--------------------------------------------------------------------------
-  //i is the zero-ideal
-  //-------------------------------------------------------------------------
-
-   if(size(i)==0)
-   {
-      return(ideal(0));
-   }
-
+   attrib(i,"isSB",1);   // i needs to be a reduced standard basis
    list indep,fett;
    intvec @w,@hilb,op;
    int @wr,@n,@m,lauf,di;
@@ -2903,7 +2891,6 @@ static proc radicalKL (ideal i,ideal ser,list #)
    {
       return(zeroRad(i));
    }
-
    //-------------------------------------------------------------------------
    //search for a maximal independent set indep,i.e.
    //look for subring such that the intersection with the ideal is zero
@@ -4494,29 +4481,29 @@ EXAMPLE: example radical; shows an example
    }
    def @P=basering;
    int j,il;
-   if(size(#)>0)
-   {
-     il=#[1];
-   }
+   if(size(#)>0){il=#[1];}
+   if(size(i)==0){return(ideal(0));}
    ideal re=1;
    intvec op = option(get);
    list qr=simplifyIdeal(i);
-
    map phi=@P,qr[2];
-   ideal k=qr[1];
+
    option(redSB);
-   k=groebner(k);
+   i=groebner(qr[1]);
    option(set,op);
-   int di=dim(k);
+   int di=dim(i);
+
    if(di==0)
    {
-     i=zeroRad(k,i);
+     i=zeroRad(i,qr[1]);
      return(interred(phi(i)));
    }
+
    option(redSB);
-   list pr=facstd(k);
+   list pr=facstd(i);
    option(set,op);
    int s=size(pr);
+
    for(j=1;j<=s;j++)
    {
       attrib(pr[s+1-j],"isSB",1);
