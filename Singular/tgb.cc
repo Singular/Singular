@@ -4002,7 +4002,7 @@ static poly gcd_of_terms(poly p, ring r){
   while (t!=NULL){
     
     if (max_g_0==0) break;
-    for (i=pVariables; i; i--)
+    for (i=max_g_0; i; i--)
     {
       pSetExp(m,i, min(pGetExp(t,i),pGetExp(m,i)));
       if (max_g_0==i)
@@ -4012,14 +4012,16 @@ static poly gcd_of_terms(poly p, ring r){
 	max_g_0=i;
       }
     }
-                t=t->next;
+    t=t->next;
   }
-        for (i=pVariables;i;i--)
-        {
-                if(pGetExp(m,i)>0)
-                        return m;
-  }
-        pDelete(&m);
+  // for (i=pVariables;i;i--)
+//   {
+//     if(pGetExp(m,i)>0)
+//       return m;
+//   }
+  if (max_g_0>0)
+    return m;
+  pDelete(&m);
   return NULL;
 }
 static BOOLEAN pHasNotCFExtended(poly p1, poly p2, poly m)
