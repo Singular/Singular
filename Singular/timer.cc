@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: timer.cc,v 1.3 1997-03-27 20:26:04 obachman Exp $";
+static char rcsid[] = "$Id: timer.cc,v 1.4 1997-03-27 20:37:17 obachman Exp $";
 /*
 *  ABSTRACT - get the computing time
 */
@@ -130,6 +130,7 @@ static struct timezone tzp;
 void initRTimer()
 {
   gettimeofday(&startRl, &tzp);
+  gettimeofday(&iStartRTime, &tzp);
 }
 
 void startRTimer()
