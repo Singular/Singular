@@ -1,15 +1,12 @@
-// $Id: classify.lib,v 1.16 1997-11-10 19:18:41 krueger Exp $
-//
-//  A library for the classification of isolated hypersurface singularities
-//  with respect to right equivalence. Based on the determinator of 
-//  singularities by V.I. Arnold.
-//  Author: Kai Krueger, (ev. Post Adresse)
-//  Please send bugs and comments to krueger@mathematik.uni-kl.de
-//  last modified: 
-//
+// $Id: classify.lib,v 1.17 1997-12-02 18:34:08 krueger Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES  
+
+   A library for classifying isolated hypersurface singularities w.r.t. right
+   equivalence, based on the determinator of singularities by V.I. Arnold.
+   Author: Kai Krueger, krueger@mathematik.uni-kl.de
+   last modified: 08.11.1997
 
 basicinvariants(f);  computes Milnor number, determinacy-bound and corank of f
 classify(f);         normal form of poly f determined with Arnold's method
@@ -20,28 +17,19 @@ internalfunctions(); display names of internal procedures of this library
 milnorcode(f[,e]);   Hilbert poly of [e-th] Milnor algebra coded with Hcode
 morsesplit(f);       residual part of f after applying the splitting lemma
 quickclass(f)        normal form of f determined by invariants (milnorcode)
-//singinfo(N,[k,]);    info about singularity given by its name N and index k
 singularity(s,[]);   normal form of singularity given by its name s and index
-                     moduli may be given.
 swap (a,b);          returns b,a
 tschirnhaus(f,v);    Tschirnhaus transformation of f w.r.t. variable v
-(parameters in square brackets [] are optional)
-AL(s/f)              shortcut for quickclass(f) or normalform(s)
+A_L(s/f)              shortcut for quickclass(f) or normalform(s)
 normalform(s);       normal form of singularity given by its name s
+debug_log (lev,[])   print trace and debugging information w.r.t level>@DeBug
+           (parameters in square brackets [] are optional)
 
-debug_log (int level, list #)     printout trace and debugging information
-                                  depending on level>@DeBug.  
-
-// required libraries
 LIB "inout.lib";
 LIB "elim.lib";
 LIB "sing.lib";
-
-proc Classify
-{
-  return(classify(#[1]));
-}
 ///////////////////////////////////////////////////////////////////////////////
+
 proc classify (poly f_in)
 USAGE:    classify(f);  f=poly
 COMPUTE:  normal form and singularity type of f with respect to right
@@ -51,15 +39,14 @@ COMPUTE:  normal form and singularity type of f with respect to right
 RETURN:   normal form of f, of type poly
 REMARK:   This version of classify is only alpha. Please send bugs and
           comments to: "Kai Krueger" <krueger@mathematik.uni-kl.de>
-          Be shure to have at least Singular version 0.9.3, better 1.0.1
+          Be sure to have at least Singular version 0.9.3, better 1.0.1
           Updates can be found under:
-          URL=http://www.mathematik.uni-kl.de/~krueger/...
+          URL=http://www.mathematik.uni-kl.de/~krueger/Singular/
 NOTE:     type init_debug(n); (0 <= n <= 10) in order to get intermediate 
           information, higher values of n give more information.
           The proc creates several global objects with names all starting
           with @, hence there should be no name conflicts 
 EXAMPLE:  example classify; shows an example
-
 {
 //---------------------------- initialisation ---------------------------------
   poly   f_out;
@@ -85,9 +72,9 @@ EXAMPLE:  example classify; shows an example
   poly f_out = v[1];
   s2 = v[2];          // s2: Typ des Polynoms f z.b: E[18]
   corank = v[3];
-//hh;
+
 //---------------- collect results and create return-value --------------------
-  if( s2=="Fehler!" || s2=="NoClass") { 
+  if( s2=="error!" || s2=="NoClass") { 
       setring ring_ext;
       return(f_in);
   }
@@ -109,8 +96,8 @@ example
    ring r=0,(x,y,z),ds;
    poly f=(x2+3y-2z)^2+xyz-(x-y3+x2*z3)^3;
    classify(f);
-   //init_debug(3);
-   //classify(f);
+   init_debug(3);
+   classify(f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,7 +145,7 @@ proc Klassifiziere (poly f)
     if(Mu<0) {
       debug_log(0, "The Milnor number of the function is infinite.");
       debug_log(0, "The singularity is not in Arnolds list.");
-      return(printresult(1, 1, "Fehler!", cstn, -1));
+      return(printresult(1, 1, "error!", cstn, -1));
     }
 
     f = jet(f, K);
@@ -233,7 +220,7 @@ proc Funktion1bis (poly f, list cstn)
     if(corank == 2) { v_class = Funktion3(G, cstn); }
     else {
       if(corank == 3) { v_class = Funktion50(G, cstn); }
-      else { v_class = printresult(1, f, "Fehler!", cstn, -1); }
+      else { v_class = printresult(1, f, "error!", cstn, -1); }
     }
 //-------------------------- classification done ------------------------------
     poly f_result = v_class[1];
@@ -270,11 +257,11 @@ proc Funktion3 (poly f, list cstn)
       if( Mult == 2) { return(Funktion6(f, cstn));}         // series E,J
       debug_log(0, "dimension 1 und deg != 1, 2 => error, ", 
                         "this should never occur");
-      return(printresult(3, f, "Fehler!", cstn, -1));
+      return(printresult(3, f, "error!", cstn, -1));
       // Should never reach this line
     }
     // Should never reach this line
-    return(printresult(3, f, "Fehler!", cstn, -1));
+    return(printresult(3, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -352,7 +339,7 @@ proc Funktion6 (poly f, list cstn)
       }
     }
     // Should never reach this line
-    return(printresult(6, f, "Fehler!", cstn, -1));
+    return(printresult(6, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -389,7 +376,7 @@ proc Funktion13 (poly f, list cstn)
       if( Mult == 3 ) { return(Funktion25(f, cstn)); }
     } 
     // Should never reach this line
-    return(printresult(13, f, "Fehler!", cstn, -1));
+    return(printresult(13, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -456,7 +443,7 @@ proc Funktion17 (poly f, list cstn)
       }
     }
     // Should never reach this line
-    return(printresult(17, f, "Fehler!", cstn, -1));
+    return(printresult(17, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -510,7 +497,7 @@ proc Funktion25 (poly f, list cstn)
            return(printresult(32, f, 
                   "W#["+string(k)+","+string(Mu-12*k-2)+"]", cstn, 3*k-1));
         }
-        return(printresult(29, f, "Fehler!", cstn, -1));
+        return(printresult(29, f, "error!", cstn, -1));
       }
       else {
         // x^4 oder x^2(x^2+x(2)^2k+1)
@@ -521,7 +508,7 @@ proc Funktion25 (poly f, list cstn)
            return(printresult(31, f, "W["+string(k)+","+string(Mu-12*k-3)+"]",
                   cstn, 3*k-1));
         }
-        if( Dim != 1 ) { return(printresult(29, f, "Fehler!", cstn, -1)); }
+        if( Dim != 1 ) { return(printresult(29, f, "error!", cstn, -1)); }
 
         //-------------------------- step 33(k) -------------------------------
         JetId = x(1)^4 + x(1)*x(2)^(3*k+2);   // check jet x4,xy3k+2 : W[12k+5]
@@ -559,13 +546,13 @@ proc Funktion25 (poly f, list cstn)
             }
           }
           if(Mult!=3) { 
-            return(printresult(36, f, "Fehler!", cstn, -1)); }
+            return(printresult(36, f, "error!", cstn, -1)); }
         }
-        else { return(printresult(36, f, "Fehler!", cstn, -1)); }
+        else { return(printresult(36, f, "error!", cstn, -1)); }
       }
     }  // Ende der While-Schleife
     // Should never reach this line
-    return(printresult(25, f, "Fehler!", cstn, -1));
+    return(printresult(25, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -596,8 +583,8 @@ proc Funktion40 (poly f, list cstn, int k)
     list v=Klassifiziere(map_top2tmp(b));
     init_debug(oldDebug);
     Typ = v[2];
-    Typ,kr,rr,sr=DecodeNormalFormString(Typ);
-    r = kr-k;
+    Typ, kr, rr, sr = DecodeNormalFormString(Typ);
+    r   = kr-k;
     setring ring_top;
     if( Typ == "E[6k]" ) { 
        return(printresult(42, f, "Z["+string(k)+","+string(12*k+6*r-1)+"]", 
@@ -620,7 +607,7 @@ proc Funktion40 (poly f, list cstn, int k)
               cstn, 3*k+r-2));
     }
     // Should never reach this line
-    return(printresult(40, f, "Fehler!", cstn, -1));
+    return(printresult(40, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -672,7 +659,7 @@ proc Funktion50 (poly f, list cstn)
     }
 
     // Should never reach this line
-    return(printresult(50, f, "Fehler!", cstn, -1));
+    return(printresult(50, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -899,7 +886,7 @@ proc Funktion59 (poly f, list cstn)
       }
     }
     // Should never reach this line
-    return(printresult(59, f, "Fehler!", cstn, -1));
+    return(printresult(59, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -928,7 +915,7 @@ proc Funktion66 (poly f, list cstn)
     JetId = jacob(fx);
     JetId = std(JetId);
     "nach z:",Show(fz), "  Id=", JetId, "  Dim=", dim(JetId);
-    return(printresult(1, 66, "Fehler!", cstn, -1));
+    return(printresult(1, 66, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1025,7 +1012,7 @@ proc Funktion82 (poly f, list cstn)
     if( C[1,1] == 0 && C[2,1] != 0 && C[3,1] == 0 && C[4,1] != 0 ) { 
       return(Funktion83(f, cstn));
     }
-    return(printresult(82, f, "Fehler!", cstn, -1));
+    return(printresult(82, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1169,7 +1156,7 @@ proc Funktion83 (poly f, list cstn)
       } // ende dim=1
       else { return(printresult(83, f, "NoClass", cstn, -1)); }
     } // ENDE While
-    return(printresult(83, f, "Fehler!", cstn, -1));
+    return(printresult(83, f, "error!", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1320,27 +1307,11 @@ proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
       d = Coeff(fk, x(1)*x(2), x(1)*x(2)^3);
 
       if( (a != 0) && (b != 0) ) {  
-        debug_log(8, "Mx", Matx);
-        debug_log(8, "My", Maty);
-        debug_log(8, "C(Mx[1,1], y, y)=", Coeff(Matx[1,1], x(2), x(2)));
-        debug_log(8, "C(Mx[1,1], x, x)=", Coeff(Maty[1,1], x(1), x(1)));
-        debug_log(8, "C(Mx[1,1], x, x2)=", Coeff(Matx[2,1], x(1), x(1)^2));
-        debug_log(8, "C(Mx[1,1],xy,xy)=",Coeff(Matx[2,1],x(1)*x(2),x(1)*x(2)));
-        debug_log(8, "C(Mx[1,1], y, y2)=", Coeff(Matx[2,1], x(2), x(2)^2));
-
         B = -int(Coeff(Matx[1,1], x(2), x(2)));
         C = -int(Coeff(Maty[1,1], x(1), x(1)));
         alpha = int(Coeff(Matx[2,1], x(1), x(1)^2));
         beta  = int(Coeff(Matx[2,1], x(1)*x(2), x(1)*x(2)));
         gamma = int(Coeff(Matx[2,1], x(2), x(2)^2));
-
-        debug_log(8, "B=", B);
-        debug_log(8, "C=", C);
-        debug_log(8, "alpha=", alpha);
-        debug_log(8, "beta =", beta);
-        debug_log(8, "gamma=", gamma);
-        debug_log(8, "(B-beta)/2=", (B-beta)/2);
-        debug_log(8, "(C-beta)/2=", (C-beta)/2);
 
         bb[rvar(x(1))] = x(1) - (2*gamma / (B - beta))*x(2);
         bb[rvar(x(2))] = x(2) - ((C - beta) / (2*gamma))*x(1);
@@ -1438,15 +1409,15 @@ proc printresult (int step, poly f, string typ, list cstn, int m)
   if( @DeBug >= 0 ) {
     "The singularity";
     "   `"+Show(jet(f, K))+"'";
-    if( typ != "Fehler!" && typ != "NoClass" ) {
+    if( typ != "error!" && typ != "NoClass" ) {
       "is R-equivalent to "+typ+".";
     }
     if ( typ == "NoClass" ) {
       "is not in Arnolds list.";
     }
 //    if(K>=0)  { "  det = "+string(K); }
-    if(Mu>=0) { "   Mu = "+string(Mu); }
-    if(m>=0)  { "   m  = "+string(m); }
+    if(Mu>=0) { "   Milnor number = "+string(Mu); }
+    if(m>=0)  { "   modality      = "+string(m); }
   }
   v[1] = f;
   v[2] = typ;
@@ -1455,7 +1426,6 @@ proc printresult (int step, poly f, string typ, list cstn, int m)
   return(v);
 }
 
-///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion47 (poly f, list cstn)
 {
@@ -1517,8 +1487,8 @@ proc Funktion96 (poly f, list cstn, int k)
 ///////////////////////////////////////////////////////////////////////////////
 proc morsesplit(poly f)
 USAGE:    morsesplit(f);        f=poly
-RETURN:   Normal-Form of f in M^3";
-COMPUTE:  aplly the splittinglemma to f
+RETURN:   Normal form of f in M^3 after application of the splitting lemma
+COMPUTE:  apply the splitting lemma (generalized Morse lemma) to f
 EXAMPLE:  example morsesplit; shows an example
 {
 //---------------------------- initialisation ---------------------------------
@@ -1762,10 +1732,10 @@ proc ReOrder(poly f)
 ///////////////////////////////////////////////////////////////////////////////
 proc quickclass(poly f);
 USAGE:    quickclass(f);         f=poly
-RETURN:   Normal-Form of f
+RETURN:   Normal form of f in Arnold's list
 REMARK:   try to determine the normal form of f by invariants, mainly by
-          computing the Hilbert funktion of the Milnor albegra, no
-          coordinate change is needed (see also proc 'milnorcode').
+          computing the Hilbert funktion of the Milnor albegra,
+          no coordinate change is needed (see also proc 'milnorcode').
 EXAMPLE:  example quickclass; shows an example
 {
 //---------------------------- initialisation ---------------------------------
@@ -1801,13 +1771,13 @@ EXAMPLE:  example quickclass; shows an example
     return();
   }
   if(cnt==1) { 
-    debug_log(1,"Getting Normalform from database.");
-    "Normal form :",AL(Typ);
-    return(AL(Typ));
+    debug_log(1,"Getting normal form from database.");
+    "normal form :",A_L(Typ);
+    return(A_L(Typ));
   }
   // Hier nun der Fall cnt>1
   "Hilbert-Code of Jf^2";
-  "We have ", cnt, "case to test.";
+  "We have ", cnt, "cases to test";
   Cubic(f);
   return(Typ,cnt);
 }
@@ -1844,8 +1814,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc Hcode (intvec v)
 USAGE:    Hcode(v); v=intvec
-RETURN:   intvec, coding v according to the number of successive repetitions
-          of an entry
+RETURN:   intvec, coding v according to the number of successive
+          repetitions of an entry
 EXAMPLE:  example Hcode; shows an example.
 {
   int    col, len, i, cur, cnt, maxcoef, nlen;
@@ -2251,16 +2221,17 @@ proc HKclass7_teil_1 (intvec sg, string SG_Typ, int cnt)
 
 ///////////////////////////////////////////////////////////////////////////////
 proc singularity(string typ, list #)
-USAGE:    singularity(typ, list)
-COMPUTE:  get the Singularity named by type from the database.
-          list # is as follows:
-          #= k [,r [,s [,a [,b [,c [,d]]]]]] k,r,s=int   a,b,c,d=poly
+USAGE:    singularity(t, l); t=string (name of singularity), 
+          l=list of integers (index/indices of singularity)
+COMPUTE:  get the Singularity named by type t from the database.
+          list l is as follows:
+          l= k [,r [,s [,a [,b [,c [,d]]]]]] k,r,s=int   a,b,c,d=poly
           The name of the dbm-databasefile is: NFlist.[dir,pag]
           The file is found in the current directory. If it does not
           exists, please run the script MakeDBM first.
-RETURN:   Normal-form and corank of the singularity named by type and its
-          corank.
-EXAMPLE:  example info; shows an example
+RETURN:   Normal form and corank of the singularity named by type t and its
+          index (indices) l
+EXAMPLE:  example singularity; shows an example
 {
   poly a1, a2, a3, a4, f;
   int k, r, s;
@@ -2409,9 +2380,10 @@ USAGE:    RandomPolyK(M, Typ)
 
 ///////////////////////////////////////////////////////////////////////////////
 proc debug_log (int level, list #)
-USAGE:    debug_log(level,"comma separated message list");
+USAGE:    debug_log(level,li); level=int, li=comma separated "message" list
 COMPUTE:  print "messages" if level>=@DeBug.
-          usefull for userdefined trace-messages.
+          useful for user-defined trace messages.
+EXAMPLE:  example debug_log; shows an example
 SEE ALSO: init_debug();
 { 
    int len = size(#);
@@ -2433,9 +2405,9 @@ COMPUTE:  Set the global variable @DeBug to level. The variable @DeBug is
           used by the function debug_log(level, list of strings) to know 
           when to print the list of strings. init_debug() reports only 
           changes of @DeBug.
-EXAMPLE:  example init_debug; shows an example
 NOTE:     The procedure init_debug(n); is usefull as trace-mode. n may
           range from 0 to 10, higher values of n give more information.
+EXAMPLE:  example init_debug; shows an example
 { 
   int newDebug=0;
   if( defined(@DeBug) != 0 ) { newDebug = @DeBug; }
@@ -2504,7 +2476,7 @@ example
 proc corank(poly f)
 USAGE:    corank(f);   f=poly
 RETURN:   the corank of the Hessian matrix of f, of type int
-REMARK:   corank(f) is the number of variables accuring in the residual
+REMARK:   corank(f) is the number of variables occuring in the residual
           singulartity after applying 'morsesplit' to f
 EXAMPLE:  example corank; shows an example
 {
@@ -2652,7 +2624,7 @@ USAGE:    DecodeNormalFormString
   r = 0;
   s = 0;
 
-  if(a<0 || b<0) { return("Error",0,0,0); }
+  if(a<0 || b<0) { return("Error", 0, 0 ,0); }
   Typ = s_in[1..a-1];
   s1  = s_in[a..b];
   debug_log(6, "Suche Type:", Typ);
@@ -2734,15 +2706,16 @@ USAGE:    DecodeNormalFormString
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc AL
-USAGE:    AL(f);         f=poly
-          AL("name");    type=string
-COMPUTE:  Arnold's List.
-          For AL(f): Computes via the Milnorcode the class of f and 
-          returns the Normalform of f found in the database.
-          For AL("name"): Get the Normalform from the database for the 
-          singularity given by its name.
-EXAMPLE:  example AL; shows an example
+proc A_L
+USAGE:    A_L(f);         f=poly
+          A_L("name");    type=string
+COMPUTE:  the normal form in Arnold's list of the singularity given either
+          by a polynomial f or by its name.
+RETURN:   A_L(f): compute via 'milnorcode' the class of f and
+          return the normal form of f found in the database.
+          A_L("name"): Get the normal form from the database for
+          the singularity given by its name.
+EXAMPLE:  example A_L; shows an example
 { 
   // if trace/debug mode not set, do it!
   init_debug();
@@ -2760,15 +2733,15 @@ EXAMPLE:  example AL; shows an example
 example
 { "EXAMPLE:"; echo=2;
   ring r=0,(a,b,c),ds;  
-  poly f=AL("E[13]");
+  poly f=A_L("E[13]");
   f;
-  AL(f);
+  A_L(f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 proc normalform(string s_in)
 USAGE:    normalform(s);  s=string
-COMPUTE:
+RETURN:   Arnold's normal form of singularity with name s
 EXAMPLE:  example normalform; shows an example.
 { 
   string Typ;
@@ -2777,13 +2750,13 @@ EXAMPLE:  example normalform; shows an example.
 
   if(checkring()) { return(s_in); }
   if(nvars(basering)<=1) {
-    "We need at least 2 variables in basering, You have",nvars(basering),".";
+    "We need at least 2 variables in basering, you have",nvars(basering),".";
     return();
   }
   // if trace/debug mode not set, do it!
   init_debug();
 
-  Typ,k,r,s=DecodeNormalFormString(s_in);
+  Typ, k, r, s = DecodeNormalFormString(s_in);
   if(Typ=="Error") { return(0); }
   f, crk = singularity(Typ, k, r, s);
   return(f);
@@ -2797,7 +2770,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc swap 
 USAGE:    swap(a,b);
-RETURN:   return b,a.
+RETURN:   b,a if b,a is the input (any type)
 {
   return(#[2],#[1]); 
 }
@@ -2811,7 +2784,6 @@ proc Setring(int c, string name)
 USAGE:    
 {
   string s="ring "+name+"=0,(x(1.."+ string(c) +")),(c,ds);";
- // k;
   return(s);
 }
 
@@ -2820,8 +2792,9 @@ proc internalfunctions
 USAGE:   internalfunctions();
 RETURN:  nothing, display names of internal procedures of classify.lib
 EXAMPLE: no example
-{ "   Internal functions for the classification unsing Arnold's method:
-  Klassifiziere(poly f);             determine the type of the singularity f
+{ "   Internal functions for the classification using Arnold's method,";
+  "   the function numbers correspond to numbers in Arnold's classifier:";
+ "Klassifiziere(poly f);             determine the type of the singularity f
   Funktion1bis (poly f, list cstn)
   Funktion3 (poly f, list cstn)
   Funktion6 (poly f, list cstn)
@@ -2849,16 +2822,16 @@ EXAMPLE: no example
   printresult (string f, string typ, int Mu, int m, int corank, int K)
   ";
   "   Internal functions for the classifcation by invariants:
-  Cubic (poly f)          (for internal use only)
+  Cubic (poly f)
   parity (int e)               return the parity of e
-  HKclass (intvec i)          (for internal use only)
-  HKclass3( intvec i)         (for internal use only)
-  HKclass3_teil_1 (intvec i)  (for internal use only)
-  HKclass5 (intvec i)         (for internal use only)
-  HKclass5_teil_1 (intvec i)  (for internal use only)
-  HKclass5_teil_2 (intvec i)  (for internal use only)
-  HKclass7 (intvec i)         (for internal use only)
-  HKclass7_teil_1 (intvec i)  (for internal use only)
+  HKclass (intvec i)
+  HKclass3( intvec i, string SG_Typ, int cnt)
+  HKclass3_teil_1 (intvec i, string SG_Typ, int cnt)
+  HKclass5 (intvec i, string SG_Typ, int cnt)
+  HKclass5_teil_1 (intvec i, string SG_Typ, int cnt)
+  HKclass5_teil_2 (intvec i, string SG_Typ, int cnt)
+  HKclass7 (intvec i, string SG_Typ, int cnt)
+  HKclass7_teil_1 (intvec i, string SG_Typ, int cnt)
   ";
   "   Internal functions for the Morse-splitting lemma:
   Morse(poly fi, int K, int corank)          Splittinglemma itself
@@ -2871,13 +2844,12 @@ EXAMPLE: no example
   RandomPolyK
   Faktorisiere(poly f, poly g, int p, int k)     compute g = (ax+by^k)^p
   Teile(poly f, poly g);                  Teilt f durch g.
-  GetRf(poly f, int n);                   (for internal use only)
-  Show(poly f);                           (for internal use only)
-  checkring();                    (for internal use only)
-  DecodeNormalFormString(string s); (for internal use only)
-  Setring
+  GetRf(poly f, int n);
+  Show(poly f);
+  checkring();
+  DecodeNormalFormString(string s);
+  Setring(int n, string ringname);
   ";
 }
 ///////////////////////////////////////////////////////////////////////////////
 // E n d   O f   F i l e
-///////////////////////////////////////////////////////////////////////////////
