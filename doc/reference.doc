@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.159 1999-11-24 14:07:00 obachman Exp $
+@comment $Id: reference.doc,v 1.160 1999-11-24 14:34:29 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -83,6 +83,7 @@ brackets are allowed.
 * factorize::
 * fetch::
 * fglm::
+* fglmquot::
 * filecmd::
 * find::
 * finduni::
@@ -680,6 +681,7 @@ close(l); // shut down SINGULAR server
 @end smallexample
 @end table
 @c ref
+See
 @ref{link};
 @ref{open}.
 @c ref
@@ -844,7 +846,8 @@ M, then K*A=M' where M' is the part of M that can be expressed.
 @end table
 @c ref
 See
-@ref{coef}; @ref{kbase}.
+@ref{coef};
+@ref{kbase}.
 @c ref
 @c ---------------------------------------
 @node contract, dbprint, coeffs, Functions
@@ -1572,7 +1575,7 @@ See
 @ref{qring}.
 @c ref
 @c ---------------------------------------
-@node fglm, filecmd, fetch, Functions
+@node fglm, fglmquot, fetch, Functions
 @subsection fglm
 @cindex fglm
 
@@ -1610,6 +1613,7 @@ directly.
 @end smallexample
 @end table
 @c ref
+See
 @ref{ring};
 @ref{qring};
 @ref{std};
@@ -1617,7 +1621,46 @@ directly.
 @ref{vdim}.
 @c ref
 @c ---------------------------------------
-@node filecmd, find, fglm, Functions
+@node fglmquot, filecmd, fglm, Functions
+@subsection fglmquot
+@cindex fglmquot
+
+@table @code
+@item @strong{Syntax:}
+@code{fglmquot (} ideal@code{,} poly @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+calculates a reduced Groebner basis of the ideal quotient @math{i:p} of
+a zero-dimensional ideal @math{i} and a polynomial @math{p} using
+FGLM-techniques.
+@*The ideal must be zero-dimensional and given as a reduced Groebner
+basis in the given ring. The poly must be reduced with respect to the
+ideal. The result is a reduced Groebner basis.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),lp;
+  ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
+  option(redSB);   // force the computation of a reduced SB
+  i=std(i);
+  poly p=reduce(x+yz2+z10, i);
+  ideal j=fglmquot(i,p);
+  j;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{fglm};
+@ref{ring};
+@ref{std};
+@ref{option};
+@ref{quotient};
+@ref{vdim}.
+@c ref
+@c ---------------------------------------
+@node filecmd, find, fglmquot, Functions
 @subsection input from files
 @cindex filecmd
 @cindex <
@@ -1665,6 +1708,7 @@ in the string or 0 (if not found),
 @end smallexample
 @end table
 @c ref
+See
 @ref{string}.
 @c ref
 @c ---------------------------------------
@@ -1794,7 +1838,10 @@ returns the i-th free generator of a free module.
 @end smallexample
 @end table
 @c ref
-See @ref{freemodule}; @ref{int}; @ref{vector}.
+See
+@ref{freemodule};
+@ref{int};
+@ref{vector}.
 @c ref
 @c ---------------------------------------
 @node getdump, groebner, gen, Functions
@@ -1930,6 +1977,7 @@ help standard.lib;  // displays help about library 'standard.lib'
 @end table
 
 @c ref
+See
 @ref{Format of a library};
 @ref{Procedure definition};
 @ref{Command line options};
@@ -3239,9 +3287,9 @@ immediate garbage collection can be enforced with the command
 @end smallexample
 @end table
 @c ref
-See also
-@ref{option}
-@ref{system}
+See
+@ref{option};
+@ref{system}.
 @c ref
 @c ---------------------------------------
 @node minbase, minor, memory, Functions
@@ -4654,6 +4702,7 @@ quotient(m,id3);
 @end table
 @c ref
 See
+@ref{fglmquot};
 @ref{ideal};
 @ref{module}.
 @c ref
@@ -5725,7 +5774,8 @@ transposes a matrix.
 @end smallexample
 @end table
 @c ref
-See @ref{intmat};
+See
+@ref{intmat};
 @ref{matrix};
 @ref{module}.
 @c ref
@@ -6109,6 +6159,7 @@ execute "ideal k="+s+";"; // this defines an ideal k which
 @end smallexample
 @end table
 @c ref
+See
 @ref{read};
 @ref{link};
 @ref{Data types};
@@ -6829,7 +6880,7 @@ degBound = 0; //resets degree bound to infinity
 @end smallexample
 @end table
 @c ref
-See also
+See
 @ref{deg};
 @ref{int};
 @ref{option};
