@@ -1,0 +1,168 @@
+# $Id: Makefile.dist,v 1.1.1.1 1997-05-02 17:00:43 Singular Exp $
+#################################################
+factoryversion = 1.2b
+factorypath = ../factory/$(factoryversion)
+RM = /bin/rm -f
+MV = /bin/mv
+AR = ar cr
+RANLIB = ranlib
+LIBPREF = libfac
+OPTMARK =
+LIBFAC = $(LIBPREF)$(OPTMARK).a
+LIBFAC-G = $(LIBPREF)-g$(OPTMARK).a 
+SINGLIBFAC = libsingfac$(OPTMARK).a
+SINGLIBFAC-G = libsingfac-g$(OPTMARK).a  
+
+STRIP = strip
+# define the debugging flags here
+#
+FACDEFINES = 
+CHARDEFINES =
+DEFINES = $(FACDEFINES) $(CHARDEFINES)
+WARN = -Wall
+ALLFLAGS = -fno-implicit-templates 
+DEBFLAGS= -g $(DEFINES) $(ALLFLAGS)
+DEBFLAGSTMPL= -g $(DEFINES) 
+OPTFLAGS = -O3 $(DEFINES) $(ALLFLAGS) 
+OPTFLAGSTMPL= -O3 $(DEFINES) 
+
+IFLAGS =  -I/usr/local/include -I$(factorypath)  -I./factor
+CXX = gcc 
+OPTCXX = gcc
+CXXFLAGS = $(WARN) 
+
+# some machines don't like `gcc` as the linker for C++ code...
+# e.g. the SUN Sparc, so we use `g++` as the linker
+LD = g++ $(ALLFLAGS)
+OPTLD = g++ -s $(ALLFLAGS) 
+LDFLAGS=
+LIBPATH = -L/usr/local/lib -L$(factorypath) -L.
+
+.SUFFIXES:      .cc .h .o
+
+DEBOBJ/%.o: %.cc ; $(CXX) -c $< $(CXXFLAGS) $(IFLAGS) $(DEBFLAGS) -o $@
+
+OPTOBJ/%.o: %.cc ; $(OPTCXX) -c $< $(CXXFLAGS) $(IFLAGS) $(OPTFLAGS) -o $@
+
+DEBOBJ/%.o: charset/%.cc ; $(CXX) -c $< $(CXXFLAGS) $(IFLAGS) $(DEBFLAGS) -o $@
+
+OPTOBJ/%.o: charset/%.cc ; $(OPTCXX) -c $< $(CXXFLAGS) $(IFLAGS) $(OPTFLAGS) -o $@
+
+DEBOBJ/%.o: factor/%.cc ; $(CXX) -c $< $(CFLAGS) $(IFLAGS) $(DEBFLAGS) -o $@
+
+OPTOBJ/%.o: factor/%.cc ; $(OPTCXX) -c $< $(CFLAGS) $(IFLAGS) $(OPTFLAGS) -o $@
+
+.c.a: 
+	$(CXX) $(CFLAGS) $(OPTFLAGS) -c $< -o $*.o
+	$(AR) $@ $*.o
+	$(RANLIB) $@
+
+
+FACTORSRC1 =	factor/SqrFree.cc factor/Factor.cc \
+		factor/MVMultiHensel.cc factor/Truefactor.cc \
+		factor/helpstuff.cc  factor/debug.cc factor/version.cc \
+		factor/homogfactor.cc
+FACTORSRC1 =	factor/tmpl_inst.cc
+FACTORSRC = 	$(FACTORSRC2) $(FACTORSRC1)
+CHARSETSRC1 =	charset/csutil.cc charset/charset.cc charset/reorder.cc
+CHARSETSRC = 	$(CHARSETSRC1)
+FACTORINCL =	factor/Factor.h factor/MVMultiHensel.h factor/Truefactor.h \
+		factor/tmpl_inst.h factor/SqrFree.h factor/helpstuff.h \
+		factor/debug.h factor/timing.h factor/homogfactor.h
+CHARSETINCL =	charset/csutil.h charset/charset.h charset/reorder.h
+
+OPTFACTOROBJ1 =	OPTOBJ/SqrFree.o OPTOBJ/Factor.o OPTOBJ/MVMultiHensel.o \
+		OPTOBJ/Truefactor.o OPTOBJ/helpstuff.o OPTOBJ/version.o \
+		OPTOBJ/homogfactor.o
+OPTFACTOROBJ2 =	OPTOBJ/tmpl_inst.o
+OPTFACTOROBJ =	$(OPTFACTOROBJ2) $(OPTFACTOROBJ1)
+
+DEBFACTOROBJ1 =	DEBOBJ/SqrFree.o DEBOBJ/Factor.o DEBOBJ/MVMultiHensel.o \
+		DEBOBJ/Truefactor.o DEBOBJ/helpstuff.o DEBOBJ/version.o \
+		DEBOBJ/homogfactor.o
+DEBFACTOROBJ2 =	DEBOBJ/tmpl_inst.o
+DEBFACTOROBJ =	$(DEBFACTOROBJ2) $(DEBFACTOROBJ1)
+
+CHARSETOPTOBJ =	OPTOBJ/csutil.o OPTOBJ/charset.o OPTOBJ/reorder.o
+
+CHARSETDEBOBJ =	DEBOBJ/csutil.o DEBOBJ/charset.o DEBOBJ/reorder.o
+
+LIBS = -lfac -lcf -lmem -lgmp -lm #-lPW
+OPTLIBS = -lfac -lcf-optimize -lmem-optimize -lgmp -lm
+DEBLIBS = -lfac-g -lcf-debug -lmem-debug -lgmp -lm
+
+debtest:	libfac-g DEBOBJ/test.o
+		$(LD) -o test $(LIBPATH) DEBOBJ/test.o $(DEBLIBS)
+
+opttest:	libfac OPTOBJ/test.o   
+		$(OPTLD) -o test $(LIBPATH) OPTOBJ/test.o $(OPTLIBS)
+
+libfac.a:	$(OPTFACTOROBJ) $(CHARSETOPTOBJ)
+		$(AR) $(LIBFAC) $(OPTFACTOROBJ) $(CHARSETOPTOBJ)
+		$(RANLIB) $(LIBFAC)
+libfac:		libfac.a
+
+libfac-g.a:	$(DEBFACTOROBJ) $(CHARSETDEBOBJ)
+		$(AR) $(LIBFAC-G) $(DEBFACTOROBJ) $(CHARSETDEBOBJ)
+		$(RANLIB) $(LIBFAC-G)
+libfac-g:	libfac-g.a
+
+singlibfac.a:	$(OPTFACTOROBJ1) $(CHARSETOPTOBJ)
+		$(AR) $(SINGLIBFAC) $(OPTFACTOROBJ1) $(CHARSETOPTOBJ)
+		$(RANLIB) $(SINGLIBFAC)
+singlibfac:	singlibfac.a
+
+singlibfac-g.a:	$(DEBFACTOROBJ1) $(CHARSETDEBOBJ)
+		$(AR) $(SINGLIBFAC-G) $(DEBFACTOROBJ1) $(CHARSETDEBOBJ)
+		$(RANLIB) $(SINGLIBFAC-G)
+singlibfac-g:	singlibfac-g.a
+
+debtests:	debtest
+		(cd tests ; factortest )
+
+opttests:	opttest
+		(cd tests ; factortest )
+
+tests:		opttests
+
+newdepend: $(FACTORINCL) $(CHARSETINCL)
+	./bin/makedep -P OPTOBJ $(IFLAGS) $(FACTORSRC1) \
+				> OPTOBJ/optdepend
+	./bin/makedep -P DEBOBJ $(DEFINES) $(IFLAGS) $(FACTORSRC1) \
+				> DEBOBJ/debdepend
+depend:	newdepend
+
+clean:
+	$(RM)   test $(LIBFAC) $(LIBFAC-G) $(SINGLIBFAC) $(SINGLIBFAC-g)
+
+cleanall:	clean
+	( cd charset; make cleanall )
+	$(RM)   OPTOBJ/optdepend DEBOBJ/debdepend  \
+		DEBOBJ/*.o OPTOBJ/*.o \
+
+archive:	cleanall
+		(cd charset ; make cleanall )
+	rm -f ../libfac.tgz
+
+	gtar -zcvf ../libfac.tgz  . 
+
+disk:		archive
+	mcopy ../libfac.tgz a:\libfac.tgz
+	mcopy ../libfac.tgz a:\libfac1.tgz
+
+unpack:
+	mcopy a:\libfac.tgz ../libfac.tgz
+	gtar zxvf ../libfac.tgz
+	( cd charset ; make dirs )
+
+
+DEBOBJ/tmpl_inst.o: factor/tmpl_inst.cc ; $(CXX) -c $< $(CFLAGS) $(DEBFLAGSTMPL) $(IFLAGS) -o $@
+
+OPTOBJ/tmpl_inst.o: factor/tmpl_inst.cc ; $(OPTCXX) -c $< $(CFLAGS) $(OPTFLAGSTMPL) $(IFLAGS) -o $@
+
+OPTOBJ/optdepend:
+	./bin/makedep -P OPTOBJ  $(IFLAGS) $(FACTORSRC1)  $(CHARSETSRC1) > $@
+
+DEBOBJ/debdepend:
+	./bin/makedep -P DEBOBJ $(DEFINES) $(IFLAGS) $(FACTORSRC1) $(CHARSETSRC1) > $@
+

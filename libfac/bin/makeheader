@@ -1,0 +1,51 @@
+#!/usr/local/bin/perl
+
+###
+### makeheader - generate a header file out of several header file (ver 1.1)
+###
+
+if ( ( $#ARGV == 0 ) && ( $ARGV[0] eq '-help' ) ) {
+    die "\nThis is makeheader, a header file generation tool.\n\n" .
+	"   with makeheader it is possible to generate a single header\n" .
+	"   file out of several other header files\n" .
+	"   the parts to be included in the generated header file have\n" .
+	"   to be marked with /*BEGINPUBLIC*/ and /*ENDPUBLIC*/\n" .
+        "   to include a header file into the generated header file use\n" .
+	"   the command .INCLUDE name.h on a single line\n\n" .
+        "usage: makeheader <template> <outfile>\n\n";
+}
+
+if ( $#ARGV < 1 ) {
+    die "usage: makeheader <template> <outfile>\n\n";
+}
+
+$infile = shift( @ARGV );
+$outfile = shift( @ARGV );
+
+open( INFILE, $infile ) || 
+    die "makeheader: can not open template file $infile for reading!\n";
+open( OUTFILE, ">$outfile" ) ||
+    die "makeheader: can not open header file $outfile for writing!\n";
+
+while( $currentline = <INFILE> ) {
+    if ( index( $currentline, ".INCLUDE" ) == 0 ) {
+	$currentline =~ s/.INCLUDE //;
+	open( INCLFILE, $currentline ) ||
+	    die "can not open included file '$currentline' for reading!\n";
+	while ( $inclline = <INCLFILE> ) {
+	    if ( index( $inclline, "/*BEGINPUBLIC*/" ) >= 0 ) {
+		while (( $inclline = <INCLFILE> ) &&
+		       ( index( $inclline, "/*ENDPUBLIC*/" ) < 0 )) {
+		    print OUTFILE $inclline;
+		}
+	    }
+	}
+    }
+    else {
+	print OUTFILE $currentline;
+    }
+}
+
+close OUTFILE;
+close INFILE;
+

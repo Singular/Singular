@@ -1,0 +1,6 @@
+31991
+abcxyz
+a*(x+y+z)-(x-y-z);
+b*(x+z)-(x+y-z);
+c*(x-y+z)-(x+y);
+0;

@@ -1,0 +1,128 @@
+dnl
+dnl Process this file with autoconf to produce a configure script.
+dnl
+
+AC_INIT(factor.h)
+
+dnl
+dnl Set up variables for Makefile.in
+dnl
+AC_SUBST(libfacversion)
+libfacversion="0.2.2"
+AC_SUBST(libfac)
+libfac="libfac"
+AC_SUBST(libfac_g)
+libfac_g="libfac-g"
+AC_SUBST(libsingfac)
+libsingfac="libsingfac"
+AC_SUBST(libsingfac_g)
+libsingfac_g="libsingfac-g"
+AC_SUBST(factorH)
+factorH="factor.h"
+AC_SUBST(targetname)
+
+dnl
+dnl Parse options
+dnl
+
+AC_ARG_WITH(
+  debug,
+  [  --with-debug    build with debugging options turned on])
+
+AC_ARG_WITH(
+  Singular,
+  [  --with-Singular build for use with Singular])
+
+if test "$with_Singular" = yes; then
+  AC_DEFINE(HAVE_SINGULAR)
+  if test "$with_debug" = yes; then
+     targetname="libsingfac-g"
+  else
+     targetname="libsingfac"
+  fi
+else
+  if test "$with_debug" = yes; then
+     targetname="libfac-g"
+  else
+     targetname="libfac"
+  fi
+fi
+
+dnl
+dnl add to -I and -L, if necessary 
+dnl
+if (test "x${prefix} != xNONE && test "${prefix} != "/usr/local") || \
+  test "${ac_default_prefix}" != "/usr/local" || \
+  test "${includedir}" != '${prefix}/include'; then 
+  CPPFLAGS="-I${includedir} ${CPPFLAGS}"
+fi
+CPPFLAGS="-I./factor ${CPPFLAGS}"
+
+if (test "x${prefix} != xNONE && test "${prefix} != "/usr/local") || \
+  test "${ac_default_prefix}" != "/usr/local" || \
+  test "${libdir}" != '${prefix}/lib'; then 
+  LDFLAGS="-L${libdir} ${LDFLAGS}"
+fi
+LDFLAGS="-L. ${LDFLAGS}"
+
+if test "$with_debug" = yes; then
+  CXXFLAGS="-g"
+else
+  CXXFLAGS="-O"
+  AC_DEFINE(NDEBUG)  
+fi
+
+dnl
+dnl Checks for programs.
+dnl
+AC_LANG_CPLUSPLUS  
+AC_PROG_CXX
+AC_REQUIRE_CPP
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+AC_CHECK_PROG(AR,ar,ar)
+if test -z "$AR"; then
+  AC_MSG_ERROR(Need ar)
+fi
+
+dnl
+dnl programs for installation
+dnl
+ac_save_path=${PATH}
+PATH="$PATH:.."  
+AC_PROG_INSTALL
+AC_PATH_PROG(MKINSTALLDIRS, mkinstalldirs, -mkdir -p)
+PATH="$ac_save_path"
+
+dnl
+dnl Checks for header files.
+dnl
+AC_CHECK_HEADER(factory.h,,AC_MSG_WARN(factory.h not found!))
+
+dnl
+dnl Checks for libraries.
+dnl
+
+
+dnl
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl
+AC_C_CONST
+AC_C_INLINE
+
+dnl
+dnl Last, but not least, customize CFLAGS
+dnl
+if test ${GXX} = yes; then
+  if test "$with_debug" = yes; then
+     CXXFLAGS="-O -g"
+  else
+     CXXFLAGS="-O3 "
+  fi
+  CXXTEMPLFLAGS="-fno-implicit-templates"
+else
+  CXXTEMPFLAGS=""
+fi
+AC_SUBST(CXXTEMPLFLAGS)
+  
+AC_OUTPUT(Makefile)

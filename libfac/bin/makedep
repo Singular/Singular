@@ -1,0 +1,70 @@
+#!/usr/local/bin/perl
+
+# Usage: makedep [options] [files]
+
+# Configuration parameters.
+
+$CPP = "gcc -E";
+# $CPP = "cc -P";
+# $CPP = "/lib/cpp";
+
+# Process switches.
+
+$noglobincludes = 1;
+$prefix = "";
+
+while ($ARGV[0] =~ /^-/) {
+    $_ = shift;
+    if (/^-D(.*)/) {
+	$defines .= " -D" . ($1 ? $1 : shift);
+    }
+    elsif (/^-I(.*)/) {
+	$includes .= " -I" . ($1 ? $1 : shift);
+    }
+    elsif (/^-d(.*)/) {
+	$dir = ($1 ? $1 : shift);
+    }
+    elsif (/^-G/) {
+	$noglobincludes = 0;
+    }
+    elsif (/^-P/) {
+	$prefix .= ($1 ? $1 : shift) . "/";
+    }
+    else {
+	die "Unrecognized switch: $_\n";
+    }
+}
+
+# Do each file on command line.
+
+foreach $file (@ARGV) {
+    open(CPP,"$CPP $defines $includes $file|")
+	|| die "Can't run cpp: $!\n";
+
+    # Scan output for line directives.
+
+    %seen = ();
+    while (<CPP>) {
+	next unless /^#/;
+	next unless ($filename) = /^# \d.*"(.*)"/;
+	$seen{$filename}++;
+    }
+    close CPP;
+
+    # Figure out the corresponding object file name.
+
+    ($ofile = $file) =~ s/\.c$/.o/;
+    ($ofile = $ofile) =~ s/\.C$/.o/;
+    ($ofile = $ofile) =~ s/\.cpp$/.o/;
+    ($ofile = $ofile) =~ s/\.cxx$/.o/;
+    ($ofile = $ofile) =~ s/\.cc$/.o/;
+    $ofile =~ s#.*/##;
+    $ofile = "$dir/$ofile" if $dir;
+
+    # Print out the dependencies.
+
+    foreach (sort keys(%seen)) {
+        print "$prefix$ofile: $_\n" unless ( /^\// && $noglobincludes );
+    }
+    print "\n";
+}

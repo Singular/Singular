@@ -1,0 +1,28 @@
+/* Copyright 1996 Michael Messollen. All rights reserved. */
+////////////////////////////////////////////////////////////
+// emacs edit mode for this file is -*- C++ -*-
+// $Id: charset.h,v 1.1.1.1 1997-05-02 17:00:44 Singular Exp $
+////////////////////////////////////////////////////////////
+
+#ifndef INCL_CHARSET_H
+#define INCL_CHARSET_H
+
+#include <factory.h>
+#include <tmpl_inst.h>  // for typedef's
+
+CFList     BasicSet( const CFList &PS );
+CFList     CharSet( const CFList &PS );
+/*BEGINPUBLIC*/
+CFList     MCharSetN( const CFList &PS, PremForm & Remembern );
+ListCFList IrrCharSeries( const CFList &PS );
+/*ENDPUBLIC*/
+
+#endif /* INCL_CHARSET_H */
+
+////////////////////////////////////////////////////////////
+/*
+$Log: not supported by cvs2svn $
+Revision 1.2  1997/04/25 22:42:10  michael
+Version for libfac-0.2.1
+
+*/

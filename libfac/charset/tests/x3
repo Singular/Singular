@@ -1,0 +1,13 @@
+31991
+rstuvwxyz
+s*u+r*v;
+t*u+r*w;
+t*v+s*w;
+s*x+r*y;
+t*x+r*z;
+t*y+s*z;
+v*x+u*y;
+w*x+u*z;
+w*y+v*z;
+0;
+

@@ -1,0 +1,118 @@
+#!/bin/csh
+# Make various tests for the factorization. 
+
+set OS=`uname`
+if ( $OS == "Linux" ) then
+	set ECHO="/bin/echo -e"
+else if ( $OS == "SunOS" ) then
+	set ECHO=/usr/5bin/echo
+else
+	set ECHO=echo
+endif
+$ECHO "\n\ntesting univariate factorization:\c"
+$ECHO "\nf1  \c" 
+../test < f1  
+$ECHO "\nf2  \c"
+../test < f2
+$ECHO "\nf3  \c"
+../test < f3
+
+$ECHO "\n\ntesting multivariate factorization:"
+$ECHO "\nf4  \c"
+../test < f4
+$ECHO "\nf5  \c"
+../test < f5
+$ECHO "\nf6  \c"
+../test < f6
+$ECHO "\nf7  \c"
+../test < f7
+$ECHO "\nf8  \c"
+../test < f8
+$ECHO "\nf9  \c"
+../test < f9
+$ECHO "\nf10 \c"
+../test < f10
+#$ECHO "\nf11 \c"
+#../test < f11
+$ECHO "\nf12 \c"
+../test < f12
+$ECHO "\nf12 \c"
+../test < f13
+$ECHO "\nf14 \c"
+../test < f14
+$ECHO "\nf15 \c"
+../test < f15
+$ECHO "\nf16  -- skipping; takes long time.  See the Long-time section!\c"
+$ECHO "\nf17 \c"
+../test < f17
+$ECHO "\nf18 \c"
+../test < f18
+$ECHO "\nf19 \c"
+../test < f19
+$ECHO "\nf20 \c"
+../test < f20
+$ECHO "\nf21 \c"
+../test < f21
+$ECHO "\nf21a \c"
+../test < f21a
+$ECHO "\nf22 \c"
+../test < f22
+$ECHO "\nf23 \c"
+../test < f23
+$ECHO "\nf24 -- skipping; takes long time.  See the Long-time section!\c"
+$ECHO "\nf25 -- skipping; takes long time.  See the Long-time section!\c"
+$ECHO "\nf26 -- skipping; takes long time.  See the Long-time section!\c"
+$ECHO "\nf27 \c"
+../test < f27
+$ECHO "\nf28 -- skipping; takes long time.  See the Long-time section!\c"
+$ECHO "\nf29 -- Test suite not available.\c"
+#../test < f29
+$ECHO "\nf30 -- Test suite not available.\c"
+#../test < f30
+$ECHO "\nf31 -- Test suite not available.\c"
+#../test < f31
+$ECHO "\nf32 \c"
+../test < f32
+$ECHO "\nf33 \c"
+../test < f33
+$ECHO "\nf34 \c"
+../test < f34
+$ECHO "\nf35 -- skipping; takes long time.  See the Long-time section!\c"
+$ECHO "\nf36 \c"
+../test < f36
+$ECHO "\nf37 \c"
+../test < f37
+$ECHO "\nf38 \c"
+../test < f38
+$ECHO "\n"
+$ECHO "Tests from Gerhard Pfister:"
+$ECHO "p1   -- skipping; takes long time.  See the Long-time section!\c"
+$ECHO "\np2 \c"
+../test < p2
+$ECHO "\np3 \c"
+../test < p3
+$ECHO "\np4 \c"
+../test < p4
+$ECHO "\np5 \c"
+../test < p5.3
+
+$ECHO "\n"  
+# need-extensions section:
+$ECHO "\n Need-extensions section!\n"
+$ECHO "\nf39 \c"
+../test < f39
+$ECHO "\nf40 \c"
+../test < f40
+$ECHO "\nf41 \c"
+../test < f41
+$ECHO "\nf42 \c"
+../test < f42
+$ECHO "\nf43 \c"
+../test < f43
+
+
+$ECHO "\n"
+$ECHO 
+# long time section:
+$ECHO "\n Long-time section!\n"
+$ECHO "\n ... Skipping!\n"

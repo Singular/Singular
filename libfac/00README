@@ -1,0 +1,219 @@
+This is the file 00README.libfac for version 0.2.1 of libfac.
+
+######### What is libfac?
+libfac is an extension to factory (see the factory documentation for details
+about factory and what it does), which implements factorization of polynomials
+over finite fields and algorithms for manipulation of polynomial ideals via
+the characteristic set methods (e.g., calculating the charcteristic set and the
+irreducible characteristic series).
+
+Note: libfac is just beta-code. There are bugs, I think. Please help to test
+this code! Submit a bug-report if you found a bug!
+
+######### Copyright #####################
+This software is copyrighted by Michael Messollen <michael@math.uni-sb.de>.
+    (c) 1996 Michael Messollen <michael@math.uni-sb.de>
+
+           This software is *not* free software.
+
+The authors of Macaulay2 and Singular are allowed to distribute the sources
+with their source code of the respective programs.
+
+Anyone is allowed to distribute:
+ a) this 00README alone
+ b) your code/binary or whatever which uses a binary version of this library 
+    (libfac.a and/or libfac-g.a), if you state anywhere in your documentation,
+    that you use this code, who is and how to contact the author.
+    If you don't have a documentation for your code/binary or whatever, you 
+    have to distribute this 00README as well.
+
+In other words: You are not allowed to distribute the sources or part of the 
+sources, even if you have got them with a distribution, e.g. like Macaulay2 or 
+Singular! Tell those people which want sources, how to contact the author.
+
+In no event you are allowed to modify the sources (beside the Makefile's,
+configure.in, configure and install-sh).
+Note that no permission is granted to extract a portion of the source code of 
+this library and incorporate it into another program.
+
+No written agreement, license, or royalty fee is required for any of the 
+authorized uses.
+
+Note: This restricted copyright will change in future to a more "free" one.
+But for now I want to keep track of the sources (this is the intention of the
+restrictions of this licence). They aren't in their final state and there will 
+be bugs (or even "features"). So please let *me* fix any problems.
+
+If your intended use of this library is not covered by the license above,
+please contact the author so we can work something out.
+
+How to contact the author:
+
+          Michael Messollen
+          Univ. Saarbruecken
+          FB 9.1 Mathematik
+          66041 Saarbruecken
+          GERMANY
+          email: michael@math.uni-sb.de
+
+######### DISCLAIMER #####################
+
+  IN NO EVENT SHALL THE AUTHOR OR DISTRIBUTORS BE LIABLE TO ANY PARTY
+  FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+  ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY
+  DERIVATIVES THEREOF, EVEN IF THE AUTHOR HAS BEEN ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+
+  THE AUTHOR AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE
+  IS PROVIDED ON AN "AS IS" BASIS, AND THE AUTHOR AND DISTRIBUTORS HAVE
+  NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+  MODIFICATIONS.
+
+######### REQUIREMENTS ###################
+* You need factory to compile this code. Factory is designed and maintained 
+  (at least until 30.9.96) by 
+       Ruediger Stobbe <stobbe@mathematik.uni-kl.de> .
+  This code compiles, works and is tested with factoryversion 1.1 
+  and factoryversion 1.2beta .
+  factory is not yet available to the public. You have to contact the holder 
+  of the copyright first. To my knowledge this is (at least since 1.10.96):
+          Prof. Dr. Gert-Martin Greuel
+          FB Mathematik
+          Uni. Kaiserslautern
+          D-67618 Kaiserslautern
+          GERMANY
+          email: greuel@mathematik.uni-kl.de
+  
+* gcc 2.7.2 ( earlier versions of gcc *may* work as well as any other ANSI C++
+  compiler; it is reported that gcc 2.6.3 works also, but beware of gcc 2.7.0;
+  it has some serious C++ bugs )
+
+* GNU Make version 3.74 or above ( earlier versions of GNU make *may* work )
+
+######### INSTALLATION ###################
+A) Using configure
+For the library type:
+  configure [--with-debug] [--with-Singular] [--includedir=path-to-factory.h]
+  make
+this will produce libfac.a or singlibfac.a (depending on --with-Singular).
+
+B) Using Makefile.dist
+copy Makefile.dist to Makefile
+Edit the factoryversion and the path to the factory library in the top Makefile
+(in this directory).
+currently: factoryversion=1.2b
+(I have tested with factoryversion 1.1 & 1.2beta; earlier versions *don't* work)
+
+type:
+   make
+to generate a testprogram (test). You'll get a non-interactive debugging 
+version of test, which is half as fast as an optimized version. 
+You get an optimized version of test by typing:
+   make opttest
+
+If you type
+   make tests
+
+a program (test) will be generated and a bunch of test-examples will
+be tested. 
+
+If you only need the library ( it will be produced anyway) just type
+   make libfac
+for the optimized version (libfac.a) or
+   make libfac-g
+for the debugging version (libfac-g.a).
+
+The include file for the libraries is called "factor.h" and is shipped
+with this version. 
+If you have perl you can generate "factor.h" with:
+   ./bin/makeheader header.tpl factor.h
+in the top directory (Perhaps you have to edit the path to perl in 
+./bin/makeheader).
+
+
+ If you have found a bug (beside the KNOWN BUGS, see KNOWN BUGS section later),
+*please* email me: michael@math.uni-sb.de
+Please include the characteristic and the ideal(s)/polynomial(s) you tried as
+well as the factoryversion you used (Best to include all your input!).
+
+Please allow some days for an answer.
+
+Have fun!
+ Michael Messollen ( michael@math.uni-sb.de )
+
+##### 
+I would like to thank Dongming Wang <Dongming.Wang@imag.fr> who showed me the 
+power of the Characteristic Set methods and from whom I learned a lot about 
+this topic.
+If you want to learn about characteristic sets, the next is a good point
+to start with:
+    Dongming Wang:
+    An Implementation of the Characteristic Set Method in Maple.
+    In: Automated Practical Reasoning: Algebraic Approaches 
+    (J. Pfalzgraf and D. Wang, eds.), Springer-Verlag, 
+    Wien-New York, 1995, pp. 187-201.
+
+
+########### KNOWN BUGS ############################
+* The  irreducible characteristic series stuff doesn't work for some problems.
+  You will get a warning:
+         "Factorization over algebraic function field required!"
+  if this program needs factorization over an algebraic function field, which
+  is not yet implemented (but I'm working on it).
+  Don't trust the result you'll get in such a case!!!!!!
+
+* The performance of the irreducible characteristic series stuff heavily
+  depends on the ordering of the variables in some cases. No (nearly) optimal
+  ordering of the variables is choosen automatically, right now. 
+  E.g.: if your ideal is (t^10-x, t^31-t^6-t-y, t^8-z) and you choose the
+  variable ordering with t > z > y > x, the calculation of the irreducible 
+  characteristic series will take hours; if you choose t as the variable with 
+  the lowest level, you will get the answer immediately (the ideal is an 
+  irreducible characteristic series with the ordering z > y > x > t ).
+  I am thinking about the problem how to choose the ordering automatically. 
+Since version 0.2 of the library:
+(There is now a function: Varlist neworder(const CFList & PolyList ),
+ which returns a list of heuristically optimal reorderd variables;
+ if you use the library for programming purpose, look at factor.h how to
+ use this function in your code)
+For users of Macaulay2 and/or Singular: look at the documentation of the
+respective program, if and how this is incorporated.
+
+* Factorization is slow for large polynomials. There are mainly two reasons
+  for this:
+   a) the factorization algorithm is shipped with no "tricks" yet. (I'm working
+      on that, but it heavily depends on b) )
+   b) factory has an extremly slow GCD-algorithm for the case of characteristic
+      p>0 ( people are working on it )
+  There will be a quite different, faster factorization algorithm in the 
+  future.
+
+Problems will be fixed in a later version of libfac .
+
+######### Changes:
+Version coding scheme: major.minor.bugfixnumber
+          e.g.: 0.1 major=0 minor=1 no bugfixnumber (no bugfix incorporated)
+
+V0.1	* Initial version for alpha-testers
+
+V0.2	* Added neworder(..) and reorder(..) for IrrCharSeries
+	* Added external strings (in factor/version.cc):
+	    libfac_name     - the name of the game
+	    libfac_version  - the version number
+	    libfac_date     - the date libfac_version was released
+	    libfac_author   - who wants to know?
+	* added support for factorization of homogenious polynomials (in 
+          factor/homogfactor.cc), 
+          reorganized code in factor/Factor.cc and factor/Factor.h
+	* added files factor/debug.cc, factor/debug.h, factor/timing.h; 
+	  mainly for internal use
+
+V0.2.1  * changed lc == 1 to lc == unit in choose_mainvar (factor/Factor.cc)
+        * changed cerr and cout messages for use with Singular (all .cc files)
+          (why the hell don't they use libiostream?)
+        * added configure -- basics only; (old)Makefile changed to 
+          Makefile.dist (if nothing works...) 
+          Makefile produced with configure uses GNU coding standards
+

@@ -1,0 +1,51 @@
+#!/bin/csh
+set OS=`uname`
+if ( $OS == "Linux" ) then
+	set ECHO="/bin/echo -e"
+	set MAKE=make
+else if ( $OS == "SunOS" ) then
+	set ECHO=/usr/5bin/echo
+	set MAKE=gmake
+else
+	set ECHO=echo
+	set MAKE=make
+endif
+
+(cd .. ; $MAKE testmcs )
+
+$ECHO "\n\ntesting CharSet:\c"
+$ECHO "\nt1  \c" 
+../testmcs < t1  
+$ECHO "\nt2  \c"
+../testmcs < t2
+$ECHO "\nt3  \c"
+../testmcs < t3
+$ECHO "\nt4  \c"
+../testmcs < t4
+$ECHO "\nt5  \c"
+../testmcs < t5
+$ECHO "\nt6  \c"
+../testmcs < t6
+$ECHO "\nt7  \c"
+../testmcs < t7
+$ECHO "\nt8  \c"
+../testmcs < t8
+$ECHO "\nt9  \c"
+../testmcs < f9
+
+$ECHO "\nw1 \c"
+../testmcs < w1
+$ECHO "\nw2 \c"
+../testmcs < w2
+$ECHO "\nw3 \c"
+../testmcs < w3
+$ECHO "\nw4 \c"
+../testmcs < w4
+
+$ECHO "\nx1 \c"
+../testmcs < x1
+
+$ECHO "\n"
+$ECHO 
+# long time section:
+$ECHO "\n Long-time section!\n"

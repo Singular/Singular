@@ -1,0 +1,47 @@
+#!/bin/csh
+set OS=`uname`
+if ( $OS == "Linux" ) then
+	set ECHO="/bin/echo -e"
+	set MAKE=make
+else if ( $OS == "SunOS" ) then
+	set ECHO=/usr/5bin/echo
+	set MAKE=gmake
+else
+	set ECHO=echo
+	set MAKE=make
+endif
+
+(cd .. ; $MAKE opttestcs )
+
+$ECHO "\n\ntesting CharSet:\c"
+$ECHO "\nt1  \c" 
+../testcs < t1  
+$ECHO "\nt2  \c"
+../testcs < t2
+$ECHO "\nt3  \c"
+../testcs < t3
+$ECHO "\nt4  \c"
+../testcs < t4
+$ECHO "\nt5  \c"
+../testcs < t5
+$ECHO "\nt6  \c"
+../testcs < t6
+$ECHO "\nt7  \c"
+../testcs < t7
+$ECHO "\nt8  \c"
+../testcs < t8
+$ECHO "\nt9  \c"
+../testcs < t9
+
+$ECHO "\nw1 \c"
+../testcs < w1
+$ECHO "\nw2 \c"
+../testcs < w2
+$ECHO "\nw3 \c"
+../testcs < w3
+$ECHO "\nw4 \c"
+../testcs < w4
+
+$ECHO "\nx1 \c"
+../testcs < x1
+
