@@ -2,27 +2,10 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(matpol.h)
 AC_CONFIG_HEADER(mod2.h si_paths.h)
 
-dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl version stuff -- should be set in ../configure.in
-dnl
-dnl here are some defaults
-
-SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-1}
-SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-2}
-SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-0}
-SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION.$SINGULAR_MINOR_VERSION.$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"June 1998"}
-
-dnl pass them on into the Makefiles
-AC_SUBST(SINGULAR_VERSION)
-AC_DEFINE_UNQUOTED(SINGULAR_MAJOR_VERSION, ${SINGULAR_MAJOR_VERSION})
-AC_DEFINE_UNQUOTED(SINGULAR_MINOR_VERSION, ${SINGULAR_MINOR_VERSION})
-AC_DEFINE_UNQUOTED(SINGULAR_SUB_VERSION, ${SINGULAR_SUB_VERSION})
-AC_DEFINE_UNQUOTED(S_VERSION1, "${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}")
-AC_DEFINE_UNQUOTED(S_VERSION2, "${VERSION_DATE}")
-AC_DEFINE_UNQUOTED(SINGULAR_SUB_VERSION, ${SINGULAR_SUB_VERSION})
-
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl determine singuname
+dnl
+
 AC_MSG_CHECKING(uname for singular)
 AC_CACHE_VAL(ac_cv_singuname,
 ac_cv_singuname="unknown"
@@ -42,6 +25,34 @@ if test "$ac_cv_singuname" = unknown; then
   AC_MSG_ERROR(Unknown architecture: Check singuname.sh)
 fi
 AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname")
+
+# stupid Win programs do not like dots in their pathnames
+if test "$ac_cv_singuname" = ix86-Win; then
+  VERSION_SEP="-"
+else
+  VERSION_SEP="."
+fi
+
+dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl version stuff -- should be set in ../configure.in
+dnl
+dnl here are some defaults
+
+SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-1}
+SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-2}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-0}
+SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
+VERSION_DATE=${VERSION_DATE:-"June 1998"}
+
+dnl pass them on into the Makefiles
+AC_SUBST(SINGULAR_VERSION)
+AC_DEFINE_UNQUOTED(SINGULAR_MAJOR_VERSION, ${SINGULAR_MAJOR_VERSION})
+AC_DEFINE_UNQUOTED(SINGULAR_MINOR_VERSION, ${SINGULAR_MINOR_VERSION})
+AC_DEFINE_UNQUOTED(SINGULAR_SUB_VERSION, ${SINGULAR_SUB_VERSION})
+AC_DEFINE_UNQUOTED(S_VERSION1, "${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}")
+AC_DEFINE_UNQUOTED(S_VERSION2, "${VERSION_DATE}")
+AC_DEFINE_UNQUOTED(SINGULAR_SUB_VERSION, ${SINGULAR_SUB_VERSION})
+
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler stuff
@@ -154,7 +165,7 @@ fi
 
 # expand bindir
 test "x$bindir" = 'x${exec_prefix}/bin' && bindir="${exec_prefix}/bin" 
-SINGULAR=${SINGULAR:-$bindir/Singular-$SINGULAR_MAJOR_VERSION.$SINGULAR_MINOR_VERSION.$SINGULAR_SUB_VERSION}
+SINGULAR=${SINGULAR:-$bindir/Singular-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}
 AC_SUBST(SINGULAR)
 AC_DEFINE_UNQUOTED(S_BIN_DIR, "${bindir}")
 
