@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.60 2002-01-16 13:16:17 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.61 2002-01-22 11:18:28 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -384,14 +384,14 @@ static proc max(ideal e)
 static proc liftbound(module U,module H,int k,int K)
 {
   def R=basering;
-  ring S=0,s,ds;
+  ring T=0,s,ds;
   module U=imap(R,U);
   module H=imap(R,H);
   degBound=k+K+1;
   H=jet(lift(U,H),K);
   degBound=0;
   setring(R);
-  return(imap(S,H));
+  return(imap(T,H));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -573,8 +573,12 @@ EXAMPLE:  example monodromy; shows examples
   e,m,A0,r,k1=eigvals(A0,r,H,k0,n);
   A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,k1,0,0);
 
+  list l=jordan(A,e,m);
   setring(R);
-  return(jordan(imap(G,A),imap(G,e),m));
+  list l=imap(G,l);
+  kill G,gmsmaxweight;
+
+  return(l);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -900,10 +904,14 @@ EXAMPLE:  example vwfilt; shows examples
   kill v;
   module v=simplify(jet(H*U0*H0,2*k0)/s^(2*k0),1);
 
+  kill l;
+  list l=sppnf(a,w,v)+list(gmsbasis,gmsstd);
   setring(R);
-  ideal g=imap(G,gmsstd);
-  attrib(g,"isSB",1);
-  return(sppnf(imap(G,a),w,imap(G,v))+list(imap(G,gmsbasis),g));
+  list l=imap(G,l);
+  kill G,gmsmaxweight;
+  attrib(l[5],"isSB",1);
+
+  return(l);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -960,18 +968,24 @@ EXAMPLE:  example tmatrix; shows examples
   e,m,A0,r,k1=eigvals(A0,r,H,k0,n);
   A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,k1,k0+k1,k0+k1);
 
+  ring S=0,s,(ds,c);
+  matrix A=imap(G,A);
+  module H0=imap(G,H0);
+  ideal e=imap(G,e);
+  kill G,gmsmaxweight;
+
   dbprint(printlevel-voice+2,"// transform to Jordan basis");
   module U=jordanbasis(A,e,m)[1];
   matrix V=inverse(U);
   A=V*A*U;
-  H=V*H0;
+  module H=V*H0;
 
   dbprint(printlevel-voice+2,"// compute splitting of V-filtration");
   int i,j,k;
   U=freemodule(mu);
   V=matrix(0,mu,mu);
   matrix v[mu^2][1];
-  A0=commutator(jet(A,0));
+  matrix A0=commutator(jet(A,0));
   for(k=1;k<=k0+k1;k++)
   {
     for(j=0;j<k;j++)
@@ -994,19 +1008,19 @@ EXAMPLE:  example tmatrix; shows examples
   for(k=ncols(H1);k>=1;k--)
   {
     i0=leadexp(H1[k])[nvars(basering)+1];
-    j0=ord(H1[k])/deg(s);
+    j0=ord(H1[k]);//deg(s);
     H0[k]=lead(H1[k]);
     H1[k]=H1[k]-lead(H1[k]);
     if(H1[k]!=0)
     {
       i=leadexp(H1[k])[nvars(basering)+1];
-      j=ord(H1[k])/deg(s);
+      j=ord(H1[k]);//deg(s);
       while(A[i,i]+j==A[i0,i0]+j0)
       {
         H0[k]=H0[k]+lead(H1[k]);
         H1[k]=H1[k]-lead(H1[k]);
         i=leadexp(H1[k])[nvars(basering)+1];
-        j=ord(H1[k])/deg(s);
+        j=ord(H1[k]);//deg(s);
       }
     }
   }
@@ -1058,7 +1072,7 @@ EXAMPLE:  example tmatrix; shows examples
 
     I=list();
     I0=module();
-    U0=std(0);
+    module U0=std(0);
     for(i=size(F);i>=1;i--)
     {
       I[i]=module();
@@ -1088,17 +1102,12 @@ EXAMPLE:  example tmatrix; shows examples
   H=V*H;
 
   dbprint(printlevel-voice+2,"// compute reduced standard basis of H''");
-  ring S=0,s,ds;
-  module H=imap(G,H);
-  degBound=k0+k1+1;
+  degBound=k0+k1+2;
   option("redSB");
-
   H=std(H);
-
+  option("noredSB");
   degBound=0;
   H=simplify(jet(H,k0+k1),1);
-  setring(G);
-  H=imap(S,H);
 
   dbprint(printlevel-voice+2,"// compute matrix A0+sA1 of t");
   A=liftbound(H,s*A*H+s^2*diff(matrix(H),s),k0+k1,1);
@@ -1106,7 +1115,10 @@ EXAMPLE:  example tmatrix; shows examples
   A=jet(A,1)/s;
 
   setring(R);
-  return(list(imap(G,A0),imap(G,A)));
+  matrix A0=imap(S,A0);
+  matrix A1=imap(S,A);
+  kill S;
+  return(list(A0,A1));
 }
 example
 { "EXAMPLE:"; echo=2;
