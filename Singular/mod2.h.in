@@ -9,10 +9,10 @@
 #define MOD2_H
 
 /*******************************************************************
- * Defines which are set by configure 
+ * Defines which are set by configure
  ******************************************************************/
 /* Define the info program to use, if you have TeXInfo, undef otherwise */
-#undef HAVE_INFO 
+#undef HAVE_INFO
 /* Define to use readline lib for fancy display */
 #undef HAVE_READLINE
 /* Define to use built-in command line parser */
@@ -65,7 +65,7 @@
 #undef HAVE_GETTIMEOFDAY
 /* Define if you have atexit */
 #undef HAVE_ATEXIT
-/* Define if you have bcopy, bzero and bcmp 
+/* Define if you have bcopy, bzero and bcmp
    Linux needs that define! */
 #undef HAVE_BCOPY
 /* Define if sprintf does not return number of printed chars */
@@ -138,7 +138,7 @@
 #endif
 
 /* Define to use old mechanismen for saving currRing with procedures
- * Does not work with HAVE_NAMESPACES enabled 
+ * Does not work with HAVE_NAMESPACES enabled
  */
 #undef USE_IILOCALRING
 
@@ -155,7 +155,7 @@
 #ifdef PROFILING
 #define PROFILER ,0,0
 #else
-#define PROFILER 
+#define PROFILER
 #endif
 
 /* Define to use gmp for rational arithmetic */
@@ -209,7 +209,7 @@
 #endif
 
 /*******************************************************************
- * Miscellanous Defines 
+ * Miscellanous Defines
  ******************************************************************/
 /* define MM_COUNT to enable "memory(0)" (resp. memory(1))*/
 #define MM_COUNT 1
@@ -255,7 +255,7 @@
 extern int pShortOut;
 
 #ifdef DO_PROFILE
-/* define to enable explicit profiling of some crucial inline 
+/* define to enable explicit profiling of some crucial inline
  * routines and defines  */
 #undef DO_DEEP_PROFILE
 #endif
@@ -266,7 +266,7 @@ extern int pShortOut;
  * -- you better know what your are doing, if you touch this
  ******************************************************************/
 #define buildin_rand 1
-#ifndef NDEBUG 
+#ifndef NDEBUG
 
 /* define MDEBUG 0 for checking Alloc/Free */
 #define MDEBUG 0
@@ -282,11 +282,11 @@ extern int pShortOut;
 /* define PDEBUG 1 for additionally checking access to polys  -- vewry slow !*/
 #define PDEBUG 1
 /* define KDEBUG checking during standard base computation */
-#define KDEBUG 
+#define KDEBUG
 /* define LDEBUG checking numbers, undefine otherwise */
-#define LDEBUG 
+#define LDEBUG
 /* define RDEBUG checking rings (together with TRACE=9) */
-#define RDEBUG 
+#define RDEBUG
 /* define TEST for non time critical tests, undefine otherwise */
 #define TEST
 /* define MM_STAT for printing block stats */
@@ -294,9 +294,13 @@ extern int pShortOut;
 /* #define PAGE_TEST */
 /* #define PAGE_COUNT */
 
+/* allow debugging of bison texts */
+#undef YYDEBUG
+#define YYDEBUG 1
+
 /* Undefine to disable debugging of MP stuff */
 #ifdef HAVE_MPSR
-#define MPSR_DEBUG 
+#define MPSR_DEBUG
 #endif
 
 /* MLIST requires MDEBUG */
