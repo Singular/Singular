@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.18 2000-09-18 09:19:37 obachman Exp $ */
+/* $Id: syz2.cc,v 1.19 2000-10-19 15:25:42 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1027,7 +1027,7 @@ Print("compute %d Paare im Module %d im Grad %d \n",howmuch,index,actdeg+index);
     if (TEST_OPT_PROT) Print("%d",actdeg);
     if (TEST_OPT_PROT) Print("(m%d)",index);
     if (index==0)
-      i = syInitSyzMod(syzstr,index,idRankFreeModule(arg)+1);
+      i = syInitSyzMod(syzstr,index,idRankFreeModule(arg, origR)+1);
     else
       i = syInitSyzMod(syzstr,index);
     j = syInitSyzMod(syzstr,index+1);

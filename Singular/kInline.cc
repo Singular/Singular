@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.5 2000-10-19 15:00:13 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.6 2000-10-19 15:25:41 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -226,6 +226,7 @@ KINLINE sLObject::sLObject(poly p_in, ring c_r, ring t_r)
 
 KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int use_bucket, ring tailRing)
 {
+  Set(lm, tailRing);
   if (use_bucket)
   {
     bucket = kBucketCreate(tailRing);
@@ -236,7 +237,6 @@ KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int use_bucket, ring tail
   {
     pNext(lm) = p_tail;
   }
-  Set(lm, tailRing);
 }
 
 KINLINE void sLObject::Tail_Mult_nn(number n)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.106 2000-10-19 15:00:12 obachman Exp $ */
+/* $Id: ideals.cc,v 1.107 2000-10-19 15:25:40 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -597,7 +597,7 @@ BOOLEAN idIs0 (ideal h)
 /*2
 * return the maximal component number found in any polynomial in s
 */
-int idRankFreeModule (ideal s)
+int idRankFreeModule (ideal s, ring r)
 {
   if (s!=NULL)
   {
@@ -610,8 +610,8 @@ int idRankFreeModule (ideal s)
     {
       if (*p!=NULL)
       {
-        pTest(*p);
-        k = pMaxComp(*p);
+        p_Test(*p, r);
+        k = p_MaxComp(*p, r);
         if (k>j) j = k;
       }
       p++;
