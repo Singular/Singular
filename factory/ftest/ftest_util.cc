@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.7 1997-10-02 11:09:20 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.8 1997-10-07 07:58:10 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -856,8 +856,8 @@ ftestPrintEnv ()
     if ( ftestPrintEnvFlag ) {
 	// characteristic
 	if ( ftestEnv.extDegree )
-	    ftestPrint( "char  : %d^%d (%c)\n",
-			"%d^%d (%c)\n",
+	    ftestPrint( "char  : %d^%d(%c)\n",
+			"%d^%d(%c)\n",
 			ftestEnv.characteristic, ftestEnv.extDegree, ftestEnv.extGen );
 	else
 	    ftestPrint( "char  : %d\n", "%d\n", ftestEnv.characteristic );
@@ -894,7 +894,7 @@ ftestPrintEnv ()
 	if ( ftestEnv.seedSet )
 	    ftestPrint( "seed  : %d\n", "%d\n", ftestEnv.seed );
 	else
-	    ftestPrint( "seed  : <not set>\n", "<not set>\n" );
+	    ftestPrint( "seed  : not set\n", "not set\n" );
 
 	// factory version
 	const char * version;
