@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.7 1997-03-27 20:23:36 obachman Exp $ 
+// $Id: fglm.cc,v 1.8 1997-03-29 09:49:21 Singular Exp $ 
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -58,13 +58,15 @@ ideal fglmUpdatesource( const ideal sourceIdeal )
 	(newSource->m)[k]= pCopy( (sourceIdeal->m)[k] );
     offset= IDELEMS( sourceIdeal );
     for ( l= IDELEMS( currQuotient )-1; l >= 0; l-- ) {
-	found= FALSE;
-	for ( k= IDELEMS( sourceIdeal )-1; (k >= 0) && (found == FALSE); k-- )
-	    if ( pDivisibleBy( (sourceIdeal->m)[k], (currQuotient->m)[l] ) )
-		found= TRUE;
-	if ( ! found ) {
-	    (newSource->m)[offset]= pCopy( (currQuotient->m)[l] );
-	    offset++;
+	if ( (currQuotient->m)[l] != NULL ) {
+	    found= FALSE;
+	    for ( k= IDELEMS( sourceIdeal )-1; (k >= 0) && (found == FALSE); k-- )
+		if ( pDivisibleBy( (sourceIdeal->m)[k], (currQuotient->m)[l] ) )
+		    found= TRUE;
+	    if ( ! found ) {
+		(newSource->m)[offset]= pCopy( (currQuotient->m)[l] );
+		offset++;
+	    }
 	}
     }
     idSkipZeroes( newSource );
@@ -81,11 +83,13 @@ fglmUpdateresult( ideal & result )
     int k, l;
     BOOLEAN found;
     for ( k= IDELEMS( result )-1; k >=0; k-- ) {
-	found= FALSE;
-	for ( l= IDELEMS( currQuotient )-1; (l >= 0) && ( found == FALSE ); l-- )
-	    if ( pDivisibleBy( (currQuotient->m)[l], (result->m)[k] ) )
-		found= TRUE;
-	if ( found ) pDelete( &(currQuotient->m)[l] );
+	if ( (result->m)[k] != NULL ) {
+	    found= FALSE;
+	    for ( l= IDELEMS( currQuotient )-1; (l >= 0) && ( found == FALSE ); l-- ) 
+		if ( pDivisibleBy( (currQuotient->m)[l], (result->m)[k] ) )
+		    found= TRUE;
+	    if ( found ) pDelete( & ((result->m)[k]) );
+	}
     }
     idSkipZeroes( result );
 }
