@@ -229,9 +229,28 @@ static void feBrowserFile()
   }
   else
   {
+#ifdef ix86_Win
+    // for the 6(!) default browsers
+    heHelpBrowsers=(heBrowser_s*)omAlloc0(5*sizeof(heBrowser_s));
+#else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0(4*sizeof(heBrowser_s));
+#endif
   }
+#ifdef ix86_Win
+  heHelpBrowsers[br].browser="winhlp";
+  heHelpBrowsers[br].init_proc=heGenInit;
+  heHelpBrowsers[br].help_proc=heWinHelp;
+  heHelpBrowsers[br].required="h";
+  //heHelpBrowsers[br].action=NULL;
+  br++;
+  heHelpBrowsers[br].browser="html";
+  heHelpBrowsers[br].init_proc=heGenInit;
+  heHelpBrowsers[br].help_proc=heHtmlHelp;
+  heHelpBrowsers[br].required="h";
+  //heHelpBrowsers[br].action=NULL;
+  br++;
+#endif
   heHelpBrowsers[br].browser="builtin";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heBuiltinHelp;
@@ -835,7 +854,37 @@ static BOOLEAN heGenInit(int warn, int br)
   }
   return TRUE;
 }
+#ifdef ix86_Win
+static void heHtmlHelp(heEntry hentry, int br)
+{
+  char url[MAXPATHLEN];
+  char* html_dir = feResource('h' /*"HtmlDir"*/);
+  sprintf(url, "%s/%s",
+          (html_dir != NULL ? html_dir : feResource('u' /*"ManualUrl"*/)),
+          (hentry!=NULL && *(hentry->url)!='\0' ? hentry->url : "index.htm"));
 
+  heOpenWinntUrl(url, (html_dir != NULL ? 1 : 0));
+}
+
+static void heWinHelp(heEntry hentry, int br)
+{
+  char keyw[MAX_HE_ENTRY_LENGTH];
+  if ((hentry!=NULL)&&(hentry->key!=NULL))
+    strcpy(keyw,hentry->key);
+  else
+    strcpy(keyw," ");
+  char* helppath = feResource('h' /*"HtmlDir"*/);
+  const char *filename="/Manual.hlp";
+  int helppath_len=0;
+  if (helppath!=NULL) helppath_len=strlen(helppath);
+  char *callpath=(char *)omAlloc0(helppath_len+strlen(filename)+1);
+  if ((helppath!=NULL) && (*helppath>' '))
+    strcpy(callpath,helppath);
+  strcat(callpath,filename);
+  heOpenWinntHlp(keyw,callpath);
+  omfree(callpath);
+}
+#endif
 static void heGenHelp(heEntry hentry, int br)
 {
   char sys[MAX_SYSCMD_LEN];
