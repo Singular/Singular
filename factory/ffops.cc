@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.cc,v 1.4 1997-06-19 12:23:06 schmidt Exp $ */
+/* $Id: ffops.cc,v 1.5 1997-10-22 13:42:23 schmidt Exp $ */
 
 #include <config.h>
 
@@ -15,10 +15,12 @@ short * ff_invtab = new short [32767];
 
 void ff_setprime ( const int p )
 {
-    ff_prime = p;
-    ff_halfprime = ff_prime / 2;
-    if ( ! ff_big )
-	for ( int i = 0; i < ff_prime; i++ ) ff_invtab[i] = 0;
+    if ( p != ff_prime ) {
+	ff_prime = p;
+	ff_halfprime = ff_prime / 2;
+	if ( ! ff_big )
+	    for ( int i = 0; i < ff_prime; i++ ) ff_invtab[i] = 0;
+    }
 }
 
 int ff_newinv ( const int a )
