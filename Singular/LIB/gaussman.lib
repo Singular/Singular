@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.42 2001-05-30 18:28:23 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.43 2001-05-30 18:32:37 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -112,9 +112,9 @@ ring G:
   s is the inverse of the Gauss-Manin connection of f,
   G contains:
     poly gmspoly: image of f
-    ideal gmsjacob: image of Jacobian ideal df
-    ideal gmsstd: image of standard basis of df
-    matrix gmsmatrix: matrix(gmsjacob)*s=matrix(gmsstd)
+    ideal gmsjacob: image of Jacobian ideal
+    ideal gmsstd: image of standard basis of Jacobian ideal
+    matrix gmsmatrix: matrix(gmsjacob)*gmsmatrix=matrix(gmsstd)
     ideal gmsbasis: image of monomial vector space basis of Jacobian algebra
     int gmsmaxweight: maximal weight of variables of basering
   G projects to H''=C{{s}}*gmsbasis
