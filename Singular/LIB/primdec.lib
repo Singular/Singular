@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.92 2001-01-12 13:08:26 pfister Exp $";
+version="$Id: primdec.lib,v 1.93 2001-01-15 16:17:49 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1479,14 +1479,14 @@ static proc cleanPrimary(list l)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc minAssPrimes(ideal i, list #)
+
+proc minAssPrimesold(ideal i, list #)
 "USAGE:   minAssPrimes(i); i ideal
          minAssPrimes(i,1); i ideal  (to use also the factorizing Groebner)
 RETURN:  list = the minimal associated prime ideals of i
 EXAMPLE: example minAssPrimes; shows an example
 "
 {
-   intvec op;
    def @P=basering;
    list qr=simplifyIdeal(i);
    map phi=@P,qr[2];
@@ -1512,10 +1512,8 @@ EXAMPLE: example minAssPrimes; shows an example
    }
    list @res,empty;
    ideal ser;
-   op=option(get);
    option(redSB);
    list @pr=facstd(i);
-   option(set,op);
    if(size(@pr)==1)
    {
       attrib(@pr[1],"isSB",1);
@@ -1532,16 +1530,14 @@ EXAMPLE: example minAssPrimes; shows an example
          execute ("ring gnir1 = ("+charstr(basering)+"),
                               ("+varstr(basering)+"),(C,lp);");
          ideal i=fetch(@P,i);
-         op=option(get);
-         option(redSB);
-
          list @pr=facstd(i);
-         option(set,op);
+        // ideal ser;
          setring gnir;
          @pr=fetch(gnir1,@pr);
          kill gnir1;
       }
    }
+    option(noredSB);
    int j,k,odim,ndim,count;
    attrib(@pr[1],"isSB",1);
    if(#[1]==77)
@@ -1600,6 +1596,73 @@ EXAMPLE: example minAssPrimes; shows an example
    setring @P;
    list @res=imap(gnir,@res);
    return(phi(@res));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 32003,(x,y,z),lp;
+   poly  p = z2+1;
+   poly  q = z4+2;
+   ideal i = p^2*q^3,(y-z3)^3,(x-yz+z4)^4;
+   list pr= minAssPrimes(i);  pr;
+
+   minAssPrimes(i,1);
+}
+
+
+
+
+
+
+static proc minAssPrimes(ideal i, list #)
+"USAGE:   minAssPrimes(i); i ideal
+         minAssPrimes(i,1); i ideal  (to use also the factorizing Groebner)
+RETURN:  list = the minimal associated prime ideals of i
+EXAMPLE: example minAssPrimes; shows an example
+"
+{
+   def P=basering;
+   list q=simplifyIdeal(i);
+   list re=maxideal(1);
+   int j,a;
+   intvec op=option(get);
+   map phi=P,q[2];
+
+   i=groebner(q[1]);   
+   if((size(#)==0)||(dim(i)==0))   
+   {
+      re[1]=decomp(i,2);
+      re=union(re);
+      return(phi(re));
+   }
+   
+   option(redSB);
+   q=facstd(i);
+
+   if((size(q)==1)&&(dim(i)>1))
+   {
+      execute ("ring gnir=("+charstr(P)+"),("+varstr(P)+"),lp;");
+      list p=facstd(fetch(P,i));
+      if(size(p)>1)
+      {
+         a=1;
+         setring P;
+         q=fetch(gnir,p);
+      }
+      else
+      {
+         setring P;
+      }
+      kill gnir;
+   }
+
+   option(set,op);
+   for(j=1;j<=size(q);j++)
+   {
+      if(a==0){attrib(q[j],"isSB",1);}
+      re[j]=decomp(q[j],2);
+   }
+   re=union(re);
+   return(phi(re));
 }
 example
 { "EXAMPLE:"; echo = 2;
