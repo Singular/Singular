@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.15 1998-08-05 14:48:50 Singular Exp $ */
+/* $Id: febase.inc,v 1.16 1998-08-05 14:54:00 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -405,14 +405,11 @@ static int fePrintEcho(char *anf)
       PrintTCL('N',len_s,anf);
     }
     else
+    #endif
     {
       fwrite(anf,1,len_s,stdout);
       mflush();
     }
-    #else
-    fwrite(anf,1,len_s,stdout);
-    mflush();
-    #endif
     if (traceit&TRACE_SHOW_LINE)
     {
       #ifdef HAVE_TCL
