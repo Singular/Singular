@@ -1,9 +1,9 @@
-// $Id: general.lib,v 1.10 1999-04-19 11:02:10 obachman Exp $
+// $Id: general.lib,v 1.11 1999-06-07 17:25:07 Singular Exp $
 //system("random",787422842);
 //GMG, last modified 30.9.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.10 1999-04-19 11:02:10 obachman Exp $";
+version="$Id: general.lib,v 1.11 1999-06-07 17:25:07 Singular Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -139,20 +139,22 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc binomial (int n, int k, list #)
-"USAGE:   binomial(n,k[,p/s]); n,k,p integers, s string
-RETURN:  binomial(n,k);    binomial coefficient n choose k of type int
-                           (machine integer, limited size! )
-         binomial(n,k,p);  n choose k in char p of type string
-         binomial(n,k,s);  n choose k of type number (s any string), computed
-                           in char of basering if a basering is defined
+proc binomial (def n, int k, list #)
+"USAGE:   binomial(n,k[,p]); n,k,p integers
+RETURN:  binomial(n,k); binomial coefficient n choose k,
+         of type number if n is of type number (computed in char(basering)),
+         of type int if n is of type int (machine integer, limited size!)
+         binomial(n,k,p);  n choose k in char p, of type string
 EXAMPLE: example binomial; shows an example
 "
 {
-   if ( size(#)==0 ) { int rr=1; }
+   if ( size(#)==0 )
+   {
+      if ( typeof(n)=="number" ) { number rr=1; }
+      else { int rr=1; }
+   }
    if ( typeof(#[1])=="int") { ring bin = #[1],x,dp; number rr=1; }
-   if ( typeof(#[1])=="string") { number rr=1; }
-   if ( size(#)==0 or typeof(#[1])=="int" or typeof(#[1])=="string" )
+   if ( size(#)==0 or typeof(#[1])=="int" )
    {
       def r = rr;
       if ( k<=0 or k>n ) { return((k==0)*r); }
@@ -169,68 +171,61 @@ EXAMPLE: example binomial; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    int b1 = binomial(10,7); b1;
-   binomial(37,17,0);
-   ring t = 31,x,dp;
-   number b2 = binomial(37,17,""); b2;
+   binomial(137,17,0);
+   ring t = 0,x,dp;
+   number b2 = binomial(number(137),17); b2;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc factorial (int n, list #)
-"USAGE:   factorial(n[,string]);  n integer
-RETURN:  factorial(n); string of n! in char 0
-         factorial(n,s);  n! of type number (s any string), computed in char of
-         basering if a basering is defined
+proc factorial (def n)
+"USAGE:   factorial(n);  n = integer
+RETURN:  factorial(n); n! in char 0, of type string if n is of type int
+         n! of type number, computed in char(basering) if n is of type number
 EXAMPLE: example factorial; shows an example
 "
 {
-   if ( size(#)==0 ) { ring R = 0,x,dp; poly r=1; }
-   if ( typeof(#[1])=="string" ) { number r=1; }
-   if ( size(#)==0 or typeof(#[1])=="string" )
+   int t,l;
+   if ( typeof(n)=="number" ) { number r=1; }
+   else { ring R = 0,x,dp; number r=1; t=1; }
+   for (l=2; l<=n; l=l+1)
    {
-      int l;
-      for (l=2; l<=n; l=l+1)
-      {
-         r=r*l;
-      }
-      if ( size(#)==0 ) { return(string(r)); }
-      return(r);
+      r=r*l;
    }
+   if ( t==1 ) { return(string(r)); }
+   return(r);
 }
 example
 { "EXAMPLE:"; echo = 2;
    factorial(37);
    ring r1 = 32003,(x,y,z),ds;
-   number p = factorial(37,""); p;
+   number p = factorial(number(37)); p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc fibonacci (int n, list #)
-"USAGE:   fibonacci(n[,string]);  (n integer)
-RETURN:  fibonacci(n); string of nth Fibonacci number,
+proc fibonacci (def n)
+"USAGE:   fibonacci(n);  (n integer)
+RETURN:  fibonacci(n); nth Fibonacci number,
             f(0)=f(1)=1, f(i+1)=f(i-1)+f(i)
-         fibonacci(n,s);  nth Fibonacci number of type number (s any string),
-         computed in characteristic of basering if a basering is defined
+         of type string if n is of type int
+         of type number computed in char(basering) if n is of type number
 EXAMPLE: example fibonacci; shows an example
 "
 {
-   if ( size(#)==0 ) { ring fibo = 0,x,dp; number f=1; }
-   if ( typeof(#[1])=="string" ) { number f=1; }
-   if ( size(#)==0 or typeof(#[1])=="string" )
+   int ii,t;
+   if ( typeof(n)=="number" ) { number f,g,h=1,1,1; }
+   else { ring fibo = 0,x,dp; number f,g,h=1,1,1; t=1; }
+   for (ii=3; ii<=n; ii=ii+1)
    {
-      number g,h = 1,1; int ii;
-      for (ii=3; ii<=n; ii=ii+1)
-      {
-         h = f+g; f = g; g = h;
-      }
-      if ( size(#)==0 ) { return(string(h)); }
-      return(h);
-   }
+      h = f+g; f = g; g = h;
+    }
+   if ( t==1 ) { return(string(h)); }
+   return(h);
 }
 example
 { "EXAMPLE:"; echo = 2;
    fibonacci(37);
    ring r = 17,x,dp;
-   number b = fibonacci(37,""); b;
+   number b = fibonacci(number(37)); b;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
