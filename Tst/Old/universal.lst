@@ -166,6 +166,7 @@ koszul
 res 
 sres
 ; DIFF syzygies
+syzygies_new
 varlist
 qhw
 weight
