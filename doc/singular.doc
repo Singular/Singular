@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.103 2000-12-15 11:53:41 Singular Exp $
+@comment $Id: singular.doc,v 1.104 2000-12-19 15:55:08 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -341,6 +341,7 @@ LIB "all.lib";
 * gaussman_lib:: procedures for gauss-manin connection of a singularity
 * hnoether_lib:: procedures for the Hamburger-Noether (Puiseux) development
 * mondromy_lib:: procedures to compute the monodromy of a singularity
+* qhmoduli_lib:: procedures for moduli spaces of sqh-singularities
 * sing_lib:: procedures for computing invariants of singularities
 * spcurve_lib:: procedures for cm codimension 2 singularities
 * spectrum_lib:: procedures for computing singularity spectra
@@ -367,11 +368,15 @@ LIB "all.lib";
 @subsection hnoether_lib
 @c lib hnoether.lib
 @c ---------------------------------------------------------
-@node mondromy_lib, sing_lib, hnoether_lib, Singularities
+@node mondromy_lib, qhmoduli_lib, hnoether_lib, Singularities
 @subsection mondromy_lib
 @c lib mondromy.lib
+@c ---------------------------------------------------------
+@node qhmoduli_lib, sing_lib, mondromy_lib, Singularities
+@subsection qhmoduli_lib
+@c lib qhmoduli.lib
 @c ----------------------------------------------------------
-@node sing_lib, spcurve_lib, mondromy_lib, Singularities
+@node sing_lib, spcurve_lib, qhmoduli_lib, Singularities
 @subsection sing_lib
 @c lib sing.lib
 @c ---------------------------------------------------------
@@ -448,6 +453,7 @@ LIB "all.lib";
 @menu
 * graphics_lib:: procedures to draw  with Mathematica
 * latex_lib:: procedures for typesetting in TeX
+* paramet_lib:: procedures for parametrizations
 * surf_lib:: interface to the surf programm::
 @end menu
 
@@ -456,11 +462,15 @@ LIB "all.lib";
 @subsection graphics_lib
 @c lib graphics.lib no_ex
 @c ---------------------------------------------------------
-@node latex_lib, surf_lib, graphics_lib, Visualization
+@node latex_lib, paramet_lib, graphics_lib, Visualization
 @subsection latex_lib
 @c lib latex.lib no_ex
 @c ---------------------------------------------------------
-@node surf_lib,, latex_lib, Visualization
+@node paramet_lib, surf_lib, latex_lib, Visualization
+@subsection paramet_lib
+@c lib paramet.lib
+@c ---------------------------------------------------------
+@node surf_lib,, paramet_lib, Visualization
 @subsection surf_lib
 @c lib surf.lib no_ex
 
