@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.71 1999-12-20 16:38:21 krueger Exp $ */
+/* $Id: iplib.cc,v 1.72 2000-04-17 13:58:38 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -284,7 +284,9 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   /* start interpreter ======================================*/
   myynest++;
   err=yyparse();
+  //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
   killlocals(myynest);
+  //Print("end kill locals for %s (%d)\n",IDID(pn),myynest);
   myynest--;
   si_echo=old_echo;
   if (pi!=NULL)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.53 1999-12-21 15:10:47 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.54 2000-04-17 13:58:38 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -252,12 +252,20 @@ static void killlocals0(int v, idhdl * localhdl)
 
 void killlocals(int v)
 {
-#ifndef HAVE_NAMESPACES
   killlocals0(v,&IDROOT);
 
-  idhdl h = IDROOT;
+  if ((iiRETURNEXPR_len > myynest)
+  && ((iiRETURNEXPR[myynest].Typ()==RING_CMD)
+    || (iiRETURNEXPR[myynest].Typ()==QRING_CMD)))
+  {
+    leftv h=&iiRETURNEXPR[myynest];
+    killlocals0(v,&(((ring)h->data)->idroot));
+  }
+
   idhdl sh=currRingHdl;
   BOOLEAN changed=FALSE;
+#ifndef HAVE_NAMESPACES
+  idhdl h = IDROOT;
 
   while (h!=NULL)
   {
@@ -270,11 +278,7 @@ void killlocals(int v)
     h = IDNEXT(h);
   }
 #else
-  killlocals0(v,&IDROOT);
-
   idhdl h = NSROOT(namespaceroot->root);
-  idhdl sh=currRingHdl;
-  BOOLEAN changed=FALSE;
 
   while (h!=NULL)
   {
