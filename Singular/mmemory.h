@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.19 1999-06-30 11:53:59 Singular Exp $ */
+/* $Id: mmemory.h,v 1.20 1999-08-18 09:18:44 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -215,19 +215,19 @@ void* mmGListHasCycle(void* list, int next);
  *
  **********************************************************************/
 #ifdef DO_DEEP_PROFILE
-extern void _memcpyW(void* p1, void* p2, long l);
-#define memcpy_nwEVEN(p1, p2, l)    _memcpyW((void*) p1, (void*) p2, (long) l)
-#define memcpy_nwODD(p1, p2, l)     _memcpyW((void*) p1, (void*) p2, (long) l)
-#define memcpyW(p1, p2, l)          _memcpyW((void*) p1, (void*) p2, (long) l)
+extern void _memcpyW(long* p1, long* p2, long l);
+#define memcpy_nwEVEN(p1, p2, l)    _memcpyW((long*) p1, (long*) p2, (long) l)
+#define memcpy_nwODD(p1, p2, l)     _memcpyW((long*) p1, (long*) p2, (long) l)
+#define memcpyW(p1, p2, l)          _memcpyW((long*) p1, (long*) p2, (long) l)
 
-extern void _memaddW(void* p1, void* p2, void* p3, long l);
+extern void _memaddW(long* p1, long* p2, long* p3, long l);
 #define memaddW(p1, p2, p3, l)          _memaddW(p1, p2, p3, l)
 #define memadd_nwODD(p1, p2, p3, l)     _memaddW(p1, p2, p3, l)
 #define memadd_nwEVEN(p1, p2, p3, l)    _memaddW(p1, p2, p3, l)
 #define memadd_nwONE(p1, p2, p3)        _memaddW(p1, p2, p3, 1)
 #define memadd_nwTWO(p1, p2, p3)        _memaddW(p1, p2, p3, 2)
 
-extern void _memsetW(void* p1, long w, long l);
+extern void _memsetW(long* p1, long w, long l);
 #define memsetW(p1, w, l) _memsetW(p1, w, l)
 
 #else /* ! DO_DEEP_PROFILE */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.8 1999-08-13 17:12:21 Singular Exp $ */
+/* $Id: mmisc.c,v 1.9 1999-08-18 09:18:28 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -313,7 +313,7 @@ void* mmGListHasCycle(void* list, int next)
  **********************************************************************/
 
 #ifdef DO_DEEP_PROFILE
-void _memcpyW(void* p1, void* p2, long l)
+void _memcpyW(long* p1, long* p2, long l)
 {
   assume(l >= 0);
 
@@ -324,7 +324,7 @@ void _memcpyW(void* p1, void* p2, long l)
   }
 }
 
-void _memaddW(void* p1, void* p2, void* p3, long l)
+void _memaddW(long* p1, long* p2, long* p3, long l)
 {
   assume(l >= 0);
 
@@ -335,7 +335,7 @@ void _memaddW(void* p1, void* p2, void* p3, long l)
   }
 }
 
-void _memsetW(void* p1, long w, long l)
+void _memsetW(long* p1, long w, long l)
 {
   assume(l >= 0);
 
