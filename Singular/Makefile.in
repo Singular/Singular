@@ -290,11 +290,11 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
 	echo "#define feVersionId "  `date '+%Y%m%d%H'` >version.h
 
-libparse: libparse_main.o utils.o fegetopt.o febase.cc
-	${CXX}  -DSTANDALONE_PARSER -o libparse febase.cc libparse_main.o utils.o fegetopt.o
+libparse: libparse_main.o utils.o fegetopt.o
+	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o fegetopt.o ${LDFLAGS} ${LIBS} -lomalloc_ndebug mmalloc.o
 
 libparse_main.o: libparse.cc
-	${CXX} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
+	${CXX} ${CPPFLAGS} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
 
 libparse.cc: libparse.l
 	@if test "x${LEX}" = x; then \

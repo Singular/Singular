@@ -60,3 +60,7 @@ public:
   char          is_static;        // if set, proc not accessible for user
   procinfodata  data;
 };
+
+
+typedef void * idhdl;
+
