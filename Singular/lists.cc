@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.23 2000-11-14 16:04:58 obachman Exp $ */
+/* $Id: lists.cc,v 1.24 2002-05-16 17:52:02 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -33,9 +33,6 @@ lists lCopy(lists L)
   {
     N->m[n].Copy(&L->m[n]);
   }
-#ifdef HAVE_NAMESPACES_N
-  N->src_packhdl = L->src_packhdl;
-#endif
   //Print("copy list with %d -> %d elems\n",L->nr,N->nr);
   return N;
 }

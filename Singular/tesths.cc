@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.89 2002-03-07 18:46:58 Singular Exp $ */
+/* $Id: tesths.cc,v 1.90 2002-05-16 17:53:01 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -112,13 +112,6 @@ int main(          /* main entry to Singular */
 
   /* say hello */
   {
-#ifdef HAVE_NAMESPACES
-    namespaceroot->push(NULL, "Top", 0, TRUE);
-    idhdl h;
-    h=enterid("Top", 0, PACKAGE_CMD, &IDROOT, TRUE);
-    IDPACKAGE(h) = NSPACK(namespaceroot);
-    IDPACKAGE(h)->language = LANG_TOP;
-#endif /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
     basePack=(package)omAlloc0(sizeof(*basePack));
     currPack=basePack;
@@ -128,7 +121,7 @@ int main(          /* main entry to Singular */
     IDPACKAGE(h)=basePack;
     currPackHdl=h;
     basePackHdl=h;
-#endif /* HAVE_NAMESPACES */
+#endif /* HAVE_NS */
   }
   if (BVERBOSE(0))
   {
@@ -162,11 +155,7 @@ int main(          /* main entry to Singular */
   {
     int vv=verbose;
     verbose &= ~Sy_bit(V_LOAD_LIB);
-#ifdef HAVE_NAMESPACES
-    iiLibCmd(omStrDup("standard.lib"),TRUE, TRUE);
-#else /* HAVE_NAMESPACES */
     iiLibCmd(omStrDup("standard.lib"), TRUE);
-#endif /* HAVE_NAMESPACES */
     verbose=vv;
   }
   errorreported = 0;

@@ -542,12 +542,7 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
 // otherwise, return FALSE
 static BOOLEAN heOnlineHelp(char* s)
 {
-#ifdef HAVE_NAMESPACES
-  idhdl h, ns;
-  iiname2hdl(s, &ns, &h);
-#else /* HAVE_NAMESPACES */
   idhdl h=IDROOT->get(s,myynest);
-#endif /* HAVE_NAMESPACES */
 
   // try help for a procedure
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
@@ -597,15 +592,11 @@ static BOOLEAN heOnlineHelp(char* s)
     lib_style_types lib_style; // = OLD_LIBSTYLE;
 
     yylpin = fp;
-#ifdef HAVE_NAMESPACES
-    yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
     yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
 #else /* HAVE_NS */
     yylplex(str, libnamebuf, &lib_style, GET_INFO);
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
     reinit_yylp();
     if(lib_style == OLD_LIBSTYLE)
     {
@@ -651,12 +642,7 @@ static BOOLEAN heOnlineHelp(char* s)
 static long heKeyChksum(char* key)
 {
   if (key == NULL || *key == '\0') return 0;
-#ifdef HAVE_NAMESPACES
-  idhdl h, ns;
-  iiname2hdl(key, &ns, &h);
-#else /* HAVE_NAMESPACES */
   idhdl h=IDROOT->get(key,myynest);
-#endif /* HAVE_NAMESPACES */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
     procinfo *pi = IDPROC(h);

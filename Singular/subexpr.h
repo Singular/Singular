@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.32 2002-03-07 18:45:06 Singular Exp $ */
+/* $Id: subexpr.h,v 1.33 2002-05-16 17:53:31 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -52,11 +52,6 @@ class sleftv
                   * ....
                   */
     Subexpr e;    /* holds the indices for indexed values */
-#ifdef HAVE_NAMESPACES
-    idhdl       packhdl;
-    idhdl       req_packhdl;
-#define IDSROOT(a) (IDPACKAGE(((sleftv)a).packhdl)->idroot)
-#endif /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
     package     packhdl;
     package     req_packhdl;
