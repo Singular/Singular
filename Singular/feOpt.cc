@@ -1,12 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.19 2001-10-09 16:35:58 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.20 2002-05-22 10:30:04 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
 
 #include <string.h>
+#include <stdlib.h>
 #include "mod2.h"
 #include "feOpt.h"
 
@@ -374,7 +375,7 @@ static char* feOptAction(feOptIndex opt)
           sdb_flags = 1;
         else
           sdb_flags = 0;
-      #endif	
+      #endif
         return NULL;
 
       case FE_OPT_VERSION:
