@@ -1,0 +1,7 @@
+config.log
+GNUmakefile
+config.status
+config.h
+stamp-h
+factoryconf.h
+factory.h
