@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.7 1998-04-20 10:05:54 krueger Exp $ */
+/* $Id: libparse.l,v 1.8 1998-04-22 08:40:55 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -663,11 +663,11 @@ main( int argc, char *argv[] )
      yyin = stdin;
 
   printf( "  %-15s  %20s      %s,%s    %s,%s     %s,%s\n", "Library",
-	  "function", "line", "start-eod", "line", "body-eop",
+	  "function", "line", "start-eod", "line", "body-eob",
 	  "line", "example-eoe");
   yylplex(argv[0], argv[0], &lib_style);
   if(yylp_errno) {
-    printf("ERROR accured: [%d] ", yylp_errno);
+    printf("ERROR occured: [%d] ", yylp_errno);
     printf(yylp_errlist[yylp_errno], yylplineno);
     printf("\n");
   } 
