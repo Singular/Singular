@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.150 2000-11-13 14:50:21 levandov Exp $ */
+/* $Id: extra.cc,v 1.151 2000-12-07 15:42:30 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -626,6 +626,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #endif
 #include "mpsr.h"
 
+#include "mod_raw.h"
    
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {

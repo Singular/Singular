@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopyTemplate.cc,v 1.4 2000-11-03 14:50:23 obachman Exp $ */
+/* $Id: prCopyTemplate.cc,v 1.5 2000-12-07 15:42:30 obachman Exp $ */
 /*
 * ABSTRACT - templates for pr routines
 */
@@ -19,7 +19,7 @@ static poly PR_NAME
   {
     pNext(dest) = (poly) PR_ALLOC_MONOM(r_dest);
     pIter(dest);
-    pSetCoeff0(dest, PR_NCOPY(pGetCoeff(src)));
+    pSetCoeff0(dest, PR_NCOPY(pGetCoeff(src), r_src));
     PR_CPY_EVECTOR(dest, r_dest, src, r_src);
     tmp = pNext(src);
     PR_DELETE_MONOM(src, r_src);

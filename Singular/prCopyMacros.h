@@ -32,12 +32,12 @@ while (0)
 #undef PR_NDELETE
 #undef PR_NUMBER_SIMPLE_NAME
 #if PR_NUMBER_SIMPLE > 0 
-#define PR_NCOPY(n) n
+#define PR_NCOPY(n, r) n
 #define PR_NDELETE(n, r) ((void)0)
 #define PR_NUMBER_SIMPLE_NAME NSimple
 #else
-#define PR_NCOPY(n) nCopy(n)
-#define PR_NDELETE(n, r) nDelete(n)
+#define PR_NCOPY(n, r) n_Copy(n,r)
+#define PR_NDELETE(n, r) n_Delete(n,r)
 #define PR_NUMBER_SIMPLE_NAME NoNSimple
 #endif
 
