@@ -322,8 +322,10 @@ poly pFastPower(poly f, int n, ring r){
   pot_array[0]=f; //do not delete it
   for(i=1;i<field_size;i++){
     poly p=pot_array[i-1];
-    pot_array[i]=multifastmult(p,p,r);
-    //pot_array[i]=pp_Mult_qq(p,p,r);
+    if(rVar(r)==1)
+      pot_array[i]=multifastmult(p,p,r);
+    else
+      pot_array[i]=pp_Mult_qq(p,p,r);
   }
   
 
@@ -360,8 +362,11 @@ poly pFastPower(poly f, int n, ring r){
   }
   for(i=0;i<field_size;i++){
     if(int_pot_array[i]==1){
-      poly prod=multifastmult(erg,pot_array[i],r);
-      //      poly prod=pp_Mult_qq(erg,pot_array[i],r);
+      poly prod;
+      if(rVar(r)==1)
+	prod=multifastmult(erg,pot_array[i],r);
+      else
+	prod=pp_Mult_qq(erg,pot_array[i],r);
       pDelete(&erg);
       erg=prod;
     }
