@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.137 1999-08-18 14:28:41 siebert Exp $
+@comment $Id: reference.doc,v 1.138 1999-08-19 09:23:07 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -239,7 +239,7 @@ to the value @emph{expression}.
 @c example
 @end smallexample
 @item @strong{Remark:}
-An attribute may be described by any string_expression. Some of these are 
+An attribute may be described by any string_expression. Some of these are
 used by the kernel of @sc{Singular} and referred to as reserved attributes.
 Non-reserved attributes may be used, however, in procedures and can
 considerably speed up computations.
@@ -864,7 +864,7 @@ contract( x^A , x^B) := x^(B-A) (if B>=A elementwise), 0 otherwise
 @tex
 $${\rm contract}(x^A ,  x^B) := \cases{ x^{(B-A)}, &if $B\ge A$ elementwise\cr 0,&otherwise.\cr}$$
 @end tex
-where A and B are the multiexponents of the ring variables represented by 
+where A and B are the multiexponents of the ring variables represented by
 @tex
 $x$.
 @end tex
@@ -943,7 +943,7 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns a value !=0 (TRUE) if there is a userdefined object with this name,
+returns a value <>0 (TRUE) if there is a userdefined object with this name,
 and 0 (FALSE) otherwise.
 @*A non-zero return value is the level where the object is defined (level
 1 denotes the top level, level 2 the level of a first procedure, level 3
@@ -1252,11 +1252,11 @@ See
 the same as the type of the first argument
 @item @strong{Purpose:}
 eliminates variables occurring as factors of the second argument from an
-ideal, resp.@: module, by intersecting it with the subring not containing 
+ideal, resp.@: module, by intersecting it with the subring not containing
 these variables.
 @*@code{eliminate} does not need a special ordering nor a standard basis as input.
 
-@*Since elimination is expensive, it might be useful for homogeneous input, 
+@*Since elimination is expensive, it might be useful for homogeneous input,
 first to compute the Hilbert function of the ideal (first
 argument) with a fast ordering (e.g., @code{dp}). Then make use of it to speed
 up the computation: a Hilbert-driven elimination uses the intvec
@@ -1335,7 +1335,7 @@ none
 @item @strong{Purpose:}
 Immediately Interrupts the current computation, returns to the
 top-level, and displays the argument @code{string_expression} as error
-message. 
+message.
 
 @item @strong{Note:}
 This should be used as an emergency, or, failure exit within procedures.
@@ -1346,7 +1346,7 @@ This should be used as an emergency, or, failure exit within procedures.
 int i = 1;
 proc myError() {ERROR("Need to leave now");i=2;}
 myError();
-i;     
+i;
 @c example
 @end smallexample
 @end table
@@ -1675,7 +1675,7 @@ See
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns an ideal which is contained in the ideal_expression such that the ith 
+returns an ideal which is contained in the ideal_expression such that the ith
 generator is a univariate polynomial in the ith ring variable.
 @* The polynomials have minimal degree w.r.t.@: this property.  The
 ideal must be zero-dimensional and given as a reduced Groebner basis in
@@ -1881,12 +1881,12 @@ manual is displayed.
 @item
 @code{?} may be used instead of @code{help}.
 
-@item 
+@item
 @code{topic} can be an index entry of the @sc{Singular} manual or the
-name of (loaded) procedure which has a help section. 
+name of (loaded) procedure which has a help section.
 @item
 @code{topic} may contain wildcard characters (i.e.,
-@code{*} characters).  
+@code{*} characters).
 @item
 If a (possibly "wildcarded") @code{topic} can not be found (or,
 uniquely matched) a warning is displayed and no help information is
@@ -1902,7 +1902,7 @@ printed to the terminal.
 The browser in which the help information is displayed can be either set
 with the command-line option @code{--browser=<browser>} (@pxref{Command
 line options}), or with the command @code{system("--browser",
-"<browser>")}. Use the command @code{system("browserws");} for a list of 
+"<browser>")}. Use the command @code{system("browserws");} for a list of
 all available browsers. @xref{The online help system}, for more details
 about help browsers.
 
@@ -1916,13 +1916,13 @@ help ring; // display help about 'ring'
 @expansion{} // ** No help for topic 'ringe' (not even for '*ringe*')
 @expansion{} // ** Try '?;'       for general help
 @expansion{} // ** or  '?Index;'  for all available help topics
-?ring*;     
+?ring*;
 @expansion{} //  ** No unique help for 'ring*'
 @expansion{} //  ** Try one of
-@expansion{} ?Rings and orderings; ?Rings and standard bases; ?ring; 
-@expansion{} ?ring declarations; ?ring operations; ?ring related functions; 
+@expansion{} ?Rings and orderings; ?Rings and standard bases; ?ring;
+@expansion{} ?ring declarations; ?ring operations; ?ring related functions;
 @expansion{} ?ring.lib; ?ring_lib; ?ringtensor; ?ringweights;
-help Rings and orderings; 
+help Rings and orderings;
 help standard.lib;  // displays help about library 'standard.lib'
 @end smallexample
 @end table
@@ -3008,7 +3008,7 @@ Let @code{list L=lres(M,0);} then @code{L[1]} generates M,
 @code{L[2]} generates
 the first syzygy
 module of @code{L[1]}, etc.
-( @code{L[i]} 
+( @code{L[i]}
 @tex
 $=M_i$
 @end tex
@@ -3357,15 +3357,15 @@ where n is the number of variables of the basering.
 Let @code{list L=mres(M,0);}
  then @code{L[1]} consists of a minimal set of generators of the input, @code{L[2]}
 consists of a minimal set of generators of the first syzygy module of
-@code{L[1]}, etc., until @code{L[p+1]}, such that @code{L[i]}.
+@code{L[1]}, etc., until @code{L[p+1]}, such that @code{L[i]}
 @ifinfo
-!=0 for i<=p,
+<>0 for i<=p,
 @end ifinfo
 @tex
 $\neq 0$ for $i \le p$,
 @end tex
- but @code{L[p+1]}, the
-first syzygy module of @code{L[p]}, is 0 (if the basering is not a qring).
+ but @code{L[p+1]}, the first syzygy module of @code{L[p]},
+is 0 (if the basering is not a qring).
 @item @strong{Note:}
 To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take time.
@@ -3400,7 +3400,7 @@ See
 list
 @item @strong{Purpose:}
 returns a list whose first entry is a standard basis and whose second
-entry is a minimal generating set of the ideal which is a subset of the 
+entry is a minimal generating set of the ideal which is a subset of the
 standard basis for homogeneous input (w.r.t. any monomial ordering).
 @item @strong{Example:}
 @smallexample
@@ -4241,7 +4241,7 @@ string determines, which format to use to generate the string. The
 following format strings are supported:
 @table @code
 @item "betti"
-given a matrix 
+given a matrix
 @tex
 $M$
 @end tex
@@ -4264,7 +4264,7 @@ $d$ in row $i$ and column $j$
 d in row i and column j
 @end ifinfo
 is the minimal number of generators in
-degree 
+degree
 @tex
 $i+j$ of the $j$-th
 @end tex
@@ -5017,7 +5017,7 @@ returns the number of entries (rows*columns).
 @end smallexample
 @end table
 @c ref
-See 
+See
 @ref{string};
 @ref{intvec};
 @ref{intmat};
@@ -5039,7 +5039,7 @@ See
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
-computes the permutation 
+computes the permutation
 @tex
 $v\colon I[i]\leftarrow I[v[i]]$
 @end tex
@@ -5365,7 +5365,7 @@ interface to internal data and the operating system. The
 string_expression determines the command to execute. Some commands
 require an additional argument (second form) where the type of the
 argument depends on the command. See below for a list of all possible
-commands.  
+commands.
 @*Not all functions work on every platform.
 @item @strong{Functions:}
 @table @asis
@@ -5388,7 +5388,7 @@ returns shell environment variable given as the second argument
 @cindex setenv
 @cindex system, setenv
 sets the shell environment variable given as the second argument to the
-value given as the third argument. Returns the third argument. Might not 
+value given as the third argument. Returns the third argument. Might not
 be available on all platforms.
 @item @code{system("tty")}
 @cindex tty
@@ -5437,7 +5437,7 @@ value given by the expression. Can only be used for some options (e.g.,
 for @code{--browser}). @xref{Command line options}.
 @item @code{system("browsers");}
 @cindex system, browsers
-returns a string about available help browsers. 
+returns a string about available help browsers.
 @xref{The online help system}.
 @end table
 @item @strong{Example for UNIX:}
@@ -5704,7 +5704,7 @@ string
 @item @strong{Purpose:}
 returns the list of the names of the ring variables as a string
 or the name of the n-th ring variable, where n is given by the
-int_expression. 
+int_expression.
 @*If the ring name is omitted, the basering is used, thus
 @code{varstr(n)} is equivalent to @code{varstr(basering,n)}.
 @item @strong{Example:}
@@ -5738,8 +5738,8 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-computes the vector space dimension of the ring, resp.@: free module, 
-modulo the ideal, resp.@: module, 
+computes the vector space dimension of the ring, resp.@: free module,
+modulo the ideal, resp.@: module,
 generated by the initial terms of the given generators.
 If the generators form a standard basis,
 this is the same as the vector space dimension of the ring, resp.
