@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.33 1998-03-23 16:01:15 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.34 1998-04-20 15:06:48 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -59,8 +59,8 @@ RANLIB =	@RANLIB@
 LN_S = 		@LN_S@
 AR =		@AR@
 BISON =		@BISON@
-MKINSTALLDIRS =	@MKINSTALLDIRS@
-MAKEHEADER =	@MAKEHEADER@
+MKINSTALLDIRS =	@FACTORY_MKINSTALLDIRS@
+MAKEHEADER =	@FACTORY_MAKEHEADER@
 
 #
 # - flags.
