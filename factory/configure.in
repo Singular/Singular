@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.37 2003-06-20 14:25:29 hannes Exp $
+dnl # $Id: configure.in,v 1.38 2003-06-20 14:26:52 Singular Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.37 2003-06-20 14:25:29 hannes Exp $)
+AC_REVISION($Id: configure.in,v 1.38 2003-06-20 14:26:52 Singular Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -314,7 +314,7 @@ AC_LANG_C
 AC_MSG_CHECKING(whether your compiler does arithmetic shifts)
 AC_CACHE_VAL(ac_cv_shift,
   [ AC_TRY_RUN(
-      [ int main() { if (-2 >> 1 == -1) exit(0); else exit(1); } ],
+      [ int main() { if (-2 >> 1 == -1) return(0); else return(1); } ],
       ac_cv_shift=yes, ac_cv_shift=no, ac_cv_shift=yes) ])
 if test "x$ac_cv_shift" = xyes; then   
   AC_MSG_RESULT(yes)
