@@ -1,3 +1,4 @@
+/* $Id: NTLconvert.h,v 1.2 2002-07-30 15:20:02 Singular Exp $ */
 #ifndef INCL_NTLCONVERT_H
 #define INCL_NTLCONVERT_H
 
@@ -16,6 +17,8 @@
 #include "fac_multivar.h"
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
+
+#ifdef HAVE_NTL
 
 #include <NTL/ZZXFactoring.h>
 #include <NTL/ZZ_pXFactoring.h>
@@ -39,5 +42,8 @@ CanonicalForm convertNTLZZpE2CF(ZZ_pE coefficient,Variable x);
 CFFList convertNTLvec_pair_ZZpEX_long2FacCFFList(vec_pair_ZZ_pEX_long e,ZZ_pE multi,Variable x,Variable alpha);
 CanonicalForm convertNTLGF2E2CF(GF2E coefficient,Variable x);
 CFFList convertNTLvec_pair_GF2EX_long2FacCFFList(vec_pair_GF2EX_long e,GF2E multi,Variable x,Variable alpha);
+GF2EX convertFacCF2NTLGF2EX(CanonicalForm f,ZZ_pX mipo);
+ZZ_pEX convertFacCF2NTLZZ_pEX(CanonicalForm f,ZZ_pX mipo);
 
+#endif
 #endif
