@@ -104,7 +104,8 @@ static int monom_poly_crit(const void* ap1, const void* ap2){
   monom_poly* p2;
   p1=((monom_poly*) ap1);
   p2=((monom_poly*)ap2);
-
+  if(p1->f>p2->f) return 1;
+  if(p1->f<p2->f) return -1;  
   int c=pLmCmp(p1->f,p2->f);
   if (c !=0) return c;
   c=pLmCmp(p1->m,p2->m);
@@ -195,6 +196,32 @@ static int posInPolys (poly*  p, int pn, poly qe,calc_dat* c)
       }
       i=(an+en) / 2;
         if (pLmCmp(p[i],qe)==1)
+          en=i;
+      else an=i;
+    }
+}
+static int posInMonomPolys (monom_poly*  p, int pn, monom_poly & qe,calc_dat* c)
+{
+  if(pn==0) return 0;
+
+  int length=pn-1;
+  int i;
+  int an = 0;
+  int en= length;
+
+  if (monom_poly_crit(&qe,&p[en])==1)
+    return length+1;
+
+  while(1)
+    {
+      //if (an >= en-1)
+      if(en-1<=an)
+      {
+        if (monom_poly_crit(&p[an],&qe)==1) return an;
+        return en;
+      }
+      i=(an+en) / 2;
+        if (monom_poly_crit(&p[i],&qe)==1)
           en=i;
       else an=i;
     }
@@ -1836,11 +1863,19 @@ static void simplify(monom_poly& h, calc_dat* c){
   {
     assume(F_minus!=NULL);
     int i;
-    for(i=0;i<F->size;i++)
+    int posm=posInMonomPolys (F->mp, F->size, h,c);
+#ifdef TGB_DEBUG
+#endif
+     //for(i=0;i<F->size;i++)
+    for(i=min(posm,F->size-1);i>=0;i--)
     {
+      //      if((i>=posm)&&(F->mp[i].f!=h.f)) break;
+      if((i<posm)&&(F->mp[i].f!=h.f)) break;
       if ((h.f==F->mp[i].f) &&(p_LmDivisibleBy(F->mp[i].m,h.m,c->r)))
       {
 	
+	//	Print("found");
+       
 	  //according to the algorithm you should test (!(pIsConstant(F[i].m)))
 	  //but I think this is only because of bad formulation
 	int j;
@@ -2789,6 +2824,7 @@ static void go_on_F4 (calc_dat* c){
   assume((*F_m_i)==NULL);
   //should resize the array to save memory
   //F and F_minus
+  qsort(chosen,chosen_index,sizeof(monom_poly),monom_poly_crit);//important for simplify
   (*F_m_i)=(poly_array_list*) omalloc(sizeof(poly_array_list));
   (*F_m_i)->size=F_minus_index;
   (*F_m_i)->p=F_minus;
