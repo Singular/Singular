@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.105 2000-12-20 16:46:20 Singular Exp $
+@comment $Id: singular.doc,v 1.106 2001-01-11 17:00:31 pfister Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -255,20 +255,15 @@ LIB "all.lib";
 
 @menu
 * matrix_lib:: procedures for matrix operations
-* jordan_lib:: procedures to compute the jordan normal form
 * linalg_lib:: procedures for algorithmic linear algebra
 @end menu
 
 @c ----------------------------------------------------------
-@node matrix_lib, jordan_lib,  Linear algebra, Linear algebra
+@node matrix_lib, linalg_lib,  Linear algebra, Linear algebra
 @subsection matrix_lib
 @c lib matrix.lib
 @c ---------------------------------------------------------
-@node jordan_lib, linalg_lib, matrix_lib, Linear algebra
-@subsection jordan_lib
-@c lib jordan.lib
-@c ---------------------------------------------------------
-@node linalg_lib, , jordan_lib, Linear algebra
+@node linalg_lib, , matrix_lib, Linear algebra
 @subsection linalg_lib
 @c lib linalg.lib no_ex
 @c ----------------------------------------------------------------------------
