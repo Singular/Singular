@@ -1,9 +1,12 @@
-dnl $Id: ftest_util.m4,v 1.14 1997-12-17 12:16:11 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.15 1998-02-19 15:10:07 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
 dnl "External" macro start with prefix `ftest', "internal" macros
 dnl with prefix `_'.
+dnl
+dnl Almost all macros insert `#line'-preprocessor directives into
+dnl code to aid debugging.
 dnl
 dnl Note: Be carefull where to place the ';'!
 dnl
@@ -57,6 +60,7 @@ define(`ftestUsage',``$2'')dnl
 #
 define(`ftestPreprocInit', `dnl
 changecom(`//')dnl
+`#line' __line__ "__file__"
 `#include <unistd.h>
 
 #define TIMING
@@ -65,13 +69,14 @@ changecom(`//')dnl
 #include <factory.h>
 
 #include "ftest_util.h"
-#include "ftest_io.h"
-'')
+#include "ftest_io.h"'
+dnl')
 
 #
 # ftestGlobalInit() - global initialization.
 #
 define(`ftestGlobalInit', `dnl
+`#line' __line__ "__file__"
 `TIMING_DEFINE_PRINT( ftestTimer )'')
 
 #
@@ -81,7 +86,8 @@ define(`ftestGlobalInit', `dnl
 # this case print the usage and exit), and catche signals.
 #
 define(`ftestMainInit', `dnl
-`int optind = 0;
+`#line' __line__ "__file__"
+    `int optind = 0;
     ftestStatusT check = UndefinedResult;
 
     ftestSetName( argv[0], "'ftestAlgorithm`", 'ftestUsage`);
@@ -91,13 +97,16 @@ define(`ftestMainInit', `dnl
         exit( 0 );
     }
 
-    ftestSignalCatch()'')
+    ftestSignalCatch();
+    #line' __line__ "__file__"
+dnl')
 
 #
 # ftestMainExit() - clean up in main().
 #
 define(`ftestMainExit', `dnl
-`return check'')
+`#line' __line__ "__file__"
+    `return check'')
 
 #
 # ftestOutVar() - declare output variable.
@@ -141,7 +150,8 @@ ifelse(`$1', `int',
 # ftestGetOpts() - read options.
 #
 define(`ftestGetOpts', `dnl
-`ftestGetOpts( argc, argv, optind )'')
+`#line' __line__ "__file__"
+    `ftestGetOpts( argc, argv, optind )'')
 
 #
 # ftestGetEnv() - read environment.
@@ -149,7 +159,8 @@ define(`ftestGetOpts', `dnl
 # And print it directly after reading it.
 #
 define(`ftestGetEnv', `dnl
-`ftestGetEnv( argc, argv, optind );
+`#line' __line__ "__file__"
+    `ftestGetEnv( argc, argv, optind );
 
     ftestPrintEnv()'')
 
@@ -175,12 +186,15 @@ ifelse(`$#', `1',
     } else
 	ftestError( CommandlineError,
                     "expected '_stripTWS(`_ftestInType_$1')` at position %d in commandline\n",
-                    optind )'',
+                    optind );'',
   ``if ( argv[ optind ] ) {
 	ftestArgGiven$1 = true;
 	$1 = ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
     } else
-	$1 = '_qstripTWS(`$2')')')
+	$1 = '_qstripTWS(`$2')`;'')
+    `#line' __line__ "__file__"
+
+dnl')
 
 #
 # ftestArgGiven() - check whether an argument was given.
@@ -199,7 +213,8 @@ define(`ftestArgGiven', `dnl
 # semicolon!
 #
 define(`ftestRun', `dnl
-`// save random generator seed now since the algorithm
+`#line' __line__ "__file__"
+    `// save random generator seed now since the algorithm
     // most likely is going to change it
     ftestWriteSeed();
 
@@ -220,7 +235,8 @@ define(`ftestRun', `dnl
 # $1: check function (with parameters) to call
 #
 define(`ftestCheck', `dnl
-`if ( ftestCheckFlag )
+`#line' __line__ "__file__"
+    `if ( ftestCheckFlag )
 	check = '_qstripTWS(`$1')')
 
 #
@@ -239,18 +255,9 @@ ifelse(`$#', `0', ,
     ftestPrintResult( $1, '_qstripTWS(`$2')` )'_ftestOutput(shift(shift($@)))')')
 
 define(`ftestOutput', `dnl
-`ftestPrintTimer( timing_ftestTimer_time );
+`#line' __line__ "__file__"
+    `ftestPrintTimer( timing_ftestTimer_time );
     ftestPrintCheck( check )'_ftestOutput($@)')
-
-#
-# ftestSetEnv() - set factory environment.
-#
-# This macro is quite spurious, but I keep it for future
-# use.
-#
-define(`ftestSetEnv', `dnl
-`ftestSetEnv();
-    ftestPrintEnv()'')
 
 dnl switch on output again
 divert`'dnl
