@@ -1,9 +1,9 @@
-// $Id: general.lib,v 1.5 1998-04-03 22:47:04 krueger Exp $
+// $Id: general.lib,v 1.6 1998-04-23 17:09:20 Singular Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.5 1998-04-03 22:47:04 krueger Exp $";
+version="$Id: general.lib,v 1.6 1998-04-23 17:09:20 Singular Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -20,9 +20,9 @@ LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
  ringweights(r);        intvec of weights of ring variables of ring r
  sort(ideal/module);    sort generators according to monomial ordering
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
-           (parameters in square brackets [] are optional)
  which(command);	searches for command and returns absolute
                         path, if found
+           (parameters in square brackets [] are optional)
 ";
 
 LIB "inout.lib";
@@ -636,7 +636,7 @@ EXAMPLE:  example which; shows an example
    string pn;
    if( typeof(command) != "string") 
    {
-	return pn;
+	return (pn);
    }
    i = system("sh", "which " + command + " > " + fn);
    pn = read(fn);
