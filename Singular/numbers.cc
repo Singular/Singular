@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.25 2000-11-17 14:07:12 Singular Exp $ */
+/* $Id: numbers.cc,v 1.26 2000-11-20 15:55:13 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -423,8 +423,7 @@ void nInitChar(ring r)
 
   n_Procs_s *n=cf_root;
   while((n!=NULL)
-    && (n->nChar!=c)
-    && (n->type!=t))
+    && ((n->nChar!=c) || (n->type!=t)))
       n=n->next;
   if (n==NULL)
   {
@@ -435,12 +434,16 @@ void nInitChar(ring r)
     n->type=t;
     cf_root=n;
   }
-  else
+  else if ((n->nChar==c) && (n->type==t))
   {
     n->ref++;
     r->cf=n;
     return;
   }
+  else
+  {
+    WerrorS("nInitChar failed");
+  } 
   r->cf=n;
   r->cf->nChar = c;
   r->cf->nPar  = ndPar;
