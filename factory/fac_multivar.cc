@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multivar.cc,v 1.9 2002-10-10 17:43:40 Singular Exp $ */
+/* $Id: fac_multivar.cc,v 1.10 2002-10-24 12:17:49 Singular Exp $ */
 
 #include <config.h>
 
@@ -19,6 +19,7 @@
 #include "cf_primes.h"
 #include "fac_distrib.h"
 
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 TIMING_DEFINE_PRINT(fac_content);
 TIMING_DEFINE_PRINT(fac_findeval);
@@ -147,6 +148,13 @@ void find_good_prime(const CanonicalForm &f, const CanonicalForm &r,int &start)
     int l = f.level();
     for ( CFIterator i = f; i.hasTerms(); i++ )
     {
+      if((i.exp()!=0) && ((i.exp() % cf_getSmallPrime(start))==0))
+      {
+        start++;
+        CanonicalForm ff=r;
+        find_good_prime(ff,r,start);
+	return;
+      }
       find_good_prime(i.coeff(),r,start);
     }
   }
@@ -239,15 +247,16 @@ ZFactorizeMulti ( const CanonicalForm & arg )
 	    prime_number=i;
 	  }  
 	  modpk bb=coeffBound(U0,p);
-	  if (bb.getpk() > b.getpk() ) b=bb;
+	  if (bb.getk() > b.getk() ) b=bb;
 	  bb=coeffBound(arg,p);
-	  if (bb.getpk() > b.getpk() ) b=bb;
+	  if (bb.getk() > b.getk() ) b=bb;
         }
         #else
         b = coeffBound( U, getZFacModulus().getp() );
         if ( getZFacModulus().getpk() > b.getpk() )
             b = getZFacModulus();
         #endif
+	//printf("p=%d, k=%d\n",b.getp(),b.getk());
         DEBOUTLN( cerr, "the coefficient bound of the factors of U is " << b.getpk() );
 
         r = G.size();

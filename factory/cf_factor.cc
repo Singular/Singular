@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.16 2002-10-10 17:43:39 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.17 2002-10-24 12:17:46 Singular Exp $ */
 
 //{{{ docu
 //
@@ -179,7 +179,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   if (! f.isUnivariate() )
   {
     mv=find_mvar(f);
-    if ( getCharacteristic() > 0 )
+    if ( getCharacteristic() == 0 )
     {
       if (mv!=f.level())
       {
@@ -297,6 +297,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         //{
         //  F.removeFirst();
         //}
+	//printf("NTL:\n");out_cff(F);
+	//F=ZFactorizeUnivariate( fz, issqrfree );
+	//printf("fac.:\n");out_cff(F);
       }
       else
       #endif
