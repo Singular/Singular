@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.247 2001-01-09 15:40:07 Singular Exp $ */
+/* $Id: iparith.cc,v 1.248 2001-01-12 12:38:26 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1829,7 +1829,7 @@ static BOOLEAN jjKoszul_Id(leftv res, leftv u, leftv v)
   memset(&h,0,sizeof(sleftv));
   h.rtyp=INT_CMD;
   h.data=(void *)IDELEMS((ideal)v->Data());
-  return mpKoszul(res, &h, u, v);
+  return mpKoszul(res, u, &h, v);
 }
 static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
 {
