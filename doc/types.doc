@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.62 1998-05-20 11:28:35 wichmann Exp $
+@comment $Id: types.doc,v 1.63 1998-05-20 12:13:12 pohl Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1759,6 +1759,9 @@ is a list entry; the index 1 gives the first element.
 @cindex list related functions
 
 @table @code
+@item bareiss
+returns a list of a matrix (lower triangular) and
+of an intvec (permutations of columns, see @ref{bareiss})
 @item betti
 Betti numbers of a resolution (see @ref{betti})
 @item delete
