@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.170 2001-11-12 13:34:33 Singular Exp $ */
+/* $Id: extra.cc,v 1.171 2001-11-13 14:22:26 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -682,32 +682,32 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 
               short * iv=iv2array(v);
               poly r=0;
-              poly h=ppJetW(f,n,iv);
+              poly hp=ppJetW(f,n,iv);
               int s=MATCOLS(m);
               int j=0;
               matrix T=mpInitI(s,1,0);
 
-              while (h != NULL)
+              while (hp != NULL)
               {
-                if (pDivisibleBy(m->m[j],h))
+                if (pDivisibleBy(m->m[j],hp))
                   {
                     if (MATELEM(T,j+1,1)==0)
                     {
-                      MATELEM(T,j+1,1)=pDivideM(pHead(h),pHead(m->m[j]));
+                      MATELEM(T,j+1,1)=pDivideM(pHead(hp),pHead(m->m[j]));
                     }
                     else
                     {
-                      pAdd(MATELEM(T,j+1,1),pDivideM(pHead(h),pHead(m->m[j])));
+                      pAdd(MATELEM(T,j+1,1),pDivideM(pHead(hp),pHead(m->m[j])));
                     }
-                    h=ppJetW(ksOldSpolyRed(m->m[j],h,0),n,iv);
+                    hp=ppJetW(ksOldSpolyRed(m->m[j],hp,0),n,iv);
                     j=0;
                   }
                 else
                 {
                   if (j==s-1)
                   {
-                    r=pAdd(r,pHead(h));
-                    pLmDeleteAndNext(h); /* h=pSub(h,pHead(h));*/
+                    r=pAdd(r,pHead(hp));
+                    hp=pLmDeleteAndNext(hp); /* hp=pSub(hp,pHead(hp));*/
                     j=0;
                   }
                   else
@@ -730,6 +730,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
               L->m[1].rtyp=MATRIX_CMD;   L->m[1].data=(void *)T;
               res->data=L;
               res->rtyp=LIST_CMD;
+              // iv aufraeumen
+              omFree(iv);
             }
             else
             {
