@@ -633,6 +633,7 @@ static int add_to_reductors(calc_dat* c, poly h, int len){
   assume(pLength(c->strat->S[i])==c->strat->lenS[i]);
   if(c->strat->lenSw)
     c->strat->lenSw[i]=pq;
+ 
   return i;
  
 }
@@ -4937,7 +4938,8 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     
     int i;
     int len;
-    
+    //    wrp(los[erg.to_reduce_u].p);
+    //Print("\n");
     multi_reduce_step(erg,los,c);
     }
 //     reduction_step *rs=create_reduction_step(erg, los, c);
