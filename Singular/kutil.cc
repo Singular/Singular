@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.31 1998-11-16 08:41:18 Singular Exp $ */
+/* $Id: kutil.cc,v 1.32 1999-04-29 11:38:48 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3146,13 +3146,11 @@ void updateS(BOOLEAN toT,kStrategy strat)
         if (((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
         && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
         {
-#ifdef KDEBUG
           if (TEST_OPT_DEBUG)
           {
             PrintS("reduce:");
             wrp(strat->S[i]);
           }
-#endif
           pDelete(&redSi);
           redSi = pHead(strat->S[i]);
           strat->S[i] = redBba(strat->S[i],i-1,strat);
@@ -3169,9 +3167,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
           if (strat->S[i]==NULL)
           {
             pDelete(&redSi);
-#ifdef KDEBUG
             if (TEST_OPT_DEBUG) PrintS(" to 0");
-#endif
             deleteInS(i,strat);
             i--;
           }
@@ -3201,14 +3197,12 @@ void updateS(BOOLEAN toT,kStrategy strat)
               pTest(h.p);
               if (h.p!=NULL)
               {
-#ifdef KDEBUG
                 if (TEST_OPT_DEBUG)
                 {
                   Print("new (aug %d) s:",augl);
                   wrp(h.p);
                   PrintLn();
                 }
-#endif
                 if (TEST_OPT_INTSTRATEGY)
                 {
                   //pContent(h.p);
@@ -3238,17 +3232,13 @@ void updateS(BOOLEAN toT,kStrategy strat)
             {
               pNorm(strat->S[i]);
             }
-#ifdef KDEBUG
             if (TEST_OPT_DEBUG)
             {
               PrintS(" to ");
               wrp(strat->S[i]);
             }
-#endif
           }
-#ifdef KDEBUG
           if (TEST_OPT_DEBUG) PrintLn();
-#endif
         }
         i++;
       }
@@ -3578,13 +3568,11 @@ void initBuchMoraCrit(kStrategy strat)
   /* alway use tailreduction, except:
   * - in local rings, - in lex order case, -in ring over extensions */
   strat->noTailReduction = !TEST_OPT_REDTAIL;
-#ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
     if (strat->homog) PrintS("ideal/module is homogeneous\n");
     else              PrintS("ideal/module is not homogeneous\n");
   }
-#endif
 }
 
 void initBuchMoraPos (kStrategy strat)
@@ -3882,14 +3870,12 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
       mflush();
     }
     strat->HCord=j;
-#ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       Print("H(%d):",j);
       wrp(strat->kHEdge);
       PrintLn();
     }
-#endif
   }
   if (pComp(strat->kNoether,newNoether)!=1)
   {

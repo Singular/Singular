@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.13 1999-03-08 18:11:49 Singular Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.14 1999-04-29 11:38:52 Singular Exp $ */
 
 /***************************************************************
  *
@@ -37,12 +37,12 @@ static char* GenerateRingName();
 int mpsr_rDefault(short ch, char *name, ring &r)
 {
   // check for currRing
-  if (currRing != NULL && rInternalChar(currRing) == ch) 
+  if (currRing != NULL && rInternalChar(currRing) == ch)
   // orig: currRing->ch==ch ???
   {
     int i, n = currRing->N;
     char **names = currRing->names;
-    
+
     for (i=0; i<n; i++)
     {
       if (strcmp(names[i], name) == 0)
@@ -59,7 +59,7 @@ int mpsr_rDefault(short ch, char *name, ring &r)
 
 ring mpsr_rDefault(short ch)
 {
-  if (currRing != NULL && rInternalChar(currRing) == ch) 
+  if (currRing != NULL && rInternalChar(currRing) == ch)
   // orig: currRing->ch==ch ???
   {
     (currRing->ref)++;
@@ -156,7 +156,7 @@ BOOLEAN mpsr_RingEqual(ring r1, ring r2)
     ideal id1 = r1->qideal, id2 = r2->qideal;
     int i, n;
     poly *m1, *m2;
-    
+
     if (id2 == NULL) return 0;
     if ((n = IDELEMS(id1)) != IDELEMS(id2)) return 0;
 
@@ -171,7 +171,7 @@ BOOLEAN mpsr_RingEqual(ring r1, ring r2)
   return 1;
 }
 
-  
+
 // returns TRUE, if r1 less or equals r2
 // FALSE, otherwise
 // Less or equal means that r1 is a strong subring of r2
@@ -200,7 +200,7 @@ inline BOOLEAN RingLessEqual(ring r1, ring r2)
       (r1->order[0] != r2->order[0] && r1->order[0] != ringorder_unspec) ||
       r1->order[1] != r2->order[1])
     return 0;
-  
+
   for (i=0; i<rPar(r1);i++)
   {
       if (strcmp(r1->parameter[i], r2->parameter[i])!=0)
@@ -258,7 +258,7 @@ mpsr_Status_t mpsr_MergeLeftv(mpsr_leftv mlv1, mpsr_leftv mlv2)
 
   lv = mlv1->lv;
   while (lv->next != NULL) lv = lv->next;
-  
+
   lv->next = mlv2->lv;
   mlv1->r = r;
 
@@ -273,11 +273,11 @@ mpsr_Status_t mpsr_MergeLeftv(mpsr_leftv mlv1, mpsr_leftv mlv2)
 void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
 {
   int i, n;
-  
+
   while (l != NULL)
   {
     short typ = l->Typ();
-    
+
     switch(typ)
     {
         case POLY_CMD:
@@ -309,7 +309,7 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
           Free(m1, n*sizeof(poly));
           break;
         }
-          
+
         case LIST_CMD:
         {
           lists ll = (lists) l->Data();
@@ -341,7 +341,7 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
           number nn = (number) l->data;
           mpsr_SetCurrRing(to_ring, TRUE);
           nSetMap(rInternalChar(from_ring), from_ring->parameter,
-	    rPar(from_ring), from_ring->minpoly);
+            rPar(from_ring), from_ring->minpoly);
           l->data = (void *) nMap(nn);
           mpsr_SetCurrRing(from_ring, FALSE);
           nDelete(&nn);
@@ -350,8 +350,8 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
     l = l->next;
   }
 }
-          
-           
+
+
 // searches for a ring handle which has a ring which is equal to r
 // if one is found, then this one is set to the new global ring
 // otherwise, a ring name is generated, and a new idhdl is created
@@ -365,7 +365,7 @@ void mpsr_SetCurrRingHdl(ring r)
       mpsr_SetCurrRing(IDRING(currRingHdl), TRUE);
     return;
   }
-  
+
   rTest(r);
   // try to find an idhdl which is an equal ring
   while (h != NULL)
@@ -419,7 +419,7 @@ static char* GenerateRingName()
   sprintf(grname, "mpsr_r%d", gringcounter++);
   return grname;
 }
-        
+
 // searches through the Singular namespace for a matching name:
 // the first found is returned together witht the respective ring
 idhdl mpsr_FindIdhdl(char *name, ring &r)
@@ -430,7 +430,7 @@ idhdl mpsr_FindIdhdl(char *name, ring &r)
   idhdl h = (idroot != NULL ? idroot->get(name, 0): (idhdl) NULL), h2;
 #endif /* HAVE_NAMESPACES */
   r = NULL;
-  
+
   if (h != NULL)
   {
     r = NULL;
@@ -444,7 +444,7 @@ idhdl mpsr_FindIdhdl(char *name, ring &r)
     {
       h2 = (IDRING(h)->idroot!=NULL ?IDRING(h)->idroot->get(name, 0) :
             (idhdl) NULL);
-      
+
       if (h2 != NULL)
       {
         r = IDRING(h);
@@ -549,7 +549,7 @@ void mpsr_Init()
 
 #ifdef  PARI_BIGINT_TEST
   init(4000000, 2);
-#endif  
+#endif
 }
 
 #ifdef MPSR_DEBUG

@@ -71,8 +71,8 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
     comm.cc kstd1.cc kstd2.cc kutil.cc lists.cc \
     longalg.cc longrat.cc longrat0.cc \
-    maps.cc matpol.cc misc.cc sdb.cc \
-    mminit.cc modulop.cc sparsmat.cc \
+    maps.cc matpol.cc misc.cc sdb.cc gnumpfl.cc\
+    mminit.cc modulop.cc mpr_complex.cc sparsmat.cc \
     fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
@@ -94,9 +94,9 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
 	cntrlc.h ipprint.h ring.h timer.h sdb.h \
-	febase.h ipshell.h shortfl.h tok.h \
+	febase.h ipshell.h shortfl.h tok.h mpr_complex.h mpr_global.h \
 	mmemory.h mmprivate.h mmheap.h mmpage.h page.h \
-	ffields.h khstd.h silink.h sparsmat.h \
+	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h \
 	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
@@ -115,7 +115,7 @@ DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 	mod2.h.in si_paths.h.in grammar.h testgh install-sh mkinstalldirs \
 	${INCS}
 
-OBJS=grammar.o scanner.o matpol.o binom.o\
+OBJS=grammar.o scanner.o matpol.o binom.o mpr_complex.o gnumpfl.o \
      febase.o feread.o timer.o intvec.o attrib.o lists.o\
      longrat.o longrat0.o misc.o ring.o numbers.o maps.o\
      hilb.o comm.o kstd1.o kstd2.o kutil.o khstd.o kstdfac.o modulop.o spolys.o\
@@ -331,7 +331,7 @@ DEFSG		= -D@SING_UNAME@
 ## .og files for having -O and -g object versions available at the same time
 ## 
 
-OBJG1=	grammar.og scanner.og matpol.og binom.og\
+OBJG1=	grammar.og scanner.og matpol.og binom.og gnumpfl.og mpr_complex.og \
      febase.og feread.og timer.og intvec.og attrib.og lists.og\
      longrat.og longrat0.og misc.og ring.og numbers.og maps.og\
      hilb.og comm.og kstd1.og kstd2.og kutil.og khstd.og kstdfac.og modulop.og \
@@ -407,7 +407,7 @@ BPROFOBJ	= /usr/local/lib/bmon.o
 ## .op files for gprof
 ## 
 
-OBJP1=	grammar.op scanner.op matpol.op binom.op\
+OBJP1=	grammar.op scanner.op matpol.op binom.op gnumpfl.op mpr_complex.op \
      febase.op feread.op timer.op intvec.op attrib.op lists.op\
      longrat.op longrat0.op misc.op ring.op numbers.op maps.op\
      hilb.op comm.op kstd1.op kstd2.op kutil.op khstd.op kstdfac.op modulop.op \
@@ -433,7 +433,7 @@ OBJP=$(OBJP1) $(OBJP2) claptmpl.op
 ## .ob files for bprof
 ## 
 
-OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
+OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob gnumpfl.ob mpr_complex.ob \
      febase.ob feread.ob timer.ob intvec.ob attrib.ob lists.ob\
      longrat.ob longrat0.ob misc.ob ring.ob numbers.ob maps.ob\
      hilb.ob comm.ob kstd1.ob kstd2.ob kutil.ob khstd.ob kstdfac.ob modulop.ob \

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.20 1999-04-14 18:32:00 Singular Exp $ */
+/* $Id: polys1.cc,v 1.21 1999-04-29 11:38:55 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -492,14 +492,14 @@ poly pPower(poly p, int i)
           rc = pNext(p);
           if (rc == NULL)
             return pMonPower(p,i);
-	  /* else: binom */
+          /* else: binom */
           int char_p=rChar(currRing);
           if (pNext(rc) != NULL)
             return pPow(p,i);
-	  if ((char_p==0) || (i<=char_p))
-	    return pTwoMonPower(p,i);
-	  poly p_p=pTwoMonPower(pCopy(p),char_p);
-	  return pMult(pPower(p,i-char_p),p_p);
+          if ((char_p==0) || (i<=char_p))
+            return pTwoMonPower(p,i);
+          poly p_p=pTwoMonPower(pCopy(p),char_p);
+          return pMult(pPower(p,i-char_p),p_p);
         }
       /*end default:*/
     }

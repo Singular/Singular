@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.89 1999-04-20 17:02:47 Singular Exp $ */
+/* $Id: extra.cc,v 1.90 1999-04-29 11:38:40 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -911,24 +911,24 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if ((h!=NULL) && (h->Typ()==PROC_CMD))
       {
         procinfov p=(procinfov)h->Data();
-	if (p->language!=LANG_SINGULAR)
-	{
-	  WerrorS("set breakpoints only in Singular procedures");
-	  return TRUE;
-	}
+        if (p->language!=LANG_SINGULAR)
+        {
+          WerrorS("set breakpoints only in Singular procedures");
+          return TRUE;
+        }
         int lineno=p->data.s.body_lineno;
         if ((h->next!=NULL) && (h->next->Typ()==INT_CMD))
-	{
+        {
           lineno=(int)h->next->Data();
-	}
+        }
         int i;
-	if (lineno== -1)
-	{
-	  i=p->trace_flag;
-	  p->trace_flag &=1;
-	  Print("breakpoints in %s deleted(%#x)\n",p->procname,i &255);
-	  return FALSE;
-	}  
+        if (lineno== -1)
+        {
+          i=p->trace_flag;
+          p->trace_flag &=1;
+          Print("breakpoints in %s deleted(%#x)\n",p->procname,i &255);
+          return FALSE;
+        }
         i=0;
         while((i<7) && (sdb_lines[i]!=-1)) i++;
         if (sdb_lines[i]!= -1)
@@ -936,13 +936,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           PrintS("too many breakpoints set, max is 7\n");
           return FALSE;
         }
-	else
-	{
+        else
+        {
           sdb_lines[i]=lineno;
-	  i++;
-	  Print("breakpoint %d, at line %d in %s\n",i,lineno,p->procname);
+          i++;
+          Print("breakpoint %d, at line %d in %s\n",i,lineno,p->procname);
           p->trace_flag|=(1<<i);
-	}
+        }
       }
       else
       {

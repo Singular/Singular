@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.23 1999-03-19 14:18:06 obachman Exp $ */
+/* $Id: ring.h,v 1.24 1999-04-29 11:38:57 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -58,7 +58,7 @@ inline BOOLEAN rField_is_Zp(ring r, int p)
 inline BOOLEAN rField_is_Q(ring r=currRing)
 { return (r->ch == 0) && (r->parameter==NULL); }
 inline BOOLEAN rField_is_R(ring r=currRing)
-{ return (r->ch == -1); }
+{ return (r->ch == -1) && (r->ch_flags==0); }
 inline BOOLEAN rField_is_GF(ring r=currRing)
 { return (r->ch > 1) && (r->parameter!=NULL); }
 inline BOOLEAN rField_is_Zp_a(ring r=currRing)
@@ -67,8 +67,12 @@ inline BOOLEAN rField_is_Zp_a(ring r, int p)
 { return (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
 inline BOOLEAN rField_is_Q_a(ring r=currRing)
 { return (r->ch == 1); }
+inline BOOLEAN rField_is_long_R(ring r=currRing)
+{ return (r->ch == -1) && (r->ch_flags!=0); }
 inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
-{ return (r->ch>1); } /* Z/p and GF(p,n) */
+{ return (r->ch>1) || (r->ch== -1); } /* Z/p and GF(p,n) and R and long_R*/
+inline BOOLEAN rField_is_Extension(ring r=currRing)
+{ return (rField_is_Q_a(r)) || (rField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 
 enum
 {

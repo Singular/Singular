@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.14 1999-03-08 18:11:48 Singular Exp $ */
+/* $Id: mpsr.h,v 1.15 1999-04-29 11:38:51 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -99,9 +99,9 @@ inline void mpsr_SetCurrRing(ring rg, BOOLEAN complete)
   if (currRing != rg || (complete && ! currComplete))
   {
 #ifdef PDEBUG
-    nSetChar(rInternalChar(rg), TRUE, rg->parameter,rPar(rg));
+    nSetChar(rg, TRUE);
 #else
-    nSetChar(rInternalChar(rg), complete, rg->parameter,rPar(rg));
+    nSetChar(rg, complete);
 #endif
     pChangeRing(rg->N, rg->OrdSgn, rg->order, rg->block0, rg->block1,
                 rg->wvhdl);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.145 1999-04-26 12:58:45 Singular Exp $ */
+/* $Id: iparith.cc,v 1.146 1999-04-29 11:38:44 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1511,8 +1511,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
           par_perm_size=rPar(r);
           BITSET save_test=test;
           naSetChar(rInternalChar(r),TRUE,r->parameter,rPar(r));
-          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-                   rPar(currRing));
+          nSetChar(currRing,TRUE);
           test=save_test;
         }
         else
@@ -5811,6 +5810,6 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 
 #endif
   assume(0);
-  return -1;
+  return 0;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.9 1998-10-06 08:24:27 Singular Exp $ */
+/* $Id: polys0.cc,v 1.10 1999-04-29 11:38:54 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -26,7 +26,8 @@ static void writemon(poly p, int ko)
 {
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
 
-  nNormalize(pGetCoeff(p));
+  if (pGetCoeff(p)!=NULL)
+    nNormalize(pGetCoeff(p));
 
   if (((pGetComp(p) == (short)ko)
     &&(pIsConstantComp(p)))

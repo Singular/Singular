@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.18 1999-02-26 15:32:06 Singular Exp $ */
+/* $Id: structs.h,v 1.19 1999-04-29 11:38:58 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -131,6 +131,7 @@ struct sip_sring
   short      partN;
 #endif
   short      ch;     /* characteristic */
+  short      ch_flags; /* additional char-flags */
   short      N;      /* number of vars */
 
   short      P;      /* number of pars */

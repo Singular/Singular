@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.23 1999-03-08 17:30:39 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.24 1999-04-29 11:38:46 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -80,28 +80,22 @@ static void redSyz (LObject* h,kStrategy strat)
       i = 0;
     }
   }
-#ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
     PrintS("red:");
     wrp(h->p);
     PrintS(" ");
   }
-#endif
   loop
   {
-#ifdef KDEBUG
     if (TEST_OPT_DEBUG) Print("%d",j);
-#endif
     if (pDivisibleBy(strat->S[j],(*h).p))
     {
-#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         PrintS("+\nwith ");
         wrp(strat->S[j]);
       }
-#endif
       if ((!exchanged) && (pEqual((*h).p,strat->S[j])))
       {
 //PrintS("@");
@@ -135,9 +129,7 @@ static void redSyz (LObject* h,kStrategy strat)
                           strat->spSpolyLoop);
       if ((*h).p == NULL)
       {
-#ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-#endif
         if (h->lcm!=NULL) pFree1((*h).lcm);
 #ifdef KDEBUG
         (*h).lcm=NULL;
@@ -193,9 +185,7 @@ static void redSyz (LObject* h,kStrategy strat)
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
 */
-#ifdef KDEBUG
 static reductions = 0;
-#endif
 
 static void redHomog (LObject* h,kStrategy strat)
 {
@@ -207,40 +197,32 @@ static void redHomog (LObject* h,kStrategy strat)
 
   int j = 0;
 
-#ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
     PrintS("red:");
     wrp(h->p);
     PrintS(" ");
   }
-#endif
   if (strat->ak!=0)
   {
     loop
       {
-#ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print("%d",j);
-#endif
         if (pDivisibleBy1(strat->S[j],(*h).p))
         {
-#ifdef KDEBUG
           reductions++;
           if (TEST_OPT_DEBUG)
           {
             Print("+\n%d:with ", reductions);
             wrp(strat->S[j]);
           }
-#endif
           //if (strat->interpt) test_int_std(strat->kIdeal);
           /*- compute the s-polynomial -*/
           (*h).p = spSpolyRed(strat->S[j],(*h).p,strat->kNoether,
                               strat->spSpolyLoop);
           if ((*h).p == NULL)
           {
-#ifdef KDEBUG
             if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-#endif
             if (h->lcm!=NULL) pFree1((*h).lcm);
 #ifdef KDEBUG
             (*h).lcm=NULL;
@@ -265,42 +247,34 @@ static void redHomog (LObject* h,kStrategy strat)
     // no module component
     loop
       {
-#ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print("%d",j);
-#endif
         if (pDivisibleBy2(strat->S[j],(*h).p))
         {
-#ifdef KDEBUG
           reductions++;
           if (TEST_OPT_DEBUG)
           {
             Print("+\n%d:with ",reductions);
             wrp(strat->S[j]);
           }
-#endif
           //if (strat->interpt) test_int_std(strat->kIdeal);
           /*- compute the s-polynomial -*/
           (*h).p = spSpolyRed(strat->S[j],(*h).p,strat->kNoether,
                               strat->spSpolyLoop);
           if ((*h).p == NULL)
           {
-#ifdef KDEBUG
             if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-#endif
             if (h->lcm!=NULL) pFree1((*h).lcm);
 #ifdef KDEBUG
             (*h).lcm=NULL;
 #endif
             return;
           }
-#ifdef KDEBUG
           if (TEST_OPT_DEBUG)
           {
             Print(" to %d:", pLength((*h).p));
             wrp((*h).p);
             PrintS("\n");
           }
-#endif
           j = 0;
         }
         else
@@ -331,39 +305,31 @@ static void redHomog0 (LObject* h,kStrategy strat)
   int j = 0;
   int k = 0;
 
-#ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
     PrintS("red:");
     wrp(h->p);
     PrintS(" ");
   }
-#endif
   if (strat->ak)
   {
     loop
       {
-#ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print("%d",j);
-#endif
         if (pDivisibleBy1(strat->T[j].p,(*h).p))
         {
           //if (strat->interpt) test_int_std(strat->kIdeal);
-#ifdef KDEBUG
           if (TEST_OPT_DEBUG)
           {
             PrintS("+\nwith ");
             wrp(strat->S[j]);
           }
-#endif
           /*- compute the s-polynomial -*/
           (*h).p = spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether,
                               strat->spSpolyLoop);
           if ((*h).p == NULL)
           {
-#ifdef KDEBUG
             if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-#endif
             if (h->lcm!=NULL) pFree1((*h).lcm);
 #ifdef KDEBUG
             (*h).lcm=NULL;
@@ -395,27 +361,21 @@ static void redHomog0 (LObject* h,kStrategy strat)
       {
 
         // no module component
-#ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print("%d",j);
-#endif
         if (pDivisibleBy2(strat->T[j].p,(*h).p))
         {
           //if (strat->interpt) test_int_std(strat->kIdeal);
-#ifdef KDEBUG
           if (TEST_OPT_DEBUG)
           {
             PrintS("+\nwith ");
             wrp(strat->S[j]);
           }
-#endif
           /*- compute the s-polynomial -*/
           (*h).p = spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether,
                               strat->spSpolyLoop);
           if ((*h).p == NULL)
           {
-#ifdef KDEBUG
             if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-#endif
             if (h->lcm!=NULL) pFree1((*h).lcm);
 #ifdef KDEBUG
             (*h).lcm=NULL;
@@ -461,34 +421,28 @@ static void redLazy (LObject* h,kStrategy strat)
   int pass = 0;
   int reddeg = pFDeg((*h).p);
 
-#ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
     PrintS("red:");
     wrp(h->p);
     PrintS(" ");
   }
-#endif
   loop
   {
     if (pDivisibleBy1(strat->S[j],(*h).p))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
-#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         Print("\nwith S[%d] ",j);
         wrp(strat->S[j]);
       }
-#endif
       /*- compute the s-polynomial -*/
       (*h).p = spSpolyRed(strat->S[j],(*h).p,strat->kNoether
                           , strat->spSpolyLoop);
       if ((*h).p == NULL)
       {
-#ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-#endif
         if (h->lcm!=NULL) pFree1((*h).lcm);
 #ifdef KDEBUG
         (*h).lcm=NULL;
@@ -522,9 +476,7 @@ static void redLazy (LObject* h,kStrategy strat)
             }
           }
           while (!pDivisibleBy1(strat->S[i],(*h).p));
-#ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
-#endif
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           (*h).p = NULL;
           return;
@@ -541,9 +493,7 @@ static void redLazy (LObject* h,kStrategy strat)
     {
       if (j >= strat->sl)
       {
-#ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintLn();
-#endif
         if (TEST_OPT_INTSTRATEGY)
         {
           //pContent(h->p);
@@ -575,20 +525,16 @@ static void redHoney (LObject*  h,kStrategy strat)
 
   pass = j = 0;
   d = reddeg = pFDeg((*h).p)+(*h).ecart;
-#ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
     PrintS("red:");
     wrp((*h).p);
   }
-#endif
   loop
   {
     if (pDivisibleBy1(strat->T[j].p,(*h).p))
     {
-#ifdef KDEBUG
       if (TEST_OPT_DEBUG) Print(" T[%d]",j);
-#endif
       pi = strat->T[j].p;
       ei = strat->T[j].ecart;
       /*
@@ -606,9 +552,7 @@ static void redHoney (LObject*  h,kStrategy strat)
           break;
         if ((strat->T[i].ecart < ei) && pDivisibleBy1(strat->T[i].p,(*h).p))
         {
-#ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" T[%d]",i);
-#endif
           /*
           * the polynomial to reduce with is now;
           */
@@ -634,9 +578,7 @@ static void redHoney (LObject*  h,kStrategy strat)
           /*- h will not become the next element to reduce -*/
           {
             enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-#ifdef KDEBUG
             if (TEST_OPT_DEBUG) Print(" ecart too big: -> L%d\n",at);
-#endif
             (*h).p = NULL;
             return;
           }
@@ -649,13 +591,11 @@ static void redHoney (LObject*  h,kStrategy strat)
           enterpairs((*h).p,strat->sl,(*h).ecart,0,strat);
         }
       }
-#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         PrintS("\nwith ");
         wrp(pi);
       }
-#endif
       if (strat->fromT)
       {
         strat->fromT=FALSE;
@@ -664,14 +604,12 @@ static void redHoney (LObject*  h,kStrategy strat)
       }
       else
         (*h).p = spSpolyRed(pi,(*h).p,strat->kNoether, strat->spSpolyLoop);
-#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         PrintS(" to ");
         wrp((*h).p);
         PrintLn();
       }
-#endif
       if ((*h).p == NULL)
       {
         if (h->lcm!=NULL) pFree1((*h).lcm);
@@ -725,10 +663,8 @@ static void redHoney (LObject*  h,kStrategy strat)
             }
           } while (!pDivisibleBy1(strat->S[i],(*h).p));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-#ifdef KDEBUG
           if (TEST_OPT_DEBUG)
             Print(" degree jumped: -> L%d\n",at);
-#endif
           (*h).p = NULL;
           return;
         }
@@ -744,9 +680,7 @@ static void redHoney (LObject*  h,kStrategy strat)
     {
       if (j >= strat->tl)
       {
-#ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintLn();
-#endif
         if (TEST_OPT_INTSTRATEGY)
         {
           //pContent(h->p);
@@ -928,17 +862,13 @@ static poly redNF (poly h,kStrategy strat)
   int j = 0;
   int z = 3;
 
-#ifdef KDEBUG
  if (TEST_OPT_DEBUG)
  {
    PrintS("red:");wrp(h);
  }
-#endif
   if (0 > strat->sl)
   {
-#ifdef KDEBUG
     if (TEST_OPT_DEBUG) PrintLn();
-#endif
     return h;
   }
   loop
@@ -947,21 +877,17 @@ static poly redNF (poly h,kStrategy strat)
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
-#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         Print("\nwith S[%d]:",j);wrp(strat->S[j]);
       }
-#endif
       h = spSpolyRed(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
-#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         PrintS("\nto:");
         wrp(h);
         if (h==NULL) PrintLn();
       }
-#endif
       if (h == NULL) return NULL;
       z++;
       if (z>=10)
@@ -1077,9 +1003,7 @@ lists bbaLink (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, stdLink 
     if((stdTrace!=NULL && stdTrace->Verwaltung) || (stdTrace == NULL))
     {
       if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
-#ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
-#endif
       //test_int_std(strat->kIdeal);
       if (strat->Ll== 0) strat->interpt=TRUE;
       if (TEST_OPT_DEGBOUND
@@ -1230,14 +1154,12 @@ lists bbaLink (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, stdLink 
                     strat->P.p = redtailBba(strat->P.p,pos-1,strat);
                   }
                 }
-#ifdef KDEBUG
                 if (TEST_OPT_DEBUG)
                 {
                   PrintS("new s:");
                   wrp(strat->P.p);
                   PrintLn();
                 }
-#endif
                 if((strat->P.p1==NULL) && (strat->minim>0))
                 {
                   if (strat->minim==1)
@@ -1291,9 +1213,7 @@ lists bbaLink (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, stdLink 
   }
   if((stdTrace!=NULL && stdTrace->ResultSend) || (stdTrace == NULL))
   {
-#ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
-#endif
     /* complete reduction of the standard basis--------- */
     if (TEST_OPT_REDSB) completeReduce(strat);
     /* release temp data-------------------------------- */
@@ -1357,9 +1277,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   while (strat->Ll >= 0)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
-#ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
-#endif
     //test_int_std(strat->kIdeal);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
@@ -1485,14 +1403,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
                   strat->P.p = redtailBba(strat->P.p,pos-1,strat);
                 }
               }
-#ifdef KDEBUG
               if (TEST_OPT_DEBUG)
               {
                 PrintS("new s:");
                 wrp(strat->P.p);
                 PrintLn();
               }
-#endif
               if((strat->P.p1==NULL) && (strat->minim>0))
               {
                 if (strat->minim==1)
@@ -1528,9 +1444,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
     kTest(strat);
   }
-#ifdef KDEBUG
   if (TEST_OPT_DEBUG) messageSets(strat);
-#endif
   /* complete reduction of the standard basis--------- */
   if (TEST_OPT_REDSB) completeReduce(strat);
   /* release temp data-------------------------------- */
@@ -1679,7 +1593,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
 
-  if (rField_has_simple_inverse() || rField_is_R())
+  if (rField_has_simple_inverse())
     strat->LazyPass=20;
   else
    strat->LazyPass=2;

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.8 1999-01-21 15:00:08 Singular Exp $ */
+/* $Id: numbers.cc,v 1.9 1999-04-29 11:38:52 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -17,6 +17,8 @@
 #include "longrat.h"
 #include "longalg.h"
 #include "modulop.h"
+#include "gnumpfl.h"
+#include "ring.h"
 #ifndef FAST_AND_DIRTY
 #undef npMultM
 #undef npSubM
@@ -87,10 +89,11 @@ int ndSize(number a) {return (int)nIsZero(a)==FALSE; }
 /*2
 * init operations for characteristic c (complete==TRUE)
 * init nDelete    for characteristic c (complete==FALSE)
-* param: the names of the parameters (read-only)
 */
-void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
+void nSetChar(ring r, BOOLEAN complete)
 {
+  int c=rInternalChar(r);
+
   if (nNULL!=NULL)
   {
     nDelete(&nNULL);nNULL=NULL;
@@ -102,10 +105,11 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
     nParDeg= ndParDeg;
     nSize  = ndSize;
   }
-  //Print("n:c=%d compl=%d param=%d\n",c,complete,param);
-  if ((c == 1) || (c< (-1)))
+  //Print("n:c=%d compl=%d param=%d\n",c,complete,r->parameter);
+  //if ((c == 1) || (c< (-1)))
+  if (rField_is_Extension(r))
   {
-    naSetChar(c,complete,param,pars);
+    naSetChar(c,complete,r->parameter,rPar(r));
 #ifdef LDEBUG
     nDBDelete= naDBDelete;
 #else
@@ -151,7 +155,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
     }
   }
   else
-  if (c == 0)
+  if (rField_is_Q(r))
   {
 #ifdef LDEBUG
     nDBDelete= nlDBDelete;
@@ -194,7 +198,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
 #endif
     }
   }
-  else if ((c>1)&&(param==NULL))
+  else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
 #ifdef LDEBUG
@@ -240,7 +244,8 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
     }
   }
   else
-  if (c>1)
+  /* -------------- GF(p^m) -----------------------*/
+  if (rField_is_GF(r))
   {
 #ifdef LDEBUG
     nDBDelete= nDBDummy1;
@@ -250,7 +255,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
     if (complete)
     {
       test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
-      nfSetChar(c,param);
+      nfSetChar(c,r->parameter);
       nNew   = nDummy1;
       nNormalize=nDummy2;
       nInit  = nfInit;
@@ -287,7 +292,9 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
     }
   }
   else
-  //if (c==(-1)) // the rest...
+  /* -------------- R -----------------------*/
+  //if (c==(-1))
+  if (rField_is_R(r))
   {
 #ifdef LDEBUG
     nDBDelete= nDBDummy1;
@@ -329,6 +336,57 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
 #endif
     }
   }
+  else
+  /* -------------- long R -----------------------*/
+  if (rField_is_long_R(r))
+  {
+    setGMPFloatPrecBytes(r->ch_flags);
+#ifdef LDEBUG
+    nDBDelete= ngfDBDelete;
+#else
+    nDelete= ngfDelete;
+#endif
+    if (complete)
+    {
+      nNew=ngfNew;
+      nNormalize=nDummy2;
+      nInit  = ngfInit;
+      nInt   = ngfInt;
+      nAdd   = ngfAdd;
+      nSub   = ngfSub;
+      nMult  = ngfMult;
+      nDiv   = ngfDiv;
+      nExactDiv= ngfDiv;
+      nIntDiv= ngfDiv;
+      nIntMod= ngfIntMod;
+      nNeg   = ngfNeg;
+      nInvers= ngfInvers;
+      nCopy  = ngfCopy;
+      nGreater = ngfGreater;
+      nEqual = ngfEqual;
+      nIsZero = ngfIsZero;
+      nIsOne = ngfIsOne;
+      nIsMOne = ngfIsMOne;
+      nGreaterZero = ngfGreaterZero;
+      nWrite = ngfWrite;
+      nRead = ngfRead;
+      nPower = ngfPower;
+      nGcd  = ndGcd;
+      nLcm  = ndGcd; /* tricky, isn't it ?*/
+      nSetMap=ngfSetMap;
+      nName=ndName;
+      /*nSize  = ndSize;*/
+#ifdef LDEBUG
+      nDBTest=ngfDBTest;
+#endif
+    }
+  }
+#ifdef TEST
+  else
+  {
+    WerrorS("unknown field");
+  }
+#endif
   if (complete&&(!errorreported)) nNULL=nInit(0);
 }
 

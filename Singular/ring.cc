@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.51 1999-04-17 12:30:23 Singular Exp $ */
+/* $Id: ring.cc,v 1.52 1999-04-29 11:38:56 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -70,7 +70,7 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
     }
 
     /*------------ global variables related to coefficients ------------*/
-    nSetChar(r->ch, complete, r->parameter, rPar(r));
+    nSetChar(r, complete);
 
     /*------------ global variables related to polys -------------------*/
     pSetGlobals(r, complete);
@@ -318,7 +318,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
     WerrorS("more than one ordering c/C specified");
     return TRUE;
   }
-  
+
   // initialize fields of R
   R->order=(int *)Alloc0(n*sizeof(int));
   R->block0=(int *)Alloc0(n*sizeof(int));
@@ -402,11 +402,11 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           R->block1[n] = last;
           break;
         }
-        
+
         case ringorder_no:
            R->order[n] = ringorder_unspec;
            return TRUE;
-           
+
         default:
           Werror("Internal Error: Unknown ordering %d", (*iv)[1]);
           R->order[n] = ringorder_unspec;
@@ -415,7 +415,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
     sl=sl->next;
   }
 
-  // check for complete coverage 
+  // check for complete coverage
   if ((R->order[n]==ringorder_c) ||  (R->order[n]==ringorder_C)) n--;
   if (R->block1[n] != R->N)
   {
@@ -425,7 +425,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
          (R->order[n]==ringorder_Ds) ||
          (R->order[n]==ringorder_lp) ||
          (R->order[n]==ringorder_ls))
-        && 
+        &&
         R->block0[n] <= R->N)
     {
       R->block1[n] = R->N;
@@ -444,7 +444,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
 // get array of strings from list of sleftv's
 static BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
 {
-  
+
   while(sl!=NULL)
   {
     if (sl->Name() == sNoName)
@@ -453,13 +453,13 @@ static BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
       {
         sleftv s_sl;
         iiConvert(POLY_CMD,ANY_TYPE,-1,sl,&s_sl);
-        if (s_sl.Name() != sNoName) 
+        if (s_sl.Name() != sNoName)
           *p = mstrdup(s_sl.Name());
         else
           *p = NULL;
         sl->next = s_sl.next;
         s_sl.next = NULL;
-        s_sl.CleanUp(); 
+        s_sl.CleanUp();
         if (*p == NULL) return TRUE;
       }
       else
@@ -477,10 +477,10 @@ static BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
 ////////////////////
 //
 // rInit itself:
-// 
+//
 // INPUT:  s: name, pn: ch & parameter (names), rv: variable (names)
 //         ord: ordering
-// RETURN: currRingHdl on success 
+// RETURN: currRingHdl on success
 //         NULL        on error
 // NOTE:   * makes new ring to current ring, on success
 //         * considers input sleftv's as read-only
@@ -488,6 +488,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
             BOOLEAN isDRing)
 {
   int ch;
+  int float_len=0;
   ring R = NULL;
   idhdl tmp = NULL;
   BOOLEAN ffChar=FALSE;
@@ -501,6 +502,11 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   else if (pn->name != NULL && strcmp(pn->name,"real")==0)
   {
     ch=-1;
+    if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+    {
+      float_len=(int)pn->next->Data();
+      pn=pn->next;
+    }
   }
   else
   {
@@ -508,7 +514,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     goto rInitError;
   }
   pn=pn->next;
-  
+
   /* characteristic -----------------------------------------------*/
   /* input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE
    *         0    1 : Q(a,...)        *names         FALSE
@@ -520,8 +526,8 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   if (ch!=-1)
   {
     int l = 0;
-    
-    if (ch!=0 && (ch<2) || (ch > 32003)) 
+
+    if (ch!=0 && (ch<2) || (ch > 32003))
     {
       Warn("%d is invalid characteristic of ground field. 32003 is used.", ch);
       ch=32003;
@@ -545,7 +551,11 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   // allocated ring and set ch
   R = (ring) Alloc0(sizeof(sip_sring));
   R->ch = ch;
-  
+  if (ch == -1)
+  {
+    R->ch_flags= float_len;
+  }
+
   /* parameter -------------------------------------------------------*/
   if (pn!=NULL)
   {
@@ -578,7 +588,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     WerrorS("name of ring variable expected");
     goto rInitError;
   }
-  
+
   /* ordering -------------------------------------------------------------*/
   if (rSleftvOrdering2Ordering(ord, R))
     goto rInitError;
@@ -586,11 +596,11 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   // Complete the initialization
   if (rComplete(R))
     goto rInitError;
-  
+
   // try to enter the ring into the name list //
   if ((tmp = enterid(s, myynest, RING_CMD, &IDROOT))==NULL)
     goto rInitError;
-  
+
   memcpy(IDRING(tmp),R,sizeof(*R));
   // set current ring
   Free(R,  sizeof(ip_sring));
@@ -610,16 +620,16 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
 // More particularly, sets r->VarOffset
 BOOLEAN rComplete(ring r, int force)
 {
-  
+
   int VarCompIndex, VarLowIndex, VarHighIndex;
   // check number of vars and number of params
   if (r->N + 1 > (int) MAX_EXPONENT_NUMBER)
   {
-    Werror("Too many ring variables: %d is the maximum", 
+    Werror("Too many ring variables: %d is the maximum",
            MAX_EXPONENT_NUMBER -1);
     return TRUE;
   }
-  
+
 
   r->VarOffset = (int*) Alloc((r->N + 1)*sizeof(int));
   pGetVarIndicies(r, r->VarOffset, VarCompIndex,
@@ -693,7 +703,10 @@ void rWrite(ring r)
   {
     PrintS("//   characteristic : ");
     if ( rField_is_R(r) )        PrintS("0 (real)\n");  /* R */
-    else Print ("%d\n",rChar(r)); /* Fp(a) */
+    else if ( rField_is_long_R(r) )
+      Print("0 (real:%d digits)\n",r->ch_flags);  /* long R */
+    else
+      Print ("%d\n",rChar(r)); /* Fp(a) */
     if (r->parameter!=NULL)
     {
       Print ("//   %d parameter    : ",rPar(r));
@@ -779,9 +792,9 @@ void rWrite(ring r)
 static void rDelete(ring r)
 {
   int i, j;
-  
+
   if (r == NULL) return;
- 
+
   // delete order stuff
   if (r->order != NULL)
   {
@@ -803,7 +816,7 @@ static void rDelete(ring r)
   {
     assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
   }
-  
+
   // delete varnames
   if(r->names!=NULL)
   {
@@ -813,7 +826,7 @@ static void rDelete(ring r)
     }
     Free((ADDRESS)r->names,r->N*sizeof(char *));
   }
-  
+
   // delete parameter
   if (r->parameter!=NULL)
   {
@@ -827,7 +840,7 @@ static void rDelete(ring r)
     }
     Free((ADDRESS)r->parameter,rPar(r)*sizeof(char *));
   }
-  if (r->VarOffset != NULL) 
+  if (r->VarOffset != NULL)
     Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
   Free(r, sizeof(ip_sring));
 }
@@ -1300,7 +1313,7 @@ int rSum(ring r1, ring r2, ring &sum)
       {
         if (r2->minpoly!=NULL)
         {
-          nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
+          nSetChar(r1,TRUE);
           if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
               && naEqual(r1->minpoly,r2->minpoly))
           {
@@ -1308,13 +1321,11 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.parameter[0]=mstrdup(r1->parameter[0]);
             tmpR.minpoly=naCopy(r1->minpoly);
             tmpR.P=1;
-            nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-              rPar(currRing));
+            nSetChar(currRing,TRUE);
           }
           else
           {
-            nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-              rPar(currRing));
+            nSetChar(currRing,TRUE);
             WerrorS("different minpolys");
             return -1;
           }
@@ -1327,10 +1338,9 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.parameter=(char **)Alloc0(sizeof(char *));
             tmpR.parameter[0]=mstrdup(r1->parameter[0]);
             tmpR.P=1;
-            nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
+            nSetChar(r1,TRUE);
             tmpR.minpoly=naCopy(r1->minpoly);
-            nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-              rPar(currRing));
+            nSetChar(currRing,TRUE);
           }
           else
           {
@@ -1349,10 +1359,9 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.parameter=(char **)Alloc(sizeof(char *));
             tmpR.parameter[0]=mstrdup(r1->parameter[0]);
             tmpR.P=1;
-            nSetChar(rInternalChar(r2),TRUE,r2->parameter,rPar(r2));
+            nSetChar(r2,TRUE);
             tmpR.minpoly=naCopy(r2->minpoly);
-            nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-              rPar(currRing));
+            nSetChar(currRing,TRUE);
           }
           else
           {
@@ -1404,10 +1413,9 @@ int rSum(ring r1, ring r2, ring &sum)
         memcpy(tmpR.parameter,r1->parameter,rPar(r1)*sizeof(char *));
         if (r1->minpoly!=NULL)
         {
-          nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
+          nSetChar(r1,TRUE);
           tmpR.minpoly=naCopy(r1->minpoly);
-          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-            rPar(currRing));
+          nSetChar(currRing,TRUE);
         }
       }
       else  /* R, Q(a),Z/q,Z/p(a),GF(p,n) */
@@ -1431,10 +1439,9 @@ int rSum(ring r1, ring r2, ring &sum)
         memcpy(tmpR.parameter,r2->parameter,rPar(r2)*sizeof(char *));
         if (r2->minpoly!=NULL)
         {
-          nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
+          nSetChar(r1,TRUE);
           tmpR.minpoly=naCopy(r2->minpoly);
-          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-            rPar(currRing));
+          nSetChar(currRing,TRUE);
         }
       }
       else if (r2->ch>1) /* Z/p,GF(p,n) */
@@ -1467,10 +1474,9 @@ int rSum(ring r1, ring r2, ring &sum)
         }
         if (r1->minpoly!=NULL)
         {
-          nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
+          nSetChar(r1,TRUE);
           tmpR.minpoly=naCopy(r1->minpoly);
-          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-            rPar(currRing));
+          nSetChar(currRing,TRUE);
         }
       }
       else  /* R, Z/p,GF(p,n) */
@@ -1497,10 +1503,9 @@ int rSum(ring r1, ring r2, ring &sum)
         }
         if (r2->minpoly!=NULL)
         {
-          nSetChar(rInternalChar(r2),TRUE,r2->parameter,rPar(r2));
+          nSetChar(r2,TRUE);
           tmpR.minpoly=naCopy(r2->minpoly);
-          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-            rPar(currRing));
+          nSetChar(currRing,TRUE);
         }
       }
       else
@@ -1644,8 +1649,8 @@ int rSum(ring r1, ring r2, ring &sum)
         tmpR.order[i]=rb->order[i];
         tmpR.block0[i]=rb->block0[i];
         tmpR.block1[i]=rb->block1[i];
-	if (rb->wvhdl[i]!=NULL)
-	  WarnS("rSum: weights not implemented");
+        if (rb->wvhdl[i]!=NULL)
+          WarnS("rSum: weights not implemented");
       }
       tmpR.block0[0]=1;
     }
