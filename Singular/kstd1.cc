@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.47 1999-11-15 17:20:14 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.48 2000-02-02 14:27:46 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1716,6 +1716,9 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     if (hilb==NULL) strat->LazyPass*=2;
   }
   strat->homog=h;
+#ifdef KDEBUG
+  idTest(F);
+#endif
   if (pOrdSgn==-1)
   {
     if (w!=NULL)
