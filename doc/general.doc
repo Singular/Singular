@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.24 1998-05-05 14:22:35 anne Exp $
+@comment $Id: general.doc,v 1.25 1998-05-06 09:21:20 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -180,7 +180,7 @@ go one character to the left
 erase the character under the cursor
 (or return @kbd{EOF}, if the current line is empty)
 @item CTL-E
-goto to the end of the line
+go to to the end of the line
 @item CTL-F
 go one character to the right
 @item BACKSPACE
@@ -594,13 +594,13 @@ be omitted.
 @end example
 @example
   ring r7=(7^2,a),(x,y,z),dp;
-                // defines a ring with name r7,
-                // the same ring as r6
-                // this option is offered for
-                // a few powers of primes
-                // (see file gftable/49)
-                // the computations are faster
-                // in this representation
+               // defines a ring with name r7,
+               // the same ring as r6
+               // this option is offered for
+               // a few powers of primes
+               // (see file gftable/49)
+               // the computations are faster
+               // in this representation
 @end example
 @example
   ring r8=(181,A,B,Z),(x,y,z),dp;
@@ -1358,9 +1358,9 @@ A list of indexed names can be built as a name followed by
 @example
 @c example
   ring R;
-  int jindex=3;
+  int n=3;
   ideal j(3);
-  ideal j(jindex);     // is equivalent with the above
+  ideal j(n);     // is equivalent with the above
   ideal j(2)=x;
   j(2..3);
 @c example
