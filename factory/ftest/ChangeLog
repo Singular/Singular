@@ -1,3 +1,45 @@
+Mon Apr  6 13:36:37 MET DST 1998  Jens Schmidt
+
+	* ChangeLog, ftest_io.h, ftest_util.m4, ftest_util.cc:
+	  ***** merge from branch `factory-gcd' to main trunk
+
+Mon Apr  6 12:49:32 MET DST 1998  Jens Schmidt
+
+	* ChangeLog, ftest_io.cc, ftest_io.h, ftest_util.cc, ftest_util.m4, 
+	* insert.m4, norm.m4, size.m4, totaldegree.m4, divrem.m4,
+	* degree.m4, deriv.m4, fbinops.m4:
+	  ***** merge from branch `factory-gcd' to main trunk
+
+    **************** <<< changes in branch `factory-gcd' ****************
+
+	* ftest_util.cc, ftest_util.m4, ftest_io.h: bug fix.  References
+	  to `ftestRead()' relplaced by `ftestReadString()'
+
+	* ftest_io.cc, ftest_io.h, ftest_util.m4, ftest_util.cc
+	  (ftestGetCanonicalForm, ftestGetbool, ftestGetint,
+ 	  ftestGetVariable): functions renamed to `ftestReadString'.  All
+ 	  of them store result in reference variable.  Declarations
+ 	  adapted.  All callers changed.
+
+	* ftest_io.cc (ftestReadString): does not read environment variables
+
+	* ftest_io.cc (ftestReadString): cosmetical changes
+
+	* ftest_io.cc, ftest_io.h (ftestPrintResult( ..., bool )): new
+	  function.  Declarations added.
+
+	* fbinops.m4 (ftestDivideTest, ftestModuloTest): new tests added
+
+	* divrem.m4: new file
+
+Thu Apr  2 14:54:40 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* degree.m4, deriv.m4, insert.m4, norm.m4, size.m4,
+	  totaldegree.m4 (main): order of `if ( ftestArgGiven )' and
+	  `ftestRun()' interchanged
+
+    **************** >>> changes in branch `factory-gcd' ****************
+
 Tue Mar 31 12:33:25 MET DST 1998  Jens Schmidt
 
 	* ChangeLog, ftest_io.cc, fbinops.m4:
