@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.11 2000-03-30 06:35:44 krueger Exp $
+ * $Id: grammar.y,v 1.12 2000-04-17 07:21:24 krueger Exp $
  */
 
 %{
@@ -18,6 +18,7 @@
 #include "stype.h"
 
 int sectnum = 1;
+int iseof = 0;
 extern moddef module_def;
 extern int yylineno;
 extern int do_create_makefile;
@@ -33,6 +34,7 @@ procdef procedure_decl;
  
 void yyerror(char * fmt)
   {
+    if(!iseof) printf("%s at line %d\n", fmt, yylineno);
   }
 
 %}
@@ -91,6 +93,22 @@ goal: part1 sect2 sect2end code
 
 part1: initmod sect1 sect1end
         {
+          if(do_create_makefile)mod_create_makefile(&module_def);
+          if(write_intro(&module_def)) {
+            return(myyyerror("Error while creating files\n"));
+          }
+        }
+        | sect1 sect1end
+        {
+          write_mod_init(&module_def, module_def.fmtfp);
+          if(do_create_makefile)mod_create_makefile(&module_def);
+          if(write_intro(&module_def)) {
+            return(myyyerror("Error while creating files\n"));
+          }
+        }
+        | sect1end
+        {
+          write_mod_init(&module_def, module_def.fmtfp);
           if(do_create_makefile)mod_create_makefile(&module_def);
           if(write_intro(&module_def)) {
             return(myyyerror("Error while creating files\n"));

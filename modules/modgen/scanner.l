@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.10 2000-03-30 06:35:45 krueger Exp $ */
+/* $Id: scanner.l,v 1.11 2000-04-17 07:21:24 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -27,6 +27,8 @@
 #  define YYLP_MISS_BR1   10
 #  define YYLP_MISS_BR2   11
 #  define YYLP_MISS_BR3   12
+
+  extern int iseof;
 
   int offset = 0;
   int yylineno = 1;
@@ -315,6 +317,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         .*(\n?) { lvalp->name = yytext; return CODEPART; }
 
         <<EOF>>  { sectnum = 0;
+	           iseof=1;
 	           return SECT3END;
                    /*yyterminate();*/
                  }
@@ -437,7 +440,6 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
 extern "C" {
   int yywrap() {
-    printf("===================== yywrap() =====================\n");
     return 1;
   }
 }

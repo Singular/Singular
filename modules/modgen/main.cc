@@ -122,9 +122,18 @@ main( int argc, char *argv[] )
   init_type_conv();
   do {
       i=yyparse();
-      if(!i) printf("FINISH? (%d)\n", i);
-      else
-        if(debug)printf("NEXT LOOP at line %d (%s) %d\n", yylineno, yytext, i);
+      switch(i) {
+          case 0:
+            printf("FINISH? %s (%d)\n", yytext, yylineno); break;
+          case 1:
+            if(debug>2)
+              printf("NEXT LOOP at line %d (%s) %d\n", yylineno, yytext, i);
+            if(strlen(yytext))
+              printf("something went wrong at line %d\n", yylineno);
+            break;
+          default:
+            break;
+      }
   }
   while (!i);
   if(trace)printf("files for module '%s' created.\n", argv[optind]);
