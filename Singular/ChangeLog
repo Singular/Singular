@@ -1,14 +1,18 @@
+Mon Oct 19 16:01:18 MESZ 1998 hannes
+* hannes: limitations on length of arguments removed (was 200 chars)
+  (iplib.cc)
+
 Thu Oct 15 15:54:05 MEST 1998 <krueger@mathematik.uni-kl.de>
-	* extra.cc,grammar.y,ipid.cc,ipid.h,iplib.cc,ipshell.cc
-	* ipshell.h,ring.cc,structs.h,tesths.cc,mod2.h.in
-	  Replaced ring *iiLocalRing[] by a stack (class namerec)
-	  To use old method define USE_IILOCALRING in mod2.h
-	  Old method incompatible with HAVE_NAMESPACES!
-	
+        * extra.cc,grammar.y,ipid.cc,ipid.h,iplib.cc,ipshell.cc
+        * ipshell.h,ring.cc,structs.h,tesths.cc,mod2.h.in
+          Replaced ring *iiLocalRing[] by a stack (class namerec)
+          To use old method define USE_IILOCALRING in mod2.h
+          Old method incompatible with HAVE_NAMESPACES!
+
 1998-10-14  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* sing_mp.cc (slOpenMPLaunch): added slKill as link function
-	* added --MPrsh to slOpenLaunch
+        * sing_mp.cc (slOpenMPLaunch): added slKill as link function
+        * added --MPrsh to slOpenLaunch
 
 Wed Jul  1 15:25:23 MET DST 1998 hannes:
 * fixed bug with quotient: M:module(0) returns (1), not ([1])
@@ -16,7 +20,7 @@ Wed Jul  1 15:25:23 MET DST 1998 hannes:
 Fri Jun 19 10:01:59 MET DST 1998 hannes
 * hannes: changed back: quot is now from standard.lib,
                         quotient the C-version
-			(iparith.cc LIB/standard.lib)
+                        (iparith.cc LIB/standard.lib)
 
 Thu Jun 18 19:27:27 MET DST 1998 hannes
         * error handling (grammar.y iparith.cc iplib.cc)
