@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.47 1998-05-14 13:04:12 Singular Exp $ */
+/* $Id: extra.cc,v 1.48 1998-05-18 16:12:14 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -98,6 +98,35 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
   {
 // ONLY documented system calls go here
 // Undocumented system calls go down into #ifdef HAVE_EXTENDED_SYSTEM
+/*==================== nblocks ==================================*/
+    if (strcmp((char*)(h->Data()), "nblocks") == 0)
+    {
+      ring r;
+      if (h->next == NULL)
+      {
+        if (currRingHdl != NULL)
+        {
+          r = IDRING(currRingHdl);
+        }
+        else
+        {
+          WerrorS("no ring active");
+          return TRUE;
+        }
+      }
+      else
+      {
+        if (h->next->Typ() != RING_CMD)
+        {
+          WerrorS("ring expected");
+          return TRUE;
+        }
+        r = (ring) h->next->Data();
+      }
+      res->rtyp = INT_CMD;
+      res->data = (void*) rBlocks(r) - 1;
+      return FALSE;
+    }
 /*==================== version ==================================*/
     if(strcmp((char*)(h->Data()),"version")==0)
     {
@@ -244,8 +273,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     #endif
     #endif
     #endif
-/*==================== whoami ==================================*/
-    if (strcmp((char*)(h->data), "whoami") == 0)
+/*==================== Singular ==================================*/
+    if (strcmp((char*)(h->data), "Singular") == 0)
     {
       res->rtyp=STRING_CMD;
       res->data=(void*)feGetExpandedExecutable();

@@ -1,3 +1,8 @@
+1998-05-18  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* extra.cc (jjSYSTEM): changed "whoami" --> "Singular", added
+	"nblocks" 
+
 Sat May 16 14:14:20 MET DST 1998 hannes
 * avoid multiple objects of the same name (fix keepring)
 Fri May 15 18:02:57 MET DST 1998 hannes

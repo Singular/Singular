@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.50 1998-05-18 15:27:34 wichmann Exp $
+@comment $Id: types.doc,v 1.51 1998-05-18 16:12:17 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1376,7 +1376,7 @@ There are the following default values:
 @code{fork} is specified, the default mode is set to @code{fork}. 
 
 @item if no application is specified (in mode @code{launch}) the default
-application is @code{system("whoami") + " -b"}.
+application is the value of @code{system("Singular") + " -b"}.
 
 @item if no hostname is specified the localhost is used as default host.
 @end itemize
@@ -1644,7 +1644,7 @@ is a list entry; the index 1 gives the first element.
 
 @table @code
 @item betti
-Betti numbers from a resolution (see @ref{betti})
+Betti numbers of a resolution (see @ref{betti})
 @item delete
 delete an element from a list (see @ref{delete})
 @item facstd
@@ -2710,9 +2710,14 @@ to the quotient ring.
 @section resolution
 @cindex resolution
 
-Resolutions are represented as lists of ideals/modules which generate
-the resolution. Like ideals and modules they can only be defined or
-accessed with respect to a basering.
+The resolution type is intented as an intermediate representation which
+internally retains additional information obtained during resolution
+computations. It furthermore enables the use of partial results to
+compute, for example, Betti numbers or minimal resolutions. Like ideals
+and modules, a resolution can only be defined w.r.t. a basering.
+
+To access the elements of a resolution, it has to be assigned to a list
+(which also finishes not yet completed computations).
 
 @menu
 * resolution declarations::     
@@ -2739,6 +2744,9 @@ none
   ideal i=z2,x;
   resolution re=res(i,0);
   re;
+  betti(re);
+  list l = re;
+  l;
 @c example
 @end example
 @end table
@@ -2753,16 +2761,10 @@ A resolution expression is:
 @item
 an identifier of type resolution
 @item
-a function returning resolution
+a function returning a resolution
 @item
 a typecast to resolution.
 @end enumerate
-
-@example
-@c example
-
-@c example
-@end example
 
 @c ref
 See @ref{Type conversion and casting}.
@@ -2774,6 +2776,8 @@ See @ref{Type conversion and casting}.
 @cindex resolution related functions
 
 @table @code
+@item betti
+Betti numbers of a resolution (see @ref{betti})
 @item lres
 minimal resolution (see @ref{lres})
 @item minres

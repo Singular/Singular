@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.57 1998-05-18 16:09:12 wichmann Exp $
+@comment $Id: reference.doc,v 1.58 1998-05-18 16:12:15 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4834,11 +4834,15 @@ resets the random generator to the given value and return it (type int)
 returns the seed of the random generator (type int)
 @item @code{system("gen")} 
 returns the generating element of the multiplicative
-group of Z/p\@{0@} (as int) where p is the characteristic of the basering
+group of Z/p\@{0@} (as int) where p is the characteristic of the
+basering
+@item @code{system("nblocks" [, ring]} 
+returns the number of blocks of @code{ring}, or the number of parameters 
+of the current basering, if no second argument is given.
 @item @code{system("HC")} 
 returns the order of the highest corner of the last
 computation or 0
-@item @code{system("whoami")} 
+@item @code{system("Singular")} 
 returns the absolute (path) name of the running @sc{Singular} (type string)
 @item @code{system("--option_name")} 
 returns the value of the (command-line)
@@ -4856,7 +4860,7 @@ int and either 1 or 0; for all other options, the return type is string.
   @expansion{} /tmp/xx4711
   system("getenv","PATH");
   @expansion{} /bin:/usr/bin:/usr/local/bin
-  system("whoami");
+  system("Singular");
   @expansion{} /usr/local/bin/Singular
   // report minimal display time
   system("--min-time");
