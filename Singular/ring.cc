@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.179 2002-01-20 10:01:48 Singular Exp $ */
+/* $Id: ring.cc,v 1.180 2002-02-04 14:23:18 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -4018,6 +4018,7 @@ ring rCompose(lists  L)
     R->algring=rCompose((lists)L->m[0].Data());
     if (R->algring==NULL)
     {
+      WerrorS("could not create rational function coefficient field");
       goto rCompose_err;
     }
     R->ch=R->algring->ch;
@@ -4026,6 +4027,7 @@ ring rCompose(lists  L)
   }
   else
   {
+    WerrorS("coefficient field must be described by `int` or `list`");
     goto rCompose_err;
   }
   // ------------------------- VARS ---------------------------
@@ -4044,12 +4046,14 @@ ring rCompose(lists  L)
         i--;
         while (i>=0) { omFree(R->names[i]); i--; }
         omFree(R->names);
+        Werror("var name %d must be `string`",i+1);
         goto rCompose_err;
       }
     }
   }
   else
   {
+    WerrorS("variable must be given as `list`");
     goto rCompose_err;
   }
   // ------------------------ ORDER ------------------------------
@@ -4132,11 +4136,16 @@ ring rCompose(lists  L)
       {
         R->block1[j] = R->N;
       }
-      else goto rCompose_err;
+      else
+      {
+        Werror("ordering incomplete: size (%d) should be %d",R->block1[j],R->N);
+        goto rCompose_err;
+      }
     }
   }
   else
   {
+    WerrorS("ordering must be given as `list`");
     goto rCompose_err;
   }
   // ------------------------ Q-IDEAL ------------------------
@@ -4148,6 +4157,7 @@ ring rCompose(lists  L)
   }
   else
   {
+    WerrorS("q-ideal must be given as `ideal`");
     goto rCompose_err;
   }
 
