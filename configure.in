@@ -2,6 +2,7 @@ dnl Process this file with autoconf to produce a configure script
 AC_INIT(Singular/matpol.h)
 AC_PREFIX_DEFAULT(`pwd`)
 
+
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Version business --  set these here
 dnl
@@ -23,6 +24,12 @@ AC_SUBST(SINGULAR_MAJOR_VERSION)
 AC_SUBST(SINGULAR_MINOR_VERSION)
 AC_SUBST(SINGULAR_SUB_VERSION)
 
+# construct name of installed Singular executable
+SINGULAR=${bindir}/Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}
+export SINGULAR
+AC_SUBST(SINGULAR)
+
+
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl those are needed to check for libs and headers, later on
 dnl
@@ -30,13 +37,15 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_AIX
 
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl exec_prefix, bindir, libdir, includedir to some sensible values
-dnl
 
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl set exec_prefix, bindir, libdir, includedir to some sensible values
+dnl
 # expand prefix and pass it to subsequent configures
-test "x$prefix" = xNONE && prefix=${ac_default_prefix}; \
-    ac_configure_args="$ac_configure_args --prefix=${prefix}"
+if test "x$prefix" = xNONE; then
+  prefix=${ac_default_prefix}
+  ac_configure_args="$ac_configure_args --prefix=${prefix}"
+fi
 
 # expand exec_prefix
 if test "x$exec_prefix" = xNONE; then
@@ -53,30 +62,37 @@ if test "x$exec_prefix" = xNONE; then
 fi
 
 # expand bindir
-test "x$bindir" = 'x${exec_prefix}/bin' && \
-  bindir="${exec_prefix}/bin" ; \
-   ac_configure_args="$ac_configure_args --bindir=${bindir}"
-
-# construct name of installed Singular executable
-SINGULAR=${bindir}/Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}
-export SINGULAR
-AC_SUBST(SINGULAR)
+if test "x$bindir" = 'x${exec_prefix}/bin'; then
+  bindir="${exec_prefix}/bin"
+  ac_configure_args="$ac_configure_args --bindir=${bindir}"
+fi
 
 # expand libdir
-test "x$libdir" = 'x${exec_prefix}/lib' && \
-  libdir="${exec_prefix}/lib/${SINGULAR_VERSION}" ; \
-   ac_configure_args="$ac_configure_args --libdir=${libdir}"
+if test "x$libdir" = 'x${exec_prefix}/lib'; then
+  libdir="${exec_prefix}/lib/${SINGULAR_VERSION}"
+  ac_configure_args="$ac_configure_args --libdir=${libdir}"
+fi
 
 # expand includedir
-test "x$includedir" = 'x${prefix}/include' &&  \
-  includedir="${exec_prefix}/include/${SINGULAR_VERSION}" ; \
-   ac_configure_args="$ac_configure_args --includedir=${includedir}"
+if test "x$includedir" = 'x${prefix}/include'; then
+  includedir="${exec_prefix}/include/${SINGULAR_VERSION}"
+  ac_configure_args="$ac_configure_args --includedir=${includedir}"
+fi
 
-# add to -I to CPPFLAGS and and -L to LDFLAGS, just to be sure
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl check for various libraries and headers
+dnl
+dnl After this part, the variables 'ac_<package>_ok' is 'yes'
+dnl if '<package>' is already existent on the system, otherwise
+dnl undefined.
+dnl
+
+# add -I to CPPFLAGS and -L to LDFLAGS, just to be sure
 LDFLAGS="-L${libdir} ${LDFLAGS}"
 CPPFLAGS="-I${includedir} ${CPPFLAGS}"
 
-
+# check for AIX
 AC_MSG_CHECKING(whether _AIX is defined)
 AC_CACHE_VAL(ac_cv_is_aix,
 AC_EGREP_CPP(yes,
@@ -90,10 +106,6 @@ else
   AC_MSG_RESULT(no)
 fi
 
-
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl check for various libraries and headers
-dnl
 AC_CHECK_LIB(m, atof)
 AC_CHECK_LIB(bsd, socket)
 AC_CHECK_LIB(socket, listen)
@@ -109,13 +121,13 @@ AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h)
 
 if test "$ac_cv_lib_gmp_mpq_init" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
-    ac_gmp_ok=yes
+  ac_gmp_ok=yes
 fi
 
 if test "$ac_cv_lib_smallgmp_mpz_init" = yes && \
  test "$ac_cv_header_smallgmp_h" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
-    ac_smallgmp_ok=yes
+  ac_smallgmp_ok=yes
 fi
 
 if test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
@@ -134,7 +146,6 @@ if test "$ac_cv_lib_singfac_atof" = yes && \
  test "$ac_cv_header_factor_h" = yes; then
   ac_libfac_ok=yes
 fi
-
 
   
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -468,11 +479,12 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check for known subdirs
 dnl
+SUBDIRS=""
 if test -d smallgmp; then
-  SUBDIRS="smallgmp"
+  SUBDIRS="$SUBDIRS smallgmp"
 fi
 if test -d gmp; then
-  SUBDIRS="gmp"
+  SUBDIRS="$SUBDIRS gmp"
 fi
 if test -d MP; then
   SUBDIRS="$SUBDIRS MP"
@@ -484,7 +496,7 @@ if test -d libfac; then
   SUBDIRS="$SUBDIRS libfac"
 fi
 if test -d sgroup; then
-  SUBDIRS="sgroup"
+  SUBDIRS="$SUBDIRS sgroup"
 fi
 if test -d Singular; then
   SUBDIRS="$SUBDIRS Singular"
@@ -492,7 +504,7 @@ fi
   
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl Enough --wrap it up
+dnl Enough -- wrap it up
 dnl
 AC_PROG_MAKE_SET
 AC_SUBST(SUBDIRS)
