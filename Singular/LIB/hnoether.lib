@@ -2,8 +2,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-7 or newer
 
-version="$Id: hnoether.lib,v 1.28 2001-02-05 12:01:39 lossen Exp $";
-//category="Singularities";
+version="$Id: hnoether.lib,v 1.29 2001-02-05 13:27:00 Singular Exp $";
+category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Development
 AUTHOR:   Martin Lamm,   lamm@mathematik.uni-kl.de
