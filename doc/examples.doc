@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.31 1998-07-08 14:59:58 Singular Exp $
+@comment $Id: examples.doc,v 1.32 1998-07-09 07:39:10 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -25,33 +25,33 @@ The following topics are treated:
 @end ifinfo
 
 @menu
-* Milnor and Tjurina::          
-* Procedures and LIB::          
-* Critical points::             
-* Saturation::                  
-* Long coefficients::           
-* Parameters::                  
-* T1 and T2::                   
-* Deformations::                
-* Finite fields::               
-* Elimination::                 
-* Free resolution::             
-* Ext::                         
-* Polar curves::                
-* Depth::                       
-* Formatting output::            
-* Cyclic roots::                
-* G_a -Invariants::             
-* Invariants of a finite group::  
-* Factorization::               
-* Puiseux pairs::               
-* Primary decomposition::       
-* Normalization::               
-* Kernel of module homomorphisms::  
-* Algebraic dependence::        
-* Classification::              
-* Fast lexicographical GB::     
-* Parallelization with MPtcp links::  
+* Milnor and Tjurina::
+* Procedures and LIB::
+* Critical points::
+* Saturation::
+* Long coefficients::
+* Parameters::
+* T1 and T2::
+* Deformations::
+* Finite fields::
+* Elimination::
+* Free resolution::
+* Ext::
+* Polar curves::
+* Depth::
+* Formatting output::
+* Cyclic roots::
+* G_a -Invariants::
+* Invariants of a finite group::
+* Factorization::
+* Puiseux pairs::
+* Primary decomposition::
+* Normalization::
+* Kernel of module homomorphisms::
+* Algebraic dependence::
+* Classification::
+* Fast lexicographical GB::
+* Parallelization with MPtcp links::
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -226,17 +226,17 @@ lists may be empty.)
   @itemize @minus
   @item
   the procedure @code{mil} which must be called with one parameter, a
-  polynomial. 
+  polynomial.
   The name g is local to the procedure and is killed automatically.
   @code{mil} returns the Milnor number (and displays a comment).
   @item
   the procedure @code{tjur} where the parameters are not specified. They
-  are referred 
+  are referred
   to by @code{#[1]} for the 1-st, @code{#[2]} for the 2-nd parameter etc.
   @code{tjur} returns the Tjurina number (and displays a comment).
   @item
   the procedure @code{milrina} which returns a list consisting of two
-  integers, 
+  integers,
   the Milnor and the Tjurina number.
   @end itemize
 @end itemize
@@ -914,7 +914,7 @@ $$
 
 @example
         j = J intersected with K[x1,...,xn]
-J=(x1-f1(t1,...,tr),...,xn-fn(t1,...,tr)) in k[t1,...tr,x1,...,xn] 
+J=(x1-f1(t1,...,tr),...,xn-fn(t1,...,tr)) in k[t1,...tr,x1,...,xn]
 @end example
 
 @end ifinfo
@@ -1105,7 +1105,7 @@ minimizes every module in the resolution except the first module
   computes the 1-st syzygy module of the input, i.e. the module of
          relations between the given generators.
 @end table
-@code{res(i,r)}, @code{lres(i,r)}, @code{sres(i,r)}, @code{mres(i,r)}, 
+@code{res(i,r)}, @code{lres(i,r)}, @code{sres(i,r)}, @code{mres(i,r)},
 @code{nres(i,r)} compute the first r modules of the resolution
 of i, resp. the full resolution if r=0 and the basering is not a qring.
 See the description of @code{res}, @code{lres}, @code{sres}, @code{mres} and
@@ -1201,7 +1201,7 @@ $A/(A \cap B)$
 A/(A intersect B)
 @end ifinfo
 in the usual way. As we have a chain complex this is obviously the same
-as ker/Im.  
+as ker/Im.
 
 We collect these statements in this short procedure.
 
@@ -1211,10 +1211,10 @@ proc ext(int n, ideal I)
   resolution rs = mres(I,n+1);
   module tAn    = transpose(rs[n+1]);
   module tAn_1  = transpose(rs[n]);
-  module ext_n  = modulo(syz(tAn),tAn_1); 
+  module ext_n  = modulo(syz(tAn),tAn_1);
   return(ext_n);
 @}
-@end example  
+@end example
 
 Now consider the following example:
 
@@ -1228,7 +1228,7 @@ print(ext(2,I));
 @expansion{} 0,0,0,1,0,0,0,
 @expansion{} 0,0,0,0,1,0,0,
 @expansion{} 0,0,0,0,0,1,0,
-@expansion{} 0,0,0,0,0,0,1 
+@expansion{} 0,0,0,0,0,0,1
 ext(3,I);   // too big to be displayed here
 @end example
 
@@ -1931,7 +1931,7 @@ m x r and m x s
 over the ring @math{R} and consider the corresponding maps
 @tex
 $$
-R^r \buildrel{A}\over{\longrightarrow} 
+R^r \buildrel{A}\over{\longrightarrow}
 R^m \buildrel{B}\over{\longleftarrow} R^s\;.
 $$
 @end tex
@@ -1951,7 +1951,7 @@ $$
 We want to compute the kernel of the map
 @tex
 $R^r \buildrel{A}\over{\longrightarrow}
-R^m\longrightarrow 
+R^m\longrightarrow
 R^m/\hbox{Im}(B) \;.$
 @end tex
 @ifinfo
@@ -2028,7 +2028,7 @@ $I \cap K[Y_1,\ldots,Y_r]$
 @ifinfo
 I intersected with K[Y_1,@dots{},Y_r]
 @end ifinfo
-are the algebraic relations between 
+are the algebraic relations between
 @tex
 $f_1$, \dots, $f_r$.
 @end tex
@@ -2051,7 +2051,7 @@ $g \in K[f_1,\ldots,f_r]$
 @ifinfo
 g in K[f_1,@dots{},f_r]
 @end ifinfo
-if and only if the normalform of @math{g} with respect to @math{I} and a 
+if and only if the normalform of @math{g} with respect to @math{I} and a
 blockordering with respect to
 @tex
 $X=(x_1,\ldots,x_n)$ and $Y=(Y_1,\ldots,Y_r)$ with $X>Y$
@@ -2059,7 +2059,7 @@ $X=(x_1,\ldots,x_n)$ and $Y=(Y_1,\ldots,Y_r)$ with $X>Y$
 @ifinfo
 X=(x1,@dots{},xn) and Y=(Y_1,@dots{},Y_r) with X>Y
 @end ifinfo
-is in @math{K[Y]}. Then 
+is in @math{K[Y]}. Then
 @tex
 $g=h(f_1,\ldots,f_r)$.
 @end tex
@@ -2080,9 +2080,9 @@ proc algebraicDep(ideal I, poly g)
   int k=nvars(R);
   int i;
   intvec v;
-  
-  //construction of the new ring 
-  
+
+  //construction of the new ring
+
   v[n+k]=0;
   for(i=1;i<=k;i++)
   @{
@@ -2091,12 +2091,12 @@ proc algebraicDep(ideal I, poly g)
   string orde="(a("+string(v)+"),dp);";
   string ri="ring Rhelp=("+charstr(R)+"),
                         ("+varstr(R)+",Y(1.."+string(n)+")),"+orde;
-  
+
   execute(ri);
   ideal I=imap(R,I);
   for(i=1;i<=n;i++)
   @{
-    I[i]=I[i]-var(k+i); 
+    I[i]=I[i]-var(k+i);
   @}
   poly g=imap(R,g);
   if(g==0)
@@ -2139,7 +2139,7 @@ on the Hilbert polynomial of the Milnor algebra is made.
   // part is saved in the database, we added z^2 to get an E_14
   // of embedding dimension 3.
   //
-  // Now we apply a coordinate change in order to deal with a 
+  // Now we apply a coordinate change in order to deal with a
   // singularity which is not in normal form:
   map phi=r,x+y,y+z,x;
   poly q=phi(p);
@@ -2153,7 +2153,7 @@ on the Hilbert polynomial of the Milnor algebra is made.
   corank(q);
   morsesplit(q);
 @c example
-@end example  
+@end example
 
 @c ----------------------------------------------------------------------------
 @node Fast lexicographical GB, Parallelization with MPtcp links, Classification, Examples
@@ -2197,7 +2197,7 @@ and @code{stdhilb} about 10 times faster than std.
 @cindex MPtcp
 @cindex link
 In this example, we demonstrate how MPtcp links can be used to
-parallelize computations. 
+parallelize computations.
 
 To compute a standard base for a zero-dimensional ideal in the
 lexicographical ordering, one of the two powerful routines
@@ -2222,9 +2222,9 @@ Kaiserslautern; 1997} for more details.
 
 @example
 @c example
-ring r=0,(a,b,c,u,v,w,x,y,z),lp; 
-ideal i=a+c+v+2x-1, ab+cu+2vw+2xy+2xz-2/3,  ab2+cu2+2vw2+2xy2+2xz2-2/5, 
-ab3+cu3+2vw3+2xy3+2xz3-2/7, ab4+cu4+2vw4+2xy4+2xz4-2/9, vw2+2xyz-1/9, 
+ring r=0,(a,b,c,u,v,w,x,y,z),lp;
+ideal i=a+c+v+2x-1, ab+cu+2vw+2xy+2xz-2/3,  ab2+cu2+2vw2+2xy2+2xz2-2/5,
+ab3+cu3+2vw3+2xy3+2xz3-2/7, ab4+cu4+2vw4+2xy4+2xz4-2/9, vw2+2xyz-1/9,
 vw4+2xy2z2-1/25, vw3+xyz2+xy2z-1/15, vw4+xyz3+xy3z-1/21;
 
 link l_hilb,l_fglm = "MPtcp:fork","MPtcp:fork";         // 1.
@@ -2232,11 +2232,11 @@ link l_hilb,l_fglm = "MPtcp:fork","MPtcp:fork";         // 1.
 open(l_fglm); open(l_hilb);
 
 write(l_hilb, quote(system("pid")));                    // 2.
-write(l_fglm, quote(system("pid")));        
-int pid_hilb,pid_fglm = read(l_hilb),read(l_fglm); 
+write(l_fglm, quote(system("pid")));
+int pid_hilb,pid_fglm = read(l_hilb),read(l_fglm);
 
 write(l_hilb, quote(stdhilb(i)));                       // 3.
-write(l_fglm, quote(stdfglm(eval(i)))); 
+write(l_fglm, quote(stdfglm(eval(i))));
 
 while ((! status(l_hilb, "read", "ready", 1)) &&        // 4.
        (! status(l_fglm, "read", "ready", 1))) {}
@@ -2255,7 +2255,7 @@ else                                                    // 5.
 @end example
 Some explainatory remarks are in order:
 @enumerate
-@item 
+@item
 Instead of using links of the type @code{MPtcp:fork}, we alternatively
 could use @code{MPtcp:launch} links such that the two "competing"
 @sc{Singular} processes run on different machines. This has the
@@ -2269,7 +2269,7 @@ process. Therefore, we explicitely need to get the process id numbers of
 the competing @sc{Singular} processes, so that we can later "kill" the
 looser.
 
-@item 
+@item
 Notice how quoting is used in order to prevent local evaluation
 (i.e., local computation of results). Since we "forked" the two
 competing processes, the identifier @code{i} is defined and has
@@ -2280,14 +2280,14 @@ children. However, when @code{MPtcp:launch} links are used, the inner
 evaluation must be applied so that actual values, and not the
 identifiers are communicated (as is done for the @code{l_fglm} link).
 
-@item 
+@item
 We go into a "sleepy" loop and wait until one of the two children
-finished the computation. That is, the current process checks appr. once 
+finished the computation. That is, the current process checks appr. once
 a per second the status of one of the connecting links, and sleeps
 (i.e., suspends its execution) in the intermediate time.
 
 @item
-The child which won delivers the result and is terminated with the usual 
+The child which won delivers the result and is terminated with the usual
 @code{close} command. The other child which is still computing needs to
 be terminated by an explicit (i.e., system) kill command, since it can
 not be terminated through the link while it is still computing.

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.27 1998-06-05 08:22:55 wichmann Exp $
+@comment $Id: start.doc,v 1.28 1998-07-09 07:39:11 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added chages by GMG.
 
@@ -23,9 +23,9 @@
 
 
 @menu
-* Background::                  
-* How to use this manual::      
-* Getting started::             
+* Background::
+* How to use this manual::
+* Getting started::
 @end menu
 
 @c ------------------------------------------------------------------
@@ -35,7 +35,7 @@
 
 @sc{Singular} is a Computer Algebra system for polynomial
 computations with emphasize on the special needs of commutative
-algebra, algebraic geometry, and singularity theory.  
+algebra, algebraic geometry, and singularity theory.
 
 @sc{Singular}'s main computational objects are ideals and
 modules over a large variety of baserings. The baserings are polynomial
@@ -74,7 +74,7 @@ existing systems was able to compute.
 
 In the early 1990s @sc{Singular}'s "home-town" moved to
 Kaiserslautern, a general standard basis algorithm was implemented in C
-and @sc{Singular} was ported to Unix, MS-DOS, Windows NT, and MacOS. 
+and @sc{Singular} was ported to Unix, MS-DOS, Windows NT, and MacOS.
 
 Continuous extensions (like polynomial factorization, gcd computations,
 links) and refinements led in 1997 to the release of @sc{Singular}
@@ -94,7 +94,9 @@ libraries for primary decomposition, ring normalization, etc.
 @section How to use this manual
 @cindex How to use this manual
 
+@ifset singularmanual
 @subsubheading For the impatient user
+@end ifset
 In @ref{Getting started}, some simple examples are explained in a
 step-by-step manner to introduce into @sc{Singular}.
 
@@ -104,6 +106,8 @@ solve some given mathematical problems without dwelling to deeply into
 detailed instructions and explanations on how to solve mathematical
 problems using @sc{Singular}.
 
+@c ------------------------------------------------------------------------
+@ifset singularmanual
 @subsubheading For the systematic user
 In @ref{General concepts}, all basic concepts which are important to use
 and understand @sc{Singular} are developed.  But even for users
@@ -170,14 +174,16 @@ lexicographical ordering'' one should refer to this chapter.
 @ref{SINGULAR libraries}, and @ref{Library function index} lists the
 libraries which come with @sc{Singular} and the functions contained in
 them, resp.
+@end ifset
+@c ------------------------------------------------------------------------
 
 @subsubheading Typographical conventions
 Throughout this manual, the following typographical conventions are
 adopted:
 
 @itemize @bullet
-@item 
-text in @code{typewriter} denotes @sc{Singular} input and output as well 
+@item
+text in @code{typewriter} denotes @sc{Singular} input and output as well
 as reserved names:
 
 @itemize @asis
@@ -195,20 +201,20 @@ the arrow @expansion{} denotes @sc{Singular} output:
 
 @item
 square brackets are used to denote parts of syntax descriptions which
-are optional: 
+are optional:
 
 @itemize @asis
 [optional_text] required_text
 @end itemize
 
-@item 
-keys are denoted using typewriter, for example: 
+@item
+keys are denoted using typewriter, for example:
 
 @itemize @asis
 @item @code{N} (press the key @code{N} to get to the next node in help
-mode) 
+mode)
 @item @code{RETURN} (press @code{RETURN} to finish an input line)
-@item @code{CTRL-P} (press control key together with the key @code{P} to 
+@item @code{CTRL-P} (press control key together with the key @code{P} to
 get the previous input line)
 @end itemize
 
@@ -222,18 +228,18 @@ get the previous input line)
 @sc{Singular} is a special purpose system for polynomial
 computations. Hence, the most powerful computations in @sc{Singular}
 require the prior definition of a ring. Most important rings are
-polynomial rings over a field, localizations hereof, or quotient rings of 
+polynomial rings over a field, localizations hereof, or quotient rings of
 such rings modulo an ideal. However, some simple computations with
-integers (machine integers of limited size) and manipulations of strings 
+integers (machine integers of limited size) and manipulations of strings
 are available without a ring.
 
 @menu
-* First steps::                 
-* Rings and standard bases::    
-* Procedures and libraries::    
-* Change of rings::             
-* Modules and their annihilator::  
-* Resolution::                  
+* First steps::
+* Rings and standard bases::
+* Procedures and libraries::
+* Change of rings::
+* Modules and their annihilator::
+* Resolution::
 @end menu
 
 @c ------------------------------------------------------------------
@@ -302,9 +308,14 @@ matrix of integers, are obtained by
 
 @example
 help intmat;
-@end example  
+@end example
 
-@noindent This shows the text from @ref{intmat}, in the printed maual. 
+@ifset singularmanual
+@noindent This shows the text from @ref{intmat}, in the printed manual.
+@end ifset
+@ifclear singularmanual
+@noindent This shows the text from node @code{intmat}, in the printed manual.
+@end ifclear
 
 Next, we define a
 @tex
@@ -313,12 +324,12 @@ $3 \times 3$
 @ifinfo
 3 x 3
 @end ifinfo
-matrix of integers and initialize it with some values, row-wise 
+matrix of integers and initialize it with some values, row-wise
 from left to right:
 
 @example
 intmat m[3][3] = 1,2,3,4,5,6,7,8,9;
-@end example  
+@end example
 
 @noindent A single matrix entry may be selected and changed with the
 square brackets @code{[} and @code{]}.
@@ -329,7 +340,7 @@ m;
 @expansion{} 1,0,3,
 @expansion{} 4,5,6,
 @expansion{} 7,8,9
-@end example  
+@end example
 
 To calculate the trace of this matrix, we use a @code{for} loop. The
 curly brackets (@code{@{} and @code{@}}) denote the beginning resp.@:
@@ -378,11 +389,11 @@ this list and prints all results separated by spaces.
 @cindex Rings and standard bases
 
 To calculate with objects as ideals, matrices, modules, and polynomial
-vectors, a ring has to be defined first. 
+vectors, a ring has to be defined first.
 
 @example
 ring r = 0,(x,y,z),dp;
-@end example   
+@end example
 
 The definition of a ring consists of three parts: the first part
 determines the ground field, the second part determines the names of the
@@ -395,7 +406,7 @@ ordering should be used.
 
 Other ring declarations:
 
-@table @code 
+@table @code
 @item ring r1=32003,(x,y,z),dp;
 characteristic 32003, variables @code{x}, @code{y}, and @code{z} and
 ordering @code{dp}.
@@ -417,10 +428,10 @@ transcendental extension of @math{Q} by @math{a}, variable names
 @c or equal to @math{32003}. The name of the ring variables may be any
 @c valid @sc{Singular} name. Even indexed names are allowed, so
 @c @code{x(1..10)} specifies the ring variables @code{x(1)}, @dots{},
-@c @code{x(10)}. @sc{Singular} offers the possibility to calculate with any 
-@c monomial ordering, some orderings are predefined with special names like 
+@c @code{x(10)}. @sc{Singular} offers the possibility to calculate with any
+@c monomial ordering, some orderings are predefined with special names like
 @c @code{dp} in the example above. Another important example is the
-@c lexicographical ordering called @code{lp}. 
+@c lexicographical ordering called @code{lp}.
 @c
 Typing the name of a ring prints its definition. The example below
 shows, that the default ring in @sc{Singular} is @math{Z/32003[x,y,z]}
@@ -435,7 +446,13 @@ r5;
 
 Defining a ring makes this ring the current active basering, so each
 ring definition above switches to a new basering. The concept of rings
-in @sc{Singular} is discussed in detail in @ref{Rings and orderings}.
+in @sc{Singular} is discussed in detail in
+@ifset singularmanual
+@ref{Rings and orderings}.
+@end ifset
+@ifclear singularmanual
+the chapter "Rings and orderings" of the @sc{Singular} manual.
+@end ifclear
 
 The basering now is @code{r5}. Since we want to calcualate in the ring
 @code{r}, which we defined first, we have to switch back to it. This can
@@ -512,8 +529,11 @@ ideal defined by @code{g}.
 The function @code{groebner}, like many other functions in
 @sc{Singular}, prints a protocol during calculation, if you want so. The
 command @code{option(prot);} enables protocoling whereas
-@code{option(noprot);} turns it off. @ref{option}, explains the meaning
+@code{option(noprot);} turns it off.
+@ifset singularmanual
+@ref{option}, explains the meaning
 of the different symbols printed during calculation.
+@end ifset
 
 The command @code{kbase} calculates a basis of the polynomial ring
 modulo an ideal. As an example we calculate the Milnor number of a
@@ -521,7 +541,7 @@ hypersurface singularity in the global and local case. This is the
 vector space dimension of the polynomial ring modulo the Jacobian ideal
 in the global case resp.@: of the power series ring modulo the Jacobian
 ideal in the local case. @xref{Critical points}, for a detailed
-explanation. 
+explanation.
 
 The Jacobian ideal is obtained with the command @code{jacob}.
 
@@ -536,7 +556,7 @@ J;
 
 @noindent @sc{Singular} prints the line @code{// ** redefining J
 **}. That means, that we previously have defined a variable with name
-@code{J} of type ideal (see above). 
+@code{J} of type ideal (see above).
 
 To get a representing set of the quotient vectorspace first we
 calculate a standard basis, then we apply the function @code{kbase} to
@@ -574,7 +594,7 @@ $K[x,y,z]/\hbox{\rm jacob}(f)$.
 @ifinfo
 K[x,y,z]/jacob(f).
 @end ifinfo
-As in @sc{Singular} the functions may take directly the input from 
+As in @sc{Singular} the functions may take directly the input from
 earlier calculations, all may be written together in one single statement.
 
 @example
@@ -632,7 +652,7 @@ see in the next chapter.
 With @sc{Singular} come several libraries, a collection of useful
 procedures based on the kernel commands, which extend the functionality
 of @sc{Singular}. The command @code{help "all.lib";} lists all libraries
-together with a one-line explanation.  
+together with a one-line explanation.
 @c The command @code{help}
 @c library_name@code{;} lists all procedures of the library, @code{help}
 @c proc_name@code{;} shows an explanation of the procedure after the
@@ -660,8 +680,8 @@ milnor(f);
 @expansion{} 12
 @end example
 
-The procedures in a library have a help part 
-which is shown with 
+The procedures in a library have a help part
+which is shown with
 
 @example
 help milnor;
@@ -687,13 +707,13 @@ example milnor;
 @c @expansion{}    ring r     = 32003,(x,y,z),ds;
 @c @expansion{}    ideal j    = x5+y6+z6,x2+2y2+3z2,xyz+yx;
 @c @expansion{}    milnor(j);
-@c @expansion{} //sequence of discriminant numbers: 100,149,70 
+@c @expansion{} //sequence of discriminant numbers: 100,149,70
 @c @expansion{} 21
 @c @expansion{}    poly f     = x7+y7+(x-y)^2*x2y2+z2;
 @c @expansion{}    milnor(f);
 @c @expansion{} 28
 @c @expansion{}    printlevel = p;
-@c @expansion{} 
+@c @expansion{}
 @end example
 
 @noindent Likewise the library itself has a help part, to show all the functions
@@ -711,9 +731,14 @@ help sing.lib;
 @cindex Change of rings
 
 To calculate the local Milnor number we have to do the calculation with the
-same commands in a ring with local ordering.  Define the localization of 
-the polynomial ring at the origin (@pxref{Polynomial data} and
-@ref{Mathematical background}).
+same commands in a ring with local ordering.
+@ifset singularmanual
+Define the localization of the polynomial ring at the origin
+(@pxref{Polynomial data} and @ref{Mathematical background}).
+@end ifset
+@ifclear singularmanual
+Define the localization of the polynomial ring at the origin.
+@end ifclear
 
 @example
 ring rl = 0,(x,y,z),ds;
@@ -730,9 +755,14 @@ f;
 @end example
 
 @noindent Instead of @code{fetch} we can use the function @code{imap}
-which is more general but less efficient. The most general way to fetch
-data from one ring to another is to use maps, this will be explained in
-@ref{map}.
+which is more general but less efficient.
+@ifset singularmanual
+The most general way to fetch data from one ring to another is to use maps,
+this will be explained in @ref{map}.
+@end ifset
+@ifclear singularmanual
+The most general way to fetch data from one ring to another is to use maps.
+@end ifclear
 
 Here the terms are ordered by increasing exponents. The local Milnor
 number is now
@@ -856,7 +886,7 @@ print(freemodule(4));
 @expansion{} 1,0,0,0,
 @expansion{} 0,1,0,0,
 @expansion{} 0,0,1,0,
-@expansion{} 0,0,0,1 
+@expansion{} 0,0,0,1
 @end example
 
 To define a module, we give a list of vectors generating a submodule of
@@ -870,10 +900,10 @@ module MD = [x,0,x],[y,z,-y];
 matrix MM = MD;
 print(MM);
 @expansion{} x,y,
-@expansion{} 0,z, 
-@expansion{} x,-y 
+@expansion{} 0,z,
+@expansion{} x,-y
 @end example
- 
+
 The submodule @math{MD} may, however, be also considered as the module
 of relations of the factor module
 @tex
@@ -882,10 +912,16 @@ $r^3/MD$.
 @ifinfo
 r^3/MD.
 @end ifinfo
-In this way @sc{Singular} can treat arbitrary finitely generated modules 
-over the basering (@pxref{Representation of mathematical objects}).
+In this way @sc{Singular} can treat arbitrary finitely generated modules
+over the
+@ifset singularmanual
+basering (@pxref{Representation of mathematical objects}).
+@end ifset
+@ifclear singularmanual
+basering.
+@end ifclear
 
-In order to get the module of relations of @math{MD}, 
+In order to get the module of relations of @math{MD},
 we use the command @code{syz}.
 
 @example
@@ -894,14 +930,14 @@ syz(MD);
 @end example
 
 We want to calculate as application the annihilator of a given module.
-Let 
+Let
 @tex
 $M = r^3/U$,
 @end tex
 @ifinfo
 M = r^3/U,
 @end ifinfo
-where U is our defining module of relations. 
+where U is our defining module of relations.
 
 @example
 module U = [z3,xy2,x3],[yz2,1,xy5z+z3],[y2z,0,x3],[xyz+x2,y2,0],[xyz,x2y,1];
@@ -912,9 +948,9 @@ Then, by definition, the annihilator of M is the ideal
 $\hbox{ann}(M) = \{a \mid aM = 0 \}$
 @end tex
 @ifinfo
-ann(M) = @{a | aM = 0 @} 
+ann(M) = @{a | aM = 0 @}
 @end ifinfo
-which is by the description of M the same as 
+which is by the description of M the same as
 @tex
 $\{ a \mid ar^3 \in U \}$.
 @end tex
@@ -923,10 +959,10 @@ $\{ a \mid ar^3 \in U \}$.
 @end ifinfo
 Hence we have to calculate the quotient
 @tex
-$\{ a \mid a \in U \colon r^3 \}$. 
+$\{ a \mid a \in U \colon r^3 \}$.
 @end tex
 @ifinfo
-@{ a | a in U:r^3@}. 
+@{ a | a in U:r^3@}.
 @end ifinfo
 The rank of the free module is determined by the choice of U and is the
 number of rows of the corresponding matrix. This may be determined by
@@ -949,7 +985,7 @@ standard basis method up to the length @math{n}, where @math{n=0} means
 the full resolution.
 
 Here we use the possibility to inspect the calculation process using the
-option @code{prot}. 
+option @code{prot}.
 
 @example
 ring rr;      // the default ring in char 32003
@@ -957,7 +993,7 @@ rr;
 @expansion{} //   characteristic : 32003
 @expansion{} //   number of vars : 3
 @expansion{} //        block   1 : ordering dp
-@expansion{} //                  : names    x y z 
+@expansion{} //                  : names    x y z
 @expansion{} //        block   2 : ordering C
 ideal I = x4+x3y+x2yz,x2y2+xy2z+y2z2,x2z2+2xz3,2x2z2+xyz2;
 option(prot);
@@ -983,7 +1019,7 @@ free modules.
 rs;
 @expansion{}   1       4       5       2       0
 @expansion{} rr  <-- rr  <-- rr  <-- rr  <-- rr
-@expansion{}  
+@expansion{}
 @expansion{} 0       1       2       3       4
 print(betti(rs),"betti");
 @expansion{}            0     1     2     3
@@ -1003,9 +1039,9 @@ brackets @code{[} and @code{]}.
 
 @example
 print(rs[3]);
-@expansion{} y2z,  y3,    
-@expansion{} -y2,  -y2,   
-@expansion{} x+y-z,x+y-z, 
+@expansion{} y2z,  y3,
+@expansion{} -y2,  -y2,
+@expansion{} x+y-z,x+y-z,
 @expansion{} -2z,  x-y+4z,
-@expansion{} -z,   -y+3z  
+@expansion{} -z,   -y+3z
 @end example

@@ -48,7 +48,7 @@ DOC2TEX_FILES	= \
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 TUTOR_FILES	= \
-		tutor.tex examples.tex start.tex proc.tex copyright.tex
+		tutor.tex examples.tex start.tex copyright.tex
 
 .PHONY: info dvi ps 
 # default target

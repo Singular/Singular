@@ -1,8 +1,8 @@
 \input texinfo    @c -*-texinfo-*-
-@comment %**start of header
-@set VERSION 1.2
+@comment $Id: tutor.tex,v 1.3 1998-07-09 07:39:12 Singular Exp $
 @c ---------------------------------------------------------------------------
-
+@comment %**start of header
+@c -----------------------
 @setfilename tutor.hlp
 @settitle Singular Tutorial
 @iftex
@@ -10,6 +10,8 @@
 @finalout
 @end iftex
 @comment %**end of header
+@c ------------------------
+@set VERSION 1.2
 @c ------------------------
 @ifinfo
 this is the texinfo file with the Singular Tutorial (version @value{VERSION})
@@ -53,7 +55,6 @@ q: quit help, m: menu item, n: next node, p: previous node, u: up
 * Preface
 * Introduction::
 * Examples::
-* Writing procedures::
 * Index::
 @end menu
 @c ----------------------------------------------------------------------------
@@ -69,16 +70,13 @@ q: quit help, m: menu item, n: next node, p: previous node, u: up
 
 @include start.tex
 @c ----------------------------------------------------------------------------
-@node Examples,Writing procedures,Introduction, Top
+@node Examples,Index,Introduction, Top
 @chapter Examples
 @cindex Examples
 
 @include examples.tex
 @c ----------------------------------------------------------------------------
-@node Writing procedures,Index,Examples,Top
-@include proc.tex
-@c ------------------------------------------------------------------
-@node Index,,Writing procedures,Top
+@node Index,,Examples,Top
 @chapter Index
 @printindex cp
 @contents
