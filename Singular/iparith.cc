@@ -2545,6 +2545,10 @@ static BOOLEAN jjLEADEXP(leftv res, leftv v)
   res->data=(char *)iv;
   return FALSE;
 }
+static BOOLEAN jjLIB(leftv res, leftv v)
+{
+  return iiLibCmd((char *)v->CopyD());
+}
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
 #ifdef MM_COUNT
@@ -3230,6 +3234,7 @@ struct sValCmd1 dArith1[]=
 ,{jjLEADCOEF,   LEADCOEF_CMD,    NUMBER_CMD,     VECTOR_CMD }
 ,{jjLEADEXP,    LEADEXP_CMD,     INTVEC_CMD,     POLY_CMD }
 ,{jjLEADEXP,    LEADEXP_CMD,     INTVEC_CMD,     VECTOR_CMD }
+,{jjLIB,        LIB_CMD,         NONE,           STRING_CMD }
 ,{jjCALL1MANY,  LIST_CMD,        LIST_CMD,       DEF_CMD }
 ,{jjWRONG,      MAP_CMD,         0,              ANY_TYPE}
 ,{jjDUMMY,      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD }
