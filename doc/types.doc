@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.9 1998-04-27 15:30:16 Singular Exp $
+@comment $Id: types.doc,v 1.10 1998-04-27 15:33:49 Singular Exp $
 @comment this file contains the type definitions
 @menu
 * boolean::                     
@@ -232,7 +232,6 @@ See @ref{ideal}; @ref{ideal operations}; @ref{ideal related functions};
 @subsection ideal operations
 @cindex ideal operations
 @c --> subsection ideal oparations
-There are the following operations for ideals:
 @table @asis
 @item @code{+}
 addition (concatenation of the generator and simplification)
@@ -252,7 +251,6 @@ power, exponentiation (by an integer)
 @subsection ideal related functions
 @cindex ideal related functions
 @c --> subsection ideal related functions
-There are the following functions for ideals:
 @table @asis
 @item @code{char_series}
 ireducible characteristic series (see @ref{char_series})
@@ -483,7 +481,6 @@ See @ref{implicit type conversions}; @ref{type casting}; @ref{int related functi
 @cindex mod
 @cindex div
 @c --> subsection int operations
-There are the following operations for objects of type int:
 @table @asis
 @item @code{++}
 will change its operand to its successor, is itself no int expression
@@ -520,7 +517,6 @@ comparison
 @subsection int related functions
 @cindex int related functions
 @c --> section int related functions
-There are the following functions concerning int:
 @table @asis
 @item @code{char}
 characteristic of the coefficient field of a ring (see @ref{char})
@@ -671,7 +667,6 @@ intmat comparison (yielding int): @code{<>}, @code{==}
 @subsection intmat related functions
 @cindex intmat related functions
 @c --> intmat related functions
-There are the following functions for intmat
 @table @asis
 @item @code{bareiss}
 Bareiss algorithm (see @ref{bareiss})
@@ -814,7 +809,6 @@ See @ref{intvec functions}.
 @subsection intvec related functions
 @cindex intvec related functions
 @c --> intvec related functions
-There are the following functions concerning intvec
 @table @asis
 @item @code{hilb}
 returns Hilbert series as intvec (see @ref{hilb})
@@ -965,7 +959,6 @@ See @ref{list}; @ref{list operations}; @ref{list functions};
 @subsection list operations
 @cindex list operations
 @c --> subsection list operations
-There are the following operations for list
 @table @asis
 @item @code{+}
 concatenation
@@ -983,7 +976,6 @@ construct a new list whose elements are the parts of the expression list
 @subsection list related functions
 @cindex list related functions
 @c --> subsection list related functions
-There are the following functions for list
 @table @asis
 @item @code{betti}
 Betti numbers from a resolution (see @ref{betti})
@@ -1151,7 +1143,6 @@ See @ref{matrix}; @ref{matrix operations}; @ref{matrix functions};
 @subsection matrix operations
 @cindex matrix operations
 @c --> subsection matrix oparations
-There are the following operations for matrices
 @table @asis
 @item @code{+}
 addition
@@ -1173,7 +1164,6 @@ comparison
 @subsection matrix related functions
 @cindex matrix related functions
 @c --> subsection matrix related functions
-There are the following functions for matrices
 @table @asis
 @item @code{bareiss}
 Bareiss algorithm (see @ref{bareiss})
@@ -1345,7 +1335,6 @@ See @ref{module}; @ref{module operations}; @ref{module functions};
 @subsection module operations
 @cindex module operations
 @c --> subsection module oparations
-There are the following operations for modules:
 @table @asis
 @item @code{+}
 addition (concatenation of the generators and simplification)
@@ -1363,7 +1352,6 @@ multiplication with ideal or poly, but not `module` * `module`
 @subsection module related functions
 @cindex module related functions
 @c --> subsection module related functions
-There are the following functions for modules:
 @table @asis
 @item @code{coeffs}
 matrix of coefficients (see @ref{coeffs})
@@ -1555,7 +1543,6 @@ See @ref{number}; @ref{ring}; @ref{number operations};
 @subsection number operations
 @cindex number operations
 @c --> subsection number operations
-There are the following operations and functions for numbers:
 @table @asis
 @item @code{+}
 addition
@@ -1689,7 +1676,6 @@ See @ref{ring}; @ref{poly}; @ref{poly operations}; @ref{poly related functions};
 @subsection poly operations
 @cindex poly operations
 @c --> subsection poly operations
-There are the following operations for polys:
 @table @asis
 @item @code{+}
 addition
@@ -1728,7 +1714,6 @@ Brackets may be used to access elements of ideals and matrices:
 @subsection poly related functions
 @cindex poly related functions
 @c --> subsection poly related functions
-There are the following functions concerning polys:
 @table @asis
 @item @code{cleardenom}
 quotient of a poly by its content (see @ref{cleardenom})
@@ -1976,7 +1961,6 @@ See @ref{implicit type conversions}; @ref{type casting}.
 @subsection string operations
 @cindex string operations
 @c --> subsection string operations
-There are the following operations for strings:
 @table @asis
 @item @code{+}
 concatenation
@@ -2175,7 +2159,6 @@ See @ref{ring}; @ref{vector}; @ref{vector operations}; @ref{vector related funct
 @subsection vector operations
 @cindex vector operations
 @c --> subsection vector operations
-There are the following operations for vectors:
 @table @asis
 @item @code{+}
 addition
@@ -2204,7 +2187,6 @@ choice of a component
 @subsection vector related functions
 @cindex vector related functions
 @c --> subsection vector related functions
-There are the following functions for vectors:
 @table @asis
 @item @code{cleardenom}
 quotient of a vector by its content (see @ref{cleardenom})
