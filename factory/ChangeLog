@@ -1,3 +1,8 @@
+Wed Sep 23 19:05:47 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* fac_ezgcd.cc (ezgcd_specialcase): bug fix (???).  See comments
+	  in the file for more information.
+
 Tue Jul  7 18:34:39 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* GNUmakefile.in (ftestm4src): `extgcd.m4' added to distribution
