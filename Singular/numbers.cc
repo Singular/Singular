@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.39 2001-01-30 13:37:04 Singular Exp $ */
+/* $Id: numbers.cc,v 1.40 2001-02-20 09:45:43 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -253,7 +253,7 @@ void nInitChar(ring r)
     r->cf->nPower      = naPower;
     r->cf->nGcd        = naGcd;
     r->cf->nLcm        = naLcm;
-    r->cf->nSetMap     = naSetMap;
+    r->cf->cfSetMap    = naSetMap;
     r->cf->nName       = naName;
     r->cf->nSize       = naSize;
     r->cf->nGetDenom   = naGetDenom;
@@ -289,7 +289,7 @@ void nInitChar(ring r)
     r->cf->nPower = nlPower;
     r->cf->nGcd  = nlGcd;
     r->cf->nLcm  = nlLcm;
-    r->cf->nSetMap = nlSetMap;
+    r->cf->cfSetMap = nlSetMap;
     r->cf->nSize  = nlSize;
     r->cf->nGetDenom = nlGetDenom;
 #ifdef LDEBUG
@@ -324,7 +324,7 @@ void nInitChar(ring r)
     r->cf->nPower = npPower;
     r->cf->nGcd  = ndGcd;
     r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
-    r->cf->nSetMap = npSetMap;
+    r->cf->cfSetMap = npSetMap;
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
@@ -361,7 +361,7 @@ void nInitChar(ring r)
     r->cf->nPower = nfPower;
     r->cf->nGcd  = ndGcd;
     r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
-    r->cf->nSetMap = nfSetMap;
+    r->cf->cfSetMap = nfSetMap;
     r->cf->nName= nfName;
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
@@ -396,7 +396,7 @@ void nInitChar(ring r)
     r->cf->nPower = nrPower;
     r->cf->nGcd  = ndGcd;
     r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
-    r->cf->nSetMap=nrSetMap;
+    r->cf->cfSetMap=nrSetMap;
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
@@ -432,7 +432,7 @@ void nInitChar(ring r)
     r->cf->nPower = ngfPower;
     r->cf->nGcd  = ndGcd;
     r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
-    r->cf->nSetMap=ngfSetMap;
+    r->cf->cfSetMap=ngfSetMap;
     r->cf->nName= ndName;
     r->cf->nSize  = ndSize;
 #ifdef LDEBUG
@@ -468,7 +468,7 @@ void nInitChar(ring r)
     r->cf->nPower = ngcPower;
     r->cf->nGcd  = ndGcd;
     r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
-    r->cf->nSetMap=ngcSetMap;
+    r->cf->cfSetMap=ngcSetMap;
     r->cf->nPar=ngcPar;
     r->cf->nRePart=ngcRePart;
     r->cf->nImPart=ngcImPart;

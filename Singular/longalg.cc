@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.58 2001-01-20 12:38:41 Singular Exp $ */
+/* $Id: longalg.cc,v 1.59 2001-02-20 09:45:44 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2678,6 +2678,12 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
   poly res=NULL;
   poly p;
   napoly za=((lnumber)z)->z;
+  nMapFunc nMap=NULL;
+  if (currRing->parameter!=NULL)
+    nMap=currRing->algring->cf->cfSetMap(r->algring, currRing->algring);
+  else
+    nMap=currRing->cf->cfSetMap(r->algring, currRing);
+  if (nMap==NULL) return NULL; /* emergency exit only */
   do
   {
     p = pInit();
@@ -2690,14 +2696,15 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
     napoly pa=NULL;
     if (currRing->parameter!=NULL)
     {
+      assume(r->algring!=NULL);
       pGetCoeff(p)=(number)omAlloc0Bin(rnumber_bin);
       ((lnumber)pGetCoeff(p))->s=2;
-      ((lnumber)pGetCoeff(p))->z=napInitz(nacCopy(napGetCoeff(za)));
+      ((lnumber)pGetCoeff(p))->z=napInitz(nMap(napGetCoeff(za)));
       pa=((lnumber)pGetCoeff(p))->z;
     }
     else
     {
-      pGetCoeff(p)=nCopy(napGetCoeff(za));
+      pGetCoeff(p)=nMap(napGetCoeff(za));
     }
     for(i=0;i<P;i++)
     {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.56 2001-02-01 21:19:54 obachman Exp $ */
+/* $Id: structs.h,v 1.57 2001-02-20 09:45:43 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -249,7 +249,7 @@ struct n_Procs_s
    number  (*nGcd)(number a, number b, const ring r);
    number  (*nLcm)(number a, number b, const ring r);
    void    (*cfDelete)(number * a, const ring r);
-   nMapFunc (*nSetMap)(ring src, ring dst);
+   nMapFunc (*cfSetMap)(ring src, ring dst);
    char *  (*nName)(number n);
 //extern number  (*nMap)(number from);
 

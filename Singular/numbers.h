@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.25 2001-01-18 16:54:19 Singular Exp $ */
+/* $Id: numbers.h,v 1.26 2001-02-20 09:45:44 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -63,7 +63,7 @@ extern void    (*n__Delete)(number * a, const ring r);
 #define nTest(a) (1)
 #define nDelete(A) (currRing)->cf->cfDelete(A,currRing)
 
-#define nSetMap(R) (currRing->cf->nSetMap(R,currRing))
+#define nSetMap(R) (currRing->cf->cfSetMap(R,currRing))
 extern char *  (*nName)(number n);
 
 void nDummy1(number* d);
