@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.31 1998-05-11 12:48:21 Singular Exp $ */
+/* $Id: grammar.y,v 1.32 1998-05-11 16:55:29 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -380,19 +380,22 @@ pprompt:
             {
               exitVoice();
             }
-            errorreported = FALSE;
-            lastreserved=NULL;
+            //errorreported = FALSE;
+            //lastreserved=NULL;
           }
         ;
 
 flowctrl: ifcmd
           | whilecmd
+          | example_dummy
           | forcmd
           | proccmd
           | filecmd
           | helpcmd
             {currentVoice->ifsw=0;}
         ;
+
+example_dummy : EXAMPLE_CMD BLOCKTOK { FreeL((ADDRESS)$2); }
 
 command: assign
          | executecmd
@@ -1042,10 +1045,6 @@ executecmd:
         | EXAMPLE_CMD extendedid
           {
             singular_help($2,TRUE);
-            FreeL((ADDRESS)$2);
-          }
-        | EXAMPLE_CMD BLOCKTOK
-          {
             FreeL((ADDRESS)$2);
           }
         ;
