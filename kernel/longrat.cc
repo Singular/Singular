@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.2 2004-06-04 13:23:10 Singular Exp $ */
+/* $Id: longrat.cc,v 1.3 2004-08-04 13:21:55 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -96,7 +96,7 @@ BOOLEAN nlDBTest(number a, char *f,int l);
 
 omBin rnumber_bin = omGetSpecBin(sizeof(snumber));
 
-number nlOne=nlInit(1);
+number nlOne=INT_TO_SR(1);
 
 #if (__GNU_MP_VERSION*10+__GNU_MP_VERSION_MINOR < 31)
 void mpz_mul_si (mpz_ptr r, mpz_srcptr s, long int si)
@@ -228,7 +228,7 @@ number nlRInit (int i);
 static number nlMapR(number from)
 {
   double f=nrFloat(from);
-  if (f==0.0) return nlInit(0);
+  if (f==0.0) return INT_TO_SR(0);
   int f_sign=1;
   if (f<0.0)
   {
@@ -264,7 +264,7 @@ static number nlMapLongR(number from)
 
   size = (*f)[0]._mp_size;
   if (size == 0)
-    return nlInit(0);
+    return INT_TO_SR(0);
   if(size<0)
   {
     negative = 1;
@@ -1144,7 +1144,7 @@ void nlNormalize (number &x)
     if (mpz_cmp_ui(&x->z,(long)0)==0)
     {
       nlDelete(&x,currRing);
-      x=nlInit(0);
+      x=INT_TO_SR(0);
       return;
     }
     if (mpz_size1(&x->z)<=MP_SMALL)
@@ -1201,9 +1201,21 @@ void nlNormalize (number &x)
     }
     else if (divided)
     {
-      _mpz_realloc(&x->n,mpz_size1(&x->n));
+#define mpz_alloc1(A) ((A)->_mp_alloc)
+      int l;
+      if ((mpz_alloc1(&x->n)>>1) >= (l=mpz_size1(&x->n)))
+      {
+        _mpz_realloc(&x->n,il /* mpz_size1(&x->n)*/);
+      }
     }
-    if (divided) _mpz_realloc(&x->z,mpz_size1(&x->z));
+    if (divided)i
+    {
+      int l;
+      if ((mpz_alloc1(&x->z)>>1) >= (l=mpz_size1(&x->z)))
+      {
+        _mpz_realloc(&x->z,l /*mpz_size1(&x->z)*/);
+      }
+    }
   }
 #ifdef LDEBUG
   nlTest(x);
