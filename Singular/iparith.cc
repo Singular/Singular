@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.309 2003-12-17 19:39:00 levandov Exp $ */
+/* $Id: iparith.cc,v 1.310 2004-02-03 16:19:39 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2771,7 +2771,7 @@ static BOOLEAN jjCOUNT_RG(leftv res, leftv v)
   if (rField_is_Zp(r)||rField_is_GF(r)) elems=rInternalChar(r);
   else if (rField_is_Zp_a(r) && (r->minpoly!=NULL))
   {
-    elems=ABS(rInternalChar(r)*naParDeg(r->minpoly));
+    elems=(int)pow(ABS(rInternalChar(r),naParDeg(r->minpoly)));
   }
   res->data = (char *)elems;
   return FALSE;
@@ -2896,8 +2896,24 @@ static BOOLEAN jjEXECUTE(leftv res, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
-  res->data=(void *)kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
-  setFlag(res,FLAG_STD);
+  ideal_list p,h;
+  h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
+  p=h;
+  int l=0;
+  while (p!=NULL) { p=p->next;l++; }
+  lists L=(lists)omAllocBin(slists_bin);
+  L->Init(l);
+  l=0;
+  while(h!=NULL) 
+  {
+    L->m[l].data=(char *)h->d;
+    L->m[l].rtyp=IDEAL_CMD;
+    p=h->next;
+    omFreeSize(h,sizeof(*h));
+    h=p;
+    l++;
+  }
+  res->data=(void *)L;
   return FALSE;
 }
 static BOOLEAN jjFAC_P(leftv res, leftv u)
