@@ -2375,7 +2375,7 @@ int row_cmp_gen(const void* a, const void* b){
   const mac_poly bp=*((mac_poly*) b);
   if (ap==NULL) return 1;
   if (bp==NULL) return -1;
-  if (ap->exp>bp->exp) return -1;
+  if (ap->exp<bp->exp) return -1;
   return 1;
 }
 void tgb_sparse_matrix::sort_rows(){
@@ -2580,6 +2580,8 @@ void simple_gauss(tgb_sparse_matrix* mat){
   int pn=mat->get_rows();
   int matcol=mat->get_columns();
   int* area=(int*) omalloc(sizeof(int)*((matcol-1)/bundle_size+1));
+    //rows are divided in areas 
+  //if row begins with columns col, it is located in [area[col/bundle_size],area[col/bundle_size+1]-1]
   assume(pn>0);
   //first clear zeroes
   for(i=0;i<pn;i++)
@@ -2594,7 +2596,10 @@ void simple_gauss(tgb_sparse_matrix* mat){
   }
   mat->sort_rows();
   for(i=0;i<pn;i++)
+  {
       row_cache[i]=mat->min_col_not_zero_in_row(i);
+      // Print("row_cache:%d\n",row_cache[i]);
+  }
   int last_area=-1;
   for(i=0;i<pn;i++)
   {
