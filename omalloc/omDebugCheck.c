@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.7 2000-09-20 11:52:31 obachman Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.8 2000-09-25 12:27:42 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <stdarg.h>
@@ -138,8 +138,9 @@ omError_t omCheckPtr(void* ptr, omError_t report, OM_FLR_DECL)
 omError_t omDoCheckAddr(void* addr, void* bin_size, omTrackFlags_t flags, char level, 
                         omError_t report, OM_FLR_DECL)
 {
+  if (level <= 0) return omError_NoError;
   omAssume(! ((flags & OM_FSIZE) && (flags & OM_FBIN)));
-
+  
   if (addr == NULL)
   {
     omCheckReturnError(!(flags & OM_FSLOPPY), omError_NullAddr);
@@ -421,14 +422,26 @@ static omError_t omDoCheckBinPage(omBinPage page, int normal_page, int level,
 omError_t omReportAddrError(omError_t error, omError_t report_error, void* addr, void* bin_size, omTrackFlags_t flags, 
                             OM_FLR_DECL, const char* fmt, ...) 
 {
+  int max_check, max_track;
   va_list ap;
   va_start(ap, fmt);
+  
+  /* reset MaxTrack and MaxCheck to prevent infinite loop, in case
+     printf allocates memory */
+  max_check = om_Opts.MaxCheck;
+  max_track = om_Opts.MaxTrack;
+  om_Opts.MaxCheck = 0;
+  om_Opts.MaxTrack = 0;
+ 
   om_CallErrorHook = 0;
   omReportError(error, report_error, OM_FLR_VAL, fmt, ap);
   om_CallErrorHook = 1;
   
   _omPrintAddrInfo(stderr, error, addr, bin_size, flags, 10, " occured for");
   om_Opts.ErrorHook();
+  
+  om_Opts.MaxCheck = max_check;
+  om_Opts.MaxTrack = max_track;
   return om_ErrorStatus;
 }
 

@@ -3,7 +3,7 @@
  *  Purpose: implementation of Error handling routines 
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.c,v 1.5 2000-09-18 09:12:15 obachman Exp $
+ *  Version: $Id: omError.c,v 1.6 2000-09-25 12:27:43 obachman Exp $
  *******************************************************************/
 
 #include <stdarg.h>
@@ -78,7 +78,16 @@ int om_CallErrorHook = 1;
 omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,  
                         const char* fmt, ...)
 {
+  int max_check, max_track;
+  
   if (report_error == omError_MaxError) return error;
+  /* reset MaxTrack and MaxCheck to prevent infinite loop, in case
+     printf allocates memory */
+  max_check = om_Opts.MaxCheck;
+  max_track = om_Opts.MaxTrack;
+  om_Opts.MaxCheck = 0;
+  om_Opts.MaxTrack = 0;
+  
   om_InternalErrorStatus = error;
   om_ErrorStatus = (report_error == omError_NoError ? error : report_error);
 
@@ -113,6 +122,9 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
   }
   if (om_CallErrorHook)
     om_Opts.ErrorHook();
+  
+  om_Opts.MaxCheck = max_check;
+  om_Opts.MaxTrack = max_track;
   return error;
 }
 

@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.10 2000-09-18 09:12:13 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.11 2000-09-25 12:27:42 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -98,6 +98,9 @@ omError_t omTestMemory(int check_level)
 
 #undef MAX
 #define MAX(a,b) (a > b ? a : b)
+#undef MIN
+#define MIN(a,b) (a < b ? a : b)
+
 /*******************************************************************
  *  
  * First level _omDebug alloc/free routines: call respective checks and dispatch
@@ -110,6 +113,8 @@ void* _omDebugAlloc(void* size_bin, omTrackFlags_t flags, OM_CTFL_DECL)
   OM_R_DEF;
   check = MAX(check, om_Opts.MinCheck);
   track = MAX(track, om_Opts.MinTrack);
+  check = MIN(check, om_Opts.MaxCheck);
+  track = MIN(track, om_Opts.MaxTrack);
 
   if (check)
   {
@@ -147,6 +152,8 @@ void* _omDebugRealloc(void* old_addr, void* old_size_bin, void* new_size_bin,
   OM_R_DEF;
   check = MAX(check, om_Opts.MinCheck);
   track = MAX(track, om_Opts.MinTrack);
+  check = MIN(check, om_Opts.MaxCheck);
+  track = MIN(track, om_Opts.MaxTrack);
   
   if (check)
   {
@@ -177,6 +184,8 @@ void _omDebugFree(void* addr, void* size_bin,
 {
   OM_R_DEF;
   check = MAX(check, om_Opts.MinCheck);
+  check = MIN(check, om_Opts.MaxCheck);
+
   if (check && _omCheckAddr(addr, size_bin, flags|OM_FUSED, check, omError_NoError, OM_FLR_VAL)) return;
   
   __omDebugFree(addr,size_bin,flags, OM_FLR_VAL);
@@ -197,6 +206,8 @@ void* _omDebugMemDup(void* addr, omTrackFlags_t flags, OM_CTFL_DECL)
 
   check = MAX(check, om_Opts.MinCheck);
   track = MAX(track, om_Opts.MinTrack);
+  check = MIN(check, om_Opts.MaxCheck);
+  track = MIN(track, om_Opts.MaxTrack);
 
   if (check & _omCheckAddr(addr, 0, OM_FUSED, check, omError_NoError, OM_FLR_VAL))
   {
@@ -229,6 +240,7 @@ char* _omDebugStrDup(const char* addr, OM_TFL_DECL)
     return NULL;
   }
   track = MAX(track, om_Opts.MinTrack);
+  track = MIN(track, om_Opts.MaxTrack);
 
 #if 0
   // this breaks if SizeOfAddr(addr) > PAGESIZE
@@ -263,13 +275,17 @@ char* _omDebugStrDup(const char* addr, OM_TFL_DECL)
 omError_t _omDebugAddr(void* addr, void* bin_size, omTrackFlags_t flags, OM_CFL_DECL)
 {
   OM_R_DEF;
+  check = MAX(check,om_Opts.MinCheck);
+  check = MIN(check,om_Opts.MaxCheck);
   return _omCheckAddr(addr, bin_size, 
-                      OM_FUSED|flags,MAX(check,om_Opts.MinCheck),omError_NoError,OM_FLR_VAL);
+                      OM_FUSED|flags,check,omError_NoError,OM_FLR_VAL);
 }
 omError_t _omDebugMemory(OM_CFL_DECL)
 {
   OM_R_DEF;
-  return _omCheckMemory(MAX(check, om_Opts.MinCheck), omError_NoError,OM_FLR_VAL);
+  check = MAX(check,om_Opts.MinCheck);
+  check = MIN(check,om_Opts.MaxCheck);
+  return _omCheckMemory(check, omError_NoError,OM_FLR_VAL);
 }
 omError_t _omDebugBin(omBin bin, OM_CFL_DECL)
 {

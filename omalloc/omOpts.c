@@ -3,7 +3,7 @@
  *  Purpose: definitions of stats related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omOpts.c,v 1.4 2000-09-18 09:12:15 obachman Exp $
+ *  Version: $Id: omOpts.c,v 1.5 2000-09-25 12:27:43 obachman Exp $
  *******************************************************************/
 
 #include "omAlloc.h"
@@ -13,6 +13,8 @@ omOpts_t om_Opts =
 {
   OM_DEFAULT_MIN_TRACK,
   OM_DEFAULT_MIN_CHECK,
+  OM_DEFAULT_MAX_TRACK,
+  OM_DEFAULT_MAX_CHECK,
   OM_DEFAULT_KEEP,
   OM_DEFAULT_HOW_TO_REPORT_ERRORS,
   OM_DEFAULT_MARK_AS_STATIC,

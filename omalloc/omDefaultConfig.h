@@ -3,7 +3,7 @@
  *  Purpose: default declaration of of configurable stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDefaultConfig.h,v 1.4 2000-09-18 09:12:15 obachman Exp $
+ *  Version: $Id: omDefaultConfig.h,v 1.5 2000-09-25 12:27:42 obachman Exp $
  *******************************************************************/
 
 /********************************************************************
@@ -39,6 +39,19 @@
    then this is used as CheckLevel: om_Opts.MinCheck is initalized with this */
 #ifndef OM_DEFAULT_MIN_CHECK
 #define OM_DEFAULT_MIN_CHECK 0
+#endif
+
+/* MAX options. If Max < Min, then Max value is used. */
+/* If this is smaller than the track parameter given to the omDebug routines,
+   then this is used as TrackLevel: om_Opts.MaxTrack is initalized with this */
+#ifndef OM_DEFAULT_MAX_TRACK
+#define OM_DEFAULT_MAX_TRACK 5
+#endif
+
+/* If this is smaller than the check parameter given to the omDebug routines,
+   then this is used as CheckLevel: om_Opts.MaxCheck is initalized with this */
+#ifndef OM_DEFAULT_MAX_CHECK
+#define OM_DEFAULT_MAX_CHECK 10
 #endif
 
 /* If this is greater than 0, then the omDebugFree omDebugRealloc delay freeing memory 

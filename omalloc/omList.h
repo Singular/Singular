@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omList.h,v 1.4 2000-08-14 12:26:46 obachman Exp $
+ *  Version: $Id: omList.h,v 1.5 2000-09-25 12:27:43 obachman Exp $
  *******************************************************************/
 
 #ifndef OM_LIST_H
@@ -79,6 +79,8 @@ omError_t _omCheckSortedList(void* list, int next, int long_field, int level, om
 #define omRemoveFromSortedList(ptr, what, addr) \
   _omRemoveFromSortedList(ptr, 0, OM_LIST_OFFSET(ptr, what), addr)
 #ifndef OM_NDEBUG
+#define omTestList(ptr, level) \
+  _omCheckList(ptr, 0, level, omError_NoError, OM_FLR)
 #define omCheckList(ptr, level, report, OM_FLR_VAL) \
   _omCheckList(ptr, 0, level, report, OM_FLR_VAL)
 #define omCheckSortedList(ptr, what, level, report, OM_FLR_VAL) \
@@ -109,10 +111,14 @@ omError_t _omCheckSortedList(void* list, int next, int long_field, int level, om
 #define omRemoveFromSortedGList(ptr, next, what, addr) \
   _omRemoveFromSortedList(ptr, OM_LIST_OFFSET(addr,next),OM_LIST_OFFSET(addr,what),addr)
 #ifndef OM_NDEBUG
+#define omTestGList(ptr, next, level) \
+ omCheckGList(ptr, next, level, omError_NoError, OM_FLR)
 #define omCheckGList(ptr, next, level, report, OM_FLR_VAL) \
  _omCheckList(ptr, OM_LIST_OFFSET(ptr,next), level, report, OM_FLR_VAL)
 #define omCheckSortedGList(ptr, next, what, level, report, OM_FLR_VAL) \
  _omCheckSortedList(ptr, OM_LIST_OFFSET(ptr,next), OM_LIST_OFFSET(ptr,what), level, report, OM_FLR_VAL)
+#else
+#define omTestGList(ptr, next, val) (omError_NoError)
 #endif
 
 #endif /* OM_LIST_H */
