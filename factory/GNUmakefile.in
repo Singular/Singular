@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.21 1997-11-05 15:46:22 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.22 1997-11-13 08:15:52 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -355,7 +355,8 @@ distfiles :=	\
 .PHONY:		all cf mem dist depend \
 		clean mostlyclean distclean maintainer-clean \
 		install installcf installmem installgftables installtest \
-		uninstall uninstallcf uninstallmem uninstallgftables
+		uninstall uninstallcf uninstallmem uninstallgftables \
+		ftestall ftestclean ftestdistclean
 
 #
 # - pattern rules.
@@ -367,17 +368,22 @@ distfiles :=	\
 %.o: %.c config.h
 	$(CC) -c $< $(LIBCFLAGS) -o $@
 
-# how to create dependency files
+# how to create dependency files.  To avoid broken dependency files
+# (which in turn break this GNUmakefile) we first generate them in
+# a temporary file which we then move to the destination file.
 %.d: %.cc factoryconf.h config.h
-	echo $@ "\\" > $@
-	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@
+	echo $@ "\\" > $@tmp
+	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@tmp
+	mv $@tmp $@
 %.d: %.c factoryconf.h config.h
-	echo $@ "\\" > $@
-	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@
+	echo $@ "\\" > $@tmp
+	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@tmp
+	mv $@tmp $@
 %.d: %.template
-	echo $@ $(@:.d=.h) : "\\" > $@
-	sed -n '/^\/\*MAKEHEADER/!d; n; s/^#include "//; s/"//; p;' $< | tr '\012' ' ' >> $@
-	echo >> $@
+	echo $@ $(@:.d=.h) : "\\" > $@tmp
+	sed -n '/^\/\*MAKEHEADER/!d; n; s/^#include "//; s/"//; p;' $< | tr '\012' ' ' >> $@tmp
+	echo >> $@tmp
+	mv $@tmp $@
 
 # how to create header files from header templates
 %.h: %.template
@@ -430,7 +436,7 @@ conftest:
 #
 # - Factory Test Environment.
 #
-$(ftestexec):	conftest factory.h libcf.a libcfmem.a ftmpl_inst.o
+$(ftestexec):	conftest factoryconf.h factory.h libcf.a libcfmem.a ftmpl_inst.o
 		cd ftest && $(MAKE) $@
 		@if test -r "$@"; then \
 		  :; \
@@ -438,6 +444,15 @@ $(ftestexec):	conftest factory.h libcf.a libcfmem.a ftmpl_inst.o
 		  echo "$(LN_S) ftest/$@ $@"; \
 		  $(LN_S) ftest/$@ $@; \
 		fi
+
+ftestall:	$(ftestexec)
+
+ftestclean:
+		-cd ftest && $(MAKE) clean
+
+ftestdistclean:
+		-cd ftest && $(MAKE) distclean
+		-rmdir ftest
 
 #
 # - GF(q) table generation.
@@ -572,10 +587,7 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 clean:		ftestclean
 		-rm -f $(libfactory) libcfmem.a \
 		  $(ftestexec) gengftables test_install \
-		  factoryconf.h factory.h *.o *.d
-
-ftestclean:
-		-cd ftest && $(MAKE) clean
+		  factoryconf.h factory.h *.o *.d *.dtmp
 
 # remove gftables only if we built them
 mostlyclean:	clean
@@ -588,10 +600,6 @@ distclean:	ftestdistclean mostlyclean
 		-rm -f $(distname).tgz GNUmakefile stamp-h \
 		  config.cache config.log config.status config.h
 		-rm -rf $(distname)
-
-ftestdistclean:
-		-cd ftest && $(MAKE) distclean
-		-rmdir ftest
 
 maintainer-clean: distclean
 		@echo "This command is intended for maintainers to use;"
