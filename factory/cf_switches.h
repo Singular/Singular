@@ -1,16 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_switches.h,v 1.0 1996-05-17 10:59:39 stobbe Exp $
+// $Id: cf_switches.h,v 1.1 1997-03-26 16:54:25 schmidt Exp $
 
 #ifndef INCL_CF_SWITCHES_H
 #define INCL_CF_SWITCHES_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:39  stobbe
+Initial revision
+
 */
 
 #include "cf_defs.h"
-
-#define RATIONAL 0;
 
 class CFSwitches
 {
