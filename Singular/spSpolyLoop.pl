@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 ###########################################################################
-# $Id: spSpolyLoop.pl,v 1.4 1998-03-31 12:18:51 obachman Exp $
+# $Id: spSpolyLoop.pl,v 1.5 1998-03-31 12:20:23 obachman Exp $
 
 ###########################################################################
 ##
@@ -256,13 +256,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
     CALL_COMPARE(b, a2, d);
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop\n");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = CALL_NMULT("pGetCoeff(a1)",tm);
     if (!CALL_NEQUAL("pGetCoeff(a2)",tb))
     {
@@ -287,11 +281,6 @@ $spSpolyLoopBodyTemplate = <<_EOT_
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop\n");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -300,11 +289,6 @@ $spSpolyLoopBodyTemplate = <<_EOT_
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop\n");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,CALL_NMULT("pGetCoeff(a1)",tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
