@@ -753,12 +753,10 @@ char * versionString()
               StringAppend("MP(%s),",MP_VERSION);
 #endif
 #if defined(HAVE_READLINE) && !defined(FEREAD)
-              StringAppendS("libreadline,\n\t");
+              StringAppendS("libreadline,");
 #else
 #ifdef HAVE_FEREAD
-              StringAppendS("emulated libreadline,\n\t");
-#else
-              StringAppendS("\n\t");
+              StringAppendS("emulated libreadline,");
 #endif
 #endif
 #ifdef SRING
@@ -768,7 +766,9 @@ char * versionString()
               StringAppendS("Weyl algebra,");
 #endif
 #ifdef HAVE_DBM
-              StringAppendS("DBM,");
+              StringAppendS("DBM,\n\t");
+#else
+              StringAppendS("\n\t");
 #endif
 #ifdef HAVE_INFO
               StringAppendS("info,");
@@ -784,6 +784,9 @@ char * versionString()
 #endif
 #ifdef MDEBUG
               StringAppend("MDEBUG=%d,",MDEBUG);
+#endif
+#ifdef MTRACK
+              StringAppend("MTRACK,");
 #endif
 #ifdef PDEBUG
               StringAppend("PDEBUG,");
