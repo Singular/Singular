@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.145 2000-11-23 17:34:13 obachman Exp $ */
+/* $Id: ring.cc,v 1.146 2000-11-25 13:02:09 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -656,14 +656,14 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
  s: name, chr: ch, varnames: rv, ordering: ord, typ: typ
  */
 
-int rIsRingVar(char *n)
+int r_IsRingVar(char *n, ring r)
 {
-  if ((currRing!=NULL) && (currRing->names!=NULL))
+  if ((r!=NULL) && (r->names!=NULL))
   {
-    for (int i=0; i<currRing->N; i++)
+    for (int i=0; i<r->N; i++)
     {
-      if (currRing->names[i]==NULL) return -1;
-      if (strcmp(n,currRing->names[i]) == 0) return (int)i;
+      if (r->names[i]==NULL) return -1;
+      if (strcmp(n,r->names[i]) == 0) return (int)i;
     }
   }
   return -1;
