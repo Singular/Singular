@@ -1,6 +1,6 @@
 //(BM/GMG)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.12 2000-12-22 14:05:48 greuel Exp $";
+version="$Id: homolog.lib,v 1.13 2000-12-30 15:45:35 greuel Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -653,10 +653,10 @@ EXAMPLE: example Ext;   shows examples
         imag  = imag,D;
         extMN = modulo(ker,imag);
         dbprint(p-1,"// Computing Ext^"+string(k)+" (help Ext; gives an explanation):",
-         "// Let 0<--coker(M)<--F0<--F1<--F2<--... be a resolution of coker(M),",
-         "// and 0<--coker(N)<--G0<--G1 a presentation of coker(N),",
-         "// then Hom(F"+string(k)+",G0)-->Hom(F"+string(k+1)+",G0) is given by:",A,
-         "// and Hom(F"+string(k-1)+",G0) + Hom(F"+string(k)+",G1)-->Hom(F"+string(k)+",G0) is given by:",imag,"");
+    "// Let 0<--coker(M)<--F0<--F1<--F2<--... be a resolution of coker(M),",
+    "// and 0<--coker(N)<--G0<--G1 a presentation of coker(N),",
+    "// then Hom(F"+string(k)+",G0)-->Hom(F"+string(k+1)+",G0) is given by:",A,
+    "// and Hom(F"+string(k-1)+",G0) + Hom(F"+string(k)+",G1)-->Hom(F"+string(k)+",G0) is given by:",imag,"");
         extMN0 = std(extMN);
         if( p>0 ) { "// degree of Ext^"+string(k)+":"; degree(extMN0);""; }
 //---------- more information -------------------------------------------------
@@ -664,7 +664,7 @@ EXAMPLE: example Ext;   shows examples
         { if( vdim(extMN0) >= 0 )
           { kb = kbase(extMN0);
             if ( size(ker)!=0) { kb = matrix(ker)*kb; }
-            dbpri(p-1,"// columns of matrix are kbase of Ext^"+
+            dbprint(p-1,"// columns of matrix are kbase of Ext^"+
                      string(k)+" in Hom(F"+string(k)+",G0)",kb,"");
             if( p>0 )
             { for (l=1;l<=ncols(kb);l=l+1)
