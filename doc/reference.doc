@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.114 1999-07-01 13:09:03 obachman Exp $
+@comment $Id: reference.doc,v 1.115 1999-07-01 15:34:30 pohl Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -278,25 +278,67 @@ value of type int is the multiplicity (see @ref{mult})
 
 @table @code
 @item @strong{Syntax:}
-@code{bareiss (} matrix_expression @code{)}
+@code{bareiss (} module_expression @code{)}
+@*@code{bareiss (} matrix_expression @code{)}
+@*@code{bareiss (} module_expression@code{,} int_expression@code{,} int_expression @code{)}
+@*@code{bareiss (} matrix_expression@code{,} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 list of matrix and intvec
 @item @strong{Purpose:}
-applies Gauss-Bareiss algorithm (see @ref{References})
-to a matrix with an 'optimal' pivotstrategy.
-Result is a list: the first entry is a lower triangular matrix,
-the second entry an intvec with the permutations of the columns
+applies sparse Gauss-Bareiss algorithm (see @ref{References}, Lee and Saunders)
+to a module (or with type conversion to a matrix) with an 'optimal' pivotstrategy.
+The vectors of the module are the columns of the matrix, hence the rows are eliminated.
+With only one parameter a complete elimination is done.
+Result is a list: the first entry is a module with a minimal independent set of vectors
+(as a matrix lower triangular),
+the second entry an intvec with the permutations of the rows
 w.r.t. the original matrix.
+The further parameters control the algorithm:
+the second is the number of last rows out of the elimination and the third is
+as follows, if the vectors to reduce in the algorithm
+are smaller or equal this number the method stops.
 @item @strong{Example:}
 @example
 @c example
-  ring r2=0,(x(1..9)),ds;
-  matrix m[4][5]=maxideal(1),maxideal(1);
-  print(m);
-  list lb=bareiss(m);
-  print(lb[1]);
-  lb[2];
-  lb[1][3,2];
+  ring r=0,(x,y,z),(c,dp);
+  module mm;
+  int d=7;
+  int b=2;
+  int db=d-b;
+  int i;
+  for(i=d;i>0;i--)
+  {
+    mm[i]=3*x*gen(i);
+  }
+  for(i=db;i;i--)
+  {
+    mm[i]=mm[i]+7*y*gen(i+b);
+  }
+  for(i=d;i>db;i--)
+  {
+    mm[i]=mm[i]+7*y*gen(i-db);
+  }
+  for(i=d;i>b;i--)
+  {
+    mm[i]=mm[i]+11*z*gen(i-b);
+  }
+  for(i=b;i;i--)
+  {
+    mm[i]=mm[i]+11*z*gen(i+db);
+  }
+  print(mm);
+  // complete elimination
+  list ss=bareiss(mm);
+  print(ss[1]);
+  ss[2];
+  // elimination up to 3 vectors
+  ss=bareiss(mm,0,3);
+  print(ss[1]);
+  ss[2];
+  // elimination without the last 3 rows
+  ss=bareiss(mm,3,0);
+  print(ss[1]);
+  ss[2];
 @c example
 @end example
 @end table
@@ -1023,10 +1065,16 @@ See
 @item @strong{Syntax:}
 @code{det (} intmat_expression @code{)}
 @*@code{det (} matrix_expression @code{)}
+@*@code{det (} module_expression @code{)}
 @item @strong{Type:}
 int resp. poly
 @item @strong{Purpose:}
-returns the determinant of a square matrix.
+returns the determinant of a square matrix. A module is considered
+as a matrix. The applied algorithms depend on type of input.
+If the input is a module or matrix with symbolic entries the
+Bareiss algorithm is used. In the other cases the chinese remainder
+algorithm is used. For large sparse problems the input as a module
+has advantages.
 @item @strong{Example:}
 @example
 @c example
@@ -1850,13 +1898,17 @@ none (if called with one argument)
 @item @strong{Purpose:}
 computes the Hilbert series of the ideal resp.@: module
 defined by the leading terms of the generators
-of the given ideal resp.@: module.   If the input is
-homogeneous (all variable weights 1) and a standard basis,
-this is the Hilbert series of the original
+of the given ideal resp.@: module. If the ringorder is a weighted
+degree order, the Hilbert series is computed w.r.t to this weights.
+In the other cases all weights are one. If the input is
+homogeneous w.r.t. to the weights and a standard basis,
+this is the (weighted) Hilbert series of the original
 ideal resp.@: module.
 
 Prints first and second Hilbert series with one argument,
 returns the n-th (n=1, 2) Hilbert series as intvec with two arguments.
+The leading number of the intvec is not part of the Hilbert series and
+is used in the Hilbert driven standard basis computation.
 @item @strong{Example:}
 @example
 @c example
@@ -5062,6 +5114,8 @@ See @ref{link}; @ref{open}; @ref{read}; @ref{write}.
 @*@code{std (} module_expression@code{)}
 @*@code{std (} ideal_expression@code{,} intvec_expression @code{)}
 @*@code{std (} module_expression@code{,} intvec_expression @code{)}
+@*@code{std (} ideal_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
+@*@code{std (} module_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
 @*@code{std (} ideal_expression@code{,} poly_expression @code{)}
 @*@code{std (} module_expression@code{,} vector_expression @code{)}
 @item @strong{Type:}
@@ -5076,6 +5130,9 @@ second argument of type @code{intvec} as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
 if the ideal resp. module is homogeneous,
 (Hilbert driven standard basis computation, @ref{stdhilb}).
+If the ideal is quasihomogeneous with some weights w and if the Hilbert series
+is computed w.r.t. to this weights, then use w as third argument if the ordering
+is not weighted degree with w.
 @item @strong{Note:}
 The
 standard basis is computed with a (more or less) brute-force
@@ -5084,18 +5141,39 @@ Buchberger (resp. Mora) algorithm. For global orderings, use the
 @code{groebner} (@pxref{groebner}) command, instead, which heuristically
 chooses the "best" algorithm to compute a Groebner basis.
 @*Use an optional second argument of type @code{poly} resp.@ @code{vector}
-to construct the standard basis from an already computed one (given as the
+to construct the standard basis from an already computed one (givenn as the
 first argument) and one additional generator (the second argument).
 @item @strong{Example:}
 @example
 @c example
+  // local computation 
   ring r = 32003, (x,y,z), ds;
-  poly s1  = 1x3y2 + 151x5y + 169x2y4 + 151x2yz3 + 186xy6 + 169y9;
-  poly s2  = 1x2y2z2 + 3z8;
-  poly s3  = 5x4y2 + 4xy5 + 2x2y2z3 + 1y7 + 11x10;
+  poly s1  = 1x2y + 151xyz10 + 169y21;
+  poly s2  = 1xz14 + 6x2y4 + 3z24;
+  poly s3  = 5y10z10x + 2y20z10 + y10z20 + 11x3;
   ideal i = s1, s2, s3;
-  // compute standard basis j
   ideal j = std(i);
+  degree(j);
+  // Hilbert driven elimination (standard)
+  ring rhom = 32003, (x,y,z,h), dp;
+  ideal i = homog(imap(r,i),h);
+  ideal j = std(i);
+  intvec iv = hilb(j,1);
+  ring rlex = 32003, (x,y,z,h), lp;
+  ideal i = fetch(rhom,i);
+  ideal j = std(i,iv);
+  j = subst(j,h,1);
+  j[1];
+  // Hilbert driven elimination (ideal is quasihomogeneous)
+  intvec w=10,1,1;
+  ring whom = 32003, (x,y,z), wp(w);
+  ideal i = fetch(r,i);
+  ideal j = std(i);
+  intvec iw = hilb(j,1);
+  ring wlex = 32003, (x,y,z), lp;
+  ideal i = fetch(whom,i);
+  ideal j = std(i,iw,w);
+  j[1];
 @c example
 @end example
 @end table
