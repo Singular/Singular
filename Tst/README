@@ -21,13 +21,14 @@ To run Singular test(s):
       diff xx.res xx.new.res | tee xx.diff
     is run. 
 5.) If no diffs were found, xx.diff and xx.new.res are rm'ed and
-    xx.res is gzip'ed. Otherwise (i.e., diffs were found), xx.diff and
-    xx.new.res are kept, diffs are printed to stdout, and regress.cmd
-    exits with exit status != 0.
+    xx.res is gzip'ed and uuencoded. Otherwise (i.e., diffs were
+    found), xx.diff and xx.new.res are kept, diffs are printed to
+    stdout, and regress.cmd exits with exit status != 0.
 
 Do also 
    ../regress.cmd -h
-for some more details on regress.cmd.
+and see the source code of ../regress.cmd for some more details on
+regress.cmd.
 
 To add a new test for a library/commando to the test-suite:
 -----------------------------------------------------------
@@ -75,8 +76,16 @@ To add a new test for a library/commando to the test-suite:
   "time" keyword --   // ignore: time:
   "memory" keyword -- // ignore: memory:
   which causes automatic tests to ignore these lines when doing a diff 
-  on result files. If possible, short tests should not contain
-  system-dependent output. 
+  on result files. 
+  
+  3.) Time and/or memory-intensive tests should be followed by
+  (tst_ignore'd) time (resp. memory) output, so that we can keep track
+  of the timing (resp. memory) behaviour of Singular. This could be
+  accomplished as shown below: 
+  int mytime = timer;
+  /* time/memory intesive computations */
+  tst_ignore("time", timer - mytime);
+  tst_ignore("memory", memory(0));
 
 * Command for generating *.res files: 
   cd <directopry where xx.tst should reside>; ../regress.cmd -g xx.tst

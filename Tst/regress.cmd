@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.1.1.1 1998-04-17 15:06:45 obachman Exp $
+# $Id: regress.cmd,v 1.2 1998-04-23 08:30:52 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -19,7 +19,7 @@ regress.cmd    -- regress test of Singular
   [-s <Singular>]  -- use <Singular> as executable to test
   [-h]             -- print out help and exit
   [-n]             -- do not ignore output from tst_ignore when diffing
-  [-k]             -- keep result (*.res) files, do not gzip original res file
+  [-k]             -- keep result (*.res) files, do not zip original res file
   [-v num]         -- set verbosity to num (used range 0..3, default: 1)
   [-g]             -- generate result (*.res) files, only
   [file.lst]       -- read tst files from file.lst
@@ -53,6 +53,8 @@ $gunzip = "gunzip";
 $gzip = "gzip";
 $rm = "rm";
 $cp = "cp";
+$uuencode = "uuencode";
+$uudecode = "uudecode";
 
 #################################################################
 # 
@@ -83,10 +85,23 @@ sub tst_check
   {
     if (! (-r "$root.res.gz"))
     {
-      if ($generate ne "yes")
+      if (! (-r "$root.res.gz.uu"))
       {
-	print (STDERR "Can not read $root.res[.gz]\n");
-	return (1);
+	if ($generate ne "yes")
+	{
+	  print (STDERR "Can not read $root.res[.gz]\n");
+	  return (1);
+	}
+      }
+      else 
+      {
+	$exit_status 
+	  = $exit_status || &mysystem("$uudecode -o $root.res.gz $root.res.gz.uu; $gunzip $root.res.gz");
+	if ($exit_status)
+	{
+	  print (STDERR "Can not decode $root.res.gz.uu\n");
+	  return ($exit_status);
+	}
       }
     }
     else
@@ -94,7 +109,7 @@ sub tst_check
       $exit_status = $exit_status || & mysystem("$gunzip -f -c $root.res.gz > $root.res");
       if ($exit_status)
       {
-	print (STDERR "Can not $gunzip -f -c $root.res.gz > $root.res" );
+	print (STDERR "Can not `$gunzip -f -c $root.res.gz > $root.res'\n" );
 	return ($exit_status);
       }
     }
@@ -145,18 +160,18 @@ sub tst_check
   if ($keep eq "no" && $exit_status == 0 && $generate ne "yes")
   {
     & mysystem("$rm -rf $root.new.res $root.diff");
-    if (-r "$root.res.gz")
+    if (-r "$root.res.gz.uu")
     {
       & mysystem("$rm -rf $root.res");
     }
     else
     {
-      & mysystem("$gzip -f $root.res");
+      & mysystem("$gzip -f $root.res; $uuencode $root.res.gz $root.res.gz > $root.res.gz");
     }
   } 
   elsif ($generate eq "yes")
   {
-    & mysystem("$gzip -f $root.res");
+    & mysystem("$gzip -f $root.res; $uuencode $root.res.gz $root.res.gz > $root.res.gz");
     if ($keep eq "yes")
     {
       & mysystem("mv $root.new.res $root.res");
