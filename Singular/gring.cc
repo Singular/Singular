@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.31 2003-03-12 14:12:54 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.32 2003-03-12 21:34:51 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -237,8 +237,8 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
   // pExpVectorCopy(F,F0);
   memcpy(G, G0,(rN+1)*sizeof(int));
   //  pExpVectorCopy(G,G0);
-  // F[0]=0; done by omAlloc0
-  // G[0]=0; done by omAlloc0
+  F[0]=0;
+  G[0]=0;
 
   iF=rN;
   while ((F[iF]==0)&&(iF>=1)) iF--; /* last exp_num of F */
@@ -815,11 +815,8 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
 
   if (newcMTsize<=cMTsize)
   {
-    if ( MATELEM(r->nc->MT[vik],a,b)!=NULL)
-    {
-      out=p_Copy(MATELEM(r->nc->MT[vik],a,b),r);
-      return (out);
-    }
+    out =  nc_p_CopyGet(MATELEM(r->nc->MT[vik],a,b),r);
+    if (out !=NULL) return (out);
   }
   int k,m;
   if (newcMTsize > cMTsize)
@@ -834,9 +831,10 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     {
       for (m=1;m<=cMTsize;m++)
       {
-        if ( MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m) != NULL )
+	out = nc_p_CopyGet(MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m),r);
+        if ( out != NULL )
         {
-          MATELEM(tmp,k,m) = MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m);
+          MATELEM(tmp,k,m) = nc_p_CopyPut(MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m),r);;
           //           omCheckAddr(tmp->m);
           MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m)=NULL;
           //           omCheckAddr(r->nc->MT[UPMATELEM(j,i,rN)]->m);
@@ -1344,7 +1342,6 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
   poly suffix=NULL;
   int nMin,nMax;
   number nTmp=NULL;
-  number MinusOne=nInit(-1);
   int i,j,k;
   for (i=1;i<=rN;i++)
   {
@@ -1370,14 +1367,13 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
             }
             else
             {
-              nTmp=nInit(1);
-              nTmp=nSub(pGetCoeff(bres),nTmp);
+              nTmp=nSub(pGetCoeff(bres),nInit(1));
               pSetCoeff(bres,nTmp); /* only lc ! */
             }
 #ifdef PDEBUG
             pTest(bres);
 #endif
-            if (i>j)  bres=p_Mult_nn(bres, MinusOne,currRing);
+            if (i>j)  bres=p_Neg(bres, currRing);
           }
           if (bres!=NULL)
           {
