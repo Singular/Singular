@@ -14,17 +14,20 @@
 #include "kInline.cc"
 #include "kstd1.h"
 #define FULLREDUCTIONS
-enum calc_state {
+enum calc_state 
+{
   UNCALCULATED,
   HASTREP,
   UNIMPORTANT
 };
-struct calc_dat{
+struct calc_dat
+{
   int* rep;
   int** states;
   ideal S;
   ring r;
   int* lengths;
+  long* short_Exps;
   kStrategy strat;
   int found_i;
   int found_j;
@@ -44,7 +47,8 @@ bool has_t_rep(int arg_i, int arg_j, calc_dat* state);
 int* make_connections(int from, poly bound, calc_dat* c);
 void now_t_rep(int arg_i, int arg_j, calc_dat* c);
 
-bool find_next_pair(calc_dat* c){
+bool find_next_pair(calc_dat* c)
+{
   int start_i,start_j,i,j;
   start_i=0;
   start_j=-1;
@@ -53,15 +57,15 @@ bool find_next_pair(calc_dat* c){
   start_j=c->continue_j;
 
   /*  for (int i=start_i;i<c->n;i++){
-    for(int j=(i==start_i)?start_j+1:0;j<i;j++){
+      for(int j=(i==start_i)?start_j+1:0;j<i;j++){
       // printf("searching at %d,%d",i,j);
       if (c->states[i][j]==UNCALCULATED){
-	c->continue_i=c->found_i=i;
-	c->continue_j=c->found_j=j;
-	return true;
+      c->continue_i=c->found_i=i;
+      c->continue_j=c->found_j=j;
+      return true;
       }
-    }
-    }*/
+      }
+      }*/
   int z=0;
   i=start_i;
   j=start_j;
@@ -70,13 +74,13 @@ bool find_next_pair(calc_dat* c){
    
     while(i>j){
       if(i>=c->n) {
-	if (c->skipped_i<0) c->skipped_i=i;
+        if (c->skipped_i<0) c->skipped_i=i;
       } else{
-	if(c->states[i][j]==UNCALCULATED){
-	  c->continue_i=c->found_i=i;
-	  c->continue_j=c->found_j=j;
-	  return true;
-	}
+        if(c->states[i][j]==UNCALCULATED){
+          c->continue_i=c->found_i=i;
+          c->continue_j=c->found_j=j;
+          return true;
+        }
       }
       --i;
       ++j;
@@ -87,24 +91,34 @@ bool find_next_pair(calc_dat* c){
   }
   return false;
 }
-void replace_pair(int & i, int & j, calc_dat* c){  
+void replace_pair(int & i, int & j, calc_dat* c)
+{
+  int curr_deg;
   poly lm=pOne();
   
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
   int* i_con =make_connections(i,lm,c);
-  int* j_con =make_connections(j,lm,c);
-  for (int n=0;((n<c->n) && (j_con[n]>=0));n++){
-    for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
-      if (has_t_rep(j_con[n],i_con[m],c)){
-	i= i_con[m];
-	j=j_con[n];
-	omfree(i_con);
-	omfree(j_con);
-	return;
-      }
+
+  for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
+    if (i_con[n]==j){
+//       curr_deg=pFDeg(lm);
+//       for(int z1=0;((z1<c->n) && (i_con[z1]>=0));z1++)
+// 	for (int z2=z1+1;((z2<c->n)&&(i_con[z2]>=0));z2++)
+// 	{
+// 	  pLcm(c->S->m[i_con[z1]], c->S->m[i_con[z2]], lm);
+// 	  pSetm(lm);
+// 	  if (pFDeg(lm)==curr_deg)
+// 	    now_t_rep(i_con[z1],i_con[z2],c);
+// 	}
+      now_t_rep(i,j,c);
+      omfree(i_con);
+      p_Delete(&lm,c->r);
+      return;
     }
   }
+
+  int* j_con =make_connections(j,lm,c);
   i= i_con[0];
   j=j_con[0];
   if(c->n>1){
@@ -112,13 +126,13 @@ void replace_pair(int & i, int & j, calc_dat* c){
       i=i_con[1];
     else {
       if (j_con[1]>=0)
-	j=j_con[1];
+        j=j_con[1];
     }
   }
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
   poly short_s;
-  int curr_deg=pFDeg(lm);
+  curr_deg=pFDeg(lm);
   for (int n=0;((n<c->n) && (j_con[n]>=0));n++){
     for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
       pLcm(c->S->m[i_con[m]], c->S->m[j_con[n]], lm);
@@ -129,34 +143,34 @@ void replace_pair(int & i, int & j, calc_dat* c){
       //  ((comp_deg==curr_deg) &&
       short_s=ksCreateShortSpoly(c->S->m[i_con[m]],c->S->m[j_con[n]],c->r);
       if (short_s==NULL) {
-	p_Delete(&short_s,c->r);
-	continue;
+        p_Delete(&short_s,c->r);
+        continue;
       }
       for (int dz=0;dz<=c->n;dz++){
-	if (dz==c->n) {
-	  //have found not head reducing pair
-	  i=i_con[m];
-	  j=j_con[n];
-	  p_Delete(&short_s,c->r);
-	  p_Delete(&lm,c->r);
-	  omfree(i_con);
-	  omfree(j_con);
-	  
-	  return;
-	}
-	if (p_LmDivisibleBy(c->S->m[dz],short_s,c->r)) break;
+        if (dz==c->n) {
+          //have found not head reducing pair
+          i=i_con[m];
+          j=j_con[n];
+          p_Delete(&short_s,c->r);
+          p_Delete(&lm,c->r);
+          omfree(i_con);
+          omfree(j_con);
+          
+          return;
+        }
+        if (p_LmDivisibleBy(c->S->m[dz],short_s,c->r)) break;
       }
       p_Delete(&short_s,c->r);
       if ((comp_deg<curr_deg)
-	  ||
-	  ((comp_deg==curr_deg) &&
-      (c->lengths[i]+c->lengths[j]
-	  <=
-       c->lengths[i_con[m]]+c->lengths[j_con[n]])))
-	  {
-	curr_deg=comp_deg;
-	i=i_con[m];
-	j=j_con[n];
+          ||
+          ((comp_deg==curr_deg) &&
+           (c->lengths[i]+c->lengths[j]
+            <=
+            c->lengths[i_con[m]]+c->lengths[j_con[n]])))
+      {
+        curr_deg=comp_deg;
+        i=i_con[m];
+        j=j_con[n];
       }
     }
   }
@@ -165,18 +179,20 @@ void replace_pair(int & i, int & j, calc_dat* c){
   omfree(j_con);
   return;
 }
-int* make_connections(int from, poly bound, calc_dat* c){
+int* make_connections(int from, poly bound, calc_dat* c)
+{
   ideal I=c->S;
   int* cans=(int*) omalloc(c->n*sizeof(int));
   int* connected=(int*) omalloc(c->n*sizeof(int));
   int cans_length=0;
   connected[0]=from;
   int connected_length=1;
+  long neg_bounds_short= ~p_GetShortExpVector(bound,c->r);
   for (int i=0;i<c->n;i++){
     if (i!=from){
-      if(p_LmDivisibleBy(I->m[i],bound,c->r)){
-	cans[cans_length]=i;
-	cans_length++;
+      if(p_LmShortDivisibleBy(I->m[i],c->short_Exps[i],bound,neg_bounds_short,c->r)){
+        cans[cans_length]=i;
+        cans_length++;
       }
     }
   }
@@ -189,10 +205,10 @@ int* make_connections(int from, poly bound, calc_dat* c){
       if (cans[i]<0) continue;
       if (has_t_rep(pos,cans[i],c)){
 
-	connected[connected_length]=cans[i];
-	connected_length++;
-	cans[i]=-1;
-	--not_yet_found;
+        connected[connected_length]=cans[i];
+        connected_length++;
+        cans[i]=-1;
+        --not_yet_found;
 
       }
     }
@@ -232,6 +248,7 @@ void initial_data(calc_dat* c){
   } else {
     exit(1);
   }
+  c->short_Exps=(long*) omalloc(n*sizeof(long));
   for (i=0;i<n;i++){
     h=omalloc(i*sizeof(int));
     if (h!=NULL){
@@ -242,15 +259,18 @@ void initial_data(calc_dat* c){
     for (j=0;j<i;j++){
       //check product criterion
       if (pHasNotCF(c->S->m[i],c->S->m[j])){
-	c->states[i][j]=HASTREP;
+        c->states[i][j]=HASTREP;
       } else {
-	c->states[i][j]=UNCALCULATED;
+        c->states[i][j]=UNCALCULATED;
       }
     }
   
     c->rep[i]=i;
+    c->short_Exps[i]=p_GetShortExpVector(c->S->m[i],c->r);
     c->lengths[i]=pLength(c->S->m[i]);
   }
+
+
   c->strat=new skStrategy;
   c->strat->syzComp = 0;
   initBuchMoraCrit(c->strat);
@@ -260,7 +280,7 @@ void initial_data(calc_dat* c){
   c->strat->sl = -1;
   initS(c->S,NULL,c->strat);
   for (i=c->strat->sl;i>=0;i--)
-     pNorm(c->strat->S[i]);
+    pNorm(c->strat->S[i]);
 }
 void add_to_basis(poly h, calc_dat* c){
   
@@ -276,6 +296,8 @@ void add_to_basis(poly h, calc_dat* c){
   } else {
     exit(1);
   }
+  c->short_Exps=(long *) omrealloc(c->short_Exps ,c->n*sizeof(long));
+  
   hp=omrealloc(c->lengths, c->n *sizeof(int));
   if (hp!=NULL){
     c->lengths=(int*) hp;
@@ -302,29 +324,30 @@ void add_to_basis(poly h, calc_dat* c){
     exit(1);
   }
   c->S->m[i]=h;
+  c->short_Exps[i]=p_GetShortExpVector(h,c->r);
   for (j=0;j<i;j++){
     if (c->rep[j]==j){ 
       //check product criterion
       if (pHasNotCF(c->S->m[i],c->S->m[j])){
-	c->states[i][j]=HASTREP;
+        c->states[i][j]=HASTREP;
       } else {
-	c->states[i][j]=UNCALCULATED;
+        c->states[i][j]=UNCALCULATED;
       }
 
       //lies I[i] under I[j] ?
       if(p_LmDivisibleBy(c->S->m[i],c->S->m[j],c->r)){
-	c->rep[j]=i;
-	PrintS("R");
-	for(int z=0;z<j;z++){
-	  if (c->states[j][z]==UNCALCULATED){
-	    c->states[j][z]=UNIMPORTANT;
-	  }
-	}
-	for(int z=j+1;z<i;z++){
-	  if (c->states[z][j]==UNCALCULATED){
-	    c->states[z][j]=UNIMPORTANT;
-	  }
-	}
+        c->rep[j]=i;
+        PrintS("R");
+        for(int z=0;z<j;z++){
+          if (c->states[j][z]==UNCALCULATED){
+            c->states[j][z]=UNIMPORTANT;
+          }
+        }
+        for(int z=j+1;z<i;z++){
+          if (c->states[z][j]==UNCALCULATED){
+            c->states[z][j]=UNIMPORTANT;
+          }
+        }
       }
     }
     else {
@@ -360,46 +383,46 @@ static poly redNF (poly h,kStrategy strat)
   }
   not_sev = ~ pGetShortExpVector(h);
   loop
-  {
-    if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
     {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
-      /*- compute the s-polynomial -*/
+      if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
+      {
+        //if (strat->interpt) test_int_std(strat->kIdeal);
+        /*- compute the s-polynomial -*/
 #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("red:");
-        wrp(h);
-        PrintS(" with ");
-        wrp(strat->S[j]);
-      }
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("red:");
+          wrp(h);
+          PrintS(" with ");
+          wrp(strat->S[j]);
+        }
 #endif
-      h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
+        h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
 #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("\nto:");
-        wrp(h);
-        PrintLn();
-      }
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("\nto:");
+          wrp(h);
+          PrintLn();
+        }
 #endif
-      if (h == NULL) return NULL;
-      z++;
-      if (z>=10)
-      {
-        z=0;
-        pNormalize(h);
+        if (h == NULL) return NULL;
+        z++;
+        if (z>=10)
+        {
+          z=0;
+          pNormalize(h);
+        }
+        /*- try to reduce the s-polynomial -*/
+        j = 0;
+        not_sev = ~ pGetShortExpVector(h);
       }
-      /*- try to reduce the s-polynomial -*/
-      j = 0;
-      not_sev = ~ pGetShortExpVector(h);
+      else
+      {
+        if (j >= strat->sl) return h;
+        j++;
+      }
     }
-    else
-    {
-      if (j >= strat->sl) return h;
-      j++;
-    }
-  }
 }
 
 void do_this_spoly_stuff(int i,int j,calc_dat* c){
@@ -489,14 +512,14 @@ bool has_t_rep(int arg_i, int arg_j, calc_dat* state){
     i=arg_i;
     j=arg_j;
   }
-  if (state->states[j][i]==HASTREP)
-    return(true);
-  if (j==state->rep[i]) return(false);
+  return (state->states[j][i]==HASTREP);
+   
+//  if (j==state->rep[i]) return(false);
 
-  if (state->rep[i]!=i) 
-    return(has_t_rep(i,state->rep[i],state) && has_t_rep(state->rep[i],j,state));
+//   if (state->rep[i]!=i) 
+//     return(has_t_rep(i,state->rep[i],state) && has_t_rep(state->rep[i],j,state));
   
-  if (state->rep[j]!=j)
-    return(has_t_rep(j,state->rep[j],state) && has_t_rep(state->rep[j],i,state));
-  return(false);
+//   if (state->rep[j]!=j)
+//     return(has_t_rep(j,state->rep[j],state) && has_t_rep(state->rep[j],i,state));
+//  return(false);
 }
