@@ -281,6 +281,7 @@ info dvi ps html:
 check:	Singular ${testdir}/general_test.in ${testdir}/general_test.out
 	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
+	Singular=`pwd`/Singular; export Singular;\
 	${testdir}/comparecheck ${testdir}/general_test.in ${testdir}/general_test.out
 	@ if test "${WITH_MP}" = yes; then ${MAKE} mpcheck; fi; 
 	@ if test "${WITH_FACTORY}" = yes && test "${WITH_LIBFAC}" = yes; then \
@@ -292,18 +293,21 @@ check:	Singular ${testdir}/general_test.in ${testdir}/general_test.out
 mpcheck: Singular ${testdir}/mpcheck ${testdir}/mpcheck.data
 	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
+	Singular=`pwd`/Singular; export Singular;\
 	${testdir}/mpcheck ${testdir}/mpcheck.data
 
 factorycheck: Singular ${testdir}/comparecheck ${testdir}/fac_test.in \
 		${testdir}/fac_test.out
 	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
+	Singular=`pwd`/Singular; export Singular;\
 	${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out
 
 dbmcheck: Singular ${testdir}/comparecheck ${testdir}/dbm_test.in \
 		${testdir}/dbm_test.out 
 	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
+	Singular=`pwd`/Singular; export Singular;\
 	${testdir}/comparecheck ${testdir}/dbm_test.in ${testdir}/dbm_test.out
 
 
