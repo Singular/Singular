@@ -86,21 +86,6 @@ AC_CHECK_PROGS(GUNZIP, gunzip,  ${pwd}/warn_not_found.sh gunzip)
 AC_CHECK_PROGS(MYGZIP, gzip, ${pwd}/warn_not_found.sh gzip)
 AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html)
 AC_PROG_LN_S
-if test -d Texi2html; then
-if test -r ${T2H_HOME}/texi2html.init; then
-TEXI2HTML=`pwd`/Texi2html/texi2html.pl
-else
-TEXI2HTML=`pwd`/Texi2html/texi2html
-fi
-AC_SUBST(TEXI2HTML)
-else
-AC_MSG_WARN(could not find Texi2html/texi2html HTML generation might fail)
-AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html)
-fi
-if test "$ac_cv_prog_LATEX2HTML" = latex2html; then
-  TEXI2HTML_OPTS="-l2h"
-fi
-AC_SUBST(TEXI2HTML_OPTS)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Set exec_prefix, bindir, libdir, includedir to some sensible values
@@ -566,16 +551,29 @@ else
 fi  
 
 
-AC_MSG_CHECKING(whether to build Texi2html)
+AC_MSG_CHECKING(whether to configure and build Texi2html)
 if test "$enable_Texi2html" != no && test -d Texi2html; then
  AC_MSG_RESULT(yes)
+ CONFIG_SUBDIRS="$CONFIG_SUBDIRS Texi2html"
  BUILD_SUBDIRS="$BUILD_SUBDIRS Texi2html"
  if test "$enable_Texi2html" != yes; then
    ac_configure_args="$ac_configure_args --enable-Texi2html"
  fi
+ TEXI2HTML=${bindir}/texi2html
+ AC_SUBST(TEXI2HTML)
 else
  AC_MSG_RESULT(no)
+ AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html)
 fi
+
+if test "${TEXI2HTML+set}" != set; then
+AC_MSG_WARN(texi2html not found. HTML doc generation will fail)
+fi
+if test "$ac_cv_prog_LATEX2HTML" = latex2html; then
+  TEXI2HTML_OPTS="-l2h"
+fi
+AC_SUBST(TEXI2HTML_OPTS)
+
 
 AC_MSG_CHECKING(whether to build doc)
 if test "$enable_doc" != no && test -d doc; then
