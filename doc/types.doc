@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.21 1998-05-04 17:41:10 Singular Exp $
+@comment $Id: types.doc,v 1.22 1998-05-05 12:29:29 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -939,8 +939,20 @@ returns weights for the weigted ecart method (see @ref{weight})
 
 Links describe the communication channels of @sc{Singular}, i.e.
 something @sc{Singular} can write to and/or read from. Currently,
-@sc{Singular} supports four different link types: @ref{ASCII links},
-@ref{MPfile links}, @ref{MPtcp links}, and @ref{DBM links}.
+@sc{Singular} supports four different link types: 
+@itemize @bullet
+@item ASCII links (see
+@ref{ASCII links})
+
+@item MPfile links (see
+@ref{MPfile links})
+
+@item MPtcp links (see
+@ref{MPtcp links})
+
+@item DBM links (see
+@ref{DBM links})
+@end itemize
 
 @c ------------------------------
 @node link declarations, link expressions, link, link
@@ -954,9 +966,10 @@ something @sc{Singular} can write to and/or read from. Currently,
 @item @strong{Purpose:}
 defines a new communication link.
 @item @strong{Default:}
-none.
+none
 @item @strong{Example:}
 @example
+@c example
   link l=":w example.txt";
   int i=22;
   string s="An int follows:";
@@ -964,9 +977,9 @@ none.
   l;
   close(l);
   read(l);
-  l;
   read(l);
   close(l);
+@c example
 @end example
 @end table
 @c {{{endfold}}}
@@ -985,35 +998,36 @@ an identifier of type link
 a string describing the link
 @end enumerate
 
-A link is described by a string which starts with a property_string
-(specifying the type and mode of the link) and is followed by a
-name_string (specifying, for example, a filename).
+A link is described by a string which consists of two parts: a property
+string followed by a name string. The property string describes the type
+of the link (@code{ASCII}, @code{MPfile}, @code{MPtcp} or @code{DBM})
+and the mode of the link (open for read, write or append). The name
+string describes the filename of the link, resp. a network connection
+for MPtcp links.
 
-@*A property string
-must always contain the colon (":") character and may not contain space
-characters. The string before the colon denotes the type of the link and
-the string after the colon denotes its mode. If no type is specified,
-then the link type is set to @code{ASCII}, by default. If no mode is
-specified, then the default mode of the respective link type is used. If
-no property string is specified, then by default, the link type is set
-to @code{ASCII} and the mode is left unspecified.
+For a detailed format description of the link describing string see:
+@iftex
+@itemize @bullet
+@item for ASCII links:
+@ref{ASCII links}
 
-The name_string following the property_string specifies a filename for
-@code{ASCII}, @code{MPfile}, and @code{DBM} links and a network
-connection for @code{MPtcp} links.
+@item for MPfile links:
+@ref{MPfile links}
 
-For a detailed format description of the link describing string see
-@ref{ASCII links}, @ref{MPfile links}, @ref{MPtcp links}, @ref{DBM links}.
+@item for MPtcp links:
+@ref{MPtcp links}
 
-A link is opened by the command @code{open} or by the first
-@code{read} or @code{write} command and closed by @code{close} or
-@code{kill} (either explicitly by the user or implicitly by leaving the
-local scope of the identifier). Status information about a link can be
-obtained using the command @code{status}. The state of a @sc{Singular}
-session (i.e. all variables and their values) can be dumped and
-retrieved using the commands @code{dump} and @code{getdump}. See
-@ref{read}, @ref{write}, @ref{open}, @ref{close}, @ref{status},
-@ref{dump}, @ref{getdump}.
+@item for DBM links:
+@ref{DBM links}
+@end itemize
+@end iftex
+
+@menu
+* ASCII links::
+* MPfile links::
+* MPtcp links::
+* DBM links::
+@end menu
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -1051,19 +1065,51 @@ closes and kills a link (see @ref{kill})
 Via ASCII links data that can be converted to a string can be written
 into files for storage or communcation with other programs. The data is
 written in plain ASCII format. The output format of polynomials is done
-w.r.t. the value of the global variable @ref{short}. Reading
+w.r.t. the value of the global variable @code{short} (see @ref{short}). Reading
 from an ASCII links returns a string - conversion into other data is up to
-the user.
+the user. This can be done for example using the command @code{execute} 
+(see @ref{execute}).
 
-ASCII links provide also the possibility to read from
-@code{stdin} / write to @code{stdout}: the empty string as filename
-denotes the terminal.
+The ASCII link describing string has to be one of the following:
 
-An ASCII link can be used either for reading or for writing, but not for
-both at the same time. A @code{close} command must be used before a
-change of i/o direction.
+@enumerate
+@item @code{"ASCII: "} + filename
+@*the mode (read or append) is set by the first @code{read} or
+@code{write} command.
+@item @code{"ASCII:r "} + filename
+@*opens the file for reading.
+@item @code{"ASCII:w "} + filename
+@*opens the file for overwriting.
+@item @code{"ASCII:a "} + filename
+@*opens the file for appending.
+@end enumerate
 
-Types without a conversion to @code{string} cannot be written.
+There are the following default values:
+@itemize @bullet
+@item the type @code{ASCII} may be ommitted since ASCII links are the
+default links. 
+
+@item If non of @code{r}, @code{w} or @code{a} is specified, the mode of
+the link is set by the first @code{read} or @code{write} command on the
+link. If the first command is @code{write}, the mode is set to @code{a}
+(append mode).
+
+@item if the filename is ommitted, @code{read} reads from stdin and
+@code{write} writes to stdout.
+@end itemize
+
+Using these default rules, the string @code{":r temp"} describes a link
+which is equivalent to the link @code{"ASCII:r temp"}: an ASCII link to
+the file @code{temp} which is opened for reading. The string
+@code{"temp"} describes an ASCII link to the file @code{temp}, where the
+mode is set by the first @code{read} or @code{write} command. See also
+the example below.
+
+Note that the filename may contain an (absolute) path. An ASCII link can
+be used either for reading or for writing, but not for both at the same
+time. A @code{close} command must be used before a change of i/o
+direction. Types without a conversion to @code{string} cannot be
+written.
 
 @strong{Example:}
 @example
@@ -1071,9 +1117,8 @@ Types without a conversion to @code{string} cannot be written.
   ring r=32003,(x,y,z),dp;
   link l=":w example.txt";     // type is ASCII, mode is overwrite
   l;
-  status(l, "name");           // name is example.txt
   status(l, "open", "yes");    // link is not yet opened
-  ideal i=maxideal(2);
+  ideal i=x2,y2,z2;
   write (l,1,";",2,";","ideal i=",i,";");
   status(l, "open", "yes");    // now link is open
   status(l, "mode");           // for writing
@@ -1081,14 +1126,9 @@ Types without a conversion to @code{string} cannot be written.
   read("example.txt");         // data is returned as string
   close(l);                    // link is closed
   execute read(l);             // read string is executed
-  status(l, "open", "yes");    // now link is open
-  status(l, "mode");           // in read mode
   close(l);                    // link is closed
   // dump vars overwriting previous file content:
   dump(":w example.txt");
-  kill r;
-  getdump("example.txt");      // get dump from file
-  dump("");                    // dump to stdout
 @c example
 @end example
 @c {{{endfold}}}
@@ -1113,13 +1153,6 @@ ring.  Currently, data is written without attributes (which is likely to
 change in future versions). For a general description of MP, see
 @code{http://symbolicnet.mcs.kent.edu:/areas/mp.html}.
 
-@strong{Restrictions:}
-@enumerate
-@item MP links are currently only implemented for Unix platforms.
-@item Objects of type @code{number} are always communicated as
-objects of type @code{poly}.
-@end enumerate
-
 @menu
 * MPfile links::
 * MPtcp links::
@@ -1139,16 +1172,30 @@ string containing the entire content of the file. Furthermore, ring
 dependent data is stored together with a ring description. Therefore,
 reading ring-dependent data might change the current ring.
 
-An MP file link can be used either for reading or for writing, but not for
-both at the same time. A @code{close} command must be used before a
-change of i/o direction.
-
 @enumerate
 @item @code{"MPFile: "} + filename
-@item @code{"MPFile:a "} + filename
-@item @code{"MPFile:w "} + filename
+@*the mode (read or append) is set by the first @code{read} or
+@code{write} command. 
 @item @code{"MPFile:r "} + filename
+@*opens the file for reading.
+@item @code{"MPFile:w "} + filename
+@*opens the file for overwriting.
+@item @code{"MPFile:a "} + filename
+@*opens the file for appending.
 @end enumerate
+
+There are the following default values:
+@itemize @bullet
+@item If none of @code{r}, @code{w} or @code{a} is specified, the mode of
+the link is set by the first @code{read} or @code{write} command on the
+link. If the first command is @code{write}, the mode is set to @code{a}
+(append mode).
+@end itemize
+
+Note that the filename may contain an (absolute) path. An MP file link
+can be used either for reading or for writing, but not for both at the
+same time. A @code{close} command must be used before a change of i/o
+direction.
 
 @strong{Example:}
 @example
@@ -1156,8 +1203,7 @@ change of i/o direction.
   ring r;
   link l="MPfile:w example.mp"; // type=MPfile, mode=overwrite
   l;
-  status(l, "name"); // name is example.mp; link is not yet opened
-  ideal i=maxideal(2);
+  ideal i=x2,y2,z2;
   write (l,1, i, "hello world");// write three expressions
   status(l, "open", "yes");     // now link is open
   status(l, "mode");            // in write mode
@@ -1172,8 +1218,6 @@ change of i/o direction.
   def s = read(l);              // third expression
   close(l);                     // link is closed
   dump("MPfile:w example.mp");  // dump everything to example.mp
-  kill basering, s; listvar();  // kill all vars
-  getdump("MPfile: example.mp");// get dump from file
 @c example
 @end example
 @c {{{endfold}}}
@@ -1185,38 +1229,49 @@ change of i/o direction.
 @c {{{ subsubsection MPtcp links }}}
 MPtcp links give the possibility to exchange data in the binary MP
 format between two processes which may run on the same or different
-computers. MPtcp links can be opened in four different modes: listen,
-connect, launch, and fork.
+computers. MPtcp links can be opened in four different modes: 
 
-@*Opening an MPtcp link in listen mode blocks
-until a connection to the specified port was made by a connect
-call. Opening a MPtcp link in connect mode, supposes that an application
-is listening for a connection at the specified host and port.
+@table @code
+@item listen
+opens a MPtcp link in listen mode and blocks until a connection to the
+specified port was made by a connect call.
 
-@*Opening an MPtcp link in launch mode, launches the specified
-application (using rsh, i.e., the application to launch must either be
-given with an absolute pathname, or must be in a directory contained in
-the search path) on the specified host.  The launching side (client)
-"listens" at a chosen port, until the launched (server) application
-which was launched with the additional command line arguments "--MPmode
-connect --MPhost hostname --MPport portnumber" (hostname and portnumber
-are substituted by their respective values) does a connect call. To
-launch @sc{Singular} in server mode, the command line option @code{-b}
-must be added.
+@item connect
+opens a MPtcp link in connect mode supposing that an application is
+listening for a connection at the specified host and port.
 
-@*Opening an MPtcp link in fork mode, forkes a child of the current
+@item launch
+opens a MPtcp link in launch mode launching the specified application on
+the specified host.
+
+@item fork
+opens a MPtcp link in fork mode forking a child of the current
+@sc{Singular}, which will take the role of a server.
+@end table
+
+Opening an MPtcp link in launch mode, the application to launch must
+either be given with an absolute pathname, or must be in a directory
+contained in the search path. The launching side (client) "listens" at
+a chosen port, until the launched (server) application which was
+launched with the additional command line arguments "--MPmode connect
+--MPhost hostname --MPport portnumber" (hostname and portnumber are
+substituted by their respective values) does a connect call. To launch
+@sc{Singular} in server mode, the command line option @code{-b} must be
+added.
+
+Opening an MPtcp link in fork mode, forkes a child of the current
 @sc{Singular}, which will take the role of a server, i.e. after the
 connection between the parent (client) and child (server) is
 established, the child @sc{Singular} goes into server mode. All
-variables and their values which existed in the parent
-@sc{Singular} befor the fork link was opened, are inherited by the child
-(i.e. forked) @sc{Singular}.
+variables and their values which existed in the parent @sc{Singular}
+before the fork link was opened, are inherited by the child (i.e. forked)
+@sc{Singular}.
 
-@*To arrange the
-evaluation of an expression by a server, the expression must be quoted,
-so that a local evaluation is prevented (otherwise, the expression is
-evaluated first, and the result of the evaluation is written, instead of
-the expression which is to be evaluated).
+To arrange the evaluation of an expression by a server, the expression
+must be quoted using the command @code{quote} (see @ref{quote}), so that
+a local evaluation is prevented (otherwise, the expression is evaluated
+first, and the result of the evaluation is written, instead of the
+expression which is to be evaluated).
 
 If @sc{Singular} is in server mode, the value of the variable
 @code{mp_ll} is the MPtcp link connecting to the client and
@@ -1229,30 +1284,55 @@ server, there is exactly one expression written back (which might be an
 "empty" expression, if the evaluation on the server side does not return
 a value).
 
-MPtcp links should explicitely be opened before being used. MPtcp links
+MPtcp links should explicitly be opened before being used. MPtcp links
 are bidirectional, i.e., can be be used for both, writing and
 reading. Reading from an MPtcp link blocks until data was written to
 that link. The @code{status} command can be used to check whether there
 is data to read.
 
+The MPtcp link describing string has to be
+@itemize @bullet
+@item for starting in listen mode:
+@enumerate
+@item @code{"MPtcp: listen --MPport "} + portnumber
+@end enumerate
+@item for starting in connect mode:
+@enumerate
+@item @code{"MPtcp: connect --MPport "} + portnumber
+@item @code{"MPtcp: connect --MPhost" } + hostname + @code{" --MPport "} +
+portnumber
+@end enumerate
+@item for starting in launch mode:
 @enumerate
 @item @code{"MPtcp: launch"}
 @item @code{"MPtcp: launch --MPapplication "} + application
 @item @code{"MPtcp: launch --MPhost "} + hostname
 @item @code{"MPtcp: launch --MPhost "} + hostname +
 @code{" --MPapplication "} + application
-@item @code{"MPtcp: listen --MPport "} + portnumber
-@item @code{"MPtcp: connect --MPport "} + portnumber
-@item @code{"MPtcp: connect --MPhost" } + hostname @code{" --MPport "} +
-portnumber
 @end enumerate
+@item for starting in fork mode:
+@enumerate
+@item @code{"MPtcp: fork"}
+@end enumerate
+@end itemize
+
+There are the following default values:
+@itemize @bullet
+@item If none of @code{listen}, @code{connect}, @code{launch} or
+@code{fork} is specified, the default mode is set to @code{fork}. 
+
+@item If no application is specified (in mode @code{launch}) the default
+application is @code{Singular -b}.
+
+@item If no hostname is specified the localhost is used as default host.
+@end itemize
 
 @strong{Example:}
 @example
 @c example
   LIB "general.lib"; // needed for "which" and "killall" commands
-  // MPtcp:launch link for launching Singular in batch modus
-  // on the local host
+  // MPtcp:launch link for launching SINGULAR in batch modus
+  // on the local host 
   link l="MPtcp:launch";
   open(l);
   l; // notice that link is ready for writing but not for reading
@@ -1299,37 +1379,60 @@ portnumber
 @cindex DBM links
 
 @c {{{ subsection DBM links }}}
-DBM links provide access to data stored in a data base
-(using the unix dbm or gdbm library).
+DBM links provide access to data stored in a data base (using the dbm or
+gdbm library). Each entry in the data base consists of a (key_string,
+value_string) pair. Such a pair can be inserted with the command
+@code{write(}link@code{,} key_string@code{,} value_string@code{)}.  By
+calling @code{write(}link@code{,} key_string@code{)}, the entry with key
+key_string is deleted from the data base. The value of an entry is
+returned by the command @code{read(}link@code{,}
+key_string@code{)}. With only one argument, @code{read(}link@code{)}
+returns the next key in the data base. Using this feature you can scan a
+data base in order to access all entries of the data base.
+
+If a data base with name @code{name} is opened for writing for the first
+time, two files (@code{name.pag} and @code{name.dir}) are automatically
+created, which contain the data base. 
+
+The DBM link describing string has to be one of the following:
 
 @enumerate
-@item @code{"DBM: "} + filename
-@item @code{"DBM:r "} + filename
-@item @code{"DBM:rw "} + filename
+@item @code{"DBM: "} + name
+@*opens the data base for reading (default mode).
+
+@item @code{"DBM:r "} + name
+@*opens the data base for reading.
+
+@item @code{"DBM:rw "} + name
+@*opens the data base for reading and writing.
 @end enumerate
+
+Note, that @code{name} without the suffix @code{.pag} or @code{.dir} is
+the name of the data base which is used for DBM links (see the example
+below). The name may contain an (absolute) path.
 
 @strong{Example:}
 @example
 @c example
-  link dbmLink="DBM:rw example";
-  write(dbmLink,"1","abc");
-  write(dbmLink,"3","XYZ");
-  write(dbmLink,"2","ABCc");
-  dbmLink;
-  close(dbmLink);
+  link l="DBM:rw example";
+  write(l,"1","abc");
+  write(l,"3","XYZ");
+  write(l,"2","ABC");
+  l;
+  close(l);
   // read all keys (till empty string):
-  read(dbmLink);
-  read(dbmLink);
-  read(dbmLink);
-  read(dbmLink);
+  read(l);
+  read(l);
+  read(l);
+  read(l);
   // read data corresponding to key "1"
-  read(dbmLink,"1");
+  read(l,"1");
   // read all data:
-  read(dbmLink,read(dbmLink));
-  read(dbmLink,read(dbmLink));
-  read(dbmLink,read(dbmLink));
+  read(l,read(l));
+  read(l,read(l));
+  read(l,read(l));
   // close
-  close(dbmLink);
+  close(l);
 @c example
 @end example
 @c {{{endfold}}}
@@ -2389,6 +2492,7 @@ none
 @section resolution
 @cindex resolution
 
+@c {{{ section resolution }}}
 @menu
 * resolution declarations::
 * resolution expressions::
@@ -2404,11 +2508,12 @@ can only be defined or accessed with respect to a base ring.
 @subsection resolution declarations
 @cindex resolution declarations
 
+@c {{{ subsection resolution daclarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{resolution} name @code{=} resolution_expression @code{;}
 @item @strong{Purpose:}
-defines an resolution.
+defines a resolution.
 @item @strong{Default:}
 none
 @item @strong{Example:}
@@ -2421,13 +2526,15 @@ none
 @c example
 @end example
 @end table
+@c {{{endfold}}}
 
 @c ------------------------------
 @node resolution expressions, resolution related functions, resolution declarations, resolution
 @subsection resolution expressions
 @cindex resolution expressions
 
-An resolution expression is:
+@c {{{ subsection resolution expressions }}}
+A resolution expression is:
 @enumerate
 @item
 an identifier of type resolution
@@ -2446,12 +2553,14 @@ a typecast from list to resolution.
 See @ref{resolution}; @ref{resolution related functions};
 @ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
+@c {{{endfold}}}
 
 @c ------------------------------
 @node resolution related functions, ,resolution expressions, resolution
 @subsection resolution related functions
 @cindex resolution related functions
 
+@c {{{ subsection resolution related functions }}}
 @table @asis
 @item @code{mres}
 minimal free resolution of an ideal/module, also minimizing the given ideal/module
@@ -2465,7 +2574,8 @@ free resolution of a standard basis (see @ref{sres})
 @c @strong{Example:}
 @c @example
 @c @end example
-
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node ring, string, resolution, Data types
