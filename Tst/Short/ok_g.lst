@@ -69,7 +69,7 @@ mora_6.tst
 mora_7.tst
 mora_8.tst
 mora_9.tst
-; mpsr_s trouble with ring
+mpsr_s
 normal
 pAdd_s
 pAddManyVars_s
