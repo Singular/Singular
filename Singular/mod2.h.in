@@ -59,12 +59,6 @@
 #undef HAVE_VPRINTF
 /* Define if you have gettimeofday */
 #undef HAVE_GETTIMEOFDAY
-/* Define if you have strstr */
-#undef HAVE_STRSTR
-/* Define if you have strtod */
-#undef HAVE_STRTOD
-/* Define if you have strtol */
-#undef HAVE_STRTOL
 /* Define if you have atexit */
 #undef HAVE_ATEXIT
 /* Define if you have bcopy, bzero and bcmp 
@@ -152,11 +146,6 @@
 /* FGLM needs factory */
 #ifdef HAVE_FACTORY
 #define HAVE_FGLM
-#endif
-
-/* In case we do not have strstr, we provide our own version */
-#ifndef HAVE_STRSTR
-char *strstr(const char *haystack, const char *needle);
 #endif
 
 /* Undefine to disable real time measurments  */

@@ -181,7 +181,7 @@ if test "$ac_check_prog" = yes; then
     NEED_LIBS="-lgmp $LIBS"
   fi
   
-  AC_CHECK_FUNCS(select socket gethostname gethostbyname strtol)
+  AC_CHECK_FUNCS(select socket gethostname gethostbyname strtol strstr)
   if test "$ac_cv_func_select" != yes; then
     AC_MSG_WARN(Did not find library containing function select)
     AC_MSG_WARN(Linking programs with MP might fail)
