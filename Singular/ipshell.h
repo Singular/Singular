@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.35 2004-10-05 13:00:51 Singular Exp $ */
+/* $Id: ipshell.h,v 1.36 2005-01-24 14:59:13 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -87,9 +87,13 @@ BOOLEAN iiExprArithM(leftv res, sleftv* a, int op);
 
 typedef BOOLEAN (*proc1)(leftv,leftv);
 
-#ifdef INIT_BUG
+#ifdef __GNUC__
+#if (__GNUC__ < 3)
+#define INIT_BUG 1
 void    jjInitTab1();
 #endif
+#endif
+
 #ifdef GENTABLE
 typedef char * (*Proc1)(char *);
 struct sValCmd1
