@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.73 1998-11-09 15:43:01 obachman Exp $ */
+/* $Id: extra.cc,v 1.74 1998-11-12 13:06:11 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -47,7 +47,6 @@
 #include "ideals.h"
 #include "kstd1.h"
 #include "syz.h"
-#include "lamat.h"
 
 // Define to enable many more system commands
 #define HAVE_EXTENDED_SYSTEM
@@ -69,6 +68,10 @@
 #ifdef HAVE_DYNAMIC_LOADING
 #include <dlfcn.h>
 #endif /* HAVE_DYNAMIC_LOADING */
+
+#ifdef HAVE_PCV
+#include "pcv.h"
+#endif
 
 // see clapsing.cc for a description of the `FACTORY_*' options
 
@@ -395,59 +398,26 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
-/*==================== latest ==================================*/
-    if(strcmp(sys_cmd,"la")==0)
+/*==================== pcv ==================================*/
+#ifdef HAVE_PCV
+    if(strcmp(sys_cmd,"pcvConv")==0)
     {
-      if (h!=NULL)
-      {
-        int i0=-1, i1=-1;
-        leftv hh=h->next;
-        if ((hh!=NULL)&&(hh->Typ()==INT_CMD))
-        {
-          i0=(int)hh->Data();
-          if ((hh->next!=NULL) &&(hh->next->Typ()==INT_CMD))
-            i1=(int)hh->next->Data();
-        }
-        if(h->Typ()==IDEAL_CMD)
-        {
-        // "la",<ideal>[,<int d0>[,<int d1>]]:
-        // convert ideal from deg d0 to deg d1 to coeff-vectors
-          if (i1==(-1))
-          {
-            i1=1024;
-            if (i0==(-1)) i0=0;
-          }
-          ideal I=(ideal)(h->Data());
-          laSet();
-          ideal m=laI2Mo(I,i0,i1);
-          laReset();
-          res->rtyp=MODUL_CMD;
-          res->data=(void *)m;
-          return FALSE;
-        }
-        else
-        if(h->Typ()==MODUL_CMD)
-        {
-        // "la",<module>[,<int c0>[,<int c1>]]:
-        // convert module from comp c0 to comp c1 to ideal
-          if (i1==(-1))
-          {
-            i1=32767;
-            if (i0==(-1)) i0=1;
-          }
-          ideal M=(ideal)(h->Data());
-          laSet();
-          ideal I=laMo2I(M,i0,i1);
-          laReset();
-          res->rtyp=IDEAL_CMD;
-          res->data=(void *)I;
-          return FALSE;
-        }
-      }
-      WerrorS("<ideal/module>[,<int>[,<int>]] expected");
-      return TRUE;
+      return iiPcvConv(res, h);
+    }
+    else if(strcmp(sys_cmd,"pcvDim")==0)
+    {
+      return iiPcvDim(res, h);
+    }
+    else if(strcmp(sys_cmd,"pcvBasis")==0)
+    {
+      return iiPcvBasis(res, h);
+    }
+    else if(strcmp(sys_cmd,"pcvOrd")==0)
+    {
+      return iiPcvOrd(res,h);
     }
     else
+#endif
 /*==================== naIdeal ==================================*/
     if(strcmp(sys_cmd,"naIdeal")==0)
     {
