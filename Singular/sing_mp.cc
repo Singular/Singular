@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.12 1997-04-12 16:04:46 Singular Exp $ */
+/* $Id: sing_mp.cc,v 1.13 1997-06-05 16:41:21 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -22,6 +22,8 @@
 #include "silink.h"
 #include"mpsr.h"
 
+static int Batch_ReadEval(si_link silink);
+
 #ifdef MPSR_DEBUG
 #define MP_SET_LINK_OPTIONS(link) \
   if (link != NULL) \
@@ -33,7 +35,7 @@
 MP_Env_pt mp_Env = NULL;
 
 /* =============== general utilities ====================================== */
-void FreeCmdArgs(int argc, char** argv)
+static void FreeCmdArgs(int argc, char** argv)
 {
   int i;
   for (i=0; i<argc; i++)
@@ -42,7 +44,7 @@ void FreeCmdArgs(int argc, char** argv)
   Free(argv, argc*sizeof(char *));
 }
 
-void GetCmdArgs(int *argc, char ***argv, char *str)
+static void GetCmdArgs(int *argc, char ***argv, char *str)
 {
   if (str == NULL || str[0] == '\0')
   {
@@ -102,7 +104,7 @@ void GetCmdArgs(int *argc, char ***argv, char *str)
  * MPfile  specific stuff
  *
  ***************************************************************/
-BOOLEAN slOpenMPFile(si_link l, short flag)
+static BOOLEAN slOpenMPFile(si_link l, short flag)
 {
   char *argv[] = {"-MPtransp", "FILE", "-MPmode", "append",
                   "-MPfile", "/tmp/mpout"};
@@ -220,7 +222,46 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   return MP_OpenLink(mp_Env, 8, argv);
 }
 
-BOOLEAN slOpenMPTcp(si_link l, short flag)
+static MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
+{
+  MP_Link_pt link = NULL;
+  char *argv[] = {"-MPtransp", "TCP", "-MPmode", "fork", "-MPport", "1703"};
+  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "-MPport");
+
+  if (port != NULL) argv[5] = port;
+
+  link = MP_OpenLink(mp_Env, 6, argv);    
+  if (link != NULL)
+  {
+    if (MP_GetLinkStatus(link, MP_LinkIsParent))
+    {
+    /* parent's business */
+      if (l->name != NULL) FreeL(l->name);
+      l->name = mstrdup("parent");
+      return link;
+    }
+    else
+    {
+      /* child's business -- go into batch mode */
+      if (l->name != NULL) FreeL(l->name);
+      l->name = mstrdup("child");
+      MP_SET_LINK_OPTIONS(link);
+      SI_LINK_SET_RW_OPEN_P(l);
+      l->data = (void *) link;
+      feBatch=TRUE;
+      _exit(Batch_ReadEval(slCopy(l)));
+    }
+  }
+  else
+  {
+    /* only parent can get here */
+    return NULL;
+  }
+}
+
+    
+                                
+static BOOLEAN slOpenMPTcp(si_link l, short flag)
 {
   MP_Link_pt link = NULL;
   char **argv;
@@ -239,14 +280,15 @@ BOOLEAN slOpenMPTcp(si_link l, short flag)
 
   if (strcmp(l->mode, "connect") == 0) link = slOpenMPConnect(argc, argv);
   else if (strcmp(l->mode, "listen") == 0) link = slOpenMPListen(argc, argv);
+  else if (strcmp(l->mode, "launch") == 0) link = slOpenMPLaunch(argc, argv);
   else
   {
-    link = slOpenMPLaunch(argc, argv);
-    if (link != NULL && (strcmp(l->mode, "launch") != 0))
+    if (strcmp(l->mode, "fork") != 0)
     {
-      FreeL(l->mode);
-      l->mode = mstrdup("launch");
+      if (l->mode != NULL) FreeL(l->mode);
+      l->mode = mstrdup("fork");
     }
+    link = slOpenMPFork(l, argc, argv);
   }
 
   FreeCmdArgs(argc, argv);
@@ -267,7 +309,7 @@ BOOLEAN slOpenMPTcp(si_link l, short flag)
  *
  ***************************************************************/
 
-BOOLEAN slWriteMP(si_link l, leftv v)
+static BOOLEAN slWriteMP(si_link l, leftv v)
 {
   leftv next = (v != NULL ? v->next : (leftv) NULL);
   mpsr_ClearError();
@@ -321,9 +363,9 @@ static void SentQuitMsg(si_link l)
   Free(v, sizeof(sleftv));
 }
 
-BOOLEAN slCloseMP(si_link l)
+static BOOLEAN slCloseMP(si_link l)
 {
-  if ((strcmp(l->mode, "launch") == 0) &&
+  if ((strcmp(l->mode, "launch") == 0 || strcmp(l->mode, "fork") == 0) &&
       (MP_GetLinkStatus((MP_Link_pt)l->data,MP_LinkReadyWriting) == MP_TRUE))
     SentQuitMsg(l);
   MP_CloseLink((MP_Link_pt) l->data);
@@ -332,7 +374,7 @@ BOOLEAN slCloseMP(si_link l)
 }
 
 
-BOOLEAN slDumpMP(si_link l)
+static BOOLEAN slDumpMP(si_link l)
 {
   mpsr_ClearError();
   if (mpsr_PutDump((MP_Link_pt) l->data) != mpsr_Success)
@@ -344,7 +386,7 @@ BOOLEAN slDumpMP(si_link l)
     return FALSE;
 }
 
-BOOLEAN slGetDumpMP(si_link l)
+static BOOLEAN slGetDumpMP(si_link l)
 {
   mpsr_ClearError();
   if (mpsr_GetDump((MP_Link_pt) l->data) != mpsr_Success)
@@ -356,7 +398,7 @@ BOOLEAN slGetDumpMP(si_link l)
     return FALSE;
 }
 
-char* slStatusMP(si_link l, char* request)
+static char* slStatusMP(si_link l, char* request)
 {
   if (strcmp(request, "read") == 0)
   {
@@ -381,54 +423,11 @@ char* slStatusMP(si_link l, char* request)
  *
  ***************************************************************/
 
-// #define MPSR_BATCH_DEBUG
-#ifdef MPSR_BATCH_DEBUG
-static BOOLEAN stop = 1;
-#endif
-
-int Batch_do(int argc, char **argv)
+int Batch_ReadEval(si_link silink)
 {
-#ifdef MPSR_BATCH_DEBUG
-  fprintf(stderr, "Was started with pid %d\n", getpid());
-  while (stop){};
-#endif
-  si_link silink = (si_link) Alloc0(sizeof(sip_link));
   leftv v = NULL;
-  char *port = IMP_GetCmdlineArg(argc, argv, "-MPport");
-  char *host = IMP_GetCmdlineArg(argc, argv, "-MPhost");
-  char *istr;
-  idhdl id;
-
-  // parse argv to get port and host
-  if (port == NULL)
-  {
-    fprintf(stderr,
-            "Need '-MPport portnumber' command line argument in batch modus\n");
-    return 1;
-  }
-  if (host == NULL)
-  {
-    fprintf(stderr,
-            "Need '-MPhost hostname' command line argument in batch modus\n");
-    return 1;
-  }
-
-  // initialize si_link
-  istr = (char *) AllocL((strlen(port) + strlen(host) + 40)*sizeof(char));
-  sprintf(istr, "MPtcp:connect -MPport %s -MPhost %s", port, host);
-  slInit(silink, istr);
-  FreeL(istr);
-
-  // open link
-  if (slOpen(silink, SI_LINK_OPEN))
-  {
-    fprintf(stderr, "Batch side could not connect on port %s and host %s\n",
-            port, host);
-    return 1;
-  }
-
   // establish top-level identifier for link
-  id = enterid(mstrdup("mp_ll"), 0, LINK_CMD, &idroot, FALSE);
+  idhdl id = enterid(mstrdup("mp_ll"), 0, LINK_CMD, &idroot, FALSE);
   IDLINK(id) = silink;
 
   // the main read-eval-write loop
@@ -462,6 +461,53 @@ int Batch_do(int argc, char **argv)
   // should never get here
   return 1;
 }
+
+// #define MPSR_BATCH_DEBUG
+#ifdef MPSR_BATCH_DEBUG
+static BOOLEAN stop = 1;
+#endif
+
+int Batch_do(int argc, char **argv)
+{
+#ifdef MPSR_BATCH_DEBUG
+  fprintf(stderr, "Was started with pid %d\n", getpid());
+  while (stop){};
+#endif
+  si_link silink = (si_link) Alloc0(sizeof(sip_link));
+  char *port = IMP_GetCmdlineArg(argc, argv, "-MPport");
+  char *host = IMP_GetCmdlineArg(argc, argv, "-MPhost");
+  char *istr;
+
+  // parse argv to get port and host
+  if (port == NULL)
+  {
+    fprintf(stderr,
+            "Need '-MPport portnumber' command line argument in batch modus\n");
+    return 1;
+  }
+  if (host == NULL)
+  {
+    fprintf(stderr,
+            "Need '-MPhost hostname' command line argument in batch modus\n");
+    return 1;
+  }
+
+  // initialize si_link
+  istr = (char *) AllocL((strlen(port) + strlen(host) + 40)*sizeof(char));
+  sprintf(istr, "MPtcp:connect -MPport %s -MPhost %s", port, host);
+  slInit(silink, istr);
+  FreeL(istr);
+  // open link
+  if (slOpen(silink, SI_LINK_OPEN))
+  {
+    fprintf(stderr, "Batch side could not connect on port %s and host %s\n",
+            port, host);
+    return 1;
+  }
+
+  return Batch_ReadEval(silink);
+}
+
 
 /***************************************************************
  *

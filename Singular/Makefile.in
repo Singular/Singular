@@ -354,7 +354,7 @@ Singularg: scanner.cc $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h
 	$(CXXG) ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
 	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS}
 
-iparith.og: ${OBJS} iparith.inc iparith.cc
+iparith.og: iparith.inc iparith.cc
 	$(CXXG)  ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og
 
 mpsr_Tok.og: iparith.inc mpsr_Tok.cc

@@ -1,0 +1,5 @@
+CHANGES FROM VERSION 1.0
+========================
+
+  * MPtcp:fork mode added, default MPtcp mode is now fork, instead of
+    launch
