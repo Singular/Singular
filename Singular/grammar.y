@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.83 2000-09-18 09:18:59 obachman Exp $ */
+/* $Id: grammar.y,v 1.84 2000-09-25 14:19:49 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -51,7 +51,25 @@
 #include "lists.h"
 #include "libparse.h"
 
+/* From the bison docu:
+   
+     By defining the macro `YYMAXDEPTH', you can control how deep the
+parser stack can become before a stack overflow occurs.  Define the
+macro with a value that is an integer.  This value is the maximum number
+of tokens that can be shifted (and not reduced) before overflow.  It
+must be a constant expression whose value is known at compile time.
 
+   The stack space allowed is not necessarily allocated.  If you
+specify a large value for `YYMAXDEPTH', the parser actually allocates a
+small stack at first, and then makes it bigger by stages as needed.
+This increasing allocation happens automatically and silently.
+Therefore, you do not need to make `YYMAXDEPTH' painfully small merely
+to save space for ordinary inputs that do not need much stack.
+
+   The default value of `YYMAXDEPTH', if you do not define it, is 10000.
+*/
+#define YYMAXDEPTH INT_MAX
+    
 extern int   yylineno;
 extern FILE* yyin;
 
