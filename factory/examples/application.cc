@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: application.cc,v 1.1 1997-10-27 15:52:02 schmidt Exp $ */
+/* $Id: application.cc,v 1.2 1997-10-27 16:50:59 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -15,6 +15,7 @@ main()
     // test for existence of GF(q) tables
     setCharacteristic( 3, 2, 'z' );
     cout << factoryVersion << endl;
+    cout << factoryConfiguration << endl;
     cout << "Factory lives!" << endl;
 
     // now for something completely different
@@ -29,19 +30,18 @@ main()
 
     // call some of Factory's functions and methods and print
     // their results
-    cout << "Do not forget to terminate canonical forms by `;' in input!" << endl;
+    cout << "Do not forget to terminate canonical forms with `;' in input!" << endl;
+    cout << "Simple polynomial operations in characteristic 0." << endl;
+    cout << "Please enter two multivariate polynomials over Q." << endl;
 
     cout << "f(x, y, z) = ";
     cin >> f;
-
     cout << "g(x, y, z) = ";
     cin >> g;
+    cout << "f                = " << f << endl;
+    cout << "g                = " << g << endl;
 
-    cout << "You entered:" << endl;
-    cout << "f         = " << f << endl;
-    cout << "g         = " << g << endl;
-
-    cout << "Some information on f:" << endl;
+    cout << "Polynomial information on f:" << endl;
     cout << "mvar(f)          = " << mvar( f ) << endl;
     cout << "degree(f)        = " << degree( f ) << endl;
     cout << "degree(f, x)     = " << degree( f, x ) << endl;
@@ -51,11 +51,11 @@ main()
     cout << "LC(f, y)         = " << LC( f, y ) << endl;
     cout << "LC(f, z)         = " << LC( f, z ) << endl;
 
-    cout << "We test the arithmetic operators:" << endl;
-    cout << "f+g       = " << f + g << endl;
-    cout << "f-g       = " << f - g << endl;
-    cout << "f*g       = " << f * g << endl;
-    cout << "f/g       = " << f / g << endl;
-    cout << "f%g       = " << f % g << endl;
-    cout << "f(g, x)   = " << f(g, x) << endl;
+    cout << "Arithmetic operators:" << endl;
+    cout << "f+g              = " << f + g << endl;
+    cout << "f-g              = " << f - g << endl;
+    cout << "f*g              = " << f * g << endl;
+    cout << "f/g              = " << f / g << endl;
+    cout << "f%g              = " << f % g << endl;
+    cout << "f(g, x)          = " << f(g, x) << endl;
 }
