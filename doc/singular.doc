@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.58 1999-07-06 11:58:16 obachman Exp $
+@comment $Id: singular.doc,v 1.59 1999-07-07 11:47:43 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -154,6 +154,11 @@ a ring must have 505 variables or less
 @item
 integers (of type @code{int}) have the limited range
 from -2147483647 to 2147483647
+@item
+floating point numbers (type @code{number} from field @code{real})
+have the limited range (machine dependent, usually -1.0e-38 to 1.0e+38).
+The string representation of overflow and underflow varies also.
+(Linux: Inf, HPUX: +.+00e+00, @dots{})
 @c @item
 @c a token (in the input) must have 16383 characters or less.
 @c @*(Tokens are strings, blocks of statements, numbers)
@@ -221,7 +226,7 @@ in an error.
 @c   chapter "boolean expressions".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
-@strong{All} arguments of a logical expressions are first evaluated and
+@strong{All} arguments of a logical expression are first evaluated and
 then the value of the logical expression is determined. For example, the
 logical expressions @code{(a || b)} is evaluated by first evaluating
 @code{a} @emph{and} @code{b}, even though the value of @code{b} has no
@@ -288,7 +293,7 @@ value is overwritten by its global one.
 @cindex case
 @cindex switch
 
-@sc{Singular} does not offer a @code{case} (or, @code{switch})
+@sc{Singular} does not offer a @code{case} (or @code{switch})
 statement. However, it can be imitated in the following way:
 
 @example
@@ -381,7 +386,7 @@ language, the type of the
 return value of a procedure does not need to be specified. As a
 consequence, the return type of a procedure may vary, i.e., may, for
 example, depend on the input. However, the return value
-of such a procedures may then only be assigned to a variable of type
+of such a procedure may then only be assigned to a variable of type
 @code{def}.
 
 @example
@@ -495,7 +500,7 @@ the ideal (resp.@: module).
 
 @item computations in qrings
 
-@sc{Singular} computes in a quotient rings as long as possible with the
+@sc{Singular} computes in a quotient ring as long as possible with the
 given representative of a polynomial, say, @code{f}.  I.e., it usually
 does not reduce @code{f} w.r.t. the quotient ideal.  This is only done
 when necessary
@@ -504,7 +509,7 @@ the command @code{reduce(f, std(0))} (@pxref{reduce}).
 
 @item substring selection
 
-Two comma -- separated @code{int}s in square brackets after a string select a
+Two comma - separated @code{int}s in square brackets after a string select a
 substring. An @code{intvec} in square brackets after a string selects
 the respective single characters of the string and returns them as an
 expression list of two strings.
@@ -639,18 +644,18 @@ command @code{LIB "all.lib";} for loading all libraries.
 The library @code{standard.lib} provides extensions to the
 set of built-in commands and is automatically loaded
 during the start of @sc{Singular}, unless @sc{Singular} is started up
-with the @code{--no-stdlib} command line option (see 
+with the @code{--no-stdlib} command line option (see
 @ref{Command line options}).
 
 @c lib standard.lib:LibInfo lib_fun lib_ex
- 
+
 @c ----------------------------------------------------------
 @node all_lib, general_lib, standard_lib, SINGULAR libraries
 @section all_lib
 @cindex all_lib
 
 The library @code{all.lib} provides a convenient way to load all
-libraries of the @sc{Singular} distribution. 
+libraries of the @sc{Singular} distribution.
 
 @strong{Example:}
 @example
