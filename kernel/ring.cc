@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.18 2004-08-13 18:26:02 levandov Exp $ */
+/* $Id: ring.cc,v 1.19 2004-08-14 12:11:55 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -744,9 +744,9 @@ int rSum(ring r1, ring r2, ring &sum)
           }
           if (i!=len)
           {
-            omReallocSize(tmpR.parameter,len*sizeof(char_ptr),i*sizeof(char_ptr));
+            tmpR.parameter=(char**)omReallocSize(tmpR.parameter,len*sizeof(char_ptr),i*sizeof(char_ptr));
           }
-          tmpR.P=len;
+          tmpR.P=i;
         }
       }
     }
