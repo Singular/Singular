@@ -475,6 +475,29 @@ if test "$enable_MP" = yes && test "${with_extra_cflags+set}" != set; then
 ac_configure_args="$ac_configure_args --with-extra_cflags=-fPIC"
 fi
 
+AC_MSG_CHECKING(whether to configure and build NTL lib)
+if test "$enable_NTL" != yes && test "$enable_NTL" != no; then
+  if test "$with_NTL" != no && test "$ac_NTL_ok" != yes && \
+     test -d ntl; then
+    enable_NTL=yes
+    AC_MSG_RESULT(yes)
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS ntl"
+    ac_configure_args="$ac_configure_args --enable-NTL"
+  else
+    enable_NTL=no
+    AC_MSG_RESULT(no)
+  fi
+elif test "$enable_NTL" = yes; then
+  if test -d ntl; then
+    AC_MSG_RESULT(yes)
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS ntl"
+  else
+    AC_MSG_RESULT(no)
+    AC_MSG_ERROR(can not build NTL without ntl directory)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
 
 AC_MSG_CHECKING(whether to configure and build factory lib)
 if test "$enable_factory" != yes && test "$enable_factory" != no; then
@@ -802,6 +825,9 @@ if test -d gmp; then
 fi
 if test -d MP; then
   SUBDIRS="$SUBDIRS MP"
+fi
+if test -d ntl; then
+  SUBDIRS="$SUBDIRS ntl"
 fi
 if test -d factory; then
   SUBDIRS="$SUBDIRS factory"

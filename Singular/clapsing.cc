@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.79 2002-01-20 09:20:19 Singular Exp $
+// $Id: clapsing.cc,v 1.80 2002-11-08 13:28:44 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -22,8 +22,8 @@
 #include "clapconv.h"
 #ifdef HAVE_LIBFAC_P
 #include <factor.h>
-CanonicalForm algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const Varlist & order);
-
+//CanonicalForm algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const Varlist & order);
+CanonicalForm alg_gcd(const CanonicalForm &, const CanonicalForm &, const CFList &);
 #endif
 #include "ring.h"
 
@@ -231,12 +231,15 @@ poly singclap_gcd ( poly f, poly g )
       {
       //  WerrorS( feNotImplemented );
         CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
-	Varlist ord;
-	ord.append(mipo.mvar()); 
-	CFList as(mipo);
-	Variable a=rootOf(mipo);
-	CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
-	res= convClapAPSingAP( algcd( F, G, as, ord) );
+        //Varlist ord;
+        //ord.append(mipo.mvar());
+        CFList as(mipo);
+        Variable a=rootOf(mipo);
+        //CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
+        CanonicalForm F( convSingTrPClapP(f) ), G( convSingTrPClapP(g) );
+        //res= convClapAPSingAP( algcd( F, G, as, ord) );
+        //res= convClapAPSingAP( alg_gcd( F, G, as) );
+        res= convClapAPSingAP( alg_gcd( F, G, as) );
       }
       else
       {
@@ -629,6 +632,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   //            2 return true factors and exponents
   //            0 return coeff, factors and exponents
 
+
   ideal res=NULL;
 
   // handle factorize(0) =========================================
@@ -687,9 +691,15 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     }
     return res;
   }
-  // use factory/libfac in general ==============================
+  //PrintS("S:");pWrite(f);PrintLn();
+  // use factory/liffac in general ==============================
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
+  On(SW_USE_NTL);
+  #ifdef HAVE_NTL
+  extern int prime_number;
+  //if(rField_is_Q()) prime_number=0;
+  #endif
   CFFList L;
   number N=NULL;
   number NN=NULL;
@@ -765,17 +775,24 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       {
         CanonicalForm G( convSingTrPClapP( f ) );
 #ifdef HAVE_LIBFAC_P
-        CFList as(mipo);
-        L = newfactoras( G, as, 1);
+        if (rField_is_Q_a())
+        {
+          CFList as(mipo);
+          L = newfactoras( G, as, 1);
+        }
+        else
+        {
+          L=Factorize(G, mipo);
+        }
 #else
         WarnS("complete factorization only for univariate polynomials");
-        if (nGetChar()==1) /* Q(a) */
+        if ((nGetChar()==1)||(!F.isUnivariate()) /* Q(a) */
         {
           L = factorize( G );
         }
         else
         {
-          goto notImpl;
+          L = factorize( F, a );
         }
 #endif
       }
@@ -869,7 +886,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
               (**v)[i]=0;
             j++;
           }
-	}
+        }
       }
       if (j>0)
       {
@@ -917,18 +934,23 @@ notImpl:
   {
     nDelete(&N);
   }
+  //PrintS("......S\n");
   return res;
 }
 
 matrix singclap_irrCharSeries ( ideal I)
 {
 #ifdef HAVE_LIBFAC_P
+  if (idIs0(I)) return mpNew(1,1);
+
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   matrix res=NULL;
   int i;
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
+  On(SW_USE_NTL);
+  //Off(SW_USE_NTL);
   CFList L;
   ListCFList LL;
   if (((nGetChar() == 0) || (nGetChar() > 1) )
@@ -1056,6 +1078,7 @@ char* singclap_neworder ( ideal I)
   int cnt=pVariables+offs;
   loop
   {
+    if(! Li.hasItem()) break;
     BOOLEAN done=TRUE;
     i=Li.getItem()-1;
     mark[i]=1;
@@ -1072,7 +1095,6 @@ char* singclap_neworder ( ideal I)
     cnt--;
     if(cnt==0) break;
     if (done) StringAppendS(",");
-    if(! Li.hasItem()) break;
   }
   for(i=0;i<pVariables+offs;i++)
   {
