@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.97 1999-07-26 17:27:56 Singular Exp $
+@comment $Id: types.doc,v 1.98 1999-07-28 14:52:35 anne Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -69,8 +69,8 @@ E.g., @code{ideal i=x,y,z; def j=i^2;} defines the ideal @code{i^2}
 with the name @code{j}.
 
 @strong{Note:} Unlike other assignments a ring as an untyped object
-is not a copy but another reference to the same ring. This means that
-entries in one of these rings appear also in the other ones.
+is not a copy but another reference to the same (possibly unnamed) ring. 
+This means that entries in one of these rings appear also in the other ones.
 The following defines a ring @code{s} which is just another reference (or name)
 for the basering @code{r}.
 
@@ -85,6 +85,9 @@ for the basering @code{r}.
   poly g = y;
   kill f;
   listvar(r);
+  ring t=32003,(u,w),dp;
+  def rt=r+t;
+  rt;
 @c example
 @end smallexample
 
