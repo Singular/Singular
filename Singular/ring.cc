@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.166 2001-07-17 09:42:26 Singular Exp $ */
+/* $Id: ring.cc,v 1.167 2001-07-30 08:02:39 mschulze Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2737,9 +2737,12 @@ static void rHighSet(ring r, int o_r, int o)
     case ringorder_ws:
     case ringorder_Ws:
       {
-        int i;
-        for(i=r->block1[o]-r->block0[o];i>=0;i--)
-          if (r->wvhdl[o][i]<0) { r->MixedOrder=TRUE; break; }
+        if (r->wvhdl[o]!=NULL)
+        {
+          int i;
+          for(i=r->block1[o]-r->block0[o];i>=0;i--)
+            if (r->wvhdl[o][i]<0) { r->MixedOrder=TRUE; break; }
+        }
       }
       break;
     case ringorder_c:
@@ -2967,8 +2970,6 @@ BOOLEAN rComplete(ring r, int force)
   if (r->VarOffset!=NULL && force == 0) return FALSE;
   nInitChar(r);
   rSetOutParams(r);
-  rSetDegStuff(r);
-  rSetOption(r);
   int n=rBlocks(r)-1;
   int i;
   int bits;
@@ -3265,6 +3266,9 @@ BOOLEAN rComplete(ring r, int force)
   r->pOrdIndex=i;
 
   // ----------------------------
+  rSetDegStuff(r);
+  rSetOption(r);
+  // ----------------------------
   // r->p_Setm
   r->p_Setm = p_GetSetmProc(r);
 
@@ -3435,8 +3439,11 @@ void rDebugPrint(ring r)
   Print("bitmask=0x%x (expbound=%d) \n",r->bitmask, r->bitmask);
   Print("BitsPerExp=%d ExpPerLong=%d MinExpPerLong=%d at L[%d]\n", r->BitsPerExp, r->ExpPerLong, r->MinExpPerLong, r->VarL_Offset[0]);
   PrintS("varoffset:\n");
-  for(j=0;j<=r->N;j++) Print("  v%d at e-pos %d, bit %d\n",
-     j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
+  if (r->VarOffset==NULL) PrintS(" NULL\n");
+  else
+     for(j=0;j<=r->N;j++) 
+       Print("  v%d at e-pos %d, bit %d\n",
+             j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
   Print("divmask=%p\n", r->divmask);
   PrintS("ordsgn:\n");
   for(j=0;j<r->CmpL_Size;j++)
