@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.60 1998-05-18 18:18:45 Singular Exp $
+@comment $Id: reference.doc,v 1.61 1998-05-18 19:09:13 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7,7 +7,7 @@
 @c is wrapped in `@ifset' and `@end' it does not harm `tex' or
 @c `makeinfo' but is a great help in editing this file (emacs
 @c ignores the conditionals).
-@ifset thisVariableShouldNeverBeSet
+@ignore
 %**start
 \input texinfo.tex
 @setfilename reference.info
@@ -18,8 +18,7 @@
 @node Functions and system variables, Tricks and pitfalls, Data types, Top
 @chapter Functions and system variables
 %**end
-@end ifset
-
+@end ignore
 
 @c ---------------------------------------
 @menu
@@ -27,7 +26,6 @@
 * Control structures::
 * System variables::
 @end menu
-
 
 @c ---------------------------------------
 @node Functions, Control structures, Functions and system variables, Functions and system variables
@@ -82,7 +80,6 @@ the brackets are optional. In the syntax of the commands @code{help} and
 * gcd::
 * gen::
 * getdump::
-* groebner::
 * help::
 * hilb::
 * homog::
@@ -647,8 +644,9 @@ The first row consists of these monomials, the second row
 of the corresponding coefficients of the monomials in f.
 Thus f = M[1,1]*M[2,1]+..+M[1,n]*M[2,n].
 
-Second case: the first matrix (i.e. the 3rd argument) will contain the
-monomials, the second (i.e. the 4th argument)  the corresponding coefficients of the monomials in the vector.
+Second case: the first matrix (i.e. the 3rd argument) contains the
+monomials, the second (i.e. the 4th argument) the corresponding
+coefficients of the monomials in the vector.
 @item @strong{Example:}
 @example
 @c example
@@ -970,7 +968,7 @@ See @ref{ideal}; @ref{std}; @ref{dim}; @ref{vdim}; @ref{mult}.
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-deletes the element with the given index from a list (the input will not be changed).
+deletes the element with the given index from a list (the input is not changed).
 @item @strong{Example:}
 @example
 @c example
@@ -1010,12 +1008,11 @@ returns the determinant of a square matrix.
 @c example
 @end example
 @end table
-@menu
-* matrix expressions::
-@end menu
-@iftex
-See @ref{intmat expression}, @ref{matrix expressions}, @ref{minor}.
-@end iftex
+@c ref
+See @ref{intmat};
+@ref{matrix};
+@ref{minor}.
+@c ref
 @c ---------------------------------------
 @node diff, dim, det, Functions
 @subsection diff
@@ -1133,7 +1130,7 @@ link (which must be either an ASCII or MP link) such that a
 @example
 @c example
   ring r;
-  dump("dump.ascii");
+  dump(":w dump.ascii");
   kill r;
   getdump("dump.ascii");
   r;
@@ -1241,7 +1238,7 @@ prevent local evaluations  when writing to an MPtcp link.
 * write::
 @end menu
 @iftex
-See @ref{MPtcp link}; @ref{quote}; @ref{write}.
+See @ref{MPtcp links}; @ref{quote}; @ref{write}.
 @end iftex
 @c ---------------------------------------
 @node execute, exit, eval, Functions 
@@ -1256,12 +1253,12 @@ none
 executes a string containing a sequence of @sc{Singular} commands.
 
 @item @strong{Note:} 
-The string will be inserted into your input
-stream at the next line break, @emph{NOT} after the @code{;} !  Hence, execute
-should be the only command on a line.   execute should be avoided in
-procedures whenever possible since it may give rise to name conflicts.
-Moreover, such procedures cannot be precompiled (something
-@sc{Singular} will provide in the future).
+The string is inserted into the input stream at the next line break,
+@emph{NOT} after the @code{;} !  Hence, @code{execute} should be the
+only command on a line. @code{execute} should be avoided in procedures
+whenever possible since it may give rise to name conflicts.  Moreover,
+such procedures cannot be precompiled (something @sc{Singular} will
+provide in the future).
 @item @strong{Example:}
 @example
 @c example
@@ -1483,7 +1480,7 @@ a Groebner basis in the current ring. Implements the so-called FGLM
 (Faugere, Gianni, Lazard, Mora)  algorithm. 
 @*The ideal must be zero dimensional and given as a reduced Groebner
 basis in the given ring.
-The result will be a reduced Groebner basis.
+The result is a reduced Groebner basis.
 @*The only permissable difference between the given ring and the current ring
 may be the monomial ordering and a permutation of the variables
 resp. parameters.
@@ -1527,7 +1524,7 @@ See @ref{ring}; @ref{qring};
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-input will come from new file @file{filename}. This is shorthand
+input comes from new file @file{filename}. This is shorthand
 @code{execute read(filename)}.
 @item @strong{Example:}
 @example
@@ -1702,7 +1699,7 @@ returns the i-th free generator of a free module.
 See @ref{freemodule}; @ref{int expressions}; @ref{vector}.
 @c ref
 @c ---------------------------------------
-@node getdump, groebner, gen, Functions
+@node getdump, help, gen, Functions
 @subsection getdump
 @cindex getdump
 @table @code
@@ -1739,26 +1736,7 @@ to @code{stdin} (standard input).
 See @ref{link}, @ref{dump}, @ref{read}.
 @end iftex
 @c ---------------------------------------
-@node groebner, help, getdump, Functions
-@subsection groebner
-@cindex groebner
-@table @code
-@item @strong{Syntax:}
-@code{groebner (}  @code{) ;}
-@item @strong{Type:}
-@item @strong{Purpose:}
-@item @strong{Example:}
-@example
-@c example
-@c example
-@end example
-@end table
-@c ref
-See
-@ref{std}.
-@c ref
-@c ---------------------------------------
-@node help, hilb, groebner, Functions
+@node help, hilb, getdump, Functions
 @subsection help
 @cindex help
 @table @code
@@ -1812,7 +1790,7 @@ computes the Hilbert series of the ideal resp.@: module
 defined by the leading terms of the generators
 of the given ideal resp.@: module.   If the input is
 homogeneous (all variable weights 1) and a standard basis,
-this will be the Hilbert series of the original
+this is the Hilbert series of the original
 ideal resp.@: module.
 
 Prints first and second Hilbert series with one argument,
@@ -3004,7 +2982,7 @@ A1
 @end ifinfo
 are a minimal set of generators
 of M if the basering is local or if M is homogeneous.
-The computation will stop after k steps, if the int expression k
+The computation stops after k steps, if the int expression k
 is not zero, and returns a list of modules
 @tex
 $M_i={\tt module}(A_i)$, i=1..k.
@@ -3848,7 +3826,7 @@ See @ref{module expressions}.
 intvec
 @item @strong{Purpose:}
 computes the weight vector for a quasihomogeneous ideal.
-If the input is not weighted homogeneous, an intvec of zeroes will be returned.
+If the input is not weighted homogeneous, an intvec of zeroes is returned.
 @item @strong{Example:}
 @example
 @c example
@@ -4045,6 +4023,7 @@ See @ref{link}; @ref{write}; @ref{getdump}; @ref{execute}; @ref{status}.
 @node reduce, regularity, read, Functions
 @subsection reduce
 @cindex reduce
+@cindex NF
 @table @code
 @item @strong{Syntax:}
 @code{reduce (} poly_expression@code{,} ideal_expression @code{)}
@@ -4070,7 +4049,6 @@ is an element (resp. subideal, submodule) of the ideal (resp. module).
 The result may have no meaning if the second argument is not a standard basis.
 @*The third (optional) argument 1 forces a reduction which considers
 only the leading term and does no tail reduction.
-@cindex NF
 @item @strong{Note:}
 @code{NF} may be used instead of @code{reduce}.
 @item @strong{Example:}
@@ -4124,7 +4102,7 @@ The regularity is the smallest number $s$ with the property deg($e_{a,i})
  \leq s+i$ for all $i$.
 @end tex
 @*If the input to the commands @code{res} and @code{mres} is homogeneous
-the regularity will be computed and used as a degree bound during
+the regularity is computed and used as a degree bound during
 the computation unless @code{option(notRegularity);} is given.
 @item @strong{Example:}
 @example
@@ -4184,7 +4162,7 @@ $A_1$
 A1
 @end ifinfo
 are the given set of generators of M.
-The computation will stop after k steps, if the int expression k
+The computation stops after k steps, if the int expression k
 is not zero, and returns a list of modules
 @tex
 $M_i={\tt module}(A_i)$, i=1..k.
@@ -4377,7 +4355,7 @@ given as the second argument.
 functions:
 @table @asis
 @item 1
-normalize (leading coefficients will be 1)
+normalize (leading coefficients are 1)
 @item 2
 erase zero generators/columns
 @item 4
@@ -4539,7 +4517,7 @@ M1=coker(A1)
 $M_1=coker(A_1)$
 $$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M_1\longrightarrow 0,$$
 @end tex
-The computation will stop after k steps, if the int expression k
+The computation stops after k steps, if the int expression k
 is not zero, and returns a list of modules (given by standard bases)
 @tex
 $M_i={\tt module}(A_i)$, i=1..k.
@@ -4750,7 +4728,7 @@ ideal
 returns a standard basis of an homogeneous ideal with respect to the
 monomial ordering of the basering
 (Hilbert driven standard basis computation).
-First the hilbert series will be computed (if not given).
+First the hilbert series is computed (if not given).
 @*Use an optional
 second argument as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
@@ -4829,7 +4807,7 @@ the first expression must be of type string and selects the desired function.
 depends on the desired function, may be none
 @item @strong{Purpose:}
 interface to internal data and the operating system.
-@*Not all functions will work on every platform.
+@*Not all functions work on every platform.
 @item @strong{Functions}
 @table @code
 @item @code{system("sh"},string_expression @code{)} 
@@ -5158,7 +5136,7 @@ generated by the initial terms of the given generators.
 If the generators are  a standard basis,
 this is the same as the vector space dimension of the ring (resp.
 free module) modulo the ideal (resp. module).
-@*If the ideal resp. module is not zero-dimensional, -1 will be returned
+@*If the ideal resp.@: module is not zero-dimensional, -1 is returned
 @item @strong{Example:}
 @example
 @c example
@@ -5617,7 +5595,9 @@ returns the result(s) of a procedure.
 @end example
 @end table
 @c ref
-See @ref{Data types}; @ref{proc}; @ref{Return type of procedures}.
+See 
+@ref{Data types}; 
+@ref{proc}.
 @c ref
 @c ---------------------------------------
 @node while, ~ , return, Control structures
@@ -5628,7 +5608,7 @@ See @ref{Data types}; @ref{proc}; @ref{Return type of procedures}.
 @code{while (}boolean_expression@code{)} block
 @item @strong{Purpose:}
 repetitive, conditional execution of block.  
-@*The command @code{break} will leave the innermost @code{while}
+@*The command @code{break} leaves the innermost @code{while}
 construct.
 @item @strong{Example:}
 @example
@@ -5767,7 +5747,7 @@ See @ref{int expressions}; @ref{option}.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-input will be echoed if @code{echo >= voice}.
+input is echoed if @code{echo} >= @code{voice}.
 @*echo is a local setting for a script and defaulted to 0.
 @*echo does not affect the output of commands
 @item @strong{Example:}
@@ -5900,7 +5880,7 @@ int
 @item @strong{Purpose:}
 sets the debug level for dbprint.
 If @code{printlevel} >= @code{voice} @code{dbprint} is equivalent to
-@code{print}, otherwise nothing will be printed.
+@code{print}, otherwise nothing is printed.
 @item @strong{Example:}
 @example
 @c example
@@ -5928,12 +5908,12 @@ See @ref{int expressions}; @ref{dbprint}; @ref{voice}.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-the output of monomials will be in the short manner,
+the output of monomials is done in the short manner,
 if @code{short} is nonzero. A C-like notion is used, if short is zero.
 Both notations may be used as input.
 @*The default depends on the names of the ring variables
 (0 if there are names of variables longer than 1 character, 1 otherwise). Every
-change of the basering sets @code{short} and will overwrite
+change of the basering sets @code{short} and overwrites
 the previous setting.
 @item @strong{Example:}
 @example
