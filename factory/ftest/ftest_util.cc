@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.3 1997-09-24 07:28:10 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.4 1997-09-25 08:00:53 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -156,34 +156,6 @@ ftestSubStr( const char * subString, const char * string )
 }
 //}}}
 
-//{{{ static size_t ftestStrLen( const char * string )
-//{{{ docu
-//
-// ftestStrLen() - return length of string, 0 for zero pointer.
-//
-//}}}
-static size_t
-ftestStrLen( const char * string )
-{
-    return string ? strlen( string ) : 0;
-}
-//}}}
-
-//{{{ static char * ftestStrCat (char * to, const char * from)
-//{{{ docu
-//
-// ftestStrCat() - concatenate (maybe empty) from and to.
-//
-//}}}
-static char *
-ftestStrCat (char * to, const char * from)
-{
-    if ( from )
-	strcat( to, from );
-    return to;
-}
-//}}}
-
 //{{{ static const char * ftestSkipBlancs ( const char * string )
 //{{{ docu
 //
@@ -215,34 +187,29 @@ ftestConcatEnv ( char ** argv, int & optind )
 {
     // first get length
     int i = optind;
-    int len;
-    len = ftestStrLen( getenv( "FTEST_ENV" ) )
-	+ ftestStrLen( getenv( "FTEST_SEED" ) )
-	+ ftestStrLen( getenv( "FTEST_CHAR" ) )
-	+ ftestStrLen( getenv( "FTEST_VARS" ) )
-	+ ftestStrLen( getenv( "FTEST_SWITCHES" ) );
+    int len = 0;
+    const char * envString = getenv( "FTEST_ENV" );
+    if ( envString )
+	len = strlen( envString );
 
     while ( (argv[i] != 0) && (*ftestSkipBlancs( argv[i] ) == '/') ) {
 	len += strlen( argv[i] );
 	i++;
     }
 
-    char * envString = new char[len+1];
+    char * fEnvString = new char[len+1];
 
     // now build string
-    envString[0] = '\0';
-    ftestStrCat( envString, getenv( "FTEST_ENV" ) );
-    ftestStrCat( envString, getenv( "FTEST_SEED" ) );
-    ftestStrCat( envString, getenv( "FTEST_CHAR" ) );
-    ftestStrCat( envString, getenv( "FTEST_VARS" ) );
-    ftestStrCat( envString, getenv( "FTEST_SWITCHES" ) );
+    fEnvString[0] = '\0';
+    if ( envString )
+	strcat( fEnvString, envString );
 
     while ( optind < i ) {
-	strcat( envString, argv[optind] );
+	strcat( fEnvString, argv[optind] );
 	optind++;
     }
 
-    return envString;
+    return fEnvString;
 }
 //}}}
 
@@ -528,7 +495,8 @@ ftestParseOutputType ( const char * outputType )
 	case 'a':
 	    ftestPrintResultFlag = 1;
 	    ftestPrintCheckFlag = 1;
-	    ftestPrintTimingFlag = 1; break;
+	    ftestPrintTimingFlag = 1;
+	    ftestPrintEnvFlag = 1; break;
 	default: ftestError( CommandlineError, "unknown output type specifier `%c'\n", *outputType );
 	}
 	outputType++;
@@ -700,7 +668,16 @@ ftestGetOpts ( const int argc, char ** argv, int & optind )
     // parse command line
     GetOpt getopt( argc, argv, "a:o:c:" );
     int optionChar;
-    char * outputType = getenv( "FTEST_OUTPUT" );
+    const char * outputType = 0;
+    const char * envString = 0;
+
+    // read from environment first
+    envString = getenv( "FTEST_ALARM" );
+    if ( envString )
+	ftestAlarm = (int)strtol( envString, 0, 0 );
+    envString = getenv( "FTEST_CIRCLE" );
+    if ( envString )
+	ftestCircle = (int)strtol( envString, 0, 0 );
 
     // parse options
     while ( (optionChar = getopt()) != EOF ) {
@@ -843,6 +820,35 @@ ftestPrintEnv ()
 // - garbage.
 //
 
+#if 0
+//{{{ static size_t ftestStrLen( const char * string )
+//{{{ docu
+//
+// ftestStrLen() - return length of string, 0 for zero pointer.
+//
+//}}}
+static size_t
+ftestStrLen( const char * string )
+{
+    return string ? strlen( string ) : 0;
+}
+//}}}
+
+//{{{ static char * ftestStrCat (char * to, const char * from)
+//{{{ docu
+//
+// ftestStrCat() - concatenate (maybe empty) from and to.
+//
+//}}}
+static char *
+ftestStrCat (char * to, const char * from)
+{
+    if ( from )
+	strcat( to, from );
+    return to;
+}
+//}}}
+
 //{{{ static void ftestSetSeed ()
 //{{{ docu
 //
@@ -956,3 +962,4 @@ ftestSetEnv ()
     ftestSetVars();
 }
 //}}}
+#endif
