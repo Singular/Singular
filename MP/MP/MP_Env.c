@@ -56,7 +56,7 @@
  ***************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Env.c,v 1.1.1.1 1997-05-25 20:31:46 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Env.c,v 1.2 1997-06-05 16:38:52 obachman Exp $";
 #endif /*lint */
 
 #include <values.h>  /* to figure out if we use IEEE or not */
@@ -182,7 +182,7 @@ MP_Status_t open_logfile(env)
 #endif     
 
       /* Store the log file name. */
-      env->logfilename = IMP_MemAllocFnc(strlen(fname) + 1);
+      env->logfilename = IMP_RawMemAllocFnc(strlen(fname) + 1);
       if (env->logfilename == NULL) {
         fprintf(stderr, "MP_InitializeEnv: can't allocate memory!!\n");
         fflush(stderr);
@@ -345,7 +345,7 @@ void MP_ReleaseEnv(env)
 #ifndef NO_LOGGING
     fprintf(env->logfd, "\nReleasing MP environment resources. \n");
     fclose(env->logfd);
-    IMP_MemFreeFnc(env->logfilename, strlen(env->logfilename));
+    IMP_RawMemFreeFnc(env->logfilename);
 #endif
 
     mp_free_env_transp_list(env);
@@ -494,7 +494,7 @@ MP_Status_t MP_AddEnvTranspDevice(env, transp_dev, ops)
     MP_TranspList_pt tp;
 
 #ifdef MP_DEBUG
-    fprintf(stderr,"MP_AddEnvTranspDevice: entering to add device %s\n", name);
+    fprintf(stderr,"MP_AddEnvTranspDevice: entering to add device %d\n", transp_dev);
     fflush(stderr);
 #endif
 

@@ -65,7 +65,7 @@
  **************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Get.c,v 1.1.1.1 1997-05-25 20:31:46 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Get.c,v 1.2 1997-06-05 16:38:54 obachman Exp $";
 #endif /* lint */
  
 #include "MP.h"
@@ -176,11 +176,11 @@ MP_Status_t IMP_GetNodeHeader(link, ntype, dtag, cv, num_annots, num_child)
     MP_NumChild_t *num_child;
 #endif
 {
+    unsigned char t;
+    MP_Status_t status;
 #ifdef MP_DEBUG
     fprintf(stderr, "IMP_GetNodeHeader: entering for link %d\n", link->link_id);
 #endif
-    unsigned char t;
-    MP_Status_t status;
     /*
      * For now we don't let the programmer in on this little secret (unless,
      * of course, you are looking at the code :-0).  Make sure that the

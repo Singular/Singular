@@ -118,7 +118,7 @@ maintainer-clean: distclean
 	@echo "You need perl to rebuild the deleted file"
 	rm -f MP.h 
 	
-MP.h: ${HEADERS} 
+MP.h: ${HEADERS}
 	perl ./makeheader.pl -I${hdir} ${hdir}/MP.h MP.h
 
 MP_Config.h: stamp-h

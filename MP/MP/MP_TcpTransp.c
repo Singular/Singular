@@ -73,7 +73,7 @@
 
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.1.1.1 1997-05-25 20:31:47 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.2 1997-06-05 16:38:56 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -178,6 +178,9 @@ static int get_tcp_mode(argc, argv)
             return MP_LISTEN_MODE;
         else if (!strcmp(cmode, "launch"))
             return MP_LAUNCH_MODE;
+        else if (!strcmp(cmode, "fork"))
+          return MP_FORK_MODE;
+    
 
 #ifdef MP_DEBUG
     fprintf(stderr, "get_tcp_mode: exiting\n");
@@ -612,6 +615,117 @@ MP_Status_t open_tcp_listen_mode(link, argc, argv)
 
 
 /***********************************************************************
+ * FUNCTION:  open_tcp_fork_mode
+ * INPUT:     link - pointer to link structure for this connection
+ * OUTPUT:    Success:  MP_Success
+ *                      socket connected to the a forked child
+ *            Failure:  MP_Failure - couldn't make the connection.
+ * OPERATION: forks a child, establishes a connection to it and uses
+ *            the return of the fork to set parent/child attribute
+ ***********************************************************************/
+#ifdef __STDC__
+MP_Status_t open_tcp_fork_mode(MP_Link_pt link, int argc, char** argv)
+#else
+MP_Status_t open_tcp_fork_mode(link, argc, argv)
+    MP_Link_pt   link;
+    int          argc;
+    char**       argv;
+#endif
+{
+  int pid;
+  MP_TCP_t *tcp_rec = (MP_TCP_t *) link->transp.private1;
+#ifndef NO_LOGGING
+  char log_msg[200];
+  char *parent_logfilename = link->env->logfilename;
+  FILE *parent_logfd = link->env->logfd;
+#endif
+  
+  /* prepare the socket */
+  if (open_tcp_listen_mode(link, argc, argv) != MP_Success)
+  {
+    MP_LogEvent(link, MP_ERROR_EVENT,
+                "MP_OpenLink: can't open a listening socket");
+    return MP_SetError(link, MP_CantConnect);
+  }
+
+#ifndef NO_LOGGING
+  /* Open the log file before the fork, so that the processes do not
+     get out of sync */
+  sprintf(log_msg,
+          "open_tcp_fork: Preparing to create fork link, parent id: %d",
+          getpid());
+  if (open_logfile(link->env) != MP_Success) return MP_Failure;
+  MP_LogEvent(link, MP_INIT_EVENT,
+              "open_tcp_fork: MP Log file for a forked (child) link");
+  sprintf(log_msg, "open_tcp_fork: Parent link: L%d, logfile: %s, pid: %d",
+          link->link_id, parent_logfilename, getpid());
+  MP_LogEvent(link, MP_INIT_EVENT, log_msg);
+#endif
+  
+  /* Do the fork */
+  if ((pid = fork()) == -1)
+  {
+#ifndef NO_LOGGING
+    link->env->logfilename = parent_logfilename;
+    link->env->logfd = parent_logfd;
+#endif    
+    MP_LogEvent(link, MP_ERROR_EVENT, "MP_OpenLink: can't fork");
+    return MP_SetError(link, MP_Failure);
+  }
+
+  if (!pid)
+  {
+    /* Child's business */
+    MP_Status_t stat;
+    char cport[12];
+    char *argv[] = {"MPtransp","TCP","-MPmode","connect","-MPhost",
+                    "localhost", "-MPport", ""};
+    sprintf(cport,"%d",tcp_rec->peerport);
+    argv[7] = cport;
+    tcp_rec->isparent = 0;
+
+    /* establish connection */
+    stat = open_tcp_connect_mode(link, 8, argv);
+
+#ifndef NO_LOGGING
+    IMP_RawMemFreeFnc(parent_logfilename);
+    if (stat == MP_Success)
+      sprintf(log_msg, "open_tcp_fork: opened forked link, child id: %d",
+              getpid());
+    else
+      sprintf(log_msg,
+              "open_tcp_fork: open of forked link failed, child is exited");
+    MP_LogEvent(link, MP_ERROR_EVENT, log_msg);
+#endif
+    if (stat != MP_Success)
+      _exit(1);
+    else
+      return MP_Success;
+  }
+  else
+  {
+    /* parent's business */
+#ifndef NO_LOGGING
+    /* reset logging stuff */
+    link->env->logfilename = parent_logfilename;
+    link->env->logfd = parent_logfd;
+#endif
+
+    /* establish connection */
+    socket_accept_blocking(link, &tcp_rec->sock);
+    tcp_rec->isparent = 1;
+
+#ifndef NO_LOGGING
+    sprintf(log_msg,"open_tcp_fork: opened fork link, parent id: %d",
+            getpid()); 
+    MP_LogEvent(link, MP_INIT_EVENT, log_msg);
+#endif
+
+    RETURN_OK(link);
+  }
+}
+  
+/***********************************************************************
  * FUNCTION:  open_tcp_connect_mode
  * INPUT:     link - pointer to link structure for this connection
  *            argc - number of arguments in argv
@@ -877,6 +991,13 @@ MP_Boolean_t tcp_get_status(link, status_to_check)
 #ifdef MP_DEBUG
     printf("tcp_get_status: entering for link %d\n", link->link_id);
 #endif
+  if (status_to_check == MP_LinkIsParent)
+  {
+    if (((MP_TCP_t *)link->transp.private1)->isparent)
+      return MP_TRUE;
+    else
+      return MP_FALSE;
+  }
 
     FD_ZERO(&mask);
     FD_SET(sock, &mask);
@@ -1121,6 +1242,7 @@ MP_Status_t tcp_init_transport(link)
     tcp_rec->peerport = 0;
     tcp_rec->myhost   = NULL;
     tcp_rec->peerhost = NULL;
+    tcp_rec->isparent   = 0;
 
     link->transp.private1 = (char *)tcp_rec;
 
@@ -1131,8 +1253,6 @@ MP_Status_t tcp_init_transport(link)
 
     RETURN_OK(link);
 }
-
-
 
 /***********************************************************************
  * FUNCTION:  tcp_close_connection
@@ -1237,6 +1357,10 @@ MP_Status_t tcp_open_connection(link, argc, argv)
         status = open_tcp_launch_mode(link, argc, argv);
         break;
 
+        case MP_FORK_MODE:
+          status = open_tcp_fork_mode(link, argc, argv);
+          break;
+          
     default:
         MP_LogEvent(link, MP_ERROR_EVENT,
                     "Can't open connection, unknown -MPmode argument");

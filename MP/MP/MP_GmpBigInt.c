@@ -47,10 +47,10 @@ MP_Status_t IMP_PutGmpInt(link, mp_apint)
     MP_ApInt_t  mp_apint;
 #endif
 {
+  mpz_ptr apint = (mpz_ptr) mp_apint;
 #ifdef MP_DEBUG
   fprintf(stderr, "IMP_PutGmpInt: entering\n"); fflush(stderr);
 #endif
-  mpz_ptr apint = (mpz_ptr) mp_apint;
 
   if (!IMP_PutLong(link, (long *)&(apint->_mp_size)))
     return MP_SetError(link, MP_CantPutDataPacket);

@@ -117,5 +117,5 @@ EXTERN MP_Status_t MP_SetEnvBigIntFormat _ANSI_ARGS_((MP_Env_t *env,
                              MP_BigIntOps_t *ops, MP_BigNumFormat_t format));
 EXTERN MP_Status_t MP_SetEnvBigRealFormat _ANSI_ARGS_((MP_Env_t *env, 
                              MP_BigRealOps_t *ops, MP_BigNumFormat_t format));
- 
+EXTERN MP_Status_t open_logfile _ANSI_ARGS_((MP_ENV env));
 #endif /* _MP_Env_h */

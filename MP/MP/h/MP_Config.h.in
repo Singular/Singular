@@ -51,6 +51,11 @@
 /* Define if you have <sys/select.h> */
 #undef HAVE_SYS_SELECT_H
 
+/* Define if you have BIG ENDIAN numbers */
+#ifndef WORDS_BIGENDIAN
+#undef WORDS_BIGENDIAN
+#endif
+
 /* Define to turn off logging */
 #undef NO_LOGGING
 

@@ -35,7 +35,8 @@
 #define MP_RECEIVE  1
 
 /* For checking the status of a link*/
-enum link_status_option {MP_LinkReadyReading, MP_LinkReadyWriting};
+enum link_status_option {MP_LinkReadyReading, MP_LinkReadyWriting,
+                         MP_LinkIsParent};
 typedef enum link_status_option MP_LinkStatus_t;
 
 /* To determine which byte ordering is native and which is actually used. */

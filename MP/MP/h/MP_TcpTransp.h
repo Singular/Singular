@@ -62,6 +62,7 @@ typedef int SOCKET;
 #define MP_CONNECT_MODE         1
 #define MP_LISTEN_MODE          2
 #define MP_LAUNCH_MODE          3
+#define MP_FORK_MODE            4
 
 /* Initial port for listening */
 #define MP_INIT_PORT            "1025"
@@ -93,6 +94,7 @@ typedef struct{
     short   peerport;
     char    *peerhost;
     char    *myhost;
+    char     isparent;
 } MP_TCP_t;
 
 #endif
