@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.48 1999-03-19 14:18:05 obachman Exp $ */
+/* $Id: ring.cc,v 1.49 1999-03-25 20:18:32 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -523,7 +523,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     
     if (ch!=0 && (ch<2) || (ch > 32003)) 
     {
-      Warn("%d is invalid characteristic of ground field. 32203 is used.", ch);
+      Warn("%d is invalid characteristic of ground field. 32003 is used.", ch);
       ch=32003;
     }
     // load fftable, if necessary
