@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.192 2003-01-29 16:04:18 levandov Exp $ */
+/* $Id: extra.cc,v 1.193 2003-01-29 16:13:10 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1399,11 +1399,17 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (currRing->nc==NULL)
       {
         currRing->nc=(nc_struct *)omAlloc0(sizeof(nc_struct));
+	currRing->nc->ref=1;
       }
       else
       {
         WarnS("redefining algebra structure");
-	/* kill the previous nc data */
+	if (currRing->nc->ref>1) // in use by somebody else
+	  currRing->nc->ref--;
+	else
+	  ncKill(currRing); /* kill the previous nc data */
+	currRing->nc=(nc_struct *)omAlloc0(sizeof(nc_struct));
+	currRing->nc->ref=1;
       }
       currRing->nc->type=nc_general;
       /* C is either a poly (coeff - an int or a number) or a  matrix */

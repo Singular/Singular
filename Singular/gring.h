@@ -3,13 +3,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.15 2003-01-29 16:04:18 levandov Exp $ */
+/* $Id: gring.h,v 1.16 2003-01-29 16:13:11 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
 
 #ifdef HAVE_PLURAL
 #include "structs.h"
+
+void ncKill(ring r);
 
 #define UPMATELEM(i,j,nVar) ( (nVar * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1)-(i) )
 // poly functions defined in p_Procs :

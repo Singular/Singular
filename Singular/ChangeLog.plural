@@ -1,4 +1,9 @@
 29.11.02
+        ref for ncstruct introduced,
+	used in extra.cc ("PLURAL"), rCopy0, rKill
+	new routine ncKill
+
+29.11.02
 	qring q=system("twostd",i); is introduced and tested
 	file: exterior1.tst
 	todo: forbid the use of non-twosided ideals

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.67 2002-11-26 13:54:44 Singular Exp $ */
+/* $Id: structs.h,v 1.68 2003-01-29 16:13:10 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -351,6 +351,7 @@ struct sro_ord
 #ifdef HAVE_PLURAL
 struct nc_struct
 {
+  short ref;
   nc_type type;
   matrix C;
   matrix D;
