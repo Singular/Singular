@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.12 1998-05-04 17:17:28 Singular Exp $
+@comment $Id: singular.doc,v 1.13 1998-05-04 17:41:09 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -60,17 +60,17 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @center Centre for Computer Algebra
 @end ifinfo
 @menu
-* Preface::                     
-* Introduction::                
-* General concepts::            
-* Data types::                  
-* Functions and variables::     
-* Tricks and pitfalls::         
-* Examples::                    
-* Mathematical background::     
-* SINGULAR libraries::          
-* Library function index::      
-* Index::                       
+* Preface::
+* Introduction::
+* General concepts::
+* Data types::
+* Functions and variables::
+* Tricks and pitfalls::
+* Examples::
+* Mathematical background::
+* SINGULAR libraries::
+* Library function index::
+* Index::
 @end menu
 @c ----------------------------------------------------------------------------
 @node Preface, Introduction, Top, Top
@@ -266,7 +266,7 @@ degree of the part at infinity.
 @node standard_lib, all_lib, SINGULAR libraries, SINGULAR libraries
 @section standard_lib
 @cindex standard_lib
-The library @code{standard.lib} provides extensions to the 
+The library @code{standard.lib} provides extensions to the
 set of built-in commands and will be automatically loaded
 during the start of @code{Singular}.
 It contains:

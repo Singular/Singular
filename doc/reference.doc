@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.21 1998-05-04 17:33:18 Singular Exp $
+@comment $Id: reference.doc,v 1.22 1998-05-04 17:41:08 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7,7 +7,7 @@
 @c @setfilename reference.info
 @c @node Top, Functions and variables
 @c @menu
-@c * Functions and variables:: 
+@c * Functions and variables::
 @c @end menu
 @c @node Functions and variables, Tricks and pitfalls, Data types, Top
 @c @chapter Functions and variables
@@ -15,9 +15,9 @@
 
 @c ---------------------------------------
 @menu
-* Functions:: 
+* Functions::
 * Control structures::
-* System variables::  
+* System variables::
 @end menu
 
 
@@ -31,123 +31,123 @@
 @end ifinfo
 @menu
 * attrib::
-* bareiss::   
-* betti:: 
-* char::  
-* char_series::   
-* charstr::   
+* bareiss::
+* betti::
+* char::
+* char_series::
+* charstr::
 * cleardenom::
-* close:: 
-* coef::  
+* close::
+* coef::
 * coeffs::
-* contract::  
-* dbprint::   
-* defined::   
-* deg::   
+* contract::
+* dbprint::
+* defined::
+* deg::
 * degree::
 * delete::
-* det::   
-* diff::  
-* dim::   
-* dump::  
-* eliminate:: 
-* eval::  
-* execute::   
+* det::
+* diff::
+* dim::
+* dump::
+* eliminate::
+* eval::
+* execute::
 * extgcd::
 * facstd::
-* factorize:: 
-* fetch:: 
-* fglm::  
-* filecmd::   
-* find::  
-* finduni::   
+* factorize::
+* fetch::
+* fglm::
+* filecmd::
+* find::
+* finduni::
 * freemodule::
-* gcd::   
-* gen::   
-* getdump::   
-* help::  
-* hilb::  
-* homog:: 
-* imap::  
-* indepSet::  
+* gcd::
+* gen::
+* getdump::
+* help::
+* hilb::
+* homog::
+* imap::
+* indepSet::
 * insert::
-* interred::  
-* intersect:: 
-* jacob:: 
-* jet::   
-* kbase:: 
-* kill::  
+* interred::
+* intersect::
+* jacob::
+* jet::
+* kbase::
+* kill::
 * killattrib::
 * koszul::
-* lead::  
-* leadcoef::  
-* leadexp::   
-* LIB::   
-* lift::  
-* liftstd::   
-* listvar::   
+* lead::
+* leadcoef::
+* leadexp::
+* LIB::
+* lift::
+* liftstd::
+* listvar::
 * lres::
-* maxideal::  
+* maxideal::
 * memory::
-* minbase::   
-* minor:: 
+* minbase::
+* minor::
 * minres::
 * modulo::
-* monitor::   
-* mres::  
-* mstd::  
-* mult::  
+* monitor::
+* mres::
+* mstd::
+* mult::
 * nameof::
-* names:: 
-* ncols:: 
-* npars:: 
-* nrows:: 
-* nvars:: 
-* open::  
+* names::
+* ncols::
+* npars::
+* nrows::
+* nvars::
+* open::
 * option::
-* ord::   
+* ord::
 * ordstr::
-* par::   
+* par::
 * pardeg::
 * parstr::
-* pause:: 
-* preimage::  
-* prime:: 
-* print:: 
-* prune:: 
-* qhweight::  
-* quote:: 
-* quotient::  
+* pause::
+* preimage::
+* prime::
+* print::
+* prune::
+* qhweight::
+* quote::
+* quotient::
 * random::
-* read::  
+* read::
 * reduce::
 * regularity::
-* res::   
-* reservedName::  
-* resultant:: 
-* rvar::  
-* setring::   
-* simplify::  
-* size::  
-* sortvec::   
-* sres::  
+* res::
+* reservedName::
+* resultant::
+* rvar::
+* setring::
+* simplify::
+* size::
+* sortvec::
+* sres::
 * status::
-* std::   
-* stdfglm::   
+* std::
+* stdfglm::
 * stdhilbert::
-* subst:: 
+* subst::
 * system::
-* syz::   
-* trace:: 
-* transpose:: 
-* type::  
+* syz::
+* trace::
+* transpose::
+* type::
 * typeof::
-* var::   
+* var::
 * varstr::
-* vdim::  
-* wedge:: 
+* vdim::
+* wedge::
 * weight::
-* write:: 
+* write::
 @end menu
 @c ---------------------------------------
 @node attrib, bareiss, Functions, Functions
@@ -5078,16 +5078,16 @@ See @ref{read}, @ref{link}, @ref{Expressions}; @ref{expression list};
 @*List of all supported control structures.
 @end ifinfo
 @menu
-* break:: 
-* continue::  
-* else::  
+* break::
+* continue::
+* else::
 * export::
-* for::   
+* for::
 * if::
-* keepring::  
-* quit::  
+* keepring::
+* quit::
 * return::
-* while:: 
+* while::
 @end menu
 @c ---------------------------------------
 @node break, continue, Control structures, Control structures
@@ -5411,16 +5411,16 @@ See @ref{block}; @ref{boolean expressions}; @ref{break}.
 @*List of all system variables.
 @end ifinfo
 @menu
-* degBound::  
-* echo::  
-* minpoly::   
-* multBound:: 
-* noether::   
+* degBound::
+* echo::
+* minpoly::
+* multBound::
+* noether::
 * printlevel::
-* short:: 
-* timer:: 
-* TRACE var:: 
-* voice:: 
+* short::
+* timer::
+* TRACE var::
+* voice::
 @end menu
 @c ---------------------------------------
 @c @node alternating, degBound, System variables, System variables

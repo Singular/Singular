@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.20 1998-05-04 17:17:29 Singular Exp $
+@comment $Id: types.doc,v 1.21 1998-05-04 17:41:10 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -7,30 +7,30 @@
 @c @setfilename types.info
 @c @node Top, Data types
 @c @menu
-@c * Data types::     
+@c * Data types::
 @c @end menu
 @c @node Data types, , Top, Top
 @c @chapter Data types
 
 @menu
-* def::                         
-* ideal::                       
-* int::                         
-* intmat::                      
-* intvec::                      
-* link::                        
-* list::                        
-* map::                         
-* matrix::                      
-* module::                      
-* number::                      
-* poly::                        
-* proc::                        
-* qring::                       
+* def::
+* ideal::
+* int::
+* intmat::
+* intvec::
+* link::
+* list::
+* map::
+* matrix::
+* module::
+* number::
+* poly::
+* proc::
+* qring::
 * resolution::
-* ring::                        
-* string::                      
-* vector::                      
+* ring::
+* string::
+* vector::
 @end menu
 
 @cindex expression list
@@ -58,7 +58,7 @@ An expression list is any comma separated list of expressions.
 @c {{{ section def }}}
 @c ------------------------------
 @menu
-* def declarations::            
+* def declarations::
 @end menu
 
 Objects may also be defined without a type: they get their
@@ -122,10 +122,10 @@ See @ref{untyped definitions}; @ref{typeof}.
 
 @c {{{ section ideal }}}
 @menu
-* ideal declarations::          
-* ideal expressions::           
-* ideal operations::            
-* ideal related functions::     
+* ideal declarations::
+* ideal expressions::
+* ideal operations::
+* ideal related functions::
 @end menu
 
 Ideals are represented as lists of polynomials which generate the ideal.
@@ -783,10 +783,10 @@ trace of an intmat (see @ref{trace})
 
 @c {{{ section intvec }}}
 @menu
-* intvec declarations::         
-* intvec expressions::          
-* intvec operations::           
-* intvec related functions::    
+* intvec declarations::
+* intvec expressions::
+* intvec operations::
+* intvec related functions::
 @end menu
 
 Variables of type intvec are lists of integers.
@@ -939,7 +939,7 @@ returns weights for the weigted ecart method (see @ref{weight})
 
 Links describe the communication channels of @sc{Singular}, i.e.
 something @sc{Singular} can write to and/or read from. Currently,
-@sc{Singular} supports four different link types: @ref{ASCII links},  
+@sc{Singular} supports four different link types: @ref{ASCII links},
 @ref{MPfile links}, @ref{MPtcp links}, and @ref{DBM links}.
 
 @c ------------------------------
@@ -1076,7 +1076,7 @@ Types without a conversion to @code{string} cannot be written.
   ideal i=maxideal(2);
   write (l,1,";",2,";","ideal i=",i,";");
   status(l, "open", "yes");    // now link is open
-  status(l, "mode");           // for writing 
+  status(l, "mode");           // for writing
   write("example.txt","int j=5;");// data is appended to file
   read("example.txt");         // data is returned as string
   close(l);                    // link is closed
@@ -1113,16 +1113,16 @@ ring.  Currently, data is written without attributes (which is likely to
 change in future versions). For a general description of MP, see
 @code{http://symbolicnet.mcs.kent.edu:/areas/mp.html}.
 
-@strong{Restrictions:} 
+@strong{Restrictions:}
 @enumerate
-@item MP links are currently only implemented for Unix platforms. 
-@item Objects of type @code{number} are always communicated as 
+@item MP links are currently only implemented for Unix platforms.
+@item Objects of type @code{number} are always communicated as
 objects of type @code{poly}.
 @end enumerate
 
 @menu
-* MPfile links::                
-* MPtcp links::                 
+* MPfile links::
+* MPtcp links::
 @end menu
 
 @node MPfile links, MPtcp links, MP links, MP links
@@ -1186,12 +1186,12 @@ change of i/o direction.
 MPtcp links give the possibility to exchange data in the binary MP
 format between two processes which may run on the same or different
 computers. MPtcp links can be opened in four different modes: listen,
-connect, launch, and fork. 
+connect, launch, and fork.
 
 @*Opening an MPtcp link in listen mode blocks
 until a connection to the specified port was made by a connect
 call. Opening a MPtcp link in connect mode, supposes that an application
-is listening for a connection at the specified host and port. 
+is listening for a connection at the specified host and port.
 
 @*Opening an MPtcp link in launch mode, launches the specified
 application (using rsh, i.e., the application to launch must either be
@@ -1210,7 +1210,7 @@ connection between the parent (client) and child (server) is
 established, the child @sc{Singular} goes into server mode. All
 variables and their values which existed in the parent
 @sc{Singular} befor the fork link was opened, are inherited by the child
-(i.e. forked) @sc{Singular}. 
+(i.e. forked) @sc{Singular}.
 
 @*To arrange the
 evaluation of an expression by a server, the expression must be quoted,
@@ -1233,18 +1233,18 @@ MPtcp links should explicitely be opened before being used. MPtcp links
 are bidirectional, i.e., can be be used for both, writing and
 reading. Reading from an MPtcp link blocks until data was written to
 that link. The @code{status} command can be used to check whether there
-is data to read. 
+is data to read.
 
 @enumerate
 @item @code{"MPtcp: launch"}
 @item @code{"MPtcp: launch --MPapplication "} + application
 @item @code{"MPtcp: launch --MPhost "} + hostname
 @item @code{"MPtcp: launch --MPhost "} + hostname +
-@code{" --MPapplication "} + application 
+@code{" --MPapplication "} + application
 @item @code{"MPtcp: listen --MPport "} + portnumber
 @item @code{"MPtcp: connect --MPport "} + portnumber
 @item @code{"MPtcp: connect --MPhost" } + hostname @code{" --MPport "} +
-portnumber 
+portnumber
 @end enumerate
 
 @strong{Example:}
@@ -1252,9 +1252,9 @@ portnumber
 @c example
   LIB "general.lib"; // needed for "which" and "killall" commands
   // MPtcp:launch link for launching Singular in batch modus
-  // on the local host 
+  // on the local host
   link l="MPtcp:launch";
-  open(l); 
+  open(l);
   l; // notice that link is ready for writing but not for reading
   ring r; ideal i=x2+y,xyz+z,x2+y2;
   write (l,quote(std(eval(i)))); // std(i) is computed on server
@@ -1269,8 +1269,8 @@ portnumber
   write(l, killall); read(l);
                      // write killall procedure to server
   // and kill everything in server, but links (need to protect mp_ll)
-  write(l, quote(killall("not", "link"))); read(l); 
-  write(l, quote(getdump(mp_ll))); // server gets dump 
+  write(l, quote(killall("not", "link"))); read(l);
+  write(l, quote(getdump(mp_ll))); // server gets dump
   dump(l);           //  dump is written to server (includes proc's)
   read(l);           // result of previous write-command is read
   killall("not", "link"); killall("proc");
@@ -1486,9 +1486,9 @@ free resolution of an ideal/module given by a standard base (see @ref{sres})
 
 @c {{{ section map }}}
 @menu
-* map declarations::            
-* map expressions::             
-* map related functions::       
+* map declarations::
+* map expressions::
+* map related functions::
 @end menu
 
 Maps are ring maps from a preimage ring into the base ring.
@@ -1793,10 +1793,10 @@ wedge product (see @ref{wedge})
 
 @c {{{ section module }}}
 @menu
-* module declarations::         
-* module expressions::          
-* module operations::           
-* module related functions::    
+* module declarations::
+* module expressions::
+* module operations::
+* module related functions::
 @end menu
 
 Modules are submodules of a free module over the base ring with basis
@@ -2025,9 +2025,9 @@ vector space dimension of free module over the basering modulo module (see @ref{
 @c {{{ section number }}}
 @c ------------------------------
 @menu
-* number declarations::         
-* number expressions::          
-* number operations::           
+* number declarations::
+* number expressions::
+* number operations::
 @end menu
 
 Numbers are the coefficients of a monomial (power products of ring variables).
@@ -2390,9 +2390,9 @@ none
 @cindex resolution
 
 @menu
-* resolution declarations::          
-* resolution expressions::           
-* resolution related functions::     
+* resolution declarations::
+* resolution expressions::
+* resolution related functions::
 @end menu
 
 Resolutions are represented as lists of ideals/modules which generate the
@@ -2476,7 +2476,7 @@ free resolution of a standard basis (see @ref{sres})
 Rings are ... . See @ref{Rings and orderings}.
 
 @menu
-* ring declarations::           
+* ring declarations::
 @end menu
 
 @node ring declarations,  , ring, ring
@@ -2497,7 +2497,7 @@ and matrices and sets it as the actual basering.
 
 The coefficient field is given by either
 @enumerate
-@item 
+@item
 the characteristic (0 or a prime <= 32003)
 @item
 an expression_list of the characteristic and

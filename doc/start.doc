@@ -1,10 +1,10 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.3 1998-05-04 10:24:19 schmidt Exp $
+@comment $Id: start.doc,v 1.4 1998-05-04 17:41:10 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @menu
-* Background::                  
-* How to use this manual::      
-* Getting started::             
+* Background::
+* How to use this manual::
+* Getting started::
 @end menu
 
 @node Background, How to use this manual, Introduction, Introduction
@@ -87,4 +87,4 @@ index}, resp.
 
 @node Getting started,  , How to use this manual, Introduction
 @section Getting started
-@cindex Getting started 
+@cindex Getting started

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.22 1998-05-04 17:19:45 Singular Exp $
+@comment $Id: general.doc,v 1.23 1998-05-04 17:41:05 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -7,17 +7,17 @@
 @c @setfilename general.info
 @c @node Top, General concepts
 @c @menu
-@c * General concepts::     
+@c * General concepts::
 @c @end menu
 @c @node General concepts, Data types, Introduction, Top
 @c @chapter General concepts
 
 
 @menu
-* Interactive use::             
-* Rings and orderings::         
-* Implemented algorithms::      
-* The SINGULAR language::       
+* Interactive use::
+* Rings and orderings::
+* Implemented algorithms::
+* The SINGULAR language::
 * Procedures::
 * Libraries::
 * Debugging tools::
@@ -31,15 +31,15 @@
 @cindex Interactive use
 
 @menu
-* How to enter and exit::       
-* SINGULAR prompt and error recovery::  
-* The online help system::      
-* Interrupting SINGULAR::       
-* Editing input::               
-* Control parameters::          
-* Startup sequence::            
-* Reuse of output::             
-* Commandline options::         
+* How to enter and exit::
+* SINGULAR prompt and error recovery::
+* The online help system::
+* Interrupting SINGULAR::
+* Editing input::
+* Control parameters::
+* Startup sequence::
+* Reuse of output::
+* Commandline options::
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -55,11 +55,11 @@ and a short remark how to get help on
 Enter @code{help;} to get the online manual at the @sc{Singular} prompt
 @code{>}.
 Commands are always ended with a @code{;} (semicolon) and @code{<ENTER>}.
-Spaces and commas are always considered as separators. 
+Spaces and commas are always considered as separators.
 @*To exit @sc{Singular} enter @code{quit;}, @code{exit;} or @code{$}.
 
 
-@sc{Singular} may also be started with command-line options and with 
+@sc{Singular} may also be started with command-line options and with
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
 @*@code{  Singular  [options] [file1 [file2 ...]] }
 
@@ -68,9 +68,9 @@ filenames as arguments. More generally, the synopsis of @sc{Singular} is
 * Commandline options::
 @end menu
 
-@*On start-up, @sc{Singular} 
+@*On start-up, @sc{Singular}
 @enumerate
-@item 
+@item
 loads the library @code{standard.lib} (provided the @code{--no-stdlib}
 was not given)
 
@@ -80,9 +80,9 @@ home directory of the user for a file named @code{.singularrc} and
 executes it, if found (provided the @code{--no-rc} options was not
 given)
 
-@item 
+@item
 executes the files @code{file1}, @code{file2} ...  (given on the command
-line) in that order. 
+line) in that order.
 @end enumerate
 
 Unless otherwise specified, @sc{Singular} locates all (data) files and
@@ -124,7 +124,7 @@ and the name of an "Up" node (@code{Up:}).
 To move within info type commands of single characters and do not type a RETURN
 character. The most important commands:
 @table @asis
-@item @code{q} 
+@item @code{q}
 leave info
 @item @code{n}
 go to the "next" node
@@ -289,40 +289,40 @@ The synopsis of @sc{Singular} is
 short format):
 @table @asis
 
-@item @code{-b},@code{--batch} 
+@item @code{-b},@code{--batch}
 Run in MP batch mode. Opens a TCP/IP connection with host specified by
 @code{--MPhost} at the port specified by @code{--MPport}. Input is read
 from and output is written to this connection in the MP format.
 
-@item @code{-h},@code{--help} 
+@item @code{-h},@code{--help}
 Print a short help message and exit.
 
 @item @code{-q},@code{--quiet}
 Do not print start-up banner and warnings and redirect stderr (all error
 messages)  to stdout (normal output channel).
 
-@item @code{-t},@code{--no-tty} 
+@item @code{-t},@code{--no-tty}
 Do not redefine the terminal characteristics (useful for batch
-processes, see @ref{Editing input}).  
+processes, see @ref{Editing input}).
 
-@item @code{-v},@code{--version}             
+@item @code{-v},@code{--version}
 Print extended information about the version and configuration of
 @sc{Singular}  (used optional parts, compilation date, start of random
 generator etc.). This information should be included if a user reports
 an error to the authors.
 
-@item @code{-e},@code{--echo[=VAL]} 
+@item @code{-e},@code{--echo[=VAL]}
 Set value of variable @code{echo} to @code{VAL} (integer in the range 0
 .. 9). Without an argument, @code{echo} is set to 1, which echoes all
 input coming from a file. By default, the value of @code{echo} is 0. See
 also @ref{System variables}.
 
-@item @code{-c},@code{--execute=STRING} 
+@item @code{-c},@code{--execute=STRING}
 Execute @code{STRING} as a (sequence) of @sc{Singular} commands on
 start-up after the @code{.singularrc} file is executed, but prior to
 executing the files given on the command line.
 
-@item @code{-r},@code{--random=SEED}         
+@item @code{-r},@code{--random=SEED}
 Seed (i.e., set initial value of) pseudo random generator with integer
 (integer) @code{SEED} (integer). If this option is not given, then the
 random generated is seeded with a time-based @code{SEED} (e.g., the
@@ -330,17 +330,17 @@ number of seconds since January, 1, 1970, on Unix systems).
 
 @item @code{-u},@code{--user-option=STRING}
 Returns @code{STRING} on @code{system("--user-option")}. This is useful
-for passing arbitrary arguments (like filenames) from the command line to 
+for passing arbitrary arguments (like filenames) from the command line to
 the @sc{Singular} interpreter (i.e. top-level of @sc{Singular}).
 
 @item @code{--no-stdlib}
 Do not load the library @code{standard.lib} on start-up. By default,
 this library is loaded on start-up.
 
-@item @code{--no-rc}               
+@item @code{--no-rc}
 Do not execute the @code{.singularrc} file on start-up. By default,
 @sc{Singular} searches first in the current directory and then in the
-home directory of the user for a file named @code{.singularrc}. If it is 
+home directory of the user for a file named @code{.singularrc}. If it is
 found, then it is executed after the library @code{standard.lib} is
 loaded and prior to executing the string specified by
 @code{--user-option}.
@@ -351,7 +351,7 @@ If the @code{timer} variables is set, do only report times larger than
 greater than 0). By default, this value is set to 0.5 (i.e., half a
 second).
 
-@item @code{--MPport=PORT} 
+@item @code{--MPport=PORT}
 Use @code{PORT} as default port number for MP connections (whenever not
 further specified) . This option is mandatory when the @code{--batch}
 option is given. See also @ref{MPtcp links}.
@@ -361,8 +361,8 @@ Use @code{HOST} as default host for MP connections (whenever not
 further specified) . This option is mandatory when the @code{--batch}
 option is given. See also @ref{MPtcp links}.
 
-@item @code{--ticks-per-sec=TICKS} 
-Sets unit of timer to @code{TICKS} per second (i.e. the value reported by 
+@item @code{--ticks-per-sec=TICKS}
+Sets unit of timer to @code{TICKS} per second (i.e. the value reported by
 the @code{timer} variable multiplied by @code{TICKS} gives the time in
 seconds.By default, this value is 1.
 
@@ -376,9 +376,9 @@ seconds.By default, this value is 1.
 @cindex Rings and orderings
 
 @menu
-* Available rings::             
-* General syntax of a ring definition::  
-* Term orderings::              
+* Available rings::
+* General syntax of a ring definition::
+* Term orderings::
 @end menu
 
 @c ---------------------------------------------------------------------------
@@ -796,7 +796,7 @@ and tangent cone orderings (Mora algorithm) as special cases.
 Different syzygy algorithms, free resolutions (@code{sres, res, mres}) for computation of free resolutions
 of modules over the above rings are implemented.
 
-Combinatorial algorithms for computing dimensions, hilbert series, multiplicities, ... 
+Combinatorial algorithms for computing dimensions, hilbert series, multiplicities, ...
 
 An algorithm for uni- and multivariate polynomial factorization.
 
@@ -923,11 +923,11 @@ the functions of the kernel of @sc{Singular} and from other libraries.
 See the section 'Writing procedures' of the tutorial.
 
 @menu
-* General command syntax::      
-* Special characters::          
-* Names and objects::           
-* Type conversion and casting::  
-* Control structures::          
+* General command syntax::
+* Special characters::
+* Names and objects::
+* Type conversion and casting::
+* Control structures::
 @end menu
 
 @node General command syntax, Special characters, The SINGULAR language, The SINGULAR language
@@ -1487,9 +1487,9 @@ See @ref{if}; @ref{for}; @ref{while}; @ref{proc}
 Procedures are user-defined functions containing sequences of @sc{Singular}
 commands. Several procedures can be stored in a file which is then
 called a library. Procedures and libraries have to comply with special
-syntax-rules described in this chapter. 
+syntax-rules described in this chapter.
 
-The @sc{Singular} distribution contains sevaral libraries. 
+The @sc{Singular} distribution contains sevaral libraries.
 @c @ifset singularmanual
 (See @ref{SINGULAR libraries} for a complete list of available libraries.)
 @c @end ifset

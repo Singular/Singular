@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.4 1998-04-30 09:30:53 Singular Exp $
+@comment $Id: math.doc,v 1.5 1998-05-04 17:41:07 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @menu
@@ -945,14 +945,14 @@ of M.
 The length of the sequence is at most n, where n is the number of variables in
 the polynomial resp. power series ring.
 Free resolutions over other rings may be infinite.
-Considreed as modules, 
+Considered as modules,
 @tex
 $A_1$
 @end tex
 @ifinfo
 A1
 @end ifinfo
-is a set of generators of the input, 
+is a set of generators of the input,
 @tex
 $A_2$
 @end tex
