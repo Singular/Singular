@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.15 2001-08-09 13:10:32 Singular Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.16 2002-01-22 16:17:43 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>
@@ -674,8 +674,11 @@ void omUnMarkAsStaticAddr(void* addr)
 static void _omMarkAsStatic(void* addr)
 {
   omTrackAddr d_addr = (omTrackAddr) addr;
-  omAssume(omIsTrackAddr(addr) && omOutAddr_2_TrackAddr(addr) == d_addr);
-  d_addr->flags |= OM_FSTATIC;
+  if (!omCheckPtr(addr, omError_MaxError, OM_FLR))
+  {  
+    omAssume(omIsTrackAddr(addr) && omOutAddr_2_TrackAddr(addr) == d_addr);
+    d_addr->flags |= OM_FSTATIC;
+  }  
 }
 
 static void _omUnMarkAsStatic(void* addr)

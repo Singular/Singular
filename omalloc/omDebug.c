@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.16 2001-08-09 13:10:32 Singular Exp $
+ *  Version: $Id: omDebug.c,v 1.17 2002-01-22 16:17:41 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>
@@ -512,7 +512,7 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_F
       omError_t status = omDoCheckAddr(om_KeptAddr, NULL, OM_FKEPT, om_Opts.MinCheck,
                                        omError_MemoryCorrupted, OM_FLR_VAL);
       addr = om_KeptAddr;
-      om_KeptAddr = *((void**) addr);
+      if (addr!=NULL) om_KeptAddr = *((void**) addr);
       om_NumberOfKeptAddrs--;
       if (status != omError_NoError) return;
     }

@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.13 2001-04-30 09:02:04 Singular Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.14 2002-01-22 16:17:43 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include <stdarg.h>
@@ -420,7 +420,8 @@ omError_t omReportAddrError(omError_t error, omError_t report_error, void* addr,
 
 void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, int frames, char* s)
 {
-  if (! omCheckPtr(addr, omError_MaxError, OM_FLR))
+  int x;
+  if (! (x=omCheckPtr(addr, omError_MaxError, OM_FLR)))
   {
     fprintf(fd, "%s addr:%p size:%ld", s, addr, omSizeOfAddr(addr));
 
@@ -437,7 +438,7 @@ void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omT
   }
   else
   {
-    fprintf(fd, "%s (invalid) addr: %p\n", s, addr);
+    fprintf(fd, "%s (invalid) addr: %p (error=%d)\n", s, addr,x);
   }
 }
 
