@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.77 1999-11-18 16:29:32 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.78 1999-11-29 13:01:28 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -326,7 +326,7 @@ extern int pShortOut;
 
 /* set to 0 to disable aso memory mamagent */
 #ifndef HAVE_ASO
-#define HAVE_ASO 1
+#define HAVE_ASO 0
 #endif
 #if defined(HAVE_ASO) && HAVE_ASO == 1
 /* define to enable ASO debugging */
