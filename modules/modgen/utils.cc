@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.10 2000-12-05 15:26:59 obachman Exp $
+ * $Id: utils.cc,v 1.11 2001-05-23 20:11:49 anne Exp $
  */
 
 #include <stdio.h>
@@ -96,7 +96,7 @@ char *build_filename(
   int what
 )
 {
-  char* p = (char*) malloc(512*sizeof(char));
+  static char p[512];
 
   switch(what) 
     {
@@ -110,7 +110,7 @@ char *build_filename(
           snprintf(p, sizeof(p), "%s/%s.bin", module->name, text);
           break;
         default:
-          snprintf(p, sizeof(p), "%s/%s", module->name, text);
+          snprintf(p, sizeof(p), "%s/%s", module->name, text); 
           break;
     }
   
