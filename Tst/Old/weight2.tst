@@ -1,3 +1,4 @@
+option(prot);
 ring h2=32003,(t,x,y,z),dp;
 ideal i=
 2t3x5y2z+x2t5y+2x2y,
@@ -40,6 +41,7 @@ kill s6,e,a,b,c,alpha,beta,t;
 ring s12=32003,(x,y,z,w),dp;
 ideal i0=x2-z10-z20,xy3-z10-z30,y6-xy3w40;
 ideal i=interred(i0^3);
+i;
 intvec e=weight(i);
 e;
 //ring r=32003,(u,v,a,b),wp(e[1],e[2],e[3],e[4]);
@@ -161,6 +163,7 @@ ring r=32003,(a,b,c),ds;
 map ff=ra3,a+b2,b2-c3,c;
 ideal i=ff(i0);
 ideal j=std(i);
+j;
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
@@ -172,6 +175,7 @@ ideal i=
 7y+4x2y+y2x+2zt,
 3tz+3yz2+2yz4;
 ideal j=std(i);
+j;
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
@@ -183,6 +187,7 @@ poly p2 = 1x2y2z2+3z8;
 poly p3 = 5x4y2+4xy5+2x2y2z3+1y7+11x10;
 ideal i=p1,p2,p3;
 ideal j=std(i);
+j;
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
@@ -191,6 +196,7 @@ kill r2;
 ring r12=32003,(x,y,z,w),ds;
 ideal i=x2-z10-z20,xy3-z10-z30,y6-xy3w40;
 ideal j=std(i);
+j;
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
@@ -204,6 +210,7 @@ ideal i=
 31999y3z3+31991x6y+32x3y5+32001x4yz3,
 12xy3z2+6x5yz2+24y3z5+20x4yz4+56y3z6+12x4yz5;
 ideal j=std(i);
+j;
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
@@ -215,6 +222,7 @@ ideal i=
 5t2z7y3x+5x2z4t3y+3t7,
 6zt2y+2x8+6z2y2t+2y5;
 ideal j=std(i);
+j;
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
@@ -226,6 +234,7 @@ poly f =xyz*(x+y+z)^2 +(x+y+z)^3 +x^a+y^a+z^a;
 ideal i= jacob(f);
 test(-9);
 ideal j=std(i);
+j;
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
