@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.15 2001-01-30 12:12:33 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.16 2001-01-30 12:15:36 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -171,6 +171,8 @@ const char SHORT_OPTS_STRING[] = "bdhqtvxec:r:u:";
 
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 main()
 {
   FILE* fd;
