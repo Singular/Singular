@@ -1711,6 +1711,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     r=sySchreyer((ideal)u->Data(),maxl+1);
   if (r==NULL) return TRUE;
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
+  r->list_length=wmaxl;
   res->data=(void *)r;
   return FALSE;
 }

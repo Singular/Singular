@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.26 1998-04-29 07:20:43 siebert Exp $ */
+/* $Id: syz1.cc,v 1.27 1998-04-29 16:28:19 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2265,7 +2265,7 @@ lists syConvRes(syStrategy syzstr)
       }
     }
   }
-  return liMakeResolv(trueres,syzstr->length,-1,typ0,w);
+  return liMakeResolv(trueres,syzstr->length,syzstr->list_length,typ0,w);
 }
 
 syStrategy syConvList(lists li)
@@ -2280,6 +2280,7 @@ syStrategy syConvList(lists li)
     if (fr[i]!=NULL)
       result->fullres[i] = idCopy(fr[i]);
   }
+  result->list_length=result->length;
   Free((ADDRESS)fr,(result->length)*sizeof(ideal));
   return result;
 }

@@ -1,3 +1,6 @@
+Wed Apr 29 18:26:19 MET DST 1998 hannes
+	* added filed list_length tossyStrategy
+	( for conversion list <-> resolution): syz.h, syz1.cc, iparith.cc
 1998-04-29  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* mmutil.c (mmGetIndex): new implementation: Use generated lookup

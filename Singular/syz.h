@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.8 1998-04-29 07:05:30 siebert Exp $ */
+/* $Id: syz.h,v 1.9 1998-04-29 16:28:18 Singular Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -27,7 +27,6 @@ class ssyStrategy;
 typedef ssyStrategy * syStrategy;
 class ssyStrategy{
   public:
-  int length;
   int ** truecomponents;
   int ** backcomponents;
   int ** Howmuch;
@@ -39,11 +38,13 @@ class ssyStrategy{
   intvec * Tl;
   resolvente fullres;
   resolvente minres;
-  int references;
   int * binom;
-  int highdeg_1;
   intvec * resolution;
   intvec * cw;
+  int highdeg_1;
+  int length;
+  short list_length;
+  short references;
 };
 
 void sySchreyersSyzygiesM(polyset F,int Fmax,polyset* Shdl,int* Smax,
