@@ -16,9 +16,9 @@ static usage(char *progname)
   printf("libparse: a syntax-checker for Singular Libraries.\n");
   printf("USAGE: %s [options] singular-library\n", progname);
   printf("Options:\n");
-  printf("   -f <singular library> : checks\n");
+  printf("   -f <singular library> : performs syntax-checks\n");
   printf("   -d [digit]            : digit=1,..,4 increases the verbosity of the checks\n");
-  printf("   -s                    : \n");
+  printf("   -s                    : turns on reporting about violations of unenforced syntax rules\n");
   printf("   -h                    : print this message\n");
   exit(1);
 }
