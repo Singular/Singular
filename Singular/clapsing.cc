@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.19 1997-12-16 10:49:27 Singular Exp $
+// $Id: clapsing.cc,v 1.20 1997-12-16 11:40:27 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -249,11 +249,13 @@ poly singclap_pdivide ( poly f, poly g )
 {
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
+  poly res=NULL;
+  On(SW_RATIONAL);
   if ( nGetChar() == 0 || nGetChar() > 1 )
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
-    return convClapPSingP( F / G );
+    res = convClapPSingP( F / G );
   }
   // and over Q(a) / Fp(a)
   else if (( nGetChar()==1 ) /* Q(a) */
@@ -261,7 +263,6 @@ poly singclap_pdivide ( poly f, poly g )
   {
     if (nGetChar()==1) setCharacteristic( 0 );
     else               setCharacteristic( -nGetChar() );
-    poly res;
     if (currRing->minpoly!=NULL)
     {
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
@@ -274,12 +275,11 @@ poly singclap_pdivide ( poly f, poly g )
       CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
       res= convClapPSingTrP(  F / G  );
     }
-    Off(SW_RATIONAL);
-    return res;
   }
   else
     WerrorS( "not implemented" );
-  return NULL;
+  Off(SW_RATIONAL);
+  return res;
 }
 
 void singclap_divide_content ( poly f )
@@ -496,7 +496,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         if (pIsConstant(res->m[i]))
         {
           pDelete(&(res->m[i]));
-          if ((*v)!=NULL)
+          if ((v!=NULL) && ((*v)!=NULL))
             (**v)[i]=0;
           j++;
         }
@@ -504,7 +504,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       if (j>0)
       {
         idSkipZeroes(res);
-        if ((*v)!=NULL)
+        if ((v!=NULL) && ((*v)!=NULL))
         {
           intvec *w=*v;
           *v = new intvec( max(n-j,1) );
