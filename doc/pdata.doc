@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.15 1999-07-21 12:13:00 anne Exp $
+@comment $Id: pdata.doc,v 1.16 1999-07-23 12:32:38 obachman Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -280,7 +280,7 @@ However, @code{dim(M)}, resp.@: @code{vdim(M)}, returns
 dim$(R^n/M)$, resp. dim$_k(R^n/M)$
 @end tex
 @ifinfo
-dim(R^n/M), resp. dim_k(R^n/M)
+dim(R^n/M), resp.@: dim_k(R^n/M)
 @end ifinfo
 (if M is given by a standard basis).
 
@@ -366,7 +366,7 @@ $K[x_1,\ldots,x_n]$,
 @ifinfo
 K[x1,...,xn], 
 @end ifinfo
-resp.  @code{ds} for computations in the localization 
+resp.@:  @code{ds} for computations in the localization 
 @tex
 $\hbox{Loc}_{(x)}K[x_1,\ldots,x_n])$.
 @end tex
@@ -374,14 +374,14 @@ $\hbox{Loc}_{(x)}K[x_1,\ldots,x_n])$.
 Loc_(x)K[x1,...,xn]).
 @end ifinfo
 
-For inhomogenous input ideals,  standard (resp. groebner) bases
+For inhomogenous input ideals,  standard (resp.@: groebner) bases
 computations are generally faster 
-with the orderings Wp(w_1, @dots{}, w_n) (resp. Ws(w_1, @dots{}, w_n))
+with the orderings Wp(w_1, @dots{}, w_n) (resp.@: Ws(w_1, @dots{}, w_n))
 if the input is quasihomogenous w.r.t. the weights w_1, @dots{}, w_n of
 x_1, @dots{}, x_n. 
 
-If the output needs to be "triangular" (resp. "block-triangular"), the
-lexicographical ordering @code{lp} (resp. lexicographical
+If the output needs to be "triangular" (resp.@: "block-triangular"), the
+lexicographical ordering @code{lp} (resp.@: lexicographical
 block-orderings) need to be used. However, these orderings usually
 result in much less efficient computations.
 

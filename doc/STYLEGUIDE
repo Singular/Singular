@@ -110,6 +110,9 @@
 
     the result is a standard basis (statt will be a standard basis)
 
++ Fuer Kardinalzahlen: 0th, 1st, 2nd, i-th n-th
+
+
 
 * Schreibweisen *
 =================
@@ -249,4 +252,4 @@ i;  // mit Leerzeichen beginnen.
   domkumentiert. Siehe doc2tex.c.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.12 1999-07-22 07:14:05 wichmann Exp $
+$Id: STYLEGUIDE,v 1.13 1999-07-23 12:32:35 obachman Exp $

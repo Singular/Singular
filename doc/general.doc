@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.133 1999-07-23 12:09:07 Singular Exp $
+@comment $Id: general.doc,v 1.134 1999-07-23 12:32:37 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -327,7 +327,7 @@ seconds since January, 1, 1970, on Unix-like operating systems, to be
 precise).
 
 @item @code{--min-time=SECS}
-If the @code{timer} (@pxref{timer}), resp.  @code{rtimer}
+If the @code{timer} (@pxref{timer}), resp.@:  @code{rtimer}
 (@pxref{rtimer}) , variable is
 set, report only
 times larger than @code{SECS} seconds (@code{SECS} needs to be a
@@ -362,7 +362,7 @@ further specified).  This option is mandatory when the @code{--batch}
 option is given.  @xref{MPtcp links}.
 
 @end table
-The value of options given to @sc{Singular} (resp. their default values,
+The value of options given to @sc{Singular} (resp.@: their default values,
 if an option was not given), can be checked with the command
 @code{system("} long_option_name_string @code{")}.  @xref{system}.
 @smallexample
@@ -799,10 +799,10 @@ the command @code{reduce(f, std(0))} (@pxref{reduce}).
 @subsection Term orderings
 @cindex Monomial orderings, Term orderings
 
-Any polynomial (resp. vector) in @sc{Singular} is ordered w.r.t. a
+Any polynomial (resp.@: vector) in @sc{Singular} is ordered w.r.t. a
 term ordering (or, monomial ordering), which has to be specified
 together with the declaration of a ring. @sc{Singular} stores and
-displays a polynomial (resp. vector) w.r.t. this ordering, i.e., the
+displays a polynomial (resp.@: vector) w.r.t. this ordering, i.e., the
 greates monomial (als called the leading monomial) comes first, and the
 smalles monomial comes last.
 
@@ -814,7 +814,7 @@ $K[x_1,\ldots,x_n]$,
 @ifinfo
 K[x1,...,xn],
 @end ifinfo
-resp.  @code{ds} for computations in the localization
+resp.@:  @code{ds} for computations in the localization
 @tex
 $\hbox{Loc}_{(x)}K[x_1,\ldots,x_n])$.
 @end tex
@@ -2413,9 +2413,9 @@ printed out) but not
 @samp{comment2}; and nothing is displayed if  @code{Test} is called
 from within any other procedure.
 However, if @code{printlevel} is set to  a value k with k>0, then
-@samp{comment1} (resp. @samp{comment2} is displayed provided that
+@samp{comment1} (resp.@: @samp{comment2} is displayed provided that
 @code{Test} is called from other procedures, with a nesting level up to
-k (resp. k-1).
+k (resp.@: k-1).
 
 Note furthermore, that the example part of a procedure
 behaves in this respect like a procedure (i.e., the value of @code{voice}
@@ -2500,7 +2500,7 @@ done, but the content-string is assumed to be in the texinfo format.
 @item
 The texinfo commands @code{@@*}, @code{@@code@{..@}},
 @code{@@math@{..@}} may be used to enforce linebreaks, and typesetting
-in typewriter font resp. math mode. Text inside @code{@@math@{..@}}
+in typewriter font resp.@: math mode. Text inside @code{@@math@{..@}}
 need to be valid latex math markup.
 
 @item
@@ -2555,8 +2555,8 @@ and then @code{RETURN} .
 @c ---------------------------------------
 @node Tracing of procedures, Break points, Debugging tools, Debugging tools
 @subsection Tracing of procedures
-Setting the @code{TRACE} variable to 1 (resp. 3) results in a listing of
-the called procedures (resp. together with line numbers).
+Setting the @code{TRACE} variable to 1 (resp.@: 3) results in a listing of
+the called procedures (resp.@: together with line numbers).
 If @code{TRACE} is set to 4, @code{Singular}
 displays each line before its interpretation and waits for the @code{RETURN}
 key being pressed.

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.48 1999-07-19 14:07:35 obachman Exp $
+@comment $Id: examples.doc,v 1.49 1999-07-23 12:32:36 obachman Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -95,7 +95,7 @@ The following topics are treated:
 @cindex Milnor
 @cindex Tjurina
 
-The Milnor number, resp. the Tjurina number, of a power
+The Milnor number, resp.@: the Tjurina number, of a power
 series f in
 @tex
 $K[[x_1,\ldots,x_n]]$
@@ -106,7 +106,7 @@ K[[x1,...,xn]]
 is
 @ifinfo
 @*      milnor(f) = dim_K(K[[x1,...,xn]]/jacob(f))
-@*resp.
+@*resp.@:
 @*      tjurina(f) = dim_K(K[[x1,...,xn]]/((f)+jacob(f)))
 @*where
 @end ifinfo
@@ -313,7 +313,7 @@ milrina(f)[2];  // the second element of the list
 @section Critical points
 @cindex Critical points
 
-The same computation which computes the Milnor, resp. the Tjurina,
+The same computation which computes the Milnor, resp.@: the Tjurina,
 number, but with ordering @code{dp} instead of @code{ds} (i.e., in
 @tex
 $K[x_1,\ldots,x_n]$
@@ -671,15 +671,15 @@ j_0=j_t=a
 @cindex T1
 @cindex T2
 
-T1 resp. T2 of an ideal j do usually denote the modules of
-infinitesimal deformations resp. of obstructions.
+T1 resp.@: T2 of an ideal j do usually denote the modules of
+infinitesimal deformations resp.@: of obstructions.
 In @sc{Singular} there are procedures @code{T1} and @code{T2} in
 @code{sing.lib} such that
 @code{T1(j)} and @code{T2(j)} compute a standard basis of
 a presentation of these modules.
 If T1 nad T2 are finite dimensional K-vector spaces (e.g., for isolated
 singularities), a basis can be computed by applying
-@code{kbase(T1(j));} resp. @code{kbase(T2(j));}, the dimensions by
+@code{kbase(T1(j));} resp.@: @code{kbase(T2(j));}, the dimensions by
 applying @code{vdim}.
 For a complete intersection j the procedure @code{Tjurina} also
 computes T1, but faster (T2=0 in this case).
@@ -801,10 +801,10 @@ L[4];                 // vdim of T2
 
 @itemize @bullet
 @item
-The libraries @code{sing.lib}, resp. @code{deform.lib}, contain procedures
+The libraries @code{sing.lib}, resp.@: @code{deform.lib}, contain procedures
 to compute total and base space of the
 miniversal (= semiuniversal) deformation of an
-isolated complete intersection singularity, resp. arbitrary isolated
+isolated complete intersection singularity, resp.@: arbitrary isolated
 singularity.
 @item
 The procedure @code{deform} in @code{sing.lib} returns a matrix whose columns
@@ -1095,7 +1095,7 @@ In any case, if the input is weighted homogeneous (=quasihomogeneous),
 the variables should be given the correct weights.
 @sc{Singular} offers a function @code{weight} which proposes,
 given an ideal or module, integer weights for the variables, such that
-the ideal resp. module is as homogeneous as possible with respect to these weights.
+the ideal resp.@: module is as homogeneous as possible with respect to these weights.
 The function finds correct weights, if the input is weighted homogeneous
 (but is rather slow for many variables). In order to check, whether the
 input is quasihomogeneous, use the function @code{qhweight}, which returns
@@ -1264,7 +1264,7 @@ given generators).
 @end table
 @code{res(i,r)}, @code{lres(i,r)}, @code{sres(i,r)}, @code{mres(i,r)},
 @code{nres(i,r)} compute the first r modules of the resolution
-of i, resp. the full resolution if r=0 and the basering is not a qring.
+of i, resp.@: the full resolution if r=0 and the basering is not a qring.
 See the manual for a precise description of these commands.
 @*Note: The command @code{betti} does not require a minimal
 resolution for the minimal betti numbers.
@@ -1421,7 +1421,7 @@ If @math{M} is a module, then
 $\hbox{Ext}^1(M,M)$ resp.\ $\hbox{Ext}^2(M,M)$
 @end tex
 @ifinfo
-Ext^1(M,M) resp. Ext^2(M,M)
+Ext^1(M,M) resp.@: Ext^2(M,M)
 @end ifinfo
 are the modules of infinitesimal deformations resp.@: of obstructions of
 @math{M} (like T1 and T2 for a singularity).  Similar to the treatment

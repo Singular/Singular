@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.43 1999-07-21 12:13:32 anne Exp $
+@comment $Id: math.doc,v 1.44 1999-07-23 12:32:38 obachman Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -82,7 +82,7 @@ $f \in I$ if and only if $\hbox{NF}(f,\hbox{std}(I)) = 0$ (for $I
 \subseteq R$, resp.\ $I \subseteq R^r$).
 @end tex
 @ifinfo
-f in I if and only if NF(f,std(I)) = 0 (for I in R, resp. I in R^r).
+f in I if and only if NF(f,std(I)) = 0 (for I in R, resp.@: I in R^r).
 @end ifinfo
 @item Hilbert function:
 @tex
@@ -175,7 +175,7 @@ $A_1$
 @end tex
 @ifinfo
 A1 generate I. The length of the sequence is at most n, where n is the
-number of variables in the polynomial ring, resp. power series ring.
+number of variables in the polynomial ring, resp.@: power series ring.
 Note that free resolutions over other rings may be infinite.  Considered as
 modules,
 A1
@@ -210,7 +210,7 @@ The graded @strong{Betti number} b_(i,j) of R^n/M
 (M a homogeneous submodule of R^n) is the minimal number of
 generators in degree i+j of the j-th syzygy module (= module of
 relations) of R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n
-(resp. M)).
+(resp.@: M)).
 @end ifinfo
 
 @subheading Regularity

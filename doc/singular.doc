@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.71 1999-07-23 12:09:07 Singular Exp $
+@comment $Id: singular.doc,v 1.72 1999-07-23 12:32:41 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -305,7 +305,7 @@ LIB "all.lib";
 @node latex_lib,hnoether_lib,invar_lib, SINGULAR libraries
 @section latex_lib
 @cindex latex_lib
-@c @c lib latex.lib no_ex
+@c lib latex.lib no_ex
 @c ---------------------------------------------------------
 @node hnoether_lib,classify_lib,latex_lib, SINGULAR libraries
 @section hnoether_lib
@@ -320,7 +320,7 @@ LIB "all.lib";
 @node graphics_lib,normal_lib,classify_lib, SINGULAR libraries
 @section graphics_lib
 @cindex graphics_lib
-@c @c lib graphics.lib no_ex
+@c lib graphics.lib no_ex
 @c ---------------------------------------------------------
 @node normal_lib, mondromy_lib,graphics_lib, SINGULAR libraries
 @section normal_lib

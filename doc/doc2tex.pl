@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.14 1999-07-22 13:35:12 obachman Exp $
+# $Id: doc2tex.pl,v 1.15 1999-07-23 12:32:35 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -35,18 +35,15 @@
 #    the text before first @ref.
 #
 ####
-# @c lib libname.lib[:proc] [lib_fun, lib_ex, no_ex]
-#   Without :proc
-#   --> includes info of libname.lib in output file
-#   --> includes function names of info into function index
-#   --> if lib_fun is given, includes listing of functions and 
-#                      their help into output file
-#   --> if lib_ex is given, includes computed examples of functions, as well
-#   With :proc
-#   --> includes content of procedure 'proc' from library libname:lib
-#
-#   Optional no_ex, lib_fun, lib_ex arguments overwrite respective
-#    command-line arguments
+# @c lib libname.lib[:proc] [no_ex, no_fun, (\w*)section]
+#   --> replaced by @include $texfile where 
+#        $texfile = $subdir/libname_lib[_noFun,_noEx].tex
+#   --> if $make, calls "make $texfile" 
+#   --> Error, if $tex_file does not exist
+#   --> if [:proc] is given, then includes only of respective
+#       proc body
+#   --> if (\w*)section is given, replaces @subsection by @$1section
+#       and pastes in content of tex file directly
 # 
 #
 ###################################################################
@@ -440,7 +437,7 @@ sub HandleLib
   $proc = $1 if (/^:(.*?) /);
   $n_fun = 1 if ($no_fun || /no_fun/);
   $n_ex = 1 if ($no_ex || /no_ex/);
-  $section = $1 if /\w*section/;
+  $section = $1 if /(\w*)section/;
   
   # contruct tex file name
   $tex_file = "$doc_subdir/$lib"."_lib";
@@ -490,7 +487,7 @@ sub HandleLib
 	$found = 1 if /c ---content $proc---/;
 	if ($found)
 	{
-	  s/subsection/$section/ if $section;
+	  s/subsection/${section}section/ if $section;
 	  print TEX $_; 
 	}
 	last if $found && /c ---end content $proc---/;
@@ -510,7 +507,7 @@ sub HandleLib
     {
       while (<LTEX>)
       {
-	s/subsection/$section/;
+	s/subsection/${section}section/;
 	print TEX $_;
       }
     }
