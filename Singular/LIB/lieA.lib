@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: lieA.lib,v 1.3 2003-07-25 14:34:34 levandov Exp $";
+version="$Id: lieA.lib,v 1.4 2003-07-31 19:52:53 levandov Exp $";
 category="Plural: Lie Theory";
 info="
 LIBRARY:  lieA.lib      definitions of several enveloping algebras
@@ -9,7 +9,7 @@ AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
 
 PROCEDURES:
  sl(n);                 returns U(sl_n)
- A(n);                  returns U(A(n1))=U(sl_{n+1})
+ A(n);                  returns U(A(n))=U(sl_{n+1})
  sl2();                 returns U(sl_2) in the {e,f,h} presentation
  g2();                  returns U(g_2) in the {x(i),y(i),Ha,Hb} presentation
  gl3();                 returns U(gl_3) in the {e_ij (1<i,j<3)} presentation
