@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multihensel.cc,v 1.5 1997-06-19 12:23:28 schmidt Exp $ */
+/* $Id: fac_multihensel.cc,v 1.6 1997-09-09 07:20:01 schmidt Exp $ */
 
 #include <config.h>
 
@@ -9,7 +9,6 @@
 
 #include "cf_defs.h"
 #include "cf_eval.h"
-#include "cf_map.h"
 #include "cf_binom.h"
 #include "fac_util.h"
 #include "fac_iterfor.h"
