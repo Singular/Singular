@@ -127,6 +127,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
   pi->data.s.body_lineno = 0;
   pi->data.s.example_lineno = 0;
   pi->data.s.body = NULL;
+  pi->data.s.help_chksum = 0;
   return(pi);
 }
 
@@ -198,6 +199,7 @@ printpi(procinfov pi)
       printf("\nEOT\n$example{\"%s\"} = <<EOT;\n", pi->procname);
       PrintOut(fp, pi->data.s.example_start, pi->data.s.proc_end);
       printf("\nEOT\n");
+      printf("$chksum{\"%s\"} = %d;\n", pi->procname, pi->data.s.help_chksum);
     }
   }
   else

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.34 1999-07-21 11:41:16 obachman Exp $ */
+/* $Id: libparse.l,v 1.35 1999-07-21 19:52:52 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -125,13 +125,14 @@ extern "C"
 extern libstackv library_stack;
 #  endif /* STANDALONE_PARSER */
 
+static unsigned long help_chksum;
 #  define SET_DEF_END(mode, pi, p) \
      if ( mode == LOAD_LIB) pi->data.s.def_end = p;
 #  define SET_HELP_START(mode, pi, p) \
-     if ( mode == LOAD_LIB) pi->data.s.help_start = p;
-
+     if ( mode == LOAD_LIB) {pi->data.s.help_start = p; help_chksum = 0;}
 #  define SET_HELP_END(mode, pi, p) \
-     if ( mode == LOAD_LIB) pi->data.s.help_end = p;
+     if ( mode == LOAD_LIB) {pi->data.s.help_end = p;  \
+                             pi->data.s.help_chksum = help_chksum;}
 
 #  define SET_BODY_START(mode, pi, l, p) \
      if ( mode == LOAD_LIB) { \
@@ -154,6 +155,16 @@ extern libstackv library_stack;
        pi->data.s.proc_end = p-1; \
        if(pi->data.s.body_end==0) pi->data.s.body_end = p-1; \
      }
+
+#define ROTATE_RIGHT(c) if ((c) & 01) (c) = ((c) >>1) + 0x8000; else (c) >>= 1;
+#define IncrCheckSum(c)                          \
+do                                              \
+{                                               \
+  ROTATE_RIGHT(help_chksum);                  \
+  help_chksum += c;                           \
+  help_chksum &= 0xffff;                      \
+}                                               \
+while(0)
 
 #  undef YY_DECL
 #  ifdef HAVE_NAMESPACES
@@ -605,7 +616,7 @@ LIB[ \t]+"\"" { quote++;
              printf("BODY at %d/%d", yylplineno, current_pos(0));
 #endif
            }
-<phelp>\n  { yylplineno++; }
+<phelp>\n  { yylplineno++;}
 
 <pbody>({comment}[^\n]*) { }
 <pbody>{quote} { quote++; old_state = YYSTATE;
@@ -694,12 +705,14 @@ LIB[ \t]+"\"" { quote++;
 #endif /* HAVE_NAMESPACES */
                            last_cmd = LP_NONE;
                            if(old_state==phelp)
+                           {              
                               SET_HELP_END(mode, pi, current_pos(0));
+                           }
                            BEGIN(old_state); /* printf("%s", yytext); */
                          }
-<string>(\\\\)|(\\\")    { }
-<string>\n               { yylplineno++; }
-<string>.                { }
+<string>(\\\\)|(\\\")    { if (old_state == phelp) IncrCheckSum(*yytext);}
+<string>\n               { yylplineno++; if (old_state == phelp) IncrCheckSum('\n');}
+<string>.                { if (old_state == phelp) IncrCheckSum(*yytext);}
 
 <pexample>(\/\/[^\n]*)  { }
 <pexample>"\""           { quote++; old_state = YYSTATE;
