@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.41 1999-10-18 11:19:28 obachman Exp $ */
+/* $Id: kutil.cc,v 1.42 1999-10-18 16:05:24 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3591,11 +3591,13 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
 
 void kFreeStrat(kStrategy strat)
 {
+#if 0
   if (strat->THeap != NULL)
   {
     mmMergeHeap(mm_specHeap, strat->THeap);
     mmUnGetTempHeap(&(strat->THeap));
   }
+#endif
   FreeSizeOf(strat, skStrategy);
 }
 
