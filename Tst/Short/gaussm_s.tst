@@ -9,11 +9,16 @@ proc tst_gaussm(poly f)
   basering;
   f;
   print(monodromy(f));
+  "vwfilt";
   list l=vwfilt(f);
   l;
+  "spnf";
   l=spnf(l[1],l[3],l[4])+list(l[5],l[6]);
+  "endvfilt";
   endvfilt(l);
+  "spgamma";
   spgamma(l);
+  "tmatrix";
   l=tmatrix(f);
   print(l[1]);
   print(l[2]);
