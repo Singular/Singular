@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.21 1998-05-20 12:40:21 wichmann Exp $
+@comment $Id: start.doc,v 1.22 1998-05-25 09:36:09 schmidt Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -132,13 +132,13 @@ introduced such as the notions of names and objects, data types and
 conversion between them, etc.
 
 @item
+In @ref{Input and output}, @sc{Singular}'s mechanisms to store and
+retrieve data are discussed.
+
+@item
 The more complex concepts of procedures and libraries as
 well as tools to debug them are considered in the following sections:
 @ref{Procedures}, @ref{Libraries}, and @ref{Debugging tools}.
-
-@item
-Finally, in @ref{Input and output},  @sc{Singular}'s mechanisms to
-store and retrieve data are discussed.
 
 @end itemize
 
