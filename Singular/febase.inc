@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.19 1998-10-29 13:26:52 Singular Exp $ */
+/* $Id: febase.inc,v 1.20 1999-03-16 15:33:06 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -391,7 +391,8 @@ static int fePrintEcho(char *anf)
     && (strncmp(anf,";return();",10)!=0)
    )
   || (traceit&TRACE_SHOW_LINE)
-  || (traceit&TRACE_SHOW_LINE1))
+  || (traceit&TRACE_SHOW_LINE1)
+  || ((currentVoice->pi!=NULL)&&(currentVoice->pi->trace_flag&TRACE_SHOW_LINE)))
   {
     if (currentVoice->typ!=BT_example)
     {
@@ -419,7 +420,8 @@ static int fePrintEcho(char *anf)
       while(fgetc(stdin)!='\n');
     }
   }
-  else if (traceit&TRACE_SHOW_LINENO)
+  else if ((traceit&TRACE_SHOW_LINENO)
+  || ((currentVoice->pi!=NULL)&&(currentVoice->pi->trace_flag&TRACE_SHOW_LINENO)))
   {
     Print("{%d}",yylineno);
     mflush();

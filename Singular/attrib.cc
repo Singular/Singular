@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.10 1998-05-28 16:50:45 Singular Exp $ */
+/* $Id: attrib.cc,v 1.11 1999-03-16 15:33:04 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -262,6 +262,12 @@ BOOLEAN atATTRIB1(leftv res,leftv a)
     if (v==NULL) return TRUE;
   }
   attr at=v->attribute;
+  if (v->Typ()==PROC_CMD)
+  {
+    procinfo *p=(procinfo *)v->Data();
+    if (p->trace_flag!=0)
+      Print("trace:%d\n",p->trace_flag);
+  }    
   if (hasFlag(v,FLAG_STD))
   {
     PrintS("attr:isSB, type int\n");
@@ -293,6 +299,12 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
     res->rtyp=INT_CMD;
     res->data=(void *)(((ideal)v->Data())->rank);
   }
+  else if ((v->Typ()==PROC_CMD) && (strcmp(name,"trace")==0))
+  {
+    procinfo *p=(procinfo *)v->Data();
+    res->rtyp=INT_CMD;
+    res->data=(void *)p->trace_flag;
+  }    
   else
   {
     attr at=v->attribute->get(name);
@@ -349,6 +361,16 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
     ideal I=(ideal)v->Data();
     I->rank=max(I->rank,(int)c->Data());
   }
+  else if ((strcmp(name,"trace")==0)&&(v->Typ()==PROC_CMD))
+  {
+    if (c->Typ()!=INT_CMD)
+    {
+      WerrorS("attrib `trace` must be int");
+      return TRUE;
+    }
+    procinfo *p=(procinfo *)v->Data();
+    p->trace_flag=(int)c->Data();
+  }    
 #ifdef DRING
   else if (strcmp(name,"D")==0)
   {

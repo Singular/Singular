@@ -1,3 +1,7 @@
+Tue Mar 16 15:54:02 MET 1999 hannes
+  * introduced new routine ERROR(string) (iparith.cc, tok.h)
+  * added trace flag for proc (ipid.cc iplib.cc, febase*)
+
 Mon Mar  8 18:27:26 MET 1999 hannes
   * access to coeff-description via functions (1. approach)
     (rChar,  rInternalChar, rField_is_Zp, rField_is_Q,

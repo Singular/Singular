@@ -3,9 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.26 1999-02-26 15:32:01 Singular Exp $ */
+/* $Id: febase.h,v 1.27 1999-03-16 15:33:05 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: basic i/o
 */
 #include <stdio.h>
 #include <string.h>

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.14 1999-02-26 09:36:18 krueger Exp $ */
+/* $Id: subexpr.h,v 1.15 1999-03-16 15:33:15 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -144,6 +144,7 @@ public:
   language_defs language;
   short         ref;
   char          is_static;        // if set, proc not accessible for user
+  char          trace_flag;
   procinfodata  data;
 };
 

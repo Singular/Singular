@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.137 1999-03-16 13:38:08 Singular Exp $ */
+/* $Id: iparith.cc,v 1.138 1999-03-16 15:33:09 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -148,6 +148,7 @@ cmdnames cmds[] =
   { "dump",        0, DUMP_CMD,           CMD_1},
   { "extgcd",      0, EXTGCD_CMD ,        CMD_2},
   { "EXTGCD",      2, EXTGCD_CMD ,        CMD_2},
+  { "ERROR",       0, ERROR_CMD ,         CMD_1},
   { "eliminate",   0, ELIMINATION_CMD,    CMD_23},
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
   { "eval",        0, EVAL ,              EVAL},
@@ -1417,6 +1418,11 @@ static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
   setFlag(res,FLAG_STD);
   return FALSE;
+}
+static BOOLEAN jjERROR(leftv res, leftv u)
+{
+  WerrorS((char *)u->Data());
+  return TRUE;
 }
 static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
 {
@@ -3402,6 +3408,7 @@ struct sValCmd1 dArith1[]=
 ,{jjDIM_R,      DIM_CMD,         XS(INT_CMD),    RESOLUTION_CMD }
 ,{jjDUMP,       DUMP_CMD,        NONE,           LINK_CMD }
 ,{jjE,          E_CMD,           VECTOR_CMD,     INT_CMD }
+,{jjERROR,      ERROR_CMD,       NONE,           STRING_CMD }
 #ifdef HAVE_FACTORY
 ,{jjFAC_P,      FAC_CMD,         LIST_CMD,       POLY_CMD }
 #else

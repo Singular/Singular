@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.51 1999-02-26 09:35:14 krueger Exp $ */
+/* $Id: iplib.cc,v 1.52 1999-03-16 15:33:14 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -411,7 +411,8 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   iiLocalRing[myynest]=currRing;
 #endif
   iiRETURNEXPR[myynest+1].Init();
-  if (traceit&TRACE_SHOW_PROC)
+  if ((traceit&TRACE_SHOW_PROC)
+  || (pi->trace_flag&TRACE_SHOW_PROC))
   {
     if (traceit&TRACE_SHOW_LINENO) PrintLn();
     Print("entering%-*.*s %s (level %d)\n",myynest*2,myynest*2," ",IDID(pn),myynest);
@@ -436,7 +437,8 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
                  Free((ADDRESS)res, sizeof(sleftv));
                  break;
   }
-  if (traceit&TRACE_SHOW_PROC)
+  if ((traceit&TRACE_SHOW_PROC)
+  || (pi->trace_flag&TRACE_SHOW_PROC))
   {
     if (traceit&TRACE_SHOW_LINENO) PrintLn();
     Print("leaving %-*.*s %s (level %d)\n",myynest*2,myynest*2," ",IDID(pn),myynest);

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.22 1999-01-22 17:40:52 Singular Exp $ */
+/* $Id: tok.h,v 1.23 1999-03-16 15:33:16 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -59,6 +59,7 @@ enum {
   DET_CMD,
   DUMP_CMD,
   END_GRAMMAR,
+  ERROR_CMD,
   EXTGCD_CMD,
   FAC_CMD,
   FIND_CMD,

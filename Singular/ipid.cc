@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.30 1999-03-15 16:18:52 Singular Exp $ */
+/* $Id: ipid.cc,v 1.31 1999-03-16 15:33:13 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -764,7 +764,7 @@ char *idhdl2id(idhdl pck, idhdl h)
 
 void iiname2hdl(const char *name, idhdl *pck, idhdl *h)
 {
-  char *q = strchr(name, ':');
+  const char *q = strchr(name, ':');
   char *p, *i;
 
   if(q==NULL)
