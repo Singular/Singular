@@ -334,7 +334,7 @@ kill ll;
 
 
 // MPlaunch dump
-string sing = system("whoami");
+string sing = system("Singular");
 
 if (size(sing))
 {
