@@ -820,7 +820,7 @@ else
   AC_MSG_RESULT(no)
 fi
 
-AC_MSG_CHECKING(whether to have namespaces links)
+AC_MSG_CHECKING(whether to have namespaces)
 if test "$with_namespaces" != yes; then
   AC_MSG_RESULT(no)
 else
@@ -828,12 +828,26 @@ else
   AC_MSG_RESULT(yes)
 fi
 
-AC_MSG_CHECKING(whether to have dynamic loading links)
+AC_MSG_CHECKING(whether to have dynamic loading)
 if test "$with_dl" != yes; then
   AC_MSG_RESULT(no)
 else
   AC_DEFINE(HAVE_DYNAMIC_LOADING) 
-  LDFLAGS="${LDFLAGS} -rdynamic -ldl"
+  case "$ac_cv_singuname" in
+	unknown) ;;
+	HPUX-9)
+	  AC_CHECK_LIB(dld, shl_load)
+	  LD_DYN_FLAGS="-E"
+	;;
+	HPUX-10)
+	  AC_CHECK_LIB(dld, shl_load)
+	  LD_DYN_FLAGS="-E"
+	;;
+	ix86-Linux)
+	  LD_DYN_FLAGS="-rdynamic -ldl"
+	;;
+  esac
+  AC_SUBST(LD_DYN_FLAGS)
   AC_MSG_RESULT(yes)
 fi
 

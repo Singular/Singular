@@ -50,6 +50,7 @@ CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir} @CPPFLAGS@
 DEFS		= @DEFS@ -DNDEBUG
 LDFLAGS		= @LDFLAGS@
+LD_DYN_FLAGS	= @LD_DYN_FLAGS@
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 LIBS		= -lm @NEED_LIBS@
 
@@ -159,14 +160,15 @@ all:	Singular
 Singular: mod2.h si_paths.h Makefile version.h scanner.cc gmalloc.o \
           ${OBJS} iparith.o mpsr_Tok.o tesths.cc libparse.cc 
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -o Singular \
-	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o
+	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS} \
+	${LD_DYN_FLAGS} gmalloc.o
 
 Singular-static: mod2.h si_paths.h Makefile version.h scanner.cc  gmalloc.o \
 	        ${OBJS} iparith.o mpsr_Tok.o tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	-o Singular-static \
 	tesths.cc iparith.o mpsr_Tok.o \
-	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS} gmalloc.o
+	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS} ${LD_DYN_FLAGS} gmalloc.o
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
@@ -366,7 +368,8 @@ $(OBJG2) gmalloc.og: %.og: %.c
 
 Singularg: scanner.cc gmalloc.og $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
-	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS} gmalloc.og
+	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS} \
+	${LD_DYN_FLAGS} gmalloc.og
 
 iparith.og: iparith.inc iparith.cc
 	$(CXXG)  ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og
@@ -468,7 +471,8 @@ $(OBJP2) gmalloc.op: %.op: %.c
 
 Singularp: scanner.cc  gmalloc.op $(OBJP) iparith.op mpsr_Tok.op tesths.cc version.h
 	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp \
-	tesths.cc iparith.op mpsr_Tok.op $(OBJP) ${LDFLAGSP} ${LIBS} gmalloc.op
+	tesths.cc iparith.op mpsr_Tok.op $(OBJP) ${LDFLAGSP} ${LIBS} \
+	${LD_DYN_FLAGS} gmalloc.op
 
 iparith.op: iparith.inc iparith.cc
 	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c iparith.cc -o iparith.op
