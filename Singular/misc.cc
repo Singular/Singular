@@ -679,13 +679,16 @@ char * versionString()
 #endif
 #endif
 #ifdef HAVE_MPSR
-              StringAppend("MP(%s),\n\t",MP_VERSION);
+              StringAppend("MP(%s),",MP_VERSION);
 #endif
 #if defined(HAVE_READLINE) && !defined(FEREAD)
               StringAppendS("libreadline,\n\t");
-#endif
+#else
 #ifdef HAVE_FEREAD
-              StringAppendS("emulated libreadline,\n");
+              StringAppendS("emulated libreadline,\n\t");
+#else
+              StringAppendS("\n\t");
+#endif
 #endif
 #ifdef SRING
               StringAppendS("super algebra,");
