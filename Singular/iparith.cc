@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.335 2005-02-04 14:33:13 Singular Exp $ */
+/* $Id: iparith.cc,v 1.336 2005-02-04 14:43:07 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1445,15 +1445,20 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 {
   idrec tmp_proc;
+  Subexpr e;
+  void *d;
+  int typ;
   BOOLEAN t=FALSE;
   if (u->rtyp!=IDHDL) 
   {
     tmp_proc.id="_auto";
-    tmp_proc.typ=IDHDL;
-    tmp_proc.data.pinf=(procinfo *)u->data;  
+    tmp_proc.typ=PROC_CMD;
+    tmp_proc.data.pinf=(procinfo *)u->Data();  
     tmp_proc.ref=1;
-    u->data=(void *)&tmp_proc;
+    d=u->data; u->data=(void *)&tmp_proc;
+    e=u->e; u->e=NULL;
     t=TRUE;
+    typ=u->rtyp; u->rtyp=IDHDL;
   }
 #ifdef HAVE_NS
   leftv sl;
@@ -1466,8 +1471,9 @@ static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 #endif /* HAVE_NS */
   if (t)
   {
-    u->rtyp=PROC_CMD;
-    u->data=(void *)tmp_proc.data.pinf;
+    u->rtyp=typ;
+    u->data=d;
+    u->e=e;
   }
   if (sl==NULL)
   {
