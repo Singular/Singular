@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.46 2000-12-23 17:10:16 greuel Exp $";
+version  = "$Id: classify.lib,v 1.47 2001-01-07 15:20:08 greuel Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -11,8 +11,8 @@ OVERVIEW:
    equivalence, based on the determinator of singularities by V.I. Arnold.
 
 PROCEDURES:
-basicinvariants(f); computes Milnor number, determinacy-bound and corank of
-classify(f);        normal form of poly f determined with Arnold's method
+ basicinvariants(f); computes Milnor number, determinacy-bound and corank of
+ classify(f);        normal form of poly f determined with Arnold's method
  corank(f);          computes the corank of f (i.e. of the Hessian of f)
  Hcode(v);           coding of intvec v acoording to the number repetitions
  init_debug([n]);    print trace and debugging information depending on int n
