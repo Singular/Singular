@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.9 1998-12-18 11:11:38 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.10 1999-01-18 17:28:05 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -300,7 +300,6 @@ void * mmDBAllocBlock( size_t size,  char * fname, int lineno)
   if (size==0)
   {
     fprintf(stderr,"alloc(0) in %s:%d\n",fname,lineno);
-    assume(0);
     size = 1;
   }
 
