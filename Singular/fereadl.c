@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.23 2003-04-24 16:55:54 Singular Exp $ */
+/* $Id: fereadl.c,v 1.24 2003-05-12 17:37:21 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -868,6 +868,9 @@ int fe_init_dyn_rl()
       fe_rl_hdl=dynl_open("/usr/lib/libreadline.sl");
     #else
     fe_rl_hdl=dynl_open("libreadline.so");
+    if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.2");
+    if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.3");
+    if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.4");
     #endif
     if (fe_rl_hdl==NULL) { return 1;}
 
