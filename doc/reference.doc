@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.51 1998-05-16 23:16:34 gorzel Exp $
+@comment $Id: reference.doc,v 1.52 1998-05-18 13:10:55 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4067,8 +4067,8 @@ by a standard basis.
 Return 0 if and only if the polynomial (resp. vector, ideal, module)
 is an element (resp. subideal, submodule) of the ideal (resp. module).
 The result may have no meaning if the second argument is not a standard basis.
-@*The third (optional) argument 1 forces a lazy reduction
-(only the leading term is used for the reduction; no tail reduction).
+@*The third (optional) argument 1 forces a reduction which considers
+only the leading term and does no tail reduction.
 @cindex NF
 @item @strong{Note:}
 @code{NF} may be used instead of @code{reduce}.
