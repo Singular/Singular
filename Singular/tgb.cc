@@ -905,28 +905,28 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
 	assume(!(p_LmDivisibleBy(c->S->m[j],c->S->m[i],c->r)));
       }
       //lies I[i] under I[j] ?
-  //     if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
-//         c->rep[j]=i;
+      if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
+        c->rep[j]=i;
 	
-//         PrintS("R"); R_found=TRUE;
+        PrintS("R"); R_found=TRUE;
 
-//         c->Rcounter++;
-//         if((i_pos>=0) && (j_pos>=0)){
+        c->Rcounter++;
+        if((i_pos>=0) && (j_pos>=0)){
        
-//         }
-//         for(int z=0;z<j;z++){
-//           if(c->rep[z]!=z) continue;
-//           if (c->states[j][z]==UNCALCULATED){
-//             c->states[j][z]=UNIMPORTANT;
-//           }
-//         }
-//         for(int z=j+1;z<i;z++){
-//           if(c->rep[z]!=z) continue;
-//           if (c->states[z][j]==UNCALCULATED){
-//             c->states[z][j]=UNIMPORTANT;
-//           }
-//         }
-//       }
+        }
+        for(int z=0;z<j;z++){
+          if(c->rep[z]!=z) continue;
+          if (c->states[j][z]==UNCALCULATED){
+            c->states[j][z]=UNIMPORTANT;
+          }
+        }
+        for(int z=j+1;z<i;z++){
+          if(c->rep[z]!=z) continue;
+          if (c->states[z][j]==UNCALCULATED){
+            c->states[z][j]=UNIMPORTANT;
+          }
+        }
+      }
     }
     else {
       c->states[i][j]=UNIMPORTANT;
