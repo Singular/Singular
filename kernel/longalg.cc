@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.2 2004-04-29 14:54:32 Singular Exp $ */
+/* $Id: longalg.cc,v 1.3 2004-04-29 15:04:22 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2610,7 +2610,9 @@ static napoly napPerm(napoly p,const int *par_perm,const ring src_ring,const nMa
   {
     for(i=1;i<=rPar(src_ring);i++)
     {
-      int e=par_perm[i-1];
+      int e;
+      if (par_perm!=NULL) e=par_perm[i-1];
+      else                e=-i;
       int ee=napGetExpFrom(p,i,src_ring);
       if (e<0)
         napSetExp(w,-e,ee);
