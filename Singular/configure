@@ -995,8 +995,8 @@ fi
 # check whether the compiler accepts -pipe
 echo $ac_n "checking whether compiler accepts -pipe""... $ac_c" 1>&6
 echo "configure:998: checking whether compiler accepts -pipe" >&5
-temp_cxxflags=${CXXFLAGS}
-CXXFLAGS="${CXXFLAGS} -pipe"
+temp_cflags=${CFLAGS}
+CFLAGS="${CFLAGS} -pipe"
 if eval "test \"`echo '$''{'ac_cv_cxx_have_pipe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1022,7 +1022,7 @@ rm -f conftest*
 fi
 
 echo "$ac_t""${ac_cv_cxx_have_pipe}" 1>&6
-CXXFLAGS=${temp_cxxflags}
+CFLAGS=${temp_cflags}
 if test "${ac_cv_cxx_have_pipe}" != yes; then
   PIPE=
 else
