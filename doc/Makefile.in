@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.84 2003-02-06 19:33:15 levandov Exp $
+### $Id: Makefile.in,v 1.85 2003-02-06 19:54:38 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -260,7 +260,7 @@ ${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex
 	${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
-plu_html: ${PLU_MANUAL_FILES} ${TMP_DIR} ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} ${PLU_IMAGES_HTML} 
+plu_html: pluralmain.tex ${PLU_MANUAL_FILES} ${TMP_DIR} ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} ${PLU_IMAGES_HTML} 
 ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} plural.tex
 	${PERL} ${TEXI2HTML} ${PLU_TEXI2HTML_OPTS} -prefix ${PLU_HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} pluralmain.tex
