@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.212 2001-11-27 09:00:38 Singular Exp $
+@comment $Id: reference.doc,v 1.213 2002-03-07 17:58:39 mschulze Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1232,30 +1232,30 @@ See
 @item @strong{Syntax:}
 @code{division (} ideal_expression@code{,} ideal_expression @code{)}
 @*@code{division (} module_expression@code{,} module_expression @code{)}
+@*@code{division (} ideal_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{division (} module_expression@code{,} module_expression@code{,} int_expression @code{)}
+@*@code{division (} ideal_expression@code{,} ideal_expression@code{,} int_expression@code{,} intvec_expression @code{)}
+@*@code{division (} module_expression@code{,} module_expression@code{,} int_expression@code{,} intvec_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-computes the transformation matrix which expresses the generators of a
-module @code{sm} (the first argument) in terms of the generators of a
-module @code{m} (the second argument) and a rest @code{R}.
-Uses different algorithms depending on whether the modules are, resp.@: are not,
-represented by standard bases.
-@*Returns the list @code{T,U,R}, where @code{T,U} are matrices and @code{R}
-is a module (resp.@: ideal) such that
-@code{matrix(sm)*U+matrix(R) = matrix(m)*T}
-and @code{module(sm*U+matrix(R)) = module(matrix(m)*T)}
-(resp.@: @code{ideal(sm*U+matrix(R)) = ideal(matrix(m)*T)}).
-@*@code{U} is a diagonal matrix of units (if the basering is a polynomial ring
-then @code{U} is the identity matrix).
-@*@code{T} is the transformation matrix as returned by @code{lift}.
+@code{division} computes a division with remainder.
+For two ideals resp.@: modules @code{M} (first argument) and @code{N} (second argument), it returns a list @code{T,R,U} where @code{T} is a matrix, @code{R} is an ideal resp. a module, and @code{U} is a diagonal matrix of units such that @code{matrix(M)*U=matrix(N)*T+matrix(R)} is a standard representation for the normal form @code{R} of @code{M} with respect to a standard basis of @code{N}.
+@code{division} uses different algorithms depending on whether @code{N} is represented by a standard basis.
+For a polynomial basering, the matrix @code{U} is the identity matrix.
+A matrix @code{T} as above is also computed by @code{lift}.
+@*For additional arguments @code{n} (third argument) and @code{w} (fourth argument), @code{division} returns a list @code{T,R} as above such that @code{matrix(M)=matrix(N)*T+matrix(R)} is a standard representation for the normal form @code{R} of @code{M} with respect to @code{N} up to weighted degree @code{n} with respect to the weight vector @code{w}.
+The weighted degree of @code{T} and @code{R} respect to @code{w} is at most @code{n}.
+If the weight vector @code{w} is not given, @code{division} uses the standard weight vector @code{w=1,...,1}.
 @item @strong{Example:}
 @smallexample
 @c example
-  ring r;
-  ideal m=3x2+yz,7y6+2x2y+5xz;
-  poly f=y7+x3+xyz+z2;
-  ideal i=jacob(f)+x;
-  division(m,i);
+ring R=0,(x,y),ds;
+poly f=x5+x2y2+y5;
+division(f,jacob(f));
+division(f^2,jacob(f));
+list l=division(ideal(f^2),jacob(f),10,intvec(1,1));
+matrix(ideal(f^2))-matrix(jacob(f))*l[1]-matrix(l[2]);
 @c example
 @end smallexample
 @end table
@@ -1684,6 +1684,7 @@ resp.@: parameters.
 @item @strong{Example:}
 @smallexample
 @c example
+/*
   ring r=0,(x,y,z),dp;
   ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
   option(redSB);   // force the computation of a reduced SB
@@ -1692,6 +1693,7 @@ resp.@: parameters.
   ring s=0,(z,x,y),lp;
   ideal j=fglm(r,i);
   j;
+*/
 @c example
 @end smallexample
 @end table
@@ -1726,6 +1728,7 @@ ideal.
 @item @strong{Example:}
 @smallexample
 @c example
+/*
   ring r=0,(x,y,z),lp;
   ideal i=y3+x2,x2y+x2,x3-x2,z4-x2-y;
   option(redSB);   // force the computation of a reduced SB
@@ -1733,6 +1736,7 @@ ideal.
   poly p=reduce(x+yz2+z10,i);
   ideal j=fglmquot(i,p);
   j;
+*/
 @c example
 @end smallexample
 @end table
@@ -1816,12 +1820,14 @@ the current ring.
 @item @strong{Example:}
 @smallexample
 @c example
+/*
   ring  r=0,(x,y,z), dp;
   ideal i=y3+x2,x2y+x2,z4-x2-y;
   option(redSB);  // force computation of reduced basis
   i=std(i);
   ideal k=finduni(i);
   print(k);
+*/
 @c example
 @end smallexample
 @end table
@@ -2366,8 +2372,10 @@ returns the imaginary part of a number in a complex ground field,
 @item @strong{Example:}
 @smallexample
 @c example
+/*
   ring r=(complex,i),x,dp;
   impart(1+2*i);
+*/
 @c example
 @end smallexample
 @end table
@@ -2856,9 +2864,11 @@ list are of type number, otherwise of type string.
 @item @strong{Example:}
 @smallexample
 @c example
+/*
 ring rs1=0,(x,y),lp;
 poly f=15x5+x3+x2-10;
 laguerre(f,10,2);
+*/
 @c example
 @end smallexample
 @end table
@@ -5175,8 +5185,10 @@ returns the real part of a number from a complex ground field,
 @item @strong{Example:}
 @smallexample
 @c example
+/*
   ring r=(complex,i),x,dp;
   repart(1+2*i);
+*/
 @c example
 @end smallexample
 @end table
@@ -6144,11 +6156,13 @@ are of type number, otherwise of type string.
 @item @strong{Example:}
 @smallexample
 @c example
+/*
 ring rsc=(real,20,I),(x,y),lp;
 ideal i=(2+3*I)*x2+(0.35+I*45.0e-2)*y2-8,x2+xy+(42.7)*y2;
 list l=uressolve(i,0,0,2);
 l[1];
 subst(subst(i[1],x,l[1][1]),y,l[1][2]);
+*/
 @c example
 @end smallexample
 @end table
