@@ -1,15 +1,22 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_iterfor.cc,v 1.1 1996-07-08 08:18:49 stobbe Exp $
+// $Id: fac_iterfor.cc,v 1.2 1997-03-27 09:43:07 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/07/08 08:18:49  stobbe
+"IteratedFor now handles the cases in which the mainvariable is not of
+level 1.
+"
+
 Revision 1.0  1996/05/17 10:59:45  stobbe
 Initial revision
 
 */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "fac_iterfor.h"
 
 void
@@ -100,6 +107,7 @@ IteratedFor::operator[] ( int i ) const
     return index[i-FROM];
 }
 
+#ifndef NOSTREAMIO
 ostream& operator<< ( ostream& os, const IteratedFor & I )
 {
     os << "( " << I[I.from()];
@@ -108,3 +116,4 @@ ostream& operator<< ( ostream& os, const IteratedFor & I )
     os << " )";
     return os;
 }
+#endif /* NOSTREAMIO */
