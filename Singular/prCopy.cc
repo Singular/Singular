@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.9 2000-11-03 14:50:23 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.10 2000-12-08 14:43:46 Singular Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
@@ -130,16 +130,17 @@ poly prSortR(poly p, ring r, BOOLEAN revert)
 static inline void 
 prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
 {
-  assume(dest_r == currRing);
+  assume((dest_r == currRing)||(dest_r== currRing->algring));
   number n = pGetCoeff(dest);
-  int i=0;
-  for (i=max; i; i--)
+  int i;
+  for (i=max; i>0; i--)
   {
     p_SetExp(dest, i, p_GetExp( src, i,src_r), dest_r);
     assume(n == pGetCoeff(dest));
   }
-  p_SetComp(dest, p_GetComp( src,src_r), dest_r);
-    assume(n == pGetCoeff(dest));
+  if (rRing_has_Comp(dest_r))
+    p_SetComp(dest, p_GetComp( src,src_r), dest_r);
+  assume(n == pGetCoeff(dest));
   p_Setm(dest, dest_r);
   assume(n == pGetCoeff(dest));
 }
