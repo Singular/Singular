@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.47 1999-10-22 11:43:57 obachman Exp $
+;; $Id: singular.el,v 1.48 1999-11-05 14:09:16 obachman Exp $
 
 ;;; Commentary:
 
@@ -3948,6 +3948,17 @@ Sets singular-*-last values."
   (let* ((buffer-name (singular-process-name-to-buffer-name name))
 	 ;; buffer associated with Singular, nil if there is none
 	 (buffer (get-buffer buffer-name)))
+    
+    ;; make sure directory contains a "/" at the end
+    (setq directory 
+      (concat directory
+	      ;; we check for trailing slash and backslash
+	      ;; but unconditionally insert a slash.
+	      ;; Hopefully that works on NT, too.
+	      (if (memq (aref directory
+			      (1- (length directory)))
+			'(?/ ?\\))
+		  "" "/")))
     
     (if (not buffer)
 	(progn
