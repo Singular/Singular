@@ -1,23 +1,33 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.2 1997-06-20 10:30:30 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.3 1997-06-26 14:11:11 schmidt Exp $
+
 #
-# GNUmakefile - master makefile for factory.
-# note:		use GNU make to make with this makefile.
+# GNUmakefile.in - used by configure to create GNUmakefile, the
+#   top level makefile for factory.
 #
+# In general, you should let configure guess the correct values
+# for the variables below.  But if something seriously goes wrong
+# in configuring, please inform the authors and feel free to
+# edit the marked section.
+#
+# See the INSTALL file for information on how to build factory.
+#
+# Note:	Use GNU make to make with this makefile.
+#
+
+############### START OF CONFIGURABLE SECTION ###############
 
 SHELL =		/bin/sh
 
 #
 # - versions.
 #
-
 version =	@factory_version@
 distname =	factory-$(version)
 
 #
 # - paths.
 #
-
 prefix =	@prefix@
 exec_prefix =	@exec_prefix@
 libdir =	@libdir@
@@ -32,7 +42,6 @@ VPATH =		@srcdir@
 #
 # - the name of the game.
 #
-
 libfactory =	@libfactory@
 libmem =	@libmem@
 headerfactory =	@headerfactory@
@@ -41,7 +50,6 @@ factoryconf =	@factoryconf@
 #
 # - programs.
 #
-
 CC =		@CC@
 CXX =		@CXX@
 # seems configure sometimes finds non-BSD install, so we better
@@ -59,7 +67,6 @@ MAKEHEADER =	@MAKEHEADER@
 #
 # - flags.
 #
-
 CFLAGS =	@CFLAGS@
 CPPFLAGS =	@CPPFLAGS@
 CXXFLAGS =	@CXXFLAGS@
@@ -73,7 +80,6 @@ MAKEHEADERFLAGS=@MAKEHEADERFLAGS@
 #
 # - some other variables.
 #
-
 factorysrc =	@factorysrc@
 factoryincl =	@factoryincl@
 memmansrc =	@memmansrc@
@@ -83,14 +89,11 @@ alltargets =	@alltargets@
 installtargets =@installtargets@
 uninstalltargets=@uninstalltargets@
 
-#
-# end of configuration dependend stuff
-########################################
+############### END OF CONFIGURABLE SECTION ###############
 
 #
 # - compiler flags.
 #
-
 LIBCFLAGS =	-Wall \
 		-I. -I$(srcdir) \
 		$(DEFS) $(CPPFLAGS) $(CFLAGS)
@@ -108,6 +111,7 @@ TMPLCXXFLAGS =	-Wall \
 TESTLDFLAGS = 	-L. \
 		$(LIBS) $(LDFLAGS)
 
+# flags to create dependency lists
 DEPCXXFLAGS =	-I. -I$(srcdir) \
 		$(DEFS) $(CPPFLAGS)
 
@@ -115,7 +119,7 @@ DEPCXXFLAGS =	-I. -I$(srcdir) \
 # - source files.
 #
 
-# factory, source files
+# factory source files
 basefactorysrc := \
 		canonicalform.cc \
 		cf_binom.cc \
@@ -168,13 +172,13 @@ distfactorysrc := \
 		$(singfactorysrc) \
 		$(useiofactorysrc)
 
-# factory, object files and dependencies
+# factory object files and dependencies
 factoryobj :=	$(factorysrc:.cc=.o)
 factoryobj :=	$(factoryobj:.y=.o)
 factorydep :=	$(factorysrc:.cc=.d)
 factorydep :=	$(factorydep:.y=.d)
 
-# factory, header files
+# factory header files
 basefactoryincl := \
 		assert.h \
 		canonicalform.h \
@@ -226,7 +230,7 @@ distfactoryincl := \
 		$(singfactoryincl) \
 		$(useiofactoryincl)
 
-# memory manager, source files
+# memory manager source files
 basememmansrc := \
 		newdelete.cc
 newmemmansrc :=	\
@@ -245,13 +249,13 @@ distmemmansrc := \
 		$(newmemmansrc) \
 		$(oldmemmansrc)
 
-# memory manager, object files and dependencies
+# memory manager object files and dependencies
 memmanobj :=	$(memmansrc:.cc=.o)
 memmanobj :=	$(memmanobj:.c=.o)
 memmandep :=	$(memmansrc:.cc=.d)
 memmandep :=	$(memmandep:.c=.d)
 
-# memory manager, header files
+# memory manager header files
 newmemmanincl := \
 		mmprivate.h \
 		memman.h
@@ -301,7 +305,6 @@ distfiles :=	\
 #
 # - phony targets.
 #
-
 .PHONY:		all cf mem depend dist\
 		clean mostlyclean distclean maintainer-clean realmaintainer-clean \
 		install installcf installcflinks installmem installgftables \
@@ -336,7 +339,6 @@ distfiles :=	\
 #
 # - building factory.
 #
-
 all:		$(alltargets)
 
 cf:		factoryconf.h factory.h $(libfactory)
@@ -346,7 +348,6 @@ mem:		$(libmem)
 #
 # - explicit targets.
 #
-
 $(libfactory):	$(factoryobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
@@ -391,7 +392,6 @@ TAGS:
 #
 # - install targets.
 #
-
 install:	$(installtargets)
 
 installcf:	cf
@@ -419,7 +419,6 @@ installgftables: gftables
 #
 # - uninstall targets.
 #
-
 uninstall:	$(uninstalltargets)
 
 uninstallcf:
@@ -444,7 +443,6 @@ uninstallgftables:
 #
 # - building a distribution.
 #
-
 dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 		rm -f $(distname).tar.gz
 		rm -rf $(distname)
@@ -462,7 +460,6 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 #
 # - cleaning up.
 #
-
 clean:		
 		-rm -f $(libfactory) $(libmem) gengftables \
 		  factoryconf.h factory.h *.o *.d core *~
@@ -490,13 +487,14 @@ realmaintainer-clean: maintainer-clean
 		-rm -f $(srcdir)/configure
 
 #
-# - include dependencies but do not generate them automatically if
-#     there are not any dependencies at all.  this trick saves some
-#     time when you do not want to compile but do some maintenance
-#     which do not require the dependencies.  say 'make depend' to
-#     create the dependencies explicitly.
+# - dependencies.
 #
-
+# Do not generate them automatically if there are not any
+# dependencies at all.  this trick saves some time when you do
+# not want to compile but do some maintenance which do not
+# require the dependencies.  say 'make depend' to create the
+# dependencies explicitly.
+#
 depend:		config.h factoryconf.h \
 		$(factorydep) $(memmandep) $(hdrtempldep)
 
@@ -507,7 +505,6 @@ endif
 #
 # - configure stuff.
 #
-
 $(srcdir)/configure: configure.in
 		-cd $(srcdir) && autoconf
 
@@ -530,7 +527,6 @@ config.status:	configure
 #
 # - some extra targets inserted by configure.
 #
-
 @timingtargets@
 @debouttargets@
 @debtimingtargets@
