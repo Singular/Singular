@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.3 1998-04-24 11:52:40 krueger Exp $
+@comment $Id: reference.doc,v 1.4 1998-04-27 07:49:25 Singular Exp $
 @comment this file contains the reference part of the manual
 @c ---------------------------------------
 @node Functions, Control structures, Declaration commands, Commands
@@ -257,75 +257,75 @@ or Dongming Wang, Characteristic Sets and Zero Structure of Polynomial Sets
   print(char_series(ideal(xyz,xz,y)));
 @c example
 @end example
-@item @strong{Background:}
-@tex
-Let $>$ be the lexicographical ordering $x_1 < ... < x_n$ on $R=K[x_1,...,x_n]$.
-For $f \in R$ let lvar(f) (the leading variable of f) be the largest
-variable in lead(f) (the leading term of f with respect to $>$),
-i.e. if $f=a_k(x_1,...,x_{k-1})x_k^s+...+a_0(x_1,...,x_{k-1})$ for some
-$k \leq n$ then $lvar(f)=x_k$, moreover let $ini(f):=a_k(x_1,...,x_{k-1})$.
-
-A set $T=\{f_1,...,f_r\} \subset R$ is called triangular if $lvar(f_1)<...<lvar(f_r)$.
-The pseudoremainder $r=prem(g,f)$ of $g$ with respect to $f$ is defined by
-$ini(f)^a*g=q*f+r$ with the property $deg_{lvar(f)}(r)<deg_{lvar(f)}(f)$,
-a minimal.
-
-(T,U) is called a triangular system, if T is a triangular set such that ini(T)
-does not vanish on $Zero(T) \setminus Zero(U)
-( =:Zero(T\setminus U))$.
-
-T is called irreducible if for every i there are no $d_i$,$f_i'$,$f_i''$ with
-the property:
-$$   lvar(d_i)<lvar(f_i) $$
-$$   lvar(f_i')=lvar(f_i'')=lvar(f_i)$$
-$$   0 \not\in prem(\{ d_i, ini(f_i'), ini(f_i'')\},\{ f_1,...,f_(i-1)\})$$
-such that $prem(d_i*f_i-f_i'*f_i'',\{f_1,...,f_(i-1)\})=0$.
-
-(T,U) is irreducible if T is irreducible.
-
-Let $G=\{g_1,...,g_s\}$ then there are irreducible triangular sets $T_1,...,T_l$
-such that $Zero(G)=\bigcup(i=1..l: Zero(T_i\setminus I_i))$
-where $I_i=\{ini(f), f \in T_i \}$.
-@end tex
-@ifinfo
-Let > be the lexicographical ordering x_1 < ... < x_n on R=K[x_1,...,x_n].
-For f in R let lvar(f) (the leading variable of f) be the largest
-variable in lead(f) (the leading term of f with respect to >),
-i.e. if f=a_k(x_1,...,x_(k-1))x_k^s+...+a_0(x_1,...,x_(k-1)) for some
-k<=n then lvar(f)=x_k, moreover let ini(f):=a_k(x_1,...,x_(k-1)).
-
-A set T=@{f_1,...,f_r@} in R is called triangular if lvar(f_1)<...<lvar(f_r).
-The pseudoremainder r=prem(g,f) of g with respect to f is defined by
-ini(f)^a*g=q*f+r with the property deg_(lvar(f))(r)<deg_(lvar(f))(f),s
-a minimal.
-
-(T,U) is called a triangular system, if T is a triangular set such that ini(T)
-does not vanish on the zero set of T \ zero set of U
-( =:Zero(T\U)).
-
-T is called irreducible if for every i there are no d_i,f_i',f_i'' with
-the property:
-@*   lvar(d_i)<lvar(f_i)
-@*   lvar(f_i')=lvar(f_i'')=lvar(f_i)
-@*   0 not in prem(@{ d_i, ini(f_i'), ini(f_i'')@},@{ f_1,...,f_(i-1)@})
-@*such that prem(d_i*f_i-f_i'*f_i'',@{f_1,...,f_(i-1)@})=0.
-
-(T,U) is irreducible if T is irreducible.
-
-Let G=@{g_1,...,g_s@} then there are irreducible triangular sets T_1,...,T_l
-such that Zero(G)=Union(i=1..l: Zero(T_i\I_i))
-where I_i=@{ini(f), f in T_i @}.
-@end ifinfo
-@item @strong{Example:}
-@example
-@c example
-  ring R= 0,(x,y,z,u),dp;
-  ideal i=-3zu+y2-2x+2,
-          -3x2u-4yz-6xz+2y2+3xy,
-          -3z2u-xu+y2z+y;
-  print(char_series(i));
-@c example
-@end example
+@c @item @strong{Background:}
+@c @tex
+@c Let $>$ be the lexicographical ordering $x_1 < ... < x_n$ on $R=K[x_1,...,x_n]$.
+@c For $f \in R$ let lvar(f) (the leading variable of f) be the largest
+@c variable in lead(f) (the leading term of f with respect to $>$),
+@c i.e. if $f=a_k(x_1,...,x_{k-1})x_k^s+...+a_0(x_1,...,x_{k-1})$ for some
+@c $k \leq n$ then $lvar(f)=x_k$, moreover let $ini(f):=a_k(x_1,...,x_{k-1})$.
+@c 
+@c A set $T=\{f_1,...,f_r\} \subset R$ is called triangular if $lvar(f_1)<...<lvar(f_r)$.
+@c The pseudoremainder $r=prem(g,f)$ of $g$ with respect to $f$ is defined by
+@c $ini(f)^a*g=q*f+r$ with the property $deg_{lvar(f)}(r)<deg_{lvar(f)}(f)$,
+@c a minimal.
+@c 
+@c (T,U) is called a triangular system, if T is a triangular set such that ini(T)
+@c does not vanish on $Zero(T) \setminus Zero(U)
+@c ( =:Zero(T\setminus U))$.
+@c 
+@c T is called irreducible if for every i there are no $d_i$,$f_i'$,$f_i''$ with
+@c the property:
+@c $$   lvar(d_i)<lvar(f_i) $$
+@c $$   lvar(f_i')=lvar(f_i'')=lvar(f_i)$$
+@c $$   0 \not\in prem(\{ d_i, ini(f_i'), ini(f_i'')\},\{ f_1,...,f_(i-1)\})$$
+@c such that $prem(d_i*f_i-f_i'*f_i'',\{f_1,...,f_(i-1)\})=0$.
+@c 
+@c (T,U) is irreducible if T is irreducible.
+@c 
+@c Let $G=\{g_1,...,g_s\}$ then there are irreducible triangular sets $T_1,...,T_l$
+@c such that $Zero(G)=\bigcup(i=1..l: Zero(T_i\setminus I_i))$
+@c where $I_i=\{ini(f), f \in T_i \}$.
+@c @end tex
+@c @ifinfo
+@c Let > be the lexicographical ordering x_1 < ... < x_n on R=K[x_1,...,x_n].
+@c For f in R let lvar(f) (the leading variable of f) be the largest
+@c variable in lead(f) (the leading term of f with respect to >),
+@c i.e. if f=a_k(x_1,...,x_(k-1))x_k^s+...+a_0(x_1,...,x_(k-1)) for some
+@c k<=n then lvar(f)=x_k, moreover let ini(f):=a_k(x_1,...,x_(k-1)).
+@c 
+@c A set T=@{f_1,...,f_r@} in R is called triangular if lvar(f_1)<...<lvar(f_r).
+@c The pseudoremainder r=prem(g,f) of g with respect to f is defined by
+@c ini(f)^a*g=q*f+r with the property deg_(lvar(f))(r)<deg_(lvar(f))(f),s
+@c a minimal.
+@c 
+@c (T,U) is called a triangular system, if T is a triangular set such that ini(T)
+@c does not vanish on the zero set of T \ zero set of U
+@c ( =:Zero(T\U)).
+@c 
+@c T is called irreducible if for every i there are no d_i,f_i',f_i'' with
+@c the property:
+@c @*   lvar(d_i)<lvar(f_i)
+@c @*   lvar(f_i')=lvar(f_i'')=lvar(f_i)
+@c @*   0 not in prem(@{ d_i, ini(f_i'), ini(f_i'')@},@{ f_1,...,f_(i-1)@})
+@c @*such that prem(d_i*f_i-f_i'*f_i'',@{f_1,...,f_(i-1)@})=0.
+@c 
+@c (T,U) is irreducible if T is irreducible.
+@c 
+@c Let G=@{g_1,...,g_s@} then there are irreducible triangular sets T_1,...,T_l
+@c such that Zero(G)=Union(i=1..l: Zero(T_i\I_i))
+@c where I_i=@{ini(f), f in T_i @}.
+@c @end ifinfo
+@c @item @strong{Example:}
+@c @example
+@c @c example
+@c   ring R= 0,(x,y,z,u),dp;
+@c   ideal i=-3zu+y2-2x+2,
+@c           -3x2u-4yz-6xz+2y2+3xy,
+@c           -3z2u-xu+y2z+y;
+@c   print(char_series(i));
+@c @c example
+@c @end example
 @end table
 @c ---------------------------------------
 @node charstr, cleardenom, char_series, Functions

@@ -81,27 +81,6 @@ Thus, we hope to offer a useful system
 for dealing with local and global computational aspects
 of systems of polynomial equations.
 
-For a description of the basic algorithms, together with many examples
-and comparisons, cf. Grassmann, H.; Greuel, G.-M.; Martin, B.; Neumann,
-W.; Pfister, G.; Pohl, W.;
-@tex
-Sch\"onemann,
-@end tex
-@ifinfo
- Schoenemann
-@end ifinfo
- H.; Siebert, T.:  On an
-implementation of standard bases and syzygies in  @sc{Singular},
-Proceedings of the Workshop  Computational Methods in Lie theory in AAECC (1995).
-
-For a mathematical background, in particular for general (global, local
-or mixed) orderings and resolutions, cf. Greuel, G.-M.; Pfister, G.:
-Advances and improvements in the theory of standard bases and
-syzygies, Arch. d. Math. 63(1995)
-
-@c Both papers are available as Latex files via  anonymous ftp from
-@c @code{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}.
-
 @c ---------------------------------------
 @section Notations
 
