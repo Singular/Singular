@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.69 2003-07-25 15:05:55 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.70 2003-07-25 17:12:13 levandov Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -466,7 +466,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 
   assumeStdFlag(a);
   #ifdef HAVE_PLURAL
-  if(rIsPluralRing())
+  if(rIsPluralRing(currRing))
   {
     if (!hasFlag(a,FLAG_TWOSTD))
     {
