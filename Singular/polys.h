@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.19 1998-12-03 11:02:37 obachman Exp $ */
+/* $Id: polys.h,v 1.20 1999-05-26 16:24:00 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -297,8 +297,19 @@ void      pSetSyzComp(int k);
 /*BOOLEAN   pVectorHasUnitM(poly p, int * k);*/
 BOOLEAN   pVectorHasUnitB(poly p, int * k);
 void      pVectorHasUnit(poly p, int * k, int * len);
-poly      pTakeOutComp(poly * p, int k);
 poly      pTakeOutComp1(poly * p, int k);
+// Splits *p into two polys: *q which consists of all monoms with 
+// component == comp and *p of all other monoms *lq == pLength(*q)
+// On rreturn all components pf *q == 0
+void pTakeOutComp(poly *p, Exponent_t comp, poly *q, int *lq);
+// Similar to pTakeOutComp, except that only those components are
+// taken out whose Order == order
+// ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
+//         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
+void pDecrOrdTakeOutComp(poly *p, Exponent_t comp, Order_t order,
+                         poly *q, int *lq);
+// This is something weird -- Don't use it, unless you know what you are doing 
+poly      pTakeOutComp(poly * p, int k);
 void      pDeleteComp(poly * p,int k);
 void      pNorm(poly p);
 void      pNormalize(poly p);

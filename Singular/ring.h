@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.25 1999-05-10 15:10:54 Singular Exp $ */
+/* $Id: ring.h,v 1.26 1999-05-26 16:24:00 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -105,7 +105,10 @@ typedef enum rOrderType_t
   rOrderType_Exp,         // simple ordering, exponent vector has priority
                           // component is compatible with exp-vector order
   rOrderType_Syz,         // syzygy ordering
-  rOrderType_Schreyer     // Schreyer ordering
+  rOrderType_Schreyer,     // Schreyer ordering
+  rOrderType_Syz2dpc,     // syzcomp2dpc
+  rOrderType_ExpNoComp    // simple ordering, differences in component are 
+                          // not considered
 } rOrderType_t;
 
 BOOLEAN rHasSimpleOrder(ring r);

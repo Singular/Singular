@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.12 1998-11-12 14:44:37 siebert Exp $ */
+/* $Id: syz.h,v 1.13 1999-05-26 16:24:02 obachman Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -93,4 +93,6 @@ syStrategy syConvList(lists li,BOOLEAN toDel=FALSE);
 syStrategy syForceMin(lists li);
 syStrategy syMinimize(syStrategy syzstr);
 void syKillEmptyEntres(resolvente res,int length);
+
+extern int *  currcomponents;
 #endif

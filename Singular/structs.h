@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.19 1999-04-29 11:38:58 Singular Exp $ */
+/* $Id: structs.h,v 1.20 1999-05-26 16:24:02 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -53,6 +53,7 @@ class skStrategy;
 class ssyStrategy;
 class procinfo;
 class namerec;
+class kBucket;
 #endif
 
 struct  sip_sring;
@@ -105,6 +106,7 @@ typedef ip_package *       package;
 typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
 typedef namerec *          namehdl;
+typedef kBucket*           kBucket_pt;
 
 struct _scmdnames
 {

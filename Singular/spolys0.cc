@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.13 1998-11-11 14:44:27 Singular Exp $ */
+/* $Id: spolys0.cc,v 1.14 1999-05-26 16:24:01 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -28,7 +28,7 @@
 *       3  ->  a == 1,  b == 1
 *   this value is used to control the spolys
 */
-static int spCheckCoeff(number *a, number *b)
+int spCheckCoeff(number *a, number *b)
 {
   int c = 0;
   number an = *a, bn = *b;

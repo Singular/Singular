@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.13 1998-12-15 10:08:50 pohl Exp $ */
+/* $Id: kutil.h,v 1.14 1999-05-26 16:23:56 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -154,6 +154,7 @@ BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
 
 rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp);
+extern int spCheckCoeff(number *a, number *b);
 
 inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
 #ifdef KDEBUG

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.38 1999-05-25 16:49:39 obachman Exp $ */
+/* $Id: polys.cc,v 1.39 1999-05-26 16:23:59 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1924,6 +1924,109 @@ poly pTakeOutComp(poly * p, int k)
     }
   }
   return result;
+}
+
+
+// Splits *p into two polys: *q which consists of all monoms with
+// component == comp and *p of all other monoms *lq == pLength(*q)
+void pTakeOutComp(poly *r_p, Exponent_t comp, poly *r_q, int *lq)
+{
+  spolyrec pp, qq;
+  poly p, q, p_prev;
+  int l = 0;
+
+#ifdef HAVE_ASSUME
+  int lp = pLength(*r_p);
+#endif
+
+  pNext(&pp) = *r_p;
+  p = *r_p;
+  p_prev = &pp;
+  q = &qq;
+
+  while(p != NULL)
+  {
+    while (pGetComp(p) == comp)
+    {
+      pNext(q) = p;
+      pIter(q);
+      pSetComp(p, 0);
+      pIter(p);
+      l++;
+      if (p == NULL)
+      {
+        pNext(p_prev) = NULL;
+        goto Finish;
+      }
+    }
+    pNext(p_prev) = p;
+    p_prev = p;
+    pIter(p);
+  }
+
+  Finish:
+  pNext(q) = NULL;
+  *r_p = pNext(&pp);
+  *r_q = pNext(&qq);
+  *lq = l;
+#ifdef HAVE_ASSUME
+  assume(pLength(*r_p) + pLength(*r_q) == lp);
+#endif
+  pTest(*r_p);
+  pTest(*r_q);
+}
+
+void pDecrOrdTakeOutComp(poly *r_p, Exponent_t comp, Order_t order,
+                         poly *r_q, int *lq)
+{
+  spolyrec pp, qq;
+  poly p, q, p_prev;
+  int l = 0;
+
+  pNext(&pp) = *r_p;
+  p = *r_p;
+  p_prev = &pp;
+  q = &qq;
+
+#ifdef HAVE_ASSUME
+  if (p != NULL)
+  {
+    while (pNext(p) != NULL)
+    {
+      assume(pGetOrder(p) >= pGetOrder(pNext(p)));
+      pIter(p);
+    }
+  }
+  p = *r_p;
+#endif
+
+  while (p != NULL && pGetOrder(p) > order) pIter(p);
+
+  while(p != NULL && pGetOrder(p) == order)
+  {
+    while (pGetComp(p) == comp)
+    {
+      pNext(q) = p;
+      pIter(q);
+      pIter(p);
+      pSetComp(p, 0);
+      l++;
+      if (p == NULL || pGetOrder(p) != order)
+      {
+        pNext(p_prev) = p;
+        goto Finish;
+      }
+    }
+    pNext(p_prev) = p;
+    p_prev = p;
+    pIter(p);
+  }
+
+  Finish:
+  pNext(q) = NULL;
+  *r_p = pNext(&pp);
+  *r_q = pNext(&qq);
+  *lq = l;
 }
 
 poly pTakeOutComp1(poly * p, int k)

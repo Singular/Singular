@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.12 1999-04-20 11:25:50 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.13 1999-05-26 16:23:55 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -344,35 +344,58 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
   if (strcmp(ns,"%l") == 0)
   {
     res->data = (char*) u->String(NULL, TRUE, dim);
+    if (dim == 2)
+    {
+      char* ns = (char*) AllocL(strlen((char*) res->data) + 2);
+      strcpy(ns, (char*) res->data);
+      FreeL(res->data);
+      strcat(ns, "\n");
+      res->data = ns;
+    }
   }
   else if (strcmp(ns,"%t") == 0)
   {
     SPrintStart();
-    if (u->rtyp==IDHDL) type_cmd((idhdl) (u->data));
-    else type_cmd((idhdl) u);
+    if (u->rtyp==IDHDL) 
+      type_cmd((idhdl) (u->data));
+    else 
+      type_cmd((idhdl) u);
     res->data = SPrintEnd();
+    if (dim != 2) 
+      ((char*)res->data)[strlen((char*)res->data) -1] = '\0';
   }
   else if (strcmp(ns,"%;") == 0)
   {
     SPrintStart();
     u->Print();
+    if (dim == 2) PrintLn();
     res->data = SPrintEnd();
   }
   else if  (strcmp(ns,"%p") == 0)
   {
     SPrintStart();
     iiExprArith1(res, u, PRINT_CMD);
+    if (dim == 2) PrintLn();
     res->data = SPrintEnd();
   }
   else if (strcmp(ns,"%b") == 0 && (u->Typ()==INTMAT_CMD))
   {
     SPrintStart();
     ipPrintBetti(u);
+    if (dim == 2) PrintLn();
     res->data = SPrintEnd();
   }
   else 
   {
     res->data = u->String(NULL, FALSE, dim);
+    if (dim == 2)
+    {
+      char* ns = (char*) AllocL(strlen((char*) res->data) + 2);
+      strcpy(ns, (char*) res->data);
+      FreeL(res->data);
+      strcat(ns, "\n");
+      res->data = ns;
+    }
   }
     
   FreeL(ns);
