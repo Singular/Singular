@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.14 2004-08-09 16:16:01 Singular Exp $ */
+/* $Id: ring.cc,v 1.15 2004-08-09 16:55:54 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3468,17 +3468,24 @@ ring rOpp(ring src)
   int i2=(rVar(r)-1)/2;
   for(int i=i2; i>=0; i--)
   {
-    //Print("ex: %d <-> %d\n",i,rVar(r)-1-i);
+    // index: 0..N-1
+    //Print("ex var names: %d <-> %d\n",i,rVar(r)-1-i);
     // exchange names
     char *p;
-    int t;
     p=r->names[rVar(r)-1-i];
     r->names[rVar(r)-1-i]=r->names[i];
     r->names[i]=p;
+  }
+  i2=(rVar(r)+1)/2;
+  for(int i=i2; i>0; i--)
+  {
+    // index: 1..N
+    //Print("ex var places: %d <-> %d\n",i,rVar(r)+1-i);
     // exchange VarOffset
+    int t;
     t=r->VarOffset[i];
-    r->VarOffset[i]=r->VarOffset[rVar(r)-1-i];
-    r->VarOffset[rVar(r)-1-i]=t;
+    r->VarOffset[i]=r->VarOffset[rVar(r)+1-i];
+    r->VarOffset[rVar(r)+1-i]=t;
   }
   // change names:
   for (i=rVar(r)-1; i>=0; i--)
@@ -3539,6 +3546,7 @@ ring rOpp(ring src)
   r->order[0]=ringorder_unspec;
   r->block0[0]=1;
   r->block1[0]=rVar(r);
+  r->order[1]=0;
   rDebugPrint(r);
   return r;
 }
