@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.7 1997-10-10 10:53:14 schmidt Exp $ */
+/* $Id: int_rat.cc,v 1.8 1997-12-12 09:26:41 schmidt Exp $ */
 
 #include <config.h>
 
@@ -182,18 +182,6 @@ InternalCF* InternalRational::neg()
 	mpz_neg( &_num, &_num );
 	return this;
     }
-}
-
-int InternalRational::comparesame( InternalCF * c )
-{
-    ASSERT( ! ::is_imm( c ) && c->levelcoeff() == RationalDomain, "illegal domain" );
-    MP_INT dummy1, dummy2;
-    mpz_init( &dummy1 ); mpz_init( &dummy2 );
-    mpz_mul( &dummy1, &_num, &MPQDEN( c ) );
-    mpz_mul( &dummy2, &_den, &MPQNUM( c ) );
-    int result = mpz_cmp( &dummy1, &dummy2 );
-    mpz_clear( &dummy1 ); mpz_clear( &dummy2 );
-    return result;
 }
 
 InternalCF* InternalRational::addsame( InternalCF * c )
@@ -440,10 +428,44 @@ bool InternalRational::divremsamet( InternalCF* c, InternalCF*& quot, InternalCF
     return true;
 }
 
-int InternalRational::comparecoeff( InternalCF* c )
+//{{{ int InternalRational::comparesame, comparecoeff ( InternalCF * c )
+//{{{ docu
+//
+// comparesame(), comparecoeff() - compare with an
+//   InternalRational.
+//
+// comparesame() compares the CO=a/b and c=p/q using the
+// equivalence a/b < p/q iff a*q < p*b.
+//
+// comparecoeff() compares the CO=a/b and the integer c using the
+// equivalence a/b < c iff a < c*b.
+//
+// Note: Both operations may be relatively expensive due to the
+// multiplications.
+//
+// See also: CanonicalForm::operator ==(),
+// CanonicalForm::operator !=(), CanonicalForm::operator >(),
+// CanonicalForm::operator <(), 
+//
+//}}}
+int
+InternalRational::comparesame ( InternalCF * c )
 {
-    ASSERT( ::is_imm( c ) == INTMARK || ! ::is_imm( c ), "expected integer" );
+    ASSERT( ! ::is_imm( c ) && c->levelcoeff() == RationalDomain, "incompatible base coefficients" );
+    MP_INT dummy1, dummy2;
+    mpz_init( &dummy1 ); mpz_init( &dummy2 );
+    mpz_mul( &dummy1, &_num, &MPQDEN( c ) );
+    mpz_mul( &dummy2, &_den, &MPQNUM( c ) );
+    int result = mpz_cmp( &dummy1, &dummy2 );
+    mpz_clear( &dummy1 ); mpz_clear( &dummy2 );
+    return result;
+}
+
+int
+InternalRational::comparecoeff ( InternalCF* c )
+{
     if ( ::is_imm( c ) ) {
+	ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
 	MP_INT dummy;
 	mpz_init_set_si( &dummy, imm2int( c ) );
 	mpz_mul( &dummy, &dummy, &_den );
@@ -452,15 +474,16 @@ int InternalRational::comparecoeff( InternalCF* c )
 	return result;
     }
     else {
-	ASSERT( c->levelcoeff() == IntegerDomain, "expected integer" );
+	ASSERT( c->levelcoeff() == IntegerDomain, "incompatible base coefficients" );
 	MP_INT dummy;
 	mpz_init( &dummy );
-	mpz_mul( &dummy, &dummy, &InternalInteger::MPI( c ) );
+	mpz_mul( &dummy, &_den, &InternalInteger::MPI( c ) );
 	int result = mpz_cmp( &_num, &dummy );
 	mpz_clear( &dummy );
 	return result;
     }
 }
+//}}}
 
 InternalCF* InternalRational::addcoeff( InternalCF* c )
 {
