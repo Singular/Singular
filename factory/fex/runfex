@@ -1,5 +1,5 @@
 #! /mnt/amd/users/urmel/insider/schmidt/bin/bash
-# $Id: runfex,v 1.1 1997-10-10 13:07:25 schmidt Exp $
+# $Id: runfex,v 1.2 1997-10-28 17:18:36 schmidt Exp $
 
 #{{{ docu
 #
@@ -80,7 +80,7 @@ debugMode=""
 # - functions.
 #
 
-#{{{ warn()
+#{{{ warn ()
 #{{{ docu
 #
 # warn() - print arguments to stderr prefixed $ExecName.
@@ -95,7 +95,7 @@ warn()
 }
 #}}}
 
-#{{{ pc()
+#{{{ pc ()
 #{{{ docu
 #
 # pc() - print html table cell.
@@ -112,7 +112,7 @@ pc()
 }
 #}}}
 
-#{{{ pct()
+#{{{ pct ()
 #{{{ docu
 #
 # pc() - print html table cell in type writer style.
@@ -129,7 +129,7 @@ pct()
 }
 #}}}
 
-#{{{ runAlgorithm()
+#{{{ runAlgorithm ()
 #{{{ docu
 #
 # runAlgorithm() - run algorithm with the correct options.
@@ -167,7 +167,7 @@ runAlgorithm()
 }
 #}}}
 
-#{{{ printData()
+#{{{ printData ()
 #{{{ docu
 #
 # printData() - print example/run table.
@@ -200,36 +200,36 @@ printData()
     # get correct block height
     blockHeight=blockHeight+${#options}
     case "$options" in
-	*r*) blockHeight=blockHeight+${#algResultTags[@]}-1 ;;
+	(*r*) blockHeight=blockHeight+${#algResultTags[@]}-1 ;;
     esac
     case "$options" in
-	*d*) blockHeight=blockHeight+${#algDataTags[@]}-1 ;;
+	(*d*) blockHeight=blockHeight+${#algDataTags[@]}-1 ;;
     esac
 
     #{{{ print first line
     # for efficiency, we repeat this case statement to print the first line
     if [ -n "$options" ]; then
 	case "$options" in
-	    *p*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Char )$( pct "$algChar" "width=$colWidth" )<!eol></tr>"
+	    (*p*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Char )$( pct "$algChar" "width=$colWidth" )<!eol></tr>"
 		 options="${options//p/}" ;;
-	    *s*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Switches )$( pct "$algSwitch" "width=$colWidth" )<!eol></tr>"
+	    (*s*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Switches )$( pct "$algSwitch" "width=$colWidth" )<!eol></tr>"
 		 options="${options//s/}" ;;
-	    *v*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Variables )$( pct "$algVars" "width=$colWidth" )<!eol></tr>"
+	    (*v*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Variables )$( pct "$algVars" "width=$colWidth" )<!eol></tr>"
 		 options="${options//v/}" ;;
-	    *n*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Circles )$( pct "$algCircle" "width=$colWidth" )<!eol></tr>"
+	    (*n*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Circles )$( pct "$algCircle" "width=$colWidth" )<!eol></tr>"
 		 options="${options//n/}" ;;
-	    *g*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Seed )$( pct "$algSeed" "width=$colWidth" )<!eol></tr>"
+	    (*g*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Seed )$( pct "$algSeed" "width=$colWidth" )<!eol></tr>"
 		 options="${options//g/}" ;;
-	    *f*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Version )$( pct "$algVers" "width=$colWidth" )<!eol></tr>"
+	    (*f*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Version )$( pct "$algVers" "width=$colWidth" )<!eol></tr>"
 		 options="${options//f/}" ;;
-	    *t*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Time )$( pct "$algTime" "width=$colWidth" )<!eol></tr>"
+	    (*t*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Time )$( pct "$algTime" "width=$colWidth" )<!eol></tr>"
 		 options="${options//t/}" ;;
-	    *c*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Check )$( pct "$algCheck" "width=$colWidth" )<!eol></tr>"
+	    (*c*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Check )$( pct "$algCheck" "width=$colWidth" )<!eol></tr>"
 		 options="${options//c/}" ;;
-	    *d*|*r*)
+	    (*d*|*r*)
 		 warn "first line in a table must not start with data or result information"
 		 options="" ;;
-	    *)   warn "unknown output type specifier '$options' in table specification"
+	    (*)   warn "unknown output type specifier '$options' in table specification"
 		 options="" ;;
 	esac
     fi
@@ -238,23 +238,23 @@ printData()
     #{{{ print other lines
     while [ -n "$options" ]; do
 	case "$options" in
-	    *p*) echo "<tr align=left valign=top><!bol>$( pc Char )$( pct "$algChar" )<!eol></tr>"
+	    (*p*) echo "<tr align=left valign=top><!bol>$( pc Char )$( pct "$algChar" )<!eol></tr>"
 		 options="${options//p/}" ;;
-	    *s*) echo "<tr align=left valign=top><!bol>$( pc Switches )$( pct "$algSwitch" )<!eol></tr>"
+	    (*s*) echo "<tr align=left valign=top><!bol>$( pc Switches )$( pct "$algSwitch" )<!eol></tr>"
 		 options="${options//s/}" ;;
-	    *v*) echo "<tr align=left valign=top><!bol>$( pc Variables )$( pct "$algVars" )<!eol></tr>"
+	    (*v*) echo "<tr align=left valign=top><!bol>$( pc Variables )$( pct "$algVars" )<!eol></tr>"
 		 options="${options//v/}" ;;
-	    *n*) echo "<tr align=left valign=top><!bol>$( pc Circles )$( pct "$algCircle" )<!eol></tr>"
+	    (*n*) echo "<tr align=left valign=top><!bol>$( pc Circles )$( pct "$algCircle" )<!eol></tr>"
 		 options="${options//n/}" ;;
-	    *g*) echo "<tr align=left valign=top><!bol>$( pc Seed )$( pct "$algSeed" )<!eol></tr>"
+	    (*g*) echo "<tr align=left valign=top><!bol>$( pc Seed )$( pct "$algSeed" )<!eol></tr>"
 		 options="${options//g/}" ;;
-	    *f*) echo "<tr align=left valign=top><!bol>$( pc Version )$( pct "$algVers" )<!eol></tr>"
+	    (*f*) echo "<tr align=left valign=top><!bol>$( pc Version )$( pct "$algVers" )<!eol></tr>"
 		 options="${options//f/}" ;;
-	    *t*) echo "<tr align=left valign=top><!bol>$( pc Time )$( pct "$algTime" )<!eol></tr>"
+	    (*t*) echo "<tr align=left valign=top><!bol>$( pc Time )$( pct "$algTime" )<!eol></tr>"
 		 options="${options//t/}" ;;
-	    *c*) echo "<tr align=left valign=top><!bol>$( pc Check )$( pct "$algCheck" )<!eol></tr>"
+	    (*c*) echo "<tr align=left valign=top><!bol>$( pc Check )$( pct "$algCheck" )<!eol></tr>"
 		 options="${options//c/}" ;;
-	    *d*) 
+	    (*d*) 
 		n=${#algDataTags[@]}
 		i=0
 		while [ $i -lt $n ]; do
@@ -272,7 +272,7 @@ EOT
 		    i=i+1
 		done
 		options="${options//d/}" ;;
-	    *r*)
+	    (*r*)
 		n=${#algResultTags[@]}
 		i=0
 		while [ $i -lt $n ]; do
@@ -290,7 +290,7 @@ EOT
 		    i=i+1
 		done
 		options="${options//r/}" ;;
-	    *)   warn "unknown output type specifier '$options' in table specification"
+	    (*)   warn "unknown output type specifier '$options' in table specification"
 		 options="" ;;
 	esac
     done
@@ -298,7 +298,7 @@ EOT
 }
 #}}}
 
-#{{{ collection()
+#{{{ collection ()
 #{{{ docu
 #
 # collection() - set up collection data.
@@ -319,18 +319,26 @@ collection()
     collectionOptions=""
     collectionEnvironment=""
 
+    # read collection name
+    if [ "$#" = "0" ]; then
+	warn "no collection name specified"
+	exit 1
+    fi
+    #collectionName="$1"
+    shift
+
     #{{{ read options and environment
     # read options
     typeset opt
     while getopts "n:a:c:t:x:r:" opt; do
 	case "$opt" in
-	    n)	collectionNote="${collectionNote:-$OPTARG}" ;;
-	    a)	collectionOptions="$collectionOptions -a$OPTARG" ;;
-	    c)	collectionOptions="$collectionOptions -c$OPTARG" ;;
-	    t)	collectionTBOptions="${collectionTBOptions:-$OPTARG}" ;;
-	    x)	collectionXOOptions="${collectionXOOptions:-$OPTARG}" ;;
-	    r)	collectionROOptions="${collectionROOptions:-$OPTARG}" ;;
-	    ?)	warn "bad collection option"; exit 1 ;;
+	    (n)	collectionNote="${collectionNote:-$OPTARG}" ;;
+	    (a)	collectionOptions="$collectionOptions -a$OPTARG" ;;
+	    (c)	collectionOptions="$collectionOptions -c$OPTARG" ;;
+	    (t)	collectionTBOptions="${collectionTBOptions:-$OPTARG}" ;;
+	    (x)	collectionXOOptions="${collectionXOOptions:-$OPTARG}" ;;
+	    (r)	collectionROOptions="${collectionROOptions:-$OPTARG}" ;;
+	    (?)	warn "bad collection option"; exit 1 ;;
 	esac
     done
     # shift options and reset OPTIND
@@ -348,7 +356,7 @@ collection()
 }
 #}}}
 
-#{{{ createTable()
+#{{{ createTable ()
 #{{{ docu
 #
 # createTable() - create html file from output data.
@@ -366,6 +374,7 @@ createTable()
     # write header
     cat << EOT
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<! Generated by runfex>
 <html>
 <head>
   <title>Results from running $collectionName</title>
@@ -382,11 +391,13 @@ EOT
 <table border=1 cellpadding=5 cellspacing=1>
 <tr align=left valign=top>$( pc "Coll. Name" )$( pct "$collectionName" colspan=2 )</tr>
 <tr align=left valign=top>$( pc "Coll. Note" )$( pct "${collectionNote:-(no note)}" colspan=2 )</tr>
+<!TB>
 <tr align=left valign=top><!bol>$( pc "" )$( pc "<a name=\"TB$runName\" href=\"#RO$runName\">$runName</a>" "colspan=2")<!eol></tr>
 EOT
     cat  "$runName.tb.tbl"
 
     cat << EOT
+<!/TB>
 </table>
 EOT
 
@@ -397,10 +408,12 @@ EOT
 <tr align=left valign=top>$( pc "Coll. Name" )$( pct "$collectionName" colspan=2 )</tr>
 <tr align=left valign=top>$( pc "Coll. Note" )$( pct "${collectionNote:-(no note)}" colspan=2 )</tr>
 <tr align=left valign=top>$( pc "Examples" )$( pc "Data" colspan=2 )</tr>
+<!XO>
 EOT
     cat  "$runName.xo.tbl"
 
     cat << EOT
+<!/XO>
 </table>
 EOT
 
@@ -412,10 +425,12 @@ EOT
 <tr align=left valign=top>$( pc "Coll. Name" )$( pct "$collectionName" colspan=2 )</tr>
 <tr align=left valign=top>$( pc "Coll. Note" )$( pct "${collectionNote:-(no note)}" colspan=2 )</tr>
 <tr align=left valign=top>$( pc "Runs" )$( pc "Data" colspan=2 )</tr>
+<!RO>
 EOT
     cat  "$runName.ro.tbl"
 
     cat << EOT
+<!/RO>
 </table>
 EOT
 
@@ -428,7 +443,7 @@ EOT
 }
 #}}}
 
-#{{{ defineSkip()
+#{{{ defineSkip ()
 #{{{ docu
 #
 # defineSkip() - define function skipExample().
@@ -465,8 +480,8 @@ skipExample()
 skipExample()
 {
     case \"\$1\" in
-	$regExp) return 1 ;;
-	*) return 0 ;;
+	($regExp) return 1 ;;
+	(*) return 0 ;;
     esac
 }
 "
@@ -475,8 +490,8 @@ skipExample()
 skipExample()
 {
     case \"\$1\" in
-	$notRegExp) return 0 ;;
-	*) return 1 ;;
+	($notRegExp) return 0 ;;
+	(*) return 1 ;;
     esac
 }
 "
@@ -485,9 +500,9 @@ skipExample()
 skipExample()
 {
     case \"\$1\" in
-	$notRegExp) return 0 ;;
-	$regExp) return 1 ;;
-	*) return 0 ;;
+	($notRegExp) return 0 ;;
+	($regExp) return 1 ;;
+	(*) return 0 ;;
     esac
 }
 "
@@ -495,7 +510,7 @@ skipExample()
 }
 #}}}
 
-#{{{ example()
+#{{{ example ()
 #{{{ docu
 #
 # example() - run an example.
@@ -545,12 +560,12 @@ example()
     typeset opt
     while getopts "n:a:c:t:x:" opt; do
 	case "$opt" in
-	    n)	exampleNote="$OPTARG" ;;
-	    a)	exampleOptions="$exampleOptions -a$OPTARG" ;;
-	    c)	exampleOptions="$exampleOptions -c$OPTARG" ;;
-	    t)	exampleTBOptions="$OPTARG" ;;
-	    x)	exampleXOOptions="$OPTARG" ;;
-	    ?)	warn "bad example option"; exit 1 ;;
+	    (n)	exampleNote="$OPTARG" ;;
+	    (a)	exampleOptions="$exampleOptions -a$OPTARG" ;;
+	    (c)	exampleOptions="$exampleOptions -c$OPTARG" ;;
+	    (t)	exampleTBOptions="$OPTARG" ;;
+	    (x)	exampleXOOptions="$OPTARG" ;;
+	    (?)	warn "bad example option"; exit 1 ;;
 	esac
     done
     # shift options and reset OPTIND
@@ -617,7 +632,7 @@ example()
 	# preprocess output and store result in the arrays
 	while read line; do
 	    case "$line" in
-		@@!*)
+		(@@!*)
 		    # read data lines
 		    algDataTags[i]="${line#@@!}"
 		    read line
@@ -627,13 +642,13 @@ example()
 $line"
 		    done
 		    i=i+1 ;;
-		@!*)
+		(@!*)
 		    # read one data line
 		    algDataTags[i]="${line#@!}"
 		    algDataTags[i]="${algDataTags[i]%%:*}"
 		    algData[i]="${line#*: }"
 		    i=i+1 ;;
-		@@*)
+		(@@*)
 		    # read result lines
 		    algResultTags[j]="${line#@@}"
 		    read line
@@ -643,7 +658,7 @@ $line"
 $line"
 		    done
 		    j=j+1 ;;
-		@*)
+		(@*)
 		    # read one result line
 		    algResultTags[j]="${line#@}"
 		    algResultTags[j]="${algResultTags[j]%%:*}"
@@ -716,14 +731,14 @@ typeset rawCollectionName=""
 typeset opt
 while getopts "n:a:c:t:x:r:d" opt; do
     case "$opt" in
-	n)  runNote="$OPTARG" ;;
-	a)  runOptions="$runOptions -a$OPTARG" ;;
-	c)  runOptions="$runOptions -c$OPTARG" ;;
-	t)  runTBOptions="$OPTARG" ;;
-	x)  runXOOptions="$OPTARG" ;;
-	r)  runROOptions="$OPTARG" ;;
-	d)  debugMode="1" ;;
-	?)  warn "bad run option"; exit 1 ;;
+	(n)  runNote="$OPTARG" ;;
+	(a)  runOptions="$runOptions -a$OPTARG" ;;
+	(c)  runOptions="$runOptions -c$OPTARG" ;;
+	(t)  runTBOptions="$OPTARG" ;;
+	(x)  runXOOptions="$OPTARG" ;;
+	(r)  runROOptions="$OPTARG" ;;
+	(d)  debugMode="1" ;;
+	(?)  warn "bad run option"; exit 1 ;;
     esac
 done
 # shift options and reset OPTIND
