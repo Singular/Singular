@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.19 1999-03-15 15:43:06 Singular Exp $
+// $Id: clapconv.cc,v 1.20 1999-06-15 07:59:28 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -550,7 +550,7 @@ convSingGFClapGF( poly p )
   while ( p != NULL )
   {
     CanonicalForm term;
-    term = npInt( ???????pGetCoeff( p ) );
+    term = make_cf_from_gf( pGetCoeff( p ) );
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = pGetExp( p, i )) != 0 )
@@ -599,7 +599,7 @@ convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i, exp[i]);
     pSetComp(term, 0);
-    pGetCoeff( term ) = nInit( ?????f.intval() );
+    pGetCoeff( term ) = (number) gf_value (f);
     pSetm( term );
     result = pAdd( result, term );
   }
