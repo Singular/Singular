@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.41 2001-01-31 13:45:30 levandov Exp $ */
+/* $Id: feread.cc,v 1.42 2001-03-27 08:54:35 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -426,6 +426,9 @@ static char * fe_fgets_stdin_init(char *pr,char *s, int size)
   #if !defined(HAVE_READLINE) && defined(HAVE_FEREAD)
     fe_fgets_stdin=fe_fgets_stdin_emu;
     return(fe_fgets_stdin_emu(pr,s,size));
+  #else
+    fe_fgets_stdin=fe_fgets;
+    return(fe_fgets(pr,s,size));
   #endif
 #endif
 }
