@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.5 1997-10-01 11:09:25 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.6 1997-10-02 07:16:45 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -85,7 +85,8 @@ define(`ftestMainInit', `dnl
 # ftestMainExit() - clean up in main().
 #
 define(`ftestMainExit', `dnl
-`return check'')
+`ftestMainExit();
+    return check'')
 
 #
 # ftestOutVar() - declare output variable.
