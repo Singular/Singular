@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.40 2000-08-14 12:56:34 obachman Exp $ */
+/* $Id: libparse.l,v 1.41 2000-09-04 13:39:00 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -300,6 +300,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                #else /* HAVE_NAMESPACES */
                if (text_buffer!=NULL) omFree((ADDRESS)text_buffer);
                text_buffer = omStrDup(libnamebuf);
+	       omMarkAsStaticAddr(text_buffer);
                #endif /* HAVE_NAMESPACES */
                #endif
              }
@@ -779,6 +780,7 @@ LIB[ \t]+"\"" { quote++;
                            #else
                            if (text_buffer!=NULL) omFree((ADDRESS)text_buffer);
                            text_buffer = omStrDup(yytext);
+                           omMarkAsStaticAddr(text_buffer);
                            #endif
                            #if YYLPDEBUG > 1
                              printf("[%s]", yytext);
@@ -890,6 +892,7 @@ void copy_string(lp_modes mode)
     fseek(yylpin, string_start, SEEK_SET);
     if (text_buffer!=NULL) omFree((ADDRESS)text_buffer);
     text_buffer = (char *)omAlloc(len+2);
+    omMarkAsStaticAddr(text_buffer);
     myfread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
     text_buffer[len]='\0';

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.27 2000-08-14 12:56:48 obachman Exp $ */
+/* $Id: scanner.l,v 1.28 2000-09-04 13:39:06 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,6 +24,32 @@ extern char * yytext;
 extern int yyleng;
 extern int inerror;
 
+// this is to  shadow the malloc/realloc
+// used by yy_flex_malloc/yy_flex_realloc
+// so that we can mark stuff as static
+static void* my_malloc(size_t size)
+{
+  void* addr = omAlloc(size);
+  omMarkAsStaticAddr(addr);
+  return addr;
+}
+
+static void* my_realloc(void* addr, size_t size)
+{
+  void* new_addr = omRealloc(addr, size);
+  omMarkAsStaticAddr(new_addr);
+  return new_addr;
+}
+static void my_free(void* addr)
+{
+  omFree(addr);
+}
+#undef malloc
+#define malloc my_malloc
+#undef realloc 
+#define realloc my_realloc
+#undef free
+#define free my_free
 static char * dupyytext()
 {
   char* s;

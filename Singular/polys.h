@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.34 2000-08-29 14:10:29 obachman Exp $ */
+/* $Id: polys.h,v 1.35 2000-09-04 13:39:05 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -189,12 +189,15 @@ poly      pPower(poly p, int i);
 /*
 void      pMultN(poly a, number c);
 poly      pMultCopyN(poly a, number c);
-poly      pMult(poly a, poly b);
 poly      pNeg(poly p);
+poly      pMult(poly a, poly b);
 */
 
 // ----------------- define to enable new p_procs -----*/
-// #define HAVE_P_PROCS
+#ifdef HAVE_SHIFTED_EXPONENTS
+#define HAVE_P_PROCS
+#endif
+
 #ifdef HAVE_P_PROCS
 #include "p_Procs.h"
 #define pDelete p_Delete
@@ -365,10 +368,10 @@ BOOLEAN pDBTest(poly p, omBin tail_heap, char *f, int l);
 BOOLEAN prDBTest(poly p, ring r, char *f, int l);
 BOOLEAN pDBTest(poly p,  omBin tail_heap, omBin lm_heap, char *f, int l);
 #else
-#define prTest(p, r)    (TRUE)
-#define pHeapTest(A,B)  (TRUE)
-#define pTest(A)        (TRUE)
-#define pDBTest(A,B,C)  (TRUE)
+#define prTest(p, r)    ((void)0)
+#define pHeapTest(A,B)  ((void)0)
+#define pTest(A)        ((void)0)
+#define pDBTest(A,B,C)  ((void)0)
 #endif
 #endif
 

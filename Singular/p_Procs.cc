@@ -6,8 +6,9 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.3 2000-08-29 14:10:27 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.4 2000-09-04 13:39:01 obachman Exp $
  *******************************************************************/
+#include <string.h>
 #include "mod2.h"
 
 
@@ -16,6 +17,9 @@
  * Configurations
  * 
  *******************************************************************/
+// define to enable/disable ptest in p_Procs
+// #undef TEST_P_PROCS
+#define TEST_P_PROCS
 
 /***************************************************************
  Here is how it works:
@@ -41,7 +45,7 @@
 //   2 -- plus FieldZp_Length*_Ord* procs
 //   3 -- plus Field*_Length*_OrdGeneral procs
 //   4 -- all Field*_Length*_Ord* procs
-const int HAVE_FAST_P_PROCS = 0;
+const int HAVE_FAST_P_PROCS = 4;
 
 // Set HAVE_FAST_FIELD to:
 //   0 -- only FieldGeneral
@@ -55,7 +59,7 @@ const int HAVE_FAST_FIELD = 1;
 //   2 -- special cases for length <= 2
 //   3 -- special cases for length <= 4
 //   4 -- special cases for length <= 8
-const int HAVE_FAST_LENGTH = 8;
+const int HAVE_FAST_LENGTH = 2;
 
 // Set HAVE_FAST_ORD to:
 //  0  -- only OrdGeneral
@@ -170,7 +174,6 @@ typedef enum p_Proc
   p_Mult_mm_Proc,
   p_Add_q_Proc,
   p_Minus_mm_Mult_qq_Proc,
-  p_ReverseNeg_Proc,
   p_Neg_Proc,
   p_Unknown_Proc
 };
@@ -259,7 +262,6 @@ char* p_ProcEnum_2_String(p_Proc proc)
       case p_Mult_mm_Proc: return "p_Mult_mm_Proc";
       case p_Add_q_Proc: return "p_Add_q_Proc";
       case p_Minus_mm_Mult_qq_Proc: return "p_Minus_mm_Mult_qq_Proc";
-      case p_ReverseNeg_Proc: return "p_ReverseNeg_Proc";
       case p_Neg_Proc: return "p_Neg_Proc";
       case p_Unknown_Proc: return "p_Unknown_Proc";
   }
@@ -269,8 +271,7 @@ char* p_ProcEnum_2_String(p_Proc proc)
 
 
 #ifdef GENERATE_P_PROCS
-#include <stdio.h>
-#define assume_violation(f, l)  do{fprintf(stderr, "assume violation: %s:%d\n", f, l);exit(1);}while(0)
+#include "dError.c"
 #endif
 
 /***************************************************************
@@ -462,7 +463,6 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
   {
       case p_Delete_Proc:
       case p_Mult_nn_Proc:
-      case p_ReverseNeg_Proc:
       case p_Neg_Proc:
         return field;
         
@@ -506,6 +506,11 @@ static void SetProcs(p_Field field, p_Length length, p_Ord ord);
 #include "p_MemCmp.h"
 #include "p_MemAdd.h"
 #include "p_MemCopy.h"
+#ifndef TEST_P_PROCS
+#undef pTest
+#define pTest(p) ((void)0)
+#endif
+
 #define FreeAndAdvance(p)                       \
 do                                              \
 {                                               \
@@ -604,7 +609,7 @@ static inline p_Ord p_OrdIs(ring r)
   if (sgn[0] == 1 && sgn[l-1] == 1 && p_IsNomog(&sgn[1], l-2))
     return (zero ? OrdPosNomogPosZero : OrdPosNomogPos);
 
-  if (sgn[0] == -1 && sgn[1] == 0 && p_IsNomog(&sgn[2], l-2))
+  if (sgn[0] == -1 && sgn[1] == 1 && p_IsNomog(&sgn[2], l-2))
     return (zero ? OrdNegPosNomogZero : OrdNegPosNomog);
 
   return OrdGeneral;
@@ -635,7 +640,6 @@ void p_SetProcs(ring r, p_Procs_s* p_Procs)
     (p_Procs->pp_Mult_mm != NULL) &&
     (p_Procs->p_Mult_mm != NULL) &&
     (p_Procs->p_Add_q != NULL) &&
-    (p_Procs->p_ReverseNeg != NULL) &&
     (p_Procs->p_Neg != NULL) &&
     (p_Procs->p_Minus_mm_Mult_qq != NULL));
 }
@@ -901,7 +905,6 @@ static void SetProcs(p_Field field, p_Length length, p_Ord ord)
   SetProc(p_Mult_mm, field, length, OrdGeneral);
   SetProc(p_Add_q, field, length, ord);
   SetProc(p_Minus_mm_Mult_qq, field, length, ord);
-  SetProc(p_ReverseNeg, field, LengthGeneral, OrdGeneral);
   SetProc(p_Neg, field, LengthGeneral, OrdGeneral);
 }
 

@@ -6,12 +6,15 @@
  *  Purpose: implementation of p_* related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Inline.cc,v 1.1 2000-08-29 14:10:26 obachman Exp $
+ *  Version: $Id: p_Inline.cc,v 1.2 2000-09-04 13:39:01 obachman Exp $
  *******************************************************************/
 #ifndef P_INLINE_CC
 #define P_INLINE_CC
 
 #if !defined(NO_P_INLINE) || defined(POLYS_IMPL_CC)
+
+#include "polys-impl.h"
+#include "p_Numbers.h"
 
 // returns a copy of p
 P_INLINE poly p_Copy(poly p, const ring r = currRing)
@@ -123,18 +126,23 @@ P_INLINE poly pp_Mult_qq(poly p, poly q, const ring r = currRing)
   return _p_Mult_q(p, q, 1, r);
 }
 
-#include "p_MemCmp.h"
-#include "polys-impl.h"
+// returns p + m*q destroys p, const: q, m
+P_INLINE poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r=currRing)
+{
+  poly res;
+  int shorter;
+  pSetCoeff0(m, p_nNeg(pGetCoeff(m), r));
+  
+  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
+  pSetCoeff0(m, p_nNeg(pGetCoeff(m), r));
+  return res;
+}
 
 P_INLINE int p_LmCmp(poly p, poly q, const ring r = currRing)
 {
   assume(p != NULL && q != NULL);
-  
-  p_MemCmp_LengthGeneral_OrdGeneral(p->exp.l, q->exp.l, 
-                                    r->pCompLSize, r->ordsgn,
-                                    return 0, return 1, return -1);
+  p_LmCmpAction(p, q, r, return 0, return 1, return -1);
 }
-
 
 #endif // defined(P_INLINE) || defined(POLYS_CC)
 #endif // P_INLINE_CC

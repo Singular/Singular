@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.73 2000-08-14 12:56:24 obachman Exp $ */
+/* $Id: iplib.cc,v 1.74 2000-09-04 13:38:57 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -347,6 +347,7 @@ static void iiCheckNest()
     iiRETURNEXPR=(sleftv *)omreallocSize(iiRETURNEXPR,
                                    iiRETURNEXPR_len*sizeof(sleftv),
                                    (iiRETURNEXPR_len+16)*sizeof(sleftv));
+    omMarkAsStaticAddr(iiRETURNEXPR);
 #ifdef USE_IILOCALRING
     iiLocalRing=(ring *)omreallocSize(iiLocalRing,
                                    iiRETURNEXPR_len*sizeof(ring),

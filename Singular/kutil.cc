@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.55 2000-08-14 12:56:33 obachman Exp $ */
+/* $Id: kutil.cc,v 1.56 2000-09-04 13:38:59 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -176,10 +176,7 @@ void cleanT (kStrategy strat)
       i++;
       if (i>strat->sl)
       {
-        if (strat->T[j].heap != NULL)
-          pHeapDelete(&p, strat->T[j].heap);
-        else
-          pDelete(&p);
+        pDelete(&p);
         break;
       }
       if (p == strat->S[i])
@@ -525,10 +522,11 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
 *is used after updating the pairset,if the leading term of p
 *devides the leading term of some S[i] it will be canceled
 */
-void clearS (poly p, int* at, int* k,kStrategy strat)
+inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
+                    kStrategy strat)
 {
-  unsigned long sev = pGetShortExpVector(p);
-  if (!pShortDivisibleBy(p,sev, strat->S[*at], ~ strat->sevS[*at])) return;
+  assume(p_sev == pGetShortExpVector(p));
+  if (!pShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
   deleteInS((*at),strat);
   (*at)--;
   (*k)--;
@@ -1137,10 +1135,11 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat)
     ||(pGetComp(h)<=strat->syzComp)))
   {
     //Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
+    unsigned long h_sev = pGetShortExpVector(h);
     loop
     {
       if (j > k) break;
-      clearS(h,&j,&k,strat);
+      clearS(h,h_sev, &j,&k,strat);
       j++;
     }
     //Print("end clearS sl=%d\n",strat->sl);
@@ -1167,8 +1166,9 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat)
   j=pos;
   loop
   {
+    unsigned long h_sev = pGetShortExpVector(h);
     if (j > k) break;
-    clearS(h,&j,&k,strat);
+    clearS(h,h_sev,&j,&k,strat);
     j++;
   }
 }
@@ -3232,7 +3232,6 @@ void enterT (LObject p,kStrategy strat)
   strat->T[atT].ecart = p.ecart;
   strat->T[atT].length = p.length;
   strat->T[atT].pLength = p.pLength;
-  strat->T[atT].heap = p.heap;
   if (p.sev == 0)
   {
     p.sev = pGetShortExpVector(p.p);
@@ -3252,7 +3251,7 @@ void enterTBba (LObject p, int atT,kStrategy strat)
 {
   int i;
 
-  pHeapTest(p.p, (p.heap == NULL ? currPolyBin : p.heap));
+  pTest(p.p);
   assume(p.pLength == 0 || pLength(p.p) == p.pLength);
 
   strat->newt = TRUE;
@@ -3265,7 +3264,6 @@ void enterTBba (LObject p, int atT,kStrategy strat)
   if (TEST_OPT_INTSTRATEGY)
     strat->T[atT].length = p.length;
 
-  strat->T[atT].heap = p.heap;
   strat->T[atT].pLength = p.pLength;
   if (p.sev == 0)
   {

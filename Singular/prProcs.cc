@@ -1,13 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prProcs.cc,v 1.4 2000-08-24 14:42:45 obachman Exp $ */
+/* $Id: prProcs.cc,v 1.5 2000-09-04 13:39:05 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
 #include "mod2.h"
 #include <omalloc.h>
 #include "polys.h"
+
+#ifndef HAVE_P_PROCS
 #include "polys-comp.h"
 #include "prProcs.h"
 #include "numbers.h"
@@ -341,3 +343,4 @@ poly pr_Minus_m_Mult_q_General (poly p,
   return pNext(&rp);
 } 
 
+#endif // HAVE_P_PROCS

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.31 2000-08-14 12:56:08 obachman Exp $ */
+/* $Id: febase.inc,v 1.32 2000-09-04 13:38:57 obachman Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -52,6 +52,10 @@ void VoiceBackTrack()
 void Voice::Next()
 {
   Voice *p=new Voice;
+  // OB: ???
+  // Hmm... when Singular is used as batch file
+  // then this voice is never freed
+  omMarkAsStaticAddr(p);
   if (currentVoice != NULL)
   {
     currentVoice->curr_lineno=yylineno;
@@ -86,6 +90,7 @@ BOOLEAN newFile(char *fname,FILE* f)
   //Print(":File%d(%s):%s(%x)\n",
   //  currentVoice->typ,BT_name[currentVoice->typ],fname,currentVoice);
   currentVoice->filename   = omStrDup(fname);
+  omMarkAsStaticAddr(currentVoice->filename);
   if (strcmp(fname,"STDIN") == 0)
   {
     currentVoice->files = stdin;

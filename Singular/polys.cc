@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.57 2000-08-29 14:10:28 obachman Exp $ */
+/* $Id: polys.cc,v 1.58 2000-09-04 13:39:04 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -806,9 +806,10 @@ void pSetGlobals(ring r, BOOLEAN complete)
 }
 
 
+static Exponent_t pMultT_nok = 0;
+
 #ifndef HAVE_P_PROCS
 /* -------------------------------------------------------- */
-static Exponent_t pMultT_nok;
 /*2
 * update the polynomial a by multipying it by
 * the (number) coefficient
@@ -906,7 +907,10 @@ poly pMultCopyN(poly a, number c)
 * multiply p1 with p2, p1 and p2 are destroyed
 * do not put attention on speed: the procedure is only used in the interpreter
 */
-poly pMult(poly p1, poly p2)
+
+#endif
+
+poly pMult_Old(poly p1, poly p2)
 {
   poly res, r, rn, a;
   BOOLEAN cont;
@@ -974,7 +978,6 @@ poly pMult(poly p1, poly p2)
   return NULL;
 }
 
-#endif
 
 /*2
 * assumes that the head term of b is a multiple of the head term of a

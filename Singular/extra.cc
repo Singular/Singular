@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.139 2000-08-24 14:42:39 obachman Exp $ */
+/* $Id: extra.cc,v 1.140 2000-09-04 13:38:55 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -654,6 +654,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         fd = fopen((char*) h->Data(), "w");
         if (fd == NULL)
           Warn("Can not open %s for writing og mtrack. Using stdout");
+        omMarkAsStaticAddr(h);
       }
       omPrintUsedTrackAddrs((fd == NULL ? stdout : fd));
       if (fd != NULL) fclose(fd);
@@ -675,6 +676,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         fd = fopen((char*) h->Data(), "w");
         if (fd == NULL)
           Warn("Can not open %s for writing og mtrack. Using stdout");
+        omMarkAsStaticAddr(h);
       }
       // OB: TBC print to fd
       omPrintUsedAddrs((fd == NULL ? stdout : fd));

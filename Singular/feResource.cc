@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.27 2000-08-14 12:56:06 obachman Exp $ */
+/* $Id: feResource.cc,v 1.28 2000-09-04 13:38:56 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -10,9 +10,12 @@
 
 #include "mod2.h"
 #include "distrib.h"
+#include "dError.h"
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <omalloc.h>
 #include "febase.h"
+#else
+#include "dError.c"
 #endif
 
 // define RESOURCE_DEBUG for chattering about resource management
@@ -333,7 +336,7 @@ static char* feInitResource(feResourceConfig config, int warn)
   else if (config->fmt == NULL)
   {
     sprintf(value, "Wrong Resource Specification of %s", config->key);
-    feReportBug(value);
+    dReportBug(value);
     return NULL;
   }
 
@@ -386,8 +389,8 @@ static char* feGetExpandedExecutable()
 {
   if (feArgv0 == NULL || *feArgv0 == '\0')
   {
-    if (feArgv0 == NULL) feReportBug("feArgv0 == NULL");
-    else feReportBug("feArgv0 == ''");
+    if (feArgv0 == NULL) dReportBug("feArgv0 == NULL");
+    else dReportBug("feArgv0 == ''");
     return NULL;
   }
 #ifndef macintosh
@@ -414,7 +417,7 @@ static char* feGetExpandedExecutable()
   {
     char message[MAXRESOURCELEN];
     sprintf(message, "Could not get expanded executable from %s", feArgv0);
-    feReportBug(message);
+    dReportBug(message);
     return NULL;
   }
   return omStrDup(value);

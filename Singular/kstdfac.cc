@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.36 2000-08-14 12:56:33 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.37 2000-09-04 13:38:58 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -75,12 +75,12 @@ static void copyL (kStrategy o,kStrategy n)
   for (j=0; j<=o->Ll; j++)
   {
     // copy .p ----------------------------------------------
-    if (o->L[j].p->next!=o->tail)
+    if (pNext(o->L[j].p)!=o->tail)
       l[j].p=pCopy(o->L[j].p);
     else
     {
       l[j].p=pHead(o->L[j].p);
-      l[j].p->next=n->tail;
+      pNext(l[j].p)=n->tail;
     }
     // copy .lcm ----------------------------------------------
     if (o->L[j].lcm!=NULL)
@@ -132,8 +132,6 @@ static void copyL (kStrategy o,kStrategy n)
       }
     }
 
-    // copy .heap ----------------------------------------------
-    l[j].heap=NULL;
     // copy .ecart ---------------------------------------------
     l[j].ecart=o->L[j].ecart;
     // copy .length --------------------------------------------

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.48 2000-08-29 14:10:28 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.49 2000-09-04 13:39:03 obachman Exp $ */
 
 /***************************************************************
  *
@@ -28,6 +28,7 @@
 #include "ring.h"
 #include "polys-impl.h"
 #include "p_Procs.h"
+#include "dError.h"
 
 #ifdef HAVE_SHIFTED_EXPONENTS
 #ifdef PDEBUG
@@ -289,11 +290,11 @@ Exponent_t pPDSetExp(poly p, int v, Exponent_t e, char* f, int l)
 {
   if (v == 0)
   {
-    Warn("zero index to exponent in %s:%d\n", f, l);
+    dReportError("zero index to exponent in %s:%d\n", f, l);
   }
   if (v > pVariables)
   {
-    Warn("index %d to exponent too large in %s:%d\n", v, f, l);
+    dReportError("index %d to exponent too large in %s:%d\n", v, f, l);
   }
   return (p)->exp.e[_pExpIndex(v)]=(e);
 }
@@ -302,11 +303,11 @@ Exponent_t pPDGetExp(poly p, int v, char* f, int l)
 {
   if (v == 0)
   {
-    Warn("zero index to exponent in %s:%d\n", f, l);
+    dReportError("zero index to exponent in %s:%d\n", f, l);
   }
   if (v > pVariables)
   {
-    Warn("index %d to exponent too large in %s:%d\n", v, f, l);
+    dReportError("index %d to exponent too large in %s:%d\n", v, f, l);
   }
   return (p)->exp.e[_pExpIndex(v)];
 }
@@ -315,11 +316,11 @@ Exponent_t pPDRingSetExp(ring r, poly p, int v, Exponent_t e, char* f, int l)
 {
   if (v == 0)
   {
-    Warn("zero index to exponent in %s:%d\n", f, l);
+    dReportError("zero index to exponent in %s:%d\n", f, l);
   }
   if (v > r->N)
   {
-    Warn("index %d to exponent too large in %s:%d\n", v, f, l);
+    dReportError("index %d to exponent too large in %s:%d\n", v, f, l);
   }
   return (p)->exp.e[_pRingExpIndex(r, v)]=(e);
 }
@@ -328,11 +329,11 @@ Exponent_t pPDRingGetExp(ring r, poly p, int v, char* f, int l)
 {
   if (v == 0)
   {
-    Warn("zero index to exponent in %s:%d\n", f, l);
+    dReportError("zero index to exponent in %s:%d\n", f, l);
   }
   if (v > r->N)
   {
-    Warn("index %d to exponent too large in %s:%d\n", v, f, l);
+    dReportError("index %d to exponent too large in %s:%d\n", v, f, l);
   }
   return (p)->exp.e[_pRingExpIndex(r,v)];
 }
@@ -341,11 +342,11 @@ Exponent_t pPDIncrExp(poly p, int v, char* f, int l)
 {
   if (v == 0)
   {
-    Warn("zero index to exponent in %s:%d\n", f, l);
+    dReportError("zero index to exponent in %s:%d\n", f, l);
   }
   if (v > pVariables)
   {
-    Warn("index %d to exponent too large in %s:%d\n", v, f, l);
+    dReportError("index %d to exponent too large in %s:%d\n", v, f, l);
   }
   return ((p)->exp.e[_pExpIndex(v)])++;
 }
@@ -354,11 +355,11 @@ Exponent_t pPDDecrExp(poly p, int v, char* f, int l)
 {
   if (v == 0)
   {
-    Warn("zero index to exponent in %s:%d\n", f, l);
+    dReportError("zero index to exponent in %s:%d\n", f, l);
   }
   if (v > pVariables)
   {
-    Warn("index %d to exponent too large in %s:%d\n", v, f, l);
+    dReportError("index %d to exponent too large in %s:%d\n", v, f, l);
   }
   return ((p)->exp.e[_pExpIndex(v)])--;
 }
@@ -367,11 +368,11 @@ Exponent_t pPDAddExp(poly p, int v, Exponent_t e, char* f, int l)
 {
   if (v == 0)
   {
-    Warn("zero index to exponent in %s:%d\n", f, l);
+    dReportError("zero index to exponent in %s:%d\n", f, l);
   }
   if (v > pVariables)
   {
-    Warn("index %d to exponent too large in %s:%d\n", v, f, l);
+    dReportError("index %d to exponent too large in %s:%d\n", v, f, l);
   }
   return ((p)->exp.e[_pExpIndex(v)]) += (e);
 }
@@ -380,11 +381,11 @@ Exponent_t pPDSubExp(poly p, int v, Exponent_t e, char* f, int l)
 {
   if (v == 0)
   {
-    Warn("zero index to exponent in %s:%d\n", f, l);
+    dReportError("zero index to exponent in %s:%d\n", f, l);
   }
   if (v > pVariables)
   {
-    Warn("index %d to exponent too large in %s:%d\n", v, f, l);
+    dReportError("index %d to exponent too large in %s:%d\n", v, f, l);
   }
   return ((p)->exp.e[_pExpIndex(v)]) -= (e);
 }
@@ -393,11 +394,11 @@ Exponent_t pPDMultExp(poly p, int v, Exponent_t e, char* f, int l)
 {
   if (v == 0)
   {
-    Warn("zero index to exponent in %s:%d\n", f, l);
+    dReportError("zero index to exponent in %s:%d\n", f, l);
   }
   if (v > pVariables)
   {
-    Warn("index %d to exponent too large in %s:%d\n", v, f, l);
+    dReportError("index %d to exponent too large in %s:%d\n", v, f, l);
   }
   return ((p)->exp.e[_pExpIndex(v)]) *= (e);
 }
@@ -407,14 +408,14 @@ Exponent_t pDBSetComp(poly p, Exponent_t k, int le, char* f, int l)
 {
   if (k < 0)
   {
-    Warn("set negative component %d in %s:%d", k, f, l);
+    dReportError("set negative component %d in %s:%d", k, f, l);
   }
   if (currRing->order[1] == ringorder_S)
   {
     if (le <= 0) le = currRing->typ[1].data.syzcomp.length;
     if (k > l)
     {
-      Warn("component %d larger then max %d in %s:%d",
+      dReportError("component %d larger then max %d in %s:%d",
             k, le, f, l);
     }
   }
@@ -425,7 +426,7 @@ Exponent_t pDBDecrComp(poly p, char* f, int l)
 {
   if (_pGetComp(p) < 1)
   {
-    Warn("decrement to negative component %d in %s:%d\n", _pGetComp(p), f, l);
+    dReportError("decrement to negative component %d in %s:%d\n", _pGetComp(p), f, l);
   }
   return _pGetComp(p)--;
 }
@@ -434,7 +435,7 @@ Exponent_t pDBAddComp(poly p, Exponent_t k, int le, char* f, int l)
 {
   if (_pGetComp(p) + k < 0)
   {
-    Warn("add to negative component %d + %d = %d in %s:%d\n", _pGetComp(p),
+    dReportError("add to negative component %d + %d = %d in %s:%d\n", _pGetComp(p),
           k, _pGetComp(p) + k, f, l);
   }
   _pGetComp(p) += (k);
@@ -444,7 +445,7 @@ Exponent_t pDBAddComp(poly p, Exponent_t k, int le, char* f, int l)
     if (le <= 0) le = currRing->typ[1].data.syzcomp.length;
     if (_pGetComp(p) > le)
     {
-      Warn("sum of components %d larger then max %d in %s:%d\n",
+      dReportError("sum of components %d larger then max %d in %s:%d\n",
             _pGetComp(p), le, f, l);
       assume(0);
     }
@@ -456,7 +457,7 @@ Exponent_t pDBSubComp(poly p, Exponent_t k, char* f, int l)
 {
   if (_pGetComp(p) - k < 0)
   {
-    Warn("sub to negative component %d - %d = %d in %s:%d\n", _pGetComp(p),
+    dReportError("sub to negative component %d - %d = %d in %s:%d\n", _pGetComp(p),
           k, _pGetComp(p) - k, f, l);
   }
   return _pGetComp(p) -= (k);
@@ -466,7 +467,7 @@ Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l)
 {
   if (k < 0)
   {
-    Warn("set negative component %d in %s:%d\n", k, f, l);
+    dReportError("set negative component %d in %s:%d\n", k, f, l);
   }
   return _pRingGetComp(r, p) = (k);
 }
@@ -478,7 +479,7 @@ void pDBMonAddOn(poly p1, poly p2, char* f, int l)
 
   if (pGetComp(p1) != 0 && pGetComp(p2) != 0)
   {
-    Warn("Error in pMonAddOn: both components %d:%d !=0 in %s:%d",
+    dReportError("Error in pMonAddOn: both components %d:%d !=0 in %s:%d",
          pGetComp(p1), pGetComp(p2), f, l);
   }
 
@@ -493,7 +494,7 @@ void pDBMonAddOn(poly p1, poly p2, char* f, int l)
 
   if (! pEqual(ptemp, p1))
   {
-    Warn("Error in pMonAddOn in %s:%d\n", f, l);
+    dReportError("Error in pMonAddOn in %s:%d\n", f, l);
   }
 
   pFree1(ptemp);
@@ -506,7 +507,7 @@ void pDBMonSubFrom(poly p1, poly p2, char* f, int l)
 
   if ((pGetComp(p1) != pGetComp(p2)) && (pGetComp(p2)!=0))
   {
-    Warn("Error in pMonSubFrom: components are different %d:%d in %s:%d",
+    dReportError("Error in pMonSubFrom: components are different %d:%d in %s:%d",
          pGetComp(p1), pGetComp(p2), f, l);
   }
 
@@ -516,7 +517,7 @@ void pDBMonSubFrom(poly p1, poly p2, char* f, int l)
   {
     if (pGetExp(ptemp, i) < pGetExp(p2, i))
     {
-      Warn("Error in pMonSubFrom: %dth exponent %d of p1 smaller than %d of p2", i, pGetExp(ptemp, i), pGetExp(p2, i));
+      dReportError("Error in pMonSubFrom: %dth exponent %d of p1 smaller than %d of p2", i, pGetExp(ptemp, i), pGetExp(p2, i));
     }
     pSubExp(ptemp, i, pGetExp(p2, i));
   }
@@ -525,7 +526,7 @@ void pDBMonSubFrom(poly p1, poly p2, char* f, int l)
 
   if (! pEqual(ptemp, p1))
   {
-    Warn("Error in pMonSubFrom in %s:%d", f, l);
+    dReportError("Error in pMonSubFrom in %s:%d", f, l);
   }
 
   pFree1(ptemp);
@@ -537,12 +538,12 @@ void prDBMonAdd(poly p1, poly p2, poly p3, ring r, char* f, int l)
   {
     if (pGetComp(p3) != 0 && pGetComp(p2) != 0)
     {
-      Warn("Error in pMonAdd: both components %d:%d !=0 in %s:%d",
+      dReportError("Error in pMonAdd: both components %d:%d !=0 in %s:%d",
            pGetComp(p3), pGetComp(p2), f, l);
     }
     if (p2 == p1 || p3 == p1)
     {
-      Warn("Error in pMonAdd: Destination equals source in %s:%d", f, l);
+      dReportError("Error in pMonAdd: Destination equals source in %s:%d", f, l);
     }
   }
   __pMonAdd(p1, p2, p3, r);
@@ -555,7 +556,7 @@ void prDBMonAdd(poly p1, poly p2, poly p3, ring r, char* f, int l)
       pSetExp(ptemp, i, pGetExp(p2, i) + pGetExp(p3, i));
       if (pGetExp(ptemp, i) != pGetExp(p1, i))
       {
-        Warn("Error in pMonAdd: %th exponent: %d != (%d == %d + %d)",
+        dReportError("Error in pMonAdd: %th exponent: %d != (%d == %d + %d)",
              i, pGetExp(p1, i), pGetExp(ptemp, i), pGetExp(p2, i),
              pGetExp(p3, i));
       }
@@ -564,7 +565,7 @@ void prDBMonAdd(poly p1, poly p2, poly p3, ring r, char* f, int l)
     pSetm(ptemp);
 
     if (! pEqual(ptemp, p1))
-      Warn("Error in pMonAdd in %s:%d", f, l);
+      dReportError("Error in pMonAdd in %s:%d", f, l);
     pFree1(ptemp);
   }
 }
@@ -588,7 +589,7 @@ BOOLEAN pDBDivisibleBy(poly a, poly b, char* f, int l)
 
   if (istrue != f_istrue)
   {
-    Warn("Error in pDivisibleBy in %s:%d\n", f, l);
+    dReportError("Error in pDivisibleBy in %s:%d\n", f, l);
     _pDivisibleBy_orig(a, b);
   }
   return istrue;
@@ -601,7 +602,7 @@ BOOLEAN pDBDivisibleBy1(poly a, poly b, char* f, int l)
 
   if (istrue != f_istrue)
   {
-    Warn("Error in pDivisibleBy1 in %s:%d\n", f, l);
+    dReportError("Error in pDivisibleBy1 in %s:%d\n", f, l);
     _pDivisibleBy1_orig(a, b);
   }
   return istrue;
@@ -614,7 +615,7 @@ BOOLEAN pDBDivisibleBy2(poly a, poly b, char* f, int l)
 
   if (istrue != f_istrue)
   {
-    Warn("Error in pDivisibleBy2 in %s:%d\n", f, l);
+    dReportError("Error in pDivisibleBy2 in %s:%d\n", f, l);
     __pDivisibleBy(a, b);
   }
   return f_istrue;
@@ -634,7 +635,7 @@ BOOLEAN mmDBEqual(poly p, poly q, char *f, int l)
   if (pGetComp(p) != pGetComp(q)) return FALSE;
   if (__pEqual(p, q) != TRUE)
   {
-    Warn("Error in pEqual: exp/comp same, bug monoms different in %s:%d",
+    dReportError("Error in pEqual: exp/comp same, bug monoms different in %s:%d",
          f, l);
   }
   return TRUE;
@@ -679,12 +680,12 @@ BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
 #endif
     if ((p->coef==NULL)&&(nGetChar()<2))
     {
-      Warn("NULL coef in poly in %s:%d\n",f,l);
+      dReportError("NULL coef in poly in %s:%d\n",f,l);
       return FALSE;
     }
     if (nIsZero(p->coef))
     {
-      Warn("zero coef in poly in %s:%d\n",f,l);
+      dReportError("zero coef in poly in %s:%d\n",f,l);
       return FALSE;
     }
     int i=pVariables;
@@ -694,14 +695,14 @@ BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
     {
       if (pGetExp(p,i)<0)
       {
-        Warn("neg. Exponent %d of x(%d) in %s:%d\n",pGetExp(p,i),i,f,l);
+        dReportError("neg. Exponent %d of x(%d) in %s:%d\n",pGetExp(p,i),i,f,l);
         return FALSE;
       }
     }
 #endif
     if (pGetComp(p)<0)
     {
-      Warn("neg Component in %s:%d\n",f,l);
+      dReportError("neg Component in %s:%d\n",f,l);
       return FALSE;
     }
     if (ismod==0)
@@ -713,7 +714,7 @@ BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
     {
       if (pGetComp(p)==0)
       {
-        Warn("mix vec./poly in %s:%d\n",f,l);
+        dReportError("mix vec./poly in %s:%d\n",f,l);
         return FALSE;
       }
     }
@@ -721,7 +722,7 @@ BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
     {
       if (pGetComp(p)!=0)
       {
-        Warn("mix poly/vec. in %s:%d\n",f,l);
+        dReportError("mix poly/vec. in %s:%d\n",f,l);
         return FALSE;
       }
     }
@@ -735,18 +736,18 @@ BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
       ccc1 = o->data.syzcomp.ShiftedComponents[cc1];
       if (! (c1 == 0 || cc1 != 0))
       {
-        Warn("Component <-> TrueComponent zero mismatch\n", f, l);
+        dReportError("Component <-> TrueComponent zero mismatch\n", f, l);
         return FALSE;
       }
       if (! (c1 == 0 || ccc1 != 0))
       {
-        Warn("Component <-> ShiftedComponent zero mismatch\n", f, l);
+        dReportError("Component <-> ShiftedComponent zero mismatch\n", f, l);
         return FALSE;
       }
       ec1 = p->exp.l[currRing->typ[1].data.syzcomp.place];
       if (ec1 != ccc1)
       {
-        Warn("Shifted comp out of sync. should %d, is %d", ccc1, ec1);
+        dReportError("Shifted comp out of sync. should %d, is %d", ccc1, ec1);
         return FALSE;
       }
     }
@@ -756,7 +757,7 @@ BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
       pSetm(p);
       if (p->exp.l[currRing->typ[0].data.syz.place] != syzindex)
       {
-        Warn("Syzindex wrong: Was %dl but should be %d in %s:%d\n",
+        dReportError("Syzindex wrong: Was %dl but should be %d in %s:%d\n",
              syzindex, p->exp.l[currRing->typ[0].data.syz.place], f, l);
       }
     }
@@ -764,7 +765,7 @@ BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
     pIter(p);
     if (pComp(old,p)!=1)
     {
-      Warn("wrong order (");
+      dReportError("wrong order (");
       wrp(old);
       Print(") in %s:%d (pComp=%d)\n",f,l,pComp(old,p));
       return FALSE;
@@ -780,7 +781,7 @@ BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
         }
         if (i == 0)
         {
-          Warn("different Compare, but same exponent vector for");
+          dReportError("different Compare, but same exponent vector for");
           wrp(old);
           Print(" in %s%d\n", f, l);
           return FALSE;
@@ -877,13 +878,13 @@ BOOLEAN pDBShortDivisibleBy(poly p1, unsigned long sev_1,
 {
   if (sev_1 != 0 && pGetShortExpVector(p1) != sev_1)
   {
-    Warn("sev1 is %o but should be %o in %s:%d\n", sev_1,
+    dReportError("sev1 is %o but should be %o in %s:%d\n", sev_1,
           pGetShortExpVector(p1), f, l);
     assume(0);
   }
   if (~ pGetShortExpVector(p2) != not_sev_2)
   {
-    Warn("not_sev2 is %o but should be %o in %s:%d\n", not_sev_2,
+    dReportError("not_sev2 is %o but should be %o in %s:%d\n", not_sev_2,
           ~ pGetShortExpVector(p2), f, l);
     assume(0);
   }
@@ -896,7 +897,7 @@ BOOLEAN pDBShortDivisibleBy(poly p1, unsigned long sev_1,
     pDivisibleBy_ShortFalse++;
     if (ret)
     {
-      Warn("p1 divides p2, but sev's are wrong in %s:%d\n", f, l);
+      dReportError("p1 divides p2, but sev's are wrong in %s:%d\n", f, l);
       assume(0);
     }
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.43 2000-08-14 12:56:32 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.44 2000-09-04 13:38:58 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -62,15 +62,14 @@ static int redHomog (LObject* h,kStrategy strat)
     j = 0;
     h->sev = pGetShortExpVector(h->p);
     not_sev = ~ h->sev;
-    while ( j <= strat->tl)
+    while (1)
     {
+      if (j > strat->tl) return 1;
       if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
                             h->p, not_sev)) break;
       j++;
     }
-
-    if (j > strat->tl) return 1;
-
+    
     // now we found one which is divisible
     ksReducePoly(h, &(strat->T[j]), strat->kNoether);
 #ifdef KDEBUG
@@ -617,14 +616,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       message((strat->honey ? strat->P.ecart : 0) + pFDeg(strat->P.p),
               &olddeg,&reduc,strat);
 
-    kTest_TS(strat);
     /* reduction of the element choosen from L */
     red_result = strat->red(&strat->P,strat);
 
-    // reduktion to non-zero new poly
+    // reduction to non-zero new poly
     if (red_result == 1)
     {
-      kTest_TS(strat);
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
       /* enter P.p into s and L */
@@ -633,16 +630,16 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         if (TEST_OPT_INTSTRATEGY)
         {
           pCleardenom(strat->P.p);
-	  if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-	  {
+          if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+          {
             strat->P.p = redtailBba(strat->P.p,pos-1,strat);
             pCleardenom(strat->P.p);
-	  }
+          }
         }
         else
         {
           pNorm(strat->P.p);
-	  if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+          if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
             strat->P.p = redtailBba(strat->P.p,pos-1,strat);
         }
 
@@ -667,7 +664,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         enterTBba(strat->P, strat->posInT(strat->T,strat->tl,strat->P), 
                   strat);
         enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
-        // posInS only depends only onthe leading term
+        // posInS only depends on the leading term
         strat->enterS(strat->P, pos, strat);
         if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }

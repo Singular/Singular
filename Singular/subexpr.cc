@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.59 2000-08-24 14:42:47 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.60 2000-09-04 13:39:07 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,6 +39,7 @@ omBin sSubexpr_bin = omGetSpecBin(sizeof(sSubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
 omBin procinfo_bin = omGetSpecBin(sizeof(procinfo));
 omBin libstack_bin = omGetSpecBin(sizeof(libstack));
+static omBin size_two_bin = omGetSpecBin(2);
 
 sleftv     sLastPrinted;
 const char sNoName[]="_";
@@ -308,7 +309,7 @@ void sleftv::CleanUp()
         idDelete((ideal *)(&data));
         break;
       case STRING_CMD:
-        omFree((ADDRESS)data);
+          omFree((ADDRESS)data);
         break;
       case POLY_CMD:
       case VECTOR_CMD:
@@ -462,7 +463,7 @@ void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
         return (void *)omStrDup((char *)d);
       else if (e->next==NULL)
       {
-        char *s=(char *)omAlloc(2);
+        char *s=(char*)omAllocBin(size_two_bin);
         s[0]=*(char *)d;
         s[1]='\0';
         return s;
@@ -1093,7 +1094,11 @@ void * sleftv::Data()
     }
     case STRING_CMD:
     {
-      r=(char *)omAlloc(2);
+      // this is a memory leak
+      // OB: ???
+      // Hannes, any chance to get around this ???
+      r=(char *)omAllocBin(size_two_bin);
+      omMarkAsStaticAddr(r);
       if ((e->start>0)&& (e->start<=(int)strlen((char *)d)))
       {
         r[0]=*(((char *)d)+e->start-1);

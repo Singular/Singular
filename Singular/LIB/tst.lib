@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.25 2000-08-29 14:10:31 obachman Exp $
+// $Id: tst.lib,v 1.26 2000-09-04 13:39:07 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.25 2000-08-29 14:10:31 obachman Exp $";
+version="$Id: tst.lib,v 1.26 2000-09-04 13:39:07 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -534,7 +534,18 @@ proc tst_rgen_init_weights(int n)
   return (v);
 }
 
-  
+proc tst_rgen_init_matrix(int n)
+{
+  intmat m[n][n];
+  int i;
+  // let us emulate lp
+  for (i=1; i<= n; i++)
+  {
+    m[i,i] = 1;
+  }
+  return (m);
+} 
+ 
 proc tst_rgen_generate_block(int n_vars, string simple_ordering, int extra_weights)
 {
   string order = simple_ordering;
@@ -551,7 +562,7 @@ proc tst_rgen_generate_block(int n_vars, string simple_ordering, int extra_weigh
   {
     if (simple_ordering[1] == "M") 
     {
-      order = order + "(" + string(tst_rgen_init_weights(n_vars*n_vars)) + ")";
+      order = order + "(" + string(tst_rgen_init_matrix(n_vars)) + ")";
     }
     else
     {
@@ -669,17 +680,23 @@ proc tst_rgen_init()
     tst_rgen_extra_weights = 0..2;
   }
 
+  if (! defined(tst_rgen_exp_bounds))
+  {
+    list tst_rgen_exp_bounds;
+    export(tst_rgen_exp_bounds);
+  }
+  
   if (! defined(tst_rgen_char_index))
   {
-    int tst_rgen_char_index, tst_rgen_var_index, tst_rgen_comp_index, tst_rgen_ordering_index;
+    int tst_rgen_char_index, tst_rgen_var_index, tst_rgen_comp_index, tst_rgen_ordering_index, tst_rgen_exp_bounds_index;
     list tst_rgen_orderings;
-    export (tst_rgen_char_index, tst_rgen_var_index, tst_rgen_comp_index, tst_rgen_ordering_index, tst_rgen_orderings);
+    export (tst_rgen_char_index, tst_rgen_var_index, tst_rgen_comp_index, tst_rgen_ordering_index, tst_rgen_orderings, tst_rgen_exp_bounds_index);
   }
-    
   tst_rgen_char_index = 1;
   tst_rgen_var_index = 1;
   tst_rgen_comp_index = 1;
-  tst_rgen_ordering_index = 1;
+  tst_rgen_ordering_index = 0;
+  tst_rgen_exp_bounds_index = 1;
   tst_rgen_orderings = tst_rgen_generate_product_orderings(tst_rgen_nvars[1], tst_rgen_simple_orderings, tst_rgen_extra_weights, tst_rgen_products);
 }
 
@@ -691,15 +708,20 @@ proc tst_next_ring()
     tst_rgen_comp_index++;
     if (tst_rgen_comp_index > size(tst_rgen_comp_orderings))
     {
-      tst_rgen_var_index++;
-      if (tst_rgen_var_index > size(tst_rgen_nvars))
+      tst_rgen_exp_bounds_index++;
+      if (tst_rgen_exp_bounds_index > size(tst_rgen_exp_bounds))
       {
-        tst_rgen_char_index++;
-        if (tst_rgen_char_index > size(tst_rgen_charstrs))
+        tst_rgen_var_index++;
+        if (tst_rgen_var_index > size(tst_rgen_nvars))
         {
-          return ("");
+          tst_rgen_char_index++;
+          if (tst_rgen_char_index > size(tst_rgen_charstrs))
+          {
+            return ("");
+          }
+          tst_rgen_var_index = 1;
         }
-        tst_rgen_var_index = 1;
+        tst_rgen_exp_bounds_index = 1;
       }
       tst_rgen_comp_index = 1;
       tst_rgen_orderings =  tst_rgen_generate_product_orderings(tst_rgen_nvars[tst_rgen_var_index], tst_rgen_simple_orderings, tst_rgen_extra_weights, tst_rgen_products);
@@ -707,7 +729,14 @@ proc tst_next_ring()
     tst_rgen_ordering_index = 1;
   }
   
-  string rs = "(" + tst_rgen_charstrs[tst_rgen_char_index] + "),(" + A_Z("a", tst_rgen_nvars[tst_rgen_var_index]) + "),(";
+  if (tst_rgen_nvars[tst_rgen_var_index] <= 26)
+  {
+    string rs = "(" + tst_rgen_charstrs[tst_rgen_char_index] + "),(" + A_Z("a", tst_rgen_nvars[tst_rgen_var_index]) + "),(";
+  }
+  else
+  {
+    string rs = "(" + tst_rgen_charstrs[tst_rgen_char_index] + "),(x(1.." + string(tst_rgen_nvars[tst_rgen_var_index]) + ")),(";
+  }
 
   if (tst_rgen_comp_orderings[tst_rgen_comp_index] == "CC")
   {
@@ -738,129 +767,178 @@ proc tst_next_ring()
       }
     }
   }
-  rs = rs + ")";
+  if (size(tst_rgen_exp_bounds) > 0) 
+  {
+    if (! defined(tst_rgen_Lring))
+    {
+      string tst_rgen_Lring;
+      export tst_rgen_Lring;
+    }
+    tst_rgen_Lring = rs + ",L(" + string(tst_rgen_exp_bounds[tst_rgen_exp_bounds_index]) + "))";
+    if (system("version") >= 1309)
+    {
+      rs = tst_rgen_Lring;
+    }
+    else
+    {
+      rs = rs + ")";
+    }
+  }
+  else
+  {
+    rs = rs + ")";
+  }
+  
   return (rs);
 }
 
 
-proc tst_rgen_test()
+proc tst_FullIdeal()
 {
-  tst_rgen_init();
-  string rs = tst_next_ring();
-  
-  while (size(rs) > 1)
+  ideal id, mid;
+  int n_vars = nvars(basering);
+  int i,j;
+  for (i=1; i<=n_vars; i++)
   {
-    rs;
-    rs = "ring r = " + rs + ";";
-    execute (rs);
-    rs = tst_next_ring();
+    mid = maxideal(i);
+    id[i] = mid[1];
+    for (j=2;j<=size(mid); j++)
+    {
+      id[i] = id[i] + mid[j];
+    }
   }
+  return (id);
 }
 
-proc tst_AddIdeal(ideal id, int how_often)
+proc tst_cyclic(int n)
 {
   int i, j, k, l;
+  ideal id;
+  
+  poly p, q;
+  for (i=1; i<n; i++)
+  {
+    p = 0;
+    k = 1;
+    for (j=1; j<=n; j++)
+    {
+      q = var(j);
+      k = j + 1;
+        if (k > n)
+        {
+          k=1;
+        }
+      for (l=2; l <= i; l++)
+      {
+        q = q*var(k);
+        k++;
+        if (k > n)
+        {
+          k=1;
+        }
+      }
+      p = p + q;
+    }
+    id[i] = p;
+  }
+  
+  p = var(1);
+  for (i=2;i<=n;i++)
+  {
+    p = p*var(i);
+  }
+  id[n] = p -1;
+  return (id);
+}
+
+proc tst_TestMult(ideal id, int how_often, int Module)
+{
+  int i, j, l, is, s;
+  module m;
+  def ret;
   poly p;
-  if (! defined(db_print))
+  if (Module > 0)
   {
-    int db_print = 0;
-    export db_print;
-  }
-  
-  for (i=1; i<= size(id); i++)
-  {
-    if (id[i] == 0) 
+    for (i=1; i<= size(id); i++)
     {
-      id[i] = 1;
+      m[i] = id[i] + gen(2)*id[i];
     }
+    ret = m;
   }
-  dbprint(db_print, id);
-  dbprint(db_print, "");
-  ideal idl = lead(id);
-  ideal idr = id;
+  else
+  {
+    ret = id;
+  }
   l = 0;
-  for (j=1; j<= how_often; j++)
+  for (i=1; i<= how_often; i++)
   {
     l++;
     if (l > size(id))
     {
-      l=1;
+      l = 1;
     }
-    for (k=1; k<=size(id); k++)
+    for (j=1;j<=size(id);j++)
     {
-      p = id[k] + idl[l]*idr[k];
-      dbprint(db_print, p);
-      for (i=1; i<=k; i++)
-      {
-        dbprint(db_print, idr[i]);
-        p = p + idr[i];
-        dbprint(db_print, p);
-        dbprint(db_print, "");
-      }
-      idr[k] = p;
+      ret[j] = ret[j]*id[l];
     }
   }
-  return (idr);
+  for (i=1; i<=size(ret); i++)
+  {
+    is = size(ret[i]);
+    s = s + is;
+    string(i) + " : " + string(is) + " : " + string(lead(ret[i]));
+  }
+  "s : " + string(s);
 }
 
-      
-proc tst_AddModule(ideal id, int how_often)
+proc tst_TestAdd(ideal id, int how_often, int Module)
 {
   int i, j, k, l;
-  vector v;
-  if (! defined(db_print))
-  {
-    int db_print = 0;
-    export db_print;
-  }
+  module m;
+  ideal idl = 1, maxideal(1);
   
-  for (i=1; i<= size(id); i++)
+  if (Module > 0)
   {
-    if (id[i] == 0) 
+    for (i=1; i<= size(id); i++)
     {
-      id[i] = 1;
+      m[i] = id[i] + gen(2)*id[i];
     }
   }
-  ideal idl = lead(id);
-  module m = id;
-  
-  dbprint(db_print, id);
-  dbprint(db_print, "");
+  def r,p;
+  if (Module > 0)
+  {
+    r = m;
+  }
+  else
+  {
+    r = id;
+  }
   l = 0;
   for (j=1; j<= how_often; j++)
   {
     l++;
-    if (l > size(id))
+    if (l > size(idl))
     {
-      l=1;
+      l = 1;
     }
-    for (k=1; k<=size(id); k++)
+    for (k=1; k<=size(r); k++)
     {
-      v = gen(k)*id[k];
-      v = v + idl[l]*m[k];
-      dbprint(db_print, v);
-      for (i=1; i<=k; i++)
+      p = idl[l]*r[k];
+      for (i=1; i<=k;i++)
       {
-        dbprint(db_print, m[i]);
-        v = v + m[i];
-        dbprint(db_print, v);
-        dbprint(db_print, "");
+        p = p + r[i];
       }
-      m[k] = v;
+      r[k] = p;
     }
   }
-  return (m);
-}
-
-proc tst_TotalSize(def id)
-{
-  int i, s;
-  
-  for (i=1; i<=size(id); i++)
+  int is, s;
+  for (i=1; i<=size(r); i++)
   {
-    s = s + size(id[i]);
+    is = size(r[i]);
+    s = s + is;
+    string(i) + " : " + string(is) + " : " + string(lead(r[i]));
   }
-  return (s);
+  "s : " + string(s);
 }
 
 proc tst_PrintStats(def id)

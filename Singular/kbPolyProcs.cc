@@ -59,7 +59,7 @@ void kbReducePoly(LObject* PR,
 
   pMonSubFast(lm, p2);
   assume(pGetComp(lm) == 0);
-  lm->next = NULL;
+  pNext(lm) = NULL;
   pTest(lm);
   int l1, l2;
   kb_p_Minus_m_Mult_q(&(PR->p), &l1, 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.47 2000-08-14 12:56:07 obachman Exp $ */
+/* $Id: febase.h,v 1.48 2000-09-04 13:38:56 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -101,8 +101,6 @@ void    PrintTCLS(const char c, const char * s);
 #define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
 #endif
 void    PrintS(char* s);
-#define feReportBug(s) fePrintReportBug(s, __FILE__, __LINE__)
-void    fePrintReportBug(char* msg, char* file, int line);
 char*   feGetResource(const char id);
 
 #ifdef HAVE_FEREAD

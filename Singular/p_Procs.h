@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.2 2000-08-29 14:10:28 obachman Exp $
+ *  Version: $Id: p_Procs.h,v 1.3 2000-09-04 13:39:02 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
@@ -56,6 +56,8 @@ P_INLINE poly p_Mult_mm(poly p, poly m, const ring r = currRing);
 P_INLINE poly p_Add_q(poly p, poly q, const ring r = currRing);
 // return p - m*q, destroys p; const: q,m
 P_INLINE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r = currRing);
+// returns p + m*q destroys p, const: q, m
+P_INLINE poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r = currRing);
 // returns p*q, destroys p and q
 P_INLINE poly p_Mult_q(poly p, poly q, const ring r = currRing);
 // returns p*q, does neither destroy p nor q
@@ -72,9 +74,8 @@ typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, poly m,
                                    poly spNoether, const ring r);
 typedef poly (*p_Add_q_Proc_Ptr)(poly p, poly q, int & shorter, const ring r);
 typedef poly (*p_Minus_mm_Mult_qq_Proc_Ptr)(poly p, poly m, poly q, 
-                                          int &shorter, poly spNoether, 
-                                          const ring r);
-typedef poly (*p_ReverseNeg_Proc_Ptr)(poly p, const ring r);
+                                                int &shorter, poly spNoether, 
+                                                const ring r);
 typedef poly (*p_Neg_Proc_Ptr)(poly p, const ring r);
 
 typedef struct p_Procs_s
@@ -88,7 +89,6 @@ typedef struct p_Procs_s
   p_Mult_mm_Proc_Ptr            p_Mult_mm;
   p_Add_q_Proc_Ptr              p_Add_q;
   p_Minus_mm_Mult_qq_Proc_Ptr   p_Minus_mm_Mult_qq;
-  p_ReverseNeg_Proc_Ptr         p_ReverseNeg;
   p_Neg_Proc_Ptr                p_Neg;
 } pProcs_s;
 

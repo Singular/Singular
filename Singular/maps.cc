@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.24 2000-08-14 12:56:37 obachman Exp $ */
+/* $Id: maps.cc,v 1.25 2000-09-04 13:39:00 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -11,7 +11,6 @@
 #include "febase.h"
 #include "polys.h"
 #include "numbers.h"
-//#include "ipid.h"
 #include "ring.h"
 #include "ideals.h"
 #include "matpol.h"
@@ -21,6 +20,10 @@
 #include "longalg.h"
 #include "maps.h"
 #include "prCopy.h"
+
+// This is a very dirty way to "normalize" numbers w.r.t. a
+// MinPoly 
+static poly pMinPolyNormalize(poly p);
 
 /* debug output: Tok2Cmdname in maApplyFetch*/
 //#include "ipshell.h"
@@ -151,7 +154,7 @@ poly maEval(map theMap, poly p,ring preimage_r,matrix s)
       }
       omFreeSize((ADDRESS)monoms,l*sizeof(poly));
     }
-    if (currRing->minpoly!=NULL) result=pMult(result,pOne());
+    if (currRing->minpoly!=NULL) result=pMinPolyNormalize(result);
   }
   pTest(result);
   return result;
@@ -503,7 +506,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         res->data=(void *)naPermNumber((number)data,par_perm,P);
         res->rtyp=POLY_CMD;
         if (currRing->minpoly!=NULL)
-          res->data=(void *)pMult((poly)res->data,pOne());
+          res->data=(void *)pMinPolyNormalize((poly)res->data);
 	pTest((poly) res->data);
       }
       else
@@ -532,7 +535,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         idDelete((ideal *)&s);
       }
       if (currRing->minpoly!=NULL)
-        res->data=(void *)pMult((poly)res->data,pOne());
+        res->data=(void *)pMinPolyNormalize((poly)res->data);
       pTest((poly)res->data);
       break;
     case MODUL_CMD:
@@ -582,7 +585,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       {
         for (i=R*C-1;i>=0;i--)
         {
-          m->m[i]=pMult(m->m[i],pOne());
+          m->m[i]=pMinPolyNormalize(m->m[i]);
           pTest(m->m[i]);
         }
       }
@@ -635,3 +638,34 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
   return FALSE;
 }
 
+// This is a very dirty way to cancel monoms whose number equals the 
+// MinPoly 
+static poly pMinPolyNormalize(poly p)
+{
+  number one = nInit(1);
+  spolyrec rp;
+  
+  poly q = &rp;
+  
+  while (p != NULL)
+  {
+    // this returns 0, if p == MinPoly
+    number product = nMult(pGetCoeff(p), one);
+    if (product == NULL)
+    {
+      pDelete1(&p);
+    }
+    else
+    {
+      pSetCoeff(p, product);
+      pNext(q) = p;
+      q = p;
+      p = pNext(p);
+    }
+  }
+  pNext(q) = NULL;
+  return rp.next;
+}
+
+  
+  

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.49 2000-08-24 14:28:55 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.50 2000-09-04 13:39:04 obachman Exp $ */
 
 /***************************************************************
  *
@@ -171,7 +171,7 @@ inline Exponent_t pSSetExp(poly p, int v, int e, ring r)
   assume(e>=0);
   assume(v>0);
   assume(v<=r->N);
-  assume(e<=((int)r->bitmask));
+  assume((unsigned int) e<=r->bitmask);
 
   // shift e to the left:
   register int shift = r->VarOffset[v] >> 24;
@@ -616,5 +616,25 @@ DECLARE(int, _pExpQuerSum(poly p))
   }
 }
 #endif
+
+/***************************************************************
+ *
+ * New p_* stuff
+ *
+ ***************************************************************/
+#include "p_MemCmp.h"
+#define p_LmCmpAction(p, q, r, actionE, actionG, actionS)       \
+  p_MemCmp_LengthGeneral_OrdGeneral(p->exp.l, q->exp.l,         \
+                                    r->pCompLSize, r->ordsgn,   \
+                                    actionE, actionG, actionS)
+
+#define pFreeAndNext(p)                         \
+do                                              \
+{                                               \
+  poly _tmp = p;                                \
+  pIter(p);                                     \
+  omFreeBinAddr(_tmp);                           \
+}                                               \
+while (0)
 
 #endif // POLYS_IMPL_H

@@ -21,7 +21,7 @@
 #include "ipshell.h"
 #include "libparse.h"
 #include "feOpt.h"
-
+#include "dError.h"
 
 /*****************************************************************
  *
@@ -227,7 +227,7 @@ char* feHelpBrowser(char* which, int warn)
       i++;
     }
     // should never get here
-    feReportBug("");
+    dReportBug("should never get here");
   }
 
   // with argument, find matching help browser

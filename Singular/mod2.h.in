@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.85 2000-08-24 14:42:42 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.86 2000-09-04 13:39:00 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -332,6 +332,9 @@ extern int pShortOut;
  ******************************************************************/
 #ifndef NDEBUG
 
+/* undefine to enable inline */
+#define NO_INLINE
+
 /* undefine to disable assume -- should normally be defined for NDEBUG */
 #define HAVE_ASSUME
 
@@ -426,8 +429,8 @@ extern int pShortOut;
      omDebug and omCheck routines are undefined
    + to break at the time an omError occurs within a debugger, 
      set a breakpoint on omReportError
-   + to do checks from within the debugger, or to do checks with exlicit check level,
-     use omTest routines.
+   + to do checks from within the debugger, or to do checks with exlicit 
+     check level, use omTest routines.
 */
 
 #define OM_TRACK 3
@@ -530,15 +533,16 @@ extern int pShortOut;
 #define r_assume(x) ((void) 0)
 #else /* ! HAVE_ASSUME */
 
+#define assume_violation(s,f,l) \
+  dReportError("assume violation at %s:%l condition:%s", f,l,s)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* Set a breakpoint on this function */
-extern void assume_violation(char* file, int line);
+extern void dReportError(const char* fmt, ...);
 #ifdef __cplusplus
 }
 #endif
-
 
 #define assume(x)   _assume(x, __FILE__, __LINE__)
 #define r_assume(x) _r_assume(x, __FILE__, __LINE__)
@@ -548,7 +552,7 @@ do                                              \
 {                                               \
   if (! (x))                                    \
   {                                             \
-    assume_violation(f, l);                     \
+    assume_violation(#x, f, l);                 \
   }                                             \
 }                                               \
 while (0)
@@ -558,11 +562,18 @@ do                                              \
 {                                               \
   if (! (x))                                    \
   {                                             \
-    assume_violation(f, l);                     \
+    assume_violation(#x, f, l);                 \
     return 0;                                   \
   }                                             \
 }                                               \
 while (0)
 #endif /* HAVE_ASSUME */
+
+#if 0
+#define HAVE_SHIFTED_EXPONENTS
+#ifndef RDEBUG
+#define RDEBUG 
+#endif
+#endif
 
 #endif /* MOD2_H  */

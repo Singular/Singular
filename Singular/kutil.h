@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.26 2000-08-14 12:56:34 obachman Exp $ */
+/* $Id: kutil.h,v 1.27 2000-09-04 13:38:59 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -21,9 +21,15 @@ class sTObject
 public:
   poly  p;
   int ecart,length, pLength;
-  omBin heap;
   unsigned long sev;
-  sTObject() { memset((void*) this, 0, sizeof(sTObject)); heap = currPolyBin;}
+  ring lmRing;
+  ring tailRing;
+  sTObject() 
+    { 
+      memset((void*) this, 0, sizeof(sTObject)); 
+      lmRing=currRing; 
+      tailRing=currRing;
+    }
   inline poly SetP(poly p_new);
 };
 
@@ -33,10 +39,17 @@ public:
   poly  p;
   poly  p1,p2; /*- the pair p comes from -*/
   poly  lcm;   /*- the lcm of p1,p2 -*/
-  omBin heap;
+  ring lmRing;
+  ring tailRing;
+  int is_bucket;
   int ecart,length, pLength;
   unsigned long sev;
-  sLObject() { memset((void*) this, 0, sizeof(sLObject));}
+  sLObject() 
+    { 
+      memset((void*) this, 0, sizeof(sLObject));
+      lmRing=currRing; 
+      tailRing=currRing;
+    }
 };
 
 typedef class sTObject TObject;
