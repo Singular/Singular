@@ -1,6 +1,6 @@
 
 
-       --- This README file corresponds to Factory version 1.3a ---
+      --- This `README' file corresponds to Factory version 1.3b ---
 
 
 			  README file for Factory
@@ -9,23 +9,26 @@
 NOTE: The copyright state of Factory is still unclear.  Sooner or later it
 will be free software, but by now please do *not* distribute the sources.
 
+
 Overview
 ========
-1. What is Factory?
-2. Comments, questions, bug reports
-3. Installation
-4. Distribution
-5. Prerequisites
-6. Memory manager
-7. Stream IO
-8. Diagnostic messages
-9. GF(q) tables
-10. A note on Singular
-11. Configure options, dependencies
-12. Documentation
-13. Examples and Tests
-14. Editing Factory
-15. Files in the distribution
+1.  What is Factory?
+2.  Comments, Questions, Bug Reports
+3.  Installation
+4.  Distribution
+5.  Prerequisites
+6.  Memory Manager
+7.  Stream IO
+8.  Diagnostic Messages
+9.  GF(q) Tables
+10. A Note on Singular
+11. Configure Options, Dependencies
+12. Linking Factory with Your Application
+13. Factory Template Instantiation
+14. Documentation
+15. Examples and Tests
+16. Editing Factory
+17. Files in the Distribution
 
 
 1. What is Factory?
@@ -40,47 +43,49 @@ G.-M. Greuel, G. Pfister and H. Schoenemann).
 coefficient domains, such as Z, Q and GF(q), as well as algebraic
 extensions over Q and GF(q) in an efficient way.  Factory includes
 algorithms for computing univariate and multivariate gcds, resultants,
-chinese remainders and several algorithms to factorize univariate
+chinese remainders, and several algorithms to factorize univariate
 polynomials over the integers and over finite fields.  Factorization of
 multivariate polynomials over the integers is in beta test stage.
 
   The interface to the polynomial system of Factory is provided by a single
-class CanonicalForm which can deal with elements of the coefficient domain
-as well as polynomials.  Using operator overloading, you can handle
+class `CanonicalForm' which can deal with elements of the coefficient
+domain as well as polynomials.  Using operator overloading, you can handle
 polynomial data similarly to built-in types such as the machine integers.
-For example, to add together two polynomials one simply uses the '+'
-operator.  Because of this, Factory is easy to use even if you are not
-familiar with C++ programming.
+For example, to add two polynomials one simply uses the `+' operator.
+Because of this, Factory is easy to use even if you are not familiar with
+C++ programming.
 
   There are a couple of utility classes provided by Factory such as lists,
 arrays, polynomial maps, etc.  These make the usage more comfortable.
 
 
-2. Comments, questions, bug reports
+2. Comments, Questions, Bug Reports
 ====================================
   Factory is a project in evolution.  That means there is no guarantee that
 Factory is bug free.  I am sure that there are bugs or at least features.
 If you find bugs or if you find a strange behavior of the library, please
 let me know (e-mail: Jens Schmidt <schmidt@mathematik.uni-kl.de>).
 Comments and questions are welcome, too.
+
   Factory version 1.2c and newer define an external variable
-'factoryVersion' describing the version of the library.  Please include
-this version number in your bug reports.  You may either use the UNIX
-utility 'what' to get this number ('what libcf.a') or compile and run
-something similar to this:
+`factoryVersion' describing the version of the library.  The external
+variable `factoryConfiguration' (not present in versions 1.2c and 1.3a)
+describes the options Factory has been configured with.  Please include the
+version number and the configuration options in your bug reports.  You may
+either use the UNIX utility `what' to get this information (`what libcf.a')
+or compile and run something similar to this:
 
   #include <factory.h>
-  main() { cout << factoryVersion << endl; }
+  main() { cout << factoryVersion << "; " << factoryConfiguration << endl; }
 
 3. Installation
 ===============
-
 NOTE: If you have received this Factory distribution together with Singular
 you do not have to worry about compilation or installation at all.  The
 installation procedure for Singular should do everything for you.  For more
-information, see the section 'A note on Singular'.
+information, see the section "A Note on Singular".
 
-  See the INSTALL file for instructions on how to install Factory.  The
+  See the `INSTALL' file for instructions on how to install Factory.  The
 installation procedure conforms more or less to the GNU standard:
 
   ./configure; make; make gftables; make install; make installgftables
@@ -91,15 +96,15 @@ non-standard options to configure.
 
 4. Distribution
 ===============
-  The newest version of Factory is always available by anonymous ftp from
+  The latest version of Factory is always available by anonymous ftp from
 
 		www.mathematik.uni-kl.de:/pub/Math/Factory
 
 The Factory distribution consists of three archives:
 
-o the Factory source code (factory-<version>.tgz);
-o some preliminary documentation on Factory (factory-doc-prelim.tgz);
-o Factory GF(q) addition tables (factory-gftables.tgz, see below).
+o the Factory source code (`factory-<version>.tgz');
+o some preliminary documentation on Factory (`factory-doc-prelim.tgz');
+o Factory GF(q) addition tables (`factory-gftables.tgz', see below).
 
 
 5. Prerequisites
@@ -115,50 +120,52 @@ version of Singular (not recommended).
 Configure options:
 ------------------
   --with-gmp(=<gmp_inc_path>(,<gmp_lib_path>))
-                          specify where to find gmp library.
-  --enable-gmp            together with --with-Singular means: installation
-                          in process, be graceful when there is no gmp.h
+                          specify where to find the GMP library.
+  --enable-gmp            together with `--with-Singular' means: installation
+                          in process, be graceful when there is no `gmp.h'
 
   If <gmp_lib_path> is not given, but <gmp_inc_path> is,
-'<gmp_inc_path>/../lib/' is used as <gmp_lib_path>.  If neither
-<gmp_lib_path> nor <gmp_inc_path> is specified, configure looks in the
+`<gmp_inc_path>/../lib/' is used as <gmp_lib_path>.  If neither
+<gmp_lib_path> nor <gmp_inc_path> is specified, `configure' looks in the
 standard system locations for GMP.
 
-  Furthermore, you may specify the symbolic directory '$(includedir)' for
+  Furthermore, you may specify the symbolic directory `$(includedir)' for
 <gmp_inc_path>:
 
   --with-gmp='$(includedir)'
 
+Do not forget the single quotes or otherwise your shell might complain.
+
   This is useful when Factory is delivered as part of a larger package
 which also provides the GMP library.  In this case, at configuration time
-there would not be any gmp.h.  Without this option, Factory's configure
+there would not be any `gmp.h'.  Without this option, Factory's `configure'
 script would exit with an error message.  If this symbolic directory is
-given, the configure script does not look for gmp.h and libgmp.a.  Rather,
-it adds the option '-I$(includedir)' to its $(CXXFLAGS) and the option
-'-L$(libdir)' to its $(LDFLAGS) assuming that at compilation-time gmp.h and
-libgmp.a will reside in these directories.
-  The option --enable-gmp does the same, but it is a special (and ugly)
-gift to Singular, so it may be used with option --with-Singular only.
+given, the `configure' script does not look for `gmp.h' and `libgmp.a'.
+Rather, it adds the option `-I$(includedir)' to its `$(CXXFLAGS)' and the
+option `-L$(libdir)' to its `$(LDFLAGS)' assuming that at compilation-time
+`gmp.h' and `libgmp.a' will reside in these directories.
+  The option `--enable-gmp' does the same, but it is a special (and ugly)
+gift to Singular, so it may be used with option `--with-Singular' only.
 
 
-6. Memory manager
+6. Memory Manager
 =================
   You can use one of the memory management tools provided with Factory.
-There are the 'new' and the 'old' memory manager.  In fact, on some systems
-the 'old' memory management seems to be faster then the new one, but so far
+There are the "new" and the "old" memory manager.  In fact, on some systems
+the old memory management seems to be faster then the new one, but so far
 there have not been systematic timings.  If you configure Factory with
-'--with-memman=no' it will use the standard C++ operators new/delete, which
-is not recommended.
-  You may trace the actions (alloc/free) of the new memory manager by
+`--with-memman=no' it will use the standard C++ operators `new'/`delete',
+which is not recommended.
+  You may trace the actions (allocate/free) of the new memory manager by
 enabling memory management debugging.  This produces a *lot* of output.
 
 Configure options:
 ------------------
   --with-memman(=<memman>) specify Factory memory manager.
-                          <memman> is either 'old' (default), 'new', or 'no'.
+                          <memman> is either `old' (default), `new', or `no'.
   --enable-memdebug=<level> switch on memory management debugging.  Meaningful
-                          with --with-memman=new only.  <level> may be either
-                          'no' (default), 'normal', or 'full'.
+                          with `--with-memman=new' only.  <level> may be either
+                          `no' (default), `normal', or `full'.
 
 
 7. Stream IO
@@ -172,21 +179,21 @@ Configure options:
   --disable-streamio      build Factory without stream IO
 
 
-8. Diagnostic messages
+8. Diagnostic Messages
 ======================
 Factory has three types of diagnostic messages:
-- Assertions (implemented by the ASSERT macros in assert.h) are used to
+o Assertions (implemented by the "ASSERT macros" in `assert.h') are used to
   ensure preconditions before running some algorithm.  A typical example is
   to test f != 0 before dividing by f.
-- Debug output (implemented by the DEBOUT macros in debug.h/debug.cc) is
-  used to trace complex algorithms, e.g. factorization.
-- Timing information may be accumulated and printed using the TIMING macros
-  in timing.h.
+o Debug output (implemented by the "DEBOUT macros" in `debug.h'/`debug.cc')
+  is used to trace complex algorithms, e.g. factorization.
+o Timing information may be accumulated and printed using the "TIMING macros"
+  in `timing.h'.
 
   Since all diagnostic messages are implemented using preprocessor macros,
 they will completely cease when disabled, thus avoiding any impact on
-speed.  For more information, see section 'Configuring and building Factory
-for different configurations' in the INSTALL file.  By default, all
+speed.  For more information, see section "Configuring and building Factory
+for different configurations" in the `INSTALL' file.  By default, all
 diagnostic messages are disabled.
 
 Configure options:
@@ -196,106 +203,221 @@ Configure options:
   --enable-debugoutput    build Factory so it will print debugging information
 
 
-9. GF(q) tables
+9. GF(q) Tables
 ===============
-  Factory uses addition tables to calculate in GF(p^n) in an efficient way.
 
 NOTE: Since the format of the GF(q) tables changed from Factory Version
 1.2b to Factory Version 1.3a you should get/create them by new!
 
+  Factory uses addition tables to calculate in GF(p^n) in an efficient way.
+
 There are two possibilities to get these tables:
-o get them from the net (factory-gftables.tgz) where you got Factory
-  from.  The files unpack into a directory gftables/.
-o create them with gengftables which is a part of Factory.  Building
+o get them from the net (`factory-gftables.tgz') where you got Factory
+  from.  The files unpack into a directory `gftables/'.
+o create them with `gengftables' which is a part of Factory.  Building
   the tables takes quite a while!
-See the INSTALL file for more information.
+See the `INSTALL' file for more information.
 
 
-10. A note on Singular
+10. A Note on Singular
 =====================
   If you have received this Factory distribution together with Singular you
 do not have to worry about compilation or installation at all.  The
 installation procedure for Singular should do everything for you.  If you
 want to configure/build the package on your own instead of letting
-Singular's configure do the work you should:
+Singular's `configure' do the work you should:
 
   ./configure --with-Singular --enable-gmp
 	(or, equivalently: )
   ./configure --with-Singular --with-gmp='${includedir}'
 
-  Furthermore, you should specify --prefix so 'make install' will install
+  Furthermore, you should specify `--prefix' so `make install' will install
 the files in the places where Singular looks for them.  By default, this is
 the top directory of the Singular distribution.  In this case you have to
-specify '--prefix=..'.
+specify `--prefix=..'.
 
   The Singular GF(q) tables are the same as the Factory GF(q) tables.
 However, Singular uses a different naming scheme.  Therefore, a Factory
-configured with '--without-Singular' will not find Singular's GF(q) tables
-as well as a Factory configured with '--with-Singular' will not find the
+configured with `--without-Singular' will not find Singular's GF(q) tables
+as well as a Factory configured with `--with-Singular' will not find the
 GF(q) tables created by gengftables.  But this is not a major drawback
 since Singular is distributed with ready-to-use GF(q) tables.
 
-  The newest version of Singular is always available at
+  The latest version of Singular is always available at
 www.mathematik.uni-kl.de:/pub/Math/Singular.
 
 Configure options:
 ------------------
   --with-Singular         build for use with computer algebra system Singular.
 
-  Except from setting the #define SINGULAR, this option only changes the
-defaults to: '--with-memman=no --disable-streamio'.
+  Except from setting the `#define SINGULAR', this option only changes the
+defaults to: `--with-memman=no --disable-streamio'.
 
 
-11. Configure options, dependencies
+11. Configure Options, Dependencies
 ===================================
-- do not configure '--with-Singular --with-memman'.  In this case
+o do not configure `--with-Singular --with-memman'.  In this case
   both Singular and the library will try to initialize their own memory
   management.
 
-- do not configure '--disable-streamio --enable-debugoutput'.  The
-  DEBOUT macros need stream IO.
+o do not configure `--disable-streamio --enable-debugoutput'.  The
+  "DEBOUT macros" need stream IO.
 
-- you may configure '--with-Singular --enable-streamio', but this
+o you may configure `--with-Singular --enable-streamio', but this
   is not supported by Singular.  You will have to change manually
-  Singular's Makefile.  The same is true for '--with-Singular
+  Singular's `Makefile'.  The same is true for `--with-Singular
   --enable-streamio --enable-debugoutput'.
 
-- you may configure '--with-Singular --enable-timing', but this
+o you may configure `--with-Singular --enable-timing', but this
   will not have any visible effect (except from a slightly slower
   running time) because Singular will not print the timing
   results.
 
-- --enable-gmp has an effect only together with --with-Singular
+o `--enable-gmp' has an effect only together with `--with-Singular'
 
-- --with-memdebug has an effect only together with
-  --with-memman=new
+o `--with-memdebug' has an effect only together with
+  `--with-memman=new'
 
 
-12. Documentation
+12. Linking Factory With Your Application
+=========================================
+  To translate your application you need (apart from your
+application, of course):
+
+o the Factory user interface header file (`factory.h')
+
+  To link your application with Factory you need:
+
+o the Factory library (`libcf.a')
+o unless you configured Factory `--without-memman' you need one of the
+  Factory memory manager libraries (`libcfmem.a')
+
+o the instantiated Factory templates (`ftmpl_inst.o').
+
+o unless you configured Factory `--without-streamio' you need the stream IO
+  libraries.  With GNU CC, you do not need to care about this because they
+  are linked automatically to your application if you call the compiler
+  either as `g++' or as `c++'.  Otherwise, you need to link with library
+  `libiostream.a'.
+o The GNU Multiple Precision Library (`libgmp.a').  See section
+  "Prerequisites" in this file for more information.
+o The standard mathematical library (`libm.a')
+
+  `factory.h', `libcf.a', and `libcfmem.a' are created when you build
+Factory and installed by `make install'.  `libiostream.a', `libgmp.a', and
+`libm.a' should be already installed on your system, otherwise your
+application will fail to link.  `ftmpl_inst.o' is not installed by Factory.
+Instead, its source file `ftmpl_inst.cc' is installed and you have to build
+`ftmpl_inst.o' when you are building your application.  For more
+information on template instantiation and `ftmpl_inst.cc', see the
+following section "Factory Template Instantiation".
+
+  To give an example, look at the following one-shot solution to the
+problem "linking Factory with your application" where the "application" is
+a small test program (`applocation.cc') from the subdirectory `examples/'
+of the Factory source directory ('\' at the end of a line denotes line
+continuation):
+
+  g++ -c /usr/local/include/templates/ftmpl_inst.cc \
+    -fno-implicit-templates -O2 -fomit-frame-pointer -o ftmpl_inst.o
+  g++ -c application.cc -fno-implicit-templates -O2 -fomit-frame-pointer \
+    ftmpl_inst.o -lcf -lcfmem -lm -lgmp
+
+  This should work fine provided that you installed Factory in a location
+where `g++' may find it (here I have assumed `/usr/local/') and all the
+other files mentioned above are installed properly and where `g++' looks
+for them.
+
+  You may find a small `GNUmakefile' which translates `application.cc' and
+other examples in the `examples/' subdirectory of the Factory source
+directory.  For more information, see the section "Examples and Tests".
+
+
+13. Factory Template Instantiation
+==================================
+  There are a couple of classes provided by Factory such as lists, arrays,
+etc, which may be used to derive new abstract data types from already
+existing ones.  Factory uses them itself, e.g. to return the result of a
+factorization (a list of factors), and you may use them to create new
+derived abstract data types.  These classes are realized using C++
+"templates", which you need to "instantiate" befor you use them (refer to
+some introduction to C++ if you do not know these terms).
+
+  With GNU CC the most reliable way to instantiate templates is to
+
+o explicitely instantiate all necessary templates, and compile with option
+  `-fno-implicit-templates' and to
+o collect all explicit template instantiations in one single file.
+
+  This approach is the one Factory uses.  All object files of the library
+are generated with option `--fno-implicit-templates' and the explicit
+template instantiations are collected in `ftmpl_inst.cc'.  You could
+translate this file using the `make' target `ftmpl_inst.o' (see section
+"Building Factory" in the `INSTALL' file).
+
+  The consequence of this approach: since you may want to add template
+instantiations of Factory's or your own templates after the installation of
+Factory, it is necessary to install `ftmpl_inst.cc' as well as the template
+source files together with the library.  They are automatically installed
+in `$(includedir)/templates/' when you type `make install'.
+
+  To join your own template instantiations with the ones from
+`ftmpl_inst.cc' there are several possibilities:
+
+o you copy `ftmpl_inst.cc' file from the directory where it was installed
+  into your working directory and add your template instantiations after
+  the corresponig comment at the end of the file;
+o you cut the template instantiations from `ftmpl_inst.cc' and paste
+  them into your own template instantiation file.
+
+Both methods suffer from one disadvantage: each time `ftmpl_inst.cc'
+changes in a new version of Factory you will have to redo these steps.  The
+best method therefore is maybe this one:
+
+o you write your own template instantiation file with a
+  `#include <templates/ftmpl_inst.cc>' statement at the beginning of it.
+
+
+14. Documentation
 =================
   So far there are only preliminary versions of a user/reference manual and
-a tutorial ('A quick start into Factory').  Please do not expect them to
-be complete or even error-free.  For this reason, the documentation is not
-included in the source code archive (factory-<version>.tgz).  Instead, the
-sources and compiled dvi files reside in factory-doc-prelim.tgz. They will
-unpack into a directory factory-doc-prelim/.
+a tutorial ("A quick start into Factory").  Please do not expect them to
+be error-free or even complete.  For this reason, the documentation is not
+included in the source code archive (`factory-<version>.tgz').  Instead, the
+sources and compiled DVI files reside in `factory-doc-prelim.tgz'. They will
+unpack into a directory `factory-doc-prelim/'.
 
 
-13. Examples and Tests
+15. Examples and Tests
 ======================
-  So far neither examples nor tests, sorry.  You may have a look at
-gengftables.cc which is an application of the most basic Factory features.
+  The directory `examples/' in the Factory source directory contains some
+example applications for Factory and a `GNUmakefile' to build them.  The
+main purpose of the examples is to show how to link applications with an
+installed version of Factory.  This means that you have to install Factory
+before you can build the examples (but it is not necessary to install the
+GF(q) tables).  For the same reason, the `GNUmakefile' is not configured
+automatically by `configure'.  You will have to change some of the
+variables manually.
+
+  Furthermore, you may have a look at `gengftables.cc' in the Factory
+source directory which is another application of the most basic Factory
+features.
+
+  To test whether Factory (including GF(q) tables) has been installed
+properly, use `make' target `installtest'.
 
 
-14. Editing Factory
+16. Editing Factory
 ===================
-  Parts of Factory are written using Emacs' folding-mode.  You may load
-this mode from Emacs with 'M-x load-file RET
-factory-<version>/bin/folding.el RET'.
-To switch it on, say 'M-x folding-mode RET'.  Alternatively, you may load
-factory-<version>/bin/fold-docu.el which contains some additional functions
+  Parts of Factory are written using GNU Emacs' `folding-mode'.  You may
+load this mode from Emacs with
+
+  M-x load-file RET factory-<version>/bin/folding.el RET
+
+To switch it on, say `M-x folding-mode RET'.  Alternatively, you may load
+`factory-<version>/bin/fold-docu.el' which contains some additional functions
 to fold only the documentation.  If you add the following lines to your
-.emacs-file, all this would be done automatically for you:
+`.emacs' file, all this would be done automatically for you:
 
   (load-file "factory-<version>/bin/folding.el")
   (load-file "factory-<version>/bin/fold-docu.el")
@@ -307,30 +429,30 @@ to fold only the documentation.  If you add the following lines to your
   For more information, see the respective files.
 
 
-15. Files in the distribution
+17. Files in the Distribution
 =============================
 ChangeLog	- history of changes
 INSTALL		- installation instructions
-README		- this file
 NEWS		- new Factory features
+README		- this file
 
-bin/install-sh	- a script version of the BSD install program
-bin/makeheader	- creates headers from header templates (*.template)
-bin/mkinstalldirs - recursive mkdir
-bin/folding.el	- Emacs folding-mode
+bin/install-sh	- a script version of the BSD `install' program
+bin/makeheader	- creates headers from header templates (`*.template')
+bin/mkinstalldirs - recursive `mkdir'
+bin/folding.el	- Emacs `folding-mode'
 bin/fold-docu.el - some extensions to it
 
 GNUmakefile.in	- master makefile and
-config.h.in	- configuration include file.  Run configure to create
-		  GNUmakefile and config.h, resp.
+config.h.in	- configuration include file.  Run `configure' to create
+		  `GNUmakefile' and `config.h', resp.
 configure
-configure.in	- configure script generated with Autoconf 2.10
-		  from configure.in
+configure.in	- `configure' script generated with Autoconf 2.10
+		  from `configure.in'
 
 factory.template
 factoryconf.template - header templates for the user interface header
-		  files.  Run makeheader to create factory.h and
-		  factoryconf.h, resp.
+		  files.  Run `makeheader' to create `factory.h' and
+		  `factoryconf.h', resp.
 
 ffops.cc
 ffops.h
@@ -363,8 +485,8 @@ sm_*.h		- sparse modular gcd.  Contributed by Marion Bruder
 parseutil.cc
 parseutil.h
 readcf.cc
-readcf.y	- Factory parser to read canonical forms.  readcf.cc
-		  translated with Bison 1.18 from readcf.y.
+readcf.y	- Factory parser to read canonical forms.  `readcf.cc'
+		  translated with Bison 1.18 from `readcf.y'.
 
 gmpext.h
 initgmp.cc	- Factories interface to GNU MP
@@ -372,16 +494,21 @@ singext.cc
 singext.h	- Factories interface to Singular
 
 memutil.c
-memutil.h	- 'old' Factory memory manager
+memutil.h	- "old" Factory memory manager
 memman.h
 mm*.c
-mm*.h		- 'new' Factory memory manager
+mm*.h		- "new" Factory memory manager
 newdelete.cc	- C++ interface to the memory managers
 
-assert.h	- the ASSERT macros
+assert.h	- the "ASSERT macros"
 debug.h
-debug.cc	- the DEBOUT macros
-timing.h	- the TIMING macros
+debug.cc	- the "DEBOUT macros"
+timing.h	- the "TIMING macros"
 
-gengftables.cc	- run gengftables to create the GF(q) addition tables
+examples/	- some example applications for Factory and a `GNUmakefile'
+		  to build them
+gengftables.cc	- run `gengftables' to create the GF(q) addition tables
 		  necessary to work with Factory
+test_install.cc	- a small program to test whether installation has
+		  been successful.  Built and called by `make' target
+		  `installtest'
