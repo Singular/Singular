@@ -1,7 +1,6 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.14 1998-04-30 09:07:26 Singular Exp $
+@comment $Id: general.doc,v 1.15 1998-04-30 09:29:24 Singular Exp $
 @comment this file contains the general information about Singular
-@c * wichmann: + removed typographical errors.
 
 @menu
 * Interactive use::             
@@ -23,7 +22,7 @@
 * Singular prompt and error recovery::  
 * The online help system::      
 * Interrupting SINGULAR::       
-* Editing Input::               
+* Editing input::               
 * Control parameters::          
 * Startup sequence::            
 * Reuse of output::             
@@ -101,14 +100,14 @@ extra semicolons are interpreted as empty statements.
 @cindex The online help system
 
 @c --------------------------------------------------------------------------
-@node Interrupting SINGULAR,Editing Input,The online help system,Interactive use
+@node Interrupting SINGULAR,Editing input,The online help system,Interactive use
 @subsection Interrupting SINGULAR
 @cindex Interrupting SINGULAR
 
 @c --------------------------------------------------------------------------
-@node Editing Input,Control parameters,Interrupting SINGULAR,Interactive use
-@subsection Editing Input
-@cindex Editing Input
+@node Editing input,Control parameters,Interrupting SINGULAR,Interactive use
+@subsection Editing input
+@cindex Editing input
 
 If the command line option @code{-t} is not given,
 @sc{Singular} redefines the terminal characteristics
@@ -156,7 +155,7 @@ send it to the Singular parser for interpretation
 for the key bindings.
 
 @c --------------------------------------------------------------------------
-@node Control parameters, Startup sequence, Editing Input, Interactive use
+@node Control parameters, Startup sequence, Editing input, Interactive use
 @subsection Control parameters
 @cindex Control parameters
 
@@ -256,7 +255,7 @@ messages)  to stdout (normal output channel).
 
 @item @code{-t},@code{--no-tty} 
 Do not redefine the terminal characteristics (useful for batch
-processes, see @ref{Editing Input}).  
+processes, see @ref{Editing input}).  
 
 @item @code{-v},@code{--version}             
 Print extended information about the version and configuration of
