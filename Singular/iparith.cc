@@ -246,7 +246,7 @@ cmdnames cmds[] =
   { "prune",       0, PRUNE_CMD ,         CMD_1},
   { "proc",        0, PROC_CMD ,          PROC_CMD},
   { "qring",       0, QRING_CMD ,         ROOT_DECL},
-  { "quotient",    0, QUOTIENT_CMD ,      CMD_2},
+  { "quot",        0, QUOTIENT_CMD ,      CMD_2},
   { "quote",       0, QUOTE ,             QUOTE},
   { "qhweight",    0, QHWEIGHT_CMD ,      CMD_1},
   { "random",      0, RANDOM_CMD ,        CMD_23},
