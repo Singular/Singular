@@ -205,8 +205,8 @@ all:	$(SING_EXEC)
 Singular-static: mod2.h Makefile version.h scanner.cc gmalloc.o \
           ${ASO_OBJS} ${OBJS} \
           iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o
-	echo "#define HAVE_STATIC" > static.h
 	sleep 1
+	echo "#define HAVE_STATIC" > static.h
 	${MAKE} LD_STATIC=1 Singular
 	echo "#undef HABE_STATIC" > static.h
 	${INSTALL_PROGRAM} Singular Singular-static
