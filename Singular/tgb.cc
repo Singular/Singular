@@ -1966,12 +1966,12 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
   kBucketInit(P.bucket,h /*P.p*/,len /*pLength(P.p)*/);
   pTest(h);
   loop
-    {
+  {
       P.p=h;
       P.t_p=NULL;
       P.SetShortExpVector();
       loop
-        {
+      {
           j=kFindDivisibleByInS(strat->S,strat->sevS,sl,&P);
           if (j>=0)
           {
@@ -2024,16 +2024,11 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
 #endif
             break;
           }
-        } /* end loop current mon */
+      } /* end loop current mon */
       poly tmp=pHead(h /*kBucketGetLm(P.bucket)*/);
       act->next=tmp;pIter(act);
-      poly tmp2=pHead(h);
-      pNeg(tmp2);
-      int ltmp2=1;
-      pTest(tmp2);
-      kBucket_Add_q(P.bucket, tmp2, &ltmp2);
 
-      h = kBucketGetLm(P.bucket);
+      h = kBucketExtractLm(P.bucket);
       if (h==NULL)
       {
 #ifdef REDTAIL_PROT
@@ -2043,7 +2038,7 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
         return res;
       }
       pTest(h);
-    }
+  }
 }
 #endif
 
