@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: cmpl.pl,v 1.1 1999-07-19 10:25:14 obachman Exp $
+# $Id: cmpl.pl,v 1.2 1999-07-21 12:13:10 obachman Exp $
 ###################################################################
 #
 # FILE:    cmpl.pl
@@ -59,6 +59,7 @@ elsif ($cmpl eq 'hlp')
 	s/\* (.*):.*/$1/;
 	s/(.*) <\d+>$/$1/;
 	s/^\s*(.*)\s*/$1/;
+	s/([\\#"])/\\$1/g;
 	push @strings, $_ if $_ && $_ ne $prev;
 	$prev = $_;
       }
