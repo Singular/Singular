@@ -1,21 +1,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gmsystem.lib,v 1.1 2000-10-25 10:26:05 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.1 2000-10-31 13:54:37 mschulze Exp $";
 info="
-LIBRARY:  gmsystem.lib  GAUSS-MANIN SYSTEM OF A SINGULARITY
+LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
 AUTHOR:   Mathias Schulze (mschulze@mathematik.uni-kl.de)
 
 OVERVIEW:
- A library to compute invariants related to the Gauss-Manin system 
+ A library to compute invariants related to the Gauss-Manin connection 
  of an isolated hypersurface singularity
 
 PROCEDURES:
- monomat(f);   monodromy matrix of f
- monospec(f);  spectrum of monodromy of f
- vfilt(f);     V-filtration of f on H''/H'
- singspec(f);  singularity spectrum of f
- vjacob(f);    V-filtration of f on Jacobian algebra
+ monomat  : monodromy matrix
+ monospec : spectrum of monodromy
+ vfilt    : V-filtration on H''/H'
+ singspec : singularity spectrum
+ vjacob   : V-filtration on Jacobian algebra
 ";
 
 LIB "jordan.lib";
@@ -131,9 +131,9 @@ static proc redNF(module M,module N,list #)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc monomat(poly f,list #)
-"USAGE:   monomat(f); f poly
+"USAGE:   <matrix> M=monomat(<poly> f);
 ASSUME:  f defines an isolated hypersurface singularity
-RETURN:  a matrix M such that exp(-2*pi*i*M) is a monodromy matrix of f
+RETURN:  exp(-2*pi*i*M) is a monodromy matrix
 EXAMPLE: example monomat; shows an example
 "
 {
@@ -180,7 +180,7 @@ EXAMPLE: example monomat; shows an example
   while(k<K||sdH>0)
   {
     k++;
-    C=coeffs(redNF(w,sJ,U),m,product(maxideal(1)));
+    C=coeffs(redNF(w,sJ,U),m);
     A0=A0+C*var(1)^k;
     if(sdH>0)
     {
@@ -318,10 +318,9 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc monospec(poly f)
-"USAGE:   monospec(f); f poly
+"USAGE:   <matrix> M=monospec(<poly> f);
 ASSUME:  f defines an isolated hypersurface singularity
-RETURN:  a matrix M such that the spectrum of exp(-2*pi*i*M) is the spectrum of
-         the monodromy of f
+RETURN:  the spectrum of exp(-2*pi*i*M) is the spectrum of monodromy
 EXAMPLE: example monospec; shows an example
 "
 {
@@ -337,13 +336,15 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc vfilt(poly f,list #)
-"USAGE:   vfilt(f); f poly
+"USAGE:   <list> l=vfilt(<poly> f);
 ASSUME:  f defines an isolated hypersurface singularity
-RETURN:  a list l where l[1] is an ideal containing the spectral numbers of f
-         in increasing order and l[2] is a list of modules such that l[2][i]
-         contains a vector space basis of the l[1][i]-th graded part of the
-         V-filtration of f on H''/H' in terms of the monomial vector space 
-         basis contained in the ideal l[3]
+RETURN:  <ideal> l[1] : spectral numbers in increasing order
+         <intvec> l[2] :
+           <int> l[2][i] : multiplicity of spectral number l[1][i]
+         <list> l[3] : 
+           <module> l[3][i] : vector space basis of l[1][i]-th graded part 
+                              of the V-filtration on H''/H' in terms of l[4]
+         <ideal> l[4] : monomial vector space basis of H''/H'
 EXAMPLE: example vfilt; shows an example
 "
 {
@@ -384,7 +385,7 @@ EXAMPLE: example vfilt; shows an example
   while(k<K||sdH>0)
   {
     k++;
-    C=coeffs(redNF(w,sJ,U),m,product(maxideal(1)));
+    C=coeffs(redNF(w,sJ,U),m);
     A=A+C*var(1)^k;
     if(sdH>0)
     {
@@ -524,9 +525,9 @@ EXAMPLE: example vfilt; shows an example
   list V;
   matrix Me;
   V[ncols(eM)+1]=std(V1);
+  intvec d;
   if(size(#)>0)
   {
-    intvec d;
     for(i=ncols(eM);i>=1&&number(eM[i])-1>=number(n-1)/2;i--)
     {
       Me=freemodule(mu*N);
@@ -608,9 +609,11 @@ EXAMPLE: example vfilt; shows an example
     for(k=1;k<size(v);k++)
     {
       v[k]=std(reduce(v[k],std(v[k+1])));
+      d[k]=size(v[k]);
     }
-    v[size(v)]=std(v[size(v)]);
-    return(list(s,v,m));
+    v[k]=std(v[k]);
+    d[k]=size(v[k]);
+    return(list(s,d,v,m));
   }
 }
 example
@@ -623,11 +626,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc singspec(poly f)
-"USAGE:   singspec(f); f poly
+"USAGE:   <list> l=singspec(<poly> f);
 ASSUME:  f defines an isolated hypersurface singularity
-RETURN:  a list l where l[1] is an ideal containing the spectral numbers of f
-         in increasing order and l[2] is a list of intvecs such that l[2][i]
-         is the multiplicity of the spectral number l[1][i]
+RETURN:  <ideal> l[1] : spectral numbers in increasing order
+         <intvec> l[2] :
+           <int> l[2][i] : multiplicity of spectral number l[1][i]
 EXAMPLE: example singspec; shows an example
 "
 {
@@ -643,35 +646,36 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc vjacob(poly f)
-"USAGE:   vjacob(f); f poly
+"USAGE:   <list> l=vjacob(f);
 ASSUME:  f defines an isolated hypersurface singularity
-RETURN:  a list l where l[1] is an ideal containing the spectral numbers of
-         the V-filtration of f on the Jacobian algebra in increasing order and 
-         l[2] is a list of modules such that l[2][i] contains a vector space 
-         basis of the l[1][i]-th graded part of the V-filtration of f on the 
-         Jacobian algebra in terms of the monomial vector space basis 
-         contained in the ideal l[3]
+RETURN:  <ideal> l[1] : spectral numbers of the V-filtration on the 
+                        Jacobian algebra in increasing order
+         <intvec> l[2] :
+           <int> l[2][i] : multiplicity of spectral number l[1][i]
+         <list> l[3] : 
+            <module> l[3][i] : vector space basis of l[1][i]-th graded part 
+                               of the V-filtration on the Jaconian algebra
+                               in terms of l[4]
+         <ideal> l[4] : monomial vector space basis of the Jacobian algebra 
 EXAMPLE: example vjacob; shows an example
 "
 {
   list l=vfilt(f);
-  def s,v,m=l[1..3];
+  def s,d,v,m=l[1..4];
   int mu=ncols(m);
 
   int i,j,k;
   module V=v[1];
-  intvec d=ncols(v[1]);
   for(i=2;i<=size(v);i++)
   {
     V=V,v[i];
-    d=d,ncols(v[i]);
   }
   
   ideal sJ=std(jacob(f));
   list M;
   for(i=ncols(m);i>=1;i--)
   {
-    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m,product(maxideal(1)))*V);
+    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V);
   }
 
   int i0,j0,i1,j1;
@@ -748,7 +752,6 @@ EXAMPLE: example vjacob; shows an example
   }
 
   option(redSB);
-
   for(i=1;i<size(v0);i++)
   {
     v0[i+1]=std(v0[i+1]);
@@ -761,6 +764,7 @@ EXAMPLE: example vjacob; shows an example
     i++;
   }
   list v1=v0[i];
+  intvec d1=size(v0[i]);
   ideal s1=s0[i];
   i++;
   while(i<=size(v0))
@@ -768,12 +772,12 @@ EXAMPLE: example vjacob; shows an example
     if(size(v0[i])>0)
     {
       v1=v1+list(v0[i]);
+      d1=d1,size(v0[i]);
       s1=s1,s0[i];
     }
     i++;
   }
-
-  return(list(s1,v1,m));
+  return(list(s1,d1,v1,m));
 }
 example
 { "EXAMPLE:"; echo=2;
