@@ -1,6 +1,5 @@
-// GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.26 2001-01-18 09:32:27 Singular Exp $";
+version="$Id: matrix.lib,v 1.27 2005-01-11 16:17:50 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -32,6 +31,7 @@ PROCEDURES:
  colred(A[,any]);       reduction of matrix A with elementary col-operations
  rm_unitrow(A);         remove unit rows and associated columns of A
  rm_unitcol(A);         remove unit columns and associated rows of A
+ headStand(A);          A[n-i+1,m-j+1]=headStand(A[i,j])
           (parameters in square brackets [] are optional)
 ";
 
@@ -112,7 +112,7 @@ example
 proc diag (list #)
 "USAGE:   diag(p,n); p poly, n integer
          diag(A);   A matrix
-RETURN:  diag(p,n): diagonal matrix, p times unitmatrix of size n.
+RETURN:  diag(p,n): diagonal matrix, p times unit matrix of size n.
 @*       diag(A)  : n*m x n*m diagonal matrix with entries all the entries of
                     the nxm matrix A, taken from the 1st row, 2nd row etc of A
 EXAMPLE: example diag; shows an example
@@ -361,7 +361,7 @@ proc skewmat (int n, list #)
 "USAGE:   skewmat(n[,id]);  n integer, id ideal
 RETURN:  skew-symmetric nxn matrix, with entries from id
          (default: id=maxideal(1))
-         kewmat(n); creates the generic skew-symmetric matrix
+         skewmat(n); creates the generic skew-symmetric matrix
 NOTE:    if id has less than n*(n-1)/2 elements, the matrix is
          filled with 0's,
 EXAMPLE: example skewmat; shows an example
@@ -459,6 +459,13 @@ RETURN:  matrix, tensor product of A and B
 EXAMPLE: example tensor; shows an example
 "
 {
+   if (ncols(A)==0)
+   {
+     int q=nrows(A)*nrows(B);
+     matrix D[q][0];
+     return(D);
+   }
+ 
    int i,j;
    matrix C,D;
    for( i=1; i<=nrows(A); i++ )
@@ -597,7 +604,8 @@ RETURN: - a matrix B, if called with one argument; B is the complete row-
           (resp. as far as this is possible if A is a polynomial matrix;
           no division by polynomials).
 @*      - a list L of two matrices, if called with two arguments;
-          L satidfies L[1] = L[2] * A with L[1] the row-reduced form of A
+          L satisfies transpose(L[2])*A=transpose(L[1])
+	  with L[1] the row-reduced form of A
           and L[2] the transformation matrix.
 NOTE:   * This procedure just applies gauss_col to the transposed matrix.
           The transformation matrix is obtained by applying lift.
@@ -963,5 +971,21 @@ example
    0,1,  0,   0, 0,  0,
    0,0,  1,   0, 0,  0;
    print(rm_unitrow(m));
+}
+//////////////////////////////////////////////////////////////////////////////
+proc headStand(matrix M)
+{
+  int i,j;
+  int n=nrows(M);
+  int m=ncols(M);
+  matrix B[n][m];
+  for(i=1;i<=n;i++)
+  {
+     for(j=1;j<=m;j++)
+     {
+        B[n-i+1,m-j+1]=M[i,j];
+     }
+  }
+  return(B);
 }
 //////////////////////////////////////////////////////////////////////////////
