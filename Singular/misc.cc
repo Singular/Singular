@@ -542,9 +542,9 @@ char * showOption()
 char * versionString()
 {
   char* str = StringSetS("");
-  StringAppend("Singular for %s version %s  (%lu)  %s %s\nwith\n",
+  StringAppend("Singular for %s version %s  (%lu)  %s\nwith\n",
                S_UNAME, S_VERSION1,
-               feVersionId,__DATE__,__TIME__);
+               feVersionId,singular_date);
   StringAppend("\t");
 #ifdef HAVE_FACTORY
               StringAppend("factory(%s),", factoryVersion);

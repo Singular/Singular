@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.78 1999-11-15 17:20:55 obachman Exp $ */
+/* $Id: tesths.cc,v 1.79 2000-04-11 15:18:08 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -34,6 +34,8 @@
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory.h>
 #endif
+
+char *singular_date=__DATE__ " " __TIME__;
 
 /*0 implementation*/
 int main(          /* main entry to Singular */
