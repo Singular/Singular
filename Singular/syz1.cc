@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.63 2000-09-18 09:19:36 obachman Exp $ */
+/* $Id: syz1.cc,v 1.64 2000-10-16 15:22:20 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2719,7 +2719,8 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->Firstelem = (int**)omAlloc0((*length+1)*sizeof(int*));
   syzstr->sev = (unsigned long **) omAlloc0((*length+1)*sizeof(unsigned long *));
   syzstr->bucket = kBucketCreate();
-  int len0=idRankFreeModule(arg)+1;
+  int len0=idRankFreeModule(temp)+1;
+
   startdeg = actdeg;
   nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
   //if (TEST_OPT_PROT) Print("(%d,%d)",howmuch,index);
