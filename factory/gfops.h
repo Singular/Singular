@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.h,v 1.5 1997-09-10 14:21:55 schmidt Exp $ */
+/* $Id: gfops.h,v 1.6 1997-11-19 11:43:24 schmidt Exp $ */
 
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H
@@ -26,6 +26,19 @@ extern unsigned short * gf_table;
 
 extern CanonicalForm gf_mipo;
 
+//{{{ predicates
+inline bool gf_iszero ( int a )
+{
+    return gf_q == a;
+}
+
+inline bool gf_isone ( int a )
+{
+    return 0 == a;
+}
+//}}}
+
+//{{{ conversion functions
 inline int gf_int2gf ( int i )
 {
     while ( i < 0 )
@@ -41,29 +54,22 @@ inline int gf_int2gf ( int i )
     }
     return c;
 }
+//}}}
 
-inline bool gf_iszero ( int a )
-{
-    return gf_q == a;
-}
-
+//{{{ zero and one
 inline int gf_zero()
 {
     return gf_q;
-}
-
-inline bool gf_isone ( int a )
-{
-    return 0 == a;
 }
 
 inline int gf_one()
 {
     return 0;
 }
+//}}}
 
 //{{{ inline int gf_sign ( int a )
-// docu: see CanonicalForm::sign()
+// docu: see imm_sign()
 inline
 int gf_sign ( int a )
 {
@@ -74,6 +80,7 @@ int gf_sign ( int a )
 }
 //}}}
 
+//{{{ arithmetic operators
 inline int gf_neg ( int a )
 {
     // -z^a=z^a*(-1)=z^a*gf_m1;
@@ -143,7 +150,9 @@ inline int gf_inv ( int a )
     ASSERT( a != gf_q, "divide by zero" );
     return gf_q1 - a;
 }
+//}}}
 
+//{{{ input/output
 #ifndef NOSTREAMIO
 inline void gf_print ( ostream & os, int a )
 {
@@ -157,7 +166,9 @@ inline void gf_print ( ostream & os, int a )
 	os << gf_name << "^" << a;
 }
 #endif /* NOSTREAMIO */
+//}}}
 
+//{{{ exponentation
 inline int gf_power ( int a, int n )
 {
     if ( n == 0 )
@@ -167,6 +178,7 @@ inline int gf_power ( int a, int n )
     else
 	return gf_mul( a, gf_power( a, n-1 ) );
 }
+//}}}
 
 void gf_setcharacteristic ( int p, int n, char name );
 
