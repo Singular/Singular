@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.34 2002-06-03 12:14:47 Singular Exp $ */
+/* $Id: ipid.h,v 1.35 2002-06-26 11:16:44 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -142,7 +142,11 @@ idhdl enterid(char * a, int lev, idtyp t, idhdl* root, BOOLEAN init=TRUE);
 idhdl ggetid(const char *n, BOOLEAN local = FALSE);
 idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl);
 void  killid(char * a, idhdl * i);
+#ifdef HAVE_NS
+void killhdl(idhdl h, package prooti=currPack);
+#else
 void  killhdl(idhdl h);
+#endif
 void  killhdl2(idhdl h, idhdl * ih, ring r);
 lists ipNameList(idhdl root);
 void  ipMoveId(idhdl h);

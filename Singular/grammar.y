@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.98 2002-06-18 13:44:38 anne Exp $ */
+/* $Id: grammar.y,v 1.99 2002-06-26 11:16:43 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1122,6 +1122,11 @@ exportcmd:
           else
           {
 #ifdef HAVE_NS
+            package p=(package)$4.Data();
+	    if (p!=$2.req_packhdl)
+	    {
+	      if(iiExport(&$2,0,(idhdl)$4.data)) YYERROR;
+	    }
 #else
             Print("%s::%s;\n", (char *)$4.Name(),$2.Name());
 #endif /* HAVE_NS */
@@ -1142,7 +1147,11 @@ killcmd:
             }
             else
             {
+	      #ifdef HAVE_NS
+              killhdl((idhdl)v->data,v->req_packhdl);
+	      #else
               killhdl((idhdl)v->data);
+	      #endif
             }
             v=v->next;
           } while (v!=NULL);

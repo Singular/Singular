@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.62 2002-06-18 13:45:44 anne Exp $ */
+/* $Id: ipid.cc,v 1.63 2002-06-26 11:16:44 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -462,6 +462,38 @@ void killhdl(idhdl h)
 #endif /* HAVE_NS */
   }
 }
+
+#ifdef HAVE_NS
+void killhdl(idhdl h, package proot)
+{
+  int t=IDTYP(h);
+  if ((BEGIN_RING<t) && (t<END_RING) && (t!=QRING_CMD))
+    killhdl2(h,&currRing->idroot,currRing);
+  else
+  {
+    if(t==PACKAGE_CMD)
+    {
+      killhdl2(h,&(basePack->idroot),NULL);
+    }
+    else
+    {
+      idhdl s=proot->idroot;
+      while ((s!=h) && (s!=NULL)) s=s->next;
+      if (s!=NULL)
+        killhdl2(h,&(proot->idroot),NULL);
+      else if (basePack!=proot)
+      {
+        idhdl s=basePack->idroot;
+        while ((s!=h) && (s!=NULL)) s=s->next;
+        if (s!=NULL)
+          killhdl2(h,&(basePack->idroot),currRing);
+        else
+          killhdl2(h,&(currRing->idroot),currRing);
+       }
+    }
+  }
+}
+#endif /* HAVE_NS */
 
 void killhdl2(idhdl h, idhdl * ih, ring r)
 {
