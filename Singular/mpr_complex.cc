@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.21 2000-06-06 15:46:07 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.22 2000-06-14 08:36:27 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -80,8 +80,8 @@ void setGMPFloatDigits( size_t digits )
   gmp_float::setEqualBits( bits );
   gmp_output_digits= digits;
   mpf_set_default_prec( bits+bits );
-  mpf_set_ui(*gmpRel.mpfp(),1);
-  mpf_div_2exp(*gmpRel.mpfp(),*gmpRel.mpfp(),bits);
+  mpf_set_ui(*gmpRel._mpfp(),1);
+  mpf_div_2exp(*gmpRel._mpfp(),*gmpRel.mpfp(),bits);
 }
 
 size_t getGMPFloatDigits()

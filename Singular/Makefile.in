@@ -218,7 +218,7 @@ Singular: mod2.h Makefile version.h scanner.cc gmalloc.o \
 	  -o Singular \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
 	  ${OBJS} ${LDFLAGS} ${LIBS} \
-	  gmalloc.o ${LD_LIBC}
+	  gmalloc.o 
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
@@ -478,7 +478,7 @@ Singularg: scanner.cc gmalloc.og \
            iparith.og mpsr_Tok.og claptmpl.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
 	tesths.cc iparith.og mpsr_Tok.og claptmpl.og $(OBJG) ${LDFLAGS} ${LIBS} \
-	${LD_DYN_FLAGS} gmalloc.og
+	${LD_DYN_FLAGS} gmalloc.og ${LD_LIBC}
 
 iparith.og: iparith.inc iparith.cc
 	$(CXXG)  ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og

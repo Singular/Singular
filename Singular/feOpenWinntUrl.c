@@ -15,7 +15,7 @@
 #define MAXPATHLEN 1024
 #endif
 
-heOpenWinntUrl(const char* url, int local)
+void heOpenWinntUrl(const char* url, int local)
 {
 #ifdef TEST
   printf("url:%s:local:%d\n", url, local);
