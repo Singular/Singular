@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.22 1999-11-15 17:19:50 obachman Exp $
+// $Id: clapconv.cc,v 1.23 2000-05-31 10:33:19 pfister Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -328,7 +328,7 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
 
 poly convClapAPSingAP ( const CanonicalForm & f )
 {
-  int n = pVariables+1;
+  int n = pVariables+1+rPar(currRing);
   /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
   int * exp = new int[n];
   // for ( int i = 0; i < n; i++ ) exp[i] = 0;
