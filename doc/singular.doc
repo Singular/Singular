@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.21 1998-05-13 08:00:01 wichmann Exp $
+@comment $Id: singular.doc,v 1.22 1998-05-13 08:16:36 schmidt Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -64,7 +64,7 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 * Introduction::
 * General concepts::
 * Data types::
-* Functions and variables::
+* Functions and system variables::
 * Tricks and pitfalls::
 * Examples::
 * Mathematical background::
@@ -91,19 +91,19 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @include general.tex
 
 @c ----------------------------------------------------------------------------
-@node Data types, Functions and variables, General concepts, Top
+@node Data types, Functions and system variables, General concepts, Top
 @chapter Data types
 @cindex Data types
 @include types.tex
 
 @c ----------------------------------------------------------------------------
-@node Functions and variables, Tricks and pitfalls, Data types, Top
-@chapter Functions and variables
+@node Functions and system variables, Tricks and pitfalls, Data types, Top
+@chapter Functions and system variables
 @cindex Commands
 @include reference.tex
 
 @c ----------------------------------------------------------------------------
-@node Tricks and pitfalls, Examples, Functions and variables, Top
+@node Tricks and pitfalls, Examples, Functions and system variables, Top
 @chapter Tricks and pitfalls
 @cindex Tricks and pitfalls
 
