@@ -1,4 +1,4 @@
-// $Id: latex.lib,v 1.2 1998-05-20 15:40:07 gorzel Exp $   
+// $Id: latex.lib,v 1.3 1998-08-07 17:33:55 gorzel Exp $   
 //                        1998/04/17
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 // 
@@ -1211,7 +1211,7 @@ proc texpoly(string fname,def p,list #)
 RETURN:  string, the objects in TeX-typesetting if fname == empty string;
          otherwise append this to file fname.tex; return nothing    
 NOTE:    preceeding ">>" end ending ".tex" may miss in fname;      
-EXAMPLE: example texpoly; shoes an example
+EXAMPLE: example texpoly; shows an example
 "
 { 
   def @r = basering;
@@ -1678,6 +1678,23 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+
+proc tktex (def d)
+{
+ // calls appropriate proc from latex lib
+
+ string typeofd =typeof(d);
+ if (typeofd=="int" or typeofd=="string" or typeofd=="resolution" or typeofd=="map" or typeofd =="list"){ return(d);}
+
+ if (typeofd=="intvec" or typeofd == "intmat" or typeofd =="vector" or
+     typeofd=="matrix" or typeofd == "module")   { return(texobj("",d));}
+ if (typeofd=="ring" or typeofd=="qring") { return(texring("",d));}
+ if (typeofd =="ideal") { return(texobj("",d));}
+ if (typeofd=="number" or typeofd=="poly" or typeofd=="ideal")
+                                                 { return(texpoly("",d));}
+ if (typeofd=="link") {return(d);}
+
+}
 /////////////////////////////  PART0 //////////////////////////////////////////
 
 static proc part0(string fname)

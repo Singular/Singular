@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.13 1998-07-08 12:09:42 obachman Exp $
+// $Id: all.lib,v 1.14 1998-08-07 17:33:53 gorzel Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.13 1998-07-08 12:09:42 obachman Exp $";
+version="$Id: all.lib,v 1.14 1998-08-07 17:33:53 gorzel Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -14,7 +14,8 @@ LIBRARY:  all.lib   Load all libraries
   hnoether.lib  PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
   homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
   inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
-  invar.lib     PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
+  invar.lib     PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS 
+  latex.lib     PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN LATEX2E
   matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
   normal.lib    PROCEDURES FOR COMPUTING THE NORMALIZATION
   poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
@@ -25,22 +26,22 @@ LIBRARY:  all.lib   Load all libraries
   ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
   sing.lib      PROCEDURES FOR SINGULARITIES
   standard.lib  PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
-  latex.lib     PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN TEX
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 LIB "classify.lib";
 LIB "deform.lib";
 LIB "elim.lib";
-LIB "factor.lib";
-LIB "fastsolv.lib";
 LIB "finvar.lib";
 LIB "general.lib";
+LIB "graphics.lib";
 LIB "hnoether.lib";
 LIB "homolog.lib";
 LIB "inout.lib";
 LIB "invar.lib";
+LIB "latex.lib";
 LIB "matrix.lib";
 LIB "normal.lib";
 LIB "poly.lib";
@@ -50,5 +51,3 @@ LIB "primitiv.lib";
 LIB "random.lib";
 LIB "ring.lib";
 LIB "sing.lib";
-LIB "latex.lib";
-// LIB "tools.lib";
