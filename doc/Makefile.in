@@ -93,6 +93,20 @@ html: ${MANUAL_FILES}
 	done
 	touch html
 
+# html stuff
+html_tutor: ${TUTOR_FILES}
+	test -d html_tutor || mkdir html_tutor
+	cd html_tutor && ../texi2html -I .. -menu -expandinfo -number -split_node -verbose ../tutor.tex
+	test -d html || mkdir html
+	test -d html/images || mkdir html/images
+	for img in ${IMAGES}; \
+	do \
+		echo uudecode images/$${img}.uu; \
+		uudecode images/$${img}.uu; \
+	done
+	test -e html_tutor/images || (cd html_tutor; ln -s ../html/images images)
+	touch html_tutor
+
 # how to create the texinfo files
 %.tex: %.doc doc2tex ${SINGULAR}
 	@ echo
