@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.9 1997-10-08 09:19:17 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.10 1997-10-22 14:04:26 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -798,7 +798,7 @@ ftestWriteSeed ()
 	    ftestError( FileError,
 			"failed to open `%s' for writing: %s\n", ftestSeedFile,
 			strerror( errno ) );
-	fprintf( seedFile, "%d\n", factoryrandom() );
+	fprintf( seedFile, "%d\n", factoryrandom( 0 ) );
 	fclose( seedFile );
     }
 }
