@@ -1,3 +1,7 @@
+Tue Sep  9 11:05:28 MET DST 1997
+        * hannes: flex-staff is now in febase.inc
+               changed tutorial (doc/examples.doc, version-no: doc/tutor.tex)
+
 Fri Aug 15 11:44:13 MESZ 1997  Kai Krueger <krueger@mathematik.uni-kl.de>
 	* ndbm.cc: fix open-bug  for dos
 	  default mode of open is ascii, we need binary mode.
