@@ -1,0 +1,67 @@
+Thu Jul 17 10:15:59 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+New features in Factory, version 1.3a:
+======================================
+  Besides minor changes at 'source code level' (bug fixes, new features)
+which are not really visible to the user in general there are quite a lot
+of changes at 'organization level' (aka 'preprocessor level') and at
+'distribution level' (configure, Makefile).
+
+
+Source code level:
+------------------
+o Serious bug in univariate factorization in characterstic 0 fixed (by
+  R"udiger).
+
+o New gcd algorithm (sparse modular), not fully testes by now (contributed
+  by Marion Bruder).  Switch on with SW_USE_SPARSEMOD.
+
+o Various minor bug fixes.
+
+
+Organization level:
+-------------------
+o Factory translates now on Macintosh with metroworks
+  CodeWarrior Academic Pro 11 (changes by Wilfred Pohl)
+
+o So called 'new' memory manager (written by R"udiger) added to
+  distribution.  So far no timigs available which memory manager is
+  faster.
+
+o ASSERT, DEBOUT, TIMING macros streamlined
+
+o Factory's IO completely re-organized (that was a mess!).  It is now
+  possible to switch off everything which is related to stream IO (use
+  --disbale-streamio option to configure).  This way it is possible to link
+  Factory without libg++.  Changes include:
+
+  - everything related to stream IO wrapped by '#ifndef NOSTREAMIO'
+  - all error messages/debug output messages rewritten so they use the
+    ASSERT and DEBOUT macros
+  - furthermore, it was necessary to change the way the GF(q) tables are
+    read.  As a consequence, the format of the GF(q) tables slightly
+    changed, too.  You have to generate/get them from net by new.
+
+
+Distribution level:
+-------------------
+o The organization of the distribution as well as the compile/install
+  procedure totally changed.  It is now more GNU like.  See the INSTALL
+  file and the README file for more information.
+
+o The file names of the template sources changed.  To make them less
+  canonical, all names are prefixed with 'ftmpl_' ('Factory template') now.
+
+o The installation target directories and their structure changed a little
+  bit.  See the INSTALL file for more information.
+
+
+
+Before May 3 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+New features in Factory, version 1.2c:
+======================================
+  Version 1.2c is a more or less inofficial version distributed with
+Singular 1.0.  I hope it does not distribute to far...  The description of
+new features to version 1.3a cope the description of new features to this
+version.
