@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.33 2000-12-05 11:15:08 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.34 2000-12-12 11:03:00 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -27,7 +27,6 @@
 #include "ideals.h"
 #include "matpol.h"
 #include "lists.h"
-#include "sing_mp.h"
 
 #include <limits.h>
 
